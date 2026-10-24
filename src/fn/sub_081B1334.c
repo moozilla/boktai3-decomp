@@ -1,12 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.1%
-// fix.py best version (reprinted C)
 // confidence=low: provisional role inferred from state transitions and player-motion calls
 
 // confidence=low: part approaches the player and chooses contact or timeout animation
-// Remaining differences: Entry/reset pointer allocation, guarded-transition address reuse, and final stores differ.
 #include "display_animation.h"
 #include "scene_vec.h"
 struct ActorStatusPart {
@@ -24,7 +20,7 @@ struct ActorStatusPart {
     u8 unknownA4[0xb8];
     u32 variant, flags, state, timer;
     u8 action, previousAction, reset, enter, finished;
-    u8 unknown171[0x2b];
+    u8 unknown171[7];
     u32 countdown;
 };
 void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
@@ -79,9 +75,11 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
         u32 elapsed = state->elapsed + 1;
         register u32 mask asm("r6");
         u32 temp;
-        register u32 savedDuration asm("r3");
+        u8 savedDuration;
         state->elapsed = elapsed;
         temp = 0xFFFF;
+        /* Preserve the current command while establishing the frame-index mask. */
+        asm("" : "+r"(temp) : "r"(command));
         mask = temp;
         duration = state->duration;
         elapsed = (u16)elapsed;
@@ -90,7 +88,7 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
             state->elapsed = 0;
             flags = state->flags;
             if (flags & 4) {
-                s16 index = state->index;
+                u32 index = state->index;
                 if (index == 0) {
                     u32 hold = 8;
                     hold &= flags;
@@ -305,7 +303,7 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
             case 2: {
                 u32 entered;
                 {
-                    register u8 *address asm("r0") = &p->enter;
+                    register u8 *address = &p->enter;
                     entered = *address;
                     enter = address;
                 }
@@ -318,13 +316,12 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
                 if ((++p->timer) > 120) {
                     SetAnimation(p, owner, 9, 0);
                     {
-                        register u32 next asm("r1") = 3;
+                        register u32 next = 3;
                         p->state = next;
                     }
                     p->timer = 0;
                     {
                         u8 *e = enter;
-                        asm("" : "+r"(e));
                         *e = 1;
                     }
                 }
@@ -337,6 +334,3 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdateGuardedApproach);
-#endif
