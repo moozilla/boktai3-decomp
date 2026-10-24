@@ -1,10 +1,6 @@
 #include "global.h"
 #include "contact_actor.h"
-#ifdef NONMATCHING
-// fuzzy: 63.2%
-// Loop-invariant layout matches (table, &offset, index, 1023, zero hoisted; sine table kept in
-// the loop by setting it twice). Remaining: the ROM keeps the sine pointer in r2 for the second
-// lookup instead of reloading it, v[1] reuses the hoisted zero, and i/table registers rotate.
+// MATCHING_CONCESSION: register-pinning
 struct SpriteEffectController;
 struct SpriteEffectController *SpriteEffectController_Create(const struct ContactPosition *,
                                                              const struct ContactPosition *, s32,
@@ -27,28 +23,36 @@ static inline int step(const u16 *table)
 
 void sub_0817AEC8(u8 *p, int direction)
 {
-    int i;
+    const u16 *table;
+    int i = 0;
     s16 offset[4];
-    for (i = 0; i < 6; i++) {
-        const u16 *table = gUnk_0203B400;
+    {
+        const u16 *randomTable = gUnk_0203B400;
+        asm("" : "+r"(randomTable));
+        table = randomTable;
+    }
+    for (; i < 6; i++) {
         s16 *v = offset;
         int angle = ((step(table) >> 4) & 63);
         int radius = ((step(table) >> 4) & 31);
         int life;
-        const s16 *sine;
-        angle = angle + direction - 32;
-        radius = radius + i * 4 + 2;
+        int spread;
+        int speed;
+        int zero = 0;
+        int heading;
+        register const s16 *sine asm("r2");
+        spread = i * 4;
+        heading = angle + direction;
+        heading -= 32;
+        speed = radius + spread;
+        speed += 2;
         sine = gUnk_086149C4;
-        v[0] = Scale(sine[(angle + 64) & 255] * radius);
-        v[1] = 0;
-        sine = gUnk_086149C4;
-        v[2] = Scale(sine[angle & 255] * radius);
+        v[0] = Scale(sine[(heading + 64) & 255] * speed);
+        v[1] = zero;
+        v[2] = Scale(sine[heading & 255] * speed);
         life = ((step(table) >> 4) & 15) + 16;
         SpriteEffectController_Create((struct ContactPosition *)(p + 0x54),
                                       (struct ContactPosition *)offset, 0x1C1E, 0xD43F, 0, 0, 0x11,
                                       1, 1, 2, 0, life, 0, 0, 0, 0, -4, -4);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0817AEC8);
-#endif
