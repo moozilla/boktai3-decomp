@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 extern u8 *gUnk_02000580;
@@ -51,11 +50,10 @@ static inline u8 ReactionFlag(struct SceneActorReactionMotion *reaction, u32 mas
 }
 static inline u8 ContextFlag(struct GhostPlayerReaction *state, u32 input, u32 **saved)
 {
-    register u32 mask asm("r2") = input;
+    u32 mask = input;
     u32 *flags = &state->flags;
-    register u32 tested asm("r0");
+    u32 tested;
     tested = *flags & mask;
-    asm("" : : "r"(tested));
     *saved = flags;
     if (tested)
         return 1;
