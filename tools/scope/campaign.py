@@ -221,8 +221,8 @@ def cmd_tick(args):
                                    + " Take one more round of up to 80"
                                    " compiles on the remaining hunks (why on each, confirm with a knob, then C;"
                                    " a pin is acceptable only as the last resort). scope has new commands since"
-                                   " you started: `scope.py FILE.c probe` flips each cse/gcse decision"
-                                   " (canonical register, jump follow, PRE) alone and names the one behind the"
+                                   " you started: `scope.py FILE.c probe` flips each cse/gcse/loop decision"
+                                   " (canonical register, jump follow, PRE, loop strength reduction) alone and names the one behind the"
                                    " difference, with the C lines involved; and a difference that is only a"
                                    " moved branch target is now explained (loop head or jump threading)."
                                    " Rerun scope on your best file first. Update the deliverables." + hint)):
