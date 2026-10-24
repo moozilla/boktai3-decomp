@@ -2,9 +2,8 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 // confidence=low: neighboring Skeleton controls establish provisional role
-#ifdef NONMATCHING
-// fuzzy: 94.3%
-// Remaining differences: cached group/route addresses, north/south scan tails, and terrain-load registers.
+// MATCHING_CONCESSION: register-pinning
+// Keep the map address live through each final signed width load.
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 u8 sub_0812E118(u32, u32, u32, u32);
@@ -83,6 +82,7 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
     u32 cell, height, shape;
     s32 chosen, next, i;
     void **route;
+    struct EngineMap **mapSlot;
 
     do {
         cell = actor->terrainCell;
@@ -107,12 +107,12 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
                 route = &actor->routeObject;
                 do {
                     if (!sub_0812E118(cell, next, height, shape))
-                        break;
-                    next += MapWidth();
+                        goto finishSouth;
+                    mapSlot = &gUnk_030052F4;
+                    next += *(s16 *)((*mapSlot)->cells + 4);
                     i++;
                 } while (i < steps);
-                chosen = next - MapWidth();
-                break;
+                goto finishSouthLoaded;
             case 2:
                 next = cell - 1;
                 i = 0;
@@ -131,11 +131,23 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
                 route = &actor->routeObject;
                 do {
                     if (!sub_0812E118(cell, next, height, shape))
-                        break;
-                    next -= MapWidth();
+                        goto finishNorth;
+                    mapSlot = &gUnk_030052F4;
+                    next -= *(s16 *)((*mapSlot)->cells + 4);
                     i++;
                 } while (i < steps);
-                chosen = next + MapWidth();
+                goto finishNorthLoaded;
+            finishSouth:
+                mapSlot = &gUnk_030052F4;
+            finishSouthLoaded:
+                chosen = next - *(s16 *)((*mapSlot)->cells + 4);
+                asm volatile("" : "+r"(mapSlot));
+                break;
+            finishNorth:
+                mapSlot = &gUnk_030052F4;
+            finishNorthLoaded:
+                chosen = next + *(s16 *)((*mapSlot)->cells + 4);
+                asm volatile("" : "+r"(mapSlot));
                 break;
             default:
                 chosen = actor->terrainCell;
@@ -151,10 +163,11 @@ selected:
     actor->direction = priorDirection;
     SceneActorTerrain_GetCenter(chosen, &center);
     {
-
+        s16 groupOffset = (u32) & ((struct SceneActorRegistryResetView *)0)->group;
+        u8 *group = (u8 *)actor + groupOffset;
         if (TryRoute(actor, *route, &actor->position, &center))
             return 1;
-        Callback_InvokeActor(actor, *(void **)((u8 *)&actor->group + 0x224));
+        Callback_InvokeActor(actor, *(void **)(group + 0x224));
     }
     return 0;
 }
@@ -163,6 +176,3 @@ u32 Skeleton_TrySelectRetreatCell(struct SceneActorRegistryResetView *actor, u32
 {
     return SelectRetreat(actor, priorDirection, 1);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Skeleton_TrySelectRetreatCell);
-#endif
