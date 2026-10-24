@@ -441,6 +441,12 @@ def rom_pool_ranges(code, addr):
     return sorted((t, t + 4) for t in data)
 
 
+def rom_data(func, addr, code):
+    """The ROM function's data ranges: its generated assembly's, plus the literal pools its
+    pc-relative loads reach (a function the disassembler left as .incbin has no labels at all)."""
+    return sorted(set(rom_data_ranges(func, addr) or []) | set(rom_pool_ranges(code, addr)))
+
+
 # ---------------------------------------------------------------- decode
 
 def decode(code, addr, data):
@@ -587,10 +593,7 @@ def align(rom, mine):
 
 def report(src, func, rom_code, addr, mine, info, t_compile):
     wd = info["wd"]
-    rdata = rom_data_ranges(rom_name(src, func), addr)
-    if rdata is None:
-        rdata = rom_pool_ranges(rom_code, addr)
-    rom = decode(rom_code, addr, rdata)
+    rom = decode(rom_code, addr, rom_data(rom_name(src, func), addr, rom_code))
     mdata = info["data"] if "data" in info else mapping_ranges(os.path.join(wd, "u.o"), info["obj_offset"], len(mine))
     dr = decode(mine, addr, mdata)
     ann = draft_annotations(wd, info["obj_name"], dr, info["obj_offset"], info.get("lines"))
@@ -1585,10 +1588,7 @@ def fast_score(src, func, env):
     if mine == rom_code:
         return 0, "MATCH"
     if addr not in _ROMDEC:
-        rdata = rom_data_ranges(rom_name(src, func), addr)
-        if rdata is None:
-            rdata = rom_pool_ranges(rom_code, addr)
-        _ROMDEC[addr] = decode(rom_code, addr, rdata)
+        _ROMDEC[addr] = decode(rom_code, addr, rom_data(rom_name(src, func), addr, rom_code))
     pairs, _ = align(_ROMDEC[addr], decode(mine, addr, mdata))
     rows = [{"tag": t} for _, _, t in pairs]
     return sum(1 for r in rows if r["tag"] != "="), count_text(rows)
@@ -2331,7 +2331,7 @@ def cmd_rom(target):
     if addr is None:
         sys.exit(f"{target}: not in the function inventory")
     code = rom_bytes()[off(addr):off(addr) + sizes[target]]
-    data = sorted(set(rom_data_ranges(target, addr) or []) | set(rom_pool_ranges(code, addr)))
+    data = rom_data(target, addr, code)
     names = {a & ~1: n for n, a in funcs}
     for n, (v, _) in elf_syms().items():
         if not n.startswith(("_", "$")) and not n.endswith("__addr"):
@@ -2510,10 +2510,18 @@ def cmd_try(src, func, variants, env):
     knobs = " ".join(f"{k}={v}" for k, v in env.items())
     print(f"{func}: base {src}{' [' + knobs + ']' if knobs else ''}: {base_info.get('counts', 'MATCH')}."
           f" {len(variants)} variants in {dt:.2f}s ({dt / max(1, len(variants) + 1) * 1000:.0f} ms each)")
-    rows.sort(key=lambda r: (r[0] is None, r[0] if r[0] is not None else 0))
+    def key(n, counts):
+        """Rank by the counts shown: the larger side, then the total, then differing rows."""
+        m = re.match(r"(\d+) ROM / (\d+) draft", counts or "")
+        if n is None:
+            return None
+        return (0, 0, 0) if n == 0 else (max(int(m[1]), int(m[2])), int(m[1]) + int(m[2]), n) if m else (n, n, n)
+    base_k = key(base_n, base_info.get("counts", "MATCH"))
+    rows.sort(key=lambda r: (r[0] is None, key(r[0], r[2]) or (0,)))
     for n, name, counts, change in rows:
-        mark = "MATCH" if n == 0 else ("better" if n is not None and n < base_n else
-                                       "same" if n == base_n else "worse" if n is not None else "")
+        k = key(n, counts)
+        mark = "MATCH" if n == 0 else ("better" if k is not None and k < base_k else
+                                       "same" if k == base_k else "worse" if k is not None else "")
         print(f"  {mark:6} {counts:44} {name}" + ("" if change == "knob" else f"  [{change}]"))
     best = rows[0] if rows else None
     if best and best[0] is not None and best[3] != "knob":
