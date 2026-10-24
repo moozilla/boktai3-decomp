@@ -1,6 +1,6 @@
 #include "contact_swarm.h"
 #ifdef NONMATCHING
-// fuzzy: 98.6%
+// fix.py best version
 // Only the speed-byte stack reload uses r0 instead of r2; the reviewed body is 428 bytes.
 #define ContactSwarm_SpawnPairedAdvanceCount sub_08044AD4
 void ContactSwarm_SetDirectionalSequence(struct ContactSwarm *, struct ContactSwarmSlot *, u32);
@@ -16,6 +16,7 @@ s32 ContactSwarm_SpawnPairedAdvanceCount(struct ContactSwarm *pool,
     struct ContactSwarmDrawPacket *draw;
     s32 index;
     s32 limit;
+    typeof(&slot->resourceCollider) t1;
     headings[0] = direction - 96;
     headings[1] = direction + 96;
     slot = &pool->slots[0];
@@ -52,9 +53,9 @@ s32 ContactSwarm_SpawnPairedAdvanceCount(struct ContactSwarm *pool,
                     slot->state = state;
                     slot->enter = state;
                     slot->stateFrame = active;
-                    table = (const u16 *)RANDOM_TABLE_ADDR;
+                    table = (const u16 *)0x0203B400;
                     counter = &gUnk_03005308;
-                    randomIndex = *counter + 1;
+                    randomIndex = (*counter) + 1;
                     randomMask = 1023;
                     randomIndex &= randomMask;
                     firstWord = table[randomIndex];
@@ -65,7 +66,7 @@ s32 ContactSwarm_SpawnPairedAdvanceCount(struct ContactSwarm *pool,
                     {
                         s32 stagger = index;
                         {
-                            u32 frames = stagger * 8 + 15;
+                            u32 frames = (stagger * 8) + 15;
                             slot->trackingFrames = frames;
                         }
                     }
@@ -79,7 +80,7 @@ s32 ContactSwarm_SpawnPairedAdvanceCount(struct ContactSwarm *pool,
                     headingIndex &= 1;
                     heading = headings[headingIndex];
                     secondWord &= 63;
-                    slot->direction = heading + secondWord - 32;
+                    slot->direction = (heading + secondWord) - 32;
                     slot->speed = speed;
                 }
                 destination = &slot->display.animation.draw.sprite.position;
@@ -101,10 +102,11 @@ s32 ContactSwarm_SpawnPairedAdvanceCount(struct ContactSwarm *pool,
                     view->graphics.paletteData = palette;
                 }
                 {
-                    u32 offset = (u8 *)slot->shadow - (u8 *)slot;
-                    ActorShadow_Enable((u8 *)slot + offset);
+                    u32 offset = ((u8 *)slot->shadow) - ((u8 *)slot);
+                    ActorShadow_Enable(((u8 *)slot) + offset);
                 }
-                collider = &slot->resourceCollider;
+                t1 = &slot->resourceCollider;
+                collider = t1;
                 Collider_SetPosition(collider, destination, 0);
                 Collider_SetAttackProperties(collider, resourceId, cost, 0x8000, active, option);
                 collider = &slot->display.healthCollider;
@@ -125,9 +127,9 @@ s32 ContactSwarm_SpawnPairedAdvanceCount(struct ContactSwarm *pool,
                 u32 stride;
                 nextIndex++;
                 index = nextIndex;
+                draw = (void *)(((u8 *)draw) + stride);
                 stride = sizeof(*slot);
-                draw = (void *)((u8 *)draw + stride);
-                slot = (void *)((u8 *)slot + stride);
+                slot = (void *)(((u8 *)slot) + stride);
             }
             limit = count;
         } while (index < limit);
@@ -138,7 +140,8 @@ s32 ContactSwarm_SpawnPairedAdvanceCount(struct ContactSwarm *pool,
         s8 *level;
         u8 *reverse;
         u8 *bank;
-        void *first, *second;
+        void *first;
+        void *second;
         *fadeActive = 1;
         level = &pool->fadeLevel;
         *level = 20;
@@ -146,7 +149,7 @@ s32 ContactSwarm_SpawnPairedAdvanceCount(struct ContactSwarm *pool,
         *reverse = zero;
         bank = gUnk_030042E4;
         first = bank + 0x5A60;
-        second = bank + 0x5A60 + 0x80;
+        second = (bank + 0x5A60) + 0x80;
         Palette_InterpolateBanks(pool->palette, first, second, *level, 5);
     }
     return 0;

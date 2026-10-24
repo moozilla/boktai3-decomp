@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 94.7%
+// fix.py best version
 // fix.py best version (reprinted C)
 // confidence=low: limits the tether target distance and clips its position against terrain.
 
@@ -136,10 +136,11 @@ void Player_ConstrainTetherTarget(struct Actor *input, s32 dx, s32 dz, s32 radiu
             candidate.y = heightAt((void *)(&candidate));
         x = actor->position.x - candidate.x;
         z = actor->position.z - candidate.z;
-        angle = Math_Atan2(x, z);
+        angle = (u16)Math_Atan2(x, z);
         TetherActor_SetInteractionTarget(&candidate, ((((u16)angle) + 0x70) >> 5) & 7);
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Player_ConstrainTetherTarget);
 #endif

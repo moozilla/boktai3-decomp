@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 65.7%
+// fix.py best version
 // fix.py best version (reprinted C)
 // Directional pair placement recovered; stack-vector allocation and projection ordering differ.
 
@@ -51,6 +51,20 @@ static inline void Add(struct Vec *out, struct Vec *a, struct Vec *b)
     out->x = (u16)a->x + (u16)b->x;
     out->y = (u16)a->y + (u16)b->y;
     out->z = (u16)a->z + (u16)b->z;
+}
+
+inline static void Project_0813BAD8(struct Vec *screen, struct PackedVec *world)
+{
+    u8 x = world->x;
+    u8 z = world->z;
+    s32 depth;
+    u16 height;
+    screen->x = Scale(x - z);
+    depth = Scale(x + z);
+    height = Scale(world->y);
+    screen->x = (((u16)screen->x) - ((u16)gUnk_03005418.x)) + 120;
+    screen->y = ((depth - height) - ((u16)gUnk_03005418.y)) + 80;
+    screen->z = (depth + height) - ((u16)gUnk_03005418.z);
 }
 
 void sub_0813BAD8(u8 *p)
@@ -117,15 +131,15 @@ void sub_0813BAD8(u8 *p)
     position.x = *((s16 *)(p + 0x30));
     position.z = *((s16 *)(p + 0x34));
     position.y = *((s16 *)(p + 0x32));
-    Project(&projected, &position);
-    first.x -= 4;
+    Project_0813BAD8(&projected, &position);
+    second.x = (first.x -= 4);
     first.y -= 4;
-    second.x -= 4;
     second.y -= 4;
     Add((struct Vec *)(p + 0x790), &projected, &first);
     Add((struct Vec *)(p + 0x7B8), &projected, &second);
     return;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0813BAD8);
 #endif

@@ -1,9 +1,5 @@
 #include "scene_actor_animation.h"
 
-#ifdef NONMATCHING
-// fuzzy: 88.0%
-// fix.py best version (reprinted C)
-// Remaining: direction arithmetic, constant derivation, address reuse and callback setup registers.
 // confidence=low: turns one octant toward the requested direction on animation ticks.
 
 void Axe_GetDirectionalFrame(u8, u32 *, u32 *);
@@ -93,6 +89,22 @@ static inline u32 Arg2(u32 k_, struct SceneActorAnimationView *actor)
     return (*((u32 *)(((u8 *)actor) + 0x2CC))) & k_;
 }
 
+inline static void Control_UpdateTurnAnimation(struct SceneActorAnimationView *a, void *callback,
+                                               u32 phase)
+{
+    a->directionalEntryFlag = 1;
+    a->unknown2B0 = 0;
+    *((u8 *)(((u8 *)a) + 0x2B5)) = phase;
+    *((void **)(((u8 *)a) + 0x21C)) = callback;
+    *((u16 *)(((u8 *)a) + 0x2C8)) = 0;
+    {
+        u32 *flags = &(*((u32 *)(((u8 *)a) + 0x114)));
+        u32 mask = ~1;
+        *flags &= mask;
+    }
+    *((u32 *)(((u8 *)a) + 0x104)) = 0;
+}
+
 void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
 {
     u8 *direction = ((u8 *)actor) + 0x50;
@@ -103,14 +115,22 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
         s32 target = ((actor->nextDirection + 0x70) >> 5) & 7;
         if (current == target) {
             actor->direction = actor->nextDirection;
-            Control(actor, *((void **)(((u8 *)actor) + 0x22C)), 0);
+            Control_UpdateTurnAnimation(actor, *((void **)(((u8 *)actor) + 0x22C)), 0);
             actor->unknown2B0 = 1;
             return;
         }
-        if (((current - (target - 8)) & 7) <= 4)
-            *((u32 *)(((u8 *)actor) + 0x2CC)) &= ~0x10000;
-        else
-            *((u32 *)(((u8 *)actor) + 0x2CC)) |= 0x10000;
+        target -= 8;
+        {
+            s32 k1 = 4;
+            if (((u8)((current - target) & 7)) <= k1) {
+                u32 *p = (u32 *)(((u8 *)actor) + 0x2CC);
+                u32 mask = ~0x10000;
+                *p &= mask;
+            } else {
+                u32 mask = 0x10000;
+                *((u32 *)(((u8 *)actor) + 0x2CC)) |= mask;
+            }
+        }
     }
     sequence = ((u8 *)actor->drawable) + 0x48;
     if (Arg1(0xA02F, actor)) {
@@ -135,7 +155,7 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
         u32 variant;
         u32 flags;
         u32 selection;
-        Control(actor, *((void **)(((u8 *)actor) + 0x224)), 2);
+        Control_UpdateTurnAnimation(actor, *((void **)(((u8 *)actor) + 0x224)), 2);
         if (Arg2(0x10000, actor))
             direction[9] += 32;
         else
@@ -146,6 +166,4 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
         Select(actor, selection, variant, flags);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Axe_UpdateTurnAnimation);
-#endif
+

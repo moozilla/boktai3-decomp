@@ -5,6 +5,9 @@
 #ifdef NONMATCHING
 // fuzzy: 98.8%
 // foundry draft (worker best 86.5%); what differs is mostly register allocation and instruction order
+// The ROM recomputes &scratch.step (add r5, sp, #0xc; ldrh [r5, #4]) for the z add. An inline
+// AddZ(s16 *, const struct ContactPosition *) gives that form, but gcse PRE then replaces it with
+// the reaching copy of v; no single canon/follow/pre knob (tools/rtlprobe.py) matches.
 extern const s16 gUnk_086149C4[];
 void Skeleton_TickDecayingLunge(void);
 s32 SceneParticleBurst_CreateWithPause(const struct ContactPosition *,
