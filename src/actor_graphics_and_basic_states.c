@@ -52,9 +52,6 @@ void SceneActorGraphics_SelectResource(u8 *p)
     }
 }
 
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining: contact-store scheduling, field-address lifetimes, and registers.
 #define SceneActorGraphics_OnDamageContact sub_08021F4C
 extern u8 *gUnk_02000580;
 extern u32 gUnk_030053F4;
@@ -68,17 +65,28 @@ void WirelessGame_AddItem(void *, s32);
 struct ContactVector {
     s16 x, y, z;
 };
-void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contactArg, u8 *actorArg)
+struct DamageContactActor {
+    u8 pad[0x33c];
+    union {
+        u32 value;
+        u16 halves[2];
+    } damage;
+};
+
+static inline u32 TestContactFlags(u32 *flags, u32 mask)
 {
-    register u8 *contact asm("r4") = contactArg;
-    register u8 *p asm("r5") = actorArg;
-    register u8 *actor asm("r8") = p;
-    register u8 *sprite asm("sb") = p + 0x48;
-    register u32 mode asm("sl");
+    return *flags & mask;
+}
+
+void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
+{
+    u8 *actor = p;
+    u8 *sprite = p + 0x48;
+    u32 mode;
     struct ContactVector size;
     u8 *position;
     s32 item;
-    typeof(*((u16 *)(source + 0x44))) t1;
+    u16 responseValue;
     if (*((u16 *)(p + 0x34e)))
         return;
     mode = gUnk_02000580[0x418];
@@ -87,8 +95,7 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contactArg, u8 *actorArg
         *((u16 *)(contact + 0x3e)) = 0;
     if (!(gUnk_030053F4 & 0x1000))
         PlayerStats_AddContactHundredths(source, contact, *((s16 *)(p + 0x380)));
-    *((u32 *)(p + 0x33c)) = *((u16 *)(contact + 0x3e));
-    asm("" : : : "memory");
+    ((struct DamageContactActor *)p)->damage.value = *((u16 *)(contact + 0x3e));
     if ((*((u16 *)(contact + 0x3e))) == 0) {
         Sound_PlaySongChecked(0x211);
         *((u16 *)(p + 0x34c)) = 10;
@@ -100,18 +107,23 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contactArg, u8 *actorArg
     }
     {
         u32 k1 = 0x100;
-        if ((*((u16 *)(source + 6))) & k1)
-            p[0x342] = source[0x42];
-        else
+        if ((*((u16 *)(source + 6))) & k1) {
+            u8 angle = source[0x42];
+            p[0x342] = angle;
+        } else
             p[0x342] = Math_Atan2((*((s16 *)(contact + 0x24))) - (*((s16 *)(source + 0x24))),
                                   (*((s16 *)(contact + 0x28))) - (*((s16 *)(source + 0x28))));
     }
-    *((u32 *)(actor + 0xbc)) = *((u32 *)(source + 0x34));
-    *((u32 *)(actor + 0xc0)) = *((u32 *)(source + 0x38));
-    t1 = *((u16 *)(source + 0x44));
-    *((u16 *)(p + 0x34e)) = t1;
+    {
+        u32 value = *((u32 *)(source + 0x34));
+        *((u32 *)(actor + 0xbc)) = value;
+        value = *((u32 *)(source + 0x38));
+        *((u32 *)(actor + 0xc0)) = value;
+    }
+    responseValue = *((u16 *)(source + 0x44));
+    *((u16 *)(p + 0x34e)) = responseValue;
     PlayerStats_AddContactHundredths(source, contact, actor[0xe2]);
-    if (((*((s32 *)(p + 0x33c))) > 0) && ((*((u32 *)(source + 0x38))) & 1))
+    if (((*((s32 *)(p + 0x33c))) > 0) && TestContactFlags((u32 *)(source + 0x38), 1))
         p[0x340] = 1;
     if (!(gUnk_030053F4 & 0x1000))
         return;
@@ -123,12 +135,13 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contactArg, u8 *actorArg
     }
     if (contact[0x43] & 8)
         WirelessGame_AddItem(contact + 0xc, 0);
-    if (!((*((u32 *)(source + 0x38))) & 0x800000))
+    if (!TestContactFlags((u32 *)(source + 0x38), 0x800000))
         return;
-    item = (s16)((*((u16 *)((((u8 *)gUnk_02000710) +
-                             ((*((s16 *)(((u8 *)gUnk_02000710) + 0x52))) << 1)) +
-                            0x88))) -
-                 6);
+    {
+        u8 *stats = (u8 *)gUnk_02000710;
+        u32 offset = *((s16 *)(stats + 0x52)) << 1;
+        item = (s16)(*((u16 *)(offset + (u32)stats + 0x88)) - 6);
+    }
     switch ((u32)item) {
         case 0:
             WirelessGame_AddItem(contact + 0xc, 2);
@@ -144,31 +157,24 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contactArg, u8 *actorArg
 
         case 3:
             contact += 0xc;
-            position = contact;
-            WirelessGame_AddItem(position, 2);
-            WirelessGame_AddItem(position, 1);
+            WirelessGame_AddItem(contact, 2);
+            WirelessGame_AddItem(contact, 1);
             break;
 
         case 4:
             contact += 0xc;
-            position = contact;
-            WirelessGame_AddItem(position, 2);
-            WirelessGame_AddItem(position, 3);
+            WirelessGame_AddItem(contact, 2);
+            WirelessGame_AddItem(contact, 3);
             break;
 
         case 5:
             contact += 0xc;
-            position = contact;
-            WirelessGame_AddItem(position, 2);
-            WirelessGame_AddItem(position, 1);
-            WirelessGame_AddItem(position, 3);
+            WirelessGame_AddItem(contact, 2);
+            WirelessGame_AddItem(contact, 1);
+            WirelessGame_AddItem(contact, 3);
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08021F4C);
-#endif
 
 void SceneActorGraphics_InitBodyNoOp(void)
 {
@@ -823,19 +829,7 @@ extern u8 *gUnk_030042E4;
 
 void SceneMessages_SetPendingTrigger(void *, void *);
 
-void Trigger_ConsumePending(void *, s32);
-
-void SceneActors_StopBackgroundFlash(void *);
-
-void BackgroundFlash_BeginAlternating(void *);
-
-void BackgroundFlash_BeginAppearance(void *);
-
-s32 SceneActorGraphics_GetResourceId(void *);
-
 void CpuSet(const void *, void *, u32);
-
-void SceneActors_ConfigureEffect(void *, s32, s32, s32);
 
 static inline void setStateFull(struct S *s, u32 state, u32 entered, u32 sub)
 {
