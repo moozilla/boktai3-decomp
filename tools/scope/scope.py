@@ -28,12 +28,70 @@ import json
 import os
 import pickle
 import re
+import socket
 import subprocess
 import sys
 import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TOOLS = os.path.dirname(HERE)
+SOCK = os.path.join(os.path.dirname(TOOLS), "build", "scope", "serve.sock")
+FORWARD = ("AGBCC_", "CSE_", "SCOPE_", "CPP")  # environment a command reads, sent with it to the server
+
+
+def _client():
+    """Run this command in the resident `scope.py serve` when one is up: it keeps the ROM, symbols,
+    capstone and inventory warm, so a command costs its own work and not two Python startups and
+    cache loads. Without one (or with SCOPE_SERVER=0), start one in the background for next time
+    and run here. Returns the exit code, or None to run locally."""
+    argv = sys.argv[1:]
+    if (os.environ.get("SCOPE_SERVER") == "0" or os.environ.get("SCOPE_IN_SERVER") or os.environ.get("SCOPE_REEXEC")
+            or (argv and argv[0] == "serve")):
+        return None
+    if len(SOCK) > 100:  # AF_UNIX path limit
+        return None
+    c = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    try:
+        c.connect(SOCK)
+    except OSError:
+        c.close()
+        try:
+            os.makedirs(os.path.dirname(SOCK), exist_ok=True)
+            log = open(SOCK[:-5] + ".log", "a")
+            subprocess.Popen([sys.executable, os.path.abspath(__file__), "serve"], stdin=subprocess.DEVNULL,
+                             stdout=log, stderr=log, start_new_session=True,
+                             env={k: v for k, v in os.environ.items() if not k.startswith(FORWARD[:3])})
+        except OSError:
+            pass
+        return None
+    env = {k: v for k, v in os.environ.items() if k.startswith(FORWARD)}
+    c.sendall((json.dumps({"argv": argv, "cwd": os.getcwd(), "env": env}) + "\n").encode())
+    out = sys.stdout.buffer
+    tail = b""
+    while True:
+        chunk = c.recv(65536)
+        if not chunk:
+            break
+        data = tail + chunk
+        cut = max(0, len(data) - 64)  # keep the end back: the exit trailer may straddle chunks
+        out.write(data[:cut])
+        out.flush()
+        tail = data[cut:]
+    c.close()
+    m = re.search(rb"\0SCOPE-EXIT (-?\d+|RESTART)\n$", tail)
+    if not m:
+        out.write(tail)
+        return 1
+    out.write(tail[:m.start()])
+    out.flush()
+    return None if m.group(1) == b"RESTART" else int(m.group(1))
+
+
+if __name__ == "__main__":
+    _code = _client()
+    if _code is not None:
+        sys.exit(_code)
+
 try:
     import capstone
 except ImportError:  # the project venv has it
@@ -184,15 +242,7 @@ def compile_draft(src, func, env=None):
     ENV adds knob settings (CSE_NOCANON=N, AGBCC_FORCE=..., see tools/scope/build_agbcc.sh)."""
     env = resolve_knobs(src, func, env)
     wd = workdir(func)
-    defines = build.DEFINES + ["-DNONMATCHING"]
-    pre = build.sh(build.CPP + ["-nostdinc", "-undef"] + defines + ["-I", "include", "-iquote", ".", src])
-    tf = (env or {}).get("SCOPE_TRANSFORM") or os.environ.get("SCOPE_TRANSFORM")
-    if tf:  # a what-if over the preprocessed source: a module with transform(text) -> text
-        import importlib.util
-        spec = importlib.util.spec_from_file_location("scope_transform", os.path.join(ROOT, tf))
-        mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(mod)
-        pre = mod.transform(pre)
+    pre = preprocess(src, env)
     open(os.path.join(wd, "u.i"), "w").write(pre)
     for p in PASSES:
         try:
@@ -253,6 +303,18 @@ def compile_draft(src, func, env=None):
     open(os.path.join(wd, "a.s"), "w").write(text + "\t.text\n\t.align\t2, 0\n")
     rel = os.path.relpath(wd, ROOT)
     build.sh(build.AS + ["-o", f"{rel}/u.o", f"{rel}/a.s"])
+    # Place FUNC at its ROM address from the object itself (fast.py: relocations, mapping symbols and
+    # DWARF lines in Python); the linker path below remains for objects it cannot resolve.
+    import fast
+    obj = open(os.path.join(wd, "u.o"), "rb").read()
+    _, addr_all, _ = inventory()
+    a = addr_all[rom_name(src, func)]
+    code, start, funcs, missing = fast.place(obj, own, elf_syms(), a)
+    if code is not None and not missing and os.environ.get("SCOPE_LINK") != "1":  # SCOPE_LINK=1: the ld path
+        names = [n for _, n in funcs]
+        obj_name = next(n for n in own if n in names)
+        return code, a, {"obj_offset": start, "wd": wd, "env": env or {}, "obj_name": obj_name,
+                         "data": fast.place.data, "lines": fast.dwarf_lines(obj)}
     # Link so FUNC itself sits at its ROM address: the drafts before it in a multi-function unit
     # compile to their own sizes, and linking the first function at its address would shift every
     # call FUNC makes to an outside symbol (bl targets off by the size difference).
@@ -408,14 +470,15 @@ def decode(code, addr, data):
     return rows
 
 
-def draft_annotations(wd, func, rows, obj_offset):
-    """C line and insn uid for each draft code row."""
-    lines = {}
-    out = build.sh(["arm-none-eabi-objdump", "--dwarf=decodedline", os.path.join(wd, "u.o")])
-    for ln in out.splitlines():
-        p = ln.split()
-        if len(p) >= 3 and p[1].isdigit() and p[2].startswith("0x"):
-            lines[int(p[2], 16)] = (p[0], int(p[1]))
+def draft_annotations(wd, func, rows, obj_offset, lines=None):
+    """C line and insn uid for each draft code row. LINES: {text offset: (file, line)} if known."""
+    if lines is None:
+        lines = {}
+        out = build.sh(["arm-none-eabi-objdump", "--dwarf=decodedline", os.path.join(wd, "u.o")])
+        for ln in out.splitlines():
+            p = ln.split()
+            if len(p) >= 3 and p[1].isdigit() and re.match(r"(0x[0-9a-f]+|0)$", p[2]):
+                lines[int(p[2], 16)] = (p[0], int(p[1]))
     # walk the .s of FUNC: instruction lines carry "@ UID" (-dp)
     asm = open(os.path.join(wd, "u.s")).read()
     m = re.search(r"^" + re.escape(func) + r":\n(.*?)(?=^\s*\.size\s+" + re.escape(func) + r"|^\S+:\n\s*\.globl|\Z)",
@@ -508,9 +571,9 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
     if rdata is None:
         rdata = rom_pool_ranges(rom_code, addr)
     rom = decode(rom_code, addr, rdata)
-    mdata = mapping_ranges(os.path.join(wd, "u.o"), info["obj_offset"], len(mine))
+    mdata = info["data"] if "data" in info else mapping_ranges(os.path.join(wd, "u.o"), info["obj_offset"], len(mine))
     dr = decode(mine, addr, mdata)
-    ann = draft_annotations(wd, info["obj_name"], dr, info["obj_offset"])
+    ann = draft_annotations(wd, info["obj_name"], dr, info["obj_offset"], info.get("lines"))
     born = born_passes(wd)
     pairs, shifted = align(rom, dr)
 
@@ -2165,7 +2228,8 @@ def cmd_why(src, func, uid, env, via=None):
 
 
 def cmd_fastcheck(n):
-    """The fork-server path must give compile_draft's bytes: check N units (drafts first)."""
+    """Both of scope's object paths (the fork server, and the one-shot compile placed in Python) must give
+    the bytes ld and objcopy give: check N units (drafts first)."""
     import glob
     import random
     srcs = sorted(glob.glob(os.path.join(ROOT, "src", "fn", "*.c")) + glob.glob(os.path.join(ROOT, "src", "*.c")))
@@ -2183,11 +2247,19 @@ def cmd_fastcheck(n):
             skip += 1
             continue
         try:
+            os.environ["SCOPE_LINK"] = "1"  # the reference: ld, objcopy and objdump
+            ref = compile_draft(src, func, {})[0]
+            del os.environ["SCOPE_LINK"]
             t0 = time.perf_counter()
             mine = compile_draft(src, func, {})[0]
             t_full += time.perf_counter() - t0
         except SystemExit:
+            os.environ.pop("SCOPE_LINK", None)
             skip += 1
+            continue
+        if mine != ref:
+            diff += 1
+            print(f"  FULL PATH DIFFERS FROM ld: {src} {func}")
             continue
         t0 = time.perf_counter()
         r = fast_compile(src, func, {})
@@ -2206,6 +2278,89 @@ def cmd_fastcheck(n):
     return 1 if diff else 0
 
 
+def cmd_serve():
+    """The resident scope: warm caches in this process, one forked child per command (children can run
+    side by side; each starts its own agbcc fork servers). Restarts itself when scope.py or fast.py
+    changes; exits after SCOPE_SERVE_IDLE seconds (default 1800) without a command."""
+    import signal
+    import traceback
+    code_files = [os.path.abspath(__file__), os.path.join(HERE, "fast.py")]
+    stamp = [os.stat(f).st_mtime_ns for f in code_files]
+    elf_syms(), inventory(), rom_bytes()  # warm: these are what every command loads first
+    if os.path.exists(SOCK):
+        probe_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        try:
+            probe_sock.connect(SOCK)
+            print("a scope server is already running")
+            return 0
+        except OSError:
+            os.remove(SOCK)
+        finally:
+            probe_sock.close()
+    srv = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    srv.bind(SOCK)
+    srv.listen(16)
+    srv.settimeout(int(os.environ.get("SCOPE_SERVE_IDLE", "1800")))
+    signal.signal(signal.SIGCHLD, signal.SIG_IGN)  # children are never waited for
+    print(f"scope server {os.getpid()} on {SOCK}", flush=True)
+    while True:
+        try:
+            conn, _ = srv.accept()
+        except socket.timeout:
+            break
+        if [os.stat(f).st_mtime_ns for f in code_files] != stamp:
+            conn.sendall(b"\0SCOPE-EXIT RESTART\n")
+            conn.close()
+            srv.close()
+            os.remove(SOCK)
+            os.execv(sys.executable, [sys.executable, os.path.abspath(__file__), "serve"])
+        if os.fork():
+            conn.close()
+            continue
+        srv.close()
+        code = 1
+        try:
+            f = conn.makefile("rb")
+            req = json.loads(f.readline())
+            os.chdir(req["cwd"])
+            for k in [k for k in os.environ if k.startswith(FORWARD)]:
+                del os.environ[k]
+            os.environ.update(req["env"])
+            os.environ["SCOPE_IN_SERVER"] = "1"
+            global WORK
+            WORK = os.path.join(ROOT, "build", "scope", os.environ.get("SCOPE_RUN", ""))
+            _FAST.clear()  # the parent's agbcc servers are not this child's
+            sys.stdout.flush()
+            os.dup2(conn.fileno(), 1)
+            os.dup2(conn.fileno(), 2)
+            sys.stdout = os.fdopen(1, "w", buffering=1, closefd=False)
+            sys.stderr = sys.stdout
+            sys.argv = [os.path.abspath(__file__)] + req["argv"]
+            try:
+                code = main() or 0
+            except SystemExit as e:
+                if isinstance(e.code, int) or e.code is None:
+                    code = e.code or 0
+                else:
+                    print(e.code)
+                    code = 1
+            except Exception:
+                traceback.print_exc()
+            sys.stdout.flush()
+            for fs in _FAST.values():
+                fs.close()
+        finally:
+            try:
+                os.write(1, f"\0SCOPE-EXIT {code}\n".encode())
+            except OSError:
+                pass
+            os._exit(0)
+    srv.close()
+    if os.path.exists(SOCK):
+        os.remove(SOCK)
+    return 0
+
+
 def last_func():
     p = os.path.join(WORK, "LAST")
     return open(p).read().strip() if os.path.exists(p) else None
@@ -2216,6 +2371,8 @@ def main():
     if not args or args[0] in ("-h", "--help"):
         print(__doc__)
         return 0
+    if args[0] == "serve":
+        return cmd_serve()
     if args[0] == "fastcheck":
         return cmd_fastcheck(int(args[1]) if len(args) > 1 else 40)
     if args[0] == "uses":

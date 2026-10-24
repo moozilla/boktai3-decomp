@@ -257,3 +257,112 @@ class Fast:
         for s in self.servers.values():
             s.close()
         self.servers.clear()
+
+
+def _uleb(b, i):
+    v = shift = 0
+    while True:
+        x = b[i]
+        i += 1
+        v |= (x & 0x7F) << shift
+        shift += 7
+        if not x & 0x80:
+            return v, i
+
+
+def _sleb(b, i):
+    v = shift = 0
+    while True:
+        x = b[i]
+        i += 1
+        v |= (x & 0x7F) << shift
+        shift += 7
+        if not x & 0x80:
+            if x & 0x40:
+                v -= 1 << shift
+            return v, i
+
+
+def dwarf_lines(obj):
+    """{.text offset: (file name, line)} from the object's DWARF 2 line program (what
+    `objdump --dwarf=decodedline` prints; a later row at the same address wins)."""
+    secs = elf_sections(obj)
+    li = next((i for i, s in enumerate(secs) if s["name"] == ".debug_line"), None)
+    if li is None:
+        return {}
+    sec = secs[li]
+    b = bytearray(obj[sec["off"]:sec["off"] + sec["size"]])
+    syms = elf_symbols(obj, secs)
+    for s in secs:  # apply .rel.debug_line (DW_LNE_set_address operands)
+        if s["type"] == 9 and s["info"] == li:
+            for k in range(s["size"] // 8):
+                off, info = struct.unpack_from("<II", obj, s["off"] + k * 8)
+                if info & 0xFF == 2:
+                    addend, = struct.unpack_from("<I", b, off)
+                    struct.pack_into("<I", b, off, (syms[info >> 8][1] + addend) & 0xFFFFFFFF)
+    rows = {}
+    i = 0
+    while i + 4 <= len(b):
+        unit_len, = struct.unpack_from("<I", b, i)
+        end = i + 4 + unit_len
+        hdr_len, = struct.unpack_from("<I", b, i + 6)
+        prog = i + 10 + hdr_len
+        min_inst, _, line_base, line_range, op_base = struct.unpack_from("<BBbBB", b, i + 10)
+        lens = b[i + 15:i + 15 + op_base - 1]
+        j = i + 15 + op_base - 1
+        while b[j]:  # include directories
+            j = b.index(0, j) + 1
+        j += 1
+        files = []
+        while b[j]:
+            z = b.index(0, j)
+            files.append(b[j:z].decode())
+            j = z + 1
+            for _ in range(3):
+                _, j = _uleb(b, j)
+        j = prog
+        addr, fileno, line = 0, 1, 1
+
+        def emit():
+            rows[addr] = (files[fileno - 1] if 0 < fileno <= len(files) else "?", line)
+        while j < end:
+            op = b[j]
+            j += 1
+            if op >= op_base:
+                adj = op - op_base
+                addr += (adj // line_range) * min_inst
+                line += line_base + adj % line_range
+                emit()
+            elif op == 0:
+                n, j = _uleb(b, j)
+                sub = b[j]
+                if sub == 1:
+                    addr, fileno, line = 0, 1, 1
+                elif sub == 2:
+                    addr, = struct.unpack_from("<I", b, j + 1)
+                j += n
+            elif op == 1:
+                emit()
+            elif op == 2:
+                n, j = _uleb(b, j)
+                addr += n * min_inst
+            elif op == 3:
+                n, j = _sleb(b, j)
+                line += n
+            elif op == 4:
+                fileno, j = _uleb(b, j)
+            elif op == 5:
+                _, j = _uleb(b, j)
+            elif op in (6, 7):
+                pass
+            elif op == 8:
+                addr += ((255 - op_base) // line_range) * min_inst
+            elif op == 9:
+                n, = struct.unpack_from("<H", b, j)
+                j += 2
+                addr += n
+            else:
+                for _ in range(lens[op - 1]):
+                    _, j = _uleb(b, j)
+        i = end
+    return rows
