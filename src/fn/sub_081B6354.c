@@ -12,34 +12,49 @@ struct Half {
     u16 w20e;
     u8 pad210[0xc];
 };
-#ifdef NONMATCHING
-// fuzzy: 94.9%
-// Only the placement of the 'down' computation relative to pointer setup differs.
+struct HalfHeading {
+    u16 w144;
+    u16 w146;
+    u16 w148;
+};
+struct HalfConfig {
+    u16 w20a;
+    u8 pad20c[2];
+    u16 w20e;
+    u8 pad210[0x10];
+    u16 w220;
+};
 void PairedSceneActor_InitHalves(struct Half *base, s32 k, s32 a2, s32 a3, s32 s1, s32 s2, s32 s3,
                                  s32 s3b, s32 s4)
 {
     u32 down, up;
     s32 i;
+    u32 stride;
+    u8 *collider;
+    struct HalfConfig *config;
+    struct HalfHeading *heading;
+    stride = sizeof(struct Half);
     i = 0;
     k &= 0x7f;
     up = (0xa0 + k) & 0xff;
+    collider = base->collider;
+    config = (struct HalfConfig *)&base->w20a;
+    heading = (struct HalfHeading *)&base->w144;
     down = (0xa0 - k) & 0xff;
     do {
         if (i == 1)
-            *(u16 *)((u8 *)base + 0x360) = up;
+            base[1].w144 = up;
         else
-            do {
-                base[i].w144 = down;
-            } while (0);
-        base[i].w146 = a2;
-        base[i].w20a = s1;
-        ActorStatus_InitializeCollider(base[i].collider, s1, s2, s3);
-        *(u16 *)((u8 *)&base[i] + 0x220) = s3b;
-        *(u16 *)((u8 *)&base[i] + 0x20e) = a3;
-        base[i].w148 = s4;
+            heading->w144 = down;
+        heading->w146 = a2;
+        config->w20a = s1;
+        ActorStatus_InitializeCollider(collider, s1, s2, s3);
+        config->w220 = s3b;
+        config->w20e = a3;
+        heading->w148 = s4;
+        collider += stride;
+        config = (struct HalfConfig *)((u8 *)config + stride);
+        heading = (struct HalfHeading *)((u8 *)heading + stride);
         i++;
     } while (i <= 1);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PairedSceneActor_InitHalves);
-#endif
