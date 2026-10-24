@@ -674,6 +674,15 @@ which is exactly `10:1`. Not tested.
   makes when cse rewrites an `asm("" : "+r"(x))` input (found via `insn`).
   Takeaway: Haiku is enough for small drafts where `why` names one lever;
   pin-heavy functions need Sonnet or better, and still did not match.
+* Codex gpt-6-luna (2026-10-24, high effort) on Haiku's easy task
+  (Hresvelgr_InitializeRadialOffsets, 14/12 from the foundry draft): no
+  progress in two runs (11 and 7 compiles, ~0.5M input tokens each, mostly
+  cached). It confirmed the allocation diagnosis with the knob (8/6) but
+  reverted the shape split because it did not pay off alone, and never tried
+  `i * 64`. After run 1 the ref lever lists the counted mentions by line
+  (marking shifts) and WORKER.md says to keep changes that do not pay off
+  alone; run 2 still stopped early and restored the draft. Luna is not a
+  scope worker; Haiku is the cheapest that matched.
 * Pin survey (2026-10-24, `pins` over all 878 matched files with
   concessions): 6,303 concession lines (3,976 pins, 2,327 barriers), of
   which 18 were free (landed in #652, one function now concession-free).
