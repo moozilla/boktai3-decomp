@@ -1,9 +1,7 @@
 #include "global.h"
 #include "record_menu.h"
 #include "area_effect_link.h"
-#ifdef NONMATCHING
-// fuzzy: 92.2%
-// foundry draft (worker best 90.3%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define gActiveRecordMenu gUnk_020001D0
 extern struct RecordMenu *gUnk_020001D0;
 s32 Script_SeekToKeyword(u32);
@@ -24,13 +22,23 @@ void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 static inline u8 *GetChoices(void)
 {
     struct AreaEffectLinkState *state = gUnk_020004B4;
-    if (state && state->unavailable == 1)
-        return state->outgoingChoices;
-    return 0;
+    u32 result;
+    if (!state)
+        return 0;
+    result = state->unavailable;
+    if (result != 1)
+        return 0;
+    result = (u32)state->outgoingChoices;
+    return (u8 *)result;
 }
-static inline void SetSelection(struct RecordMenu *menu, s32 value)
+static inline s32 SetSelection(struct RecordMenu *menu, s32 value)
 {
-    menu->selection = value;
+    u8 *field = &menu->selection;
+    s32 zero = 0;
+    /* Keep the cleared flag available throughout initialization. */
+    asm("" : "+r"(zero));
+    *field = value;
+    return zero;
 }
 static inline s32 LimitSelection(s32 value)
 {
@@ -41,8 +49,8 @@ static inline s32 LimitSelection(s32 value)
 s32 RecordMenu_Initialize(struct RecordMenu *menu)
 {
     u8 *choices;
-    struct AreaEffectLinkState *state;
     s32 selection;
+    s32 zero;
     if (Script_SeekToKeyword('s')) {
         menu->titleScript = Script_GetTextSourcePc();
         if (!menu->titleScript)
@@ -63,12 +71,13 @@ s32 RecordMenu_Initialize(struct RecordMenu *menu)
     if (!choices)
         return -1;
     {
+        s32 choice = choices[0];
         u8 *field = &menu->selection;
-        *field = choices[0] - 5;
+        *field = choice - 5;
     }
     selection = LimitSelection(menu->selection);
     {
-        SetSelection(menu, selection);
+        zero = SetSelection(menu, selection);
         Bg_ClearTilemap(3);
         Bg_ClearTilemap(2);
         Bg_ClearTilemap(1);
@@ -87,7 +96,6 @@ s32 RecordMenu_Initialize(struct RecordMenu *menu)
         }
         menu->redraw = 1;
         {
-            s32 zero = 0;
             menu->leaving = zero;
             if (Script_GetKeywordValue('f', 0))
                 ScreenTransition_SendCommand(2, 5, 4, 4, 4, 65535, zero);
@@ -96,6 +104,3 @@ s32 RecordMenu_Initialize(struct RecordMenu *menu)
     gUnk_020001D0 = menu;
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", RecordMenu_Initialize);
-#endif
