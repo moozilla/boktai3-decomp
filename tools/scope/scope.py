@@ -561,7 +561,10 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
                       " branch is threaded. Try the repeated tests of that value written the other way,"
                       " one at a time; a version that threads too much drops the ROM's cmp/branch pairs."
                       " First run `scope.py FILE.c probe`: threading usually follows a cse"
-                      " canonical-register choice it can name.")
+                      " canonical-register choice it can name. cse also carries a known value"
+                      " (a `result = 0` it can test) into a jump's target only when that label"
+                      " is used once and nothing falls into it: a label reached by a goto and"
+                      " by fall-through stops the threading there; `return 0` paths do not.")
             else:
                 print("  The join or block order differs: the insns between the two targets belong to"
                       " different blocks in the ROM and the draft. Compare the C around both lines.")
