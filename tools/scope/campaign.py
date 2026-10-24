@@ -298,7 +298,7 @@ def cmd_land(args):
             sys.exit(f"{func}: merge conflict against the current {r['src']}; land by hand")
         merged = open(a).read()
     pins = len(re.findall(r'\basm\("r\d+"\)', merged))
-    bars = len(re.findall(r'\basm\(\s*""', merged))
+    bars = len(re.findall(r'\basm(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', merged))
     marker = "// MATCHING_CONCESSION: register-pinning"
     if (pins or bars) and marker not in merged:
         merged = marker + "\n" + merged
