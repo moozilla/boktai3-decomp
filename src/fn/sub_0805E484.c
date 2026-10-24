@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_input_grid.h"
 #ifdef NONMATCHING
-// fuzzy: 93.4%
+// fuzzy: 95.5%
 // Register allocation around zero, step and widget offset still differs (192/180 bytes).
 void SceneInput_BeginPairTransition(struct SceneInputPair *pairInput, const u32 *enabledInput,
                                     const struct SceneInputPosition *startsInput,
@@ -19,7 +19,6 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pairInput, const u32 
     s32 compare;
     {
         register const u32 *incomingFrames asm("r3") = frames;
-        asm("" : : "r"(incomingFrames));
         localFrames = incomingFrames;
     }
     widget = pair->widgets;
@@ -40,19 +39,17 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pairInput, const u32 
             position = (struct SceneInputPosition *)&pair->widgets[0].position;
             {
                 register u32 offset asm("r3") = widgetOffset;
-                asm("" : : "r"(offset));
                 position = (void *)((u8 *)position + offset);
             }
             {
                 s32 lowIndex = i;
                 asm("" : "+l"(lowIndex) : : "r0", "r1", "r3");
                 targetOffset = lowIndex * 8;
-                asm("" : "+r"(targetOffset));
             }
             {
                 const struct SceneInputPosition *source = starts;
-                register u32 low asm("r0");
-                register u32 high asm("r1");
+                u32 low;
+                u32 high;
                 asm("" : "+l"(source) : : "r0", "r1");
                 low = ((const u32 *)source)[0];
                 high = ((const u32 *)source)[1];
@@ -62,9 +59,9 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pairInput, const u32 
             position = (void *)pair->targets;
             position = (void *)((u8 *)position + targetOffset);
             {
-                register const struct SceneInputPosition *source asm("r3") = targets;
-                register u32 low asm("r0");
-                register u32 high asm("r1");
+                const struct SceneInputPosition *source = targets;
+                u32 low;
+                u32 high;
                 asm("" : "+l"(source) : : "r0", "r1");
                 low = ((const u32 *)source)[0];
                 high = ((const u32 *)source)[1];
@@ -81,13 +78,11 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pairInput, const u32 
         {
             register const u32 *cursor asm("r3") = localFrames;
             cursor++;
-            asm("" : : "r"(cursor));
             localFrames = cursor;
         }
         widget++;
         {
             u32 offset = widgetOffset;
-            asm("" : : "l"(offset) : "r0", "r1", "r2", "r3");
             offset += 0x60;
             widgetOffset = offset;
         }

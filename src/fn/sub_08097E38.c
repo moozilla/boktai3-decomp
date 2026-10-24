@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 extern u8 *gUnk_02000580;
@@ -51,11 +50,10 @@ static inline u8 ReactionFlag(struct SceneActorReactionMotion *reaction, u32 mas
 }
 static inline u8 ContextFlag(struct GhostPlayerReaction *state, u32 input, u32 **saved)
 {
-    register u32 mask asm("r2") = input;
+    u32 mask = input;
     u32 *flags = &state->flags;
-    register u32 tested asm("r0");
+    u32 tested;
     tested = *flags & mask;
-    asm("" : : "r"(tested));
     *saved = flags;
     if (tested)
         return 1;
@@ -79,8 +77,6 @@ static inline void State(struct SceneActorRegistryResetView *actor, u8 state, u8
     actor->field2B1 = 1;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 99.6%
 // Remaining difference: one player-slot literal reload.
 // confidence=low: reacts to player motion within range, with separate drain and approach transitions.
 static inline void ZeroState(struct SceneActorRegistryResetView *actor, u32 behavior)
@@ -107,11 +103,9 @@ void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
         return;
     state = actor->context;
     {
-        register u8 **players asm("r2") = &gUnk_02000580;
-        register u8 **slots asm("r8");
-        asm("" : : "r"(players));
+        u8 **players = &gUnk_02000580;
+        u8 **slots;
         slots = players;
-        asm("" : : "r"(slots));
         Delta(&delta, &state->previousPlayer, (void *)(gUnk_02000580 + 0x30));
     }
     state->previousPlayer = *(struct ContactPosition *)(gUnk_02000580 + 0x30);
@@ -153,7 +147,3 @@ void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
         state->delay = 10;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Ghost_ReactToPlayerMovement);
-#endif

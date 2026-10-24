@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 82.9%
+// fuzzy: 84.5%
 // Remaining differences: literal-pool/temp register numbering and the loop entry test.
 // confidence=low: applies queued scene commands to the armor actor (behavior, attachments, flags).
 
@@ -23,14 +23,14 @@ void *ActorAttachment_ReleaseResource(void *, u32, void *);
 #define ADC(x)                                                                                     \
     ({                                                                                             \
         u32 o_ = 0xADC;                                                                            \
-        asm("" : "+r"(o_));                                                                        \
+                                                                                \
         (void *)((x) + o_);                                                                        \
     })
 
 #define B(x, o)                                                                                    \
     ({                                                                                             \
         u8 *t_ = (x);                                                                              \
-        asm("" : "+r"(t_));                                                                        \
+                                                                                \
         t_ + (o);                                                                                  \
     })
 

@@ -2,7 +2,7 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 90.4%
+// fuzzy: 95.3%
 // fix.py best version (reprinted C)
 // confidence=low: Vampire pending-damage handler: applies queued damage, flash/shake, death and stagger transitions.
 struct VampireDamage {
@@ -61,16 +61,16 @@ static inline void Vampire_SetState_1(struct VampireDamage *p, void (*fn)(void *
 
 int Vampire_ApplyPendingDamage(struct VampireDamage *p)
 {
-    register struct VampireDamage *base asm("r6") = p;
+    struct VampireDamage *base = p;
     u8 *sprite = ((u8 *)p) + 0x48;
     void *collider = ((u8 *)p) + 0x1cc;
     int damage;
     int special;
     int trigger;
-    register int flaggedBit asm("sl");
+    int flaggedBit;
     u32 *flags;
     u8 *hit;
-    register s16 *hp asm("sb");
+    s16 *hp;
     struct Packed size;
     {
         s32 *damagePtr = (s32 *)(((u8 *)p) + 0x33c);
@@ -83,7 +83,6 @@ int Vampire_ApplyPendingDamage(struct VampireDamage *p)
             *damagePtr = 0;
             {
                 u32 off = 0x341;
-                asm("" : "+r"(off));
                 hit = ((u8 *)p) + off;
             }
             *hit = 0;

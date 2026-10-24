@@ -1,7 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 96.8%
 struct Vec {
     s16 x, y, z, w;
 };
@@ -31,7 +29,7 @@ struct Manager {
 };
 static inline u32 frame_factor(u16 v)
 {
-    register u32 value asm("r1") = v;
+    u32 value = v;
     u32 mask = 15;
     return mask & value;
 }
@@ -50,13 +48,13 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
     register struct Manager *owner asm("r8") = m;
     register struct Manager *base asm("r12") = owner;
     register s32 offset asm("r10") = 0;
-    register struct Cursor *cursor asm("r6") = (void *)((u8 *)owner + 0x44);
-    register struct Anim *sequence asm("r9") = (void *)((u8 *)owner + 0x60);
-    register struct Obj *sprites asm("r7") = (void *)((u8 *)owner + 0x34);
+    struct Cursor *cursor = (void *)((u8 *)owner + 0x44);
+    struct Anim *sequence = (void *)((u8 *)owner + 0x60);
+    struct Obj *sprites = (void *)((u8 *)owner + 0x34);
     do {
         if (cursor->active) {
             struct Manager *p = base;
-            register struct Obj *o asm("r5");
+            struct Obj *o;
             struct Anim *a;
             const volatile u16 *entry;
             register u16 n asm("r0");
@@ -151,7 +149,3 @@ int PositionEffectDisplay_UpdateSources(struct Manager *m)
     } while ((s32)base <= (s32)((u8 *)owner + 0x120));
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PositionEffectDisplay_UpdateSources);
-#endif

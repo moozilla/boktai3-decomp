@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 92.0%
+// fuzzy: 92.6%
 // fix.py best version (reprinted C)
 // Remaining differences: state dispatch, coordinate lifetimes and register allocation.
 #include "global.h"
@@ -202,9 +202,9 @@ void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
 
         case 1:
             if ((p->sprite.position.y - p->ground) > 0x1000) {
-                register u8 *boss asm("r9") = p->boss;
+                u8 *boss = p->boss;
                 struct NidhoggrVector *position;
-                register struct NidhoggrVector *savedPosition asm("r8");
+                struct NidhoggrVector *savedPosition;
                 u16 *xField;
                 u16 *zField;
                 u16 value;

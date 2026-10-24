@@ -36,7 +36,7 @@ void AnimData_SelectPaletteBank(void *, s32);
 void Sprite_Init(struct Sprite *, void *, s32);
 s32 Mod(s32, s32);
 #ifdef NONMATCHING
-// fuzzy: 85.4%
+// fuzzy: 88.0%
 // Animation-pointer retention and array-cursor allocation still differ.
 static inline s32 Random(u16 *table, u32 *rng)
 {
@@ -80,13 +80,11 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
     speeds = (void *)((u8 *)m + 0x52);
     {
         register u16 *held asm("sl") = speeds;
-        asm("" : "+r"(held));
         speeds = held;
     }
     lifetimes = (u8 *)m + 0x46;
     animData = (u8 *)m + 0x24;
     base = g;
-    asm("" : "+r"(base), "+r"(rng));
     for (; j < 4; g++, base++, lifetimes += sizeof(struct Group),
                   speeds = (void *)((u8 *)speeds + sizeof(struct Group)),
                   animData += sizeof(struct Group), j++) {
@@ -108,7 +106,6 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
                 struct Vec *velocity = base->velocity;
                 u16 *speedOut = speeds;
                 register u8 *life asm("sl") = lifetimes;
-                asm("" : "+r"(cursor));
                 asm("" : "+r"(table), "+r"(velocity), "+r"(life));
                 do {
                     struct Sprite *p;

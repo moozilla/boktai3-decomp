@@ -65,7 +65,6 @@ struct Velocity {
 static inline void Polar(struct Velocity *v, s32 angle, s32 magnitude)
 {
     register const s16 *sine asm("r1") = gUnk_086149C4;
-    asm("" : "+r"(sine));
     v->x = Scale(sine[(angle + 64) & 255] * magnitude);
     v->y = 0;
     v->z = Scale(sine[angle] * magnitude);
@@ -82,14 +81,13 @@ s32 PoisonHand_UpdateEmergence(struct PoisonHandBurst *input)
     struct Velocity velocity;
     register s32 angle asm("r5");
     register s32 magnitude asm("r2");
-    register u32 attributes asm("r8");
-    register u32 palette asm("r6");
-    register struct Velocity *v asm("sb");
+    u32 attributes;
+    u32 palette;
+    struct Velocity *v;
     PoisonHand_CopyPosition(&position, &p->position);
     PoisonHand_RaiseOrigin(&position);
     angle = PoisonHand_NextSpread(gUnk_0203B400) & 255;
     magnitude = p->spread + (PoisonHand_NextSpread(gUnk_0203B400) & 15) - 8;
-    asm("" : "+r"(angle), "+r"(magnitude));
     Polar(&velocity, angle, magnitude);
     v = &velocity;
     asm("" : "+r"(v));

@@ -117,7 +117,6 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
     *((u8 *)&p->sprite + 7) = 3;
     sequences = ScriptProc_Start(0x922E, 0x5184);
     p->f218 = sequences;
-    asm("" : "+r"(&p->sprite));
     if (!p->f1F6) {
         p->update = Screamer_WaitForPlayerApproach;
         Anim_SetSequence(&p->sequence, sequences, 0x1A, (u8)p->f1D8, 8);
@@ -137,7 +136,6 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
         struct ActorPosition *offsetPosition;
         position = p->sprite.position;
         offsetPosition = &position;
-        asm("" : "+r"(offsetPosition));
         if (!p->f1D8)
             offsetPosition->x += 128;
         else

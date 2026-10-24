@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "orbit_motion.h"
 #ifdef NONMATCHING
-// fuzzy: 87.7%
+// fuzzy: 89.2%
 // Remaining differences: saved-pointer placement and squared-distance register allocation.
 s32 ScalarApproach_StepHalf(s32, s32);
 s32 ScalarApproach_StepQuarter(s32, s32);
@@ -28,10 +28,10 @@ s32 MotionTrack_Update(struct OrbitMotion *argument)
 {
     struct OrbitMotion *p = argument;
     struct OrbitVector *out;
-    register struct OrbitVector *target asm("r5");
+    struct OrbitVector *target;
     register struct OrbitVector *step asm("r6");
-    register struct OrbitVector *savedTarget asm("r9");
-    register struct OrbitVector *savedStep asm("r8");
+    struct OrbitVector *savedTarget;
+    struct OrbitVector *savedStep;
     s32 a, b, c, d;
     if (p->state != 1)
         return 0;

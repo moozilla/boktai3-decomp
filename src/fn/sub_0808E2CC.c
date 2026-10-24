@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 88.8%
+// fuzzy: 95.9%
 // Vector pointer allocation and two missing register copies remain; candidate is four bytes short.
 #include "scene_actor_chase.h"
 // confidence=low: terrain-edge response is registered as the Slime body collider callback.
@@ -16,7 +16,7 @@ struct SlimeContact {
 };
 static inline u8 Unavailable(struct SceneActorRegistryResetView *input)
 {
-    register struct SceneActorRegistryResetView *actor asm("r2") = input;
+    struct SceneActorRegistryResetView *actor = input;
     asm("" : "+r"(actor));
     if (actor) {
         u32 mask = 0x40;

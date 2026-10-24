@@ -1,8 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 85.6%
 // Remaining differences: temporary registers for field offsets and target coordinate loads.
 // confidence=low: advances presentation and caches bearings and planar target distances.
 #define Vanargand_UpdateAnimationAndTargets sub_081AD3E8
@@ -63,10 +60,9 @@ static inline u32 TestGlobal(u32 mask, u32 *flags)
 void Vanargand_UpdateAnimationAndTargets(struct VanargandTargets *p)
 {
     struct VanargandTargets *actor = p;
-    register struct VanargandTargets *owner asm("r9") = p;
+    struct VanargandTargets *owner = p;
     struct TargetSprite *sprite = &actor->sprite;
     s32 i;
-    asm("" : "+r"(owner));
     ScenePanel_DispatchTransitionCommands(actor);
     Vanargand_UpdatePartAnimation(actor, actor->part);
     Obj_StepPosition(sprite);
@@ -75,13 +71,11 @@ void Vanargand_UpdateAnimationAndTargets(struct VanargandTargets *p)
     actor->renderPosition.x = sprite->position.x;
     actor->renderPosition.y = sprite->position.y;
     {
-        register u32 offset asm("r4");
-        register s16 z asm("r1") = sprite->position.z;
+        u32 offset;
+        s16 z = sprite->position.z;
         offset = 0x210;
-        asm("" : "+r"(offset), "+r"(z));
         {
-            register s16 *out asm("r0") = (s16 *)((u8 *)actor + offset);
-            asm("" : : "r"(out), "r"(z));
+            s16 *out = (s16 *)((u8 *)actor + offset);
             *out = z;
         }
     }
@@ -93,8 +87,7 @@ void Vanargand_UpdateAnimationAndTargets(struct VanargandTargets *p)
     SceneActors_UpdateTargetMetrics(owner);
     i = 0;
     if (i < actor->targetCount) {
-        register struct TargetSprite *base asm("r8") = &owner->sprite;
-        asm("" : "+r"(base));
+        struct TargetSprite *base = &owner->sprite;
         do {
             struct TargetVec *target = owner->targets[i];
             if (target) {
@@ -113,7 +106,3 @@ void Vanargand_UpdateAnimationAndTargets(struct VanargandTargets *p)
         actor->proximityTimer = 0;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081AD3E8);
-#endif

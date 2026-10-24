@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 96.2%
 
 // 32 differing instruction runs; size +4 bytes; first diff at +0xA (adds r5, r1, #0 vs adds r4, r1, #0)
 struct Vec {
@@ -81,7 +79,7 @@ static inline int height(struct Vec *pos)
 #define SceneActorAnimation_UpdateWalkToPosition sub_0802EA90
 void SceneActorAnimation_UpdateWalkToPosition(void *unused, struct Actor *arg)
 {
-    register struct Actor *p asm("r5") = arg;
+    struct Actor *p = arg;
     if (p->entered) {
         int zero = 0;
         p->entered = zero;
@@ -89,20 +87,20 @@ void SceneActorAnimation_UpdateWalkToPosition(void *unused, struct Actor *arg)
         Actor_PlayAnimationEntry(p, 1, 1, zero, 4);
     }
     if ((u8)p->callback(p) != 1) {
-        register struct Vec *pos asm("r3") = &p->pos;
+        struct Vec *pos = &p->pos;
         struct Vec *target = &p->target;
         int dx = target->x - pos->x;
         int dz = target->z - pos->z;
         u32 distance = dx * dx + dz * dz;
         u32 limit = p->speedSquared;
-        register struct Vec *savedPos asm("r8") = pos;
-        register struct Vec *savedTarget asm("ip") = target;
+        struct Vec *savedPos = pos;
+        struct Vec *savedTarget = target;
 
         if (distance <= limit) {
             p->pos = p->target;
             p->done = 1;
         } else {
-            register u8 *ap asm("r3") = &p->angle;
+            u8 *ap = &p->angle;
             register struct Vec *vel asm("r4") = &p->velocity;
             register int angle asm("r6") = *ap;
             int speed = p->speed;
@@ -115,9 +113,9 @@ void SceneActorAnimation_UpdateWalkToPosition(void *unused, struct Actor *arg)
             vel->z = scale(speed * gUnk_086149C4[angle]);
             asm("" ::"r"(angle), "r"(speed));
             {
-                register struct Vec *target asm("r3") = savedTarget;
+                struct Vec *target = savedTarget;
                 s32 x;
-                register struct Vec *pos asm("r6");
+                struct Vec *pos;
                 s32 z;
 
                 x = target->x;
@@ -135,19 +133,16 @@ void SceneActorAnimation_UpdateWalkToPosition(void *unused, struct Actor *arg)
                 *out = value;
                 {
                     register s32 shifted asm("r2") = value + 112;
-                    register s32 mask asm("r0");
+                    s32 mask;
                     asm("" : "+r"(shifted));
                     shifted >>= 5;
                     mask = 7;
-                    asm("" ::"r"(shifted), "r"(mask));
                     p->facing8 = mask & shifted;
                 }
                 {
-                    register s32 mask asm("r0");
+                    s32 mask;
                     s32 shifted = (value + 96) >> 6;
-                    asm("" ::"r"(shifted));
                     mask = 3;
-                    asm("" ::"r"(mask));
                     mask &= shifted;
                     asm("" : "+r"(mask));
                     p->facing4 = mask;
@@ -158,6 +153,3 @@ void SceneActorAnimation_UpdateWalkToPosition(void *unused, struct Actor *arg)
         Actor_PlayFootstepSound(p, 1);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0802EA90);
-#endif

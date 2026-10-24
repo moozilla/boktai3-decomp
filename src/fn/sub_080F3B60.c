@@ -59,8 +59,6 @@ static inline u8 EnterState(struct ChildGroup *p)
     }
     return 0;
 }
-#ifdef NONMATCHING
-// fuzzy: 99.4%
 // Differs only in where `movs r2, #3` (the loop counter) is placed: the ROM sets it before the kid-0 pointers.
 void ChildGroup_UpdateTrailingMembers(struct ChildGroup *p)
 {
@@ -72,36 +70,45 @@ void ChildGroup_UpdateTrailingMembers(struct ChildGroup *p)
             p->kids[i].z = p->pos.z;
             p->kids[i].b6 = p->bB6E;
         }
+
         for (i = 0; i < 4; i++)
             p->kids[i].flags &= ~1;
+
         p->callbackCD8 = Ivy_WaitForPrimaryActionCompletion;
         p->h4B4 = 0;
         p->b4B0 = 0;
         p->hD5A = 0;
         p->callbackCF0 = Ivy_InitColorTransition;
-        *((u8 *)p + 0xD53) = 0;
+        *(((u8 *)p) + 0xD53) = 0;
         Sound_PlaySong(0x16F);
     }
     if (p->callbackCD8)
         Callback_InvokeActor(p, p->callbackCD8);
     if (p->fieldD80 & 1) {
         int i;
-        u16 *x0 = &p->kids[0].x;
-        u16 *y0 = &p->kids[0].y;
-        u16 *z0 = &p->kids[0].z;
-        u8 *b0 = &p->kids[0].b6;
-        for (i = 3; i > 0; i--) {
+        u16 *x0;
+        u16 *y0;
+        u16 *z0;
+        u8 *b0;
+        // A loop around the counter's start doubles its use weight in global
+        // allocation (flow weights refs by loop depth): i gets r2 as in the ROM.
+        do {
+            i = 3;
+        } while (0);
+        x0 = &p->kids[0].x;
+        y0 = &p->kids[0].y;
+        z0 = &p->kids[0].z;
+        b0 = &p->kids[0].b6;
+        for (; i > 0; i--) {
             p->kids[i].x = p->kids[i - 1].x;
             p->kids[i].y = p->kids[i - 1].y;
             p->kids[i].z = p->kids[i - 1].z;
             p->kids[i].b6 = p->kids[i - 1].b6;
         }
+
         *x0 = p->pos.x;
         *y0 = p->pos.y;
         *z0 = p->pos.z;
         *b0 = p->bB6E;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ChildGroup_UpdateTrailingMembers);
-#endif

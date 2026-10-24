@@ -21,8 +21,8 @@ static inline u32 StepFirst(struct Drawable *owner, struct DisplaySequenceState 
     const volatile u16 *command;
     u32 ended;
     u32 bit;
-    register u32 duration asm("r2");
-    register u32 flags asm("r1");
+    u32 duration;
+    u32 flags;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -57,7 +57,7 @@ static inline u32 StepFirst(struct Drawable *owner, struct DisplaySequenceState 
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r4");
+        u32 mask;
         register u32 temp asm("r1");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
@@ -138,8 +138,8 @@ static inline u32 StepSecond(struct Drawable *owner, struct DisplaySequenceState
     struct ContactSwarmSprite *sprite = &owner->sprite;
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, bit;
-    register u32 duration asm("r2");
-    register u32 flags asm("r1");
+    u32 duration;
+    u32 flags;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -174,12 +174,11 @@ static inline u32 StepSecond(struct Drawable *owner, struct DisplaySequenceState
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r5");
+        u32 mask;
         register u32 temp asm("r2");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
-        asm("" : "+r"(temp));
         mask = temp;
         asm("" : "+r"(mask));
         /* Keep the live mask distinct from its source without binding r7. */

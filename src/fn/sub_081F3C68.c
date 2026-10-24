@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 79.4%
+// fuzzy: 79.5%
 // Remaining differences: vector pointer lifetimes, collider argument reloads and loop scheduling.
 struct Vec {
     s16 x, y, z, pad;
@@ -157,7 +157,7 @@ void Ratatosk_UpdateRadialSummonAttack(struct Actor *p, s32 tick)
         Sound_PlaySong(0x565);
     if (tick > 56) {
         if (p->active == 3) {
-            register u32 angle asm("r5") = (u8)randomA();
+            u32 angle = (u8)randomA();
             register s32 pattern asm("r10") = randomB();
             s32 i;
             pattern &= 3;

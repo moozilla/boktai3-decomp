@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #ifdef NONMATCHING
-// fuzzy: 90.6%
+// fuzzy: 90.7%
 struct CueActor {
     u8 pad0[0x1D0];
     u32 f1D0;
@@ -102,7 +102,6 @@ static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceS
         asm("" : "+r"(bit));
         first = bit;
         first &= input;
-        asm("" : "+r"(first));
         first = (u8)first;
         if (first != (((*command & 0x30) >> 4) & bit))
             sprite->flags |= 8;

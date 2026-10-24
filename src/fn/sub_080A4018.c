@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 90.1%
+// fuzzy: 90.8%
 // fix.py best version (reprinted C)
 // confidence=low: periodically probes a randomized heading and updates the Spider route endpoint and cooldown.
 
@@ -29,7 +29,7 @@ static inline u8 Test(struct SpiderContext *ctx, u32 mask)
 
 void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
 {
-    register struct SpiderContext *ctx asm("r8") = input->context;
+    struct SpiderContext *ctx = input->context;
     u8 *group = (u8 *)(&input->group);
     register struct Transform *transform asm("r5") = (void *)(((u8 *)input) + 0x50);
     struct ContactPackedVector target;
@@ -45,7 +45,6 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
     *indexAddress = index;
     angle = (table[index] & 127) - 63;
     heading = angle + transform->facing;
-    asm("" : "+r"(heading));
     if (Mod(input->counter2AC, 30) == 0) {
         if (ctx->timer > 0)
             goto decrement;

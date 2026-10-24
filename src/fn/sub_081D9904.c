@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 91.0%
+// fuzzy: 92.0%
 // fix.py best version (reprinted C)
 // Remaining differences: parameter flag operations and saved pointer lifetimes.
 
@@ -21,8 +21,8 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
     const volatile u16 *command;
     u32 ended;
     u32 bit;
-    register u32 duration asm("r2");
-    register u32 flags asm("r1");
+    u32 duration;
+    u32 flags;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -57,7 +57,7 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r5");
+        u32 mask;
         register u32 temp asm("r1");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
@@ -166,8 +166,8 @@ s32 Task4E01_SpawnImpactChildren(u8 *input)
 {
     register u8 *p asm("r10") = input;
     u8 storage[0x58];
-    register u8 *params asm("r5") = storage;
-    register struct SpawnConfig *config asm("r4") = (void *)(p + 0x18);
+    u8 *params = storage;
+    struct SpawnConfig *config = (void *)(p + 0x18);
     u32 direction = (u8)config->direction;
     register s32 speed asm("r6") = config->speed;
     register s32 i asm("r7");

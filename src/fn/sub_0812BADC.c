@@ -2,7 +2,7 @@
 #include "contact_swarm.h"
 
 #ifdef NONMATCHING
-// fuzzy: 87.0%
+// fuzzy: 89.3%
 // fix.py best version (reprinted C)
 // Remaining: sine/RNG load order, position and terrain register allocation, and collider temporaries.
 struct SlashCollider {
@@ -92,18 +92,15 @@ static inline void AddPosition(struct ContactPosition *out, struct ContactPositi
                                struct ContactPosition *b)
 {
     {
-        register u32 v asm("r0") = (u16)a->x;
-        asm("" : "+r"(v));
+        u32 v = (u16)a->x;
         out->x = v + (u16)b->x;
     }
     {
-        register u32 v asm("r0") = (u16)a->y;
-        asm("" : "+r"(v));
+        u32 v = (u16)a->y;
         out->y = v + (u16)b->y;
     }
     {
-        register u32 v asm("r0") = (u16)a->z;
-        asm("" : "+r"(v));
+        u32 v = (u16)a->z;
         out->z = v + (u16)b->z;
     }
 }
@@ -121,22 +118,18 @@ void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
             register u32 mask asm("r1") = 255;
             angle = Math_Atan2(p->velocity.x, p->velocity.z) + 128;
             mask = 255;
-            asm("" : "+r"(mask));
             angle &= mask;
-            asm("" : "+r"(angle));
         }
         velocity = &p->velocity;
         magnitude = 12;
-        asm("" : "+r"(magnitude));
         {
-            register const s16 *sine asm("r2") = gUnk_086149C4;
+            const s16 *sine = gUnk_086149C4;
             velocity->x = Truncate(sine[(angle + 64) & 255] * magnitude);
         }
         velocity->y = 0;
         {
-            register u32 masked asm("r0") = 255;
+            u32 masked = 255;
             masked &= angle;
-            asm("" : "+r"(masked));
             velocity->z = Truncate(gUnk_086149C4[masked] * magnitude);
         }
         {
@@ -144,12 +137,10 @@ void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
             gUnk_03005308 = index;
             {
                 register u32 offset asm("r0") = index * 2;
-                register const u16 *source asm("r3");
-                asm("" : "+r"(offset));
+                const u16 *source;
                 source = gUnk_0203B400;
                 {
-                    register u32 sample asm("r0") = *((const u16 *)(((u32)source) + offset));
-                    asm("" : "+r"(sample));
+                    u32 sample = *((const u16 *)(((u32)source) + offset));
                     p->velocity.y = (sample & 15) + 8;
                 }
             }
@@ -161,7 +152,7 @@ void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
     }
     TimedEffect_UpdateVisibility(p);
     {
-        register struct ContactPosition *current asm("r2") = &p->position;
+        struct ContactPosition *current = &p->position;
         register struct ContactPosition *velocity asm("r1") = &p->velocity;
         asm("" : "+r"(current), "+r"(velocity));
         p->position.x = ((u16)p->position.x) + ((u16)velocity->x);

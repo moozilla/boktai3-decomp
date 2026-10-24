@@ -41,7 +41,7 @@ s32 Math_Atan2(s32, s32);
 void Armor_UpdateAlignedStrikeDecision(struct ArmorDecisionActor *p)
 {
     register s32 dx asm("r5");
-    register s32 dy asm("r3");
+    s32 dy;
     register s32 dz asm("r1");
     register s32 ax asm("r7");
     s32 ay;

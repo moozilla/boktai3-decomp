@@ -4,7 +4,7 @@
 #include "scene_vec.h"
 
 #ifdef NONMATCHING
-// fuzzy: 95.9%
+// fuzzy: 97.0%
 // fix.py best version (reprinted C)
 // confidence=low: player-directed sweeping strike followed by a timed retreat.
 
@@ -129,7 +129,7 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     {
         u32 elapsed = state->elapsed + 1;
         u32 mask;
-        register u32 temp asm("r1");
+        u32 temp;
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;

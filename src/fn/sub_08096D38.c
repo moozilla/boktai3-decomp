@@ -2,7 +2,7 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #ifdef NONMATCHING
-// fuzzy: 86.9%
+// fuzzy: 87.6%
 // fix.py best version (reprinted C)
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
@@ -134,7 +134,7 @@ void Ghost_AdvanceApproachRoute(struct SceneActorRegistryResetView *actor)
     struct GhostRoute *route = actor->context;
     struct ContactPosition target;
     struct ContactPosition delta;
-    register u32 *flags asm("r9") = &route->flags;
+    u32 *flags = &route->flags;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
         Control(actor, actor->entryTarget228, 1);
         route->index = 0;

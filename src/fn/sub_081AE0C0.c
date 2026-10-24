@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 83.2%
+// fuzzy: 83.7%
 // Remaining: constant-address reuse, PRE stack order, palette registers and state tails.
 struct VanargandPart {
     u8 pad0[0x10];
@@ -213,7 +213,6 @@ static inline void placeBody(struct Vanargand *p)
     s16 *pos = (void *)((u8 *)p + 0x54);
     s32 xz = 0x33B;
     s32 y = 0x100;
-    asm("" : "+r"(xz), "+r"(y));
     pos[0] = xz;
     pos[1] = y;
     pos[2] = xz;
@@ -238,7 +237,7 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
     FIELD(u32, p, 0x570) = 1;
     asm("" : : "r"(&p->variant), "r"(p->palette));
     {
-        register u8 **target asm("r2") = (void *)((u8 *)p + 0x110);
+        u8 **target = (void *)((u8 *)p + 0x110);
         u8 **slot = (void *)((u8 *)p + 0x10C);
         u8 **player = gUnk_02000580;
         s32 count = 1;
@@ -320,7 +319,6 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
         position.y = 768;
         position.z = 640;
         flags = 32;
-        asm("" : "+r"(flags));
     }
     if (Script_SeekToKeyword('m'))
         p->variant = Script_GetValue();
@@ -410,12 +408,10 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
     Vanargand_SetPairedEffectParameter(p->attachment, effect);
     {
         void *callback = Vanargand_ApplyPendingDamage;
-        asm("" : "+r"(callback));
         FIELD(void *, self, 0x104) = callback;
     }
     {
         void *callback = Vanargand_ApplyRequestedMode;
-        asm("" : "+r"(callback));
         FIELD(void *, self, 0x108) = callback;
     }
     FIELD(void *, p, 0x57C) = VanargandProjectilePool_Create(FIELD(u16, p, 0x58C), 10);

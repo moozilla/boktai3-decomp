@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 72.5%
+// fuzzy: 73.5%
 // Remaining differences: owner and random-source allocation, scale decay and state setup.
 struct Vec {
     s16 x, y, z, pad;
@@ -126,7 +126,7 @@ static inline void setState(struct Actor *p, void (*update)(void), u8 state)
 #define Ratatosk_UpdateKnockbackRecovery sub_081F5290
 void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
 {
-    register s32 tick asm("r8") = elapsed;
+    s32 tick = elapsed;
     u8 params[0x1c];
     struct Vec spawn;
     struct Actor *p2 = p;

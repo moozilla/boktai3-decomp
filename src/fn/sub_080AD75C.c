@@ -3,7 +3,7 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 78.8%
+// fuzzy: 79.6%
 // fix.py best version (reprinted C)
 // Remaining differences: address lifetimes, state scheduling, and register allocation.
 u8 Skeleton_RerouteToTarget(void *);
@@ -31,7 +31,7 @@ static inline u8 AtRest(s32 x, s32 z)
 }
 static inline u32 Test(u16 *f, u32 m)
 {
-    register u32 mask asm("r1") = m;
+    u32 mask = m;
     return *f & mask;
 }
 static inline u8 ContextFlags(u8 *ctx)
@@ -80,7 +80,7 @@ static inline u32 Arg1(u32 k_, u8 *anim)
 void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 tick)
 {
     u8 *ctx = actor->context;
-    register u8 *anim asm("r7") = ((u8 *)actor->drawable) + 0x20;
+    u8 *anim = ((u8 *)actor->drawable) + 0x20;
     register u8 *group asm("sl") = (u8 *)(&actor->group);
     struct ContactPosition range;
     s32 x;

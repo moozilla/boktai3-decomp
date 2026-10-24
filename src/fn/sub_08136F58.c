@@ -1,12 +1,4 @@
 #include "scene_actor_reset.h"
-
-#ifdef NONMATCHING
-// fuzzy: 96.6%
-// fix.py best version (reprinted C)
-// Open: register allocation. The original keeps group in sb and the 0x200 constant in
-// r8 (this draft swaps them), and the final control reset uses separate zero registers
-// and loads the 0xFDFF mask before the halfword.
-
 s32 Callback_InvokeActor(void *, void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void sub_08136F48(void *, struct SceneActorRegistryControl *);
@@ -98,7 +90,11 @@ void sub_08136F58(struct SceneActorRegistryResetView *actor)
             u32 bit;
             SetState(actor, 0, 0, 7);
             SetControl(actor, actor->entryTarget228, 1);
-            bit = 0x200;
+            // The loop around this assignment doubles bit's use weight in
+            // global allocation, which gives it r8 ahead of group (rasolve).
+            do {
+                bit = 0x200;
+            } while (0);
             (*((struct ContactPosition **)(((u8 *)group) + bit)))->pad = 1;
             if (!MoveTo(actor, group, bit)) {
                 Callback_InvokeActor(actor, *((void **)(((u8 *)group) + 0x224)));
@@ -121,6 +117,3 @@ void sub_08136F58(struct SceneActorRegistryResetView *actor)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08136F58);
-#endif

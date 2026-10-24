@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 84.5%
+// fuzzy: 84.6%
 // Collider and sprite views, constant reuse, and the defined zero return still differ.
 #include "display_animation.h"
 #include "scene_vec.h"
@@ -42,7 +42,7 @@ struct EffectVector {
 };
 static inline u32 StepAnimation(u8 *owner, struct DisplaySequenceState *stateArg, u32 flipMask)
 {
-    register struct DisplaySequenceSprite *sprite asm("r8") =
+    struct DisplaySequenceSprite *sprite =
         (struct DisplaySequenceSprite *)(owner + 0x24);
     struct DisplaySequenceState *state = stateArg;
     const volatile u16 *command; /* preserve observed packed-command reads */
@@ -56,7 +56,6 @@ static inline u32 StepAnimation(u8 *owner, struct DisplaySequenceState *stateArg
     {
         u32 frame = *command >> 6;
         register struct DisplaySequenceSprite *out asm("r3") = sprite;
-        asm("" : "+r"(out) : "r"(frame));
         out->frame = frame;
     }
     {
@@ -69,8 +68,7 @@ static inline u32 StepAnimation(u8 *owner, struct DisplaySequenceState *stateArg
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit)) {
             u32 flags = (*(u32 *)(owner + 0x24));
-            register u32 flip asm("r2") = flipMask;
-            asm("" : : "r"(flip));
+            u32 flip = flipMask;
             (*(u32 *)(owner + 0x24)) = flags | flip;
         } else
             (*(u32 *)(owner + 0x24)) &= ~4;
@@ -88,14 +86,14 @@ static inline u32 StepAnimation(u8 *owner, struct DisplaySequenceState *stateArg
         {
             register u32 flags asm("r1");
             if (first != (((*command & 0x30) >> 4) & bit)) {
-                register struct DisplaySequenceSprite *read asm("r2") = sprite;
+                struct DisplaySequenceSprite *read = sprite;
                 flags = read->flags | 8;
             } else {
-                register struct DisplaySequenceSprite *read asm("r2") = sprite;
+                struct DisplaySequenceSprite *read = sprite;
                 flags = read->flags & ~8;
             }
             {
-                register struct DisplaySequenceSprite *out asm("r3") = sprite;
+                struct DisplaySequenceSprite *out = sprite;
                 asm("" : "+r"(out));
                 out->flags = flags;
             }

@@ -32,7 +32,7 @@ static inline void Normalize(struct Vec *v)
 }
 void Hresvelgr_SteerTowardTarget(struct Actor *input)
 {
-    register struct Actor *a asm("r10") = input;
+    struct Actor *a = input;
     struct Vec delta, left, right;
     register struct Vec *v asm("r5") = &a->steering;
     register s32 y asm("r9");

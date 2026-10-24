@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 96.0%
+// fuzzy: 98.3%
 // Structure matches; the mirrored flag is re-read via sp instead of r4 and the command-lookup registers differ.
 struct ParticleVector {
     u16 x, y, z, unused;
@@ -43,12 +43,11 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
     register struct Projectile *sprite asm("r5") = owner;
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, duration, flags, bit;
-    asm("" : "+r"(sprite));
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
         {
-            register struct Projectile *source asm("r5") = base;
+            struct Projectile *source = base;
             asm("" : "+r"(source));
             table = source->sequence.commands;
         }

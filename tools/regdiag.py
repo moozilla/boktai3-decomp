@@ -199,11 +199,24 @@ def object_function(o_path, func):
     sys.exit(f"{func} not in {o_path}")
 
 
-def first_function(src):
+def symbol_name(src, func):
+    """The object-file name of FUNC: drafts often say `#define Nice_Name sub_XXXXXXXX`."""
+    m = re.search(r"^#\s*define\s+" + re.escape(func) + r"\s+(\w+)\s*$", open(src).read(), re.M)
+    return m.group(1) if m else func
+
+
+def first_function(src, nonmatching=False):
+    """The first non-static function; with NONMATCHING, the first one in a draft
+    (a multi-function unit's first function is usually already matched)."""
     text = re.sub(r"/\*.*?\*/|//[^\n]*", "", open(src).read(), flags=re.S)
+    if nonmatching:
+        drafts = "".join(re.findall(r"#\s*ifdef\s+NONMATCHING\b(.*?)#\s*else\b", text, re.S))
+        for m in re.finditer(r"^(static\s+)?[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\)\s*\{", drafts, re.M):
+            if not m.group(1):
+                return symbol_name(src, m.group(2))
     for m in re.finditer(r"^(static\s+)?[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\)\s*\{", text, re.M):
         if not m.group(1):
-            return m.group(2)
+            return symbol_name(src, m.group(2))
     return os.path.splitext(os.path.basename(src))[0]
 
 
@@ -258,7 +271,7 @@ class Analysis:
 def analyze(src, func=None, nonmatching=False):
     if nonmatching and "-DNONMATCHING" not in build.DEFINES:
         build.DEFINES.append("-DNONMATCHING")
-    func = func or first_function(src)
+    func = symbol_name(src, func) if func else first_function(src, nonmatching)
     an = Analysis()
     an.func = func
 

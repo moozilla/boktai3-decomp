@@ -1,7 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 96.0%
 struct Position {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -51,23 +49,25 @@ static inline s32 PlayerKind(void)
     return player[offset];
 }
 // confidence=low: highlights the nearest eligible actor and invokes its script on input.
+// The mask as an inline argument matches (found by tools/fix.py).
+static inline u32 ActorFlag(u32 mask, struct Actor *actor)
+{
+    return actor->flags & mask;
+}
 #define SceneActorAnimation_UpdateInteractionCue sub_0802E188
 void SceneActorAnimation_UpdateInteractionCue(struct Context *input)
 {
     struct Context *context = input;
     s32 buttons = gUnk_03005260[1];
-    register s32 pressed asm("sl") = 1;
+    s32 pressed = 1;
     s32 kind;
     struct Actor *nearest;
     struct Actor *actor;
     s32 playerKind;
-    asm("" ::: "r0");
-    asm("" : "+r"(pressed));
     {
-        register s32 scratch asm("r6") = pressed;
+        s32 scratch = pressed;
         asm("" ::"r"(scratch));
         scratch &= buttons;
-        asm("" ::"r"(scratch));
         pressed = scratch;
     }
     playerKind = PlayerKind();
@@ -126,7 +126,7 @@ selected:
         s32 best = 1000000;
         actor = context->head;
         while (actor) {
-            if ((actor->flags & 0x800) && actor->script) {
+            if (ActorFlag(0x800, actor) && actor->script) {
                 struct Position *position = &actor->position;
                 struct Position *target = context->target;
                 s32 x = target->x - position->x;
@@ -201,6 +201,3 @@ selected:
         Script_Call(nearest->script, 0);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0802E188);
-#endif

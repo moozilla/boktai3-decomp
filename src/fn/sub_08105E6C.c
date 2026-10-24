@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 92.6%
+// fuzzy: 92.7%
 // fix.py best version (reprinted C)
 // Remaining differences: pointer lifetimes, flag-test address reuse, and decoder register allocation.
 #include "contact_swarm.h"
@@ -39,7 +39,7 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
     struct DisplaySequenceState *state = st;
     const volatile u16 *command;
     u32 duration, flags, bit;
-    register u32 done asm("r2");
+    u32 done;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -78,7 +78,7 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
     {
         u32 elapsed = state->elapsed + 1;
         register u32 mask asm("r5");
-        register u32 temp asm("r1");
+        u32 temp;
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;

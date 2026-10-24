@@ -150,3 +150,68 @@ Results on October 23:
 * Old drafts' residue is mostly register allocation (often with pins).
   rasolve found no exact compiler-space fix on 8 sampled; that needs its own
   catalog (priority changes as C edits).
+
+## Fourth session: register differences (October 23-24)
+
+Test set: the 121 NONMATCHING drafts at 95% fuzzy or better. 34 differ only
+in registers (`check.py`'s "N differing insns, 0 ignoring registers"); 27 of
+those 34 use register pins.
+
+* `tools/whyreg.py FILE.c [FUNC] --nonmatching` prints, for each instruction
+  whose registers differ, its operands after expand, cse, cse2, combine and
+  local alloc, with pseudos named by their variables, and says which pass is
+  responsible: a substitution of another equal value (cse), swapped
+  commutative operands, or the same value throughout (allocation, use
+  rasolve). Over the 34 drafts: 83 reload registers, 62 allocation, one cse
+  substitution (Vanargand_UpdateRepeatedPairAttack: cse stores `result`
+  where the ROM stores `phase`, both known to be 0), one operand order.
+* rasolve over the 34: 10 have an exact compiler-space fix. Nine are a
+  reload-register rotation shift ("reload #k should come one spill register
+  later"), one is a priority (sub_08136F58).
+* The priority case matched with `do { bit = 0x200; } while (0);`, found by
+  rasolve's guided C search. flow weights each reference by loop depth
+  (`REG_N_REFS += loop_depth`), and a do/while(0) still emits loop notes, so
+  the wrap doubles the weight of every register the statement sets or uses
+  without changing the code. It is now the spelling `sp_loop_weight`, first
+  for local-alloc and global-alloc decisions; fix.py finds sub_08136F58 in
+  11 s (tests/fix).
+* ChildGroup_UpdateTrailingMembers (parked before) matched in two steps:
+  start the loop counter before the four address locals (the ROM loads #3
+  first), which leaves only allocation; rasolve said "raise i's priority",
+  and fix.py's loop weight did it in 5 s.
+* Reload rotation shifts have no C edit yet. On SceneHud_SelectUpgradeableStat
+  the ROM's first reload takes r5 where ours takes r1; reload1.c
+  order_regs_for_reload prefers free call-clobbered registers, so in the ROM
+  something allocated to r1 is live across that insn. The guided search
+  (33k candidates, focused and whole-function) found nothing.
+* Two 99.9% drafts (Player_EmitMovementEffects, Player_UpdateTetherMovement)
+  differ in one branch target: the ROM threads the first null test of `p`
+  through two inline null tests; ours stops after one, because FlagFour's
+  `return 0` leaves a set of its result register on the path at
+  thread_jumps time. Writing the flag test as `p && ...` threads correctly
+  but lets cse2 drop FlagMovement's null test. Open; step.py and flip.py
+  report nothing for a branch-target-only difference.
+
+### Pins in drafts (October 24)
+
+The register-only drafts were mostly pinned, and pins in a draft are added
+while other differences remain; they outlive their reason. `unpin.py --drafts`
+removes them: all at once, then one hint at a time, then a pin together with
+the barriers that name only its variable, keeping each removal that does not
+lower the fuzzy score.
+
+* Over the 267 pinned drafts it matched 9 functions: sub_08097E38 and
+  sub_080BAB80 with no pins at all, sub_081AD3E8 (28 bytes off) likewise,
+  and sub_080AA688, sub_08138778 (118 bytes off), sub_0820DC18, sub_082343B8,
+  sub_0802EA90 (96.2%) and sub_081B1B90 (95.7%) with some pins left. 52 more
+  drafts improved (sub_081D1908 44.5% to 79.8%, sub_081D7934 90.2% to 98.0%).
+* sub_082081F4 is sub_0820DC18 for another enemy. Once the second matched,
+  its spelling of the random-index read plus the same pin removal matched the
+  first. Drafts with a matched sibling are worth a manual diff.
+* The objective matters. The first sweep ranked by differing bytes, which
+  count a one-instruction shift as a mismatch to the end; it kept removals
+  that lowered the count while the fuzzy score fell in 75 of 108 drafts.
+  Those rewrites were dropped; the tool ranks by (fuzzy, bytes).
+* regdiag (and step, whyreg, rasolve) now resolve `#define Nice_Name
+  sub_XXXXXXXX` aliases and, with --nonmatching, analyze the draft's function
+  rather than a multi-function unit's first one.

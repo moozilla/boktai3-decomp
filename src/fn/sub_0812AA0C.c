@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 87.4%
+// fuzzy: 88.3%
 // Open: entry vector pointer allocation, reset offsets, and six structural differences.
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
@@ -35,7 +35,7 @@ static inline u32 Step(struct Sprite *sprite, struct Anim *state)
     {
         u32 input = state->flags;
         register u32 first asm("r1");
-        register u32 maskBit asm("r3") = 1;
+        u32 maskBit = 1;
         bit = maskBit;
         asm("" : "+r"(bit));
         first = bit;
@@ -184,7 +184,7 @@ void LinkedEffect_SetVariant(void *, u32);
 void LinkedEffect_BeginRisingTravel(struct Pool *pool, struct Effect *p)
 {
     if (p->entered) {
-        register u32 heading asm("r3");
+        u32 heading;
         u32 sample;
         register u32 distance asm("r4");
         struct UnsignedVector *velocity;

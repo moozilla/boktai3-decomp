@@ -3,7 +3,7 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 95.2%
+// fuzzy: 97.7%
 // fix.py best version (reprinted C)
 // Remaining differences: keyframe pointer allocation, vector lifetimes and projection stores.
 struct VanargandPart {
@@ -231,7 +231,6 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
     switch (state) {
         case 0:
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
             if (entering) {
                 *enter = 0;
@@ -247,7 +246,6 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
 
         case 1:
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
             if (entering) {
                 *enter = 0;
@@ -264,7 +262,6 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
         case 2: {
             struct SceneVec target;
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
             if (entering) {
                 *enter = 0;

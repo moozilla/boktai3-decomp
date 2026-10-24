@@ -2,7 +2,7 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 89.4%
+// fuzzy: 90.5%
 // fix.py best version (reprinted C)
 // Remaining: terrain/center allocation and pointer/register lifetimes.
 // The original falls through on the unobstructed path without setting its result.
@@ -76,7 +76,6 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
     s32 previous;
     s32 height;
     struct Vec *velocity = &local.velocity;
-    asm("" : "+r"(direction), "+r"(velocity));
     local.zero = 0;
     CpuSet(&local.zero, velocity, 0x05000002);
     if (current != target) {
