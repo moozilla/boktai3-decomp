@@ -2,6 +2,7 @@
 """Look inside agbcc at one draft: what really differs from the ROM, and where it came from.
 
   scope.py FILE.c [FUNC]        compile the draft, align it with the ROM, print the real differences
+  scope.py FILE.c KNOB=V ...    the same with instrumented-compiler knobs set (a what-if)
   scope.py insn UID [FUNC]      one RTL insn through every pass (from the last compile of FUNC)
 
 One compile with the instrumented agbcc (-g -dp -da) gives the code, the C line of every
@@ -14,6 +15,7 @@ its insn uid and the pass that created that insn.
 Everything is kept in build/scope/FUNC/ for follow-up queries:
   diff.txt    the whole aligned listing     diff.json  the same rows, for jq
   u.s         agbcc output with insn uids   u.i.PASS   RTL after each pass
+  stderr.txt  the compiler's stderr (knob traces such as CSE_DEBUG go here)
 """
 import difflib
 import json
@@ -65,8 +67,20 @@ def nonmatching_func(src):
     return defs[-1] if defs else None
 
 
-def compile_draft(src, func):
-    """Compile with the instrumented agbcc; return (bytes, address, info) for FUNC."""
+def rom_name(src, func):
+    """The ROM-side name of the draft: its INCLUDE_ASM in the #else branch (names may lag the C)."""
+    _, addr, _ = check.inventory()
+    if func in addr:
+        return func
+    text = open(os.path.join(ROOT, src)).read()
+    m = re.search(r"#ifdef NONMATCHING.*?#else(.*?)#endif", text, re.S)
+    names = re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', m.group(1) if m else "")
+    return next((n for n in names if n in addr), func)
+
+
+def compile_draft(src, func, env=None):
+    """Compile with the instrumented agbcc; return (bytes, address, info) for FUNC.
+    ENV adds knob settings (CSE_NOCANON=N, AGBCC_FORCE=..., see tools/agbcc-instr.sh)."""
     wd = workdir(func)
     defines = build.DEFINES + ["-DNONMATCHING"]
     pre = build.sh(build.CPP + ["-nostdinc", "-undef"] + defines + ["-I", "include", "-iquote", ".", src])
@@ -77,7 +91,8 @@ def compile_draft(src, func):
         except FileNotFoundError:
             pass
     r = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "-dp", "-da", "u.i", "-o", "u.s"],
-                       cwd=wd, capture_output=True, text=True)
+                       cwd=wd, capture_output=True, text=True, env=dict(os.environ, **(env or {})))
+    open(os.path.join(wd, "stderr.txt"), "w").write(r.stderr)
     if r.returncode or "error" in r.stderr:
         sys.exit(r.stderr.strip())
     asm = open(os.path.join(wd, "u.s")).read()
@@ -94,8 +109,8 @@ def compile_draft(src, func):
     end = next((v & ~1 for v, n in syms if (v & ~1) > start), len(whole))
     base = syms[0][0] & ~1
     _, addr, _ = check.inventory()
-    a = addr[func]
-    return whole[start - base:end - base], a, {"obj_offset": start, "wd": wd}
+    a = addr[rom_name(src, func)]
+    return whole[start - base:end - base], a, {"obj_offset": start, "wd": wd, "env": env or {}}
 
 
 def symtab(obj):
@@ -322,7 +337,7 @@ def align(rom, mine):
 
 def report(src, func, rom_code, addr, mine, info, t_compile):
     wd = info["wd"]
-    rdata = rom_data_ranges(func, addr)
+    rdata = rom_data_ranges(rom_name(src, func), addr)
     if rdata is None:
         rdata = rom_pool_ranges(rom_code, addr)
     rom = decode(rom_code, addr, rdata)
@@ -369,7 +384,9 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
     nm = sum(1 for _, _, t in pairs if t in "+~")
     same = rom_code == mine
     rel = os.path.relpath(wd, ROOT)
-    print(f"{func}  {src}  ROM {len(rom_code)} B / draft {len(mine)} B  compile {t_compile:.1f}s")
+    knobs = " ".join(f"{k}={v}" for k, v in info.get("env", {}).items())
+    print(f"{func}  {src}  ROM {len(rom_code)} B / draft {len(mine)} B  compile {t_compile:.1f}s"
+          + (f"  [{knobs}]" if knobs else ""))
     if same:
         print("MATCH")
         return 0
@@ -433,16 +450,18 @@ def main():
     if not src.endswith(".c"):
         src = os.path.join("src", "fn", src + ".c")
     src = os.path.relpath(os.path.join(ROOT, src) if not os.path.isabs(src) else src, ROOT)
-    func = args[1] if len(args) > 1 else nonmatching_func(src)
+    env = dict(a.split("=", 1) for a in args[1:] if "=" in a)
+    rest = [a for a in args[1:] if "=" not in a]
+    func = rest[0] if rest else nonmatching_func(src)
     if not func:
         sys.exit("name the function: scope.py FILE.c FUNC")
     os.makedirs(os.path.join(ROOT, "build", "scope"), exist_ok=True)
     open(os.path.join(ROOT, "build", "scope", "LAST"), "w").write(func)
     t0 = time.time()
-    mine, addr, info = compile_draft(src, func)
+    mine, addr, info = compile_draft(src, func, env)
     t1 = time.time() - t0
     _, _, sizes = check.inventory()
-    rom_code = load_rom(verify=False)[off(addr):off(addr) + sizes[func]]
+    rom_code = load_rom(verify=False)[off(addr):off(addr) + sizes[rom_name(src, func)]]
     return report(src, func, rom_code, addr, mine, info, t1)
 
 
