@@ -54,7 +54,7 @@ struct Manager *ParticleManager_Create(void *, u32);
 s32 Mod(s32, s32);
 void sub_08217E40(void *, s32);
 #ifdef NONMATCHING
-// fuzzy: 78.0%
+// fix.py best (sweep after the inlined-insn fix)
 // Register lifetimes and stack offsets still differ in the group and velocity loops.
 static inline s32 Random(u16 *table, u32 mask, u32 *rng)
 {
@@ -73,9 +73,11 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position, st
 {
     struct Manager *m = gUnk_02000060;
     u8 *resource;
-    struct Group *g, *pool;
+    struct Group *g;
+    struct Group *pool;
     u32 *rng;
-    s32 priority, j;
+    s32 priority;
+    s32 j;
     register s32 i asm("r5");
     asm("" : "+m"(count), "+m"(options), "+m"(position));
     if (!m) {
@@ -84,12 +86,12 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position, st
             return -1;
     }
     priority = options >> 8;
+    options &= 255;
     {
         register s32 held asm("r4") = priority;
         asm("" : "+r"(held));
         priority = held;
     }
-    options &= 255;
     if (count > 8)
         count = 8;
     asm("" : "+m"(options));
@@ -98,26 +100,26 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position, st
     else
         resource = m->large;
     j = 0;
-    rng = &gUnk_03005308;
     asm("" : "+r"(rng));
+    rng = &gUnk_03005308;
     pool = m->groups;
     g = pool;
     asm("" : "+r"(g));
     for (; j < 6; g++, pool++, j++) {
         if (!g->active) {
             g->active = 1;
-            g->type = *(u8 *)&options;
-            g->count = *(u8 *)&count;
+            g->type = *((u8 *)(&options));
+            g->count = *((u8 *)(&count));
             if (priority > 0)
                 g->priority = priority - 1;
             else
                 g->priority = 2;
             i = 0;
             if (i < count) {
-                u16 *table = gUnk_0203B400;
+                u16 *table = (u16 *)0x0203B400;
                 register u32 mask asm("sb") = 0x3ff;
                 struct Particle *p = pool->particles;
-                u8 *sprite = (u8 *)pool + 20;
+                u8 *sprite = ((u8 *)pool) + 20;
                 asm("" : "+r"(table), "+r"(mask));
                 i = count;
                 asm("" : "+r"(i));
@@ -150,12 +152,12 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position, st
                     ClearFlag(&p->flags, 1);
                     {
                         struct Vec *source = position;
-                        u32 a = *(u32 *)source;
-                        u32 b = *((u32 *)source + 1);
-                        *(u32 *)&p->position = a;
-                        *((u32 *)&p->position + 1) = b;
+                        u32 a = *((u32 *)source);
+                        u32 b = *(((u32 *)source) + 1);
+                        *((u32 *)(&p->position)) = a;
+                        *(((u32 *)(&p->position)) + 1) = b;
                     }
-                    p->tile = *(u16 *)(resource + 4) + gUnk_08604B90[options];
+                    p->tile = (*((u16 *)(resource + 4))) + gUnk_08604B90[options];
                     p->priority = g->priority;
                     sub_08217E40(sprite, 0);
                     p++;
@@ -176,6 +178,7 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position, st
             break;
         }
     }
+
     return 0;
 }
 

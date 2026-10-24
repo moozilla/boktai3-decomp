@@ -5,7 +5,7 @@
 void *SceneActorContacts_SelectForActor(void *, u32);
 void SceneActorControl_OnIdle(void);
 #ifdef NONMATCHING
-// fuzzy: 75.0%
+// fix.py best (sweep after the inlined-insn fix)
 /* Offset reuse, gate-result lifetime and control reset registers still differ. */
 static inline u32 Bits(u32 *p, u32 mask)
 {
@@ -44,11 +44,12 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *p, u32 k
 #define SceneActorReaction_BeginContactResponse sub_0812F3CC
 u8 SceneActorReaction_BeginContactResponse(struct SceneActorRegistryResetView *a)
 {
-    register u8 *group asm("r5") = (u8 *)&a->group;
+    register u8 *group asm("r5") = (u8 *)(&a->group);
     void *contact;
     u32 *flags;
     u32 zero;
     u8 byteZero;
+    s32 t1;
     asm("" : "+r"(group));
     {
         u32 mask = 0x1010;
@@ -58,15 +59,15 @@ u8 SceneActorReaction_BeginContactResponse(struct SceneActorRegistryResetView *a
     if (!ActorBits(a, 0x1000000))
         goto fail;
     flags = &a->flags2CC;
-    if (!HasContact((void *)((u8 *)a + 0xDC), 1))
+    if (!HasContact((void *)(((u8 *)a) + 0xDC), 1))
         goto fail;
     {
         u32 mask = 0x80;
-        if ((u8)(*flags & mask))
+        if ((u8)((*flags) & mask))
             goto fail;
     }
-    if (FIELD(a, 0x45C, u8 *)) {
-        u32 v = FIELD(FIELD(a, 0x45C, u8 *), 5, u8);
+    if (*((u8 **)(((u8 *)a) + 0x45C))) {
+        u32 v = *((u8 *)(((u8 *)(*((u8 **)(((u8 *)a) + 0x45C)))) + 5));
         if (v & 1)
             goto fail;
         if (v & 4)
@@ -79,16 +80,20 @@ u8 SceneActorReaction_BeginContactResponse(struct SceneActorRegistryResetView *a
         goto success;
 fail:
     return 0;
+
 success: {
     u8 *control = group + 0x4C;
-    Clear(flags, 0xFFFEBE3F);
+    do {
+        Clear(flags, 0xFFFEBE3F);
+    } while (0);
     zero = 0;
-    FIELD(control, 0x18, u32) = zero;
+    *((u32 *)(((u8 *)control) + 0x18)) = zero;
     byteZero = 0;
-    FIELD(control, 0x14, u16) = zero;
-    FIELD(control, 8, u16) = zero;
+    *((u16 *)(((u8 *)control) + 0x14)) = zero;
+    *((u16 *)(((u8 *)control) + 8)) = zero;
 }
-    FIELD(group, 0x88, void *) = contact;
+
+    *((void **)(((u8 *)group) + 0x88)) = contact;
     Control(a, SceneActorControl_OnIdle, 0x10, zero, byteZero);
     {
         u32 state = 3;
@@ -100,7 +105,8 @@ success: {
     a->counter2AC = zero;
     a->field2B1 = 1;
     Clear(flags, ~0x10);
-    Set(&a->flags2D6, 0x800);
+    t1 = 0x800;
+    Set(&a->flags2D6, t1);
     return 1;
 }
 

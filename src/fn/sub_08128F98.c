@@ -2,7 +2,7 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 80.2%
+// fix.py best (sweep after the inlined-insn fix)
 // Vector address lifetimes, RNG allocation and packed coordinate stores still differ.
 struct Vec {
     s16 x, y, z, pad;
@@ -85,11 +85,14 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
 {
     struct {
         u32 zero;
-        struct Vec center, velocity, spot;
+        struct Vec center;
+        struct Vec velocity;
+        struct Vec spot;
         s32 cell;
     } local;
     s32 direction = Divide64((p->angle + 0x20) & 255) * 64;
     s32 cell;
+    s32 t1;
     SetVelocity(&local.center, direction, 512);
     Add(&local.center, &p->position, &local.center);
     {
@@ -97,22 +100,24 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
         local.cell = sourceCell;
     }
     local.zero = 0;
-    CpuSet(&local.zero, &local.velocity, 0x05000002);
+    t1 = 0x05000002;
+    CpuSet(&local.zero, &local.velocity, t1);
     if (count > 0) {
         u32 *rng = &gUnk_03005308;
         s32 remaining = count;
         do {
-            s32 height, difference;
-            *(u32 *)&local.spot = (u16)((Random(rng) & 255) - 128);
-            *(u32 *)&local.spot.z = (u16)((Random(rng) & 255) - 128);
+            s32 height;
+            s32 difference;
+            *((u32 *)(&local.spot)) = (u16)((Random(rng) & 255) - 128);
+            *((u32 *)(&local.spot.z)) = (u16)((Random(rng) & 255) - 128);
             Add(&local.spot, &local.center, &local.spot);
             cell = CellIndex(&local.spot);
             if (FeatherEffectPool_ClipScatterPath(p, &local.spot, local.cell, cell,
                                                   Divide64(direction)))
                 goto next;
-            if (*CellData(cell) >> 4)
+            if ((*CellData(cell)) >> 4)
                 goto next;
-            height = *CellData(local.cell) & 15;
+            height = (*CellData(local.cell)) & 15;
             {
                 s32 value = *CellData(cell);
                 difference = value & 15;
@@ -128,7 +133,7 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
                 u32 zero = 0;
                 local.spot.y = difference << 8;
                 if (!p->variant) {
-                    s32 life = (Random(rng) & 63) + 20;
+                    s32 life = (((u8)Random(rng)) & 63) + 20;
                     SpriteEffectController_Create(&local.spot, &local.velocity, 0x1C1A, 0xD1B8, 3,
                                                   zero, 0x31, zero, 1, zero, zero, life, 4, 1,
                                                   p->effectFlags, 30, 8, 8);
@@ -140,6 +145,7 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
             }
         next:
             remaining--;
+
         } while (remaining);
     }
 }

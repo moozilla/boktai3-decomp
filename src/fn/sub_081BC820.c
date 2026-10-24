@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fix.py best (sweep after the inlined-insn fix)
 // twin.py transplant from a matched near-clone
 // 31 differing instruction runs; first diff at +0x4 (adds r7, r0, #0 vs adds r6, r0, #0)
 void Bg_SetLayerMap(u32, u32, u32);
@@ -20,7 +21,7 @@ void StatGauge_BeginAdjustment(u8 *s)
     u32 latezero;
     u32 mask;
     u32 mask2;
-    u32 mask3;
+    s8 mask3;
     u32 value;
     struct Word8 {
         u8 pad[8];
@@ -32,6 +33,7 @@ void StatGauge_BeginAdjustment(u8 *s)
     u32 *initial;
     s32 i;
     s32 j;
+    typeof(p) c1;
     Bg_SetLayerMap(0, *((u32 *)(s + 0x8E0)), 4);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     DarkLoan_HideSprites(s);
@@ -54,16 +56,20 @@ void StatGauge_BeginAdjustment(u8 *s)
     *((u32 *)(s + 0x5A0)) &= (mask2 = ~1);
     q = (u32 *)(resource + 0x5A0);
     p = (u32 *)(resource + 0x3C0);
+    c1 = p;
     j = 3;
     do {
-        *p &= mask2;
+        *c1 &= mask2;
         *q &= mask2;
         q = (u32 *)(((u8 *)q) + 0x60);
-        p = (u32 *)(((u8 *)p) + 0x60);
+        p = (u32 *)(((u8 *)c1) + 0x60);
     } while ((--j) >= 0);
     latezero = 0;
     DarkLoan_UpdateAdjustmentDigits(s);
-    *((u16 *)(s + 0x908)) = latezero;
+    {
+        u16 *d1 = (u16 *)(s + 0x8F8);
+        d1[8] = latezero;
+    }
     *((u16 *)(s + 0x90A)) = latezero;
     ((struct Word8 *)(s + 0x778))->flags &= (mask3 = ~1);
     *((u32 *)(s + 0x898)) &= mask3;

@@ -34,7 +34,7 @@ static inline s32 Entry_MessageCount(Entry *entry)
 // confidence=low: handles the emitter's cutscene messages: 0xC starts emitting with a speed,
 // direction and palette from the message, 0xD drains it.
 #ifdef NONMATCHING
-// fuzzy: 63.1%
+// fix.py best (sweep after the inlined-insn fix)
 // The ROM does not hoist the field addresses out of the loop (it uses only r4-r7), and cross-jumping merges the two loop tests.
 void sub_081C2C04(struct SparkleEmitter *p)
 {
@@ -47,7 +47,7 @@ void sub_081C2C04(struct SparkleEmitter *p)
             case 12: {
                 s32 speed = m[4];
                 u8 direction = ((u8 *)m)[10];
-                s32 palette = m[6];
+                u32 palette = m[6];
                 p->speed = speed;
                 p->angle = (u8)((direction + 5) << 5);
                 p->palette = palette;
@@ -59,6 +59,7 @@ void sub_081C2C04(struct SparkleEmitter *p)
                 Trigger_ConsumePending(entry, 1);
                 break;
             }
+
             case 13:
                 Sound_PauseChannel12(8);
                 p->update = SparkleEmitter_UpdateDraining;
@@ -68,6 +69,7 @@ void sub_081C2C04(struct SparkleEmitter *p)
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081C2C04);
 #endif

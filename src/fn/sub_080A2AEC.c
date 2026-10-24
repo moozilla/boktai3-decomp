@@ -1,7 +1,7 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
-// fuzzy: 83.1%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: address lifetimes, register allocation, and instruction scheduling.
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: eases landing displacement, then restores route pursuit.
@@ -139,9 +139,41 @@ static inline void ClearFlag(u16 *p, u32 mask)
 {
     *p &= mask;
 }
+inline static void ClearFlag_1(struct SceneActorRegistryResetView *a_, u32 mask)
+{
+    u16 *p = &a_->flags2D4;
+    *p &= mask;
+}
+
+inline static u8 MoveLanding_1(struct LandingState *s, struct SceneActorRegistryResetView *a)
+{
+    s16 *cx;
+    s16 *cz;
+    s32 x = Quarter(s->targetX - s->currentX);
+    s32 z;
+    cx = &s->currentX;
+    z = Quarter(s->targetZ - s->currentZ);
+    cz = &s->currentZ;
+    if (x > 200)
+        x = 200;
+    else if (x < (-200))
+        x = -200;
+    if (z > 200)
+        z = 200;
+    else if (z < (-200))
+        z = -200;
+    a->motion.x += x;
+    a->motion.z += z;
+    *cx += x;
+    *cz += z;
+    if ((!x) && (!z))
+        return 1;
+    return 0;
+}
+
 void Spider_UpdateLandingMotion(struct SceneActorRegistryResetView *a, s32 frame)
 {
-    struct LandingSequence *seq = (void *)((u8 *)a->drawable + 0x48);
+    struct LandingSequence *seq = (void *)(((u8 *)a->drawable) + 0x48);
     u32 *flags;
     if (TakeEntry(&a->field2B2)) {
         ClearContext(&((struct SpiderRecoveryContext *)a->context)->flags, ~6);
@@ -158,19 +190,21 @@ void Spider_UpdateLandingMotion(struct SceneActorRegistryResetView *a, s32 frame
         flags = &a->flags2CC;
         *flags |= mask;
     }
-    if (frame <= 17 && seq->frame == 1)
+    if ((frame <= 17) && (seq->frame == 1))
         seq->elapsed = 0;
-    if (MoveLanding(a)) {
-        u8 *group = (u8 *)&a->group;
-        a->field2B0 = 1;
+    if (MoveLanding_1((void *)a, a)) {
+        u8 *group = (u8 *)(&a->group);
+        do {
+            a->field2B0 = 1;
+        } while (0);
         SetState(a, 0, 0, 12);
-        SetControl(a, *(void **)(group + 0x48), 26);
+        SetControl(a, *((void **)(group + 0x48)), 26);
         sub_080A4798(a);
         SceneActorMovement_ResolveRoutePosition(a);
         AddGroup(&a->group, 4);
         AddMotion(a, 0x80);
         a->group.field418 = a->group.field416;
-        ClearFlag(&a->flags2D4, ~0x20);
+        ClearFlag_1(a, ~0x20);
         a->direction = a->fieldE9;
         {
             u32 mask = 0x10;

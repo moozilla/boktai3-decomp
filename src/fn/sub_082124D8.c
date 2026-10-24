@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 84.6%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining: constant/register materialization order in the tail, widget loop base address.
 struct IbRes {
@@ -34,6 +34,7 @@ u32 ForgingBook_InitSprites(u8 *p)
     struct IbPos pos;
     s32 i;
     u8 *w;
+    u32 t1;
     res = ScriptProc_Start(0xcb05, 0xe2ab);
     *((struct IbRes *)(p + 0x24)) = *res;
     ResourceHeader_Relocate(p + 0x24, res);
@@ -66,7 +67,7 @@ u32 ForgingBook_InitSprites(u8 *p)
     pos.y = 0x18;
     w = p + 0x3a8;
     for (i = 0; i < 18; i++) {
-        Widget_InitLinked(w, p + 0x388, (u16)(0xf0 + i), 0x10, 0, 0, 0, 0);
+        Widget_InitLinked(w, p + 0x388, (u16)(0xf0 + i), t1 = 0x10, 0, 0, 0, 0);
         *((u16 *)(w + 0x20)) = pos.x;
         *((u16 *)(w + 0x22)) = pos.y;
         *((u16 *)(w + 0x24)) = 0;
@@ -76,7 +77,7 @@ u32 ForgingBook_InitSprites(u8 *p)
         } else {
             pos.x += 0x18;
         }
-        w += 0x60;
+        w += t1 + 80;
     }
 
     {
@@ -112,6 +113,7 @@ u32 ForgingBook_InitSprites(u8 *p)
     *((u8 *)(p + 0xb18)) = 0x40;
     *((u8 *)(p + 0xb19)) = 0x40;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", ForgingBook_InitSprites);
 #endif

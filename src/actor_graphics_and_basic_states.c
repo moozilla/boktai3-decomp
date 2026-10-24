@@ -53,7 +53,7 @@ void SceneActorGraphics_SelectResource(u8 *p)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 84.5%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining: contact-store scheduling, field-address lifetimes, and registers.
 #define SceneActorGraphics_OnDamageContact sub_08021F4C
 extern u8 *gUnk_02000580;
@@ -78,39 +78,44 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contactArg, u8 *actorArg
     struct ContactVector size;
     u8 *position;
     s32 item;
-    if (*(u16 *)(p + 0x34e))
+    typeof(*((u16 *)(source + 0x44))) t1;
+    if (*((u16 *)(p + 0x34e)))
         return;
     mode = gUnk_02000580[0x418];
     Collision_CalculateDamageResponse(source, contact);
-    if (*(u32 *)(p + 0x358) == 1 && mode != 2)
-        *(u16 *)(contact + 0x3e) = 0;
+    if (((*((u32 *)(p + 0x358))) == 1) && (mode != 2))
+        *((u16 *)(contact + 0x3e)) = 0;
     if (!(gUnk_030053F4 & 0x1000))
-        PlayerStats_AddContactHundredths(source, contact, *(s16 *)(p + 0x380));
-    *(u32 *)(p + 0x33c) = *(u16 *)(contact + 0x3e);
-    asm("" ::: "memory");
-    if (*(u16 *)(contact + 0x3e) == 0) {
+        PlayerStats_AddContactHundredths(source, contact, *((s16 *)(p + 0x380)));
+    *((u32 *)(p + 0x33c)) = *((u16 *)(contact + 0x3e));
+    asm("" : : : "memory");
+    if ((*((u16 *)(contact + 0x3e))) == 0) {
         Sound_PlaySongChecked(0x211);
-        *(u16 *)(p + 0x34c) = 10;
-        *(void **)(p + 0x288) = p + 0x5c4;
+        *((u16 *)(p + 0x34c)) = 10;
+        *((void **)(p + 0x288)) = p + 0x5c4;
         size.x = 16;
         size.y = 0;
         size.z = 16;
-        DamageNumberDisplay_Show(contact, *(u16 *)(contact + 0x3e), 0, sprite + 12, &size, 1);
+        DamageNumberDisplay_Show(contact, *((u16 *)(contact + 0x3e)), 0, sprite + 12, &size, 1);
     }
-    if (*(u16 *)(source + 6) & 0x100)
-        p[0x342] = source[0x42];
-    else
-        p[0x342] = Math_Atan2(*(s16 *)(contact + 0x24) - *(s16 *)(source + 0x24),
-                              *(s16 *)(contact + 0x28) - *(s16 *)(source + 0x28));
-    *(u32 *)(actor + 0xbc) = *(u32 *)(source + 0x34);
-    *(u32 *)(actor + 0xc0) = *(u32 *)(source + 0x38);
-    *(u16 *)(p + 0x34e) = *(u16 *)(source + 0x44);
+    {
+        u32 k1 = 0x100;
+        if ((*((u16 *)(source + 6))) & k1)
+            p[0x342] = source[0x42];
+        else
+            p[0x342] = Math_Atan2((*((s16 *)(contact + 0x24))) - (*((s16 *)(source + 0x24))),
+                                  (*((s16 *)(contact + 0x28))) - (*((s16 *)(source + 0x28))));
+    }
+    *((u32 *)(actor + 0xbc)) = *((u32 *)(source + 0x34));
+    *((u32 *)(actor + 0xc0)) = *((u32 *)(source + 0x38));
+    t1 = *((u16 *)(source + 0x44));
+    *((u16 *)(p + 0x34e)) = t1;
     PlayerStats_AddContactHundredths(source, contact, actor[0xe2]);
-    if (*(s32 *)(p + 0x33c) > 0 && (*(u32 *)(source + 0x38) & 1))
+    if (((*((s32 *)(p + 0x33c))) > 0) && ((*((u32 *)(source + 0x38))) & 1))
         p[0x340] = 1;
     if (!(gUnk_030053F4 & 0x1000))
         return;
-    if (mode - 1 <= 1) {
+    if ((mode - 1) <= 1) {
         position = contact + 0xc;
         if (WirelessGame_TryAddCyclingItem(position) && (contact[0x43] & 8))
             WirelessGame_AddItem(position, 0);
@@ -118,33 +123,39 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contactArg, u8 *actorArg
     }
     if (contact[0x43] & 8)
         WirelessGame_AddItem(contact + 0xc, 0);
-    if (!(*(u32 *)(source + 0x38) & 0x800000))
+    if (!((*((u32 *)(source + 0x38))) & 0x800000))
         return;
-    item =
-        (s16)(*(u16 *)((u8 *)gUnk_02000710 + (*(s16 *)((u8 *)gUnk_02000710 + 0x52) << 1) + 0x88) -
-              6);
+    item = (s16)((*((u16 *)((((u8 *)gUnk_02000710) +
+                             ((*((s16 *)(((u8 *)gUnk_02000710) + 0x52))) << 1)) +
+                            0x88))) -
+                 6);
     switch ((u32)item) {
         case 0:
             WirelessGame_AddItem(contact + 0xc, 2);
             break;
+
         case 1:
             WirelessGame_AddItem(contact + 0xc, 1);
             break;
+
         case 2:
             WirelessGame_AddItem(contact + 0xc, 3);
             break;
+
         case 3:
             contact += 0xc;
             position = contact;
             WirelessGame_AddItem(position, 2);
             WirelessGame_AddItem(position, 1);
             break;
+
         case 4:
             contact += 0xc;
             position = contact;
             WirelessGame_AddItem(position, 2);
             WirelessGame_AddItem(position, 3);
             break;
+
         case 5:
             contact += 0xc;
             position = contact;
@@ -154,6 +165,7 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contactArg, u8 *actorArg
             break;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08021F4C);
 #endif
@@ -423,11 +435,11 @@ void SceneActors_AddResourceCost(int amount)
 // confidence=low: index of the first of the count tracked positions at 0x110 that lies inside
 // the box min..max on x and z, or -1.
 #ifdef NONMATCHING
-// fuzzy: 67.2%
+// fix.py best (sweep after the inlined-insn fix)
 // The ROM recomputes p + 0x110 + i * 4 on every pass (no loop optimization), which the goto
 // loop reproduces; the remaining difference is allocation: inside needs about 3x its priority
 // (translate.py) to take r4 ahead of count.
-s32 sub_08022624(u8 *p, s32 count, s16 *min, s16 *max)
+s32 sub_08022624(u8 *p, u8 count, s16 *min, s16 *max)
 {
     s32 i;
     i = 0;
@@ -439,18 +451,20 @@ loop: {
     if (pos) {
         s32 x = pos[0];
         u8 inside = 0;
-        if (x >= min[0] && x <= max[0] && pos[2] >= min[2] && pos[2] <= max[2])
+        if ((((x >= min[0]) && (x <= max[0])) && (pos[2] >= min[2])) && (pos[2] <= max[2]))
             inside = 1;
         if (inside)
             return i;
     }
 }
+
     i++;
     if (i < count)
         goto loop;
 end:
     return -1;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08022624);
 #endif

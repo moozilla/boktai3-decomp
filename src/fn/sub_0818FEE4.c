@@ -3,7 +3,7 @@
 #include "global.h"
 #include "display_animation.h"
 #ifdef NONMATCHING
-// fuzzy: 64.3%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: stack-vector placement, source-coordinate addresses and allocation.
 struct NidhoggrVector {
     s16 x, y, z, pad;
@@ -64,23 +64,31 @@ void Nidhoggr_UpdateSeekingAttackEffect(struct NidhoggrEffect *pArg)
 {
     register struct NidhoggrEffect *p asm("r6") = pArg;
     u8 *state;
-    union SeekingVector motion, immediatePoint, expiredPoint;
-    s32 dx, dy, dz, angle, randomAngle;
+    union SeekingVector motion;
+    union SeekingVector immediatePoint;
+    union SeekingVector expiredPoint;
+    s32 dx;
+    s32 dy;
+    s32 dz;
+    s32 angle;
+    s32 randomAngle;
     struct NidhoggrVector *position;
     asm("" : : "r"(p));
     {
-
         struct NidhoggrSprite *sprite = &p->sprite;
         struct DisplaySequenceState *state = &p->sequence;
-        const volatile u16 *command; /* preserve observed packed-command reads */
-        u32 ended, duration, flags, bit;
+        const volatile u16 *command;
+        u32 ended;
+        u32 duration;
+        u32 flags;
+        u32 bit;
         {
             u32 offset = state->index << 1;
             const volatile u16 *table;
             table = p->sequence.commands;
-            command = (const volatile u16 *)((u32)table + offset);
+            command = (const volatile u16 *)(((u32)table) + offset);
         }
-        sprite->frame = *command >> 6;
+        sprite->frame = (*command) >> 6;
         {
             u32 input = state->flags;
             register u32 first asm("r1");
@@ -89,7 +97,7 @@ void Nidhoggr_UpdateSeekingAttackEffect(struct NidhoggrEffect *pArg)
             asm("" : "+r"(bit));
             first = bit;
             first &= input;
-            if (first != (((*command & 0x30) >> 4) & bit))
+            if (first != ((((*command) & 0x30) >> 4) & bit))
                 sprite->flags |= 4;
             else
                 sprite->flags &= ~4;
@@ -104,22 +112,20 @@ void Nidhoggr_UpdateSeekingAttackEffect(struct NidhoggrEffect *pArg)
             first &= input;
             asm("" : "+r"(first));
             first = (u8)first;
-            if (first != (((*command & 0x30) >> 4) & bit))
+            if (first != ((((*command) & 0x30) >> 4) & bit))
                 sprite->flags |= 8;
             else
                 sprite->flags &= ~8;
         }
         {
             u32 elapsed = state->elapsed + 1;
-            register u32 mask asm(NIDHOGGR_MASK);
+            register u32 mask asm("r5");
             register u32 temp asm("r1");
             register u32 savedDuration asm("r3");
             state->elapsed = elapsed;
             temp = 0xFFFF;
             asm("" : "+r"(temp));
             mask = temp;
-            /* Preserve the observed constant-to-mask copy. */
-
             duration = state->duration;
             elapsed = (u16)elapsed;
             savedDuration = duration;
@@ -169,16 +175,16 @@ void Nidhoggr_UpdateSeekingAttackEffect(struct NidhoggrEffect *pArg)
                     u32 offset = state->index << 1;
                     const volatile u16 *table;
                     table = state->commands;
-                    command = (const volatile u16 *)((u32)table + offset);
+                    command = (const volatile u16 *)(((u32)table) + offset);
                 }
-                state->frameWeight = *command & 15;
+                state->frameWeight = (*command) & 15;
                 {
                     register s32 weight asm("r1") = state->frameWeight;
                     s32 speed;
                     speed = state->speed;
                     speed = (speed * weight) >> 6;
                     state->duration = speed;
-                    if (!(u8)speed)
+                    if (!((u8)speed))
                         state->duration = 1;
                 }
             } else {
@@ -187,16 +193,16 @@ void Nidhoggr_UpdateSeekingAttackEffect(struct NidhoggrEffect *pArg)
         }
     }
     state = &p->state;
-    if (*state == 0)
+    if ((*state) == 0)
         goto initial_phase;
-    if (*state == 255)
+    if ((*state) == 255)
         goto immediate_impact;
     {
         u8 *player = gUnk_02000710;
         position = &p->sprite.position;
-        dx = *(s16 *)(player + 0x30) - position->x;
-        dy = *(s16 *)(player + 0x32) - position->y;
-        dz = *(s16 *)(player + 0x34) - position->z;
+        dx = (*((s16 *)(player + 0x30))) - position->x;
+        dy = (*((s16 *)(player + 0x32))) - position->y;
+        dz = (*((s16 *)(player + 0x34))) - position->z;
     }
     angle = Math_Atan2(dx, dz);
     if (RandomSample() > 0xdfff)
@@ -210,28 +216,34 @@ initial_phase: {
         p->velocity.x = 8;
     {
         u8 *age = &p->age;
-        if (*age > 30) {
+        if ((*age) > 30) {
             (*state)++;
             *age = 0;
         }
     }
     return;
 }
+
 immediate_impact: {
     u8 *boss = p->boss;
     immediatePoint.words[0] = 0xffa00000;
-    immediatePoint.packed.z = 0;
+    do {
+        immediatePoint.packed.z = 0;
+    } while (0);
     OffsetPointAdd(&immediatePoint, &p->sprite.position);
     Nidhoggr_CreateTimedPositionEffect(&immediatePoint, boss);
     goto destroy;
 }
+
 strong_motion:
     motion.words[0] = (u16)(gUnk_086149C4[(angle + 64) & 255] >> 9);
+
     motion.packed.z = gUnk_086149C4[angle & 255] >> 9;
 motion_ready:
     randomAngle = (u8)RandomSample();
-    motion.packed.x += (gUnk_086149C4[(randomAngle + 64) & 255] >> 10);
-    motion.packed.z += (gUnk_086149C4[randomAngle & 255] >> 10);
+
+    motion.packed.x += gUnk_086149C4[(randomAngle + 64) & 255] >> 10;
+    motion.packed.z += gUnk_086149C4[randomAngle & 255] >> 10;
     p->velocity = motion.coordinates;
     if (p->age == 0)
         p->state++;
@@ -245,10 +257,11 @@ motion_ready:
         expiredPoint.packed.z = 0;
         OffsetPointAdd(&expiredPoint, position);
         Nidhoggr_CreateTimedPositionEffect(&expiredPoint, boss);
-        Collider_Remove((u8 *)p + 0x120);
+        Collider_Remove(((u8 *)p) + 0x120);
     }
 destroy:
     p->update = 0;
+
     if (p->destroy) {
         Callback_InvokeActor(p, p->destroy);
         p->destroy = 0;
@@ -256,9 +269,10 @@ destroy:
     return;
 proximity:
     dx += 48;
+
     dy += 256;
     dz += 48;
-    if ((u32)dx <= 96 && dy >= 0 && dy <= 256 && dz >= 0 && dz <= 96)
+    if (((((((u32)dx) <= 96) && (dy >= 0)) && (dy <= 256)) && (dz >= 0)) && (dz <= 96))
         p->state = 255;
     return;
 }

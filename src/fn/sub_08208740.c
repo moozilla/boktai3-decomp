@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
+// fix.py best (sweep after the inlined-insn fix)
 // twin.py transplant from a matched near-clone
 // Collider and sprite views, constant reuse, and the defined zero return still differ.
 #include "display_animation.h"
@@ -317,6 +318,153 @@ static inline u32 StepAnimation_UpdateCombat(u8 *owner, struct DisplaySequenceSt
     return ended;
 }
 
+inline static u32 RandomFrom_UpdateCombat(const u16 *table)
+{
+    gUnk_03005308 = (u16)((gUnk_03005308 + 1) & 0x3ff);
+    return table[gUnk_03005308];
+}
+
+static inline u32 StepAnimation_UpdateCombat(u8 *owner, struct DisplaySequenceState *stateArg,
+                                             u32 flipMask)
+{
+    struct DisplaySequenceSprite *sprite = (struct DisplaySequenceSprite *)(owner + 0x24);
+    struct DisplaySequenceState *state = stateArg;
+    const volatile u16 *command; /* preserve observed packed-command reads */
+    u32 ended;
+    u32 duration;
+    u32 flags;
+    u32 bit;
+    {
+        u32 offset = state->index << 1;
+        const volatile u16 *table;
+        table = state->commands;
+        command = (const volatile u16 *)((u32)table + offset);
+    }
+    {
+        u32 frame = *command >> 6;
+        register struct DisplaySequenceSprite *out asm("r3") = sprite;
+        out->frame = frame;
+    }
+    {
+        u32 input = state->flags;
+        register u32 first asm("r2");
+        u32 maskBit = 1;
+        bit = maskBit;
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        if (first != (((*command & 0x30) >> 4) & bit)) {
+            u32 flags = (*(u32 *)(owner + 0x24));
+            u32 flip = flipMask;
+            (*(u32 *)(owner + 0x24)) = flags | flip;
+        } else
+            (*(u32 *)(owner + 0x24)) &= ~4;
+    }
+    {
+        u32 input = state->flags;
+        u32 bit;
+        register u32 first asm("r2");
+        bit = 2;
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        asm("" : "+r"(first));
+        first = (u8)first;
+        {
+            register u32 flags asm("r1");
+            if (first != (((*command & 0x30) >> 4) & bit)) {
+                struct DisplaySequenceSprite *read = sprite;
+                flags = read->flags | 8;
+            } else {
+                struct DisplaySequenceSprite *read = sprite;
+                flags = read->flags & ~8;
+            }
+            {
+                struct DisplaySequenceSprite *out = sprite;
+                asm("" : "+r"(out));
+                out->flags = flags;
+            }
+        }
+    }
+    {
+        u32 elapsed = state->elapsed + 1;
+        u32 mask;
+        register u32 temp asm("r2");
+        register u32 savedDuration asm("r4");
+        state->elapsed = elapsed;
+        temp = 0xFFFF;
+        asm("" : "+r"(temp));
+        mask = temp;
+        /* Keep the live mask distinct from its source without binding r7. */
+        asm("" : "+&r"(mask) : "r"(temp));
+        duration = state->duration;
+        elapsed = (u16)elapsed;
+        savedDuration = duration;
+        if (elapsed >= duration) {
+            state->elapsed = 0;
+            flags = state->flags;
+            if (flags & 4) {
+                u32 index = state->index;
+                if (index == 0) {
+                    u32 hold = 8;
+                    hold &= flags;
+                    if (hold) {
+                        state->elapsed = savedDuration;
+                    } else {
+                        state->index = state->frameCount - 1;
+                    }
+                    ended = 1;
+                } else {
+                    state->index = index - 1;
+                    ended = 0;
+                }
+            } else {
+                u32 index = state->index + 1;
+                u32 frameCount;
+                u32 endFlag;
+                state->index = index;
+                frameCount = state->frameCount;
+                if ((index & mask) >= frameCount) {
+                    endFlag = flags & 8;
+                    asm("" : "+r"(endFlag));
+                    endFlag = (u8)endFlag;
+                    if (endFlag) {
+                        state->elapsed = duration;
+                        {
+                            u32 lastIndex = frameCount - 1;
+                            state->index = lastIndex;
+                        }
+                    } else {
+                        state->index = 0;
+                    }
+                    ended = 1;
+                } else {
+                    ended = 0;
+                }
+            }
+            {
+                u32 offset = state->index << 1;
+                const volatile u16 *table;
+                table = state->commands;
+                command = (const volatile u16 *)((u32)table + offset);
+            }
+            state->frameWeight = *command & 15;
+            {
+                register s32 weight asm("r2") = state->frameWeight;
+                s32 speed;
+                speed = state->speed;
+                speed = (speed * weight) >> 6;
+                state->duration = speed;
+                if (!(u8)speed)
+                    state->duration = 1;
+            }
+        } else {
+            ended = 0;
+        }
+    }
+    return ended;
+}
+
 s32 CannonTurret_UpdateCombat(u8 *p)
 {
     struct SceneVec position;
@@ -366,12 +514,12 @@ s32 CannonTurret_UpdateCombat(u8 *p)
             }
             velocity.x = -4;
             table = (const u16 *)0x0203B400;
-            velocity.y = RandomFrom(table) & 7;
+            velocity.y = RandomFrom_UpdateCombat(table) & 7;
             velocity.z = -4;
             size.x = 24;
-            size.y = (RandomFrom(table) & 7) + 3;
+            size.y = (RandomFrom_UpdateCombat(table) & 7) + 3;
             size.z = 24;
-            count = (RandomFrom(table) & 3) + 4;
+            count = (RandomFrom_UpdateCombat(table) & 3) + 4;
             sub_08014634(count, 2, &position, &velocity, &size, 15, 15);
             Anim_RestartSequence(p + 0x10c, *((void **)(p + 0x164)), 10, 0, 0);
             AnimData_SelectPaletteBank(p + 0x50, 0x1bc);

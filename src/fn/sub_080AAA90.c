@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 81.8%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: mask setup order and flag-cursor strength reduction.
 #include "scene_actor_reset.h"
 struct Vec {
@@ -48,28 +48,42 @@ static inline s32 half(s32 v)
 }
 // confidence=low: adds per-segment impulses and halves their signed components.
 #define TentacleActor_UpdateSegmentImpulses sub_080AAA90
+inline static u8 test_080AAA90(u8 *p, u8 mask)
+{
+    if ((*p) & mask)
+        return 1;
+    return 0;
+}
+
 void TentacleActor_UpdateSegmentImpulses(struct SceneActorRegistryResetView *p)
 {
     struct Group *g;
     s32 i;
     register u32 two asm("r9");
     register u32 one asm("r8");
+    g = p->context;
     if (inactive(p))
         return;
-    g = p->context;
     two = 2;
     asm("" : : "r"(two));
     one = 1;
     asm("" : : "r"(one));
     for (i = 0; i < g->count; i++) {
         struct Segment *s = &g->segments[i];
-        if (test((u8 *)g + i * 296 + 0x4d9, two) && !test((u8 *)g + i * 296 + 0x4d9, one)) {
-            (*(s16 *)((u8 *)g + i * 296 + 0x3f0)) += (*(s16 *)((u8 *)g + i * 296 + 0x4f0));
-            (*(s16 *)((u8 *)g + i * 296 + 0x3f2)) += (*(s16 *)((u8 *)g + i * 296 + 0x4f2));
-            (*(s16 *)((u8 *)g + i * 296 + 0x3f4)) += (*(s16 *)((u8 *)g + i * 296 + 0x4f4));
-            (*(s16 *)((u8 *)g + i * 296 + 0x4f0)) = half((*(s16 *)((u8 *)g + i * 296 + 0x4f0)));
-            (*(s16 *)((u8 *)g + i * 296 + 0x4f2)) = half((*(s16 *)((u8 *)g + i * 296 + 0x4f2)));
-            (*(s16 *)((u8 *)g + i * 296 + 0x4f4)) = half((*(s16 *)((u8 *)g + i * 296 + 0x4f4)));
+        if (test_080AAA90((((u8 *)g) + (i * 296)) + 0x4d9, two) &&
+            (!test_080AAA90((((u8 *)g) + (i * 296)) + 0x4d9, one))) {
+            *((s16 *)((((u8 *)g) + (i * 296)) + 0x3f0)) +=
+                *((s16 *)((((u8 *)g) + (i * 296)) + 0x4f0));
+            *((s16 *)((((u8 *)g) + (i * 296)) + 0x3f2)) +=
+                *((s16 *)((((u8 *)g) + (i * 296)) + 0x4f2));
+            *((s16 *)((((u8 *)g) + (i * 296)) + 0x3f4)) +=
+                *((s16 *)((((u8 *)g) + (i * 296)) + 0x4f4));
+            *((s16 *)((((u8 *)g) + (i * 296)) + 0x4f0)) =
+                half(*((s16 *)((((u8 *)g) + (i * 296)) + 0x4f0)));
+            *((s16 *)((((u8 *)g) + (i * 296)) + 0x4f2)) =
+                half(*((s16 *)((((u8 *)g) + (i * 296)) + 0x4f2)));
+            *((s16 *)((((u8 *)g) + (i * 296)) + 0x4f4)) =
+                half(*((s16 *)((((u8 *)g) + (i * 296)) + 0x4f4)));
         }
     }
 }

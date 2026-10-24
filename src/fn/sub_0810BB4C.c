@@ -1,6 +1,7 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 70.6%
+// fix.py best (sweep after the inlined-insn fix)
+// fix.py best (sweep after the inlined-insn fix)
 // Open: register allocation only. The original keeps p in r4, i*2 in r2 and
 // the clamped count in r3; this draft swaps p and i*2 (p in r3, i*2 in r4).
 // Pinning the count to r3 reaches ~82% but p/i*2 stay swapped; pinning p
@@ -37,13 +38,13 @@ static inline void SetNegative(struct LinkResults *p, s32 i, u16 v)
 // confidence=low: bumps one side's positive result counter, saturating at 20.
 void sub_0810BB4C(struct LinkResults *p, s32 i)
 {
-    if (p != NULL && Valid(i)) {
+    if ((p != ((void *)0)) && Valid(i)) {
         u16 *c = &p->positive[i];
-        s32 v;
-        (*c)++;
-        v = *c;
-        if (v > 20)
-            v = 20;
+        u8 v;
+        do {
+            (*c)++;
+        } while (0);
+        v = (v > 20) ? (20) : (*c);
         SetPositive(p, i, v);
     }
 }
@@ -51,16 +52,17 @@ void sub_0810BB4C(struct LinkResults *p, s32 i)
 // confidence=low: bumps one side's negative result counter, saturating at 20.
 void sub_0810BB90(struct LinkResults *p, s32 i)
 {
-    if (p != NULL && Valid(i)) {
+    if ((p != ((void *)0)) && Valid(i)) {
         u16 *c = &p->negative[i];
-        s32 v;
-        (*c)++;
-        v = *c;
-        if (v > 20)
-            v = 20;
+        u8 v;
+        do {
+            (*c)++;
+        } while (0);
+        v = (v > 20) ? (20) : (*c);
         SetNegative(p, i, v);
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0810BB4C);
 INCLUDE_ASM("asm/nonmatching", sub_0810BB90);

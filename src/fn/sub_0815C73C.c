@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 78.4%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, u32, u32, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
@@ -77,7 +77,13 @@ void Player_ConfigureAttachmentEffect(u8 *p, u32 action, s32 value, s32 arg)
 
         case 6:
             *((u8 *)(p + 0xB08)) = 5;
-            *((u16 *)(p + 0xB0A)) = 0;
+            {
+                u16 *d1 = (u16 *)(p + 0xB04);
+                {
+                    u8 k1 = 0;
+                    d1[3] = k1;
+                }
+            }
             *((void **)(p + 0xB04)) = ActorAttachment_UpdateFromDescriptor(
                 *((void **)(p + 0xB04)), p + 0x24, *((u8 *)(p + 0xB08)), 0, 0, 0, 150, 230);
             break;
@@ -96,6 +102,7 @@ void Player_ConfigureAttachmentEffect(u8 *p, u32 action, s32 value, s32 arg)
             break;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0815C73C);
 #endif

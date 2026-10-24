@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 73.5%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: owner and random-source allocation, scale decay and state setup.
 struct Vec {
     s16 x, y, z, pad;
@@ -130,8 +130,9 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
     u8 params[0x1c];
     struct Vec spawn;
     struct Actor *p2 = p;
-    u8 *sprite = (u8 *)p + 0x48;
-    u16 *scaleX, *scaleZ;
+    u8 *sprite = ((u8 *)p) + 0x48;
+    u16 *scaleX;
+    u16 *scaleZ;
     register u32 *flags asm("r9");
     if (p->changed) {
         s32 angle;
@@ -140,7 +141,9 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
             angle = p->savedAngle;
         else
             angle = p->targetAngle + 128;
-        facing(p, angle);
+        do {
+            facing(p, angle);
+        } while (0);
         SceneActors_StartDirectionalAnimation(p, p2->animationData, p2->animation, 29, 0, 1, 4);
         Sound_PlaySong(0x55e);
     }
@@ -163,45 +166,52 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 elapsed)
     decay(scaleX);
     scaleZ = &p2->scaleZ;
     decay(scaleZ);
-    p2->phaseTimer = 8;
-    p2->motion = 0;
     {
-        u32 mask = 12;
-        flags = &p->flags;
-        *flags |= mask;
-    }
-    if (tick > 29) {
-        *scaleX = 0;
-        *scaleZ = 0;
-        p2->scaleStep = 0;
-        if (p->health <= 0 && !p->locked) {
-            setState(p, Ratatosk_UpdateDefeatSequence, 15);
-        } else {
-            setState(p, Ratatosk_UpdateDirectionalAnimation, 1);
-            p->nextState = 1;
-        }
-    } else {
-        register u32 one asm("r12") = 1;
-        asm("" : "+r"(one));
-        if (tick & one) {
-            register u32 speed asm("r7") = randomA() & 7;
-            register u32 variant asm("r6") = randomA() & one;
-            register u32 angle asm("r8") = (u8)randomA();
-            register u32 drift asm("r4") = randomA() & 15;
-            struct Vec *position = &spawn;
-            spawn = p->position;
-            position->x -= 128;
-            position->y += 128;
-            variant <<= 12;
-            drift <<= 12;
-            Ratatosk_InitAnimatedParticleParams(params);
-            Ratatosk_ConfigureAnimatedParticle(params, (randomA() & 31) + 52, speed, angle, 1,
-                                               variant, drift);
-            sub_081FC26C(params, position);
-        }
+        typeof(p2->phaseTimer) *q1 = &p2->phaseTimer;
+        u8 z1 = 8;
+        *q1 = z1;
+        p2->motion = 0;
         {
-            u32 mask = 1;
+            u32 mask = 12;
+            flags = &p->flags;
             *flags |= mask;
+        }
+        if (tick > 29) {
+            *scaleX = 0;
+            *scaleZ = 0;
+            p2->scaleStep = 0;
+            if ((p->health <= 0) && (!p->locked)) {
+                setState(p, Ratatosk_UpdateDefeatSequence, 15);
+            } else {
+                setState(p, Ratatosk_UpdateDirectionalAnimation, 1);
+                p->nextState = 1;
+            }
+        } else {
+            register u32 one asm("r12") = 1;
+            asm("" : "+r"(one));
+            if (tick & one) {
+                register u32 speed asm("r7") = randomA() & 7;
+                register u32 variant asm("r6") = randomA() & one;
+                register u32 angle asm("r8") = (u8)randomA();
+                register u32 drift asm("r4") = randomA() & 15;
+                struct Vec *position = &spawn;
+                spawn = p->position;
+                position->x -= 128;
+                position->y += 128;
+                variant <<= 12;
+                drift <<= 12;
+                Ratatosk_InitAnimatedParticleParams(params);
+                Ratatosk_ConfigureAnimatedParticle(params, (randomA() & 31) + 52, speed, angle, 1,
+                                                   variant, drift);
+                sub_081FC26C(params, position);
+            }
+            {
+                u32 mask = 1;
+                {
+                    s32 v1 = (*flags) | mask;
+                    *flags = v1;
+                }
+            }
         }
     }
 }

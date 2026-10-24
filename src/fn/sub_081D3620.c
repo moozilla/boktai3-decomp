@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 63.6%
+// fix.py best (sweep after the inlined-insn fix)
 struct CloudPosition {
     u16 x, y, z, pad;
 };
@@ -31,6 +31,13 @@ static inline s32 ShiftAnchor(s32 coordinate, u32 random)
 }
 // confidence=low: scatters particle anchors horizontally and raises them by sixteen units.
 #define PlayerParticleCloud_ScatterAnchors sub_081D3620
+inline static s32 ShiftAnchor_081D3620(s32 coordinate, u32 random)
+{
+    u8 shifted = coordinate - 512;
+    asm("" : : "r"(shifted));
+    return (random & 1023) + shifted;
+}
+
 s32 PlayerParticleCloud_ScatterAnchors(void)
 {
     struct CloudTask *p = gUnk_02000298;
@@ -40,17 +47,19 @@ s32 PlayerParticleCloud_ScatterAnchors(void)
     if (!p)
         return -1;
     particle = p->particles;
-    table = (const u16 *)RANDOM_TABLE_ADDR;
+    table = (const u16 *)0x0203B400;
     for (i = 39; i >= 0; i--, particle++) {
         u32 random = RandomValue(table);
-        particle->origin.x = ShiftAnchor(particle->origin.x, random);
+        particle->origin.x = ShiftAnchor_081D3620(particle->origin.x, random);
         random = RandomValue(table);
-        particle->origin.z = ShiftAnchor(particle->origin.z, random);
+        particle->origin.z = ShiftAnchor_081D3620(particle->origin.z, random);
         particle->origin.y += 4096;
         particle->anchor = &particle->origin;
     }
+
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081D3620);
 #endif

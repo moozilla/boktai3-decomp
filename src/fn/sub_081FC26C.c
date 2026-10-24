@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 80.0%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: random-source lifetimes, sprite pointers and inlined sequence allocation.
 #define Ratatosk_SpawnAnimatedParticle sub_081FC26C
@@ -167,6 +167,123 @@ static inline u32 RandomSample(void)
     return gUnk_086141BC[gUnk_03005304];
 }
 // confidence=low: randomizes a larger particle record and its sprite or sequence.
+inline static void updatePlayback_081FC26C(struct Particle *eIn, struct DisplaySequenceState *state,
+                                           struct ContactSwarmSprite *sprite)
+{
+    struct Particle *e = eIn;
+    const volatile u16 *command;
+    u32 flags;
+    u32 bit;
+    struct ContactSwarmSprite *result;
+    typeof(state->speed) t1;
+    {
+        u32 offset = state->index << 1;
+        const volatile u16 *table;
+        table = e->sequence.commands;
+        command = (const volatile u16 *)(((u32)table) + offset);
+    }
+    sprite->frame = (*command) >> 6;
+    {
+        u32 input = state->flags;
+        u32 first;
+        u32 maskBit = 1;
+        bit = maskBit;
+        first = bit;
+        first &= input;
+        {
+            u32 second = (((*command) & 0x30) >> 4) & bit;
+            result = sprite;
+            if (first != second)
+                e->sprite.flags |= 4;
+            else
+                e->sprite.flags &= ~4;
+        }
+    }
+    {
+        u32 input = state->flags;
+        u32 bit;
+        u32 first;
+        bit = 2;
+        first = bit;
+        first &= input;
+        if (first != ((((*command) & 0x30) >> 4) & bit))
+            sprite->flags |= 8;
+        else
+            sprite->flags &= ~8;
+        first = (u8)first;
+    }
+    {
+        u32 elapsed = state->elapsed + 1;
+        u32 mask;
+        u32 duration;
+        u32 temp;
+        u32 savedDuration;
+        state->elapsed = elapsed;
+        temp = 0xFFFF;
+        mask = temp;
+        duration = state->duration;
+        elapsed = (u16)elapsed;
+        savedDuration = duration;
+        if (elapsed >= duration) {
+            state->elapsed = 0;
+            flags = state->flags;
+            if (flags & 4) {
+                u32 index = state->index;
+                if (index == 0) {
+                    u32 hold = 8;
+                    hold &= flags;
+                    if (hold) {
+                        state->elapsed = savedDuration;
+                    } else {
+                        state->index = state->frameCount - 1;
+                    }
+                } else {
+                    state->index = index - 1;
+                }
+            } else {
+                u32 index = state->index + 1;
+                u32 frameCount;
+                u32 endFlag;
+                state->index = index;
+                frameCount = state->frameCount;
+                if ((index & mask) >= frameCount) {
+                    endFlag = flags & 8;
+                    endFlag = (u8)endFlag;
+                    if (endFlag) {
+                        state->elapsed = duration;
+                        {
+                            u32 lastIndex = frameCount - 1;
+                            state->index = lastIndex;
+                        }
+                    } else {
+                        state->index = 0;
+                    }
+                } else {
+                }
+            }
+            {
+                u32 offset = state->index << 1;
+                const volatile u16 *table;
+                table = state->commands;
+                command = (const volatile u16 *)(((u32)table) + offset);
+            }
+            state->frameWeight = (*command) & 15;
+            {
+                s32 weight = state->frameWeight;
+                s32 speed;
+                t1 = state->speed;
+                speed = t1;
+                speed = (speed * weight) >> 6;
+                state->duration = speed;
+                if (!((u8)speed)) {
+                    u32 one = 1;
+                    state->duration = one;
+                }
+            }
+        }
+    }
+}
+
 s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct ContactPosition *position)
 {
     struct ParticlePool *pool = gUnk_020005E4;
@@ -198,12 +315,15 @@ s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct Contact
     e->sprite.position = *position;
     e->appearanceFlags = 0;
     kind = (kind == 3) ? (1) : (RandomSample() & 3);
-    e->appearanceFlags = kind;
+    {
+        typeof(e->appearanceFlags) *q1 = &e->appearanceFlags;
+        *q1 = kind;
+    }
     if ((e->appearanceFlags & 15) <= 1) {
         if (RandomSample() & 1) {
             Anim_SetSequence(&e->sequence, *((void **)(((u8 *)pool) + 0xf38)), 1, 0, 0);
             sprite = &e->sprite;
-            updatePlayback(e, &e->sequence, sprite);
+            updatePlayback_081FC26C(e, &e->sequence, sprite);
         } else {
             u32 variant = RandomSample() & 7;
             if (variant > 5)
@@ -242,6 +362,7 @@ s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct Contact
     *((u32 *)(((u8 *)pool) + 0xf3c)) += 1;
     return slot;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081FC26C);
 #endif

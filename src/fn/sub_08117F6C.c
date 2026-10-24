@@ -109,7 +109,7 @@ void ActorMarkerPool_ShowMarker(s32);
 void Character_SetLowResourceColorEffect(void *, void *);
 
 #ifdef NONMATCHING
-// fuzzy: 82.9%
+// fix.py best (sweep after the inlined-insn fix)
 // confidence=low: restores appearance and resources after defeat recovery.
 #define Glove_UpdateRecoveryFlash sub_08117F6C
 static inline u32 LinkMode(u32 mask)
@@ -120,8 +120,10 @@ void Glove_UpdateRecoveryFlash(struct Glove *p)
 {
     struct Obj *self = &p->motion;
     register s32 h asm("r10");
-    s32 dx, dz;
-    u32 a, b;
+    s32 dx;
+    s32 dz;
+    u32 a;
+    u32 b;
     u16 *flags;
     if (p->active) {
         if (!LinkMode(0x800))
@@ -136,12 +138,15 @@ void Glove_UpdateRecoveryFlash(struct Glove *p)
         *flags |= bit;
     }
     {
-        s32 *vy = &self->vy, *bias = &self->unkC0;
-        s32 *py, *px, *idy, *idz;
-        h = *vy + *bias;
+        s32 *vy = &self->vy;
+        s32 *bias = &self->unkC0;
+        s32 *py;
+        s32 *px;
+        s32 *idy;
+        s32 *idz;
+        h = (*vy) + (*bias);
         if (h > 0xF000)
             h = 0xF000;
-
         self->y += 0x200;
         py = &self->y;
         if (self->steps > 0) {
@@ -160,33 +165,36 @@ void Glove_UpdateRecoveryFlash(struct Glove *p)
             idz = &self->dz;
         }
         Actor_ClampMovementSpeed(self);
-
         {
-            s32 *pprevZ, *pprevX, *pvz;
+            s32 *pprevZ;
+            s32 *pprevX;
+            s32 *pvz;
             s32 lim;
-            self->outX = *px + h - self->prevX;
-            self->outY = *py + *idy;
-            self->outZ = self->vz + *idz;
-            dx = (*px - self->prevX) >> 12;
+            self->outX = ((*px) + h) - self->prevX;
+            self->outY = (*py) + (*idy);
+            self->outZ = self->vz + (*idz);
+            dx = ((*px) - self->prevX) >> 12;
             dz = (self->z - self->prevZ) >> 12;
             lim = 0x3000;
             pprevX = &self->prevX;
-            pprevZ = &self->prevZ;
             pvz = &self->vz;
+            pprevZ = &self->prevZ;
             if (h > lim)
                 dx = 0x80;
-            if (dx == 0 && dz == 0)
+            if ((dx == 0) && (dz == 0))
                 self->angle = 0xFFFF;
             else
                 self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
             *pprevX = *px;
             *pprevZ = self->z;
             Terrain_ResolveActorMotion(self);
-            a = (u32) ~(self->unk3C >> 12) >> 31;
-            b = (u32) ~(self->unk38 >> 12) >> 31;
-            if (self->unk4 != self->unk8 && (self->unk4 & 0x1000) && !(self->unk8 & 0xF000) &&
-                b <= 1 && a == 1) {
-                s32 v = ((*vy >> 10) + (*bias >> 8)) >> 1;
+            a = ((u32)(~(self->unk3C >> 12))) >> 31;
+            b = ((u32)(~(self->unk38 >> 12))) >> 31;
+            if (((((self->unk4 != self->unk8) && (self->unk4 & 0x1000)) &&
+                  (!(self->unk8 & 0xF000))) &&
+                 (b <= 1)) &&
+                (a == 1)) {
+                s32 v = (((*vy) >> 10) + ((*bias) >> 8)) >> 1;
                 if (v < 4)
                     v = 4;
                 if (v > 18)
@@ -195,7 +203,6 @@ void Glove_UpdateRecoveryFlash(struct Glove *p)
                 self->flags40 &= ~1;
             }
             p->height = h;
-
             Actor_UpdateShadowSpriteParts(self, p->model);
             if (self->flags40 & 2)
                 *pvz = 0;
@@ -206,25 +213,25 @@ void Glove_UpdateRecoveryFlash(struct Glove *p)
     if (p->blinkTimer) {
         p->blinkTimer--;
     } else {
-        if (U32(p, 0x618) & 1)
+        if ((*((u32 *)(((u8 *)p) + 0x618))) & 1)
             CharacterModel_ClearAnimationFlags(p->model, 1);
         else
             CharacterModel_SetAnimationFlags(p->model, 1);
         p->blinkTimer = 3;
     }
-    U32(self, 0x5C) = U32(self, 0x60);
+    *((u32 *)(((u8 *)self) + 0x5C)) = *((u32 *)(((u8 *)self) + 0x60));
     {
-        u16 *current = (u16 *)((u8 *)self + 0x58);
-        u16 *target = (u16 *)((u8 *)self + 0x5A);
-        if ((s16)*current < (s16)*target) {
-            if ((s16)*target - *(s16 *)current > 100)
+        u16 *current = (u16 *)(((u8 *)self) + 0x58);
+        u16 *target = (u16 *)(((u8 *)self) + 0x5A);
+        if (((s16)(*current)) < ((s16)(*target))) {
+            if ((((s16)(*target)) - (*((s16 *)current))) > 100)
                 *current += 20;
             else
                 *current += 5;
         } else
             *current = *target;
         if (p->timer > 120) {
-            U32(self, 0x5C) = U32(self, 0x60);
+            *((u32 *)(((u8 *)self) + 0x5C)) = *((u32 *)(((u8 *)self) + 0x60));
             *current = *target;
             CharacterModel_ClearAnimationFlags(p->model, 1);
             {
@@ -240,11 +247,12 @@ void Glove_UpdateRecoveryFlash(struct Glove *p)
                 s32 mask = ~1;
                 *flags &= mask;
             }
-            Character_SetLowResourceColorEffect((u8 *)self + 0x44, (u8 *)self + 0x48);
+            Character_SetLowResourceColorEffect(((u8 *)self) + 0x44, ((u8 *)self) + 0x48);
         } else
             p->timer++;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08117F6C);
 #endif

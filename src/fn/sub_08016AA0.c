@@ -28,7 +28,7 @@ extern const u16 gUnk_0203B400[];
 // confidence=low: rises for the first few frames, then sinks (shaking in mode 3) and moves to
 // state 4 after 8 (mode 3: 9) frames.
 #ifdef NONMATCHING
-// fuzzy: 63.3%
+// fix.py best (sweep after the inlined-insn fix)
 // The shaking jitter differs: the ROM keeps the table in r8 and computes x - 1 before adding the random bits.
 void sub_08016AA0(u8 *m, struct Effect *p)
 {
@@ -41,30 +41,34 @@ void sub_08016AA0(u8 *m, struct Effect *p)
             p->position.y += 0x40;
         else
             p->position.y -= 4;
-    } else {
-        if (p->timer <= 4)
-            p->position.y += 0x40;
-        else
-            p->position.y -= 8;
-    }
+    } else if (p->timer <= 4)
+        p->position.y += 0x40;
+    else
+        p->position.y -= 8;
     FloatingEffect_Project(p);
-    if (p->mode == 3 && p->timer > 3) {
+    if ((p->mode == 3) && (p->timer > 3)) {
         const u16 *table = gUnk_0203B400;
         u32 *seed = &gUnk_03005308;
-        u32 index = (*seed + 1) & 0x3FF;
+        u16 index = ((*seed) + 1) & 0x3FF;
         *seed = index;
-        p->sprite.position.x += (table[index] & 3) - 1;
+        {
+            typeof(table[index]) v1 = table[index];
+            p->sprite.position.x += (v1 & 3) - 1;
+        }
         index = (index + 1) & 0x3FF;
         *seed = index;
         p->sprite.position.y += (table[index] & 3) - 1;
     }
-    if (p->mode == 3 ? p->timer > 8 : p->timer > 7) {
-        p->state = 4;
+    if ((p->mode == 3) ? (p->timer > 8) : (p->timer > 7)) {
+        do {
+            p->state = 4;
+        } while (0);
         p->entered = 1;
         p->timer = 0;
     } else
         p->timer++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08016AA0);
 #endif

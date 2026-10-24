@@ -2,7 +2,7 @@
 #include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 83.6%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: motion-pointer lifetime and state reset scheduling.
 extern const u8 gUnk_0824E230[];
@@ -66,7 +66,9 @@ void Vorn_SelectReactionControl(struct SceneActorRegistryResetView *a)
             a->phase2A9 = 1;
             {
                 typeof(a->state2A8) *q1 = &a->state2A8;
-                *q1 = active;
+                do {
+                    *q1 = active;
+                } while (0);
             }
             a->behavior2AA = active;
             a->counter2AC = active;
@@ -76,6 +78,7 @@ void Vorn_SelectReactionControl(struct SceneActorRegistryResetView *a)
         SetMotion(m, 8);
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080B197C);
 #endif

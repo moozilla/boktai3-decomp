@@ -5,8 +5,6 @@ void SceneActorControl_OnIdle(void);
 #define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
 // confidence=low: starts the actor callback at 0x234 then consumes its trigger.
 #define SceneActorControl_UpdateCallbackTrigger sub_08130994
-#ifdef NONMATCHING
-// fuzzy: 76.2%
 /* Control argument placement, state offsets and zero lifetimes still differ. */
 static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind,
                                 u32 zero)
@@ -69,22 +67,29 @@ static inline void SetFlags(struct SceneActorRegistryResetView *actor, u32 mask)
     asm("" : "+r"(value));
     actor->flags2D6 = value;
 }
+inline static void SetState_1(struct SceneActorRegistryResetView *actor, u32 state, u32 zero)
+{
+    actor->state2A8 = state;
+    actor->phase2A9 = 0;
+    actor->behavior2AA = 0;
+    actor->counter2AC = zero;
+    {
+        typeof(actor->field2B1) *q1 = &actor->field2B1;
+        *q1 = 1;
+    }
+}
+
 void SceneActorControl_UpdateCallbackTrigger(struct SceneActorRegistryResetView *actor)
 {
     u32 taken = SceneActorControl_TakeFlag(&actor->field2B1);
-
     if (taken) {
-        BeginControlZero(actor, FIELD(actor, 0x234, void *), 0x11);
+        BeginControlZero(actor, *((void **)(((u8 *)actor) + 0x234)), 0x11);
     } else if (actor->field2B0) {
-        Trigger_ConsumePending((u8 *)actor + 0xC, 1);
+        Trigger_ConsumePending(((u8 *)actor) + 0xC, 1);
         BeginControl(actor, SceneActorControl_OnIdle, 0x10, taken);
-        SetState(actor, 3, taken, 0);
+        SetState_1(actor, 3, taken);
         SetFlags(actor, 0x1000);
     } else {
         actor->counter2AC++;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08130994);
-#endif

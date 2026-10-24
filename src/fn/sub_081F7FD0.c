@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 73.6%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: vector and random-source lifetimes, stack addressing and register allocation.
 struct Vec {
     s16 x, y, z, pad;
@@ -101,13 +101,28 @@ static inline u32 flag(void *p, u32 mask)
 }
 // confidence=low: draws the player into a midpoint orbit before releasing movement.
 #define Ratatosk_UpdatePlayerOrbitAttack sub_081F7FD0
+inline static void sum_081F7FD0(struct Vec *d, struct Vec *a, struct Vec *b)
+{
+    {
+        typeof(a->x) v2 = a->x;
+        d->x = v2 + b->x;
+    }
+    {
+        typeof(a->y) v1 = a->y;
+        d->y = v1 + b->y;
+    }
+    d->z = a->z + b->z;
+}
+
 void Ratatosk_UpdatePlayerOrbitAttack(struct Actor *p)
 {
     struct Actor *q = p;
     struct {
         u32 zero;
         u32 config[6];
-        struct Vec offset, delta, position;
+        struct Vec offset;
+        struct Vec delta;
+        struct Vec position;
     } scratch;
     if (consume(q)) {
         setAnimation(q, 9);
@@ -130,34 +145,33 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Actor *p)
                     p->center.y = q->position.y;
                     p->center.z = q->position.z + Div(p->center.z, 2);
                     p->duration = 128;
-                    polar(&scratch.offset, ((((u8)randomB() + 0x60) >> 6) & 3) * 64 + 64, 512);
-                    sum(&p->destination, &scratch.offset, &p->center);
+                    polar(&scratch.offset, ((((((u8)randomB()) + 0x60) >> 6) & 3) * 64) + 64, 512);
+                    sum_081F7FD0(&p->destination, &scratch.offset, &p->center);
                     player = gUnk_02000580;
                     if (flag(player, 0x40000) != 1) {
                         Player_BeginInterpolatedMovement(player, &p->center, p->duration, 0, 476, 0,
                                                          0);
-                        p->previousAngle = BYTE(gUnk_02000580, 0x4f4);
+                        p->previousAngle = *((u8 *)(((u8 *)gUnk_02000580) + 0x4f4));
                         p->ended = 0;
                         Sound_PlaySong(0x569);
                     }
                     setAnimation(q, 5);
+                } else if ((++p->waitTimer) > 2) {
+                    p->duration = 64;
+                    p->complete = 1;
                 } else {
-                    if (++p->waitTimer > 2) {
-                        p->duration = 64;
-                        p->complete = 1;
-                    } else {
-                        s32 index = Mod(randomB(), 9);
-                        *(struct PackedPosition *)&p->destination = p->points[index];
-                        setAnimation(q, 4);
-                        p->sequence = 3;
-                    }
+                    s32 index = Mod(randomB(), 9);
+                    *((struct PackedPosition *)(&p->destination)) = p->points[index];
+                    setAnimation(q, 4);
+                    p->sequence = 3;
                 }
             }
             break;
+
         case 1: {
             s32 prev = p->previousAngle;
             u8 *player = gUnk_02000580;
-            s32 amount = BYTE(player, 0x4f4);
+            s32 amount = *((u8 *)(((u8 *)player) + 0x4f4));
             if (amount < prev)
                 amount -= prev - 256;
             else
@@ -170,7 +184,7 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Actor *p)
                 Sound_StopSong(0x569);
             }
             if (!p->ended) {
-                if ((u8)randomB() < 8 && !p->particleTimer)
+                if ((((u8)randomB()) < 8) && (!p->particleTimer))
                     p->particleTimer = 10;
                 if (p->particleTimer > 0) {
                     s32 step = Mod(q->timer, 32);
@@ -183,7 +197,7 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Actor *p)
                         scratch.delta.y = 196;
                         scratch.delta.z = Div(scratch.delta.z * step, 32);
                     }
-                    sum(&scratch.position, &scratch.delta, Player_GetEffectivePosition(0));
+                    sum_081F7FD0(&scratch.position, &scratch.delta, Player_GetEffectivePosition(0));
                     scratch.position.y += 128;
                     SlotMotion_Initialize(scratch.config);
                     Ratatosk_ConfigureParticle(scratch.config, 10, 0, 0, 0, 0);
@@ -197,10 +211,12 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Actor *p)
                 p->waitTimer = 0;
                 p->sequence = 2;
             }
+
             break;
         }
+
         case 2:
-            if (p->waitTimer == 13 && !p->ended) {
+            if ((p->waitTimer == 13) && (!p->ended)) {
                 u8 *player = gUnk_02000580;
                 if (flag(player, 0x40000) != 1)
                     Player_ApplyInterpolatedMovement(player, &p->center, 30, q->angle, 0, 42, 30,
@@ -213,6 +229,7 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Actor *p)
             }
             p->waitTimer++;
             break;
+
         case 3:
             if (q->ready) {
                 setAnimation(q, 9);

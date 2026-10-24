@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 63.2%
+// fix.py best (sweep after the inlined-insn fix)
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -51,28 +51,31 @@ void SceneActorAnimation_UpdateTurnToAngle(void *unused, struct Actor *p)
         u32 mask = 0x1000;
         p->flags |= mask;
     }
-    if ((u8)p->callback(p) != 1) {
-        s8 *angle = (s8 *)&p->angle;
-        s32 current = (u8)*angle;
+    if (((u8)p->callback(p)) != 1) {
+        s8 *angle = (s8 *)(&p->angle);
+        s32 current = (u8)(*angle);
         s32 delta = (s8)(p->targetAngle - current);
-        register u8 next asm("r2");
+        register u16 next asm("r2");
         u16 facing;
         if (delta > 8)
-            next = (s8)current + 8;
-        else if (delta < -8)
-            next = (s8)current - 8;
+            next = ((s8)current) + 8;
+        else if (delta < (-8))
+            next = ((s8)current) - 8;
         else
-            next = (s8)current + delta;
+            next = ((s8)current) + delta;
         asm("" : "+r"(next));
-        *angle = (s8)next;
         facing = (s8)next;
+        *angle = (s8)next;
         p->facing8 = ((facing + 112) >> 5) & 7;
         p->facing4 = ((facing + 96) >> 6) & 3;
-        Actor_PlayAnimationEntry(p, 2, 1, 0, 1);
-        if ((u8)*angle == p->targetAngle)
+        do {
+            Actor_PlayAnimationEntry(p, 2, 1, 0, 1);
+        } while (0);
+        if (((u8)(*angle)) == p->targetAngle)
             p->done = 1;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0802EBD0);
 #endif

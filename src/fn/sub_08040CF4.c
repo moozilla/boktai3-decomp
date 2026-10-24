@@ -1,5 +1,5 @@
 #ifdef NONMATCHING
-// fuzzy: 84.2%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences are low-register allocation; reviewed full extent is 716 bytes.
 #include "modifier_list.h"
 void ModifierMenu_DrawFirstSourceStats(struct ModifierMenu *);
@@ -13,7 +13,8 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
 {
     struct ModifierSelection *current = &menu->current;
     struct ModifierDisplayObject *object;
-    u32 one, mask;
+    u32 one;
+    u32 mask;
     s32 remaining;
     s32 mode;
     menu->previewFlags |= 1;
@@ -37,8 +38,8 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
         remaining = 3;
         do {
             *column |= bit;
-            column = (u32 *)((u8 *)column + sizeof(struct ModifierDisplayObject));
-        } while (--remaining >= 0);
+            column = (u32 *)(((u8 *)column) + (sizeof(struct ModifierDisplayObject)));
+        } while ((--remaining) >= 0);
     }
     {
         u32 bit = 1;
@@ -46,8 +47,8 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
         remaining = 3;
         do {
             *column |= bit;
-            column = (u32 *)((u8 *)column + sizeof(struct ModifierDisplayObject));
-        } while (--remaining >= 0);
+            column = (u32 *)(((u8 *)column) + (sizeof(struct ModifierDisplayObject)));
+        } while ((--remaining) >= 0);
     }
     mode = menu->mode;
     switch (mode) {
@@ -63,10 +64,14 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
                 ModifierMenu_DrawFirstSourceStats(menu);
             } else if (selectedCategory == 1) {
                 object = &menu->displays[10];
-                object->x = -96;
-                object->y = 56;
-                Anim_LoadKeyframe(object, &menu->graphicsB, 10, 0);
-                ModifierMenu_DrawSecondSourceStats(menu);
+                {
+                    typeof(object->x) *q1 = &object->x;
+                    u8 z1 = 56;
+                    *q1 = -96;
+                    object->y = z1;
+                    Anim_LoadKeyframe(object, &menu->graphicsB, 10, 0);
+                    ModifierMenu_DrawSecondSourceStats(menu);
+                }
             } else if (selectedCategory == 2) {
                 object = &menu->displays[11];
                 object->x = -96;
@@ -82,7 +87,7 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
             }
             object->flags &= ~1;
             object = &menu->displays[14];
-            if (*category == 3) {
+            if ((*category) == 3) {
                 if (menu->current.sourceIds[3] < 0)
                     object->flags |= 1;
                 else {
@@ -95,15 +100,18 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
             }
             break;
         }
+
         case 1: {
-            s32 start, end, id;
+            s32 start;
+            s32 end;
+            s32 id;
             object = &menu->displays[10];
             object->x = -96;
             object->y = 56;
             ModifierMenu_DrawSecondSourceStats(menu);
             object->flags &= ~1;
             object = &menu->displays[14];
-            start = menu->choice.cursor.category * 3 * 2;
+            start = (menu->choice.cursor.category * 3) * 2;
             end = start + 6;
             for (id = start; id < end; id++) {
                 if (Modifier_TestSelection(current, id)) {
@@ -112,19 +120,22 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
                     object++;
                 }
             }
+
             break;
         }
+
         case 2: {
-            s32 start, end;
+            s32 start;
+            s32 end;
             object = &menu->displays[10];
             object->x = -96;
             object->y = 56;
             ModifierMenu_DrawSecondSourceStats(menu);
             object->flags &= ~1;
             object = &menu->displays[14];
-            start = menu->choice.cursor.category * 3 * 2;
+            start = (menu->choice.cursor.category * 3) * 2;
             end = start + 6;
-            if (current->secondaryId >= start && current->secondaryId < end) {
+            if ((current->secondaryId >= start) && (current->secondaryId < (start + 6))) {
                 object->flags &= ~1;
                 ModifierMenu_PositionSelectionMarker(object, Mod(current->secondaryId, 6));
             }

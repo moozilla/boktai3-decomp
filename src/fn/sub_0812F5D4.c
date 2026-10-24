@@ -6,7 +6,7 @@
 
 // Remaining differences: PRE stack slots, random-loop allocation, and inline reset order.
 #ifdef NONMATCHING
-// fuzzy: 84.2%
+// fix.py best (sweep after the inlined-insn fix)
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
 {
     actor->state2A8 = s;
@@ -84,9 +84,21 @@ static inline void SetBehavior(struct SceneActorRegistryResetView *actor, u32 be
     actor->counter2AC = counter;
     actor->field2B1 = 1;
 }
+inline static u32 Arg1(u32 k_, struct SceneActorRegistryResetView *actor, u32 updateOffset)
+{
+    return (*((u16 *)(((u8 *)actor) + updateOffset))) & k_;
+}
+
+inline static void SetBehavior_1(struct SceneActorRegistryResetView *actor)
+{
+    actor->behavior2AA = 13;
+    actor->counter2AC = 0;
+    actor->field2B1 = 1;
+}
+
 void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)(&actor->group);
     u32 result;
     s32 event;
     u16 *scale;
@@ -95,13 +107,13 @@ void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *a
     }
     updateOffset = 0x270;
     asm("" : "+r"(updateOffset));
-    if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + updateOffset)))
+    if ((u8)Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + updateOffset))))
         return;
     if (sub_0812F3CC(actor))
         return;
-    result = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
+    result = Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + 0x260)));
     updateOffset += 0x64;
-    if (*(u16 *)((u8 *)actor + updateOffset) & 0xa02f) {
+    if (Arg1(0xa02f, actor, updateOffset)) {
         u16 *field = &actor->field2C2;
         *field = 64;
         scale = field;
@@ -113,12 +125,12 @@ void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *a
             *field = 64;
     }
     if (!actor->drawableKind)
-        Anim_SetDurationScale((u8 *)actor->drawable + 0x48, *scale);
+        Anim_SetDurationScale(((u8 *)actor->drawable) + 0x48, *scale);
     else
-        Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
-    event = NavMesh_ConsumeProbeEvent(*(void **)(group + 0x1fc));
+        Anim_SetFrameDurationScale(((u8 *)actor->drawable) + 0x20, *scale);
+    event = NavMesh_ConsumeProbeEvent(*((void **)(group + 0x1fc)));
     if (event) {
-        if (SceneActorBehavior_RequestDescriptorTurn(actor, *(void **)(group + 0x1fc), 32, 32,
+        if (SceneActorBehavior_RequestDescriptorTurn(actor, *((void **)(group + 0x1fc)), 32, 32,
                                                      result)) {
             if (!TestField((u16 *)(group + 0x40), 4)) {
                 if (sub_0807AF94(actor))
@@ -129,17 +141,16 @@ void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *a
                     return;
                 }
             }
-            SetBehavior(actor, 13, 0);
+            SetBehavior_1(actor);
         }
-    } else {
-        if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *(void **)(group + 0x1fc), 32, 32,
-                                                          result)) {
-            SetBehavior(actor, 14, event);
-            return;
-        }
+    } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *((void **)(group + 0x1fc)), 32,
+                                                             32, result)) {
+        SetBehavior(actor, 14, event);
+        return;
     }
     actor->counter2AC++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", SceneActorReaction_UpdateContactRoute);
 #endif

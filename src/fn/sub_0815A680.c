@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 65.4%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Open: the original keeps two copies of the actor pointer (r4 and r5).
 extern u8 *gUnk_02000580[];
@@ -13,7 +13,9 @@ u32 ScriptActor_TestFlagFromScript(void)
     u8 *actor;
     u8 *p;
     s32 i = Script_GetActorIndex();
-    p = (actor = gUnk_02000580[i]);
+    do {
+        p = (actor = gUnk_02000580[i]);
+    } while (0);
     if (actor && Script_SeekToKeyword('f')) {
         u32 flag = Script_GetValue();
         u32 *word;
@@ -32,6 +34,7 @@ u32 ScriptActor_TestFlagFromScript(void)
     }
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", ScriptActor_TestFlagFromScript);
 #endif
