@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 
@@ -38,11 +37,9 @@ static inline s32 Quarter(s32 value)
     return value >= 0 ? value >> 6 : -((-value) >> 6);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 98.0%
 void Skeleton_UpdateHomingBurst(struct SceneActorRegistryResetView *p, s32 tick)
 {
-    register u8 *context asm("r2") = p->context;
+    u8 *context = p->context;
     if (SceneActorReaction_TakePrepared(p)) {
         struct ContactPackedVector spawn = *(struct ContactPackedVector *)&p->position;
         struct ContactPosition delta;
@@ -67,9 +64,8 @@ void Skeleton_UpdateHomingBurst(struct SceneActorRegistryResetView *p, s32 tick)
         else
             base = (u8)angle;
         {
-            register struct ContactPackedVector *sp asm("r4") = &spawn;
+            struct ContactPackedVector *sp = &spawn;
             u32 b8, c0, d4, c8;
-            asm("" : "+r"(sp));
             b8 = p->fieldB8;
             c0 = p->fieldC0;
             d4 = p->wordD4;
@@ -98,6 +94,3 @@ void Skeleton_UpdateHomingBurst(struct SceneActorRegistryResetView *p, s32 tick)
         p->word104 = z;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Skeleton_UpdateHomingBurst);
-#endif
