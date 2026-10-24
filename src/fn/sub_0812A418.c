@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 84.6%
-// foundry draft (worker best 83.0%); what differs is mostly register allocation and instruction order
 struct EffectPoolSlot {
     u8 unknown[0xF2];
     u8 state;
@@ -42,8 +39,5 @@ s32 EffectPool_UpdateSlots(struct EffectPool *pool)
         } while (i <= 11);
         return 0;
     }
-    return (s32)pool;
+    // No return value on this path: the ROM leaves the argument in r0.
 }
-#else
-INCLUDE_ASM("asm/nonmatching", EffectPool_UpdateSlots);
-#endif

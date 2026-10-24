@@ -2,8 +2,6 @@
 #include "contact_swarm.h"
 #include "player.h"
 // confidence=low: provisional action interpretation from retained C and assembly.
-#ifdef NONMATCHING
-// fuzzy: 97.6%
 // Remaining differences: instruction selection and register allocation.
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
@@ -142,6 +140,8 @@ void Player_UpdateOddDirectionPose(struct Player *p)
 {
     Player_ConsumeStateEntry(p);
     if ((s16)p->directionHistory[0] >= 0) {
+        u8 *facing = &p->facing;
+        asm("" : : "r"(facing));
         p->facing = (p->directionHistory[0] & 254) + 1;
         if (p->facing > 4) {
             p->heading = (8 - p->facing) >> 1;
@@ -154,12 +154,14 @@ void Player_UpdateOddDirectionPose(struct Player *p)
     Anim_SetSequence(&((struct ReleaseAnimation *)p)->seq, *(const void **)((u8 *)p + 0x410), 2,
                      p->heading, p->side);
     Step(&((struct ReleaseAnimation *)p)->sprite, &((struct ReleaseAnimation *)p)->seq);
-    if ((s8)p->movementAnimationState < 0) {
-        Player_UpdateFacingSide(p);
-        ActorSequence_Begin(p, 0, 0);
+    {
+        register u32 offset asm("r2") = 0x4F3;
+        register s8 *gate asm("r0");
+        asm("" : "+r"(offset));
+        gate = (s8 *)p + offset;
+        if (*gate < 0) {
+            Player_UpdateFacingSide(p);
+            ActorSequence_Begin(p, 0, 0);
+        }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateOddDirectionPose);
-#endif

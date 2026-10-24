@@ -10,6 +10,12 @@ Two functions are clones when their instructions are identical after symbols
 member's C is copied to each unmatched sibling with every referenced symbol and
 address renamed in order of appearance; tools/check.py decides. Candidates are
 written to wip/clones/ and copied to src/fn/ only on MATCH.
+
+  clones.py --graft [--loose]            the same for siblings that have a NONMATCHING draft:
+                                         put the template's function (renamed) into the draft's
+                                         own file, which keeps its own structs and externs (a
+                                         sibling often has the same code over another layout,
+                                         so field offsets differ), and promote the draft on MATCH
 """
 import argparse
 import collections
@@ -150,18 +156,100 @@ def port(src_c, src_name, dst_name, funcs):
     return out
 
 
+def function_span(text, name):
+    """(start, end) of NAME's definition in TEXT, or None."""
+    m = re.search(r"^[A-Za-z_][\w \*]*\b" + re.escape(name) + r"\s*\([^;{]*\)\s*\{", text, re.M)
+    if not m:
+        return None
+    depth, i = 0, m.end() - 1
+    while i < len(text):
+        depth += {"{": 1, "}": -1}.get(text[i], 0)
+        i += 1
+        if depth == 0:
+            return m.start(), i
+    return None
+
+
+def draft_file(name):
+    """The src file whose INCLUDE_ASM fallback is NAME's, and the C name of the draft."""
+    pat = re.compile(r'INCLUDE_ASM\("asm/nonmatching", ' + re.escape(name) + r'\)')
+    for d, _, fs in os.walk(os.path.join(ROOT, "src")):
+        for f in fs:
+            if f.endswith(".c"):
+                p = os.path.join(d, f)
+                text = open(p).read()
+                if pat.search(text):
+                    alias = re.search(r"^#define (\w+)\s+" + re.escape(name) + r"\s*$", text, re.M)
+                    return p, alias.group(1) if alias else name
+    return None, None
+
+
+def graft(funcs, done, fams):
+    import tempfile
+    ok = 0
+    for f in fams:
+        tmpl = [n for n in f if n in done]
+        for n in f:
+            if n in done:
+                continue
+            path, cname = draft_file(n)
+            if not path:
+                continue
+            text = open(path).read()
+            block = re.search(r"#\s*ifdef\s+NONMATCHING\b.*?#\s*else\s*\n\s*INCLUDE_ASM\([^)]*\b" +
+                              re.escape(n) + r"\b", text, re.S)
+            span = block and function_span(text[block.start():block.end()], cname)
+            if not span:
+                continue
+            a, b = block.start() + span[0], block.start() + span[1]
+            for t in tmpl:
+                p = os.path.join(ROOT, "src", "fn", f"sub_{funcs[t][0]:08X}.c")
+                if not os.path.exists(p):
+                    continue
+                ported = port(p, t, n, funcs)
+                s = ported and function_span(ported, n)
+                if not s:
+                    continue
+                body = ported[s[0]:s[1]]
+                if cname != n:
+                    body = re.sub(r"\b" + re.escape(n) + r"\b", cname, body)
+                cand = text[:a] + body + text[b:]
+                fd, tmp = tempfile.mkstemp(suffix=".c", prefix=".graft_", dir=os.path.dirname(path))
+                with os.fdopen(fd, "w") as fh:
+                    fh.write(cand)
+                try:
+                    r = subprocess.run([sys.executable, "tools/check.py", tmp, "--nonmatching"], cwd=ROOT,
+                                       capture_output=True, text=True)
+                finally:
+                    os.unlink(tmp)
+                out = r.stdout + r.stderr
+                m = re.search(r"fuzzy ([\d.]+)%", out)
+                hit = re.search(r"^" + re.escape(cname) + r": MATCH|^" + re.escape(n) + r": MATCH", out, re.M)
+                print(f"{'MATCH' if hit else '-----'} {n} from {t}: {m.group(1) + '%' if m else 'error'} "
+                      f"({os.path.relpath(path, ROOT)})", flush=True)
+                if hit:
+                    open(path, "w").write(cand)
+                    subprocess.run([sys.executable, "tools/promote_draft.py", path, n], cwd=ROOT)
+                    ok += 1
+                    break
+    print(f"{ok} drafts grafted")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stats", action="store_true")
     ap.add_argument("--port", action="store_true")
     ap.add_argument("--range", nargs=2)
     ap.add_argument("--loose", action="store_true", help="also allow differing immediates")
+    ap.add_argument("--graft", action="store_true")
     a = ap.parse_args()
     global LOOSE
     LOOSE = a.loose
     funcs = parse()
     done = done_names()
     fams = families(funcs)
+    if a.graft:
+        return graft(funcs, done, fams)
     if a.stats or not a.port:
         n_un = sum(1 for f in fams for n in f if n not in done)
         port_ok = sum(1 for f in fams if any(n in done for n in f) for n in f if n not in done)
@@ -169,8 +257,12 @@ def main():
               f"{n_un} unmatched members, {port_ok} in families with a matched member")
         return
     lo, hi = (int(a.range[0], 16), int(a.range[1], 16)) if a.range else (0, 1 << 32)
-    srcs = {os.path.basename(p)[:-2]: os.path.join(ROOT, "src", "fn", p)
-            for p in os.listdir(os.path.join(ROOT, "src", "fn")) if p.endswith(".c")}
+    # one-function units are src/fn/sub_ADDR.c whatever the function is called now
+    srcs = {}
+    for n, v in funcs.items():
+        p = os.path.join(ROOT, "src", "fn", f"sub_{v[0]:08X}.c")
+        if os.path.exists(p):
+            srcs[n] = p
     wip = os.path.join(ROOT, "wip", "clones")
     os.makedirs(wip, exist_ok=True)
     ok = 0
@@ -187,12 +279,16 @@ def main():
                 c = port(srcs[t], t, n, funcs)
                 if c is None:
                     continue
-                out = os.path.join(wip, n + ".c")
+                out = os.path.join(wip, f"sub_{funcs[n][0]:08X}.c")
                 open(out, "w").write(c)
                 r = subprocess.run([sys.executable, "tools/check.py", out, "--quiet"], cwd=ROOT,
                                    capture_output=True, text=True)
                 if r.returncode == 0:
-                    shutil.copy(out, os.path.join(ROOT, "src", "fn", n + ".c"))
+                    dst = os.path.join(ROOT, "src", "fn", f"sub_{funcs[n][0]:08X}.c")
+                    if not os.path.exists(dst):
+                        print(f"MATCH {n} (from {t}) in {out}: its unit is not src/fn/sub_ADDR.c, merge by hand")
+                        continue
+                    shutil.copy(out, dst)
                     ok += 1
                     print(f"MATCH {n} (from {t})")
                     break

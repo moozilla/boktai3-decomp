@@ -1,8 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
 
-#ifdef NONMATCHING
-// fuzzy: 94.9%
 // foundry draft (worker best 94.9%); what differs is mostly register allocation and instruction order
 struct SceneActorApproachActionContext {
     u8 unknown0[0x6F2];
@@ -15,10 +14,6 @@ struct SceneActorApproachActionContext {
 void sub_080BAAF4(void);
 void Vorn_SpawnHazard(struct SceneActorRegistryResetView *, s32);
 void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
-static inline u16 ClearedCounter(void)
-{
-    return 0;
-}
 static inline u8 TakeReady(struct SceneActorRegistryResetView *actor)
 {
     if (actor->field2B1) {
@@ -32,7 +27,7 @@ static inline void ClearFlags(u16 *p, u32 mask)
     *p &= mask;
 }
 static inline void SetControl(struct SceneActorRegistryResetView *actor, void *fn, u8 zero8,
-                              u16 zero)
+                              u32 zero)
 {
     u8 code = 0x2C;
     {
@@ -48,7 +43,11 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *f
         ((u8 *)actor)[field] = code;
         actor->target = fn;
         field += 0x13;
-        *(u16 *)((u8 *)actor + field) = zero;
+        {
+            u16 *q = (u16 *)((u8 *)actor + field);
+            asm("" : "+r"(q), "+r"(field));
+            *q = zero;
+        }
     } while (0);
     {
         u32 *flags = &actor->flags114;
@@ -61,11 +60,17 @@ void SceneActorApproach_CaptureTargetAndRunAction(struct SceneActorRegistryReset
 {
     struct SceneActorApproachActionContext *context = actor->context;
     if (TakeReady(actor)) {
+        register u8 zero8 asm("r3");
+        register u32 zero asm("r5");
         u32 flags = 0x100;
-        u16 *flagptr = &actor->flags2D4;
-        u32 value = *flagptr;
-        u8 zero8 = 0;
-        u32 zero = ClearedCounter();
+        u32 off = 0x2D4;
+        register u16 *flagptr asm("r2");
+        u32 value;
+        flagptr = (u16 *)((u8 *)actor + off);
+        value = *flagptr;
+        zero8 = 0;
+        zero = 0;
+        asm("" : "+r"(zero8), "+r"(zero));
         flags |= value;
         *flagptr = flags;
         SetControl(actor, sub_080BAAF4, zero8, zero);
@@ -79,6 +84,3 @@ void SceneActorApproach_CaptureTargetAndRunAction(struct SceneActorRegistryReset
     } else
         actor->counter2AC++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorApproach_CaptureTargetAndRunAction);
-#endif
