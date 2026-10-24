@@ -131,8 +131,12 @@ class Draft:
             # regions() lets branch offsets follow from the instructions; a label that moves
             # (a statement into or out of a loop) shows only there
             diff = [i for i, (a, b) in enumerate(zip(self.rom, mine)) if a != b]
-            return max(1, len(diff)), (diff[0] if diff else len(self.rom))
-        return total, (regs[0][1] if regs else len(self.rom))
+            return max(1, len(diff)), (diff[0] if diff else len(self.rom)), max(1, len(diff))
+        # third: differences that are not register names alone. The right shape with a register
+        # cascade after it (Ghost_TurnTowardHeading's `& 7`: 37 insns, 2 of them shape) is often
+        # closer than a wrong shape that happens to keep the allocation (4 insns, 4 shape)
+        shape = sum(max(i2 - i1, j2 - j1) for kind, i1, i2, j1, j2 in regs if kind != "regs")
+        return total, (regs[0][1] if regs else len(self.rom)), shape
 
     def materialize(self, fn, helpers):
         """The source file with FN and the edited HELPERS written back."""
@@ -241,21 +245,32 @@ def one_round(d, keys, show, try_all, seeds, log, deadline=None):
             break
     # a spelling that leaves the score as it is can enable the next one (an if/else to a ternary,
     # then the temporary inlined): kept, ranked last
-    good = sorted([r for r in results if r[0][0] < base[0] or r[0][1] > base[1]
+    good = sorted([r for r in results if r[0][0] < base[0] or r[0][1] > base[1] or r[0][2] < base[2]
                    or r[0] == base and r[2].startswith("sp_")],
                   key=lambda r: (r[0][0], r[2] not in prefer, -r[0][1], len(r[1])))
     return base, good, compiles
 
 
-def canon_probe(path):
-    """The pseudo whose CSE canonicalisation alone explains a near match (tools/rtlprobe.py canon), or None."""
+def cse_probe(path):
+    """The CSE decision that alone explains a near match, as a line to print, or None: a pseudo made
+    canonical (tools/rtlprobe.py canon) or a jump cse follows into its target (rtlprobe.py follow)."""
     import subprocess
     if not os.path.exists(os.path.join(ROOT, "build", "agbcc-instr", "gcc", "agbcc")):
         return None
-    r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "rtlprobe.py"), "canon", path, "-j", "2"],
-                       capture_output=True, text=True, cwd=ROOT)
+    probe = os.path.join(ROOT, "tools", "rtlprobe.py")
+    r = subprocess.run([sys.executable, probe, "canon", path, "-j", "2"], capture_output=True, text=True, cwd=ROOT)
     m = re.search(r"CSE_NOCANON=(\d+):.*MATCH", r.stdout)
-    return int(m.group(1)) if m else None
+    if m:
+        reg = m.group(1)
+        return (f"CSE makes pseudo {reg} a canonical register (rtlprobe.py canon: CSE_NOCANON={reg} matches); "
+                f"make the ROM-side value live longer, or keep the copy into {reg} inside one block")
+    r = subprocess.run([sys.executable, probe, "follow", path, "-j", "2"], capture_output=True, text=True, cwd=ROOT)
+    m = re.search(r"CSE_NOFOLLOW=(\d+):.*MATCH\n\s*jump at line (\d+): (.*)", r.stdout)
+    if m:
+        return (f"CSE carries values across the jump at line {m.group(2)} `{m.group(3).strip()}` "
+                f"(rtlprobe.py follow: CSE_NOFOLLOW={m.group(1)} matches); keep the reused value from being "
+                f"known there (a constant in another mode: sp_narrow_mask)")
+    return None
 
 
 def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
@@ -290,6 +305,12 @@ def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
             log(f"      {tag:9} [{fam}] {desc}")
     keep = good[:show]
     keep += [r for r in sorted(good, key=lambda r: (-r[0][1], r[0][0]))[:show] if r not in keep]
+    # and the edits that fix shape at the price of registers (fewest differences beyond names)
+    shaped = [r for r in sorted(good, key=lambda r: (r[0][2], r[0][0]))[:2] if r[0][2] < base[2] and r not in keep]
+    if verbose:
+        for sc, desc, fam, fn, helpers in shaped:
+            log(f"      {sc[0]} insns, {sc[2]} beyond registers [{fam}] {desc}")
+    keep += shaped
     return [(sc, d.materialize(fn, helpers), desc, fam) for sc, desc, fam, fn, helpers in keep], n
 
 
@@ -301,10 +322,10 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
         text = strip_draft(text)
     t0 = time.time()
     total = 0
-    states = [((10 ** 9, 0), text, [])]
+    states = [((10 ** 9, 0, 10 ** 9), text, [])]
     start = None
     seen = {text}
-    best = states[0]
+    best = best_shape = states[0]
     with tempfile.TemporaryDirectory(dir=os.path.join(ROOT, "build")) as wd:
         for rnd in range(depth):
             log(f"\n== round {rnd + 1}")
@@ -318,13 +339,11 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
                 if rnd == 0 and isinstance(kids, list) and start is None:
                     start = Draft(txt, func, wd).score()
                     if start and start[0] <= 4:
-                        reg = canon_probe(os.path.join(wd, f"{func}.c"))
-                        if reg:
-                            log(f"   cause: CSE makes pseudo {reg} a canonical register (rtlprobe.py canon: "
-                                f"CSE_NOCANON={reg} matches); make the ROM-side value live longer, or keep "
-                                f"the copy into {reg} inside one block")
+                        cause = cse_probe(os.path.join(wd, f"{func}.c"))
+                        if cause:
+                            log(f"   cause: {cause}")
                 if kids == "match":
-                    kids = [((0, 0), txt, "as written", "")]
+                    kids = [((0, 0, 0), txt, "as written", "")]
                 for ksc, ktxt, desc, fam in kids:
                     if ktxt in seen:
                         continue
@@ -337,6 +356,9 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
             # one divergence can expose more differences after it)
             children.sort(key=lambda c: (c[0][0], -c[0][1], len(c[2])))
             states = children[:(beam + 1) // 2]
+            fewest_shape = min(children, key=lambda c: (c[0][2], c[0][0], len(c[2])))
+            if fewest_shape not in states and fewest_shape[0][2] < states[0][0][2]:
+                states.append(fewest_shape)
             for c in sorted(children, key=lambda c: (-c[0][1], c[0][0], len(c[2]))):
                 if len(states) >= beam:
                     break
@@ -344,6 +366,9 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
                     states.append(c)
             if (states[0][0][0], -states[0][0][1]) < (best[0][0], -best[0][1]):
                 best = states[0]
+            shaped = min(states, key=lambda c: (c[0][2], c[0][0]))
+            if (shaped[0][2], shaped[0][0]) < (best_shape[0][2], best_shape[0][0]):
+                best_shape = shaped
             if states[0][0][0] == 0:
                 sc, txt, path = states[0]
                 for ln in atlas.cdiff(text, txt, limit=24):
@@ -355,7 +380,13 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
                 log(f"\nMATCH after {len(path)} edit(s), {total} compiles, {time.time() - t0:.0f} s: "
                     f"{os.path.relpath(out, ROOT)}")
                 return 0, path, total
-            log(f"   beam: {', '.join(str(c[0][0]) for c in states)} differing insns")
+            log(f"   beam: {', '.join(f'{c[0][0]}/{c[0][2]}' for c in states)} differing insns/not registers alone")
+        if best_shape is not best and 0 < best_shape[0][2] <= 4:
+            # right shape but for a few insns, the rest register names: ask the compiler why
+            open(os.path.join(wd, f"{func}.c"), "w").write(best_shape[1])
+            cause = cse_probe(os.path.join(wd, f"{func}.c"))
+            log(f"\n   closest shape: {best_shape[0][2]} insns beyond registers ({best_shape[0][0]} in all) after "
+                f"{'; '.join(best_shape[2]) or 'no edit'}" + (f"\n   cause: {cause}" if cause else ""))
     sc, txt, path = best
     log("\n".join("   " + p for p in path))
     log(f"\nno match: best {sc[0]} differing insns (from {start[0] if start else '?'}) after {len(path)} edit(s), "
