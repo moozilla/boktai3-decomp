@@ -213,11 +213,18 @@ def cmd_tick(args):
         print("nothing running; queue " + ("empty" if all(state(r["func"]) != "pending" for r in rows)
                                            else "has pending items (quota?)"))
         return 0
+    for r in rows:  # finished while no tick was watching: report once
+        wd = os.path.join(CAMP, r["func"])
+        if state(r["func"]) == "done" and not os.path.exists(os.path.join(wd, ".reported")):
+            open(os.path.join(wd, ".reported"), "w").write("")
+            print(f"finished earlier {r['func']}: {summary(r['func'])}")
     print(f"{len(running)} running: {', '.join(sorted(running))}", flush=True)
     while True:
         done = [f for f in running if state(f) in ("done", "failed")]
         if done:
             for f in done:
+                if state(f) == "done":
+                    open(os.path.join(CAMP, f, ".reported"), "w").write("")
                 print(f"finished {f}: {summary(f)}" if state(f) == "done" else
                       f"stopped {f}: {failed_turn(os.path.join(CAMP, f))} (the next tick resumes it)")
             return 0
