@@ -129,9 +129,52 @@ def rom_name(src, func):
     return hit or func
 
 
+def kref(wd, func, x):
+    """How a what-if knob should name pseudo X: its C variable name when that is unique (names survive
+    edits; numbers shift), else the number."""
+    pn = pseudo_names(wd, func)
+    n = pn.get(x)
+    if n and re.fullmatch(r"[A-Za-z_]\w*(#\d+)?", n) and list(pn.values()).count(n) == 1:
+        return n
+    return str(x)
+
+
+def resolve_knobs(src, func, env):
+    """AGBCC_PRI / AGBCC_FORCE may name pseudos by C variable (`table:+214`): compile once without them to
+    learn the numbers, then substitute."""
+    env = dict(env or {})
+    for k in ("AGBCC_PRI", "AGBCC_FORCE"):
+        if k not in env and os.environ.get(k):
+            env[k] = os.environ[k]
+    keys = [k for k in ("AGBCC_PRI", "AGBCC_FORCE") if re.search(r"(^|,)[A-Za-z_]", env.get(k, ""))]
+    if not keys:
+        return env
+    saved = {k: os.environ.pop(k) for k in keys if k in os.environ}
+    try:
+        compile_draft(src, func, {k: v for k, v in env.items() if k not in keys})
+    finally:
+        os.environ.update(saved)
+    wd = workdir(func)
+    rev = {}
+    for p, n in pseudo_names(wd, func).items():
+        rev.setdefault(n, []).append(p)
+    def sub(tok):
+        name, rest = tok.split(":", 1)
+        if name.isdigit():
+            return tok
+        if len(rev.get(name, [])) != 1:
+            sys.exit(f"{name}: " + (f"names pseudos {rev[name]}; use a number" if name in rev else
+                                     f"no pseudo by that name (known: {', '.join(sorted(rev))[:300]})"))
+        return f"{rev[name][0]}:{rest}"
+    out = dict(env, **{k: ",".join(sub(t) for t in env[k].split(",")) for k in keys})
+    print("  knobs: " + " ".join(f"{k}={out[k]}" for k in keys), file=sys.stderr)
+    return out
+
+
 def compile_draft(src, func, env=None):
     """Compile with the instrumented agbcc; return (bytes, address, info) for FUNC.
     ENV adds knob settings (CSE_NOCANON=N, AGBCC_FORCE=..., see tools/agbcc-instr.sh)."""
+    env = resolve_knobs(src, func, env)
     wd = workdir(func)
     defines = build.DEFINES + ["-DNONMATCHING"]
     pre = build.sh(build.CPP + ["-nostdinc", "-undef"] + defines + ["-I", "include", "-iquote", ".", src])
@@ -163,6 +206,11 @@ def compile_draft(src, func, env=None):
     asm = open(os.path.join(wd, "u.s")).read()
     text = re.sub(r"^(\w+):\n", lambda m: f"{m.group(1)}:\n\t.global {m.group(1)}__addr\n{m.group(1)}__addr:\n"
                   if not m.group(1).startswith(".") else m.group(0), asm, flags=re.M)
+    # Inline the macros a top-level asm() includes: gas sometimes misreads the included file's first
+    # line (an @ comment) depending on where the .include falls in its input buffer, so the same C
+    # failed or assembled depending on the -g/-dp output's size.
+    macros = open(os.path.join(ROOT, "asm", "macros.inc")).read()
+    text = re.sub(r'^\s*\.include\s+"asm/macros\.inc"\s*$', lambda m: macros, text, flags=re.M)
     open(os.path.join(wd, "a.s"), "w").write(text + "\t.text\n\t.align\t2, 0\n")
     rel = os.path.relpath(wd, ROOT)
     build.sh(build.AS + ["-o", f"{rel}/u.o", f"{rel}/a.s"])
@@ -449,7 +497,8 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
         cur.append(i)
     if cur:
         hunks.append(cur)
-    nr = sum(1 for _, _, t in pairs if t in "-~→")
+    nr = sum(1 for _, _, t in pairs if t in "-~")
+    nb = sum(1 for _, _, t in pairs if t == "→")
     nm = sum(1 for _, _, t in pairs if t in "+~")
     same = rom_code == mine
     rel = os.path.relpath(wd, ROOT)
@@ -459,8 +508,9 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
     if same:
         print("MATCH")
         return 0
-    print(f"{len(hunks)} hunk(s): {nr} ROM / {nm} draft insns differ; "
-          f"{shifted} offset-only shifts hidden.  full listing: {rel}/diff.txt (json: diff.json)")
+    print(f"{len(hunks)} hunk(s): {nr} ROM / {nm} draft insns differ"
+          + (f" (+{nb} branch(es) whose target moved: they follow from the others)" if nb else "")
+          + f"; {shifted} offset-only shifts hidden.  full listing: {rel}/diff.txt (json: diff.json)")
     shown = 0
     for h in hunks:
         if shown >= 8:
@@ -1063,7 +1113,7 @@ def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
             print(txt)
             print(f"      to flip the order (priority = floor_log2(refs) * refs / live * 10000): "
                   + "; or ".join(flip_levers(nm, y, recs[y], pseudo, rec, wd)))
-            print(f"      what-if: AGBCC_PRI={y}:+{max(rec[2] - recs[y][2] + 1, 1)}")
+            print(f"      what-if: AGBCC_PRI={kref(wd, func, y)}:+{max(rec[2] - recs[y][2] + 1, 1)}")
         else:
             print(txt)
         return True
@@ -1129,7 +1179,7 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
               f"    global alloc left it without a register; reload placed it in {rname(got)} afterwards"
               f" (retry_global_alloc -> find_reg, first free register in r0 to r15 order).")
         print(f"    so {rname(got)} vs {rname(want)} is decided by which registers are in use and free at that"
-              f" point. what-if: AGBCC_FORCE={pseudo}:{want}")
+              f" point. what-if: AGBCC_FORCE={kref(wd, func, pseudo)}:{want}")
         rom = rom_hard(wd)
         pc0 = conf.get(pseudo, (set(), set()))[0]
         for x in sorted(y for y in rom if rom[y] == got and y != pseudo)[:3]:
@@ -1174,10 +1224,10 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         if top is not None and rec[0] == "G":
             print(f"    to flip the order (priority = floor_log2(refs) * refs / live * 10000; flow counts refs"
                   f" inside loops weighted by depth): " + "; or ".join(flip_levers(nm, pseudo, rec, top, recs[top], wd)))
-            print(f"    what-if: AGBCC_PRI={pseudo}:+{recs[top][2] - rec[2] + 1} or AGBCC_FORCE={pseudo}:{want}")
+            print(f"    what-if: AGBCC_PRI={kref(wd, func, pseudo)}:+{recs[top][2] - rec[2] + 1} or AGBCC_FORCE={kref(wd, func, pseudo)}:{want}")
         else:
             print(f"    lever: raise {nm(pseudo)}'s priority above theirs (more uses or a shorter life), or end"
-                  f" the overlap; what-if: AGBCC_PRI={pseudo}:+N or AGBCC_FORCE={pseudo}:{want}")
+                  f" the overlap; what-if: AGBCC_PRI={kref(wd, func, pseudo)}:+N or AGBCC_FORCE={kref(wd, func, pseudo)}:{want}")
         return
     # the rival: a conflicting pseudo the ROM keeps in {rname(got)}; we took that register first
     rom = rom_hard(wd)
@@ -1219,7 +1269,7 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
             lev = flip_levers(nm, x, xr, pseudo, rec, wd)
             print(f"    to flip the order (priority = floor_log2(refs) * refs / live * 10000; flow counts refs"
                   f" inside loops weighted by depth): " + "; or ".join(lev))
-            print(f"    what-if: AGBCC_PRI={x}:+{max(pri - xr[2] + 1, 1)} (should match if this is the only cause)")
+            print(f"    what-if: AGBCC_PRI={kref(wd, func, x)}:+{max(pri - xr[2] + 1, 1)} (should match if this is the only cause)")
             return
     if explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
         return
@@ -1227,7 +1277,7 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
     print(f"    {rname(want)} was free for it; {who} preferred {rname(got)} (copy/tie preferences or register order)."
           f" If the ROM's value was instead a constant that reload loaded (an integer address or offset"
           f" rather than a symbol, or a variable left without a register), it would take the rotation's"
-          f" register: try `spill`. what-if: AGBCC_FORCE={pseudo}:{want}")
+          f" register: try `spill`. what-if: AGBCC_FORCE={kref(wd, func, pseudo)}:{want}")
 
 
 def reload_records(wd, func):
@@ -1249,6 +1299,8 @@ def score(src, func, env):
     mine, addr, info = compile_draft(src, func, env)
     _, _, sizes = inventory()
     rom_code = load_rom(verify=False)[off(addr):off(addr) + sizes[rom_name(src, func)]]
+    if mine == rom_code:  # the listing can misalign a literal pool at a 2-byte offset; bytes decide
+        return 0, info
     with contextlib.redirect_stdout(io.StringIO()):
         report(src, func, rom_code, addr, mine, info, 0)
     rows = json.load(open(os.path.join(info["wd"], "diff.json")))

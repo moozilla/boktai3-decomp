@@ -651,6 +651,25 @@ which is exactly `10:1`. Not tested.
   `why` and `life`), compile errors looked like empty output (now
   `COMPILE FAILED` with a C89 hint); open: no shape explainer, no RTL diff
   between two drafts, "no explainer for this pass" for loop and regmove.
+* Second trials (2026-10-24), Vanargand_UpdatePartSidestep (868 B, 6 pins,
+  11 barriers): Haiku stayed at 9/6 but removed 3 pins for free (by hand:
+  hence `pins`); Sonnet, starting from that, reached 5/5 (+3 moved branches)
+  with 2 barriers fewer and explained the open `bossArg` r8/r7 question (a
+  consequence of where `state` lands; `AGBCC_FORCE=269:7` fixes all but one
+  hunk). Sonnet's feedback, addressed: knobs take C names (pseudo numbers
+  shift between edits, so a suggested `AGBCC_PRI=428:+871` silently did
+  nothing on the next draft); moved branches no longer count as differences;
+  gas failing on `asm/macros.inc:1 ... '@'` depending on the `.s` size
+  (scope now inlines the macros). Open: an explainer for the copy reload
+  makes when cse rewrites an `asm("" : "+r"(x))` input (found via `insn`).
+  Takeaway: Haiku is enough for small drafts where `why` names one lever;
+  pin-heavy functions need Sonnet or better, and still did not match.
+* Pin survey (2026-10-24, `pins` over all 878 matched files with
+  concessions): 6,303 concession lines (3,976 pins, 2,327 barriers), of
+  which 18 were free (landed in #652, one function now concession-free).
+  The rest are load-bearing: phase 3 needs a diagnosis per concession. The
+  survey found `score()` counting phantom differences when the ROM listing
+  misaligns a literal pool (22 files; it now trusts byte equality).
 * The shared instrumented compiler was older than its patch (see above);
   the one in the scope worktree also lacked AGBCC_NOPRE until it was rebuilt
   with `tools/agbcc-instr.sh` (150 files, plain and NONMATCHING, compile

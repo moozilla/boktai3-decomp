@@ -46,6 +46,11 @@ scope.py FILE.c insn UID            one RTL insn through every compiler pass
 scope.py FILE.c uses REG...         which insns use a pseudo after each pass
 ```
 
+Knobs take a pseudo number or a C variable name (`AGBCC_PRI=table:+214`);
+names survive edits, numbers do not, so prefer the name `why` prints.
+Branches marked `>` whose target moved are counted separately: they follow
+from the other differences, do not chase them.
+
 Knobs (what-ifs; they never go into the final C): `AGBCC_PRI=PSEUDO:+N`
 (raise a value's allocation priority), `AGBCC_FORCE=PSEUDO:REG`,
 `AGBCC_SPILL=K:REG` (reload's K-th choice), `CSE_KEEP=PSEUDO` (keep a
