@@ -5,9 +5,7 @@
 // confidence=low: moves a Vanargand part along its heading, then plays sequence 7.
 // confidence=low: provisional role inferred from adjacent Vanargand part callbacks.
 
-#ifdef NONMATCHING
-// fuzzy: 95.3%
-// Remaining differences: state-transition address reuse, entry-pointer copies, and allocation.
+// Byte-identical with five register pins and five empty constraints.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x1c];
@@ -54,8 +52,8 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     }
     sprite->frame = *command >> 6;
     {
-        u32 input = state->flags;
-        register u32 first asm("r1");
+        register u32 input asm("r0") = state->flags;
+        u32 first;
         u32 maskBit = one;
         bit = maskBit;
         first = bit;
@@ -82,7 +80,7 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r6");
+        register u32 mask;
         register u32 temp asm("r1");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
@@ -168,12 +166,10 @@ static inline void SetFlags(struct VanargandPart *p, u32 mask)
 }
 void Vanargand_UpdatePartRetreat(u8 *boss, struct VanargandPart *p)
 {
-    register u8 *savedBoss asm("r9") = boss;
     u8 *enter;
     u32 state;
     struct SceneVec delta;
     u32 mask = 0x20;
-    asm("" : "+r"(savedBoss));
     p->flags |= mask;
     if (p->reset) {
         p->reset = 0;
@@ -183,13 +179,10 @@ void Vanargand_UpdatePartRetreat(u8 *boss, struct VanargandPart *p)
             RetreatVector(&delta, p->heading);
         MotionTrack_Initialize(p->motion, &p->origin, &delta, 0, 4);
         {
-            register u32 zero asm("r1") = 0;
-            u32 offset = 0x164;
-            asm("" : "+r"(zero));
-            *(u32 *)((u8 *)p + offset) = zero;
+            u32 zero = 0;
+            p->state = zero;
             p->timer = zero;
-            offset += 11;
-            *(u8 *)((u8 *)p + offset) = 1;
+            p->enter = 1;
         }
     }
     state = p->state;
@@ -199,21 +192,21 @@ void Vanargand_UpdatePartRetreat(u8 *boss, struct VanargandPart *p)
             MotionTrack_Update(p->motion);
             {
                 u32 finished = p->motion[0x29] == 2;
-                asm("" : "+r"(finished));
                 if (finished) {
                     SetState(p, 1);
                     p->enter = 1;
                 }
             }
             break;
-        case 1:
-            enter = &p->enter;
-            if (*enter) {
-                u32 value = *enter;
-                asm("" : "+r"(value));
-                *enter = value = 0;
-                Anim_SetSequence(&p->sequence, *(void **)(savedBoss + 0x4d0), 7, (u8)p->variant, 0);
+        case 1: {
+            u8 *localEnter = &p->enter;
+            u8 value = *localEnter;
+            enter = localEnter;
+            if (value) {
+                *localEnter = value = 0;
+                Anim_SetSequence(&p->sequence, *(void **)(boss + 0x4d0), 7, (u8)p->variant, 0);
             }
+        }
             if (StepPlayback(p, &p->sequence, p, state)) {
                 SetState(p, 2);
                 *enter = 1;
@@ -224,7 +217,3 @@ void Vanargand_UpdatePartRetreat(u8 *boss, struct VanargandPart *p)
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartRetreat);
-#endif
