@@ -1,9 +1,6 @@
 #include "global.h"
 #include "scene_hud_display.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.9%
-// only the base copy (mov r7, r8) is placed after the flags/widget pointers; assigning it first makes CSE derive them from the copy
 s32 Inventory_GetQuantityByStorage(u32, u32);
 u32 Selection_GetDisplayFrame(s32);
 s32 SceneHud_CanApplySelectedAction(s32);
@@ -17,10 +14,10 @@ void SceneHud_RefreshActionIcons(struct SceneHudState *owner)
     struct SceneInputWidget *w;
     i = 0;
     category = &owner->actionCategory;
-    flags = (u32 *)((u8 *)owner + 0x17e8);
-    w = (struct SceneInputWidget *)((u8 *)owner + 0x17e0);
     base = (u8 *)owner;
-    for (; i < 16; base += 0x60, w++, flags += 0x18, i++) {
+    flags = &owner->categoryWidgets[10].flags;
+    w = &owner->categoryWidgets[10];
+    for (; i < 16; base += sizeof(*w), w++, flags += sizeof(*w) / sizeof(*flags), i++) {
         s32 action = Inventory_GetQuantityByStorage(*category, i);
         if (action < 0) {
             *flags |= 1;
@@ -38,7 +35,5 @@ void SceneHud_RefreshActionIcons(struct SceneHudState *owner)
             }
         }
     }
+    owner = NULL;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneHud_RefreshActionIcons);
-#endif
