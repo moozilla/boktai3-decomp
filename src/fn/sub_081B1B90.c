@@ -170,7 +170,7 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
 {
     struct SceneVec target;
     u8 *enter;
-    register u32 state asm("r7");
+    u32 state;
     u32 mask = 8;
     typeof(state) c1;
     p->flags |= mask;
@@ -182,20 +182,16 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
     }
     state = p->state;
     c1 = state;
-    asm("" : "+r"(state));
     switch (c1) {
         case 0: {
-            register u32 entered asm("r1");
+            u32 entered;
             {
-                register u8 *address asm("r0") = &p->enter;
+                u8 *address = &p->enter;
                 entered = *address;
-                asm("" : "+r"(address), "+r"(entered));
                 enter = address;
-                asm("" : "+r"(enter));
             }
             if (entered) {
-                register u32 zero asm("r0") = 0;
-                asm("" : "+r"(zero));
+                u32 zero = 0;
                 *enter = zero;
                 Difference(&target, Player_GetEffectivePosition(zero), p->anchor);
                 if (p->variant == 1) {
@@ -211,7 +207,6 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
             MotionTrack_Update(p->motion);
             if (MotionEnded(p)) {
                 u32 next = 1;
-                asm("" : "+r"(next));
                 p->state = next;
                 p->timer = 0;
                 *enter = next;
@@ -220,26 +215,22 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
         }
 
         case 1: {
-            register struct DisplaySequenceState *seq asm("r4");
-            register u32 entered asm("r1");
+            struct DisplaySequenceState *seq;
+            u32 entered;
             {
-                register u8 *address asm("r0") = &p->enter;
+                u8 *address = &p->enter;
                 entered = *address;
-                asm("" : "+r"(address), "+r"(entered));
                 enter = address;
-                asm("" : "+r"(enter));
             }
             seq = &p->sequence;
             if (entered) {
-                register u32 zero asm("r2") = 0;
-                asm("" : "+r"(zero));
+                u32 zero = 0;
                 *enter = zero;
                 Anim_SetSequence(seq, *((void **)(boss + 0x4d0)), 8, (u8)p->variant, zero);
             }
             if (StepPlayback(p, seq, p, c1)) {
                 {
-                    register u32 next asm("r1") = 2;
-                    asm("" : "+r"(next));
+                    u32 next = 2;
                     p->state = next;
                 }
                 p->timer = 0;

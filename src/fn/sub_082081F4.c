@@ -112,7 +112,7 @@ void CannonTurret_ApplyHitReaction(struct Source *sourceInput, struct Hit *input
                 {
                     u32 c = *index + 1;
                     {
-                        register u32 m asm("r0") = 0x3ff;
+                        u32 m = 0x3ff;
                         asm("" : "+r"(m));
                         random = c & m;
                     }
@@ -126,7 +126,7 @@ void CannonTurret_ApplyHitReaction(struct Source *sourceInput, struct Hit *input
                 pos->y += (u8)table[random];
                 random = (random + 1) & 0x3ff;
                 {
-                    register u32 *cursor asm("r7") = index;
+                    u32 *cursor = index;
                     *cursor = random;
                 }
                 {

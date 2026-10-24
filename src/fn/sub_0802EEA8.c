@@ -110,9 +110,8 @@ void Actor_OnRisingFadeUpdate(void *unused, struct Actor *p, int ticks)
                 {
                     register int v asm("r0") = height(p->drawPos);
                     register int h asm("r2");
-                    register struct Vec *dq asm("r1");
+                    struct Vec *dq;
                     register int sum asm("r0");
-                    asm("" : "+r"(v));
                     h = v << 8;
                     dq = p->drawPos;
                     sum = h + b;
@@ -126,9 +125,8 @@ void Actor_OnRisingFadeUpdate(void *unused, struct Actor *p, int ticks)
                 {
                     register int v asm("r0") = height(p->drawPos);
                     register int h asm("r2");
-                    register struct Vec *dq asm("r1");
+                    struct Vec *dq;
                     register int sum asm("r0");
-                    asm("" : "+r"(v));
                     h = v << 8;
                     dq = p->drawPos;
                     sum = h + b;
@@ -152,7 +150,7 @@ void Actor_OnRisingFadeUpdate(void *unused, struct Actor *p, int ticks)
                 break;
         }
         {
-            register int ang asm("r2") = p->targetAngle;
+            int ang = p->targetAngle;
             register int t1 asm("r1");
             register int k asm("r0");
             asm("" : "+r"(ang));

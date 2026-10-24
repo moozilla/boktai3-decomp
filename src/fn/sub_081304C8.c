@@ -48,18 +48,16 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
     actor->phase2A9 = zero;
     actor->behavior2AA = zero;
     {
-        register u32 *counter asm("r0") = &actor->counter2AC;
-        asm("" : "+r"(counter));
+        u32 *counter = &actor->counter2AC;
         *counter = zero;
     }
     actor->field2B1 = 1;
 }
 static inline void SetFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    register u32 value asm("r0") = mask;
+    u32 value = mask;
     asm("" : "+r"(value));
     value |= actor->flags2D4;
-    asm("" : "+r"(value));
     actor->flags2D4 = value;
 }
 void SceneActorControl_HideOffscreen(struct SceneActorRegistryResetView *actor)
@@ -80,8 +78,7 @@ void SceneActorControl_HideOffscreen(struct SceneActorRegistryResetView *actor)
         if (actor->drawableKind == 0)
             FIELD(actor->drawable, 0, u32) |= mask;
         else {
-            register struct DrawablePart *part asm("r1") = (void *)((u8 *)actor->drawable + 0x20);
-            asm("" : "+r"(part));
+            struct DrawablePart *part = (void *)((u8 *)actor->drawable + 0x20);
             part->flags |= mask;
         }
     }

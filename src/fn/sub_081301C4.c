@@ -79,7 +79,6 @@ void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *
         }
         {
             register u32 height asm("r1") = (u16)actor->position.y;
-            asm("" : "+r"(height));
             target.y = height;
         }
         Chase_TryRoute(actor, *(void **)(group + 0x1fc), &actor->position, &target);

@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 
 #include "global.h"
 #include "scene_actor_reaction.h"
@@ -143,7 +142,6 @@ void TentacleBody_UpdatePursuit(struct SceneActorRegistryResetView *actor)
         TentacleActor_SelectWanderRoute(actor);
     }
     o = (t1 = 0x270);
-    asm("" : "+r"(t1));
     if ((u8)Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + o)))) {
         State0(actor);
         return;

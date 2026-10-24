@@ -30,8 +30,8 @@ static inline s32 LocalPlayer(void)
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
     if (Test(gUnk_030053F4, 0x4800)) {
-        register u32 *owner asm("r1") = &actor->field2E0;
-        register u32 mask asm("r2") = *owner;
+        u32 *owner = &actor->field2E0;
+        u32 mask = *owner;
         if (!(mask & 0x20) && mask) {
             switch (LocalPlayer()) {
                 case 0:
@@ -79,7 +79,6 @@ static inline void UpdateHitFlagsShared(struct SceneActorRegistryResetView *acto
     u32 flags = *flags2D4;
     if (flags) {
         u32 down = IsDown(actor, flags);
-        asm("" : "+m"(*flags2D4));
         if (down) {
             u32 zero = 0;
             *flags2D4 = 0x40;

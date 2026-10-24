@@ -357,13 +357,10 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
                 {
                     u16 *timer = (void *)(p + 0x5D2);
                     register u8 byteZero asm("r2") = 0;
-                    register void (*callback)(void) asm("r1");
-                    register u32 offset asm("r0") = 0xB4;
-                    asm("" : "+r"(byteZero));
+                    register void (*callback)(void);
+                    u32 offset = 0xB4;
                     *timer = offset;
-                    asm("" : "+r"(offset));
                     callback = SceneMover_InterpolateScreenX;
-                    asm("" : : "r"(callback));
                     offset += 0x4C;
                     SetCallback(callback, (void (**)(void))(context + offset));
                     *(u32 *)(context + 0x90) = zero;
@@ -382,7 +379,6 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
                 u32 *field = (void *)(p + 0x5BC);
                 register u32 one asm("r5") = 1;
                 *field = one;
-                asm("" : "+r"(one));
                 *(u32 *)(p + 0x2FC) = 0;
                 state = (struct DisplaySequenceState *)(p + 0x2EC);
                 Anim_SetSequence(state, *(void **)(p + 0x390), 0, 0, 0);

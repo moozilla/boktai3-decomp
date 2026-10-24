@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "state_actor.h"
 
 // foundry draft (worker best 82.4%); what differs is mostly register allocation and instruction order
@@ -67,7 +66,6 @@ s32 sub_081C8FB0(struct Context *ctx, struct StateActor *p, s32 checkAngle)
         diff1 = facing - ((s8)Math_Atan2(dx, dz));
         {
             s32 angle = p->angle + 0x80;
-            asm("" : "+r"(angle));
             diff2u = facing - angle;
         }
         d1 = (s8)diff1;

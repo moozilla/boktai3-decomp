@@ -1,6 +1,5 @@
 #include "global.h"
 
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -39,7 +38,6 @@ s32 EffectPool_CreateEntries(struct EffectPool *pool)
     s32 i, result;
     for (i = 0; i < 3; i++) {
         void *shadow;
-        asm("" : "+r"(entry));
         Sprite_Init(entry, pool->animationData, 0);
         Anim_SetSequence(entry->animation, pool->sequence, 3, 0, 0);
         entry->flags |= 1;

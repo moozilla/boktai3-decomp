@@ -103,14 +103,13 @@ void Actor_OnDescendingFadeUpdate(void *unused, struct Actor *p, int ticks)
                 register u32 k asm("r1");
                 int t = 8 - ticks;
                 k = 200;
-                asm("" : "+r"(k));
                 b = t * k + 0xa0;
                 {
                     register u8 *q asm("r0");
                     struct Vec *dp;
                     register int v asm("r0");
-                    register int h asm("r2");
-                    register struct Vec *dq asm("r1");
+                    int h;
+                    struct Vec *dq;
                     register int sum asm("r0");
                     register u32 off asm("r3");
                     register u8 *q2 asm("r0");
@@ -118,7 +117,6 @@ void Actor_OnDescendingFadeUpdate(void *unused, struct Actor *p, int ticks)
                     q = (u8 *)p + k;
                     dp = *(struct Vec **)q;
                     v = height(dp);
-                    asm("" : "+r"(v));
                     h = v << 8;
                     off = 0x160;
                     asm("" : "+r"(off));
@@ -144,9 +142,8 @@ void Actor_OnDescendingFadeUpdate(void *unused, struct Actor *p, int ticks)
                 {
                     register int v asm("r0") = height(p->drawPos);
                     register int h asm("r2");
-                    register struct Vec *dq asm("r1");
+                    struct Vec *dq;
                     register int sum asm("r0");
-                    asm("" : "+r"(v));
                     h = v << 8;
                     dq = p->drawPos;
                     sum = h + b;
@@ -161,7 +158,7 @@ void Actor_OnDescendingFadeUpdate(void *unused, struct Actor *p, int ticks)
                 break;
         }
         {
-            register int ang asm("r2") = p->targetAngle;
+            int ang = p->targetAngle;
             register int t1 asm("r1");
             register int k asm("r0");
             asm("" : "+r"(ang));

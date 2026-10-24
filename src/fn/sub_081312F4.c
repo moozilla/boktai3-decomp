@@ -60,7 +60,7 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 behavior, u3
 }
 static inline void *SavedControl(u8 *group)
 {
-    register void **field asm("r0") = (void *)(group + 0x214);
+    void **field = (void *)(group + 0x214);
     return *field;
 }
 static inline u32 Finished(struct SceneActorRegistryResetView *a)
@@ -83,9 +83,8 @@ static inline u32 MotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
 }
 void SceneActorRoute_UpdateReturnEntry(struct SceneActorRegistryResetView *actor)
 {
-    register u8 *group asm("r6") = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group;
     u8 result;
-    asm("" : "+r"(group));
     if (SceneActorControl_TakeFlag(&actor->field2B1))
         BeginControlZero(actor, actor->entryTarget224, 2);
     if ((u8)Callback_InvokeActor(actor, actor->update270))

@@ -103,7 +103,6 @@ static inline void Step(struct Member *m, struct Render *owner, struct Frames *s
         register int mask asm("r3") = 1;
         register int mine asm("r1");
         int bits;
-        asm("" : "+r"(mask));
         mine = mask & settings;
         bits = (*word & 48) >> 4;
         bits &= mask;
@@ -117,9 +116,7 @@ static inline void Step(struct Member *m, struct Render *owner, struct Frames *s
         register int mask asm("r3") = 2;
         register int mine asm("r1");
         int bits;
-        asm("" : "+r"(mask));
         mine = mask & settings;
-        asm("" : "+r"(mine));
         mine = (u8)mine;
         bits = (*word & 48) >> 4;
         bits &= mask;
@@ -130,13 +127,12 @@ static inline void Step(struct Member *m, struct Render *owner, struct Frames *s
     }
     {
         register u32 mask asm("r5");
-        register int duration asm("r2");
+        int duration;
         register int savedDuration asm("r3");
         u32 timer = f->timer + 1;
         f->timer = timer;
         {
             register u32 initialMask asm("r3") = 65535;
-            asm("" : "+r"(initialMask));
             mask = initialMask;
             asm("" : "+&r"(mask) : "r"(initialMask));
         }
@@ -160,9 +156,8 @@ static inline void Step(struct Member *m, struct Render *owner, struct Frames *s
                 index--;
                 goto storeIndex;
             } else {
-                register int count asm("r3");
+                int count;
                 index = f->index + 1;
-                asm("" : "+r"(index));
                 f->index = index;
                 count = f->count;
                 if ((index & mask) < count)

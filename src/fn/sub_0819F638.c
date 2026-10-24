@@ -71,9 +71,9 @@ void Hresvelgr_UpdateRandomVolleyPhase(struct ActorReaction *actor, s32 frame)
         Sound_PlaySong(0x3E2);
     if (frame > 15) {
         if ((actor->timer & 3) == 0) {
-            register s32 a asm("r12");
+            s32 a;
             s32 b;
-            register const u16 *table asm("r3");
+            const u16 *table;
             frame = actor->timer >> 2;
             AddReactionVector(&pos, &actor->position, &actor->offsets[actor->variant]);
             pos.y = actor->ground->y + 128;

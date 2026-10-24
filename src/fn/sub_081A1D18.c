@@ -44,7 +44,6 @@ static inline void emitBurst(u32 emitter)
     for (i = 0; i < 4; ++i) {
         MotionDelta delta = {0};
         register const u16 *table asm("r4") = gUnk_0203B400;
-        asm("" : "+r"(table));
         delta.x = (nextRandom(table) & 15) - 8;
         delta.y = nextRandom(table) & 7;
         delta.z = (nextRandom(table) & 15) - 8;

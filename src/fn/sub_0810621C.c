@@ -37,7 +37,7 @@ static inline u32 Step(struct ContactSwarmSprite *sprite, struct DisplaySequence
     struct DisplaySequenceState *state = st;
     const volatile u16 *command;
     u32 duration, flags, bit;
-    register u32 done asm("r2");
+    u32 done;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;

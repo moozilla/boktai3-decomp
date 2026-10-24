@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_animation.h"
 #include "scene_vec.h"
@@ -22,7 +21,7 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
     struct TileTrigger *sprite = owner;
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, flags, bit;
-    register u32 duration asm("r2");
+    u32 duration;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -32,10 +31,9 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
     sprite->spriteFrame = *command >> 6;
     {
         u32 input = state->flags;
-        register u32 first asm("r1");
+        u32 first;
         u32 maskBit = 1;
         bit = maskBit;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
@@ -46,12 +44,10 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
     {
         u32 input = state->flags;
         u32 bit;
-        register u32 first asm("r1");
+        u32 first;
         bit = 2;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
-        asm("" : "+r"(first));
         first = (u8)first;
         if (first != (((*command & 0x30) >> 4) & bit))
             owner->flags |= 8;
@@ -61,17 +57,14 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
     {
         u32 elapsed = state->elapsed + 1;
         u32 mask;
-        register u32 temp asm("r1");
+        u32 temp;
         u32 savedDuration;
         state->elapsed = elapsed;
         temp = 0xFFFF;
-        asm("" : "+r"(temp));
         mask = temp;
-        asm("" : "+&r"(mask) : "r"(temp));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
-        asm("" : "+r"(savedDuration));
         if (elapsed >= duration) {
             state->elapsed = 0;
             flags = state->flags;
@@ -98,7 +91,6 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
                     endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -122,7 +114,7 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
             }
             state->frameWeight = *command & 15;
             {
-                register s32 weight asm("r1") = state->frameWeight;
+                s32 weight = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;

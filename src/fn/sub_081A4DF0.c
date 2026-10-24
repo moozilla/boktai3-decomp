@@ -61,6 +61,5 @@ s32 Hresvelgr_InitializeProjectilePool(struct ProjectilePool *pool, s32 a, s32 b
         entry++;
     }
     pool->active = 0;
-    asm("" : "+r"(result));
     return result;
 }

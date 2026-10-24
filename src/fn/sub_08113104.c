@@ -35,18 +35,15 @@ static inline u32 StepDebrisSprite(struct Visual *visual)
     register struct Visual *v asm("r12") = visual;
     struct ContactSwarmSprite *sprite = &v->sprite;
     struct DisplaySequenceState *state = &v->sequence;
-    register const volatile u16 *command asm("r6"); /* preserve observed packed-command reads */
+    const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, duration, flags, bit;
     {
-        register u32 offset asm("r0") = state->index << 1;
-        register const volatile u16 *table asm("r1");
+        u32 offset = state->index << 1;
+        const volatile u16 *table;
         register struct Visual *read asm("r2") = v;
-        asm("" : : "r"(read), "r"(offset));
         table = read->sequence.commands;
-        asm("" : "+r"(table));
         command = (const volatile u16 *)((u32)table + offset);
     }
-    asm("" : "+r"(command));
     sprite->frame = *command >> 6;
     {
         u32 input = state->flags;
@@ -59,17 +56,13 @@ static inline u32 StepDebrisSprite(struct Visual *visual)
             register u32 value asm("r0");
             if (first != (((*command & 0x30) >> 4) & bit)) {
                 register struct Visual *read asm("r1") = v;
-                asm("" : "+r"(read));
                 value = read->sprite.flags | 4;
             } else {
                 register struct Visual *read asm("r1") = v;
-                asm("" : "+r"(read));
                 value = read->sprite.flags & ~4;
             }
-            asm("" : "+r"(value));
             {
                 register struct Visual *out asm("r2") = v;
-                asm("" : "+r"(out));
                 out->sprite.flags = value;
             }
         }
@@ -91,7 +84,7 @@ static inline u32 StepDebrisSprite(struct Visual *visual)
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r6");
+        u32 mask;
         register u32 temp asm("r1");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
@@ -146,10 +139,9 @@ static inline u32 StepDebrisSprite(struct Visual *visual)
                 }
             }
             {
-                register u32 offset asm("r0") = state->index << 1;
-                register const volatile u16 *table asm("r1");
+                u32 offset = state->index << 1;
+                const volatile u16 *table;
                 table = state->commands;
-                asm("" : "+r"(table));
                 command = (const volatile u16 *)((u32)table + offset);
             }
             state->frameWeight = *command & 15;
@@ -173,7 +165,7 @@ void SceneDebris_UpdateAnimatedMotion(struct Debris *p)
 {
     struct Packed projected;
     s32 ended;
-    register struct ContactPosition *output asm("r3");
+    struct ContactPosition *output;
     if (p->entered) {
         u32 *flags;
         if (!p->visualType)
@@ -182,7 +174,6 @@ void SceneDebris_UpdateAnimatedMotion(struct Debris *p)
             flags = (u32 *)((u8 *)p->visual + 0x28);
         {
             u32 mask = ~1;
-            asm("" : "+r"(mask));
             *flags &= mask;
         }
         p->entered = 0;
@@ -192,7 +183,6 @@ void SceneDebris_UpdateAnimatedMotion(struct Debris *p)
     projected.x = p->position.x - gUnk_020004B8->x;
     projected.y = p->position.y - gUnk_020004B8->y;
     output = (void *)&projected;
-    asm("" : "+r"(output));
     if (!p->visualType) {
         struct Visual *visual = p->visual;
         visual->sprite.position.x = ((struct ContactPosition *)&projected)->x;

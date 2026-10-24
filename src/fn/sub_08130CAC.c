@@ -49,8 +49,7 @@ static inline void TurnState(struct SceneActorRegistryResetView *a, u32 behavior
     a->phase2A9 = zero;
     a->behavior2AA = behavior;
     {
-        register u32 *counter asm("r0") = &a->counter2AC;
-        asm("" : "+r"(counter));
+        u32 *counter = &a->counter2AC;
         *counter = zero;
     }
     a->field2B1 = 1;
@@ -64,7 +63,6 @@ void SceneActorRoute_UpdateAdvancePhase(struct SceneActorRegistryResetView *acto
     register u8 *group asm("r5") = (u8 *)&actor->group;
     s32 speed, event;
     u16 *scale;
-    asm("" : "+r"(group));
     if (SceneActorControl_TakeFlag(&actor->field2B1))
         BeginControlZero(actor, actor->entryTarget228, 1);
     if ((u8)Callback_InvokeActor(actor, actor->update270))
@@ -91,15 +89,13 @@ void SceneActorRoute_UpdateAdvancePhase(struct SceneActorRegistryResetView *acto
     group += 0x1FC;
     event = NavMesh_ConsumeProbeEvent(*(void **)group);
     if (!event) {
-        register void *descriptor asm("r1") = *(void **)group;
-        asm("" : "+r"(descriptor));
+        void *descriptor = *(void **)group;
         if (SceneActorBehavior_AccelerateTowardDescriptor(actor, descriptor, 32, 32, speed)) {
             State(actor, event, event, event, event);
             return;
         }
     } else {
-        register void *descriptor asm("r1") = *(void **)group;
-        asm("" : "+r"(descriptor));
+        void *descriptor = *(void **)group;
         if (SceneActorBehavior_RequestDescriptorTurn(actor, descriptor, 32, 32, speed))
             TurnState(actor, 6);
     }

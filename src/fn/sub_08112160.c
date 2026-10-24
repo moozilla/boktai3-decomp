@@ -1,5 +1,4 @@
 /* Provisional names and object interpretation; offsets follow static accesses. */
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct Digit {
     u32 flags;
@@ -10,7 +9,6 @@ s32 Anim_SelectWidgetGlyph(void *, void *, u32);
 static inline u32 *FLP(struct Digit *p, s32 n)
 {
     u32 o = n * 0x60;
-    asm("" : "+r"(o));
     return (u32 *)((u32)p + o);
 }
 #define FL(p, n) (*FLP(p, n))

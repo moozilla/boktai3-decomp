@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_route.h"
@@ -209,8 +208,7 @@ void Crow_ApproachPlayerThenRecoil(struct SceneActorRegistryResetView *actor)
         *((s16 *)(body + 0x42c)) =
             Shift(gUnk_086149C4[(actor->direction + 64) & 255] * body[0x3d9], 12);
         {
-            register s32 depth asm("r1") = Shift(gUnk_086149C4[actor->direction] * body[0x3d9], 12);
-            asm("" : "+r"(depth));
+            s32 depth = Shift(gUnk_086149C4[actor->direction] * body[0x3d9], 12);
             {
                 typeof(*((s16 *)(body + 0x430))) *q1 = &(*((s16 *)(body + 0x430)));
                 u32 z1 = 0;
