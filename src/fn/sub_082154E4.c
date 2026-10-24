@@ -1,8 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: priority-loop allocation and invariant address hoisting.
 struct OamEntry {
     u32 attributes;
     u16 tile, depth;
@@ -29,14 +25,13 @@ void SpriteOam_FinalizeQueue(void)
     s32 priorities[4];
     struct OamEntry *entry;
     s32 i;
-    register s32 count asm("r5");
-    register struct OamEntry *buffer asm("r9");
+    s32 count;
+    /* Reused for the OAM buffer and then the affine lookup table. */
+    void *base;
     work.fill = -1;
     CpuFastSet(&work.fill, work.heads, 0x1000040);
-    count = gUnk_03004798;
     {
-        register struct OamEntry *entry asm("r5") = gUnk_030047A0;
-        register s32 i asm("r4");
+        entry = gUnk_030047A0;
         for (i = 0; i < gUnk_0300479C; i++) {
             u32 depth = entry->depth;
             u8 *head = &work.heads[depth >> 8];
@@ -48,47 +43,50 @@ void SpriteOam_FinalizeQueue(void)
     {
         s32 sum;
         sum = gUnk_03004798;
-        buffer = gUnk_03004390;
         for (i = 0; i < 4; i++) {
+            base = gUnk_03004390;
             priorities[i] = sum;
             sum += gUnk_03004790[i];
         }
     }
+    count = gUnk_03004798;
     for (i = 255; (i >= 0) && (count < 128); i--) {
         s32 index = work.heads[i];
         if (index != 255) {
             do {
                 s32 *next;
-                entry = &gUnk_030047A0[index];
-                next = &priorities[(entry->tile >> 10) & 3];
+                struct OamEntry *queued;
+                queued = &gUnk_030047A0[index];
+                next = &priorities[(queued->tile >> 10) & 3];
                 if ((*next) < 128) {
-                    gUnk_03004390[*next] = *entry;
+                    gUnk_03004390[*next] = *queued;
                     count++;
                     (*next)++;
                 }
-                index = (u8)entry->depth;
+                index = (u8)queued->depth;
             } while (index != 255);
         }
     }
 
     i = count;
-    entry = buffer + i;
+    entry = (struct OamEntry *)(i * sizeof(*entry) + (u32)base);
     for (; i < 128; i++, entry++) {
         entry->attributes = 0x200;
     }
 
-    entry = buffer;
     {
-        register struct Matrix *matrix asm("r6") = gUnk_03004310;
-        register struct OamEntry *entry asm("r5") = buffer;
-        register s32 i asm("r4");
+        struct Matrix *matrix;
+        entry = base;
+        matrix = gUnk_03004310;
         if (gUnk_03004BA0 > 31)
             gUnk_03004BA0 = 32;
         for (i = 0; i < gUnk_03004BA0; i++) {
-            s32 angle = matrix->angle;
-            s32 sine = gUnk_086149C4[angle] * 4;
-            s32 cosine = gUnk_086149C4[(angle + 64) & 255] * 4;
-            s32 value;
+            s32 angle;
+            s32 sine, cosine, value;
+            base = gUnk_086149C4;
+            angle = matrix->angle;
+            sine = ((s16 *)base)[angle] * 4;
+            cosine = ((s16 *)base)[(angle + 64) & 255] * 4;
             if (!matrix->scaleX) {
                 value = matrix->scaleX;
                 entry[0].depth = value;
@@ -111,7 +109,3 @@ void SpriteOam_FinalizeQueue(void)
     }
     gUnk_03003A04 |= 1;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SpriteOam_FinalizeQueue);
-#endif
