@@ -2,7 +2,7 @@
 
 // confidence=low: projects the owner's position to the screen, then runs each of four parts'
 // state handlers from a table and places the active parts relative to that screen point.
-// sub_082320C0 is the same update with another handler table.
+// sub_08231EF8 and sub_082320C0 are the same update with other handler tables.
 struct Vec50 {
     s32 x : 16, y : 16, z : 16;
 };

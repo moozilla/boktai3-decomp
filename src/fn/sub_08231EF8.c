@@ -1,88 +1,80 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 87.3%
-// fix.py best version (reprinted C)
-// 14 differing instruction runs; first diff at +0x10 (mov r5, sp vs ldr r3, [r1, #8])
-struct Slot {
-    u8 state, b1;
-    u16 h2;
-    s16 h4;
-    u8 p6[2];
-    u16 x, y, z, hE;
-    u32 f10;
-    u8 p14[0x28 - 0x14];
-    u16 ox, oy, oz;
-    u8 p2E[0x48 - 0x2E];
+
+// confidence=low: projects the owner's position to the screen, then runs each of four parts'
+// state handlers from a table and places the active parts relative to that screen point.
+// sub_08231FDC and sub_082320C0 are the same update with other handler tables.
+struct Vec50 {
+    s32 x : 16, y : 16, z : 16;
 };
-struct S {
-    u8 p0[8];
-    s16 *vec;
-    struct Slot slots[4];
-};
-struct V {
+struct ScreenPoint {
     u16 x, y, z, pad;
 };
+struct EffectPart;
+struct EffectGroup;
+typedef void (*EffectPartHandler)(void *, struct EffectGroup *, struct EffectPart *);
+struct EffectPart {
+    u8 state;
+    u8 pad1;
+    u16 timer;
+    u8 pad4[4];
+    u16 x, y, z;
+    u8 padE[0x28 - 0xe];
+    u16 screenX, screenY, screenZ;
+    u8 pad2E[0x48 - 0x2e];
+};
+struct EffectGroup {
+    u8 pad0[8];
+    struct Vec50 *position;
+    struct EffectPart parts[4];
+};
 extern u16 gUnk_03005418[];
-typedef void (*Fn)(void *, struct S *, struct Slot *);
-extern Fn const gUnk_08E879A8[];
-static inline s32 scale(s32 x)
+extern EffectPartHandler const gUnk_08E879A8[];
+static inline s32 scale50(s32 v)
 {
-    s32 r;
-    if (x >= 0)
-        r = x >> 5;
+    if (v >= 0)
+        v = v >> 5;
     else
-        r = -((-x) >> 5);
-    x *= 3;
-    return r;
+        v = -((-v) >> 5);
+    return v;
 }
-
-void sub_08231EF8(void *a, struct S *s)
+void sub_08231EF8(void *context, struct EffectGroup *group)
 {
-    struct V v;
-    u16 *q;
-    s16 *p = s->vec;
-    s32 x = p[0];
-    s32 z = p[2];
-    s32 y;
-    struct Slot *slot;
-    struct Slot *callslot;
-    int i;
-    typeof(slot->x + q[0]) t1;
-    typeof(slot->z + q[2]) t2;
-    {
-        u16 *q = (u16 *)(&v);
-        q[0] = scale(x - z);
-        z = scale(x + z);
-        y = scale(p[1]);
-        q[1] = z - y;
-        z += y;
-        q[0] = (q[0] - gUnk_03005418[0]) + 0x78;
-        q[1] = (q[1] - gUnk_03005418[1]) + 0x50;
-        z -= gUnk_03005418[2];
-        q[2] = z;
-    }
-    {
-        const Fn *table = gUnk_08E879A8;
-        q = (u16 *)(&v);
-        slot = s->slots;
-        callslot = slot;
-        i = 3;
-        do {
-            table[slot->state](a, s, callslot);
-            if (slot->state) {
-                t1 = slot->x + q[0];
-                slot->ox = t1;
-                slot->oy = q[1] + slot->y;
-                t2 = slot->z + q[2];
-                slot->oz = t2;
-                slot->h2++;
-            }
-            slot++;
-            callslot++;
-            i--;
-        } while (i >= 0);
-    }
+    struct ScreenPoint screen;
+    u16 *dest;
+    s16 *coords;
+    s32 x, z, sum, vertical, y, depth;
+    struct EffectPart *part;
+    struct EffectPart *state;
+    s32 i;
+    EffectPartHandler const *table;
+    struct ScreenPoint *point;
+    dest = (u16 *)&screen;
+    coords = (s16 *)group->position;
+    x = coords[0];
+    z = coords[2];
+    dest[0] = scale50((x - z) * 3);
+    sum = scale50((x + z) * 3);
+    vertical = scale50(coords[1] * 3);
+    y = sum - vertical;
+    depth = sum + vertical;
+    dest[0] = dest[0] - gUnk_03005418[0] + 120;
+    dest[1] = y - gUnk_03005418[1] + 80;
+    dest[2] = depth - gUnk_03005418[2];
+    table = gUnk_08E879A8;
+    point = &screen;
+    part = group->parts;
+    state = part;
+    i = 3;
+    do {
+        table[state->state](context, group, part);
+        if (state->state) {
+            state->screenX = point->x + state->x;
+            state->screenY = state->y + point->y;
+            state->screenZ = point->z + state->z;
+            state->timer++;
+        }
+        state++;
+        part++;
+        i--;
+    } while (i >= 0);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08231EF8);
-#endif
