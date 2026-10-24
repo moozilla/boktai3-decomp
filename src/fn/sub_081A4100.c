@@ -1,7 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// Remaining differences: random-table reload and lifetime/mode scratch registers.
 struct MotionVector {
     s16 x, y, z, pad;
 };
@@ -31,7 +29,7 @@ struct MotionCounts {
 };
 extern const struct MotionCounts gUnk_0824F770;
 extern const u16 gUnk_08611F38[];
-extern const u16 gUnk_0203B400[];
+#define RANDOM_TABLE_ADDR 0x0203B400
 extern u32 gUnk_03005308;
 extern struct MotionPool *gUnk_02000240;
 struct MotionEntry *Hresvelgr_FindInactiveEffect(void);
@@ -44,7 +42,7 @@ static inline s32 randomValue(void)
     u32 offset;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
-    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+    return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 struct MotionEntry *MotionEntry_Create(struct MotionVector *origin, u32 type, u32 mode,
                                        u32 lifetime)
@@ -52,7 +50,6 @@ struct MotionEntry *MotionEntry_Create(struct MotionVector *origin, u32 type, u3
     struct MotionCounts counts = gUnk_0824F770;
     struct MotionPool *pool = gUnk_02000240;
     struct MotionEntry *entry;
-    struct MotionVector *emptyOrigin = NULL;
     if (type > 3 || mode > 1 || !(entry = Hresvelgr_FindInactiveEffect()))
         return NULL;
     pool->allocated++;
@@ -72,7 +69,7 @@ struct MotionEntry *MotionEntry_Create(struct MotionVector *origin, u32 type, u3
         entry->origin = origin;
         MotionEntry_UpdatePosition(entry);
     } else {
-        entry->origin = emptyOrigin;
+        entry->origin = NULL;
         entry->savedPosition = *origin;
         entry->position = entry->savedPosition;
     }
@@ -87,7 +84,3 @@ struct MotionEntry *MotionEntry_Create(struct MotionVector *origin, u32 type, u3
     entry->frame = 0;
     return entry;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", MotionEntry_Create);
-#endif
