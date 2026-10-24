@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 95.7%
 // fix.py best version (reprinted C)
 // Animation setup and tail scheduling still differ.
 // MATCHING_CONCESSION: register-pinning
@@ -51,7 +49,7 @@ static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequ
     owner->frame = (*command) >> 6;
     {
         u32 input = state->flags;
-        register u32 first asm("r1");
+        u32 first;
         u32 maskBit = one;
         bit = maskBit;
         c1 = bit;
@@ -171,7 +169,7 @@ static inline u8 MotionEnded(struct ActorStatusPart *p)
 void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
 {
     struct SceneVec target;
-    register u8 *enter asm("r8");
+    u8 *enter;
     register u32 state asm("r7");
     u32 mask = 8;
     typeof(state) c1;
@@ -255,6 +253,3 @@ void ActorStatus_UpdateFlankingStrike(u8 *boss, struct ActorStatusPart *p)
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorStatus_UpdateFlankingStrike);
-#endif
