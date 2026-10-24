@@ -211,12 +211,14 @@ def cmd_tick(args):
         except (OSError, ValueError):
             continue
         m = re.match(r"(\d+) ROM / (\d+) draft", str(res.get("counts", "")))
-        if res.get("match") or not m or int(m.group(1)) + int(m.group(2)) > 8:
+        again = os.path.exists(os.path.join(wd, "again"))  # a reviewer asks for one more round anyway
+        if res.get("match") or not (again or (m and int(m.group(1)) + int(m.group(2)) <= 8)):
             continue
-        open(os.path.join(wd, ".second"), "w").write(res["counts"])
+        open(os.path.join(wd, ".second"), "w").write(str(res.get("counts")))
         hint = os.path.join(wd, "hint.txt")  # a reviewer's note for this function, read once
         hint = (" A reviewer adds: " + open(hint).read().strip()) if os.path.exists(hint) else ""
-        if resume(r, model, note=(f"You stopped at {res['counts']}: very close. Take one more round of up to 80"
+        if resume(r, model, note=(f"You stopped at {res['counts']}" + (": a reviewer has a lead (below)." if again else ": very close.")
+                                   + " Take one more round of up to 80"
                                    " compiles on the remaining hunks (why on each, confirm with a knob, then C;"
                                    " a pin is acceptable only as the last resort). scope has new commands since"
                                    " you started: `scope.py FILE.c probe` flips each cse/gcse decision"
