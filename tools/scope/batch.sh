@@ -3,7 +3,8 @@
 #   tools/scope/batch.sh N TREE FUNC...
 # Each FUNC gets its own commit on claude/night-N (from origin/main) in the worktree TREE. A FUNC whose
 # unit does not match is skipped (campaign.py land restores the file). The PR is opened and merged
-# only after `make` prints exactly "build/boktai3.gba: OK".
+# only after `make` prints exactly "build/boktai3.gba: OK". With no FUNC it finishes the batch already on
+# claude/night-N (after landing or fixing something there by hand).
 set -eu
 n=$1
 tree=$2
@@ -11,8 +12,15 @@ shift 2
 here=$(cd "$(dirname "$0")/../.." && pwd)
 cd "$tree"
 git fetch -q origin
-git checkout -q -B "claude/night-$n" origin/main
 landed=""
+if [ $# -eq 0 ]; then
+    [ "$(git branch --show-current)" = "claude/night-$n" ] || { echo "not on claude/night-$n"; exit 1; }
+    [ -z "$(git status --porcelain src tools)" ] || { echo "uncommitted changes"; exit 1; }
+    landed=$(git log --format=%s origin/main..HEAD | sed -n 's/^Match \([A-Za-z0-9_]*\).*/\1/p' | tr '\n' ' ')
+    landed=" ${landed% }"
+else
+    git checkout -q -B "claude/night-$n" origin/main
+fi
 for f in "$@"; do
     if ! out=$(python3 "$here/tools/scope/campaign.py" land "$f" "$tree" 2>&1); then
         echo "$out"
@@ -54,7 +62,7 @@ git commit -q -m "Regenerate PROGRESS.md and PROGRESS.json
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 python3 tools/pii_check.py --range origin/main..HEAD
 git push -q -u origin "claude/night-$n"
-list=$(for f in $landed; do echo "- $f"; done)
+list=$(git log --reverse --format="- %s" origin/main..HEAD | grep -v "^- Regenerate PROGRESS")
 url=$(gh pr create --base main --head "claude/night-$n" --title "Night batch $n:$landed" --body "Batch integration of scope-campaign matches, one commit per function:
 
 $list
