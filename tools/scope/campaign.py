@@ -4,7 +4,7 @@
   campaign.py queue [--category Bosses] [--all]    write build/scope/campaign/queue.json from origin/main
   campaign.py tick [--workers 4] [--model M]       keep WORKERS running; return when one finishes
   campaign.py status                               what ran, what matched, what is in flight
-  campaign.py land FUNC WORKTREE                   verify FUNC's best_match.c, unwrap its NONMATCHING block,
+  campaign.py land FUNC WORKTREE [REV]                  verify FUNC's best_match.c, unwrap its NONMATCHING block,
                                                    three-way merge it into WORKTREE's file, check the unit
 
 Each worker gets its own directory build/scope/campaign/FUNC/ (start.c = the draft as on origin/main,
@@ -168,6 +168,7 @@ def start(r, model):
     os.makedirs(wd, exist_ok=True)
     text = sh("git", "show", f"origin/main:{r['src']}")
     open(os.path.join(wd, "base.c"), "w").write(text)
+    open(os.path.join(wd, ".main_rev"), "w").write(sh("git", "rev-parse", "origin/main").strip())
     open(os.path.join(wd, "start.c"), "w").write(text)
     rel = os.path.relpath(wd, ROOT)
     env = dict(os.environ, SCOPE_RUN=func)
@@ -269,7 +270,11 @@ def cmd_land(args):
     new = unwrap(open(cand).read(), func, r["addr"])
     if new is None:
         sys.exit(f"{func}: no NONMATCHING block for it in best_match.c")
-    base = unwrap(open(os.path.join(wd, "base.c")).read(), func, r["addr"]) or open(os.path.join(wd, "base.c")).read()
+    # the merge base is the file as it was on main when the worker started (workers may edit base.c)
+    revf = os.path.join(wd, ".main_rev")
+    rev = open(revf).read().strip() if os.path.exists(revf) else (args[2] if len(args) > 2 else None)
+    btext = sh("git", "show", f"{rev}:{r['src']}") if rev else open(os.path.join(wd, "base.c")).read()
+    base = unwrap(btext, func, r["addr"]) or btext
     target = os.path.join(tree, r["src"])
     cur = open(target).read()
     curu = unwrap(cur, func, r["addr"])
