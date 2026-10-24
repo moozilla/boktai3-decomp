@@ -304,14 +304,31 @@ Each was read from the compiler source and confirmed on a live draft.
    cse2 `make_regs_eqv` can make it head over a variable cse1 kept. A fix that
    makes cse1 right can be undone by cse1's own substitutions elsewhere.
 
-8. **Reload hands out spill registers round-robin.** `allocate_reload_reg`
-   (reload1.c) starts its search after `last_spill_reg`, the index of the last
-   spill register it chose, reset per function. So the register a reload gets
-   depends on the previous reload's choice anywhere earlier in the function.
-   An earlier insn that needs one more (or one fewer) reload shifts every
-   later choice. Hard-register pins (`register asm("r1")`) remove a reload, so
-   they shift the rotation too. `AGBCC_SPILL=K:D` reproduces a shift; `scope
-   spill` searches for one.
+8. **Reload hands out spill registers round-robin, per function.**
+   `reload()` resets `last_spill_reg` to -1 for each function; nothing
+   carries over between functions. The spill list is every hard register
+   reload uses anywhere in the function, ascending (e.g. r0 r1 r2 r3 r7).
+   `allocate_reload_reg` (reload1.c) searches from the position after the
+   previous choice, skips registers live there or taken by another reload of
+   the same insn (a first pass prefers sharing a register already reloaded in
+   this insn), and sets `last_spill_reg` to its pick. Inherited reloads (value
+   already in a register) and reloads that reuse the insn's own output
+   register make no choice. So the register a reload gets depends on the
+   previous choice anywhere earlier in the function. The C-level nudges add
+   or remove reloads before that point:
+   * a value in a high register (r8-r10) used by a low-register insn: one
+     reload per use;
+   * a variable that gets no register (long-lived and low priority, e.g. a
+     constant set before a loop and used in it): reload rematerializes the
+     constant at each use, one choice each;
+   * an integer address or a large offset written as a constant
+     (`0x0203B400`, `RANDOM_TABLE_ADDR`): Thumb `add` cannot encode it, so
+     reload loads it, one choice; the same address as a symbol
+     (`gUnk_0203B400`) becomes its own pseudo at expand and needs none;
+   * a `register asm` pin: removes the reload of that value.
+   `AGBCC_SPILL=K:D` reproduces a shift; `scope spill` searches for one and
+   lists the pins, high-register values and register-less values between the
+   two choices.
 9. **cse's extended blocks skip around blocks without labels.** With
    `-fcse-skip-blocks` (on at -O2), `cse_end_of_basic_block` treats a
    conditional branch over a block with no CODE_LABEL inside as AROUND, so
@@ -321,6 +338,13 @@ Each was read from the compiler source and confirmed on a live draft.
    extended block containing it; the first look that substitutes rewrites the
    insn, so later looks see the substituted form. Unused labels are deleted
    before cse1, so an empty label or `do {} while (0)` does not stop a skip.
+
+* **Solved: Vanargand_UpdateFacingPairAttack** (plain C, no pins). Depinning
+  `RandomValue` left the table base in r1 (ROM r2) plus the same one-step
+  rotation. One fact explains both: in the ROM the table address is a
+  reload. Written as the integer `RANDOM_TABLE_ADDR` (as other matched files
+  do), reload loads it as choice #10 -> r2, and `&p->pair`'s constant moves to
+  #11 -> r0, as in the ROM.
 
 ## Survey: how much of Bosses is reload rotation (2026-10-24)
 
@@ -346,7 +370,13 @@ which is exactly `10:1`. Not tested.
 
 ## Live investigations
 
-* **Hresvelgr_InitializeShots** (src/fn/sub_081A3554.c, 4 insns). MATCH with
+* **Solved: Hresvelgr_InitializeShots** (moozilla/boktai3-decomp#641, plain C,
+  no pins). The hypothesis below was right except for the constant: it is a
+  pre-loop variable `x = 0x708` assigned before `y` and `z`, so it lives
+  longest, gets no register, and reload rematerializes it in the loop (choice
+  #5 `=1800` -> r0, then `y` from sl -> r1, `z` from sb -> r2, the old #5 -> r3
+  as in the ROM). Assignment order matters, declaration order does not.
+  Original notes: 4 insns. MATCH with
   `AGBCC_SPILL=5:3`: everything is reload rotation (fact 8). Reload #5 (line
   64, `zero` from r8) gets r1, the ROM r3, so the ROM made extra reload
   choices before it. The likely spot is the inlined `SetPosition`: the draft

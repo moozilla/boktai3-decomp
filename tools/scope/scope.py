@@ -629,10 +629,12 @@ def alloc_records(wd, func):
     for ln in open(path) if os.path.exists(path) else []:
         p = ln.split()
         if p[0] == "G" and p[1] == func:
-            out[int(p[2])] = ("G", rank, int(p[3]), int(p[4]), int(p[5]), int(p[6]), int(p[7]))
+            if out.get(int(p[2]), ("G",))[0] != "L":
+                out[int(p[2])] = ("G", rank, int(p[3]), int(p[4]), int(p[5]), int(p[6]), int(p[7]))
             rank += 1
-        elif p[0] == "L" and p[1] == func:
-            out.setdefault(int(p[3]), ("L", int(p[2]), int(p[5]), int(p[6]), int(p[7]), int(p[8]), int(p[10])))
+        elif p[0] == "L" and p[1] == func and int(p[10]) >= 0:
+            # local alloc runs first; a pseudo it placed also shows up in the G list, so L wins
+            out[int(p[3])] = ("L", int(p[2]), int(p[5]), int(p[6]), int(p[7]), int(p[8]), int(p[10]))
     return out
 
 
@@ -693,8 +695,11 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         print(f"    lever: raise {nm(pseudo)}'s priority above theirs (more uses or a shorter life), or end the"
               f" overlap; what-if: AGBCC_PRI={pseudo}:+N or AGBCC_FORCE={pseudo}:{want}")
         return
-    print(f"    r{want} was free for it; global alloc preferred r{got} (copy/tie preferences or register order)."
-          f" what-if: AGBCC_FORCE={pseudo}:{want}")
+    who = "local alloc" if rec and rec[0] == "L" else "global alloc"
+    print(f"    r{want} was free for it; {who} preferred r{got} (copy/tie preferences or register order)."
+          f" If the ROM's value was instead a constant that reload loaded (an integer address or offset"
+          f" rather than a symbol, or a variable left without a register), it would take the rotation's"
+          f" register: try `spill`. what-if: AGBCC_FORCE={pseudo}:{want}")
 
 
 def reload_records(wd, func):
@@ -721,6 +726,47 @@ def score(src, func, env):
     return sum(1 for r in rows if r["tag"] != "="), info
 
 
+def rotation_hints(src, wd, func, rel, k, d, regs, order):
+    """What lies between reload choice K-1 and K that decides how many choices the ROM made there."""
+    prev = next((r for r in rel if r[0] == k - 1), None)
+    cur = next(r for r in rel if r[0] == k)
+    lo = order.index(prev[1]) if prev and prev[1] in order else 0
+    hi = order.index(cur[1]) if cur[1] in order else len(order)
+    span = set(order[lo:hi + 1])
+    lines = uid_lines(wd)
+    names = pseudo_names(wd, func)
+    recs = alloc_records(wd, func)
+    hard = hard_of(wd)
+    text = open(os.path.join(ROOT, src)).read().splitlines()
+    cl = sorted({lines[u] for u in span if lines.get(u)})
+    print(f"    between reload {k - 1} (line {prev[3] if prev else '?'}) and {k} (line {cur[3]}): the ROM's"
+          f" rotation is {d} step(s) on (list {' '.join('r%d' % r for r in regs)}), so it made more (or"
+          f" fewer, mod {len(regs)}) reload choices here. C lines in the span: {', '.join(map(str, cl))}")
+    pins = [i + 1 for i, t in enumerate(text) if re.search(r"register\b[^;]*asm\s*\(", t)]
+    if pins:
+        print(f"      register pins in the file (each removes the reload of its value): lines"
+              f" {', '.join(map(str, pins))}")
+    used = {}
+    for u, _, r in insn_list(wd, "lreg"):
+        if u in span:
+            for x in regs_of(r):
+                if x >= 16:
+                    used.setdefault(x, u)
+    high = [x for x in used if 8 <= hard.get(x, recs.get(x, (0,) * 7)[6]) <= 12]
+    none = [x for x in used if x in recs and recs[x][0] == "G" and recs[x][6] < 0]
+    def nm(x):
+        return f"{x} ({names[x]})" if x in names else str(x)
+    if high:
+        print(f"      values in high registers used here (each use by a low-register insn is a reload):"
+              f" {', '.join(nm(x) + ' r%d' % hard.get(x, recs.get(x, (0,) * 7)[6]) for x in high)}")
+    if none:
+        print(f"      values with no register (reloaded from a constant or the stack at each use):"
+              f" {', '.join(nm(x) for x in none)}")
+    print("      levers: a value moved from a low register to a high one, or to no register (make it a"
+          " longer-lived variable set earlier), adds reloads; a pin, or a value already in a low register,"
+          " removes them")
+
+
 def cmd_spill(src, func, env):
     """Is the whole difference reload's spill rotation? Greedily shift the rotation (AGBCC_SPILL) before
     each reload choice, from the first differing instruction on, keeping shifts that reduce the diff."""
@@ -734,7 +780,7 @@ def cmd_spill(src, func, env):
     regs = sorted({r[2] for r in rel})
     print(f"{func}: {base} differing insns; {len(rel)} reload register choices, spill registers seen"
           f" {', '.join('r%d' % r for r in regs)}")
-    spec, best, tried = [], base, 0
+    spec, best, tried, accepted = [], base, 0, []
     for k, uid, reg, line, lab in rel:
         if best == 0:
             break
@@ -750,6 +796,9 @@ def cmd_spill(src, func, env):
             best = cand[0]
             spec.append(f"{k}:{cand[1]}")
             print(f"  reload {k} (insn {uid}, line {line}, {lab}, got r{reg}): shift {cand[1]} -> {best} differ")
+            accepted.append((k, cand[1]))
+    for k, d in accepted:
+        rotation_hints(src, wd, info["obj_name"], rel, k, d, regs, order)
     print(f"  {tried} compiles. " + (f"MATCH with AGBCC_SPILL={','.join(spec)}: the C's shape is right; only"
           " reload's round-robin spill choice differs (last_spill_reg, reload1.c). The ROM made a different"
           " number of reload choices, or had a different spill set, before these points."
