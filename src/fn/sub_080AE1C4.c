@@ -1,7 +1,7 @@
 #include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 83.8%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: converges saved motion and restores the route after a reaction timer.
 // Remaining differences: reset-address lifetimes, saved registers, and collision-control scheduling; delaying maskTwo and spilling group reduced structural differences.
@@ -45,6 +45,11 @@ static inline u8 Test(u16 *p, u32 mask)
         return 1;
     return 0;
 }
+inline static u32 Arg1(u32 k_, struct SceneActorRegistryResetView *actor)
+{
+    return ((u8 *)actor->context) + k_;
+}
+
 void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
 {
     u8 *volatile group = (u8 *)(&actor->group);
@@ -164,7 +169,7 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
         Chase_SetState(actor, 3, 1, 0);
         Chase_SetCtl(actor, *((void **)(group + 0x20C)), 8);
         {
-            s32 mask = ~2;
+            s8 mask = ~2;
             actor->flags2D0 &= mask;
         }
         motionFlags = &actor->flags2D4;
@@ -183,7 +188,7 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
         else
             collider->flags |= 0x100;
         {
-            u16 *f = (u16 *)(((u8 *)actor->context) + 0x6D4);
+            u16 *f = (u16 *)Arg1(0x6D4, actor);
             s32 mask = ~0x1E;
             *f &= mask;
         }
@@ -196,6 +201,7 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Vorn_UpdateKnockbackRecovery);
 #endif

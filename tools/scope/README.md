@@ -221,7 +221,7 @@ Artifacts in `build/scope/FUNC/`: `diff.txt` (whole aligned listing),
 `CSE_DEBUG` land here). ROM symbols and the function inventory are cached in
 `build/scope/cache/`.
 
-Knobs of the instrumented compiler (`tools/agbcc-instr.sh`): `AGBCC_NOGIV=U1,U2` /
+Knobs of scope's instrumented compiler (`tools/scope/build_agbcc.sh`): `AGBCC_NOGIV=U1,U2` /
 `AGBCC_GIV=U1,U2` (loop.c: keep the giv set by insn U unreduced / reduce it anyway;
 `AGBCC_LOOP_TRACE=1` lists each giv with `fn=`, type, benefit and decision; added after
 sub_0803D430's worker asked for a strength-reduction explainer, where NOGIV=66 alone takes
@@ -235,7 +235,7 @@ post-increment or a stepped register before writing C; it reached 24/25 by C, no
 jump cse follows), `CSE_NOFOLLOW=K` (refuse the K-th follow),
 `AGBCC_GCSE_T=N` (gcse hash table size), `AGBCC_PRI`, `AGBCC_FORCE`,
 `AGBCC_DUMPPRI`, `AGBCC_SPILL` (local-alloc / reload; see the sources for
-syntax). Added in this thread (in `tools/patches/agbcc-instr.patch`):
+syntax). Added in this thread (in `tools/scope/agbcc.patch`):
 
 * `CSE_WHY=UID`: for each SET of insn UID, every time cse processes it, print
   the candidates (`src`, `src_folded`, `src_eqv`, `src_related`) with costs
@@ -258,14 +258,18 @@ With no knobs set the instrumented compiler emits the same code as agbcc
 (checked on 62 files, default and NONMATCHING, after these additions; again
 on 80 compiles after the trace markers and `CSE_PATHS`).
 
-**The shared `build/agbcc-instr` in the main checkout can be stale**: on
-2026-10-24 it predated the patch's `CSE_PATH`/`CSE_NOFOLLOW`. Rebuild with
-`sh tools/agbcc-instr.sh` (20 s) after the patch changes; this worktree keeps a
-private build so a rebuild never disturbs other threads. Incremental rebuild
-after editing one file: `make -s normal BASE_CFLAGS="-O2 -std=gnu11
--Werror-implicit-function-declaration -Wno-error=incompatible-pointer-types
--Wno-everything"` in `build/agbcc-instr/gcc` (2.5 s); then regenerate that
-file's section of the patch (`diff -u --label a/F --label b/F`).
+**scope has its own compiler.** `tools/scope/agbcc.patch`, built by
+`sh tools/scope/build_agbcc.sh` (20 s) into `build/scope/agbcc/gcc/agbcc`. It
+began as a copy of the shared `tools/patches/agbcc-instr.patch` (rasolve,
+agbserve), which other threads keep extending. When both lived in one file,
+merging main into this branch meant re-merging and re-verifying a compiler
+(2026-10-24), so they were split: changes on either side never touch the
+other. Ideas from the shared patch (e.g. `AGBCC_WHYREG`, `AGBCC_PREF`) can be
+ported here deliberately. Incremental rebuild after editing one file:
+`make -s normal BASE_CFLAGS="-O2 -std=gnu11 -Werror-implicit-function-declaration
+-Wno-error=incompatible-pointer-types -Wno-everything"` in
+`build/scope/agbcc/gcc` (2.5 s); then regenerate that file's section of
+`tools/scope/agbcc.patch` (`diff -u --label a/F --label b/F`).
 
 ### Speed (measured on an M-series Mac)
 
@@ -658,7 +662,7 @@ which is exactly `10:1`. Not tested.
   there are 2) and takes 8 s.
 * check.py prints raw hex when run outside the venv (no capstone).
 * agbccsrc.py keyword lookup returns unrelated sections.
-* `tools/worktree.sh` does not link `build/agbcc-instr` into new worktrees.
+* `tools/worktree.sh` does not build scope's compiler in new worktrees: run `sh tools/scope/build_agbcc.sh` once.
 * scope itself, fixed: `FILE.c insn UID` used to treat `insn` as the function
   name; high registers (sb/sl/fp/ip) were not parsed, which mis-paired ROM and
   draft operands; positional operand pairing reported reload registers as a

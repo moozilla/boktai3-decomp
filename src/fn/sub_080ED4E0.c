@@ -2,7 +2,7 @@
 // confidence=low: attempts a grab on the active animation frames and positions its target.
 #define Ivy_UpdateGrabAttempt sub_080ED4E0
 #ifdef NONMATCHING
-// fuzzy: 75.1%
+// fix.py best (sweep after the inlined-insn fix)
 // Full grab and fallback flow; animation and reset-field lifetimes still differ.
 #include "scene_actor_chase.h"
 #include "scene_actor_reaction.h"
@@ -64,35 +64,60 @@ static inline void Ivy_DisableContact(struct SceneActorRegistryResetView *actor)
     collider->flags = (collider->flags & 0xFFFB) | 8;
     Ivy_ClearHalf(&actor->flags2C0, ~0x800);
 }
+inline static void Ivy_Facing_080ED4E0(struct SceneActorRegistryResetView *actor, u8 *quadrant,
+                                       u8 *flip)
+{
+    s16 side = ((actor->direction + 0x60) >> 6) & 3;
+    if (side > 1) {
+        *flip = 1;
+        *quadrant = 3 - side;
+    } else {
+        *flip = 0;
+        *quadrant = side;
+    }
+}
+
+inline static void Ivy_EnableContact_080ED4E0(struct SceneActorRegistryResetView *actor)
+{
+    do {
+        actor->colliderA.flags = (actor->colliderA.flags | 4) & 0xFFF7;
+    } while (0);
+    {
+        u32 mask = 0x800;
+        actor->flags2C0 = mask | actor->flags2C0;
+    }
+}
+
 void Ivy_UpdateGrabAttempt(struct SceneActorRegistryResetView *actor)
 {
-    struct DisplaySequenceState *sequence = (void *)((u8 *)actor->drawable + 0x48);
-    u8 quadrant, flip;
+    struct DisplaySequenceState *sequence = (void *)(((u8 *)actor->drawable) + 0x48);
+    u8 quadrant;
+    u8 flip;
     u16 index;
     struct ContactPosition position;
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
-    if (sequence->index == 3 && sequence->elapsed == 0)
+    if ((sequence->index == 3) && (sequence->elapsed == 0))
         Sound_PlaySong(477);
     index = sequence->index;
-    if (index == 3 && (s32)sequence->elapsed > 6) {
-        Ivy_EnableContact(actor);
+    if ((index == 3) && (((s32)sequence->elapsed) > 6)) {
+        Ivy_EnableContact_080ED4E0(actor);
         if (Ivy_FindAdjacentTarget(actor, 0)) {
             struct IvyTarget *target;
             struct IvyContext *context;
             Chase_SetCtl(actor, Ivy_UpdateHold, 0x25);
             Ivy_SetState(actor, 2, 1);
-            Ivy_Facing(actor, &quadrant, &flip);
+            Ivy_Facing_080ED4E0(actor, &quadrant, &flip);
             position.x = actor->position.x + gUnk_08606384[flip][sequence->index].x;
             position.y = actor->position.y + gUnk_08606384[flip][sequence->index].y;
             position.z = actor->position.z + gUnk_08606384[flip][sequence->index].z;
             target = (void *)actor->fieldDC;
             if (target->kind <= 3) {
                 Player_BeginPositionRequest(((void **)gUnk_02000580)[target->kind],
-                                            (void *)&position, 0, 0, flip, 0, 0, 0, 0);
+                                            (void *)(&position), 0, 0, flip, 0, 0, 0, 0);
             } else if (target->kind == 4) {
                 struct SceneActorRegistryResetView *victim = target->actor;
-                *(u16 *)((u8 *)victim + 0x178) = 0;
+                *((u16 *)(((u8 *)victim) + 0x178)) = 0;
                 SceneActorTerrain_ClearCollisionTimers((void *)victim);
                 Ivy_ClearHalf(&victim->flags2D4, ~0x20);
                 sub_0807D2E0(victim, 0, &position, 0, flip, 0);
@@ -104,10 +129,10 @@ void Ivy_UpdateGrabAttempt(struct SceneActorRegistryResetView *actor)
             }
             return;
         }
-    } else if ((u16)index <= 1) {
+    } else if (((u16)index) <= 1) {
         Ivy_DisableContact(actor);
     } else {
-        Ivy_EnableContact(actor);
+        Ivy_EnableContact_080ED4E0(actor);
     }
     if (actor->field2B3) {
         Ivy_DisableContact(actor);

@@ -65,7 +65,7 @@ static inline void SetCallback(void (*callback)(void), void (**slot)(void))
 }
 
 #ifdef NONMATCHING
-// fuzzy: 75.4%
+// fix.py best (sweep after the inlined-insn fix)
 // Full reconstruction; vector pointer lifetimes and projection/ramp register allocation differ.
 void ContactImpactEffect_BeginMotion(struct ContactImpactEffect *input, struct Vec *source,
                                      struct Vec *destination, u32 time, u32 trackMode,
@@ -82,30 +82,35 @@ void ContactImpactEffect_BeginMotion(struct ContactImpactEffect *input, struct V
         return;
     if (from) {
         if (!effect->coordinateMode) {
-            struct Vec *out = (struct Vec *)&effect->worldX;
+            struct Vec *out = (struct Vec *)(&effect->worldX);
             FromScreen(out, from, 0);
             origin = out;
-            screen = (struct Vec *)&effect->screenX;
+            screen = (struct Vec *)(&effect->screenX);
         } else {
-            origin = (struct Vec *)&effect->worldX;
+            origin = (struct Vec *)(&effect->worldX);
             *origin = *from;
-            screen = (struct Vec *)&effect->screenX;
+            screen = (struct Vec *)(&effect->screenX);
         }
     } else {
-        origin = (struct Vec *)&effect->worldX;
-        screen = (struct Vec *)&effect->screenX;
+        origin = (struct Vec *)(&effect->worldX);
+        screen = (struct Vec *)(&effect->screenX);
         FromScreen(origin, screen, 512);
     }
     if (!effect->coordinateMode) {
-        target = (struct Vec *)&effect->targetX;
+        target = (struct Vec *)(&effect->targetX);
         FromScreen(target, to, 0);
     } else {
-        target = (struct Vec *)&effect->targetX;
-        if (effect->coordinateMode == 1)
-            *target = *to;
+        target = (struct Vec *)(&effect->targetX);
+        {
+            typeof(effect->coordinateMode) v1 = effect->coordinateMode;
+            if (v1 == 1)
+                *target = *to;
+        }
     }
-    ToScreen(screen, origin);
-    OrbitMotion_BeginDistanceWave((u8 *)effect + 0xA0, origin, target, duration, trackMode);
+    do {
+        ToScreen(screen, origin);
+    } while (0);
+    OrbitMotion_BeginDistanceWave(((u8 *)effect) + 0xA0, origin, target, duration, trackMode);
     if (rampFrom < 0)
         effect->rampFrom = (s8)effect->byte3C;
     else
@@ -114,11 +119,12 @@ void ContactImpactEffect_BeginMotion(struct ContactImpactEffect *input, struct V
     effect->shakeThreshold = rampDuration;
     effect->byte3C = effect->rampFrom;
     effect->byte3D = effect->rampFrom;
-    *(u32 *)((u8 *)effect + 0x34) &= ~1;
-    SetCallback(ContactImpactEffect_UpdateContact, (void *)((u8 *)effect + 0xF4));
+    *((u32 *)(((u8 *)effect) + 0x34)) &= ~1;
+    SetCallback(ContactImpactEffect_UpdateContact, (void *)(((u8 *)effect) + 0xF4));
     effect->shakeTimer = 0;
     effect->shakeFlag = 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081C3024);
 #endif

@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 49.0%
+// fix.py best (sweep after the inlined-insn fix)
 struct Position {
     s16 x, y, z, pad;
 };
@@ -60,6 +60,7 @@ void StateActor_ProcessDirectionMessages(struct StateActor *actor)
 {
     struct Receiver *receiver = &actor->receiver;
     s32 i;
+    u32 k1;
     for (i = 0; i < receiver->counts[gUnk_0200047C[0x24]]; i++) {
         struct Command *command = receiver->commands[gUnk_0200047C[0x24]][i];
         switch (command->kind) {
@@ -71,29 +72,37 @@ void StateActor_ProcessDirectionMessages(struct StateActor *actor)
                                           actor->target.z - actor->position.z);
                 ResetMotion(actor, 2);
                 break;
+
             case 3:
                 actor->angle = (command->data.direction + 5) << 5;
                 ResetMotion(actor, 3);
                 break;
         }
+
         SceneMessages_SetPendingTrigger(receiver, command);
     }
+
     if (gUnk_03005260[1] & 2) {
         s32 x = RandomPart();
         s32 z = RandomPart();
         struct Position *target = &actor->target;
-        target->x = x + 1024;
-        target->y = 256;
-        target->z = z + 1024;
-        actor->angle = Math_Atan2(target->x - actor->position.x, target->z - actor->position.z);
-        ResetMotion(actor, 2);
-        actor->kind = 3;
-        actor->update = sub_0802EA90;
-        actor->counter = 0;
-        actor->pending = 1;
-        actor->flags18 = 0;
+        {
+            typeof(target->x) *q1 = &target->x;
+            u32 z1 = 256;
+            *q1 = x + (k1 = 1024);
+            target->y = z1;
+            target->z = z + k1;
+            actor->angle = Math_Atan2(target->x - actor->position.x, target->z - actor->position.z);
+            ResetMotion(actor, 2);
+            actor->kind = 3;
+            actor->update = sub_0802EA90;
+            actor->counter = 0;
+            actor->pending = 1;
+            actor->flags18 = 0;
+        }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081C6780);
 #endif

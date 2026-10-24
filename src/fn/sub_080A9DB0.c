@@ -1,9 +1,9 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 79.7%
-// Remaining differences: group/flag induction, divisor setup and saved-head address reuse.
+#define FIELD_OFFSET(type, member) ((u32) & ((type *)0)->member)
+#define SEGMENT_POSITION(group, index)                                                             \
+    ((struct Vec *)((u8 *)(group) + (index) * (s32)sizeof(struct Segment) +                        \
+                    FIELD_OFFSET(struct Group, segments[0].position)))
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -65,31 +65,43 @@ static inline s32 magnitude(struct Vec *v)
 }
 // confidence=low: advances marked segments and bridges gaps along the chain.
 #define TentacleActor_UpdateSegmentPositions sub_080A9DB0
-void TentacleActor_UpdateSegmentPositions(struct Actor *p, s32 argDivisor, s32 threshold)
+void TentacleActor_UpdateSegmentPositions(struct Actor *p, s32 divisor, s32 threshold)
 {
-    register s32 divisor asm("r8") = argDivisor;
     struct Group *g = p->group;
-
     struct Vec delta;
     struct Position head;
     struct Vec firstDelta;
-    s32 i, first, run;
-    asm("" : "=m"(delta));
+    s32 i;
+    s32 first;
+    s32 run;
     head = p->drawable->position;
-    asm("" : : "m"(head));
     for (i = 0; i < g->count; i++) {
         struct Segment *seg = &g->segments[i];
-        if (test(seg, 2) && !test(seg, 1)) {
-            difference(&delta, &seg->target, (struct Vec *)((u8 *)g + i * 296 + 0x3f0));
+        if (test(seg, 2) && (!test(seg, 1))) {
+            difference(&delta, &seg->target, SEGMENT_POSITION(g, i));
             if (magnitude(&delta) > threshold) {
-                if (divisor < 1)
-                    divisor = 1;
-                (*(s16 *)((u8 *)g + i * 296 + 0x3f0)) += Div(delta.x, divisor);
-                (*(s16 *)((u8 *)g + i * 296 + 0x3f2)) += Div(delta.y, divisor);
-                (*(s16 *)((u8 *)g + i * 296 + 0x3f4)) += Div(delta.z, divisor);
+                {
+                    u8 minimumDivisor = 1;
+                    if (divisor < minimumDivisor)
+                        divisor = 1;
+                }
+                {
+                    s32 quotient = Div(delta.x, divisor);
+                    u32 address = (u32)g;
+                    address += i * (s32)sizeof(struct Segment);
+                    *(s16 *)(address + FIELD_OFFSET(struct Group, segments[0].position)) +=
+                        quotient;
+                }
+                *((s16 *)((((u8 *)g) + (i * (s32)sizeof(struct Segment))) +
+                          FIELD_OFFSET(struct Group, segments[0].position.y))) +=
+                    Div(delta.y, divisor);
+                *((s16 *)((((u8 *)g) + (i * (s32)sizeof(struct Segment))) +
+                          FIELD_OFFSET(struct Group, segments[0].position.z))) +=
+                    Div(delta.z, divisor);
             }
         }
     }
+
     TentacleActor_TargetMarkedSegment(p);
     head = p->drawable->position;
     first = 255;
@@ -99,18 +111,19 @@ void TentacleActor_UpdateSegmentPositions(struct Actor *p, s32 argDivisor, s32 t
         if (!test(seg, 1)) {
             if (test(seg, 2)) {
                 if (first != 255)
-                    sub_080A9BD8(p, &head, (struct Vec *)((u8 *)g + i * 296 + 0x3f0), first,
-                                 first + run);
+                    sub_080A9BD8(p, &head, SEGMENT_POSITION(g, i), first, first + run);
                 else {
-                    difference(&firstDelta, (void *)&head,
-                               (struct Vec *)((u8 *)g + i * 296 + 0x3f0));
+                    difference(&firstDelta, (void *)(&head), SEGMENT_POSITION(g, i));
                     if (magnitude(&firstDelta) > 0x1a44) {
-                        (*(struct Vec *)((u8 *)g + i * 296 + 0x3f0)).x += Div(firstDelta.x, 4);
-                        (*(struct Vec *)((u8 *)g + i * 296 + 0x3f0)).y += Div(firstDelta.y, 4);
-                        (*(struct Vec *)((u8 *)g + i * 296 + 0x3f0)).z += Div(firstDelta.z, 4);
+                        SEGMENT_POSITION(g, i)->x += Div(firstDelta.x, 4);
+                        SEGMENT_POSITION(g, i)->y += Div(firstDelta.y, 4);
+                        SEGMENT_POSITION(g, i)->z += Div(firstDelta.z, 4);
                     }
                 }
-                head = *(struct Position *)(struct Vec *)((u8 *)g + i * 296 + 0x3f0);
+                {
+                    struct Vec *base = &g->segments[0].position;
+                    head = *(struct Position *)((u8 *)base + i * (s32)sizeof(struct Segment));
+                }
                 first = 255;
                 run = 0;
             } else {
@@ -120,9 +133,6 @@ void TentacleActor_UpdateSegmentPositions(struct Actor *p, s32 argDivisor, s32 t
             }
         }
     }
+
     TentacleActor_UpdateSegmentHeadings(p);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080A9DB0);
-#endif

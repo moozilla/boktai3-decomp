@@ -1,9 +1,6 @@
 #include "global.h"
 // confidence=low: places forward collider and selects direction-dependent contact bounds.
 
-#ifdef NONMATCHING
-// fuzzy: 99.4%
-// The availability test reloads offset 0x2D0 instead of subtracting four from 0x2D4.
 #include "scene_actor_reset.h"
 extern const s16 gUnk_086149C4[];
 void Collider_SetPosition(void *, void *, u32);
@@ -11,15 +8,14 @@ static inline u8 SuppressCollision(struct SceneActorRegistryResetView *a)
 {
     if (a) {
         u32 mask = 0x40;
-        if (a->flags2D4 & mask)
-            return 1;
-        {
+        if (!(a->flags2D4 & mask)) {
             u32 mask = 0x20000;
-            if (a->flags2D0 & mask)
-                return 1;
+            if (!(a->flags2D0 & mask)) {
+                if (a->health > 0)
+                    return 0;
+            }
         }
-        if (a->health <= 0)
-            return 1;
+        return 1;
     }
     return 0;
 }
@@ -106,6 +102,3 @@ void Dog_UpdateCollisionBounds(struct SceneActorRegistryResetView *a)
     else
         ((struct ContactCollider *)(context + 0x624))->bounds = *(struct ContactPosition *)&narrow;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Dog_UpdateCollisionBounds);
-#endif

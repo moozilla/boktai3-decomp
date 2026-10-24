@@ -20,6 +20,7 @@ from romlib import ROOT  # noqa: E402
 
 def main():
     os.chdir(ROOT)
+    fix.AVOID.clear()  # the suite measures every family, avoided ones included
     paths = sorted(glob.glob(os.path.join(ROOT, "tests", "fix", "*.c")))
     if sys.argv[1:]:
         paths = [p for p in paths if os.path.basename(p)[:-2] in sys.argv[1:]]

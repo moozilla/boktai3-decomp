@@ -1,21 +1,20 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reaction.h"
-#ifdef NONMATCHING
-// fuzzy: 93.1%
-// fix.py best version (reprinted C)
 // confidence=low: starts the target-pursuit route and resets pursuit timers and callbacks.
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 void sub_080B1FA8(void *);
 void Vorn_UpdatePursuitDistance(void);
-// Flag reloads, route-index addressing, constant lifetimes, and register allocation still differ.
 static inline u8 Test(volatile u16 *p, u32 bits)
 {
-    if (*p & bits)
+    register u32 value asm("r0") = *p;
+    value &= bits;
+    if (value)
         return 1;
     return 0;
 }
-static inline void SetFlags(u16 *field, u16 bit)
+static inline void SetFlags(u16 bit, u16 *field)
 {
     struct Flags {
         s16 bits : 16;
@@ -62,6 +61,16 @@ static inline void SetMotion(struct SceneActorRegistryResetView *actor, void *cb
     actor->word110 = kind;
     actor->flags114 = 1;
 }
+static inline void StartRoute(void *body, void *path, u8 *group)
+{
+    u32 index = group[0x83] ^ 1;
+    u8 *routes = group + 0x81;
+    SceneBody_StartRoute(body, path, routes[index], 0, 0);
+}
+struct PursuitContext {
+    u8 pad000[0x6ac];
+    u16 cooldown;
+};
 u8 Vorn_BeginPursuitRoute(struct SceneActorRegistryResetView *actor, u32 reset)
 {
     u8 *context = actor->context;
@@ -72,15 +81,14 @@ u8 Vorn_BeginPursuitRoute(struct SceneActorRegistryResetView *actor, u32 reset)
     flags = (void *)(context + 0x6d4);
     if (((reset != 1) && Test(flags, 4)) && (!Test(flags, 2)))
         return 0;
-    *((u16 *)(((u8 *)context) + 0x6ac)) = 60;
+    ((struct PursuitContext *)context)->cooldown = 60;
     {
-        SetFlags(flags, 4);
+        SetFlags(4, flags);
         ClearFlags(flags, 2);
     }
     *((u16 *)(((u8 *)context) + 0x6ec)) = 60;
     if (reset == 1)
-        SceneBody_StartRoute(((u8 *)actor) + 0x50, group + 0x74, group[0x81 + (group[0x83] ^ 1)], 0,
-                             0);
+        StartRoute(((u8 *)actor) + 0x50, group + 0x74, group);
     sub_080B1FA8(actor);
     {
         u32 *field = &actor->flags2CC;
@@ -96,25 +104,17 @@ u8 Vorn_BeginPursuitRoute(struct SceneActorRegistryResetView *actor, u32 reset)
         bit |= *field;
         *field = bit;
     }
-    {
-        u32 bit = 0x80;
-        u16 *field = &actor->flags2D4;
-        u32 value = *field;
-        *field = bit | value;
-    }
+    SetFlags(0x80, &actor->flags2D4);
     {
         u32 timer = *((u16 *)(((u8 *)actor) + 0x416));
         *((u16 *)(((u8 *)actor) + 0x418)) = timer;
     }
     {
-        u32 bit = 8;
         u8 *field = ((u8 *)actor) + 0xdc;
+        u32 bit = 8;
         bit |= field[15];
         field[15] = bit;
     }
     actor->flags2CC |= 0x80;
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vorn_BeginPursuitRoute);
-#endif

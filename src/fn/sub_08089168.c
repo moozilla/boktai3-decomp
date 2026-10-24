@@ -3,9 +3,6 @@
 #include "scene_actor_reaction.h"
 // confidence=low: animation-three state eases stored displacement into motion until animation completion.
 
-#ifdef NONMATCHING
-// fuzzy: 99.1%
-// Two differing bytes: zero-scratch register in the first signed source load.
 void SparkParticle_Spawn(void *, u32, void *, u32, u32, u32, u32, u32);
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
@@ -22,7 +19,12 @@ struct GhoulDraw {
 };
 static inline u32 MotionFlag(struct SceneActorRegistryResetView *a, u32 mask)
 {
-    return a->flags2D4 & mask;
+    register u32 offset asm("r2") = (u32) & ((struct SceneActorRegistryResetView *)0)->flags2D4;
+    asm("" : : "r"(offset));
+    {
+        register u16 *flags asm("r0") = (void *)((u8 *)a + offset);
+        return *flags & mask;
+    }
 }
 static inline u32 RandomSample(void)
 {
@@ -32,10 +34,8 @@ static inline u32 RandomSample(void)
     index *= 2;
     {
         register const u16 *table asm("r3") = gUnk_0203B400;
-        asm("" : "+r"(table));
         {
-            register const u16 *entry asm("r0") = (const u16 *)(index + (u32)table);
-            asm("" : "+r"(entry));
+            const u16 *entry = (const u16 *)(index + (u32)table);
             v = *entry;
         }
     }
@@ -44,49 +44,36 @@ static inline u32 RandomSample(void)
 }
 static inline s32 Quarter(s32 value)
 {
-    register s32 result asm("r0");
+    s32 result;
     if (value >= 0)
         result = value >> 2;
     else
         result = -((-value) >> 2);
-    asm("" : "+r"(result));
     return result;
 }
 static inline s32 AxisDelta(struct SceneActorRegistryResetView *actor, u32 offset, s16 **saved)
 {
-    register s32 source asm("r2");
-    register s16 *current asm("r1");
+    s32 source;
+    s16 *current;
     register s32 value asm("r0");
     if (offset == 0x310) {
         register u32 sourceOffset asm("r5") = offset;
         asm("" : "+r"(sourceOffset));
         {
             register s16 *address asm("r0") = (void *)((u8 *)actor + sourceOffset);
-            asm("" : "+r"(address));
             source = *address;
         }
     } else {
-        register u32 sourceOffset asm("r1") = offset;
-        asm("" : "+r"(sourceOffset));
+        u32 sourceOffset = offset;
         {
-            register s16 *address asm("r0") = (void *)((u8 *)actor + sourceOffset);
-            asm("" : "+r"(address));
+            s16 *address = (void *)((u8 *)actor + sourceOffset);
             source = *address;
-            asm("" : : "r"(sourceOffset));
         }
     }
-    if (offset == 0x310) {
-        register u32 currentOffset asm("r3") = offset + 8;
-        asm("" : "+r"(currentOffset));
-        current = (void *)((u8 *)actor + currentOffset);
-    } else {
-        register u32 currentOffset asm("r0") = offset + 8;
-        asm("" : "+r"(currentOffset));
-        current = (void *)((u8 *)actor + currentOffset);
-    }
+    current = (void *)((u8 *)actor + (offset + 8));
     value = *current;
     value = source - value;
-    asm("" : "+r"(value), "+r"(current));
+    asm("" : "+r"(value));
     *saved = current;
     return Quarter(value);
 }
@@ -137,9 +124,12 @@ void Ghoul_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     actor->motion.z += dz;
     *x += dx;
     *z += dz;
-    if (Stopped(dx, dz) && actor->field2B3)
-        actor->field2B0 = 1;
+    if (Stopped(dx, dz) && actor->field2B3) {
+        register u32 offset asm("r2") = (u32) & ((struct SceneActorRegistryResetView *)0)->field2B0;
+        asm("" : : "r"(offset));
+        {
+            register u8 *state asm("r1") = (void *)((u8 *)actor + offset);
+            *state = 1;
+        }
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Ghoul_UpdateDisplacementRecovery);
-#endif

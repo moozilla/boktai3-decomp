@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 94.4%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Differs: argument evaluation order of the final SpriteEffectController_Create call
 // (0x1C1E/0xD43F pool loads come last in the original) and a few register choices.
@@ -48,7 +48,7 @@ static inline s32 Truncate(s32 v)
 s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
 {
     register u32 a asm("r12") = a_;
-    s8 k2;
+    u8 k2;
     u8 *p = p_;
     register u8 *q asm("r6") = p + 0x20;
     if (q[0xd] != 0) {
@@ -122,7 +122,7 @@ s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
                     s32 *pp = (s32 *)(p + 0x300);
                     s32 adj = *((s32 *)(p + 0x328));
                     pos->x = (pp[0] >> 12) - gUnk_020004B8->x;
-                    pos->y = (((pp[1] + adj) + pp[2]) >> 12) + 0x60;
+                    pos->y = ((pp[2] + (pp[1] + adj)) >> 12) + 0x60;
                     pos->z = pp[2] >> 12;
                     {
                         register u32 opaque asm("r8") = 0x0403b714;
@@ -170,6 +170,7 @@ s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
     }
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", SceneNpc_OnStateEffectUpdate);
 #endif

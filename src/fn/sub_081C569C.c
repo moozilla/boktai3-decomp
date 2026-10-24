@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.7%
 struct ChallengeMenu {
     u8 pad000[0x2E2];
     u8 repeatTimer;
@@ -17,6 +15,8 @@ void sub_081C569C(struct ChallengeMenu *p)
 {
     u16 *keys = gUnk_03005260;
     u8 *timer;
+    u32 repeatMask;
+    u32 pendingKeys;
     if (keys[1] & 1) {
         if (((p->enabledMask >> (p->selection - 1)) & 1) || p->selection == 0) {
             ChallengeMenu_StartFadeOut(p);
@@ -35,17 +35,22 @@ void sub_081C569C(struct ChallengeMenu *p)
             p->repeatTimer = 0;
         timer = &p->repeatTimer;
         if (++*timer > 9) {
-            keys[1] |= 0x40;
-            goto reset;
+            pendingKeys = keys[1];
+            repeatMask = 0x40;
+            goto repeat;
         }
     } else if (keys[0] & 0x80) {
         if (!(p->prevKeys & 0x80))
             p->repeatTimer = 0;
         timer = &p->repeatTimer;
         if (++*timer > 9) {
-            keys[1] |= 0x80;
-        reset:
-            *timer = 0;
+            pendingKeys = keys[1];
+            repeatMask = 0x80;
+        repeat:
+            pendingKeys = repeatMask | pendingKeys;
+            repeatMask = 0;
+            keys[1] = pendingKeys;
+            *timer = repeatMask;
         }
     }
     p->prevKeys = keys[0];
@@ -59,6 +64,3 @@ void sub_081C569C(struct ChallengeMenu *p)
         SceneTextSelector_UpdatePanel(p);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081C569C);
-#endif

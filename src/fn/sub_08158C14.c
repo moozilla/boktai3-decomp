@@ -12,45 +12,46 @@ extern u32 gUnk_02000580[4];
 extern u16 gUnk_02000508[4];
 extern u16 gUnk_02000548[2];
 extern u16 gUnk_0200052C, gUnk_02000550, gUnk_0200053C, gUnk_02000554;
-#ifdef NONMATCHING
-// fuzzy: 65.3%
-// Remaining differences: hoisted global pointers and loop register allocation.
+// MATCHING_CONCESSION: register-pinning
 // confidence=low: clears the link-mode shared arrays and counters in the movement-state tail.
 #define Player_ResetLinkState sub_08158C14
 void Player_ResetLinkState(void)
 {
     s32 i;
-    u32 *first, *second;
-    u16 *half;
-    s32 pair;
-    gUnk_02000544 = 0;
-    first = gUnk_02000580;
-    second = gUnk_02000560;
-    half = gUnk_02000508;
-    for (i = 3; i >= 0; --i) {
-        *first++ = 0;
-        *half = 0;
-        *second++ = 0;
-        ++half;
+    u16 *firstCounter, *secondCounter, *thirdCounter, *fourthCounter;
+    s32 pairAddress;
+    s32 pairBase;
+    u16 zero;
+    *(u16 *)0x02000544 = 0;
+    for (i = 0; i < 4; i++) {
+        gUnk_02000580[i] = 0;
+        gUnk_02000508[i] = 0;
+        gUnk_02000560[i] = 0;
     }
+
     gUnk_02000500 = 0;
     gUnk_02000520 = 0;
     gUnk_02000534 = 0;
-    gUnk_02000590 = 0;
-    gUnk_02000570 = 0;
-    gUnk_02000528 = 0;
-    gUnk_02000518 = 0;
-    pair = (s32)gUnk_02000548 + 2;
+    firstCounter = &gUnk_02000590;
+    secondCounter = &gUnk_02000570;
+    thirdCounter = &gUnk_02000528;
+    fourthCounter = &gUnk_02000518;
+    // Keep these addresses live together until the counter resets.
+    asm("" : : "g"(firstCounter), "g"(secondCounter), "g"(thirdCounter), "g"(fourthCounter));
+    *firstCounter = 0;
+    *secondCounter = 0;
+    *thirdCounter = 0;
+    *fourthCounter = 0;
+    pairBase = (s32)gUnk_02000548;
+    pairAddress = pairBase;
+    zero = 0;
+    pairAddress += 2;
     do {
-        *(u16 *)pair = 0;
-        pair -= 2;
-    } while (pair >= (s32)gUnk_02000548);
+        *((u16 *)pairAddress) = zero;
+        pairAddress -= 2;
+    } while (pairAddress >= pairBase);
     gUnk_0200052C = 0;
     gUnk_02000550 = 0;
     gUnk_0200053C = 0;
     gUnk_02000554 = 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08158C14);
-#endif

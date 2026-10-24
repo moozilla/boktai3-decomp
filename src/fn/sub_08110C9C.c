@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 91.2%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Scrolls the tilemap panel horizontally and draws the newly exposed 8px column(s).
 // Remaining: original keeps case 0/2 zeros as literals, sets offset (r1) by movs and
@@ -88,7 +88,9 @@ void sub_08110C9C(struct TilemapPanel *p)
             if (cellWidth == 1)
                 TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
             else {
-                cellWidth = 1;
+                do {
+                    cellWidth = 1;
+                } while (0);
                 TilemapPanel_DrawRegion(p, col, 0, x0, top, x0 + 1, 1, cellWidth, 20, offset, top);
                 x0++;
                 TilemapPanel_DrawRegion(p, (col + 1) & 31, 0, x0, top, x0 + 1, 1, cellWidth, 20,
@@ -99,6 +101,7 @@ void sub_08110C9C(struct TilemapPanel *p)
 
     p->drawnX = (next >> 3) << 3;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08110C9C);
 #endif

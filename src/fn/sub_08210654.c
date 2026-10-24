@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 94.0%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: option/animation register allocation and defined success return.
 #include "pink_spine_playback.h"
 // confidence=low: prefix follows the neighboring creator; species identity remains tentative.
@@ -69,8 +69,8 @@ s32 PinkSpine_InitFromScript(struct PinkSpineState *p, void *resource)
     AnimData_SelectPaletteBank(graphics, 0x1BD);
     sequences = ScriptProc_Start(0x922E, 0x5184);
     p->f15C = sequences;
-    asm("" : "+r"(initialSprite));
     sprite = initialSprite;
+    asm("" : "+r"(initialSprite));
     if (!p->f13A) {
         p->update = ProjectileEmitter_WaitForPlayerApproach;
         Anim_SetSequence(&p->sequence, sequences, 0xB, 0, 0);
@@ -93,9 +93,9 @@ s32 PinkSpine_InitFromScript(struct PinkSpineState *p, void *resource)
         TerrainOverlay_QueueAddActor(p->body);
     }
     p->f136 = 1;
-    // The creator consumes only the sign of the incidental ROM return word.
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", PinkSpine_InitFromScript);
 #endif

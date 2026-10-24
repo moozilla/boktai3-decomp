@@ -3,14 +3,11 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.0%
-// fix.py best version (reprinted C)
 // confidence=low: player-directed sweeping strike followed by a timed retreat.
 
 // confidence=low: inferred from adjacent Vanargand part callbacks and local state transitions.
 
-// Remaining differences: inline setup order, pointer lifetimes, and animation-step allocation.
+// Exact with temporary allocation concessions in StepPlayback.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x1c];
@@ -86,7 +83,7 @@ static inline u8 MotionEnded(struct VanargandPart *p)
     return p->motion[0x29] == 2;
 }
 static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequenceState *state,
-                               struct VanargandPart *base, u32 one)
+                               struct VanargandPart *base, u32 one, u32 flip)
 {
     struct ContactSwarmSprite *sprite = &owner->sprite;
     const volatile u16 *command; /* preserve observed packed-command reads */
@@ -107,7 +104,7 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
-            owner->sprite.flags |= 4;
+            owner->sprite.flags |= flip;
         else
             owner->sprite.flags &= ~4;
     }
@@ -128,8 +125,9 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     }
     {
         u32 elapsed = state->elapsed + 1;
-        u32 mask;
-        u32 temp;
+        /* Keep the mask load and its saved copy distinct. */
+        register u32 mask asm("r6");
+        register u32 temp asm("r2");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
@@ -163,8 +161,8 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
                 state->index = index;
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
+                    endFlag = 8;
+                    endFlag &= flags;
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -188,8 +186,11 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
             }
             state->frameWeight = *command & 15;
             {
-                register s32 weight asm("r1") = state->frameWeight;
+                s32 weight;
                 s32 speed;
+                /* The flags scratch is free once the next command is selected. */
+                flags = state->frameWeight;
+                weight = flags;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
                 state->duration = speed;
@@ -212,7 +213,7 @@ static inline u32 Arg1(u32 k_, struct VanargandPart *p)
 void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 tick)
 {
     u8 *enter;
-    register u32 entering asm("r1");
+    u32 entering;
     u32 mask = 0x20;
     p->flags |= mask;
     if (p->reset) {
@@ -225,22 +226,23 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
         case 0: {
             struct SceneVec delta;
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
             if (entering) {
                 *enter = 0;
                 MakeVector(&delta, AimAngle(p), 256);
                 AddVector(&delta, &p->origin, &delta);
-                OrbitMotion_BeginDistanceWave(p->motion, &p->origin, &delta,
-                                              (Arg1(7, p) + 96) & 255, 16);
+                {
+                    void *motion = p->motion;
+                    u32 angle = (Arg1(7, p) + 96) & 255;
+                    OrbitMotion_BeginDistanceWave(motion, &p->origin, &delta, angle, 16);
+                }
                 {
                     void *data = *((void **)(boss + 0x4d0));
-                    register u32 flip asm("r9") = 4;
+                    u32 flip = 4;
                     struct DisplaySequenceState *seq;
-                    asm("" : "+r"(flip));
                     seq = &p->sequence;
                     Anim_SetSequence(seq, data, 8, (u8)p->variant, flip);
-                    StepPlayback(p, &p->sequence, p, 1);
+                    StepPlayback(p, &p->sequence, p, 1, flip);
                 }
             }
             MotionTrack_Update(p->motion);
@@ -254,7 +256,6 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
         case 1: {
             struct SceneVec delta;
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
             if (entering) {
                 *enter = 0;
@@ -273,7 +274,6 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
 
         case 2:
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
             if (entering) {
                 p->enter = 0;
@@ -311,7 +311,6 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
             struct SceneVec *v;
             SetFlags(p, 8);
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
             if (entering) {
                 *enter = 0;
@@ -336,7 +335,6 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
             struct SceneVec delta;
             SetFlags(p, 8);
             entering = p->enter;
-            asm("" : "+r"(entering));
             enter = &p->enter;
             if (entering) {
                 *enter = 0;
@@ -357,6 +355,3 @@ void Vanargand_UpdatePartSweepingStrike(u8 *boss, struct VanargandPart *p, u32 t
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartSweepingStrike);
-#endif

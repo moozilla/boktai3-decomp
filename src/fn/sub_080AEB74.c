@@ -1,7 +1,7 @@
 #include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 91.3%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: restores a saved patrol destination and delayed command.
 // confidence=low: tentative Vorn behavior role recovered from the surrounding callbacks.
@@ -29,6 +29,11 @@ static inline void ClearMotion(struct SceneActorRegistryResetView *a, s32 mask)
 {
     a->flags2D4 &= mask;
 }
+inline static u32 Bits_1(struct SceneActorRegistryResetView *a)
+{
+    return a->flags2CC & 0x200000;
+}
+
 s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)(&actor->group);
@@ -36,7 +41,7 @@ s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
     struct SceneActorReactionMotion *motion;
     struct SceneActorReactionMotion *savedMotion;
     struct ContactPosition *destination;
-    u32 k1;
+    s16 k1;
     if (((!Bits(actor, 0x400000)) || (!Bits(actor, 0x200000))) ||
         (!CanRestore(motion = (void *)(&actor->fieldDC), 1)))
         return 0;
@@ -77,7 +82,7 @@ s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
     {
         struct SceneActorRegistryControl *control = &actor->group.control;
         u32 *flags = &actor->flags2D0;
-        if (Bits(actor, 0x200000)) {
+        if (Bits_1(actor)) {
             {
                 u32 k2 = 0x1000000;
                 *flags &= ~k2;
@@ -101,6 +106,7 @@ s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
     Vorn_SendMessage(actor);
     return 1;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Vorn_TryRestorePatrolRoute);
 #endif

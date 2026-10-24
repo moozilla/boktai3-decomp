@@ -60,33 +60,60 @@ static inline void SetControl(struct SceneActorRegistryResetView *a, void *cb, u
 // timer above 2, disables all six colliders and starts the reverse flicker.
 #define Axe_OnBodyContact sub_080F75C0
 #ifdef NONMATCHING
-// fuzzy: 64.5%
+// fix.py best (sweep after the inlined-insn fix)
 // The ROM keeps the collider loop counter and hoists the SetControl addresses differently.
+inline static u8 Unavailable_080F75C0(struct SceneActorRegistryResetView *actor)
+{
+    register u32 mask asm("r1");
+    u32 offset;
+    if (actor) {
+        mask = 0x40;
+        offset = 0x2D4;
+        asm("" : "+r"(mask), "+r"(offset));
+        if ((*((u16 *)(((u8 *)actor) + offset))) & mask)
+            return 1;
+        mask = 0x20000;
+        offset -= 4;
+        {
+            s16 value = *((u32 *)(((u8 *)actor) + offset));
+            if (value & mask)
+                return 1;
+        }
+        if (actor->health <= 0)
+            return 1;
+    }
+    return 0;
+}
+
 void Axe_OnBodyContact(struct SceneActorBehaviorContactView *source,
                        struct SceneActorBehaviorContactView *destination,
                        struct SceneActorRegistryResetView *actor)
 {
-    struct AxeContext *context = *(struct AxeContext **)((u8 *)actor + 0x3D0);
-    if (Unavailable(actor))
+    struct AxeContext *context = *((struct AxeContext **)(((u8 *)actor) + 0x3D0));
+    typeof(destination->mode) t1;
+    if (Unavailable_080F75C0(actor))
         return;
     SceneActorBehavior_ApplyContactReaction(source, destination, actor);
-    if (H(actor, 0x178) == 0) {
-        H(actor, 0x172) = destination->remaining;
-        H(actor, 0x2E6) = destination->mode;
-        H(actor, 0x178) = destination->parameter44;
+    if ((*((u16 *)(((u8 *)actor) + 0x178))) == 0) {
+        *((u16 *)(((u8 *)actor) + 0x172)) = destination->remaining;
+        t1 = destination->mode;
+        *((u16 *)(((u8 *)actor) + 0x2E6)) = t1;
+        *((u16 *)(((u8 *)actor) + 0x178)) = destination->parameter44;
     }
-    if ((context->flags & 2) && context->timer > 2) {
-        s32 i;
+    if ((context->flags & 2) && (context->timer > 2)) {
+        u32 i;
         for (i = 0; i <= 2; i++) {
             struct AxeCollider *a = &context->attack[i];
             struct AxeCollider *b = &context->body[i];
             a->flags |= 4;
             b->flags |= 4;
         }
+
         SetControl(actor, (void *)ActorPhase_UpdateReverseFlicker, 0x2F);
         context->timer = 0;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080F75C0);
 #endif

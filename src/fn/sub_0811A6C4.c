@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 96.7%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Initial position rematerialization, participant access and register lifetimes still differ.
 
@@ -126,6 +126,13 @@ static inline u32 Mode_1(void)
     return (gUnk_030053F4 | gUnk_030053F0) & 0x800;
 }
 
+inline static void SetCallback_1(struct Glove *p, void (*fn)(void *))
+{
+    p->active = 1;
+    p->update = fn;
+    p->timer = 0;
+}
+
 s32 Glove_InitFromScript(struct Glove *p)
 {
     struct Obj *self = &p->motion;
@@ -178,8 +185,8 @@ s32 Glove_InitFromScript(struct Glove *p)
         dz = (self->z - self->prevZ) >> 12;
         lim = 0x3000;
         px = &self->x;
-        pprevX = &self->prevX;
         py = &self->y;
+        pprevX = &self->prevX;
         pprevZ = &self->prevZ;
         pvz = &self->vz;
         if (h > lim)
@@ -217,7 +224,7 @@ s32 Glove_InitFromScript(struct Glove *p)
             FieldHud_InitializeWidgets(((u8 *)self) + 0x5c, &p->height, ((u8 *)self) + 0x58,
                                        *((u16 *)(((u8 *)self) + 0x5a)), optional);
         }
-        SetCallback(p, sub_081175F8, 0);
+        SetCallback_1(p, sub_081175F8);
     } else {
         s32 ready;
         FieldHud_InitializeWidgets(((u8 *)self) + 0x5c, &p->height, ((u8 *)self) + 0x58,
@@ -239,6 +246,7 @@ s32 Glove_InitFromScript(struct Glove *p)
     Memory_Clear(((u8 *)p) + 0x950, 8);
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Glove_InitFromScript);
 #endif

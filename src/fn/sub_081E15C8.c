@@ -3,7 +3,7 @@
 #include "game_state.h"
 
 #ifdef NONMATCHING
-// fuzzy: 92.1%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 struct GameStartRes {
     u32 w[8];
@@ -110,6 +110,52 @@ static inline void StepAnim(struct GameStartAnim *a, struct GameStartSprite *s)
 }
 
 // Tentative: sets up the Game Start screen (backgrounds, widgets, cursor sprite, save state).
+inline static void StepAnim_Init(struct GameStartAnim *a, struct GameStartSprite *s)
+{
+    const volatile u16 *entry = a->data + a->frame;
+    s->frame = (*entry) >> 6;
+    {
+        u32 left = a->flags & 1;
+        if (left != ((u8)((((*entry) & 0x30) >> 4) & 1)))
+            s->flags |= 4;
+        else
+            s->flags &= ~4;
+    }
+    {
+        register u32 input asm("r0") = a->flags;
+        u32 mask = 2;
+        if (((u8)(mask & input)) != ((((*entry) & 0x30) >> 4) & mask))
+            s->flags |= 8;
+        else
+            s->flags &= ~8;
+    }
+    if (((u16)(++a->timer)) >= a->rate) {
+        a->timer = 0;
+        if (a->flags & 4) {
+            if (a->frame == 0) {
+                if (a->flags & 8)
+                    a->timer = a->rate;
+                else
+                    a->frame = a->count - 1;
+            } else {
+                a->frame--;
+            }
+        } else if (((u16)(++a->frame)) >= a->count) {
+            if ((u8)(a->flags & 8)) {
+                a->timer = a->rate;
+                a->frame = a->count - 1;
+            } else {
+                a->frame = 0;
+            }
+        }
+        entry = a->data + a->frame;
+        a->factor = (*entry) & 15;
+        a->rate = (a->factor * a->scale) >> 6;
+        if (a->rate == 0)
+            a->rate = 1;
+    }
+}
+
 s32 GameStart_Init(u8 *p)
 {
     u32 layers;
@@ -136,7 +182,10 @@ s32 GameStart_Init(u8 *p)
     Widget_InitLinked(p + 0xa4, p + 0x104, 0x28, 0x10, 0, 0, 0, 0);
     *((s32 *)(p + 0xac)) |= 1;
     *((u16 *)(p + 0xc4)) = 0;
-    *((u16 *)(p + 0xc6)) = 0xffe0;
+    {
+        s32 k1 = 0xffe0;
+        *((u16 *)(p + 0xc6)) = k1;
+    }
     {
         u32 group = 0xcb05;
         asm("" : "+r"(group));
@@ -152,7 +201,7 @@ s32 GameStart_Init(u8 *p)
     *((u16 *)(p + 0x492)) = 0x2c;
     *((void **)(p + 0x4ec)) = ScriptProc_Start(0x922e, 0x4bbf);
     Anim_SetSequence(p + 0x4bc, *((void **)(p + 0x4ec)), 0, 0, 0);
-    StepAnim((struct GameStartAnim *)(p + 0x4bc), (struct GameStartSprite *)(p + 0x474));
+    StepAnim_Init((struct GameStartAnim *)(p + 0x4bc), (struct GameStartSprite *)(p + 0x474));
     pos.x = 0xa8;
     pos.y = 0x28;
     for (i = 0; i <= 4; i++) {
@@ -203,6 +252,7 @@ check:
     GameStart_RunInitHook(p);
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", GameStart_Init);
 #endif

@@ -2,9 +2,6 @@
 #include "global.h"
 #include "scene_actor_registry.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.9%
-// Remaining differences: the 0x3D0 context-offset temp lands in r0 instead of r5 (3 insns).
 struct SceneActorActionCooldown {
     u8 unknown0[0x678];
     u32 flags;
@@ -36,32 +33,25 @@ static inline u32 MaskFlags(u32 value, u32 *p)
 {
     return *p & value;
 }
-static inline void QueueAction(u8 *actor)
+static inline void QueueAction(struct SceneActorRegistryActor *actor)
 {
     u32 behavior = 15;
-    u32 offset = 0x2A8;
     u32 zero;
-    u32 odd;
-    u8 *q = actor + offset;
+    u8 *q = &actor->state2A8;
     zero = 0;
     *q = zero;
-    odd = 0x2A9;
-    ((u8 *)actor)[odd] = zero;
-    offset += 2;
-    ((u8 *)actor)[offset] = behavior;
-    *(u32 *)(actor + 0x2AC) = zero;
-    odd += 8;
-    ((u8 *)actor)[odd] = 1;
+    actor->phase2A9 = zero;
+    actor->behavior2AA = behavior;
+    actor->counter2AC = zero;
+    actor->field2B1 = 1;
     {
-        u32 off = 0x3D0;
-        u32 off2 = 0x678;
         u32 *flags;
         s32 mask;
-        u8 *ctx;
-        asm("" : "+r"(off));
-        ctx = *(u8 **)(actor + off);
-        asm("" : "+r"(off2));
-        flags = (u32 *)(ctx + off2);
+        struct SceneActorActionCooldown *ctx;
+        /* Keep this context address separate from the pending-action test. */
+        asm("" : "+r"(actor));
+        ctx = actor->context;
+        flags = &ctx->flags;
         mask = -2;
         *flags &= mask;
     }
@@ -96,9 +86,6 @@ void SceneActorControl_TickActionCooldown(struct SceneActorRegistryActor *actor)
         *p |= one;
     }
     if (HasPending(actor)) {
-        QueueAction((u8 *)actor);
+        QueueAction(actor);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorControl_TickActionCooldown);
-#endif

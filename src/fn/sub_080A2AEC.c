@@ -1,14 +1,7 @@
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 83.1%
-// Remaining differences: address lifetimes, register allocation, and instruction scheduling.
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: eases landing displacement, then restores route pursuit.
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
-void ScaledShadow_Enable(void *);
-void ScaledShadow_Destroy(void *);
-void SceneActorReaction_RestoreAlternateAfterDelay(void);
 struct SpiderFlagWord {
     s16 bits : 16;
 };
@@ -16,10 +9,7 @@ struct SpiderRecoveryContext {
     u8 pad[0x62C];
     struct SpiderFlagWord flags;
 };
-struct SpiderHalfFlags {
-    s16 bits : 16;
-};
-static inline u8 TakeEntry(u8 *p)
+static inline u8 Spider_TakeEntry(u8 *p)
 {
     if (*p) {
         *p = 0;
@@ -27,38 +17,12 @@ static inline u8 TakeEntry(u8 *p)
     }
     return 0;
 }
-static inline void ClearHidden(struct SpiderHalfFlags *p, u32 mask)
+static inline void Spider_ClearContextFlags(struct SpiderFlagWord *p, u32 mask)
 {
     p->bits &= mask;
 }
-struct RecoveryPacket {
-    u8 pad[8];
-    u8 state, phase, behavior, gap;
-    u32 delay;
-    void *callback;
-};
-static inline void SetCollider(struct ContactCollider *c)
-{
-    c->flags |= 4;
-}
-static inline void ClearCollider(struct ContactCollider *c)
-{
-    u32 mask = ~4;
-    c->flags &= mask;
-}
-static inline void ClearContext(struct SpiderFlagWord *p, u32 mask)
-{
-    p->bits &= mask;
-}
-static inline void SaveRecovery(struct RecoveryPacket *p, void *callback, u8 behavior, u32 delay)
-{
-    p->delay = delay;
-    p->callback = callback;
-    p->state = 0;
-    p->phase = 0;
-    p->behavior = behavior;
-}
-static inline void SetControl(struct SceneActorRegistryResetView *a, void *callback, u32 kind)
+static inline void Spider_SetControl(struct SceneActorRegistryResetView *a, void *callback,
+                                     u32 kind)
 {
     a->field2B2 = 1;
     a->field2B0 = 0;
@@ -72,7 +36,8 @@ static inline void SetControl(struct SceneActorRegistryResetView *a, void *callb
     }
     a->word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 phase, u8 behavior)
+static inline void Spider_SetState(struct SceneActorRegistryResetView *a, u8 state, u8 phase,
+                                   u8 behavior)
 {
     a->state2A8 = state;
     a->phase2A9 = phase;
@@ -93,22 +58,46 @@ struct LandingSequence {
     u8 gap[4];
     u16 elapsed;
 };
-static inline s32 Quarter(s32 x)
+static inline s32 Spider_QuarterDisplacement(s32 x)
 {
     if (x >= 0)
-        return x >> 2;
-    return -((-x) >> 2);
+        x >>= 2;
+    else
+        x = -((-x) >> 2);
+    return x;
 }
-static inline u8 MoveLanding(struct SceneActorRegistryResetView *a)
+static inline void Spider_AddMotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {
-    struct LandingState *s = (void *)a;
+    u32 value = mask;
+    value |= a->flags2D4;
+    a->flags2D4 = value;
+}
+static inline void Spider_AddGroupFlags(struct SceneActorRegistryControlGroup *g, u32 mask)
+{
+    u16 *flags = &g->flags414;
+    u32 value = mask;
+    value |= *flags;
+    *flags = value;
+}
+static inline void Spider_ClearMotionFlags(struct SceneActorRegistryResetView *a_, u32 mask)
+{
+    u16 *p = &a_->flags2D4;
+    *p &= mask;
+}
+
+static inline u8 Spider_MoveLanding(struct LandingState *s, struct SceneActorRegistryResetView *a)
+{
     s16 *cx;
     s16 *cz;
-    s32 x = Quarter(s->targetX - s->currentX);
-    s32 z;
+    s32 x, z, delta;
+
+    delta = s->targetX - s->currentX;
     cx = &s->currentX;
-    z = Quarter(s->targetZ - s->currentZ);
+    x = Spider_QuarterDisplacement(delta);
+    delta = s->targetZ - s->currentZ;
     cz = &s->currentZ;
+    delta = Spider_QuarterDisplacement(delta);
+    z = delta;
     if (x > 200)
         x = 200;
     else if (x < -200)
@@ -125,28 +114,25 @@ static inline u8 MoveLanding(struct SceneActorRegistryResetView *a)
         return 1;
     return 0;
 }
-static inline void AddMotion(struct SceneActorRegistryResetView *a, u32 mask)
+
+struct LandingReady {
+    u8 value;
+};
+static inline u32 Spider_SetLandingReady(struct LandingReady *p)
 {
-    register u32 m asm("r0") = mask;
-    asm("" : "+r"(m));
-    a->flags2D4 = m | a->flags2D4;
+    u32 zero = 0;
+    p->value = 1;
+    return zero;
 }
-static inline void AddGroup(struct SceneActorRegistryControlGroup *g, u32 mask)
-{
-    g->flags414 = mask | g->flags414;
-}
-static inline void ClearFlag(u16 *p, u32 mask)
-{
-    *p &= mask;
-}
+
 void Spider_UpdateLandingMotion(struct SceneActorRegistryResetView *a, s32 frame)
 {
-    struct LandingSequence *seq = (void *)((u8 *)a->drawable + 0x48);
+    struct LandingSequence *seq = (void *)(((u8 *)a->drawable) + 0x48);
     u32 *flags;
-    if (TakeEntry(&a->field2B2)) {
-        ClearContext(&((struct SpiderRecoveryContext *)a->context)->flags, ~6);
+    if (Spider_TakeEntry(&a->field2B2)) {
+        Spider_ClearContextFlags(&((struct SpiderRecoveryContext *)a->context)->flags, ~6);
         SceneActorAnimation_SelectDirectionalEntry(a, 3);
-        AddMotion(a, 0x20);
+        Spider_AddMotionFlags(a, 0x20);
     }
     {
         u32 mask = 0x10000;
@@ -155,22 +141,23 @@ void Spider_UpdateLandingMotion(struct SceneActorRegistryResetView *a, s32 frame
     }
     {
         u32 mask = 0x2000;
-        flags = &a->flags2CC;
-        *flags |= mask;
+        u32 *p = &a->flags2CC;
+        *p |= mask;
+        flags = p;
     }
     if (frame <= 17 && seq->frame == 1)
         seq->elapsed = 0;
-    if (MoveLanding(a)) {
-        u8 *group = (u8 *)&a->group;
-        a->field2B0 = 1;
-        SetState(a, 0, 0, 12);
-        SetControl(a, *(void **)(group + 0x48), 26);
+    if (Spider_MoveLanding((void *)a, a)) {
+        struct SceneActorRegistryControlGroup *group = &a->group;
+        u32 zero = Spider_SetLandingReady((void *)&a->field2B0);
+        Spider_SetState(a, zero, zero, 12);
+        Spider_SetControl(a, group->entryControl41C, 26);
         sub_080A4798(a);
         SceneActorMovement_ResolveRoutePosition(a);
-        AddGroup(&a->group, 4);
-        AddMotion(a, 0x80);
+        Spider_AddGroupFlags(&a->group, 4);
+        Spider_AddMotionFlags(a, 0x80);
         a->group.field418 = a->group.field416;
-        ClearFlag(&a->flags2D4, ~0x20);
+        Spider_ClearMotionFlags(a, ~0x20);
         a->direction = a->fieldE9;
         {
             u32 mask = 0x10;
@@ -178,7 +165,3 @@ void Spider_UpdateLandingMotion(struct SceneActorRegistryResetView *a, s32 frame
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Spider_UpdateLandingMotion);
-#endif

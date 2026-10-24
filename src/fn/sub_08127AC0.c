@@ -1,8 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.3%
-// Structure matches; the mirrored flag is re-read via sp instead of r4 and the command-lookup registers differ.
 struct ParticleVector {
     u16 x, y, z, unused;
 };
@@ -37,23 +34,19 @@ extern u32 gUnk_030052F8, gUnk_030052FC;
 void *TerrainModifiers_FindCellOverride(u32, u32);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
-static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
-                       struct Projectile *base)
+static inline u32 Step(struct Projectile *const owner, struct ParticleSequence *state)
 {
-    register struct Projectile *sprite asm("r5") = owner;
     const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, duration, flags, bit;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
         {
-            struct Projectile *source = base;
-            asm("" : "+r"(source));
-            table = source->sequence.commands;
+            table = owner->sequence.commands;
         }
         command = (const volatile u16 *)((u32)table + offset);
     }
-    sprite->frame = *command >> 6;
+    owner->frame = *command >> 6;
     {
         u32 input = state->flags;
         register u32 first asm("r1");
@@ -63,9 +56,9 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 4;
+            owner->flags |= 4;
         else
-            sprite->flags &= ~4;
+            owner->flags &= ~4;
     }
     {
         u32 input = state->flags;
@@ -78,20 +71,20 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
         asm("" : "+r"(first));
         first = (u8)first;
         if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
+            owner->flags |= 8;
         else
-            sprite->flags &= ~8;
+            owner->flags &= ~8;
     }
     {
         u32 elapsed = state->elapsed + 1;
         u32 mask;
         register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
+        u8 savedDuration;
         state->elapsed = elapsed;
         temp = 0xFFFF;
         asm("" : "+r"(temp));
         mask = temp;
-        /* Keep the live mask distinct from its source without binding r7. */
+        /* Preserve a separate working copy of the index mask. */
         asm("" : "+&r"(mask) : "r"(temp));
         duration = state->duration;
         elapsed = (u16)elapsed;
@@ -146,10 +139,11 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
             }
             state->frameWeight = *command & 15;
             {
-                register s32 weight asm("r1") = state->frameWeight;
+                s32 weight = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
-                speed = (speed * weight) >> 6;
+                speed = speed * weight;
+                speed >>= 6;
                 state->duration = speed;
                 if (!(u8)speed)
                     state->duration = 1;
@@ -166,15 +160,13 @@ struct TimedSpritePool {
 };
 void Anim_SetSequence(struct ParticleSequence *, void *, s32, s32, s32);
 void TimedSprite_BlinkAndRemove(struct TimedSpritePool *, struct Projectile *);
-static inline void SelectDirection(u8 *angle, u8 *row, u8 *flip)
+static inline u8 *SelectDirection(u8 *angle, u8 *row, u8 *flip)
 {
     register u8 *t0 asm("r0") = flip;
-    register u8 *f asm("r4");
+    u8 *f;
     u32 quadrant;
-    asm("" : "+r"(t0));
     quadrant = ((*angle + 0x60) >> 6) & 3;
     f = t0;
-    asm("" : "+r"(f));
     if (quadrant > 1) {
         *f = 1;
         *row = 3 - quadrant;
@@ -182,29 +174,24 @@ static inline void SelectDirection(u8 *angle, u8 *row, u8 *flip)
         *f = 0;
         *row = quadrant;
     }
+    return f;
 }
 // confidence=low: initializes direction-dependent playback before the blinking removal state.
 void TimedSprite_UpdateBlinkAnimation(struct TimedSpritePool *pool, struct Projectile *input)
 {
-    register struct Projectile *p asm("r5") = input;
+    struct Projectile *const p = input;
     u8 direction, mirrored;
-    register struct Projectile *incoming asm("r1") = input;
+    struct Projectile *incoming = input;
     if (p->enter) {
-        asm("" : "+r"(incoming));
-        SelectDirection(&incoming->angle, &direction, &mirrored);
-        Anim_SetSequence(&p->sequence, pool->resource, 19, direction, mirrored);
+        u8 *flip = SelectDirection(&incoming->angle, &direction, &mirrored);
+        Anim_SetSequence(&p->sequence, pool->resource, 19, direction, *flip);
         p->age = 0;
         p->enter = 0;
     }
-    Step(p, &p->sequence, p);
+    Step(p, &p->sequence);
     TimedSprite_BlinkAndRemove(pool, p);
     {
-        register u16 *age asm("r1") = &p->age;
-        asm("" : "+r"(age));
+        u16 *const age = &p->age;
         (*age)++;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", TimedSprite_UpdateBlinkAnimation);
-#endif

@@ -1,9 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 94.4%
-// fix.py best version (reprinted C)
-// foundry draft (worker best 85.4%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 #define gPlayerCloneManager gUnk_020005F8
 struct ClonePosition {
     u16 x, y, z, pad;
@@ -45,18 +42,15 @@ struct PlayerCloneManager {
 };
 extern struct PlayerCloneManager *gUnk_020005F8;
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
-static inline u32 enableClone(u32 value)
-{
-    u32 one = 1;
-    return one | value;
-}
 void PlayerClone_BeginActiveReactions(void)
 {
     struct PlayerCloneManager *manager = gUnk_020005F8;
-    u32 k1 = 0x344;
+    u32 slotStride = 0x344;
     if (manager) {
         struct PlayerCloneReactionSlot *s = manager->slots;
         s32 i = 0;
+        // Keep the shared reset value separate from the loop index.
+        register u32 resetValue asm("r10") = 0;
         u32 *flags = &s->flags;
         struct CloneAnimationState *animationFlags = (void *)(&s->animationFlags);
         u32 timer = 660;
@@ -67,7 +61,7 @@ void PlayerClone_BeginActiveReactions(void)
                 s->position.y = animationFlags->position.y + 128;
                 s->position.z = animationFlags->position.z;
                 flags[1] = 5;
-                animationFlags->flags = 0;
+                animationFlags->flags = resetValue;
                 {
                     u16 one = 1;
                     *flags |= one;
@@ -76,18 +70,15 @@ void PlayerClone_BeginActiveReactions(void)
                     struct CloneColliderState *collider = &s->collider;
                     collider->flags |= 4;
                 }
-                flags[6] = 0;
+                flags[6] = resetValue;
                 Anim_LoadKeyframe(s->animation, s->resource, 0, 1);
                 s->timer = timer;
             }
             timer += 30;
             i++;
-            flags = (void *)(((u8 *)flags) + k1);
-            animationFlags = (void *)(((u8 *)animationFlags) + k1);
+            flags = (void *)(((u8 *)flags) + slotStride);
+            animationFlags = (void *)(((u8 *)animationFlags) + slotStride);
             s++;
         } while (i <= 2);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerClone_BeginActiveReactions);
-#endif

@@ -1,10 +1,9 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 85.9%
-// fix.py best version (reprinted C)
+// MATCHING_CONCESSION: register-pinning
 // confidence=low: applies camera, collision, palette and shake presentation effects.
 #define Vanargand_UpdatePresentation sub_081AD564
+#define RANDOM_TABLE_ADDR            0x0203B400
 struct PresentationVec {
     s16 x, y, z, pad;
 };
@@ -12,6 +11,13 @@ struct PresentationCollider {
     u8 pad0[6];
     u16 flags;
     u8 pad8[0x54 - 8];
+};
+struct PresentationAnimation {
+    u32 header[2];
+    u32 flags;
+    u8 padC[0x20 - 0xC];
+    struct PresentationVec collisionPosition;
+    u8 pad28[0x60 - 0x28];
 };
 struct VanargandPresentation {
     u8 pad0[0x54];
@@ -23,13 +29,13 @@ struct VanargandPresentation {
     u8 padCD[0x110 - 0xCD];
     struct PresentationVec *target;
     u8 pad114[0x18C - 0x114];
-    u32 animation[0x60 / 4];
-    u8 drawable[0x21C - 0x1EC];
+    struct PresentationAnimation animation;
+    u8 drawable[0x20C - 0x1EC];
+    struct PresentationVec blendPosition;
+    u8 pad214[0x21C - 0x214];
     u8 paletteState[0x234 - 0x21C];
     u32 shadowFlags;
-    u8 pad238[0x2AC - 0x238];
-    struct PresentationVec collisionPosition;
-    u8 pad2B4[0x418 - 0x2B4];
+    u8 pad238[0x418 - 0x238];
     struct PresentationVec cameraPosition;
     u8 pad420[0x4FC - 0x420];
     u32 partFlags;
@@ -47,8 +53,8 @@ struct VanargandPresentation {
     u16 selectedHalf;
     u8 pad5B8[0x5C2 - 0x5B8];
     s16 mode;
+    u8 pad5C4[4];
     struct PresentationCollider bodyCollider;
-    u8 pad618[4];
     struct PresentationCollider colliders[2];
     struct PresentationCollider healthCollider;
     u8 palette[0x200];
@@ -68,7 +74,6 @@ extern u16 gUnk_03005260[];
 extern u8 *gUnk_030042E4;
 extern u16 gUnk_03004FC0[];
 extern u32 gUnk_03005308;
-extern u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void SceneActors_UpdateEffects(void *);
 void Camera_BlendOffset(void *, void *, s32);
@@ -86,14 +91,20 @@ static inline s32 Scale(s32 value)
         return value >> 12;
     return -(-value >> 12);
 }
-static inline s32 Blend(s32 t, s32 first, s32 last)
+static inline void Direction(struct PresentationVec *v, s32 angle, s32 length)
+{
+    v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * length);
+    v->y = 0;
+    v->z = Scale(gUnk_086149C4[angle] * length);
+}
+static inline s32 Blend(s32 t, s32 first, s32 last, s32 duration)
 {
     s32 value;
     if (t <= 0)
         return first;
-    if (t >= 3)
+    if (t >= duration)
         return last;
-    value = t * ((last - first) << 8) / 3;
+    value = t * ((last - first) << 8) / duration;
     if (value >= 0)
         value >>= 8;
     else
@@ -103,16 +114,44 @@ static inline s32 Blend(s32 t, s32 first, s32 last)
 static inline s32 RandomValue(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
+    return *(u16 *)((gUnk_03005308 << 1) + RANDOM_TABLE_ADDR);
 }
-static inline u32 Arg1(u32 k_, struct VanargandPresentation *self)
+static inline u32 TestActorFlag(u32 mask, struct VanargandPresentation *self)
 {
-    return self->flags & k_;
+    return self->flags & mask;
 }
 
+static inline void ClearColliderFlag(u32 mask, struct PresentationCollider *c)
+{
+    c->flags &= ~mask;
+}
+static inline void StorePalettePair(u32 value)
+{
+    u16 color = value;
+    u16 *palette;
+    /* Preserve the packed color before computing the palette addresses. */
+    asm("" : "+r"(color));
+    palette = gUnk_03004FC0;
+    palette[0x5A / 2] = color;
+    palette[0x10E / 2] = color;
+}
+static inline void SetAnimationFlag(struct PresentationAnimation *a)
+{
+    a->flags |= 1;
+}
+static inline void ClearAnimationFlag(struct PresentationAnimation *a)
+{
+    a->flags &= ~1;
+}
+static inline void ClearActorFlag(u32 mask, struct VanargandPresentation *p)
+{
+    p->flags &= ~mask;
+}
 void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
 {
     struct VanargandPresentation *self = p;
+    struct PresentationCollider *health;
+
     SceneActors_UpdateEffects(p);
     if (gUnk_03005260[0] & 2) {
         if (gUnk_03005260[1] & 0x40) {
@@ -122,14 +161,14 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
             p->debugValue++;
         }
     }
-    if (Arg1(0x200000, self)) {
+    if (TestActorFlag(0x200000, self)) {
         switch (p->cameraMode) {
             case 3:
                 Camera_SetOffset(8, &self->position);
                 break;
 
             case 1:
-                Camera_BlendOffset(self->target, &p->collisionPosition, 128);
+                Camera_BlendOffset(self->target, &p->blendPosition, 128);
                 break;
 
             case 2:
@@ -159,13 +198,13 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
         self->flags |= mask;
         p->pauseTimer--;
     }
-    if (self->flags & 16) {
-        p->animation[2] |= 1;
-        self->flags &= ~0x80000;
+    if (TestActorFlag(16, self)) {
+        SetAnimationFlag(&p->animation);
+        ClearActorFlag(0x80000, self);
     } else {
-        p->animation[2] &= ~1;
+        ClearAnimationFlag(&p->animation);
     }
-    if (self->flags & 0x80000)
+    if (TestActorFlag(0x80000, self))
         p->shadowFlags &= ~1;
     else
         p->shadowFlags |= 1;
@@ -173,24 +212,25 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
         Camera_RequestShake(12);
         p->impactShake--;
     }
-    if (self->flags & 4) {
+    health = &p->healthCollider;
+    if (TestActorFlag(4, self)) {
         p->collisionValue = 0;
-        p->healthCollider.flags |= 4;
+        health->flags |= 4;
     } else {
-        p->healthCollider.flags &= ~4;
-        Collider_SetPosition(&p->healthCollider, &p->collisionPosition, 0);
+        ClearColliderFlag(4, health);
+        Collider_SetPosition(health, &p->animation.collisionPosition, 0);
     }
-    if (!(self->flags & 8)) {
+    health = &p->bodyCollider;
+    if (!TestActorFlag(8, self)) {
         s32 i;
         struct PresentationCollider *c;
-        Collider_SetPosition(&p->bodyCollider, &self->position, 0);
-        Collider_Refresh(&p->bodyCollider);
-        c = p->colliders;
+        Collider_SetPosition(health, &self->position, 0);
+        Collider_Refresh(health);
         i = 0;
         do {
+            c = &p->colliders[i];
             Collider_SetPosition(c, ((u8 *)p) + 0x17C, 0);
             Collider_Refresh(c);
-            c++;
             i++;
         } while (i <= 1);
     }
@@ -208,9 +248,9 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
                     CpuSet(gUnk_030042E4 + 0xDE0, p->palette, 0x4000020);
                     CpuSet(p->fadeA, gUnk_03004FC0, 0x4000068);
                     t = p->transition;
-                    r = Blend(t, 7, 19);
-                    g = Blend(t, 0, 18);
-                    b = Blend(t, 0, 19);
+                    r = Blend(t, 7, 19, 3);
+                    g = Blend(t, 0, 18, 3);
+                    b = Blend(t, 0, 19, 3);
                     r |= g << 5;
                     r |= b << 10;
                     {
@@ -219,17 +259,12 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
                         palette[0x56 / 2] = color;
                         palette[0x10C / 2] = color;
                     }
-                    r = Blend(t, 21, 24);
-                    g = Blend(t, 0, 29);
-                    b = Blend(t, 0, 31);
+                    r = Blend(t, 21, 24, 3);
+                    g = Blend(t, 0, 29, 3);
+                    b = Blend(t, 0, 31, 3);
                     r |= g << 5;
                     r |= b << 10;
-                    {
-                        u16 color = r;
-                        u16 *palette = gUnk_03004FC0;
-                        palette[0x5A / 2] = color;
-                        palette[0x10E / 2] = color;
-                    }
+                    StorePalettePair((u16)r);
                     break;
                 }
 
@@ -258,28 +293,22 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
         s32 product = gUnk_086149C4[(angle + 64) & 255] * (p->shake << 3);
         s32 x = Scale(product);
         s32 z;
-        p->collisionPosition.x += x;
+        p->animation.collisionPosition.x += x;
         product = gUnk_086149C4[angle & 255] * (p->shake << 3);
         z = Scale(product);
-        p->collisionPosition.z += z;
+        p->animation.collisionPosition.z += z;
         p->shake--;
     }
     if (p->mode == 1)
         p->partFlags |= 1;
-    if (self->flags & 0x40000) {
-        s16 destination[4];
-        s32 angle = self->heading;
-        destination[0] = Scale(gUnk_086149C4[(angle + 64) & 255] * 128);
-        destination[1] = 0;
-        destination[2] = Scale(gUnk_086149C4[angle] * 128);
-        destination[0] += 1024;
-        destination[1] += 256;
-        destination[2] += 1024;
-        self->position.x = ScalarApproach_StepSixteenth(self->position.x, destination[0]);
-        self->position.z = ScalarApproach_StepSixteenth(self->position.z, destination[2]);
+    if (TestActorFlag(0x40000, self)) {
+        struct PresentationVec destination;
+        Direction(&destination, self->heading, 128);
+        destination.x += 1024;
+        destination.y += 256;
+        destination.z += 1024;
+        self->position.x = ScalarApproach_StepSixteenth(self->position.x, destination.x);
+        self->position.z = ScalarApproach_StepSixteenth(self->position.z, destination.z);
     }
     ScreenPalette_UpdateState(p->paletteState);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081AD564);
-#endif

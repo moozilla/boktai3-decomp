@@ -23,7 +23,7 @@ void ChildGroup_WaitForInactiveMembers(struct SwordGroup *);
 // confidence=low: launches the next resting sword every launchDelay frames; once all are out,
 // waits for them to finish.
 #ifdef NONMATCHING
-// fuzzy: 56.0%
+// fix.py best (sweep after the inlined-insn fix)
 // agbcc strength-reduces i*0x194 into a pointer; the ROM keeps i and multiplies in the found block.
 void sub_080F3420(struct SwordGroup *p)
 {
@@ -35,16 +35,22 @@ void sub_080F3420(struct SwordGroup *p)
     for (i = 0; i < p->count; i++) {
         if (p->children[i].active == 0) {
             struct SwordChild *child = &p->children[i];
-            child->active = 1;
-            child->entered = 0;
-            child->flags |= 1;
-            p->children[i].update = Sword_BeginRestOrbit;
-            p->delay = p->launchDelay;
-            return;
+            {
+                typeof(child->active) *q1 = &child->active;
+                s16 z1 = 0;
+                *q1 = 1;
+                child->entered = z1;
+                child->flags |= 1;
+                p->children[i].update = Sword_BeginRestOrbit;
+                p->delay = p->launchDelay;
+                return;
+            }
         }
     }
+
     p->callback = ChildGroup_WaitForInactiveMembers;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080F3420);
 #endif

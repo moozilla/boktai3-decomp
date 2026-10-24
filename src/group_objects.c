@@ -6,6 +6,7 @@ int BoardPiece_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int 
 {
     struct GroupResource *resource;
     struct GroupSprite *sprite;
+    struct GroupVec *position;
     {
         int zero = 0;
         asm("" : "+r"(zero));
@@ -25,19 +26,9 @@ int BoardPiece_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int 
     sprite = &p->sprite;
     Sprite_Init(sprite, resource, 1);
     sprite->mode = 2;
-    {
-        register struct GroupVec *position asm("r5") = &p->sprite.position;
-        {
-            u32 zero = 0;
-            {
-                register u32 *src asm("r0") = &zero;
-                struct GroupVec *dst = position;
-                asm("" : : "r"(src), "r"(dst));
-                CpuSet(src, dst, 0x05000002);
-            }
-        }
-        Shadow_Initialize(p->transform, position, 0);
-    }
+    position = &p->sprite.position;
+    ZeroFill8(position);
+    Shadow_Initialize(p->transform, position, 0);
     ActorShadow_Disable(p->transform);
 }
 
@@ -165,14 +156,19 @@ static inline void addPositionAt(struct GroupVec *d, struct GroupVec *dst, struc
 }
 
 #ifdef NONMATCHING
-// fuzzy: 81.6% (loop counter lives in a register, random table not hoisted into one)
+// fix.py best (sweep after the inlined-insn fix)
 int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct GroupVec origin;
     int i;
-    int radius0, radius1, radius2, direction, spread;
+    int radius0;
+    int radius1;
+    int radius2;
+    int direction;
+    int spread;
     struct GroupPiece *p;
     struct GroupPiece *r;
+    u32 k1 = 16;
     origin.x = cmd->originX;
     origin.y = cmd->originY;
     origin.z = cmd->originZ;
@@ -192,20 +188,20 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     }
     p = m->pieces;
     r = p;
-    for (i = 0; i < 16; i++, p++, r++) {
+    for (i = 0; i < k1; i++, p++, r++) {
         p->state = 5;
         p->active = 1;
         p->timer = 0;
         p->direction = direction;
         if (spread != 0)
-            p->direction += Mod(randomValue(), spread);
+            p->direction += Mod((s16)randomValue(), spread);
         p->duration = radius0;
         polar(&r->position, p->direction, radius1);
         addPositionAt(&p->position, &r->position, &origin);
         polar(&r->target, p->direction, radius2);
         addPositionAt(&p->target, &r->target, &origin);
         p->angle = randomValue();
-        p->targetY = i * 16 + p->position.y;
+        p->targetY = (i * k1) + p->position.y;
         p->speed = (randomValue() & 7) + 7;
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
@@ -214,19 +210,25 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         p->resource.palette = m->palette;
         ActorShadow_Enable(r->transform);
     }
+
     m->active = 1;
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0800FC28);
 #endif
 #ifdef NONMATCHING
-// fuzzy: 83.3% (same as sub_0800FC28, state 0)
+// fix.py best (sweep after the inlined-insn fix)
 int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct GroupVec origin;
     int i;
-    int radius0, radius1, radius2, direction, spread;
+    int radius0;
+    int radius1;
+    int radius2;
+    int direction;
+    int spread;
     struct GroupPiece *p;
     struct GroupPiece *r;
     origin.x = cmd->originX;
@@ -249,7 +251,9 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     p = m->pieces;
     r = p;
     for (i = 0; i < 16; i++, p++, r++) {
-        p->state = 0;
+        do {
+            p->state = 0;
+        } while (0);
         p->active = 1;
         p->timer = 0;
         p->direction = direction;
@@ -261,7 +265,7 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         polar(&r->target, p->direction, radius2);
         addPositionAt(&p->target, &r->target, &origin);
         p->angle = randomValue();
-        p->targetY = i * 16 + p->position.y;
+        p->targetY = (i * 16) + p->position.y;
         p->speed = (randomValue() & 7) + 7;
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
@@ -270,9 +274,11 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         p->resource.palette = m->palette;
         ActorShadow_Enable(r->transform);
     }
+
     m->active = 1;
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0800FE98);
 #endif
@@ -341,12 +347,7 @@ int BoardPieces_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
     return 0;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 65.2%
-// goto loop keeps loop.c from hoisting the table and the constants 0/1 (the ROM hoists only
-// index and mask, which are source-level here). Remaining (rasolve): y must rank below index,
-// mask and the constant 1 so it is spilled to the stack; one reload rotation step.
-static inline int step(const u16 *table, u32 *index, u32 mask)
+static inline int BoardPieces_NextRandomValue(const u16 *table, u32 *index, u32 mask)
 {
     u32 offset;
     *index = (*index + 1) & mask;
@@ -354,12 +355,13 @@ static inline int step(const u16 *table, u32 *index, u32 mask)
     return *(const u16 *)(offset + (u32)table);
 }
 
+// MATCHING_CONCESSION: register-pinning
 int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct GroupActor *actor;
-    s32 y;
+    s32 duration;
     struct GroupVec position;
-    int i;
+    int remaining;
     struct GroupPiece *p;
     u32 *index;
     u32 mask;
@@ -368,36 +370,49 @@ int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     if (!actor)
         return -1;
     position = actor->position;
-    y = (s16)cmd->originY;
-    m->timer = 0;
-    index = &gUnk_03005308;
-    mask = 1023;
-    i = 15;
-    p = m->pieces;
-loop: {
-    int angle;
-    const u16 *table;
-    p->state = 3;
-    p->active = 1;
-    p->timer = 0;
-    p->target = position;
-    angle = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
-    p->direction = angle;
-    table = gUnk_0203B400;
-    p->direction = angle - 16 + (step(table, index, mask) & 31);
-    p->duration = y;
-    p->speed = (step(table, index, mask) & 7) + 7;
-    i--;
-    p++;
-    if (i >= 0)
-        goto loop;
+    duration = (s16)cmd->originY;
+    {
+        register int enabled asm("r8");
+        m->timer = 0;
+        index = &gUnk_03005308;
+        mask = 1023;
+        remaining = 15;
+        p = m->pieces;
+    loop: {
+        int angle;
+        int zero;
+        const u16 *table;
+        p->state = 3;
+        do {
+            enabled = 1;
+            p->active = enabled;
+        } while (0);
+        zero = 0;
+        p->timer = zero;
+        p->target = position;
+        asm("" : : "r"(zero), "r"(index), "r"(mask));
+        angle = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
+        p->direction = angle;
+        table = gUnk_0203B400;
+        {
+            register int random asm("r3") = BoardPieces_NextRandomValue(table, index, mask);
+            angle -= 16;
+            random &= 31;
+            angle += random;
+            p->direction = angle;
+        }
+        p->duration = duration;
+        p->speed = (BoardPieces_NextRandomValue(table, index, mask) & 7) + 7;
+        remaining--;
+        p++;
+        if (remaining >= 0)
+            goto loop;
+    }
+
+        m->active = enabled;
+        return 0;
+    }
 }
-    m->active = 1;
-    return 0;
-}
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08010298);
-#endif
 
 static inline int count(struct GroupQueue *q)
 {
@@ -675,10 +690,6 @@ void BoardPiece_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int in
     }
 }
 
-static inline void CpuSet_2(u32 *a0, int a2, struct GroupVec *a1)
-{
-    CpuSet(a0, a1, a2);
-}
 void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
@@ -689,12 +700,10 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
     active = p->active;
     offset = &p->offset;
     if (active) {
-        u32 zero;
         p->active = 0;
         p->anchor = p->position;
         p->direction = randomValue();
-        zero = 0;
-        CpuSet_2(&zero, 0x05000002, offset);
+        ZeroFill8(offset);
     }
     Vec16_Lerp(&p->anchor, &p->anchor, &p->target, index + 8, 5);
     if (p->speed == 0) {

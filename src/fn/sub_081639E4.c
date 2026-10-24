@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 89.1%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: spawns one particle (kind 0/1 picks tile frames) into a 16-slot pool.
 // Remaining difference: random-index/table register allocation in the position jitter.
@@ -56,7 +56,7 @@ void sub_081639E4(struct ParticlePool *inPool, struct SceneVec *position, s32 an
             mask = 0x3FF;
             index &= mask;
             {
-                u32 random = gUnk_0203B400[index];
+                u32 random = (*((typeof(gUnk_0203B400) *)0x0203B400))[index];
                 s32 x = (u16)p->position.x;
                 x -= 63;
                 range = 0x7F;
@@ -66,7 +66,7 @@ void sub_081639E4(struct ParticlePool *inPool, struct SceneVec *position, s32 an
             index = (index + 1) & mask;
             gUnk_03005308 = index;
             {
-                u32 random = gUnk_0203B400[index];
+                u32 random = (*((typeof(gUnk_0203B400) *)0x0203B400))[index];
                 s32 z = (u16)p->position.z;
                 z -= 63;
                 p->position.z = z + random;
@@ -93,7 +93,8 @@ void sub_081639E4(struct ParticlePool *inPool, struct SceneVec *position, s32 an
             u32 index = (gUnk_03005308 + 1) & 0x3FF;
             gUnk_03005308 = index;
             {
-                u32 random = *((u16 *)((index << 1) + ((u32)gUnk_0203B400)));
+                u32 random =
+                    *((u16 *)((index << 1) + ((u32)(*((typeof(gUnk_0203B400) *)0x0203B400)))));
                 u32 range = 7;
                 p->lifetime = (random & range) + 8;
             }
@@ -102,6 +103,7 @@ void sub_081639E4(struct ParticlePool *inPool, struct SceneVec *position, s32 an
         p->kind = kind;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081639E4);
 #endif

@@ -26,4 +26,15 @@ asm(".include \"asm/macros.inc\"");
 void CpuSet(const void *src, void *dest, u32 control);
 void CpuFastSet(const void *src, void *dest, u32 control);
 
+/* Zero the 8 bytes at dest (CpuSet, 32-bit, fixed zero source). The game's own
+ * spelling: unlike the SDK's CpuFill32 it evaluates dest before the zero is
+ * stored, which sets the stack order and registers of 128 call sites. Per-file
+ * Fill/Clear helpers and asm barriers on CpuSet's arguments stand in for it.
+ * The original name is unknown (confidence=low). */
+static inline void ZeroFill8(void *dest)
+{
+    vu32 zero = 0;
+    CpuSet((void *)&zero, dest, 0x05000002);
+}
+
 #endif

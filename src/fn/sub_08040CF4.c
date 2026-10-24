@@ -1,6 +1,3 @@
-#ifdef NONMATCHING
-// fuzzy: 84.2%
-// Remaining differences are low-register allocation; reviewed full extent is 716 bytes.
 #include "modifier_list.h"
 void ModifierMenu_DrawFirstSourceStats(struct ModifierMenu *);
 void ModifierMenu_DrawSecondSourceStats(struct ModifierMenu *);
@@ -13,9 +10,11 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
 {
     struct ModifierSelection *current = &menu->current;
     struct ModifierDisplayObject *object;
-    u32 one, mask;
-    s32 remaining;
+    u32 one;
+    u32 mask;
+    s32 i;
     s32 mode;
+    s32 end;
     menu->previewFlags |= 1;
     one = 1;
     object = &menu->displays[8];
@@ -34,20 +33,20 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
     {
         u32 bit = 1;
         u32 *column = &menu->displays[9].flags;
-        remaining = 3;
+        i = 3;
         do {
             *column |= bit;
-            column = (u32 *)((u8 *)column + sizeof(struct ModifierDisplayObject));
-        } while (--remaining >= 0);
+            column = (u32 *)(((u8 *)column) + (sizeof(struct ModifierDisplayObject)));
+        } while ((--i) >= 0);
     }
     {
         u32 bit = 1;
         u32 *column = &menu->displays[14].flags;
-        remaining = 3;
+        i = 3;
         do {
             *column |= bit;
-            column = (u32 *)((u8 *)column + sizeof(struct ModifierDisplayObject));
-        } while (--remaining >= 0);
+            column = (u32 *)(((u8 *)column) + (sizeof(struct ModifierDisplayObject)));
+        } while ((--i) >= 0);
     }
     mode = menu->mode;
     switch (mode) {
@@ -82,7 +81,7 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
             }
             object->flags &= ~1;
             object = &menu->displays[14];
-            if (*category == 3) {
+            if ((*category) == 3) {
                 if (menu->current.sourceIds[3] < 0)
                     object->flags |= 1;
                 else {
@@ -95,36 +94,39 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
             }
             break;
         }
+
         case 1: {
-            s32 start, end, id;
+            s32 start;
             object = &menu->displays[10];
             object->x = -96;
             object->y = 56;
             ModifierMenu_DrawSecondSourceStats(menu);
             object->flags &= ~1;
             object = &menu->displays[14];
-            start = menu->choice.cursor.category * 3 * 2;
+            start = (menu->choice.cursor.category * 3) * 2;
             end = start + 6;
-            for (id = start; id < end; id++) {
-                if (Modifier_TestSelection(current, id)) {
+            for (i = start; i < end; i++) {
+                if (Modifier_TestSelection(current, i)) {
                     object->flags &= ~1;
-                    ModifierMenu_PositionSelectionMarker(object, Mod(id, 6));
+                    ModifierMenu_PositionSelectionMarker(object, Mod(i, 6));
                     object++;
                 }
             }
+
             break;
         }
+
         case 2: {
-            s32 start, end;
+            s32 start;
             object = &menu->displays[10];
             object->x = -96;
             object->y = 56;
             ModifierMenu_DrawSecondSourceStats(menu);
             object->flags &= ~1;
             object = &menu->displays[14];
-            start = menu->choice.cursor.category * 3 * 2;
+            start = (menu->choice.cursor.category * 3) * 2;
             end = start + 6;
-            if (current->secondaryId >= start && current->secondaryId < end) {
+            if ((current->secondaryId >= start) && (current->secondaryId < end)) {
                 object->flags &= ~1;
                 ModifierMenu_PositionSelectionMarker(object, Mod(current->secondaryId, 6));
             }
@@ -132,8 +134,3 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
         }
     }
 }
-
-#else
-#include "global.h"
-INCLUDE_ASM("asm/nonmatching", ModifierMenu_DrawPendingChoice);
-#endif

@@ -25,7 +25,7 @@ void SpriteParticle_SetPlanarVelocity(void *, s32, s32);
 void SpriteParticle_Emit(void *, void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 #ifdef NONMATCHING
-// fuzzy: 66.2%
+// fix.py best (sweep after the inlined-insn fix)
 /* Remaining differences: receiver aliases, packed positions and particle stack allocation. */
 static inline u32 Random(void)
 {
@@ -42,6 +42,8 @@ static inline u32 Next(const u16 *table, u32 *randomIndex, u32 wrap)
 void SingletonSlot7_UpdateShakingDeparture(struct DepartureOwner *p, s32 frame)
 {
     u8 *actor = (u8 *)p;
+    u32 k1 = 90;
+    u32 k2;
     if (p->entry) {
         p->entry = 0;
         p->flag304 = 1;
@@ -57,45 +59,47 @@ void SingletonSlot7_UpdateShakingDeparture(struct DepartureOwner *p, s32 frame)
         gUnk_03005308 = index;
         p->shakeZ = (gUnk_0203B400[index] & 7) - 4;
     } else if (p->flag304 && p->flag34C)
-        FIELD(p, 0x5A0, u32) += 2;
-    if ((frame & 1) && frame > 60) {
+        *((u32 *)(((u8 *)p) + 0x5A0)) += 2;
+    if ((frame & 1) && (frame > 60)) {
         const u16 *table = gUnk_0203B400;
         u32 *randomIndex = &gUnk_03005308;
         u32 wrap = 1023;
         struct PackedPosition position;
-        s32 dx, dz;
+        s32 dx;
+        s32 dz;
         u8 params[0x34];
-        u32 index = (*randomIndex + 1) & wrap;
-        position.x = (table[index] & 31) + FIELD(actor, 0x2DC, u16) - 16;
-        position.y = FIELD(actor, 0x2DE, u16);
+        u32 index = ((*randomIndex) + 1) & wrap;
+        position.x = ((table[index] & 31) + (*((u16 *)(((u8 *)actor) + 0x2DC)))) - 16;
+        position.y = *((u16 *)(((u8 *)actor) + 0x2DE));
         position.z = 100;
         index = (index + 1) & wrap;
         dx = ((table[index] & 15) - 8) << 10;
         index = (index + 1) & wrap;
         *randomIndex = index;
-        dz = -(s32)((table[index] & 7) << 10);
+        dz = -((s32)((table[index] & 7) << 10));
         SpriteParticle_InitParams(params);
         SpriteParticle_SetMotionParams(params, 0, 60, 0, 0);
-        if ((s32)(u8)Next(table, randomIndex, wrap) > 128) {
-            SpriteParticle_SetSpriteResource(params, FIELD(actor, 0x388, u32), 0, 0x1F5);
-            SpriteParticle_SetAnimationTrack(params, FIELD(actor, 0x38C, void *), 5);
+        if (((s32)((u8)Next(table, randomIndex, wrap))) > 128) {
+            SpriteParticle_SetSpriteResource(params, *((u32 *)(((u8 *)actor) + (k2 = 0x388))), 0,
+                                             0x1F5);
+            SpriteParticle_SetAnimationTrack(params, *((void **)(((u8 *)actor) + 0x38C)), 5);
         } else {
-            SpriteParticle_SetSpriteResource(params, FIELD(actor, 0x388, u32), 0, 0x1F5);
-            SpriteParticle_SetAnimationTrack(params, FIELD(actor, 0x38C, void *), 6);
+            SpriteParticle_SetSpriteResource(params, *((u32 *)(((u8 *)actor) + k2)), 0, 0x1F5);
+            SpriteParticle_SetAnimationTrack(params, *((void **)(((u8 *)actor) + 0x38C)), 6);
         }
         SpriteParticle_SetPlanarVelocity(params, dx, dz);
         SpriteParticle_Emit(params, &position);
     }
-    if (FIELD(actor, 0x5A0, s32) == 58) {
-        FIELD(actor, 0x5DC, u16) = 90;
-        FIELD(actor, 0x5D8, u16) = FIELD(actor, 0x2DC, u16);
-        FIELD(actor, 0x5DA, u16) = 155;
+    if ((*((s32 *)(((u8 *)actor) + 0x5A0))) == 58) {
+        *((u16 *)(((u8 *)actor) + 0x5DC)) = k1;
+        *((u16 *)(((u8 *)actor) + 0x5D8)) = *((u16 *)(((u8 *)actor) + 0x2DC));
+        *((u16 *)(((u8 *)actor) + 0x5DA)) = 155;
         Sound_PlaySong(0x146);
         Sound_PlaySong(0x597);
     }
-    if (FIELD(actor, 0x5A0, s32) > 59)
-        FIELD(actor, 0x5A0, u32) = 60;
-    if (frame > 90 && Sprite_BlinkUntilExpired(actor + 0x2C0, frame - 90, 45, 90))
+    if ((*((s32 *)(((u8 *)actor) + 0x5A0))) > 59)
+        *((u32 *)(((u8 *)actor) + 0x5A0)) = 60;
+    if ((frame > k1) && Sprite_BlinkUntilExpired(actor + 0x2C0, frame - k1, 45, k1))
         p->complete = 1;
 }
 

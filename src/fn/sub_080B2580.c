@@ -6,7 +6,7 @@
 // confidence=low: route role inferred from callers and terrain/path tests.
 
 #ifdef NONMATCHING
-// fuzzy: 94.5%
+// fix.py best (sweep after the inlined-insn fix)
 // Width-load rematerialization, stack-slot order, and literal-pool placement still differ.
 static inline u32 CellIndex(struct ContactPosition *p)
 {
@@ -160,6 +160,71 @@ static inline void GetCenter(s32 cell, struct ContactPosition *p)
     p->y = CenterHeight(cell);
     p->z = (z << 8) + 128;
 }
+static inline s32 Sweep_SelectReachableEscapeCell(struct SceneActorRegistryResetView *actor,
+                                                  s32 range)
+{
+    s32 cell = actor->terrainCell;
+    u32 height = CellHeight(&actor->position, cell);
+    u32 shape = *SceneActorTerrain_GetCell(cell) >> 4;
+    s32 direction = RoundDirection(actor->direction + 32) & 3;
+    s32 next;
+    s32 i;
+    switch (direction) {
+        case 0:
+            next = cell + 1;
+            i = 0;
+            if (i < range)
+                do {
+                    if (!sub_0812E118(cell, next, height, shape))
+                        break;
+                    next++;
+                } while (++i < range);
+            goto east;
+        case 1:
+            next = cell + SceneActorTerrain_Width();
+            i = 0;
+            if (i < range)
+                do {
+                    if (!sub_0812E118(cell, next, height, shape))
+                        break;
+                    next += SceneActorTerrain_Width();
+                } while (++i < range);
+            goto south;
+        case 2:
+            next = cell - 1;
+            i = 0;
+            if (i < range)
+                do {
+                    if (!sub_0812E118(cell, next, height, shape))
+                        break;
+                    next--;
+                } while (++i < range);
+            goto west;
+        case 3:
+            next = cell - SceneActorTerrain_Width();
+            i = 0;
+            if (i < range)
+                do {
+                    if (!sub_0812E118(cell, next, height, shape))
+                        break;
+                    next -= SceneActorTerrain_Width();
+                } while (++i < range);
+            goto north;
+        default:
+            goto home;
+    }
+east:
+    return next - 1;
+south:
+    return next - SceneActorTerrain_Width();
+west:
+    return next + 1;
+north:
+    return next + SceneActorTerrain_Width();
+home:
+    return actor->terrainCell;
+}
+
 u8 Vorn_SelectReachableEscapeCell(struct SceneActorRegistryResetView *actor, u32 savedDirection)
 {
     struct ContactPosition target;
@@ -170,24 +235,26 @@ u8 Vorn_SelectReachableEscapeCell(struct SceneActorRegistryResetView *actor, u32
     do {
         s32 tries = 0;
         do {
-            dest = Sweep(actor, range);
+            dest = Sweep_SelectReachableEscapeCell(actor, range);
             if (dest != actor->terrainCell) {
                 found = 1;
                 goto nextRange;
             }
             actor->direction += 64;
-        } while (++tries <= 3);
+        } while ((++tries) <= 3);
     nextRange:
         range--;
+
         actor->direction = savedDirection;
-        if (found || range <= 0)
+        if (found || (range <= 0))
             goto done;
     } while (1);
 done:
     GetCenter(dest, &target);
-    group = (u8 *)&actor->group;
+
+    group = (u8 *)(&actor->group);
     if (!TryRoute(actor, group, &target)) {
-        Callback_InvokeActor(actor, *(void **)(group + 0x224));
+        Callback_InvokeActor(actor, *((void **)(group + 0x224)));
         return 0;
     }
     return 1;

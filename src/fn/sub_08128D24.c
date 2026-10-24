@@ -2,7 +2,7 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 90.5%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining: terrain/center allocation and pointer/register lifetimes.
 // The original falls through on the unobstructed path without setting its result.
@@ -142,14 +142,20 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
                         index = ((*rng) + k1) & mask;
                     }
                     *rng = index;
-                    spot->y = (height << 8) + (table[index] & 255);
+                    {
+                        typeof(table[index]) v1 = table[index];
+                        spot->y = (height << 8) + (v1 & 255);
+                    }
                     zero = 0;
                     asm("" : "+r"(zero));
                     if (!p->variant) {
                         s32 life;
                         index = ((*rng) + 1) & mask;
                         *rng = index;
-                        life = (table[index] & 63) + 30;
+                        {
+                            typeof(table[index]) v2 = table[index];
+                            life = (v2 & 63) + 30;
+                        }
                         SpriteEffectController_Create(spot, &local.velocity, 0x1C1A, 0xD1B8, 3,
                                                       zero, 0x31, zero, 1, zero, zero, life, 4, 1,
                                                       p->effectFlags, 30, 8, 8);
@@ -164,6 +170,7 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
         } while (current != target);
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", FeatherEffectPool_ClipScatterPath);
 #endif

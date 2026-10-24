@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 86.4%
-// Remaining differences: saved-state address reuse, selection-table lifetimes and merged state tails.
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -68,16 +65,24 @@ static inline u32 randomB(void)
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     return gUnk_0203B400[gUnk_03005308];
 }
+#define RANDOM_TABLE_ADDR 0x0203B400
 static inline s32 randomByte(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(const u8 *)((u32)gUnk_0203B400 + gUnk_03005308 * 2);
+    return *(const u8 *)(RANDOM_TABLE_ADDR + gUnk_03005308 * 2);
 }
 static inline void snapshot(struct Actor *p, struct Actor *q)
 {
     p->savedTick = p->tick;
     p->savedTimer = q->timer;
     p->savedState = q->state;
+    p->savedSequence = p->sequence;
+}
+static inline void snapshotWithState(struct Actor *p, struct Actor *q, u32 *savedState)
+{
+    p->savedTick = p->tick;
+    p->savedTimer = q->timer;
+    *savedState = q->state;
     p->savedSequence = p->sequence;
 }
 static inline void setState(struct Actor *q, u32 state, u32 zero, u32 one)
@@ -102,6 +107,7 @@ void Ratatosk_UpdateAttackSelection(struct Actor *p)
 {
     struct Actor *q = p;
     struct ChoiceTable choices;
+    u32 *savedState;
     Callback_InvokeActor(p, gUnk_08613F04[q->state]);
     if (flags(p, 0x100000) && q->state == 6 && !p->interruptLock) {
         struct Vec *player = Player_GetEffectivePosition(0);
@@ -156,8 +162,9 @@ void Ratatosk_UpdateAttackSelection(struct Actor *p)
             if (q->state == 2) {
                 choices = gUnk_0824FE08;
                 choose(p, q, &choices);
-            } else if ((u8)(q->state - 8) <= 2 && p->savedState == 6 && p->hasOrb == 0) {
-                snapshot(p, q);
+            } else if ((u8)(q->state - 8) <= 2 && *(savedState = &p->savedState) == 6 &&
+                       p->hasOrb == 0) {
+                snapshotWithState(p, q, savedState);
                 setState(q, 6, 0, 1);
             } else {
                 SunOrb_FadeOutAll(p->orbManager);
@@ -188,8 +195,9 @@ void Ratatosk_UpdateAttackSelection(struct Actor *p)
             if (q->state == 2) {
                 choices = gUnk_0824FE18;
                 choose(p, q, &choices);
-            } else if ((u8)(q->state - 8) <= 2 && p->savedState == 6 && p->hasOrb == 0) {
-                snapshot(p, q);
+            } else if ((u8)(q->state - 8) <= 2 && *(savedState = &p->savedState) == 6 &&
+                       p->hasOrb == 0) {
+                snapshotWithState(p, q, savedState);
                 setState(q, 6, 0, 1);
             } else if (q->state == 1) {
                 if (p->pendingAttack) {
@@ -199,8 +207,9 @@ void Ratatosk_UpdateAttackSelection(struct Actor *p)
                     p->pendingAttack = 0;
                 } else {
                     p->duration = 32;
-                    setState(q, p->savedState, 0, 1);
-                    snapshot(p, q);
+                    savedState = &p->savedState;
+                    setState(q, *savedState, 0, 1);
+                    snapshotWithState(p, q, savedState);
                 }
             } else {
                 SunOrb_FadeOutAll(p->orbManager);
@@ -213,7 +222,3 @@ void Ratatosk_UpdateAttackSelection(struct Actor *p)
         p->complete = 0;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081F92C8);
-#endif

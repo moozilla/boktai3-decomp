@@ -2,7 +2,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 75.7%
+// fix.py best (sweep after the inlined-insn fix)
 // confidence=low: timed held-action phases, animation and completion script.
 #define H(o) (*(u16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))
@@ -31,144 +31,157 @@ static inline u32 held(u8 *p, u32 mask)
 }
 // confidence=low: sibling of timed charge action with reversed hold gating and a pulsing overlay.
 #define Player_UpdateTimedChargePulse sub_08155D58
+inline static u32 Arg1(u32 k_, u8 *p)
+{
+    return p + k_;
+}
+
 void Player_UpdateTimedChargePulse(u8 *actor)
 {
     u8 *p = actor;
     Player_AddControlFlags(p, 8);
-    switch (B(0x458)) {
+    switch (*((u8 *)(p + 0x458))) {
         case 0:
-            Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 0), 64, 1);
-            if (*(u16 *)(W(0x348) + 2) & 1)
+            Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 0), 64, 1);
+            if ((*((u16 *)((*((u32 *)(p + 0x348))) + 2))) & 1)
                 ActorSequence_Begin(p, 7, 1);
             break;
+
         case 1: {
             u16 *frame = (u16 *)(p + 0x45A);
-            if (!*frame) {
-                B(0x3A4) = 4;
-                B(0x3A2) = 1;
-                B(0x3A3) = 0;
+            if (!(*frame)) {
+                *((u8 *)(p + 0x3A4)) = 4;
+                *((u8 *)(p + 0x3A2)) = 1;
+                *((u8 *)(p + 0x3A3)) = 0;
                 Player_SetActionOrigin(p);
                 (*frame)++;
             }
-            H(0x6FC) = 15;
-            if (!Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 8), 64, 1))
+            *((u16 *)(p + 0x6FC)) = 15;
+            if (!Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 8), 64, 1))
                 break;
             Sound_PlaySong(203);
-            if (!(*(u16 *)W(0x348) & 1))
+            if (!((*((u16 *)(*((u32 *)(p + 0x348))))) & 1))
                 goto release;
             if (!held(p, 16)) {
                 Sound_PlaySong(0x239);
-                B(0x4FD) = 1;
-                H(0x4F8) = 0;
+                *((u8 *)(p + 0x4FD)) = 1;
+                *((u16 *)(p + 0x4F8)) = 0;
                 ActorSequence_Begin(p, 7, 2);
                 break;
             }
-            H(0x4F8) = 0;
+            *((u16 *)(p + 0x4F8)) = 0;
             goto pause;
         }
+
         case 2: {
             u16 *count = (u16 *)(p + 0x4F8);
-            W(0x20) |= 160;
-            if (*count <= 4) {
-                if (++*count == 5)
+            *((u32 *)(p + 0x20)) |= 160;
+            if ((*count) <= 4) {
+                if ((++(*count)) == 5)
                     Sound_PlaySong(0x239);
             }
-            Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 9), 64, 1);
-            H(0x6FC) = 30;
+            Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 9), 64, 1);
+            *((u16 *)(p + 0x6FC)) = 30;
             ConvergingEffects_EmitFarParticle(p, p + 0xA80);
-            H(0xAD6) = 0x16F;
-            if (H(0x45A) <= 31)
-                H(0xAD8) = H(0x45A);
+            *((u16 *)(p + 0xAD6)) = 0x16F;
+            if ((*((u16 *)(p + 0x45A))) <= 31)
+                *((u16 *)(p + 0xAD8)) = *((u16 *)(p + 0x45A));
             else
-                H(0xAD8) = 64 - H(0x45A);
-            if (++H(0x45A) > 64)
-                H(0x45A) = 0;
-
-            if (!(*(u16 *)W(0x348) & 1)) {
+                *((u16 *)(p + 0xAD8)) = 64 - (*((u16 *)(p + 0x45A)));
+            if ((++(*((u16 *)(p + 0x45A)))) > 64)
+                *((u16 *)(p + 0x45A)) = 0;
+            if (!((*((u16 *)(*((u32 *)(p + 0x348))))) & 1)) {
                 Sound_StopSong(0x239);
-                B(0x4FD) = 0;
+                *((u8 *)(p + 0x4FD)) = 0;
                 goto release;
             }
             if (held(p, 16)) {
                 Sound_StopSong(0x239);
-                B(0x4FD) = 0;
+                *((u8 *)(p + 0x4FD)) = 0;
             pause:
                 ActorSequence_Begin(p, 7, 3);
+
                 goto end;
             }
             {
-                u32 elapsed = (u16)(4 + H(0x52A));
-                H(0x52A) = elapsed;
-                if (elapsed >= H(0x52C)) {
+                u32 elapsed = (u16)(4 + (*((u16 *)(p + 0x52A))));
+                *((u16 *)(p + 0x52A)) = elapsed;
+                if (elapsed >= (*((u16 *)(p + 0x52C)))) {
                     u32 script;
                     Hud_ClearTimer();
-                    B(0x458) = 5;
-                    script = W(0x5A4);
+                    *((u8 *)(p + 0x458)) = 5;
+                    script = *((u32 *)(p + 0x5A4));
                     if (script) {
                         s32 value;
                         struct Call call;
                         call.count = 1;
                         call.values = &value;
                         value = 1;
-                        W(0x5A4) = 0;
+                        *((u32 *)(p + 0x5A4)) = 0;
                         Script_Call(script, &call);
                     }
                 }
                 break;
             }
         }
+
         case 3:
-            W(0x20) |= 128;
-            Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 10), 64, 1);
-            H(0x6FC) = 30;
-            if (!(*(u16 *)W(0x348) & 1)) {
+            *((u32 *)(p + 0x20)) |= 128;
+            Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 10), 64, 1);
+            *((u16 *)(p + 0x6FC)) = 30;
+            if (!((*((u16 *)(*((u32 *)(p + 0x348))))) & 1)) {
             release:
                 ActorSequence_Begin(p, 7, 4);
+
                 break;
             }
             if (!held(p, 16)) {
                 Sound_PlaySong(0x239);
-                B(0x4FD) = 1;
-                H(0x4F8) = 0;
+                *((u8 *)(p + 0x4FD)) = 1;
+                *((u16 *)(p + 0x4F8)) = 0;
                 ActorSequence_Begin(p, 7, 2);
             }
             break;
+
         case 4:
-            H(0x6FC) = 15;
-            if (Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 11), 64, 1)) {
+            *((u16 *)(p + 0x6FC)) = 15;
+            if (Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 11), 64,
+                                    1)) {
                 Player_UpdateFacingSide(p);
                 ActorSequence_Begin(p, 7, 0);
             }
             break;
+
         case 5:
-            H(0xAD6) = 0x16F;
-            if (H(0x45A) <= 31)
-                H(0xAD8) = H(0x45A);
+            *((u16 *)(p + 0xAD6)) = 0x16F;
+            if ((*((u16 *)(p + 0x45A))) <= 31)
+                *((u16 *)(p + 0xAD8)) = *((u16 *)(p + 0x45A));
             else
-                H(0xAD8) = 64 - H(0x45A);
-            if (++H(0x45A) > 64)
-                H(0x45A) = 0;
-            Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 9), 64, 1);
-            H(0x6FC) = 30;
+                *((u16 *)(p + 0xAD8)) = 64 - (*((u16 *)(p + 0x45A)));
+            if ((++(*((u16 *)(p + 0x45A)))) > 64)
+                *((u16 *)(p + 0x45A)) = 0;
+            Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 9), 64, 1);
+            *((u16 *)(p + 0x6FC)) = 30;
             ConvergingEffects_EmitFarParticle(p, p + 0xA80);
             break;
     }
+
 end:
-    if (B(0x458) != 5) {
-        if (!--H(0x528)) {
+    if ((*((u8 *)(p + 0x458))) != 5) {
+        if (!(--(*((u16 *)(p + 0x528))))) {
             u32 script;
             Hud_ClearTimer();
             Sound_StopSong(0x239);
             Player_UpdateFacingSide(p);
             PlayerCue_EnterStandUpdate(p);
-            script = W(0x5A4);
+            script = *((u32 *)Arg1(0x5A4, p));
             if (script) {
                 s32 value;
                 struct Call call;
                 call.count = 1;
                 call.values = &value;
                 value = 0;
-                W(0x5A4) = 0;
+                *((u32 *)(p + 0x5A4)) = 0;
                 Script_Call(script, &call);
             }
         }

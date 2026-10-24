@@ -47,7 +47,7 @@ static inline void SetControlWords(struct SceneActorRegistryResetView *actor, vo
         *flags = 1;
     }
 }
-void sub_080B03BC(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_WaitForRouteResult(struct SceneActorRegistryResetView *actor)
 {
     u8 busy;
     u8 zero;

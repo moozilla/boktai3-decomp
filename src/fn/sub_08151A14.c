@@ -2,7 +2,7 @@
 #include "player.h"
 
 #ifdef NONMATCHING
-// fuzzy: 87.4%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: tentative cue role inferred from named callers and callback behavior.
 
@@ -42,10 +42,13 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
                     dir = Arg2(1, p);
                 else
                     dir = p->facing + 1;
-                p->facing = dir & 7;
-                Player_UpdateFacingSide(p);
-                p->heading--;
-                p->tetherFrame = 0;
+                {
+                    typeof(p->facing) *q1 = &p->facing;
+                    *q1 = dir & 7;
+                    Player_UpdateFacingSide(p);
+                    p->heading--;
+                    p->tetherFrame = 0;
+                }
             } else
                 p->tetherFrame++;
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x37), 0x40, 1);
@@ -140,6 +143,7 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
             gUnk_02000528 = n;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateTurningPalette);
 #endif

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 struct SlimeReactionContext {
     u8 unknown0[0x3d4];
@@ -9,7 +8,6 @@ struct SlimeReactionContext {
     u16 flags;
 };
 extern u32 gUnk_03005308;
-extern const u16 gUnk_0203B400[];
 void Slime_EmitTargetedReactionBurst(void *), Slime_RunPendingActionScript(void *),
     SceneActorControl_OnIdle(void);
 static inline void Clear(u16 *p, u32 mask)
@@ -58,25 +56,18 @@ static inline u32 CollisionFlags(struct ContactCollider *p)
 {
     return p->statRewardFlags;
 }
-struct ReactionBits {
-    u16 motion, status;
-    u32 unknown4, damage;
-};
-static inline u32 MaskedDamage(struct ReactionBits *bits, u32 flags, u32 mask)
+static inline u32 MaskedDamage(struct SceneActorRegistryResetView *actor, u32 flags, u32 mask)
 {
-    return bits->damage & flags & mask;
+    return actor->field2DC & flags & mask;
 }
 static inline u32 Mask16(u16 *p, u32 mask)
 {
     return *p & mask;
 }
-static inline u32 DamageFlags(struct SceneActorRegistryResetView *actor)
+static inline u32 DamageFlags(struct SceneActorRegistryResetView *actor, u32 offset)
 {
-    return actor->field2DC;
+    return *(u32 *)((u8 *)actor + offset);
 }
-#ifdef NONMATCHING
-// fuzzy: 96.6%
-// Remaining differences: reaction-field addressing, split-script offset reuse, and register allocation.
 // confidence=low: reaction callback chooses split/idle/recovery states after damage.
 u32 Slime_ResolveDamageReaction(struct SceneActorRegistryResetView *actor)
 {
@@ -84,6 +75,7 @@ u32 Slime_ResolveDamageReaction(struct SceneActorRegistryResetView *actor)
     u16 *motionFlags;
     u32 zero;
     u32 damage;
+    u32 damageFlagsOffset;
     if (actor->reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
     else
@@ -92,8 +84,9 @@ u32 Slime_ResolveDamageReaction(struct SceneActorRegistryResetView *actor)
         Slime_EmitTargetedReactionBurst(actor);
     Clear(&actor->flags2D4, ~0x20);
     context->timer += 80;
-    damage = MaskedDamage((void *)&actor->flags2D4, CollisionFlags(&actor->colliderA), 0x7f);
+    damage = MaskedDamage(actor, CollisionFlags(&actor->colliderA), 0x7f);
     motionFlags = &actor->flags2D4;
+    damageFlagsOffset = (u32) & ((struct SceneActorRegistryResetView *)0)->field2DC;
     if (damage == 0 && context->splitScript) {
         if (actor->health < context->healthThreshold)
             Slime_RunPendingActionScript(actor);
@@ -101,14 +94,13 @@ u32 Slime_ResolveDamageReaction(struct SceneActorRegistryResetView *actor)
             u32 index = (gUnk_03005308 + 1) & 1023;
             gUnk_03005308 = index;
             {
-                s32 random = *(const u8 *)((u32)gUnk_0203B400 + index * 2);
-                asm("" : "+r"(random));
+                s32 random = *(const u8 *)(RANDOM_TABLE_ADDR + index * 2);
                 if (random <= 24)
                     Slime_RunPendingActionScript(actor);
             }
         }
     }
-    if ((DamageFlags(actor) & 0x40000)) {
+    if ((DamageFlags(actor, damageFlagsOffset) & 0x40000)) {
         ClearReaction(&actor->flags2D6, ~0x980);
         SetControl(actor, actor->reactionTarget230, 0x12);
         SetState(actor, 3, 0, 0);
@@ -126,7 +118,3 @@ u32 Slime_ResolveDamageReaction(struct SceneActorRegistryResetView *actor)
     }
     return 1;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Slime_ResolveDamageReaction);
-#endif

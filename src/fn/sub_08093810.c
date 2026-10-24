@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 82.4%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences include stack-vector addressing, waypoint address reuse and registers.
 #include "scene_actor_reaction.h"
@@ -112,7 +112,10 @@ void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
         Control(actor, actor->entryTarget228, 1);
         body[0x428] = 0;
         if (Test(*((u32 *)(body + k1)), 8)) {
-            Polar(&buf.dest, ((*(((u8 *)actor) + 0xE9)) + ((Rand() & 63) + 128)) & 255, 320);
+            {
+                u8 k2 = 128;
+                Polar(&buf.dest, ((*(((u8 *)actor) + 0xE9)) + ((Rand() & 63) + k2)) & 255, 320);
+            }
             *((u32 *)(body + k1)) &= ~8;
             {
                 s32 variant = Bee_GetMovementVariant(actor);
@@ -136,8 +139,11 @@ void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
     if (((*((s16 *)(body + 0x43A))) > 0) &&
         (((buf.delta.x * buf.delta.x) + (buf.delta.z * buf.delta.z)) > 1024)) {
         s32 steps = Shift(*((s16 *)(body + 0x43A)), 5);
-        if (steps < 1)
-            steps = 1;
+        {
+            u8 k3 = 1;
+            if (steps < k3)
+                steps = 1;
+        }
         *((u16 *)(((u8 *)actor) + 0x64)) +=
             Div((*((s16 *)((body + 0x3E0) + (body[0x428] * 8)))) - actor->position.x, steps);
         *((u16 *)(((u8 *)actor) + 0x68)) +=
@@ -173,6 +179,7 @@ void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
             State(actor, 2, 2);
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Bee_FollowWanderRoute);
 #endif

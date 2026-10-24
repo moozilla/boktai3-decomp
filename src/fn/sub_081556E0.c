@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 90.6%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: inferred from player cue phases and animation consumers.
 
@@ -51,6 +51,7 @@ static inline u32 Arg2(u32 k_, const u16 *frame)
 
 void Player_UpdateStateMotionCue(u8 *p)
 {
+    u32 t1;
     if (!(*((u16 *)(p + 0x45A)))) {
         Sound_PlaySong(490);
         if (*((u16 *)(p + 0x530)))
@@ -58,7 +59,7 @@ void Player_UpdateStateMotionCue(u8 *p)
         else if ((*((s32 *)((gUnk_02000710 + ((*((u8 *)(p + 0x472))) * 4)) + 0x628))) > 0)
             *((u16 *)(p + 0xC6)) = 46;
         else if (Event(p, 0x10000000))
-            *((u16 *)(p + 0xC6)) = 0x179;
+            *((u16 *)(p + 0xC6)) = (t1 = 0x179);
         else if (p && ((*((s32 *)(p + 0x444))) < 0))
             *((u16 *)(p + 0xC6)) = 0x175;
         else if (Extra(p, 1))
@@ -66,7 +67,7 @@ void Player_UpdateStateMotionCue(u8 *p)
         else if (Event(p, 0x40000000))
             *((u16 *)(p + 0xC6)) = 0x178;
         else if (Event(p, 0x20000000))
-            *((u16 *)(p + 0xC6)) = 0x176;
+            *((u16 *)(p + 0xC6)) = t1 - 3;
         else
             *((u16 *)(p + 0xC6)) = 51;
     }
@@ -130,6 +131,7 @@ void Player_UpdateStateMotionCue(u8 *p)
         *((u8 *)(p + 0x5A3)) = 1;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Player_UpdateStateMotionCue);
 #endif

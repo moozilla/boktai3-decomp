@@ -28,20 +28,22 @@ void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 // confidence=low: script command that applies item 'E' to the actor: kind 5 starts a timed
 // effect (duration from 't' or valueB seconds), kind 1 heals valueA percent of max HP and shows
 // the amount.
-#ifdef NONMATCHING
-// fuzzy: 77.3%
-// Only register allocation differs: the ROM keeps the actor in r5 and the item definition in r6.
+// MATCHING_CONCESSION: register-pinning
+#define ITEM_USER_OFFSET(field) ((u32) & ((struct ItemUser *)0)->field)
 void sub_0815A73C(void)
 {
     struct ItemUser *p;
-    s32 item, value;
+    s32 item;
+    s32 value;
     const struct ItemDef *def;
+    const struct ItemDef *table;
     s32 i = Script_GetActorIndex();
     p = gUnk_02000580[i];
-    if (p == NULL || !Script_SeekToKeyword(0x45))
+    if ((p == ((void *)0)) || (!Script_SeekToKeyword(0x45)))
         return;
     item = Script_GetValue();
-    def = &gUnk_08E61280[item];
+    table = gUnk_08E61280;
+    def = table + item;
     if (def->actionKind == 5) {
         if (Script_SeekToKeyword(0x74))
             value = Script_GetValue();
@@ -51,15 +53,24 @@ void sub_0815A73C(void)
         p->effectTimer = value;
         p->effectItem = item;
     } else if (def->actionKind == 1) {
-        u16 *maxHealth = &p->maxHealth;
+        register u32 maxHealthOffset asm("r1") = ITEM_USER_OFFSET(maxHealth);
+        u16 *maxHealth;
         u16 *health;
-        s32 amount = Div(*maxHealth * def->valueA, 100);
-        health = &p->health;
-        if (*health + amount > *maxHealth) {
-            amount = *maxHealth - *health;
+        register u32 healthOffset asm("r2");
+        s32 amount;
+        // Keep the field offset in its assigned register and the actor live here.
+        asm("" : "+r"(maxHealthOffset) : "r"(p));
+        maxHealth = (u16 *)((u8 *)p + maxHealthOffset);
+        amount = Div((*maxHealth) * def->valueA, 100);
+        healthOffset = ITEM_USER_OFFSET(health);
+        // Preserve the field offset register across address formation.
+        asm("" : "+r"(healthOffset));
+        health = (u16 *)((u8 *)p + healthOffset);
+        if (((*health) + amount) > (*maxHealth)) {
+            amount = (*maxHealth) - (*health);
             *health = *maxHealth;
         } else
-            *health = *health + amount;
+            *health = (*health) + amount;
         if (amount > 0)
             DamageNumberDisplay_Show(p->collider, amount, 1, p->position, p->numberOffset, 0);
     } else
@@ -67,6 +78,3 @@ void sub_0815A73C(void)
     p->cooldown = 0x16E;
     p->cooldownFrames = 0x30;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0815A73C);
-#endif

@@ -1,5 +1,5 @@
 #ifdef NONMATCHING
-// fuzzy: 67.3%
+// fix.py best (sweep after the inlined-insn fix)
 // Allocation and projection/animation scheduling still differ; reviewed extent is 1112 bytes.
 #include "scene_arc.h"
 s32 __divsi3(s32, s32);
@@ -48,17 +48,19 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
     u32 paused;
     if (frame <= duration) {
         u32 remainder = duration - frame;
-        s32 lift, terrain;
+        s32 lift;
+        s32 terrain;
         sprite = &slot->sprite;
         slot->position.x =
-            __divsi3((slot->target.x >> 12) * frame + (slot->start.x >> 12) * remainder, duration)
+            __divsi3(((slot->target.x >> 12) * frame) + ((slot->start.x >> 12) * remainder),
+                     duration)
             << 12;
         slot->position.y =
-            __divsi3((slot->target.y >> 12) * frame + (slot->start.y >> 12) * remainder,
+            __divsi3(((slot->target.y >> 12) * frame) + ((slot->start.y >> 12) * remainder),
                      slot->flightDuration)
             << 12;
         slot->position.z =
-            __divsi3((slot->target.z >> 12) * frame + (slot->start.z >> 12) * remainder,
+            __divsi3(((slot->target.z >> 12) * frame) + ((slot->start.z >> 12) * remainder),
                      slot->flightDuration)
             << 12;
         lift = SignedShift(
@@ -82,10 +84,10 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
         u32 interval = duration - slot->endFrame;
         struct ArcDirection direction;
         struct SceneVec velocity;
-        s32 angle, terrain;
+        s32 angle;
+        s32 terrain;
         sprite = &slot->sprite;
         direction.x = (slot->target.x >> 12) - (slot->start.x >> 12);
-        /* Original consumes target.y without shifting here. */
         direction.y = slot->target.y - (slot->start.y >> 12);
         direction.z = (slot->target.z >> 12) - (slot->start.z >> 12);
         angle = Math_Atan2(direction.x, direction.z);
@@ -133,15 +135,18 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
     {
         struct SceneArcAnimation *animation = &slot->animation;
         const u16 *key = &animation->data[animation->frame];
-        u32 one = 1, two;
-        u32 limit, rate, flags, next;
-        sprite->frame = *key >> 6;
-        if ((animation->flags & one) != ((*key >> 4) & one))
+        u32 two;
+        u32 limit;
+        u32 rate;
+        u32 flags;
+        u32 next;
+        sprite->frame = (*key) >> 6;
+        if ((animation->flags & 1) != (((*key) >> 4) & 1))
             sprite->flags |= 4;
         else
             sprite->flags &= ~4;
         two = 2;
-        if ((u8)(animation->flags & two) != ((*key >> 4) & two))
+        if (((u8)(animation->flags & two)) != (((*key) >> 4) & two))
             sprite->flags |= 8;
         else
             sprite->flags &= ~8;
@@ -177,7 +182,8 @@ void SceneArc_UpdateSlot(struct SceneArcManager *manager, struct SceneArcSlot *s
             }
         newFrame:
             key = &animation->data[animation->frame];
-            animation->factor = *key & 15;
+
+            animation->factor = (*key) & 15;
             animation->rate = (animation->scale * animation->factor) >> 6;
             if (!animation->rate)
                 animation->rate = 1;

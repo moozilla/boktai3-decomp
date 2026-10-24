@@ -1,10 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 93.6%
-// fix.py best version (reprinted C)
-// Open: the seed address takes r7 for the first sample, so the 0x1f mask is rematerialized
-// instead of shared in r7, and the parameter-pointer spill is set up later than in the ROM.
 #include "scene_vec.h"
 #define gRandomIndex gUnk_03005308
 struct SceneScriptBurstObject {
@@ -24,6 +18,11 @@ static inline s32 Sample(u32 table, u32 index)
 {
     return *(const u16 *)(index * 2 + table);
 }
+static inline s32 AdvanceAndSample(u32 *table, u32 index)
+{
+    *table += index * 2;
+    return *(const u16 *)*table;
+}
 static inline s32 PaletteIndex(s32 state, s32 parameter)
 {
     if (state <= 1) {
@@ -36,25 +35,30 @@ static inline s32 PaletteIndex(s32 state, s32 parameter)
 void SceneScriptObject_UpdateBurst(struct SceneScriptBurstObject *object)
 {
     struct SceneVec velocity;
-    u16 index;
+    u32 index;
     u16 counter;
     if (object->counter == 0) {
-        register s32 i asm("r6") = 0;
-        s16 *statePtr = &object->state;
-        struct SceneVec *position = &object->position;
-        register u32 mask asm("r8") = 0x3ff;
-        struct SceneVec *v = &velocity;
-        s16 *parameterPtr = &object->parameter;
-        register s32 zero asm("r5") = 0;
+        s32 i = 0;
+        s16 *statePtr;
+        struct SceneVec *position;
+        u32 mask;
+        struct SceneVec *v;
+        s16 *parameterPtr;
+        s32 zero;
+        statePtr = &object->state;
+        parameterPtr = &object->parameter;
+        position = &object->position;
+        mask = 0x3ff;
+        v = &velocity;
+        zero = 0;
         do {
             s32 kind = (i & 1) ? (0x400) : (0x200);
             u32 table = 0x0203B400;
             s32 x;
             s32 y;
             s32 z;
-            register u32 index asm("r1");
+            u16 index;
             s32 threshold;
-            asm("" : "+r"(table) : "r"(index));
             index = (gUnk_03005308 + 1) & mask;
             x = (Sample(table, index) >> 4) & 0x1f;
             index = (index + 1) & mask;
@@ -69,7 +73,7 @@ void SceneScriptObject_UpdateBurst(struct SceneScriptBurstObject *object)
             v->z = z;
             index = (index + 1) & mask;
             gUnk_03005308 = index;
-            threshold = ((Sample(table, index) >> 4) & 0x7f) + 0x20;
+            threshold = ((AdvanceAndSample(&table, index) >> 4) & 0x7f) + 0x20;
             sub_08127590(position, &velocity, 0x83A6, 0x99CB, *statePtr, threshold, kind, zero,
                          PaletteIndex(*statePtr, *parameterPtr), zero, i & 1, zero, zero, zero,
                          zero);
@@ -84,6 +88,3 @@ void SceneScriptObject_UpdateBurst(struct SceneScriptBurstObject *object)
     else
         object->counter++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneScriptObject_UpdateBurst);
-#endif

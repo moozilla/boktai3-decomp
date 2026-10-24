@@ -1,7 +1,7 @@
 #include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 71.5%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 static inline s32 Direction(s32 x)
 {
@@ -11,7 +11,7 @@ u8 sub_0812E118(s32, s32, s32, s32);
 // Branch layout, pointer lifetimes and register allocation still differ.
 // confidence=low: searches along the facing direction and starts a reachable route.
 #define Dog_TryFacingRoute sub_080DEF78
-u8 Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
+void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
 {
     struct ContactPosition target;
     u8 *context = a->context;
@@ -88,10 +88,13 @@ u8 Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
             break;
     } while ((++tries) <= 3);
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    if (((u8)gUnk_0203B400[gUnk_03005308]) <= 127)
-        context[k1] = 1;
-    else
-        context[k1] = 0;
+    {
+        s32 k2 = 127;
+        if (((u8)gUnk_0203B400[gUnk_03005308]) <= k2)
+            context[k1] = 1;
+        else
+            context[k1] = 0;
+    }
     a->direction = saved;
     {
         s32 x = Mod(selected, *((s16 *)(gUnk_030052F4->cells + 4)));
@@ -108,11 +111,12 @@ u8 Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
     }
     if (Chase_TryRoute(a, *((void **)(group + 0x1FC)), &a->position, &target)) {
         context[0x6A7]++;
-        return 1;
+        return;
     }
     Callback_InvokeActor(a, *((void **)(group + 0x224)));
-    return 0;
+    return;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080DEF78);
 #endif

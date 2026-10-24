@@ -3,7 +3,7 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
-// fuzzy: 80.3%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 #define gPlayerSlotFlags gUnk_02000560
 // Open: mostly register allocation (ROM: actor r5, group sl, flags2D4 pointer r8,
@@ -162,6 +162,34 @@ static inline void ResetControl(struct SceneActorRegistryResetView *actor, u32 *
 }
 
 // confidence=low: scene actor starts reacting to its link-player target: drops the target, enters state 3 with RestoreAfterDelay, then walks to the route point.
+static inline u32 CellHeight_0813727C(u32 cell, struct ContactPosition *position)
+{
+    u32 shape;
+    u32 height;
+    u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
+    if (data)
+        data += 4;
+    else {
+        struct EngineMap *map = gUnk_030052F4;
+        u32 offset = cell * 4 + 12;
+        data = map->cells + offset;
+    }
+    shape = *data >> 4;
+    height = (*data & 15) << 8;
+    if (shape == 1)
+        goto slopeZ;
+    if (shape == 2)
+        goto slopeX;
+    goto done;
+slopeZ:
+    height -= *((u8 *)position + 4);
+    goto done;
+slopeX:
+    height -= *(u8 *)position;
+done:
+    return height;
+}
+
 u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
 {
     u8 *group;
@@ -177,6 +205,7 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
     struct SceneActorRegistryControl *control;
     u32 bit;
     s8 k1 = 0x10;
+    u32 k2;
     if (IsUnavailable(actor))
         return 0;
     motion = (struct SceneActorReactionMotion *)(&actor->fieldDC);
@@ -215,11 +244,15 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
     {
         u8 *saved = group + 0x8C;
         void *callback = actor->entryTarget228;
-        *((u32 *)(((u8 *)saved) + 0xC)) = 30;
-        *((void **)(((u8 *)saved) + k1)) = callback;
-        saved[8] = 0;
-        saved[9] = 0;
-        saved[10] = 7;
+        {
+            typeof(*((u32 *)(((u8 *)saved) + (k2 = 0xC)))) *q1 = &(*((u32 *)(((u8 *)saved) + k2)));
+            u8 z1 = 0;
+            *q1 = 30;
+            *((void **)(((u8 *)saved) + k1)) = callback;
+            saved[8] = z1;
+            saved[9] = z1;
+            saved[10] = 7;
+        }
     }
     control = &actor->group.control;
     ResetControl(actor, flags2CC, flagsp, control);
@@ -229,7 +262,7 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
         struct RouteLink *link = (void *)(&actor->route);
         dest->x = link->point->x;
         dest->z = link->point->z;
-        dest->y = CellHeight(CellIndex(dest), dest);
+        dest->y = CellHeight_0813727C(CellIndex(dest), dest);
     }
     bit = 0x200;
     (*((struct ContactPosition **)(((u8 *)group) + bit)))->pad = 1;
@@ -254,6 +287,7 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
     }
     return 1;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0813727C);
 #endif

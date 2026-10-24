@@ -48,7 +48,7 @@ import build  # noqa: E402
 import check  # noqa: E402
 from romlib import ROOT, load_rom, off  # noqa: E402
 
-INSTR = os.path.join(ROOT, "build", "agbcc-instr", "gcc", "agbcc")
+INSTR = os.path.join(ROOT, "build", "scope", "agbcc", "gcc", "agbcc")  # tools/scope/build_agbcc.sh
 PASSES = ["rtl", "jump", "cse", "addressof", "gcse", "loop", "cse2", "flow", "combine", "regmove",
           "lreg", "greg", "jump2", "mach"]
 PASS_NOTE = {"greg": "greg/reload", "mach": "mach (late split/reorg)"}
@@ -181,7 +181,7 @@ def resolve_knobs(src, func, env):
 
 def compile_draft(src, func, env=None):
     """Compile with the instrumented agbcc; return (bytes, address, info) for FUNC.
-    ENV adds knob settings (CSE_NOCANON=N, AGBCC_FORCE=..., see tools/agbcc-instr.sh)."""
+    ENV adds knob settings (CSE_NOCANON=N, AGBCC_FORCE=..., see tools/scope/build_agbcc.sh)."""
     env = resolve_knobs(src, func, env)
     wd = workdir(func)
     defines = build.DEFINES + ["-DNONMATCHING"]

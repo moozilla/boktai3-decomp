@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.8%
-// foundry draft (worker best 92.0%); what differs is mostly register allocation and instruction order
 #define gActorDisplayCamera gUnk_020004B8
 struct WorldPosition {
     s32 x, y, z;
@@ -61,6 +58,7 @@ void ActorDisplay_UpdateScreenAnchor(struct ActorDisplay *actor)
         struct PackedAnchor anchor;
         anchor.x = actor->position.x;
         anchor.y = actor->position.y;
+        anchor.z = 0;
         actor->screen.x = anchor.x;
         actor->screen.y = 0;
     }
@@ -74,6 +72,3 @@ void ActorDisplay_UpdateScreenAnchor(struct ActorDisplay *actor)
         BgGfx_LoadTilemapAtPosition(3, origin - x, 88 - actor->verticalOffset);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ActorDisplay_UpdateScreenAnchor);
-#endif

@@ -6,7 +6,7 @@ u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 // confidence=low: selects a route return phase from motion and route flags.
 #define SceneActorRoute_UpdateContactRecovery sub_081314E8
 #ifdef NONMATCHING
-// fuzzy: 77.1%
+// fix.py best (sweep after the inlined-insn fix)
 /* Flag lifetimes, partial-vector scheduling and repeated control tails still differ. */
 static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind,
                                 u32 zero)
@@ -101,7 +101,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route
 }
 void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *actor)
 {
-    register u8 *group asm("sl") = (u8 *)&actor->group;
+    register u8 *group asm("sl") = (u8 *)(&actor->group);
     u8 result;
     u16 *motionFlags;
     asm("" : "+r"(group));
@@ -131,30 +131,38 @@ void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *a
         return;
     if (FlagsSave(actor, 0x1000, &motionFlags)) {
         struct ContactPosition delta;
-        struct ContactPosition *p = (void *)(*(u8 **)FIELD(group, 0x88, void *) + 0xC);
+        struct ContactPosition *p =
+            (void *)((*((u8 **)(*((void **)(((u8 *)group) + 0x88))))) + 0xC);
         SceneActorTerrain_Subtract(&delta, p, &actor->position);
-        if ((u32)(delta.x * delta.x + delta.z * delta.z) <= 0xFFFE) {
-            BeginControl(actor, FIELD(group, 0x238, void *), 0x19, result);
+        if (((u32)((delta.x * delta.x) + (delta.z * delta.z))) <= 0xFFFE) {
+            BeginControl(actor, *((void **)(((u8 *)group) + 0x238)), 0x19, result);
             {
                 u32 state = 3;
                 u8 *field = &actor->state2A8;
                 *field = state;
             }
-            actor->phase2A9 = 1;
-            actor->behavior2AA = 0;
-            actor->counter2AC = result;
-            actor->field2B1 = 1;
-            return;
+            {
+                typeof(actor->phase2A9) *q1 = &actor->phase2A9;
+                u8 z1 = 0;
+                *q1 = 1;
+                actor->behavior2AA = z1;
+                actor->counter2AC = result;
+                {
+                    typeof(actor->field2B1) *q2 = &actor->field2B1;
+                    *q2 = 1;
+                }
+                return;
+            }
         }
     }
     if (actor->counter2AC == 30) {
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
-        if (*motionFlags & 0x1000) {
-            Callback_InvokeActor(actor, FIELD(group, 0x244, void *));
+        if ((*motionFlags) & 0x1000) {
+            Callback_InvokeActor(actor, *((void **)(((u8 *)group) + 0x244)));
             return;
         }
     }
-    if ((s32)actor->counter2AC > 60) {
+    if (((s32)actor->counter2AC) > 60) {
         u32 destinationOffset;
         struct ContactPosition **destination;
         State(actor, 7, 0);
@@ -162,9 +170,9 @@ void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *a
         destinationOffset = 0x200;
         destination = (void *)(group + destinationOffset);
         (*destination)->pad = 1;
-        if (!TryRoute(actor, FIELD(group, 0x1FC, void *), &actor->position, *destination,
+        if (!TryRoute(actor, *((void **)(((u8 *)group) + 0x1FC)), &actor->position, *destination,
                       motionFlags, destinationOffset)) {
-            Callback_InvokeActor(actor, FIELD(group, 0x224, void *));
+            Callback_InvokeActor(actor, *((void **)(((u8 *)group) + 0x224)));
             return;
         }
         if (actor->flags2CC & 0x200000) {
@@ -176,8 +184,8 @@ void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *a
             }
             *motionFlags &= ~0x200;
             control[0xA] = 0;
-            FIELD(control, 0x18, u32) = 0;
-            FIELD(control, 8, u16) = 0;
+            *((u32 *)(((u8 *)control) + 0x18)) = 0;
+            *((u16 *)(((u8 *)control) + 8)) = 0;
         }
     } else
         actor->counter2AC++;

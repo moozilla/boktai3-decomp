@@ -33,27 +33,27 @@ static inline void add(struct BurstVector *d, struct BurstVector *a, struct Burs
     d->y = b->y + a->y;
     d->z = b->z + a->z;
 }
-static inline s32 randomValue(void)
+static inline s32 randomValue(const u16 *table)
 {
     u32 offset;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
-    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+    return *(const u16 *)(offset + (u32)table);
 }
-#ifdef NONMATCHING
-// Remaining differences: redundant angle mask, table load and argument-copy order.
-void Hresvelgr_GetTravelTarget(struct BurstActor *actor, struct BurstVector *out)
+// MATCHING_CONCESSION: register-pinning
+void Hresvelgr_GetTravelTarget(struct BurstActor *object, struct BurstVector *out)
 {
+    struct BurstActor *actor = object;
     if (out) {
-        s32 radius = (randomValue() >> 3) % 512 + 256;
-        s32 sample = randomValue();
-        s32 angle = ((actor->side << 6) + ((sample >> 3) % 32 + 112)) & 255;
+        register const u16 *table asm("r4") = gUnk_0203B400;
+        s32 radius = (randomValue(table) >> 3) % 512 + 256;
+        s32 sample = randomValue(table);
+        s32 base = actor->side << 6;
+        s32 offset = (sample >> 3) % 32 + 112;
+        s32 angle = base + offset;
+        angle &= 255;
         polar(out, angle, radius);
         add(out, actor->target, out);
         out->y = 832;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_GetTravelTarget);
-#endif

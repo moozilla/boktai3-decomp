@@ -122,7 +122,11 @@ class Draft:
         return "\n".join(out)
 
     def score(self, fn=None, helpers=None):
-        mine = atlas.texts_of(self.source(fn, helpers))
+        return self.score_source(self.source(fn, helpers))
+
+    def score_source(self, src):
+        """(differing insns, first divergence, differences beyond registers) of a whole source."""
+        mine = atlas.texts_of(src)
         if mine is None:
             return None
         regs = atlas.regions(self.rom, mine)
@@ -141,24 +145,43 @@ class Draft:
     def materialize(self, fn, helpers):
         """The source file with FN and the edited HELPERS written back."""
         text = self.text
+        # a header's helper edited: local copies under other names of it and of the header helpers
+        # that reach it from the function (Chase_SnapToRoute -> Chase_Height -> Chase_CellAt)
+        header = {n for n in self.helpers if not find_def(text, n)}
+        copies = {n for n in helpers if n in header}
+        grew = bool(copies)
+        while grew:
+            grew = False
+            for n in header - copies:
+                if any(isinstance(c, ca.FuncCall) and isinstance(c.name, ca.ID) and c.name.name in copies
+                       for c, _, _ in rewrites.walk(helpers.get(n, self.helpers[n]))):
+                    copies.add(n)
+                    grew = True
+
+        def renamed(node):
+            node = __import__("copy").deepcopy(node)
+            for c, _, _ in rewrites.walk(node):
+                if isinstance(c, ca.FuncCall) and isinstance(c.name, ca.ID) and c.name.name in copies:
+                    c.name.name += "_"
+            return node
+        if copies:
+            fn = renamed(fn)
+            order = [h for _, h in self.segments]
+            for name in sorted(copies, key=order.index):
+                h2 = renamed(helpers.get(name, self.helpers[name]))
+                h2.decl.name = name + "_"
+                h2.decl.type.type.declname = name + "_"
+                span = find_def(text, self.src_name)
+                text = text[:span[0]] + ast_util.to_c(h2).strip() + "\n\n" + text[span[0]:]
         for name, h in helpers.items():
+            if name in copies:
+                continue
             span = find_def(text, name) if name in self.helpers else None
             if name not in self.helpers:  # a new helper: before the function
                 span = find_def(text, self.src_name)
-                text = text[:span[0]] + ast_util.to_c(h).strip() + "\n\n" + text[span[0]:]
+                text = text[:span[0]] + ast_util.to_c(renamed(h)).strip() + "\n\n" + text[span[0]:]
             elif span:
-                text = text[:span[0]] + ast_util.to_c(h).strip() + "\n" + text[span[1]:]
-            else:  # a header's helper: a local copy under another name
-                new = name + "_"
-                h2 = __import__("copy").deepcopy(h)
-                h2.decl.name = new
-                h2.decl.type.type.declname = new
-                fn = __import__("copy").deepcopy(fn)
-                for n, _, _ in rewrites.walk(fn):
-                    if isinstance(n, ca.FuncCall) and isinstance(n.name, ca.ID) and n.name.name == name:
-                        n.name.name = new
-                span = find_def(text, self.src_name)
-                text = text[:span[0]] + ast_util.to_c(h2).strip() + "\n\n" + text[span[0]:]
+                text = text[:span[0]] + ast_util.to_c(renamed(h)).strip() + "\n" + text[span[1]:]
         if self.take == "TakeFlag_" and "TakeFlag_(" in ast_util.to_c(fn) and "TakeFlag_(u8" not in text:
             span = find_def(text, self.src_name)
             text = text[:span[0]] + TAKE + "\n" + text[span[0]:]
@@ -184,6 +207,11 @@ def decision(path, func):
             keys.append(k)
     keys += [t for t in hint.topics_for(st, e) if t not in keys]
     return (st, e), keys
+
+
+# spelling families not tried unless asked for (--allow): Ben prefers C without
+# `do { } while (0)` loop-weight wrappers
+AVOID = {"sp_loop_weight"}
 
 
 def candidates(d, seeds):
@@ -214,9 +242,44 @@ def candidates(d, seeds):
         except Exception as ex:
             if os.environ.get("FIX_DEBUG"):
                 print(f"   ({sp.__name__}: {type(ex).__name__}: {ex})")
+    for name, node, desc in corpus_helpers(d):
+        yield "sp_corpus_helper", desc, d.fn, {name: node}
     for t, (fam, desc, f2) in atlas.edits(d.fn, d.ast, d.func, seeds).items():
         if fam not in {r.__name__ for r in rewrites.REWRITES}:
             yield fam, desc, f2, {}
+
+
+_CORPUS = []
+
+
+def corpus_helpers(d):
+    """(helper, FuncDef, description) for each matched helper in src/ that spells one of D's helpers
+    another way (tools/helperswap.py: same globals, callees, constants and arity), parsed in D's
+    context. The original's helper is often in the corpus already (the random-table step returning
+    s32: CallbackPool_SpawnHitParticles)."""
+    import helperswap
+    if not _CORPUS:
+        _CORPUS.append(helperswap.corpus())
+    out = []
+    names = list(d.helpers)
+    own = re.compile(r"\b(?:%s)\s*\(" % "|".join({re.escape(d.func), re.escape(d.src_name)}))
+    for name, f, cname, raw in helperswap.variants(d, _CORPUS[0]):
+        # not the unit that already has this function matched (a regression draft's own answer)
+        if own.search(helperswap.matched_text(open(os.path.join(ROOT, f)).read())):
+            continue
+        i = [h for _, h in d.segments].index(name) if name in [h for _, h in d.segments] else None
+        if i is None:
+            continue
+        prefix = "\n".join(seg + "\n" + (ast_util.to_c(d.helpers[h]) if h != name else "")
+                           for seg, h in d.segments[:i + 1])
+        try:
+            ast = ast_util.parse_c(prefix + "\n" + raw)
+        except Exception:
+            continue
+        node = next((e for e in reversed(ast.ext) if isinstance(e, ca.FuncDef) and e.decl.name == name), None)
+        if node is not None and name in names:
+            out.append((name, node, f"{name} spelled as {cname} ({f})"))
+    return out
 
 
 def one_round(d, keys, show, try_all, seeds, log, deadline=None):
@@ -227,6 +290,7 @@ def one_round(d, keys, show, try_all, seeds, log, deadline=None):
     results, seen, compiles = [], set(), 0
     cands = list(candidates(d, seeds))
     cands.sort(key=lambda c: (c[0] not in prefer, prefer.index(c[0]) if c[0] in prefer else 0))
+    cands = [c for c in cands if c[0] not in AVOID]
     for fam, desc, fn, helpers in cands:
         if deadline and time.time() > deadline:
             break
@@ -277,8 +341,36 @@ def cse_probe(path):
     return None
 
 
-def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
-    """Children of one state: (score, new text, desc, fam), plus the compiles spent."""
+HIGH = ("r8", "r9", "r10", "r11", "ip", "sb", "sl", "fp")
+
+
+def kept_copy(rom, mine):
+    """A cause line when the ROM sets a high register and copies it straight back (`mov ip, r0;
+    mov r0, ip`) more often than the candidate, else None. reload, reload_cse and jump's no-op move
+    deletion drop that copy back unless the set and the use differ in mode (an HImode set, an SImode
+    use): agbccsrc.py reload-mode, spellings.sp_helper_ret_word."""
+    def pairs(t):
+        out = 0
+        for a, b in zip(t, t[1:]):
+            m = re.match(r"mov (\w+), (r[0-7])$", a)
+            if m and m.group(1) in HIGH and b == f"mov {m.group(2)}, {m.group(1)}":
+                out += 1
+        return out
+    n, k = pairs(rom), pairs(mine or [])
+    if n > k:
+        return (f"the ROM copies a high register straight back {n - k} more time(s) (`mov H, rN; mov rN, H`): "
+                "the value was set in another mode than it is used in (an HImode constant used as SImode), "
+                "so reload could not reuse rN")
+    if k > n:
+        return (f"the candidate copies a high register straight back {k - n} more time(s) (`mov H, rN; mov rN, "
+                "H`) where the ROM reuses rN: the candidate sets the value in another mode than it uses it in "
+                "(an HImode constant used as SImode); in the ROM both were one mode")
+    return None
+
+
+def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None, extra=()):
+    """Children of one state: (score, new text, desc, fam), plus the compiles spent. EXTRA: decision
+    keys known from a compiler probe (cse_probe), tried before step.py's."""
     path = os.path.join(wd, f"{func}.c")
     open(path, "w").write(text)
     try:
@@ -286,6 +378,7 @@ def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
     except (Exception, SystemExit) as ex:  # a state step.py cannot compile: drop it
         log(f"   (step.py failed on a state: {type(ex).__name__})")
         return [], 0
+    keys = list(extra) + [k for k in keys if k not in extra]
     d = Draft(text, func, wd)
     if dec is None:
         sc = d.score()
@@ -293,7 +386,7 @@ def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
             return "match", 0
         # only a branch offset differs: a label moved (a statement into or out of a loop, a
         # hoisted invariant), which step.py does not see as a differing instruction
-        keys = ["loop-invariant", "order"]
+        keys = list(extra) + ["loop-invariant", "order"]
         dec = (None, {"lines": [], "note": "only a branch target differs (a label moved)"})
     st, e = dec
     base, good, n = one_round(d, keys, show, try_all, seeds, log, deadline)
@@ -330,7 +423,28 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
     start = None
     seen = {text}
     best = best_shape = states[0]
+    extra = []
     with tempfile.TemporaryDirectory(dir=os.path.join(ROOT, "build")) as wd:
+        # a near match: ask the instrumented compiler first whether one CSE decision explains it,
+        # and try that decision's spellings first in every round
+        open(os.path.join(wd, f"{func}.c"), "w").write(text)
+        try:
+            start = Draft(text, func, wd).score()
+        except (Exception, SystemExit):
+            start = None
+        cause = None
+        if start and start[0] > 0:
+            # a copy back through a high register is visible in any draft: no compile needed
+            d0 = Draft(text, func, wd)
+            cause = kept_copy(d0.rom, atlas.texts_of(d0.source()))
+            if cause:
+                extra = ["reload-mode"]
+        if not cause and start and 0 < start[0] <= 4:
+            cause = cse_probe(os.path.join(wd, f"{func}.c"))
+        if cause:
+            log(f"   cause: {cause}")
+            if "canonical register" in cause:
+                extra = ["cse-canon"]
         for rnd in range(depth):
             log(f"\n== round {rnd + 1}")
             children = []
@@ -338,14 +452,8 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
                 if budget and time.time() - t0 > budget:
                     break
                 kids, n = expand(txt, func, wd, show, try_all, seeds, log, verbose=(i == 0),
-                                 deadline=budget and t0 + budget)
+                                 deadline=budget and t0 + budget, extra=extra)
                 total += n
-                if rnd == 0 and isinstance(kids, list) and start is None:
-                    start = Draft(txt, func, wd).score()
-                    if start and start[0] <= 4:
-                        cause = cse_probe(os.path.join(wd, f"{func}.c"))
-                        if cause:
-                            log(f"   cause: {cause}")
                 if kids == "match":
                     kids = [((0, 0, 0), txt, "as written", "")]
                 for ksc, ktxt, desc, fam in kids:
@@ -412,7 +520,10 @@ def main():
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--beam", type=int, default=4)
     ap.add_argument("--budget", type=float, help="seconds; no new state is expanded after it")
+    ap.add_argument("--allow", default="", help="comma-separated families to try although avoided by default "
+                                                 f"({', '.join(sorted(AVOID))})")
     a = ap.parse_args()
+    AVOID.difference_update(a.allow.split(","))
     src = os.path.abspath(a.src)
     asm = re.search(r'INCLUDE_ASM\("asm/nonmatching", (\w+)\)', open(a.src).read())
     func = a.func or (asm.group(1) if a.nonmatching and asm else None) or re.findall(r"^\w[\w \*]*?\b(\w+)\s*\([^;]*?\)\s*\{", open(src).read(), re.M)[-1]

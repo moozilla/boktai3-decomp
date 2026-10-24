@@ -1,8 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-// Remaining difference: the first two pointer copies use the opposite register order.
-#ifdef NONMATCHING
+// `self`, a copy of p made at entry, keeps its own register in the phase checks
+// (spellings.sp_param_alias). With p alone the two phase branches end alike and
+// are cross-jumped into one tail.
 struct Slot7Motion {
     u8 pad0[0xAE];
     u8 phase, reset, entered;
@@ -15,13 +15,7 @@ struct Slot7Motion {
 };
 extern void *gUnk_08613DA8[];
 s32 Callback_InvokeActor(void *, void *);
-struct PhaseState {
-    u8 pad[0xAE];
-    u8 phase, reset, entered;
-    u8 padB1[0x13];
-    u32 timer;
-};
-static inline void BeginPhase(struct PhaseState *p, s32 phase)
+static inline void BeginPhase(struct Slot7Motion *p, s32 phase)
 {
     p->phase = phase;
     p->timer = 0;
@@ -29,29 +23,19 @@ static inline void BeginPhase(struct PhaseState *p, s32 phase)
 }
 void Slot7_UpdateMotionPhase(struct Slot7Motion *p)
 {
-    struct PhaseState *other = (struct PhaseState *)p;
-    u8 *reset = &p->reset;
-    asm("" : "+r"(other));
-    if (*reset) {
-        BeginPhase((struct PhaseState *)p, 1);
-    }
+    struct Slot7Motion *self = p;
+    if (p->reset)
+        BeginPhase(p, 1);
     Callback_InvokeActor(p, gUnk_08613DA8[p->phase]);
-    if ((u8)(p->phase - 1) <= 1) {
-        if (p->timer > 60 || (p->speed <= 0x1FFF && p->timer > 30)) {
-            if (p->previousPhase == 4) {
-                BeginPhase((struct PhaseState *)p, 3);
-                p->previousPhase = 3;
+    if (((u8)(p->phase - 1)) <= 1) {
+        if ((self->timer > 60) || ((self->speed <= 0x1FFF) && (self->timer > 30))) {
+            if (self->previousPhase == 4) {
+                BeginPhase(self, 3);
+                self->previousPhase = 3;
             } else {
-                u32 phase = 4;
-                u32 zero = 0;
-                ((struct PhaseState *)p)->phase = phase;
-                ((struct PhaseState *)p)->timer = zero;
-                other->entered = 1;
-                p->previousPhase = 4;
+                BeginPhase(self, 4);
+                self->previousPhase = 4;
             }
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Slot7_UpdateMotionPhase);
-#endif

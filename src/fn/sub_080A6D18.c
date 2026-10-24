@@ -1,12 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
 
-#ifdef NONMATCHING
-// fuzzy: 90.8%
-// fix.py best version (reprinted C)
-// Register allocation and inline animation restart-pointer lifetimes still differ.
-static inline void Select(struct SceneActorAnimationView *actor, u32 selection, u32 variant,
-                          u32 flags)
+static inline void TentacleBody_SelectAnimation(struct SceneActorAnimationView *actor,
+                                                u32 selection, u32 variant, u32 flags)
 {
     u32 force;
     u8 *restart;
@@ -55,18 +50,21 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
     *restart = 0;
 }
 
+struct TentacleAttackBody {
+    u8 unknown0[0x8D0];
+    u16 attackFlags;
+};
+
 void TentacleBody_GetDirectionFrame(u8, u32 *, u32 *);
-void TentacleBody_ResetDirectionalAnimations(void *, s32);
 void TentacleBody_RefreshDirectionalAnimations(void *, s32);
-void sub_080A9DB0(void *, s32, s32);
 void TentacleBody_UpdateAttackRecovery(void);
 void SceneActor_AimArcAtPlayer(void *);
 void ActorTrail_ApplyAngularOffsets(void *, s32, s32, s32);
-static inline u8 SceneActorControl_TakeFlag_(u8 *flag)
+static inline u8 TentacleBody_TakeEntryFlag(u8 *flag)
 {
     if (*flag) {
-        return 1;
         *flag = 0;
+        return 1;
     }
     return 0;
 }
@@ -76,13 +74,15 @@ void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
     u8 *entry = (void *)SceneActorProfiles_GetEntryAddress(
         ((struct SceneActorAnimationView *)actor)->profileId,
         ((struct SceneActorAnimationView *)actor)->profileMode, 0);
-    register u8 *body asm("r5") = actor->context;
+    struct TentacleAttackBody *body = actor->context;
     u32 variant;
     u32 flags;
+    u32 entered = TentacleBody_TakeEntryFlag(&actor->field2B2);
+    u8 *direction = &actor->direction;
     u32 *attackFlags = &actor->flags2D0;
-    if (SceneActorControl_TakeFlag_(&actor->field2B2)) {
+    if (entered) {
         SceneActor_AimArcAtPlayer(actor);
-        actor->direction = Math_Atan2(actor->secondaryMotion.x, actor->secondaryMotion.z);
+        *direction = Math_Atan2(actor->secondaryMotion.x, actor->secondaryMotion.z);
         {
             u32 mask = 256;
             actor->flags2D4 |= mask;
@@ -92,27 +92,26 @@ void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
             *attackFlags &= mask;
         }
         {
-            u16 mask = ~2;
-            u16 *p = (u16 *)(body + 0x8D0);
-            u32 value = *p;
+            u16 *bodyFlags = &body->attackFlags;
+            s32 mask = ~2;
+            u32 value = *bodyFlags;
             mask &= value;
             mask |= 4;
-            *p = mask;
+            body->attackFlags = mask;
         }
         Sound_PlaySong(982);
     }
-    TentacleBody_GetDirectionFrame(actor->direction, &variant, &flags);
-    Select((void *)actor, entry[0x38], variant, flags);
+    TentacleBody_GetDirectionFrame(*direction, &variant, &flags);
+    TentacleBody_SelectAnimation((void *)actor, entry[0x38], variant, flags);
     ActorTrail_ApplyAngularOffsets(actor, 18, 6, 0);
     TentacleBody_RefreshDirectionalAnimations(actor->context, 15);
     {
         u32 mask = 16;
         if ((*attackFlags) & mask) {
             {
-                u8 mask = ~256;
-                u16 *flags = &actor->flags2D4;
-                u32 value = *flags;
-                *flags = mask & value;
+                u16 *field = &actor->flags2D4;
+                s32 mask = ~256;
+                actor->flags2D4 = *field & mask;
             }
             {
                 void *callback = (void *)TentacleBody_UpdateAttackRecovery;
@@ -135,6 +134,3 @@ void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", TentacleBody_BeginDirectedAttack);
-#endif

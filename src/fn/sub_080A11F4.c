@@ -1,10 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 89.6%
-// fix.py best version (reprinted C)
-// Ground-height load scheduling and final behavior-state offset derivation still differ.
 s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -19,6 +15,17 @@ static inline u8 TakeEntry(struct SceneActorRegistryResetView *s)
 static inline u32 TestFlags(struct SceneActorRegistryResetView *s, u32 mask)
 {
     return s->flags2D4 & mask;
+}
+static inline void SceneActorControl_ResetReturnState(struct SceneActorRegistryResetView *s)
+{
+    u32 one = 1;
+    u8 *state = &s->state2A8;
+    u32 zero = 0;
+    *state = zero;
+    s->phase2A9 = zero;
+    s->behavior2AA = one;
+    s->counter2AC = zero;
+    s->field2B1 = one;
 }
 void SceneActorControl_UpdateHeightReturn(struct SceneActorRegistryResetView *s)
 {
@@ -57,30 +64,19 @@ void SceneActorControl_UpdateHeightReturn(struct SceneActorRegistryResetView *s)
     else
         Anim_SetFrameDurationScale(((u8 *)s->drawable) + 0x20, *height);
     {
-        s32 ground = s->groundHeight2BE;
-        s32 y = s->position.y;
-        s32 offset = -280;
+        s32 y;
+        s32 offset;
+        delta = s->groundHeight2BE;
+        y = s->position.y;
+        offset = -280;
         y += offset;
-        delta = ground;
         delta -= y;
     }
-    if (((u32)delta) < 0)
+    if (delta < 0)
         delta = -delta;
     if ((delta <= 16) && (((s32)s->counter2AC) > 80)) {
-        u32 one = 1;
-        u8 *state = &s->state2A8;
-        {
-            u8 k1 = 0;
-            *state = k1;
-        }
-        s->phase2A9 = 0;
-        s->behavior2AA = one;
-        s->counter2AC = 0;
-        s->field2B1 = one;
+        SceneActorControl_ResetReturnState(s);
     } else {
         ++s->counter2AC;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorControl_UpdateHeightReturn);
-#endif

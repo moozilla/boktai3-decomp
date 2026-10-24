@@ -13,53 +13,60 @@ struct BlendFade {
 void Video_SetBlendControl(u32, u32, u32);
 void Video_SetBlendAlpha(s32, s32);
 void Video_SetBlendBrightness(s32);
+/* Clear in reverse order and return the cursor after the final store. */
+static inline u8 *BlendFade_ClearCoefficients(u8 *first)
+{
+    s32 zero = 0;
+    u8 *cursor = first + 1;
+    do {
+        *cursor = zero;
+        cursor--;
+    } while ((s32)cursor >= (s32)first);
+    first = cursor;
+    return first;
+}
 // confidence=low: reads a blend fade from the script: mode 'm', start coefficients 'i', their
 // change 'a', targets 's' and 'd' and duration 't' (default 60), then applies the start values.
-#ifdef NONMATCHING
-// fuzzy: 76.6%
-// Wrapping the first start = p->start in a do-while(0) reaches 86% (loop weight changes the allocation). The zero-fill loops still differ: the ROM keeps the bound and the 0 in low registers.
 s32 sub_08018E00(struct BlendFade *p)
 {
-    u8 *start, *delta, *s;
+    u8 *start;
+    u8 *delta;
+    u8 *s;
     s32 i;
     p->mode = Script_GetKeywordValue('m', 1);
     if (Script_SeekToKeyword('i')) {
         start = p->start;
         delta = p->delta;
         s = start;
-        do {
-            s32 value = (s32)Script_GetPc();
-            if (value)
-                value = Script_GetValue();
-            *s = value;
-            s++;
-        } while ((s32)s <= (s32)(start + 1));
+    read_start: {
+        s32 value = (s32)Script_GetPc();
+        if (value)
+            value = Script_GetValue();
+        *s = value;
+        s++;
+    }
+        if ((s32)s <= (s32)(start + 1))
+            goto read_start;
     } else {
         start = p->start;
         delta = p->delta;
-        s = &p->start[1];
-        do {
-            *s = 0;
-            s--;
-        } while ((s32)s >= (s32)start);
+        s = BlendFade_ClearCoefficients(start);
     }
     if (Script_SeekToKeyword('a')) {
         i = 0;
         s = delta;
         do {
+            u8 coefficient;
             s32 value = (s32)Script_GetPc();
             if (value)
                 value = Script_GetValue() - start[i];
-            *s = value;
+            coefficient = value;
+            *s = coefficient;
             s++;
             i++;
         } while (i <= 1);
     } else {
-        s = delta + 1;
-        do {
-            *s = 0;
-            s--;
-        } while ((s32)s >= (s32)delta);
+        s = BlendFade_ClearCoefficients(delta);
     }
     p->firstTarget = Script_GetKeywordValue('s', 0);
     p->secondTarget = Script_GetKeywordValue('d', 0);
@@ -74,6 +81,3 @@ s32 sub_08018E00(struct BlendFade *p)
         Video_SetBlendBrightness(p->start[0]);
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08018E00);
-#endif

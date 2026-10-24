@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 95.2%
+// fix.py best (sweep after the inlined-insn fix)
 // Logic matches; reload-register rotation differs in case 0 (link pointer in r1 not r0,
 // 0x02000580 loaded after the shift) and for the final mode store.
 struct Vec {
@@ -44,7 +44,6 @@ void sub_08226CF8(struct Camera2 *camera)
 {
     struct Player *player = gUnk_02000710;
     struct PackedVec target;
-
     target.x = player->x + camera->offsetX;
     target.y = player->y + camera->offsetY;
     target.z = player->z + camera->offsetZ;
@@ -52,12 +51,15 @@ void sub_08226CF8(struct Camera2 *camera)
         case 0:
             if (gUnk_030053F4 & 0x800) {
                 struct LinkState *link = gUnk_020004B4;
-                if (link && link->player >= 0) {
-                    struct Player **p = &gUnk_02000580[link->player];
-                    if (*p) {
-                        camera->pos.x = (*p)->x;
-                        camera->pos.y = (*p)->y + 150;
-                        camera->pos.z = (*p)->z;
+                {
+                    typeof(link->player) v1 = link->player;
+                    if (link && (v1 >= 0)) {
+                        struct Player **p = &gUnk_02000580[link->player];
+                        if (*p) {
+                            camera->pos.x = (*p)->x;
+                            camera->pos.y = (*p)->y + 150;
+                            camera->pos.z = (*p)->z;
+                        }
                     }
                 }
             } else {
@@ -71,31 +73,35 @@ void sub_08226CF8(struct Camera2 *camera)
                 camera->pos.z = target.z;
             }
             break;
+
         case 1:
             camera->pos.x = camera->target.x;
             camera->pos.y = camera->target.y;
             camera->pos.z = camera->target.z;
             break;
+
         case 2:
             camera->pos.x =
-                Div(camera->pos.x * (camera->timer - 1) + camera->target.x, camera->timer);
+                Div((camera->pos.x * (camera->timer - 1)) + camera->target.x, camera->timer);
             camera->pos.y =
-                Div(camera->pos.y * (camera->timer - 1) + camera->target.y, camera->timer);
+                Div((camera->pos.y * (camera->timer - 1)) + camera->target.y, camera->timer);
             camera->pos.z =
-                Div(camera->pos.z * (camera->timer - 1) + camera->target.z, camera->timer);
-            if (--camera->timer <= 1)
+                Div((camera->pos.z * (camera->timer - 1)) + camera->target.z, camera->timer);
+            if ((--camera->timer) <= 1)
                 camera->mode = 1;
             break;
+
         case 3:
-            camera->pos.x = Div(camera->pos.x * (camera->timer - 1) + target.x, camera->timer);
+            camera->pos.x = Div((camera->pos.x * (camera->timer - 1)) + target.x, camera->timer);
             camera->pos.y =
-                Div(camera->pos.y * (camera->timer - 1) + target.y + 150, camera->timer);
-            camera->pos.z = Div(camera->pos.z * (camera->timer - 1) + target.z, camera->timer);
-            if (--camera->timer <= 1)
+                Div(((camera->pos.y * (camera->timer - 1)) + target.y) + 150, camera->timer);
+            camera->pos.z = Div((camera->pos.z * (camera->timer - 1)) + target.z, camera->timer);
+            if ((--camera->timer) <= 1)
                 camera->mode = 0;
             break;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08226CF8);
 #endif

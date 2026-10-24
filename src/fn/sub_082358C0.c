@@ -1,43 +1,49 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.5%
-// fix.py best version (reprinted C)
-// Draft: advance an 8-step blend of two positions, then switch handler.
-// Open: ~1/~2 mask constants should share one register (movs/rsbs then subs #1),
-// and the 0x50/0x51 byte stores' address setup is ordered differently.
+// Advance an eight-step position blend, then switch handlers.
 s32 Div(s32, s32);
 void Sound_PlaySong(u32);
 void sub_08235794(u8 *);
 
-#define F16(o) (*(u16 *)(p + (o)))
-#define S16(o) (*(s16 *)(p + (o)))
+struct BlendActor {
+    u8 pad00[0x24];
+    u32 flags;
+    u8 pad28[0x3c - 0x28];
+    u16 x;
+    u16 y;
+    u8 pad40[0x50 - 0x40];
+    u8 blend0;
+    u8 blend1;
+    u8 pad52[0x7c - 0x52];
+    s16 targetX;
+    s16 targetY;
+    u8 pad80[4];
+    s16 startX;
+    s16 startY;
+    u8 pad88[0x34e - 0x88];
+    u16 counter;
+    void (*handler)(u8 *);
+};
 
-void sub_082358C0(u8 *p)
+void sub_082358C0(struct BlendActor *p)
 {
     u16 *counter;
     u8 *q;
-    *((u32 *)(p + 0x24)) &= ~1;
-    counter = (u16 *)(p + 0x34e);
-    (*counter)++;
-    if ((*counter) > 7) {
-        {
-            u32 *d1 = (u32 *)(p + 0x4);
-            d1[8] &= ~2;
-        }
-        *((void (**)(u8 *))(p + 0x350)) = sub_08235794;
+    s32 blend;
+    p->flags &= ~1;
+    counter = &p->counter;
+    p->counter++;
+    if (*counter > 7) {
+        p->flags &= ~2;
+        p->handler = sub_08235794;
         *counter = 0;
         Sound_PlaySong(0x284);
     } else {
-        q = p + 0x51;
-        *q = ((*counter) * 2) + 0x20;
+        blend = *counter * 2 + 0x20;
+        q = &p->blend1;
+        *q = blend;
         *(q - 1) = *q;
-        *((u16 *)(p + 0x3c)) = Div(
-            ((*((s16 *)(p + 0x7c))) * (*counter)) + ((*((s16 *)(p + 0x84))) * (8 - (*counter))), 8);
-        *((u16 *)(p + 0x3e)) = Div(
-            ((*((s16 *)(p + 0x7e))) * (*counter)) + ((*((s16 *)(p + 0x86))) * (8 - (*counter))), 8);
+        p->x = Div(p->targetX * *counter + p->startX * (8 - *counter), 8);
+        p->y = Div(p->targetY * *counter + p->startY * (8 - *counter), 8);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_082358C0);
-#endif

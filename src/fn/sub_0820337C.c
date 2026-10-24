@@ -3,16 +3,17 @@
 #include "display_animation.h"
 #include "scene_vec.h"
 
-#ifdef NONMATCHING
-// fuzzy: 99.0%
-// Remaining differences: palette-loop bound and decrement scheduling.
+struct CannonPaletteColor {
+    u16 value;
+} __attribute__((packed, aligned(2)));
+
 struct CannonEmitter {
     u8 pad0[0x18];
     struct SceneVec initialPosition;
     struct DisplaySequenceSprite sprite;
     u8 animationData[0x1c];
     u8 body[0x48];
-    s16 flashPalette[16];
+    struct CannonPaletteColor flashPalette[16];
     void (*state)(void);
     struct DisplaySequenceState sequence;
     s32 rangeSquared;
@@ -41,7 +42,6 @@ static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
     }
     {
         u32 frame = *command >> 6;
-        asm("" : "+r"(sprite) : "r"(frame));
         {
             register struct DisplaySequenceSprite *out asm("r3") = &owner->sprite;
             asm("" : "+r"(out));
@@ -53,13 +53,11 @@ static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
         register u32 first asm("r2");
         register u32 maskBit asm("r4") = 1;
         bit = maskBit;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
         if (first != (((*command & 0x30) >> 4) & bit)) {
             u32 flags = owner->sprite.flags;
-            register u32 flip asm("r2") = flipMask;
-            asm("" : : "r"(flip));
+            register u32 flip = flipMask;
             owner->sprite.flags = flags | flip;
         } else
             owner->sprite.flags &= ~4;
@@ -69,10 +67,8 @@ static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
         register u32 bit asm("r4");
         register u32 first asm("r2");
         bit = 2;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
-        asm("" : "+r"(first));
         first = (u8)first;
         {
             register u32 flags asm("r1");
@@ -205,14 +201,18 @@ s32 CannonEmitter_InitializeFromScript(struct CannonEmitter *p, void *parent)
     AnimData_SelectPaletteBank(p->animationData, p->variant + 0x1ba);
     {
         s32 i = 15;
+        struct CannonPaletteColor *palette;
+        s32 first;
         do {
-            p->flashPalette[i] = 0x7fff;
-        } while (--i >= 0);
+            first = (s32)p->flashPalette;
+            palette = &p->flashPalette[i];
+            palette->value = 0x7fff;
+            --i;
+        } while ((s32)palette - (s32)sizeof(*palette) >= first);
     }
     p->resource = ScriptProc_Start(0x922e, 0x5184);
     result = Anim_SetSequence(&p->sequence, p->resource, 6, 0, 0);
     CannonEmitter_StepAnimation(p, &p->sequence, 4);
-    asm("" : "+r"(result));
     if (p->solid) {
         SceneBody_Init(p->body, p->parent, (u8 *)p + 0x3c, 0, 4, p);
         SceneBody_SetSprite(p->body, &p->sprite);
@@ -221,7 +221,3 @@ s32 CannonEmitter_InitializeFromScript(struct CannonEmitter *p, void *parent)
     p->state = ProximitySequence_TestPlayerDistance;
     return result;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", CannonEmitter_InitializeFromScript);
-#endif

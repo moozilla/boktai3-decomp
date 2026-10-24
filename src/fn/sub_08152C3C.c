@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #ifdef NONMATCHING
-// fuzzy: 90.7%
+// fix.py best (sweep after the inlined-insn fix)
 struct CueActor {
     u8 pad0[0x1D0];
     u32 f1D0;
@@ -189,6 +189,132 @@ static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceS
 }
 // confidence=low: reduces departure scale and returns to standing after animation.
 // confidence=low: phased cue alternates facing and restores standing motion.
+inline static u32 StepEnd_08152C3C(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st,
+                                   u32 phase)
+{
+    struct ContactSwarmSprite *sprite = sp;
+    struct DisplaySequenceState *state = st;
+    const volatile u16 *command;
+    u32 duration;
+    u32 flags;
+    u32 bit;
+    u32 ended;
+    {
+        u32 offset = state->index << 1;
+        const volatile u16 *table;
+        table = state->commands;
+        command = (const volatile u16 *)(((u32)table) + offset);
+    }
+    sprite->frame = (*command) >> 6;
+    {
+        u32 input = state->flags;
+        register u32 first asm("r1");
+        u32 maskBit = phase;
+        bit = maskBit;
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        if (first != ((((*command) & 0x30) >> 4) & bit))
+            sprite->flags |= 4;
+        else
+            sprite->flags &= ~4;
+    }
+    {
+        u32 input = state->flags;
+        u32 bit;
+        register u32 first asm("r1");
+        bit = 2;
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        first = (u8)first;
+        if (first != ((((*command) & 0x30) >> 4) & bit))
+            sprite->flags |= 8;
+        else
+            sprite->flags &= ~8;
+    }
+    {
+        u32 elapsed = state->elapsed + 1;
+        register u32 mask asm("r5");
+        register u32 temp asm("r1");
+        register u32 savedDuration asm("r3");
+        state->elapsed = elapsed;
+        temp = 0xFFFF;
+        asm("" : "+r"(temp));
+        mask = temp;
+        duration = state->duration;
+        elapsed = (u16)elapsed;
+        savedDuration = duration;
+        if (elapsed >= duration) {
+            state->elapsed = 0;
+            flags = state->flags;
+            if (flags & 4) {
+                s16 index = state->index;
+                if (index == 0) {
+                    u32 hold = 8;
+                    hold &= flags;
+                    if (hold) {
+                        state->elapsed = savedDuration;
+                        goto ended_animation;
+                    } else {
+                        state->index = state->frameCount - 1;
+                        goto ended_animation;
+                    }
+                } else {
+                    state->index = index - 1;
+                }
+            } else {
+                u32 index = state->index + 1;
+                u32 frameCount;
+                u32 endFlag;
+                state->index = index;
+                frameCount = state->frameCount;
+                if ((index & mask) >= frameCount) {
+                    endFlag = flags & 8;
+                    asm("" : "+r"(endFlag));
+                    endFlag = (u8)endFlag;
+                    if (endFlag) {
+                        state->elapsed = duration;
+                        {
+                            u32 lastIndex = frameCount - 1;
+                            state->index = lastIndex;
+                        }
+                    } else {
+                        state->index = 0;
+                    }
+                    goto ended_animation;
+                } else {
+                }
+            }
+            ended = 0;
+            goto update_frame;
+        ended_animation:
+            ended = 1;
+
+        update_frame: {
+            u32 offset = state->index << 1;
+            const volatile u16 *table;
+            table = state->commands;
+            command = (const volatile u16 *)(((u32)table) + offset);
+        }
+
+            state->frameWeight = (*command) & 15;
+            {
+                register s32 weight asm("r1") = state->frameWeight;
+                s32 speed;
+                speed = state->speed;
+                speed = (speed * weight) >> 6;
+                state->duration = speed;
+                if (!((u8)speed))
+                    state->duration = 1;
+            }
+        } else {
+            ended = 0;
+        }
+    }
+    return ended;
+}
+
 void sub_08152C3C(struct CueActor *p)
 {
     if (Player_ConsumeStateEntry(p)) {
@@ -198,26 +324,26 @@ void sub_08152C3C(struct CueActor *p)
         p->f4EE = 1;
         Sound_PlaySong(0x306);
         p->f1D0 &= ~1;
-        p->f1EC = *(u16 *)((u8 *)gUnk_02000710 + 0x30) - 6;
-        p->f1EE = 450 + *(u16 *)((u8 *)gUnk_02000710 + 0x32);
-        p->f1F0 = *(u16 *)((u8 *)gUnk_02000710 + 0x34) + 6;
-        Anim_SetSequence((u8 *)p + 0x218, *(void **)((u8 *)p + 0x22C), 21, 0, 0);
+        p->f1EC = (*((u16 *)(((u8 *)gUnk_02000710) + 0x30))) - 6;
+        p->f1EE = 450 + (*((u16 *)(((u8 *)gUnk_02000710) + 0x32)));
+        p->f1F0 = (*((u16 *)(((u8 *)gUnk_02000710) + 0x34))) + 6;
+        Anim_SetSequence(((u8 *)p) + 0x218, *((void **)(((u8 *)p) + 0x22C)), 21, 0, 0);
         p->f228 = 0;
     }
     if (p->f228)
-        Anim_SetSequence((u8 *)p + 0x218, *(void **)((u8 *)p + 0x22C), 21, 0, 0);
-    p->f228 = StepEnd((void *)((u8 *)p + 0x1D0), (void *)((u8 *)p + 0x218), 1);
+        Anim_SetSequence(((u8 *)p) + 0x218, *((void **)(((u8 *)p) + 0x22C)), 21, 0, 0);
+    p->f228 = StepEnd_08152C3C((void *)(((u8 *)p) + 0x1D0), (void *)(((u8 *)p) + 0x218), 1);
     if (p->f222 == 21) {
         if (p->f1F2 == 1)
             p->f1EE -= 10;
         else
             p->f1EE += 10;
     }
-    if (p->f1F2 == 1 && (s16)p->f1EE < *(s16 *)((u8 *)gUnk_02000710 + 0x32) + 220)
-        p->f1EE = *(u16 *)((u8 *)gUnk_02000710 + 0x32) + 220;
+    if ((p->f1F2 == 1) && (((s16)p->f1EE) < ((*((s16 *)(((u8 *)gUnk_02000710) + 0x32))) + 220)))
+        p->f1EE = (*((u16 *)(((u8 *)gUnk_02000710) + 0x32))) + 220;
     switch (p->f458) {
         case 0:
-            if ((u8)(p->f3A4 - 2) <= 4) {
+            if (((u8)(p->f3A4 - 2)) <= 4) {
                 p->f3A4 = 4;
                 p->f3A2 = 4;
                 p->f3A3 = 0;
@@ -230,7 +356,8 @@ void sub_08152C3C(struct CueActor *p)
             p->f3A2 >>= 2;
             if (p->f4EE) {
                 struct {
-                    u32 a, b;
+                    u32 a;
+                    u32 b;
                 } particles;
                 particles.a = 0;
                 particles.b = 15;
@@ -239,6 +366,7 @@ void sub_08152C3C(struct CueActor *p)
             }
             Player_SetActionPhase(p, 1);
             break;
+
         case 1:
             if (p->f4EE) {
                 p->fAD8 += 3;
@@ -253,9 +381,10 @@ void sub_08152C3C(struct CueActor *p)
                     Player_SetActionPhase(p, 3);
             }
             break;
+
         case 2: {
             u32 timerMask;
-            if ((p->f45A & 7) < 7 - (p->f45A >> 2))
+            if ((p->f45A & 7) < (7 - (p->f45A >> 2)))
                 Player_SetAnimation(p, ActorVariant_GetTableValue(p->f418, 10), 64, 1);
             else if (p->f418 == 0)
                 Player_SetAnimation(p, ActorVariant_GetTableValue(2, 10), 64, 1);
@@ -268,24 +397,26 @@ void sub_08152C3C(struct CueActor *p)
                 p->fAD8 = 32;
             p->f6FC = 30;
             if (((++p->f45A) & timerMask) > 9) {
-                p->f418 = p->f418 ? 0 : 2;
+                p->f418 = (p->f418) ? (0) : (2);
                 Player_InitVisualResources(p);
                 p->fAC4 = 0xFFFF;
-                if (p->f536 != 21 && p->f536 != 49)
+                if ((p->f536 != 21) && (p->f536 != 49))
                     p->f538 = 0;
                 Player_SetActionPhase(p, 4);
                 p->f1D0 |= 1;
             }
             break;
         }
+
         case 3:
             if (!p->f45A)
                 Sound_PlaySong(0x192);
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->f418, 10), 64, 1);
             p->f6FC = 30;
-            if (++p->f45A > 15)
+            if ((++p->f45A) > 15)
                 Player_SetActionPhase(p, 4);
             break;
+
         case 4:
             p->f6FC = 15;
             ++p->f45A;
@@ -298,13 +429,13 @@ void sub_08152C3C(struct CueActor *p)
             } else {
                 p->f4E6 = 0xFFF4;
                 p->f4EA = 12;
-                Anim_SetKeyframes((u8 *)p + 0x8C, (u8 *)p + 0x6C, 0x1AB, 1, 0);
-                Anim_Step((u8 *)p + 0x8C, (u8 *)p + 0x6C);
+                Anim_SetKeyframes(((u8 *)p) + 0x8C, ((u8 *)p) + 0x6C, 0x1AB, 1, 0);
+                Anim_Step(((u8 *)p) + 0x8C, ((u8 *)p) + 0x6C);
             }
             Player_InitVisualResources(p);
             p->fAC4 = 0xFFFF;
             p->fAD8 = 0;
-            if (++p->f45A > 29) {
+            if ((++p->f45A) > 29) {
                 Player_UpdateFacingSide(p);
                 p->f464 = 1;
                 p->f465 = 2;
@@ -315,6 +446,7 @@ void sub_08152C3C(struct CueActor *p)
             break;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08152C3C);
 #endif

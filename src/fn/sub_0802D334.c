@@ -12,15 +12,15 @@ struct ActorActionQueue {
 };
 extern const void *const gUnk_08605050[];
 // confidence=low: starts the pending action (from gUnk_08605050) if there is one.
-#ifdef NONMATCHING
-// fuzzy: 37.5%
-// The ROM loads the table entry before the store address and keeps 0x11C in r4.
 s32 sub_0802D334(struct ActorActionQueue *p)
 {
     s32 started;
-    u16 id = p->pending;
-    if (id) {
-        p->action = gUnk_08605050[id];
+    if (p->pending) {
+        const void *const *table = gUnk_08605050;
+        u16 id = p->pending;
+        const void *action;
+        action = table[id];
+        p->action = action;
         p->current = id;
         p->entered = 1;
         p->timer = 0;
@@ -29,6 +29,3 @@ s32 sub_0802D334(struct ActorActionQueue *p)
         started = 0;
     return started;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0802D334);
-#endif

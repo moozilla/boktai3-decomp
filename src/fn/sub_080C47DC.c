@@ -1,12 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 85.9%
-// fix.py best version (reprinted C)
-// Golem settle step (called from Golem_ReturnHome with actor->context). Instruction order
-// matches apart from allocation: the ROM keeps dz in r2 and dx in ip from the first delta to
-// the Math_Atan2 call (rasolve: raise dz's priority, raise link's). The empty memory barrier
-// in the z branch reproduces the ROM's reload of body->position.z.
+// Golem settle step, called with the actor context.
 #include "engine.h"
 #include "contact_actor.h"
 
@@ -32,7 +25,7 @@ static inline u32 Cell(s32 x, s32 z)
 {
     if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) || (((u32)z) >= gUnk_030052FC))
         return 0;
-    return x + gUnk_030052F4->rows[z];
+    return gUnk_030052F4->rows[z] + x;
 }
 
 s32 sub_080C47DC(u8 *actor)
@@ -47,18 +40,19 @@ s32 sub_080C47DC(u8 *actor)
         s32 dz = (*target)->position.z - body->position.z;
         u8 *direction;
         struct Unk080C47DCDelta delta;
+        struct Unk080C47DCObject **goalTarget;
         if (Cell((*target)->position.x >> 8, (*target)->position.z >> 8) !=
             Cell(body->position.x >> 8, body->position.z >> 8)) {
             if (((dx < 0) ? (-dx) : (dx)) < ((dz < 0) ? (-dz) : (dz)))
                 link->target->position.x = (body->position.x & (~0xFF)) + 0x80;
             else {
-                asm("" : : : "memory");
-                link->target->position.z = (body->position.z & (~0xFF)) + 0x80;
+                struct ContactPosition *position = &body->position;
+                link->target->position.z = (position->z & (~0xFF)) + 0x80;
             }
         }
-        target = &link->target;
-        dx = (*target)->position.x - body->position.x;
-        dz = (*target)->position.z - body->position.z;
+        goalTarget = &link->target;
+        dx = (*goalTarget)->position.x - body->position.x;
+        dz = (*goalTarget)->position.z - body->position.z;
         {
             u8 angle = Math_Atan2(dx, dz);
             direction = actor + 0x68E;
@@ -66,17 +60,18 @@ s32 sub_080C47DC(u8 *actor)
         }
         *direction = ((((*direction) + 0x20) & 0xFF) >> 6) << 6;
         {
-            struct ContactPosition *from = (struct ContactPosition *)(owner + 0x5C);
-            struct ContactPosition *goal = &(*target)->position;
-            s32 quadrant;
             struct Unk080C47DCDelta *out = &delta;
-            out->y = ((u16)goal->y) - ((u16)from->y);
-            out->z = ((u16)goal->z) - ((u16)from->z);
+            struct ContactPosition *from = (struct ContactPosition *)(owner + 0x5C);
+            struct ContactPosition *goal = &(*goalTarget)->position;
+            s32 quadrant;
             {
                 struct Unk080C47DCDelta *first = &delta;
                 first->x = ((u16)goal->x) - ((u16)from->x);
             }
-            quadrant = ((Math_Atan2(delta.x, out->z) + 0x20) & 0xFF) >> 6;
+            out->y = ((u16)goal->y) - ((u16)from->y);
+            out->z = ((u16)goal->z) - ((u16)from->z);
+            quadrant = Math_Atan2(delta.x, out->z);
+            quadrant = ((quadrant + 0x20) & 0xFF) >> 6;
             if ((delta.x != (-out->z)) && (quadrant != ((*direction) >> 6)))
                 Memory_Clear(owner + 0x64, 8);
         }
@@ -85,6 +80,3 @@ s32 sub_080C47DC(u8 *actor)
     }
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080C47DC);
-#endif

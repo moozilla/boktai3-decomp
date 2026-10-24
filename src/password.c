@@ -1,5 +1,7 @@
 #include "password.h"
 
+// MATCHING_CONCESSION: register-pinning
+
 int Text_CopyWithoutTags(u8 *dst, u8 *src, int limit)
 {
     int tag = 0, count = 0;
@@ -72,48 +74,42 @@ s32 Password_EncodeSymbols(struct PasswordEntry *s)
     return 0;
 }
 
-#ifdef NONMATCHING
-
-// fuzzy: 79.7%
-// register allocation differs (name/q/found) and the inner glyph-search loop is rotated differently (original jumps into the test)
 int sub_080115DC(struct PasswordEntry *e)
 {
-    int i;
-    u8 *name;
-    for (i = 0, name = e->name; i < 5; i++, name++) {
-        if (*name != 0) {
+    int nameIndex;
+    u8 *nameByte;
+    for (nameIndex = 0, nameByte = e->name; nameIndex < 5; nameByte++, nameIndex++) {
+        if (*nameByte != 0) {
             int found = 0;
-            int j;
-            int *sp = &e->script;
-            u8 *q = name;
-            for (j = 0; j < 2; j++) {
-                u8 *s = Text_LookupString(Script_ParseStringRef((void *)*sp) + j);
-                u32 c = s[0];
-                while (c) {
-                    if (s[1] != *q) {
-                        s += 2;
-                        c = s[0];
-                        continue;
+            int tableIndex = 0;
+            int *scriptRef = &e->script;
+            register u8 *currentName asm("r5") = nameByte;
+            for (; tableIndex < 2; tableIndex++) {
+                u8 *glyphs =
+                    Text_LookupString(Script_ParseStringRef((void *)*scriptRef) + tableIndex);
+                u32 firstByte = glyphs[0];
+                goto checkGlyph;
+                while (1) {
+                    glyphs += 2;
+                    firstByte = glyphs[0];
+                checkGlyph:
+                    if (!firstByte)
+                        break;
+                    if (glyphs[1] == *currentName) {
+                        found = 1;
+                        break;
                     }
-                    found = 1;
-                    break;
                 }
             }
             if (found == 0) {
-                if (*name != 0xFF)
+                if (*nameByte != 0xFF)
                     return 1;
-                *name = 0xF0;
+                *nameByte = 0xF0;
             }
         }
     }
     return 0;
 }
-
-#else
-
-INCLUDE_ASM("asm/nonmatching", sub_080115DC);
-
-#endif
 
 int NameEntry_DecodeAndValidate(struct PasswordEntry *m)
 {

@@ -87,11 +87,6 @@ u32 SelectionMenu_Destroy(struct SelectionMenu *p);
 int SelectionMenu_Initialize(struct SelectionMenu *p, void *a, void *b);
 void *SelectionMenu_Create(void *a, void *b);
 
-static inline void SelectionMenu_ClearPosition(void *source, void *destination)
-{
-    CpuSet(source, destination, 0x05000002);
-}
-
 u8 *SelectionMenu_GetIconPalette(s32 i)
 {
     return gUnk_030042E4 + (i + 0x373) * 0x20;
@@ -277,50 +272,22 @@ INCLUDE_ASM("asm/nonmatching", sub_0801A218);
 
 void SelectionMenu_InitCursors(struct SelectionMenu *p)
 {
-    struct {
-        u32 zero;
-        struct ContactPosition position;
-    } scratch;
-    struct SceneInputWidget *g;
+    struct ContactPosition position;
     int i;
-    struct ContactPosition *pos = &scratch.position;
-    struct ContactPosition *saved;
-    int clear;
-    scratch.zero = 0;
-    SelectionMenu_ClearPosition(&scratch.zero, pos);
-    saved = pos;
-    clear = 0;
-    g = p->cursors;
-    i = 2;
-    do {
-        Widget_InitLinked(g, &p->panelResource, 0x4e, 0x10, clear, clear, 0x3c, saved);
-        g++;
-        i--;
-    } while (i >= 0);
+
+    ZeroFill8(&position);
+    for (i = 0; i < 3; i++)
+        Widget_InitLinked(&p->cursors[i], &p->panelResource, 0x4e, 0x10, 0, 0, 0x3c, &position);
 }
 
 void SelectionMenu_InitMarkers(struct SelectionMenu *p)
 {
-    struct {
-        u32 zero;
-        struct ContactPosition position;
-    } scratch;
-    struct SceneInputWidget *g;
+    struct ContactPosition position;
     int i;
-    struct ContactPosition *pos = &scratch.position;
-    struct ContactPosition *saved;
-    int clear;
-    scratch.zero = 0;
-    SelectionMenu_ClearPosition(&scratch.zero, pos);
-    saved = pos;
-    clear = 0;
-    g = p->markers;
-    i = 7;
-    do {
-        Widget_InitLinked(g, &p->panelResource, 0x50, 0x31, clear, clear, 0x3c, saved);
-        g++;
-        i--;
-    } while (i >= 0);
+
+    ZeroFill8(&position);
+    for (i = 0; i < 8; i++)
+        Widget_InitLinked(&p->markers[i], &p->panelResource, 0x50, 0x31, 0, 0, 0x3c, &position);
 }
 
 void SelectionMenu_InitHighlight(struct SelectionMenu *p)
@@ -451,38 +418,20 @@ void SelectionMenu_RemoveHighlight(struct SelectionMenu *p)
 }
 
 // confidence=low: lays out the 19 actor icons from the last one down, then the heading at x 32.
-#ifdef NONMATCHING
-// fuzzy: 59.2%
-// The ROM keeps the position pointer in one register (sb) and recomputes sp + 0x14 after the loop; here it stays in a second register (sl), so an extra callee-saved register is pushed.
 void sub_0801A6D0(struct SelectionMenu *p)
 {
-    struct {
-        u32 zero;
-        struct ContactPosition position;
-    } scratch;
-    struct SceneInputWidget *g;
+    struct ContactPosition position;
+    struct SceneInputWidget *heading;
     int i;
-    struct ContactPosition *pos = &scratch.position;
-    struct ContactPosition *saved;
-    int clear;
-    scratch.zero = 0;
-    SelectionMenu_ClearPosition(&scratch.zero, pos);
-    i = 18;
-    saved = pos;
-    clear = 0;
-    g = &p->icons[18];
-    do {
-        Widget_InitLinked(g, &p->iconResource, 0, 0x11, clear, clear, 0x3c, saved);
-        g--;
-        i--;
-    } while (i >= 0);
-    saved->x = 0x20;
-    scratch.position.y = 0;
-    Widget_InitLinked(&p->heading, &p->panelResource, 0, 0x11, 0, 0, 0x3c, &scratch.position);
+
+    ZeroFill8(&position);
+    for (i = 18; i >= 0; i--)
+        Widget_InitLinked(&p->icons[i], &p->iconResource, 0, 0x11, 0, 0, 0x3c, &position);
+    heading = &p->heading;
+    position.x = 0x20;
+    position.y = 0;
+    Widget_InitLinked(heading, &p->panelResource, 0, 0x11, 0, 0, 0x3c, &position);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0801A6D0);
-#endif
 
 void SelectionMenu_PopulateActors(struct SelectionMenu *p)
 {
@@ -720,14 +669,14 @@ void SelectionMenu_RefreshItemPage(struct SelectionMenu *p)
         p, (u32)Text_LookupString(Script_ParseStringRef((void *)p->promptMessages)));
 }
 
-#ifdef NONMATCHING
-// fuzzy: 98.5%
-// Only the first held-input read in the repeat branch differs: the ROM reloads the input pointer from ip.
+// MATCHING_CONCESSION: register-pinning
 int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
 {
     int index = p->selectedSlot;
     int direction = 0;
-    if (gUnk_03005260[1] & 0x40)
+    int pressedUp = gUnk_03005260[1] & 0x40;
+    u16 *held = gUnk_03005260;
+    if (pressedUp)
         direction = 1;
     else if (gUnk_03005260[1] & 0x80)
         direction = 2;
@@ -737,14 +686,15 @@ int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
         direction = 8;
     if (!direction) {
         if (p->repeatTicks > 7) {
-            u16 *held = gUnk_03005260;
             if (*held & 0x40)
                 direction = 1;
             else if (*held & 0x80)
                 direction = 2;
-            if (gUnk_03005260[0] & 0x20)
+            /* Read held input again for horizontal navigation. */
+            asm("" ::: "memory");
+            if (held[0] & 0x20)
                 direction |= 4;
-            else if (gUnk_03005260[0] & 0x10)
+            else if (held[0] & 0x10)
                 direction |= 8;
         } else if (gUnk_03005260[0] & 0xf0)
             p->repeatTicks++;
@@ -777,9 +727,6 @@ int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
     }
     return index;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SelectionMenu_NavigateGrid);
-#endif
 
 // MATCHING_CONCESSION: register-pinning
 void SelectionMenu_Choose(struct SelectionMenu *p)

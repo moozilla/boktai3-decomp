@@ -2,7 +2,7 @@
 #include "player.h"
 
 #ifdef NONMATCHING
-// fuzzy: 76.3%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: shared geometry tails, trigonometric table lifetimes and field scheduling.
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: selects sweep, vertical-arc or radial reach from the active attack animation.
@@ -47,41 +47,41 @@ static inline void PlaceRadial(struct AttackMotionContext *q, s32 radius)
 }
 void Player_UpdateAttackColliderMotion(struct Player *p, s32 forced)
 {
-    struct AttackMotionContext *q = (void *)((u8 *)p + 0xB44);
+    struct AttackMotionContext *q = (void *)(((u8 *)p) + 0xB44);
     u32 flags = ActorFlags_GetResponseBits(p);
     s32 power;
     s32 animation;
-    if (PH(0x428) < ActorFlags_SelectResponse(p))
+    if ((*((u16 *)(((u8 *)p) + 0x428))) < ActorFlags_SelectResponse(p))
         flags = 0;
     if (forced) {
         flags |= 0x40000;
-        PH(0xBFC) = 100;
+        *((u16 *)(((u8 *)p) + 0xBFC)) = 100;
     } else
-        PH(0xBFC) = 20;
+        *((u16 *)(((u8 *)p) + 0xBFC)) = 20;
     power = Player_CalculateActionStat(p, q, p->derivedStats[2]);
     animation = p->animationIndex;
     switch (animation) {
         case 0x54: {
             s32 angle;
             PlayerAttackEffect_SetEmissionState(1);
-            q->speed = Div(512, PH(0x9C));
+            q->speed = Div(512, *((u16 *)(((u8 *)p) + 0x9C)));
             q->phase1 = 8;
-            if ((u16)(p->actionCueFlags - 1) > 1) {
-                PH(0xC1A) = 0xFFFF;
+            if (((u16)(p->actionCueFlags - 1)) > 1) {
+                *((u16 *)(((u8 *)p) + 0xC1A)) = 0xFFFF;
                 return;
             }
-            if (PS(0xC1A) != 0x54)
+            if ((*((s16 *)(((u8 *)p) + 0xC1A))) != 0x54)
                 Sound_PlaySong(0x38C);
-            PH(0xC1A) = animation;
+            *((u16 *)(((u8 *)p) + 0xC1A)) = animation;
             ++q->timer;
             if (p->side) {
                 u8 *heading = &q->heading;
-                angle = *heading - q->timer * q->speed + 0x120;
+                angle = ((*heading) - (q->timer * q->speed)) + 0x120;
                 angle &= 255;
                 asm("" : "+r"(angle));
             } else {
                 u8 *heading = &q->heading;
-                angle = q->timer * q->speed + 0x100;
+                angle = (q->timer * q->speed) + 0x100;
                 angle += *heading;
                 angle -= 0x20;
                 angle &= 255;
@@ -92,54 +92,62 @@ void Player_UpdateAttackColliderMotion(struct Player *p, s32 forced)
             q->dest.z = q->origin.z + Scale12(gUnk_086149C4[angle] * 160);
             break;
         }
+
         case 0x81: {
-            s32 angle, radius;
+            s32 angle;
+            s32 radius;
             PlayerAttackEffect_SetEmissionState(2);
-            q->speed = Div(1216, PH(0x9C));
+            q->speed = Div(1216, *((u16 *)(((u8 *)p) + 0x9C)));
             if (p->actionCueFlags <= 1) {
-                PH(0xC1A) = 0xFFFF;
+                *((u16 *)(((u8 *)p) + 0xC1A)) = 0xFFFF;
                 return;
             }
             if (p->actionCueFlags > 3)
                 break;
-            if (PS(0xC1A) != 0x81)
+            if ((*((s16 *)(((u8 *)p) + 0xC1A))) != 0x81)
                 Sound_PlaySong(0x386);
-            PH(0xC1A) = animation;
+            *((u16 *)(((u8 *)p) + 0xC1A)) = animation;
             ++q->timer;
-            angle = (0x150 - q->timer * q->speed) & 255;
+            angle = (0x150 - (q->timer * q->speed)) & 255;
             q->dest.y = q->origin.y + Scale12(gUnk_086149C4[angle & 255] * 250);
             radius = Scale12(gUnk_086149C4[(angle + 64) & 255] * 250);
             q->dest.x = q->origin.x + Scale12(gUnk_086149C4[(q->heading + 64) & 255] * radius);
             q->dest.z = q->origin.z + Scale12(gUnk_086149C4[q->heading] * radius);
             break;
         }
+
         case 0x72:
             PlayerAttackEffect_SetEmissionState(3);
-            q->speed = Div(3584, PH(0x9C));
+            q->speed = Div(3584, *((u16 *)(((u8 *)p) + 0x9C)));
             q->phase1 = 0;
             q->phase2 = 3;
             ++q->timer;
             if (q->timer < q->phase1) {
-                PH(0xC1A) = 0xFFFF;
-                PlaceRadial(q, q->speed * q->timer + 0xCC);
-            } else if (q->timer < q->phase1 + q->phase2) {
-                if (PS(0xC1A) != 0x72)
+                *((u16 *)(((u8 *)p) + 0xC1A)) = 0xFFFF;
+                PlaceRadial(q, (q->speed * q->timer) + 0xCC);
+            } else if (q->timer < (q->phase1 + q->phase2)) {
+                if ((*((s16 *)(((u8 *)p) + 0xC1A))) != 0x72)
                     Sound_PlaySong(0x385);
-                PH(0xC1A) = animation;
-                PlaceRadial(q, q->speed * q->phase1 + 0xCC);
+                *((u16 *)(((u8 *)p) + 0xC1A)) = animation;
+                PlaceRadial(q, (q->speed * q->phase1) + 0xCC);
             }
             break;
+
         default:
-            PH(0xC1A) = 0xFFFF;
+            *((u16 *)(((u8 *)p) + 0xC1A)) = 0xFFFF;
             break;
     }
+
     Collider_SetPosition(q->collider, &q->dest, 0);
     Collider_Refresh(q->collider);
-    Collider_SetAttackProperties(q->collider, power, q->attackParameter, 1, flags, PH(0xBFE));
-    Collider_SetContactMode((u8 *)p + 0xB8C, Player_ComputeActionScale(p, q->collider));
+    Collider_SetAttackProperties(q->collider, power, q->attackParameter, 1, flags,
+                                 *((u16 *)(((u8 *)p) + 0xBFE)));
+    do {
+        Collider_SetContactMode(((u8 *)p) + 0xB8C, Player_ComputeActionScale(p, q->collider));
+    } while (0);
     if (q->extendedFlags == 1)
-        *(u32 *)((u8 *)q->collider + 0x38) |= 0x800000;
-    *((u8 *)q + 0x8A) = q->heading;
+        *((u32 *)(((u8 *)q->collider) + 0x38)) |= 0x800000;
+    *(((u8 *)q) + 0x8A) = q->heading;
 }
 
 #else

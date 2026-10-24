@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 87.5%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: register allocation, pointer lifetimes and shared block placement.
 struct Vec {
@@ -210,7 +210,7 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
         do {
             u16 speed = randomA() & 15;
             u16 variant = randomA() & 1;
-            u8 angle = randomA();
+            s8 angle = randomA();
             u16 drift = randomA() & 15;
             struct Vec *position = &spawn;
             spawn = p->position;
@@ -219,8 +219,11 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
             drift <<= 12;
             variant <<= 12;
             Ratatosk_InitAnimatedParticleParams(params);
-            Ratatosk_ConfigureAnimatedParticle(params, (randomA() & 31) + 292, speed, angle, 1,
-                                               variant, drift);
+            {
+                u8 k1 = 31;
+                Ratatosk_ConfigureAnimatedParticle(params, (randomA() & k1) + 292, speed, angle, 1,
+                                                   variant, drift);
+            }
             sub_081FC26C(params, position);
         } while ((--i) >= 0);
     }
@@ -247,6 +250,7 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
         p->flags = value & (~16);
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Ratatosk_UpdateDefeatSequence);
 #endif

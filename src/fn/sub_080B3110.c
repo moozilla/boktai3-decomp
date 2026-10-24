@@ -1,7 +1,7 @@
 #include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 80.1%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: reset scheduling, saved zero values, and group-address lifetimes.
 void sub_080B1FA8(void *);
@@ -59,6 +59,56 @@ static inline u8 Test_1(u16 *p)
     return 0;
 }
 
+inline static void ResetContext_080B3110(struct SceneActorRegistryResetView *a)
+{
+    struct SceneActorReactionMotion *motion;
+    struct SceneActorRegistryControl *control;
+    u16 *flags;
+    s32 t1;
+    a->field2C2 = 64;
+    a->group.flags414 = 0;
+    a->group.field418 = 0;
+    flags = &a->flags2D4;
+    {
+        s32 mask = ~0x380;
+        *flags = mask & (*flags);
+    }
+    motion = (void *)(&a->fieldDC);
+    {
+        s32 mask = ~0x18;
+        motion->flags = mask & motion->flags;
+    }
+    control = &a->group.control;
+    t1 = 0x200000;
+    if (Chase_Bits32(&a->flags2CC, t1)) {
+        u32 *state = &a->flags2D0;
+        s32 mask = ~0x1000000;
+        *state = mask & (*state);
+        {
+            s32 mask = ~0x200;
+            *flags = mask & (*flags);
+        }
+        control->mode = 0;
+        control->counter = 0;
+        control->timer = 0;
+    }
+    {
+        s32 mask = ~0x400;
+        *flags = mask & (*flags);
+    }
+    a->field5DA = 255;
+}
+
+inline static u8 Test_1_080B3110(u16 *p)
+{
+    {
+        u16 k1 = 1;
+        if ((*p) & k1)
+            return 1;
+    }
+    return 0;
+}
+
 void Vorn_BeginResponsePursuit(struct SceneActorRegistryResetView *a, u32 reset, const void *unused,
                                u32 unused2)
 {
@@ -68,10 +118,10 @@ void Vorn_BeginResponsePursuit(struct SceneActorRegistryResetView *a, u32 reset,
     typeof(*((u16 *)(((u8 *)ctx) + 0x69A))) t1;
     if (ctx->field69E)
         return;
-    if (Test_1(flags) && (!Test(flags, 2)))
+    if (Test_1_080B3110(flags) && (!Test(flags, 2)))
         return;
     ctx->field69E = 60;
-    ResetContext(ctx);
+    ResetContext_080B3110(ctx);
     {
         u32 value = 1 | (*flags);
         value |= 0;
@@ -89,7 +139,7 @@ void Vorn_BeginResponsePursuit(struct SceneActorRegistryResetView *a, u32 reset,
         a->flags2D0 = mask | a->flags2D0;
     }
     {
-        s32 mask = ~16;
+        s8 mask = ~16;
         a->flags2CC = mask & a->flags2CC;
     }
     Chase_SetBehavior(a, 15);
@@ -109,6 +159,7 @@ void Vorn_BeginResponsePursuit(struct SceneActorRegistryResetView *a, u32 reset,
         a->flags2CC = mask | a->flags2CC;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080B3110);
 #endif

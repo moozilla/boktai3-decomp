@@ -1,6 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version
 // fix.py best version (reprinted C)
 // Directional pair placement recovered; stack-vector allocation and projection ordering differ.
@@ -67,6 +68,14 @@ inline static void Project_0813BAD8(struct Vec *screen, struct PackedVec *world)
     screen->z = (depth + height) - ((u16)gUnk_03005418.z);
 }
 
+inline static struct Vec *SetVec_0813BAD8(struct Vec *v, s32 x, s32 y, s32 z)
+{
+    v->x = x;
+    v->y = y;
+    return v;
+    v->z = z;
+}
+
 void sub_0813BAD8(u8 *p)
 {
     struct Vec first;
@@ -91,8 +100,8 @@ void sub_0813BAD8(u8 *p)
                                              15 - (*((s16 *)(gUnk_02000710 + 0x10))));
             Player_SetDirectionalEffectFrame(p + 0x7A0, *((void **)(p + 0x774)),
                                              13 - (*((s16 *)(gUnk_02000710 + 0x10))));
-            SetVec(&first, -28, -44, 0);
-            SetVec(&second, 12, -4, 0);
+            SetVec_0813BAD8(&first, -28, -44, 0);
+            SetVec_0813BAD8(&second, 12, -4, 0);
             break;
 
         case 3:
@@ -100,8 +109,8 @@ void sub_0813BAD8(u8 *p)
                                              9 - (*((s16 *)(gUnk_02000710 + 0x10))));
             Player_SetDirectionalEffectFrame(p + 0x7A0, *((void **)(p + 0x774)),
                                              15 - (*((s16 *)(gUnk_02000710 + 0x10))));
-            SetVec(&first, 16, -32, 0);
-            SetVec(&second, -24, 8, 0);
+            SetVec_0813BAD8(&first, 16, -32, 0);
+            SetVec_0813BAD8(&second, -24, 8, 0);
             break;
 
         case 5:
@@ -109,8 +118,8 @@ void sub_0813BAD8(u8 *p)
                                              11 - (*((s16 *)(gUnk_02000710 + 0x10))));
             Player_SetDirectionalEffectFrame(p + 0x7A0, *((void **)(p + 0x774)),
                                              9 - (*((s16 *)(gUnk_02000710 + 0x10))));
-            SetVec(&first, 16, 8, 0);
-            SetVec(&second, -24, -32, 0);
+            SetVec_0813BAD8(&first, 16, 8, 0);
+            SetVec_0813BAD8(&second, -24, -32, 0);
             break;
 
         case 7:
@@ -118,8 +127,8 @@ void sub_0813BAD8(u8 *p)
                                              13 - (*((s16 *)(gUnk_02000710 + 0x10))));
             Player_SetDirectionalEffectFrame(p + 0x7A0, *((void **)(p + 0x774)),
                                              11 - (*((s16 *)(gUnk_02000710 + 0x10))));
-            SetVec(&first, -20, -4, 0);
-            SetVec(&second, 20, -44, 0);
+            SetVec_0813BAD8(&first, -20, -4, 0);
+            SetVec_0813BAD8(&second, 20, -44, 0);
             break;
 
         default:
@@ -128,7 +137,9 @@ void sub_0813BAD8(u8 *p)
             return;
     }
 
-    position.x = *((s16 *)(p + 0x30));
+    do {
+        position.x = *((s16 *)(p + 0x30));
+    } while (0);
     position.z = *((s16 *)(p + 0x34));
     position.y = *((s16 *)(p + 0x32));
     Project_0813BAD8(&projected, &position);

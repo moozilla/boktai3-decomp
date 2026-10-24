@@ -1,9 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.7%
-// fix.py best version (reprinted C)
-// foundry draft (worker best 91.4%); what differs is mostly register allocation and instruction order
+// MATCHING_CONCESSION: register-pinning
 struct SwordTask {
     u8 unknown0[0x86];
     u16 value86;
@@ -25,20 +22,20 @@ void Sword_InitAttackComponents(struct SwordTask *);
 void sub_080F67AC(struct SwordTask *);
 static inline u8 Sword_ClampKind(s32 kind)
 {
-    if (kind <= 1)
-        goto ret1;
-    kind = 1;
-    return 1;
-ret1:
-    return 1;
+    if (kind > 1)
+        return 1;
+    return kind;
 }
 
 s32 Sword_InitializeFromScript(struct SwordTask *p)
 {
     s32 i;
+    register s32 kind asm("r1");
     s32 *argument;
     p->kind = Script_GetKeywordValue('t', 0);
-    p->kind = Sword_ClampKind(p->kind);
+    kind = p->kind;
+    kind = Sword_ClampKind(kind);
+    p->kind = kind;
     p->palette = 701;
     p->animation = 402;
     Script_SeekToKeyword('a');
@@ -57,6 +54,3 @@ s32 Sword_InitializeFromScript(struct SwordTask *p)
     sub_080F67AC(p);
     return p->ticks = 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Sword_InitializeFromScript);
-#endif

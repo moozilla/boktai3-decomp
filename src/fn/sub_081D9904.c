@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 92.0%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: parameter flag operations and saved pointer lifetimes.
 
@@ -175,19 +175,19 @@ s32 Task4E01_SpawnImpactChildren(u8 *input)
     register const volatile u16 *randomTable asm("r9");
     if (!(config->flags & 0x10)) {
         randomIndex = &gUnk_03005308;
-        randomTable = gUnk_0203B400;
         i = 0;
         do {
+            randomTable = gUnk_0203B400;
             if (config->flags & 0x20) {
-                *randomIndex = ((*randomIndex) + 1) & 1023;
+                *(&gUnk_03005308) = ((*(&gUnk_03005308)) + 1) & 1023;
                 {
                     u8 k1 = 32;
                     config->direction =
-                        ((randomTable[*randomIndex] & 63) - k1) + ((u8)config->direction);
+                        ((randomTable[*(&gUnk_03005308)] & 63) - k1) + ((u8)config->direction);
                 }
             } else {
-                *randomIndex = ((*randomIndex) + 1) & 1023;
-                config->direction = randomTable[*randomIndex];
+                *(&gUnk_03005308) = ((*(&gUnk_03005308)) + 1) & 1023;
+                config->direction = randomTable[*(&gUnk_03005308)];
             }
             Projectile_InitializeParams(params);
             if (i == 0)
@@ -226,6 +226,7 @@ s32 Task4E01_SpawnImpactChildren(u8 *input)
     Task4E01_BeginImpactAnimation(p);
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Task4E01_SpawnImpactChildren);
 #endif

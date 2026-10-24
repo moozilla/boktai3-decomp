@@ -1,7 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 63.6%
 struct CloudPosition {
     u16 x, y, z, pad;
 };
@@ -17,40 +15,50 @@ struct CloudTask {
 };
 extern struct CloudTask *gUnk_02000298;
 extern u32 gUnk_03005308;
-static inline u32 RandomValue(const u16 *table)
-{
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
-    return table[index];
-}
-static inline s32 ShiftAnchor(s32 coordinate, u32 random)
-{
-    s32 shifted = coordinate - 512;
-    asm("" : : "r"(shifted));
-    return shifted + (random & 1023);
-}
 // confidence=low: scatters particle anchors horizontally and raises them by sixteen units.
 #define PlayerParticleCloud_ScatterAnchors sub_081D3620
 s32 PlayerParticleCloud_ScatterAnchors(void)
 {
     struct CloudTask *p = gUnk_02000298;
     struct CloudParticle *particle;
-    const u16 *table;
+    register const u16 *table asm("r5");
     s32 i;
+    s32 bias;
+    u32 *indexPtr;
+    u32 mask;
     if (!p)
         return -1;
     particle = p->particles;
-    table = (const u16 *)RANDOM_TABLE_ADDR;
+    table = (const u16 *)0x0203B400;
+    indexPtr = &gUnk_03005308;
+    mask = 1023;
+    bias = -512;
     for (i = 39; i >= 0; i--, particle++) {
-        u32 random = RandomValue(table);
-        particle->origin.x = ShiftAnchor(particle->origin.x, random);
-        random = RandomValue(table);
-        particle->origin.z = ShiftAnchor(particle->origin.z, random);
+        u32 index;
+        register u32 random asm("r0");
+        register s32 shiftedX asm("r2");
+        s32 shiftedZ;
+        index = *indexPtr;
+        index++;
+        index &= mask;
+        *indexPtr = index;
+        random = table[index];
+        shiftedX = particle->origin.x + bias;
+        random &= mask;
+        shiftedX += random;
+        particle->origin.x = shiftedX;
+        index = (index + 1) & mask;
+        *indexPtr = index;
+        index <<= 1;
+        index += (u32)table;
+        random = *(const u16 *)index;
+        shiftedZ = particle->origin.z + bias;
+        random &= mask;
+        shiftedZ += random;
+        particle->origin.z = shiftedZ;
         particle->origin.y += 4096;
         particle->anchor = &particle->origin;
     }
+
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081D3620);
-#endif

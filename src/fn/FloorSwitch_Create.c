@@ -1,10 +1,6 @@
 #include "global.h"
 #include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: 96.6%
-// Open: the "pressed" block ORs a register holding 0 into flags88
-// (movs r5,#0; orrs r0,r5) before the & ~1; until that zero is reproduced,
-// &delta is hoisted before the registry call and ip/r8 swap.
+// MATCHING_CONCESSION: register-pinning
 struct Vec16 {
     s16 x, y, z;
 };
@@ -121,24 +117,26 @@ void FloorSwitch_Create(void)
         AnimData_SelectPaletteBank(e->anim, 0x16C);
     }
     {
-        struct SceneObject *o;
-        struct Vec16 *d = &delta;
+        register struct SceneObject *o asm("r4");
+        struct Vec16 *d;
         if (SceneBody_GetRegistry())
             goto scan;
         goto skip;
     found:
         e->field5A = o->next0;
-        e->flags88 = (e->flags88 | 2) & ~1;
+        e->flags88 |= 2;
+        e->flags88 &= ~1;
         e->field8C = 0;
         e->field10 = 1;
         AnimData_SelectPaletteBank(e->anim, 0x16D);
         goto skip;
     scan:
         for (o = SceneBody_GetRegistry()->head; o; o = o->next) {
+            d = &delta;
             if (!(o->flags & 2)) {
                 struct Vec16 *op = (struct Vec16 *)&o->x;
                 struct Vec16 *ep = (struct Vec16 *)&e->x;
-                d->x = op->x - ep->x;
+                d->x = o->x - ep->x;
                 d->y = op->y - ep->y;
                 d->z = op->z - ep->z;
                 if ((u16)d->x <= 0x100 && d->y <= 0x20 && d->y >= 0 && d->z <= 0x100 && d->z >= 0)
@@ -157,6 +155,3 @@ skip:
     e->field8B = 0;
     e->field8A = 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", FloorSwitch_Create);
-#endif

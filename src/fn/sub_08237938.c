@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 94.2%
+// fix.py best (sweep after the inlined-insn fix)
 struct GlyphPosition {
     u16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -49,23 +49,27 @@ void ActorGlyphTrail_UpdateParticles(struct GlyphTrail *p)
     register s32 direction asm("r10") = ((p->direction + 5) & 7) << 5;
     register u16 *timer asm("r5") = &p->slots[0].timer;
     s32 i;
-    for (i = 0; i <= 3; i++, timer = (u16 *)((u8 *)timer + 0x30)) {
-        struct GlyphParticleView *slot = (void *)((u8 *)p + 0x94 + i * 0x30);
+    typeof(timer = (u16 *)(((u8 *)timer) + 0x30)) t1;
+    u32 k1 = 255;
+    t1 = (timer = (u16 *)(((u8 *)timer) + 0x30));
+    for (i = 0; i <= 3; i++, t1) {
+        struct GlyphParticleView *slot = (void *)((((u8 *)p) + 0x94) + (i * 0x30));
         if (slot->active) {
             slot->timer++;
             if (slot->timer > 14) {
                 slot->active = 0;
                 p->slots[i].flags |= 1;
             } else {
-                s32 radius = slot->radius * (16 - *timer) >> 3;
-                s32 angle = (direction + WidenAngle(slot->angle)) & 255;
+                s32 radius = (slot->radius * (16 - (*timer))) >> 3;
+                s32 angle = (direction + WidenAngle(slot->angle)) & k1;
                 slot->position = p->position;
-                slot->position.x += Truncate(gUnk_086149C4[(angle + 64) & 255] * radius);
-                slot->position.z += Truncate(gUnk_086149C4[angle & 255] * radius);
+                slot->position.x += Truncate(gUnk_086149C4[(angle + 64) & k1] * radius);
+                slot->position.z += Truncate(gUnk_086149C4[angle & k1] * radius);
             }
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08237938);
 #endif

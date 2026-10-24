@@ -1,10 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_vec.h"
-#ifdef NONMATCHING
-// fuzzy: 75.8%
-// fix.py best version (reprinted C)
-// Remaining differences: second-loop field cursors, action-state addressing and spills.
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, u32);
@@ -23,10 +19,14 @@ static inline void Vector(struct SceneVec *v, s32 angle, s32 scale)
     v->y = 0;
     v->z = Scale(gUnk_086149C4[angle & 255] * scale);
 }
+static inline u32 MaskedFlags(u32 *flags, u32 mask)
+{
+    return *flags & mask;
+}
 static inline void ChangeAction(u8 *p, u32 action)
 {
     u32 zero = 0;
-    if (*(u32 *)(p + 0x160) & 0x100)
+    if (MaskedFlags((u32 *)(p + 0x160), 0x100))
         return;
     if ((u8)(p[0x16d] - 25) <= 1 && !p[0x170])
         return;
@@ -51,7 +51,6 @@ s32 Vanargand_InitializePartController(u8 *boss, s32 arg, u8 *palettes, s32 mode
     u16 *key;
     s32 i;
     void *data = ScriptProc_Start(0xcb05, 0xb3de);
-    typeof(half) c1;
     resource = boss + 0x78;
     ResourceHeader_Relocate(resource, data);
     animation = boss + 0x18;
@@ -71,11 +70,11 @@ s32 Vanargand_InitializePartController(u8 *boss, s32 arg, u8 *palettes, s32 mode
     *((void **)(boss + 0x4d0)) = ScriptProc_Start(0x922e, 0x572b);
     i = 0;
     links = (void **)(boss + 0x228);
+    palette = (void **)(boss + 0xd0);
     key = (u16 *)(boss + 0xca);
     half = boss + 0x98;
-    c1 = half;
     do {
-        PairedSceneActor_InitializeHalf(c1, arg, i);
+        PairedSceneActor_InitializeHalf(half, arg, i);
         if (i == 1) {
             *key = 0x70;
             links[0] = boss + 0x514;
@@ -97,16 +96,20 @@ s32 Vanargand_InitializePartController(u8 *boss, s32 arg, u8 *palettes, s32 mode
         CpuSet(links[0], *palette, 0x04000008);
         {
             register u32 stride asm("r0") = 0x21c;
-            asm("" : "+r"(stride));
             links = (void **)(((u8 *)links) + stride);
             palette = (void **)(((u8 *)palette) + stride);
             key = (u16 *)(((u8 *)key) + stride);
             half += stride;
         }
-        palette = (void **)(boss + 0xd0);
         i++;
     } while (i <= 1);
-    *((u32 *)(boss + 0x5b4)) = 0;
+    {
+        register u32 offset asm("r2") = 0x5b4;
+        u32 *state;
+        state = (u32 *)(boss + offset);
+        asm("" : : "r"(offset));
+        *state = 0;
+    }
     switch (mode) {
         case 0:
             *((u16 *)(boss + 0x20c)) = 0;
@@ -114,21 +117,19 @@ s32 Vanargand_InitializePartController(u8 *boss, s32 arg, u8 *palettes, s32 mode
             break;
 
         case 1:
-            half = boss + 0x98;
+            i = 0;
             do {
-                *((u16 *)(half + 0x174)) = *((u16 *)(half + 0x176));
-                *((u32 *)half) &= ~1;
-                CpuSet(*((void **)(half + 0x190)), *((void **)(half + 0x38)), 0x04000008);
-                Vector((struct SceneVec *)(half + 0x9c), *((s16 *)(half + 0xac)),
-                       *((s16 *)(half + 0xae)));
-                ChangeAction(half, 2);
-                half += 0x21c;
-            } while (half <= (boss + 0x2b4));
+                *((u16 *)(boss + i * 0x21c + 0x20c)) = *((u16 *)(boss + i * 0x21c + 0x20e));
+                *((u32 *)(boss + i * 0x21c + 0x98)) &= ~1;
+                CpuSet(*((void **)(boss + i * 0x21c + 0x228)),
+                       *((void **)(boss + i * 0x21c + 0xd0)), 0x04000008);
+                Vector((struct SceneVec *)(boss + i * 0x21c + 0x134),
+                       *((s16 *)(boss + i * 0x21c + 0x144)), *((s16 *)(boss + i * 0x21c + 0x146)));
+                ChangeAction(boss + i * 0x21c + 0x98, 2);
+                i++;
+            } while (i <= 1);
             break;
     }
 
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081B5EA4);
-#endif

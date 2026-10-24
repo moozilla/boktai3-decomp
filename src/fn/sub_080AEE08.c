@@ -3,7 +3,7 @@
 #include "script_utility.h"
 
 #ifdef NONMATCHING
-// fuzzy: 90.0%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: tentative Vorn behavior role.
 // confidence=low: tentative Vorn behavior role recovered from the surrounding callbacks.
@@ -44,6 +44,18 @@ static inline u32 RandomFrom(const u16 *table)
     v &= 3;
     return v + 1;
 }
+inline static u32 Random4_UpdateDefeat(void)
+{
+    register u32 *cursor asm("r3") = &gUnk_03005308;
+    u32 index = ((*cursor) + 1) & 1023;
+    register u32 v asm("r1");
+    *cursor = index;
+    index *= 2;
+    v = *((const u16 *)(index + ((u32)(*((typeof(gUnk_0203B400) *)0x0203B400)))));
+    v &= 3;
+    return v + 1;
+}
+
 void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
 {
     s32 values[8];
@@ -87,14 +99,14 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         rangeB.y = 60;
         rangeB.z = t1 + 52;
         {
-            register const u16 *table asm("r4") = gUnk_0203B400;
+            register const u16 *table asm("r4") = *((typeof(gUnk_0203B400) *)0x0203B400);
             register s32 duration asm("r8");
             register s32 scale asm("sl");
             register s32 count asm("r9");
             register struct ContactPackedVector *range asm("r5") = &rangeB;
             register struct ContactPosition *position asm("r6");
-            SparkParticle_Spawn(position = &actor->position, Random4(), range, 0x20, count = 4,
-                                duration = 20, scale = 2, 1);
+            SparkParticle_Spawn(position = &actor->position, Random4_UpdateDefeat(), range, 0x20,
+                                count = 4, duration = 20, scale = 2, 1);
             SparkParticle_Spawn(position, RandomFrom(table), range, 0x40, count, duration, scale,
                                 1);
             SparkParticle_Spawn(position, RandomFrom(table), range, 0x5E, count, duration, scale,
@@ -173,6 +185,7 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     }
     ActorShadow_Disable(((u8 *)actor) + 0x320);
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Vorn_UpdateDefeat);
 #endif

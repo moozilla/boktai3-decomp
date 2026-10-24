@@ -2,7 +2,7 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
-// fuzzy: 89.2%
+// fix.py best (sweep after the inlined-insn fix)
 // foundry draft (worker best 89.2%); what differs is mostly register allocation and instruction order
 #define gRandomTableIndex gUnk_03005308
 #define gRandomTable      gUnk_0203B400
@@ -44,10 +44,17 @@ static inline void Clear(u32 *p, u32 mask)
 {
     *p &= ~mask;
 }
+inline static s32 RandomByte_TrySoloAction(void)
+{
+    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+    return *((const u8 *)((*((typeof(gUnk_0203B400) *)0x0203B400)) + gUnk_03005308));
+}
+
 void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
 {
     struct SceneActorRegistryResetView *q = p;
     u8 zero;
+    s32 t1;
     if (Inactive(p))
         return;
     {
@@ -57,7 +64,8 @@ void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
     }
     if (!q->field688)
         return;
-    if (!Test(&q->flags6D4, 4))
+    t1 = 4;
+    if (!Test(&q->flags6D4, t1))
         return;
     if (SceneActorRegistry_CountLivingByCategory(0x19) > 1)
         return;
@@ -68,7 +76,7 @@ void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
         q->timer68D = zero - 1;
     else {
         q->timer68D = 0xF0;
-        if (RandomByte() <= 0x9F)
+        if (RandomByte_TrySoloAction() <= 0x9F)
             return;
         if (!q->field688)
             return;
@@ -94,6 +102,7 @@ void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
         p->word104 = zero;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", SceneActor_TrySoloAction);
 #endif

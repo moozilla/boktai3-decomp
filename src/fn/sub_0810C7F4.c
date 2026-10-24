@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 91.1%
+// fix.py best (sweep after the inlined-insn fix)
 // Structure matches; register allocation in the second slot loop differs (ROM keeps &role in ip via r1, zero in r4).
 struct LinkSlot {
     u8 cur, prev, state;
@@ -77,12 +77,20 @@ static inline void SetUpdate(struct LinkPanel *p, void (*fp)(struct LinkPanel *)
     p->exiting = st;
 }
 
+inline static s32 GetPeer_0810C7F4(void)
+{
+    u16 r = -1;
+    u8 *st = gUnk_020004B4;
+    if (st)
+        r = *((u16 *)(st + 0x1a));
+    return r;
+}
+
 void sub_0810C7F4(struct LinkPanel *p)
 {
     s32 i;
     struct LinkSlot *s;
     u32 zero;
-
     if (p->redraw) {
         p->message = 0xff;
         Bg_SetLayerMap(3, p->layerMap, 2);
@@ -95,6 +103,7 @@ void sub_0810C7F4(struct LinkPanel *p)
             s->state = zero;
             RegistryF246_ShowSlotDefaultFrame(p, i);
         }
+
         p->padF5B = 0;
         ScrollingDialogue_ClearScript();
         ScrollingDialogue_SetScript(Text_LookupString(Script_ParseStringRef(p->script) + 2));
@@ -102,7 +111,7 @@ void sub_0810C7F4(struct LinkPanel *p)
         p->delay = 2;
     }
     p->role = Serial_GetRole();
-    p->peerIndex = GetPeer();
+    p->peerIndex = GetPeer_0810C7F4();
     {
         u32 zero2;
         for (i = 0, zero2 = 0, s = (struct LinkSlot *)p->slotData; i <= 1; i++, s++) {
@@ -112,7 +121,7 @@ void sub_0810C7F4(struct LinkPanel *p)
             else
                 s->cur = peerStatus(i);
             if (s->prev != s->cur)
-                *((u8 *)p + i * 0x5fc + 0x942) = zero2;
+                *((((u8 *)p) + (i * 0x5fc)) + 0x942) = zero2;
         }
     }
     SlotMenu_UpdateLastEntry(p);
@@ -133,6 +142,7 @@ void sub_0810C7F4(struct LinkPanel *p)
         p->flags |= 1;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0810C7F4);
 #endif

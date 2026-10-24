@@ -45,19 +45,18 @@ void Player_LoadVisualParameters(struct Player *p)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 60.3%
+// fix.py best (sweep after the inlined-insn fix)
 // Palette blend layout recovered; channel allocation remains tentative.
 void sub_0813C9B4(struct Player *actor, const u16 *input, s32 weightA, s32 weightB, s32 shift)
 {
     register struct Player *p asm("sl") = actor;
-    register s32 sourceWeight asm("ip") = weightA;
     register s32 baseWeight asm("sb") = weightB;
     register const u16 *source asm("r8");
     register u16 *base asm("r6");
     s32 i;
     u8 *brightnessPtr;
     u32 *palette;
-    if (!sourceWeight) {
+    if (!weightA) {
         if (!p->unk419)
             p->actionVariantResource = (u32)p->visualParameters;
         else
@@ -71,7 +70,7 @@ void sub_0813C9B4(struct Player *actor, const u16 *input, s32 weightA, s32 weigh
         base = (u16 *)p->visualParameters;
         brightnessPtr = p->unkAC6;
         for (; i < 16; i++) {
-            if ((u32)(i - 5) <= 1 || i == 13)
+            if ((((u32)(i - 5)) <= 1) || (i == 13))
                 base[16] = base[0];
             else {
                 u32 color = *source;
@@ -79,31 +78,34 @@ void sub_0813C9B4(struct Player *actor, const u16 *input, s32 weightA, s32 weigh
                 register s32 r asm("r4");
                 register s32 g asm("r2");
                 register s32 b asm("r5");
-                s32 br, bg, bb;
+                s32 br;
+                s32 bg;
+                s32 bb;
                 r = color & 31;
                 brightness = *brightnessPtr;
                 r += brightness;
                 if (r > 31)
                     r = 31;
-                g = (((u16)color >> 5) & 31) + brightness;
+                g = ((((u16)color) >> 5) & 31) + brightness;
                 if (g > 31)
                     g = 31;
-                b = (((u16)color >> 10) & 31) + brightness;
+                b = ((((u16)color) >> 10) & 31) + brightness;
                 if (b > 31)
                     b = 31;
                 color = *base;
                 br = color & 31;
-                bg = ((u16)color >> 5) & 31;
-                bb = ((u16)color >> 10) & 31;
-                r = (sourceWeight * r + baseWeight * br) >> shift;
-                g = (sourceWeight * g + baseWeight * bg) >> shift;
-                b = (sourceWeight * b + baseWeight * bb) >> shift;
-                base[16] = (b << 10) | (g << 5) | r;
+                bg = (((u16)color) >> 5) & 31;
+                bb = (((u16)color) >> 10) & 31;
+                r = ((weightA * r) + (baseWeight * br)) >> shift;
+                g = ((weightA * g) + (baseWeight * bg)) >> shift;
+                b = ((weightA * b) + (baseWeight * bb)) >> shift;
+                base[16] = ((b << 10) | (g << 5)) | r;
             }
             source++;
             base++;
         }
-        *palette = (u32)((u8 *)p + 0x380);
+
+        *palette = (u32)(((u8 *)p) + 0x380);
     } else {
         i = 0;
         brightnessPtr = p->unkAC6;
@@ -115,33 +117,37 @@ void sub_0813C9B4(struct Player *actor, const u16 *input, s32 weightA, s32 weigh
                 register s32 r asm("r4");
                 register s32 g asm("r2");
                 register s32 b asm("r5");
-                s32 br, bg, bb;
-                r = color & 31;
+                s32 br;
+                s32 bg;
+                s32 bb;
+                r = (u16)(color & 31);
                 brightness = *brightnessPtr;
                 r += brightness;
                 if (r > 31)
                     r = 31;
-                g = (((u16)color >> 5) & 31) + brightness;
+                g = ((((u16)color) >> 5) & 31) + brightness;
                 if (g > 31)
                     g = 31;
-                b = (((u16)color >> 10) & 31) + brightness;
+                b = ((((u16)color) >> 10) & 31) + brightness;
                 if (b > 31)
                     b = 31;
                 color = *base;
                 br = color & 31;
-                bg = ((u16)color >> 5) & 31;
-                bb = ((u16)color >> 10) & 31;
-                r = (sourceWeight * r + baseWeight * br) >> shift;
-                g = (sourceWeight * g + baseWeight * bg) >> shift;
-                b = (sourceWeight * b + baseWeight * bb) >> shift;
-                base[16] = (b << 10) | (g << 5) | r;
+                bg = (((u16)color) >> 5) & 31;
+                bb = (((u16)color) >> 10) & 31;
+                r = ((weightA * r) + (baseWeight * br)) >> shift;
+                g = ((weightA * g) + (baseWeight * bg)) >> shift;
+                b = ((weightA * b) + (baseWeight * bb)) >> shift;
+                base[16] = ((b << 10) | (g << 5)) | r;
             }
             source++;
             base++;
         }
-        p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+
+        p->visualObject->parameters = (u32)(((u8 *)p) + 0x380);
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0813C9B4);
 #endif
@@ -645,9 +651,7 @@ s32 SceneActor_SelectEffectDisplayMode(struct Player *p, s32 mode)
     return mode;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// Register copies and indexed timer-load allocation remain different.
+// MATCHING_CONCESSION: register-pinning
 
 void Player_EmitQueuedEffects(struct Player *);
 s32 Mod(s32, s32);
@@ -669,9 +673,10 @@ static inline void Player_StoreStatusTimer(u16 *timers, s32 offset, u32 duration
 {
     *(u16 *)((u8 *)timers + offset) = duration;
 }
-void sub_0813D834(struct Player *p, s32 inputKind, u32 duration)
+void sub_0813D834(struct Player *p, s32 inputKind, u32 inputDuration)
 {
     register s32 kind asm("r3") = inputKind;
+    u32 duration = inputDuration;
     s32 offset;
     switch (kind) {
         case 0: {
@@ -688,8 +693,10 @@ void sub_0813D834(struct Player *p, s32 inputKind, u32 duration)
                     break;
             }
             {
-                u32 current = p->scriptStatus[kind];
-                offset = kind * 2;
+                register s32 scaled asm("r0") = kind * 2;
+                u16 *timers = p->scriptStatus;
+                u32 current = *(u16 *)((u8 *)timers + scaled);
+                offset = scaled;
                 if (!current) {
                     u16 *target = &gUnk_02000504;
                     s32 random = Mod(Player_NextStatusRandom(), 7);
@@ -707,10 +714,6 @@ void sub_0813D834(struct Player *p, s32 inputKind, u32 duration)
     }
     Player_StoreStatusTimer(p->scriptStatus, offset, duration);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0813D834);
-#endif
 
 void Player_ClearStateTimer(struct Player *p, s32 idx)
 {

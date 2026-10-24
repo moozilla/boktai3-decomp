@@ -1,10 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 91.8%
-// fix.py best version (reprinted C)
-// Differs: case 28 loads 3 before 2 in the ROM, the hoisted zero (r5) comes first, and i++ is
-// reloaded into r4 and compared directly instead of reloaded again.
 #include "scene_panel.h"
 #include "scene_panel_commands.h"
 struct BlinkCommand {
@@ -38,30 +33,25 @@ void sub_0817B2DC(struct BlinkActor *p)
             SceneMessages_SetPendingTrigger(receiver, command);
             op = command->opcode;
             switch (op) {
-                case 1:
-                    p->modeA = 0;
-                    p->modeB = 0;
-                    p->modeC = 0;
-                    p->timer = 0;
+                case 1: {
+                    s32 zero = 0;
+                    u8 *modeA = &p->modeA;
+                    u8 *modeB = &p->modeB;
+                    u8 *modeC = &p->modeC;
+                    u32 *timer = &p->timer;
+                    *modeA = zero;
+                    *modeB = zero;
+                    *modeC = zero;
+                    *timer = zero;
                     p->active = op;
                     break;
+                }
 
                 case 5:
                     p->level = (command->value + 5) << 5;
-                    {
-                        typeof(p->modeA) *q1 = &p->modeA;
-                        *q1 = 2;
-                    }
-                    p->modeB = 0;
-                    p->modeC = 1;
-                    p->timer = 0;
-                    p->active = 1;
-                    break;
-
-                case 28:
                     p->modeA = 2;
                     p->modeB = 0;
-                    p->modeC = 3;
+                    p->modeC = 1;
                     p->timer = 0;
                     p->active = 1;
                     break;
@@ -73,12 +63,19 @@ void sub_0817B2DC(struct BlinkActor *p)
                     p->timer = 0;
                     p->active = 1;
                     break;
+
+                case 28: {
+                    s32 mode = 3;
+                    p->modeA = 2;
+                    p->modeB = 0;
+                    p->modeC = mode;
+                    p->timer = 0;
+                    p->active = 1;
+                    break;
+                }
             }
 
             i++;
         } while (i < receiver->count[gUnk_0200047C->bank]);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0817B2DC);
-#endif

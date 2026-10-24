@@ -1,9 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 95.5%
-// Remaining differences: Step spills the sprite pointer to the stack and the row mask register differs.
 // confidence=low: refreshes segment animations from their direction, keeping frame and timer.
 struct SegmentAnim {
     const u16 *data;
@@ -29,43 +26,41 @@ void Anim_SetDurationScale(void *, u32);
 static inline u8 TestMask2(struct SegmentAnim *p, u32 mask)
 {
     register u32 m asm("r1") = mask;
-    asm("" : "+r"(m));
     if (*(volatile u8 *)&p->status & m)
         return 1;
     return 0;
 }
-static inline u8 TestMask(struct SegmentAnim *p, u32 mask)
+static inline u8 TestMask(struct SegmentAnim *p)
 {
     u32 f = p->status;
-    asm("" : "+r"(f));
-    if (f & mask)
+    if (f & 1)
         return 1;
     return 0;
 }
 static inline void *ScriptAt(u8 *body, s32 offset)
 {
-    register u32 address asm("r0") = 0x4d4;
+    u32 address = 0x4d4;
     address += (u32)body;
-    asm("" : "+r"(address));
     address += offset;
     return *(void **)address;
 }
 static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
 {
-    register struct Segment *seg asm("r8") = sprite;
-    register struct Segment *o asm("r7") = seg;
+    struct Segment *seg = sprite;
+    struct Segment *o = seg;
     struct SegmentAnim *a = input;
-    register struct SegmentAnim *b asm("r4") = input;
+    struct SegmentAnim *b = input;
     const volatile u16 *entry;
-    asm("" : "+r"(o), "+r"(b));
     entry = a->data + a->frame;
-    seg->frame = *entry >> 6;
+    {
+        u32 frame = *entry >> 6;
+        seg->frame = frame;
+    }
     {
         u32 input = a->flags;
         u32 left = 1;
-        u32 mask = 1;
         left &= input;
-        if (left != (((*entry & 0x30) >> 4) & mask))
+        if (left != (((*entry & 0x30) >> 4) & 1))
             seg->flags |= 4;
         else
             seg->flags &= ~4;
@@ -98,7 +93,7 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
             if (flags & 4) {
                 u32 index = b->frame;
                 if (index == 0) {
-                    register u32 f8 asm("r0") = 8;
+                    u32 f8 = 8;
                     f8 &= flags;
                     if (f8)
                         b->timer = savedDuration;
@@ -112,8 +107,8 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
                 b->frame = index;
                 frameCount = b->count;
                 if ((index & mask) >= frameCount) {
-                    u32 endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
+                    u32 endFlag = 8;
+                    endFlag &= flags;
                     if ((u8)endFlag) {
                         b->timer = duration;
                         b->frame = frameCount - 1;
@@ -127,7 +122,7 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
                 u32 r = (b->factor * b->scale) >> 6;
                 b->rate = r;
                 if (!(u8)r) {
-                    register u32 one asm("r0") = 1;
+                    u32 one = 1;
                     b->rate = one;
                 }
             }
@@ -136,17 +131,17 @@ static inline void Step(struct SegmentAnim *input, struct Segment *sprite)
 }
 void TentacleBody_RefreshDirectionalAnimations(u8 *input, s32 inputKind)
 {
-    register u8 *body asm("r9") = input;
+    u8 *body = input;
     struct {
         s32 row, flags, kind;
         u8 *profile, *actor;
         s32 i;
     } frame;
-    register s32 offset asm("r10");
+    s32 offset;
     s32 four;
     u16 frameSave, timerSave;
     struct SegmentAnim *a;
-    register struct Segment *s asm("r8");
+    struct Segment *s;
     frame.kind = inputKind;
     frame.actor = body;
     frame.profile =
@@ -158,7 +153,7 @@ void TentacleBody_RefreshDirectionalAnimations(u8 *input, s32 inputKind)
     a = (void *)(body + 0x4c4);
     s = (void *)(body + 0x3d4);
     do {
-        if (!TestMask(a, 1)) {
+        if (!TestMask(a)) {
             if (TestMask2(a, 4)) {
                 TentacleBody_GetDirectionFrame((FIELD(a, 0x14, u8) + 128) & 255, &frame.row,
                                                &frame.flags);
@@ -179,9 +174,7 @@ void TentacleBody_RefreshDirectionalAnimations(u8 *input, s32 inputKind)
                 {
                     register u8 *act asm("r1") = frame.actor;
                     register u16 *ad asm("r0");
-                    asm("" : "+r"(act));
                     ad = (u16 *)(act + 0x2c2);
-                    asm("" : "+r"(ad));
                     Anim_SetDurationScale(a, *ad);
                 }
                 a->frame = frameSave;
@@ -191,7 +184,6 @@ void TentacleBody_RefreshDirectionalAnimations(u8 *input, s32 inputKind)
         }
         {
             register u32 step asm("r1") = 0x128;
-            asm("" : "+r"(step));
             offset += step;
             a = (void *)((u8 *)a + step);
             s = (void *)((u8 *)s + step);
@@ -202,7 +194,3 @@ void TentacleBody_RefreshDirectionalAnimations(u8 *input, s32 inputKind)
                  t;
              }) < FIELD(body, 0x8da, s16));
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", TentacleBody_RefreshDirectionalAnimations);
-#endif

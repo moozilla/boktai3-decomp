@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 85.2%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: pause branch layout, random-table lifetimes, stack slots and explicit callback return.
 #include "screamer_playback.h"
@@ -39,7 +39,7 @@ static inline u32 RandomValue(void)
 {
     return RandomFrom((const u16 *)RANDOM_TABLE_ADDR);
 }
-s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
+void Screamer_UpdateDamageParticles(struct ScreamerState *p)
 {
     struct ScreamerParticleParameters parameters;
     struct ActorPosition position;
@@ -48,8 +48,10 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
     void *graphics;
     u16 *blink;
     register u32 allocationToken asm("r0");
-    if (PauseFlags(0x400) || TestFlags(&gUnk_02000560, 4))
-        return 0;
+    s32 t1;
+    t1 = 4;
+    if (PauseFlags(0x400) || TestFlags(&gUnk_02000560, t1))
+        return;
     Callback_InvokeActor(p, p->update);
     graphics = p->graphics;
     if ((p->f1DC > 0) && (!p->f1E0)) {
@@ -127,8 +129,9 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
     }
     p->age++;
     asm("" : : "r"(allocationToken));
-    return 0;
+    return;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Screamer_UpdateDamageParticles);
 #endif

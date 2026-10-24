@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 90.5%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining difference: the script value array (values[]) stores go through a hoisted sp+0x24 base register instead of direct sp-relative stores; script/offset temporaries then shift registers.
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
@@ -26,7 +26,10 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
 {
     u8 *ctx = actor->context;
     struct {
-        u16 x, y, z, w;
+        u16 x;
+        u16 y;
+        u16 z;
+        u16 w;
     } pieces[3];
     u16 script;
     if (SceneActorReaction_TakePrepared(actor)) {
@@ -38,18 +41,19 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         Bee_ConsumeFlag80(actor);
         if (!Flag(actor, 0x4000, 0x2D4)) {
             s32 i;
-            u16 px, py;
+            u16 px;
+            u16 py;
             register u16 pz asm("r0");
             struct ContactPosition *pos;
             u32 index = (gUnk_03005308 + 1) & 1023;
             u32 count;
             gUnk_03005308 = index;
-            count = Mod(*(u16 *)(RANDOM_TABLE_ADDR + index * 2), 3) + 1;
+            count = Mod(*((u16 *)(0x0203B400 + (index * 2))), 3) + 1;
             pos = &actor->position;
             {
                 u16 *a = (u16 *)pos;
-                u16 *b = (u16 *)((u8 *)actor + 0x5E);
-                u16 *c = (u16 *)((u8 *)actor + 0x60);
+                u16 *b = (u16 *)(((u8 *)actor) + 0x5E);
+                u16 *c = (u16 *)(((u8 *)actor) + 0x60);
                 px = *a;
                 py = *b;
                 pz = *c;
@@ -63,31 +67,34 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
                     q[1] = py;
                     q[2] = pz;
                     q += 4;
-                } while (--i >= 0);
+                } while ((--i) >= 0);
             }
-            sub_0800AFE8(count, 0, *(u8 *)(ctx + 0x5BC), pos, pieces, 300, 120);
+            sub_0800AFE8(count, 0, *((u8 *)(ctx + 0x5BC)), pos, pieces, 300, 120);
         }
     }
     if (!actor->field2B3)
         return;
     actor->field2B0 = 1;
     SceneActorBehavior_CallTerrainScript(actor);
-    script = *(u16 *)((u8 *)actor + 0x1F8);
     if (script) {
         s32 values[8];
         struct ScriptUtilityArguments arguments;
         values[0] = actor->position.x;
-        values[1] = actor->position.y;
+        {
+            typeof(values[1]) *q1 = &values[1];
+            *q1 = actor->position.y;
+        }
         values[2] = actor->position.z;
-        values[3] = *(s32 *)((u8 *)actor + 0x1FC);
-        values[4] = *(s32 *)((u8 *)actor + 0x200);
-        values[5] = *(s32 *)((u8 *)actor + 0x204);
-        values[6] = *(s32 *)((u8 *)actor + 0x2E0);
+        values[3] = *((s32 *)(((u8 *)actor) + 0x1FC));
+        values[4] = *((s32 *)(((u8 *)actor) + 0x200));
+        values[5] = *((s32 *)(((u8 *)actor) + 0x204));
+        values[6] = *((s32 *)(((u8 *)actor) + 0x2E0));
         values[7] = actor->id;
         arguments.count = 8;
         arguments.values = values;
         Script_Call(script, &arguments);
     }
+    script = *((u16 *)(((u8 *)actor) + 0x1F8));
     {
         u32 mask = 0x4000;
         u16 *flags;
@@ -96,7 +103,7 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         u16 masked;
         u32 test = actor->flags2D4 & mask;
         flags = &actor->flags2D4;
-        if (!test && (u32)(actor->category - 11) > 2)
+        if ((!test) && (((u32)(actor->category - 11)) > 2))
             GameState_SetEventFlag(
                 BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
         {
@@ -130,6 +137,7 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Ghost_UpdateDefeat);
 #endif

@@ -1,7 +1,7 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
-// fuzzy: 93.2%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: address lifetimes, register allocation, and instruction scheduling.
 // MATCHING_CONCESSION: register-pinning
@@ -65,6 +65,14 @@ static inline void SetFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {
     a->flags2CC = mask | a->flags2CC;
 }
+inline static void ClearMotion_BeginPlayerPursuit(struct SceneActorRegistryResetView *a, u32 mask)
+{
+    {
+        s32 v1 = (~mask) & a->flags2D4;
+        a->flags2D4 = v1;
+    }
+}
+
 void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
 {
     struct PursuitContext *ctx;
@@ -76,6 +84,7 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     void *dest;
     s32 result;
     typeof(mesh) c1;
+    u32 k1;
     if (Blocked(a))
         return;
     if (!gUnk_02000580)
@@ -90,7 +99,7 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     c1 = mesh;
     if (!Nav_IsPositionInMesh(*mesh, &a->position, gUnk_02000580 + 0x30))
         return;
-    point = (void *)(group + 0x200);
+    point = (void *)(group + (k1 = 0x200));
     *(*point) = a->position;
     (*point)->pad = ready;
     a->fieldDC = (u32)(gUnk_02000580 + 0x24);
@@ -103,7 +112,7 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
         if (result != 2)
             Memory_Clear(&a->motion, 8);
     } else {
-        ClearMotion(a, 0x200);
+        ClearMotion_BeginPlayerPursuit(a, k1);
     }
     SetFlags(a, 0x4010);
     a->field2C2 = Div(64, 3);
@@ -113,6 +122,7 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     }
     ctx->timer = 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Spider_BeginPlayerPursuit);
 #endif

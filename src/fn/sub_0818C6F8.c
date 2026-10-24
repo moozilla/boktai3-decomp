@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 88.1%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining: recoil address lifetimes, load scheduling, and scratch register allocation.
 
@@ -45,6 +45,16 @@ static inline void EnterBroken(u8 *part, u32 one, u32 mode)
     part[0x11F] = mode;
     part[0x119] = one | part[0x119];
 }
+inline static void EnterBroken_OnPartDamageCollision(u8 *part, u8 one, u32 mode)
+{
+    part[0x11E] = one;
+    part[0x11F] = mode;
+    {
+        typeof(part[0x119]) v1 = part[0x119];
+        part[0x119] = one | v1;
+    }
+}
+
 void Armor_OnPartDamageCollision(u8 *attack, u8 *response, u8 *part)
 {
     u8 *owner = *((u8 **)(part + 0x15C));
@@ -68,7 +78,7 @@ void Armor_OnPartDamageCollision(u8 *attack, u8 *response, u8 *part)
         AnimData_SelectPaletteBank(*((void **)(part + 0xC)), *((u16 *)(owner + 0x5BE)));
         *hp -= *((u16 *)(response + 0x3E));
         if ((*hp) <= 0) {
-            EnterBroken(part, 1, 5);
+            EnterBroken_OnPartDamageCollision(part, 1, 5);
             goto hit;
         }
     }
@@ -135,6 +145,7 @@ void Armor_OnPartDamageCollision(u8 *attack, u8 *response, u8 *part)
         Sound_PlaySongChecked(0x190);
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Armor_OnPartDamageCollision);
 #endif

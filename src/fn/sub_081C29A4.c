@@ -1,8 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 92.7%
-// fix.py best version (reprinted C)
-// RNG stores, literal-load order and scratch registers still differ.
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -26,7 +22,18 @@ extern s16 gUnk_03005418[];
 struct Particle *ParticlePool_FindFreeEntry(struct Emitter *);
 static inline s32 random(void)
 {
-    return gUnk_0203B400[gUnk_03005308 = (gUnk_03005308 + 1) & 1023];
+    const u16 *table = gUnk_0203B400;
+    u32 *indexPtr = &gUnk_03005308;
+    u32 index = *indexPtr + 1;
+    u32 mask = 1023;
+    index &= mask;
+    *indexPtr = index;
+    return table[index];
+}
+static inline s32 randomCircle(void)
+{
+    /* The shared random table resides in work RAM. */
+    return ((const u16 *)0x0203B400)[gUnk_03005308 = (gUnk_03005308 + 1) & 1023];
 }
 static inline s32 scale12(s32 x)
 {
@@ -62,8 +69,7 @@ void SparkleEmitter_EmitParticle(struct Emitter *input)
     struct Particle *particle;
     struct Vec screen;
     s32 angle;
-    s32 speed;
-    s32 t1;
+    s32 baseAngle;
     if (emitter->speed <= 1)
         return;
     particle = ParticlePool_FindFreeEntry(emitter);
@@ -71,8 +77,10 @@ void SparkleEmitter_EmitParticle(struct Emitter *input)
         return;
     emitter->count++;
     particle->flags &= ~1;
-    circle(((emitter->angle + ((random() >> 4) & 63)) + 128) & 255, &screen, t1);
-    t1 = 150;
+    angle = randomCircle();
+    baseAngle = emitter->angle;
+    angle = ((angle >> 4) & 63) + baseAngle;
+    circle((angle + 128) & 255, &screen, 150);
     screen.x += 120;
     screen.y += 80;
     unproject(&particle->pos, &screen);
@@ -80,6 +88,3 @@ void SparkleEmitter_EmitParticle(struct Emitter *input)
           emitter->speed + ((random() >> 4) & 3));
     particle->age = 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SparkleEmitter_EmitParticle);
-#endif

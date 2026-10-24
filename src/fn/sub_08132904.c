@@ -1,4 +1,5 @@
 #ifdef NONMATCHING
+// fix.py best (sweep after the inlined-insn fix)
 // twin.py transplant from a matched near-clone
 // Pointer spills, RNG load/store scheduling and branch layout still differ.
 // MATCHING_CONCESSION: register-pinning
@@ -128,6 +129,13 @@ static inline u32 GetFlags(u32 **out, struct SceneActorRegistryResetView *actor,
     return result;
 }
 // Area-effect damage with a random knockback heading.
+inline static u32 RandomBits_ApplyLinkedAreaDamage(u32 mask)
+{
+    u32 index = (gUnk_03005308 + 1) & 1023;
+    gUnk_03005308 = index;
+    return (*((const u16 *)(((u32)gUnk_0203B400) + (index * 2)))) & mask;
+}
+
 u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *actor)
 {
     u32 *flags2CC;
@@ -164,8 +172,8 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
     }
     if (!gain)
         goto fail;
-    dx = RandomBits(0x3F) - 16;
-    dz = RandomBits(0x3F) - 16;
+    dx = RandomBits_ApplyLinkedAreaDamage(0x3F) - 16;
+    dz = RandomBits_ApplyLinkedAreaDamage(0x3F) - 16;
     collider->cost = gain;
     actor->reactionSoundVariant = gain;
     {
