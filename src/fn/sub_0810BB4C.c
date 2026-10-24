@@ -45,6 +45,7 @@ void sub_0810BB4C(struct LinkResults *p, s32 i)
     }
 }
 
+#ifdef NONMATCHING
 // confidence=low: bumps one side's negative result counter, saturating at 20.
 void sub_0810BB90(struct LinkResults *p, s32 i)
 {
@@ -58,3 +59,6 @@ void sub_0810BB90(struct LinkResults *p, s32 i)
         SetNegative(p, i, v);
     }
 }
+#else
+INCLUDE_ASM("asm/nonmatching", sub_0810BB90);
+#endif
