@@ -1,7 +1,5 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -12,9 +10,7 @@ struct Context {
 };
 #define U8(p, o)  (*(u8 *)((u8 *)(p) + (o)))
 #define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
-#define U32(p, o) (*(u32 *)((u8 *)(p) + (o)))
 #define P(p, o)   ((u8 *)(p) + (o))
-#define PTR(p, o) (*(u8 **)P(p, o))
 extern u32 gUnk_030053F4;
 extern u32 gUnk_02000560;
 s32 Math_Atan2(s32, s32);
@@ -31,61 +27,71 @@ static inline u32 Flag(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-static inline s32 Blocked(u8 *p)
+static inline s32 AllowsFacing(u8 *p)
 {
     if ((u8)(U8(p, 0x418) - 3) <= 2)
-        return 1;
+        return 0;
     if (Flag((u32 *)P(p, 0x20), 0x100000))
-        return 1;
+        return 0;
     if (U16(p, 0x538) && (u16)(U16(p, 0x534) - 5) <= 1)
-        return 1;
+        return 0;
     {
         u8 mode = U8(p, 0x457);
         u8 allow = 1;
         if (mode > 1 && mode != 7)
             allow = 0;
-        if (!allow)
-            return 1;
+        return allow;
     }
-    return 0;
 }
-static inline void Facing(u8 *p, u32 value)
+static inline u32 AttachmentFlag(void)
 {
-    U8(p, 0x1A) = ((value + 112) >> 5) & 7;
-    U8(p, 0x19) = ((value + 96) >> 6) & 3;
+    u32 mask = 4;
+    return gUnk_02000560 & mask;
 }
 // confidence=low: tracks a target facing and enables contact response when positions and angles agree.
 #define SceneActorAnimation_UpdateTargetFacing sub_0802F298
-inline static void Facing_0802F298(u8 *p, u32 value)
-{
-    *((u8 *)(((u8 *)p) + 0x1A)) = ((value + 112) << 24) >> 29;
-    *((u8 *)(((u8 *)p) + 0x19)) = ((value + 96) >> 6) & 3;
-}
 
 void SceneActorAnimation_UpdateTargetFacing(struct Context *ctx, u8 *p)
 {
     struct Vec *pos = (void *)(((u8 *)p) + 0x68);
     s32 facing;
-    typeof(&gUnk_02000560) t1;
     if (ctx->target) {
         struct Vec *target = ctx->target;
         s32 angle = Math_Atan2(target->x - pos->x, target->z - pos->z);
         if (*(*((u8 **)(((u8 *)p) + 0x2B8)))) {
-            u8 *current = ((u8 *)p) + 0x65;
+            register u8 *current asm("r2") = ((u8 *)p) + 0x65;
             s32 diff = (s8)(angle - (*current));
-            u32 value;
+            s32 value;
+            register s32 octant asm("r2");
+            s32 mask;
+            s32 quadrantMask;
             if (diff > 8) {
-                value = (*current) + 8;
+                value = *current;
+                value += 8;
                 *current = value;
             } else {
-                if (diff < (-8))
-                    value = (*current) - 8;
-                else
-                    value = (*current) + diff;
+                if (diff < -8) {
+                    value = *current;
+                    value -= 8;
+                } else {
+                    value = *current;
+                    value += diff;
+                }
                 *current = value;
-                value = (u16)value;
+                value = (u32)value << 16;
+                value = (u32)value >> 16;
             }
-            Facing_0802F298(p, value);
+            octant = value;
+            octant += 112;
+            octant >>= 5;
+            mask = 7;
+            mask &= octant;
+            U8(p, 0x1A) = mask;
+            value += 96;
+            value >>= 6;
+            quadrantMask = 3;
+            quadrantMask &= value;
+            U8(p, 0x19) = quadrantMask;
         }
         facing = ctx->targetActor[0x2D];
     } else
@@ -99,14 +105,15 @@ void SceneActorAnimation_UpdateTargetFacing(struct Context *ctx, u8 *p)
             u8 angle = *((u8 *)(((u8 *)p) + 0x65));
             *((u8 *)(((u8 *)p) + 0x225)) = angle;
         }
-        if (((ctx->targetActor && Blocked(ctx->targetActor)) && (!(gUnk_030053F4 & 0x200))) &&
+        if (((ctx->targetActor && !AllowsFacing(ctx->targetActor)) && (!(gUnk_030053F4 & 0x200))) &&
             (*((u8 *)(((u8 *)p) + 0xB)))) {
             u8 *target = ctx->targetActor;
-            s32 tether = 0;
+            u8 tether;
             if ((target[0x457] == 6) && TetherActor_GetPosition())
                 tether = 1;
-            t1 = &gUnk_02000560;
-            if (tether || Flag(t1, 4))
+            else
+                tether = 0;
+            if (tether || AttachmentFlag())
                 Actor_SetAttachmentEffect(p, 0, 0, 0);
             else
                 Actor_SetAttachmentEffect(p, 3, 0, 0);
@@ -120,25 +127,23 @@ void SceneActorAnimation_UpdateTargetFacing(struct Context *ctx, u8 *p)
     if (((u8)(*((s32(**)(u8 *))(((u8 *)p) + 0x2E4)))(p)) != 1) {
         struct Vec *target = ctx->target;
         s32 radius = *((u32 *)(((u8 *)p) + 0x228));
-        s32 near = 0;
+        u8 near;
         if (((Abs(target->x - pos->x) < radius) && (Abs(target->y - pos->y) <= 255)) &&
             (Abs(target->z - pos->z) < radius))
             near = 1;
+        else
+            near = 0;
         if (near) {
-            s32 direction = (s8)Math_Atan2(pos->x - ctx->target->x, pos->z - ctx->target->z);
-            s32 delta = (s8)(facing - direction);
+            struct Vec *destination = ctx->target;
+            s32 direction = (s8)Math_Atan2(pos->x - destination->x, pos->z - destination->z);
+            s32 delta = facing - direction;
             s32 oppositeFacing = (*((u8 *)(((u8 *)p) + 0x65))) + 128;
             u8 opposite;
-            asm("" : "+r"(oppositeFacing));
             opposite = facing - oppositeFacing;
-            if ((Abs(delta) <= 63) && (Abs((s8)opposite) <= 31)) {
+            if ((Abs((s8)delta) <= 63) && (Abs((s8)opposite) <= 31)) {
                 u32 mask = 0x800;
                 *((u16 *)(((u8 *)p) + 0xE)) |= mask;
             }
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0802F298);
-#endif
