@@ -15,6 +15,11 @@
   scope.py FILE.c pins          cost of removing each register pin / asm barrier; greedy free removal
   scope.py census [CALLEE]      every pin/barrier in matched code grouped by the call it serves, with
                                 clean and draft sites of the same call: missing helpers show up as groups
+  scope.py rom FUNC|ADDR        FUNC's ROM listing with calls and literal symbols named (no draft needed)
+  scope.py fields OFF... [STRUCT]  structs in include/ with members at these offsets (agbcc's own layout),
+                                or STRUCT's member at each offset
+  scope.py like FUNC|ADDR [N]   matched functions whose ROM shares the most rare 3-insn windows with
+                                FUNC's, with the calls and constants they share: whose C to read first
   scope.py insn UID [FUNC]      one RTL insn through every pass (from the last compile of FUNC)
   scope.py uses REG... [PASS...] [FUNC]   insns (uid@C line) using each pseudo after each pass
 
@@ -2289,6 +2294,93 @@ def cmd_fastcheck(n):
     return 1 if diff else 0
 
 
+def code_status():
+    """({name: 'matched' | 'draft' | 'undrafted'}, {name: source file}) from the source tree."""
+    import progress
+    from pathlib import Path
+    funcs, _ = progress.load_functions()
+    known = {n: n for n, _ in funcs}
+    known.update({f"sub_{a:08X}": n for n, a in funcs})
+    status = {n: "undrafted" for n, _ in funcs}
+    files = {}
+    for p in sorted(Path(ROOT, "src").rglob("*.c")):
+        rel = str(p.relative_to(ROOT))
+        for n in progress.c_functions(p, with_asm=False):
+            if n in known:
+                status[known[n]] = "matched"
+                files[known[n]] = rel
+        for n, _ in progress.nonmatching_functions(p):
+            if n in known and status[known[n]] != "matched":
+                status[known[n]] = "draft"
+                files[known[n]] = rel
+    return status, files
+
+
+def cmd_rom(target):
+    """FUNC's ROM listing (no draft needed): calls and literal words named from the ROM ELF."""
+    import progress
+    funcs, sizes = progress.load_functions()
+    if re.fullmatch(r"(0x)?0?8[0-9A-Fa-f]{6}", target):
+        a = int(target, 16)
+        target = next((n for n, x in funcs if x == a), target)
+    addr = dict(funcs).get(target)
+    if addr is None:
+        sys.exit(f"{target}: not in the function inventory")
+    code = rom_bytes()[off(addr):off(addr) + sizes[target]]
+    data = sorted(set(rom_data_ranges(target, addr) or []) | set(rom_pool_ranges(code, addr)))
+    names = {a & ~1: n for n, a in funcs}
+    for n, (v, _) in elf_syms().items():
+        if not n.startswith(("_", "$")) and not n.endswith("__addr"):
+            names.setdefault(v & ~1, n)
+    status, files = code_status()
+    print(f"{target} @ {addr:08X}, {len(code)} bytes, {status.get(target, '?')}"
+          + (f" ({files[target]})" if target in files else ""))
+    for o, n, text, _, tgt in decode(code, addr, data):
+        note = ""
+        m = re.match(r"bl #0x([0-9a-f]+)$", text)
+        if m:
+            text = "bl " + names.get(int(m.group(1), 16) & ~1, text[3:])
+        m = re.match(r"(ldr \w+, =)0x([0-9A-Fa-f]+)$", text)
+        if m and int(m.group(2), 16) & ~1 in names:
+            note = names[int(m.group(2), 16) & ~1]
+        m = re.match(r"\.word 0x([0-9A-F]+)$", text)
+        if m and int(m.group(1), 16) & ~1 in names:
+            note = names[int(m.group(1), 16) & ~1]
+        print(f"  {o:4X}  {text:36}" + (f"@ {note}" if note else ""))
+    return 0
+
+
+def cmd_fields(offs, want):
+    import glob
+    import structure
+    heads = sorted(glob.glob(os.path.join(ROOT, "include", "**", "*.h"), recursive=True))
+
+    def compile_c(text):
+        r = subprocess.run(build.CPP + ["-nostdinc", "-undef"] + build.DEFINES + ["-I", "include", "-"],
+                           input=text, capture_output=True, text=True, cwd=ROOT)
+        if r.returncode:
+            return None
+        a = subprocess.run([build.AGBCC] + build.CFLAGS + ["-o", "-"], input=r.stdout, capture_output=True,
+                           text=True, cwd=ROOT)
+        return a.stdout if a.returncode == 0 and "error" not in a.stderr else None
+    lay = cached("struct_layouts", heads, lambda: structure.layouts(ROOT, compile_c))
+    return structure.fields(offs, lay, want)
+
+
+def cmd_like(target, show):
+    import structure
+    import progress
+    funcs, sizes = progress.load_functions()
+    elf = os.path.join(ROOT, "build", "boktai3.elf")
+    index = cached("like_index", [elf, os.path.join(ROOT, "symbols", "functions.csv")],
+                   lambda: structure.build_index(funcs, sizes, rom_bytes(), decode, rom_pool_ranges))
+    if re.fullmatch(r"(0x)?0?8[0-9A-Fa-f]{6}", target):
+        a = int(target, 16)
+        target = next((n for n, x in funcs if x == a), target)
+    status, files = code_status()
+    return structure.like(target, index, status, files, show)
+
+
 def cmd_serve():
     """The resident scope: warm caches in this process, one forked child per command (children can run
     side by side; each starts its own agbcc fork servers). Restarts itself when scope.py or fast.py
@@ -2435,6 +2527,14 @@ def main():
     if not args or args[0] in ("-h", "--help"):
         print(__doc__)
         return 0
+    if args[0] == "fields":  # fields OFF... [STRUCT]: which structs have members at these offsets
+        offs = [int(a, 16) if a.lower().startswith("0x") else int(a) for a in args[1:] if re.fullmatch(r"(0x)?[0-9a-fA-F]+", a)]
+        want = next((a for a in args[1:] if not re.fullmatch(r"(0x)?[0-9a-fA-F]+", a)), None)
+        return cmd_fields(offs, want)
+    if args[0] == "rom":  # rom FUNC|ADDR: the ROM listing, no draft needed
+        return cmd_rom(args[1])
+    if args[0] == "like":  # like FUNC|ADDR: matched functions whose ROM looks like this one's
+        return cmd_like(args[1], int(args[2]) if len(args) > 2 else 8)
     if args[0] == "census":  # census [CALLEE]: concessions across src/ grouped by the call they serve
         import structure
         return structure.census(ROOT, want=args[1] if len(args) > 1 else None)

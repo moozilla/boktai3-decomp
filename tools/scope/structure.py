@@ -161,3 +161,199 @@ def census(root, show=20, want=None):
         print(f"  {n:4} {nf:5} {ncl:5} {ndr:5}  {shape}")
     print("\nnext: scope.py census CALLEE (every site, and clean spellings to compare)")
     return 0
+
+
+# ---------------------------------------------------------------- like: matched functions whose ROM looks alike
+
+def norm_insn(text, names):
+    """One instruction as a token: registers abstracted, calls by name, literals and immediates kept."""
+    m = re.match(r"bl #0x([0-9a-f]+)$", text)
+    if m:
+        return "bl " + names.get(int(m.group(1), 16) & ~1, "?")
+    m = re.match(r"ldr \w+, =(0x[0-9A-Fa-f]+)$", text)
+    if m:
+        v = int(m.group(1), 16)
+        return "ldr =" + names.get(v & ~1, f"0x{v:X}")
+    if re.match(r"b\w*\s+(func\+|#)", text):
+        return text.split()[0]
+    t = re.sub(r"\br([0-9]|1[0-2])\b", "R", text)
+    return re.sub(r"\b(sb|sl|fp|ip|r8|r9|r10)\b", "H", t)
+
+
+def build_index(funcs, sizes, rom, decode, pool_ranges):
+    """{name: [tokens]} for every function in the inventory, from the ROM."""
+    names = {a: n for n, a in funcs}
+    out = {}
+    for n, a in funcs:
+        size = sizes[n]
+        if not 0x08000000 <= a < 0x08000000 + len(rom) or size <= 0 or size > 0x4000:
+            continue
+        code = rom[a - 0x08000000:a - 0x08000000 + size]
+        try:
+            rows = decode(code, a, pool_ranges(code, a))
+        except Exception:
+            continue
+        out[n] = [norm_insn(r[2], names) for r in rows if not r[2].startswith(".")]
+    return out
+
+
+def shingles(tokens, k=3):
+    return {"|".join(tokens[i:i + k]) for i in range(max(0, len(tokens) - k + 1))}
+
+
+def like(target, index, status, files, show=8):
+    """Matched functions ranked by shared rare 3-insn windows with TARGET; prints the shared calls."""
+    import math
+    if target not in index:
+        print(f"{target}: not in the ROM index")
+        return 1
+    sh = {n: shingles(t) for n, t in index.items()}
+    df = collections.Counter(s for v in sh.values() for s in v)
+    total = len(sh)
+    idf = {s: math.log(total / c) for s, c in df.items()}
+    mine = sh[target]
+    self_w = sum(idf[s] for s in mine) or 1
+    scores = []
+    for n, v in sh.items():
+        if n == target or status.get(n) != "matched":
+            continue
+        common = mine & v
+        if not common:
+            continue
+        w = sum(idf[s] for s in common)
+        other_w = sum(idf[s] for s in v) or 1
+        scores.append((w / math.sqrt(self_w * other_w), w / self_w, n))
+    scores.sort(reverse=True)
+    tcalls = [t for t in index[target] if t.startswith(("bl ", "ldr ="))]
+    print(f"{target} ({len(index[target])} insns, {status.get(target, '?')}): {len(tcalls)} calls/literals;"
+          f" matched functions with the most shared rare 3-insn windows:")
+    for sim, cover, n in scores[:show]:
+        theirs = set(t for t in index[n] if t.startswith(("bl ", "ldr =")))
+        shared = [t for t in dict.fromkeys(tcalls) if t in theirs]
+        print(f"  {sim:.2f} (covers {cover:4.0%})  {n:40} {len(index[n]):4} insns  {files.get(n, '?')}")
+        if shared:
+            print("        shared: " + ", ".join(s.replace('ldr =', '=') for s in shared[:8])
+                  + (f" +{len(shared) - 8}" if len(shared) > 8 else ""))
+    unknown = [t for t in dict.fromkeys(tcalls) if not any(
+        t in index[n] for _, _, n in scores[:show])]
+    if unknown:
+        print("  in no listed match: " + ", ".join(s.replace('ldr =', '=') for s in unknown[:10]))
+    return 0
+
+
+# ---------------------------------------------------------------- fields: which struct has fields at these offsets
+
+def struct_members(text):
+    """{struct name: [member names]} for top-level struct definitions in a header's text (members
+    of nested anonymous structs and bit-fields are skipped: offsetof cannot name them simply)."""
+    out = {}
+    text = re.sub(r"/\*.*?\*/|//[^\n]*", "", text, flags=re.S)
+    for m in re.finditer(r"^struct\s+(\w+)\s*\{", text, re.M):
+        i, depth, body = m.end(), 1, []
+        while i < len(text) and depth:
+            c = text[i]
+            depth += (c == "{") - (c == "}")
+            body.append(c if depth >= 1 else "")
+            i += 1
+        names = []
+        level, cur = 0, ""
+        for c in "".join(body):
+            if c == "{":
+                level += 1
+            elif c == "}":
+                level -= 1
+            if c == ";" and level == 0:
+                decl = re.sub(r"\{.*\}", "{}", cur, flags=re.S).strip()
+                cur = ""
+                if not decl or ":" in decl or decl.startswith(("union {", "struct {")) and decl.endswith("}"):
+                    continue
+                fp = re.search(r"\(\s*\*\s*(\w+)\s*\)", decl)
+                if fp:
+                    names.append(fp.group(1))
+                    continue
+                parts = decl.split(",")
+                first = re.sub(r"\[[^\]]*\]", "", parts[0])
+                ids = re.findall(r"[A-Za-z_]\w*", first)
+                if len(ids) >= 2:
+                    names.append(ids[-1])
+                for p in parts[1:]:
+                    q = re.findall(r"[A-Za-z_]\w*", re.sub(r"\[[^\]]*\]", "", p))
+                    if q:
+                        names.append(q[0])
+                continue
+            cur += c
+        out[m.group(1)] = names
+    return out
+
+
+def layouts(root, compile_c):
+    """{struct: [(offset, size, member)]} for the structs of include/*.h, measured by agbcc: one
+    `offsetof`/`sizeof` table per header. COMPILE_C(text) -> assembly text or None."""
+    out = {}
+    for h in sorted(glob.glob(os.path.join(root, "include", "**", "*.h"), recursive=True)):
+        rel = os.path.relpath(h, os.path.join(root, "include"))
+        members = struct_members(open(h, errors="replace").read())
+        members = {s: m for s, m in members.items() if m}
+        if not members:
+            continue
+
+        def table(items):
+            src = f'#include "global.h"\n#include "{rel}"\n'
+            for k, (s, ms) in enumerate(items):
+                vals = ", ".join(f"(unsigned)&((struct {s} *)0)->{x}, sizeof(((struct {s} *)0)->{x})" for x in ms)
+                src += f"const unsigned scope_layout{k}[] = {{ sizeof(struct {s}), {vals} }};\n"
+            return compile_c(src)
+        items = list(members.items())
+        asm = table(items)
+        groups = [items] if asm else [[it] for it in items]  # a bad member: measure struct by struct
+        for g in groups:
+            a = asm if asm and len(groups) == 1 else table(g)
+            if not a:
+                continue
+            for k, (s, ms) in enumerate(g):
+                blk = re.search(rf"scope_layout{k}:\n((?:\s*\.word\s+-?(?:0x[0-9a-fA-F]+|\d+)\n)+)", a)
+                if not blk:
+                    continue
+                vals = [int(v, 0) & 0xFFFFFFFF for v in re.findall(r"\.word\s+(-?(?:0x[0-9a-fA-F]+|\d+))",
+                                                                 blk.group(1))]
+                rows = [(vals[1 + 2 * j], vals[2 + 2 * j], ms[j]) for j in range(len(ms))]
+                out.setdefault(s, {"size": vals[0], "header": rel, "fields": rows})
+    return out
+
+
+def fields(offs, lay, want=None, show=10):
+    """Structs with fields at OFFS: exact starts first, then offsets inside a member (arrays)."""
+    def at(rows, o):
+        for start, size, name in rows:
+            if start == o:
+                return name, True
+        for start, size, name in rows:
+            if start < o < start + size:
+                return f"{name}+0x{o - start:X}", False
+        return None, False
+    if want:
+        if want not in lay:
+            print(f"struct {want}: not measured (not in include/, or its header did not compile)")
+            return 1
+        L = lay[want]
+        print(f"struct {want} ({L['size']:#x} bytes, include/{L['header']}):")
+        for o in offs:
+            name, exact = at(L["fields"], o)
+            print(f"  {o:#6x}  {name or '(beyond the struct)' if o >= L['size'] else name or '(padding)'}")
+        return 0
+    ranked = []
+    for s, L in lay.items():
+        if max(offs) >= L["size"]:
+            continue
+        hits = [at(L["fields"], o) for o in offs]
+        exact = sum(1 for n, e in hits if e)
+        inside = sum(1 for n, e in hits if n and not e)
+        if exact:
+            ranked.append((exact, inside, -L["size"], s, hits))
+    ranked.sort(reverse=True)
+    print(f"structs in include/ with members at {', '.join(f'{o:#x}' for o in offs)}"
+          f" ({len(ranked)} have at least one exactly):")
+    for exact, inside, negsize, s, hits in ranked[:show]:
+        print(f"  {exact}/{len(offs)}  {s} ({-negsize:#x} bytes, include/{lay[s]['header']}): "
+              + ", ".join(f"{o:#x} {n or '-'}" for o, (n, e) in zip(offs, hits)))
+    return 0
