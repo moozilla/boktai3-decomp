@@ -250,10 +250,13 @@ def analyze(src, func=None, nonmatching=False):
             for u, first, p in gone[:3]:
                 evs.append((u, p, "deleted", f"your insn `{first[:70]}` was deleted by {p}: "
                                              + DELETED_BY.get(p, "")))
-        if kind in ("insert", "replace") and any(t.startswith("str") for _, t in orig) and not note:
+        n_str = lambda xs: sum(t.startswith("str") for _, t in xs)
+        if kind in ("insert", "replace") and n_str(orig) > n_str(cand) and not note:
             gone = dead_stores(dumps, func)
+            near = [an.off_line.get(an.cd[k][0]) for k in (idx - 1, idx) if 0 <= k < len(an.cd)]
+            near = [x for x in near if x]
             if gone:
-                u, first, ln = gone[0]
+                u, first, ln = min(gone, key=lambda g: min((abs(g[2] - x) for x in near), default=0))
                 note = (f"dead store: the ROM keeps a store that flow.c deleted as dead in yours, insn {u} "
                         f"`{first[:60]}` ({show(ln)}). flow deletes a store when a later store in the block "
                         f"writes the same address and nothing between them may read it. agbcc -O2 gives each "
