@@ -1,9 +1,5 @@
 #include "scene_actor_animation.h"
 
-#ifdef NONMATCHING
-// fix.py best version
-// fix.py best version (reprinted C)
-// Remaining: direction arithmetic, constant derivation, address reuse and callback setup registers.
 // confidence=low: turns one octant toward the requested direction on animation ticks.
 
 void Axe_GetDirectionalFrame(u8, u32 *, u32 *);
@@ -123,12 +119,17 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
             actor->unknown2B0 = 1;
             return;
         }
+        target -= 8;
         {
-            u8 k1 = 8;
-            if ((((current - (target - k1)) << 29) >> 29) <= 4)
-                *((u32 *)(((u8 *)actor) + 0x2CC)) &= ~0x10000;
-            else
-                *((u32 *)(((u8 *)actor) + 0x2CC)) |= 0x10000;
+            s32 k1 = 4;
+            if (((u8)((current - target) & 7)) <= k1) {
+                u32 *p = (u32 *)(((u8 *)actor) + 0x2CC);
+                u32 mask = ~0x10000;
+                *p &= mask;
+            } else {
+                u32 mask = 0x10000;
+                *((u32 *)(((u8 *)actor) + 0x2CC)) |= mask;
+            }
         }
     }
     sequence = ((u8 *)actor->drawable) + 0x48;
@@ -166,6 +167,3 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
     }
 }
 
-#else
-INCLUDE_ASM("asm/nonmatching", Axe_UpdateTurnAnimation);
-#endif
