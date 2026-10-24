@@ -1,8 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 98.3%
-// foundry draft (worker best 98.3%); what differs is mostly register allocation and instruction order
 struct Part {
     u8 a, b, c;
     u8 pad[0x11];
@@ -22,29 +19,33 @@ void Effect_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 
+static inline void **Object_GetAnimationField(struct Obj *p)
+{
+    return &p->anim;
+}
+
 s32 sub_08017684(struct Obj *p)
 {
     s32 i;
     struct Part *e;
     u32 z;
+    void **anim;
 
     p->anim = AnimData_FindEntry(0x1C1C);
     p->w64 = 0;
     p->w66 = 0;
     e = p->parts;
     z = 0;
+    anim = Object_GetAnimationField(p);
     i = 31;
     for (; i >= 0; i--, e++) {
         void *sub = e->sub;
         e->a = z;
         e->b = z;
         e->c = z;
-        Effect_Initialize(sub, p->anim, 1);
+        Effect_Initialize(sub, *anim, 1);
         Effect_SetOrigin(sub, -4, -4);
-        SpriteDrawable_SelectTileFrame(sub, p->anim, 0x1E);
+        SpriteDrawable_SelectTileFrame(sub, *anim, 0x1E);
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08017684);
-#endif
