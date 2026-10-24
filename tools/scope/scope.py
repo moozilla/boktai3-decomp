@@ -511,9 +511,49 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
     if same:
         print("MATCH")
         return 0
+    only_targets = nb and not nr and not nm and len(rom_code) == len(mine)
     print(f"{len(hunks)} hunk(s): {nr} ROM / {nm} draft insns differ"
-          + (f" (+{nb} branch(es) whose target moved: they follow from the others)" if nb else "")
+          + (f" (+{nb} branch(es) whose target moved"
+             + ("" if only_targets else ": they follow from the others") + ")" if nb else "")
           + f"; {shifted} offset-only shifts hidden.  full listing: {rel}/diff.txt (json: diff.json)")
+    if only_targets:
+        # Same instructions, same size: a label sits before a different instruction. Name both targets.
+        at_r = {o: i for i, (o, *_) in enumerate(rom)}
+        at_m = {o: i for i, (o, *_) in enumerate(dr)}
+        for x, y, t in pairs:
+            if t != "→":
+                continue
+            tr = re.search(r"func\+0x([0-9A-Fa-f]+)", rom[x][2])
+            tm = re.search(r"func\+0x([0-9A-Fa-f]+)", dr[y][2])
+            if not (tr and tm):
+                continue
+            ir, im = at_r.get(int(tr.group(1), 16)), at_m.get(int(tm.group(1), 16))
+            if ir is None or im is None:
+                continue
+            # identical code: the draft insn at the ROM target's offset carries its C line
+            lr = ctag(at_m.get(rom[ir][0], im))[0]
+            lm = ctag(im)[0]
+            print(f"\nThe code is identical; only where a label sits differs. ROM `{rom[x][2]}` lands on"
+                  f" `{rom[ir][2]}` (line {lr or '?'}), the draft's on `{dr[im][2]}` (line {lm or '?'}).")
+            back = int(tr.group(1), 16) <= rom[x][0]
+            if back and ir > im:
+                print("  Loop head: the insns between the two targets run once before the loop in the ROM but"
+                      " on every pass in the draft. Typical cause: a loop invariant the ROM hoisted (set"
+                      " before the loop, or left unpinned for loop.c to hoist) that the draft assigns inside"
+                      " the loop, often a pinned register.")
+            elif back:
+                print("  Loop head: the insns between the two targets run on every pass in the ROM but once"
+                      " in the draft. Move that assignment into the loop body.")
+            elif re.match(r"(cmp|tst|cmn)\b", dr[im][2]):
+                print("  Jump threading: the draft's branch lands on a second test of a value it has already"
+                      " tested; the ROM's skips that test and goes where it leads. Which repeated tests"
+                      " GCC threads depends on how each reaches RTL (an inline helper's parameter, a"
+                      " macro, an explicit `p && ...`), and rewriting one test can change whether another"
+                      " branch is threaded. Try the repeated tests of that value written the other way,"
+                      " one at a time; a version that threads too much drops the ROM's cmp/branch pairs.")
+            else:
+                print("  The join or block order differs: the insns between the two targets belong to"
+                      " different blocks in the ROM and the draft. Compare the C around both lines.")
     shown = 0
     for h in hunks:
         if shown >= 8:
