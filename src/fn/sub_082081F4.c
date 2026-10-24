@@ -1,9 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: collision callback records damage and emits sparks for selected source flags.
-#ifdef NONMATCHING
-// fuzzy: 99.0%
-// Only the first RNG-index read uses a different pointer register.
 struct Vec {
     u16 x, y, z, pad;
 };
@@ -101,7 +98,7 @@ void CannonTurret_ApplyHitReaction(struct Source *sourceInput, struct Hit *input
             s32 i;
             struct Vec *vel = &frame.velocity;
             struct Vec *pos = &frame.position;
-            register u32 *index asm("r9") = &gUnk_03005308;
+            u32 *index = &gUnk_03005308;
             u32 mask = 0x7f;
             i = 2;
             do {
@@ -113,12 +110,12 @@ void CannonTurret_ApplyHitReaction(struct Source *sourceInput, struct Hit *input
                 frame.position = target->position;
                 table = (const u16 *)RANDOM_TABLE_ADDR;
                 {
-                    u32 *cursor = index;
-                    register u32 wrap asm("r0");
-                    random = *cursor + 1;
-                    wrap = 0x3ff;
-                    asm("" : "+r"(wrap) : "r"(cursor));
-                    random &= wrap;
+                    u32 c = *index + 1;
+                    {
+                        register u32 m asm("r0") = 0x3ff;
+                        asm("" : "+r"(m));
+                        random = c & m;
+                    }
                 }
                 sample = table[random];
                 x = pos->x - 0x40;
@@ -145,7 +142,3 @@ void CannonTurret_ApplyHitReaction(struct Source *sourceInput, struct Hit *input
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", CannonTurret_ApplyHitReaction);
-#endif
