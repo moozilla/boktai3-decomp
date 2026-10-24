@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.7%
 
 struct CollectionRes {
     u32 w[8];
@@ -78,7 +76,8 @@ void sub_0821358C(u8 *m)
         AnimData_Load(m + 0x3e8 + i * 0x1c, 0xca1f);
         Sprite_Init(m + 0x500 + i * 0x2c, m + 0x3e8 + i * 0x1c, 0x11);
         frame = &gUnk_08614054[i];
-        s = (struct CollectionSprite *)(m - -(i * 0x2c) + 0x500);
+        s = (struct CollectionSprite *)(i * 0x2c + (u32)m);
+        s = (struct CollectionSprite *)((u8 *)s + 0x500);
         s->frame = *frame;
         c->sprites[i].x = pos.x;
         c->sprites[i].y = pos.y;
@@ -110,6 +109,3 @@ void sub_0821358C(u8 *m)
         *(u16 *)(m + 0xfe) = v;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0821358C);
-#endif
