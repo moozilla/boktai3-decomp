@@ -1,8 +1,5 @@
 #include "global.h"
 #include "game_state.h"
-#ifdef NONMATCHING
-// fuzzy: 97.7%
-// Differs only in register choice for the flag-test address (ROM computes it in r1 and copies it to r2).
 struct LinkScorePanel {
     u8 pad0[0xfe4];
     void (*update)(struct LinkScorePanel *);
@@ -40,9 +37,9 @@ static inline void SetFlag(u32 *f, u32 m)
     *f |= m;
 }
 
-static inline u8 TestFlag(u32 *flags, u32 m)
+static inline u8 FlagIsSet(u32 bits)
 {
-    if (*flags & m)
+    if (bits)
         return TRUE;
     return FALSE;
 }
@@ -79,11 +76,13 @@ void sub_0811048C(struct LinkScorePanel *p)
             return;
         }
         {
-            u32 m = 1;
-            u32 *flags = &p->flags;
-            if (!TestFlag(flags, m) && (gUnk_03005260[1] & 0x30f)) {
+            u32 value = 1;
+            u32 *flagWord = &p->flags;
+            u32 bits = *flagWord & value;
+            value = (u32)flagWord;
+            if (!FlagIsSet(bits) && (gUnk_03005260[1] & 0x30f)) {
                 p->step <<= 3;
-                SetFlag(flags, 1);
+                SetFlag((u32 *)value, 1);
             }
         }
     }
@@ -91,6 +90,3 @@ void sub_0811048C(struct LinkScorePanel *p)
     LinkScorePanel_SetNumber(p, 1, SCORE);
     p->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0811048C);
-#endif

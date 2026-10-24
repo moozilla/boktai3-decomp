@@ -1,9 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 // confidence=low: tentative cue role from callback phases.
-#ifdef NONMATCHING
-// fuzzy: 98.5%
-// Remaining playback completion branch sharing and mask copies differ.
 
 struct P {
     u8 pad0[0x14C];
@@ -157,6 +154,7 @@ static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceS
     const volatile u16 *command;
     u32 duration, flags, bit;
     u32 ended;
+    u32 finalIndex;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -215,8 +213,8 @@ static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceS
                         state->elapsed = savedDuration;
                         goto ended_animation;
                     } else {
-                        state->index = state->frameCount - 1;
-                        goto ended_animation;
+                        finalIndex = state->frameCount - 1;
+                        goto store_final_index;
                     }
                 } else {
                     state->index = index - 1;
@@ -231,23 +229,23 @@ static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceS
                     endFlag = flags & 8;
                     asm("" : "+r"(endFlag));
                     endFlag = (u8)endFlag;
+                    finalIndex = endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
+                        finalIndex = frameCount - 1;
                     }
-                    goto ended_animation;
+                    goto store_final_index;
                 } else {
                 }
             }
-            ended = 0;
-            goto update_frame;
+            goto not_ended;
+        store_final_index:
+            state->index = finalIndex;
         ended_animation:
             ended = 1;
+            goto update_frame;
+        not_ended:
+            ended = 0;
         update_frame: {
             u32 offset = state->index << 1;
             const volatile u16 *table;
@@ -274,7 +272,7 @@ static inline u32 StepEnd(struct ContactSwarmSprite *sp, struct DisplaySequenceS
 void PlayerCue_UpdateSideArrival(struct P *p)
 {
     u32 phase = p->phase;
-    switch (phase) {
+    switch ((s16)phase) {
         case 0:
             if (!p->timer) {
                 Face(p, phase);
@@ -295,12 +293,15 @@ void PlayerCue_UpdateSideArrival(struct P *p)
             if (StepEnd(&p->sprite, &p->seq, phase)) {
                 Player_UpdateFacingSide(p);
                 ActorSequence_Begin(p, 0, 0);
-                p->fn = Player_RestartAnimationFromResource;
+                {
+                    register u32 callbackOffset asm("r2") = (u32) & ((struct P *)0)->fn;
+                    register void (**callback)(struct P *) asm("r1");
+                    asm("" : "+r"(callbackOffset));
+                    callback = (void (**)(struct P *))((u32)p + callbackOffset);
+                    *callback = Player_RestartAnimationFromResource;
+                }
                 PlayerCue_CompleteAction(p);
             }
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSideArrival);
-#endif

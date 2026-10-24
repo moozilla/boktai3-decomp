@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 94.6%
-// The hoisted callback and completion-field addresses use different derivation order.
 struct PhaseParent {
     u8 unknown0[0xD80];
     u32 flags;
@@ -26,10 +23,12 @@ struct PhaseActor {
 void IvyChild_UpdateAfterBob(void);
 static inline void Finish(struct PhaseActor *p, u8 one)
 {
+    u8 *flags = &p->flags119;
+    void (**update)(void) = &p->update164;
     p->state = one;
     p->state2 = one;
-    p->flags119 |= one;
-    p->update164 = IvyChild_UpdateAfterBob;
+    p->flags119 = *flags | one;
+    *update = IvyChild_UpdateAfterBob;
 }
 void Sword_AccelerateReturnTurn(struct PhaseActor *p)
 {
@@ -47,7 +46,3 @@ void Sword_AccelerateReturnTurn(struct PhaseActor *p)
             p->turnSteps = 7;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Sword_AccelerateReturnTurn);
-#endif

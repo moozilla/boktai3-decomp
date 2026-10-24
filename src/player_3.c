@@ -651,9 +651,7 @@ s32 SceneActor_SelectEffectDisplayMode(struct Player *p, s32 mode)
     return mode;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// Register copies and indexed timer-load allocation remain different.
+// MATCHING_CONCESSION: register-pinning
 
 void Player_EmitQueuedEffects(struct Player *);
 s32 Mod(s32, s32);
@@ -675,9 +673,10 @@ static inline void Player_StoreStatusTimer(u16 *timers, s32 offset, u32 duration
 {
     *(u16 *)((u8 *)timers + offset) = duration;
 }
-void sub_0813D834(struct Player *p, s32 inputKind, u32 duration)
+void sub_0813D834(struct Player *p, s32 inputKind, u32 inputDuration)
 {
     register s32 kind asm("r3") = inputKind;
+    u32 duration = inputDuration;
     s32 offset;
     switch (kind) {
         case 0: {
@@ -694,8 +693,10 @@ void sub_0813D834(struct Player *p, s32 inputKind, u32 duration)
                     break;
             }
             {
-                u32 current = p->scriptStatus[kind];
-                offset = kind * 2;
+                register s32 scaled asm("r0") = kind * 2;
+                u16 *timers = p->scriptStatus;
+                u32 current = *(u16 *)((u8 *)timers + scaled);
+                offset = scaled;
                 if (!current) {
                     u16 *target = &gUnk_02000504;
                     s32 random = Mod(Player_NextStatusRandom(), 7);
@@ -713,10 +714,6 @@ void sub_0813D834(struct Player *p, s32 inputKind, u32 duration)
     }
     Player_StoreStatusTimer(p->scriptStatus, offset, duration);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0813D834);
-#endif
 
 void Player_ClearStateTimer(struct Player *p, s32 idx)
 {
