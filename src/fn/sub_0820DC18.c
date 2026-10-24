@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.0%
 // Remaining difference: first spark RNG cursor copy lands in r0 (original uses r7) and the 0x3ff mask in r7 (original r0).
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
@@ -101,7 +99,7 @@ void PoisonHand_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
             register s32 i asm("r6");
             struct Vec *vel = &frame.velocity;
             struct Vec *pos = &frame.position;
-            register u32 *index asm("r9") = &gUnk_03005308;
+            u32 *index = &gUnk_03005308;
             u32 mask = 0x7f;
             i = 2;
             do {
@@ -145,7 +143,3 @@ void PoisonHand_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PoisonHand_ApplyHitReaction);
-#endif
