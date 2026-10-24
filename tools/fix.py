@@ -303,6 +303,10 @@ def kept_copy(rom, mine):
         return (f"the ROM copies a high register straight back {n - k} more time(s) (`mov H, rN; mov rN, H`): "
                 "the value was set in another mode than it is used in (an HImode constant used as SImode), "
                 "so reload could not reuse rN")
+    if k > n:
+        return (f"the candidate copies a high register straight back {k - n} more time(s) (`mov H, rN; mov rN, "
+                "H`) where the ROM reuses rN: the candidate sets the value in another mode than it uses it in "
+                "(an HImode constant used as SImode); in the ROM both were one mode")
     return None
 
 
@@ -370,17 +374,19 @@ def run(src, func, nonmatching=False, depth=3, show=4, try_all=False, seeds=2, l
             start = Draft(text, func, wd).score()
         except (Exception, SystemExit):
             start = None
-        if start and 0 < start[0] <= 4:
+        cause = None
+        if start and start[0] > 0:
+            # a copy back through a high register is visible in any draft: no compile needed
             d0 = Draft(text, func, wd)
             cause = kept_copy(d0.rom, atlas.texts_of(d0.source()))
             if cause:
                 extra = ["reload-mode"]
-            else:
-                cause = cse_probe(os.path.join(wd, f"{func}.c"))
-            if cause:
-                log(f"   cause: {cause}")
-                if "canonical register" in cause:
-                    extra = ["cse-canon"]
+        if not cause and start and 0 < start[0] <= 4:
+            cause = cse_probe(os.path.join(wd, f"{func}.c"))
+        if cause:
+            log(f"   cause: {cause}")
+            if "canonical register" in cause:
+                extra = ["cse-canon"]
         for rnd in range(depth):
             log(f"\n== round {rnd + 1}")
             children = []

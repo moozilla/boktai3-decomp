@@ -1519,17 +1519,19 @@ def sp_helper_ret_word(fn, helpers):
     constant's HImode pseudo stays an operand through a paradoxical subreg, which cse cannot fold.
     Allocated to a high register it is set in HImode and reloaded in SImode, and reload, reload_cse and
     jump's no-op move deletion all refuse to reuse the low register that set it (another mode): the
-    ROM's `movs rN, #C; mov H, rN; mov rN, H`."""
+    ROM's `movs rN, #C; mov H, rN; mov rN, H`. A word-returning helper is tried as u16/s16 too."""
     called = {n.name.name for n, _, _ in walk(fn) if isinstance(n, ca.FuncCall) and isinstance(n.name, ca.ID)}
     for name, h in helpers.items():
         if name not in called or not isinstance(h.decl.type, ca.FuncDecl):
             continue
         ret = h.decl.type.type
-        if not (isinstance(ret, ca.TypeDecl) and isinstance(ret.type, ca.IdentifierType)
-                and ret.type.names[-1] in SUBWORD):
+        if not (isinstance(ret, ca.TypeDecl) and isinstance(ret.type, ca.IdentifierType)):
             continue
         cur = " ".join(ret.type.names)
-        for t in ("s32", "u32"):
+        # and the inverse, for a candidate that keeps the copy where the ROM reuses the register
+        widths = (("s32", "u32") if ret.type.names[-1] in SUBWORD else
+                  ("u16", "s16") if ret.type.names[-1] in ("s32", "u32", "int") else ())
+        for t in widths:
             h2 = copy.deepcopy(h)
             h2.decl.type.type.type = ca.IdentifierType([t])
             yield f"{name} returns {t} (was {cur})", (copy.deepcopy(fn), [h2])
@@ -1568,11 +1570,11 @@ DECISIONS = {
     "cse-follow": ["sp_narrow_mask", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
     "cse-swap": ["rw_commute", "sp_scoped_operand"],
     "regmove-copy": ["rw_commute", "sp_inline_decl"],
-    "local-alloc": ["sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
-    "global-alloc": ["sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
+    "local-alloc": ["sp_helper_ret_word", "sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
+    "global-alloc": ["sp_helper_ret_word", "sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
     "move2add": ["sp_specialize", "sp_addr_then_const", "sp_scoped_operand", "rw_share_const"],
     "reload-mode": ["sp_helper_ret_word", "sp_const_literal", "rw_inline_var", "sp_inline_decl", "rw_width", "sp_narrow_mask"],
-    "reload": ["sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const",
+    "reload": ["sp_helper_ret_word", "sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const",
                "sp_outline_setter", "sp_outline_store", "sp_split_offset", "sp_offset_local"],
 }
 
