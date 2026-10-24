@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 89.9%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining: unavailable-result register, context address lifetimes and argument-store scheduling.
 #include "scene_actor_reaction.h"
@@ -107,6 +107,13 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 state, u32 p
     a->counter2AC = 0;
     a->field2B1 = 1;
 }
+inline static void Add_StartMoveToBody(struct BeeVec *a, struct BeeVec *b)
+{
+    a->x = a->x + b->x;
+    a->y = a->y + b->y;
+    a->z = a->z + b->z;
+}
+
 void Bee_StartMoveToBody(struct SceneActorRegistryResetView *actor, u16 *args)
 {
     register u8 *body asm("r8");
@@ -136,13 +143,14 @@ void Bee_StartMoveToBody(struct SceneActorRegistryResetView *actor, u16 *args)
     angle = ((Rand() & 0x3F) + actor->fieldE9) & 0xFF;
     Polar(&offset, angle, 0x200);
     *((u16 *)(body + 0x43A)) = 0x500;
-    Add(&offset, (struct BeeVec *)(&actor->position));
+    Add_StartMoveToBody(&offset, (struct BeeVec *)(&actor->position));
     sub_0809345C(actor, &offset);
     Bee_SubVector(actor, &actor->position, &offset);
     Clear(&fill, body + 0x480);
     State(actor, 2, 0, 10);
     Control(actor, actor->entryTarget228, 1);
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Bee_StartMoveToBody);
 #endif

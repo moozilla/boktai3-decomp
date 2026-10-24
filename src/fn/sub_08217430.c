@@ -2,7 +2,7 @@
 
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 97.1%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Left: fast-path bank address register (ROM r3 plus a copy), the flags & 0x20
 // ands operand order, and src/dst allocation in the first blend loop.
@@ -129,7 +129,9 @@ void sub_08217430(void)
                 *dst = ((((((u16)c) & 0x7C1F) * level) & 0xF83E0) |
                         (((c & 0x3E0) * level) & 0x7C00)) >>
                        5;
-                src++;
+                do {
+                    src++;
+                } while (0);
                 dst++;
             }
         }
@@ -236,6 +238,7 @@ void sub_08217430(void)
     }
     gUnk_03004DAC = gUnk_030051D4;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08217430);
 #endif

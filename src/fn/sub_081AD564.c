@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 85.9%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: applies camera, collision, palette and shake presentation effects.
 #define Vanargand_UpdatePresentation sub_081AD564
@@ -227,7 +227,9 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
                     {
                         u16 color = r;
                         u16 *palette = gUnk_03004FC0;
-                        palette[0x5A / 2] = color;
+                        do {
+                            palette[0x5A / 2] = color;
+                        } while (0);
                         palette[0x10E / 2] = color;
                     }
                     break;
@@ -280,6 +282,7 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
     }
     ScreenPalette_UpdateState(p->paletteState);
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081AD564);
 #endif

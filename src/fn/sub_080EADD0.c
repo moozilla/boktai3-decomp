@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 87.7%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: defeat state. The body spins (drawable+6) and drifts on the spin vector;
 // once the death flag (0x2D0 & 0x10) is set it runs the defeat effects, scripts and bestiary
@@ -57,6 +57,11 @@ static inline u16 Rand(void)
     gUnk_03005308 = index;
     index *= 2;
     return *(const u16 *)(index + RANDOM_TABLE_ADDR);
+}
+
+inline static u32 Arg1(u32 k_, u16 *flags)
+{
+    return (*flags) & k_;
 }
 
 void Octopus_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
@@ -116,74 +121,78 @@ void Octopus_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         *((u16 *)(((u8 *)drawable) + 0x20)) -= (gUnk_086149C4[angle & 0xFF] * 33) >> 11;
         *((u16 *)(((u8 *)drawable) + 0x1C)) -= (gUnk_086149C4[(angle + 0x40) & 0xFF] * 33) >> 11;
     }
-    if (actor->flags2D0 & 0x10) {
-        u16 *flags = &actor->flags2D4;
-        struct ContactPosition *pos;
-        {
-            u32 bit = 0x40;
-            *flags = bit | (*flags);
-        }
-        *((u16 *)(((u8 *)actor) + 0x9C)) = 0;
-        pos = &actor->position;
-        SpriteParticle_SpawnBatch(pos, 1, 2, 0, 0x154);
-        Sound_PlaySong(0x1D8);
-        {
-            u8 *d;
-            u32 bit = 1;
-            if (actor->drawableKind == 0) {
-                d = actor->drawable;
-                *((u32 *)d) |= bit;
-            } else {
-                u8 *p;
-                d = actor->drawable;
-                p = d + 0x20;
-                *((u32 *)(p + 8)) |= bit;
+    {
+        u8 k2 = 0x10;
+        if (actor->flags2D0 & k2) {
+            u16 *flags = &actor->flags2D4;
+            struct ContactPosition *pos;
+            {
+                u32 bit = 0x40;
+                *flags = bit | (*flags);
             }
-            if (actor->drawableKind == 0) {
-                u32 mask = ~2;
-                *((u32 *)d) &= mask;
-            } else {
-                u32 mask = ~2;
-                d += 0x20;
-                *((u32 *)(d + 8)) &= mask;
+            *((u16 *)(((u8 *)actor) + 0x9C)) = 0;
+            pos = &actor->position;
+            SpriteParticle_SpawnBatch(pos, 1, 2, 0, 0x154);
+            Sound_PlaySong(0x1D8);
+            {
+                u8 *d;
+                u32 bit = 1;
+                if (actor->drawableKind == 0) {
+                    d = actor->drawable;
+                    *((u32 *)d) |= bit;
+                } else {
+                    u8 *p;
+                    d = actor->drawable;
+                    p = d + 0x20;
+                    *((u32 *)(p + 8)) |= bit;
+                }
+                if (actor->drawableKind == 0) {
+                    u32 mask = ~2;
+                    *((u32 *)d) &= mask;
+                } else {
+                    u32 mask = ~2;
+                    d += 0x20;
+                    *((u32 *)(d + 8)) &= mask;
+                }
             }
-        }
-        SceneActorBehavior_CallTerrainScript(actor);
-        {
-            u16 script = *((u16 *)(((u8 *)actor) + 0x1F8));
-            if (script) {
-                struct ScriptUtilityArguments arguments;
-                values[0] = pos->x;
-                values[1] = actor->position.y;
-                values[2] = actor->position.z;
-                values[3] = *((u32 *)(((u8 *)actor) + 0x1FC));
-                values[4] = *((u32 *)(((u8 *)actor) + 0x200));
-                values[5] = *((u32 *)(((u8 *)actor) + 0x204));
-                values[6] = actor->field2E0;
-                values[7] = actor->id;
-                arguments.count = 8;
-                arguments.values = values;
-                Script_Call(script, &arguments);
+            SceneActorBehavior_CallTerrainScript(actor);
+            {
+                u16 script = *((u16 *)(((u8 *)actor) + 0x1F8));
+                if (script) {
+                    struct ScriptUtilityArguments arguments;
+                    values[0] = pos->x;
+                    values[1] = actor->position.y;
+                    values[2] = actor->position.z;
+                    values[3] = *((u32 *)(((u8 *)actor) + 0x1FC));
+                    values[4] = *((u32 *)(((u8 *)actor) + 0x200));
+                    values[5] = *((u32 *)(((u8 *)actor) + 0x204));
+                    values[6] = actor->field2E0;
+                    values[7] = actor->id;
+                    arguments.count = 8;
+                    arguments.values = values;
+                    Script_Call(script, &arguments);
+                }
             }
-        }
-        if ((!((*flags) & 0x4000)) && (((u32)(actor->category - 11)) > 2))
-            GameState_SetEventFlag(
-                BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
-        SetCtl(actor, (void *)SceneActorControl_OnIdle, 0x10);
-        SetState(actor, 1, 0, 2);
-        {
-            u8 *linked = actor->context;
-            u16 *message = (u16 *)values;
-            u32 id;
-            message[0] = 8;
-            message[1] = 0;
-            id = *((u32 *)(((u8 *)linked) + 0x630));
-            if (id)
-                SceneActorRegistry_SendToActorId(15, values, id);
-        }
-    } else if (Mod(frame, 4) == 0)
-        *((u16 *)(((u8 *)actor) + 0x2EE)) -= 8;
+            if ((!Arg1(0x4000, flags)) && (((u32)(actor->category - 11)) > 2))
+                GameState_SetEventFlag(
+                    BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
+            SetCtl(actor, (void *)SceneActorControl_OnIdle, 0x10);
+            SetState(actor, 1, 0, 2);
+            {
+                u8 *linked = actor->context;
+                u16 *message = (u16 *)values;
+                u32 id;
+                message[0] = 8;
+                message[1] = 0;
+                id = *((u32 *)(((u8 *)linked) + 0x630));
+                if (id)
+                    SceneActorRegistry_SendToActorId(15, values, id);
+            }
+        } else if (Mod(frame, 4) == 0)
+            *((u16 *)(((u8 *)actor) + 0x2EE)) -= 8;
+    }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Octopus_UpdateDefeat);
 #endif

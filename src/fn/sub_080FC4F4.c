@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #ifdef NONMATCHING
-// fuzzy: 85.3%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: actor allocation, collider argument scheduling, and stack spills.
 struct Frames {
     u16 *data;
@@ -111,13 +111,20 @@ void Axe_OnSecondaryColliderContact(void);
 u32 Shadow_Initialize(void *, void *, s32);
 void Axe_InitAttackTrail(struct SceneActorRegistryActor *s)
 {
-    struct ContactPackedVector bodySize, bodyOffset, attackSize, attackOffset;
+    struct ContactPackedVector bodySize;
+    struct ContactPackedVector bodyOffset;
+    struct ContactPackedVector attackSize;
+    struct ContactPackedVector attackOffset;
     u8 *d = s->context;
     void *resource = d + 0xa64;
     struct Render *sprite;
     struct Frames *frames;
     void *sequence;
     s32 i;
+    typeof(*((u16 *)(((u8 *)s) + 0xb4))) t1;
+    typeof(*((u16 *)(((u8 *)s) + 0xbc))) t2;
+    typeof(*((u32 *)(((u8 *)s) + 0xcc))) t3;
+    typeof(*((u16 *)(((u8 *)s) + 0xc4))) t4;
     AnimData_Load(resource, 0x5291);
     sprite = (void *)(d + 0xa38);
     Sprite_Init(sprite, resource, 0);
@@ -126,14 +133,14 @@ void Axe_InitAttackTrail(struct SceneActorRegistryActor *s)
         struct {
             u8 pad[0xa];
             u16 index;
-        } *drawable = (void *)((u8 *)s->drawable + 0x48);
+        } *drawable = (void *)(((u8 *)s->drawable) + 0x48);
         u32 index = drawable->index;
         frames = (void *)(d + 0xa80);
         Anim_SetSequence(frames, sequence, index, d[0xed7], 0);
     }
     step(frames, sprite);
-    *(u32 *)(d + 0xa38) |= 1;
-    *(struct ContactPosition *)(d + 0xa54) = s->position;
+    *((u32 *)(d + 0xa38)) |= 1;
+    *((struct ContactPosition *)(d + 0xa54)) = s->position;
     d[0xa3f] = 1;
     bodySize.x = 24;
     bodySize.y = 70;
@@ -142,13 +149,14 @@ void Axe_InitAttackTrail(struct SceneActorRegistryActor *s)
     bodyOffset.y = 0;
     bodyOffset.z = 0;
     for (i = 0; i < 3; i++) {
-        void *c = d + 0xb8c + i * 0x54;
+        void *c = (d + 0xb8c) + (i * 0x54);
         Collider_Init(c, 0, 0x5001, 0, 16, &bodySize, &bodyOffset);
         Collider_SetBodyProperties(c, 0, 0, 0);
         Collider_SetPosition(c, d + 0xc88, 0);
         Collider_SetCallback(c, Axe_LatchColliderContact, d);
         Collider_Refresh(c);
     }
+
     attackSize.x = 24;
     attackSize.y = 64;
     attackSize.z = 24;
@@ -156,13 +164,19 @@ void Axe_InitAttackTrail(struct SceneActorRegistryActor *s)
     attackOffset.y = 0;
     attackOffset.z = 0;
     for (i = 0; i < 3; i++) {
-        void *c = d + 0xa90 + i * 0x54;
-        Collider_Init(c, 0, 0x2401, 0, 16, &attackSize, &attackOffset);
-        Collider_SetAttackProperties(c, *(u16 *)((u8 *)s + 0xb4), *(u16 *)((u8 *)s + 0xbc), 0,
-                                     *(u32 *)((u8 *)s + 0xcc), *(u16 *)((u8 *)s + 0xc4));
+        void *c = (d + 0xa90) + (i * 0x54);
+        do {
+            Collider_Init(c, 0, 0x2401, 0, 16, &attackSize, &attackOffset);
+        } while (0);
+        t1 = *((u16 *)(((u8 *)s) + 0xb4));
+        t2 = *((u16 *)(((u8 *)s) + 0xbc));
+        t3 = *((u32 *)(((u8 *)s) + 0xcc));
+        t4 = *((u16 *)(((u8 *)s) + 0xc4));
+        Collider_SetAttackProperties(c, t1, t2, 0, t3, t4);
         Collider_SetPosition(c, d + 0xc88, 0);
         Collider_SetCallback(c, Axe_OnSecondaryColliderContact, d);
     }
+
     d[0xca7] = Shadow_Initialize(d + 0xcac, d + 0xa54, 0);
     ActorShadow_Disable(d + 0xcac);
 }

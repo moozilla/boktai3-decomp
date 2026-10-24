@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 94.7%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: PRE stack-slot order and register allocation in route reacquisition.
 // MATCHING_CONCESSION: register-pinning
@@ -218,6 +218,7 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
     Arrive(actor);
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Mummy_TryDirectPursuit);
 #endif

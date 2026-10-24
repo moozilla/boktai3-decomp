@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 95.9%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 struct ParticleVec {
     s16 x, y, z, pad;
@@ -70,47 +70,51 @@ s32 sub_08114E68(struct ParticleVec *position, s16 *range, s16 *spread, s32 coun
         if (!e)
             return -1;
         sprite = &m->sprites[e->index];
-        e->position = *position;
-        if (spread) {
-            if (spread[0])
-                e->position.x += Mod(random(&gUnk_03005304), spread[0] * 2) - spread[0];
-            if (spread[1])
-                e->position.y += Mod(random(&gUnk_03005304), spread[1] * 2) - spread[1];
-        }
-        if (!range) {
-            e->velocity.x = 0;
-            e->velocity.y = 0;
-        } else {
-            struct ParticleVec v;
-            if (range[0] == 0)
-                v.x = 0;
-            else
-                v.x = Mod(random(&gUnk_03005304), range[0]);
-            if (range[1] == 0)
-                v.y = 0;
-            else
-                v.y = Mod(random(&gUnk_03005304), range[1]);
-            e->velocity = v;
-        }
-        ParticleSprite_Initialize(sprite, m->graphics, 0);
-        Effect_SetOrigin(sprite, -8, -8);
-        flag = night();
-        sequence = 13;
-        if (flag)
-            sequence = 14;
-        Anim_SetSequence(m->animations[e->index], m->resource, sequence, 0,
-                         (u8)(Mod(random(&gUnk_03005304), 2) | animFlags));
-        sprite->priority = priority;
         {
-            u8 k1 = 0x11;
-            sprite->flags = (sprite->flags | k1) | spriteFlags;
+            typeof(e->position) *q1 = &e->position;
+            *q1 = *position;
+            if (spread) {
+                if (spread[0])
+                    e->position.x += Mod(random(&gUnk_03005304), spread[0] * 2) - spread[0];
+                if (spread[1])
+                    e->position.y += Mod(random(&gUnk_03005304), spread[1] * 2) - spread[1];
+            }
+            if (!range) {
+                e->velocity.x = 0;
+                e->velocity.y = 0;
+            } else {
+                struct ParticleVec v;
+                if (range[0] == 0)
+                    v.x = 0;
+                else
+                    v.x = Mod(random(&gUnk_03005304), range[0]);
+                if (range[1] == 0)
+                    v.y = 0;
+                else
+                    v.y = Mod(random(&gUnk_03005304), range[1]);
+                e->velocity = v;
+            }
+            ParticleSprite_Initialize(sprite, m->graphics, 0);
+            Effect_SetOrigin(sprite, -8, -8);
+            flag = night();
+            sequence = 13;
+            if (flag)
+                sequence = 14;
+            Anim_SetSequence(m->animations[e->index], m->resource, sequence, 0,
+                             (u8)(Mod(random(&gUnk_03005304), 2) | animFlags));
+            {
+                u8 k1 = 0x11;
+                sprite->flags = (sprite->flags | k1) | spriteFlags;
+            }
+            sprite->priority = priority;
+            e->active = 1;
+            e->tag = tag;
         }
-        e->active = 1;
-        e->tag = tag;
     }
 
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08114E68);
 #endif

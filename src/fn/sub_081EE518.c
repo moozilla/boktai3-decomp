@@ -2,7 +2,7 @@
 #include "global.h"
 // confidence=low: hit callback slows this departure action.
 #ifdef NONMATCHING
-// fuzzy: 91.4%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: base preservation, second decoder allocation, and phase transitions.
 struct Frames {
     u16 *data;
@@ -139,109 +139,116 @@ void SceneActors_UpdateHitSensitiveDeparture(void *arg, int time)
     register void *base asm("r7") = p;
     u8 *enter;
     asm("" : "+r"(p), "+r"(tick), "+r"(base));
-    enter = (u8 *)p + 0xb1;
+    enter = ((u8 *)p) + 0xb1;
     if (*enter) {
         struct Frames *f;
         struct Render *r;
         register int zero asm("r2") = 0;
         *enter = zero;
         asm("" : "+r"(zero));
-        r = (void *)((u8 *)p + 0x2c0);
-        W(p, 0x298) = 0;
-        W(p, 0x290) = 0;
-        W(p, 0x294) = 40;
-        W((u8 *)r, 0x3c) = 2;
-        f = (void *)((u8 *)p + 0x2ec);
-        Anim_SetSequence(f, (void *)W(p, 0x390), 2, 0, 0);
+        r = (void *)(((u8 *)p) + 0x2c0);
+        *((s32 *)(((u8 *)p) + 0x298)) = 0;
+        *((s32 *)(((u8 *)p) + 0x290)) = 0;
+        *((s32 *)(((u8 *)p) + 0x294)) = 40;
+        *((s32 *)(((u8 *)((u8 *)r)) + 0x3c)) = 2;
+        f = (void *)(((u8 *)p) + 0x2ec);
+        Anim_SetSequence(f, (void *)(*((s32 *)(((u8 *)p) + 0x390))), 2, 0, 0);
         step(f, r);
-        W(p, 0x398) = 0;
+        *((s32 *)(((u8 *)p) + 0x398)) = 0;
         Sound_PlaySong(0x586);
     }
-    switch ((u32)W(base, 0x398)) {
+    switch ((u32)(*((s32 *)(((u8 *)base) + 0x398)))) {
         case 0:
             if (tick > 90) {
                 struct Frames *f;
                 struct Render *r;
-                W(base, 0x304) = 1;
-                W(base, 0x2fc) = 3;
-                f = (void *)((u8 *)base + 0x2ec);
-                Anim_SetSequence(f, (void *)W(base, 0x390), 3, 0, 0);
-                r = (void *)((u8 *)base + 0x2c0);
+                *((s32 *)(((u8 *)base) + 0x304)) = 1;
+                *((s32 *)(((u8 *)base) + 0x2fc)) = 3;
+                f = (void *)(((u8 *)base) + 0x2ec);
+                Anim_SetSequence(f, (void *)(*((s32 *)(((u8 *)base) + 0x390))), 3, 0, 0);
+                r = (void *)(((u8 *)base) + 0x2c0);
                 step(f, r);
-                W(base, 0x398) = 1;
+                *((s32 *)(((u8 *)base) + 0x398)) = 1;
             }
-            W(base, 0x288) = (randomValue() & 1);
+            *((s32 *)(((u8 *)base) + 0x288)) = (randomValue() << 31) >> 31;
             goto moving;
+
         case 1:
             if (tick > 150) {
-                W(base, 0x304) = 0;
-                W(base, 0x398) = 2;
-                W(base, 0x294) = 160;
+                *((s32 *)(((u8 *)base) + 0x304)) = 0;
+                *((s32 *)(((u8 *)base) + 0x398)) = 2;
+                *((s32 *)(((u8 *)base) + 0x294)) = 160;
             }
-            W(base, 0x288) = (randomValue() & 3);
+            *((s32 *)(((u8 *)base) + 0x288)) = randomValue() & 3;
         moving:
-            SceneMover_ApproachScreenX(p, W(base, 0x294));
+            SceneMover_ApproachScreenX(p, *((s32 *)(((u8 *)base) + 0x294)));
+
             ActorDisplay_UpdateScreenAnchor(p);
             ActorDisplay_UpdateForegroundSprite(p);
             ActorDisplay_UpdateAccentSprite(p);
             SceneActors_EmitPeriodicParticles(p, tick);
             break;
+
         case 2: {
-            int velocity = Player_GetHorizontalVelocity((void *)W(base, 0x3a0));
+            int velocity = Player_GetHorizontalVelocity((void *)(*((s32 *)(((u8 *)base) + 0x3a0))));
             s16 position[8];
             if (velocity < 0x6000)
                 velocity = 0x6000;
-            if (H(base, 0x5c2) > 0)
+            if ((*((s16 *)(((u8 *)base) + 0x5c2))) > 0)
                 velocity >>= 1;
-            SceneMover_StepPastScreenX(p, W(base, 0x294), velocity);
-            W(base, 0x288) = (randomValue() & 7);
+            SceneMover_StepPastScreenX(p, *((s32 *)(((u8 *)base) + 0x294)), velocity);
+            *((s32 *)(((u8 *)base) + 0x288)) = randomValue() & 7;
             ActorDisplay_UpdateScreenAnchor(p);
             ActorDisplay_UpdateForegroundSprite(p);
             ActorDisplay_UpdateAccentSprite(p);
             SceneActors_EmitPeriodicParticles(p, tick);
-            if (W(base, 0x300))
-                W(base, 0x304) = 1;
+            if (*((s32 *)(((u8 *)base) + 0x300)))
+                *((s32 *)(((u8 *)base) + 0x304)) = 1;
             Player_GetWorldPosition(0, position);
-            if (H(base, 0x278) > 159 || tick > 420) {
-                W(base, 0x304) = 0;
-                W(base, 0x2fc) = 3;
-                B(base, 0x2f0) |= 4;
-                Anim_RestartSequence((void *)((u8 *)base + 0x2ec), (void *)W(base, 0x390),
-                                     (u16)W(base, 0x2fc), 0, 0);
-                W(base, 0x294) = 60;
-                W(base, 0x398) = 4;
-            } else if (W(base, 0x590) == 1) {
-                W(base, 0x294) = 60;
-                W(base, 0x398) = 3;
+            if (((*((s16 *)(((u8 *)base) + 0x278))) > 159) || (tick > 420)) {
+                *((s32 *)(((u8 *)base) + 0x304)) = 0;
+                *((s32 *)(((u8 *)base) + 0x2fc)) = 3;
+                *(((u8 *)base) + 0x2f0) |= 4;
+                Anim_RestartSequence((void *)(((u8 *)base) + 0x2ec),
+                                     (void *)(*((s32 *)(((u8 *)base) + 0x390))),
+                                     (u16)(*((s32 *)(((u8 *)base) + 0x2fc))), 0, 0);
+                *((s32 *)(((u8 *)base) + 0x294)) = 60;
+                *((s32 *)(((u8 *)base) + 0x398)) = 4;
+            } else if ((*((s32 *)(((u8 *)base) + 0x590))) == 1) {
+                *((s32 *)(((u8 *)base) + 0x294)) = 60;
+                *((s32 *)(((u8 *)base) + 0x398)) = 3;
             }
             break;
         }
+
         case 3:
-            SceneMover_ApproachScreenX(p, W(base, 0x294));
-            W(base, 0x288) = (randomValue() & 1);
+            SceneMover_ApproachScreenX(p, *((s32 *)(((u8 *)base) + 0x294)));
+            *((s32 *)(((u8 *)base) + 0x288)) = randomValue() & 1;
             ActorDisplay_UpdateScreenAnchor(p);
             ActorDisplay_UpdateForegroundSprite(p);
             ActorDisplay_UpdateAccentSprite(p);
             SceneActors_EmitPeriodicParticles(p, tick);
-            W(base, 0x304) = 0;
-            W(base, 0x2fc) = 3;
-            B(base, 0x2f0) |= 4;
-            Anim_RestartSequence((void *)((u8 *)base + 0x2ec), (void *)W(base, 0x390),
-                                 (u16)W(base, 0x2fc), 0, 0);
-            W(base, 0x398) = 4;
-            W(base, 0x294) = 60;
+            *((s32 *)(((u8 *)base) + 0x304)) = 0;
+            *((s32 *)(((u8 *)base) + 0x2fc)) = 3;
+            *(((u8 *)base) + 0x2f0) |= 4;
+            Anim_RestartSequence((void *)(((u8 *)base) + 0x2ec),
+                                 (void *)(*((s32 *)(((u8 *)base) + 0x390))),
+                                 (u16)(*((s32 *)(((u8 *)base) + 0x2fc))), 0, 0);
+            *((s32 *)(((u8 *)base) + 0x398)) = 4;
+            *((s32 *)(((u8 *)base) + 0x294)) = 60;
             break;
+
         case 4:
-            SceneMover_ApproachScreenX(p, W(base, 0x294));
-            B(base, 0x2f0) |= 4;
-            W(base, 0x288) = (randomValue() & 1);
+            SceneMover_ApproachScreenX(p, *((s32 *)(((u8 *)base) + 0x294)));
+            *(((u8 *)base) + 0x2f0) |= 4;
+            *((s32 *)(((u8 *)base) + 0x288)) = randomValue() & 1;
             ActorDisplay_UpdateScreenAnchor(p);
             ActorDisplay_UpdateForegroundSprite(p);
             ActorDisplay_UpdateAccentSprite(p);
             SceneActors_EmitPeriodicParticles(p, tick);
-            if (W(base, 0x300)) {
-                B(base, 0x2f0) &= ~4;
-                B(p, 0xaf) = 1;
+            if (*((s32 *)(((u8 *)base) + 0x300))) {
+                *(((u8 *)base) + 0x2f0) &= ~4;
+                *(((u8 *)p) + 0xaf) = 1;
             }
             break;
     }

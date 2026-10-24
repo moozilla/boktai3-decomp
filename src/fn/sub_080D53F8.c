@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 87.0%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: navigation probe events select turns or acceleration behaviors.
 
@@ -116,6 +116,7 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
 increment:
     actor->counter2AC++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Mummy_UpdateProbeNavigation);
 #endif

@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 94.0%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: action role inferred from local animation, motion and effects.
 #include "contact_swarm.h"
@@ -197,7 +197,6 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
 {
     u8 *enter;
     register u32 entering asm("r1");
-    u8 *savedBoss = boss;
     register u32 savedFrame asm("r8") = frame;
     u32 mask = 0x20;
     p->flags |= mask;
@@ -217,8 +216,8 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
                     u32 zero = 0;
                     *enter = zero;
                     asm("" : "+r"(zero));
-                    Anim_SetSequence(&p->sequence, *((void **)(savedBoss + 0x4d0)), 8,
-                                     (u8)p->variant, zero);
+                    Anim_SetSequence(&p->sequence, *((void **)(boss + 0x4d0)), 8, (u8)p->variant,
+                                     zero);
                 }
             }
             if (StepPlayback(p, &p->sequence, p, 1)) {
@@ -265,8 +264,8 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
             }
             MotionTrack_Update(p->motion);
             if (Ended(p)) {
-                if ((ScenePair_CountPositiveCounters(savedBoss) == 2) &&
-                    (savedBoss[(p->variant == 1) ? (0x205) : (0x421)] == 12)) {
+                if ((ScenePair_CountPositiveCounters(boss) == 2) &&
+                    (boss[(p->variant == 1) ? (0x205) : (0x421)] == 12)) {
                     struct SceneVec point;
                     Sound_PlaySong(0x1ba);
                     Add(&point, p->basePosition, &p->target);
@@ -290,6 +289,7 @@ void Vanargand_UpdatePartImpact(u8 *boss, struct VanargandPart *p, u32 frame)
             break;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartImpact);
 #endif

@@ -2,7 +2,7 @@
 #include "contact_swarm.h"
 
 #ifdef NONMATCHING
-// fuzzy: 89.3%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining: sine/RNG load order, position and terrain register allocation, and collider temporaries.
 struct SlashCollider {
@@ -112,6 +112,7 @@ void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
     s32 angle;
     s32 magnitude;
     s32 height;
+    typeof(((u16)p->position.x) + ((u16)velocity->x)) t1;
     if (p->entered) {
         p->timer = 0;
         {
@@ -155,8 +156,9 @@ void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
         struct ContactPosition *current = &p->position;
         register struct ContactPosition *velocity asm("r1") = &p->velocity;
         asm("" : "+r"(current), "+r"(velocity));
-        p->position.x = ((u16)p->position.x) + ((u16)velocity->x);
-        current->y = ((u16)current->y) + ((u16)velocity->y);
+        t1 = ((u16)p->position.x) + ((u16)velocity->x);
+        p->position.x = t1;
+        current->y = ((u16)velocity->y) + ((u16)current->y);
         current->z = ((u16)current->z) + ((u16)velocity->z);
     }
     position = &p->position;
@@ -178,6 +180,7 @@ void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
     } else
         p->timer++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", PursuingActor_UpdateRecoil);
 #endif

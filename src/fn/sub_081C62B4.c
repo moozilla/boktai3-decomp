@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 95.0%
+// fix.py best (sweep after the inlined-insn fix)
 // Loop pointer registers differ: ROM keeps the y-source pointer in r6 (copied from r0) and the counter in r5.
 struct DigitPos {
     u16 x, y;
@@ -19,16 +19,22 @@ s32 Div(s32, s32);
 void memcpy(void *, const void *, u32);
 s32 Mod(s32, s32);
 
+inline static u32 Arg1(u32 k_, u16 *sy)
+{
+    return (*sy) + k_;
+}
+
 void sub_081C62B4(u8 *p)
 {
     struct DigitPos pos[6];
-    s32 hours, minutes, seconds;
+    s32 hours;
+    s32 minutes;
+    s32 seconds;
     s32 i;
-
     memcpy(pos, &gUnk_0824FA00, sizeof(pos));
-    hours = Div(*(s32 *)(p + 0x368), 216000);
-    minutes = Div(*(s32 *)(p + 0x368), 3600) - hours * 60;
-    seconds = Div(*(s32 *)(p + 0x368), 60) - hours * 3600 - minutes * 60;
+    hours = Div(*((s32 *)(p + 0x368)), 216000);
+    minutes = Div(*((s32 *)(p + 0x368)), 3600) - (hours * 60);
+    seconds = (Div(*((s32 *)(p + 0x368)), 60) - (hours * 3600)) - (minutes * 60);
     if (hours > 99) {
         ChallengeResult_LoadDigit(p + 0x2f8, p + 0x38, 9);
         ChallengeResult_LoadDigit(p + 0x298, p + 0x38, 9);
@@ -52,9 +58,9 @@ void sub_081C62B4(u8 *p)
         u16 *dx = (u16 *)(p + 0x138);
         u16 *sx = &pos[0].x;
         u8 *obj = p;
-        for (i = 5; i >= 0; i--) {
-            *dx = *sx + 0x90;
-            *(u16 *)(obj + 0x13a) = *sy + 0x38;
+        for (i = 0; i < 6; i++) {
+            *dx = (*sx) + 0x90;
+            *((u16 *)(obj + 0x13a)) = Arg1(0x38, sy);
             sy += 2;
             dx += 0x30;
             sx += 2;
@@ -62,6 +68,7 @@ void sub_081C62B4(u8 *p)
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081C62B4);
 #endif

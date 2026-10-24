@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 88.5%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: coordinates player positioning and release.
 
@@ -162,6 +162,33 @@ static inline u8 PlayerCanMove_1(struct Player *p)
     return result;
 }
 
+inline static void FindReleaseTarget_UpdatePlayerRelease(struct Hresvelgr *actor, struct Vec *out)
+{
+    u32 k1 = 0x81;
+    if (out) {
+        s32 cell = CellIndex(&actor->position);
+        if (!((*((u16 *)(CellProperties(cell) + 2))) & k1)) {
+            *out = actor->position;
+            out->x = (out->x & (~255)) + 128;
+            out->z = (out->z & (~255)) + 128;
+        } else {
+            s32 i;
+            for (i = 0; i <= 3; i++) {
+                s32 neighbor = cell + gUnk_030052F4->neighborOffsets[i & 3];
+                if (!((*((u16 *)(CellProperties(neighbor) + 2))) & k1)) {
+                    PolarVector(out, (i << 6) + 192, 256);
+                    AddVector(out, &actor->position, out);
+                    out->x = (out->x & (~255)) + 128;
+                    out->z = (out->z & (~255)) + 128;
+                    return;
+                }
+            }
+
+            SetVector(out, 0xb54, 0, 0xb54);
+        }
+    }
+}
+
 void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
 {
     struct Hresvelgr *saved = actor;
@@ -169,8 +196,10 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
     if (actor->pending) {
         actor->pending = 0;
         if (PlayerCanMove_1(actor->player)) {
-            Player_BeginPositionRequest(actor->player, actor->requestedPosition, 0, 0, 0, 0, 1, 0,
-                                        64);
+            do {
+                Player_BeginPositionRequest(actor->player, actor->requestedPosition, 0, 0, 0, 0, 1,
+                                            0, 64);
+            } while (0);
             ActionState_Reset(action);
             Sound_PlaySong(0x3dc);
         } else
@@ -204,7 +233,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
             if (!action->frame) {
                 Hresvelgr_SelectPlayerAnimation(actor, 1);
                 SetVector(&saved->step, 0, 72, 0);
-                FindReleaseTarget(saved, &saved->target);
+                FindReleaseTarget_UpdatePlayerRelease(saved, &saved->target);
                 action->frame = 1;
             }
             if (saved->step.y < 0)
@@ -280,6 +309,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
             break;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdatePlayerRelease);
 #endif

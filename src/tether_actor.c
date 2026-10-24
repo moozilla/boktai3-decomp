@@ -587,7 +587,7 @@ void TetherActor_InitializeSegments(struct TetherActor *actor)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 87.6%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining: the ROM hoists neither z endpoint out of the segment loop and keeps the
 // priority in sb; this hoists start.z and spills the priority.
 static inline s32 scaleOffsetR(s32 value)
@@ -615,6 +615,7 @@ void TetherActor_UpdateSegments(struct TetherActor *actor)
         s32 n;
         for (n = 0, segment = actor->segments; n < 7; n++, segment++)
             segment->flags |= 1;
+
         return;
     }
     angle = (((*gUnk_02000580)->heading + 1) & 7) * 32;
@@ -634,23 +635,22 @@ void TetherActor_UpdateSegments(struct TetherActor *actor)
     end.x = actor->position.x + scaleOffsetR(100 * gUnk_086149C4[(angle + 64) & 255]);
     end.y = actor->position.y - 50;
     end.z = actor->position.z + scaleOffsetR(100 * gUnk_086149C4[angle & 255]);
-    priority = -2;
-    if ((*gUnk_02000580)->heading == 4)
-        priority = -20;
+    priority = ((*gUnk_02000580)->heading == 4) ? (-20) : (-2);
     segment = actor->segments;
     i = 0;
     do {
         s32 count = i + 1;
         s32 remaining = 7 - i;
-        segment->position.x = (end.x * count + start.x * remaining) >> 3;
-        segment->position.y = (end.y * count + start.y * remaining) >> 3;
-        segment->position.z = (start.z * remaining + end.z * count) >> 3;
+        segment->position.x = ((end.x * count) + (start.x * remaining)) >> 3;
+        segment->position.z = ((start.z * remaining) + (end.z * count)) >> 3;
+        segment->position.y = ((end.y * count) + (start.y * remaining)) >> 3;
         segment->priority = priority;
         segment->flags &= ~1;
         i = count;
         ++segment;
     } while (i <= 6);
 }
+
 #else
 
 INCLUDE_ASM("asm/nonmatching", TetherActor_UpdateSegments);

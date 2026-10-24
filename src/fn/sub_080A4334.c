@@ -2,6 +2,7 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
+// fix.py best (sweep after the inlined-insn fix)
 // twin.py transplant from a matched near-clone
 // Remaining differences: register allocation, address reuse, and instruction order.
 #define F(p, o, T) (*(T *)((u8 *)(p) + (o)))
@@ -112,7 +113,7 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
         return 0;
     asm("" : : "r"(player));
     pos = (void *)(player + 0x30);
-    Delta(&delta, &a->position, pos);
+    Delta(&delta, &a->position, (void *)(player + 0x30));
     height = delta.y;
     if (height < 0)
         height = -height;
@@ -122,7 +123,7 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
     Math_Atan2(delta.x, delta.z);
     if (distance >= (a->distanceLimitF8 * 2))
         return 0;
-    Delta(&delta, &a->position, pos);
+    Delta(&delta, &a->position, (void *)(player + 0x30));
     angle = Facing(a, &delta);
     if (angle < 0)
         angle = -angle;

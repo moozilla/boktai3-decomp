@@ -57,7 +57,7 @@ TOPICS = {
         "address register. agbcc -O2 turns on -fstrict-aliasing: accesses of different types are in "
         "different alias sets and never alias, so a void * field read between two u32 stores does not keep "
         "the first one. When the ROM keeps the store, the read between had the stored type "
-        "(spellings.sp_alias_read `*(u32 *)&x->f`). rtlprobe.py alias recompiles with alias sets off "
+        "(spellings.sp_alias_read `*(u32 *)&x->f`). An access directly through a union member, or through a char, is in alias set 0 and aliases everything (c_get_alias_set), so `((union { s16 v; } *)p)[i].v = x` keeps later loads of other types in place (sub_081D3C90: same effect as alias sets off). rtlprobe.py alias recompiles with alias sets off "
         "(AGBCC_NOSTRICT=1) to tell whether any difference is an alias decision.",
         [("flow.c", "this memory write is dead (remember", -8, 14),
          ("alias.c", "if (!writep && RTX_UNCHANGING_P (mem))", -12, 24)]),

@@ -19,7 +19,7 @@ static inline u8 PlayerHasFlag(u32 mask)
     return 0;
 }
 #ifdef NONMATCHING
-// fuzzy: 95.1%
+// fix.py best (sweep after the inlined-insn fix)
 void ScenePool_SpawnEntriesNearPlayers(struct ScenePoolManager *m0)
 {
     register struct ScenePoolManager *m asm("r8") = m0;
@@ -44,14 +44,14 @@ void ScenePool_SpawnEntriesNearPlayers(struct ScenePoolManager *m0)
             return;
     }
     for (next = 0; (i = next) < m->playerCount;) {
-        s32 k, n, nn;
-        n = 2;
-        if (regions[0] == regions[1])
-            n = 1;
+        s32 k;
+        s32 n;
+        s32 nn;
+        n = (regions[0] == regions[1]) ? (1) : (2);
         k = 0;
         next = i + 1;
         nn = n;
-        while (k < nn) {
+        while (k < n) {
             struct ScenePoolNode *node =
                 ((struct ScenePoolNode **)m->registry[1])[sub_08249498(regions[k], m->registry[0])];
             if (node) {
@@ -68,12 +68,12 @@ void ScenePool_SpawnEntriesNearPlayers(struct ScenePoolManager *m0)
                                 sub_0803BC88(slot, e, e->index);
                                 {
                                     u32 *fp = &m->firstId;
-                                    if (*fp > e->index)
+                                    if ((*fp) > e->index)
                                         *fp = e->index;
                                 }
                                 {
                                     u32 *lp = &m->lastId;
-                                    if (*lp < e->index)
+                                    if ((*lp) < e->index)
                                         *lp = e->index;
                                 }
                             }
@@ -86,6 +86,7 @@ void ScenePool_SpawnEntriesNearPlayers(struct ScenePoolManager *m0)
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", ScenePool_SpawnEntriesNearPlayers);
 #endif

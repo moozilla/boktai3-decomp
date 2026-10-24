@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.9%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: sequence setup, field-access order, and register allocation.
 #include "global.h"
@@ -115,6 +115,8 @@ void ActorPhase_EmitTrailSprite(struct SceneActorRegistryResetView *actor,
     struct DisplaySequenceState *state;
     typeof(actor->drawable) t1;
     typeof(context + ((*((u16 *)(context + 0xE44))) * 0x60)) t2;
+    typeof(actor->drawable) t3;
+    typeof(context + ((*((u16 *)(context + 0xE44))) * 0x60)) t4;
     if ((*((u32 *)actor->drawable)) & 1)
         return;
     {
@@ -124,10 +126,13 @@ void ActorPhase_EmitTrailSprite(struct SceneActorRegistryResetView *actor,
         {
             struct DisplaySequenceState *source = (void *)(((u8 *)actor->drawable) + 0x48);
             u16 sequence = source->unknownA;
-            Anim_SetSequence(
-                (void *)(((context + 0x708) + ((*((u16 *)(context + 0xE44))) * 0x60)) + 0x48),
-                *((void **)(((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)(context + 0x760)))),
-                sequence, context[0xED7], zero);
+            {
+                u32 k1 = 0x760;
+                Anim_SetSequence(
+                    (void *)(((context + 0x708) + ((*((u16 *)(context + 0xE44))) * 0x60)) + 0x48),
+                    *((void **)(((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)(context + k1)))),
+                    sequence, context[0xED7], zero);
+            }
         }
     }
     sprite = (void *)((((*((u16 *)(context + 0xE44))) * 0x60) + ((u32)context)) + 0x708);
@@ -145,10 +150,13 @@ void ActorPhase_EmitTrailSprite(struct SceneActorRegistryResetView *actor,
     t1 = actor->drawable;
     t2 = context + ((*((u16 *)(context + 0xE44))) * 0x60);
     CopyScaleX(t1, t2);
-    CopyScaleY(actor->drawable, context + ((*((u16 *)(context + 0xE44))) * 0x60));
+    t3 = actor->drawable;
+    t4 = context + ((*((u16 *)(context + 0xE44))) * 0x60);
+    CopyScaleY(t3, t4);
     if ((++(*((u16 *)(context + 0xE44)))) > 3)
         *((u16 *)(context + 0xE44)) = 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", ActorPhase_EmitTrailSprite);
 #endif

@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 92.9%
+// fix.py best (sweep after the inlined-insn fix)
 // foundry draft (worker best 92.1%); what differs is mostly register allocation and instruction order
 #define gOrbitEffectRandomTable gUnk_0203B400
 #define gOrbitEffectRandomIndex gUnk_03005308
@@ -65,7 +65,7 @@ void OrbitEffect_SpawnHomingTrail(struct OrbitEffect *p, struct OrbitEffectPosit
         }
         {
             struct OrbitEffectPosition *position = origin;
-            u16 x = position->x;
+            u32 x = position->x;
             zero = 0;
             trail->position.x = x;
             trail->position.y = position->y;
@@ -78,6 +78,7 @@ void OrbitEffect_SpawnHomingTrail(struct OrbitEffect *p, struct OrbitEffectPosit
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", OrbitEffect_SpawnHomingTrail);
 #endif

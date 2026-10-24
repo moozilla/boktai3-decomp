@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 89.9%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: coordinates paired animations with an offset motion track.
 #define Vanargand_UpdateMovingPairAttack sub_081A93A0
@@ -58,6 +58,28 @@ static inline void AddVector(s16 *v, s16 *a, s16 *b)
     bv = b[2];
     v[2] = av + bv;
 }
+inline static void SetVector_081A93A0(s16 *v, s32 x, s32 y, s32 z)
+{
+    {
+        typeof(v[0]) *q1 = &v[0];
+        *q1 = x;
+    }
+    v[1] = y;
+    v[2] = z;
+}
+
+inline static void AddVector_1(u16 bv, s16 *v, s16 *a, s16 *b)
+{
+    u16 av = a[0];
+    v[0] = av + bv;
+    av = b[1];
+    bv = a[1];
+    v[1] = av + bv;
+    av = a[2];
+    bv = b[2];
+    v[2] = av + bv;
+}
+
 void Vanargand_UpdateMovingPairAttack(struct MovingPairActor *p)
 {
     struct MovingPairActor *self = p;
@@ -103,9 +125,9 @@ void Vanargand_UpdateMovingPairAttack(struct MovingPairActor *p)
                     p->phase = 3;
                     p->timer = 0;
                 }
-                SetVector(destination, 576, 512, 576);
+                SetVector_081A93A0(destination, 576, 512, 576);
                 asm("" : : : "memory");
-                AddVector(destination, p->reference, destination);
+                AddVector_1(destination[0], destination, p->reference, destination);
                 MotionTrack_Initialize(p->track, self->position, destination, 0, 4);
                 p->timer++;
             } else if (PairedSceneActor_AreSelectedHalvesFinished(p->pair) && IsComplete(p)) {
@@ -125,13 +147,13 @@ void Vanargand_UpdateMovingPairAttack(struct MovingPairActor *p)
         case 2:
             p->finished = 1;
             {
-                u32 mask = 0x20000;
-                p->flags |= mask | 4;
+                p->flags |= 0x20000 | 4;
             }
             PairedSceneActor_ApplyToSelectedHalves(p->pair, 3, 19);
             break;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081A93A0);
 #endif

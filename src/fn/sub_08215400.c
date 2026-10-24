@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 87.5%
+// fix.py best (sweep after the inlined-insn fix)
 // Only allocation differs: the outer `entry` gets r2 (ROM: r1, shared with `e`), so the
 // 0x06010000 temporary takes r1 and a copy to `e` is added at the loop top.
 struct Entry {
@@ -17,10 +17,9 @@ void ObjGfx_LoadTiles(u32 start)
     u32 i;
     struct Entry *entry = gUnk_02039000;
     u32 dst = 0x06010000 + (start << 5);
-    u32 total = gUnk_03004304;
     i = 0;
-    if (i < total) {
-        u32 n = total;
+    if (i < gUnk_03004304) {
+        u32 n = gUnk_03004304;
         do {
             struct Entry *e = entry;
             u32 src = e->src;
@@ -34,12 +33,14 @@ void ObjGfx_LoadTiles(u32 start)
                 src += 0x200;
                 dst += e->size;
             }
+
             i++;
             entry++;
         } while (i < n);
     }
     gUnk_03004304 = 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", ObjGfx_LoadTiles);
 #endif

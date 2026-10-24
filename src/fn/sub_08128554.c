@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 93.2%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences are loop setup, mask allocation and short-lived register copies.
 struct Vec {
     s16 x, y, z, pad;
@@ -185,6 +185,128 @@ static inline void ProjectShift(struct Vec *out, struct Vec *in, struct Vec *cam
     out->y = out->y - camera->y + 80;
     out->z -= camera->z;
 }
+inline static u32 Step_UpdateImpactAnimation(struct FragmentSprite *owner,
+                                             struct FragmentSequence *state,
+                                             struct FragmentSprite *base, u32 endMask)
+{
+    const volatile u16 *command;
+    u32 ended;
+    u32 duration;
+    u32 flags;
+    u32 bit;
+    {
+        u32 offset = state->index << 1;
+        const volatile u16 *table;
+        table = state->commands;
+        command = (const volatile u16 *)(((u32)table) + offset);
+    }
+    owner->frame = (*command) >> 6;
+    {
+        u32 input = state->flags;
+        u32 first;
+        u32 maskBit = 1;
+        bit = maskBit;
+        first = 1;
+        first &= input;
+        {
+            u8 k1 = 1;
+            if (first != ((((*command) & 0x30) >> 4) & k1))
+                owner->flags |= 4;
+            else
+                owner->flags &= ~4;
+        }
+    }
+    {
+        u32 input = state->flags;
+        u32 bit;
+        register u32 first asm("r1");
+        bit = 2;
+        first = bit;
+        first &= input;
+        asm("" : "+r"(first));
+        first = (u8)first;
+        if (first != ((((*command) & 0x30) >> 4) & bit))
+            owner->flags |= endMask;
+        else
+            owner->flags &= ~8;
+    }
+    {
+        u32 elapsed = state->elapsed + 1;
+        u32 mask;
+        register u32 temp asm("r2");
+        register u32 savedDuration asm("r2");
+        state->elapsed = elapsed;
+        temp = 0xFFFF;
+        asm("" : "+r"(temp));
+        mask = temp;
+        duration = state->duration;
+        elapsed = (u16)elapsed;
+        savedDuration = duration;
+        if (elapsed >= duration) {
+            state->elapsed = 0;
+            flags = state->flags;
+            if (flags & 4) {
+                u32 index = state->index;
+                if (index == 0) {
+                    u32 hold = endMask;
+                    hold &= flags;
+                    if (hold) {
+                        state->elapsed = savedDuration;
+                    } else {
+                        state->index = state->frameCount - 1;
+                    }
+                    ended = 1;
+                } else {
+                    state->index = index - 1;
+                    ended = 0;
+                }
+            } else {
+                u32 index = state->index + 1;
+                u32 frameCount;
+                u32 endFlag;
+                state->index = index;
+                frameCount = state->frameCount;
+                if ((index & mask) >= frameCount) {
+                    endFlag = flags & endMask;
+                    asm("" : "+r"(endFlag));
+                    endFlag = (u8)endFlag;
+                    if (endFlag) {
+                        state->elapsed = duration;
+                        {
+                            u32 lastIndex = frameCount - 1;
+                            state->index = lastIndex;
+                        }
+                    } else {
+                        state->index = 0;
+                    }
+                    ended = 1;
+                } else {
+                    ended = 0;
+                }
+            }
+            {
+                u32 offset = state->index << 1;
+                const volatile u16 *table;
+                table = state->commands;
+                command = (const volatile u16 *)(((u32)table) + offset);
+            }
+            state->frameWeight = (*command) & 15;
+            {
+                register s32 weight asm("r1") = state->frameWeight;
+                s32 speed;
+                speed = state->speed;
+                speed = (speed * weight) >> 6;
+                state->duration = speed;
+                if (!((u8)speed))
+                    state->duration = 1;
+            }
+        } else {
+            ended = 0;
+        }
+    }
+    return ended;
+}
+
 void FragmentBurst_UpdateImpactAnimation(void *unused, struct FragmentBurst *p)
 {
     s32 i;
@@ -200,7 +322,7 @@ void FragmentBurst_UpdateImpactAnimation(void *unused, struct FragmentBurst *p)
     do {
         struct FragmentSprite *sprite = &p->sprites[i];
         sprite->flags &= ~1;
-        Step(sprite, &p->sequences[i], sprite, endMask);
+        Step_UpdateImpactAnimation(sprite, &p->sequences[i], sprite, endMask);
         ProjectShift(&sprite->position, &p->origin, camera);
         sprite->position.y += i * 32;
         i++;

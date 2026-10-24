@@ -4,7 +4,7 @@
 #include "actor_attachment_manager.h"
 
 #ifdef NONMATCHING
-// fuzzy: 91.2%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 /* Remaining differences are register lifetimes and inline mask/address selection. */
 s32 ActorAttachment_IsUnavailable(struct ActorAttachmentSlotView *);
@@ -20,6 +20,18 @@ static inline u32 TestHalf(u16 *p, u32 mask)
 {
     return *p & mask;
 }
+inline static u32 TestHalf_1(struct SceneActorRegistryResetView *actor_, u32 mask)
+{
+    u16 *p = &actor_->flags2D4;
+    return (*p) & mask;
+}
+
+inline static u32 TestWord_1(struct SceneActorRegistryResetView *actor_, s16 mask)
+{
+    u32 *p = &actor_->flags2D0;
+    return (*p) & mask;
+}
+
 void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView *actor,
                                               u32 inputkind, u32 inputevent, u32 inputcategory)
 {
@@ -65,7 +77,7 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
                 actor->attachment =
                     ActorAttachment_ReleaseResource(actor->attachment, 2, (void *)actor->id);
                 SceneActorAttachment_SelectOffsets(category, 0, &y, &z);
-                if ((event == 0) && TestWord(&actor->flags2D0, 0x8000))
+                if ((event == 0) && TestWord_1(actor, 0x8000))
                     event = 3;
                 *((void **)(((u8 *)group) + 0xA0)) = ActorAttachment_CreateSpriteSlot(
                     event, &follow->anchor, (void *)follow->identity, y, z, category, actor,
@@ -78,7 +90,7 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
                 break;
 
             case 1:
-                if (TestHalf(&actor->flags2D4, 2))
+                if (TestHalf_1(actor, 2))
                     break;
                 actor->attachment =
                     ActorAttachment_ReleaseResource(actor->attachment, 0, (void *)actor->id);
@@ -134,6 +146,7 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", SceneActorAttachment_ReplaceResponseSlot);
 #endif

@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 90.8%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: periodically probes a randomized heading and updates the Spider route endpoint and cooldown.
 
@@ -27,6 +27,11 @@ static inline u8 Test(struct SpiderContext *ctx, u32 mask)
     return 0;
 }
 
+inline static u32 Arg1(u32 k_, struct SceneActorRegistryResetView *input)
+{
+    return ((u8 *)input) + k_;
+}
+
 void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
 {
     struct SpiderContext *ctx = input->context;
@@ -43,7 +48,10 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
     distance += 256;
     index = (index + 1) & mask;
     *indexAddress = index;
-    angle = (table[index] & 127) - 63;
+    {
+        typeof(table[index]) v1 = table[index];
+        angle = (v1 & 127) - 63;
+    }
     heading = angle + transform->facing;
     if (Mod(input->counter2AC, 30) == 0) {
         if (ctx->timer > 0)
@@ -67,7 +75,7 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
             {
                 void *mesh = *((void **)(group + 0x1FC));
                 struct ContactPosition *from = &transform->position;
-                struct ContactPosition *to = (void *)(((u8 *)input) + 0x310);
+                struct ContactPosition *to = (void *)Arg1(0x310, input);
                 u8 moved = Chase_TryRoute(input, mesh, from, to);
                 if (!moved) {
                     SceneActorMovement_ResolveRoutePosition(input);
@@ -90,6 +98,7 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
     }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Spider_UpdateWanderGoal);
 #endif

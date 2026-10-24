@@ -1,8 +1,5 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 92.6%
 // fix.py best version (reprinted C)
-// 12 differing instruction runs; size +8 bytes; first diff at +0xE (mov sl, r1 vs mov sb, r1)
 extern u8 *gUnk_02000154;
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
@@ -31,6 +28,7 @@ void SpriteParticle_Create(u32 *a, s32 b, s32 c, s32 d, s32 e, u32 f, s32 g, s32
     u32 mask;
     s32 value;
     typeof((Mod(table[*rng], e) - (e >> 1)) + d) t1;
+    typeof(Mod(table[*rng], c) + b) t2;
     if (!context) {
         context = ScriptedParticle_EnsurePool();
         if (!context)
@@ -57,15 +55,16 @@ void SpriteParticle_Create(u32 *a, s32 b, s32 c, s32 d, s32 e, u32 f, s32 g, s32
     table = gUnk_0203B400;
     rng = &gUnk_03005308;
     mask = 0x3FF;
-    *rng = ((*rng) + 1) & mask;
-    value = Mod(table[*rng], c) + b;
+    *rng = ((*rng) + 1) & 0x3FF;
+    t2 = Mod(table[*rng], c) + b;
+    value = t2;
     *((u16 *)(s + 0x5C)) = value;
-    *rng = ((*rng) + 1) & mask;
+    *rng = ((*rng) + 1) & 0x3FF;
     t1 = (Mod(table[*rng], e) - (e >> 1)) + d;
     value = t1;
     *((u16 *)(s + 0x5E)) = value;
-    *rng = ((*rng) + 1) & mask;
-    value = Mod(table[*rng], h) + g;
+    *rng = ((*rng) + 1) & 0x3FF;
+    value = g + Mod(table[*rng], h);
     s[0x5A] = value;
     *((u16 *)(s + 0x64)) = f;
     *((u16 *)(s + 0x68)) = i;
@@ -77,7 +76,7 @@ end:;
 
     ;
     ;
+    ;
+    ;
+    ;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SpriteParticle_Create);
-#endif
