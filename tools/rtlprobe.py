@@ -431,8 +431,8 @@ def alias(a):
     (_, base), (_, off) = try_env(a, quiet=True)
     print(f'{"default":>16}: {base}')
     print(f'{"no alias sets":>16}: {off}')
-    nb, no = int(base.split()[0]), int(off.split()[0])
-    if no < nb:
+    realigned = lambda s: int(re.search(r'realigned (\d+)', s).group(1))
+    if 'MATCH' in off or realigned(off) < realigned(base):
         print('the difference shrinks without type-based alias sets: a store and a read the original keeps '
               'ordered (or a store it keeps alive) have the same type there and different types in yours '
               '(flow dead stores, cse reuse across a store). Read or write that field with the type of the '
