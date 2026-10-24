@@ -38,7 +38,7 @@ void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void Effect_LinkToList(void *, u32);
 s32 Mod(s32, s32);
 #ifdef NONMATCHING
-// fuzzy: 80.4%
+// fuzzy: 82.0%
 // Loop counter spills, setup order, and register choices still differ.
 static inline u32 Random(void)
 {
@@ -83,7 +83,6 @@ static inline void SetPoint(struct Part *out, struct Part *sample, struct Camera
 {
     register u16 *table asm("r3") = RANDOM_TABLE;
     s32 x, z;
-    asm("" : "+r"(table));
     x = (RandomAt(table) & 0xfff) + camera->x - 0x800;
     if (index == 0)
         out->first.x = x;
@@ -103,7 +102,6 @@ s32 Weather_SpawnTerrainParticles(struct Weather *p, s32 count, s32 delay, s32 d
 {
     struct Camera *camera = gUnk_02000580;
     s32 i;
-    asm("" : "+m"(count), "+m"(delay), "+m"(delayRange));
     if (Weather_TestFlags(p->flags, 4))
         return 0;
     if (p->delay) {

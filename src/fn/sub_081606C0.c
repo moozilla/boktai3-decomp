@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 66.1%
+// fuzzy: 78.0%
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: allocates one of sixteen attack particle slots and initializes its animation.
 #define PlayerAttackEffect_AllocateParticle sub_081606C0
@@ -31,7 +31,7 @@ static inline u32 Step(struct ContactSwarmSprite *draw, struct DisplaySequenceSt
     sprite->frame = *command >> 6;
     {
         u32 input = state->flags;
-        register u32 first asm("r2");
+        u32 first;
         u32 maskBit = one;
         bit = maskBit;
         first = bit;
@@ -58,12 +58,10 @@ static inline u32 Step(struct ContactSwarmSprite *draw, struct DisplaySequenceSt
         u32 elapsed = state->elapsed + 1;
         u32 mask;
         register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
+        u32 savedDuration;
         state->elapsed = elapsed;
         temp = 0xFFFF;
-        asm("" : "+r"(temp));
         mask = temp;
-        asm("" : "+r"(mask));
         /* Keep the live mask distinct from its source without binding r7. */
 
         duration = state->duration;
@@ -137,8 +135,8 @@ static inline u32 Step(struct ContactSwarmSprite *draw, struct DisplaySequenceSt
 s32 PlayerAttackEffect_AllocateParticle(u8 *arg, struct Vec *pos, s32 lifetime, void *anim,
                                         s32 sequence, s32 kind)
 {
-    register u8 *p asm("r6") = arg;
-    register struct Vec *position asm("r5") = pos;
+    u8 *p = arg;
+    struct Vec *position = pos;
     register void *animation asm("r10") = anim;
     register s32 mode asm("r9") = kind;
     s32 i;

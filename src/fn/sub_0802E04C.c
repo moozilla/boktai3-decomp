@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 64.2%
+// fuzzy: 64.6%
 struct Position {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -72,9 +72,9 @@ void SceneActorAnimation_EmitTowardNearbyActors(struct Emitter *emitter)
 
     do {
         if (Flag(&actor->flags, 0x1000)) {
-            register struct Position *position asm("r6") = &actor->position;
+            struct Position *position = &actor->position;
             struct Position *origin = &emitter->position;
-            register struct Position *savedOrigin asm("sb");
+            struct Position *savedOrigin;
             s32 distance;
             s32 dx = origin->x - position->x;
             s32 dz = origin->z - position->z;

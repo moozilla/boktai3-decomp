@@ -2,7 +2,7 @@
 #include "contact_swarm.h"
 
 #ifdef NONMATCHING
-// fuzzy: 91.5%
+// fuzzy: 91.7%
 // fix.py best version (reprinted C)
 // confidence=low: tentative cue role from callback phases.
 // Remaining scale offsets, phase tails and playback register lifetimes differ.
@@ -35,7 +35,7 @@ void Player_RestartAnimationFromResource(struct P *);
 void Player_UpdateFacingSide(struct P *);
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
-    register struct ContactSwarmSprite *sprite asm("r5") = sp;
+    struct ContactSwarmSprite *sprite = sp;
     register struct DisplaySequenceState *state asm("r4") = st;
     const volatile u16 *command;
     u32 duration;
@@ -51,7 +51,7 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     sprite->frame = (*command) >> 6;
     {
         u32 input = state->flags;
-        register u32 first asm("r1");
+        u32 first;
         u32 maskBit = 1;
         bit = maskBit;
         asm("" : "+r"(bit));

@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 88.7%
+// fuzzy: 90.1%
 // fix.py best version (reprinted C)
 // Control-pointer allocation, spill ordering, and initial flag operations still differ.
 #include "scene_actor_chase.h"
@@ -39,7 +39,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group)
 {
     void *route = *(void **)(group + 0x1FC);
     struct ContactPosition *position = &actor->position;
-    register u32 mask asm("r8") = 0x200;
+    u32 mask = 0x200;
     struct ContactPosition *target = *(struct ContactPosition **)(group + mask);
     s32 result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {

@@ -31,7 +31,7 @@ void Sound_PlaySong(u32);
 void CpuSet(const void *, void *, u32);
 void SingletonSlot7_SetMotionMode(void *, u32);
 #ifdef NONMATCHING
-// fuzzy: 39.8%
+// fuzzy: 44.6%
 /* Loop setup, duplicated resource paths and state/control lifetimes still differ. */
 static inline void SetPhase(struct Slot7CommandOwner *owner, u32 phase)
 {
@@ -84,7 +84,7 @@ void SingletonSlot7_DispatchPendingCommands(struct Slot7CommandOwner *input)
 {
     register struct Slot7CommandOwner *owner asm("r8") = input;
     u8 *actor = (u8 *)owner;
-    register struct Slot7Receiver *receiver asm("r10") = &owner->receiver;
+    struct Slot7Receiver *receiver = &owner->receiver;
     s32 i = 0;
     if (i < receiver->count[gUnk_0200047C->bank])
         do {

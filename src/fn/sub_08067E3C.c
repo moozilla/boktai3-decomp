@@ -3,7 +3,7 @@
 // confidence=low: spawns pooled particles with optional velocity ranges and position jitter.
 #define SceneParticleBurst_CreateWithRanges sub_08067E3C
 #ifdef NONMATCHING
-// fuzzy: 61.6%
+// fuzzy: 63.9%
 // Remaining: packed velocity temporaries, loop and pointer/register lifetimes.
 extern struct SceneParticleBurstPool *gUnk_02000130;
 extern u32 gUnk_03005308;
@@ -23,8 +23,8 @@ s32 SceneParticleBurst_CreateWithRanges(const struct ContactPosition *position,
                                         const struct ContactPosition *jitter0, s32 count,
                                         u32 priority, u32 flip, u32 flags)
 {
-    register const struct ContactPosition *velocity asm("r8") = velocity0;
-    register const struct ContactPosition *jitter asm("sb") = jitter0;
+    const struct ContactPosition *velocity = velocity0;
+    const struct ContactPosition *jitter = jitter0;
     struct SceneParticleBurstPool *pool;
     s32 i;
     register const u16 *table asm("sl");

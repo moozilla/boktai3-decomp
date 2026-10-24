@@ -3,7 +3,7 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 94.7%
+// fuzzy: 95.3%
 // fix.py best version (reprinted C)
 // confidence=low: emits six radial effects, waits for animation 10, then deactivates the part.
 
@@ -93,14 +93,12 @@ static inline u32 StepPlayback(struct VanargandPart *owner, struct DisplaySequen
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r5");
+        u32 mask;
         register u32 temp asm("r2");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
-        asm("" : "+r"(temp));
         mask = temp;
-        asm("" : "+r"(mask));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -184,7 +182,7 @@ void Vanargand_ReleaseRadialEffects(u8 *boss, struct VanargandPart *p)
         struct SceneVec position;
         s32 i;
         s32 phase;
-        register u32 *state asm("r10");
+        u32 *state;
         u32 *timer;
         u8 *entered;
         p->reset = 0;

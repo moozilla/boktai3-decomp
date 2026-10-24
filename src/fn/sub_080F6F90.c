@@ -2,7 +2,7 @@
 #include "display_animation.h"
 
 #ifdef NONMATCHING
-// fuzzy: 95.1%
+// fuzzy: 95.5%
 // fix.py best version (reprinted C)
 // confidence=low: initializes the four active sword attack components.
 
@@ -54,7 +54,6 @@ static inline void Step(struct DisplaySequenceSprite *sprite, struct DisplaySequ
         u32 temporary = 0xFFFF;
         u32 mask;
         state->elapsed = elapsed;
-        asm volatile("" : "+r"(temporary));
         mask = temporary;
         duration = state->duration;
         if ((u16)elapsed >= duration) {

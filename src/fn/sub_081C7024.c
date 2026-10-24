@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 70.7%
+// fuzzy: 85.4%
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -43,7 +43,7 @@ void StateActor_UpdateTargetApproach(void *context, struct StateActor *input)
     u32 r;
     s32 dx, dz;
     register struct Vec *position asm("r8");
-    register struct Vec *target asm("r12");
+    struct Vec *target;
     if (p->entered) {
         p->entered = 0;
         p->done = 0;

@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 90.2%
+// fuzzy: 90.9%
 // fix.py best version (reprinted C)
 // Remaining differences: health and +0x2D8 pointer spills, mode lifetime,
 // shared hit-flag expansion and temporary-register choices (see worker notes).
@@ -43,7 +43,7 @@ static inline s32 LocalPlayer(void)
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
     if (Test(gUnk_030053F4, 0x4800)) {
-        register u32 *owner asm("r1") = &actor->field2E0;
+        u32 *owner = &actor->field2E0;
         register u32 mask asm("r2") = *owner;
         if (!(mask & 0x20) && mask) {
             switch (LocalPlayer()) {
@@ -72,7 +72,7 @@ static inline u8 IsDown(struct SceneActorRegistryResetView *actor, u32 flags)
 {
     if (actor) {
         {
-            register u32 mask asm("r0") = 0x40;
+            u32 mask = 0x40;
             asm("" : "+r"(mask));
             if (mask & flags)
                 return 1;

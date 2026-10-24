@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 44.5%
+// fuzzy: 79.8%
 // Remaining differences: channel spills, loop setup and register allocation.
 // The palette binding at actor offset 0x148 is distinct from the main graphics palette.
 extern u8 *gUnk_030042E4;
@@ -22,7 +22,7 @@ void SceneNpc_BlendPalette(u8 *actor, s32 step, s32 length)
     u16 *output = gUnk_02000278;
     s32 inverse;
     s32 tr, tg;
-    register s32 tb asm("r10");
+    s32 tb;
     u32 mask;
     s32 i;
     SetPalette((struct PaletteBinding *)(actor + 0xe0), output);
@@ -33,7 +33,6 @@ void SceneNpc_BlendPalette(u8 *actor, s32 step, s32 length)
     tg = 0;
     tr = 0;
     mask = 31;
-    asm("" : : "r"(mask));
     i = 15;
     do {
         u32 color = *source;

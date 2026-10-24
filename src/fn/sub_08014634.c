@@ -54,7 +54,7 @@ struct Manager *ParticleManager_Create(void *, u32);
 s32 Mod(s32, s32);
 void sub_08217E40(void *, s32);
 #ifdef NONMATCHING
-// fuzzy: 77.7%
+// fuzzy: 78.0%
 // Register lifetimes and stack offsets still differ in the group and velocity loops.
 static inline s32 Random(u16 *table, u32 mask, u32 *rng)
 {
@@ -89,7 +89,6 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position, st
         asm("" : "+r"(held));
         priority = held;
     }
-    asm("" : "+m"(options));
     options &= 255;
     if (count > 8)
         count = 8;

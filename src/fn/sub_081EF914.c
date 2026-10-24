@@ -4,6 +4,7 @@
 // Remaining differences: playback pointer lifetimes and a few operand/order choices.
 
 #ifdef NONMATCHING
+// fuzzy: 99.9%
 #include "contact_swarm.h"
 
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
@@ -28,8 +29,8 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
     sprite->frame = *command >> 6;
     {
         u32 input = state->flags;
-        register u32 first asm("r1");
-        register u32 maskBit asm("r3") = 1;
+        u32 first;
+        u32 maskBit = 1;
         bit = maskBit;
         first = bit;
         first &= input;
@@ -40,8 +41,8 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
     }
     {
         u32 input = state->flags;
-        register u32 bit asm("r3");
-        register u32 first asm("r1");
+        u32 bit;
+        u32 first;
         bit = 2;
         first = bit;
         first &= input;
@@ -54,14 +55,12 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
     {
         u32 elapsed = state->elapsed + 1;
         u32 mask;
-        register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
+        u32 temp;
+        u32 savedDuration;
         state->elapsed = elapsed;
         temp = 0xFFFF;
-        asm("" : "+r"(temp));
         mask = temp;
         /* Keep the live mask distinct from its source without binding r7. */
-        asm("" : "+&r"(mask) : "r"(temp));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -91,7 +90,6 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
                 frameCount = state->frameCount;
                 if ((index & mask) >= frameCount) {
                     endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
                     endFlag = (u8)endFlag;
                     if (endFlag) {
                         state->elapsed = duration;
@@ -115,7 +113,7 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
             }
             state->frameWeight = *command & 15;
             {
-                register s32 weight asm("r1") = state->frameWeight;
+                s32 weight = state->frameWeight;
                 s32 speed;
                 speed = state->speed;
                 speed = (speed * weight) >> 6;
@@ -256,7 +254,6 @@ static inline u32 ConsumeEntry(u8 *p)
         result = TRUE;
     } else
         result = FALSE;
-    asm("" : "+r"(result));
     return result;
 }
 
@@ -279,7 +276,7 @@ static inline void SetCallback(void (*v)(void), void (**a)(void))
 void SingletonSlot7_UpdateEndingScene(u8 *p)
 {
     u8 *context = p;
-    register u32 flag asm("r8") = ConsumeEntry(context);
+    u32 flag = ConsumeEntry(context);
     if (flag == 1) {
         struct Drawable *foreground = (struct Drawable *)(p + 0x2C0);
         struct DisplaySequenceState *state;
@@ -303,7 +300,6 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
                 u32 *field = (void *)(p + 0x304);
                 register u32 one asm("r5") = 1;
                 *field = one;
-                asm("" : "+r"(one));
                 *(u32 *)(p + 0x2FC) = 3;
                 state = (struct DisplaySequenceState *)(p + 0x2EC);
                 Anim_SetSequence(state, *(void **)(p + 0x390), 3, 0, 0);
@@ -322,13 +318,10 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
                 {
                     u16 *timer = (void *)(p + 0x5D2);
                     register u8 byteZero asm("r3") = 0;
-                    register void (*callback)(void) asm("r1");
-                    register u32 offset asm("r0") = 0x1E;
-                    asm("" : "+r"(byteZero));
+                    void (*callback)(void);
+                    u32 offset = 0x1E;
                     *timer = offset;
-                    asm("" : "+r"(offset));
                     callback = SceneMover_InterpolateScreenX;
-                    asm("" : : "r"(callback));
                     offset += 0xE2;
                     SetCallback(callback, (void (**)(void))(context + offset));
                     *(u32 *)(context + 0x90) = zero;
@@ -354,7 +347,7 @@ void SingletonSlot7_UpdateEndingScene(u8 *p)
                 *field = zero;
                 *(u32 *)(p + 0x2FC) = 3;
                 {
-                    register u32 mask asm("r0") = 4;
+                    u32 mask = 4;
                     u8 *field = p + 0x2F0;
                     asm("" : "+r"(mask));
                     *field = mask | *field;

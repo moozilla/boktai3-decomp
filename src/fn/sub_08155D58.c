@@ -2,7 +2,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 74.8%
+// fuzzy: 75.7%
 // confidence=low: timed held-action phases, animation and completion script.
 #define H(o) (*(u16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))
@@ -33,7 +33,7 @@ static inline u32 held(u8 *p, u32 mask)
 #define Player_UpdateTimedChargePulse sub_08155D58
 void Player_UpdateTimedChargePulse(u8 *actor)
 {
-    register u8 *p asm("r4") = actor;
+    u8 *p = actor;
     Player_AddControlFlags(p, 8);
     switch (B(0x458)) {
         case 0:

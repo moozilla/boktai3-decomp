@@ -6,6 +6,7 @@
 
 // Remaining differences: PRE stack slots, random-loop allocation, and inline reset order.
 #ifdef NONMATCHING
+// fuzzy: 84.2%
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
 {
     actor->state2A8 = s;
@@ -50,11 +51,11 @@ static inline void BeginContactTurn(void *obj, u32 saved)
     u8 *group = (u8 *)&actor->group;
     if (!FullFlags(actor, 0x400) && !TestField((u16 *)((u8 *)actor + 0x414), 4)) {
         register s32 prior asm("r5") = actor->direction;
-        register s32 tries asm("r1") = 0;
+        s32 tries = 0;
         s32 choice;
         const u16 *table = gUnk_0203B400;
         u32 *randomIndex = &gUnk_03005308;
-        register u32 wrap asm("r7");
+        u32 wrap;
         register u32 mask asm("r6");
         do {
             u32 index;

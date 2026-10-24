@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 90.2%
+// fuzzy: 98.0%
 // fix.py best version (reprinted C)
 // Remaining differences: outer switch layout, frame setup, and packed animation register allocation.
 
@@ -19,12 +19,12 @@ struct Drawable {
 static inline u32 StepFirst(struct Drawable *owner, struct DisplaySequenceState *inputState)
 {
     register struct DisplaySequenceState *state asm("r5") = inputState;
-    register struct ContactSwarmSprite *sprite asm("r6") = &owner->sprite;
-    register const volatile u16 *command asm("r7");
+    struct ContactSwarmSprite *sprite = &owner->sprite;
+    const volatile u16 *command;
     u32 ended;
     u32 bit;
-    register u32 duration asm("r2");
-    register u32 flags asm("r1");
+    u32 duration;
+    u32 flags;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -58,7 +58,7 @@ static inline u32 StepFirst(struct Drawable *owner, struct DisplaySequenceState 
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r4");
+        u32 mask;
         register u32 temp asm("r1");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
@@ -137,11 +137,11 @@ static inline u32 StepFirst(struct Drawable *owner, struct DisplaySequenceState 
 static inline u32 StepSecond(struct Drawable *owner, struct DisplaySequenceState *inputState)
 {
     register struct DisplaySequenceState *state asm("r4") = inputState;
-    register struct ContactSwarmSprite *sprite asm("r5") = &owner->sprite;
-    register const volatile u16 *command asm("r6"); /* preserve observed packed-command reads */
+    struct ContactSwarmSprite *sprite = &owner->sprite;
+    const volatile u16 *command; /* preserve observed packed-command reads */
     u32 ended, bit;
-    register u32 duration asm("r2");
-    register u32 flags asm("r1");
+    u32 duration;
+    u32 flags;
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -176,7 +176,7 @@ static inline u32 StepSecond(struct Drawable *owner, struct DisplaySequenceState
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r5");
+        u32 mask;
         register u32 temp asm("r2");
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
@@ -281,8 +281,8 @@ struct ImpactHeader {
 };
 s32 Task4E01_BeginImpactAnimation(u8 *input)
 {
-    register u8 *p asm("r8") = input;
-    register u8 *config asm("r9") = input + 0x18;
+    u8 *p = input;
+    u8 *config = input + 0x18;
     ((struct ImpactHeader *)input)->config.flags |= 0x1000;
     ((struct ImpactHeader *)input)->time = 0;
     ((struct ImpactConfig *)config)->time = 0;

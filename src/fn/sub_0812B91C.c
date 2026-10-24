@@ -2,7 +2,7 @@
 #include "contact_swarm.h"
 
 #ifdef NONMATCHING
-// fuzzy: 87.7%
+// fuzzy: 89.0%
 // fix.py best version (reprinted C)
 // Remaining: heading/velocity temporaries, projected-position lifetime and state-entry tail sharing.
 struct SlashCollider {
@@ -86,18 +86,15 @@ static inline void AddPosition(struct ContactPosition *out, struct ContactPositi
                                struct ContactPosition *b)
 {
     {
-        register u32 v asm("r0") = (u16)a->x;
-        asm("" : "+r"(v));
+        u32 v = (u16)a->x;
         out->x = v + (u16)b->x;
     }
     {
-        register u32 v asm("r0") = (u16)a->y;
-        asm("" : "+r"(v));
+        u32 v = (u16)a->y;
         out->y = v + (u16)b->y;
     }
     {
-        register u32 v asm("r0") = (u16)a->z;
-        asm("" : "+r"(v));
+        u32 v = (u16)a->z;
         out->z = v + (u16)b->z;
     }
 }
@@ -107,8 +104,8 @@ void PursuingActor_AdvanceChase(struct Pool *unused, struct Slash *p)
     struct ContactPosition next;
     struct ContactPosition *velocity;
     struct ContactPosition *position;
-    register s32 angle asm("r4");
-    register s32 magnitude asm("r6");
+    s32 angle;
+    s32 magnitude;
     {
         u8 *entered = &p->entered;
         if (*entered) {
@@ -119,23 +116,21 @@ void PursuingActor_AdvanceChase(struct Pool *unused, struct Slash *p)
     TwinSpriteEffect_EmitTrail(p);
     TimedEffect_UpdateVisibility(p);
     {
-        register u32 offset asm("r2") = 0x1A5;
+        u32 offset = 0x1A5;
         register u8 *heading asm("r1") = (void *)(((u8 *)p) + offset);
         register u16 *speed asm("r0");
         offset += 3;
         speed = (void *)(((u8 *)p) + offset);
         offset -= 12;
         velocity = (void *)(((u8 *)p) + offset);
-        asm("" : "+r"(velocity));
         angle = *heading;
         magnitude = *speed;
     }
     velocity->x = Truncate(gUnk_086149C4[(angle + 64) & 255] * magnitude);
     velocity->y = 0;
     {
-        register const s16 *sine asm("r1") = gUnk_086149C4;
+        const s16 *sine = gUnk_086149C4;
         register u32 index asm("r0") = angle;
-        asm("" : "+r"(index));
         velocity->z = Truncate(sine[index] * magnitude);
     }
     {

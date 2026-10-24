@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 90.4%
+// fuzzy: 91.7%
 // fix.py best version (reprinted C)
 // confidence=low: arrival callback restores the delayed behavior and retargets the chase.
 // Arrival and chase logic reconstructed; group and reroute pointer allocation,
@@ -64,7 +64,7 @@ static inline u8 Arrive(void *obj)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
-    register u8 *group asm("r9") = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
     s32 player;

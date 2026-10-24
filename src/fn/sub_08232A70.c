@@ -35,7 +35,7 @@ static inline s32 Scale4096(s32 n)
 static inline void Project(struct OrbitVec *out, struct OrbitVec *world)
 {
     s32 sum, height, low;
-    register s32 x asm("r3") = world->x;
+    s32 x = world->x;
     register s32 z asm("r2") = world->z;
     out->x = Scale32((x - z) * 3);
     sum = Scale32((x + z) * 3);

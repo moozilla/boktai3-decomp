@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 92.5%
+// fuzzy: 93.4%
 // fix.py best version (reprinted C)
 // Remaining: pause branch layout, flags allocation and the defined callback return differ.
 #include "pink_spine_playback.h"
@@ -63,7 +63,6 @@ s32 PinkSpine_UpdateDamageAnimation(struct PinkSpineState *p)
     {
         register u32 allocationToken asm("r0");
         u32 ended;
-        asm("" : "=r"(allocationToken));
         ended = PinkSpine_StepAnimation(p);
         if (ended && (p->update == ProjectileEmitter_UpdateAttack))
             Sound_PlaySong(0x521);

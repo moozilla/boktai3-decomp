@@ -2,7 +2,7 @@
 
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 90.4%
+// fuzzy: 91.0%
 // fix.py best version (reprinted C)
 // confidence=low: energy meter plus a 4-digit timer shown below it.
 // Remaining differences: register choice for the tile cursor and repeated player-pointer reloads in the timer test.
@@ -52,8 +52,8 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
         partial = units - (full << 3);
     }
     {
-        register u8 *player asm("r2") = *((u8 **)(p + 0xa40));
-        register u16 *c asm("r2");
+        u8 *player = *((u8 **)(p + 0xa40));
+        u16 *c;
         kind = *(player + 0x418);
         color = 0x1f;
         if (kind != 6)
@@ -63,7 +63,6 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
             emptyTile = 0x4b;
             endTile = 0x4c;
             m = 0x60;
-            asm("" : "+r"(m));
             if ((*((u32 *)(player + 0x20))) & m) {
                 u16 *timer = (u16 *)(p + 0xa62);
                 s32 bit;
@@ -85,7 +84,6 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
             else
                 c = Hud_GetTilemapCell(0, row - 1, col);
         }
-        asm("" : : "r"(p));
         if (gUnk_03005178 != color)
             gUnk_03005178 = color;
         if ((mode != 0) && (cap != 0))
@@ -95,7 +93,6 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
 
         if (partial) {
             s32 r = partial - 8;
-            asm("" : "+r"(r));
             *(c++) = (fullTile - r) | 0xd000;
             n++;
         }
@@ -109,10 +106,8 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
         (mode == 0)) {
         if ((*((u8 **)(p + 0xa40))) && ((*((u32 *)((*((u8 **)(p + 0xa40))) + 0x444))) & 0x40))
             goto digits;
-        asm("" : : : "memory");
         if ((*((u8 **)(p + 0xa40))) && ((*((u32 *)((*((u8 **)(p + 0xa40))) + 0x44c))) & 0x10))
             goto digits;
-        asm("" : : : "memory");
         if ((*((u8 *)((*((u8 **)Arg1(0xa40, p))) + 0xc18))) == 7) {
         digits:
             digits[0] = Div(*((s32 *)(gUnk_02000710 + 0x77c)), 1000);

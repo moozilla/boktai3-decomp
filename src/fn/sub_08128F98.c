@@ -2,7 +2,7 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 80.1%
+// fuzzy: 80.2%
 // Vector address lifetimes, RNG allocation and packed coordinate stores still differ.
 struct Vec {
     s16 x, y, z, pad;
@@ -99,9 +99,8 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
     local.zero = 0;
     CpuSet(&local.zero, &local.velocity, 0x05000002);
     if (count > 0) {
-        register u32 *rng asm("r10") = &gUnk_03005308;
-        register s32 remaining asm("r9") = count;
-        asm("" : "+r"(rng), "+r"(remaining));
+        u32 *rng = &gUnk_03005308;
+        s32 remaining = count;
         do {
             s32 height, difference;
             *(u32 *)&local.spot = (u16)((Random(rng) & 255) - 128);
@@ -126,8 +125,7 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
                     goto next;
             }
             {
-                register u32 zero asm("r3") = 0;
-                asm("" : "+r"(zero));
+                u32 zero = 0;
                 local.spot.y = difference << 8;
                 if (!p->variant) {
                     s32 life = (Random(rng) & 63) + 20;

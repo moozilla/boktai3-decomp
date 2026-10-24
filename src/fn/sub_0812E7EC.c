@@ -76,7 +76,7 @@ void *ActorAttachment_UpdateFromDescriptor(void *, void *, u32, u32, u32, u32, s
 void *ActorAttachment_ReleaseResource(void *, u32, u32);
 void *ActorAttachment_ReleasePartsResource(void *, u32, u32);
 #ifdef NONMATCHING
-// fuzzy: 47.8%
+// fuzzy: 72.2%
 /* Repeated behavior/control tails are merged; receiver and attachment lifetimes differ. */
 static inline u8 HasFlag(struct SceneActorRegistryResetView *actor, u32 mask)
 {
@@ -120,9 +120,9 @@ static inline void SetBehavior(struct SceneActorRegistryResetView *actor, u32 be
 #define SceneActorReaction_DispatchPendingCommands sub_0812E7EC
 s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetView *input)
 {
-    register struct SceneActorRegistryResetView *actor asm("r7") = input;
+    struct SceneActorRegistryResetView *actor = input;
     u8 *group;
-    register void *attachment asm("r6");
+    void *attachment;
     struct CommandReceiver *receiver;
     register u32 category asm("r10");
     s32 i;
@@ -141,7 +141,7 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
     if (i >= receiver->counts[gUnk_0200047C->bank])
         return 1;
     do {
-        register struct ActorCommand *command asm("r9") =
+        struct ActorCommand *command =
             receiver->commands[gUnk_0200047C->bank][i];
         switch (command->command) {
             case 0:

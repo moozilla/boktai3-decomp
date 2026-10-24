@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 96.0%
+// fuzzy: 97.5%
 struct Position {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -56,18 +56,15 @@ void SceneActorAnimation_UpdateInteractionCue(struct Context *input)
 {
     struct Context *context = input;
     s32 buttons = gUnk_03005260[1];
-    register s32 pressed asm("sl") = 1;
+    s32 pressed = 1;
     s32 kind;
     struct Actor *nearest;
     struct Actor *actor;
     s32 playerKind;
-    asm("" ::: "r0");
-    asm("" : "+r"(pressed));
     {
-        register s32 scratch asm("r6") = pressed;
+        s32 scratch = pressed;
         asm("" ::"r"(scratch));
         scratch &= buttons;
-        asm("" ::"r"(scratch));
         pressed = scratch;
     }
     playerKind = PlayerKind();
