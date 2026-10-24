@@ -1,11 +1,6 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// confidence=low: coordinates player positioning and release.
-
-// Remaining differences: release-target vector/address lifetimes and RNG register allocation.
+// MATCHING_CONCESSION: register-pinning
 #include "engine.h"
 
 // confidence=low: moves a requested player position and eventually restores player control.
@@ -56,8 +51,9 @@ void Camera_RequestShake(u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline u8 PlayerCanMove(struct Player *p, u32 mask)
 {
+    u32 flags = p->flags & mask;
     u8 result = 0;
-    if (!(p->flags & mask))
+    if (!flags)
         result = 1;
     return result;
 }
@@ -80,9 +76,9 @@ static inline void SetVector(struct Vec *p, s32 x, s32 y, s32 z)
 }
 static inline void AddVector(struct Vec *out, struct Vec *a, struct Vec *b)
 {
-    out->x = a->x + b->x;
-    out->y = a->y + b->y;
-    out->z = a->z + b->z;
+    out->x = b->x + a->x;
+    out->y = b->y + a->y;
+    out->z = b->z + a->z;
 }
 static inline s32 CellIndex(struct Vec *p)
 {
@@ -119,55 +115,25 @@ static inline s32 SignedShift(s32 value, u32 shift)
         return value >> shift;
     return -((-value) >> shift);
 }
-static inline void PolarVector(struct Vec *out, u32 angle, s32 magnitude)
+static inline void PolarUnitVector(struct Vec *out, u32 angle)
 {
     s32 value;
+    s32 magnitude;
     angle &= 255;
+    magnitude = 256;
     value = gUnk_086149C4[(angle + 64) & 255] * magnitude;
     out->x = SignedShift(value, 12);
     out->y = 0;
     value = gUnk_086149C4[angle & 255] * magnitude;
     out->z = SignedShift(value, 12);
 }
-static inline void FindReleaseTarget(struct Hresvelgr *actor, struct Vec *out)
+static inline void FindReleaseTarget(void *object, struct Vec *out)
 {
+    struct Hresvelgr *actor = object;
+    u32 blockedMask = 0x81;
     if (out) {
         s32 cell = CellIndex(&actor->position);
-        if (!(*(u16 *)(CellProperties(cell) + 2) & 0x81)) {
-            *out = actor->position;
-            out->x = (out->x & ~255) + 128;
-            out->z = (out->z & ~255) + 128;
-        } else {
-            s32 i;
-            for (i = 0; i <= 3; i++) {
-                s32 neighbor = cell + gUnk_030052F4->neighborOffsets[i & 3];
-                if (!(*(u16 *)(CellProperties(neighbor) + 2) & 0x81)) {
-                    PolarVector(out, (i << 6) + 192, 256);
-                    AddVector(out, &actor->position, out);
-                    out->x = (out->x & ~255) + 128;
-                    out->z = (out->z & ~255) + 128;
-                    return;
-                }
-            }
-            SetVector(out, 0xb54, 0, 0xb54);
-        }
-    }
-}
-// confidence=low: coordinates player positioning, landing, and release.
-static inline u8 PlayerCanMove_1(struct Player *p)
-{
-    u8 result = 0;
-    if (!(p->flags & 0x40000))
-        result = 1;
-    return result;
-}
-
-inline static void FindReleaseTarget_UpdatePlayerRelease(struct Hresvelgr *actor, struct Vec *out)
-{
-    u32 k1 = 0x81;
-    if (out) {
-        s32 cell = CellIndex(&actor->position);
-        if (!((*((u16 *)(CellProperties(cell) + 2))) & k1)) {
+        if (!((*((u16 *)(CellProperties(cell) + 2))) & blockedMask)) {
             *out = actor->position;
             out->x = (out->x & (~255)) + 128;
             out->z = (out->z & (~255)) + 128;
@@ -175,8 +141,8 @@ inline static void FindReleaseTarget_UpdatePlayerRelease(struct Hresvelgr *actor
             s32 i;
             for (i = 0; i <= 3; i++) {
                 s32 neighbor = cell + gUnk_030052F4->neighborOffsets[i & 3];
-                if (!((*((u16 *)(CellProperties(neighbor) + 2))) & k1)) {
-                    PolarVector(out, (i << 6) + 192, 256);
+                if (!((*((u16 *)(CellProperties(neighbor) + 2))) & blockedMask)) {
+                    PolarUnitVector(out, (i << 6) + 192);
                     AddVector(out, &actor->position, out);
                     out->x = (out->x & (~255)) + 128;
                     out->z = (out->z & (~255)) + 128;
@@ -195,11 +161,9 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
     struct Action *action = &actor->action;
     if (actor->pending) {
         actor->pending = 0;
-        if (PlayerCanMove_1(actor->player)) {
-            do {
-                Player_BeginPositionRequest(actor->player, actor->requestedPosition, 0, 0, 0, 0, 1,
-                                            0, 64);
-            } while (0);
+        if (PlayerCanMove(actor->player, 0x40000)) {
+            Player_BeginPositionRequest(actor->player, actor->requestedPosition, 0, 0, 0, 0, 1, 0,
+                                        64);
             ActionState_Reset(action);
             Sound_PlaySong(0x3dc);
         } else
@@ -222,7 +186,10 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
         case 1:
             if (!action->frame) {
                 Hresvelgr_SelectPlayerAnimation(actor, 0);
-                saved->savedPosition = *actor->requestedPosition;
+                {
+                    struct Vec *requested = actor->requestedPosition;
+                    saved->savedPosition = *requested;
+                }
                 action->frame = 1;
             }
             if (actor->pulse)
@@ -233,21 +200,26 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
             if (!action->frame) {
                 Hresvelgr_SelectPlayerAnimation(actor, 1);
                 SetVector(&saved->step, 0, 72, 0);
-                FindReleaseTarget_UpdatePlayerRelease(saved, &saved->target);
+                FindReleaseTarget(saved, &saved->target);
                 action->frame = 1;
             }
             if (saved->step.y < 0)
                 ActionState_AdvanceState(action);
             else {
                 struct Vec delta;
-                u8 x = (RandomValue(gUnk_0203B400) >> 3) & 31;
-                s32 z = (RandomValue(gUnk_0203B400) >> 3) & 31;
+                const u16 *table = gUnk_0203B400;
+                s32 rawX = RandomValue(table) >> 3;
+                u32 smallMask = 31;
+                u8 x = rawX & smallMask;
+                s32 z = (RandomValue(table) >> 3) & smallMask;
+                // Preserve the shared random table across particle setup.
+                asm("" : : "r"(table));
                 SetVector(&delta, x - 16, 0, z - 16);
                 actor->velocity = saved->step;
                 saved->step.y--;
                 if (tick & 1)
                     MotionEntry_CreateWithDelta(&saved->renderPosition, &delta,
-                                                (RandomValue(gUnk_0203B400) >> 5) % 4, 64);
+                                                (RandomValue(table) >> 5) % 4, 64);
                 actor->velocity.x =
                     Math_ApproachEighth(actor->position.x, saved->target.x) - actor->position.x;
                 actor->velocity.z =
@@ -268,12 +240,15 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
                 ActionState_AdvanceState(action);
             } else {
                 struct Vec delta;
-                s32 x = (RandomValue(gUnk_0203B400) >> 3) & 31;
-                s32 z = (RandomValue(gUnk_0203B400) >> 3) & 31;
+                const u16 *table = gUnk_0203B400;
+                s32 x = (RandomValue(table) >> 3) & 31;
+                s32 z = (RandomValue(table) >> 3) & 31;
+                // Preserve the shared random table across particle setup.
+                asm("" : : "r"(table));
                 SetVector(&delta, x - 16, 0, z - 16);
                 if (tick & 1)
                     MotionEntry_CreateWithDelta(&saved->renderPosition, &delta,
-                                                (RandomValue(gUnk_0203B400) >> 5) % 4, 64);
+                                                (RandomValue(table) >> 5) % 4, 64);
                 actor->velocity = saved->step;
                 saved->step.y--;
             }
@@ -309,7 +284,3 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdatePlayerRelease);
-#endif
