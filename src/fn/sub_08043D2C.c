@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 86.1%
-// Reviewed full extent; register lifetimes and instruction scheduling still differ.
+// fuzzy: 99.9%
+// One branch offset differs: the ROM hoists the table load out of the loop after the other invariants; with the pin, loop.c keeps it inside.
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
@@ -38,7 +38,7 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
         u8 *bank = gUnk_030042E4;
         void *first = bank + 0x5A60;
         void *second = bank + 0x5AA0;
-        Palette_InterpolateBanks((u8 *)pool + 0x1700, first, second, 63, 6);
+        Palette_InterpolateBanks(((u8 *)pool) + 0x1700, first, second, 63, 6);
     }
     pool->retreatCenter = *center;
     slot = &pool->slots[0];
@@ -49,14 +49,14 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
         struct ContactCollider *health;
         u32 radius;
         u32 direction;
-        table = (const u16 *)RANDOM_TABLE_ADDR;
+        table = (const u16 *)0x0203B400;
         slot->state = 0;
         slot->enter = 1;
         slot->stateFrame = 0;
-        slot->direction = index * 32 + (nextRandom(table) & 31);
+        slot->direction = (index * 32) + (nextRandom(table) & 31);
         slot->speed = speed;
         slot->unknown12 = parameter;
-        sprite = (void *)&slot->sprite;
+        sprite = (void *)(&slot->sprite);
         if (pool->mode == 2) {
             if (index <= 7)
                 slot->targetIndex = 1;
@@ -75,16 +75,19 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
         slot->targetHeight = position->y + (nextRandom(table) & 511);
         direction = slot->direction;
         slot->position.x =
-            position->x + truncateShift12(gUnk_086149C4[(direction + 64) & 255] * radius);
+            position->x + truncateShift12(gUnk_086149C4[(slot->direction + 64) & 255] * radius);
         slot->position.y = slot->targetHeight;
-        slot->position.z = position->z + truncateShift12(gUnk_086149C4[direction] * radius);
+        {
+            slot->position.z =
+                truncateShift12(gUnk_086149C4[slot->direction] * radius) + position->z;
+        }
         slot->steeringTimer = (nextRandom(table) & 7) + 7;
         actorPosition = &slot->position;
         sprite->position = slot->position;
         slot->sprite.flags &= ~1;
         ContactActor_SetDirectionalSequence(pool, slot, 0);
         AnimData_SelectPaletteBank(slot->graphics, 0x2D3);
-        sprite->tileData = (u8 *)pool + 0x1700;
+        sprite->tileData = ((u8 *)pool) + 0x1700;
         ActorShadow_Enable(slot->shadow);
         Collider_SetPosition(&slot->resourceCollider, actorPosition, 0);
         health = &slot->healthCollider;

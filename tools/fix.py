@@ -203,7 +203,7 @@ def candidates(d, seeds):
                 if os.environ.get("FIX_DEBUG"):
                     print(f"   ({fam}: {type(ex).__name__}: {ex})")
                 continue
-    for sp in (spellings.sp_specialize, spellings.sp_local_to_arg):
+    for sp in spellings.HELPER_SPELLINGS:
         try:
             for desc, (f2, extra) in sp(d.fn, d.helpers):
                 yield sp.__name__, desc, f2, {e.decl.name: e for e in extra}
@@ -256,10 +256,16 @@ def expand(text, func, wd, show, try_all, seeds, log, verbose, deadline=None):
     except (Exception, SystemExit) as ex:  # a state step.py cannot compile: drop it
         log(f"   (step.py failed on a state: {type(ex).__name__})")
         return [], 0
-    if dec is None:
-        return "match", 0
-    st, e = dec
     d = Draft(text, func, wd)
+    if dec is None:
+        sc = d.score()
+        if not sc or sc[0] == 0:
+            return "match", 0
+        # only a branch offset differs: a label moved (a statement into or out of a loop, a
+        # hoisted invariant), which step.py does not see as a differing instruction
+        keys = ["loop-invariant", "order"]
+        dec = (None, {"lines": [], "note": "only a branch target differs (a label moved)"})
+    st, e = dec
     base, good, n = one_round(d, keys, show, try_all, seeds, log, deadline)
     if base is None:
         return [], n

@@ -4,3 +4,5 @@ Pillow==12.3.0
 # Matching-search configuration; decomp-permuter bundles its own C parser.
 toml==0.10.2
 clang-format==19.1.7
+# Differential execution of drafts against the ROM (tools/semcheck.py).
+unicorn==2.1.4

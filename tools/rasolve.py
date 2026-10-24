@@ -119,7 +119,9 @@ class Compiler:
         key = (self.pre, tuple(sorted((pri or {}).items())), tuple(sorted((force or {}).items())), dump,
                tuple(sorted((spill or {}).items())), tuple(sorted((env or {}).items())))
         if key in self.cache:
+            self.last_bytes = self.__dict__.setdefault("bytes_cache", {}).get(key)
             return self.cache[key]
+        self.last_bytes = None
         env = dict(env or {})
         if spill:
             env["AGBCC_SPILL"] = ",".join(f"{k}:{d}" for k, d in spill.items() if d)
@@ -141,6 +143,7 @@ class Compiler:
             obj = self.resolver.assemble(asm, self.work)
             mine, missing = self.resolver.bytes_of(obj, self.func) if obj else (None, ["as"])
             if mine is not None and not missing:
+                self.last_bytes = bytes(mine)  # the function's code, for tools/semcheck.py
                 n = self.size or len(mine)
                 orig = self.rom[off(self.address):off(self.address) + n]
                 diff = distance(orig, mine)
@@ -148,6 +151,7 @@ class Compiler:
                 result = (diff, dumped)
         if len(self.cache) < 20000:
             self.cache[key] = result
+            self.__dict__.setdefault("bytes_cache", {})[key] = self.last_bytes
         return result
 
 
