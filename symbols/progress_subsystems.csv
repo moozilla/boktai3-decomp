@@ -248,7 +248,7 @@ Script options,0811DAD4,0811E37C,,,auto: 4 of 24 functions named ScriptOptions_*
 Script record,0811E37C,0811EE3C,,,auto: 5 of 38 functions named ScriptRecord_*; also CallbackList_* Modifier_* ModifierStats_* StatModifier_*
 Actor emitter,0811EE3C,0811F474,,,auto: 5 of 9 functions named ActorEmitter_*
 Actor ability,0811F474,0811FAB8,,,auto: 4 of 16 functions named ActorAbility_*; also Modifier_*
-Registry A8CB,0811FAB8,081213B0,,,auto: 10 of 25 functions named RegistryA8CB_*
+Registry A8CB,0811FAB8,081213B0,,,auto: 10 of 27 functions named RegistryA8CB_*
 Scene collider effect,081213B0,08121F70,,,auto: 7 of 25 functions named SceneColliderEffect_*; also SceneSpriteBurst_*
 Scene actor 14,08121F70,08122824,,,auto: 6 of 18 functions named SceneActor14_*
 Scene scheduled effect,08122824,08122DF0,,,auto: 5 of 13 functions named SceneScheduledEffect_*
