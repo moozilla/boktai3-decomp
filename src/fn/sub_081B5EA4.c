@@ -2,7 +2,7 @@
 #include "global.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 75.8%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: second-loop field cursors, action-state addressing and spills.
 void *ScriptProc_Start(u32, u32);
@@ -40,6 +40,26 @@ static inline void ChangeAction(u8 *p, u32 action)
 }
 // confidence=low: initializes the controller resources and its two embedded halves.
 #define Vanargand_InitializePartController sub_081B5EA4
+inline static void ChangeAction_1(u8 *p)
+{
+    u32 zero = 0;
+    if ((*((u32 *)(p + 0x160))) & 0x100)
+        return;
+    if ((((u8)(p[0x16d] - 25)) <= 1) && (!p[0x170]))
+        return;
+    p[0x16d] = 2;
+    {
+        typeof(p[0x16c]) *q1 = &p[0x16c];
+        u8 z1 = 1;
+        *q1 = 2;
+        p[0x16e] = z1;
+        p[0x170] = zero;
+        *((u32 *)(p + 0x178)) = zero;
+        *((u32 *)(p + 0x164)) = zero;
+        *((u32 *)(p + 0x168)) = zero;
+    }
+}
+
 s32 Vanargand_InitializePartController(u8 *boss, s32 arg, u8 *palettes, s32 mode)
 {
     u8 *resource;
@@ -71,8 +91,8 @@ s32 Vanargand_InitializePartController(u8 *boss, s32 arg, u8 *palettes, s32 mode
     *((void **)(boss + 0x4d0)) = ScriptProc_Start(0x922e, 0x572b);
     i = 0;
     links = (void **)(boss + 0x228);
-    key = (u16 *)(boss + 0xca);
     half = boss + 0x98;
+    key = (u16 *)(boss + 0xca);
     c1 = half;
     do {
         PairedSceneActor_InitializeHalf(c1, arg, i);
@@ -121,7 +141,7 @@ s32 Vanargand_InitializePartController(u8 *boss, s32 arg, u8 *palettes, s32 mode
                 CpuSet(*((void **)(half + 0x190)), *((void **)(half + 0x38)), 0x04000008);
                 Vector((struct SceneVec *)(half + 0x9c), *((s16 *)(half + 0xac)),
                        *((s16 *)(half + 0xae)));
-                ChangeAction(half, 2);
+                ChangeAction_1(half);
                 half += 0x21c;
             } while (half <= (boss + 0x2b4));
             break;
@@ -129,6 +149,7 @@ s32 Vanargand_InitializePartController(u8 *boss, s32 arg, u8 *palettes, s32 mode
 
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081B5EA4);
 #endif

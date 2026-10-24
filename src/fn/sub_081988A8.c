@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 84.4%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: register allocation, stack lifetimes and instruction ordering.
 struct Pair {
     u32 a, b;
@@ -35,17 +35,22 @@ void SceneEffect_UpdateRecoil(struct Actor *a)
     s32 state = a->entered;
     u16 k;
     u8 *t;
+    typeof(a->timer) *q1 = &a->timer;
     switch (state) {
         case 0:
             Anim_SetKeyframes(a->anim, a->resource, 4, 2, 0);
             a->entered++;
             break;
+
         case 1:
-            t = &a->timer;
-            if (*t <= 7)
+            t = q1;
+            if ((*t) <= 7)
                 goto increment;
             else {
-                a->entered = 2;
+                {
+                    u8 k1 = 2;
+                    a->entered = k1;
+                }
                 a->timer = 0;
                 if (a->flags & 4) {
                     a->dx = -48;
@@ -58,6 +63,7 @@ void SceneEffect_UpdateRecoil(struct Actor *a)
                 }
             }
             break;
+
         case 2:
             a->x += a->dx;
             a->z += a->dz;
@@ -81,11 +87,13 @@ void SceneEffect_UpdateRecoil(struct Actor *a)
                 a->timer = 0;
             }
             break;
+
         default:
-            t = &a->timer;
-            if (*t <= 3) {
+            t = q1;
+            if ((*t) <= 3) {
             increment:
                 (*t)++;
+
             } else {
                 k = 8;
                 a->state = k;
@@ -94,10 +102,19 @@ void SceneEffect_UpdateRecoil(struct Actor *a)
             }
             break;
     }
+
     {
         struct Collider *c = &a->collider;
         switch (a->frame) {
             case 5:
+
+            case 7:
+                if (a->flags & 4)
+                    c->bounds = gUnk_0824F664;
+                else
+                    c->bounds = gUnk_0824F644;
+                break;
+
             case 6: {
                 u32 mask = ~4;
                 c->flags = mask & c->flags;
@@ -107,24 +124,21 @@ void SceneEffect_UpdateRecoil(struct Actor *a)
                 else
                     c->bounds = gUnk_0824F63C;
                 break;
-            case 7:
-                if (a->flags & 4)
-                    c->bounds = gUnk_0824F664;
-                else
-                    c->bounds = gUnk_0824F644;
-                break;
+
             case 15:
                 if (a->flags & 4)
                     c->bounds = gUnk_0824F66C;
                 else
                     c->bounds = gUnk_0824F64C;
                 break;
+
             case 16:
                 if (a->flags & 4)
                     c->bounds = gUnk_0824F674;
                 else
                     c->bounds = gUnk_0824F654;
                 break;
+
             default:
                 c->flags |= 4;
                 break;

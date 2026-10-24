@@ -1,7 +1,7 @@
 #include "global.h"
 #define FrostEmitter_SpawnParticle sub_081D2D78
 #ifdef NONMATCHING
-// fuzzy: 69.3%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining: free-slot search, RNG scheduling and vector/register lifetimes.
 struct FrostVec {
     u16 x, y, z, pad;
@@ -51,6 +51,15 @@ static inline void Polar(struct FrostVec *p, s32 angle, s32 magnitude)
     p->y = 0;
     p->z = Scale(gUnk_086149C4[angle & 255] * magnitude);
 }
+inline static u32 Rand_081D2D78(void)
+{
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    {
+        s8 k1 = 4;
+        return gUnk_0203B400[gUnk_03005308] >> k1;
+    }
+}
+
 void FrostEmitter_SpawnParticle(struct FrostEmitter *p)
 {
     struct FrostParticle *slot = 0;
@@ -61,13 +70,17 @@ void FrostEmitter_SpawnParticle(struct FrostEmitter *p)
             break;
         }
     }
+
     if (slot) {
-        s32 angle, magnitude;
+        s32 angle;
+        s32 magnitude;
         slot->position = *p->source;
-        angle = Rand() & 63;
-        magnitude = (Rand() & 1) + 1;
+        angle = Rand_081D2D78() & 63;
+        do {
+            magnitude = (Rand_081D2D78() & 1) + 1;
+        } while (0);
         Polar(&slot->velocity, angle, magnitude);
-        slot->velocity.y = (Rand() & 3) + 4;
+        slot->velocity.y = (Rand_081D2D78() & 3) + 4;
         slot->active = 60;
         Anim_SetSequence(&slot->sequence, p->resource, 0, 0, 4);
         slot->flags &= ~1;

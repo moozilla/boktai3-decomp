@@ -1207,7 +1207,7 @@ void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 70.7%
+// fix.py best (sweep after the inlined-insn fix)
 
 /* Both slope pushes are a duplicated inline (the ROM keeps two copies and cross-jumps only the z tail). Remaining: octant gets r5 instead of r4 (needs higher allocation priority), reload-register rotation makes the cells[2] loads in the second chain cross-jump. */
 
@@ -1222,11 +1222,22 @@ static inline void slopePush(struct TetherActor *actor, s32 octant)
     actor->movementDelta.z -= scaleOffset(gUnk_02000550 * sine);
 }
 
+inline static void slopePush_AdjustSlopeMovement(struct TetherActor *actor, s32 octant)
+{
+    s32 angle = (octant + 1) << 5;
+    s32 cosine = gUnk_086149C4[(angle + 64) & 255];
+    s32 sine = gUnk_086149C4[angle & 255];
+    do {
+        actor->movementDelta.x -= scaleOffset(gUnk_02000550 * cosine);
+    } while (0);
+    actor->movementDelta.z -= scaleOffset(gUnk_02000550 * sine);
+}
+
 void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
 {
     s32 neighbor;
     s32 octant;
-    if (actor->kind != 9 || actor->state == 11 || gUnk_02000550 < gUnk_0200052C)
+    if (((actor->kind != 9) || (actor->state == 11)) || (gUnk_02000550 < gUnk_0200052C))
         return;
     if (!actor->movementProbe) {
         void *probe = &actor->movementProbeStorage;
@@ -1252,9 +1263,10 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
             if (h < (cellByte(actor->movementProbeStorage.cell + neighbor) & 15))
                 return;
         }
-        slopePush(actor, octant);
+        slopePush_AdjustSlopeMovement(actor, octant);
     } else {
-        s32 x, z;
+        s32 x;
+        s32 z;
         if (octant == 0)
             neighbor = ((s16 *)gUnk_030052F4->cells)[2] + 1;
         else if (octant == 2)
@@ -1262,7 +1274,7 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
         else if (octant == 4)
             neighbor = ~((s16 *)gUnk_030052F4->cells)[2];
         else if (octant == 6)
-            neighbor = -((s16 *)gUnk_030052F4->cells)[2] + 1;
+            neighbor = (-((s16 *)gUnk_030052F4->cells)[2]) + 1;
         {
             u32 h;
             u32 value = cellByte(actor->movementProbeStorage.cell);
@@ -1279,7 +1291,7 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
             else
                 neighbor = ((s16 *)gUnk_030052F4->cells)[2];
         } else if (octant == 2) {
-            if (x + z > 256)
+            if ((x + z) > 256)
                 neighbor = ((s16 *)gUnk_030052F4->cells)[2];
             else
                 neighbor = -1;
@@ -1289,7 +1301,7 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
             else
                 neighbor = -1;
         } else if (octant == 6) {
-            if (x + z > 256)
+            if ((x + z) > 256)
                 neighbor = 1;
             else
                 neighbor = -((s16 *)gUnk_030052F4->cells)[2];
@@ -1302,7 +1314,7 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
             if (h < (cellByte(actor->movementProbeStorage.cell + neighbor) & 15))
                 return;
         }
-        slopePush(actor, octant);
+        slopePush_AdjustSlopeMovement(actor, octant);
     }
 }
 

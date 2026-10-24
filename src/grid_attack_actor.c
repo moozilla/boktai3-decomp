@@ -225,7 +225,7 @@ static inline void GridAttack_StartAction(struct GridAttackActor *p, int id, int
 }
 
 #ifdef NONMATCHING
-// fuzzy: 68.0%
+// fix.py best (sweep after the inlined-insn fix)
 // Stack copy scheduling, random masks and register lifetimes still differ.
 void *BouncingObject_Spawn(void *, void *, void *, s32, s32, s32, s32);
 void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *actor,
@@ -241,25 +241,30 @@ void GridAttackActor_SpawnTargetedProjectile(struct GridAttackActor *actor,
     volatile s16 *pos;
     zero = 0;
     CpuSet(&zero, vel, 0x05000002);
-    pos = (volatile s16 *)&position;
+    pos = (volatile s16 *)(&position);
     original = *point;
-    *(struct GridAttackPoint *)&position = original;
+    *((struct GridAttackPoint *)(&position)) = original;
     {
         const u16 *table = gUnk_0203B400;
         register u32 *randomIndex asm("r8") = &gUnk_03005308;
         register u32 index asm("r2");
-        u32 indexMask = 1023;
         register s32 upper asm("r4") = ~255;
         register u32 mask asm("r5") = 63;
         u32 sample;
-        index = (*randomIndex + 1) & indexMask;
+        index = ((*randomIndex) + 1) & 1023;
         sample = table[index];
-        pos[0] = (pos[0] & upper) + ((sample & mask) + 128) - 32;
+        {
+            u8 k2 = 128;
+            pos[0] = ((pos[0] & upper) + ((sample & mask) + k2)) - 32;
+        }
         pos[1] += 1024;
-        index = (index + 1) & indexMask;
+        index = (index + 1) & 1023;
         *randomIndex = index;
         sample = table[index];
-        pos[2] = (pos[2] & upper) + ((sample & mask) + 128) - 32;
+        {
+            u8 k1 = 128;
+            pos[2] = ((pos[2] & upper) + ((sample & mask) + k1)) - 32;
+        }
     }
     target = original;
     BouncingObject_Spawn(&position, vel, &target, p->projectileDamage, 50, kind, 0);
@@ -1037,7 +1042,7 @@ static inline void GridAttack_StartActionMode(struct GridAttackActor *p, int mod
 }
 
 #ifdef NONMATCHING
-// fuzzy: 73.6%
+// fix.py best (sweep after the inlined-insn fix)
 // Receiver loop, action constants and pointer lifetimes still differ.
 void SceneActors_ConfigureEffect(void *, s32, s32, s32);
 static inline void GridAttack_StartMessageAction(struct GridAttackActor *p, s32 mode, s32 zero,
@@ -1054,6 +1059,8 @@ void GridAttack_ProcessMessages(struct GridAttackActor *p)
     struct GridAttackActor *base = p;
     struct SceneEventReceiver *receiver = &p->receiver;
     s32 i = 0;
+    typeof(*((u16 *)(((u8 *)p) + 0x54))) t1;
+    typeof((*((u16 *)(((u8 *)p) + 0x56))) + base->height) t2;
     while (i < receiver->count[gUnk_0200047C->phase]) {
         struct SceneEventCommand *command = receiver->pending[gUnk_0200047C->phase][i];
         s32 action;
@@ -1062,50 +1069,64 @@ void GridAttack_ProcessMessages(struct GridAttackActor *p)
             case 0:
                 GridAttack_StartMessageAction(p, 2, 0, 0);
                 break;
+
             case 1:
-                p->savedAngle = (((u8 *)&command->value)[0] + 5) << 5;
+                p->savedAngle = (((u8 *)(&command->value))[0] + 5) << 5;
                 GridAttack_StartMessageAction(p, 2, 0, 1);
                 break;
+
             case 10:
                 GridAttack_StartMessageAction(p, 2, 0, 2);
                 break;
+
             case 11:
                 GridAttack_StartMessageAction(p, 2, 0, 3);
                 break;
+
             case 29:
                 GridAttack_StartMessageAction(p, 2, 0, 4);
                 break;
+
             case 30:
                 GridAttack_StartMessageAction(p, 2, 0, 5);
                 break;
+
             case 31:
                 GridAttack_StartMessageAction(p, 2, 0, 6);
                 break;
+
             case 32:
                 GridAttack_StartMessageAction(p, 2, 0, 7);
                 break;
+
             case 18:
                 GridAttack_StartMessageAction(p, 2, 0, 8);
                 break;
+
             case 9:
                 SceneActors_ConfigureEffect(p, command->value, 180, 180);
                 Trigger_ConsumePending(&p->receiver, 1);
                 break;
+
             case 17:
                 base->messageParameter = command->value;
                 Trigger_ConsumePending(&p->receiver, 1);
                 break;
+
             case 2: {
-                *(u16 *)((u8 *)p + 0x54) = *(u16 *)((u8 *)command + 8);
-                *(u16 *)((u8 *)p + 0x56) = *(u16 *)((u8 *)command + 10);
-                *(u16 *)((u8 *)p + 0x58) = *(u16 *)((u8 *)command + 12);
-                *(u16 *)((u8 *)base + 0x8A4) = *(u16 *)((u8 *)p + 0x54);
-                *(u16 *)((u8 *)base + 0x8A6) = *(u16 *)((u8 *)p + 0x56) + base->height;
-                *(u16 *)((u8 *)base + 0x8A8) = *(u16 *)((u8 *)p + 0x58);
+                *((u16 *)(((u8 *)p) + 0x54)) = *((u16 *)(((u8 *)command) + 8));
+                *((u16 *)(((u8 *)p) + 0x56)) = *((u16 *)(((u8 *)command) + 10));
+                *((u16 *)(((u8 *)p) + 0x58)) = *((u16 *)(((u8 *)command) + 12));
+                t1 = *((u16 *)(((u8 *)p) + 0x54));
+                *((u16 *)(((u8 *)base) + 0x8A4)) = t1;
+                t2 = (*((u16 *)(((u8 *)p) + 0x56))) + base->height;
+                *((u16 *)(((u8 *)base) + 0x8A6)) = t2;
+                *((u16 *)(((u8 *)base) + 0x8A8)) = *((u16 *)(((u8 *)p) + 0x58));
                 Trigger_ConsumePending(&p->receiver, 1);
                 break;
             }
         }
+
         i++;
     }
 }

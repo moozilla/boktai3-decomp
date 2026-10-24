@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 76.4%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining: loop induction and collider pointer lifetimes.
 #define gVanargandProjectileProperties gUnk_08612114
 struct ProjectilePosition {
@@ -63,8 +63,10 @@ s32 VanargandProjectile_CreateWithSource(struct VanargandProjectilePool *pool,
     struct VanargandProjectile *projectile = VanargandProjectilePool_FindFreeSlot(pool, &index);
     struct ProjectileSprite *sprite;
     s32 i;
-    struct ProjectileCollider *attack, *body;
+    struct ProjectileCollider *attack;
+    struct ProjectileCollider *body;
     struct ProjectilePosition *pos;
+    u32 t1;
     if (!projectile)
         return -1;
     {
@@ -77,7 +79,7 @@ s32 VanargandProjectile_CreateWithSource(struct VanargandProjectilePool *pool,
         projectile->angle = direction << 8;
         projectile->speed = speed;
         projectile->type = type;
-        projectile->steeringTimer = 64;
+        projectile->steeringTimer = (t1 = 64);
         projectile->trailIndex = 0;
         projectile->target = target;
     }
@@ -88,18 +90,22 @@ s32 VanargandProjectile_CreateWithSource(struct VanargandProjectilePool *pool,
     pos = &projectile->position;
     body = &projectile->healthCollider;
     for (; i <= 5; i++) {
-        sprite = &projectile->sprites[i];
         projectile->history[i] = projectile->position;
+        sprite = &projectile->sprites[i];
         sprite->position = projectile->position;
-        sprite->flags &= ~1;
+        {
+            u8 k1 = 1;
+            sprite->flags &= ~k1;
+        }
         Sprite_LinkToList(sprite, 0);
     }
+
     AnimData_SelectPaletteBank(projectile->animation, projectile->type + 0x1db);
     Collider_SetPosition(attack, pos, 0);
     Collider_SetPosition(body, pos, 0);
     body->flags |= 4;
     attack->extent = 16;
-    body->extent = 16;
+    body->extent = t1 - 48;
     {
         s32 property = gUnk_08612114[projectile->type].first;
         Collider_SetAttackProperties(attack, pool->attack, 30, 16, property, 30);
@@ -109,6 +115,7 @@ s32 VanargandProjectile_CreateWithSource(struct VanargandProjectilePool *pool,
     pool->activeMask |= 1 << index;
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081B71D4);
 #endif

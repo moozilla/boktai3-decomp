@@ -3,7 +3,7 @@
 // confidence=low: emits one centered explosion and seven offset explosions.
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
-// fuzzy: 71.0%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: RNG mask/register lifetimes and offset scheduling.
 #define Hresvelgr_EmitImpactExplosions sub_081A4AB4
 struct ImpactPosition {
@@ -38,13 +38,18 @@ void Hresvelgr_EmitImpactExplosions(struct ImpactActor *actor)
         *p = actor->position;
         if (i > 0) {
             const u16 *table = gUnk_0203B400;
-            s32 dx = (randomValue(table) >> 3) % 512 - 256;
+            s32 dx = ((randomValue(table) >> 3) % 512) - 256;
             s32 dz;
             asm("" : "+r"(dx));
             p->x += dx;
-            dz = ((randomValue(table) >> 3) & 512) - 256;
+            do {
+                dz = ((randomValue(table) >> 3) & 512) - 256;
+            } while (0);
             asm("" : "+r"(dz));
-            p->z += dz;
+            {
+                typeof(p->z) v1 = p->z + dz;
+                p->z = v1;
+            }
         }
         ExplosionEffect_CreateConfigured(p, 16, pool->parameterA, pool->parameterB, 0x40000,
                                          pool->parameterC, 0, i << 3);

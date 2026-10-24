@@ -165,14 +165,19 @@ static inline void addPositionAt(struct GroupVec *d, struct GroupVec *dst, struc
 }
 
 #ifdef NONMATCHING
-// fuzzy: 81.6% (loop counter lives in a register, random table not hoisted into one)
+// fix.py best (sweep after the inlined-insn fix)
 int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct GroupVec origin;
     int i;
-    int radius0, radius1, radius2, direction, spread;
+    int radius0;
+    int radius1;
+    int radius2;
+    int direction;
+    int spread;
     struct GroupPiece *p;
     struct GroupPiece *r;
+    u32 k1 = 16;
     origin.x = cmd->originX;
     origin.y = cmd->originY;
     origin.z = cmd->originZ;
@@ -192,20 +197,20 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     }
     p = m->pieces;
     r = p;
-    for (i = 0; i < 16; i++, p++, r++) {
+    for (i = 0; i < k1; i++, p++, r++) {
         p->state = 5;
         p->active = 1;
         p->timer = 0;
         p->direction = direction;
         if (spread != 0)
-            p->direction += Mod(randomValue(), spread);
+            p->direction += Mod((s16)randomValue(), spread);
         p->duration = radius0;
         polar(&r->position, p->direction, radius1);
         addPositionAt(&p->position, &r->position, &origin);
         polar(&r->target, p->direction, radius2);
         addPositionAt(&p->target, &r->target, &origin);
         p->angle = randomValue();
-        p->targetY = i * 16 + p->position.y;
+        p->targetY = (i * k1) + p->position.y;
         p->speed = (randomValue() & 7) + 7;
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
@@ -214,19 +219,25 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         p->resource.palette = m->palette;
         ActorShadow_Enable(r->transform);
     }
+
     m->active = 1;
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0800FC28);
 #endif
 #ifdef NONMATCHING
-// fuzzy: 83.3% (same as sub_0800FC28, state 0)
+// fix.py best (sweep after the inlined-insn fix)
 int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct GroupVec origin;
     int i;
-    int radius0, radius1, radius2, direction, spread;
+    int radius0;
+    int radius1;
+    int radius2;
+    int direction;
+    int spread;
     struct GroupPiece *p;
     struct GroupPiece *r;
     origin.x = cmd->originX;
@@ -249,7 +260,9 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     p = m->pieces;
     r = p;
     for (i = 0; i < 16; i++, p++, r++) {
-        p->state = 0;
+        do {
+            p->state = 0;
+        } while (0);
         p->active = 1;
         p->timer = 0;
         p->direction = direction;
@@ -261,7 +274,7 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         polar(&r->target, p->direction, radius2);
         addPositionAt(&p->target, &r->target, &origin);
         p->angle = randomValue();
-        p->targetY = i * 16 + p->position.y;
+        p->targetY = (i * 16) + p->position.y;
         p->speed = (randomValue() & 7) + 7;
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
@@ -270,9 +283,11 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         p->resource.palette = m->palette;
         ActorShadow_Enable(r->transform);
     }
+
     m->active = 1;
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0800FE98);
 #endif
@@ -342,7 +357,7 @@ int BoardPieces_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
 }
 
 #ifdef NONMATCHING
-// fuzzy: 65.2%
+// fix.py best (sweep after the inlined-insn fix)
 // goto loop keeps loop.c from hoisting the table and the constants 0/1 (the ROM hoists only
 // index and mask, which are source-level here). Remaining (rasolve): y must rank below index,
 // mask and the constant 1 so it is spilled to the stack; one reload rotation step.
@@ -363,38 +378,47 @@ int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     struct GroupPiece *p;
     u32 *index;
     u32 mask;
+    typeof(p->target) t1;
     m->actorId = cmd->originX;
     actor = SceneBody_GetById(m->actorId);
     if (!actor)
         return -1;
     position = actor->position;
     y = (s16)cmd->originY;
-    m->timer = 0;
-    index = &gUnk_03005308;
-    mask = 1023;
-    i = 15;
-    p = m->pieces;
-loop: {
-    int angle;
-    const u16 *table;
-    p->state = 3;
-    p->active = 1;
-    p->timer = 0;
-    p->target = position;
-    angle = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
-    p->direction = angle;
-    table = gUnk_0203B400;
-    p->direction = angle - 16 + (step(table, index, mask) & 31);
-    p->duration = y;
-    p->speed = (step(table, index, mask) & 7) + 7;
-    i--;
-    p++;
-    if (i >= 0)
-        goto loop;
+    {
+        typeof(m->timer) *q1 = &m->timer;
+        u8 z1 = 1;
+        *q1 = 0;
+        index = &gUnk_03005308;
+        mask = 1023;
+        i = 15;
+        p = m->pieces;
+    loop: {
+        int angle;
+        const u16 *table;
+        p->state = 3;
+        do {
+            p->active = 1;
+        } while (0);
+        p->timer = 0;
+        p->target = (t1 = position);
+        angle = Math_Atan2(t1.x - p->position.x, p->target.z - p->position.z);
+        p->direction = angle;
+        table = gUnk_0203B400;
+        p->direction = (angle - 16) + (step(table, index, mask) & 31);
+        p->duration = y;
+        p->speed = (step(table, index, mask) & 7) + 7;
+        i--;
+        p++;
+        if (i >= 0)
+            goto loop;
+    }
+
+        m->active = z1;
+        return 0;
+    }
 }
-    m->active = 1;
-    return 0;
-}
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08010298);
 #endif

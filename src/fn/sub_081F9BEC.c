@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 74.6%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: register allocation, scheduling and random-source lifetimes.
 struct Vec {
@@ -72,16 +72,22 @@ void Ratatosk_OnDamageCollision(u8 *hit, u8 *response, struct Actor *owner)
 {
     struct Actor *p2 = owner;
     struct Actor *p = owner;
+    typeof(*((u16 *)(hit + 0x44))) t1;
     Collision_CalculateDamageResponse(hit, response);
     if (*((u16 *)(response + 0x44))) {
-        *((u16 *)(response + 0x3e)) = 0;
-        response[0x43] = 0;
+        {
+            typeof(*((u16 *)(response + 0x3e))) *q1 = &(*((u16 *)(response + 0x3e)));
+            u8 z1 = 0;
+            *q1 = z1;
+            response[0x43] = z1;
+        }
     } else {
         u32 attack;
         u32 flags;
         p2->motion = *((u16 *)(response + 0x3e));
         *((u32 *)(((u8 *)p2) + 0xf08)) = *((u16 *)(hit + 10));
-        *((u16 *)(((u8 *)p2) + 0x1cc)) = *((u16 *)(hit + 0x44));
+        t1 = *((u16 *)(hit + 0x44));
+        *((u16 *)(((u8 *)p2) + 0x1cc)) = t1;
         if (p->flags & 0x80000)
             p2->motion = 0;
         if ((*((u16 *)(hit + 6))) & 0x100)
@@ -103,7 +109,10 @@ void Ratatosk_OnDamageCollision(u8 *hit, u8 *response, struct Actor *owner)
                     }
                 } else if ((++p2->repeatHits) > 1) {
                     p2->damageWindow = 0;
-                    p->flags |= 0x400000;
+                    {
+                        u32 k1 = 0x400000;
+                        p->flags |= k1;
+                    }
                 }
             }
         }
@@ -130,6 +139,7 @@ void Ratatosk_OnDamageCollision(u8 *hit, u8 *response, struct Actor *owner)
         PlayerStats_AddContactHundredths(hit, response, *((s16 *)(((u8 *)p2) + 0xf0c)));
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081F9BEC);
 #endif

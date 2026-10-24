@@ -26,7 +26,7 @@ void StatusScreen_BeginClose(struct StatusScreen *p)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 84.5%
+// fix.py best (sweep after the inlined-insn fix)
 void sub_0800E974(struct StatusScreen *p)
 {
     u16 zero = p->timer;
@@ -50,17 +50,25 @@ void sub_0800E974(struct StatusScreen *p)
         for (; row < 15;) {
             int col = 0;
             int next = row + 1;
-            for (; col < gUnk_03004C30[0].width * 2; col++)
-                *tiles++ = 0xD000;
-            row = next;
+            for (; col < (gUnk_03004C30[0].width * 2); col++)
+                *(tiles++) = 0xD000;
+
+            do {
+                row = next;
+            } while (0);
         }
     }
-    if (p->timer++ >= p->times[3]) {
-        p->state = StatusScreen_BeginClose;
-        p->timer = 0;
+    if ((p->timer++) >= p->times[3]) {
+        {
+            typeof(p->state) *q1 = &p->state;
+            u8 z1 = 0;
+            p->timer = z1;
+            *q1 = StatusScreen_BeginClose;
+        }
     }
     p->dirty |= 15;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0800E974);
 #endif

@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
-// fuzzy: 79.5%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: vector pointer lifetimes, collider argument reloads and loop scheduling.
 struct Vec {
     s16 x, y, z, pad;
@@ -141,8 +141,12 @@ static inline void clampSpawn(struct Vec *spawn)
 #define Ratatosk_UpdateRadialSummonAttack sub_081F3C68
 void Ratatosk_UpdateRadialSummonAttack(struct Actor *p, s32 tick)
 {
-    u8 projectile[0x20], clone[0x20];
-    struct Vec delta, spawn, cloneDelta, cloneSpawn;
+    u8 projectile[0x20];
+    u8 clone[0x20];
+    struct Vec delta;
+    struct Vec spawn;
+    struct Vec cloneDelta;
+    struct Vec cloneSpawn;
     struct Actor *p2 = p;
     facing(p, p->requestedAngle);
     if (p->changed) {
@@ -157,9 +161,9 @@ void Ratatosk_UpdateRadialSummonAttack(struct Actor *p, s32 tick)
         Sound_PlaySong(0x565);
     if (tick > 56) {
         if (p->active == 3) {
-            u32 angle = (u8)randomA();
+            u8 angle = (u8)randomA();
             register s32 pattern asm("r10") = randomB();
-            s32 i;
+            u8 i;
             pattern &= 3;
             for (i = 0; i < p2->projectileCount; i++) {
                 register struct Vec *deltaPtr asm("r9") = &delta;
@@ -187,15 +191,18 @@ void Ratatosk_UpdateRadialSummonAttack(struct Actor *p, s32 tick)
                     case 0:
                         angle += Div(256, p2->projectileCount);
                         break;
+
                     case 1:
                         angle += 32;
                         break;
+
                     case 2:
-                        if (i == 0 || i == 2)
+                        if ((i == 0) || (i == 2))
                             angle += 32;
                         else
                             angle += 96;
                         break;
+
                     case 3:
                         if (i != 2)
                             angle += 32;
@@ -203,8 +210,10 @@ void Ratatosk_UpdateRadialSummonAttack(struct Actor *p, s32 tick)
                             angle += 96;
                         break;
                 }
+
                 angle = (u8)angle;
             }
+
         } else {
             u8 angle = randomA();
             s32 i;
@@ -213,7 +222,7 @@ void Ratatosk_UpdateRadialSummonAttack(struct Actor *p, s32 tick)
                 polar(&cloneDelta, angle, 512);
                 sum(&cloneSpawn, &cloneSpawn, &cloneDelta);
                 PlayerClone_InitConfig(clone);
-                *(u32 *)(clone + 8) = (randomB() & 15) + 16;
+                *((u32 *)(clone + 8)) = (randomB() & 15) + 16;
                 PlayerClone_SetLifetimeAndBehavior(clone, 60, 5, angle + 128);
                 PlayerClone_SetColliderExtents(clone, p2->cloneCollider[0], p2->cloneCollider[1],
                                                p2->cloneCollider[2], p2->cloneCollider[3],

@@ -42,25 +42,30 @@ static inline s32 randomValue(const u16 *table)
     return *(const u16 *)(offset + (u32)table);
 }
 #ifdef NONMATCHING
-// fuzzy: 81.0%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: random-table address lifetimes and loop register allocation.
 void Hresvelgr_EmitFacingMotionBurst(struct BurstActor *actor)
 {
-    struct BurstVector offset, position, delta;
+    struct BurstVector offset;
+    struct BurstVector position;
+    struct BurstVector delta;
     s32 i;
     polar(&offset, (actor->direction + 128) & 255, 768);
     {
         struct BurstVector *target = actor->target;
         add(&position, target, &offset);
     }
-    for (i = 15; i >= 0; i--) {
-        const u16 *table = gUnk_0203B000;
-        s32 type, vertical;
+    for (i = 0; i < 16; i++) {
+        const u16 *table = *((typeof(gUnk_0203B000) *)0x0203B000);
+        s32 type;
+        s32 vertical;
         s32 sample = randomValue(table);
-        polar(&delta, (actor->direction + (sample >> 3) % 64 - 32) & 255, 128);
+        polar(&delta, ((actor->direction + ((sample >> 3) % 64)) - 32) & 255, 128);
         type = (randomValue(table) >> 3) % 4;
-        vertical = 32 - (randomValue(table) >> 3) % 64;
-        MotionEntry_CreateWithDelta(&actor->position, &delta, type, vertical);
+        vertical = 32 - ((randomValue(table) >> 3) % 64);
+        do {
+            MotionEntry_CreateWithDelta(&actor->position, &delta, type, vertical);
+        } while (0);
     }
 }
 

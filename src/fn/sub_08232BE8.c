@@ -3,7 +3,7 @@
 // confidence=low: projects the source and positions a timed icon around the screen center.
 #define ScreenOrbitEffect_UpdateFixedSlot sub_08232BE8
 #ifdef NONMATCHING
-// fuzzy: 73.1%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining: projection and sprite-pointer lifetimes, branch layout and registers.
 struct OrbitVec {
     s16 x, y, z, pad;
@@ -67,34 +67,53 @@ static inline u32 TakeFlag(u8 *flag)
     }
     return 0;
 }
+static inline void Project_08232BE8(struct OrbitVec *out, struct OrbitVec *world)
+{
+    s32 sum;
+    s32 height;
+    s32 low;
+    s32 x = world->x;
+    register s32 z asm("r2") = world->z;
+    out->x = Scale32((x - z) * 3);
+    sum = Scale32((x + z) * 3);
+    height = Scale32(world->y * 3);
+    low = sum - height;
+    sum += height;
+    out->x = out->x - gUnk_03005418.x + 120;
+    out->y = low - gUnk_03005418.y + 80;
+    out->z = sum - gUnk_03005418.z;
+}
+
 void ScreenOrbitEffect_UpdateFixedSlot(struct OrbitOwner *context, struct OrbitSlot *input)
 {
     register struct OrbitOwner *owner asm("r8") = context;
-    register struct OrbitSlot *p asm("r6") = input;
-    u32 entered = TakeFlag(&p->enter);
+    u32 entered = TakeFlag(&input->enter);
     asm("" : "+r"(entered));
     if (entered) {
         struct OrbitVec projected;
-        Project(&projected, &p->world);
-        p->angle = Math_Atan2(projected.x - owner->center.x, projected.z - owner->center.z);
-        if (Distance(&projected, &owner->center) > 4095 && (p->age & 31) <= 16)
-            Place(p);
-        else
-            p->flags |= 1;
+        Project_08232BE8(&projected, &input->world);
+        input->angle = Math_Atan2(projected.x - owner->center.x, projected.z - owner->center.z);
+        {
+            s32 k1 = 4095;
+            if ((Distance(&projected, &owner->center) > k1) && ((input->age & 31) <= 16))
+                Place(input);
+            else
+                input->flags |= 1;
+        }
     } else {
         struct OrbitVec projected;
-        Project(&projected, &p->world);
-        if (Distance(&projected, &owner->center) > 4095 && (p->age & 31) <= 16)
-            Place(p);
+        Project_08232BE8(&projected, &input->world);
+        if ((Distance(&projected, &owner->center) > 4095) && ((input->age & 31) <= 16))
+            Place(input);
         else
-            p->flags |= 1;
+            input->flags |= 1;
     }
-    if (p->age > 59) {
-        p->state = 0;
-        p->age = 0;
-        p->enter = 1;
+    if (input->age > 59) {
+        input->state = 0;
+        input->age = 0;
+        input->enter = 1;
     }
-    p->age++;
+    input->age++;
 }
 
 #else

@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 62.0%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining: reset widths, loop invariant order, and collider pointer allocation.
 struct ProjectilePosition {
     s16 x, y, z, pad;
@@ -59,9 +59,12 @@ s32 VanargandProjectile_Initialize(struct VanargandProjectilePool *pool,
                                    struct VanargandProjectile *p, s32 index)
 {
     struct ProjectileSprite *sprite;
-    struct PackedVector size, offset;
+    struct PackedVector size;
+    struct PackedVector offset;
+    struct VanargandProjectile *new_var;
     struct ProjectileCollider *c;
     s32 i;
+    typeof(c) t1;
     p->state = 0;
     p->entered = 1;
     p->timer = 0;
@@ -70,14 +73,18 @@ s32 VanargandProjectile_Initialize(struct VanargandProjectilePool *pool,
     AnimData_Load(p->animation, 0x8202);
     AnimData_SelectPaletteBank(p->animation, 0x1DB);
     sprite = p->sprites;
+    new_var = p;
     for (i = 0; i <= 5; i++, sprite++) {
         vu32 zero;
-        Sprite_InitUnlinked(sprite, p->animation, 1);
-        *(u16 *)((u8 *)sprite + 0x10) = 5 - i;
-        *((u8 *)sprite + 7) = 1;
-        zero = 0;
-        CpuSet((const void *)&zero, &sprite->position, 0x05000002);
+        Sprite_InitUnlinked(sprite, new_var->animation, 1);
+        *((u16 *)(((u8 *)sprite) + 0x10)) = 5 - i;
+        *(((u8 *)sprite) + 7) = 1;
+        do {
+            zero = 0;
+        } while (0);
+        CpuSet((const void *)(&zero), &sprite->position, 0x05000002);
     }
+
     c = &p->healthCollider;
     size.x = 128;
     size.y = 512;
@@ -90,18 +97,19 @@ s32 VanargandProjectile_Initialize(struct VanargandProjectilePool *pool,
     Collider_SetCallback(c, ActorReaction_BeginOnContact, p);
     Collider_SetBodyProperties(c, 0, 0, 0);
     Collider_Refresh(c);
-    c = &p->collider;
+    c = (t1 = &p->collider);
     size.x = 16;
     size.y = 100;
     size.z = 16;
     offset.x = 0;
     offset.y = 0;
     offset.z = 0;
-    Collider_Init(c, 0, 0x2001, 0, 16, &size, &offset);
-    Collider_SetPosition(c, &p->position, 0);
-    Collider_SetCallback(c, ActorReaction_Idle, p);
-    Collider_SetAttackProperties(c, pool->attack, 30, 16, 0, 15);
+    Collider_Init(t1, 0, 0x2001, 0, 16, &size, &offset);
+    Collider_SetPosition(t1, &p->position, 0);
+    Collider_SetCallback(t1, ActorReaction_Idle, p);
+    Collider_SetAttackProperties(t1, pool->attack, 30, 16, 0, 15);
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_081B6888);
 #endif

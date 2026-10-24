@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 77.8%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: retained pool cursors, loop-stride hoisting and collider temporary allocation.
 struct PanelEffectSlot {
@@ -66,11 +66,17 @@ void ScenePanelEffect_UpdatePool(struct PanelEffectPool *pool)
             if (anchor) {
                 large->position.x = anchor->x + large->delta.x;
                 large->position.y = large->delta.y + anchor->y;
-                large->position.z = large->delta.z + anchor->z;
+                large->position.z = anchor->z + large->delta.z;
             } else {
                 large->position.x = large->delta.x + large->position.x;
                 large->position.y = large->delta.y + large->position.y;
-                large->position.z = large->delta.z + large->position.z;
+                {
+                    typeof(large->delta.z) v1 = large->delta.z;
+                    {
+                        typeof(large->position.z) v2 = large->position.z;
+                        large->position.z = v1 + v2;
+                    }
+                }
             }
             if (!((gUnk_03003A50 ^ remaining) & 1)) {
                 Collider_SetPosition(large->colliderCC, &large->position, 0);
@@ -84,6 +90,7 @@ void ScenePanelEffect_UpdatePool(struct PanelEffectPool *pool)
         index++;
     } while (remaining > 0);
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0818ECFC);
 #endif
