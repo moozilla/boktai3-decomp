@@ -36,7 +36,7 @@ void AnimData_SelectPaletteBank(void *, s32);
 void Sprite_Init(struct Sprite *, void *, s32);
 s32 Mod(s32, s32);
 #ifdef NONMATCHING
-// fuzzy: 88.0%
+// fix.py best (sweep after the inlined-insn fix)
 // Animation-pointer retention and array-cursor allocation still differ.
 static inline s32 Random(u16 *table, u32 *rng)
 {
@@ -67,26 +67,29 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
     u8 *lifetimes;
     u16 *speeds;
     register u32 *rng asm("sb");
-    s32 i, j;
+    s32 i;
+    s32 j;
     u8 *animData;
-    if (!gUnk_02000064 && !FragmentManager_Create(0, 0))
+    typeof(lifetimes) t1;
+    typeof(rng) t2;
+    if ((!gUnk_02000064) && (!FragmentManager_Create(0, 0)))
         return -1;
     m = gUnk_02000064;
     if (count > 6)
         count = 6;
     j = 0;
-    rng = &gUnk_03005308;
+    rng = (t2 = &gUnk_03005308);
     g = m->groups;
-    speeds = (void *)((u8 *)m + 0x52);
+    speeds = (void *)(((u8 *)m) + 0x52);
     {
         register u16 *held asm("sl") = speeds;
         speeds = held;
     }
-    lifetimes = (u8 *)m + 0x46;
-    animData = (u8 *)m + 0x24;
+    lifetimes = (t1 = ((u8 *)m) + 0x46);
+    animData = ((u8 *)m) + 0x24;
     base = g;
     for (; j < 4; g++, base++, lifetimes += sizeof(struct Group),
-                  speeds = (void *)((u8 *)speeds + sizeof(struct Group)),
+                  speeds = (void *)(((u8 *)speeds) + (sizeof(struct Group))),
                   animData += sizeof(struct Group), j++) {
         if (!g->active) {
             u8 *animation;
@@ -97,15 +100,15 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
             animation = animData;
             if (!loaded)
                 return -1;
-            if (g->type == 4 || g->type == 8)
-                AnimData_SelectPaletteBank(animation, *(u16 *)(g->animation + 6) + 1);
+            if ((g->type == 4) || (g->type == 8))
+                AnimData_SelectPaletteBank(animation, (*((u16 *)(g->animation + 6))) + 1);
             i = 0;
             if (i < count) {
-                u16 *table = RANDOM_TABLE;
+                u16 *table = (u16 *)0x0203B400;
                 u8 *cursor = (u8 *)base;
                 struct Vec *velocity = base->velocity;
                 u16 *speedOut = speeds;
-                register u8 *life asm("sl") = lifetimes;
+                register u8 *life asm("sl") = t1;
                 asm("" : "+r"(table), "+r"(velocity), "+r"(life));
                 do {
                     struct Sprite *p;
@@ -116,7 +119,7 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
                     if (!lifetimeRange)
                         *life = lifetime;
                     else {
-                        s32 random = Random(table, rng);
+                        s32 random = Random(table, t2);
                         *life = lifetime + Mod(random, lifetimeRange);
                     }
                     if (!speedRange)
@@ -137,7 +140,7 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
                         velocity->y = vertical;
                     else {
                         s32 random = Random(table, rng);
-                        *(s16 *)(cursor + 0x42) = vertical + Mod(random, verticalRange);
+                        *((s16 *)(cursor + 0x42)) = vertical + Mod(random, verticalRange);
                     }
                     p->flags &= ~1;
                     p->position = *position;
@@ -162,6 +165,7 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
             break;
         }
     }
+
     return 0;
 }
 

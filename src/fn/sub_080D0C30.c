@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 93.6%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: records attack contacts and queues a timed reaction.
 #define Mummy_OnAttackCollision sub_080D0C30
@@ -66,6 +66,7 @@ void Mummy_OnAttackCollision(u8 *unused, u8 *obj, u8 *input)
 {
     u8 *base = input;
     u8 *state = *((u8 **)(input + 0x3D0));
+    typeof(*((volatile u16 *)(base + 0x172))) t1;
     if (blocked2048(input))
         return;
     if (((u16)((*((u16 *)(obj + 10))) - 1)) <= 7) {
@@ -88,8 +89,12 @@ void Mummy_OnAttackCollision(u8 *unused, u8 *obj, u8 *input)
             *((u32 *)(base + 0x2E0)) = 1;
             *((u32 *)(base + 0x2DC)) = 4;
             *((u32 *)(base + 0x2D8)) = 0;
-            *((u16 *)(base + 0x172)) = 1;
-            *((u16 *)(base + 0x2E4)) = *((volatile u16 *)(base + 0x172));
+            {
+                u16 *d1 = (u16 *)(base + 0x170);
+                d1[1] = 1;
+            }
+            t1 = *((volatile u16 *)(base + 0x172));
+            *((u16 *)(base + 0x2E4)) = t1;
             *((u16 *)(base + 0x174)) = 1;
             *((u16 *)(base + 0x178)) = 30;
             *((u16 *)(base + 0x2E6)) = 4;
@@ -99,6 +104,7 @@ void Mummy_OnAttackCollision(u8 *unused, u8 *obj, u8 *input)
         *((u32 *)(input + 0x2D0)) &= 0xFEFFFFFF;
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_080D0C30);
 #endif

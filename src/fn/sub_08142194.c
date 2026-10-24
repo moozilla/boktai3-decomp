@@ -3,7 +3,7 @@
 // confidence=low: action phases push neighboring scene objects and emit position effects.
 
 #ifdef NONMATCHING
-// fuzzy: 92.9%
+// fix.py best (sweep after the inlined-insn fix)
 // foundry draft (worker best 91.4%); what differs is mostly register allocation and instruction order
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -122,12 +122,15 @@ void Player_UpdateObjectPush(struct P *p)
 {
     s32 sb;
     u8 state;
-    struct PackedVec v, a, b, c;
+    struct PackedVec v;
+    struct PackedVec a;
+    struct PackedVec b;
+    struct PackedVec c;
     if (!sub_08156DAC()) {
         ActorSequence_Begin(p, 0, 0);
         return;
     }
-    if (p->state == 1 && (p->state & p->q348->flags))
+    if ((p->state == 1) && (p->state & p->q348->flags))
         Player_SetActionPhase(p, 2);
     state = p->state;
     switch (state) {
@@ -149,8 +152,13 @@ void Player_UpdateObjectPush(struct P *p)
                 return;
             Player_SetActionPhase(p, 1);
             return;
+
         case 1: {
-            int t, d4, d5, h, h2;
+            int t;
+            int d4;
+            int d5;
+            s8 h;
+            int h2;
             orFlags(&p->flags, 8);
             p->a4a4 = state;
             t = p->target;
@@ -158,10 +166,10 @@ void Player_UpdateObjectPush(struct P *p)
             d5 = (p->dir + 1) & 7;
             sb = ActorVariant_GetTableValue(p->type, 3);
             p->a7c8 = state;
-            if (t != d4 && t != d5) {
+            if ((t != d4) && (t != d5)) {
                 if (Player_IsWithinCoordinateBand(p)) {
                     if (SceneObjects_TryPushNeighborByIndex(&p->pos, p->a3a4) > 0) {
-                        if (p != 0 && isTwo(p)) {
+                        if ((p != 0) && isTwo(p)) {
                             ActorSequence_Begin(p, 0, 0);
                         } else {
                             ActorSequence_Begin(p, 5, 0);
@@ -170,9 +178,11 @@ void Player_UpdateObjectPush(struct P *p)
                     }
                 }
             } else {
-                int s, idx, d;
+                int s;
+                int idx;
+                int d;
                 d = p->dir;
-                t = (((t - d) * 2 + 8) + d) & 7;
+                t = ((((t - d) * 2) + 8) + d) & 7;
                 t = (t + 1) & 7;
                 v = p->pos;
                 v.x -= scale(gUnk_086149C4[((t << 5) + 0x40) & 0xff] * 50);
@@ -180,12 +190,12 @@ void Player_UpdateObjectPush(struct P *p)
                 v.z -= scale(gUnk_086149C4[s & 0xff] * 50);
                 idx = tileIndex(&v);
                 h = heightAt(&v, tileIndex(&v));
-                if (h > p->pos.y - 0x80 && h < p->pos.y + 0x80) {
+                if ((h > (p->pos.y - 0x80)) && (h < (p->pos.y + 0x80))) {
                     if (!Player_IsStatusBit3ActionActive(((struct Cell *)cell(idx))->flags)) {
-                        v.x -= scale(gUnk_086149C4[(((p->dir + 1) & 7) << 5) + 0x40 & 0xff] * 50);
+                        v.x -= scale(gUnk_086149C4[((((p->dir + 1) & 7) << 5) + 0x40) & 0xff] * 50);
                         v.z -= scale(gUnk_086149C4[((p->dir + 1) & 7) << 5] * 50);
                         h2 = heightAt(&v, tileIndex(&v));
-                        if (h2 >= h + 0xc8) {
+                        if (h2 >= (h + 0xc8)) {
                             if (!(((struct Cell *)cell(tileIndex(&v)))->flags & 4)) {
                                 int m;
                                 u16 q;
@@ -205,10 +215,12 @@ void Player_UpdateObjectPush(struct P *p)
                 }
             }
             Player_SetAnimation(p, sb, 0x40, 1);
-            if (p->a3a0 == ActorVariant_GetTableValue(p->type, 4) && p->aa0 == 0 && p->a98 == 1)
+            if (((p->a3a0 == ActorVariant_GetTableValue(p->type, 4)) && (p->aa0 == 0)) &&
+                (p->a98 == 1))
                 Sound_PlaySong(0xdb);
             return;
         }
+
         case 2: {
             int d;
             orFlags(&p->flags, 8);
@@ -257,6 +269,7 @@ void Player_UpdateObjectPush(struct P *p)
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Player_UpdateObjectPush);
 #endif

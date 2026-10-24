@@ -1,7 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 90.7%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Packet handling and readiness are recovered; register allocation and block placement differ.
 struct LinkReadyState {
@@ -59,6 +59,14 @@ static inline u8 Mode_1(u32 value, u32 mask)
 {
     value &= mask;
     if (value == 0x1400)
+        return 1;
+    return 0;
+}
+
+inline static u8 Mode_WaitForReadyPeers(u32 value, u32 mask, u32 expected)
+{
+    value &= mask;
+    if (expected == value)
         return 1;
     return 0;
 }
@@ -156,8 +164,9 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
         mask = 0x3c00;
         for (i = 0; i <= 1; i++) {
             u16 value = Slot(p, i);
-            if ((value != 0xffff) && ((Mode(value, mask, 0x400) && ((value & 255) == 0x9c)) ||
-                                      Mode(value, mask, 0x1400))) {
+            if ((value != 0xffff) &&
+                ((Mode_WaitForReadyPeers(value, mask, 0x400) && ((value & 255) == 0x9c)) ||
+                 Mode_WaitForReadyPeers(value, mask, 0x1400))) {
                 readyCount++;
                 if (p->ready[i] < 255)
                     p->ready[i]++;
@@ -232,6 +241,7 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
     }
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", LinkMenu_WaitForReadyPeers);
 #endif

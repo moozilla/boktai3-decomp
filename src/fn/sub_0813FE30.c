@@ -1,7 +1,7 @@
 #include "player_3.h"
 
 #ifdef NONMATCHING
-// fuzzy: 93.8%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Initializes both animation channels and script facing; constructor allocation differs.
 
@@ -25,7 +25,8 @@ void sub_0813FE30(struct Player *p)
         c1 = &p->animation;
         Widget_InitLinked(c1, p->animationData, 0, 0x9000, 2, 0, 60, &p->position);
         secondary = &p->secondaryAnimation;
-        Widget_InitLinked(secondary, p->animationData, 0, 0x1001, 2, 0, 60, &p->position);
+        Widget_InitLinked(&p->secondaryAnimation, p->animationData, 0, 0x1001, 2, 0, 60,
+                          &p->position);
         if (Script_SeekToKeyword('d'))
             p->facing = Script_GetValue();
         else
@@ -52,16 +53,20 @@ void sub_0813FE30(struct Player *p)
         }
         p->animationIndex = 0;
         Anim_SetKeyframes(c1, p->animationData, p->heading, 1, 0);
-        Anim_SetKeyframes(secondary, p->animationData, (u16)(p->animationIndex + p->heading), 1, 0);
+        Anim_SetKeyframes(&p->secondaryAnimation, p->animationData,
+                          (u16)(p->animationIndex + p->heading), 1, 0);
         if (p->side) {
-            (&p->animation)->flags |= 4;
-            secondary->flags |= 4;
+            do {
+                (&p->animation)->flags |= 4;
+            } while (0);
+            (&p->secondaryAnimation)->flags |= 4;
         } else {
             (&p->animation)->flags &= ~4;
-            secondary->flags &= ~4;
+            (&p->secondaryAnimation)->flags &= ~4;
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0813FE30);
 #endif

@@ -4,7 +4,7 @@
 // confidence=low: defeat control emits effects, runs scripts, and returns the actor to idle.
 
 #ifdef NONMATCHING
-// fuzzy: 92.3%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: flag-address materialization, late argument registers and zero lifetimes.
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
@@ -88,14 +88,14 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
     u16 *motionFlags;
     register struct ContactCollider *collider asm("r5");
     if (SceneActorReaction_TakePrepared(actor)) {
-        u8 *group = (u8 *)&actor->group;
+        u8 *group = (u8 *)(&actor->group);
         if (!Flag(actor, 0x20000, 0x2D0)) {
-            if (!*((u8 *)actor + 8)) {
+            if (!(*(((u8 *)actor) + 8))) {
                 u32 *flags = actor->drawable;
                 s32 mask = ~1;
-                *flags = mask & *flags;
+                *flags = mask & (*flags);
             } else
-                HideTile((void *)((u8 *)actor->drawable + 0x20));
+                HideTile((void *)(((u8 *)actor->drawable) + 0x20));
         }
         {
             struct SceneActorRegistryControl *control = (void *)(group + 0x4C);
@@ -103,7 +103,7 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
             u32 mask = ~0x141C0;
             *flags &= mask;
             control->counter = 0;
-            *(u16 *)((u8 *)control + 0x14) = 0;
+            *((u16 *)(((u8 *)control) + 0x14)) = 0;
             control->timer = 0;
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
@@ -115,16 +115,15 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
         SceneActorEffects_AdvanceSteps(actor, 4);
         collider = &actor->colliderA;
         asm("" : "+r"(collider));
-        *(u16 *)((u8 *)actor + 0x178) = 0;
+        *((u16 *)(((u8 *)actor) + 0x178)) = 0;
         SceneActorPlacement_PlayCategoryEventSound(actor);
         if (Flag(actor, 8, 0x2D4))
             Sound_PlaySong(0x12A);
         {
-            /* reuse the observed collider */
             collider->flags |= 4;
         }
     }
-    if (Mod(frame, 12) == 0 && Flag(actor, 8, 0x2D4)) {
+    if ((Mod(frame, 12) == 0) && Flag(actor, 8, 0x2D4)) {
         rangeA.x = 60;
         rangeA.y = 60;
         rangeA.z = 40;
@@ -132,7 +131,7 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
                             2);
     }
     if (frame <= 0x22)
-        *(u16 *)(anim + 0xE) = 0;
+        *((u16 *)(anim + 0xE)) = 0;
     SceneActorMovement_UpdateAirborne(actor);
     SceneActorMovement_UpdateHeight(actor);
     if (!actor->field2B3)
@@ -168,26 +167,29 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
                                         duration, scale, 1);
                 }
                 category = actor->category;
-                if (category == 4 || category == 1 || category == 5 || category == 7 ||
-                    category == 6 || category == 0x18 || category == 0x19)
+                if (((((((category == 4) || (category == 1)) || (category == 5)) ||
+                       (category == 7)) ||
+                      (category == 6)) ||
+                     (category == 0x18)) ||
+                    (category == 0x19))
                     Sound_PlaySong(0xE5);
             }
         }
     }
     SceneActorBehavior_CallTerrainScript(actor);
-    script = *(u16 *)((u8 *)actor + 0x1F8);
+    script = *((u16 *)(((u8 *)actor) + 0x1F8));
     if (script) {
         values[0] = actor->position.x;
         values[1] = actor->position.y;
         values[2] = actor->position.z;
-        values[3] = *(s32 *)((u8 *)actor + 0x1FC);
-        values[4] = *(s32 *)((u8 *)actor + 0x200);
+        values[3] = *((s32 *)(((u8 *)actor) + 0x1FC));
+        values[4] = *((s32 *)(((u8 *)actor) + 0x200));
         {
             register u32 offset asm("r5") = 0x204;
             asm("" : "+r"(offset));
-            values[5] = *(s32 *)((u8 *)actor + offset);
+            values[5] = *((s32 *)(((u8 *)actor) + offset));
         }
-        values[6] = *(s32 *)((u8 *)actor + 0x2E0);
+        values[6] = *((s32 *)(((u8 *)actor) + 0x2E0));
         values[7] = actor->id;
         arguments.count = 8;
         arguments.values = values;
@@ -199,9 +201,9 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
         u32 zero;
         u32 one;
         u16 masked;
-        u32 test = *motionFlags & mask;
+        u32 test = (*motionFlags) & mask;
         flags = &actor->flags2D4;
-        if (!test && (u32)(actor->category - 11) > 2)
+        if ((!test) && (((u32)(actor->category - 11)) > 2))
             GameState_SetEventFlag(
                 BestiaryDisplay_GetEntryForActor(actor->category, actor->paletteOffset));
         actor->fieldAA = 0;
@@ -215,7 +217,7 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
         {
             void *callback = (void *)SceneActorControl_OnIdle;
             u32 kind = 16;
-            actor->field2B2 = one;
+            actor->field2B2 = 1;
             actor->field2B0 = zero;
             actor->field2B5 = kind;
             actor->target = callback;
@@ -228,19 +230,19 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
             actor->word104 = 0;
             {
                 u32 behavior = 2;
-                actor->state2A8 = one;
+                actor->state2A8 = 1;
                 actor->phase2A9 = zero;
                 actor->behavior2AA = behavior;
                 actor->counter2AC = 0;
-                actor->field2B1 = one;
+                actor->field2B1 = 1;
             }
         }
     }
-    if (!*((u8 *)actor + 8))
-        *(u32 *)actor->drawable |= 1;
+    if (!(*(((u8 *)actor) + 8)))
+        *((u32 *)actor->drawable) |= 1;
     else
-        ShowTile((void *)((u8 *)actor->drawable + 0x20), 1);
-    ActorShadow_Disable((u8 *)actor + 0x320);
+        ShowTile((void *)(((u8 *)actor->drawable) + 0x20), 1);
+    ActorShadow_Disable(((u8 *)actor) + 0x320);
 }
 
 #else

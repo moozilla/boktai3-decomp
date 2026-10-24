@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 95.0%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: control reacquires a player route once the context delay clears.
 
@@ -201,6 +201,7 @@ void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
     } else
         actor->counter2AC++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Mummy_UpdatePlayerRoute);
 #endif

@@ -2,7 +2,7 @@
 // confidence=low: switches between reaction setup and directed secondary motion.
 #define SceneActorReaction_SetMotionMode sub_08080BE0
 #ifdef NONMATCHING
-// fuzzy: 92.8%
+// fix.py best (sweep after the inlined-insn fix)
 // Flag-width, expression ordering and register allocation differences remain.
 #include "scene_actor_chase.h"
 
@@ -62,22 +62,33 @@ static inline s32 Reaction_ScaleMotion(s32 value)
         return value >> 12;
     return -((-value) >> 12);
 }
+inline static void Reaction_ClearWord_08080BE0(u32 *field, u32 bits)
+{
+    u16 mask = ~bits;
+    *field &= mask;
+}
+
+inline static void Reaction_SetHalf_08080BE0(struct SceneActorRegistryResetView *actor, u16 mask)
+{
+    actor->flags2D6 = mask | actor->flags2D6;
+}
+
 u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 amplitude)
 {
     struct SceneActorRegistryResetView *actor = owner->actor;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)(&actor->group);
     struct ContactCollider *second = &actor->colliderB;
     struct ContactCollider *first = &actor->colliderA;
     if (Reaction_IsBlocked(actor))
         return 0;
     switch (mode) {
         case 0: {
-            u32 bit = 0x8000;
+            u16 bit = 0x8000;
             u16 *motion = &actor->flags2D4;
-            if (!(*motion & bit)) {
+            if (!((*motion) & bit)) {
                 second->flags |= 4;
                 first->flags |= 4;
-                Chase_SetCtl(actor, *(void **)(group + 0x23C), 0x1F);
+                Chase_SetCtl(actor, *((void **)(group + 0x23C)), 0x1F);
                 Chase_SetState(actor, 3, 0, 0);
                 *motion |= bit;
                 if (*motion) {
@@ -85,20 +96,20 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
                         *motion = 0x40;
                         actor->field2E6 = 0;
                         Reaction_ClearHalf(&actor->flags2D6, ~0x980);
-                    } else if (*motion & 0x803E) {
+                    } else if ((*motion) & 0x803E) {
                         *motion &= ~0x201;
-                        Reaction_ClearWord(&actor->flags2CC, 0x4000);
+                        Reaction_ClearWord_08080BE0(&actor->flags2CC, 0x4000);
                         actor->flagsEB &= ~0x10;
-                        if (!(*motion & 0x20))
-                            Reaction_ClearWord(&actor->flags2CC, 0x80);
-                        Reaction_ClearWord(&actor->flags2D0, 0x100004);
-                        Reaction_SetHalf(actor, 0x400);
+                        if (!((*motion) & 0x20))
+                            Reaction_ClearWord_08080BE0(&actor->flags2CC, 0x80);
+                        Reaction_ClearWord_08080BE0(&actor->flags2D0, 0x100004);
+                        Reaction_SetHalf_08080BE0(actor, 0x400);
                         actor->field2E6 = 0;
                         actor->flags2CC |= 0x2000;
                     } else
-                        Reaction_ClearWord(&actor->flags2CC, 0x2000);
+                        Reaction_ClearWord_08080BE0(&actor->flags2CC, 0x2000);
                 } else
-                    Reaction_ClearWord(&actor->flags2CC, 0x2000);
+                    Reaction_ClearWord_08080BE0(&actor->flags2CC, 0x2000);
             }
             actor->secondaryMotion.x = 0;
             actor->secondaryMotion.y = 0;
@@ -110,7 +121,7 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
                 actor->field2E0 = 1;
                 actor->field2DC = 2;
                 actor->field2D8 = 1;
-                Reaction_SetHalf(actor, 0x20);
+                Reaction_SetHalf_08080BE0(actor, 0x20);
             } else {
                 actor->reactionSoundVariant = 0;
                 actor->field2E6 = 0;
@@ -120,6 +131,7 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
             }
             break;
         }
+
         case 1:
             Reaction_ClearHalf(&second->flags, ~4);
             Reaction_ClearHalf(&first->flags, ~4);
@@ -133,9 +145,10 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
             }
             actor->secondaryMotion.y = 4;
             Chase_SetState(actor, 3, 0, 0);
-            Chase_SetCtl(actor, *(void **)(group + 0x240), 0x20);
+            Chase_SetCtl(actor, *((void **)(group + 0x240)), 0x20);
             break;
     }
+
     return 1;
 }
 

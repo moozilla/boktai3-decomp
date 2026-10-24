@@ -2,7 +2,7 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
-// fuzzy: 95.3%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: Vampire pending-damage handler: applies queued damage, flash/shake, death and stagger transitions.
 struct VampireDamage {
@@ -61,17 +61,18 @@ static inline void Vampire_SetState_1(struct VampireDamage *p, void (*fn)(void *
 
 int Vampire_ApplyPendingDamage(struct VampireDamage *p)
 {
+    int special;
     struct VampireDamage *base = p;
     u8 *sprite = ((u8 *)p) + 0x48;
     void *collider = ((u8 *)p) + 0x1cc;
     int damage;
-    int special;
     int trigger;
     int flaggedBit;
     u32 *flags;
     u8 *hit;
     s16 *hp;
     struct Packed size;
+    u32 t1;
     {
         s32 *damagePtr = (s32 *)(((u8 *)p) + 0x33c);
         damage = *damagePtr;
@@ -111,7 +112,7 @@ int Vampire_ApplyPendingDamage(struct VampireDamage *p)
             SceneActors_SpawnDestructionParticles(p);
             damage = (*((s16 *)(((u8 *)gUnk_02000710) + 0x876))) * 5;
             Sound_PlaySongChecked(0x12a);
-            *((u16 *)(((u8 *)p) + 0x350)) = 60;
+            *((u16 *)(((u8 *)p) + 0x350)) = (t1 = 60);
         }
     } else {
         *((u16 *)(((u8 *)p) + 0x350)) -= 1;
@@ -170,7 +171,7 @@ int Vampire_ApplyPendingDamage(struct VampireDamage *p)
             Vampire_SetState_1(base, sub_08026FF0);
             return 1;
         }
-        ((u8 *)p)[0x399] = 8;
+        ((u8 *)p)[0x399] = t1 - 52;
         gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
         {
             u32 index = gUnk_03005308 * 2;
@@ -181,6 +182,7 @@ int Vampire_ApplyPendingDamage(struct VampireDamage *p)
     }
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Vampire_ApplyPendingDamage);
 #endif

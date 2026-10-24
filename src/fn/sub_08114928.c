@@ -1,7 +1,7 @@
 #include "global.h"
 // confidence=low: profile-driven native effect motion and creation.
 #ifdef NONMATCHING
-// fuzzy: 93.8%
+// fix.py best (sweep after the inlined-insn fix)
 /* Open: the ROM masks the second group id with 0xFF (word load of the timer) where this
  * truncates, and the case-2 offset/constant temporaries swap r3/r4.
  * The u8/u16 form keeps the timer address from being shared with the first GroupId. */
@@ -87,19 +87,24 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
                 case 0:
                     NativeEffect_InitTypeZeroSprite(&m->effects[i]);
                     break;
+
                 case 1:
                     NativeEffect_InitDirectionalSprite(&m->effects[i], reverse);
                     break;
+
                 case 2:
                     NativeEffect_InitThresholdSprite(&m->effects[i], profile->threshold);
                     break;
+
                 case 3:
                     NativeEffect_InitDirectionalTypeThreeSprite(&m->effects[i], reverse);
                     break;
+
                 case 4:
                     NativeEffect_InitUnsequencedSprite(&m->effects[i], reverse);
                     break;
             }
+
             m->effects[i].position = *position;
             m->effects[i].velocity = *velocity;
             m->effects[i].height = height;
@@ -108,7 +113,10 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
             m->effects[i].sprite.priority = 1;
             m->effects[i].active = 1;
             m->effects[i].state = 0;
-            m->effects[i].id = (u8)group | (u16)(m->timer << 8);
+            {
+                typeof(m->timer) v1 = m->timer;
+                m->effects[i].id = ((u8)group) | ((u16)(v1 << 8));
+            }
             switch (profile->type) {
                 case 0:
                     m->effects[i].position.x += 0x4000;
@@ -119,6 +127,7 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
                     NativeEffect_SetState(&m->effects[i], NativeEffect_UpdateLinearFlight);
                     Sound_PlaySong(0xcd);
                     break;
+
                 case 2:
                     m->effects[i].position.x += 0xc000;
                     m->effects[i].velocity.x += 0x5000;
@@ -134,6 +143,7 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
                     NativeEffect_SetState(&m->effects[i], NativeEffect_UpdateLinearFlight);
                     Sound_PlaySong(0xcd);
                     break;
+
                 case 1:
                     m->effects[i].position.x += 0x4000;
                     m->effects[i].velocity.x += 0x800;
@@ -143,6 +153,7 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
                     NativeEffect_SetState(&m->effects[i], NativeEffect_UpdateRotatingFlight);
                     Sound_PlaySong(0xcd);
                     break;
+
                 case 3:
                     m->effects[i].position.x += 0x10000;
                     m->effects[i].velocity.x += 0x2000;
@@ -152,14 +163,17 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
                     NativeEffect_SetState(&m->effects[i], NativeEffect_UpdateTurningTrail);
                     Sound_PlaySong(0x164);
                     break;
+
                 case 4:
                     EffectActor_BeginHorizontalMotion(&m->effects[i], profile, reverse);
                     Sound_PlaySong(0x164);
                     break;
             }
+
             return i;
         }
     }
+
     return -1;
 }
 

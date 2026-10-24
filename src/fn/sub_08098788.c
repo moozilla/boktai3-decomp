@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 87.4%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: address scheduling, inlined tests and register allocation.
 #include "scene_actor_reset.h"
@@ -109,6 +109,7 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
 {
     struct SceneActorRegistryResetView *saved = a;
     u8 *ctx;
+    u32 k1;
     {
         struct ContactCollider *c = &a->colliderB;
         c->flags |= 4;
@@ -119,7 +120,7 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
             ActorShadow_Disable(((u8 *)a) + 0x320);
             {
                 s8 mask = ~0x20;
-                u32 *flags = (void *)(((u8 *)saved) + 0x558);
+                u32 *flags = (void *)(((u8 *)saved) + (k1 = 0x558));
                 *flags &= mask;
             }
         } else
@@ -130,7 +131,7 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
     ctx = a->context;
     if (!Unavailable(a)) {
         u32 discarded = gUnk_030053F4 & 0x4800;
-        u32 *flags = (u32 *)(ctx + 0x558);
+        u32 *flags = (u32 *)(ctx + k1);
         s32 reveal;
         if (Flag(ctx, 0x100)) {
             reveal = SaveFlag(0x20);
@@ -164,7 +165,7 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
         } else {
         hide:
             if (!Flag(ctx, 0x20)) {
-                if (Hidden(a)) {
+                if ((u8)Hidden(a)) {
                     *((u16 *)(ctx + 0x5B2)) = 0;
                     {
                         u32 mask = ~0x40;
@@ -184,6 +185,7 @@ finish:
 
     return 1;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Ghost_UpdateVisibility);
 #endif

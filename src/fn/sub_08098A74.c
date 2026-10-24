@@ -83,22 +83,33 @@ static inline void SaveInitialPlayer(struct ContactPosition *out, u8 **players)
     *out = *(struct ContactPosition *)(*source + 0x30);
 }
 #ifdef NONMATCHING
-// fuzzy: 87.6%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: player-pointer copies, control-field offsets and animation-scale allocation.
 // confidence=low: follows the player's displacement while draining, then returns to idle.
+inline static void ClearCollider_FollowDrainedPlayer(struct ContactCollider *c)
+{
+    struct ColliderFlags {
+        u8 pad[6];
+        s32 flags : 16;
+    };
+    {
+        u8 k1 = 4;
+        ((struct ColliderFlags *)c)->flags &= ~k1;
+    }
+}
+
 void Ghost_FollowDrainedPlayer(struct SceneActorRegistryResetView *actor)
 {
+    register u16 *flags asm("r6") = &actor->flags2D4;
     u8 *context = actor->context;
     struct ContactPosition delta;
     u8 taken = Take(&actor->field2B1);
-    register u8 **player asm("r8") = gUnk_02000580;
-    register u16 *flags asm("r6") = &actor->flags2D4;
     if (taken) {
         Control(actor, Ghost_UpdateEnergyDrainAnimation, 0x23);
-        SaveInitialPlayer((void *)(context + 0x5EC), player);
+        SaveInitialPlayer((void *)(context + 0x5EC), gUnk_02000580);
         {
             u32 mask = 0x100;
-            *flags = mask | *flags;
+            *flags = mask | (*flags);
         }
         {
             u32 mask = 0x2000000;
@@ -109,18 +120,19 @@ void Ghost_FollowDrainedPlayer(struct SceneActorRegistryResetView *actor)
     {
         u32 scale = 64;
         actor->field1EA = scale;
-        Delta(&delta, ((struct ContactPosition *)(context + 0x5EC)), (void *)((*player) + 0x30));
+        Delta(&delta, (struct ContactPosition *)(context + 0x5EC),
+              (void *)((*gUnk_02000580) + 0x30));
         actor->motion.x += delta.x;
         actor->motion.z += delta.z;
         *((struct ContactPosition *)(context + 0x5EC)) =
-            *(struct ContactPosition *)((*player) + 0x30);
+            *((struct ContactPosition *)((*gUnk_02000580) + 0x30));
         Scale(actor, flags);
     }
-    if (actor->field2B0 || *(u16 *)(gUnk_02000580[0] + 0x428) == 0) {
+    if (actor->field2B0 || ((*((u16 *)(gUnk_02000580[0] + 0x428))) == 0)) {
         Sound_PlaySong(0x3CC);
         State(actor, 3);
         Control(actor, SceneActorControl_OnIdle, 0x10);
-        ClearCollider(&actor->colliderA);
+        ClearCollider_FollowDrainedPlayer(&actor->colliderA);
     } else {
         ++actor->counter2AC;
     }

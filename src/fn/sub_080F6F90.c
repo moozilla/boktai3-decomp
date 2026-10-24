@@ -2,7 +2,7 @@
 #include "display_animation.h"
 
 #ifdef NONMATCHING
-// fuzzy: 95.5%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: initializes the four active sword attack components.
 
@@ -135,6 +135,76 @@ struct SwordComponent {
 // confidence=low: the four children are the active sword components updated at 080F63C4.
 void Ivy_OnChildDestroy(void);
 void sub_080F4708(void);
+static inline void Step_InitAttackComponents(struct DisplaySequenceSprite *sprite,
+                                             struct DisplaySequenceState *state,
+                                             const u16 *commands)
+{
+    const volatile u16 *command;
+    u32 duration;
+    u32 flags;
+    command = (void *)((state->index << 1) + (u32)state->commands);
+    sprite->frame = *command >> 6;
+    {
+        u32 first = state->flags & 1;
+        u32 bit = 1;
+        if (first != (((*command & 0x30) >> 4) & bit))
+            sprite->flags |= 4;
+        else
+            sprite->flags &= ~4;
+    }
+    {
+        u32 bit = 2;
+        u32 first;
+        flags = state->flags;
+        first = (u8)(flags & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            sprite->flags |= 8;
+        else
+            sprite->flags &= ~8;
+    }
+    {
+        u32 elapsed = state->elapsed + 1;
+        u32 temporary = 0xFFFF;
+        u32 mask;
+        state->elapsed = elapsed;
+        mask = temporary;
+        duration = state->duration;
+        if ((u16)elapsed >= duration) {
+            state->elapsed = 0;
+            if (flags & 4) {
+                u32 index = state->index;
+                if (index == 0) {
+                    if (flags & 8)
+                        state->elapsed = duration;
+                    else
+                        state->index = state->frameCount - 1;
+                } else
+                    state->index = index - 1;
+            } else {
+                u32 index = state->index + 1;
+                state->index = index;
+                if ((index & mask) >= state->frameCount) {
+                    if ((u8)(flags & 8)) {
+                        state->elapsed = duration;
+                        state->index = state->frameCount - 1;
+                    } else
+                        state->index = 0;
+                }
+            }
+            command = state->commands + state->index;
+            state->frameWeight = *command & 15;
+            {
+                s32 weight = state->frameWeight;
+                s32 speed = state->speed;
+                speed = (speed * weight) >> 6;
+                state->duration = speed;
+                if (!(u8)speed)
+                    state->duration = 1;
+            }
+        }
+    }
+}
+
 void Sword_InitAttackComponents(u8 *input)
 {
     u8 *p = input;
@@ -183,7 +253,9 @@ void Sword_InitAttackComponents(u8 *input)
         child->fieldFC = zero;
         child->field119 = 0;
         child->field10A = zero;
-        child->field11A = 0;
+        do {
+            child->field11A = 0;
+        } while (0);
         child->field12A = 0;
         child->field12B = 0;
         child->field126 = zero;
@@ -191,7 +263,7 @@ void Sword_InitAttackComponents(u8 *input)
         child->field168 = zero;
         AnimData_Load(graphics, 0x5291);
         Sprite_Init(child, graphics, 0);
-        Step(sprite, &sequence, sequence.commands);
+        Step_InitAttackComponents(sprite, &sequence, sequence.commands);
         sprite->flags = 3;
         AnimData_SelectPaletteBank((void *)sprite->resource, *((u16 *)(((u8 *)p) + 0xD56)));
         child->field118 = i;
@@ -220,6 +292,7 @@ void Sword_InitAttackComponents(u8 *input)
 
     zero = 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Sword_InitAttackComponents);
 #endif

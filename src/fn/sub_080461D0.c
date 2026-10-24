@@ -11,7 +11,7 @@ struct ContactSequenceScriptArgs {
     s32 *values;
 };
 #ifdef NONMATCHING
-// fuzzy: 97.0%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: signed-field scratch registers and the script-count mask reload.
 void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
                                       struct ContactSequenceActor *actor)
@@ -28,9 +28,9 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
     u32 randomMask;
     u32 xzMask;
     if (ContactSequenceActor_TakeEntryFlag(actor)) {
-        table = (const u16 *)RANDOM_TABLE_ADDR;
+        table = (const u16 *)0x0203B400;
         {
-            u32 randomIndex;
+            u16 randomIndex;
             u32 sample;
             u32 smallMask;
             u32 lowMask;
@@ -73,7 +73,7 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
             scatterPosition->x = x;
             y = (u16)scatterPosition->y;
             positionOffset = 0x10;
-            lowPosition = (struct ContactPosition *)(positionOffset + (u32)actor);
+            lowPosition = (struct ContactPosition *)(positionOffset + ((u32)actor));
             position = lowPosition;
             sourceY = (u16)actor->position.y;
             y += sourceY;
@@ -85,7 +85,7 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
         }
         TransientSpriteEffects_Spawn(0, 0x1004, scatterPosition, 0, 256, 256);
         {
-            u32 randomIndex;
+            u8 randomIndex;
             u32 sampleX;
             u32 lowMask;
             u32 sampleY;
@@ -128,7 +128,7 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
         sub_080148CC(4, 14, position, 64, 256, 12, 8, 8, 8, 30, 30);
         {
             s32 health = actor->health;
-            if (health <= 0 && parent->script) {
+            if ((health <= 0) && parent->script) {
                 coordinates[0] = actor->position.x;
                 coordinates[1] = actor->position.y;
                 coordinates[2] = actor->position.z;
@@ -142,6 +142,7 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
     ContactSequenceActor_SetFlags(actor, 1);
     ContactSequenceActor_Deactivate(parent, actor);
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", ContactSequenceActor_UpdateDying);
 #endif

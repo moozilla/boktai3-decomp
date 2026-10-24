@@ -2,7 +2,7 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 94.7%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: defined vector padding, inline clamps, argument order and registers.
 
@@ -97,7 +97,8 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
         SetControl(actor, actor->entryTarget224, 2);
     }
     if (state->approachTime < ((s32)actor->counter2AC)) {
-        Delta(&delta, &actor->position, (struct ContactPosition *)(gUnk_02000580 + 0x30));
+        Delta(&delta, &actor->position,
+              (struct ContactPosition *)((*((typeof(gUnk_02000580) *)0x02000580)) + 0x30));
         t1 = delta.x;
         t2 = delta.z;
         angle = Math_Atan2(t1, t2);
@@ -126,7 +127,8 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
         SetState(actor, 0, 0, 4);
         return;
     } else if (state->orbitRange > actor->distanceF0) {
-        Delta(&delta, (struct ContactPosition *)(gUnk_02000580 + 0x30), &actor->position);
+        Delta(&delta, (struct ContactPosition *)((*((typeof(gUnk_02000580) *)0x02000580)) + 0x30),
+              &actor->position);
         angle = Math_Atan2(delta.x, delta.z);
         turn = Normalize(((angle + 64) & 255) - actor->direction);
         if (turn < 0)
@@ -141,7 +143,8 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
             step = 2;
         goto clamp;
     } else {
-        Delta(&delta, &actor->position, (struct ContactPosition *)(gUnk_02000580 + 0x30));
+        Delta(&delta, &actor->position,
+              (struct ContactPosition *)((*((typeof(gUnk_02000580) *)0x02000580)) + 0x30));
         angle = Math_Atan2(delta.x, delta.z);
         turn = Normalize(angle - actor->direction);
         if (turn < 0)
@@ -173,6 +176,7 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
         state->turnDelay--;
     actor->counter2AC++;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Crow_SteerAroundPlayer);
 #endif

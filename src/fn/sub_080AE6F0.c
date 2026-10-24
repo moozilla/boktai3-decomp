@@ -2,7 +2,7 @@
 #include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 85.3%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: resumes the route or runs the recovery script.
 // Remaining differences: saved-zero lifetimes, context flag scheduling, and register allocation; caching flags reduces register differences.
@@ -29,6 +29,7 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
     u16 *contextFlags;
     register u32 zero asm("sl");
     typeof(flags) c1;
+    u32 k1;
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->direction = (((actor->direction + 128) & 255) >> 6) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -54,7 +55,7 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
     StartRoute(actor, group);
     contextFlags = (u16 *)(context + 0x6D4);
     {
-        s32 mask = ~10;
+        s32 mask = ~(k1 = 10);
         *contextFlags &= mask;
     }
     if (Vorn_HasActiveResponse(context)) {
@@ -79,7 +80,9 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
             s32 mask = ~0x1E;
             *contextFlags &= mask;
         }
-        actor->field2C2 = 64;
+        do {
+            actor->field2C2 = 64;
+        } while (0);
         *((u16 *)(((u8 *)actor) + 0x414)) = 0;
         *((u16 *)(((u8 *)actor) + 0x418)) = 0;
         ClearMotion(motionFlags, ~0x380);
@@ -93,7 +96,7 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
         if ((*actionFlags) & 0x200000) {
             *flags &= ~0x1000000;
             ClearMotion(motionFlags, ~0x200);
-            *(((u8 *)control) + 10) = zero;
+            *(((u8 *)control) + k1) = zero;
             control->counter = 0;
             control->timer = 0;
         }
@@ -105,6 +108,7 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
     }
     actor->field2C2 = 64;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Vorn_ResumeReactionRoute);
 #endif

@@ -1,6 +1,7 @@
 #include "scene_pool.h"
 
 #ifdef NONMATCHING
+// fix.py best (sweep after the inlined-insn fix)
 // twin.py transplant from a matched near-clone
 // fix.py best version (reprinted C)
 s32 ScenePool_SelectStateAtPositionLimit(struct ScenePoolEntry *);
@@ -36,6 +37,16 @@ static inline void Enter_1(struct ScenePoolEntry *entry, u32 zero)
     Memory_Clear(entry->history, 0x100);
 }
 
+inline static void Enter_StateTrackAdaptive(struct ScenePoolEntry *entry, u32 state, u32 zero)
+{
+    entry->state = state;
+    entry->stateFrame = zero;
+    entry->stateEntered = 1;
+    do {
+        Memory_Clear(entry->history, 0x100);
+    } while (0);
+}
+
 s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
                                  struct ScenePoolEntry *entry)
 {
@@ -43,6 +54,7 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
     u32 flag;
     u8 *entered;
     u32 value;
+    typeof(value) c1;
     if (entry->stateEntered) {
         entry->stateEntered = 0;
         history[0] = 0;
@@ -101,10 +113,10 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
                 break;
 
             case 2:
-                if (entry->mode != 0)
-                    state = 7;
-                else
+                if (!(entry->mode != 0))
                     state = 5;
+                else
+                    state = 7;
                 break;
 
             case 3:
@@ -115,7 +127,7 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
                 goto done;
         }
 
-        Enter(entry, state, flag);
+        Enter_StateTrackAdaptive(entry, state, flag);
         goto done;
     }
     if (entry->stateFrame > 239) {
@@ -145,11 +157,12 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
             }
         } else if (entry->direction > 0) {
             value = 1;
-            entry->state = value;
+            c1 = value;
+            entry->state = c1;
             entry->stateFrame = flag;
             entered = &entry->stateEntered;
         sharedEntry:
-            *entered = value;
+            *entered = c1;
 
             {
                 u32 *arg = entry->history;
@@ -157,7 +170,7 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
             }
             goto done;
         } else {
-            Enter(entry, 2, flag);
+            Enter_StateTrackAdaptive(entry, 2, flag);
             asm volatile("");
         }
     } else

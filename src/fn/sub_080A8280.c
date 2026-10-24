@@ -12,7 +12,7 @@ void sub_0809345C(void *, void *);
 void Bee_SubVector(void *, void *, void *);
 s32 Bee_GetMovementVariant(void *);
 #ifdef NONMATCHING
-// fuzzy: 90.3%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: segment address lifetimes and register allocation.
 static inline u8 Take(u8 *p)
 {
@@ -148,6 +148,15 @@ static inline void AddVectors(struct ContactPosition *out, const struct ContactP
     out->y = a->y + b->y;
     out->z = b->z + a->z;
 }
+inline static void AddVectors_ReturnToCellCenter(struct ContactPosition *out,
+                                                 const struct ContactPosition *a,
+                                                 const struct ContactPosition *b)
+{
+    out->x = b->x + a->x;
+    out->y = b->y + a->y;
+    out->z = b->z + a->z;
+}
+
 void TentacleBody_ReturnToCellCenter(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;
@@ -161,45 +170,45 @@ void TentacleBody_ReturnToCellCenter(struct SceneActorRegistryResetView *actor)
         {
             u32 cell = actor->terrainCell;
             asm("" : "+r"(cell));
-            *(u16 *)(body + 0x87a) = cell;
+            *((u16 *)(body + 0x87a)) = cell;
         }
-        SceneActorTerrain_GetCenter(*(u16 *)(body + 0x87a), (void *)(body + 0x924));
+        SceneActorTerrain_GetCenter(*((u16 *)(body + 0x87a)), (void *)(body + 0x924));
     }
-    Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x270));
-    speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
+    Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + 0x270)));
+    speed = Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + 0x260)));
     Scale(actor);
-    difference = *((u8 *)actor + 0x3cd) - actor->direction;
+    difference = (*(((u8 *)actor) + 0x3cd)) - actor->direction;
     direction = &actor->direction;
     if (difference > 128)
         difference += -256;
-    else if (difference < -128)
+    else if (difference < (-128))
         difference += 256;
     {
-        s32 magnitude = difference < 0 ? -difference : difference;
+        s32 magnitude = (difference < 0) ? (-difference) : (difference);
         motion = &actor->motion;
         if (magnitude > 8) {
-            s32 x = Shift(speed * gUnk_086149C4[(*((u8 *)actor + 0x59) + 64) & 255], 12);
-            s32 z = Shift(speed * gUnk_086149C4[*((u8 *)actor + 0x59)], 12);
+            s32 x = (u8)Shift(speed * gUnk_086149C4[((*(((u8 *)actor) + 0x59)) + 64) & 255], 12);
+            s32 z = Shift(speed * gUnk_086149C4[*(((u8 *)actor) + 0x59)], 12);
             motion->x += x;
             actor->motion.z += z;
             motion = &actor->motion;
         }
     }
-    AddVectors(&target, &actor->motion, &actor->position);
+    AddVectors_ReturnToCellCenter(&target, &actor->motion, &actor->position);
     index = SceneActorTerrain_GetCellIndex(&target);
-    if (*(u16 *)(body + 0x87a) != index) {
+    if ((*((u16 *)(body + 0x87a))) != index) {
         Delta(&target, &target, (void *)(body + 0x924));
         motion->x += Div(target.x, 10);
         actor->motion.z += Div(target.z, 10);
     }
     sub_080A9DB0(actor, 12, 0xa410);
-    if ((difference < 0 ? -difference : difference) <= 7) {
-        if (*(u16 *)(body + 0x87a) == index)
+    if (((difference < 0) ? (-difference) : (difference)) <= 7) {
+        if ((*((u16 *)(body + 0x87a))) == index)
             State(actor);
     } else if (difference > 0) {
-        *((u8 *)actor + 0x59) += (((64 - actor->field2C2) >> 4) << 1) + 1;
+        *(((u8 *)actor) + 0x59) += (((64 - actor->field2C2) >> 4) << 1) + 1;
     } else {
-        *((u8 *)actor + 0x59) -= (((64 - actor->field2C2) >> 4) << 1) + 1;
+        *(((u8 *)actor) + 0x59) -= (((64 - actor->field2C2) >> 4) << 1) + 1;
     }
     actor->counter2AC++;
 }

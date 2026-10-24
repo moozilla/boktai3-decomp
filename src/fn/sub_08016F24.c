@@ -22,7 +22,7 @@ extern struct LinkedWidgetSet *gUnk_02000078;
 void Widget_InitLinked(void *, struct ChoiceResource *, s32, s32, s32, s32, s32, struct Position *);
 // confidence=low: loads resource CB05/5D04 and sets up eight linked widgets with frame 0x11.
 #ifdef NONMATCHING
-// fuzzy: 97.8%
+// fix.py best (sweep after the inlined-insn fix)
 // Only the fill store before CpuSet is scheduled one instruction early (ROM computes &zero first).
 s32 sub_08016F24(struct LinkedWidgetSet *p)
 {
@@ -36,8 +36,8 @@ s32 sub_08016F24(struct LinkedWidgetSet *p)
         return -1;
     p->resource = *resource;
     ResourceHeader_Relocate(&p->resource, resource);
-    p->unknown18 = 0;
     fill = 0;
+    p->unknown18 = 0;
     CpuSet(&fill, &zero, 0x05000002);
     for (i = 0; i < 8; i++) {
         struct LinkedWidgetSlot *slot = &p->slots[i];
@@ -48,6 +48,7 @@ s32 sub_08016F24(struct LinkedWidgetSet *p)
         Widget_InitLinked(slot->widget, &p->resource, 0, 0x11, 1, 0, 0x3C, &zero);
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08016F24);
 #endif

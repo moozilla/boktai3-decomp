@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 86.1%
+// fix.py best (sweep after the inlined-insn fix)
 // Route-slot and flag-pointer lifetimes still differ; candidate is four bytes short.
 #include "scene_actor_chase.h"
 // confidence=low: context flag 0x628 requests a delayed restart from the route origin.
@@ -37,22 +37,31 @@ static inline u8 TestPending(u8 *context, u32 mask, u16 **pending)
         return 1;
     return 0;
 }
+inline static u8 TestPending_1(u8 *context, u32 mask, u16 *pending_)
+{
+    u16 **pending = &pending_;
+    *pending = (void *)(context + 0x628);
+    if ((*(*pending)) & mask)
+        return 1;
+    return 0;
+}
+
 s32 Ghoul_ResumePendingRoute(struct SceneActorRegistryResetView *actor)
 {
     register u8 *context asm("sl") = actor->context;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)(&actor->group);
     u16 *flags;
     u16 *pending;
     u16 *timer;
     void *route;
     if (Unavailable(actor))
         return 1;
-    if (!TestPending(context, 1, &pending))
+    if (!TestPending_1(context, 1, pending))
         return 1;
     {
         u32 mask = 0xA107;
         flags = &actor->flags2D4;
-        if (mask & *flags)
+        if (mask & (*flags))
             return 1;
     }
     timer = (void *)(context + 0x648);
@@ -62,24 +71,24 @@ s32 Ghoul_ResumePendingRoute(struct SceneActorRegistryResetView *actor)
         {
             u32 *p = &actor->flags2D0;
             u32 mask = ~4;
-            *p = mask & *p;
+            *p = mask & (*p);
         }
-        route = *(void **)(group + 0x1FC);
-        SceneActor_SetPositionXZ(&actor->id, *(s16 *)((u8 *)route + 0x1C),
-                                 *(s16 *)((u8 *)route + 0x20));
+        route = *((void **)(group + 0x1FC));
+        SceneActor_SetPositionXZ(&actor->id, *((s16 *)(((u8 *)route) + 0x1C)),
+                                 *((s16 *)(((u8 *)route) + 0x20)));
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-        SaveDelay(group + 0x8C, *(void **)(group + 0x48), 12, 30);
+        SaveDelay(group + 0x8C, *((void **)(group + 0x48)), 12, 30);
         Chase_SetCtl(actor, SceneActorReaction_RestoreAfterDelay, 14);
         Chase_SetState(actor, 3, 1, 0);
         SceneBody_StartRoute(&actor->id, group + 0x74, group[0x84], group[0x85], group[0x86]);
         {
-            void *route = *(void **)(group + 0x1FC);
+            void *route = *((void **)(group + 0x1FC));
             struct ContactPosition *position = &actor->position;
             struct ContactPosition *target = (void *)(context + 0x62C);
             s32 result = Nav_IsPositionInMesh(route, position, target);
             if (!result) {
                 u32 mask = ~0x200;
-                *flags = mask & *flags;
+                *flags = mask & (*flags);
             } else {
                 result = Terrain_ApplyBlocked(route, position, target);
                 if (result) {
@@ -87,13 +96,13 @@ s32 Ghoul_ResumePendingRoute(struct SceneActorRegistryResetView *actor)
                         Memory_Clear(&actor->motion, 8);
                 } else {
                     u32 mask = ~0x200;
-                    *flags = mask & *flags;
+                    *flags = mask & (*flags);
                 }
             }
         }
         {
             u32 mask = ~1;
-            *pending = mask & *pending;
+            *pending = mask & (*pending);
         }
     }
     return 1;

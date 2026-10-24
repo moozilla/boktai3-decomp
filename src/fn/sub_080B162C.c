@@ -2,7 +2,7 @@
 #include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 97.4%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 void SceneActor_SelectDistantRoutePoint(void *, void *, void *, u32);
 u8 Vorn_SelectUphillTurn(void *, void *);
@@ -47,6 +47,12 @@ static inline u8 Chase_Test_(s16 value, u32 mask)
     return 0;
 }
 
+inline static u32 Chase_Bits32_1(struct SceneActorRegistryResetView *actor_, u32 mask)
+{
+    u32 *field = &actor_->flags2CC;
+    return (*field) & mask;
+}
+
 void Vorn_TryUphillRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
@@ -57,7 +63,7 @@ void Vorn_TryUphillRoute(struct SceneActorRegistryResetView *actor)
         return;
     if (MotionFlags(actor, 0xE3BF))
         return;
-    if (Chase_Bits32(&actor->flags2CC, 16))
+    if (Chase_Bits32_1(actor, 16))
         return;
     if (actor->field2B5 != 1)
         return;
@@ -100,6 +106,7 @@ void Vorn_TryUphillRoute(struct SceneActorRegistryResetView *actor)
         *flags = mask | (*flags);
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Vorn_TryUphillRoute);
 #endif

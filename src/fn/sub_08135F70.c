@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 90.9%
+// fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: health and +0x2D8 pointer spills, mode lifetime,
 // shared hit-flag expansion and temporary-register choices (see worker notes).
@@ -244,6 +244,7 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
     register u32 four asm("r4");
     u32 bits;
     u32 k1;
+    typeof(four) c1;
     if (!HasPendingHit(actor)) {
         if (SceneActorReaction_ApplyAreaDamage(actor)) {
             flags2D4 = &actor->flags2D4;
@@ -270,10 +271,11 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
     {
         u32 v = actor->field2E6;
         four = 4;
-        bits = four & v;
+        c1 = four;
+        bits = c1 & v;
         mode = 1;
         if (bits)
-            mode = four;
+            mode = c1;
     }
     flags2D8 = &actor->field2D8;
     {
@@ -347,6 +349,7 @@ done: {
     SceneActorTerrain_ClearCollisionTimers(actor);
     return 1;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ResolveDamage);
 #endif

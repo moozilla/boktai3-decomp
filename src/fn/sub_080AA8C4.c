@@ -2,7 +2,7 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
-// fuzzy: 85.1%
+// fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: segment address lifetimes and register allocation.
 struct TrailSegment {
     u8 unknown0[0x1c];
@@ -94,30 +94,33 @@ void TentacleActor_AlignSegmentsToTerrain(struct SceneActorRegistryResetView *ac
 {
     struct TentacleTrail *trail;
     s32 i;
+    u32 k1 = 0x3f2;
     if (IsInactive(actor))
         return;
-    trail = actor->context;
+    do {
+        trail = actor->context;
+    } while (0);
     if (WordFlag(actor, 0x100000))
         return;
     for (i = 0; i < trail->segmentCount; i++) {
         struct TrailSegment *segment = &trail->segments[i];
-        if (TestSegment(segment, 2) && !TestSegment(segment, 1)) {
-            s32 height =
+        if (TestSegment(segment, 2) && (!TestSegment(segment, 1))) {
+            s16 height =
                 Height(SceneActorTerrain_GetCellIndex(&segment->position), &segment->position);
-            s32 y = (*(s16 *)((u8 *)trail + i * 296 + 0x3f2));
+            s32 y = *((s16 *)((((u8 *)trail) + (i * 296)) + k1));
             if (y != height) {
                 if (y < height) {
                     s32 delta = height - y;
                     if (!NearHeight(delta, delta, 255))
-                        (*(s16 *)((u8 *)trail + i * 296 + 0x3f2)) = actor->position.y;
+                        *((s16 *)((((u8 *)trail) + (i * 296)) + k1)) = actor->position.y;
                     else
-                        (*(s16 *)((u8 *)trail + i * 296 + 0x3f2)) = height;
+                        *((s16 *)((((u8 *)trail) + (i * 296)) + k1)) = height;
                 } else {
                     s32 delta = height - y;
                     if (Abs(delta) > 256)
-                        (*(s16 *)((u8 *)trail + i * 296 + 0x3f2)) = actor->position.y;
+                        *((s16 *)((((u8 *)trail) + (i * 296)) + k1)) = actor->position.y;
                     else
-                        (*(s16 *)((u8 *)trail + i * 296 + 0x3f2)) += Div(delta, 10);
+                        *((s16 *)((((u8 *)trail) + (i * 296)) + k1)) += Div(delta, 10);
                 }
             }
         }
