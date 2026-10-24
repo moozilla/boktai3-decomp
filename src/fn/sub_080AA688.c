@@ -1,8 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 96.1%
 // Remaining differences: the reverse-loop stride uses r0 instead of r1.
 struct TrailSegment {
     u8 unknown0[0x1C];
@@ -24,7 +22,6 @@ static inline u8 *CountAddress(struct ActorTrail *trail)
 {
     register u32 offset asm("r0") = 0x8ea;
     register u8 *p asm("r1");
-    asm volatile("" : "+r"(offset));
     p = (u8 *)trail + offset;
     asm("" : "+r"(p));
     return p;
@@ -54,7 +51,3 @@ void TentacleActor_RemoveSegmentColliders(struct SceneActorRegistryResetView *ac
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080AA688);
-#endif
