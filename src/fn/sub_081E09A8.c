@@ -1,6 +1,7 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 95.6%
+// MATCHING_CONCESSION: register-pinning
+
+#define SCRIPT_PROMPT_INPUT_BASE ((u16 *)0x03005260)
 
 struct ScriptPromptTask {
     u8 pad0[0x24];
@@ -42,30 +43,36 @@ void sub_081E09A8(struct ScriptPromptTask *s)
     state = *statep;
     switch (state) {
         case 0: {
-            u32 one;
-            if (gUnk_03005260[1] & (one = 1)) {
+            u32 activeState;
+            u16 *input;
+            register u32 pressedKeys asm("r1");
+            input = SCRIPT_PROMPT_INPUT_BASE;
+            pressedKeys = input[1];
+            activeState = 1;
+            if (activeState & pressedKeys) {
                 if (s->selection == 0) {
                     Sound_PlaySong(0xDD);
                     s->fadeSpeed = 3;
                     Menu_StartFadeOut(3);
                     Sound_PauseChannel10(2);
-                    s->result = one;
+                    s->result = activeState;
                     goto set_state;
                 } else {
                     goto cancel;
                 }
-            } else if (gUnk_03005260[1] & 2) {
+            } else if (2 & pressedKeys) {
             cancel:
                 Sound_PlaySong(0xDE);
                 Menu_StartFadeOut(s->fadeSpeed);
                 do {
                     s->result = state;
                 set_state:
-                    *statep = one;
+                    *statep = activeState;
                 } while (0);
             }
-            if (((gUnk_03005260[1] & 0x20) && s->selection == 1) ||
-                ((gUnk_03005260[1] & 0x10) && s->selection == 0)) {
+            input = SCRIPT_PROMPT_INPUT_BASE;
+            if (((input[1] & 0x20) && s->selection == 1) ||
+                ((input[1] & 0x10) && s->selection == 0)) {
                 s->selection = 1 - s->selection;
                 Sound_PlaySong(0x37C);
             }
@@ -91,6 +98,3 @@ void sub_081E09A8(struct ScriptPromptTask *s)
     }
     s->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081E09A8);
-#endif
