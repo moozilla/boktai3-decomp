@@ -1,9 +1,5 @@
 #include "global.h"
 
-// MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 95.1%
-// Remaining differences: lifetime store and collider-argument scratch registers.
 struct HresvelgrShotSprite {
     u32 flags;
     u8 unknown04[0xC];
@@ -31,35 +27,30 @@ s32 Hresvelgr_InitShotCollider(struct HresvelgrShot *, s32, s32, s32);
 static inline void SetPosition(struct HresvelgrShotSprite *sprite, s32 x, s32 y, s32 z)
 {
     sprite->x = x;
-    {
-        register u32 value asm("r1") = y;
-        asm("" : "+r"(value));
-        sprite->y = value;
-    }
-    {
-        register u32 value asm("r2") = z;
-        asm("" : "+r"(value));
-        sprite->z = value;
-    }
+    sprite->y = y;
+    sprite->z = z;
 }
 s32 Hresvelgr_InitializeShots(struct HresvelgrShotPool *pool)
 {
     struct HresvelgrShot *shot;
     s32 i;
     struct HresvelgrShotSprite *sprite;
-    u16 zero, y, z;
+    u16 zero, x, y, z;
     AnimData_Load(pool->animationData, 0x3070);
     AnimData_SelectPaletteBank(pool->animationData, 0x2F4);
     shot = pool->shots;
     zero = 0;
     i = 31;
     sprite = &shot->sprite;
+    // The order matters: x lives longest, gets no register, and is
+    // rematerialized in the loop, which sets reload's register rotation.
+    x = 0x708;
     y = 0x100;
     z = 0x4B0;
     do {
         Sprite_Init(shot, pool->animationData, 0);
         sprite->animation = zero;
-        SetPosition(sprite, 0x708, y, z);
+        SetPosition(sprite, x, y, z);
         sprite->flags |= 1;
         shot->lifetime = zero;
         Hresvelgr_InitShotCollider(shot, pool->attackA, pool->attackB, pool->attackC);
@@ -68,6 +59,3 @@ s32 Hresvelgr_InitializeShots(struct HresvelgrShotPool *pool)
     } while (--i >= 0);
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_InitializeShots);
-#endif

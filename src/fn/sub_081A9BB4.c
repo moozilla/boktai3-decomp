@@ -1,9 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: facing and active-half mask choose the side for randomized commands 8/11.
-#ifdef NONMATCHING
-// fuzzy: 99.2%
-// Remaining differences: RNG table and pair-slot offset use different low registers.
 struct Pair {
     u8 pad0[0x205];
     u8 first;
@@ -44,15 +40,12 @@ void Vanargand_SetPairedMotionParameter(void *, u16);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
 s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
 extern u32 gUnk_03005308;
-extern u16 gUnk_0203B400[];
 static inline s32 RandomValue(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
     {
-        u32 i = gUnk_03005308 << 1;
-        register u32 t asm("r2") = (u32)gUnk_0203B400;
-        asm("" : "+r"(t));
-        return *(u16 *)(i + t);
+        u32 offset = gUnk_03005308 * 2;
+        return *(u16 *)(offset + RANDOM_TABLE_ADDR);
     }
 }
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, int, int, int);
@@ -157,7 +150,3 @@ void Vanargand_UpdateFacingPairAttack(struct Vanargand *p)
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdateFacingPairAttack);
-#endif
