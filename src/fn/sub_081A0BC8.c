@@ -2,10 +2,10 @@
 
 // confidence=low: spawns projectiles while traversing the arena boundary.
 
-#ifdef NONMATCHING
-// fuzzy: 99.4%
-// Remaining differences: animation argument lifetimes and RNG arithmetic/register allocation.
 // MATCHING_CONCESSION: register-pinning
+// The two remaining hints stand in for longer lives: without them `state` outranks the
+// flags pointer in global allocation (state needs a life of 49+ insns, it has 41), and
+// the 0x3FF mask is re-placed in sl instead of ip once reload evicts it from r5.
 #include "engine.h"
 // confidence=low: traverses a boundary, spawning falling projectiles over valid terrain.
 struct Vec {
@@ -54,17 +54,15 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline void SetHeading(struct Hresvelgr *p, s32 heading)
 {
     s32 shifted;
-    register u32 mask asm("r1");
+    u32 mask;
     p->heading = heading;
     shifted = (p->heading + 96) >> 6;
     mask = 3;
     mask &= shifted;
-    asm("" : "+r"(mask));
     p->direction4 = mask;
     shifted = (p->heading + 112) >> 5;
     mask = 7;
     mask &= shifted;
-    asm("" : "+r"(mask));
     p->direction8 = mask;
 }
 static inline s32 RandomValue(const u16 *table)
@@ -172,7 +170,10 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
                     const u16 *table = gUnk_0203B400;
                     s32 rawX = RandomValue(table);
                     s32 px = actor->position.x;
-                    s32 x = (rawX >> 3) % 512;
+                    // Not `% 512`: as the whole right-hand side, expand_divmod would
+                    // compute the quotient in x itself. Here the division is a
+                    // subexpression, so the quotient gets its own register, as in the ROM.
+                    s32 x = (rawX >> 3) - ((rawX >> 3) / 512) * 512;
                     s32 rawZ = RandomValue(table);
                     s32 pz = actor->position.z;
                     u32 height;
@@ -202,7 +203,3 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
     }
     asm("" ::"r"(aoff));
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_UpdateBoundaryBarrage);
-#endif
