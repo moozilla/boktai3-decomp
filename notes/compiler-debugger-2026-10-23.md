@@ -191,3 +191,27 @@ those 34 use register pins.
   thread_jumps time. Writing the flag test as `p && ...` threads correctly
   but lets cse2 drop FlagMovement's null test. Open; step.py and flip.py
   report nothing for a branch-target-only difference.
+
+### Pins in drafts (October 24)
+
+The register-only drafts were mostly pinned, and pins in a draft are added
+while other differences remain; they outlive their reason. `unpin.py --drafts`
+removes them: all at once, then one hint at a time, then a pin together with
+the barriers that name only its variable, keeping each removal that does not
+lower the fuzzy score.
+
+* Over the 267 pinned drafts it matched 9 functions: sub_08097E38 and
+  sub_080BAB80 with no pins at all, sub_081AD3E8 (28 bytes off) likewise,
+  and sub_080AA688, sub_08138778 (118 bytes off), sub_0820DC18, sub_082343B8,
+  sub_0802EA90 (96.2%) and sub_081B1B90 (95.7%) with some pins left. 52 more
+  drafts improved (sub_081D1908 44.5% to 79.8%, sub_081D7934 90.2% to 98.0%).
+* sub_082081F4 is sub_0820DC18 for another enemy. Once the second matched,
+  its spelling of the random-index read plus the same pin removal matched the
+  first. Drafts with a matched sibling are worth a manual diff.
+* The objective matters. The first sweep ranked by differing bytes, which
+  count a one-instruction shift as a mismatch to the end; it kept removals
+  that lowered the count while the fuzzy score fell in 75 of 108 drafts.
+  Those rewrites were dropped; the tool ranks by (fuzzy, bytes).
+* regdiag (and step, whyreg, rasolve) now resolve `#define Nice_Name
+  sub_XXXXXXXX` aliases and, with --nonmatching, analyze the draft's function
+  rather than a multi-function unit's first one.

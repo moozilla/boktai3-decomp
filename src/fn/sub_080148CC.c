@@ -54,7 +54,7 @@ struct Manager *ParticleManager_Create(void *, u32);
 s32 Mod(s32, s32);
 void sub_08217E40(void *, s32);
 #ifdef NONMATCHING
-// fuzzy: 73.8%
+// fuzzy: 81.6%
 // Loop pointer lifetimes, stack allocation, and some inline arithmetic still differ.
 static inline s32 Random(u16 *table, u32 *rng)
 {
@@ -78,7 +78,6 @@ static inline s32 FixedMultiply(s32 a, s32 b)
 }
 static inline void Direction(struct Vec *out, s32 angle, s32 speed)
 {
-    asm("" : "+r"(out));
     out->x = FixedMultiply(gUnk_086149C4[(angle + 64) & 255], speed);
     out->y = 0;
     out->z = FixedMultiply(gUnk_086149C4[angle & 255], speed);
@@ -89,8 +88,8 @@ s32 ParticleGroup_SpawnRadial(s32 count, s32 options, struct Vec *position, s32 
 {
     struct Manager *m = gUnk_02000060;
     struct Group *g;
-    register struct Group *pool asm("sl");
-    register u32 *rng asm("r8");
+    struct Group *pool;
+    u32 *rng;
     s32 priority, j, halfRange, palette, angleOffset;
     s32 i;
     u8 *resource;
@@ -100,7 +99,6 @@ s32 ParticleGroup_SpawnRadial(s32 count, s32 options, struct Vec *position, s32 
             return -1;
     }
     priority = options >> 8;
-    asm("" : "+m"(options));
     options &= 255;
     if (count > 8)
         count = 8;

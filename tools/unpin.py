@@ -209,6 +209,25 @@ def depin_draft(p, write):
                     break
             else:
                 i += 1
+        # 3. a pin together with the barriers that name only its variable (a pin alone,
+        # with its barrier left, still keeps the value in some register there)
+        for var in sorted({re.findall(r"\w+", h.group(1))[-1] for h in HINT.finditer(cur) if h.group(1)}):
+            if best == MATCH:
+                break
+            group = [h for m in DRAFT.finditer(cur) for h in HINT.finditer(cur, m.start(), m.end())
+                     if (h.group(1) and re.findall(r"\w+", h.group(1))[-1] == var) or
+                     (not h.group(1) and set(re.findall(r'"\+?=?r"\s*\(\s*(\w+)\s*\)', h.group(0))) == {var})]
+            if len(group) < 2:
+                continue
+            cand = cur
+            for h in reversed(group):
+                cand = cand[:h.start()] + remove_hint(h) + cand[h.end():]
+            dd, mm = check_draft(p, cand)
+            tried += 1
+            if dd <= cur_score:
+                cur, cur_score = cand, dd
+                if dd < best:
+                    best, best_text, matched = dd, cand, mm
     if write and best < base:
         p.write_text(best_text)
     left = sum(len(HINT.findall(m.group(0))) for m in DRAFT.finditer(best_text))

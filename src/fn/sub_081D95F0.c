@@ -2,7 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
-// fuzzy: 88.3%
+// fuzzy: 88.8%
 // Remaining differences: register lifetimes, flag branches and collision-field copies.
 
 #include "contact_swarm.h"
@@ -31,7 +31,7 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
     sprite->frame = *command >> 6;
     {
         u32 input = state->flags;
-        register u32 first asm("r1");
+        u32 first;
         u32 maskBit = 1;
         bit = maskBit;
         first = bit;

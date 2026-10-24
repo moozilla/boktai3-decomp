@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 97.7%
+// fuzzy: 98.1%
 // fix.py best version (reprinted C)
 // confidence=low: provisional role inferred from state transitions and player-motion calls
 
@@ -241,14 +241,14 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
     }
     {
         register u32 offset asm("r1") = 0x164;
-        register u32 *state asm("r0");
+        u32 *state;
         state = (u32 *)(((u8 *)p) + offset);
         switch (*state) {
             case 0: {
                 u32 entered;
                 register void *motion asm("r6");
                 {
-                    register u8 *address asm("r0") = &p->enter;
+                    u8 *address = &p->enter;
                     entered = *address;
                     enter = address;
                 }
@@ -277,7 +277,7 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
                 u32 entered;
                 register void *motion asm("r6");
                 {
-                    register u8 *address asm("r0") = &p->enter;
+                    u8 *address = &p->enter;
                     entered = *address;
                     enter = address;
                 }
@@ -293,7 +293,7 @@ void ActorStatus_UpdateGuardedApproach(u8 *boss, struct ActorStatusPart *part)
                     RequestBehavior(p, 18);
                 } else if (MotionEnded(p)) {
                     {
-                        register u32 next asm("r1") = 2;
+                        u32 next = 2;
                         p->state = next;
                     }
                     p->timer = 0;
