@@ -57,6 +57,8 @@ CS = capstone.Cs(capstone.CS_ARCH_ARM, capstone.CS_MODE_THUMB)
 # ---------------------------------------------------------------- compile
 
 CACHE = os.path.join(ROOT, "build", "scope", "cache")
+# SCOPE_RUN=NAME keeps a worker's per-function traces apart from another worker on the same function
+WORK = os.path.join(ROOT, "build", "scope", os.environ.get("SCOPE_RUN", ""))
 CLANG = "/Library/Developer/CommandLineTools/usr/bin/clang"
 if sys.platform == "darwin" and "CPP" not in os.environ and os.path.exists(CLANG):
     build.CPP = [CLANG, "-E"]  # same output as `cc -E`, without the xcrun shim
@@ -99,7 +101,7 @@ def inventory():
 
 
 def workdir(func):
-    d = os.path.join(ROOT, "build", "scope", func)
+    d = os.path.join(WORK, func)
     os.makedirs(d, exist_ok=True)
     return d
 
@@ -108,10 +110,9 @@ def nonmatching_func(src):
     """The function a draft file is about: the first definition inside #ifdef NONMATCHING."""
     text = open(os.path.join(ROOT, src)).read()
     m = re.search(r"#ifdef NONMATCHING(.*?)#else", text, re.S)
-    if not m:
-        return None
-    defs = re.findall(r"^[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\)\s*\{", m.group(1), re.M)
-    defs = [d for d in defs if not re.search(r"\binline\b.*\b" + d + r"\b", m.group(1))]
+    body = m.group(1) if m else text  # a matched file: its last non-inline, non-static definition
+    defs = re.findall(r"^[A-Za-z_][\w \*]*?\b(\w+)\s*\([^;{]*\)\s*\{", body, re.M)
+    defs = [d for d in defs if not re.search(r"\b(inline|static)\b.*\b" + d + r"\b", body)]
     return defs[-1] if defs else None
 
 
@@ -124,6 +125,8 @@ def rom_name(src, func):
     m = re.search(r"#ifdef NONMATCHING.*?#else(.*?)#endif", text, re.S)
     names = re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', m.group(1) if m else "")
     hit = next((n for n in names if n in addr), None)
+    for alias in re.findall(r"^#define\s+" + re.escape(func) + r"\s+(\w+)\s*$", text, re.M):
+        hit = hit or (alias if alias in addr else None)  # `#define Name sub_ADDR` in a matched file
     if hit is None and re.fullmatch(r"sub_[0-9A-Fa-f]{8}", func):  # an address name renamed since
         hit = next((n for n, a in addr.items() if a == int(func[4:], 16)), None)
     return hit or func
@@ -1138,7 +1141,9 @@ def flip_levers(nm, lo, lo_rec, hi, hi_rec, wd=None):
         if 0 < m < llive:
             out.append(f"{nm(lo)} living {m // ld} insns or fewer instead of {llive // ld}"
                        + (" (flow's count; it is doubled as a constant register)" if ld == 2 else "")
-                       + (", or the same life if it were not a constant (killing REG_EQUIV)" if ld == 2
+                       + (", or the same life if it were not a constant (killing REG_EQUIV: in C, give"
+                          " its variable a second, non-constant value after its last use, e.g. reuse it"
+                          " for the next value the ROM keeps in the same register; fact 20)" if ld == 2
                           and lb * lrefs * 10000 // (llive // 2) > hpri else ""))
     hb = hrefs.bit_length() - 1
     if hb:
@@ -1371,7 +1376,7 @@ def cmd_pins(src, func, env):
     """Phase 3 helper: remove each concession (register pin or empty asm barrier) in turn and report the
     cost, then greedily remove every one that does not add differences, and write the result."""
     def run(text, tag):
-        path = os.path.join(ROOT, "build", "scope", "drafts", ".pins", f"{func}_{tag}.c")
+        path = os.path.join(ROOT, "build", "scope", "drafts", ".pins", os.environ.get("SCOPE_RUN", ""), f"{func}_{tag}.c")
         os.makedirs(os.path.dirname(path), exist_ok=True)
         open(path, "w").write(text)
         try:
@@ -1657,7 +1662,7 @@ def cmd_why(src, func, uid, env):
 
 
 def last_func():
-    p = os.path.join(ROOT, "build", "scope", "LAST")
+    p = os.path.join(WORK, "LAST")
     return open(p).read().strip() if os.path.exists(p) else None
 
 
@@ -1695,8 +1700,8 @@ def main():
             rest = rest[:-1]
         if not func:
             sys.exit(f"name the function: scope.py {rest[0]} ... FUNC")
-        os.makedirs(os.path.join(ROOT, "build", "scope"), exist_ok=True)
-        open(os.path.join(ROOT, "build", "scope", "LAST"), "w").write(func)
+        os.makedirs(WORK, exist_ok=True)
+        open(os.path.join(WORK, "LAST"), "w").write(func)
         compile_draft(src, func, env)
         if rest[0] == "insn":
             cmd_insn(int(rest[1]), func)
@@ -1721,8 +1726,8 @@ def main():
     func = rest[0] if rest else nonmatching_func(src)
     if not func:
         sys.exit("name the function: scope.py FILE.c FUNC")
-    os.makedirs(os.path.join(ROOT, "build", "scope"), exist_ok=True)
-    open(os.path.join(ROOT, "build", "scope", "LAST"), "w").write(func)
+    os.makedirs(WORK, exist_ok=True)
+    open(os.path.join(WORK, "LAST"), "w").write(func)
     if why_uid == -1:
         return cmd_why_all(src, func, env)
     if why_uid is not None:

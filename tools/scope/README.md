@@ -481,6 +481,16 @@ Each was read from the compiler source and confirmed on a live draft.
    a variable (`s32 offset = y % 32 + 112;`) is a boundary fold cannot see
    through. Keep statement order as the ROM's evaluation order when you split.
 
+20. **A variable set twice is not a constant register.** update_equiv_regs
+   (local-alloc.c) marks a pseudo REG_EQUIV only if every set stores the
+   same invariant; then its priority is halved (fact 10). The ROM's
+   `table = gUnk_0203B400` often wins a register the C draft loses to a
+   mask constant: the original reused the variable. In
+   Hresvelgr_SetRandomTravelTarget `u32 t = (u32)gUnk_0203B400; ... t = base
+   + offset; t &= 255;` (the angle, which the ROM keeps in the same r4)
+   matches with no pin. `why` points here when killing REG_EQUIV would flip
+   the order.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
