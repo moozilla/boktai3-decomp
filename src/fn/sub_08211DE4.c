@@ -1,14 +1,14 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining: switch tail sharing, address derivation of the case 5 and category<=5 blocks.
 extern u8 *gUnk_030042E4;
 void VariantSprite_SelectAnimation(void *, u32);
 s32 ForgingBook_IsWeaponDiscovered(u32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void PlayerAttackEffect_SetEmissionState(u32);
+struct ForgingBookPreviewFrame {
+    u16 animationId;
+};
 struct FbPreview {
     u16 pad[12];
     u16 a, b, c;
@@ -45,29 +45,30 @@ s32 ForgingBook_RefreshCategoryPreview(u8 *p)
             break;
 
         case 5: {
-            s32 w = ForgingBook_IsWeaponDiscovered(0x30);
-            if (w) {
-                *((u16 *)(p + 0xaea)) = 0x1b6;
+            s32 discovered = ForgingBook_IsWeaponDiscovered(0x30);
+            if (discovered) {
+                ((struct ForgingBookPreviewFrame *)(p + 0xaea))->animationId = 0x1b6;
             } else {
-                u8 *r4 = p + 0xae8;
-                u16 *r5 = (u16 *)(p + 0xaea);
-                void *a = p + 0xa88;
-                void *b = p + 0xa68;
-                *r4 = 3;
+                u8 *frameOffset = p + 0xae8;
+                u16 *baseFrame;
+                void *animation;
+                void *keyframes;
+                *frameOffset = 3;
                 *((u8 *)(p + 0xae9)) = 1;
-                *r5 = w;
-                Anim_LoadKeyframe(a, b, *r4, 2);
-                Anim_SetKeyframes(a, b, (u16)((*r5) + (*r4)), 2, 4);
-                *((s32 *)(p + 0x20)) = w;
+                baseFrame = (u16 *)(p + 0xaea);
+                *baseFrame = discovered;
+                animation = p + 0xa88;
+                keyframes = p + 0xa68;
+                Anim_LoadKeyframe(animation, keyframes, *frameOffset, 2);
+                Anim_SetKeyframes(animation, keyframes, (u16)((*baseFrame) + (*frameOffset)), 2, 4);
+                *((s32 *)(p + 0x20)) = discovered;
                 return 0;
             }
             break;
         }
 
-        case 6: {
-            u16 *d2 = (u16 *)(p + 0xAE4);
-            d2[3] = 0x1bc;
-        }
+        case 6:
+            ((struct ForgingBookPreviewFrame *)(p + 0xaea))->animationId = 0x1bc;
             *((u8 *)(p + 0xbe5)) = 1;
             break;
 
@@ -88,52 +89,53 @@ s32 ForgingBook_RefreshCategoryPreview(u8 *p)
     }
 
     {
-        s16 *cat = (s16 *)(p + 0xb60);
-        if ((*cat) <= 5) {
-            u8 *r4 = p + 0xae8;
-            void *a = p + 0xa88;
-            void *b = p + 0xa68;
-            u16 *r5 = (u16 *)(p + 0xaea);
-            *r4 = 3;
+        s16 *category = (s16 *)(p + 0xb60);
+        if ((*category) <= 5) {
+            u8 *frameOffset = p + 0xae8;
+            void *animation;
+            void *keyframes;
+            u16 *baseFrame;
+            *frameOffset = 3;
             *((u8 *)(p + 0xae9)) = 1;
-            Anim_LoadKeyframe(a, b, (u16)((*r5) + (*r4)), 2);
-            Anim_SetKeyframes(a, b, (u16)((*r5) + (*r4)), 2, 4);
-            if ((*cat) <= 4) {
+            animation = p + 0xa88;
+            keyframes = p + 0xa68;
+            baseFrame = (u16 *)(p + 0xaea);
+            Anim_LoadKeyframe(animation, keyframes, (u16)((*baseFrame) + (*frameOffset)), 2);
+            Anim_SetKeyframes(animation, keyframes, (u16)((*baseFrame) + (*frameOffset)), 2, 4);
+            if ((*category) <= 4) {
                 PlayerAttackEffect_SetEmissionState(2);
                 PlayerAttackEffect_SetEmissionState(1);
-                if ((*cat) == 0)
+                if ((*category) == 0)
                     PlayerAttackEffect_SetEmissionState(3);
-                if ((*cat) == 4)
+                if ((*category) == 4)
                     PlayerAttackEffect_SetEmissionState(2);
             } else {
                 struct FbPreview *src = (struct FbPreview *)(gUnk_030042E4 + 0x6a0);
-                *((u16 *)(p + 0xaf6)) = src->a;
-                {
-                    u16 *d1 = (u16 *)(p + 0xAF6);
-                    d1[1] = src->b;
-                }
-                *((u16 *)(p + 0xb06)) = src->c;
+                u16 value = src->a;
+                *((u16 *)(p + 0xaf6)) = value;
+                value = src->b;
+                *((u16 *)(p + 0xaf8)) = value;
+                value = src->c;
+                *((u16 *)(p + 0xb06)) = value;
             }
         } else {
             *((u8 *)(p + 0xae8)) = 0;
-            if ((*cat) == 8)
+            if ((*category) == 8)
                 *((u8 *)(p + 0xae9)) = 0;
             else
                 *((u8 *)(p + 0xae9)) = 1;
             {
-                void *a = p + 0xa88;
-                void *b = p + 0xa68;
-                u16 *r5 = (u16 *)(p + 0xaea);
-                u8 *r4 = p + 0xbe5;
-                Anim_LoadKeyframe(a, b, *r5, *r4);
-                Anim_SetKeyframes(a, b, *r5, *r4, 4);
+                void *animation = p + 0xa88;
+                void *keyframes = p + 0xa68;
+                u16 *baseFrame = (u16 *)(p + 0xaea);
+                u8 *emissionMode;
+                u16 frame = *baseFrame;
+                emissionMode = p + 0xbe5;
+                Anim_LoadKeyframe(animation, keyframes, frame, *emissionMode);
+                Anim_SetKeyframes(animation, keyframes, *baseFrame, *emissionMode, 4);
             }
         }
     }
     *((s32 *)(p + 0x20)) = 0;
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", ForgingBook_RefreshCategoryPreview);
-#endif
