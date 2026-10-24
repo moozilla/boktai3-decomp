@@ -163,7 +163,7 @@ address,isa,evidence,replacement_end
 08083F5C,thumb,Independent terrain response function with own push and pop-bx following collision latch helper; full 232-byte reviewed extent,08084044
 08084280,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08084284
 0808AED8,thumb,Independent random pattern selector (own push/pop-bx and literal pool) left as incbin by gbadisasm; exact standalone C,0808AF38
-0808B264,thumb,"Vorn-style actor reset: copies context frame 0x64A to 0x648, sets behavior 15 and restarts the saved route; raw span before Vorn_ParseField624_0808B320; retained assembly",
+0808B264,thumb,"Vorn-style actor reset: copies context frame 0x64A to 0x648, sets behavior 15 and restarts the saved route; raw span before Vorn_ParseField624_0808B320; exact 188-byte C body",0808B320
 0808EB98,thumb,Slime: consume the prepared flag (replay profile animation 14) then pick the next move (roll flag or walk choice) at random; raw span before Slime_ConvergeReactionMotion,0808EC7C
 0808EC7C,thumb,Empty bx lr stub at the end of the raw 0808EB98-0808EC80 span,0808EC80
 0808F9E4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0808F9E8
