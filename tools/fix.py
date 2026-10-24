@@ -186,6 +186,11 @@ def decision(path, func):
     return (st, e), keys
 
 
+# spelling families not tried unless asked for (--allow): Ben prefers C without
+# `do { } while (0)` loop-weight wrappers
+AVOID = {"sp_loop_weight"}
+
+
 def candidates(d, seeds):
     """(family, description, fn, helpers) one edit away, over the function and its helpers."""
     targets = [(None, d.fn)] + list(d.helpers.items())
@@ -227,6 +232,7 @@ def one_round(d, keys, show, try_all, seeds, log, deadline=None):
     results, seen, compiles = [], set(), 0
     cands = list(candidates(d, seeds))
     cands.sort(key=lambda c: (c[0] not in prefer, prefer.index(c[0]) if c[0] in prefer else 0))
+    cands = [c for c in cands if c[0] not in AVOID]
     for fam, desc, fn, helpers in cands:
         if deadline and time.time() > deadline:
             break
@@ -412,7 +418,10 @@ def main():
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--beam", type=int, default=4)
     ap.add_argument("--budget", type=float, help="seconds; no new state is expanded after it")
+    ap.add_argument("--allow", default="", help="comma-separated families to try although avoided by default "
+                                                 f"({', '.join(sorted(AVOID))})")
     a = ap.parse_args()
+    AVOID.difference_update(a.allow.split(","))
     src = os.path.abspath(a.src)
     asm = re.search(r'INCLUDE_ASM\("asm/nonmatching", (\w+)\)', open(a.src).read())
     func = a.func or (asm.group(1) if a.nonmatching and asm else None) or re.findall(r"^\w[\w \*]*?\b(\w+)\s*\([^;]*?\)\s*\{", open(src).read(), re.M)[-1]
