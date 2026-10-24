@@ -2,8 +2,6 @@
 #include "global.h"
 // confidence=low: computes a target-relative endpoint before accelerating the turn.
 
-#ifdef NONMATCHING
-// fuzzy: 95.5%
 struct Orbit {
     u8 pad[0x134];
     u16 endX, endY, endZ;
@@ -22,7 +20,7 @@ void Sword_BeginTargetOrbit(u8 *p)
 {
     u8 *owner = *(u8 **)(p + 0x160);
     u8 *target = *(u8 **)(owner + 0x60);
-    s32 direction, angle;
+    s32 angle;
     struct Orbit *o = (void *)p;
     angle = Math_Atan2(*(s16 *)(target + 0x30) - *(s16 *)(p + 0x1c),
                        *(s16 *)(target + 0x34) - *(s16 *)(p + 0x20));
@@ -34,15 +32,25 @@ void Sword_BeginTargetOrbit(u8 *p)
     }
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     {
-        s32 bits = *(u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
-        register s32 mask asm("r2") = 1;
-        asm("" : "+r"(mask));
-        bits &= mask;
-        direction = -1;
-        if (bits)
-            direction = 1;
-        p[0x18a] = direction;
-        p[0x18b] = mask;
+        register s32 turn asm("r1");
+        s32 choice;
+        u32 one;
+        {
+            u32 offset = gUnk_03005308 * 2;
+            register const u16 *table asm("r3") = gUnk_0203B400;
+            choice = *(const u16 *)(offset + (u32)table);
+        }
+        one = 1;
+        choice &= one;
+        {
+            register s32 negative asm("r3") = -1;
+            asm("" : "+r"(negative));
+            turn = negative;
+        }
+        if (choice)
+            turn = 1;
+        p[0x18a] = turn;
+        p[0x18b] = one;
     }
 
     o->startX = *(u16 *)(p + 0x1c);
@@ -56,7 +64,3 @@ void Sword_BeginTargetOrbit(u8 *p)
     o->dz = o->endZ - o->startZ;
     *(void (**)(void))(p + 0x178) = ActorPhase_AccelerateTurn;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Sword_BeginTargetOrbit);
-#endif
