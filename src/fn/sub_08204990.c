@@ -70,7 +70,7 @@ void EnemyD459_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
         target->damageType = source->type;
         target->reaction = source->reaction;
         if (source->flags & 0x40) {
-            register void *hud asm("r8");
+            void *hud;
             s32 health;
             s32 a, b, direction;
             target->reaction = 0x26;
@@ -121,7 +121,7 @@ void EnemyD459_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
                 pos->y += (u8)table[random];
                 random = (random + 1) & 0x3ff;
                 {
-                    register u32 *cursor asm("r7") = index;
+                    u32 *cursor = index;
                     *cursor = random;
                 }
                 {

@@ -9,7 +9,6 @@
 static inline u32 Offset(u32 base, u32 off)
 {
     u32 sum = base + off;
-    asm("" : "+r"(sum));
     return sum;
 }
 #define PLACE0(p, n, pos)                                                                          \

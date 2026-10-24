@@ -53,7 +53,6 @@ void PauseMenu_BeginVitalRatioExchange(u8 *s, u32 mode)
             register u8 *o asm("r0");
             o = OWNER(s);
             off = 0x424;
-            asm("" : "+r"(off));
             w = H(o, off);
             ((struct RatioHud *)s)->prevA = w;
             o = OWNER(s);
@@ -71,11 +70,9 @@ void PauseMenu_BeginVitalRatioExchange(u8 *s, u32 mode)
             ((struct RatioHud *)s)->nextB = 1;
         s[0x4861] = 0;
     } else {
-        register u32 zero asm("r3");
+        u32 zero;
         u8 *q = &s[0x487f];
-        asm("" : "+r"(q));
         zero = 0;
-        asm("" : "+r"(zero));
         *q = 2;
         ((struct RatioHud *)s)->prevA = H(OWNER(s), 0x424);
         ((struct RatioHud *)s)->prevB = H(OWNER(s), 0x428);

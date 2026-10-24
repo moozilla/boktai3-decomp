@@ -7,7 +7,6 @@ static inline u32 TestResponse(struct SceneActorRegistryResetView *p)
     register u32 *field asm("r0");
     asm("" : "+r"(off));
     field = (void *)((u8 *)p + off);
-    asm("" : "+r"(field));
     return *field & 0x40000;
 }
 s32 SceneActorPlacement_BeginDefaultResponse(struct SceneActorRegistryResetView *p)
@@ -23,12 +22,10 @@ s32 SceneActorPlacement_BeginDefaultResponse(struct SceneActorRegistryResetView 
     else
         Sound_PlaySong(0x112);
     if (TestResponse(p)) {
-        register u32 mask asm("r0") = 32;
-        register u32 off asm("r3") = 0x2D4;
-        register u16 *flags asm("r2");
-        asm("" : "+r"(off));
+        u32 mask = 32;
+        u32 off = 0x2D4;
+        u16 *flags;
         flags = (void *)((u8 *)p + off);
-        asm("" : "+r"(flags), "+r"(mask));
         mask |= *flags;
         *flags = mask;
     }
@@ -50,7 +47,6 @@ s32 SceneActorPlacement_BeginDefaultResponse(struct SceneActorRegistryResetView 
             register u32 halfOffset asm("r2") = 0x2C8;
             asm("" : "+r"(halfOffset));
             field = (u16 *)((u8 *)p + halfOffset);
-            asm("" : "+r"(field));
             byteZero = 0;
             *field = zero;
         }
@@ -61,20 +57,17 @@ s32 SceneActorPlacement_BeginDefaultResponse(struct SceneActorRegistryResetView 
         }
         p->word104 = zero;
         {
-            register u32 state asm("r1") = 3;
+            u32 state = 3;
             u32 stateOffset2;
-            register u32 phaseOffset asm("r1");
-            asm("" : "+r"(state));
+            u32 phaseOffset;
             stateOffset = 0x2A8;
             *((u8 *)p + stateOffset) = state;
             asm("" : "+r"(stateOffset));
             phaseOffset = 0x2A9;
-            asm("" : "+r"(phaseOffset));
             *((u8 *)p + phaseOffset) = byteZero;
             stateOffset += 2;
             {
                 register u8 *field asm("r0") = (u8 *)p + stateOffset;
-                asm("" : "+r"(field));
                 *field = byteZero;
             }
             offset = 0x2AC;
@@ -82,7 +75,6 @@ s32 SceneActorPlacement_BeginDefaultResponse(struct SceneActorRegistryResetView 
             phaseOffset += 8;
             {
                 register u8 *field asm("r0") = (u8 *)p + phaseOffset;
-                asm("" : "+r"(field));
                 *field = one;
             }
         }

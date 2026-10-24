@@ -206,9 +206,7 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
         p->facing = Script_GetValue();
         {
             u32 facing = (u16)(p->facing = (p->facing - 1) / 2);
-            asm("" : "+r"(facing));
             if (facing <= 3) {
-                asm("" : "+r"(facing));
                 switch (facing) {
                     case 0:
                     case 1:
@@ -242,20 +240,16 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
         asm("" : "+r"(off));
         if (*(s16 *)((u8 *)p + off) == 0) {
             off += 0x24;
-            asm("" : "+r"(off));
             *(u16 *)((u8 *)p + off) = 0x22;
             p->startSequence = 0x23;
             off += 4;
-            asm("" : "+r"(off));
             *(u16 *)((u8 *)p + off) = 0x24;
             p->endSequence = 0x25;
         } else {
             off = 0x146;
-            asm("" : "+r"(off));
             *(u16 *)((u8 *)p + off) = 0x1e;
             p->startSequence = 0x1f;
             off += 4;
-            asm("" : "+r"(off));
             *(u16 *)((u8 *)p + off) = 0x20;
             p->endSequence = 0x21;
         }
@@ -263,18 +257,14 @@ s32 Ooze_InitializeFromScript(struct OozeInit *p, void *parent)
     }
     Ooze_InitAttackCollider(p);
     {
-        register u32 d asm("r0");
-        asm("" : "=r"(d));
+        u32 d;
         if (p->delayScript)
             Ooze_ReadScriptValueList(p);
-        asm("" ::"r"(d));
     }
     {
-        register u32 d0 asm("r0");
-        register s32 r asm("r1");
-        asm volatile("" : "=r"(d0));
+        u32 d0;
+        s32 r;
         r = p->solid;
-        asm volatile("" ::"r"(d0));
         if (r) {
             CopyPosition(&position, (struct SceneVec *)((u8 *)p + 0x3c));
             if (p->variant == 1) {

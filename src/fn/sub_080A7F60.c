@@ -130,14 +130,13 @@ static inline u8 Turned(s32 angle)
 void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
 {
     u32 zero;
-    register s32 speed asm("r5");
+    s32 speed;
     s32 amplitude, turn, rate;
     s32 dx, dz;
     if (Take(&actor->field2B1)) {
         Control(actor, *(void **)((u8 *)actor + 0x228), 1);
         {
             u32 m = 0x100000;
-            asm("" : "+r"(m));
             *(u32 *)((u8 *)actor + 0x2D0) |= m;
         }
     }
@@ -145,10 +144,9 @@ void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
         Sound_PlaySong(0x3D7);
     {
         u8 *dst = (u8 *)actor + 0x2EC;
-        asm("" : "+r"(dst));
         zero = 0;
         {
-            register u32 *zp asm("r0") = &zero;
+            u32 *zp = &zero;
             asm("" : "+r"(zp));
             CpuSet(zp, dst, 0x05000002);
         }

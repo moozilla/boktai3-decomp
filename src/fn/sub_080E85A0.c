@@ -15,7 +15,7 @@ static inline u8 HasMode(u8 *p)
 u8 Mimic_StartHitReaction(struct SceneActorRegistryResetView *actor)
 {
     u8 *ctx = actor->context;
-    register u32 off asm("r3");
+    u32 off;
     if (actor->reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
     else
@@ -23,57 +23,45 @@ u8 Mimic_StartHitReaction(struct SceneActorRegistryResetView *actor)
     off = 0x2DC;
     asm("" : "+r"(off));
     if (*(u32 *)((u8 *)actor + off) & 0xC0000) {
-        register u32 o4 asm("r4") = 0x230;
+        u32 o4 = 0x230;
         register u32 kind asm("r1");
         register u32 control asm("r2");
-        register u32 one asm("r5");
+        u32 one;
         register u32 zero asm("r3");
-        register u32 z4 asm("r4");
+        u32 z4;
         register u8 *addr asm("r0");
-        asm("" : "+r"(o4));
         control = *(u32 *)((u8 *)actor + o4);
         kind = 0x12;
-        asm("" : "+r"(kind));
         off -= 0x2A;
-        asm("" : "+r"(off));
         addr = (u8 *)actor + off;
         zero = 0;
         one = 1;
-        asm("" : "+r"(zero), "+r"(one));
         *addr = one;
         o4 += 0x80;
-        asm("" : "+r"(o4));
         addr = (u8 *)actor + o4;
         *addr = zero;
         o4 += 5;
-        asm("" : "+r"(o4));
         addr = (u8 *)actor + o4;
         *addr = kind;
         {
-            register u32 ot asm("r1") = 0x21C;
-            register u32 *w asm("r0");
-            asm("" : "+r"(ot));
+            u32 ot = 0x21C;
+            u32 *w;
             w = (u32 *)((u8 *)actor + ot);
             *w = control;
         }
         {
-            register u32 o asm("r2") = 0x2C8;
-            register u16 *h asm("r0");
-            asm("" : "+r"(o));
+            u32 o = 0x2C8;
+            u16 *h;
             h = (u16 *)((u8 *)actor + o);
             z4 = 0;
-            asm("" : "+r"(z4));
             *h = zero;
         }
         {
-            register u32 o asm("r0") = 0x114;
-            register u32 *fl asm("r2");
-            register u32 m asm("r1");
-            asm("" : "+r"(o));
+            u32 o = 0x114;
+            u32 *fl;
+            u32 m;
             fl = (u32 *)((u8 *)actor + o);
-            asm("" : "+r"(fl));
             m = ~1;
-            asm("" : "+r"(m));
             *fl = m & *fl;
         }
         {
@@ -84,18 +72,15 @@ u8 Mimic_StartHitReaction(struct SceneActorRegistryResetView *actor)
             *w = zero;
         }
         {
-            register u32 three asm("r1") = 3;
-            register u32 o asm("r2") = 0x2A8;
+            u32 three = 3;
+            u32 o = 0x2A8;
             register u32 o1 asm("r1");
-            asm("" : "+r"(three), "+r"(o));
             addr = (u8 *)actor + o;
             *addr = three;
             o1 = 0x2A9;
-            asm("" : "+r"(o1));
             addr = (u8 *)actor + o1;
             *addr = z4;
             o += 2;
-            asm("" : "+r"(o));
             addr = (u8 *)actor + o;
             *addr = z4;
             {
@@ -106,15 +91,14 @@ u8 Mimic_StartHitReaction(struct SceneActorRegistryResetView *actor)
                 *w = zero;
             }
             o1 += 8;
-            asm("" : "+r"(o1));
             addr = (u8 *)actor + o1;
             *addr = one;
         }
         return 1;
     }
     {
-        register u32 mask asm("r0");
-        register u16 *flags asm("r2");
+        u32 mask;
+        u16 *flags;
         u32 value;
         off = 0xB5 << 2;
         asm("" : "+r"(off));
@@ -137,19 +121,18 @@ u8 Mimic_StartHitReaction(struct SceneActorRegistryResetView *actor)
             {
                 register u32 o asm("r4") = 0x3D0;
                 register u8 *c asm("r0");
-                register u8 *mode asm("r1");
-                register u32 k asm("r0");
-                register u32 mask asm("r0");
-                register u16 *mp asm("r1");
+                u8 *mode;
+                u32 k;
+                u32 mask;
+                u16 *mp;
                 asm("" : "+r"(o));
                 c = (u8 *)actor + o;
                 mode = *(u8 **)c;
                 k = 0x65C;
-                asm("" : "+r"(k));
                 mp = (u16 *)(mode + k);
                 mask = ~1;
                 {
-                    register u32 value asm("r2");
+                    u32 value;
                     value = *mp;
                     mask &= value;
                     *mp = mask;
@@ -171,21 +154,19 @@ u8 Mimic_StartHitReaction(struct SceneActorRegistryResetView *actor)
                 *flags = mask | *flags;
             }
             {
-                register u32 o asm("r1") = 0x3D0;
-                register u8 *c asm("r0");
-                register u8 *mode asm("r1");
-                register u32 k asm("r2");
-                register u32 mask asm("r0");
-                register u16 *mp asm("r1");
-                asm("" : "+r"(o));
+                u32 o = 0x3D0;
+                u8 *c;
+                u8 *mode;
+                u32 k;
+                u32 mask;
+                u16 *mp;
                 c = (u8 *)actor + o;
                 mode = *(u8 **)c;
                 k = 0x65C;
-                asm("" : "+r"(k));
                 mp = (u16 *)(mode + k);
                 mask = ~1;
                 {
-                    register u32 value asm("r2");
+                    u32 value;
                     value = *mp;
                     mask &= value;
                     *mp = mask;

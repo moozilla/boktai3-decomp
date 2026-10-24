@@ -81,7 +81,6 @@ s32 Task4E01_UpdateTrailImpact(u8 *p)
         u8 *collider;
         {
             register s32 w asm("r3") = *timer * 4 + 8;
-            asm("" : "+r"(w));
             Projectile_SetCollisionSize(config, w, 0x50);
         }
         collider = p + 0xb8;

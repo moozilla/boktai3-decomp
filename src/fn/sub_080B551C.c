@@ -8,11 +8,10 @@ u8 Skeleton_RerouteToTarget(void *obj)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
-    register struct SceneActorRegistryResetView *alt asm("sl") = obj;
+    struct SceneActorRegistryResetView *alt = obj;
     u8 *group = (u8 *)&actor->group;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
-    asm("" : "+r"(alt));
     Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
     {
         struct ChaseTarget *t = *slot;
@@ -23,14 +22,13 @@ u8 Skeleton_RerouteToTarget(void *obj)
         goto done;
     }
     {
-        register struct ContactPosition *targetPointer asm("sb") = &target;
+        struct ContactPosition *targetPointer = &target;
         s32 x;
-        register s32 z asm("r8");
+        s32 z;
         u8 *data;
         void *route;
         u8 ok;
         s32 result;
-        asm("" : "+r"(targetPointer));
         x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
         z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
         target.x = (x << 8) + 0x80;
@@ -41,7 +39,6 @@ u8 Skeleton_RerouteToTarget(void *obj)
             data = gUnk_030052F4->cells + (cell * 4 + 12);
         {
             u32 h = (*data & 15) << 8;
-            asm("" : "+r"(targetPointer));
             targetPointer->y = h;
         }
         targetPointer->z = (z << 8) + 0x80;

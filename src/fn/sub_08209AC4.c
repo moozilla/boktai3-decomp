@@ -357,8 +357,7 @@ tail:
         Anim_SetDurationScale(&p->sequence, (u16)scale);
     }
     {
-        register u32 *sprite asm("r8") = &p->flags;
-        asm("" : "+r"(sprite));
+        u32 *sprite = &p->flags;
         Fan_Step(p, sprite, &p->sequence);
     }
     p->age++;

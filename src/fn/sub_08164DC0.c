@@ -71,7 +71,6 @@ void Hud_UpdateTransientStatGauge(u8 *p)
                 asm("" : "+r"(t));
                 mk = t;
             }
-            asm("" : "+r"(mk));
             n = 2;
             do {
                 *cell-- = tile | mk;

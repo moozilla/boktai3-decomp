@@ -289,6 +289,8 @@ address,evidence
 0811E5B0,ScriptRecord table: count word 0x1A8 or 0 when absent; raw span before ScriptRecord_FindByteModifier
 0811E644,Modifier table task: count word 0x1FC or 0 when absent; raw span before Modifier_ScaleDefaultStat
 0811FEE0,Hidden tail after ActorCollision_InitBounds
+08121044,Independent push-lr function after sub_08120FF4's literal pool (raw .byte tail)
+08121094,Independent push-lr function after 08121044's literal pool (raw .byte tail)
 0812125C,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 08121454,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 08121B98,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C

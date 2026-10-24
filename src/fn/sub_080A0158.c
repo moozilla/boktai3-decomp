@@ -27,7 +27,7 @@ struct CrowPlacement {
 static inline void StepSequence(void *obj)
 {
     struct SceneActorControlMotionDrawable *owner = obj;
-    register struct DisplaySequenceState *state asm("r4");
+    struct DisplaySequenceState *state;
     const volatile u16 *command;
     u32 duration, flags, bit;
     state = &owner->sequence;

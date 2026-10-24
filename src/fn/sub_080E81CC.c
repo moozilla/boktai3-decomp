@@ -6,7 +6,6 @@ u32 SceneActor_GetDirectionFlags(s32 direction)
     register s32 quadrant asm("r1") = (direction + 16) & 255;
     asm("" : "+r"(quadrant));
     quadrant >>= 6;
-    asm("" : "+r"(quadrant), "+r"(result));
     switch (quadrant) {
         case 0:
         case 2:
@@ -17,6 +16,5 @@ u32 SceneActor_GetDirectionFlags(s32 direction)
             result = 1;
             break;
     }
-    asm("" : "+r"(result));
     return result;
 }

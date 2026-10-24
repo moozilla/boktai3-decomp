@@ -66,12 +66,10 @@ void RouteSpriteActor_TickHopToRandomPoint(struct RouteSpritePool *pool,
     }
     if (actor->moveTimer <= 0) {
         register u32 offset asm("r6") = 0x148;
-        asm("" : "+r"(offset));
         *(struct ContactPosition *)((u32)actor + offset) = actor->sprite.position;
         actor->state = 2;
         {
             register u32 changed asm("r2") = 0x157;
-            asm("" : "+r"(changed));
             *(u8 *)((u32)actor + changed) = 1;
             offset += 0x1E;
             {

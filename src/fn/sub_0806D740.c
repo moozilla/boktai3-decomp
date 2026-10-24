@@ -160,7 +160,6 @@ void RouteSpriteActor_TickWandering(struct RouteSpritePool *pool, struct RouteSp
     struct RouteSpriteActor *self = actor;
     struct DisplaySequenceState *sequence;
     u32 finished;
-    asm("" : "+r"(self));
     sequence = &actor->sequence;
     finished = 0;
     if (actor->entered) {
@@ -183,7 +182,7 @@ void RouteSpriteActor_TickWandering(struct RouteSpritePool *pool, struct RouteSp
             angle = (u8 *)((u32)actor + angleOffset);
             *angle = value;
             {
-                register u32 targetOffset asm("r0") = 0x140;
+                u32 targetOffset = 0x140;
                 asm("" : "+r"(targetOffset));
                 Polar((struct ContactPosition *)((u32)actor + targetOffset), *angle, 0x18);
             }

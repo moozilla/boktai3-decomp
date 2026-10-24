@@ -166,6 +166,13 @@ def wait_for_cloud_setup():
         pid = int(open(pidfile).read())
     except (OSError, ValueError):
         return
+    # A stale file from an earlier session can name a reused pid (even a thread
+    # of a tool that is itself waiting on this build); wait only for the setup.
+    try:
+        if b"cloud_setup" not in open(f"/proc/{pid}/cmdline", "rb").read():
+            return
+    except OSError:
+        pass
     said = False
     while True:
         try:

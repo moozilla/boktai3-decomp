@@ -37,9 +37,7 @@ void SceneActor_EasePlayerHeight(struct SceneActorRegistryResetView *actor)
         register s32 playerY asm("r0") = gUnk_02000580[0]->position.y;
         register s32 target asm("r1");
         s16 *height;
-        asm("" : : "r"(playerY));
         target = playerY + offset;
-        asm("" : : "r"(target));
         height = &actor->position.y;
         *height += Div(target - *height, 10);
     } else {
@@ -47,11 +45,9 @@ void SceneActor_EasePlayerHeight(struct SceneActorRegistryResetView *actor)
         s32 delta;
         delta = ScaleWave(wave);
         {
-            register s32 base asm("r0") = gUnk_02000580[0]->position.y + offset;
-            register s32 sum asm("r1");
-            asm("" : : "r"(base));
+            s32 base = gUnk_02000580[0]->position.y + offset;
+            s32 sum;
             sum = base + delta;
-            asm("" : : "r"(sum));
             delta = sum;
         }
         EaseHeight(&actor->position.y, delta);

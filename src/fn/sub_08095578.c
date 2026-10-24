@@ -79,33 +79,28 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
                 *f &= mask;
             }
             {
-                register u32 mask asm("r1") = 0x80;
+                u32 mask = 0x80;
                 register u32 offset asm("r2") = 0x558;
-                register u32 test asm("r0");
-                register u32 *field asm("r0");
-                asm("" : : "r"(offset));
+                u32 test;
+                u32 *field;
                 field = (u32 *)(p + offset);
-                asm("" : : "r"(field));
                 test = *field & mask;
                 asm volatile("" : : "r"(test) : "memory");
             }
             {
                 u8 *player = gUnk_02000580;
-                register u32 three asm("r3");
-                asm("" : : "r"(player));
+                u32 three;
                 three = 3;
                 player[0x4F6] += 3;
                 {
                     register u32 mask asm("r2") = 0x80;
                     u32 offset = 0x558;
                     u32 *flags;
-                    asm("" : : "r"(mask));
                     flags = (u32 *)(p + offset);
                     *flags |= mask;
                 }
                 {
                     register u8 *field asm("r0") = p + 0x5BB;
-                    asm("" : : "r"(field));
                     *field = three;
                 }
             }

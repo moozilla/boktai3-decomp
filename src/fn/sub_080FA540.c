@@ -54,10 +54,10 @@ void Axe_UpdateCollapsePhase(struct SceneActorRegistryResetView *actor)
     }
     if (actor->field2B0) {
         u16 *flags = &actor->flags2C0;
-        register u32 mask asm("r1") = ~0x1800;
+        u32 mask = ~0x1800;
         u32 zero;
         u8 zero8;
-        register u32 masked asm("r1");
+        u32 masked;
         asm("" : "+r"(mask));
         masked = mask & *flags;
         zero8 = 0;

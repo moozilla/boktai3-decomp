@@ -165,7 +165,6 @@ s32 OrangeSpine_InitializeFromScript(u8 *p, void *parent)
         {
             s16 *q = &H(0x13a);
             s32 v = 300;
-            asm("" : "+r"(v) : "r"(q));
             *q = v;
         }
     }
@@ -237,7 +236,6 @@ s32 OrangeSpine_InitializeFromScript(u8 *p, void *parent)
     AnimData_SelectPaletteBank(p + 0x50, 0x1c1);
     resource = ScriptProc_Start(0x922e, 0x5184);
     slot = (void **)(p + 0x170);
-    asm("" : "+r"(slot));
     *slot = resource;
     dead = H(0x14a);
     sprite = earlySprite;

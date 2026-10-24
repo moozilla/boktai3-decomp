@@ -32,7 +32,7 @@ static inline u32 Step(struct Sprite *sprite, struct Anim *state)
     {
         u32 input = state->flags;
         register u32 first asm("r1");
-        register u32 maskBit asm("r3") = 1;
+        u32 maskBit = 1;
         bit = maskBit;
         asm("" : "+r"(bit));
         first = bit;
@@ -165,11 +165,10 @@ void TwinSpriteEffect_EmitTrail(struct Effect *p)
     if (!Mod(p->frame, p->interval)) {
         struct Sprite *sprite;
         struct Anim *anim;
-        register u32 k asm("r4");
+        u32 k;
         {
             u32 idx = p->next;
             k = 0x5c;
-            asm("" : "+r"(k));
             Anim_SetSequence((void *)(idx * k + (u32)p + 0x84), p->resource, 1, 0, 0);
         }
         {
@@ -195,7 +194,6 @@ void TwinSpriteEffect_EmitTrail(struct Effect *p)
             asm("" ::"r"(d0));
             off = *np * 0x5c;
             asm("" ::"r"(d1));
-            asm("" : "+r"(off));
             b = (u8 *)p + 0x58;
             dest = (void *)(b + off);
             *dest = *(struct Packed *)&p->position;

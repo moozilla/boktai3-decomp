@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 extern u16 gUnk_03005418[];
 s32 __divsi3(s32, s32);
@@ -68,16 +67,14 @@ static inline void ApplyOffset(u16 *field, s32 random, s32 range)
 }
 // confidence=low: projects the fixed world position and adds a growing random shake.
 #define ContactImpactEffect_UpdateShakingPosition sub_081C3B04
-#ifdef NONMATCHING
-// fuzzy: 75.9%
-// Full reconstruction; RNG/table lifetimes, growing range spill, and pointer allocation differ.
 void ContactImpactEffect_UpdateShakingPosition(struct ContactImpactEffect *effect)
 {
     s32 *timer;
     s32 range;
-    register const u16 *table asm("r6");
+    const u16 *table;
     u32 *seed;
-    u32 index, mask;
+    u16 index;
+    u32 mask;
     s32 random;
     Project(&effect->screenX, (struct Vec *)&effect->worldX);
     timer = &effect->shakeTimer;
@@ -85,10 +82,9 @@ void ContactImpactEffect_UpdateShakingPosition(struct ContactImpactEffect *effec
         effect->shakeFlag = 1;
     range = *timer >> 2;
     table = gUnk_0203B400;
-    asm("" : "+r"(table));
     seed = &gUnk_03005308;
     index = *seed + 1;
-    mask = 1023;
+    mask = 0x3FF;
     index &= mask;
     *seed = index;
     random = table[index];
@@ -99,6 +95,3 @@ void ContactImpactEffect_UpdateShakingPosition(struct ContactImpactEffect *effec
     ApplyOffset(&effect->screenY, random, range);
     ++*timer;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081C3B04);
-#endif

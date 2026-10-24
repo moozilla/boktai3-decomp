@@ -141,8 +141,7 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
     if (i >= receiver->counts[gUnk_0200047C->bank])
         return 1;
     do {
-        struct ActorCommand *command =
-            receiver->commands[gUnk_0200047C->bank][i];
+        struct ActorCommand *command = receiver->commands[gUnk_0200047C->bank][i];
         switch (command->command) {
             case 0:
                 if (category == 18) {

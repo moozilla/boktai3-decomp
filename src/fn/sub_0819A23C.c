@@ -38,7 +38,7 @@ static inline u32 CannonBattery_StepAnimation(struct CannonBatteryEffect *e)
     o->frame = *entry >> 6;
     {
         u32 input = a->flags;
-        register u32 left asm("r2") = 1;
+        u32 left = 1;
         u32 mask = 1;
         left &= input;
         if (left != (((*entry & 0x30) >> 4) & mask))
@@ -49,7 +49,7 @@ static inline u32 CannonBattery_StepAnimation(struct CannonBatteryEffect *e)
     {
         register u32 input asm("r0") = a->flags;
         u32 mask = 2;
-        register u32 left asm("r1") = (u8)(mask & input);
+        u32 left = (u8)(mask & input);
         if (left != (((*entry & 0x30) >> 4) & mask))
             o->flags |= 8;
         else

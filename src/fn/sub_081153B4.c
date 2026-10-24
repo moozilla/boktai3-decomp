@@ -68,9 +68,9 @@ void Collectible_StartDeath(struct Col *p)
         }
         state = &p->sequence;
         {
-            register void *rd asm("r1") = p->animData;
-            register u32 ra asm("r2") = a;
-            register u32 rb asm("r3") = b;
+            void *rd = p->animData;
+            u32 ra = a;
+            u32 rb = b;
             asm("" : "+r"(rd), "+r"(ra), "+r"(rb));
             Anim_SetSequence(state, rd, ra, rb, 0);
         }
@@ -191,7 +191,6 @@ void Collectible_StartDeath(struct Col *p)
         register u32 d asm("r0");
         register u32 d1 asm("r1");
         asm("" : "=r"(d));
-        asm("" : "=r"(d1));
         xp = &p->x;
         vxp = &p->vx;
         asm("" ::"r"(d), "r"(d1));

@@ -38,9 +38,8 @@ static inline u32 Actor32(struct SceneActorRegistryResetView *a, u32 m)
 static inline u8 Disabled(struct SceneActorRegistryResetView *a)
 {
     if (a) {
-        register u32 m asm("r1") = 64;
+        u32 m = 64;
         register u32 off asm("r2") = 0x2d4;
-        asm("" : "+r"(off));
         if (F(a, off, u16) & m)
             return 1;
         m = 0x20000;

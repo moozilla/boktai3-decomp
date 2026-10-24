@@ -150,7 +150,7 @@ s32 EnemyParticle_UpdatePool(struct Pool *pool)
                 s->frame = *command >> 6;
                 {
                     u32 input = cursor->anim.flags;
-                    register u32 left asm("r2") = 1;
+                    u32 left = 1;
                     u32 mask = 1;
                     left &= input;
                     if (left != (((*command & 0x30) >> 4) & mask))
@@ -173,7 +173,7 @@ s32 EnemyParticle_UpdatePool(struct Pool *pool)
                 }
                 {
                     u32 elapsed = state->timer + 1;
-                    register u32 mask asm("r5");
+                    u32 mask;
                     register u32 temp asm("r2");
                     register u32 savedDuration asm("r2");
                     state->timer = elapsed;

@@ -79,8 +79,7 @@ static inline void State(struct SceneActorRegistryResetView *actor, u32 behavior
 }
 static inline void SaveInitialPlayer(struct ContactPosition *out, u8 **players)
 {
-    register u8 **source asm("r4") = players;
-    asm("" : : "r"(source));
+    u8 **source = players;
     *out = *(struct ContactPosition *)(*source + 0x30);
 }
 #ifdef NONMATCHING

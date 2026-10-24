@@ -35,7 +35,7 @@ s32 NameEntry_Initialize(u8 *s)
     u8 *str;
     s32 i;
     u32 value;
-    register void *res asm("r6");
+    void *res;
     register u8 *obj asm("r4");
 
     count = 0;

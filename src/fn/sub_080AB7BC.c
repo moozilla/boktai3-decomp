@@ -48,11 +48,9 @@ static inline u8 chk(struct P *p)
                 return TRUE;
             {
                 u32 m2 = 0x20000;
-                register u32 *q asm("r0");
-                asm("" : "+r"(m2));
+                u32 *q;
                 o -= 4;
                 q = (u32 *)((u8 *)p + o);
-                asm("" : "+r"(q));
                 if (tstw(m2, q))
                     return TRUE;
             }
@@ -118,7 +116,6 @@ void TentacleActor_UpdateSegmentColliders(struct P *pp)
             q = (u16 *)(g + 0x30);
             {
                 register u32 gx asm("r1") = H(g, 0x30);
-                asm("" : "+r"(gx));
                 dp[0] = gx - H(a, 0);
             }
             dp[1] = q[1] - H(a, 2);

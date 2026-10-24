@@ -29,7 +29,6 @@ static inline void UpdateSequence(struct TimedEffectActor *p, u32 complete)
             u16 animation;
             u8 *a = &p->animation;
             u8 *st = p->animationState;
-            asm("" : "+r"(a), "+r"(st));
             animation = 0x148;
             asm("" : "+r"(animation));
             SceneActors_StartEightDirectionAnimation(p, a, st, animation, 3, 1, 4);
