@@ -420,7 +420,41 @@ void SceneActors_AddResourceCost(int amount)
     }
 }
 
+// confidence=low: index of the first of the count tracked positions at 0x110 that lies inside
+// the box min..max on x and z, or -1.
+#ifdef NONMATCHING
+// fuzzy: 67.2%
+// The ROM recomputes p + 0x110 + i * 4 on every pass (no loop optimization), which the goto
+// loop reproduces; the remaining difference is allocation: inside needs about 3x its priority
+// (translate.py) to take r4 ahead of count.
+s32 sub_08022624(u8 *p, s32 count, s16 *min, s16 *max)
+{
+    s32 i;
+    i = 0;
+    if (i >= count)
+        goto end;
+loop:
+    {
+        s16 **list = (s16 **)(p + 0x110);
+        s16 *pos = list[i];
+        if (pos) {
+            s32 x = pos[0];
+            u8 inside = 0;
+            if (x >= min[0] && x <= max[0] && pos[2] >= min[2] && pos[2] <= max[2])
+                inside = 1;
+            if (inside)
+                return i;
+        }
+    }
+    i++;
+    if (i < count)
+        goto loop;
+end:
+    return -1;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08022624);
+#endif
 
 INCLUDE_ASM("asm/nonmatching", sub_08022694);
 
