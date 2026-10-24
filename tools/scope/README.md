@@ -689,6 +689,16 @@ which is exactly `10:1`. Not tested.
   for local-alloc choices (which dying operand it tied to); `life NAME`
   picks an inline helper's variable silently (show every instance with its
   declaration and call site); count the extra compile a named knob costs.
+* Sol, second run (phase 3: no new concessions; 114 compiles, 2.86M input
+  of which 2.60M cached, 20K output): 15 -> 13 concessions with MATCH (#655;
+  `endFlag = 8; endFlag &= flags;` for a regmove operand merge, an inline
+  `ScaleSequenceSpeed(weight, speed)` for a local-alloc preference); plain C
+  89/75 -> 76/64. Where it got stuck, and the tool gaps: regmove merging
+  input into result (losing the ROM's copy; 3 pins) has no explainer; a
+  priority the knob confirms (`duration` over `flags`, `state`) found no C
+  lever; shape-only differences (an immediate load instead of a mask copy,
+  dropped byte extensions) have no confirming knob; misaligned rows can
+  suggest misleading register diagnoses; `why all` recompiles per hunk.
 * Codex gpt-6-luna (2026-10-24, high effort) on Haiku's easy task
   (Hresvelgr_InitializeRadialOffsets, 14/12 from the foundry draft): no
   progress in two runs (11 and 7 compiles, ~0.5M input tokens each, mostly
