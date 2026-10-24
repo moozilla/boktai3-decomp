@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 94.2%
+// twin.py transplant from a matched near-clone
 struct HudPos {
     s16 x, y, z, pad;
 };
@@ -42,7 +42,8 @@ static inline void Show(struct HudSprite *s)
 }
 void sub_08166534(struct HudPanel *p, s32 col, s32 row)
 {
-    s32 i, j;
+    s32 i;
+    s32 j;
     u16 *cell;
     for (i = 0; i <= 2; i++) {
         p->shown[i] = p->stats->values[i];
@@ -50,18 +51,23 @@ void sub_08166534(struct HudPanel *p, s32 col, s32 row)
             p->shown[i] = 100;
         cell = Hud_GetTilemapCell(0, col, row + i);
         for (j = 0; j < 3; j++)
-            *cell++ = 0xF001;
+            *(cell++) = 0xF001;
+
         MenuDisplay_LoadAdjustedDigits(p->shown[i] + p->base[i], p->delta[i], p->digits,
-                                       &p->numbers[i * 3 + 0], &p->numbers[i * 3 + 1],
-                                       &p->numbers[i * 3 + 2]);
-        SetPos(&p->numbers[i * 3 + 0].pos, col * 8, (row + i) * 8);
-        SetPos(&p->numbers[i * 3 + 1].pos, col * 8 + 8, (row + i) * 8);
-        SetPos(&p->numbers[i * 3 + 2].pos, col * 8 + 16, (row + i) * 8);
-        Show(&p->numbers[i * 3 + 0]);
-        Show(&p->numbers[i * 3 + 1]);
-        Show(&p->numbers[i * 3 + 2]);
+                                       &p->numbers[(i * 3) + 0], &p->numbers[(i * 3) + 1],
+                                       &p->numbers[(i * 3) + 2]);
+        SetPos(&p->numbers[(i * 3) + 0].pos, col * 8, (row + i) * 8);
+        SetPos(&p->numbers[(i * 3) + 1].pos, (col * 8) + 8, (row + i) * 8);
+        SetPos(&p->numbers[(i * 3) + 2].pos, (col * 8) + 16, (row + i) * 8);
+        {
+            struct HudPanel *q = (struct HudPanel *)((i * 0x120) + ((u32)p));
+            Show(&q->numbers[0]);
+            Show(&q->numbers[1]);
+            Show(&q->numbers[2]);
+        }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08166534);
 #endif

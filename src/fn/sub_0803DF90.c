@@ -1,7 +1,7 @@
 #include "scene_pool.h"
 
 #ifdef NONMATCHING
-// fuzzy: 89.1%
+// twin.py transplant from a matched near-clone
 // fix.py best version (reprinted C)
 s32 ScenePool_SelectStateAtPositionLimit(struct ScenePoolEntry *);
 s32 ScenePool_ResumeAfterIdle(void *, struct ScenePoolEntry *);
@@ -125,7 +125,7 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
             gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
             {
                 u32 offset = gUnk_03005308 << 1;
-                const u8 *table;
+                register const u8 *table asm("r3");
                 table = (const u8 *)gUnk_0203B400;
                 random = *((const u8 *)(offset + ((u32)table)));
             }
@@ -140,15 +140,16 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
                 entry->stateFrame = 0;
                 entered = &entry->stateEntered;
                 value = 1;
+                asm("" : "+r"(entered), "+r"(value));
                 goto sharedEntry;
             }
         } else if (entry->direction > 0) {
             value = 1;
-            entry->state = 1;
+            entry->state = value;
             entry->stateFrame = flag;
             entered = &entry->stateEntered;
         sharedEntry:
-            *entered = 1;
+            *entered = value;
 
             {
                 u32 *arg = entry->history;
@@ -157,12 +158,14 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
             goto done;
         } else {
             Enter(entry, 2, flag);
+            asm volatile("");
         }
     } else
         entry->stateFrame++;
 done:
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", ScenePool_StateTrackAdaptive);
 #endif

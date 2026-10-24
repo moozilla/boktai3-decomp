@@ -1,5 +1,5 @@
 #ifdef NONMATCHING
-// fuzzy: 88.1%
+// twin.py transplant from a matched near-clone
 // Pointer spills, RNG load/store scheduling and branch layout still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
@@ -137,11 +137,13 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
     u16 *maxHealth;
     s16 *health;
     u32 *flags2D8;
-    s32 gain, dx, dz;
-    if (ActorFlags(actor, 8) || actor->enabled != 1 || GetFlags(&flags2CC, actor, 2))
+    s32 gain;
+    s32 dx;
+    s32 dz;
+    if ((ActorFlags(actor, 8) || (actor->enabled != 1)) || GetFlags(&flags2CC, actor, 2))
         goto fail;
     collider = &actor->colliderA;
-    timer = (u16 *)((u8 *)actor + 0x178);
+    timer = (u16 *)(((u8 *)actor) + 0x178);
     if (*timer)
         goto fail;
     {
@@ -149,11 +151,11 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
         register u16 *max asm("r5");
         if (Test(gUnk_030053F4, 0x4800)) {
             pos = &actor->position;
-            max = (u16 *)&actor->defaultHealth;
+            max = (u16 *)(&actor->defaultHealth);
             gain = AreaEffect_ScaleLinkGainAtPosition(pos, *max);
         } else {
             pos = &actor->position;
-            max = (u16 *)&actor->defaultHealth;
+            max = (u16 *)(&actor->defaultHealth);
             gain = AreaEffect_ScaleGainAtPosition(pos, *max);
         }
         asm("" : "+r"(pos), "+r"(max));
@@ -172,12 +174,12 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
         *health -= damage;
     }
     flags2D8 = &actor->field2D8;
-    if (!(*flags2D8 & 0x20000)) {
-        u16 bank = *(u16 *)((u8 *)actor + 0x1E2);
+    if (!((*flags2D8) & 0x20000)) {
+        u16 bank = *((u16 *)(((u8 *)actor) + 0x1E2));
         if (actor->drawableKind == 0)
-            AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
+            AnimData_SelectPaletteBank(((u8 *)actor->drawable) + 0x2C, bank);
         else
-            *(u8 **)((u8 *)actor->drawable + 0x68) = gUnk_030042E4 + bank * 32;
+            *((u8 **)(((u8 *)actor->drawable) + 0x68)) = gUnk_030042E4 + (bank * 32);
         {
             u32 eight = 8;
             actor->field1E8 = eight;
@@ -191,31 +193,31 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
             u32 buffer[2];
             s32 h = *health;
             u32 max = *maxHealth;
-            s32 kind = *(s16 *)((u8 *)actor + 0xB2);
-            s32 param = *(s16 *)((u8 *)actor + 0x9A);
+            s32 kind = *((s16 *)(((u8 *)actor) + 0xB2));
+            s32 param = *((s16 *)(((u8 *)actor) + 0x9A));
             SceneHud_SetTimedState(actor->id, h, max, kind, 0, param);
             Fill(&zero, buffer);
-            if (actor->reactionSoundVariant || !(*flags2D8 & 0x20000))
+            if (actor->reactionSoundVariant || (!((*flags2D8) & 0x20000)))
                 DamageNumberDisplay_Show(collider, actor->reactionSoundVariant, 0, position, buffer,
                                          1);
         }
     }
-    SceneActorMovement_ProjectProbe(actor, dx, dz);
+    SceneActorMovement_ProjectProbe(actor, 0, 0);
     {
-        struct FlagHalfword *flags = (void *)&actor->flags2D4;
+        struct FlagHalfword *flags = (void *)(&actor->flags2D4);
         flags->bits |= 8;
     }
     actor->direction = Math_Atan2(dx, dz);
     *timer = 38;
     actor->field2DC = 0x40000;
     actor->field2D8 = 0;
-    ClearHit((void *)&actor->flags2D4, ~0x2000);
+    ClearHit((void *)(&actor->flags2D4), ~0x2000);
     actor->field2B8 = 0;
-    if (*health <= 0) {
+    if ((*health) <= 0) {
         collider->responseValue = 0;
         Hide(actor);
         {
-            void *control = *(void **)((u8 *)actor + 0x234);
+            void *control = *((void **)(((u8 *)actor) + 0x234));
             Reaction_SetControl(actor, 17, control);
         }
         {
@@ -227,7 +229,7 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
             actor->field2B1 = 1;
         }
         actor->field2E0 = 32;
-        if (!Test(gUnk_030053F4, 0x4800) && !Flag2D0(actor, 0x800))
+        if ((!Test(gUnk_030053F4, 0x4800)) && (!Flag2D0(actor, 0x800)))
             SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
     } else {
         {
