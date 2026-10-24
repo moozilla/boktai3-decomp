@@ -1,9 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.9%
-// Vector pointer allocation and two missing register copies remain; candidate is four bytes short.
 #include "scene_actor_chase.h"
 // confidence=low: terrain-edge response is registered as the Slime body collider callback.
 void SceneActorBehavior_ApplyContactReaction(void *, void *);
@@ -16,8 +13,7 @@ struct SlimeContact {
 };
 static inline u8 Unavailable(struct SceneActorRegistryResetView *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
-    asm("" : "+r"(actor));
+    register struct SceneActorRegistryResetView *actor asm("r2") = input;
     if (actor) {
         u32 mask = 0x40;
         if (actor->flags2D4 & mask)
@@ -25,12 +21,8 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *input)
         mask = 0x20000;
         if (actor->flags2D0 & mask)
             return 1;
-        {
-            s32 health = actor->health;
-            asm("" : : "r"(actor));
-            if (health <= 0)
-                return 1;
-        }
+        if (actor->health <= 0)
+            return 1;
     }
     return 0;
 }
@@ -61,9 +53,14 @@ void Slime_ResolveBodyContact(struct SlimeContact *contact, void *other,
 {
     struct ContactPosition next, displacement, center, fromContact, adjusted;
     s32 angle;
-    if (Unavailable(actor))
+    u32 contactFlags;
+    register struct SceneActorRegistryResetView *checkActor asm("r2") = actor;
+    if (Unavailable(checkActor))
         return;
-    if (ContactFlags(contact, 0x800)) {
+    contactFlags = ContactFlags(contact, 0x800);
+    /* Keep the checked actor live through the contact flag load. */
+    asm("" : : "r"(checkActor));
+    if (contactFlags) {
         Add(&next, &actor->position, &actor->motion);
         Subtract(&displacement, &contact->position, &next);
         SceneActorTerrain_GetCenter(actor->terrainCell, &center);
@@ -104,7 +101,3 @@ void Slime_ResolveBodyContact(struct SlimeContact *contact, void *other,
     } else
         SceneActorBehavior_ApplyContactReaction(contact, other);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Slime_ResolveBodyContact);
-#endif
