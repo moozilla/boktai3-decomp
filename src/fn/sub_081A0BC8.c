@@ -160,7 +160,6 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
             } else {
                 Actor_SetHeadingVelocity(actor, 32);
                 state &= tick;
-                asm("" : "+r"(state));
                 if (!state) {
                     u32 mask = 16;
                     *flags |= mask;
