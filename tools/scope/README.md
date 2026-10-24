@@ -743,6 +743,11 @@ which is exactly `10:1`. Not tested.
   the span `spill` names. Open: a search over that span's C (the values in
   high registers it lists, pins there) that reports which edit changes the
   reload count by the needed amount, instead of leaving it to the worker.
+  ActorParticles_SpawnWideBurst shows a second reload gap: the ROM has
+  `movs r0, #7; mov ip, r0; mov r0, ip; ands r2, r0` and the draft drops
+  the `mov r0, ip` (reload inherits r0's 7 for the `ands`; the ROM's did
+  not). No command explains inheritance yet (reload1.c reg_reloaded_*:
+  which reload kept r0's contents, and what invalidated them in the ROM).
   Power_EnterSleep needs an inline `svc #3` (SDK SystemCall), which agbcc
   cannot emit from C: a policy question, not a tool gap.
 * Codex gpt-6-luna (2026-10-24, high effort) on Haiku's easy task
