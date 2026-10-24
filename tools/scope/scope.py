@@ -13,6 +13,8 @@
   scope.py FILE.c life NAME...  the insns flow counts toward a value's live length, by C line
   scope.py A.c vs B.c [FUNC]    two drafts' register allocation side by side (rank, priority, refs/live)
   scope.py FILE.c pins          cost of removing each register pin / asm barrier; greedy free removal
+  scope.py census [CALLEE]      every pin/barrier in matched code grouped by the call it serves, with
+                                clean and draft sites of the same call: missing helpers show up as groups
   scope.py insn UID [FUNC]      one RTL insn through every pass (from the last compile of FUNC)
   scope.py uses REG... [PASS...] [FUNC]   insns (uid@C line) using each pseudo after each pass
 
@@ -2433,6 +2435,9 @@ def main():
     if not args or args[0] in ("-h", "--help"):
         print(__doc__)
         return 0
+    if args[0] == "census":  # census [CALLEE]: concessions across src/ grouped by the call they serve
+        import structure
+        return structure.census(ROOT, want=args[1] if len(args) > 1 else None)
     if args[0] == "serve":
         return cmd_serve()
     if args[0] == "fastcheck":
