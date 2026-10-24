@@ -956,8 +956,8 @@ def sp_narrow_mask(fn):
 
 def sp_copy_uses(fn):
     """T *v = E; ... E ... v ...  ->  move single uses between the copy v and its source E
-    (Slot7_UpdateMotionPhase: `other = (struct PhaseState *)p`; which of the two pseudos gets the
-    higher allocation priority, and so the callee-saved register, follows their use counts). Sound
+    (which of the two pseudos gets the higher allocation priority, and so the callee-saved register,
+    follows their use counts; Slot7_UpdateMotionPhase's copy turned out to be sp_param_alias). Sound
     while neither v nor what E reads is reassigned. The C-level replacement for a `do { } while (0)`
     loop-weight wrapper around one use."""
     decls = [d for d in fn.body.block_items if isinstance(d, ca.Decl) and d.init is not None
@@ -983,6 +983,42 @@ def sp_copy_uses(fn):
             n, par, slot = nth(f2, is_var, k)
             set_child(par, slot, copy.deepcopy(d.init))
             yield f"use {src[:24]} for {d.name} (use {k + 1})", f2
+
+
+def sp_param_alias(fn):
+    """T *p (a parameter)  ->  T *self = p; at entry, and self for p in one arm of an if
+    (Slot7_UpdateMotionPhase: `BeginPhase(self, 4); self->previousPhase = 4;` in the else arm). cse
+    puts p back for the copy only inside the extended block where it saw `self = p` (cse.c
+    make_regs_eqv; the block ends at the arm's label), so the arm's uses keep a pseudo of their own
+    and it gets another register. The two arms then differ, and jump.c's cross-jumping
+    (find_cross_jump) no longer merges their tails. The ROM's sign: an entry copy of the parameter
+    (`adds r7, r4, #0`) used only in one arm, and two arm tails that differ only in that base
+    register. Sound while p is never reassigned."""
+    if not (isinstance(fn.decl.type, ca.FuncDecl) and fn.decl.type.args):
+        return
+    changed = {text(n.lvalue) for n, _, _ in walk(fn.body) if isinstance(n, ca.Assignment)} | \
+              {text(n.expr) for n, _, _ in walk(fn.body) if isinstance(n, ca.UnaryOp)
+               and n.op in ("++", "--", "p++", "p--", "&")}
+    params = [p for p in fn.decl.type.args.params
+              if isinstance(p, ca.Decl) and p.name and isinstance(p.type, ca.PtrDecl) and p.name not in changed]
+    ifs = [n for n, _, _ in walk(fn.body) if isinstance(n, ca.If)]
+    for prm in params:
+        for k, node in enumerate(ifs):
+            for arm in ("iftrue", "iffalse"):
+                if getattr(node, arm) is None or not reads_of(getattr(node, arm), prm.name):
+                    continue
+                f2 = copy.deepcopy(fn)
+                node2 = [n for n, _, _ in walk(f2.body) if isinstance(n, ca.If)][k]
+                names = {n.name for n, _, _ in walk(f2) if isinstance(n, (ca.ID, ca.Decl)) and getattr(n, "name", None)}
+                v = "self" if "self" not in names else new_name(f2, "self")
+                for r, par, slot in reads_of(getattr(node2, arm), prm.name):
+                    set_child(par, slot, ca.ID(v))
+                d = copy.deepcopy(prm)
+                d.name, d.type = v, _renamed(prm.type, v)
+                d.init = ca.ID(prm.name)
+                add_local(f2, d)
+                which = "then" if arm == "iftrue" else "else"
+                yield f"{v} = {prm.name} at entry, used in the {which} arm of `if ({text(node.cond)[:24]})`", f2
 
 
 WORD_TYPES = {"u32", "s32", "int", "unsigned int", "vu32", "uintptr_t"}
@@ -1630,7 +1666,8 @@ SPELLINGS = [sp_cmp_sign, sp_call_narrow, sp_ternary, sp_into_loop, sp_flag_take
              sp_count_up, sp_count_down, sp_ptr_walk, sp_ptr_index, sp_rmw_temp, sp_chain_assign,
              sp_sign_shift, sp_fresh_var, sp_neg_mul, sp_member_ptr, sp_offset_local, sp_const_local,
              sp_load_local, sp_symbol_literal, sp_outline_store, sp_outline_setter, sp_loop_normal, sp_ptr_deinduct,
-             sp_field_extend, sp_narrow_mask, sp_alias_read, sp_copy_uses, sp_fold_copy, sp_const_literal]
+             sp_field_extend, sp_narrow_mask, sp_alias_read, sp_copy_uses, sp_fold_copy, sp_const_literal,
+             sp_param_alias]
 # type hypotheses: they assert a type the C does not show (a callee that returns u8, a comparison
 # done unsigned), so they may change what the draft does. That is their job: a byte match proves the
 # ROM does the same. spelltest.py --soundness reports them apart from the rewrites, which must not.
@@ -1642,7 +1679,7 @@ HELPER_SPELLINGS = [sp_specialize, sp_local_to_arg, sp_arg_to_local, sp_helper_r
 DECISIONS = {
     "frame": ["sp_nonvoid", "rw_void"],
     "dead store": ["sp_alias_read"],
-    "cse-canon": ["sp_fold_copy", "sp_copy_uses", "rw_copy_var", "sp_inline_decl"],
+    "cse-canon": ["sp_fold_copy", "sp_copy_uses", "sp_param_alias", "rw_copy_var", "sp_inline_decl"],
     "call result": ["sp_call_narrow"],
     "comparison type": ["sp_cmp_sign", "rw_width", "sp_sign_shift", "sp_field_extend"],
     "order": ["sp_helper_arg", "sp_specialize", "sp_local_to_arg", "sp_arg_to_local", "sp_addr_before_next", "sp_addr_local", "sp_scoped_operand", "sp_addr_then_const", "sp_into_loop", "sp_index_local", "sp_inline_decl",
@@ -1655,9 +1692,10 @@ DECISIONS = {
     "cse-reuse": ["sp_narrow_mask", "sp_arg_to_local", "sp_member_ptr", "sp_symbol_literal", "sp_load_local", "sp_split_offset", "sp_flag_take", "sp_inline_decl", "rw_copy_var", "rw_reuse_stored"],
     "cse-follow": ["sp_narrow_mask", "sp_flag_take", "sp_inline_decl", "rw_copy_var"],
     "cse-swap": ["rw_commute", "sp_scoped_operand"],
+    "cross-jump": ["sp_param_alias", "rw_copy_var", "sp_copy_uses"],
     "regmove-copy": ["rw_commute", "sp_inline_decl"],
-    "local-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
-    "global-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
+    "local-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_param_alias", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var", "rw_inline_var"],
+    "global-alloc": ["sp_corpus_helper", "sp_helper_ret_word", "sp_result_into_arg", "sp_copy_uses", "sp_param_alias", "sp_loop_weight", "sp_narrow_mask", "sp_inline_decl", "sp_ternary", "rw_width", "rw_decl_order", "rw_copy_var"],
     "move2add": ["sp_specialize", "sp_addr_then_const", "sp_scoped_operand", "rw_share_const"],
     "reload-mode": ["sp_corpus_helper", "sp_helper_ret_word", "sp_const_literal", "rw_inline_var", "sp_inline_decl", "rw_width", "sp_narrow_mask"],
     "reload": ["sp_corpus_helper", "sp_helper_ret_word", "sp_symbol_literal", "sp_const_local", "sp_specialize", "sp_addr_then_const", "sp_inline_decl", "rw_share_const",

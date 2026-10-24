@@ -112,6 +112,16 @@ TOPICS = {
         "rtlprobe.py try-env AGBCC_PREF=N:R confirms it as a preference.",
         [("integrate.c", "		  && reg_overlap_mentioned_p (arg_vals[i], target))", -4, 8),
          ("integrate.c", "      if (REG_FUNCTION_VALUE_P (loc))", -2, 5)]),
+    "cross-jump": (
+        "cross jump tail merge identical branch ends shared tail copy alias parameter entry register",
+        "jump.c's cross-jumping merges two code paths that end in identical insns before jumping to the same "
+        "place: one path's tail is deleted and it jumps into the other's. Any register that differs keeps the "
+        "tails apart. A copy of a parameter made at entry (`T *self = p;`) is replaced by p only inside the "
+        "extended block where cse saw the copy, so uses of self after a label stay on their own pseudo and "
+        "register. The ROM's sign: two branch tails identical except for one base register (`adds r1, r4` / "
+        "`adds r1, r7`) and an entry copy `adds r7, r4, #0` (Slot7_UpdateMotionPhase). "
+        "spellings.sp_param_alias.",
+        [("jump.c", "/* Compare the instructions before insn E1 with those before E2", 0, 13)]),
     "cse-reuse": (
         "cse reuse deleted same value common subexpression recompute equivalent",
         "cse deletes a computation when the same value is already in a register within the extended basic "
