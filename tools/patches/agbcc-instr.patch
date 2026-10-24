@@ -1095,3 +1095,16 @@
  	    continue;
  
  	  /* Now scan through the operands looking for a destination operand
+--- a/toplev.c
++++ b/toplev.c
+@@ -3613,7 +3613,9 @@
+         flag_caller_saves = 1;
+         flag_force_mem = 1;
+         flag_regmove = 1;
+-        flag_strict_aliasing = 1;
++        /* Instrumentation: AGBCC_NOSTRICT=1 turns type-based alias sets off
++           (one compile tells whether a difference is an alias-set decision).  */
++        flag_strict_aliasing = getenv ("AGBCC_NOSTRICT") ? 0 : 1;
+     }
+ 
+     if (optimize >= 3)

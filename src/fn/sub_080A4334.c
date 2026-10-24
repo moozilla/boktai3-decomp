@@ -2,7 +2,7 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
-// fuzzy: 97.2%
+// twin.py transplant from a matched near-clone
 // Remaining differences: register allocation, address reuse, and instruction order.
 #define F(p, o, T) (*(T *)((u8 *)(p) + (o)))
 void SceneActorMovement_ResolveRoutePosition(void *);
@@ -92,12 +92,13 @@ static inline void BeginContact(struct SceneActorRegistryResetView *a, u8 *nav)
 // confidence=low: detects a player in front and selects close or distant contact behavior
 u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *a)
 {
-    u8 *transform = (u8 *)a + 0x50;
+    u8 *transform = ((u8 *)a) + 0x50;
     u8 *c = (void *)SceneActorControl_GetState(a);
     struct ContactPosition delta;
     u8 *player;
     struct ContactPosition *pos;
-    s32 height, angle;
+    s32 height;
+    s32 angle;
     u32 distance;
     if (!HasFlag(c, 2)) {
         if (SceneActorPlacement_BeginContactRoute(a))
@@ -109,7 +110,7 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
     player = gUnk_02000580[0];
     if (!player)
         return 0;
-    asm("" ::"r"(player));
+    asm("" : : "r"(player));
     pos = (void *)(player + 0x30);
     Delta(&delta, &a->position, pos);
     height = delta.y;
@@ -117,9 +118,9 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
         height = -height;
     if (height > 255)
         return 0;
-    distance = delta.x * delta.x + delta.z * delta.z;
+    distance = (delta.x * delta.x) + (delta.z * delta.z);
     Math_Atan2(delta.x, delta.z);
-    if (distance >= a->distanceLimitF8 * 2)
+    if (distance >= (a->distanceLimitF8 * 2))
         return 0;
     Delta(&delta, &a->position, pos);
     angle = Facing(a, &delta);
@@ -127,11 +128,11 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
         angle = -angle;
     if (angle > 32)
         return 0;
-    if (!sub_0821D4F0(transform + 12, (u8 *)pos, 5, 256))
+    if (!sub_0821D4F0(transform + 12, gUnk_02000580[0] + 0x30, 5, 256))
         return 0;
     a->fieldDC = (u32)(player + 0x24);
-    if ((s32)distance <= 0x3fff)
-        BeginContact(a, (u8 *)a + 0x3d4);
+    if (((s32)distance) <= 0x3fff)
+        BeginContact(a, ((u8 *)a) + 0x3d4);
     else {
         State(a, 16);
         Control(a, sub_080A28A8, 3);

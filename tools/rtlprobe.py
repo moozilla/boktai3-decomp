@@ -10,6 +10,7 @@
   rtlprobe.py canon FILE.c [--nonmatching] [-j N]
   rtlprobe.py follow FILE.c [--nonmatching] [-j N]
   rtlprobe.py pre FILE.c [--nonmatching] [-j N]
+  rtlprobe.py alias FILE.c [--nonmatching] [-j N]
 
 Each command compiles FILE.c as build.py does (preprocessed the same way),
 with `-dp` and the pass dumps, into build/rtlprobe/<stem>/, in under a second
@@ -424,6 +425,20 @@ def pre(a):
             print(f'{spec:>16}: {text}')
 
 
+def alias(a):
+    """Is the difference a type-based alias decision? One compile with AGBCC_NOSTRICT=1."""
+    a.envs = ['AGBCC_NOSTRICT=1']
+    (_, base), (_, off) = try_env(a, quiet=True)
+    print(f'{"default":>16}: {base}')
+    print(f'{"no alias sets":>16}: {off}')
+    realigned = lambda s: int(re.search(r'realigned (\d+)', s).group(1))
+    if 'MATCH' in off or realigned(off) < realigned(base):
+        print('the difference shrinks without type-based alias sets: a store and a read the original keeps '
+              'ordered (or a store it keeps alive) have the same type there and different types in yours '
+              '(flow dead stores, cse reuse across a store). Read or write that field with the type of the '
+              'other access: spellings.sp_alias_read `*(T *)&x->f`, or the field declared that type.')
+
+
 def perline(a):
     work = compile_dumps(a.src, ['-g', '-ds', '-dl'], a.nonmatching, lines=True)
 
@@ -461,7 +476,7 @@ def dump(a):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd', required=True)
-    for name in ('dump', 'loop', 'gcse', 'try-t', 'try-env', 'perline', 'canon', 'follow', 'pre'):
+    for name in ('dump', 'loop', 'gcse', 'try-t', 'try-env', 'perline', 'canon', 'follow', 'pre', 'alias'):
         p = sub.add_parser(name)
         p.add_argument('src')
         p.add_argument('--nonmatching', action='store_true')
@@ -474,7 +489,7 @@ def main():
     sub.choices['gcse'].add_argument('--need', type=int, nargs='+',
                                      help='expression indices in the bucket order wanted: print the T windows')
     sub.choices['try-t'].add_argument('t', nargs='+', help='table sizes, or LO:HI to sweep the odd sizes')
-    for name in ('try-t', 'try-env', 'canon', 'follow', 'pre'):
+    for name in ('try-t', 'try-env', 'canon', 'follow', 'pre', 'alias'):
         sub.choices[name].add_argument('-j', type=int, default=os.cpu_count() or 4)
     sub.choices['try-env'].add_argument('envs', nargs='+')
     sub.choices['perline'].add_argument('--func')
@@ -482,7 +497,7 @@ def main():
     a = ap.parse_args()
     a.src = os.path.relpath(os.path.abspath(a.src), ROOT)
     {'dump': dump, 'loop': loop, 'gcse': gcse, 'try-t': try_t, 'try-env': try_env,
-     'perline': perline, 'canon': canon, 'follow': follow, 'pre': pre}[a.cmd](a)
+     'perline': perline, 'canon': canon, 'follow': follow, 'pre': pre, 'alias': alias}[a.cmd](a)
 
 
 if __name__ == '__main__':

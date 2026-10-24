@@ -1,6 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
-// fuzzy: 98.7%
+// fix.py best after the inlined-insn fix
 struct HomingVec {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -121,7 +121,17 @@ static inline void SetRiseHeight(struct HomingSlot *p, u16 height)
         *dest = height;
     }
 }
-// fuzzy: 93.3%
+inline static void SpawnTrail_UpdateDefaultState(struct HomingSlot *p)
+{
+    u32 seed;
+    u32 t;
+    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
+    seed = gUnk_03005308;
+    t = *((u8 *)(&(*((typeof(gUnk_0203B400) *)0x0203B400))[seed]));
+    SpriteParticle_CreateDefaultVariant4384(&p->origin, 0x28, 0x20, 0xc, 4, 0x18, t, 0x20, 0x20, 3,
+                                            2, 0x200);
+}
+
 u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
 {
     struct HomingParams *params = &p->params;
@@ -134,31 +144,33 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
             one = 1;
             asm("" : "+r"(one));
             if (time & one)
-                SpawnTrail(p);
+                SpawnTrail_UpdateDefaultState(p);
             p->sprite.flags |= 0x400;
-            p->sprite.position.y = p->target.y - (30 - p->lifetime) * 2;
+            p->sprite.position.y = p->target.y - ((30 - p->lifetime) * 2);
             if (p->lifetime > 30) {
                 *state = one;
                 p->sprite.flags &= ~0x400;
                 Aim(p, params);
-                sequence = params->variant == 0 ? 7 : 0;
+                sequence = (params->variant == 0) ? (7) : (0);
                 Face(p, params, sequence, one);
             }
             break;
         }
+
         case 1: {
             register u16 *delay asm("r2") = &p->params.delay;
-            s32 limit = slot * 30 + 30;
+            s32 limit = (slot * 30) + 30;
             asm("" : "+r"(delay));
-            if (p->lifetime > limit + *delay) {
+            if (p->lifetime > (limit + (*delay))) {
                 Aim(p, params);
-                sequence = params->variant == 0 ? 10 : 6;
+                sequence = (params->variant == 0) ? (10) : (6);
                 p->sequence.flags |= 8;
                 Face(p, params, sequence, 1);
                 p->state = 2;
             }
             break;
         }
+
         case 2:
             if (params->variant == 0) {
                 if (p->sequence.index != 5)
@@ -170,7 +182,7 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                                             p->sprite.position.z};
                     struct LocalVec to;
                     struct LocalVec *player = (struct LocalVec *)Player_GetEffectivePosition(0);
-                    u16 *q = (u16 *)&to;
+                    u16 *q = (u16 *)(&to);
                     to = *player;
                     q[1] += 0x60;
                     SunDiscPool_SpawnDisc(&from, &to, p->params.shotA, p->params.shotB, 2,
@@ -186,9 +198,12 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                 {
                     struct LocalVec from = {p->sprite.position.x, p->sprite.position.y + 0x100,
                                             p->sprite.position.z};
-                    struct LocalVec to, delta;
+                    struct LocalVec to;
+                    struct LocalVec delta;
                     struct LocalVec *player = (struct LocalVec *)Player_GetEffectivePosition(0);
-                    struct LocalVec *t = &to, *d, *f;
+                    struct LocalVec *t = &to;
+                    struct LocalVec *d;
+                    struct LocalVec *f;
                     u16 length;
                     s32 speed;
                     *t = *player;
@@ -198,7 +213,7 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                     d->y = t->y - f->y;
                     d->z = t->z - f->z;
                     speed = 30;
-                    length = Sqrt(d->x * d->x + d->y * d->y + d->z * d->z);
+                    length = Sqrt(((d->x * d->x) + (d->y * d->y)) + (d->z * d->z));
                     if (length) {
                         d->x = Div(d->x * speed, length);
                         d->y = Div(d->y * speed, length);
@@ -207,7 +222,7 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                     BouncingObject_Spawn(f, d, t, p->params.shotA, p->params.shotB, 0x50, elapsed);
                 }
             }
-            sequence = params->variant == 0 ? 7 : 0;
+            sequence = (params->variant == 0) ? (7) : (0);
             Face(p, params, sequence, 1);
             p->state = 3;
             {
@@ -216,13 +231,14 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
             }
             p->blinkTimer = 0;
             break;
+
         case 3:
             if (p->lifetime & 1)
-                SpawnTrail(p);
+                SpawnTrail_UpdateDefaultState(p);
             {
                 s32 limit = slot * 30;
                 u32 elapsed = p->lifetime - 200;
-                SetRiseHeight(p, p->target.y - (30 - (limit - elapsed)) * 2);
+                SetRiseHeight(p, p->target.y - ((30 - (limit - elapsed)) * 2));
             }
             {
                 register u32 spriteOffset asm("r1");
@@ -231,11 +247,11 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                 register s16 *timer asm("r4");
                 spriteOffset = 0x10c;
                 asm("" : "+r"(spriteOffset));
-                sprite = (void *)((u8 *)p + spriteOffset);
+                sprite = (void *)(((u8 *)p) + spriteOffset);
                 asm("" : "+r"(sprite));
                 timerOffset = 0x15e;
                 asm("" : "+r"(timerOffset));
-                timer = (void *)((u8 *)p + timerOffset);
+                timer = (void *)(((u8 *)p) + timerOffset);
                 asm("" : "+r"(timer));
                 if (Sprite_BlinkUntilExpired(sprite, *timer, 0x2d, 0x5a))
                     return 1;
@@ -243,8 +259,10 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
             }
             break;
     }
+
     return 0;
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", HomingProjectile_UpdateDefaultState);
 #endif

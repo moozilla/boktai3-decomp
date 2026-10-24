@@ -3,7 +3,7 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #ifdef NONMATCHING
-// fuzzy: 98.4%
+// fix.py best after the inlined-insn fix
 // fix.py best version (reprinted C)
 // confidence=low: moves the part along its stored retreat angle, then returns to idle.
 // Remaining differences: register lifetimes, instruction order and literal pools.
@@ -206,11 +206,15 @@ void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
                 if (Ended(p)) {
                     {
                         register u32 next asm("r2") = 1;
-                        asm("" : "+r"(next));
                         p->state = next;
+                        asm("" : "+r"(next));
                     }
-                    p->timer = 0;
-                    *enter = 1;
+                    {
+                        typeof(p->timer) *q1 = &p->timer;
+                        u8 z1 = 1;
+                        *q1 = 0;
+                        *enter = z1;
+                    }
                 }
                 break;
             }
@@ -231,6 +235,7 @@ void Vanargand_UpdatePartSidestep(u8 *bossArg, struct VanargandPart *p)
         }
     }
 }
+
 #else
 INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartSidestep);
 #endif

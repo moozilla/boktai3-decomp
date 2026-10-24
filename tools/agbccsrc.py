@@ -50,6 +50,17 @@ TOPICS = {
         "within one machine mode: a constant made in QImode by `(u8)(x & 7)` is not reused for an int "
         "`& 7` (spellings.sp_narrow_mask).",
         [("cse.c", "if (follow_jumps && q != 0 && GET_CODE (q) == BARRIER)", -2, 26)]),
+    "dead store": (
+        "dead store flow alias set strict aliasing deleted store mem_set_list type",
+        "flow.c deletes a store as dead when, scanning a block backwards, a later store writes an rtx-equal "
+        "address and no read in between may alias it (anti_dependence) and no insn in between sets the "
+        "address register. agbcc -O2 turns on -fstrict-aliasing: accesses of different types are in "
+        "different alias sets and never alias, so a void * field read between two u32 stores does not keep "
+        "the first one. When the ROM keeps the store, the read between had the stored type "
+        "(spellings.sp_alias_read `*(u32 *)&x->f`). rtlprobe.py alias recompiles with alias sets off "
+        "(AGBCC_NOSTRICT=1) to tell whether any difference is an alias decision.",
+        [("flow.c", "this memory write is dead (remember", -8, 14),
+         ("alias.c", "if (!writep && RTX_UNCHANGING_P (mem))", -12, 24)]),
     "cse-reuse": (
         "cse reuse deleted same value common subexpression recompute equivalent",
         "cse deletes a computation when the same value is already in a register within the extended basic "
