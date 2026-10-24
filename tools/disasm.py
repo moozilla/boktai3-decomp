@@ -4,7 +4,8 @@
 Seeds functions from:
   * fixed entry points (crt0, AgbMain, ...)
   * every Thumb BL target that starts with `push {..., lr}`
-  * symbols/functions.csv (names are applied)
+  * symbols/functions.csv (names are applied; hidden starts in
+    symbols/build_extra_functions.csv are left to split.py)
   * Thumb function pointers found in literal pools of a previous pass
     (iterated until no new functions appear)
 
@@ -44,6 +45,13 @@ def load_names():
         for r in csv.DictReader(open(p)):
             names[int(r["addr"], 16)] = r
     return names
+
+
+def hidden_starts():
+    p = os.path.join(ROOT, "symbols", "build_extra_functions.csv")
+    if not os.path.exists(p):
+        return set()
+    return {int(r["address"], 16) for r in csv.DictReader(open(p))}
 
 
 def bl_targets(b):
@@ -125,7 +133,9 @@ def main():
         sys.exit(f"gbadisasm not found at {GBADISASM}; run tools/setup.sh")
     b = load_rom()
     names = load_names()
-    seeds = bl_targets(b) | set(names) | data_table_seeds(b)
+    # A hidden function (symbols/build_extra_functions.csv) may carry a name in functions.csv,
+    # but its start is cut by split.py; seeding it here would change the disassembly around it.
+    seeds = bl_targets(b) | (set(names) - hidden_starts()) | data_table_seeds(b)
     outdir = os.path.join(ROOT, "gen")
     os.makedirs(outdir, exist_ok=True)
     cfg = os.path.join(outdir, "disasm.cfg")

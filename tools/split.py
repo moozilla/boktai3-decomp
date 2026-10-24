@@ -377,7 +377,7 @@ def main():
             if generated != name:
                 aliases.append(f"{generated} = {name};")
                 aliases.append(f"{generated}__addr = {name}__addr;")
-        covered = {int(n[4:], 16) for n in exact_names
+        covered = {int(n[4:], 16) for n in generated_exact_names
                    if re.fullmatch(r"sub_[0-9A-F]{8}", n)}
         ranges = [(a, replacement_ranges[a]) for a in covered if a in replacement_ranges]
         end = c_replacement_end(code, funcs[last][2], funcs[last][3], covered, ranges,

@@ -2977,6 +2977,7 @@ addr,name,mode,confidence,source,notes
 0808AE44,Ghoul_BindProfile,thumb,low,src-alias,Finds or adds actor profile category four and stores its handle
 0808AE60,Bat_LookupAnimationEntry,thumb,low,src-alias,
 0808AEB8,Ghoul_TickCooldown,thumb,low,src-alias,Decrements the owner context countdown at offset 0x63C without underflow; cooldown purpose is tentative
+0808B264,Ghoul_BeginAlternateRoute,thumb,low,src-alias,Sets owner context flag bits and starts the route group alternate route in behavior 15
 0808B320,Vorn_ParseField624_0808B320,thumb,low,src-alias,
 0808B3A0,Bat_TickDelayedScript,thumb,low,src-alias,
 0808CC48,Ghoul_ResumePendingRoute,thumb,low,src-alias,
