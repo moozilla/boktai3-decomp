@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """Print the generated disassembly around a ROM address: asmat.py ADDR [LINES]
 
-Starts at the function containing ADDR. Reviewed interior labels
-(symbols/function_nonentries.csv) are not function starts: the listing backs up
-past them to the real owner and prints them as plain labels, as the split does.
-Reviewed starts that the disassembler left as plain labels
-(symbols/build_extra_functions.csv) are function starts.
+Starts at the function containing ADDR. The inventory (symbols/progress_functions.csv) decides
+what a function start is, as the split does: a disassembler start it does not list is an interior
+label (the listing backs up past it to the real owner and prints it as a plain label), and an
+inventory start the disassembler left inside raw bytes is a function start.
 """
 import re
 import signal
@@ -32,7 +31,7 @@ def label_addr(i):
 
 
 def is_extra_start(i):
-    """A plain label that symbols/build_extra_functions.csv makes a function start."""
+    """A plain label that the inventory makes a function start."""
     m = LABEL.match(lines[i])
     return bool(m and m.group(2)) and int(m.group(2), 16) in extra
 
@@ -60,9 +59,9 @@ for j in range(i, max(best + n, i + n)):
     if j >= len(lines):
         break
     if is_extra_start(j):
-        out.append(f"\t@ function start (symbols/build_extra_functions.csv)")
+        out.append(f"\t@ function start (inventory; the disassembler missed it)")
     if j > i and is_interior_start(j):
-        out.append(f"\t@ interior label (symbols/function_nonentries.csv), not a function start")
+        out.append(f"\t@ interior label (not in the inventory), not a function start")
         continue
     out.append(lines[j])
 print("\n".join(out))

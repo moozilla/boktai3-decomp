@@ -8,7 +8,7 @@ struct layout, with other constants, an extra call or a missing branch, so its
 normalized instructions (clones.parse(), registers abstracted) are similar but
 not identical. Candidates are matched functions within --window of the length
 whose instruction-trigram overlap is at least 0.5; they are ranked by
-difflib's ratio. Interior labels (symbols/function_nonentries.csv) are skipped.
+difflib's ratio. Interior labels (disassembler starts the inventory does not list) are skipped.
 
 Each row shows where the unmatched function lives: "asm" (no C yet), "unit
 FILE" (an INCLUDE_ASM in a src/*.c unit), or "draft N%" (a NONMATCHING draft
@@ -28,6 +28,7 @@ import re
 
 import clones
 from romlib import ROOT
+from split import function_nonentries
 from worklist import done_names
 
 REG = re.compile(r"\b(r\d+|sb|sl|fp|ip)\b")
@@ -67,14 +68,14 @@ def main():
     clones.LOOSE = True
     funcs = {n: (v[0], [REG.sub("R", l) for l in v[1]]) for n, v in clones.parse().items()}
     done = done_names()
-    nonentries = open(os.path.join(ROOT, "symbols", "function_nonentries.csv")).read().upper()
+    nonentries = function_nonentries()
 
     def usable(n):
         lines = funcs[n][1]
         return len(lines) >= 12 and "DATA" not in lines
 
     unmatched = [n for n in funcs if n not in done and usable(n) and len(funcs[n][1]) <= args.max_len
-                 and f"{funcs[n][0]:08X}" not in nonentries]
+                 and funcs[n][0] not in nonentries]
     matched = [n for n in funcs if n in done and usable(n)]
     grams = {n: collections.Counter(zip(funcs[n][1], funcs[n][1][1:], funcs[n][1][2:]))
              for n in unmatched + matched}

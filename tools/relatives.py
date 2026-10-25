@@ -92,7 +92,7 @@ def functions():
     from split import FUNC_LABEL, extra_function_starts, function_nonentries
     nm = names()
     nonentries = function_nonentries()
-    extra = extra_function_starts()  # reviewed starts left as plain labels
+    extra = extra_function_starts()  # inventory starts left as plain labels
     out, cur, prev, fresh = {}, None, None, False
     for ln in open(os.path.join(ROOT, "gen", "code.s")):
         m = re.match(r"_([0-9A-F]{8}):", ln)
@@ -109,7 +109,7 @@ def functions():
             fresh = False
             m = FUNC_LABEL.match(ln)
             if m and prev and int(m.group(2), 16) in nonentries:
-                # Interior label (symbols/function_nonentries.csv): the body
+                # Interior label (not in the inventory): the body
                 # continues the previous function.
                 del out[cur]
                 cur = prev

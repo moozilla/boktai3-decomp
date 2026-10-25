@@ -69,7 +69,7 @@ The old `67984` assembly symbol retained unrelated executable bytes after its
 
 The request-all helper visits all used slots and, when index is nonnegative and
 kind is not 2, sets departure flag `2` and collider flag `4`. The new reviewed
-boundaries are recorded in `symbols/build_extra_functions.csv`; the whole tail
+boundaries are recorded in the inventory (`symbols/progress_functions.csv`); the whole tail
 is never credited as part of the old 12-byte reset.
 
 ## Particle pools

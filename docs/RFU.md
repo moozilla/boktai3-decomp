@@ -82,10 +82,10 @@ remain assembly; upstream naked assembly definitions are deliberately omitted
 from the C unit. The transport's interrupt pointer must retain the even ARM
 address, unlike Thumb callbacks with bit 0 set.
 
-`symbols/build_extra_functions.csv` records the reviewed entries and ISA.
-The splitter applies these boundaries to binary blobs in memory, leaving shared
-`gen/` untouched. It validates alignment and rejects duplicate or unlocated
-boundaries. The progress inventory includes all ten, so the three retained
+The inventory (`symbols/progress_functions.csv`) lists all ten entries;
+`tools/disasm.py` seeds the three ARM trampolines as ARM (`ARM_ENTRIES`), and an
+entry gbadisasm cannot take as a seed (IntrSIO32, `NO_SEED`) is cut from the
+binary blob in memory, leaving shared `gen/` untouched. The three retained
 stubs receive no C credit. `// COMPILER: agbcc_arm` selects the bundled ARM
 compiler and excludes the Thumb fork's unsupported `-fhex-asm` flag; the
 compiler path, contents and flags remain part of the build cache identity.

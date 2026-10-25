@@ -32,7 +32,7 @@ def sources():
 
 def func_labels():
     """Disassembler function labels by mode. Hidden boundaries added later
-    (symbols/build_extra_functions.csv) are not sub_ labels and keep aliases."""
+    (inventory starts split.py cuts from raw bytes) are not sub_ labels and keep aliases."""
     path = os.path.join(ROOT, "gen", "code.s")
     if not os.path.exists(path):
         sys.exit("gen/code.s missing: run make disasm")
