@@ -2818,6 +2818,44 @@ def cmd_rom(target):
     return 0
 
 
+def rom_refs(name, funcs, sizes, names):
+    """What FUNC's ROM refers to, as a Counter: ("call", callee) per bl, ("const", value) per literal-pool
+    word and per immediate of a mov/cmp/add/sub (offsets, counts and masks a twin's C may have wrong)."""
+    import collections
+    addr = dict(funcs)[name]
+    code = rom_bytes()[off(addr):off(addr) + sizes[name]]
+    out = collections.Counter()
+    for _, _, text, _, _ in decode(code, addr, rom_data(name, addr, code)):
+        m = re.match(r"bl #0x([0-9a-f]+)$", text)
+        if m:
+            t = int(m.group(1), 16) & ~1
+            out[("call", names.get(t, f"0x{t:08X}"))] += 1
+            continue
+        m = re.match(r"\.word 0x([0-9A-F]+)$", text)
+        if m:
+            v = int(m.group(1), 16)
+            out[("const", names.get(v & ~1, f"0x{v:X}"))] += 1
+            continue
+        m = re.match(r"(?:movs|cmp|adds|subs) \w+, (?:\w+, )?#(0x[0-9a-f]+|\d+)$", text)
+        if m and int(m.group(1), 0) > 1:
+            out[("const", f"#0x{int(m.group(1), 0):X}")] += 1
+    return out
+
+
+def twin_differences(twin, name, funcs, sizes):
+    """Lines saying which calls and constants FUNC's ROM has that its twin's has not, and the reverse."""
+    names = {a & ~1: n for n, a in funcs}
+    a, b = rom_refs(name, funcs, sizes, names), rom_refs(twin, funcs, sizes, names)
+    lines = []
+    for kind in ("call", "const"):
+        mine = sorted(f"{v}" + (f" x{n}" if n > 1 else "") for (k, v), n in (a - b).items() if k == kind)
+        theirs = sorted(f"{v}" + (f" x{n}" if n > 1 else "") for (k, v), n in (b - a).items() if k == kind)
+        if mine or theirs:
+            lines.append(f"{kind}s only in {name}: {', '.join(mine[:12]) or '-'}; only in {twin}: "
+                         f"{', '.join(theirs[:12]) or '-'}")
+    return lines
+
+
 def cmd_fields(offs, want):
     import glob
     import structure
@@ -3204,6 +3242,18 @@ def cmd_new(target):
             if tname:
                 out = land.seed_from_twin(ttext, tname, name, [d for d in defined if d != tname])
                 seed = f"{twin}'s C ({tfile}, covers {best[1]:.0%} of its rare windows), renamed"
+                diffs = twin_differences(twin, name, funcs, sizes)
+                pins_ = len(re.findall(r'\basm\("(?:r\d+|sb|sl|fp|ip)"\)', out))
+                note = ([f"/* scope: seeded from {twin} ({tfile}); its ROM and {name}'s differ in:"]
+                        + [f"   {d}" for d in diffs or ["nothing scope compares (calls, literals, immediates)"]]
+                        + ([f"   The twin's C has {pins_} register pin(s): try without them (`pins`)."] if pins_ else [])
+                        + ["   The twin's comments and #define alias describe the twin, not this function. */"])
+                sp = land.definition_span(out, name)
+                if sp:
+                    out = (out[:sp[0]] + "\n".join(note) + f"\n// scope: write {name} here (`scope.py rom {name}`)\n"
+                           + out[sp[0]:])
+                for d in diffs:
+                    print(f"  twin difference: {d}")
         if out is None:
             head, where_ = tree_prototype(name)
             if where_:
@@ -3283,6 +3333,7 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         sys.exit(f"{name}: {dest} exists already")
     text = re.sub(r"^// scope: write .*\n", "", text, flags=re.M)
     text = re.sub(r"/\* Ghidra's pseudo-C \(a reading aid\):\n.*?\*/\n", "", text, flags=re.S)
+    text = re.sub(r"/\* scope: seeded from .*?\*/\n", "", text, flags=re.S)
     if nonmatching:
         text = land.wrap_nonmatching(text, name, asm_name or name, info.get("fuzzy", 0.0), info.get("shape"))
         if text is None:
