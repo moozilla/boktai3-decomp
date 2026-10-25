@@ -10,6 +10,7 @@
                                                    build, PROGRESS, and a PR merged when the build is OK
   campaign.py harvest [--all]                      land-ready without a worker: pending functions whose `new`
                                                    seed (a matched twin's C) matches as it is
+  campaign.py submit FUNC FILE [--name N] [--note T]   a draft of the coordinator's own, landed by integrate
   campaign.py review [--model M] | review --say MSG   an independent reviewer of scope itself
                                                    (build/scope/campaign/review/REVIEW.md); --say continues it
   campaign.py status                               what ran, what matched, what is in flight
@@ -236,7 +237,7 @@ def quota():
 
 def state(func):
     wd = os.path.join(CAMP, func)
-    if os.path.exists(os.path.join(wd, "harvested")):
+    if os.path.exists(os.path.join(wd, "harvested")) or os.path.exists(os.path.join(wd, "submitted")):
         return "done"
     if not os.path.exists(os.path.join(wd, "pid")):
         return "pending"
@@ -540,6 +541,41 @@ def cmd_harvest(args):
     return 0
 
 
+def cmd_submit(args):
+    """Hand a draft written outside the campaign (the coordinator's own) to integrate:
+    submit FUNC FILE [--name NAME] [--note TEXT]. FILE is a workspace copy (`scope.py new`); its base
+    is the workspace's, so landing merges it like a worker's result."""
+    import shutil
+    func, src = args[0], os.path.abspath(os.path.expanduser(args[1]))
+    wd = os.path.join(CAMP, func)
+    os.makedirs(wd, exist_ok=True)
+    env = {k: v for k, v in os.environ.items() if k != "SCOPE_RUN"}
+    out = subprocess.run(["python3", "tools/scope/scope.py", src, func], cwd=ROOT, capture_output=True, text=True,
+                         env=env).stdout
+    exact = "\nMATCH" in out
+    m = re.search(r"(\d+ ROM / \d+ draft)", out)
+    shutil.copy(src, os.path.join(wd, "best.c"))
+    if exact:
+        shutil.copy(src, os.path.join(wd, "best_match.c"))
+    base = os.path.join(os.path.dirname(src), func + ".base.c")
+    if os.path.exists(base):
+        shutil.copy(base, os.path.join(wd, "base.c"))
+    name = args[args.index("--name") + 1] if "--name" in args else None
+    note = args[args.index("--note") + 1] if "--note" in args else None
+    json.dump({"match": exact, "counts": "MATCH" if exact else (m.group(1) if m else "?"), "pins": 0, "barriers": 0,
+               "compiles": 0, "name": name, "note": note}, open(os.path.join(wd, "result.json"), "w"))
+    open(os.path.join(wd, "submitted"), "w").write(src)
+    rows = json.load(open(QUEUE)) if os.path.exists(QUEUE) else []
+    if not any(r["func"] == func for r in rows):
+        rows.append({"func": func, "addr": func[-8:], "size": 0, "kind": "draft"})
+    for r in rows:
+        if r["func"] == func:
+            r["kind"] = "draft"
+    json.dump(rows, open(QUEUE, "w"), indent=1)
+    print(f"{func}: submitted ({'MATCH' if exact else (m.group(1) if m else '?')}); the next integrate lands it")
+    return 0
+
+
 def cmd_integrate(args):
     tree = os.path.abspath(os.path.expanduser(args[0]))
     limit = int(args[args.index("--limit") + 1]) if "--limit" in args else 10 ** 6
@@ -711,4 +747,5 @@ def cmd_land(args):
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
     sys.exit({"queue": cmd_queue, "tick": cmd_tick, "status": cmd_status, "land": cmd_land,
-              "review": cmd_review, "integrate": cmd_integrate, "harvest": cmd_harvest}[cmd](sys.argv[2:]))
+              "review": cmd_review, "integrate": cmd_integrate, "harvest": cmd_harvest,
+              "submit": cmd_submit}[cmd](sys.argv[2:]))
