@@ -286,6 +286,7 @@ addr,name,mode,confidence,source,notes
 0800D7D4,FallingObjectManager_Destroy,thumb,low,src-alias,task destroy callback (wired in FallingObjectManager_Create) that frees every object in the manager's list and clears the global manager pointer
 0800D800,FallingObjectManager_Initialize,thumb,low,src-alias,"sets the global manager pointer, starts the falling-object animation script, and resets the object list head; called from FallingObjectManager_Create"
 0800D828,FallingObjectManager_Create,thumb,low,src-alias,lazily creates the manager task (update/destroy callbacks) and runs FallingObjectManager_Initialize; called from FallingObject_Create
+0800D874,ScanlinePresentation_UpdateNoise,thumb,low,src-alias,Noise callback: clears rows outside start..end; fills the band with random byte pairs scaled by amplitude; then steps amplitude by delta clamped to 0..128
 0800D9A0,ScanlinePresentation_UpdateFadeIn,thumb,low,src-alias,increments phase toward duration and clears p->fade when done; assigned to p->fade during state 1 (fade-in)
 0800D9FC,ScanlinePresentation_UpdateFadeOut,thumb,low,src-alias,decrements phase and on reaching zero calls the script callback and kills the task; assigned to p->fade during state 3 (fade-out)
 0800DA5C,ScanlinePresentation_Update,thumb,low,src-alias,

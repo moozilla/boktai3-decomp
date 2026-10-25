@@ -1,6 +1,36 @@
 #include "scanline_presentation.h"
 
-INCLUDE_ASM("asm/nonmatching", sub_0800D874);
+extern const u16 gUnk_0203B400[];
+extern u32 gUnk_03005308;
+#ifdef NONMATCHING
+// fuzzy: 66.9%
+// scope shape 38 (differences once low registers are set aside)
+void ScanlinePresentation_UpdateNoise(struct ScanlinePresentation *p)
+{
+    s32 i;
+    s16 *amplitude = &p->amplitude, *delta = &p->delta;
+    for (i = 0; i < p->start; i++)
+        p->rows[p->active][i] = 0;
+    i = p->start;
+    for (; i < p->end; i++) {
+        u32 offset;
+        s32 v;
+        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        offset = gUnk_03005308 * 2;
+        v = (*(u16 *)(offset + (u32)gUnk_0203B400) * p->amplitude) >> 18;
+        p->rows[p->active][i] = v | (v << 8);
+    }
+    for (i = p->end; i < 160; i++)
+        p->rows[p->active][i] = 0;
+    *amplitude += *delta;
+    if (*amplitude < 0)
+        *amplitude = 0;
+    else if (*amplitude > 128)
+        *amplitude = 128;
+}
+#else
+INCLUDE_ASM("asm/nonmatching", ScanlinePresentation_UpdateNoise);
+#endif
 
 s32 Div(s32, s32);
 
@@ -73,7 +103,7 @@ int ScanlinePresentation_Update(struct ScanlinePresentation *p)
                         Sound_PlaySong(225);
                     p->amplitude = 128;
                     p->delta = -2;
-                    p->noise = sub_0800D874;
+                    p->noise = ScanlinePresentation_UpdateNoise;
                 }
                 break;
             case 1:
@@ -90,7 +120,7 @@ int ScanlinePresentation_Update(struct ScanlinePresentation *p)
                         Sound_PlaySong(227);
                     p->amplitude = 0;
                     p->delta = 4;
-                    p->noise = sub_0800D874;
+                    p->noise = ScanlinePresentation_UpdateNoise;
                 }
                 break;
         }

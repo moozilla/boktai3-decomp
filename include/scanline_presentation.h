@@ -41,7 +41,7 @@ extern u32 gUnk_030051D4;
 extern s32 gUnk_03004DA0;
 extern u16 gUnk_03005260[];
 
-void sub_0800D874(struct ScanlinePresentation *p);
+void ScanlinePresentation_UpdateNoise(struct ScanlinePresentation *p);
 void ScanlinePresentation_UpdateFadeIn(struct ScanlinePresentation *p);
 void ScanlinePresentation_UpdateFadeOut(struct ScanlinePresentation *p);
 int ScanlinePresentation_Update(struct ScanlinePresentation *p);
