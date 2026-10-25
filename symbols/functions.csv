@@ -6792,6 +6792,7 @@ addr,name,mode,confidence,source,notes
 0819B96C,Hresvelgr_SetAnimation,thumb,low,src-alias,
 0819B9E4,Hresvelgr_HasCellOverride,thumb,low,src-alias,
 0819BA7C,Hresvelgr_HasAdjacentOverride,thumb,low,src-alias,
+0819BCB8,Hresvelgr_EmitFacingMotion,thumb,low,src-alias,
 0819BF34,Hresvelgr_SelectPlayerAnimation,thumb,low,src-alias,
 0819C024,Collider_IgnoreCallback,thumb,low,src-alias,
 0819C028,Hresvelgr_InitializeCollider,thumb,low,src-alias,

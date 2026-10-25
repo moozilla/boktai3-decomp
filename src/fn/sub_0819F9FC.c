@@ -24,7 +24,7 @@ void ActionState_SetState(u8 *, u32);
 void ActionState_AdvanceState(u8 *);
 void Hresvelgr_SetAnimation(struct ActorReaction *, void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
-void sub_0819BCB8(struct ActorReaction *);
+void Hresvelgr_EmitFacingMotion(struct ActorReaction *);
 s32 Callback_InvokeActor(void *, void *);
 void Hresvelgr_UpdateFacingActionPhase(struct ActorReaction *actor)
 {
@@ -60,7 +60,7 @@ void Hresvelgr_UpdateFacingActionPhase(struct ActorReaction *actor)
             }
             if (actor->animationCycles > 4)
                 ActionState_AdvanceState(action);
-            sub_0819BCB8(actor);
+            Hresvelgr_EmitFacingMotion(actor);
             break;
         case 1:
             actor->finished = 1;
