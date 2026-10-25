@@ -519,6 +519,15 @@ def land_draft(func, tree, wd):
         cmd.append("--nonmatching")
     env = {k: v for k, v in os.environ.items() if k != "SCOPE_RUN"}  # the base was copied to the unscoped workspace
     p = subprocess.run(cmd, cwd=tree, capture_output=True, text=True, env=env)
+    if p.returncode and "is already used" in p.stdout + p.stderr and "--name" in cmd:
+        # the worker's name is taken: land the code anyway, under its sub_ label
+        print((p.stdout + p.stderr).strip() + "\n  landing without the name")
+        i = cmd.index("--name")
+        cmd = cmd[:i] + cmd[i + 2:]
+        if "--note" in cmd:
+            j = cmd.index("--note")
+            cmd = cmd[:j] + cmd[j + 2:]
+        p = subprocess.run(cmd, cwd=tree, capture_output=True, text=True, env=env)
     print((p.stdout + p.stderr).strip())
     if p.returncode == 0:
         open(os.path.join(wd, "landed"), "w").write(tree)
