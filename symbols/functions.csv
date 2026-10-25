@@ -7923,6 +7923,7 @@ addr,name,mode,confidence,source,notes
 081DA0B4,TimedEffect_InitEntry,thumb,low,src-alias,
 081DA178,TimedEffect_RemoveFromManager,thumb,low,src-alias,
 081DA1DC,TimedEffect_UpdateTerrainTurn,thumb,low,src-alias,
+081DA3D8,TimedEffect_UpdateManager,thumb,low,src-alias,Updates active timed effects; applies motion and terrain reactions; and refreshes collision state.
 081DA61C,TimedEffect_DestroyManager,thumb,low,src-alias,
 081DA684,TimedEffect_InitManager,thumb,low,src-alias,
 081DA720,Task4E01_GetOrCreate,thumb,low,src-alias,
