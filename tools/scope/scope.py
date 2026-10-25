@@ -457,6 +457,8 @@ def rom_pool_ranges(code, addr, arm=False):
         return sorted((t, t + 4) for t in data)
     for i in range(0, len(code) - 1, 2):
         h = int.from_bytes(code[i:i + 2], "little")
+        if any(t <= i < t + 4 for t in data):
+            continue  # a pool word's halfword (0x08604A48 holds 0x4A48, an `ldr r2, [pc]`) is not a load
         if h & 0xF800 == 0x4800:
             t = ((addr + i + 4) & ~3) + (h & 0xFF) * 4 - addr
             if 0 <= t < len(code):
@@ -465,9 +467,12 @@ def rom_pool_ranges(code, addr, arm=False):
 
 
 def rom_data(func, addr, code, arm=False):
-    """The ROM function's data ranges: its generated assembly's, plus the literal pools its
-    pc-relative loads reach (a function the disassembler left as .incbin has no labels at all)."""
-    return sorted(set(rom_data_ranges(func, addr) or []) | set(rom_pool_ranges(code, addr, arm)))
+    """The ROM function's data ranges: its generated assembly's, or (a function the disassembler
+    left as .incbin has no labels at all) the literal pools its pc-relative loads reach."""
+    labeled = rom_data_ranges(func, addr)
+    if labeled:  # the disassembler's data labels are exact; the pool scan is for .incbin functions
+        return sorted(labeled)
+    return rom_pool_ranges(code, addr, arm)
 
 
 def is_arm(name, addr, index=None):
