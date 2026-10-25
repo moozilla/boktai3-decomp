@@ -4896,6 +4896,7 @@ addr,name,mode,confidence,source,notes
 0812C41C,FragmentEffect_SpawnRandomParticle,thumb,low,src-alias,Spawns a particle with randomized horizontal direction and vertical velocity lasting 60 ticks
 0812C4E8,FragmentEffect_GrowToFullSize,thumb,low,src-alias,
 0812C69C,FragmentEffect_UpdateOrbit,thumb,low,src-alias,
+0812C8E0,FragmentEffect_ShrinkAndRemove,thumb,low,src-alias,Shrinks a fragment over 20 ticks; emits particles; advances animation; then frees its sprite and pool slot; inventory includes a separate 612-byte routine.
 0812CD10,FragmentEffect_UpdateManager,thumb,low,src-alias,Task update callback dispatches each active slot through its state callback table
 0812CD70,FragmentEffect_DestroyManager,thumb,low,src-alias,Task cleanup callback removes active sprites and clears the singleton pointer
 0812CDB0,FragmentEffect_InitManager,thumb,low,src-alias,Clears the pool mask and loads fragment animation resource F422 before publishing the singleton
