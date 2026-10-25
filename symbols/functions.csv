@@ -5012,6 +5012,7 @@ addr,name,mode,confidence,source,notes
 08138B18,ParticleEmitter_UpdateScatterTrail,thumb,low,src-alias,
 08138CDC,ParticleEmitter_UpdateFlight,thumb,low,src-alias,
 08138FE0,SoundDelay_Update,thumb,low,src-alias,
+08139028,BallisticSpriteEffect_UpdateLaunch,thumb,low,src-alias,Updates a ballistic sprite with sine drift; an initial particle trail and animation; then enters its sound delay.
 08139298,BallisticSpriteEffect_UpdateManager,thumb,low,src-alias,Invokes each active effect slot callback in the four-slot manager; ballistic identity is tentative
 081392DC,BallisticSpriteEffect_DestroyManager,thumb,low,src-alias,Removes all four slot sprites and clears the manager pointer
 0813930C,SceneProcSprites_Initialize,thumb,low,src-alias,

@@ -26,7 +26,7 @@ extern u8 *gUnk_020004CC;
 u8 *BallisticSpriteEffect_EnsureManager(void);
 void Memory_Clear(void *, u32);
 void BallisticSpriteEffect_OnAnimationComplete(void);
-void sub_08139028(void);
+void BallisticSpriteEffect_UpdateLaunch(void);
 void SceneProcSprites_SubmitBounds(void *, void (*)(void), u32, u32);
 s32 SceneProcSprites_CreateEntry(struct SpriteVector *position, s32 a, s32 b, u32 kind, u16 *params)
 {
@@ -55,7 +55,7 @@ s32 SceneProcSprites_CreateEntry(struct SpriteVector *position, s32 a, s32 b, u3
             p->entries[i].kind = kind;
             SceneProcSprites_SubmitBounds(&p->entries[i], BallisticSpriteEffect_OnAnimationComplete,
                                           params[3], kind + 1);
-            ((struct SceneProcSprites *)((u8 *)p + i * 0xe0))->entries[0].callback = sub_08139028;
+            ((struct SceneProcSprites *)((u8 *)p + i * 0xe0))->entries[0].callback = BallisticSpriteEffect_UpdateLaunch;
             p->entries[i].flags = 1;
             return i;
         }
