@@ -8634,6 +8634,7 @@ addr,name,mode,confidence,source,notes
 0820AFD0,DragonPuppy_ReadAttackSchedule,thumb,low,src-alias,Reads up to eight script timing values consumed by the attack state
 0820B174,DragonPuppy_UpdateAttackTiming,thumb,low,src-alias,Attack state callback that triggers an attack on scheduled or periodic intervals
 0820B258,DragonPuppy_UpdateAttackRecovery,thumb,low,src-alias,Recovery callback that counts down before restoring animation and attack timing
+0820B2AC,DragonPuppy_UpdateAttackWindup,thumb,low,src-alias,Jitters the displayed position near the attack timer; then restores it and starts the attack animation.
 0820B3E0,DragonPuppy_UpdateCombat,thumb,low,src-alias,
 0820B7D4,DragonPuppy_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that removes the puppy sprite
 0820B7E0,DragonPuppy_InitializeFromScript,thumb,low,src-alias,

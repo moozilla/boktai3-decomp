@@ -26,7 +26,7 @@ void Anim_SetSequence(void *, void *, u32, u32, u32);
 void DragonPuppy_InitCollider(void *);
 void DragonPuppy_UpdateAttackTiming(void);
 void DragonPuppy_ReadAttackSchedule(void *);
-void sub_0820B2AC(void);
+void DragonPuppy_UpdateAttackWindup(void);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
@@ -242,7 +242,7 @@ s32 DragonPuppy_InitializeFromScript(u8 *p, void *parent)
         *(void (**)(void))(p + 0x108) = DragonPuppy_UpdateAttackTiming;
         Anim_SetSequence(p + 0x10c, resource, 3, B(0x132), dead);
     } else {
-        *(void (**)(void))(p + 0x108) = sub_0820B2AC;
+        *(void (**)(void))(p + 0x108) = DragonPuppy_UpdateAttackWindup;
         Anim_SetSequence(p + 0x10c, resource, 5, B(0x132), 0);
     }
     DragonPuppy_StepAnimation(p, sprite, (struct FanSeq *)(p + 0x10c));
