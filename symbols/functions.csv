@@ -520,6 +520,7 @@ addr,name,mode,confidence,source,notes
 08018420,Weather_GetType,thumb,low,src-alias,"Simple getter returning the gUnk_02000088 weather-type/state global, read both inside and outside the weather subsystem"
 0801842C,Weather_GetTypeFromScript,thumb,low,src-alias,"Thin wrapper forwarding to Weather_GetType, taking an (unused) context pointer for a script-call signature"
 08018438,PaletteCycle_RefreshBasePalette,thumb,low,src-alias,CpuSets 512 bytes from the fixed IWRAM palette buffer (0x03004FC0) into the task's working buffer at p+0x1c; used both on init and conditionally each 
+08018454,PaletteCycle_UpdateEntry,thumb,low,src-alias,Advances one palette-cycle entry: steps and holds toward one palette; then (unless flagged to stop) back; and writes the blended or copied colors.
 080185B8,PaletteCycle_Update,thumb,low,src-alias,"Task update callback installed by PaletteCycle_Create: resyncs the base palette when needed, then walks the p+0x18-count array of 0x18-byte cycle entr"
 080185F4,PaletteCycle_Destroy,thumb,low,src-alias,Task destroy callback installed by PaletteCycle_Create: clears the gUnk_02000094 singleton handle when the palette-cycle task is killed
 08018600,PaletteCycle_Initialize,thumb,low,src-alias,"Sets the gUnk_02000094 singleton to the new task, zeroes its active-cycle count at p+0x18, and primes the base palette via PaletteCycle_RefreshBasePal"
