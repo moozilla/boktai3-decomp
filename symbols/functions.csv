@@ -8251,7 +8251,7 @@ addr,name,mode,confidence,source,notes
 081F21F8,SingletonSlot7_OnEffectMotionComplete,thumb,low,src-alias,Motion completion callback resets the effect to state 1 and clears its timer
 081F2208,SpriteTrail_InitializeEntry,thumb,low,src-alias,Initializes a sprite-trail pool entry; its seven sprites; animation; and render/motion spatial entries.
 081F23A0,SpriteGroup_RemoveSlot,thumb,low,src-alias,
-081F2404,SpriteTrail_UpdatePositions,thumb,low,src-alias,
+081F2404,SpriteTrail_UpdatePositions,thumb,low,src-alias,Projects the current and three historical trail positions; averages adjacent sprites; and advances the four-entry position history unless frozen.
 081F2534,SpriteTrail_BeginImpact,thumb,low,src-alias,
 081F2678,SpriteGroup_UpdateExpiringSlot,thumb,low,src-alias,
 081F26BC,SpriteGroup_UpdateSlots,thumb,low,src-alias,
@@ -8424,7 +8424,7 @@ addr,name,mode,confidence,source,notes
 081FCF74,SceneProjectile_InitPool,thumb,low,src-alias,Publishes the projectile pool singleton and initializes its ten slots
 081FCFA8,SceneProjectile_CreatePool,thumb,low,src-alias,Allocates and initializes the projectile pool task with update and destruction callbacks
 081FCFE8,Projectile_FindFreeSlot,thumb,low,src-alias,Finds the first unused entry in the ten-slot projectile pool and returns its index
-081FD01C,Projectile_SpawnAtPosition,thumb,low,src-alias,
+081FD01C,Projectile_SpawnAtPosition,thumb,low,src-alias,Allocates a projectile slot; configures behavior; velocity; colliders and animation; activates it; and plays its spawn sound.
 081FD3D8,Projectile_InitParameters,thumb,low,src-alias,
 081FD458,Projectile_SetLaunchParameters,thumb,low,src-alias,Sets type and lifetime plus heading and speed used to calculate initial velocity
 081FD474,Projectile_SetHomingParameters,thumb,low,src-alias,Sets steering duration and target pointer plus turn rate; target use confirmed by steering code
@@ -8619,7 +8619,7 @@ addr,name,mode,confidence,source,notes
 0820958C,FanCannon_Activate,thumb,low,src-alias,Switches an inactive cannon to its active callback and plays its sound
 082095B8,FanCannon_IsPathToPlayerClear,thumb,low,src-alias,
 082096E8,FanCannon_UpdateInactive,thumb,low,src-alias,Inactive state callback that decrements a positive timer
-08209704,FanCannon_UpdateActive,thumb,low,src-alias,
+08209704,FanCannon_UpdateActive,thumb,low,src-alias,Emits randomized wind particles every 30 ticks and ramps wind strength to its cap.
 08209A38,CombatActor_UpdateDefeatEffect,thumb,low,src-alias,
 08209AC4,FanCannon_Update,thumb,low,src-alias,
 0820A2C8,FanCannonManager_Update,thumb,low,src-alias,
@@ -9647,6 +9647,7 @@ addr,name,mode,confidence,source,notes
 082315A8,EffectGroup_Spawn,thumb,low,src-alias,
 08231788,SceneActorEffects_FinishSlot,thumb,low,src-alias,Resets slot state and timer while marking its drawable inactive
 082317A0,EffectPart_UpdateLoopAnimation,thumb,low,src-alias,
+082318E0,EffectPart_UpdateFinish,thumb,low,src-alias,Advances a sprite part animation; frees its slot at the sequence boundary; and decrements the group's active count.
 08231A0C,EffectPart_UpdateAnimation,thumb,low,src-alias,
 08231B3C,EffectPart_UpdateBlink,thumb,low,src-alias,
 08231C84,EffectPart_UpdateAnimation2,thumb,low,src-alias,
@@ -9689,6 +9690,7 @@ addr,name,mode,confidence,source,notes
 08233418,ExplosionEffect_CreateDelayed,thumb,low,src-alias,Creates a default blast with a caller-specified activation delay
 08233488,ExplosionEffect_CreateConfigured,thumb,low,src-alias,Creates a blast with caller-specified attack flags and cooldown plus palette and delay
 082334F4,ChargedBurst_SetState,thumb,low,src-alias,Stores the state callback and resets its frame counter; charged burst identity is tentative
+082335F0,ChargedBurst_EmitSpark,thumb,low,src-alias,Activates the next of eight sparks every other call; copying the emitter position and adding three random offsets.
 08233714,TimedDisplay_AdvanceIntro,thumb,low,src-alias,
 08233760,ChargedBurst_EmitTerminalDebris,thumb,low,src-alias,
 082338EC,ChargedBurst_OnTaskUpdate,thumb,low,src-alias,Task update callback that invokes the current charged burst state handler

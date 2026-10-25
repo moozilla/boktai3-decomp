@@ -8,14 +8,14 @@ struct TimedDisplay {
     void (*state)(void);
 };
 void sub_0823350C(struct TimedDisplay *);
-void sub_082335F0(struct TimedDisplay *);
+void ChargedBurst_EmitSpark(struct TimedDisplay *);
 void ChargedBurst_SetState(struct TimedDisplay *, void (*)(void));
 void ChargedBurst_EmitTerminalDebris(void);
 void Sound_PlaySong(u32);
 void TimedDisplay_AdvanceIntro(struct TimedDisplay *s)
 {
     sub_0823350C(s);
-    sub_082335F0(s);
+    ChargedBurst_EmitSpark(s);
     if (++s->timer > 31) {
         s->flags &= ~1;
         Sound_PlaySong(0x133);
