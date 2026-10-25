@@ -6924,6 +6924,7 @@ addr,name,mode,confidence,source,notes
 081A68F8,Vanargand_AdvanceEffectStageOne,thumb,low,src-alias,Advances the effect controller at offset 0x15 from stage 1 to stage 2
 081A690C,Vanargand_AdvanceEffectStageThree,thumb,low,src-alias,Advances the effect controller at offset 0x15 from stage 3 to stage 4
 081A6920,ScreenPalette_UpdateState,thumb,low,src-alias,
+081A6AEC,Vanargand_GetTargetLateralDistance,thumb,low,src-alias,Returns planar world distance corresponding to the target's projected horizontal separation from the actor.
 081A6C24,Vanargand_UpdateCameraOffset,thumb,low,src-alias,Blends a stored camera position toward the player using a distance-dependent shift; preserving player height.
 081A6D0C,Camera_UpdatePlayerBlendOffset,thumb,low,src-alias,Blends actor X/Z toward the effective player position with a clamped shift; keeps player Y; and applies an eight-frame camera offset.
 081A6DCC,Camera_BlendOffset,thumb,low,src-alias,
