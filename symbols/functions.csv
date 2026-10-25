@@ -6912,6 +6912,7 @@ addr,name,mode,confidence,source,notes
 081A5614,Vanargand_UpdatePaletteTransition,thumb,low,src-alias,
 081A6148,PositionedEffect_InitContactCollider,thumb,low,src-alias,
 081A61EC,PositionedEffect_InitAttackCollider,thumb,low,src-alias,
+081A645C,Debug_TestIsometricProjection,thumb,low,src-alias,On a newly pressed R button; unprojects a local (0; 1; 0) vector and discards the result; tentative debug hook.
 081A64C8,ScreenPalette_ProjectPosition,thumb,low,src-alias,
 081A6568,ScreenPalette_ProjectPositionAt88,thumb,low,src-alias,
 081A6604,PositionedEffect_UpdateVectors,thumb,low,src-alias,
