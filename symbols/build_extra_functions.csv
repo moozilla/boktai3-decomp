@@ -479,7 +479,7 @@ address,isa,evidence,replacement_end
 081A36FC,thumb,Hidden Task_Kill wrapper for gUnk_02000238,081A3710
 081A398C,thumb,Hidden raw-tail function,081A39E0
 081A3F70,thumb,Hidden Task_Kill wrapper for gUnk_0200023C,081A3F84
-081A4420,thumb,Independent falling-motion updater clone with own prologue and return after 081A42AC,
+081A4420,thumb,Independent falling-motion updater clone with own prologue and return after 081A42AC; exact 372-byte C body,081A4594
 081A47D0,thumb,Hidden Task_Kill wrapper for gUnk_02000240,081A47E4
 081A4ED8,thumb,Hidden Task_Kill wrapper for gUnk_02000244,081A4EEC
 081A6458,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081A645C
