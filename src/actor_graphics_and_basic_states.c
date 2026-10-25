@@ -2125,7 +2125,141 @@ void SceneActorState_EnterPhase6AndResetAnimation(State_08023F98 *p)
     ((u8 *)p)[0x383] = 0;
 }
 
+struct ProbeBox {
+    s32 x : 16, y : 16, z : 16, w : 16;
+};
+
+// confidence=low: state 6 of the actor's recovery pipeline: grab a tracked target in reach in
+// front (variant 1), otherwise advance to phase 5 once the animation ends or the ground 0x190
+// ahead is more than two tiles above or below.
+
+// confidence=low: state 6 of the actor's recovery pipeline: grab a tracked target in reach in
+// front (variant 1), otherwise advance to phase 5 once the animation ends or the ground 0x190
+// ahead is more than two tiles above or below.
+
+// confidence=low: state 6 of the actor's recovery pipeline: grab a tracked target in reach in
+// front (variant 1), otherwise advance to phase 5 once the animation ends or the ground 0x190
+// ahead is more than two tiles above or below.
+struct ProbePos {
+    s16 x, y, z, w;
+};
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
+
+static inline s32 ProbeTruncate12(s32 value)
+{
+    return value >= 0 ? value >> 12 : -((-value) >> 12);
+}
+
+static inline void ProbeProject(struct ProbePos *out, u8 angle, s32 distance)
+{
+    out->x = ProbeTruncate12(gUnk_086149C4[(angle + 0x40) & 0xff] * distance);
+    out->y = 0;
+    out->z = ProbeTruncate12(gUnk_086149C4[angle] * distance);
+}
+
+static inline void ProbeAdd(struct ProbePos *dst, struct ProbePos *src)
+{
+    dst->x += src->x;
+    dst->y += src->y;
+    dst->z += src->z;
+}
+
+static inline s32 ProbeCellAt(struct ProbePos *p)
+{
+    s32 x = p->x >> 8;
+    s32 z = p->z >> 8;
+    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        return 0;
+    return gUnk_030052F4->rows[z] + x;
+}
+
+static inline u8 *ProbeCellProps(s32 cell)
+{
+    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
+    if (p)
+        return p + 4;
+    return gUnk_030052F4->cells + (cell * 4 + 12);
+}
+
+#ifdef NONMATCHING
+// fuzzy: 89.6%
+// scope shape 5 (differences once low registers are set aside)
+// confidence=low: state 6 of the actor's recovery pipeline: grab a tracked target in reach in
+// front (variant 1), otherwise advance to phase 5 once the animation ends or the ground 0x190
+// ahead is more than two tiles above or below.
+void sub_08023FE8(State_08023F98 *p)
+{
+    u8 *actor = (u8 *)p;
+    struct ProbePos *sprite = (struct ProbePos *)((u8 *)p + 0x48);
+    p->vulnerable = 1;
+    if (enter_08023F98(p)) {
+        u32 k = 6;
+        p->animation = k;
+    }
+    if (actor[0x394] == 1) {
+        struct ProbePos off, min, max;
+        s32 r;
+        ProbeProject(&off, ((u8 *)sprite)[9], 0x80);
+        ProbeAdd(&off, (struct ProbePos *)((u8 *)sprite + 0xc));
+        min.x = -0x80;
+        min.z = -0x80;
+        ProbeAdd(&min, &off);
+        max.x = 0x80;
+        max.z = 0x80;
+        ProbeAdd(&max, &off);
+        r = sub_08022624(actor, actor[0x174], (struct BoxSearchPosition *)&min,
+                         (struct BoxSearchPosition *)&max);
+        if (r >= 0) {
+            u8 *q = (&gUnk_02000580)[r];
+            u32 mask = 0x40000;
+            if (!(*(u32 *)(q + 0x20) & mask)) {
+                actor[0x395] = r;
+                SceneActorState_EnterPhase6AndResetAnimation(p);
+                return;
+            }
+        }
+    }
+    {
+        struct ProbePos pos;
+        s32 distance = 0x190;
+        u8 *s = actor + 0x48;
+        u8 *props;
+        u32 type;
+        s32 h;
+        u32 bad;
+        ProbeProject(&pos, s[9], distance);
+        ProbeAdd(&pos, (struct ProbePos *)(s + 0xc));
+        props = ProbeCellProps(ProbeCellAt(&pos));
+        type = *props >> 4;
+        h = (*props & 0xf) << 8;
+        switch (type) {
+            case 1:
+                h -= (u8)pos.z;
+                break;
+            case 2:
+                h -= (u8)pos.x;
+                break;
+        }
+        {
+            u32 d = h - *(s16 *)(actor + 0x352) + 0x1ff;
+            bad = 0;
+            if (d > 0x3fe)
+                bad = 1;
+        }
+        if (bad || p->finished) {
+            u32 next = 5;
+            u32 zero;
+            p->phase = next;
+            zero = 0;
+            p->elapsed = zero;
+            p->enter_08023F98 = 1;
+        } else
+            p->elapsed++;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08023FE8);
+#endif
 
 struct S_0802429C {
     u8 f0[0x9a];
