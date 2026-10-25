@@ -2126,6 +2126,46 @@ def cmd_pins(src, func, env):
     return 0
 
 
+def cmd_calls(src, func, env):
+    """The ROM's call sequence against the draft's: each `bl` to another function, by name, aligned so
+    a missing, extra or reordered call shows at its place. A `bl` into the function itself is a far
+    branch (to a shared tail), not a call, and is left out. For a big draft this says which calls and
+    blocks are still missing without reading the whole listing."""
+    mine, addr, info = compile_draft(src, func, env)
+    by_label, addrs, sizes = inventory()
+    name = rom_name(src, func)
+    rom_code = load_rom(verify=False)[off(addr):off(addr) + sizes[name]]
+    data = info["data"] if "data" in info else mapping_ranges(os.path.join(info["wd"], "u.o"),
+                                                              info["obj_offset"], len(mine))
+    names = {}
+    for n, a in addrs.items():
+        names.setdefault(a, n)
+
+    def calls(rows):
+        out = []
+        for o, _, text, _, _ in rows:
+            m = re.match(r"bl #(0x[0-9a-f]+)$", text)
+            if m:
+                t = int(m.group(1), 16)
+                out.append((o, names.get(t, names.get(t | 1, f"0x{t:08X}"))))
+        return out
+    rom = calls(decode(rom_code, addr, rom_data(name, addr, rom_code)))
+    dr = calls(decode(mine, addr, data))
+    sm = difflib.SequenceMatcher(None, [n for _, n in rom], [n for _, n in dr], autojunk=False)
+    same = sum(b.size for b in sm.get_matching_blocks())
+    print(f"{func}: {len(rom)} ROM calls, {len(dr)} draft calls, {same} in the same order"
+          + ("" if same < len(rom) or len(rom) != len(dr) else ": every call present, in order"))
+    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+        if tag == "equal":
+            continue
+        before = rom[i1 - 1][1] if i1 else "(entry)"
+        for o, n in rom[i1:i2]:
+            print(f"  missing  ROM +0x{o:X}  {n}  (after {before})")
+        for o, n in dr[j1:j2]:
+            print(f"  extra    draft +0x{o:X}  {n}  (after {before})")
+    return 0
+
+
 def cmd_spill(src, func, env):
     """Is the whole difference reload's spill rotation? Greedily shift the rotation (AGBCC_SPILL) before
     each reload choice, from the first differing instruction on, keeping shifts that reduce the diff."""
@@ -4211,6 +4251,19 @@ def c_change(base_lines, path):
     return f"lines {lo}-{hi} (+{plus} -{minus})" if lo != hi else f"line {lo} (+{plus} -{minus})"
 
 
+def is_snippet(base_lines, text, func):
+    """Is TEXT a `put` snippet rather than a whole copy of the workspace: it lacks a function or
+    INCLUDE_ASM the workspace has besides FUNC, or the workspace's #include lines."""
+    base = "\n".join(base_lines)
+
+    def defined(t):
+        return (set(re.findall(r"^(?!static\b)[A-Za-z_][^\n;=(){}]*?\b(\w+)\s*\([^;{}]*\)\s*\{", t, re.M))
+                | set(re.findall(r"INCLUDE_ASM\([^,]+,\s*(\w+)\)", t)))
+    if (defined(base) - {func}) - defined(text):
+        return True
+    return bool(re.search(r"^#include", base, re.M)) and not re.search(r"^#include", text, re.M)
+
+
 def cmd_try(src, func, variants, env):
     """Score each variant (a whole-file .c, or one KNOB=V) through the fork server, best first."""
     t0 = time.perf_counter()
@@ -4234,6 +4287,19 @@ def cmd_try(src, func, variants, env):
         if not os.path.isfile(path):
             rows.append((None, rel, "source file not found", "missing file", {}))
             continue
+        if is_snippet(base_lines, open(path).read(), func):
+            # a snippet (FUNC and what it needs, as `put` takes) is scored as the workspace with it put in
+            import contextlib
+            import io
+            full = os.path.splitext(path)[0] + ".full.c"
+            open(full, "w").write("\n".join(base_lines) + "\n")
+            try:
+                with contextlib.redirect_stdout(io.StringIO()):
+                    put_definition(os.path.relpath(full, ROOT), path, func)
+            except SystemExit as e:
+                rows.append((None, rel, "snippet: " + str(e.code).splitlines()[0][:80], "put failed", {}))
+                continue
+            rel = os.path.relpath(full, ROOT)
         try:
             n, info = score(rel, func, env)
         except SystemExit as e:
@@ -4570,6 +4636,10 @@ def main():
         rest.remove("spill")
         func = source_function(src, rest[0] if rest else None)
         return cmd_spill(src, func, env)
+    if "calls" in rest:  # FILE.c calls [FUNC]: the ROM's call sequence against the draft's
+        rest.remove("calls")
+        func = source_function(src, rest[0] if rest else None)
+        return cmd_calls(src, func, env)
     if "why" in rest:
         i = rest.index("why")
         why_uid = -1 if rest[i + 1] == "all" else int(rest[i + 1])
