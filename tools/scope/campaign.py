@@ -566,9 +566,19 @@ def cmd_submit(args):
     shutil.copy(src, os.path.join(wd, "best.c"))
     if exact:
         shutil.copy(src, os.path.join(wd, "best_match.c"))
+    # the workspace's base sits next to the draft; a copy made elsewhere finds it in any scope run
     base = os.path.join(os.path.dirname(src), func + ".base.c")
+    if not os.path.exists(base):
+        import glob
+        found = sorted(glob.glob(os.path.join(ROOT, "build", "scope", "*", "work", func + ".base.c"))
+                       + glob.glob(os.path.join(ROOT, "build", "scope", "work", func + ".base.c")), key=os.path.getmtime)
+        base = found[-1] if found else base
     if os.path.exists(base):
         shutil.copy(base, os.path.join(wd, "base.c"))
+    elif os.path.exists(os.path.join(wd, "base.c")):
+        # an earlier attempt's base describes the unit as it was then: merging against it could undo neighbors
+        os.replace(os.path.join(wd, "base.c"), os.path.join(wd, "base.c.stale"))
+        print(f"{func}: no workspace base for {args[1]}; dropped the earlier attempt's base.c")
     name = args[args.index("--name") + 1] if "--name" in args else None
     note = args[args.index("--note") + 1] if "--note" in args else None
     json.dump({"match": exact, "counts": "MATCH" if exact else (m.group(1) if m else "?"), "pins": 0, "barriers": 0,
