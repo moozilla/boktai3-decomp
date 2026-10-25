@@ -4872,6 +4872,7 @@ addr,name,mode,confidence,source,notes
 0812B2CC,FragmentProjectilePool_Init,thumb,low,src-alias,Starts the pool animation script and clears the allocation mask before registering the singleton
 0812B2F8,FragmentProjectilePool_GetOrCreate,thumb,low,src-alias,Returns the existing projectile pool or creates and initializes its task with lifecycle callbacks
 0812B344,FragmentProjectilePool_ResetSingleton,thumb,low,src-alias,Clears the projectile pool singleton during scene subsystem reset
+0812B350,FragmentProjectilePool_RequestRemovalAll,thumb,low,src-alias,Requests removal for each occupied effect slot by setting state 3 and its entry flag; preserving slots already in state 3.
 0812B3A8,TwinSpriteEffect_InitGraphics,thumb,low,src-alias,
 0812B424,TwinSpriteEffect_EmitTrail,thumb,low,src-alias,
 0812B5D0,TimedEffect_UpdateVisibility,thumb,low,src-alias,
