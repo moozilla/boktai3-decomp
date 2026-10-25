@@ -3956,6 +3956,7 @@ addr,name,mode,confidence,source,notes
 080FC8D4,ActorCollision_InitThreeAuxiliaryAttacks,thumb,low,src-alias,
 080FC998,Axe_UpdateTrailColliders,thumb,low,src-alias,
 080FCB3C,Axe_RemoveSecondaryColliders,thumb,low,src-alias,Removes two colliders from the axe auxiliary data
+080FCB64,Axe_UpdateBodyColliders,thumb,low,src-alias,Gate three body/attack collider pairs and rotate their positions along the Axe actor.
 080FD04C,ActorGroup_ReadScriptOptions,thumb,low,src-alias,
 080FD10C,Axe_PrepareUpdate,thumb,low,src-alias,Runs three preparation helpers before the axe state callback
 080FD128,Axe_UpdateEffects,thumb,low,src-alias,Runs six effect and timer helpers after the axe state callback; grouping is provisional
