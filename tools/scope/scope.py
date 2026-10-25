@@ -1722,6 +1722,8 @@ def neighbor_failure(src, func, stderr):
         m = re.search(r"In function [`'‘’](\w+)", ln)
         if m:
             current = m.group(1)
+        elif "At top level" in ln:  # a declaration-level error belongs to no function
+            current = None
         elif current and re.search(r"error|undeclared|conflicting types", ln, re.I):
             if current not in failed:
                 failed.append(current)
@@ -4132,7 +4134,11 @@ def cmd_try(src, func, variants, env):
         try:
             n, info = score(rel, func, env)
         except SystemExit as e:
-            n, info = None, {"counts": "compile fails: " + str(e.code).splitlines()[-1].strip()[:60]}
+            msg = str(e.code).splitlines()
+            # the first diagnostic that is an error, as LINE: text (the last line is often only a summary)
+            err = next((re.sub(r"^.*?\.c:(\d+):", r"line \1:", ln).strip() for ln in msg
+                        if re.search(r"\.c:\d+: (?!warning)", ln)), msg[-1].strip())
+            n, info = None, {"counts": "compile fails: " + err[:90]}
         rows.append((n, rel, info.get("counts", "MATCH" if n == 0 else "?"), c_change(base_lines, path), info))
     dt = time.perf_counter() - t0
     knobs = " ".join(f"{k}={v}" for k, v in env.items())
