@@ -18,7 +18,13 @@
   scope.py rom FUNC|ADDR        FUNC's ROM listing with calls and literal symbols named (no draft needed)
   scope.py fields OFF... [STRUCT]  structs in include/ with members at these offsets (agbcc's own layout),
                                 or STRUCT's member at each offset
-  scope.py todo [N] [prior|size|addr]   functions with no C yet (phase 1), most matched prior art first
+  scope.py FILE.c shape         the diff with low registers blanked: order and instruction differences only
+  scope.py todo [N] [addr|prior|size]   functions with no C yet (phase 1), in ROM order
+  scope.py new FUNC             open FUNC: a draft in build/scope/work/ (its unit with a stub, or a twin's C)
+  scope.py land FUNC [D.c] [--name NEW] [--note T] [--rom] [--nonmatching]   put a matching draft into
+                                src/ (unit merge, or a new src/fn file and the hidden boundary), check the
+                                file, name it; --nonmatching: an unfinished draft under #ifdef NONMATCHING
+  scope.py rename FUNC NEW [--note T]   functions.csv and every C spelling of the old name or sub_ label
   scope.py like FUNC|ADDR [N]   matched functions whose ROM shares the most rare 3-insn windows with
                                 FUNC's, with the calls and constants they share: whose C to read first
   scope.py insn UID [FUNC]      one RTL insn through every pass (from the last compile of FUNC)
@@ -133,6 +139,7 @@ PASSES = ["rtl", "jump", "cse", "addressof", "gcse", "loop", "cse2", "flow", "co
           "lreg", "greg", "jump2", "mach"]
 PASS_NOTE = {"greg": "greg/reload", "mach": "mach (late split/reorg)"}
 CS = capstone.Cs(capstone.CS_ARCH_ARM, capstone.CS_MODE_THUMB)
+CS_ARM = capstone.Cs(capstone.CS_ARCH_ARM, capstone.CS_MODE_ARM)
 
 
 # ---------------------------------------------------------------- compile
@@ -188,8 +195,14 @@ def workdir(func):
 
 
 def nonmatching_func(src):
-    """The function a draft file is about: the first definition inside #ifdef NONMATCHING."""
+    """The function a draft file is about: a workspace draft's own (build/scope/work/FUNC.c, from `new`),
+    else the first definition inside #ifdef NONMATCHING."""
     text = open(os.path.join(ROOT, src)).read()
+    ws = os.path.relpath(os.path.join(ROOT, src), os.path.join(WORK, "work"))
+    if not ws.startswith(".."):
+        name = os.path.basename(ws).split(".")[0]
+        if re.search(rf"\b{re.escape(name)}\s*\([^;{{]*\)\s*\{{", text):
+            return name
     run = os.environ.get("SCOPE_RUN")  # a campaign worker's assignment, when it is drafted in this file
     if run and any(re.search(rf"^[A-Za-z_][\w \*]*?\b{re.escape(run)}\s*\(", b, re.M)
                    for b in re.findall(r"#ifdef NONMATCHING(.*?)#else", text, re.S)):
@@ -431,9 +444,17 @@ def rom_data_ranges(func, addr):
     return data
 
 
-def rom_pool_ranges(code, addr):
+def rom_pool_ranges(code, addr, arm=False):
     """Fallback: literal-pool words found from pc-relative loads."""
     data = set()
+    if arm:  # ldr rN, [pc, #+-imm12]
+        for i in range(0, len(code) - 3, 4):
+            w = int.from_bytes(code[i:i + 4], "little")
+            if w & 0x0F7F0000 == 0x051F0000:
+                t = i + 8 + (w & 0xFFF if w & (1 << 23) else -(w & 0xFFF))
+                if 0 <= t < len(code):
+                    data.add(t)
+        return sorted((t, t + 4) for t in data)
     for i in range(0, len(code) - 1, 2):
         h = int.from_bytes(code[i:i + 2], "little")
         if h & 0xF800 == 0x4800:
@@ -443,16 +464,31 @@ def rom_pool_ranges(code, addr):
     return sorted((t, t + 4) for t in data)
 
 
-def rom_data(func, addr, code):
+def rom_data(func, addr, code, arm=False):
     """The ROM function's data ranges: its generated assembly's, plus the literal pools its
     pc-relative loads reach (a function the disassembler left as .incbin has no labels at all)."""
-    return sorted(set(rom_data_ranges(func, addr) or []) | set(rom_pool_ranges(code, addr)))
+    return sorted(set(rom_data_ranges(func, addr) or []) | set(rom_pool_ranges(code, addr, arm)))
+
+
+def is_arm(name, addr, index=None):
+    """FUNC is ARM code: its functions.csv or build_extra_functions.csv mode, or its unit is built
+    with agbcc_arm."""
+    import land
+    if any(a == addr and m == "arm" for a, m in arm_starts()):
+        return True
+    row = land.hidden_row(ROOT, addr)
+    if row:
+        return row["isa"] == "arm"
+    kind, dest, _ = land.where(ROOT, name, addr, index)
+    path = os.path.join(ROOT, dest)
+    return kind == "unit" and "// COMPILER: agbcc_arm" in open(path).read()
 
 
 # ---------------------------------------------------------------- decode
 
-def decode(code, addr, data):
-    """[(offset, size, text, key, target_offset)]; data words decode as .word."""
+def decode(code, addr, data, arm=False):
+    """[(offset, size, text, key, target_offset)]; data words decode as .word. ARM=True for ARM code."""
+    cs, step, pc = (CS_ARM, 4, 8) if arm else (CS, 2, 4)
     rows, i = [], 0
     data = sorted(data)
     lo, hi = addr, addr + len(code)
@@ -466,17 +502,17 @@ def decode(code, addr, data):
             rows.append((i, n, text, ".word ->" if tgt is not None else text, tgt))
             i += n
             continue
-        ins = next(CS.disasm(code[i:i + 4], addr + i), None)
+        ins = next(cs.disasm(code[i:i + 4], addr + i), None)
         if ins is None:
-            v = int.from_bytes(code[i:i + 2], "little")
-            rows.append((i, 2, f".2byte 0x{v:04X}", f".2byte 0x{v:04X}", None))
-            i += 2
+            v = int.from_bytes(code[i:i + step], "little")
+            rows.append((i, step, f".{step}byte 0x{v:0{step * 2}X}", f".{step}byte 0x{v:0{step * 2}X}", None))
+            i += step
             continue
         text = f"{ins.mnemonic} {ins.op_str}".strip()
         key, tgt = text, None
         m = re.match(r"ldr (\w+), \[pc, #(-?0x[0-9a-f]+|-?\d+)\]", text)
         if m:
-            la = ((addr + i + 4) & ~3) + int(m.group(2), 0) - addr
+            la = ((addr + i + pc) & ~3) + int(m.group(2), 0) - addr
             if 0 <= la <= len(code) - 4:
                 v = int.from_bytes(code[la:la + 4], "little")
                 if lo <= (v & ~1) < hi:
@@ -1678,7 +1714,14 @@ def fast_score(src, func, env):
     pairs, _ = align(_ROMDEC[addr], dr)
     rows = [{"tag": t} for _, _, t in pairs]
     fast_score.shape = shape_distance(_ROMDEC[addr], dr)
+    fast_score.fuzzy = fuzzy_percent(_ROMDEC[addr], dr)
     return sum(1 for r in rows if r["tag"] != "="), count_text(rows)
+
+
+def fuzzy_percent(rom, mine):
+    """check.py's fuzzy score (instruction-text similarity, addresses masked), for a NONMATCHING draft."""
+    norm = lambda rows: [re.sub(r"0x[0-9a-fA-F]{7,8}", "ADDR", r[3]) for r in rows]
+    return min(99.9, 100 * difflib.SequenceMatcher(None, norm(rom), norm(mine), autojunk=False).ratio())
 
 
 def score(src, func, env, full=False):
@@ -1689,7 +1732,8 @@ def score(src, func, env, full=False):
     if not full and os.environ.get("SCOPE_FAST") != "0":  # SCOPE_FAST=0: one-shot compiles (A/B, debugging)
         r = fast_score(src, func, env)
         if r is not None:
-            return r[0], {"counts": r[1], "shape": fast_score.shape if r[0] else 0}
+            return r[0], {"counts": r[1], "shape": fast_score.shape if r[0] else 0,
+                          "fuzzy": fast_score.fuzzy if r[0] else 100.0}
     mine, addr, info = compile_draft(src, func, env)
     _, _, sizes = inventory()
     rom_code = load_rom(verify=False)[off(addr):off(addr) + sizes[rom_name(src, func)]]
@@ -2185,6 +2229,11 @@ def norm_insn(text):
     return re.sub(r"\br[0-7]\b", "R", text or "")
 
 
+def is_copy(text):
+    """A register-to-register copy: what register allocation adds or removes, not the C's order."""
+    return bool(re.match(r"(mov|movs) (r\d+|sb|sl|fp|ip), (r\d+|sb|sl|fp|ip)$|adds (r\d+), (r\d+), #0$", text or ""))
+
+
 def hunk_spans(rows):
     """[(lo, hi)] row ranges of the diff's hunks (differing rows at most 4 apart), with up to 4 equal rows of
     context on each side (the same grouping as the diff view)."""
@@ -2218,6 +2267,8 @@ def order_moves(rows, lo, hi):
         if a in kept:
             continue
         key = norm_insn(rows[rom[a]]["rom"])
+        if is_copy(rows[rom[a]]["rom"]):
+            continue  # a register copy (into a high register, or adds rX, rY, #0) is allocation, not order
         twin = next((j for j in left_d if norm_insn(rows[dr[j]]["draft"]) == key), None)
         if twin is None:
             continue
@@ -2685,19 +2736,23 @@ def cmd_rom(target):
     if addr is None:
         sys.exit(f"{target}: not in the function inventory")
     code = rom_bytes()[off(addr):off(addr) + sizes[target]]
-    data = rom_data(target, addr, code)
+    arm = is_arm(target, addr)
+    data = rom_data(target, addr, code, arm)
     names = {a & ~1: n for n, a in funcs}
     for n, (v, _) in elf_syms().items():
         if not n.startswith(("_", "$")) and not n.endswith("__addr"):
             names.setdefault(v & ~1, n)
     status, files = code_status()
     print(f"{target} @ {addr:08X}, {len(code)} bytes, {status.get(target, '?')}"
-          + (f" ({files[target]})" if target in files else ""))
-    for o, n, text, _, tgt in decode(code, addr, data):
+          + (f" ({files[target]})" if target in files else "") + (", ARM" if arm else ""))
+    if arm:
+        print("  (ARM code: scope lists it, but its compiler is Thumb agbcc only; drafts of ARM units"
+              " compile with tools/check.py, without why/try)")
+    for o, n, text, _, tgt in decode(code, addr, data, arm):
         note = ""
-        m = re.match(r"bl #0x([0-9a-f]+)$", text)
-        if m:
-            text = "bl " + names.get(int(m.group(1), 16) & ~1, text[3:])
+        m = re.match(r"(bl|blx|b) #0x([0-9a-f]+)$", text)
+        if m and int(m.group(2), 16) & ~1 in names:
+            text = f"{m.group(1)} " + names[int(m.group(2), 16) & ~1]
         m = re.match(r"(ldr \w+, =)0x([0-9A-Fa-f]+)$", text)
         if m and int(m.group(2), 16) & ~1 in names:
             note = names[int(m.group(2), 16) & ~1]
@@ -2741,14 +2796,249 @@ def like_tables():
                   lambda: structure.tables(like_index()))
 
 
+def work_paths(name):
+    d = os.path.join(WORK, "work")
+    return os.path.join(d, name + ".c"), os.path.join(d, name + ".base.c")
+
+
+def ghidra_c(addr):
+    """Ghidra's pseudo-C for ADDR from the export at gen/ghidra/decomp.c (tools/ghidra/README.md), or None."""
+    path = os.path.join(ROOT, "gen", "ghidra", "decomp.c")
+    if not os.path.exists(path):
+        return None
+    out, take = [], False
+    for ln in open(path, encoding="utf-8", errors="replace"):
+        if ln.startswith("// ===== "):
+            if take:
+                break
+            take = ln.startswith(f"// ===== {addr:08X} ")
+        elif take:
+            out.append(ln)
+    return "".join(out) or None
+
+
+def cmd_shape(src, func, env):
+    """The diff with low registers blanked: only hunks where the order or the instructions themselves
+    differ, each with its C lines. Register choice is set aside; `why all` explains what is left."""
+    n, info = score(src, func, env, full=True)
+    if n == 0:
+        print(f"{func}: MATCH")
+        return 0
+    rows = json.load(open(os.path.join(info["wd"], "diff.json")))
+    rom = [r for r in rows if r["rom"]]
+    dr = [r for r in rows if r["draft"]]
+    key = lambda t: re.sub(r"func\+0x[0-9A-F]+", "->", norm_insn(t))
+    sm = difflib.SequenceMatcher(None, [key(r["rom"]) for r in rom], [key(r["draft"]) for r in dr], autojunk=False)
+    ops = [o for o in sm.get_opcodes() if o[0] != "equal"]
+    nr = sum(i2 - i1 for _, i1, i2, _, _ in ops)
+    nd = sum(j2 - j1 for _, _, _, j1, j2 in ops)
+    print(f"{func}: shape {nr + nd} ({nr} ROM / {nd} draft insns out of place or different, low registers"
+          f" blanked) in {len(ops)} hunk(s); {count_text(rows)} with registers")
+    for tag, i1, i2, j1, j2 in ops:
+        lines = sorted({r["line"] for r in dr[j1:j2] if r["line"]} | {r["line"] for r in dr[max(0, j1 - 1):j1 + 1] if r["line"]},
+                       key=lambda x: int(x) if str(x).isdigit() else 0)
+        at = rom[i1]["rom_addr"] if i1 < len(rom) else "end"
+        print(f"\n@ ROM {at}  C line(s) {', '.join(map(str, lines)) or '?'}  ({tag})")
+        for k in range(max(i2 - i1, j2 - j1)):
+            a = rom[i1 + k]["rom"] if i1 + k < i2 else ""
+            b = dr[j1 + k]["draft"] if j1 + k < j2 else ""
+            ln = dr[j1 + k]["line"] if j1 + k < j2 else ""
+            print(f"  {a:34} {b:34} {ln}")
+    print(f"\nnext: FILE.c why all (registers and moves) | try V.c...")
+    return 1
+
+
+def cmd_new(target):
+    """Open FUNC for writing: a draft in build/scope/work/ that compiles and scores right away. A function
+    in a unit gets a copy of the unit with an empty definition in place of its INCLUDE_ASM (landing merges
+    it back); a function with no file gets the C of the matched function most like it (`like`, when that
+    covers at least half its rare windows), renamed, or an empty definition."""
+    import land
+    import progress
+    import structure
+    funcs, sizes = progress.load_functions()
+    name = resolve_target(target, funcs)
+    addr = dict(funcs).get(name)
+    if addr is None:
+        sys.exit(f"{target}: not in the function inventory")
+    status, files = code_status()
+    if status.get(name) != "undrafted":
+        sys.exit(f"{name} is {status.get(name)} in {files.get(name)}: work on that file")
+    kind, dest, asm_name = land.where(ROOT, name, addr)
+    draft, base = work_paths(name)
+    if os.path.exists(draft):
+        print(f"{name}: {os.path.relpath(draft, ROOT)} exists; continuing it (delete it to start over)")
+        return 0
+    os.makedirs(os.path.dirname(draft), exist_ok=True)
+    seed = "an empty definition"
+    if kind == "unit":
+        text = open(os.path.join(ROOT, dest)).read()
+        open(base, "w").write(text)
+        incs = re.findall(r'^#include "([^"]+)"', text, re.M)
+        hdrs = [open(os.path.join(ROOT, "include", h)).read() for h in incs if os.path.exists(os.path.join(ROOT, "include", h))]
+        out = land.stub_unit(text, asm_name, name, hdrs)
+    else:
+        out = None
+        best = next(iter(structure.similar(name, like_index(), status, like_tables())), None)
+        if best and best[1] >= 0.5 and files.get(best[2]):
+            twin, tfile = best[2], files[best[2]]
+            ttext = open(os.path.join(ROOT, tfile)).read()
+            defined = progress.c_functions(os.path.join(ROOT, tfile), with_asm=False)
+            tname = twin if twin in defined else next((d for d in defined if d == f"sub_{dict(funcs)[twin]:08X}"), None)
+            if tname:
+                out = land.seed_from_twin(ttext, tname, name, [d for d in defined if d != tname])
+                seed = f"{twin}'s C ({tfile}, covers {best[1]:.0%} of its rare windows), renamed"
+        if out is None:
+            decls = [open(p).read() for p in land.sources(ROOT) if p.endswith(".h")]
+            head = land.prototype(decls, name) or f"void {name}(void)"
+            out = (f'#include "global.h"\n\n// scope: write {name} here (`scope.py rom {name}`)\n'
+                   f"{head}\n{{\n}}\n")
+    g = ghidra_c(addr)
+    if g:  # a reading aid inside the stub: Ghidra's types and control flow, never matching C
+        out = out.replace(f"// scope: write {name} here", "/* Ghidra's pseudo-C (a reading aid):\n"
+                          + g.replace("*/", "* /") + "*/\n" + f"// scope: write {name} here", 1)
+        seed += " (with Ghidra's pseudo-C as a comment)"
+    open(draft, "w").write(out)
+    rel = os.path.relpath(draft, ROOT)
+    print(f"{name} @ {addr:08X}, {sizes[name]} bytes, {kind}: lands in {dest}"
+          + ("; ARM: scope cannot compile it (Thumb agbcc only), use tools/check.py" if is_arm(name, addr) else ""))
+    print(f"  draft {rel}: {seed}")
+    r = fast_score(rel, name, {})
+    if r is not None:
+        print(f"  now: {r[1]}, shape {fast_score.shape if r[0] else 0}")
+    print(f"next: scope.py {rel}  |  rom {name}  |  {rel} try V.c...  |  land {name} [--name NEW]")
+    return 0
+
+
+def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatching=False):
+    """Put a matching draft into the source tree: merged into its unit, or a new src/fn file (a hidden
+    function also gets its replacement end). Then the concession marker, clang-format, a check of
+    every C function in the landed file, and optionally the name and a whole-ROM build.
+    NONMATCHING: a draft that does not match yet goes in as `#ifdef NONMATCHING` C with its fuzzy
+    score, and the default build keeps the INCLUDE_ASM (docs/WORKER.md); the function counts as drafted."""
+    import land
+    import progress
+    funcs, sizes = progress.load_functions()
+    name = resolve_target(target, funcs)
+    addr = dict(funcs).get(name)
+    if addr is None:
+        sys.exit(f"{target}: not in the function inventory")
+    wdraft, base = work_paths(name)
+    draft = draft or wdraft
+    rel = os.path.relpath(os.path.abspath(draft), ROOT)
+    n, info = score(rel, name, {})
+    if n != 0 and not nonmatching:
+        sys.exit(f"{name}: {rel} does not match ({info.get('counts')}); nothing landed"
+                 " (`land FUNC --nonmatching` lands it as a draft)")
+    if n == 0 and nonmatching:
+        nonmatching = False
+        print(f"{name}: the draft matches; landing it as exact C")
+    kind, dest, asm_name = land.where(ROOT, name, addr)
+    if nonmatching and kind == "hidden":
+        sys.exit(f"{name}: a hidden function has no INCLUDE_ASM to fall back on; match it, or land by hand")
+    path = os.path.join(ROOT, dest)
+    text = open(os.path.abspath(draft)).read()
+    before = {path: open(path).read() if os.path.exists(path) else None}
+    extras = os.path.join(ROOT, "symbols", "build_extra_functions.csv")
+    before[extras] = open(extras).read()
+    if kind == "unit":
+        cur = before[path]
+        merged = land.merge(cur, open(base).read() if os.path.exists(base) else cur, text)
+        if merged is None:
+            sys.exit(f"{name}: {dest} changed since `new` in a way that conflicts with the draft; land by hand")
+        text = merged
+    elif before[path] is not None:
+        sys.exit(f"{name}: {dest} exists already")
+    text = re.sub(r"^// scope: write .*\n", "", text, flags=re.M)
+    text = re.sub(r"/\* Ghidra's pseudo-C \(a reading aid\):\n.*?\*/\n", "", text, flags=re.S)
+    if nonmatching:
+        text = land.wrap_nonmatching(text, name, asm_name or name, info.get("fuzzy", 0.0), info.get("shape"))
+        if text is None:
+            sys.exit(f"{name}: no definition of {name} in {rel}")
+    text, pins, bars = land.concessions(text)
+    open(path, "w").write(text)
+    fmt = os.path.join(ROOT, "build", "venv", "bin", "clang-format")
+    subprocess.run([fmt if os.path.exists(fmt) else "clang-format", "-i", path], cwd=ROOT)
+    if kind == "hidden":
+        land.set_replacement_end(ROOT, addr, addr + sizes[name], sizes[name])
+    bad = []
+    for f in progress.c_functions(path, with_asm=False):
+        k, inf = score(dest, f, {})
+        if k != 0:
+            bad.append(f"{f}: {inf.get('counts')}")
+    if bad:
+        for p, t in before.items():
+            if t is None:
+                os.remove(p)
+            else:
+                open(p, "w").write(t)
+        sys.exit(f"{name}: after landing, {dest} has functions that do not match ({'; '.join(bad[:4])});"
+                 " restored")
+    if nonmatching:  # the project's fuzzy figure (progress.py reads it); the system python3, as check.py runs in CI
+        subprocess.run(["python3", "tools/check.py", dest, "--nonmatching", "--record"], cwd=ROOT,
+                       capture_output=True)
+        m = re.search(r"#ifdef NONMATCHING\n// fuzzy: ([\d.]+)%\n(?:.*\n){0,3}?[^\n]*\b" + re.escape(name) + r"\(",
+                      open(path).read())
+        info["fuzzy"] = float(m.group(1)) if m else info.get("fuzzy", 0.0)
+    print(f"{name}: landed in {dest} ({kind}; {pins} pins, {bars} barriers in the file)"
+          + (f"; NONMATCHING draft, fuzzy {info.get('fuzzy', 0.0):.1f}%" if nonmatching else "")
+          + ("; build_extra_functions.csv replacement end set" if kind == "hidden" else ""))
+    if new_name:
+        cmd_rename(name, new_name, note)
+        name = new_name
+    if rom:
+        r = subprocess.run(["make", "-j8"], cwd=ROOT, capture_output=True, text=True)
+        ok = "build/boktai3.gba: OK" in r.stdout.splitlines()
+        print("build/boktai3.gba: OK" if ok else "ROM build FAILED:\n" + "\n".join((r.stdout + r.stderr).splitlines()[-12:]))
+        if not ok:
+            return 1
+    for p in (wdraft, base):
+        if os.path.exists(p) and os.path.abspath(draft) == wdraft:
+            os.replace(p, p + ".landed")
+    return 0
+
+
+def cmd_rename(target, new, note=None):
+    """Name a function: its functions.csv row and every spelling of the old name or label in src/ and
+    include/. Hidden functions work too (split.py names them from the csv)."""
+    import land
+    import progress
+    funcs, _ = progress.load_functions()
+    name = resolve_target(target, funcs)
+    addr = dict(funcs).get(name)
+    if addr is None:
+        sys.exit(f"{target}: not in the function inventory")
+    row = land.hidden_row(ROOT, addr)
+    mode = row["isa"] if row else ("arm" if any(a == addr and m == "arm" for a, m in arm_starts()) else "thumb")
+    try:
+        changed = land.rename(ROOT, addr, name, new, mode=mode, note=note)
+    except ValueError as e:
+        sys.exit(str(e))
+    print(f"{name} -> {new}: " + ", ".join(f"{f} ({k})" for f, k in changed))
+    print("  names reach the ROM link: run `make` (or `land ... --rom`) before committing")
+    return 0
+
+
+def arm_starts():
+    """[(addr, 'arm')] from functions.csv, read once per command."""
+    if "arm_starts" not in _MEMO:
+        import csv as _csv
+        with open(os.path.join(ROOT, "symbols", "functions.csv"), newline="") as f:
+            _MEMO["arm_starts"] = [(int(r["addr"], 16), r["mode"]) for r in _csv.DictReader(f) if r["mode"] == "arm"]
+    return _MEMO["arm_starts"]
+
+
 def cmd_todo(show, order):
     """Phase-1 work list: undrafted functions, most matched prior art first."""
     import structure
     import progress
     funcs, sizes = progress.load_functions()
     status, _ = code_status()
+    import land
+    index = land.include_asm_index(ROOT)
+    arm = {n for n, a in funcs if status.get(n) == "undrafted" and is_arm(n, a, index)}
     return structure.todo(like_index(), status, funcs, sizes, progress.load_asm_ranges(), show, order,
-                          like_tables())
+                          like_tables(), arm)
 
 
 def cmd_like(target, show):
@@ -2929,9 +3219,27 @@ def main():
         return cmd_fields(offs, want)
     if args[0] == "rom":  # rom FUNC|ADDR: the ROM listing, no draft needed
         return cmd_rom(args[1])
+    if args[0] == "new":  # new FUNC: a draft in build/scope/work/ seeded from the unit or a twin
+        return cmd_new(args[1])
+    if args[0] == "land":  # land FUNC [DRAFT.c] [--name NEW] [--note TEXT] [--rom] [--nonmatching]
+        opt = {}
+        rest = []
+        it = iter(args[2:])
+        for a in it:
+            if a in ("--name", "--note"):
+                opt[a[2:]] = next(it)
+            elif a in ("--rom", "--nonmatching"):
+                opt[a[2:]] = True
+            else:
+                rest.append(a)
+        return cmd_land(args[1], rest[0] if rest else None, opt.get("name"), opt.get("rom", False), opt.get("note"),
+                        opt.get("nonmatching", False))
+    if args[0] == "rename":  # rename FUNC NEW [--note TEXT]
+        note = args[args.index("--note") + 1] if "--note" in args else None
+        return cmd_rename(args[1], args[2], note)
     if args[0] == "todo":  # todo [N] [prior|size|addr]: undrafted functions, most matched prior art first
         n = next((int(a) for a in args[1:] if a.isdigit()), 20)
-        order = next((a for a in args[1:] if a in ("prior", "size", "addr")), "prior")
+        order = next((a for a in args[1:] if a in ("prior", "size", "addr")), "addr")
         return cmd_todo(n, order)
     if args[0] == "like":  # like FUNC|ADDR: matched functions whose ROM looks like this one's
         return cmd_like(args[1], int(args[2]) if len(args) > 2 else 8)
@@ -3002,6 +3310,10 @@ def main():
         rest.remove("probe")
         func = rest[0] if rest else nonmatching_func(src)
         return cmd_probe(src, func, env)
+    if "shape" in rest:  # FILE.c shape [FUNC]: only the order / instruction differences, registers blanked
+        rest.remove("shape")
+        func = rest[0] if rest else nonmatching_func(src)
+        return cmd_shape(src, func, env)
     if "spill" in rest:
         rest.remove("spill")
         func = rest[0] if rest else nonmatching_func(src)

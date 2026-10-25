@@ -134,7 +134,11 @@ python3 tools/scope/scope.py FILE.c pins          remove each register pin / emp
 python3 tools/scope/scope.py FILE.c try V.c...     score whole-file variants (or `try KNOB={a,b}`: one variant per knob value), best first (by shape distance), ~12 ms each
 python3 tools/scope/scope.py FILE.c insn UID      (also `FILE.c uses REG...`): compile FILE first, then show
 SCOPE_TRANSFORM=tools/scope/transforms/X.py scope.py FILE.c   what-if over the preprocessed source
-python3 tools/scope/scope.py todo [N] [prior|size|addr]   functions with no C yet, most matched prior art first
+python3 tools/scope/scope.py FILE.c shape [FUNC]  the diff with low registers blanked: order and shape differences only
+python3 tools/scope/scope.py todo [N] [addr|prior|size]   functions with no C yet, in ROM order (default) or by prior art/size
+python3 tools/scope/scope.py new FUNC             open FUNC: build/scope/work/FUNC.c (its unit with a stub, or a like twin's C)
+python3 tools/scope/scope.py land FUNC [--name N] [--rom] [--nonmatching]   put the draft into src/ and check it
+python3 tools/scope/scope.py rename FUNC NEW      functions.csv plus every C spelling of the old name or sub_ label
 python3 tools/scope/scope.py like FUNC|ADDR [N]   matched functions sharing the most rare 3-insn windows (helpers to reuse)
 python3 tools/scope/scope.py rom FUNC|ADDR        ROM listing, literal pools as data, calls named (no draft needed)
 python3 tools/scope/scope.py fields OFF... [STRUCT]   structs with members at these offsets (agbcc-measured layouts)
@@ -277,6 +281,40 @@ ported here deliberately. Incremental rebuild after editing one file:
 `build/scope/agbcc/gcc` (2.5 s); then regenerate that file's section of
 `tools/scope/agbcc.patch` (`diff -u --label a/F --label b/F`).
 
+### The workspace: new, land, rename
+
+`new FUNC` finds where FUNC's C will live: an `INCLUDE_ASM` line in a unit,
+a hidden start in `symbols/build_extra_functions.csv`, or nowhere yet (a new
+`src/fn/sub_ADDR.c`). It writes `build/scope/work/FUNC.c`: the whole unit with
+FUNC's `INCLUDE_ASM` replaced by a stub (signature from the first
+declaration in the unit or its headers), plus `FUNC.base.c`, the unit as it
+was. Outside a unit, the draft is a like twin's file (coverage >= 0.5) with
+the twin renamed, or a stub. Every scope command run on the workspace file
+defaults to FUNC, not the unit's last function. The unit suffix is cut at
+FUNC's closing brace, so a variant in a 30-function unit compiles in ~38 ms.
+
+`land FUNC` requires a match. It three-way merges the draft into the unit
+(`git merge-file` against `FUNC.base.c`, so edits made to the unit since
+`new` survive) or writes the new file and the hidden function's replacement
+end. Then it adds or removes the concession marker, runs clang-format, and
+checks every C function in the landed file (restoring everything on a
+failure). With `--name` it renames, and with `--rom` it builds the ROM.
+`--nonmatching` lands an unfinished draft for phase 1: the definition goes
+under `#ifdef NONMATCHING` with its `// fuzzy:` line (check.py's figure,
+which progress.py reads) and scope's shape distance, and `INCLUDE_ASM` stays
+in the `#else`. A hidden function cannot land this way (it has no
+`INCLUDE_ASM` to fall back on).
+
+`rename FUNC NEW` writes or updates the functions.csv row and rewrites every
+whole-word spelling of the old name, of `sub_ADDR` and of any `#define X
+sub_ADDR` alias (the define is dropped) across `src/` and `include/`. It
+refuses a name that is already in use. A hidden function can take a name:
+disasm.py and split.py read it from the csv.
+
+ARM functions (sub_08000430, `// COMPILER: agbcc_arm`) list with ARM decoding
+in `rom`, and `todo` marks them `[ARM: no scope compile]`; scope's compiler
+is Thumb only.
+
 ### Speed (measured on an M-series Mac)
 
 The target agreed for the tool: interactive questions well under a second,
@@ -362,6 +400,13 @@ in the patch.
 * Done: `try` (whole-file variants or one knob each, through the fork server; sub_0801A6D0's 32
   historical drafts score in 1.3 s, a 13-value knob sweep in 0.23 s).
 * Pointers from each decision to the agbcc source function that makes it.
+* Global allocation in big functions (sub_080070D0, 564 bytes, landed
+  NONMATCHING at shape 58): `why` names the register each pseudo lost, but
+  which C change moves a whole allocation order is still a manual search.
+  Next: a lever search that tries the known allocation levers (declaration
+  order, hoisted pointers, block-scoped temporaries) and ranks them by shape.
+* `tools/check.py` run under the venv python (scope re-execs into it) skips
+  the per-draft fuzzy score; land calls it with the system `python3`.
 
 ## agbcc facts established with scope
 

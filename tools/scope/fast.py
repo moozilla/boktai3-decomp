@@ -51,7 +51,37 @@ def split_source(text, func_names):
         back = b
     if back and start - back.end() <= HELPER_CHARS:
         start = back.end()
-    return text[:start], text[start:]
+    # and end the suffix with FUNC's body: agbcc compiles a function at a time, so what follows cannot
+    # change FUNC's code, and a big unit's later functions would otherwise compile with every variant
+    end = body_end(text, m.end() - 1)
+    return text[:start], text[start:end]
+
+
+def body_end(text, brace):
+    """Index just past the } closing the { at BRACE, skipping strings, chars and comments."""
+    depth, i, n = 0, brace, len(text)
+    while i < n:
+        c = text[i]
+        if c in "\"'":
+            j = i + 1
+            while j < n and text[j] != c:
+                j += 2 if text[j] == "\\" else 1
+            i = j + 1
+            continue
+        if text.startswith("/*", i):
+            i = text.find("*/", i + 2) + 2 or n
+            continue
+        if text.startswith("//", i):
+            i = text.find("\n", i) + 1 or n
+            continue
+        if c == "{":
+            depth += 1
+        elif c == "}":
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    return n
 
 
 def canonical_prefix(prefix):

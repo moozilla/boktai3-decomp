@@ -209,12 +209,9 @@ def tables(index):
     return sh, df, {s: math.log(len(sh) / c) for s, c in df.items()}
 
 
-def like(target, index, status, files, show=8, tabs=None):
-    """Matched functions ranked by shared rare 3-insn windows with TARGET; prints the shared calls."""
+def similar(target, index, status, tabs=None):
+    """[(similarity, coverage, name)] of matched functions sharing rare 3-insn windows with TARGET, best first."""
     import math
-    if target not in index:
-        print(f"{target}: not in the ROM index")
-        return 1
     sh, df, idf = tabs or tables(index)
     mine = sh[target]
     self_w = sum(idf[s] for s in mine) or 1
@@ -229,6 +226,16 @@ def like(target, index, status, files, show=8, tabs=None):
         other_w = sum(idf[s] for s in v) or 1
         scores.append((w / math.sqrt(self_w * other_w), w / self_w, n))
     scores.sort(reverse=True)
+    return scores
+
+
+def like(target, index, status, files, show=8, tabs=None):
+    """Matched functions ranked by shared rare 3-insn windows with TARGET; prints the shared calls."""
+    import math
+    if target not in index:
+        print(f"{target}: not in the ROM index")
+        return 1
+    scores = similar(target, index, status, tabs)
     tcalls = [t for t in index[target] if t.startswith(("bl ", "ldr ="))]
     print(f"{target} ({len(index[target])} insns, {status.get(target, '?')}): {len(tcalls)} calls/literals;"
           f" matched functions with the most shared rare 3-insn windows:")
@@ -364,10 +371,10 @@ def fields(offs, lay, want=None, show=10):
     return 0
 
 
-def todo(index, status, funcs, sizes, asm_ranges, show=20, order="prior", tabs=None):
+def todo(index, status, funcs, sizes, asm_ranges, show=20, order="addr", tabs=None, arm=()):
     """Phase-1 work list: functions with no C at all (not even a draft), outside the reviewed assembly
-    ranges, with how much matched prior art `like` finds for each. ORDER: 'prior' (most covered by
-    matched functions first), 'size' (smallest first) or 'addr'."""
+    ranges, in ROM order (take them in turn), with how much matched prior art `like` finds for each.
+    ORDER 'prior' (most covered first) or 'size' (smallest first) sorts it otherwise."""
     import math
     addr = dict(funcs)
     todo_ = [n for n, s in status.items() if s == "undrafted" and n in addr
@@ -396,7 +403,11 @@ def todo(index, status, funcs, sizes, asm_ranges, show=20, order="prior", tabs=N
     print(f"{len(rows)} functions with no C ({total} bytes), outside the reviewed assembly ranges;"
           f" by {order} (covers = share of its rare 3-insn windows found in one matched function):")
     for n, a, size, cover, best in rows[:show]:
-        print(f"  {a:08X} {size:6} B  covers {cover * 100:3.0f}%  {n:34} {('like ' + best) if best else ''}")
+        print(f"  {a:08X} {size:6} B  covers {cover * 100:3.0f}%  {n:34} {('like ' + best) if best else ''}"
+              + ("  [ARM: no scope compile]" if n in arm else ""))
     if len(rows) > show:
-        print(f"  ... {len(rows) - show} more (todo N, todo N size|addr)")
+        print(f"  ... {len(rows) - show} more (todo N; todo N prior|size)")
+    first = next((r for r in rows if r[0] not in arm), None)
+    if first:
+        print(f"next: scope.py new {first[0]}")
     return 0
