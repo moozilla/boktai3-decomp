@@ -4222,8 +4222,164 @@ s32 Actor_DestroyController(struct ActorAnimController *p)
     gUnk_020003C8 = 0;
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_081E9E44);
+struct ScriptInteractionChild {
+    u32 flags;
+    u8 unk_04[3];
+    u8 priority;
+    u8 unk_08[8];
+    u16 frame;
+    u8 unk_12[10];
+    s16 x, y, z;
+    u8 unk_22[0x26];
+    s16 worldX, worldY, worldZ;
+    u8 unk_4E[0x56];
+    s32 completionScript, startScript;
+    void (*fn)(struct ActorAnimController *, struct ActorChildSlot *);
+    u8 group, control, orientation, option;
+    u8 timer;
+    u8 unk_B5[3];
+    s32 regionCount;
+    s32 regions[4];
+    u8 unk_CC[2];
+    u8 variant;
+    u8 unk_CF;
+    u16 effect;
+    u8 unk_D2[0xa];
+};
 
+void Terrain_GetBoxMinPosition(u16, void *);
+u8 *Script_GetPc(void);
+s32 Region_FindContaining(void *);
+
+/* The active value is one: interaction mode and the state-entry flag. */
+static inline void interaction_state(struct ActorAnimController *g, u32 mode, u32 phase)
+{
+    g->oldMode = g->mode;
+    g->mode = mode;
+    *(u16 *)((u8 *)g + 0xF5A) = (*(u16 *)((u8 *)g + 0xF5A) & 15) | (phase << 4);
+    if (g->oldMode == 3 && g->mode == 3) {
+        g->savedFrame = g->anim.frame;
+        g->savedTimer = g->anim.timer;
+    }
+    g->flags |= mode;
+}
+
+/* Tentative name: Actor_ConfigureInteractionChildFromScript.
+ * Configure the first available interaction marker from the current script. */
+#ifdef NONMATCHING
+// fuzzy: 58.9%
+// scope shape 125 (differences once low registers are set aside)
+void Actor_ConfigureInteractionChildFromScript(void)
+{
+    struct Vec position;
+    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ScriptInteractionChild *child;
+    s32 i, j;
+    u32 one = 1;
+    if (!g) {
+        g = (struct ActorAnimController *)Actor_EnsureController(0xbb34, 0);
+        if (!g)
+            return;
+    }
+    child = (struct ScriptInteractionChild *)g->children;
+    for (i = 0; i < 16; i++, child++) {
+        if (child->control & 2) {
+            child->control = 4;
+            switch (Script_GetKeywordValue('t', 0)) {
+                case 0:
+                    child->effect = 104;
+                    interaction_state(g, one, 1);
+                    child->fn = Actor_OnInteractionChildUpdate;
+                    child->control |= 1;
+                    break;
+                case 1:
+                    child->control |= 8;
+                    child->effect = 104;
+                    interaction_state(g, one, 4);
+                    child->fn = Actor_OnEffectChildPaletteInit;
+                    child->control |= 1;
+                    break;
+                case 2:
+                    child->control |= 16;
+                    child->effect = 107;
+                    child->frame = 1;
+                    interaction_state(g, one, 1);
+                    child->fn = Actor_OnInteractionChildUpdate;
+                    child->control |= 1;
+                    break;
+            }
+            child->orientation = Script_GetKeywordValue('r', 0);
+            child->option = Script_GetKeywordValue('A', 0);
+            if (Script_SeekToKeyword('R')) {
+                Terrain_GetBoxMinPosition(Script_GetValue(), &position);
+            } else {
+                if (!Script_SeekToKeyword('p'))
+                    return;
+                position.x = Script_GetValue();
+                position.y = Script_GetValue() - 64;
+                position.z = Script_GetValue();
+            }
+            if (child->orientation) {
+                ((struct ScriptInteractionChild *)g->children)[i].worldX = position.x;
+                child->x = position.x;
+                ((struct ScriptInteractionChild *)g->children)[i].worldY = position.y;
+                child->y = position.y;
+                ((struct ScriptInteractionChild *)g->children)[i].worldZ = position.z;
+                child->z = position.z - 128;
+            } else {
+                ((struct ScriptInteractionChild *)g->children)[i].worldX = position.x;
+                child->x = position.x - 128;
+                ((struct ScriptInteractionChild *)g->children)[i].worldY = position.y;
+                child->y = position.y;
+                ((struct ScriptInteractionChild *)g->children)[i].worldZ = position.z;
+                child->z = position.z;
+            }
+            child->x += 60;
+            child->z += 60;
+            child->y += 84;
+            child->priority = 2;
+            if (Script_SeekToKeyword('m')) {
+                child->regionCount = 0;
+                while (Script_GetPc()) {
+                    ((struct ScriptInteractionChild *)g->children)[i].regions[child->regionCount] =
+                        Script_GetValue();
+                    child->regionCount++;
+                }
+            } else {
+                child->regionCount = 1;
+                ((struct ScriptInteractionChild *)g->children)[i].regions[0] =
+                    Region_FindContaining(&position);
+            }
+            if (Script_SeekToKeyword('C'))
+                ((struct ScriptInteractionChild *)g->children)[i].completionScript =
+                    Script_GetValue();
+            else
+                ((struct ScriptInteractionChild *)g->children)[i].completionScript = 0;
+            if (Script_SeekToKeyword('a'))
+                ((struct ScriptInteractionChild *)g->children)[i].startScript = Script_GetValue();
+            else
+                ((struct ScriptInteractionChild *)g->children)[i].startScript = 0;
+            ((struct ScriptInteractionChild *)g->children)[i].variant =
+                Script_GetKeywordValue('u', 0);
+            if (!child->orientation) {
+                *(u16 *)g->unkF62 = -64;
+            } else {
+                ((struct ScriptInteractionChild *)g->children)[i].flags |= 4;
+                *(u16 *)g->unkF62 = 64;
+            }
+            j = child->regionCount;
+            if (j > 0) {
+                do {
+                    j--;
+                } while (j != 0);
+            }
+            return;
+        }
+    }
+}
+#else
+INCLUDE_ASM("asm/nonmatching", Actor_ConfigureInteractionChildFromScript);
+#endif
 // Provisional name: Actor_ConfigureFromScript
 
 static inline void state(struct ActorAnimController *g, u32 mode, u32 phase)
@@ -4383,7 +4539,7 @@ static inline void ActorInit_InitMainSprite(struct ActorInitController *p, struc
 
 /* Initialize the singleton controller, its palette banks and child sprites. */
 #ifdef NONMATCHING
-// fuzzy: 99.3%
+// fuzzy: 95.5%
 s32 Actor_InitializeController(void *arg0)
 {
     struct ActorInitController *p = arg0;
