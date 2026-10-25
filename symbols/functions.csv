@@ -7057,6 +7057,7 @@ addr,name,mode,confidence,source,notes
 081B47E8,Vanargand_UpdatePartFlashFade,thumb,low,src-alias,
 081B48A0,Vanargand_UpdatePartSidestep,thumb,low,src-alias,
 081B4C04,Vanargand_UpdatePartRecovery,thumb,low,src-alias,
+081B512C,Vanargand_UpdatePartVerticalOscillation,thumb,low,src-alias,Moves a Vanargand part by alternating -256 and +256 Y displacements; pausing 31 updates after each motion.
 081B52E8,Vanargand_UpdatePartBobbing,thumb,low,src-alias,
 081B5454,Vanargand_UpdatePartRadialTravel,thumb,low,src-alias,
 081B5A98,Vanargand_UpdatePartRevealFade,thumb,low,src-alias,
