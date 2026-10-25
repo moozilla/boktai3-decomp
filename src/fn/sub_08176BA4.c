@@ -2,7 +2,7 @@
 extern u16 gUnk_03004BD8, gUnk_03005214, gUnk_030051C4, gUnk_030051DC, gUnk_03005210;
 extern u32 gUnk_0300523C;
 void Hud_InitSelectionBounds(u32, u32);
-void sub_08167C84(void *);
+void Hud_UpdateEquipmentPrompt(void *);
 void Hud_SetUpdateCallback(void *, void (*)(void *));
 void Sound_ResumePersistentSongs(void);
 void HealthBurstEffect_Create(void *, u32);
@@ -47,7 +47,7 @@ void SceneHud_FinishPageExit(u8 *p)
         zero = 0;
         *(u16 *)(p + 0xa4c) = next;
         if ((u16)next > 16) {
-            Hud_SetUpdateCallback(p, sub_08167C84);
+            Hud_SetUpdateCallback(p, Hud_UpdateEquipmentPrompt);
             gUnk_03005214 = *(u16 *)(p + 0x43e0);
             gUnk_030051C4 = *(u16 *)(p + 0x43e2);
             gUnk_030051DC = *(u16 *)(p + 0x43e4);

@@ -5756,6 +5756,7 @@ addr,name,mode,confidence,source,notes
 081678A0,SelectionPanel_UpdateBlink,thumb,low,src-alias,
 08167910,PauseMenu_UpdateSelectedEquipmentIcons,thumb,low,src-alias,
 08167BDC,Hud_RefreshActivePanel,thumb,low,src-alias,
+08167C84,Hud_UpdateEquipmentPrompt,thumb,low,src-alias,Emits countdown sprite effects; refreshes HUD meters; and starts equipment selection or restores saved blending.
 08167E50,PauseMenu_RemoveHeaderAnimation,thumb,low,src-alias,Removes the menu animation at offset 0xA9C; header identity is tentative
 08167E64,Hud_InitializePanelTransition,thumb,low,src-alias,
 08167EFC,PauseMenu_RemoveEquipmentSlotAnimations,thumb,low,src-alias,Removes the three consecutive slot animations beginning at offset 0xB08
