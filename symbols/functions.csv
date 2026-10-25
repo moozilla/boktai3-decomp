@@ -8433,6 +8433,7 @@ addr,name,mode,confidence,source,notes
 081FD4B0,Projectile_SetScriptProcedure,thumb,low,src-alias,Sets the procedure identifier passed to ScriptProc_Start and an associated argument
 081FD4B8,Projectile_SetBehaviorMode,thumb,low,src-alias,Sets the mode used to select the projectile update callback during creation
 081FD530,Projectile_SetTrackingTarget,thumb,low,src-alias,Stores the target position pointer and enables target tracking
+081FD53C,OrbitEffect_SpawnInwardParticle,thumb,low,src-alias,Creates a sprite particle at a random X/Z offset; moving toward the orbit effect position.
 081FD664,OrbitEffect_AdjustHeading,thumb,low,src-alias,
 081FD704,OrbitEffect_FireProjectileOnContact,thumb,low,src-alias,
 081FD7B0,OrbitEffect_UpdateExpansion,thumb,low,src-alias,Expansion callback increases the radius then starts sound and switches to the active update; effect identity tentative

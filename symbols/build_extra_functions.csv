@@ -574,7 +574,7 @@ address,isa,evidence,replacement_end
 081FB80C,thumb,Hidden velocity integrate step,081FB828
 081FB828,thumb,Hidden leaf returning 0,081FB82C
 081FD46C,thumb,Independent 8-byte leaf left as incbin by gbadisasm; exact standalone C,081FD474
-081FD53C,thumb,Hidden tail after Projectile_SetTrackingTarget,
+081FD53C,thumb,Hidden tail after Projectile_SetTrackingTarget; exact 296-byte C body,081FD664
 081FDBC4,thumb,Hidden raw-tail function,081FDBF0
 081FE9B0,thumb,Hidden raw-tail function,081FE9DC
 081FEA04,thumb,Hidden raw-tail function,081FEA28
