@@ -62,7 +62,7 @@ extern u8 *gUnk_030042E4;
 
 void SceneMessages_SetPendingTrigger(void *, void *);
 s32 Math_Atan2(s32, s32);
-void sub_081CFFE8(struct SceneNpc *, s32);
+void SceneNpc_PlayAttachmentEffect(struct SceneNpc *, s32);
 void Actor_SetAttachmentEffect(struct SceneNpc *, s32, s32, s32);
 void sub_081D010C(struct SceneNpc *, s16 *);
 void CpuSet(const void *, void *, u32);
@@ -191,7 +191,7 @@ void SceneNpc_DispatchCommands(struct SceneNpc *npc)
 
                 case 25:
                     if (sub->flag)
-                        sub_081CFFE8(npc, m[4]);
+                        SceneNpc_PlayAttachmentEffect(npc, m[4]);
                     else
                         Actor_SetAttachmentEffect(npc, m[4], 0xB4, 0xB4);
                     break;

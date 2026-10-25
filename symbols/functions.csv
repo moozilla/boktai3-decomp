@@ -7745,6 +7745,7 @@ addr,name,mode,confidence,source,notes
 081CFCA4,SceneNpc_UpdateProjectedIdle,thumb,low,src-alias,
 081CFDA4,SceneNpc_UpdateProjectedMove,thumb,low,src-alias,
 081CFFAC,SceneNpc_OnStateChange,thumb,low,src-alias,State-change callback installs the requested state handler and resets its execution fields
+081CFFE8,SceneNpc_PlayAttachmentEffect,thumb,low,src-alias,Plays an NPC attachment effect with its sound; or releases all six attachment resource categories.
 081D01C8,SceneNpc_DispatchCommands,thumb,low,src-alias,"kind 5 (NPC) cutscene receiver: commands set state 0 with a sub-state, 4/5/36 walk to a point, 13-16 palette, 64 place"
 081D07D8,SceneNpc_EnterProjectedIdle,thumb,low,src-alias,
 081D0928,SceneNpc_OnStateEffectUpdate,thumb,low,src-alias,
