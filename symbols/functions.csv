@@ -7791,6 +7791,7 @@ addr,name,mode,confidence,source,notes
 081D227C,TaggedSceneNpc_UpdateState17AnimationB,thumb,low,src-alias,
 081D2544,SceneNpc_EnterRequestedState,thumb,low,src-alias,
 081D25AC,SceneNpc_TickStateAndPalette,thumb,low,src-alias,
+081D2610,TaggedSceneNpc_DispatchCutsceneCommands,thumb,low,src-alias,Dispatches buffered cutscene commands to a tagged NPC's state; facing; movement targets; arc parameters and attachment effects.
 081D29FC,TaggedSceneNpc_OnFrameUpdate,thumb,low,src-alias,Registered frame callback that processes commands and updates actor motion and animation before clearing state
 081D2A1C,TaggedSceneNpc_OnVisibilityUpdate,thumb,low,src-alias,Registered callback that refreshes the actor spatial link and applies visibility flags
 081D2A28,TaggedSceneNpc_DispatchReceiverCallback,thumb,low,src-alias,Forwards the NPC message receiver at offset 0x168 to the shared dispatcher
