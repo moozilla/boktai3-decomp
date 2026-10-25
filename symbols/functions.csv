@@ -4764,6 +4764,7 @@ addr,name,mode,confidence,source,notes
 08125B58,SceneTerrainProbe_ResetPool,thumb,low,src-alias,Clears the singleton during scene subsystem reset
 08125B68,SceneMovingParticle_AllocateEntry,thumb,low,src-alias,Claims the first unused bit among 26 slots and stores the particle slot index
 08125BBC,SceneMovingParticle_UpdateAnimation,thumb,low,src-alias,Counts down a timer and alternates between two frames every four updates
+08125BF8,SceneMovingParticle_Update,thumb,low,src-alias,Applies particle gravity; damped terrain bounces and raised-floor reflection; then advances animation and lifetime.
 08125E74,EffectSlot_Release,thumb,low,src-alias,
 08125EC4,SceneMovingParticle_Create,thumb,low,src-alias,Creates a particle from position velocity lifetime and variant with the fifth option fixed to one
 08125ED8,SceneMovingParticle_CreateWithOptions,thumb,low,src-alias,Forwards all five arguments to the particle constructor
