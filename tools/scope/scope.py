@@ -21,6 +21,7 @@
   scope.py FILE.c shape         the diff with low registers blanked: order and instruction differences only
   scope.py FILE.c frame         stack slots, ROM against draft, with the pseudo (C variable) in each
   scope.py FILE.c hoist         loop-invariant motion pass by pass: what loop.c moved out, what stayed, why
+  scope.py FILE.c giv           loop strength reduction: each induction value, loop.c's benefit and decision
   scope.py todo [N] [addr|prior|size]   functions with no C yet (phase 1), in ROM order
   scope.py new FUNC             open FUNC: a draft in build/scope/work/ (its unit with a stub, or a twin's C)
   scope.py land FUNC [D.c] [--name NEW] [--note T] [--rom] [--nonmatching]   put a matching draft into
@@ -3037,6 +3038,94 @@ def pseudo_value(wd, pseudo):
     return None, None
 
 
+def cmd_giv(src, func, env):
+    """Loop strength reduction from loop.c's own dump (u.i.loop): each loop's induction variables (bivs:
+    counters stepped by a constant) and the values computed from them (givs), with the C line, loop.c's
+    benefit, lifetime and decision. A giv is reduced (given its own register, stepped each pass) when
+    net benefit x lifetime x threshold >= the loop's insns, where net = the cost of computing it from
+    the biv (2 per add or shift) minus 2 per biv increment (and a copy if it is not replaceable); a
+    biv used only for counting can then be eliminated and the loop reversed (counting down to 0)."""
+    n, info = score(src, func, env, full=True)
+    wd = info["wd"]
+    path = os.path.join(wd, "u.i.loop")
+    if not os.path.exists(path):
+        sys.exit(f"{func}: no loop dump (u.i.loop) in {os.path.relpath(wd, ROOT)}")
+    lines = uid_lines(wd)
+    fnames = {func, rom_name(src, func), info.get("obj_name")}
+    text, keep = [], False
+    for ln in open(path).read().splitlines():
+        m = re.match(r";; Function (\w+)", ln)
+        if m:
+            keep = m.group(1) in fnames
+            continue
+        if keep:
+            text.append(ln)
+    if not text:
+        sys.exit(f"{func}: not in the loop dump")
+    ln_of = lambda u: lines.get(int(u), "?")
+    loops, cur = [], None
+    for ln in text:
+        m = re.match(r"Loop from (\d+) to (\d+): (\d+) real insns", ln)
+        if m:
+            cur = dict(span=(int(m.group(1)), int(m.group(2))), insns=int(m.group(3)), bivs={}, givs={}, notes=[])
+            loops.append(cur)
+            continue
+        if cur is None:
+            continue
+        m = re.match(r"Biv (\d+) initialized at insn (\d+): initial value (.*)", ln)
+        if m:
+            cur["bivs"][m.group(1)] = dict(init=m.group(3).strip(), fate="")
+            continue
+        m = re.match(r"(?:Cannot eliminate biv (\d+)(.*)|biv (\d+) can be eliminated)", ln)
+        if m:
+            r = m.group(1) or m.group(3)
+            b = cur["bivs"].setdefault(r, dict(init="?", fate=""))
+            if m.group(3):
+                b["fate"] = "eliminated (counting only: the loop can run backwards)"
+            else:
+                u = re.search(r"insn (\d+)", m.group(2) or "")
+                b["fate"] = "kept" + (f": used at line {ln_of(u.group(1))} (insn {u.group(1)})" if u else "")
+            continue
+        m = re.match(r"Insn (\d+): (giv reg \d+|dest address|dest reg \d+) src reg (\d+) benefit (-?\d+) lifetime (\d+)"
+                     r"(.*?)mult (\S+) add (.*)", ln)
+        if m:
+            uid = m.group(1)
+            cur["givs"][uid] = dict(kind="address" if "address" in m.group(2) else "value", biv=m.group(3),
+                                    benefit=int(m.group(4)), life=int(m.group(5)),
+                                    repl="replaceable" in m.group(6), mult=m.group(7), add=m.group(8).strip(),
+                                    fate="?")
+            continue
+        m = re.match(r"giv of insn (\d+) not worth while, (-?\d+) vs (\d+)", ln)
+        if m and m.group(1) in cur["givs"]:
+            cur["givs"][m.group(1)]["fate"] = f"kept, recomputed each pass ({m.group(2)} < {m.group(3)} insns)"
+            continue
+        m = re.match(r"giv at (\d+) reduced to", ln)
+        if m and m.group(1) in cur["givs"]:
+            cur["givs"][m.group(1)]["fate"] = "REDUCED: own register, stepped each pass"
+            continue
+        m = re.match(r"giv at (\d+) combined with giv at (\d+)", ln)
+        if m and m.group(1) in cur["givs"]:
+            cur["givs"][m.group(1)]["fate"] = f"combined with insn {m.group(2)} (line {ln_of(m.group(2))})"
+    status = "MATCH" if n == 0 else info.get("counts", "")
+    print(f"{func}: {status}; loop strength reduction, {len(loops)} loop scan(s) (loop.c runs twice)")
+    for L in loops:
+        ls = sorted({ln_of(u) for u in list(L["givs"]) if ln_of(u) != "?"})
+        print(f"  loop insns {L['span'][0]}-{L['span'][1]} ({L['insns']} insns), givs on line(s) {', '.join(map(str, ls)) or '-'}:")
+        for r, b in L["bivs"].items():
+            print(f"    biv  pseudo {r} from {b['init'][:40]}: {b['fate'] or 'kept'}")
+        for uid, g in L["givs"].items():
+            if g["kind"] == "address" and g["benefit"] <= 0:
+                continue  # an address used once: never worth it, never interesting
+            add = re.sub(r"\s+", " ", g["add"])[:50]
+            print(f"    giv  line {ln_of(uid):>4} insn {uid:>4}  {g['kind']} = biv {g['biv']} x {g['mult']} + {add}"
+                  f"  benefit {g['benefit']} life {g['life']}{'' if g['repl'] else ' (not replaceable)'}: {g['fate']}")
+    print("  A value the ROM recomputes from the counter each pass but the draft REDUCED: make its computation a\n"
+          "  single add of the counter and one invariant register (benefit 2, net 0: never reduced), e.g. hold the\n"
+          "  invariant part in a variable first. One the ROM steps but the draft recomputes: compute it with two\n"
+          "  operations (counter * size + base, counter << k plus an offset). `probe` flips each with AGBCC_NOGIV/GIV.")
+    return 0
+
+
 def cmd_hoist(src, func, env):
     """Loop-invariant motion, pass by pass: every invariant set loop.c saw in each loop, whether it
     moved it out (threshold x savings x lifetime >= insns in the loop; the threshold starts at 13 in
@@ -3943,6 +4032,10 @@ def main():
         rest.remove("shape")
         func = source_function(src, rest[0] if rest else None)
         return cmd_shape(src, func, env)
+    if "giv" in rest:  # FILE.c giv [FUNC]: loop strength reduction, each induction value and loop.c's decision
+        rest.remove("giv")
+        func = source_function(src, rest[0] if rest else None)
+        return cmd_giv(src, func, env)
     if "hoist" in rest:  # FILE.c hoist [FUNC]: loop-invariant motion pass by pass, and why each stayed
         rest.remove("hoist")
         func = source_function(src, rest[0] if rest else None)
