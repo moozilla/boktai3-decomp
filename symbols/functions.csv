@@ -7063,6 +7063,7 @@ addr,name,mode,confidence,source,notes
 081B5CCC,Vanargand_UpdatePartFadeOut,thumb,low,src-alias,
 081B5D8C,PairedSceneActor_UpdateHalves,thumb,low,src-alias,
 081B6180,Vanargand_CreatePartController,thumb,low,src-alias,Creates and registers a controller task that manages two animated boss parts
+081B61E0,PairedSceneActor_ApplyToHalf,thumb,low,src-alias,Applies a state to one indexed actor half; then updates its mode and clears its completion flag when active and unblocked.
 081B6244,PairedSceneActor_ApplyToSelectedHalves,thumb,low,src-alias,
 081B6310,PairedSceneActor_SetResetValues,thumb,low,src-alias,
 081B6354,PairedSceneActor_InitHalves,thumb,low,src-alias,
