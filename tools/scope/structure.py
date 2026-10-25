@@ -201,16 +201,21 @@ def shingles(tokens, k=3):
     return {"|".join(tokens[i:i + k]) for i in range(max(0, len(tokens) - k + 1))}
 
 
-def like(target, index, status, files, show=8):
+def tables(index):
+    """(shingle sets, document frequency, idf) over the index: what like and todo weigh windows by."""
+    import math
+    sh = {n: shingles(t) for n, t in index.items()}
+    df = collections.Counter(s for v in sh.values() for s in v)
+    return sh, df, {s: math.log(len(sh) / c) for s, c in df.items()}
+
+
+def like(target, index, status, files, show=8, tabs=None):
     """Matched functions ranked by shared rare 3-insn windows with TARGET; prints the shared calls."""
     import math
     if target not in index:
         print(f"{target}: not in the ROM index")
         return 1
-    sh = {n: shingles(t) for n, t in index.items()}
-    df = collections.Counter(s for v in sh.values() for s in v)
-    total = len(sh)
-    idf = {s: math.log(total / c) for s, c in df.items()}
+    sh, df, idf = tabs or tables(index)
     mine = sh[target]
     self_w = sum(idf[s] for s in mine) or 1
     scores = []
@@ -356,4 +361,42 @@ def fields(offs, lay, want=None, show=10):
     for exact, inside, negsize, s, hits in ranked[:show]:
         print(f"  {exact}/{len(offs)}  {s} ({-negsize:#x} bytes, include/{lay[s]['header']}): "
               + ", ".join(f"{o:#x} {n or '-'}" for o, (n, e) in zip(offs, hits)))
+    return 0
+
+
+def todo(index, status, funcs, sizes, asm_ranges, show=20, order="prior", tabs=None):
+    """Phase-1 work list: functions with no C at all (not even a draft), outside the reviewed assembly
+    ranges, with how much matched prior art `like` finds for each. ORDER: 'prior' (most covered by
+    matched functions first), 'size' (smallest first) or 'addr'."""
+    import math
+    addr = dict(funcs)
+    todo_ = [n for n, s in status.items() if s == "undrafted" and n in addr
+             and not any(lo <= addr[n] < hi for lo, hi in asm_ranges)]
+    sh, df, idf = tabs or tables(index)
+    matched = [(n, v) for n, v in sh.items() if status.get(n) == "matched"]
+    # inverted index: shingle -> matched functions that have it, so each target looks at its own windows only
+    inv = collections.defaultdict(list)
+    for n, v in matched:
+        for s in v:
+            if df[s] <= 50:  # common windows (push/pop, loads) say nothing about prior art
+                inv[s].append(n)
+    rows = []
+    for n in todo_:
+        mine = sh.get(n, set())
+        self_w = sum(idf[s] for s in mine) or 1
+        acc = collections.Counter()
+        for s in mine:
+            for m in inv.get(s, ()):
+                acc[m] += idf[s]
+        best, cover = max(((m, w / self_w) for m, w in acc.items()), key=lambda x: x[1], default=(None, 0.0))
+        rows.append((n, addr[n], sizes.get(n, 0), cover, best))
+    key = {"prior": lambda r: (-r[3], r[2]), "size": lambda r: (r[2], -r[3]), "addr": lambda r: r[1]}[order]
+    rows.sort(key=key)
+    total = sum(r[2] for r in rows)
+    print(f"{len(rows)} functions with no C ({total} bytes), outside the reviewed assembly ranges;"
+          f" by {order} (covers = share of its rare 3-insn windows found in one matched function):")
+    for n, a, size, cover, best in rows[:show]:
+        print(f"  {a:08X} {size:6} B  covers {cover * 100:3.0f}%  {n:34} {('like ' + best) if best else ''}")
+    if len(rows) > show:
+        print(f"  ... {len(rows) - show} more (todo N, todo N size|addr)")
     return 0

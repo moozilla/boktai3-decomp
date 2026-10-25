@@ -18,6 +18,7 @@
   scope.py rom FUNC|ADDR        FUNC's ROM listing with calls and literal symbols named (no draft needed)
   scope.py fields OFF... [STRUCT]  structs in include/ with members at these offsets (agbcc's own layout),
                                 or STRUCT's member at each offset
+  scope.py todo [N] [prior|size|addr]   functions with no C yet (phase 1), most matched prior art first
   scope.py like FUNC|ADDR [N]   matched functions whose ROM shares the most rare 3-insn windows with
                                 FUNC's, with the calls and constants they share: whose C to read first
   scope.py insn UID [FUNC]      one RTL insn through every pass (from the last compile of FUNC)
@@ -44,6 +45,7 @@ import json
 import os
 import pickle
 import re
+import shlex
 import socket
 import subprocess
 import sys
@@ -1529,9 +1531,35 @@ def preprocess(src, env=None):
     return _PRE[key]
 
 
+_CPP1 = {}
+
+
+def cpp_command(src):
+    """The preprocessor command for SRC. build.CPP is a compiler driver (`cc -E`), which on macOS goes
+    through the xcrun shim and then forks the real preprocessor: 23 ms where the preprocessor itself
+    takes 9. Ask the driver once (-###) what it would run, and run that directly with SRC swapped in.
+    Falls back to build.CPP if the driver's answer cannot be used."""
+    args = ["-nostdinc", "-undef"] + build.DEFINES + ["-DNONMATCHING", "-I", "include", "-iquote", "."]
+    if "cmd" not in _CPP1:
+        _CPP1["cmd"] = None
+        try:
+            r = subprocess.run(build.CPP + args + [src, "-###"], cwd=ROOT, capture_output=True, text=True)
+            last = [ln for ln in r.stderr.splitlines() if ln.startswith((' "', '"', " /"))]
+            cmd = shlex.split(last[-1]) if r.returncode == 0 and len(last) == 1 else None
+            if cmd and cmd.count(src) == 1 and "-E" in cmd:
+                _CPP1["cmd"] = cmd
+                _CPP1["src"] = src
+        except (OSError, ValueError):
+            pass
+    cmd = _CPP1["cmd"]
+    if not cmd:
+        return build.CPP + args + [src]
+    old = _CPP1["src"]
+    return [src if a == old else os.path.basename(src) if a == os.path.basename(old) else a for a in cmd]
+
+
 def _preprocess(src, env=None):
-    defines = build.DEFINES + ["-DNONMATCHING"]
-    pre = build.sh(build.CPP + ["-nostdinc", "-undef"] + defines + ["-I", "include", "-iquote", ".", src])
+    pre = build.sh(cpp_command(src))
     tf = (env or {}).get("SCOPE_TRANSFORM") or os.environ.get("SCOPE_TRANSFORM")
     if tf:  # a what-if over the preprocessed source: a module with transform(text) -> text
         import importlib.util
@@ -1540,6 +1568,62 @@ def _preprocess(src, env=None):
         spec.loader.exec_module(mod)
         pre = mod.transform(pre)
     return pre
+
+
+_HEADS = {}
+_BODY_TOKEN = re.compile(r'"(?:\\.|[^"\\\n])*"|\'(?:\\.|[^\'\\\n])*\'|/\*.*?\*/|//[^\n]*|[A-Za-z_]\w*|.', re.S)
+_DYNAMIC = {"__LINE__", "__FILE__", "__DATE__", "__TIME__", "__COUNTER__", "__INCLUDE_LEVEL__", "__BASE_FILE__"}
+
+
+def fast_preprocess(src, env=None):
+    """preprocess() for the fork server, without running cpp on every variant. A draft is a block of
+    #includes and then plain C; cpp's output for the include block is cached (keyed by its text and the
+    headers' mtimes), and the C after it passes through with comments blanked, as cpp would leave it,
+    when it holds no directive, line splice, trigraph or name of a macro the headers define. Anything else
+    goes to cpp. Bytes only: the line markers name a stand-in file."""
+    if (env or {}).get("SCOPE_TRANSFORM") or os.environ.get("SCOPE_TRANSFORM"):
+        return preprocess(src, env)
+    text = open(os.path.join(ROOT, src)).read()
+    lines = text.split("\n")
+    last = max((i for i, ln in enumerate(lines) if ln.lstrip().startswith("#")), default=-1)
+    head = "\n".join(lines[:last + 1]) + "\n"
+    body = "\n".join(lines[last + 1:])
+    if last < 0 or any(not re.match(r"\s*(#\s*include\b.*)?$", ln) and not re.match(r"\s*(//.*)?$", ln)
+                       for ln in lines[:last + 1]):
+        return preprocess(src, env)  # a #define, #if, or code between the includes
+    h = _HEADS.get(head)
+    if h is not None and any(os.path.getmtime(os.path.join(ROOT, f)) != t for f, t in h[2]):
+        h = None
+    if h is None:
+        work = os.path.join(WORK, "cache")
+        os.makedirs(work, exist_ok=True)
+        tmp = os.path.join(work, "head.c")
+        open(tmp, "w").write(head)
+        rel = os.path.relpath(tmp, ROOT)
+        # how many newlines cpp leaves after its last marker depends on the last include (a guarded
+        # header emits none); a marker of our own says where the body starts
+        out = re.sub(r"\n+\Z", "\n", build.sh(cpp_command(rel))) + f'# {last + 2} "{rel}"\n'
+        cmd = cpp_command(rel)
+        e = cmd.index("-E") + 1
+        defs = build.sh(cmd[:e] + ["-dM"] + cmd[e:])
+        macros = set(re.findall(r"^#define (\w+)", defs, re.M)) | _DYNAMIC
+        files = sorted({f for f in re.findall(r'^# \d+ "([^"<][^"]*)"', out, re.M) if os.path.exists(os.path.join(ROOT, f))})
+        h = _HEADS[head] = (out, macros, [(f, os.path.getmtime(os.path.join(ROOT, f))) for f in files])
+    out, macros, _ = h
+    if "\\\n" in body or "??" in body:
+        return preprocess(src, env)
+    parts = []
+    for m in _BODY_TOKEN.finditer(body):
+        t = m.group(0)
+        if t[:2] == "/*":
+            parts.append(" " + "\n" * t.count("\n"))
+        elif t[:2] == "//":
+            parts.append(" ")
+        elif t == "#" or (t[0].isalpha() or t[0] == "_") and t in macros:
+            return preprocess(src, env)
+        else:
+            parts.append(t)
+    return out + "".join(parts)
 
 
 def inline_macros(text):
@@ -1563,7 +1647,7 @@ def fast_compile(src, func, env=None):
                                    os.path.join(WORK, "cache"), fixup=inline_macros)
         os.makedirs(os.path.join(WORK, "cache"), exist_ok=True)
     knobs = {k: v for k, v in (env or {}).items() if k.startswith(("AGBCC_", "CSE_"))}
-    code, err = f.bytes(preprocess(src, env), (func, rom_name(src, func)), knobs)
+    code, err = f.bytes(fast_preprocess(src, env), (func, rom_name(src, func)), knobs)
     if code is None:
         return None
     return code, addr, f.data
@@ -2548,26 +2632,55 @@ def code_status():
     known.update({f"sub_{a:08X}": n for n, a in funcs})
     status = {n: "undrafted" for n, _ in funcs}
     files = {}
+    # per-file parse results, reused while the file's mtime and size stay the same (9932 files: 1.6 s
+    # to parse, 50 ms to stat)
+    path = os.path.join(CACHE, "code_status.pickle")
+    try:
+        with open(path, "rb") as f:
+            old = pickle.load(f)
+    except (OSError, EOFError, pickle.UnpicklingError):
+        old = {}
+    new = {}
     for p in sorted(Path(ROOT, "src").rglob("*.c")):
         rel = str(p.relative_to(ROOT))
-        for n in progress.c_functions(p, with_asm=False):
+        st = p.stat()
+        stamp = (st.st_mtime_ns, st.st_size)
+        if old.get(rel, (None,))[0] == stamp:
+            new[rel] = old[rel]
+        else:
+            new[rel] = (stamp, progress.c_functions(p, with_asm=False),
+                        [n for n, _ in progress.nonmatching_functions(p)])
+        _, exact, drafts = new[rel]
+        for n in exact:
             if n in known:
                 status[known[n]] = "matched"
                 files[known[n]] = rel
-        for n, _ in progress.nonmatching_functions(p):
+        for n in drafts:
             if n in known and status[known[n]] != "matched":
                 status[known[n]] = "draft"
                 files[known[n]] = rel
+    if new != old:
+        os.makedirs(CACHE, exist_ok=True)
+        with open(path + ".tmp", "wb") as f:
+            pickle.dump(new, f)
+        os.replace(path + ".tmp", path)
     return status, files
+
+
+def resolve_target(target, funcs):
+    """A function name from a name, an address, or a sub_XXXXXXXX label renamed since."""
+    m = re.fullmatch(r"(?:sub_|0x)?(0?8[0-9A-Fa-f]{6})", target)
+    if m and target not in dict(funcs):
+        a = int(m.group(1), 16)
+        return next((n for n, x in funcs if x == a), target)
+    return target
 
 
 def cmd_rom(target):
     """FUNC's ROM listing (no draft needed): calls and literal words named from the ROM ELF."""
     import progress
     funcs, sizes = progress.load_functions()
-    if re.fullmatch(r"(0x)?0?8[0-9A-Fa-f]{6}", target):
-        a = int(target, 16)
-        target = next((n for n, x in funcs if x == a), target)
+    target = resolve_target(target, funcs)
     addr = dict(funcs).get(target)
     if addr is None:
         sys.exit(f"{target}: not in the function inventory")
@@ -2612,6 +2725,32 @@ def cmd_fields(offs, want):
     return structure.fields(offs, lay, want)
 
 
+def like_index():
+    import structure
+    import progress
+    funcs, sizes = progress.load_functions()
+    elf = os.path.join(ROOT, "build", "boktai3.elf")
+    return cached("like_index", [elf, os.path.join(ROOT, "symbols", "functions.csv")],
+                  lambda: structure.build_index(funcs, sizes, rom_bytes(), decode, rom_pool_ranges))
+
+
+def like_tables():
+    import structure
+    elf = os.path.join(ROOT, "build", "boktai3.elf")
+    return cached("like_tables", [elf, os.path.join(ROOT, "symbols", "functions.csv")],
+                  lambda: structure.tables(like_index()))
+
+
+def cmd_todo(show, order):
+    """Phase-1 work list: undrafted functions, most matched prior art first."""
+    import structure
+    import progress
+    funcs, sizes = progress.load_functions()
+    status, _ = code_status()
+    return structure.todo(like_index(), status, funcs, sizes, progress.load_asm_ranges(), show, order,
+                          like_tables())
+
+
 def cmd_like(target, show):
     import structure
     import progress
@@ -2619,11 +2758,9 @@ def cmd_like(target, show):
     elf = os.path.join(ROOT, "build", "boktai3.elf")
     index = cached("like_index", [elf, os.path.join(ROOT, "symbols", "functions.csv")],
                    lambda: structure.build_index(funcs, sizes, rom_bytes(), decode, rom_pool_ranges))
-    if re.fullmatch(r"(0x)?0?8[0-9A-Fa-f]{6}", target):
-        a = int(target, 16)
-        target = next((n for n, x in funcs if x == a), target)
+    target = resolve_target(target, funcs)
     status, files = code_status()
-    return structure.like(target, index, status, files, show)
+    return structure.like(target, index, status, files, show, like_tables())
 
 
 def cmd_serve():
@@ -2792,6 +2929,10 @@ def main():
         return cmd_fields(offs, want)
     if args[0] == "rom":  # rom FUNC|ADDR: the ROM listing, no draft needed
         return cmd_rom(args[1])
+    if args[0] == "todo":  # todo [N] [prior|size|addr]: undrafted functions, most matched prior art first
+        n = next((int(a) for a in args[1:] if a.isdigit()), 20)
+        order = next((a for a in args[1:] if a in ("prior", "size", "addr")), "prior")
+        return cmd_todo(n, order)
     if args[0] == "like":  # like FUNC|ADDR: matched functions whose ROM looks like this one's
         return cmd_like(args[1], int(args[2]) if len(args) > 2 else 8)
     if args[0] == "census":  # census [CALLEE]: concessions across src/ grouped by the call they serve

@@ -24,6 +24,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 MARK = "\x01"  # right after the prefix's last newline: no extra line
 
 
+HELPER_CHARS = 12000  # longest unit-local stretch before FUNC sent with every request
+
+
 def split_source(text, func_names):
     """(prefix, suffix): the suffix starts at the definition of one of FUNC_NAMES.
     None when the text has no such definition or contains the marker byte."""
@@ -39,7 +42,26 @@ def split_source(text, func_names):
         return None
     # start at the line holding the definition, so line numbers stay the same
     start = text.rfind("\n", 0, m.start()) + 1
+    # Cut instead where the last #include ends (cpp's `# N "file" 2` return marker) when what follows is
+    # small: the unit's own structs and inline helpers then go with each request, so a variant that edits
+    # a helper reuses the server instead of parsing every header again. A long stretch (earlier
+    # functions of a big unit) stays in the prefix, where it is parsed and compiled once.
+    back = None
+    for b in re.finditer(r'^# \d+ "[^"]*" 2[^\n]*\n', text[:start], re.M):
+        back = b
+    if back and start - back.end() <= HELPER_CHARS:
+        start = back.end()
     return text[:start], text[start:]
+
+
+def canonical_prefix(prefix):
+    """PREFIX with the main file's name in cpp's line markers replaced by a fixed one, so drafts of one
+    unit saved under different paths share a server (the fork server returns bytes only; the name is
+    only debug information)."""
+    m = re.match(r'# 1 "([^"]+)"', prefix)
+    if not m:
+        return prefix
+    return re.sub(r'^(# \d+ )"%s"' % re.escape(m.group(1)), r'\1"unit.c"', prefix, flags=re.M)
 
 
 class Server:
@@ -241,7 +263,7 @@ class Fast:
         parts = split_source(pre, own)
         if parts is None:
             return None, "the fork server needs FUNC's definition in the unit"
-        asm = self.server(parts[0]).compile(parts[1], env)
+        asm = self.server(canonical_prefix(parts[0])).compile(parts[1], env)
         if asm is None:
             return None, "compile failed"
         obj, err = assemble(self.assembler, self.fixup(asm), self.workdir)

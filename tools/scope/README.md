@@ -131,9 +131,14 @@ python3 tools/scope/scope.py FILE.c spill         is the whole difference reload
 python3 tools/scope/scope.py FILE.c life NAME...  the insns flow counts toward a pseudo's live length, by C line
 python3 tools/scope/scope.py A.c vs B.c [FUNC]    two drafts' allocation side by side: rank, priority, refs/live, prefs, register
 python3 tools/scope/scope.py FILE.c pins          remove each register pin / empty asm barrier in turn: its cost; then greedy free removal
-python3 tools/scope/scope.py FILE.c try V.c...     score whole-file variants (or `try KNOB={a,b}`: one variant per knob value), best first, ~12 ms each
+python3 tools/scope/scope.py FILE.c try V.c...     score whole-file variants (or `try KNOB={a,b}`: one variant per knob value), best first (by shape distance), ~12 ms each
 python3 tools/scope/scope.py FILE.c insn UID      (also `FILE.c uses REG...`): compile FILE first, then show
 SCOPE_TRANSFORM=tools/scope/transforms/X.py scope.py FILE.c   what-if over the preprocessed source
+python3 tools/scope/scope.py todo [N] [prior|size|addr]   functions with no C yet, most matched prior art first
+python3 tools/scope/scope.py like FUNC|ADDR [N]   matched functions sharing the most rare 3-insn windows (helpers to reuse)
+python3 tools/scope/scope.py rom FUNC|ADDR        ROM listing, literal pools as data, calls named (no draft needed)
+python3 tools/scope/scope.py fields OFF... [STRUCT]   structs with members at these offsets (agbcc-measured layouts)
+python3 tools/scope/scope.py census [CALLEE]      register-pinning concessions and drafts grouped by the call they serve
 ```
 
 `life` takes C variable names or pseudo numbers (names survive edits, numbers
@@ -281,8 +286,10 @@ and milliseconds per variant when a hypothesis has many variants.
 |---|---|
 | agbcc, plain / with all 14 RTL dumps | 7 ms / 19 ms |
 | agbcc fork-server child (declarations parsed once) | ~3 ms |
-| preprocess (`clang -E` direct; memoised per file mtime) | 14 ms |
-| one search variant (fork server, `as`, Python placement, align) | ~12 ms (was ~120 ms) |
+| preprocess (the driver's own cpp command, run directly; memoised per file mtime) | 9 ms (`cc -E`: 23 ms) |
+| a draft's C after its `#include` block (fast path: cached include block, body passed through) | <1 ms |
+| one search variant, a new file (fork server, `as`, Python placement, align) | ~12 ms (was 51 ms; ~120 ms before that) |
+| one search variant, same file and a knob | ~10 ms |
 | a diff with all dumps, through the resident server | 0.12 s (was 0.30 s; 0.7 s before that) |
 | `probe` (25 variants) / `spill` (42 variants) | 0.36 s / 0.60 s (were 2.6 s / 4.9 s) |
 
@@ -306,6 +313,18 @@ How (2026-10-24):
   object's relocations (BL, ABS32, Thumb b/b<cond>) at FUNC's ROM address
   and reads its `$d`/`$t` mapping symbols; `fast.dwarf_lines` decodes the
   DWARF 2 line program. `SCOPE_LINK=1` runs the old linker path.
+* **No cpp on a variant**: `fast_preprocess` caches cpp's output for a
+  draft's `#include` block (keyed by its text and the headers' mtimes) and
+  passes the C after it through with comments blanked, when that C has no
+  directive, line splice, trigraph or name of a macro the headers define
+  (anything else runs cpp). Checked token by token, with line numbers,
+  against cpp on every unit in src/.
+* **One server per unit, not per draft**: the fork-server prefix ends where
+  the last header ends (the unit's own structs and inline helpers go with
+  each request, up to 12 KB), and the main file's name in cpp's line
+  markers is canonical. Before this, every variant that edited a helper, or
+  was saved under another path, parsed all headers again; past 8 prefixes the
+  servers were flushed.
 * **Checked**: `scope.py fastcheck N` compiles N units both ways and compares
   each path's bytes with ld's (148/148 identical; the full report was
   identical on 40 drafts). Run it after changing fast.py or the patch.
@@ -319,8 +338,16 @@ in the patch.
 
 * Done: trace summarizer and pseudo names (`why`). On RepeatedPairAttack it
   reproduces in one call what took ~15 calls of raw trace reading.
-* `why` has no explainer yet for combine, regmove or gcse changes (it says so),
-  and the allocation explainer's "who held the register" scan is linear over
+* Done: order. `why all` compares each hunk with low registers blanked; an
+  insn both sides have elsewhere is a move. It names the ROM's anchor, says
+  whether expansion order or a pass set the draft's order, and for a constant
+  follows it to the C use cse placed it at (e.g. a bitfield store's `and 0`
+  mask) and the lines where the ROM's first use must be. Passes without an
+  explainer say what the removed pseudo held and whether its set was folded.
+  On sub_0808B264 this states in one call what took five variants by hand.
+* Done: shape distance (register-blind insertions + deletions). `try` ranks by
+  it; insn counts ranked the step that led to sub_0808B264's match as worse.
+* The allocation explainer's "who held the register" scan is linear over
   the pseudo's insn span, not true liveness (`life` has the true liveness;
   use it there next).
 * Done: a `vs OTHER.c` mode: allocation order, priorities and lives of named
