@@ -54,6 +54,7 @@ struct Manager *ParticleManager_Create(void *, u32);
 s32 Mod(s32, s32);
 void sub_08217E40(void *, s32);
 #ifdef NONMATCHING
+// fuzzy: 74.5%
 // fix.py best (sweep after the inlined-insn fix)
 // Register lifetimes and stack offsets still differ in the group and velocity loops.
 static inline s32 Random(u16 *table, u32 mask, u32 *rng)

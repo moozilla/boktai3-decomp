@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 64.8%
 // fix.py best version
 // fix.py best version (reprinted C)
 // confidence=low: selects turn animation and rotates toward the route facing.

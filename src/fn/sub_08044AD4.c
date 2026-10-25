@@ -1,5 +1,6 @@
 #include "contact_swarm.h"
 #ifdef NONMATCHING
+// fuzzy: 88.8%
 // fix.py best version
 // Only the speed-byte stack reload uses r0 instead of r2; the reviewed body is 428 bytes.
 #define ContactSwarm_SpawnPairedAdvanceCount sub_08044AD4

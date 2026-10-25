@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 95.6%
 // fix.py best (sweep after the inlined-insn fix)
 // The first terrain lookup recomputes its position pointer; registers also differ.
 struct ParticleVector {

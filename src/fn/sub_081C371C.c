@@ -65,6 +65,7 @@ static inline void SetCallback(void (*callback)(void), void (**slot)(void))
 // confidence=low: initializes linear world movement and a scale ramp without a motion track.
 #define ContactImpactEffect_BeginInterpolatedPosition sub_081C371C
 #ifdef NONMATCHING
+// fuzzy: 93.0%
 // fix.py best (sweep after the inlined-insn fix)
 // Full reconstruction; destination/origin pointer copies and projection registers still differ.
 static inline void Project_081C371C(u16 *screen, struct Vec *world)

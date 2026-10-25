@@ -2,6 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
+// fuzzy: 81.3%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: vector pointer lifetimes, collider argument reloads and loop scheduling.
 struct Vec {

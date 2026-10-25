@@ -51,6 +51,7 @@ static inline void storeByte(u8 *p, u32 off, u32 value)
     ((u8 *)p)[off] = value;
 }
 #ifdef NONMATCHING
+// fuzzy: 94.0%
 // fix.py best version
 void Player_AdvanceScriptDestination(u8 *p)
 {

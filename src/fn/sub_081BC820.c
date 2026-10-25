@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 70.1%
 // fix.py best (sweep after the inlined-insn fix)
 // twin.py transplant from a matched near-clone
 // 31 differing instruction runs; first diff at +0x4 (adds r7, r0, #0 vs adds r6, r0, #0)

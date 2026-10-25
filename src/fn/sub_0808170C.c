@@ -2,6 +2,7 @@
 // confidence=low: settles reaction displacement and restores normal actor control.
 #define SceneActorReaction_SettleDisplacement sub_0808170C
 #ifdef NONMATCHING
+// fuzzy: 74.8%
 // fix.py best (sweep after the inlined-insn fix)
 // Full flow recovered; reset-field and motion-pointer lifetimes still differ.
 #include "scene_actor_chase.h"

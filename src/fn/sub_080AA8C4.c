@@ -2,6 +2,7 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 #ifdef NONMATCHING
+// fuzzy: 87.5%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: segment address lifetimes and register allocation.
 struct TrailSegment {

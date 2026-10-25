@@ -3,6 +3,7 @@
 #include "contact_swarm.h"
 // confidence=low: motion 0x1D applies decaying recoil until standing resumes.
 #ifdef NONMATCHING
+// fuzzy: 96.7%
 // fix.py best (sweep after the inlined-insn fix)
 // Two address constants use different registers; reviewed body ends at 08152C3C.
 struct P {

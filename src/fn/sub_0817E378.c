@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 44.3%
 // fix.py best (sweep after the inlined-insn fix)
 // register allocation: flags/count pointers swap (r3/r5); asrs ok
 struct A {

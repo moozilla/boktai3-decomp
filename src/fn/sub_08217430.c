@@ -2,6 +2,7 @@
 
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
+// fuzzy: 96.8%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Left: fast-path bank address register (ROM r3 plus a copy), the flags & 0x20

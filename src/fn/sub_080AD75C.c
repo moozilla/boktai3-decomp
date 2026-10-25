@@ -3,6 +3,7 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
+// fuzzy: 77.8%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: address lifetimes, state scheduling, and register allocation.

@@ -45,6 +45,7 @@ void Player_LoadVisualParameters(struct Player *p)
 }
 
 #ifdef NONMATCHING
+// fuzzy: 66.5%
 // fix.py best (sweep after the inlined-insn fix)
 // Palette blend layout recovered; channel allocation remains tentative.
 void sub_0813C9B4(struct Player *actor, const u16 *input, s32 weightA, s32 weightB, s32 shift)

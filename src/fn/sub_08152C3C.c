@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #ifdef NONMATCHING
+// fuzzy: 87.4%
 // fix.py best (sweep after the inlined-insn fix)
 struct CueActor {
     u8 pad0[0x1D0];

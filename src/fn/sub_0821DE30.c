@@ -1,5 +1,6 @@
 #include "engine.h"
 #ifdef NONMATCHING
+// fuzzy: 70.7%
 // fix.py best (sweep after the inlined-insn fix)
 struct TrapPosition {
     s16 x, y, z;

@@ -4,6 +4,7 @@
 #include "scene_actor_position_search.h"
 
 #ifdef NONMATCHING
+// fuzzy: 89.4%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 /* Remaining differences: pointer lifetimes, state/reset constants, and command setup. */

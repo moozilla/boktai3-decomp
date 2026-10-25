@@ -8,6 +8,7 @@
 
 // Remaining differences: register allocation, PRE stack slots, and inline setup order.
 #ifdef NONMATCHING
+// fuzzy: 82.8%
 void Skeleton_UpdateScriptWaitState(void);
 void sub_0807E334(void *);
 s32 Mod(s32, s32);

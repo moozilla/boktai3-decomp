@@ -2,6 +2,7 @@
 #include "directional_particles.h"
 
 #ifdef NONMATCHING
+// fuzzy: 69.9%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 extern u32 gUnk_03005308;

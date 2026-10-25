@@ -83,6 +83,7 @@ static inline void SaveInitialPlayer(struct ContactPosition *out, u8 **players)
     *out = *(struct ContactPosition *)(*source + 0x30);
 }
 #ifdef NONMATCHING
+// fuzzy: 94.9%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: player-pointer copies, control-field offsets and animation-scale allocation.
 // confidence=low: follows the player's displacement while draining, then returns to idle.

@@ -16,6 +16,7 @@ static inline s32 Trunc5(s32 v)
 }
 #define PAL(o) ((struct PalFade *)((u8 *)(o) + 0x348))
 #ifdef NONMATCHING
+// fuzzy: 88.6%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining diff: spill-slot numbering and the order in which the per-row
 // accumulator pointers are formed.

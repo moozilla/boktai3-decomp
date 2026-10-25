@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 89.6%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: orientation range guard and later address/allocation ordering.
 #include "global.h"

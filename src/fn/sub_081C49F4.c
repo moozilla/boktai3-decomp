@@ -1,6 +1,7 @@
 #include "global.h"
 #include "display_animation.h"
 #ifdef NONMATCHING
+// fuzzy: 99.1%
 // fix.py best after the inlined-insn fix
 // (this draft uses local register pinning)
 // Remaining: the ROM stores paletteData off p (`str r0, [r6, #0x50]`); writing

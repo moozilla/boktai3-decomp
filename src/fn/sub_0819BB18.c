@@ -42,6 +42,7 @@ static inline s32 randomValue(const u16 *table)
     return *(const u16 *)(offset + (u32)table);
 }
 #ifdef NONMATCHING
+// fuzzy: 85.0%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: random-table address lifetimes and loop register allocation.
 void Hresvelgr_EmitFacingMotionBurst(struct BurstActor *actor)

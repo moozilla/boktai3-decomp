@@ -2,6 +2,7 @@
 #include "global.h"
 // confidence=low: hit callback slows this departure action.
 #ifdef NONMATCHING
+// fuzzy: 92.0%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: base preservation, second decoder allocation, and phase transitions.
 struct Frames {

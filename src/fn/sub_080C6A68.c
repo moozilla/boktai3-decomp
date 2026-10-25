@@ -3,6 +3,7 @@
 #include "global.h"
 // confidence=low: neighboring Golem controls establish the state role.
 #ifdef NONMATCHING
+// fuzzy: 91.1%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: stack-slot placement, packed-store scheduling and animation pointer copies.
 /* Decelerate the charge, return to the current cell center, then restore the saved route. */

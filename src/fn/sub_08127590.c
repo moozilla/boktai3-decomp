@@ -3,6 +3,7 @@
 // confidence=low: creates a pooled projectile with optional spin and collider.
 #define SpriteProjectile_Create sub_08127590
 #ifdef NONMATCHING
+// fuzzy: 84.9%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: guard evaluation order, animation temporaries and register allocation.
 struct ParticleVector {

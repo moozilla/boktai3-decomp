@@ -3,6 +3,7 @@
 // confidence=low: projects the source and positions a timed icon around the screen center.
 #define ScreenOrbitEffect_UpdateFixedSlot sub_08232BE8
 #ifdef NONMATCHING
+// fuzzy: 77.7%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining: projection and sprite-pointer lifetimes, branch layout and registers.
 struct OrbitVec {

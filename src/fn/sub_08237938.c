@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 93.3%
 // fix.py best (sweep after the inlined-insn fix)
 struct GlyphPosition {
     u16 x, y, z, pad;

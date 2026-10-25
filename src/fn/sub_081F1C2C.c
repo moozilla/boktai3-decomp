@@ -2,6 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
+// fuzzy: 89.5%
 // fix.py best (sweep after the inlined-insn fix)
 /* Remaining differences: script/vector stack layout and state/resource setup lifetimes. */
 s32 Script_SeekToKeyword(u32);

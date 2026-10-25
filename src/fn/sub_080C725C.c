@@ -4,6 +4,7 @@
 // confidence=low: neighboring Golem controls establish the state role.
 // confidence=low: Golem_BeginSlideState installs control kind 0x29 with speed 0x200.
 #ifdef NONMATCHING
+// fuzzy: 90.5%
 // fix.py best (sweep after the inlined-insn fix)
 // Push along the stored heading, emit dust, and resolve an impact into completion or defeat.
 // Remaining mismatch: motion-pointer copies, RNG allocation and completion/control-reset offsets.

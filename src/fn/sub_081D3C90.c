@@ -25,6 +25,7 @@ static inline s32 Shift13(s32 v)
 // confidence=low: places six parts at fixed offsets from the anchor and sways each one in x by
 // a sine wave whose amplitude shrinks along the chain.
 #ifdef NONMATCHING
+// fuzzy: 43.8%
 // fix.py best (sweep after the inlined-insn fix)
 // The ROM reloads p->phase every iteration (not hoisted) and keeps the anchor coordinate addresses in registers.
 inline static s32 Shift5_081D3C90(s32 v)

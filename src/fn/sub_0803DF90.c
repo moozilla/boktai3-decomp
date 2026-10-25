@@ -1,6 +1,7 @@
 #include "scene_pool.h"
 
 #ifdef NONMATCHING
+// fuzzy: 85.6%
 // fix.py best (sweep after the inlined-insn fix)
 // twin.py transplant from a matched near-clone
 // fix.py best version (reprinted C)

@@ -1,6 +1,7 @@
 #include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
+// fuzzy: 79.8%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: reset scheduling, saved zero values, and group-address lifetimes.

@@ -1,6 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 97.1%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // foundry draft (worker best 83.0%); what differs is mostly register allocation and instruction order

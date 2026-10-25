@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 91.7%
 // fix.py best (sweep after the inlined-insn fix)
 // foundry draft (worker best 92.1%); what differs is mostly register allocation and instruction order
 #define gOrbitEffectRandomTable gUnk_0203B400

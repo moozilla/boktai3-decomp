@@ -1,6 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 87.1%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Packet handling and readiness are recovered; register allocation and block placement differ.

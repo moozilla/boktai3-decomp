@@ -2,6 +2,7 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
+// fuzzy: 96.2%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: Vampire pending-damage handler: applies queued damage, flash/shake, death and stagger transitions.

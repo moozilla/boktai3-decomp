@@ -156,6 +156,7 @@ static inline void addPositionAt(struct GroupVec *d, struct GroupVec *dst, struc
 }
 
 #ifdef NONMATCHING
+// fuzzy: 85.5%
 // fix.py best (sweep after the inlined-insn fix)
 int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
@@ -219,6 +220,7 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
 INCLUDE_ASM("asm/nonmatching", sub_0800FC28);
 #endif
 #ifdef NONMATCHING
+// fuzzy: 82.0%
 // fix.py best (sweep after the inlined-insn fix)
 int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {

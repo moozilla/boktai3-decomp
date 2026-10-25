@@ -587,6 +587,7 @@ void TetherActor_InitializeSegments(struct TetherActor *actor)
 }
 
 #ifdef NONMATCHING
+// fuzzy: 94.6%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining: the ROM hoists neither z endpoint out of the segment loop and keeps the
 // priority in sb; this hoists start.z and spills the priority.
@@ -1207,6 +1208,7 @@ void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
 }
 
 #ifdef NONMATCHING
+// fuzzy: 72.9%
 // fix.py best (sweep after the inlined-insn fix)
 
 /* Both slope pushes are a duplicated inline (the ROM keeps two copies and cross-jumps only the z tail). Remaining: octant gets r5 instead of r4 (needs higher allocation priority), reload-register rotation makes the cells[2] loads in the second chain cross-jump. */

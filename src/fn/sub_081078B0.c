@@ -129,6 +129,7 @@ static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequence
     return ended;
 }
 #ifdef NONMATCHING
+// fuzzy: 84.7%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining: the savedDuration copy is emitted before the PRE-inserted
 // &p->frame and lands in r5, swapping with mask (ROM: saved r7, mask r5).

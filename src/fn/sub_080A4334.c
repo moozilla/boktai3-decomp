@@ -2,6 +2,7 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
+// fuzzy: 94.0%
 // fix.py best (sweep after the inlined-insn fix)
 // twin.py transplant from a matched near-clone
 // Remaining differences: register allocation, address reuse, and instruction order.

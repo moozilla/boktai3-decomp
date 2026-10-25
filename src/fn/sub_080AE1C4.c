@@ -1,6 +1,7 @@
 #include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
+// fuzzy: 83.5%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: converges saved motion and restores the route after a reaction timer.

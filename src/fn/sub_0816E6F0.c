@@ -1,6 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 94.6%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 extern u16 gUnk_0203B400[];

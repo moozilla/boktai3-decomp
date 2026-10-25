@@ -19,6 +19,7 @@ static inline u8 PlayerHasFlag(u32 mask)
     return 0;
 }
 #ifdef NONMATCHING
+// fuzzy: 96.7%
 // fix.py best (sweep after the inlined-insn fix)
 void ScenePool_SpawnEntriesNearPlayers(struct ScenePoolManager *m0)
 {

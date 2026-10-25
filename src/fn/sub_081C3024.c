@@ -65,6 +65,7 @@ static inline void SetCallback(void (*callback)(void), void (**slot)(void))
 }
 
 #ifdef NONMATCHING
+// fuzzy: 80.7%
 // fix.py best (sweep after the inlined-insn fix)
 // Full reconstruction; vector pointer lifetimes and projection/ramp register allocation differ.
 void ContactImpactEffect_BeginMotion(struct ContactImpactEffect *input, struct Vec *source,

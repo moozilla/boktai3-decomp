@@ -1,6 +1,7 @@
 #include "player_3.h"
 
 #ifdef NONMATCHING
+// fuzzy: 99.5%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Initializes both animation channels and script facing; constructor allocation differs.

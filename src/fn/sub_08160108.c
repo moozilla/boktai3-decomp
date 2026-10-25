@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 57.0%
 // fix.py best (sweep after the inlined-insn fix)
 struct BurstPosition {
     u16 x, y, z, pad;

@@ -1,6 +1,7 @@
 #include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
+// fuzzy: 63.4%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 static inline s32 Direction(s32 x)

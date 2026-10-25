@@ -3,6 +3,7 @@
 // confidence=low: emits one centered explosion and seven offset explosions.
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
+// fuzzy: 70.3%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: RNG mask/register lifetimes and offset scheduling.
 #define Hresvelgr_EmitImpactExplosions sub_081A4AB4

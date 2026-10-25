@@ -6,6 +6,7 @@
 #define SpriteEffectController_UpdateTileBounce sub_0806AF74
 void Heap_Free(void *);
 #ifdef NONMATCHING
+// fuzzy: 92.7%
 // fix.py best (sweep after the inlined-insn fix)
 // Frame-address hoisting and reverse-playback pointer copies still differ.
 static inline u32 StepTile(struct SpriteEffectController *controller, u32 sequenceMode)

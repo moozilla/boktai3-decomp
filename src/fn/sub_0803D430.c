@@ -4,6 +4,7 @@ void ScenePool_UpdateOccupiedActorSlots(struct ScenePoolManager *);
 // confidence=low: records the position, map region and presence mask of each player (stopping
 // at the first missing one), then spawns nearby entries and updates occupied actor slots.
 #ifdef NONMATCHING
+// fuzzy: 61.3%
 // fix.py best (sweep after the inlined-insn fix)
 // The ROM does not strength-reduce regions[i] (it recomputes i*4 each iteration) and keeps m in r8.
 s32 sub_0803D430(struct ScenePoolManager *m)

@@ -3,6 +3,7 @@
 // confidence=low: disables contact and sequences bursts before recording a defeat event.
 #define Ivy_UpdateDefeatBurst sub_080F421C
 #ifdef NONMATCHING
+// fuzzy: 72.4%
 // fix.py best (sweep after the inlined-insn fix)
 // Complete defeat flow; child-loop induction and local allocation still differ.
 #include "engine.h"

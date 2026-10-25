@@ -60,6 +60,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *a, void *cb, u
 // timer above 2, disables all six colliders and starts the reverse flicker.
 #define Axe_OnBodyContact sub_080F75C0
 #ifdef NONMATCHING
+// fuzzy: 76.3%
 // fix.py best (sweep after the inlined-insn fix)
 // The ROM keeps the collider loop counter and hoists the SetControl addresses differently.
 inline static u8 Unavailable_080F75C0(struct SceneActorRegistryResetView *actor)

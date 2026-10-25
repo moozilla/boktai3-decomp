@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 55.0%
 // fix.py best (sweep after the inlined-insn fix)
 struct Position {
     s16 x, y, z, pad;

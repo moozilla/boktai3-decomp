@@ -21,6 +21,7 @@ static inline s32 scale12(s32 v)
 // the sprite from its start to its target position with a sine bob; afterwards it starts the
 // shake.
 #ifdef NONMATCHING
+// fuzzy: 90.7%
 // fix.py best after the inlined-insn fix
 // ROM keeps the incremented timer untruncated in a copy for the 0x50/0x51 bytes; u8 t adds a truncation and wider types fold +1+0x22.
 void sub_08234DC8(u8 *p)

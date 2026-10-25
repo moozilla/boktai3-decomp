@@ -6,6 +6,7 @@ u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 // confidence=low: selects a route return phase from motion and route flags.
 #define SceneActorRoute_UpdateContactRecovery sub_081314E8
 #ifdef NONMATCHING
+// fuzzy: 89.3%
 // fix.py best (sweep after the inlined-insn fix)
 /* Flag lifetimes, partial-vector scheduling and repeated control tails still differ. */
 static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind,

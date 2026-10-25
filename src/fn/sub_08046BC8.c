@@ -3,6 +3,7 @@ void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void sub_08217E40(void *, u32);
 extern const u32 gUnk_086059C0[];
 #ifdef NONMATCHING
+// fuzzy: 78.3%
 // fix.py best (sweep after the inlined-insn fix)
 // Decimal setup is recovered; register allocation and projection-loop lifetimes still differ.
 inline static void DamageNumber_ProjectPosition_(struct ContactPosition *screen,

@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 96.5%
 // fix.py best (sweep after the inlined-insn fix)
 #include "scene_hud_display.h"
 #include "player.h"

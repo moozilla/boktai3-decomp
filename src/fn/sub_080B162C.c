@@ -2,6 +2,7 @@
 #include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
+// fuzzy: 97.2%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 void SceneActor_SelectDistantRoutePoint(void *, void *, void *, u32);

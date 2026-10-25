@@ -2,6 +2,7 @@
 #include "contact_swarm.h"
 
 #ifdef NONMATCHING
+// fuzzy: 94.1%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: tentative player cue role; see callback body.

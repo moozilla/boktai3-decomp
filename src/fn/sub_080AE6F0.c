@@ -2,6 +2,7 @@
 #include "scene_actor_chase.h"
 
 #ifdef NONMATCHING
+// fuzzy: 83.1%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: resumes the route or runs the recovery script.

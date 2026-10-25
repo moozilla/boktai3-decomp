@@ -1,6 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 94.8%
 // fix.py best version
 // fix.py best version (reprinted C)
 // confidence=low: limits the tether target distance and clips its position against terrain.

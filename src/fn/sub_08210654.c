@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 92.3%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: option/animation register allocation and defined success return.
 #include "pink_spine_playback.h"

@@ -4,6 +4,7 @@
 #include "display_animation.h"
 
 #ifdef NONMATCHING
+// fuzzy: 91.6%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Transition constants, mask copies, and register allocation still differ.

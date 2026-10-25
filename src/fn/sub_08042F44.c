@@ -1,4 +1,5 @@
 #ifdef NONMATCHING
+// fuzzy: 65.8%
 // fix.py best (sweep after the inlined-insn fix)
 // Reviewed full extent; register lifetimes and instruction scheduling still differ.
 #include "contact_actor.h"

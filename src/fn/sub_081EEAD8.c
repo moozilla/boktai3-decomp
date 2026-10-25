@@ -2,6 +2,7 @@
 #include "global.h"
 // confidence=low: fades sprite palettes before emitting dispersal particles.
 #ifdef NONMATCHING
+// fuzzy: 94.6%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: palette destination setup and particle-loop initialization order.
 struct P {

@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 87.5%
 // fix.py best (sweep after the inlined-insn fix)
 // Structure matches; register allocation in the second slot loop differs (ROM keeps &role in ip via r1, zero in r4).
 struct LinkSlot {

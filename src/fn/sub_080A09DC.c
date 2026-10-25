@@ -3,6 +3,7 @@
 #include "engine.h"
 
 #ifdef NONMATCHING
+// fuzzy: 96.0%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: ground-height lookup temporaries (r0/r1/r3 swap) and a derived pool constant.
 #define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))

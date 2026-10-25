@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 90.3%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 extern s32 gUnk_03005324, gUnk_0300531C;

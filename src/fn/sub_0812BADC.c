@@ -2,6 +2,7 @@
 #include "contact_swarm.h"
 
 #ifdef NONMATCHING
+// fuzzy: 86.2%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining: sine/RNG load order, position and terrain register allocation, and collider temporaries.

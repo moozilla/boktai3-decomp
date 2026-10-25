@@ -2,6 +2,7 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
+// fuzzy: 75.9%
 // fix.py best (sweep after the inlined-insn fix)
 // Vector address lifetimes, RNG allocation and packed coordinate stores still differ.
 struct Vec {

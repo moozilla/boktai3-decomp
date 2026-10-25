@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 67.9%
 // fix.py best (sweep after the inlined-insn fix)
 struct LinkPalTarget {
     u8 pad0[0xC];

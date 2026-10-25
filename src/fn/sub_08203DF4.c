@@ -3,6 +3,7 @@
 // confidence=low: per-frame update applies pending damage, starts the death sequence and steps the
 // sprite animation.
 #ifdef NONMATCHING
+// fuzzy: 94.4%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining: collider flag-update registers and one copy of the constant 7 from sl.
 struct DisplaySequenceState {

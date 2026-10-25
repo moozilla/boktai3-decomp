@@ -2,6 +2,7 @@
 #include "global.h"
 #include "engine.h"
 #ifdef NONMATCHING
+// fuzzy: 88.2%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining: terrain/center allocation and pointer/register lifetimes.

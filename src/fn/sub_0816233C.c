@@ -1,6 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 79.1%
 // fix.py best (sweep after the inlined-insn fix)
 // confidence=low: updates attack particles and advances their animation or lifetime.
 #define PlayerAttackEffect_UpdateParticles sub_0816233C

@@ -6,6 +6,7 @@
 // confidence=low: route role inferred from callers and terrain/path tests.
 
 #ifdef NONMATCHING
+// fuzzy: 86.7%
 // fix.py best (sweep after the inlined-insn fix)
 // Width-load rematerialization, stack-slot order, and literal-pool placement still differ.
 static inline u32 CellIndex(struct ContactPosition *p)

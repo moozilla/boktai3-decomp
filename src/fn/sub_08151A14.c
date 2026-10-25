@@ -2,6 +2,7 @@
 #include "player.h"
 
 #ifdef NONMATCHING
+// fuzzy: 84.2%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: tentative cue role inferred from named callers and callback behavior.

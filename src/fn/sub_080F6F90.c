@@ -2,6 +2,7 @@
 #include "display_animation.h"
 
 #ifdef NONMATCHING
+// fuzzy: 93.8%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: initializes the four active sword attack components.
