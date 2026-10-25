@@ -9,7 +9,8 @@ address,isa,evidence,replacement_end
 08009E30,thumb,Independent 12-byte global-pointer clear after directional script return and literal pool,08009E3C
 0800A800,thumb,Independent 12-byte effect manager global-pointer clear following collision controller teardown,0800A80C
 0800B2F4,thumb,Hidden raw-tail function,0800B330
-0800B330,thumb,Hidden raw-tail function (retained),
+0800B330,thumb,Hidden raw-tail function; exact 172-byte C body,0800B3DC
+0800B3DC,thumb,Empty 4-byte leaf (bx lr) after sub_0800B330; first entry of each row of the particle update table gUnk_08604A78; exact 4-byte C body,0800B3E0
 0800CBA0,thumb,Independent global manager reset after allocator return and pool; exact 12-byte C body,0800CBAC
 0800E3D4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0800E3E0
 080133C0,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080133CC

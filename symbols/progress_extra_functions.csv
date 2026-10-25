@@ -14,7 +14,8 @@ address,evidence
 08009E30,Independent 12-byte global-pointer clear after directional script return and literal pool
 0800A800,Independent 12-byte effect manager global-pointer clear following collision controller teardown
 0800B2F4,Hidden raw-tail function
-0800B330,Hidden raw-tail function (retained)
+0800B330,Hidden raw-tail function
+0800B3DC,Empty 4-byte leaf (bx lr) after sub_0800B330; first entry of each row of the particle update table gUnk_08604A78
 0800CBA0,Independent 12-byte global manager reset after allocator return and pool
 0800E3D4,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
 0800F4B8,Independent 12-byte store of zero to gUnk_02000048 between sub_0800F474 and sub_0800F4C4 (twin of sub_0800F6EC)
