@@ -28,7 +28,7 @@ void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void SceneHud_SetTimedState(void *, s32, s32, s32, u32, s32);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
-void sub_0820B2AC(void);
+void DragonPuppy_UpdateAttackWindup(void);
 #define H(o) (*(s16 *)(p + (o)))
 #define U(o) (*(u16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))
@@ -384,7 +384,7 @@ s32 DragonPuppy_UpdateCombat(u8 *p)
             Anim_RestartSequence(p + 0x10c, *((void **)(p + 0x170)), 5, *((u8 *)(p + 0x132)), 0);
             AnimData_SelectPaletteBank(p + 0x50, 0x1b9);
             *((s16 *)(p + 0x130)) = 0;
-            *((void (**)(void))(p + 0x108)) = sub_0820B2AC;
+            *((void (**)(void))(p + 0x108)) = DragonPuppy_UpdateAttackWindup;
             *((u32 *)(p + 0x18)) = 0;
         }
         {

@@ -1,13 +1,13 @@
 #include "global.h"
 
-void sub_081F2208(u8 *, u8 *, s32);
+void SpriteTrail_InitializeEntry(u8 *, u8 *, s32);
 
 u32 SingletonSlot7_InitEffectPool(u8 *p)
 {
     u8 *q = p + 0x20;
     s32 i = 0;
     do {
-        sub_081F2208(p, q, i);
+        SpriteTrail_InitializeEntry(p, q, i);
         i++;
         q += 0x258;
     } while (i <= 3);

@@ -25,7 +25,7 @@ struct GlowTask {
 };
 void RadialBurstEffect_EmitOrbitParticle(struct GlowOwner *, void *);
 void sub_08235DB0(struct GlowOwner *);
-void sub_082362EC(struct GlowOwner *, void *);
+void RadialBurstEffect_StartBurst(struct GlowOwner *, void *);
 void TimedSprite_UpdateFrames(void);
 void Sound_PlaySong(u32);
 
@@ -55,6 +55,6 @@ void sub_08236790(struct GlowTask *p)
         }
         p->callback = TimedSprite_UpdateFrames;
         p->timer = 0;
-        sub_082362EC(p->owner, &p->x);
+        RadialBurstEffect_StartBurst(p->owner, &p->x);
     }
 }

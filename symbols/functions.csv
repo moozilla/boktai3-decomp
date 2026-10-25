@@ -7812,6 +7812,7 @@ addr,name,mode,confidence,source,notes
 081D39E0,PaletteTransition_UpdateWobble,thumb,low,src-alias,
 081D3A98,PaletteTransition_UpdateBlink,thumb,low,src-alias,
 081D3D68,SceneDisplay_InitCurrentAnimation,thumb,low,src-alias,Initializes display animation using the current descriptor index
+081D3D74,SceneDisplay_UpdateHopAnimation,thumb,low,src-alias,Cycles three directional animations; moves the display vertically; restores its saved position; then pauses before repeating.
 081D3F24,SceneDisplay_GetAlternateDescriptor,thumb,low,src-alias,Maps descriptor pairs 100 through 103 to their alternate variants
 081D3FFC,SceneDisplay_SwitchToAlternateDescriptor,thumb,low,src-alias,Selects the alternate descriptor and resets state before rebuilding the display
 081D4024,PaletteTransition_CopyBanks,thumb,low,src-alias,
@@ -8248,6 +8249,7 @@ addr,name,mode,confidence,source,notes
 081F21C0,MotionEffectPool_FindFreeEntry,thumb,low,src-alias,Returns the first of four entries whose occupancy bit is clear and writes its index; tentative pool identity
 081F21F4,MotionEffectPool_OnRenderComplete,thumb,low,src-alias,Empty callback supplied by the pool entry render setup routines; tentative callback role
 081F21F8,SingletonSlot7_OnEffectMotionComplete,thumb,low,src-alias,Motion completion callback resets the effect to state 1 and clears its timer
+081F2208,SpriteTrail_InitializeEntry,thumb,low,src-alias,Initializes a sprite-trail pool entry; its seven sprites; animation; and render/motion spatial entries.
 081F23A0,SpriteGroup_RemoveSlot,thumb,low,src-alias,
 081F2404,SpriteTrail_UpdatePositions,thumb,low,src-alias,
 081F2534,SpriteTrail_BeginImpact,thumb,low,src-alias,
@@ -8282,6 +8284,7 @@ addr,name,mode,confidence,source,notes
 081F330C,Ratatosk_FindActiveTargetNearestPlayer,thumb,low,src-alias,Selects an active target with minimum cached secondary distance; player association tentative
 081F333C,Ratatosk_FindActiveTargetNearestReference,thumb,low,src-alias,Selects an active target with minimum cached primary distance; reference association tentative
 081F33F0,SceneDistance_ClearLinkedEntry,thumb,low,src-alias,
+081F3450,Ratatosk_FindPointNearestReferenceExcept,thumb,low,src-alias,Selects the last minimum-distance point among nine cached reference distances; excluding one index; returns -1 if slot 4 is absent.
 081F34C8,Ratatosk_GetPosition,thumb,low,src-alias,Returns the position vector at offset 0x54 of the slot 4 Ratatosk instance
 081F34D8,Ratatosk_GetSelectedPointIndex,thumb,low,src-alias,Returns the signed selection index at offset 0xE4C; point role tentative
 081F34F0,Ratatosk_GetSelectedTargetIndex,thumb,low,src-alias,Returns the signed target index at offset 0xE4E used by target interaction logic
@@ -8433,6 +8436,7 @@ addr,name,mode,confidence,source,notes
 081FD4B0,Projectile_SetScriptProcedure,thumb,low,src-alias,Sets the procedure identifier passed to ScriptProc_Start and an associated argument
 081FD4B8,Projectile_SetBehaviorMode,thumb,low,src-alias,Sets the mode used to select the projectile update callback during creation
 081FD530,Projectile_SetTrackingTarget,thumb,low,src-alias,Stores the target position pointer and enables target tracking
+081FD53C,OrbitEffect_SpawnInwardParticle,thumb,low,src-alias,Creates a sprite particle at a random X/Z offset; moving toward the orbit effect position.
 081FD664,OrbitEffect_AdjustHeading,thumb,low,src-alias,
 081FD704,OrbitEffect_FireProjectileOnContact,thumb,low,src-alias,
 081FD7B0,OrbitEffect_UpdateExpansion,thumb,low,src-alias,Expansion callback increases the radius then starts sound and switches to the active update; effect identity tentative
@@ -8634,6 +8638,7 @@ addr,name,mode,confidence,source,notes
 0820AFD0,DragonPuppy_ReadAttackSchedule,thumb,low,src-alias,Reads up to eight script timing values consumed by the attack state
 0820B174,DragonPuppy_UpdateAttackTiming,thumb,low,src-alias,Attack state callback that triggers an attack on scheduled or periodic intervals
 0820B258,DragonPuppy_UpdateAttackRecovery,thumb,low,src-alias,Recovery callback that counts down before restoring animation and attack timing
+0820B2AC,DragonPuppy_UpdateAttackWindup,thumb,low,src-alias,Jitters the displayed position near the attack timer; then restores it and starts the attack animation.
 0820B3E0,DragonPuppy_UpdateCombat,thumb,low,src-alias,
 0820B7D4,DragonPuppy_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that removes the puppy sprite
 0820B7E0,DragonPuppy_InitializeFromScript,thumb,low,src-alias,
@@ -9709,6 +9714,7 @@ addr,name,mode,confidence,source,notes
 08234770,SpiralBurst_Init,thumb,low,src-alias,Stores owner and position then initializes particles and collision and starts the burst state
 082347C8,SpiralBurst_Create,thumb,low,src-alias,Allocates the spiral burst task and installs its update and cleanup callbacks
 08234810,FlickerParticle_UpdateMotion,thumb,low,src-alias,
+08234868,HealthRestoreEffect_StartParticleBurst,thumb,low,src-alias,Initializes eight flicker particles with randomized radial velocities for the health restore effect.
 08234960,FlickerParticle_UpdateVerticalMotion,thumb,low,src-alias,
 082349A0,HealthRestoreEffect_InitRisingParticle,thumb,low,src-alias,Activates animation 6 with a randomized position and upward velocity during health restoration
 08234A4C,FlickerParticle_UpdateStationary,thumb,low,src-alias,
@@ -9738,6 +9744,7 @@ addr,name,mode,confidence,source,notes
 08236024,RadialBurstEffect_UpdateBurstParticle,thumb,low,src-alias,
 0823614C,RadialBurstEffect_EmitOrbitParticle,thumb,low,src-alias,
 08236294,RadialBurstEffect_UpdateParticle,thumb,low,src-alias,Particle callback that integrates velocity and changes animation before expiring after thirteen frames
+082362EC,RadialBurstEffect_StartBurst,thumb,low,src-alias,Initializes twelve radial burst particles around an origin with randomized headings and speeds.
 08236428,CallbackGroup_UpdateActive,thumb,low,src-alias,
 08236484,RadialBurstEffect_RemoveParticles,thumb,low,src-alias,Removes all twelve effects from the radial particle pool
 0823652C,RadialBurstEffect_BlendSpritePalette,thumb,low,src-alias,Interpolates sixteen palette colors between gray level 15 and their source colors using the sprite blend factor
@@ -9922,6 +9929,7 @@ addr,name,mode,confidence,source,notes
 08241310,Player_GetAdjustedMovementInterval,thumb,low,src-alias,Computes a movement interval from a base of twelve or eight and clamps the adjusted result to at least two
 08241350,Player_BeginWalk,thumb,low,src-alias,
 08241504,PlayerCue_UpdateOffsetBurst,thumb,low,src-alias,
+082418CC,PlayerCue_UpdatePoseRecovery,thumb,low,src-alias,Drains a recovery countdown; plays a finishing pose and returns the player to tether mode zero.
 08241BC4,PlayerCue_UpdateTerrainSlide,thumb,low,src-alias,
 08241EB8,PlayerCue_UpdateSpiralPose,thumb,low,src-alias,
 08242120,Player_TryStepForward,thumb,low,src-alias,
