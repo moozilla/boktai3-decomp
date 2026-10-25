@@ -44,10 +44,14 @@ struct IwVec {
     s16 x, y, z;
 };
 
+struct IwSpr;
+
 struct IwObj {
     u8 pad0[8];
     u32 flags;
-    u8 padC[0x14];
+    u8 padC[0xE];
+    u8 priority;
+    u8 pad1B[5];
     struct IwVec pos;
     u16 dx;
     u16 dy;
@@ -55,7 +59,17 @@ struct IwObj {
     s16 bottom;
     s16 left;
     s16 top;
-    u8 pad34[0x28];
+    u8 scaleX;
+    u8 scaleY;
+    u16 angle;
+    u16 count;
+    u16 palBase;
+    u32 attr;
+    u8 pad40[8];
+    u8 *palSrc;
+    struct IwSpr *spr;
+    u8 *tiles;
+    u8 pad54[8];
     struct IwObj *next;
 };
 
@@ -87,26 +101,7 @@ static inline void IwProject(struct IwVec *screen, struct IwVec *world)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 21.6%
-struct IwSpr;
-struct IwObjDraw {
-    u8 pad0[8];
-    u32 flags;
-    u8 padC[0xE];
-    u8 priority;
-    u8 pad1B[0x19];
-    u8 scaleX;
-    u8 scaleY;
-    u16 angle;
-    u16 count;
-    u16 palBase;
-    u32 attr;
-    u8 pad40[8];
-    u8 *palSrc;
-    struct IwSpr *spr;
-    u8 *tiles;
-};
-
+// fuzzy: 55.4%
 struct IwSpr {
     u8 flags;
     u8 size;
@@ -182,79 +177,103 @@ static inline s32 IwAddAffine(u8 angle, s32 a, s32 b)
     return n;
 }
 
-// confidence=low: batches an IwObj's sprites into OAM (affine setup, bounds check, palette cache, tile requests)
-void sub_08000430(struct IwObj *obj0, s32 x, s32 y, s32 z)
+static inline s32 IwQueueTiles(struct IwObj *obj, u32 tile, s32 step, s32 tw, s32 th)
 {
-    struct IwObjDraw *obj = (struct IwObjDraw *)obj0;
-    u8 affTbl[4];
+    u32 slot;
+    if (gUnk_030042E8 + step >= 0x400)
+        return -1;
+    slot = gUnk_03004304;
+    ((struct IwTileReq *)0x02039000)[slot].src = obj->tiles + (tile << 5);
+    ((struct IwTileReq *)0x02039000)[slot].desc = (tw << 5) | (th << 16);
+    gUnk_03004304 = slot + 1;
+    return 0;
+}
+
+static inline void IwPushOam(u32 attr01, u32 attr2)
+{
+    s32 c = gUnk_03004798;
+    if (c <= 0x7f) {
+        gUnk_03004798 = c + 1;
+        gUnk_03004390[c].attr01 = attr01;
+        gUnk_03004390[c].attr2 = attr2;
+        gUnk_03003A04 |= 1;
+    }
+}
+
+static inline void IwPushOamZ(u32 attr01, u32 attr2, s32 z, u32 prio)
+{
+    s32 c = gUnk_0300479C;
+    if (c <= 0x7f) {
+        gUnk_0300479C = c + 1;
+        gUnk_030047A0[c].attr01 = attr01;
+        gUnk_030047A0[c].attr2 = attr2;
+        gUnk_030047A0[c].attr3 = (z + 0x80) << 8;
+        gUnk_03004790[prio]++;
+    }
+}
+
+// confidence=low: batches an IwObj's sprites into OAM (affine setup, bounds check, palette cache, tile requests)
+void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
+{
     u32 oam[64];
     u8 attr3[64];
     u16 tile[64];
     u8 keyIdx[64];
     u32 keys[16];
+    u8 affTbl[4];
     u32 bankIdx[16];
+    s32 i;
     s32 n = 0;
     s32 nKeys = 0;
-    u32 objFlags;
+    s32 sinv, cosv;
     u32 fl2;
     u32 f4, f8;
-    s32 sinv, cosv;
-    s32 count;
-    s32 i;
     struct IwSpr *p;
+    s32 j;
 
     f4 = obj->flags & 4;
     f8 = obj->flags & 8;
-    if (z >= 0)
-        z = z >> 1;
-    else
-        z = -((-z) >> 1);
+    z = z >= 0 ? z >> 1 : -((-z) >> 1);
     if (z < -0x80)
         z = -0x80;
-    else if (z >= 0x7f)
+    else if (z > 0x7f)
         z = 0x7f;
 
-    objFlags = obj->flags;
     fl2 = 0;
-    if (((gUnk_03005230 & 1) && obj->priority != 0 && !(objFlags & 0x10000)) || (objFlags & 0x800))
+    if (((gUnk_03005230 & 1) && obj->priority != 0 && !(obj->flags & 0x10000)) ||
+        (obj->flags & 0x800))
         fl2 |= 0x1000;
     if (gUnk_0300522C != 0) {
-        if (objFlags & 0x4000)
+        if (obj->flags & 0x4000)
             fl2 |= 0x400;
     }
-    if (objFlags & 0x100)
+    if (obj->flags & 0x100)
         fl2 |= 0x800;
 
-    if (!(objFlags & 2)) {
-        sinv = 0;
-        cosv = 0;
+    if (!(obj->flags & 2)) {
+        sinv = cosv = 0;
     } else {
         s32 a = obj->scaleX;
         s32 b = obj->scaleY;
-        u8 ang = obj->angle;
         s32 ra, rb, idx;
 
         if (f4)
             a = -a;
         if (f8)
             b = -b;
-        if (objFlags & 0x20000) {
+        if (obj->flags & 0x20000) {
             fl2 |= 0x100;
         } else {
-            s32 aa = a < 0 ? -a : a;
-            s32 ab = b < 0 ? -b : b;
-            if (aa > 0x3c || ab > 0x3c || obj->angle != 0)
+            if ((a < 0 ? -a : a) > 0x3c || (b < 0 ? -b : b) > 0x3c || obj->angle != 0)
                 fl2 |= 0x300;
             else
                 fl2 |= 0x100;
         }
-        affTbl[0] = IwAddAffine(ang, (s8)a, (s8)b);
-        if (objFlags & 0x8000) {
-            s32 na = -a;
-            s32 nb = -b;
-            affTbl[1] = IwAddAffine(ang, (s8)na, (s8)b);
-            affTbl[2] = IwAddAffine(ang, (s8)a, (s8)nb);
-            affTbl[3] = IwAddAffine(ang, (s8)na, (s8)nb);
+        affTbl[0] = IwAddAffine(obj->angle, (s8)a, (s8)b);
+        if (obj->flags & 0x8000) {
+            affTbl[1] = IwAddAffine(obj->angle, (s8)-a, (s8)b);
+            affTbl[2] = IwAddAffine(obj->angle, (s8)a, (s8)-b);
+            affTbl[3] = IwAddAffine(obj->angle, (s8)-a, (s8)-b);
         } else {
             affTbl[1] = affTbl[0];
             affTbl[2] = affTbl[0];
@@ -265,16 +284,15 @@ void sub_08000430(struct IwObj *obj0, s32 x, s32 y, s32 z)
         cosv = gUnk_086149C4[(-idx + 0x40) & 0xff];
     }
 
-    count = obj->count;
     p = obj->spr;
-    for (i = 0; i < count; i++, p++) {
+    for (i = 0; i < obj->count; i++, p++) {
         u32 sz = p->size;
         s32 ht = gUnk_03004D20[sz];
         s32 wd = gUnk_03004D90[sz];
         u32 fl = fl2;
         s32 px, py;
 
-        if (!(objFlags & 2)) {
+        if (!(obj->flags & 2)) {
             s32 x0 = p->dx;
             s32 y0 = p->dy;
             s32 x1 = x0 + wd;
@@ -295,12 +313,14 @@ void sub_08000430(struct IwObj *obj0, s32 x, s32 y, s32 z)
                 fl |= 0x10000000;
             if (f8 != (p->flags & 8))
                 fl |= 0x20000000;
-            if (!(objFlags & 0x40)) {
-                if (x1 + x < 0)
+            if (!(obj->flags & 0x40)) {
+                x1 += x;
+                y1 += y;
+                if (x1 < 0)
                     continue;
                 if (px > 0xF0)
                     continue;
-                if (y1 + y < 0)
+                if (y1 < 0)
                     continue;
                 if (py > 0xA0)
                     continue;
@@ -318,13 +338,16 @@ void sub_08000430(struct IwObj *obj0, s32 x, s32 y, s32 z)
             ey = sy;
             if (f8)
                 ey = -sy;
-            idx = ((p->flags & 4) ? 1 : 0);
+            if (p->flags & 4)
+                idx = 1;
+            else
+                idx = 0;
             if (p->flags & 8)
                 idx |= 2;
             fl |= (u32)affTbl[idx] << 25;
             rx = IwScale12(sx * cosv - ey * sinv);
-            ry = IwScale12(ey * cosv + sinv * sx);
             px = rx - hx;
+            ry = IwScale12(sinv * sx + ey * cosv);
             py = ry - hy;
             if ((fl & 0x300) == 0x300) {
                 px = px - hx;
@@ -354,9 +377,10 @@ void sub_08000430(struct IwObj *obj0, s32 x, s32 y, s32 z)
         }
 
         {
-            u32 key = p->tile >> 12;
+            u32 key;
             s32 k;
             tile[n] = p->tile & 0xfff;
+            key = p->tile >> 12;
             for (k = 0; k < nKeys && keys[k] != key; k++)
                 ;
             keyIdx[n] = k;
@@ -373,72 +397,34 @@ void sub_08000430(struct IwObj *obj0, s32 x, s32 y, s32 z)
     if (n <= 0)
         return;
 
-    for (i = 0; i < nKeys; i++)
-        bankIdx[i] = Palette_CacheObjectBankArm(obj->palBase + keys[i],
-                                                (u32 *)(obj->palSrc + (keys[i] << 5)));
+    for (j = 0; j < nKeys; j++)
+        bankIdx[j] = Palette_CacheObjectBankArm(obj->palBase + keys[j],
+                                                (u32 *)(obj->palSrc + (keys[j] << 5)));
 
     if (obj->flags & 0x20) {
-        for (i = 0; i < n; i++) {
-            u32 s = attr3[i];
+        for (j = 0; j < n; j++) {
+            u32 s = attr3[j];
             s32 step = gUnk_03004D30[s];
             s32 tw = gUnk_03004D40[s];
             s32 th = gUnk_03004D10[s];
-            s32 ok;
-            if (gUnk_030042E8 + step >= 0x400) {
-                ok = -1;
-            } else {
-                u32 slot = gUnk_03004304;
-                gUnk_02039000[slot].src = obj->tiles + (tile[i] << 5);
-                ok = 0;
-                gUnk_02039000[slot].desc = (th << 16) | (tw << 5);
-                gUnk_03004304 = slot + 1;
-            }
-            if (ok < 0)
+            if (IwQueueTiles(obj, tile[j], step, tw, th) < 0)
                 return;
-            {
-                u32 a2 = (u32)gUnk_030042E8 | (obj->priority << 10) | (bankIdx[keyIdx[i]] << 12);
-                u32 o = oam[i];
-                s32 c = gUnk_03004798;
-                if (c <= 0x7f) {
-                    gUnk_03004798 = c + 1;
-                    gUnk_03004390[c].attr01 = o;
-                    gUnk_03004390[c].attr2 = a2;
-                    gUnk_03003A04 |= 1;
-                }
-            }
+            IwPushOam(oam[j],
+                      (u32)gUnk_030042E8 | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12));
             gUnk_030042DC += step;
             gUnk_030042E8 += step;
         }
     } else {
-        for (i = 0; i < n; i++) {
-            u32 s = attr3[i];
+        for (j = 0; j < n; j++) {
+            u32 s = attr3[j];
             s32 step = gUnk_03004D30[s];
             s32 tw = gUnk_03004D40[s];
             s32 th = gUnk_03004D10[s];
-            s32 ok;
-            if (gUnk_030042E8 + step >= 0x400) {
-                ok = -1;
-            } else {
-                u32 slot = gUnk_03004304;
-                gUnk_02039000[slot].src = obj->tiles + (tile[i] << 5);
-                ok = 0;
-                gUnk_02039000[slot].desc = (th << 16) | (tw << 5);
-                gUnk_03004304 = slot + 1;
-            }
-            if (ok < 0)
+            if (IwQueueTiles(obj, tile[j], step, tw, th) < 0)
                 return;
-            {
-                u32 a2 = (u32)gUnk_030042E8 | (obj->priority << 10) | (bankIdx[keyIdx[i]] << 12);
-                u32 o = oam[i];
-                s32 c = gUnk_0300479C;
-                if (c <= 0x7f) {
-                    gUnk_0300479C = c + 1;
-                    gUnk_030047A0[c].attr01 = o;
-                    gUnk_030047A0[c].attr2 = a2;
-                    gUnk_030047A0[c].attr3 = (z + 0x80) << 8;
-                    gUnk_03004790[obj->priority]++;
-                }
-            }
+            IwPushOamZ(oam[j],
+                       (u32)gUnk_030042E8 | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12), z,
+                       obj->priority);
             gUnk_030042DC += step;
             gUnk_030042E8 += step;
         }
