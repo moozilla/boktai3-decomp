@@ -76,6 +76,8 @@ scope.py FILE.c probe               is it one cse/gcse/loop decision (cse canoni
                                     PRE, loop strength reduction, invariant hoist)? flips each alone
                                     (SCOPE_PROBE_MAX=150 compiles); "no change" covers only those families
 scope.py FILE.c pins                cost of removing each register pin / asm barrier; greedy free removal
+scope.py FILE.c put SNIPPET.c       SNIPPET.c (FUNC's definition, its structs/helpers above it) in place of
+                                    FUNC's definition, then the score; safer than editing a unit copy by hand
 scope.py FILE.c try V1.c V2.c ...   score whole-file variants, best first, with the lines each changed
 scope.py FILE.c try KNOB={a,b,c}    one variant per knob value (shell expansion makes the list)
 scope.py FILE.c frame               stack slots, ROM against draft, with the C variable in each
