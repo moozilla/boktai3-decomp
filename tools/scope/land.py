@@ -245,9 +245,13 @@ def seed_from_twin(text, twin, func, others):
     """A one-function draft from the twin's file: TWIN renamed to FUNC, OTHERS (the file's other
     non-static functions and INCLUDE_ASM lines) removed; the structs, declarations and helpers stay."""
     for o in others:
-        sp = definition_span(text, o)
-        if sp:
-            text = text[:sp[0]] + text[sp[1]:]
+        # a function the file defines under a `#define ALIAS sub_ADDR` alias is spelled ALIAS there
+        aliases = re.findall(r"^#define[ \t]+(\w+)[ \t]+%s\b.*$" % re.escape(o), text, re.M)
+        for name in [o] + aliases:
+            sp = definition_span(text, name)
+            if sp:
+                text = text[:sp[0]] + text[sp[1]:]
+        text = re.sub(r"^#define[ \t]+\w+[ \t]+%s\b.*\n" % re.escape(o), "", text, flags=re.M)
     text = INCLUDE_ASM.sub("", text)
     text = re.sub(r"#ifdef NONMATCHING\n.*?#endif\n?", "", text, flags=re.S)
     return re.sub(r"\b%s\b" % re.escape(twin), func, text)
