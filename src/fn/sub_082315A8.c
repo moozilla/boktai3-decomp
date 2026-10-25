@@ -35,7 +35,7 @@ struct Unk082315A8Graphics {
 extern struct Unk082315A8Graphics *gUnk_0200005C;
 extern s16 gUnk_03005418[];
 extern const u16 gUnk_08E879A0[];
-extern u8 gUnk_08231444[];
+void sub_08231444(void);
 void EffectGroup_Reset(void *);
 void Anim_SetSequence(void *, void *, u32, u32, u32);
 void sub_08231EF8(void);
@@ -74,7 +74,7 @@ s32 EffectGroup_Spawn(struct Unk082315A8Group *group, u32 kind, u32 parameter,
         group->kind = kind;
         switch (group->kind) {
             case 0:
-                group->callback = gUnk_08231444 + 1;
+                group->callback = sub_08231444;
                 break;
             case 1:
                 group->callback = sub_08231EF8;

@@ -22,7 +22,6 @@ class SplitAliasTests(unittest.TestCase):
                 for folder in ('gen', 'symbols', 'src', 'build/asm'):
                     (root / folder).mkdir(parents=True)
                 (root / 'symbols/functions.csv').write_text('08004000,Panel_Update\n')
-                (root / 'symbols/build_extra_functions.csv').write_text('address,isa\n')
                 (root / 'gen/code_sym.s').write_text(
                     f'\tthumb_func_start {generated}\n{generated}: @ 0x08004000\n'
                     '\tpush {lr}\n_08004002:\n\tbx lr\n'
@@ -31,13 +30,17 @@ class SplitAliasTests(unittest.TestCase):
                 (root / 'src/panel.c').write_text(alias + 'void Panel_Update(void) {}\n')
                 with patch.object(split, 'ROOT', directory), \
                      patch.object(split, 'function_nonentries', return_value=set()), \
+                     patch.object(split, 'inventory_starts', return_value=[0x08004000, 0x08004004]), \
+                     patch.object(split, 'disassembler_starts', return_value={0x08004000}), \
                      contextlib.redirect_stdout(io.StringIO()), \
                      contextlib.redirect_stderr(io.StringIO()):
                     split.main()
                 labels = (root / 'build/c_labels.ld').read_text()
                 retained = ''.join(path.read_text() for path in
                                    (root / 'build/asm').glob('seg_*.s'))
+                # the data after the C has its own inventory start: cut there and kept as assembly
                 self.assertEqual(retained.count('.incbin "baserom.gba", 0x4004, 0x4'), 1)
+                self.assertIn('sub_08004004: @ 0x08004004', retained)
                 self.assertNotIn('_08004004 =', labels)
                 self.assertIn(f'_08004002 = {generated}__addr + 0x2;', labels)
                 if generated != definition:

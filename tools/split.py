@@ -26,33 +26,37 @@ FUNC_LABEL = re.compile(r"^(\w+): @ 0x([0-9A-F]{8})")
 LABEL = re.compile(r"^(\w+):")
 SET_LABEL = re.compile(r"^\t\.set (\w+),")
 INSN = re.compile(r"^\t(?!\.)(?!\w+_func_start)[a-z]")
-NONENTRIES = os.path.join(ROOT, "symbols", "function_nonentries.csv")
+INVENTORY = os.path.join(ROOT, "symbols", "progress_functions.csv")
 
 
-EXTRA_STARTS = os.path.join(ROOT, "symbols", "build_extra_functions.csv")
-
-
-def extra_function_starts(path=EXTRA_STARTS):
-    """Reviewed function starts the disassembler left as plain labels."""
-    if not os.path.exists(path):
-        return set()
+def inventory_starts(path=INVENTORY):
+    """Every function start (symbols/progress_functions.csv): the one list of them."""
     with open(path, newline="") as source:
-        return {int(row["address"], 16) for row in csv.DictReader(source)}
+        return sorted(int(row["address"], 16) for row in csv.DictReader(source))
 
 
-def function_nonentries(path=NONENTRIES):
-    """Reviewed disassembler labels inside real function bodies."""
-    if not os.path.exists(path):
-        return set()
-    entries = set()
-    with open(path, newline="") as source:
-        for row in csv.DictReader(source):
-            address = int(row["address"], 16)
-            if (address in entries or address & 1 or
-                    not 0x08000000 <= address < 0x0824DAFA or not row["evidence"].strip()):
-                raise ValueError("invalid reviewed non-entry boundary")
-            entries.add(address)
-    return entries
+_STARTS = {}
+
+
+def disassembler_starts(path=os.path.join(ROOT, "gen", "code.s")):
+    """Function starts gbadisasm emitted (gen/code.s), before split.py's corrections."""
+    if path not in _STARTS:
+        with open(path) as source:
+            _STARTS[path] = {int(a, 16) for a in re.findall(
+                r"^\t(?:thumb|arm|non_word_aligned_thumb)_func_start \S+\n\w+: @ 0x([0-9A-F]{8})",
+                source.read(), re.M)}
+    return _STARTS[path]
+
+
+def extra_function_starts():
+    """Inventory starts the disassembler left inside a raw block (split.py cuts them there)."""
+    return set(inventory_starts()) - disassembler_starts()
+
+
+def function_nonentries():
+    """Disassembler function starts the inventory does not list: labels inside a function (an
+    interior push gbadisasm took for an entry while following calls). The split drops them."""
+    return disassembler_starts() - set(inventory_starts())
 
 
 def remove_nonentry_starts(code, addresses):
@@ -179,9 +183,12 @@ def write_nonmatching(code, funcs):
         # agbcc emits divided syntax; gbadisasm output is unified
         text = ("\t.syntax unified\n" + "".join(f"\t.global {g}\n" for g in sorted(globs)) +
                 "\n".join(body) + "\n\t.syntax divided\n")
-        p = os.path.join(d, name + ".s")
-        if not os.path.exists(p) or open(p).read() != text:
-            open(p, "w").write(text)
+        # a named function is also included by its address name: INCLUDE_ASM(dir, sub_ADDR) from
+        # before the name (or from when the disassembler had no start there) keeps working
+        for n in {name} | ({f"sub_{addr:08X}"} if addr is not None else set()):
+            p = os.path.join(d, n + ".s")
+            if not os.path.exists(p) or open(p).read() != text:
+                open(p, "w").write(text)
 
 
 def c_replacement_end(code, start, end, covered_addresses=(), covered_ranges=(), includes_asm=False):
@@ -221,24 +228,17 @@ def c_replacement_end(code, start, end, covered_addresses=(), covered_ranges=(),
     return end
 
 
-def apply_extra_boundaries(code, path):
-    """Split only reviewed incbin entries in memory; never rewrite shared gen/."""
-    if not os.path.exists(path):
-        return code
-    with open(path, newline="") as source:
-        rows = list(csv.DictReader(source))
-    entries = {}
-    for row in rows:
-        address = int(row["address"], 16)
-        isa = row["isa"]
-        if isa not in ("arm", "thumb") or address % (4 if isa == "arm" else 2):
-            raise ValueError("invalid reviewed function ISA/alignment")
-        if address in entries:
-            raise ValueError("duplicate reviewed function boundary")
-        entries[address] = isa
+def apply_extra_boundaries(code, starts):
+    """Cut the raw blocks at STARTS (extra_function_starts) in memory; never rewrite shared gen/.
+    A cut function takes the mode of the function whose block it sits in."""
+    entries = {a: None for a in starts}
     found = set()
     result = []
+    isa = "thumb"
     for line in code:
+        directive = re.match(r"^\t(thumb|arm|non_word_aligned_thumb)_func_start ", line)
+        if directive:
+            isa = "arm" if directive.group(1) == "arm" else "thumb"
         blob = re.fullmatch(r'\s*\.incbin "baserom\.gba",\s*(0x[0-9a-fA-F]+),\s*(0x[0-9a-fA-F]+)', line)
         if not blob:
             result.append(line)
@@ -254,13 +254,17 @@ def apply_extra_boundaries(code, path):
             if cursor < address:
                 result.append(f'\t.incbin "baserom.gba", {cursor - 0x08000000:#x}, {address - cursor:#x}')
             name = f"sub_{address:08X}"
-            result += [f"\t{entries[address]}_func_start {name}",
-                       f"{name}: @ 0x{address:08X}",
+            # a label at the cut (the blob's own) goes with the function that starts there
+            own = [result.pop()] if address == start and result and result[-1] == f"_{address:08X}:" else []
+            if address % (4 if isa == "arm" else 2):
+                raise ValueError(f"function start {address:08X} is misaligned for {isa}")
+            result += [f"\t{isa}_func_start {name}",
+                       f"{name}: @ 0x{address:08X}"] + own + [
                        f'\t.incbin "baserom.gba", {address - 0x08000000:#x}, {following - address:#x}']
             found.add(address)
             cursor = following
     if found != set(entries):
-        raise ValueError("reviewed function boundary is not inside an incbin: " +
+        raise ValueError("inventory function start the disassembler missed outside a raw block: " +
                          ", ".join(f"{a:08X}" for a in sorted(set(entries) - found)))
     return result
 
@@ -268,16 +272,12 @@ def apply_extra_boundaries(code, path):
 def main():
     code = open(os.path.join(ROOT, "gen", "code_sym.s")).read().split("\n")
     code = remove_nonentry_starts(code, function_nonentries())
-    boundary_path = os.path.join(ROOT, "symbols", "build_extra_functions.csv")
-    code = apply_extra_boundaries(code, boundary_path)
-    with open(boundary_path, newline="") as source:
-        replacement_ranges = {}
-        for row in csv.DictReader(source):
-            if row.get("replacement_end"):
-                lo, hi = int(row["address"], 16), int(row["replacement_end"], 16)
-                if hi <= lo or hi % 2:
-                    raise ValueError("invalid reviewed replacement endpoint")
-                replacement_ranges[lo] = hi
+    extras = extra_function_starts()
+    code = apply_extra_boundaries(code, extras)
+    # a C body replaces the raw bytes up to the next start (also when symbolize split that block
+    # around the labels of its literals)
+    inv = inventory_starts()
+    following = dict(zip(inv, inv[1:] + [0x0824DAFA]))
     # function blocks: [start_line, end_line) per function, in order
     starts = [i for i, ln in enumerate(code) if FUNC_START.match(ln)]
     funcs = []
@@ -379,7 +379,8 @@ def main():
                 aliases.append(f"{generated}__addr = {name}__addr;")
         covered = {int(n[4:], 16) for n in generated_exact_names
                    if re.fullmatch(r"sub_[0-9A-F]{8}", n)}
-        ranges = [(a, replacement_ranges[a]) for a in covered if a in replacement_ranges]
+        covered |= {funcs[index[n]][1] for n in generated_exact_names if n in index} - {None}
+        ranges = [(a, following[a]) for a in covered if a in following]
         end = c_replacement_end(code, funcs[last][2], funcs[last][3], covered, ranges,
                                 includes_asm=funcs[last][0] not in generated_exact_names)
         # Labels that disappear with the asm are redefined relative to the
