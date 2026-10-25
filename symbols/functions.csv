@@ -6487,6 +6487,7 @@ addr,name,mode,confidence,source,notes
 0818E9B8,SpriteColliderGroup_ActivateParts,thumb,low,src-alias,
 0818EA1C,Armor_IsSequenceIncomplete,thumb,low,src-alias,Tentatively tests whether the current sequence counter remains below its target
 0818EA3C,SpriteColliderGroup_ResetActiveParts,thumb,low,src-alias,
+0818EA90,Armor_QueueFallingParts,thumb,low,src-alias,Queues inactive Armor parts above the player along a heading-spaced line; with rising spawn heights.
 0818EBF4,ScenePanelEffect_InitPool,thumb,low,src-alias,
 0818ECAC,Nidhoggr_ClearEffectPools,thumb,low,src-alias,Clears update callbacks and invokes pending cleanup callbacks across both effect pools
 0818EE38,Nidhoggr_StepPoolAnimation,thumb,low,src-alias,
