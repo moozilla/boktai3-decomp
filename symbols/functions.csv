@@ -9713,6 +9713,7 @@ addr,name,mode,confidence,source,notes
 08234A84,HealthRestoreEffect_InitSparkle,thumb,low,src-alias,Activates animation 2 at a randomized position and installs its particle callback
 08234B04,HealthRestoreEffect_UpdateParticles,thumb,low,src-alias,Invokes the update callback of each active particle in the eight element pool
 08234B34,HealthRestoreEffect_UpdateCompletion,thumb,low,src-alias,Task state callback that plays the completion sound and releases global flags before termination
+08234B98,HealthRestoreEffect_UpdateRestoration,thumb,low,src-alias,Restores owner health while shaking the effect and spawning particles; then enters completion.
 08234D0C,HealthRestoreEffect_UpdateShake,thumb,low,src-alias,Task state callback that shakes the animation briefly before starting health restoration
 08234ECC,HealthRestoreEffect_OnUpdate,thumb,low,src-alias,Task update callback that advances particles and the current restoration state
 08234EF4,HealthRestoreEffect_OnDestroy,thumb,low,src-alias,Task destruction callback that removes the main animation and eight particle effects

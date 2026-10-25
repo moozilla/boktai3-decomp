@@ -3,7 +3,7 @@ extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
-void sub_08234B98(u8 *);
+void HealthRestoreEffect_UpdateRestoration(u8 *);
 #define H(o) (*(u16 *)(p + (o)))
 static inline s32 rnd(u16 *table)
 {
@@ -22,7 +22,7 @@ void HealthRestoreEffect_UpdateShake(u8 *p)
         H(0x3e) = H(0x7e) + Mod(rnd(table), range) - (range >> 1);
     }
     if (H(0x270) > 29) {
-        *(void (**)(u8 *))(p + 0x274) = sub_08234B98;
+        *(void (**)(u8 *))(p + 0x274) = HealthRestoreEffect_UpdateRestoration;
         Sound_PlaySong(0x259);
         H(0x270) = 0;
     }
