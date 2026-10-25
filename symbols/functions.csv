@@ -7141,7 +7141,7 @@ addr,name,mode,confidence,source,notes
 081B8E44,OrbitMotion_UpdateCrossedSines,thumb,low,src-alias,
 081B8F54,OrbitMotion_UpdateAbsoluteSines,thumb,low,src-alias,
 081B9014,OrbitMotion_InterpolatePosition,thumb,low,src-alias,
-081B90F0,OrbitMotion_CalculateArcCenter,thumb,low,src-alias,
+081B90F0,OrbitMotion_CalculateArcCenter,thumb,low,src-alias,Calculates a circular arc center and radius from two positions and a signed 256-unit sweep.
 081B9334,MotionTrack_Initialize,thumb,low,src-alias,
 081B939C,OrbitMotion_BeginDistanceWave,thumb,low,src-alias,
 081B9440,OrbitMotion_BeginArc,thumb,low,src-alias,
