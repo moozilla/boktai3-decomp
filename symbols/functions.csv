@@ -5448,6 +5448,7 @@ addr,name,mode,confidence,source,notes
 0815AA38,ScriptActor_TestCounter628FromScript,thumb,low,src-alias,"via index i=Script_GetActorIndex(), reads the scripted actor's type/kind byte at +0x472 and returns whether game state's per-kind counter array at +0x628 is >"
 0815AA7C,ScriptActor_ClearCounter628FromScript,thumb,low,src-alias,"via index i=Script_GetActorIndex(), reads the scripted actor's type/kind byte at +0x472 and zeroes the matching entry of game state's per-kind counter array a"
 0815AAFC,ScriptActor_SetField4A2FromScript,thumb,low,src-alias,"via index i=Script_GetActorIndex(), sets the scripted actor's +0x4a2 flag byte to 1; purpose of the flag is unclear so named by offset"
+0815AC04,ScriptActor_TestFacingPointFromScript,thumb,low,src-alias,Tests a mode-12 script actor against a nearby point and two facing-angle windows.
 0815ACF4,ScriptActor_TestFlagBit20FromScript,thumb,low,src-alias,"via index i=Script_GetActorIndex(), tests fixed bit 0x100000 (bit 20) of the scripted actor's flags word at +0x20, right after the ""st"" state field; returns 1"
 0815AD78,Player_EnterKindTwo,thumb,low,src-alias,
 0815AE94,PlayerCue_OverlaySet,thumb,low,src-alias,"player cutscene cmds 48 (n) and 50: +0xAE4 = 1, +0xAD6 = n + 366 (cmd 50: 378)"
