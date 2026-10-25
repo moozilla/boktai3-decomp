@@ -312,6 +312,7 @@ addr,name,mode,confidence,source,notes
 0800ECD0,StatusScreen_WaitForStart,thumb,low,src-alias,
 0800ED30,StatusScreen_FadeInPalette,thumb,low,src-alias,
 0800EE5C,StatusScreen_FadeOutPalette,thumb,low,src-alias,
+0800EF90,StatusScreen_UpdateScanlineNoise,thumb,low,src-alias,blocked: gcse PRE places the loop-2 pointer pair (&p->amplitude/&p->delta) in the entry block directly before the cc0 setter; after the test's address calc; plain C order puts them before it. Also loop 2 keeps constant 1023 in-loop (pass-2 hoist threshold 26>=26) and r8/sb/sl allocation. Best C: single counter i; random via inline int helper (stops load_mems promoting gUnk_03005308; gives asrs); ptr pair assigned before loop 2 (fixes zero-reg r7 vs amplitude): 62 -> 38 insns differ. Knobs: NOMOVE=111 + CSE_NOCANON=52.
 0800F0F0,StatusScreen_ClearScanlineNoise,thumb,low,src-alias,
 0800F154,StatusScreen_Update,thumb,low,src-alias,
 0800F1BC,StatusScreen_Destroy,thumb,low,src-alias,
