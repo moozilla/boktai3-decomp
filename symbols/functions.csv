@@ -496,6 +496,7 @@ addr,name,mode,confidence,source,notes
 08016EFC,FloatingEffectManager_Destroy,thumb,low,src-alias,Task destroy callback (paired with FloatingEffectManager_Update via Task_SetCallbacks): removes the 8 Anim slots in the manager struct and clears the 
 08016FE0,FloatingEffectManager_Create,thumb,low,src-alias,"Creates the FloatingEffectManager singleton task if none exists, wires up its Update/Destroy callbacks, runs further init, and kills the task on failu"
 0801702C,FloatingEffectManager_GetOrCreate,thumb,low,src-alias,"Returns the existing FloatingEffectManager singleton pointer, or creates it via FloatingEffectManager_Create if not yet set"
+08017044,FloatingItemEffect_Spawn,thumb,low,src-alias,draft ~75% (93 ROM / 97 draft insns differ; from 127/129): do-while slot loop (ROM has no entry test); Effect size 0x84 (tail[0x84-0x5C]); idx temp for gUnknown_02000580[idx] order. With AGBCC_PRI=e:-2600 it is 55/59: e = NULL first-set doubles e's priority above item; reload rotation then 1 step off after line 52 (slot=-1).
 08017270,ScanlineWave_Update,thumb,low,src-alias,
 080172D8,ScanlineWave_Destroy,thumb,low,src-alias,Destroy callback paired with ScanlineWave_Update in Task_SetCallbacks for ScanlineWave_Create; deregisters the scanline effect and clears the active-w
 080172EC,ScanlineWave_Initialize,thumb,low,src-alias,

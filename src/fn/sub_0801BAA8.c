@@ -19,7 +19,7 @@ void PlayerCue_Stand(void *, int);
 void Vec16_Lerp(void *, void *, void *, u32, int);
 void OrbitingParticles_Create(void *, int, int, int, int);
 void Sound_PlaySong(int);
-void sub_08017044(int, int, int, int, void *, void *, int, void *);
+void FloatingItemEffect_Spawn(int, int, int, int, void *, void *, int, void *);
 void PlayerCue_Motion7Front(void *, int, int);
 void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
 void sub_080148CC(int, int, void *, int, int, int, int, int, int, int, int);
@@ -53,7 +53,7 @@ void Transformation_Reveal(u8 *p)
             out->x -= 32;
             out->z += 32;
             out->y += 128;
-            sub_08017044(1, p[0x7c], 0, 0, out, origin, 60, p);
+            FloatingItemEffect_Spawn(1, p[0x7c], 0, 0, out, origin, 60, p);
         }
         PlayerCue_Motion7Front(actor, 0, 0);
         Sound_PlaySong(0x110);

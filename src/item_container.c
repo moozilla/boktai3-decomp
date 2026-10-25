@@ -10,7 +10,7 @@ void ScaledShadow_Destroy(void *);
 s32 sub_0822D490(s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void ScaledShadow_Disable(void *);
-void sub_08017044(s32, s32, s32, s32, struct SceneVec *, struct SceneVec *, s32, struct Trigger *);
+void FloatingItemEffect_Spawn(s32, s32, s32, s32, struct SceneVec *, struct SceneVec *, s32, struct Trigger *);
 u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
 void ParticleSprite_Initialize(struct TriggerSprite *, struct TriggerGraphics *, u32);
 void Effect_SetOrigin(struct TriggerSprite *, s32, s32);
@@ -319,7 +319,7 @@ void sub_080070D0(struct TriggerManager *manager, struct Trigger *p)
         if (!(gUnk_030053F4 & 2048) && !sub_0822D490(p->id, p->kind)) {
             if (p->armed && !p->cooldown) {
                 if (p->id <= 5) {
-                    sub_08017044(p->id, p->kind, 1, i, &pos, &pos, 24, p);
+                    FloatingItemEffect_Spawn(p->id, p->kind, 1, i, &pos, &pos, 24, p);
                     Sound_PlaySongChecked(272);
                 }
                 p->cooldown = 36;
@@ -332,7 +332,7 @@ void sub_080070D0(struct TriggerManager *manager, struct Trigger *p)
         }
         p->actor = i;
         if (p->id <= 5)
-            sub_08017044(p->id, p->kind, 0, i, &pos, &pos, 24, p);
+            FloatingItemEffect_Spawn(p->id, p->kind, 0, i, &pos, &pos, 24, p);
         if (!(gUnk_030053F4 & 2048))
             Sound_PlaySongChecked(272);
         {
@@ -667,11 +667,11 @@ void Trigger_UpdateOpeningAnimation(struct TriggerManager *manager, struct Trigg
         raised.y += 128;
         if (!(gUnk_030053F4 & 2048) && sub_0822D490(p->id, p->kind) == 0) {
             if (p->id <= 5)
-                sub_08017044(p->id, p->kind, 1, p->actor, &raised, &raised, 24, p);
+                FloatingItemEffect_Spawn(p->id, p->kind, 1, p->actor, &raised, &raised, 24, p);
             p->update = Trigger_UpdateLockedPause;
         } else {
             if (p->id <= 5)
-                sub_08017044(p->id, p->kind, 0, p->actor, &raised, &raised, 24, p);
+                FloatingItemEffect_Spawn(p->id, p->kind, 0, p->actor, &raised, &raised, 24, p);
             p->update = Trigger_UpdateActivation;
         }
         p->timer = 0;
