@@ -7035,6 +7035,7 @@ addr,name,mode,confidence,source,notes
 081AFD10,PairedSceneActor_UpdateHalfPresentation,thumb,low,src-alias,
 081B0018,PairedSceneActor_InitializeHalf,thumb,low,src-alias,
 081B019C,ActorStatus_Deactivate,thumb,low,src-alias,
+081B0248,Vanargand_SpawnPartEmergenceEffects,thumb,low,src-alias,Emits four radial effects above a part's base position with randomized outward velocities and the opposite variant.
 081B03C0,PairedSceneActor_UpdatePlayerCapture,thumb,low,src-alias,
 081B08B8,ActorStatus_UpdatePlayerApproach,thumb,low,src-alias,
 081B0F34,ActorStatus_UpdatePlayerCapture,thumb,low,src-alias,

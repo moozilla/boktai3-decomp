@@ -162,7 +162,7 @@ void CpuSet(const void *, void *, u32);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 Anim_Step(void *, void *);
 void Sound_PlaySong(u32);
-void sub_081B0248(void *);
+void Vanargand_SpawnPartEmergenceEffects(void *);
 extern s16 gUnk_03005418[];
 static inline s32 Divide32(s32 value)
 {
@@ -286,7 +286,7 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
                 Vector(&p->origin, p->heading, 640);
                 Vector(&target, p->heading, p->distance);
                 MotionTrack_Initialize(p->motion, &p->origin, &target, 0, 4);
-                sub_081B0248(p);
+                Vanargand_SpawnPartEmergenceEffects(p);
                 Sound_PlaySong(0x58e);
             }
             MotionTrack_Update(p->motion);
