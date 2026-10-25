@@ -81,6 +81,8 @@ scope.py FILE.c try KNOB={a,b,c}    one variant per knob value (shell expansion 
 scope.py FILE.c frame               stack slots, ROM against draft, with the C variable in each
 scope.py FILE.c hoist               loop-invariant motion by pass: what moved, what stayed, and the dead
                                     re-set lever scored for each hoisted variable
+scope.py FILE.c giv                 loop strength reduction: each induction value with its C line, loop.c's
+                                    benefit and lifetime, and whether it was reduced, kept or eliminated
 scope.py FILE.c insn UID            one RTL insn through every compiler pass
 scope.py FILE.c uses REG...         which insns use a pseudo after each pass
 ```
