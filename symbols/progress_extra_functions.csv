@@ -318,6 +318,8 @@ address,evidence
 0812B350,Hidden tail after FragmentProjectilePool_ResetSingleton
 0812B918,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0812C124,Hidden tail after SlashEffect_ResetManagerReference
+0812C158,Hidden function in sub_0812C124's block (registered by land from the draft)
+0812C198,Hidden function in sub_0812C124's block (registered by land from the draft)
 0812C4E4,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C
 0812CE30,Hidden tail after FragmentEffect_ResetManagerReference
 0812CE64,Hidden tail function

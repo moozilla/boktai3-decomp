@@ -4890,6 +4890,7 @@ addr,name,mode,confidence,source,notes
 0812C0A4,SlashEffect_InitManager,thumb,low,src-alias,Clears the pool mask and loads animation resource 354D before publishing the singleton
 0812C0CC,SlashEffect_GetOrCreateManager,thumb,low,src-alias,Returns the singleton or creates its task and installs update and cleanup callbacks
 0812C118,SlashEffect_ResetManagerReference,thumb,low,src-alias,Clears the singleton pointer during scene subsystem reset
+0812C124,PursuingActor_RetireAll,thumb,low,src-alias,Retires chasing slashes; the assigned extent also contains a recoil-all routine and a homing-slash script constructor.
 0812C310,FragmentEffect_OnColliderContact,thumb,low,src-alias,Empty contact callback installed on the fragment effect collider
 0812C314,FragmentEffect_InitCollider,thumb,low,src-alias,Initializes the collider with 24-unit horizontal extents and installs its contact callback
 0812C3B0,FragmentEffect_UpdateCollider,thumb,low,src-alias,Moves the collider to the effect position and refreshes it

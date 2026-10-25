@@ -299,7 +299,9 @@ address,isa,evidence,replacement_end
 0812A7B4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812A7B8
 0812B350,thumb,Hidden tail after FragmentProjectilePool_ResetSingleton,
 0812B918,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812B91C
-0812C124,thumb,Hidden tail after SlashEffect_ResetManagerReference,
+0812C124,thumb,Hidden tail after SlashEffect_ResetManagerReference; exact 52-byte C body,0812C158
+0812C158,thumb,Hidden function in sub_0812C124's block (registered by land from the draft); exact 64-byte C body,0812C198
+0812C198,thumb,Hidden function in sub_0812C124's block (registered by land from the draft); exact 376-byte C body,0812C310
 0812C4E4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812C4E8
 0812CE30,thumb,Hidden tail function,0812CE64
 0812CE64,thumb,Hidden tail function,0812CE90
