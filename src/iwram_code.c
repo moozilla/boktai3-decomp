@@ -101,7 +101,7 @@ static inline void IwProject(struct IwVec *screen, struct IwVec *world)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 99.4%
+// fuzzy: 55.4%
 struct IwSpr {
     u8 flags;
     u8 size;
@@ -236,9 +236,9 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
     u32 f4, f8;
     struct IwSpr *p;
     s32 j;
-    u8 *ewram;
-    u8 *ew2;
-    s32 step;
+    u8 *ewram = 0;
+    u8 *ew2 = 0;
+    s32 step = 0;
     u8 *b = 0;
     u8 *b2 = 0;
 
@@ -401,8 +401,8 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
                 keys[j] = key;
             }
             attr3[n] = sz;
-            oam[n] =
-                (fl | ((gUnk_03004D50[sz] | obj->attr) | ((py & 0xff) | ((px & 0x1ff) << 16))));
+            oam[n] = ((gUnk_03004D50[sz] | obj->attr) | ((py & 0xff) | ((px & 0x1ff) << 16)));
+            oam[n] |= fl;
             n++;
         }
     }
