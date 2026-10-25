@@ -4681,6 +4681,7 @@ addr,name,mode,confidence,source,notes
 0811FAB8,Actor_ApplyKnockback,thumb,low,src-alias,
 0811FCB4,ActorMotion_SetKnockback,thumb,low,src-alias,
 0811FDB4,ActorCollision_InitBounds,thumb,low,src-alias,
+0811FEE0,ActorMotion_ApplyInput,thumb,low,src-alias,Applies held-key motion adjustments; a health-consuming boost with a sprite effect; speed limits; and damping.
 081200C8,ActorScript_ParseParams,thumb,low,src-alias,
 08120264,RegistryA8CB_FindAvailableEntry,thumb,low,src-alias,Returns the manager entry whose state is not active.
 08120294,RegistryA8CB_FindEntryByName,thumb,low,src-alias,Finds a nonempty entry matching the supplied script name hash.
