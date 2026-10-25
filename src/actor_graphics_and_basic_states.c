@@ -585,7 +585,118 @@ void SceneActors_StopBackgroundFlash(struct StateActor *p)
     *(u32 *)((u8 *)p + 0x3c0) = 0;
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_08022B18);
+struct ReactionActor {
+    u8 pad0[0x90];
+    u32 timer;
+    u8 pad94[8];
+    u32 flags;
+    u8 padA0[2];
+    u8 reset;
+    u8 padA3;
+    u32 pending;
+    u8 facing, facing8, requested, state;
+    u8 active, actionReset, action, finished, entered, changed;
+    u8 padB2[0x12];
+    u32 actionTimer;
+    u8 padC8[0x38];
+    void (*callback)(void *);
+};
+void SceneActors_UpdateShrinkingReaction(void *);
+void SceneActors_UpdateKnockbackReaction(void *);
+void sub_08027214(void *);
+void WirelessGame_AddItem(void *, s32);
+
+static inline void reactionAction(struct ReactionActor *p, int one, int id, int zero)
+{
+    p->active = one;
+    p->actionReset = zero;
+    p->action = id;
+    p->actionTimer = zero;
+    p->entered = one;
+}
+
+static inline void reactionState(struct ReactionActor *p, void (*fn)(void *), int id)
+{
+    int zero;
+    p->state = id;
+    zero = 0;
+    p->callback = fn;
+    p->timer = zero;
+    p->changed = 1;
+    p->reset = zero;
+    p->pending = zero;
+}
+
+// confidence=low: damage handler: 0 shows the damage number and starts the shrinking reaction
+// (wireless games may award an item when hit from the front), 2 starts a knockback, 1 a death.
+s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
+{
+    u8 *actor = (u8 *)p;
+    u8 *sprite = (u8 *)p + 0x48;
+    s32 result = 1;
+    switch (kind) {
+        case 0: {
+            s32 shown = damage;
+            if (*(u32 *)((u8 *)p + 0x358) == 1 && gUnk_02000580[0x418] != 2) {
+                shown = 0;
+                result = 0;
+            }
+            if (damage > 0) {
+                struct ContactVector size;
+                size.x = 0x20;
+                size.y = 0;
+                size.z = 0x20;
+                DamageNumberDisplay_Show(actor + 0x1cc, shown, 0, sprite + 0xc, &size, 1);
+            }
+            {
+                u32 mask = 0x100000;
+                if (p->flags & mask)
+                    SceneActors_StopBackgroundFlash((struct StateActor *)actor);
+            }
+            reactionAction(p, 1, 0, 0);
+            reactionState(p, SceneActors_UpdateShrinkingReaction, 0x16);
+            if (gUnk_030053F4 & 0x1000) {
+                u8 *position = sprite + 0xc;
+                if (WirelessGame_TryAddCyclingItem(position)) {
+                    s32 d =
+                        actor[0x20e] -
+                        Math_Atan2(*(s16 *)(sprite + 0xc) - *(s16 *)((u8 *)gUnk_02000710 + 0x30),
+                                   *(s16 *)(sprite + 0x10) - *(s16 *)((u8 *)gUnk_02000710 + 0x34));
+                    if (d < 0)
+                        d = -d;
+                    if (d <= 0x20)
+                        WirelessGame_AddItem(position, 0);
+                }
+            }
+            break;
+        }
+        case 2:
+            reactionAction(p, 1, 1, 0);
+            reactionState(p, SceneActors_UpdateKnockbackReaction, 0x17);
+            {
+                u8 v = sprite[9] + 0x80;
+                ((u8 *)p)[0x342] = v;
+            }
+            break;
+        case 1: {
+            s32 zero;
+            {
+                u8 v = (*(u8 **)((u8 *)p + 0x10c))[0x2d];
+                u8 *dst = (u8 *)p + 0x342;
+                zero = 0;
+                *dst = v;
+            }
+            {
+                u32 mask = 2;
+                p->flags |= mask;
+            }
+            reactionAction(p, 1, 3, zero);
+            reactionState(p, sub_08027214, 0x19);
+            break;
+        }
+    }
+    return result;
+}
 
 void SceneActorState_StepTableByte(struct StateActor *p, const u8 *tbl)
 {
