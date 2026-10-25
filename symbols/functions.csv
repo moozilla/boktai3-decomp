@@ -7907,6 +7907,7 @@ addr,name,mode,confidence,source,notes
 081D8FC8,Projectile_InitAlternatingExpiry,thumb,low,src-alias,Installs the alternating-frame expiry callback and selects sprite frame 25
 081D8FE8,TimedEffect_TestDuration,thumb,low,src-alias,
 081D9024,TimedEffect_BeginPhase26,thumb,low,src-alias,
+081D905C,TimedEffect_UpdateHoming,thumb,low,src-alias,Scans forward-cone collider targets; retains the nearer target; steers and accelerates a timed effect until its duration expires.
 081D927C,Projectile_InitSecondaryExpiry,thumb,low,src-alias,Installs a second timed expiry callback and selects sprite frame 25; phase interpretation tentative
 081D929C,Projectile_UpdateSecondaryExpiry,thumb,low,src-alias,Secondary expiry callback that sets flag 2 and requests removal at the configured lifetime
 081D92B8,Projectile_InitArcFlight,thumb,low,src-alias,Installs a callback that updates vertical motion and saves the starting height; arc interpretation tentative
