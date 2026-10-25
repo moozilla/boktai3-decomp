@@ -4,7 +4,7 @@ extern s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 void Sound_PlaySong(u32);
 void MusicSlots_StopAllAndRetainResumable(void);
-void sub_08234868(u8 *);
+void HealthRestoreEffect_StartParticleBurst(u8 *);
 void HealthRestoreEffect_UpdateShake(u8 *);
 #define H(o) (*(u16 *)(p + (o)))
 #define S(o) (*(s16 *)(p + (o)))
@@ -42,7 +42,7 @@ void sub_08234DC8(u8 *p)
     t = ++(*timer);
     if ((*timer) > 15) {
         *((u32 *)(p + 0x24)) &= ~2;
-        sub_08234868(p);
+        HealthRestoreEffect_StartParticleBurst(p);
         *((void (**)(u8 *))(p + 0x274)) = HealthRestoreEffect_UpdateShake;
         *timer = 0;
         Sound_PlaySong(0x284);

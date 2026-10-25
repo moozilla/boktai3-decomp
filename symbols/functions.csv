@@ -9709,6 +9709,7 @@ addr,name,mode,confidence,source,notes
 08234770,SpiralBurst_Init,thumb,low,src-alias,Stores owner and position then initializes particles and collision and starts the burst state
 082347C8,SpiralBurst_Create,thumb,low,src-alias,Allocates the spiral burst task and installs its update and cleanup callbacks
 08234810,FlickerParticle_UpdateMotion,thumb,low,src-alias,
+08234868,HealthRestoreEffect_StartParticleBurst,thumb,low,src-alias,Initializes eight flicker particles with randomized radial velocities for the health restore effect.
 08234960,FlickerParticle_UpdateVerticalMotion,thumb,low,src-alias,
 082349A0,HealthRestoreEffect_InitRisingParticle,thumb,low,src-alias,Activates animation 6 with a randomized position and upward velocity during health restoration
 08234A4C,FlickerParticle_UpdateStationary,thumb,low,src-alias,

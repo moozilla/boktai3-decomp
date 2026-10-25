@@ -1,6 +1,6 @@
 #include "global.h"
 extern u32 gUnk_0300523C, gUnk_030053F4;
-void sub_08234868(u8 *);
+void HealthRestoreEffect_StartParticleBurst(u8 *);
 void Sound_PlaySong(u32);
 void Sound_ResumePersistentSongs(void);
 void Task_Kill(u8 *);
@@ -12,7 +12,7 @@ static inline void clear(u32 *dst, u32 mask)
 void HealthRestoreEffect_UpdateCompletion(u8 *p)
 {
     if (H(0x270) == 30) {
-        sub_08234868(p);
+        HealthRestoreEffect_StartParticleBurst(p);
         Sound_PlaySong(0x285);
         *(u32 *)(p + 0x24) |= 1;
     }
