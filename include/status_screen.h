@@ -66,7 +66,7 @@ struct BgMapInfo {
 u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y); // address of a tile in the background's tilemap
 void NumericDisplay_DrawPair(void *unused, int left, int right);
 void NumericDisplay_DrawStatusValues(struct StatusScreen *);
-void sub_0800E5B8(struct StatusScreen *);
+void StatusScreen_DrawClock(struct StatusScreen *);
 void StatusScreen_RefreshDirtyDisplays(struct StatusScreen *);
 int StatusScreen_CheckConfirm(struct StatusScreen *);
 void StatusScreen_Close(struct StatusScreen *);

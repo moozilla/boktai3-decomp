@@ -301,6 +301,7 @@ addr,name,mode,confidence,source,notes
 0800E3E0,StatusScreen_GetTilePtr,thumb,low,src-alias,"computes the tilemap pointer for tile (x,y) on background bg (gUnk_03004C30); used by the digit-drawing helpers to locate tiles to write"
 0800E408,NumericDisplay_DrawPair,thumb,low,src-alias,
 0800E4DC,NumericDisplay_DrawStatusValues,thumb,low,src-alias,
+0800E5B8,StatusScreen_DrawClock,thumb,low,src-alias,match with 1 pin (values asm ip): natural alloc gives sb since values priority 625 < hours 1012 so pass 0 never sees ip; AGBCC_PRI=values:+600 / AGBCC_FORCE=values:12 -> MATCH. Not reproduced in C after tries (two pseudos; values[col]; stores via values). Same pin as sibling sub_0800F4EC
 0800E77C,StatusScreen_RefreshDirtyDisplays,thumb,low,src-alias,called from StatusScreen_Update; redraws whichever numeric/overlay pieces s->dirty flags mark before clearing them
 0800E7D8,StatusScreen_CheckConfirm,thumb,low,src-alias,
 0800E838,StatusScreen_Close,thumb,low,src-alias,
