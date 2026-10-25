@@ -556,6 +556,15 @@ def cmd_submit(args):
     is the workspace's, so landing merges it like a worker's result."""
     import shutil
     func, src = args[0], os.path.abspath(os.path.expanduser(args[1]))
+    # the build rejects a raw ROM-data address (it would not move with the data), so say so now,
+    # with the gen/data.s label to use, rather than at integrate
+    code = re.sub(r"/\*.*?\*/|//[^\n]*", "", open(src).read(), flags=re.S)
+    raw = sorted({m.group(1).upper() for m in re.finditer(r"\b0[xX]0?([89][0-9A-Fa-f]{6})\b", code)
+                  if int(m.group(1), 16) >= 0x0824DAFC})
+    if raw:
+        sys.exit(f"{func}: not submitted: raw ROM data address(es) {', '.join('0x0' + a for a in raw)}. Use the "
+                 f"gen/data.s label instead, e.g. `extern const u8 gUnk_0{raw[0]}[];` and `gUnk_0{raw[0]}` "
+                 f"(cast it to the type you need).")
     wd = os.path.join(CAMP, func)
     os.makedirs(wd, exist_ok=True)
     env = {k: v for k, v in os.environ.items() if k != "SCOPE_RUN"}
@@ -608,6 +617,14 @@ def mismatch_files(tree, out, touched):
             c = row.split(",")
             if len(c) > 1 and re.fullmatch(r"[0-9A-Fa-f]{8}", c[0]):
                 starts.append((int(c[0], 16), c[1]))
+    # a size change moves everything after it, so the first difference is often a far-off pointer;
+    # the layout check names the first moved function, and the culprit is the one just before it
+    moved = re.search(r"layout shifted: (\w+) is not at its original address", out)
+    if moved:
+        at = re.fullmatch(r"sub_([0-9A-Fa-f]{8})", moved.group(1))
+        at = int(at.group(1), 16) if at else next((a for a, n in starts if n == moved.group(1)), None)
+        if at:
+            addr = at - 1
     before = [s for s in starts if s[0] <= addr]
     if not before:
         return set()

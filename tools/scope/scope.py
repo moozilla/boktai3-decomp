@@ -1966,10 +1966,26 @@ def score(src, func, env, full=False):
 def shape_distance(rom, mine):
     """Insns to delete or insert to turn the draft into the ROM with low registers blanked: what is left
     once register choice is set aside (order and instruction shape). A moved block costs twice its length."""
-    a = [norm_insn(r[3]) for r in rom]
-    b = [norm_insn(r[3]) for r in mine]
-    same = sum(n for _, _, n in difflib.SequenceMatcher(None, a, b, autojunk=False).get_matching_blocks())
-    return len(a) + len(b) - 2 * same
+    # a branch's offset moves with every size difference before it (the diff shows those as moved
+    # targets, not differences), so only its kind counts here
+    a = [re.sub(r"func\+0x[0-9A-Fa-f]+", "func+X", norm_insn(r[3])) for r in rom]
+    b = [re.sub(r"func\+0x[0-9A-Fa-f]+", "func+X", norm_insn(r[3])) for r in mine]
+    return len(a) + len(b) - 2 * lcs_length(a, b)
+
+
+def lcs_length(a, b):
+    """Longest common subsequence of A and B (bit-parallel, Hyyro 2004). SequenceMatcher's greedy
+    longest-block pairing misses most of the alignment in a long, repetitive listing, which made a
+    fuller draft of a big function score worse than a skeleton."""
+    masks = {}
+    for i, x in enumerate(a):
+        masks[x] = masks.get(x, 0) | (1 << i)
+    full = (1 << len(a)) - 1
+    v = full
+    for y in b:
+        u = v & masks.get(y, 0)
+        v = ((v + u) | (v - u)) & full
+    return len(a) - bin(v).count("1")
 
 
 def count_text(rows):
@@ -3353,8 +3369,17 @@ def put_definition(src, snippet, func):
     if not sp:
         sys.exit(f"{func}: no definition in {src} to replace (`new` writes one)")
     start = pat.search(text, sp[0]).start()
-    have = set(re.findall(r"^#include .*$", text, re.M))
-    new = "".join(ln for ln in new.splitlines(True) if ln.rstrip("\n") not in have)
+    # #include and other directives the unit has already are dropped (a #define replaces the old one below)
+    have = set(re.findall(r"^#(?!define\b).*$", text, re.M))
+    new = "".join(ln for ln in new.splitlines(True) if not (ln.startswith("#") and ln.rstrip("\n") in have))
+    # a prototype of FUNC in the unit takes the definition's signature, so a changed type compiles
+    header = re.sub(r"\s+", " ", new[pat.search(new).start():new.index("{", pat.search(new).start())]).strip()
+    proto = re.compile(r"^(?!static\b)[A-Za-z_][^\n;=(){}]*\b%s\s*\([^;{}]*\)\s*;" % re.escape(func), re.M)
+    text = proto.sub(lambda m: re.sub(r"^static\s+", "", header) + ";", text[:start]) + text[start:]
+    sp = land.definition_span(text, func)
+    start = pat.search(text, sp[0]).start()
+    # a macro the snippet #defines replaces an earlier put's #define of it
+    macros = set(re.findall(r"^#define\s+(\w+)", new, re.M))
     # a helper or type the snippet defines replaces the same-named one an earlier put left between the
     # previous definition and FUNC (re-putting an edited snippet would otherwise redefine it)
     # the gap starts after the previous function definition that is not a static helper
@@ -3374,7 +3399,11 @@ def put_definition(src, snippet, func):
             dropped.append(n)
             pos = b
     kept.append(gap[pos:])
-    gap = re.sub(r"\n{3,}", "\n\n", "".join(kept))
+    gap = "".join(kept)
+    for name in macros:
+        gap, n = re.subn(r"^#define\s+%s\b(?:[^\n]*\\\n)*[^\n]*\n?" % re.escape(name), "", gap, flags=re.M)
+        dropped += [name] * bool(n)
+    gap = re.sub(r"\n{3,}", "\n\n", gap)
     open(path, "w").write(text[:prev_end] + gap + new.strip("\n") + "\n" + text[sp[1]:])
     print(f"{func}: {src}: definition replaced with {snippet}"
           + (f" (replacing the earlier {', '.join(sorted(set(dropped)))})" if dropped else ""))
