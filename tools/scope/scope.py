@@ -3036,6 +3036,7 @@ def hoist_levers(src, func, env, passes, names, lines, base, info):
                 out = rows[:close] + [f"{indent}{name} = {m.group(1).strip()}; /* dead: keeps loop.c from hoisting {name} */"] + rows[close:]
                 var = os.path.join(os.path.relpath(os.path.join(WORK, "work"), ROOT),  # the run's own (SCOPE_RUN)
                                    os.path.basename(src)[:-2] + f".lever-{name}.c")
+                os.makedirs(os.path.dirname(os.path.join(ROOT, var)), exist_ok=True)
                 with open(os.path.join(ROOT, var), "w") as f:
                     f.write("\n".join(out))
                 k, inf = score(var, func, env)
@@ -3057,7 +3058,15 @@ def cmd_frame(src, func, env):
     rows = json.load(open(os.path.join(wd, "diff.json")))
     slots, names = frame_slots(wd, func), pseudo_names(wd, func)
     if not slots:
-        sys.exit("no S lines in names.txt: rebuild scope's agbcc (sh tools/scope/build_agbcc.sh)")
+        path = os.path.join(wd, "names.txt")
+        any_s = os.path.exists(path) and any(ln.startswith("S ") for ln in open(path))
+        uses_sp = any(SP_SLOT.search(r[k] or "") for r in rows for k in ("rom", "draft"))
+        if not any_s and uses_sp and not os.path.exists(path):
+            sys.exit("no names.txt from this compile: rebuild scope's agbcc (sh tools/scope/build_agbcc.sh)")
+        sys.exit(f"{func}: reload gave no pseudo a stack slot in the draft"
+                 + ("; the sp accesses are locals that live in memory (arrays, structs, address-taken"
+                    " variables: their order is declaration order) or outgoing call arguments, not spills"
+                    if uses_sp else "; neither side uses the stack beyond pushes"))
     off = lambda t: [int(m.group(1) or "0", 0) for m in SP_SLOT.finditer(t or "")]
     size = lambda side: next((int(m.group(1), 0) for r in rows for m in [re.match(r"sub sp, #(\S+)$", r[side] or "")] if m), 0)
     votes, rom_seen, dr_seen = {}, set(), set()
