@@ -84,7 +84,7 @@ static inline s32 RoundDirection(s32 n)
     return -((-n) >> 6);
 }
 // confidence=low: tests cardinal cells at decreasing ranges.
-u8 sub_0812E118(u32, u32, u32, u32);
+u8 SceneActorTerrain_CanTraverseCell(u32, u32, u32, u32);
 static inline s32 Sweep(struct SceneActorRegistryResetView *actor, s32 range)
 {
     s32 cell = actor->terrainCell;
@@ -98,7 +98,7 @@ static inline s32 Sweep(struct SceneActorRegistryResetView *actor, s32 range)
             i = 0;
             if (i < range)
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
                     next++;
                 } while (++i < range);
@@ -108,7 +108,7 @@ static inline s32 Sweep(struct SceneActorRegistryResetView *actor, s32 range)
             i = 0;
             if (i < range)
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
                     next += SceneActorTerrain_Width();
                 } while (++i < range);
@@ -118,7 +118,7 @@ static inline s32 Sweep(struct SceneActorRegistryResetView *actor, s32 range)
             i = 0;
             if (i < range)
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
                     next--;
                 } while (++i < range);
@@ -128,7 +128,7 @@ static inline s32 Sweep(struct SceneActorRegistryResetView *actor, s32 range)
             i = 0;
             if (i < range)
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
                     next -= SceneActorTerrain_Width();
                 } while (++i < range);
@@ -175,7 +175,7 @@ static inline s32 Sweep_SelectReachableEscapeCell(struct SceneActorRegistryReset
             i = 0;
             if (i < range)
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
                     next++;
                 } while (++i < range);
@@ -185,7 +185,7 @@ static inline s32 Sweep_SelectReachableEscapeCell(struct SceneActorRegistryReset
             i = 0;
             if (i < range)
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
                     next += SceneActorTerrain_Width();
                 } while (++i < range);
@@ -195,7 +195,7 @@ static inline s32 Sweep_SelectReachableEscapeCell(struct SceneActorRegistryReset
             i = 0;
             if (i < range)
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
                     next--;
                 } while (++i < range);
@@ -205,7 +205,7 @@ static inline s32 Sweep_SelectReachableEscapeCell(struct SceneActorRegistryReset
             i = 0;
             if (i < range)
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
                     next -= SceneActorTerrain_Width();
                 } while (++i < range);

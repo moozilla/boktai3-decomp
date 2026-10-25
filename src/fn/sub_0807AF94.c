@@ -262,7 +262,7 @@ done:
     return 0;
 }
 
-u8 sub_0812E118(s32, s32, s32, u32);
+u8 SceneActorTerrain_CanTraverseCell(s32, s32, s32, u32);
 void SceneActorControl_OnIdle(void);
 static inline s32 Width(void)
 {
@@ -290,7 +290,7 @@ static inline u8 Reach(struct SceneActorRegistryResetView *actor, s32 start, s32
         i = start + 1;
         column = Mod(i, width);
         while (column < Width()) {
-            if (!sub_0812E118(start, i, height, shape))
+            if (!SceneActorTerrain_CanTraverseCell(start, i, height, shape))
                 break;
             if (i == target)
                 return 1;
@@ -298,7 +298,7 @@ static inline u8 Reach(struct SceneActorRegistryResetView *actor, s32 start, s32
             column++;
         }
         for (i = start + Width(); count > i; i += Width()) {
-            if (!sub_0812E118(start, i, height, shape))
+            if (!SceneActorTerrain_CanTraverseCell(start, i, height, shape))
                 break;
             if (i == target)
                 return 1;
@@ -307,7 +307,7 @@ static inline u8 Reach(struct SceneActorRegistryResetView *actor, s32 start, s32
         i = start - 1;
         column = Mod(i, width);
         while (column >= 0) {
-            if (!sub_0812E118(start, i, height, shape))
+            if (!SceneActorTerrain_CanTraverseCell(start, i, height, shape))
                 break;
             if (i == target)
                 return 1;
@@ -315,7 +315,7 @@ static inline u8 Reach(struct SceneActorRegistryResetView *actor, s32 start, s32
             column--;
         }
         for (i = start - Width(); i >= 0; i -= Width()) {
-            if (!sub_0812E118(start, i, height, shape))
+            if (!SceneActorTerrain_CanTraverseCell(start, i, height, shape))
                 break;
             if (i == target)
                 return 1;
