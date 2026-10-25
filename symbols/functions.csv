@@ -7919,6 +7919,7 @@ addr,name,mode,confidence,source,notes
 081D9CB8,Projectile_UpdateAnimationTail,thumb,low,src-alias,Animation-tail callback that marks the sprite active until the signed counter reaches zero
 081D9CDC,Projectile_InitResetDelay,thumb,low,src-alias,Installs the delayed reset callback and conditionally restores frame 25 with both flips cleared
 081D9D14,Projectile_UpdateResetDelay,thumb,low,src-alias,Delay callback that sets flag 2 and restarts projectile state after the lifetime threshold
+081D9D3C,Projectile_SpawnImpactPair,thumb,low,src-alias,Tentatively: on eligible projectile impact; spawn two randomized child projectiles and register their stimuli.
 081D9F18,Projectile_InitFromType,thumb,low,src-alias,
 081DA0B4,TimedEffect_InitEntry,thumb,low,src-alias,
 081DA178,TimedEffect_RemoveFromManager,thumb,low,src-alias,

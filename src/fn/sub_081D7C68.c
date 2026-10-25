@@ -262,7 +262,7 @@ void Task4E01_OnDefaultDirectionalAnimation(void *);
 void Task4E01_OnType7DirectionalAnimation(void *);
 void Task4E01_OnType4Animation(void *);
 void Projectile_UpdateAnimation(void *);
-void sub_081D9D3C(void *);
+void Projectile_SpawnImpactPair(void *);
 // confidence=low: resets projectile time and chooses the terminal animation by projectile kind.
 inline static u32 StepFirst_StartTerminalAnimation(struct Drawable *owner,
                                                    struct DisplaySequenceState *state)
@@ -552,7 +552,7 @@ s32 Task4E01_StartTerminalAnimation(u8 *input)
         case 11:
             if (!((*((u16 *)config)) & 0x2000))
                 ((struct Drawable *)(input + 0x8c))->sprite.frame = 29;
-            Projectile_SetUpdateCallback(config, sub_081D9D3C);
+            Projectile_SetUpdateCallback(config, Projectile_SpawnImpactPair);
             break;
 
         case 8:
