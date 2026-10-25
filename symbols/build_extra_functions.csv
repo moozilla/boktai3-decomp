@@ -311,7 +311,7 @@ address,isa,evidence,replacement_end
 0812DEB0,thumb,Heading/velocity toward a target with an XZ range test; raw span before Math_GetVectorLength,0812DF40
 0812DF94,thumb,Actor anchor clamp then Nav/terrain test that clears flag 0x200 or velocity; raw span,0812E058
 0812E094,thumb,Independent 132-byte command-selection routine with full high-register save prologue and restore after 0812E084 leaf return; removes132 false old retained-tail C bytes,0812E118
-0812E46C,thumb,Hidden tail after InventorySlot_PickRandom,
+0812E46C,thumb,Hidden tail after InventorySlot_PickRandom; exact 312-byte C body,0812E5A4
 0812EED0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812EED4
 0812F5C4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812F5C8
 0812F5C8,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,0812F5CC

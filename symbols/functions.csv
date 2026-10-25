@@ -4932,6 +4932,7 @@ addr,name,mode,confidence,source,notes
 0812E058,SceneActor_SetPositionXZ,thumb,low,src-alias,
 0812E084,SceneActorReaction_ResetResponseState,thumb,low,src-alias,Clears embedded response state bytes and control words used by actor restoration callers
 0812E3DC,InventorySlot_PickRandom,thumb,low,src-alias,
+0812E46C,ActorParticles_SpawnDirectionalBurst,thumb,low,src-alias,When amount is positive; spawn 2–3 actor particles with direction-based horizontal velocity and randomized velocity spread.
 0812E5A4,ActorParticles_SpawnBurst,thumb,low,src-alias,
 0812E6F0,ActorMode_SelectOddStateVariant,thumb,low,src-alias,
 0812E714,ActorParticles_SpawnWideBurst,thumb,low,src-alias,
