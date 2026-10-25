@@ -7407,6 +7407,7 @@ addr,name,mode,confidence,source,notes
 081C2BE8,SparkleEmitter_UpdateDraining,thumb,low,src-alias,Updates existing particles without spawning more and advances the frame counter
 081C2D0C,SparkleEmitter_OnTaskUpdate,thumb,low,src-alias,Processes scene messages and dispatches the emitter state callback
 081C2D34,SparkleEmitter_OnTaskDestroy,thumb,low,src-alias,Removes all 32 particle sprites and releases the receiver and singleton
+081C2D68,SparkleEmitter_Initialize,thumb,low,src-alias,Initializes 32 sparkle sprites; registers scene messages; and applies script options to start emitting or draining.
 081C2ECC,SparkleEmitter_ReconfigureFromScript,thumb,low,src-alias,
 081C2F8C,SparkleEmitter_StopEmitting,thumb,low,src-alias,Switches the singleton to its particle update callback without further spawning
 081C2FC0,SparkleEmitter_CreateFromScript,thumb,low,src-alias,Creates the singleton particle task with CC88 sparkle sprites and script configuration
