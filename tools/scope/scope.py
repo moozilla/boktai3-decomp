@@ -734,6 +734,11 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
              + ("" if only_targets else ": they follow from the others") + ")" if nb else "")
           + f"; shape {shape_distance(rom, dr)} (register-blind distance, what try ranks by)"
           + f"; {shifted} offset-only shifts hidden.  full listing: {rel}/diff.txt (json: diff.json)")
+    mv = moved_rows(rows_json)
+    if mv:
+        ex = next(i for i in sorted(mv) if rows_json[i]["tag"] == "+")
+        print(f"{len(mv) // 2} of the differing insns are the same instruction at another position (an order"
+              f" difference, not a missing one): `why {rows_json[ex]['uid']}` names what reads each copy")
     tail = []
     for x, y, t in reversed(pairs):
         if y is not None or x is None:
@@ -1204,6 +1209,50 @@ def reg_nums(text):
     out = []
     for m in re.finditer(r"\b(?:r(\d+)|(sb|sl|fp|ip|sp|lr|pc))\b", (text or "").split(None, 1)[-1] if text else ""):
         out.append(int(m.group(1)) if m.group(1) else REG_ALIASES[m.group(2)])
+    return out
+
+
+def moved_rows(rows, window=8):
+    """{index: partner index} for a '+' row and a '-' row with the same text close together: the
+    same instruction at another position (an order difference), not a missing or extra one."""
+    out = {}
+    for i, r in enumerate(rows):
+        if r["tag"] != "+" or i in out:
+            continue
+        for j in range(max(0, i - window), min(len(rows), i + window + 1)):
+            q = rows[j]
+            if q["tag"] == "-" and j not in out and q["rom"] == r["draft"]:
+                out[i], out[j] = j, i
+                break
+    return out
+
+
+def asm_dest(text):
+    """The register an assembly line writes, or None (stores, compares and branches write none)."""
+    op = (text or "").split(None, 1)
+    if not op or re.match(r"(str|cmp|cmn|tst|b|bl|bx|push|pop|\.)", op[0]):
+        return None
+    regs = reg_nums(text)
+    return regs[0] if regs else None
+
+
+def asm_reads(text):
+    """Registers an assembly line reads."""
+    regs = reg_nums(text)
+    return regs if asm_dest(text) is None else regs[1:] + (regs[:1] if re.match(r"(adds|subs|ands|orrs|eors|bics|muls|lsls|lsrs|asrs|adcs|sbcs|rors|mvns|negs)\b", text) and len(regs) == 2 else [])
+
+
+def readers_after(rows, i, side, reg, limit=12):
+    """Rows after row I (on SIDE: 'rom' or 'draft') that read REG before it is written again."""
+    out = []
+    for j in range(i + 1, min(len(rows), i + 1 + 4 * limit)):
+        t = rows[j][side]
+        if not t:
+            continue
+        if reg in asm_reads(t):
+            out.append(j)
+        if asm_dest(t) == reg or len(out) >= limit:
+            break
     return out
 
 
@@ -2777,6 +2826,47 @@ def pool_load_origin(wd, draft, line):
     return min(cands, key=lambda u: abs((lines.get(u) or 0) - (line or 0))) if cands else None
 
 
+def explain_moved(wd, rows, row, nm, at):
+    """A '+' insn whose twin is a '-' nearby: say where the ROM has it and, for the register it writes,
+    which instructions read each copy on each side, with how the passes rewrote the draft readers'
+    operands (cse folding equal constants into one register is the usual cause)."""
+    i = rows.index(row) if row in rows else None
+    mv = moved_rows(rows)
+    if i is None or i not in mv:
+        return
+    j = mv[i]
+    k = sum(1 for q in rows[min(i, j) + 1:max(i, j)] if q["rom"]) if j > i else -sum(1 for q in rows[j + 1:i] if q["rom"])
+    print(f"  moved: the ROM has this same instruction at {rows[j]['rom_addr']}, {abs(k)} ROM insn(s)"
+          f" {'later' if k > 0 else 'earlier'}; nothing is missing, only the order differs")
+    reg = asm_dest(row["draft"])
+    if reg is None:
+        return
+    seen = set()
+    for side, start in (("rom", j), ("draft", i)):
+        rd = readers_after(rows, start, side, reg)
+        txt = ", ".join(f"{rows[x][side]}" + (f" [{rows[x]['rom_addr']}]" if side == "rom" else f" (insn {rows[x]['uid']})")
+                        for x in rd) or "nothing"
+        print(f"  {side}: {rname(reg)} set here is read by {txt}")
+        if side == "draft":
+            seen.update(rows[x]["uid"] for x in rd if rows[x]["uid"])
+    # the draft readers' operands through the passes
+    for u in sorted(seen):
+        last, steps = None, []
+        for p in PASSES:
+            path = os.path.join(wd, "u.i." + p)
+            if not os.path.exists(path):
+                continue
+            m = re.search(r"^\((?:insn|jump_insn|call_insn)(?:/\w)* " + str(u) + r" .*?(?=^\(|\Z)", open(path).read(), re.S | re.M)
+            regs = regs_of(one_line(m.group(0))) if m else None
+            if regs and regs != last:
+                steps.append(f"{PASS_NOTE.get(p, p)}: {', '.join(nm(r) for r in regs)}")
+                last = regs
+        if len(steps) > 1:
+            print(f"    {at(u)} operands: " + "  ->  ".join(steps))
+    print("  when a reader's value register changes in cse, cse swapped equal values (often two zeros or"
+          " one constant in two modes); the ROM's order says which copy each reader should get")
+
+
 def cmd_why(src, func, uid, env, via=None):
     import contextlib
     import io
@@ -2825,6 +2915,8 @@ def cmd_why(src, func, uid, env, via=None):
             ps = [x for x in regs_of(pre) if hmap.get(x, x) == int(b)]
             alloc_diffs.append((ps[0] if ps else None, int(a), int(b)))
             print(f"  ROM {rname(a)} where the draft has {rname(b)}" + (f" = pseudo {nm(ps[0])}" if ps else ""))
+    if row and not via:
+        explain_moved(wd, rows, row, nm, at)
     # operand through the passes
     trail, last, changes = [], None, []
     for p in PASSES:
