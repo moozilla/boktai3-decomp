@@ -8248,6 +8248,7 @@ addr,name,mode,confidence,source,notes
 081F21C0,MotionEffectPool_FindFreeEntry,thumb,low,src-alias,Returns the first of four entries whose occupancy bit is clear and writes its index; tentative pool identity
 081F21F4,MotionEffectPool_OnRenderComplete,thumb,low,src-alias,Empty callback supplied by the pool entry render setup routines; tentative callback role
 081F21F8,SingletonSlot7_OnEffectMotionComplete,thumb,low,src-alias,Motion completion callback resets the effect to state 1 and clears its timer
+081F2208,SpriteTrail_InitializeEntry,thumb,low,src-alias,Initializes a sprite-trail pool entry; its seven sprites; animation; and render/motion spatial entries.
 081F23A0,SpriteGroup_RemoveSlot,thumb,low,src-alias,
 081F2404,SpriteTrail_UpdatePositions,thumb,low,src-alias,
 081F2534,SpriteTrail_BeginImpact,thumb,low,src-alias,
