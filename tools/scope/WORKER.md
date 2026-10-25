@@ -30,6 +30,14 @@ the ROM. scope compiles one function in well under a second and explains,
 from the compiler's own traces, *why* each differing instruction came out
 the way it did. Work from those explanations; do not try C forms blindly.
 
+**The goal is an exact match, not a higher fuzzy score.** Every function in
+the game already has a draft, so a draft that scores a few points higher is
+worth little. The fuzzy percentage is a rough guide and is easy to game: a
+change that raises it can move the C further from the original (an extra
+temporary, a reordered statement that happens to line up more instructions).
+Judge a change by whether `why` says it fixes the mechanism behind a hunk,
+not by the percentage. Keep going on one function until it matches.
+
 ## Setup (do this once)
 
 * Work in the scope checkout (the directory holding `tools/scope/scope.py`).
@@ -163,18 +171,26 @@ register canonical in cse).
 * agbcc is C89: in each block, declarations come before statements.
   `COMPILE FAILED` means the file did not compile; fix that first.
 * No hand-written instructions in `asm()`, ever. Register pins
-  (`register T x asm("rN")`) and empty `asm("" : "+r"(x))` barriers are a
-  project-authorized last resort (CLAUDE.md): only where a knob proved an
-  allocation decision you could not reproduce in C after real attempts, and
-  say so in the report. Try to remove the ones a draft already has (`pins`).
+  (`register T x asm("rN")`) and empty `asm("" : "+r"(x))` barriers are
+  allowed by CLAUDE.md but not recommended. Again and again, removing a pin
+  and finding the C that gives the same allocation has turned out easier
+  than it looked, and the pin hides the real cause. Use one only where a
+  knob proved an allocation decision you could not reproduce in C after
+  real attempts, and say so in the report. Remove the ones a draft already
+  has (`pins` shows the cost of each).
 * Keep the C readable: names, struct fields, inline helpers are fine.
-* Stop when you get MATCH, or after about 25 compile attempts without
-  progress.
+* Do not give up on a function. When progress stalls, the next step is
+  more diagnosis (`why all`, `probe`, `hoist`, `giv`, `frame`, `spill`,
+  `life`), not a different function. Stop only at MATCH, or when you can
+  name the one compiler decision still blocking it, have proved it with a
+  knob, and have tried the C spellings that should produce it. Then report
+  that decision as a scope gap: it is the next tool change.
 
 ## Report
 
-* MATCH or the best count of differing insns (`N ROM / M draft`), and the
-  path of your best file.
+* MATCH, or the blocking decision (the hunk, what `why` and the knob
+  showed, the C spellings tried) with the count of differing insns
+  (`N ROM / M draft`) and the path of your best file.
 * For each change that helped: what `why` said and what you changed.
 * **Where scope's output was confusing, wrong or missing** (this matters as
   much as the match: it is how the tool gets better).
