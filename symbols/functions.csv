@@ -8350,6 +8350,7 @@ addr,name,mode,confidence,source,notes
 081F7C08,SceneActor_UpdateDirectionalTrigger_081F7C08,thumb,low,src-alias,
 081F7CAC,AnimationActor_UpdateProjectileSequence,thumb,low,src-alias,
 081F7DAC,Ratatosk_UpdateCloneAttack,thumb,low,src-alias,
+081F84E4,Ratatosk_UpdateArenaCheckedSequence,thumb,low,src-alias,Consumes activation; selects an arena-checked animation sequence based on sun-orb manager status; and advances completion and timers.
 081F8600,Ratatosk_UpdateSunOrbPlacement,thumb,low,src-alias,
 081F88A0,AnimationActor_UpdateRepeatedAttack,thumb,low,src-alias,
 081F8988,Ratatosk_UpdateSunOrbRelocation,thumb,low,src-alias,
