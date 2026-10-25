@@ -3456,7 +3456,10 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         print(f"{name}: the draft matches; landing it as exact C")
     kind, dest, asm_name = land.where(ROOT, name, addr)
     # a hidden function's split block has its own asm/nonmatching file, so its INCLUDE_ASM fallback works
-    # as a plain function's does (its replacement end stays unset: the default build keeps the assembly)
+    # as a plain function's does (its replacement end stays unset: the default build keeps the assembly).
+    # split.py names that block sub_ADDR whatever functions.csv calls the function
+    if kind == "hidden":
+        asm_name = f"sub_{addr:08X}"
     if new_name:  # a name that cannot be applied fails before anything is written
         try:
             land.rename(ROOT, addr, name, new_name, dry=True)

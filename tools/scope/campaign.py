@@ -614,7 +614,7 @@ def cmd_integrate(args):
     git("fetch", "-q", "origin")
     if git("checkout", "-q", "-B", branch, "origin/main").returncode:
         sys.exit(f"{tree}: could not check out {branch}")
-    done, landed = [], []
+    done, landed, commits = [], [], {}
     for r in ready:
         func, wd = r["func"], os.path.join(CAMP, r["func"])
         rc = land_draft(func, tree, wd)
@@ -636,12 +636,38 @@ def cmd_integrate(args):
         title = f"Match {label}" if exact else f"Draft {label} (NONMATCHING, {res.get('counts', '?')})"
         git("add", "-A", "src", "include", "symbols")
         git("commit", "-q", "-m", title + "\n\nPhase-1 scope campaign worker.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>")
+        commits[wd] = (git("rev-parse", "HEAD").stdout.strip(),
+                       set(git("show", "--name-only", "--format=", "HEAD").stdout.split()))
         done.append(title)
         landed.append(wd)
         print(title, flush=True)
     if not done or "--no-pr" in args:
         return 0
     b = subprocess.run(["make", "-j8"], cwd=tree, capture_output=True, text=True)
+    for _ in range(3):
+        if "build/boktai3.gba: OK" in b.stdout + b.stderr:
+            break
+        # the build names the file it failed on: drop the commits that touched it and build the rest,
+        # so one bad draft does not hold the whole batch back
+        out = b.stdout + b.stderr
+        errors = "\n".join(ln for ln in out.splitlines()
+                           if re.search(r"(?i)error|failed|must be|undefined|can't|cannot", ln))
+        files = {f"src/{m}.c" for m in re.findall(r"(?:build/)?src/([\w/]+)\.[cso]\b", errors)}
+        bad = [wd for wd in landed if commits[wd][1] & files]
+        if not bad or len(bad) == len(landed):
+            break
+        for wd in bad:
+            os.replace(os.path.join(wd, "landed"), os.path.join(wd, "land_failed"))
+            open(os.path.join(wd, "land_failed"), "a").write("\ncombined build failed on its file:\n" + out[-1500:])
+            i = landed.index(wd)
+            print(f"dropped {os.path.basename(wd)}: the combined build failed on {', '.join(sorted(commits[wd][1] & files))}",
+                  flush=True)
+            del landed[i], done[i]
+        git("reset", "-q", "--hard", "origin/main")
+        if git("cherry-pick", *[commits[wd][0] for wd in landed]).returncode:
+            git("cherry-pick", "--abort")
+            break
+        b = subprocess.run(["make", "-j8"], cwd=tree, capture_output=True, text=True)
     if "build/boktai3.gba: OK" not in b.stdout + b.stderr:
         # nothing reached main: the next integrate retries them (the culprit fails its own unit check
         # or the build again); the commits stay on the local branch for a look
