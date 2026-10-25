@@ -3485,6 +3485,18 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         text = merged
     elif before[path] is not None:
         sys.exit(f"{name}: {dest} exists already")
+    else:
+        # a new file holds FUNC (and any hidden neighbor written alongside it). A body of a function that
+        # already has a file (a stale twin seed's neighbors) would define it twice and break split.py
+        status, _ = code_status()
+        names = {a: f for f, a in funcs}
+        def owned(f):
+            m = re.fullmatch(r"sub_([0-9A-F]{8})", f)
+            return status.get(names.get(int(m.group(1), 16), f) if m else f, "undrafted") != "undrafted"
+        stale = [f for f in progress.c_functions(os.path.abspath(draft), with_asm=False) if f != name and owned(f)]
+        if stale:
+            text = land.seed_from_twin(text, name, name, stale)
+            print(f"{name}: dropped {', '.join(stale)} from the draft (defined in other files already)")
     text = re.sub(r"^// scope: write .*\n", "", text, flags=re.M)
     text = re.sub(r"/\* Ghidra's pseudo-C \(a reading aid\):\n.*?\*/\n", "", text, flags=re.S)
     text = re.sub(r"/\* scope: seeded from .*?\*/\n", "", text, flags=re.S)
