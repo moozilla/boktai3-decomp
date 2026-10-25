@@ -123,6 +123,10 @@ register canonical in cse).
   multiply and a shift differently.
 * **Instruction order** mostly follows C statement and expression order;
   temporaries (`s32 t = ...; p->f = t;`) move a load or computation earlier.
+  When the summary says some differing insns are "the same instruction at another
+  position", run `why UID` on the `+` one: it lists what reads each copy in the ROM
+  and the draft, and how cse rewrote the readers' operands. Two equal constants
+  (zeros in different modes) that cse swaps between readers show up here.
 * **Expression shape** (no `why` explainer yet: if a differing insn is "in
   no RTL dump" or `why` says nothing useful, it is shape). fold reassociates
   constants inside one expression: `&p->arr[i]` becomes `(i * 8 + 0x338) +
