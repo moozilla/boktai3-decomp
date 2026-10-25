@@ -7428,6 +7428,7 @@ addr,name,mode,confidence,source,notes
 081C4058,RegistryF3E4_Show,thumb,low,src-alias,Starts the singleton actor appearance transition
 081C406C,RegistryF3E4_Hide,thumb,low,src-alias,Starts the singleton actor disappearance transition
 081C4080,RegistryF3E4_Create,thumb,low,src-alias,
+081C4194,SceneTransition_SpawnParticleBurst,thumb,low,src-alias,Emits sixteen sprite particles at the supplied coordinates with randomized polar velocities and increasing speed bands.
 081C439C,Registry6A37_UpdateBackgroundScroll,thumb,low,src-alias,Applies the object's coordinates as background layer 3 scroll offsets
 081C43B0,SceneTransition_BeginOffsetMove,thumb,low,src-alias,
 081C43F8,SceneTransition_BeginVectorTween,thumb,low,src-alias,

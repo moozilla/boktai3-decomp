@@ -9,7 +9,7 @@ struct SceneTransition {
 };
 void PositionMotion_InitTimedInterpolation(void *, void *, s16 *, s16 *, u16);
 void sub_081C42B0(s32, s32, s32);
-void sub_081C4194(s32, s32, s32);
+void SceneTransition_SpawnParticleBurst(s32, s32, s32);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void Registry6A37_UpdateFirstScrollTransition(void);
 
@@ -33,7 +33,7 @@ void SceneTransition_BeginFirstScroll(struct SceneTransition *p)
     for (zero = 0; zero <= 7; zero++) {
         sub_081C42B0(0x50, 0x30, zero);
     }
-    sub_081C4194(0, 0, p->f6c);
+    SceneTransition_SpawnParticleBurst(0, 0, p->f6c);
     {
         s32 zero;
         ScreenTransition_SendCommand(0, 4, 0x1f, 0x1f, 0x1f, 0xFFFF, zero = 0);
