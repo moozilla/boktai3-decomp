@@ -9723,6 +9723,7 @@ addr,name,mode,confidence,source,notes
 0823511C,FlickerParticle_UpdateSecondaryMotion,thumb,low,src-alias,
 08235294,FlickerParticle_UpdatePool,thumb,low,src-alias,
 082352C8,HealthBurstEffect_UpdateFadeOut,thumb,low,src-alias,Final state callback that reduces a screen effect and briefly refreshes the collider before termination
+08235328,HealthBurstEffect_StartBurst,thumb,low,src-alias,Starts the next alternating burst sprite at a randomized position and records its terrain floor height.
 08235574,HealthBurstEffect_UpdateBurstSprites,thumb,low,src-alias,Updates two burst sprites through descent and rebound states; playing a landing sound and hiding expired sprites.
 0823565C,HealthBurstEffect_UpdateBursts,thumb,low,src-alias,State callback that emits six periodic bursts before hiding sprites and entering fade out
 08235964,HealthBurstEffect_OnUpdate,thumb,low,src-alias,Task update callback that advances particles and dispatches the current burst state

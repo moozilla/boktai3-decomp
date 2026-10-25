@@ -4,7 +4,7 @@ struct Elem {
     u8 pad[40];
 };
 extern u32 gUnk_0300523C;
-void sub_08235328(u8 *);
+void HealthBurstEffect_StartBurst(u8 *);
 void HealthBurstEffect_UpdateBurstSprites(u8 *);
 void HealthBurstEffect_UpdateFadeOut(u8 *);
 static inline void clear(u32 *dst, u32 mask)
@@ -16,7 +16,7 @@ void HealthBurstEffect_UpdateBursts(u8 *p)
 {
     u32 age = H(0x34e);
     if (age == 0 || age == 18 || age == 36 || age == 54 || age == 72 || age == 90)
-        sub_08235328(p);
+        HealthBurstEffect_StartBurst(p);
     HealthBurstEffect_UpdateBurstSprites(p);
     H(0x34e)++;
     if (H(0x34e) > 121) {
