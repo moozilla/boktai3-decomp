@@ -4313,7 +4313,158 @@ void Actor_ConfigureFromScript(void)
     }
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_081EA4DC);
+/* Initialization view names the body and counters absent from the shared layout. */
+struct ActorInitData {
+    u8 unk_00[12];
+    const u16 *palette;
+    u8 unk_10[0x1c];
+};
+struct ActorInitController {
+    u8 unk_00[0x18];
+    void *owner;
+    struct ActorChildSlot children[16];
+    struct ActorSprite obj;
+    u8 unk_E00[8];
+    struct ActorInitData data[1];
+    u8 shadow[0x40];
+    void *animationResource;
+    u16 count;
+    u8 delta, unk_E7B;
+    u16 counter;
+    u8 unk_E7E[2];
+    u8 body[0xc];
+    u8 unk_E8C[0x3c];
+    s16 deltaX, deltaY, deltaZ;
+    u8 unk_ECE[2];
+    s16 targetX, targetY, targetZ;
+    u8 unk_ED6[2];
+    s16 startX, startY, startZ;
+    u8 unk_EDE[2];
+    s16 savedX, savedY, savedZ;
+    u8 unk_EE6[2];
+    u16 alternate[16], fadeColors[32];
+    const u16 *savedPalette;
+    u8 unk_F4C[0x12];
+    u16 speed, heading;
+    u8 unk_F62[4];
+    u8 direction;
+    u8 unk_F67[4];
+    u8 flip;
+    u8 unk_F6C[0xe];
+    u16 savedY2;
+    u8 unk_F7C[0xe];
+    u16 resource;
+    u8 unk_F8C[8];
+    void (*scaleFn)(void *), (*otherFn)(void *);
+    s32 timer;
+    u32 variant;
+};
+
+extern void *gUnknown_02000580;
+s32 AnimData_Load(void *, u32);
+void Sprite_Init(void *, void *, u32);
+void Sprite_SetOriginStub(void *, s32, s32);
+void Shadow_Initialize(void *, void *, s32);
+void SceneBody_Init(void *, s32, void *, s32, s32, void *);
+
+static inline void ActorInit_InitMainSprite(struct ActorInitController *p, struct ActorSprite *obj)
+{
+    void *effect;
+    p->animationResource = ScriptProc_Start(0x922e, 0xc6a0);
+    effect = p->data;
+    AnimData_Load(effect, 0x97d3);
+    Sprite_Init(obj, effect, 0);
+    Sprite_SetOriginStub(obj, -8, -19);
+    obj->priority = 0;
+    obj->flags = 3;
+}
+
+// Provisional name: Actor_InitializeController
+
+/* Initialize the singleton controller, its palette banks and child sprites. */
+#ifdef NONMATCHING
+// fuzzy: 99.3%
+s32 Actor_InitializeController(void *arg0)
+{
+    struct ActorInitController *p = arg0;
+    struct ActorSprite *obj;
+    void *shadow;
+    const u16 *palette, *src;
+    u16 *dst;
+    s32 i;
+    u32 mask;
+    gUnk_020003C8 = arg0;
+    p->owner = gUnknown_02000580;
+    obj = &p->obj;
+    ActorInit_InitMainSprite(p, obj);
+    shadow = p->shadow;
+    Shadow_Initialize(shadow, &p->obj.x, 0);
+    ActorShadow_Disable(shadow);
+    p->delta = 1;
+    p->count = 0;
+    p->counter = 0;
+    {
+        struct ActorInitData *data = p->data;
+        const u16 **saved = &p->savedPalette;
+        *saved = data->palette;
+    }
+    palette = p->savedPalette;
+    mask = 0xffff;
+    src = palette;
+    dst = p->fadeColors;
+    for (i = 15; i >= 0; i--) {
+        dst[16] = *src;
+        *dst = *src & mask;
+        src++;
+        dst++;
+    }
+    {
+        const u16 *src2 = palette + 16;
+        u16 *dst2 = p->alternate;
+        for (i = 15; i >= 0; i--) {
+            *dst2 = *src2;
+            src2++;
+            dst2++;
+        }
+    }
+    p->direction = 0;
+    p->heading = 0;
+    p->flip = 0;
+    for (i = 0; i < 16; i++) {
+        u32 one = 1;
+        void (*callback)(void *, void *) = (void (*)(void *, void *))Actor_OnControllerIdle;
+        struct ActorChildSlot *child = &p->children[i];
+        void *data = child->sprite;
+        AnimData_Load(data, 0xa850);
+        Sprite_Init(child, data, 0);
+        Sprite_SetOriginStub(child, -8, -16);
+        child->flags = one;
+        child->index = i;
+        child->control = 2;
+        child->fn = callback;
+        child->control |= one;
+    }
+    p->scaleFn = 0;
+    p->otherFn = 0;
+    p->obj.x = 0;
+    p->obj.y = 0;
+    p->obj.z = 0;
+    p->deltaZ = 0;
+    p->deltaY = 0;
+    p->deltaX = 0;
+    p->savedY2 = 0;
+    p->targetX = 25;
+    p->targetY = 102;
+    p->targetZ = 0;
+    p->speed = 200;
+    if (!SceneBody_GetById(p->resource))
+        SceneBody_Init(p->body, p->resource, &p->savedX, 0, 7, p);
+    p->variant = 0;
+    return 0;
+}
+#else
+INCLUDE_ASM("asm/nonmatching", Actor_InitializeController);
+#endif
 
 void Actor_RequestControllerRemoval(void)
 {
@@ -4326,7 +4477,7 @@ struct ActorAnimController *Task_Create(u32, u32);
 
 void Task_SetCallbacks(void *, void (*)(void *), void (*)(void *));
 
-s32 sub_081EA4DC(void *);
+s32 Actor_InitializeController(void *);
 
 u8 *Actor_EnsureController(u32 resource, u32 unused)
 {
@@ -4337,7 +4488,7 @@ u8 *Actor_EnsureController(u32 resource, u32 unused)
     if (p) {
         p->resource = resource;
         Task_SetCallbacks(p, Actor_UpdateController, Actor_DestroyController);
-        if (sub_081EA4DC(p) < 0) {
+        if (Actor_InitializeController(p) < 0) {
             Task_Kill(p);
             return 0;
         }

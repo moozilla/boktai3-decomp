@@ -8154,6 +8154,7 @@ addr,name,mode,confidence,source,notes
 081E9D84,Actor_UpdateController,thumb,low,src-alias,Controller task callback that checks resources and updates mode and optional callbacks
 081E9DE4,Actor_DestroyController,thumb,low,src-alias,Controller destruction callback that removes sprites and releases associated resources
 081EA1C0,Actor_ConfigureFromScript,thumb,low,src-alias,
+081EA4DC,Actor_InitializeController,thumb,low,src-alias,Initialize the singleton actor controller; main sprite and shadow; palette banks; sixteen child sprites; and optional scene body.
 081EA71C,Actor_RequestControllerRemoval,thumb,low,src-alias,Requests termination of the global actor controller task
 081EA730,Actor_EnsureController,thumb,low,src-alias,Returns the existing controller or creates and initializes its task and callbacks
 081EA78C,TimeDisplay_GetLightPhaseGroup,thumb,low,src-alias,Provisionally groups solar phases into two display variants with minus one for unknown phases
