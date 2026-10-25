@@ -9738,6 +9738,7 @@ addr,name,mode,confidence,source,notes
 08236024,RadialBurstEffect_UpdateBurstParticle,thumb,low,src-alias,
 0823614C,RadialBurstEffect_EmitOrbitParticle,thumb,low,src-alias,
 08236294,RadialBurstEffect_UpdateParticle,thumb,low,src-alias,Particle callback that integrates velocity and changes animation before expiring after thirteen frames
+082362EC,RadialBurstEffect_StartBurst,thumb,low,src-alias,Initializes twelve radial burst particles around an origin with randomized headings and speeds.
 08236428,CallbackGroup_UpdateActive,thumb,low,src-alias,
 08236484,RadialBurstEffect_RemoveParticles,thumb,low,src-alias,Removes all twelve effects from the radial particle pool
 0823652C,RadialBurstEffect_BlendSpritePalette,thumb,low,src-alias,Interpolates sixteen palette colors between gray level 15 and their source colors using the sprite blend factor
