@@ -8619,7 +8619,7 @@ addr,name,mode,confidence,source,notes
 0820958C,FanCannon_Activate,thumb,low,src-alias,Switches an inactive cannon to its active callback and plays its sound
 082095B8,FanCannon_IsPathToPlayerClear,thumb,low,src-alias,
 082096E8,FanCannon_UpdateInactive,thumb,low,src-alias,Inactive state callback that decrements a positive timer
-08209704,FanCannon_UpdateActive,thumb,low,src-alias,
+08209704,FanCannon_UpdateActive,thumb,low,src-alias,Emits randomized wind particles every 30 ticks and ramps wind strength to its cap.
 08209A38,CombatActor_UpdateDefeatEffect,thumb,low,src-alias,
 08209AC4,FanCannon_Update,thumb,low,src-alias,
 0820A2C8,FanCannonManager_Update,thumb,low,src-alias,
