@@ -2155,6 +2155,17 @@ def cmd_calls(src, func, env):
     same = sum(b.size for b in sm.get_matching_blocks())
     print(f"{func}: {len(rom)} ROM calls, {len(dr)} draft calls, {same} in the same order"
           + ("" if same < len(rom) or len(rom) != len(dr) else ": every call present, in order"))
+    # per callee: a block laid out elsewhere shows below as missing + extra although nothing is missing
+    import collections
+    want, got = collections.Counter(n for _, n in rom), collections.Counter(n for _, n in dr)
+    short = {n: c - got[n] for n, c in want.items() if c > got[n]}
+    over = {n: c - want[n] for n, c in got.items() if c > want[n]}
+    if not short and not over:
+        if same < len(rom):
+            print("  every callee called as often as in the ROM: the differences below are order only")
+    else:
+        print("  by callee: " + ", ".join([f"{n} {c} fewer" for n, c in sorted(short.items())]
+                                          + [f"{n} {c} more" for n, c in sorted(over.items())]))
     for tag, i1, i2, j1, j2 in sm.get_opcodes():
         if tag == "equal":
             continue
