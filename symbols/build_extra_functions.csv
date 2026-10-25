@@ -558,7 +558,7 @@ address,isa,evidence,replacement_end
 081EEEC0,thumb,Hidden raw-tail function,081EEECC
 081EF12C,thumb,Hidden raw-tail function,081EF140
 081F2084,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081F2088
-081F28C4,thumb,Hidden tail after SpriteTrail_InitRenderCollider,
+081F28C4,thumb,Hidden tail after SpriteTrail_InitRenderCollider; exact 324-byte C body up to SpriteTrail_CreateMotionEffect,081F2A08
 081F2B70,thumb,Hidden raw-tail function,081F2BB0
 081F2F90,thumb,Hidden raw-tail function: Ratatosk find point with largest weight at +0xD28,081F3084
 081F336C,thumb,Hidden raw-tail function,081F339C

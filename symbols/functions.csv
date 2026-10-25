@@ -8252,6 +8252,7 @@ addr,name,mode,confidence,source,notes
 081F2764,SingletonSlot7_CreateEffectPool,thumb,low,src-alias,Creates the four-entry effect task used by the slot 7 singleton
 081F27A4,SpriteTrail_InitCollider,thumb,low,src-alias,
 081F2838,SpriteTrail_InitRenderCollider,thumb,low,src-alias,
+081F28C4,SpriteTrail_CreateFixedEffect,thumb,low,src-alias,Motion-effect trail without velocity; stores the end point at 0x54 and links four head and three tail sprites
 081F2A08,SpriteTrail_CreateMotionEffect,thumb,low,src-alias,
 081F2BFC,SingletonSlot7_DestroyImpactSprite,thumb,low,src-alias,Impact sprite task destruction callback removes its sprite
 081F2C0C,SingletonSlot7_InitImpactSprite,thumb,low,src-alias,Loads resource 0x8639 and initializes a positioned sprite with the requested palette variant
