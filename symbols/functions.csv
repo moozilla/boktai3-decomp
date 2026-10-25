@@ -9647,6 +9647,7 @@ addr,name,mode,confidence,source,notes
 082315A8,EffectGroup_Spawn,thumb,low,src-alias,
 08231788,SceneActorEffects_FinishSlot,thumb,low,src-alias,Resets slot state and timer while marking its drawable inactive
 082317A0,EffectPart_UpdateLoopAnimation,thumb,low,src-alias,
+082318E0,EffectPart_UpdateFinish,thumb,low,src-alias,Advances a sprite part animation; frees its slot at the sequence boundary; and decrements the group's active count.
 08231A0C,EffectPart_UpdateAnimation,thumb,low,src-alias,
 08231B3C,EffectPart_UpdateBlink,thumb,low,src-alias,
 08231C84,EffectPart_UpdateAnimation2,thumb,low,src-alias,
