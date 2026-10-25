@@ -6266,6 +6266,7 @@ addr,name,mode,confidence,source,notes
 081813F8,ActorMarker_EmitIndexedEffect,thumb,low,src-alias,
 081814C0,Armor_SpawnRandomDirectionalParticle,thumb,low,src-alias,Selects one of ten directional particle offsets using the shared random sequence
 081814F8,Armor_SpawnDirectionalParticleFan,thumb,low,src-alias,Spawns particles at directional offsets zero through eight
+08181514,ActorMarker_LaunchFragments,thumb,low,src-alias,Initializes nine embedded bouncing fragments with facing-dependent positions; outward horizontal velocity; random upward velocity; and sound 0xC4.
 08181634,ArmorPalette_CopyKindBanks,thumb,low,src-alias,
 081816B0,ActorPalette_RestoreSelectedBanks,thumb,low,src-alias,
 0818171C,ActorPalette_LoadScriptBanks,thumb,low,src-alias,

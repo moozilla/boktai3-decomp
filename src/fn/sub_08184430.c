@@ -41,7 +41,7 @@ void ScaledShadow_Disable(void *);
 void Armor_SpawnDirectionalParticleFan(void *);
 void ActorMarker_InitMovingSprite(void *);
 void SceneCombatActor_SpawnBouncingEffect(void *);
-void sub_08181514(void *, u32);
+void ActorMarker_LaunchFragments(void *, u32);
 void SpriteColliderGroup_ResetActiveParts(void *);
 void Collider_SetAttackPowerAndForce(void *, u32, u32);
 u16 Math_Atan2(s32, s32);
@@ -129,7 +129,7 @@ void ActorController_UpdateBreakApartTransition(u8 *p)
             Armor_SpawnDirectionalParticleFan(p);
             ActorMarker_InitMovingSprite(p);
             SceneCombatActor_SpawnBouncingEffect(p);
-            sub_08181514(p, 1);
+            ActorMarker_LaunchFragments(p, 1);
             SpriteColliderGroup_ResetActiveParts(p + 0xB58);
             (*s)++;
             *t = zero;

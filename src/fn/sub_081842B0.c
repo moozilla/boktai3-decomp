@@ -18,7 +18,7 @@ void Anim_UnlinkFromList(void *, u32);
 void ScaledShadow_Disable(void *);
 void ActorMarker_InitMovingSprite(void *);
 void SceneCombatActor_SpawnBouncingEffect(u8 *);
-void sub_08181514(u8 *, u32);
+void ActorMarker_LaunchFragments(u8 *, u32);
 void SpriteColliderGroup_ResetActiveParts(void *);
 void ActorMarker_InitOffsetPosition(u8 *);
 static inline void Armor_CheckFlagRefresh(u8 *q)
@@ -64,7 +64,7 @@ void Armor_UpdateDefeatSequence(u8 *p)
             Armor_SpawnDirectionalParticleFan(p);
             ActorMarker_InitMovingSprite(p);
             SceneCombatActor_SpawnBouncingEffect(p);
-            sub_08181514(p, 0);
+            ActorMarker_LaunchFragments(p, 0);
             SpriteColliderGroup_ResetActiveParts(p + 0xb58);
             {
                 u8 v = *s + 1;
