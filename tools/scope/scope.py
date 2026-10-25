@@ -3757,14 +3757,25 @@ def cmd_try(src, func, variants, env):
         return (sh, max(int(m[1]), int(m[2])), int(m[1]) + int(m[2]), n) if m else (sh, n, n, n)
     base_k = key(base_n, base_info)
     rows.sort(key=lambda r: (r[0] is None, key(r[0], r[4]) or (0,)))
+    def total(info):
+        m = re.match(r"(\d+) ROM / (\d+) draft", info.get("counts") or "")
+        return int(m[1]) + int(m[2]) if m else None
+    base_total = total(base_info) if base_n else 0
     for n, name, counts, change, info in rows:
         k = key(n, info)
         mark = "MATCH" if n == 0 else ("better" if k is not None and k < base_k else
                                        "same" if k == base_k else "worse" if k is not None else "")
+        t = total(info) if n else None
+        if mark == "worse" and t is not None and base_total and t < base_total:
+            mark = "mixed"  # fewer differing insns, larger shape distance: often a step worth keeping
         if n:
             counts = f"{counts}, shape {info.get('shape', '?')}"
         print(f"  {mark:6} {counts:44} {name}" + ("" if change == "knob" else f"  [{change}]"))
     best = rows[0] if rows else None
+    if any(r[0] and base_total and (total(r[4]) or base_total) < base_total and key(r[0], r[4]) >= base_k
+           for r in rows if r[0] is not None):
+        print("  mixed: fewer differing insns but a larger shape distance (ranked by shape). A change `why` or a\n"
+              "  knob asked for is often worth keeping and stacking on (WORKER.md step 5).")
     if best and best[0] is not None and best[3] != "knob":
         print(f"\nnext: scope.py {best[1]} {func}   (the best variant's listing)")
     return 0 if any(r[0] == 0 for r in rows) else 1
