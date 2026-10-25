@@ -136,7 +136,8 @@ python3 tools/scope/scope.py FILE.c insn UID      (also `FILE.c uses REG...`): c
 SCOPE_TRANSFORM=tools/scope/transforms/X.py scope.py FILE.c   what-if over the preprocessed source
 python3 tools/scope/scope.py FILE.c shape [FUNC]  the diff with low registers blanked: order and shape differences only
 python3 tools/scope/scope.py FILE.c frame [FUNC]  stack slots, ROM against draft, with the pseudo (C variable) reload put in each
-python3 tools/scope/scope.py FILE.c hoist [FUNC]  loop-invariant motion pass by pass: what loop.c moved out, what stayed, and why
+python3 tools/scope/scope.py FILE.c hoist [FUNC]  loop-invariant motion pass by pass: what loop.c moved out, what stayed, and why;
+                                                  then for each hoisted variable it scores the dead re-set before the loop's closing brace
 python3 tools/scope/scope.py todo [N] [addr|prior|size]   functions with no C yet, in ROM order (default) or by prior art/size
 python3 tools/scope/scope.py new FUNC             open FUNC: build/scope/work/FUNC.c (its unit with a stub, or a like twin's C)
 python3 tools/scope/scope.py land FUNC [--name N] [--rom] [--nonmatching]   put the draft into src/ and check it
@@ -643,7 +644,11 @@ Each was read from the compiler source and confirmed on a live draft.
    cannot prove it redundant), makes it may_not_optimize. Flow deletes the dead store,
    and the function matches with no pins. In one basic block cse deletes the repeat, and
    the lever does nothing. `probe` found it (`AGBCC_NOMOVE=271: MATCH`); `hoist` shows
-   the arithmetic and the reasons.
+   the arithmetic and the reasons. EffectManager_SpawnParticlesAt (the twin, whose table
+   uses sit in one block of a multi-block body) matched with the same line on its first
+   try. `hoist` now writes and scores that variant for every hoisted variable
+   (`lever: ... MATCH`). It needs a C variable to re-set: when the hoisted value is an
+   unnamed constant inside an inline, name it at the top of the body first.
 22. **Stack slot order is pseudo order.** Reload gives each spilled pseudo a slot in
    pseudo-number order (alter_reg), at rising offsets; pseudos it evicts later come
    after. Pseudo numbers follow first appearance, so declaration order is a frame lever.
