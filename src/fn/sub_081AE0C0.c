@@ -183,7 +183,7 @@ void Vanargand_InitPart(void *, void *);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 void SceneActors_SetHealthLimits(void *, s32, s32, s32);
 void PositionedEffect_InitAttackCollider(void *);
-void sub_081A6284(void *);
+void PositionedEffect_InitRadialAttackColliders(void *);
 void PositionedEffect_InitContactCollider(void *);
 void ActorSoundPhase_StartFlaggedAnimation(void);
 void Vanargand_OnPrimaryStopState(void);
@@ -361,7 +361,7 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
     SceneActors_StartUnmirroredAnimation(self, (u8 *)p + 0x18C, (u8 *)p + 0x1EC, 2, 1, 0);
     SceneActors_SetHealthLimits(self, health, health, scale);
     PositionedEffect_InitAttackCollider(p);
-    sub_081A6284(p);
+    PositionedEffect_InitRadialAttackColliders(p);
     PositionedEffect_InitContactCollider(p);
     switch (mode) {
         case 0:
