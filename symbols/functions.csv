@@ -9922,6 +9922,7 @@ addr,name,mode,confidence,source,notes
 08242120,Player_TryStepForward,thumb,low,src-alias,
 082422D8,Player_SelectInputMode,thumb,low,src-alias,
 0824261C,Player_UpdateLinkKind,thumb,low,src-alias,
+082429AC,Player_UpdateHalfChargeLinkKind,thumb,low,src-alias,Updates player kinds 1; 2 and 8 using rounded-up half link charge; alternate action callbacks; movement and terrain transitions (tentative).
 08242DCC,Player_SynchronizeColliderState,thumb,low,src-alias,
 08242EA4,Player_UpdateActionPhase,thumb,low,src-alias,
 08242F7C,Player_FindMaskedSlot,thumb,low,src-alias,
