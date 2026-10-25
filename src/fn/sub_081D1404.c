@@ -8,7 +8,7 @@ extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 s32 Mod(s32, s32);
 void Task_Kill(void *);
-void sub_081D11E4(void *, s32);
+void SceneNpc_SpawnTransitionParticle(void *, s32);
 void SceneNpc_UpdateTransitionParticles(void *);
 
 #define RAND() (gUnk_0203B400[gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF])
@@ -86,7 +86,7 @@ s32 SceneNpc_UpdateTransitionEffect(u8 *p)
             }
             *(u16 *)(p + 0x62) += 0x64;
             if (*(s32 *)(p + 0x70) > 2 && Mod(*(s32 *)(p + 0x70), 3) == 0)
-                sub_081D11E4(p, -1);
+                SceneNpc_SpawnTransitionParticle(p, -1);
             if (*(s32 *)(p + 0x70) > 0x1d) {
                 *(u32 *)(p + 0x6c) = 4;
                 *(u32 *)(p + 0x70) = 0;

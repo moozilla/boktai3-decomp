@@ -7758,6 +7758,7 @@ addr,name,mode,confidence,source,notes
 081D10D8,SceneNpc_SetBehaviorTwoFromScript,thumb,low,src-alias,Selects the named or current NPC and installs the behavior used by creation option i=2
 081D1150,SceneNpc_RequestRigAction,thumb,low,src-alias,Tentatively requests a rig action by setting the current NPC rig flag at offset 0x2C
 081D116C,SceneNpc_SetBehaviorFourFromScript,thumb,low,src-alias,Selects the named or current NPC and installs the animation behavior used by creation option i=4
+081D11E4,SceneNpc_SpawnTransitionParticle,thumb,low,src-alias,Activates the first free NPC transition particle; with a randomized lifetime and optional position scatter.
 081D12FC,SceneNpc_UpdateTransitionParticles,thumb,low,src-alias,Updates eight NPC transition particles with polar movement; gravity; a frame change and lifetime expiry.
 081D1404,SceneNpc_UpdateTransitionEffect,thumb,low,src-alias,
 081D15C8,SceneNpc_OnTransitionEffectDestroy,thumb,low,src-alias,Transition effect task destructor removes its sprite and eight effect instances
