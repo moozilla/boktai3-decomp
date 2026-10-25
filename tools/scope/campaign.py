@@ -610,11 +610,24 @@ def cmd_integrate(args):
     if not ready:
         print("nothing to integrate")
         return 0
-    branch = "claude/codex-drafts-" + time.strftime("%m%d-%H%M")
-    git("fetch", "-q", "origin")
+    # keep a failed attempt inspectable even when its retry starts in the same minute
+    branch = "claude/codex-drafts-" + time.strftime("%m%d-%H%M%S")
+    fetched = git("fetch", "-q", "origin")
+    if fetched.returncode:
+        sys.exit(f"{tree}: fetch failed; nothing integrated\n" + fetched.stderr)
     if git("checkout", "-q", "-B", branch, "origin/main").returncode:
         sys.exit(f"{tree}: could not check out {branch}")
     done, landed, commits = [], [], {}
+
+    def release_landings(reason):
+        for wd in landed:
+            marker = os.path.join(wd, "landed")
+            if os.path.exists(marker):
+                os.replace(marker, marker + "." + reason)
+
+    def built(b):
+        return b.returncode == 0 and "build/boktai3.gba: OK" in (b.stdout + b.stderr).splitlines()
+
     for r in ready:
         func, wd = r["func"], os.path.join(CAMP, r["func"])
         rc = land_draft(func, tree, wd)
@@ -634,18 +647,23 @@ def cmd_integrate(args):
         exact = os.path.exists(os.path.join(wd, "best_match.c"))
         label = f"{name} ({func})" if name != func else func
         title = f"Match {label}" if exact else f"Draft {label} (NONMATCHING, {res.get('counts', '?')})"
-        git("add", "-A", "src", "include", "symbols")
-        git("commit", "-q", "-m", title + "\n\nPhase-1 scope campaign worker.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>")
+        landed.append(wd)
+        added = git("add", "-A", "src", "include", "symbols")
+        committed = (git("commit", "-q", "-m", title + "\n\nPhase-1 scope campaign worker.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>")
+                     if added.returncode == 0 else added)
+        if committed.returncode:
+            release_landings("commit_failed")
+            sys.exit(f"{tree}: commit failed on {branch}; changes kept for review, retry markers released\n"
+                     + committed.stdout + committed.stderr)
         commits[wd] = (git("rev-parse", "HEAD").stdout.strip(),
                        set(git("show", "--name-only", "--format=", "HEAD").stdout.split()))
         done.append(title)
-        landed.append(wd)
         print(title, flush=True)
     if not done or "--no-pr" in args:
         return 0
     b = subprocess.run(["make", "-j8"], cwd=tree, capture_output=True, text=True)
     for _ in range(3):
-        if "build/boktai3.gba: OK" in b.stdout + b.stderr:
+        if built(b):
             break
         # the build names the file it failed on: drop the commits that touched it and build the rest,
         # so one bad draft does not hold the whole batch back
@@ -668,11 +686,10 @@ def cmd_integrate(args):
             git("cherry-pick", "--abort")
             break
         b = subprocess.run(["make", "-j8"], cwd=tree, capture_output=True, text=True)
-    if "build/boktai3.gba: OK" not in b.stdout + b.stderr:
+    if not built(b):
         # nothing reached main: the next integrate retries them (the culprit fails its own unit check
         # or the build again); the commits stay on the local branch for a look
-        for wd in landed:
-            os.replace(os.path.join(wd, "landed"), os.path.join(wd, "landed.build_failed"))
+        release_landings("build_failed")
         sys.exit(f"{tree}: combined build failed on {branch}; not opening a PR\n" + (b.stdout + b.stderr)[-2000:])
     subprocess.run(["python3", "tools/progress.py", "--markdown", "PROGRESS.md"], cwd=tree, capture_output=True)
     git("add", "PROGRESS.md", "PROGRESS.json")

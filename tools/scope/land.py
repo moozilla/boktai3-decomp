@@ -168,6 +168,13 @@ def concessions(text):
     return text, pins, bars
 
 
+def context_key(text):
+    """Whitespace-insensitive unit context, preserving string/character literal contents."""
+    text = re.sub(r"^// scope: write .*\n", "", text, flags=re.M)
+    tokens = re.findall(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|\s+|.', text, re.S)
+    return "".join(t for t in tokens if not t.isspace())
+
+
 def merge(current, base, draft):
     """Three-way merge of a unit: the draft was made from BASE; CURRENT is the file now. None on conflict."""
     if current == base:
