@@ -6691,6 +6691,7 @@ addr,name,mode,confidence,source,notes
 08199314,CallbackPool_Destroy,thumb,low,src-alias,
 08199374,SceneEffect_InitializeEmitterOptions,thumb,low,src-alias,
 08199410,SceneEffectQueue_Create,thumb,low,src-alias,Creates and initializes the singleton task managing queued effects
+0819946C,SceneEffectQueue_PostTypeZeroMessage,thumb,low,src-alias,Posts message 0x382F with effect type zero; projected player screen side; and a caller-supplied value; inventory extent includes two following routines.
 08199790,SceneEffectQueue_QueueTypeZeroEffect,thumb,low,src-alias,Queues a type-zero effect on the player's projected screen side
 081999CC,SceneEffectQueue_QueueTypeTwoEffect,thumb,low,src-alias,Queues a type-two effect on the player's projected screen side
 08199AEC,CannonBattery_LoadAnimation,thumb,low,src-alias,Loads the shared animation resource used by cannon sprites and firing effects
