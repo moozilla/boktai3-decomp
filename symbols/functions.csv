@@ -6835,6 +6835,7 @@ addr,name,mode,confidence,source,notes
 081A1CBC,ActorReaction_BeginCollisionPhase,thumb,low,src-alias,
 081A1E5C,ActorReaction_UpdateCallbackGate,thumb,low,src-alias,
 081A1EA4,Hresvelgr_ApplyRequestedAction,thumb,low,src-alias,Installs the requested action callback for valid action IDs and resets action execution fields
+081A1EFC,Hresvelgr_ApplyContactDamage,thumb,low,src-alias,Consumes queued contact hits; applies environmental damage; and selects health; reaction; sound and particle effects.
 081A2378,Hresvelgr_InitializeRadialOffsets,thumb,low,src-alias,
 081A2430,Hresvelgr_DispatchSceneMessages,thumb,low,src-alias,
 081A26D8,Hresvelgr_UpdateAnimationAndTargets,thumb,low,src-alias,
