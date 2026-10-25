@@ -245,3 +245,17 @@ def seed_from_twin(text, twin, func, others):
     text = INCLUDE_ASM.sub("", text)
     text = re.sub(r"#ifdef NONMATCHING\n.*?#endif\n?", "", text, flags=re.S)
     return re.sub(r"\b%s\b" % re.escape(twin), func, text)
+
+
+def wrap_nonmatching(text, func, asm_name, fuzzy, shape=None):
+    """TEXT with FUNC's definition inside `#ifdef NONMATCHING` (its fuzzy score first, as check.py
+    --record writes it) and `INCLUDE_ASM` in the `#else`, so the default build keeps the ROM's bytes."""
+    sp = definition_span(text, func)
+    if not sp:
+        return None
+    body = text[sp[0]:sp[1]].rstrip("\n") + "\n"
+    note = f"// fuzzy: {fuzzy:.1f}%\n" + (f"// scope shape {shape} (differences once low registers are set aside)\n"
+                                           if shape else "")
+    block = (f"#ifdef NONMATCHING\n{note}{body}#else\n"
+             f'INCLUDE_ASM("asm/nonmatching", {asm_name});\n#endif\n')
+    return text[:sp[0]] + block + text[sp[1]:]

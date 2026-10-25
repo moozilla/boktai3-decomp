@@ -18,10 +18,12 @@
   scope.py rom FUNC|ADDR        FUNC's ROM listing with calls and literal symbols named (no draft needed)
   scope.py fields OFF... [STRUCT]  structs in include/ with members at these offsets (agbcc's own layout),
                                 or STRUCT's member at each offset
+  scope.py FILE.c shape         the diff with low registers blanked: order and instruction differences only
   scope.py todo [N] [addr|prior|size]   functions with no C yet (phase 1), in ROM order
   scope.py new FUNC             open FUNC: a draft in build/scope/work/ (its unit with a stub, or a twin's C)
-  scope.py land FUNC [D.c] [--name NEW] [--note T] [--rom]   put a matching draft into src/ (unit merge,
-                                or a new src/fn file and the hidden boundary), check the file, name it
+  scope.py land FUNC [D.c] [--name NEW] [--note T] [--rom] [--nonmatching]   put a matching draft into
+                                src/ (unit merge, or a new src/fn file and the hidden boundary), check the
+                                file, name it; --nonmatching: an unfinished draft under #ifdef NONMATCHING
   scope.py rename FUNC NEW [--note T]   functions.csv and every C spelling of the old name or sub_ label
   scope.py like FUNC|ADDR [N]   matched functions whose ROM shares the most rare 3-insn windows with
                                 FUNC's, with the calls and constants they share: whose C to read first
@@ -193,8 +195,14 @@ def workdir(func):
 
 
 def nonmatching_func(src):
-    """The function a draft file is about: the first definition inside #ifdef NONMATCHING."""
+    """The function a draft file is about: a workspace draft's own (build/scope/work/FUNC.c, from `new`),
+    else the first definition inside #ifdef NONMATCHING."""
     text = open(os.path.join(ROOT, src)).read()
+    ws = os.path.relpath(os.path.join(ROOT, src), os.path.join(WORK, "work"))
+    if not ws.startswith(".."):
+        name = os.path.basename(ws).split(".")[0]
+        if re.search(rf"\b{re.escape(name)}\s*\([^;{{]*\)\s*\{{", text):
+            return name
     run = os.environ.get("SCOPE_RUN")  # a campaign worker's assignment, when it is drafted in this file
     if run and any(re.search(rf"^[A-Za-z_][\w \*]*?\b{re.escape(run)}\s*\(", b, re.M)
                    for b in re.findall(r"#ifdef NONMATCHING(.*?)#else", text, re.S)):
@@ -1706,7 +1714,14 @@ def fast_score(src, func, env):
     pairs, _ = align(_ROMDEC[addr], dr)
     rows = [{"tag": t} for _, _, t in pairs]
     fast_score.shape = shape_distance(_ROMDEC[addr], dr)
+    fast_score.fuzzy = fuzzy_percent(_ROMDEC[addr], dr)
     return sum(1 for r in rows if r["tag"] != "="), count_text(rows)
+
+
+def fuzzy_percent(rom, mine):
+    """check.py's fuzzy score (instruction-text similarity, addresses masked), for a NONMATCHING draft."""
+    norm = lambda rows: [re.sub(r"0x[0-9a-fA-F]{7,8}", "ADDR", r[3]) for r in rows]
+    return min(99.9, 100 * difflib.SequenceMatcher(None, norm(rom), norm(mine), autojunk=False).ratio())
 
 
 def score(src, func, env, full=False):
@@ -1717,7 +1732,8 @@ def score(src, func, env, full=False):
     if not full and os.environ.get("SCOPE_FAST") != "0":  # SCOPE_FAST=0: one-shot compiles (A/B, debugging)
         r = fast_score(src, func, env)
         if r is not None:
-            return r[0], {"counts": r[1], "shape": fast_score.shape if r[0] else 0}
+            return r[0], {"counts": r[1], "shape": fast_score.shape if r[0] else 0,
+                          "fuzzy": fast_score.fuzzy if r[0] else 100.0}
     mine, addr, info = compile_draft(src, func, env)
     _, _, sizes = inventory()
     rom_code = load_rom(verify=False)[off(addr):off(addr) + sizes[rom_name(src, func)]]
@@ -2213,6 +2229,11 @@ def norm_insn(text):
     return re.sub(r"\br[0-7]\b", "R", text or "")
 
 
+def is_copy(text):
+    """A register-to-register copy: what register allocation adds or removes, not the C's order."""
+    return bool(re.match(r"(mov|movs) (r\d+|sb|sl|fp|ip), (r\d+|sb|sl|fp|ip)$|adds (r\d+), (r\d+), #0$", text or ""))
+
+
 def hunk_spans(rows):
     """[(lo, hi)] row ranges of the diff's hunks (differing rows at most 4 apart), with up to 4 equal rows of
     context on each side (the same grouping as the diff view)."""
@@ -2246,6 +2267,8 @@ def order_moves(rows, lo, hi):
         if a in kept:
             continue
         key = norm_insn(rows[rom[a]]["rom"])
+        if is_copy(rows[rom[a]]["rom"]):
+            continue  # a register copy (into a high register, or adds rX, rY, #0) is allocation, not order
         twin = next((j for j in left_d if norm_insn(rows[dr[j]]["draft"]) == key), None)
         if twin is None:
             continue
@@ -2794,6 +2817,37 @@ def ghidra_c(addr):
     return "".join(out) or None
 
 
+def cmd_shape(src, func, env):
+    """The diff with low registers blanked: only hunks where the order or the instructions themselves
+    differ, each with its C lines. Register choice is set aside; `why all` explains what is left."""
+    n, info = score(src, func, env, full=True)
+    if n == 0:
+        print(f"{func}: MATCH")
+        return 0
+    rows = json.load(open(os.path.join(info["wd"], "diff.json")))
+    rom = [r for r in rows if r["rom"]]
+    dr = [r for r in rows if r["draft"]]
+    key = lambda t: re.sub(r"func\+0x[0-9A-F]+", "->", norm_insn(t))
+    sm = difflib.SequenceMatcher(None, [key(r["rom"]) for r in rom], [key(r["draft"]) for r in dr], autojunk=False)
+    ops = [o for o in sm.get_opcodes() if o[0] != "equal"]
+    nr = sum(i2 - i1 for _, i1, i2, _, _ in ops)
+    nd = sum(j2 - j1 for _, _, _, j1, j2 in ops)
+    print(f"{func}: shape {nr + nd} ({nr} ROM / {nd} draft insns out of place or different, low registers"
+          f" blanked) in {len(ops)} hunk(s); {count_text(rows)} with registers")
+    for tag, i1, i2, j1, j2 in ops:
+        lines = sorted({r["line"] for r in dr[j1:j2] if r["line"]} | {r["line"] for r in dr[max(0, j1 - 1):j1 + 1] if r["line"]},
+                       key=lambda x: int(x) if str(x).isdigit() else 0)
+        at = rom[i1]["rom_addr"] if i1 < len(rom) else "end"
+        print(f"\n@ ROM {at}  C line(s) {', '.join(map(str, lines)) or '?'}  ({tag})")
+        for k in range(max(i2 - i1, j2 - j1)):
+            a = rom[i1 + k]["rom"] if i1 + k < i2 else ""
+            b = dr[j1 + k]["draft"] if j1 + k < j2 else ""
+            ln = dr[j1 + k]["line"] if j1 + k < j2 else ""
+            print(f"  {a:34} {b:34} {ln}")
+    print(f"\nnext: FILE.c why all (registers and moves) | try V.c...")
+    return 1
+
+
 def cmd_new(target):
     """Open FUNC for writing: a draft in build/scope/work/ that compiles and scores right away. A function
     in a unit gets a copy of the unit with an empty definition in place of its INCLUDE_ASM (landing merges
@@ -2856,10 +2910,12 @@ def cmd_new(target):
     return 0
 
 
-def cmd_land(target, draft=None, new_name=None, rom=False, note=None):
+def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatching=False):
     """Put a matching draft into the source tree: merged into its unit, or a new src/fn file (a hidden
     function also gets its replacement end). Then the concession marker, clang-format, a check of
-    every C function in the landed file, and optionally the name and a whole-ROM build."""
+    every C function in the landed file, and optionally the name and a whole-ROM build.
+    NONMATCHING: a draft that does not match yet goes in as `#ifdef NONMATCHING` C with its fuzzy
+    score, and the default build keeps the INCLUDE_ASM (docs/WORKER.md); the function counts as drafted."""
     import land
     import progress
     funcs, sizes = progress.load_functions()
@@ -2871,9 +2927,15 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None):
     draft = draft or wdraft
     rel = os.path.relpath(os.path.abspath(draft), ROOT)
     n, info = score(rel, name, {})
-    if n != 0:
-        sys.exit(f"{name}: {rel} does not match ({info.get('counts')}); nothing landed")
-    kind, dest, _ = land.where(ROOT, name, addr)
+    if n != 0 and not nonmatching:
+        sys.exit(f"{name}: {rel} does not match ({info.get('counts')}); nothing landed"
+                 " (`land FUNC --nonmatching` lands it as a draft)")
+    if n == 0 and nonmatching:
+        nonmatching = False
+        print(f"{name}: the draft matches; landing it as exact C")
+    kind, dest, asm_name = land.where(ROOT, name, addr)
+    if nonmatching and kind == "hidden":
+        sys.exit(f"{name}: a hidden function has no INCLUDE_ASM to fall back on; match it, or land by hand")
     path = os.path.join(ROOT, dest)
     text = open(os.path.abspath(draft)).read()
     before = {path: open(path).read() if os.path.exists(path) else None}
@@ -2889,6 +2951,10 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None):
         sys.exit(f"{name}: {dest} exists already")
     text = re.sub(r"^// scope: write .*\n", "", text, flags=re.M)
     text = re.sub(r"/\* Ghidra's pseudo-C \(a reading aid\):\n.*?\*/\n", "", text, flags=re.S)
+    if nonmatching:
+        text = land.wrap_nonmatching(text, name, asm_name or name, info.get("fuzzy", 0.0), info.get("shape"))
+        if text is None:
+            sys.exit(f"{name}: no definition of {name} in {rel}")
     text, pins, bars = land.concessions(text)
     open(path, "w").write(text)
     fmt = os.path.join(ROOT, "build", "venv", "bin", "clang-format")
@@ -2908,7 +2974,14 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None):
                 open(p, "w").write(t)
         sys.exit(f"{name}: after landing, {dest} has functions that do not match ({'; '.join(bad[:4])});"
                  " restored")
+    if nonmatching:  # the project's fuzzy figure (progress.py reads it); the system python3, as check.py runs in CI
+        subprocess.run(["python3", "tools/check.py", dest, "--nonmatching", "--record"], cwd=ROOT,
+                       capture_output=True)
+        m = re.search(r"#ifdef NONMATCHING\n// fuzzy: ([\d.]+)%\n(?:.*\n){0,3}?[^\n]*\b" + re.escape(name) + r"\(",
+                      open(path).read())
+        info["fuzzy"] = float(m.group(1)) if m else info.get("fuzzy", 0.0)
     print(f"{name}: landed in {dest} ({kind}; {pins} pins, {bars} barriers in the file)"
+          + (f"; NONMATCHING draft, fuzzy {info.get('fuzzy', 0.0):.1f}%" if nonmatching else "")
           + ("; build_extra_functions.csv replacement end set" if kind == "hidden" else ""))
     if new_name:
         cmd_rename(name, new_name, note)
@@ -3148,18 +3221,19 @@ def main():
         return cmd_rom(args[1])
     if args[0] == "new":  # new FUNC: a draft in build/scope/work/ seeded from the unit or a twin
         return cmd_new(args[1])
-    if args[0] == "land":  # land FUNC [DRAFT.c] [--name NEW] [--note TEXT] [--rom]
+    if args[0] == "land":  # land FUNC [DRAFT.c] [--name NEW] [--note TEXT] [--rom] [--nonmatching]
         opt = {}
         rest = []
         it = iter(args[2:])
         for a in it:
             if a in ("--name", "--note"):
                 opt[a[2:]] = next(it)
-            elif a == "--rom":
-                opt["rom"] = True
+            elif a in ("--rom", "--nonmatching"):
+                opt[a[2:]] = True
             else:
                 rest.append(a)
-        return cmd_land(args[1], rest[0] if rest else None, opt.get("name"), opt.get("rom", False), opt.get("note"))
+        return cmd_land(args[1], rest[0] if rest else None, opt.get("name"), opt.get("rom", False), opt.get("note"),
+                        opt.get("nonmatching", False))
     if args[0] == "rename":  # rename FUNC NEW [--note TEXT]
         note = args[args.index("--note") + 1] if "--note" in args else None
         return cmd_rename(args[1], args[2], note)
@@ -3236,6 +3310,10 @@ def main():
         rest.remove("probe")
         func = rest[0] if rest else nonmatching_func(src)
         return cmd_probe(src, func, env)
+    if "shape" in rest:  # FILE.c shape [FUNC]: only the order / instruction differences, registers blanked
+        rest.remove("shape")
+        func = rest[0] if rest else nonmatching_func(src)
+        return cmd_shape(src, func, env)
     if "spill" in rest:
         rest.remove("spill")
         func = rest[0] if rest else nonmatching_func(src)
