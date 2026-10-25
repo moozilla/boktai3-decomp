@@ -5035,6 +5035,7 @@ addr,name,mode,confidence,source,notes
 08139F58,CallbackPool_RemoveEntry,thumb,low,src-alias,
 08139FAC,FollowingSpriteEffect_SetStateCallback,thumb,low,src-alias,Stores the state callback and sets its entry flag for an effect that follows a position
 08139FB8,FollowingSpriteEffect_OnStop,thumb,low,src-alias,Hides the secondary sprite and clears the activity flag and callback on state entry
+08139FE0,FollowingSpriteEffect_UpdateFollowing,thumb,low,src-alias,Follows an anchor with adaptive X easing; projects and animates the sprite; refreshes its collider; and stops on expiry.
 0813A1E0,PairCallbackPool_Update,thumb,low,src-alias,
 0813A228,FollowingSpriteEffect_DestroyManager,thumb,low,src-alias,Releases both following effect slots with forced cleanup and clears the manager pointer
 0813A24C,SpritePairPool_Initialize,thumb,low,src-alias,

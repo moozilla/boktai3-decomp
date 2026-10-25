@@ -37,7 +37,7 @@ u8 SpritePairPool_TestUnavailable(struct SpritePairPool *, u32, s32);
 void SpritePairEntry_CreateEffect(struct SpritePairEntry *, void (*)(void), u32, u32);
 void FollowingSpriteEffect_SetStateCallback(struct SpritePairEntry *, void (*)(void));
 void FollowingSpriteEffect_OnAnimationComplete(void);
-void sub_08139FE0(void);
+void FollowingSpriteEffect_UpdateFollowing(void);
 void Sound_PlaySong(u32);
 static inline u32 SpritePairPool_MakeKey(u32 counter, u32 id)
 {
@@ -76,7 +76,7 @@ s32 SpritePairPool_StartEntry(void *position, u32 *height, u32 unused,
             SpritePairEntry_CreateEffect(&pool->entries[i],
                                          FollowingSpriteEffect_OnAnimationComplete, params->value,
                                          id + 1);
-            FollowingSpriteEffect_SetStateCallback(&pool->entries[i], sub_08139FE0);
+            FollowingSpriteEffect_SetStateCallback(&pool->entries[i], FollowingSpriteEffect_UpdateFollowing);
             Sound_PlaySong(0x3e4);
             return i;
         }
