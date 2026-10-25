@@ -484,7 +484,7 @@ address,isa,evidence,replacement_end
 081A4ED8,thumb,Hidden Task_Kill wrapper for gUnk_02000244,081A4EEC
 081A6458,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081A645C
 081A645C,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,081A64C8
-081A6C24,thumb,Function in the listed extent of sub_081A6AEC; push right after its pop and bx r1 return; retained assembly,
+081A6C24,thumb,Function in the listed extent of sub_081A6AEC; push right after its pop and bx r1 return; exact 232-byte C body,081A6D0C
 081A6D0C,thumb,Function after 081A6C24's literal pool; independent push and bl; exact 192-byte C body,081A6DCC
 081AB904,thumb,Hidden tail after Vanargand_RunDefeatSequence,081ABA64
 081ADBB8,thumb,Hidden raw-tail function,081ADBF8
