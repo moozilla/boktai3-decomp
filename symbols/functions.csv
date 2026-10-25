@@ -8251,7 +8251,7 @@ addr,name,mode,confidence,source,notes
 081F21F8,SingletonSlot7_OnEffectMotionComplete,thumb,low,src-alias,Motion completion callback resets the effect to state 1 and clears its timer
 081F2208,SpriteTrail_InitializeEntry,thumb,low,src-alias,Initializes a sprite-trail pool entry; its seven sprites; animation; and render/motion spatial entries.
 081F23A0,SpriteGroup_RemoveSlot,thumb,low,src-alias,
-081F2404,SpriteTrail_UpdatePositions,thumb,low,src-alias,
+081F2404,SpriteTrail_UpdatePositions,thumb,low,src-alias,Projects the current and three historical trail positions; averages adjacent sprites; and advances the four-entry position history unless frozen.
 081F2534,SpriteTrail_BeginImpact,thumb,low,src-alias,
 081F2678,SpriteGroup_UpdateExpiringSlot,thumb,low,src-alias,
 081F26BC,SpriteGroup_UpdateSlots,thumb,low,src-alias,
