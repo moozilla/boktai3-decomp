@@ -393,7 +393,7 @@ address,isa,evidence,replacement_end
 0815F578,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,0815F588
 0815F588,thumb,Player byte getter (offset 0x3A4); first of four functions in the reviewed 0815F588-0815F6A8 span,0815F5A0
 0815F5A0,thumb,Player byte getter (offset 0x2D); second function of the reviewed 0815F588-0815F6A8 span,0815F5B4
-0815F5B4,thumb,Target registry lookup by id (loop never advances); third function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched),
+0815F5B4,thumb,Target registry lookup by id (loop never advances); third function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched); exact 68-byte C body,0815F5F8
 0815F5F8,thumb,Full high-register-save function; fourth function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched); exact 176-byte C body,0815F6A8
 081656E0,thumb,Hidden raw-tail function: HUD header label and counter clamp by mode,081657F0
 0816A578,thumb,Hidden menu prompt setup: background layer then ramp display,0816A5A8

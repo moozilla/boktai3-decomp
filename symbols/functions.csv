@@ -5573,6 +5573,7 @@ addr,name,mode,confidence,source,notes
 0815F2C8,Player_InitializeFromScript,thumb,low,src-alias,
 0815F4F4,Player_Create,thumb,medium,gcl-name,name from GCL key F5EB プレイヤー (Player); registry callback
 0815F53C,Player_GetEffectivePosition,thumb,low,src-alias,Returns the player position or an alternate position during actions 0x26 and 0x0C
+0815F5B4,TargetRegistry_FindById,thumb,low,src-alias,Returns the enabled registry head when its layout-dependent ID matches; repeats that entry indefinitely on ID mismatch.
 0815F5F8,TargetRegistry_FindNearestInCone,thumb,low,src-alias,Returns the nearest enabled registry entry strictly inside a distance limit and within a directional cone.
 0815F6A8,TargetRegistry_RegisterActor,thumb,low,src-alias,Registers an actor and callback in the shared target list with flag 0x10 cleared
 0815F6F0,TargetRegistry_RegisterSceneActor,thumb,low,src-alias,Registers a scene actor damage callback with flag 0x10 selecting the alternate data layout
