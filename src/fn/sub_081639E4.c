@@ -2,6 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 85.3%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: spawns one particle (kind 0/1 picks tile frames) into a 16-slot pool.

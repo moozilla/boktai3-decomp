@@ -1,4 +1,5 @@
 #ifdef NONMATCHING
+// fuzzy: 85.3%
 // fix.py best (sweep after the inlined-insn fix)
 // twin.py transplant from a matched near-clone
 // Pointer spills, RNG load/store scheduling and branch layout still differ.

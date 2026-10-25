@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 91.5%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining: pause branch layout, flags allocation and the defined callback return differ.

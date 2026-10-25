@@ -34,6 +34,7 @@ static inline void face(u8 *p)
     }
 }
 #ifdef NONMATCHING
+// fuzzy: 82.4%
 // fix.py best version
 inline static void putB_UpdateMoveDestination(u8 *p, u32 o, u8 v)
 {

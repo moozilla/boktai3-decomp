@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 97.2%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Initial position rematerialization, participant access and register lifetimes still differ.

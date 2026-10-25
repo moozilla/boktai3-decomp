@@ -25,6 +25,7 @@ void SpriteParticle_SetPlanarVelocity(void *, s32, s32);
 void SpriteParticle_Emit(void *, void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 #ifdef NONMATCHING
+// fuzzy: 65.5%
 // fix.py best (sweep after the inlined-insn fix)
 /* Remaining differences: receiver aliases, packed positions and particle stack allocation. */
 static inline u32 Random(void)

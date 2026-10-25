@@ -4,6 +4,7 @@
 // confidence=low: defeat control emits effects, runs scripts, and returns the actor to idle.
 
 #ifdef NONMATCHING
+// fuzzy: 92.1%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: flag-address materialization, late argument registers and zero lifetimes.
 #include "scene_actor_reaction.h"

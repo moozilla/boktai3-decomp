@@ -3,6 +3,7 @@
 #include "global.h"
 #include "display_animation.h"
 #ifdef NONMATCHING
+// fuzzy: 61.6%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: stack-vector placement, source-coordinate addresses and allocation.
 struct NidhoggrVector {

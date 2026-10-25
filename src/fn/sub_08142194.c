@@ -3,6 +3,7 @@
 // confidence=low: action phases push neighboring scene objects and emit position effects.
 
 #ifdef NONMATCHING
+// fuzzy: 89.5%
 // fix.py best (sweep after the inlined-insn fix)
 // foundry draft (worker best 91.4%); what differs is mostly register allocation and instruction order
 struct PackedVec {

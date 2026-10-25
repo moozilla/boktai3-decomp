@@ -2,6 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
+// fuzzy: 71.8%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: owner and random-source allocation, scale decay and state setup.
 struct Vec {

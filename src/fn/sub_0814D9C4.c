@@ -2,6 +2,7 @@
 #include "player.h"
 
 #ifdef NONMATCHING
+// fuzzy: 78.7%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: register allocation; reviewed body has no structural differences.
 // MATCHING_CONCESSION: register-pinning

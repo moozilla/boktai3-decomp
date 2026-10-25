@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 96.1%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: provisional role inferred from state transitions and player-motion calls

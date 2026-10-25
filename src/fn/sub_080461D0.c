@@ -11,6 +11,7 @@ struct ContactSequenceScriptArgs {
     s32 *values;
 };
 #ifdef NONMATCHING
+// fuzzy: 84.4%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: signed-field scratch registers and the script-count mask reload.
 void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,

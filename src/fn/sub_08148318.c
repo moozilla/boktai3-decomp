@@ -3,6 +3,7 @@
 #include "player.h"
 // confidence=low: random neighboring directions with short hold durations.
 #ifdef NONMATCHING
+// fuzzy: 88.2%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: RNG allocation, even-direction address scheduling and literal pools.
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)

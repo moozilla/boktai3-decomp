@@ -1,6 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
+// fuzzy: 90.7%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: loop setup, mask hoisting, backdrop temporaries and register allocation.

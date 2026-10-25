@@ -2,6 +2,7 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
+// fuzzy: 93.5%
 // fix.py best (sweep after the inlined-insn fix)
 // foundry draft (worker best 89.2%); what differs is mostly register allocation and instruction order
 #define gRandomTableIndex gUnk_03005308

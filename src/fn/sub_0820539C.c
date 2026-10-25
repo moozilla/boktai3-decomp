@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 94.5%
 // fix.py best (sweep after the inlined-insn fix)
 // Register choice for the z pointer (r7 in the ROM), the facing-index pointer
 // reloads and the Anim_SetSequence argument setup still differ.

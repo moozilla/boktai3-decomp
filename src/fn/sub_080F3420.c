@@ -23,6 +23,7 @@ void ChildGroup_WaitForInactiveMembers(struct SwordGroup *);
 // confidence=low: launches the next resting sword every launchDelay frames; once all are out,
 // waits for them to finish.
 #ifdef NONMATCHING
+// fuzzy: 63.9%
 // fix.py best (sweep after the inlined-insn fix)
 // agbcc strength-reduces i*0x194 into a pointer; the ROM keeps i and multiplies in the found block.
 void sub_080F3420(struct SwordGroup *p)

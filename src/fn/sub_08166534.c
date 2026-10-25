@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 90.4%
 // twin.py transplant from a matched near-clone
 struct HudPos {
     s16 x, y, z, pad;

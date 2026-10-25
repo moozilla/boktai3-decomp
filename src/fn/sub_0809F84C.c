@@ -2,6 +2,7 @@
 #include "scene_actor_control_phase.h"
 
 #ifdef NONMATCHING
+// fuzzy: 92.3%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: defined vector padding, inline clamps, argument order and registers.

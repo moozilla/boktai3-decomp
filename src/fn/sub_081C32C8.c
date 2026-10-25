@@ -64,6 +64,7 @@ static inline void SetCallback(void (*callback)(void), void (**slot)(void))
 }
 
 #ifdef NONMATCHING
+// fuzzy: 63.1%
 // fix.py best (sweep after the inlined-insn fix)
 // Full arc-motion reconstruction; pointer lifetimes, parameter spills and projection allocation differ.
 void SceneTarget_BeginMove(struct ContactImpactEffect *input, struct Vec *source,

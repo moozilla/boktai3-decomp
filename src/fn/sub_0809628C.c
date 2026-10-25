@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 88.0%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining difference: the script value array (values[]) stores go through a hoisted sp+0x24 base register instead of direct sp-relative stores; script/offset temporaries then shift registers.
 #include "scene_actor_reaction.h"

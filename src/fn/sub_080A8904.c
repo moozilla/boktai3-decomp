@@ -2,6 +2,7 @@
 #include "scene_actor_terrain.h"
 #define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 #ifdef NONMATCHING
+// fuzzy: 81.2%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences concern local lifetimes, register allocation and ordering.
 extern u32 gUnk_03005308;

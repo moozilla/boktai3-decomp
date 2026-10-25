@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 80.8%
 // fix.py best (sweep after the inlined-insn fix)
 // confidence=low: steers and accelerates a linked effect toward a target until expiry.
 #define LinkedEffect_FollowTarget sub_0812ACB0

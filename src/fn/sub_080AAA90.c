@@ -2,6 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
+// fuzzy: 85.1%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: mask setup order and flag-cursor strength reduction.
 #include "scene_actor_reset.h"

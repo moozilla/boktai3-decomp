@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 96.0%
 // fix.py best (sweep after the inlined-insn fix)
 // Loop pointer registers differ: ROM keeps the y-source pointer in r6 (copied from r0) and the counter in r5.
 struct DigitPos {

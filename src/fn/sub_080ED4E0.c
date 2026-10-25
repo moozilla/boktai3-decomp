@@ -2,6 +2,7 @@
 // confidence=low: attempts a grab on the active animation frames and positions its target.
 #define Ivy_UpdateGrabAttempt sub_080ED4E0
 #ifdef NONMATCHING
+// fuzzy: 80.2%
 // fix.py best (sweep after the inlined-insn fix)
 // Full grab and fallback flow; animation and reset-field lifetimes still differ.
 #include "scene_actor_chase.h"

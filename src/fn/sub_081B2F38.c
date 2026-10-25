@@ -4,6 +4,7 @@
 #include "scene_vec.h"
 
 #ifdef NONMATCHING
+// fuzzy: 96.0%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: provisional role inferred from adjacent Vanargand part callbacks.

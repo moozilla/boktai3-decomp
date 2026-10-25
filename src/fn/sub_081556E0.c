@@ -1,6 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 81.1%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: inferred from player cue phases and animation consumers.

@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
+// fuzzy: 59.0%
 // fix.py best (sweep after the inlined-insn fix)
 // Reviewed full extent; register lifetimes and instruction scheduling still differ.
 #include "contact_actor.h"

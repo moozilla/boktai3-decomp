@@ -4,6 +4,7 @@
 #include "scene_actor_terrain.h"
 
 #ifdef NONMATCHING
+// fuzzy: 79.3%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 /* Candidate keys match the search order; vector pointer allocation still differs. */

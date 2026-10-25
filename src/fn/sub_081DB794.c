@@ -2,6 +2,7 @@
 #include "global.h"
 // confidence=low: background, labels, animations and menu selection initialization.
 #ifdef NONMATCHING
+// fuzzy: 83.6%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: sprite/resource lifetimes, text-rectangle setup, palette reload.
 struct Rect {

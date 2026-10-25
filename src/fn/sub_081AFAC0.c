@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 98.1%
 // fix.py best (sweep after the inlined-insn fix)
 // Parameter-save order and the first signed-load scratch still differ.
 // MATCHING_CONCESSION: register-pinning

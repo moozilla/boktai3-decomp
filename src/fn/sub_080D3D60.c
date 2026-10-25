@@ -2,6 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 92.9%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: control reacquires a player route once the context delay clears.

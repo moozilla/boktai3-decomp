@@ -6,6 +6,7 @@ s32 SceneMover_StepPastScreenX(void *, s32, s32);
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 #ifdef NONMATCHING
+// fuzzy: 92.1%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: time/context allocation, decoder literal scheduling, callback setup.
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.

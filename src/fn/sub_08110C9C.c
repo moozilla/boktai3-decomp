@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 89.4%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Scrolls the tilemap panel horizontally and draws the newly exposed 8px column(s).

@@ -2,6 +2,7 @@
 #include "engine.h"
 
 #ifdef NONMATCHING
+// fuzzy: 91.4%
 // fix.py best (sweep after the inlined-insn fix)
 // Structure matches; left: 'to' and the grid pointer swap r5/r6, one add operand order.
 struct Pos {

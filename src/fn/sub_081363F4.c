@@ -178,6 +178,7 @@ static inline u8 HasPendingHitSave(struct SceneActorRegistryResetView *actor, u1
 }
 
 #ifdef NONMATCHING
+// fuzzy: 28.3%
 // fix.py best (sweep after the inlined-insn fix)
 // Full reconstruction; route reset, shared hit flags, HUD argument ordering and pointer lifetimes still differ.
 inline static u32 Arg1(u32 k_, u16 *flags2D4)

@@ -1,6 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
+// fuzzy: 67.0%
 // fix.py best (sweep after the inlined-insn fix)
 // register allocation: b/frame/state get r5/r6/r4 instead of r6/r4/r5
 struct Vec081CBE30 {

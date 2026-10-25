@@ -1,6 +1,7 @@
 #include "orbit_motion.h"
 
 #ifdef NONMATCHING
+// fuzzy: 94.9%
 // fix.py best (sweep after the inlined-insn fix)
 // foundry draft (worker best 95.5%); what differs is mostly register allocation and instruction order
 #define gSineTable gUnk_086149C4

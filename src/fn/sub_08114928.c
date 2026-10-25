@@ -1,6 +1,7 @@
 #include "global.h"
 // confidence=low: profile-driven native effect motion and creation.
 #ifdef NONMATCHING
+// fuzzy: 90.6%
 // fix.py best (sweep after the inlined-insn fix)
 /* Open: the ROM masks the second group id with 0xFF (word load of the timer) where this
  * truncates, and the case-2 offset/constant temporaries swap r3/r4.

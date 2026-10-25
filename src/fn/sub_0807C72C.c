@@ -4,6 +4,7 @@
 #include "actor_attachment_manager.h"
 
 #ifdef NONMATCHING
+// fuzzy: 84.4%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 /* Remaining differences are register lifetimes and inline mask/address selection. */

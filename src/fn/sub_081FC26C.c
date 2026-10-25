@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 79.2%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: random-source lifetimes, sprite pointers and inlined sequence allocation.

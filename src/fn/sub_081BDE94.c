@@ -2,6 +2,7 @@
 #include "global.h"
 #include "scene_input_grid.h"
 #ifdef NONMATCHING
+// fuzzy: 76.8%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining: transition-array pointer induction, stack lifetimes and register allocation.
 struct SwapWidget {

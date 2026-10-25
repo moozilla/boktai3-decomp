@@ -2,6 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 86.2%
 // fix.py best (sweep after the inlined-insn fix)
 // Route-slot and flag-pointer lifetimes still differ; candidate is four bytes short.
 #include "scene_actor_chase.h"

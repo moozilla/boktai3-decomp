@@ -6,6 +6,7 @@
 
 // Remaining differences: PRE stack slots, random-loop allocation, and inline reset order.
 #ifdef NONMATCHING
+// fuzzy: 81.3%
 // fix.py best (sweep after the inlined-insn fix)
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
 {

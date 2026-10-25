@@ -2,6 +2,7 @@
 // confidence=low: switches between reaction setup and directed secondary motion.
 #define SceneActorReaction_SetMotionMode sub_08080BE0
 #ifdef NONMATCHING
+// fuzzy: 90.8%
 // fix.py best (sweep after the inlined-insn fix)
 // Flag-width, expression ordering and register allocation differences remain.
 #include "scene_actor_chase.h"

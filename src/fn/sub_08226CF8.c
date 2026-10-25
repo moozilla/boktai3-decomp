@@ -1,6 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 91.3%
 // fix.py best (sweep after the inlined-insn fix)
 // Logic matches; reload-register rotation differs in case 0 (link pointer in r1 not r0,
 // 0x02000580 loaded after the shift) and for the final mode store.

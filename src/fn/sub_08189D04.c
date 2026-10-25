@@ -1,6 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
+// fuzzy: 74.9%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining: shared strike tails, zero/address scheduling and delta register allocation.

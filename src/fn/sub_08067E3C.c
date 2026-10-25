@@ -3,6 +3,7 @@
 // confidence=low: spawns pooled particles with optional velocity ranges and position jitter.
 #define SceneParticleBurst_CreateWithRanges sub_08067E3C
 #ifdef NONMATCHING
+// fuzzy: 85.0%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining: packed velocity temporaries, loop and pointer/register lifetimes.
 extern struct SceneParticleBurstPool *gUnk_02000130;

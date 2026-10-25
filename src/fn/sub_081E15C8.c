@@ -3,6 +3,7 @@
 #include "game_state.h"
 
 #ifdef NONMATCHING
+// fuzzy: 92.2%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 struct GameStartRes {

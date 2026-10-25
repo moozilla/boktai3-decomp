@@ -1,6 +1,7 @@
 #include "rotation_phase.h"
 
 #ifdef NONMATCHING
+// fuzzy: 94.8%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining: player-vector argument order, flags pointer lifetime, rotation scratch and phase-tail scheduling.

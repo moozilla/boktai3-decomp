@@ -1,6 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 67.0%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Motion-pointer lifetimes and register allocation still differ.

@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #ifdef NONMATCHING
+// fuzzy: 84.3%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: actor allocation, collider argument scheduling, and stack spills.
 struct Frames {

@@ -1,4 +1,5 @@
 #ifdef NONMATCHING
+// fuzzy: 64.3%
 // fix.py best (sweep after the inlined-insn fix)
 // Allocation and projection/animation scheduling still differ; reviewed extent is 1112 bytes.
 #include "scene_arc.h"

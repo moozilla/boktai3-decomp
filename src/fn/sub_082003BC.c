@@ -89,6 +89,7 @@ static inline void Bits_Set(u32 m, u8 *p)
 #define CTX_SPEED(c) (*(s32 *)((c) + 8))
 
 #ifdef NONMATCHING
+// fuzzy: 80.0%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: register allocation in case 0 (speed lands in r8, the
 // Vec_Sum source pointer is computed before Div), constant reuse for s + 0x278

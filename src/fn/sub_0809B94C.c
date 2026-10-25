@@ -1,6 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 81.8%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: follows the existing Lun movement callback interpretation.

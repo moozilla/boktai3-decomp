@@ -1,6 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 86.5%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: vector and random-source lifetimes, stack addressing and register allocation.
 struct Vec {

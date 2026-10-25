@@ -2,6 +2,7 @@
 #include "player.h"
 
 #ifdef NONMATCHING
+// fuzzy: 71.7%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: shared geometry tails, trigonometric table lifetimes and field scheduling.
 // MATCHING_CONCESSION: register-pinning

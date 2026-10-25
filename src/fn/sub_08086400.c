@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 84.8%
 // fix.py best version
 // fix.py best version (reprinted C)
 // Shared animation tails, duration-pointer lifetime, and branch/register allocation still differ.

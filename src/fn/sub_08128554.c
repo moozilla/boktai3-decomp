@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 95.9%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences are loop setup, mask allocation and short-lived register copies.
 struct Vec {

@@ -1,6 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
+// fuzzy: 86.4%
 // fix.py best (sweep after the inlined-insn fix)
 struct S {
     u8 f[1];

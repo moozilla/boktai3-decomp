@@ -137,6 +137,7 @@ s32 Player_GetHorizontalVelocity(s32);
 #define H(o) (*(u16 *)(p + (o)))
 #define S(o) (*(s16 *)(p + (o)))
 #ifdef NONMATCHING
+// fuzzy: 54.1%
 // fix.py best (sweep after the inlined-insn fix)
 // confidence=low: two animated layers track the active view with a velocity state machine.
 #define SceneActors_UpdateCameraFollowingDisplay sub_081ED1A4

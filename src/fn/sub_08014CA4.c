@@ -36,6 +36,7 @@ void AnimData_SelectPaletteBank(void *, s32);
 void Sprite_Init(struct Sprite *, void *, s32);
 s32 Mod(s32, s32);
 #ifdef NONMATCHING
+// fuzzy: 89.2%
 // fix.py best (sweep after the inlined-insn fix)
 // Animation-pointer retention and array-cursor allocation still differ.
 static inline s32 Random(u16 *table, u32 *rng)

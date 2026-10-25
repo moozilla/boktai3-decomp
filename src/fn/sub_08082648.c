@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 65.3%
 // fix.py best (sweep after the inlined-insn fix)
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: contact healing updates health feedback and selects a recovery phase.

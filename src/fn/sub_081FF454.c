@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 99.4%
 // fix.py best after the inlined-insn fix
 struct HomingVec {
     s16 x, y, z, pad;

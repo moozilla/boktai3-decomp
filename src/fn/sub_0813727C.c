@@ -3,6 +3,7 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
+// fuzzy: 84.7%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 #define gPlayerSlotFlags gUnk_02000560

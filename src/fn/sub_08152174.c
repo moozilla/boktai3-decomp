@@ -2,6 +2,7 @@
 #include "contact_swarm.h"
 
 #ifdef NONMATCHING
+// fuzzy: 72.2%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: motion seven changes sprite scale and visibility over six phases.

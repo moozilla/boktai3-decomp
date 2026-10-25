@@ -3,6 +3,7 @@
 #include "game_state.h"
 
 #ifdef NONMATCHING
+// fuzzy: 79.5%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 struct TerrainPos {

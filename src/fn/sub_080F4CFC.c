@@ -1,6 +1,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 96.8%
 // fix.py best version
 // foundry draft (worker best 91.4%); what differs is mostly register allocation and instruction order
 #define gRandomIndex gUnk_03005308

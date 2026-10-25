@@ -1,6 +1,7 @@
 #include "scene_actor_reset.h"
 
 #ifdef NONMATCHING
+// fuzzy: 94.0%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: address lifetimes, register allocation, and instruction scheduling.

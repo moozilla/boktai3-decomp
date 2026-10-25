@@ -12,6 +12,7 @@ void sub_0809345C(void *, void *);
 void Bee_SubVector(void *, void *, void *);
 s32 Bee_GetMovementVariant(void *);
 #ifdef NONMATCHING
+// fuzzy: 90.6%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: segment address lifetimes and register allocation.
 static inline u8 Take(u8 *p)

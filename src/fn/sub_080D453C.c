@@ -2,6 +2,7 @@
 // confidence=low: consumes a nearby stimulus and attempts a tagged-position route.
 #define Mummy_TryStimulusRoute sub_080D453C
 #ifdef NONMATCHING
+// fuzzy: 57.0%
 // fix.py best (sweep after the inlined-insn fix)
 // Full control flow recovered; guard, helper lifetimes and flag ordering still differ.
 #include "scene_actor_chase.h"

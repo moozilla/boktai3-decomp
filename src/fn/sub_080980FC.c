@@ -2,6 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 95.5%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences: address scheduling, inlined tests and register allocation.
 #include "scene_actor_reset.h"

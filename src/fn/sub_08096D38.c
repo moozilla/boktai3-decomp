@@ -2,6 +2,7 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #ifdef NONMATCHING
+// fuzzy: 90.4%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 extern const s16 gUnk_086149C4[];

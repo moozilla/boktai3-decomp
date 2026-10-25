@@ -109,6 +109,7 @@ void ActorMarkerPool_ShowMarker(s32);
 void Character_SetLowResourceColorEffect(void *, void *);
 
 #ifdef NONMATCHING
+// fuzzy: 82.3%
 // fix.py best (sweep after the inlined-insn fix)
 // confidence=low: restores appearance and resources after defeat recovery.
 #define Glove_UpdateRecoveryFlash sub_08117F6C

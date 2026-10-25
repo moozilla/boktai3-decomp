@@ -2,6 +2,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
+// fuzzy: 81.2%
 // fix.py best (sweep after the inlined-insn fix)
 // confidence=low: timed held-action phases, animation and completion script.
 #define H(o) (*(u16 *)(p + (o)))

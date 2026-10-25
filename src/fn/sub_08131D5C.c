@@ -1,4 +1,5 @@
 #ifdef NONMATCHING
+// fuzzy: 89.5%
 // fix.py best (sweep after the inlined-insn fix)
 // Pointer spills, RNG load/store scheduling and branch layout still differ.
 // MATCHING_CONCESSION: register-pinning

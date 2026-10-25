@@ -1,5 +1,6 @@
 #include "global.h"
 #ifdef NONMATCHING
+// fuzzy: 85.9%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining: the 0xFFFFD000 tile attribute mask is copied from the literal pool through a second register in the original.
 s32 Div(s32, s32);

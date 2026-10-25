@@ -2,6 +2,7 @@
 #include "global.h"
 
 #ifdef NONMATCHING
+// fuzzy: 84.2%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: navigation probe events select turns or acceleration behaviors.

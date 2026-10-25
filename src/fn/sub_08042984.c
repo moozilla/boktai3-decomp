@@ -1,4 +1,5 @@
 #ifdef NONMATCHING
+// fuzzy: 95.3%
 // fix.py best (sweep after the inlined-insn fix)
 // Reviewed original extent: 384 bytes; candidate is 380 bytes. Initialization ordering/allocation differs.
 #include "contact_actor.h"
