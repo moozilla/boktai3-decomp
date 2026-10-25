@@ -2367,7 +2367,76 @@ void SceneActorState_PlayAnimation8ThenRecover(struct S_08024334 *p)
         p->c4++;
 }
 
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+struct S_080243CC {
+    u8 f0[0x9a];
+    u8 a9a;
+    u8 f1[0x13];
+    u8 ae;
+    u8 af;
+    u8 b0;
+    u8 f2[0x13];
+    u32 c4;
+    u8 f3[0x2bb];
+    u8 b383;
+};
+
+#ifdef NONMATCHING
+// fuzzy: 40.4%
+// scope shape 18 (differences once low registers are set aside)
+void sub_080243CC(struct S_080243CC *p)
+{
+    struct S_080243CC *p2 = p;
+    u32 z;
+    u8 t;
+    p->a9a = 1;
+    if (p->b0) {
+        p->b0 = 0;
+        p->af = 0;
+    }
+    if (p->af) {
+        t = p->b383;
+        if (t) {
+            p2->ae = 8;
+            p2->c4 = 0;
+        } else {
+            p2->ae = 7;
+            p2->c4 = t;
+        }
+        p2->b0 = 1;
+    } else {
+        p->c4++;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_080243CC);
+#endif
 
 struct S_08024440 {
     u8 f0[0x9a];
