@@ -3455,8 +3455,8 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         nonmatching = False
         print(f"{name}: the draft matches; landing it as exact C")
     kind, dest, asm_name = land.where(ROOT, name, addr)
-    if nonmatching and kind == "hidden":
-        sys.exit(f"{name}: a hidden function has no INCLUDE_ASM to fall back on; match it, or land by hand")
+    # a hidden function's split block has its own asm/nonmatching file, so its INCLUDE_ASM fallback works
+    # as a plain function's does (its replacement end stays unset: the default build keeps the assembly)
     if new_name:  # a name that cannot be applied fails before anything is written
         try:
             land.rename(ROOT, addr, name, new_name, dry=True)
@@ -3526,7 +3526,7 @@ def land_write(name, addr, kind, dest, path, text, info, nonmatching, funcs, siz
     for f in progress.c_functions(path, with_asm=False):
         a = at.get(f)
         row = land.hidden_row(ROOT, a) if a is not None else None
-        if row and not row.get("replacement_end"):
+        if row and not row.get("replacement_end") and not (nonmatching and f == name):
             land.set_replacement_end(ROOT, a, a + sizes[f], sizes[f])
     bad = []
     for f in progress.c_functions(path, with_asm=False):
@@ -3545,7 +3545,7 @@ def land_write(name, addr, kind, dest, path, text, info, nonmatching, funcs, siz
         info["fuzzy"] = float(m.group(1)) if m else info.get("fuzzy", 0.0)
     print(f"{name}: landed in {dest} ({kind}; {pins} pins, {bars} barriers in the file)"
           + (f"; NONMATCHING draft, fuzzy {info.get('fuzzy', 0.0):.1f}%" if nonmatching else "")
-          + ("; build_extra_functions.csv replacement end set" if kind == "hidden" else ""))
+          + ("; build_extra_functions.csv replacement end set" if kind == "hidden" and not nonmatching else ""))
     if new_name:
         cmd_rename(name, new_name, note)
         name = new_name
