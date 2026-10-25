@@ -2702,7 +2702,192 @@ void Actor_MoveAlongScriptedCurve(struct ActorAnimController *p)
     }
 }
 
+extern const s16 gUnk_086149C4[];
+
+/* Animation-tick step shared by the two places that advance the sequence (081E728C). */
+static inline u8 sub_081E728C_Advance(struct ActorAnimController *p, u32 direction, u32 flip)
+{
+    struct ActorAnim *anim = &p->anim;
+    struct ActorSprite *obj = &p->obj;
+    const u16 *entry;
+    u8 wrapped = 0;
+
+    Anim_SetSequence(anim, p->arg, p->state, direction, flip);
+    entry = anim->data + anim->frame;
+    obj->frame = *entry >> 6;
+    if ((anim->flags & 1) != ((*entry >> 4) & 1))
+        obj->flags |= 4;
+    else
+        obj->flags &= ~4;
+    if ((anim->flags & 2) != ((*entry >> 4) & 2))
+        obj->flags |= 8;
+    else
+        obj->flags &= ~8;
+
+    anim->timer++;
+    if (anim->timer >= anim->rate) {
+        anim->timer = 0;
+        if (anim->flags & 4) {
+            if (anim->frame != 0) {
+                anim->frame--;
+            } else {
+                if (anim->flags & 8)
+                    anim->timer = anim->rate;
+                else
+                    anim->frame = anim->count - 1;
+                wrapped = 1;
+            }
+        } else {
+            anim->frame++;
+            if (anim->frame >= anim->count) {
+                if (anim->flags & 8) {
+                    anim->timer = anim->rate;
+                    anim->frame = anim->count - 1;
+                } else {
+                    anim->frame = 0;
+                }
+                wrapped = 1;
+            }
+        }
+        entry = anim->data + anim->frame;
+        anim->factor = *entry & 15;
+        anim->rate = (anim->scale * anim->factor) >> 6;
+        if (anim->rate == 0)
+            anim->rate = 1;
+    }
+    return wrapped;
+}
+
+/* Settle path shared by the near-target branch: copies the target, optionally advances, finishes. */
+static inline void sub_081E728C_Finish(struct ActorAnimController *p)
+{
+    *(u16 *)((u8 *)p + 0xF5A) &= 0xF;
+    if (p->oldMode == 3 && p->mode == 3) {
+        p->savedFrame = p->anim.frame;
+        p->savedTimer = p->anim.timer;
+    }
+    p->flags |= 1;
+    if (p->handle) {
+        void *handle = p->handle;
+        p->handle = 0;
+        Script_Call(handle, 0);
+    }
+}
+
+#ifdef NONMATCHING
+// fuzzy: 36.6%
+// scope shape 331 (differences once low registers are set aside)
+// confidence=low: steps an actor's animation toward its target: heading, sprite playback, and motion.
+void sub_081E728C(struct ActorAnimController *p)
+{
+    s32 dx, dz, adx, adz;
+    s16 targetY;
+    u8 snap;
+
+    dx = p->targetX - p->obj.x;
+    dz = p->targetZ - p->obj.z;
+    p->heading = Math_Atan2(dx, dz);
+
+    if (take_v2(p)) {
+        s32 idx;
+        s16 v;
+
+        p->state = 0;
+        v = (s16)p->heading;
+        while (v < 0)
+            v += 256;
+        while (v > 255)
+            v -= 256;
+        idx = ((v - 16) >> 5) & 7;
+        if (idx == 4) {
+            p->direction = 0;
+        } else if (idx == 0) {
+            p->direction = 4;
+        } else if (idx <= 3) {
+            p->direction = 4 - idx;
+            p->flip = 1;
+        } else {
+            p->direction = idx - 4;
+            p->flip = 0;
+        }
+        p->unkF67[1] = (idx - 4) & 7;
+        p->unkF7C = 0;
+        ActorShadow_Enable(p->p2);
+    }
+
+    {
+        u16 old = p->count;
+        p->count = old + 1;
+        if ((old & 3) == 0) {
+            s32 sel = p->anim.frame & 3;
+            if (sel == 0 || sel == 3) {
+                p->delta = (p->obj.flags & 0x10) ? 1 : -8;
+            } else {
+                p->delta = (p->obj.flags & 0x10) ? -1 : 8;
+            }
+            p->obj.y += p->delta;
+        }
+    }
+
+    p->done = sub_081E728C_Advance(p, p->direction, p->flip);
+
+    adx = dx < 0 ? -dx : dx;
+    adz = dz < 0 ? -dz : dz;
+    if (adx + adz <= 9 && p->unkF7C != 0) {
+        p->obj.x = p->targetX;
+        p->obj.z = p->targetZ;
+        if ((s8)p->unkF67[0] >= 0) {
+            u32 m = (s8)p->unkF67[0] & 7;
+            u32 flip = 0;
+            p->unkF67[1] = p->unkF67[0];
+            if (m > 4) {
+                m = (u8)(8 - m);
+                flip = 1;
+            }
+            p->done = sub_081E728C_Advance(p, m, flip);
+        }
+        sub_081E728C_Finish(p);
+        return;
+    }
+
+    if (p->unkF7C == 0) {
+        targetY = p->targetY;
+        snap = 0;
+        if (targetY > p->obj.y) {
+            p->obj.y += 7;
+            p->savedY += 7;
+            if (targetY < p->obj.y)
+                snap = 1;
+        } else if (targetY < p->obj.y) {
+            p->obj.y -= 7;
+            p->savedY -= 7;
+            if (targetY > p->obj.y)
+                snap = 1;
+        }
+        if (snap) {
+            p->obj.y = targetY;
+            p->savedY = targetY;
+            p->unkF7C = 1;
+        }
+    }
+
+    if (dx == 0 && dz == 0)
+        return;
+    {
+        const s16 *sine = gUnk_086149C4;
+        s16 cosv = sine[((s16)p->heading + 0x40) & 0xFF];
+        s16 sinv = sine[p->heading & 0xFF];
+        p->deltaX = Div(cosv, 500);
+        *(s16 *)p->unkECC = Div(sinv, 500);
+        p->obj.x += p->deltaX;
+        p->obj.z += *(s16 *)p->unkECC;
+        p->savedX = p->obj.x;
+        p->savedZ = p->obj.z;
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_081E728C);
+#endif
 
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
@@ -4345,7 +4530,7 @@ static inline void interaction_state(struct ActorAnimController *g, u32 mode, u3
 /* Tentative name: Actor_ConfigureInteractionChildFromScript.
  * Configure the first available interaction marker from the current script. */
 #ifdef NONMATCHING
-// fuzzy: 57.1%
+// fuzzy: 57.3%
 // scope shape 125 (differences once low registers are set aside)
 void Actor_ConfigureInteractionChildFromScript(void)
 {
