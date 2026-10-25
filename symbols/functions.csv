@@ -9689,6 +9689,7 @@ addr,name,mode,confidence,source,notes
 08233418,ExplosionEffect_CreateDelayed,thumb,low,src-alias,Creates a default blast with a caller-specified activation delay
 08233488,ExplosionEffect_CreateConfigured,thumb,low,src-alias,Creates a blast with caller-specified attack flags and cooldown plus palette and delay
 082334F4,ChargedBurst_SetState,thumb,low,src-alias,Stores the state callback and resets its frame counter; charged burst identity is tentative
+082335F0,ChargedBurst_EmitSpark,thumb,low,src-alias,Activates the next of eight sparks every other call; copying the emitter position and adding three random offsets.
 08233714,TimedDisplay_AdvanceIntro,thumb,low,src-alias,
 08233760,ChargedBurst_EmitTerminalDebris,thumb,low,src-alias,
 082338EC,ChargedBurst_OnTaskUpdate,thumb,low,src-alias,Task update callback that invokes the current charged burst state handler
