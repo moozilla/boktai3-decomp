@@ -6688,6 +6688,7 @@ addr,name,mode,confidence,source,notes
 08198F24,SceneEffect_DestroyRing,thumb,low,src-alias,Destruction callback removing the ring effect collider and sprite
 08198F3C,SceneEffect_InitializeRing,thumb,low,src-alias,
 08199034,SceneEntryPool_CreateEntry,thumb,low,src-alias,
+08199094,SceneEffectQueue_UpdateEffects,thumb,low,src-alias,Consumes queued effect requests; updates one actor and four ring slots; and advances their animations.
 08199314,CallbackPool_Destroy,thumb,low,src-alias,
 08199374,SceneEffect_InitializeEmitterOptions,thumb,low,src-alias,
 08199410,SceneEffectQueue_Create,thumb,low,src-alias,Creates and initializes the singleton task managing queued effects
