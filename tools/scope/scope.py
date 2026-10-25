@@ -2940,7 +2940,49 @@ def cmd_hoist(src, func, env):
                 print(f"    ({quiet} more used once or twice: kept, or folded into the use)")
     print("  probe flips each hoist (AGBCC_NOMOVE=UID); a set the ROM keeps in the loop needs one of the"
           " 'stays' reasons in C (see probe's note).")
+    if n:
+        hoist_levers(src, func, env, passes, names, lines, n, info)
     return 0
+
+
+def hoist_levers(src, func, env, passes, names, lines, base, info):
+    """For each named variable loop.c hoisted, write the variant that stores it again (dead) just
+    before its loop's closing brace and score it: the second set in a later block makes it
+    may_not_optimize, and flow deletes the dead store (EffectManager_SpawnParticles and
+    EffectManager_SpawnParticlesAt matched this way)."""
+    text = open(os.path.join(ROOT, src)).read()
+    rows = text.split("\n")
+    tried = set()
+    for ps in passes:
+        for cands in ps.values():
+            for uid, c in cands.items():
+                name, ln = names.get(c["reg"], ""), lines.get(uid)
+                if not (c["move"] and c["move"][0] and re.fullmatch(r"[A-Za-z_]\w*", name) and ln) or name in tried:
+                    continue
+                tried.add(name)
+                m = re.search(rf"\b{name}\s*=\s*([^;=][^;]*);", rows[ln - 1])
+                head = next((i for i in range(ln - 1, -1, -1)
+                             if re.search(r"\b(for|while)\s*\(|\bdo\b", rows[i])), None)
+                if not m or head is None:
+                    continue
+                depth, close = 0, None
+                for i in range(head, len(rows)):
+                    for ch in rows[i]:
+                        depth += (ch == "{") - (ch == "}")
+                    if depth == 0 and "{" in "".join(rows[head:i + 1]) and i > head:
+                        close = i
+                        break
+                if close is None or close < ln:
+                    continue
+                indent = re.match(r"\s*", rows[close]).group(0) + "    "
+                out = rows[:close] + [f"{indent}{name} = {m.group(1).strip()}; /* dead: keeps loop.c from hoisting {name} */"] + rows[close:]
+                var = os.path.join("build/scope/work", os.path.basename(src)[:-2] + f".lever-{name}.c")
+                with open(os.path.join(ROOT, var), "w") as f:
+                    f.write("\n".join(out))
+                k, inf = score(var, func, env)
+                res = "MATCH" if k == 0 else inf.get("counts", f"{k} differ")
+                print(f"  lever: `{name} = {m.group(1).strip()};` again before line {close + 1}: {res}"
+                      f" ({'better' if k < base else 'same' if k == base else 'worse'}; {var})")
 
 
 def cmd_frame(src, func, env):
