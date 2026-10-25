@@ -83,7 +83,7 @@ u8 ScenePool_IsNearPrimaryPlayer(u8 *);
 void SpatialIndex_InsertEntry(void *);
 void ScenePool_ResetProximityContact(u8 *);
 void Character_UpdateTimedEffect(void *);
-void sub_0811BF44(u8 *);
+void ActorParticles_SpawnImpactBurst(u8 *);
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
@@ -329,7 +329,7 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
     ScenePool_ResetProximityContact(slot);
     Character_UpdateTimedEffect(actor + 0x68);
     if (!(*flags & 0x20) && (a->flags40 & 4))
-        sub_0811BF44(actor);
+        ActorParticles_SpawnImpactBurst(actor);
     FIELD(item, 0x14, struct Vec16) = FIELD(actor, 0x10, struct Vec16);
 }
 #else

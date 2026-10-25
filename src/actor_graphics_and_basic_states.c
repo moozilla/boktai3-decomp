@@ -486,7 +486,49 @@ end:
     return -1;
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_08022694);
+typedef struct ParticleOffset {
+    s16 x, y, z, pad;
+} ParticleOffset;
+extern u32 gUnk_03005308;
+extern const u16 gUnk_0203B400[];
+s32 SceneParticle_CreateParticles(const void *anchor, const ParticleOffset *offset,
+                                  const void *range, const void *jitter, s32 count, u32 priority);
+
+// confidence=low: emits four particles from the anchor at p + 0x54 around a facing-dependent
+// center, each offset by a random -64..63 in x and z.
+void sub_08022694(u8 *p)
+{
+    u8 *base = p + 0x48;
+    ParticleOffset center;
+    ParticleOffset offset;
+    s32 i;
+    if (p[0xa8] <= 1) {
+        center.x = 0x40;
+        center.y = 0xc8;
+        center.z = -0x80;
+    } else {
+        center.x = -0x80;
+        center.y = 0xc8;
+        center.z = 0x40;
+    }
+    for (i = 0; i < 4; i++) {
+        const u16 *table = gUnk_0203B400;
+        u16 index = (gUnk_03005308 + 1) & 0x3FF;
+        {
+            u16 random = table[index];
+            offset.x = ((random & 0x7F) + center.x) - 0x40;
+        }
+        offset.y = center.y;
+        index = (index + 1) & 0x3FF;
+        gUnk_03005308 = index;
+        {
+            u16 random = table[index];
+            offset.z = ((random & 0x7F) + center.z) - 0x40;
+        }
+        table = 0;
+        SceneParticle_CreateParticles(base + 0xC, &offset, table, table, 1, 1);
+    }
+}
 
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -542,7 +584,61 @@ void sub_08022790(u8 *p, s32 big)
     SparkParticle_Spawn(&pos, 5, &size, angle, count, speed, 0, 2);
 }
 
+typedef struct BurstVec {
+    s32 x : 16, y : 16, z : 16, pad : 16;
+} BurstVec;
+extern const BurstVec gUnk_08604D84[];
+extern u32 gUnk_03005308;
+extern const u16 gUnk_0203B400[];
+u16 Sqrt(u32);
+s32 Div(s32, s32);
+void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
+void TransientSpriteEffects_Spawn(int, int, void *, void *, int, int);
+
+#ifdef NONMATCHING
+// fuzzy: 30.8%
+// scope shape 95 (differences once low registers are set aside)
+// confidence=low: bursts eight particles around fixed offsets from p, each flying outward
+// from a point 0xc8 above p at speed 5.
+void sub_08022878(BurstVec *p)
+{
+    BurstVec center = *p;
+    s32 i;
+    BurstVec pos[1], vel[1];
+    center.y += 0xc8;
+    for (i = 0; i < 8; i++) {
+        const u16 *table = gUnk_0203B400;
+        u32 index;
+        u16 len;
+        u16 r;
+        index = (gUnk_03005308 + 1) & 0x3FF;
+        gUnk_03005308 = index;
+        r = table[index] & 0x1f;
+        pos->x = gUnk_08604D84[i].x + p->x - 0x10 + r;
+        index = (index + 1) & 0x3FF;
+        gUnk_03005308 = index;
+        r = table[index] & 0x1f;
+        pos->y = gUnk_08604D84[i].y + p->y - 0x10 + r;
+        index = (index + 1) & 0x3FF;
+        gUnk_03005308 = index;
+        r = table[index] & 0x1f;
+        pos->z = gUnk_08604D84[i].z + p->z - 0x10 + r;
+        AnimatedParticles_EmitBurst(pos, 1, 0, 0x40, 0xc, 0xc, 4, 4);
+        vel->x = pos->x - center.x;
+        vel->y = pos->y - center.y;
+        vel->z = pos->z - center.z;
+        len = Sqrt(vel->x * vel->x + vel->y * vel->y + vel->z * vel->z);
+        if (len) {
+            vel->x = Div(vel->x * 5, len);
+            vel->y = Div(vel->y * 5, len);
+            vel->z = Div(vel->z * 5, len);
+        }
+        TransientSpriteEffects_Spawn(2, 0, pos, vel, 0x20, 0x100);
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08022878);
+#endif
 
 // MATCHING_CONCESSION: register-pinning
 void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
@@ -585,7 +681,118 @@ void SceneActors_StopBackgroundFlash(struct StateActor *p)
     *(u32 *)((u8 *)p + 0x3c0) = 0;
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_08022B18);
+struct ReactionActor {
+    u8 pad0[0x90];
+    u32 timer;
+    u8 pad94[8];
+    u32 flags;
+    u8 padA0[2];
+    u8 reset;
+    u8 padA3;
+    u32 pending;
+    u8 facing, facing8, requested, state;
+    u8 active, actionReset, action, finished, entered, changed;
+    u8 padB2[0x12];
+    u32 actionTimer;
+    u8 padC8[0x38];
+    void (*callback)(void *);
+};
+void SceneActors_UpdateShrinkingReaction(void *);
+void SceneActors_UpdateKnockbackReaction(void *);
+void sub_08027214(void *);
+void WirelessGame_AddItem(void *, s32);
+
+static inline void reactionAction(struct ReactionActor *p, int one, int id, int zero)
+{
+    p->active = one;
+    p->actionReset = zero;
+    p->action = id;
+    p->actionTimer = zero;
+    p->entered = one;
+}
+
+static inline void reactionState(struct ReactionActor *p, void (*fn)(void *), int id)
+{
+    int zero;
+    p->state = id;
+    zero = 0;
+    p->callback = fn;
+    p->timer = zero;
+    p->changed = 1;
+    p->reset = zero;
+    p->pending = zero;
+}
+
+// confidence=low: damage handler: 0 shows the damage number and starts the shrinking reaction
+// (wireless games may award an item when hit from the front), 2 starts a knockback, 1 a death.
+s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
+{
+    u8 *actor = (u8 *)p;
+    u8 *sprite = (u8 *)p + 0x48;
+    s32 result = 1;
+    switch (kind) {
+        case 0: {
+            s32 shown = damage;
+            if (*(u32 *)((u8 *)p + 0x358) == 1 && gUnk_02000580[0x418] != 2) {
+                shown = 0;
+                result = 0;
+            }
+            if (damage > 0) {
+                struct ContactVector size;
+                size.x = 0x20;
+                size.y = 0;
+                size.z = 0x20;
+                DamageNumberDisplay_Show(actor + 0x1cc, shown, 0, sprite + 0xc, &size, 1);
+            }
+            {
+                u32 mask = 0x100000;
+                if (p->flags & mask)
+                    SceneActors_StopBackgroundFlash((struct StateActor *)actor);
+            }
+            reactionAction(p, 1, 0, 0);
+            reactionState(p, SceneActors_UpdateShrinkingReaction, 0x16);
+            if (gUnk_030053F4 & 0x1000) {
+                u8 *position = sprite + 0xc;
+                if (WirelessGame_TryAddCyclingItem(position)) {
+                    s32 d =
+                        actor[0x20e] -
+                        Math_Atan2(*(s16 *)(sprite + 0xc) - *(s16 *)((u8 *)gUnk_02000710 + 0x30),
+                                   *(s16 *)(sprite + 0x10) - *(s16 *)((u8 *)gUnk_02000710 + 0x34));
+                    if (d < 0)
+                        d = -d;
+                    if (d <= 0x20)
+                        WirelessGame_AddItem(position, 0);
+                }
+            }
+            break;
+        }
+        case 2:
+            reactionAction(p, 1, 1, 0);
+            reactionState(p, SceneActors_UpdateKnockbackReaction, 0x17);
+            {
+                u8 v = sprite[9] + 0x80;
+                ((u8 *)p)[0x342] = v;
+            }
+            break;
+        case 1: {
+            s32 zero;
+            {
+                u8 v = (*(u8 **)((u8 *)p + 0x10c))[0x2d];
+                u8 *dst = (u8 *)p + 0x342;
+                zero = 0;
+                *dst = v;
+            }
+            {
+                u32 mask = 2;
+                p->flags |= mask;
+            }
+            reactionAction(p, 1, 3, zero);
+            reactionState(p, sub_08027214, 0x19);
+            break;
+        }
+    }
+    return result;
+}
 
 void SceneActorState_StepTableByte(struct StateActor *p, const u8 *tbl)
 {
@@ -754,6 +961,7 @@ void SceneActorState_SnapReactionPosition(u8 *p, struct SnapVector *position)
 }
 
 #ifdef NONMATCHING
+// fuzzy: 71.3%
 
 // fuzzy: 81.1%
 

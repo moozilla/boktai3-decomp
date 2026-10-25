@@ -7,7 +7,7 @@ extern struct P *gUnk_02000218;
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);
-void sub_08199094(void);
+void SceneEffectQueue_UpdateEffects(void);
 void CallbackPool_Destroy(void);
 s32 SceneEffect_InitializeEmitterOptions(void *);
 struct P *SceneEffectQueue_Create(u16 a)
@@ -18,7 +18,7 @@ struct P *SceneEffectQueue_Create(u16 a)
     p = Task_Create(8, 0x46C);
     if (p != 0) {
         p->w = a;
-        Task_SetCallbacks(p, sub_08199094, CallbackPool_Destroy);
+        Task_SetCallbacks(p, SceneEffectQueue_UpdateEffects, CallbackPool_Destroy);
         if (SceneEffect_InitializeEmitterOptions(p) < 0) {
             Task_Kill(p);
             return 0;

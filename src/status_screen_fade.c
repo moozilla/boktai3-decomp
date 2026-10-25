@@ -141,7 +141,39 @@ void StatusScreen_FadeOutPalette(struct StatusScreen *p)
     p->fade += p->fadeStep;
 }
 
+extern const u16 gUnk_0203B400[];
+extern u32 gUnk_03005308;
+#ifdef NONMATCHING
+// fuzzy: 59.7%
+// scope shape 36 (differences once low registers are set aside)
+void sub_0800EF90(struct StatusScreen *p)
+{
+    s32 i, j;
+    s16 *amplitude, *delta;
+    for (i = 0; i < p->top; i++)
+        p->rows[p->active][i] = 0;
+    j = p->top;
+    for (; j < p->bottom; j++) {
+        amplitude = &p->amplitude;
+        delta = (s16 *)&p->delta;
+        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        p->rows[p->active][j] = (gUnk_0203B400[gUnk_03005308] * p->amplitude) >> 18;
+    }
+    for (i = p->bottom; i < 160; i++)
+        p->rows[p->active][i] = 0;
+    gUnk_03004278 = p->rows[p->active];
+    gUnk_03003A00 = (void *)0x0400004C;
+    gUnk_03004270 = 1;
+    gUnk_03004274 = 1;
+    *amplitude += *delta;
+    if (*amplitude < 0)
+        *amplitude = 0;
+    else if (*amplitude > 256)
+        *amplitude = 256;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0800EF90);
+#endif
 
 void StatusScreen_ClearScanlineNoise(struct StatusScreen *p)
 {

@@ -6,7 +6,7 @@
 // Keep the map address live through each final signed width load.
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-u8 sub_0812E118(u32, u32, u32, u32);
+u8 SceneActorTerrain_CanTraverseCell(u32, u32, u32, u32);
 static inline u32 CellHeight(struct ContactPosition *position, u32 cell)
 {
     u32 shape, height;
@@ -94,7 +94,7 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
                 i = 0;
                 route = &actor->routeObject;
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
                     next++;
                     i++;
@@ -106,7 +106,7 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
                 i = 0;
                 route = &actor->routeObject;
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         goto finishSouth;
                     mapSlot = &gUnk_030052F4;
                     next += *(s16 *)((*mapSlot)->cells + 4);
@@ -118,7 +118,7 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
                 i = 0;
                 route = &actor->routeObject;
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
                     next--;
                     i++;
@@ -130,7 +130,7 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
                 i = 0;
                 route = &actor->routeObject;
                 do {
-                    if (!sub_0812E118(cell, next, height, shape))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         goto finishNorth;
                     mapSlot = &gUnk_030052F4;
                     next -= *(s16 *)((*mapSlot)->cells + 4);

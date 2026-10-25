@@ -8,7 +8,7 @@ struct S {
     u8 obj[4];
 };
 s32 Armor_TryStartAction(void *, s32);
-void sub_0818EA90(void *);
+void Armor_QueueFallingParts(void *);
 void Armor_UpdateAction10Sequence(struct S *p)
 {
     u8 *q = &p->st;
@@ -23,7 +23,7 @@ void Armor_UpdateAction10Sequence(struct S *p)
         case 1:
             if (*(u8 *)((u8 *)p + 0xB40) == 0xff) {
                 {
-                    sub_0818EA90(p->obj);
+                    Armor_QueueFallingParts(p->obj);
                 }
                 {
                     u32 zero = 0;

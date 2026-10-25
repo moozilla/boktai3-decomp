@@ -1,11 +1,11 @@
 #include "global.h"
 
 void CollisionVolume_InitCollider(void *);
-void sub_08163C84(void *);
+void ParticlePool_InitParticles(void *);
 
 s32 ParticlePool_Init(void *p)
 {
     CollisionVolume_InitCollider(p);
-    sub_08163C84(p);
+    ParticlePool_InitParticles(p);
     return 0;
 }

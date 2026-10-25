@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "route_sprite_actor.h"
 void RouteSpriteActor_RunEventScript(struct RouteSpriteActor *);
-void sub_081287D4(struct ContactPosition *, u32, u32, u32, u32, u32, void *);
+void FragmentBurst_Create(struct ContactPosition *, u32, u32, u32, u32, u32, void *);
 union EmissionPosition {
     struct ContactPosition position;
     struct ContactPackedVector packed;
@@ -85,7 +85,7 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
                 position.position = low->sprite.position;
             }
             position.packed.y -= 60;
-            sub_081287D4(&position.position, (u16)actor->amount, actor->kind, actor->parameter,
+            FragmentBurst_Create(&position.position, (u16)actor->amount, actor->kind, actor->parameter,
                          actor->option, 20, actor->context);
             RouteSpriteActor_RunEventScript(actor);
         }

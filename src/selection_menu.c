@@ -268,7 +268,80 @@ void SelectionMenu_HandleHorizontalInput(struct SelectionMenu *p)
     }
 }
 
+struct PanelSprite {
+    u32 flags;
+    u8 pad4[3], priority;
+    u8 pad8[8];
+    u16 tile;
+    u8 pad12[10];
+    s16 x, y;
+};
+#ifdef NONMATCHING
+// fuzzy: 49.0%
+// scope shape 72 (differences once low registers are set aside)
+void sub_0801A218(struct SelectionMenu *m)
+{
+    u8 *p = (u8 *)m;
+    u32 zero;
+    u8 attr[8];
+    struct DisplaySequenceState a;
+    void *res;
+    struct PanelSprite *s;
+    const u16 *entry;
+    zero = 0;
+    CpuSet(&zero, attr, 0x05000002);
+    Widget_InitLinked(p + 0xD4, p + 0x4C, 0xB4, 0x10, 0, 0, 0x3C, attr);
+    Widget_InitLinked(p + 0x134, p + 0x4C, 0xB5, 0x10, 0, 0, 0x3C, attr);
+    res = ScriptProc_Start(0x922E, 0x4BBF);
+    AnimData_Load(p + 0xB8, 0x593A);
+    AnimData_SelectPaletteBank(p + 0xB8, 0x1F7);
+    s = (struct PanelSprite *)(p + 0x8C);
+    Sprite_Init(s, p + 0xB8, 0x30);
+    Anim_RestartSequence(&a, res, 6, 0, 0);
+    entry = a.commands + a.index;
+    s->tile = *entry >> 6;
+    if ((u8)(a.flags & 1) != (((*entry & 0x30) >> 4) & 1))
+        s->flags |= 4;
+    else
+        s->flags &= ~4;
+    if ((u8)(a.flags & 2) != (((*entry & 0x30) >> 4) & 2))
+        s->flags |= 8;
+    else
+        s->flags &= ~8;
+    if (++a.elapsed >= a.duration) {
+        a.elapsed = 0;
+        if (a.flags & 4) {
+            if (a.index == 0) {
+                if (a.flags & 8)
+                    a.elapsed = a.duration;
+                else
+                    a.index = a.frameCount - 1;
+            } else {
+                a.index--;
+            }
+        } else {
+            if (++a.index >= a.frameCount) {
+                if ((u8)(a.flags & 8)) {
+                    a.elapsed = a.duration;
+                    a.index = a.frameCount - 1;
+                } else {
+                    a.index = 0;
+                }
+            }
+        }
+        entry = a.commands + a.index;
+        a.frameWeight = *entry & 15;
+        a.duration = (a.frameWeight * a.speed) >> 6;
+        if (!a.duration)
+            a.duration = 1;
+    }
+    s->priority = 0;
+    s->x = 8;
+    s->y = 0x50;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0801A218);
+#endif
 
 void SelectionMenu_InitCursors(struct SelectionMenu *p)
 {

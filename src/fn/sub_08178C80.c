@@ -22,7 +22,7 @@ void PauseMenu_RefreshStatusPanel(u8 *);
 void Hud_RefreshActivePanel(u8 *);
 void Hud_OnUnpausedRefresh(void);
 void FieldHud_RefreshModeEight(void);
-void sub_08167C84(void);
+void Hud_UpdateEquipmentPrompt(void);
 void Hud_SetUpdateCallback(u8 *, void (*)(void));
 void InventoryPanel_InitCallbackGroups(u8 *);
 void SceneHud_RebuildTertiaryOptions(u8 *);
@@ -102,7 +102,7 @@ u32 SceneHud_InitFromScript(u8 *s)
         Hud_SetUpdateCallback(s, FieldHud_RefreshModeEight);
     } else {
         Hud_RefreshActivePanel(s);
-        Hud_SetUpdateCallback(s, sub_08167C84);
+        Hud_SetUpdateCallback(s, Hud_UpdateEquipmentPrompt);
     }
     InventoryPanel_InitCallbackGroups(s);
     {

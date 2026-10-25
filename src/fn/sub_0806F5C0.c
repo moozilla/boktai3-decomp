@@ -15,7 +15,7 @@ struct SceneEffectEntry {
 extern void *gUnk_0200019C;
 extern u32 gUnk_030053F0;
 struct SceneEffectEntry *SceneEffectSchedule_Allocate(void *);
-void *sub_08122B8C(struct SceneEffectEntry *, u16 name, s32 time, u8 d, u8 f, s32, s32 ax, s32 ay,
+void *SceneScheduledEffect_Create(struct SceneEffectEntry *, u16 name, s32 time, u8 d, u8 f, s32, s32 ax, s32 ay,
                    s32 az, s32 delay, u16 flagged);
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
@@ -83,5 +83,5 @@ void SceneEffectSchedule_AddFromScript(void)
     time = scaleUnlessFlagged(e->time);
     delay = scaleUnlessFlagged(e->delay);
     e->effect =
-        sub_08122B8C(e, e->name, time, e->d, e->f, -1, e->ax, e->ay, e->az, delay, e->flagged);
+        SceneScheduledEffect_Create(e, e->name, time, e->d, e->f, -1, e->ax, e->ay, e->az, delay, e->flagged);
 }

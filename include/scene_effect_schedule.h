@@ -26,6 +26,6 @@ s32 SceneEffectSchedule_Tick(struct SceneEffectSchedule *);
 void SceneEffectSchedule_Destroy(void *);
 s32 SceneEffectSchedule_Initialize(struct SceneEffectSchedule *, u32);
 struct SceneEffectSchedule *SceneEffectSchedule_Create(u32);
-struct SceneScheduledEffect *sub_08122B8C(const struct ContactPosition *, u32, s32, u32, u32, s32,
+struct SceneScheduledEffect *SceneScheduledEffect_Create(const struct ContactPosition *, u32, s32, u32, u32, s32,
                                           s32, s32, s32, s32, u32);
 #endif

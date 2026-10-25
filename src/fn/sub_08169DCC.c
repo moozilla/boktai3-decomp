@@ -21,7 +21,7 @@ extern struct OptionHud *gUnk_02000214;
 void Hud_LoadConditionalPaletteRows(void *);
 void sub_08168850(void *);
 void SceneHud_UpdateSecondaryWidgets(void *);
-void sub_08168A0C(void *);
+void SceneHud_RebuildPrimaryOptions(void *);
 void PauseMenu_RefreshEquipmentSlotIcons(void *);
 void sub_08168214(void *);
 u32 WirelessGame_IsItemToggleEnabled(void);
@@ -37,7 +37,7 @@ void SceneHud_EnterOptionControls(void)
         Hud_LoadConditionalPaletteRows(p);
         sub_08168850(p);
         SceneHud_UpdateSecondaryWidgets(p);
-        sub_08168A0C(p);
+        SceneHud_RebuildPrimaryOptions(p);
         PauseMenu_RefreshEquipmentSlotIcons(p);
         sub_08168214(p);
         p->flagA59 = 0;

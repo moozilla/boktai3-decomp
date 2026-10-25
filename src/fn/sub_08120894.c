@@ -54,7 +54,7 @@ void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
 void Terrain_ResolveActorMotion(struct Obj *);
 void Actor_UpdateShadowSpriteParts(struct Obj *, u8 *);
-void sub_0811BF44(struct Obj *);
+void ActorParticles_SpawnImpactBurst(struct Obj *);
 void CharacterModel_UpdateAccessoryAnimations(u8 *);
 void Trigger_ConsumePending(void *, s32);
 void ActorPhysics_UpdateFallMotion(void);
@@ -131,7 +131,7 @@ void SceneActor_UpdateKnockbackFall(struct Obj *p)
     p->unk8AC = h;
     Actor_UpdateShadowSpriteParts(self, p->model);
     if (self->hit & 4)
-        sub_0811BF44(self);
+        ActorParticles_SpawnImpactBurst(self);
     if (self->hit & 2)
         *pz = 0;
     if (self->hit & 1)

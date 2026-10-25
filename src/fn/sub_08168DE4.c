@@ -7,7 +7,7 @@ void PauseMenu_ApplySelectedVariant(u8 *);
 void SceneHud_RefreshWidgetVisibility(u8 *);
 void Sound_RestartPlayer29And30Songs(void);
 void Hud_SetUpdateCallback(u8 *, void *);
-void sub_08167C84(void);
+void Hud_UpdateEquipmentPrompt(void);
 static inline void andm(u32 *a, u32 m)
 {
     *a &= m;
@@ -22,5 +22,5 @@ void PauseMenu_FinishEquipmentSelection(u8 *p)
     SceneHud_RefreshWidgetVisibility(p);
     Sound_RestartPlayer29And30Songs();
     andm(&gUnk_0300523C, ~4);
-    Hud_SetUpdateCallback(p, sub_08167C84);
+    Hud_SetUpdateCallback(p, Hud_UpdateEquipmentPrompt);
 }

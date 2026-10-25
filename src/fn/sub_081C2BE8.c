@@ -1,9 +1,9 @@
 #include "global.h"
 
-void sub_081C2838(u8 *);
+void SparkleEmitter_UpdateParticles(u8 *);
 
 void SparkleEmitter_UpdateDraining(u8 *p)
 {
-    sub_081C2838(p);
+    SparkleEmitter_UpdateParticles(p);
     *(u32 *)(p + 0x770) += 1;
 }

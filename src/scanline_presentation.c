@@ -151,7 +151,138 @@ int ScanlinePresentation_Destroy(struct ScanlinePresentation *p)
     return 0;
 }
 
+extern u16 gUnk_03004FC0[];
+extern u16 gUnk_03005214, gUnk_030051C4, gUnk_030051DC, gUnk_03005210;
+extern u8 gUnk_03004C30[];
+void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
+s32 ResourceHeader_Relocate(void *, void *);
+u32 Script_GetTextSourcePc(void);
+s32 Mod(s32, s32);
+s32 MessageWindow_SetMessageTable(u32);
+s32 MessageWindow_SetBounds(s32, s32, s32, s32);
+s32 MessageWindow_SetDisplayMode(s32);
+s32 MessageWindow_ShowMessage(s32);
+void MessageWindow_SetPalette(u32);
+s32 MessageWindow_GetRemainingTextWidth(void);
+void Mosaic_SetParameters(s32, s32, s32);
+
+struct WidgetAttr {
+    u32 a;
+    u16 b, c;
+};
+
+#ifdef NONMATCHING
+// fuzzy: 77.6%
+// scope shape 89 (differences once low registers are set aside)
+s32 sub_0800DC90(struct ScanlinePresentation *p)
+{
+    struct WidgetAttr attr;
+    s32 digits[2];
+    s32 message, shown, number, *d;
+    struct ScanlineLayer *layer;
+    s32 i;
+    u32 handle;
+    s32 x;
+    void *res;
+    s16 *mode;
+
+    gUnk_03004FC0[0] = 0x1084;
+    attr.b = 0;
+    attr.a = 0;
+    p->fade = 0;
+    p->phase = 0;
+    p->state = 0;
+    p->cancellable = Script_GetKeywordValue(0x43, 0);
+    p->mode = Script_GetKeywordValue(0x6E, 0);
+    if (p->mode == 0)
+        p->delay = 0x40;
+    else
+        p->delay = 0;
+    p->duration = 0x40;
+    p->hold = Script_GetKeywordValue(0x64, 0x80);
+    message = Script_GetKeywordValue(0x69, 0);
+    shown = Script_GetKeywordValue(0x63, 0);
+    number = Script_GetKeywordValue(0x73, -1);
+    p->script = Script_GetKeywordValue(0x65, 0);
+    p->digitsA = Script_GetKeywordValue(0x6F, -1);
+    p->digitsB = Script_GetKeywordValue(0x74, -1);
+    p->banner = Script_GetKeywordValue(0x6C, 0);
+    handle = Script_SeekToKeyword(0x72);
+    if (handle)
+        handle = Script_GetTextSourcePc();
+    p->handle = handle;
+    x = Script_SeekToKeyword(0x79);
+    if (x) {
+        p->start = Script_GetValue();
+        p->end = Script_GetValue();
+    } else {
+        p->start = x;
+        p->end = x;
+    }
+    res = ScriptProc_Start(0xCB05, 0xE89F);
+    if (res == 0)
+        return -1;
+    p->header = *(struct ScanlineResourceHeader *)res;
+    ResourceHeader_Relocate(&p->header, res);
+    if (number >= 0)
+        Widget_InitLinked(&p->layers[0], &p->header, (u16)(number + 0x17), 0x870, 0, 0, 0x3C,
+                          &attr);
+    else
+        Widget_InitLinked(&p->layers[0], &p->header, 0x17, 0x871, 0, 0, 0x3C, &attr);
+    Widget_InitLinked(&p->layers[1], &p->header, 0x16, 0x871, 0, 0, 0x3C, &attr);
+    if (shown)
+        p->layers[1].flags &= ~1;
+    Widget_InitLinked(&p->layers[3], &p->header, p->banner ? 0x26 : 1, 0x871, 0, 0, 0x3C, &attr);
+    if (p->digitsA >= 0) {
+        p->layers[3].flags &= ~1;
+        digits[0] = Mod(p->digitsA, 10);
+        digits[1] = Div(p->digitsA, 10);
+        digits[0] += 2;
+        digits[1] += 12;
+    } else {
+        if (p->banner)
+            p->layers[3].flags &= ~1;
+        digits[0] = 2;
+        digits[1] = 12;
+    }
+    mode = &p->mode;
+    d = digits;
+    layer = &p->layers[4];
+    for (i = 1; i >= 0; i--) {
+        Widget_InitLinked(layer, &p->header, (u16)*d, 0x871, 0, 0, 0x3C, &attr);
+        if (p->digitsA >= 0)
+            layer->flags &= ~1;
+        d++;
+        layer++;
+    }
+    Widget_InitLinked(&p->layers[2], &p->header, (u16)(p->digitsB < 0 ? 0 : p->digitsB), 0x871, 0,
+                      0, 0x3C, &attr);
+    if (p->digitsB >= 0)
+        p->layers[2].flags &= ~1;
+    if (p->handle) {
+        MessageWindow_SetDisplayMode(1);
+        MessageWindow_SetPalette(0x539C);
+        MessageWindow_SetMessageTable(p->handle);
+        MessageWindow_ShowMessage(message);
+        MessageWindow_SetBounds(0, 7, 0x1A, 2);
+        *(u16 *)(gUnk_03004C30 + 0x20) = MessageWindow_GetRemainingTextWidth() * 4 - 0x78;
+        Mosaic_SetParameters(0, 0, 0x11);
+    } else {
+        Mosaic_SetParameters(0, 0, 0x10);
+    }
+    if (*mode == 0) {
+        gUnk_03004DA0 = 0;
+        gUnk_03005214 = 0x1084;
+        gUnk_030051C4 = 0xFFFF;
+        gUnk_030051D4 = 0;
+        gUnk_030051DC = 0x1084;
+        gUnk_03005210 = 0;
+    }
+    return 0;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_0800DC90);
+#endif
 
 void *ScanlinePresentation_Create(void)
 {

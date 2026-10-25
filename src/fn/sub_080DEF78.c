@@ -7,7 +7,7 @@ static inline s32 Direction(s32 x)
 {
     return x >= 0 ? x >> 6 : -(-x >> 6);
 }
-u8 sub_0812E118(s32, s32, s32, s32);
+u8 SceneActorTerrain_CanTraverseCell(s32, s32, s32, s32);
 // Branch layout, pointer lifetimes and register allocation still differ.
 // confidence=low: searches along the facing direction and starts a reachable route.
 #define Dog_TryFacingRoute sub_080DEF78
@@ -36,7 +36,7 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
                 next = cell + 1;
                 count = 0;
                 do {
-                    if (!sub_0812E118(cell, next, height, kind))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, kind))
                         break;
                     next++;
                 } while ((++count) < 1);
@@ -47,7 +47,7 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
                 next = cell + (*((s16 *)(gUnk_030052F4->cells + 4)));
                 count = 0;
                 do {
-                    if (!sub_0812E118(cell, next, height, kind))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, kind))
                         break;
                     next += *((s16 *)(gUnk_030052F4->cells + 4));
                 } while ((++count) < 1);
@@ -58,7 +58,7 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
                 next = cell - 1;
                 count = 0;
                 do {
-                    if (!sub_0812E118(cell, next, height, kind))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, kind))
                         break;
                     next--;
                 } while ((++count) < 1);
@@ -69,7 +69,7 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
                 next = cell - (*((s16 *)(gUnk_030052F4->cells + 4)));
                 count = 0;
                 do {
-                    if (!sub_0812E118(cell, next, height, kind))
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, kind))
                         break;
                     next -= *((s16 *)(gUnk_030052F4->cells + 4));
                 } while ((++count) < 1);

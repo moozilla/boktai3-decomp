@@ -24,7 +24,7 @@ u32 MenuInput_ReadDirectionRepeat(void *);
 void Presentation_UpdateListCursor(void *);
 void Sound_PlaySong(u32);
 void Presentation_DrawEntryCount(void *);
-void sub_08174D20(void *);
+void InventoryGrid_LayoutStatMarkers(void *);
 void PauseMenu_SetConfirmationIndicator(void *, u32);
 void MenuDisplay_SetPaletteOverrides(void *, u32, u32, u32, u32);
 void MenuSelection_ProcessConfirmation(void);
@@ -131,7 +131,7 @@ void Presentation_UpdateAllocationSelection(u8 *p)
         (*remaining)--;
     changed:
         Presentation_DrawEntryCount(p);
-        sub_08174D20(p);
+        InventoryGrid_LayoutStatMarkers(p);
         Sound_PlaySong(0x19a);
     } else {
         if ((gUnk_03005260[1] & 1) && p[0xa58]) {
@@ -144,7 +144,7 @@ void Presentation_UpdateAllocationSelection(u8 *p)
             Sound_PlaySong(0xde);
             Presentation_InitListValues(p);
             Presentation_DrawEntryCount(p);
-            sub_08174D20(p);
+            InventoryGrid_LayoutStatMarkers(p);
         }
     }
     do {

@@ -22,7 +22,7 @@ extern const struct NidhoggrEffectPair gUnk_0824F2D4, gUnk_0824F2CC;
 extern struct NidhoggrEffectPair gUnk_0824F2DC;
 struct NidhoggrFallingEffect *SceneEffectPool_AllocateSlot(void *);
 void SceneEffect_ResetState(void *);
-void sub_08190798(void *);
+void Nidhoggr_UpdateOwnedSeekingEffect(void *);
 void Nidhoggr_DestroyShadowedEffect(void *);
 void Nidhoggr_OnEffectCollision(void *);
 void ScenePanelEffect_OnContact(void *);
@@ -63,7 +63,7 @@ void Nidhoggr_CreateOwnedSeekingEffect(u8 *owner, struct NidhoggrEffectVector *a
         return;
     SceneEffect_ResetState(effect);
     {
-        void (*update)(void *) = sub_08190798;
+        void (*update)(void *) = Nidhoggr_UpdateOwnedSeekingEffect;
         void (*destroy)(void *) = Nidhoggr_DestroyShadowedEffect;
         effect->update = update;
         effect->destroy = destroy;

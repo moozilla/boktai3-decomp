@@ -982,7 +982,85 @@ void Player_DestroyEffects(struct Player *p)
 
 #define Player_GetEffectIntensity sub_0813E0F0
 
-INCLUDE_ASM("asm/nonmatching", sub_0813DF5C);
+/* Tentative names for the per-channel effect reset state. */
+struct PlayerEffectResetState {
+    u8 unk_00[0xAF2];
+    u16 duration;
+    u8 modes[4];
+    u8 counters[4];
+    u16 limits[4];
+};
+/* The position copy includes the fourth halfword of the stored vector. */
+struct PlayerEffectPositionWords {
+    u32 first, second;
+};
+void sub_08232264(void *, void *, s32, s32, s32);
+void Shadow_Initialize(void *, void *, s32);
+void *SceneParticlePool_EnsureSingleton(void);
+void Player_InitTimedEffect(void *);
+void Player_InitDirectionalEffectPair(void *);
+void Player_InitOrbitingEffect(void *);
+void ConvergingEffects_InitSprites(void *);
+void DirectionalSpriteEffect_InitSprite(void *);
+extern u16 gUnk_02000550, gUnk_0200053C, gUnk_0200052C;
+extern u16 gUnk_02000558, gUnk_02000590;
+
+static inline u8 PlayerEffects_IsSceneModeFive(struct Player *p)
+{
+    u16 active = p->active;
+    u8 result = 0;
+    if (active && p->sceneMode == 5)
+        result = 1;
+    return result;
+}
+
+void Player_InitEffects(struct Player *p)
+{
+    struct PlayerEffectPositionWords *position;
+    if (p->unk419 == 1)
+        sub_08232264(&p->effectGroup, &p->colliderPosition, 0, 0, 1);
+    else
+        sub_08232264(&p->effectGroup, &p->previousPosition, 0, 0, 1);
+    position = (void *)&p->previousPosition;
+    *(struct PlayerEffectPositionWords *)p->effectPosition = *position;
+    p->resetValue6F8 = 0;
+    p->resetValue6FA = 0;
+    p->resetValue6FC = 0;
+    Shadow_Initialize(p->shadow, p->effectPosition, 0);
+    SceneParticlePool_EnsureSingleton();
+    if (p && PlayerEffects_IsSceneModeFive(p)) {
+        ((struct PlayerEffectResetState *)p)->duration = 64;
+        p->unk4E1[0] = 1;
+    }
+    Player_InitVisualState(p);
+    Player_InitTimedEffect(p);
+    Player_InitDirectionalEffectPair(p);
+    Player_InitOrbitingEffect(p);
+    ConvergingEffects_InitSprites(p);
+    DirectionalSpriteEffect_InitSprite(p);
+    ((struct PlayerEffectResetState *)p)->modes[0] = 4;
+    ((struct PlayerEffectResetState *)p)->modes[1] = 4;
+    ((struct PlayerEffectResetState *)p)->modes[2] = 4;
+    ((struct PlayerEffectResetState *)p)->modes[3] = 4;
+    ((struct PlayerEffectResetState *)p)->counters[0] = 0;
+    ((struct PlayerEffectResetState *)p)->counters[1] = 0;
+    ((struct PlayerEffectResetState *)p)->counters[2] = 0;
+    ((struct PlayerEffectResetState *)p)->counters[3] = 0;
+    ((struct PlayerEffectResetState *)p)->limits[0] = 4;
+    ((struct PlayerEffectResetState *)p)->limits[1] = 4;
+    ((struct PlayerEffectResetState *)p)->limits[2] = 4;
+    ((struct PlayerEffectResetState *)p)->limits[3] = 4;
+    p->unkAF0 = 0;
+    p->movementRequestTarget.x = 0;
+    p->movementRequestTarget.y = 0;
+    p->movementRequestTarget.z = 0;
+    gUnk_02000550 = 0;
+    gUnk_0200053C = 0;
+    gUnk_0200052C = 1;
+    gUnk_02000558 = 1;
+    gUnk_02000590 = 0;
+    p->movementAnimationState = 255;
+}
 
 s16 sub_0813E0F0(void)
 {

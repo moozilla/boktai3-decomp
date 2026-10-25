@@ -3,7 +3,7 @@
 #include "scene_actor_control_phase.h"
 #define F(p, o, T) (*(T *)((u8 *)(p) + (o)))
 void Sound_PlaySong(u32);
-void sub_081218C0(void *, void *, u32, u32, u32);
+void SceneColliderEffect_SpawnAimedSprite(void *, void *, u32, u32, u32);
 void sub_080A4798(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
 static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k)
@@ -56,7 +56,7 @@ void Spider_UpdateContactWindup(struct SceneActorRegistryResetView *a, s32 n)
         Sound_PlaySong(0x114);
         v = F(c, 0x624, void *);
         if (v)
-            sub_081218C0(transform, v, a->fieldB6, a->fieldBE, a->fieldC6);
+            SceneColliderEffect_SpawnAimedSprite(transform, v, a->fieldB6, a->fieldBE, a->fieldC6);
     }
     {
         u32 q = 0x2B3;

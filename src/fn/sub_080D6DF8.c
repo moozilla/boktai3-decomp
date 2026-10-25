@@ -1,7 +1,7 @@
 #include "global.h"
-/* SceneActorPath_FaceAndCheckStraightPath: faces the actor toward its target and checks that the grid cells along the row/column from its cell to the goal cell are passable (sub_0812E118); restores the facing on failure (provisional) */
+/* SceneActorPath_FaceAndCheckStraightPath: faces the actor toward its target and checks that the grid cells along the row/column from its cell to the goal cell are passable (SceneActorTerrain_CanTraverseCell); restores the facing on failure (provisional) */
 #include "scene_actor_terrain.h"
-u8 sub_0812E118(s32, s32, s32, u32);
+u8 SceneActorTerrain_CanTraverseCell(s32, s32, s32, u32);
 s32 Math_Atan2(s32, s32);
 
 struct Unk080D6DF8Goal {
@@ -42,23 +42,23 @@ static inline u8 CanReach(s32 cell, s32 goal, s32 y, u32 kind, s32 total)
     s32 i, col;
     if (cell < goal) {
         i = cell + 1;
-        for (col = Mod(i, GridWidth()); col < GridWidth() && sub_0812E118(cell, i, y, kind);
+        for (col = Mod(i, GridWidth()); col < GridWidth() && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
              i++, col++) {
             if (i == goal)
                 return 1;
         }
-        for (i = cell + GridWidth(); total > i && sub_0812E118(cell, i, y, kind);
+        for (i = cell + GridWidth(); total > i && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
              i += GridWidth()) {
             if (i == goal)
                 return 1;
         }
     } else {
         i = cell - 1;
-        for (col = Mod(i, GridWidth()); col >= 0 && sub_0812E118(cell, i, y, kind); i--, col--) {
+        for (col = Mod(i, GridWidth()); col >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i--, col--) {
             if (i == goal)
                 return 1;
         }
-        for (i = cell - GridWidth(); i >= 0 && sub_0812E118(cell, i, y, kind); i -= GridWidth()) {
+        for (i = cell - GridWidth(); i >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i -= GridWidth()) {
             if (i == goal)
                 return 1;
         }

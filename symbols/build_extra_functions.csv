@@ -23,8 +23,10 @@ address,isa,evidence,replacement_end
 08014C28,thumb,ParticleManager clear: removes every live effect in the six particle groups and clears their flags; raw 08014C28-08014CA4 span,08014C98
 08014C98,thumb,Clears the gUnk_02000064 pointer; leaf at the end of the raw 08014C28-08014CA4 span,08014CA4
 08015154,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08015160
+08015A0C,thumb,Registered for the build by land (sub_08015A0C counted for progress only),
 08015B1C,thumb,Independent exact 104-byte fan emission wrapper inside retained byte tail,08015B84
 08015C90,thumb,Independent exact 96-byte angled burst wrapper inside retained byte tail,08015CF0
+08015F54,thumb,Registered for the build by land (sub_08015F54 counted for progress only); exact 12-byte C body,08015F60
 080164AC,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080164B8
 08017264,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08017270
 08017428,thumb,Weather manager presence check: TRUE when gUnk_02000090 is set; raw span after the scanline wave allocator,08017444
@@ -271,9 +273,9 @@ address,isa,evidence,replacement_end
 0811E514,thumb,ScriptRecord table: count word 0x13C or 0 when absent; raw span before ScriptRecord_FindAttributeModifier,0811E534
 0811E5B0,thumb,ScriptRecord table: count word 0x1A8 or 0 when absent; raw span before ScriptRecord_FindByteModifier,0811E5D0
 0811E644,thumb,Modifier table task: count word 0x1FC or 0 when absent; raw span before Modifier_ScaleDefaultStat,0811E660
-0811FEE0,thumb,Hidden tail after ActorCollision_InitBounds,
-08121044,thumb,Independent push-lr function after sub_08120FF4's literal pool (raw .byte tail),
-08121094,thumb,Independent push-lr function after 08121044's literal pool (raw .byte tail),
+0811FEE0,thumb,Hidden tail after ActorCollision_InitBounds; exact 488-byte C body,081200C8
+08121044,thumb,Independent push-lr function after sub_08120FF4's literal pool (raw .byte tail); exact 80-byte C body,08121094
+08121094,thumb,Independent push-lr function after 08121044's literal pool (raw .byte tail); exact 48-byte C body,081210C4
 0812125C,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08121268
 08121454,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08121458
 08121B98,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08121B9C
@@ -285,7 +287,7 @@ address,isa,evidence,replacement_end
 08122DF0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08122DF4
 08125498,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812549C
 08125524,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08125528
-08125928,thumb,Hidden tail after PairSlotPool_Allocate,
+08125928,thumb,Hidden tail after PairSlotPool_Allocate; exact 364-byte C body,08125A94
 08125B64,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08125B68
 08126140,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08126144
 08126650,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0812665C
@@ -297,9 +299,11 @@ address,isa,evidence,replacement_end
 08128B48,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08128B4C
 081298F0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081298F4
 0812A7B4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812A7B8
-0812B350,thumb,Hidden tail after FragmentProjectilePool_ResetSingleton,
+0812B350,thumb,Hidden tail after FragmentProjectilePool_ResetSingleton; exact 88-byte C body,0812B3A8
 0812B918,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812B91C
-0812C124,thumb,Hidden tail after SlashEffect_ResetManagerReference,
+0812C124,thumb,Hidden tail after SlashEffect_ResetManagerReference; exact 52-byte C body,0812C158
+0812C158,thumb,Hidden function in sub_0812C124's block (registered by land from the draft); exact 64-byte C body,0812C198
+0812C198,thumb,Hidden function in sub_0812C124's block (registered by land from the draft); exact 376-byte C body,0812C310
 0812C4E4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812C4E8
 0812CE30,thumb,Hidden tail function,0812CE64
 0812CE64,thumb,Hidden tail function,0812CE90
@@ -311,7 +315,7 @@ address,isa,evidence,replacement_end
 0812DEB0,thumb,Heading/velocity toward a target with an XZ range test; raw span before Math_GetVectorLength,0812DF40
 0812DF94,thumb,Actor anchor clamp then Nav/terrain test that clears flag 0x200 or velocity; raw span,0812E058
 0812E094,thumb,Independent 132-byte command-selection routine with full high-register save prologue and restore after 0812E084 leaf return; removes132 false old retained-tail C bytes,0812E118
-0812E46C,thumb,Hidden tail after InventorySlot_PickRandom,
+0812E46C,thumb,Hidden tail after InventorySlot_PickRandom; exact 312-byte C body,0812E5A4
 0812EED0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812EED4
 0812F5C4,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812F5C8
 0812F5C8,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,0812F5CC
@@ -393,8 +397,8 @@ address,isa,evidence,replacement_end
 0815F578,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,0815F588
 0815F588,thumb,Player byte getter (offset 0x3A4); first of four functions in the reviewed 0815F588-0815F6A8 span,0815F5A0
 0815F5A0,thumb,Player byte getter (offset 0x2D); second function of the reviewed 0815F588-0815F6A8 span,0815F5B4
-0815F5B4,thumb,Target registry lookup by id (loop never advances); third function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched),
-0815F5F8,thumb,Full high-register-save function; fourth function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched),
+0815F5B4,thumb,Target registry lookup by id (loop never advances); third function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched); exact 68-byte C body,0815F5F8
+0815F5F8,thumb,Full high-register-save function; fourth function of the reviewed 0815F588-0815F6A8 span; retained assembly (not yet matched); exact 176-byte C body,0815F6A8
 081656E0,thumb,Hidden raw-tail function: HUD header label and counter clamp by mode,081657F0
 0816A578,thumb,Hidden menu prompt setup: background layer then ramp display,0816A5A8
 0816A770,thumb,Hidden menu prompt setup: hide sprites then pulse display,0816A7D8
@@ -415,7 +419,7 @@ address,isa,evidence,replacement_end
 081792F8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081792FC
 081792FC,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08179300
 0817A238,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0817A23C
-0817A354,thumb,Hidden first position inside box search (retained),
+0817A354,thumb,Hidden first position inside box search; exact 112-byte C body,0817A3C4
 0817A918,thumb,Hidden tail after SceneVolume_TestPlayerPosition (random reachable corner around player 0); exact C,0817AA14
 0817AAB8,thumb,Hidden predicate: field 0x94 not positive,0817AAD0
 0817C19C,thumb,Hidden clear of flags 0xB0/0xAF,0817C1B8
