@@ -74,7 +74,7 @@ def set_replacement_end(root, addr, end, size):
     for r in rows[1:]:
         if r and int(r[0], 16) == addr:
             if not re.search(r"exact \d+-byte C body", r[2]):
-                r[2] = re.sub(r";?\s*retained assembly\.?$", "", r[2]).rstrip() + f"; exact {size}-byte C body"
+                r[2] = re.sub(r";?\s*retained assembly\.?$|\s*\(retained\)", "", r[2]).rstrip() + f"; exact {size}-byte C body"
             r[3] = f"{end:08X}"
     out = io.StringIO()
     csv.writer(out, lineterminator="\n").writerows(rows)

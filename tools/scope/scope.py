@@ -184,8 +184,9 @@ def elf_syms():
 
 
 def inventory():
-    csv = os.path.join(ROOT, "symbols", "functions.csv")
-    by_label, addr, sizes = cached("inventory", [csv, os.path.join(ROOT, "build", "boktai3.elf")],
+    # progress_functions.csv holds the starts (a newly registered hidden function shortens its neighbor)
+    deps = [os.path.join(ROOT, "symbols", f) for f in ("functions.csv", "progress_functions.csv")]
+    by_label, addr, sizes = cached("inventory", deps + [os.path.join(ROOT, "build", "boktai3.elf")],
                                    lambda: tuple(check.inventory()))
     return by_label, addr, sizes
 
@@ -421,6 +422,7 @@ def rom_data_ranges(func, addr):
     if not os.path.exists(path):
         return None
     data, cur = [], addr
+    blobs = []  # (start, end) of .incbin runs: raw bytes the pool scan must classify
     for ln in open(path):
         s = ln.split("@")[0].strip()
         m = re.match(r"(\w+):\s*(.*)", s)
@@ -443,11 +445,16 @@ def rom_data_ranges(func, addr):
             if pad:
                 data.append((cur - addr, cur - addr + pad))
             cur += pad
+        elif s.startswith(".incbin"):
+            m = re.search(r",\s*(0x[0-9A-Fa-f]+|\d+)\s*,\s*(0x[0-9A-Fa-f]+|\d+)", s)
+            if m:
+                n = int(m.group(2), 0)
+                blobs.append((cur - addr, cur - addr + n)); cur += n
         elif s.startswith("."):
             continue
         else:
             cur += 4 if re.match(r"bl\b", s) else 2
-    return data
+    return data, blobs
 
 
 def rom_pool_ranges(code, addr, arm=False):
@@ -475,10 +482,13 @@ def rom_pool_ranges(code, addr, arm=False):
 def rom_data(func, addr, code, arm=False):
     """The ROM function's data ranges: its generated assembly's, or (a function the disassembler
     left as .incbin has no labels at all) the literal pools its pc-relative loads reach."""
-    labeled = rom_data_ranges(func, addr)
-    if labeled:  # the disassembler's data labels are exact; the pool scan is for .incbin functions
-        return sorted(labeled)
-    return rom_pool_ranges(code, addr, arm)
+    found = rom_data_ranges(func, addr)
+    if not found or not (found[0] or found[1]):
+        return rom_pool_ranges(code, addr, arm)
+    labeled, blobs = found
+    # the disassembler's data labels are exact; bytes it left as .incbin get the pool scan
+    pools = [r for r in rom_pool_ranges(code, addr, arm) if any(a <= r[0] < b for a, b in blobs)]
+    return sorted(set(labeled) | set(pools))
 
 
 def is_arm(name, addr, index=None):
@@ -509,6 +519,8 @@ def decode(code, addr, data, arm=False):
             n = min(4, d[1] - i, 4 - (addr + i) % 4 if (addr + i) % 4 else 4)
             v = int.from_bytes(code[i:i + n], "little")
             text = f".word 0x{v:08X}" if n == 4 else f".{n}byte 0x{v:0{n * 2}X}"
+            if n == 2 and v == 0 and not arm:
+                text = "movs r0, r0"  # pool alignment: the other side may decode it as code
             tgt = (v & ~1) - addr if n == 4 and lo <= (v & ~1) < hi else None
             rows.append((i, n, text, ".word ->" if tgt is not None else text, tgt))
             i += n
@@ -699,6 +711,16 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
              + ("" if only_targets else ": they follow from the others") + ")" if nb else "")
           + f"; shape {shape_distance(rom, dr)} (register-blind distance, what try ranks by)"
           + f"; {shifted} offset-only shifts hidden.  full listing: {rel}/diff.txt (json: diff.json)")
+    tail = []
+    for x, y, t in reversed(pairs):
+        if y is not None or x is None:
+            break
+        tail.insert(0, rom[x])
+    if tail and (tail[0][2] == "bx lr" or re.match(r"push \{.*lr\}", tail[0][2])):
+        # gbadisasm folded a following function into this one (often after a literal pool)
+        at = addr + tail[0][0]
+        print(f"ROM goes on past the draft's end with what starts a function at {at:08X} ({tail[0][2]}).  If it is"
+              f" one, register it and rescore: python3 tools/hidden_tails.py split '{at:08X},,DESCRIPTION'")
     if only_targets:
         # Same instructions, same size: a label sits before a different instruction. Name both targets.
         at_r = {o: i for i, (o, *_) in enumerate(rom)}
@@ -2830,6 +2852,38 @@ def work_paths(name):
     return os.path.join(d, name + ".c"), os.path.join(d, name + ".base.c")
 
 
+def refresh_workspace(draft):
+    """A unit workspace draft whose unit changed since `new` (a neighbour landed): three-way merge the
+    unit's changes into the draft and move the base forward, so the draft compiles against today's unit."""
+    import land
+    if not draft.startswith(os.path.join("build", "scope", "work") + os.sep) or not draft.endswith(".c"):
+        return
+    name = os.path.basename(draft)[:-2]
+    path, base = work_paths(name)
+    if not (os.path.exists(path) and os.path.exists(base)):
+        return
+    import progress
+    addr = dict(progress.load_functions()[0]).get(name)
+    if addr is None:
+        return
+    kind, unit, _ = land.where(ROOT, name, addr)
+    if kind != "unit":
+        return
+    if not unit or not unit.endswith(".c") or not os.path.exists(os.path.join(ROOT, unit)):
+        return
+    cur, old = open(os.path.join(ROOT, unit)).read(), open(base).read()
+    if cur == old:
+        return
+    merged = land.merge(cur, old, open(path).read())
+    if merged is None:
+        print(f"{name}: {unit} changed since the workspace was made and the merge conflicts;"
+              f" resolve by hand (base: {os.path.relpath(base, ROOT)})")
+        return
+    open(path, "w").write(merged)
+    open(base, "w").write(cur)
+    print(f"{name}: {unit} changed since the workspace was made; merged its changes into the draft")
+
+
 def ghidra_c(addr):
     """Ghidra's pseudo-C for ADDR from the export at gen/ghidra/decomp.c (tools/ghidra/README.md), or None."""
     path = os.path.join(ROOT, "gen", "ghidra", "decomp.c")
@@ -3093,6 +3147,7 @@ def cmd_new(target):
     kind, dest, asm_name = land.where(ROOT, name, addr)
     draft, base = work_paths(name)
     if os.path.exists(draft):
+        refresh_workspace(os.path.relpath(draft, ROOT))
         print(f"{name}: {os.path.relpath(draft, ROOT)} exists; continuing it (delete it to start over)")
         return 0
     os.makedirs(os.path.dirname(draft), exist_ok=True)
@@ -3185,8 +3240,14 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
     open(path, "w").write(text)
     fmt = os.path.join(ROOT, "build", "venv", "bin", "clang-format")
     subprocess.run([fmt if os.path.exists(fmt) else "clang-format", "-i", path], cwd=ROOT)
-    if kind == "hidden":
-        land.set_replacement_end(ROOT, addr, addr + sizes[name], sizes[name])
+    # every hidden function the landed file now defines gets its reviewed end (one landed into a unit
+    # too, and a hidden neighbor the draft wrote alongside it)
+    at = dict(funcs)
+    for f in progress.c_functions(path, with_asm=False):
+        a = at.get(f)
+        row = land.hidden_row(ROOT, a) if a is not None else None
+        if row and not row.get("replacement_end"):
+            land.set_replacement_end(ROOT, a, a + sizes[f], sizes[f])
     bad = []
     for f in progress.c_functions(path, with_asm=False):
         k, inf = score(dest, f, {})
@@ -3491,6 +3552,7 @@ def main():
     if not src.endswith(".c"):
         src = os.path.join("src", "fn", src + ".c")
     src = os.path.relpath(os.path.join(ROOT, src) if not os.path.isabs(src) else src, ROOT)
+    refresh_workspace(src)
     env = dict(a.split("=", 1) for a in args[1:] if "=" in a)
     rest = [a for a in args[1:] if "=" not in a]
     why_uid = None
