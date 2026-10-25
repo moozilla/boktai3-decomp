@@ -135,6 +135,8 @@ python3 tools/scope/scope.py FILE.c try V.c...     score whole-file variants (or
 python3 tools/scope/scope.py FILE.c insn UID      (also `FILE.c uses REG...`): compile FILE first, then show
 SCOPE_TRANSFORM=tools/scope/transforms/X.py scope.py FILE.c   what-if over the preprocessed source
 python3 tools/scope/scope.py FILE.c shape [FUNC]  the diff with low registers blanked: order and shape differences only
+python3 tools/scope/scope.py FILE.c frame [FUNC]  stack slots, ROM against draft, with the pseudo (C variable) reload put in each
+python3 tools/scope/scope.py FILE.c hoist [FUNC]  loop-invariant motion pass by pass: what loop.c moved out, what stayed, and why
 python3 tools/scope/scope.py todo [N] [addr|prior|size]   functions with no C yet, in ROM order (default) or by prior art/size
 python3 tools/scope/scope.py new FUNC             open FUNC: build/scope/work/FUNC.c (its unit with a stub, or a like twin's C)
 python3 tools/scope/scope.py land FUNC [--name N] [--rom] [--nonmatching]   put the draft into src/ and check it
@@ -239,6 +241,12 @@ sub_0803D430's worker asked for a strength-reduction explainer, where NOGIV=66 a
 address, which the ROM *does* step, so the gain came from allocation side effects; a probe hit on
 a giv says the decision matters, not which side the ROM is on: check the ROM listing for a
 post-increment or a stepped register before writing C; it reached 24/25 by C, not a match),
+`AGBCC_NOMOVE=U1,U2` (loop.c: leave the invariant set by insn U in the loop; with
+`AGBCC_LOOP_TRACE=1` the trace also prints `loopopt fn=` once per loop pass, a `cand` line
+for every pseudo set in each loop (may_not_optimize, maybe_never, used_before, in_block,
+set_in_loop, invariant) and a `move` line with the threshold arithmetic; `probe` flips each
+hoist and `hoist` prints the table), reload1.c `S` lines in names.txt (each stack slot:
+pseudo, sp offset, size, allocation order; `frame` reads them),
 `CSE_NOCANON=N`
 (new reg N never becomes a class head), `CSE_KEEP=N,...` (keep N canonical),
 `CSE_DEBUG=N` (trace `make_regs_eqv` for new >= N), `CSE_PATH=1` (trace each
@@ -407,6 +415,15 @@ in the patch.
   order, hoisted pointers, block-scoped temporaries) and ranks them by shape.
 * `tools/check.py` run under the venv python (scope re-execs into it) skips
   the per-draft fuzzy score; land calls it with the system `python3`.
+
+* `frame` pairs ROM and draft stack slots by voting over aligned rows; where the
+  alignment is off (a hunk of inserted code), a slot can be paired with the wrong
+  draft offset. Pair by the insn uid of each access instead.
+* `hoist` explains the draft side only. When the ROM keeps an invariant in the
+  loop, the tool cannot tell which "stays" reason the original source used.
+  Open case: a table used in one basic block (sub_081A0EA4 and the other
+  register-pinned random-table loops); cse deletes a repeated set there, so the
+  dead-store lever below does not apply.
 
 ## agbcc facts established with scope
 
@@ -612,6 +629,32 @@ Each was read from the compiler source and confirmed on a live draft.
    local-alloc) and asks for the non-constant set before the constant one.
    ContactActorPool_Start's worker showed the earlier version of this fact
    (and of `why`) wrong: `table` set twice, no REG_EQUIV note, life doubled.
+
+21. **Loop-invariant motion (loop.c) and how to keep a set in the loop.** An invariant
+   set moves when `threshold x savings x lifetime >= insns in the loop`. The threshold
+   starts at 13 in a loop with a call (26 without) and drops by 3 after each hoist, and
+   loop.c runs twice (rerun-loop-opt), starting again at 13. Being late in the first pass
+   does not keep a long-lived invariant in: the second pass moves it. A set never moves
+   if it is set in two blocks of the loop or again after a use (may_not_optimize), or if
+   it follows a branch in the body (or is read before it) while its uses span blocks.
+   EffectManager_SpawnParticles: the ROM loads the random table at the top of each pass
+   and keeps it in r4 through seven draws. `table = gUnk_0203B400;` at the top, plus the
+   same store again, dead, at the end of the body (past the join labels, where cse
+   cannot prove it redundant), makes it may_not_optimize. Flow deletes the dead store,
+   and the function matches with no pins. In one basic block cse deletes the repeat, and
+   the lever does nothing. `probe` found it (`AGBCC_NOMOVE=271: MATCH`); `hoist` shows
+   the arithmetic and the reasons.
+22. **Stack slot order is pseudo order.** Reload gives each spilled pseudo a slot in
+   pseudo-number order (alter_reg), at rising offsets; pseudos it evicts later come
+   after. Pseudo numbers follow first appearance, so declaration order is a frame lever.
+   `frame` prints the order the ROM needs.
+23. **Small forms seen in EffectManager_SpawnParticles.** `if (x) f = 1; else f = 0;`
+   gives the store-flag `(x | -x) >> 31`; `f = x != 0` branches. `p->s8 = v | -128`
+   folds to a QImode constant; computing it in an `s32` temporary keeps it SImode, so
+   reload's move2add reuses -128 for the next `adds r1, #0x7e`. A QImode subreg operand
+   goes first in an AND, and a `(u8)` cast narrows it. For a mask-first `ands`, write
+   `1 & a->flags`. A local pointer variable (`sprite = &p->sprite`) creates the
+   DEST_REG giv that strength reduction steps; the same address written inline does not.
 
 ## Survey: random table as a literal address (2026-10-24)
 

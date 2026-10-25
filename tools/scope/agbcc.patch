@@ -645,10 +645,15 @@
     or perhaps its old hard reg has been commandeered for reloads.
 --- a/reload1.c
 +++ b/reload1.c
-@@ -208,6 +208,85 @@
+@@ -208,7 +208,91 @@
  /* Index of last register assigned as a spill register.  We allocate in
     a round-robin fashion.  */
  static int last_spill_reg;
++/* scope frame: for each pseudo given a stack slot, the order alter_reg gave it out and the hard
++   register it was spilled from (-1: global-alloc found it no register); printed as S lines.  */
++#define AGBCC_MAXSLOT 40000
++static int agbcc_slot_seq[AGBCC_MAXSLOT], agbcc_slot_from[AGBCC_MAXSLOT], agbcc_slot_count;
+ 
 +/* Instrumentation (tools/rasolve.py): AGBCC_SPILL="k:d,..." advances the
 +   spill rotation by D before the K-th reload register choice in a function;
 +   AGBCC_DUMPPRI also logs each choice.  */
@@ -728,10 +733,20 @@
 +    }
 +  return 0;
 +}
- 
++
  /* Describes order of preference for putting regs into spill_regs.
     Contains the numbers of all the hard regs, in order most preferred first.
-@@ -815,6 +894,9 @@
+    This order is different for each function.
+@@ -590,6 +674,8 @@
+   init_recog ();
+ 
+   failure = 0;
++  agbcc_slot_count = 0;
++  memset (agbcc_slot_seq, 0, sizeof agbcc_slot_seq);
+ 
+   reload_firstobj = (char *) obstack_alloc (&reload_obstack, 0);
+ 
+@@ -815,6 +901,9 @@
    
    /* Initialize to -1, which means take the first spill register.  */
    last_spill_reg = -1;
@@ -741,11 +756,37 @@
  
    spilled_pseudos = ALLOCA_REG_SET ();
  
-@@ -5027,6 +5109,28 @@
+@@ -1076,6 +1165,14 @@
+       if (reg_equiv_address[i])
+ 	addr = reg_equiv_address[i];
  
++      if (addr && agbcc_dump && reg_renumber[i] < 0 && i < AGBCC_MAXSLOT
++	  && (addr == stack_pointer_rtx
++	      || (GET_CODE (addr) == PLUS && XEXP (addr, 0) == stack_pointer_rtx
++		  && GET_CODE (XEXP (addr, 1)) == CONST_INT)))
++	fprintf (agbcc_dump, "S %s %d %d %d %d %d\n", current_function_name, i,
++		 addr == stack_pointer_rtx ? 0 : (int) INTVAL (XEXP (addr, 1)),
++		 GET_MODE_SIZE (GET_MODE (regno_reg_rtx[i])),
++		 agbcc_slot_seq[i] ? agbcc_slot_seq[i] : -1, agbcc_slot_from[i]);
+       if (addr)
+ 	{
+ 	  if (reg_renumber[i] < 0)
+@@ -2257,6 +2354,11 @@
+     {
+       register rtx x;
+       int inherent_size = PSEUDO_REGNO_BYTES (i);
++      if (i < AGBCC_MAXSLOT)  /* scope frame: the order reload hands out stack slots */
++	{
++	  agbcc_slot_seq[i] = ++agbcc_slot_count;
++	  agbcc_slot_from[i] = from_reg;
++	}
+       int total_size = MAX (inherent_size, reg_max_ref_width[i]);
+       int adjust = 0;
+ 
+@@ -5028,6 +5130,28 @@
     If NOERROR is nonzero, we return 1 if successful,
     or 0 if we couldn't find a spill reg and we didn't change anything.  */
-+
+ 
 +/* The label of reload R's value: "=constant", "regN" or "-".  */
 +static char *
 +agbcc_reload_label (r)
@@ -767,10 +808,11 @@
 +    }
 +  return "-";
 +}
- 
++
  static int
  allocate_reload_reg (chain, r, last_reload, noerror)
-@@ -5066,6 +5170,27 @@
+      struct insn_chain *chain;
+@@ -5066,6 +5190,27 @@
       reloads A and B can share regs.  These need two regs.
       Suppose A and B are given different regs.
       That leaves none for C.  */
@@ -798,7 +840,7 @@
    for (pass = 0; pass < 2; pass++)
      {
        /* I is the index in spill_regs.
-@@ -5203,6 +5328,28 @@
+@@ -5203,6 +5348,28 @@
  
  	    reload_reg_rtx[r] = new;
  	    reload_spill_index[r] = spill_regs[i];
@@ -1336,7 +1378,54 @@
  static void strength_reduce (rtx, rtx, rtx, int, rtx, rtx, rtx, int, int);
  static void find_single_use_in_loop (rtx, rtx, varray_type);
  static int valid_initial_value_p (rtx, rtx, int, rtx);
-@@ -4533,6 +4557,12 @@
+@@ -462,6 +486,8 @@
+   register int i;
+ 
+   loop_dump_stream = dumpfile;
++  if (getenv ("AGBCC_LOOP_TRACE"))
++    fprintf (stderr, "loopopt fn=%s\n", current_function_name);  /* scope: one per pass */
+ 
+   init_recog_no_volatile ();
+ 
+@@ -809,6 +835,19 @@
+ 	       && find_reg_note (p, REG_RETVAL, NULL_RTX))
+ 	in_libcall = 0;
+ 
++      if (getenv ("AGBCC_LOOP_TRACE") && GET_CODE (p) == INSN
++	  && (set = single_set (p)) && GET_CODE (SET_DEST (set)) == REG
++	  && REGNO (SET_DEST (set)) >= FIRST_PSEUDO_REGISTER
++	  && REGNO (SET_DEST (set)) < max_reg_before_loop)
++	/* scope: every loop set of a pseudo and what movability sees */
++	fprintf (stderr, "cand fn=%s loop=%d insn=%d regno=%d may_not=%d maybe_never=%d used_before=%d in_block=%d set_in_loop=%d invariant=%d call_passed=%d\n",
++		 current_function_name, INSN_UID (loop_start), INSN_UID (p),
++		 REGNO (SET_DEST (set)),
++		 VARRAY_CHAR (may_not_optimize, REGNO (SET_DEST (set))), maybe_never,
++		 loop_reg_used_before_p (set, p, loop_start, scan_start, end),
++		 reg_in_basic_block_p (p, SET_DEST (set)),
++		 VARRAY_INT (set_in_loop, REGNO (SET_DEST (set))),
++		 invariant_p (SET_SRC (set)), call_passed);
+       if (GET_CODE (p) == INSN
+ 	  && (set = single_set (p))
+ 	  && GET_CODE (SET_DEST (set)) == REG
+@@ -1828,7 +1867,16 @@
+ 	  /* It is also desirable to move if it can be moved at no
+ 	     extra cost because something else was already moved.  */
+ 
+-	  if (already_moved[regno]
++	  if (getenv ("AGBCC_LOOP_TRACE"))  /* scope: the numbers behind each invariant-motion decision */
++	    fprintf (stderr, "move fn=%s insn=%d regno=%d threshold=%d savings=%d lifetime=%d"
++		     " insn_count=%d moved_once=%d already_moved=%d forces=%d match=%d\n",
++		     current_function_name, INSN_UID (p), regno, threshold, savings, m->lifetime,
++		     insn_count, moved_once[regno], already_moved[regno],
++		     m->forces ? INSN_UID (m->forces->insn) : 0,
++		     m->match ? INSN_UID (m->match->insn) : 0);
++	  if (uid_listed (getenv ("AGBCC_NOMOVE"), INSN_UID (p)) && ! already_moved[regno])
++	    ;  /* scope what-if: leave this invariant in the loop */
++	  else if (already_moved[regno]
+ 	      || flag_move_all_movables
+ 	      || (threshold * savings * m->lifetime) >=
+ 		 (moved_once[regno] ? insn_count * 2 : insn_count)
+@@ -4533,6 +4581,12 @@
  	{
  	  struct induction *tv;
  
@@ -1349,7 +1438,7 @@
  	  if (v->ignore || v->same)
  	    continue;
  
-@@ -4591,8 +4621,25 @@
+@@ -4591,8 +4645,25 @@
  	     of such giv's whether or not we know they are used after the loop
  	     exit.  */
  

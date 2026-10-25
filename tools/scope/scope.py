@@ -19,6 +19,8 @@
   scope.py fields OFF... [STRUCT]  structs in include/ with members at these offsets (agbcc's own layout),
                                 or STRUCT's member at each offset
   scope.py FILE.c shape         the diff with low registers blanked: order and instruction differences only
+  scope.py FILE.c frame         stack slots, ROM against draft, with the pseudo (C variable) in each
+  scope.py FILE.c hoist         loop-invariant motion pass by pass: what loop.c moved out, what stayed, why
   scope.py todo [N] [addr|prior|size]   functions with no C yet (phase 1), in ROM order
   scope.py new FUNC             open FUNC: a draft in build/scope/work/ (its unit with a stub, or a twin's C)
   scope.py land FUNC [D.c] [--name NEW] [--note T] [--rom] [--nonmatching]   put a matching draft into
@@ -195,14 +197,18 @@ def workdir(func):
 
 
 def nonmatching_func(src):
-    """The function a draft file is about: a workspace draft's own (build/scope/work/FUNC.c, from `new`),
-    else the first definition inside #ifdef NONMATCHING."""
+    """The function a draft file is about: a workspace draft's own (build/scope/work/FUNC.c, from `new`,
+    or any copy of it, by its `// scope: write FUNC here` marker), else the first definition inside
+    #ifdef NONMATCHING."""
     text = open(os.path.join(ROOT, src)).read()
     ws = os.path.relpath(os.path.join(ROOT, src), os.path.join(WORK, "work"))
     if not ws.startswith(".."):
         name = os.path.basename(ws).split(".")[0]
         if re.search(rf"\b{re.escape(name)}\s*\([^;{{]*\)\s*\{{", text):
             return name
+    m = re.search(r"^// scope: write (\w+) here", text, re.M)  # `new`'s marker: also in copies made for try
+    if m:
+        return m.group(1)
     run = os.environ.get("SCOPE_RUN")  # a campaign worker's assignment, when it is drafted in this file
     if run and any(re.search(rf"^[A-Za-z_][\w \*]*?\b{re.escape(run)}\s*\(", b, re.M)
                    for b in re.findall(r"#ifdef NONMATCHING(.*?)#else", text, re.S)):
@@ -457,6 +463,8 @@ def rom_pool_ranges(code, addr, arm=False):
         return sorted((t, t + 4) for t in data)
     for i in range(0, len(code) - 1, 2):
         h = int.from_bytes(code[i:i + 2], "little")
+        if any(t <= i < t + 4 for t in data):
+            continue  # a pool word's halfword (0x08604A48 holds 0x4A48, an `ldr r2, [pc]`) is not a load
         if h & 0xF800 == 0x4800:
             t = ((addr + i + 4) & ~3) + (h & 0xFF) * 4 - addr
             if 0 <= t < len(code):
@@ -465,9 +473,12 @@ def rom_pool_ranges(code, addr, arm=False):
 
 
 def rom_data(func, addr, code, arm=False):
-    """The ROM function's data ranges: its generated assembly's, plus the literal pools its
-    pc-relative loads reach (a function the disassembler left as .incbin has no labels at all)."""
-    return sorted(set(rom_data_ranges(func, addr) or []) | set(rom_pool_ranges(code, addr, arm)))
+    """The ROM function's data ranges: its generated assembly's, or (a function the disassembler
+    left as .incbin has no labels at all) the literal pools its pc-relative loads reach."""
+    labeled = rom_data_ranges(func, addr)
+    if labeled:  # the disassembler's data labels are exact; the pool scan is for .incbin functions
+        return sorted(labeled)
+    return rom_pool_ranges(code, addr, arm)
 
 
 def is_arm(name, addr, index=None):
@@ -1673,7 +1684,9 @@ def fast_compile(src, func, env=None):
     a few ms per variant, bytes only. None when the unit cannot be served (then use compile_draft)."""
     import fast
     env = resolve_knobs(src, func, env)
-    flags = tuple(build.cflags_for(src))
+    # -g as compile_draft has it: debug notes take insn uids, so without it the uids `why` and `insn`
+    # print name other insns here and uid knobs (AGBCC_NOMOVE, AGBCC_NOGIV, ...) in `try` miss
+    flags = tuple(build.cflags_for(src)) + ("-g",)
     _, addr_all, _ = inventory()
     addr = addr_all[rom_name(src, func)]
     key = (flags, addr)
@@ -1942,7 +1955,8 @@ def cmd_probe(src, func, env):
     """Which cse / gcse / loop decision is the difference? One traced compile lists the decisions: pseudos
     make_regs_eqv makes a class's canonical register (CSE_NOCANON), jumps cse follows into their
     target (CSE_NOFOLLOW), computations gcse's PRE replaces with a copy (AGBCC_NOPRE), induction
-    values loop.c strength-reduces or not (AGBCC_NOGIV / AGBCC_GIV). Then each is
+    values loop.c strength-reduces or not (AGBCC_NOGIV / AGBCC_GIV), invariants loop.c hoists out
+    of a loop (AGBCC_NOMOVE). Then each is
     flipped alone; a flip that matches or lowers the count names the decision (rtlprobe.py's
     canon / follow / pre, inside scope's loop and with its counts)."""
     base, info = score(src, func, env, full=True)
@@ -1966,6 +1980,12 @@ def cmd_probe(src, func, env):
     for m in re.finditer(r"giv fn=(\w+) insn=(\d+) type=(\w+) (?:benefit=-?\d+ lifetime=\d+ )?reduce=(\w+)", tr):
         if m.group(1) in fnames:
             givs[int(m.group(2))] = (m.group(3), m.group(4) in ("1", "combined"))
+    hoists = {}  # insn uid -> (pseudo, threshold, lifetime, insns): invariants loop.c moved out of a loop
+    for m in re.finditer(r"move fn=(\w+) insn=(\d+) regno=(\d+) threshold=(-?\d+) savings=(\d+) lifetime=(\d+)"
+                         r" insn_count=(\d+) moved_once=(\d) already_moved=(\d)", tr):
+        fn, uid, reg, t, sv, life, n, once, done = m.groups()
+        if fn in fnames and (done == "1" or int(t) * int(sv) * int(life) >= int(n) * (2 if once == "1" else 1)):
+            hoists.setdefault(int(uid), (int(reg), int(t), int(life), int(n)))
     names = pseudo_names(wd, info["obj_name"])
     lines = uid_lines(wd)
     rtl = open(os.path.join(wd, "u.i.rtl")).read()
@@ -2010,6 +2030,8 @@ def cmd_probe(src, func, env):
               for n in sorted(heads)]
              + [("CSE_NOFOLLOW", str(k), f"cse follow of the jump at line {ln}") for k, ln in sorted(follows.items())]
              + [("AGBCC_NOPRE", str(k), f"PRE replacement {k}") for k in pres]
+             + [("AGBCC_NOMOVE", str(u), f"loop invariant hoist of {who(r)} (insn {u}, line {lines.get(u, '?')};"
+                 f" threshold {t} x lifetime {life} >= {n} insns)") for u, (r, t, life, n) in sorted(hoists.items())]
              + [("AGBCC_NOGIV" if red else "AGBCC_GIV", str(u),
                  f"loop strength reduction of the {'address' if t == 'addr' else 'value'} computed at line"
                  f" {lines.get(u, '?')} (insn {u}, {'reduced' if red else 'not reduced'})")
@@ -2017,7 +2039,7 @@ def cmd_probe(src, func, env):
     budget = int(env.get("SCOPE_PROBE_MAX") or os.environ.get("SCOPE_PROBE_MAX", "150"))
     print(f"{func}: {info.get('counts') or base} differ; {len(heads)} cse canonical-register choices,"
           f" {len(follows)} cse jump follows, {len(pres)} PRE replacements"
-          + f", {len(givs)} loop induction values"
+          + f", {len(givs)} loop induction values, {len(hoists)} loop invariant hoists"
           + (f"; trying the first {budget} (SCOPE_PROBE_MAX=N)" if len(cands) > budget else ""))
     hits = []
     for knob, val, what in cands[:budget]:
@@ -2043,7 +2065,14 @@ def cmd_probe(src, func, env):
                           " (base[i], base + i * size) instead of walking a pointer, keep one loop"
                           " counter, or make the step not a constant multiple of the counter.",
            "AGBCC_GIV": "the ROM steps this value in its own register each pass; the draft recomputes"
-                        " it. In C walk a pointer (p++ / p += size) instead of indexing."}
+                        " it. In C walk a pointer (p++ / p += size) instead of indexing.",
+           "AGBCC_NOMOVE": "loop.c hoisted this invariant out of the loop; the ROM sets it inside each"
+                           " pass. In C make the set unmovable (scope.py FILE.c hoist shows why each one"
+                           " moved): assign the same variable again in a later block of the body, past a"
+                           " join label, so cse cannot drop the repeat and loop.c sees it set in two blocks"
+                           " (flow deletes the dead store afterwards); or set it after a branch in the body"
+                           " when its uses span blocks (maybe_never). Each earlier hoist also lowers the"
+                           " threshold by 3, but loop runs twice, so luck rarely holds in both passes."}
     score(src, func, env, full=True)  # leave the workdir's dumps at the unmodified draft
     if not hits:
         print(f"  {min(len(cands), budget)} compiles: no single cse/gcse/loop decision changes the count;"
@@ -2817,6 +2846,161 @@ def ghidra_c(addr):
     return "".join(out) or None
 
 
+SP_SLOT = re.compile(r"\[sp(?:, #(0x[0-9a-fA-F]+|\d+))?\]")
+
+
+def frame_slots(wd, func):
+    """draft sp offset -> (pseudo, bytes, order given out, spilled-from register) from scope's agbcc
+    S lines (reload's stack slots; order -1 for a parameter passed on the stack)."""
+    func = dump_func(wd, func)
+    out = {}
+    path = os.path.join(wd, "names.txt")
+    for ln in open(path) if os.path.exists(path) else []:
+        p = ln.split()
+        if len(p) == 7 and p[0] == "S" and p[1] == func:
+            out.setdefault(int(p[3]), (int(p[2]), int(p[4]), int(p[5]), int(p[6])))
+    return out
+
+
+def pseudo_value(wd, pseudo):
+    """A short reading of what an unnamed pseudo holds: the source of its first set before allocation,
+    with the C line."""
+    lines = uid_lines(wd)
+    for u, _, r in insn_list(wd, "lreg"):
+        m = re.match(r"\(set \(reg(?:/\w)*:\w+ %d\) (.*)\)$" % pseudo, r)
+        if m:
+            v = re.sub(r"\(reg(?:/\w)*:\w+ (\d+)\)", r"r\1", m.group(1))
+            v = re.sub(r"\(const_int (-?\d+)\)", r"\1", v)
+            v = re.sub(r"\s*\[\s*\d+\s*\]|\(expr_list.*$", "", v)
+            return (v[:60] + ("..." if len(v) > 60 else "")), lines.get(u)
+    return None, None
+
+
+def cmd_hoist(src, func, env):
+    """Loop-invariant motion, pass by pass: every invariant set loop.c saw in each loop, whether it
+    moved it out (threshold x savings x lifetime >= insns in the loop; the threshold starts at 13 in
+    a loop with a call, 26 without, and drops by 3 after each hoist; loop.c runs twice), and why the
+    others stayed: set in two blocks or set again after a use (may_not_optimize), set after a branch
+    or read before its set while used across blocks (maybe_never / used_before), or the move test."""
+    n, info = score(src, func, env, full=True)
+    wd = info["wd"]
+    tr = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "u.i", "-o", "/dev/null"], cwd=wd,
+                        capture_output=True, text=True,
+                        env=dict(os.environ, AGBCC_LOOP_TRACE="1", **info["env"])).stderr
+    fnames = (func, rom_name(src, func))
+    names, lines = pseudo_names(wd, info["obj_name"]), uid_lines(wd)
+    passes, cur = [], None
+    for ln in tr.splitlines():
+        m = re.match(r"loopopt fn=(\w+)", ln)
+        if m:
+            cur = {} if m.group(1) in fnames else None
+            if cur is not None:
+                passes.append(cur)
+            continue
+        if cur is None:
+            continue
+        m = re.match(r"cand fn=\w+ loop=(\d+) insn=(\d+) regno=(\d+) may_not=(\d) maybe_never=(\d) used_before=(\d)"
+                     r" in_block=(\d) set_in_loop=(\d+) invariant=(\d)", ln)
+        if m:
+            loop, uid, reg, mn, never, before, blk, sets, inv = map(int, m.groups())
+            last = cur.setdefault(loop, {})  # move_movables runs right after this loop's scan
+            if inv:
+                cur.setdefault(loop, {})[uid] = dict(reg=reg, why=(
+                    f"set {sets} times in the loop, in two blocks or again after a use (may_not_optimize)" if mn else
+                    ("set after a branch in the body" if never else "read before its set") +
+                    " and used across blocks" if (never or before) and not blk else None), move=None)
+            continue
+        m = re.match(r"move fn=\w+ insn=(\d+) regno=\d+ threshold=(-?\d+) savings=(\d+) lifetime=(\d+)"
+                     r" insn_count=(\d+) moved_once=(\d) already_moved=(\d)", ln)
+        if m:
+            uid, t, sv, life, cnt, once, done = map(int, m.groups())
+            if uid in last:
+                need = cnt * (2 if once else 1)
+                ok = done or t * sv * life >= need
+                last[uid]["move"] = (ok, f"{t} x {sv} x {life} {'>=' if ok else '<'} {need}", life)
+    if not passes:
+        sys.exit(f"no loop trace for {func}: rebuild scope's agbcc (sh tools/scope/build_agbcc.sh), or it has no loop")
+    print(f"{func}: {info.get('counts') or 'MATCH'}; loop invariants, {len(passes)} loop pass(es)"
+          " (threshold x savings x lifetime >= insns moves it)")
+    for i, ps in enumerate(passes, 1):
+        for loop, cands in ps.items():
+            first = min(cands, key=lambda u: lines.get(u, 1 << 30)) if cands else None
+            print(f"  pass {i}, loop {loop} (from line {lines.get(first, '?')}):")
+            quiet = 0
+            for uid, c in cands.items():
+                name = names.get(c["reg"], "")
+                what = f"line {lines.get(uid, '?'):>4}  insn {uid:>5}  pseudo {c['reg']}" + (f" `{name}`" if name else "")
+                if c["move"] and (c["move"][0] or c["move"][2] > 2):
+                    print(f"    {'moved' if c['move'][0] else 'kept '}  {what}  ({c['move'][1]})")
+                elif c["why"]:
+                    print(f"    stays  {what}  ({c['why']})")
+                else:
+                    quiet += 1
+            if quiet:
+                print(f"    ({quiet} more used once or twice: kept, or folded into the use)")
+    print("  probe flips each hoist (AGBCC_NOMOVE=UID); a set the ROM keeps in the loop needs one of the"
+          " 'stays' reasons in C (see probe's note).")
+    return 0
+
+
+def cmd_frame(src, func, env):
+    """The stack frame side by side: each ROM stack slot, the draft slot the aligned insns use for it,
+    and the pseudo (C variable) reload put there, in the order reload gave the slots out. Reload gives
+    a slot to each pseudo global alloc left without a register, in pseudo-number order (the order the
+    variables and temporaries were created), at rising offsets; pseudos it evicts later come after."""
+    n, info = score(src, func, env, full=True)
+    if n == 0:
+        print(f"{func}: MATCH")
+        return 0
+    wd = info["wd"]
+    rows = json.load(open(os.path.join(wd, "diff.json")))
+    slots, names = frame_slots(wd, func), pseudo_names(wd, func)
+    if not slots:
+        sys.exit("no S lines in names.txt: rebuild scope's agbcc (sh tools/scope/build_agbcc.sh)")
+    off = lambda t: [int(m.group(1) or "0", 0) for m in SP_SLOT.finditer(t or "")]
+    size = lambda side: next((int(m.group(1), 0) for r in rows for m in [re.match(r"sub sp, #(\S+)$", r[side] or "")] if m), 0)
+    votes, rom_seen, dr_seen = {}, set(), set()
+    for r in rows:
+        a, b = off(r["rom"]), off(r["draft"])
+        rom_seen.update(a)
+        dr_seen.update(b)
+        if len(a) == 1 and len(b) == 1:
+            votes.setdefault(a[0], {}).setdefault(b[0], 0)
+            votes[a[0]][b[0]] += 1
+    pair = {a: max(v, key=v.get) for a, v in votes.items()}
+
+    def who(o):
+        if o not in slots:
+            return "", ""
+        ps, _, seq, frm = slots[o]
+        nm = names.get(ps)
+        if not nm:
+            v, ln = pseudo_value(wd, ps)
+            nm = f"[{v}]" + (f" line {ln}" if ln else "") if v else "-"
+        return f"{ps}", nm + ("" if seq != -1 else " (stack parameter)") + (f" (evicted from r{frm})" if seq > 0 and frm >= 0 else "")
+    print(f"{func}: frame {size('rom'):#x} in the ROM, {size('draft'):#x} in the draft (sub sp)")
+    print(f"  {'ROM':9} {'draft':9} {'pseudo':>6}  value (slots are given out in pseudo order)")
+    for a in sorted(rom_seen):
+        b = pair.get(a)
+        ps, nm = who(b) if b is not None else ("", "")
+        mark = " " if b == a else "!"
+        print(f"{mark} sp+{a:<#6x} {('sp+%#x' % b) if b is not None else '?':9} {ps:>6}  {nm}")
+    extra = sorted(set(slots) - set(pair.values()))
+    for b in extra:
+        ps, nm = who(b)
+        print(f"+ {'':9} sp+{b:<#6x} {ps:>6}  {nm}  (the ROM has no slot for this)")
+    order = [pair[a] for a in sorted(pair) if pair[a] in slots and slots[pair[a]][2] > 0]
+    want = [slots[b][0] for b in order]
+    if want != sorted(want):
+        print("\nThe ROM's slot order needs these pseudos created in this order (declare or first compute"
+              " them in it):")
+        print("  " + " < ".join(f"{slots[b][0]} {names.get(slots[b][0], '')}".strip() for b in order))
+    if extra:
+        print(f"\n{len(extra)} draft slot(s) the ROM does not have: those values need a register in the ROM's"
+              " allocation, or do not exist there (a temporary the ROM's C does not make).")
+    return 1
+
+
 def cmd_shape(src, func, env):
     """The diff with low registers blanked: only hunks where the order or the instructions themselves
     differ, each with its C lines. Register choice is set aside; `why all` explains what is left."""
@@ -3056,10 +3240,10 @@ def cmd_like(target, show):
 def cmd_serve():
     """The resident scope: warm caches in this process, one forked child per command (children can run
     side by side; each starts its own agbcc fork servers). Restarts itself when scope.py or fast.py
-    changes; exits after SCOPE_SERVE_IDLE seconds (default 1800) without a command."""
+    changes, or scope's agbcc is rebuilt; exits after SCOPE_SERVE_IDLE seconds (default 1800) without a command."""
     import signal
     import traceback
-    code_files = [os.path.abspath(__file__), os.path.join(HERE, "fast.py")]
+    code_files = [os.path.abspath(__file__), os.path.join(HERE, "fast.py"), INSTR]  # INSTR: a rebuilt compiler
     stamp = [os.stat(f).st_mtime_ns for f in code_files]
     elf_syms(), inventory(), rom_bytes()  # warm: these are what every command loads first
     if os.path.exists(SOCK):
@@ -3314,6 +3498,14 @@ def main():
         rest.remove("shape")
         func = rest[0] if rest else nonmatching_func(src)
         return cmd_shape(src, func, env)
+    if "hoist" in rest:  # FILE.c hoist [FUNC]: loop-invariant motion pass by pass, and why each stayed
+        rest.remove("hoist")
+        func = rest[0] if rest else nonmatching_func(src)
+        return cmd_hoist(src, func, env)
+    if "frame" in rest:  # FILE.c frame [FUNC]: stack slots, ROM against draft, with the pseudo in each
+        rest.remove("frame")
+        func = rest[0] if rest else nonmatching_func(src)
+        return cmd_frame(src, func, env)
     if "spill" in rest:
         rest.remove("spill")
         func = rest[0] if rest else nonmatching_func(src)
