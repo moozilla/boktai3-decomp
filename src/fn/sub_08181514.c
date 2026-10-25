@@ -21,7 +21,7 @@ struct ActorMarker {
 extern const u16 gUnk_0824E818[];
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
-void sub_08180CE0(struct ActorMarker *);
+void ActorMarker_InitBouncingParticles(struct ActorMarker *);
 void Sound_PlaySongChecked(u32);
 
 /* Tentative: launch the nine embedded fragments during an actor break-apart sequence. */
@@ -54,7 +54,7 @@ void ActorMarker_LaunchFragments(struct ActorMarker *p, u32 fast)
             row = 1;
             break;
     }
-    sub_08180CE0(p);
+    ActorMarker_InitBouncingParticles(p);
     i = 0;
     row8 = row * 8;
     posY = &p->position[1];

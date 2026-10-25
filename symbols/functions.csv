@@ -6258,6 +6258,7 @@ addr,name,mode,confidence,source,notes
 08180B14,SceneCombatActor_InitBouncingParticle,thumb,low,src-alias,
 08180BC4,ActorMarker_InitFacingSprite,thumb,low,src-alias,
 08180C74,ActorOverlay_InitSprite,thumb,low,src-alias,
+08180CE0,ActorMarker_InitBouncingParticles,thumb,low,src-alias,Initializes nine bouncing particle sprites with direction-selected frames; kind-selected animations; alternating layer flags; callbacks; and the actor floor height.
 08180E68,SceneCombatActor_SpawnBouncingEffect,thumb,low,src-alias,
 08180FE0,SceneCombatActor_SpawnBouncingParticle,thumb,low,src-alias,
 08181134,ActorMarker_InitOffsetPosition,thumb,low,src-alias,
