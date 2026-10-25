@@ -6807,6 +6807,7 @@ addr,name,mode,confidence,source,notes
 0819F0D4,Hresvelgr_UpdateRandomBurstPhase,thumb,low,src-alias,
 0819F2B4,Hresvelgr_UpdateAdjacentRandomBurstPhase,thumb,low,src-alias,
 0819F55C,DirectionBurst_EmitOffset,thumb,low,src-alias,
+0819F5B4,DirectionBurst_EmitStaggeredLine,thumb,low,src-alias,Copies an origin and emits six shots along x or z; changing angle every two shots.
 0819F638,Hresvelgr_UpdateRandomVolleyPhase,thumb,low,src-alias,
 0819F788,Hresvelgr_UpdateAlternatingVolley,thumb,low,src-alias,
 0819F954,Hresvelgr_UpdateRecoveryPhase,thumb,low,src-alias,
