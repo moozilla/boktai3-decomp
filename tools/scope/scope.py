@@ -557,7 +557,7 @@ def decode(code, addr, data, arm=False):
     return rows
 
 
-def draft_annotations(wd, func, rows, obj_offset, lines=None):
+def draft_annotations(wd, func, rows, obj_offset, lines=None, data=()):
     """C line and insn uid for each draft code row. LINES: {text offset: (file, line)} if known."""
     if lines is None:
         lines = {}
@@ -578,7 +578,11 @@ def draft_annotations(wd, func, rows, obj_offset, lines=None):
             continue
         u = re.search(r"@\s+(\d+)\s", s + " ")
         seq.append((s.split()[0], int(u.group(1)) if u else None))
-    code = [r for r in rows if not r[2].startswith(".")]
+    # decode renders zero halfwords in literal-pool alignment as `movs r0, r0`
+    # to compare them with ROM padding. They have no assembly instruction or
+    # RTL uid: including even one would discard annotations for the whole unit.
+    code = [r for r in rows if not r[2].startswith(".")
+            and not any(lo <= r[0] < hi for lo, hi in data)]
     ann = {}
     if len(seq) == len(code):
         for (mn, uid), r in zip(seq, code):
@@ -657,7 +661,7 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
     rom = decode(rom_code, addr, rom_data(rom_name(src, func), addr, rom_code))
     mdata = info["data"] if "data" in info else mapping_ranges(os.path.join(wd, "u.o"), info["obj_offset"], len(mine))
     dr = decode(mine, addr, mdata)
-    ann = draft_annotations(wd, info["obj_name"], dr, info["obj_offset"], info.get("lines"))
+    ann = draft_annotations(wd, info["obj_name"], dr, info["obj_offset"], info.get("lines"), mdata)
     born = born_passes(wd)
     pairs, shifted = align(rom, dr)
 
