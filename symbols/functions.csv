@@ -8532,6 +8532,7 @@ addr,name,mode,confidence,source,notes
 081FE12C,OrbitEffect_UpdateNarrowRadius,thumb,low,src-alias,Advances the radius and reverses its velocity at fixed-point bounds one and a half and three
 081FE16C,OrbitEffect_InitSlot,thumb,low,src-alias,
 081FE244,OrbitEffect_RemoveSlot,thumb,low,src-alias,
+081FE2C4,OrbitEffect_UpdateManager,thumb,low,src-alias,
 081FE644,OrbitEffect_DestroyManager,thumb,low,src-alias,Destructor callback releases active entries in the four-slot pool and stops its sound before clearing the singleton
 081FE68C,SunOrb_InitManager,thumb,low,src-alias,Initializes four orb slots and loads the sun orb animation; object identity is tentative
 081FE6E0,SunOrb_GetOrCreateManager,thumb,low,src-alias,Returns the existing singleton or creates its task and initializes its slots
