@@ -309,6 +309,11 @@ def compile_draft(src, func, env=None):
     open(os.path.join(wd, "stderr.txt"), "w").write(r.stderr)
     if r.returncode or "error" in r.stderr:
         errs = [ln.replace(ROOT + os.sep, "") for ln in r.stderr.splitlines() if ln.strip()]
+        # the errors first: other functions' warnings would push them past the shown lines
+        hard = [e for e in errs if re.search(r":\d+: (?!warning)", e)]
+        if hard:
+            nwarn = sum(1 for e in errs if re.search(r":\d+: warning", e))
+            errs = hard + ([f"(and {nwarn} warning(s), not shown)"] if nwarn else [])
         hint = ("\n  (agbcc is C89: in each block, declarations come before statements)"
                 if any("parse error" in e or "syntax error" in e for e in errs) else "")
         context = neighbor_failure(src, func, r.stderr)
@@ -1724,7 +1729,7 @@ def neighbor_failure(src, func, stderr):
             current = m.group(1)
         elif "At top level" in ln:  # a declaration-level error belongs to no function
             current = None
-        elif current and re.search(r"error|undeclared|conflicting types", ln, re.I):
+        elif current and re.search(r"error|undeclared|conflicting types|redefinition|previously defined", ln, re.I):
             if current not in failed:
                 failed.append(current)
     if not failed:
@@ -3350,8 +3355,77 @@ def put_definition(src, snippet, func):
     start = pat.search(text, sp[0]).start()
     have = set(re.findall(r"^#include .*$", text, re.M))
     new = "".join(ln for ln in new.splitlines(True) if ln.rstrip("\n") not in have)
-    open(path, "w").write(text[:start] + new.strip("\n") + "\n" + text[sp[1]:])
-    print(f"{func}: {src}: definition replaced with {snippet}")
+    # a helper or type the snippet defines replaces the same-named one an earlier put left between the
+    # previous definition and FUNC (re-putting an edited snippet would otherwise redefine it)
+    # the gap starts after the previous function definition that is not a static helper
+    prev_end = 0
+    head = text[:start]
+    for a, b in top_level_spans(head):
+        t = head[a:b]
+        if t.rstrip().endswith("}") and not re.match(r"static\b", t) and re.search(r"\)\s*\{", t):
+            prev_end = b
+    names = {n for n, _ in item_names(new[:pat.search(new).start()])}
+    kept, dropped = [], []
+    gap = text[prev_end:start]
+    pos = 0
+    for (a, b), n in zip(top_level_spans(gap), [n for n, _ in item_names(gap)]):
+        if n in names:
+            kept.append(gap[pos:a])
+            dropped.append(n)
+            pos = b
+    kept.append(gap[pos:])
+    gap = re.sub(r"\n{3,}", "\n\n", "".join(kept))
+    open(path, "w").write(text[:prev_end] + gap + new.strip("\n") + "\n" + text[sp[1]:])
+    print(f"{func}: {src}: definition replaced with {snippet}"
+          + (f" (replacing the earlier {', '.join(sorted(set(dropped)))})" if dropped else ""))
+
+
+def top_level_spans(text):
+    """(start, end) of each top-level declaration or definition in TEXT. A function definition (its
+    first '{' follows a ')') ends at its closing '}'; anything else ends at a ';' at brace depth 0
+    (`struct X { ... };`, `typedef struct { ... } X;`, prototypes, externs). Comments and
+    preprocessor lines are skipped."""
+    spans, depth, start, brace, i = [], 0, None, None, 0
+    while i < len(text):
+        c = text[i]
+        if text.startswith("//", i) or (c == "#" and (i == 0 or text[i - 1] == "\n")):
+            j = text.find("\n", i)
+            i = len(text) if j < 0 else j
+            continue
+        if text.startswith("/*", i):
+            j = text.find("*/", i + 2)
+            i = len(text) if j < 0 else j + 2
+            continue
+        if start is None and not c.isspace():
+            start, brace = i, None
+        if c == "{":
+            if depth == 0 and brace is None:
+                brace = text[start:i].rstrip().endswith(")")
+            depth += 1
+        elif c == "}":
+            depth -= 1
+            if depth == 0 and brace:
+                spans.append((start, i + 1))
+                start = None
+        elif c == ";" and depth == 0 and start is not None:
+            spans.append((start, i + 1))
+            start = None
+        i += 1
+    return spans
+
+
+def item_names(text):
+    """[(name, kind)] for each top-level item of TEXT (in top_level_spans order): a struct/union/enum
+    tag or typedef name, a function (definition or prototype), or an extern variable."""
+    out = []
+    for a, b in top_level_spans(text):
+        t = text[a:b]
+        m = (re.match(r"\s*typedef\b.*?(\w+)\s*;\s*$", t, re.S)
+             or re.match(r"\s*(?:struct|union|enum)\s+(\w+)\s*\{", t)
+             or re.match(r"[^=;{]*?\b(\w+)\s*\([^;{]*\)\s*[;{]", t, re.S)
+             or re.match(r"\s*extern\b[^;]*?\b(\w+)\s*(?:\[[^\]]*\])?\s*;", t, re.S))
+        out.append((m.group(1) if m else None, t))
+    return out
 
 
 def cmd_giv(src, func, env):
