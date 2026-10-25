@@ -7057,6 +7057,7 @@ addr,name,mode,confidence,source,notes
 081B47E8,Vanargand_UpdatePartFlashFade,thumb,low,src-alias,
 081B48A0,Vanargand_UpdatePartSidestep,thumb,low,src-alias,
 081B4C04,Vanargand_UpdatePartRecovery,thumb,low,src-alias,
+081B4DA4,Vanargand_UpdatePartLeap,thumb,low,src-alias,Selects animation 9; raises a Vanargand part along a variant-dependent heading; then moves it to terrain height.
 081B512C,Vanargand_UpdatePartVerticalOscillation,thumb,low,src-alias,Moves a Vanargand part by alternating -256 and +256 Y displacements; pausing 31 updates after each motion.
 081B52E8,Vanargand_UpdatePartBobbing,thumb,low,src-alias,
 081B5454,Vanargand_UpdatePartRadialTravel,thumb,low,src-alias,
