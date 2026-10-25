@@ -4823,6 +4823,7 @@ addr,name,mode,confidence,source,notes
 081281A8,DirectionalProjectile_ResetPool,thumb,low,src-alias,Clears the directional projectile pool singleton during scene reset
 081281B4,FragmentBurst_RunCompletionScript,thumb,low,src-alias,Calls the optional script stored at offset 0x158 when burst cleanup runs
 081281CC,FragmentBurst_OnContact,thumb,low,src-alias,Empty collider callback installed on the four-sprite burst; effect identity is tentative
+08128268,FragmentBurst_UpdateRadialAnimation,thumb,low,src-alias,Initializes four radial sprites; advances their animation sequences; refreshes the attack collider; and enters state 3 when the fourth sequence ends.
 081284E0,SpriteGroup_Release,thumb,low,src-alias,
 08128554,FragmentBurst_UpdateImpactAnimation,thumb,low,src-alias,
 0812876C,FragmentBurst_AllocateSlot,thumb,low,src-alias,Claims and clears one of four composite effect slots and records its index
