@@ -7285,7 +7285,7 @@ addr,name,mode,confidence,source,notes
 081BE0F0,SceneInventory_ResetCategoryPalette,thumb,low,src-alias,
 081BE16C,Storage_RefreshItemSlots,thumb,low,src-alias,
 081BE2E0,Storage_RefreshConsumableSlots,thumb,low,src-alias,
-081BE504,Storage_RefreshEquipmentSlots,thumb,low,src-alias,
+081BE504,Storage_RefreshEquipmentSlots,thumb,low,src-alias,Refreshes carried and stored equipment icons; highlights assignment status; positions equipped markers; and records first empty slots.
 081BE7FC,Storage_BeginItemSpecialMove,thumb,low,src-alias,
 081BE8B0,Storage_BeginEquipmentSpecialMove,thumb,low,src-alias,
 081BE960,Storage_ShowItemDescription,thumb,low,src-alias,
