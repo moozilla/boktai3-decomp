@@ -3389,7 +3389,7 @@ def put_definition(src, snippet, func):
         t = head[a:b]
         if t.rstrip().endswith("}") and not re.match(r"static\b", t) and re.search(r"\)\s*\{", t):
             prev_end = b
-    names = {n for n, _ in item_names(new[:pat.search(new).start()])}
+    names = {n for n, _ in item_names(new[:pat.search(new).start()])} - {None}
     kept, dropped = [], []
     gap = text[prev_end:start]
     pos = 0
