@@ -8853,6 +8853,7 @@ addr,name,mode,confidence,source,notes
 082158B0,Bg_UpdateScrollShadow,thumb,low,src-alias,masks the BG scroll records gUnk_03004C30[bg].x/y to 8 bits into the HOFS/VOFS shadow gUnk_03004C20
 08215A48,Bg_SetTileUpload,thumb,low,src-alias,Stores a background tile source with destination offset and size for later upload; upload role is tentative.
 08215A74,Bg_SetPriority,thumb,low,src-alias,Sets the priority bits in the selected background control register
+08215B18,Bg_SetAffineTransform,thumb,low,src-alias,Stores background position; angle and scales; then computes the signed fixed-point affine matrix and reference offsets.
 08215C8C,BgGfx_FindEntryById,thumb,low,src-alias,Finds a resource entry by ID for background tile loading
 08215CB8,Bg_CopyTiles,thumb,low,src-alias,
 08215DF0,Bg_SetTilemapEntry,thumb,low,src-alias,Writes a tile index with flip flags and palette bank into a background map cell
