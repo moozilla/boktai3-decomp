@@ -7256,7 +7256,7 @@ addr,name,mode,confidence,source,notes
 081BD2D4,DarkLoan_OnDestroy,thumb,low,src-alias,Removes all 22 animations and the loan display sprite
 081BD300,DarkLoan_StartDisplayScript,thumb,low,src-alias,Clears a display flag and starts the script supplying loan interface resources
 081BD334,ScriptPanel_InitializeProcedure,thumb,low,src-alias,
-081BD38C,DarkLoan_BuildDisplay,thumb,low,src-alias,
+081BD38C,DarkLoan_BuildDisplay,thumb,low,src-alias,Loads and relocates two resources; initializes the Dark Loan rate and digit widgets; and creates its palette-selected sprite.
 081BD6D8,DarkLoan_GetDefaultRate,thumb,low,src-alias,Computes a tentative default loan rate clamped between two and nine
 081BD708,DarkLoan_InitializeFromScript,thumb,low,src-alias,
 081BD814,DarkLoan_Create,thumb,medium,gcl-name,name from GCL key E9D3 暗黒ローン (Dark Loan); registry callback
