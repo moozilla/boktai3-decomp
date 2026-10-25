@@ -4125,7 +4125,85 @@ void sub_081E9BA0(void)
 {
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_081E9BA4);
+struct ActorRegionChild {
+    u32 flags;
+    u8 unk_04[0xa8];
+    void (*callback)(void *, void *);
+    u8 index;
+    u8 control;
+    u8 unk_B2[6];
+    s32 regionCount;
+    u32 regions[4];
+    u8 unk_CC[3];
+    u8 timer;
+    u8 unk_D0[12];
+};
+
+struct ActorRegionController {
+    u8 unk_00[0x1c];
+    struct ActorRegionChild children[16];
+};
+
+struct ActorRegionCount {
+    s32 count;
+    u8 unk_04[0xd8];
+};
+
+struct ActorRegionPlayer {
+    u8 unk_00[0x5a0];
+    u32 region;
+};
+
+static inline u8 ActorChild_IsCurrentRegion(u32 current, u32 region)
+{
+    if (current == region)
+        return TRUE;
+    return FALSE;
+}
+
+/* Update child visibility for the current region, then tick active visible children. */
+#ifdef NONMATCHING
+// fuzzy: 61.8%
+// scope shape 28 (differences once low registers are set aside)
+void Actor_UpdateRegionChildren(struct ActorRegionController *p)
+{
+    s32 i = 0;
+    struct ActorRegionCount *countBase = (struct ActorRegionCount *)&p->children[0].regionCount;
+    struct ActorRegionChild *children = p->children;
+    for (; i < 16; i++) {
+        s32 visible = 0;
+        if (visible < countBase[i].count) {
+            u32 current = ((struct ActorRegionPlayer *)gUnk_02000710)->region;
+            s32 count = p->children[i].regionCount;
+            s32 j = 0;
+            do {
+                if (ActorChild_IsCurrentRegion(current, p->children[i].regions[j]))
+                    visible = 1;
+                j++;
+            } while (--count != 0);
+        }
+        {
+            u32 value;
+            if (visible)
+                value = children[i].flags & ~1;
+            else
+                value = children[i].flags | 1;
+            children[i].flags = value;
+        }
+    }
+    for (i = 0; i < 16; i++) {
+        if (p->children[i].control & 4) {
+            if (!(children[i].flags & 1)) {
+                if (p->children[i].timer)
+                    p->children[i].timer--;
+                p->children[i].callback(p, &p->children[i]);
+            }
+        }
+    }
+}
+#else
+INCLUDE_ASM("asm/nonmatching", Actor_UpdateRegionChildren);
+#endif
 
 /* Tentative role: Copy the saved position and dispatch the animation phase. */
 
@@ -4267,7 +4345,7 @@ static inline void interaction_state(struct ActorAnimController *g, u32 mode, u3
 /* Tentative name: Actor_ConfigureInteractionChildFromScript.
  * Configure the first available interaction marker from the current script. */
 #ifdef NONMATCHING
-// fuzzy: 58.9%
+// fuzzy: 57.1%
 // scope shape 125 (differences once low registers are set aside)
 void Actor_ConfigureInteractionChildFromScript(void)
 {

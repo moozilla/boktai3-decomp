@@ -8147,6 +8147,7 @@ addr,name,mode,confidence,source,notes
 081E9574,Actor_UpdateFinishingAnimation,thumb,low,src-alias,Plays sequence 10 then hides the actor and resets active child callbacks on completion
 081E97D4,Actor_UpdateRotatingGrowth,thumb,low,src-alias,Rotates the sprite while increasing both scale components toward 127
 081E98E0,Actor_UpdateRotatingShrink,thumb,low,src-alias,Rotates the sprite while decreasing both scale components toward 64
+081E9BA4,Actor_UpdateRegionChildren,thumb,low,src-alias,Refresh child visibility from the current player region; decrement active visible child timers; and invoke their callbacks.
 081E9C9C,Actor_UpdateMotionPhase,thumb,low,src-alias,Saves the current position before dispatching the motion phase callback
 081E9CEC,Actor_DispatchAnimationPhase,thumb,low,src-alias,Dispatches the callback selected by the upper phase bits of the packed mode field
 081E9D10,Actor_UpdateInteractionMode,thumb,low,src-alias,Selects the nearest interaction before dispatching the current mode callback
