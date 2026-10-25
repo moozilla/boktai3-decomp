@@ -206,7 +206,7 @@ address,isa,evidence,replacement_end
 080F636C,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080F6370
 080FB4EC,thumb,Function in the listed extent of sub_080FB30C; push after its literal pool; retained assembly,
 080FB620,thumb,Function after the bx and literal pool following 080FB4EC's jump table; retained assembly,
-080FC1F8,thumb,Function in the listed extent of sub_080FC094; push after its bx r0 return and padding; retained assembly,
+080FC1F8,thumb,Function in the listed extent of sub_080FC094; push after its bx r0 return and padding; exact 512-byte C body,080FC3F8
 080FFDD0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080FFDD4
 080FFF74,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,080FFF78
 08100388,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0810038C
