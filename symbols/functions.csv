@@ -7138,6 +7138,7 @@ addr,name,mode,confidence,source,notes
 081B89C0,SceneMover_SteerXZ,thumb,low,src-alias,
 081B8B38,SceneMover_SteerXY,thumb,low,src-alias,
 081B8CB0,OrbitMotion_UpdateAngle,thumb,low,src-alias,
+081B8D84,OrbitMotion_UpdateFoldedOrbit,thumb,low,src-alias,Adds a polar X/Z step from a folded time-based angle; completes after speed times timer exceeds 512.
 081B8E44,OrbitMotion_UpdateCrossedSines,thumb,low,src-alias,
 081B8F54,OrbitMotion_UpdateAbsoluteSines,thumb,low,src-alias,
 081B9014,OrbitMotion_InterpolatePosition,thumb,low,src-alias,
