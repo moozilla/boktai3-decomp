@@ -6676,6 +6676,7 @@ addr,name,mode,confidence,source,notes
 081980FC,SceneEffect_UpdateFinishAnimation,thumb,low,src-alias,Starts the final animation and clears the pooled effect when playback completes; tentative effect role
 08198158,SceneActor_SetSavedPositionOffset,thumb,low,src-alias,
 081981C8,ShadowActor_UpdateThreeStageAction,thumb,low,src-alias,
+08198678,SceneEffect_UpdateArrival,thumb,low,src-alias,Projects the player position; slides an effect inward from a screen edge; then restores world coordinates and enables its shadow.
 081988A8,SceneEffect_UpdateRecoil,thumb,low,src-alias,
 08198B08,SceneEffect_UpdateActor,thumb,low,src-alias,Dispatches the actor state and refreshes its collider position
 08198B44,SceneEffect_DestroyActor,thumb,low,src-alias,Destruction callback removing the actor controller collider and optional animation
