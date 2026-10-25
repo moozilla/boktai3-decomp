@@ -3447,10 +3447,18 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
     wdraft, base = work_paths(name)
     draft = draft or wdraft
     rel = os.path.relpath(os.path.abspath(draft), ROOT)
-    n, info = score(rel, name, {})
-    if n != 0 and not nonmatching:
-        sys.exit(f"{name}: {rel} does not match ({info.get('counts')}); nothing landed"
-                 " (`land FUNC --nonmatching` lands it as a draft)")
+    registered = register_draft_functions(name, addr, sizes, draft)
+    if registered:
+        funcs, sizes = progress.load_functions()
+    try:
+        n, info = score(rel, name, {})
+        if n != 0 and not nonmatching:
+            sys.exit(f"{name}: {rel} does not match ({info.get('counts')}); nothing landed"
+                     " (`land FUNC --nonmatching` lands it as a draft)")
+    except BaseException:
+        for p, t in registered.items():
+            open(p, "w").write(t)
+        raise
     if n == 0 and nonmatching:
         nonmatching = False
         print(f"{name}: the draft matches; landing it as exact C")
@@ -3470,6 +3478,7 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
     before = {path: open(path).read() if os.path.exists(path) else None}
     extras = os.path.join(ROOT, "symbols", "build_extra_functions.csv")
     before[extras] = open(extras).read()
+    before.update(registered)  # the csvs as they were before the draft's hidden functions were registered
     if kind == "unit":
         cur = before[path]
         if not os.path.exists(base):
@@ -3526,6 +3535,34 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         # tree back as it was; land_write restores and exits itself for a plain mismatch
         restore()
         raise
+
+
+def register_draft_functions(name, addr, sizes, draft):
+    """A draft can define functions the inventory does not list yet, inside FUNC's extent (code the
+    disassembler left in one block): `sub_ADDR`, or a `#define NAME sub_ADDR` alias. Each one that starts
+    with a `push {..., lr}` is registered as `hidden_tails.py split` would. Returns {csv path: text before}."""
+    import progress
+    at = {a for _, a in progress.load_functions()[0]}
+    rom = rom_bytes()
+    found = []
+    for f in progress.c_functions(os.path.abspath(draft), with_asm=False):
+        m = re.fullmatch(r"sub_([0-9A-F]{8})", f)
+        a = int(m.group(1), 16) if m else None
+        if f == name or a is None or a in at or not addr < a < addr + sizes.get(name, 0) or a % 2:
+            continue
+        if rom[off(a) + 1] == 0xB5:  # push {..., lr}
+            found.append(a)
+    if not found:
+        return {}
+    paths = [os.path.join(ROOT, "symbols", p) for p in
+             ("build_extra_functions.csv", "progress_extra_functions.csv", "progress_functions.csv")]
+    before = {p: open(p).read() for p in paths}
+    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "hidden_tails.py"), "split"]
+                   + [f"{a:08X},,Hidden function in {name}'s block (registered by land from the draft)" for a in found],
+                   cwd=ROOT, check=True)
+    print(f"{name}: registered " + ", ".join(f"sub_{a:08X}" for a in found)
+          + " (the draft defines them inside its block)")
+    return before
 
 
 def land_write(name, addr, kind, dest, path, text, info, nonmatching, funcs, sizes, restore, pins, bars,
