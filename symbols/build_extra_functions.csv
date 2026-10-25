@@ -285,7 +285,7 @@ address,isa,evidence,replacement_end
 08122DF0,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08122DF4
 08125498,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0812549C
 08125524,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08125528
-08125928,thumb,Hidden tail after PairSlotPool_Allocate,
+08125928,thumb,Hidden tail after PairSlotPool_Allocate; exact 364-byte C body,08125A94
 08125B64,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08125B68
 08126140,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,08126144
 08126650,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0812665C

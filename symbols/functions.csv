@@ -4757,6 +4757,7 @@ addr,name,mode,confidence,source,notes
 08125528,SpreadShot_Step,thumb,low,src-alias,
 08125898,SceneTerrainProbe_DestroyEntry,thumb,low,src-alias,Clears the slot mask and releases entry resources before clearing the record; terrain probe identity is tentative
 081258DC,PairSlotPool_Allocate,thumb,low,src-alias,
+08125928,SpreadShot_Create,thumb,low,src-alias,Allocates a spread-shot slot; copies position and velocity; initializes its collider and scene body; and queues the actor.
 08125A94,PairSlotPool_Update,thumb,low,src-alias,
 08125AF4,SceneTerrainProbe_OnPoolDestroy,thumb,low,src-alias,Task destruction callback that clears the two-slot pool singleton
 08125B00,SceneTerrainProbe_InitPool,thumb,low,src-alias,Publishes the newly allocated pool as the singleton
