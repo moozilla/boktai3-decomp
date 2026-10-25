@@ -310,7 +310,17 @@ def compile_draft(src, func, env=None):
 _G_WARNED = set()
 
 
+def arm_unit_exit(src, func):
+    """Scope's instrumented compiler is Thumb agbcc: an agbcc_arm unit would compile as Thumb and
+    compare against ARM bytes, a listing of nothing but differences. Stop with what to use instead."""
+    if os.path.basename(build.compiler_for(src)) == "agbcc_arm":
+        sys.exit(f"{func}: {src} is an ARM unit (// COMPILER: agbcc_arm); scope compiles Thumb agbcc only."
+                 " Edit the unit in src/, then tools/check.py UNIT --nonmatching gives the fuzzy score;"
+                 " compare arm-none-eabi-objdump -d of its object with tools/asmat.py for the listing")
+
+
 def compile_draft_g(src, func, env=None):
+    arm_unit_exit(src, func)
     env = resolve_knobs(src, func, env)
     wd = workdir(func)
     pre = preprocess(src, env, func)
@@ -1902,6 +1912,8 @@ def fast_compile(src, func, env=None, plain=None):
     a few ms per variant, bytes only. None when the unit cannot be served (then use compile_draft).
     PLAIN (default: when ENV sets no knob) compiles without -g, as the real build does."""
     import fast
+    if os.path.basename(build.compiler_for(src)) == "agbcc_arm":
+        return None
     env = resolve_knobs(src, func, env)
     if plain is None:
         plain = not has_knobs(env)
