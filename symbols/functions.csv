@@ -4706,6 +4706,7 @@ addr,name,mode,confidence,source,notes
 081214E0,SceneColliderEffect_UpdateCollider,thumb,low,src-alias,Updates the effect then synchronizes and refreshes its collider position.
 08121890,SceneColliderEffect_AllocateSprite,thumb,low,src-alias,Reserves an unused pool entry and returns its leading sprite field; effect identity is tentative.
 081218A0,Direction_IsMiddleQuadrants,thumb,low,src-alias,
+081218C0,SceneColliderEffect_SpawnAimedSprite,thumb,low,src-alias,Allocates a collider sprite at a source transform and sets target-directed horizontal velocity and a travel-time-based vertical component.
 08121A78,ActionGroup_RunSelectedCallbacks,thumb,low,src-alias,
 08121AC8,SceneColliderEffect_DestroyPool,thumb,low,src-alias,Task destruction callback removes sprites from occupied slots and clears the pool singleton.
 08121B08,SceneColliderEffect_InitPool,thumb,low,src-alias,Loads shared graphics and animation sequences and initializes the four-slot pool.
