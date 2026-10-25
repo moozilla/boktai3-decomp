@@ -415,7 +415,7 @@ address,isa,evidence,replacement_end
 081792F8,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081792FC
 081792FC,thumb,Independent 4-byte empty leaf left as incbin by gbadisasm; exact standalone C,08179300
 0817A238,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,0817A23C
-0817A354,thumb,Hidden first position inside box search (retained),
+0817A354,thumb,Hidden first position inside box search; exact 112-byte C body,0817A3C4
 0817A918,thumb,Hidden tail after SceneVolume_TestPlayerPosition (random reachable corner around player 0); exact C,0817AA14
 0817AAB8,thumb,Hidden predicate: field 0x94 not positive,0817AAD0
 0817C19C,thumb,Hidden clear of flags 0xB0/0xAF,0817C1B8
