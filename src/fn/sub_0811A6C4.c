@@ -95,7 +95,7 @@ void MotionActor_ParsePosition(void *);
 void CharacterModel_SetPrimaryAppearance(void *, void *);
 void CharacterModel_SetSecondaryAppearance(void *, void *, void *);
 s32 Script_GetKeywordValue(u32, s32);
-void sub_081169A8(void *);
+void Glove_InitializeStyleModifiers(void *);
 void ActorSprite_InitPartDrawings(void *, void *, u32);
 void FieldHud_InitializeWidgets(void *, void *, void *, u32, void *);
 void sub_081175F8(void *);
@@ -156,7 +156,7 @@ s32 Glove_InitFromScript(struct Glove *p)
     *((u32 *)(((u8 *)p) + 0x910)) = Script_GetKeywordValue('n', 0);
     if (!Mode(0x800))
         *((u32 *)(((u8 *)p) + 0x904)) = Script_GetKeywordValue('g', 0);
-    sub_081169A8(p);
+    Glove_InitializeStyleModifiers(p);
     ActorSprite_InitPartDrawings(self, p->model, 0x3d99);
     if ((*((s32 *)(((u8 *)p) + 0x5f4))) == 0x20000)
         self->x = -0x40000;

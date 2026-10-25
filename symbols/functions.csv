@@ -4465,6 +4465,7 @@ addr,name,mode,confidence,source,notes
 081167CC,ActorRecoil_UpdateMotion,thumb,low,src-alias,
 08116870,MotionActor_UpdateMovementAudio,thumb,low,src-alias,
 08116918,MotionActor_ParsePosition,thumb,low,src-alias,
+081169A8,Glove_InitializeStyleModifiers,thumb,low,src-alias,Initializes Glove style from link payload or game state; then stats; modifiers; drain and color effects.
 08116BCC,Player_SaveCurrentHealth,thumb,low,src-alias,Tentatively copies the primary player's current health into persistent game state
 08116BF0,Player_RestoreCurrentHealth,thumb,low,src-alias,Tentatively restores primary player health from persistent state and refreshes health threshold indicators
 08116C20,Player_GetHorizontalVelocity,thumb,low,src-alias,Returns the selected player's motion value used as horizontal velocity by launched scene objects
