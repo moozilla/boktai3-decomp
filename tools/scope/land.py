@@ -100,7 +100,8 @@ def name_in_use(root, name):
     _, lines = csv_rows(root)
     in_csv = any(ln.split(",")[1:2] == [name] for ln in lines[1:])
     pat = re.compile(r"\b%s\b" % re.escape(name))
-    return in_csv, [os.path.relpath(p, root) for p in sources(root) if pat.search(open(p).read())]
+    code = lambda t: re.sub(r"/\*.*?\*/|//[^\n]*", "", t, flags=re.S)  # a name in a comment is not a use
+    return in_csv, [os.path.relpath(p, root) for p in sources(root) if pat.search(code(open(p).read()))]
 
 
 def rename(root, addr, old, new, mode="thumb", note=None, confidence="low", dry=False):
@@ -115,6 +116,8 @@ def rename(root, addr, old, new, mode="thumb", note=None, confidence="low", dry=
     # a file that already aliases NEW to this function (`#define NEW sub_ADDR`) is not a collision
     alias = re.compile(r"^#define[ \t]+%s[ \t]+%s\b" % (re.escape(new), label), re.M)
     users = [u for u in users if not alias.search(open(os.path.join(root, u)).read())]
+    if in_csv and csv_name(root, addr) == new:  # already this function's name: only the spellings change
+        in_csv = False
     if in_csv or (users and new != old):
         raise ValueError(f"{new} is already used: " + ", ".join((["functions.csv"] if in_csv else []) + users[:5]))
     olds = {old, label}

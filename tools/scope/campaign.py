@@ -500,7 +500,8 @@ def land_draft(func, tree, wd):
         cmd += ["--name", name] + (["--note", res["note"]] if res.get("note") else [])
     if not exact:
         cmd.append("--nonmatching")
-    p = subprocess.run(cmd, cwd=tree, capture_output=True, text=True)
+    env = {k: v for k, v in os.environ.items() if k != "SCOPE_RUN"}  # the base was copied to the unscoped workspace
+    p = subprocess.run(cmd, cwd=tree, capture_output=True, text=True, env=env)
     print((p.stdout + p.stderr).strip())
     if p.returncode == 0:
         open(os.path.join(wd, "landed"), "w").write(tree)

@@ -1,5 +1,30 @@
 # Matching a function with scope (worker brief)
 
+## Phase 1: a function with no C yet
+
+`scope.py todo` lists them (ROM order; `todo N prior` puts the ones with
+the most matched prior art first). `scope.py new FUNC` opens a workspace in
+`build/scope/work/FUNC.c` (under `build/scope/RUN/work/` with `SCOPE_RUN`):
+the function's unit with an empty definition where its INCLUDE_ASM was, the
+C of a matched twin when one covers at least half of its rare instruction
+windows, or an empty definition with the signature a header or a caller
+declares. Keep its `// scope: write FUNC here` line: it tells every command
+which function the file is about. Then:
+
+1. `scope.py rom FUNC` reads the ROM with calls and literal symbols named.
+2. `scope.py like FUNC` lists matched functions with the most similar code
+   and what they share; read the closest one's C, and the unit's neighbors,
+   for types, struct fields and idioms.
+3. `scope.py fields OFF... [STRUCT]` names the include/ structs with members
+   at the offsets the ROM reads (it does not see structs local to a .c file:
+   grep the callers too).
+4. Write C until the calls, loops and branches line up with the ROM, then
+   follow the loop below. `land FUNC` (exact) or `land FUNC --nonmatching`
+   (an unfinished draft) puts it in the tree; `land --name Prefix_Action`
+   names it.
+
+## Phase 2: a draft to a match
+
 You are turning a nonmatching C draft into C that compiles byte-for-byte to
 the ROM. scope compiles one function in well under a second and explains,
 from the compiler's own traces, *why* each differing instruction came out
@@ -47,10 +72,15 @@ Other commands:
 scope.py FILE.c life NAME...        insns that count toward a value's live length, by C line
 scope.py A.c vs B.c                 two drafts' register allocation side by side
 scope.py FILE.c spill               is the whole difference reload's spill rotation? (SCOPE_SPILL_MAX=42 compiles)
-scope.py FILE.c probe               is it one cse/gcse/loop decision? flips each alone (SCOPE_PROBE_MAX=150 compiles)
+scope.py FILE.c probe               is it one cse/gcse/loop decision (cse canonical register, jump follow,
+                                    PRE, loop strength reduction, invariant hoist)? flips each alone
+                                    (SCOPE_PROBE_MAX=150 compiles); "no change" covers only those families
 scope.py FILE.c pins                cost of removing each register pin / asm barrier; greedy free removal
 scope.py FILE.c try V1.c V2.c ...   score whole-file variants, best first, with the lines each changed
 scope.py FILE.c try KNOB={a,b,c}    one variant per knob value (shell expansion makes the list)
+scope.py FILE.c frame               stack slots, ROM against draft, with the C variable in each
+scope.py FILE.c hoist               loop-invariant motion by pass: what moved, what stayed, and the dead
+                                    re-set lever scored for each hoisted variable
 scope.py FILE.c insn UID            one RTL insn through every compiler pass
 scope.py FILE.c uses REG...         which insns use a pseudo after each pass
 ```
@@ -124,7 +154,11 @@ register canonical in cse).
 
 * agbcc is C89: in each block, declarations come before statements.
   `COMPILE FAILED` means the file did not compile; fix that first.
-* No `asm()` statements and no `register ... asm("rN")` pins.
+* No hand-written instructions in `asm()`, ever. Register pins
+  (`register T x asm("rN")`) and empty `asm("" : "+r"(x))` barriers are a
+  project-authorized last resort (CLAUDE.md): only where a knob proved an
+  allocation decision you could not reproduce in C after real attempts, and
+  say so in the report. Try to remove the ones a draft already has (`pins`).
 * Keep the C readable: names, struct fields, inline helpers are fine.
 * Stop when you get MATCH, or after about 25 compile attempts without
   progress.

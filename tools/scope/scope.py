@@ -3244,6 +3244,11 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
     kind, dest, asm_name = land.where(ROOT, name, addr)
     if nonmatching and kind == "hidden":
         sys.exit(f"{name}: a hidden function has no INCLUDE_ASM to fall back on; match it, or land by hand")
+    if new_name:  # a name that cannot be applied fails before anything is written
+        try:
+            land.rename(ROOT, addr, name, new_name, dry=True)
+        except ValueError as e:
+            sys.exit(f"{name}: {e}; nothing landed")
     path = os.path.join(ROOT, dest)
     text = open(os.path.abspath(draft)).read()
     before = {path: open(path).read() if os.path.exists(path) else None}
@@ -3251,6 +3256,16 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
     before[extras] = open(extras).read()
     if kind == "unit":
         cur = before[path]
+        if not os.path.exists(base):
+            # no record of the unit the draft started from: take the draft whole only if, outside
+            # FUNC, it is the unit as it is now (else it would undo neighbors that landed since)
+            sp = land.definition_span(text, name)
+            rest = text[:sp[0]] + text[sp[1]:] if sp else text
+            now = re.sub(r'^INCLUDE_ASM\("[^"]*", %s\);\n' % re.escape(asm_name or name), "", cur, flags=re.M)
+            strip = lambda t: re.sub(r"^// scope: write .*\n|\s+", "", t, flags=re.M)
+            if strip(rest) != strip(now):
+                sys.exit(f"{name}: no workspace base for {rel}, and outside {name} it differs from {dest};"
+                         " land by hand (or reopen with `new`)")
         merged = land.merge(cur, open(base).read() if os.path.exists(base) else cur, text)
         if merged is None:
             sys.exit(f"{name}: {dest} changed since `new` in a way that conflicts with the draft; land by hand")
@@ -3264,6 +3279,30 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         if text is None:
             sys.exit(f"{name}: no definition of {name} in {rel}")
     text, pins, bars = land.concessions(text)
+
+    def restore():
+        if getattr(restore, "committed", False):  # validated and named: later steps (the ROM build) keep it
+            return
+        for p, t in before.items():
+            if t is None:
+                if os.path.exists(p):
+                    os.remove(p)
+            else:
+                open(p, "w").write(t)
+    try:
+        return land_write(name, addr, kind, dest, path, text, info, nonmatching, funcs, sizes, restore,
+                          pins, bars, new_name, note, rom, wdraft, base, draft)
+    except BaseException:
+        # any failure after the first write (a compile error in the check, a format crash, ^C) puts the
+        # tree back as it was; land_write restores and exits itself for a plain mismatch
+        restore()
+        raise
+
+
+def land_write(name, addr, kind, dest, path, text, info, nonmatching, funcs, sizes, restore, pins, bars,
+               new_name, note, rom, wdraft, base, draft):
+    import land
+    import progress
     open(path, "w").write(text)
     fmt = os.path.join(ROOT, "build", "venv", "bin", "clang-format")
     subprocess.run([fmt if os.path.exists(fmt) else "clang-format", "-i", path], cwd=ROOT)
@@ -3281,11 +3320,7 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         if k != 0:
             bad.append(f"{f}: {inf.get('counts')}")
     if bad:
-        for p, t in before.items():
-            if t is None:
-                os.remove(p)
-            else:
-                open(p, "w").write(t)
+        restore()
         sys.exit(f"{name}: after landing, {dest} has functions that do not match ({'; '.join(bad[:4])});"
                  " restored")
     if nonmatching:  # the project's fuzzy figure (progress.py reads it); the system python3, as check.py runs in CI
@@ -3300,6 +3335,7 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
     if new_name:
         cmd_rename(name, new_name, note)
         name = new_name
+    restore.committed = True
     if rom:
         r = subprocess.run(["make", "-j8"], cwd=ROOT, capture_output=True, text=True)
         ok = "build/boktai3.gba: OK" in r.stdout.splitlines()
