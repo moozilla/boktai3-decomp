@@ -6641,6 +6641,7 @@ addr,name,mode,confidence,source,notes
 081963B8,Nidhoggr_UpdateTimedAttackSequence,thumb,low,src-alias,Runs a timed attack with paired effects and player-dependent target values then chooses the next behavior; attack identity is tentative
 08196674,Nidhoggr_UpdateRetreat,thumb,low,src-alias,Moves left with decreasing retreat speed then switches state at the position threshold
 08196718,Nidhoggr_UpdateEffectAttack,thumb,low,src-alias,Tentative attack sequence that repositions emits repeated effects and retreats before restoring a combat state
+08196A5C,Nidhoggr_UpdateLeftwardRetreat,thumb,low,src-alias,Disables the part colliders; retreats left with sway; then selects behavior 0x11.
 08196BA4,Nidhoggr_InitOffscreenPose,thumb,low,src-alias,Initializes position to zero X and negative Z once on entering the state
 08196BE4,Nidhoggr_UpdateDescendingExit,thumb,low,src-alias,Advances along positive Z then curves left and acknowledges the pending scene trigger
 08196D54,Nidhoggr_UpdateRightwardPass,thumb,low,src-alias,Moves right through a fixed reference position and acknowledges the pending scene trigger

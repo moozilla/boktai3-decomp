@@ -2827,13 +2827,79 @@ void Nidhoggr_UpdateEffectAttack(struct Nidhoggr *t)
     }
 }
 
-/* Tentative: sits between Nidhoggr_UpdateEffectAttack and Nidhoggr_InitOffscreenPose in
- * ROM order, and is never called directly (no "bl" site found in this unit), so it is most
- * likely reached only through the behavior dispatch table at gUnk_0824F5C0 -- i.e. another
- * Nidhoggr_UpdateXxx behavior handler for a mode not covered by this unit's other named
- * Update* functions. 328 bytes; not attempted byte-for-byte this pass. confidence=low. */
+/* Tentative: disable the part colliders and retreat left before selecting the
+ * offscreen pose behavior. The alternate collider range begins at slot one. */
 
-INCLUDE_ASM("asm/nonmatching", sub_08196A5C);
+struct RetreatCollider {
+    u8 unk_00[6];
+    u16 flags;
+    u8 unk_08[0x54 - 8];
+};
+
+struct RetreatPartExtra {
+    u32 unk_00;
+    u32 flags;
+    u8 unk_08[8];
+};
+
+void Nidhoggr_UpdateLeftwardRetreat(struct Nidhoggr *t)
+{
+    switch (t->state) {
+        case 0: {
+            s32 i;
+            u16 *altFlags;
+            register s32 altOffset asm("r1");
+            s32 stride, extraMask;
+            register s32 colliderMask asm("r4");
+            u32 flags, altValue;
+            u16 x;
+            struct SceneVec *base;
+            t->active = 1;
+            i = 0;
+            stride = sizeof(struct RetreatCollider);
+            colliderMask = 4;
+            extraMask = 1;
+            altOffset = (u8 *)&((struct RetreatCollider *)&t->altColliders[1])->flags - (u8 *)t;
+            asm("" : "+r"(altOffset));
+            altFlags = (u16 *)((u8 *)t + altOffset);
+        disablePart:
+            altValue = *altFlags;
+            altValue |= colliderMask;
+            *altFlags = altValue;
+            flags = ((struct RetreatCollider *)((u8 *)t->colliders + i * stride))->flags;
+            flags |= colliderMask;
+            ((struct RetreatCollider *)((u8 *)t->colliders + i * stride))->flags = flags;
+            ((struct RetreatPartExtra *)t->partExtra)[i].flags |= extraMask;
+            altFlags = (u16 *)((u8 *)altFlags + stride);
+            i++;
+            if (i < 26)
+                goto disablePart;
+            x = t->pos.x - 0x800;
+            base = &t->basePos;
+            colliderMask = 0;
+            base->x = x;
+            t->basePos.y = t->pos.y;
+            t->basePos.z = t->pos.z;
+            Nidhoggr_InitRelativeMotion(t, t->basePos.x, t->basePos.z);
+            t->posOffsetXVelocity = -0xe00;
+            t->swayXVelocity = -0x88;
+            t->state++;
+            t->timer = colliderMask;
+            break;
+        }
+        case 1:
+            if (t->timer == 6)
+                Sound_PlaySongChecked(0x409);
+            t->posOffsetX += t->posOffsetXVelocity;
+            if (t->posOffsetX < 0)
+                t->state++;
+            Nidhoggr_UpdateWideSway(t);
+            break;
+        case 2:
+            Nidhoggr_SetBehavior(t, 0x11);
+            break;
+    }
+}
 
 void Nidhoggr_InitOffscreenPose(struct Nidhoggr *p)
 {
