@@ -7740,6 +7740,7 @@ addr,name,mode,confidence,source,notes
 081CF578,SceneNpc_UpdateDashSlide,thumb,low,src-alias,
 081CF62C,SceneNpc_UpdateDescendingDash,thumb,low,src-alias,
 081CF84C,SceneNpc_PlayAnimation12,thumb,low,src-alias,
+081CF8A4,SceneNpc_UpdateParticleDisappearance,thumb,low,src-alias,Blends the NPC palette; waits for animation completion; scatters a particle cloud; and enters hidden idle.
 081CF9E8,SceneNpc_UpdateRisingToTerrain,thumb,low,src-alias,
 081CFC44,SceneNpc_UpdateProjectedVisible,thumb,low,src-alias,
 081CFCA4,SceneNpc_UpdateProjectedIdle,thumb,low,src-alias,
