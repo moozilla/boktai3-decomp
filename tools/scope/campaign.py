@@ -595,6 +595,32 @@ def cmd_submit(args):
     return 0
 
 
+def mismatch_files(tree, out, touched):
+    """A ROM MISMATCH names no file, only its first differing address: the touched src/ files that
+    define the function containing that address (by functions.csv start), so its landing is dropped."""
+    m = re.search(r"first difference at 0x([0-9a-fA-F]+)", out)
+    if not m:
+        return set()
+    addr = int(m.group(1), 16)
+    starts = []
+    with open(os.path.join(tree, "symbols", "functions.csv")) as f:
+        for row in f:
+            c = row.split(",")
+            if len(c) > 1 and re.fullmatch(r"[0-9A-Fa-f]{8}", c[0]):
+                starts.append((int(c[0], 16), c[1]))
+    before = [s for s in starts if s[0] <= addr]
+    if not before:
+        return set()
+    a, name = max(before)
+    pat = re.compile(r"\b(?:%s|sub_%08X)\s*\(" % (re.escape(name), a))
+    found = set()
+    for f in touched:
+        path = os.path.join(tree, f)
+        if f.startswith("src/") and f.endswith(".c") and os.path.exists(path) and pat.search(open(path).read()):
+            found.add(f)
+    return found
+
+
 def cmd_integrate(args):
     tree = os.path.abspath(os.path.expanduser(args[0]))
     limit = int(args[args.index("--limit") + 1]) if "--limit" in args else 10 ** 6
@@ -674,6 +700,7 @@ def cmd_integrate(args):
                            if re.match(r"\s*(?:\S*/)?(?:build/)?src/[\w/]+\.[cso]:", ln)
                            or re.search(r"(?i)error|failed|must be|undefined|can't|cannot", ln))
         files = {f"src/{m}.c" for m in re.findall(r"(?:build/)?src/([\w/]+)\.[cso]\b", errors)}
+        files |= mismatch_files(tree, out, [f for wd in landed for f in commits[wd][1]])
         bad = [wd for wd in landed if commits[wd][1] & files]
         if not bad or len(bad) == len(landed):
             break
