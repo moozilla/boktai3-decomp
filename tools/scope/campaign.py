@@ -475,31 +475,8 @@ def block_span(text, func, addr):
 
 
 def unwrap(text, func, addr):
-    """The matching C without its #ifdef NONMATCHING / #else INCLUDE_ASM / #endif wrapper and fuzzy notes."""
-    for m in re.finditer(r"#ifdef NONMATCHING\n(.*?)#else\n(.*?)#endif\n?", text, re.S):
-        names = re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', m.group(2))
-        if func in names or "sub_" + addr in names:
-            body = "".join(ln for ln in m.group(1).splitlines(True)
-                           if not re.match(r"\s*// (fuzzy:|Remaining differences)", ln))
-            # a block can hold several functions (one file-wide #ifdef): the others stay nonmatching,
-            # each in its own #ifdef NONMATCHING / #else INCLUDE_ASM / #endif
-            for other in names:
-                if other in (func, "sub_" + addr):
-                    continue
-                d = re.search(r"^[A-Za-z_][^\n;=]*\b" + other + r"\s*\([^;{]*\)\s*\{.*?^\}\n", body, re.S | re.M)
-                if not d:
-                    return None
-                start = d.start()
-                while True:  # take the comment lines directly above the definition along
-                    prev = body.rfind("\n", 0, start - 1) + 1
-                    if start == 0 or not body[prev:start].lstrip().startswith("//"):
-                        break
-                    start = prev
-                inc = re.search(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*' + other + r"\s*\);", m.group(2)).group(0)
-                body = (body[:start] + "#ifdef NONMATCHING\n" + body[start:d.end()] + "#else\n" + inc
-                        + "\n#endif\n" + body[d.end():])
-            return text[:m.start()] + body + text[m.end():]
-    return None
+    import land
+    return land.unwrap(text, func, addr)
 
 
 def land_draft(func, tree, wd):
@@ -600,6 +577,10 @@ def cmd_submit(args):
     json.dump({"match": exact, "counts": "MATCH" if exact else (m.group(1) if m else "?"), "pins": 0, "barriers": 0,
                "compiles": 0, "name": name, "note": note}, open(os.path.join(wd, "result.json"), "w"))
     open(os.path.join(wd, "submitted"), "w").write(src)
+    # a new submission supersedes an earlier landing: with the old marker left, integrate skips it
+    for mark in ("landed", "land_failed", "landed.build_failed"):
+        if os.path.exists(os.path.join(wd, mark)):
+            os.replace(os.path.join(wd, mark), os.path.join(wd, mark + ".prev"))
     rows = json.load(open(QUEUE)) if os.path.exists(QUEUE) else []
     if not any(r["func"] == func for r in rows):
         rows.append({"func": func, "addr": func[-8:], "size": 0, "kind": "draft"})
@@ -667,6 +648,12 @@ def cmd_integrate(args):
         sys.exit(f"{tree}: fetch failed; nothing integrated\n" + fetched.stderr)
     if git("checkout", "-q", "-B", branch, "origin/main").returncode:
         sys.exit(f"{tree}: could not check out {branch}")
+    # landing scores each draft with scope's compilers: a tree that never built them borrows this one's
+    for c in ("agbcc", "agbcc_arm"):
+        mine, theirs = os.path.join(ROOT, "build", "scope", c), os.path.join(tree, "build", "scope", c)
+        if os.path.isdir(mine) and not os.path.exists(theirs) and os.path.realpath(mine) != os.path.realpath(theirs):
+            os.makedirs(os.path.dirname(theirs), exist_ok=True)
+            os.symlink(mine, theirs)
     done, landed, commits = [], [], {}
 
     def release_landings(reason):
