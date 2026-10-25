@@ -6024,6 +6024,7 @@ addr,name,mode,confidence,source,notes
 08174594,Presentation_SelectGraphicResource,thumb,low,src-alias,
 081748B8,InventoryGrid_GetSlotPosition,thumb,low,src-alias,
 08174B8C,Presentation_DrawEntryCount,thumb,low,src-alias,
+08174BBC,Presentation_SetAmountGlyphRows,thumb,low,src-alias,Shows and positions three rows of three amount glyphs; then redraws the entry count.
 08174C2C,InventoryGrid_UpdateStatPreview,thumb,low,src-alias,
 08174D20,InventoryGrid_LayoutStatMarkers,thumb,low,src-alias,Shows and positions three cumulative base; offset; and delta stat-marker groups.
 08174E38,Presentation_UpdateListCursor,thumb,low,src-alias,

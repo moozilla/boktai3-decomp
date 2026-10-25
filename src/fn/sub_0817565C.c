@@ -24,7 +24,7 @@ void MenuSelection_DrawNumericSummary(u8 *);
 void Hud_DrawCounter7B0(u32, u32);
 void Hud_DrawCounter50C(u32, u32);
 void Hud_DrawStatusDayNightIndicators(u8 *);
-void sub_08174BBC(u8 *);
+void Presentation_SetAmountGlyphRows(u8 *);
 void SceneCatalog_SetSelection(u8 *, u32);
 void InventoryGrid_LayoutStatMarkers(u8 *);
 void SceneCatalog_ResetTextWindow(u8 *);
@@ -60,7 +60,7 @@ void Hud_InitStatusMenu(u8 *s)
     PauseMenu_ClearSpriteFlags(s, 0x4D, 1);
     PauseMenu_ClearSpriteFlags(s, 0x4E, 1);
     sub_0816618C(s, 8, 0x20);
-    sub_08174BBC(s);
+    Presentation_SetAmountGlyphRows(s);
     SceneCatalog_SetSelection(s, 0);
     InventoryGrid_LayoutStatMarkers(s);
     InventoryPanel_ShowStatusIcons(s);
