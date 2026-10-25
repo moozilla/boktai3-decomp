@@ -6519,6 +6519,7 @@ addr,name,mode,confidence,source,notes
 08190704,ScenePanelEffect_Create,thumb,low,src-alias,Creates a scheduled panel effect task and stores its duration and contact reaction parameters
 0819074C,ScenePanelEffect_OnContact,thumb,low,src-alias,Contact callback that disables the effect and applies its stored reaction parameter
 08190778,ScenePanelEffect_CreatePositionEffect,thumb,low,src-alias,Creates an effect at the supplied position using the task's stored duration
+08190798,Nidhoggr_UpdateOwnedSeekingEffect,thumb,low,src-alias,Advances an owned Nidhoggr seeking effect; selects randomized motion toward the player; and emits a position impact before destruction.
 08190C98,Nidhoggr_ChangeCompletedPartState,thumb,low,src-alias,
 08190CE4,SceneAnimation_SetSlotState,thumb,low,src-alias,Sets a slot's state and clears its phase counter and completion bytes
 08190D1C,SceneAnimation_UpdateSlotSequenceFourReveal,thumb,low,src-alias,Steps sequence four through keyframes two to four and reveals the associated visual; reveal interpretation tentative
