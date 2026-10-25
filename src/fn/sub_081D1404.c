@@ -9,7 +9,7 @@ extern u32 gUnk_03005308;
 s32 Mod(s32, s32);
 void Task_Kill(void *);
 void sub_081D11E4(void *, s32);
-void sub_081D12FC(void *);
+void SceneNpc_UpdateTransitionParticles(void *);
 
 #define RAND() (gUnk_0203B400[gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF])
 
@@ -116,7 +116,7 @@ s32 SceneNpc_UpdateTransitionEffect(u8 *p)
             f = 0;
         *(u16 *)(p + 0x28) = f;
     }
-    sub_081D12FC(p);
+    SceneNpc_UpdateTransitionParticles(p);
     *(s32 *)(p + 0x68) += 1;
     return 0;
 }
