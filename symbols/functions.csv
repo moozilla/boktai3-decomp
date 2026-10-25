@@ -4740,6 +4740,7 @@ addr,name,mode,confidence,source,notes
 081229E0,SceneScheduledEffect_OnColliderContact,thumb,low,src-alias,Empty collider callback referenced by the scheduled effect collider initializer
 081229E4,StateSprite_InitCollider,thumb,low,src-alias,
 08122B00,StateSprite_InitAnimation,thumb,low,src-alias,
+08122B8C,SceneScheduledEffect_Create,thumb,low,src-alias,Allocates and initializes a scheduled sprite effect; optionally offsetting its body and registering it with the terrain overlay.
 08122D20,SceneScheduledEffect_LoadResource,thumb,low,src-alias,Loads resource 1BC7 and relocates its embedded header
 08122DA0,SceneScheduledEffect_EnsureSingleton,thumb,low,src-alias,Creates the shared effect task when absent; called by scene effect schedule initialization
 08122DE4,SceneScheduledEffect_ResetSingleton,thumb,low,src-alias,Clears the shared effect manager pointer during scene reset
