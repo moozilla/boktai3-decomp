@@ -7880,6 +7880,7 @@ addr,name,mode,confidence,source,notes
 081D7434,OptionMenu_Update,thumb,low,src-alias,
 081D7510,ScreenParams2A0_SetFromScript,thumb,low,src-alias,
 081D75AC,ScreenParams2A0_CreateSelector,thumb,low,src-alias,Creates an input task that selects among eight script callbacks configured through ScreenParams2A0
+081D75E8,Task4E01_UpdateTrailSprites,thumb,low,src-alias,Updates four radial trail sprites with shrinking offsets and hides each after its fifteenth tick.
 081D76F4,Task4E01_SpawnTrailSprite,thumb,low,src-alias,
 081D7874,Task4E01_ClearTrailSprites,thumb,low,src-alias,Clears four active bytes and hides their corresponding sprites; trail identity tentative
 081D789C,SpriteGroup_InitFourSprites,thumb,low,src-alias,
