@@ -6,7 +6,7 @@ void Task4E01_SpawnTrailSprite(void *, void *);
 void Projectile_SetCollisionSize(void *, s32, s32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
-void sub_081D75E8(void *, void *);
+void Task4E01_UpdateTrailSprites(void *, void *);
 void Task4E01_UpdateTimedSprite(void);
 extern u16 gUnk_03005260;
 
@@ -103,6 +103,6 @@ s32 Task4E01_UpdateTrailImpact(u8 *p)
         if (config->f3a == 0)
             Sound_PlaySong(0xCD);
     }
-    sub_081D75E8(group, p);
+    Task4E01_UpdateTrailSprites(group, p);
     return 1;
 }

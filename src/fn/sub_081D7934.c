@@ -266,7 +266,7 @@ void Task4E01_OnType7DirectionalAnimation(void *);
 void Task4E01_OnType8DirectionalAnimation(void *);
 void Task4E01_OnType4Animation(void *);
 void Projectile_UpdateAnimation(void *);
-void sub_081D9D3C(void *);
+void Projectile_SpawnImpactPair(void *);
 // confidence=low: resets projectile time, chooses impact animation, and sets the impact flag.
 struct ImpactConfig {
     u16 flags;
@@ -338,7 +338,7 @@ s32 Task4E01_BeginImpactAnimation(u8 *input)
             asm("" : "+r"(impactFlags));
             if (!(*impactFlags & 0x2000))
                 ((struct Drawable *)(input + 0x8c))->sprite.frame = 31;
-            Projectile_SetUpdateCallback(config, sub_081D9D3C);
+            Projectile_SetUpdateCallback(config, Projectile_SpawnImpactPair);
             break;
         }
 

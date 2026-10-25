@@ -475,25 +475,25 @@ address,isa,evidence,replacement_end
 0819EBD0,thumb,Hidden raw-tail function: emits a run of direction bursts,0819EC08
 0819F49C,thumb,Hidden tail function,0819F4D8
 0819F4D8,thumb,Hidden tail function,0819F55C
-0819F5B4,thumb,Independent six-shot offset emission loop with own prologue and return after DirectionBurst_EmitOffset,
+0819F5B4,thumb,Independent six-shot offset emission loop with own prologue and return after DirectionBurst_EmitOffset; exact 132-byte C body,0819F638
 081A36FC,thumb,Hidden Task_Kill wrapper for gUnk_02000238,081A3710
 081A398C,thumb,Hidden raw-tail function,081A39E0
 081A3F70,thumb,Hidden Task_Kill wrapper for gUnk_0200023C,081A3F84
-081A4420,thumb,Independent falling-motion updater clone with own prologue and return after 081A42AC,
+081A4420,thumb,Independent falling-motion updater clone with own prologue and return after 081A42AC; exact 372-byte C body,081A4594
 081A47D0,thumb,Hidden Task_Kill wrapper for gUnk_02000240,081A47E4
 081A4ED8,thumb,Hidden Task_Kill wrapper for gUnk_02000244,081A4EEC
 081A6458,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081A645C
 081A645C,thumb,Code following a reviewed gap leaf (own boundary so the leaf can be replaced); retained assembly,081A64C8
-081A6C24,thumb,Function in the listed extent of sub_081A6AEC; push right after its pop and bx r1 return; retained assembly,
-081A6D0C,thumb,Function after 081A6C24's literal pool; independent push and bl; retained assembly,
+081A6C24,thumb,Function in the listed extent of sub_081A6AEC; push right after its pop and bx r1 return; exact 232-byte C body,081A6D0C
+081A6D0C,thumb,Function after 081A6C24's literal pool; independent push and bl; exact 192-byte C body,081A6DCC
 081AB904,thumb,Hidden tail after Vanargand_RunDefeatSequence,081ABA64
 081ADBB8,thumb,Hidden raw-tail function,081ADBF8
 081AF738,thumb,Hidden raw-tail function,081AF76C
 081B0244,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081B0248
-081B512C,thumb,Function in the listed extent of sub_081B4DA4; push after its pop and bx r0 return; retained assembly,
-081B7614,thumb,Hidden raw-tail function (retained),
+081B512C,thumb,Function in the listed extent of sub_081B4DA4; push after its pop and bx r0 return; exact 444-byte C body,081B52E8
+081B7614,thumb,Hidden raw-tail function; exact 136-byte C body,081B769C
 081B8104,thumb,Hidden raw-tail function,081B8160
-081B8D84,thumb,Hidden tail after OrbitMotion_UpdateAngle,
+081B8D84,thumb,Hidden tail after OrbitMotion_UpdateAngle; exact 192-byte C body,081B8E44
 081B94AC,thumb,Hidden raw-tail function: orbit motion begin XY distance wave (mode 7),081B9598
 081B9864,thumb,Hidden raw-tail function,081B98D8
 081B9ECC,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081B9ED0

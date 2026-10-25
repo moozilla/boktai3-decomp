@@ -23,7 +23,7 @@ typedef struct {
     u8 *q;
 } Obj;
 
-extern void sub_081B7B1C(Obj *p);
+extern void GrowthHazard_UpdateSharedFlash(Obj *p);
 extern s32 Callback_InvokeActor(void *arg, void *function);
 extern void AnimData_SelectPaletteBank(void *a, s32 b);
 extern u32 gUnk_08612154[];
@@ -31,7 +31,7 @@ extern u32 gUnk_08612154[];
 s32 GrowthHazard_UpdateManager(Obj *p)
 {
     s32 i;
-    sub_081B7B1C(p);
+    GrowthHazard_UpdateSharedFlash(p);
     if (*(s16 *)(p->q + 0x94) > 0) {
         for (i = 0; i < p->n; i++) {
             Ent *e = &p->e[i];

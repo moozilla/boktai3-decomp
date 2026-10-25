@@ -3,7 +3,7 @@ extern u8 *gUnk_02000274, *gUnk_02000480;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetKeywordValue(s32, s32);
 u8 *Actor_FindById(void *, s32);
-void sub_081CEFCC(void);
+void SceneNpc_FollowSceneTarget(void);
 void SceneNpc_SetBehaviorTwoFromScript(void)
 {
     u8 *p;
@@ -31,7 +31,7 @@ void SceneNpc_SetBehaviorTwoFromScript(void)
         }
         *(u32 *)(p + 0x14) = zero;
         p[8] = one;
-        f = sub_081CEFCC;
+        f = SceneNpc_FollowSceneTarget;
         p[6] = 0x10;
         *(void (**)(void))(p + 0x2cc) = f;
         *(u32 *)(p + 0x10) = zero;
