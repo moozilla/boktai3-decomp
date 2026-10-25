@@ -542,7 +542,61 @@ void sub_08022790(u8 *p, s32 big)
     SparkParticle_Spawn(&pos, 5, &size, angle, count, speed, 0, 2);
 }
 
+typedef struct BurstVec {
+    s32 x : 16, y : 16, z : 16, pad : 16;
+} BurstVec;
+extern const BurstVec gUnk_08604D84[];
+extern u32 gUnk_03005308;
+extern const u16 gUnk_0203B400[];
+u16 Sqrt(u32);
+s32 Div(s32, s32);
+void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
+void TransientSpriteEffects_Spawn(int, int, void *, void *, int, int);
+
+#ifdef NONMATCHING
+// fuzzy: 30.8%
+// scope shape 95 (differences once low registers are set aside)
+// confidence=low: bursts eight particles around fixed offsets from p, each flying outward
+// from a point 0xc8 above p at speed 5.
+void sub_08022878(BurstVec *p)
+{
+    BurstVec center = *p;
+    s32 i;
+    BurstVec pos[1], vel[1];
+    center.y += 0xc8;
+    for (i = 0; i < 8; i++) {
+        const u16 *table = gUnk_0203B400;
+        u32 index;
+        u16 len;
+        u16 r;
+        index = (gUnk_03005308 + 1) & 0x3FF;
+        gUnk_03005308 = index;
+        r = table[index] & 0x1f;
+        pos->x = gUnk_08604D84[i].x + p->x - 0x10 + r;
+        index = (index + 1) & 0x3FF;
+        gUnk_03005308 = index;
+        r = table[index] & 0x1f;
+        pos->y = gUnk_08604D84[i].y + p->y - 0x10 + r;
+        index = (index + 1) & 0x3FF;
+        gUnk_03005308 = index;
+        r = table[index] & 0x1f;
+        pos->z = gUnk_08604D84[i].z + p->z - 0x10 + r;
+        AnimatedParticles_EmitBurst(pos, 1, 0, 0x40, 0xc, 0xc, 4, 4);
+        vel->x = pos->x - center.x;
+        vel->y = pos->y - center.y;
+        vel->z = pos->z - center.z;
+        len = Sqrt(vel->x * vel->x + vel->y * vel->y + vel->z * vel->z);
+        if (len) {
+            vel->x = Div(vel->x * 5, len);
+            vel->y = Div(vel->y * 5, len);
+            vel->z = Div(vel->z * 5, len);
+        }
+        TransientSpriteEffects_Spawn(2, 0, pos, vel, 0x20, 0x100);
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08022878);
+#endif
 
 // MATCHING_CONCESSION: register-pinning
 void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
@@ -865,6 +919,7 @@ void SceneActorState_SnapReactionPosition(u8 *p, struct SnapVector *position)
 }
 
 #ifdef NONMATCHING
+// fuzzy: 71.3%
 
 // fuzzy: 81.1%
 
