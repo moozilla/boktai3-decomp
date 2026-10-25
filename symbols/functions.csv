@@ -472,6 +472,7 @@ addr,name,mode,confidence,source,notes
 08015C30,AnimatedParticles_EmitBurst,thumb,low,src-alias,
 08015CF0,AnimatedParticles_EmitOffset,thumb,low,src-alias,
 08015DE0,AnimatedParticles_CreateFromScript,thumb,low,src-alias,
+08015F60,FadingParticleGroup_Spawn,thumb,low,src-alias,draft 84%: table via gUnk_0203B400 symbol; rng pointer set at top of the i loop body (lets loop.c hoist it out of the i loop like the ROM); (u8) indices on the sine table (stops the pass-2 hoist). 35/35 insns; only the table-vs-rng priority remains (AGBCC_PRI=table:+2000 gives 8/8)
 08016118,FadingParticleGroup_Update,thumb,low,src-alias,
 08016334,FadingParticleManager_Update,thumb,low,src-alias,Task update callback (set via Task_SetCallbacks in FadingParticleManager_Create) that advances each of the 6 fading particle groups via FadingParticleGroup_Update and
 0801636C,FadingParticleManager_Destroy,thumb,low,src-alias,Task destroy callback (paired with the update callback in FadingParticleManager_Create) that removes the effects owned by each active fading particle group and clears
