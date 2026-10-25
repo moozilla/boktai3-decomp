@@ -85,7 +85,7 @@ s32 Math_Atan2(s32, s32);
 void Terrain_ResolveActorMotion(struct Obj *);
 void PalFade_Update(struct Obj *);
 void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
-void sub_0811BF44(struct Obj *);
+void ActorParticles_SpawnImpactBurst(struct Obj *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
 void ScenePool_ClampMotionSpeeds(struct Obj *);
 void Actor_ClampMovementSpeed(struct Obj *);

@@ -51,7 +51,7 @@ s32 Math_Atan2(s32, s32);
 void Terrain_ResolveActorMotion(struct Actor *);
 void PalFade_Update(struct Actor *);
 void Actor_UpdateShadowSpriteParts(struct Actor *, u8 *);
-void sub_0811BF44(struct Actor *);
+void ActorParticles_SpawnImpactBurst(struct Actor *);
 void CharacterModel_UpdateAccessoryAnimations(u8 *);
 
 void ActorMotion_UpdateFallFrame(struct Actor *p)
@@ -119,7 +119,7 @@ void ActorMotion_UpdateFallFrame(struct Actor *p)
     PalFade_Update(self);
     Actor_UpdateShadowSpriteParts(self, p->model);
     if (self->flags & 4)
-        sub_0811BF44(self);
+        ActorParticles_SpawnImpactBurst(self);
     if (self->flags & 2)
         *baseZ = 0;
     if (self->flags & 1)

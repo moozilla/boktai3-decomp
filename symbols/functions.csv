@@ -4544,6 +4544,7 @@ addr,name,mode,confidence,source,notes
 0811BCBC,Actor_ClampMovementSpeed,thumb,low,src-alias,Clamps actor field 5DC between 32 and 200 in twelve-bit fixed point; movement speed interpretation is tentative
 0811BCE8,Actor_SetSpriteDepthOffsets,thumb,low,src-alias,Sets five sprite depth fields from signed table offsets plus a shared base; depth interpretation is tentative
 0811BD30,Actor_UpdateShadowSpriteParts,thumb,low,src-alias,
+0811BF44,ActorParticles_SpawnImpactBurst,thumb,low,src-alias,Plays sound 0x90 and emits four randomized pairs of actor-relative impact particles (impact role tentative).
 0811C09C,ActorParticles_EmitOffsetBurst,thumb,low,src-alias,
 0811C168,ActorParticles_SpawnSideBurst,thumb,low,src-alias,
 0811C2EC,ActorParticles_UpdateEmitter,thumb,low,src-alias,
