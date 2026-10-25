@@ -290,7 +290,27 @@ def resolve_knobs(src, func, env):
 
 def compile_draft(src, func, env=None):
     """Compile with the instrumented agbcc; return (bytes, address, info) for FUNC.
-    ENV adds knob settings (CSE_NOCANON=N, AGBCC_FORCE=..., see tools/scope/build_agbcc.sh)."""
+    ENV adds knob settings (CSE_NOCANON=N, AGBCC_FORCE=..., see tools/scope/build_agbcc.sh).
+    The dumps, uids and DWARF lines come from a -g compile. Without knobs the bytes are the real
+    build's (no -g): where -g changes the code, those win and info["g_differs"] is set."""
+    mine, a, info = compile_draft_g(src, func, env)
+    if has_knobs(resolve_knobs(src, func, env)):
+        return mine, a, info
+    plain = fast_compile(src, func, env, plain=True)
+    if plain is not None and plain[0] != mine:
+        if func not in _G_WARNED:
+            _G_WARNED.add(func)
+            print(f"note: -g changes agbcc's code for {func}; the bytes here are the real build's (no -g),"
+                  " so C lines and insn uids in this listing are approximate", file=sys.stderr)
+        info.update(data=plain[2], lines={}, g_differs=True)
+        mine = plain[0]
+    return mine, a, info
+
+
+_G_WARNED = set()
+
+
+def compile_draft_g(src, func, env=None):
     env = resolve_knobs(src, func, env)
     wd = workdir(func)
     pre = preprocess(src, env, func)
@@ -1877,14 +1897,23 @@ def inline_macros(text):
     return re.sub(r'^\s*\.include\s+"asm/macros\.inc"\s*$', lambda m: macros, text, flags=re.M)
 
 
-def fast_compile(src, func, env=None):
+def has_knobs(env):
+    return any(k.startswith(("AGBCC_", "CSE_")) for k in (env or {}))
+
+
+def fast_compile(src, func, env=None, plain=None):
     """(FUNC's bytes, address, data ranges) through scope's agbcc fork server (tools/scope/fast.py):
-    a few ms per variant, bytes only. None when the unit cannot be served (then use compile_draft)."""
+    a few ms per variant, bytes only. None when the unit cannot be served (then use compile_draft).
+    PLAIN (default: when ENV sets no knob) compiles without -g, as the real build does."""
     import fast
     env = resolve_knobs(src, func, env)
+    if plain is None:
+        plain = not has_knobs(env)
     # -g as compile_draft has it: debug notes take insn uids, so without it the uids `why` and `insn`
-    # print name other insns here and uid knobs (AGBCC_NOMOVE, AGBCC_NOGIV, ...) in `try` miss
-    flags = tuple(build.cflags_for(src)) + ("-g",)
+    # print name other insns here and uid knobs (AGBCC_NOMOVE, AGBCC_NOGIV, ...) in `try` miss. But -g
+    # is not always the same code (Storage_RefreshConsumableSlots: -g keeps a loop counting up that the
+    # plain compile reverses), so a compile without knobs, whose bytes are a verdict, goes without it.
+    flags = tuple(build.cflags_for(src)) + (() if plain else ("-g",))
     _, addr_all, _ = inventory()
     addr = addr_all[rom_name(src, func)]
     key = (flags, addr)
@@ -3419,6 +3448,11 @@ def put_definition(src, snippet, func):
     sp = land.definition_span(text, func)
     if not sp:
         sys.exit(f"{func}: no definition in {src} to replace (`new` writes one)")
+    # every prototype of FUNC in the unit (before or after it) takes the definition's signature
+    header = re.sub(r"\s+", " ", new[pat.search(new).start():new.index("{", pat.search(new).start())]).strip()
+    proto = re.compile(r"^(?!static\b)[A-Za-z_][^\n;=(){}]*\b%s\s*\([^;{}]*\)\s*;" % re.escape(func), re.M)
+    text = proto.sub(lambda m: re.sub(r"^static\s+", "", header) + ";", text)
+    sp = land.definition_span(text, func)
     start = pat.search(text, sp[0]).start()
     # what a put inserts sits between these markers, and the next put replaces exactly that
     begin, end = f"// scope: put {func} begin\n", f"// scope: put {func} end\n"
@@ -3434,12 +3468,6 @@ def put_definition(src, snippet, func):
     # #include and other directives the unit has already are dropped (a #define replaces the old one below)
     have = set(re.findall(r"^#(?!define\b).*$", text, re.M))
     new = "".join(ln for ln in new.splitlines(True) if not (ln.startswith("#") and ln.rstrip("\n") in have))
-    # a prototype of FUNC in the unit takes the definition's signature, so a changed type compiles
-    header = re.sub(r"\s+", " ", new[pat.search(new).start():new.index("{", pat.search(new).start())]).strip()
-    proto = re.compile(r"^(?!static\b)[A-Za-z_][^\n;=(){}]*\b%s\s*\([^;{}]*\)\s*;" % re.escape(func), re.M)
-    text = proto.sub(lambda m: re.sub(r"^static\s+", "", header) + ";", text[:start]) + text[start:]
-    sp = land.definition_span(text, func)
-    start = pat.search(text, sp[0]).start()
     # a macro the snippet #defines replaces an earlier put's #define of it
     macros = set(re.findall(r"^#define\s+(\w+)", new, re.M))
     # a helper or type the snippet defines replaces the same-named one an earlier put left between the
@@ -3936,6 +3964,12 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         sys.exit(f"{target}: not in the function inventory")
     wdraft, base = work_paths(name)
     draft = draft or wdraft
+    text0 = open(draft).read()
+    if new_name and not land.definition_span(text0, name) and land.definition_span(text0, new_name):
+        # a draft that already spells FUNC by its proposed --name: land it under FUNC, then rename
+        draft = os.path.splitext(os.path.abspath(draft))[0] + ".as_func.c"
+        open(draft, "w").write(re.sub(r"\b%s\b" % re.escape(new_name), name, text0))
+        print(f"{name}: the draft defines it as {new_name}; landing it under {name}, then renaming")
     rel = os.path.relpath(os.path.abspath(draft), ROOT)
     registered = register_draft_functions(name, addr, sizes, draft)
     if registered:
