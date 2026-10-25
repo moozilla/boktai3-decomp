@@ -27,7 +27,7 @@ void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 extern u32 gUnk_030053F4;
-void sub_08107398(struct TileTrigger *);
+void TileTrigger_EmitParticles(struct TileTrigger *);
 static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequenceState *state,
                                struct TileTrigger *base)
 {
@@ -159,7 +159,7 @@ void TileTrigger_StepHold(struct TileTrigger *p)
         {
             u8 *forced = &p->forced;
             if (*forced) {
-                sub_08107398(p);
+                TileTrigger_EmitParticles(p);
                 Anim_SetSequence(&p->animation, manager->animationData, 0, (u8)p->sequence, 0);
                 *forced = 0;
                 switch (p->sequence) {

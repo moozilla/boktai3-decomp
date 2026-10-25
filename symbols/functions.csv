@@ -4107,6 +4107,7 @@ addr,name,mode,confidence,source,notes
 08107240,Pool1B8_Allocate,thumb,low,src-alias,
 08107298,TileTrigger_IsTetherNearby,thumb,low,src-alias,
 08107320,TileTrigger_TickIdle,thumb,low,src-alias,
+08107398,TileTrigger_EmitParticles,thumb,low,src-alias,Emits six randomized particle groups around sequence-0/1 tile triggers unless the global 0x800 flag suppresses them.
 0810764C,TileTrigger_TickDelay,thumb,low,src-alias,
 081076D0,TileTrigger_StepHold,thumb,low,src-alias,
 081078B0,TileTrigger_StepPress,thumb,low,src-alias,
