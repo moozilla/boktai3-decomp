@@ -2,10 +2,16 @@
 """Run scope workers (Codex) over a queue of NONMATCHING drafts, a few at a time.
 
   campaign.py queue [--category Bosses] [--all]    write build/scope/campaign/queue.json from origin/main
-  campaign.py tick [--workers 4] [--model M]       keep WORKERS running; return when one finishes
+  campaign.py queue --undrafted [--reverse] [--max-size B]   phase 1: functions with no C yet (scope todo),
+                                                   ARM ones left out; --reverse starts from the ROM's end
+  campaign.py tick [--workers 4] [--model M] [--floor 15]   keep WORKERS running; return when one finishes
+  campaign.py review [--model M] | review --say MSG   an independent reviewer of scope itself
+                                                   (build/scope/campaign/review/REVIEW.md); --say continues it
   campaign.py status                               what ran, what matched, what is in flight
   campaign.py land FUNC WORKTREE [REV]                  verify FUNC's best_match.c, unwrap its NONMATCHING block,
                                                    three-way merge it into WORKTREE's file, check the unit
+                                                   (a phase-1 draft: `scope.py land` in WORKTREE, exact if
+                                                   best_match.c matches, else best.c --nonmatching)
 
 Each worker gets its own directory build/scope/campaign/FUNC/ (start.c = the draft as on origin/main,
 base.c = the same, kept for a three-way merge at landing) and SCOPE_RUN=FUNC. Workers are detached:
@@ -66,6 +72,91 @@ Deliverables in {wd}:
 Your last message: a five-line summary of the same.
 """
 
+DRAFT_BRIEF = """You are a worker on a GBA decompilation project (Boktai 3). Your job: write C for one function that has
+none yet, and drive it as close to a byte-for-byte match with the original ROM as you can, using the `scope`
+tool, in C the original authors could have written. Several other workers run at the same time on other
+functions; you never touch the source tree.
+
+Read first (you are in the scope checkout; run every command from its root):
+- tools/scope/WORKER.md: the matching loop (why, knobs, try, probe, life, vs, pins).
+- tools/scope/README.md: grep the section "agbcc facts established with scope" when a difference looks
+  familiar (allocation order, loop motion, slot order, small forms). CLAUDE.md "Compiler facts".
+
+Your function: {func} at {addr} ({size} bytes{arm}). Your directory: {wd}.
+- {wd}/start.c is scope's workspace for it, opened with `scope.py new` ({seed}): the whole unit (or a seed
+  file) with an empty definition of {func} where you write the body. Keep the `// scope: write ... here`
+  line: it tells scope which function the file is about. Work on copies in your directory only.
+- Prefix every scope command with SCOPE_RUN={run}:
+    SCOPE_RUN={run} python3 tools/scope/scope.py {wd}/start.c        compile, align with the ROM, list hunks
+  Use a copy (cp {wd}/start.c {wd}/d1.c) for each line of attack; `try` scores several copies at once.
+
+Phase 1, a first draft (spend about a third of your effort here):
+1. Read the ROM: `scope.py rom {func}` (calls and literal symbols named). `scope.py like {func}` lists matched
+   functions with the most similar code, with shared calls and constants; read the closest one's C (grep its
+   name in src/) for types, struct fields and idioms. Neighbors in the same unit file are the best guide to
+   the structs and helpers in use.
+2. Structs: `scope.py fields OFF... [STRUCT]` names include/ structs with members at the offsets the ROM
+   reads. Use fields where a struct fits; if none does, declare a local struct in the file (padding
+   members named unk_XX) rather than pointer arithmetic. Prototypes for callees: grep include/ and src/
+   for the name; declare missing ones in the file with the types the call sites need.
+3. Ghidra pseudo-C (if `new` put one in the file) is a reading aid only; write C in the style of the unit.
+4. Compile until it builds (agbcc is C89: declarations first in each block; `COMPILE FAILED` = fix that
+   first) and the control flow and calls line up with the ROM: same calls in the same order, same loops.
+
+Phase 2, toward the match: follow WORKER.md's loop (why on the first difference of each hunk, confirm with a
+knob, then C). `frame` compares stack slots; `hoist` explains loop-invariant motion and scores the dead
+re-set lever; `probe` flips each cse/gcse/loop decision alone; `spill` checks reload rotation.
+
+Rules:
+- No hand-written instructions, ever. Register pins (`register T x asm("rN")`) and empty `asm("" : "+r"(x))`
+  barriers are a last resort, only where a knob proved an allocation decision you could not reproduce in C
+  after real attempts; say so in the report.
+- Keep the C readable: struct fields and names, no magic offsets where a struct fits. Comments in the C must
+  stand alone: do not mention REPORT.md, your directory or your experiments.
+- Edit nothing outside {wd} (not src/, symbols/, tools/, include/); do not commit, push or run make. Never use
+  `rm -rf` (move files to ~/.Trash). Do not run whole-corpus checks.
+- Budget: about 150 compiles. A good draft that does not match is a fine result: stop when `why`-backed ideas
+  run out.
+
+Deliverables in {wd}:
+- best.c: your best file (the whole file, as start.c is), matching or not. best_match.c as well if it MATCHes.
+- result.json: {{"match": true/false, "counts": "N ROM / M draft" (or "MATCH"), "pins": P, "barriers": B,
+  "compiles": C, "name": "Prefix_Action or null", "note": "one line: what the function does"}}
+  (name: a provisional name in the project's Prefix_Action style, one prefix per object, like its unit's
+  neighbors; null if you cannot tell.)
+- REPORT.md: what the function does; for each step that helped, what scope said and what you changed; what
+  is left and its diagnosis; and, as much as the C itself, **where scope's output was confusing, wrong or
+  missing, and what command or output would have saved you time**.
+Your last message: a five-line summary of the same.
+"""
+
+REVIEW_BRIEF = """You are an independent reviewer of `scope`, the agent-facing decompilation IDE in tools/scope/ of
+this GBA decompilation project (Boktai 3; agbcc, GCC 2.95 Thumb). Its purpose: let an agent take a function
+from nothing to a byte-exact C match by asking the compiler why, instead of trying C forms blindly. Phase 1
+is writing a first draft for functions with no C (`todo`, `new`, `rom`, `like`, `fields`); phase 2 drives a
+draft to a match (`why`, knobs, `try`, `probe`, `spill`, `frame`, `hoist`, `life`, `vs`, `pins`); `land`
+puts the result in the tree. Other agents are using it right now on other functions.
+
+Read tools/scope/README.md, tools/scope/WORKER.md and `python3 tools/scope/scope.py --help`, then the code
+(tools/scope/scope.py, land.py, structure.py, fast.py, campaign.py, agbcc.patch). Use it yourself on real
+functions: pick two from `python3 tools/scope/scope.py todo 300` near the end of the list and one existing
+draft (grep -l NONMATCHING src/*.c), work them in build/scope/campaign/review/ with SCOPE_RUN=review, and
+note every point where the tool slowed you down, misled you, or left you guessing.
+
+Write build/scope/campaign/review/REVIEW.md, kept current as you go (rewrite it, do not only append):
+- Top findings, ranked by how much agent time each would save across the remaining ~250 undrafted and
+  ~290 drafted functions. For each: the evidence (command, output, what was wrong or missing), and a
+  concrete change (which function in which file, what it should print or do).
+- Bugs (wrong output, crashes) with a reproducer command.
+- Docs that are wrong, stale or missing.
+- What works well and should not change.
+You may make small, safe fixes yourself in tools/scope/ (bugs with a clear reproducer), each listed in
+REVIEW.md with its diff summary; do not touch src/, symbols/ or include/; do not commit, push or run make;
+never `rm -rf`. The coordinator (another agent) reads REVIEW.md periodically and may send you questions or
+ask you to look at something specific; answer those at the top of REVIEW.md under "Replies".
+Your last message: the five most valuable findings, one line each.
+"""
+
 
 def sh(*a, **k):
     return subprocess.run(a, cwd=ROOT, capture_output=True, text=True, **k).stdout
@@ -84,7 +175,31 @@ def drafts_on_main():
     return out
 
 
+def undrafted(args):
+    """Phase-1 queue rows from `scope.py todo`: functions with no C yet, ARM ones (no scope compile) left out."""
+    out = sh("python3", "tools/scope/scope.py", "todo", "100000")
+    rows = []
+    for m in re.finditer(r"^  ([0-9A-F]{8})\s+(\d+) B .*?  (\w+)\s+like .*$", out, re.M):
+        if "[ARM" in m.group(0):
+            continue
+        rows.append({"func": m.group(3), "addr": m.group(1), "size": int(m.group(2)), "kind": "draft"})
+    if "--max-size" in args:
+        rows = [r for r in rows if r["size"] <= int(args[args.index("--max-size") + 1])]
+    if "--reverse" in args:
+        rows.reverse()
+    return rows
+
+
 def cmd_queue(args):
+    if "--undrafted" in args:
+        rows = undrafted(args)
+        os.makedirs(CAMP, exist_ok=True)
+        old = json.load(open(QUEUE)) if os.path.exists(QUEUE) else []
+        seen = {r["func"] for r in old}
+        merged = old + [r for r in rows if r["func"] not in seen]
+        json.dump(merged, open(QUEUE, "w"), indent=1)
+        print(f"{len(rows)} undrafted functions; queue now {len(merged)}")
+        return 0
     prog = json.loads(sh("git", "show", "origin/main:PROGRESS.json"))
     drafts = drafts_on_main()
     want = None if "--all" in args else (args[args.index("--category") + 1] if "--category" in args else "Bosses")
@@ -167,8 +282,48 @@ def resume(r, model, note=None):
     return True
 
 
+def start_draft(r, model):
+    """A phase-1 worker: scope's workspace for FUNC (`scope.py new`) copied into its directory."""
+    func = r["func"]
+    wd = os.path.join(CAMP, func)
+    os.makedirs(wd, exist_ok=True)
+    env = dict(os.environ, SCOPE_RUN=func)
+    out = sh("python3", "tools/scope/scope.py", "new", func, env=env)
+    work = os.path.join(ROOT, "build", "scope", "work", func + ".c")
+    if not os.path.exists(work):
+        r["skip"] = "scope new failed: " + out.strip().splitlines()[-1:][0] if out.strip() else "scope new failed"
+        print(f"skip {func}: {r['skip']}", flush=True)
+        return False
+    import shutil
+    shutil.copy(work, os.path.join(wd, "start.c"))
+    if os.path.exists(work[:-2] + ".base.c"):
+        shutil.copy(work[:-2] + ".base.c", os.path.join(wd, "base.c"))
+    open(os.path.join(wd, ".main_rev"), "w").write(sh("git", "rev-parse", "HEAD").strip())
+    m = re.search(r"draft \S+: (.*)", out)
+    seed = m.group(1).strip() if m else "an empty definition"
+    rel = os.path.relpath(wd, ROOT)
+    r["start_counts"] = "undrafted"
+    brief = DRAFT_BRIEF.format(func=func, addr=r["addr"], size=r["size"], wd=rel, run=func, seed=seed, arm="")
+    return launch(wd, brief, model, r)
+
+
+def launch(wd, brief, model, r):
+    open(os.path.join(wd, "brief.txt"), "w").write(brief)
+    log = open(os.path.join(wd, "codex.json"), "w")
+    p = subprocess.Popen(["codex", "exec", "-m", model, "-s", "workspace-write", "-C", ROOT, "-c",
+                          "model_reasoning_effort=high", "--json", "-o", os.path.join(wd, "last.txt"), brief],
+                         cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
+                         start_new_session=True)
+    open(os.path.join(wd, "pid"), "w").write(str(p.pid))
+    open(os.path.join(wd, "started"), "w").write(time.strftime("%Y-%m-%d %H:%M:%S"))
+    print(f"started {r['func']} ({r['size']} B, {r.get('start_counts')})", flush=True)
+    return True
+
+
 def start(r, model):
     func = r["func"]
+    if r.get("kind") == "draft":
+        return start_draft(r, model)
     wd = os.path.join(CAMP, func)
     os.makedirs(wd, exist_ok=True)
     text = sh("git", "show", f"origin/main:{r['src']}")
@@ -187,21 +342,13 @@ def start(r, model):
     counts = m.group(1) if m else ("MATCH already" if "MATCH" in counts else "see scope")
     r["start_counts"] = counts
     brief = BRIEF.format(func=func, size=r["size"], counts=counts, wd=rel, src=r["src"], run=func)
-    open(os.path.join(wd, "brief.txt"), "w").write(brief)
-    log = open(os.path.join(wd, "codex.json"), "w")
-    p = subprocess.Popen(["codex", "exec", "-m", model, "-s", "workspace-write", "-C", ROOT, "-c",
-                          "model_reasoning_effort=high", "--json", "-o", os.path.join(wd, "last.txt"), brief],
-                         cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
-                         start_new_session=True)
-    open(os.path.join(wd, "pid"), "w").write(str(p.pid))
-    open(os.path.join(wd, "started"), "w").write(time.strftime("%Y-%m-%d %H:%M:%S"))
-    print(f"started {func} ({r['size']} B, {counts})", flush=True)
-    return True
+    return launch(wd, brief, model, r)
 
 
 def cmd_tick(args):
     workers = int(args[args.index("--workers") + 1]) if "--workers" in args else 4
     model = args[args.index("--model") + 1] if "--model" in args else "gpt-6.1-sol"
+    floor = int(args[args.index("--floor") + 1]) if "--floor" in args else FLOOR
     rows = json.load(open(QUEUE))
     running = {r["func"] for r in rows if state(r["func"]) == "running"}
     for r in rows:  # one more round for near-misses (a few insns left), in the same session
@@ -239,8 +386,8 @@ def cmd_tick(args):
         if state(r["func"]) != "pending" or r.get("skip"):
             continue
         q = quota()
-        if q is not None and q <= FLOOR:
-            print(f"quota {q}% <= floor {FLOOR}%: not starting more workers")
+        if q is not None and q <= floor:
+            print(f"quota {q}% <= floor {floor}%: not starting more workers")
             break
         if start(r, model):
             running.add(r["func"])
@@ -326,11 +473,65 @@ def unwrap(text, func, addr):
     return None
 
 
+def land_draft(func, tree, wd):
+    """A phase-1 result through `scope.py land` in TREE: its unit merge against the workspace base the
+    worker started from, the check of every function in the file, the provisional name."""
+    import shutil
+    exact = os.path.exists(os.path.join(wd, "best_match.c"))
+    cand = os.path.join(wd, "best_match.c" if exact else "best.c")
+    if not os.path.exists(cand):
+        sys.exit(f"{func}: no best.c")
+    work = os.path.join(tree, "build", "scope", "work")
+    os.makedirs(work, exist_ok=True)
+    if os.path.exists(os.path.join(wd, "base.c")):
+        shutil.copy(os.path.join(wd, "base.c"), os.path.join(work, func + ".base.c"))
+    try:
+        res = json.load(open(os.path.join(wd, "result.json")))
+    except (OSError, ValueError):
+        res = {}
+    cmd = ["python3", "tools/scope/scope.py", "land", func, cand]
+    name = res.get("name")
+    if name and re.fullmatch(r"[A-Z]\w*_[A-Z]\w*", str(name)):
+        cmd += ["--name", name] + (["--note", res["note"]] if res.get("note") else [])
+    if not exact:
+        cmd.append("--nonmatching")
+    p = subprocess.run(cmd, cwd=tree, capture_output=True, text=True)
+    print((p.stdout + p.stderr).strip())
+    if p.returncode == 0:
+        open(os.path.join(wd, "landed"), "w").write(tree)
+    return p.returncode
+
+
+def cmd_review(args):
+    """Start the scope reviewer, or (--say MSG) continue its session with a message from the coordinator."""
+    wd = os.path.join(CAMP, "review")
+    os.makedirs(wd, exist_ok=True)
+    model = args[args.index("--model") + 1] if "--model" in args else "gpt-6.1-sol"
+    if "--say" in args:
+        if state("review") == "running":
+            sys.exit("the reviewer is mid-turn; say it once its turn ends (campaign.py status shows it)")
+        head = open(os.path.join(wd, "codex.json")).read(4000)
+        m = re.search(r'"thread_id":"([0-9a-f-]+)"', head)
+        log = open(os.path.join(wd, "codex.json"), "a")
+        p = subprocess.Popen(["codex", "exec", "resume", "-c", "model_reasoning_effort=high", "--json", "-o",
+                              os.path.join(wd, "last.txt"), m.group(1), args[args.index("--say") + 1]],
+                             cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
+                             start_new_session=True)
+        open(os.path.join(wd, "pid"), "w").write(str(p.pid))
+        print("sent; the reply lands in REVIEW.md (Replies) and last.txt")
+        return 0
+    if state("review") == "running":
+        sys.exit("the reviewer is running")
+    return 0 if launch(wd, REVIEW_BRIEF, model, {"func": "review", "size": 0, "start_counts": "review"}) else 1
+
+
 def cmd_land(args):
     func, tree = args[0], os.path.abspath(os.path.expanduser(args[1]))
     rows = {r["func"]: r for r in json.load(open(QUEUE))}
     r = rows[func]
     wd = os.path.join(CAMP, func)
+    if r.get("kind") == "draft":
+        return land_draft(func, tree, wd)
     cand = os.path.join(wd, "best_match.c")
     rel = os.path.relpath(cand, ROOT)
     out = sh("python3", "tools/scope/scope.py", rel, func, env=dict(os.environ, SCOPE_RUN=func))
@@ -398,4 +599,5 @@ def cmd_land(args):
 
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
-    sys.exit({"queue": cmd_queue, "tick": cmd_tick, "status": cmd_status, "land": cmd_land}[cmd](sys.argv[2:]))
+    sys.exit({"queue": cmd_queue, "tick": cmd_tick, "status": cmd_status, "land": cmd_land,
+              "review": cmd_review}[cmd](sys.argv[2:]))
