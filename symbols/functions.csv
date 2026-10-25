@@ -7812,6 +7812,7 @@ addr,name,mode,confidence,source,notes
 081D39E0,PaletteTransition_UpdateWobble,thumb,low,src-alias,
 081D3A98,PaletteTransition_UpdateBlink,thumb,low,src-alias,
 081D3D68,SceneDisplay_InitCurrentAnimation,thumb,low,src-alias,Initializes display animation using the current descriptor index
+081D3D74,SceneDisplay_UpdateHopAnimation,thumb,low,src-alias,Cycles three directional animations; moves the display vertically; restores its saved position; then pauses before repeating.
 081D3F24,SceneDisplay_GetAlternateDescriptor,thumb,low,src-alias,Maps descriptor pairs 100 through 103 to their alternate variants
 081D3FFC,SceneDisplay_SwitchToAlternateDescriptor,thumb,low,src-alias,Selects the alternate descriptor and resets state before rebuilding the display
 081D4024,PaletteTransition_CopyBanks,thumb,low,src-alias,
