@@ -160,6 +160,7 @@ addr,name,mode,confidence,source,notes
 08006FD8,TriggerManager_RemoveTrigger,thumb,low,src-alias,"Unlinks a Trigger from gUnk_02000030's doubly-linked list, the inverse of InsertTrigger and first step of Trigger destruction"
 0800700C,Trigger_Destroy,thumb,low,src-alias,"Unlinks the trigger via RemoveTrigger then frees its effect/other/animation/sprite/object and itself, called from TriggerManager_Update and the manage"
 08007060,Trigger_UpdateShake,thumb,low,src-alias,
+080070D0,Trigger_UpdateProximity,thumb,low,src-alias,Arms or fires each trigger by the player's distance to its box; returns s32 though callers ignore it
 08007304,Trigger_TryOpenNearby,thumb,low,src-alias,
 08007444,Trigger_UpdateFalling,thumb,low,src-alias,
 0800751C,Trigger_UpdateLanding,thumb,low,src-alias,
