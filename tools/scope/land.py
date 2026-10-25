@@ -112,6 +112,9 @@ def rename(root, addr, old, new, mode="thumb", note=None, confidence="low", dry=
         raise ValueError(f"{new}: not a C identifier")
     label = f"sub_{addr:08X}"
     in_csv, users = name_in_use(root, new)
+    # a file that already aliases NEW to this function (`#define NEW sub_ADDR`) is not a collision
+    alias = re.compile(r"^#define[ \t]+%s[ \t]+%s\b" % (re.escape(new), label), re.M)
+    users = [u for u in users if not alias.search(open(os.path.join(root, u)).read())]
     if in_csv or (users and new != old):
         raise ValueError(f"{new} is already used: " + ", ".join((["functions.csv"] if in_csv else []) + users[:5]))
     olds = {old, label}

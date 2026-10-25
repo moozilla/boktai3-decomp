@@ -5,6 +5,9 @@
   campaign.py queue --undrafted [--reverse] [--max-size B]   phase 1: functions with no C yet (scope todo),
                                                    ARM ones left out; --reverse starts from the ROM's end
   campaign.py tick [--workers 4] [--model M] [--floor 15]   keep WORKERS running; return when one finishes
+  campaign.py integrate TREE [--limit N] [--no-pr]   land every finished phase-1 result into TREE on a fresh
+                                                   branch from origin/main, one commit each; then one ROM
+                                                   build, PROGRESS, and a PR merged when the build is OK
   campaign.py review [--model M] | review --say MSG   an independent reviewer of scope itself
                                                    (build/scope/campaign/review/REVIEW.md); --say continues it
   campaign.py status                               what ran, what matched, what is in flight
@@ -504,6 +507,74 @@ def land_draft(func, tree, wd):
     return p.returncode
 
 
+def cmd_integrate(args):
+    tree = os.path.abspath(os.path.expanduser(args[0]))
+    limit = int(args[args.index("--limit") + 1]) if "--limit" in args else 10 ** 6
+    def git(*a):
+        return subprocess.run(["git", *a], cwd=tree, capture_output=True, text=True)
+    if git("status", "--porcelain", "--", "src", "include", "symbols").stdout.strip():
+        sys.exit(f"{tree}: src/, include/ or symbols/ has uncommitted changes")
+    rows = json.load(open(QUEUE))
+    ready = [r for r in rows if r.get("kind") == "draft" and state(r["func"]) == "done"
+             and not os.path.exists(os.path.join(CAMP, r["func"], "landed"))
+             and not os.path.exists(os.path.join(CAMP, r["func"], "land_failed"))
+             and os.path.exists(os.path.join(CAMP, r["func"], "best.c"))][:limit]
+    if not ready:
+        print("nothing to integrate")
+        return 0
+    branch = "claude/codex-drafts-" + time.strftime("%m%d-%H%M")
+    git("fetch", "-q", "origin")
+    if git("checkout", "-q", "-B", branch, "origin/main").returncode:
+        sys.exit(f"{tree}: could not check out {branch}")
+    done = []
+    for r in ready:
+        func, wd = r["func"], os.path.join(CAMP, r["func"])
+        rc = land_draft(func, tree, wd)
+        if rc:
+            open(os.path.join(wd, "land_failed"), "w").write(str(rc))
+            for p in git("status", "--porcelain", "--", "src", "include", "symbols").stdout.splitlines():
+                if p.startswith("??"):  # never leave a half-landed file behind
+                    import shutil
+                    shutil.move(os.path.join(tree, p[3:]), os.path.expanduser(f"~/.Trash/{os.path.basename(p[3:])}.{int(time.time())}"))
+            git("checkout", "--", "src", "include", "symbols")
+            continue
+        try:
+            res = json.load(open(os.path.join(wd, "result.json")))
+        except (OSError, ValueError):
+            res = {}
+        name = res.get("name") if res.get("name") and re.fullmatch(r"[A-Z]\w*_[A-Z]\w*", str(res.get("name"))) else func
+        exact = os.path.exists(os.path.join(wd, "best_match.c"))
+        label = f"{name} ({func})" if name != func else func
+        title = f"Match {label}" if exact else f"Draft {label} (NONMATCHING, {res.get('counts', '?')})"
+        git("add", "-A", "src", "include", "symbols")
+        git("commit", "-q", "-m", title + "\n\nPhase-1 scope campaign worker.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>")
+        done.append(title)
+        print(title, flush=True)
+    if not done or "--no-pr" in args:
+        return 0
+    b = subprocess.run(["make", "-j8"], cwd=tree, capture_output=True, text=True)
+    if "build/boktai3.gba: OK" not in b.stdout + b.stderr:
+        sys.exit(f"{tree}: combined build failed on {branch}; not opening a PR\n" + (b.stdout + b.stderr)[-2000:])
+    subprocess.run(["python3", "tools/progress.py", "--markdown", "PROGRESS.md"], cwd=tree, capture_output=True)
+    git("add", "PROGRESS.md", "PROGRESS.json")
+    git("commit", "-q", "-m", "Regenerate PROGRESS.md and PROGRESS.json\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>")
+    pii = subprocess.run(["python3", "tools/pii_check.py", "--range", "origin/main..HEAD"], cwd=tree,
+                         capture_output=True, text=True)
+    if pii.returncode:
+        sys.exit("pii_check failed:\n" + pii.stdout + pii.stderr)
+    git("push", "-q", "-u", "origin", branch)
+    body = ("Batch integration of phase-1 scope campaign workers, one commit per function:\n\n"
+            + "\n".join(f"- {t}" for t in done) + "\n\n`build/boktai3.gba: OK`; PROGRESS regenerated.\n\n"
+            "🤖 Generated with [Claude Code](https://claude.com/claude-code)")
+    pr = subprocess.run(["gh", "pr", "create", "--head", branch, "--title",
+                         f"Phase-1 campaign batch: {len(done)} functions", "--body", body],
+                        cwd=tree, capture_output=True, text=True).stdout.strip().splitlines()[-1:]
+    if pr:
+        subprocess.run(["gh", "pr", "merge", pr[0], "--merge"], cwd=tree, capture_output=True)
+        print(f"merged {pr[0]}")
+    return 0
+
+
 def cmd_review(args):
     """Start the scope reviewer, or (--say MSG) continue its session with a message from the coordinator."""
     wd = os.path.join(CAMP, "review")
@@ -602,4 +673,4 @@ def cmd_land(args):
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
     sys.exit({"queue": cmd_queue, "tick": cmd_tick, "status": cmd_status, "land": cmd_land,
-              "review": cmd_review}[cmd](sys.argv[2:]))
+              "review": cmd_review, "integrate": cmd_integrate}[cmd](sys.argv[2:]))
