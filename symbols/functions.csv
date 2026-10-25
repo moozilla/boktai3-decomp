@@ -8424,7 +8424,7 @@ addr,name,mode,confidence,source,notes
 081FCF74,SceneProjectile_InitPool,thumb,low,src-alias,Publishes the projectile pool singleton and initializes its ten slots
 081FCFA8,SceneProjectile_CreatePool,thumb,low,src-alias,Allocates and initializes the projectile pool task with update and destruction callbacks
 081FCFE8,Projectile_FindFreeSlot,thumb,low,src-alias,Finds the first unused entry in the ten-slot projectile pool and returns its index
-081FD01C,Projectile_SpawnAtPosition,thumb,low,src-alias,
+081FD01C,Projectile_SpawnAtPosition,thumb,low,src-alias,Allocates a projectile slot; configures behavior; velocity; colliders and animation; activates it; and plays its spawn sound.
 081FD3D8,Projectile_InitParameters,thumb,low,src-alias,
 081FD458,Projectile_SetLaunchParameters,thumb,low,src-alias,Sets type and lifetime plus heading and speed used to calculate initial velocity
 081FD474,Projectile_SetHomingParameters,thumb,low,src-alias,Sets steering duration and target pointer plus turn rate; target use confirmed by steering code
