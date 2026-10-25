@@ -492,6 +492,7 @@ addr,name,mode,confidence,source,notes
 08016990,FloatingEffect_Wait,thumb,low,src-alias,
 08016A0C,FloatingEffect_ShrinkAway,thumb,low,src-alias,
 08016B78,FloatingEffect_RiseAndShrink,thumb,low,src-alias,
+08016C04,FloatingItemEffect_UpdateFlight,thumb,low,src-alias,draft ~97% (2 ROM / 4 draft insns differ; from 120/128): fixed by reading v->x; v->z into locals once; a separate temp for 3*v in Scale3; p->pad6 (offset 6) in the sound branch; and split -= 8 / += ... on position.x. Remaining: ldr r1;=0x2000580 and mov r6;sp order in the first projection; and ROM stores position.x once (a temp changes reload rotation).
 08016EA8,FloatingEffectManager_Update,thumb,low,src-alias,
 08016EFC,FloatingEffectManager_Destroy,thumb,low,src-alias,Task destroy callback (paired with FloatingEffectManager_Update via Task_SetCallbacks): removes the 8 Anim slots in the manager struct and clears the 
 08016FE0,FloatingEffectManager_Create,thumb,low,src-alias,"Creates the FloatingEffectManager singleton task if none exists, wires up its Update/Destroy callbacks, runs further init, and kills the task on failu"
