@@ -274,9 +274,29 @@ def wrap_nonmatching(text, func, asm_name, fuzzy, shape=None):
     sp = definition_span(text, func)
     if not sp:
         return None
-    body = text[sp[0]:sp[1]].rstrip("\n") + "\n"
+    # A non-inline static helper only FUNC uses would still be emitted by the default build and
+    # shift every later address, so it moves into the block with FUNC.
+    spans = {func: sp}
+    for name in re.findall(r"^static\s+(?![^\n(]*\binline\b)[^\n;=(]*?\b(\w+)\s*\([^;{]*\)\s*\{", text, re.M):
+        if name != func and definition_span(text, name):
+            spans[name] = definition_span(text, name)
+    private = set(spans) - {func}
+    while True:
+        inside = [spans[n] for n in private | {func}]
+        leaked = {n for n in private
+                  if any(not any(a <= m.start() < b for a, b in inside)
+                         for m in re.finditer(r"\b%s\b" % re.escape(n), text))}
+        if not leaked:
+            break
+        private -= leaked
+    moved = sorted([spans[n] for n in private], key=lambda s: s[0])
+    body = "".join(text[a:b].rstrip("\n") + "\n\n" for a, b in moved) + text[sp[0]:sp[1]].rstrip("\n") + "\n"
     note = f"// fuzzy: {fuzzy:.1f}%\n" + (f"// scope shape {shape} (differences once low registers are set aside)\n"
                                            if shape else "")
     block = (f"#ifdef NONMATCHING\n{note}{body}#else\n"
              f'INCLUDE_ASM("asm/nonmatching", {asm_name});\n#endif\n')
-    return text[:sp[0]] + block + text[sp[1]:]
+    out, at = "", 0
+    for a, b in sorted(moved + [sp]):
+        out += text[at:a] + (block if (a, b) == sp else "")
+        at = b
+    return out + text[at:]
