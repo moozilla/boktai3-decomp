@@ -1199,14 +1199,408 @@ void Nidhoggr_EmitSparks(u32 a)
  * (0x211 among them) and updates t->attackActive (0x71BE) gating. 1216 bytes, several
  * undiscovered globals/helpers; not attempted byte-for-byte this pass. confidence=low. */
 
+/* Life drain: subtract dmg from boss life, clamp it to the group hp total, and when it
+ * reaches zero take the overflow out of dmg and switch behavior. */
+
+/* Publish boss life, then show the damage number and the sprite override for the row. */
+
+/* Hit flags for the part's contact state: t->flags[2] bits and the t->flags[3 + slot] level. */
+
+// confidence=low: Nidhoggr body-part hit callback; collider c is one of t->colliders, src is the attacker.
+
+/* Life drain: subtract dmg from boss life, clamp it to the group hp total, and when it
+ * reaches zero take the overflow out of dmg and switch behavior. */
+
+/* Publish boss life, then show the damage number and the sprite override for the row. */
+
+/* Hit flags for the part's contact state: t->flags[2] bits and the t->flags[3 + slot] level. */
+
+// confidence=low: Nidhoggr body-part hit callback; collider c is one of t->colliders, src is the attacker.
+
+/* Life drain: subtract dmg from boss life, clamp it to the group hp total, and when it
+ * reaches zero take the overflow out of dmg and switch behavior. */
+
+/* Publish boss life, then show the damage number and the sprite override for the row. */
+
+/* Hit flags for the part's contact state: t->flags[2] bits and the t->flags[3 + slot] level. */
+
+// confidence=low: Nidhoggr body-part hit callback; collider c is one of t->colliders, src is the attacker.
+struct Sub08193874Hit {
+    u8 unk_00[0x3E];
+    u16 damage;
+    u8 unk_40[0x43 - 0x40];
+    u8 flags;
+    u8 unk_44[0x54 - 0x44];
+};
+struct Sub08193874Source {
+    u8 unk_00[0x44];
+    u16 power;
+};
+void Collision_CalculateDamageResponse(void *);
+void PlayerStats_AddContactHundredths(void *, void *, s32);
+s32 sub_08249420(s32, s32);
+void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
+void PaletteEffect_StartSpriteOverride(void *, s32, s32);
+void Nidhoggr_CreateBurstEffects(void *, void *);
+void Sound_PlaySong(u32);
+void Sound_PlaySongChecked(u32);
+
+/* Life drain: subtract dmg from boss life, clamp it to the group hp total, and when it
+ * reaches zero take the overflow out of dmg and switch behavior. */
+static inline s32 Sub08193874_Life(struct Nidhoggr *t, s32 dmg, s32 total)
+{
+    t->life -= dmg;
+    if (t->life < total)
+        t->life = total;
+    if (t->life <= 0) {
+        dmg += t->life;
+        t->life = 0;
+        if (t->mode != 6)
+            Nidhoggr_SetBehavior(t, 12);
+    }
+    return dmg;
+}
+
+/* Publish boss life, then show the damage number and the sprite override for the row. */
+static inline void Sub08193874_Report(struct Nidhoggr *t, struct Sub08193874Hit *c, s32 part,
+                                      s32 dmg, s32 flag)
+{
+    *(s32 *)((u8 *)gUnk_02000710 + 0x618) = t->life;
+    if (dmg >= 0) {
+        DamageNumberDisplay_Show(c, dmg, 0, (u8 *)c + 0xC, (u8 *)c + 0x14, 1);
+        PaletteEffect_StartSpriteOverride(&t->rows[part], 8, flag);
+    }
+}
+
+/* Hit flags for the part's contact state: t->flags[2] bits and the t->flags[3 + slot] level. */
+static inline void Sub08193874_Level(struct Nidhoggr *t, struct Sub08193874Hit *c, s32 slot, s32 hp,
+                                     s32 th1, s32 th2, s32 th3)
+{
+    u8 *fl = &t->flags[3];
+    if (hp > th3) {
+        if (fl[slot] != 0)
+            fl[slot] = 0;
+        return;
+    }
+    if (hp > th2) {
+        if (fl[slot] != 1)
+            fl[slot] = 1;
+        return;
+    }
+    if (hp > th1) {
+        if (fl[slot] != 2)
+            fl[slot] = 2;
+        return;
+    }
+    if (hp > 0) {
+        if (fl[slot] != 3)
+            fl[slot] = 3;
+        return;
+    }
+    if (fl[slot] != 4)
+        fl[slot] = 4;
+}
+
+#ifdef NONMATCHING
+// fuzzy: 34.9%
+// scope shape 285 (differences once low registers are set aside)
+// confidence=low: Nidhoggr body-part hit callback; collider c is one of t->colliders, src is the attacker.
+void sub_08193874(void *src, struct Sub08193874Hit *c, struct Nidhoggr *t)
+{
+    s32 part;
+    s32 slot = 0;
+    s32 sl = 0;
+    s32 dmg;
+    s32 total;
+    s32 th1, th2, th3;
+    s16 *gh;
+    s32 saved;
+
+    Collision_CalculateDamageResponse(src);
+    dmg = c->damage;
+    PlayerStats_AddContactHundredths(src, c, t->optionS);
+    part = sub_08249420((u8 *)c - 0x66D8 - (u8 *)t, 0x54);
+    if (t->rowBlink[part] != 0)
+        return;
+    t->rowBlink[part] = ((struct Sub08193874Source *)src)->power;
+
+    gh = &t->groupHpA;
+    total = gh[0] + gh[1];
+    if ((u32)part <= 1) {
+        s32 y = t->optionY;
+        th1 = y >> 2;
+        th2 = y >> 1;
+        th3 = (y * 3) >> 2;
+        slot = part;
+        if (gh[slot] <= 0)
+            return;
+        if (t->attackActive == 0) {
+            Sound_PlaySongChecked(0x211);
+            return;
+        }
+        saved = gh[slot];
+        gh[slot] = saved - dmg;
+        if (gh[slot] < 0) {
+            dmg += gh[slot];
+            gh[slot] = sl;
+        }
+        total = gh[0] + gh[1];
+        if (total <= 0 && t->mode != 6)
+            Nidhoggr_SetBehavior(t, 12);
+        dmg = Sub08193874_Life(t, dmg, total);
+        Sub08193874_Report(t, c, part, dmg, 1);
+        if (gh[slot] > 0) {
+            if (slot == 0)
+                t->flags[2] &= 0xFB;
+            else
+                t->flags[2] &= 0xF7;
+            if (dmg != 0)
+                Sound_PlaySongChecked(0x13E);
+            else
+                Sound_PlaySong(0x211);
+            if (c->flags & 4)
+                Nidhoggr_EmitSparks((u32)c + 0x24);
+        } else {
+            if (slot == 0)
+                t->flags[2] |= 4;
+            else
+                t->flags[2] |= 8;
+            Sound_PlaySongChecked(0x1BB);
+            Nidhoggr_CreateBurstEffects(&t->effectPool, (u8 *)c + 0x24);
+        }
+        Sub08193874_Level(t, c, slot, gh[slot], th1, th2, th3);
+        return;
+    }
+
+    switch (t->mode) {
+        case 2:
+        case 3:
+        case 8:
+            if ((u32)(part - 6) <= 3) {
+                slot = part - 6;
+                sl = 5;
+            } else if ((u32)(part - 14) <= 3) {
+                slot = part - 10;
+                sl = 10;
+            } else if (part == 19) {
+                slot = 8;
+                sl = 15;
+            } else {
+                return;
+            }
+            break;
+        case 4:
+        case 5:
+        case 9:
+            if ((u32)(part - 2) <= 3) {
+                slot = part - 2;
+                sl = 5;
+            } else if ((u32)(part - 10) <= 3) {
+                slot = part - 6;
+                sl = 10;
+            } else if (part == 18) {
+                slot = 8;
+                sl = 15;
+            } else {
+                return;
+            }
+            break;
+        default:
+            slot = 0;
+            sl = 0;
+            break;
+    }
+
+    if (t->hp[slot] <= 0)
+        return;
+    saved = t->hp[slot];
+    t->hp[slot] = saved - dmg;
+    if (t->hp[slot] > 0) {
+        if (dmg != 0)
+            Sound_PlaySongChecked(0x13E);
+        else
+            Sound_PlaySong(0x211);
+        if (c->flags & 4)
+            Nidhoggr_EmitSparks((u32)c + 0x24);
+    } else {
+        dmg += t->hp[slot];
+        t->hp[slot] = 0;
+        t->dead[slot] = 0;
+        SceneAnimation_SetSlotState(t, part, sl);
+        if ((u8)(t->state - 2) <= 1)
+            t->posOffsetXVelocity = -0x600;
+    }
+    total = t->groupHpA + t->groupHpB;
+    dmg = Sub08193874_Life(t, dmg, total);
+    Sub08193874_Report(t, c, part, dmg, 2);
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08193874);
+#endif
 
 /* Tentative: sibling of sub_08193874 (also assigned via Nidhoggr_InitParts's literal pool, used
  * once rather than five times), taking the same (task, index, damage) shape and operating
  * on t->groupHpA/groupHpB (0x728A/0x728C) and t->maxHp-derived scaling from t->optionY
  * (0x726C). 964 bytes; not attempted byte-for-byte this pass. confidence=low. */
 
-INCLUDE_ASM("asm/nonmatching", sub_08193D34);
+/* Applies collider damage to Nidhoggr's two health groups or nine independent parts.
+ * Damage is clamped against part and total health before displaying the hit. */
+struct NidhoggrDamageCollider {
+    u8 unk_00[0xC];
+    struct SceneVec position;
+    struct SceneVec displayOffset;
+    u8 unk_1C[0x50 - 0x1C];
+    struct Nidhoggr *owner;
+};
+/* The two grouped-health pools and their damage stages are indexed together. */
+struct NidhoggrGroupHealth {
+    u8 unk_00[0x724F];
+    u8 state[2];
+    u8 unk_7251[0x728A - 0x7251];
+    s16 hp[2];
+};
+
+void PaletteEffect_StartSpriteOverride(void *, s32, s32);
+
+#ifdef NONMATCHING
+// fuzzy: 91.9%
+// scope shape 8 (differences once low registers are set aside)
+s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, s32 amount)
+{
+    struct Nidhoggr *p;
+    u32 slot;
+    s32 damage;
+    u32 part;
+    u32 slotState;
+    if (kind != 0)
+        return 0;
+    part = 0;
+    slotState = 0;
+    p = collider->owner;
+    damage = amount;
+    slot = (u32)collider - (u32)&p->colliders[0];
+    slot /= sizeof(p->colliders[0]);
+    if (slot <= 1) {
+        s32 quarter, half, threeQuarters;
+        quarter = (s16)p->optionY >> 2;
+        half = (s16)p->optionY >> 1;
+        threeQuarters = ((s16)p->optionY * 3) >> 2;
+        part = slot;
+        if (((struct NidhoggrGroupHealth *)p)->hp[slot] <= 0)
+            return 0;
+        ((struct NidhoggrGroupHealth *)p)->hp[slot] -= damage;
+        if (((struct NidhoggrGroupHealth *)p)->hp[slot] < 0) {
+            damage += ((struct NidhoggrGroupHealth *)p)->hp[slot];
+            ((struct NidhoggrGroupHealth *)p)->hp[slot] = 0;
+        }
+        if (p->groupHpA <= 0 && p->groupHpB <= 0 && p->mode != 6)
+            Nidhoggr_SetBehavior(p, 12);
+        p->life -= damage;
+        if (p->life <= 0) {
+            damage += p->life;
+            p->life = 0;
+            if (p->mode != 6)
+                Nidhoggr_SetBehavior(p, 12);
+        }
+        gUnk_02000710->unk618 = p->life;
+        if (damage > 0) {
+            DamageNumberDisplay_Show(collider, damage, 0, &collider->position,
+                                     &collider->displayOffset, 1);
+            PaletteEffect_StartSpriteOverride(&p->rows[slot], 8, 1);
+        }
+        if (((struct NidhoggrGroupHealth *)p)->hp[part] > 0) {
+            if (part)
+                p->flags[2] &= ~8;
+            else
+                p->flags[2] &= ~4;
+        } else {
+            if (part)
+                p->flags[2] |= 8;
+            else
+                p->flags[2] |= 4;
+        }
+        if (((struct NidhoggrGroupHealth *)p)->hp[part] > threeQuarters) {
+            if (((struct NidhoggrGroupHealth *)p)->state[part] != 0)
+                ((struct NidhoggrGroupHealth *)p)->state[part] = 0;
+        } else if (((struct NidhoggrGroupHealth *)p)->hp[part] > half) {
+            if (((struct NidhoggrGroupHealth *)p)->state[part] != 1)
+                ((struct NidhoggrGroupHealth *)p)->state[part] = 1;
+        } else if (((struct NidhoggrGroupHealth *)p)->hp[part] > quarter) {
+            if (((struct NidhoggrGroupHealth *)p)->state[part] != 2)
+                ((struct NidhoggrGroupHealth *)p)->state[part] = 2;
+        } else if (((struct NidhoggrGroupHealth *)p)->hp[part] > 0) {
+            if (((struct NidhoggrGroupHealth *)p)->state[part] != 3)
+                ((struct NidhoggrGroupHealth *)p)->state[part] = 3;
+        } else {
+            if (((struct NidhoggrGroupHealth *)p)->state[part] != 4)
+                ((struct NidhoggrGroupHealth *)p)->state[part] = 4;
+        }
+    } else {
+        switch (p->mode) {
+            case 2:
+            case 3:
+            case 8:
+                if (slot - 6 <= 3) {
+                    part = slot - 6;
+                    slotState = 5;
+                } else if (slot - 14 <= 3) {
+                    part = slot - 10;
+                    slotState = 10;
+                } else if (slot == 19) {
+                    part = 8;
+                    slotState = 15;
+                } else
+                    return 0;
+                break;
+            case 4:
+            case 5:
+            case 9:
+                if (slot - 2 <= 3) {
+                    part = slot - 2;
+                    slotState = 5;
+                } else if (slot - 10 <= 3) {
+                    part = slot - 6;
+                    slotState = 10;
+                } else if (slot == 18) {
+                    part = 8;
+                    slotState = 15;
+                } else
+                    return 0;
+                break;
+            case 6:
+            case 7:
+                return 0;
+        }
+        if (p->hp[part] <= 0)
+            return 0;
+        p->hp[part] -= damage;
+        if (p->hp[part] <= 0) {
+            damage += p->hp[part];
+            p->hp[part] = 0;
+            p->dead[part] = 0;
+            SceneAnimation_SetSlotState(p, slot, slotState);
+            if ((u8)(p->state - 2) <= 1)
+                p->posOffsetXVelocity = -0x600;
+        }
+        p->life -= damage;
+        if (p->life <= 0) {
+            damage += p->life;
+            p->life = 0;
+            if (p->mode != 6)
+                Nidhoggr_SetBehavior(p, 12);
+        }
+        gUnk_02000710->unk618 = p->life;
+        if (damage > 0) {
+            DamageNumberDisplay_Show(collider, damage, 0, &collider->position,
+                                     &collider->displayOffset, 1);
+            PaletteEffect_StartSpriteOverride(&p->rows[slot], 8, 2);
+        }
+    }
+    return 1;
+}
+#else
+INCLUDE_ASM("asm/nonmatching", Nidhoggr_ApplyPartDamage);
+#endif
 
 /* Initialize Nidhoggr's part animations, attack/body colliders, target records,
  * and the time-dependent palette used by part 21. */
@@ -1246,8 +1640,7 @@ void TargetRegistry_RegisterSceneActor(void *, void *, void *);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
 void Collider_SetAttackProperties(void *, s32, s32, u32, u32, s32);
 void TimePalette_InitTransition(void *, void *, void *, void *);
-void sub_08193D34(void);
-void sub_08193874(void);
+s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, s32 amount);
 
 static inline void Nidhoggr_MaskPartFlags(struct NidhoggrPartCollider *p, u32 mask)
 {
@@ -1289,7 +1682,7 @@ struct NidhoggrPartInit {
 };
 
 #ifdef NONMATCHING
-// fuzzy: 72.5%
+// fuzzy: 69.9%
 // scope shape 46 (differences once low registers are set aside)
 void Nidhoggr_InitParts(void *arg0)
 {
@@ -1318,7 +1711,7 @@ void Nidhoggr_InitParts(void *arg0)
             collider = &t->colliders[i];
             Collider_Init(collider, t->actorId, 0x4005, 0, extent, zeroVector, zeroVector);
             Collider_Refresh(collider);
-            TargetRegistry_RegisterSceneActor(target, collider, sub_08193D34);
+            TargetRegistry_RegisterSceneActor(target, collider, Nidhoggr_ApplyPartDamage);
             Nidhoggr_AddTargetFlags(&target->flags, 1);
             row++;
             target++;

@@ -6634,6 +6634,7 @@ addr,name,mode,confidence,source,notes
 081937F8,Nidhoggr_UnregisterTerrainCells,thumb,low,src-alias,Removes both terrain registrations when active and clears their active flag
 0819382C,Nidhoggr_SetTerrainCellFlag40,thumb,low,src-alias,Sets flag 0x40 on both terrain registrations with its gameplay meaning still tentative
 0819384C,Nidhoggr_EmitSparks,thumb,low,src-alias,Calls the spark particle emitter with a fixed spread and emission parameters
+08193D34,Nidhoggr_ApplyPartDamage,thumb,low,src-alias,
 081940F8,Nidhoggr_InitParts,thumb,low,src-alias,Initializes 26 Nidhoggr part animations; paired colliders and target records; then configures collider groups and a time-dependent palette.
 08194480,Nidhoggr_DestroyParts,thumb,low,src-alias,Removes all 26 part animations and colliders and releases their auxiliary records
 081944C4,Nidhoggr_InitSuspendedObject,thumb,low,src-alias,Initializes a separate sprite and collider; suspended object is a tentative interpretation
@@ -6792,6 +6793,7 @@ addr,name,mode,confidence,source,notes
 0819B96C,Hresvelgr_SetAnimation,thumb,low,src-alias,
 0819B9E4,Hresvelgr_HasCellOverride,thumb,low,src-alias,
 0819BA7C,Hresvelgr_HasAdjacentOverride,thumb,low,src-alias,
+0819BCB8,Hresvelgr_EmitFacingMotion,thumb,low,src-alias,
 0819BF34,Hresvelgr_SelectPlayerAnimation,thumb,low,src-alias,
 0819C024,Collider_IgnoreCallback,thumb,low,src-alias,
 0819C028,Hresvelgr_InitializeCollider,thumb,low,src-alias,
@@ -8531,6 +8533,7 @@ addr,name,mode,confidence,source,notes
 081FE12C,OrbitEffect_UpdateNarrowRadius,thumb,low,src-alias,Advances the radius and reverses its velocity at fixed-point bounds one and a half and three
 081FE16C,OrbitEffect_InitSlot,thumb,low,src-alias,
 081FE244,OrbitEffect_RemoveSlot,thumb,low,src-alias,
+081FE2C4,OrbitEffect_UpdateManager,thumb,low,src-alias,
 081FE644,OrbitEffect_DestroyManager,thumb,low,src-alias,Destructor callback releases active entries in the four-slot pool and stops its sound before clearing the singleton
 081FE68C,SunOrb_InitManager,thumb,low,src-alias,Initializes four orb slots and loads the sun orb animation; object identity is tentative
 081FE6E0,SunOrb_GetOrCreateManager,thumb,low,src-alias,Returns the existing singleton or creates its task and initializes its slots
