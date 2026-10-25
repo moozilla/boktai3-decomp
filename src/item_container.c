@@ -276,7 +276,81 @@ void Trigger_UpdateShake(struct Trigger *p)
     }
 }
 
+#ifdef NONMATCHING
+// fuzzy: 32.5%
+// scope shape 58 (differences once low registers are set aside)
+void sub_080070D0(struct TriggerManager *manager, struct Trigger *p)
+{
+    struct SceneVec box, pos;
+    struct SceneVec *out = &box;
+    s32 armed, i;
+    {
+        struct SceneVec *v = p->position;
+        s32 x = v->x, z = v->z, a, y;
+        out->x = scale(x - z);
+        a = scale(x + z);
+        y = scale(v->y);
+        out->y = a - y;
+        out->z = a + y;
+    }
+    if (p->cooldown && --p->cooldown == 0) {
+        p->shake = 4;
+        p->baseX = p->position->x;
+        p->baseZ = p->position->z;
+    }
+    armed = 1;
+    for (i = 0; i < 4; i++) {
+        struct Player *actor = manager->actors[i];
+        struct SceneVec *proj, *v;
+        s32 dy, near;
+        if (!actor)
+            continue;
+        if (gUnk_02000560[i] & 12)
+            continue;
+        v = p->position;
+        proj = &manager->projected[i];
+        dy = out->y - proj->y;
+        near = absolute(v->y - actor->position.y) <= 127 && absolute(out->x - proj->x) <= 14 &&
+               dy >= -24 && dy <= 4;
+        if (!near)
+            continue;
+        pos = *p->position;
+        pos.y += 128;
+        if (!(gUnk_030053F4 & 2048) && !sub_0822D490(p->id, p->kind)) {
+            if (p->armed && !p->cooldown) {
+                if (p->id <= 5) {
+                    sub_08017044(p->id, p->kind, 1, i, &pos, &pos, 24, p);
+                    Sound_PlaySongChecked(272);
+                }
+                p->cooldown = 36;
+                p->shake = 4;
+                p->baseX = p->position->x;
+                p->baseZ = p->position->z;
+            }
+            armed = 0;
+            continue;
+        }
+        p->actor = i;
+        if (p->id <= 5)
+            sub_08017044(p->id, p->kind, 0, i, &pos, &pos, 24, p);
+        if (!(gUnk_030053F4 & 2048))
+            Sound_PlaySongChecked(272);
+        {
+            s32 event;
+            if (gUnk_030053F4 & 2048)
+                event = 1;
+            else
+                event = sub_0822D490(p->id, p->kind) == 1;
+            Trigger_RunScript(p, *(u16 *)&p->script, event);
+        }
+        p->flags |= 1;
+        break;
+    }
+    p->armed = armed;
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_080070D0);
+#endif
 
 s32 Trigger_TryOpenNearby(struct TriggerOpener *actor)
 {
