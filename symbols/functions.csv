@@ -7122,6 +7122,7 @@ addr,name,mode,confidence,source,notes
 081B79A4,AnimatedMarker_TickActive,thumb,low,src-alias,
 081B79F8,GrowthHazard_UpdateCooldown,thumb,low,src-alias,Cooldown callback advances state once both the flash counter and cooldown have expired
 081B7A2C,GrowthHazard_RevealWhenCellVacant,thumb,low,src-alias,
+081B7B1C,GrowthHazard_UpdateSharedFlash,thumb,low,src-alias,Consumes two pending sound/flash bits and updates two 16-color palettes; fading each back to the normal palette.
 081B7C98,GrowthHazard_UpdateManager,thumb,low,src-alias,Task update callback runs entry callbacks and advances temporary palette flashes
 081B7E4C,GrowthHazard_InitEntryFromScript,thumb,low,src-alias,
 081B8098,GrowthHazard_InitManager,thumb,low,src-alias,Resets the entry count and binds the manager to the current scene context
