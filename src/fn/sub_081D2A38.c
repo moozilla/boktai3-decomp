@@ -91,7 +91,7 @@ void SceneNpc_OnStateEffectUpdate(void);
 void SceneNpc_OnDestroy(void);
 void Actor_OnIdleUpdate(void);
 void Actor_OnHiddenIdleUpdate(void);
-void sub_081CEFCC(void);
+void SceneNpc_FollowSceneTarget(void);
 void SceneNpc_PlayAnimation12(void);
 void Actor_OnConfiguredAnimationUpdate(void);
 void SceneNpc_EnterRequestedState(void);

@@ -7733,6 +7733,7 @@ addr,name,mode,confidence,source,notes
 081CEDD4,SceneNpc_ApplyDeceleratingBlink,thumb,low,src-alias,Sets visibility flag 0x100 on alternating shrinking intervals and reports completion
 081CEE18,SceneNpc_UpdateAnimationEight,thumb,low,src-alias,Starts animation entry 8 on state entry then invokes the NPC animation callback
 081CEF3C,SceneNpc_UpdateStopped,thumb,low,src-alias,
+081CEFCC,SceneNpc_FollowSceneTarget,thumb,low,src-alias,Follows a scene target by snapping or walking toward it and tests nearby conversation-facing angles.
 081CF264,SceneNpc_UpdateTransitionFade,thumb,low,src-alias,
 081CF490,SceneNpc_UpdateBlinkPhase,thumb,low,src-alias,
 081CF4F0,SceneNpc_UpdateBlinkOut,thumb,low,src-alias,Applies the sixteen-interval blink sequence then hides the NPC and marks completion
