@@ -92,7 +92,7 @@ s32 EffectManager_UpdateParticles(struct EffectManager *, struct Effect *, struc
 s32 EffectManager_UpdateAll(struct EffectManager *);
 s32 EffectManager_DestroyManager(struct EffectManager *);
 s32 EffectManager_Init(struct EffectManager *, void *);
-void *EffectManager_Create(void *);
+void *EffectManager_Create(void *, u32);
 
 /* Engine helpers. */
 void Sound_PlaySongChecked(u32);

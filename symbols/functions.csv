@@ -247,6 +247,7 @@ addr,name,mode,confidence,source,notes
 0800AB18,EffectManager_DestroyManager,thumb,low,src-alias,"removes all active effects' particles then clears the global manager pointer; passed as the kill callback to Task_SetCallbacks, matching the project's"
 0800AB60,EffectManager_Init,thumb,low,src-alias,
 0800AC00,EffectManager_Create,thumb,low,src-alias,"creates the manager's task, wires the update/destroy callbacks, and calls EffectManager_Init, tearing the task down on failure"
+0800AC44,EffectManager_SpawnParticles,thumb,low,src-alias,claims a free effect slot (of 6) and starts up to 4 particles at pos plus a random spread; with random timers; guess
 0800B3E0,EffectParticle_UpdateDriftAroundActor,thumb,low,src-alias,
 0800B788,EffectParticle_UpdateDriftBeforeHoming,thumb,low,src-alias,
 0800BB34,EffectParticle_UpdateHomingWide,thumb,low,src-alias,

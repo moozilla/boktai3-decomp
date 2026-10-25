@@ -103,6 +103,7 @@ void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 void Script_ReadReference(void *);
 void Script_WriteReferenceValue(void *, s32, s32);
-void sub_0800AC44(u32, u32, u32, struct CollisionVec *, struct SceneExtent *, u32, u32);
+void EffectManager_SpawnParticles(u32, u32, u32, struct CollisionVec *, struct SceneExtent *, u32,
+                                  u32);
 
 #endif

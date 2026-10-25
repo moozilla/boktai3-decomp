@@ -1,7 +1,7 @@
 #include "area_effect.h"
 s32 AreaEffect_FindContainingEntry(struct AreaEffectPosition *);
 void AreaEffect_UpdateGraphicsId(struct AreaEffectManager *);
-void sub_0800AC44(u32, u32, u32, void *, void *, u32, u32);
+void EffectManager_SpawnParticles(u32, u32, u32, void *, void *, u32, u32);
 struct PackedHalfword {
     u32 lo : 16;
     u32 hi : 16;
@@ -75,7 +75,7 @@ void AreaEffect_UpdateActionParticles(struct AreaEffectManager *manager)
                             *(u32 *)&size.zpad = (*(u32 *)&size.zpad & highMask) | 256;
                         }
                     }
-                    sub_0800AC44(1, 1, 25, &position, &size, 180, 60);
+                    EffectManager_SpawnParticles(1, 1, 25, &position, &size, 180, 60);
                 }
                 manager->actionFrame++;
             }
