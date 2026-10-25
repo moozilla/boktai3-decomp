@@ -3,6 +3,7 @@
 
   scope.py FILE.c [FUNC]        compile the draft, align it with the ROM, print the real differences
   scope.py FILE.c KNOB=V ...    the same with instrumented-compiler knobs set (a what-if)
+  scope.py FILE.c SCOPE_NEIGHBORS_ASM=1 [FUNC]   keep the target draft C; other NONMATCHING blocks use ASM
   scope.py FILE.c spill         is the whole difference reload's spill rotation? (searches AGBCC_SPILL)
   scope.py FILE.c probe         is it one cse/gcse decision? (CSE_NOCANON, CSE_NOFOLLOW, AGBCC_NOPRE)
   scope.py FILE.c try V.c... | try KNOB=V...   score many variants (whole files, or one knob each;
@@ -290,7 +291,7 @@ def compile_draft(src, func, env=None):
     ENV adds knob settings (CSE_NOCANON=N, AGBCC_FORCE=..., see tools/scope/build_agbcc.sh)."""
     env = resolve_knobs(src, func, env)
     wd = workdir(func)
-    pre = preprocess(src, env)
+    pre = preprocess(src, env, func)
     open(os.path.join(wd, "u.i"), "w").write(pre)
     for p in PASSES:
         try:
@@ -308,7 +309,8 @@ def compile_draft(src, func, env=None):
         errs = [ln.replace(ROOT + os.sep, "") for ln in r.stderr.splitlines() if ln.strip()]
         hint = ("\n  (agbcc is C89: in each block, declarations come before statements)"
                 if any("parse error" in e or "syntax error" in e for e in errs) else "")
-        sys.exit(f"COMPILE FAILED: agbcc rejected {src}:\n" + "\n".join("  " + e for e in errs[:15]) + hint)
+        context = neighbor_failure(src, func, r.stderr)
+        sys.exit(f"COMPILE FAILED: agbcc rejected {src}:\n" + "\n".join("  " + e for e in errs[:15]) + hint + context)
     # The dumps hold every function of the unit, and insn uids restart in each one: keep only FUNC's
     # section, so uid lookups (why, insn, probe, uses) cannot land in another function.
     for p in PASSES:
@@ -650,8 +652,14 @@ def align(rom, mine):
             rt, mt = rom[x][4], mine[y][4]
             if rt is not None or mt is not None:
                 ri, mi = r_at.get(rt), m_at.get(mt)
-                if ri is None or mi is None or r2m.get(ri) != mi:
-                    t = "→"  # lands somewhere else
+                # Identical target offsets are positive evidence that the branch
+                # target did not move, even when its destination instruction has
+                # different registers and SequenceMatcher did not pair it as equal.
+                if rt == mt:
+                    if rom[x][0] != mine[y][0]:
+                        shifted += 1
+                elif ri is None or mi is None or r2m.get(ri) != mi:
+                    t = "→"  # different offsets, not aligned to the same destination
                 elif rom[x][2] != mine[y][2] or rom[x][0] != mine[y][0]:
                     shifted += 1
             elif rom[x][0] != mine[y][0]:
@@ -690,7 +698,10 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
         lt, u, bp = ctag(y) if y is not None else ("", None, "")
         rows_json.append({"tag": t, "rom_addr": f"{addr + r[0]:08X}" if r else None, "rom": r[2] if r else None,
                           "draft_off": m[0] if m else None, "draft": m[2] if m else None,
-                          "line": lt, "uid": u, "born": bp})
+                          "line": lt, "uid": u, "born": bp,
+                          "target_relation": ("same target offset" if r[4] == m[4] else
+                                              "aligned destination" if t == "=" else "different destination")
+                          if r and m and (r[4] is not None or m[4] is not None) else None})
         full.append(f"{t} {(f'{addr + r[0]:08X} ' + r[2]) if r else '':40} {(m[2] if m else ''):32} "
                     f"{lt:>6} {u or '':>5} {bp}")
     open(os.path.join(wd, "diff.txt"), "w").write("\n".join(full) + "\n")
@@ -1615,15 +1626,80 @@ _ROMDEC = {}
 _PRE = {}
 
 
-def preprocess(src, env=None):
+def nonmatching_blocks(text):
+    """Positive NONMATCHING guards with an #else, respecting nested preprocessor guards."""
+    stack, blocks = [], []
+    aliases = dict(re.findall(r"^#define[ \t]+(\w+)[ \t]+(\w+)[ \t]*(?://[^\n]*)?$", text, re.M))
+    for m in re.finditer(r"^[ \t]*#[ \t]*(if|ifdef|ifndef|elif|else|endif)\b([^\n]*)", text, re.M):
+        kind, expr = m.group(1), m.group(2).strip()
+        if kind in ('if', 'ifdef', 'ifndef'):
+            positive = kind == 'ifdef' and expr == 'NONMATCHING' or kind == 'if' and bool(
+                re.fullmatch(r"defined\s*(?:\(\s*NONMATCHING\s*\)|NONMATCHING)", expr))
+            stack.append({'start': m.start(), 'body': m.end(), 'positive': positive, 'else': None, 'elif': False})
+        elif stack and kind == 'else':
+            stack[-1]['else'] = (m.start(), m.end())
+        elif stack and kind == 'elif':
+            stack[-1]['elif'] = True
+        elif stack and kind == 'endif':
+            b = stack.pop()
+            if not b['positive'] or b['else'] is None or b['elif']:
+                continue
+            body = text[b['body']:b['else'][0]]
+            names = set(re.findall(r"^[A-Za-z_][\w \t*]*?\b(\w+)\s*\([^;{}]*\)\s*\{", body, re.M))
+            names.update(aliases[n] for n in list(names) if n in aliases)
+            names.update(re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', text[b['else'][1]:m.start()]))
+            b.update(names=names, end=m.end())
+            blocks.append(b)
+    return blocks
+
+
+def neighbors_as_asm(text, targets):
+    """Disable only other draft blocks, preserving every source line and the target's complete block."""
+    dropped = []
+    for b in sorted(nonmatching_blocks(text), key=lambda b: b['start'], reverse=True):
+        if set(targets) & b['names']:
+            continue
+        text = text[:b['start']] + '#if 0 /* scope: neighbor draft uses INCLUDE_ASM */' + text[b['body']:]
+        dropped.extend(sorted(b['names']))
+    return text, sorted(set(dropped))
+
+
+def neighbor_failure(src, func, stderr):
+    """Name the first failed function, without mistaking a later warning's function for the error."""
+    current, failed = None, []
+    for ln in stderr.splitlines():
+        m = re.search(r"In function [`'‘’](\w+)", ln)
+        if m:
+            current = m.group(1)
+        elif current and re.search(r"error|undeclared|conflicting types", ln, re.I):
+            if current not in failed:
+                failed.append(current)
+    if not failed:
+        return ''
+    targets = {func, rom_name(src, func)}
+    owners = ', '.join(failed)
+    note = f"\n  failed function(s): {owners}; selected target: {func}"
+    text = open(os.path.join(ROOT, src)).read()
+    guarded = set().union(*(b['names'] for b in nonmatching_blocks(text) if not targets & b['names']))
+    if any(f in guarded for f in failed):
+        run = os.environ.get('SCOPE_RUN')
+        prefix = f"SCOPE_RUN={shlex.quote(run)} " if run else ''
+        command = shlex.join(['build/venv/bin/python', 'tools/scope/scope.py', src, func, 'SCOPE_NEIGHBORS_ASM=1'])
+        note += ("\n  a neighbor NONMATCHING draft failed; retry with its INCLUDE_ASM branch (no source edits):\n  "
+                 + prefix + command)
+    return note
+
+
+def preprocess(src, env=None, func=None):
     """The unit's preprocessed text, memoised on its mtime and size (knob-only variants reuse it)."""
     st = os.stat(os.path.join(ROOT, src))
     tf = (env or {}).get("SCOPE_TRANSFORM") or os.environ.get("SCOPE_TRANSFORM")
-    key = (src, st.st_mtime_ns, st.st_size, tf)
+    isolated = (env or {}).get('SCOPE_NEIGHBORS_ASM', os.environ.get('SCOPE_NEIGHBORS_ASM')) == '1'
+    key = (src, st.st_mtime_ns, st.st_size, tf, func if isolated else None, isolated)
     if key not in _PRE:
         if len(_PRE) > 64:
             _PRE.clear()
-        _PRE[key] = _preprocess(src, env)
+        _PRE[key] = _preprocess(src, env, func)
     return _PRE[key]
 
 
@@ -1654,8 +1730,22 @@ def cpp_command(src):
     return [src if a == old else os.path.basename(src) if a == os.path.basename(old) else a for a in cmd]
 
 
-def _preprocess(src, env=None):
-    pre = build.sh(cpp_command(src))
+def _preprocess(src, env=None, func=None):
+    isolated = (env or {}).get('SCOPE_NEIGHBORS_ASM', os.environ.get('SCOPE_NEIGHBORS_ASM')) == '1'
+    if isolated:
+        func = func or nonmatching_func(src)
+        if not func:
+            sys.exit('SCOPE_NEIGHBORS_ASM=1 needs a selected function')
+        text = open(os.path.join(ROOT, src)).read()
+        text, dropped = neighbors_as_asm(text, (func, rom_name(src, func)))
+        cmd = ['-' if a == src else a for a in cpp_command(src)]
+        cmd += ['-iquote', os.path.dirname(src) or '.']
+        pre = build.sh(cmd, input=f'#line 1 "{src}"\n' + text)
+        if dropped:
+            print('  neighbors as INCLUDE_ASM: ' + ', '.join(dropped[:8])
+                  + (f' (+{len(dropped) - 8} more)' if len(dropped) > 8 else ''))
+    else:
+        pre = build.sh(cpp_command(src))
     tf = (env or {}).get("SCOPE_TRANSFORM") or os.environ.get("SCOPE_TRANSFORM")
     if tf:  # a what-if over the preprocessed source: a module with transform(text) -> text
         import importlib.util
@@ -1671,14 +1761,15 @@ _BODY_TOKEN = re.compile(r'"(?:\\.|[^"\\\n])*"|\'(?:\\.|[^\'\\\n])*\'|/\*.*?\*/|
 _DYNAMIC = {"__LINE__", "__FILE__", "__DATE__", "__TIME__", "__COUNTER__", "__INCLUDE_LEVEL__", "__BASE_FILE__"}
 
 
-def fast_preprocess(src, env=None):
+def fast_preprocess(src, env=None, func=None):
     """preprocess() for the fork server, without running cpp on every variant. A draft is a block of
     #includes and then plain C; cpp's output for the include block is cached (keyed by its text and the
     headers' mtimes), and the C after it passes through with comments blanked, as cpp would leave it,
     when it holds no directive, line splice, trigraph or name of a macro the headers define. Anything else
     goes to cpp. Bytes only: the line markers name a stand-in file."""
-    if (env or {}).get("SCOPE_TRANSFORM") or os.environ.get("SCOPE_TRANSFORM"):
-        return preprocess(src, env)
+    if ((env or {}).get("SCOPE_TRANSFORM") or os.environ.get("SCOPE_TRANSFORM")
+            or (env or {}).get('SCOPE_NEIGHBORS_ASM', os.environ.get('SCOPE_NEIGHBORS_ASM')) == '1'):
+        return preprocess(src, env, func)
     text = open(os.path.join(ROOT, src)).read()
     lines = text.split("\n")
     last = max((i for i, ln in enumerate(lines) if ln.lstrip().startswith("#")), default=-1)
@@ -1686,7 +1777,7 @@ def fast_preprocess(src, env=None):
     body = "\n".join(lines[last + 1:])
     if last < 0 or any(not re.match(r"\s*(#\s*include\b.*)?$", ln) and not re.match(r"\s*(//.*)?$", ln)
                        for ln in lines[:last + 1]):
-        return preprocess(src, env)  # a #define, #if, or code between the includes
+        return preprocess(src, env, func)  # a #define, #if, or code between the includes
     h = _HEADS.get(head)
     if h is not None and any(os.path.getmtime(os.path.join(ROOT, f)) != t for f, t in h[2]):
         h = None
@@ -1707,7 +1798,7 @@ def fast_preprocess(src, env=None):
         h = _HEADS[head] = (out, macros, [(f, os.path.getmtime(os.path.join(ROOT, f))) for f in files])
     out, macros, _ = h
     if "\\\n" in body or "??" in body:
-        return preprocess(src, env)
+        return preprocess(src, env, func)
     parts = []
     for m in _BODY_TOKEN.finditer(body):
         t = m.group(0)
@@ -1716,7 +1807,7 @@ def fast_preprocess(src, env=None):
         elif t[:2] == "//":
             parts.append(" ")
         elif t == "#" or (t[0].isalpha() or t[0] == "_") and t in macros:
-            return preprocess(src, env)
+            return preprocess(src, env, func)
         else:
             parts.append(t)
     return out + "".join(parts)
@@ -1745,7 +1836,7 @@ def fast_compile(src, func, env=None):
                                    os.path.join(WORK, "cache"), fixup=inline_macros)
         os.makedirs(os.path.join(WORK, "cache"), exist_ok=True)
     knobs = {k: v for k, v in (env or {}).items() if k.startswith(("AGBCC_", "CSE_"))}
-    code, err = f.bytes(fast_preprocess(src, env), (func, rom_name(src, func)), knobs)
+    code, err = f.bytes(fast_preprocess(src, env, func), (func, rom_name(src, func)), knobs)
     if code is None:
         return None
     return code, addr, f.data
@@ -2147,7 +2238,105 @@ def cmd_probe(src, func, env):
     return 0
 
 
+def why_all_issues(text):
+    """Compact mechanism keys from why's own diagnostic sections; full prose stays in why-all.txt."""
+    issues = []
+    ids = lambda s: [int(n) for n in re.findall(r"(?:^|, )(\d+)\b", s)]
+    knob = lambda s: next(iter(re.findall(r"(?:AGBCC_|CSE_)[A-Z_]+=[^\s;()]+", s)), None)
+    # Move explanations precede the corresponding why header, so collect them independently.
+    for line in text.splitlines():
+        m = re.match(r"   `([^`]+)` (.*)", line)
+        if m:
+            issues.append((('order', norm_insn(m.group(1)), m.group(2)),
+                           'order: `' + m.group(1) + '` ' + m.group(2), None, None))
+    for part in re.split(r"(?m)(?=^why insn \d+)", text):
+        head = re.match(r"why insn (\d+)  line ([^:]+):", part)
+        if not head:
+            continue
+        uid, line = int(head.group(1)), head.group(2)
+        found = False
+        for section in re.split(r"(?m)(?=^  (?:allocation:|cse pass \d replaced|regmove replaced|reload:))", part):
+            alloc = re.match(r"  allocation: (\d+)([^\n]*)", section)
+            cse = re.match(r"  cse pass (\d) replaced (.*?) by (.*?)\.\n", section)
+            regmove = re.match(r"  regmove replaced (.*?) by (.*?)\.\n", section)
+            reload = re.match(r"  reload:.*?choice #(\d+)", section)
+            whatif = knob(section)
+            if alloc:
+                pseudo = int(alloc.group(1))
+                other = re.search(r"the ROM keeps (\d+)|went to a conflicting pseudo allocated earlier: (\d+)", section)
+                pair = tuple(sorted((pseudo, int(other.group(1) or other.group(2))))) if other else (pseudo,)
+                mechanism = ('allocation order' if 'to flip the order' in section else
+                             'reload eviction' if 'reload then needed' in section else 'allocation')
+                lines = [s.strip() for s in section.splitlines()[1:] if s.strip()]
+                summary = next((s for s in lines if 'the ROM keeps ' in s or 'went to a conflicting pseudo' in s), lines[0] if lines else 'see full explanation')
+                key = (mechanism, pair)
+                title = f"{mechanism}, pseudos {' / '.join(map(str, pair))}: {summary}"
+            elif cse:
+                old, new = ids(cse.group(2)), ids(cse.group(3))
+                key = ('cse' + cse.group(1), tuple(sorted(set(old + new))))
+                title = f"cse{cse.group(1)}: {cse.group(2)} -> {cse.group(3)}"
+                takeover = re.search(r"    (\d+).* became canonical over", section)
+                if takeover:
+                    whatif = f"CSE_NOCANON={takeover.group(1)}"
+                elif len(new) == 1:
+                    whatif = f"CSE_NOCANON={new[0]}"
+            elif regmove:
+                key = ('regmove', tuple(sorted(set(ids(regmove.group(1)) + ids(regmove.group(2))))))
+                title = f"regmove: {regmove.group(1)} -> {regmove.group(2)}"
+            elif reload:
+                key = ('reload rotation', int(reload.group(1)))
+                title = section.splitlines()[0].strip()
+            else:
+                continue
+            issues.append((key, title, whatif, uid))
+            found = True
+        if not found:
+            shape = re.search(r"^  (this is a shape difference[^\n]*|insn \d+ is in no RTL dump[^\n]*)", part, re.M)
+            title = shape.group(1) if shape else f"insn {uid}, line {line}: no supported causal summary; see details"
+            issues.append((('shape/emission', uid), title, knob(part), uid))
+    return issues
+
+
 def cmd_why_all(src, func, env):
+    """One summary per mechanism/pseudo pair; complete per-hunk reasoning is an artifact."""
+    import contextlib
+    import io
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        result = why_all_details(src, func, env)
+    details = buf.getvalue()
+    wd = workdir(func)
+    path = os.path.join(wd, 'why-all.txt')
+    open(path, 'w').write(details)
+    if result == 0:
+        print(details.rstrip())
+        return 0
+    groups = {}
+    for key, title, knob, uid in why_all_issues(details):
+        item = groups.setdefault(key, {'mechanism': key[0], 'title': title, 'knob': knob, 'uids': []})
+        if uid is not None and uid not in item['uids']:
+            item['uids'].append(uid)
+        if not item['knob'] and knob:
+            item['knob'] = knob
+    json.dump(list(groups.values()), open(os.path.join(wd, 'why-all.json'), 'w'), indent=2)
+    first = details.splitlines()[0] if details else func
+    print(first.split('; per hunk:')[0] + f"; {len(groups)} distinct mechanism(s)")
+    for item in list(groups.values())[:12]:
+        us = ', '.join(map(str, item['uids']))
+        title = item['title']
+        print('  - ' + title[:300] + ('...' if len(title) > 300 else '') + (f" [insns {us}]" if us else ''))
+        if item['knob']:
+            print('    what-if: ' + item['knob'])
+    if not groups:
+        # Preserve the actionable no-UID/branch-only diagnosis, rather than inventing a mechanism.
+        print('\n'.join(details.splitlines()[1:8]))
+    if len(groups) > 12:
+        print(f"  ... {len(groups) - 12} more in why-all.json")
+    print(f"  full reasoning: {os.path.relpath(path, ROOT)} (structured summary: why-all.json)")
+    return result
+
+
+def why_all_details(src, func, env):
     """why for the first differing insn (with a uid) of each hunk, up to 8."""
     n, info = score(src, func, env, full=True)
     if n == 0:
@@ -2186,7 +2375,8 @@ def cmd_why_all(src, func, env):
     lines = uid_lines(wd)
     srclines = open(os.path.join(ROOT, src)).read().splitlines()
     at = lambda u: f"insn {u} (line {lines[u]})" if lines.get(u) else f"insn {u}"
-    for lo, hi in hunk_spans(rows):
+    spans = hunk_spans(rows)
+    for lo, hi in spans[:8]:
         diff = [i for i in range(lo, hi + 1) if rows[i]["tag"] != "="]
         print(f"hunk at ROM {next((rows[i]['rom_addr'] for i in diff if rows[i]['rom_addr']), '?')}:")
         moved = explain_order(wd, rows, lo, hi, at, srclines)
@@ -2200,9 +2390,16 @@ def cmd_why_all(src, func, env):
             print("  in place but in other registers (this can follow from the moves above):")
         if u:
             cmd_why(src, func, u, env)
+            trace = os.path.join(wd, "stderr.txt")
+            if os.path.exists(trace):
+                saved = os.path.join(wd, f"why-all-{u}.stderr.txt")
+                open(saved, "w").write(open(trace).read())
+                print(f"  saved trace: {os.path.relpath(saved, ROOT)}")
         elif not moved:
             print("  (no insn with an RTL uid here)")
         print()
+    if len(spans) > 8:
+        print(f"{len(spans) - 8} later hunks not analyzed (8-hunk limit); see diff.txt and ask why UID")
     return 1
 
 
@@ -2900,10 +3097,11 @@ def rom_refs(name, funcs, sizes, names):
         m = re.match(r"\.word 0x([0-9A-F]+)$", text)
         if m:
             v = int(m.group(1), 16)
-            out[("const", names.get(v & ~1, f"0x{v:X}"))] += 1
+            label = names.get(v & ~1)
+            out[("const", (label + ("|1" if v & 1 else "")) if label else f"0x{v:X}")] += 1
             continue
         m = re.match(r"(?:movs|cmp|adds|subs) \w+, (?:\w+, )?#(0x[0-9a-f]+|\d+)$", text)
-        if m and int(m.group(1), 0) > 1:
+        if m:
             out[("const", f"#0x{int(m.group(1), 0):X}")] += 1
     return out
 
@@ -2944,14 +3142,16 @@ def like_index():
     import progress
     funcs, sizes = progress.load_functions()
     elf = os.path.join(ROOT, "build", "boktai3.elf")
-    return cached("like_index", [elf, os.path.join(ROOT, "symbols", "functions.csv")],
+    return cached("like_index", [elf, os.path.join(ROOT, "symbols", "functions.csv"),
+                                  os.path.join(ROOT, "symbols", "progress_functions.csv")],
                   lambda: structure.build_index(funcs, sizes, rom_bytes(), decode, rom_pool_ranges))
 
 
 def like_tables():
     import structure
     elf = os.path.join(ROOT, "build", "boktai3.elf")
-    return cached("like_tables", [elf, os.path.join(ROOT, "symbols", "functions.csv")],
+    return cached("like_tables", [elf, os.path.join(ROOT, "symbols", "functions.csv"),
+                                  os.path.join(ROOT, "symbols", "progress_functions.csv")],
                   lambda: structure.tables(like_index()))
 
 
@@ -3370,6 +3570,11 @@ def cmd_new(target):
     if os.path.exists(draft):
         refresh_workspace(os.path.relpath(draft, ROOT))
         print(f"{name}: {os.path.relpath(draft, ROOT)} exists; continuing it (delete it to start over)")
+        # Harvest also visits existing workspaces: their current bytes, not the
+        # mere presence of a workspace, decide whether a worker is necessary.
+        r = fast_score(os.path.relpath(draft, ROOT), name, {})
+        if r is not None:
+            print(f"  now: {r[1]}, shape {fast_score.shape if r[0] else 0}")
         return 0
     os.makedirs(os.path.dirname(draft), exist_ok=True)
     seed = "an empty definition"
@@ -3403,9 +3608,13 @@ def cmd_new(target):
                         + ([f"   The twin's C has {pins_} register pin(s): try without them (`pins`)."] if pins_ else [])
                         + ["   The twin's comments and #define alias describe the twin, not this function. */"])
                 sp = land.definition_span(out, name)
-                if sp:
-                    out = (out[:sp[0]] + "\n".join(note) + f"\n// scope: write {name} here (`scope.py rom {name}`)\n"
-                           + out[sp[0]:])
+                if sp is None:  # many matched twins define FriendlyName via a sub_ADDR alias
+                    aliases = re.findall(r"^#define[ \t]+(\w+)[ \t]+%s[ \t]*(?://[^\n]*)?$"
+                                         % re.escape(name), out, re.M)
+                    sp = next((p for a in aliases if (p := land.definition_span(out, a))), None)
+                at = sp[0] if sp else 0
+                out = (out[:at] + "\n".join(note) + f"\n// scope: write {name} here (`scope.py rom {name}`)\n"
+                       + out[at:])
                 for d in diffs:
                     print(f"  twin difference: {d}")
         if out is None:
@@ -3487,8 +3696,7 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
             sp = land.definition_span(text, name)
             rest = text[:sp[0]] + text[sp[1]:] if sp else text
             now = re.sub(r'^INCLUDE_ASM\("[^"]*", %s\);\n' % re.escape(asm_name or name), "", cur, flags=re.M)
-            strip = lambda t: re.sub(r"^// scope: write .*\n|\s+", "", t, flags=re.M)
-            if strip(rest) != strip(now):
+            if land.context_key(rest) != land.context_key(now):
                 sys.exit(f"{name}: no workspace base for {rel}, and outside {name} it differs from {dest};"
                          " land by hand (or reopen with `new`)")
         merged = land.merge(cur, open(base).read() if os.path.exists(base) else cur, text)
@@ -3518,6 +3726,10 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
             sys.exit(f"{name}: no definition of {name} in {rel}")
     text, pins, bars = land.concessions(text)
 
+    def remember(p):
+        if p not in before:
+            before[p] = open(p).read() if os.path.exists(p) else None
+
     def restore():
         if getattr(restore, "committed", False):  # validated and named: later steps (the ROM build) keep it
             return
@@ -3525,8 +3737,9 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
             if t is None:
                 if os.path.exists(p):
                     os.remove(p)
-            else:
+            elif not os.path.exists(p) or open(p).read() != t:
                 open(p, "w").write(t)
+    restore.remember = remember
     try:
         return land_write(name, addr, kind, dest, path, text, info, nonmatching, funcs, sizes, restore,
                           pins, bars, new_name, note, rom, wdraft, base, draft)
@@ -3571,7 +3784,7 @@ def land_write(name, addr, kind, dest, path, text, info, nonmatching, funcs, siz
     import progress
     open(path, "w").write(text)
     fmt = os.path.join(ROOT, "build", "venv", "bin", "clang-format")
-    subprocess.run([fmt if os.path.exists(fmt) else "clang-format", "-i", path], cwd=ROOT)
+    subprocess.run([fmt if os.path.exists(fmt) else "clang-format", "-i", path], cwd=ROOT, check=True)
     # every hidden function the landed file now defines gets its reviewed end (one landed into a unit
     # too, and a hidden neighbor the draft wrote alongside it)
     at = dict(funcs)
@@ -3599,6 +3812,10 @@ def land_write(name, addr, kind, dest, path, text, info, nonmatching, funcs, siz
           + (f"; NONMATCHING draft, fuzzy {info.get('fuzzy', 0.0):.1f}%" if nonmatching else "")
           + ("; build_extra_functions.csv replacement end set" if kind == "hidden" and not nonmatching else ""))
     if new_name:
+        # The landed draft may add local aliases absent during early validation.
+        # Discover every actual rename write now, and journal it before mutation.
+        for rel, _ in land.rename(ROOT, addr, name, new_name, note=note, dry=True):
+            restore.remember(os.path.join(ROOT, rel))
         cmd_rename(name, new_name, note)
         name = new_name
     restore.committed = True
@@ -3662,7 +3879,8 @@ def cmd_like(target, show):
     import progress
     funcs, sizes = progress.load_functions()
     elf = os.path.join(ROOT, "build", "boktai3.elf")
-    index = cached("like_index", [elf, os.path.join(ROOT, "symbols", "functions.csv")],
+    index = cached("like_index", [elf, os.path.join(ROOT, "symbols", "functions.csv"),
+                                  os.path.join(ROOT, "symbols", "progress_functions.csv")],
                    lambda: structure.build_index(funcs, sizes, rom_bytes(), decode, rom_pool_ranges))
     target = resolve_target(target, funcs)
     status, files = code_status()
