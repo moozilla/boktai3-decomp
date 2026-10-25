@@ -5000,6 +5000,7 @@ addr,name,mode,confidence,source,notes
 08138300,LinkSession_ReceiveSelectionByte,thumb,low,src-alias,
 08138380,Registry1745_BeginShutdown,thumb,low,src-alias,Clears participant count and saves the previous state before entering state zero and closing related displays
 081383A4,Registry1745_InitParticipantOrder,thumb,low,src-alias,Fills participant order entries with consecutive indices and pads the remaining entries with sentinel four
+081383E0,Registry1745_UpdateParticipantScores,thumb,low,src-alias,Updates bounded participant scores and totals; the actual 192-byte routine matches; but the listed 592-byte extent includes a separate routine at 081384A0.
 081386F0,ScriptNotifier_CallWithValue,thumb,low,src-alias,
 08138778,PositionEffectDisplay_UpdateSources,thumb,low,src-alias,
 081388F4,PositionEffectDisplay_Destroy,thumb,low,src-alias,Task destructor removes four sprites and clears the singleton; position effect ownership is tentative
