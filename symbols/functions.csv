@@ -5656,6 +5656,7 @@ addr,name,mode,confidence,source,notes
 08163BD4,ParticlePool_OnUpdate,thumb,low,src-alias,Task update callback advancing the pool particle simulation
 08163BE0,ParticlePool_OnDestroy,thumb,low,src-alias,Task destruction callback removing all sixteen particle effects
 08163C00,CollisionVolume_InitCollider,thumb,low,src-alias,
+08163C84,ParticlePool_InitParticles,thumb,low,src-alias,Initializes 16 particle sprites with randomized motion parameters and kind-dependent tile frames.
 08163E0C,ParticlePool_Init,thumb,low,src-alias,Initializes the pool collider and particle effects
 08163E24,ParticlePool_Create,thumb,low,src-alias,
 08163E68,ParticlePool_Destroy,thumb,low,src-alias,Kills the particle-pool task through the task lifecycle
