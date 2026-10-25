@@ -648,6 +648,7 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
     print(f"{len(hunks)} hunk(s): {nr} ROM / {nm} draft insns differ"
           + (f" (+{nb} branch(es) whose target moved"
              + ("" if only_targets else ": they follow from the others") + ")" if nb else "")
+          + f"; shape {shape_distance(rom, dr)} (register-blind distance, what try ranks by)"
           + f"; {shifted} offset-only shifts hidden.  full listing: {rel}/diff.txt (json: diff.json)")
     if only_targets:
         # Same instructions, same size: a label sits before a different instruction. Name both targets.
@@ -1589,8 +1590,10 @@ def fast_score(src, func, env):
         return 0, "MATCH"
     if addr not in _ROMDEC:
         _ROMDEC[addr] = decode(rom_code, addr, rom_data(rom_name(src, func), addr, rom_code))
-    pairs, _ = align(_ROMDEC[addr], decode(mine, addr, mdata))
+    dr = decode(mine, addr, mdata)
+    pairs, _ = align(_ROMDEC[addr], dr)
     rows = [{"tag": t} for _, _, t in pairs]
+    fast_score.shape = shape_distance(_ROMDEC[addr], dr)
     return sum(1 for r in rows if r["tag"] != "="), count_text(rows)
 
 
@@ -1602,7 +1605,7 @@ def score(src, func, env, full=False):
     if not full and os.environ.get("SCOPE_FAST") != "0":  # SCOPE_FAST=0: one-shot compiles (A/B, debugging)
         r = fast_score(src, func, env)
         if r is not None:
-            return r[0], {"counts": r[1]}
+            return r[0], {"counts": r[1], "shape": fast_score.shape if r[0] else 0}
     mine, addr, info = compile_draft(src, func, env)
     _, _, sizes = inventory()
     rom_code = load_rom(verify=False)[off(addr):off(addr) + sizes[rom_name(src, func)]]
@@ -1613,6 +1616,15 @@ def score(src, func, env, full=False):
     rows = json.load(open(os.path.join(info["wd"], "diff.json")))
     info["counts"] = count_text(rows)
     return sum(1 for r in rows if r["tag"] != "="), info
+
+
+def shape_distance(rom, mine):
+    """Insns to delete or insert to turn the draft into the ROM with low registers blanked: what is left
+    once register choice is set aside (order and instruction shape). A moved block costs twice its length."""
+    a = [norm_insn(r[3]) for r in rom]
+    b = [norm_insn(r[3]) for r in mine]
+    same = sum(n for _, _, n in difflib.SequenceMatcher(None, a, b, autojunk=False).get_matching_blocks())
+    return len(a) + len(b) - 2 * same
 
 
 def count_text(rows):
@@ -2724,7 +2736,7 @@ def cmd_try(src, func, variants, env):
                 n, info = score(src, func, dict(env, **{k: f"{prev},{val}" if prev else val}))
             except SystemExit as e:
                 n, info = None, {"counts": str(e.code).splitlines()[0][:60]}
-            rows.append((n, v, info.get("counts", "MATCH" if n == 0 else "?"), "knob"))
+            rows.append((n, v, info.get("counts", "MATCH" if n == 0 else "?"), "knob", info))
             continue
         path = v if os.path.isabs(v) else os.path.join(os.getcwd(), v)
         if not os.path.exists(path):
@@ -2734,23 +2746,29 @@ def cmd_try(src, func, variants, env):
             n, info = score(rel, func, env)
         except SystemExit as e:
             n, info = None, {"counts": "compile fails: " + str(e.code).splitlines()[-1].strip()[:60]}
-        rows.append((n, rel, info.get("counts", "MATCH" if n == 0 else "?"), c_change(base_lines, path)))
+        rows.append((n, rel, info.get("counts", "MATCH" if n == 0 else "?"), c_change(base_lines, path), info))
     dt = time.perf_counter() - t0
     knobs = " ".join(f"{k}={v}" for k, v in env.items())
-    print(f"{func}: base {src}{' [' + knobs + ']' if knobs else ''}: {base_info.get('counts', 'MATCH')}."
+    print(f"{func}: base {src}{' [' + knobs + ']' if knobs else ''}: {base_info.get('counts', 'MATCH')}"
+          f"{', shape ' + str(base_info['shape']) if base_n else ''}."
           f" {len(variants)} variants in {dt:.2f}s ({dt / max(1, len(variants) + 1) * 1000:.0f} ms each)")
-    def key(n, counts):
-        """Rank by the counts shown: the larger side, then the total, then differing rows."""
-        m = re.match(r"(\d+) ROM / (\d+) draft", counts or "")
+    def key(n, info):
+        """Rank: order and shape first (register choice set aside), then the larger side, the total, rows."""
+        m = re.match(r"(\d+) ROM / (\d+) draft", info.get("counts") or "")
         if n is None:
             return None
-        return (0, 0, 0) if n == 0 else (max(int(m[1]), int(m[2])), int(m[1]) + int(m[2]), n) if m else (n, n, n)
-    base_k = key(base_n, base_info.get("counts", "MATCH"))
-    rows.sort(key=lambda r: (r[0] is None, key(r[0], r[2]) or (0,)))
-    for n, name, counts, change in rows:
-        k = key(n, counts)
+        if n == 0:
+            return (0, 0, 0, 0)
+        sh = info.get("shape", n)
+        return (sh, max(int(m[1]), int(m[2])), int(m[1]) + int(m[2]), n) if m else (sh, n, n, n)
+    base_k = key(base_n, base_info)
+    rows.sort(key=lambda r: (r[0] is None, key(r[0], r[4]) or (0,)))
+    for n, name, counts, change, info in rows:
+        k = key(n, info)
         mark = "MATCH" if n == 0 else ("better" if k is not None and k < base_k else
                                        "same" if k == base_k else "worse" if k is not None else "")
+        if n:
+            counts = f"{counts}, shape {info.get('shape', '?')}"
         print(f"  {mark:6} {counts:44} {name}" + ("" if change == "knob" else f"  [{change}]"))
     best = rows[0] if rows else None
     if best and best[0] is not None and best[3] != "knob":
