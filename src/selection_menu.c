@@ -277,67 +277,67 @@ struct PanelSprite {
     s16 x, y;
 };
 #ifdef NONMATCHING
-// fuzzy: 49.0%
+// fuzzy: 74.1%
+// scope shape 16 (differences once low registers are set aside)
 // scope shape 72 (differences once low registers are set aside)
 void sub_0801A218(struct SelectionMenu *m)
 {
-    u8 *p = (u8 *)m;
-    u32 zero;
-    u8 attr[8];
     struct DisplaySequenceState a;
+    long long attr;
+    struct DisplaySequenceState *st;
     void *res;
-    struct PanelSprite *s;
+    struct SceneInputPanelDrawable *s;
     const u16 *entry;
-    zero = 0;
-    CpuSet(&zero, attr, 0x05000002);
-    Widget_InitLinked(p + 0xD4, p + 0x4C, 0xB4, 0x10, 0, 0, 0x3C, attr);
-    Widget_InitLinked(p + 0x134, p + 0x4C, 0xB5, 0x10, 0, 0, 0x3C, attr);
+    ZeroFill8(&attr);
+    Widget_InitLinked(&m->panels[0], &m->panelResource, 0xB4, 0x10, 0, 0, 0x3C, &attr);
+    Widget_InitLinked(&m->panels[1], &m->panelResource, 0xB5, 0x10, 0, 0, 0x3C, &attr);
     res = ScriptProc_Start(0x922E, 0x4BBF);
-    AnimData_Load(p + 0xB8, 0x593A);
-    AnimData_SelectPaletteBank(p + 0xB8, 0x1F7);
-    s = (struct PanelSprite *)(p + 0x8C);
-    Sprite_Init(s, p + 0xB8, 0x30);
-    Anim_RestartSequence(&a, res, 6, 0, 0);
-    entry = a.commands + a.index;
-    s->tile = *entry >> 6;
-    if ((u8)(a.flags & 1) != (((*entry & 0x30) >> 4) & 1))
+    AnimData_Load(m->panel.graphics, 0x593A);
+    AnimData_SelectPaletteBank(m->panel.graphics, 0x1F7);
+    s = &m->panel;
+    Sprite_Init(s, m->panel.graphics, 0x30);
+    st = &a;
+    Anim_RestartSequence(st, res, 6, 0, 0);
+    entry = st->commands + st->index;
+    s->frame = *entry >> 6;
+    if ((u8)(st->flags & 1) != (((*entry & 0x30) >> 4) & 1))
         s->flags |= 4;
     else
         s->flags &= ~4;
-    if ((u8)(a.flags & 2) != (((*entry & 0x30) >> 4) & 2))
+    if ((u8)(st->flags & 2) != (((*entry & 0x30) >> 4) & 2))
         s->flags |= 8;
     else
         s->flags &= ~8;
-    if (++a.elapsed >= a.duration) {
-        a.elapsed = 0;
-        if (a.flags & 4) {
-            if (a.index == 0) {
-                if (a.flags & 8)
-                    a.elapsed = a.duration;
+    if (++st->elapsed >= st->duration) {
+        st->elapsed = 0;
+        if (st->flags & 4) {
+            if (st->index == 0) {
+                if (st->flags & 8)
+                    st->elapsed = st->duration;
                 else
-                    a.index = a.frameCount - 1;
+                    st->index = st->frameCount - 1;
             } else {
-                a.index--;
+                st->index--;
             }
         } else {
-            if (++a.index >= a.frameCount) {
-                if ((u8)(a.flags & 8)) {
-                    a.elapsed = a.duration;
-                    a.index = a.frameCount - 1;
+            if (++st->index >= st->frameCount) {
+                if ((u8)(st->flags & 8)) {
+                    st->elapsed = st->duration;
+                    st->index = st->frameCount - 1;
                 } else {
-                    a.index = 0;
+                    st->index = 0;
                 }
             }
         }
-        entry = a.commands + a.index;
-        a.frameWeight = *entry & 15;
-        a.duration = (a.frameWeight * a.speed) >> 6;
-        if (!a.duration)
-            a.duration = 1;
+        entry = st->commands + st->index;
+        st->frameWeight = *entry & 15;
+        st->duration = (st->frameWeight * st->speed) >> 6;
+        if (!st->duration)
+            st->duration = 1;
     }
-    s->priority = 0;
-    s->x = 8;
-    s->y = 0x50;
+    m->panel.priority = 0;
+    m->panel.position.x = 8;
+    m->panel.position.y = 0x50;
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_0801A218);
