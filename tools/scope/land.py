@@ -21,14 +21,15 @@ def sources(root):
     return sorted({p for pat in pats for p in glob.glob(os.path.join(root, pat), recursive=True)})
 
 
-def include_asm_index(root):
-    """{asm name: unit path} for every INCLUDE_ASM outside a NONMATCHING #else, in one pass over src/."""
+def include_asm_index(root, drafts=False):
+    """{asm name: unit path} for every INCLUDE_ASM outside a NONMATCHING #else, in one pass over src/.
+    DRAFTS: the ones inside a NONMATCHING #else too (a drafted function's unit)."""
     out = {}
     for path in sorted(glob.glob(os.path.join(root, "src", "**", "*.c"), recursive=True)):
         text = open(path).read()
         if "INCLUDE_ASM" not in text:
             continue
-        plain = re.sub(r"#ifdef NONMATCHING\n.*?#endif", "", text, flags=re.S)
+        plain = text if drafts else re.sub(r"#ifdef NONMATCHING\n.*?#endif", "", text, flags=re.S)
         for m in INCLUDE_ASM.finditer(plain):
             out.setdefault(m.group(1), os.path.relpath(path, root))
     return out
@@ -42,7 +43,9 @@ def include_asm_file(root, names, index=None):
 
 def where(root, name, addr, index=None):
     """('unit', path, asm_name) | ('plain', path, None): where FUNC's C goes."""
-    hit = include_asm_file(root, [name, f"sub_{addr:08X}"], index)
+    names = [name, f"sub_{addr:08X}"]
+    # a drafted function's INCLUDE_ASM sits in its NONMATCHING #else: that unit is still its home
+    hit = include_asm_file(root, names, index) or include_asm_file(root, names, include_asm_index(root, True))
     if hit:
         return "unit", hit[0], hit[1]
     path = f"src/fn/sub_{addr:08X}.c"
@@ -230,6 +233,34 @@ def seed_from_twin(text, twin, func, others):
     text = INCLUDE_ASM.sub("", text)
     text = re.sub(r"#ifdef NONMATCHING\n.*?#endif\n?", "", text, flags=re.S)
     return re.sub(r"\b%s\b" % re.escape(twin), func, text)
+
+
+def unwrap(text, func, addr):
+    """The matching C without its #ifdef NONMATCHING / #else INCLUDE_ASM / #endif wrapper and fuzzy notes."""
+    for m in re.finditer(r"#ifdef NONMATCHING\n(.*?)#else\n(.*?)#endif\n?", text, re.S):
+        names = re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', m.group(2))
+        if func in names or "sub_" + addr in names:
+            body = "".join(ln for ln in m.group(1).splitlines(True)
+                           if not re.match(r"\s*// (fuzzy:|Remaining differences)", ln))
+            # a block can hold several functions (one file-wide #ifdef): the others stay nonmatching,
+            # each in its own #ifdef NONMATCHING / #else INCLUDE_ASM / #endif
+            for other in names:
+                if other in (func, "sub_" + addr):
+                    continue
+                d = re.search(r"^[A-Za-z_][^\n;=]*\b" + other + r"\s*\([^;{]*\)\s*\{.*?^\}\n", body, re.S | re.M)
+                if not d:
+                    return None
+                start = d.start()
+                while True:  # take the comment lines directly above the definition along
+                    prev = body.rfind("\n", 0, start - 1) + 1
+                    if start == 0 or not body[prev:start].lstrip().startswith("//"):
+                        break
+                    start = prev
+                inc = re.search(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*' + other + r"\s*\);", m.group(2)).group(0)
+                body = (body[:start] + "#ifdef NONMATCHING\n" + body[start:d.end()] + "#else\n" + inc
+                        + "\n#endif\n" + body[d.end():])
+            return text[:m.start()] + body + text[m.end():]
+    return None
 
 
 def wrap_nonmatching(text, func, asm_name, fuzzy, shape=None):
