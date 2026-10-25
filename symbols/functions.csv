@@ -6267,6 +6267,7 @@ addr,name,mode,confidence,source,notes
 08181778,Armor_BindPaletteBanks,thumb,low,src-alias,
 08181964,Armor_InitPaletteController,thumb,low,src-alias,Prepares palette resources and restores palette banks before clearing controller callbacks
 081819E0,ActorPalette_Reset,thumb,low,src-alias,
+08181A08,ActorPalette_FadeWhiteFast,thumb,low,src-alias,Eight-step white fade of the actor palette banks (blend shift 3); then clears active and runs the callback
 08181AE0,Armor_StartFastWhiteFade,thumb,low,src-alias,Installs the eight-step white palette fade callback and resets its timer
 08181B00,ActorPalette_FadeWhite,thumb,low,src-alias,
 08181BD8,Armor_StartSlowWhiteFade,thumb,low,src-alias,Installs the sixteen-step white palette fade callback and resets its timer
