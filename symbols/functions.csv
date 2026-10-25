@@ -8517,6 +8517,7 @@ addr,name,mode,confidence,source,notes
 082003BC,PlayerClone_UpdateBehavior,thumb,low,src-alias,
 08200A10,PlayerClone_InitSlot,thumb,low,src-alias,Initializes a pooled Django-sprite instance with animation resources and four colliders; clone identity is tentative
 08200C40,PlayerClone_ReleaseSlot,thumb,low,src-alias,Stops instance effects and clears its occupancy bit while decrementing the active count
+08200C94,PlayerClone_UpdatePool,thumb,low,src-alias,Updates three active player clones; their movement; animation; colliders; palettes and expiration.
 08201024,PlayerClone_DestroyPool,thumb,low,src-alias,Removes all three slots' colliders and animation tasks and clears the singleton pointer
 0820107C,DirectionalSpritePool_Init,thumb,low,src-alias,
 082010EC,PlayerClone_CreatePool,thumb,low,src-alias,Creates the singleton task managing three clone instances and installs its lifecycle callbacks
