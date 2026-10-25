@@ -86,7 +86,367 @@ static inline void IwProject(struct IwVec *screen, struct IwVec *world)
     screen->z = sum + vertical - gUnk_03005418[2];
 }
 
+#ifdef NONMATCHING
+// fuzzy: 21.6%
+struct IwSpr;
+struct IwObjDraw {
+    u8 pad0[8];
+    u32 flags;
+    u8 padC[0xE];
+    u8 priority;
+    u8 pad1B[0x19];
+    u8 scaleX;
+    u8 scaleY;
+    u16 angle;
+    u16 count;
+    u16 palBase;
+    u32 attr;
+    u8 pad40[8];
+    u8 *palSrc;
+    struct IwSpr *spr;
+    u8 *tiles;
+};
+
+struct IwSpr {
+    u8 flags;
+    u8 size;
+    s16 dx;
+    s16 dy;
+    u16 tile;
+};
+
+struct IwAffineParam {
+    u8 angle;
+    s8 a;
+    s8 b;
+    u8 pad;
+};
+
+struct IwTileReq {
+    u8 *src;
+    u32 desc;
+};
+
+struct IwOamOut {
+    u32 attr01;
+    u16 attr2;
+    u16 attr3;
+};
+
+extern u8 gUnk_03005230;
+extern u32 gUnk_0300522C;
+extern s32 gUnk_03004BA0;
+extern struct IwAffineParam gUnk_03004310[];
+extern const s16 gUnk_086149C4[];
+extern u8 gUnk_03004D20[];
+extern u8 gUnk_03004D90[];
+extern u32 gUnk_03004D50[];
+extern u8 gUnk_03004D30[];
+extern u8 gUnk_03004D40[];
+extern u8 gUnk_03004D10[];
+extern s16 gUnk_030042E8;
+extern u16 gUnk_030042DC;
+extern u32 gUnk_03004304;
+extern struct IwTileReq gUnk_02039000[];
+extern s32 gUnk_03004798;
+extern struct IwOamOut gUnk_03004390[];
+extern u32 gUnk_03003A04;
+extern s32 gUnk_0300479C;
+extern struct IwOamOut gUnk_030047A0[];
+extern u16 gUnk_03004790[];
+u32 Palette_CacheObjectBankArm(u32 key, u32 *src);
+
+static inline s32 IwScale6(s32 v)
+{
+    if (v >= 0)
+        return v >> 6;
+    return -((-v) >> 6);
+}
+
+static inline s32 IwScale12(s32 v)
+{
+    if (v >= 0)
+        return v >> 12;
+    return -((-v) >> 12);
+}
+
+static inline s32 IwAddAffine(u8 angle, s32 a, s32 b)
+{
+    s32 n = gUnk_03004BA0;
+    if (n > 0x1f)
+        return 0;
+    gUnk_03004BA0 = n + 1;
+    gUnk_03004310[n].angle = angle;
+    gUnk_03004310[n].a = a;
+    gUnk_03004310[n].b = b;
+    return n;
+}
+
+// confidence=low: batches an IwObj's sprites into OAM (affine setup, bounds check, palette cache, tile requests)
+void sub_08000430(struct IwObj *obj0, s32 x, s32 y, s32 z)
+{
+    struct IwObjDraw *obj = (struct IwObjDraw *)obj0;
+    u8 affTbl[4];
+    u32 oam[64];
+    u8 attr3[64];
+    u16 tile[64];
+    u8 keyIdx[64];
+    u32 keys[16];
+    u32 bankIdx[16];
+    s32 n = 0;
+    s32 nKeys = 0;
+    u32 objFlags;
+    u32 fl2;
+    u32 f4, f8;
+    s32 sinv, cosv;
+    s32 count;
+    s32 i;
+    struct IwSpr *p;
+
+    f4 = obj->flags & 4;
+    f8 = obj->flags & 8;
+    if (z >= 0)
+        z = z >> 1;
+    else
+        z = -((-z) >> 1);
+    if (z < -0x80)
+        z = -0x80;
+    else if (z >= 0x7f)
+        z = 0x7f;
+
+    objFlags = obj->flags;
+    fl2 = 0;
+    if (((gUnk_03005230 & 1) && obj->priority != 0 && !(objFlags & 0x10000)) || (objFlags & 0x800))
+        fl2 |= 0x1000;
+    if (gUnk_0300522C != 0) {
+        if (objFlags & 0x4000)
+            fl2 |= 0x400;
+    }
+    if (objFlags & 0x100)
+        fl2 |= 0x800;
+
+    if (!(objFlags & 2)) {
+        sinv = 0;
+        cosv = 0;
+    } else {
+        s32 a = obj->scaleX;
+        s32 b = obj->scaleY;
+        u8 ang = obj->angle;
+        s32 ra, rb, idx;
+
+        if (f4)
+            a = -a;
+        if (f8)
+            b = -b;
+        if (objFlags & 0x20000) {
+            fl2 |= 0x100;
+        } else {
+            s32 aa = a < 0 ? -a : a;
+            s32 ab = b < 0 ? -b : b;
+            if (aa > 0x3c || ab > 0x3c || obj->angle != 0)
+                fl2 |= 0x300;
+            else
+                fl2 |= 0x100;
+        }
+        affTbl[0] = IwAddAffine(ang, (s8)a, (s8)b);
+        if (objFlags & 0x8000) {
+            s32 na = -a;
+            s32 nb = -b;
+            affTbl[1] = IwAddAffine(ang, (s8)na, (s8)b);
+            affTbl[2] = IwAddAffine(ang, (s8)a, (s8)nb);
+            affTbl[3] = IwAddAffine(ang, (s8)na, (s8)nb);
+        } else {
+            affTbl[1] = affTbl[0];
+            affTbl[2] = affTbl[0];
+            affTbl[3] = affTbl[0];
+        }
+        idx = (u16)obj->angle;
+        sinv = gUnk_086149C4[(-idx) & 0xff];
+        cosv = gUnk_086149C4[(-idx + 0x40) & 0xff];
+    }
+
+    count = obj->count;
+    p = obj->spr;
+    for (i = 0; i < count; i++, p++) {
+        u32 sz = p->size;
+        s32 ht = gUnk_03004D20[sz];
+        s32 wd = gUnk_03004D90[sz];
+        u32 fl = fl2;
+        s32 px, py;
+
+        if (!(objFlags & 2)) {
+            s32 x0 = p->dx;
+            s32 y0 = p->dy;
+            s32 x1 = x0 + wd;
+            s32 y1 = y0 + ht;
+            if (f4) {
+                s32 t = x0;
+                x0 = -x1;
+                x1 = -t;
+            }
+            if (f8) {
+                s32 t = y0;
+                y0 = -y1;
+                y1 = -t;
+            }
+            px = x0 + x;
+            py = y0 + y;
+            if (f4 != (p->flags & 4))
+                fl |= 0x10000000;
+            if (f8 != (p->flags & 8))
+                fl |= 0x20000000;
+            if (!(objFlags & 0x40)) {
+                if (x1 + x < 0)
+                    continue;
+                if (px > 0xF0)
+                    continue;
+                if (y1 + y < 0)
+                    continue;
+                if (py > 0xA0)
+                    continue;
+            }
+        } else {
+            s32 hx = wd >> 1;
+            s32 hy = ht >> 1;
+            s32 sx = IwScale6((p->dx + hx) * obj->scaleX);
+            s32 sy = IwScale6((p->dy + hy) * obj->scaleY);
+            s32 ey, rx, ry;
+            u32 idx;
+
+            if (f4)
+                sx = -sx;
+            ey = sy;
+            if (f8)
+                ey = -sy;
+            idx = ((p->flags & 4) ? 1 : 0);
+            if (p->flags & 8)
+                idx |= 2;
+            fl |= (u32)affTbl[idx] << 25;
+            rx = IwScale12(sx * cosv - ey * sinv);
+            ry = IwScale12(ey * cosv + sinv * sx);
+            px = rx - hx;
+            py = ry - hy;
+            if ((fl & 0x300) == 0x300) {
+                px = px - hx;
+                py = py - hy;
+                px += x;
+                py += y;
+                if (px + wd * 2 < 0)
+                    continue;
+                if (px > 0xF0)
+                    continue;
+                if (py + ht * 2 < 0)
+                    continue;
+                if (py > 0xA0)
+                    continue;
+            } else {
+                px += x;
+                py += y;
+                if (px + wd < 0)
+                    continue;
+                if (px > 0xF0)
+                    continue;
+                if (py + ht < 0)
+                    continue;
+                if (py > 0xA0)
+                    continue;
+            }
+        }
+
+        {
+            u32 key = p->tile >> 12;
+            s32 k;
+            tile[n] = p->tile & 0xfff;
+            for (k = 0; k < nKeys && keys[k] != key; k++)
+                ;
+            keyIdx[n] = k;
+            if (k == nKeys) {
+                nKeys = k + 1;
+                keys[k] = key;
+            }
+            attr3[n] = sz;
+            oam[n] = gUnk_03004D50[sz] | obj->attr | ((py & 0xff) | ((px & 0x1ff) << 16)) | fl;
+            n++;
+        }
+    }
+
+    if (n <= 0)
+        return;
+
+    for (i = 0; i < nKeys; i++)
+        bankIdx[i] = Palette_CacheObjectBankArm(obj->palBase + keys[i],
+                                                (u32 *)(obj->palSrc + (keys[i] << 5)));
+
+    if (obj->flags & 0x20) {
+        for (i = 0; i < n; i++) {
+            u32 s = attr3[i];
+            s32 step = gUnk_03004D30[s];
+            s32 tw = gUnk_03004D40[s];
+            s32 th = gUnk_03004D10[s];
+            s32 ok;
+            if (gUnk_030042E8 + step >= 0x400) {
+                ok = -1;
+            } else {
+                u32 slot = gUnk_03004304;
+                gUnk_02039000[slot].src = obj->tiles + (tile[i] << 5);
+                ok = 0;
+                gUnk_02039000[slot].desc = (th << 16) | (tw << 5);
+                gUnk_03004304 = slot + 1;
+            }
+            if (ok < 0)
+                return;
+            {
+                u32 a2 = (u32)gUnk_030042E8 | (obj->priority << 10) | (bankIdx[keyIdx[i]] << 12);
+                u32 o = oam[i];
+                s32 c = gUnk_03004798;
+                if (c <= 0x7f) {
+                    gUnk_03004798 = c + 1;
+                    gUnk_03004390[c].attr01 = o;
+                    gUnk_03004390[c].attr2 = a2;
+                    gUnk_03003A04 |= 1;
+                }
+            }
+            gUnk_030042DC += step;
+            gUnk_030042E8 += step;
+        }
+    } else {
+        for (i = 0; i < n; i++) {
+            u32 s = attr3[i];
+            s32 step = gUnk_03004D30[s];
+            s32 tw = gUnk_03004D40[s];
+            s32 th = gUnk_03004D10[s];
+            s32 ok;
+            if (gUnk_030042E8 + step >= 0x400) {
+                ok = -1;
+            } else {
+                u32 slot = gUnk_03004304;
+                gUnk_02039000[slot].src = obj->tiles + (tile[i] << 5);
+                ok = 0;
+                gUnk_02039000[slot].desc = (th << 16) | (tw << 5);
+                gUnk_03004304 = slot + 1;
+            }
+            if (ok < 0)
+                return;
+            {
+                u32 a2 = (u32)gUnk_030042E8 | (obj->priority << 10) | (bankIdx[keyIdx[i]] << 12);
+                u32 o = oam[i];
+                s32 c = gUnk_0300479C;
+                if (c <= 0x7f) {
+                    gUnk_0300479C = c + 1;
+                    gUnk_030047A0[c].attr01 = o;
+                    gUnk_030047A0[c].attr2 = a2;
+                    gUnk_030047A0[c].attr3 = (z + 0x80) << 8;
+                    gUnk_03004790[obj->priority]++;
+                }
+            }
+            gUnk_030042DC += step;
+            gUnk_030042E8 += step;
+        }
+    }
+}
+#else
 INCLUDE_ASM("asm/nonmatching", sub_08000430);
+#endif
 void sub_08000E90(void)
 {
     struct IwObj *o;
