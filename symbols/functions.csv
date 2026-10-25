@@ -5770,6 +5770,7 @@ addr,name,mode,confidence,source,notes
 081686FC,SceneHud_UpdateSecondaryWidgets,thumb,low,src-alias,
 08168784,PauseMenu_RefreshEquipmentSlotIcons,thumb,low,src-alias,Reloads three equipment slot icons and assigns their row positions
 081687D8,SceneHud_UpdateTertiaryWidgets,thumb,low,src-alias,
+08168A0C,SceneHud_RebuildPrimaryOptions,thumb,low,src-alias,Rebuilds primary ability choices; repairs an unavailable saved selection; and resets icon blinking.
 08168BEC,SceneHud_RebuildTertiaryOptions,thumb,low,src-alias,
 08168C90,PauseMenu_BeginEquipmentSelection,thumb,low,src-alias,Prepares selection displays and sets modal bit 4 before installing the selection update callback
 08168CC4,PauseMenu_ApplySelectedEquipment,thumb,low,src-alias,Equips the selected slot entry on the player or passes -1 when selection is inactive

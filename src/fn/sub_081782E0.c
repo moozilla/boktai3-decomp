@@ -4,7 +4,7 @@
 extern struct SceneHudState *gSceneHud;
 extern struct Player *gUnk_02000580[];
 extern u32 gUnk_030053F4;
-void sub_08168A0C(struct SceneHudState *);
+void SceneHud_RebuildPrimaryOptions(struct SceneHudState *);
 void PauseMenu_RefreshEquipmentSlotIcons(struct SceneHudState *);
 void sub_08168850(struct SceneHudState *);
 void SceneHud_UpdateSecondaryWidgets(struct SceneHudState *);
@@ -18,7 +18,7 @@ void SceneHud_RefreshControls(void)
         struct Player *owner = gUnk_02000580[0];
         gSceneHud->actionOwner = owner;
         if (gSceneHud->actionOwner) {
-            sub_08168A0C(gSceneHud);
+            SceneHud_RebuildPrimaryOptions(gSceneHud);
             PauseMenu_RefreshEquipmentSlotIcons(gSceneHud);
             sub_08168850(gSceneHud);
             SceneHud_UpdateSecondaryWidgets(gSceneHud);
