@@ -1,4 +1,5 @@
 #include "status_screen.h"
+// MATCHING_CONCESSION: register-pinning
 
 u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y)
 {
@@ -99,39 +100,36 @@ void NumericDisplay_DrawStatusValues(struct StatusScreen *unused)
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 65.9%
-// scope shape 54 (differences once low registers are set aside)
-void sub_0800E5B8(struct StatusScreen *unused)
+void StatusScreen_DrawClock(struct StatusScreen *unused)
 {
     int digits[2];
     s16 *dst;
     int row, col, n, base;
-    int *values;
+    register int *values asm(
+        "ip"); // pin: values must be allocated before hours/minutes (AGBCC_PRI=values:+600), so it lands in ip
     u32 hours, minutes;
     struct StatusGameState *c = &gUnk_03005430;
     if (!c)
         return;
     if (c->mode == 0 || c->mode == 4 || c->mode == 5) {
         dst = (s16 *)StatusScreen_GetTilePtr(0, 4, 15);
-        hours = gUnk_03005430.altCounters[0];
-        minutes = gUnk_03005430.altCounters[1];
+        hours = c->altCounters[0];
+        minutes = c->altCounters[1];
     } else {
         dst = (s16 *)StatusScreen_GetTilePtr(0, 4, 15);
-        hours = gUnk_03005430.counters[0];
-        minutes = gUnk_03005430.counters[1];
+        hours = c->counters[0];
+        minutes = c->counters[1];
     }
     for (row = 0; row < 2; row++) {
         int shift = row << 4;
-        int tile = shift + 0x6a;
-        s16 *out = dst;
+        base = 0x6a;
         for (col = 0; col < 4; col++)
-            *out++ = (tile + col) | -12288;
+            dst[col] = (shift + base + col) | -12288;
         dst += gUnk_03004C30[0].width * 2;
     }
 
     dst = (s16 *)StatusScreen_GetTilePtr(0, 8, 15);
-    if (gUnk_03005430.mode == 0 || gUnk_03005430.mode == 4 || gUnk_03005430.mode == 5) {
+    if (c->mode == 0 || c->mode == 4 || c->mode == 5) {
         n = 2;
         base = 0x6e;
     } else {
@@ -140,19 +138,16 @@ void sub_0800E5B8(struct StatusScreen *unused)
     }
     for (row = 0; row < 2; row++) {
         int shift = row << 4;
-        s16 *out = dst;
         for (col = 0; col < n; col++)
-            *out++ = (shift + base + col) | -12288;
+            dst[col] = (shift + base + col) | -12288;
         dst += gUnk_03004C30[0].width * 2;
     }
 
     digits[0] = Div(hours, 10);
     digits[1] = hours - digits[0] * 10;
     dst = (s16 *)StatusScreen_GetTilePtr(0, 16, 15);
-    do {
-        row = 0;
-        values = digits;
-    } while (0);
+    row = 0;
+    values = digits;
     for (; row < 2; row++) {
         int shift = row << 4;
         int *digit = values;
@@ -171,22 +166,17 @@ void sub_0800E5B8(struct StatusScreen *unused)
     values = digits;
     for (; row < 2;) {
         int next = row + 1;
-        row <<= 4;
-        {
-            int *digit = values;
-            s16 *out = dst;
-            for (col = 0; col < 2; col++) {
-                int tile = *digit++ + 0x60;
-                *out++ = row + tile | -12288;
-            }
-            dst += gUnk_03004C30[0].width * 2;
+        int shift = row << 4;
+        int *digit = values;
+        s16 *out = dst;
+        for (col = 0; col < 2; col++) {
+            int tile = *digit++ + 0x60;
+            *out++ = shift + tile | -12288;
         }
+        dst += gUnk_03004C30[0].width * 2;
         row = next;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0800E5B8);
-#endif
 
 void StatusScreen_RefreshDirtyDisplays(struct StatusScreen *s)
 {
@@ -197,7 +187,7 @@ void StatusScreen_RefreshDirtyDisplays(struct StatusScreen *s)
     if (s->dirty & 2)
         NumericDisplay_DrawStatusValues(s);
     if (s->dirty & 4)
-        sub_0800E5B8(s);
+        StatusScreen_DrawClock(s);
     s->dirty = 0;
 }
 

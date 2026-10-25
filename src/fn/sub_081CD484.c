@@ -155,7 +155,7 @@ extern struct Camera *gUnk_02000580;
 void *memset(void *, s32, u32);
 void *SceneMessages_FindScript(s32);
 void Trigger_CreateDrop(void *, s32, s32, void *, void *, s32, s32, s32);
-void sub_08017044(s32, s32, s32, s32, void *, void *, s32, void *);
+void FloatingItemEffect_Spawn(s32, s32, s32, s32, void *, void *, s32, void *);
 void SunOrb_GetOrCreateManager(void);
 s32 SunOrb_CreateSceneTargeted(struct PackedVec *);
 void Trigger_ConsumePending(void *, s32);
@@ -209,7 +209,7 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
                     struct Vec *p = &npc->motion.pos;
                     pos = gUnk_02000580->position;
                     pos.y += 200;
-                    sub_08017044(a, b, 3, 0, &pos, p, 24, p);
+                    FloatingItemEffect_Spawn(a, b, 3, 0, &pos, p, 24, p);
                 } break;
                 case 4: {
                     setSpeed(npc, 10);

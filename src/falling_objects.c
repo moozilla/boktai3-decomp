@@ -334,7 +334,7 @@ void FallingObject_UpdateFalling(struct FallingObject *object)
     }
 }
 
-void sub_08015F60(u32, void *, u32, u32, u32, u32, u32, u32, u32, u32);
+void FadingParticleGroup_Spawn(u32, void *, u32, u32, u32, u32, u32, u32, u32, u32);
 
 void FallingObject_UpdateLanding(struct FallingObject *object)
 {
@@ -342,7 +342,7 @@ void FallingObject_UpdateLanding(struct FallingObject *object)
         object->entered = 0;
         Anim_SetSequence(&object->anim, gUnk_0200046C->animation, 2, 0, 0);
         FallingObject_ClearEffect(object);
-        sub_08015F60((FallingObject_Random() & 3) + 6, &object->position, 9, 20, 8, 8, 0, 256, 24,
+        FadingParticleGroup_Spawn((FallingObject_Random() & 3) + 6, &object->position, 9, 20, 8, 8, 0, 256, 24,
                      16);
     }
     if (object->type > 1) {

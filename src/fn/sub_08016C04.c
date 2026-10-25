@@ -28,8 +28,8 @@ void Sound_PlaySongChecked(u32);
 s32 Inventory_IsKeyItemId(u32);
 static inline int FloatingEffect_Scale3(int v)
 {
-    v *= 3;
-    return v >= 0 ? v >> 5 : -((-v) >> 5);
+    int t = v * 3;
+    return t >= 0 ? t >> 5 : -((-t) >> 5);
 }
 static inline int FloatingEffect_Scale4(int v)
 {
@@ -38,8 +38,9 @@ static inline int FloatingEffect_Scale4(int v)
 static inline void FloatingEffect_ProjectVec(struct Vec *out, struct Vec *v)
 {
     int depth, height;
-    out->x = FloatingEffect_Scale3(v->x - v->z);
-    depth = FloatingEffect_Scale3(v->x + v->z);
+    int vx = v->x, vz = v->z;
+    out->x = FloatingEffect_Scale3(vx - vz);
+    depth = FloatingEffect_Scale3(vx + vz);
     height = FloatingEffect_Scale3(v->y);
     out->y = depth - height;
     out->z = depth + height;
@@ -48,14 +49,16 @@ static inline void FloatingEffect_ProjectVec(struct Vec *out, struct Vec *v)
     out->z = out->z - gUnk_03005418.z;
 }
 #ifdef NONMATCHING
-// fuzzy: 60.2%
+// fuzzy: 97.3%
+// scope shape 6 (differences once low registers are set aside)
 // scope shape 54 (differences once low registers are set aside)
-void sub_08016C04(u8 *m, struct Effect *p, int index)
+void FloatingItemEffect_UpdateFlight(u8 *m, struct Effect *p, int index)
 {
     struct Sprite *s = &p->sprite;
     struct Vec to, from;
     u32 t, inv;
     u8 *scale;
+    int xl;
     if (p->entered) {
         p->entered = 0;
         p->sprite.flags &= ~1;
@@ -79,17 +82,18 @@ void sub_08016C04(u8 *m, struct Effect *p, int index)
         *scale -= 2;
     s->scaleY = *scale;
     s->angle += 8;
-    s->position.x = s->position.x - 8 + ((64 - *scale) >> 3);
+    s->position.x -= 8;
+    s->position.x += (64 - *scale) >> 3;
     s->position.y -= 8;
     if (p->timer > 15) {
-        if (p->mode == 0) {
+        if (p->pad6 == 0) {
             if (p->item - 40 <= 6)
                 Sound_PlaySongChecked(0x183);
             else if (Inventory_IsKeyItemId(p->item) == 1)
                 Sound_PlaySongChecked(0x123);
             else
                 Sound_PlaySongChecked(0x111);
-        } else if (p->mode != 3) {
+        } else if (p->pad6 != 3) {
             Sound_PlaySongChecked(0x123);
         }
         FloatingEffect_Init(p);
@@ -98,5 +102,5 @@ void sub_08016C04(u8 *m, struct Effect *p, int index)
         p->timer++;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08016C04);
+INCLUDE_ASM("asm/nonmatching", FloatingItemEffect_UpdateFlight);
 #endif

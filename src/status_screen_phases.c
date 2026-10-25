@@ -10,7 +10,7 @@ void StatusScreen_BeginClose(struct StatusScreen *p)
         p->bottom = 160;
         p->amplitude = 0;
         p->delta = 4;
-        p->noise = sub_0800EF90;
+        p->noise = StatusScreen_UpdateScanlineNoise;
     }
     if (p->timer++ >= p->times[4]) {
         p->dirty &= ~3;
@@ -45,7 +45,7 @@ void sub_0800E974(struct StatusScreen *p)
         p->bottom = 116;
         p->amplitude = zero;
         p->delta = 4;
-        p->noise = sub_0800EF90;
+        p->noise = StatusScreen_UpdateScanlineNoise;
     }
     if (p->timer == 48) {
         u16 *tiles = StatusScreen_GetTilePtr(0, 0, 0);
@@ -92,7 +92,7 @@ void StatusScreen_Reveal(struct StatusScreen *p)
             p->bottom = 160;
             p->amplitude = 256;
             p->delta = -2;
-            p->noise = sub_0800EF90;
+            p->noise = StatusScreen_UpdateScanlineNoise;
             p->blend = 0x1084;
             p->fade = 0;
             p->fadeStep = 4;

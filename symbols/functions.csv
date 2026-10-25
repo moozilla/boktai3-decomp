@@ -301,6 +301,7 @@ addr,name,mode,confidence,source,notes
 0800E3E0,StatusScreen_GetTilePtr,thumb,low,src-alias,"computes the tilemap pointer for tile (x,y) on background bg (gUnk_03004C30); used by the digit-drawing helpers to locate tiles to write"
 0800E408,NumericDisplay_DrawPair,thumb,low,src-alias,
 0800E4DC,NumericDisplay_DrawStatusValues,thumb,low,src-alias,
+0800E5B8,StatusScreen_DrawClock,thumb,low,src-alias,match with 1 pin (values asm ip): natural alloc gives sb since values priority 625 < hours 1012 so pass 0 never sees ip; AGBCC_PRI=values:+600 / AGBCC_FORCE=values:12 -> MATCH. Not reproduced in C after tries (two pseudos; values[col]; stores via values). Same pin as sibling sub_0800F4EC
 0800E77C,StatusScreen_RefreshDirtyDisplays,thumb,low,src-alias,called from StatusScreen_Update; redraws whichever numeric/overlay pieces s->dirty flags mark before clearing them
 0800E7D8,StatusScreen_CheckConfirm,thumb,low,src-alias,
 0800E838,StatusScreen_Close,thumb,low,src-alias,
@@ -312,6 +313,7 @@ addr,name,mode,confidence,source,notes
 0800ECD0,StatusScreen_WaitForStart,thumb,low,src-alias,
 0800ED30,StatusScreen_FadeInPalette,thumb,low,src-alias,
 0800EE5C,StatusScreen_FadeOutPalette,thumb,low,src-alias,
+0800EF90,StatusScreen_UpdateScanlineNoise,thumb,low,src-alias,blocked: gcse PRE places the loop-2 pointer pair (&p->amplitude/&p->delta) in the entry block directly before the cc0 setter; after the test's address calc; plain C order puts them before it. Also loop 2 keeps constant 1023 in-loop (pass-2 hoist threshold 26>=26) and r8/sb/sl allocation. Best C: single counter i; random via inline int helper (stops load_mems promoting gUnk_03005308; gives asrs); ptr pair assigned before loop 2 (fixes zero-reg r7 vs amplitude): 62 -> 38 insns differ. Knobs: NOMOVE=111 + CSE_NOCANON=52.
 0800F0F0,StatusScreen_ClearScanlineNoise,thumb,low,src-alias,
 0800F154,StatusScreen_Update,thumb,low,src-alias,
 0800F1BC,StatusScreen_Destroy,thumb,low,src-alias,
@@ -472,6 +474,7 @@ addr,name,mode,confidence,source,notes
 08015C30,AnimatedParticles_EmitBurst,thumb,low,src-alias,
 08015CF0,AnimatedParticles_EmitOffset,thumb,low,src-alias,
 08015DE0,AnimatedParticles_CreateFromScript,thumb,low,src-alias,
+08015F60,FadingParticleGroup_Spawn,thumb,low,src-alias,draft 84%: table via gUnk_0203B400 symbol; rng pointer set at top of the i loop body (lets loop.c hoist it out of the i loop like the ROM); (u8) indices on the sine table (stops the pass-2 hoist). 35/35 insns; only the table-vs-rng priority remains (AGBCC_PRI=table:+2000 gives 8/8)
 08016118,FadingParticleGroup_Update,thumb,low,src-alias,
 08016334,FadingParticleManager_Update,thumb,low,src-alias,Task update callback (set via Task_SetCallbacks in FadingParticleManager_Create) that advances each of the 6 fading particle groups via FadingParticleGroup_Update and
 0801636C,FadingParticleManager_Destroy,thumb,low,src-alias,Task destroy callback (paired with the update callback in FadingParticleManager_Create) that removes the effects owned by each active fading particle group and clears
@@ -492,10 +495,13 @@ addr,name,mode,confidence,source,notes
 08016990,FloatingEffect_Wait,thumb,low,src-alias,
 08016A0C,FloatingEffect_ShrinkAway,thumb,low,src-alias,
 08016B78,FloatingEffect_RiseAndShrink,thumb,low,src-alias,
+08016C04,FloatingItemEffect_UpdateFlight,thumb,low,src-alias,draft ~97% (2 ROM / 4 draft insns differ; from 120/128): fixed by reading v->x; v->z into locals once; a separate temp for 3*v in Scale3; p->pad6 (offset 6) in the sound branch; and split -= 8 / += ... on position.x. Remaining: ldr r1;=0x2000580 and mov r6;sp order in the first projection; and ROM stores position.x once (a temp changes reload rotation).
 08016EA8,FloatingEffectManager_Update,thumb,low,src-alias,
 08016EFC,FloatingEffectManager_Destroy,thumb,low,src-alias,Task destroy callback (paired with FloatingEffectManager_Update via Task_SetCallbacks): removes the 8 Anim slots in the manager struct and clears the 
+08016F24,LinkedWidgetSet_Init,thumb,low,src-alias,match: use global.h ZeroFill8(&zero) (stores the fill after &zero is evaluated) instead of a local fill + CpuSet
 08016FE0,FloatingEffectManager_Create,thumb,low,src-alias,"Creates the FloatingEffectManager singleton task if none exists, wires up its Update/Destroy callbacks, runs further init, and kills the task on failu"
 0801702C,FloatingEffectManager_GetOrCreate,thumb,low,src-alias,"Returns the existing FloatingEffectManager singleton pointer, or creates it via FloatingEffectManager_Create if not yet set"
+08017044,FloatingItemEffect_Spawn,thumb,low,src-alias,draft ~75% (93 ROM / 97 draft insns differ; from 127/129): do-while slot loop (ROM has no entry test); Effect size 0x84 (tail[0x84-0x5C]); idx temp for gUnknown_02000580[idx] order. With AGBCC_PRI=e:-2600 it is 55/59: e = NULL first-set doubles e's priority above item; reload rotation then 1 step off after line 52 (slot=-1).
 08017270,ScanlineWave_Update,thumb,low,src-alias,
 080172D8,ScanlineWave_Destroy,thumb,low,src-alias,Destroy callback paired with ScanlineWave_Update in Task_SetCallbacks for ScanlineWave_Create; deregisters the scanline effect and clears the active-w
 080172EC,ScanlineWave_Initialize,thumb,low,src-alias,

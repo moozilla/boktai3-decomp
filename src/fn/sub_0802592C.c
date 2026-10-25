@@ -52,7 +52,7 @@ struct Sub0802592CActor {
     u8 unk36A[0x383 - 0x36A];
     u8 unk383;
     u8 unk384[0x395 - 0x384];
-    s8 unk395;
+    u8 unk395;
     u8 unk396;
     u8 unk397;
     u8 unk398;
@@ -67,6 +67,7 @@ struct Sub0802592CActor {
 
 #ifdef NONMATCHING
 // fuzzy: 59.2%
+// scope shape 120 (differences once low registers are set aside)
 // scope shape 120 (differences once low registers are set aside)
 // confidence=low: player-trail update: a per-frame state machine that starts an animation on a flagged frame, copies a position pair, and reports health and damage changes
 void sub_0802592C(struct Sub0802592CActor *actor, s32 param)
@@ -88,7 +89,7 @@ void sub_0802592C(struct Sub0802592CActor *actor, s32 param)
 
     if (actor->unkB1) {
         actor->unkB1 = 0;
-        idx = actor->unk395;
+        idx = (s8)actor->unk395;
         state = gUnknown_02000580[idx]->unk418;
         switch (state) {
             case 1:
@@ -117,13 +118,13 @@ void sub_0802592C(struct Sub0802592CActor *actor, s32 param)
             actor->unkA8 = 1;
         }
         actor->unkA9 = ((actor->unk51 + 0x70) >> 5) & 7;
-        idx = actor->unk395;
+        idx = (s8)actor->unk395;
         pair = (u32 *)actor->unk10C[idx + 1];
         actor->unk9CC = pair[0];
         actor->unk9D0 = pair[1];
         Player_BeginPositionRequest(gUnknown_02000580[idx], (u8 *)actor + 0x260, 0, 0, 0, 0, 1, 0,
                                     2);
-        idx = actor->unk395;
+        idx = (s8)actor->unk395;
         if (idx >= 0) {
             v = actor->unk10C[idx]->unk4F4;
             actor->unk396 = v;
@@ -135,7 +136,7 @@ void sub_0802592C(struct Sub0802592CActor *actor, s32 param)
 
     cb = (u8)Callback_InvokeActor(actor, actor->unk104);
     if (cb != 0) {
-        idx = actor->unk395;
+        idx = (s8)actor->unk395;
         Player_ApplyPositionRequest(gUnknown_02000580[idx], &actor->unk9CC, 0x32, actor->unk51,
                                     0x32, 0, 0, 0);
         return;
@@ -143,13 +144,13 @@ void sub_0802592C(struct Sub0802592CActor *actor, s32 param)
 
     cb2 = (u8)Callback_InvokeActor(actor, actor->unk108);
     if (cb2 != 0) {
-        idx = actor->unk395;
+        idx = (s8)actor->unk395;
         Player_ApplyPositionRequest(gUnknown_02000580[idx], &actor->unk9CC, 0x32, actor->unk51,
                                     0x32, 0, 0, 0);
         return;
     }
 
-    idx = actor->unk395;
+    idx = (s8)actor->unk395;
     q = actor->unk10C[idx];
     v = q->unk4F4;
     w = actor->unk397;
@@ -163,8 +164,8 @@ void sub_0802592C(struct Sub0802592CActor *actor, s32 param)
         actor->unk39A = cb2;
     }
     if (actor->unk254 == 3 && actor->unk24C == 0) {
-        reqRes = Player_BeginPositionRequest(gUnknown_02000580[actor->unk395], (u8 *)actor + 0x260,
-                                             0, 0, 0, 0, 1, actor->unk368, 2);
+        reqRes = Player_BeginPositionRequest(gUnknown_02000580[(s8)actor->unk395],
+                                             (u8 *)actor + 0x260, 0, 0, 0, 0, 1, actor->unk368, 2);
         hp = actor->unk94;
         SceneActors_SetHealth(actor, hp + reqRes);
         if (hp != actor->unk94) {
@@ -177,7 +178,7 @@ void sub_0802592C(struct Sub0802592CActor *actor, s32 param)
         Sound_PlaySongChecked(0x34C);
     }
 
-    idx = actor->unk395;
+    idx = (s8)actor->unk395;
     q = actor->unk10C[idx];
     if (((q->unk4F4 - (actor->unk396 - 0x100)) & 0xFF) > 0xF)
         actor->unk383 = 1;
