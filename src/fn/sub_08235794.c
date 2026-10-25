@@ -7,7 +7,7 @@ extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
-void sub_08235174(u8 *);
+void FlickerParticle_StartSecondaryBurst(u8 *);
 void HealthBurstEffect_UpdateBursts(u8 *);
 void sub_082356E4(u8 *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
@@ -29,7 +29,7 @@ void sub_08235794(u8 *p)
         H(0x3e) = H(0x7e) + Mod(rnd(table), range) - (range >> 1);
     }
     if (H(0x34e) == 30) {
-        sub_08235174(p);
+        FlickerParticle_StartSecondaryBurst(p);
         Sound_PlaySong(0x285);
         *(u32 *)(p + 0x24) |= 1;
     }
