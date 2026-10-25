@@ -668,8 +668,11 @@ def cmd_integrate(args):
         # the build names the file it failed on: drop the commits that touched it and build the rest,
         # so one bad draft does not hold the whole batch back
         out = b.stdout + b.stderr
+        # a diagnostic names its file first (`src/x.c: ...`, `build/src/x.s:5: Error ...`); other error lines
+        # name it anywhere
         errors = "\n".join(ln for ln in out.splitlines()
-                           if re.search(r"(?i)error|failed|must be|undefined|can't|cannot", ln))
+                           if re.match(r"\s*(?:\S*/)?(?:build/)?src/[\w/]+\.[cso]:", ln)
+                           or re.search(r"(?i)error|failed|must be|undefined|can't|cannot", ln))
         files = {f"src/{m}.c" for m in re.findall(r"(?:build/)?src/([\w/]+)\.[cso]\b", errors)}
         bad = [wd for wd in landed if commits[wd][1] & files]
         if not bad or len(bad) == len(landed):
