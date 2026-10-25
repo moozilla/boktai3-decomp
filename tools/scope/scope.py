@@ -1956,9 +1956,27 @@ def cmd_why_all(src, func, env):
             print("  Find the C that produces them (a missing statement, a different expression shape); a"
                   " draft-only row that is alignment padding follows from the size change.")
         return 1
-    print(f"{func}: {count_text(rows)} differ; why on the first of each hunk: {', '.join(map(str, picks))}\n")
-    for u in picks:
-        cmd_why(src, func, u, env)
+    print(f"{func}: {count_text(rows)} differ; per hunk: moved insns, then why on the first insn left\n")
+    wd = info["wd"]
+    lines = uid_lines(wd)
+    srclines = open(os.path.join(ROOT, src)).read().splitlines()
+    at = lambda u: f"insn {u} (line {lines[u]})" if lines.get(u) else f"insn {u}"
+    for lo, hi in hunk_spans(rows):
+        diff = [i for i in range(lo, hi + 1) if rows[i]["tag"] != "="]
+        print(f"hunk at ROM {next((rows[i]['rom_addr'] for i in diff if rows[i]['rom_addr']), '?')}:")
+        moved = explain_order(wd, rows, lo, hi, at, srclines)
+        moves, kept = order_moves(rows, lo, hi)
+        placed = {m[0] for m in moves} | {m[1] for m in moves} | {i for pair in kept for i in pair}
+        # what is left for the register/shape why: an in-place insn in other registers, or one nothing explains
+        regs = [d for r, d in kept if rows[r]["rom"] != rows[d]["draft"] and rows[d]["born"] in PASSES]
+        other = [i for i in diff if i not in placed and rows[i]["uid"] and rows[i]["tag"] != "→"]
+        u = rows[(regs or other)[0]]["uid"] if regs or other else None
+        if u and moved and regs:
+            print("  in place but in other registers (this can follow from the moves above):")
+        if u:
+            cmd_why(src, func, u, env)
+        elif not moved:
+            print("  (no insn with an RTL uid here)")
         print()
     return 1
 
@@ -2065,6 +2083,217 @@ def explain_move2add(wd, uid, row, at):
           " with if/return instead of a plain if)")
 
 
+def norm_insn(text):
+    """An instruction with its low registers blanked, so the same operation in other registers compares
+    equal. High registers (r8, sb, ...) stay: there they name a role (a value kept across a call)."""
+    return re.sub(r"\br[0-7]\b", "R", text or "")
+
+
+def hunk_spans(rows):
+    """[(lo, hi)] row ranges of the diff's hunks (differing rows at most 4 apart), with up to 4 equal rows of
+    context on each side (the same grouping as the diff view)."""
+    real = [i for i, r in enumerate(rows) if r["tag"] != "="]
+    spans = []
+    for i in real:
+        if spans and i - spans[-1][1] <= 4:
+            spans[-1][1] = i
+        else:
+            spans.append([i, i])
+    return [(max(0, a - 4), min(len(rows) - 1, b + 4)) for a, b in spans]
+
+
+def order_moves(rows, lo, hi):
+    """Instructions of rows[lo..hi] that both sides have, in different places. Compares the two sides with
+    registers blanked: what the blanked sequences share in order is in place; a leftover ROM insn with a
+    leftover draft twin moved. Returns ([(rom_index, draft_index, anchor)], [(rom_index, draft_index)] in
+    place) (indexes into rows), anchor = (row of the nearest in-place insn before the ROM copy, row of the
+    nearest one after), either None."""
+    rom = [i for i in range(lo, hi + 1) if rows[i]["rom"]]
+    dr = [i for i in range(lo, hi + 1) if rows[i]["draft"]]
+    sm = difflib.SequenceMatcher(None, [norm_insn(rows[i]["rom"]) for i in rom],
+                                 [norm_insn(rows[i]["draft"]) for i in dr], autojunk=False)
+    kept = {}  # rom position -> draft position, in place
+    for a, b, n in sm.get_matching_blocks():
+        for k in range(n):
+            kept[a + k] = b + k
+    left_d = [j for j in range(len(dr)) if j not in set(kept.values())]
+    moves = []
+    for a in range(len(rom)):
+        if a in kept:
+            continue
+        key = norm_insn(rows[rom[a]]["rom"])
+        twin = next((j for j in left_d if norm_insn(rows[dr[j]]["draft"]) == key), None)
+        if twin is None:
+            continue
+        left_d.remove(twin)
+        before = max((k for k in kept if k < a), default=None)
+        after = min((k for k in kept if k > a), default=None)
+        moves.append((rom[a], dr[twin], (dr[kept[before]] if before is not None else None,
+                                         dr[kept[after]] if after is not None else None)))
+    return moves, [(rom[a], dr[b]) for a, b in sorted(kept.items())]
+
+
+def rtl_origin(wd, uid):
+    """The insn whose value UID copies, followed back through plain register/subreg copies in the rtl dump:
+    (uid, rtl). For `(set (reg 44) (subreg (reg:HI 43)))` it is the insn that set 43."""
+    seq = insn_list(wd, "rtl")
+    pos = {u: i for i, (u, _, _) in enumerate(seq)}
+    cur = uid
+    for _ in range(8):
+        if cur not in pos:
+            return None
+        r = seq[pos[cur]][2]
+        m = re.match(r"\(set \(reg(?:/\w)*:\w+ \d+\) \((?:subreg:\w+ )?\(?reg(?:/\w)*:\w+ (\d+)\)", r)
+        if not m:
+            return cur, r
+        src = int(m.group(1))
+        prev = next((u for u, _, x in reversed(seq[:pos[cur]])
+                     if re.match(r"\(set \(reg(?:/\w)*:\w+ %d\)" % src, x)), None)
+        if prev is None:
+            return cur, r
+        cur = prev
+    return cur, seq[pos[cur]][2]
+
+
+def first_real_use(wd, uid):
+    """The first insn after UID that uses UID's destination other than to copy it, following copies:
+    (uid, rtl), or None."""
+    seq = insn_list(wd, "rtl")
+    pos = {u: i for i, (u, _, _) in enumerate(seq)}
+    cur = uid
+    for _ in range(8):
+        if cur not in pos:
+            return None
+        m = re.match(r"\(set \(reg(?:/\w)*:\w+ (\d+)\)", seq[pos[cur]][2])
+        if not m:
+            return None
+        pat = re.compile(r"\(reg(?:/\w)*:\w+ %s\)" % m.group(1))
+        nxt = next(((u, r) for u, _, r in seq[pos[cur] + 1:] if pat.search(r)), None)
+        if not nxt:
+            return None
+        if re.match(r"\(set \(reg(?:/\w)*:\w+ \d+\) \((?:subreg:\w+ )?\(?reg(?:/\w)*:\w+ %s\)" % m.group(1), nxt[1]):
+            cur = nxt[0]
+            continue
+        return nxt
+    return None
+
+
+def explain_substitution(wd, p, uid, gone, nm, at):
+    """A pass took pseudos out of insn UID: say what each one held (its set in the previous dump) and whether
+    the pass folded that set into this insn."""
+    prev = PASSES[max(0, PASSES.index(p) - 1)]
+    for k in range(PASSES.index(p) - 1, -1, -1):
+        if os.path.exists(os.path.join(wd, "u.i." + PASSES[k])):
+            prev = PASSES[k]
+            break
+    before = insn_list(wd, prev)
+    after_uids = {u for u, _, _ in insn_list(wd, p)}
+    for g in gone:
+        st = next(((u, r) for u, _, r in before if re.match(r"\(set \(reg(?:/\w)*:\w+ %d\)" % g, r)), None)
+        if not st:
+            continue
+        folded = st[0] not in after_uids
+        what = {"combine": "combine merged it into this insn" if folded else "combine substituted its value here",
+                "cse": "cse found the same value already in a register", "cse2": "cse2 found the same value"
+                " already in a register", "loop": "loop moved or reduced it", "gcse": "gcse replaced it by an"
+                " earlier copy of the same value"}.get(p, f"{p} substituted it")
+        print(f"    {nm(g)} was set by {at(st[0])}: {st[1][:90]}; {what}"
+              + (" (that insn is gone)." if folded else "."))
+
+
+def relative_order(wd, u, p):
+    """[(pass, u_first)] for each dump where both insns appear, so a pass that reorders them shows."""
+    out = []
+    for ps in PASSES:
+        seq = [x for x, _, _ in insn_list(wd, ps)]
+        if u in seq and p in seq:
+            out.append((ps, seq.index(u) < seq.index(p)))
+    return out
+
+
+def explain_order(wd, rows, lo, hi, at, srclines):
+    """why for a hunk whose insns are the ROM's, in another order: which insns moved, where the ROM has them,
+    which pass fixed the draft's order, and for a constant, the C use that put it there. Returns the number
+    of moved rows explained."""
+    moves, _ = order_moves(rows, lo, hi)
+    if not moves:
+        return 0
+    lines = uid_lines(wd)
+    code = lambda ln: srclines[ln - 1].strip() if ln and 0 < ln <= len(srclines) else ""
+    # consecutive moved draft rows form one block (an address built in three insns moves as one)
+    blocks = []
+    for m in sorted(moves, key=lambda m: m[1]):
+        if blocks and m[1] - blocks[-1][-1][1] <= 1:
+            blocks[-1].append(m)
+        else:
+            blocks.append([m])
+    print(f"  {len(moves)} insn(s) here are the ROM's own, in another place (registers aside):")
+    notes = set()
+    for blk in blocks:
+        d_rows = [rows[m[1]] for m in blk]
+        text = "; ".join(r["draft"] for r in d_rows)
+        born = [r for r in d_rows if r["uid"] and r["born"] in PASSES]
+        lead = min(born, key=lambda r: PASSES.index(r["born"])) if born else None
+        bef, aft = blk[0][2][0], blk[-1][2][1]
+        anchor = rows[bef] if bef is not None else None
+        anchor2 = rows[aft] if aft is not None else None
+        where = (f"after `{anchor['draft']}` (line {anchor['line']}" + (f", insn {anchor['uid']})" if anchor["uid"] else ")")
+                 if anchor else "at the start")
+        if anchor2:
+            where += f", before `{anchor2['draft']}` (line {anchor2['line']})"
+        print(f"   `{text}` (draft line {d_rows[0]['line'] or '?'}): the ROM has it {where}.")
+        if not lead:
+            continue
+        u = lead["uid"]
+        ref = anchor if anchor and anchor["uid"] else anchor2 if anchor2 and anchor2["uid"] else None
+        if ref:
+            rel = relative_order(wd, u, ref["uid"])
+            if rel:
+                first_pass, first = rel[0]
+                flips = [ps for (ps, f), (_, g) in zip(rel[1:], rel) if f != g]
+                if flips:
+                    print(f"    {at(u)} and {at(ref['uid'])} change order in {flips[0]}: that pass moved it"
+                          + {"combine": " (a merged insn takes the later insn's place)",
+                             "loop": " (an invariant hoisted out of a loop)",
+                             "gcse": " (a partially redundant expression moved to an earlier block)",
+                             "greg": " (reload put a load or copy right before its use)"}.get(flips[0], ""))
+                else:
+                    print(f"    expansion order: {at(u)} comes {'before' if first else 'after'} {at(ref['uid'])}"
+                          f" from {first_pass} on; no pass reorders them.")
+                    notes.add("expand")
+        # a constant: cse shares one register for every use of it in an extended block, set at the first use
+        cse = next((r for x, _, r in insn_list(wd, "cse") if x == u), "")
+        c = re.match(r"\(set \(reg(?:/\w)*:\w+ (\d+)\) \(const_int (-?\d+)\)\)", cse)
+        if c:
+            reg, val = int(c.group(1)), int(c.group(2))
+            o = rtl_origin(wd, u)
+            users = [(x, lines.get(x)) for x, _, r in insn_list(wd, "cse")
+                     if x != u and re.search(r"\(reg(?:/\w)*:\w+ %d\)" % reg, r)]
+            first = o[0] if o else u
+            use = first_real_use(wd, first)
+            print(f"    it is the constant {val}, which cse keeps in one register for all {len(users)} later"
+                  f" use(s) (lines {', '.join(str(l) for _, l in users if l) or '?'}). Its set sits where the"
+                  f" first use was expanded: {at(first)}: {code(lines.get(first)).rstrip(';')}" +
+                  (f"; that first use is {at(use[0])} {use[1][:90]}" if use else ""))
+            lo_l = anchor["line"] if anchor else None
+            hi_l = anchor2["line"] if anchor2 else None
+            span = (f"in line {lo_l}" if lo_l == hi_l or not hi_l else
+                    f"after line {lo_l} and before line {hi_l}" if lo_l else f"before line {hi_l}")
+            print(f"    so in the ROM's C the first use of {val} is expanded {span}"
+                  + "".join(f"\n      {l}: {code(int(l))}" for l in dict.fromkeys(x for x in (lo_l, hi_l) if x and x.isdigit())))
+            notes.add("const")
+    if "expand" in notes:
+        print("  levers: agbcc schedules nothing on Thumb, so expansion order is the C's order. Reorder the"
+              " statements, or move the expression into the statement (or inline-call argument) that comes"
+              " after the anchor.")
+    if "const" in notes:
+        print("  constants: the set is placed at the first use. Hidden first uses: a bitfield store's mask (an"
+              " s16 :16 store clears with `and 0`), a zero-extension, an inline helper's parameter (bound before"
+              " its body, in argument order). Make that use come at the ROM's place, or move the draft's first"
+              " use later.")
+    return sum(len(b) for b in blocks)
+
+
 def pool_load_origin(wd, draft, line):
     """A constant-pool load born in the final pass (`ldr rN, =X`) is final's copy of an insn that loaded rN
     from the pool before then; return that insn's uid (same constant, nearest C line)."""
@@ -2167,8 +2396,8 @@ def cmd_why(src, func, uid, env, via=None):
                 print(f"  regmove replaced {', '.join(nm(r) for r in gone)} by {', '.join(nm(r) for r in new)}.")
                 explain_regmove(wd, uid, gone, new, nm, at)
             elif p not in ("greg", "lreg"):
-                print(f"  {p} replaced {', '.join(nm(r) for r in gone)} by {', '.join(nm(r) for r in new)}"
-                      " (no explainer for this pass yet)")
+                print(f"  {p} replaced {', '.join(nm(r) for r in gone)} by {', '.join(nm(r) for r in new) or 'nothing'}.")
+                explain_substitution(wd, p, uid, gone, nm, at)
             continue
         n = 1 if p == "cse" else 2
         t = trace.get(n, {"why": [], "eqv": []})
