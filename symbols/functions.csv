@@ -8350,6 +8350,7 @@ addr,name,mode,confidence,source,notes
 081F7C08,SceneActor_UpdateDirectionalTrigger_081F7C08,thumb,low,src-alias,
 081F7CAC,AnimationActor_UpdateProjectileSequence,thumb,low,src-alias,
 081F7DAC,Ratatosk_UpdateCloneAttack,thumb,low,src-alias,
+081F84E4,Ratatosk_UpdateArenaCheckedSequence,thumb,low,src-alias,Consumes activation; selects an arena-checked animation sequence based on sun-orb manager status; and advances completion and timers.
 081F8600,Ratatosk_UpdateSunOrbPlacement,thumb,low,src-alias,
 081F88A0,AnimationActor_UpdateRepeatedAttack,thumb,low,src-alias,
 081F8988,Ratatosk_UpdateSunOrbRelocation,thumb,low,src-alias,
@@ -9713,6 +9714,7 @@ addr,name,mode,confidence,source,notes
 08234A84,HealthRestoreEffect_InitSparkle,thumb,low,src-alias,Activates animation 2 at a randomized position and installs its particle callback
 08234B04,HealthRestoreEffect_UpdateParticles,thumb,low,src-alias,Invokes the update callback of each active particle in the eight element pool
 08234B34,HealthRestoreEffect_UpdateCompletion,thumb,low,src-alias,Task state callback that plays the completion sound and releases global flags before termination
+08234B98,HealthRestoreEffect_UpdateRestoration,thumb,low,src-alias,Restores owner health while shaking the effect and spawning particles; then enters completion.
 08234D0C,HealthRestoreEffect_UpdateShake,thumb,low,src-alias,Task state callback that shakes the animation briefly before starting health restoration
 08234ECC,HealthRestoreEffect_OnUpdate,thumb,low,src-alias,Task update callback that advances particles and the current restoration state
 08234EF4,HealthRestoreEffect_OnDestroy,thumb,low,src-alias,Task destruction callback that removes the main animation and eight particle effects
@@ -9723,6 +9725,8 @@ addr,name,mode,confidence,source,notes
 0823511C,FlickerParticle_UpdateSecondaryMotion,thumb,low,src-alias,
 08235294,FlickerParticle_UpdatePool,thumb,low,src-alias,
 082352C8,HealthBurstEffect_UpdateFadeOut,thumb,low,src-alias,Final state callback that reduces a screen effect and briefly refreshes the collider before termination
+08235328,HealthBurstEffect_StartBurst,thumb,low,src-alias,Starts the next alternating burst sprite at a randomized position and records its terrain floor height.
+08235574,HealthBurstEffect_UpdateBurstSprites,thumb,low,src-alias,Updates two burst sprites through descent and rebound states; playing a landing sound and hiding expired sprites.
 0823565C,HealthBurstEffect_UpdateBursts,thumb,low,src-alias,State callback that emits six periodic bursts before hiding sprites and entering fade out
 08235964,HealthBurstEffect_OnUpdate,thumb,low,src-alias,Task update callback that advances particles and dispatches the current burst state
 08235984,SceneEffectGroup_Remove,thumb,low,src-alias,
@@ -9922,6 +9926,7 @@ addr,name,mode,confidence,source,notes
 08242120,Player_TryStepForward,thumb,low,src-alias,
 082422D8,Player_SelectInputMode,thumb,low,src-alias,
 0824261C,Player_UpdateLinkKind,thumb,low,src-alias,
+082429AC,Player_UpdateHalfChargeLinkKind,thumb,low,src-alias,Updates player kinds 1; 2 and 8 using rounded-up half link charge; alternate action callbacks; movement and terrain transitions (tentative).
 08242DCC,Player_SynchronizeColliderState,thumb,low,src-alias,
 08242EA4,Player_UpdateActionPhase,thumb,low,src-alias,
 08242F7C,Player_FindMaskedSlot,thumb,low,src-alias,
