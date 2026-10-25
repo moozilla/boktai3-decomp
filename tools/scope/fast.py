@@ -279,6 +279,10 @@ class Fast:
         self.servers = {}
 
     def server(self, prefix):
+        stamp = os.stat(self.compiler).st_mtime_ns
+        if getattr(self, "stamp", stamp) != stamp:  # the compiler was rebuilt: never answer with the old one
+            self.close()
+        self.stamp = stamp
         key = hashlib.sha1(prefix.encode()).hexdigest()
         s = self.servers.get(key)
         if s is None or s.proc.poll() is not None:
