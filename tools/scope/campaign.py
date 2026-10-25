@@ -559,7 +559,7 @@ def cmd_integrate(args):
     git("fetch", "-q", "origin")
     if git("checkout", "-q", "-B", branch, "origin/main").returncode:
         sys.exit(f"{tree}: could not check out {branch}")
-    done = []
+    done, landed = [], []
     for r in ready:
         func, wd = r["func"], os.path.join(CAMP, r["func"])
         rc = land_draft(func, tree, wd)
@@ -582,11 +582,16 @@ def cmd_integrate(args):
         git("add", "-A", "src", "include", "symbols")
         git("commit", "-q", "-m", title + "\n\nPhase-1 scope campaign worker.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>")
         done.append(title)
+        landed.append(wd)
         print(title, flush=True)
     if not done or "--no-pr" in args:
         return 0
     b = subprocess.run(["make", "-j8"], cwd=tree, capture_output=True, text=True)
     if "build/boktai3.gba: OK" not in b.stdout + b.stderr:
+        # nothing reached main: the next integrate retries them (the culprit fails its own unit check
+        # or the build again); the commits stay on the local branch for a look
+        for wd in landed:
+            os.replace(os.path.join(wd, "landed"), os.path.join(wd, "landed.build_failed"))
         sys.exit(f"{tree}: combined build failed on {branch}; not opening a PR\n" + (b.stdout + b.stderr)[-2000:])
     subprocess.run(["python3", "tools/progress.py", "--markdown", "PROGRESS.md"], cwd=tree, capture_output=True)
     git("add", "PROGRESS.md", "PROGRESS.json")
