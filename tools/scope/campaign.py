@@ -289,7 +289,8 @@ def start_draft(r, model):
     os.makedirs(wd, exist_ok=True)
     env = dict(os.environ, SCOPE_RUN=func)
     out = sh("python3", "tools/scope/scope.py", "new", func, env=env)
-    work = os.path.join(ROOT, "build", "scope", "work", func + ".c")
+    m = re.search(r"(build/scope/(?:[^\s/]+/)?work/[^\s/:]+\.c)", out)  # SCOPE_RUN: under build/scope/RUN/
+    work = os.path.join(ROOT, m.group(1)) if m else ""
     if not os.path.exists(work):
         r["skip"] = "scope new failed: " + out.strip().splitlines()[-1:][0] if out.strip() else "scope new failed"
         print(f"skip {func}: {r['skip']}", flush=True)
@@ -300,7 +301,8 @@ def start_draft(r, model):
         shutil.copy(work[:-2] + ".base.c", os.path.join(wd, "base.c"))
     open(os.path.join(wd, ".main_rev"), "w").write(sh("git", "rev-parse", "HEAD").strip())
     m = re.search(r"draft \S+: (.*)", out)
-    seed = m.group(1).strip() if m else "an empty definition"
+    seed = m.group(1).strip() if m else ("an earlier workspace: read what is there first" if "exists; continuing" in out
+                                         else "an empty definition")
     rel = os.path.relpath(wd, ROOT)
     r["start_counts"] = "undrafted"
     brief = DRAFT_BRIEF.format(func=func, addr=r["addr"], size=r["size"], wd=rel, run=func, seed=seed, arm="")
