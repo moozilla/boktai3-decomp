@@ -4905,6 +4905,7 @@ addr,name,mode,confidence,source,notes
 0812CF30,LargeFragmentEffect_UpdateCollider,thumb,low,src-alias,Moves the larger fragment effect collider to its current position and refreshes it
 0812CF50,SceneSlot_Allocate,thumb,low,src-alias,
 0812CF9C,SceneSlot_EmitPulse,thumb,low,src-alias,
+0812D064,LargeFragmentEffect_SpawnRandomParticle,thumb,low,src-alias,Emits a sprite particle at the supplied position with random radial velocity; vertical velocity; and lifetime.
 0812D180,SceneSlot_UpdateTimedPulse,thumb,low,src-alias,
 0812D1D8,LargeFragmentEffect_UpdateAnimation,thumb,low,src-alias,
 0812D34C,SceneSlot_Remove,thumb,low,src-alias,

@@ -173,7 +173,7 @@ static inline u32 Step(struct Feather *owner, struct FeatherSequence *state, str
 void LargeFragmentEffect_UpdateCollider(u8 *);
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
-void sub_0812D064(struct Vec *);
+void LargeFragmentEffect_SpawnRandomParticle(struct Vec *);
 void LargeFragmentEffect_UpdateAnimation(void *unused, struct Feather *p)
 {
     if (p->enter) {
@@ -185,7 +185,7 @@ void LargeFragmentEffect_UpdateAnimation(void *unused, struct Feather *p)
     if ((u16)(p->sequence.index - 1) <= 2) {
         LargeFragmentEffect_UpdateCollider((u8 *)p);
         if (Mod(p->timer, 6) == 0)
-            sub_0812D064(&p->position);
+            LargeFragmentEffect_SpawnRandomParticle(&p->position);
     }
     p->timer++;
     if (Step(p, &p->sequence, p)) {
