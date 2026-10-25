@@ -2860,7 +2860,7 @@ def refresh_workspace(draft):
     """A unit workspace draft whose unit changed since `new` (a neighbour landed): three-way merge the
     unit's changes into the draft and move the base forward, so the draft compiles against today's unit."""
     import land
-    if not draft.startswith(os.path.join("build", "scope", "work") + os.sep) or not draft.endswith(".c"):
+    if not draft.startswith(os.path.relpath(os.path.join(WORK, "work"), ROOT) + os.sep) or not draft.endswith(".c"):
         return
     name = os.path.basename(draft)[:-2]
     path, base = work_paths(name)
@@ -3034,7 +3034,8 @@ def hoist_levers(src, func, env, passes, names, lines, base, info):
                     continue
                 indent = re.match(r"\s*", rows[close]).group(0) + "    "
                 out = rows[:close] + [f"{indent}{name} = {m.group(1).strip()}; /* dead: keeps loop.c from hoisting {name} */"] + rows[close:]
-                var = os.path.join("build/scope/work", os.path.basename(src)[:-2] + f".lever-{name}.c")
+                var = os.path.join(os.path.relpath(os.path.join(WORK, "work"), ROOT),  # the run's own (SCOPE_RUN)
+                                   os.path.basename(src)[:-2] + f".lever-{name}.c")
                 with open(os.path.join(ROOT, var), "w") as f:
                     f.write("\n".join(out))
                 k, inf = score(var, func, env)
@@ -3132,6 +3133,21 @@ def cmd_shape(src, func, env):
     return 1
 
 
+def tree_prototype(name):
+    """(definition head, file) from the first declaration of NAME in include/, else in src/ (a caller's
+    own prototype); (None, None) when nothing declares it."""
+    import land
+    files = sorted(land.sources(ROOT), key=lambda p: not p.endswith(".h"))
+    pat = re.compile(r"\b%s\s*\(" % re.escape(name))
+    for p in files:
+        text = open(p).read()
+        if pat.search(text):
+            head = land.prototype([text], name)
+            if head:
+                return head, os.path.relpath(p, ROOT)
+    return None, None
+
+
 def cmd_new(target):
     """Open FUNC for writing: a draft in build/scope/work/ that compiles and scores right away. A function
     in a unit gets a copy of the unit with an empty definition in place of its INCLUDE_ASM (landing merges
@@ -3162,6 +3178,12 @@ def cmd_new(target):
         incs = re.findall(r'^#include "([^"]+)"', text, re.M)
         hdrs = [open(os.path.join(ROOT, "include", h)).read() for h in incs if os.path.exists(os.path.join(ROOT, "include", h))]
         out = land.stub_unit(text, asm_name, name, hdrs)
+        if re.search(r"^void %s\(void\)\n\{\n\}" % re.escape(name), out, re.M):
+            # nothing in the unit or its headers declares it: a caller elsewhere may
+            head, where_ = tree_prototype(name)
+            if head and head != f"void {name}(void)":
+                out = re.sub(r"^void %s\(void\)\n" % re.escape(name), head + "\n", out, count=1, flags=re.M)
+                seed += f" with the signature {where_} declares"
     else:
         out = None
         best = next(iter(structure.similar(name, like_index(), status, like_tables())), None)
@@ -3174,10 +3196,11 @@ def cmd_new(target):
                 out = land.seed_from_twin(ttext, tname, name, [d for d in defined if d != tname])
                 seed = f"{twin}'s C ({tfile}, covers {best[1]:.0%} of its rare windows), renamed"
         if out is None:
-            decls = [open(p).read() for p in land.sources(ROOT) if p.endswith(".h")]
-            head = land.prototype(decls, name) or f"void {name}(void)"
+            head, where_ = tree_prototype(name)
+            if where_:
+                seed += f" with the signature {where_} declares"
             out = (f'#include "global.h"\n\n// scope: write {name} here (`scope.py rom {name}`)\n'
-                   f"{head}\n{{\n}}\n")
+                   f"{head or f'void {name}(void)'}\n{{\n}}\n")
     g = ghidra_c(addr)
     if g:  # a reading aid inside the stub: Ghidra's types and control flow, never matching C
         out = out.replace(f"// scope: write {name} here", "/* Ghidra's pseudo-C (a reading aid):\n"
