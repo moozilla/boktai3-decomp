@@ -553,7 +553,32 @@ s32 sub_0800B2F4(void)
     }
     return total;
 }
-INCLUDE_ASM("asm/nonmatching", sub_0800B330);
+void EffectManager_ConvertHomingToDrift(void)
+{
+    struct EffectManager *manager = gUnk_02000040;
+    s32 i, n;
+    if (!manager)
+        return;
+    for (i = 0; i < 6; i++) {
+        struct Effect *effect = &manager->effects[i];
+        if (!effect->active || effect->type != 2)
+            continue;
+        effect->type = 0;
+        for (n = 0; n < 4; n++) {
+            struct EffectParticle *p = &effect->particles[n];
+            if (!p->state)
+                continue;
+            Anim_SetSequence(&p->anim, manager->animation,
+                             gUnk_08604A18[manager->mode][effect->type].id, 0, 0);
+            if (p->state <= 2 && p->timer < 180)
+                p->timer = 180;
+        }
+    }
+}
+
+void EffectParticle_UpdateNone(void)
+{
+}
 
 static inline u32 randomValue(s32 reverse)
 {
