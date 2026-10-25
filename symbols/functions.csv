@@ -7416,6 +7416,7 @@ addr,name,mode,confidence,source,notes
 081C2444,IconRow_Init,thumb,low,src-alias,
 081C2570,ControlPanel_InitializeFromScript,thumb,low,src-alias,
 081C27EC,ControlPanel_CreateFromScript,thumb,low,src-alias,Creates the singleton task and initializes its C046 panel sprites from script parameters
+081C2838,SparkleEmitter_UpdateParticles,thumb,low,src-alias,Advances 32 sparkle particles; animates and projects them; and retires particles outside padded screen bounds.
 081C2968,ParticlePool_FindFreeEntry,thumb,low,src-alias,
 081C29A4,SparkleEmitter_EmitParticle,thumb,low,src-alias,
 081C2BB8,SparkleEmitter_OnUpdateHook,thumb,low,src-alias,Empty hook called by the sparkle emitter task update
