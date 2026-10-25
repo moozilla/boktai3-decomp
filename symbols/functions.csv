@@ -7110,6 +7110,7 @@ addr,name,mode,confidence,source,notes
 081B7510,VanargandAfterimagePool_Spawn,thumb,low,src-alias,Activates a free effect slot at the requested position and increments the active count
 081B7538,GrowthHazard_ResetEntryCooldown,thumb,low,src-alias,Clears the indexed entry's cooldown and activity flag when in state 2; growth identity tentative
 081B7568,GrowthHazard_FindNearestActiveEntry,thumb,low,src-alias,
+081B7614,GrowthHazard_FindNearestEntryDistance,thumb,low,src-alias,Returns the nearest entry squared X/Z distance; optionally copying its position; returns -1 when no entry is selected.
 081B769C,AnimatedMarker_RegisterOccupiedCell,thumb,low,src-alias,
 081B76F8,GrowthHazard_RegisterCellEffect,thumb,low,src-alias,Registers the entry's cell effect using its cell index and integer height then marks it registered
 081B7744,GrowthHazard_ApplyAnimationEvent,thumb,low,src-alias,

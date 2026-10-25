@@ -491,7 +491,7 @@ address,isa,evidence,replacement_end
 081AF738,thumb,Hidden raw-tail function,081AF76C
 081B0244,thumb,Independent 4-byte leaf left as incbin by gbadisasm; exact standalone C,081B0248
 081B512C,thumb,Function in the listed extent of sub_081B4DA4; push after its pop and bx r0 return; retained assembly,
-081B7614,thumb,Hidden raw-tail function (retained),
+081B7614,thumb,Hidden raw-tail function; exact 136-byte C body,081B769C
 081B8104,thumb,Hidden raw-tail function,081B8160
 081B8D84,thumb,Hidden tail after OrbitMotion_UpdateAngle; exact 192-byte C body,081B8E44
 081B94AC,thumb,Hidden raw-tail function: orbit motion begin XY distance wave (mode 7),081B9598
