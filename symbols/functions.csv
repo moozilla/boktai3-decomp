@@ -5131,6 +5131,7 @@ addr,name,mode,confidence,source,notes
 0813DD84,Player_AdvanceEffectTick,thumb,low,src-alias,Increments the effect timing counter when the linked object's activity flags are set
 0813DDAC,SceneActor_UpdateVisualEffects,thumb,low,src-alias,
 0813DF08,Player_DestroyEffects,thumb,low,src-alias,Releases the embedded effect controller and visual effects then removes the auxiliary sprite
+0813DF5C,Player_InitEffects,thumb,low,src-alias,Initializes player effect anchors; shadow and visual components; then resets effect channels and shared movement-force state.
 0813E1D8,Player_ModifyValueByMissingLife,thumb,low,src-alias,Equipment modifier callback returning one quarter of the input plus an integer missing-life contribution
 0813E208,Player_ModifyValueByRemainingLife,thumb,low,src-alias,Equipment modifier callback adding ten percent and subtracting a contribution based on the integer missing-life ratio
 0813E244,Player_ModifyValueByEquipmentLevel,thumb,low,src-alias,Equipment modifier callback adjusting the input using player level and a byte from the equipment definition

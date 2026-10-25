@@ -15,7 +15,7 @@ void Player_RefreshActionEquipment(struct Player *);
 void sub_08140244(struct Player *);
 void Player_InitEquipmentHook(struct Player *);
 void Player_InitVitalsAndCollisionFromScript(struct Player *);
-void sub_0813DF5C(struct Player *);
+void Player_InitEffects(struct Player *);
 void Player_RegisterSceneMessageReceiver(struct Player *);
 void Player_InitEventProcedureFromScript(struct Player *);
 void Player_SaveStateSnapshot(struct Player *);
@@ -158,7 +158,7 @@ s32 Player_InitializeFromScript(struct Player *p, s32 slot)
     sub_08140244(p);
     Player_InitEquipmentHook(p);
     Player_InitVitalsAndCollisionFromScript(p);
-    sub_0813DF5C(p);
+    Player_InitEffects(p);
     Player_RegisterSceneMessageReceiver(p);
     Player_InitEventProcedureFromScript(p);
     gUnk_02000580[p->movementRequestBlocked] = p;
