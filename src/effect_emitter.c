@@ -22,7 +22,7 @@ void EffectEmitter_ReceiveHit(struct EmitterAttack *attack, void *unused,
             object->health = object->maximum;
             position = object->sprite.position;
             position.y += 64;
-            sub_0800AFE8(object->count, 1, object->kind, &position, 0, 600, 100);
+            EffectManager_SpawnParticlesAt(object->count, 1, object->kind, &position, 0, 600, 100);
         }
     }
 }

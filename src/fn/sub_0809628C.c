@@ -13,7 +13,7 @@ void SceneActorPlacement_PlayCategoryEventSound(void *);
 void Bee_ConsumeFlag80(void *);
 void SceneActor_EndLinkedReaction(void *);
 void Sound_PlaySong(u32);
-void sub_0800AFE8(u32, u32, u32, void *, void *, u32, u32);
+void EffectManager_SpawnParticlesAt(u32, u32, u32, void *, void *, u32, u32);
 s32 Mod(s32, s32);
 extern u32 gUnk_03005308;
 static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput, u32 off)
@@ -69,7 +69,7 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
                     q += 4;
                 } while ((--i) >= 0);
             }
-            sub_0800AFE8(count, 0, *((u8 *)(ctx + 0x5BC)), pos, pieces, 300, 120);
+            EffectManager_SpawnParticlesAt(count, 0, *((u8 *)(ctx + 0x5BC)), pos, pieces, 300, 120);
         }
     }
     if (!actor->field2B3)

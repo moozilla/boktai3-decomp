@@ -4,7 +4,7 @@
 #include "scene_object.h"
 
 // Tentative: a hovering, bobbing prop with a shadow that can be hit; when its health runs out it
-// bursts into an effect (sub_0800AFE8), see homing_effect.h.
+// bursts into an effect (EffectManager_SpawnParticlesAt), see homing_effect.h.
 
 struct EmitterVec {
     s16 x, y, z, pad;
@@ -52,7 +52,7 @@ s32 EffectEmitter_Initialize(struct EffectEmitter *, u32, u32);
 void *EffectEmitter_Create(u32, u32);
 
 /* Engine helpers. */
-s32 sub_0800AFE8(s32, u32, s32, struct EmitterVec *, void *, s32, s32);
+s32 EffectManager_SpawnParticlesAt(s32, u32, s32, struct EmitterVec *, void *, s32, s32);
 void *Region_FindContaining(void *);
 void Shadow_Destroy(void *);
 void Shadow_Initialize(void *, void *, u32);

@@ -404,7 +404,141 @@ s32 EffectManager_SpawnParticles(s32 count, u32 type, u32 kind, struct EffectVec
     }
     return 0;
 }
-INCLUDE_ASM("asm/nonmatching", sub_0800AFE8);
+s32 EffectManager_SpawnParticlesAt(s32 count, u32 type, u32 kind, struct EffectVec *pos,
+                                   struct EffectVec *positions, s32 timerBase, s32 timerRange)
+{
+    u32 lifetime;
+    struct EffectManager *manager = gUnk_02000040;
+    s32 reverse, i, n, phase;
+    struct Effect *effect;
+    if (!manager) {
+        manager = EffectManager_Create((void *)0xFC73, 0);
+        if (!manager)
+            return -1;
+    }
+    if (type & 0xF0)
+        reverse = 1;
+    else
+        reverse = 0;
+    type &= 15;
+    if (count > 4)
+        count = 4;
+    if (!timerRange)
+        timerRange = 1;
+    lifetime = gUnk_08604A48[type];
+    for (i = 0; i < 6; i++) {
+        effect = &manager->effects[i];
+        if (effect->active)
+            continue;
+        effect->type = type;
+        effect->kind = kind;
+        effect->count = count;
+        if (reverse)
+            effect->soundDelay = 0;
+        else
+            effect->soundDelay = 14;
+        phase = 0;
+        for (n = 0; n < count; n++) {
+            struct EffectParticle *p = &effect->particles[n];
+            struct EffectSprite *sprite = &p->sprite;
+            struct EffectAnim *a;
+            const u16 *entry;
+            const u16 *table;
+            const struct EffectVec *src;
+            if (positions)
+                src = &positions[n];
+            else
+                src = pos;
+            p->state = 1;
+            table = gUnk_0203B400;
+            p->timer = timerBase + Mod(spawnRandom(table), timerRange);
+            p->lifetime = lifetime;
+            p->speed = (spawnRandom(table) & 3) + 4;
+            p->angle = spawnRandom(table);
+            {
+                s32 drift = spawnRandom(table) | -128;
+                p->drift = drift;
+            }
+            p->sprite.flags &= ~1;
+            p->sprite.position.x = src->x;
+            p->sprite.position.y = src->y;
+            p->sprite.position.z = src->z;
+            Anim_SetSequence(&p->anim, manager->animation, gUnk_08604A18[manager->mode][type].id, 0,
+                             0);
+            p->anim.frame = phase;
+            if (++phase > 2)
+                phase = 0;
+            p->velocity.x = 0;
+            p->velocity.y = 0;
+            p->velocity.z = 0;
+            p->origin = p->sprite.position;
+            {
+                struct EffectGraphics *graphics = manager->graphics;
+                a = &p->anim;
+                entry = a->data + a->frame;
+                {
+                    u32 factor = *entry >> 6;
+                    p->sprite.tile =
+                        (p->sprite.width >> 3) * (p->sprite.height >> 3) * factor + graphics->base;
+                }
+            }
+            {
+                u32 left = 1 & a->flags;
+                u32 mask = 1;
+                if (left != (((*entry & 0x30) >> 4) & mask))
+                    p->sprite.flags |= 4;
+                else
+                    p->sprite.flags &= ~4;
+            }
+            {
+                u32 left = (u8)(2 & a->flags);
+                u32 mask = 2;
+                if (left != (((*entry & 0x30) >> 4) & mask))
+                    p->sprite.flags |= 8;
+                else
+                    p->sprite.flags &= ~8;
+            }
+            if (++a->timer >= a->rate) {
+                a->timer = 0;
+                if (a->flags & 4) {
+                    if (a->frame == 0) {
+                        if (a->flags & 8) {
+                            a->timer = a->rate;
+                        } else {
+                            a->frame = a->count - 1;
+                        }
+                    } else {
+                        a->frame--;
+                    }
+                } else {
+                    if (++a->frame >= a->count) {
+                        if ((u8)(a->flags & 8)) {
+                            a->timer = a->rate;
+                            a->frame = a->count - 1;
+                        } else {
+                            a->frame = 0;
+                        }
+                    }
+                }
+                entry = a->data + a->frame;
+                a->rate = ((*entry & 15) * a->scale) >> 6;
+            }
+            sub_08217E40(sprite, 0);
+            /* Dead, but it sets table in a second block, so loop.c keeps the load
+               in the body as the ROM does (flow drops the store later). */
+            table = gUnk_0203B400;
+        }
+        for (; n <= 3; n++) {
+            struct EffectSprite *sprite = &effect->particles[n].sprite;
+            sprite->flags |= 1;
+            sub_08217E40(sprite, 0);
+        }
+        effect->timer = 40;
+        effect->active = 1;
+        break;
+    }
+    return 0;
+}
 s32 sub_0800B2F4(void)
 {
     struct EffectManager *manager = gUnk_02000040;
