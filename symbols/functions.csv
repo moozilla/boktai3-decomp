@@ -7789,6 +7789,7 @@ addr,name,mode,confidence,source,notes
 081D201C,TaggedSceneNpc_UpdateArcMove,thumb,low,src-alias,
 081D2118,SceneNpc_OscillatePaletteBlend,thumb,low,src-alias,
 081D227C,TaggedSceneNpc_UpdateState17AnimationB,thumb,low,src-alias,
+081D2318,TaggedSceneNpc_UpdateTargetFacing,thumb,low,src-alias,Turns toward a conversation target; refreshes tagged animation and attachment effects; and flags proximity with facing agreement.
 081D2544,SceneNpc_EnterRequestedState,thumb,low,src-alias,
 081D25AC,SceneNpc_TickStateAndPalette,thumb,low,src-alias,
 081D2610,TaggedSceneNpc_DispatchCutsceneCommands,thumb,low,src-alias,Dispatches buffered cutscene commands to a tagged NPC's state; facing; movement targets; arc parameters and attachment effects.
