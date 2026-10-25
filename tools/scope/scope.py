@@ -3754,10 +3754,18 @@ def register_draft_functions(name, addr, sizes, draft):
     """A draft can define functions the inventory does not list yet, inside FUNC's extent (code the
     disassembler left in one block): `sub_ADDR`, or a `#define NAME sub_ADDR` alias. Each one that starts
     with a `push {..., lr}` is registered as `hidden_tails.py split` would. Returns {csv path: text before}."""
+    import csv as _csv
+    import land
     import progress
     at = {a for _, a in progress.load_functions()[0]}
     rom = rom_bytes()
     found = []
+    # FUNC itself may count for progress (progress_extra_functions.csv) without a block in the build
+    # (build_extra_functions.csv): split.py then has no label for its C or its INCLUDE_ASM
+    with open(os.path.join(ROOT, "symbols", "progress_extra_functions.csv"), newline="") as f:
+        progress_only = {int(r[0], 16) for r in _csv.reader(f) if r and re.fullmatch(r"[0-9A-Fa-f]{8}", r[0])}
+    if addr in progress_only and not land.hidden_row(ROOT, addr):
+        found.append(addr)
     for f in progress.c_functions(os.path.abspath(draft), with_asm=False):
         m = re.fullmatch(r"sub_([0-9A-F]{8})", f)
         a = int(m.group(1), 16) if m else None
@@ -3771,10 +3779,11 @@ def register_draft_functions(name, addr, sizes, draft):
              ("build_extra_functions.csv", "progress_extra_functions.csv", "progress_functions.csv")]
     before = {p: open(p).read() for p in paths}
     subprocess.run([sys.executable, os.path.join(ROOT, "tools", "hidden_tails.py"), "split"]
-                   + [f"{a:08X},,Hidden function in {name}'s block (registered by land from the draft)" for a in found],
+                   + [f"{a:08X},," + (f"Registered for the build by land ({name} counted for progress only)" if a == addr
+                                       else f"Hidden function in {name}'s block (registered by land from the draft)")
+                      for a in found],
                    cwd=ROOT, check=True)
-    print(f"{name}: registered " + ", ".join(f"sub_{a:08X}" for a in found)
-          + " (the draft defines them inside its block)")
+    print(f"{name}: registered " + ", ".join(f"sub_{a:08X}" for a in found) + " for the build")
     return before
 
 
