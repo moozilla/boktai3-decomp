@@ -486,7 +486,49 @@ end:
     return -1;
 }
 
-INCLUDE_ASM("asm/nonmatching", sub_08022694);
+typedef struct ParticleOffset {
+    s16 x, y, z, pad;
+} ParticleOffset;
+extern u32 gUnk_03005308;
+extern const u16 gUnk_0203B400[];
+s32 SceneParticle_CreateParticles(const void *anchor, const ParticleOffset *offset,
+                                  const void *range, const void *jitter, s32 count, u32 priority);
+
+// confidence=low: emits four particles from the anchor at p + 0x54 around a facing-dependent
+// center, each offset by a random -64..63 in x and z.
+void sub_08022694(u8 *p)
+{
+    u8 *base = p + 0x48;
+    ParticleOffset center;
+    ParticleOffset offset;
+    s32 i;
+    if (p[0xa8] <= 1) {
+        center.x = 0x40;
+        center.y = 0xc8;
+        center.z = -0x80;
+    } else {
+        center.x = -0x80;
+        center.y = 0xc8;
+        center.z = 0x40;
+    }
+    for (i = 0; i < 4; i++) {
+        const u16 *table = gUnk_0203B400;
+        u16 index = (gUnk_03005308 + 1) & 0x3FF;
+        {
+            u16 random = table[index];
+            offset.x = ((random & 0x7F) + center.x) - 0x40;
+        }
+        offset.y = center.y;
+        index = (index + 1) & 0x3FF;
+        gUnk_03005308 = index;
+        {
+            u16 random = table[index];
+            offset.z = ((random & 0x7F) + center.z) - 0x40;
+        }
+        table = 0;
+        SceneParticle_CreateParticles(base + 0xC, &offset, table, table, 1, 1);
+    }
+}
 
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
