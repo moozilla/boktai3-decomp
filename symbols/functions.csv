@@ -4827,6 +4827,7 @@ addr,name,mode,confidence,source,notes
 08128554,FragmentBurst_UpdateImpactAnimation,thumb,low,src-alias,
 0812876C,FragmentBurst_AllocateSlot,thumb,low,src-alias,Claims and clears one of four composite effect slots and records its index
 081287C4,FragmentBurst_AllocateSpriteGroup,thumb,low,src-alias,Wraps composite slot allocation and returns its leading sprite group
+081287D4,FragmentBurst_Create,thumb,low,src-alias,Creates a pooled fragment burst with terrain height; projected sprites; randomized animation frames; and an attack collider.
 08128A5C,SpriteGroupPool_Destroy,thumb,low,src-alias,
 08128AB8,FragmentBurst_InitPool,thumb,low,src-alias,Loads shared D45E graphics and animation resources then registers the empty burst pool
 08128AF0,FragmentBurst_EnsurePool,thumb,low,src-alias,Returns or creates the composite burst pool task and installs its callbacks
