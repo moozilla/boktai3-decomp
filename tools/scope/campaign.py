@@ -271,6 +271,13 @@ def resume(r, model, note=None):
     head = open(os.path.join(wd, "codex.json")).read(4000)
     m = re.search(r'"thread_id":"([0-9a-f-]+)"', head)
     n = int(open(os.path.join(wd, "retries")).read()) if os.path.exists(os.path.join(wd, "retries")) else 0
+    why = failed_turn(wd) or ""
+    if not m and re.search(r"usage limit|at capacity", why):
+        # the worker never started (quota): pending again, not given up, so a later queue picks it up
+        os.replace(os.path.join(wd, "codex.json"), os.path.join(wd, "codex.unstarted.json"))
+        os.remove(os.path.join(wd, "pid"))
+        print(f"{func} never started ({why[:80]}); pending again")
+        return False
     if not m or n >= 3:
         open(os.path.join(wd, "gave_up"), "w").write(failed_turn(wd) or "?")
         print(f"gave up on {func} after {n} resumes")
