@@ -23,6 +23,8 @@
   scope.py FILE.c frame         stack slots, ROM against draft, with the pseudo (C variable) in each
   scope.py FILE.c hoist         loop-invariant motion pass by pass: what loop.c moved out, what stayed, why
   scope.py FILE.c giv           loop strength reduction: each induction value, loop.c's benefit and decision
+  scope.py FILE.c put SNIPPET.c [FUNC]   SNIPPET.c (FUNC's definition, with its structs/helpers above) in
+                                place of FUNC's definition, then the score: no hand edits of the unit copy
   scope.py todo [N] [addr|prior|size]   functions with no C yet (phase 1), in ROM order
   scope.py new FUNC             open FUNC: a draft in build/scope/work/ (its unit with a stub, or a twin's C)
   scope.py land FUNC [D.c] [--name NEW] [--note T] [--rom] [--nonmatching]   put a matching draft into
@@ -3238,6 +3240,26 @@ def pseudo_value(wd, pseudo):
     return None, None
 
 
+def put_definition(src, snippet, func):
+    """FILE.c with SNIPPET.c in place of FUNC's definition (the stub `new` wrote, or a draft). The snippet
+    is FUNC's definition and whatever it needs above it (structs, prototypes, inline helpers); its
+    #include lines that FILE.c has already are dropped. Comments above the old definition stay."""
+    import land
+    path = os.path.join(ROOT, src)
+    text, new = open(path).read(), open(os.path.expanduser(snippet)).read()
+    pat = re.compile(r"^[A-Za-z_][^\n;=()]*\b%s\s*\([^;{]*\)\s*\{" % re.escape(func), re.M)
+    if not pat.search(new):
+        sys.exit(f"{func}: {snippet} has no definition of it")
+    sp = land.definition_span(text, func)
+    if not sp:
+        sys.exit(f"{func}: no definition in {src} to replace (`new` writes one)")
+    start = pat.search(text, sp[0]).start()
+    have = set(re.findall(r"^#include .*$", text, re.M))
+    new = "".join(ln for ln in new.splitlines(True) if ln.rstrip("\n") not in have)
+    open(path, "w").write(text[:start] + new.strip("\n") + "\n" + text[sp[1]:])
+    print(f"{func}: {src}: definition replaced with {snippet}")
+
+
 def cmd_giv(src, func, env):
     """Loop strength reduction from loop.c's own dump (u.i.loop): each loop's induction variables (bivs:
     counters stepped by a constant) and the values computed from them (givs), with the C line, loop.c's
@@ -4178,6 +4200,9 @@ def validate_cli(args):
     elif rest and rest[0] == "vs":
         if len(rest) not in (2, 3):
             cli_error("FILE.c vs OTHER.c [FUNC]")
+    elif rest and rest[0] == "put":
+        if len(rest) not in (2, 3):
+            cli_error("FILE.c put SNIPPET.c [FUNC]")
     elif rest and rest[0] == "pins":
         if len([a for a in rest if a != "--all"]) > 2:
             cli_error("FILE.c pins [FUNC] [--all]")
@@ -4300,6 +4325,12 @@ def main():
             cmd_uses([int(a) for a in rest[1:] if a.isdigit()], func,
                      [a for a in names if a in PASSES] or ["cse", "cse2", "combine", "lreg"])
         return 0
+    if rest and rest[0] == "put":  # FILE.c put SNIPPET.c [FUNC]: the snippet's C in place of FUNC's, then the score
+        if len(rest) < 2:
+            cli_error("FILE.c put SNIPPET.c [FUNC]")
+        func = source_function(src, rest[2] if len(rest) > 2 else None)
+        put_definition(src, rest[1], func)
+        rest = [func]
     if rest and rest[0] == "pins":  # FILE.c pins: cost of removing each pin / barrier, greedy removal
         rest = [a for a in rest if a != "--all"]
         func = source_function(src, rest[1] if len(rest) > 1 else None)
