@@ -790,7 +790,7 @@ address,isa,evidence,replacement_end
 0823C8FC,thumb,Hidden raw-tail function (retained),
 0824000C,thumb,Hidden tail after Player_UpdateSolarBombCharge,
 08241714,thumb,Hidden tail after PlayerCue_UpdateOffsetBurst,
-082418CC,thumb,Separate entry after the complete 08241714 return and literal pool; full prologue and independent return,
+082418CC,thumb,Separate entry after the complete 08241714 return and literal pool; full prologue and independent return; exact 760-byte C body,08241BC4
 082429AC,thumb,Hidden tail after Player_UpdateLinkKind; exact 900-byte C body,08242D30
 082436EC,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,08243704
 08243704,thumb,Script command (actor i must exist; reads keyword T); first of two functions in the reviewed 08243704-082437A8 span,0824372C

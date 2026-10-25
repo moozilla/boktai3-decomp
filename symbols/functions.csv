@@ -9922,6 +9922,7 @@ addr,name,mode,confidence,source,notes
 08241310,Player_GetAdjustedMovementInterval,thumb,low,src-alias,Computes a movement interval from a base of twelve or eight and clamps the adjusted result to at least two
 08241350,Player_BeginWalk,thumb,low,src-alias,
 08241504,PlayerCue_UpdateOffsetBurst,thumb,low,src-alias,
+082418CC,PlayerCue_UpdatePoseRecovery,thumb,low,src-alias,Drains a recovery countdown; plays a finishing pose and returns the player to tether mode zero.
 08241BC4,PlayerCue_UpdateTerrainSlide,thumb,low,src-alias,
 08241EB8,PlayerCue_UpdateSpiralPose,thumb,low,src-alias,
 08242120,Player_TryStepForward,thumb,low,src-alias,
