@@ -8,6 +8,8 @@
   campaign.py integrate TREE [--limit N] [--no-pr]   land every finished phase-1 result into TREE on a fresh
                                                    branch from origin/main, one commit each; then one ROM
                                                    build, PROGRESS, and a PR merged when the build is OK
+  campaign.py harvest [--all]                      land-ready without a worker: pending functions whose `new`
+                                                   seed (a matched twin's C) matches as it is
   campaign.py review [--model M] | review --say MSG   an independent reviewer of scope itself
                                                    (build/scope/campaign/review/REVIEW.md); --say continues it
   campaign.py status                               what ran, what matched, what is in flight
@@ -234,6 +236,8 @@ def quota():
 
 def state(func):
     wd = os.path.join(CAMP, func)
+    if os.path.exists(os.path.join(wd, "harvested")):
+        return "done"
     if not os.path.exists(os.path.join(wd, "pid")):
         return "pending"
     pid = int(open(os.path.join(wd, "pid")).read())
@@ -285,7 +289,7 @@ def resume(r, model, note=None):
     return True
 
 
-def start_draft(r, model):
+def start_draft(r, model, harvest_only=False):
     """A phase-1 worker: scope's workspace for FUNC (`scope.py new`) copied into its directory."""
     func = r["func"]
     wd = os.path.join(CAMP, func)
@@ -308,6 +312,18 @@ def start_draft(r, model):
                                          else "an empty definition")
     rel = os.path.relpath(wd, ROOT)
     r["start_counts"] = "undrafted"
+    if re.search(r"^  now: MATCH", out, re.M):
+        # the seed (a matched twin's C) is exact already: no worker needed
+        shutil.copy(work, os.path.join(wd, "best.c"))
+        shutil.copy(work, os.path.join(wd, "best_match.c"))
+        json.dump({"match": True, "counts": "MATCH", "pins": len(re.findall(r'\basm\("r\d+"\)', open(work).read())),
+                   "barriers": 0, "compiles": 1, "name": None, "note": "seeded: " + seed},
+                  open(os.path.join(wd, "result.json"), "w"))
+        open(os.path.join(wd, "harvested"), "w").write(seed)
+        print(f"harvested {func}: {seed} matches as seeded", flush=True)
+        return False
+    if harvest_only:
+        return False
     brief = DRAFT_BRIEF.format(func=func, addr=r["addr"], size=r["size"], wd=rel, run=func, seed=seed, arm="")
     return launch(wd, brief, model, r)
 
@@ -508,6 +524,22 @@ def land_draft(func, tree, wd):
     return p.returncode
 
 
+def cmd_harvest(args):
+    """Open every pending phase-1 function with `scope.py new` and keep the ones whose seed matches
+    as it is (a twin's C): integrate lands them like worker results, and no worker is spent on them."""
+    if "--all" in args:  # also the undrafted functions the queue left out (large ones)
+        cmd_queue(["--undrafted"])
+    rows = json.load(open(QUEUE))
+    n = 0
+    for r in rows:
+        if r.get("kind") == "draft" and state(r["func"]) == "pending" and not r.get("skip"):
+            if not start_draft(r, None, harvest_only=True) and os.path.exists(os.path.join(CAMP, r["func"], "harvested")):
+                n += 1
+    json.dump(rows, open(QUEUE, "w"), indent=1)
+    print(f"{n} functions match as seeded")
+    return 0
+
+
 def cmd_integrate(args):
     tree = os.path.abspath(os.path.expanduser(args[0]))
     limit = int(args[args.index("--limit") + 1]) if "--limit" in args else 10 ** 6
@@ -674,4 +706,4 @@ def cmd_land(args):
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
     sys.exit({"queue": cmd_queue, "tick": cmd_tick, "status": cmd_status, "land": cmd_land,
-              "review": cmd_review, "integrate": cmd_integrate}[cmd](sys.argv[2:]))
+              "review": cmd_review, "integrate": cmd_integrate, "harvest": cmd_harvest}[cmd](sys.argv[2:]))
