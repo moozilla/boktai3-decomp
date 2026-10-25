@@ -26,7 +26,7 @@ void Hud_DrawCounter50C(u32, u32);
 void Hud_DrawStatusDayNightIndicators(u8 *);
 void sub_08174BBC(u8 *);
 void SceneCatalog_SetSelection(u8 *, u32);
-void sub_08174D20(u8 *);
+void InventoryGrid_LayoutStatMarkers(u8 *);
 void SceneCatalog_ResetTextWindow(u8 *);
 void SceneHud_SetPairedIcons(u8 *, u32, s32);
 void SceneCatalog_SetDescription(u8 *, s32);
@@ -62,7 +62,7 @@ void Hud_InitStatusMenu(u8 *s)
     sub_0816618C(s, 8, 0x20);
     sub_08174BBC(s);
     SceneCatalog_SetSelection(s, 0);
-    sub_08174D20(s);
+    InventoryGrid_LayoutStatMarkers(s);
     InventoryPanel_ShowStatusIcons(s);
     SceneCatalog_ResetTextWindow(s);
     PauseMenu_SetPromptIconPositions(s, 0, 8);

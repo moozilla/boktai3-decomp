@@ -10,7 +10,7 @@ void InventoryGrid_UpdateModifierPreview(void);
 void Presentation_CommitListValues(u8 *);
 void Player_RefreshStatsAndVitals(void *);
 void Presentation_DrawEntryCount(u8 *);
-void sub_08174D20(u8 *);
+void InventoryGrid_LayoutStatMarkers(u8 *);
 void Hud_DrawDefaultHealthMeter(u8 *, u32, u32, u32);
 void Hud_DrawDefaultEnergyMeter(u8 *, u32, u32, u32, u32, u32);
 void MenuSelection_ProcessConfirmation(u8 *s)
@@ -31,7 +31,7 @@ void MenuSelection_ProcessConfirmation(u8 *s)
         p = (u8 **)(s + 0xA40);
         Player_RefreshStatsAndVitals(*p);
         Presentation_DrawEntryCount(s);
-        sub_08174D20(s);
+        InventoryGrid_LayoutStatMarkers(s);
         Hud_DrawDefaultHealthMeter(s, 1, 8, 8);
         Hud_DrawDefaultEnergyMeter(s, 1, 8, 10, *(u16 *)(*p + 0x428), *(u16 *)(*p + 0x42A));
         neg = -1;
