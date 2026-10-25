@@ -266,8 +266,8 @@ void CollisionController_UpdateHitAnimation(struct CollisionManager *manager,
         effect.x = 10;
         effect.y = 10;
         effect.z = 10;
-        sub_0800AC44(p->kind, p->type | 16, p->attack, &p->sprite.position, &effect, p->range,
-                     p->script);
+        EffectManager_SpawnParticles(p->kind, p->type | 16, p->attack, &p->sprite.position, &effect,
+                                     p->range, p->script);
         if (p->type == 2)
             Sound_PlaySongChecked(696);
         else

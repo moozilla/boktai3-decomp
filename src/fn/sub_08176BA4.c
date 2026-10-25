@@ -18,7 +18,7 @@ struct PackedVec {
     s32 z : 16;
     s32 pad : 16;
 };
-void sub_0800AC44(u32, u32, u32, struct PackedVec *, struct PackedVec *, u32, u32);
+void EffectManager_SpawnParticles(u32, u32, u32, struct PackedVec *, struct PackedVec *, u32, u32);
 static inline void clearFlags(u32 *p, u32 mask)
 {
     *p &= mask;
@@ -82,7 +82,8 @@ void SceneHud_FinishPageExit(u8 *p)
                 a = &pos;
                 b = &size;
                 for (i = 2; i >= 0; i--)
-                    sub_0800AC44(4, p[0x4871], *(u16 *)(p + 0x4872), a, b, 300, 120);
+                    EffectManager_SpawnParticles(4, p[0x4871], *(u16 *)(p + 0x4872), a, b, 300,
+                                                 120);
                 p[0x4871] = 0;
                 p[0x4870] = 0;
             }
