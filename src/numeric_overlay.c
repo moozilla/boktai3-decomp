@@ -8,56 +8,54 @@ u16 *NumericOverlay_GetTileMapPtr(u32 bg, u32 x, s32 y)
     return p + (t->width << 1) * y;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 41.7%
-// scope shape 70 (differences once low registers are set aside)
+// MATCHING_CONCESSION: register-pinning
 void sub_0800F4EC(struct NumericOverlay *unused)
 {
     int digits[2];
     s16 *dst;
-    int row, col, base, n;
-    int *values;
-    int left, right;
-    if (&gUnk_03005430 == NULL)
+    int row, col, n, base;
+    register int *values asm("ip");
+    u32 hours, minutes;
+    struct StatusGameState *c = &gUnk_03005430;
+    if (!c)
         return;
-    if (gUnk_03005430.mode == 0 || gUnk_03005430.mode == 4 || gUnk_03005430.mode == 5) {
+    if (c->mode == 0 || c->mode == 4 || c->mode == 5) {
         dst = (s16 *)NumericOverlay_GetTileMapPtr(0, 4, 15);
-        left = gUnk_03005430.altCounters[0];
-        right = gUnk_03005430.altCounters[1];
+        hours = c->altCounters[0];
+        minutes = c->altCounters[1];
     } else {
         dst = (s16 *)NumericOverlay_GetTileMapPtr(0, 4, 15);
-        left = gUnk_03005430.counters[0];
-        right = gUnk_03005430.counters[1];
+        hours = c->counters[0];
+        minutes = c->counters[1];
     }
-    for (row = 0, base = 0x6A; row < 2; row++, base += 16) {
-        s16 *out = dst;
+    for (row = 0; row < 2; row++) {
+        int shift = row << 4;
+        base = 0x6a;
         for (col = 0; col < 4; col++)
-            *out++ = base + col | -12288;
+            dst[col] = (shift + base + col) | -12288;
         dst += gUnk_03004C30[0].width * 2;
     }
 
     dst = (s16 *)NumericOverlay_GetTileMapPtr(0, 8, 15);
-    if (gUnk_03005430.mode == 0 || gUnk_03005430.mode == 4 || gUnk_03005430.mode == 5) {
+    if (c->mode == 0 || c->mode == 4 || c->mode == 5) {
         n = 2;
-        base = 0x6E;
+        base = 0x6e;
     } else {
         n = 2;
-        base = 0x4E;
+        base = 0x4e;
     }
-    for (row = 0; row < 2; row++, base += 16) {
-        s16 *out = dst;
+    for (row = 0; row < 2; row++) {
+        int shift = row << 4;
         for (col = 0; col < n; col++)
-            *out++ = base + col | -12288;
+            dst[col] = (shift + base + col) | -12288;
         dst += gUnk_03004C30[0].width * 2;
     }
 
-    digits[0] = Div(left, 10);
-    digits[1] = left - digits[0] * 10;
+    digits[0] = Div(hours, 10);
+    digits[1] = hours - digits[0] * 10;
     dst = (s16 *)NumericOverlay_GetTileMapPtr(0, 16, 15);
-    do {
-        row = 0;
-        values = digits;
-    } while (0);
+    row = 0;
+    values = digits;
     for (; row < 2; row++) {
         int shift = row << 4;
         int *digit = values;
@@ -69,29 +67,24 @@ void sub_0800F4EC(struct NumericOverlay *unused)
         dst += gUnk_03004C30[0].width * 2;
     }
 
-    digits[0] = Div(right, 10);
-    digits[1] = right - digits[0] * 10;
+    digits[0] = Div(minutes, 10);
+    digits[1] = minutes - digits[0] * 10;
     dst = (s16 *)NumericOverlay_GetTileMapPtr(0, 22, 15);
     row = 0;
     values = digits;
     for (; row < 2;) {
         int next = row + 1;
-        row <<= 4;
-        {
-            int *digit = values;
-            s16 *out = dst;
-            for (col = 0; col < 2; col++) {
-                int tile = *digit++ + 0x60;
-                *out++ = row + tile | -12288;
-            }
-            dst += gUnk_03004C30[0].width * 2;
+        int shift = row << 4;
+        int *digit = values;
+        s16 *out = dst;
+        for (col = 0; col < 2; col++) {
+            int tile = *digit++ + 0x60;
+            *out++ = shift + tile | -12288;
         }
+        dst += gUnk_03004C30[0].width * 2;
         row = next;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0800F4EC);
-#endif
 
 void NumericOverlay_RefreshDisplay(struct NumericOverlay *s)
 {
