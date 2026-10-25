@@ -8282,6 +8282,7 @@ addr,name,mode,confidence,source,notes
 081F330C,Ratatosk_FindActiveTargetNearestPlayer,thumb,low,src-alias,Selects an active target with minimum cached secondary distance; player association tentative
 081F333C,Ratatosk_FindActiveTargetNearestReference,thumb,low,src-alias,Selects an active target with minimum cached primary distance; reference association tentative
 081F33F0,SceneDistance_ClearLinkedEntry,thumb,low,src-alias,
+081F3450,Ratatosk_FindPointNearestReferenceExcept,thumb,low,src-alias,Selects the last minimum-distance point among nine cached reference distances; excluding one index; returns -1 if slot 4 is absent.
 081F34C8,Ratatosk_GetPosition,thumb,low,src-alias,Returns the position vector at offset 0x54 of the slot 4 Ratatosk instance
 081F34D8,Ratatosk_GetSelectedPointIndex,thumb,low,src-alias,Returns the signed selection index at offset 0xE4C; point role tentative
 081F34F0,Ratatosk_GetSelectedTargetIndex,thumb,low,src-alias,Returns the signed target index at offset 0xE4E used by target interaction logic
