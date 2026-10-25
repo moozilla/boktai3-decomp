@@ -227,10 +227,15 @@ def rom_name(src, func):
     if func in addr:
         return func
     text = open(os.path.join(ROOT, src)).read()
-    m = re.search(r"#ifdef NONMATCHING.*?#else(.*?)#endif", text, re.S)
-    names = re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', m.group(1) if m else "")
+    # Friendly C names need the INCLUDE_ASM from their own block, not the
+    # first draft in a multi-function unit.
+    names = []
+    for m in re.finditer(r"#ifdef NONMATCHING(.*?)#else(.*?)#endif", text, re.S):
+        if re.search(r"\b%s\s*\([^;{}]*\)\s*\{" % re.escape(func), m.group(1)):
+            names = re.findall(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)', m.group(2))
+            break
     hit = next((n for n in names if n in addr), None)
-    for alias in re.findall(r"^#define\s+" + re.escape(func) + r"\s+(\w+)\s*$", text, re.M):
+    for alias in re.findall(r"^#define[ \t]+" + re.escape(func) + r"[ \t]+(\w+)[ \t]*(?://[^\n]*)?$", text, re.M):
         hit = hit or (alias if alias in addr else None)  # `#define Name sub_ADDR` in a matched file
     if hit is None and re.fullmatch(r"sub_[0-9A-Fa-f]{8}", func):  # an address name renamed since
         hit = next((n for n, a in addr.items() if a == int(func[4:], 16)), None)
@@ -1066,14 +1071,31 @@ def regs_of(rtl):
     return [int(n) for n in re.findall(r"\(reg(?:/[a-z]+)*:\w+ (\d+)", rtl or "")]
 
 
-def parse_trace(text):
-    """Split CSE_WHY / CSE_DEBUG output into per-pass lists of eqv events and why-blocks."""
+def function_trace(text, func):
+    """Only FUNC's trace records. UIDs and decision indices restart in each function.
+    PRE runs after cse1, so its unlabelled records belong to that cse marker;
+    loop traces carry their own function marker before the next cse pass.
+    """
+    out, current = [], None
+    for ln in text.splitlines():
+        m = re.match(r"cse pass \d (\w+)$|loopopt fn=(\w+)$", ln)
+        if m:
+            current = m.group(1) or m.group(2)
+        if current == func:
+            out.append(ln)
+    return "\n".join(out)
+
+
+def parse_trace(text, func):
+    """FUNC's CSE_WHY / CSE_DEBUG output, split by pass; never mix units' UIDs."""
+    text = function_trace(text, func)
     passes, cur = {}, None
     block = None
     for seq, ln in enumerate(text.splitlines()):
         m = re.match(r"cse pass (\d)", ln)
         if m:
             cur = passes.setdefault(int(m.group(1)), {"eqv": [], "why": []})
+            block = None
             continue
         if cur is None:
             continue
@@ -1777,11 +1799,17 @@ def score(src, func, env, full=False):
     _, _, sizes = inventory()
     rom_code = load_rom(verify=False)[off(addr):off(addr) + sizes[rom_name(src, func)]]
     if mine == rom_code:  # the listing can misalign a literal pool at a 2-byte offset; bytes decide
+        info.update(counts="MATCH", shape=0, fuzzy=100.0)
         return 0, info
     with contextlib.redirect_stdout(io.StringIO()):
         report(src, func, rom_code, addr, mine, info, 0)
     rows = json.load(open(os.path.join(info["wd"], "diff.json")))
-    info["counts"] = count_text(rows)
+    data = info["data"] if "data" in info else mapping_ranges(os.path.join(info["wd"], "u.o"),
+                                                              info["obj_offset"], len(mine))
+    rom_rows = decode(rom_code, addr, rom_data(rom_name(src, func), addr, rom_code))
+    draft_rows = decode(mine, addr, data)
+    info.update(counts=count_text(rows), shape=shape_distance(rom_rows, draft_rows),
+                fuzzy=fuzzy_percent(rom_rows, draft_rows))
     return sum(1 for r in rows if r["tag"] != "="), info
 
 
@@ -1991,6 +2019,7 @@ def cmd_probe(src, func, env):
                         capture_output=True, text=True,
                         env=dict(os.environ, CSE_DEBUG="1", CSE_PATH="1", AGBCC_PRE_TRACE="1", AGBCC_LOOP_TRACE="1",
                                  **{k: v for k, v in info["env"].items()})).stderr
+    tr = function_trace(tr, info["obj_name"])
     heads, copied = set(), {}
     for m in re.finditer(r"eqv new=(\d+) old=(\d+) first=(\d+) newlast=(\d+) newfirst=(\d+) "
                          r"firstlast=(-?\d+) bb=(\d+)\.\.(\d+)", tr):
@@ -2000,7 +2029,7 @@ def cmd_probe(src, func, env):
             copied.setdefault(new, old)
     follows = {int(m.group(1)): int(m.group(2))
                for m in re.finditer(r"follow k=(\d+) pass=1 jump=\d+ label=\d+ line=(\d+)", tr)}
-    pres = [int(m.group(1)) for m in re.finditer(r"pre k=(\d+) insn=(\d+) expr=\d+", tr)]
+    pres = sorted({int(m.group(1)) for m in re.finditer(r"pre k=(\d+) insn=(\d+) expr=\d+", tr)})
     fnames = (func, rom_name(src, func))
     givs = {}  # insn uid -> (addr|reg, reduced?) for loop strength reduction in this function
     for m in re.finditer(r"giv fn=(\w+) insn=(\d+) type=(\w+) (?:benefit=-?\d+ lifetime=\d+ )?reduce=(\w+)", tr):
@@ -2496,22 +2525,55 @@ def explain_order(wd, rows, lo, hi, at, srclines):
     return sum(len(b) for b in blocks)
 
 
+def rtl_constant_value(expr, symbols):
+    """Known 32-bit value of a constant RTL expression; None is never evidence of equality."""
+    m = re.fullmatch(r"\(const_int (-?\d+)\)", expr)
+    if m:
+        return int(m.group(1)) & 0xFFFFFFFF
+    m = re.fullmatch(r'\(symbol_ref(?:/\w)*:SI \("([^"]+)"\)\)', expr)
+    if m:
+        return symbols[m.group(1)][0] & 0xFFFFFFFF if m.group(1) in symbols else None
+    m = re.fullmatch(r"\(const:SI (.*)\)", expr)
+    if m:
+        return rtl_constant_value(m.group(1), symbols)
+    m = re.match(r"\((plus|minus):SI ", expr)
+    if m and expr[m.end():].startswith("("):
+        end = _sexp_end(expr, m.end())
+        a = rtl_constant_value(expr[m.end():end], symbols)
+        rest = expr[end:].strip()
+        if rest.startswith("(") and _sexp_end(rest, 0) == len(rest) - 1 and rest.endswith(")"):
+            b = rtl_constant_value(rest[:-1], symbols)
+            if a is not None and b is not None:
+                return (a + b if m.group(1) == "plus" else a - b) & 0xFFFFFFFF
+    return None
+
+
 def pool_load_origin(wd, draft, line):
-    """A constant-pool load born in the final pass (`ldr rN, =X`) is final's copy of an insn that loaded rN
-    from the pool before then; return that insn's uid (same constant, nearest C line)."""
-    m = re.match(r"ldr r(\d+), =(0x[0-9A-Fa-f]+|\d+)", draft or "")
+    """A pre-final SET of the same hard register with a positively equal constant value.
+    Keep raw greg notes: one_line() deliberately strips REG_EQUAL/REG_EQUIV.
+    Unknown pool symbols/expressions cannot establish an origin.
+    """
+    m = re.match(r"ldr r(\d+), =(0x[0-9A-Fa-f]+|\d+)$", draft or "")
     if not m:
         return None
-    n, value = int(m.group(1)), int(m.group(2), 0)
-    lines = uid_lines(wd)
+    n, value = int(m.group(1)), int(m.group(2), 0) & 0xFFFFFFFF
+    lines, symbols = uid_lines(wd), elf_syms()
+    path = os.path.join(wd, "u.i.greg")
+    text = open(path).read() if os.path.exists(path) else ""
     cands = []
-    for u, _, r in insn_list(wd, "greg"):
-        if not re.search(r"\(set \(reg(?:/\w)*:SI %d r%d\) \(mem/u:SI \(symbol_ref/u:SI" % (n, n), r):
+    for m in re.finditer(r"^\(insn(?:/\w)* (\d+) .*?(?=^\(|\Z)", text, re.S | re.M):
+        raw = m.group(0)
+        st = re.fullmatch(r"\(set \(reg(?:/\w)*:SI %d(?: \w+)?\) (.*)\)" % n, one_line(raw))
+        if not st:
             continue
-        c = re.search(r"REG_EQU(?:IV|AL) \(const_int (-?\d+)", r)
-        if c and int(c.group(1)) & 0xFFFFFFFF != value:
-            continue
-        cands.append(u)
+        source = st.group(1)
+        known = rtl_constant_value(source, symbols)
+        if known is None and re.match(r"\(mem/u:SI \(symbol_ref", source):
+            note = re.search(r"REG_EQU(?:IV|AL) ", raw)
+            if note:
+                known = rtl_constant_value(" ".join(raw[note.end():_sexp_end(raw, note.end())].split()), symbols)
+        if known == value:
+            cands.append(int(m.group(1)))
     return min(cands, key=lambda u: abs((lines.get(u) or 0) - (line or 0))) if cands else None
 
 
@@ -2543,9 +2605,12 @@ def cmd_why(src, func, uid, env, via=None):
     if row and not via and uid not in {u for u, _, _ in insn_list(wd, "greg")}:
         v = pool_load_origin(wd, row["draft"], lines.get(uid))
         if v:
-            print(f"insn {uid} ({row['draft']}) is the final pass's copy of insn {v}, which loads the same"
-                  f" constant before reload; explaining {v}:")
+            print(f"insn {uid} ({row['draft']}) has the same constant value as pre-final insn {v}"
+                  f" (nearest matching C line); explaining {v}:")
             return cmd_why(src, func, v, env, dict(row, uid=v))
+        if re.match(r"ldr r\d+, =", row["draft"] or ""):
+            print(f"insn {uid}: constant origin is unknown (no equal-valued pre-final SET found);"
+                  " retaining the emitted insn rather than guessing from its register")
     ln = lines.get(uid)
     code = srclines[ln - 1].strip() if ln and ln <= len(srclines) else ""
     print(f"why insn {uid}  line {ln}: {code}")
@@ -2591,7 +2656,7 @@ def cmd_why(src, func, uid, env, via=None):
         print(f"  this is a shape difference ({row['rom'].split()[0]} vs {row['draft'].split()[0]}), not a"
               " register choice: compare the RTL (`scope.py insn UID`) with what the ROM implies")
         explain_move2add(wd, uid, row, at)
-    trace = parse_trace(open(os.path.join(wd, "stderr.txt")).read())
+    trace = parse_trace(open(os.path.join(wd, "stderr.txt")).read(), info["obj_name"])
     for p, gone, new in changes:
         if p not in ("cse", "cse2") or not new:
             if p == "regmove":
@@ -3579,6 +3644,9 @@ def cmd_try(src, func, variants, env):
         if not os.path.exists(path):
             path = os.path.join(ROOT, v)
         rel = os.path.relpath(path, ROOT)
+        if not os.path.isfile(path):
+            rows.append((None, rel, "source file not found", "missing file", {}))
+            continue
         try:
             n, info = score(rel, func, env)
         except SystemExit as e:
@@ -3618,15 +3686,145 @@ def last_func():
     return open(p).read().strip() if os.path.exists(p) else None
 
 
+def source_function(src, explicit=None):
+    """Select a file command's function once; explicit names must identify a definition.
+    Accept a C spelling, its file-local asm alias, or a renamed sub_ADDR spelling.
+    """
+    if explicit is None:
+        func = nonmatching_func(src)
+        if not func:
+            sys.exit(f"name the function: scope.py {src} COMMAND ... FUNC")
+        return func
+    import land
+    text = open(os.path.join(ROOT, src)).read()
+    _, addr, _ = inventory()
+    aliases = dict(re.findall(r"^#define[ \t]+(\w+)[ \t]+(\w+)[ \t]*(?://[^\n]*)?$", text, re.M))
+    spellings = [explicit]
+    target = resolve_target(explicit, list(addr.items()))
+    if target in addr:
+        spellings.extend((target, f"sub_{addr[target]:08X}"))
+    spellings.extend(n for n, target in aliases.items() if target in spellings)
+    func = next((n for n in spellings if land.definition_span(text, n)), None)
+    if func is None or rom_name(src, func) not in addr:
+        sys.exit(f"{explicit}: no ROM function definition by that name in {src}")
+    return func
+
+
+def cli_error(syntax, message=None):
+    sys.exit((message + "\n" if message else "") + f"usage: scope.py {syntax}")
+
+
+def cli_number(value, syntax):
+    try:
+        n = int(value)
+    except ValueError:
+        cli_error(syntax, f"{value!r}: expected a nonnegative decimal integer")
+    if n < 0:
+        cli_error(syntax, f"{value!r}: expected a nonnegative decimal integer")
+    return n
+
+
+def validate_cli(args):
+    """Check argument shapes before indexing argv or starting a compile/mutation."""
+    cmd, tail = args[0], args[1:]
+    fixed = {"rom": (1, 1, "rom FUNC|ADDR"), "new": (1, 1, "new FUNC"),
+             "like": (1, 2, "like FUNC|ADDR [N]"), "insn": (1, 2, "insn UID [FUNC]"),
+             "fastcheck": (0, 1, "fastcheck [N]"), "census": (0, 1, "census [CALLEE]"),
+             "serve": (0, 0, "serve")}
+    if cmd in fixed:
+        lo, hi, syntax = fixed[cmd]
+        if not lo <= len(tail) <= hi:
+            cli_error(syntax)
+        if cmd == "insn":
+            cli_number(tail[0], syntax)
+        elif cmd == "like" and len(tail) == 2:
+            cli_number(tail[1], syntax)
+        elif cmd == "fastcheck" and tail:
+            cli_number(tail[0], syntax)
+        return
+    if cmd == "fields":
+        return  # offsets and optional struct name are validated together in main
+    if cmd == "rename":
+        syntax = "rename FUNC NEW [--note TEXT]"
+        if len(tail) not in (2, 4) or len(tail) == 4 and tail[2] != "--note":
+            cli_error(syntax)
+        return
+    if cmd == "land":
+        syntax = "land FUNC [DRAFT.c] [--name NEW] [--note TEXT] [--rom] [--nonmatching]"
+        if not tail or tail[0].startswith("--"):
+            cli_error(syntax)
+        i, drafts = 1, 0
+        while i < len(tail):
+            a = tail[i]
+            if a in ("--name", "--note"):
+                if i + 1 == len(tail) or tail[i + 1].startswith("--"):
+                    cli_error(syntax, f"{a} needs a value")
+                i += 2
+            elif a in ("--rom", "--nonmatching"):
+                i += 1
+            elif a.startswith("--"):
+                cli_error(syntax, f"unknown option: {a}")
+            else:
+                drafts += 1
+                i += 1
+        if drafts > 1:
+            cli_error(syntax)
+        return
+    if cmd == "todo":
+        if len(tail) > 2 or any(a not in ("addr", "prior", "size") and not a.isdigit() for a in tail):
+            cli_error("todo [N] [addr|prior|size]")
+        return
+    if cmd == "uses":
+        if not any(a.isdigit() for a in tail):
+            cli_error("uses REG... [PASS...] [FUNC]")
+        return
+    rest = [a for a in tail if "=" not in a]
+    if "try" in rest:
+        i = tail.index("try")
+        if not tail[i + 1:] or all("=" not in a and not a.endswith(".c") for a in tail[i + 1:]):
+            cli_error("FILE.c [FUNC] try VARIANT.c...|KNOB=V... [FUNC]")
+    elif "why" in rest:
+        i = rest.index("why")
+        if len(rest) not in (2, 3) or i + 1 >= len(rest):
+            cli_error("FILE.c why UID|all [FUNC]")
+        if rest[i + 1] != "all":
+            cli_number(rest[i + 1], "FILE.c why UID|all [FUNC]")
+    elif rest and rest[0] == "insn":
+        if len(rest) not in (2, 3):
+            cli_error("FILE.c insn UID [FUNC]")
+        cli_number(rest[1], "FILE.c insn UID [FUNC]")
+    elif rest and rest[0] in ("life", "uses"):
+        if len(rest) < 2 or rest[0] == "uses" and not any(a.isdigit() for a in rest[1:]):
+            cli_error("FILE.c " + rest[0] + " NAME|REG... [FUNC]")
+    elif rest and rest[0] == "vs":
+        if len(rest) not in (2, 3):
+            cli_error("FILE.c vs OTHER.c [FUNC]")
+    elif rest and rest[0] == "pins":
+        if len([a for a in rest if a != "--all"]) > 2:
+            cli_error("FILE.c pins [FUNC] [--all]")
+    elif any(a in rest for a in ("probe", "shape", "frame", "hoist", "spill")):
+        if len(rest) > 2:
+            cli_error("FILE.c COMMAND [FUNC]")
+    elif len(rest) > 1:
+        cli_error("FILE.c [FUNC] [KNOB=V...]")
+
+
 def main():
     args = sys.argv[1:]
     if not args or args[0] in ("-h", "--help"):
         print(__doc__)
         return 0
+    validate_cli(args)
     if args[0] == "fields":  # fields OFF... [STRUCT]: which structs have members at these offsets
-        offs = [int(a, 16) if a.lower().startswith("0x") else int(a) for a in args[1:] if re.fullmatch(r"(0x)?[0-9a-fA-F]+", a)]
-        want = next((a for a in args[1:] if not re.fullmatch(r"(0x)?[0-9a-fA-F]+", a)), None)
-        return cmd_fields(offs, want)
+        offs, names = [], []
+        for a in args[1:]:
+            if re.fullmatch(r"(?:0[xX])?[0-9a-fA-F]+", a):
+                offs.append(int(a, 16 if a.lower().startswith("0x") or re.search(r"[a-fA-F]", a) else 10))
+            else:
+                names.append(a)
+        if not offs or len(names) > 1 or names and not re.fullmatch(r"[A-Za-z_]\w*", names[0]):
+            cli_error("fields OFF... [STRUCT]", "offsets: decimal, 0xHEX, or bare hex containing A-F")
+        return cmd_fields(offs, names[0] if names else None)
     if args[0] == "rom":  # rom FUNC|ADDR: the ROM listing, no draft needed
         return cmd_rom(args[1])
     if args[0] == "new":  # new FUNC: a draft in build/scope/work/ seeded from the unit or a twin
@@ -3665,16 +3863,22 @@ def main():
         names = [a for a in args[1:] if not a.isdigit()]
         passes = [a for a in names if a in PASSES] or ["cse", "cse2", "combine", "lreg"]
         func = next((a for a in names if a not in PASSES), None) or last_func()
+        if not func:
+            cli_error("uses REG... [PASS...] FUNC", "no previous function in this SCOPE_RUN")
         cmd_uses(regs, func, passes)
         return 0
     if args[0] == "insn":
         func = args[2] if len(args) > 2 else last_func()
+        if not func:
+            cli_error("insn UID FUNC", "no previous function in this SCOPE_RUN")
         cmd_insn(int(args[1]), func)
         return 0
     src = args[0]
     if not src.endswith(".c"):
         src = os.path.join("src", "fn", src + ".c")
     src = os.path.relpath(os.path.join(ROOT, src) if not os.path.isabs(src) else src, ROOT)
+    if not os.path.isfile(os.path.join(ROOT, src)):
+        sys.exit(f"{src}: source file not found (run scope.py --help for commands)")
     refresh_workspace(src)
     env = dict(a.split("=", 1) for a in args[1:] if "=" in a)
     rest = [a for a in args[1:] if "=" not in a]
@@ -3682,14 +3886,29 @@ def main():
     if rest and rest[0] == "vs":  # FILE.c vs OTHER.c: allocation side by side
         other = rest[1]
         other = os.path.relpath(os.path.join(ROOT, other) if not os.path.isabs(other) else other, ROOT)
-        func = rest[2] if len(rest) > 2 else nonmatching_func(src)
+        if not os.path.isfile(os.path.join(ROOT, other)):
+            cli_error("FILE.c vs OTHER.c [FUNC]", f"{other}: source file not found")
+        func = source_function(src, rest[2] if len(rest) > 2 else None)
         return cmd_vs(src, other, func, env)
     if rest and rest[0] in ("insn", "uses", "life"):  # FILE.c insn UID / uses REG... / life NAME... [FUNC]
-        func = nonmatching_func(src)
-        if len(rest) > 2 and rest[-1] in (func, rom_name(src, func) if func else None):
-            rest = rest[:-1]
-        if not func:
-            sys.exit(f"name the function: scope.py {rest[0]} ... FUNC")
+        params = rest[1:]
+        explicit = None
+        if rest[0] == "insn":
+            explicit = params[1] if len(params) > 1 else None
+            params = params[:1]
+        elif rest[0] == "uses":
+            if params and not params[-1].isdigit() and params[-1] not in PASSES:
+                explicit = params.pop()
+        elif params:
+            import land
+            last = params[-1]
+            text = open(os.path.join(ROOT, src)).read()
+            if last in inventory()[1] or land.definition_span(text, last) or re.fullmatch(r"sub_[0-9A-Fa-f]{8}", last):
+                explicit = params.pop()
+        func = source_function(src, explicit)
+        if not params:
+            cli_error("FILE.c " + rest[0] + " NAME|REG... [FUNC]")
+        rest = [rest[0], *params]
         os.makedirs(WORK, exist_ok=True)
         open(os.path.join(WORK, "LAST"), "w").write(func)
         compile_draft(src, func, env)
@@ -3704,7 +3923,7 @@ def main():
         return 0
     if rest and rest[0] == "pins":  # FILE.c pins: cost of removing each pin / barrier, greedy removal
         rest = [a for a in rest if a != "--all"]
-        func = rest[1] if len(rest) > 1 else nonmatching_func(src) or os.path.basename(src)[:-2]
+        func = source_function(src, rest[1] if len(rest) > 1 else None)
         return cmd_pins(src, func, env)
     if "try" in rest:  # FILE.c [KNOB=V...] try VARIANT... [FUNC]: whole-file variants or single knobs
         i = args.index("try")
@@ -3714,34 +3933,33 @@ def main():
         func = before[0] if before else nonmatching_func(src)
         if variants and not variants[-1].endswith(".c") and "=" not in variants[-1]:
             func = variants.pop()
-        if not func:
-            sys.exit("name the function: scope.py FILE.c try VARIANT... FUNC")
+        func = source_function(src, func)
         return cmd_try(src, func, variants, env)
     if "probe" in rest:
         rest.remove("probe")
-        func = rest[0] if rest else nonmatching_func(src)
+        func = source_function(src, rest[0] if rest else None)
         return cmd_probe(src, func, env)
     if "shape" in rest:  # FILE.c shape [FUNC]: only the order / instruction differences, registers blanked
         rest.remove("shape")
-        func = rest[0] if rest else nonmatching_func(src)
+        func = source_function(src, rest[0] if rest else None)
         return cmd_shape(src, func, env)
     if "hoist" in rest:  # FILE.c hoist [FUNC]: loop-invariant motion pass by pass, and why each stayed
         rest.remove("hoist")
-        func = rest[0] if rest else nonmatching_func(src)
+        func = source_function(src, rest[0] if rest else None)
         return cmd_hoist(src, func, env)
     if "frame" in rest:  # FILE.c frame [FUNC]: stack slots, ROM against draft, with the pseudo in each
         rest.remove("frame")
-        func = rest[0] if rest else nonmatching_func(src)
+        func = source_function(src, rest[0] if rest else None)
         return cmd_frame(src, func, env)
     if "spill" in rest:
         rest.remove("spill")
-        func = rest[0] if rest else nonmatching_func(src)
+        func = source_function(src, rest[0] if rest else None)
         return cmd_spill(src, func, env)
     if "why" in rest:
         i = rest.index("why")
         why_uid = -1 if rest[i + 1] == "all" else int(rest[i + 1])
         rest = rest[:i] + rest[i + 2:]
-    func = rest[0] if rest else nonmatching_func(src)
+    func = source_function(src, rest[0] if rest else None)
     if not func:
         sys.exit("name the function: scope.py FILE.c FUNC")
     os.makedirs(WORK, exist_ok=True)
