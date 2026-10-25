@@ -375,10 +375,8 @@ see `docs/COMPILER_REFERENCES.md` for the scoring controls and limitations.
 also holds other complete routines (its own `pop {pc}`/`bx` and literal pool,
 then another `push {..., lr}`, often after raw `.byte` runs), register the
 missing start instead of skipping the function:
-`build/venv/bin/python tools/hidden_tails.py split START,END,DESCRIPTION`
-(no commas in DESCRIPTION; END empty keeps the new function as retained assembly; `scan` lists
-candidates). It updates `symbols/build_extra_functions.csv`,
-`symbols/progress_extra_functions.csv` and the progress inventory. Check the
+`python3 tools/add_function.py START` adds it to the inventory
+(`symbols/progress_functions.csv`), and `make` then splits it off. Check the
 start with objdump and look for references first (see
 `docs/SCENE_ACTOR_BEHAVIOR.md`), then match the shortened function. Commit the
 boundary separately (`boundary XXXXXXXX: ...`); the full build validates it.

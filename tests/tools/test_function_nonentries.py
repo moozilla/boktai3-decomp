@@ -21,8 +21,6 @@ class NonentryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             source = Path(tmp) / 'code.s'
             source.write_text('\n'.join(code))
-            with patch.object(progress, 'function_nonentries', return_value={0x0806070C}):
-                self.assertEqual(progress.assembly_addresses(source), [0x08060708, 0x080607B0])
             filtered = split.remove_nonentry_starts(code, {0x0806070C})
             self.assertIn('sub_0806070C: @ 0x0806070C', filtered)
             self.assertIn('\tpush {r6}', filtered)
@@ -35,11 +33,8 @@ class NonentryTests(unittest.TestCase):
             _, sizes = progress.load_functions(inventory, symbols)
             self.assertEqual(sizes['sub_08060708'], 168)
 
-    def test_reject_duplicate_or_unevidenced_nonentries(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp) / 'nonentries.csv'
-            for rows in ('0806070C,reviewed\n0806070C,duplicate\n', '0806070C,\n',
-                         '0806070D,unaligned\n'):
-                path.write_text('address,evidence\n' + rows)
-                with self.assertRaises(ValueError):
-                    split.function_nonentries(path)
+    def test_boundaries_derive_from_the_inventory(self):
+        with patch.object(split, 'inventory_starts', return_value=[0x08060708, 0x08060790, 0x080607B0]), \
+             patch.object(split, 'disassembler_starts', return_value={0x08060708, 0x0806070C, 0x080607B0}):
+            self.assertEqual(split.function_nonentries(), {0x0806070C})
+            self.assertEqual(split.extra_function_starts(), {0x08060790})

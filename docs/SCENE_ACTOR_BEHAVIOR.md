@@ -204,7 +204,7 @@ Two complete independent routines were hidden in `.incbin` tails:
 |0807836C|08078430|196|Own PUSH-r4/r5/r6/LR, blink control flow, POP/BX and final alignment after sound routine return/literal pool.|
 |08078550|0807864C|252|Own PUSH/save prologue, independent descriptor steering body, POP/BX and alignment after78430 return.|
 
-Both are registered in `symbols/build_extra_functions.csv` and `symbols/progress_extra_functions.csv`. Full-ROM stored Thumb-pointer searches and halfword-decoded B/Bcc/BL target scans found no references; independent complete function structure supports the boundaries. This adds two functions and leaves the code-byte denominator unchanged. The existing sound routine7827C is **240 bytes**, not its earlier436-byte retained span; its complete C checks exact at240. The following196-byte blink routine is now actually matched.78430 ends78550 and covers288 bytes, rather than claiming the252-byte independent successor.
+Both are registered in the inventory (`symbols/progress_functions.csv`). Full-ROM stored Thumb-pointer searches and halfword-decoded B/Bcc/BL target scans found no references; independent complete function structure supports the boundaries. This adds two functions and leaves the code-byte denominator unchanged. The existing sound routine7827C is **240 bytes**, not its earlier436-byte retained span; its complete C checks exact at240. The following196-byte blink routine is now actually matched.78430 ends78550 and covers288 bytes, rather than claiming the252-byte independent successor.
 
 ### Proximity and script helpers:78078–7836C
 

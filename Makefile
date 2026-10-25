@@ -33,7 +33,7 @@ english: gen/code_sym.s gen/data.s
 setup:
 	tools/setup.sh
 
-gen/code.s: tools/disasm.py symbols/functions.csv
+gen/code.s: tools/disasm.py symbols/functions.csv symbols/progress_functions.csv
 	$(PY) tools/disasm.py
 
 gen/code_sym.s gen/data.s: gen/code.s tools/symbolize.py tools/m4a.py symbols/*.csv symbols/*.txt data/manifest.csv $(wildcard data/*.csv) $(wildcard build/text/*.tsv) $(wildcard build/res/*/*) $(wildcard tools/datafmt/*.py)

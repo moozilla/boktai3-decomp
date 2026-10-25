@@ -80,9 +80,9 @@ Per task:
    docs/FOUNDRY.md say when each helps.
    If a function has no prologue (no `push`, or only `push {r5, r6, r7}`), reads a
    stack frame it never set up, or its neighbour has no epilogue, the split is wrong:
-   it is a label inside another function. `tools/split_audit.py` lists such starts and
-   `--write` records them in `symbols/function_nonentries.csv` (then `make`); match the
-   whole parent as one function.
+   it is a label inside another function. Remove its start from
+   `symbols/progress_functions.csv` (then `make`): the split drops disassembler starts the
+   inventory does not list. Match the whole parent as one function.
 4. Byte-identical only, no handwritten `asm()` instructions. A close miss (fuzzy ≥ 80%)
    may stay as a `#ifdef NONMATCHING` draft (docs/WORKER.md); otherwise leave the
    `INCLUDE_ASM`. Give every function you match a useful name: a file-local

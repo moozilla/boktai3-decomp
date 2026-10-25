@@ -25,36 +25,27 @@ class ArmUnitTests(unittest.TestCase):
             self.assertEqual(Path(build.compiler_for(str(source))).name, "agbcc_arm")
             self.assertEqual(build.cflags_for(str(source)), ["-O2", "-mthumb-interwork"])
 
-    def expand(self, entries, lines):
-        with tempfile.TemporaryDirectory() as directory:
-            inventory = Path(directory) / "boundaries.csv"
-            inventory.write_text("address,isa\n" + entries)
-            return split.apply_extra_boundaries(lines, inventory)
-
-    def test_reviewed_entries_preserve_prefix_and_unmatched_tail(self):
-        original = ['prefix:', '\t.incbin "baserom.gba", 0x4000, 0x20', 'suffix:']
-        expanded = self.expand("08004004,arm\n08004010,thumb\n", original)
+    def test_cuts_take_the_mode_of_their_block(self):
+        original = ['\tarm_func_start prefix', 'prefix: @ 0x08004000', '\t.incbin "baserom.gba", 0x4000, 0x10',
+                    '\tthumb_func_start other', 'other: @ 0x08004010', '\t.incbin "baserom.gba", 0x4010, 0x10']
+        expanded = split.apply_extra_boundaries(original, {0x08004004, 0x08004012})
         self.assertEqual(expanded, [
-            'prefix:', '\t.incbin "baserom.gba", 0x4000, 0x4',
+            '\tarm_func_start prefix', 'prefix: @ 0x08004000', '\t.incbin "baserom.gba", 0x4000, 0x4',
             '\tarm_func_start sub_08004004', 'sub_08004004: @ 0x08004004',
             '\t.incbin "baserom.gba", 0x4004, 0xc',
-            '\tthumb_func_start sub_08004010', 'sub_08004010: @ 0x08004010',
-            '\t.incbin "baserom.gba", 0x4010, 0x10', 'suffix:'])
-        # Replacing the ARM function consumes only its reviewed range. The
-        # separate Thumb entry remains available as an assembly unit.
-        self.assertEqual(split.c_replacement_end(expanded, 2, 5, {0x08004004}), 5)
-        self.assertEqual(original[1], '\t.incbin "baserom.gba", 0x4000, 0x20')
+            '\tthumb_func_start other', 'other: @ 0x08004010', '\t.incbin "baserom.gba", 0x4010, 0x2',
+            '\tthumb_func_start sub_08004012', 'sub_08004012: @ 0x08004012',
+            '\t.incbin "baserom.gba", 0x4012, 0xe'])
+        # Replacing the ARM function consumes only its own block. The
+        # Thumb function after it remains available as an assembly unit.
+        self.assertEqual(split.c_replacement_end(expanded, 3, 6, {0x08004004}), 6)
+        self.assertEqual(original[2], '\t.incbin "baserom.gba", 0x4000, 0x10')
 
-    def test_malformed_or_unlocated_entries_are_rejected(self):
-        blob = ['\t.incbin "baserom.gba", 0x4000, 0x20']
-        for entries, message in (
-            ("08004002,arm\n", "ISA/alignment"),
-            ("08004004,mips\n", "ISA/alignment"),
-            ("08004004,arm\n08004004,arm\n", "duplicate"),
-            ("08004020,arm\n", "not inside"),
-        ):
-            with self.subTest(entries=entries), self.assertRaisesRegex(ValueError, message):
-                self.expand(entries, blob)
+    def test_misaligned_or_unlocated_starts_are_rejected(self):
+        blob = ['\tarm_func_start prefix', 'prefix: @ 0x08004000', '\t.incbin "baserom.gba", 0x4000, 0x20']
+        for starts, message in (({0x08004002}, "misaligned"), ({0x08004020}, "outside a raw block")):
+            with self.subTest(starts=starts), self.assertRaisesRegex(ValueError, message):
+                split.apply_extra_boundaries(blob, starts)
 
     def test_reviewed_body_fragments_stop_at_exact_endpoint(self):
         lines = ['sub_08004000:',

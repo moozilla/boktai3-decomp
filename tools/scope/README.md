@@ -293,7 +293,7 @@ ported here deliberately. Incremental rebuild after editing one file:
 ### The workspace: new, land, rename
 
 `new FUNC` finds where FUNC's C will live: an `INCLUDE_ASM` line in a unit,
-a hidden start in `symbols/build_extra_functions.csv`, or nowhere yet (a new
+or nowhere yet (a new
 `src/fn/sub_ADDR.c`). It writes `build/scope/work/FUNC.c`: the whole unit with
 FUNC's `INCLUDE_ASM` replaced by a stub (signature from the first
 declaration in the unit or its headers), plus `FUNC.base.c`, the unit as it
@@ -731,8 +731,7 @@ which is exactly `10:1`. Not tested.
   close; what the tool added was knowing which property to aim for.
   Without the tool, `const` parameters, the matched siblings' helper idioms,
   a named `speed` local and other operand orders were all tried with no effect.
-  The sine twin also needed a reviewed `replacement_end` in
-  `symbols/build_extra_functions.csv`: gbadisasm leaves it as a blob.
+  The sine twin also needed its own inventory start: gbadisasm left it as a blob.
 * **Hresvelgr_GetTravelTarget** (sub_0819C5D4): 8/6 -> 3/3 in plain C
   (`build/scope/drafts/gtt_best_natural.c`, not landed). Facts 18 and 19 fixed
   the `+ 112` placement and the double mask. Left: (a) the ROM loads the

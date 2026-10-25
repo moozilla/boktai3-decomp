@@ -19,11 +19,10 @@ import subprocess
 import sys
 
 from romlib import ROOT
-from split import c_functions, nonmatching_functions, function_nonentries, split_nonmatching
+from split import c_functions, nonmatching_functions, split_nonmatching
 
 CODE_END = 0x0824DAFA
 INVENTORY = Path(ROOT) / "symbols/progress_functions.csv"
-EXTRA_BOUNDARIES = Path(ROOT) / "symbols/progress_extra_functions.csv"
 LIBRARIES = Path(ROOT) / "symbols/progress_libraries.csv"
 SUBSYSTEMS = Path(ROOT) / "symbols/progress_subsystems.csv"
 AREAS = Path(ROOT) / "symbols/progress_areas.csv"
@@ -155,32 +154,12 @@ def unit_areas(areas, unit_name, address):
     return ids
 
 
-def assembly_addresses(path):
-    """Read only function-start addresses, never instructions or ROM bytes."""
-    code = Path(path).read_text()
-    nonentries = function_nonentries()
-    return [int(a, 16) for a in re.findall(
-        r"^\t(?:thumb|arm|non_word_aligned_thumb)_func_start \S+\n\w+: @ 0x([0-9A-F]{8})",
-        code, re.M) if int(a, 16) not in nonentries]
-
-
 def write_inventory(path, addresses):
     validate_addresses(addresses)
     with Path(path).open("w", newline="") as f:
         writer = csv.writer(f, lineterminator="\n")
         writer.writerow(["address"])
         writer.writerows([f"{a:08X}"] for a in addresses)
-
-
-def inventory_addresses(assembly, extras=EXTRA_BOUNDARIES):
-    # A few SDK functions have verified C definitions but gbadisasm leaves
-    # their bytes inside the preceding function's span. Keep these reviewed
-    # exceptions explicit rather than accepting arbitrary source definitions.
-    with Path(extras).open(newline="") as f:
-        extra = [int(row["address"], 16) for row in csv.DictReader(f)]
-    if extra:
-        validate_addresses(extra)
-    return sorted(set(assembly_addresses(assembly)) | set(extra))
 
 
 def validate_addresses(addresses):
@@ -237,7 +216,7 @@ def collect_done(funcs, source_root):
     for p in sorted(Path(source_root).rglob("*.c")):
         for n in c_functions(p, with_asm=False):
             if n not in known:
-                raise ValueError(f"{p}: {n} has no progress boundary; refresh inventory")
+                raise ValueError(f"{p}: {n} has no progress boundary; add it with tools/add_function.py")
             done.add(known[n])
     return done
 
@@ -270,7 +249,7 @@ def check_tails(elf, source_root=Path(ROOT) / "src"):
     funcs, sizes = load_functions(INVENTORY, extra=split)
     done = collect_done(funcs, source_root)
     return [f"{n} ({a:08X}) is credited {span} bytes but compiles to {size}; register the tail at "
-            f"{a + size:08X} with tools/hidden_tails.py split"
+            f"{a + size:08X} with tools/add_function.py {a + size:08X}"
             for n, a, span, size in uncovered_tails(funcs, sizes, done, elf_code_sizes(elf))]
 
 
@@ -516,21 +495,13 @@ def main():
     parser.add_argument("--list-pinned", action="store_true",
                         help="print matched functions that use pins/asm hints, smallest first")
     parser.add_argument("--inventory", type=Path, default=INVENTORY)
-    parser.add_argument("--refresh-inventory", metavar="ASSEMBLY", type=Path,
-                        help="locally export address-only metadata from gen/code_sym.s")
-    parser.add_argument("--check-inventory", metavar="ASSEMBLY", type=Path)
     args = parser.parse_args()
-    if args.refresh_inventory:
-        write_inventory(args.inventory, inventory_addresses(args.refresh_inventory))
     split = source_boundaries(args.inventory, Path(ROOT) / "src")
     if split:
-        print("warning: C functions without an inventory boundary (counted as splits; add them to "
-              f"{EXTRA_BOUNDARIES.name} and refresh the inventory): "
+        print("warning: C functions without an inventory boundary (counted as splits; add them with "
+              "tools/add_function.py): "
               + ", ".join(f"{a:08X}" for a in split), file=sys.stderr)
     funcs, sizes = load_functions(args.inventory, extra=split)
-    if args.check_inventory:
-        if [a for _, a in funcs] != inventory_addresses(args.check_inventory):
-            parser.error("progress inventory differs from generated function boundaries")
     done = collect_done(funcs, Path(ROOT) / "src")
     pinned = collect_pinned(funcs, Path(ROOT) / "src") & done
     if args.list_pinned:

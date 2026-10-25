@@ -18,20 +18,12 @@ next start, with the last ending at `0824DAFA`, preserving the historical
 `progress.py` accounting (including intervening alignment and literal pools).
 This measures the code region, not the whole ROM or asset progress.
 
-Reviewed SDK entries in `symbols/progress_extra_functions.csv` are also
-included. The initial three had verified C definitions in `src/lib/m4a.c`, but the
-disassembler absorbs their bytes into preceding function spans. The corrected
-baseline is **4,145 / 11,028 functions**, versus the historical 4,145 / 11,025:
-the old numerator counted these three while its denominator did not. Code-byte
-progress is unchanged. Refreshing metadata unions these explicit boundaries
-with generated starts; it does not infer new boundaries from arbitrary C. Later
-libgcc, RTC, EEPROM and RFU audits add further explicit boundaries, including
-unmatched entries needed to avoid crediting retained assembly blobs. RFU ARM
-entries used by the splitter are separately reviewed in
-`symbols/build_extra_functions.csv`; see `docs/RFU.md`.
-A hidden function named in `symbols/functions.csv` keeps its start in
-`build_extra_functions.csv`: `tools/disasm.py` does not seed it (the splitter
-cuts it), and the C file may define it by that name or as `sub_XXXXXXXX`.
+The inventory is the one list of function starts. `tools/disasm.py` seeds gbadisasm
+with every start in it (a short `NO_SEED` list names the two it cannot take), `split.py`
+drops any start gbadisasm adds that the inventory does not list (an interior label it
+reached by following a call) and cuts any inventory start gbadisasm leaves inside raw
+bytes, and a C function replaces its bytes up to the next start. Add a start with
+`python3 tools/add_function.py ADDR`, remove one by deleting its line, then `make`.
 
 The same `split.c_functions` scanner used by the build identifies non-static C
 definitions and address aliases. `INCLUDE_ASM` placeholders and static helpers
@@ -89,26 +81,17 @@ From the repository root:
 ```sh
 python3 -m unittest discover -s tests/tools -p 'test_progress.py' -v
 python3 tools/progress.py --json /tmp/report.json --markdown /tmp/PROGRESS.md
-python3 tools/progress.py --check-inventory gen/code_sym.s
 ```
 
-After a disassembly update changes function boundaries:
-
-```sh
-python3 tools/progress.py --refresh-inventory gen/code_sym.s
-python3 tools/progress.py --check-inventory gen/code_sym.s
-make
-```
-
-Review the address-only CSV diff and commit it with the boundary change only
-after `make` prints `build/boktai3.gba: OK`. Never add `gen/code_sym.s` or a ROM.
+After adding or removing a function start (`tools/add_function.py ADDR`), run
+`make`, and commit the address-only CSV diff only after it prints
+`build/boktai3.gba: OK`. Never add `gen/code_sym.s` or a ROM.
 A name-only change in `symbols/functions.csv` needs no inventory refresh.
 
 When a C unit matches a function that gbadisasm keeps inside a neighbour's span
 (a split tail), `progress.py` still counts it: it takes the address from
 `symbols/functions.csv` (or the `sub_XXXXXXXX` name), adds a boundary in memory
-and prints a warning. Make it permanent by adding the address with evidence to
-`symbols/progress_extra_functions.csv` and refreshing the inventory as above.
+and prints a warning. Make it permanent with `tools/add_function.py ADDR`.
 
 ## Registering the public project
 

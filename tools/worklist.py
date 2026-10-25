@@ -31,8 +31,7 @@ def functions():
     for ln in code:
         m = re.match(r"^_([0-9A-F]{8}):", ln)
         if m and int(m.group(1), 16) in extra:
-            # A reviewed start the disassembler left as a plain label
-            # (symbols/build_extra_functions.csv).
+            # An inventory start the disassembler left as a plain label.
             prev = cur
             cur = {"name": "sub_" + m.group(1), "addr": int(m.group(1), 16), "insns": 0,
                    "calls": 0, "branches": 0, "jt": False}
@@ -50,7 +49,7 @@ def functions():
         if m and cur["addr"] is None:
             addr = int(m.group(1), 16)
             if addr in nonentries and prev is not None:
-                # A reviewed interior label (symbols/function_nonentries.csv): the split keeps
+                # An interior label (a disassembler start not in the inventory): the split keeps
                 # it inside its owner, so count its body there too.
                 out.pop()
                 cur = prev

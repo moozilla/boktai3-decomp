@@ -67,9 +67,8 @@ for your callers, say so in your report rather than working around it silently.
   header first.
 * **Gaps**: a range may hold small functions gbadisasm left as data or labels
   (`_08XXXXXX:` in `gen/code_sym.s`). A unit must be contiguous, so decompile
-  them (they are usually trivial). Name them `sub_<ADDR>` and register each one in
-  `symbols/progress_extra_functions.csv` (`ADDR,evidence`, keep sorted), then
-  `tools/progress.py --refresh-inventory gen/code_sym.s`. If a gap cannot be
+  them (they are usually trivial). Name them `sub_<ADDR>` and register each one
+  with `tools/add_function.py ADDR` (then `make`). If a gap cannot be
   matched, keep it as `INCLUDE_ASM` in the unit.
 * Unmatched functions inside the range stay as
   `INCLUDE_ASM("asm/nonmatching", name);` (or a `#ifdef NONMATCHING` draft) in

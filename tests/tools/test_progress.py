@@ -143,7 +143,7 @@ class ProgressTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / 'unknown.c').write_text('void sub_08000104(void) { }\n')
-            with self.assertRaisesRegex(ValueError, 'refresh inventory'):
+            with self.assertRaisesRegex(ValueError, 'add_function'):
                 progress.collect_done([('sub_08000100', 0x08000100)], root)
 
     def test_split_definition_gets_boundary(self):
@@ -157,27 +157,6 @@ class ProgressTests(unittest.TestCase):
                                          'void sub_08000104(void) { }\nvoid NoAddress(void) { }\n')
             self.assertEqual(progress.source_boundaries(inventory, root, symbols),
                              [0x08000104, 0x08000108])
-
-    def test_export_only_function_start_addresses(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            assembly = Path(tmp) / 'code.s'
-            assembly.write_text('\tthumb_func_start sub_08000100\n'
-                                'sub_08000100: @ 0x08000100\n\tmovs r0, #1\n'
-                                'literal: @ 0x08000104\n\t.word 0xDEADBEEF\n'
-                                '\tarm_func_start Named\nNamed: @ 0x08000108\n'
-                                '\tnon_word_aligned_thumb_func_start Odd\nOdd: @ 0x0800010A\n')
-            self.assertEqual(progress.assembly_addresses(assembly),
-                             [0x08000100, 0x08000108, 0x0800010A])
-
-    def test_reviewed_extra_boundary_is_not_double_counted(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            assembly = Path(tmp) / 'code.s'
-            assembly.write_text('\tthumb_func_start sub_08000100\n'
-                                'sub_08000100: @ 0x08000100\n')
-            extras = Path(tmp) / 'extras.csv'
-            extras.write_text('address,evidence\n08000100,already known\n08000104,verified SDK entry\n')
-            self.assertEqual(progress.inventory_addresses(assembly, extras), [0x08000100, 0x08000104])
-
 
 
 class AreaCategoryTest(unittest.TestCase):

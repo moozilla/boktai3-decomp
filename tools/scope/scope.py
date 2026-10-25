@@ -527,14 +527,10 @@ def rom_data(func, addr, code, arm=False):
 
 
 def is_arm(name, addr, index=None):
-    """FUNC is ARM code: its functions.csv or build_extra_functions.csv mode, or its unit is built
-    with agbcc_arm."""
+    """FUNC is ARM code: its functions.csv mode, or its unit is built with agbcc_arm."""
     import land
     if any(a == addr and m == "arm" for a, m in arm_starts()):
         return True
-    row = land.hidden_row(ROOT, addr)
-    if row:
-        return row["isa"] == "arm"
     kind, dest, _ = land.where(ROOT, name, addr, index)
     path = os.path.join(ROOT, dest)
     return kind == "unit" and "// COMPILER: agbcc_arm" in open(path).read()
@@ -773,7 +769,7 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
         # gbadisasm folded a following function into this one (often after a literal pool)
         at = addr + tail[0][0]
         print(f"ROM goes on past the draft's end with what starts a function at {at:08X} ({tail[0][2]}).  If it is"
-              f" one, register it and rescore: python3 tools/hidden_tails.py split '{at:08X},,DESCRIPTION'")
+              f" one, register it and rescore: python3 tools/add_function.py {at:08X}")
     if only_targets:
         # Same instructions, same size: a label sits before a different instruction. Name both targets.
         at_r = {o: i for i, (o, *_) in enumerate(rom)}
@@ -3987,11 +3983,6 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         nonmatching = False
         print(f"{name}: the draft matches; landing it as exact C")
     kind, dest, asm_name = land.where(ROOT, name, addr)
-    # a hidden function's split block has its own asm/nonmatching file, so its INCLUDE_ASM fallback works
-    # as a plain function's does (its replacement end stays unset: the default build keeps the assembly).
-    # split.py names that block sub_ADDR whatever functions.csv calls the function
-    if kind == "hidden":
-        asm_name = f"sub_{addr:08X}"
     if new_name:  # a name that cannot be applied fails before anything is written
         try:
             land.rename(ROOT, addr, name, new_name, dry=True)
@@ -4000,9 +3991,7 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
     path = os.path.join(ROOT, dest)
     text = open(os.path.abspath(draft)).read()
     before = {path: open(path).read() if os.path.exists(path) else None}
-    extras = os.path.join(ROOT, "symbols", "build_extra_functions.csv")
-    before[extras] = open(extras).read()
-    before.update(registered)  # the csvs as they were before the draft's hidden functions were registered
+    before.update(registered)  # the inventory as it was before the draft's hidden functions were registered
     if kind == "unit":
         cur = before[path]
         if not os.path.exists(base):
@@ -4068,19 +4057,11 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
 def register_draft_functions(name, addr, sizes, draft):
     """A draft can define functions the inventory does not list yet, inside FUNC's extent (code the
     disassembler left in one block): `sub_ADDR`, or a `#define NAME sub_ADDR` alias. Each one that starts
-    with a `push {..., lr}` is registered as `hidden_tails.py split` would. Returns {csv path: text before}."""
-    import csv as _csv
-    import land
+    with a `push {..., lr}` is added to the inventory (tools/add_function.py). Returns {csv path: text before}."""
     import progress
     at = {a for _, a in progress.load_functions()[0]}
     rom = rom_bytes()
     found = []
-    # FUNC itself may count for progress (progress_extra_functions.csv) without a block in the build
-    # (build_extra_functions.csv): split.py then has no label for its C or its INCLUDE_ASM
-    with open(os.path.join(ROOT, "symbols", "progress_extra_functions.csv"), newline="") as f:
-        progress_only = {int(r[0], 16) for r in _csv.reader(f) if r and re.fullmatch(r"[0-9A-Fa-f]{8}", r[0])}
-    if addr in progress_only and not land.hidden_row(ROOT, addr):
-        found.append(addr)
     for f in progress.c_functions(os.path.abspath(draft), with_asm=False):
         m = re.fullmatch(r"sub_([0-9A-F]{8})", f)
         a = int(m.group(1), 16) if m else None
@@ -4090,15 +4071,11 @@ def register_draft_functions(name, addr, sizes, draft):
             found.append(a)
     if not found:
         return {}
-    paths = [os.path.join(ROOT, "symbols", p) for p in
-             ("build_extra_functions.csv", "progress_extra_functions.csv", "progress_functions.csv")]
-    before = {p: open(p).read() for p in paths}
-    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "hidden_tails.py"), "split"]
-                   + [f"{a:08X},," + (f"Registered for the build by land ({name} counted for progress only)" if a == addr
-                                       else f"Hidden function in {name}'s block (registered by land from the draft)")
-                      for a in found],
+    path = str(progress.INVENTORY)
+    before = {path: open(path).read()}
+    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "add_function.py")] + [f"{a:08X}" for a in found],
                    cwd=ROOT, check=True)
-    print(f"{name}: registered " + ", ".join(f"sub_{a:08X}" for a in found) + " for the build")
+    print(f"{name}: registered " + ", ".join(f"sub_{a:08X}" for a in found) + f" in {name}'s block")
     return before
 
 
@@ -4109,14 +4086,6 @@ def land_write(name, addr, kind, dest, path, text, info, nonmatching, funcs, siz
     open(path, "w").write(text)
     fmt = os.path.join(ROOT, "build", "venv", "bin", "clang-format")
     subprocess.run([fmt if os.path.exists(fmt) else "clang-format", "-i", path], cwd=ROOT, check=True)
-    # every hidden function the landed file now defines gets its reviewed end (one landed into a unit
-    # too, and a hidden neighbor the draft wrote alongside it)
-    at = dict(funcs)
-    for f in progress.c_functions(path, with_asm=False):
-        a = at.get(f)
-        row = land.hidden_row(ROOT, a) if a is not None else None
-        if row and not row.get("replacement_end") and not (nonmatching and f == name):
-            land.set_replacement_end(ROOT, a, a + sizes[f], sizes[f])
     bad = []
     for f in progress.c_functions(path, with_asm=False):
         k, inf = score(dest, f, {})
@@ -4133,8 +4102,7 @@ def land_write(name, addr, kind, dest, path, text, info, nonmatching, funcs, siz
                       open(path).read())
         info["fuzzy"] = float(m.group(1)) if m else info.get("fuzzy", 0.0)
     print(f"{name}: landed in {dest} ({kind}; {pins} pins, {bars} barriers in the file)"
-          + (f"; NONMATCHING draft, fuzzy {info.get('fuzzy', 0.0):.1f}%" if nonmatching else "")
-          + ("; build_extra_functions.csv replacement end set" if kind == "hidden" and not nonmatching else ""))
+          + (f"; NONMATCHING draft, fuzzy {info.get('fuzzy', 0.0):.1f}%" if nonmatching else ""))
     if new_name:
         # The landed draft may add local aliases absent during early validation.
         # Discover every actual rename write now, and journal it before mutation.
@@ -4165,8 +4133,7 @@ def cmd_rename(target, new, note=None):
     addr = dict(funcs).get(name)
     if addr is None:
         sys.exit(f"{target}: not in the function inventory")
-    row = land.hidden_row(ROOT, addr)
-    mode = row["isa"] if row else ("arm" if any(a == addr and m == "arm" for a, m in arm_starts()) else "thumb")
+    mode = "arm" if any(a == addr and m == "arm" for a, m in arm_starts()) else "thumb"
     try:
         changed = land.rename(ROOT, addr, name, new, mode=mode, note=note)
     except ValueError as e:

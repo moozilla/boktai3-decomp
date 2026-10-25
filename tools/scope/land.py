@@ -1,15 +1,11 @@
 """File operations behind `scope.py new`, `land` and `rename`: where a function's C lives, how a draft
 goes into the source tree, and how a name change reaches every place that spells it.
 
-A function with no C is in one of three states (scope.py todo counts them):
+A function with no C is in one of two states (scope.py todo counts them):
   in a unit   an INCLUDE_ASM line inside a src/*.c unit: its C replaces that line in that file
-  hidden      a start in symbols/build_extra_functions.csv (code the disassembler left in a blob):
-              a new src/fn/sub_ADDR.c, and the row's replacement_end set to the function's end
-  plain       a function gbadisasm found with no C anywhere: a new src/fn/sub_ADDR.c
+  plain       an inventory function with no C anywhere: a new src/fn/sub_ADDR.c
 """
-import csv
 import glob
-import io
 import os
 import re
 import subprocess
@@ -44,41 +40,13 @@ def include_asm_file(root, names, index=None):
     return next(((index[n], n) for n in names if n in index), None)
 
 
-def hidden_row(root, addr):
-    """The build_extra_functions.csv row for ADDR, or None."""
-    path = os.path.join(root, "symbols", "build_extra_functions.csv")
-    stamp = os.stat(path).st_mtime_ns
-    if _HIDDEN.get("stamp") != stamp:
-        with open(path, newline="") as f:
-            _HIDDEN.update(stamp=stamp, rows={int(r["address"], 16): r for r in csv.DictReader(f)})
-    return _HIDDEN["rows"].get(addr)
-
-
-_HIDDEN = {}
-
-
 def where(root, name, addr, index=None):
-    """('unit', path, asm_name) | ('hidden', path, None) | ('plain', path, None): where FUNC's C goes."""
+    """('unit', path, asm_name) | ('plain', path, None): where FUNC's C goes."""
     hit = include_asm_file(root, [name, f"sub_{addr:08X}"], index)
     if hit:
         return "unit", hit[0], hit[1]
     path = f"src/fn/sub_{addr:08X}.c"
-    return ("hidden" if hidden_row(root, addr) else "plain"), path, None
-
-
-def set_replacement_end(root, addr, end, size):
-    """Give the hidden function at ADDR its reviewed end (the C body replaces exactly that span)."""
-    path = os.path.join(root, "symbols", "build_extra_functions.csv")
-    text = open(path, newline="").read()
-    rows = list(csv.reader(io.StringIO(text)))
-    for r in rows[1:]:
-        if r and int(r[0], 16) == addr:
-            if not re.search(r"exact \d+-byte C body", r[2]):
-                r[2] = re.sub(r";?\s*retained assembly\.?$|\s*\(retained\)", "", r[2]).rstrip() + f"; exact {size}-byte C body"
-            r[3] = f"{end:08X}"
-    out = io.StringIO()
-    csv.writer(out, lineterminator="\n").writerows(rows)
-    open(path, "w").write(out.getvalue())
+    return "plain", path, None
 
 
 def csv_rows(root):
@@ -121,7 +89,6 @@ def rename(root, addr, old, new, mode="thumb", note=None, confidence="low", dry=
     if in_csv or (users and new != old):
         raise ValueError(f"{new} is already used: " + ", ".join((["functions.csv"] if in_csv else []) + users[:5]))
     olds = {old, label}
-    hidden = hidden_row(root, addr) is not None
     changed = []
     for p in sources(root):
         text = open(p).read()
@@ -136,9 +103,6 @@ def rename(root, addr, old, new, mode="thumb", note=None, confidence="low", dry=
             continue
         out = re.sub(r"^#define[ \t]+\w+[ \t]+%s[ \t]*(?://[^\n]*)?\n" % label, "", text, flags=re.M)
         out, n = pat.subn(new, out)
-        if hidden:  # split.py writes a hidden block's assembly as sub_ADDR.s whatever the csv calls it
-            out = re.sub(r'(INCLUDE_ASM\(\s*"[^"]*"\s*,\s*)%s(\s*\))' % re.escape(new),
-                         lambda m: m.group(1) + label + m.group(2), out)
         if out != text:
             changed.append((os.path.relpath(p, root), n))
             if not dry:

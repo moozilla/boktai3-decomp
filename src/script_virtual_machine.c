@@ -418,7 +418,7 @@ void Script_ReadReference(struct ScriptUtilityReference *ref)
 
 /* Gap: scans operands from a hidden cursor argument until the terminating zero
  * type and clears the PC. gbadisasm left it as data; no caller (bl or pointer)
- * has been found yet. See symbols/progress_extra_functions.csv. */
+ * has been found yet. See symbols/progress_functions.csv. */
 u8 *sub_0821AAF4(u8 *p)
 {
     s32 type, value;
@@ -511,7 +511,7 @@ u32 Script_RegisterCommandTable(struct ScriptCommandTable *n)
 
 /* Gap: unlinks a command table from the registered list, returning 0 if found in
  * the middle, -1 if it was the head or not found. gbadisasm left it as data; no
- * caller (bl or pointer) has been found yet. See symbols/progress_extra_functions.csv. */
+ * caller (bl or pointer) has been found yet. See symbols/progress_functions.csv. */
 s32 sub_0821ABF8(struct ScriptCommandTable *n)
 {
     struct ScriptCommandTable *cur;
@@ -612,7 +612,7 @@ s32 Script_CallInlineProcedure(u8 *p)
 
 /* Gap: a binary search by key over a ScriptArchiveEntry table, returning the entry
  * pointer (not its value, unlike Script_LookupArchive). gbadisasm left it as data;
- * no caller (bl or pointer) has been found yet. See symbols/progress_extra_functions.csv. */
+ * no caller (bl or pointer) has been found yet. See symbols/progress_functions.csv. */
 void *sub_0821AD98(void *table, u32 key, s32 count)
 {
     struct ScriptArchiveEntry *tbl = table;

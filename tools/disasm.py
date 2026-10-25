@@ -1,26 +1,21 @@
 #!/usr/bin/env python3
 """Generate the reassemblable disassembly (gen/code.s) with gbadisasm.
 
-Seeds functions from:
-  * fixed entry points (crt0, AgbMain, ...)
-  * every Thumb BL target that starts with `push {..., lr}`
-  * symbols/functions.csv (names are applied; hidden starts in
-    symbols/build_extra_functions.csv are left to split.py)
-  * Thumb function pointers found in literal pools of a previous pass
-    (iterated until no new functions appear)
+Seeds every function start in symbols/progress_functions.csv (the inventory, the one list of
+function starts), with names and modes from symbols/functions.csv, in a single gbadisasm run.
+gbadisasm still follows calls on its own, so it can add a start inside a function (an interior
+push); split.py drops the starts the inventory does not list and cuts the ones gbadisasm missed.
 
 The generated assembly is derived from the ROM, so it is written to build/
 and never committed; the inputs (this script + symbols/) are the source of truth.
 """
 import csv
 import os
-import re
 import subprocess
 import sys
 
-from romlib import ROOT, baserom_path, load_rom, u16, u32
+from romlib import ROOT, baserom_path
 
-CODE_END = 0x0824DAFA  # first byte after the last function (verified by rebuild)
 GBADISASM = os.environ.get("GBADISASM", os.path.join(ROOT, "build", "tools", "gbadisasm", "gbadisasm"))
 
 FIXED = [
@@ -32,10 +27,23 @@ FIXED = [
 # They are position-independent apart from literal-pool data addresses, so they
 # disassemble and reassemble at their ROM addresses.
 IWRAM_ARM = [0x08000350, 0x08000430, 0x08000E90, 0x08001038, 0x08001120, 0x080012E0]
+# Unnamed ARM entries outside IWRAM_ARM: RFU callback trampolines (`bx r2`, `bx r1`; docs/RFU.md)
+ARM_ENTRIES = [0x0824538C, 0x08245390, 0x08245394]
+# Inventory starts gbadisasm cannot take as seeds; split.py cuts them from the bytes instead
+NO_SEED = {
+    0x08244A38: "IntrSIO32: seeding it trips gbadisasm's print_disassembly assertion (addr <= nextAddr)",
+    0x0822F1B8: "m4a stub that branches into SoundMainRAM's ROM copy: seeded, gbadisasm decodes that"
+                " overlay as ARM code; unseeded it still finds the stub by its caller",
+}
 # ROM ranges that are code linked elsewhere (IWRAM overlays): emit as data
 OVERLAYS = [
     (0x0822F248, 0x0822F648, "m4a_SoundMainRAM_030035F0"),
 ]
+
+
+def inventory():
+    with open(os.path.join(ROOT, "symbols", "progress_functions.csv"), newline="") as f:
+        return {int(r["address"], 16) for r in csv.DictReader(f)}
 
 
 def load_names():
@@ -45,54 +53,6 @@ def load_names():
         for r in csv.DictReader(open(p)):
             names[int(r["addr"], 16)] = r
     return names
-
-
-def hidden_starts():
-    p = os.path.join(ROOT, "symbols", "build_extra_functions.csv")
-    if not os.path.exists(p):
-        return set()
-    return {int(r["address"], 16) for r in csv.DictReader(open(p))}
-
-
-def bl_targets(b):
-    seeds = set()
-    for o in range(0, CODE_END - 0x08000000, 2):
-        h1, h2 = u16(b, o), u16(b, o + 2)
-        if (h1 & 0xF800) == 0xF000 and (h2 & 0xF800) == 0xF800:
-            off11 = h1 & 0x7FF
-            if off11 & 0x400:
-                off11 -= 0x800
-            t = o + 4 + (off11 << 12) + ((h2 & 0x7FF) << 1)
-            if 0 <= t < CODE_END - 0x08000000 and (u16(b, t) & 0xFF00) == 0xB500:
-                seeds.add(0x08000000 + t)
-    return seeds
-
-
-def data_table_seeds(b):
-    """Thumb entries referenced from aligned words anywhere in the ROM
-    (callback/state tables in the data region), which never show up as code
-    literals. Only entries that start with a push are taken."""
-    seeds = set()
-    for o in range(0, len(b) - 3, 4):
-        v = u32(b, o)
-        if v & 1 and 0x08000400 <= v < CODE_END:
-            a = v & ~1
-            if (u16(b, a - 0x08000000) & 0xFE00) == 0xB400 and not in_overlay(a):
-                seeds.add(a)
-    return seeds
-
-
-def plausible_entry(b, a):
-    """A pointer-derived Thumb entry must look like a function start: a push,
-    or directly after a return / alignment padding."""
-    o = a - 0x08000000
-    h = u16(b, o)
-    if (h & 0xFE00) == 0xB400:  # push {...} / push {..., lr}
-        return True
-    prev = u16(b, o - 2)
-    prev2 = u16(b, o - 4)
-    return (prev & 0xFF80) == 0x4700 or (prev & 0xFF00) == 0xBD00 or prev == 0 or \
-        (prev2 & 0xFF80) == 0x4700 and prev == 0x0000
 
 
 def in_overlay(a):
@@ -131,35 +91,16 @@ def run(cfg):
 def main():
     if not os.path.exists(GBADISASM):
         sys.exit(f"gbadisasm not found at {GBADISASM}; run tools/setup.sh")
-    b = load_rom()
     names = load_names()
-    # A hidden function (symbols/build_extra_functions.csv) may carry a name in functions.csv,
-    # but its start is cut by split.py; seeding it here would change the disassembly around it.
-    seeds = bl_targets(b) | (set(names) - hidden_starts()) | data_table_seeds(b)
+    for a in ARM_ENTRIES:
+        names.setdefault(a, {"name": f"sub_{a:08X}", "mode": "arm"})
+    seeds = {a for a in inventory() if a >= FIXED[0][1]} - set(NO_SEED)
     outdir = os.path.join(ROOT, "gen")
     os.makedirs(outdir, exist_ok=True)
     cfg = os.path.join(outdir, "disasm.cfg")
-    for it in range(6):
-        write_cfg(cfg, seeds, names)
-        asm = run(cfg)
-        ptrs = {int(v, 16) for v in re.findall(r"\.4byte 0x(08[0-9A-F]{6})", asm)}
-        new = {p & ~1 for p in ptrs if p & 1 and p < CODE_END} - seeds
-        gaps = [(0x08000000 + int(o, 16), int(n, 16)) for o, n in
-                re.findall(r'\.incbin "baserom\.gba", (0x[0-9a-f]+), (0x[0-9a-f]+)', asm)]
-
-        byte_labels = {int(x, 16) for x in re.findall(r"^_([0-9A-F]{8}):\n\t\.byte ", asm, re.M)}
-
-        def in_gap(a):
-            return a in byte_labels or any(s <= a < s + n for s, n in gaps)
-        # a word-aligned target in undecoded bytes is accepted too: small leaf
-        # callbacks often sit right after a literal pool or padding
-        new = {a for a in new if not in_overlay(a) and
-               (plausible_entry(b, a) or (a % 4 == 0 and in_gap(a)))}
-        nfunc = asm.count("func_start")
-        print(f"pass {it}: {nfunc} functions, {len(new)} new pointer-derived seeds", file=sys.stderr)
-        if not new:
-            break
-        seeds |= new
+    write_cfg(cfg, seeds, names)
+    asm = run(cfg)
+    print(f"{asm.count('func_start')} functions from {len(seeds)} inventory seeds", file=sys.stderr)
     open(os.path.join(outdir, "code.s"), "w").write(asm)
 
 
