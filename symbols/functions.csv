@@ -4692,6 +4692,7 @@ addr,name,mode,confidence,source,notes
 08120894,SceneActor_UpdateKnockbackFall,thumb,low,src-alias,
 08120B44,ActorPhysics_UpdateFallMotion,thumb,low,src-alias,
 08120DAC,SceneActor_DispatchCommands,thumb,low,src-alias,
+08121094,RegistryA8CB_DisableCommandsFromScript,thumb,low,src-alias,Reads script keyword n; finds the owned RegistryA8CB object; and clears its command-enable flag.
 081210C4,RegistryA8CB_ResetUpdateState,thumb,low,src-alias,Clears update flags and runs the object's state processing routine.
 081210DC,RegistryA8CB_UpdateAnimation,thumb,low,src-alias,Updates embedded animation state and advances the counter unless flag bits inhibit it.
 08121110,ActorAction_RunActiveCallbacks,thumb,low,src-alias,
