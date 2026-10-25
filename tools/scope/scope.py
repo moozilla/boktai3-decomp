@@ -2155,6 +2155,17 @@ def cmd_calls(src, func, env):
     same = sum(b.size for b in sm.get_matching_blocks())
     print(f"{func}: {len(rom)} ROM calls, {len(dr)} draft calls, {same} in the same order"
           + ("" if same < len(rom) or len(rom) != len(dr) else ": every call present, in order"))
+    # per callee: a block laid out elsewhere shows below as missing + extra although nothing is missing
+    import collections
+    want, got = collections.Counter(n for _, n in rom), collections.Counter(n for _, n in dr)
+    short = {n: c - got[n] for n, c in want.items() if c > got[n]}
+    over = {n: c - want[n] for n, c in got.items() if c > want[n]}
+    if not short and not over:
+        if same < len(rom):
+            print("  every callee called as often as in the ROM: the differences below are order only")
+    else:
+        print("  by callee: " + ", ".join([f"{n} {c} fewer" for n, c in sorted(short.items())]
+                                          + [f"{n} {c} more" for n, c in sorted(over.items())]))
     for tag, i1, i2, j1, j2 in sm.get_opcodes():
         if tag == "equal":
             continue
@@ -3409,6 +3420,17 @@ def put_definition(src, snippet, func):
     if not sp:
         sys.exit(f"{func}: no definition in {src} to replace (`new` writes one)")
     start = pat.search(text, sp[0]).start()
+    # what a put inserts sits between these markers, and the next put replaces exactly that
+    begin, end = f"// scope: put {func} begin\n", f"// scope: put {func} end\n"
+    a = text.find(begin)
+    b = text.find(end, a) if a >= 0 else -1
+    if a >= 0 and b >= 0 and a <= start < b:
+        b += len(end)
+        have = set(re.findall(r"^#(?!define\b).*$", text[:a] + text[b:], re.M))
+        new = "".join(ln for ln in new.splitlines(True) if not (ln.startswith("#") and ln.rstrip("\n") in have))
+        open(path, "w").write(text[:a] + begin + new.strip("\n") + "\n" + end + text[b:])
+        print(f"{func}: {src}: the previous put replaced with {snippet}")
+        return
     # #include and other directives the unit has already are dropped (a #define replaces the old one below)
     have = set(re.findall(r"^#(?!define\b).*$", text, re.M))
     new = "".join(ln for ln in new.splitlines(True) if not (ln.startswith("#") and ln.rstrip("\n") in have))
@@ -3444,7 +3466,7 @@ def put_definition(src, snippet, func):
         gap, n = re.subn(r"^#define\s+%s\b(?:[^\n]*\\\n)*[^\n]*\n?" % re.escape(name), "", gap, flags=re.M)
         dropped += [name] * bool(n)
     gap = re.sub(r"\n{3,}", "\n\n", gap)
-    open(path, "w").write(text[:prev_end] + gap + new.strip("\n") + "\n" + text[sp[1]:])
+    open(path, "w").write(text[:prev_end] + gap + begin + new.strip("\n") + "\n" + end + text[sp[1]:])
     print(f"{func}: {src}: definition replaced with {snippet}"
           + (f" (replacing the earlier {', '.join(sorted(set(dropped)))})" if dropped else ""))
 
@@ -3976,7 +3998,7 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         if stale:
             text = land.seed_from_twin(text, name, name, stale)
             print(f"{name}: dropped {', '.join(stale)} from the draft (defined in other files already)")
-    text = re.sub(r"^// scope: write .*\n", "", text, flags=re.M)
+    text = re.sub(r"^// scope: (?:write|put) .*\n", "", text, flags=re.M)
     text = re.sub(r"/\* Ghidra's pseudo-C \(a reading aid\):\n.*?\*/\n", "", text, flags=re.S)
     text = re.sub(r"/\* scope: seeded from .*?\*/\n", "", text, flags=re.S)
     if nonmatching:
