@@ -662,7 +662,7 @@ def cmd_integrate(args):
     if not done or "--no-pr" in args:
         return 0
     b = subprocess.run(["make", "-j8"], cwd=tree, capture_output=True, text=True)
-    for _ in range(3):
+    for _ in range(10):  # make stops at its first failing file, so each round finds one culprit
         if built(b):
             break
         # the build names the file it failed on: drop the commits that touched it and build the rest,

@@ -121,6 +121,7 @@ def rename(root, addr, old, new, mode="thumb", note=None, confidence="low", dry=
     if in_csv or (users and new != old):
         raise ValueError(f"{new} is already used: " + ", ".join((["functions.csv"] if in_csv else []) + users[:5]))
     olds = {old, label}
+    hidden = hidden_row(root, addr) is not None
     changed = []
     for p in sources(root):
         text = open(p).read()
@@ -135,6 +136,9 @@ def rename(root, addr, old, new, mode="thumb", note=None, confidence="low", dry=
             continue
         out = re.sub(r"^#define[ \t]+\w+[ \t]+%s[ \t]*(?://[^\n]*)?\n" % label, "", text, flags=re.M)
         out, n = pat.subn(new, out)
+        if hidden:  # split.py writes a hidden block's assembly as sub_ADDR.s whatever the csv calls it
+            out = re.sub(r'(INCLUDE_ASM\(\s*"[^"]*"\s*,\s*)%s(\s*\))' % re.escape(new),
+                         lambda m: m.group(1) + label + m.group(2), out)
         if out != text:
             changed.append((os.path.relpath(p, root), n))
             if not dry:
