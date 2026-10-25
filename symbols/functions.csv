@@ -8677,6 +8677,7 @@ addr,name,mode,confidence,source,notes
 0820DE60,PoisonHand_WaitForPlayerApproach,thumb,low,src-alias,State callback that starts the emergence sequence when the player enters range
 0820DEE0,PoisonHand_UpdateEmergence,thumb,low,src-alias,
 0820E128,PoisonHand_UpdateDefeatBurst,thumb,low,src-alias,
+0820E2A4,PoisonHand_Update,thumb,low,src-alias,Runs the action callback; applies damage and defeat particles; updates palette/blink timers; and advances sprite animation.
 0820E718,PoisonHand_Destroy,thumb,low,src-alias,Destruction callback that removes the Poison Hand sprite
 0820E724,PoisonHand_InitializeFromScript,thumb,low,src-alias,
 0820EBA8,PoisonHand_Create,thumb,medium,gcl-name,name from GCL key FE92 ポイズンハンド (Poison Hand); registry callback
