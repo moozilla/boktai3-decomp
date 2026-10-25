@@ -23,6 +23,7 @@ address,isa,evidence,replacement_end
 08014C28,thumb,ParticleManager clear: removes every live effect in the six particle groups and clears their flags; raw 08014C28-08014CA4 span,08014C98
 08014C98,thumb,Clears the gUnk_02000064 pointer; leaf at the end of the raw 08014C28-08014CA4 span,08014CA4
 08015154,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08015160
+08015A0C,thumb,Registered for the build by land (sub_08015A0C counted for progress only),
 08015B1C,thumb,Independent exact 104-byte fan emission wrapper inside retained byte tail,08015B84
 08015C90,thumb,Independent exact 96-byte angled burst wrapper inside retained byte tail,08015CF0
 080164AC,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,080164B8

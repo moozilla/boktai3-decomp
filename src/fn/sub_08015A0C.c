@@ -1,0 +1,48 @@
+#include "global.h"
+#include "breakable_prop.h"
+#include "scene_vec.h"
+
+extern u32 gUnk_03005308;
+static inline u16 Particles_NextRandom(void)
+{
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    return ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+}
+#ifdef NONMATCHING
+// fuzzy: 55.8%
+// scope shape 38 (differences once low registers are set aside)
+void sub_08015A0C(struct SceneVec *base, struct SceneVec *mask, s32 yaw, s32 yawRange, s32 count,
+                  s32 type, s32 flags, s32 speed, s32 horizontal, s32 start, s32 decay)
+{
+    struct AnimatedParticleConfig config;
+    struct SceneVec pos;
+    s32 i;
+    config.type = type;
+    config.flags = flags;
+    config.speed = speed;
+    config.vertical = 0;
+    config.verticalRange = 0;
+    config.horizontal = horizontal;
+    config.horizontalRange = 0;
+    config.pitch = 0;
+    config.pitchRange = 0;
+    config.yaw = yaw;
+    config.yawRange = yawRange;
+    config.verticalStart = start;
+    config.verticalStartRange = 0;
+    config.verticalDecay = decay;
+    config.verticalDecayRange = 0;
+    config.horizontalStart = start;
+    config.horizontalStartRange = 0;
+    config.horizontalDecay = decay;
+    config.horizontalDecayRange = 0;
+    for (i = 0; i < count; i++) {
+        pos.x = (Particles_NextRandom() & mask->x) + base->x;
+        pos.y = (Particles_NextRandom() & mask->y) + base->y;
+        pos.z = (Particles_NextRandom() & mask->z) + base->z;
+        AnimatedParticles_Create(1, &pos, &config);
+    }
+}
+#else
+INCLUDE_ASM("asm/nonmatching", sub_08015A0C);
+#endif
