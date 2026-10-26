@@ -1,10 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 91.3%
-// fix.py best (sweep after the inlined-insn fix)
-// Logic matches; reload-register rotation differs in case 0 (link pointer in r1 not r0,
-// 0x02000580 loaded after the shift) and for the final mode store.
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -53,9 +48,10 @@ void sub_08226CF8(struct Camera2 *camera)
             if (gUnk_030053F4 & 0x800) {
                 struct LinkState *link = gUnk_020004B4;
                 {
-                    typeof(link->player) v1 = link->player;
-                    if (link && (v1 >= 0)) {
-                        struct Player **p = &gUnk_02000580[link->player];
+                    s16 index;
+                    if (link && (index = link->player) >= 0) {
+                        struct Player **table = gUnk_02000580;
+                        struct Player **p = table + index;
                         if (*p) {
                             camera->pos.x = (*p)->x;
                             camera->pos.y = (*p)->y + 150;
@@ -102,7 +98,3 @@ void sub_08226CF8(struct Camera2 *camera)
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08226CF8);
-#endif
