@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
+#include "engine.h"
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
-extern u32 gUnk_03005308;
 static inline u8 IsControlled(struct SceneActorRegistryResetView *a)
 {
     if (a->object == (void *)1)
@@ -96,9 +96,9 @@ void SceneActorReaction_PlayStaggerBurst(struct SceneActorRegistryResetView *inp
         range.packed.y = 60;
         range.packed.z = 40;
         {
-            u32 index = (gUnk_03005308 + 1) & 1023;
+            u32 index = (gRandomIndex + 1) & 1023;
             u32 mode;
-            gUnk_03005308 = index;
+            gRandomIndex = index;
             index *= 2;
             mode = *(const u16 *)((u32)gUnk_0203B400 + index) & randomMask;
             mode += 1;

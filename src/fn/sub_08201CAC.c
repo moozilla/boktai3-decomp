@@ -12,7 +12,7 @@ struct S {
     u8 p2[0x1a8 - 0x48];
     s16 h1a8;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);
@@ -26,8 +26,8 @@ u32 ScriptCombatActor_UpdateDefeatEffect(struct S *p)
             u32 idx, t;
             v = p->v;
             q[1] += 0xc8;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-            idx = gUnk_03005308;
+            gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+            idx = gRandomIndex;
             t = *(u8 *)&gUnk_0203B400[idx];
             SpriteParticle_CreateDefaultVariant4384(&v, 0x80, 0x20, 0xc, 0xc, 0x18, t, 0x20, 0x20,
                                                     1, 2, 0x200);

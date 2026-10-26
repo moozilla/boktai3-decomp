@@ -8,6 +8,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 #include "scene_actor_chase.h"
+#include "ram.h"
 
 static inline u8 Test16(u16 *p, u32 mask)
 {
@@ -21,9 +22,9 @@ static inline u32 PickTurn(u32 dir)
     s32 i;
     for (i = 0; i < 4; i++) {
         {
-            u32 index = (gUnk_03005308 + 1) & 1023;
+            u32 index = (gRandomIndex + 1) & 1023;
             u32 v;
-            gUnk_03005308 = index;
+            gRandomIndex = index;
             index *= 2;
             v = *(const u16 *)(index + (u32)gUnk_0203B400);
             {
@@ -74,7 +75,7 @@ static inline u8 Arrive(void *obj)
     s32 cell;
     s32 player;
     Chase_SnapToRoute(*((struct ContactPosition **)(((u8 *)actor) + 0x5D4)), ((u8 *)actor) + 0x448);
-    if (Chase_Test(gUnk_030053F4, 0x4800)) {
+    if (Chase_Test(gEngineFlags, 0x4800)) {
         register struct ChaseTarget *t asm("r1") = *slot;
         if (!t)
             goto invoke;
@@ -129,15 +130,15 @@ static inline u8 Arrive(void *obj)
     goto done;
 reroute: {
     struct ContactPosition *targetPointer = &target;
-    s32 x = Mod(cell, *((s16 *)(gUnk_030052F4->cells + 4)));
-    s32 z = Div(cell, *((s16 *)(gUnk_030052F4->cells + 4)));
+    s32 x = Mod(cell, *((s16 *)(gTerrainMap->cells + 4)));
+    s32 z = Div(cell, *((s16 *)(gTerrainMap->cells + 4)));
     u8 *data;
     targetPointer->x = (x << 8) + 0x80;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + ((cell * 4) + 12);
+        data = gTerrainMap->cells + ((cell * 4) + 12);
     targetPointer->y = ((*data) & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
     if (Chase_TryRoute(actor, *((void **)(group + 0x1FC)), &actor->position, &target))
@@ -152,14 +153,13 @@ done:
 // confidence=low: straight-path test falls back to player route reacquisition.
 u8 SceneActorTerrain_CanTraverseCell(s32, s32, s32, u32);
 u8 Mummy_RequestStraightRoute(struct SceneActorRegistryResetView *);
-extern u16 gUnk_02000508;
 static inline s32 GridWidth(void)
 {
-    return *(s16 *)(gUnk_030052F4->cells + 4);
+    return *(s16 *)(gTerrainMap->cells + 4);
 }
 static inline s32 GridHeight(void)
 {
-    return *(s16 *)(gUnk_030052F4->cells + 6);
+    return *(s16 *)(gTerrainMap->cells + 6);
 }
 
 static inline u8 CanReach(s32 cell, s32 goal, s32 y, u32 kind, s32 total)
@@ -205,7 +205,7 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
     u8 *body = actor->context;
     u8 *group = (u8 *)(&actor->group);
     s32 goal = *((u16 *)((*((u8 **)(actor->fieldDC + 0x1c))) + 6));
-    if ((*((u32 *)(group + 0x64))) != gUnk_02000508)
+    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId)
         return 0;
     if (goal == actor->terrainCell)
         return 1;

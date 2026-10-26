@@ -1,5 +1,5 @@
-#define gSpritePairPool gUnk_020004D4
 #include "global.h"
+#include "ram.h"
 struct SpritePairEntry {
     u8 pad0[0x44];
     u8 animData[0x1c];
@@ -20,7 +20,6 @@ struct SpritePairPool {
     struct SpritePairEntry entries[2];
     u32 counter;
 };
-extern struct SpritePairPool *gUnk_020004D4;
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void *ScriptProc_Start(u16, u16);
@@ -44,6 +43,6 @@ s32 SpritePairPool_Initialize(struct SpritePairPool *pool)
         entry->active = 0;
     }
     pool->counter = 0;
-    gUnk_020004D4 = pool;
+    gSpritePairPool = pool;
     return 0;
 }

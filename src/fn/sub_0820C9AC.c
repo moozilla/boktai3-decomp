@@ -25,7 +25,7 @@ struct ScreamerParticleParameters {
 };
 static inline u32 PauseFlags(u32 mask)
 {
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 static inline u32 TestFlags(u32 *flags, u32 mask)
 {
@@ -33,8 +33,8 @@ static inline u32 TestFlags(u32 *flags, u32 mask)
 }
 static inline u32 RandomFrom(const u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    return table[gRandomIndex];
 }
 static inline u32 RandomValue(void)
 {

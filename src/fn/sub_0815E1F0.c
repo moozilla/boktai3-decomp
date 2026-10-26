@@ -76,7 +76,7 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
         shift = -1;
     else
         shift = 0;
-    if (((source->reactionFlags & 0x80010)) && !(gUnk_030053F4 & 0x1000))
+    if (((source->reactionFlags & 0x80010)) && !(gEngineFlags & 0x1000))
         p->positionResetState = 1;
     else
         p->positionResetState = 0;
@@ -95,7 +95,7 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
             register u32 power asm("r2") = source->unknown3C;
             u32 duration = power + 60;
             u32 flags;
-            flags = gUnk_030053F4 & 0x1000;
+            flags = gEngineFlags & 0x1000;
             // Preserve the original evaluated values without changing the callee's ABI.
             asm volatile("" : "+r"(flags) : "r"(power), "r"(duration));
             Player_RequestTimedReset(p, power + 60);

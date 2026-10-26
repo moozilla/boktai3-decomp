@@ -7,11 +7,11 @@ struct G {
     u32 a72c;
     u32 a730;
 };
-extern struct G *gUnk_02000710;
+extern struct G *gGameState;
 u32 ForgingBook_IsItemDiscovered(s32 n)
 {
-    u32 a = gUnk_02000710->a720 | 0x04000400;
-    u32 b = gUnk_02000710->a724 | 0x8020;
+    u32 a = gGameState->a720 | 0x04000400;
+    u32 b = gGameState->a724 | 0x8020;
     if (n <= 0x1f)
         return a & (1 << n);
     return b & (1 << (n - 0x20));

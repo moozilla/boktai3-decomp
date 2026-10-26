@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct AnimBox {
     u8 pad0[8];
     u32 flags;
@@ -17,7 +18,6 @@ struct OptionHud {
     u8 anim[0x10];
     u16 pad_aac[0];
 };
-extern struct OptionHud *gUnk_02000214;
 void Hud_LoadConditionalPaletteRows(void *);
 void sub_08168850(void *);
 void SceneHud_UpdateSecondaryWidgets(void *);
@@ -32,7 +32,7 @@ void Hud_SetUpdateCallback(void *, void (*)(void));
 void SceneHud_UpdateOptionControls(void);
 void SceneHud_EnterOptionControls(void)
 {
-    struct OptionHud *p = gUnk_02000214;
+    struct OptionHud *p = gFieldHud;
     if (p) {
         Hud_LoadConditionalPaletteRows(p);
         sub_08168850(p);

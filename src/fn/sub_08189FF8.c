@@ -1,4 +1,6 @@
 #include "global.h"
+#include "game_state.h"
+#include "engine.h"
 
 // confidence=low: armor decision step: counts down the cooldown and mode timers, then picks the next behavior from the target offset, facing and phase.
 
@@ -65,16 +67,14 @@ struct S08189FF8Target {
     s16 x, y, z;
 };
 void ActorController_SetBehavior(void *, s32);
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
-extern struct GameState *gUnk_02000710;
 s32 Armor_IsSequenceIncomplete(void *);
 s32 Math_Atan2(s32, s32);
 
 static inline u16 S08189FF8_Rand(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return gUnk_0203B400[gRandomIndex];
 }
 
 #ifdef NONMATCHING
@@ -131,7 +131,7 @@ void sub_08189FF8(struct S08189FF8Actor *p)
             return;
     }
 
-    tg = (struct S08189FF8Target *)gUnk_02000710;
+    tg = (struct S08189FF8Target *)gGameState;
     rawX = tg->x - p->x;
     rawZ = tg->z - p->z;
     dx = (rawX + 0x80) >> 8;

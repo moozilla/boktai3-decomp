@@ -41,10 +41,10 @@ static inline u32 GroundHeight(struct EffectPosition *position)
     u8 *cell;
     u32 type;
     s32 height;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         index = 0;
     else
-        index = gUnk_030052F4->rows[z] + x;
+        index = gTerrainMap->rows[z] + x;
     cell = cellProps(index);
     type = *cell >> 4;
     height = (*cell & 15) << 8;

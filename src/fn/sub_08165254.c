@@ -1,6 +1,6 @@
 #include "global.h"
-extern u32 gUnk_02000560, gUnk_030053F4;
-extern u8 *gUnk_02000710;
+extern u32 gUnk_02000560, gEngineFlags;
+extern u8 *gGameState;
 s32 Div(s32, s32);
 void Anim_LoadKeyframe(void *, void *, u16, s32);
 void SceneHud_PlayActionChangeCue(void *, s32, s32, s32);
@@ -59,7 +59,7 @@ void Hud_UpdateCountdownDigits(u8 *p)
                     tens = 0;
                     ones = 0;
                 }
-                if ((gUnk_030053F4 & 0x1000) || (*(u32 *)(gUnk_02000710 + 0x868) & 0x400)) {
+                if ((gEngineFlags & 0x1000) || (*(u32 *)(gGameState + 0x868) & 0x400)) {
                     ((struct AnimationFlags *)(p + 0xbc8))->flags |= 1;
                     if (hundreds == 0 && tens == 0) {
                         Anim_LoadKeyframe(p + 0xb08, res, 0x33, 1);

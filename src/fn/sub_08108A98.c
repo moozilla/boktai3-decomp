@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_020001BC;
+#include "ram.h"
 
 void AnimatedTile_ResetManager(void)
 {
-    gUnk_020001BC = 0;
+    gNamedEntryPool = 0;
 }

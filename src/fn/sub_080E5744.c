@@ -101,9 +101,9 @@ static inline u8 Test(u32 value, u32 mask)
 static inline u32 Cell(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u32 Height(u32 cell, struct ContactPosition *p)
 {
@@ -112,7 +112,7 @@ static inline u32 Height(u32 cell, struct ContactPosition *p)
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + cell * 4 + 12;
+        data = gTerrainMap->cells + cell * 4 + 12;
     shape = *data >> 4;
     height = (*data & 15) << 8;
     if (shape == 1)
@@ -338,7 +338,7 @@ static inline void InitializeCallbacks(struct SceneActorRegistryResetView *a)
         }
     }
     if (Test(a->flags2C0, 2))
-        U16(a, 0x2FA) = U32(gUnk_02000710, 0x5A0);
+        U16(a, 0x2FA) = U32(gGameState, 0x5A0);
     else
         U16(a, 0x2FA) = Region_FindContaining(&a->position);
     if (Test(a->flags2C0, 0x40))
@@ -562,7 +562,7 @@ s32 Dog_Init(struct SceneActorRegistryResetView *a)
     if (a->drawableKind == 1)
         U16(a->drawable, 0x5A) = SceneActorScript_GetManagerField62() - 0x5FFF;
     InitializeCallbacks(a);
-    if (Script_GetKeywordValue('S', 0) || !Test(U32(gUnk_02000710, 0x5A0) == U16(a, 0x2FA), 1))
+    if (Script_GetKeywordValue('S', 0) || !Test(U32(gGameState, 0x5A0) == U16(a, 0x2FA), 1))
         SceneActorPlacement_HideActor(a, 0);
     SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
     if (!a->drawableKind)

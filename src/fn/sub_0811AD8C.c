@@ -1,11 +1,8 @@
 #include "global.h"
-#define gTerrainColumns       gUnk_020001FC
-#define gTerrainColumnIndices gUnk_020001F8
+#include "ram.h"
 struct TerrainColumn {
     u16 cells[80];
 };
-extern struct TerrainColumn *gUnk_020001FC;
-extern u8 *gUnk_020001F8;
 s32 Terrain_GetCellClearance(s16 *position)
 {
     s32 clampedX = position[0] < 0 ? 0 : position[0];
@@ -14,8 +11,8 @@ s32 Terrain_GetCellClearance(s16 *position)
     struct TerrainColumn *column;
     s32 tileX, tileZ;
     s32 x = clampedX >> 5;
-    columns = &gUnk_020001FC;
-    column = *columns + gUnk_020001F8[x];
+    columns = &gTerrainColumns;
+    column = *columns + gTerrainColumnIndices[x];
     tileX = (clampedX &= 31) >> 3;
     tileZ = clampedZ >> 3;
     if (tileZ > 7)

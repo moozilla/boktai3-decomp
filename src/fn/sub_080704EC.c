@@ -39,7 +39,7 @@ zero:
 }
 static inline u8 IsScenePaused(void)
 {
-    if (gUnk_030053F4 & 0x4800)
+    if (gEngineFlags & 0x4800)
         return 1;
     return 0;
 }

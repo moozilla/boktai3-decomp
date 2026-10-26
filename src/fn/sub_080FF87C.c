@@ -2,6 +2,7 @@
 #include "global.h"
 #include "display_animation.h"
 #include "contact_actor.h"
+#include "ram.h"
 struct WoodenCrate {
     u32 flags;
     u8 pad4[3];
@@ -28,7 +29,6 @@ struct WoodenCrateManager {
     u8 pad[0x18];
     void *animationData;
 };
-extern struct WoodenCrateManager *gUnk_020001A4;
 struct WoodenCrateManager *WoodenCrate_GetOrCreateManager(void);
 struct WoodenCrate *WoodenCrate_AllocateSlot(struct WoodenCrateManager *);
 void WoodenCrate_InitCollider(struct WoodenCrate *);
@@ -168,7 +168,7 @@ static inline u32 Step(struct WoodenCrate *spriteInput, struct DisplaySequenceSt
 // confidence=low: allocates a crate slot and reads sprite, trigger and callback options from the script.
 void WoodenCrate_CreateFromScript(void)
 {
-    struct WoodenCrateManager *manager = gUnk_020001A4;
+    struct WoodenCrateManager *manager = gWoodenCrateManager;
     struct WoodenCrate *crate;
     register struct WoodenCrate *sprite asm("r8");
     if (!manager) {

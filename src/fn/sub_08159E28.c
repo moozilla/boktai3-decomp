@@ -1,7 +1,7 @@
 #include "global.h"
 #include "player.h"
+#include "ram.h"
 extern u32 gUnk_0200054C;
-extern u16 gUnk_02000594;
 void ActorSequence_Begin(struct Player *, s32, s32);
 void Player_AddControlFlags(struct Player *, s32);
 static inline u32 requestBlocked(u32 *flags, u32 mask)
@@ -24,6 +24,6 @@ s32 Player_ResetPositionState(struct Player *p, struct SceneVec *position)
     p->positionResetState = 0;
     p->particleEmissionCount = 0;
     gUnk_0200054C = 0;
-    gUnk_02000594 = 0;
+    gPlayerNotificationPending = 0;
     return 1;
 }

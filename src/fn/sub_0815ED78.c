@@ -1,9 +1,9 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #include "player.h"
+#include "engine.h"
 
 // confidence=low: consumes actionLatch465 and refreshes the selected action's presentation.
-extern u32 gUnk_030053F4;
 void Player_UpdateLinkModeMovement(struct Player *);
 void Player_UpdateActionModeMovement(struct Player *);
 void Player_InitVisualResources(struct Player *);
@@ -20,7 +20,7 @@ static inline void ApplyActionMode(struct Player *p, u32 mode, u32 resource)
         p->actionEighteenDuration = 32;
     }
     *action = mode;
-    if (gUnk_030053F4 & 0x1000)
+    if (gEngineFlags & 0x1000)
         p->updateCallback = Player_UpdateLinkModeMovement;
     else
         p->updateCallback = Player_UpdateActionModeMovement;

@@ -1,4 +1,4 @@
-#define gSceneGameState gUnk_02000710
+#define gSceneGameState gGameState
 #include "global.h"
 #include "game_state.h"
 struct SceneSequenceEntry {
@@ -14,8 +14,8 @@ struct SceneSequence {
 s32 MessageWindow_ShowMessage(s32);
 void SceneSequence_SelectEntryMessage(struct SceneSequence *s)
 {
-    if ((s16)gUnk_02000710->savedX > 5)
-        MessageWindow_ShowMessage((s16)gUnk_02000710->savedX + 56);
+    if ((s16)gGameState->savedX > 5)
+        MessageWindow_ShowMessage((s16)gGameState->savedX + 56);
     else
         MessageWindow_ShowMessage(s->entries[s->selection].message);
 }

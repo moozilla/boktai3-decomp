@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct S {
     u8 pad[0x54];
     u16 f54;
@@ -8,10 +9,9 @@ struct S {
     u16 f62;
     u16 f64;
 };
-extern struct S *gUnk_03005420;
 void Camera_SetOffset(s32 n, u16 *a)
 {
-    struct S *p = gUnk_03005420;
+    struct S *p = gActiveCamera;
     if (p) {
         p->f60 = a[0];
         p->f62 = a[1];

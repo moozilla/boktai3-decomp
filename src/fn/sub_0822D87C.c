@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+#include "game_state.h"
 extern void *gUnk_02000580;
 s32 Inventory_GetEquipmentId(s32);
 void Inventory_SetEquipmentEntry(s32, const void *);
@@ -25,7 +25,7 @@ s32 Inventory_AddEquipmentFromRecord(const void *record)
     idx = i;
     count = 0;
     {
-        u8 **t = &gUnk_02000710;
+        u8 **t = &gGameState;
         q = (s16 *)*t;
         m1 = -1;
         gp = t;

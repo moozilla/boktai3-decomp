@@ -1,9 +1,9 @@
 #include "global.h"
+#include "game_state.h"
 
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const u16 gUnk_03005260[];
-extern u8 *gUnk_02000710;
 extern const u8 gUnk_0824F960[];
 extern const u8 gUnk_0824F968[];
 extern const u8 gUnk_0824F970[];
@@ -51,8 +51,8 @@ static inline void sub081C0CE4_Enter(struct Sub081C0CE4Task *task, s32 state)
 
 static inline u8 sub081C0CE4_RandomDigit(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return Mod(gUnk_0203B400[gUnk_03005308], 10) + '0';
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return Mod(gUnk_0203B400[gRandomIndex], 10) + '0';
 }
 
 #ifdef NONMATCHING
@@ -168,9 +168,9 @@ void sub_081C0CE4(struct Sub081C0CE4Task *task)
             }
             if (task->timer <= 0x3b) {
                 for (i = 0; i < 8; i++) {
-                    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+                    gRandomIndex = (gRandomIndex + 1) & 1023;
                     Anim_LoadKeyframe(&task->entries[i], task->keyframeData,
-                                      (u16)Mod(gUnk_0203B400[gUnk_03005308], 10), 1);
+                                      (u16)Mod(gUnk_0203B400[gRandomIndex], 10), 1);
                     task->entries[i].flags8 &= ~1;
                 }
                 if (task->timer & 1)
@@ -203,7 +203,7 @@ void sub_081C0CE4(struct Sub081C0CE4Task *task)
             }
             if (task->timer > 0x3c || (gUnk_03005260[1] & 1)) {
                 Menu_EraseRect(0x17, 0xa, 8, 2);
-                v = *(s16 *)((u8 *)gUnk_02000710 + 0x660);
+                v = *(s16 *)((u8 *)gGameState + 0x660);
                 if (v == 1 || v == 0)
                     Menu_DrawText(0x17, 0xa, v == 1 ? gUnk_0824F968 : gUnk_0824F960);
                 else
@@ -216,7 +216,7 @@ void sub_081C0CE4(struct Sub081C0CE4Task *task)
             task->flags &= ~2;
             if (task->timer > 0x3c || (gUnk_03005260[1] & 1)) {
                 Menu_EraseRect(0x13, 0xd, 0xc, 2);
-                v = *(s16 *)((u8 *)gUnk_02000710 + 0x662);
+                v = *(s16 *)((u8 *)gGameState + 0x662);
                 if (v == 4 || v == 0)
                     Menu_DrawText(0x14, 0xd, v == 4 ? gUnk_0824F984 : gUnk_0824F978);
                 else

@@ -34,7 +34,7 @@ struct Entry {
 };
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u32 gUnk_0824F760[4];
 s32 sub_08249350(s32, s32);
 void *Player_GetEffectivePosition(s32);

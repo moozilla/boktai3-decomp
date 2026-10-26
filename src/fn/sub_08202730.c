@@ -92,7 +92,7 @@ static inline u8 *CellData(int i)
     u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return p + 4;
-    return gUnk_030052F4->cells + 12 + i * 4;
+    return gTerrainMap->cells + 12 + i * 4;
 }
 s32 ProjectilePool_Update(struct ProjPool *pool)
 {
@@ -100,7 +100,7 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
     s32 i;
     {
         u32 mask = 0x400;
-        if ((gUnk_030053F4 | gUnk_030053F0) & mask)
+        if ((gEngineFlags | gUnk_030053F0) & mask)
             return 0;
     }
     {
@@ -152,10 +152,10 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
                 s32 index;
                 register u32 dummy asm("r5");
                 asm("" : "=r"(dummy));
-                if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+                if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
                     index = 0;
                 else
-                    index = gUnk_030052F4->rows[z] + x;
+                    index = gTerrainMap->rows[z] + x;
                 asm("" ::"r"(dummy));
                 if ((u32)((*CellData(index) & 0xf) << 8) <= o->pos.y)
                     goto alive;

@@ -12,32 +12,32 @@ struct Context {
     struct Trap traps[64];
     u8 *tops[64];
 };
-extern struct Context *gUnk_030052F4;
+extern struct Context *gTerrainMap;
 s32 Script_SeekToKeyword(s32);
 void *Script_GetPc(void);
 s32 Script_GetValue(void);
 u32 sub_0821E2F8(void)
 {
-    s32 n = gUnk_030052F4->count;
+    s32 n = gTerrainMap->count;
     Script_SeekToKeyword('n');
     while (Script_GetPc()) {
-        struct Trap *src = gUnk_030052F4->traps;
+        struct Trap *src = gTerrainMap->traps;
         s32 kept;
         s32 id;
         s32 i;
         u8 **tsrc;
-        tsrc = gUnk_030052F4->tops;
+        tsrc = gTerrainMap->tops;
         kept = 0;
         id = Script_GetValue();
         for (i = 0; i < n; i++, src++, tsrc++) {
             if (id != src->id) {
-                gUnk_030052F4->traps[kept] = *src;
-                gUnk_030052F4->tops[kept] = *tsrc;
+                gTerrainMap->traps[kept] = *src;
+                gTerrainMap->tops[kept] = *tsrc;
                 kept++;
             }
         }
         n = kept;
     }
-    gUnk_030052F4->count = n;
+    gTerrainMap->count = n;
     return 0;
 }

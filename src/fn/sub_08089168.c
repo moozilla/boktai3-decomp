@@ -1,10 +1,10 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
+#include "engine.h"
 // confidence=low: animation-three state eases stored displacement into motion until animation completion.
 
 void SparkParticle_Spawn(void *, u32, void *, u32, u32, u32, u32, u32);
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 struct GhoulAnimation {
     u8 pad[7];
@@ -28,9 +28,9 @@ static inline u32 MotionFlag(struct SceneActorRegistryResetView *a, u32 mask)
 }
 static inline u32 RandomSample(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
+    u32 index = (gRandomIndex + 1) & 1023;
     u32 v;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     index *= 2;
     {
         register const u16 *table asm("r3") = gUnk_0203B400;

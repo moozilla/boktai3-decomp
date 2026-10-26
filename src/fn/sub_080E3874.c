@@ -2,9 +2,8 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_restoration.h"
 #include "scene_actor_control_helpers.h"
+#include "engine.h"
 
-extern u32 gUnk_03005308;
-extern u32 gUnk_030053F4;
 extern const u16 gUnk_0203B400[];
 extern u8 *gUnk_02000580[];
 s32 sub_0812F3CC(struct SceneActorRegistryResetView *);
@@ -18,8 +17,8 @@ void Memory_Clear(void *dst, s32 bytes);
 
 static inline u32 Dog080E3874_Rand(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return gUnk_0203B400[index];
 }
 
@@ -28,8 +27,8 @@ static inline s32 Dog080E3874_CellIndex(u16 x, u16 z)
 {
     s32 cx = (s16)x >> 8;
     s32 cz = (s16)z >> 8;
-    struct EngineMap *map = (struct EngineMap *)gUnk_030052F4;
-    if (cx < 0 || cz < 0 || cx >= gUnk_030052F8 || cz >= gUnk_030052FC)
+    struct EngineMap *map = (struct EngineMap *)gTerrainMap;
+    if (cx < 0 || cz < 0 || cx >= gTerrainWidth || cz >= gTerrainHeight)
         return 0;
     return *(u16 *)((u8 *)map + 0x24 + (cz << 1)) + cx;
 }
@@ -40,7 +39,7 @@ static inline u8 *Dog080E3874_CellData(s32 cell)
     u8 *override = TerrainModifiers_FindCellOverride(cell, 1);
     if (override)
         return override + 4;
-    return *(u8 **)((u8 *)gUnk_030052F4 + 4) + (cell << 2) + 0xC;
+    return *(u8 **)((u8 *)gTerrainMap + 4) + (cell << 2) + 0xC;
 }
 
 // Fills out from pos: x and z copied, y from the terrain word of the cell.
@@ -149,7 +148,7 @@ void sub_080E3874(struct SceneActorRegistryResetView *actor)
         Dog080E3874_Step(a + 0x460, *(void **)(a + 0x41C), 0xC);
         out = *(struct ContactPosition **)(a + 0x5D4);
         Dog080E3874_Sample(out, *(u16 **)(a + 0x450));
-        if (gUnk_030053F4 & 0x4800) {
+        if (gEngineFlags & 0x4800) {
             q = *(u8 **)(a + 0xDC);
             if (q == 0)
                 goto fallback;
@@ -224,8 +223,8 @@ void sub_080E3874(struct SceneActorRegistryResetView *actor)
     return;
 
 navigate:
-    cx = Mod(cell, *(s16 *)(*(u8 **)(gUnk_030052F4 + 4) + 4));
-    cz = Div(cell, *(s16 *)(*(u8 **)(gUnk_030052F4 + 4) + 4));
+    cx = Mod(cell, *(s16 *)(*(u8 **)(gTerrainMap + 4) + 4));
+    cz = Div(cell, *(s16 *)(*(u8 **)(gTerrainMap + 4) + 4));
     target.x = (cx << 8) + 0x80;
     target.z = (cz << 8) + 0x80;
     target.y = (Dog080E3874_CellData(cell)[0] & 0xF) << 8;

@@ -63,7 +63,7 @@ static inline s32 LocalPlayer(void)
 }
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         register u32 *owner asm("r1") = &actor->field2E0;
         register u32 mask asm("r2") = *owner;
         if (!(mask & 0x20) && mask) {
@@ -108,13 +108,12 @@ static inline void Fill(u32 *zero, void *dst)
 }
 s32 AreaEffect_ScaleGainAtPosition(void *, u32);
 s32 AreaEffect_ScaleLinkGainAtPosition(void *, u32);
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 static inline u32 RandomBits(u32 mask)
 {
     const u16 *table = gUnk_0203B400;
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return *(const u16 *)((u32)table + index * 2) & mask;
 }
 static inline u32 ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
@@ -131,8 +130,8 @@ static inline u32 GetFlags(u32 **out, struct SceneActorRegistryResetView *actor,
 // Area-effect damage with a random knockback heading.
 inline static u32 RandomBits_ApplyLinkedAreaDamage(u32 mask)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return (*((const u16 *)(((u32)gUnk_0203B400) + (index * 2)))) & mask;
 }
 
@@ -157,7 +156,7 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
     {
         register struct ContactPosition *pos asm("r4");
         register u16 *max asm("r5");
-        if (Test(gUnk_030053F4, 0x4800)) {
+        if (Test(gEngineFlags, 0x4800)) {
             pos = &actor->position;
             max = (u16 *)(&actor->defaultHealth);
             gain = AreaEffect_ScaleLinkGainAtPosition(pos, *max);
@@ -237,7 +236,7 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
             actor->field2B1 = 1;
         }
         actor->field2E0 = 32;
-        if ((!Test(gUnk_030053F4, 0x4800)) && (!Flag2D0(actor, 0x800)))
+        if ((!Test(gEngineFlags, 0x4800)) && (!Flag2D0(actor, 0x800)))
             SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
     } else {
         {
@@ -270,5 +269,6 @@ fail:
 #else
 #include "global.h"
 #include "render.h"
+#include "engine.h"
 INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ApplyLinkedAreaDamage);
 #endif

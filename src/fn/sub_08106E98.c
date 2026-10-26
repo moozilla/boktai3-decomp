@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 struct SceneVec {
     s16 x, y, z;
@@ -13,8 +14,6 @@ void TetherActor_BeginDetachedState(s32 mode);
 void ScriptTriggerActor_DispatchPendingScripts(struct TileTrigger *p);
 s32 EffectGroup_SpawnPart(void *, u32, void *, void *, void *, u32, u32);
 void SceneActorReaction_SinkAndRemove(void);
-extern u32 gUnk_030053F4;
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 
 #ifdef NONMATCHING
@@ -80,13 +79,13 @@ void sub_08106E98(struct TileTrigger *arg0)
         *(u16 *)(a + 0x2B8) = 0;
         if (*(u32 *)a == 1 && (*(u16 *)(a + 0x2D4) & 0x2000)) {
             for (n = 0; n < 3; n++) {
-                idx = gUnk_03005308;
+                idx = gRandomIndex;
                 idx = (idx + 1) & 0x3FF;
                 vel.x = (gUnk_0203B400[idx] & 0xF) - 7;
                 idx = (idx + 1) & 0x3FF;
                 vel.y = (gUnk_0203B400[idx] & 0x1F) - 16;
                 idx = (idx + 1) & 0x3FF;
-                gUnk_03005308 = idx;
+                gRandomIndex = idx;
                 vel.z = (gUnk_0203B400[idx] & 0xF) - 7;
                 scale.x = 5;
                 scale.y = 10;
@@ -106,7 +105,7 @@ void sub_08106E98(struct TileTrigger *arg0)
     }
 
     if (inRange[0] || inRange[1] || inRange[2] || inRange[3]) {
-        if ((gUnk_030053F4 & 0x800) != 0) {
+        if ((gEngineFlags & 0x800) != 0) {
             if ((*(u16 *)(self + 0xC0) & 0x10) == 0) {
                 *(u16 *)(self + 0xBE) = 5;
                 self[0xC2] = 1;

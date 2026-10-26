@@ -7,8 +7,8 @@
 // fix.py best version (reprinted C)
 // confidence=low: energy meter plus a 4-digit timer shown below it.
 // Remaining differences: register choice for the tile cursor and repeated player-pointer reloads in the timer test.
-extern u8 *gUnk_02000710;
-extern u32 gUnk_030053F4;
+extern u8 *gGameState;
+extern u32 gEngineFlags;
 extern u16 gUnk_03005178;
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 Hud_GetStyleTileIndex(s32, s32);
@@ -108,7 +108,7 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
         if (cap != 0)
             *c = endTile | 0xd000;
     }
-    if (((!(gUnk_030053F4 & 0x1000)) && (!((*((u32 *)(gUnk_02000710 + 0x868))) & 0x80))) &&
+    if (((!(gEngineFlags & 0x1000)) && (!((*((u32 *)(gGameState + 0x868))) & 0x80))) &&
         (mode == 0)) {
         if ((*((u8 **)(p + 0xa40))) && ((*((u32 *)((*((u8 **)(p + 0xa40))) + 0x444))) & 0x40))
             goto digits;
@@ -116,9 +116,9 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
             goto digits;
         if ((*((u8 *)((*((u8 **)Arg1(0xa40, p))) + 0xc18))) == 7) {
         digits:
-            digits[0] = Div(*((s32 *)(gUnk_02000710 + 0x77c)), 1000);
+            digits[0] = Div(*((s32 *)(gGameState + 0x77c)), 1000);
 
-            rem = (*((s32 *)(gUnk_02000710 + 0x77c))) - (digits[0] * 1000);
+            rem = (*((s32 *)(gGameState + 0x77c))) - (digits[0] * 1000);
             digits[1] = Div(rem, 100);
             rem -= digits[1] * 100;
             digits[2] = Div(rem, 10);

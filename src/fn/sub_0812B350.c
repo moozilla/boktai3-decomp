@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct ActorEffect {
     u8 unk_00[0x176];
@@ -14,8 +15,6 @@ struct ActorEffectManager {
     struct ActorEffect slots[8];
 };
 
-extern struct ActorEffectManager *gUnk_02000180;
-
 static inline u8 IsOccupied(u32 *mask, s32 index, u32 one)
 {
     if (*mask & (one << index))
@@ -25,7 +24,7 @@ static inline u8 IsOccupied(u32 *mask, s32 index, u32 one)
 
 void FragmentProjectilePool_RequestRemovalAll(void)
 {
-    struct ActorEffectManager *manager = gUnk_02000180;
+    struct ActorEffectManager *manager = gActorEffectManager;
     struct ActorEffect *effect;
     s32 i;
     u32 one;

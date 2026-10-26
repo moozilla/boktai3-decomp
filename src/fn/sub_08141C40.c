@@ -7,7 +7,7 @@
 // because its `return 0` set precedes the block that copies Mask's value into it.
 #define B(n) (*(u8 *)(p + (n)))
 #define H(n) (*(u16 *)(p + (n)))
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 void Player_PlayPositionEffect(void *, void *, u32, u32, void *, u32, u32);
 s32 RepeatedEffect_RequestNearby(void *);
 s32 Player_IsNormalActionAllowed(u32);
@@ -44,7 +44,7 @@ static inline u8 IsMode(u8 *p, u32 mode)
 }
 static inline u32 GlobalMask(u32 mask)
 {
-    return *(u32 *)(gUnk_02000710 + 0x868) & mask;
+    return *(u32 *)(gGameState + 0x868) & mask;
 }
 static inline u8 HasGlobalFlag(void)
 {

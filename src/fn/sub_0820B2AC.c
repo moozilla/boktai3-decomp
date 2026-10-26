@@ -30,7 +30,7 @@ struct DragonPuppy {
 };
 
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 void DragonPuppy_HandleDefeat(struct DragonPuppy *);
 void DragonPuppy_UpdateAttackTiming(void);
 void Anim_SetSequence(void *, void *, u32, u32, u32);
@@ -38,8 +38,8 @@ void Anim_SetSequence(void *, void *, u32, u32, u32);
 static inline u32 NextRandom(void)
 {
     const u16 *table = gUnk_0203B400;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return table[gRandomIndex];
 }
 
 u32 DragonPuppy_UpdateAttackWindup(struct DragonPuppy *p)

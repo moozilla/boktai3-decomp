@@ -11,7 +11,7 @@ static inline u32 isSpecial(void)
 void OrbitBackground_UpdateVisibility(struct OrbitBackground *input)
 {
     register struct OrbitBackground *background asm("r5") = input;
-    if (gUnk_030053F4 & 0x800) {
+    if (gEngineFlags & 0x800) {
         register s32 selected asm("r1");
         u32 status;
         if (!gUnk_020004B4)

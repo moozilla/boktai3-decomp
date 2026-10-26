@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 struct Vec {
     u16 x, y, z, pad;
@@ -55,7 +56,6 @@ struct Actor {
 };
 #define W(o) (*(u32 *)((u8 *)p2 + (o)))
 void GameState_SetEventFlag(s32);
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const struct Vec gUnk_0824FDF0;
 struct Vec *Ratatosk_GetRandomMovementPoint(void *);
@@ -72,8 +72,8 @@ static inline u32 randomTable(u32 table, u32 *index, u32 fullMask)
 }
 static inline u32 randomB(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
 static inline void setState(struct Actor *p, void (*update)(void), u8 state)
 {
@@ -163,7 +163,7 @@ s32 Ratatosk_ApplyQueuedDamage(struct Actor *p)
             vel = &scratch.velocity;
             angle = &p->angle;
             pos = &scratch.spawn;
-            index = &gUnk_03005308;
+            index = &gRandomIndex;
             fullMask = 1023;
             mask = 127;
             i = 2;

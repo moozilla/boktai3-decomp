@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_0200013C;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 SceneActor14_InitManager(u8 *);
@@ -11,8 +11,8 @@ void SpriteEffectPool_RemoveSlots(void);
 u8 *SceneActor14_EnsureSingleton(void)
 {
     u8 *p;
-    if (gUnk_0200013C != 0)
-        return gUnk_0200013C;
+    if (gSpriteEffectPool != 0)
+        return gSpriteEffectPool;
     p = Task_Create(0xa, 0x6f8);
     if (p != 0) {
         Task_SetCallbacks(p, SpriteEffectPool_Update, SpriteEffectPool_RemoveSlots);

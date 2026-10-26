@@ -1,7 +1,7 @@
 #include "stacked_actor.h"
 s32 StackedActor_IsPlayerNearby(struct StackedActor *o)
 {
-    struct GameState *g = gUnk_02000710;
+    struct GameState *g = gGameState;
     s32 dx = g->positionX - o->world.x;
     s32 dy;
     if (dx < 0)

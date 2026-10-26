@@ -24,7 +24,7 @@ static inline void ApplyScales(struct CollisionEntry *a, struct CollisionEntry *
 {
     if (a->scale != 64) {
         if (a->kind == 16) {
-            s32 factor = gUnk_02000710->unk876;
+            s32 factor = gGameState->unk876;
             b->response += Div((b->response << 1) * factor, 100);
         } else
             b->response = ScaleSigned(b->response * a->scale);

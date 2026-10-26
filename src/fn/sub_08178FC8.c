@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 void Bg_SetPriority(u32, u32);
-extern u16 gUnk_020005A4;
 extern u32 gUnk_02000580;
 extern u8 gUnk_08E60F0C[];
 void Inventory_InitEquipmentEntryFromDescriptor(u8 *, u8 *);
@@ -16,7 +16,6 @@ void sub_08167FC0(u8 *);
 void FieldHud_RefreshModeEight(void);
 void Hud_SetUpdateCallback(u8 *, void (*)(void));
 void InventoryPanel_InitCallbackGroups(u8 *);
-extern u8 *gUnk_02000214;
 u32 Hud_InitAlternateLayout(u8 *s)
 {
     u32 zero, value;
@@ -28,7 +27,7 @@ u32 Hud_InitAlternateLayout(u8 *s)
     Bg_SetPriority(0, 0);
     offset = 0xA5C;
     *(u16 *)(s + offset) = zero;
-    value = gUnk_020005A4;
+    value = gSceneHudMode;
     s[0x1414] = value;
     value = gUnk_02000580;
     *(u32 *)(s + 0xA40) = value;
@@ -66,6 +65,6 @@ u32 Hud_InitAlternateLayout(u8 *s)
     *(s8 *)(s + 0xB03) = (negative = -one);
     offset -= 0xA3;
     *(s8 *)(s + offset) = negative;
-    gUnk_02000214 = s;
+    gFieldHud = s;
     return 0;
 }

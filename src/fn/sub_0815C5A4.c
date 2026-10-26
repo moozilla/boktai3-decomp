@@ -14,7 +14,7 @@ struct P {
     u8 b5B9;
 };
 
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 
 s32 EffectGroup_Spawn(void *, s32, s32, struct Vec *);
@@ -23,8 +23,8 @@ void Sound_PlaySong(s32);
 static inline int randomWith(const u16 *table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)table);
 }
 

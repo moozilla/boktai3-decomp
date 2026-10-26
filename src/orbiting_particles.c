@@ -22,8 +22,8 @@ void OrbitingParticles_SpawnOrb(struct OrbitingParticles *o, struct OrbitingPart
     if (b->timer == 0) {
         if (o->duration < 0 || o->time < o->duration) {
             b->state = 1;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-            b->angle = *(const u16 *)((const u8 *)gUnk_0203B400 + gUnk_03005308 * 2);
+            gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+            b->angle = *(const u16 *)((const u8 *)gUnk_0203B400 + gRandomIndex * 2);
             b->rise = 0;
             b->sprite.flags &= ~1;
         }
@@ -127,15 +127,15 @@ static inline u8 *cell(int i)
     u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return p + 4;
-    return gUnk_030052F4->cells + 12 + i * 4;
+    return gTerrainMap->cells + 12 + i * 4;
 }
 
 static inline int randomAngle(void)
 {
     u32 offset, value;
     u16 *table;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     table = ((u16 *)RANDOM_TABLE_ADDR);
     value = *(u16 *)(offset + (u32)table);
     return (value & 127) - 32;
@@ -188,10 +188,10 @@ int OrbitingParticles_Initialize(struct OrbitingParticles *m, struct SceneVec *s
     pos = &m->position;
     {
         int x = pos->x >> 8, z = pos->z >> 8;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             index = 0;
         else
-            index = gUnk_030052F4->rows[z] + x;
+            index = gTerrainMap->rows[z] + x;
     }
     c = cell(index);
     slope = *c >> 4;

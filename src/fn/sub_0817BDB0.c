@@ -83,7 +83,7 @@ static inline s32 Scale(int x)
 }
 
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 s32 Mod(s32, s32);
 void Path_GetPointPositionById(void *, int, int);
 s32 SceneVolume_GetActivityState(void *);
@@ -103,8 +103,8 @@ static inline s32 RandomValue(void)
 {
     u16 *values = gUnk_0203B400;
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(u16 *)(offset + (u32)values);
 }
 // confidence=low: follows path points while creating proximity hazards

@@ -1,4 +1,7 @@
 #include "global.h"
+#include "game_state.h"
+#include "engine.h"
+#include "ram.h"
 
 struct Vec {
     s16 x, y, z;
@@ -27,11 +30,8 @@ struct Camera {
     u32 f98;
 };
 
-extern struct Camera *gUnk_03005420;
-extern u8 *gUnk_02000710;
 extern struct Vec gUnk_030042A0;
 extern struct Vec gUnk_03005418;
-extern u32 gUnk_030053F4;
 
 int SceneMessages_RegisterReceiver(u8 *p, int id, int kind);
 
@@ -54,7 +54,7 @@ static inline void updateScroll(void)
 }
 
 /* Camera setup: start at the player's saved position (raised by 150), register
-   as the kind 6 (camera) cutscene receiver and become gUnk_03005420. */
+   as the kind 6 (camera) cutscene receiver and become gActiveCamera. */
 s32 Camera_Initialize(struct Camera *c, u32 id)
 {
     u8 *gs;
@@ -62,7 +62,7 @@ s32 Camera_Initialize(struct Camera *c, u32 id)
     c->id = id;
     c->f1c = 0;
     c->f54 = 0;
-    gs = gUnk_02000710;
+    gs = gGameState;
     c->x = *(u16 *)(gs + 0x30);
     c->y = *(u16 *)(gs + 0x32) + 0x96;
     c->z = *(u16 *)(gs + 0x34);
@@ -80,8 +80,8 @@ s32 Camera_Initialize(struct Camera *c, u32 id)
     c->f82 = 0;
     c->f98 = 0;
     updateScroll();
-    if (!(gUnk_030053F4 & 0x800))
+    if (!(gEngineFlags & 0x800))
         SceneMessages_RegisterReceiver((u8 *)c + 0x20, c->id, 6);
-    gUnk_03005420 = c;
+    gActiveCamera = c;
     return 0;
 }

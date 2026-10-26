@@ -114,7 +114,7 @@ void sub_081879A8(struct Sub081879A8Actor *actor)
 
     if (actor->kindB3D == 0xFF || actor->kindB3C == 0x13 || actor->kindB3C == 0x21 ||
         actor->kindB3C == 0x20 || actor->kindB3C == 0x22) {
-        player = gUnk_02000710;
+        player = gGameState;
         px = player->positionX;
         py = player->positionY;
         pz = player->positionZ;

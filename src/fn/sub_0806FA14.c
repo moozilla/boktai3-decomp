@@ -2,7 +2,7 @@
 static inline u8 Enabled(void)
 {
     u32 mask = 4;
-    struct GameState *base = gUnk_02000710;
+    struct GameState *base = gGameState;
     if (base->flags868 & mask)
         return TRUE;
     return FALSE;

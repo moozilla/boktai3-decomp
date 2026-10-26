@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_hud_display.h"
-#define gSceneHud gUnk_02000214
+#include "engine.h"
+#define gSceneHud gFieldHud
 extern struct SceneHudState *gSceneHud;
 extern struct Player *gUnk_02000580[];
-extern u32 gUnk_030053F4;
 void SceneHud_RebuildPrimaryOptions(struct SceneHudState *);
 void PauseMenu_RefreshEquipmentSlotIcons(struct SceneHudState *);
 void sub_08168850(struct SceneHudState *);
@@ -22,7 +22,7 @@ void SceneHud_RefreshControls(void)
             PauseMenu_RefreshEquipmentSlotIcons(gSceneHud);
             sub_08168850(gSceneHud);
             SceneHud_UpdateSecondaryWidgets(gSceneHud);
-            if (gUnk_030053F4 & 0x1000) {
+            if (gEngineFlags & 0x1000) {
                 if (!gSceneHud->controlMode)
                     PauseMenu_RefreshStatusPanel(gSceneHud);
                 Hud_SetElementGroupFlags(gSceneHud);

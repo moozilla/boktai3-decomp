@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_02000174;
+#include "ram.h"
 
 void FeatherEffectPool_ResetSingleton(void)
 {
-    gUnk_02000174 = 0;
+    gFadingSpritePool = 0;
 }

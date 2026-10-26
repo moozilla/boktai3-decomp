@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_vec.h"
+#include "engine.h"
 
 struct TerrainMap {
     u32 pad;
@@ -7,8 +8,6 @@ struct TerrainMap {
     u8 pad8[28];
     u16 rows[1];
 };
-extern struct TerrainMap *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
 void SceneVec_OffsetPolar(struct SceneVec *out, const struct SceneVec *in, s32 angle, s32 distance);
 u8 *TerrainModifiers_FindCellOverride(int, int);
 s32 Player_GetTerrainHeightAtPosition(void *, struct SceneVec *);
@@ -22,14 +21,14 @@ s32 Terrain_ClassifyOffsetHeight(struct SceneVec *origin, s32 angle, s32 distanc
     SceneVec_OffsetPolar(&pos, origin, angle, distance);
     x = pos.x >> 8;
     z = pos.z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         index = 0;
     else
-        index = gUnk_030052F4->rows[z] + x;
-    if (gUnk_030052F4->cells == 0)
+        index = gTerrainMap->rows[z] + x;
+    if (gTerrainMap->cells == 0)
         cell = 0;
     else
-        cell = gUnk_030052F4->cells + 12 + index * 4;
+        cell = gTerrainMap->cells + 12 + index * 4;
     if (Player_GetTerrainHeightAtPosition(cell, &pos) > pos.y)
         return 1;
     over = TerrainModifiers_FindCellOverride(index, 1);

@@ -4,6 +4,7 @@
 #include "game_state.h"
 #include "engine.h"
 #include "render.h"
+#include "ram.h"
 
 void SceneAnimation_UpdateSlotAnimation10(struct Nidhoggr *p, s32 i)
 {
@@ -1145,9 +1146,9 @@ void TerrainModifiers_RegisterCell(void *, u32, u32, s32, u32, u32);
 
 static inline u32 CellIndex(s32 x, s32 z)
 {
-    if (x < 0 || z < 0 || x >= gUnk_030052F8 || z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || x >= gTerrainWidth || z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 void Nidhoggr_RegisterTerrainCells(struct Nidhoggr *t)
@@ -1264,7 +1265,7 @@ static inline s32 Sub08193874_Life(struct Nidhoggr *t, s32 dmg, s32 total)
 static inline void Sub08193874_Report(struct Nidhoggr *t, struct Sub08193874Hit *c, s32 part,
                                       s32 dmg, s32 flag)
 {
-    *(s32 *)((u8 *)gUnk_02000710 + 0x618) = t->life;
+    *(s32 *)((u8 *)gGameState + 0x618) = t->life;
     if (dmg >= 0) {
         DamageNumberDisplay_Show(c, dmg, 0, (u8 *)c + 0xC, (u8 *)c + 0x14, 1);
         PaletteEffect_StartSpriteOverride(&t->rows[part], 8, flag);
@@ -1501,7 +1502,7 @@ s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, 
             if (p->mode != 6)
                 Nidhoggr_SetBehavior(p, 12);
         }
-        gUnk_02000710->unk618 = p->life;
+        gGameState->unk618 = p->life;
         if (damage > 0) {
             DamageNumberDisplay_Show(collider, damage, 0, &collider->position,
                                      &collider->displayOffset, 1);
@@ -1588,7 +1589,7 @@ s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, 
             if (p->mode != 6)
                 Nidhoggr_SetBehavior(p, 12);
         }
-        gUnk_02000710->unk618 = p->life;
+        gGameState->unk618 = p->life;
         if (damage > 0) {
             DamageNumberDisplay_Show(collider, damage, 0, &collider->position,
                                      &collider->displayOffset, 1);
@@ -2183,16 +2184,14 @@ void Nidhoggr_ResetPart23Animation(u32 a)
     Nidhoggr_ChangeCompletedPartState(a, 0x17, 0);
 }
 
-extern u32 gUnk_03005304;
-
 extern const u16 gUnk_086141BC[];
 
 void Nidhoggr_SelectRandomPart22Animation(struct Nidhoggr *p)
 {
     u8 *c;
     u16 t;
-    gUnk_03005304 = (gUnk_03005304 + 1) & 0x3FF;
-    t = gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
+    t = gUnk_086141BC[gEffectRandomTableIndex];
     c = &p->flags[7];
     *c = (t & 3) + (1 + *c);
     if (*c > 5)
@@ -2207,8 +2206,8 @@ void Nidhoggr_SelectRandomPart23Animation(struct Nidhoggr *p)
 {
     u8 *c;
     u16 t;
-    gUnk_03005304 = (gUnk_03005304 + 1) & 0x3FF;
-    t = gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
+    t = gUnk_086141BC[gEffectRandomTableIndex];
     c = &p->flags[8];
     *c = (t & 3) + (1 + *c);
     if (*c > 5)
@@ -2223,8 +2222,8 @@ void Nidhoggr_SelectRandomPart22AlternateAnimation(struct Nidhoggr *p)
 {
     u8 *c;
     u16 t;
-    gUnk_03005304 = (gUnk_03005304 + 1) & 0x3FF;
-    t = gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
+    t = gUnk_086141BC[gEffectRandomTableIndex];
     c = &p->flags[7];
     *c = (t & 3) + (1 + *c);
     if (*c > 5)
@@ -2236,8 +2235,8 @@ void Nidhoggr_SelectRandomPart23AlternateAnimation(struct Nidhoggr *p)
 {
     u8 *c;
     u16 t;
-    gUnk_03005304 = (gUnk_03005304 + 1) & 0x3FF;
-    t = gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
+    t = gUnk_086141BC[gEffectRandomTableIndex];
     c = &p->flags[8];
     *c = (t & 3) + (1 + *c);
     if (*c > 5)
@@ -2258,15 +2257,15 @@ void Sound_PlaySongChecked(u32);
 
 static inline s32 Random2(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 
 void Nidhoggr_PlayNearbyRandomSound(struct Vec08194CB8 *pos)
 {
     struct Vec08194CB8 d;
-    d.x = pos->x - gUnk_02000710->positionX;
-    d.z = pos->z - gUnk_02000710->positionZ;
+    d.x = pos->x - gGameState->positionX;
+    d.z = pos->z - gGameState->positionZ;
     if (d.x < 0)
         d.x = -d.x;
     if (d.z < 0)
@@ -2505,7 +2504,7 @@ extern const struct SceneVec gUnk_0824F598, gUnk_0824F5A8, gUnk_0824F5B0, gUnk_0
 
 void Nidhoggr_TrackPlayerDepth(struct Nidhoggr *t)
 {
-    s32 d = gUnk_02000710->positionZ - (t->basePos.z - gUnk_0824F598.z);
+    s32 d = gGameState->positionZ - (t->basePos.z - gUnk_0824F598.z);
     s32 target;
     s16 *speed;
     if (d > 0x200)
@@ -2724,8 +2723,8 @@ void Nidhoggr_ShufflePartOrder(struct Nidhoggr *p)
     do {
         u8 t, *e;
         s32 r;
-        gUnk_03005304 = (gUnk_03005304 + 1) & 0x3FF;
-        r = sub_08249350(tbl[gUnk_03005304], 9);
+        gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
+        r = sub_08249350(tbl[gEffectRandomTableIndex], 9);
         a = p->shuffleOrder;
         e = a + i;
         t = *e;
@@ -3187,7 +3186,7 @@ void Nidhoggr_UpdateFastReturn(struct Nidhoggr *t)
     }
 }
 
-extern u32 gUnk_030053F4, gUnk_030053F0;
+extern u32 gUnk_030053F0;
 
 extern u32 gUnk_02000560;
 
@@ -3209,7 +3208,7 @@ static inline u32 Tst32(u32 mask, u32 *p)
 
 static inline void Track(struct Nidhoggr *t)
 {
-    if (gUnk_02000710->positionX > 0xeff)
+    if (gGameState->positionX > 0xeff)
         Nidhoggr_SetConfiguredTargetValues(t);
     else
         Nidhoggr_ClearTargetValues(t);
@@ -3252,7 +3251,7 @@ void Nidhoggr_UpdateTimedAttackSequence(struct Nidhoggr *t)
                 t->flags[2] |= 3;
             if (t->timer > 0x257) {
                 t->attackActive = 0;
-                if (gUnk_02000710->positionX > 0xeff)
+                if (gGameState->positionX > 0xeff)
                     Nidhoggr_UnregisterTerrainCells(t);
                 else
                     Nidhoggr_SetTerrainCellFlag40(t);
@@ -3268,7 +3267,7 @@ void Nidhoggr_UpdateTimedAttackSequence(struct Nidhoggr *t)
                 t->state++;
             break;
         case 6:
-            if (gUnk_02000710->positionX > 0xeff) {
+            if (gGameState->positionX > 0xeff) {
                 if ((t->groupHpA <= 0 && t->groupHpB <= 0) || t->life <= 0)
                     Nidhoggr_SetBehavior(t, 12);
                 else
@@ -3280,7 +3279,7 @@ void Nidhoggr_UpdateTimedAttackSequence(struct Nidhoggr *t)
             break;
         case 7:
             if (!t->flags[1]) {
-                if (!Tst2(0x400, &gUnk_030053F4, &gUnk_030053F0) && !Tst32(4, &gUnk_02000560))
+                if (!Tst2(0x400, &gEngineFlags, &gUnk_030053F0) && !Tst32(4, &gUnk_02000560))
                     SceneAnimation_InitTimedCollider(t);
                 else {
                     Nidhoggr_UnregisterTerrainCells(t);
@@ -3349,7 +3348,7 @@ void Nidhoggr_UpdateEffectAttack(struct Nidhoggr *t)
         case 2:
             Nidhoggr_SetBackgroundMode(t, 1);
             t->basePos = gUnk_0824F598;
-            t->basePos.z += gUnk_02000710->positionZ;
+            t->basePos.z += gGameState->positionZ;
             t->speed = 0;
             t->pos = t->basePos;
             t->pos.x += -0x800;
@@ -3627,7 +3626,7 @@ void Nidhoggr_UpdateDepartureTransition(struct Nidhoggr *t)
             t->pos.x = -0xd80;
             t->pos.y = 0;
             t->pos.z = 0x80;
-            t->pos.z = gUnk_02000710->positionZ + 0x80;
+            t->pos.z = gGameState->positionZ + 0x80;
             t->basePos = t->pos;
             t->basePos.x = -0x680;
             Nidhoggr_InitRelativeMotion(t, t->basePos.x, t->basePos.z);
@@ -3769,7 +3768,7 @@ s32 Nidhoggr_Update(struct Nidhoggr *t)
 {
     Nidhoggr_CheckActivationTriggers(t);
     Nidhoggr_UpdateState(t);
-    if (Tst2(0x400, &gUnk_030053F4, &gUnk_030053F0) || Tst32(4, &gUnk_02000560))
+    if (Tst2(0x400, &gEngineFlags, &gUnk_030053F0) || Tst32(4, &gUnk_02000560))
         t->flags[0] = 0;
     if (t->flags[0]) {
         Collider_Refresh(&t->altColliders[0]);
@@ -3911,8 +3910,8 @@ s32 Nidhoggr_Init(struct Nidhoggr *t, s32 unusedA, s32 unusedB)
     Nidhoggr_InitSuspendedObject(t);
     Nidhoggr_SetBehavior(t, 0);
     t->life = t->maxLife;
-    *(s32 *)((u8 *)gUnk_02000710 + 0x61c) = (s16)t->maxLife;
-    *(s32 *)((u8 *)gUnk_02000710 + 0x618) = t->life;
+    *(s32 *)((u8 *)gGameState + 0x61c) = (s16)t->maxLife;
+    *(s32 *)((u8 *)gGameState + 0x618) = t->life;
     t->flags[0] = 0;
     t->flags[1] = 0;
     t->attackActive = 0;

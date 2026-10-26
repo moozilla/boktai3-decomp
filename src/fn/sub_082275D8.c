@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern void *gUnk_03005420;
 void *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 Camera_Initialize(void *, void *);
@@ -11,8 +11,8 @@ void Camera_Destroy(void);
 void *Camera_Create(void *a)
 {
     void *p;
-    if (gUnk_03005420 != 0)
-        return gUnk_03005420;
+    if (gActiveCamera != 0)
+        return gActiveCamera;
     p = Task_Create(7, 0xA4);
     if (p != 0) {
         Task_SetCallbacks(p, Camera_Update, Camera_Destroy);

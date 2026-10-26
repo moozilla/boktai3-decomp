@@ -1,15 +1,15 @@
 #include "global.h"
-extern u16 gUnk_02000544;
+extern u16 gPlayerCount;
 extern u16 gUnk_02000500;
 extern u16 gUnk_02000520;
 extern u16 gUnk_02000534;
 extern u16 gUnk_02000590;
 extern u16 gUnk_02000570;
 extern u16 gUnk_02000528;
-extern u16 gUnk_02000518;
+extern u16 gPlayerCueTimer;
 extern u32 gUnk_02000560[4];
 extern u32 gUnk_02000580[4];
-extern u16 gUnk_02000508[4];
+extern u16 gTrackedPlayerId[4];
 extern u16 gUnk_02000548[2];
 extern u16 gUnk_0200052C, gUnk_02000550, gUnk_0200053C, gUnk_02000554;
 // MATCHING_CONCESSION: register-pinning
@@ -25,7 +25,7 @@ void Player_ResetLinkState(void)
     *(u16 *)0x02000544 = 0;
     for (i = 0; i < 4; i++) {
         gUnk_02000580[i] = 0;
-        gUnk_02000508[i] = 0;
+        gTrackedPlayerId[i] = 0;
         gUnk_02000560[i] = 0;
     }
 
@@ -35,7 +35,7 @@ void Player_ResetLinkState(void)
     firstCounter = &gUnk_02000590;
     secondCounter = &gUnk_02000570;
     thirdCounter = &gUnk_02000528;
-    fourthCounter = &gUnk_02000518;
+    fourthCounter = &gPlayerCueTimer;
     // Keep these addresses live together until the counter resets.
     asm("" : : "g"(firstCounter), "g"(secondCounter), "g"(thirdCounter), "g"(fourthCounter));
     *firstCounter = 0;

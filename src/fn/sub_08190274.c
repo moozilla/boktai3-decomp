@@ -17,7 +17,7 @@ struct NidhoggrFallingEffect {
     u8 unknown180[4];
     u8 *boss;
 };
-extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
+extern u32 gEngineFlags, gUnk_030053F0, gUnk_02000560;
 extern const struct NidhoggrEffectPair gUnk_0824F27C, gUnk_0824F274;
 extern struct NidhoggrEffectPair gUnk_0824F284;
 struct NidhoggrFallingEffect *SceneEffectPool_AllocateSlot(void *);
@@ -52,7 +52,7 @@ void Nidhoggr_CreateSeekingAttackEffect(u8 *owner, struct NidhoggrEffectVector *
     void (*callback)(void *);
     u32 mask = 0x400;
     u32 zero;
-    if ((gUnk_030053F4 | gUnk_030053F0) & mask)
+    if ((gEngineFlags | gUnk_030053F0) & mask)
         return;
     zero = ReadBlockFlag(4);
     if (zero)

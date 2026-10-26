@@ -1,5 +1,5 @@
-#define gCompactSpritePool gUnk_020004D8
 #include "global.h"
+#include "ram.h"
 struct CompactSpriteEntry {
     u8 animData[0x1c];
     u32 spriteFlags;
@@ -16,7 +16,6 @@ struct CompactSpritePool {
     struct CompactSpriteEntry entries[2];
     void *sequence;
 };
-extern struct CompactSpritePool *gUnk_020004D8;
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void *ScriptProc_Start(u16, u16);
@@ -39,6 +38,6 @@ s32 CompactSpritePool_Initialize(struct CompactSpritePool *pool)
         pool->entries[i].spriteFlags |= 0x11;
         pool->entries[i].spriteMode = 1;
     }
-    gUnk_020004D8 = pool;
+    gCompactSpritePool = pool;
     return 0;
 }

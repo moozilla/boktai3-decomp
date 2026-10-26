@@ -1,13 +1,13 @@
 #include "global.h"
+#include "ram.h"
 struct G {
     u8 p[0xeec];
     s32 w;
 };
-extern struct G *gUnk_020005EC;
 void SunOrb_GetOrCreateManager(void);
 s32 SunOrb_GetManagerStatus(void)
 {
-    struct G *g = gUnk_020005EC;
+    struct G *g = gSlotController;
     s32 r;
     if (g != 0)
         r = g->w;

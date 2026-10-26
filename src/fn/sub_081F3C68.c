@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
@@ -61,7 +62,6 @@ struct Actor {
 #define U(o) (*(u16 *)((u8 *)p2 + (o)))
 #define B(o) (*(u8 *)((u8 *)p2 + (o)))
 #define W(o) (*(u32 *)((u8 *)p2 + (o)))
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
@@ -73,8 +73,8 @@ u8 Callback_InvokeActor(void *, void *);
 s32 Math_Atan2(s32, s32);
 static inline u32 randomA(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 static inline void facing(struct Actor *p, s32 angle)
 {
@@ -109,7 +109,7 @@ static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
     d->z = a->z + b->z;
 }
 
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 struct Vec *Player_GetEffectivePosition(s32);
 s32 Div(s32, s32);
@@ -124,8 +124,8 @@ void PlayerClone_SetColliderExtents(void *, s32, s32, s32, s32, s32, s32);
 s32 sub_08201160(void *, struct Vec *);
 static inline u32 randomB(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(const u16 *)(gUnk_03005308 * 2 + (u32)gUnk_0203B400);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(const u16 *)(gRandomIndex * 2 + (u32)gUnk_0203B400);
 }
 static inline void clampSpawn(struct Vec *spawn)
 {

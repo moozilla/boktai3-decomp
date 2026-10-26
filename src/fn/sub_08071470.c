@@ -3,7 +3,7 @@ extern const u8 gUnk_08605C18[];
 u8 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *, const void *);
 static inline u8 SceneActorRegistry_IsPaused(void)
 {
-    if (gUnk_030053F4 & 0x4800)
+    if (gEngineFlags & 0x4800)
         return 1;
     return 0;
 }

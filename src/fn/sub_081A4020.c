@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u32 fl;
     u8 f[0x50 - 4];
@@ -11,10 +12,9 @@ struct G {
     u8 g[3];
     struct E e[32];
 };
-extern struct G *gUnk_02000240;
 struct E *Hresvelgr_FindInactiveEffect(void)
 {
-    struct G *g = gUnk_02000240;
+    struct G *g = gMotionEntryManager;
     struct E *e;
     s32 i;
     if (g->n <= 0x1f)

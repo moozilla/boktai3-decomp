@@ -12,7 +12,7 @@ void StatDisplay_DrawRatio(struct StatDisplay *, s32, s32, s32, s32, s32, s32, s
 void StatDisplay_DrawPlayerValue(struct StatDisplay *p, s32 style, s32 x, s32 y)
 {
     if (p->enabled) {
-        if ((u16)((u16)gUnk_02000710->form - 1) <= 1) {
+        if ((u16)((u16)gGameState->form - 1) <= 1) {
             s32 current = Div(p->player->statusValue, 4);
             s32 maximum = Div(4000, 4);
             StatDisplay_DrawRatio(p, style, 1000, 4, current, maximum, x, y);

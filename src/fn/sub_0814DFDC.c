@@ -1,8 +1,8 @@
 #include "global.h"
 #include "player.h"
 // confidence=low: descriptor meanings remain tentative; creates the selected attack display projectile.
-extern u32 gUnk_030053F4;
-extern u8 *gUnk_02000710;
+extern u32 gEngineFlags;
+extern u8 *gGameState;
 s32 Player_GetSelectedSlotActionScale(void);
 s32 ActorResponse_Apply(struct Player *, s32);
 u8 *Player_GetSpecialAttackDescriptor(s32);
@@ -45,7 +45,7 @@ s32 Player_SpawnSelectedAttackProjectile(struct Player *p)
     if (p->statModifierContext.statBOverrideMode == 6 &&
         p->statModifierContext.statBOverrideEnabled)
         return 0;
-    if (gUnk_030053F4 & 0x1000)
+    if (gEngineFlags & 0x1000)
         cost = Player_GetSelectedSlotActionScale();
     else {
         if (!p->statModifierContext.statBOverrideEnabled)
@@ -56,7 +56,7 @@ s32 Player_SpawnSelectedAttackProjectile(struct Player *p)
             cost = Player_GetSpecialAttackDescriptor(p->statModifierContext.actionKind)[2];
         cost = ActorResponse_Apply(p, cost);
     }
-    if (Player_IsStatBBelow(p, cost) && !(gUnk_030053F4 & 0x1000)) {
+    if (Player_IsStatBBelow(p, cost) && !(gEngineFlags & 0x1000)) {
         if (p->statModifierContext.statBOverrideEnabled && p->actionMode != 6)
             Sound_PlaySong(0xD5);
         return 0;
@@ -66,7 +66,7 @@ s32 Player_SpawnSelectedAttackProjectile(struct Player *p)
     {
         s32 stat = p->currentStatB;
         special = 0;
-        if (gUnk_030053F4 & 0x1000) {
+        if (gEngineFlags & 0x1000) {
             if ((u8)(p->thresholdMode - 6) <= 5 && stat >= cost)
                 special = 1;
         } else {
@@ -108,7 +108,7 @@ s32 Player_SpawnSelectedAttackProjectile(struct Player *p)
             size = 144;
             break;
     }
-    if (gUnk_030053F4 & 0x1000) {
+    if (gEngineFlags & 0x1000) {
         switch (p->statModifierContext.actionKind) {
             case 1:
                 power = 30;
@@ -119,9 +119,9 @@ s32 Player_SpawnSelectedAttackProjectile(struct Player *p)
                 goto powerReady;
         }
     }
-    power = *(s16 *)(gUnk_02000710 + 0x40) + descriptor[1];
+    power = *(s16 *)(gGameState + 0x40) + descriptor[1];
 powerReady:
-    if (special && (gUnk_030053F4 & 0x1000)) {
+    if (special && (gEngineFlags & 0x1000)) {
         u32 flags =
             Player_GetAttackAttributeFlags(p->statModifierContext.statBOverrideMode) | 0x800000;
         Projectile_SetDamageParams(p->statModifierContext.actionSelectionDisplay, size, flags,

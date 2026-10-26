@@ -3,7 +3,6 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_motion.h"
 #include "engine.h"
-extern u32 gUnk_030053F4;
 static inline u8 Test(u32 v, u32 m)
 {
     if (v & m)
@@ -13,9 +12,9 @@ static inline u8 Test(u32 v, u32 m)
 static inline u32 Cell(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline void StepSequence(void *obj)
 {
@@ -134,7 +133,7 @@ void Mimic_ResetPursuitDrawable(struct SceneActorRegistryResetView *actor)
     u8 *context = actor->context;
     *(u16 *)(context + 0x65A) = 0;
     *(u16 *)(context + 0x65C) = 0;
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         *(struct ContactPosition *)(context + 0x650) = actor->position;
         *(u16 *)(context + 0x658) = Cell(&actor->position);
     }

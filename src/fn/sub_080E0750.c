@@ -25,20 +25,20 @@ s32 Terrain_ApplyBlocked(void *, void *, void *);
 void Memory_Clear(void *, u32);
 void Callback_InvokeActor(void *, void *);
 
-extern u8 *gUnk_030052F4;
-extern u32 gUnk_030052F8;
-extern u32 gUnk_030052FC;
-extern u32 gUnk_030053F4;
-extern u32 gUnk_03005308;
+extern u8 *gTerrainMap;
+extern u32 gTerrainWidth;
+extern u32 gTerrainHeight;
+extern u32 gEngineFlags;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern u8 *gUnknown_02000580[];
 
 /* grid cell id of tile (x, y), 0 when outside the map */
 static inline s32 f0750_CellId(s32 x, s32 y)
 {
-    if (x < 0 || y < 0 || (u32)x >= gUnk_030052F8 || (u32)y >= gUnk_030052FC)
+    if (x < 0 || y < 0 || (u32)x >= gTerrainWidth || (u32)y >= gTerrainHeight)
         return 0;
-    return *(u16 *)(gUnk_030052F4 + 0x24 + y * 2) + x;
+    return *(u16 *)(gTerrainMap + 0x24 + y * 2) + x;
 }
 
 /* terrain height at a cell, minus the slope offset of the probe position */
@@ -51,7 +51,7 @@ static inline s32 f0750_CellHeight(s32 cell, u8 *pos)
     if (p)
         p += 4;
     else
-        p = *(u8 **)(gUnk_030052F4 + 4) + cell * 4 + 0xC;
+        p = *(u8 **)(gTerrainMap + 4) + cell * 4 + 0xC;
     b = *p;
     h = (b & 0xF) << 8;
     if ((b >> 4) == 1)
@@ -107,8 +107,8 @@ static inline void f0750_RerollFacing(u8 *arg0)
     u8 *q;
 
     for (i = 0; i <= 3; i++) {
-        gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-        rnd = (gUnk_0203B400[gUnk_03005308] & 3) << 6;
+        gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+        rnd = (gUnk_0203B400[gRandomIndex] & 3) << 6;
         if (rnd != facing)
             break;
         rnd = facing;
@@ -133,14 +133,14 @@ static inline s32 f0750_MeshCheck(u8 *arg0, s32 cell)
     s32 h;
     u8 *p;
 
-    cx = Mod(cell, *(s16 *)(*(u8 **)(gUnk_030052F4 + 4) + 4));
-    cy = Div(cell, *(s16 *)(*(u8 **)(gUnk_030052F4 + 4) + 4));
+    cx = Mod(cell, *(s16 *)(*(u8 **)(gTerrainMap + 4) + 4));
+    cy = Div(cell, *(s16 *)(*(u8 **)(gTerrainMap + 4) + 4));
     loc[0] = cx * 256 + 0x80;
     p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         p += 4;
     else
-        p = *(u8 **)(gUnk_030052F4 + 4) + cell * 4 + 0xC;
+        p = *(u8 **)(gTerrainMap + 4) + cell * 4 + 0xC;
     loc[1] = (*p & 0xF) << 8;
     loc[2] = cy * 256 + 0x80;
     h = f0750_NavMove(arg0, *(void **)(arg0 + 0x5D0), arg0 + 0x5C, loc);
@@ -205,7 +205,7 @@ void sub_080E0750(u8 *arg0)
         p[0] = pt[0];
         p[2] = pt[1];
         p[1] = f0750_CellHeight(f0750_CellId((s16)pt[0] >> 8, (s16)pt[1] >> 8), (u8 *)p);
-        if (gUnk_030053F4 & 0x4800) {
+        if (gEngineFlags & 0x4800) {
             q = AT(u8 *, 0xDC);
             if (q == 0)
                 goto a_callback;
@@ -279,7 +279,7 @@ void sub_080E0750(u8 *arg0)
         p[0] = pt[0];
         p[2] = pt[1];
         p[1] = f0750_CellHeight(f0750_CellId((s16)pt[0] >> 8, (s16)pt[1] >> 8), (u8 *)p);
-        if (gUnk_030053F4 & 0x4800) {
+        if (gEngineFlags & 0x4800) {
             q = AT(u8 *, 0xDC);
             if (q == 0)
                 goto b_callback;

@@ -23,9 +23,9 @@ s32 Terrain_ApplyBlocked(void *, void *, void *);
 
 static inline u32 Cell(s32 x, s32 z)
 {
-    if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) || (((u32)z) >= gUnk_030052FC))
+    if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight))
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 s32 sub_080C47DC(u8 *actor)

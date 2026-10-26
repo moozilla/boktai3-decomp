@@ -18,7 +18,7 @@ struct S {
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
 
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern void *gUnk_02000580[];
 void Sound_PlaySong(u32);
@@ -30,20 +30,20 @@ struct Vec {
 } __attribute__((aligned(4)));
 static inline s32 Random(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return gUnk_0203B400[gRandomIndex];
 }
 static inline s32 RandomFrom(const u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return table[gRandomIndex];
 }
 // confidence=low: emits two four-direction effect groups during a two-stage animation.
 #define StateActor_UpdateEightWayBurst sub_081CA490
 inline static s32 Random_081CA490(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return (*((typeof(gUnk_0203B400) *)0x0203B400))[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return (*((typeof(gUnk_0203B400) *)0x0203B400))[gRandomIndex];
 }
 
 void StateActor_UpdateEightWayBurst(u32 a, struct S *p, s32 tick)

@@ -73,7 +73,7 @@ struct VanargandPresentation {
 };
 extern u16 gUnk_03005260[];
 extern u16 gUnk_03004FC0[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 void SceneActors_UpdateEffects(void *);
 void Camera_BlendOffset(void *, void *, s32);
@@ -113,8 +113,8 @@ static inline s32 Blend(s32 t, s32 first, s32 last, s32 duration)
 }
 static inline s32 RandomValue(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(u16 *)((gUnk_03005308 << 1) + RANDOM_TABLE_ADDR);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR);
 }
 static inline u32 TestActorFlag(u32 mask, struct VanargandPresentation *self)
 {

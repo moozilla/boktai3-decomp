@@ -1,5 +1,6 @@
 #include "global.h"
 #include "player.h"
+#include "engine.h"
 
 void Sound_PlaySong(u32);
 s32 ActorVariant_GetTableValue(u32, s32);
@@ -9,7 +10,6 @@ u32 Player_ConsumeStateEntry(struct Player *);
 void WirelessGame_NotifyPlayerDefeated(void);
 void Player_AddControlFlags(struct Player *, u32);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, u8, u32, u32, u32, u32, u32);
-extern u32 gUnk_030053F4;
 void PlayerCue_EnterStandUpdate(void *);
 void PlayerCue_CompleteAction(void *);
 void Player_UpdateFacingSide(void *);
@@ -38,7 +38,7 @@ void Player_UpdateDefeatRecoil(struct Player *p)
         else
             Sound_PlaySong(0xE7);
         Sound_PlaySong(0xE6);
-        if (gUnk_030053F4 & 0x1000)
+        if (gEngineFlags & 0x1000)
             WirelessGame_NotifyPlayerDefeated();
         p->kindTwoAttachment =
             ActorAttachment_UpdateFromDescriptor(p->kindTwoAttachment, &p->positionalEffectGroup,
@@ -78,7 +78,7 @@ void Player_UpdateDefeatRecoil(struct Player *p)
             p->velocityZ = -scale(value);
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x2C), 0x40, 1)) {
                 p->directionFrame = 0;
-                if (!(gUnk_030053F4 & 0x1000))
+                if (!(gEngineFlags & 0x1000))
                     Player_SetActionPhase(p, 3);
                 else
                     Player_SetActionPhase(p, 4);
@@ -86,7 +86,7 @@ void Player_UpdateDefeatRecoil(struct Player *p)
             break;
         case 3:
             if (++p->tetherFrame > 19) {
-                gUnk_030053F4 |= 0x400;
+                gEngineFlags |= 0x400;
                 Player_SetActionPhase(p, 4);
             }
             break;

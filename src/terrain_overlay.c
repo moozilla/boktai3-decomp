@@ -76,15 +76,15 @@ void TerrainOverlay_RemoveActor(struct TerrainOverlay *, u16);
 static inline struct TerrainOverlayCell *baseCell(s32 index)
 {
     struct TerrainOverlayCell *cell;
-    if (!gUnk_030052F4->cells)
+    if (!gTerrainMap->cells)
         return 0;
-    cell = (struct TerrainOverlayCell *)(gUnk_030052F4->cells + 12 + index * 4);
+    cell = (struct TerrainOverlayCell *)(gTerrainMap->cells + 12 + index * 4);
     return cell;
 }
 
 static inline u16 rowOffset(s32 row)
 {
-    return gUnk_030052F4->rows[row];
+    return gTerrainMap->rows[row];
 }
 
 s32 TerrainOverlay_Update(struct TerrainOverlay *p)
@@ -183,7 +183,7 @@ s32 TerrainOverlay_Update(struct TerrainOverlay *p)
             if (dynamic)
                 cell = (struct TerrainOverlayCell *)(dynamic + 4);
             else
-                cell = (struct TerrainOverlayCell *)(gUnk_030052F4->cells + 12 + index * 4);
+                cell = (struct TerrainOverlayCell *)(gTerrainMap->cells + 12 + index * 4);
             if (!cell || (cell->flags & 16)) {
                 heights[i + 1] = 0;
                 tiles[i + 1] = 255;

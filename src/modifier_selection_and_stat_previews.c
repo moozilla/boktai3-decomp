@@ -28,27 +28,27 @@ u32 Modifier_ReadPackedValue(u32 k, s32 n)
     s32 v;
     switch (k) {
         case 0:
-            v = gUnk_02000710->unk7B8[0];
+            v = gGameState->unk7B8[0];
             r = (v >> sh) & m;
             break;
         case 1:
-            v = gUnk_02000710->unk7B8[2];
+            v = gGameState->unk7B8[2];
             r = (v >> sh) & m;
             break;
         case 2:
-            v = gUnk_02000710->unk7B8[1];
+            v = gGameState->unk7B8[1];
             r = (v >> sh) & m;
             break;
         case 3:
-            v = gUnk_02000710->unk7B8[3];
+            v = gGameState->unk7B8[3];
             r = (v >> sh) & m;
             break;
         case 4:
-            v = gUnk_02000710->unk81C;
+            v = gGameState->unk81C;
             r = (v >> sh) & m;
             break;
         case 5:
-            v = gUnk_02000710->unk7F8;
+            v = gGameState->unk7F8;
             r = (v >> sh) & m;
             break;
         default:
@@ -116,7 +116,7 @@ s32 Modifier_CollectSources(struct ModifierSelection *actor, struct ModifierSele
     i = 0;
     if (count < selection->count) {
         do {
-            ScriptRecord_FindModifierRecord(&scratch, ((s16 *)gUnk_02000710->modifierIdsBytes)[i]);
+            ScriptRecord_FindModifierRecord(&scratch, ((s16 *)gGameState->modifierIdsBytes)[i]);
             output[count] = scratch;
             count++;
             i++;
@@ -126,7 +126,7 @@ s32 Modifier_CollectSources(struct ModifierSelection *actor, struct ModifierSele
     {
         s32 selectedCount = selection->count;
         if (i < selectedCount) {
-            struct GameState *state = gUnk_02000710;
+            struct GameState *state = gGameState;
             s32 selectedId = actor->selectedId;
             s16 *ids = (s16 *)state->modifierIdsBytes;
             do {
@@ -361,7 +361,7 @@ s32 ModifierMenu_CommitFirstSource(struct ModifierMenu *p)
     d->values0[1] = s->values0[1];
     v = s->sourceIds[0];
     d->sourceIds[0] = v;
-    gUnk_02000710->unk7A0[0] = v;
+    gGameState->unk7A0[0] = v;
     return 0;
 }
 
@@ -376,7 +376,7 @@ s32 ModifierMenu_CommitSecondSource(struct ModifierMenu *p)
     d->capacity = s->capacity;
     v = s->sourceIds[1];
     d->sourceIds[1] = v;
-    gUnk_02000710->unk7A0[2] = v;
+    gGameState->unk7A0[2] = v;
     return 0;
 }
 
@@ -406,10 +406,10 @@ void ModifierMenu_ReconcileSelection(struct ModifierMenu *menu)
             menu->changed = 1;
     }
     for (index = 0; index <= 3; index++)
-        ((s16 *)gUnk_02000710->modifierIdsBytes)[index] = -1;
+        ((s16 *)gGameState->modifierIdsBytes)[index] = -1;
     for (count = 0, index = 0; index <= 31; index++) {
         if (Modifier_TestSelection(current, index)) {
-            ((s16 *)gUnk_02000710->modifierIdsBytes)[count] = index;
+            ((s16 *)gGameState->modifierIdsBytes)[count] = index;
             count++;
         }
     }
@@ -425,7 +425,7 @@ s32 ModifierMenu_CommitThirdSource(struct ModifierMenu *p)
     d->valuesE[2] = s->valuesE[2];
     v = s->sourceIds[2];
     d->sourceIds[2] = v;
-    gUnk_02000710->unk7A0[1] = v;
+    gGameState->unk7A0[1] = v;
     return 0;
 }
 
@@ -438,7 +438,7 @@ s32 ModifierMenu_CommitFourthSource(struct ModifierMenu *p)
     d->valuesE[4] = s->valuesE[4];
     v = s->sourceIds[3];
     d->sourceIds[3] = v;
-    gUnk_02000710->unk7A0[3] = v;
+    gGameState->unk7A0[3] = v;
     return 0;
 }
 
@@ -479,7 +479,7 @@ s32 ModifierMenu_CommitSecondarySource(struct ModifierMenu *p)
     struct ModifierSelection *d = &p->current;
     u16 v = s->secondaryId;
     d->secondaryId = v;
-    gUnk_02000710->unk81A = v;
+    gGameState->unk81A = v;
     return 0;
 }
 
@@ -489,7 +489,7 @@ void Registry1745_SetMenuRequest(u32);
 
 static inline u32 TestFlags(u32 mask)
 {
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 
 void ModifierMenu_CloseScript(struct ModifierMenu *menu)

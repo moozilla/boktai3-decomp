@@ -132,7 +132,7 @@ struct SceneHudState {
     u8 secondaryCount;        /* 0x13F2 */
     u8 secondarySlideTimer;   /* 0x13F3 */
     u8 unknown13F4[0x20];
-    u8 mode; /* 0x1414: snapshot of gUnk_020005A4 */
+    u8 mode; /* 0x1414: snapshot of gSceneHudMode */
     u8 unknown1415;
     u8 pageEnabled[10]; /* 0x1416: script -o visibility list */
     struct SceneInputWidget

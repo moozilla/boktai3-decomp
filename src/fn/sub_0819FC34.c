@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: charges along the facing axis, turning by a random signed offset on contact.
 struct Vec {
@@ -42,7 +43,6 @@ struct Hresvelgr {
     u8 pad32C[8];
     s16 turn;
 };
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 void ActionState_Reset(void *);
 void ActionState_SetState(void *, u32);
@@ -86,8 +86,8 @@ static inline u8 OutsideChargeBounds(struct Hresvelgr *actor)
 static inline s32 RandomValue(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 static inline void SetFlags(struct Hresvelgr *actor, u32 bits)

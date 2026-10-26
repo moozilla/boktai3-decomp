@@ -6,9 +6,9 @@ struct Task {
 };
 extern u32 gUnk_03005408, gUnk_030054B0, gUnk_03003A08, gUnk_030053E8, gUnk_030053FC;
 extern u32 gUnk_030053DC, gUnk_03005414, gUnk_0300540C;
-extern u32 gUnk_030053F4, gUnk_03005404, gUnk_030053E4, gUnk_030053D8;
+extern u32 gEngineFlags, gUnk_03005404, gUnk_030053E4, gUnk_030053D8;
 extern u16 gUnk_03005260, gUnk_030039F0;
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern u32 *gUnk_030053F8;
 void System_ShutdownAndSoftReset(void);
 void SceneLifecycle_InitSceneState(void);
@@ -98,8 +98,8 @@ update: {
                 break;
             SceneLifecycle_OnTransitionCleanup();
             SceneLifecycle_ReleaseSceneResources();
-            if (gUnk_030053F4 & 0x200) {
-                gUnk_030053F4 &= ~0x200;
+            if (gEngineFlags & 0x200) {
+                gEngineFlags &= ~0x200;
                 if (gEnginePauseFlags & 8)
                     gEnginePauseFlags &= ~8;
             }
@@ -107,7 +107,7 @@ update: {
                 GameState_BackupActiveRegions();
             else if (gUnk_030053E8 & 0x100) {
                 GameState_RestoreActiveRegions();
-                Script_SetEntryProcedure(*(s16 *)(gUnk_02000710 + 0x5A4));
+                Script_SetEntryProcedure(*(s16 *)(gGameState + 0x5A4));
             }
             task->state = 0;
             break;
@@ -121,7 +121,7 @@ update: {
         (*gUnk_030053F8)++;
     gUnk_030053E4++;
     if (gUnk_030053D8) {
-        s32 *counter = (s32 *)(gUnk_02000710 + 0x614);
+        s32 *counter = (s32 *)(gGameState + 0x614);
         if (*counter <= 0x7FFFFFFE)
             (*counter)++;
     }

@@ -1,7 +1,7 @@
 #define WoodenCrate_TestFlags WoodenCrate_HasFlags
-#define gWoodenCrateManager   gUnk_020001A4
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct WoodenCrate {
     u8 unknown0[0x2C];
     u8 animation[4];
@@ -22,12 +22,11 @@ struct WoodenCrateManager {
     u8 unknown0[0x18];
     void *animationData;
 };
-extern struct WoodenCrateManager *gUnk_020001A4;
 u8 WoodenCrate_HasFlags(struct WoodenCrate *, s32);
 void WoodenCrate_ClearFlags(struct WoodenCrate *, u16);
 void WoodenCrate_BeginToggleAnimation(struct WoodenCrate *crate)
 {
-    struct WoodenCrateManager *manager = gUnk_020001A4;
+    struct WoodenCrateManager *manager = gWoodenCrateManager;
     Sound_PlaySong(0x14C);
     if (crate->state == 2) {
         if (crate->animationFlags & 4)

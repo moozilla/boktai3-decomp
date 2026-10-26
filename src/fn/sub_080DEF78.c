@@ -30,7 +30,7 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
         if (data)
             data += 4;
         else
-            data = (gUnk_030052F4->cells + (cell * 4)) + 12;
+            data = (gTerrainMap->cells + (cell * 4)) + 12;
         kind = (*data) >> 4;
         switch (Direction(a->direction + 32) & 3) {
             case 0:
@@ -45,14 +45,14 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
                 break;
 
             case 1:
-                next = cell + (*((s16 *)(gUnk_030052F4->cells + 4)));
+                next = cell + (*((s16 *)(gTerrainMap->cells + 4)));
                 count = 0;
                 do {
                     if (!SceneActorTerrain_CanTraverseCell(cell, next, height, kind))
                         break;
-                    next += *((s16 *)(gUnk_030052F4->cells + 4));
+                    next += *((s16 *)(gTerrainMap->cells + 4));
                 } while ((++count) < 1);
-                selected = next - (*((s16 *)(gUnk_030052F4->cells + 4)));
+                selected = next - (*((s16 *)(gTerrainMap->cells + 4)));
                 break;
 
             case 2:
@@ -67,14 +67,14 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
                 break;
 
             case 3:
-                next = cell - (*((s16 *)(gUnk_030052F4->cells + 4)));
+                next = cell - (*((s16 *)(gTerrainMap->cells + 4)));
                 count = 0;
                 do {
                     if (!SceneActorTerrain_CanTraverseCell(cell, next, height, kind))
                         break;
-                    next -= *((s16 *)(gUnk_030052F4->cells + 4));
+                    next -= *((s16 *)(gTerrainMap->cells + 4));
                 } while ((++count) < 1);
-                selected = next + (*((s16 *)(gUnk_030052F4->cells + 4)));
+                selected = next + (*((s16 *)(gTerrainMap->cells + 4)));
                 break;
 
             default:
@@ -88,25 +88,25 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
         if (selected != a->terrainCell)
             break;
     } while ((++tries) <= 3);
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
     {
         s32 k2 = 127;
-        if (((u8)gUnk_0203B400[gUnk_03005308]) <= k2)
+        if (((u8)gUnk_0203B400[gRandomIndex]) <= k2)
             context[k1] = 1;
         else
             context[k1] = 0;
     }
     a->direction = saved;
     {
-        s32 x = Mod(selected, *((s16 *)(gUnk_030052F4->cells + 4)));
-        s32 z = Div(selected, *((s16 *)(gUnk_030052F4->cells + 4)));
+        s32 x = Mod(selected, *((s16 *)(gTerrainMap->cells + 4)));
+        s32 z = Div(selected, *((s16 *)(gTerrainMap->cells + 4)));
         u8 *data;
         target.x = (x << 8) + 128;
         data = TerrainModifiers_FindCellOverride(selected, 1);
         if (data)
             data += 4;
         else
-            data = (gUnk_030052F4->cells + (selected * 4)) + 12;
+            data = (gTerrainMap->cells + (selected * 4)) + 12;
         target.y = ((*data) & 15) << 8;
         target.z = (z << 8) + 128;
     }

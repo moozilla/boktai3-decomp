@@ -2,7 +2,7 @@
 #include "scene_actor_reset.h"
 #include "engine.h"
 
-#define gCurrentTerrainMap gUnk_030052F4
+#define gCurrentTerrainMap gTerrainMap
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);

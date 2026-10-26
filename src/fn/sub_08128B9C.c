@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -32,7 +33,6 @@ struct FeatherPool {
     void *sequences;
     u32 used;
 };
-extern struct FeatherPool *gUnk_02000174;
 void Sprite_Remove(void *);
 void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);

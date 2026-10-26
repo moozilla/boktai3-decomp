@@ -3,7 +3,6 @@
 // Remaining differences include octant-mask lifetime, control initialization and registers.
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 extern u8 *gUnk_02000580[];
@@ -42,6 +41,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 
 }
 
 #include "scene_actor_animation.h"
+#include "engine.h"
 void Lun_GetDirectionalFrame(u8, u32 *, u32 *);
 s32 Mod(s32, s32);
 void Player_SubtractEnergy(void *, u32);

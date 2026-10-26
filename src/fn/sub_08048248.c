@@ -11,8 +11,8 @@ s32 ContactBurst_Initialize(struct ContactBurst *effect, const struct ContactPos
     s32 status;
     effect->enabled = 0;
     effect->previousEnabled = 0;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    sample = ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    sample = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
     effect->contactFrame = Mod(sample >> 8, 3) * 2 + 32;
     effect->fade = 1;
     effect->world = world;

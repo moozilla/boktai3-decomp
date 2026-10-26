@@ -100,9 +100,9 @@ static inline s32 PlayerSlot(u8 *actor)
 static inline u32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u32 CellHeight(struct ContactPosition *position, u32 cell)
 {
@@ -111,7 +111,7 @@ static inline u32 CellHeight(struct ContactPosition *position, u32 cell)
     if (data)
         data += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         data = map->cells + offset;
     }
@@ -176,9 +176,9 @@ static inline u32 PickTurn(u32 dir)
     s32 i;
     for (i = 0; i < 4; i++) {
         {
-            u32 index = (gUnk_03005308 + 1) & 1023;
+            u32 index = (gRandomIndex + 1) & 1023;
             u32 v;
-            gUnk_03005308 = index;
+            gRandomIndex = index;
             index *= 2;
             v = *(const u16 *)(index + (u32)gUnk_0203B400);
             d = (v & 3) << 6;
@@ -238,7 +238,7 @@ static inline void Approach(void *ctx)
     u8 zero;
     ResetDestination(group);
     zero = 0;
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u8 *partner = *partnerp;
         if (!partner || (index = PlayerSlot(partner)) < 0) {
             Callback_InvokeActor(actor, *(void **)(group + 0x224));

@@ -15,7 +15,7 @@ struct FormationActor {
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 void SceneSteeringActor_CreateBobbingActor(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32,
                                            s32, s32, s32);
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 static inline s32 Scale(s32 value)
@@ -37,8 +37,8 @@ static inline void GetOffset(s16 *position, u32 angle, s32 distance, u32 mask)
 inline static s32 RandomValue_SpawnBobbingFormation(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 

@@ -50,15 +50,15 @@ void Armor_QueueFallingParts(void *arg0)
     struct ArmorLaunchPositionSlot *position;
     struct ArmorLaunchPart *part;
     u8 *activeCount;
-    x = gUnk_02000710->positionX - group->position.x;
-    targetY = gUnk_02000710->positionY + 128;
-    z = gUnk_02000710->positionZ - group->position.z;
-    y = gUnk_02000710->positionY + 2688;
+    x = gGameState->positionX - group->position.x;
+    targetY = gGameState->positionY + 128;
+    z = gGameState->positionZ - group->position.z;
+    y = gGameState->positionY + 2688;
     angle = Math_Atan2(x, z);
     stepX = ArmorLaunch_Scale(gUnk_086149C4[(angle + 64) & 255] * 224);
     stepZ = ArmorLaunch_Scale(gUnk_086149C4[angle & 255] * 224);
-    x = gUnk_02000710->positionX;
-    z = gUnk_02000710->positionZ;
+    x = gGameState->positionX;
+    z = gGameState->positionZ;
     if (group->count > 1) {
         x -= stepX;
         z -= stepZ;

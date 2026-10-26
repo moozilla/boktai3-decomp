@@ -14,7 +14,7 @@ struct S {
 
 void ControlPanel_ShowRewardBalanceDigits(struct S *p)
 {
-    s32 value = gUnk_02000710->menuRewardBalance;
+    s32 value = gGameState->menuRewardBalance;
     s32 digits[4];
     s32 *digit;
     s32 remaining;

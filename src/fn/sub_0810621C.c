@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "contact_swarm.h"
+#include "ram.h"
 struct RegionSprite {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x90 - 0x2C];
@@ -23,7 +24,6 @@ struct RegionSpriteManager {
     u8 unknown0[0x18];
     const void *sequenceResource, *alternateResource;
 };
-extern struct RegionSpriteManager *gUnk_020001B4;
 void ProximityActor_UpdateDamageAnimation(struct RegionSprite *);
 void sub_0810638C(struct RegionSprite *);
 static inline u8 Test(u32 *flags, u32 bit)
@@ -155,7 +155,7 @@ void RegionActor_UpdateHealthAnimation(struct RegionSprite *p)
 {
     struct ContactSwarmSprite *sprite = &p->sprite;
     sprite->flags &= ~1;
-    if (gUnk_020001B4) {
+    if (gRegionActorPool) {
         Step(sprite, &p->sequence);
         if (p->hit & 1) {
             if (p->health <= 0) {

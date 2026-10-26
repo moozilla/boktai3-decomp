@@ -45,7 +45,7 @@ u32 SceneActorPlacement_ConsumeShakeFlags(struct SceneActorRegistryActor *argume
                     position =
                         &((struct SceneActorRegistryTileDrawable *)actor->drawable)->position;
                 table = gUnk_0203B400;
-                index = &gUnk_03005308;
+                index = &gRandomIndex;
                 {
                     u32 next = *index + 1;
                     mask = 1023;
@@ -79,7 +79,7 @@ u32 SceneActorPlacement_ConsumeShakeFlags(struct SceneActorRegistryActor *argume
                     position =
                         &((struct SceneActorRegistryTileDrawable *)actor->drawable)->position;
                 table = gUnk_0203B400;
-                index = &gUnk_03005308;
+                index = &gRandomIndex;
                 {
                     u32 next = *index + 1;
                     mask = 1023;

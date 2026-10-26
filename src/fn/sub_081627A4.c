@@ -1,5 +1,6 @@
 #include "global.h"
 #include "terrain_cell_probe.h"
+#include "ram.h"
 
 struct BarrierSpr {
     u32 flags;
@@ -13,7 +14,6 @@ struct BarrierGame {
     s32 duration;
 };
 
-extern u32 gUnk_03003A50;
 void AnimData_SelectPaletteBank(void *, s32);
 s32 Collider_Refresh(void *);
 void PlayerBarrier_DecrementDuration(void *);
@@ -22,7 +22,7 @@ s32 PlayerBarrier_Update(u8 *b)
 {
     s32 st;
     s32 *pst, *q;
-    if ((gUnk_03003A50 & 3) == 0) {
+    if ((gSceneEffectPalettePhase & 3) == 0) {
         if (TerrainModifiers_FindCellOverride(cellIndexAt((struct Pos16 *)(b + 0x70)), 0))
             *(s32 *)(b + 0xB8) = 0;
     }
@@ -40,7 +40,7 @@ s32 PlayerBarrier_Update(u8 *b)
             Collider_Refresh(b + 0x64);
         }
         PlayerBarrier_DecrementDuration(b);
-        if (((struct BarrierGame *)gUnk_02000710)->duration <= 0)
+        if (((struct BarrierGame *)gGameState)->duration <= 0)
             *q = 2;
         (*cnt)++;
     } else if (st == 1) {

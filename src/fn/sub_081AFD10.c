@@ -50,7 +50,7 @@ struct PairOwner {
     u8 pad0[0x5B4];
     u32 activeMask;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 void Collider_SetPosition(void *, void *, s32);
 void Collider_Refresh(void *);
@@ -58,9 +58,9 @@ void ScaledShadow_Disable(void *);
 void ScaledShadow_Enable(void *);
 static inline s32 randomSample(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
+    u32 index = (gRandomIndex + 1) & 1023;
     s32 result;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     result = *(u16 *)(RANDOM_TABLE_ADDR + index * 2);
     return result;
 }

@@ -78,7 +78,7 @@ u32 sub_0821F2EC(void *arg0, void *arg1, void *arg2)
     state->a.x = to->x;
     state->a.z = to->z;
 
-    table = gUnk_030052F4->navigation;
+    table = gTerrainMap->navigation;
     foundRegion = 0xFF;
     foundEdge = 0xFF;
     for (i = 0; i < table->count; i++) {

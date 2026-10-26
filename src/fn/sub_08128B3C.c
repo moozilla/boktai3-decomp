@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_02000170;
+#include "ram.h"
 
 void FragmentBurst_ResetPool(void)
 {
-    gUnk_02000170 = 0;
+    gSpriteGroupPool = 0;
 }

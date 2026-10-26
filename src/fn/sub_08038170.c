@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 // Tentative panel/save fields for selecting two available entries in each group.
 struct P {
@@ -15,8 +16,8 @@ struct ItemInfo {
     u8 enabled;
     u8 pad[31];
 };
-extern struct Save *gUnk_02000710;
-extern u32 gUnk_03003A50, gUnk_03005308;
+extern struct Save *gGameState;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 int Mod(int, int);
 void Inventory_GetEquippedDescriptor(int, struct ItemInfo *);
@@ -41,10 +42,10 @@ void WirelessGameMenu_InitItemChoices(struct P *input)
     i = 0;
     start = count;
     do {
-        *(s16 *)((u8 *)gUnk_02000710 + i * 2 + 0x68) = -1;
+        *(s16 *)((u8 *)gGameState + i * 2 + 0x68) = -1;
         i++;
     } while (i <= 7);
-    start = Mod(gUnk_03003A50, start);
+    start = Mod(gSceneEffectPalettePhase, start);
     missing = 0;
     usable = 0;
     mask = p->leftMask;
@@ -65,7 +66,7 @@ void WirelessGameMenu_InitItemChoices(struct P *input)
         int limit;
         int index;
         {
-            struct Save **t = &gUnk_02000710;
+            struct Save **t = &gGameState;
             slot = t;
         }
         limit = start + 16;
@@ -109,7 +110,7 @@ void WirelessGameMenu_InitItemChoices(struct P *input)
             }
         }
     selected16:
-        if (*(s16 *)((u8 *)gUnk_02000710 + offset + 0x68) < 0) {
+        if (*(s16 *)((u8 *)gGameState + offset + 0x68) < 0) {
             int t = 1;
             missing = t;
         } else {
@@ -119,8 +120,8 @@ void WirelessGameMenu_InitItemChoices(struct P *input)
                 usable = t;
             }
         }
-        index = (gUnk_03005308 + 1) & 1023;
-        gUnk_03005308 = index;
+        index = (gRandomIndex + 1) & 1023;
+        gRandomIndex = index;
         {
             int off = index * 2;
             register int m asm("r2");
@@ -143,11 +144,11 @@ void WirelessGameMenu_InitItemChoices(struct P *input)
     {
         register struct Save **fallback asm("r12");
         {
-            register struct Save **t asm("r2") = &gUnk_02000710;
+            register struct Save **t asm("r2") = &gGameState;
             asm("" : "+r"(t));
             fallback = t;
         }
-        seed = &gUnk_03003A50;
+        seed = &gSceneEffectPalettePhase;
         if (({
                 register int t asm("r0") = missing;
                 asm("" : "+r"(t));
@@ -193,7 +194,7 @@ void WirelessGameMenu_InitItemChoices(struct P *input)
     }
     i = 0;
     do {
-        *(s16 *)((u8 *)gUnk_02000710 + i * 2 + 0x78) = -1;
+        *(s16 *)((u8 *)gGameState + i * 2 + 0x78) = -1;
         i++;
     } while (i <= 7);
     start = Mod(*seed, other);
@@ -217,7 +218,7 @@ void WirelessGameMenu_InitItemChoices(struct P *input)
         register int limit asm("r6");
         int index;
         {
-            struct Save **t = &gUnk_02000710;
+            struct Save **t = &gGameState;
             slot = t;
         }
         limit = start + 8;
@@ -263,7 +264,7 @@ void WirelessGameMenu_InitItemChoices(struct P *input)
             }
         }
     selected8: {
-        struct Save **t = &gUnk_02000710;
+        struct Save **t = &gGameState;
         s16 *row;
         row = (s16 *)((u8 *)*t + offset + 0x78);
         if (*row < 0)
@@ -273,8 +274,8 @@ void WirelessGameMenu_InitItemChoices(struct P *input)
             usable = t;
         }
     }
-        index = (gUnk_03005308 + 1) & 1023;
-        gUnk_03005308 = index;
+        index = (gRandomIndex + 1) & 1023;
+        gRandomIndex = index;
         {
             int off = index * 2;
             register int m asm("r2");
@@ -293,7 +294,7 @@ void WirelessGameMenu_InitItemChoices(struct P *input)
     {
         register struct Save **fallback asm("r12");
         {
-            struct Save **t = &gUnk_02000710;
+            struct Save **t = &gGameState;
             fallback = t;
         }
         if (({
@@ -350,5 +351,5 @@ void WirelessGameMenu_InitItemChoices(struct P *input)
         SolarFruit_ClearEquippedSlot(i);
         i++;
     } while (i <= 7);
-    gUnk_02000710->extraSelected = 0;
+    gGameState->extraSelected = 0;
 }

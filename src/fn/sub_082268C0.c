@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-extern u32 gUnk_03005420; /* camera (guess) */
+#include "ram.h"
 void Camera_ReadMoveRate(u32);
 void Camera_SetSway(s32 target, s32 frames, s32 mode);
 /* Script: -w target, -f (default 1), -N (default 0); stops the current camera
@@ -18,7 +18,7 @@ void Camera_SetFollowFromScript(void)
             mode = Script_GetValue();
         else
             mode = 0;
-        Camera_ReadMoveRate(gUnk_03005420);
+        Camera_ReadMoveRate(gActiveCamera);
         Camera_SetSway(target, frames, mode);
     }
 }

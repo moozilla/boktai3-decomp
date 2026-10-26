@@ -59,7 +59,7 @@ static inline s32 LocalPlayer(void)
 }
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u32 *owner = &actor->field2E0;
         register u32 mask asm("r2") = *owner;
         if (!(mask & 0x20) && mask) {
@@ -157,7 +157,7 @@ void SceneActorReaction_ApplyCategoryDamage(struct SceneActorRegistryResetView *
             actor->field2B1 = 1;
         }
         actor->field2E0 = 32;
-        if (!Test(gUnk_030053F4, 0x4800) && !Flag2D0(actor, 0x800))
+        if (!Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
             SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
     } else {
         Sound_PlaySong(0x13E);

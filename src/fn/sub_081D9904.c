@@ -7,6 +7,7 @@
 // Remaining differences: parameter flag operations and saved pointer lifetimes.
 
 #include "contact_swarm.h"
+#include "engine.h"
 
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
 struct Drawable {
@@ -147,7 +148,6 @@ void Projectile_SetDamageParams(void *, u32, u32, u32, u32, u32);
 void Projectile_SetTypeAndElement(void *, u32, u32);
 void Projectile_SetSpriteParams(void *, u32, u32, u32);
 s32 Projectile_Spawn(void *, void *);
-extern u32 gUnk_03005308;
 struct SpawnConfig {
     u16 flags, lifetime;
     u8 pad4[2];
@@ -175,20 +175,20 @@ s32 Task4E01_SpawnImpactChildren(u8 *input)
     register u32 *randomIndex asm("r8");
     register const volatile u16 *randomTable asm("r9");
     if (!(config->flags & 0x10)) {
-        randomIndex = &gUnk_03005308;
+        randomIndex = &gRandomIndex;
         i = 0;
         do {
             randomTable = gUnk_0203B400;
             if (config->flags & 0x20) {
-                *(&gUnk_03005308) = ((*(&gUnk_03005308)) + 1) & 1023;
+                *(&gRandomIndex) = ((*(&gRandomIndex)) + 1) & 1023;
                 {
                     u8 k1 = 32;
                     config->direction =
-                        ((randomTable[*(&gUnk_03005308)] & 63) - k1) + ((u8)config->direction);
+                        ((randomTable[*(&gRandomIndex)] & 63) - k1) + ((u8)config->direction);
                 }
             } else {
-                *(&gUnk_03005308) = ((*(&gUnk_03005308)) + 1) & 1023;
-                config->direction = randomTable[*(&gUnk_03005308)];
+                *(&gRandomIndex) = ((*(&gRandomIndex)) + 1) & 1023;
+                config->direction = randomTable[*(&gRandomIndex)];
             }
             Projectile_InitializeParams(params);
             if (i == 0)

@@ -7,7 +7,7 @@
 struct SceneActorRecord {
     u16 key, id, ticks;
 } __attribute__((packed, aligned(2)));
-#define SCENE_ACTOR_RECORDS ((struct SceneActorRecord *)((u8 *)gUnk_02000710 + 0x670))
+#define SCENE_ACTOR_RECORDS ((struct SceneActorRecord *)((u8 *)gGameState + 0x670))
 struct SceneActorRecord *SceneActorRecord_FindPair(u32, u32);
 struct SceneActorRecord *SceneActorRecord_FindEmpty(void);
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);

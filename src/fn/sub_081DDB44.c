@@ -1,5 +1,6 @@
 #include "global.h"
 #include "game_state.h"
+#include "ram.h"
 
 /* NameEntry_Update: per-frame task callback. State 0 handles the d-pad (with key repeat),
  * B (erase, or cancel on an empty name), SELECT (page toggle), START (jump to End) and A
@@ -20,7 +21,6 @@ struct NameEntryTask {
     u8 name[0x10]; /* 0x374 */
 };
 
-extern u32 gUnk_02000328[];
 void TextEntry_DrawName(u8 *);
 s32 Script_ParseStringRef(const void *);
 u8 *Text_LookupString(s32);
@@ -28,7 +28,7 @@ s32 sub_081DDB44(struct NameEntryTask *p)
 {
     u8 *ch = &p->name[p->position * 2];
     u8 *placeholder =
-        Text_LookupString(Script_ParseStringRef((const void *)gUnk_02000328[0]) + 0x54);
+        Text_LookupString(Script_ParseStringRef((const void *)gNamePlaceholderScript[0]) + 0x54);
     s32 result = 0;
     if ((ch[0] == 0 && ch[1] == 0) || (ch[0] == placeholder[0] && ch[1] == placeholder[1])) {
         if (p->position == 0) {

@@ -357,7 +357,7 @@ void ScenePanel_WaitRigRelease(struct ScenePanel *input)
             } while (remaining != 0);
         }
     }
-    if (gUnk_02000710->unk618 > 0)
+    if (gGameState->unk618 > 0)
         ScenePanel_RunScheduledAction((void *)panel);
     if (anyActive)
         panel->effectFrame = 0;
@@ -610,17 +610,17 @@ void ScenePanel_InitResourceConfiguration(struct ScenePanel *parent)
     s32 found = Script_SeekToKeyword('b');
     if (found) {
         parent->resourceIndex = Script_GetValue();
-        gUnk_02000710->unk618 = Script_GetValue();
-        gUnk_02000710->unk61C = Script_GetValue();
+        gGameState->unk618 = Script_GetValue();
+        gGameState->unk61C = Script_GetValue();
     } else {
         parent->resourceIndex = found;
         {
-            struct GameState *volatile *slot = &gUnk_02000710;
+            struct GameState *volatile *slot = &gGameState;
             (*slot)->unk618 = 6000;
             (*slot)->unk61C = 6000;
         }
     }
-    if (gUnk_02000710->unk618 > (gUnk_02000710->unk61C >> 2))
+    if (gGameState->unk618 > (gGameState->unk61C >> 2))
         parent->warningStage = 0;
     else
         parent->warningStage = 1;
@@ -912,7 +912,7 @@ void ScenePanel_SelectMode(struct ScenePanel *panel)
 {
     s32 mode;
     if (panel->skipMainSprite == 0)
-        mode = gUnk_02000710->unk876;
+        mode = gGameState->unk876;
     else
         mode = panel->savedMode;
     panel->paletteMode = mode;
@@ -942,8 +942,8 @@ void ScenePanel_UpdateApproachSprite(struct ScenePanel *panel)
         struct ScenePanelAuxSprite *sprite = &panel->auxiliary;
         sprite->flags &= ~1;
         sprite->frame = 1;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-        offset = gUnk_03005308 * 2;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
+        offset = gRandomIndex * 2;
         scale = *(const u16 *)(offset + (u32)gUnk_0203B400);
         scale &= 15;
         scale += 72;
@@ -973,7 +973,7 @@ s32 ScenePanel_TickLifecycle(struct ScenePanel *parent)
     if (playerKind == 4)
         return 0;
     if (parent->initialMode == 1 && parent->effectState != 14 && playerKind == 1 &&
-        !gUnk_02000710->unk618) {
+        !gGameState->unk618) {
         ScenePanel_SetEffectState((void *)parent, 14);
         ScenePanelRig_SetState(&parent->rig, 9);
         ScenePanel_NoOpAction((void *)parent);
@@ -990,7 +990,7 @@ s32 ScenePanel_TickLifecycle(struct ScenePanel *parent)
         ScenePanel_UpdateApproachSprite((void *)parent);
         if (parent->activated) {
             if (!parent->skipMainSprite) {
-                if (gUnk_02000710->unk618 == 0) {
+                if (gGameState->unk618 == 0) {
                     if (parent->warningSounds[2])
                         Sound_PlaySong(parent->warningSounds[2]);
                 } else {
@@ -1047,7 +1047,7 @@ s32 ScenePanel_InitializeLifecycle(struct ScenePanel *parent)
     ScenePanel_InitScriptProperty((void *)parent);
     ScenePanel_RegisterReceiver((void *)parent);
     {
-        s32 mode = gUnk_02000710->unk876;
+        s32 mode = gGameState->unk876;
         parent->paletteMode = mode;
     }
     gUnk_020004A4 = (void *)parent;

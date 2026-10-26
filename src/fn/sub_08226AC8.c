@@ -1,8 +1,8 @@
 #include "global.h"
-extern u8 *gUnk_03005420;
+#include "ram.h"
 void Camera_ClearSwayCounter(void)
 {
-    u8 *p = gUnk_03005420;
+    u8 *p = gActiveCamera;
     if (p)
         *(u16 *)(p + 0x8c) = 0;
 }

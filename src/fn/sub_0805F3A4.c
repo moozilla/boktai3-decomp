@@ -6,7 +6,7 @@ void SceneInputPanel_GetEquippedValues(s32 *primaryValue, s32 *secondaryValue,
     struct SceneInputItemDescriptor temporary;
     s32 first = 0, second = 0;
     s32 secondIndex = -1, firstIndex = -1;
-    struct SceneInputEquipmentView *equipment = (void *)gUnk_02000710;
+    struct SceneInputEquipmentView *equipment = (void *)gGameState;
     s32 index;
     if (equipment->selected <= 7) {
         struct SceneInputEquipmentView *entry;
@@ -35,7 +35,7 @@ void SceneInputPanel_GetEquippedValues(s32 *primaryValue, s32 *secondaryValue,
         Inventory_GetEquippedDescriptor(firstIndex, primaryDescriptor);
     if (secondaryDescriptor && secondIndex >= 0) {
         struct SceneInputEquipmentView *entry;
-        struct SceneInputEquipmentView *reloaded = (void *)gUnk_02000710;
+        struct SceneInputEquipmentView *reloaded = (void *)gGameState;
         entry = (void *)(secondIndex * 2 + (u32)reloaded);
         *secondaryDescriptor = *(u32 *)GameState_GetUnlockDescriptor(entry->secondary[0]);
     }

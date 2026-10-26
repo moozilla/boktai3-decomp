@@ -68,13 +68,12 @@ struct EngineMap {
 extern u16 gUnk_03005240;                 /* next Task id */
 extern struct TaskList gUnk_03005280[14]; /* task lists by priority */
 extern struct HeapBlock gUnk_02000714;    /* head of the general heap (Heap_Alloc/Heap_Free) */
-extern struct GameState *gUnk_02000710;   /* main game-state block, see game_state.h */
-extern struct EngineMap *gUnk_030052F4;   /* current terrain map */
-extern u32 gUnk_030052F8, gUnk_030052FC;  /* terrain map width, height (cells) */
-extern u32 gUnk_03005308;                 /* index (0..1023) into the random table */
+extern struct EngineMap *gTerrainMap;     /* current terrain map */
+extern u32 gTerrainWidth, gTerrainHeight; /* terrain map width, height (cells) */
+extern u32 gRandomIndex;                  /* index (0..1023) into the random table */
 extern const u16 gUnk_0203B400[];         /* 1024 entry random table (guess) */
 extern const s16 gUnk_086149C4[];         /* sine table (guess) */
-extern u32 gUnk_030053F4; /* more engine flags (bit 10 mutes Sound_PlaySongChecked; guess) */
+extern u32 gEngineFlags; /* more engine flags (bit 10 mutes Sound_PlaySongChecked; guess) */
 
 /* ---- Tasks and memory -------------------------------------------------- */
 

@@ -4,7 +4,7 @@ void StagedEffect_ShakeAndReveal(struct StagedEffect *effect)
     u32 phase;
     if (effect->frame <= 3) {
         u16 *random = (u16 *)RANDOM_TABLE_ADDR;
-        u32 index = (gUnk_03005308 + 1) & 0x3FF;
+        u32 index = (gRandomIndex + 1) & 0x3FF;
         u32 sample;
         u32 *new_var;
         u32 mask;
@@ -15,7 +15,7 @@ void StagedEffect_ShakeAndReveal(struct StagedEffect *effect)
         sample -= 16;
         effect->shakeX = sample;
         index = (index + 1) & 0x3FF;
-        gUnk_03005308 = index;
+        gRandomIndex = index;
         sample = random[index];
         sample &= mask;
         sample -= 16;

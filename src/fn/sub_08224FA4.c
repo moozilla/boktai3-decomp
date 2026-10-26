@@ -1,7 +1,8 @@
 #include "global.h"
+#include "ram.h"
 extern u32 gUnk_03004278, gUnk_03003A00;
 extern u16 gUnk_03004270, gUnk_03004274, gUnk_0300427C;
-extern u32 gUnk_020004B4, gUnk_020004B0;
+extern u32 gUnk_020004B4;
 void m4aMPlayAllStop(void);
 void m4aSoundVSyncOff(void);
 void InterruptsAndVideo_WaitForVBlank(void);
@@ -24,7 +25,7 @@ u32 System_ShutdownAndSoftReset(void)
     InterruptsAndVideo_WaitForVBlank();
     Solar_StopMeasurement();
     Rtc_Protect();
-    if (gUnk_020004B4 || gUnk_020004B0)
+    if (gUnk_020004B4 || gSlotMonitor)
         Serial_StopCommunication();
     rfu_setREQCallback(0);
     rfu_REQ_stopMode();

@@ -1,8 +1,7 @@
 #include "global.h"
 #include "region_actor.h"
+#include "ram.h"
 
-#define gRegionActorPool gUnk_020001B4
-extern struct RegionActorPool *gUnk_020001B4;
 void Sprite_Remove(void *);
 u32 TerrainOverlay_QueueRemoveActor(u32 *);
 void SceneBody_Unregister(void *);
@@ -53,6 +52,6 @@ s32 RegionActorPool_DestroyActors(struct RegionActorPool *pool)
             Heap_Free(actor);
         }
     }
-    gUnk_020001B4 = 0;
+    gRegionActorPool = 0;
     return 0;
 }

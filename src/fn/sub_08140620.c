@@ -13,21 +13,21 @@ void Player_ClampAlternateTerrainPosition(struct Player *p)
     s32 cell;
     u8 *properties;
     s32 cellX, cellZ, minX, maxX, minZ, maxZ;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else
-        properties = gUnk_030052F4->cells + (cell * 4 + 12);
+        properties = gTerrainMap->cells + (cell * 4 + 12);
     if (!Player_IsStatusBit13ActionActive(*(u16 *)(properties + 2)))
         return;
     if (p->actionActive489)
         return;
-    cellX = Mod(p->storedTerrainCell, *(s16 *)(gUnk_030052F4->cells + 4));
-    cellZ = Div(p->storedTerrainCell, *(s16 *)(gUnk_030052F4->cells + 4));
+    cellX = Mod(p->storedTerrainCell, *(s16 *)(gTerrainMap->cells + 4));
+    cellZ = Div(p->storedTerrainCell, *(s16 *)(gTerrainMap->cells + 4));
     cellX <<= 8;
     p->terrainCellCenter.x = cellX + 128;
     cellZ <<= 8;

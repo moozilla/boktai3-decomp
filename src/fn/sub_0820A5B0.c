@@ -1,10 +1,9 @@
 #include "global.h"
-
-extern u8 *gUnk_02000600;
+#include "ram.h"
 
 s32 FanCannonManager_IsCreated(void)
 {
-    if (gUnk_02000600 == NULL) {
+    if (gFanCannonManager == NULL) {
         return 0;
     }
     return 1;

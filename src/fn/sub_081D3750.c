@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 struct TurnSprite {
     u8 pad0[0x18];
@@ -22,22 +23,21 @@ struct TurnParticle {
     struct TurnSprite sprite_at20;
 };
 extern const s16 gUnk_086149C4[];
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Math_Atan2(s32, s32);
 static inline u32 randomBits(void)
 {
     u32 v;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    v = ((const u16 *)0x0203B400)[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    v = ((const u16 *)0x0203B400)[gRandomIndex];
     v &= 0x3F;
     return v;
 }
 static inline s32 randomNeg(void)
 {
     u32 v;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    v = ((const u16 *)0x0203B400)[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    v = ((const u16 *)0x0203B400)[gRandomIndex];
     v &= 0x3F;
     return -(s32)v;
 }

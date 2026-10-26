@@ -1,11 +1,11 @@
 #include "global.h"
 #include "player.h"
+#include "engine.h"
 
 struct Terrain {
     u8 pad[4];
     u8 *cells;
 };
-extern struct Terrain *gUnk_030052F4;
 extern u16 gUnk_0200053C;
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline u8 *Cell(s32 i)
@@ -13,11 +13,11 @@ static inline u8 *Cell(s32 i)
     u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return p + 4;
-    return gUnk_030052F4->cells + 12 + i * 4;
+    return gTerrainMap->cells + 12 + i * 4;
 }
 static inline s32 Width(void)
 {
-    return *(s16 *)(gUnk_030052F4->cells + 4);
+    return *(s16 *)(gTerrainMap->cells + 4);
 }
 s32 Player_GetForceDirection(struct Player *p)
 {

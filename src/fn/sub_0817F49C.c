@@ -6,7 +6,7 @@
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 u32 ActorExtension_ResetState(void *);
 s32 SceneActors_GetEffectiveTimeStep(void *);
 void SceneActors_SpawnDestructionParticles_0817ABEC(void *);
@@ -89,7 +89,7 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
         u16 *hitstun = (u16 *)(q + 0x4f0);
         if (*hitstun == 0) {
             if (*(u16 *)(q + 0x4ee) == 0 && !off && SceneActors_GetEffectiveTimeStep(q)) {
-                damage = *(s16 *)(gUnk_02000710 + 0x876) * 5;
+                damage = *(s16 *)(gGameState + 0x876) * 5;
                 SceneActors_SpawnDestructionParticles_0817ABEC(q + 0x2ec);
                 sound = 0x12a;
                 Sound_PlaySong(0x57a);

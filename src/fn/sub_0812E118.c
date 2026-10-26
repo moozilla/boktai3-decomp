@@ -22,7 +22,7 @@ struct TerrainGrid {
 
 static inline s32 MapWidth(void)
 {
-    return ((struct TerrainGrid *)gUnk_030052F4->cells)->width;
+    return ((struct TerrainGrid *)gTerrainMap->cells)->width;
 }
 
 static inline struct TerrainCell *CellProperties(s32 cell)
@@ -30,7 +30,7 @@ static inline struct TerrainCell *CellProperties(s32 cell)
     u8 *properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         return (struct TerrainCell *)(properties + 4);
-    return &((struct TerrainGrid *)gUnk_030052F4->cells)->cells[cell];
+    return &((struct TerrainGrid *)gTerrainMap->cells)->cells[cell];
 }
 
 static inline s32 CellHeight(s32 cell, const struct ContactPosition *position)

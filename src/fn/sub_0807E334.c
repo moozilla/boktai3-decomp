@@ -17,7 +17,7 @@ static inline u8 *F0807E334_Cell(s32 idx)
     u8 *ov = TerrainModifiers_FindCellOverride(idx, 1);
     if (ov != NULL)
         return ov + 4;
-    return gUnk_030052F4->cells + 12 + idx * 4;
+    return gTerrainMap->cells + 12 + idx * 4;
 }
 static inline s32 F0807E334_Kind(s32 idx)
 {
@@ -54,8 +54,8 @@ void sub_0807E334(void *arg0)
         sb++;
         cell = *(u16 *)(arg0 + 0x2f4);
         kind = F0807E334_Kind(cell);
-        width = *(s16 *)(gUnk_030052F4->cells + 4);
-        total = width * *(s16 *)(gUnk_030052F4->cells + 6);
+        width = *(s16 *)(gTerrainMap->cells + 4);
+        total = width * *(s16 *)(gTerrainMap->cells + 6);
         newCell = cell;
         if (mode == 1) {
             idx = cell + width;

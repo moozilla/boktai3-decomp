@@ -105,7 +105,7 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
     }
     {
         u32 mask = 0x800;
-        if (Test(gUnk_02000710->flags868, mask) || (ReadReactionFlags(0x40, source))) {
+        if (Test(gGameState->flags868, mask) || (ReadReactionFlags(0x40, source))) {
             destination->remaining = 0;
             destination->power = 0;
             actor->result2E4 = 0;

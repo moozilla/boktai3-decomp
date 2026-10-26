@@ -2,6 +2,7 @@
 // COMPILER: agbcc_arm
 // CFLAGS: -O2 -mthumb-interwork
 #include "global.h"
+#include "ram.h"
 
 struct PaletteBank {
     u32 words[8];
@@ -73,7 +74,6 @@ struct IwObj {
     struct IwObj *next;
 };
 
-extern u32 gUnk_03003A50;
 extern u32 gRenderListIndex;
 extern struct IwObj *gUnk_030042C8[];
 extern u16 gUnk_03005418[];
@@ -474,7 +474,7 @@ void sub_08000E90(void)
     s32 x, y, z;
     struct IwVec s;
 
-    mask = ((gUnk_03003A50 & 1) ? 0x200 : 0x400) + 1;
+    mask = ((gSceneEffectPalettePhase & 1) ? 0x200 : 0x400) + 1;
     for (o = gUnk_030042C8[gRenderListIndex]; o != 0; o = o->next) {
         if (o->flags & mask)
             continue;
@@ -508,7 +508,7 @@ void sub_08001038(void)
     u32 mask;
     s32 x, y, z;
 
-    mask = ((gUnk_03003A50 & 1) ? 0x200 : 0x400) + 1;
+    mask = ((gSceneEffectPalettePhase & 1) ? 0x200 : 0x400) + 1;
     for (o = gUnk_030042C8[gRenderListIndex]; o != 0; o = o->next) {
         if (o->flags & mask)
             continue;
@@ -536,7 +536,7 @@ void sub_08001120(void)
     s32 x, y, z;
     struct IwVec s;
 
-    mask = ((gUnk_03003A50 & 1) ? 0x200 : 0x400) + 1;
+    mask = ((gSceneEffectPalettePhase & 1) ? 0x200 : 0x400) + 1;
     for (o = gUnk_030042C8[gRenderListIndex]; o != 0; o = o->next) {
         if (o->flags & mask)
             continue;
@@ -573,7 +573,7 @@ void sub_080012E0(void)
     s32 x, y, z;
     struct IwVec s;
 
-    mask = ((gUnk_03003A50 & 1) ? 0x200 : 0x400) + 1;
+    mask = ((gSceneEffectPalettePhase & 1) ? 0x200 : 0x400) + 1;
     for (o = gUnk_030042C8[gRenderListIndex]; o != 0; o = o->next) {
         if (o->flags & mask)
             continue;

@@ -27,7 +27,7 @@ struct HealthRestoreEffect {
     u16 unk_272;
     void (*state)(struct HealthRestoreEffect *);
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
@@ -38,8 +38,8 @@ void HealthRestoreEffect_UpdateCompletion(struct HealthRestoreEffect *);
 static inline s32 rnd(u16 *table)
 {
     s32 v;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    v = table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    v = table[gRandomIndex];
     return v >> 3;
 }
 

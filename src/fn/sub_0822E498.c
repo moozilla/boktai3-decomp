@@ -12,13 +12,13 @@ void Player_SetActionRequest(u8 *actor, s32 id);
 void GameState_AddEquipment(s32 id)
 {
     s32 i;
-    gUnk_02000710->unlockMask |= 1 << id;
+    gGameState->unlockMask |= 1 << id;
     for (i = 0; i < 4; i++) {
-        if (*(s16 *)(i * 2 + (u8 *)gUnk_02000710 + 0x88) == -1) {
+        if (*(s16 *)(i * 2 + (u8 *)gGameState + 0x88) == -1) {
             Equipment_AssignUniqueSlot(i, id);
-            gUnk_02000710->selected = i;
+            gGameState->selected = i;
             Hud_RefreshEquipmentDisplay();
-            if (i == gUnk_02000710->selected && gUnk_02000580[0])
+            if (i == gGameState->selected && gUnk_02000580[0])
                 Player_SetActionRequest(gUnk_02000580[0], id);
             return;
         }

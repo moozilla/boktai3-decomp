@@ -1,5 +1,4 @@
 #define Player_ClearScriptStatus Player_ClearStateTimer
-#define gGameState               gUnk_02000710
 #include "global.h"
 #include "player.h"
 #include "game_state.h"

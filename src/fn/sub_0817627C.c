@@ -1,5 +1,5 @@
 #define MenuPanel_SetCallback Hud_SetInteractionCallback
-#define gPanelGameState       gUnk_02000710
+#define gPanelGameState       gGameState
 // Provisional panel family; field meanings follow static consumers.
 #include "global.h"
 #include "game_state.h"
@@ -22,7 +22,7 @@ void SelectionPanel_ProcessFlaggedChoice(void *p)
         Hud_SetInteractionCallback(p, SelectionPanel_ConfirmTransition, 0);
     } else if (choice == 1) {
         Sound_PlaySong(0xDD);
-        if ((s16)gUnk_02000710->flag86E == 0) {
+        if ((s16)gGameState->flag86E == 0) {
             Hud_SetInteractionCallback(p, SceneDialog_BeginTimedMessage, 1);
         } else {
             PauseMenu_SetConfirmationIndicator(p, 0);

@@ -2,6 +2,7 @@
 #include "contact_swarm.h"
 // confidence=low: approaches screen X and periodically emits offset effects.
 #include "scene_vec.h"
+#include "ram.h"
 // confidence=low: action role inferred from movement and effect calls.
 // Remaining differences: the +0x598 reset offset uses r3 instead of r1.
 struct P {
@@ -9,7 +10,6 @@ struct P {
     struct ContactSwarmSprite sprite;
     struct DisplaySequenceState seq;
 };
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 void ActorDisplay_UpdateScreenAnchor(struct P *);
 void ActorDisplay_UpdateForegroundSprite(struct P *);
@@ -27,8 +27,8 @@ void Anim_RestartSequence(struct DisplaySequenceState *, const void *, u16, s32,
 #define PTR(o) (*(void **)((u8 *)p + (o)))
 static inline u32 RandomValue(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 #define RandomBits(mask) (RandomValue() & (mask))
 static inline void Update(struct P *p, s32 time)

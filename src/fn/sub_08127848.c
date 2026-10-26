@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 struct StateSlot {
     u8 unknown00[0xc0];
@@ -10,7 +11,7 @@ struct StateSlotPool {
     struct StateSlot slots[10];
     u32 used;
 };
-extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
+extern u32 gUnk_030053F0, gUnk_02000560;
 extern void *gUnk_08610770[];
 s32 sub_08249240(void *, void *, void *);
 static inline u8 Occupied(const u32 *mask, u32 bit)
@@ -26,7 +27,7 @@ s32 StateSlotPool_Update(struct StateSlotPool *input)
     s32 i;
     if (pool->used) {
         u32 mask = 0x400;
-        if (!((gUnk_030053F4 | gUnk_030053F0) & mask)) {
+        if (!((gEngineFlags | gUnk_030053F0) & mask)) {
             u32 blockedMask = 4;
             u32 blocked = gUnk_02000560 & blockedMask;
             if (!blocked) {

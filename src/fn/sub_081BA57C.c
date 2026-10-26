@@ -1,14 +1,14 @@
 #include "global.h"
 #include "engine.h"
-extern u8 *gUnk_0200025C;
+#include "ram.h"
 void MenuCursor_EnableInput(void *);
 void MenuCursor_Hide(void *);
-/* Script: for the registry 2388 task (gUnk_0200025C) with a child at +0x558:
+/* Script: for the registry 2388 task (gSelectionPanel) with a child at +0x558:
    -v nonzero clears +0x52A and calls MenuCursor_EnableInput, else sets it and calls
    MenuCursor_Hide (tentative). */
 void Registry2388_SetVisibleFromScript(void)
 {
-    u8 *p = gUnk_0200025C;
+    u8 *p = gSelectionPanel;
     void **child;
     if (!p)
         return;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 
 /* Tentative Armor-family sequence: face target, action 25, delay, action 43. */
 struct ArmorActor {
@@ -22,7 +23,6 @@ struct ArmorTarget {
     s16 unk32;
     s16 y;
 };
-extern struct ArmorTarget *gUnk_02000710;
 s32 Math_Atan2(s32, s32);
 u32 ActorController_StartAlternateTurn(struct ArmorActor *, u32);
 s32 DirectionalActor_TryBeginState(struct ArmorActor *, s32);
@@ -33,7 +33,7 @@ void Armor_UpdateFacingActionSequence(struct ArmorActor *p)
     u8 r;
     switch (*q) {
         case 0: {
-            struct ArmorTarget *g = gUnk_02000710;
+            struct ArmorTarget *g = gGameState;
             s32 a = Math_Atan2(g->x - p->x, g->y - p->y);
             a = (a + 0x20) & 0xc0;
             if (p->facing != a) {

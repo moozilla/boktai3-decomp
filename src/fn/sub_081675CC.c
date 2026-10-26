@@ -2,6 +2,7 @@
 #include "global.h"
 // Open: temporary register choices only (constant 1 and rand address regs); pointer roles match.
 #include "level_advance_display.h"
+#include "engine.h"
 /* Tentative inventory display family, inferred from slot and item consumers. */
 struct InventoryPanelCallbackMetadata {
     u8 active, age;
@@ -23,15 +24,14 @@ struct InventoryPanel {
     u8 unknown0[0x4450];
     struct InventoryPanelCallbackGroup groups[2];
 };
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void *AnimData_FindEntry(s32);
 u32 MenuParticle_UpdateMotion(void *);
 static inline s32 NextRandom(u32 table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    return *(const u16 *)(gUnk_03005308 * 2 + table);
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    return *(const u16 *)(gRandomIndex * 2 + table);
 }
 static inline s32 Scale(s32 value)
 {

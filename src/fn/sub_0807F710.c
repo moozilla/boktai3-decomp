@@ -52,10 +52,10 @@ s32 SceneActorTarget_ResolvePendingObject(struct SceneActorRegistryResetView *ac
             x = ((struct ContactPosition *)(object + 0xC))->x >> 8;
             z = ((struct ContactPosition *)(object + 0xC))->z >> 8;
         }
-        if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) || (((u32)z) >= gUnk_030052FC)) {
+        if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight)) {
             cell = 0;
         } else {
-            cell = gUnk_030052F4->rows[z] + x;
+            cell = gTerrainMap->rows[z] + x;
         }
         *(u16 *)((u8 *)owner + 0x2F8) = cell;
         {

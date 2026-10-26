@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 struct G {
     u8 pad[0x720];
     u32 a720;
@@ -7,7 +8,6 @@ struct G {
     u32 a72c;
     u32 a730;
 };
-extern struct G *gUnk_02000710;
 s32 Script_SeekToKeyword(s32);
 u32 Script_GetValue(void);
 void ForgingBook_RecordWeaponDiscoveryFromScript(void)
@@ -18,13 +18,13 @@ void ForgingBook_RecordWeaponDiscoveryFromScript(void)
         n = Script_GetValue();
         if (n <= 0x1f) {
             u32 m;
-            p = (u32 *)gUnk_02000710;
+            p = (u32 *)gGameState;
             p += 0x72c / 4;
             m = 1 << n;
             *p |= m;
         } else {
             u32 m;
-            p = (u32 *)gUnk_02000710;
+            p = (u32 *)gGameState;
             p += 0x730 / 4;
             m = 1 << (n - 0x20);
             *p |= m;

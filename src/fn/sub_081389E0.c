@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_020004C0;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 PlayerSlotDisplay_Initialize(u8 *);
@@ -11,8 +11,8 @@ void PositionEffectDisplay_Destroy(void);
 u8 *PositionEffectDisplay_Create(void)
 {
     u8 *p;
-    if (gUnk_020004C0 != 0)
-        return gUnk_020004C0;
+    if (gSpriteSlots != 0)
+        return gSpriteSlots;
     p = Task_Create(0xa, 0x19c);
     if (p != 0) {
         Task_SetCallbacks(p, PositionEffectDisplay_UpdateSources, PositionEffectDisplay_Destroy);

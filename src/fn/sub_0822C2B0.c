@@ -1,7 +1,7 @@
 #include "global.h"
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 extern u8 *gUnk_02000580;
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern u16 gUnk_02000528;
 s32 Solar_GetLevelForIntensity(s32);
 s32 Solar_GetLevelUpperBound(s32);
@@ -16,7 +16,7 @@ static inline s32 modeIs(s32 m)
 }
 s32 Solar_ApplyIntensityModifiers(s32 v)
 {
-    if (gUnk_030053F4 & 0x800)
+    if (gEngineFlags & 0x800)
         return v;
     if (gUnk_02000580) {
         u32 *flags = (u32 *)(gUnk_02000580 + 0x444);
@@ -28,10 +28,10 @@ s32 Solar_ApplyIntensityModifiers(s32 v)
             v = Solar_GetLevelUpperBound(band);
         }
     }
-    if (*(s16 *)(gUnk_02000710 + 0x610)) {
+    if (*(s16 *)(gGameState + 0x610)) {
         if (Solar_GetLevelForIntensity(v) <= 1)
             v = Solar_GetLevelLowerBound(2);
-    } else if (*(s16 *)(gUnk_02000710 + 0x612)) {
+    } else if (*(s16 *)(gGameState + 0x612)) {
         if (Solar_GetLevelForIntensity(v) > 2)
             v = Solar_GetLevelUpperBound(2);
     }

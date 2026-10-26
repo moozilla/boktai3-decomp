@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
@@ -11,7 +12,6 @@ struct Context {
 #define U8(p, o)  (*(u8 *)((u8 *)(p) + (o)))
 #define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
 #define P(p, o)   ((u8 *)(p) + (o))
-extern u32 gUnk_030053F4;
 extern u32 gUnk_02000560;
 s32 Math_Atan2(s32, s32);
 s32 Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
@@ -105,7 +105,7 @@ void SceneActorAnimation_UpdateTargetFacing(struct Context *ctx, u8 *p)
             u8 angle = *((u8 *)(((u8 *)p) + 0x65));
             *((u8 *)(((u8 *)p) + 0x225)) = angle;
         }
-        if (((ctx->targetActor && !AllowsFacing(ctx->targetActor)) && (!(gUnk_030053F4 & 0x200))) &&
+        if (((ctx->targetActor && !AllowsFacing(ctx->targetActor)) && (!(gEngineFlags & 0x200))) &&
             (*((u8 *)(((u8 *)p) + 0xB)))) {
             u8 *target = ctx->targetActor;
             u8 tether;

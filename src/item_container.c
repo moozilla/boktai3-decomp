@@ -45,9 +45,9 @@ static inline u8 nearby(struct SceneVec *p, struct SceneVec *a, struct TriggerOp
 static inline s32 cellIndex(struct SceneVec *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline s32 groundHeight(struct SceneVec *position)
 {
@@ -57,7 +57,7 @@ static inline s32 groundHeight(struct SceneVec *position)
     if (cell)
         cell += 4;
     else
-        cell = gUnk_030052F4->cells + 12 + index * 4;
+        cell = gTerrainMap->cells + 12 + index * 4;
     kind = *cell >> 4;
     height = (*cell & 15) << 8;
     switch (kind) {
@@ -109,7 +109,7 @@ static inline s32 scaleHeight(s32 input)
 static inline u8 sameRegion(struct Trigger *p)
 {
     u32 current = ({
-        struct GameState *world = gUnk_02000710;
+        struct GameState *world = gGameState;
         u32 offset = 0x5A0;
         *(u32 *)((u8 *)world + offset);
     });
@@ -254,15 +254,15 @@ void Trigger_UpdateShake(struct Trigger *p)
         } else {
             const u16 *table = gUnk_0203B400;
             unsigned short random;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            random = table[gUnk_03005308];
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            random = table[gRandomIndex];
             {
                 struct SceneVec *position = p->position;
                 random &= 15;
                 position->x = random + p->baseX - 4;
             }
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            random = table[gUnk_03005308];
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            random = table[gRandomIndex];
             {
                 struct SceneVec *position = p->position;
                 random &= 7;
@@ -327,7 +327,7 @@ s32 Trigger_UpdateProximity(struct TriggerManager *manager, struct Trigger *p)
             continue;
         pos = *p->position;
         pos.y += 128;
-        if (!(gUnk_030053F4 & 2048) && !sub_0822D490(p->id, p->kind)) {
+        if (!(gEngineFlags & 2048) && !sub_0822D490(p->id, p->kind)) {
             if (p->armed && !p->cooldown) {
                 if (p->id <= 5) {
                     FloatingItemEffect_Spawn(p->id, p->kind, 1, i, &pos, &pos, 24, p);
@@ -342,11 +342,11 @@ s32 Trigger_UpdateProximity(struct TriggerManager *manager, struct Trigger *p)
             p->actor = i;
             if (p->id <= 5)
                 FloatingItemEffect_Spawn(p->id, p->kind, 0, i, &pos, &pos, 24, p);
-            if (!(gUnk_030053F4 & 2048))
+            if (!(gEngineFlags & 2048))
                 Sound_PlaySongChecked(272);
             {
                 s32 event;
-                if (gUnk_030053F4 & 2048)
+                if (gEngineFlags & 2048)
                     event = 1;
                 else
                     event = sub_0822D490(p->id, p->kind) == 1;
@@ -396,7 +396,7 @@ s32 Trigger_TryOpenNearby(struct TriggerOpener *actor)
             Anim_SetSequence(p->animation, manager->resource, 5, 0, 0);
             {
                 s32 event;
-                if (gUnk_030053F4 & 2048)
+                if (gEngineFlags & 2048)
                     event = 1;
                 else
                     event = sub_0822D490(p->id, p->kind) == 1;
@@ -673,7 +673,7 @@ void Trigger_UpdateOpeningAnimation(struct TriggerManager *manager, struct Trigg
     if (done) {
         raised = *p->position;
         raised.y += 128;
-        if (!(gUnk_030053F4 & 2048) && sub_0822D490(p->id, p->kind) == 0) {
+        if (!(gEngineFlags & 2048) && sub_0822D490(p->id, p->kind) == 0) {
             if (p->id <= 5)
                 FloatingItemEffect_Spawn(p->id, p->kind, 1, p->actor, &raised, &raised, 24, p);
             p->update = Trigger_UpdateLockedPause;
@@ -749,7 +749,7 @@ void Trigger_UpdateActivation(struct TriggerManager *manager, struct Trigger *p)
         p->object->flags |= 4;
     if (p->timer == 8) {
         u16 script;
-        if (!(gUnk_030053F4 & 2048))
+        if (!(gEngineFlags & 2048))
             Sound_PlaySongChecked(272);
         script = *(u16 *)&p->script;
         Trigger_RunScript(p, script, sub_0822D490(p->id, p->kind) == 1);
@@ -983,7 +983,7 @@ s32 TriggerManager_Update(struct TriggerManager *input)
                             trigger->visible = 1;
                         } else {
                             s32 available;
-                            if (gUnk_030053F4 & 2048)
+                            if (gEngineFlags & 2048)
                                 available = stateMode();
                             else if (gUnk_02000580[0] && ({
                                          u32 *flags = &gUnk_02000580[0]->actionFlags;
@@ -1280,7 +1280,7 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
     p->animation = 0;
     if (bob) {
         p->update = Trigger_UpdateBobbingAnimation;
-        if (!(gUnk_030053F4 & 2048))
+        if (!(gEngineFlags & 2048))
             Sound_PlaySong(623);
     } else
         p->update = Trigger_UpdateIdleAnimation;
@@ -1345,7 +1345,7 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
         if (hidden) {
             s32 available;
             p->object->flags |= 1;
-            if (gUnk_030053F4 & 2048) {
+            if (gEngineFlags & 2048) {
                 available = stateMode();
             } else {
                 if (gUnk_02000478 > 0)

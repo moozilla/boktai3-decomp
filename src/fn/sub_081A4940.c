@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 f[8];
     u32 fl;
@@ -11,10 +12,9 @@ struct G {
     u16 n;
     struct E e[16];
 };
-extern struct G *gUnk_02000244;
 struct E *Hresvelgr_FindFreeProjectileSlot(void)
 {
-    struct G *g = gUnk_02000244;
+    struct G *g = gHresvelgrProjectilePool;
     struct E *e;
     s32 i;
     if (g->n <= 0xf)

@@ -1,6 +1,6 @@
 #include "global.h"
 
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 u32 AnimData_FindEntry(u32);
@@ -34,8 +34,8 @@ static inline s32 scale(s32 product)
 static inline u32 randomValue(const u16 *table, u32 mask)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & mask;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & mask;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)table);
 }
 
@@ -52,10 +52,10 @@ void SpiralBurst_InitParticles(u8 *p)
     {
         u32 next;
         table = gUnk_0203B400;
-        next = gUnk_03005308 + 1;
+        next = gRandomIndex + 1;
         mask = 1023;
-        gUnk_03005308 = next & mask;
-        base = (u8)table[gUnk_03005308];
+        gRandomIndex = next & mask;
+        base = (u8)table[gRandomIndex];
     }
     *(u32 *)(p + 0x1F8) = AnimData_FindEntry(0x1C1E);
     i = 0;

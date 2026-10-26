@@ -33,6 +33,7 @@ void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
+#include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -49,8 +50,6 @@ void WirelessController_RestoreLocalInput(struct Engine *);
 void WirelessController_PollInputExchange(struct Engine *);
 void Wireless_BuildParentUniPacket(struct Engine *);
 void RfuManager_SendData(int);
-extern u32 gUnk_03005250;
-extern u16 gUnk_03005274[];
 // MATCHING_CONCESSION: register-pinning
 static inline void publishInputs(struct Engine *p)
 {
@@ -62,14 +61,14 @@ static inline void publishInputs(struct Engine *p)
         u16 *output;
         int invalid;
         register u16 *history asm("r4");
-        gUnk_03005250 = 1;
+        gLinkMenuActive = 1;
         i = 0;
         {
             int initial = 0x2000;
             valid = initial;
         }
         mask = 4095;
-        output = gUnk_03005274;
+        output = gSceneSelectionDisplaySlots;
         {
             register int initial asm("r1") = 65535;
             asm("" : "+r"(initial));
@@ -90,7 +89,7 @@ static inline void publishInputs(struct Engine *p)
             history++;
         } while (++i <= 4);
     } else
-        gUnk_03005250 = enabled;
+        gLinkMenuActive = enabled;
 }
 int Wireless_UpdateParentUniSession(struct Engine *p)
 {

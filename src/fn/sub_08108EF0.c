@@ -1,5 +1,5 @@
 #include "global.h"
-#define gSlotMonitor gUnk_020004B0
+#include "ram.h"
 struct SlotMonitor {
     u8 unk0[0x18];
     s32 timeout;
@@ -15,7 +15,6 @@ struct SlotMonitor {
     void (*callback)(void);
     u32 f80;
 };
-extern struct SlotMonitor *gUnk_020004B0;
 extern u32 gUnk_0300546C;
 void Solar_PauseMeasurement(void);
 void Serial_InitMultiplayer(void);
@@ -25,7 +24,7 @@ void SlotMonitor_PollResult(void);
 s32 SlotMonitor_Initialize(struct SlotMonitor *obj, s32 timeout, u32 param, u32 setting, s32 config,
                            u32 mode)
 {
-    gUnk_020004B0 = obj;
+    gSlotMonitor = obj;
     Solar_PauseMeasurement();
     gUnk_0300546C = 1;
     Serial_InitMultiplayer();

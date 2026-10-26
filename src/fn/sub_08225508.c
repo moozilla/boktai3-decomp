@@ -3,7 +3,7 @@ struct G {
     u8 pad[0x5a4];
     u32 f5a4;
 };
-extern struct G *gUnk_02000710;
+extern struct G *gGameState;
 extern u32 gUnk_030053E8;
 u32 Script_GetValue(void);
 s32 Script_SeekToKeyword(s32);
@@ -17,6 +17,6 @@ s32 SceneLifecycle_LoadFromScript(void)
     if (Script_SeekToKeyword(0x6e) == 0 || (Script_GetPc() != 0 && Script_GetValue() == 0))
         *g |= 0x10;
     Script_SetEntryProcedure((s16)s);
-    gUnk_02000710->f5a4 = s;
+    gGameState->f5a4 = s;
     return 0;
 }

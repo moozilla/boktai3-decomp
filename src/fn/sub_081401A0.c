@@ -11,21 +11,20 @@ void Player_RefreshActionEquipment(struct Player *p)
 {
     if (p->actionMode == 6 || p->slot != 0)
         goto special;
-    if ((s16)gUnk_02000710->unk50 <= 7) {
-        s16 *entry = &((struct GameState *)((s16)gUnk_02000710->unk50 * 2 + (u32)gUnk_02000710))
-                          ->inventory[0];
+    if ((s16)gGameState->unk50 <= 7) {
+        s16 *entry =
+            &((struct GameState *)((s16)gGameState->unk50 * 2 + (u32)gGameState))->inventory[0];
         if (*entry >= 0)
             Player_BeginDescriptorAction(p, Inventory_GetEquipmentEntry(*entry));
     } else {
-        s16 *entry = &((struct GameState *)((s16)gUnk_02000710->unk50 * 2 + (u32)gUnk_02000710))
-                          ->inventory[0];
+        s16 *entry =
+            &((struct GameState *)((s16)gGameState->unk50 * 2 + (u32)gGameState))->inventory[0];
         if (*entry >= 0) {
             Player_BeginIndexedAction(p, GameState_GetUnlockEntry(*entry));
-            Player_SetWeaponMode(p,
-                                 SolarFruit_GetInventorySlot(
-                                     ((struct GameState *)((u8 *)gUnk_02000710 +
-                                                           gUnk_02000710->actionAuxiliarySlot * 2))
-                                         ->slots88[4]));
+            Player_SetWeaponMode(p, SolarFruit_GetInventorySlot(
+                                        ((struct GameState *)((u8 *)gGameState +
+                                                              gGameState->actionAuxiliarySlot * 2))
+                                            ->slots88[4]));
         } else
             Player_BeginDescriptorAction(p, 0);
     }

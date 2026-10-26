@@ -69,7 +69,7 @@ static inline u8 *cell(s32 i)
     u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return p + 4;
-    return gUnk_030052F4->cells + 12 + i * 4;
+    return gTerrainMap->cells + 12 + i * 4;
 }
 static inline void ComputeVelocity(struct Pos *v, struct Params *params)
 {
@@ -84,7 +84,7 @@ s32 EnemyParticle_UpdatePool(struct Pool *pool)
     struct Entry *base, *cursor;
     s32 i;
     u32 pause = 0x400;
-    if ((gUnk_030053F4 | gUnk_030053F0) & pause)
+    if ((gEngineFlags | gUnk_030053F0) & pause)
         return 0;
     {
         u32 busy = 4;
@@ -131,10 +131,10 @@ s32 EnemyParticle_UpdatePool(struct Pool *pool)
                 goto release;
             {
                 s32 x = o->pos.x >> 8, z = g->z >> 8, index;
-                if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+                if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
                     index = 0;
                 else
-                    index = gUnk_030052F4->rows[z] + x;
+                    index = gTerrainMap->rows[z] + x;
                 if ((u32)((*cell(index) & 15) << 8) > o->pos.y) {
                 release:
                     EnemyParticle_ReleaseSlot(pool, base, i);

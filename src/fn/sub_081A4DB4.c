@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct E {
     u8 f[4];
@@ -11,7 +12,6 @@ struct A {
     u8 f[0x64];
     struct E e[16];
 };
-extern void *gUnk_02000244;
 void Anim_Remove(void *);
 void ScaledShadow_Destroy(void *);
 
@@ -26,5 +26,5 @@ void Hresvelgr_DestroyProjectilePool(struct A *p)
             ScaledShadow_Destroy(&e->b);
         e++;
     }
-    gUnk_02000244 = 0;
+    gHresvelgrProjectilePool = 0;
 }

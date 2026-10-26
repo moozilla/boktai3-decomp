@@ -10,7 +10,7 @@ struct G {
     u8 f00[0x77C];
     s32 w;
 };
-extern struct G *gUnk_02000710;
+extern struct G *gGameState;
 
 void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(s32);
@@ -18,7 +18,7 @@ void Sound_PlaySong(s32);
 s32 PlayerBarrier_TryActivate(struct P *p)
 {
     struct P *q = p;
-    if (gUnk_02000710->w <= 0)
+    if (gGameState->w <= 0)
         return 0;
     if (p->st != 3) {
         p->w14c = 0;

@@ -1,5 +1,4 @@
 #define SceneActorStyle_CountEntries ModifierMenu_CountAppearanceModifiers
-#define gGameState                   gUnk_02000710
 #include "global.h"
 #include "game_state.h"
 #include "scene_actor_style.h"
@@ -8,7 +7,7 @@ void SceneActorStyle_InitializeFromGameState(struct SceneActorStyle *style)
 {
     s32 i;
     u32 zero;
-    struct GameState *state = gUnk_02000710;
+    struct GameState *state = gGameState;
     style->adjustedA = *(u8 *)&state->unk7A0[2] + 12;
     style->adjustedB = *(u8 *)&state->unk7A0[0] + 6;
     style->adjustedC = *(u8 *)&state->unk7A0[1] + 18;
@@ -17,7 +16,7 @@ void SceneActorStyle_InitializeFromGameState(struct SceneActorStyle *style)
         style->entries[i] = ((u16 *)state->modifierIdsBytes)[i];
     zero = 0;
     style->count = ModifierMenu_CountAppearanceModifiers(style);
-    state = gUnk_02000710;
+    state = gGameState;
     style->parameterD = (u16)state->unk81A;
     style->parameterB = state->unk7A0[0];
     style->parameterF = state->unk7A0[3];

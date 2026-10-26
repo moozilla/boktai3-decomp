@@ -16,7 +16,7 @@ void HealthRestoreEffect_Create(struct Player *);
 static inline u8 sceneFlag(void)
 {
     u32 mask = 0x4000;
-    if (gUnk_02000710->flags868 & mask)
+    if (gGameState->flags868 & mask)
         return 1;
     return 0;
 }
@@ -46,16 +46,16 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
     u8 *properties;
     {
         s32 x = p->position.x >> 8, z = p->position.z >> 8;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             cell = 0;
         else
-            cell = gUnk_030052F4->rows[z] + x;
+            cell = gTerrainMap->rows[z] + x;
     }
     properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else
-        properties = gUnk_030052F4->cells + 12 + cell * 4;
+        properties = gTerrainMap->cells + 12 + cell * 4;
     if ((*(u32 *)properties >> 16 & 0x40) && !p->tetherStatusFlags) {
         if (sceneFlag()) {
             hazardPlayer = p;
@@ -66,7 +66,7 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
         }
         goto hazard;
     }
-    if (gUnk_02000710->playerParticleRate > 4999) {
+    if (gGameState->playerParticleRate > 4999) {
         hazardPlayer = p;
         sequence = 0x23;
     hazard:
@@ -117,7 +117,7 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
     p->movementRequestTarget.y = 0;
     p->movementRequestTarget.z = 0;
     if (p->tetherMode != 0x18 && !p->currentStatA) {
-        if (gUnk_030053F4 & 0x1000)
+        if (gEngineFlags & 0x1000)
             return 1;
         if (!Inventory_HasItem(0x26))
             return 1;

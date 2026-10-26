@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_020001D0;
+#include "ram.h"
 void LinkLobbyPanel_RemoveSprites(void *);
 void LinkLobbyPanel_ClearTextWindows(void *);
 void CharacterModel_RemoveAnimations(void *);
@@ -17,6 +17,6 @@ s32 LinkLobbyPanel_OnTaskDestroy(u8 *s)
         p += 0x850;
     } while (--i >= 0);
     z = 0;
-    gUnk_020001D0 = z;
+    gActiveRecordMenu = z;
     return 1;
 }

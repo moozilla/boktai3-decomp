@@ -21,14 +21,14 @@ void CellObject_Init(struct CellObject *obj, u16 *point)
     u8 lo;
     u8 hi;
     u16 value;
-    struct EngineMap *map = gUnk_030052F4;
+    struct EngineMap *map = gTerrainMap;
 
     if (map->cells) {
         u8 *cells = map->cells;
         u32 off;
         x = (s16)point[0] >> 8;
         z = (s16)point[2] >> 8;
-        if (x < 0 || z < 0 || x >= gUnk_030052F8 || z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || x >= gTerrainWidth || z >= gTerrainHeight)
             cell = 0;
         else
             cell = map->rows[z] + x;

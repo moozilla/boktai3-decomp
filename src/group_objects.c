@@ -376,7 +376,7 @@ int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     {
         register int enabled asm("r8");
         m->timer = 0;
-        index = &gUnk_03005308;
+        index = &gRandomIndex;
         mask = 1023;
         remaining = 15;
         p = m->pieces;

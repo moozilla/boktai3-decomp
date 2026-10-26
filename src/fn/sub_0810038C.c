@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 
 static inline u8 Eq(u32 a, u32 b)
 {
@@ -11,7 +11,7 @@ static inline u8 Eq(u32 a, u32 b)
 u32 FloorSwitch_UpdateRegionVisibility(u32 *p)
 {
     u32 v = p[0x54 / 4];
-    if (Eq(*(u32 *)(gUnk_02000710 + 0x5A0), v)) {
+    if (Eq(*(u32 *)(gGameState + 0x5A0), v)) {
         *p &= ~1;
         return 1;
     }

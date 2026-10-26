@@ -10,12 +10,12 @@ void SceneHud_RefreshEquippedActionIcons(struct SceneHudState *p)
     s32 slot, unlock, action, entry, description;
     struct SceneInputWidget *w;
     void *resource;
-    if ((s16)gUnk_02000710->unk50 <= 7)
+    if ((s16)gGameState->unk50 <= 7)
         slot = 0;
     else
-        slot = (s16)gUnk_02000710->unk50 - 8;
-    unlock = ((s16 *)((u8 *)gUnk_02000710 + 0x78))[slot];
-    action = ((s16 *)((u8 *)gUnk_02000710 + 0x90))[gUnk_02000710->actionAuxiliarySlot];
+        slot = (s16)gGameState->unk50 - 8;
+    unlock = ((s16 *)((u8 *)gGameState + 0x78))[slot];
+    action = ((s16 *)((u8 *)gGameState + 0x90))[gGameState->actionAuxiliarySlot];
     if (unlock == -1 || action == -1) {
         {
             struct SceneInputWidget *a = &p->comparisonUnlockWidget;

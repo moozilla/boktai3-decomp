@@ -1,8 +1,7 @@
 #include "named_object.h"
 #include "player.h"
+#include "engine.h"
 extern const struct SceneVec gUnk_086064B4;
-extern struct EngineMap *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
 s32 TetherActor_TestStatusFlags(u32);
 void TetherActor_CopyPosition(struct SceneVec *);
 void TetherActor_SetPosition(struct SceneVec *);
@@ -13,7 +12,7 @@ static inline u8 *CellData(s32 cell)
     u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         return p + 4;
-    return gUnk_030052F4->cells + (cell * 4 + 12);
+    return gTerrainMap->cells + (cell * 4 + 12);
 }
 static inline u32 Attributes(s32 cell)
 {
@@ -48,10 +47,10 @@ void NamedObject_ClampTetherToPlatform(struct NamedObject *o)
     TetherActor_CopyPosition(&tether);
     x = tether.x >> 8;
     z = tether.z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     if (tether.y == ((*CellData(cell) & 15) << 8) && !(Attributes(cell) & 0x40))
         return;
     Difference(&delta, (struct SceneVec *)&o->x, &tether);

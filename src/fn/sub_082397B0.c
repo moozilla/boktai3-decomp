@@ -7,7 +7,7 @@ struct ActorEffectState {
 static inline u8 global_mode(void)
 {
     u32 mask = 2;
-    if (gUnk_02000710->flags868 & mask)
+    if (gGameState->flags868 & mask)
         return 1;
     return 0;
 }

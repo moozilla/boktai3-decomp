@@ -31,7 +31,7 @@ struct FrostEmitter {
     struct FrostParticle particles[12];
     u32 enabled, age;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Anim_SetSequence(void *, void *, u16, u8, u8);

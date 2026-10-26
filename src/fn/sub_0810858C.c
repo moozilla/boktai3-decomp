@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct Frames {
     u16 *data;
     u8 flags, count, multiplier, duration;
@@ -27,7 +28,6 @@ struct AnimatedTileManager {
     u8 pad0[0x18];
     void *sequences;
 };
-extern struct AnimatedTileManager *gUnk_020001BC;
 struct AnimatedTileManager *AnimatedTile_CreateManager(void);
 struct AnimatedTile *AnimatedTile_Allocate(struct AnimatedTileManager *);
 /* Registry routine 8192: takes a slot of the animated tile manager
@@ -36,7 +36,7 @@ struct AnimatedTile *AnimatedTile_Allocate(struct AnimatedTileManager *);
    steps it once (tentative). */
 void AnimatedTile_CreateFromScript(void)
 {
-    struct AnimatedTileManager *manager = gUnk_020001BC;
+    struct AnimatedTileManager *manager = gNamedEntryPool;
     struct AnimatedTile *e;
     struct AnimatedTile *slot;
     s32 palette;

@@ -34,7 +34,7 @@ struct Sun {
     u8 pad[0x12];
     s16 level;
 };
-extern struct Sun *gUnk_02000710;
+extern struct Sun *gGameState;
 extern const u8 gUnk_0824DC80[]; /* WEIGHT */
 extern const u8 gUnk_0824DC88[]; /* NONSEL */
 extern const u8 gUnk_0824DC90[]; /* UVMOJI */
@@ -122,7 +122,7 @@ const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
         if (p->hasValue && p->length)
             p->mode = Text_ParseDecimal(p->text, p->length);
         else {
-            int level = gUnk_02000710->level;
+            int level = gGameState->level;
             p->mode = level;
         }
         goto done;

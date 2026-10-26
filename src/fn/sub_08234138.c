@@ -24,7 +24,7 @@ struct S {
     u16 timer;
 };
 extern const s16 gUnk_086149C4[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 u32 AnimData_FindEntry(u32);
 void ParticleSprite_Initialize(void *, u32, u32);
@@ -39,15 +39,15 @@ static inline int scale(int n)
 static inline u32 rand8(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u8 *)(offset + (u32)gUnk_0203B400);
 }
 static inline u32 rand16t(const u16 *t)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)t);
 }
 

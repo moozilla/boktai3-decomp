@@ -1,10 +1,9 @@
 #include "global.h"
-
-extern u8 *gUnk_020004B0;
+#include "ram.h"
 
 void LinkConnection_SetCallbacks(void *p, u32 a, u32 b)
 {
-    u8 *g = gUnk_020004B0;
+    u8 *g = gSlotMonitor;
 
     if (g) {
         *(void **)(g + 0x80) = p;

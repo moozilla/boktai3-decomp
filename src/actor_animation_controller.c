@@ -228,7 +228,7 @@ void Actor_ProjectAndClampToScreen(struct ActorAnimController *p)
 
 // Provisional name: Actor_TryInteraction
 
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 
 extern u16 gUnk_03005260[];
 
@@ -289,8 +289,8 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
             a = 255;
         }
     }
-    if ((s8)a != *(s16 *)(gUnk_02000710 + 0x85e) && (s8)b != *(s16 *)(gUnk_02000710 + 0x85e) &&
-        (s8)c != *(s16 *)(gUnk_02000710 + 0x85e))
+    if ((s8)a != *(s16 *)(gGameState + 0x85e) && (s8)b != *(s16 *)(gGameState + 0x85e) &&
+        (s8)c != *(s16 *)(gGameState + 0x85e))
         return;
     height = q->worldY;
     owner = *(u8 **)((u8 *)p + 0x18);
@@ -429,8 +429,8 @@ void Actor_SelectNearestInteraction(struct ActorAnimController *p)
                 a = 255;
             }
         }
-        if ((s8)a != *(s16 *)(gUnk_02000710 + 0x85e) && (s8)b != *(s16 *)(gUnk_02000710 + 0x85e) &&
-            (s8)c != *(s16 *)(gUnk_02000710 + 0x85e))
+        if ((s8)a != *(s16 *)(gGameState + 0x85e) && (s8)b != *(s16 *)(gGameState + 0x85e) &&
+            (s8)c != *(s16 *)(gGameState + 0x85e))
             continue;
         height = q->worldY;
         {
@@ -4357,7 +4357,7 @@ void Actor_UpdateRegionChildren(struct ActorRegionController *p)
     for (; i < 16; i++) {
         s32 visible = 0;
         if (visible < countBase[i].count) {
-            u32 current = ((struct ActorRegionPlayer *)gUnk_02000710)->region;
+            u32 current = ((struct ActorRegionPlayer *)gGameState)->region;
             s32 count = p->children[i].regionCount;
             s32 j = 0;
             do {

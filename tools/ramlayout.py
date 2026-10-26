@@ -340,6 +340,11 @@ def cmd_unify(a):
                 if renames.get(m.group(2)) == m.group(1):
                     aliased.add((p, m.group(1)))
             new[p] = alias.sub(lambda m: "" if renames.get(m.group(2)) == m.group(1) else m.group(0), t)
+            # a file's own macro that spells another object with one of the new names: inline it
+            for m in alias.finditer(new[p]):
+                if m.group(1) in set(renames.values()) and renames.get(m.group(2)) != m.group(1):
+                    new[p] = re.sub(rf"\b{m.group(1)}\b", m.group(2), new[p].replace(m.group(0), "", 1))
+                    aliased.add((p, "inlined:" + m.group(1)))
     taken = {n: p for p, t in new.items() for n in set(renames.values())
              if (p, n) not in aliased and re.search(rf"\b{n}\b", t)}
     taken = {n: p for n, p in taken.items() if n not in {r["name"] for r, _, _ in jobs}}
@@ -349,6 +354,7 @@ def cmd_unify(a):
         for p, t in new.items():
             if pat.search(t):
                 new[p] = pat.sub(lambda m: renames[m.group(1)], t)
+    renamed = dict(new)
     hdr_inc = os.path.basename(a.header)
     # every declaration the header will hold: earlier rows and this batch
     canon = {r["name"]: parse_decl(r["decl"])[0] for r in rows if r["header"] == a.header and r["decl"]}
@@ -363,6 +369,19 @@ def cmd_unify(a):
                     if norm(spec, decls[idx], name, name) != c:
                         differ.setdefault(name, set()).add(p)
                         blocked.add(p)
+    # headers the target includes, directly or not: they keep their declarations
+    # (including the target from them would be a cycle)
+    by_base = {os.path.basename(p): p for p in new if p.endswith(".h")}
+    below, todo = set(), [a.header]
+    while todo:
+        for inc in includes(new[todo.pop()]):
+            if inc in by_base and by_base[inc] not in below:
+                below.add(by_base[inc])
+                todo.append(by_base[inc])
+    blocked |= below
+    # other headers keep their declarations too: including the target from a
+    # header reaches every file that includes it, which cannot fall back
+    blocked |= {p for p in new if p.endswith(".h") and p != a.header}
     # a file that declares one of them differently cannot include the header
     for r, decl, note in jobs:
         c, name = parse_decl(decl)
@@ -403,13 +422,17 @@ def cmd_unify(a):
             print(f"  {n} differs in: {' '.join(sorted(ps))}")
         return
 
+    probe = compile_asm(next(p for p in sorted(new) if p.startswith("src/fn/")), f'#include "{hdr_inc}"\n', False)
+    if "ERROR" in probe[:9]:
+        sys.exit(f"{a.header} does not compile on its own:\n" + probe)
+
     def before(p):
         return {nm: compile_asm(p, texts[p], nm) for nm in (False, True)} if "NONMATCHING" in texts[p] \
             else {False: compile_asm(p, texts[p], False)}
     with concurrent.futures.ThreadPoolExecutor(a.jobs) as ex:
         base = dict(zip(verify, ex.map(before, verify)))
     write(new, changed)
-    failed, chosen = [], {}
+    failed, chosen, fallback = [], {}, set()
     try:
         def same(p, t):
             for nm, asm in base[p].items():
@@ -424,12 +447,17 @@ def cmd_unify(a):
 
         def after(p):
             if p not in blocked:
-                return same(p, new[p])
+                err = same(p, new[p])
+                if err and renamed[p] != new[p] and same(p, renamed[p]) is None:
+                    chosen[p] = ("own", renamed[p])     # e.g. a struct tag the header also defines
+                    fallback.add(p)
+                    return None
+                return err
             # its own declaration differs: the shared one if the code is
             # unchanged, else its own (if the header stays out of sight),
             # else its own view as a cast at each use
             err = None
-            for how, t in (("shared", adopt(new[p], canon, a.header, cast=False)), ("own", new[p]),
+            for how, t in (("shared", adopt(new[p], canon, a.header, cast=False)), ("own", renamed[p]),
                            ("cast", adopt(new[p], canon, a.header, cast=True))):
                 if t is None:
                     continue
@@ -462,9 +490,15 @@ def cmd_unify(a):
     formatted(texts, new, changed)
     for r, decl, note in jobs:
         r.update(name=parse_decl(decl)[1], decl=decl.strip(), header=a.header)
+        size = scalar_size(decl)
+        if size:
+            r["size"] = f"{size:X}"
         if note:
             r["notes"] = note
     save(rows)
+    if fallback:
+        print(f"  {len(fallback)} files could not include {a.header} and keep their declarations: "
+              + " ".join(sorted(fallback)[:20]) + (" ..." if len(fallback) > 20 else ""))
     kept = {}
     for n, ps in sorted(differ.items()):
         for p in ps:
@@ -489,7 +523,7 @@ def adopt(t, canon, header, cast):
         for m, spec, decls, idx in reversed(declarations(t, name)):
             own = norm(spec, decls[idx], name, name)
             if own != c and cast:
-                e = view(spec, decls[idx], name, c)
+                e = view(spec, decls[idx], name, c, assigned(t, name))
                 if e is None:
                     return None
                 exprs.add(e)
@@ -502,8 +536,28 @@ def adopt(t, canon, header, cast):
     return add_include(t, header)
 
 
-def view(spec, declarator, name, canon):
-    """A cast expression that gives `name` the type of `spec declarator`."""
+SCALAR = {"u8": 1, "s8": 1, "char": 1, "bool8": 1, "u16": 2, "s16": 2, "short": 2, "bool16": 2,
+          "u32": 4, "s32": 4, "int": 4, "long": 4, "bool32": 4, "vu32": 4, "vu16": 2, "vu8": 1}
+
+
+def scalar_size(decl):
+    """sizeof for a pointer or scalar declaration, else None."""
+    norm_, name = parse_decl(decl)
+    spec, d = norm_.rsplit(" ", 1)
+    if "[" in d:
+        return None
+    if d.startswith("*"):
+        return 4
+    return SCALAR.get(spec.split()[-1])
+
+
+def assigned(t, name):
+    return re.search(rf"&\s*{name}\b|\b{name}\s*(?:[-+*/%&|^]|<<|>>)?=(?!=)|\+\+\s*{name}\b|--\s*{name}\b|\b{name}\s*(?:\+\+|--)", t)
+
+
+def view(spec, declarator, name, canon, lvalue=True):
+    """A cast expression that gives `name` the type of `spec declarator`
+    (a plain value cast for a pointer that the file never assigns)."""
     d = re.sub(r"\s+", "", declarator)
     stars = len(d) - len(d.lstrip("*"))
     dims = re.findall(r"\[[^\]]*\]", d)
@@ -511,6 +565,8 @@ def view(spec, declarator, name, canon):
     if not dims:
         if canon_array:
             return None
+        if stars and not lvalue:
+            return f"(({spec} {'*' * stars}){name})"
         return f"(*({spec} {'*' * stars}*)&{name})"
     if not canon_array:
         return None

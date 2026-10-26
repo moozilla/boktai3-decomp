@@ -1,7 +1,7 @@
 #include "global.h"
 // confidence=low: spawns six spark particles around the actor and plays a sound.
 extern u8 gUnk_0203B400[];
-extern s32 gUnk_03005308;
+extern s32 gRandomIndex;
 void SparkParticle_Spawn(u8 *, u32, void *, u32, u32, u32, u32, u32);
 void Sound_PlaySong(u32);
 struct VAB {
@@ -23,7 +23,7 @@ void TentacleActor_SpawnSparkBurst(u8 *p)
     v.z = 0x3c;
     tbl = gUnk_0203B400;
     asm("" : "+r"(tbl));
-    idx = &gUnk_03005308;
+    idx = &gRandomIndex;
     SparkParticle_Spawn(p, (rnd(tbl, idx) & 3) + 1, &v, 0x20, 4, 20, 2, 1);
     SparkParticle_Spawn(p, (rnd(tbl, idx) & 1) + 1, &v, 0x40, 4, 20, 2, 1);
     SparkParticle_Spawn(p, (rnd(tbl, idx) & 3) + 1, &v, 0x5e, 4, 20, 2, 1);

@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_02000158;
 void Effect_Remove(void *);
 
 static inline u8 Tst(u32 *m, s32 i)
@@ -31,7 +31,7 @@ u32 BlinkingEffect_DestroyPool(struct S *b)
     }
     {
         u32 z = 0;
-        gUnk_02000158 = z;
+        gSceneStatusIndicatorManager = z;
     }
     return 0;
 }

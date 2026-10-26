@@ -13,7 +13,7 @@ s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 
 struct ChasePlayer {
     u8 unknown0[0x20];
@@ -95,9 +95,9 @@ static inline u32 Chase_Bits32(u32 *field, u32 mask)
 }
 static inline s32 Chase_CellIndex(s32 x, s32 z)
 {
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline s32 Chase_CellAt(struct ContactPosition *position)
 {
@@ -110,7 +110,7 @@ static inline u32 Chase_HeightAt(s32 cell, struct ContactPosition *position)
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
+        data = gTerrainMap->cells + (cell * 4 + 12);
     kind = *data >> 4;
     height = (*data & 15) << 8;
     if (kind == 1)
@@ -193,8 +193,8 @@ static inline void Chase_SavePacket(void *p, struct SceneActorRegistryResetView 
 }
 static inline u32 Chase_RandomBits(u32 mask)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return gUnk_0203B400[index] & mask;
 }
 static inline void Chase_BeginTurn(void *obj, u8 saved)
@@ -230,7 +230,7 @@ static inline u8 Chase_Arrive(void *obj)
     s32 cell;
     s32 player;
     Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
-    if (Chase_Test(gUnk_030053F4, 0x4800)) {
+    if (Chase_Test(gEngineFlags, 0x4800)) {
         struct ChaseTarget *t = *slot;
         if (!t)
             goto invoke;
@@ -277,15 +277,15 @@ static inline u8 Chase_Arrive(void *obj)
     goto done;
 reroute: {
     struct ContactPosition *targetPointer = &target;
-    s32 x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-    s32 z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+    s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
+    s32 z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
     u8 *data;
     targetPointer->x = (x << 8) + 0x80;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
+        data = gTerrainMap->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
     if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, targetPointer))

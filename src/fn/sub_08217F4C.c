@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z;
@@ -27,7 +28,7 @@ struct OamEntry {
     u32 attributes;
     u16 tile, depth;
 };
-extern u32 gUnk_03003A50, gUnk_03003A04;
+extern u32 gUnk_03003A04;
 extern struct Drawable *gUnk_030042D0[];
 extern struct Matrix gUnk_03004310[];
 extern struct OamEntry gUnk_03004390[], gUnk_030047A0[];
@@ -50,7 +51,7 @@ void SpriteOam_QueueProjectedSprites(void)
     struct Vec pos;
     struct Drawable *p;
     s32 *matrixCount;
-    u32 parity = gUnk_03003A50 & 1;
+    u32 parity = gSceneEffectPalettePhase & 1;
     u32 skip = 0x401;
     if (parity)
         skip = 0x201;

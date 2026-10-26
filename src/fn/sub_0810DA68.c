@@ -1,10 +1,10 @@
 #include "global.h"
+#include "engine.h"
 
 struct SelectionPanel {
     u8 unk0[0x420];
     u16 entryIds[10];
 };
-extern u32 gUnk_030053F4;
 extern u32 gUnk_030053F0;
 
 void SelectionPanel_InitEntryIds(struct SelectionPanel *p)
@@ -17,7 +17,7 @@ void SelectionPanel_InitEntryIds(struct SelectionPanel *p)
     p->entryIds[6] = 0x26;
     {
         u32 mask = 0x800;
-        if ((gUnk_030053F4 | gUnk_030053F0) & mask)
+        if ((gEngineFlags | gUnk_030053F0) & mask)
             p->entryIds[1] = 0x20;
         else
             p->entryIds[1] = 0x1f;

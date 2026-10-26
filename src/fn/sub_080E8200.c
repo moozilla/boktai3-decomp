@@ -2,8 +2,8 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "player.h"
+#include "engine.h"
 
-extern u32 gUnk_030053F4;
 void *SceneActorContacts_FindObjectById(u16);
 u8 SceneActor_FindNearbyActivePlayer(struct SceneActorRegistryResetView *);
 u8 SceneActor_IsCollisionTargetUnavailable(struct SceneActorRegistryResetView *);
@@ -25,7 +25,7 @@ static inline u8 nearFlag(struct SceneActorRegistryResetView *actor)
 }
 static inline u8 collisionMode(void)
 {
-    if (gUnk_030053F4 & 0x4800)
+    if (gEngineFlags & 0x4800)
         return 1;
     return 0;
 }

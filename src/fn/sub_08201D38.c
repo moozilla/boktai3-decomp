@@ -64,7 +64,7 @@ struct ScriptCombatActorState {
     u32 w1cc;
     u8 w1d0[4];
 };
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 extern u32 gUnk_030053F0;
 extern u32 gUnk_02000560;
 void AnimData_SelectPaletteBank(void *, u32 animation);
@@ -176,7 +176,7 @@ u32 ScriptCombatActor_UpdateState(struct ScriptCombatActorState *p)
 {
     register struct ActorColliderView *c asm("r4");
     u32 m = 0x400;
-    if ((gUnk_030053F4 | gUnk_030053F0) & m)
+    if ((gEngineFlags | gUnk_030053F0) & m)
         return 0;
     {
         u32 m2 = 4;

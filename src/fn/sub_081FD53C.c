@@ -1,20 +1,20 @@
 #include "global.h"
 #include "scene_vec.h"
+#include "engine.h"
 
 struct OrbitEffect {
     u8 unk_00[0x50];
     struct SceneVec position;
 };
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 void SpriteEffectController_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                    s32, s32, s32, s32, s32, s32);
 static inline u16 RandomValue(const u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return table[gRandomIndex];
 }
 static inline s32 Scale(s32 value)
 {

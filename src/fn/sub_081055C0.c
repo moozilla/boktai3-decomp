@@ -5,13 +5,13 @@
 // MATCHING_CONCESSION: register-pinning
 #define CallbackPool_RunSpawnScript ProximityActor_SetState
 #define gShakeRandomTable           gUnk_0203B400
-#define gShakeRandomIndex           gUnk_03005308
+#define gShakeRandomIndex           gRandomIndex
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 static inline u32 NextRandom(u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    return *(u16 *)((gUnk_03005308 << 1) + (u32)table);
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    return *(u16 *)((gRandomIndex << 1) + (u32)table);
 }
 void ProximityActor_SetState(struct CallbackPoolEntry *entry, s32 count)
 {

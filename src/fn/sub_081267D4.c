@@ -1,5 +1,6 @@
-#define gEffectPool gUnk_02000158
+#define gEffectPool gSceneStatusIndicatorManager
 #include "global.h"
+#include "ram.h"
 
 struct PoolEffect {
     u8 unknown[0x28];
@@ -12,7 +13,6 @@ struct EffectPool {
     u8 unknown[0x25C];
     u32 activeMask;
 };
-extern struct EffectPool *gUnk_02000158;
 void Effect_Remove(void *);
 
 void EffectPool_ReleaseSlot(void *unused, struct PoolEffect *effect)
@@ -21,7 +21,7 @@ void EffectPool_ReleaseSlot(void *unused, struct PoolEffect *effect)
     s32 slot;
     if (effect->state)
         effect->state = 0;
-    pool = gUnk_02000158;
+    pool = gSceneStatusIndicatorManager;
     slot = effect->slot;
     pool->activeMask &= ~(1 << slot);
     effect->active = 0;

@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_vec.h"
-#define gTileTriggerManager gUnk_020001B8
+#include "engine.h"
+#include "ram.h"
 struct TileTrigger {
     u32 flags;
     u8 unknown4[0x70];
@@ -20,14 +21,12 @@ struct TileTriggerManager {
     struct TileTrigger *tiles[12];
     u32 used;
 };
-extern struct TileTriggerManager *gUnk_020001B8;
-extern u32 gUnk_030053F4;
 void TileTrigger_EmitParticles(struct TileTrigger *);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 void TileTrigger_TickDelay(struct TileTrigger *p)
 {
-    struct TileTriggerManager *manager = gUnk_020001B8;
+    struct TileTriggerManager *manager = gTileTriggerManager;
     if (p->frame >= p->delay) {
         TileTrigger_EmitParticles(p);
         Anim_SetSequence(p->animation, manager->animationData, 0, (u8)p->sequence, 0);
@@ -36,7 +35,7 @@ void TileTrigger_TickDelay(struct TileTrigger *p)
         switch (p->sequence) {
             case 0:
             case 1:
-                if (gUnk_030053F4 & 0x800)
+                if (gEngineFlags & 0x800)
                     Sound_PlaySong(0x26D);
                 else
                     Sound_PlaySong(0x1AB);

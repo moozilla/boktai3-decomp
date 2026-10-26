@@ -20,14 +20,14 @@ s32 Mod(s32, s32);
 s32 Div(s32, s32);
 static inline s32 SceneActorTerrain_Width(void)
 {
-    return *(s16 *)(gUnk_030052F4->cells + 4);
+    return *(s16 *)(gTerrainMap->cells + 4);
 }
 static inline u8 *SceneActorTerrain_GetCell(s32 cell)
 {
     u8 *override = TerrainModifiers_FindCellOverride(cell, 1);
     if (override)
         return override + 4;
-    return gUnk_030052F4->cells + (cell * 4 + 12);
+    return gTerrainMap->cells + (cell * 4 + 12);
 }
 static inline void SceneActorTerrain_GetCenter(s32 cell, struct ContactPosition *position)
 {
@@ -56,9 +56,9 @@ static inline s32 SceneActorTerrain_GetCellIndex(const struct ContactPosition *p
 {
     s32 x = position->x >> 8;
     s32 z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline void SceneActorTerrain_Subtract(struct ContactPosition *out,
                                               const struct ContactPosition *a,

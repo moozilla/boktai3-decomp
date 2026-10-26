@@ -1,6 +1,6 @@
 #include "global.h"
-extern u32 gUnk_03001688;
+#include "ram.h"
 u32 Collider_GetManager(void)
 {
-    return gUnk_03001688;
+    return gColliderManager;
 }

@@ -12,12 +12,12 @@ struct Weather {
     u8 pad2c[36];
     int bank;
 };
-extern u8 *gUnk_02000710;
-extern u32 gUnk_030053F4, gUnk_030053F0;
+extern u8 *gGameState;
+extern u32 gEngineFlags, gUnk_030053F0;
 extern int gUnk_0200008C, gUnk_02000478;
 extern u8 gUnk_03005430[];
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 void Palette_SetBrightnessMode(int);
 int Weather_TestFlags(int, int);
 void Weather_SetRandomDuration(void *);
@@ -29,8 +29,8 @@ void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
 static inline int randomValue(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(u16 *)((u8 *)gUnk_0203B400 + offset);
 }
 static inline void flags(void)
@@ -39,19 +39,19 @@ static inline void flags(void)
     gDispCntShadow = mask | gDispCntShadow;
     {
         int bit = 4096;
-        *(u32 *)(gUnk_02000710 + 0x868) |= bit;
+        *(u32 *)(gGameState + 0x868) |= bit;
     }
 }
 static inline int light(struct Weather *p)
 {
-    int v = *(s16 *)(gUnk_02000710 + 0x876);
+    int v = *(s16 *)(gGameState + 0x876);
     v += p->light;
     return v;
 }
 static inline int interrupted(void)
 {
     int mask = 1024;
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 int Weather_ActiveStorm(struct Weather *p)
 {
@@ -68,7 +68,7 @@ int Weather_ActiveStorm(struct Weather *p)
     }
     if (!Weather_TestFlags(p->flags, 8)) {
         if (!p->countdown) {
-            if (!(gUnk_030053F4 & 1024) && gUnk_02000478 > 0) {
+            if (!(gEngineFlags & 1024) && gUnk_02000478 > 0) {
                 gGrayscaleControl = 5;
                 Sound_PlaySong(103);
             }

@@ -32,8 +32,8 @@ static inline u8 TestBody(struct GolemChargeContext *body, u32 mask)
 }
 static inline u32 Random(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return ((u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return ((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
 static inline s32 WaitTime(struct GolemChargeContext *context, u32 mask, s32 shift, s32 base)
 {

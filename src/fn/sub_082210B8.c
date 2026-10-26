@@ -1,6 +1,7 @@
 #include "global.h"
+#include "ram.h"
 extern s16 gUnk_0203B400[1024];
-extern u32 gUnk_03005308, gUnk_03005304;
+extern u32 gRandomIndex;
 s32 Random_Next15(void);
 void Random_InitValueTable(void)
 {
@@ -11,6 +12,6 @@ void Random_InitValueTable(void)
             gUnk_0203B400[i] = value >> (Random_Next15() & 3);
         } while (0);
     }
-    gUnk_03005308 = Random_Next15() & 1023;
-    gUnk_03005304 = Random_Next15() & 1023;
+    gRandomIndex = Random_Next15() & 1023;
+    gEffectRandomTableIndex = Random_Next15() & 1023;
 }

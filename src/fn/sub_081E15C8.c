@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "game_state.h"
+#include "ram.h"
 
 struct GameStartRes {
     u32 w[8];
@@ -60,7 +61,6 @@ struct GameStart {
 };
 
 extern u32 gUnk_020003A0[];
-extern u8 gUnk_020005C0[];
 extern u8 gUnk_020005B4[];
 extern u16 gUnk_03004FC0[];
 
@@ -81,7 +81,7 @@ void GameStart_RunInitHook(void *);
 
 #define W(o)    (*(s32 *)(p + (o)))
 #define U16(o)  (*(u16 *)(p + (o)))
-#define GS_H(o) (*(s16 *)((u8 *)gUnk_02000710 + (o)))
+#define GS_H(o) (*(s16 *)((u8 *)gGameState + (o)))
 
 // Tentative: sets up the Game Start screen (backgrounds, widgets, cursor sprite, save state).
 inline static void StepAnim_Init(struct GameStartAnim *a, struct GameStartSprite *s)
@@ -211,7 +211,7 @@ s32 GameStart_Init(u8 *p)
     else
         Menu_StartFadeIn(3);
     if (gUnk_020003A0[6] == 0) {
-        u8 *name = gUnk_020005C0;
+        u8 *name = gAnimPanelSavedSelections;
         u8 *slot = gUnk_020005B4;
         u8 *end = name;
         s32 blank = 0x41;
@@ -229,10 +229,10 @@ s32 GameStart_Init(u8 *p)
             goto check;
         }
     }
-    if ((*((s16 *)(((u8 *)gUnk_02000710) + 0x86e))) != 0)
+    if ((*((s16 *)(((u8 *)gGameState) + 0x86e))) != 0)
         GameState_RestoreActiveRegions();
 check:
-    if ((*((s16 *)(((u8 *)gUnk_02000710) + 0x86e))) == 0)
+    if ((*((s16 *)(((u8 *)gGameState) + 0x86e))) == 0)
         ((struct GameStart *)p)->active = 1;
 
     GameStart_DrawSaveInfo(p);

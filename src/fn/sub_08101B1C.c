@@ -30,9 +30,9 @@ static inline s32 GetCell(struct Pos16 *p)
     s32 x, z;
     x = (s16)p->x >> 8;
     z = (s16)p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u8 TestV(u32 flags, u32 bit)
 {
@@ -80,8 +80,8 @@ void NamedObject_RegisterFollowCells(struct NamedObject *objectArg)
                                           5);
             object->registered[i] = 1;
             w = &where;
-            col = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-            row = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+            col = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
+            row = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
             where.x = col * 256 + 0x80;
             w->y = (*cellProps(cell) & 0xF) << 8;
             w->z = row * 256 + 0x80;
@@ -92,13 +92,13 @@ void NamedObject_RegisterFollowCells(struct NamedObject *objectArg)
         }
         switch (i) {
             case 0:
-                cell = base + *(s16 *)(gUnk_030052F4->cells + 4);
+                cell = base + *(s16 *)(gTerrainMap->cells + 4);
                 break;
             case 1:
                 cell = base - 1;
                 break;
             case 2:
-                cell = base - *(s16 *)(gUnk_030052F4->cells + 4);
+                cell = base - *(s16 *)(gTerrainMap->cells + 4);
                 break;
         }
         registration += 0x10;

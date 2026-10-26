@@ -1,12 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "game_state.h"
+#include "ram.h"
 
 /* NameEntry_Initialize: reads the script's "b" (name slot) and "d" (initial name) keywords,
  * loads the slot's current name, counts its blank trailing pairs to place the cursor, then
  * sets up the keyboard backgrounds and six widgets. (guess) */
 
-extern u32 gUnk_02000328[];
 extern u8 gUnk_020005B4[];
 extern u8 gUnk_03004FC0[];
 s32 Script_SeekToKeyword(s32);
@@ -48,7 +48,7 @@ s32 NameEntry_Initialize(u8 *s)
         *(u32 *)(s + 0x394) = Script_ReadString(Script_GetPc());
         Script_GetPc();
     }
-    if (gUnk_02000328[4] == 1) {
+    if (gNamePlaceholderScript[4] == 1) {
         if (gUnk_020005B4[*slot + 2] == 0)
             *(u32 *)(s + 0x34C) = 0x56;
         goto player;
@@ -59,10 +59,10 @@ s32 NameEntry_Initialize(u8 *s)
     player:
         CpuSet(PlayerName_GetBuffer(), s + 0x374, 8);
     } else {
-        CpuSet((u8 *)gUnk_02000710 + 0x790, s + 0x374, 8);
+        CpuSet((u8 *)gGameState + 0x790, s + 0x374, 8);
     }
     name = s + 0x374;
-    str = Text_LookupString(Script_ParseStringRef((const void *)gUnk_02000328[0]) + 0x54);
+    str = Text_LookupString(Script_ParseStringRef((const void *)gNamePlaceholderScript[0]) + 0x54);
     for (i = 8; i >= 0; i -= 2) {
         u8 *c = name + i;
         asm("" : "+r"(c));
@@ -87,7 +87,7 @@ s32 NameEntry_Initialize(u8 *s)
         u32 *p = (u32 *)(s + 0x370);
         u32 idx = *p + 2;
         if (table[idx] == 0) {
-            if (gUnk_02000328[4])
+            if (gNamePlaceholderScript[4])
                 *(u32 *)(s + 0x34C) = 0x56;
             {
                 u8 *a = table + (*p + 2);
@@ -197,6 +197,6 @@ s32 NameEntry_Initialize(u8 *s)
     }
     TextEntry_DrawName(s + 0x374);
     NameEntry_UpdateCursor(s);
-    Menu_StartFadeIn(*(u32 *)(s + 0x36C) = gUnk_02000328[5]);
+    Menu_StartFadeIn(*(u32 *)(s + 0x36C) = gNamePlaceholderScript[5]);
     return 0;
 }

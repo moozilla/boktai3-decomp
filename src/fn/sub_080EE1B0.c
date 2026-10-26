@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
+#include "engine.h"
 
 /* Ivy defeat state (tentative), a variant of Skeleton_UpdateDefeat (Skeleton_UpdateDefeat). On entry:
  * hides the actor, launches a particle burst through sub_08127590 and either plays cue 0xE5
@@ -22,10 +23,9 @@ void sub_08127590(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u
 void sub_08159164(u32);
 void Player_RefreshLifeState(u32, u32);
 void SceneActorRecord_RecordPair(u32, u32);
-extern u32 gUnk_03005308;
 extern u16 gUnk_030039F0;
 
-#define STAT(n)  (*(s16 *)((u8 *)gUnk_02000710 + (n)))
+#define STAT(n)  (*(s16 *)((u8 *)gGameState + (n)))
 #define COUNT(n) Count(&STAT(n))
 #define INC(n)   STAT(n) = Clamp(STAT(n) + 1)
 
@@ -98,9 +98,9 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u3
 }
 static inline u32 RandomFrom(const u16 *table, u32 wrap, u32 bits)
 {
-    u32 index = (gUnk_03005308 + 1) & wrap;
+    u32 index = (gRandomIndex + 1) & wrap;
     u32 v;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     index *= 2;
     v = *(const u16 *)(index + (u32)table);
     v &= bits;
@@ -247,7 +247,7 @@ void SceneActorReaction_PlayHiddenCue(void);
 static inline u8 SaveFlag(u32 maskInput)
 {
     u32 mask = maskInput;
-    if (*(u32 *)((u8 *)gUnk_02000710 + 0x868) & mask)
+    if (*(u32 *)((u8 *)gGameState + 0x868) & mask)
         return 1;
     return 0;
 }
@@ -258,8 +258,8 @@ static inline void ClearPos(void *dest, vu32 *zero)
 }
 static inline u16 Rand(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     index *= 2;
     return *(const u16 *)(index + RANDOM_TABLE_ADDR);
 }
@@ -420,6 +420,6 @@ void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     RecordKill(actor, categoryp);
     sub_08159164(*(u32 *)((u8 *)actor + 0xAC));
     Player_RefreshLifeState(actor->field2D8, *((u8 *)actor + 0xA1));
-    if (!Test(gUnk_030053F4, 0x4800) && !Flag(actor, 0x800, 0x2D0))
+    if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
         SceneActorRecord_RecordPair(gUnk_030039F0, (u16)actor->id);
 }

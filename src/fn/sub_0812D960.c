@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_02000194;
 void Effect_Remove(void *);
 
 static inline u8 Tst(u32 *m, s32 i)
@@ -31,7 +31,7 @@ u32 ParticleEffectPool_DestroyTask(struct S *b)
     }
     {
         u32 z = 0;
-        gUnk_02000194 = z;
+        gSceneParticlePool = z;
     }
     return 0;
 }

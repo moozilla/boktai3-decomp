@@ -77,7 +77,7 @@ void SceneActorReaction_EndHitCheckDefeat(struct SceneActorRegistryResetView *ac
         actor->field2B1 = 1;
     }
     actor->field2E0 = 32;
-    if (!Test(gUnk_030053F4, 0x4800) && !Flag2D0(actor, 0x800))
+    if (!Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
         SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
     {
         u32 mask = 0x2000;

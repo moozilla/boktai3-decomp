@@ -33,7 +33,7 @@ void AreaEffect_UpdateActionParticles(struct AreaEffectManager *manager)
     }
     active = 0;
     if (manager->player->stateTag == 1) {
-        if (gUnk_02000710->flags868 & 2) {
+        if (gGameState->flags868 & 2) {
             goto action;
         }
         if (AreaEffect_FindContainingEntry(&manager->player->position) > (0 - 1)) {

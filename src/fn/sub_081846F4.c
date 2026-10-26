@@ -31,7 +31,7 @@ extern u32 gUnk_0824EE90[];
 extern const struct Vec8 gUnk_0824EEA0;
 extern const struct Vec8 gUnk_0824EEA8;
 extern u32 gUnk_0824EEB0[];
-extern struct PlayerPos *gUnk_02000710;
+extern struct PlayerPos *gGameState;
 void Armor_SetAnimationFromStart(u32 a, u32 b);
 void Sound_PlaySongChecked(u32 a);
 void Armor_StartFastWhiteFade(void *);
@@ -88,8 +88,8 @@ void ActorController_UpdateChargeAttackTransition(u8 *p)
                 Collider_SetAttackPowerAndForce(c, 0, 0x50);
                 c->v1c = gUnk_0824EEA8;
                 c->v14 = gUnk_0824EEA0;
-                p[0x1D2] = Math_Atan2(gUnk_02000710->x - *(s16 *)(p + 0x48),
-                                      gUnk_02000710->z - *(s16 *)(p + 0x4C));
+                p[0x1D2] = Math_Atan2(gGameState->x - *(s16 *)(p + 0x48),
+                                      gGameState->z - *(s16 *)(p + 0x4C));
                 Sound_PlaySongChecked(0x1BA);
             }
             break;

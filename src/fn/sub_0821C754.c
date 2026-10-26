@@ -23,9 +23,9 @@ static inline s32 cellIndexAt(struct Pos16 *p)
 {
     s32 x = (s16)p->x >> 8;
     s32 z = (s16)p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 static inline u8 *cellProps(s32 cell)
@@ -33,12 +33,12 @@ static inline u8 *cellProps(s32 cell)
     u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         return p + 4;
-    return gUnk_030052F4->cells + (cell * 4 + 12);
+    return gTerrainMap->cells + (cell * 4 + 12);
 }
 
 void Terrain_SampleSurface(struct SurfaceTrack *t, struct Pos16 *out, struct Pos16 *in)
 {
-    if (gUnk_030052F4->cells) {
+    if (gTerrainMap->cells) {
         u32 cell = (u16)cellIndexAt(in);
         u8 *props = cellProps(cell);
         if (t->cell != cell) {

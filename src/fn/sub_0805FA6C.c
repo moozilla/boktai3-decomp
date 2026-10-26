@@ -40,10 +40,10 @@ void SceneInventory_ShowItemDescription(struct SceneInventoryPanel *panel)
         MessageWindow_SetDisplayMode(1);
         MessageWindow_ShowMessage(item);
         text = Script_ParseStringRef(panel->itemText);
-        if (gUnk_02000710->form == 6 && item == 13) {
+        if (gGameState->form == 6 && item == 13) {
             ScrollingDialogue_SetScript(Text_LookupString(text + 234));
         } else {
-            s32 context = gUnk_02000710->form;
+            s32 context = gGameState->form;
             if (context == 0 || context == 6)
                 text += 55;
             else

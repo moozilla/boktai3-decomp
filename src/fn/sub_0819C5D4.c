@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 struct BurstVector {
     s16 x, y, z, pad;
@@ -15,7 +16,6 @@ struct BurstActor {
 };
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 void MotionEntry_CreateWithDelta(void *, void *, s32, s32);
 static inline s32 scale(s32 n)
 {
@@ -36,8 +36,8 @@ static inline void add(struct BurstVector *d, struct BurstVector *a, struct Burs
 static inline s32 randomValue(const u16 *table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)table);
 }
 // MATCHING_CONCESSION: register-pinning

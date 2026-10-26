@@ -15,8 +15,8 @@ struct RouteCursor {
 static inline u32 Route_Random(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(u16 *)(offset + (u32)RANDOM_TABLE_ADDR);
 }
 

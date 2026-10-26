@@ -1,7 +1,8 @@
 #include "global.h"
+#include "ram.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define gEffectRandomIndex gUnk_03005304
+#define gEffectRandomIndex gEffectRandomTableIndex
 #define gEffectRandomTable gUnk_086141BC
 struct BurstActor {
     u8 pad0[0x268];
@@ -12,7 +13,6 @@ struct BurstActor {
     u32 resourceA;
     u32 resourceB;
 };
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 struct EffectVector {
     s32 x : 16;
@@ -29,13 +29,13 @@ void ActorEffect_SpawnBurstAtAnchor(struct BurstActor *actor, u32 variant)
     position.x = actor->anchor;
     position.y = 158;
     position.z = 50;
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
     {
-        u32 sample = gUnk_086141BC[gUnk_03005304];
+        u32 sample = gUnk_086141BC[gEffectRandomTableIndex];
         register u16 one asm("r5") = 1;
         velocity.x = (sample & one) + 2;
-        gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-        velocity.y = -(gUnk_086141BC[gUnk_03005304] & one);
+        gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
+        velocity.y = -(gUnk_086141BC[gEffectRandomTableIndex] & one);
         velocity.z = 0;
     }
     if (variant == 0)

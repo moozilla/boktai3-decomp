@@ -6,9 +6,9 @@ void sub_080B3110(void *, u32, const u8 *, u32);
 void SceneActor_UpdateDelayedAnimation(void);
 static inline u32 RetryDuration(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
+    u32 index = (gRandomIndex + 1) & 1023;
     u32 value;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     index *= 2;
     value = *(const u16 *)(index + (u32)gUnk_0203B400);
     value &= 31;
@@ -16,9 +16,9 @@ static inline u32 RetryDuration(void)
 }
 static inline u32 NextRetryDuration(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
+    u32 index = (gRandomIndex + 1) & 1023;
     u32 value;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     index *= 2;
     {
         register const u16 *table asm("r2") = gUnk_0203B400;

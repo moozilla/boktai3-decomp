@@ -9,8 +9,8 @@ static inline s32 Truncate12(s32 value)
 static inline s32 RandomWith(const u16 *table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)table);
 }
 static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)

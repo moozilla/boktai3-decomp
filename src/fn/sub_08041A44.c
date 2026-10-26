@@ -1,6 +1,6 @@
 #include "modifier_list.h"
 
-#define SAVED_GAME_STATE (*(struct GameState **)(u32) & gUnk_02000710)
+#define SAVED_GAME_STATE (*(struct GameState **)(u32) & gGameState)
 
 struct ModifierCapacityInfo {
     u8 id, kind, unknown2, capacity;
@@ -40,17 +40,17 @@ void ModifierMenu_ValidateSavedSelection(struct ModifierMenu *menu)
     }
 
     for (i = 0; i < 4; i++)
-        ((s16 *)gUnk_02000710->modifierIdsBytes)[i] = -1;
+        ((s16 *)gGameState->modifierIdsBytes)[i] = -1;
 
     count = 0;
     for (i = 0; i < 32; i++) {
         if (mask & (1 << i)) {
-            ((s16 *)gUnk_02000710->modifierIdsBytes)[count] = i;
+            ((s16 *)gGameState->modifierIdsBytes)[count] = i;
             count++;
             if (count >= capacity)
                 break;
         }
     }
-    if (!StateFlags_GetCategoryBit(5, gUnk_02000710->unk81A))
-        gUnk_02000710->unk81A = GameFlag_FindFirstSetIndex(5, (gUnk_086058E8[2] * 3) * 2);
+    if (!StateFlags_GetCategoryBit(5, gGameState->unk81A))
+        gGameState->unk81A = GameFlag_FindFirstSetIndex(5, (gUnk_086058E8[2] * 3) * 2);
 }

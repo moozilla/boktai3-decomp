@@ -1,4 +1,5 @@
 #include "scene_particle_pool.h"
+#include "engine.h"
 // confidence=low: spawns pooled particles with optional velocity ranges and position jitter.
 #define SceneParticle_CreateAnchoredRanges sub_08068500
 #ifdef NONMATCHING
@@ -6,7 +7,6 @@
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining: packed velocity temporaries, loop and pointer/register lifetimes.
 extern struct SceneParticlePool *gUnk_02000134;
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 struct SceneParticleSlot *SceneParticle_AllocateSlot(struct SceneParticlePool *);
 s32 Mod(s32, s32);
@@ -14,8 +14,8 @@ void ParticleSprite_Initialize(void *, const void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 static inline u32 Random(const u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return table[gRandomIndex];
 }
 s32 SceneParticle_CreateAnchoredRanges(const struct ContactPosition *position,
                                        const struct ContactPosition *offset,

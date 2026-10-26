@@ -1,6 +1,6 @@
-#define gSpatialIndex gUnk_02000200
 /* Provisional family and semantic names; inferred from static accesses and callers. */
 #include "global.h"
+#include "ram.h"
 struct SpatialEntry {
     u32 flags, mask, category;
     u8 unknownC[3];
@@ -23,7 +23,6 @@ struct SpatialIndex {
     u8 unknownB8[4];
     s32 bucketWidth;
 };
-extern struct SpatialIndex *gSpatialIndex;
 s32 Div(s32, s32);
 void *Heap_Alloc(u32);
 void SpatialIndex_InsertEntry(struct SpatialEntry *entry)

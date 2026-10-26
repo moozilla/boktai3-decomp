@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 #ifdef NONMATCHING
 // fuzzy: 90.1%
@@ -54,7 +55,6 @@ struct Actor {
 #define U(o) (*(u16 *)((u8 *)p2 + (o)))
 #define B(o) (*(u8 *)((u8 *)p2 + (o)))
 #define W(o) (*(u32 *)((u8 *)p2 + (o)))
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
@@ -66,8 +66,8 @@ u8 Callback_InvokeActor(void *, void *);
 s32 Math_Atan2(s32, s32);
 static inline u32 randomA(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 static inline void facing(struct Actor *p, s32 angle)
 {
@@ -111,9 +111,9 @@ struct Map {
     u8 pad8[0x1c];
     u16 rows[1];
 };
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
-extern u8 *gUnk_02000710;
+extern struct Map *gTerrainMap;
+extern u32 gTerrainWidth, gTerrainHeight;
+extern u8 *gGameState;
 void *TerrainModifiers_FindCellOverride(s32, s32);
 void Task_Kill(void *);
 void SceneActors_RunFirstEventScript(void *, void *);
@@ -126,9 +126,9 @@ s32 Mod(s32, s32);
 static inline s32 cellAt(struct Vec *v)
 {
     s32 x = v->x >> 8, z = v->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u16 cellFlags(s32 index)
 {
@@ -136,7 +136,7 @@ static inline u16 cellFlags(s32 index)
     if (v)
         v += 4;
     else
-        v = gUnk_030052F4->cells + (index * 4 + 12);
+        v = gTerrainMap->cells + (index * 4 + 12);
     return *(u16 *)(v + 2);
 }
 struct Anim {
@@ -234,15 +234,15 @@ void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
             SceneActors_RunSecondEventScript(p, &p2->anchor);
             sub_08159164(*((u16 *)(((u8 *)p2) + 0xed2)));
             GameState_SetEventFlag(0x51);
-            increment((u16 *)(gUnk_02000710 + 0x87c));
-            increment((u16 *)(gUnk_02000710 + 0x538));
-            increment((u16 *)(gUnk_02000710 + 0x55e));
-            value = (*((s16 *)(gUnk_02000710 + 0x592))) + 1;
+            increment((u16 *)(gGameState + 0x87c));
+            increment((u16 *)(gGameState + 0x538));
+            increment((u16 *)(gGameState + 0x55e));
+            value = (*((s16 *)(gGameState + 0x592))) + 1;
             if (value > 9999)
                 value = 9999;
             else if (value < 0)
                 value = 0;
-            *((u16 *)(gUnk_02000710 + 0x592)) = value;
+            *((u16 *)(gGameState + 0x592)) = value;
         }
         p->finished = 1;
     }

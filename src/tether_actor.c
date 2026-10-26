@@ -1,4 +1,5 @@
 #include "tether_actor.h"
+#include "engine.h"
 
 #define TetherActor_GetStatusTag sub_08049F54
 
@@ -30,7 +31,7 @@ static inline u32 cellByte(s32 cell)
     if (properties)
         properties += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         properties = map->cells + offset;
     }
@@ -40,10 +41,10 @@ static inline u32 cellByte(s32 cell)
 static inline s32 cellIndex_08049840(s32 x, s32 z)
 {
     s32 index;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         index = 0;
     else
-        index = gUnk_030052F4->rows[z] + x;
+        index = gTerrainMap->rows[z] + x;
     return index;
 }
 
@@ -54,7 +55,7 @@ static inline s32 terrainHeight(struct ContactPackedVector *position, s32 index)
     if (properties)
         properties += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = index * 4 + 12;
         properties = map->cells + offset;
     }
@@ -81,16 +82,16 @@ static inline s32 absolute_08049840(s32 value)
 static inline u8 flaggedCellHandlingEnabled(void)
 {
     u32 mask = 0x2000;
-    if (gUnk_02000710->flags868 & mask)
+    if (gGameState->flags868 & mask)
         return TRUE;
     return FALSE;
 }
 
 static inline s32 cellIndex_0804AF80(s32 x, s32 z)
 {
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 static inline u8 *cellProperties(s32 cell)
@@ -99,7 +100,7 @@ static inline u8 *cellProperties(s32 cell)
     if (properties)
         properties += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         properties = map->cells + offset;
     }
@@ -112,15 +113,15 @@ static inline u8 *propertiesAt_0804B1CC(struct ContactPosition *position)
     s32 z = position->z >> 8;
     s32 cell;
     u8 *properties;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         properties = map->cells + offset;
     }
@@ -129,9 +130,9 @@ static inline u8 *propertiesAt_0804B1CC(struct ContactPosition *position)
 
 static inline s32 cellIndex_0804B6A4(s32 x, s32 z)
 {
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 static inline s32 surfaceHeight(const struct ContactPosition *position)
@@ -192,15 +193,15 @@ static inline u8 *propertiesAt_0804BCD4(struct ContactPosition *input)
     s32 z = position->z >> 8;
     s32 cell;
     u8 *properties;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         properties = map->cells + offset;
     }
@@ -212,7 +213,7 @@ static inline u32 terrainFlagEnabled(void)
     u32 mask = 16;
     u32 flags;
     u32 result;
-    flags = gUnk_02000710->flags868;
+    flags = gGameState->flags868;
     if (flags & mask) {
         result = 1;
         asm("" : "+r"(result));
@@ -233,15 +234,15 @@ static inline u8 *propertiesAt_0804C748(s32 x, s32 z)
 {
     s32 cell;
     u8 *properties;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         properties = map->cells + offset;
     }
@@ -700,9 +701,9 @@ void TetherActor_UpdateShake(struct TetherActor *actor)
         s32 shake;
         if (phase == 96)
             Sound_PlaySong(0x2AA);
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 sample = ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+            u32 sample = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
             u32 mask = 1;
             shake = (sample & mask) * 11 - 5;
         }
@@ -751,8 +752,8 @@ void TetherActor_EmitRandomEffect(struct TetherActor *actor)
     const u8 *sample;
     u32 mask;
     struct ContactPackedVector velocity, position, size;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    sample = (const u8 *)RANDOM_TABLE_ADDR + gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    sample = (const u8 *)RANDOM_TABLE_ADDR + gRandomIndex * 2;
     mask = 255;
     angle = *sample;
     velocity.x = scaleEmission(gUnk_086149C4[(angle + 64) & mask] * 32);
@@ -817,7 +818,7 @@ void TetherActor_EmitPointEffect(const struct ContactPackedVector *source, const
     u32 highY;
     position.bits = *source;
     table = (const u16 *)RANDOM_TABLE_ADDR;
-    state = &gUnk_03005308;
+    state = &gRandomIndex;
     savedState = state;
     index = *state + 1;
     indexMask = 1023;
@@ -1000,15 +1001,15 @@ void TetherActor_UpdateMovingEffects(struct TetherActor *actor)
                 s32 cell;
                 u8 *properties;
                 u32 surface;
-                if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+                if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
                     cell = 0;
                 else
-                    cell = gUnk_030052F4->rows[z] + x;
+                    cell = gTerrainMap->rows[z] + x;
                 properties = TerrainModifiers_FindCellOverride(cell, 1);
                 if (properties)
                     properties += 4;
                 else {
-                    struct EngineMap *map = gUnk_030052F4;
+                    struct EngineMap *map = gTerrainMap;
                     u32 offset = cell * 4 + 12;
                     properties = map->cells + offset;
                 }
@@ -1173,10 +1174,10 @@ void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
     x = position->x >> 8;
     z = position->z >> 8;
     do {
-        if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) || (((u32)z) >= gUnk_030052FC)) {
+        if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight)) {
             cell = 0;
         } else {
-            u32 row = gUnk_030052F4->rows[z];
+            u32 row = gTerrainMap->rows[z];
             cell = row + x;
         }
     } while (0);
@@ -1184,7 +1185,7 @@ void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
     if (properties) {
         properties += 4;
     } else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         properties = map->cells + offset;
     }
@@ -1256,11 +1257,11 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
     neighbor = 0;
     if (octant & 1) {
         if (octant == 1)
-            neighbor = ((s16 *)gUnk_030052F4->cells)[2];
+            neighbor = ((s16 *)gTerrainMap->cells)[2];
         else if (octant == 3)
             neighbor = -1;
         else if (octant == 5)
-            neighbor = -((s16 *)gUnk_030052F4->cells)[2];
+            neighbor = -((s16 *)gTerrainMap->cells)[2];
         else if (octant == 7)
             neighbor = 1;
         {
@@ -1277,13 +1278,13 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
         s32 x;
         s32 z;
         if (octant == 0)
-            neighbor = ((s16 *)gUnk_030052F4->cells)[2] + 1;
+            neighbor = ((s16 *)gTerrainMap->cells)[2] + 1;
         else if (octant == 2)
-            neighbor = ((s16 *)gUnk_030052F4->cells)[2] - 1;
+            neighbor = ((s16 *)gTerrainMap->cells)[2] - 1;
         else if (octant == 4)
-            neighbor = ~((s16 *)gUnk_030052F4->cells)[2];
+            neighbor = ~((s16 *)gTerrainMap->cells)[2];
         else if (octant == 6)
-            neighbor = (-((s16 *)gUnk_030052F4->cells)[2]) + 1;
+            neighbor = (-((s16 *)gTerrainMap->cells)[2]) + 1;
         {
             u32 h;
             u32 value = cellByte(actor->movementProbeStorage.cell);
@@ -1298,22 +1299,22 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
             if (x > z)
                 neighbor = 1;
             else
-                neighbor = ((s16 *)gUnk_030052F4->cells)[2];
+                neighbor = ((s16 *)gTerrainMap->cells)[2];
         } else if (octant == 2) {
             if ((x + z) > 256)
-                neighbor = ((s16 *)gUnk_030052F4->cells)[2];
+                neighbor = ((s16 *)gTerrainMap->cells)[2];
             else
                 neighbor = -1;
         } else if (octant == 4) {
             if (x > z)
-                neighbor = -((s16 *)gUnk_030052F4->cells)[2];
+                neighbor = -((s16 *)gTerrainMap->cells)[2];
             else
                 neighbor = -1;
         } else if (octant == 6) {
             if ((x + z) > 256)
                 neighbor = 1;
             else
-                neighbor = -((s16 *)gUnk_030052F4->cells)[2];
+                neighbor = -((s16 *)gTerrainMap->cells)[2];
         }
         {
             u32 h;
@@ -1341,7 +1342,7 @@ void TetherActor_ClearExternalStatus(void)
 {
     Inventory_AddItem(43, 0);
     {
-        s16 *status = &gUnk_02000710->unk5AA;
+        s16 *status = &gGameState->unk5AA;
         register s32 value asm("r2");
         register s32 half asm("r1");
         value = -1;
@@ -1376,10 +1377,10 @@ done:
     do {                                                                                           \
         s32 cx_ = (px) >> 8;                                                                       \
         s32 cz_ = (pz) >> 8;                                                                       \
-        if (cx_ < 0 || cz_ < 0 || (u32)cx_ >= gUnk_030052F8 || (u32)cz_ >= gUnk_030052FC)          \
+        if (cx_ < 0 || cz_ < 0 || (u32)cx_ >= gTerrainWidth || (u32)cz_ >= gTerrainHeight)         \
             out = 0;                                                                               \
         else                                                                                       \
-            out = gUnk_030052F4->rows[cz_] + cx_;                                                  \
+            out = gTerrainMap->rows[cz_] + cx_;                                                    \
     } while (0)
 
 #define NEAR_HEIGHT(out, pos, index)                                                               \
@@ -1389,7 +1390,7 @@ done:
         if (properties_)                                                                           \
             properties_ += 4;                                                                      \
         else {                                                                                     \
-            struct EngineMap *map_ = gUnk_030052F4;                                                \
+            struct EngineMap *map_ = gTerrainMap;                                                  \
             u32 offset_ = index * 4 + 12;                                                          \
             properties_ = map_->cells + offset_;                                                   \
         }                                                                                          \
@@ -1438,15 +1439,15 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
         struct ContactPosition *p = &gUnk_02000488->position;
         s32 cx = p->x >> 8;
         s32 cz = p->z >> 8;
-        if (cx < 0 || cz < 0 || (u32)cx >= gUnk_030052F8 || (u32)cz >= gUnk_030052FC)
+        if (cx < 0 || cz < 0 || (u32)cx >= gTerrainWidth || (u32)cz >= gTerrainHeight)
             other = 0;
         else
-            other = gUnk_030052F4->rows[cz] + cx;
+            other = gTerrainMap->rows[cz] + cx;
     }
     if (own == other)
         goto yes;
     if (own == other + 1 || own == other - 1 ||
-        own == other + ((s16 *)(map = gUnk_030052F4)->cells)[2] ||
+        own == other + ((s16 *)(map = gTerrainMap)->cells)[2] ||
         own == other - ((s16 *)map->cells)[2]) {
         diff = position->y - gUnk_02000488->position.y;
         if (diff < 0)
@@ -1467,7 +1468,7 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
         struct ContactPackedVector *cp = &corner.v;
         s32 cx = cp->x >> 8;
         s32 cz = cp->z >> 8;
-        if (cx < 0 || cz < 0 || (u32)cx >= gUnk_030052F8 || (u32)cz >= gUnk_030052FC)
+        if (cx < 0 || cz < 0 || (u32)cx >= gTerrainWidth || (u32)cz >= gTerrainHeight)
             own = 0;
         else
             own = map->rows[cz] + cx;
@@ -1885,8 +1886,8 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
                 target->directedHeading = angle;
             }
         } else {
-            u32 index = (gUnk_03005308 + 1) & 1023;
-            gUnk_03005308 = index;
+            u32 index = (gRandomIndex + 1) & 1023;
+            gRandomIndex = index;
             {
                 u32 byteOffset = index << 1;
                 const u16 *table;
@@ -1944,17 +1945,17 @@ void TetherActor_SetTransformFromScript(void)
             position = &actor->savedPosition;
             x = position->x >> 8;
             z = position->z >> 8;
-            if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+            if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
                 cell = 0;
             else {
-                u32 row = gUnk_030052F4->rows[z];
+                u32 row = gTerrainMap->rows[z];
                 cell = row + x;
             }
             properties = TerrainModifiers_FindCellOverride(cell, 1);
             if (properties)
                 properties += 4;
             else {
-                struct EngineMap *map = gUnk_030052F4;
+                struct EngineMap *map = gTerrainMap;
                 u32 offset = cell * 4 + 12;
                 properties = map->cells + offset;
             }
@@ -2001,12 +2002,12 @@ void TetherActor_StartAuxiliaryState(void)
 
 s16 TetherActor_GetSavedKind(void)
 {
-    return gUnk_02000710->unk5AA;
+    return gGameState->unk5AA;
 }
 
 s32 TetherActor_GetConfiguredKind(void)
 {
-    return gUnk_02000710->unk5AA;
+    return gGameState->unk5AA;
 }
 
 extern const u16 gUnk_086059F0[];
@@ -2022,9 +2023,9 @@ void TetherActor_InitKindFromScript(struct TetherActor *actor, u32 entry)
         kind = Script_GetValue();
     else
         kind = TetherActor_GetConfiguredKind();
-    gUnk_02000710->unk5AA = kind;
+    gGameState->unk5AA = kind;
     asm("" ::: "memory");
-    actor->kind = gUnk_02000710->unk5AA;
+    actor->kind = gGameState->unk5AA;
     value = Script_SeekToKeyword('c');
     if (value)
         value = Script_GetValue();
@@ -2168,17 +2169,17 @@ void TetherActor_InitBodyFromScript(struct TetherActor *actor)
     position = &actor->savedPosition;
     x = position->x >> 8;
     z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else {
-        u32 row = gUnk_030052F4->rows[z];
+        u32 row = gTerrainMap->rows[z];
         cell = row + x;
     }
     properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties)
         properties += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         properties = map->cells + offset;
     }
@@ -2362,7 +2363,7 @@ done:;
 
 void TetherActor_UpdateChargeAndCooldown(struct TetherActor *actor)
 {
-    if (!(gUnk_030053F4 & 512)) {
+    if (!(gEngineFlags & 512)) {
         TetherActor_UpdateChargeDecay(actor);
         TetherActor_UpdateInteractionCooldown(actor);
         if (actor->contactCooldown) {
@@ -2378,7 +2379,7 @@ void TetherActor_UpdateChargeAndCooldown(struct TetherActor *actor)
 void TetherActor_UpdateSecondaryColliderValues(struct TetherActor *p)
 {
     struct ContactCollider *q = &p->secondaryCollider;
-    struct GameState *g = gUnk_02000710;
+    struct GameState *g = gGameState;
     s32 v = (s16)g->savedZ;
     p->valueA = v * 10 + 5 - (u16)g->unk876;
     Collider_SetAttackProperties(q, p->valueA, p->valueB, 0, 0x40000, 0x1E);
@@ -2474,16 +2475,16 @@ void TetherActor_HandleFlaggedCell(struct TetherActor *actor)
     s16 **positionZReference;
     s32 cell;
     u8 *properties;
-    if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) || (((u32)z) >= gUnk_030052FC)) {
+    if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight)) {
         cell = 0;
     } else {
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     }
     properties = TerrainModifiers_FindCellOverride(cell, 1);
     if (properties) {
         properties += 4;
     } else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = (cell * 4) + 12;
         properties = map->cells + offset;
     }
@@ -2498,9 +2499,8 @@ void TetherActor_HandleFlaggedCell(struct TetherActor *actor)
         goto done;
     }
     {
-        s32 column =
-            Mod(actor->movementProbeStorage.previousCell, ((s16 *)gUnk_030052F4->cells)[2]);
-        s32 row = Div(actor->movementProbeStorage.previousCell, ((s16 *)gUnk_030052F4->cells)[2]);
+        s32 column = Mod(actor->movementProbeStorage.previousCell, ((s16 *)gTerrainMap->cells)[2]);
+        s32 row = Div(actor->movementProbeStorage.previousCell, ((s16 *)gTerrainMap->cells)[2]);
         s32 cellX = column << 8;
         s32 minX = cellX + 1;
         s32 maxX = cellX + 255;
@@ -2640,7 +2640,7 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
             if (raw)
                 properties = raw + 4;
             else {
-                struct EngineMap *map = gUnk_030052F4;
+                struct EngineMap *map = gTerrainMap;
                 u32 offset = currentCell * 4 + 12;
                 properties = map->cells + offset;
             }
@@ -2728,16 +2728,16 @@ u32 TetherActor_TestTerrainTransition(struct TetherActor *actor)
         s32 z = first->z >> 8;
         s32 cell;
         position = first;
-        if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) || (((u32)z) >= gUnk_030052FC)) {
+        if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight)) {
             cell = 0;
         } else {
-            cell = gUnk_030052F4->rows[z] + x;
+            cell = gTerrainMap->rows[z] + x;
         }
         properties = TerrainModifiers_FindCellOverride(cell, 1);
         if (properties) {
             properties += 4;
         } else {
-            struct EngineMap *map = gUnk_030052F4;
+            struct EngineMap *map = gTerrainMap;
             u32 offset = cell * 4 + 12;
             properties = map->cells + offset;
         }
@@ -2820,7 +2820,7 @@ void TetherActor_UpdateLockedShake(struct TetherActor *actor)
 {
     s32 amplitude;
     register const u16 *randomTable asm("r6");
-    if (gUnk_030053F4 & 512)
+    if (gEngineFlags & 512)
         return;
     if (actor->lockFrame <= 63)
         amplitude = 16;
@@ -2829,14 +2829,14 @@ void TetherActor_UpdateLockedShake(struct TetherActor *actor)
         amplitude = (actor->lockFrame >> 2) + 16;
     }
     randomTable = (const u16 *)RANDOM_TABLE_ADDR;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    actor->shakeX = Mod(randomTable[gUnk_03005308], amplitude) - (amplitude >> 1);
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    actor->shakeZ = Mod(randomTable[gUnk_03005308], amplitude) - (amplitude >> 1);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    actor->shakeX = Mod(randomTable[gRandomIndex], amplitude) - (amplitude >> 1);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    actor->shakeZ = Mod(randomTable[gRandomIndex], amplitude) - (amplitude >> 1);
     if ((++actor->lockSoundFrame & 7) == 0) {
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 sample = randomTable[gUnk_03005308];
+            u32 sample = randomTable[gRandomIndex];
             sample &= 1;
             if (sample)
                 Sound_PlaySong(0x2B9);
@@ -2855,7 +2855,7 @@ void TetherActor_UpdateLockedShake(struct TetherActor *actor)
 
 void TetherActor_UpdateInteractionValue(struct TetherActor *p)
 {
-    if (!(gUnk_030053F4 & 0x200)) {
+    if (!(gEngineFlags & 0x200)) {
         if (p->interactionEnabled != 0) {
             if (p->interactionReset == 0) {
                 if (p->statusFlags == 0) {
@@ -2869,8 +2869,6 @@ void TetherActor_UpdateInteractionValue(struct TetherActor *p)
         }
     }
 }
-
-extern u32 gUnk_030053F4;
 
 void TetherActor_UpdateIdleState(struct TetherActor *p)
 {
@@ -2887,7 +2885,7 @@ void TetherActor_UpdateIdleState(struct TetherActor *p)
         p->glowMode = z;
     }
     TetherActor_SetEntry(p, 0);
-    if (!(gUnk_030053F4 & 0x200)) {
+    if (!(gEngineFlags & 0x200)) {
         if (p->kind != 9) {
             u16 *r3 = &p->interactionLock;
             if (*r3 != 0) {
@@ -2976,7 +2974,7 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
         gUnk_02000580[0]->position.x = (((position->x >> 8) + 1) << 8) - 2;
         return;
     }
-    rowStride = *(s16 *)(gUnk_030052F4->cells + 4);
+    rowStride = *(s16 *)(gTerrainMap->cells + 4);
     if (actorCell == playerCell + rowStride)
         gUnk_02000580[0]->position.z = ((actor->position.z >> 8) << 8) + 2;
     else if (actorCell == playerCell - rowStride)
@@ -3085,7 +3083,7 @@ void TetherActor_UpdateFollowingState(struct TetherActor *actor)
         TetherActor_SetHeadingEntry(actor, 36);
     else
         TetherActor_SetEntry(actor, 0);
-    if (!(gUnk_030053F4 & 512) && actor->kind != 9) {
+    if (!(gEngineFlags & 512) && actor->kind != 9) {
         u16 *lock = &actor->interactionLock;
         if (*lock)
             TetherActor_UpdateLockedShake(actor);
@@ -3200,7 +3198,7 @@ void TetherActor_UpdateRoamingState(struct TetherActor *actor)
     struct ContactPackedVector delta;
     if (actor->state != 3)
         TetherActor_SetState(actor, 3);
-    if (gUnk_030053F4 & 512)
+    if (gEngineFlags & 512)
         return;
     if (actor->chargeReady) {
         actor->glowMode = 0;
@@ -3251,7 +3249,7 @@ void TetherActor_UpdateWanderingState(struct TetherActor *actor)
     if (actor->state != 4) {
         TetherActor_SetState(actor, 4);
     }
-    if (gUnk_030053F4 & 512) {
+    if (gEngineFlags & 512) {
         return;
     }
     if (actor->chargeReady) {
@@ -3263,14 +3261,14 @@ void TetherActor_UpdateWanderingState(struct TetherActor *actor)
     actor->glowMode = 1;
     if (actor->roamFrame == 90) {
         if (actor->turnAfterBlock) {
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+            gRandomIndex = (gRandomIndex + 1) & 1023;
             actor->heading =
-                (actor->heading + Mod(((u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308], 5) + 2) & 7;
+                (actor->heading + Mod(((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], 5) + 2) & 7;
             actor->turnAfterBlock = 0;
         } else {
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+            gRandomIndex = (gRandomIndex + 1) & 1023;
             actor->heading =
-                (actor->heading + Mod(((u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308], 3) + 7) & 7;
+                (actor->heading + Mod(((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], 3) + 7) & 7;
         }
     } else if (actor->roamFrame > 90) {
         u32 angle;
@@ -3324,7 +3322,7 @@ void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
     register u32 counterOffset asm("r6");
     if (actor->state != 2)
         TetherActor_SetState(actor, 2);
-    frozen = gUnk_030053F4 & 512;
+    frozen = gEngineFlags & 512;
     if (frozen)
         return;
     rawTimer = actor->recoveryTimer;
@@ -3361,9 +3359,9 @@ void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
             timer = (u16 *)(offset + (u32)actor);
         }
         if ((*timer & 31) == 0) {
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+            gRandomIndex = (gRandomIndex + 1) & 1023;
             {
-                u32 sample = Mod(((u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308], 3);
+                u32 sample = Mod(((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], 3);
                 register u8 *heading asm("r2");
                 colliderOffset += 0xDC;
                 heading = (u8 *)actor + colliderOffset;
@@ -3382,7 +3380,7 @@ void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
             rawTable = (const u16 *)RANDOM_TABLE_ADDR;
             asm("" : "+r"(rawTable));
             table = rawTable;
-            randomIndex = &gUnk_03005308;
+            randomIndex = &gRandomIndex;
             index = *randomIndex + 1;
             mask = 1023;
             index &= mask;
@@ -3437,7 +3435,7 @@ void TetherActor_UpdateRecoveryState(struct TetherActor *actor)
             amplitude = 2;
         table = (const u16 *)RANDOM_TABLE_ADDR;
         {
-            u32 *slot = &gUnk_03005308;
+            u32 *slot = &gRandomIndex;
             u32 index;
             u32 mask;
             randomIndex = slot;
@@ -3597,7 +3595,7 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
     u32 current;
     if (actor->state != 5)
         TetherActor_SetState(actor, 5);
-    if (gUnk_030053F4 & 512)
+    if (gEngineFlags & 512)
         return;
     actor->glowMode = 2;
     actor->heading = 0;
@@ -3614,9 +3612,9 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
     }
     if (current <= 127) {
         s32 shake;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 bit = ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+            u32 bit = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
             bit &= 1;
             shake = (bit << 4) + bit - 8;
         }
@@ -3707,7 +3705,7 @@ void TetherActor_UpdateDescendingState(struct TetherActor *actor)
     u32 zero;
     if (actor->state != 6)
         TetherActor_SetState(actor, 6);
-    zero = gUnk_030053F4 & 512;
+    zero = gEngineFlags & 512;
     if (zero)
         return;
     actor->glowMode = zero;
@@ -3849,7 +3847,7 @@ void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
             register u32 shakeOffset asm("r6");
             asm("" : "+r"(rawTable));
             table = rawTable;
-            randomIndex = &gUnk_03005308;
+            randomIndex = &gRandomIndex;
             index = *randomIndex + 1;
             mask = 1023;
             index &= mask;
@@ -4034,9 +4032,9 @@ void TetherActor_UpdateDirectedMovement(struct TetherActor *actor)
         actor->heading = actor->directedHeading;
     }
     if (--actor->directedTimer == 0) {
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 sample = ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+            u32 sample = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
             sample &= 63;
             actor->directedTimer = sample + 45;
         }
@@ -4052,7 +4050,7 @@ void TetherActor_UpdateDirectedState(struct TetherActor *p)
     q = &p->glowMode;
     *q = 1;
     TetherActor_SetEntry(p, 0);
-    if ((gUnk_030053F4 & 0x200) == 0) {
+    if ((gEngineFlags & 0x200) == 0) {
         u32 v = p->interactionLock;
         if (v != 0) {
             TetherActor_UpdateLockedShake(p);
@@ -4092,9 +4090,9 @@ void TetherActor_UpdateReverseDirectedMovement(struct TetherActor *actor)
         actor->moving = 1;
     }
     if (--actor->directedTimer == 0) {
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 sample = ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+            u32 sample = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
             sample &= 63;
             actor->directedTimer = sample + 45;
         }
@@ -4115,7 +4113,7 @@ void TetherActor_UpdateReverseDirectedState(struct TetherActor *actor)
         TetherActor_SetHeadingEntry(actor, 36);
     else
         TetherActor_SetEntry(actor, 0);
-    if (!(gUnk_030053F4 & 512)) {
+    if (!(gEngineFlags & 512)) {
         u32 value = actor->interactionLock;
         if (value)
             TetherActor_UpdateLockedShake(actor);

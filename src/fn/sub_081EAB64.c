@@ -23,7 +23,7 @@ struct Message {
 };
 extern struct Parameters gUnk_020003D0;
 extern u16 gUnk_03005260[];
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern const s32 gUnk_08613D80[];
 s32 TimeDisplay_GetCurrentMonth(void);
 s32 TimeDisplay_GetLightPhaseGroup(void);
@@ -231,7 +231,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
             if ((gUnk_03005260[1] & 1) || (gUnk_03005260[1] & 0x38)) {
                 p->idleTimer = 0;
                 if ((gUnk_03005260[1] & 1) || (gUnk_03005260[1] & 8)) {
-                    *(u16 *)(gUnk_02000710 + 0x870) = p->selection;
+                    *(u16 *)(gGameState + 0x870) = p->selection;
                     if (p->selection == 0) {
                         Sound_PlaySong(0xE0);
                         p->fadeShift = gUnk_020003D0.confirmFade;

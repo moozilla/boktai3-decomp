@@ -1,7 +1,7 @@
 #include "global.h"
+#include "ram.h"
 #define SceneParticle_Allocate   SceneMovingParticle_AllocateEntry_0812D670
 #define SceneParticle_CreatePool ParticleEffectPool_GetOrCreate
-#define gSceneParticlePool       gUnk_02000194
 struct SceneParticleVector {
     u32 words[2];
 };
@@ -27,7 +27,6 @@ struct SceneParticlePool {
     struct SceneParticle particles[26];
     u32 occupied;
 };
-extern struct SceneParticlePool *gUnk_02000194;
 struct SceneParticlePool *ParticleEffectPool_GetOrCreate(void);
 struct SceneParticle *SceneMovingParticle_AllocateEntry_0812D670(struct SceneParticlePool *);
 void ParticleSprite_Initialize(struct SceneParticle *, void *, u32);
@@ -38,7 +37,7 @@ struct SceneParticle *SceneParticle_Create(struct SceneParticleVector *position,
                                            struct SceneParticleVector *velocity, u32 lifetime,
                                            u32 kind, u32 mode)
 {
-    struct SceneParticlePool *pool = gUnk_02000194;
+    struct SceneParticlePool *pool = gSceneParticlePool;
     struct SceneParticle *p;
     u32 frame;
     if (!pool) {

@@ -3,7 +3,6 @@
 #include "game_state.h"
 #include "player.h"
 
-extern u32 gUnk_030052F8, gUnk_030052FC;
 extern const s16 gUnk_086149C4[];
 
 struct StackPoint {
@@ -33,7 +32,7 @@ static inline u8 *CellData(u32 cell)
     u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         return data + 4;
-    return gUnk_030052F4->cells + (cell * 4 + 12);
+    return gTerrainMap->cells + (cell * 4 + 12);
 }
 
 void Player_UpdateFlinch(struct Player *p)
@@ -76,10 +75,10 @@ void Player_UpdateFlinch(struct Player *p)
             pos.z += p->velocityZ;
             x = ((struct SceneVec *)&pos)->x >> 8;
             z = ((struct SceneVec *)&pos)->z >> 8;
-            if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+            if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
                 cell = 0;
             else
-                cell = gUnk_030052F4->rows[z] + x;
+                cell = gTerrainMap->rows[z] + x;
             if (Player_IsFlaggedWithGlobalModifier10(*(u16 *)(CellData(cell) + 2))) {
                 p->velocityX = 0;
                 p->velocityZ = 0;
@@ -108,10 +107,10 @@ void Player_UpdateFlinch(struct Player *p)
             pos.z += p->velocityZ;
             x = ((struct SceneVec *)&pos)->x >> 8;
             z = ((struct SceneVec *)&pos)->z >> 8;
-            if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+            if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
                 cell = 0;
             else
-                cell = gUnk_030052F4->rows[z] + x;
+                cell = gTerrainMap->rows[z] + x;
             if (Player_IsFlaggedWithGlobalModifier10(*(u16 *)(CellData(cell) + 2))) {
                 p->velocityX = 0;
                 p->velocityZ = 0;

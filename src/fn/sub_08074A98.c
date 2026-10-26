@@ -10,7 +10,7 @@ static inline u32 TerrainHeight(struct SceneActorRegistryActor *actor, u32 index
     if (cell)
         cell += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = index * 4 + 12;
         cell = map->cells + offset;
     }

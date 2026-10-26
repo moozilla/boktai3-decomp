@@ -12,8 +12,8 @@ void Script_Call(u32, void *);
 void Script_SetEntryProcedure(s16 id);
 void Task_Kill(void *);
 #define W(o)    (*(s32 *)(p + (o)))
-#define H(o)    (*(s16 *)((u8 *)gUnk_02000710 + (o)))
-#define GS_W(o) (*(s32 *)((u8 *)gUnk_02000710 + (o)))
+#define H(o)    (*(s16 *)((u8 *)gGameState + (o)))
+#define GS_W(o) (*(s32 *)((u8 *)gGameState + (o)))
 // Task update: menu input (state 0), then fade out and run the chosen script (state 1).
 void GameStart_Update(u8 *p)
 {

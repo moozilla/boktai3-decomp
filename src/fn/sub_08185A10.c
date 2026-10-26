@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 struct Armor {
     u8 pad0[0x18];
     u8 navigation[0x30];
@@ -11,7 +12,6 @@ struct Armor {
 struct ArmorPackedPosition {
     u32 x : 16, y : 16, z : 16, unused : 16;
 };
-extern u8 *gUnk_02000710;
 s32 Terrain_ApplyBlocked(void *, void *, struct ArmorPackedPosition *);
 u32 sub_0821FB8C(void *, void *, u32, u32);
 s32 DirectionalActor_TryBeginState(struct Armor *, s32);
@@ -19,7 +19,7 @@ void Armor_UpdateTargetFacing(struct Armor *p)
 {
     struct ArmorPackedPosition pos;
     if ((p->timer & 3) == 0) {
-        u8 *target = gUnk_02000710;
+        u8 *target = gGameState;
         pos.x = *(u16 *)(target + 0x30);
         pos.y = *(u16 *)(target + 0x32);
         pos.z = *(u16 *)(target + 0x34);

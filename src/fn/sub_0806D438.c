@@ -1,11 +1,11 @@
 #include "global.h"
 
 #include "route_sprite_actor.h"
+#include "engine.h"
 
 /* confidence=low: picks the next route point, then builds the 12-point wander spline toward the source position */
 
 /* confidence=low: picks the next route point, then builds the 12-point wander spline toward the source position */
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 extern void *gUnknown_02000580;
@@ -25,14 +25,14 @@ static inline s32 f0806D438_T12(s32 value)
 
 static inline u32 f0806D438_NextRandom(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(const u16 *)((u32)gUnk_0203B400 + gUnk_03005308 * 2);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(const u16 *)((u32)gUnk_0203B400 + gRandomIndex * 2);
 }
 
 static inline u32 f0806D438_NextByte(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(const u8 *)((u32)gUnk_0203B400 + gUnk_03005308 * 2);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(const u8 *)((u32)gUnk_0203B400 + gRandomIndex * 2);
 }
 
 static inline void f0806D438_SubVec(struct ContactPosition *out, struct ContactPosition *a,

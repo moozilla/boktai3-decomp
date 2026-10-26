@@ -1,10 +1,9 @@
 #include "global.h"
-
-extern u8 *gUnk_02000710;
+#include "game_state.h"
 
 u32 GameState_AreAllEventFlagsSet(void)
 {
-    u8 *base = gUnk_02000710;
+    u8 *base = gGameState;
     if (*(s32 *)(base + 0x6F0) == -1) {
         if (*(s32 *)(base + 0x6F4) == -1) {
             if ((*(u32 *)(base + 0x6F8) & 0x7FFFF) == 0x7FFFF) {

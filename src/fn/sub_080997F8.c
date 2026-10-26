@@ -63,7 +63,7 @@ void Ghost_UpdateFacingTrigger(struct SceneActorRegistryResetView *actor)
         s32 diff = ((own + 4) & 7) - player;
         if (diff < 0)
             diff = -diff;
-        if (diff <= 1 && actor->distanceF0 < context->range && !(gUnk_030053F4 & 0x200) &&
+        if (diff <= 1 && actor->distanceF0 < context->range && !(gEngineFlags & 0x200) &&
             !(zero = Bits(4, &gUnk_02000560))) {
             u32 two = 2;
             actor->state2A8 = two;

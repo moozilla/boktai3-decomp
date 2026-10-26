@@ -22,7 +22,7 @@ struct PositionOwner {
     u8 unk_00[0x30];
     struct Vec3 position;
 };
-extern struct PositionOwner *gUnk_02000710;
+extern struct PositionOwner *gGameState;
 extern struct Vec3 gUnk_03005418;
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void ScaledShadow_Enable(void *);
@@ -72,7 +72,7 @@ void SceneEffect_UpdateArrival(struct SceneEffectActor *actor)
     if (actor->entered == 0) {
         Anim_SetKeyframes(actor->animation, actor->resource, 5, 1, 0);
         actor->flags |= 0x10;
-        player = gUnk_02000710;
+        player = gGameState;
         input.x = player->position.x;
         input.y = player->position.y;
         input.z = player->position.z;
@@ -97,7 +97,7 @@ void SceneEffect_UpdateArrival(struct SceneEffectActor *actor)
             actor->position.x = 56;
         }
         actor->flags &= ~0x10;
-        UnprojectPosition(&world, &actor->position, gUnk_02000710->position.y);
+        UnprojectPosition(&world, &actor->position, gGameState->position.y);
         actor->position.x = world.x;
         actor->position.y = world.y;
         actor->position.z = world.z;

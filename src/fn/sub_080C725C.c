@@ -38,8 +38,8 @@ static inline u32 NextRandom(void)
 {
     register const u16 *table asm("r6") = (const u16 *)RANDOM_TABLE_ADDR;
     asm("" : "+r"(table));
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return table[gRandomIndex];
 }
 static inline s32 Quarter(s16 n)
 {

@@ -1,11 +1,11 @@
 #include "global.h"
+#include "game_state.h"
 struct S {
     u8 f[0x868];
     u32 fl;
     u8 g[0xa];
     s16 v;
 };
-extern struct S *gUnk_02000710;
 extern u8 *gUnk_0200010C;
 s32 AreaEffect_FindContainingEntry(u8 *);
 s32 AreaEffect_ScaleResourceGain(s32);
@@ -21,7 +21,7 @@ static inline u8 tst(u32 v)
 }
 s32 AreaEffect_ScaleGainAtPosition(u8 *a, s32 b)
 {
-    struct S *s = gUnk_02000710;
+    struct S *s = gGameState;
     if (s->v == 0)
         goto no;
     {

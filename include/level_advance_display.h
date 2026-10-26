@@ -53,7 +53,7 @@ struct LevelAdvancePlayer {
 };
 extern struct LevelAdvancePlayer *gUnk_02000580[4];
 extern struct LevelAdvanceManager *gUnk_02000120;
-#define LEVEL_ADVANCE_PROGRESS ((struct LevelAdvanceProgress *)gUnk_02000710)
+#define LEVEL_ADVANCE_PROGRESS ((struct LevelAdvanceProgress *)gGameState)
 s32 LevelAdvanceDisplay_GetThreshold(struct LevelAdvanceManager *, u32);
 s32 LevelAdvanceDisplay_TryAdvanceLevel(struct LevelAdvanceManager *);
 s32 LevelAdvanceDisplay_PollSecondaryEvent(struct LevelAdvanceManager *);

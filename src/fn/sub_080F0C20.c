@@ -110,10 +110,10 @@ void SceneActorTerrain_ReadScriptParameters(void *);
 s32 SceneActorRegistry_LinkActor(void *);
 void *Region_FindContaining(void *);
 
-extern u32 *gUnk_030052F4;
-extern u32 gUnk_030052F8;
-extern u32 gUnk_030052FC;
-extern u8 *gUnk_02000710;
+extern u32 *gTerrainMap;
+extern u32 gTerrainWidth;
+extern u32 gTerrainHeight;
+extern u8 *gGameState;
 
 /* terrain height probe: (x, y) world pos -> cell id -> height offset */
 static inline s32 Ivy_CellHeight(u16 *pos, u16 *cellOut)
@@ -124,17 +124,17 @@ static inline s32 Ivy_CellHeight(u16 *pos, u16 *cellOut)
     u8 *p;
     s32 b, h;
 
-    if (x < 0 || y < 0 || (u32)x >= gUnk_030052F8 || (u32)y >= gUnk_030052FC)
+    if (x < 0 || y < 0 || (u32)x >= gTerrainWidth || (u32)y >= gTerrainHeight)
         cell = 0;
     else
-        cell = *(u16 *)((u8 *)gUnk_030052F4 + 0x24 + y * 2) + x;
+        cell = *(u16 *)((u8 *)gTerrainMap + 0x24 + y * 2) + x;
     if (cellOut)
         *cellOut = cell;
     p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         p += 4;
     else
-        p = (u8 *)gUnk_030052F4[1] + cell * 4 + 0xC;
+        p = (u8 *)gTerrainMap[1] + cell * 4 + 0xC;
     b = *p;
     h = (b & 0xF) << 8;
     if ((b >> 4) == 1)
@@ -454,15 +454,14 @@ s32 sub_080F0C20(u8 *arg0)
     }
 
     if (IVY_AT(u16, 0x2C0) & 2)
-        IVY_AT(u16, 0x2FA) = *(u32 *)(gUnk_02000710 + 0x5A0);
+        IVY_AT(u16, 0x2FA) = *(u32 *)(gGameState + 0x5A0);
     else
         IVY_AT(u16, 0x2FA) = (u16)(u32)Region_FindContaining(arg0 + 0x5C);
 
     if (IVY_AT(u16, 0x2C0) & 0x40)
         IVY_AT(u16, 0x13A) &= 0xFEFF;
 
-    if (Script_GetKeywordValue(0x53, 0) != 0 ||
-        *(u32 *)(gUnk_02000710 + 0x5A0) != IVY_AT(u16, 0x2FA))
+    if (Script_GetKeywordValue(0x53, 0) != 0 || *(u32 *)(gGameState + 0x5A0) != IVY_AT(u16, 0x2FA))
         SceneActorPlacement_HideActor(arg0, 0);
 
     SceneActorAnimation_SelectDirectionalEntry(arg0, 0);
@@ -515,7 +514,7 @@ s32 sub_080F0C20(u8 *arg0)
     Ivy_InitControlPresets(arg0);
     SceneActor_BeginReaction22(arg0);
 
-    if (*(u32 *)(gUnk_02000710 + 0x868) & 0x400) {
+    if (*(u32 *)(gGameState + 0x868) & 0x400) {
         IVY_AT(u8, 0x2A8) = 0;
         IVY_AT(u8, 0x2A9) = 0;
         IVY_AT(u8, 0x2AA) = 1;

@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_indicator.h"
+#include "engine.h"
 
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 extern const s16 gUnk_086149C4[];
 void SpriteEffectController_Create(void *, const void *, s32, u32, u32, u32, u32, u32, u32, u32,
                                    u32, u32, s32, s32, s32, s32, s32, s32);
@@ -16,8 +16,8 @@ static inline s32 Truncate(s32 value)
 
 static inline u32 Random(const u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return table[gRandomIndex];
 }
 
 // Tentative: emits the small particles used by the large fragment animation.
@@ -37,7 +37,7 @@ void LargeFragmentEffect_SpawnRandomParticle(struct Vec *position)
     const u16 *source;
     const u8 *sample;
     asm volatile("" : "+r"(opaque));
-    index = ((cursor = &gUnk_03005308), *cursor + 1) & 1023;
+    index = ((cursor = &gRandomIndex), *cursor + 1) & 1023;
     sample = (const u8 *)(index * 2 + (u32)table);
     mask = 255;
     angle = *sample;

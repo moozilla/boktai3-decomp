@@ -74,15 +74,15 @@ static inline u32 SceneActorReaction_TerrainHeight(struct ContactPosition *posit
     s32 x = position->x >> 8, z = position->z >> 8;
     u32 cell, flags, shape, height;
     u8 *data;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + cell * 4 + 12;
+        data = gTerrainMap->cells + cell * 4 + 12;
     flags = *data;
     shape = flags >> 4;
     height = (flags & 15) << 8;

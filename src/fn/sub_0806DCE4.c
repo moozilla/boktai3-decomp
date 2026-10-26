@@ -8,8 +8,8 @@ union EmissionPosition {
 };
 static inline u32 NextRandom(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return gUnk_0203B400[gRandomIndex];
 }
 void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpriteActor *input)
 {
@@ -46,7 +46,7 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
                 u32 value;
                 u32 spread;
                 struct RouteSpriteActor *jitterDst;
-                index = &gUnk_03005308;
+                index = &gRandomIndex;
                 next = *index + 1;
                 mask = 1023;
                 next &= mask;

@@ -29,7 +29,7 @@ struct Armor {
     u8 mode, boost;
     s16 timer, delay, accumulated, contacts, boostTimer, initialAttack;
 };
-extern struct Target *gUnk_02000710;
+extern struct Target *gGameState;
 void ActorController_SetBehavior(struct Armor *, s32);
 s32 Math_Atan2(s32, s32);
 static inline void clear(struct Part *c, u32 bits)
@@ -71,10 +71,10 @@ void Armor_UpdateFacingDecision(struct Armor *p)
          (p->behavior != 37)) &&
         (p->behavior != 39))
         return;
-    tx = gUnk_02000710->x;
+    tx = gGameState->x;
     x = p->x;
     dx = tx - x;
-    tz = gUnk_02000710->z;
+    tz = gGameState->z;
     z = p->z;
     dz = tz - z;
     dx += 128;
@@ -108,7 +108,7 @@ void Armor_UpdateFacingDecision(struct Armor *p)
             case 1:
                 if (p->behavior == 3)
                     goto pursue;
-                dir = Math_Atan2(gUnk_02000710->x - p->x, gUnk_02000710->z - p->z);
+                dir = Math_Atan2(gGameState->x - p->x, gGameState->z - p->z);
                 dir += 32;
                 dir &= k1;
                 if (p->facing == dir) {

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 
 /* tentative: 13-state axis-aligned chase toward a target */
 
@@ -20,13 +21,12 @@ struct ArmorTarget {
     s16 unk32;
     s16 y;
 };
-extern struct ArmorTarget *gUnk_02000710;
 s32 DirectionalActor_TryBeginState(struct ArmorActor *, s32);
 s32 ActorController_StartModeTwoTurn(struct ArmorActor *, s32);
 
 void Armor_UpdateAxisChase(struct ArmorActor *p, s32 fast)
 {
-    struct ArmorTarget *g = gUnk_02000710;
+    struct ArmorTarget *g = gGameState;
     s32 dx = g->x - p->x;
     s32 dy = g->y - p->y;
     s32 speed = 0x19;

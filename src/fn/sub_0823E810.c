@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_vec.h"
+#include "engine.h"
 
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void DirectionalEffect_AddParticle(void *, void *, void *, void *);
@@ -18,8 +18,8 @@ static inline s32 scale(s32 product)
 static inline u32 randomValue(const u16 *table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)table);
 }
 

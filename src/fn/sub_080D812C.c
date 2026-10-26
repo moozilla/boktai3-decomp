@@ -22,7 +22,7 @@ struct BurnState {
     u16 durations[4];
     u16 count, active, timer;
 };
-#define STATS   ((u8 *)gUnk_02000710)
+#define STATS   ((u8 *)gGameState)
 #define H(p, n) (*(s16 *)((p) + (n)))
 struct GroupLink {
     u32 unknown0;
@@ -136,7 +136,7 @@ static inline s32 LocalPlayer(void)
 }
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u32 *owner = &actor->field2E0;
         register u32 mask asm("r2") = *owner;
         if (!(mask & 0x20) && mask) {
@@ -308,7 +308,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
         void *control = *(void **)((u8 *)actor + 0x234);
         Reaction_SetControl(actor, 17, control);
     }
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         Player_NotifyFirstSelectedSlot(actor->field2E0, actor->field2D8);
         goto done;
     }
@@ -408,7 +408,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
     }
 
 record:
-    if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gUnk_030053F4, 0x4800) && !Flag2D0(actor, 0x800))
+    if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
         SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
     ((struct ContactCollider *)collider)->flags |= 4;
 done:

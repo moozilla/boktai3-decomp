@@ -3,8 +3,8 @@
 s32 SolarFruit_GetInventorySlot(s32 index);
 void SolarFruit_SetInventorySlot(s32 index, s32 value);
 s32 SolarFruit_IsInventorySlotEquipped(s32 index);
-#define STATE_S16(offset) (*(s16 *)((u8 *)gUnk_02000710 + (offset)))
-#define SLOT90(i)         (*(s16 *)((u8 *)gUnk_02000710 + (i) * 2 + 0x90))
+#define STATE_S16(offset) (*(s16 *)((u8 *)gGameState + (offset)))
+#define SLOT90(i)         (*(s16 *)((u8 *)gGameState + (i) * 2 + 0x90))
 
 void sub_0822EB14(s32 a, s32 b)
 {

@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern void *gUnk_02000580;
 struct EquipEntry {
     u32 w[4];
@@ -22,7 +22,7 @@ void Inventory_SwapEquipmentEntries(s32 a, s32 b)
     *ea = *eb;
     *eb = tmp;
     for (i = 0; i <= 7; i++) {
-        u8 *g = gUnk_02000710;
+        u8 *g = gGameState;
         s16 *q = (s16 *)(i * 2 + (u32)g + 0x68);
         if (*q == a) {
             *q = b;
@@ -40,9 +40,9 @@ void Inventory_SwapEquipmentEntries(s32 a, s32 b)
         }
     }
     pos = -1;
-    if (*(s16 *)(gUnk_02000710 + 0x50) <= 7) {
+    if (*(s16 *)(gGameState + 0x50) <= 7) {
         for (i = 0; i < n; i++) {
-            if (*(s16 *)(gUnk_02000710 + 0x68 + *(s16 *)(gUnk_02000710 + 0x50) * 2) == list[i]) {
+            if (*(s16 *)(gGameState + 0x68 + *(s16 *)(gGameState + 0x50) * 2) == list[i]) {
                 pos = i;
                 break;
             }
@@ -51,7 +51,7 @@ void Inventory_SwapEquipmentEntries(s32 a, s32 b)
     for (; n <= 7; n++)
         list[n] = -1;
     for (i = 0; i <= 7; i++)
-        *(s16 *)(gUnk_02000710 + i * 2 + 0x68) = list[i];
+        *(s16 *)(gGameState + i * 2 + 0x68) = list[i];
     if ((u32)pos <= 7)
-        *(u16 *)(gUnk_02000710 + 0x50) = pos;
+        *(u16 *)(gGameState + 0x50) = pos;
 }

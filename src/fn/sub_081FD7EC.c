@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "engine.h"
 struct OrbitVec {
     s16 x, y, z, pad;
 };
@@ -23,7 +24,6 @@ struct OrbitEffectState {
     u8 pad58[0xf4 - 0x58];
     s16 wide, count, phase;
 };
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 extern const u32 gUnk_0824FE34[4];
@@ -62,10 +62,10 @@ u32 OrbitEffect_FireVolley(struct OrbitEffectState *p)
                 struct OrbitVec spawn;
                 struct OrbitVec *sv;
                 sprites = *(const struct OrbitW4 *)gUnk_0824FE34;
-                gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+                gRandomIndex = (gRandomIndex + 1) & 0x3FF;
                 {
                     u32 tb = (u32)((const u16 *)RANDOM_TABLE_ADDR);
-                    r = *(const u16 *)((gUnk_03005308 << 1) + tb);
+                    r = *(const u16 *)((gRandomIndex << 1) + tb);
                 }
                 r &= 3;
                 target = Player_GetEffectivePosition(0);
@@ -98,10 +98,10 @@ u32 OrbitEffect_FireVolley(struct OrbitEffectState *p)
                 struct OrbitVec *pp;
                 s32 v, t;
                 s16 sixty;
-                gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+                gRandomIndex = (gRandomIndex + 1) & 0x3FF;
                 {
                     u32 tb = (u32)((const u16 *)RANDOM_TABLE_ADDR);
-                    r = *(const u16 *)((gUnk_03005308 << 1) + tb);
+                    r = *(const u16 *)((gRandomIndex << 1) + tb);
                 }
                 r &= 3;
                 target = Player_GetEffectivePosition(0);

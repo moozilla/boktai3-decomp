@@ -57,7 +57,7 @@ static inline int trunc12(int x)
 {
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void ContactSwarm_SpawnCharge(void *, void *, int, int, int, int, int);
 static inline void vector(s16 *dst, int direction, int length)
@@ -135,9 +135,9 @@ void SceneActorAnimation_UpdateChargeShotRelease(ActorAnimation *p, int tick)
         spawn.y += 300;
         power = *(s16 *)((u8 *)p2 + 0x36c);
         direction = turn(p->requestedAngle, position[9]);
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 random = gUnk_03005308 * 2;
+            u32 random = gRandomIndex * 2;
             register u16 *table asm("r3");
             table = gUnk_0203B400;
             random += (u32)table;

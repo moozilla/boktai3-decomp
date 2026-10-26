@@ -1,7 +1,7 @@
 #define PlayerStatEffect_SetPhase PlayerBurst_SetStateCallback
-#define gEngineFlags              gUnk_030053F4
 #include "global.h"
 #include "player.h"
+#include "engine.h"
 struct PlayerStatEffect {
     u8 task[0x18];
     struct Player *player;
@@ -14,7 +14,6 @@ void PlayerTransition_InitCollider(struct PlayerStatEffect *);
 void sub_08160108(struct PlayerStatEffect *);
 void PlayerOrbitEffect_UpdateIntro(struct PlayerStatEffect *);
 void PlayerBurst_SetStateCallback(struct PlayerStatEffect *, void (*)(struct PlayerStatEffect *));
-extern u32 gUnk_030053F4;
 s32 Div(s32, s32);
 s32 PlayerStatEffect_Initialize(struct PlayerStatEffect *p, struct Player *player)
 {
@@ -23,7 +22,7 @@ s32 PlayerStatEffect_Initialize(struct PlayerStatEffect *p, struct Player *playe
     PlayerTransition_InitCollider(p);
     sub_08160108(p);
     PlayerBurst_SetStateCallback(p, PlayerOrbitEffect_UpdateIntro);
-    gUnk_030053F4 |= 1;
+    gEngineFlags |= 1;
     p->targetStat = p->player->currentStatA >> 1;
     if (p->targetStat == 0)
         p->targetStat = 1;

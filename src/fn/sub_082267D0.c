@@ -1,11 +1,11 @@
 #include "global.h"
+#include "ram.h"
 struct CameraOffset {
     u32 x : 16;
     u32 y : 16;
     u32 z : 16;
     u32 w : 16;
 };
-extern void *gUnk_03005420;
 u32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 void Camera_ReadMoveRate(void *);
@@ -30,6 +30,6 @@ void sub_082267D0(void)
         offset.y = 0;
         offset.z = 0;
     }
-    Camera_ReadMoveRate(gUnk_03005420);
+    Camera_ReadMoveRate(gActiveCamera);
     Camera_PanToActor(actor, speed, &offset);
 }

@@ -36,10 +36,10 @@ void StateActor_UpdateRiseToTerrain(void *ctx, struct StateActorRise *a, s32 tic
     {
         s32 cx = (s16)pos->x >> 8;
         s32 cz = (s16)pos->z >> 8;
-        if (cx < 0 || cz < 0 || (u32)cx >= gUnk_030052F8 || (u32)cz >= gUnk_030052FC)
+        if (cx < 0 || cz < 0 || (u32)cx >= gTerrainWidth || (u32)cz >= gTerrainHeight)
             h = 0;
         else
-            h = gUnk_030052F4->rows[cz] + cx;
+            h = gTerrainMap->rows[cz] + cx;
     }
     {
         u8 *props = cellProps(h);

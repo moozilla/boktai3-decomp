@@ -1,7 +1,7 @@
 #include "global.h"
 
 #include "engine.h"
-extern void *gUnk_0200020C;
+#include "ram.h"
 extern u32 gUnk_030053F0;
 u8 *RegistryA8CB_FindEntryByName(void *, s32);
 void SpatialIndex_RemoveEntry(u8 *);
@@ -11,7 +11,7 @@ void SceneMessages_UnregisterReceiver(u8 *);
    SceneMessages_UnregisterReceiver (tentative). */
 void RegistryA8CB_ResetFromScript(void)
 {
-    void *manager = gUnk_0200020C;
+    void *manager = gActorManager;
     u8 *e;
     if (manager &&
         (e = RegistryA8CB_FindEntryByName(manager, Script_GetKeywordValue('n', 0))) != 0) {
@@ -23,7 +23,7 @@ void RegistryA8CB_ResetFromScript(void)
         SpatialIndex_RemoveEntry(p + 0x56C);
         {
             u32 mask = 0x800;
-            if (!((gUnk_030053F4 | gUnk_030053F0) & mask))
+            if (!((gEngineFlags | gUnk_030053F0) & mask))
                 SceneMessages_UnregisterReceiver(e + 0x858);
         }
     }

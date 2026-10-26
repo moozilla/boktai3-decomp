@@ -63,7 +63,7 @@ void SceneEventActor_UpdateDelayedFinish(struct SceneEventActor *actor)
             }
             break;
         case 2: {
-            if (gUnk_02000710->unk876 <= 0) {
+            if (gGameState->unk876 <= 0) {
                 u32 mask = 0x10010;
                 actor->flags |= mask;
             } else {

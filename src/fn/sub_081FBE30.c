@@ -1,6 +1,7 @@
 #include "global.h"
+#include "ram.h"
 
-#define gRandomTableIndex gUnk_03005304
+#define gRandomTableIndex gEffectRandomTableIndex
 #define gRandomTable      gUnk_086141BC
 
 struct RatatoskParticleParams {
@@ -22,7 +23,6 @@ struct RatatoskParticle {
     s32 fallSpeed;
 };
 
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 s32 Mod(s32, s32);
 

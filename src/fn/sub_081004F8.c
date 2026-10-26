@@ -25,7 +25,7 @@ struct FloorSwitch {
 void FloorSwitch_RunStateScript(struct FloorSwitch *);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sound_PlaySong(u32);
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 void FloorSwitch_Release(struct FloorSwitch *p)
 {
     u16 *flags = &p->flags88;
@@ -46,7 +46,7 @@ void FloorSwitch_Release(struct FloorSwitch *p)
             p->field10 = zero;
             AnimData_SelectPaletteBank(p->anim, 0x16C);
         } while (0);
-        if (!(gUnk_030053F4 & 0x800)) {
+        if (!(gEngineFlags & 0x800)) {
             if (*flags & 4)
                 Sound_PlaySong(0x389);
             else

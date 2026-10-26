@@ -7,10 +7,10 @@ s32 SceneActorTerrain_FindReachableCell(u16 *a, s32 dir, s32 n)
     s32 y = (s16)a[2] >> 8;
     s32 t, i, base, c;
 
-    if (x < 0 || y < 0 || (u32)x >= gUnk_030052F8 || (u32)y >= gUnk_030052FC)
+    if (x < 0 || y < 0 || (u32)x >= gTerrainWidth || (u32)y >= gTerrainHeight)
         t = 0;
     else
-        t = gUnk_030052F4->rows[y] + x;
+        t = gTerrainMap->rows[y] + x;
     base = (*SceneActorTerrain_GetCell(t) & 15) << 8;
     c = t;
     switch (dir) {

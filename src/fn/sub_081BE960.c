@@ -1,4 +1,3 @@
-#define gGameState gUnk_02000710
 #include "global.h"
 #include "scene_inventory_panel.h"
 struct StoragePanel {
@@ -39,7 +38,7 @@ void Storage_ShowItemDescription(struct StoragePanel *panel)
         MessageWindow_ShowMessage(item);
         Script_ParseStringRef(panel->itemText);
         text = Script_ParseStringRef(panel->itemText);
-        context = gUnk_02000710->form;
+        context = gGameState->form;
         if (context == 0 || context == 6)
             text += 55;
         else

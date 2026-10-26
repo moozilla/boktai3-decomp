@@ -60,14 +60,14 @@ void Sound_PlaySong(u32);
 void sub_081B71D4(void *, void *, void *, void *, s32, s32, s32);
 void VanargandProjectile_Create(void *, void *, void *, s32, s32, s32);
 s32 sub_08249350(s32, s32);
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern const u32 gUnk_0824F788[2];
 
 static inline u16 RandomValue(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    return gUnk_0203B400[gRandomIndex];
 }
 static inline s16 SpanHalf(s32 sum)
 {

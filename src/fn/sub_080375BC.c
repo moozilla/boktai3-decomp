@@ -23,7 +23,7 @@ void Memory_Copy(void *, const void *, int);
 void TextWindow_Refresh(int, int);
 void WirelessPeerPanel_SetNameFromPacket(void *, void *, int, void *, int);
 void WirelessPeerPanel_ClearName(void *, void *, int);
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 void WirelessPeerPanel_Update(struct PeerMenu *p, struct PeerPanel *panel, int index)
 {
     int status = Wireless_GetPeerHandshakeData();
@@ -45,8 +45,8 @@ void WirelessPeerPanel_Update(struct PeerMenu *p, struct PeerPanel *panel, int i
                 void *name = WirelessExchange_GetPeerEntry(0);
                 u32 zero = 0;
                 CpuSet(&zero, &p->clear, 0x05000001);
-                Memory_Copy(name, gUnk_02000710 + 0x780, 16);
-                Memory_Copy(panel->name, gUnk_02000710 + 0x780, 16);
+                Memory_Copy(name, gGameState + 0x780, 16);
+                Memory_Copy(panel->name, gGameState + 0x780, 16);
                 TextWindow_Refresh(p->window, 3);
                 panel->active = 1;
             }

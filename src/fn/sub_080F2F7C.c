@@ -47,7 +47,7 @@ struct ColorPulse {
     u8 padCF8[0xD80 - 0xCF8];
     u32 flagsD80;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern s16 gUnk_086149C4[];
 s32 Div(s32, s32);
@@ -82,8 +82,8 @@ void sub_080F2F7C(struct ColorPulse *p)
 
             p->posA = *(s16 *)((u8 *)p + 0xC4) - p->origin.x;
             p->posB = *(s16 *)((u8 *)p + 0xC8) - p->origin.z;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            sel = *(u8 *)&gUnk_0203B400[gUnk_03005308];
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            sel = *(u8 *)&gUnk_0203B400[gRandomIndex];
             p->origin.x = p->target->x + Div(gUnk_086149C4[(sel + 64) & 255] * 200, 4096);
             p->origin.y = p->target->y + 350;
             p->origin.z = p->target->z + Div(gUnk_086149C4[sel & 255] * 200, 4096);

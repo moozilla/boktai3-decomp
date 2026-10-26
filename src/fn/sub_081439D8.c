@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 // confidence=low: validates terrain for a tether target and snaps to the tether actor on flagged cells.
 
@@ -15,8 +16,6 @@ struct Map {
     u8 pad8[28];
     u16 rows[1];
 };
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u32 TetherActor_GetStatusFlags(void);
 u32 Player_IsStatusBit4ActionActive(u32);
@@ -28,15 +27,15 @@ static inline u8 *properties(struct Position *position)
     s32 x = position->x >> 8, z = position->z >> 8;
     s32 cell;
     u8 *p;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         p += 4;
     else {
-        struct Map *map = gUnk_030052F4;
+        struct Map *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         p = map->cells + offset;
     }

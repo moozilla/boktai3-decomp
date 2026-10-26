@@ -49,7 +49,7 @@ void CallbackGroup_EmitAtPosition(u8 *owner, struct SpPosition *origin)
 
         p->active = 1;
         table = gUnk_0203B400;
-        seed = &gUnk_03005308;
+        seed = &gRandomIndex;
         *(&i) = (*seed) + 1;
         mask = 1023;
         i &= mask;

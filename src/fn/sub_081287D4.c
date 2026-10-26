@@ -1,6 +1,7 @@
 #include "global.h"
 #include "contact_actor.h"
 #include "engine.h"
+#include "ram.h"
 
 struct FragmentSequence {
     const u16 *commands;
@@ -33,7 +34,6 @@ struct FragmentBurstPool {
     u8 graphics[0x1C];
     void *sequenceResource;
 };
-extern struct FragmentBurstPool *gUnk_02000170;
 extern struct ContactPosition gUnk_03005418;
 struct FragmentBurstPool *FragmentBurst_EnsurePool(void);
 struct FragmentBurst *FragmentBurst_AllocateSpriteGroup(struct FragmentBurstPool *);
@@ -59,15 +59,15 @@ static inline u16 GroundHeight(struct ContactPosition *point)
     s32 height;
     x = point->x >> 8;
     z = point->z >> 8;
-    if (x < 0 || z < 0 || x >= gUnk_030052F8 || z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || x >= gTerrainWidth || z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     definition = TerrainModifiers_FindCellOverride(cell, 1);
     if (definition)
         definition += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         definition = map->cells + offset;
     }
@@ -89,7 +89,7 @@ void FragmentBurst_Create(struct ContactPosition *position, u32 amount, u32 kind
 {
     struct ContactPosition screen;
     struct ContactPosition *out;
-    struct FragmentBurstPool *pool = gUnk_02000170;
+    struct FragmentBurstPool *pool = gSpriteGroupPool;
     struct FragmentBurst *group;
     s32 i;
     const u16 *randomTable;
@@ -132,10 +132,10 @@ void FragmentBurst_Create(struct ContactPosition *position, u32 amount, u32 kind
         struct FragmentSprite *sprite = &group->sprites[i];
         struct FragmentSequence *sequence = &group->sequences[i];
         Anim_SetSequence(sequence, pool->sequenceResource, 15, 0, 0);
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         randomTable = gUnk_0203B400;
         {
-            u32 value = randomTable[gUnk_03005308];
+            u32 value = randomTable[gRandomIndex];
             value &= 3;
             sequence->index = value;
         }

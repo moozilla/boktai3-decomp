@@ -81,7 +81,7 @@ void Storage_BeginSwapTransition(u8 *p)
                     }
                 }
 
-                id = *((s16 *)((((u8 *)gUnk_02000710) + 0x160) + (slots[selected] * 2)));
+                id = *((s16 *)((((u8 *)gGameState) + 0x160) + (slots[selected] * 2)));
                 enabled[i] = id >= 0;
                 frames[i] = id + 0x121;
                 break;

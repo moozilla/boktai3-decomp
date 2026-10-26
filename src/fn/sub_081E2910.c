@@ -34,14 +34,14 @@ void Anim_SetKeyframes(void *, void *, s32, s32, s32);
 void Presentation_UpdateLayerAnimations(void *);
 void Presentation_ClearTilemap(void);
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 static inline s32 random(u16 *input)
 {
     register u16 *table asm("r6") = input;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return table[gRandomIndex];
 }
 // Animate a presentation layer dropping, shaking, then blinking with its alternate.
 void Presentation_UpdateDropShakeBlink(struct Sequence *p)

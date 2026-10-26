@@ -1,6 +1,5 @@
-#define gAnimPanelSavedSelections gUnk_020005C0
 #include "global.h"
-extern u8 gUnk_020005C0[];
+#include "ram.h"
 struct AnimPanel {
     u8 unk0[0x34c];
     u32 selectionSecondary;
@@ -11,7 +10,7 @@ struct AnimPanel {
 void AnimPanel_ResetSelections(struct AnimPanel *p)
 {
     s32 i = 0;
-    u8 *saved = gUnk_020005C0;
+    u8 *saved = gAnimPanelSavedSelections;
     u32 empty = 0x41;
     u8 *out = saved;
     u32 *values = p->selections;

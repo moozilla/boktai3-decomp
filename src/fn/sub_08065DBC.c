@@ -9,7 +9,7 @@ static inline u8 Any(u32 bits)
 static inline u8 AlternateMode(void)
 {
     u32 bit = 0x80;
-    if (gUnk_02000710->flags868 & bit)
+    if (gGameState->flags868 & bit)
         return TRUE;
     return FALSE;
 }
@@ -77,7 +77,7 @@ gotManager:
     {
         u32 mask = 0x80;
         u32 bits;
-        bits = gUnk_02000710->flags868 & mask;
+        bits = gGameState->flags868 & mask;
         framePointer = frameLow;
         savedKind = kindPointer;
         savedAction = actionPointer;

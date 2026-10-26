@@ -12,7 +12,7 @@ struct MapMenu {
 };
 void MapMenu_PositionMarkers(struct MapMenu *s)
 {
-    struct GameState *g = gUnk_02000710;
+    struct GameState *g = gGameState;
     s->map = s->locations[(s16)g->savedY].map;
     s->x = s->locations[(s16)g->savedY].x * 4;
     s->y = s->locations[(s16)g->savedY].y * 4;

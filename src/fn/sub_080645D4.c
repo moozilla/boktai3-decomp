@@ -3,7 +3,7 @@
 void SceneActorPlacement_PlayVariantEventSound(struct ActorAttachmentSource *, u32);
 static inline u8 SameOwner(u16 *key)
 {
-    if (gUnk_02000710->region == *key)
+    if (gGameState->region == *key)
         return TRUE;
     return FALSE;
 }

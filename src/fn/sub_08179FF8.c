@@ -1,6 +1,6 @@
 #include "global.h"
 extern u16 gUnk_02000590;
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 s32 AreaEffect_IsPositionCovered(void *);
 s32 SceneActors_GetEffectiveTimeStep(u8 *p)
 {
@@ -10,7 +10,7 @@ s32 SceneActors_GetEffectiveTimeStep(u8 *p)
     } else if (AreaEffect_IsPositionCovered(p + 0x54) == 0) {
         r = 0;
     } else {
-        r = *(s16 *)(gUnk_02000710 + 0x876);
+        r = *(s16 *)(gGameState + 0x876);
     }
     return r;
 }

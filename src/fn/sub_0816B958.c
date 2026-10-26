@@ -5,7 +5,6 @@
 #define MapMenu_GetMarkerKind    MapScreen_GetMarkerType
 #define MapMenu_GetMarkerVariant MapScreen_GetMarkerFlipFlags
 #define MapMenu_GetTileAddress   Hud_GetTilemapCell
-#define gGameState               gUnk_02000710
 struct MapMenuMarker {
     u8 type, page, x, y;
 };
@@ -54,7 +53,7 @@ void MapMenu_DrawActiveMarkers(struct MapMenu *menu, s32 left, s32 top)
             break;
         if (marker->page != menu->page)
             continue;
-        if (!((*(s32 *)((u8 *)gUnk_02000710 + (s16)gUnk_02000710->savedX * 4 + 0x5C0) >> i) & 1))
+        if (!((*(s32 *)((u8 *)gGameState + (s16)gGameState->savedX * 4 + 0x5C0) >> i) & 1))
             continue;
         x = marker->x;
         y = marker->y;

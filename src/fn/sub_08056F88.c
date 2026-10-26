@@ -10,7 +10,7 @@ void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
     u32 zero;
     particle->flags &= ~1;
     table = (const u16 *)RANDOM_TABLE_ADDR;
-    randomIndex = &gUnk_03005308;
+    randomIndex = &gRandomIndex;
     index = *randomIndex + 1;
     {
         u32 firstMask = 1023;

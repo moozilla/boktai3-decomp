@@ -12,7 +12,7 @@ struct CountdownPlayer {
     u16 transitionFrame;
 };
 extern struct CountdownPlayer *gUnk_02000580;
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 void Hud_UpdateCountdownDisplay(s32, s32, u32);
 void Player_EnterKindFour(struct CountdownPlayer *);
 void Task_Kill(void *);
@@ -22,14 +22,14 @@ s32 Countdown_Tick(struct CountdownTask *task)
     s32 *remaining;
     if (gUnk_02000580 && gUnk_02000580->state == 1) {
         done = 0;
-        remaining = (s32 *)(gUnk_02000710 + 0x618);
+        remaining = (s32 *)(gGameState + 0x618);
         if (*remaining > 0) {
             if (++task->frame >= task->interval) {
                 task->frame = 0;
                 --*remaining;
-                Hud_UpdateCountdownDisplay(*(s32 *)(gUnk_02000710 + 0x618),
-                                           *(s32 *)(gUnk_02000710 + 0x61C), 1);
-                if (*(s32 *)(gUnk_02000710 + 0x618) <= 0)
+                Hud_UpdateCountdownDisplay(*(s32 *)(gGameState + 0x618),
+                                           *(s32 *)(gGameState + 0x61C), 1);
+                if (*(s32 *)(gGameState + 0x618) <= 0)
                     done = 1;
             }
         } else {

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "game_state.h"
 
 // confidence=low: Hresvelgr setup: reads script keywords into the 0x358-0x372 parameter block, creates the pools, sets callbacks and animation state.
 
@@ -24,7 +25,6 @@ extern u32 gUnknown_02000580[4];
 struct F2C80Block {
     u32 w[8];
 };
-extern void *gUnk_02000710;
 s32 Script_GetKeywordValue(s32, s32);
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
@@ -107,7 +107,7 @@ s32 sub_081A2C80(void *arg0, void *arg1)
         v = Script_GetValue();
         r5 = (u8)(((u32)(v << 29) + 0xA0000000u) >> 24);
     } else {
-        u16 *s = (u16 *)gUnk_02000710;
+        u16 *s = (u16 *)gGameState;
         pk[0] = (pk[0] & 0xFFFF0000) | s[0x30 / 2];
         pk[0] = (pk[0] & 0xFFFF) | (s[0x32 / 2] << 16);
         pk[1] = (pk[1] & 0xFFFF0000) | s[0x34 / 2];

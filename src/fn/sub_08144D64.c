@@ -1,7 +1,7 @@
 #include "global.h"
 #include "player.h"
+#include "engine.h"
 // confidence=low: charge motion pose with a countdown that shrinks the attachment descriptor.
-extern u32 gUnk_030053F4;
 void Sound_PlaySong(u32);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, int, int, int, int);
 s32 ActorVariant_GetTableValue(u32, s32);
@@ -30,7 +30,7 @@ void sub_08144D64(struct Player *p)
             Player_SetPendingCallback(p, Player_OnChargeMotionExit);
         }
     }
-    if (p->positionResetCounter == 1 && p->positionResetState == 1 && !(gUnk_030053F4 & 0x1000))
+    if (p->positionResetCounter == 1 && p->positionResetState == 1 && !(gEngineFlags & 0x1000))
         SetReset(p);
     switch (p->tetherPhase) {
         case 0:
@@ -54,7 +54,7 @@ void sub_08144D64(struct Player *p)
                 p->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
                     p->kindTwoAttachment, &p->positionalEffectGroup, p->kindTwoAttachmentDescriptor,
                     0x7F, 0, 0, 0, 0);
-                if (p->positionResetCounter == 1 && !(gUnk_030053F4 & 0x1000))
+                if (p->positionResetCounter == 1 && !(gEngineFlags & 0x1000))
                     SetReset(p);
                 p->positionResetState = 0;
                 p->positionResetCounter = 0;

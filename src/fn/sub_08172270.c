@@ -1,14 +1,14 @@
 #include "global.h"
+#include "game_state.h"
 
 /* tentative: adds or removes an entry in the 8-entry unlock list */
 
-extern u8 *gUnk_02000710;
 s32 GameState_GetUnlockEntry(s32);
 s32 GameState_HasUnlockedInventoryEntry(s32);
 void Sound_PlaySong(u32);
 
-#define UNLOCK_SLOT(i) (*(s16 *)((u8 *)gUnk_02000710 + (i) * 2 + 0x78))
-#define UNLOCK_CUR     (*(s16 *)((u8 *)gUnk_02000710 + 0x50))
+#define UNLOCK_SLOT(i) (*(s16 *)((u8 *)gGameState + (i) * 2 + 0x78))
+#define UNLOCK_CUR     (*(s16 *)((u8 *)gGameState + 0x50))
 
 s32 GameState_ToggleUnlockEquipSlot(u8 *p)
 {

@@ -76,9 +76,9 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kin
 static inline u32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u32 CellHeight(struct ContactPosition *position, u32 cell)
 {
@@ -87,7 +87,7 @@ static inline u32 CellHeight(struct ContactPosition *position, u32 cell)
     if (data)
         data += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         data = map->cells + offset;
     }
@@ -219,8 +219,8 @@ static inline void Golem_Retarget(struct SceneActorRegistryResetView *actor, str
 }
 static inline u32 Random(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return *(const u16 *)(index * 2 + RANDOM_TABLE_ADDR);
 }
 struct GolemRouteLink {
@@ -285,8 +285,8 @@ static inline u32 RandomDirectionExcept(u32 current)
     s32 i;
     for (i = 0; i <= 3; i++) {
         u32 d;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-        d = (gUnk_0203B400[gUnk_03005308] & 3) << 6;
+        gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+        d = (gUnk_0203B400[gRandomIndex] & 3) << 6;
         if (d != current)
             return d;
     }
@@ -329,7 +329,7 @@ static inline u8 Golem_Chase(struct SceneActorRegistryResetView *input)
         dest->z = link->point->z;
         dest->y = CellHeight(dest, CellIndex(dest));
     }
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u8 *target = (u8 *)*targetp;
         if (!target)
             goto fail;
@@ -419,7 +419,7 @@ void Golem_UpdateChargePursuit(struct SceneActorRegistryResetView *actor)
         body->flag625 = 0;
     }
     SceneActor_AccelerateForTerrain(actor);
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u8 *partner = (u8 *)actor->fieldDC;
         s32 index;
         if (!partner)
@@ -483,7 +483,7 @@ route:
                                            (struct ContactPosition *)((u8 *)actor->fieldDC + 0xC),
                                            &actor->position);
                 if (diff.x * diff.x + diff.z * diff.z <= 0xFFFE && body->charge682 > 199) {
-                    if (Test(gUnk_030053F4, 0x4800)) {
+                    if (Test(gEngineFlags, 0x4800)) {
                         u8 *partner = (u8 *)actor->fieldDC;
                         s32 index;
                         if (!partner)

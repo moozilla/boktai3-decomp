@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 struct S {
     u8 f0[0x48];
     s16 a48;
@@ -29,7 +30,6 @@ struct G {
     s16 pad;
     s16 y;
 };
-extern struct G *gUnk_02000710;
 s32 Math_Atan2(s32, s32);
 void ActorController_StartTurn(struct S *, s32);
 s32 Armor_TryStartAction(struct S *, s32);
@@ -39,7 +39,7 @@ void Armor_UpdateFacingAction6(struct S *p)
     u8 r;
     switch (*q) {
         case 0: {
-            struct G *g = gUnk_02000710;
+            struct G *g = gGameState;
             s32 a = Math_Atan2(g->x - p->a48, g->y - p->a4c);
             a = (a + 0x20) & 0xc0;
             if (p->b39 != a)

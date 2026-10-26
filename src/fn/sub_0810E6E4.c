@@ -28,7 +28,7 @@ struct ConfirmPanel {
     u32 fD30;
     u32 fD34;
 };
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 extern u32 gUnk_030053F0;
 extern u32 gUnk_020001CC;
 s32 Script_SeekToKeyword(s32);
@@ -75,7 +75,7 @@ s32 sub_0810E6E4(struct ConfirmPanel *p)
     }
     {
         u32 mask = 0x800;
-        u32 m = (gUnk_030053F4 | gUnk_030053F0) & mask;
+        u32 m = (gEngineFlags | gUnk_030053F0) & mask;
         if (m) {
             p->fD26 = 1;
             p->fD28 = 0;

@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define gRandomIndex  gUnk_03005308
 #define gRandomValues gUnk_0203B400
 struct ActorReaction {
     u8 unknown0[0x51];
@@ -19,7 +18,7 @@ struct ActorReaction {
     u8 unknown1B4[0x168];
     s16 motion[4];
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void Hresvelgr_SetAnimation(struct ActorReaction *, void *, void *, u32, u32, u32);
 s32 sub_08249350(s32, s32);
@@ -63,8 +62,8 @@ void Hresvelgr_UpdateRandomAnimation(struct ActorReaction *actor, u32 tick)
     if (!(t & 7)) {
         s32 anim;
         s32 random;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-        random = *(u16 *)(RANDOM_TABLE_ADDR + (gUnk_03005308 << 1));
+        gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+        random = *(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1));
         anim = sub_08249350(random >> 3, 5) + 27;
         Hresvelgr_SetAnimation(*new_var3, (*new_var3)->collider194, (*new_var3)->collider174, anim,
                                2, 4);

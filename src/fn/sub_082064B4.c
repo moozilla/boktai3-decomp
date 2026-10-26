@@ -7,7 +7,7 @@ struct Message {
     u32 reserved : 16;
     struct Args *args;
 };
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 void Script_Call(u32, struct Message *);
 void GameState_SetEventFlag(s32);
 void sub_08159164(s32);
@@ -21,7 +21,7 @@ static inline s32 clamp(s32 v)
         v = 0;
     return v;
 }
-#define INC(n) H(gUnk_02000710, n) = clamp(H(gUnk_02000710, n) + 1)
+#define INC(n) H(gGameState, n) = clamp(H(gGameState, n) + 1)
 void VulcanCannon_RecordDefeat(u8 *p)
 {
     struct Args a;
@@ -44,13 +44,10 @@ void VulcanCannon_RecordDefeat(u8 *p)
     if (W(p, 0x15C) & 1) {
         u16 flags;
         sub_08159164(H(p, 0x150));
-        H(gUnk_02000710, 0x87C) =
-            H(gUnk_02000710, 0x87C) < 9999 ? H(gUnk_02000710, 0x87C) + 1 : 9999;
-        H(gUnk_02000710, 0x538) =
-            H(gUnk_02000710, 0x538) < 9999 ? H(gUnk_02000710, 0x538) + 1 : 9999;
+        H(gGameState, 0x87C) = H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
+        H(gGameState, 0x538) = H(gGameState, 0x538) < 9999 ? H(gGameState, 0x538) + 1 : 9999;
         flags = H(p, 0x146);
-        H(gUnk_02000710, 0x566) =
-            H(gUnk_02000710, 0x566) < 9999 ? H(gUnk_02000710, 0x566) + 1 : 9999;
+        H(gGameState, 0x566) = H(gGameState, 0x566) < 9999 ? H(gGameState, 0x566) + 1 : 9999;
         if (flags & 0x80) {
             INC(0x58A);
         } else if (flags & 0x100) {

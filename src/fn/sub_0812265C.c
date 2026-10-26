@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_0200013C;
+#include "ram.h"
 
 void SceneActor14_ResetSingleton(void)
 {
-    gUnk_0200013C = 0;
+    gSpriteEffectPool = 0;
 }

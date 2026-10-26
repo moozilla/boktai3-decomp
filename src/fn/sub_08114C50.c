@@ -1,5 +1,6 @@
 #include "global.h"
-#define gSlotRegistry gUnk_020004C8
+#include "ram.h"
+#define gSlotRegistry gSceneCallbackPool
 struct RegistrySpriteSlot {
     u32 owner;
     u8 pad4[0x5C];
@@ -15,11 +16,10 @@ struct SlotRegistry {
     u8 pad0[0x18];
     struct RegistrySpriteSlot slots[16];
 };
-extern struct SlotRegistry *gUnk_020004C8;
 void Sprite_Remove(void *);
 void SlotRegistry_RemoveSprite(u32 index)
 {
-    struct SlotRegistry *registry = gUnk_020004C8;
+    struct SlotRegistry *registry = gSceneCallbackPool;
     if (registry && index <= 15) {
         if (registry->slots[index].active && registry->slots[index].spriteActive) {
             Sprite_Remove(registry->slots[index].sprite);

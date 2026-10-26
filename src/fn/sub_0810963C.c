@@ -23,7 +23,7 @@ void ResultMessage_RunOutcomeScript(struct ResultMessage *obj, u32 arg1, u32 arg
     } else {
         obj->result = result;
         if (result <= 31)
-            *(u32 *)gUnk_02000710->unk820 |= 1 << result;
+            *(u32 *)gGameState->unk820 |= 1 << result;
         if (obj->script) {
             value = obj->result;
             args.count = 1;

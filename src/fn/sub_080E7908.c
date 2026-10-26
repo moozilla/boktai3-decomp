@@ -6,7 +6,6 @@ u32 SceneActor_GetDirectionFlags(u32);
 u8 SceneActorTarget_TrySelectNearestParticipant(struct SceneActorRegistryResetView *);
 void SceneActor_ResetCollisionReaction(struct SceneActorRegistryResetView *);
 void SceneActorAnimation_SelectEntryFlags(struct SceneActorAnimationView *, s32, u32);
-extern u32 gUnk_030053F4;
 static inline s32 Quarter(s32 v)
 {
     return v >= 0 ? v >> 2 : -(-v >> 2);
@@ -99,7 +98,7 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
             *f = mask;
         }
         {
-            u32 gv = gUnk_030053F4;
+            u32 gv = gEngineFlags;
             u32 bits = 0x4800;
             u32 hit = gv & bits;
             flags2D4 = f;

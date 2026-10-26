@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_object.h"
 #include "callback_pool.h"
+#include "engine.h"
 
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
                   u32);
 
@@ -16,8 +16,8 @@ static inline void ClearVector(void *dest, u32 *zero)
 static inline s32 NextRandom(void)
 {
     const u16 *table = gUnk_0203B400;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    return table[gRandomIndex];
 }
 
 // confidence=low: spawns a small burst of hit particles at the entry's position.

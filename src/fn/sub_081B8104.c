@@ -1,11 +1,11 @@
 #include "global.h"
-extern u8 *gUnk_02000258;
+#include "ram.h"
 bool32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 
 u8 sub_081B8104(void)
 {
-    u8 *m = gUnk_02000258;
+    u8 *m = gGrowthHazardManager;
     if (m != NULL) {
         s32 id;
         s32 i;

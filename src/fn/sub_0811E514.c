@@ -1,11 +1,11 @@
 #include "global.h"
-extern u8 *gUnk_02000208;
+#include "ram.h"
 
 s32 sub_0811E514(void)
 {
     s32 count;
-    if (gUnk_02000208)
-        count = *(s32 *)(gUnk_02000208 + 0x13c);
+    if (gScriptRecordTable)
+        count = *(s32 *)(gScriptRecordTable + 0x13c);
     else
         count = 0;
     return count;

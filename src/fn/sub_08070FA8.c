@@ -1,8 +1,8 @@
 #include "scene_actor_palette.h"
+#include "engine.h"
 #ifdef NONMATCHING
 // fuzzy: 57.7%
 extern u16 gUnk_02000528;
-extern u32 gUnk_03005308;
 void Heap_Free(void *);
 void EffectGroup_SpawnPart(void *, s32, void *, void *, void *, s32, s32);
 union RegistryParticleVector {
@@ -13,8 +13,8 @@ union RegistryParticleVector {
 };
 static inline u32 RandomValue(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return ((const u16 *)RANDOM_TABLE_ADDR)[index];
 }
 static inline u8 Removed(struct SceneActorRegistryActor *p)
@@ -31,13 +31,13 @@ static inline u8 MissingObject(struct SceneActorRegistryActor *p)
 }
 static inline u8 Paused(void)
 {
-    if (gUnk_030053F4 & 0x4800)
+    if (gEngineFlags & 0x4800)
         return 1;
     return 0;
 }
 static inline u8 CurrentRegion(struct SceneActorRegistryActor *p)
 {
-    if (*(u32 *)((u8 *)gUnk_02000710 + 0x5A0) == p->regionId)
+    if (*(u32 *)((u8 *)gGameState + 0x5A0) == p->regionId)
         return 1;
     return 0;
 }
@@ -91,8 +91,8 @@ void SceneActorRegistry_UpdateActors(struct SceneActorRegistryManager *manager)
         Callback_InvokeActor(actor->context, actor->update);
         if (!MissingObject(actor) && !Paused() && !(actor->flags2D4 & 0x4000) &&
             !(actor->flags2D0 & 8) && actor->enabled && !(actor->flags2CC & 2) &&
-            (*(u32 *)((u8 *)gUnk_02000710 + 0x868) & 2) && CurrentRegion(actor) &&
-            !Ineligible(actor) && *(s16 *)((u8 *)gUnk_02000710 + 0x876) > 0 && !Stopped()) {
+            (*(u32 *)((u8 *)gGameState + 0x868) & 2) && CurrentRegion(actor) &&
+            !Ineligible(actor) && *(s16 *)((u8 *)gGameState + 0x876) > 0 && !Stopped()) {
             actor->field178 = 0;
             actor->field2B8 = 0;
             if (actor->drawableKind == 0)

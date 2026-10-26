@@ -1,18 +1,18 @@
 // MATCHING_CONCESSION: register-pinning
 #include "directional_particles.h"
+#include "engine.h"
 
 #ifdef NONMATCHING
 // fuzzy: 69.9%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
-extern u32 gUnk_03005308;
 s32 DirectionalParticle_Update(void *, struct DirectionalParticle *);
 // Lifetime/speed/position behavior recovered; stack and register allocation remain different.
 // The original also materializes an unused 0x0403B714 literal, not reproduced here.
 static inline u32 nextRandom(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
 static inline s32 scaleVelocity(s32 value)
 {
@@ -45,7 +45,7 @@ s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *source, u32 dire
     c2 = c3;
     asm("" : "+r"(c3));
     *c2 = *source->position;
-    randomIndex = (gUnk_03005308 + 1) & 1023;
+    randomIndex = (gRandomIndex + 1) & 1023;
     c2->x = (c2->x - 64) + (((const u16 *)0x0203B400)[randomIndex] & 127);
     randomIndex = (randomIndex + 1) & 1023;
     {
@@ -53,7 +53,7 @@ s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *source, u32 dire
         c3->y = (c3->y + 16) + (v2 & 31);
     }
     randomIndex = (randomIndex + 1) & 1023;
-    gUnk_03005308 = randomIndex;
+    gRandomIndex = randomIndex;
     {
         typeof(((const u16 *)0x0203B400)[randomIndex]) v1 = ((const u16 *)0x0203B400)[randomIndex];
         c3->z = (c3->z - 64) + (v1 & 127);

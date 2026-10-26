@@ -1,4 +1,6 @@
 #include "global.h"
+#include "game_state.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
@@ -13,8 +15,8 @@ struct Vec16 {
 #define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
 #define U32(p, o) (*(u32 *)((u8 *)(p) + (o)))
 #define S32(p, o) (*(s32 *)((u8 *)(p) + (o)))
-extern u32 gUnk_030053F4, gUnk_030053F0;
-extern u8 *gUnk_020004B4, *gUnk_02000710;
+extern u32 gUnk_030053F0;
+extern u8 *gUnk_020004B4;
 extern s32 gUnk_020004E0[];
 extern const s16 gUnk_086149C4[];
 void Character_GetHeightAdjustedPosition(void *, struct Vec16 *);
@@ -39,7 +41,7 @@ static inline s32 Scale(s32 v)
 }
 static inline u32 LinkMode(u32 mask)
 {
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 #define Flag(p, mask) ((p) && (U16(p, 0x8F4) & (mask)))
 static inline u8 Inactive(u8 *p)
@@ -146,7 +148,7 @@ void Glove_UpdatePostState(u8 *p)
                 amount =
                     ModifierStats_ApplyKind11(view, ParticipantStat(*((s8 *)(((u8 *)p) + 0x8F8))));
             else
-                amount = ModifierStats_ApplyKind11(view, *((s16 *)(((u8 *)gUnk_02000710) + 0x876)));
+                amount = ModifierStats_ApplyKind11(view, *((s16 *)(((u8 *)gGameState) + 0x876)));
             accumulator = (s32 *)(p + 0x8FC);
             *accumulator += amount;
             resource = (s16 *)(view + 0x58);

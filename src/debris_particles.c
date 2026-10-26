@@ -1,4 +1,5 @@
 #include "debris_particles.h"
+#include "engine.h"
 
 static inline void add(struct SceneVec *d, struct SceneVec *v)
 {
@@ -28,11 +29,10 @@ int Debris_Update(void *unused, struct DebrisParticle *p)
  * callback Debris_Update. Blocked (about 69% fuzzy): the original keeps the particle (r8),
  * velocity pointer (r7), index pointer (sb) in high registers and loads a stray literal
  * 0x0403B714 that I could not reproduce. */
-extern u32 gUnk_03005308;
 static inline u16 Debris_NextRandom(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
 static inline int Debris_Scale(int n)
 {

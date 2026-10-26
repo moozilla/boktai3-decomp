@@ -1,14 +1,14 @@
 #include "global.h"
 #include "game_state.h"
-extern u32 gUnk_030053F4;
+#include "engine.h"
 extern u32 gUnk_030053F0;
 s32 StateFlags_TestIndexedFlag(s32 index)
 {
     if ((u32)index <= 11) {
         u32 mask = 0x800;
-        if (((gUnk_030053F4 | gUnk_030053F0) & mask) && index > 5)
+        if (((gEngineFlags | gUnk_030053F0) & mask) && index > 5)
             goto enabled;
-        if ((gUnk_02000710->counters628[3] >> index) & 1)
+        if ((gGameState->counters628[3] >> index) & 1)
             goto enabled;
     }
     return 0;

@@ -1,6 +1,6 @@
 #include "global.h"
-extern u32 gUnk_02000598;
+#include "ram.h"
 void TargetRegistry_Destroy(void)
 {
-    gUnk_02000598 = 0;
+    gSceneLinkList = 0;
 }

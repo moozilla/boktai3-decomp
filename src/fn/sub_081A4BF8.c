@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 // confidence=low: advances falling projectiles and switches to impact on terrain contact.
 #define Hresvelgr_UpdateFallingProjectile sub_081A4BF8
@@ -17,7 +18,6 @@ struct FallingProjectile {
     void *callback;
     u16 timer, phase, unknownE4, delay;
 };
-extern u8 *gUnk_02000244;
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void ScaledShadow_SetGraphic(void *, s32, s32);
@@ -34,16 +34,16 @@ static inline void AddPosition(struct ProjectilePosition *out, struct Projectile
 static inline s32 CellIndex(struct ProjectilePosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u8 *CellProperties(s32 cell)
 {
     u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         return p + 4;
-    return (cell * 4 + 12) + gUnk_030052F4->cells;
+    return (cell * 4 + 12) + gTerrainMap->cells;
 }
 static inline u32 Height(struct ProjectilePosition *p)
 {
@@ -62,7 +62,7 @@ static inline u32 Height(struct ProjectilePosition *p)
 }
 void Hresvelgr_UpdateFallingProjectile(struct FallingProjectile *p)
 {
-    u8 *pool = gUnk_02000244;
+    u8 *pool = gHresvelgrProjectilePool;
     if (p->delay) {
         if (--p->delay == 0) {
             ScaledShadow_Initialize(p->shadow, &p->position, 64, 64, 64, 64, 6400, 1, 6, 1, 0);

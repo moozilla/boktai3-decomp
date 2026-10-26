@@ -1,6 +1,6 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 u8 *GameState_GetBikeName(void)
 {
-    return gUnk_02000710 + 0x790;
+    return gGameState + 0x790;
 }

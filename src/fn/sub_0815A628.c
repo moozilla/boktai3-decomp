@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000580[];
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 s32 Script_GetActorIndex(void);
 u32 Script_GetKeywordValue(u32, u32);
 void ScriptActor_SetEnergyMaxFromScript(void)
@@ -11,6 +11,6 @@ void ScriptActor_SetEnergyMaxFromScript(void)
     if (p) {
         u32 r = Script_GetKeywordValue(0x65, *(u16 *)(p + 0x42a));
         *(u16 *)(p + 0x428) = r;
-        *(u16 *)(gUnk_02000710 + 0x2c) = r;
+        *(u16 *)(gGameState + 0x2c) = r;
     }
 }

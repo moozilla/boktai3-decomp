@@ -12,7 +12,7 @@ struct Outer {
     u8 pad[4];
     struct Inner *in;
 };
-extern struct Outer *gUnk_030052F4;
+extern struct Outer *gTerrainMap;
 
 struct Obj {
     u8 pad0[0x288];
@@ -29,8 +29,8 @@ struct Obj {
 void Player_RequestNearbyEffectTarget(struct Obj *o)
 {
     if (RepeatedEffect_RequestNearby((u8 *)o + 0x30) != 0 && o->busy == 0) {
-        s32 m = Mod(o->idx, gUnk_030052F4->in->w);
-        s32 d = Div(o->idx, gUnk_030052F4->in->w);
+        s32 m = Mod(o->idx, gTerrainMap->in->w);
+        s32 d = Div(o->idx, gTerrainMap->in->w);
         o->x = (m << 8) + 0x80;
         o->y = (d << 8) + 0x80;
         o->ptr = &o->x;

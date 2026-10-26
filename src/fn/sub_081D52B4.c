@@ -1,10 +1,10 @@
 #include "global.h"
 
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 
 u32 GameState_IsPairFlagSet(u32 a, u32 b)
 {
-    u32 *p = (u32 *)(gUnk_02000710 + 0x700);
+    u32 *p = (u32 *)(gGameState + 0x700);
     u32 idx = (a << 1) + b;
     u32 w = idx >> 5;
     u32 bit;

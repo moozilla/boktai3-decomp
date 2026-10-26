@@ -1,6 +1,7 @@
 #include "global.h"
+#include "ram.h"
 #define DisplaySlots_Create PositionLinkedSprite_EnsureManager
-#define gDisplaySlots       gUnk_020004D8
+#define gDisplaySlots       gCompactSpritePool
 /* Tentative family: two display slots owned by a task. */
 struct DisplaySlot {
     u32 flags;
@@ -12,18 +13,17 @@ struct DisplaySlots {
     u8 unknown[0x34];
     struct DisplaySlot slots[2];
 };
-extern struct DisplaySlots *gUnk_020004D8;
 struct DisplaySlots *PositionLinkedSprite_EnsureManager(void);
 s32 DisplaySlots_Reserve(u32 x, u32 y)
 {
     struct DisplaySlots *p;
     s32 i;
-    if (!gUnk_020004D8) {
+    if (!gCompactSpritePool) {
         p = PositionLinkedSprite_EnsureManager();
         if (!p)
             return -1;
     } else
-        p = gUnk_020004D8;
+        p = gCompactSpritePool;
     for (i = 0; i < 2; i++) {
         if (p->slots[i].active == 0) {
             p->slots[i].x = x;

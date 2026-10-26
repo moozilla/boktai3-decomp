@@ -1,4 +1,5 @@
 #include "area_effect_link.h"
+#include "engine.h"
 struct StatusSlot {
     u32 flags;
     u8 pad4[0x24];
@@ -8,7 +9,6 @@ struct StatusSlot {
 };
 extern s32 gUnk_02000478;
 extern u16 gUnk_02000534, gUnk_02000500;
-extern u32 gUnk_030053F4;
 static inline u8 PlayerInMode(struct AreaEffectPlayer *p)
 {
     if (p) {
@@ -41,7 +41,7 @@ void SceneStatusIndicator_UpdateBlink(void *owner, struct StatusSlot *input)
     u32 active = 0;
     if (p->reset)
         p->reset = active;
-    if (gUnk_030053F4 & 0x800) {
+    if (gEngineFlags & 0x800) {
         s32 local;
         if (gUnk_020004B4 && (local = gUnk_020004B4->localPlayer) >= 0) {
             if (!PlayerInMode(gUnk_02000580[local]))

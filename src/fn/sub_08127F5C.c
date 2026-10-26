@@ -1,7 +1,7 @@
 #define MovingSpritePool_GetOrCreate DirectionalProjectile_EnsurePool
 #define MovingSpritePool_Allocate    DirectionalProjectile_AllocateSprite
-#define gMovingSpritePool            gUnk_0200016C
 #include "global.h"
+#include "ram.h"
 struct SpritePosition {
     u32 xy, z;
 };
@@ -27,7 +27,6 @@ struct MovingSpritePool {
     u8 graphics[0x1c];
     void *animationData;
 };
-extern struct MovingSpritePool *gUnk_0200016C;
 extern const s16 gUnk_086149C4[];
 struct MovingSpritePool *DirectionalProjectile_EnsurePool(void);
 struct MovingSprite *DirectionalProjectile_AllocateSprite(struct MovingSpritePool *);
@@ -54,7 +53,7 @@ static inline s32 Scale(s32 value)
 void MovingSprite_Create(struct SpritePosition *position, u32 angle, u32 arg2, u32 arg3, u32 arg4,
                          u32 arg5, s32 speed)
 {
-    struct MovingSpritePool *pool = gUnk_0200016C;
+    struct MovingSpritePool *pool = gMovingSpritePool;
     struct MovingSprite *slot;
     struct MovingSprite *sprite;
     u8 row, flip;

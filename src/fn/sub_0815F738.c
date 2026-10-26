@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-#define gSceneLinkList gUnk_02000598
 struct SceneLinkNode {
     u8 unknown0[0xC];
     struct SceneLinkNode *next;
@@ -9,10 +9,9 @@ struct SceneLinkList {
     u8 unknown0[0x18];
     struct SceneLinkNode *head;
 };
-extern struct SceneLinkList *gUnk_02000598;
 void SceneLink_RemoveNode(struct SceneLinkNode *target)
 {
-    struct SceneLinkList *list = gUnk_02000598;
+    struct SceneLinkList *list = gSceneLinkList;
     if (list) {
         struct SceneLinkNode *node = list->head;
         if (node == target)

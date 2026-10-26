@@ -23,16 +23,16 @@ void Registry1909_UpdateFalling(struct S *p)
     u32 kind;
     s32 height;
 
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cellIndex = 0;
     else
-        cellIndex = gUnk_030052F4->rows[z] + x;
+        cellIndex = gTerrainMap->rows[z] + x;
 
     cell = TerrainModifiers_FindCellOverride(cellIndex, 1);
     if (cell)
         cell += 4;
     else
-        cell = gUnk_030052F4->cells + 12 + cellIndex * 4;
+        cell = gTerrainMap->cells + 12 + cellIndex * 4;
 
     kind = *cell >> 4;
     height = (*cell & 0xf) << 8;

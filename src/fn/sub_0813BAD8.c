@@ -14,7 +14,7 @@ struct PackedVec {
     s32 x : 16, y : 16, z : 16;
     u32 pad : 16;
 };
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern struct Vec gUnk_03005418;
 void Player_SetDirectionalEffectFrame(void *, void *, s32);
 
@@ -98,36 +98,36 @@ void sub_0813BAD8(u8 *p)
     switch (direction) {
         case 1:
             Player_SetDirectionalEffectFrame(p + 0x778, *((void **)(p + 0x774)),
-                                             15 - (*((s16 *)(gUnk_02000710 + 0x10))));
+                                             15 - (*((s16 *)(gGameState + 0x10))));
             Player_SetDirectionalEffectFrame(p + 0x7A0, *((void **)(p + 0x774)),
-                                             13 - (*((s16 *)(gUnk_02000710 + 0x10))));
+                                             13 - (*((s16 *)(gGameState + 0x10))));
             SetVec_0813BAD8(&first, -28, -44, 0);
             SetVec_0813BAD8(&second, 12, -4, 0);
             break;
 
         case 3:
             Player_SetDirectionalEffectFrame(p + 0x778, *((void **)(p + 0x774)),
-                                             9 - (*((s16 *)(gUnk_02000710 + 0x10))));
+                                             9 - (*((s16 *)(gGameState + 0x10))));
             Player_SetDirectionalEffectFrame(p + 0x7A0, *((void **)(p + 0x774)),
-                                             15 - (*((s16 *)(gUnk_02000710 + 0x10))));
+                                             15 - (*((s16 *)(gGameState + 0x10))));
             SetVec_0813BAD8(&first, 16, -32, 0);
             SetVec_0813BAD8(&second, -24, 8, 0);
             break;
 
         case 5:
             Player_SetDirectionalEffectFrame(p + 0x778, *((void **)(p + 0x774)),
-                                             11 - (*((s16 *)(gUnk_02000710 + 0x10))));
+                                             11 - (*((s16 *)(gGameState + 0x10))));
             Player_SetDirectionalEffectFrame(p + 0x7A0, *((void **)(p + 0x774)),
-                                             9 - (*((s16 *)(gUnk_02000710 + 0x10))));
+                                             9 - (*((s16 *)(gGameState + 0x10))));
             SetVec_0813BAD8(&first, 16, 8, 0);
             SetVec_0813BAD8(&second, -24, -32, 0);
             break;
 
         case 7:
             Player_SetDirectionalEffectFrame(p + 0x778, *((void **)(p + 0x774)),
-                                             13 - (*((s16 *)(gUnk_02000710 + 0x10))));
+                                             13 - (*((s16 *)(gGameState + 0x10))));
             Player_SetDirectionalEffectFrame(p + 0x7A0, *((void **)(p + 0x774)),
-                                             11 - (*((s16 *)(gUnk_02000710 + 0x10))));
+                                             11 - (*((s16 *)(gGameState + 0x10))));
             SetVec_0813BAD8(&first, -20, -4, 0);
             SetVec_0813BAD8(&second, 20, -44, 0);
             break;

@@ -73,10 +73,10 @@ u8 SceneActorTerrain_CanTraverseCell(s32, s32, s32, s32);
 // confidence=low: helper; applies the direction-dependent cursor adjustment to the 0x634 cell record.
 
 // confidence=low: per-frame terrain cursor update for the scene actor in walk state 5; picks a cell from the facing direction and spawns the disc.
-extern u8 *gUnk_030052F4;
-extern u32 gUnk_030052F8;
-extern u32 gUnk_030052FC;
-extern u32 gUnk_030053F4;
+extern u8 *gTerrainMap;
+extern u32 gTerrainWidth;
+extern u32 gTerrainHeight;
+extern u32 gEngineFlags;
 extern u8 *gUnknown_02000580[];
 void *TerrainModifiers_FindCellOverride(s32, s32);
 u8 sub_0812E118(s32, s32, s32, s32);
@@ -92,13 +92,13 @@ static inline u8 *f08085DD0_cellPtr(s32 cell)
     u8 *over = (u8 *)TerrainModifiers_FindCellOverride(cell, 1);
     if (over != 0)
         return over + 4;
-    return *(u8 **)(gUnk_030052F4 + 4) + cell * 4 + 0xC;
+    return *(u8 **)(gTerrainMap + 4) + cell * 4 + 0xC;
 }
 
 // confidence=low: helper; the grid row stride stored in the terrain header.
 static inline s32 f08085DD0_stride(void)
 {
-    return *(s16 *)(*(u8 **)(gUnk_030052F4 + 4) + 4);
+    return *(s16 *)(*(u8 **)(gTerrainMap + 4) + 4);
 }
 
 // confidence=low: helper; signed high byte of a u16 field, used as a grid coordinate.
@@ -154,7 +154,7 @@ void sub_08085DD0(u8 *base)
             *(u16 *)(ctx + 0x628) &= ~4;
         }
         b2 = *(u8 **)(base + 0xDC);
-        if (gUnk_030053F4 & 0x4800) {
+        if (gEngineFlags & 0x4800) {
             if (b2 != 0) {
                 s32 idx = -1;
                 if (b2[8] <= 3)
@@ -188,7 +188,7 @@ void sub_08085DD0(u8 *base)
 
         if (mag <= 0x1F) {
             u8 *b2 = *(u8 **)(base + 0xDC);
-            if (gUnk_030053F4 & 0x4800) {
+            if (gEngineFlags & 0x4800) {
                 if (b2 != 0) {
                     s32 idx = -1;
                     if (b2[8] <= 3)
@@ -295,8 +295,8 @@ void sub_08085DD0(u8 *base)
                 s32 x = f08085DD0_hiByte(*(u16 *)(ctx + 0x634));
                 s32 y = f08085DD0_hiByte(*(u16 *)(ctx + 0x638));
                 s32 gx = 0;
-                if (x >= 0 && y >= 0 && x < gUnk_030052F8 && y < gUnk_030052FC)
-                    gx = *(u16 *)(gUnk_030052F4 + 0x24 + y * 2) + x;
+                if (x >= 0 && y >= 0 && x < gTerrainWidth && y < gTerrainHeight)
+                    gx = *(u16 *)(gTerrainMap + 0x24 + y * 2) + x;
                 cp = f08085DD0_cellPtr(gx);
                 kind = *cp >> 4;
                 v = (*cp & 0xF) << 8;

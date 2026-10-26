@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 /* HUD interpretation and descriptive names are tentative. */
 struct HudTransitionOffset {
@@ -14,12 +15,11 @@ struct Hud {
     u8 transition[0x61];
     u8 transitionState;
 };
-extern u32 gUnk_030053F4;
 void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void Hud_InitializePanelTransition(struct Hud *hud)
 {
     struct HudTransitionOffset offset;
-    if (gUnk_030053F4 & 0x1000) {
+    if (gEngineFlags & 0x1000) {
         offset.x = 0;
         offset.y = 0;
         offset.z = 0;

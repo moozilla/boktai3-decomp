@@ -6,7 +6,7 @@ static inline u8 *CellData(u32 cell)
     u8 *override = TerrainModifiers_FindCellOverride(cell, 1);
     if (override)
         return override + 4;
-    return gUnk_030052F4->cells + (cell * 4 + 12);
+    return gTerrainMap->cells + (cell * 4 + 12);
 }
 void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *actor)
 {

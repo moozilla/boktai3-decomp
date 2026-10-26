@@ -21,7 +21,7 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
     out->z = to->z - from->z;
 }
 /* Row stride of the current terrain map, in cells. */
-#define MAP_WIDTH (*(s16 *)(gUnk_030052F4->cells + 4))
+#define MAP_WIDTH (*(s16 *)(gTerrainMap->cells + 4))
 
 static inline struct IvyTargetRef *Keep(struct SceneActorRegistryResetView *actor,
                                         struct IvyTargetRef *target)
@@ -32,9 +32,9 @@ static inline struct IvyTargetRef *Keep(struct SceneActorRegistryResetView *acto
 static inline u32 CellIndex(const struct ContactPosition *position)
 {
     s32 x = position->x >> 8, z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 /* Ivy target search (tentative): the nearer of SceneActor_FindNearbyPlayerTarget's candidate and the nearest

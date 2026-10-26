@@ -1,6 +1,6 @@
 #include "global.h"
-extern u16 gUnk_03005274[];
-extern u32 gUnk_03005308;
+#include "engine.h"
+#include "ram.h"
 struct Q {
     u16 a, b;
     u8 pad[0x8c - 4];
@@ -35,11 +35,11 @@ void sub_08138664(struct S *p)
         q->x8c[i] = 0;
         q->x94[i] = 0;
         p->x84[i] = 0;
-        gUnk_03005274[i] = 0x3ff;
+        gSceneSelectionDisplaySlots[i] = 0x3ff;
     }
     p->x94 = 0;
     p->x4e = 0;
     p->x4f = 0;
     sub_08138630(p, q);
-    gUnk_03005308 = q->seed & 0x3ff;
+    gRandomIndex = q->seed & 0x3ff;
 }

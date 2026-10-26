@@ -11,7 +11,7 @@ void Slime_RollMoveFlag(struct SceneActorRegistryResetView *actor)
     {
         register s32 r asm("r0");
         u32 idx;
-        register u32 *g asm("r0") = &gUnk_03005308;
+        register u32 *g asm("r0") = &gRandomIndex;
         idx = (*g + 1) & 1023;
         *g = idx;
         r = *(u8 *)(idx * 2 + (u32)gUnk_0203B400);

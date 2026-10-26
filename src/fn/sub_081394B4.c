@@ -1,6 +1,6 @@
 #define SceneProcSprites_GetOrCreate BallisticSpriteEffect_EnsureManager
-#define gSceneProcSprites            gUnk_020004CC
 #include "global.h"
+#include "ram.h"
 struct SpriteVector {
     u32 x, y, z, w;
 };
@@ -22,7 +22,6 @@ struct SceneProcSprites {
     u8 pad[0x18];
     struct SceneProcSpriteSlot entries[4];
 };
-extern u8 *gUnk_020004CC;
 u8 *BallisticSpriteEffect_EnsureManager(void);
 void Memory_Clear(void *, u32);
 void BallisticSpriteEffect_OnAnimationComplete(void);
@@ -31,7 +30,7 @@ void SceneProcSprites_SubmitBounds(void *, void (*)(void), u32, u32);
 s32 SceneProcSprites_CreateEntry(struct SpriteVector *position, s32 a, s32 b, u32 kind, u16 *params)
 {
     struct SceneProcSprites *p;
-    u8 *existing = gUnk_020004CC;
+    u8 *existing = gSceneProcSprites;
     s32 i;
     if (existing)
         p = (void *)existing;

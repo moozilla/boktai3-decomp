@@ -1,14 +1,14 @@
 #include "global.h"
+#include "game_state.h"
 
 /* tentative: adds or removes an inventory slot from the 8-entry equipped list */
 
-extern u8 *gUnk_02000710;
 s32 SolarFruit_GetInventorySlot(s32);
 s32 SolarFruit_IsInventorySlotEquipped(s32);
 void Sound_PlaySong(u32);
 
-#define FRUIT_SLOT(i) (*(s16 *)((u8 *)gUnk_02000710 + (i) * 2 + 0x90))
-#define FRUIT_CUR     (*(s16 *)((u8 *)gUnk_02000710 + 0x54))
+#define FRUIT_SLOT(i) (*(s16 *)((u8 *)gGameState + (i) * 2 + 0x90))
+#define FRUIT_CUR     (*(s16 *)((u8 *)gGameState + 0x54))
 
 void SolarFruit_ToggleEquipSlot(u8 *p)
 {

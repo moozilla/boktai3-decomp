@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_020001C8;
 void Registry30AC_RemoveAnimations(u8 *);
 void CharacterModel_RemoveAnimations(u8 *);
 s32 Registry30AC_Destroy(u8 *p)
@@ -16,6 +16,6 @@ s32 Registry30AC_Destroy(u8 *p)
         i--;
     } while (i >= 0);
     z = 0;
-    gUnk_020001C8 = z;
+    gPanelSequence = z;
     return 1;
 }

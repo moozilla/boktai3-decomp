@@ -1,5 +1,5 @@
 #include "global.h"
-#define gRandomTableIndex gUnk_03005308
+#define gRandomTableIndex gRandomIndex
 #define gRandomTable      gUnk_0203B400
 
 /* Tentative family name; the defeat callback records script and combat statistics. */
@@ -14,7 +14,7 @@ struct CombatActor {
     u8 pad34[0x136 - 0x34];
     s16 defeatEffectDisabled;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);
@@ -28,8 +28,8 @@ u32 CombatActor_UpdateDefeatEffect(struct CombatActor *p)
             u32 idx, t;
             v = p->position;
             q[1] += 0x80;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-            idx = gUnk_03005308;
+            gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+            idx = gRandomIndex;
             t = *(u8 *)&gUnk_0203B400[idx];
             SpriteParticle_CreateDefaultVariant4384(&v, 0x80, 0x20, 8, 8, 0x18, t, 0x20, 0x20, 1, 2,
                                                     0x200);

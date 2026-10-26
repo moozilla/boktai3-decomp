@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_terrain.h"
+#include "engine.h"
 #define FIELD(p, o, t) (*(t *)((u8 *)(p) + (o)))
 extern const s16 gUnk_086149C4[];
-extern u32 gUnk_03005308;
 void SceneActorControl_OnIdle(void *);
 void CpuSet(const void *, void *, u32);
 s32 Math_Atan2(s32, s32);
@@ -78,7 +78,7 @@ void Ghost_RecoilTowardEndpoint(struct SceneActorRegistryResetView *actor)
         u32 n;
         Control(actor, Ghost_UpdateRecoilAnimation, 0x24);
         Bee_ConsumeFlag80(actor);
-        gUnk_03005308 = n = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = n = (gRandomIndex + 1) & 1023;
         angle = *(u8 *)&((const u16 *)RANDOM_TABLE_ADDR)[n];
         {
             u32 off = 0x5FC;

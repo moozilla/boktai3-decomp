@@ -1,5 +1,7 @@
 #include "global.h"
 #include "contact_actor.h"
+#include "engine.h"
+#include "ram.h"
 
 struct ScheduledEffectBody {
     u32 id, flags, unk_08;
@@ -25,8 +27,7 @@ struct ColliderVector {
     s16 x, y, z;
 };
 extern const struct ColliderVector gUnk_08610710, gUnk_08610718, gUnk_08610720;
-extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
-extern void *gUnk_02000140;
+extern u32 gUnk_030053F0, gUnk_02000560;
 struct SceneScheduledEffect *sub_0812298C(void *);
 void SceneBody_Init(struct ScheduledEffectBody *, u32, struct ContactPosition *, u32, u32, void *);
 void SceneBody_SetSprite(struct ScheduledEffectBody *, struct ScheduledEffectSprite *);
@@ -43,7 +44,7 @@ struct SceneScheduledEffect *SceneScheduledEffect_Create(const struct ContactPos
     struct ScheduledEffectSprite *sprite;
     {
         u32 mask = 0x400;
-        if ((gUnk_030053F4 | gUnk_030053F0) & mask)
+        if ((gEngineFlags | gUnk_030053F0) & mask)
             return 0;
     }
     {
@@ -51,9 +52,9 @@ struct SceneScheduledEffect *SceneScheduledEffect_Create(const struct ContactPos
         if (gUnk_02000560 & mask)
             return 0;
     }
-    if (!gUnk_02000140)
+    if (!gAnimatedBodyPool)
         return 0;
-    effect = sub_0812298C(gUnk_02000140);
+    effect = sub_0812298C(gAnimatedBodyPool);
     if (!effect)
         return 0;
     effect->position = *position;

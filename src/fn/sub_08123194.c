@@ -32,7 +32,7 @@ static inline u8 *Properties(s32 index)
     if (p)
         return p + 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = index * 4 + 12;
         return map->cells + offset;
     }
@@ -119,7 +119,7 @@ static inline u8 Seek(struct BouncePosition *position, s32 cell, s32 target)
 {
     s32 level = position->y >> 8;
     s32 width = SceneGrid_Width();
-    s32 total = width * *(s16 *)(gUnk_030052F4->cells + 6);
+    s32 total = width * *(s16 *)(gTerrainMap->cells + 6);
     s32 i, column;
     if (cell < target) {
         i = cell + 1;
@@ -204,7 +204,7 @@ u8 sub_08123194(struct BounceShot *s, s32 angle, u32 next)
         cellp = &s->cell;
         position = &s->position;
         quadrant = angle + 0x20;
-        if (gUnk_030053F4 & 0x800) {
+        if (gEngineFlags & 0x800) {
             s32 target;
             cell = *cellp;
             switch ((quadrant >> 6) & 3) {

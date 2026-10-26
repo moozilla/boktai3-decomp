@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 #ifdef NONMATCHING
 // fuzzy: 86.5%
@@ -37,7 +38,6 @@ struct Actor {
     s16 angleLimit;
 };
 extern u8 *gUnk_02000580;
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 struct Vec *Player_GetEffectivePosition(s32);
@@ -70,8 +70,8 @@ static inline u8 consume(struct Actor *p)
 }
 static inline u32 randomB(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return gUnk_0203B400[gRandomIndex];
 }
 static inline s32 trunc12(s32 v)
 {

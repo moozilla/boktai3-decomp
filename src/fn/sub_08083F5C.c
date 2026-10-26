@@ -40,16 +40,16 @@ void SceneActorControl_ReflectTerrainProbe(struct SceneActorRegistryResetView *i
         x = (s32)packed >> 24;
         z = (s32)(word << 16) >> 24;
     }
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     terrainPosition = &next;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         data = (u8 *)((u32)map->cells + offset);
     }

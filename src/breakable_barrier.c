@@ -177,7 +177,7 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
             size.y = 16;
             size.z = 164;
             table = gUnk_0203B400;
-            indexPtr = &gUnk_03005308;
+            indexPtr = &gRandomIndex;
             index = *indexPtr;
             index++;
             mask = 1023;
@@ -243,7 +243,7 @@ void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
         size.y = 16;
         size.z = 164;
         table = gUnk_0203B400;
-        indexPtr = &gUnk_03005308;
+        indexPtr = &gRandomIndex;
         index = *indexPtr;
         index++;
         mask = 1023;

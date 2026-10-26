@@ -1,9 +1,9 @@
 #include "global.h"
-extern s32 gUnk_03005324;
+#include "ram.h"
 
 s32 sub_08222BE4(void)
 {
-    s32 status = gUnk_03005324;
+    s32 status = gSerialTransferStatus;
     if (status >= 0)
         status = 0;
     return status;

@@ -1,8 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "area_effect_link.h"
+#include "ram.h"
 
-#define gLinkSelectionDisplaySlots gUnk_03005274
+#define gLinkSelectionDisplaySlots gSceneSelectionDisplaySlots
 u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);
 s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
 void Registry1745_SetMenuRequest(u32);
@@ -13,7 +14,6 @@ void Bg_ClearTilemap(s32);
 void ScriptNotifier_CallWithValue(struct AreaEffectLinkState *);
 void Registry1745_SetState(struct AreaEffectLinkState *, u32, void (*)(void));
 void SceneSelection_WaitForSlotTransition(void);
-extern u16 gUnk_03005274[];
 static inline u16 GetSlot(struct AreaEffectLinkState *p, s32 i)
 {
     if (i < 0)
@@ -59,7 +59,7 @@ s32 LinkSelection_WaitForEmptySlots(struct AreaEffectLinkState *p)
         Bg_ClearTilemap(0);
         p->menuSelection = extra[0x130];
         ScriptNotifier_CallWithValue(p);
-        base = gUnk_03005274;
+        base = gSceneSelectionDisplaySlots;
         {
             u32 fill = 0x3ff;
             q = base + 3;

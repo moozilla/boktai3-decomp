@@ -1,6 +1,6 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 s32 Inventory_GetConsumableId(u32 i)
 {
-    return *(s16 *)(gUnk_02000710 + i * 2 + 0x160);
+    return *(s16 *)(gGameState + i * 2 + 0x160);
 }

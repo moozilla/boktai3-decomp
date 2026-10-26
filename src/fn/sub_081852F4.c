@@ -1,9 +1,9 @@
 #include "global.h"
+#include "game_state.h"
 
 struct CP {
     s16 x, y, z, pad;
 };
-extern u8 *gUnk_02000710;
 void DirectionalActor_TryBeginState(u8 *, s32);
 void ActorController_StartTurn(u8 *, u32);
 u32 ActorController_StartModeTwoTurn(u8 *p, u32 v);
@@ -20,7 +20,7 @@ void ActorController_UpdateTargetMovement(u8 *p, s32 a, s32 b)
     u32 r;
     u8 *q;
     if ((p[0xB3E] & 7) == 0) {
-        u8 *g = gUnk_02000710;
+        u8 *g = gGameState;
         pos.x = *(u16 *)(g + 0x30);
         pos.y = *(u16 *)(g + 0x32);
         pos.z = *(u16 *)(g + 0x34);

@@ -48,7 +48,7 @@ u8 sub_080E7FF4(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)actor + 0x3D4;
     u8 **slot;
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u8 *partner;
         s32 index;
         u8 **p = (u8 **)((u8 *)actor + 0xDC);

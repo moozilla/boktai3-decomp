@@ -1,5 +1,6 @@
 #include "global.h"
-#define gHudManager gUnk_02000214
+#include "ram.h"
+#define gHudManager gFieldHud
 struct HudManager {
     u8 pad0[0xA5E];
     u8 mode;
@@ -9,10 +10,9 @@ struct HudManager {
     u16 displayTimer;
     u8 effect;
 };
-extern struct HudManager *gUnk_02000214;
 void Hud_UpdateCountdownDisplay(s32 value, s32 limit, u32 effect)
 {
-    struct HudManager *p = gUnk_02000214;
+    struct HudManager *p = gFieldHud;
     if (p && p->mode == 0) {
         if (value < 0)
             p->value = 0;

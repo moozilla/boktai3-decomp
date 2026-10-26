@@ -21,7 +21,7 @@ s32 ModifierMenu_Initialize(struct ModifierMenu *menu)
     ModifierMenu_ValidateSavedSelection(menu);
     ModifierMenu_LoadSavedSelection(menu);
     mask = 0x800;
-    flags = (gUnk_030053F4 | gUnk_030053F0) & mask;
+    flags = (gEngineFlags | gUnk_030053F0) & mask;
     /* The masked value is zero or 0x800: negation extracts its nonzero flag. */
     menu->specialHeader = Script_GetKeywordValue('E', (0 - flags) >> 31);
     menu->script = (void *)Script_GetKeywordValue('e', 0);

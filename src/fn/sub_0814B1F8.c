@@ -3,8 +3,8 @@
 extern u8 *gUnk_02000538;
 extern u32 gUnk_0200051C;
 extern u32 gUnk_02000524;
-extern u32 gUnk_030053F4;
-extern u32 gUnk_03005308;
+extern u32 gEngineFlags;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 
@@ -58,8 +58,8 @@ static inline s32 Player_0814B1F8_Fix(s32 v)
 
 static inline s32 Player_0814B1F8_Rand(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    return gUnk_0203B400[gRandomIndex];
 }
 
 #ifdef NONMATCHING
@@ -88,7 +88,7 @@ void sub_0814B1F8(void *p)
         PL_AT(u32, 0x110) = PL_AT(u32, 0xB0);
         PL_AT(u32, 0xEC + 8) &= ~2;
         Player_SetPendingCallback(p, Player_OnTargetMotionExit);
-        if (gUnk_030053F4 & 0x1000)
+        if (gEngineFlags & 0x1000)
             WirelessGame_ResetCyclingItemLatch();
         Player_EmitQueuedEffects(p);
         Player_NotifyActionCategories(p);

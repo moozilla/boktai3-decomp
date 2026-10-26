@@ -2,7 +2,7 @@
 #include "global.h"
 #include "player.h"
 #include "contact_swarm.h"
-extern u16 gUnk_02000544;
+#include "ram.h"
 void TimedEffect_GetOrCreateManager(s32);
 void *ActorDebris_Create(void *, void *, void *);
 void Sprite_Init(void *, void *, s32);
@@ -162,7 +162,7 @@ s32 Player_InitializeFromScript(struct Player *p, s32 slot)
     Player_RegisterSceneMessageReceiver(p);
     Player_InitEventProcedureFromScript(p);
     gUnk_02000580[p->movementRequestBlocked] = p;
-    gUnk_02000544++;
+    gPlayerCount++;
     if (!p->movementRequestBlocked) {
         Player_SaveStateSnapshot(p);
         SceneHud_RefreshControls();

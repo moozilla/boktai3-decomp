@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 #ifdef NONMATCHING
 // fuzzy: 94.8%
@@ -19,8 +20,6 @@ struct Map {
     u8 pad8[28];
     u16 rows[1];
 };
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u32 TetherActor_GetStatusFlags(void);
 u32 Player_IsStatusBit4ActionActive(u32);
@@ -32,15 +31,15 @@ static inline u8 *properties(struct Position *position)
     s32 x = position->x >> 8, z = position->z >> 8;
     s32 cell;
     u8 *p;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         p += 4;
     else {
-        struct Map *map = gUnk_030052F4;
+        struct Map *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         p = map->cells + offset;
     }
@@ -69,9 +68,9 @@ static inline s32 scale(s32 v)
 static inline s32 indexAt(struct Position *position)
 {
     s32 x = position->x >> 8, z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline s32 heightAt(struct Position *position)
 {
@@ -109,11 +108,11 @@ void Player_ConstrainTetherTarget(struct Actor *input, s32 dx, s32 dz, s32 radiu
             s32 cellz = actor->position.z >> 8;
             s32 current;
             s32 next;
-            if ((((cellx < 0) || (cellz < 0)) || (((u32)cellx) >= gUnk_030052F8)) ||
-                (((u32)cellz) >= gUnk_030052FC))
+            if ((((cellx < 0) || (cellz < 0)) || (((u32)cellx) >= gTerrainWidth)) ||
+                (((u32)cellz) >= gTerrainHeight))
                 current = 0;
             else
-                current = gUnk_030052F4->rows[cellz] + cellx;
+                current = gTerrainMap->rows[cellz] + cellx;
             asm("" : : : "memory");
             next = indexAt((void *)(&candidate));
             if (current == (next + 1))
@@ -121,7 +120,7 @@ void Player_ConstrainTetherTarget(struct Actor *input, s32 dx, s32 dz, s32 radiu
             else if (current == (next - 1))
                 candidate.x = (((((s16)ax) >> 8) + 1) << 8) - 2;
             else {
-                s32 width = *((s16 *)(gUnk_030052F4->cells + 4));
+                s32 width = *((s16 *)(gTerrainMap->cells + 4));
                 if (current == (next + width))
                     candidate.z = ((actor->position.z >> 8) << 8) + 2;
                 else if (current == (next - width))

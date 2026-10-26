@@ -102,7 +102,7 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
         rise:
             if (timer <= 19) {
                 const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
-                u32 *randomIndex = &gUnk_03005308;
+                u32 *randomIndex = &gRandomIndex;
                 register u32 index asm("r1") = *randomIndex + 1;
                 u32 mask = 1023;
                 u32 rangeMask;

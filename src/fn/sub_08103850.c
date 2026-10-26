@@ -49,7 +49,7 @@ u32 NamedObject_UpdatePool(struct NamedObjectManager *manager)
     {
         u32 mask = 0x400;
         s32 mask2 = 4;
-        if ((mask & (gUnk_030053F4 | gUnk_030053F0)) || testMask()) {
+        if ((mask & (gEngineFlags | gUnk_030053F0)) || testMask()) {
             Sound_StopSong(0x158);
             Sound_StopSong(0x261);
             Sound_StopSong(0x289);

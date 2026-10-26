@@ -27,7 +27,7 @@ struct ArmorAxisPlayer {
     u8 pad[0x30];
     s16 x, y, z;
 };
-extern struct ArmorAxisPlayer *gUnk_02000710;
+extern struct ArmorAxisPlayer *gGameState;
 void ActorController_SetBehavior(void *, s32);
 void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);
@@ -46,9 +46,9 @@ void Armor_UpdateAxisAttackDecision(struct ArmorAxisActor *p)
         --(*timer);
     if ((p->phase != 255) && (p->behavior != 20))
         return;
-    dx = gUnk_02000710->x - p->x;
-    dy = gUnk_02000710->y - p->y;
-    dz = gUnk_02000710->z - p->z;
+    dx = gGameState->x - p->x;
+    dy = gGameState->y - p->y;
+    dz = gGameState->z - p->z;
     dx = (dx + 128) >> 8;
     dz = (dz + 128) >> 8;
     ax = dx;

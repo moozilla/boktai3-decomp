@@ -11,7 +11,7 @@ void RoamingObjectB_SteerWander(struct RoamingObject *owner)
     }
     if (owner->turnTimer == 0) {
         const u16 *table = gUnk_0203B400;
-        u32 *counter = &gUnk_03005308;
+        u32 *counter = &gRandomIndex;
         u32 index;
         u32 mask;
         u32 sample;

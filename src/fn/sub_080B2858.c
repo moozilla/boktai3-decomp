@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+#include "engine.h"
 #ifdef NONMATCHING
 // fuzzy: 92.3%
 // fix.py best version (reprinted C)
@@ -12,9 +13,9 @@
 static inline u32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u32 CellHeight(struct ContactPosition *position, u32 cell)
 {
@@ -23,7 +24,7 @@ static inline u32 CellHeight(struct ContactPosition *position, u32 cell)
     if (data)
         data += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         data = map->cells + offset;
     }
@@ -94,7 +95,6 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 b)
 
 // confidence=low: distance thresholds select recovery routes.
 extern const u8 gUnk_0824E230[];
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern u8 *gUnk_02000580[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
@@ -104,8 +104,8 @@ u32 SceneActor_DispatchContextAction(void *, u32);
 static inline u32 RandomBits(u32 mask)
 {
     u32 value;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    value = *(const u16 *)((gUnk_03005308 * 2) + (u32)gUnk_0203B400);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    value = *(const u16 *)((gRandomIndex * 2) + (u32)gUnk_0203B400);
     return value & mask;
 }
 static inline u32 PlayerFlags(u8 *player, u32 mask)

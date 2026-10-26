@@ -2,7 +2,7 @@
 void Sound_RestartPlayer30Song(void);
 void ScriptUtility_ClearControlFlag(void)
 {
-    gUnk_030053F4 &= ~0x200;
+    gEngineFlags &= ~0x200;
     if (gEnginePauseFlags & 8) {
         Sound_RestartPlayer30Song();
         {

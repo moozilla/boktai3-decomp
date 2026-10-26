@@ -1,6 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "contact_swarm.h"
+#include "engine.h"
+#include "ram.h"
 struct RegionSprite {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x90 - 0x2C];
@@ -23,7 +25,6 @@ struct RegionSpriteManager {
     u8 unknown0[0x18];
     const void *sequenceResource, *alternateResource;
 };
-extern struct RegionSpriteManager *gUnk_020001B4;
 void ProximityActor_UpdateDamageAnimation(struct RegionSprite *);
 void sub_0810638C(struct RegionSprite *);
 static inline u8 Test(u32 *flags, u32 bit)
@@ -157,11 +158,10 @@ s32 Region_FindContaining(void *);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-extern u32 gUnk_030052F8, gUnk_030052FC;
 // confidence=low: script-created region actor selects one of two sprite resources and registers its terrain cell.
 void RegionActor_CreateFromScript(void)
 {
-    struct RegionSpriteManager *manager = gUnk_020001B4;
+    struct RegionSpriteManager *manager = gRegionActorPool;
     struct RegionSprite *p;
     s32 width, height, x, z, cell;
     struct ContactSwarmSprite *sprite;
@@ -226,10 +226,10 @@ void RegionActor_CreateFromScript(void)
     ProximityActor_InitializeCollider(p, width, height);
     x = p->sprite.position.x >> 8;
     z = p->sprite.position.z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     TerrainModifiers_RegisterCell(p->terrainCell, cell, 0, p->sprite.position.y >> 8, 0, 128);
     {
         u32 bit = 0x20;

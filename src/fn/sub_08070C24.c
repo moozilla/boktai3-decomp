@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #include "player.h"
+#include "ram.h"
 s32 Path_GetPointPositionById(u16 *, u32, u32);
-extern u16 gUnk_02000544;
 u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *input,
                                                const struct ContactPosition *inputBounds)
 {
@@ -41,7 +41,7 @@ u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *i
     }
     {
         s32 index = 0;
-        s32 initialCount = gUnk_02000544;
+        s32 initialCount = gPlayerCount;
         if (index < initialCount) {
             s32 count;
             struct ContactPosition *delta = &difference;

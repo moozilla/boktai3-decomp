@@ -1,6 +1,6 @@
 #include "global.h"
 #include "area_effect_link.h"
-extern u32 gUnk_03005250;
+#include "ram.h"
 u8 Registry1745_ConsumeStateEntry(void *);
 s32 Registry1745_CheckSessionReady(void *);
 void Registry1745_BeginShutdown(void *, void *);
@@ -62,7 +62,7 @@ s32 LinkSelection_WaitForInputCompletion(struct AreaEffectLinkState *p)
     u16 keys;
     u32 flags;
     s32 ready, i;
-    gUnk_03005250 = 1;
+    gLinkMenuActive = 1;
     if (Registry1745_ConsumeStateEntry(p)) {
         StageIconDisplay_Create(1, 0, 0, p);
     }

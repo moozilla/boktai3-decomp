@@ -26,7 +26,7 @@ struct PooledEffect {
     struct EffectCollider collider, healthCollider;
 };
 extern const s16 gUnk_086149C4[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u8 gUnk_0203B400[];
 struct EffectPosition *SceneActors_GetAvailablePosition(void);
 s32 Math_Atan2(s32, s32);
@@ -57,9 +57,9 @@ void ActorEffect_UpdateApproachLaunch(void *owner, struct PooledEffect *effect, 
         asm("" ::: "memory");
         angle = Math_Atan2(effect->target->x - effect->position.x,
                            effect->target->z - effect->position.z);
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 off = gUnk_03005308 << 1;
+            u32 off = gRandomIndex << 1;
             const u8 *table4;
             table4 = (const u8 *)RANDOM_TABLE_ADDR;
             byte = *(const u8 *)(off + (u32)table4);

@@ -1,6 +1,6 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 u8 *Save_GetContinuationData(void)
 {
-    return gUnk_02000710 + 0x778;
+    return gGameState + 0x778;
 }

@@ -49,7 +49,7 @@ void RadialBurstEffect_EmitOrbitParticle(u8 *owner, struct Unk0823614CPosition *
         p->active = 1;
         p->origin = origin;
         table = gUnk_0203B400;
-        seed = &gUnk_03005308;
+        seed = &gRandomIndex;
         i = *seed + 1;
         mask = 1023;
         i &= mask;

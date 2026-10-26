@@ -1,7 +1,7 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 #define DirectionalSprite_InitEntry PlayerClone_InitSlot
-#define gDirectionalSpritePool      gUnk_020005F8
 struct DirectionalSprite {
     u8 unknown0[0x320];
     u8 foldedFacing;
@@ -17,14 +17,13 @@ struct DirectionalSpritePool {
     s16 values[16];
     u8 copiedData[32];
 };
-extern struct DirectionalSpritePool *gUnk_020005F8;
 void PlayerClone_InitSlot(void *, struct DirectionalSprite *, s32);
 s32 DirectionalSpritePool_Init(struct DirectionalSpritePool *pool)
 {
     struct DirectionalSprite *entry;
     s32 i;
     s16 *value;
-    gUnk_020005F8 = pool;
+    gDirectionalSpritePool = pool;
     pool->activeMask = 0;
     entry = pool->entries;
     i = 0;

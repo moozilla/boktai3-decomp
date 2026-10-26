@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_animation.h"
+#include "ram.h"
 struct ProximityActor {
     struct DisplaySequenceSprite sprite;
     u8 pad[0x90 - sizeof(struct DisplaySequenceSprite)];
@@ -19,7 +20,6 @@ struct Context {
     u8 pad[0x18];
     void *resource;
 };
-extern struct Context *gUnk_020001B4;
 void Anim_RestartSequence(struct DisplaySequenceState *, void *, u32, u32, u32);
 s32 Div(s32, s32);
 static inline u8 Test(struct ProximityActor *p, u32 mask)
@@ -141,7 +141,7 @@ static inline void Step(struct DisplaySequenceSprite *sp, struct DisplaySequence
 // confidence=low: health-derived animation and recovery; actor identity remains tentative.
 void ProximityActor_UpdateDamageAnimation(struct ProximityActor *p)
 {
-    struct Context *ctx = gUnk_020001B4;
+    struct Context *ctx = gRegionActorPool;
     s32 frame;
     if (!ctx)
         return;

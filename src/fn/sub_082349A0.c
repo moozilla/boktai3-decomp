@@ -9,7 +9,7 @@ struct Elem {
     void *data;
     void (*update)(struct Elem *);
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void SpriteDrawable_SelectTileFrame(struct Elem *, void *, u32);
 void FlickerParticle_UpdateVerticalMotion(struct Elem *);
@@ -17,8 +17,8 @@ s32 Mod(s32, s32);
 static inline s32 rnd(u16 *table)
 {
     s32 v;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    v = table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    v = table[gRandomIndex];
     return v >> 3;
 }
 void HealthRestoreEffect_InitRisingParticle(struct Elem *p)

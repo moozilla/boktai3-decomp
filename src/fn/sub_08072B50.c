@@ -16,7 +16,7 @@ void SceneActorScript_DispatchKindPayload(void *input)
 {
     struct SceneActorScriptPayloadView *descriptor = input;
     u32 kind;
-    if (!Test(gUnk_030053F4, 0x4800))
+    if (!Test(gEngineFlags, 0x4800))
         return;
     switch (descriptor->kind) {
         case 0:

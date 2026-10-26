@@ -12,7 +12,7 @@ void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resou
     particle->flags &= ~1;
     random = (const u16 *)RANDOM_TABLE_ADDR;
     {
-        register u32 *address asm("r1") = &gUnk_03005308;
+        register u32 *address asm("r1") = &gRandomIndex;
         indexAddress = address;
         index = *address + 1;
     }

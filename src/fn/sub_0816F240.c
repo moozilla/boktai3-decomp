@@ -2,7 +2,7 @@
 #include "global.h"
 #include "scene_hud_display.h"
 #include "player.h"
-extern u32 gUnk_03005308;
+#include "engine.h"
 s32 Mod(s32, s32);
 void MessageWindow_Clear(void);
 void ScrollingDialogue_ClearScript(void);
@@ -16,12 +16,12 @@ void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
 void SceneHud_AnimateActionResult(void);
 static inline s32 Panel_RandomPercent(void)
 {
-    u32 next = gUnk_03005308 + 1;
+    u32 next = gRandomIndex + 1;
     u16 mask;
     asm("" ::: "r1");
     mask = 0x3FF;
-    gUnk_03005308 = next & mask;
-    return Mod(*(u16 *)((gUnk_03005308 << 1) + RANDOM_TABLE_ADDR), 100);
+    gRandomIndex = next & mask;
+    return Mod(*(u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR), 100);
 }
 void ScenePanel_BeginRandomTransition(u8 *s)
 {

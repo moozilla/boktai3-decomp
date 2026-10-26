@@ -2,7 +2,7 @@
 // fix.py best version (reprinted C)
 extern u8 *gUnk_02000154;
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 u8 *ScriptedParticle_EnsurePool(void);
 u8 *ScriptedParticle_AllocateSlot(u8 *);
 void AnimData_Load(u8 *, u32);
@@ -53,7 +53,7 @@ void SpriteParticle_Create(u32 *a, s32 b, s32 c, s32 d, s32 e, u32 f, s32 g, s32
     Anim_SetSequence(s + 0x48, *((void **)(context + 0x18)), (u16)p, (u8)q, zero);
     AnimData_SelectPaletteBank(resource, r);
     table = gUnk_0203B400;
-    rng = &gUnk_03005308;
+    rng = &gRandomIndex;
     mask = 0x3FF;
     *rng = ((*rng) + 1) & 0x3FF;
     t2 = Mod(table[*rng], c) + b;

@@ -1,6 +1,6 @@
 #include "global.h"
 
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 
 void SceneActorStyle_InitializeFromGameState(u8 *);
 void CharacterModel_SetComponentKeyframes(u8 *, u8 *);
@@ -12,5 +12,5 @@ void ModifierMenu_RefreshPreviewModel(u8 *p)
     u8 *b = p + 0xE34;
     SceneActorStyle_InitializeFromGameState(p + 0x884);
     CharacterModel_SetComponentKeyframes(a, b);
-    CharacterModel_LoadSecondaryPalette(b, *(s16 *)(gUnk_02000710 + 0x81A));
+    CharacterModel_LoadSecondaryPalette(b, *(s16 *)(gGameState + 0x81A));
 }

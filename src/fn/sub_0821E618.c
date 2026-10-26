@@ -16,7 +16,7 @@ struct C {
     struct D *f4;
     u8 *f8;
 };
-extern struct A *gUnk_030052F4;
+extern struct A *gTerrainMap;
 u32 Route_AdvancePoint(struct C *c)
 {
     u8 *base;
@@ -24,7 +24,7 @@ u32 Route_AdvancePoint(struct C *c)
     if (c->f2 >= c->f4->cnt)
         c->f2 = 0;
     c->f3 = 0;
-    base = gUnk_030052F4->f10;
+    base = gTerrainMap->f10;
     c->f8 = base + c->f4->off + (c->f2 << 3);
     return 1;
 }

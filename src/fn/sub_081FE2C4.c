@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 struct OrbitEffectPosition {
     s16 x, y, z, pad;
@@ -78,7 +79,7 @@ struct OrbitEffectManager {
     s32 count;
     struct OrbitEffectTarget *target;
 };
-extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
+extern u32 gUnk_030053F0, gUnk_02000560;
 extern const s16 gUnk_086149C4[];
 s32 sub_08249240(void *, void *, void *);
 void OrbitEffect_RemoveSlot(struct OrbitEffectManager *, struct OrbitEffect *, s32);
@@ -151,7 +152,7 @@ s32 OrbitEffect_UpdateManager(struct OrbitEffectManager *manager)
             u32 mask;
             params = &effect->params;
             mask = 0x400;
-            if ((gUnk_030053F4 | gUnk_030053F0) & mask)
+            if ((gEngineFlags | gUnk_030053F0) & mask)
                 goto next;
             {
                 u32 pause = 4;

@@ -1,8 +1,8 @@
 #include "global.h"
+#include "engine.h"
 struct Pair {
     u32 a, b;
 };
-extern u32 gUnk_030053F4;
 void SolarBomb_InitSprite(u8 *);
 void sub_08234138(u8 *);
 s32 Div(s32, s32);
@@ -25,7 +25,7 @@ s32 SolarBomb_Init(u8 *p, u8 *owner, struct Pair *v, u16 mode)
     (*(u8 **)(p + 0x18))[0x4ef]++;
     if (H(0x1d0))
         H(0x1d4) = 120;
-    else if (gUnk_030053F4 & 2048)
+    else if (gEngineFlags & 2048)
         H(0x1d4) = 90;
     else
         H(0x1d4) = 180;

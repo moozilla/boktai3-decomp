@@ -1,8 +1,5 @@
 #include "global.h"
 #include "animated_hazard.h"
-#define gTerrainMap    gUnk_030052F4
-#define gTerrainWidth  gUnk_030052F8
-#define gTerrainHeight gUnk_030052FC
 struct ScriptCombatActor {
     u8 pad0[0x40];
     struct SceneVec position;

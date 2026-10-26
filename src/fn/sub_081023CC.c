@@ -1,8 +1,7 @@
 #include "named_object.h"
 #include "player.h"
+#include "engine.h"
 extern const struct SceneVec gUnk_086064C4;
-extern struct EngineMap *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
 s32 TetherActor_TestStatusFlags(u32);
 void TetherActor_CopyPosition(struct SceneVec *);
 void TetherActor_SetPosition(struct SceneVec *);
@@ -36,10 +35,10 @@ void NamedObject_ConstrainTether(struct NamedObject *o)
     TetherActor_CopyPosition(&tether);
     x = ((struct SceneVec *)&o->x)->x >> 8;
     z = ((struct SceneVec *)&o->x)->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     if (NamedObject_IsMapCellOccupied(cell) && tether.y == o->y)
         return;
     Difference(&delta, (struct SceneVec *)&o->x, &tether);

@@ -64,7 +64,7 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
     register struct Transform *transform asm("r5") = (void *)&input->id;
     struct ContactPackedVector target;
     register const u16 *table asm("r6") = gUnk_0203B400;
-    register u32 *indexAddress asm("sl") = &gUnk_03005308;
+    register u32 *indexAddress asm("sl") = &gRandomIndex;
     u32 rawIndex = *indexAddress + 1;
     register u32 mask asm("sb") = 1023;
     u16 index = rawIndex & mask;

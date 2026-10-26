@@ -66,7 +66,7 @@ void sub_08072854(void)
                         sink = SceneActorReaction_SinkAndRemove;
                     Sub08072854_Sink(actor, sink);
                 }
-            } else if ((cellFlags & 0x80) && (*(u32 *)((u8 *)gUnk_02000710 + 0x868) & 0x10) &&
+            } else if ((cellFlags & 0x80) && (*(u32 *)((u8 *)gGameState + 0x868) & 0x10) &&
                        *(u16 *)((u8 *)actor + 0x178) == 0) {
                 struct ContactPosition center, delta;
                 u8 *collider = (u8 *)actor + 0x134;

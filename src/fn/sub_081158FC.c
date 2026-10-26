@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 void Sprite_Remove(void *);
-extern u32 gUnk_020001E4;
 u32 Collectible_DestroyManager(u8 *p)
 {
     u8 *e = p + 0x34;
@@ -12,7 +12,7 @@ u32 Collectible_DestroyManager(u8 *p)
     } while (i >= 0);
     {
         u32 z = 0;
-        gUnk_020001E4 = z;
+        gActorParticlePool = z;
     }
     return 0;
 }

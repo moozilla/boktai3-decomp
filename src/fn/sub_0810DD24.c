@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 struct PreviewPosition {
     u32 x : 16, y : 16, z : 16, pad : 16;
@@ -10,7 +11,7 @@ struct PreviewSource {
     u8 values[5];
 };
 extern struct PreviewSource *gUnk_020004B4;
-extern u32 gUnk_030053F4, gUnk_030053F0;
+extern u32 gUnk_030053F0;
 void CharacterModel_InitPalettes(u8 *, s32);
 void ActorSprite_InitPartDrawings(void *, void *, u32);
 void CharacterPreview_PositionParts(void *, void *, void *, s32);
@@ -23,7 +24,7 @@ void SelectionPanel_InitPreview(u8 *p)
     u8 *base, *sprite;
     u32 frame;
     u32 mask = 0x800;
-    u32 flags = (gUnk_030053F4 | gUnk_030053F0) & mask;
+    u32 flags = (gEngineFlags | gUnk_030053F0) & mask;
     if (flags) {
         register u32 offset asm("r4");
         struct PreviewSource *source = gUnk_020004B4;

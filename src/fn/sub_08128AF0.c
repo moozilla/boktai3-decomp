@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_02000170;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 FragmentBurst_InitPool(u8 *);
@@ -11,8 +11,8 @@ void SpriteGroupPool_Destroy(void);
 u8 *FragmentBurst_EnsurePool(void)
 {
     u8 *p;
-    if (gUnk_02000170 != 0)
-        return gUnk_02000170;
+    if (gSpriteGroupPool != 0)
+        return gSpriteGroupPool;
     p = Task_Create(0xa, 0x5bc);
     if (p != 0) {
         Task_SetCallbacks(p, sub_08128A00, SpriteGroupPool_Destroy);

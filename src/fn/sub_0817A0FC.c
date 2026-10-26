@@ -1,7 +1,6 @@
 #include "global.h"
-#define gRandomIndex gUnk_03005308
+#include "engine.h"
 #define gRandomTable gUnk_0203B400
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 s32 Path_GetPointPositionById(u16 *, u32, u32);

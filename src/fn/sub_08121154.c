@@ -1,5 +1,6 @@
 #include "global.h"
-#define gActorManager gUnk_0200020C
+#include "engine.h"
+#include "ram.h"
 struct ManagedActor {
     u8 unknown0[0x56C];
     u8 contact[0x8C];
@@ -13,8 +14,7 @@ struct ActorManager {
     u8 task[0x18];
     struct ManagedActor actors[1];
 };
-extern void *gUnk_0200020C;
-extern u32 gUnk_030053F4, gUnk_030053F0;
+extern u32 gUnk_030053F0;
 void Anim_Remove(void *);
 void SpatialIndex_RemoveEntry(void *);
 void SceneMessages_UnregisterReceiver(void *);
@@ -31,7 +31,7 @@ static inline void DestroyActors(struct ActorManager *manager, s32 i, u32 mask)
             } while (--j >= 0);
             actor = &manager->actors[i];
             SpatialIndex_RemoveEntry(actor->contact);
-            if (!((gUnk_030053F4 | gUnk_030053F0) & mask))
+            if (!((gEngineFlags | gUnk_030053F0) & mask))
                 SceneMessages_UnregisterReceiver(actor->drawable);
         }
     } while (++i <= 0);
@@ -39,7 +39,7 @@ static inline void DestroyActors(struct ActorManager *manager, s32 i, u32 mask)
 
 static inline void ClearManager(u32 zero)
 {
-    gUnk_0200020C = (void *)zero;
+    gActorManager = (void *)zero;
 }
 u8 ActorManager_Destroy(struct ActorManager *manager)
 {

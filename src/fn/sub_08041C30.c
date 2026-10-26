@@ -16,17 +16,17 @@ void ModifierMenu_LoadSavedSelection(struct ModifierMenu *menu)
 {
     struct ModifierSelection *pending = &menu->pending;
     s32 i;
-    pending->sourceIds[0] = gUnk_02000710->unk7A0[0];
+    pending->sourceIds[0] = gGameState->unk7A0[0];
     Modifier_LoadFirstSource(pending);
-    pending->sourceIds[1] = gUnk_02000710->unk7A0[2];
+    pending->sourceIds[1] = gGameState->unk7A0[2];
     Modifier_LoadSecondSource(pending, &menu->current);
-    pending->sourceIds[2] = gUnk_02000710->unk7A0[1];
+    pending->sourceIds[2] = gGameState->unk7A0[1];
     Modifier_LoadThirdSource(pending);
-    pending->sourceIds[3] = gUnk_02000710->unk7A0[3];
+    pending->sourceIds[3] = gGameState->unk7A0[3];
     Modifier_LoadFourthSource(pending);
     pending->count = 0;
     for (i = 0; i < 4; i++) {
-        register struct GameState *state asm("r0") = gUnk_02000710;
+        register struct GameState *state asm("r0") = gGameState;
         s16 *row;
         register s32 id asm("r0");
         row = (s16 *)(i * 2 + (u32)state);
@@ -36,10 +36,10 @@ void ModifierMenu_LoadSavedSelection(struct ModifierMenu *menu)
             Modifier_AddSelection(pending, argument);
         }
     }
-    pending->selectedId = ((s16 *)gUnk_02000710->modifierIdsBytes)[0];
+    pending->selectedId = ((s16 *)gGameState->modifierIdsBytes)[0];
     if (pending->selectedId < 0)
         pending->selectedId = 0;
-    pending->secondaryId = gUnk_02000710->unk81A;
+    pending->secondaryId = gGameState->unk81A;
     ModifierMenu_CommitFirstSource(menu);
     ModifierMenu_CommitSecondSource(menu);
     ModifierMenu_CommitThirdSource(menu);

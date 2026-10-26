@@ -1,8 +1,9 @@
 #include "global.h"
+#include "ram.h"
 
 extern s32 gUnk_03001690, gUnk_03001698, gUnk_030016A0, gUnk_030016A4;
 extern u8 gUnk_030016A8[64], gUnk_030016E8[64];
-extern s32 gUnk_03005324, gUnk_03005310;
+extern s32 gUnk_03005310;
 extern u16 gUnk_0300530C;
 
 /* Timer 3 handler for the multiplayer serial link: reads the three peer
@@ -16,9 +17,9 @@ void sub_082225FC(void)
     gUnk_0300530C = a;
     if ((*(vu16 *)0x04000128 & 0xC0) || b != 0xFFFF || c != b) {
         if (b != 0xFFFF || c != b)
-            gUnk_03005324 = -7;
+            gSerialTransferStatus = -7;
         else
-            gUnk_03005324 = -8;
+            gSerialTransferStatus = -8;
     } else {
         if ((a & 0x2000) && a != c) {
             gUnk_030016A8[gUnk_03001690] = a;

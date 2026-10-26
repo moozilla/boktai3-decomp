@@ -41,8 +41,8 @@ void Particle_UpdateHoming(u8 *actor, struct HomingParticle *p)
     if (dx * dx + dz * dz <= 99) {
         p->state = 1;
         p->speed = 0;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-        p->angle = ((const u16 *)0x0203B400)[gUnk_03005308];
+        gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+        p->angle = ((const u16 *)0x0203B400)[gRandomIndex];
     } else {
         s32 height;
         sprite->x += vx;

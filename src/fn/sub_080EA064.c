@@ -53,15 +53,15 @@ static inline u8 TestFlags(u32 value, u32 mask)
 
 static inline void CellCenter(struct SceneVec *out, u32 cell)
 {
-    s32 x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-    s32 z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+    s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
+    s32 z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
     u8 *data;
     out->x = (x << 8) + 0x80;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
+        data = gTerrainMap->cells + (cell * 4 + 12);
     out->y = (*data & 15) << 8;
     out->z = (z << 8) + 0x80;
 }
@@ -148,7 +148,7 @@ static inline s32 HudMode(void)
 
 static inline u8 MayCount(struct SceneActorRegistryResetView *victim)
 {
-    if (TestFlags(gUnk_030053F4, 0x4800)) {
+    if (TestFlags(gEngineFlags, 0x4800)) {
         u32 value = victim->field2E0;
         if (!(value & 0x20) && value) {
             switch (HudMode()) {

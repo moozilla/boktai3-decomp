@@ -65,7 +65,7 @@ struct RecScore {
     s16 draws;
 };
 extern struct RecActor *gUnk_020004B4;
-extern struct RecScore *gUnk_02000710;
+extern struct RecScore *gGameState;
 void Anim_SelectWidgetGlyph(void *, void *, u16);
 void Sound_PlayTrackedSong(u32);
 static inline s32 Clamp999(s32 x)
@@ -77,8 +77,7 @@ static inline s32 Clamp999(s32 x)
     return x;
 }
 /* The store goes through a plain s16 lvalue (not a struct field), so the score pointer is reloaded after it. */
-#define CLAMP_SCORE(field, off)                                                                    \
-    *(s16 *)((u8 *)gUnk_02000710 + off) = Clamp999(gUnk_02000710->field);
+#define CLAMP_SCORE(field, off) *(s16 *)((u8 *)gGameState + off) = Clamp999(gGameState->field);
 static inline s32 ActorSide(void)
 {
     struct RecActor *a = gUnk_020004B4;
@@ -111,7 +110,7 @@ void RecordMenu_DrawRecords(struct RecordMenu *menu)
             *cell++ = one;
     }
     if (rec->ticksA == rec->ticksB) {
-        gUnk_02000710->draws++;
+        gGameState->draws++;
         menu->spriteIds[4] = 0x37;
         menu->spriteIds[5] = 0x37;
         for (i = 4; i <= 5; i++)
@@ -120,9 +119,9 @@ void RecordMenu_DrawRecords(struct RecordMenu *menu)
         menu->sprites[5].x = 0x90;
     } else if (rec->ticksA < rec->ticksB) {
         if (gUnk_020004B4 != 0 && gUnk_020004B4->side == 0)
-            gUnk_02000710->wins++;
+            gGameState->wins++;
         else
-            gUnk_02000710->losses++;
+            gGameState->losses++;
         menu->sprites[4].x = 0;
         menu->sprites[5].x = 0x90;
         if (gUnk_020004B4 != 0 && gUnk_020004B4->side == 0)
@@ -130,9 +129,9 @@ void RecordMenu_DrawRecords(struct RecordMenu *menu)
     } else {
         s32 side = ActorSide();
         if (side == 1)
-            gUnk_02000710->wins++;
+            gGameState->wins++;
         else
-            gUnk_02000710->losses++;
+            gGameState->losses++;
         menu->sprites[4].x = 0x90;
         menu->sprites[5].x = 0;
         side = ActorSide();

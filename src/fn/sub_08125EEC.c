@@ -1,7 +1,7 @@
 #include "global.h"
+#include "ram.h"
 #define SpriteBurst_AllocateEntry      SceneMovingParticle_AllocateEntry
 #define SpriteBurst_GetOrCreateManager SceneMovingParticle_EnsurePool
-#define gSpriteBurstManager            gUnk_02000150
 struct SpriteBurstPair {
     u32 x, y;
 };
@@ -21,7 +21,6 @@ struct SpriteBurstManager {
     u8 unknown0[0x18];
     void *resource;
 };
-extern struct SpriteBurstManager *gUnk_02000150;
 struct SpriteBurstManager *SceneMovingParticle_EnsurePool(void);
 struct SpriteBurstEntry *SceneMovingParticle_AllocateEntry(struct SpriteBurstManager *);
 void ParticleSprite_Initialize(struct SpriteBurstEntry *, void *, u32);
@@ -32,7 +31,7 @@ struct SpriteBurstEntry *SpriteBurst_Create(struct SpriteBurstPair *pos,
                                             struct SpriteBurstPair *velocity, u32 kind,
                                             u32 direction, u32 mode)
 {
-    struct SpriteBurstManager *manager = gUnk_02000150;
+    struct SpriteBurstManager *manager = gSpriteBurstManager;
     struct SpriteBurstEntry *entry;
     u32 frame;
     if (!manager) {

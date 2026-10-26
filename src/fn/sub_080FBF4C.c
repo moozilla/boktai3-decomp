@@ -5,7 +5,7 @@
 #define ActorRoute_SelectDistantPoint ActorPhase_SelectDistantWaypoint
 #define ActorRoute_RememberPoint      Axe_RecordRoutePoint
 #define ActorRoute_IsRecentPoint      Axe_IsRoutePointRecent
-#define gRandomTableIndex             gUnk_03005308
+#define gRandomTableIndex             gRandomIndex
 #define gRandomTable                  gUnk_0203B400
 struct RoutePointSelection {
     u16 id;
@@ -36,9 +36,9 @@ static inline u32 Random(void)
 }
 inline static u32 Random_SelectDistantWaypoint(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
     {
-        u32 offset = gUnk_03005308 * 2;
+        u32 offset = gRandomIndex * 2;
         const u16 *table = *((typeof(gUnk_0203B400) *)0x0203B400);
         return *((u16 *)(offset + ((u32)table)));
     }

@@ -1,5 +1,5 @@
-#define gScriptRecordTable gUnk_02000208
 #include "global.h"
+#include "ram.h"
 struct ScriptByteModifier {
     s8 id;
     u8 kind;
@@ -18,11 +18,10 @@ struct ByteModifierResult {
     u8 a, b;
     u16 value;
 };
-extern struct ScriptRecordTable *gUnk_02000208;
 s32 ScriptRecord_FindByteModifier(struct ByteModifierResult *out, s32 id)
 {
     struct ScriptRecordTable *p;
-    struct ScriptRecordTable *table = gUnk_02000208;
+    struct ScriptRecordTable *table = gScriptRecordTable;
     s32 i;
     if (table)
         goto search;

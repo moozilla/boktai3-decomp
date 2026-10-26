@@ -3,11 +3,11 @@ struct S {
     u8 f[0x77c];
     s32 x;
 };
-extern struct S *gUnk_02000710;
+extern struct S *gGameState;
 void PlayerBarrier_DecrementDuration(void)
 {
-    if (gUnk_02000710->x <= 1)
-        gUnk_02000710->x = 0;
+    if (gGameState->x <= 1)
+        gGameState->x = 0;
     else
-        gUnk_02000710->x--;
+        gGameState->x--;
 }

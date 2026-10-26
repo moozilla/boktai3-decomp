@@ -1,7 +1,8 @@
 #include "global.h"
+#include "engine.h"
 
 // foundry draft (worker best 91.7%); what differs is mostly register allocation and instruction order
-#define gEffectRandomIndex gUnk_03005308
+#define gEffectRandomIndex gRandomIndex
 #define gEffectRandomTable gUnk_0203B400
 
 struct EffectMotion {
@@ -14,7 +15,6 @@ struct EffectSourceObject {
     u8 unk00[0xc];
     struct EffectMotion position;
 };
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Div(s32, s32);
 s32 SpriteEffect_SpawnWithMotion(struct EffectSourceObject *, struct EffectSourceObject *,
@@ -31,9 +31,9 @@ s32 SpriteEffect_SpawnTowardObject(struct EffectSourceObject *source,
     motion.x = target->position.x - source->position.x;
     motion.z = target->position.z - source->position.z;
     tbl = gUnk_0203B400;
-    gUnk_03005308 = (gUnk_03005308 + 1) & k2;
+    gRandomIndex = (gRandomIndex + 1) & k2;
     {
-        u32 v = tbl[gUnk_03005308];
+        u32 v = tbl[gRandomIndex];
         u32 m = 63;
         duration = (v & m) + 30;
     }
@@ -41,7 +41,7 @@ s32 SpriteEffect_SpawnTowardObject(struct EffectSourceObject *source,
     motion.z = Div(motion.z, duration);
     {
         s32 q = Div(duration, 2);
-        u32 v = tbl[gUnk_03005308 = (gUnk_03005308 + 1) & 1023];
+        u32 v = tbl[gRandomIndex = (gRandomIndex + 1) & 1023];
         u32 m = 7;
         motion.y = q + (v & m);
     }

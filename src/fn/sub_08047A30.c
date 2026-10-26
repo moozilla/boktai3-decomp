@@ -30,7 +30,7 @@ s32 BackgroundFlash_Initialize(struct BackgroundFlashController *controller, voi
     }
     BackgroundFlash_LoadPalette();
     table = (const u16 *)RANDOM_TABLE_ADDR;
-    index = gUnk_03005308 + 1;
+    index = gRandomIndex + 1;
     mask = 1023;
     index &= mask;
     sample = table[index];
@@ -45,7 +45,7 @@ s32 BackgroundFlash_Initialize(struct BackgroundFlashController *controller, voi
     sample -= 4;
     controller->speed = sample;
     index = (index + 1) & mask;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     lastSample = (const u16 *)((index << 1) + (u32)table);
     sample = *lastSample;
     sample &= sampleMask;

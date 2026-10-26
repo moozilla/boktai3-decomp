@@ -11,9 +11,9 @@ static inline s32 CellIndex(u16 *a)
 {
     s32 x = ((s16)a[0]) >> 8;
     s32 z = ((s16)a[2]) >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u32 AboveCell(u16 *a, s32 cell)
 {
@@ -35,11 +35,11 @@ s32 Task4E01_ResolveTerrainDirection(u16 *input, s32 direction)
     TerrainModifiers_FindCellOverride(CellIndex(input), 1);
     x = ((s16)input[0]) >> 8;
     z = ((s16)input[2]) >> 8;
-    widthPtr = &gUnk_030052F8;
-    if (x < 0 || z < 0 || (u32)x >= *widthPtr || (u32)z >= gUnk_030052FC)
+    widthPtr = &gTerrainWidth;
+    if (x < 0 || z < 0 || (u32)x >= *widthPtr || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     dimensions = *(struct TerrainDimensions *)widthPtr;
     width = dimensions.width;
     if (direction == 0) {

@@ -1,9 +1,8 @@
 #include "global.h"
-
-extern u32 gUnk_0200020C;
+#include "ram.h"
 
 s32 RegistryA8CB_InitManager(u32 a)
 {
-    gUnk_0200020C = a;
+    gActorManager = a;
     return 0;
 }

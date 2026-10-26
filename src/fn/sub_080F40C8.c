@@ -1,6 +1,6 @@
 #include "global.h"
 #define ChildGroup_UpdateVerticalOscillation Ivy_UpdateBobbing
-#define gChildGroupRandomIndex               gUnk_03005308
+#define gChildGroupRandomIndex               gRandomIndex
 #define gChildGroupRandomTable               gUnk_0203B400
 struct ChildGroup {
     u8 pad0[0x8D];
@@ -16,7 +16,7 @@ struct ChildGroup {
     u8 padD2E[0x27];
     u8 mode;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void sub_080F33BC(struct ChildGroup *);
 void Sword_UpdateSpinningLungeAttack(struct ChildGroup *);
@@ -46,10 +46,10 @@ void ChildGroup_UpdateAlternatingCallbacks(struct ChildGroup *p)
     if (EnterState(p)) {
         p->timerD28 = 0;
         {
-            u32 random = (gUnk_03005308 + 1) & 0x3FF;
+            u32 random = (gRandomIndex + 1) & 0x3FF;
             u32 value;
             const u16 *table;
-            gUnk_03005308 = random;
+            gRandomIndex = random;
             random <<= 1;
             table = (u16 *)0x0203B400;
             value = *(u16 *)(random + (u32)table);

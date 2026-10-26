@@ -12,7 +12,7 @@ s32 SceneInventory_ClassifyItemAction(struct SceneInventoryControlView *panel)
         if (entry < 0)
             goto invalid;
         {
-            s32 funds = gUnk_02000710->unk7B0;
+            s32 funds = gGameState->unk7B0;
             if (funds < (s32)SceneItemValue_GetItemBaseValue(entry))
                 goto invalid;
         }

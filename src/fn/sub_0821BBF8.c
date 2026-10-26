@@ -8,10 +8,10 @@ struct A {
     u8 p[4];
     struct H *f4;
 };
-extern struct A *gUnk_030052F4;
-extern s32 gUnk_030052F8, gUnk_030052FC;
+extern struct A *gTerrainMap;
+extern s32 gTerrainWidth, gTerrainHeight;
 void Terrain_UpdateSize(void)
 {
-    gUnk_030052F8 = gUnk_030052F4->f4->w;
-    gUnk_030052FC = gUnk_030052F4->f4->h;
+    gTerrainWidth = gTerrainMap->f4->w;
+    gTerrainHeight = gTerrainMap->f4->h;
 }

@@ -1,10 +1,10 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 f[0x4];
     u8 b;
     u8 pad[0xdb];
 };
-extern u32 gUnk_020004CC;
 void Sprite_Remove(void *);
 s32 BallisticSpriteEffect_DestroyManager(u8 *s)
 {
@@ -18,6 +18,6 @@ s32 BallisticSpriteEffect_DestroyManager(u8 *s)
         p++;
     } while (--i >= 0);
     z = 0;
-    gUnk_020004CC = z;
+    gSceneProcSprites = z;
     return 0;
 }

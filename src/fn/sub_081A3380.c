@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct G {
     u8 f[0x3c];
     s32 n;
@@ -8,10 +9,9 @@ struct P {
     u8 f[0x8a - 4];
     u16 h;
 };
-extern struct G *gUnk_02000238;
 void Hresvelgr_ReleaseShot(struct P *p)
 {
-    struct G *g = gUnk_02000238;
+    struct G *g = gDirectionBurstEmitter;
     if (p != 0) {
         g->n--;
         p->fl |= 1;

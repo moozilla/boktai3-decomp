@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_02000140;
+#include "ram.h"
 
 void SceneScheduledEffect_ResetSingleton(void)
 {
-    gUnk_02000140 = 0;
+    gAnimatedBodyPool = 0;
 }

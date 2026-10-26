@@ -1,7 +1,7 @@
 #include "contact_actor.h"
 #include "player.h"
 #include "scene_actor_contact_list.h"
-extern u16 gUnk_02000544;
+#include "ram.h"
 struct RetargetActorView {
     u8 unknown0[0xDC];
     void *targetSource;
@@ -20,7 +20,7 @@ void SceneActorAttachment_RetargetNearestPlayer(struct RetargetActorView *input,
     /* Only the three named halfwords are read. Padding remains unspecified. */
     struct ContactPosition difference;
     s32 initialCount;
-    initialCount = gUnk_02000544;
+    initialCount = gPlayerCount;
     if ((s32)nearest < initialCount) {
         struct ContactPosition *delta = &difference;
         struct Player **slot = gUnk_02000580;

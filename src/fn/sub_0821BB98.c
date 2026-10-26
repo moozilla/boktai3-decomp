@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 struct A {
     u8 p[4];
     u16 *f4;
@@ -8,10 +9,9 @@ struct A {
     u16 f20;
     u16 f22;
 };
-extern struct A *gUnk_030052F4;
 void Terrain_SetNeighborOffsets(void)
 {
-    struct A *a = gUnk_030052F4;
+    struct A *a = gTerrainMap;
     u16 *s = a->f4;
     a->f1c = -s[2];
     a->f1e = 1;

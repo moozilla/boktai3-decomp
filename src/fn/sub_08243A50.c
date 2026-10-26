@@ -2,13 +2,13 @@
 #include "engine.h"
 #include "game_state.h"
 #include "player.h"
+#include "ram.h"
 struct LinkRef {
     u8 unk0[0x18];
     s16 bit;
 };
 extern struct LinkRef *gUnk_020004B4;
 extern u32 gUnk_02000560[];
-extern u16 gUnk_02000544;
 void LinkPlayer_ReadSlotFromScript(void);
 void sub_0823ADB4(struct Player *);
 void KeyframeActor_InitBodyFromScript(struct Player *, void *);
@@ -35,12 +35,12 @@ s32 Player_OnCreate(struct Player *p, void *script)
     sub_0823A3CC(p);
     gUnk_02000560[p->slot] = p->kind;
     if (p->slot == LocalPlayer()) {
-        *(u16 *)((u8 *)gUnk_02000710 + 0x30) = p->position.x;
-        *(u16 *)((u8 *)gUnk_02000710 + 0x32) = p->position.y;
-        *(u16 *)((u8 *)gUnk_02000710 + 0x34) = p->position.z;
-        *(u16 *)((u8 *)gUnk_02000710 + 0x85E) = ((p->facing + 5) & 7) << 5;
+        *(u16 *)((u8 *)gGameState + 0x30) = p->position.x;
+        *(u16 *)((u8 *)gGameState + 0x32) = p->position.y;
+        *(u16 *)((u8 *)gGameState + 0x34) = p->position.z;
+        *(u16 *)((u8 *)gGameState + 0x85E) = ((p->facing + 5) & 7) << 5;
     }
     gUnk_02000580[p->movementRequestBlocked] = p;
-    gUnk_02000544++;
+    gPlayerCount++;
     return 0;
 }

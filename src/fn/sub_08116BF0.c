@@ -10,13 +10,13 @@ struct G {
     s16 h;
 };
 extern struct Q *gUnk_020004F0;
-extern struct G *gUnk_02000710;
+extern struct G *gGameState;
 void Character_SetLowResourceColorEffect(void *, void *);
 void Player_RestoreCurrentHealth(void)
 {
     struct Q *q = gUnk_020004F0;
     if (q != 0) {
-        q->v = gUnk_02000710->h;
+        q->v = gGameState->h;
         Character_SetLowResourceColorEffect(q->a, q->b);
     }
 }

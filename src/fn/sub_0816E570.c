@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-extern u32 gUnk_03005308;
+#include "engine.h"
 extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void MessageWindow_Clear(void);
@@ -55,7 +55,7 @@ void sub_0816E570(u8 *s)
     pos.x += 8;
     pos.y += 8;
     table = gUnk_0203B400;
-    index = &gUnk_03005308;
+    index = &gRandomIndex;
     w.x = -6 - Mod(NextRandom(), 3);
     w.y = -5 - Mod(NextRandom(), 5);
     speed = Mod(NextRandom(), 10) + 5;

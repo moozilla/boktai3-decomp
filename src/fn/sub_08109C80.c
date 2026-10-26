@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "render.h"
+#include "ram.h"
 struct ScriptPanel {
     u8 unk0[0x30];
     u32 counter;
@@ -31,11 +32,11 @@ s32 TextWindow_Create(s32, s32, s32, s32);
 void Hud_SetMode(s32);
 void TextWindow_StartPlayback(s32);
 void SpriteOam_ResetQueue(s32);
-extern u32 gUnk_03005250, gUnk_03005408;
+extern u32 gUnk_03005408;
 s32 ScriptPanel_OpenTextWindow(struct ScriptPanel *p)
 {
     if (Registry1745_ConsumeStateEntry(p)) {
-        gUnk_03005250 = 0;
+        gLinkMenuActive = 0;
         {
             u32 mask = 4;
             gEnginePauseFlags |= mask;

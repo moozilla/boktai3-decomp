@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 // Remaining differences: projection source register and vertical-bound operand allocation.
 struct Vec {
@@ -19,7 +20,6 @@ struct Sprite {
     u32 previous;
     struct Sprite *next;
 };
-extern u32 gUnk_03003A50;
 extern struct Sprite *gUnk_030042C0[];
 extern u16 gUnk_03005418[];
 void sub_08214600(struct Sprite *, s32, s32, s32);
@@ -58,7 +58,7 @@ void Sprite_RenderFlipAwareList(void)
 {
     struct Vec pos;
     struct Sprite *p;
-    u32 parity = gUnk_03003A50 & 1;
+    u32 parity = gSceneEffectPalettePhase & 1;
     u32 skip = 0x401;
     if (parity) {
         skip = 0x201;

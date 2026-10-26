@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 u8 Save_LoadSelectedSlot(void);
 u8 Save_LoadAlternateSlot(void);
 void GameState_BackupActiveRegions(s32);
@@ -9,22 +9,22 @@ s32 ScreenParams3F8_SelectValidDataBank(void)
     s16 flag;
     int failure;
     if (Save_LoadSelectedSlot()) {
-        *((u16 *)(gUnk_02000710 + 0x86e)) = 1;
+        *((u16 *)(gGameState + 0x86e)) = 1;
         r = 1;
     } else {
         u8 v = Save_LoadAlternateSlot();
         if (v) {
-            *((u16 *)(gUnk_02000710 + 0x86e)) = 1;
+            *((u16 *)(gGameState + 0x86e)) = 1;
             r = 0;
         } else {
-            *((u16 *)(gUnk_02000710 + 0x86e)) = v;
+            *((u16 *)(gGameState + 0x86e)) = v;
             failure = -1;
             r = failure;
         }
     }
-    flag = *((s16 *)(gUnk_02000710 + 0x86e));
+    flag = *((s16 *)(gGameState + 0x86e));
     if (flag) {
-        flag = *((s16 *)(gUnk_02000710 + 0x86e));
+        flag = *((s16 *)(gGameState + 0x86e));
         GameState_BackupActiveRegions(flag);
     }
     return r;

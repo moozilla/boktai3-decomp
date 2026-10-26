@@ -6,6 +6,7 @@
 // fix.py best version (reprinted C)
 // Remaining differences: pointer lifetimes, flag-test address reuse, and decoder register allocation.
 #include "contact_swarm.h"
+#include "ram.h"
 struct RegionSprite {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x90 - 0x2C];
@@ -25,7 +26,6 @@ struct RegionSpriteManager {
     u8 unknown0[0x18];
     const void *sequenceResource, *alternateResource;
 };
-extern struct RegionSpriteManager *gUnk_020001B4;
 void ProximityActor_UpdateDamageAnimation(struct RegionSprite *);
 void sub_0810638C(struct RegionSprite *);
 static inline u8 Test(u32 *flags, u32 bit)
@@ -399,7 +399,7 @@ inline static u32 Step_1(struct ContactSwarmSprite *sprite, struct ContactSwarmS
 void RegionActor_UpdateBehaviorAnimation(struct RegionSprite *input)
 {
     struct RegionSprite *p = input;
-    struct RegionSpriteManager *manager = gUnk_020001B4;
+    struct RegionSpriteManager *manager = gRegionActorPool;
     typeof(&p->behaviorFlags) t1;
     if (manager) {
         p->sprite.flags &= ~1;

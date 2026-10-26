@@ -14,7 +14,7 @@ void ActorAttachment_BeginPartJitter(struct ActorAttachmentSlotView *slot, s32 i
             }
             if (*status != 1) {
                 register const u16 *table asm("r5") = gUnk_0203B400;
-                u32 *randomIndex = &gUnk_03005308;
+                u32 *randomIndex = &gRandomIndex;
                 u32 mask;
                 register u32 random asm("r1");
                 struct ActorAttachmentSlotView *part;

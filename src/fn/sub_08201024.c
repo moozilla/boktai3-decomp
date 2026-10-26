@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 p[0x344];
 };
@@ -6,7 +7,6 @@ struct A {
     u8 p0[0x1c];
     struct E e[3];
 };
-extern u32 gUnk_020005F8;
 void Collider_Remove(void *);
 void ScaledShadow_Destroy(void *);
 void ActorDebris_Hide(u32);
@@ -27,5 +27,5 @@ u32 PlayerClone_DestroyPool(struct A *a)
         }
         Anim_Remove(e + 0x1b8);
     }
-    return gUnk_020005F8 = 0;
+    return gDirectionalSpritePool = 0;
 }

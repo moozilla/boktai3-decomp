@@ -34,9 +34,9 @@ static inline s32 Scale(int x)
 static inline s32 cellIndex(struct FloorPoint *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u32 groundHeight(struct FloorPoint *position)
 {
@@ -46,7 +46,7 @@ static inline u32 groundHeight(struct FloorPoint *position)
     if (cell)
         cell += 4;
     else
-        cell = gUnk_030052F4->cells + (index * 4 + 12);
+        cell = gTerrainMap->cells + (index * 4 + 12);
     kind = *cell >> 4;
     height = (*cell & 15) << 8;
     switch (kind) {
@@ -65,7 +65,7 @@ static inline u8 *cellData(s32 index)
     u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
     if (cell)
         return cell + 4;
-    return gUnk_030052F4->cells + (index * 4 + 12);
+    return gTerrainMap->cells + (index * 4 + 12);
 }
 static inline u32 ReadCellFlags(u8 *cell)
 {

@@ -1,11 +1,11 @@
 #include "global.h"
+#include "game_state.h"
 struct Game {
     u8 pad0[0x5A8];
     s16 form;
     u8 pad5aa[0x2BE];
     u32 flags;
 };
-extern struct Game *gUnk_02000710;
 static inline u8 flag(u32 *ptr, u32 mask)
 {
     if (*ptr & mask)
@@ -17,7 +17,7 @@ int TextState_GetPlayerSpeakerLabel(void)
 {
     int v;
     register u32 mask asm("r2") = 128;
-    struct Game **global = &gUnk_02000710;
+    struct Game **global = &gGameState;
     int result;
     asm("" : "+r"(mask), "+r"(global));
     if (flag(&(*global)->flags, mask)) {

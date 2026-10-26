@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_02000180;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 FragmentProjectilePool_Init(u8 *);
@@ -11,8 +11,8 @@ void FragmentProjectilePool_Cleanup(void);
 u8 *FragmentProjectilePool_GetOrCreate(void)
 {
     u8 *p;
-    if (gUnk_02000180 != 0)
-        return gUnk_02000180;
+    if (gActorEffectManager != 0)
+        return gActorEffectManager;
     p = Task_Create(0x8, 0xc80);
     if (p != 0) {
         Task_SetCallbacks(p, ActorEffect_UpdatePool, FragmentProjectilePool_Cleanup);

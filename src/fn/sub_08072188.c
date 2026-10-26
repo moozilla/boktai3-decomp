@@ -21,7 +21,7 @@ void SceneActorPalette_ClearCompletedTransitions(void)
     s32 pending;
     if (!manager || !TestP(0x2000, &manager->flags))
         return;
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         pending = SceneActorRegistry_CountLivingByCategory(10);
     } else {
         if ((u8)SceneActorRegistry_TestCategoryFlags(10, 0x20000))

@@ -9,15 +9,15 @@ struct P {
 
 extern u16 gUnk_03005260[];
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 int Mod(int, int);
 void Sound_PlaySong(int);
 void Anim_DrawDecimalDigits(void *, void *, int, int, int, int, int, int, int);
 
 static inline int randomValue(u16 *table, int limit)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return Mod(table[gUnk_03005308], limit);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return Mod(table[gRandomIndex], limit);
 }
 
 void WirelessResultPanel_UpdateRollingNumbers(struct P *p)

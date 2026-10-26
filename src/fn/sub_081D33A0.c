@@ -40,7 +40,7 @@ struct CloudTask {
 };
 extern struct CloudTask *gUnk_02000298;
 extern struct CloudPlayer *gUnk_02000580[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 void *AnimData_FindEntry(u32);
 s32 Mod(s32, s32);
@@ -50,8 +50,8 @@ void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void Effect_SetPalette(void *, s32);
 static inline u32 RandomValue(const u16 *table)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return table[index];
 }
 static inline s32 Truncate(s32 value)

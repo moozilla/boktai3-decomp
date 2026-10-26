@@ -23,18 +23,18 @@ typedef struct State {
 } State;
 extern const s16 gUnk_086149C4[];
 extern u8 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 void SpriteDrawable_SelectTileFrame(Effect *, void *, s32);
 static inline s32 random_value(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(u16 *)((u8 *)gUnk_0203B400 + (gUnk_03005308 << 1));
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(u16 *)((u8 *)gUnk_0203B400 + (gRandomIndex << 1));
 }
 static inline s32 random_first(void)
 {
     u8 *table = gUnk_0203B400;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(u16 *)(table + (gUnk_03005308 << 1));
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(u16 *)(table + (gRandomIndex << 1));
 }
 static inline s32 scale(s32 v)
 {

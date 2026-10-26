@@ -1,9 +1,9 @@
 #include "global.h"
+#include "game_state.h"
 struct S {
     u8 f[0x868];
     u32 fl;
 };
-extern struct S *gUnk_02000710;
 extern u8 *gUnk_020004B4;
 s32 AreaEffect_FindContainingEntry(u8 *);
 s32 AreaEffect_ScaleLinkResourceGain(s32);
@@ -29,7 +29,7 @@ s32 AreaEffect_ScaleLinkGainAtPosition(u8 *a, s32 gain)
         goto no;
     {
         u32 m = 2;
-        struct S *g = gUnk_02000710;
+        struct S *g = gGameState;
         if (tst(mk(&g->fl, m)) != 0)
             goto yes;
     }

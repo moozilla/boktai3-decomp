@@ -54,7 +54,7 @@ static inline s32 optionalValue(void)
 }
 static inline u8 FloorSwitch_InCurrentRegion(struct FloorSwitch *e)
 {
-    if (*(s32 *)((u8 *)gUnk_02000710 + 0x5A0) == e->region)
+    if (*(s32 *)((u8 *)gGameState + 0x5A0) == e->region)
         return TRUE;
     return FALSE;
 }

@@ -23,7 +23,7 @@ struct SelectionPanel {
     s32 proc1;
     u8 buf[1];
 };
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 extern u32 gUnk_030053F0;
 s32 ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *);
@@ -52,7 +52,7 @@ void sub_0810DB0C(struct SelectionPanel *p)
         p->fixed[i] = 0xFFFF;
         {
             u32 mask = 0x800;
-            if ((gUnk_030053F4 | gUnk_030053F0) & mask)
+            if ((gEngineFlags | gUnk_030053F0) & mask)
                 p->widgets[i].flags |= 1;
         }
     }

@@ -23,7 +23,7 @@ void Sound_PlaySong(u32);
 void LinkScorePanel_SetNumber(struct LinkScorePanel *, s32, s32);
 void LinkScorePanel_OnWaitSessionReady(struct LinkScorePanel *);
 
-#define SCORE (*(s16 *)((u8 *)gUnk_02000710 + 0x7b2))
+#define SCORE (*(s16 *)((u8 *)gGameState + 0x7b2))
 
 static inline void SetUpdate(struct LinkScorePanel *p, void (*fp)(struct LinkScorePanel *), u8 st)
 {

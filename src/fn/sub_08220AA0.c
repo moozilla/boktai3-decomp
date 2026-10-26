@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u8 *gUnk_03001688;
+#include "ram.h"
 
 void Collider_OnManagerDestroy(void)
 {
-    gUnk_03001688 = 0;
+    gColliderManager = 0;
 }

@@ -88,15 +88,15 @@ modeZero: {
     }
     cachedFlags = flagsLow;
 
-    if (cellX < 0 || cellZ < 0 || (u32)cellX >= gUnk_030052F8 || (u32)cellZ >= gUnk_030052FC)
+    if (cellX < 0 || cellZ < 0 || (u32)cellX >= gTerrainWidth || (u32)cellZ >= gTerrainHeight)
         index = 0;
     else
-        index = gUnk_030052F4->rows[cellZ] + cellX;
+        index = gTerrainMap->rows[cellZ] + cellX;
     cell = TerrainModifiers_FindCellOverride(index, 1);
     if (cell)
         cell += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = index * 4 + 12;
         cell = map->cells + offset;
     }

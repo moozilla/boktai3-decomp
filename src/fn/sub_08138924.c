@@ -1,7 +1,7 @@
 #include "global.h"
 #include "display_animation.h"
 
-#define gPlayerSlotDisplay gUnk_020004C0
+#define gPlayerSlotDisplay gSpriteSlots
 struct PlayerSlotDisplaySprite {
     u32 flags;
     u8 unknown4[3], priority;

@@ -17,7 +17,7 @@ struct H081593A0 {
     u16 b;
     u16 c;
 };
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 
 void Player_SetPositionAndSave(struct P081593A0 *p, struct H081593A0 *h)
 {
@@ -26,7 +26,7 @@ void Player_SetPositionAndSave(struct P081593A0 *p, struct H081593A0 *h)
     p->f30 = t;
     p->f168 = t;
     p->fAC = t;
-    *(u16 *)(gUnk_02000710 + 0x30) = h->a;
-    *(u16 *)(gUnk_02000710 + 0x32) = h->b;
-    *(u16 *)(gUnk_02000710 + 0x34) = h->c;
+    *(u16 *)(gGameState + 0x30) = h->a;
+    *(u16 *)(gGameState + 0x32) = h->b;
+    *(u16 *)(gGameState + 0x34) = h->c;
 }

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 struct ConfirmPanel {
     u8 f0[0x18];
@@ -19,7 +20,6 @@ struct ConfirmPanel {
     u8 fD2D;
     u16 fD2E;
 };
-extern u32 gUnk_030053F4;
 extern u32 gUnk_030053F0;
 extern u16 gUnk_03005260[];
 void Bg_SetLayerMap(u32, void *, u16);
@@ -48,7 +48,7 @@ static inline u8 TestSel(struct ConfirmPanel *p)
 static inline u32 LinkActive(void)
 {
     u32 mask = 0x800;
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 
 static inline void Refresh(struct ConfirmPanel *p)

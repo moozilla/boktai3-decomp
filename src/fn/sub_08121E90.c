@@ -1,6 +1,5 @@
 #include "global.h"
 
-#define gSpriteGroup gUnk_02000138
 struct SpriteGroupEntry {
     u8 pad[10];
     u8 state;
@@ -12,7 +11,7 @@ struct SpriteGroup {
     u32 used;
     struct SpriteGroupEntry entries[8];
 };
-extern struct SpriteGroup *volatile gUnk_02000138;
+extern struct SpriteGroup *volatile gSpriteGroup;
 void Sprite_Remove(void *);
 static inline u8 Occupied(u32 *used, u32 mask)
 {

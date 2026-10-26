@@ -3,7 +3,7 @@
 #define B(n) (*(u8 *)(p + (n)))
 #define H(n) (*(u16 *)(p + (n)))
 #define S(n) (*(s16 *)(p + (n)))
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 s32 Player_ConsumeStateEntry(void *);
 s32 Player_CanSpendSharedResource(void *, s32);
 void Sound_PlaySong(u32);
@@ -42,7 +42,7 @@ void Player_UpdateResourceDash(u8 *p)
             if (HasDashFlag(p))
                 B(0x4f0) = 26;
             else {
-                s32 value = *(s16 *)(gUnk_02000710 + 0x876) * 2 + 14;
+                s32 value = *(s16 *)(gGameState + 0x876) * 2 + 14;
                 SetByte(p + 0x4f0, value);
             }
             if (B(0x4f0) > 32)

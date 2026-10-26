@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 struct State {
     u8 pad0[15];
     u8 fresh;
@@ -75,7 +76,6 @@ struct Sun {
     u8 pad[0x12];
     s16 level;
 };
-extern struct Sun *gUnk_02000710;
 int Script_SeekToKeyword(int);
 void *Script_GetTextSourcePc(void);
 void *Script_GetPc(void);

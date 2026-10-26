@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+#include "engine.h"
+#include "ram.h"
 struct Slash {
     u32 flags;
     u8 active, unknown5, phase, priority;
@@ -30,10 +32,8 @@ struct Pool {
     u8 graphics[0x20];
     u32 used;
 };
-extern struct Pool *gUnk_02000184;
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 struct Pool *SlashEffect_GetOrCreateManager(void);
 struct Slash *SlashEffect_AllocateSlot(struct Pool *);
 void TwinSpriteEffect_InitGraphics(struct Slash *);
@@ -187,7 +187,7 @@ void PursuingActor_CreateHomingSlash(const struct ContactPosition *position, s32
     register struct DisplaySequenceState *sequence asm("r5");
     const void **resourceSlot;
     register u32 zero asm("r8");
-    pool = gUnk_02000184;
+    pool = gPursuingActorManager;
     if (!pool) {
         pool = SlashEffect_GetOrCreateManager();
         if (!pool)

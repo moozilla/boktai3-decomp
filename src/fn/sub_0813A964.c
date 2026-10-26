@@ -1,12 +1,12 @@
 #include "global.h"
-extern u8 *gUnk_020004D8;
+#include "ram.h"
 void ActorMarker_HideSlot(s32 i0)
 {
     s32 i = i0;
     u8 *b;
     u8 *q;
     if (i >= 0) {
-        b = gUnk_020004D8;
+        b = gCompactSpritePool;
         if (b != 0) {
             i *= 0x64;
             q = b + 0x78;

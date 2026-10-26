@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_020001B8;
+#include "ram.h"
 
 void Pool1B8_ResetInstance(void)
 {
-    gUnk_020001B8 = 0;
+    gTileTriggerManager = 0;
 }

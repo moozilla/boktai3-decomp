@@ -1,10 +1,10 @@
 #include "global.h"
 
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 
 u32 GameState_IsEventFlagSet(s32 idx)
 {
-    u32 *p = (u32 *)(gUnk_02000710 + 0x6F0);
+    u32 *p = (u32 *)(gGameState + 0x6F0);
     s32 w;
     u32 bit;
     if (idx >= 0) {

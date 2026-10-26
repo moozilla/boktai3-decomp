@@ -10,8 +10,8 @@ void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct S
 static inline s32 ActorParticles_NextRandom(void)
 {
     const u16 *table = gUnk_0203B400;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return table[gRandomIndex];
 }
 
 void ActorParticles_SpawnDirectionalBurst(struct SceneActorRegistryResetView *actor, s32 amount)

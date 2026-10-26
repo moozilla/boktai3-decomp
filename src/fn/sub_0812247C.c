@@ -1,7 +1,7 @@
 #define SpriteEffect_GetOrCreatePool  SceneActor14_EnsureSingleton
 #define SpriteEffect_GetFacingVariant SceneActor14_GetFacingAndFlip
-#define gSpriteEffectPool             gUnk_0200013C
 #include "global.h"
+#include "ram.h"
 
 struct EffectMotion {
     u32 xy, z;
@@ -37,7 +37,6 @@ struct SpriteEffectPool {
     u32 activeEffects;
     struct SpriteEffect effects[8];
 };
-extern struct SpriteEffectPool *gUnk_0200013C;
 struct SpriteEffectPool *SceneActor14_EnsureSingleton(void);
 struct SpriteEffect *SpriteEffectPool_AllocateSlot(struct SpriteEffectPool *);
 void SceneActor14_GetFacingAndFlip(struct EffectSourceObject *, u8 *, u8 *);
@@ -53,7 +52,7 @@ s32 SpriteEffect_SpawnWithMotion(struct EffectSourceObject *source,
     struct SpriteEffectPool *pool;
     struct SpriteEffect *effect;
     u8 variant, flip;
-    pool = gUnk_0200013C;
+    pool = gSpriteEffectPool;
     if (!pool) {
         pool = SceneActor14_EnsureSingleton();
         if (!pool)

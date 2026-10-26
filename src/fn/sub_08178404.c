@@ -1,5 +1,5 @@
-#define gFieldHud gUnk_02000214
 #include "global.h"
+#include "ram.h"
 struct FieldHud {
     u8 unknown0[0xAFF];
     u8 timerEnabled;
@@ -13,10 +13,9 @@ struct FieldHud {
     u8 unknownB74[0x5C];
     u32 timerSpriteFlags2;
 };
-extern struct FieldHud *gUnk_02000214;
 void Hud_ClearTimer(void)
 {
-    struct FieldHud *hud = gUnk_02000214;
+    struct FieldHud *hud = gFieldHud;
     if (hud) {
         hud->timer = 0;
         hud->timerSpriteFlags0 |= 1;

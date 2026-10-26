@@ -1,6 +1,7 @@
 #include "global.h"
+#include "ram.h"
 /* Provisional names and field interpretations; confidence low. */
-#define gTilePool gUnk_020001B8
+#define gTilePool gTileTriggerManager
 struct Tile {
     u8 pad0[0x2C];
     u32 resource;
@@ -12,7 +13,6 @@ struct TileManager {
     struct Tile *tiles[12];
     u32 used;
 };
-extern struct TileManager *gUnk_020001B8;
 void Heap_Free(void *);
 void Sprite_Remove(void *);
 u32 TerrainOverlay_QueueRemoveActor(u32 *);
@@ -38,5 +38,5 @@ u32 TilePool_Destroy(struct TileManager *pool)
             Heap_Free(tile);
         }
     }
-    return (u32)(gUnk_020001B8 = 0);
+    return (u32)(gTileTriggerManager = 0);
 }

@@ -39,7 +39,7 @@ void StageResults_UpdateRecordBlink(struct StageResults *);
 void Sound_PlaySong(u32);
 void MessagePanel_UpdateExitDelay(struct StageResults *);
 
-#define SCORE (*(s16 *)((u8 *)gUnk_02000710 + 0x7b2))
+#define SCORE (*(s16 *)((u8 *)gGameState + 0x7b2))
 
 #define CLAMP(x, max)                                                                              \
     {                                                                                              \

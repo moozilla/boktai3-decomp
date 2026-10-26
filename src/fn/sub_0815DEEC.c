@@ -25,9 +25,9 @@ void PlayerCue_ApplyColliderScale(struct Player *p, void *collider)
     if (PlayerCue_TestFlags(p, 0x40000))
         scale -= 6;
     if (PlayerCue_TestFlags(p, 0x1000000))
-        scale += Div(13 * gUnk_02000710->unk876, 10);
+        scale += Div(13 * gGameState->unk876, 10);
     if (PlayerCue_TestFlags(p, 0x400000))
-        scale -= Div(13 * gUnk_02000710->unk876, 10);
+        scale -= Div(13 * gGameState->unk876, 10);
     switch (SunClock_GetPhase()) {
         case 1:
         case 2:

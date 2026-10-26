@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 // confidence=low: fades sprite palettes before emitting dispersal particles.
 #ifdef NONMATCHING
 // fuzzy: 94.6%
@@ -16,7 +17,6 @@ struct PackedVec {
     s32 pad : 16;
 };
 extern u16 gUnk_03005040[4][16];
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 void Palette_InterpolateBanks(void *, const void *, const void *, s32, s32);
 void sub_08113398(struct PackedVec *, struct PackedVec *, void *, void *, s32, s32, s32, s32, s32,
@@ -29,8 +29,8 @@ void ActorDisplay_UpdateAccentSprite(struct P *);
 #define PTR(o) (*(void **)((u8 *)p + (o)))
 static inline u32 Random(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 // confidence=low: fades two palettes then emits dispersal particles.
 void SceneActors_UpdatePaletteDispersal(struct P *arg)

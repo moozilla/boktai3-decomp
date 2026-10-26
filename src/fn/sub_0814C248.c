@@ -1,5 +1,7 @@
 #include "global.h"
 #include "player.h"
+#include "engine.h"
+#include "ram.h"
 
 // confidence=low: chooses the nearest visible list entry within a fixed squared-distance limit.
 // MATCHING_CONCESSION: register-pinning
@@ -20,9 +22,7 @@ struct MotionTargets {
     u8 unknown[0x18];
     struct MotionTarget *first;
 };
-extern struct MotionTargets *gUnk_02000598;
 extern u16 gUnk_03005418[];
-extern u32 gUnk_030053F4;
 static inline s32 Project(s32 input)
 {
     s32 value = input * 3;
@@ -59,9 +59,9 @@ struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *arg)
     register s32 distance asm("sb") = 1960000;
     register struct MotionTarget *best asm("sl");
     struct MotionTarget *entry;
-    if (!gUnk_02000598)
+    if (!gSceneLinkList)
         return 0;
-    entry = gUnk_02000598->first;
+    entry = gSceneLinkList->first;
     best = 0;
     if (entry)
         do {
@@ -85,7 +85,7 @@ struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *arg)
                 }
                 square = (x * x) + (z * z);
                 if (square < distance) {
-                    if (!(gUnk_030053F4 & 0x1000)) {
+                    if (!(gEngineFlags & 0x1000)) {
                         struct TargetPosition screen;
                         {
                             u32 relative = flags & 16;

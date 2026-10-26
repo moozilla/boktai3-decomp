@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "repeated_effect.h"
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 void Sound_PlaySong(s32);
 void AnimatedParticles_EmitChargeSparkle(u32, u32, u32, u32, struct RepeatedEffectPosition *);
 void RepeatedEffect_TickUpperTransition(struct RepeatedEffect *effect)
@@ -20,7 +20,7 @@ void RepeatedEffect_TickUpperTransition(struct RepeatedEffect *effect)
             position = effect->sprite.position;
             {
                 u16 *random = (u16 *)RANDOM_TABLE_ADDR;
-                u32 *rng = &gUnk_03005308;
+                u32 *rng = &gRandomIndex;
                 register u32 index asm("r2") = *rng + 1;
                 u32 mask = 1023;
                 u8 *sample;
@@ -55,7 +55,7 @@ void RepeatedEffect_TickUpperTransition(struct RepeatedEffect *effect)
             position = effect->sprite.position;
             {
                 u16 *random = (u16 *)RANDOM_TABLE_ADDR;
-                u32 *rng = &gUnk_03005308;
+                u32 *rng = &gRandomIndex;
                 register u32 index asm("r2") = *rng + 1;
                 u32 mask = 1023;
                 u8 *sample;

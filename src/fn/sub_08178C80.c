@@ -1,12 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 void Bg_SetPriority(u32, u32);
-extern u16 gUnk_020005A4;
 extern u32 gUnk_02000580;
 extern u8 gUnk_08E60F0C[];
-extern u32 gUnk_030053F4;
-extern u8 *gUnk_02000710;
-extern u8 *gUnk_02000214;
+extern u32 gEngineFlags;
+extern u8 *gGameState;
 void Inventory_InitEquipmentEntryFromDescriptor(u8 *, u8 *);
 u32 Script_SeekToKeyword(u32);
 u32 Script_GetValue(void);
@@ -47,7 +46,7 @@ u32 SceneHud_InitFromScript(u8 *s)
     Bg_SetPriority(0, 0);
     offset = 0xA5C;
     *(u16 *)(s + offset) = zero;
-    value = gUnk_020005A4;
+    value = gSceneHudMode;
     s[0x1414] = value;
     value = gUnk_02000580;
     *(u32 *)(s + 0xA40) = value;
@@ -84,7 +83,7 @@ u32 SceneHud_InitFromScript(u8 *s)
         *(u32 *)(s + 0x4880) = Script_GetValue();
     else
         *(u32 *)(s + 0x4880) = r;
-    if (!(gUnk_030053F4 & 0x1000)) {
+    if (!(gEngineFlags & 0x1000)) {
         *(u32 *)(s + 0x48C4) = TextWindow_Create(6, 4, 10, 2);
         *(u32 *)(s + 0x48C8) = TextWindow_Create(4, 6, 22, 6);
         *(u32 *)(s + 0x48CC) = TextWindow_Create(2, 3, 10, 2);
@@ -95,7 +94,7 @@ u32 SceneHud_InitFromScript(u8 *s)
         *(u32 *)(s + 0x48E0) = TextWindow_Create(13, 12, 12, 2);
     }
     sub_08167FC0(s);
-    if (gUnk_030053F4 & 0x1000) {
+    if (gEngineFlags & 0x1000) {
         PauseMenu_RefreshStatusPanel(s);
         Hud_SetUpdateCallback(s, Hud_OnUnpausedRefresh);
     } else if (s[0xA5E] == 8) {
@@ -116,9 +115,9 @@ u32 SceneHud_InitFromScript(u8 *s)
     offset = 0xA5F;
     MinusOne(s, offset);
     *(u32 *)(s + 0x4928) = z;
-    gUnk_02000214 = s;
+    gFieldHud = s;
     SceneHud_RebuildTertiaryOptions(s);
-    if ((*(u32 *)(gUnk_02000710 + 0x868) & 0x580) || (gUnk_030053F4 & 0x3800))
+    if ((*(u32 *)(gGameState + 0x868) & 0x580) || (gEngineFlags & 0x3800))
         *(u32 *)(s + 0x48F4) = z;
     else
         *(u32 *)(s + 0x48F4) = DarkLoan_CreateHiddenDisplay(s[0x48E6], *(u32 *)(s + 0x48F0),

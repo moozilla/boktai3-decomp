@@ -1,4 +1,3 @@
-#define gTerrainMap gUnk_030052F4
 #include "global.h"
 #include "player.h"
 #include "engine.h"

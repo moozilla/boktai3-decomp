@@ -1,5 +1,4 @@
 #define gSceneInputKeys gUnk_03005260
-#define gGameState      gUnk_02000710
 #include "global.h"
 s32 MessageWindow_Clear(void);
 s32 MessageWindow_SetBounds(s32, s32, s32, s32);
@@ -34,7 +33,7 @@ void SceneHud_UpdateTimedMessage(struct SceneHudState *p)
         MessageWindow_Clear();
         MessageWindow_SetBounds(0, 18, 30, 2);
         Inventory_GetEquipmentDescriptor(
-            *(s16 *)((u8 *)gUnk_02000710 + 0x68 + 2 * *(s16 *)((u8 *)gUnk_02000710 + 0x50)), text);
+            *(s16 *)((u8 *)gGameState + 0x68 + 2 * *(s16 *)((u8 *)gGameState + 0x50)), text);
         TextWindow_SetBounds(p->timedMessageWindow, 0, 16, 30, 2);
         TextWindow_SetScript(p->timedMessageWindow, p->timedMessageScript);
         Presentation_ApplyIndexedGraphicData(p->timedMessageWindow, text, p->unknownA44);

@@ -45,8 +45,8 @@ void Crow_OnBodyContact(struct SceneActorBehaviorContactView *source,
         }
     }
     SceneActorBehavior_ApplyContactReaction(source, destination, (void *)actor);
-    index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     index *= 2;
     {
         const u16 *table = (const u16 *)0x0203B400;

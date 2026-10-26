@@ -7,7 +7,7 @@ void SceneBody_SetKeyframeDisplay(void *, void *);
 void SceneBody_SetMovementProbe(void *, void *, s32, s32);
 void SceneBody_SetPositionOffset(void *, void *);
 u32 SceneActorContacts_RegisterNode(void *, void *, u32);
-extern u16 gUnk_02000508[];
+extern u16 gTrackedPlayerId[];
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void SceneBody_Init(void *, u32, struct ContactPackedVector *, u32, u32, void *);
 u32 Player_InitBodyFromScript(u8 *owner, s32 entry)
@@ -30,22 +30,22 @@ u32 Player_InitBodyFromScript(u8 *owner, s32 entry)
         position.y = Script_GetValue();
         position.z = Script_GetValue();
     } else {
-        position.x = gUnk_02000710->positionX;
-        position.y = gUnk_02000710->positionY;
-        position.z = gUnk_02000710->positionZ;
+        position.x = gGameState->positionX;
+        position.y = gGameState->positionY;
+        position.z = gGameState->positionZ;
     }
     point = (u16 *)&position;
     x = (s16)point[0] >> 8;
     z = (s16)point[2] >> 8;
-    if (x < 0 || z < 0 || x >= gUnk_030052F8 || z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || x >= gTerrainWidth || z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     definition = TerrainModifiers_FindCellOverride(cell, 1);
     if (definition)
         definition += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         definition = map->cells + offset;
     }
@@ -83,6 +83,6 @@ u32 Player_InitBodyFromScript(u8 *owner, s32 entry)
     id = *(u32 *)(owner + 0x24);
     *(u16 *)(owner + 0x294) = id;
     result = SceneActorContacts_RegisterNode(owner + 0x2e8, body, 2);
-    gUnk_02000508[owner[0x2c]] = *(u32 *)(owner + 0x24);
+    gTrackedPlayerId[owner[0x2c]] = *(u32 *)(owner + 0x24);
     return result;
 }

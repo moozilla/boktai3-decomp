@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 void SceneActorContacts_RemoveNode(void *);
 void Anim_Remove(void *);
 void Sprite_Remove(void *);
@@ -7,7 +8,6 @@ void SceneBody_Unregister(void *);
 void LinkPlayer_RemoveAuxiliaryResources(void *);
 void Player_StopLocalActionSounds(void *);
 extern u32 gUnk_02000580[];
-extern u16 gUnk_02000544;
 s32 Player_OnDestroy(u8 *p)
 {
     SceneActorContacts_RemoveNode(p + 0x2E8);
@@ -18,6 +18,6 @@ s32 Player_OnDestroy(u8 *p)
     LinkPlayer_RemoveAuxiliaryResources(p);
     Player_StopLocalActionSounds(p);
     gUnk_02000580[*(u32 *)(p + 0x18)] = 0;
-    gUnk_02000544--;
+    gPlayerCount--;
     return 0;
 }

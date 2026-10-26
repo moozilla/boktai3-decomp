@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 // Tentative menu/save views: offsets observed in this controller.
 struct TradeMenu {
     u8 pad0[0x24];
@@ -14,10 +15,9 @@ struct TradeSave {
     u8 pad54[0x14];
     s16 leftRows[16], rightRows[16];
 };
-extern struct TradeSave *gUnk_02000710;
 void WirelessGameMenu_ConsumeSelectedEquipment(struct TradeMenu *p)
 {
-    struct TradeSave *save = gUnk_02000710;
+    struct TradeSave *save = gGameState;
     int row = save->rightSelected;
     int item = *(s16 *)((u8 *)save + row * 2 + 0x88);
     if (item >= 0) {

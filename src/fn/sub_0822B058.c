@@ -1,6 +1,6 @@
 #include "global.h"
 #include "gba/m4a_internal.h"
-extern u16 gUnk_03005470[];
+#include "ram.h"
 void m4aSongNumStartOrContinue(u16);
 void m4aSongNumStart(u16);
 void m4aSongNumStop(u16);
@@ -11,13 +11,13 @@ void m4aMPlayFadeOutTemporarily(struct MusicPlayerInfo *, u16);
 void Sound_FadeOutChannel10(u32 arg)
 {
     u32 speed = arg;
-    if (gUnk_03005470[10]) {
-        u32 song = gUnk_03005470[10];
+    if (gMusicSlotSongs[10]) {
+        u32 song = gMusicSlotSongs[10];
         u32 index = gSongTable[song].ms;
         struct MusicPlayerInfo *player = gMPlayTable[index].info;
         m4aMPlayImmInit(player);
         m4aMPlayVolumeControl(player, 0xffff, 255);
         m4aMPlayFadeOut(player, speed);
-        gUnk_03005470[index] = 0;
+        gMusicSlotSongs[index] = 0;
     }
 }

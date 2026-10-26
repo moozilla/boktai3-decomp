@@ -16,8 +16,8 @@ static inline s32 Scale(int x)
 
 static inline int step(const u16 *table)
 {
-    u32 next = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = next;
+    u32 next = (gRandomIndex + 1) & 1023;
+    gRandomIndex = next;
     return table[next];
 }
 

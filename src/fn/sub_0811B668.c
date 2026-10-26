@@ -1,5 +1,6 @@
 #include "global.h"
-#define gCategoryLists gUnk_02000200
+#include "ram.h"
+#define gCategoryLists gSpatialIndex
 struct CategoryListNode {
     u32 value;
     struct CategoryListNode *previous;
@@ -13,7 +14,6 @@ struct CategoryLists {
     u8 task[0x18];
     struct CategoryListPair lists[10];
 };
-extern struct CategoryLists *gUnk_02000200;
 void Heap_Free(void *);
 s32 CategoryLists_Destroy(struct CategoryLists *manager)
 {
@@ -33,6 +33,6 @@ s32 CategoryLists_Destroy(struct CategoryLists *manager)
         }
         i++;
     } while (i <= 9);
-    gUnk_02000200 = 0;
+    gSpatialIndex = 0;
     return 0;
 }

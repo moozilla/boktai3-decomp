@@ -4,7 +4,7 @@
 #include "global.h"
 
 /*
- * The main game-state block behind gUnk_02000710 (guess: save data plus world state; clearing
+ * The main game-state block behind gGameState (guess: save data plus world state; clearing
  * 0x30..0x77a resets a game). Built from the offsets seen across src/ (partial views in
  * src/fn/*.c). Only fields with a known access are named; unknown ranges are u8 unkXXX[N].
  * Names are provisional, "(guess)" marks unconfirmed interpretations. Array lengths are
@@ -160,9 +160,9 @@ struct GameState {
     s16 unk894;
 };
 
-extern struct GameState *gUnk_02000710;
+extern struct GameState *gGameState;
 
-/* Backup of gUnk_02000710, and the active/backup pair of the shared
+/* Backup of gGameState, and the active/backup pair of the shared
  * script-variable region (0x400 bytes each); gUnk_02000700 is the separate,
  * unbacked local-variable region. Selected together by GameState_SelectRamBase. */
 extern u8 *gUnk_0200070C;

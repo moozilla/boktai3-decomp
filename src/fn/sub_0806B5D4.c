@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "sprite_effect_controller.h"
+#include "engine.h"
 struct SequenceDrawable {
     u32 flags;
     u8 active, unknown5[2], priority;
@@ -28,7 +29,7 @@ void *SpriteEffectController_LoadSpriteResources(struct SpriteEffectController *
 void ParticleSprite_Initialize(void *, void *, s32);
 void Effect_SetOrigin(void *, s32, s32);
 void Effect_SetPalette(void *, s32);
-extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
+extern u32 gUnk_030053F0, gUnk_02000560;
 static inline void Step(struct SpriteEffectController *owner, struct SequenceDrawable *inputSprite,
                         struct DisplaySequenceState *inputState, u32 inputOne)
 {
@@ -181,7 +182,7 @@ struct SpriteEffectController *SpriteEffectController_Create(
     }
     {
         u32 mask = 0x400;
-        if ((gUnk_030053F4 | gUnk_030053F0) & mask)
+        if ((gEngineFlags | gUnk_030053F0) & mask)
             return 0;
     }
     if (gUnk_02000560 & 4)

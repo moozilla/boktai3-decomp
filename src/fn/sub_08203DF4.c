@@ -72,10 +72,10 @@ struct S {
     u8 p168[0x174 - 0x168];
     u8 terrain[4];
 };
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 extern u32 gUnk_030053F0;
 extern u32 gUnk_02000560;
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 void AnimData_SelectPaletteBank(void *, u32 animation);
 void Collider_SetPosition(void *collider, void *position, u32 value);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
@@ -102,7 +102,7 @@ inline static u32 TestFlag_UpdateDamageState(s16 mask, u32 *p)
 u32 EnemyF426_UpdateDamageState(struct S *p)
 {
     struct Col *c;
-    if (TestPair(0x400, &gUnk_030053F4, &gUnk_030053F0) ||
+    if (TestPair(0x400, &gEngineFlags, &gUnk_030053F0) ||
         TestFlag_UpdateDamageState(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, p->fn);
@@ -148,7 +148,7 @@ u32 EnemyF426_UpdateDamageState(struct S *p)
                 }
                 velocity.a.lo = -4;
                 table = (const u16 *)0x0203B400;
-                r = (gUnk_03005308 + 1) & 0x3ff;
+                r = (gRandomIndex + 1) & 0x3ff;
                 sample = table[r];
                 velocity.a.hi = sample & 7;
                 velocity.b.lo = -4;
@@ -158,7 +158,7 @@ u32 EnemyF426_UpdateDamageState(struct S *p)
                 spread.a.hi = (sample & 7) + 3;
                 spread.b.lo = 0x18;
                 r = (r + 1) & 0x3ff;
-                gUnk_03005308 = r;
+                gRandomIndex = r;
                 sample = table[r];
                 sub_08014634((sample & 3) + 4, 3, &center, &velocity, &spread, 15, 15);
                 Anim_RestartSequence(&p->seq, p->resource, 1, p->facing, 0);

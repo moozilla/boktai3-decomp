@@ -7,14 +7,14 @@ struct Weather {
     int bank;
     void *script;
 };
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 void Script_Call(void *, int);
 void Weather_EnterPhase(void *, int);
 int sub_080177AC(void *, int, int, int);
 static inline void setFlag(void)
 {
     u32 mask = 4096;
-    *(u32 *)(gUnk_02000710 + 0x868) |= mask;
+    *(u32 *)(gGameState + 0x868) |= mask;
 }
 int Weather_StormOnset(struct Weather *p)
 {

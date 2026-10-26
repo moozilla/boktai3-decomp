@@ -41,14 +41,14 @@ s32 DirectionalForce_Tick(struct DirectionalForce *force)
             else {
                 const u16 *random;
                 s32 value;
-                gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+                gRandomIndex = (gRandomIndex + 1) & 1023;
                 random = (const u16 *)RANDOM_TABLE_ADDR;
-                value = Mod(random[gUnk_03005308], force->magnitudeRange);
+                value = Mod(random[gRandomIndex], force->magnitudeRange);
                 force->targetMagnitude = (force->baseMagnitude + value) << 4;
             }
             {
                 register const u16 *random asm("r3") = (const u16 *)RANDOM_TABLE_ADDR;
-                u32 *indexAddress = &gUnk_03005308;
+                u32 *indexAddress = &gRandomIndex;
                 u32 oldIndex = *indexAddress;
                 u32 index;
                 u32 mask;
@@ -74,8 +74,8 @@ s32 DirectionalForce_Tick(struct DirectionalForce *force)
                 force->targetMagnitude = force->baseMagnitude << 4;
             else {
                 s32 value;
-                gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-                value = Mod(((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308], force->magnitudeRange);
+                gRandomIndex = (gRandomIndex + 1) & 1023;
+                value = Mod(((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], force->magnitudeRange);
                 force->targetMagnitude = (force->baseMagnitude + value) << 4;
             }
             if (!force->delayRange) {
@@ -84,7 +84,7 @@ s32 DirectionalForce_Tick(struct DirectionalForce *force)
                 goto storeDelay;
             }
             {
-                u32 *indexAddress = &gUnk_03005308;
+                u32 *indexAddress = &gRandomIndex;
                 u32 index = *indexAddress + 1;
                 register u32 mask asm("r1");
                 mask = 1023;

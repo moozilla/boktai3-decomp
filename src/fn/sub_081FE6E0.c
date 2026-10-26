@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_020005EC;
+#include "ram.h"
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 SunOrb_InitManager(u8 *);
@@ -9,8 +9,8 @@ void OrbitEffect_DestroyManager(void);
 u8 *SunOrb_GetOrCreateManager(void)
 {
     u8 *r;
-    if (gUnk_020005EC != 0)
-        return gUnk_020005EC;
+    if (gSlotController != 0)
+        return gSlotController;
     r = Task_Create(10, 0xef8);
     if (r) {
         Task_SetCallbacks(r, OrbitEffect_UpdateManager, OrbitEffect_DestroyManager);

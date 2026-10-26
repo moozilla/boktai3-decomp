@@ -1,13 +1,13 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_phase.h"
-extern u32 gUnk_03005308;
+#include "engine.h"
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Bee_UpdateFacingAnimation(struct SceneActorAnimationView *actor);
 static inline u32 Rand(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(const u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(const u16 *)((gRandomIndex << 1) + (u32)gUnk_0203B400);
 }
 static inline s32 Shift(s32 n, u32 bits)
 {

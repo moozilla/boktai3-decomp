@@ -2,6 +2,7 @@
 
 // MATCHING_CONCESSION: register-pinning
 #include "scene_vec.h"
+#include "engine.h"
 
 /* Names and field interpretations are tentative. */
 
@@ -48,7 +49,6 @@ struct HitActor {
     u8 pad1B0[8];
     u32 damageType;
 };
-extern u32 gUnk_03005308;
 extern const struct SceneVec gUnk_0824FE44;
 void Collision_CalculateDamageResponse(void *);
 void Sound_PlaySong(u32);
@@ -66,7 +66,7 @@ static inline void RandomizePosition(struct SceneVec *v, const u16 *table)
     u16 *x = (u16 *)&v->x, *y = (u16 *)&v->y, *z = (u16 *)&v->z;
     register u32 index asm("r1");
     u32 sample, base;
-    index = gUnk_03005308;
+    index = gRandomIndex;
     index++;
     index &= 1023;
     sample = table[index];
@@ -75,7 +75,7 @@ static inline void RandomizePosition(struct SceneVec *v, const u16 *table)
     index = (index + 1) & 1023;
     *y = *y + (u8)table[index];
     index = (index + 1) & 1023;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     AdjustCoordinate(z, table[index]);
 }
 void ScriptCombatActor_ApplyHitReaction(struct HitSource *source, struct HitResult *hit,

@@ -2,8 +2,8 @@
 #include "contact_swarm.h"
 // confidence=low: moves two sprite sequences left before destruction.
 #include "scene_vec.h"
+#include "ram.h"
 s32 SceneMover_StepPastScreenX(void *, s32, s32);
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 #ifdef NONMATCHING
 // fuzzy: 92.1%
@@ -263,7 +263,7 @@ static inline u32 StepPlayback_081EDE4C(struct Drawable *owner, struct DisplaySe
 
 inline static u32 Arg1(u32 k_)
 {
-    return gUnk_086141BC[gUnk_03005304] & k_;
+    return gUnk_086141BC[gEffectRandomTableIndex] & k_;
 }
 
 void SceneActors_UpdatePastEdgeDeparture(u8 *input, s32 time)
@@ -295,7 +295,7 @@ void SceneActors_UpdatePastEdgeDeparture(u8 *input, s32 time)
         StepPlayback_081EDE4C(accent, state);
     }
     result = SceneMover_StepPastScreenX(input, -40, 0x5000);
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
     *((s32 *)(p + 0x288)) = (u8)Arg1(1);
     ActorDisplay_UpdateScreenAnchor(input);
     ActorDisplay_UpdateForegroundSprite(input);

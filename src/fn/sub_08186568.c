@@ -1,6 +1,8 @@
-#define gRandomTableIndex gUnk_03005308
+#define gRandomTableIndex gRandomIndex
 #define gRandomTable      gUnk_0203B400
 #include "global.h"
+#include "game_state.h"
+#include "engine.h"
 
 /* Tentative Armor-family behavior: aim a quarter turn to either side of the target. */
 struct ArmorActor {
@@ -21,8 +23,6 @@ struct ArmorTarget {
     s16 unk32;
     s16 y;
 };
-extern struct ArmorTarget *gUnk_02000710;
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Math_Atan2(s32, s32);
 s32 DirectionalActor_TryBeginState(struct ArmorActor *, s32);
@@ -33,11 +33,11 @@ void Armor_UpdateRandomFlankAction42(struct ArmorActor *p)
     u8 r;
     switch (*q) {
         case 0: {
-            struct ArmorTarget *g = gUnk_02000710;
+            struct ArmorTarget *g = gGameState;
             s32 a = Math_Atan2(g->x - p->x, g->y - p->y);
             u32 random;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-            random = *(const u16 *)((gUnk_03005308 * 2) + (u32)gUnk_0203B400);
+            gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+            random = *(const u16 *)((gRandomIndex * 2) + (u32)gUnk_0203B400);
             random &= 0x10;
             if (random)
                 a += 0x40;

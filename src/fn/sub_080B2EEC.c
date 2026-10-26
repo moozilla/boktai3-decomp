@@ -1,10 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
+#include "engine.h"
 
-#define gRandomTableIndex gUnk_03005308
+#define gRandomTableIndex gRandomIndex
 #define gRandomTable      gUnk_0203B400
-extern u32 gUnk_03005308;
 
 s32 SceneActorRegistry_CountLiving(void);
 s32 SceneActorRegistry_CountLivingByCategory(s32);
@@ -38,8 +38,8 @@ static inline u8 Test(u16 *p, u32 mask)
 }
 static inline s32 RandomByte(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    return *(const u8 *)(gUnk_0203B400 + gUnk_03005308);
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    return *(const u8 *)(gUnk_0203B400 + gRandomIndex);
 }
 static inline void Clear(u32 *p, u32 mask)
 {
@@ -47,8 +47,8 @@ static inline void Clear(u32 *p, u32 mask)
 }
 inline static s32 RandomByte_TrySoloAction(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    return (u8)((const u16 *)0x0203B400)[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    return (u8)((const u16 *)0x0203B400)[gRandomIndex];
 }
 
 void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)

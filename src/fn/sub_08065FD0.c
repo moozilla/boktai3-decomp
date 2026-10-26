@@ -3,7 +3,7 @@
 static inline u8 AlternateMode(void)
 {
     u32 bit = 0x80;
-    if (gUnk_02000710->flags868 & bit)
+    if (gGameState->flags868 & bit)
         return TRUE;
     return FALSE;
 }
@@ -284,10 +284,10 @@ gotManager:
         asm("" : "+r"(low));
         *low = one;
     }
-    if (!(gUnk_030053F4 & 0x100) && emitBurst == 1) {
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    if (!(gEngineFlags & 0x100) && emitBurst == 1) {
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 offset = gUnk_03005308 * 2;
+            u32 offset = gRandomIndex * 2;
             register const u16 *table asm("r2");
             table = gUnk_0203B400;
             Mod(*(u16 *)(offset + (u32)table), 3);

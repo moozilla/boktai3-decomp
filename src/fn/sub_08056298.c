@@ -4,9 +4,9 @@ static inline u32 TerrainMarker_GetCellIndex(union TerrainMarkerPosition *positi
 {
     s32 x = position->world.x >> 8;
     s32 z = position->world.z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u32 TerrainMarker_GetInnerCellIndex(union TerrainMarkerPosition *position,
                                                   struct EngineMap **mapSlot)
@@ -17,7 +17,7 @@ static inline u32 TerrainMarker_GetInnerCellIndex(union TerrainMarkerPosition *p
     coordinate <<= 16;
     x = (s32)coordinate >> 24;
     z = position->world.z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
     return (*mapSlot)->rows[z] + x;
 }
@@ -26,7 +26,7 @@ static inline u32 TerrainMarker_GetCachedCellIndex(union TerrainMarkerPosition *
 {
     s32 x = position->world.x >> 8;
     s32 z = position->world.z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
     return (*mapSlot)->rows[z] + x;
 }
@@ -77,7 +77,7 @@ s32 TerrainEdgeMarker_FindTerrainDirection(struct TerrainMarkerRegion *input)
     if (insideIndex == outsideIndex)
         return 0;
     {
-        struct EngineMap **base = &gUnk_030052F4;
+        struct EngineMap **base = &gTerrainMap;
         register u8 *cells asm("r2") = (*base)->cells;
         mapSlot = base;
         asm("" : "+r"(mapSlot));

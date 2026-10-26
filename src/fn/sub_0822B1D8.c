@@ -1,11 +1,11 @@
 #include "global.h"
 #include "gba/m4a_internal.h"
-extern u16 gUnk_03005470[];
+#include "ram.h"
 extern const struct MusicPlayer gUnk_082643EC[];
 void m4aMPlayImmInit(struct MusicPlayerInfo *);
 void Sound_FadeOutChannel12(u32 speed)
 {
-    u16 *active = gUnk_03005470;
+    u16 *active = gMusicSlotSongs;
     u32 song = active[12];
     if (song) {
         u32 index = gSongTable[song].ms;

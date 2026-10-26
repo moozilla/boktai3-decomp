@@ -1,8 +1,7 @@
-#define gRandomIndex  gUnk_03005304
 #define gRandomValues gUnk_086141BC
 #include "global.h"
 #include "scene_object.h"
-extern u32 gUnk_03005304;
+#include "ram.h"
 extern const u16 gUnk_086141BC[];
 struct ActorParticleEmitter {
     u8 interval, countdown, count, enabled;
@@ -11,8 +10,8 @@ u32 ActorParticles_CreateAtOffset(void *, struct SceneExtent *, struct SceneExte
                                   u32, u32, u32, u32, u32, u32, u32, u32, u32);
 static inline u32 NextRandom(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 0x3ff;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3ff;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 void ActorParticles_UpdateEmitter(void *actor, struct ActorParticleEmitter *emitter)
 {

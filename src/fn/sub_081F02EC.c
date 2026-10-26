@@ -31,7 +31,7 @@ void SingletonSlot7_BeginScaledCooldown(void *event, struct Slot7Action *action,
         action->phase = 0;
         action->state = 0;
     } else {
-        level = gUnk_02000710->unk876;
+        level = gGameState->unk876;
         duration = level - 3;
         duration = Div(duration * 10, 6);
         if ((s32)duration <= 2)

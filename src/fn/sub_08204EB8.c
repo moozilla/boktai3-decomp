@@ -4,7 +4,7 @@ struct V {
     u16 y;
     u32 z;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 struct R {
     u8 a;
     u8 b;
@@ -22,8 +22,8 @@ s32 EnemyD459_UpdateDeath(u8 *p)
             u32 r;
             *q = *((struct V *)(p + 0x40));
             q->y += 200;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-            r = (*(&gUnk_0203B400[gUnk_03005308])).a;
+            gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+            r = (*(&gUnk_0203B400[gRandomIndex])).a;
             SpriteParticle_CreateDefaultVariant4384(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
         }
         if ((*((s32 *)(p + 0x18))) == 12) {

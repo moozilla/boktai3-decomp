@@ -19,8 +19,8 @@ static inline s32 truncateShift12(s32 value)
 }
 static inline u32 nextRandom(const u16 *table)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return table[index];
 }
 s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPosition *position,

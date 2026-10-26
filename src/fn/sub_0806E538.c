@@ -15,7 +15,7 @@ static inline void FillResolved(struct ContactPosition *position, s32 index)
     if (properties)
         properties += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = index * 4 + 12;
         properties = map->cells + offset;
     }

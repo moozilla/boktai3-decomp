@@ -43,7 +43,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                 {
                     register u32 index asm("r2");
                     {
-                        u32 *indexPointer = &gUnk_03005308;
+                        u32 *indexPointer = &gRandomIndex;
                         index = *indexPointer + 1;
                         mask = 1023;
                         index &= mask;
@@ -73,7 +73,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                         count &= 3;
                         count += 2;
                         index = (index + 1) & mask;
-                        gUnk_03005308 = index;
+                        gRandomIndex = index;
                         sample = (const u16 *)((index * sizeof(*table)) + (u32)table);
                         {
                             u32 value = *sample;
@@ -90,14 +90,14 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                     u32 direction;
                     register u32 angleMask asm("r8");
                     s32 duration;
-                    index = (gUnk_03005308 + 1) & mask;
+                    index = (gRandomIndex + 1) & mask;
                     direction = table[index];
                     direction &= 7;
                     direction += angle;
                     angleMask = 255;
                     direction &= angleMask;
                     index = (index + 1) & mask;
-                    gUnk_03005308 = index;
+                    gRandomIndex = index;
                     {
                         u32 value = table[index];
                         value &= 7;
@@ -111,7 +111,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                         u32 direction;
                         s32 count;
                         s32 duration;
-                        index = (gUnk_03005308 + 1) & mask;
+                        index = (gRandomIndex + 1) & mask;
                         direction = table[index];
                         direction &= 15;
                         direction += angle;
@@ -121,7 +121,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                         count &= 3;
                         count += 1;
                         index = (index + 1) & mask;
-                        gUnk_03005308 = index;
+                        gRandomIndex = index;
                         {
                             u32 value = table[index];
                             value &= 7;
@@ -142,7 +142,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                 {
                     register u32 index asm("r2");
                     {
-                        u32 *indexPointer = &gUnk_03005308;
+                        u32 *indexPointer = &gRandomIndex;
                         index = *indexPointer + 1;
                         mask = 1023;
                         index &= mask;
@@ -172,7 +172,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                         count &= 3;
                         count += 2;
                         index = (index + 1) & mask;
-                        gUnk_03005308 = index;
+                        gRandomIndex = index;
                         sample = (const u16 *)((index * sizeof(*table)) + (u32)table);
                         {
                             u32 value = *sample;
@@ -189,14 +189,14 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                     u32 direction;
                     u32 angleMask;
                     s32 duration;
-                    index = (gUnk_03005308 + 1) & mask;
+                    index = (gRandomIndex + 1) & mask;
                     direction = table[index];
                     direction &= 7;
                     direction += angle;
                     angleMask = 255;
                     direction &= angleMask;
                     index = (index + 1) & mask;
-                    gUnk_03005308 = index;
+                    gRandomIndex = index;
                     {
                         u32 value = table[index];
                         value &= 7;
@@ -211,7 +211,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                         u32 direction;
                         s32 count;
                         s32 duration;
-                        index = (gUnk_03005308 + 1) & mask;
+                        index = (gRandomIndex + 1) & mask;
                         direction = table[index];
                         direction &= 15;
                         direction += angle;
@@ -221,7 +221,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                         count &= 3;
                         count += 1;
                         index = (index + 1) & mask;
-                        gUnk_03005308 = index;
+                        gRandomIndex = index;
                         {
                             u32 value = table[index];
                             value &= 7;
@@ -246,7 +246,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                 {
                     register u32 index asm("r2");
                     {
-                        u32 *indexPointer = &gUnk_03005308;
+                        u32 *indexPointer = &gRandomIndex;
                         index = *indexPointer + 1;
                         mask = 1023;
                         index &= mask;
@@ -276,7 +276,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                         count &= 3;
                         count += 2;
                         index = (index + 1) & mask;
-                        gUnk_03005308 = index;
+                        gRandomIndex = index;
                         sample = (const u16 *)((index * sizeof(*table)) + (u32)table);
                         {
                             u32 value = *sample;
@@ -293,14 +293,14 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                     u32 direction;
                     register u32 angleMask asm("r9");
                     s32 duration;
-                    index = (gUnk_03005308 + 1) & mask;
+                    index = (gRandomIndex + 1) & mask;
                     direction = table[index];
                     direction &= 7;
                     direction += angle;
                     angleMask = 255;
                     direction &= angleMask;
                     index = (index + 1) & mask;
-                    gUnk_03005308 = index;
+                    gRandomIndex = index;
                     {
                         u32 value = table[index];
                         value &= 7;
@@ -315,7 +315,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                         u32 direction;
                         s32 count;
                         s32 duration;
-                        index = (gUnk_03005308 + 1) & mask;
+                        index = (gRandomIndex + 1) & mask;
                         direction = table[index];
                         direction &= 15;
                         direction += angle;
@@ -325,7 +325,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                         count &= 3;
                         count += 1;
                         index = (index + 1) & mask;
-                        gUnk_03005308 = index;
+                        gRandomIndex = index;
                         {
                             u32 value = table[index];
                             value &= 7;

@@ -33,6 +33,7 @@ void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
+#include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -49,8 +50,6 @@ void WirelessController_RestoreLocalInput(struct Engine *);
 void WirelessController_PollInputExchange(struct Engine *);
 void Wireless_BuildParentUniPacket(struct Engine *);
 void RfuManager_SendData(int);
-extern u32 gUnk_03005250;
-extern u16 gUnk_03005274[];
 int Wireless_ExchangeChildNiPacket(struct Engine *);
 void Wireless_PollChildNiSend(struct Engine *);
 int Wireless_UpdateChildNiSession(struct Engine *p)

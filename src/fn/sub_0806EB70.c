@@ -17,9 +17,9 @@ static inline s32 CellIndex(const struct ContactPosition *p)
 {
     s32 x = p->x >> 8;
     s32 z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u8 *Properties(s32 index)
 {
@@ -27,7 +27,7 @@ static inline u8 *Properties(s32 index)
     if (p)
         return p + 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = index * 4 + 12;
         return map->cells + offset;
     }
@@ -47,7 +47,7 @@ s32 sub_0806EB70(struct ContactPosition *out, const struct ContactPosition *from
     s32 fromIndex, toIndex, angle, height, column, row, result, first;
     s32 columnDelta, rowDelta;
     struct ContactPosition center, delta;
-    if (!gUnk_030052F4)
+    if (!gTerrainMap)
         return 0;
     fromIndex = CellIndex(from);
     toIndex = CellIndex(to);

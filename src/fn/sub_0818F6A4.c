@@ -7,6 +7,7 @@
 // Remaining differences: state dispatch, coordinate lifetimes and register allocation.
 #include "global.h"
 #include "display_animation.h"
+#include "engine.h"
 struct NidhoggrVector {
     s16 x, y, z, pad;
 };
@@ -168,15 +169,13 @@ struct TerrainRows {
     u16 rows[1];
 };
 
-extern u32 gUnk_030052F8, gUnk_030052FC;
-
 u8 *TerrainModifiers_FindCellOverride(int, int);
 static inline u8 *cell(int index)
 {
     u8 *p = TerrainModifiers_FindCellOverride(index, 1);
     if (p)
         return p + 4;
-    return gUnk_030052F4->cells + 12 + index * 4;
+    return gTerrainMap->cells + 12 + index * 4;
 }
 // confidence=low: rising effect retargets the player before descending and emitting an impact.
 inline static u32 Nidhoggr_StepAnimation_UpdateFallingAttackEffect(struct NidhoggrEffect *owner)
@@ -338,9 +337,9 @@ void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
                 int height;
                 u8 *c;
                 struct NidhoggrVector v;
-                value = *((u16 *)(gUnk_02000710 + 0x30));
+                value = *((u16 *)(gGameState + 0x30));
                 xField = (u16 *)(&p->sprite.position.x);
-                value = *((u16 *)(gUnk_02000710 + 0x34));
+                value = *((u16 *)(gGameState + 0x34));
                 *xField = value;
                 zField = (u16 *)(&p->sprite.position.z);
                 *((u16 *)(&p->sprite.position.z)) = value;
@@ -352,11 +351,11 @@ void Nidhoggr_UpdateFallingAttackEffect(struct NidhoggrEffect *p)
                 z = position->z >> 8;
                 savedPosition = position;
                 asm("" : "+r"(savedPosition));
-                if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) ||
-                    (((u32)z) >= gUnk_030052FC))
+                if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) ||
+                    (((u32)z) >= gTerrainHeight))
                     index = 0;
                 else
-                    index = gUnk_030052F4->rows[z] + x;
+                    index = gTerrainMap->rows[z] + x;
                 c = cell(index);
                 slope = (*c) >> 4;
                 height = ((*c) & 15) << 8;

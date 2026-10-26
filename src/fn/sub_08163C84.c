@@ -21,7 +21,7 @@ struct ParticlePool {
     void *resource;
     struct PoolParticle particles[16];
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 void *AnimData_FindEntry(u32);
 void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
@@ -31,7 +31,7 @@ void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 static inline u32 RandomByte(void)
 {
     u32 offset;
-    u32 *index = &gUnk_03005308;
+    u32 *index = &gRandomIndex;
     u32 next = *index + 1;
     u32 mask = 1023;
     *index = next & mask;
@@ -59,7 +59,7 @@ void ParticlePool_InitParticles(struct ParticlePool *pool)
     struct PoolParticleTail *tail;
     pool->resource = AnimData_FindEntry(0x1C1E);
     i = 0;
-    index = &gUnk_03005308;
+    index = &gRandomIndex;
     mask = 1023;
     zero = 0;
     tail = &pool->particles[0].tail;

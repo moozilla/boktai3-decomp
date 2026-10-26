@@ -1,5 +1,4 @@
 #define SelectionMenu_SetPhase Hud_SetUpdateCallback
-#define gGameState             gUnk_02000710
 #include "global.h"
 #include "game_state.h"
 struct SelectionMenu {
@@ -29,9 +28,9 @@ void SelectionMenu_ApplyConfirmedReward(struct SelectionMenu *p)
         Hud_SetUpdateCallback(p, SelectionMenu_UpdateConfirmInput);
     } else if (result == 1) {
         Sound_PlaySong(0xDD);
-        ((struct GameState *)(u8 *)gUnk_02000710)->menuRewardBalance += (p->count - 1) * 50;
-        if (((struct GameState *)(u8 *)gUnk_02000710)->menuRewardBalance > 9999)
-            (*(struct GameState *volatile *)&gUnk_02000710)->menuRewardBalance = 9999;
+        ((struct GameState *)(u8 *)gGameState)->menuRewardBalance += (p->count - 1) * 50;
+        if (((struct GameState *)(u8 *)gGameState)->menuRewardBalance > 9999)
+            (*(struct GameState *volatile *)&gGameState)->menuRewardBalance = 9999;
         p->confirmed = result;
         p->resultMode = 2;
         ScenePanel_BeginAccountExit(p);

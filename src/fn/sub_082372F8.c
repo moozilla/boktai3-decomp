@@ -1,10 +1,10 @@
 #include "global.h"
+#include "ram.h"
 void sub_08237280(void *);
-extern void *gUnk_020004A0;
 u32 RisingPuffPool_Init(u8 *s)
 {
     sub_08237280(s);
     *(u16 *)(s + 0x198) = 0;
-    gUnk_020004A0 = s;
+    gRisingSpritePool = s;
     return 0;
 }

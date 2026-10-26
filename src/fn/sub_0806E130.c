@@ -9,7 +9,7 @@ static inline u8 Occupied(u32 *mask, s32 index)
 static inline u32 Paused(void)
 {
     u32 mask = 0x400;
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 static inline u32 Locked(void)
 {

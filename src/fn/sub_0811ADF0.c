@@ -1,5 +1,3 @@
-#define gTerrainColumnIndices gUnk_020001F8
-#define gTerrainColumns       gUnk_020001FC
 /* Provisional family and semantic names; inferred from static accesses and callers. */
 #include "global.h"
 #include "scene_pool.h"

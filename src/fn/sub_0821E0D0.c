@@ -12,11 +12,11 @@ struct A {
     u8 p[0xc];
     struct T *fc;
 };
-extern struct A *gUnk_030052F4;
+extern struct A *gTerrainMap;
 u32 sub_0821E0D0(u16 id)
 {
     s32 i = 0;
-    struct T *t = gUnk_030052F4->fc;
+    struct T *t = gTerrainMap->fc;
     if (i < t->n) {
         s32 n = t->n;
         u8 *p = (u8 *)t;

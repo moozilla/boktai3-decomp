@@ -50,8 +50,8 @@ inline static u32 Chase_Bits32_1(struct SceneActorRegistryResetView *actor_, u32
 
 static inline u32 Vorn_GetRandomBits(u32 mask)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return ((const u16 *)0x0203B400)[index] & mask;
 }
 

@@ -1,8 +1,6 @@
-#define gGameState gUnk_02000710
 #include "global.h"
 #include "scene_hud_display.h"
 #include "game_state.h"
-extern struct GameState *gUnk_02000710;
 s32 SolarFruit_GetInventorySlot(s32);
 void SceneHud_RebuildTertiaryOptions(struct SceneHudState *p)
 {
@@ -12,7 +10,7 @@ void SceneHud_RebuildTertiaryOptions(struct SceneHudState *p)
     struct GameState **state;
     p->tertiarySelection = -1;
     i = 0;
-    state = &gUnk_02000710;
+    state = &gGameState;
     option = p->tertiaryOptions;
     for (; i <= 7; i++) {
         u8 *q = (u8 *)*state;
@@ -33,7 +31,7 @@ void SceneHud_RebuildTertiaryOptions(struct SceneHudState *p)
     }
     if (p->tertiarySelection == -1) {
         p->tertiarySelection = 0;
-        gUnk_02000710->actionAuxiliarySlot = 0;
+        gGameState->actionAuxiliarySlot = 0;
     }
     p->tertiaryVisible = count;
 }

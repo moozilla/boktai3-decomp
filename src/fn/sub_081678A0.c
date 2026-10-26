@@ -15,13 +15,13 @@ struct PanelClock {
     u8 pad[0x42];
     s16 active;
 };
-extern struct PanelClock *gUnk_02000710;
+extern struct PanelClock *gGameState;
 void PlayerPanel_ClearNoticeTiles(struct SelectionPanel *);
 void PauseMenu_InitHeaderTilemap(struct SelectionPanel *);
 void SelectionPanel_UpdateBlink(struct SelectionPanel *p)
 {
     if (p->owner->state != 6) {
-        if (gUnk_02000710->active > 0) {
+        if (gGameState->active > 0) {
             if (p->blinkTimer <= 29)
                 PlayerPanel_ClearNoticeTiles(p);
             else

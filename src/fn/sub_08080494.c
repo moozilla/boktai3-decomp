@@ -13,7 +13,7 @@ void SceneActorRecord_RecordPair(u16, u16);
 extern u16 gUnk_030039F0;
 static inline u32 NextRandom(const u16 *table)
 {
-    u32 *index = &gUnk_03005308;
+    u32 *index = &gRandomIndex;
     u32 next;
     next = (*index + 1) & 1023;
     *index = next;
@@ -21,7 +21,7 @@ static inline u32 NextRandom(const u16 *table)
 }
 static inline u32 FirstRandom(const u16 *table)
 {
-    u32 *index = &gUnk_03005308;
+    u32 *index = &gRandomIndex;
     u32 next;
     next = (*index + 1) & 1023;
     *index = next;
@@ -227,7 +227,7 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
             }
         }
     }
-    if (!Test(gUnk_030053F4, 0x4800) && !Flag(actor, 0x800, 0x2D0))
+    if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
         SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
     ActorShadow_Disable((u8 *)actor + 0x320);
 }

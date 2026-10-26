@@ -64,7 +64,7 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *input)
             struct GameState *indexed;
             slot = slotBase;
             slot += column;
-            indexed = (void *)((u32)gUnk_02000710 + cursor);
+            indexed = (void *)((u32)gGameState + cursor);
             {
                 u32 offset = 0x160;
                 s16 *values;
@@ -195,7 +195,7 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *input)
                     }
                 }
                 {
-                    struct GameState *state = gUnk_02000710;
+                    struct GameState *state = gGameState;
                     u32 offset = (u32) & ((struct GameState *)0)->unk7B0;
                     s16 *currency;
                     const struct SceneValueConsumableDefinition *record;
@@ -234,7 +234,7 @@ void SceneInventory_PopulateConsumableGrid(struct SceneInventoryPanel *input)
         }
     } while (1);
     {
-        register struct GameState *state asm("r0") = gUnk_02000710;
+        register struct GameState *state asm("r0") = gGameState;
         register struct ContactPosition *position asm("r4");
         register const s16 *party asm("r5");
         struct SceneInventoryWidgetFlags *entry;

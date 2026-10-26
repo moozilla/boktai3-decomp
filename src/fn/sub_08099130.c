@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
+#include "engine.h"
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 struct GhostPlayer {
     u8 pad[0x30];
     struct ContactPosition position;
@@ -43,22 +43,22 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
 static inline u32 RandomFirst(u32 bits)
 {
     u32 index, value;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    index = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    index = gRandomIndex * 2;
     value = *(const u16 *)(index + RANDOM_TABLE_ADDR);
     return value & bits;
 }
 static inline u16 Random(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(const u16 *)(gUnk_03005308 * 2 + (u32)gUnk_0203B400);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(const u16 *)(gRandomIndex * 2 + (u32)gUnk_0203B400);
 }
 static inline u16 RandomMotion(void)
 {
     u32 offset;
     const u16 *table;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     table = gUnk_0203B400;
     return *(const u16 *)(offset + (u32)table);
 }

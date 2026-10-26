@@ -38,6 +38,7 @@ void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
+#include "game_state.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -54,12 +55,11 @@ int SunClock_GetBaseHour(void);
 void WirelessText_EncodeString(const void *, void *, int);
 void Wireless_InitSessionConfig(void *, int, int, int, int, const void *, const void *);
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 struct Game {
     u8 pad[0x780];
     u8 playerName[8];
 };
-extern struct Game *gUnk_02000710;
 int WirelessController_UpdateAdapterSetup(struct Engine *p)
 {
     u8 *pending = &p->pending;
@@ -101,7 +101,7 @@ int WirelessController_UpdateAdapterSetup(struct Engine *p)
             *pending = 1;
             base = Script_ParseStringRef(p->script);
             table = gUnk_0203B400;
-            randomIndex = &gUnk_03005308;
+            randomIndex = &gRandomIndex;
             position = *randomIndex + 1;
             mask = 1023;
             position &= mask;
@@ -125,7 +125,7 @@ int WirelessController_UpdateAdapterSetup(struct Engine *p)
                 offset = (table[next] & three) + 4;
             }
             name = Text_LookupString(base + offset);
-            WirelessText_EncodeString(gUnk_02000710->playerName, p->userName, 8);
+            WirelessText_EncodeString(gGameState->playerName, p->userName, 8);
             userName = p->userName;
             gameName = p->gameName;
             WirelessText_EncodeString(name, gameName, 11);

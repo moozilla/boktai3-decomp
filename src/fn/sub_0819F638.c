@@ -1,6 +1,6 @@
 #include "global.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
-#define gRandomIndex          gUnk_03005308
 #define gRandomTable          gUnk_0203B400
 #define gHresvelgrVolleyState gUnk_02000230
 struct ReactionVector {
@@ -32,7 +32,7 @@ struct ActorReaction {
 struct ReactionIds {
     u32 a, b;
 };
-extern u32 gRandomIndex, gHresvelgrVolleyState;
+extern u32 gHresvelgrVolleyState;
 extern const u16 gRandomTable[];
 void DirectionBurst_EmitOffset(const void *, u32, u32, u32, u32, u32);
 void Hresvelgr_SetAnimation(struct ActorReaction *, void *, void *, u32, u32, u32);

@@ -7,7 +7,7 @@ struct LinkSession {
     u32 f628;
     u32 f62C;
 };
-extern struct LinkSession *gUnk_02000710;
+extern struct LinkSession *gGameState;
 u32 LinkPlayer_GetSessionPlayerData(u8 *);
 void LinkPlayer_InitOptionalPlayerState(u8 *);
 void LinkPlayer_LoadBaseStats(u8 *);
@@ -26,10 +26,10 @@ s32 sub_0823ADB4(u8 *p)
     u32 v = LinkPlayer_GetSessionPlayerData(p);
     *(u32 *)(p + 0x344) = v;
     *(u32 *)(p + 0x1c) = 1;
-    *(u32 *)((u8 *)gUnk_02000710 + 0x628) = 0;
-    gUnk_02000710->f62C = 0;
-    *(u16 *)((u8 *)gUnk_02000710 + 0x610) = 0;
-    gUnk_02000710->f612 = 0;
+    *(u32 *)((u8 *)gGameState + 0x628) = 0;
+    gGameState->f62C = 0;
+    *(u16 *)((u8 *)gGameState + 0x610) = 0;
+    gGameState->f612 = 0;
     LinkPlayer_InitOptionalPlayerState(p);
     LinkPlayer_LoadBaseStats(p);
     LinkPlayer_InitHealth(p);

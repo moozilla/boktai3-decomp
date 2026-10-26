@@ -24,15 +24,15 @@ typedef struct State {
 } State;
 extern const s16 gUnk_086149C4[];
 extern u8 gUnk_0203B400[];
-extern u32 gUnk_03005308;
-extern u8 *gUnk_02000710;
+extern u32 gRandomIndex;
+extern u8 *gGameState;
 void SpriteDrawable_SelectTileFrame(Effect *, void *, s32);
 static inline s32 random_value(void)
 {
     register u8 *table asm("r2");
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 << 1;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex << 1;
     table = gUnk_0203B400;
     offset += (u32)table;
     return *(u16 *)offset;
@@ -40,8 +40,8 @@ static inline s32 random_value(void)
 static inline s32 random_first(void)
 {
     u8 *table = gUnk_0203B400;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(u16 *)(table + (gUnk_03005308 << 1));
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(u16 *)(table + (gRandomIndex << 1));
 }
 static inline s32 scale(s32 v)
 {
@@ -51,7 +51,7 @@ static inline s32 scale(s32 v)
 }
 void ConvergingEffects_EmitNearParticle(State *s, Point *pos)
 {
-    s32 step = *(s16 *)(gUnk_02000710 + 0x876);
+    s32 step = *(s16 *)(gGameState + 0x876);
     s->ticks = step + 2 + s->ticks;
     if (s->ticks > 39) {
         Effect *e = &s->effects[s->next];

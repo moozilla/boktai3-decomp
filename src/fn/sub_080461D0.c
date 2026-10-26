@@ -40,7 +40,7 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
             u32 *counter;
             u32 sampleZ;
             u32 zMask;
-            randomIndex = gUnk_03005308 + 1;
+            randomIndex = gRandomIndex + 1;
             randomMask = 1023;
             randomIndex &= randomMask;
             sample = table[randomIndex];
@@ -54,7 +54,7 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
             sampleY &= yMask;
             scatter.bits.y = sampleY;
             randomIndex = (randomIndex + 1) & randomMask;
-            counter = &gUnk_03005308;
+            counter = &gRandomIndex;
             *counter = randomIndex;
             sampleZ = table[randomIndex];
             zMask = xzMask;
@@ -98,7 +98,7 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
             u32 sourceY;
             u32 zMask;
             u32 sourceZ;
-            randomIndex = (gUnk_03005308 + 1) & randomMask;
+            randomIndex = (gRandomIndex + 1) & randomMask;
             sampleX = table[randomIndex];
             lowMask = xzMask;
             sampleX &= lowMask;
@@ -109,7 +109,7 @@ void ContactSequenceActor_UpdateDying(struct ContactSequenceOwner *parent,
             sampleY &= yMask;
             scatterPosition->y = sampleY;
             randomIndex = (randomIndex + 1) & randomMask;
-            counter = &gUnk_03005308;
+            counter = &gRandomIndex;
             *counter = randomIndex;
             sampleZ = table[randomIndex];
             sourceX = (u16)actor->position.x;

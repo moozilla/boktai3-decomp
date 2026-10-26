@@ -8,6 +8,7 @@
 #define Mummy_ProcessContactPursuit sub_080D7568
 #include "scene_actor_chase.h"
 #include "scene_actor_contacts.h"
+#include "ram.h"
 s32 Mummy_CanPassMovementThreshold(void *);
 u8 Mummy_TryDirectPursuit(void *);
 void SceneActorTarget_ResetContactResponse(void *);
@@ -17,7 +18,6 @@ struct MummyContactState {
     u8 unknown[11];
     u8 flags;
 };
-extern u16 gUnk_02000508;
 static inline u8 TestContext(u8 *context, u32 mask)
 {
     if (*(u16 *)(context + 0x6F2) & mask)
@@ -46,8 +46,8 @@ static inline void Mummy_BeginTurn(void *obj, u8 saved)
         s32 choice;
         for (;;) {
             const u16 *table = gUnk_0203B400;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            choice = (table[gUnk_03005308] & 3) << 6;
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            choice = (table[gRandomIndex] & 3) << 6;
             if (choice != prior)
                 break;
             if (++tries > 3) {
@@ -73,7 +73,7 @@ static inline u8 Mummy_Arrive(void *obj)
     s32 cell;
     s32 player;
     Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
-    if (Chase_Test(gUnk_030053F4, 0x4800)) {
+    if (Chase_Test(gEngineFlags, 0x4800)) {
         struct ChaseTarget *t = *slot;
         if (!t)
             goto invoke;
@@ -120,15 +120,15 @@ static inline u8 Mummy_Arrive(void *obj)
     goto done;
 reroute: {
     struct ContactPosition *targetPointer = &target;
-    s32 x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-    s32 z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+    s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
+    s32 z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
     u8 *data;
     targetPointer->x = (x << 8) + 0x80;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
+        data = gTerrainMap->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
     if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, targetPointer))
@@ -160,7 +160,7 @@ u8 Mummy_ProcessContactPursuit(struct SceneActorRegistryResetView *actor)
         return 0;
     if (!Chase_Bits32(&actor->flags2D0, 0x1000000))
         return 0;
-    if ((*((u32 *)(group + 0x64))) != gUnk_02000508)
+    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId)
         return 0;
     target = (void *)(&actor->fieldDC);
     ((struct MummyContactState *)target)->flags |= 2;
@@ -210,7 +210,7 @@ u8 Mummy_ProcessContactPursuit(struct SceneActorRegistryResetView *actor)
         goto restore;
     if (actor->field2C2 != 64)
         return 0;
-    if ((*((u32 *)(group + 0x64))) != gUnk_02000508)
+    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId)
         return 0;
     actor->flags2D6 |= 0x100;
 restore:

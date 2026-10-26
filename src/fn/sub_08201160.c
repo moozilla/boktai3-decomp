@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 // 4 differing instruction runs; first diff at +0x1C (mov r0, r8 vs bl #0x820112c)
 struct Pair {
     u32 a, b;
@@ -10,7 +11,6 @@ struct Pool {
 struct Pos {
     u16 x, y, z, pad;
 };
-extern u8 *gUnk_020005F8;
 u8 *PlayerClone_FindFreeSlot(void *, s32 *);
 void Memory_Copy(void *, void *, u32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
@@ -30,7 +30,7 @@ s32 sub_08201160(u8 *resource, struct Pos *pos)
         s32 index;
     } scratch;
     u8 *pool;
-    t = gUnk_020005F8;
+    t = gDirectionalSpritePool;
     pool = t;
     asm("" : "+r"(pool));
     if (t) {

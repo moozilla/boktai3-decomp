@@ -26,7 +26,7 @@ struct Manager {
     struct Group groups[4];
 };
 extern struct Manager *gUnk_02000064;
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_08604C42[], gUnk_08604C30[];
 extern s16 gUnk_086149C4[];
 #define RANDOM_TABLE ((u16 *)0x0203B400)
@@ -79,7 +79,7 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
     if (count > 6)
         count = 6;
     j = 0;
-    rng = (t2 = &gUnk_03005308);
+    rng = (t2 = &gRandomIndex);
     g = m->groups;
     speeds = (void *)(((u8 *)m) + 0x52);
     {

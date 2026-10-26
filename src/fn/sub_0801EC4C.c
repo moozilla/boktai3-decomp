@@ -21,7 +21,7 @@ void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
             obj->pos.z += 0x80;
             break;
         case 1:
-            obj->cellA = cell - *(u16 *)(gUnk_030052F4->cells + 4);
+            obj->cellA = cell - *(u16 *)(gTerrainMap->cells + 4);
             obj->cellB = cell;
             obj->pos.x += 0x80;
             break;
@@ -32,7 +32,7 @@ void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
             break;
         case 3:
             obj->cellA = cell;
-            obj->cellB = cell - *(u16 *)(gUnk_030052F4->cells + 4);
+            obj->cellB = cell - *(u16 *)(gTerrainMap->cells + 4);
             obj->pos.x += 0x80;
             break;
     }

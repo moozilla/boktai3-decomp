@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 extern const s16 gUnk_086149C4[];
 struct XZ {
     u32 x, z;
@@ -20,7 +21,6 @@ struct ShotG {
     u8 f[0x3c];
     u32 n;
 };
-extern struct ShotG *gUnk_02000238;
 struct ShotE *Hresvelgr_FindInactiveShot(void);
 void EffectVariant_SetProperties(struct ShotE *, u32);
 
@@ -33,7 +33,7 @@ static inline s32 shift12(s32 v)
 void DirectionBurst_EmitConfigured(const struct XZ *origin, u32 angle, u32 speed, u32 a3, s32 a4,
                                    u32 a5, u32 param, u32 a7)
 {
-    struct ShotG *g = gUnk_02000238;
+    struct ShotG *g = gDirectionBurstEmitter;
     struct ShotE *e = Hresvelgr_FindInactiveShot();
     if (e) {
         g->n++;

@@ -2,10 +2,10 @@
 struct S {
     u32 a;
 };
-extern struct S *gUnk_02000208;
+extern struct S *gScriptRecordTable;
 struct S *Modifier_GetTableTask(void)
 {
-    if (!gUnk_02000208)
+    if (!gScriptRecordTable)
         return 0;
-    return &gUnk_02000208->a;
+    return &gScriptRecordTable->a;
 }

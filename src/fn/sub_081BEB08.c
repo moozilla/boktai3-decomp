@@ -1,4 +1,3 @@
-#define gGameState gUnk_02000710
 #include "global.h"
 #include "scene_inventory_panel.h"
 struct StoragePanel {
@@ -20,7 +19,7 @@ void Storage_ShowConsumableDescription(struct StoragePanel *panel)
     s32 item;
     if (panel->selection <= 7) {
         u32 selection = panel->items[panel->savedSelection];
-        struct GameState *state = gUnk_02000710;
+        struct GameState *state = gGameState;
         struct GameState *indexed = (void *)(selection * 2 + (u32)state);
         item = indexed->table160[0];
     } else

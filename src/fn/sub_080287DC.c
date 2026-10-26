@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // confidence=low: Vampire per-frame update: animation, scale wobble, shake, cached target bearings.
 struct Vec {
     s16 x, y, z, pad;
@@ -33,7 +34,6 @@ struct VampireTick {
     u8 pad39a;
     u8 shake2;
 };
-extern u32 gUnk_03005308;
 extern const s16 gUnk_086149C4[];
 void SceneActors_DispatchCommands(void *);
 void Obj_StepPosition(void *);
@@ -82,8 +82,8 @@ void Vampire_UpdateFrame(struct VampireTick *p)
     if (actor->shake2) {
         u32 angle;
         s32 product, x, z;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-        angle = *(u16 *)(RANDOM_TABLE_ADDR + (gUnk_03005308 << 1));
+        gRandomIndex = (gRandomIndex + 1) & 1023;
+        angle = *(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1));
         product = gUnk_086149C4[(angle + 64) & 255] * (actor->shake2 << 2);
         if (product >= 0)
             x = product >> 12;

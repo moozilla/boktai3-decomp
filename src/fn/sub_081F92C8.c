@@ -46,7 +46,7 @@ struct ChoiceTable {
 };
 extern const struct ChoiceTable gUnk_0824FDF8, gUnk_0824FE08, gUnk_0824FE18;
 extern void *const gUnk_08613F04[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 u8 Callback_InvokeActor(void *, void *);
 struct Vec *Player_GetEffectivePosition(s32);
@@ -62,14 +62,14 @@ static inline u32 flags(struct Actor *p, u32 mask)
 }
 static inline u32 randomB(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return gUnk_0203B400[gRandomIndex];
 }
 #define RANDOM_TABLE_ADDR 0x0203B400
 static inline s32 randomByte(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(const u8 *)(RANDOM_TABLE_ADDR + gUnk_03005308 * 2);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(const u8 *)(RANDOM_TABLE_ADDR + gRandomIndex * 2);
 }
 static inline void snapshot(struct Actor *p, struct Actor *q)
 {

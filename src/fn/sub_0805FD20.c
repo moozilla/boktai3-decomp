@@ -135,7 +135,7 @@ void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *input)
                         Anim_LoadKeyframe(argument, &panel->display.gridResource, frame, 1);
                     }
                 }
-                if (gUnk_02000710->unk7B0 < definition->baseValue)
+                if (gGameState->unk7B0 < definition->baseValue)
                     SceneHud_SetKeyframePaletteBank(widget, 0x374);
                 else
                     SceneHud_SetKeyframePaletteBank(widget, 0x373);
@@ -158,7 +158,7 @@ void SceneInventory_PopulateEquipmentGrid(struct SceneInventoryPanel *input)
         }
     } while (1);
     {
-        struct GameState *state = gUnk_02000710;
+        struct GameState *state = gGameState;
         const s16 *materials;
         struct ContactPosition *position;
         struct SceneInventoryWidgetFlags *entry;

@@ -1,4 +1,3 @@
-#define gGameState gUnk_02000710
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
@@ -7,8 +6,8 @@ void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
 void Player_EmitPeriodicParticles(struct Player *p)
 {
     struct ContactPackedVector spread, position;
-    if (gUnk_02000710->playerParticleRate) {
-        if (gUnk_02000710->playerParticleRate <= 2499)
+    if (gGameState->playerParticleRate) {
+        if (gGameState->playerParticleRate <= 2499)
             p->particleCadenceCounter++;
         else
             p->particleCadenceCounter += 2;

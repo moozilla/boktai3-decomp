@@ -22,7 +22,7 @@ struct BurstSparkPool {
     u8 animation[0x1C];
 };
 extern struct BurstSparkPool *gUnk_0200015C;
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 struct BurstSparkPool *BurstSpark_EnsurePool(void);
@@ -31,14 +31,14 @@ void Sprite_InitUnlinked(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, u32);
 static inline u32 RandomValue(const u16 *table)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return table[index];
 }
 static inline u32 LastRandom(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     {
         u32 offset = index * 2;
         register const u16 *lastTable asm("r3") = gUnk_0203B400;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -15,7 +16,6 @@ struct Emitter {
     s16 angle, speed;
     u32 count;
 };
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 extern s16 gUnk_03005418[];
@@ -23,7 +23,7 @@ struct Particle *ParticlePool_FindFreeEntry(struct Emitter *);
 static inline s32 random(void)
 {
     const u16 *table = gUnk_0203B400;
-    u32 *indexPtr = &gUnk_03005308;
+    u32 *indexPtr = &gRandomIndex;
     u32 index = *indexPtr + 1;
     u32 mask = 1023;
     index &= mask;
@@ -33,7 +33,7 @@ static inline s32 random(void)
 static inline s32 randomCircle(void)
 {
     /* The shared random table resides in work RAM. */
-    return ((const u16 *)0x0203B400)[gUnk_03005308 = (gUnk_03005308 + 1) & 1023];
+    return ((const u16 *)0x0203B400)[gRandomIndex = (gRandomIndex + 1) & 1023];
 }
 static inline s32 scale12(s32 x)
 {

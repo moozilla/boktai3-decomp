@@ -11,7 +11,7 @@ void SceneActorRegistry_EnsureActorSubsystems(struct SceneActorRegistryManager *
 static inline u8 TrackPairs(void)
 {
     u32 mask = 4;
-    if (gUnk_02000710->flags868 & mask)
+    if (gGameState->flags868 & mask)
         return 1;
     return 0;
 }

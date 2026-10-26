@@ -15,27 +15,27 @@ static inline s32 truncateShift12(s32 value)
 static inline s32 cellIndex(struct ContactPosition *position)
 {
     s32 x = position->x >> 8, z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u8 *cell(s32 index)
 {
     u8 *dynamic = TerrainModifiers_FindCellOverride(index, 1);
     if (dynamic)
         return dynamic + 4;
-    return gUnk_030052F4->cells + 12 + index * 4;
+    return gTerrainMap->cells + 12 + index * 4;
 }
 static inline u32 nextRandom(const u16 *table)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return table[index];
 }
 inline static u32 nextRandom_UpdateRetreat(const u16 *table)
 {
-    u32 index = ((*((typeof(gUnk_03005308) *)0x03005308)) + 1) & 1023;
-    *((typeof(gUnk_03005308) *)0x03005308) = index;
+    u32 index = ((*((typeof(gRandomIndex) *)0x03005308)) + 1) & 1023;
+    *((typeof(gRandomIndex) *)0x03005308) = index;
     return table[index];
 }
 

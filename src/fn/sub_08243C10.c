@@ -3,7 +3,7 @@
 extern u32 gUnk_030035BC, gUnk_030035B0, gUnk_030035B4, gUnk_03006A38, gUnk_03006A4C;
 extern u32 gUnk_03006A40, gUnk_03006A30, gUnk_03006A44, gUnk_03006A34;
 extern s32 gUnk_03006A48;
-extern void (*gUnk_03003A10[])(void);
+extern void (*gSerialInterruptState[])(void);
 void Solar_OnTimerInterrupt(void);
 static inline u16 maskIE(u32 ie, u32 mask)
 {
@@ -26,7 +26,7 @@ void Solar_InitTimer(void)
     REG_IE = 0;
     *(vu16 *)0x0400010C = 0;
     *(vu16 *)0x0400010E = 0xC0;
-    gUnk_03003A10[2] = Solar_OnTimerInterrupt;
+    gSerialInterruptState[2] = Solar_OnTimerInterrupt;
     gUnk_03006A34 = *(vu16 *)0x080000C4;
     *(vu16 *)0x080000C6 = 7;
     *(vu16 *)0x080000C8 = 1;

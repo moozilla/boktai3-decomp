@@ -12,7 +12,7 @@ struct P {
     u8 s9c[0x56];
     u16 hf2;
 };
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 
 s32 Collider_Refresh(void *);
 void Task_Kill(void *);
@@ -24,7 +24,7 @@ void PlayerBurst_UpdateShutdown(struct P *p)
     c = &p->hf2;
     if (*c == 0) {
         andm(&gEnginePauseFlags, ~4);
-        gUnk_030053F4 &= ~1;
+        gEngineFlags &= ~1;
     }
     (*c)++;
     if (*c <= 5)

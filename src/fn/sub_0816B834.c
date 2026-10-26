@@ -7,9 +7,9 @@ void GameState_ClearAreaFlagsFromScript(void)
     s32 i;
     if (Script_SeekToKeyword('s')) {
         i = Script_GetValue();
-        *(u32 *)((u8 *)gUnk_02000710 + i * 4 + 0x5C0) = 0;
+        *(u32 *)((u8 *)gGameState + i * 4 + 0x5C0) = 0;
     } else {
         for (i = 0; i <= 14; i++)
-            *(u32 *)((u8 *)gUnk_02000710 + i * 4 + 0x5C0) = 0;
+            *(u32 *)((u8 *)gGameState + i * 4 + 0x5C0) = 0;
     }
 }

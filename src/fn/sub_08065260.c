@@ -35,10 +35,10 @@ void ActorAttachment_TickRisingPart(struct ActorAttachmentSlotView *slot)
             slot->jitter[0].x = (wave * radius) >> 12;
         }
         slot->jitter[0].y += 2;
-        random = gUnk_03005308 + 1;
+        random = gRandomIndex + 1;
         randomMask = 0x3FF;
         random &= randomMask;
-        gUnk_03005308 = random;
+        gRandomIndex = random;
         phase = slot->phase;
         {
             register const u16 *table asm("r2");

@@ -2,7 +2,9 @@
 #include "global.h"
 #include "area_effect_link.h"
 #include "game_state.h"
-extern u32 gUnk_03005250, gUnk_030053F4, gUnk_030053F0;
+#include "engine.h"
+#include "ram.h"
+extern u32 gUnk_030053F0;
 extern u8 *gUnk_020004F0[];
 u8 Registry1745_ConsumeStateEntry(void *);
 s32 Registry1745_CheckSessionReady(void *);
@@ -67,9 +69,9 @@ s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
     u32 flags;
     s32 i;
     u32 mask;
-    gUnk_03005250 = 1;
+    gLinkMenuActive = 1;
     if (Registry1745_ConsumeStateEntry(p)) {
-        p->receiveBits = (u16)gUnk_02000710->unk874 >> 2;
+        p->receiveBits = (u16)gGameState->unk874 >> 2;
         p->sendBit = 0;
         p->receiveBit = 0;
         for (i = 0; i < p->participantCount; i++)
@@ -82,7 +84,7 @@ s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
         return -1;
     }
     mask = 0x800;
-    if ((gUnk_030053F4 | gUnk_030053F0) & mask) {
+    if ((gEngineFlags | gUnk_030053F0) & mask) {
         s32 best = 0, bestIndex = -1, j;
         for (j = 0; j <= 1; j++) {
             if (gUnk_020004F0[j]) {

@@ -1,4 +1,3 @@
-#define gGameState gUnk_02000710
 #include "global.h"
 #include "player.h"
 #include "contact_actor.h"
@@ -41,7 +40,7 @@ void PlayerContact_ApplyStatReward(struct ContactCollider *a, struct ContactColl
             gain = -(-value >> 8);
         PlayerStats_AddHundredths(p, gain);
         if (p->actionMode == 1)
-            gUnk_02000710->unk600 += 12;
+            gGameState->unk600 += 12;
     }
     if (p && masked(&p->statBonusFlags, 0x4000000))
         PlayerCue_InitCollider(p);

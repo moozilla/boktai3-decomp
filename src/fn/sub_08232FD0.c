@@ -1,5 +1,5 @@
 #include "global.h"
-extern struct Manager *gUnk_02000098;
+extern struct Manager *gEffectQuad;
 extern u8 *gUnk_020004B4;
 void SpriteDrawable_SelectTileFrame(void *, u32, s32);
 
@@ -32,13 +32,13 @@ static inline s32 GetCurrent(void)
 void sub_08232FD0(s32 index, struct Pair *pos)
 {
     struct Entry *e;
-    if (gUnk_02000098 == NULL)
+    if (gEffectQuad == NULL)
         return;
     if (GetCurrent() == index)
         return;
-    e = &gUnk_02000098->entries[index];
+    e = &gEffectQuad->entries[index];
     e->pos = *pos;
-    SpriteDrawable_SelectTileFrame(e->drawable, gUnk_02000098->resource, 53);
+    SpriteDrawable_SelectTileFrame(e->drawable, gEffectQuad->resource, 53);
     {
         u8 st = 2;
         e->state = st;

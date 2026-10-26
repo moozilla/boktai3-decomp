@@ -1,5 +1,5 @@
-#define gRandomIndex gUnk_03005308
 #include "global.h"
+#include "engine.h"
 struct LinkVector {
     s16 x, y, z;
 };
@@ -13,7 +13,6 @@ struct LinkEffect {
     u16 timer;
     u8 unknown3A, state, emitted;
 };
-extern u32 gRandomIndex;
 s32 Mod(s32, s32);
 void Sound_PlaySongChecked(u32);
 u8 *SunOrb_GetPositionFromManager(u8 *, s32);

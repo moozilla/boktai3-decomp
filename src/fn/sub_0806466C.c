@@ -92,9 +92,9 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
         }
     } else {
         if (slot->timer > 10 && IsRemoving(slot)) {
-            u32 index = (gUnk_03005308 + 1) & 1023;
+            u32 index = (gRandomIndex + 1) & 1023;
             s32 jitter;
-            gUnk_03005308 = index;
+            gRandomIndex = index;
             {
                 u32 offset = index << 1;
                 const u16 *table;

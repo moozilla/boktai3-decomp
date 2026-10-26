@@ -38,7 +38,7 @@ struct ControlPanel {
 };
 
 extern struct PanelPlayer *volatile gUnk_02000580;
-extern struct PanelState *gUnk_02000710;
+extern struct PanelState *gGameState;
 void ControlPanel_UpdateGaugeIndicator(struct ControlPanel *);
 void Sound_StopSong(u32);
 void Sound_SetChannel10Tempo(u32);
@@ -96,15 +96,15 @@ void sub_081C1FC0(struct ControlPanel *p)
             ControlPanel_UpdateSustainedInputTimer(p);
             v = sub_081C1E48(p);
             total = p->total += v;
-            if (gUnk_02000710->balance < v) {
-                gUnk_02000710->balance = done;
+            if (gGameState->balance < v) {
+                gGameState->balance = done;
                 if (p->cooldown == 0)
                     ControlPanel_BeginIdle(p, 0);
             } else if (p->ticks >= p->tickLimit && total >= p->totalLimit) {
                 ControlPanel_BeginIdle(p, 1);
             } else {
                 Sound_SetChannel10Tempo(gUnk_02000580->speed * 96);
-                gUnk_02000710->balance -= v;
+                gGameState->balance -= v;
             }
         }
         ControlPanel_ShowRewardBalanceDigits(p);

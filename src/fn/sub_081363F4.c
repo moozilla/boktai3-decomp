@@ -29,7 +29,7 @@ static inline s32 LocalPlayer(void)
 }
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u32 *owner = &actor->field2E0;
         u32 mask = *owner;
         if (!(mask & 0x20) && mask) {

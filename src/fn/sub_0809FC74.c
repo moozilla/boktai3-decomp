@@ -9,7 +9,7 @@ struct CrowWanderContext {
 };
 static inline u32 Random(void)
 {
-    u32 *indexPtr = &gUnk_03005308;
+    u32 *indexPtr = &gRandomIndex;
     u32 i = (*indexPtr + 1) & 1023;
     *indexPtr = i;
     i *= 2;

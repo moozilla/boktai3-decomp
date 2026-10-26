@@ -40,9 +40,9 @@ void sub_08014634(u32, u32, void *, void *, void *, u32, u32);
 static inline s32 cellIndex(struct SceneVec *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 static inline u32 groundHeight(struct SceneVec *position)
@@ -54,7 +54,7 @@ static inline u32 groundHeight(struct SceneVec *position)
     if (cell)
         cell += 4;
     else
-        cell = gUnk_030052F4->cells + 12 + index * 4;
+        cell = gTerrainMap->cells + 12 + index * 4;
     kind = *cell >> 4;
     height = (*cell & 15) << 8;
     switch (kind) {
@@ -95,7 +95,7 @@ void SpriteEffect_UpdateFallingShard(struct SpriteEffectPool *manager, struct Sp
         low.x = -12;
         {
             const u16 *table = gUnk_0203B400;
-            u32 *indexPtr = &gUnk_03005308;
+            u32 *indexPtr = &gRandomIndex;
             u32 index = *indexPtr + 1;
             u32 mask = 1023;
             register u32 small asm("r9");

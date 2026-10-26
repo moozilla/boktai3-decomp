@@ -1,8 +1,8 @@
 #include "state_actor.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 void *SpriteEffectController_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                     u32, u32, u32, u32, u32, s32, s32);
 static inline s32 Scale(s32 value)
@@ -11,7 +11,7 @@ static inline s32 Scale(s32 value)
 }
 static inline s32 Random(const u16 *table)
 {
-    u32 *cursor = &gUnk_03005308;
+    u32 *cursor = &gRandomIndex;
     *cursor = (*cursor + 1) & 1023;
     return table[*cursor];
 }

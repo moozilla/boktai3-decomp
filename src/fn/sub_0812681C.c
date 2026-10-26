@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_vec.h"
+#include "ram.h"
 #define SceneStatusIndicator_GetOrCreateManager BlinkingEffect_EnsurePool
-#define gSceneStatusIndicatorManager            gUnk_02000158
 struct SceneStatusIndicator {
     u32 flags;
     u8 unknown4[11], mode, unknown10[8];
@@ -21,7 +21,6 @@ struct SceneStatusIndicatorManager {
     u8 unknown0[0x18];
     void *resource;
 };
-extern struct SceneStatusIndicatorManager *gUnk_02000158;
 struct SceneStatusIndicatorManager *BlinkingEffect_EnsurePool(void);
 struct SceneStatusIndicator *SceneStatusIndicator_Allocate(struct SceneStatusIndicatorManager *);
 void ParticleSprite_Initialize(struct SceneStatusIndicator *, void *, u32);
@@ -30,7 +29,7 @@ void SpriteDrawable_SelectTileFrame(struct SceneStatusIndicator *, void *, u32);
 struct SceneStatusIndicator *
 SceneStatusIndicator_Create(struct SceneStatusIndicatorPosition *position)
 {
-    struct SceneStatusIndicatorManager *manager = gUnk_02000158;
+    struct SceneStatusIndicatorManager *manager = gSceneStatusIndicatorManager;
     struct SceneStatusIndicator *entry;
     u32 one;
     if (!manager) {

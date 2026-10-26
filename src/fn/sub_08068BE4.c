@@ -14,7 +14,7 @@ static inline u8 *sub08068BE4_CellDefinition(s32 cell)
     u8 *definition = TerrainModifiers_FindCellOverride(cell, 1);
     if (definition)
         return definition + 4;
-    return gUnk_030052F4->cells + cell * 4 + 12;
+    return gTerrainMap->cells + cell * 4 + 12;
 }
 
 static inline s32 sub08068BE4_Height(u8 *definition, struct ContactPosition *position)
@@ -36,9 +36,9 @@ static inline s32 sub08068BE4_CellIndex(struct ContactPosition *position)
 {
     s32 x = position->x >> 8;
     s32 z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 #ifdef NONMATCHING

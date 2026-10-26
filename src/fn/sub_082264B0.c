@@ -1,10 +1,10 @@
 #include "global.h"
-extern u8 *gUnk_03005420;
+#include "ram.h"
 void Camera_ReturnToDefault(void *);
 
 void sub_082264B0(void *target)
 {
-    u8 *camera = gUnk_03005420;
+    u8 *camera = gActiveCamera;
     if (camera != NULL) {
         *(u16 *)(camera + 0x1e) = 0;
         Camera_ReturnToDefault(target);

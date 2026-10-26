@@ -43,9 +43,9 @@ static inline u8 ContextFlags(u8 *ctx)
 }
 static inline u32 Random4(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
+    u32 index = (gRandomIndex + 1) & 1023;
     u32 v;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     index *= 2;
     v = *(const u16 *)((u32)gUnk_0203B400 + index);
     v &= 3;

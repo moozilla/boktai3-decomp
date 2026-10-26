@@ -43,7 +43,7 @@ struct StackedActor {
     u16 unknown380, frame;
     void (*update)(struct StackedActor *);
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern struct StackedActor *gUnk_02000118;
 void StackedActor_SetUpdate(struct StackedActor *, void (*)(struct StackedActor *));
 void StackedActor_UpdateSegments(struct StackedActor *);

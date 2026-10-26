@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: alternates side-specific sequences and emits four directional shots per pulse.
 struct Vec {
@@ -25,7 +26,6 @@ struct Hresvelgr {
 };
 extern const struct Sequences gUnk_0824F72C;
 extern s32 gUnk_02000234;
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -66,7 +66,7 @@ void Hresvelgr_UpdateAlternatingVolley(struct Hresvelgr *actor)
         register u32 *index asm("r8");
         AddOffset(&pos, actor, actor->side, &actor->position);
         Sound_PlaySong(0x3e2);
-        index = &gUnk_03005308;
+        index = &gRandomIndex;
         i = 3;
         do {
             register const u16 *table asm("r6") = gUnk_0203B400;

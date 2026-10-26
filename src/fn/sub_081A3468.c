@@ -1,10 +1,10 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 f[4];
     u8 a;
     u8 g[0x90 - 5];
 };
-extern s32 gUnk_02000238;
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
 s32 Hresvelgr_DestroyShotPool(struct E *e)
@@ -20,5 +20,5 @@ s32 Hresvelgr_DestroyShotPool(struct E *e)
         e++;
         i--;
     } while (i >= 0);
-    return gUnk_02000238 = 0;
+    return gDirectionBurstEmitter = 0;
 }

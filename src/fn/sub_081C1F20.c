@@ -21,7 +21,7 @@ void ControlPanel_UpdateIdle(void);
 
 void ControlPanel_BeginIdle(struct S *p, u32 flag)
 {
-    gUnk_02000710->menuRewardBalance = 0;
+    gGameState->menuRewardBalance = 0;
     ControlPanel_ClearPlayerInputHistory();
 
     p->multiplier = 1;

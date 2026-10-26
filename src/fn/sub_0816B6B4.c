@@ -1,4 +1,4 @@
-#define gSceneGameState          gUnk_02000710
+#define gSceneGameState          gGameState
 #define gSceneSequenceEntries    gUnk_08611BA8
 #define gSceneSequenceSelections gUnk_08611BC0
 #include "global.h"
@@ -15,7 +15,7 @@ extern const struct SceneSequenceEntry *const gUnk_08611BA8[];
 extern const struct SceneSequenceSelection *const gUnk_08611BC0[];
 s32 SceneSequence_GetSelectedMessage(void)
 {
-    struct GameState *state = gUnk_02000710;
+    struct GameState *state = gGameState;
     s32 result;
     if ((s16)state->savedX <= 5) {
         const struct SceneSequenceEntry *entries = gUnk_08611BA8[(s16)state->savedX];

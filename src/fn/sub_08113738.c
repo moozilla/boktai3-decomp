@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "actor_attachment_state.h"
+#include "ram.h"
 static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
                                              struct DisplaySequenceState *state)
 {
@@ -147,7 +148,6 @@ struct Effect {
 };
 extern struct Camera *gUnk_020004B8;
 extern const s16 gUnk_086149C4[];
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 s32 Mod(s32, s32);
 void NativeParticle_CreateWithFlag(void *, s32, void *, s32, s32, s32, s32);

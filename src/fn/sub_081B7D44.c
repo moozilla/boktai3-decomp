@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 // confidence=low: HitSwitch_DestroyManager for the growth hazard's entries (0x118 bytes each,
 // the cell always registered).
@@ -16,7 +17,6 @@ struct GrowthManager {
     u8 unknown19[0x5c - 0x19];
     struct GrowthEntry entries[1];
 };
-extern u32 gUnk_02000258;
 void SceneBody_Unregister(void *);
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
@@ -33,6 +33,6 @@ s32 GrowthManager_Destroy(struct GrowthManager *manager)
         Collider_Remove(entry->collider);
         TerrainModifiers_UnregisterCell(entry->cellRef);
     }
-    gUnk_02000258 = 0;
+    gGrowthHazardManager = 0;
     return 0;
 }

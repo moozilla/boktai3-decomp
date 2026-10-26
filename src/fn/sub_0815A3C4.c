@@ -1,6 +1,6 @@
 #include "global.h"
+#include "game_state.h"
 
-extern u8 *gUnk_02000710;
 void PlayerAction_RefreshFlagState(u32, void *, s32);
 
 s32 Player_GetCandidateAttribute(s32 i, s32 d)
@@ -8,7 +8,7 @@ s32 Player_GetCandidateAttribute(s32 i, s32 d)
     u8 buf[16];
     s32 r;
     u8 *q;
-    u8 *g = gUnk_02000710;
+    u8 *g = gGameState;
     i <<= 1;
     q = (u8 *)i;
     q += (s32)g;

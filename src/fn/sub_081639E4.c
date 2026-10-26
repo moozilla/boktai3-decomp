@@ -3,7 +3,7 @@
 
 #include "scene_vec.h"
 
-#define gParticleRandomIndex gUnk_03005308
+#define gParticleRandomIndex gRandomIndex
 struct PoolParticle {
     u32 flags;
     u8 unknown4[0x14];
@@ -20,7 +20,7 @@ struct ParticlePool {
     struct PoolParticle particles[16];
 };
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 static inline s32 TruncatePoolOffset(s32 value)
@@ -49,7 +49,7 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct Scen
             p->flags &= ~1;
             p->position = *position;
             table = gUnk_0203B400;
-            index = gUnk_03005308;
+            index = gRandomIndex;
             index++;
             mask = 0x3FF;
             index &= mask;
@@ -62,7 +62,7 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct Scen
                 p->position.x = x + random;
             }
             index = (index + 1) & mask;
-            gUnk_03005308 = index;
+            gRandomIndex = index;
             {
                 u32 random = table[index];
                 s32 z = (u16)p->position.z;
@@ -88,8 +88,8 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct Scen
         p->animationPhase = 0;
         p->state = 1;
         {
-            u32 index = (gUnk_03005308 + 1) & 0x3FF;
-            gUnk_03005308 = index;
+            u32 index = (gRandomIndex + 1) & 0x3FF;
+            gRandomIndex = index;
             {
                 u32 random = *(u16 *)((index << 1) + RANDOM_TABLE_ADDR);
                 u32 range = 7;

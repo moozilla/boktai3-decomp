@@ -1,5 +1,4 @@
 #define StatGauge_SetCallback DarkLoan_SetState
-#define gGameState            gUnk_02000710
 #include "global.h"
 #include "game_state.h"
 void DarkLoan_SetState(void *, void (*)(void));

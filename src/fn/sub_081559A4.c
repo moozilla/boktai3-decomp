@@ -14,7 +14,7 @@ void Sound_StopSong(u32);
 void ConvergingEffects_EmitNearParticle(void *, void *);
 void Hud_ClearTimer(void);
 void Script_Call(u32, void *);
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 struct Call {
     u32 count : 16;
     u32 pad : 16;
@@ -120,7 +120,7 @@ void Player_UpdateTimedChargeAction(struct TimedChargePlayer *actor)
                 goto end;
             }
             {
-                s32 elapsed = *((s16 *)(gUnk_02000710 + 0x876));
+                s32 elapsed = *((s16 *)(gGameState + 0x876));
                 elapsed += p->elapsed;
                 p->elapsed = elapsed;
                 if ((u16)elapsed >= (p->duration)) {

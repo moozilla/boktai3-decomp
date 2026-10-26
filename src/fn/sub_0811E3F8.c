@@ -1,5 +1,5 @@
-#define gScriptRecordTable gUnk_02000208
 #include "global.h"
+#include "ram.h"
 struct ScriptModifier {
     s8 id;
     u8 pad;
@@ -11,7 +11,6 @@ struct ScriptRecordTable {
     struct ScriptModifier entries[6];
     s32 count;
 };
-extern struct ScriptRecordTable *gUnk_02000208;
 struct ModifierResult {
     s8 id;
     u8 pad;
@@ -21,7 +20,7 @@ struct ModifierResult {
 s32 ScriptRecord_FindModifier(struct ModifierResult *out, s32 id)
 {
     struct ScriptRecordTable *p;
-    struct ScriptRecordTable *table = gUnk_02000208;
+    struct ScriptRecordTable *table = gScriptRecordTable;
     s32 i, count;
     if (table)
         goto search;

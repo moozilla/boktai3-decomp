@@ -6,7 +6,8 @@
 // Collider and sprite views, constant reuse, and the defined zero return still differ.
 #include "display_animation.h"
 #include "scene_vec.h"
-extern u32 gUnk_030053F0, gUnk_02000560, gUnk_03005308;
+#include "engine.h"
+extern u32 gUnk_030053F0, gUnk_02000560;
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
 void Collider_SetPosition(void *, void *, u32);
@@ -25,12 +26,12 @@ static inline void CopyPosition(struct SceneVec *out, const struct SceneVec *in)
 }
 static inline u32 RandomFrom(const u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    return table[gRandomIndex];
 }
 static inline u32 Paused(u32 mask)
 {
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 struct ColliderView {
     u8 pad[6];
@@ -320,8 +321,8 @@ static inline u32 StepAnimation_UpdateCombat(u8 *owner, struct DisplaySequenceSt
 
 inline static u32 RandomFrom_UpdateCombat(const u16 *table)
 {
-    gUnk_03005308 = (u16)((gUnk_03005308 + 1) & 0x3ff);
-    return table[gUnk_03005308];
+    gRandomIndex = (u16)((gRandomIndex + 1) & 0x3ff);
+    return table[gRandomIndex];
 }
 
 static inline u32 StepAnimation_UpdateCombat(u8 *owner, struct DisplaySequenceState *stateArg,

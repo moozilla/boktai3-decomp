@@ -1,5 +1,5 @@
-#define gPanelSpritePool gUnk_020004BC
 #include "global.h"
+#include "ram.h"
 struct PanelSprite {
     u8 data[0x1C];
     u32 flags;
@@ -16,7 +16,6 @@ struct PanelSpritePool {
     struct PanelSprite slots[8];
     void *resource;
 };
-extern struct PanelSpritePool *gUnk_020004BC;
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void *ScriptProc_Start(u16, u16);
@@ -48,7 +47,7 @@ s32 PanelSpritePool_Init(struct PanelSpritePool *p)
         slot++;
         i++;
     } while (i <= 7);
-    gUnk_020004BC = p;
+    gPanelSpritePool = p;
     result = 0;
 done:
     return result;

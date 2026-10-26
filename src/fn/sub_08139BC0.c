@@ -1,5 +1,5 @@
-#define gSceneProcParticles gUnk_020004D0
 #include "global.h"
+#include "ram.h"
 struct SceneProcParticle {
     u8 pad00[0x44];
     u8 data[0x1c];
@@ -18,7 +18,6 @@ struct SceneProcParticles {
     struct SceneProcParticle entries[6];
     u32 count;
 };
-extern struct SceneProcParticles *gUnk_020004D0;
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void *ScriptProc_Start(u16, u16);
@@ -44,6 +43,6 @@ s32 SceneProcParticles_Initialize(struct SceneProcParticles *p)
         s->used = 0;
     }
     p->count = 0;
-    gUnk_020004D0 = p;
+    gSceneProcParticles = p;
     return 0;
 }

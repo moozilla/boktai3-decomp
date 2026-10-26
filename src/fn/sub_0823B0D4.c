@@ -17,7 +17,7 @@ void CellObject_Init(void *, void *);
 void SceneBody_SetMovementProbe(void *, void *, s32, s32);
 u32 SceneBody_SetPositionOffset(void *, struct Vec16 *);
 u32 SceneActorContacts_RegisterNode(void *, void *, u32);
-extern u16 gUnk_02000508[];
+extern u16 gTrackedPlayerId[];
 
 u32 KeyframeActor_InitBodyFromScript(u8 *p, u32 entry)
 {
@@ -43,17 +43,17 @@ u32 KeyframeActor_InitBodyFromScript(u8 *p, u32 entry)
     pos = (struct Vec16 *)(p + 0x540);
     x = pos->x >> 8;
     z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else {
-        u32 row = gUnk_030052F4->rows[z];
+        u32 row = gTerrainMap->rows[z];
         cell = row + x;
     }
     prop = TerrainModifiers_FindCellOverride(cell, 1);
     if (prop)
         prop += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         prop = map->cells + offset;
     }
@@ -87,5 +87,5 @@ u32 KeyframeActor_InitBodyFromScript(u8 *p, u32 entry)
     id = *(u32 *)(p + 0x24);
     *(u16 *)(p + 0x294) = id;
     SceneActorContacts_RegisterNode(p + 0x2e8, body, 2);
-    gUnk_02000508[*(u32 *)(p + 0x18)] = *(u32 *)(p + 0x24);
+    gTrackedPlayerId[*(u32 *)(p + 0x18)] = *(u32 *)(p + 0x24);
 }

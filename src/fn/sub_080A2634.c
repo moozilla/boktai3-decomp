@@ -1,4 +1,5 @@
 #include "scene_actor_reset.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: selects delayed route recovery or alternate recovery after the context delay.
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
@@ -78,13 +79,12 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 
     a->field2B1 = 1;
 }
 
-extern u32 gUnk_03005308;
 s32 SceneActorControl_CreateFromPosition(void *);
 static inline s32 Random(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     {
         register const u16 *table asm("r5") = gUnk_0203B400;
         return *(u16 *)(offset + (u32)table);

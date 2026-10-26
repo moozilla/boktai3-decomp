@@ -17,7 +17,7 @@ struct BurstEmitterPool {
     struct BurstEmitter slots[5];
 };
 extern struct BurstEmitterPool *gUnk_02000160;
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 extern void *gUnk_08605B78[];
 void BurstEmitter_EmitFrame(struct BurstEmitter *);
 void BurstEmitter_PlayAmbientSound(struct BurstEmitter *);

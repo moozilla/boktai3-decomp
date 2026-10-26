@@ -4,8 +4,8 @@ void ScenePanel_TickAngleBurst(struct ScenePanel *input)
     struct ScenePanelScheduleView *panel = (void *)input;
     if (panel->frame < panel->interval) {
         if (++panel->frame >= panel->interval) {
-            u32 angle = Math_Atan2(gUnk_02000710->positionX - panel->origin.x,
-                                   gUnk_02000710->positionZ - panel->origin.z) -
+            u32 angle = Math_Atan2(gGameState->positionX - panel->origin.x,
+                                   gGameState->positionZ - panel->origin.z) -
                         32;
             u16 *destination = &panel->angle;
             *destination = angle & 255;

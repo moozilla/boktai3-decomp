@@ -8,7 +8,7 @@ struct Camera {
 struct Vec {
     s16 x, y, z;
 };
-extern struct Camera *gUnk_03005420;
+extern struct Camera *gActiveCamera;
 extern struct Vec gUnk_030042A0;
 extern struct Vec gUnk_03005418;
 static inline s32 scale(s32 input)
@@ -44,12 +44,12 @@ static inline void project(struct Vec *out, struct Vec *in)
 }
 void sub_082260D8(void)
 {
-    if (gUnk_03005420) {
-        gUnk_030042A0.x -= gUnk_03005420->offsetX;
-        gUnk_030042A0.z -= gUnk_03005420->offsetZ;
+    if (gActiveCamera) {
+        gUnk_030042A0.x -= gActiveCamera->offsetX;
+        gUnk_030042A0.z -= gActiveCamera->offsetZ;
         project(&gUnk_03005418, &gUnk_030042A0);
-        gUnk_03005420->shake = 0;
-        gUnk_03005420->offsetX = 0;
-        gUnk_03005420->offsetZ = 0;
+        gActiveCamera->shake = 0;
+        gActiveCamera->offsetX = 0;
+        gActiveCamera->offsetZ = 0;
     }
 }

@@ -1,5 +1,6 @@
 #include "global.h"
-#define gEffectPool gUnk_020001E0
+#include "ram.h"
+#define gEffectPool gScreenMoteManager
 struct EffectPoolEntry {
     u8 pad00[0x17];
     s8 effectIndex;
@@ -14,7 +15,6 @@ struct EffectPool {
     struct PooledEffect effects[32];
     struct EffectPoolEntry entries[32];
 };
-extern struct EffectPool *gUnk_020001E0;
 void Effect_Remove(void *);
 s32 EffectPool_Destroy(struct EffectPool *pool)
 {
@@ -28,7 +28,7 @@ s32 EffectPool_Destroy(struct EffectPool *pool)
     } while (count >= 0);
     {
         struct EffectPool *cleared = 0;
-        gUnk_020001E0 = cleared;
+        gScreenMoteManager = cleared;
     }
     return 0;
 }

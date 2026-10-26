@@ -9,8 +9,8 @@ u8 InventorySlot_PickRandom(s16 *slot, s16 *kind, s16 *param)
     u16 start;
     s16 n;
     s16 idx;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    start = Mod(*(u16 *)((u8 *)gUnk_0203B400 + gUnk_03005308 * 2), 16);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    start = Mod(*(u16 *)((u8 *)gUnk_0203B400 + gRandomIndex * 2), 16);
     for (n = 0; n < 16; n++) {
         idx = (s16)start;
         *kind = Inventory_GetItemId(idx);

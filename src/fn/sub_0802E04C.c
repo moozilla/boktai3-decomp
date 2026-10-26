@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 struct Position {
     s16 x, y, z, pad;
@@ -24,7 +25,6 @@ struct Emitter {
     u16 first, second;
 };
 extern struct ActorList *gUnk_02000480;
-extern u32 gUnk_030053F4;
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 void sub_0821C8F8(void *, struct Position *, struct Position *, u32, u32, u32);
@@ -64,7 +64,7 @@ void SceneActorAnimation_EmitTowardNearbyActors(struct Emitter *emitter)
     struct Actor *actor;
     struct Position offset;
     const s16 *table;
-    if ((!gUnk_02000480) || (gUnk_030053F4 & 0x200))
+    if ((!gUnk_02000480) || (gEngineFlags & 0x200))
         return;
     actor = gUnk_02000480->head;
     if (!actor)

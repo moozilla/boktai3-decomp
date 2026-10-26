@@ -6,7 +6,7 @@
 // Open: the original recomputes the u16 extension of the counter for the second
 // compare, and loads the pause-flag word after building the mask.
 
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 void Sound_PlaySong(u32);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 s32 Collider_Refresh(void *);
@@ -30,7 +30,7 @@ void sub_082356E4(u8 *p)
     if (*counter <= 5) {
         Collider_Refresh(p + 0x94);
     } else if (*counter == 6) {
-        gUnk_030053F4 &= ~1;
+        gEngineFlags &= ~1;
     }
     q = (u16 *)(p + 0x34e);
     n = *q + 1;

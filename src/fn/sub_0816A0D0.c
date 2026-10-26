@@ -12,7 +12,7 @@ void sub_0816A0D0(struct SceneHudState *p)
     s32 i;
     position.x = 144;
     position.y = 40;
-    value = gUnk_02000710->menuRewardBalance + p->valueRate * p->selectedQuantity;
+    value = gGameState->menuRewardBalance + p->valueRate * p->selectedQuantity;
     digits[0] = Div(value, 1000);
     value -= digits[0] * 1000;
     digits[1] = Div(value, 100);

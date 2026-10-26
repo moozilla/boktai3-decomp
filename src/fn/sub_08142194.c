@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 // confidence=low: action phases push neighboring scene objects and emit position effects.
 
@@ -53,8 +54,6 @@ struct Map {
     u8 pad8[28];
     u16 rows[1];
 };
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
 extern const s16 gUnk_086149C4[];
 void Sound_PlaySong(u32 song);
 s32 SceneObjects_TryPushNeighborByIndex(void *position, u32 index);
@@ -78,16 +77,16 @@ static inline int scale(int v)
 static inline int tileIndex(struct PackedVec *v)
 {
     int x = v->x >> 8, z = v->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u8 *cell(int i)
 {
     u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return p + 4;
-    return gUnk_030052F4->cells + 12 + i * 4;
+    return gTerrainMap->cells + 12 + i * 4;
 }
 static inline int heightAt(struct PackedVec *v, int i)
 {

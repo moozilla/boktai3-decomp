@@ -11,7 +11,7 @@ s32 Div(s32, s32);
 s32 Mod(s32, s32);
 void PlayStats_SetState(u8 *, s32);
 
-#define GS_W(o) (*(s32 *)((u8 *)gUnk_02000710 + (o)))
+#define GS_W(o) (*(s32 *)((u8 *)gGameState + (o)))
 
 s32 sub_081C1578(u8 *p)
 {

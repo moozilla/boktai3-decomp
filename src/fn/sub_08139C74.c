@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_020004D0;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 SceneProcParticles_Initialize(u8 *);
@@ -11,8 +11,8 @@ void ParticleBurstEffect_DestroyManager(void);
 u8 *ParticleBurstEffect_EnsureManager(void)
 {
     u8 *p;
-    if (gUnk_020004D0 != 0)
-        return gUnk_020004D0;
+    if (gSceneProcParticles != 0)
+        return gSceneProcParticles;
     p = Task_Create(0xa, 0x52c);
     if (p != 0) {
         Task_SetCallbacks(p, CallbackPool_Update, ParticleBurstEffect_DestroyManager);

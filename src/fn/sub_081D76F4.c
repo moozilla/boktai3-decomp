@@ -1,6 +1,6 @@
 #include "global.h"
+#include "engine.h"
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 struct TrailEntry {
@@ -34,7 +34,7 @@ struct Pos8 {
 };
 static inline s32 Rand2(s32 i)
 {
-    gUnk_03005308 = (i + 1) & 1023;
+    gRandomIndex = (i + 1) & 1023;
     return gUnk_0203B400[(i + 1) & 1023];
 }
 // confidence=low: starts the next trail sprite slot at a random offset around the owner direction.
@@ -57,7 +57,7 @@ void Task4E01_SpawnTrailSprite(struct TrailOwner *p, u8 *src)
     np = &p->next;
     new_var3 = 0x60;
     tab = gUnk_0203B400;
-    ri = (gUnk_03005308 + 1) & 1023;
+    ri = (gRandomIndex + 1) & 1023;
     dir_2 = (s32)tab[ri];
     p->e[p->next].speed = ((dir_2 >> 3) & 0x7f) + 0x40;
     p->e[*np].offset = Mod(Rand2(ri), new_var3) - 0x30;

@@ -1,11 +1,11 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_020001C4;
 void RegistryF246_RemoveAnimations(void);
 
 s32 RegistryF246_Destroy(void)
 {
     RegistryF246_RemoveAnimations();
-    gUnk_020001C4 = 0;
+    gLinkPanel = 0;
     return 1;
 }

@@ -3,6 +3,7 @@
 // confidence=low: follows the route probe, then selects a new route point outside link mode.
 
 #include "scene_actor_control_phase.h"
+#include "engine.h"
 u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
 s32 Callback_InvokeActor(void *, void *);
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
@@ -79,7 +80,6 @@ static inline void BeginRouteSelection(struct SceneActorRegistryResetView *actor
     *(u32 *)field = 0;
 }
 
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void SceneActorMovement_ResolveRoutePosition(void *);
@@ -141,13 +141,13 @@ void SceneActorControl_UpdateRouteApproach(struct SceneActorRegistryResetView *a
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, FIELD(nav, 0x1FC, void *), 0x20,
                                                              0x20, speed)) {
         BeginRouteSelection(actor, nav);
-        if (!InLinkMode(gUnk_030053F4, 0x4800)) {
+        if (!InLinkMode(gEngineFlags, 0x4800)) {
             struct RouteSelection *route = actor->currentRoute;
             u8 choice;
             {
-                u32 index = (gUnk_03005308 + 1) & 1023;
+                u32 index = (gRandomIndex + 1) & 1023;
                 s32 value;
-                gUnk_03005308 = index;
+                gRandomIndex = index;
                 index *= 2;
                 value = *(const u16 *)((u32)gUnk_0203B400 + index);
                 value >>= 3;
@@ -162,7 +162,7 @@ void SceneActorControl_UpdateRouteApproach(struct SceneActorRegistryResetView *a
             route->index = choice;
             route->phase = 0;
             {
-                u8 *base = *(void **)((u8 *)gUnk_030052F4 + 0x10);
+                u8 *base = *(void **)((u8 *)gTerrainMap + 0x10);
                 base += route->points->offset;
                 route->current = base + route->index * 8;
             }

@@ -29,7 +29,6 @@ void *SunOrb_GetOrCreateManager(void);
 void *Ratatosk_CreateAnimatedParticlePool(void);
 void *Ratatosk_CreateParticlePool(void);
 s32 Mod(s32, s32);
-extern u32 gUnk_03005308;
 extern void *gUnknown_02000580;
 
 #define H8(off)  (*(u8 *)(a + (off)))
@@ -312,7 +311,7 @@ s32 sub_081FAE0C(void *arg0, void *arg1)
     H16(0xE6C) = 0x80;
     H32(0xEF0) = 2;
 
-    zc = &gUnk_03005308;
+    zc = &gRandomIndex;
     *zc = (*zc + 1) & 0x3FF;
     k = Mod(gUnk_0203B400[*zc], 9);
     H32(0xE5C) = H32(0xCCC + k * 8);

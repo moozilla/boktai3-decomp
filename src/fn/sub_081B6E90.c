@@ -1,8 +1,9 @@
 #include "global.h"
+#include "engine.h"
 
 // MATCHING_CONCESSION: register-pinning
 #define gEffectRandomTable gUnk_0203B400
-#define gEffectRandomIndex gUnk_03005308
+#define gEffectRandomIndex gRandomIndex
 struct EffectPosition {
     s16 x, y, z, pad;
 };
@@ -28,7 +29,6 @@ struct ActorEffect {
 };
 struct EffectOwner;
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 s32 Math_Atan2(s32, s32);
 void ActorEffect_UpdateRadialTrail(struct ActorEffect *);
 u32 ActorEffect_RemoveSprites(struct EffectOwner *, struct ActorEffect *, u32);
@@ -63,7 +63,7 @@ void ActorEffect_UpdateRadialExpiry(struct EffectOwner *owner, struct ActorEffec
             angles = effect->angles;
             radii = effect->radii;
             table = gUnk_0203B400;
-            randomIndex = &gUnk_03005308;
+            randomIndex = &gRandomIndex;
             for (; i <= 5; i++) {
                 angles[i] = (s16)((NextRandom(randomIndex, table) & 31) + 240) + effect->direction;
                 radii[i] = (NextRandom(randomIndex, table) & 15) + 24;

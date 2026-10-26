@@ -31,11 +31,11 @@ void SceneHud_RebuildPrimaryOptions(struct SceneHudState *p)
         s16 **output;
         s8 *selection;
         output = &p->primarySelectionOutput;
-        state = gUnk_02000710;
+        state = gGameState;
         *output = &state->selected;
         i = 0;
-        gameState = &gUnk_02000710;
-        flags = &gUnk_030053F4;
+        gameState = &gGameState;
+        flags = &gEngineFlags;
         selection = &p->primarySelection;
         slots = state->slots88;
         option = ((struct PrimaryOptionsView *)p)->options;
@@ -51,10 +51,10 @@ void SceneHud_RebuildPrimaryOptions(struct SceneHudState *p)
             slots++;
         }
     } else {
-        p->primarySelectionOutput = &gUnk_02000710->abilityVariant;
+        p->primarySelectionOutput = &gGameState->abilityVariant;
         i = 0;
-        gameState = &gUnk_02000710;
-        flags = &gUnk_030053F4;
+        gameState = &gGameState;
+        flags = &gEngineFlags;
         for (; i < 2; i++) {
             option = &((struct PrimaryOptionsView *)p)->options[count];
             option->value = i;

@@ -9,7 +9,7 @@ extern void *gUnk_020004B8;
 extern u8 *gUnk_020004F0;
 extern u8 gUnk_03004FC0[];
 extern u8 gUnk_03005040[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 void Collider_SetFixedPositionWithYOffset(void *, void *, s32);
 void SpatialIndex_InsertEntry(void *);
@@ -42,8 +42,8 @@ static inline u8 IsSceneHidden(void)
 }
 static inline u32 Random(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return gUnk_0203B400[gRandomIndex];
 }
 static inline void CopyFourPalettes(u8 *source, u8 *dest)
 {
@@ -118,7 +118,7 @@ static inline void EmitDepartureParticle(u8 *actor, u32 zero)
     u8 params[0x34];
     struct Slot7PackedPosition position;
     s32 dx, dz;
-    u32 index = (gUnk_03005308 + 1) & 1023;
+    u32 index = (gRandomIndex + 1) & 1023;
     position.x = (gUnk_0203B400[index] & 15) + FIELD(actor, 0x5D8, u16) - 8;
     index = (index + 1) & 1023;
     position.y = (gUnk_0203B400[index] & 7) + FIELD(actor, 0x5DA, u16) - 12;
@@ -126,7 +126,7 @@ static inline void EmitDepartureParticle(u8 *actor, u32 zero)
     index = (index + 1) & 1023;
     dx = ((gUnk_0203B400[index] & 15) - 8) << 10;
     index = (index + 1) & 1023;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     dz = -(s32)((gUnk_0203B400[index] & 7) << 10);
     SpriteParticle_InitParams(params);
     SpriteParticle_SetMotionParams(params, 0, (Random() & 15) + 0x34, 0, zero);
@@ -145,10 +145,10 @@ static inline void EmitDepartureParticle(u8 *actor, u32 zero)
             SpriteParticle_SetAnimationTrack(params, 0x31F4, 8);
         }
     } else {
-        index = (gUnk_03005308 + 1) & 1023;
+        index = (gRandomIndex + 1) & 1023;
         position.x = (gUnk_0203B400[index] & 15) + FIELD(actor, 0x324, u16) - 8;
         index = (index + 1) & 1023;
-        gUnk_03005308 = index;
+        gRandomIndex = index;
         position.y = (gUnk_0203B400[index] & 7) + FIELD(actor, 0x326, u16);
         position.z = 100;
         SpriteParticle_SetMotionParams(params, 0, 42, 0, zero);

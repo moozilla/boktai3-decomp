@@ -1,4 +1,5 @@
 #include "status_screen.h"
+#include "engine.h"
 /* NumericOverlay_ClearActive: sets gUnk_02000048 (the live NumericOverlay pointer, per numeric_overlay.h) back to NULL; twin of NumericOverlay_Destroy in numeric_overlay.c */
 #define NumericOverlay_ClearActive sub_0800F4B8
 // MATCHING_CONCESSION: register-pinning
@@ -142,12 +143,11 @@ void StatusScreen_FadeOutPalette(struct StatusScreen *p)
 }
 
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 static inline int StatusScreen_Random(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)gUnk_0203B400);
 }
 #ifdef NONMATCHING

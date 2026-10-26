@@ -10,8 +10,8 @@ struct Weather {
     u16 countdown;
     u8 enabled, flags;
 };
-extern u8 *gUnk_02000710;
-extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_03005308;
+extern u8 *gGameState;
+extern u32 gEngineFlags, gUnk_030053F0, gRandomIndex;
 extern s32 gUnk_02000080, gUnk_02000084;
 #define RANDOM_TABLE ((u16 *)0x0203B400)
 void Palette_SetBrightnessMode(s32);
@@ -21,7 +21,7 @@ void Weather_EnterPhase(struct Weather *, s32);
 s32 Mod(s32, s32);
 static inline void ClearStormFlag(void)
 {
-    u32 *flags = (void *)(gUnk_02000710 + 0x868);
+    u32 *flags = (void *)(gGameState + 0x868);
     u32 mask = ~0x1000;
     *flags &= mask;
 }
@@ -31,12 +31,12 @@ static inline void ClearDisplayFlag(u16 *display, u32 mask)
 }
 static inline u32 IsPaused(u32 mask)
 {
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 static inline s32 Random(void)
 {
-    u32 n = (gUnk_03005308 + 1) & 0x3ff;
-    gUnk_03005308 = n;
+    u32 n = (gRandomIndex + 1) & 0x3ff;
+    gRandomIndex = n;
     return RANDOM_TABLE[n];
 }
 static inline s32 *StormTimer(u8 *base)
@@ -49,8 +49,8 @@ static inline s32 *StormTimer(u8 *base)
 }
 #define RandomAt(table)                                                                            \
     ({                                                                                             \
-        u32 n = (gUnk_03005308 + 1) & 0x3ff;                                                       \
-        gUnk_03005308 = n;                                                                         \
+        u32 n = (gRandomIndex + 1) & 0x3ff;                                                        \
+        gRandomIndex = n;                                                                          \
         (table)[n];                                                                                \
     })
 s32 Weather_UpdateStormTrigger(struct Weather *p)
@@ -63,20 +63,20 @@ s32 Weather_UpdateStormTrigger(struct Weather *p)
     }
     if (!Weather_TestFlags(p->flags, 2)) {
         s32 volume = Weather_GetStormVolume(p);
-        register s32 light asm("r5") = *(s16 *)(gUnk_02000710 + 0x876);
+        register s32 light asm("r5") = *(s16 *)(gGameState + 0x876);
         if (!IsPaused(0x400) && p->enabled) {
             if (light > 0) {
-                s32 *timer = StormTimer(gUnk_02000710);
+                s32 *timer = StormTimer(gGameState);
                 *timer += light >> 2;
                 asm("" : : "r"(light));
                 {
-                    u8 *base = gUnk_02000710;
+                    u8 *base = gGameState;
                     timer = StormTimer(base);
                 }
                 if (*timer >= gUnk_02000080)
                     *timer = gUnk_02000080;
             } else {
-                s32 *timer = StormTimer(gUnk_02000710);
+                s32 *timer = StormTimer(gGameState);
                 if (!*timer) {
                     u16 *table = RANDOM_TABLE;
                     asm("" : : "r"(table));
@@ -89,7 +89,7 @@ s32 Weather_UpdateStormTrigger(struct Weather *p)
                     *timer = gUnk_02000080;
                     if (gUnk_02000084 > 0) {
                         s32 random = Mod(RandomAt(table), gUnk_02000084);
-                        s32 *last = StormTimer(gUnk_02000710);
+                        s32 *last = StormTimer(gGameState);
                         *last += random;
                     }
                 } else

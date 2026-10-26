@@ -7,8 +7,8 @@ s32 ScenePool_SelectDirectionOrRepeat(void *owner, struct ScenePoolEntry *entry)
     u8 *entered;
     if (history[0] > 4) {
         s32 random;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-        random = *(const u8 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
+        gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+        random = *(const u8 *)((gRandomIndex << 1) + (u32)gUnk_0203B400);
         if (random <= 127) {
             value = 1;
             entry->state = value;

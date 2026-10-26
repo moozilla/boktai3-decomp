@@ -1,6 +1,7 @@
 #include "global.h"
 
 #include "scene_actor_registry.h"
+#include "engine.h"
 
 // confidence=low: spawns a sprite-effect burst at the actor (random offset, heading-based velocity) and returns a table entry.
 
@@ -18,7 +19,6 @@ struct Sub080DE6E0Vel {
     s16 x, y, z;
 };
 
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_086061E4[][8];
@@ -63,10 +63,10 @@ u16 sub_080DE6E0(struct SceneActorRegistryActor *actor)
         if (sb->kind == 7 || sb->kind == 5 || sb->kind == 1) {
             const u16 *table = gUnk_0203B400;
 
-            idx = (gUnk_03005308 + 1) & 1023;
+            idx = (gRandomIndex + 1) & 1023;
             pos.x = (table[idx] & 63) - 48 + actor->position.x;
             idx = (idx + 1) & 1023;
-            gUnk_03005308 = idx;
+            gRandomIndex = idx;
             pos.z = (table[idx] & 63) - 48 + actor->position.z;
 
             scale = 0x50;
@@ -83,8 +83,8 @@ u16 sub_080DE6E0(struct SceneActorRegistryActor *actor)
 
             if (actor->paletteOffset == 3) {
                 u32 life;
-                gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-                life = (table[gUnk_03005308] & 63) + 20;
+                gRandomIndex = (gRandomIndex + 1) & 1023;
+                life = (table[gRandomIndex] & 63) + 20;
                 SpriteEffectController_Create(&pos, &scratch, 0x1C1A, 0xD1B8, 3, 0, 0x31, 0, 1, 0,
                                               0, life, 4, 1, 0x200004, 30, 8, 8);
             } else {

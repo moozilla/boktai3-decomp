@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 #define P8(o)   (*(u8 *)((u8 *)p + (o)))
 #define P16(o)  (*(u16 *)((u8 *)p + (o)))
@@ -7,7 +8,6 @@
 
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 extern u32 gUnk_0200051C, gUnk_02000524;
 
 s32 Player_ConsumeStateEntry(void *);
@@ -47,8 +47,8 @@ static inline s32 sub_081561EC_Scale(s32 v)
 
 static inline u32 sub_081561EC_Rand(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    return gUnk_0203B400[gRandomIndex];
 }
 
 static inline void sub_081561EC_Anim(u8 *p, u32 frame, u32 a, u32 b, u32 mode)

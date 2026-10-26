@@ -29,8 +29,8 @@ struct TerrainMap {
     u8 unknown8[0x1C];
     u16 rows[1];
 };
-extern struct TerrainMap *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
+extern struct TerrainMap *gTerrainMap;
+extern u32 gTerrainWidth, gTerrainHeight;
 void *TerrainModifiers_FindCellOverride(u32, u32);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);

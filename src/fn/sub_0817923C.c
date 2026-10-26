@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_02000214;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 Hud_InitAlternateLayout(u8 *, u32);
@@ -11,8 +11,8 @@ void SceneHud_DestroyOwner(void);
 u8 *Hud_CreateAlternateLayout(u32 a)
 {
     u8 *p;
-    if (gUnk_02000214 != 0)
-        return gUnk_02000214;
+    if (gFieldHud != 0)
+        return gFieldHud;
     p = Task_Create(0xc, 0x4DA0);
     if (p != 0) {
         Task_SetCallbacks(p, Hud_UpdateWithCallback, SceneHud_DestroyOwner);

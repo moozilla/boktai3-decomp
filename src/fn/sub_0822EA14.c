@@ -1,5 +1,4 @@
 #define GameState_SetListEntry SolarFruit_SetInventorySlot
-#define gGameState             gUnk_02000710
 #include "global.h"
 #include "game_state.h"
 void SolarFruit_SetInventorySlot(s32, s32);

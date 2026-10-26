@@ -1,11 +1,11 @@
 #include "global.h"
+#include "engine.h"
 
 struct EffectVector {
     s16 x, y, z, pad;
 };
 struct SpriteEffectController;
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 extern const s16 gUnk_086149C4[];
 struct SpriteEffectController *SpriteEffectController_Create(const struct EffectVector *,
                                                              const struct EffectVector *, s32, u32,
@@ -34,7 +34,7 @@ void SceneTransition_SpawnParticleBurst(s32 x, s32 y, s32 flags)
         s32 angle, random;
         struct EffectVector *pos;
         table = gUnk_0203B400;
-        seed = &gUnk_03005308;
+        seed = &gRandomIndex;
         index = *seed + 1;
         mask = 0x3FF;
         index &= mask;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 // confidence=low: emits sixteen motion entries around the actor's facing direction.
 #define Hresvelgr_EmitFacingMotionBurst sub_0819BB18
@@ -15,7 +16,6 @@ struct BurstActor {
 };
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B000[];
-extern u32 gUnk_03005308;
 void MotionEntry_CreateWithDelta(void *, void *, s32, s32);
 static inline s32 scale(s32 n)
 {
@@ -37,8 +37,8 @@ static inline s32 randomValue(const u16 *table)
 {
     u32 offset;
     table += 512;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)table);
 }
 #ifdef NONMATCHING

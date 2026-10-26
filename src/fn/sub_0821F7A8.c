@@ -14,15 +14,15 @@ int Terrain_ApplyBlocked(u16 *out, void *arg, struct Pos *pos)
     s32 cell;
     u8 *props;
     u32 mask, flags;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     props = TerrainModifiers_FindCellOverride(cell, 1);
     if (props)
         props += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         props = map->cells + offset;
     }

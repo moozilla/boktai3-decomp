@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_02000164;
+#include "ram.h"
 
 void SpriteProjectile_ResetPool(void)
 {
-    gUnk_02000164 = 0;
+    gPooledSpriteManager = 0;
 }

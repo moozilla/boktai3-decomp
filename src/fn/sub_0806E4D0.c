@@ -7,7 +7,7 @@ void SceneGrid_ComputeCellDelta(s32 first, s32 second, s32 *columnDelta, s32 *ro
     s32 *columns = columnDelta;
     s32 *rows = rowDelta;
     s32 firstRow;
-    struct EngineMap **map = &gUnk_030052F4;
+    struct EngineMap **map = &gTerrainMap;
     s32 secondRow;
     s32 width;
     firstRow = Div(a, *(s16 *)((*map)->cells + 4));

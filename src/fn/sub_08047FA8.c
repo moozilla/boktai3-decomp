@@ -2,8 +2,8 @@
 static inline s32 nextRandomHighByte(void)
 {
     s32 sample;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    sample = ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    sample = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
     return sample >> 8;
 }
 void ContactBurst_UpdateContactAnimation(struct ContactBurst *effect)
@@ -13,8 +13,8 @@ void ContactBurst_UpdateContactAnimation(struct ContactBurst *effect)
         u8 *contactFrame;
         if (!(effect->contactTimer & 7)) {
             s32 sample;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            sample = ((const u8 *)RANDOM_TABLE_ADDR)[gUnk_03005308 * 2];
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            sample = ((const u8 *)RANDOM_TABLE_ADDR)[gRandomIndex * 2];
             if (sample <= 127)
                 Sound_PlaySong(0x1BF);
             else

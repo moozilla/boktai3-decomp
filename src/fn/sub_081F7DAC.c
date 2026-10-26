@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "engine.h"
 #define gPreviewKeys gUnk_03005260
-#define gRandomIndex gUnk_03005308
 #define gRandomTable gUnk_0203B400
 struct RatatoskPosition {
     u32 packedXY, packedZ;
@@ -36,7 +36,6 @@ struct Ratatosk {
     u16 spawnClone;
 };
 extern u16 gUnk_03005260[];
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 u32 HomingProjectile_GetActiveCount(void);
@@ -51,8 +50,8 @@ static inline u8 ConsumeActivation(struct Ratatosk *p)
 }
 static inline u32 NextRandom(const u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(const u16 *)(gUnk_03005308 * 2 + (u32)table);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(const u16 *)(gRandomIndex * 2 + (u32)table);
 }
 static inline s32 RandomModulo(s32 divisor)
 {
@@ -124,9 +123,9 @@ void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
                         }
                     } else {
                         p->duration = 32;
-                        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+                        gRandomIndex = (gRandomIndex + 1) & 1023;
                         p->position =
-                            *(struct RatatoskPosition *)((Mod(*(const u16 *)(gUnk_03005308 * 2 +
+                            *(struct RatatoskPosition *)((Mod(*(const u16 *)(gRandomIndex * 2 +
                                                                              (u32)gUnk_0203B400),
                                                               9) *
                                                               8 +

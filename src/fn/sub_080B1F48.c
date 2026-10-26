@@ -2,7 +2,7 @@
 /* Vorn_SelectRandomBehavior: Selects a different random eight-byte behavior entry and resets its cursor; behavior interpretation is tentative */
 #define Vorn_SelectRandomBehavior sub_080B1F48
 
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 u8 *Path_GetPointData(u8 *);
@@ -10,8 +10,8 @@ u8 *Path_GetPointData(u8 *);
 static inline u32 Random(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(u16 *)(offset + (u32)gUnk_0203B400);
 }
 

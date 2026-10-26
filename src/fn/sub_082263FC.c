@@ -12,15 +12,15 @@ struct S {
     struct P f74;
     u16 f7c;
 };
-extern struct S *gUnk_03005420;
+extern struct S *gActiveCamera;
 s32 SceneBody_GetById(u32);
 void Camera_NotifyMoveComplete(struct S *);
 void Camera_PanToActor(u32 a, s32 n, struct P *b)
 {
-    if (gUnk_03005420) {
-        gUnk_03005420->f7c = a;
-        if (SceneBody_GetById(gUnk_03005420->f7c)) {
-            struct S *p = gUnk_03005420;
+    if (gActiveCamera) {
+        gActiveCamera->f7c = a;
+        if (SceneBody_GetById(gActiveCamera->f7c)) {
+            struct S *p = gActiveCamera;
             p->f1c = 1;
             p->f74 = *b;
             if (n <= 1) {

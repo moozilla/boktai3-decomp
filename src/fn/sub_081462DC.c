@@ -1,10 +1,10 @@
 #include "global.h"
+#include "engine.h"
 
 // confidence=low: timed animation and screen-transition sequence; gameplay trigger is unknown.
 #define Player_UpdateTimedScreenTransition sub_081462DC
 #define B(n)                               (*(u8 *)(p + (n)))
 #define H(n)                               (*(u16 *)(p + (n)))
-extern u32 gUnk_030053F4;
 void Player_AddControlFlags(void *, u32);
 s32 ActorVariant_GetTableValue(u32, u32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
@@ -56,7 +56,7 @@ void Player_UpdateTimedScreenTransition(u8 *p)
             Player_AddControlFlags(p, 1);
             if (++H(0x45A) > 29) {
                 Player_SetActionPhase(p, 5);
-                gUnk_030053F4 |= 0x400;
+                gEngineFlags |= 0x400;
             }
             break;
         case 5:

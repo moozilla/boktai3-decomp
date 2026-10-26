@@ -20,7 +20,7 @@ void SpinningApproach_DampReturnMovement(void);
 void Armor_CapturePartMotionEndpoint(void *);
 void Sound_PlaySongChecked(u32);
 s32 Math_Atan2(s32, s32);
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 
@@ -116,8 +116,8 @@ void Armor_OnPartDamageCollision(u8 *attack, u8 *response, u8 *part)
         } else {
             Delta(&delta, (void *)(response + 0xC), (void *)(attack + 0xC));
             if ((delta.x == 0) && (delta.z == 0)) {
-                gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-                angle = gUnk_0203B400[gUnk_03005308];
+                gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+                angle = gUnk_0203B400[gRandomIndex];
             } else {
                 angle = Math_Atan2(delta.x, delta.z);
             }

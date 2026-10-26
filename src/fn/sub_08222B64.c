@@ -1,16 +1,16 @@
 #include "global.h"
+#include "ram.h"
 extern s32 gUnk_0300169C;
 extern s32 gUnk_030016A4;
 extern u8 gUnk_030016E8[64];
-extern s32 gUnk_03005324;
 void sub_0822253C(void);
 void sub_08222548(void);
 
 s32 sub_08222B64(u8 *data, s32 length)
 {
     s32 head, used, i;
-    if (gUnk_03005324 < 0)
-        return gUnk_03005324;
+    if (gSerialTransferStatus < 0)
+        return gSerialTransferStatus;
     sub_0822253C();
     head = gUnk_0300169C;
     used = gUnk_030016A4;

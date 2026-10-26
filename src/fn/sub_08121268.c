@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct DrawFlags {
     u8 pad0[0x16];
     u16 flags;
@@ -25,7 +26,6 @@ struct A8CBObject {
     u8 pad8AB[9];
     u32 field8B4;
 };
-extern void *gUnk_0200020C;
 void *RegistryA8CB_EnsureManager(void);
 struct A8CBObject *RegistryA8CB_FindAvailableEntry(void *manager);
 void ActorScript_ParseParams(struct A8CBObject *);
@@ -41,7 +41,7 @@ void ActorPhysics_UpdateFallMotion(void);
    loads sprite 0x3D99 and starts it with update ActorPhysics_UpdateFallMotion (tentative). */
 void RegistryA8CB_CreateFromScript(void)
 {
-    void *manager = gUnk_0200020C;
+    void *manager = gActorManager;
     struct A8CBObject *e;
     void *anim;
     u16 one;

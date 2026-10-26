@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_0200016C;
 void Sprite_Remove(void *);
 
 static inline u8 Tst(u32 *m, s32 i)
@@ -29,7 +29,7 @@ u32 DirectionalProjectile_DestroyPool(struct S *b)
     }
     {
         u32 z = 0;
-        gUnk_0200016C = z;
+        gMovingSpritePool = z;
     }
     return 0;
 }

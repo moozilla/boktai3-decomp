@@ -1,7 +1,7 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 #define gSceneEffectPaletteBanks gPaletteBankData
-#define gSceneEffectPalettePhase gUnk_03003A50
 
 struct PulsePaletteOwner {
     u8 pad[0x24];
@@ -17,7 +17,6 @@ struct SceneEffectPulse {
     u16 colors[16];
     u16 timer;
 };
-extern u32 gUnk_03003A50;
 void Palette_InterpolateBanks(void *, void *, void *, u32, u32);
 
 void SceneEffect_UpdatePulsePalette(struct SceneEffectPulse *effect)
@@ -28,7 +27,7 @@ void SceneEffect_UpdatePulsePalette(struct SceneEffectPulse *effect)
     } else {
         void *from = gPaletteBankData + 0x11e0;
         void *to = gPaletteBankData + 0x1200;
-        u32 phase = gUnk_03003A50;
+        u32 phase = gSceneEffectPalettePhase;
         u32 amount = phase & 0x3f;
         effect->paletteId = 0xf08f;
         effect->palette = effect->colors;

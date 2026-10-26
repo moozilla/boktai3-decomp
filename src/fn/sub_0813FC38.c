@@ -48,8 +48,8 @@ struct PlayerFC38 {
     u32 unkCA8;
 };
 
-extern struct GameStateFC38 *gUnk_02000710;
-extern u32 gUnk_030053F4;
+extern struct GameStateFC38 *gGameState;
+extern u32 gEngineFlags;
 extern struct InputKeysFC38 gUnk_03005260[];
 extern u16 gUnk_02000548[2];
 extern u16 gUnk_02000500, gUnk_02000504, gUnk_02000520, gUnk_02000534;
@@ -73,14 +73,14 @@ s32 Player_InitActionMode(struct PlayerFC38 *p)
         if ((u8)(p->actionMode - 1) <= 1)
             p->statGaugeFull = 1;
     } else {
-        p->actionMode = gUnk_02000710->actionMode;
+        p->actionMode = gGameState->actionMode;
     }
     if (p->actionMode == 6)
         p->timedEventSlot = 1;
     else
         p->timedEventSlot = 0;
     Player_RecalculateDerivedStats(p);
-    if (gUnk_030053F4 & 0x1000) {
+    if (gEngineFlags & 0x1000) {
         void *cb = Player_UpdateLinkModeMovement;
         u16 *q, *base = gUnk_02000548;
         u16 zero = 0;
@@ -111,7 +111,7 @@ s32 Player_InitActionMode(struct PlayerFC38 *p)
         for (j = 0; j < 2; j++)
             p->scriptStatus[j] = 0;
     }
-    p->catalogSavedOption = gUnk_02000710->menuOption;
+    p->catalogSavedOption = gGameState->menuOption;
     if (p->scriptStatus[1] != 0)
         p->catalogSavedOption = gUnk_02000504;
     p->actionLatch464 = 0;

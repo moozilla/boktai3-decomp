@@ -1,6 +1,7 @@
 #include "global.h"
 
 #include "contact_swarm.h"
+#include "ram.h"
 
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
 struct Drawable {
@@ -128,7 +129,6 @@ void ActorDisplay_UpdateForegroundSprite(void *);
 void ActorDisplay_UpdateAccentSprite(void *);
 void ActorMotion_AdvanceTowardScreenTarget(void *, s32);
 void SceneActors_EmitPeriodicParticles(void *, s32);
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 extern u8 *gUnk_020004F0;
 extern u8 *gUnk_020004B8;
@@ -301,9 +301,9 @@ void SceneActors_UpdateCameraFollowingDisplay(u8 *input, s32 time)
         }
         distance = (camera.x - (*((s32 *)(p + 0x268)))) >> 12;
         speed = Player_GetHorizontalVelocity(*((s32 *)(p + 0x3A0)));
-        gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+        gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
         {
-            u32 value = gUnk_086141BC[gUnk_03005304];
+            u32 value = gUnk_086141BC[gEffectRandomTableIndex];
             u32 *offset = (u32 *)(context + 0x288);
             *offset = value & 1;
         }

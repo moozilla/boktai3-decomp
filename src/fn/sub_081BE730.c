@@ -26,7 +26,7 @@ void sub_081BE730(struct StoragePanel *panel)
     enabled[0] = 1;
     display->widgets[panel->selection + 8].flags |= 1;
     {
-        s32 id = *(s16 *)((u8 *)gUnk_02000710 + panel->items[panel->selection] * 2 + 0x160);
+        s32 id = *(s16 *)((u8 *)gGameState + panel->items[panel->selection] * 2 + 0x160);
         base = 0x121;
         frames[0] = id + base;
     }

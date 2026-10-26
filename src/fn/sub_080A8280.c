@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
-extern u32 gUnk_03005308;
+#include "engine.h"
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 extern u8 *gUnk_02000580[];
@@ -37,8 +37,8 @@ static inline s32 Shift(s32 n, u32 bits)
 }
 static inline u32 Rand(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return gUnk_0203B400[gRandomIndex];
 }
 static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
 {

@@ -1,9 +1,9 @@
 #include "scene_inventory_actions.h"
+#include "game_state.h"
 struct SceneInventoryOwnedConsumables {
     u8 unknown0[0x160];
     s16 id;
 };
-extern struct GameState *gUnk_02000710;
 s32 SceneInventory_FindConsumableAssignment(u32);
 void SceneInventory_BeginConsumableSwapPair(struct SceneInventoryActionView *panel)
 {
@@ -35,7 +35,7 @@ void SceneInventory_BeginConsumableSwapPair(struct SceneInventoryActionView *pan
             ((struct SceneInventoryActionFlagsView *)panel)->widgets[assigned + 0x29].flags |= 1;
         {
             u32 address = slot;
-            struct GameState *game = gUnk_02000710;
+            struct GameState *game = gGameState;
             do {
                 address <<= 1;
             } while (0);

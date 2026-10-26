@@ -4,7 +4,7 @@ extern u32 gUnk_030053F0, gUnk_02000560;
 static inline u32 IsSuspended(void)
 {
     u32 mask = 0x400;
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 static inline u32 HasOverride(void)
 {

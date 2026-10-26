@@ -1,5 +1,5 @@
 #define gSineTable           gUnk_086149C4
-#define gPlayerPositionOwner gUnk_02000710
+#define gPlayerPositionOwner gGameState
 #include "global.h"
 struct LinkVector {
     s16 x, y, z;

@@ -32,7 +32,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             *(u32 *)((u8 *)obj + 0x84) = 1;
             break;
         case 1:
-            obj->cellA = cell - *(u16 *)(gUnk_030052F4->cells + 4);
+            obj->cellA = cell - *(u16 *)(gTerrainMap->cells + 4);
             obj->cellB = cell;
             obj->pos.x += 0x80;
             *(u32 *)((u8 *)obj + 0x84) = 1;
@@ -45,7 +45,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             break;
         case 3:
             obj->cellA = cell;
-            obj->cellB = cell - *(u16 *)(gUnk_030052F4->cells + 4);
+            obj->cellB = cell - *(u16 *)(gTerrainMap->cells + 4);
             obj->pos.x += 0x80;
             *(u32 *)((u8 *)obj + 0x84) = 2;
             break;
@@ -56,7 +56,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             *(u32 *)((u8 *)obj + 0x84) = 0;
             break;
         case 5:
-            obj->cellA = cell - *(u16 *)(gUnk_030052F4->cells + 4);
+            obj->cellA = cell - *(u16 *)(gTerrainMap->cells + 4);
             obj->cellB = cell;
             obj->pos.x += 0x80;
             *(u32 *)((u8 *)obj + 0x84) = 0;
@@ -69,7 +69,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             break;
         case 7:
             obj->cellA = cell;
-            obj->cellB = cell - *(u16 *)(gUnk_030052F4->cells + 4);
+            obj->cellB = cell - *(u16 *)(gTerrainMap->cells + 4);
             obj->pos.x += 0x80;
             *(u32 *)((u8 *)obj + 0x84) = 1;
             break;
@@ -81,7 +81,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             break;
         case 9:
             obj->cellA = cell;
-            obj->cellB = cell - *(u16 *)(gUnk_030052F4->cells + 4);
+            obj->cellB = cell - *(u16 *)(gTerrainMap->cells + 4);
             obj->pos.x += 0x80;
             *(u32 *)((u8 *)obj + 0x84) = 0;
             break;

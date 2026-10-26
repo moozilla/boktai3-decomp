@@ -133,7 +133,7 @@ s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
         s32 random;
         register s32 kind asm("r1");
         u32 *arg;
-        u32 *index = &gUnk_03005308;
+        u32 *index = &gRandomIndex;
         u32 next = (*index + 1) & 0x3ff;
         *index = next;
         {

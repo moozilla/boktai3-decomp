@@ -1,8 +1,6 @@
-#define gGameState gUnk_02000710
 #include "global.h"
 #include "scene_hud_display.h"
 #include "game_state.h"
-extern struct GameState *gUnk_02000710;
 s32 GameState_GetUnlockEntry(s32);
 void Player_BeginIndexedAction(void *, s32);
 void Player_BeginDescriptorAction(void *, s32);
@@ -22,7 +20,7 @@ void SceneHud_ApplySecondarySelection(struct SceneHudState *p)
         Player_BeginDescriptorAction(owner, *(s32 *)data);
     }
     {
-        u16 *out = &gUnk_02000710->unk50;
+        u16 *out = &gGameState->unk50;
         struct SceneHudState *selected = (struct SceneHudState *)((u32)p + p->selection * 8);
         *out = selected->secondaryFirstValue;
     }

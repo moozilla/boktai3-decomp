@@ -1,8 +1,6 @@
 #include "global.h"
 #include "game_state.h"
 
-#define gGameState gUnk_02000710
-
 struct DarkLoanDigitAnim {
     u8 data[0x60];
 };

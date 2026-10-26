@@ -33,7 +33,7 @@ u32 BreakableProp_Tick(struct BreakableProp *);
 u32 BreakableProp_Destroy(struct BreakableProp *);
 s32 BreakableProp_InitializeFromScript(struct BreakableProp *, u32, u32);
 s32 AnimatedParticles_Create(s32, void *, struct AnimatedParticleConfig *);
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 s32 Mod(s32, s32);
 void BreakableProp_InitializeSprite(struct BreakableProp *, void *);
 void BreakableProp_InitializeCollider(struct BreakableProp *, u32, void *);

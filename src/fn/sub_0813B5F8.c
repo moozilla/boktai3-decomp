@@ -17,5 +17,5 @@ void Player_ClampStatsAndSyncStatus(struct Player *p)
     if (p->currentStatB > (u16)v)
         p->currentStatB = v;
     p->statWhole = Div(p->statHundredths, 100);
-    *(u32 *)((u8 *)gUnk_02000710 + 0x60C) = p->statusValue;
+    *(u32 *)((u8 *)gGameState + 0x60C) = p->statusValue;
 }

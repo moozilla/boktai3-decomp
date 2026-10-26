@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 // Names are tentative, based on the static state transitions and memory writes.
-#define gScriptPromptSettings gUnk_02000388
 struct ScriptPromptSprite {
     u8 unknown[8];
     u32 flags;
@@ -18,7 +18,6 @@ struct ScriptPromptSettings {
     const void *message, *title;
     s32 o, c, p;
 };
-extern struct ScriptPromptSettings gUnk_02000388;
 void Menu_EraseRect(u32, u32, u32, u32);
 void Menu_DrawText(u32, u32, const u8 *);
 s32 Script_ParseStringRef(const void *);
@@ -30,15 +29,17 @@ void ScriptPrompt_ResetDisplay(struct ScriptPrompt *p)
     u32 zero;
     u8 *src, *dst;
     Menu_EraseRect(4, 5, 5, 2);
-    Menu_DrawText(4, 5, Text_LookupString(Script_ParseStringRef(gUnk_02000388.message) + 8));
+    Menu_DrawText(4, 5,
+                  Text_LookupString(Script_ParseStringRef(gScriptPromptSettings.message) + 8));
     Menu_EraseRect(9, 5, 16, 2);
     Menu_DrawText(9, 5, PlayerName_GetBuffer());
-    if (gUnk_02000388.p) {
+    if (gScriptPromptSettings.p) {
         Menu_EraseRect(3, 8, 24, 4);
-        Menu_DrawText(4, 8, Text_LookupString(Script_ParseStringRef(gUnk_02000388.message) + 7));
+        Menu_DrawText(4, 8,
+                      Text_LookupString(Script_ParseStringRef(gScriptPromptSettings.message) + 7));
         zero = 0;
         CpuSet(&zero, text, 0x05000008);
-        src = Text_LookupString(Script_ParseStringRef(gUnk_02000388.title));
+        src = Text_LookupString(Script_ParseStringRef(gScriptPromptSettings.title));
         dst = text;
         dst[0] = 0x80;
         dst[1] = 0xb9;

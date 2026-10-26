@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     u16 x, y, z, pad;
@@ -43,7 +44,6 @@ struct Target {
     u32 damageType;
 };
 extern const struct Vec gUnk_0824FE8C;
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 void Collision_CalculateDamageResponse(void *);
 void Sound_PlaySong(u32);
@@ -99,7 +99,7 @@ void FanCannon_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
             register s32 i asm("r6");
             struct Vec *vel = &frame.velocity;
             struct Vec *pos = &frame.position;
-            u32 *index = &gUnk_03005308;
+            u32 *index = &gRandomIndex;
             u32 mask = 0x7f;
             i = 2;
             do {

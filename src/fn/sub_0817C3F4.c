@@ -29,13 +29,13 @@ s32 SceneVolume_CanActivate(void *);
 void SceneSteeringActor_RequestRemovalAll(void);
 u8 Callback_InvokeActor(void *, void *);
 extern void *gUnk_08611C6C[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 static inline s32 RandomValue(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(u16 *)(offset + (u32)gUnk_0203B400);
 }
 static inline void SelectAction(struct DecisionActor *p, u32 zero, u32 choice)

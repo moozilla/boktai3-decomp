@@ -8,7 +8,7 @@ u32 ScriptUtility_SetFlag800(u32 result)
     do {
         do {
             do {
-                flags = &gUnk_030053F4;
+                flags = &gEngineFlags;
             } while (0);
         } while (0);
     } while (0);

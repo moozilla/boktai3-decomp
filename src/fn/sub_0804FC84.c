@@ -3,7 +3,7 @@ void Callback_InvokeActor(struct RepeatedEffect *, void (*)(struct RepeatedEffec
 void RepeatedEffect_TickEntry(struct RepeatedEffect *effect)
 {
     if (effect->constrainCell) {
-        if (effect->cell == *(u32 *)((u8 *)gUnk_02000710 + 0x5A0)) {
+        if (effect->cell == *(u32 *)((u8 *)gGameState + 0x5A0)) {
             if (!effect->constrained)
                 effect->collider.flags &= 0xFFFB;
             Callback_InvokeActor(effect, effect->update);

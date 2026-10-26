@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u32 fl;
     u8 f[0x8a - 4];
@@ -11,10 +12,9 @@ struct G {
     u8 g[8];
     struct E e[32];
 };
-extern struct G *gUnk_02000238;
 struct E *Hresvelgr_FindInactiveShot(void)
 {
-    struct G *g = gUnk_02000238;
+    struct G *g = gDirectionBurstEmitter;
     struct E *e;
     s32 i;
     if (g->n <= 0x1f)

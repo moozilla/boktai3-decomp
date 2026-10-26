@@ -69,7 +69,7 @@ s32 ScenePool_StateCruise(void *manager, struct ScenePoolActor *actor, struct Sc
     }
     {
         const u16 *table = gUnk_0203B400;
-        u32 *index = &gUnk_03005308;
+        u32 *index = &gRandomIndex;
         u32 next = *index + 1;
         u32 indexMask = 0x3ff;
         register u32 byteMask asm("r6");

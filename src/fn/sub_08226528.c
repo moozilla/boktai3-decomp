@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_03005420;
+#include "ram.h"
 struct Cam {
     u8 pad[0x1c];
     u16 mode;
@@ -12,7 +12,7 @@ struct Cam {
 };
 void sub_08226528(u32 a, u32 b)
 {
-    struct Cam *camera = (struct Cam *)gUnk_03005420;
+    struct Cam *camera = (struct Cam *)gActiveCamera;
     if (camera != NULL) {
         camera->a = a;
         camera->b = b;

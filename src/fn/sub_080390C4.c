@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "game_state.h"
 // Tentative wireless selection/menu layout from observed offsets.
 struct Slot {
     u8 counts[4];
@@ -29,9 +30,8 @@ struct Save {
     s16 values[4];
 };
 extern struct Menu *gUnk_020000FC;
-extern struct Save *gUnk_02000710;
-extern u8 gUnk_03003A50, gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u8 gSceneEffectPalettePhase, gUnk_0203B400[];
+extern u32 gRandomIndex;
 void *Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 void *Script_GetPc(void);
@@ -148,7 +148,7 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
         if (count) {
             int r;
             register int j asm("r5");
-            r = gUnk_03003A50;
+            r = gSceneEffectPalettePhase;
             j = 0;
             if ((u32)j < count)
                 do {
@@ -193,12 +193,12 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
                     p->leftMask = (1 << index) | mask;
                     Inventory_SetEquipmentEntry(index, item);
                     {
-                        register u32 *read asm("r1") = &gUnk_03005308;
+                        register u32 *read asm("r1") = &gRandomIndex;
                         register u32 *write asm("r3");
                         u32 x;
                         u8 *table;
                         x = (*read + 1) & 1023;
-                        write = &gUnk_03005308;
+                        write = &gRandomIndex;
                         *write = x;
                         x <<= 1;
                         table = gUnk_0203B400;
@@ -240,12 +240,12 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
             register int j asm("r5");
             u16 *q;
             u32 *random;
-            r = gUnk_03003A50;
+            r = gSceneEffectPalettePhase;
             j = 0;
             if ((u32)j < count) {
                 q = rightBase;
                 {
-                    register u32 *x asm("r3") = &gUnk_03005308;
+                    register u32 *x asm("r3") = &gRandomIndex;
                     asm("" : "+r"(x));
                     random = x;
                 }
@@ -320,7 +320,7 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
         register int minus asm("r0");
         register int value asm("r2");
         i = 0;
-        slot = &gUnk_02000710;
+        slot = &gGameState;
         minus = -1;
         asm("" : "+r"(slot), "+r"(minus));
         value = minus;

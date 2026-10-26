@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 
 struct SceneSelection {
     u8 pad0[0x1a];
@@ -10,7 +11,6 @@ struct SceneSelection {
     u16 command;
     u16 *slots;
 };
-extern u32 gUnk_03005250;
 u8 Registry1745_ConsumeStateEntry(struct SceneSelection *);
 s32 Registry1745_CheckSessionReady(struct SceneSelection *);
 void Registry1745_BeginShutdown(struct SceneSelection *, void (*)(void));
@@ -33,7 +33,7 @@ static inline u8 IsTransitionSlot(u32 value)
 s32 SceneSelection_WaitForSlotTransition(struct SceneSelection *p)
 {
     s32 count, i, length;
-    gUnk_03005250 = 1;
+    gLinkMenuActive = 1;
     if (Registry1745_ConsumeStateEntry(p)) {
         gBgFadeLevel = 0x40;
         gObjFadeLevel = 0x40;

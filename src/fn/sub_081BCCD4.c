@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000710, *gUnk_02000580;
+extern u8 *gGameState, *gUnk_02000580;
 extern u16 gUnk_03005260[];
 void Anim_Step(void *, void *);
 void Sound_PlaySong(u32);
@@ -26,19 +26,19 @@ void DarkLoan_UpdateAdjustment(u8 *s)
         balance = (u16 *)(gUnk_02000580 + 0x428);
         limit = (u16 *)(gUnk_02000580 + 0x42A);
     } else {
-        balance = (u16 *)(gUnk_02000710 + 0x2C);
-        limit = (u16 *)(gUnk_02000710 + 0x2E);
+        balance = (u16 *)(gGameState + 0x2C);
+        limit = (u16 *)(gGameState + 0x2E);
     }
     if (gUnk_03005260[1] & 1) {
         if (!H(0x8EE))
             Sound_PlaySong(0xDE);
         else {
             *balance += H(0x8EE);
-            *(u32 *)(gUnk_02000710 + 0x50C) += H(0x8EE) * H(0x8EC);
-            total = *(s32 *)(gUnk_02000710 + 0x51C) + H(0x8EE) * H(0x8EC);
+            *(u32 *)(gGameState + 0x50C) += H(0x8EE) * H(0x8EC);
+            total = *(s32 *)(gGameState + 0x51C) + H(0x8EE) * H(0x8EC);
             if (total < 0)
                 total = 0x7FFFFFFF;
-            *(s32 *)(gUnk_02000710 + 0x51C) = total;
+            *(s32 *)(gGameState + 0x51C) = total;
             Sound_PlaySong(0xDD);
         }
         DarkLoan_BeginClosing(s);
@@ -50,7 +50,7 @@ void DarkLoan_UpdateAdjustment(u8 *s)
         return;
     }
     if ((gUnk_03005260[0] & 0x20) &&
-        *(s32 *)(gUnk_02000710 + 0x50C) + (H(0x8EE) + 1) * H(0x8EC) <= 9999 &&
+        *(s32 *)(gGameState + 0x50C) + (H(0x8EE) + 1) * H(0x8EC) <= 9999 &&
         *balance + H(0x8EE) < *limit) {
         Sound_PlaySong(0x37D);
         H(0x8EE)++;
@@ -88,7 +88,7 @@ void DarkLoan_UpdateAdjustment(u8 *s)
         Anim_LoadKeyframe(s + 0x238, s + 0x18, 18, 1);
     }
     if ((gUnk_03005260[0] & 0x20) &&
-        *(s32 *)(gUnk_02000710 + 0x50C) + (H(0x8EE) + 1) * H(0x8EC) > 9999)
+        *(s32 *)(gGameState + 0x50C) + (H(0x8EE) + 1) * H(0x8EC) > 9999)
         H(0x908) = 60;
     if (H(0x908)) {
         if (--H(0x908) == 0) {

@@ -23,7 +23,7 @@ u32 SceneActorPalette_IsTransitionComplete(void)
     struct SceneActorPaletteManagerView *manager = (void *)gUnk_020004A8;
     if (manager == NULL || !TestP(0x2000, &manager->flags))
         return 1;
-    if (Test(gUnk_030053F4, 0x4800))
+    if (Test(gEngineFlags, 0x4800))
         id = 10;
     else {
         if (SceneActorRegistry_CountLivingByCategory(10))

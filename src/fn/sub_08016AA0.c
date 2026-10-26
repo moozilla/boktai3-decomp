@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -23,7 +24,6 @@ struct Effect {
 };
 void FloatingEffect_Project(struct Effect *);
 void FloatingEffect_Init(struct Effect *);
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 static inline u32 FloatingEffect_RandomAt(const u16 *table, u16 index)
 {
@@ -49,7 +49,7 @@ void sub_08016AA0(u8 *m, struct Effect *p)
     FloatingEffect_Project(p);
     if ((p->mode == 3) && (p->timer > 3)) {
         const u16 *table = gUnk_0203B400;
-        u32 *seed = &gUnk_03005308;
+        u32 *seed = &gRandomIndex;
         u32 mask;
         u16 index = *seed + 1;
         mask = 0x3FF;

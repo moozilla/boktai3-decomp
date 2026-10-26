@@ -163,7 +163,7 @@ static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
 extern u32 gUnk_030053F0, gUnk_02000560;
 static inline u32 CannonEmitter_TestPause(u32 mask)
 {
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 static inline u32 CannonEmitter_TestMode(u32 mask)
 {

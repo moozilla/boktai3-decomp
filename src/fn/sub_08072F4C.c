@@ -45,7 +45,7 @@ static inline u8 *Sub08072F4C_Cell(s32 cell)
     u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         return data + 4;
-    return gUnk_030052F4->cells + (cell * 4 + 12);
+    return gTerrainMap->cells + (cell * 4 + 12);
 }
 /* Cell lies in the direction `dir` (low nibble) and carries no blocking override bits. */
 static inline s32 Sub08072F4C_Walkable(s32 cell, s32 dir)
@@ -70,9 +70,9 @@ static inline s32 Sub08072F4C_CellAt(struct ContactPosition *p)
     s32 cz = (s8)(p->z >> 8);
     if (cx < 0 || cz < 0)
         return 0;
-    if (cx >= gUnk_030052F8 || cz >= gUnk_030052FC)
+    if (cx >= gTerrainWidth || cz >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[cz] + cx;
+    return gTerrainMap->rows[cz] + cx;
 }
 
 /* Contact probe of one candidate position; inlined twice in the ROM (looped copy and single copy). */
@@ -104,7 +104,7 @@ static inline s32 Sub08072F4C_Probe(struct SceneActorRegistryActor *self, void *
         return 0;
 
     if (kind == 2) {
-        if (gUnk_030053F4 & 0x4800) {
+        if (gEngineFlags & 0x4800) {
             if (!SceneActorContacts_TestPlayerCondition(obj, 1, 0x10000))
                 goto plain;
             r4 = Sub08072F4C_Half(*(s32 *)(a1 + 0xF8));
@@ -114,7 +114,7 @@ static inline s32 Sub08072F4C_Probe(struct SceneActorRegistryActor *self, void *
                 sb = Div(r4 * 7, 10);
         } else {
             if (SceneActorContacts_TestPlayerCondition(obj, 1, 0x10000) ||
-                !(*(u32 *)((u8 *)gUnk_02000710 + 0x868) & 0x20)) {
+                !(*(u32 *)((u8 *)gGameState + 0x868) & 0x20)) {
                 r4 = Sub08072F4C_Half(*(s32 *)(a1 + 0xF8));
                 if (g[0xF] & 4)
                     sb = r4;
@@ -125,9 +125,9 @@ static inline s32 Sub08072F4C_Probe(struct SceneActorRegistryActor *self, void *
             }
         }
     } else {
-        if (gUnk_030053F4 & 0x4800)
+        if (gEngineFlags & 0x4800)
             return 0;
-        if (!(*(u32 *)((u8 *)gUnk_02000710 + 0x868) & 0x20)) {
+        if (!(*(u32 *)((u8 *)gGameState + 0x868) & 0x20)) {
             r4 = Sub08072F4C_Half(*(s32 *)(a1 + 0xF8));
             if (g[0xF] & 4)
                 sb = r4;
@@ -150,7 +150,7 @@ gate:
     cell = Sub08072F4C_CellAt(pos);
     cur = *(u16 *)(a1 + 0x2F4);
     dir = (s8)(*(u16 *)(a1 + 0x5E) >> 8);
-    width = *(s16 *)(gUnk_030052F4->cells + 4);
+    width = *(s16 *)(gTerrainMap->cells + 4);
     res = (cell - 1 == cur && Sub08072F4C_Walkable(cell, dir)) ||
           (cell == cur + width && Sub08072F4C_Walkable(cell, dir)) ||
           (cell + 1 == cur && Sub08072F4C_Walkable(cell, dir)) ||
@@ -216,7 +216,7 @@ kind2:
     if (!(g[0xF] & 2))
         return 0;
     obj = arg0->object;
-    if (gUnk_030053F4 & 0x4800) {
+    if (gEngineFlags & 0x4800) {
         u32 t;
         if (obj == 0)
             return 0;

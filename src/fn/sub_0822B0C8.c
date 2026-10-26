@@ -1,6 +1,6 @@
 #include "global.h"
 #include "gba/m4a_internal.h"
-extern u16 gUnk_03005470[];
+#include "ram.h"
 void m4aSongNumStartOrContinue(u16);
 void m4aSongNumStart(u16);
 void m4aSongNumStop(u16);
@@ -19,6 +19,6 @@ void Sound_PlayChannel12Song(u32 song)
         players = gMPlayTable;
         index = entry->ms;
         m4aMPlayVolumeControl(players[index].info, 0xffff, 256);
-        gUnk_03005470[index] = song;
+        gMusicSlotSongs[index] = song;
     }
 }

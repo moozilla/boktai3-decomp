@@ -4,8 +4,8 @@ void GameState_SetUnlockSlot(s32 index, s32 value);
 void GameState_AddUnlock(s32 value);
 void Inventory_AssignUniqueSecondarySlot(s32 value, s32 slot);
 /* game state fields, addressed index-first as the original does */
-#define STATE_U16(offset) (*(u16 *)((u8 *)gUnk_02000710 + (offset)))
-#define SLOT78(i)         (*(s16 *)((u8 *)gUnk_02000710 + (i) * 2 + 0x78))
+#define STATE_U16(offset) (*(u16 *)((u8 *)gGameState + (offset)))
+#define SLOT78(i)         (*(s16 *)((u8 *)gGameState + (i) * 2 + 0x78))
 /* Script: clears the twelve entries set by GameState_SetUnlockSlot, the eight slots at
    +0x78 and +0x50, then -n count, -w count values (nonzero ones go to
    GameState_AddUnlock) and -q eight values for Inventory_AssignUniqueSecondarySlot (+0x50 = 8). */

@@ -1,5 +1,6 @@
 // confidence=low: inferred from player cue phases and animation consumers.
 #include "global.h"
+#include "game_state.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 72.6%
@@ -20,7 +21,6 @@ void Sound_StopSong(u32);
 void ConvergingEffects_EmitFarParticle(void *, void *);
 void Hud_ClearTimer(void);
 void Script_Call(u32, void *);
-extern u8 *gUnk_02000710;
 struct Call {
     u32 count : 16;
     u32 pad : 16;

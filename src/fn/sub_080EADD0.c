@@ -10,6 +10,7 @@
 
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
+#include "engine.h"
 
 void SpriteParticle_SpawnBatch(void *, u32, u32, u32, u32);
 void SceneActorBehavior_CallTerrainScript(void *);
@@ -18,7 +19,6 @@ void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorRegistry_SendToActorId(u8, void *, u16);
 s32 Mod(s32, s32);
-extern u32 gUnk_03005308;
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
 
@@ -54,8 +54,8 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u3
 
 static inline u16 Rand(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     index *= 2;
     return *(const u16 *)(index + RANDOM_TABLE_ADDR);
 }

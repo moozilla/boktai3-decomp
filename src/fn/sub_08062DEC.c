@@ -22,7 +22,7 @@ void SceneInventory_BuildUnlockedEquipmentCatalog(struct SceneInventoryScriptCat
     initialCount = &p->pageCount;
     *initialCount = 6;
     page = 0;
-    location = &gUnk_02000710;
+    location = &gGameState;
     one = 1;
     base = p->catalog;
     pageCount = initialCount;

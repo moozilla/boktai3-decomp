@@ -82,14 +82,14 @@ static inline s32 Scale(int x)
     return -(-x >> 12);
 }
 
-extern u32 gUnk_030052F8, gUnk_030052FC;
+extern u32 gTerrainWidth, gTerrainHeight;
 struct TerrainMap {
     u32 unknown;
     u8 *cells;
     u8 pad8[0x1C];
     u16 rows[1];
 };
-extern struct TerrainMap *gUnk_030052F4;
+extern struct TerrainMap *gTerrainMap;
 u8 *TerrainModifiers_FindCellOverride(u32, int);
 static inline int TerrainHeight(s16 *position)
 {
@@ -97,15 +97,15 @@ static inline int TerrainHeight(s16 *position)
     u32 cell;
     u8 *data;
     u32 shape, flags, height;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else {
-        struct TerrainMap *map = gUnk_030052F4;
+        struct TerrainMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         data = map->cells + offset;
     }

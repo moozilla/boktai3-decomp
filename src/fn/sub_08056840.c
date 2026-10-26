@@ -47,15 +47,15 @@ void TerrainEdgeMarker_AddRegionFromScript(void)
         }
         z = sample->world.z >> 8;
         world = sample;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             index = 0;
         else
-            index = gUnk_030052F4->rows[z] + x;
+            index = gTerrainMap->rows[z] + x;
         cell = TerrainModifiers_FindCellOverride(index, 1);
         if (cell)
             cell += 4;
         else {
-            struct EngineMap *map = gUnk_030052F4;
+            struct EngineMap *map = gTerrainMap;
             u32 offset = index * 4 + 12;
             cell = map->cells + offset;
         }

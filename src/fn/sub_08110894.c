@@ -58,9 +58,9 @@ s32 sub_08110894(u8 *p)
     RecordList_InitializeSprites(p);
     LinkMenu_LoadSelectionSprite(p);
     sub_0810FADC(p);
-    sub_0810FDDC(p, 0, *(s16 *)((u8 *)gUnk_02000710 + 0x7b6));
-    sub_0810FDDC(p, 1, *(s16 *)((u8 *)gUnk_02000710 + 0x7fa));
-    sub_0810FDDC(p, 2, *(s16 *)((u8 *)gUnk_02000710 + 0x7fc));
+    sub_0810FDDC(p, 0, *(s16 *)((u8 *)gGameState + 0x7b6));
+    sub_0810FDDC(p, 1, *(s16 *)((u8 *)gGameState + 0x7fa));
+    sub_0810FDDC(p, 2, *(s16 *)((u8 *)gGameState + 0x7fc));
     ModifierMenu_InitSelectionSnapshot(p + 0x770, *(void **)(p + 0x20));
     LinkScorePanel_CreateTextWindows(p);
     LinkScorePanel_RefreshPlayerName(p);

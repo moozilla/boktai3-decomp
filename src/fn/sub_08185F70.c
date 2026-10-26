@@ -20,7 +20,7 @@ struct ArmorTrackingTarget {
     u8 pad[0x30];
     s16 x, y, z;
 };
-extern struct ArmorTrackingTarget *gUnk_02000710;
+extern struct ArmorTrackingTarget *gGameState;
 s32 Math_Atan2(s32, s32);
 void ActorController_StartTurn(void *, u32);
 void ActorController_StartModeTwoTurn(void *, u32);
@@ -29,8 +29,8 @@ s32 DirectionalActor_TryBeginState(void *, s32);
 // confidence=low: computes an offset around the player before selecting movement or a turn.
 void Armor_UpdateOffsetTracking(struct ArmorTrackingActor *p, s32 mode, s32 alternate)
 {
-    s32 dx = gUnk_02000710->x - p->x;
-    s32 dz = gUnk_02000710->z - p->z;
+    s32 dx = gGameState->x - p->x;
+    s32 dz = gGameState->z - p->z;
     s32 heading = Math_Atan2(dx, dz);
     if (p->flags & 0x10)
         p->delay = 120;
@@ -54,56 +54,56 @@ void Armor_UpdateOffsetTracking(struct ArmorTrackingActor *p, s32 mode, s32 alte
         if (p->phase == 1) {
             sector = (heading - 7) & 255;
             if (sector <= 31) {
-                goal.x = gUnk_02000710->x + distance;
-                goal.z = gUnk_02000710->z;
+                goal.x = gGameState->x + distance;
+                goal.z = gGameState->z;
             } else if (sector <= 63) {
-                goal.x = gUnk_02000710->x + diagonal;
-                goal.z = gUnk_02000710->z + diagonal;
+                goal.x = gGameState->x + diagonal;
+                goal.z = gGameState->z + diagonal;
             } else if (sector <= 95) {
-                goal.x = gUnk_02000710->x;
-                goal.z = gUnk_02000710->z + distance;
+                goal.x = gGameState->x;
+                goal.z = gGameState->z + distance;
             } else if (sector <= 127) {
-                goal.x = gUnk_02000710->x - diagonal;
-                goal.z = gUnk_02000710->z + diagonal;
+                goal.x = gGameState->x - diagonal;
+                goal.z = gGameState->z + diagonal;
             } else if (sector <= 159) {
-                goal.x = gUnk_02000710->x - distance;
-                goal.z = gUnk_02000710->z;
+                goal.x = gGameState->x - distance;
+                goal.z = gGameState->z;
             } else if (sector <= 191) {
-                goal.x = gUnk_02000710->x - diagonal;
-                goal.z = gUnk_02000710->z - diagonal;
+                goal.x = gGameState->x - diagonal;
+                goal.z = gGameState->z - diagonal;
             } else if (sector <= 223) {
-                goal.x = gUnk_02000710->x;
-                goal.z = gUnk_02000710->z - distance;
+                goal.x = gGameState->x;
+                goal.z = gGameState->z - distance;
             } else {
-                goal.x = gUnk_02000710->x + diagonal;
-                goal.z = gUnk_02000710->z - diagonal;
+                goal.x = gGameState->x + diagonal;
+                goal.z = gGameState->z - diagonal;
             }
         } else {
             sector = (heading + 7) & 255;
             if (sector <= 31) {
-                goal.x = gUnk_02000710->x + diagonal;
-                goal.z = gUnk_02000710->z + diagonal;
+                goal.x = gGameState->x + diagonal;
+                goal.z = gGameState->z + diagonal;
             } else if (sector <= 63) {
-                goal.x = gUnk_02000710->x;
-                goal.z = gUnk_02000710->z + distance;
+                goal.x = gGameState->x;
+                goal.z = gGameState->z + distance;
             } else if (sector <= 95) {
-                goal.x = gUnk_02000710->x - diagonal;
-                goal.z = gUnk_02000710->z + diagonal;
+                goal.x = gGameState->x - diagonal;
+                goal.z = gGameState->z + diagonal;
             } else if (sector <= 127) {
-                goal.x = gUnk_02000710->x - distance;
-                goal.z = gUnk_02000710->z;
+                goal.x = gGameState->x - distance;
+                goal.z = gGameState->z;
             } else if (sector <= 159) {
-                goal.x = gUnk_02000710->x - diagonal;
-                goal.z = gUnk_02000710->z - diagonal;
+                goal.x = gGameState->x - diagonal;
+                goal.z = gGameState->z - diagonal;
             } else if (sector <= 191) {
-                goal.x = gUnk_02000710->x;
-                goal.z = gUnk_02000710->z - distance;
+                goal.x = gGameState->x;
+                goal.z = gGameState->z - distance;
             } else if (sector <= 223) {
-                goal.x = gUnk_02000710->x + diagonal;
-                goal.z = gUnk_02000710->z - diagonal;
+                goal.x = gGameState->x + diagonal;
+                goal.z = gGameState->z - diagonal;
             } else {
-                goal.x = gUnk_02000710->x + distance;
-                goal.z = gUnk_02000710->z;
+                goal.x = gGameState->x + distance;
+                goal.z = gGameState->z;
             }
         }
         dx = goal.x - p->x;

@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_02000194;
+#include "ram.h"
 
 void ParticleEffectPool_ResetSingleton(void)
 {
-    gUnk_02000194 = 0;
+    gSceneParticlePool = 0;
 }

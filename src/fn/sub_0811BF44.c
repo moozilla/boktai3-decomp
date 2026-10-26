@@ -1,19 +1,19 @@
 #include "global.h"
 #include "scene_object.h"
 #include "game_state.h"
+#include "ram.h"
 
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 u32 ActorEffect_SpawnAtActorPos(void *, struct SceneExtent *, struct SceneExtent *, u32, u32, u32,
                                 u32, u32, u32, u32, u32, u32, u32, u32, u32);
 static inline u32 NextRandom(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 static inline u8 HasModifier(u32 mask)
 {
-    if (gUnk_02000710->flags868 & mask)
+    if (gGameState->flags868 & mask)
         return 1;
     return 0;
 }

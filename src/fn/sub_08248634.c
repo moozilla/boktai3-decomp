@@ -1,13 +1,12 @@
 // CFLAGS: -O1 -mthumb-interwork
 #include "global.h"
+#include "ram.h"
 /* Adapted from: laqieer/libgbabackup at 9597360b36d22df1ead5dd59566a3c8618cff6c0, src/eeprom.c (tmc lineage). */
 typedef struct EEPROMConfig {
     u32 unk_00;
     u16 size, waitcnt;
     u8 address_width;
 } EEPROMConfig;
-extern const EEPROMConfig *gUnk_03006A9C;
-#define gEEPROMConfig         gUnk_03006A9C
 #define EEPROM_OUT_OF_RANGE   0x80ff
 #define EEPROM_COMPARE_FAILED 0x8000
 #define ARRAY_COUNT(a)        (sizeof(a) / sizeof((a)[0]))

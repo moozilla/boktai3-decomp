@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 
 struct PadState {
     u16 held;
@@ -8,9 +9,7 @@ struct PadState {
     u16 pad;
 };
 extern u16 gUnk_03005270;
-extern u32 gUnk_03005250;
 extern struct PadState gUnk_03005260[2];
-extern u16 gUnk_03005274[2];
 
 #define PAD_UPDATE(i, k)                                                                           \
     {                                                                                              \
@@ -26,7 +25,7 @@ void sub_08219B24(void)
     u16 keys, old;
 
     gUnk_03005270 = *(vu16 *)0x04000130;
-    if (gUnk_03005250 == 0) {
+    if (gLinkMenuActive == 0) {
         keys = 0x3FF ^ gUnk_03005270;
         PAD_UPDATE(0, keys);
         for (i = 1; i < 2; i++) {
@@ -35,10 +34,10 @@ void sub_08219B24(void)
         }
     } else if (!(gEnginePauseFlags & 1)) {
         for (i = 0; i < 2; i++) {
-            if (gUnk_03005274[i] == 0xFFFF)
+            if (gSceneSelectionDisplaySlots[i] == 0xFFFF)
                 keys = 0;
             else
-                keys = 0x3FF ^ gUnk_03005274[i];
+                keys = 0x3FF ^ gSceneSelectionDisplaySlots[i];
             PAD_UPDATE(i, keys);
         }
     }

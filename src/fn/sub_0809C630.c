@@ -1,10 +1,10 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_phase.h"
+#include "engine.h"
 
 // MATCHING_CONCESSION: register-pinning
 
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Lun_OnSpecialAnimation(void);
@@ -20,8 +20,8 @@ void SceneActorControl_ConsumeLiftFlagPenalty(struct SceneActorRegistryResetView
 static inline u32 Random(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     {
         register u32 tab asm("r2") = (u32)gUnk_0203B400;
         return *(const u16 *)(offset + tab);

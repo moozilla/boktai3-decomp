@@ -1,5 +1,5 @@
 #include "stacked_actor.h"
-extern u32 gUnk_030053F4, gUnk_02000560;
+extern u32 gEngineFlags, gUnk_02000560;
 extern u8 *gUnk_02000580;
 extern u16 gUnk_03005260[];
 s32 StackedActor_IsPlayerNearby(struct StackedActor *);
@@ -8,7 +8,7 @@ void AnimData_SelectPaletteBank(void *, u32);
 void PlayerCue_WalkTo(u8 *, struct StackedActorPosition *, u32, u32);
 void StackedActor_TickIdle(struct StackedActor *actor)
 {
-    if (!(gUnk_030053F4 & 0x200) && actor->interactionDelay <= 9)
+    if (!(gEngineFlags & 0x200) && actor->interactionDelay <= 9)
         actor->interactionDelay++;
     {
         s32 nearby = StackedActor_IsPlayerNearby(actor);

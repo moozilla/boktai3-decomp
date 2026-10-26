@@ -1,5 +1,6 @@
 #include "global.h"
-extern u32 gSpriteRenderCallback, gExtraRenderCallback, gProjectedSpriteCallback, gUnk_03003A50;
+#include "ram.h"
+extern u32 gSpriteRenderCallback, gExtraRenderCallback, gProjectedSpriteCallback;
 extern s32 gGrayscaleControl;
 void Palette_ResetObjectAllocation(void);
 void ObjGfx_ResetAllocationCounters(void);
@@ -31,6 +32,6 @@ u32 InterruptsAndVideo_OnGraphicsUpdateTask(void)
         sub_08217430();
     }
     SpriteOam_ResetQueue(0);
-    gUnk_03003A50++;
+    gSceneEffectPalettePhase++;
     return 0;
 }

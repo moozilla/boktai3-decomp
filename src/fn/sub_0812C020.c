@@ -2,10 +2,9 @@
 #include "global.h"
 #include "engine.h"
 #include "pursuing_actor.h"
+#include "ram.h"
 
-#define gPursuingActorManager gUnk_02000184
 void Sprite_Remove(void *);
-extern struct PursuingActorManager *gUnk_02000184;
 static inline u8 IsActive(struct PursuingActorManager *manager, s32 index)
 {
     if (manager->activeSlots & (1 << index))
@@ -30,5 +29,5 @@ u32 PursuingActors_ReleaseAll(struct PursuingActorManager *manager)
             }
         }
     }
-    return (u32)(gUnk_02000184 = 0);
+    return (u32)(gPursuingActorManager = 0);
 }

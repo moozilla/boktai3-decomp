@@ -6,7 +6,7 @@ void StackedActor_InitRisingParticle(struct StackedActorParticle *particle,
     particle->position = *position;
     {
         u16 *random = (u16 *)RANDOM_TABLE_ADDR;
-        register u32 *rng asm("r9") = &gUnk_03005308;
+        register u32 *rng asm("r9") = &gRandomIndex;
         register u32 index asm("r2") = *rng + 1;
         u32 mask = 1023;
         u32 mask31;

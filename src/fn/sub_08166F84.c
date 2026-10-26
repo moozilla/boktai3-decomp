@@ -1,5 +1,4 @@
 #include "global.h"
-#define gGameState gUnk_02000710
 /* Tentative inventory display family, inferred from slot and item consumers. */
 #include "game_state.h"
 struct InventoryPanelElement {
@@ -28,7 +27,7 @@ s32 InventoryPanel_UpdateSelectedEquipment(struct InventoryPanel *p, s32 x, s32 
                                            s32 position)
 {
     s32 value;
-    s32 kind = InventoryPanel_CreateEntry(&value, position, (s16)gUnk_02000710->unk50, 1, 0);
+    s32 kind = InventoryPanel_CreateEntry(&value, position, (s16)gGameState->unk50, 1, 0);
     if (query) {
         if (kind != 0) {
             kind = -1;

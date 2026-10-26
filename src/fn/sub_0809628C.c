@@ -2,6 +2,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
+#include "engine.h"
 void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
@@ -10,7 +11,6 @@ void Bee_ConsumeFlag80(void *);
 void Sound_PlaySong(u32);
 void EffectManager_SpawnParticlesAt(u32, u32, u32, void *, void *, u32, u32);
 s32 Mod(s32, s32);
-extern u32 gUnk_03005308;
 struct GhostDefeatContext {
     u8 unknown0[0x5BC];
     u8 particleStyle;
@@ -54,9 +54,9 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             u16 py;
             register u16 pz asm("r0");
             struct ContactPosition *pos;
-            u32 index = (gUnk_03005308 + 1) & 1023;
+            u32 index = (gRandomIndex + 1) & 1023;
             u32 count;
-            gUnk_03005308 = index;
+            gRandomIndex = index;
             count = Mod(*((u16 *)(0x0203B400 + (index * 2))), 3) + 1;
             pos = &actor->position;
             {

@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern void *gUnk_08610D18[];
 void Player_AccumulateAction(u8 *, s32);
 bool32 Player_CanUseSceneFeature(u8 *);
@@ -32,7 +32,7 @@ void sub_08158754(u8 *p)
         case 1: {
             s32 mode;
             if (flags & 0x10)
-                Player_AccumulateAction(p, *(s16 *)(gUnk_02000710 + 0x876));
+                Player_AccumulateAction(p, *(s16 *)(gGameState + 0x876));
             if (Player_CanUseSceneFeature(p)) {
                 Player_UpdateTimedScriptEvent(p);
                 Player_TickModeParticles(p);

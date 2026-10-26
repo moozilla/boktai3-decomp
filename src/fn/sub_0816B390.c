@@ -1,6 +1,6 @@
 #include "global.h"
 #include "render.h"
-extern u8 *gUnk_02000710;
+#include "game_state.h"
 u32 Hud_GetScaledRetryCount(void);
 void Hud_InitRetryPanel(void *);
 void Hud_BeginRetryPanel(u8 *s)

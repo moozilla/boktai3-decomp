@@ -1,8 +1,7 @@
 #include "named_object.h"
 #include "player.h"
+#include "engine.h"
 extern const struct SceneVec gUnk_086064C4;
-extern struct EngineMap *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
 s32 Player_TestAttachmentFlags(struct Player *, u32);
 void Player_SetPositionAndSave(struct Player *, struct SceneVec *);
 u8 NamedObject_IsMapCellOccupied(s32);
@@ -35,10 +34,10 @@ void NamedObject_ConstrainPlayer(struct NamedObject *o)
                     return;
                 x = ((((struct SceneVec *)&o->x)->x >> 4) >> 2) >> 2;
                 z = ((struct SceneVec *)&o->x)->z >> 8;
-                if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+                if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
                     cell = 0;
                 else
-                    cell = gUnk_030052F4->rows[z] + x;
+                    cell = gTerrainMap->rows[z] + x;
                 if (!(NamedObject_IsMapCellOccupied(cell) &&
                       gUnk_02000580[i]->position.y == o->y)) {
                     Difference(&delta, (struct SceneVec *)&o->x, &gUnk_02000580[i]->position);

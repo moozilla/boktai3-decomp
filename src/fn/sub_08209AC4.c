@@ -58,8 +58,8 @@ struct FanTerrain {
     u8 pad[0x24];
     u16 rows[1];
 };
-extern struct FanTerrain *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC, gUnk_03005308;
+extern struct FanTerrain *gTerrainMap;
+extern u32 gTerrainWidth, gTerrainHeight, gRandomIndex;
 extern u16 gUnk_02000550, gUnk_0200053C;
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
@@ -85,15 +85,15 @@ struct FanVec *Player_GetEffectivePosition(s32);
 
 static inline u32 RandomFrom(const u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    return table[gRandomIndex];
 }
 static inline s32 Fan_Cell(struct FanVec *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline void Fan_Step(struct FanCannon *p, void *sprite, struct FanSeq *s)
 {

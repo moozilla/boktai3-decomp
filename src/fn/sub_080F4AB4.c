@@ -1,6 +1,6 @@
 #include "global.h"
+#include "engine.h"
 
-#define gRandomIndex gUnk_03005308
 #define gRandomTable gUnk_0203B400
 struct PhaseActor {
     u8 unknown0[9];
@@ -18,7 +18,6 @@ struct PhaseActor {
     u8 unknown18B[4];
     u8 phaseStep;
 };
-extern u32 gRandomIndex;
 extern const u16 gRandomTable[];
 void Ivy_BeginChildPulse(void);
 void IvyChild_UpdateAfterBob(void);

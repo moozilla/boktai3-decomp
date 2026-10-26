@@ -44,8 +44,8 @@ static inline u32 Reaction_Flags(struct SceneActorRegistryResetView *actor, u32 
 }
 static inline u32 Reaction_Random(const u16 *table)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return table[index];
 }
 static inline void Reaction_SpawnPart(u8 *group)

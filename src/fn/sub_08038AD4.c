@@ -26,7 +26,7 @@ struct Target {
     s16 current, maximum;
 };
 extern struct Actor *gUnk_02000580;
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void Hud_RegisterTimer(u16 *);
 void WirelessGameMenu_SetStatusPanelState(struct P *, int);

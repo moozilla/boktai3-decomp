@@ -1,8 +1,8 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 static inline u8 TestFlag(u32 mask)
 {
-    if (*(u32 *)(gUnk_02000710 + 0x868) & mask)
+    if (*(u32 *)(gGameState + 0x868) & mask)
         return 1;
     return 0;
 }

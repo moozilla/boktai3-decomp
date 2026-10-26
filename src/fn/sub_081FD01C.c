@@ -76,7 +76,7 @@ struct Behaviors {
 extern const struct Behaviors gUnk_0824FE28;
 extern struct Pool *gUnk_020005E8;
 extern const s16 gUnk_086149C4[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 void SceneProjectile_CreatePool(void);
 struct Entry *Projectile_FindFreeSlot(struct Pool *, s32 *);
 void Projectile_SetBehaviorCallback(struct Params *, void *);
@@ -279,8 +279,8 @@ s32 Projectile_SpawnAtPosition(struct Params *params, struct Pos *pos)
             Anim_SetSequence(q, proc, (u16)e->params.sequence, var, zero);
         } else {
             u32 var;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            var = PROJECTILE_RANDOM_TABLE[gUnk_03005308];
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            var = PROJECTILE_RANDOM_TABLE[gRandomIndex];
             var &= 3;
             q = (u8 *)&e->anim;
             Anim_SetSequence(q, proc, (u16)e->params.sequence, var, zero);

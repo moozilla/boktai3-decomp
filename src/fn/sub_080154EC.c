@@ -39,7 +39,7 @@ void *ScriptProc_Start(int, int);
 int AnimData_Load(void *, int);
 void Sprite_InitUnlinked(void *, void *, int);
 void Anim_SetSequence(void *, void *, int, int, int);
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern s16 gUnk_086149C4[];
 struct Config {
@@ -57,8 +57,8 @@ void Anim_SetDurationScale(void *, int);
 void Sprite_LinkToList(void *, int);
 static inline int rnd(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return gUnk_0203B400[gRandomIndex];
 }
 static inline int scale12(int a, int b)
 {
@@ -93,7 +93,7 @@ start:
     emitted = 0;
     i = 0;
     table = gUnk_0203B400;
-    index = &gUnk_03005308;
+    index = &gRandomIndex;
     for (; i <= 31; i++) {
         struct Piece *p = &gUnk_02000068->pieces[i];
         struct Obj *o = &p->sprite;

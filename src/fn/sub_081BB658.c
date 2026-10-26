@@ -10,7 +10,7 @@ void SolarBank_SetState(void *, void (*)(void));
 void SolarBank_RefreshAmountDigits(struct SolarBankPanel *);
 void SpriteMenu_HideAll(void *);
 void sub_081BB904(void);
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 #define FIELD(T, off) (*(T *)((u8 *)panel + (off)))
 void SolarBank_BeginAmountEntry(struct SolarBankPanel *panel)
 {
@@ -24,8 +24,8 @@ void SolarBank_BeginAmountEntry(struct SolarBankPanel *panel)
     Anim_SetKeyframes(&panel->label, panel->labelData, 1, 1, 0);
     FIELD(u32, 0x1E0) &= ~1;
     Anim_LoadKeyframe(panel->unk1D8, panel->labelData, 0x12, 1);
-    panel->balance = *(u32 *)(gUnk_02000710 + 0x77C);
-    panel->transferAmount = *(s16 *)(gUnk_02000710 + 0x7B0);
+    panel->balance = *(u32 *)(gGameState + 0x77C);
+    panel->transferAmount = *(s16 *)(gGameState + 0x7B0);
     b = &panel->transferDigits[0].flags;
     a = &panel->balanceDigits[0].flags;
     for (i = 3; i >= 0; i--) {

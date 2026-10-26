@@ -39,7 +39,7 @@ struct SolarBankDisplay {
 struct Pos {
     s16 x, y, z, w;
 };
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 static inline void Pos_Set(struct Pos *p, s32 x, s32 y, s32 z)
 {
     p->x = x;
@@ -86,13 +86,12 @@ void sub_081BBE88(struct SolarBankDisplay *p)
             rate = 0;
         if (rate > 13)
             rate = 13;
-        *((s16 *)(gUnk_02000710 + 0x598)) = rate + 0x41;
-    } else if ((*((s16 *)(gUnk_02000710 + 0x598))) == 0) {
+        *((s16 *)(gGameState + 0x598)) = rate + 0x41;
+    } else if ((*((s16 *)(gGameState + 0x598))) == 0) {
         s32 sec = SunClock_GetSecond();
-        *((s16 *)(gUnk_02000710 + 0x598)) =
-            Mod((*((u32 *)(gUnk_02000710 + 0x614))) ^ sec, 13) + 0x41;
+        *((s16 *)(gGameState + 0x598)) = Mod((*((u32 *)(gGameState + 0x614))) ^ sec, 13) + 0x41;
     }
-    v = ((100 * (*((s16 *)(gUnk_02000710 + 0x598)))) >> 6) - 100;
+    v = ((100 * (*((s16 *)(gGameState + 0x598)))) >> 6) - 100;
     tens = Div(v, 10);
     v -= tens * 10;
     Widget_InitLinked(&p->w118, &p->resA, (u16)(tens + 8), 0x30, 0, 0, 0x3C, &pos);

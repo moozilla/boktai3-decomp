@@ -133,9 +133,9 @@ static inline u16 *Flags2D4(struct SceneActorRegistryResetView *actor)
 static inline u32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u32 CellHeight(u32 cell, struct ContactPosition *position)
 {
@@ -144,7 +144,7 @@ static inline u32 CellHeight(u32 cell, struct ContactPosition *position)
     if (data)
         data += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         data = map->cells + offset;
     }
@@ -198,7 +198,7 @@ static inline u32 RandomDirectionExcept(u32 current)
 {
     s32 i;
     for (i = 0; i <= 3; i++) {
-        u32 d = Random(gUnk_0203B400, &gUnk_03005308, 0x3FF, 3) << 6;
+        u32 d = Random(gUnk_0203B400, &gRandomIndex, 0x3FF, 3) << 6;
         if (d != current)
             return d;
     }
@@ -242,7 +242,7 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
         dest->z = link->point->z;
         dest->y = CellHeight(CellIndex(dest), dest);
     }
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u8 *target = (u8 *)*targetp;
         if (!target)
             goto fail;
@@ -385,8 +385,8 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         range.x = 60;
         range.y = 60;
         range.z = 40;
-        index = (gUnk_03005308 + 1) & 1023;
-        gUnk_03005308 = index;
+        index = (gRandomIndex + 1) & 1023;
+        gRandomIndex = index;
         index *= 2;
         sample = *(const u16 *)((u32)gUnk_0203B400 + index);
         sample &= 3;
@@ -425,9 +425,9 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     if (MaskFlags(actor, 0x10)) {
         struct RecoveryRoute *route = actor->currentRoute;
         u8 choice;
-        u32 index = (gUnk_03005308 + 1) & 1023;
+        u32 index = (gRandomIndex + 1) & 1023;
         s32 sample;
-        gUnk_03005308 = index;
+        gRandomIndex = index;
         sample = gUnk_0203B400[index];
         choice = Mod(sample >> 3, route->points->count);
         if (choice == route->index)
@@ -435,7 +435,7 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         route->index = choice;
         route->phase = 0;
         {
-            u8 *base = *(u8 **)((u8 *)gUnk_030052F4 + 0x10);
+            u8 *base = *(u8 **)((u8 *)gTerrainMap + 0x10);
             base += route->points->offset;
             route->current = base + route->index * 8;
         }

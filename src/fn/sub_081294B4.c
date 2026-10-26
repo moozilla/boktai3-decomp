@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -32,7 +33,6 @@ struct FeatherPool {
     void *sequences;
     u32 used;
 };
-extern struct FeatherPool *gUnk_02000174;
 void Sprite_Remove(void *);
 void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
@@ -49,14 +49,14 @@ static inline void SelectDirection(u32 angle, u8 *row, u8 *flip)
     }
 }
 
-extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
+extern u32 gEngineFlags, gUnk_030053F0, gUnk_02000560;
 struct FeatherPool *FeatherEffectPool_GetOrCreate(void);
 struct Feather *FeatherEffectPool_AllocEntry(struct FeatherPool *);
 // confidence=low: creates a directional feather effect with palette and scatter variants.
 struct Feather *FeatherEffectPool_CreateDirectional(struct Vec *position, u32 angle, u32 flags,
                                                     u32 variant)
 {
-    struct FeatherPool *pool = gUnk_02000174;
+    struct FeatherPool *pool = gFadingSpritePool;
     struct Feather *p;
     struct Feather *sprite;
     u8 row, flip;
@@ -72,7 +72,7 @@ struct Feather *FeatherEffectPool_CreateDirectional(struct Vec *position, u32 an
     }
     {
         u32 mask = 0x400;
-        if ((gUnk_030053F4 | gUnk_030053F0) & mask)
+        if ((gEngineFlags | gUnk_030053F0) & mask)
             return 0;
     }
     {

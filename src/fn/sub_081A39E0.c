@@ -39,7 +39,7 @@ struct Entry {
 };
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u32 gUnk_0824F760[4];
 s32 sub_08249350(s32, s32);
 void *Player_GetEffectivePosition(s32);
@@ -193,13 +193,13 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
             u32 types[4];
             s32 angle, sample;
             const u16 *table = gUnk_0203B400;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            sample = table[gUnk_03005308];
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            sample = table[gRandomIndex];
             index = Mod((sample >> 3) & 15, 4);
             *(struct Types *)types = *(const struct Types *)gUnk_0824F760;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+            gRandomIndex = (gRandomIndex + 1) & 1023;
             {
-                register s32 loaded asm("r2") = table[gUnk_03005308];
+                register s32 loaded asm("r2") = table[gRandomIndex];
                 asm("" : "+r"(loaded));
                 sample = loaded;
             }

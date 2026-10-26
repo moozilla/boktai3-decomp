@@ -1,34 +1,33 @@
 #include "global.h"
+#include "ram.h"
 void Serial_ResetMultiplayer_082230AC(void);
-extern u32 gUnk_03001730, gUnk_0300172C, gUnk_03001734;
 extern u16 gUnk_0300172A, gUnk_03001728, gUnk_03005330, gUnk_03005380;
-extern s16 gUnk_03005370[], gUnk_03005340[];
 extern u16 gUnk_03005350[][4];
 void SerialLink_ResetMultiplayer(void)
 {
     s32 i, j;
     Serial_ResetMultiplayer_082230AC();
-    gUnk_03001730 = 0;
+    gSerialReceivePending = 0;
     gUnk_0300172A = 0x4000;
     gUnk_03001728 = 0x4000;
-    gUnk_03005370[0] = 65535;
-    gUnk_03005370[1] = -1;
-    gUnk_03005370[2] = -1;
-    gUnk_03005370[3] = -1;
-    gUnk_03005370[4] = -1;
-    gUnk_03005370[5] = -1;
-    gUnk_03005370[6] = -1;
-    gUnk_03005370[7] = -1;
-    gUnk_0300172C = 0;
-    gUnk_03005340[0] = -1;
-    gUnk_03005340[1] = -1;
-    gUnk_03005340[2] = -1;
-    gUnk_03005340[3] = -1;
-    gUnk_03005340[4] = -1;
-    gUnk_03005340[5] = -1;
-    gUnk_03005340[6] = -1;
-    gUnk_03005340[7] = -1;
-    gUnk_03001734 = 0;
+    gSerialReceivePackets[0] = 65535;
+    gSerialReceivePackets[1] = -1;
+    gSerialReceivePackets[2] = -1;
+    gSerialReceivePackets[3] = -1;
+    gSerialReceivePackets[4] = -1;
+    gSerialReceivePackets[5] = -1;
+    gSerialReceivePackets[6] = -1;
+    gSerialReceivePackets[7] = -1;
+    gSerialReceiveIndex = 0;
+    gSerialLatestPackets[0] = -1;
+    gSerialLatestPackets[1] = -1;
+    gSerialLatestPackets[2] = -1;
+    gSerialLatestPackets[3] = -1;
+    gSerialLatestPackets[4] = -1;
+    gSerialLatestPackets[5] = -1;
+    gSerialLatestPackets[6] = -1;
+    gSerialLatestPackets[7] = -1;
+    gSerialLatestPacketIndex = 0;
     gUnk_03005330 = 0;
     gUnk_03005380 = 0;
     for (i = 0; i < 4; i++)

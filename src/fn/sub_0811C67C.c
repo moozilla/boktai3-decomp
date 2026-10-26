@@ -2,7 +2,8 @@
 #define gAreaEffectLinkState  gUnk_020004B4
 #include "global.h"
 #include "area_effect_link.h"
-extern u32 gUnk_030053F4, gUnk_030053F0;
+#include "engine.h"
+extern u32 gUnk_030053F0;
 u32 GameState_HasEquippedConsumable(s32);
 static inline u8 ValidIndex(s32 index)
 {
@@ -20,7 +21,7 @@ s32 ActorResource_SelectElementResource(s32 index)
     u32 kind;
     s32 count, selected;
     u32 mask = 0x800;
-    if ((gUnk_030053F4 | gUnk_030053F0) & mask) {
+    if ((gEngineFlags | gUnk_030053F0) & mask) {
         struct AreaEffectLinkState *link = gUnk_020004B4;
         struct AreaEffectLinkResourceSlot *slot;
         if (!link || link->unavailable != 1 || !ValidIndex(index))

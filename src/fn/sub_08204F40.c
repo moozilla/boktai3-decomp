@@ -3,7 +3,8 @@
 #include "display_animation.h"
 #include "scene_vec.h"
 #include "render.h"
-extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560, gUnk_03005308;
+#include "engine.h"
+extern u32 gUnk_030053F0, gUnk_02000560;
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
@@ -37,8 +38,8 @@ static inline u32 TestFlag(u32 mask, u32 *p)
 }
 static inline u32 RandomFrom(const u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    return table[gRandomIndex];
 }
 static inline void StepAnimation(u8 *p, void *sprite, struct DisplaySequenceState *s)
 {
@@ -134,7 +135,7 @@ static inline void StepAnimation(u8 *p, void *sprite, struct DisplaySequenceStat
 s32 EnemyD459_Update(u8 *p)
 {
     struct ColliderView *collider;
-    if (TestPair(0x400, &gUnk_030053F4, &gUnk_030053F0) || TestFlag(4, &gUnk_02000560))
+    if (TestPair(0x400, &gEngineFlags, &gUnk_030053F0) || TestFlag(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, *(void **)(p + 0x108));
     W(0x24) &= ~1;

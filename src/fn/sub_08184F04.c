@@ -10,7 +10,7 @@ struct ActorAnimationStatus {
 struct ActorControllerAnimation {
     u32 unk0, unk4, flags;
 };
-extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
+extern u32 gUnk_030053F0, gUnk_02000560;
 extern void *gUnk_0824EF10[];
 
 static inline u8 TestFlag(u8 *p, u32 mask)
@@ -23,7 +23,7 @@ void ActorController_UpdateAnimation(u8 *p)
     u8 *finished;
     struct ActorControllerAnimation *anim;
     u32 mask = 0x400;
-    if (!((gUnk_030053F4 | gUnk_030053F0) & mask)) {
+    if (!((gEngineFlags | gUnk_030053F0) & mask)) {
         u32 four = 4;
         if (!(gUnk_02000560 & four))
             Callback_InvokeActor(p, gUnk_0824EF10[p[0xB3F]]);

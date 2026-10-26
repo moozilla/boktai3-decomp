@@ -19,7 +19,7 @@ s32 SceneInventory_ClassifyConsumableAction(struct SceneInventoryControlView *pa
         if (entry < 0)
             goto invalid;
         {
-            s32 funds = gUnk_02000710->unk7B0;
+            s32 funds = gGameState->unk7B0;
             if (funds < SceneItemValue_GetConsumableBaseValue(entry))
                 goto invalid;
         }
@@ -37,7 +37,7 @@ s32 SceneInventory_ClassifyConsumableAction(struct SceneInventoryControlView *pa
         s32 selected = panel->grid.selection;
         register s32 item asm("r5");
         {
-            struct GameState *state = gUnk_02000710;
+            struct GameState *state = gGameState;
             struct GameState *slot = (void *)(selected * 2 + (u32)state);
             item = slot->table160[0];
         }

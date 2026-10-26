@@ -2,7 +2,7 @@
 #include "engine.h"
 void Solar_SaveExposureTimestamp(void);
 u32 Solar_HasExposureCooldownElapsed(void);
-#define GS(type, offset) (*(type *)((u8 *)gUnk_02000710 + (offset)))
+#define GS(type, offset) (*(type *)((u8 *)gGameState + (offset)))
 
 static inline u8 Solar_IsBlocked(void)
 {

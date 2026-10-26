@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 void Effect_Remove(void *);
-extern u32 gUnk_020004A0;
 u32 RisingPuffPool_DestroyTask(u8 *p)
 {
     u8 *e = p + 0x18;
@@ -12,7 +12,7 @@ u32 RisingPuffPool_DestroyTask(u8 *p)
     } while (i >= 0);
     {
         u32 z = 0;
-        gUnk_020004A0 = z;
+        gRisingSpritePool = z;
     }
     return 0;
 }

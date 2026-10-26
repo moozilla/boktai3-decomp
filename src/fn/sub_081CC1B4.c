@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 struct S {
     u8 f0;
@@ -22,7 +23,7 @@ struct Position {
     s16 x, y, z, pad;
 };
 s32 Math_Atan2(s32, s32);
-extern u32 gUnk_030053F4, gUnk_02000560;
+extern u32 gUnk_02000560;
 void *TetherActor_GetPosition(void);
 void Actor_SetAttachmentEffect(void *, u32, u32, u32);
 static inline u32 MaskWord(u32 *p, u32 mask)
@@ -184,7 +185,7 @@ void StateActor_UpdateTargetTurn(void *a, struct S *p)
                 goto attachmentDone;
             }
         restricted:
-            if (!(gUnk_030053F4 & 0x200) && B(p, 0xB)) {
+            if (!(gEngineFlags & 0x200) && B(p, 0xB)) {
                 if (Tethered(a) || Event(4))
                     Actor_SetAttachmentEffect(p, 0, 0, 0);
                 else

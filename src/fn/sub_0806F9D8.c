@@ -2,7 +2,7 @@
 struct SceneActorRecord *SceneActorRecord_FindPair(u32 key, u32 id)
 {
     s32 i = 0;
-    u8 *base = (u8 *)gUnk_02000710;
+    u8 *base = (u8 *)gGameState;
     u32 offset = 0x670;
     struct SceneActorRecord *entry;
     struct SceneActorRecord *result;

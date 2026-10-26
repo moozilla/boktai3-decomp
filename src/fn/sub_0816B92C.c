@@ -1,7 +1,7 @@
 #include "global.h"
-extern u8 *gUnk_02000214;
+#include "ram.h"
 void MapScreen_SuppressSpecialMarkers(void)
 {
-    if (gUnk_02000214)
-        *(u32 *)(gUnk_02000214 + 0x4928) = 1;
+    if (gFieldHud)
+        *(u32 *)(gFieldHud + 0x4928) = 1;
 }
