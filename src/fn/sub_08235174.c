@@ -34,8 +34,6 @@ static inline s32 Scale(s32 value)
     return -(-value >> 12);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 98.6%
 void FlickerParticle_StartSecondaryBurst(struct FlickerParticlePool *s)
 {
     s32 i = 0;
@@ -50,17 +48,25 @@ void FlickerParticle_StartSecondaryBurst(struct FlickerParticlePool *s)
         cursor->particles[0].y = s->y + 8;
         angle = i * 32 + ((NextRandom(table, randomMask) >> 3) & 15) - 8;
         radius = ((NextRandom(table, randomMask) >> 3) & 3) + 4;
-        cursor->particles[0].velocityX = Scale(sine[(angle + 64) & 255] * radius);
+        {
+            s32 cosineAngle = angle + 64;
+            register s32 angleMask asm("r0") = 255;
+            cosineAngle &= angleMask;
+            cursor->particles[0].velocityX = Scale(sine[cosineAngle] * radius);
+        }
         cursor->particles[0].velocityY = Scale(sine[angle & 255] * radius);
         {
             u8 *base = (u8 *)s->particles;
-            struct FlickerParticle *particle = (struct FlickerParticle *)(base + offset);
+            struct FlickerParticle *particle;
+            asm volatile("" : "+r"(base));
+            particle = (struct FlickerParticle *)(base + offset);
             particle->flags &= ~1;
         }
         cursor->particles[0].active = 1;
         cursor->particles[0].age = 0;
         {
             u8 *base = (u8 *)&s->particles[0].callback;
+            asm volatile("" : "+r"(base));
             *(void (**)(struct FlickerParticle *))(base + offset) =
                 FlickerParticle_UpdateSecondaryMotion;
         }
@@ -68,6 +74,3 @@ void FlickerParticle_StartSecondaryBurst(struct FlickerParticlePool *s)
         offset += sizeof(struct FlickerParticle);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", FlickerParticle_StartSecondaryBurst);
-#endif
