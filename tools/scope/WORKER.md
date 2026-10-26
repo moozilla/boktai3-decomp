@@ -59,6 +59,9 @@ not by the percentage. Keep going on one function until it matches.
    `python3 tools/scope/scope.py build/scope/drafts/NAME.c why UID`
    (or `why all` for the first difference of every hunk, 24 at most; `why all 0xLO-0xHI`
    takes a ROM address range, `+0x40-+0x80` offsets, `120-180` C lines).
+   `why all` lists causes first; order differences of insns that occur several times
+   in the function (`movs rN, #0`, stack stores) are only counted, since such a copy
+   can be paired with another one: look at the causes first.
 3. Read the explanation. It names the mechanism and a lever, and usually a
    what-if knob. **Confirm with the knob before changing C**: e.g.
    `python3 tools/scope/scope.py build/scope/drafts/NAME.c AGBCC_PRI=97:+768`.

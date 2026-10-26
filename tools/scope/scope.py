@@ -756,18 +756,72 @@ def one_line(rtl):
 
 # ---------------------------------------------------------------- align
 
-def align(rom, mine):
-    sm = difflib.SequenceMatcher(None, [r[3] for r in rom], [r[3] for r in mine], autojunk=False)
-    pairs = []  # (rom_index|None, mine_index|None, tag)
-    for tag, a, b, c, d in sm.get_opcodes():
-        if tag == "equal":
-            pairs += [(a + k, c + k, "=") for k in range(b - a)]
+def lcs_anchors(a_shape, b_shape, a_full, b_full):
+    """[(i, j)]: the alignment that pairs the most instructions of the same shape (low registers blanked)
+    and, among those, the most identical ones: an exact LCS (numpy, a row at a time), not difflib's greedy
+    longest block, which in a function of repeated blocks (four quadrants, a per-channel loop body
+    written out) anchors on the wrong occurrence and pairs everything after it with unrelated code."""
+    import numpy as np
+    vocab = {}
+    ids = lambda xs: np.array([vocab.setdefault(x, len(vocab)) for x in xs], dtype=np.int32)
+    A, B, Af, Bf = ids(a_shape), ids(b_shape), ids(a_full), ids(b_full)
+    n, m = len(A), len(B)
+    # same-shape pairs first: identical-first (the count is n + m - 2 x identical pairs, so it gives the
+    # lowest count) pairs `adds r1, r5, r1` with a coincidentally identical insn of the next statement
+    # instead of its twin `adds r1, r4, r1` (PaletteFade_StartFromScript): the lower count is not the
+    # correspondence. Over 149 drafts this is still 3% fewer differing insns than difflib's alignment.
+    K, I = m + 1, 1
+    W = ((A[:, None] == B[None, :]) * K + (Af[:, None] == Bf[None, :]) * I).astype(np.int32)
+    L = np.zeros((n + 1, m + 1), dtype=np.int32)
+    for i in range(1, n + 1):
+        prev = L[i - 1]  # a row never falls along j, so a weight of 0 on the diagonal changes nothing
+        np.maximum.accumulate(np.maximum(prev[1:], prev[:-1] + W[i - 1]), out=L[i, 1:])
+    out, i, j = [], n, m
+    while i > 0 and j > 0:
+        v = L[i, j]
+        if W[i - 1, j - 1] and v == L[i - 1, j - 1] + W[i - 1, j - 1]:
+            out.append((i - 1, j - 1))
+            i, j = i - 1, j - 1
+        elif v == L[i - 1, j]:
+            i -= 1
         else:
-            n = max(b - a, d - c)
-            for k in range(n):
-                x = a + k if a + k < b else None
-                y = c + k if c + k < d else None
-                pairs.append((x, y, "~" if x is not None and y is not None else ("-" if y is None else "+")))
+            j -= 1
+    return out[::-1]
+
+
+def align(rom, mine):
+    pairs = []  # (rom_index|None, mine_index|None, tag)
+    shape = lambda rows: [re.sub(r"func\+0x[0-9A-Fa-f]+", "func+X", norm_insn(r[3])) for r in rows]
+    if len(rom) * len(mine) <= 6_000_000 and os.environ.get("SCOPE_ALIGN") != "difflib":
+        anchors = lcs_anchors(shape(rom), shape(mine), [r[3] for r in rom], [r[3] for r in mine])
+        a = c = 0
+        op = lambda r: re.sub(r"#-?(?:0x[0-9a-fA-F]+|\d+)|=\S+", "#N", norm_insn(r[3]))  # operation, operand form
+        for x, y in anchors + [(len(rom), len(mine))]:
+            # the gap before an anchor: what is left on each side. Rows of the same operation and operand
+            # form (`sub sp, #0x1c` / `sub sp, #0x20`) pair as changed insns; the others stay one-sided
+            # (pairing `ldr` with an unrelated `adds` by position hid that the load had moved)
+            gap = difflib.SequenceMatcher(None, [op(r) for r in rom[a:x]], [op(r) for r in mine[c:y]],
+                                          autojunk=False)
+            for tag, i1, i2, j1, j2 in gap.get_opcodes():
+                if tag == "equal":
+                    pairs += [(a + i1 + k, c + j1 + k, "~") for k in range(i2 - i1)]
+                else:
+                    pairs += [(a + k, None, "-") for k in range(i1, i2)]
+                    pairs += [(None, c + k, "+") for k in range(j1, j2)]
+            if x < len(rom):
+                pairs.append((x, y, "=" if rom[x][3] == mine[y][3] else "~"))
+            a, c = x + 1, y + 1
+    else:  # SCOPE_ALIGN=difflib: the old greedy alignment (and the fallback for giant listings)
+        sm = difflib.SequenceMatcher(None, [r[3] for r in rom], [r[3] for r in mine], autojunk=False)
+        for tag, a, b, c, d in sm.get_opcodes():
+            if tag == "equal":
+                pairs += [(a + k, c + k, "=") for k in range(b - a)]
+            else:
+                n = max(b - a, d - c)
+                for k in range(n):
+                    x = a + k if a + k < b else None
+                    y = c + k if c + k < d else None
+                    pairs.append((x, y, "~" if x is not None and y is not None else ("-" if y is None else "+")))
     # branch targets: equal pairs must land on aligned rows
     r_at = {r[0]: i for i, r in enumerate(rom)}
     m_at = {r[0]: i for i, r in enumerate(mine)}
@@ -2648,12 +2702,47 @@ def cmd_why_all(src, func, env, rng=None):
             item['uids'].append(uid)
         if not item['knob'] and knob:
             item['knob'] = knob
+    # Causes first. Then order differences, ranked by how much they can be trusted: an insn whose shape
+    # occurs once in the ROM listing moved for certain; a `movs rN, #0` or a stack store that occurs a
+    # dozen times may be paired with another copy of itself (sub_08176F70: 29 of the first 41
+    # "mechanisms" were such moves), so those are counted, not listed.
+    rows = json.load(open(os.path.join(wd, "diff.json"))) if os.path.exists(os.path.join(wd, "diff.json")) else []
+    freq = {}
+    for r in rows:
+        if r.get("rom"):
+            freq[norm_insn(r["rom"])] = freq.get(norm_insn(r["rom"]), 0) + 1
+    def unique(item):
+        m = re.match(r"order: `([^`;]+)", item["title"])
+        return bool(m) and freq.get(norm_insn(m.group(1)), 0) <= 1
+    merged = {}  # cse substitutions into one register (sub_08176F70: eleven copies replaced by 63) are one cause
+    for key in list(groups):
+        g = groups[key]
+        m = re.match(r"cse(\d): (.*?) -> (.*)", g["title"])
+        if g["mechanism"].startswith("cse") and m and g["knob"]:
+            first = merged.setdefault((g["mechanism"], g["knob"], m.group(3)), g)
+            if first is not g:
+                first.setdefault("_from", [re.match(r"cse\d: (.*?) -> ", first["title"]).group(1)]).append(m.group(2))
+                first["uids"] += [u for u in g["uids"] if u not in first["uids"]]
+                del groups[key]
+    for (mech, _, to), g in merged.items():
+        if g.get("_from"):
+            g["title"] = f"{mech}: {len(g['_from'])} substitutions into {to} (replacing {', '.join(g.pop('_from'))})"
+    causes = [g for g in groups.values() if g["mechanism"] != "order"]
+    orders = [g for g in groups.values() if g["mechanism"] == "order"]
+    sure = [g for g in orders if unique(g)]
+    common = [g for g in orders if not unique(g)]
+    for g in orders:
+        g["unique_insn"] = unique(g)
+    groups = {i: g for i, g in enumerate(causes + sure + common)}
     json.dump(list(groups.values()), open(os.path.join(wd, 'why-all.json'), 'w'), indent=2)
     first = details.splitlines()[0] if details else func
     scope_note = [ln for ln in details.splitlines() if re.match(r"\(\d+ of \d+ hunks in", ln)]
     print(first.split('; per hunk:')[0] + f"; {len(groups)} distinct mechanism(s)"
           + (" " + scope_note[0] if scope_note else ""))
-    for item in list(groups.values())[:12]:
+    shown = causes + sure
+    if len(shown) < 12:
+        shown += common[:12 - len(shown)]
+    for item in shown[:12]:
         us = ', '.join(map(str, item['uids']))
         title = item['title']
         print('  - ' + title[:300] + ('...' if len(title) > 300 else '') + (f" [insns {us}]" if us else ''))
@@ -2662,8 +2751,13 @@ def cmd_why_all(src, func, env, rng=None):
     if not groups:
         # Preserve the actionable no-UID/branch-only diagnosis, rather than inventing a mechanism.
         print('\n'.join(details.splitlines()[1:8]))
-    if len(groups) > 12:
-        print(f"  ... {len(groups) - 12} more in why-all.json")
+    rest = [g for g in groups.values() if g not in shown[:12]]
+    if rest:
+        nc = sum(1 for g in rest if g in common)
+        print(f"  ... {len(rest)} more in why-all.json" + (
+            f" ({nc} of them order differences of insns that occur several times in the function, such as"
+            " `movs rN, #0` or a stack store: the pairing may be with another copy; look at the causes first)"
+            if nc else ""))
     for ln in details.splitlines():
         if "later hunks not analyzed" in ln:
             print("  " + ln)
