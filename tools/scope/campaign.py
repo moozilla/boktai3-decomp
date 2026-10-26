@@ -219,8 +219,8 @@ def cmd_queue(args):
                 if fuzzy < 100 and src:
                     rows.append({"func": name, "addr": addr, "size": size, "fuzzy": fuzzy, "src": src,
                                  "category": c["name"], "unit": u["name"]})
-    # likely wins first: high fuzzy per byte left, small before large
-    rows.sort(key=lambda r: (100 - r["fuzzy"]) * r["size"])
+    # ROM order: sorting likely wins first leaves the hard functions unworked
+    rows.sort(key=lambda r: int(r["addr"], 16))
     os.makedirs(CAMP, exist_ok=True)
     old = json.load(open(QUEUE)) if os.path.exists(QUEUE) else []
     seen = {r["func"] for r in old}
