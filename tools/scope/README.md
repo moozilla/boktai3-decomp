@@ -416,6 +416,23 @@ in the patch.
     `insn_list`, `pseudo_names`, `dump_func`, `born_passes`) are memoised on the dump files'
     stamps. Nidhoggr_ApplyPartDamage (4,000-line unit): 10.5 s -> 1.4 s; sub_08193874: over 120 s
     (the workers' "minutes") -> 3.3 s for 24 hunks.
+  * Repeated blocks: `align` was difflib's greedy longest block on full instruction text, which in a
+    function of repeated blocks anchors on the wrong copy, then paired whatever was left by position
+    (`ldr r4, [r7, #0x24]` beside an unrelated `adds r0, r0, r1`). It is now an exact LCS (numpy,
+    ~2 ms for 400 insns, 10 ms for 1,000) that pairs the most same-shape insns (low registers
+    blanked) and, among those, the most identical ones; leftover insns pair only with the same
+    operation and operand form (`sub sp, #0x1c` / `sub sp, #0x20`) and otherwise stay one-sided.
+    Same-shape first rather than identical first: identical first gives the lowest count but pairs
+    an insn with a coincidentally identical one of the next statement instead of its twin
+    (PaletteFade_StartFromScript). Over 149 drafts the differing insns fell 3% against the old
+    alignment; some functions count a few more (Storage_RefreshConsumableSlots 13+13 -> 15+15).
+    `SCOPE_ALIGN=difflib` gives the old alignment; listings over 6M cells use it. `frame`'s
+    slot votes and the order explainer read these rows.
+  * `why all`'s summary lists causes first, then order differences of insns that occur once in the
+    ROM listing, and counts (does not list) moves of insns that occur several times (`movs rN, #0`,
+    stack stores), which can be paired with another copy; cse substitutions into one register are
+    one line (sub_08176F70: eleven copies replaced by pseudo 63). why-all.json is in that order,
+    with `unique_insn` on order items.
 
 * Done: trace summarizer and pseudo names (`why`). On RepeatedPairAttack it
   reproduces in one call what took ~15 calls of raw trace reading.
@@ -451,9 +468,11 @@ in the patch.
 * `tools/check.py` run under the venv python (scope re-execs into it) skips
   the per-draft fuzzy score; land calls it with the system `python3`.
 
-* `frame` pairs ROM and draft stack slots by voting over aligned rows; where the
-  alignment is off (a hunk of inserted code), a slot can be paired with the wrong
-  draft offset. Pair by the insn uid of each access instead.
+* `frame` pairs ROM and draft stack slots by voting over aligned rows (the LCS alignment
+  above, 2026-10-26); where whole blocks differ a slot can still pair with the wrong
+  draft offset (sub_0821C8F8's quadrant objects). The ROM has no uids, so a better
+  pairing needs the accesses' C objects on the draft side matched to the ROM's
+  access pattern (which offsets each block reads), not row votes.
 * `hoist` explains the draft side only. When the ROM keeps an invariant in the
   loop, the tool cannot tell which "stays" reason the original source used.
   Open case: a table used in one basic block (sub_081A0EA4 and the other
