@@ -184,6 +184,30 @@ def cached(name, key_paths, make):
     return value
 
 
+def by_dumps(*files):
+    """Memoise f(wd, ...) on the stamps (mtime, size) of FILES in WD (a "*" entry: every u.i.PASS), so the
+    explainers can ask for names, uids and insn lists per insn without re-reading the dumps: `why all`
+    on a big unit spent most of its time there."""
+    def deco(f):
+        memo = {}
+        def wrapper(wd, *args):
+            paths = [os.path.join(wd, "u.i." + p) for p in PASSES] if "*" in files else []
+            paths += [os.path.join(wd, n) for n in files if n != "*"]
+            if "{pass}" in "".join(files):
+                paths = [os.path.join(wd, n.format(**{"pass": args[0]})) for n in files]
+            key = (wd, args) + tuple((st.st_mtime_ns, st.st_size) if st else None
+                                     for st in (os.stat(p) if os.path.exists(p) else None for p in paths))
+            if key not in memo:
+                if len(memo) > 256:
+                    memo.clear()
+                memo[key] = f(wd, *args)
+            v = memo[key]
+            return v.copy() if isinstance(v, (dict, list)) else v  # callers may extend what they get
+        wrapper.__doc__ = f.__doc__
+        return wrapper
+    return deco
+
+
 def elf_syms():
     elf = os.path.join(ROOT, "build", "boktai3.elf")
     return cached("elf_symbols", [elf], check.elf_symbols)
@@ -347,11 +371,40 @@ def arm_unit_exit(src, func):
                  " compare arm-none-eabi-objdump -d of its object with tools/asmat.py for the listing")
 
 
+def diagnostic_source(pre, own):
+    """PRE as the dump compile needs it for FUNC: everything after FUNC's body cut (agbcc compiles a
+    function at a time), and the bodies of earlier functions that are not inline replaced by their
+    prototype, so agbcc neither compiles nor dumps them. Insn uids and pseudo numbers restart in each
+    function, so FUNC's dumps are the same (checked with SCOPE_TRIM=0 against the whole unit); the
+    whole unit cost 2.3 s per compile in Nidhoggr_ApplyPartDamage's 4,000 lines. Data, declarations and
+    inline helpers stay. None when FUNC's definition is not found (compile the unit as it is)."""
+    import fast
+    parts = fast.split_source(pre, own)
+    if parts is None:
+        return None
+    prefix, body = parts
+    out, i = [], 0
+    for m in re.finditer(r"^([^\n;#{}()]*\b(\w+)\s*\([^;{}]*\))\s*\{", prefix, re.M):
+        if m.start() < i or re.match(r"\s*(typedef|struct|union|enum)\b", m.group(1)):
+            continue
+        end = fast.body_end(prefix, m.end() - 1)
+        if end > len(prefix):
+            break
+        if "inline" in m.group(1) or m.group(1)[:1].isspace():  # a helper FUNC may inline: kept whole
+            out.append(prefix[i:end])
+        else:
+            out.append(prefix[i:m.start()] + m.group(1) + ";" + "\n" * prefix.count("\n", m.end(1), end))
+        i = end
+    return "".join(out) + prefix[i:] + body + "\n"
+
+
 def compile_draft_g(src, func, env=None):
     arm_unit_exit(src, func)
     env = resolve_knobs(src, func, env)
     wd = workdir(func)
     pre = preprocess(src, env, func)
+    if os.environ.get("SCOPE_TRIM") != "0":
+        pre = diagnostic_source(pre, (func, rom_name(src, func))) or pre
     open(os.path.join(wd, "u.i"), "w").write(pre)
     for p in PASSES:
         try:
@@ -677,6 +730,7 @@ def draft_annotations(wd, func, rows, obj_offset, lines=None, data=()):
     return ann
 
 
+@by_dumps("*")
 def born_passes(wd):
     """uid -> (first pass the insn appears in, its RTL there)."""
     born = {}
@@ -1098,6 +1152,7 @@ def cmd_vs(src_a, src_b, func, env):
 
 # ---------------------------------------------------------------- why
 
+@by_dumps("names.txt")
 def dump_func(wd, func):
     """The function name AGBCC_DUMPPRI used in WD's names.txt: the draft may #define a friendly name to
     the ROM symbol, so FUNC falls back to the only function recorded there."""
@@ -1110,6 +1165,7 @@ def dump_func(wd, func):
     return func if func in seen or len(seen) != 1 else seen[0]
 
 
+@by_dumps("names.txt")
 def pseudo_names(wd, func):
     """pseudo -> C variable name, from AGBCC_DUMPPRI (local-alloc 'L' and global-alloc 'G' lines)."""
     func = dump_func(wd, func)
@@ -1126,6 +1182,7 @@ def pseudo_names(wd, func):
     return out
 
 
+@by_dumps("*")
 def uid_lines(wd):
     """insn uid -> C line, from the line notes in the RTL dumps."""
     out = {}
@@ -1214,6 +1271,7 @@ def parse_trace(text, func):
     return passes
 
 
+@by_dumps("u.i.{pass}")
 def insn_list(wd, p):
     """[(uid, kind, rtl)] for every insn in pass P's dump, in order."""
     path = os.path.join(wd, "u.i." + p)
@@ -2569,13 +2627,13 @@ def why_all_issues(text):
     return issues
 
 
-def cmd_why_all(src, func, env):
+def cmd_why_all(src, func, env, rng=None):
     """One summary per mechanism/pseudo pair; complete per-hunk reasoning is an artifact."""
     import contextlib
     import io
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
-        result = why_all_details(src, func, env)
+        result = why_all_details(src, func, env, rng)
     details = buf.getvalue()
     wd = workdir(func)
     path = os.path.join(wd, 'why-all.txt')
@@ -2592,7 +2650,9 @@ def cmd_why_all(src, func, env):
             item['knob'] = knob
     json.dump(list(groups.values()), open(os.path.join(wd, 'why-all.json'), 'w'), indent=2)
     first = details.splitlines()[0] if details else func
-    print(first.split('; per hunk:')[0] + f"; {len(groups)} distinct mechanism(s)")
+    scope_note = [ln for ln in details.splitlines() if re.match(r"\(\d+ of \d+ hunks in", ln)]
+    print(first.split('; per hunk:')[0] + f"; {len(groups)} distinct mechanism(s)"
+          + (" " + scope_note[0] if scope_note else ""))
     for item in list(groups.values())[:12]:
         us = ', '.join(map(str, item['uids']))
         title = item['title']
@@ -2604,12 +2664,38 @@ def cmd_why_all(src, func, env):
         print('\n'.join(details.splitlines()[1:8]))
     if len(groups) > 12:
         print(f"  ... {len(groups) - 12} more in why-all.json")
+    for ln in details.splitlines():
+        if "later hunks not analyzed" in ln:
+            print("  " + ln)
     print(f"  full reasoning: {os.path.relpath(path, ROOT)} (structured summary: why-all.json)")
     return result
 
 
-def why_all_details(src, func, env):
-    """why for the first differing insn (with a uid) of each hunk, up to 8."""
+def parse_why_range(tok, addr):
+    """`why all RANGE`: (kind, lo, hi) for ROM addresses (`0x0819396C-0x08193A00`, or offsets from the
+    function's start `+0x40-+0x80`) or C lines (`120-180`); either end may be left open (`0x08193A00-`)."""
+    m = re.fullmatch(r"([^-]*)-([^-]*)", tok)
+    if not m:
+        return None
+    ends = m.groups()
+    if all(re.fullmatch(r"\d*", e) for e in ends):
+        return ("line", int(ends[0] or 0), int(ends[1]) if ends[1] else 1 << 30)
+    def a(e, dflt):
+        if not e:
+            return dflt
+        if e.startswith("+"):
+            return addr + int(e[1:], 16)
+        v = int(e, 16)
+        return v if v >= 0x08000000 else v | 0x08000000
+    try:
+        return ("addr", a(ends[0], 0), a(ends[1], 1 << 32))
+    except ValueError:
+        return None
+
+
+def why_all_details(src, func, env, rng=None):
+    """why for the first differing insn (with a uid) of each hunk: every hunk in RNG (parse_why_range),
+    else the first SCOPE_WHY_MAX (default 24)."""
     n, info = score(src, func, env, full=True)
     if n == 0:
         print(f"{func}: MATCH")
@@ -2648,7 +2734,29 @@ def why_all_details(src, func, env):
     srclines = open(os.path.join(ROOT, src)).read().splitlines()
     at = lambda u: f"insn {u} (line {lines[u]})" if lines.get(u) else f"insn {u}"
     spans = hunk_spans(rows)
-    for lo, hi in spans[:8]:
+    if rng:
+        kind, a, b = rng
+        def where(i):  # the hunk row's ROM address (a draft-only row: the ROM row before it) and C line
+            j = next((k for k in range(i, -1, -1) if rows[k]["rom_addr"]), None)
+            ln = rows[i]["line"]
+            return (int(rows[j]["rom_addr"], 16) if j is not None else 0,
+                    int(ln) if ln and str(ln).isdigit() else None)
+        def inside(lo, hi):
+            for i in range(lo, hi + 1):
+                if rows[i]["tag"] == "=":
+                    continue
+                ad, ln = where(i)
+                if (a <= ad <= b) if kind == "addr" else (ln is not None and a <= ln <= b):
+                    return True
+            return False
+        chosen = [s for s in spans if inside(*s)]
+        print(f"({len(chosen)} of {len(spans)} hunks in {'ROM' if kind == 'addr' else 'C lines'}"
+              f" {'0x%08X-0x%08X' % (a, b) if kind == 'addr' else f'{a}-{b}'})")
+        cap = len(chosen)
+    else:
+        chosen = spans
+        cap = int(env.get("SCOPE_WHY_MAX") or os.environ.get("SCOPE_WHY_MAX", "24"))
+    for lo, hi in chosen[:cap]:
         diff = [i for i in range(lo, hi + 1) if rows[i]["tag"] != "="]
         print(f"hunk at ROM {next((rows[i]['rom_addr'] for i in diff if rows[i]['rom_addr']), '?')}:")
         moved = explain_order(wd, rows, lo, hi, at, srclines)
@@ -2670,8 +2778,12 @@ def why_all_details(src, func, env):
         elif not moved:
             print("  (no insn with an RTL uid here)")
         print()
-    if len(spans) > 8:
-        print(f"{len(spans) - 8} later hunks not analyzed (8-hunk limit); see diff.txt and ask why UID")
+    if len(chosen) > cap:
+        nxt = next((rows[i]["rom_addr"] for i in range(chosen[cap][0], chosen[cap][1] + 1)
+                    if rows[i]["tag"] != "=" and rows[i]["rom_addr"]), None)
+        print(f"{len(chosen) - cap} later hunks not analyzed (SCOPE_WHY_MAX={cap}); the rest:"
+              f" `why all 0x{nxt}-`, or any range `why all 0xLO-0xHI` (ROM), `+0x40-+0x80` (offsets),"
+              " `120-180` (C lines)")
     return 1
 
 
@@ -4604,10 +4716,14 @@ def validate_cli(args):
             cli_error("FILE.c [FUNC] try VARIANT.c...|KNOB=V... [FUNC]")
     elif "why" in rest:
         i = rest.index("why")
-        if len(rest) not in (2, 3) or i + 1 >= len(rest):
-            cli_error("FILE.c why UID|all [FUNC]")
+        syntax = "FILE.c why UID|all [RANGE] [FUNC]   (RANGE: 0xLO-0xHI ROM, +0xA-+0xB offsets, A-B C lines)"
+        if i + 1 >= len(rest):
+            cli_error(syntax)
+        has_rng = rest[i + 1] == "all" and i + 2 < len(rest) and re.fullmatch(r"[^-]*-[^-]*", rest[i + 2])
+        if len(rest) not in ((3, 4) if has_rng else (2, 3)):
+            cli_error(syntax)
         if rest[i + 1] != "all":
-            cli_number(rest[i + 1], "FILE.c why UID|all [FUNC]")
+            cli_number(rest[i + 1], syntax)
     elif rest and rest[0] == "insn":
         if len(rest) not in (2, 3):
             cli_error("FILE.c insn UID [FUNC]")
@@ -4794,6 +4910,9 @@ def main():
     if "why" in rest:
         i = rest.index("why")
         why_uid = -1 if rest[i + 1] == "all" else int(rest[i + 1])
+        why_rng = None
+        if why_uid == -1 and i + 2 < len(rest) and re.fullmatch(r"[^-]*-[^-]*", rest[i + 2]):
+            why_rng = rest.pop(i + 2)
         rest = rest[:i] + rest[i + 2:]
     func = source_function(src, rest[0] if rest else None)
     if not func:
@@ -4801,7 +4920,13 @@ def main():
     os.makedirs(WORK, exist_ok=True)
     open(os.path.join(WORK, "LAST"), "w").write(func)
     if why_uid == -1:
-        return cmd_why_all(src, func, env)
+        rng = None
+        if why_rng:
+            _, addr_all, _ = inventory()
+            rng = parse_why_range(why_rng, addr_all[rom_name(src, func)])
+            if rng is None:
+                sys.exit(f"why all {why_rng}: not a range (0xLO-0xHI ROM, +0xA-+0xB offsets, A-B C lines)")
+        return cmd_why_all(src, func, env, rng)
     if why_uid is not None:
         return cmd_why(src, func, why_uid, env)
     t0 = time.time()
