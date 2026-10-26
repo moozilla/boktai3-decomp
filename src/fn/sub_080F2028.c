@@ -23,8 +23,6 @@ struct Sub080F2028Actor {
 extern const s32 gUnk_0860641C[];
 s32 Mod(s32, s32);
 void Collider_SetPosition(void *, void *, u32);
-#ifdef NONMATCHING
-// fuzzy: 98.5%
 // scope shape 2 (differences once low registers are set aside)
 // confidence=low: places the primary collider at the actor position offset by a table value.
 void sub_080F2028(struct Sub080F2028Actor *actor)
@@ -33,15 +31,14 @@ void sub_080F2028(struct Sub080F2028Actor *actor)
     u16 *xp;
     const s32 *radius;
     s32 slot;
+    const s32 *table;
 
     slot = Mod(actor->frame, 3);
     xp = &actor->x;
-    radius = gUnk_0860641C + slot;
+    table = gUnk_0860641C;
+    radius = table + slot;
     position.x = *xp + *radius;
     position.y = actor->scene->height + 220;
     position.z = actor->z + *radius;
     Collider_SetPosition(actor->primary, &position, 0);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080F2028);
-#endif
