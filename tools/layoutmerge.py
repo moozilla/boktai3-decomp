@@ -27,12 +27,19 @@ Also harvested from the C: casts to a struct (`(struct X *)gUnk_02000710`),
 typed accesses through byte pointers (`*(u16 *)(gUnk_02000710 + 0x30)`) and
 constant indexes (`gUnk_030042A0[3]` of an `s16[]`).
 
-ROM evidence (build/boktai3.elf, `arm-none-eabi-objdump -d`): a linear scan of
-each function tracks registers loaded from literal pools. An access `[rX, #k]`
-through a RAM literal L is recorded at L+k; a word loaded from a global and
-then dereferenced gives accesses to that pointer's pointee. In agbcc's Thumb
-code one literal plus several offsets is a struct, and one literal per field
-is separate globals; the report counts both.
+ROM evidence (build/boktai3.elf, `arm-none-eabi-objdump -d`, Thumb and ARM): a
+linear scan of each function tracks registers loaded from literal pools. An
+access `[rX, #k]` through a RAM literal L is a typed access at L+k; ldm/stm,
+BIOS/libc copies and fills with a constant length, and DMA register writes are
+bulk traffic; an address passed to a call or stored is an escape. A word loaded
+from a global and then dereferenced gives accesses to that pointer's pointee.
+In agbcc's Thumb code one literal plus several offsets is a struct, and one
+literal per field is separate globals; the report lists both.
+
+Objects are keyed by address. A symbol inside another object's extent (a
+palette label inside a 512-byte buffer, &records[3] under its own name) folds
+into it. Every byte gets one observation class: typed and named, typed but
+unnamed, bulk only, escape only, or unobserved (never "unused").
 
 Output: build/layouts/<global>.md per global, build/layouts/SUMMARY.md (ranked
 by opaque bytes that another file names) and build/layouts/layouts.json.
@@ -544,7 +551,7 @@ def _scan_tu(path, text, names):
             spell = spell or f"__typeof__({obj})"
             d["struct"] = skey
             if count == "array":  # struct X g[N]: N copies, when the declaration says N
-                d["count"] = len(probes)
+                d["array"], d["count"] = True, len(probes)
                 probes.append(f"sizeof({g}) / sizeof({g}[0])")
             if skey not in structs and s.decls is not None:
                 leaves, containers = [], []
@@ -574,8 +581,8 @@ def _scan_tu(path, text, names):
         vals, bfbytes = [], []
     for d in out_decls:
         for k in ("count", "sizeof"):
-            if k in d:
-                d[k] = vals[d[k]]
+            if k in d:  # sizeof of an incomplete array: 0 or refused
+                d[k] = vals[d[k]] or None
     for st in structs.values():
         st["size"] = vals[st["size"]]
         for c in st["containers"]:
@@ -683,18 +690,45 @@ def char_signed():
 
 INSN = re.compile(r"^\s*([0-9a-f]+):\s+(?:[0-9a-f]{4}\s?){1,2}\s+(\S+)\s*(.*)$")
 FUNC = re.compile(r"^([0-9a-f]{8}) <([^>]+)>:")
+POOL = re.compile(r"@ \(?([0-9a-f]+)")
 REG = {f"r{i}": i for i in range(13)}
 REG.update(sb=9, sl=10, fp=11, ip=12)
 WIDTH = {"ldr": (4, None), "str": (4, None), "ldrh": (2, False), "strh": (2, None), "ldrb": (1, False),
          "strb": (1, None), "ldrsh": (2, True), "ldrsb": (1, True)}
+COND = re.compile(r"^(\w+?)(eq|ne|cs|cc|hs|lo|mi|pl|vs|vc|hi|ls|ge|lt|gt|le)$")
+DMA = range(0x040000B0, 0x040000E0)  # DMA0-3 SAD/DAD/CNT
+
+
+class Acc(collections.namedtuple("Acc", "lit k width signed load func ptr form note pc")):
+    """One ROM observation at literal `lit` + k (ptr: through the word stored at lit).
+    form: "typed" (ldr*/str*), "bulk" (ldm/stm, BIOS/libc copy, DMA), "escape" (address
+    passed to a call or stored)."""
+
+
+def bulk_call(callee, st):
+    """(dest/src reg, byte length) ranges a call is known to copy or fill."""
+    def c(r):
+        v = st.get(r)
+        return v[1] if v and v[0] == "const" else None
+    if callee in ("CpuSet", "CpuFastSet") and c(2) is not None:
+        ctrl = c(2)
+        n = ctrl & 0x1FFFFF
+        n = n * 4 if callee == "CpuFastSet" or ctrl >> 26 & 1 else n * 2
+        return [(0, 4 if ctrl >> 24 & 1 else n), (1, n)]  # a fill reads one unit
+    if callee in ("memcpy", "Memory_Copy") and c(2) is not None:
+        return [(0, c(2)), (1, c(2))]
+    if callee == "memset" and c(2) is not None:
+        return [(0, c(2))]
+    if callee == "Memory_Clear" and c(1) is not None:
+        return [(0, c(1))]
+    return None
 
 
 def rom_accesses(elf_path):
-    """[(literal, offset, width, signed, load?, func, pointer?)] from the Thumb code."""
+    """Acc records from every function in the code (Thumb and ARM)."""
     data = open(elf_path, "rb").read()
-    # ELF32: find .text by section header
     shoff, = pystruct.unpack_from("<I", data, 0x20)
-    shnum, shstrndx = pystruct.unpack_from("<HH", data, 0x30)
+    shnum, = pystruct.unpack_from("<H", data, 0x30)
     sects = [pystruct.unpack_from("<IIIIIIIIII", data, shoff + 40 * i) for i in range(shnum)]
     text = next(s for s in sects if s[3] == 0x08000000)
     base, off, size = text[3], text[4], text[5]
@@ -711,137 +745,216 @@ def rom_accesses(elf_path):
     for s in dis.split("\n"):
         m = FUNC.match(s)
         if m:
-            if not m.group(2).startswith("_0"):
+            if not m.group(2).startswith("_0"):  # _0800xxxx are local labels, not functions
                 if func:
-                    _scan_func(func, body, word, out)
-                func, body = m.group(2), []
+                    Scan(func, body, word, out).run()
+                func, body = m.group(2).removesuffix("__addr"), []
             body.append(("label", int(m.group(1), 16)))
             continue
         m = INSN.match(s)
         if m:
             body.append((int(m.group(1), 16), m.group(2), m.group(3)))
     if func:
-        _scan_func(func, body, word, out)
+        Scan(func, body, word, out).run()
     return out
 
 
-def _scan_func(func, body, word, out):
-    pools = set()
-    for it in body:
-        if it[0] != "label" and it[1] == "ldr" and "[pc" in it[2]:
-            m = re.search(r"@ \(([0-9a-f]+)", it[2])
-            if m:
-                a = int(m.group(1), 16)
-                pools.update(range(a, a + 4))
-    st = {}  # reg -> ("addr", A) | ("ptr", A, off) | ("const", v)
-    flow = True
-    for it in body:
-        if it[0] == "label":
-            if not flow:
-                st = {}
-            continue
-        a, op, args = it
-        if a in pools:
-            st, flow = {}, False
-            continue
+class Scan:
+    """Linear register tracking through one function. A register holds
+    ("addr", A): a RAM address; ("ptr", A, k): the word loaded from A, plus k;
+    ("const", v); or nothing known. State ends at unconditional branches; at a
+    branch target the fall-through state is kept (a heuristic)."""
+
+    def __init__(self, func, body, word, out):
+        self.func, self.body, self.word, self.out = func, body, word, out
+        self.st, self.based = {}, set()  # based: registers used as a memory base since they were set
+        self.dma = {}
+
+    def set(self, r, v):
+        if r is not None:
+            self.st[r] = v
+            self.based.discard(r)
+
+    def rec(self, b, k, w, sg, load, form, note=None):
+        if b and b[0] == "addr":
+            self.out.append(Acc(b[1], k, w, sg, load, self.func, False, form, note, self.pc))
+        elif b and b[0] == "ptr":
+            self.out.append(Acc(b[1], b[2] + k, w, sg, load, self.func, True, form, note, self.pc))
+
+    def run(self):
+        pools = set()
+        for it in self.body:
+            if it[0] != "label" and it[1].startswith("ldr") and "[pc" in it[2]:
+                m = POOL.search(it[2])
+                if m:
+                    pools.update(range(int(m.group(1), 16), int(m.group(1), 16) + 4))
         flow = True
-        args = args.split("@")[0].strip()
-        ops = [x.strip() for x in re.split(r",(?![^\[{]*[\]}])", args)] if args else []
-        dest = REG.get(ops[0]) if ops else None
-        try:
-            if op == "ldr" and "[pc" in args:
-                m = re.search(r"@ \(([0-9a-f]+)", it[2])
-                v = word(int(m.group(1), 16)) if m else None
-                st[dest] = ("addr", v) if v is not None and is_ram(v) else ("const", v) if v is not None else None
+        for it in self.body:
+            if it[0] == "label":
+                if not flow:
+                    self.st, self.based = {}, set()
                 continue
-            if op in WIDTH and len(ops) == 2 and ops[1].startswith("["):
-                inner = [x.strip() for x in ops[1].strip("[]").split(",")]
-                b = st.get(REG.get(inner[0]))
-                k = 0
-                if len(inner) > 1:
-                    if inner[1].startswith("#"):
-                        k = int(inner[1][1:], 0)
-                    else:
-                        o = st.get(REG.get(inner[1]))
-                        if o and o[0] == "const" and b and b[0] != "const":
-                            pass
-                        elif o and o[0] != "const" and b and b[0] == "const":
-                            b, o = o, b
-                        else:
-                            b = None
-                        if b:
-                            k = o[1]
-                w, sg = WIDTH[op]
-                load = op.startswith("ldr")
-                if b and b[0] == "addr":
-                    out.append((b[1], k, w, sg, load, func, False))
-                elif b and b[0] == "ptr":
-                    out.append((b[1], b[2] + k, w, sg, load, func, True))
-                if load:
-                    st[dest] = ("ptr", b[1] + k, 0) if b and b[0] == "addr" and w == 4 else None
+            self.pc, op, args = it
+            if self.pc in pools:
+                self.st, flow = {}, False
                 continue
-            if op in ("ldmia", "stmia"):
-                rn = REG.get(ops[0].rstrip("!"))
-                b = st.get(rn)
-                regs = re.findall(r"r\d+", args.split("{", 1)[1])
-                if b and b[0] in ("addr", "ptr"):
-                    for i in range(len(regs)):
-                        if b[0] == "addr":
-                            out.append((b[1], 4 * i, 4, None, op == "ldmia", func, False))
-                        else:
-                            out.append((b[1], b[2] + 4 * i, 4, None, op == "ldmia", func, True))
-                if op == "ldmia":
-                    for r in regs:
-                        st[REG[r]] = None
-                if ops[0].endswith("!"):
-                    st[rn] = shift(b, 4 * len(regs))
-                continue
-            if op in ("movs", "mov") and len(ops) == 2:
-                if ops[1].startswith("#"):
-                    st[dest] = ("const", int(ops[1][1:], 0))
+            flow = True
+            try:
+                flow = self.step(op, args)
+            except (ValueError, TypeError, KeyError, IndexError, AttributeError):
+                ops = args.split(",")
+                self.set(REG.get(ops[0].strip()), None)
+
+    def step(self, op, args):
+        st = self.st
+        cond = False
+        m = COND.match(op)
+        if m and m.group(1) in ("ldr", "str", "ldrh", "strh", "ldrb", "strb", "ldrsh", "ldrsb", "mov", "add",
+                                "sub", "b", "bx", "bl", "pop", "ldm", "stm", "lsl", "cmp"):
+            op, cond = m.group(1), True  # ARM conditional execution
+        text = args.split("@")[0].strip()
+        ops = [x.strip() for x in re.split(r",(?![^\[{]*[\]}])", text)] if text else []
+        dest = REG.get(ops[0].rstrip("!")) if ops else None
+        if op == "ldr" and "[pc" in text:
+            m = POOL.search(args)
+            v = self.word(int(m.group(1), 16)) if m else None
+            self.set(dest, None if cond or v is None else ("addr", v) if is_ram(v) else ("const", v))
+            return True
+        if op in WIDTH and len(ops) >= 2 and ops[1].startswith("["):
+            return self.mem(op, ops, dest, cond)
+        if op in ("ldmia", "stmia", "ldm", "stm", "ldmfd", "stmfd", "ldmea", "stmea"):
+            rn = REG.get(ops[0].rstrip("!"))
+            b = st.get(rn)
+            self.based.add(rn)
+            regs = [REG[r] for r in re.findall(r"\b(r\d+|ip|lr|fp|sl|sb)\b", text.split("{", 1)[1]) if r in REG]
+            for i in range(len(regs)):
+                self.rec(b, 4 * i, 4, None, op.startswith("ldm"), "bulk")
+            if op.startswith("ldm"):
+                for r in regs:
+                    self.set(r, None)
+            elif b and b[0] == "addr":
+                for i, r in enumerate(regs):  # storing an address is an escape
+                    v = st.get(r)
+                    if v and v[0] == "addr" and r not in self.based:
+                        self.rec(v, 0, 0, None, False, "escape", "stored")
+            if ops[0].endswith("!"):
+                self.set(rn, shift(b, 4 * len(regs)))
+            return True
+        if op in ("movs", "mov", "mvns", "mvn") and len(ops) == 2:
+            if cond:
+                self.set(dest, None)
+            elif ops[1].startswith("#"):
+                v = int(ops[1][1:], 0)
+                self.set(dest, ("const", v if op.startswith("mov") else ~v & 0xFFFFFFFF))
+            elif op.startswith("mov"):
+                src = REG.get(ops[1])
+                self.set(dest, st.get(src))
+                if src in self.based:
+                    self.based.add(dest)
+            else:
+                self.set(dest, None)
+            return True
+        if op in ("adds", "add", "subs", "sub") and dest is not None and dest < 13:
+            sign = -1 if op.startswith("sub") else 1
+            if len(ops) == 2:  # adds rd, #imm / add rd, rm
+                src, other = st.get(dest), ops[1]
+            else:
+                src, other = st.get(REG.get(ops[1])), ops[2]
+            if cond or len(ops) > 3:  # ARM shifted operand
+                v = None
+            elif other.startswith("#"):
+                v = shift(src, sign * int(other[1:], 0))
+            else:
+                o = st.get(REG.get(other))
+                if src and o and sign == 1 and (src[0] == "const") != (o[0] == "const"):
+                    p, c = (o, src) if src[0] == "const" else (src, o)
+                    v = shift(p, c[1])
+                elif src and o and src[0] == o[0] == "const":
+                    v = ("const", (src[1] + sign * o[1]) & 0xFFFFFFFF)
                 else:
-                    st[dest] = st.get(REG.get(ops[1]))
-                continue
-            if op in ("adds", "add", "subs", "sub") and dest is not None and dest < 13:
-                sign = -1 if op.startswith("sub") else 1
-                if len(ops) == 2:  # adds rd, #imm / add rd, rm
-                    src, other = st.get(dest), ops[1]
+                    v = None
+            self.set(dest, v)
+            return True
+        if op in ("lsls", "lsl") and len(ops) == 3 and ops[2].startswith("#"):
+            s0 = st.get(REG.get(ops[1]))
+            self.set(dest, ("const", (s0[1] << int(ops[2][1:], 0)) & 0xFFFFFFFF)
+                     if s0 and s0[0] == "const" and not cond else None)
+            return True
+        if op in ("bl", "blx"):
+            m = re.search(r"<([^>+]+)>", args)
+            callee = m.group(1).removesuffix("__addr") if m else "?"
+            ranges = dict(bulk_call(callee, st) or [])
+            for r in (0, 1, 2, 3):
+                v = st.get(r)
+                if v and v[0] in ("addr", "ptr"):
+                    if r in ranges and ranges[r]:
+                        n = ranges[r]
+                        for k in range(0, min(n, 0x10000), 4):  # one record per word keeps counts readable
+                            self.rec(v, k, min(4, n - k), None, r != 0 or callee == "?", "bulk", callee)
+                    elif r not in self.based:
+                        self.rec(v, 0, 0, None, False, "escape", callee)
+            for r in (0, 1, 2, 3, 12, 14):
+                self.set(r, None)
+            return True
+        if op in ("b", "b.n", "bx") or (op == "pop" and "pc" in text) or op == "ldmfd" and "pc" in text:
+            if not cond:
+                self.st, self.based = {}, set()
+                return False
+            return True
+        if op == "pop":
+            for r in re.findall(r"r\d+", text):
+                self.set(REG[r], None)
+            return True
+        if op.startswith(("b", "cmp", "cmn", "tst", "teq", "push", "svc", "swi", "str")):
+            return True
+        self.set(dest, None)
+        return True
+
+    def mem(self, op, ops, dest, cond):
+        """ldr*/str* rd, [rn, #k | rm] (Thumb), plus ARM pre/post-index forms."""
+        st = self.st
+        inner = [x.strip() for x in ops[1].rstrip("!").strip("[]").split(",")]
+        rn = REG.get(inner[0])
+        b, k = st.get(rn), 0
+        self.based.add(rn)
+        if len(inner) > 1:
+            if inner[1].startswith("#"):
+                k = int(inner[1][1:], 0)
+            else:
+                o = st.get(REG.get(inner[1]))
+                if o and o[0] == "const" and b and b[0] != "const":
+                    k = o[1]
+                elif o and o[0] != "const" and b and b[0] == "const":
+                    b, k = o, b[1]
+                    self.based.add(REG.get(inner[1]))
                 else:
-                    src, other = st.get(REG.get(ops[1])), ops[2]
-                if other.startswith("#"):
-                    st[dest] = shift(src, sign * int(other[1:], 0))
-                else:
-                    o = st.get(REG.get(other))
-                    if src and o and sign == 1 and (src[0] == "const") != (o[0] == "const"):
-                        p, c = (o, src) if src[0] == "const" else (src, o)
-                        st[dest] = shift(p, c[1])
-                    elif src and o and src[0] == o[0] == "const":
-                        st[dest] = ("const", src[1] + sign * o[1])
-                    else:
-                        st[dest] = None
-                continue
-            if op == "lsls" and len(ops) == 3 and ops[2].startswith("#"):
-                s0 = st.get(REG.get(ops[1]))
-                st[dest] = ("const", (s0[1] << int(ops[2][1:], 0)) & 0xFFFFFFFF) if s0 and s0[0] == "const" else None
-                continue
-            if op in ("bl", "blx"):
-                for r in (0, 1, 2, 3, 12):
-                    st[r] = None
-                continue
-            if op in ("b", "b.n", "bx") or (op == "pop" and "pc" in args):
-                st, flow = {}, False
-                continue
-            if op == "pop":
-                for r in re.findall(r"r\d+", args):
-                    st[REG[r]] = None
-                continue
-            if op.startswith(("b", "cmp", "cmn", "tst", "str", "push", "svc", "swi")):
-                continue
-            if dest is not None:
-                st[dest] = None
-        except (ValueError, TypeError, KeyError, IndexError):
-            if dest is not None:
-                st[dest] = None
+                    b = None
+        w, sg = WIDTH[op]
+        load = op.startswith("ldr")
+        self.rec(b, k, w, sg, load, "typed")
+        if not load:
+            v = st.get(dest)
+            to_dma = b and b[0] == "const" and b[1] + k in DMA
+            if v and v[0] == "addr" and dest not in self.based and not to_dma:  # an address stored to memory
+                self.rec(v, 0, 0, None, False, "escape", "stored")
+            reg = b[1] + k if b and b[0] == "const" else None
+            if reg in DMA:  # DMAn SAD +0, DAD +4, CNT +8; the CNT write starts the transfer
+                ch, slot = divmod(reg - DMA.start, 12)
+                if slot < 8 and v and v[0] in ("addr", "ptr"):
+                    self.dma.setdefault(ch, {})[slot] = v
+                c = st.get(dest)
+                if slot == 8 and c and c[0] == "const":
+                    n = (c[1] & 0xFFFF or 0x10000) * (4 if c[1] >> 26 & 1 else 2)
+                    for slot, v in self.dma.pop(ch, {}).items():
+                        fixed = (c[1] >> (23 if slot == 0 else 21) & 3) == 2
+                        for kk in range(0, min(n if not fixed else 4, 0x10000), 4):
+                            self.rec(v, kk, 4, None, slot == 0, "bulk", "DMA")
+        if ops[1].endswith("!") or len(ops) == 3:  # ARM writeback
+            post = int(ops[2][1:], 0) if len(ops) == 3 and ops[2].startswith("#") else None
+            self.set(rn, shift(b, k) if ops[1].endswith("!") else shift(b, post) if post is not None else None)
+        if load:
+            self.set(dest, None if cond else ("ptr", b[1] + k, 0) if b and b[0] == "addr" and w == 4 else None)
+        return True
 
 
 def shift(v, k):
@@ -910,11 +1023,12 @@ def _init(cs):
 PLACEHOLDER = re.compile(r"^[A-Za-z]_?(?:0x)?(?=[0-9A-Fa-f]*[0-9])[0-9A-Fa-f]{2,4}$")  # f54, a720, b_1C
 
 
-def opaque(name, lf=None):
+def opaque(name, lf=None, letters=False):
     """A member nobody has named: unk/pad/field..., a letter plus an offset
-    (f54), or a byte array named by one letter (u8 f[0x868])."""
+    (f54), a byte array named by one letter (u8 f[0x868]), or any one-letter
+    name in a struct that names its members a, b, c, ... (letters=True)."""
     own = re.split(r"[\[]", name.rsplit(".", 1)[-1])[0]
-    if OPAQUE.match(own) or PLACEHOLDER.match(own):
+    if OPAQUE.match(own) or PLACEHOLDER.match(own) or (letters and len(own) == 1):
         return True
     return bool(lf and lf["array"] and lf.get("width") == 1 and len(own) == 1)
 
@@ -950,7 +1064,7 @@ def nth_index(name, k, i):
 def merge(results, alias):
     """Per (global, space): decls, struct fields placed at offsets, C accesses.
     alias maps every name to the canonical name at its address."""
-    G = collections.defaultdict(lambda: {"decls": [], "fields": [], "access": [], "sizes": {}})
+    G = collections.defaultdict(lambda: {"decls": [], "fields": [], "access": [], "sizes": {}, "rom": []})
     structs, errors, seen = {}, {}, set()
     for f, r in sorted(results.items()):
         if "error" in r:
@@ -970,27 +1084,31 @@ def merge(results, alias):
                 seen.add(k)
                 G[(a["global"], a["space"])]["access"].append(a)
     placed = {key: placements(st) for key, st in structs.items()}
+    letters = {key: {"a", "b", "c"} <= {lf["name"] for lf in st["leaves"]} for key, st in structs.items()}
     for (g, space), e in G.items():
-        users = collections.defaultdict(set)  # (struct key, element count) -> files using it here
+        users = collections.defaultdict(set)  # (struct key, count, unsized) -> files using it here
         for d in e["decls"]:
             if d.get("struct") in structs:
-                users[(d["struct"], d.get("count") or 1)].add(d["file"])
-        for (skey, count), files in users.items():
+                unsized = bool(d.get("array")) and not d.get("count")
+                users[(d["struct"], d.get("count") or 1, unsized)].add(d["file"])
+        for (skey, count, unsized), files in users.items():
             st = structs[skey]
             stride = st["size"] or 0
             if not stride or count * stride > 0x10000:
                 count = 1
             for i in range(count):
                 for off, size, lf, name in placed[skey]:
+                    nm = f"[{i}].{name}" if count > 1 or unsized else name
                     e["fields"].append({
-                        "off": i * stride + off, "size": size, "name": f"[{i}].{name}" if count > 1 else name,
+                        "off": i * stride + off, "size": size, "name": nm,
                         "ctype": lf["ctype"], "signed": lf["signed"], "base": lf["base"], "array": lf["array"],
                         "width": lf.get("esize") if lf["array"] else
                         size if lf.get("bits") is not None else lf.get("width") or size,
                         "bits": lf.get("bits"), "bitpos": lf.get("bitpos"), "struct": skey, "spell": st["spell"],
-                        "files": sorted(files), "opaque": opaque(name, lf)})
+                        "files": sorted(files), "opaque": opaque(name, lf, letters[skey]),
+                        "repeat": stride if unsized and stride else None})
             e["sizes"][skey] = (st["size"] or 0) * count if count > 1 else st["size"]
-        if space == "direct":  # a scalar or an array of scalars names its bytes; u8 g[] leaves them opaque
+        if space == "direct":  # a scalar names its bytes; an array view (s16 g[], u8 g[]) names no field
             scal = collections.defaultdict(set)
             for d in e["decls"]:
                 if "struct" not in d and d.get("width"):
@@ -999,54 +1117,139 @@ def merge(results, alias):
             for (ct, size, w, sg, base, arr), files in scal.items():
                 e["fields"].append({"off": 0, "size": size, "name": g, "ctype": ct, "signed": sg, "base": base,
                                     "array": arr, "width": w, "bits": None, "bitpos": None, "struct": None,
-                                    "spell": ct, "files": sorted(files), "opaque": arr and w == 1})
+                                    "spell": ct, "files": sorted(files), "opaque": arr,
+                                    "repeat": None})
     return G, structs, errors
 
 
-def extent(e):
-    ext = 0
-    for skey, s in e.get("sizes", {}).items():
-        if s:
-            ext = max(ext, s)
+def extent(e, rom=True):
+    """How far the object reaches: declared sizes, fields, C accesses, and (rom)
+    typed ROM accesses. Unsized arrays don't count; they reach this far. Nor does
+    bulk traffic: one clear often covers many objects."""
+    ext = max([s for s in e["sizes"].values() if s] + [0])
     for f in e["fields"]:
         if f["size"] is not None and not f.get("to_extent"):
             ext = max(ext, f["off"] + f["size"])
     for a in e["access"]:
         ext = max(ext, a["off"] + a["width"])
-    return ext
+    if rom:
+        runs = collections.defaultdict(list)  # bulk transfers by call site
+        for a in e["rom"]:
+            if a["form"] == "typed":
+                ext = max(ext, a["off"] + a["width"])
+            elif a["form"] == "bulk":
+                runs[a.get("pc")].append(a)
+        for run in runs.values():  # a copy or fill that starts at the object and isn't a region clear
+            lo, hi = min(a["off"] for a in run), max(a["off"] + a["width"] for a in run)
+            if lo == 0 and hi <= 0x1000:
+                ext = max(ext, hi)
+    return min(ext, 0x10000)
 
 
-def analyze(g, space, e, addr, rom):
-    """Byte map, conflicts, opaque ranges for one global/space."""
-    ext = extent(e)
-    rom_here = rom or []
-    for a in rom_here:
-        ext = max(ext, a[1] + a[2])
-    ext = min(ext, 0x10000)
-    for f in e["fields"]:  # an unsized array (u16 g[]) reaches as far as anything else does
+def fold_interiors(G, syms):
+    """Fold the declarations of symbols inside an object into it: palette labels
+    inside a 512-byte buffer, &records[3] named as its own symbol. Inside means
+    within the object's extent; for an unsized array of S-byte structs, a symbol
+    at g + j*S declared with an S-byte struct (never an array of structs) is element j
+    and extends the array.
+    Returns {interior: (container, offset)}."""
+    order = sorted((a, n) for n, a in syms.items())
+    addrs = [a for a, _ in order]
+    orig = {g: {k: type(v)(v) for k, v in e.items()}
+            for (g, sp), e in G.items() if sp == "direct"}
+    parent = {}
+    for (g, space), e in list(G.items()):
+        if space != "direct":
+            continue
+        base = syms.get(g)
+        if base is None:
+            continue
+        ext = extent(e)
+        strides = {f["repeat"] for f in e["fields"] if f.get("repeat")}
+        i = bisect.bisect_right(addrs, base)
+        while i < len(order):
+            a, h = order[i]
+            delta = a - base
+            hs = orig.get(h)
+            if delta >= ext:  # past the end: only an element alias extends an unsized array
+                single = set(hs["sizes"].values()) if hs and not any(
+                    d.get("array") and d.get("struct") for d in hs["decls"]) else set()
+                fit = {s for s in strides & single if delta % s == 0 and delta < 256 * s}
+                if not fit:
+                    break
+                ext = max(ext, delta + max(fit))
+            i += 1
+            if not hs:
+                continue
+            parent.setdefault(h, (g, delta))
+            for d in hs["decls"]:
+                e["decls"].append(dict(d, how=f"via {h} +{delta:#x}", via=h))
+            for f in hs["fields"]:
+                nm = h if f["name"] == h else f"{h}.{f['name']}"
+                e["fields"].append(dict(f, off=f["off"] + delta, name=nm, via=h, repeat=None,
+                                        size=f["size"] if f["size"] is not None else f["width"]))
+            for c in hs["access"]:
+                e["access"].append(dict(c, off=c["off"] + delta, via=h))
+            for skey, s in hs["sizes"].items():
+                if s:
+                    e["sizes"][f"{skey}@{h}"] = delta + s
+    return parent
+
+
+def expand(e, ext):
+    """Fields with unsized arrays reaching ext: g[] scalars cover it, g[] structs repeat."""
+    out = []
+    for f in e["fields"]:
         if f["size"] is None or f.get("to_extent"):
-            f["size"], f["to_extent"] = max(ext - f["off"], f["width"] or 1), True
+            out.append(dict(f, size=max(ext - f["off"], f["width"] or 1), to_extent=True))
+        elif f.get("repeat"):
+            s = f["repeat"]
+            n = min(max(1, -(-(ext - f["off"]) // s)), 4096)
+            out += [dict(f, off=f["off"] + j * s, name=re.sub(r"^\[0\]", f"[{j}]", f["name"])) for j in range(n)]
+        else:
+            out.append(f)
+    return out
+
+
+CLASSES = ["typed, named", "typed, meaning unresolved", "bulk only", "address escape only", "unobserved"]
+
+
+def analyze(e):
+    """Byte map, conflicts, observation classes for one global/space."""
+    ext = extent(e)
+    fields = expand(e, ext)
     named = [set() for _ in range(ext)]  # files that name this byte
     opq = [set() for _ in range(ext)]
-    for f in e["fields"]:
+    starts = set()
+    for f in fields:
         tgt = opq if f["opaque"] else named
+        starts.add(f["off"])
         for b in range(f["off"], min(f["off"] + f["size"], ext)):
             tgt[b].update(f["files"])
-    romb = [0] * ext
-    for a in rom_here:
-        for b in range(a[1], min(a[1] + a[2], ext)):
-            romb[b] += 1
-    cacc = [0] * ext
+    typed, bulk, escape = [0] * ext, [0] * ext, [0] * ext
+    for a in e["rom"]:
+        if a["form"] == "escape":
+            if a["off"] < ext:
+                escape[a["off"]] += 1
+            continue
+        # a word copy across two declared fields is bulk traffic, not a field
+        spans = any(s in starts for s in range(a["off"] + 1, a["off"] + a["width"]))
+        tgt = bulk if a["form"] == "bulk" or spans else typed
+        for b in range(a["off"], min(a["off"] + a["width"], ext)):
+            tgt[b] += 1
     for a in e["access"]:
         for b in range(a["off"], min(a["off"] + a["width"], ext)):
-            cacc[b] += 1
-    # opaque bytes named elsewhere: some file leaves it opaque, a different file names it
+            typed[b] += 1
+    cls = []
+    for b in range(ext):
+        if typed[b]:
+            cls.append(0 if named[b] else 1)
+        else:
+            cls.append(2 if bulk[b] else 3 if escape[b] else 4)
     elsewhere = [b for b in range(ext) if opq[b] and named[b] - opq[b]]
-    covered = [bool(named[b] or opq[b]) for b in range(ext)]
     unnamed = [b for b in range(ext) if not named[b]]
-    # conflicts among named scalar fields starting at one offset
     by_off = collections.defaultdict(list)
-    for f in e["fields"]:
+    for f in fields:
         if not f["opaque"] and f["base"] in ("int", "ptr", "enum") and f.get("bits") is None:
             by_off[f["off"]].append(f)
     conflicts = []
@@ -1055,8 +1258,8 @@ def analyze(g, space, e, addr, rom):
         signs = {f["signed"] for f in fs if f["signed"] is not None and f["base"] == "int"}
         if len(widths) > 1 or len(signs) > 1:
             conflicts.append((off, fs, widths, signs))
-    return {"extent": ext, "named": named, "opq": opq, "romb": romb, "cacc": cacc, "elsewhere": elsewhere,
-            "unnamed": unnamed, "conflicts": conflicts, "covered": covered}
+    return {"extent": ext, "fields": fields, "named": named, "opq": opq, "typed": typed, "bulk": bulk,
+            "escape": escape, "cls": cls, "elsewhere": elsewhere, "unnamed": unnamed, "conflicts": conflicts}
 
 
 def ranges(bytes_, key=lambda b: None):
@@ -1082,19 +1285,40 @@ def short_files(files, n=3):
     return s + (f" +{len(files) - n}" if len(files) > n else "")
 
 
-def report(g, addr, entries, rom, syms_sorted, aliases=()):
+DEF = re.compile(r"^(?!\s)(?:[\w*]+[ \t*]+)+\**(\w+)\s*\([^;{}]*\)\s*\{", re.M)
+INCASM = re.compile(r'INCLUDE_ASM\(\s*"[^"]*"\s*,\s*(\w+)\s*\)')
+ALIAS = re.compile(r"^#define\s+(\w+)\s+(\w+)\s*$", re.M)
+
+
+def function_files():
+    """Function name -> the C files that define it (units first, then drafts)."""
+    out = collections.defaultdict(set)
+    for f in sources():
+        text = open(os.path.join(ROOT, f), errors="replace").read()
+        names = set(DEF.findall(text)) | set(INCASM.findall(text))
+        for a, b in ALIAS.findall(text):
+            if a in names or b in names:
+                names |= {a, b}
+        for n in names:
+            out[n].add(f)
+    return {n: sorted(fs, key=lambda f: (f.startswith("src/fn/"), f)) for n, fs in out.items()}
+
+
+def report(g, addr, entries, syms_sorted, aliases=(), parent=None, funcs=None):
     """Markdown for one global (direct and pointee spaces)."""
     lines = [f"# {g} ({addr:#010x})", ""]
     if aliases:
         lines += ["Also declared as " + ", ".join(aliases) + " (same address, merged here).", ""]
+    if parent:
+        lines += [f"Inside {parent[0]} at +{parent[1]:#x}: its report merges this symbol's declarations "
+                  "with the containing object's.", ""]
     for space in ("direct", "pointee"):
         e = entries.get(space)
-        rm = rom.get(space, [])
-        if not e and not rm:
+        if not e:
             continue
-        e = e or {"decls": [], "fields": [], "access": [], "sizes": {}}
-        an = analyze(g, space, e, addr, rm)
-        ext = an["extent"]
+        an = analyze(e)
+        ext, fields = an["extent"], an["fields"]
+        rm = e["rom"]
         title = "The object" if space == "direct" else f"The pointee (`*{g}`)"
         lines += [f"## {title}", ""]
         types = collections.defaultdict(set)
@@ -1105,49 +1329,53 @@ def report(g, addr, entries, rom, syms_sorted, aliases=()):
         if space == "direct":
             inside = [(n, a) for a, n in syms_sorted if addr < a < addr + ext]
             if inside:
-                lines.append("Other symbols inside this extent: " +
-                             ", ".join(f"{n} (+{a - addr:#x})" for n, a in inside[:12]) +
-                             (" ..." if len(inside) > 12 else "") + ".")
-        lines.append("")
-        lines += ["| type | how | size | files |", "|---|---|---|---|"]
-        for (ct, how), files in sorted(types.items(), key=lambda x: -len(x[1])):
+                lines.append("Symbols inside this extent: " + ", ".join(f"{n} (+{a - addr:#x})" for n, a in inside[:16])
+                             + (" ..." if len(inside) > 16 else "") + ".")
+        lines += ["", "| type | how | size | files |", "|---|---|---|---|"]
+        for (ct, how), files in sorted(types.items(), key=lambda x: (x[0][1].startswith("via"), -len(x[1]))):
             sk = next((d.get("struct") for d in e["decls"] if d["ctype"] == ct and d["how"] == how), None)
             sz = e["sizes"].get(sk) if sk else None
-            lines.append(f"| `{ct}` | {how} | {sz:#x} | {short_files(files)} |" if sz else
-                         f"| `{ct}` | {how} | | {short_files(files)} |")
+            lines.append(f"| `{ct}` | {how} | {f'{sz:#x}' if sz else ''} | {short_files(files)} |")
         lines.append("")
-        # ROM summary
+        typed = [a for a in rm if a["form"] == "typed"]
         if rm:
-            offs = {a[1] for a in rm}
-            funcs = {a[5] for a in rm}
-            if space == "pointee":
-                lines.append(f"ROM: {len(rm)} accesses at {len(offs)} offsets from {len(funcs)} functions, through "
-                             f"the word loaded from {g}.")
-            else:
-                lines.append(f"ROM: {len(rm)} accesses at {len(offs)} offsets from {len(funcs)} functions. "
-                             "Per literal-pool base (one base with several `[rX,#k]` offsets is struct access; "
-                             "a literal per field is separately addressed):")
-                lines.append("")
+            forms = collections.Counter(a["form"] for a in rm)
+            fn = {a["func"] for a in rm}
+            lines.append(f"ROM: {forms['typed']} typed accesses, {forms['bulk']} words of bulk traffic, "
+                         f"{forms['escape']} address escapes, from {len(fn)} functions"
+                         + (f", through the word loaded from {g}." if space == "pointee" else "."))
+            if space == "direct" and typed:
+                lines += ["", "Typed accesses per literal-pool base (one base used with several `[rX,#k]` "
+                          "offsets is struct access; a literal per field is separately addressed):", ""]
                 per = collections.defaultdict(collections.Counter)
-                for a in rm:
-                    per[a[7]][a[8]] += 1
+                for a in typed:
+                    per[a["lit"]][a["k"]] += 1
                 for lit, ks in sorted(per.items())[:40]:
-                    lines.append(f"- literal {g}+{lit - addr:#x}" if lit >= addr else f"- literal {lit:#x}")
-                    lines[-1] += (f" ({sum(ks.values())} accesses): #k in " +
-                                  ", ".join(f"{k:#x}" for k in sorted(ks)[:24]) + (" ..." if len(ks) > 24 else ""))
+                    where = f"{g}+{lit - addr:#x}" if lit >= addr else f"{lit:#x}"
+                    lines.append(f"- literal {where} ({sum(ks.values())}): #k in "
+                                 + ", ".join(f"{k:#x}" for k in sorted(ks)[:24]) + (" ..." if len(ks) > 24 else ""))
                 if len(per) > 40:
                     lines.append(f"- ... {len(per) - 40} more literals")
+            esc = collections.defaultdict(collections.Counter)
+            for a in rm:
+                if a["form"] in ("escape", "bulk"):
+                    esc[(a["form"], a["note"] or "ldm/stm")][a["off"] if a["form"] == "escape" else 0] += 1
+            if esc:
+                lines += ["", "Bulk traffic and escapes by callee: " + "; ".join(
+                    f"{note} ({form}" + (", at " + ", ".join(f"+{o:#x}" for o in sorted(c)[:6]) if form == "escape"
+                                         else "") + f") ×{sum(c.values())}"
+                    for (form, note), c in sorted(esc.items(), key=lambda x: -sum(x[1].values()))[:12]) + "."]
             lines.append("")
-        # offset table
+        # offset map
         lines += ["### Offset map", "",
-                  "| off | size | names (type — files) | opaque in | ROM (width/sign ×n) | C casts |",
+                  "| off | size | names (type — files) | opaque in | ROM typed (width/sign ×n) | C casts |",
                   "|---|---|---|---|---|---|"]
         starts = collections.defaultdict(list)
-        for f in e["fields"]:
+        for f in fields:
             starts[f["off"]].append(f)
         romat = collections.defaultdict(collections.Counter)
-        for a in rm:
-            romat[a[1]][(a[2], a[3], a[4])] += 1
+        for a in typed:
+            romat[a["off"]][(a["width"], a["signed"], a["load"])] += 1
         cat = collections.defaultdict(collections.Counter)
         for a in e["access"]:
             cat[a["off"]][(a["width"], a["signed"], a["form"])] += 1
@@ -1169,14 +1397,12 @@ def report(g, addr, entries, rom, syms_sorted, aliases=()):
                 nm += f"; +{len(named) - 6} more"
             op = "; ".join(f"`{n}`[{s:#x}] — {short_files(fl, 2)}" for (n, t, s), fl in
                            sorted(opq.items(), key=lambda x: -len(x[1]))[:3])
-            rw = rom_cell(romat[off])
             cw = ", ".join(f"{w}{'s' if sg else 'u' if sg is False else ''} {form}×{n}"
                            for (w, sg, form), n in sorted(cat[off].items(), key=lambda x: str(x[0])))
             flag = " **conflict**" if off in conflict_offs else ""
-            unnamed = not an["named"][off] and an["romb"][off]
-            if unnamed:
-                flag += " **unnamed, used in ROM**"
-            lines.append(f"| {off:#x}{flag} | {size:#x} | {nm} | {op} | {rw} | {cw} |")
+            if not an["named"][off] and an["typed"][off]:
+                flag += " **unnamed, typed access**"
+            lines.append(f"| {off:#x}{flag} | {size:#x} | {nm} | {op} | {rom_cell(romat[off])} | {cw} |")
         lines.append("")
         if an["conflicts"]:
             lines += ["### Conflicts", ""]
@@ -1188,7 +1414,7 @@ def report(g, addr, entries, rom, syms_sorted, aliases=()):
             lines.append("")
         lines += ["### Opaque in one file, named in another", ""]
         cover = collections.defaultdict(set)  # byte -> names covering it
-        for f in e["fields"]:
+        for f in fields:
             if not f["opaque"]:
                 for b in range(f["off"], min(f["off"] + f["size"], ext)):
                     cover[b].add(f"`{f['name']}` {f['ctype']}")
@@ -1200,17 +1426,29 @@ def report(g, addr, entries, rom, syms_sorted, aliases=()):
                          + f" (named in {len(name_files)} files, opaque in {len(opq_files)})")
         if not an["elsewhere"]:
             lines.append("(none)")
-        lines += ["", "### Named by no file", ""]
-        any_ = False
-        for lo, hi in ranges(an["unnamed"]):
-            rb = sum(1 for b in range(lo, hi) if an["romb"][b])
-            cb = sum(1 for b in range(lo, hi) if an["cacc"][b])
-            cov = "opaque" if any(an["covered"][b] for b in range(lo, hi)) else "no declaration"
-            lines.append(f"- {lo:#x}-{hi:#x} ({hi - lo:#x} bytes, {cov}): ROM touches {rb} bytes"
-                         + (f", C casts {cb}" if cb else ""))
-            any_ = True
-        if not any_:
-            lines.append("(none)")
+        lines += ["", "### What the evidence says about each byte", "",
+                  "Typed: a ROM load/store or C cast of the field's width; bulk: ldm/stm, a BIOS/libc copy or "
+                  "fill, DMA, or one access spanning two declared fields; escape: the address is passed to a call "
+                  "or stored. Unobserved means no access in this scan, not unused.", ""]
+        for lo, hi in ranges(range(ext), key=lambda b: an["cls"][b]):
+            c = an["cls"][lo]
+            nm = "named" if any(an["named"][b] for b in range(lo, hi)) else "not named by any file"
+            lines.append(f"- {lo:#x}-{hi:#x} ({hi - lo:#x}): {CLASSES[c]}" + ("" if c < 2 else f"; {nm}"))
+        lines.append("")
+        lines += ["### Consumers", "",
+                  "Functions whose code touches this object, and where their C is. A shared declaration "
+                  "must keep each of them byte-exact (`tools/check.py`) before it replaces the per-file ones.", ""]
+        byf = collections.defaultdict(collections.Counter)
+        for a in rm:
+            byf[a["func"]][a["form"]] += 1
+        for fn, c in sorted(byf.items(), key=lambda x: -sum(x[1].values()))[:60]:
+            files = (funcs or {}).get(fn, [])
+            lines.append(f"- {fn}: " + ", ".join(f"{k} {v}" for k, v in sorted(c.items()))
+                         + (f" — {files[0]}" + (f" (+{len(files) - 1})" if len(files) > 1 else "") if files else ""))
+        if len(byf) > 60:
+            lines.append(f"- ... {len(byf) - 60} more functions")
+        if not byf:
+            lines.append("(no ROM accesses found)")
         lines.append("")
     return "\n".join(lines)
 
@@ -1229,92 +1467,84 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     prune_cache()
     syms = ram_symbols()
-    names = sorted(syms)
-    results = scan_all(names, args.jobs)
+    results = scan_all(sorted(syms), args.jobs)
     byaddr = collections.defaultdict(list)
     for n, a in syms.items():
         byaddr[a].append(n)
-    alias = {}
-    for a, ns in byaddr.items():
-        canon = min(ns, key=lambda n: (not n.startswith("gUnk_"), n))
-        for n in ns:
-            alias[n] = canon
+    alias = {n: min(ns, key=lambda n: (not n.startswith("gUnk_"), n)) for ns in byaddr.values() for n in ns}
     G, structs, errors = merge(results, alias)
     syms = {n: a for n, a in syms.items() if alias[n] == n}
-    names = sorted(syms)
+    sorted_syms = sorted((a, n) for n, a in syms.items())
+    addrs = [a for a, _ in sorted_syms]
+    acc = [] if args.no_rom or not os.path.exists(ELF) else rom_accesses(ELF)
+    # a symbol's own literal says how far its object reaches, before anything is folded in
+    for a in acc:
+        if not a.ptr and a.form != "escape":
+            i = bisect.bisect_right(addrs, a.lit) - 1
+            if i >= 0 and addrs[i] == a.lit:
+                G[(sorted_syms[i][1], "direct")]["rom"].append({"off": a.k, "width": a.width, "form": a.form,
+                                                                "pc": a.pc})
+    parent = fold_interiors(G, syms)
+    exts = {syms[g]: extent(e) for (g, sp), e in G.items() if sp == "direct" and g in syms}
+    for e in G.values():
+        e["rom"] = []
+    for a in acc:
+        rec = {"width": a.width, "signed": a.signed, "load": a.load, "func": a.func, "form": a.form,
+               "note": a.note, "lit": a.lit, "k": a.k, "pc": a.pc}
+        if a.ptr:
+            i = bisect.bisect_right(addrs, a.lit) - 1
+            if i >= 0 and addrs[i] == a.lit:
+                G[(sorted_syms[i][1], "pointee")]["rom"].append(dict(rec, off=a.k))
+            continue
+        x = a.lit + a.k
+        # every object whose extent covers x, else the nearest symbol below
+        i = bisect.bisect_right(addrs, x) - 1
+        hits, j = set(), i
+        while j >= 0 and addrs[j] > x - 0x10000:
+            if addrs[j] <= x < addrs[j] + max(exts.get(addrs[j], 0), 1):
+                hits.add(j)
+            j -= 1
+        if not hits and i >= 0:
+            hits.add(i)
+        for j in hits:
+            G[(sorted_syms[j][1], "direct")]["rom"].append(dict(rec, off=x - addrs[j]))
 
-    rom = collections.defaultdict(lambda: collections.defaultdict(list))
-    if not args.no_rom and os.path.exists(ELF):
-        sorted_syms = sorted((a, n) for n, a in syms.items())
-        addrs = [a for a, _ in sorted_syms]
-        exts = {}
-        for (g, space), e in G.items():
-            if space == "direct":
-                exts[syms.get(g)] = extent(e)
-        for lit, k, w, sg, load, func, ptr in rom_accesses(ELF):
-            if lit is None:
-                continue
-            if ptr:
-                for a in (lit,):
-                    i = bisect.bisect_right(addrs, a) - 1
-                    if i >= 0 and addrs[i] == a:
-                        rom[sorted_syms[i][1]]["pointee"].append((lit, k, w, sg, load, func, None, lit, k))
-                continue
-            x = lit + k
-            # every global whose declared extent covers x, else the nearest symbol below
-            i = bisect.bisect_right(addrs, x) - 1
-            hits = set()
-            j = i
-            while j >= 0 and addrs[j] > x - 0x10000:
-                a = addrs[j]
-                if a <= x < a + max(exts.get(a, 0), 1):
-                    hits.add(j)
-                j -= 1
-            if not hits and i >= 0:
-                hits.add(i)
-            for j in hits:
-                a, n = sorted_syms[j]
-                rom[n]["direct"].append((a, x - a, w, sg, load, func, None, lit, k))
-    else:
-        sorted_syms = sorted((a, n) for n, a in syms.items())
-
-    lo, hi = 0, 1 << 32
-    if args.range:
-        lo, hi = (int(x, 16) for x in args.range.split("-"))
-    os.makedirs(OUT, exist_ok=True)
-    rows = []
-    dump = {}
-    for g in names:
+    lo, hi = (int(x, 16) for x in args.range.split("-")) if args.range else (0, 1 << 32)
+    funcs = function_files()
+    rows, dump = [], {}
+    for g in sorted(syms):
         a = syms[g]
         if not lo <= a <= hi:
             continue
-        entries = {s: G[(g, s)] for s in ("direct", "pointee") if (g, s) in G}
-        if not entries and g not in rom:
+        entries = {s: G[(g, s)] for s in ("direct", "pointee")
+                   if (g, s) in G and (G[(g, s)]["decls"] or G[(g, s)]["rom"])}
+        if not entries:
             continue
-        md = report(g, a, entries, rom.get(g, {}), sorted_syms, [n for n in byaddr[a] if n != g])
+        md = report(g, a, entries, sorted_syms, [n for n in byaddr[a] if n != g], parent.get(g), funcs)
         with open(os.path.join(OUT, g + ".md"), "w") as f:
             f.write(md + "\n")
         for space, e in entries.items():
-            an = analyze(g, space, e, a, rom.get(g, {}).get(space, []))
-            ntypes = len({d["ctype"] for d in e["decls"]})
-            opq_bytes = sum(1 for b in range(an["extent"]) if an["opq"][b])
-            rows.append({"global": g, "space": space, "addr": a, "types": ntypes,
-                         "files": len({d["file"] for d in e["decls"]}), "extent": an["extent"],
-                         "opaque": opq_bytes, "elsewhere": len(an["elsewhere"]),
-                         "unnamed": len(an["unnamed"]),
-                         "unnamed_rom": sum(1 for b in an["unnamed"] if an["romb"][b]),
-                         "conflicts": len(an["conflicts"])})
-            dump[f"{g}:{space}"] = {"addr": a, "decls": e["decls"], "fields": e["fields"], "access": e["access"],
-                                    "rom": [{"off": r[1], "width": r[2], "signed": r[3], "load": r[4],
-                                             "func": r[5], "literal": r[7], "k": r[8]}
-                                            for r in rom.get(g, {}).get(space, [])]}
+            an = analyze(e)
+            cls = collections.Counter(an["cls"])
+            rows.append({"global": g, "space": space, "addr": a, "types": len({d["ctype"] for d in e["decls"] if not d.get("via")}),
+                         "files": len({d["file"] for d in e["decls"] if not d.get("via")}), "extent": an["extent"],
+                         "opaque": sum(1 for b in range(an["extent"]) if an["opq"][b]),
+                         "elsewhere": len(an["elsewhere"]), "unnamed": len(an["unnamed"]),
+                         "typed_unnamed": cls[1], "bulk_escape": cls[2] + cls[3], "unobserved": cls[4],
+                         "conflicts": len(an["conflicts"]), "inside": parent.get(g, (None,))[0]})
+            dump[f"{g}:{space}"] = {"addr": a, "extent": an["extent"], "inside": parent.get(g),
+                                    "decls": e["decls"], "fields": an["fields"], "access": e["access"],
+                                    "rom": e["rom"],
+                                    "classes": [[lo_, hi_, CLASSES[an["cls"][lo_]]] for lo_, hi_ in
+                                                ranges(range(an["extent"]), key=lambda b: an["cls"][b])]}
     rows.sort(key=lambda r: (-r["elsewhere"], -r["types"], r["addr"]))
-    table = ["| global | space | types | files | extent | opaque | opaque, named elsewhere | named nowhere "
-             "(ROM-used) | conflicts |", "|---|---|---|---|---|---|---|---|---|"]
+    table = ["| global | space | types | files | extent | opaque | opaque, named elsewhere | typed, unnamed "
+             "| bulk/escape only | unobserved | conflicts |", "|---|---|---|---|---|---|---|---|---|---|---|"]
     for r in rows:
-        table.append(f"| [{r['global']}]({r['global']}.md) | {r['space']} | {r['types']} | {r['files']} | "
-                     f"{r['extent']:#x} | {r['opaque']} | {r['elsewhere']} | {r['unnamed']} ({r['unnamed_rom']}) | "
-                     f"{r['conflicts']} |")
+        inside = f" (in {r['inside']})" if r["inside"] else ""
+        table.append(f"| [{r['global']}]({r['global']}.md){inside} | {r['space']} | {r['types']} | {r['files']} | "
+                     f"{r['extent']:#x} | {r['opaque']} | {r['elsewhere']} | {r['typed_unnamed']} | "
+                     f"{r['bulk_escape']} | {r['unobserved']} | {r['conflicts']} |")
     with open(os.path.join(OUT, "SUMMARY.md"), "w") as f:
         f.write("# RAM layouts merged across files\n\nRanked by opaque bytes that another file names. "
                 "Generated by tools/layoutmerge.py.\n\n" + "\n".join(table) + "\n")
@@ -1324,8 +1554,8 @@ def main():
     with open(os.path.join(OUT, "layouts.json"), "w") as f:
         json.dump(dump, f)
     multi = len({r["global"] for r in rows if r["types"] > 1})
-    print(f"{len(rows)} global layouts ({multi} globals with more than one declared type), "
-          f"{len(structs)} struct definitions, {len(errors)} files not scanned; "
+    print(f"{len(rows)} global layouts ({multi} globals with more than one declared type, {len(parent)} folded "
+          f"into a containing object), {len(structs)} struct definitions, {len(errors)} files not scanned; "
           f"reports in {os.path.relpath(OUT, ROOT)}/", file=sys.stderr)
     if args.summary:
         print("\n".join(table[:2 + args.n]))
