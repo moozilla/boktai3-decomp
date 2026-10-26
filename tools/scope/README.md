@@ -126,7 +126,8 @@ python3 tools/scope/scope.py FILE.c KNOB=V ...    same compile with instrumented
 python3 tools/scope/scope.py insn UID [FUNC]      one RTL insn through every pass
 python3 tools/scope/scope.py uses REG... [PASS...] which insns (uid@C line) use a pseudo after each pass
 python3 tools/scope/scope.py FILE.c why UID       why insn UID has the registers it has (see below)
-python3 tools/scope/scope.py FILE.c why all       why on the first real difference of each hunk (<= 8)
+python3 tools/scope/scope.py FILE.c why all [RANGE]   why on the first real difference of each hunk (SCOPE_WHY_MAX=24;
+                                                  RANGE: 0xLO-0xHI ROM addresses, +0x40-+0x80 offsets, 120-180 C lines)
 python3 tools/scope/scope.py FILE.c spill         is the whole difference reload's spill rotation?
 python3 tools/scope/scope.py FILE.c life NAME...  the insns flow counts toward a pseudo's live length, by C line
 python3 tools/scope/scope.py A.c vs B.c [FUNC]    two drafts' allocation side by side: rank, priority, refs/live, prefs, register
@@ -406,6 +407,15 @@ in the patch.
     "might be used uninitialized" warnings for FUNC (Vampire_ApplyPendingDamage's `t1`).
     A pinned register variable gets no such warning (it is not a pseudo).
   * `campaign.py land` formats only the landed file (it ran `make format` over the tree).
+  * `why all` analyzes up to `SCOPE_WHY_MAX` hunks (24; was a fixed 8) and takes a range of ROM
+    addresses, offsets or C lines; the summary names the first hunk left out and the range that
+    reaches it. Speed: the dump compile (`compile_draft_g`) now compiles FUNC with the unit cut
+    after its body and earlier non-inline functions reduced to prototypes (`diagnostic_source`;
+    `SCOPE_TRIM=0` compiles the whole unit). FUNC's code, dumps, names.txt records and lines were
+    the same on 199 random units (global label numbers aside). The dump readers (`uid_lines`,
+    `insn_list`, `pseudo_names`, `dump_func`, `born_passes`) are memoised on the dump files'
+    stamps. Nidhoggr_ApplyPartDamage (4,000-line unit): 10.5 s -> 1.4 s; sub_08193874: over 120 s
+    (the workers' "minutes") -> 3.3 s for 24 hunks.
 
 * Done: trace summarizer and pseudo names (`why`). On RepeatedPairAttack it
   reproduces in one call what took ~15 calls of raw trace reading.
