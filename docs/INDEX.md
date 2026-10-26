@@ -97,6 +97,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/BACKGROUND_CONTROLLERS.md](../docs/BACKGROUND_CONTROLLERS.md) | Background controllers and scheduler report groups | *#assets #progress* | 3 |
 | [docs/BACKLOG.md](../docs/BACKLOG.md) | Research and development backlog |  | 16 |
 | [docs/BIG_FUNCTIONS.md](../docs/BIG_FUNCTIONS.md) | Matching big functions: measure, hypothesise, read the compiler | #matching #tooling | 14 |
+| [docs/BOKTAI12_COMPARISON.md](../docs/BOKTAI12_COMPARISON.md) | Boktai 1 and 2 against Boktai 3: preliminary engine comparison | #research #comparison | 21 |
 | [docs/BOUNCING_OBJECTS.md](../docs/BOUNCING_OBJECTS.md) | Twelve-slot bouncing objects (080688D0–08069964) | *#particles* | 4 |
 | [docs/BURST_EMITTER.md](../docs/BURST_EMITTER.md) | Five-slot burst emitter (tentative identity) | *#particles* | 2 |
 | [docs/CANDIDATES.md](../docs/CANDIDATES.md) | Compact checking and candidate checkpoints | *#tooling* | 3 |
@@ -129,7 +130,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/PROCESS_REVIEW.md](../docs/PROCESS_REVIEW.md) | External research review and next experiments | *#scripts #process* | 13 |
 | [docs/PROGRESS_CI.md](../docs/PROGRESS_CI.md) | ROM-free progress reports | *#progress* | 13 |
 | [docs/PUSH20_2026-10-08.md](../docs/PUSH20_2026-10-08.md) | Matching push toward 20% code | *#matching* | 11 |
-| [docs/REGALLOC.md](../docs/REGALLOC.md) | Register allocation in agbcc, and how to steer it from C | *#matching #tooling* | 18 |
+| [docs/REGALLOC.md](../docs/REGALLOC.md) | Register allocation in agbcc, and how to steer it from C | *#matching #tooling* | 20 |
 | [docs/REPORT_SUBSYSTEMS.md](../docs/REPORT_SUBSYSTEMS.md) | Subsystem report organization | *#tooling #progress* | 10 |
 | [docs/RESEARCH_2026-10-12.md](../docs/RESEARCH_2026-10-12.md) | RESEARCH_2026-10-12.md |  | 28 |
 | [docs/RETROSPECTIVE_2026-10-08.md](../docs/RETROSPECTIVE_2026-10-08.md) | Boktai 3 matching run retrospective | *#matching #process* | 26 |
@@ -197,7 +198,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/STACKED_ACTOR.md](../docs/STACKED_ACTOR.md) | Stacked display actor (tentative identity) | *#actors #particles #assets* | 5 |
 | [docs/TERRAIN_EDGE_MARKER.md](../docs/TERRAIN_EDGE_MARKER.md) | Terrain edge marker manager (tentative identity) | *#scripts* | 4 |
 | [docs/UNIT_WORKER.md](../docs/UNIT_WORKER.md) | Subsystem unit worker | *#text* | 4 |
-| [docs/WORKER.md](../docs/WORKER.md) | Worker brief: family-oriented matching | *#matching #process* | 24 |
+| [docs/WORKER.md](../docs/WORKER.md) | Worker brief: family-oriented matching | *#matching #process* | 27 |
 | [docs/WORKER_ROUND.md](../docs/WORKER_ROUND.md) | Standard round brief (only when workers are authorized) |  | 3 |
 | [docs/tasks/m4a.md](../docs/tasks/m4a.md) | Task: lift the MP2K (m4a) sound library from pokeemerald | *#sound #library* | 3 |
 | [docs/tasks/relatives.md](../docs/tasks/relatives.md) | Unmatched functions with matched relatives | *#tooling* | 35 |
@@ -223,6 +224,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/animation-contact-burst_2026-10-14.md](../notes/animation-contact-burst_2026-10-14.md) | Temporary animations and contact-burst effect, October 14 | *#particles #animation* | 7 |
 | [notes/area-effect-link_2026-10-14.md](../notes/area-effect-link_2026-10-14.md) | Link variant of area effects (Sol, 2026-10-14) |  | 2 |
 | [notes/area-effect_2026-10-14.md](../notes/area-effect_2026-10-14.md) | Rectangular area effect manager (Sol, 2026-10-14) | *#tooling* | 4 |
+| [notes/arm-08000430.md](../notes/arm-08000430.md) | sub_08000430: unpinned exact match, and how it works | #matching #compiler #register-pinning #arm | 6 |
 | [notes/bk.md](../notes/bk.md) | bk notes (backlog retry, 45 matches) |  | 5 |
 | [notes/breakable-prop_2026-10-14.md](../notes/breakable-prop_2026-10-14.md) | Breakable prop, 080515C0–08051A3C | *#particles* | 2 |
 | [notes/cell-gates_2026-10-14.md](../notes/cell-gates_2026-10-14.md) | Cell-based traversal gates and the preceding script entry | *#scripts* | 4 |
@@ -244,7 +246,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/codex-high.md](../notes/codex-high.md) | Codex high: task 0808AF38 | #matching #ghoul #slime #register-pinning | 244 |
 | [notes/codex-low.md](../notes/codex-low.md) | Task 080D812C — 2026-10-20 | #matching #dog | 376 |
 | [notes/codex-medium.md](../notes/codex-medium.md) | Codex medium worker: task 080D6FDC | #matching #scene-actor #terrain #mummy #dog | 476 |
-| [notes/compiler-debugger-2026-10-23.md](../notes/compiler-debugger-2026-10-23.md) | Compiler debugger: first session (2026-10-23) | #matching #tooling #regalloc | 6 |
+| [notes/compiler-debugger-2026-10-23.md](../notes/compiler-debugger-2026-10-23.md) | Compiler debugger: first session (2026-10-23) | #matching #tooling #regalloc | 12 |
 | [notes/contact-actor-pool_2026-10-14.md](../notes/contact-actor-pool_2026-10-14.md) | Contact actor pool setup and display (tentative) | *#actors* | 7 |
 | [notes/contact-actor-states_2026-10-14.md](../notes/contact-actor-states_2026-10-14.md) | Contact actor states and lifecycle, 08042E18–08043F64 | *#actors #tooling* | 5 |
 | [notes/contact-sequence-actor_2026-10-14.md](../notes/contact-sequence-actor_2026-10-14.md) | Sequence contact actor pool, October 14 | *#actors* | 6 |
@@ -264,7 +266,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/cx-sol09.md](../notes/cx-sol09.md) | Campaign worker sol09 | #matching #axe #scene-actor | 16 |
 | [notes/cx-sol10.md](../notes/cx-sol10.md) | cx-sol10 campaign notes | #matching #scene-actors #register-pinning | 14 |
 | [notes/cx-sol11.md](../notes/cx-sol11.md) | Campaign worker sol11 | #matching #actors | 13 |
-| [notes/cx-xhigh.md](../notes/cx-xhigh.md) | Campaign worker xhigh | #matching #monsters #compiler #register-pinning | 7 |
+| [notes/cx-xhigh.md](../notes/cx-xhigh.md) | Campaign worker xhigh | #matching #monsters #compiler #register-pinning | 9 |
 | [notes/defeat-stats-template.md](../notes/defeat-stats-template.md) | Defeat-statistics handlers: how sub_08132D2C (5740 bytes) was matched | #matching | 7 |
 | [notes/depin-manual-2_2026-10-21.md](../notes/depin-manual-2_2026-10-21.md) | depin-manual-2 worklog (2026-10-21) | *#tooling* | 8 |
 | [notes/depin-manual-3_2026-10-21.md](../notes/depin-manual-3_2026-10-21.md) | depin-manual-3 worklog (2026-10-21) | *#actors #tooling* | 7 |

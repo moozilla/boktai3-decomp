@@ -322,3 +322,16 @@ had. The rule is that it must be written as a named macro, not left bare:
 `translate.py --natural` may now insert `do { } while (0)` blocks
 (perm_ins_block); natfarm turns an empty one into `DEBUG_NOP()` and rejects
 `if (1)` blocks.
+
+## Hiding a symbol address from gcse (sub_08000430, 2026-10-26)
+
+The last pin in the ARM unit was there because gcse/PRE merged a loop test's
+`ldr =sym` with the pointer `c = &sym` hoisted above the loop. The plain C fix:
+build the address as `off = (u8 *)&sym + k;` and then `base = (s16 *)(off - k);`
+as two statements before the loop guard, with a different `k` per branch and
+one `base` variable per branch. gcse hashes `SET_SRC` (not the REG_EQUAL
+note), so it never sees `sym`. combine folds the pair inside the pre-guard
+block, and local-alloc's `REG_N_REFS == 2` path then substitutes `sym` into
+the hoisted copy after sched1 has already scheduled it as a copy. Nothing extra
+is emitted. The pass-by-pass walkthrough and the controls that fail are in
+[notes/arm-08000430.md](../notes/arm-08000430.md).
