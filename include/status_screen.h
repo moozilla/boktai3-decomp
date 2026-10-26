@@ -66,7 +66,7 @@ struct BgMapInfo {
 u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y); // address of a tile in the background's tilemap
 void NumericDisplay_DrawPair(void *unused, int left, int right);
 void NumericDisplay_DrawStatusValues(struct StatusScreen *);
-void sub_0800E5B8(struct StatusScreen *);
+void StatusScreen_DrawClock(struct StatusScreen *);
 void StatusScreen_RefreshDirtyDisplays(struct StatusScreen *);
 int StatusScreen_CheckConfirm(struct StatusScreen *);
 void StatusScreen_Close(struct StatusScreen *);
@@ -80,7 +80,7 @@ void StatusScreen_FadeInPalette(struct StatusScreen *);
 void StatusScreen_FadeOutPalette(struct StatusScreen *);
 void StatusScreen_ClearScanlineNoise(struct StatusScreen *);
 void sub_0800E974(struct StatusScreen *);
-void sub_0800EF90(struct StatusScreen *);
+void StatusScreen_UpdateScanlineNoise(struct StatusScreen *);
 
 s32 Div(s32, s32);
 s32 SunClock_GetBaseHour(void); // counter values

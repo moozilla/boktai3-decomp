@@ -143,21 +143,28 @@ void StatusScreen_FadeOutPalette(struct StatusScreen *p)
 
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
-#ifdef NONMATCHING
-// fuzzy: 59.7%
-// scope shape 36 (differences once low registers are set aside)
-void sub_0800EF90(struct StatusScreen *p)
+static inline int StatusScreen_Random(void)
 {
-    s32 i, j;
+    u32 offset;
+    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    offset = gUnk_03005308 * 2;
+    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+}
+#ifdef NONMATCHING
+// fuzzy: 75.6%
+// scope shape 34 (differences once low registers are set aside)
+// scope shape 36 (differences once low registers are set aside)
+void StatusScreen_UpdateScanlineNoise(struct StatusScreen *p)
+{
+    s32 i;
     s16 *amplitude, *delta;
     for (i = 0; i < p->top; i++)
         p->rows[p->active][i] = 0;
-    j = p->top;
-    for (; j < p->bottom; j++) {
-        amplitude = &p->amplitude;
-        delta = (s16 *)&p->delta;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-        p->rows[p->active][j] = (gUnk_0203B400[gUnk_03005308] * p->amplitude) >> 18;
+    i = p->top;
+    amplitude = &p->amplitude;
+    delta = (s16 *)&p->delta;
+    for (; i < p->bottom; i++) {
+        p->rows[p->active][i] = (StatusScreen_Random() * p->amplitude) >> 18;
     }
     for (i = p->bottom; i < 160; i++)
         p->rows[p->active][i] = 0;
@@ -172,7 +179,7 @@ void sub_0800EF90(struct StatusScreen *p)
         *amplitude = 256;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0800EF90);
+INCLUDE_ASM("asm/nonmatching", StatusScreen_UpdateScanlineNoise);
 #endif
 
 void StatusScreen_ClearScanlineNoise(struct StatusScreen *p)

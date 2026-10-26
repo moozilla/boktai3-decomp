@@ -171,9 +171,6 @@ struct WidgetAttr {
     u16 b, c;
 };
 
-#ifdef NONMATCHING
-// fuzzy: 77.6%
-// scope shape 89 (differences once low registers are set aside)
 s32 sub_0800DC90(struct ScanlinePresentation *p)
 {
     struct WidgetAttr attr;
@@ -185,6 +182,10 @@ s32 sub_0800DC90(struct ScanlinePresentation *p)
     s32 x;
     void *res;
     s16 *mode;
+    s8 *pb;
+    u32 v;
+    u16 *q;
+    s32 w;
 
     gUnk_03004FC0[0] = 0x1084;
     attr.b = 0;
@@ -248,16 +249,20 @@ s32 sub_0800DC90(struct ScanlinePresentation *p)
     mode = &p->mode;
     d = digits;
     layer = &p->layers[4];
-    for (i = 1; i >= 0; i--) {
+    for (i = 0; i < 2; i++) {
         Widget_InitLinked(layer, &p->header, (u16)*d, 0x871, 0, 0, 0x3C, &attr);
-        if (p->digitsA >= 0)
-            layer->flags &= ~1;
+        if (p->digitsA >= 0) {
+            s32 off = i * 0x60;
+            u32 *f = &p->layers[4].flags;
+            *(u32 *)((u8 *)f + off) &= ~1;
+        }
         d++;
         layer++;
     }
-    Widget_InitLinked(&p->layers[2], &p->header, (u16)(p->digitsB < 0 ? 0 : p->digitsB), 0x871, 0,
-                      0, 0x3C, &attr);
-    if (p->digitsB >= 0)
+    pb = &p->digitsB;
+    v = *pb < 0 ? 0 : *pb;
+    Widget_InitLinked(&p->layers[2], &p->header, (u16)v, 0x871, 0, 0, 0x3C, &attr);
+    if (*pb >= 0)
         p->layers[2].flags &= ~1;
     if (p->handle) {
         MessageWindow_SetDisplayMode(1);
@@ -265,7 +270,9 @@ s32 sub_0800DC90(struct ScanlinePresentation *p)
         MessageWindow_SetMessageTable(p->handle);
         MessageWindow_ShowMessage(message);
         MessageWindow_SetBounds(0, 7, 0x1A, 2);
-        *(u16 *)(gUnk_03004C30 + 0x20) = MessageWindow_GetRemainingTextWidth() * 4 - 0x78;
+        w = MessageWindow_GetRemainingTextWidth();
+        q = (u16 *)gUnk_03004C30;
+        q[16] = w * 4 - 0x78;
         Mosaic_SetParameters(0, 0, 0x11);
     } else {
         Mosaic_SetParameters(0, 0, 0x10);
@@ -280,9 +287,6 @@ s32 sub_0800DC90(struct ScanlinePresentation *p)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0800DC90);
-#endif
 
 void *ScanlinePresentation_Create(void)
 {

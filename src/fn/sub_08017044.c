@@ -20,7 +20,7 @@ struct Effect {
     struct Vec position;
     struct Vec *target;
     struct Sprite sprite;
-    u8 tail[0x84 - 0x64];
+    u8 tail[0x84 - 0x5C];
 };
 struct EffectManager {
     u8 pad0[0x18];
@@ -40,9 +40,10 @@ static inline int FloatingEffect_Scale3(int v)
     return v >= 0 ? v >> 5 : -((-v) >> 5);
 }
 #ifdef NONMATCHING
-// fuzzy: 49.5%
+// fuzzy: 59.1%
+// scope shape 14 (differences once low registers are set aside)
 // scope shape 64 (differences once low registers are set aside)
-s32 sub_08017044(int kind, int item, int mode, int index, struct Vec *position, struct Vec *target,
+s32 FloatingItemEffect_Spawn(int kind, int item, int mode, int index, struct Vec *position, struct Vec *target,
                  int duration, u32 id)
 {
     struct EffectManager *m = FloatingEffectManager_GetOrCreate();
@@ -51,9 +52,11 @@ s32 sub_08017044(int kind, int item, int mode, int index, struct Vec *position, 
     s32 slot = -1;
     s32 i;
     u32 frame;
+    int idx;
     struct Vec *s;
     int depth, height;
-    for (i = 0; i < 8; i++) {
+    i = 0;
+    do {
         if (!(m->active & (1 << i))) {
             e = &m->effects[i];
             slot = i;
@@ -63,12 +66,14 @@ s32 sub_08017044(int kind, int item, int mode, int index, struct Vec *position, 
                 break;
             }
         }
-    }
+        i++;
+    } while (i < 8);
     if (e == NULL)
         return -1;
     e->key = key;
     e->index = index;
-    if (gUnknown_02000580[e->index] == NULL)
+    idx = e->index;
+    if (gUnknown_02000580[idx] == NULL)
         e->index = 0;
     e->duration = duration;
     e->mode = mode;
@@ -139,5 +144,5 @@ s32 sub_08017044(int kind, int item, int mode, int index, struct Vec *position, 
     return 0;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_08017044);
+INCLUDE_ASM("asm/nonmatching", FloatingItemEffect_Spawn);
 #endif

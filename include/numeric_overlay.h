@@ -5,7 +5,7 @@
 #include "status_screen.h"
 
 // Tentative: a lightweight sibling of the status screen: it loads the same background map and
-// palette, draws the same counter display (sub_0800F4EC mirrors sub_0800E5B8) but has no fades
+// palette, draws the same counter display (sub_0800F4EC mirrors StatusScreen_DrawClock) but has no fades
 // or scanline transition. Its task object is 0x2C bytes.
 struct NumericOverlay {
     u8 task[24];

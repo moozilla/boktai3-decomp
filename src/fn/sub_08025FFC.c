@@ -1,4 +1,6 @@
 #include "global.h"
+#include "engine.h"
+#include "terrain_cell_probe.h"
 
 // confidence=low: advances an actor's impact animation and cue sounds, then spawns hazards at a jittered point of its impact cell.
 typedef struct Actor08025FFC {
@@ -28,20 +30,19 @@ typedef struct Map08025FFC {
     u16 rows[1];
 } Map08025FFC;
 
-extern s16 gUnk_086149C4[];
-
 static inline s32 s08025FFC_Trunc12(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
 
 #ifdef NONMATCHING
-// fuzzy: 50.3%
+// fuzzy: 61.1%
+// scope shape 78 (differences once low registers are set aside)
 // scope shape 99 (differences once low registers are set aside)
 void sub_08025FFC(Actor08025FFC *p, s32 arg)
 {
     u32 copy[2];
-    u16 d[3];
+    u16 d[4];
     u16 *s = (u16 *)copy;
     u8 *cd;
     s32 cell;
@@ -79,13 +80,13 @@ void sub_08025FFC(Actor08025FFC *p, s32 arg)
         copy[0] = src[0];
         copy[1] = src[1];
         base = p->q[0x2d];
-        idx = (*(u32 *)0x03005308 + 1) & 0x3ff;
-        a = ((u16 *)0x0203B400)[idx] & f;
+        idx = (gUnk_03005308 + 1) & 0x3ff;
+        a = gUnk_0203B400[idx] & f;
         base = base + a;
         base -= 8;
         idx = (idx + 1) & 0x3ff;
-        *(u32 *)0x03005308 = idx;
-        b = ((u16 *)0x0203B400)[idx] & 0x7f;
+        gUnk_03005308 = idx;
+        b = gUnk_0203B400[idx] & 0x7f;
         nb = b + 0x20;
         d[0] = s08025FFC_Trunc12(gUnk_086149C4[(base + 0x40) & 0xff] * nb);
         d[1] = 0;
@@ -94,30 +95,8 @@ void sub_08025FFC(Actor08025FFC *p, s32 arg)
         d[0] += s[0];
         d[1] += s[1];
         d[2] += s[2];
-        cx = (s8)(d[0] >> 8);
-        cy = (s8)(d[2] >> 8);
-        if (cx < 0 || cy < 0 || (u32)cx >= *(u32 *)0x030052F8 || (u32)cy >= *(u32 *)0x030052FC) {
-            cell = 0;
-        } else {
-            map = *(Map08025FFC **)0x030052F4;
-            cell = ((u16 *)((u8 *)map + 0x24))[cy] + cx;
-        }
-        cd = TerrainModifiers_FindCellOverride(cell, 1);
-        if (cd == NULL) {
-            map = *(Map08025FFC **)0x030052F4;
-            cd = map->cells + cell * 4 + 0xc;
-        } else {
-            cd = cd + 4;
-        }
-        bits = *cd;
-        t = (bits & 0xf) << 8;
-        kind = bits >> 4;
-        if (kind == 1) {
-            t -= ((u8 *)d)[4];
-        } else if (kind == 2) {
-            t -= ((u8 *)d)[0];
-        }
-        if (t == (s16)s[1]) {
+        Pos16_SnapToTerrain((struct Pos16 *)d);
+        if (d[1] == s[1]) {
             AnimatedHazard_Create(d, p->field36A, 0x3c);
         } else {
             AnimatedHazard_Create(s, p->field36A, 0x3c);

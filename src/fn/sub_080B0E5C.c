@@ -18,7 +18,7 @@ struct SceneActorItemLaunch {
 };
 extern struct ItemLaunchPlayer *gUnk_02000580[4];
 u8 SceneInventory_FindSlotByValue(s16 *, s16 *, s16 *, s32);
-s32 sub_08017044(s32, s32, s32, s32, void *, void *, s32, void *);
+s32 FloatingItemEffect_Spawn(s32, s32, s32, s32, void *, void *, s32, void *);
 void Inventory_ClearItemSlot(u32);
 void Sound_PlaySong(u32);
 static inline u8 busy(struct SceneActorItemLaunch *p)
@@ -43,7 +43,7 @@ s32 SceneActor_TryLaunchItem13(struct SceneActorItemLaunch *p)
         return -1;
     if (!SceneInventory_FindSlotByValue(&p->slot, &p->kind, &p->parameter, 13))
         return -1;
-    if (sub_08017044(0, p->kind, 3, 0, &pos, &q->position, 24, p) < 0) {
+    if (FloatingItemEffect_Spawn(0, p->kind, 3, 0, &pos, &q->position, 24, p) < 0) {
         p->slot = 0xffff;
         return -1;
     }

@@ -4002,6 +4002,8 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
             sys.exit(f"{name}: {e}; nothing landed")
     path = os.path.join(ROOT, dest)
     text = open(os.path.abspath(draft)).read()
+    # a draft that kept FUNC's NONMATCHING wrapper (a blocked submission) lands as plain C, wrapped again below
+    text = land.unwrap(text, name, f"{addr:08X}") or text
     before = {path: open(path).read() if os.path.exists(path) else None}
     before.update(registered)  # the inventory as it was before the draft's hidden functions were registered
     if kind == "unit":

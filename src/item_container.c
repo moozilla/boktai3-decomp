@@ -10,7 +10,7 @@ void ScaledShadow_Destroy(void *);
 s32 sub_0822D490(s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void ScaledShadow_Disable(void *);
-void sub_08017044(s32, s32, s32, s32, struct SceneVec *, struct SceneVec *, s32, struct Trigger *);
+void FloatingItemEffect_Spawn(s32, s32, s32, s32, struct SceneVec *, struct SceneVec *, s32, struct Trigger *);
 u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
 void ParticleSprite_Initialize(struct TriggerSprite *, struct TriggerGraphics *, u32);
 void Effect_SetOrigin(struct TriggerSprite *, s32, s32);
@@ -276,22 +276,29 @@ void Trigger_UpdateShake(struct Trigger *p)
     }
 }
 
-#ifdef NONMATCHING
-// fuzzy: 32.5%
-// scope shape 58 (differences once low registers are set aside)
-void sub_080070D0(struct TriggerManager *manager, struct Trigger *p)
+static inline s32 inBox(struct SceneVec *v, struct SceneVec *proj, s16 *o, struct Player *actor, s32 dy)
 {
-    struct SceneVec box, pos;
-    struct SceneVec *out = &box;
+    if (absolute(v->y - actor->position.y) <= 127 && absolute(o[0] - proj->x) <= 14 && dy >= -24) {
+        if (dy <= 4)
+            return 1;
+    }
+    return 0;
+}
+
+s32 Trigger_UpdateProximity(struct TriggerManager *manager, struct Trigger *p)
+{
+    s16 box[3];
+    struct SceneVec pos;
     s32 armed, i;
     {
+        s16 *out = box;
         struct SceneVec *v = p->position;
         s32 x = v->x, z = v->z, a, y;
-        out->x = scale(x - z);
+        out[0] = scale(x - z);
         a = scale(x + z);
-        y = scale(v->y);
-        out->y = a - y;
-        out->z = a + y;
+        y = scaleHeight(v->y);
+        out[1] = a - y;
+        out[2] = a + y;
     }
     if (p->cooldown && --p->cooldown == 0) {
         p->shake = 4;
@@ -303,15 +310,19 @@ void sub_080070D0(struct TriggerManager *manager, struct Trigger *p)
         struct Player *actor = manager->actors[i];
         struct SceneVec *proj, *v;
         s32 dy, near;
+        s16 *o = box;
         if (!actor)
             continue;
-        if (gUnk_02000560[i] & 12)
-            continue;
+        {
+            u32 mask = 12;
+            if (gUnk_02000560[i] & mask)
+                continue;
+        }
         v = p->position;
-        proj = &manager->projected[i];
-        dy = out->y - proj->y;
-        near = absolute(v->y - actor->position.y) <= 127 && absolute(out->x - proj->x) <= 14 &&
-               dy >= -24 && dy <= 4;
+        proj = (struct SceneVec *)(i * 8 + (u32)manager);
+        proj = (struct SceneVec *)((u8 *)proj + 60);
+        dy = o[1] - proj->y;
+        near = inBox(v, proj, o, actor, dy);
         if (!near)
             continue;
         pos = *p->position;
@@ -319,7 +330,7 @@ void sub_080070D0(struct TriggerManager *manager, struct Trigger *p)
         if (!(gUnk_030053F4 & 2048) && !sub_0822D490(p->id, p->kind)) {
             if (p->armed && !p->cooldown) {
                 if (p->id <= 5) {
-                    sub_08017044(p->id, p->kind, 1, i, &pos, &pos, 24, p);
+                    FloatingItemEffect_Spawn(p->id, p->kind, 1, i, &pos, &pos, 24, p);
                     Sound_PlaySongChecked(272);
                 }
                 p->cooldown = 36;
@@ -327,30 +338,27 @@ void sub_080070D0(struct TriggerManager *manager, struct Trigger *p)
                 p->baseX = p->position->x;
                 p->baseZ = p->position->z;
             }
-            armed = 0;
-            continue;
+        } else {
+            p->actor = i;
+            if (p->id <= 5)
+                FloatingItemEffect_Spawn(p->id, p->kind, 0, i, &pos, &pos, 24, p);
+            if (!(gUnk_030053F4 & 2048))
+                Sound_PlaySongChecked(272);
+            {
+                s32 event;
+                if (gUnk_030053F4 & 2048)
+                    event = 1;
+                else
+                    event = sub_0822D490(p->id, p->kind) == 1;
+                Trigger_RunScript(p, *(u16 *)&p->script, event);
+            }
+            p->flags |= 1;
+            break;
         }
-        p->actor = i;
-        if (p->id <= 5)
-            sub_08017044(p->id, p->kind, 0, i, &pos, &pos, 24, p);
-        if (!(gUnk_030053F4 & 2048))
-            Sound_PlaySongChecked(272);
-        {
-            s32 event;
-            if (gUnk_030053F4 & 2048)
-                event = 1;
-            else
-                event = sub_0822D490(p->id, p->kind) == 1;
-            Trigger_RunScript(p, *(u16 *)&p->script, event);
-        }
-        p->flags |= 1;
-        break;
+        armed = 0;
     }
     p->armed = armed;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080070D0);
-#endif
 
 s32 Trigger_TryOpenNearby(struct TriggerOpener *actor)
 {
@@ -409,7 +417,7 @@ void Trigger_UpdateFalling(struct TriggerManager *manager, struct Trigger *p)
         if (step > 32)
             step = 32;
         position->y -= step;
-        sub_080070D0(manager, p);
+        Trigger_UpdateProximity(manager, p);
         p->timer++;
     } else {
         p->position->y = height + 1;
@@ -433,7 +441,7 @@ void Trigger_UpdateLanding(struct TriggerManager *manager, struct Trigger *p)
         return;
     }
     Trigger_UpdateShake(p);
-    sub_080070D0(manager, p);
+    Trigger_UpdateProximity(manager, p);
     p->timer++;
 }
 
@@ -519,7 +527,7 @@ void Trigger_UpdateGrounded(struct TriggerManager *manager, struct Trigger *p)
                 p->timer = 900;
         }
         Trigger_UpdateShake(p);
-        sub_080070D0(manager, p);
+        Trigger_UpdateProximity(manager, p);
         p->timer++;
     }
 }
@@ -529,7 +537,7 @@ void Trigger_UpdateDropTimer(struct TriggerManager *a, struct Trigger *b)
     if (Sprite_BlinkUntilExpired(b->sprite, b->timer, 0x2d, 0x5a))
         b->flags |= 1;
     else
-        sub_080070D0(a, b);
+        Trigger_UpdateProximity(a, b);
     b->timer++;
 }
 
@@ -667,11 +675,11 @@ void Trigger_UpdateOpeningAnimation(struct TriggerManager *manager, struct Trigg
         raised.y += 128;
         if (!(gUnk_030053F4 & 2048) && sub_0822D490(p->id, p->kind) == 0) {
             if (p->id <= 5)
-                sub_08017044(p->id, p->kind, 1, p->actor, &raised, &raised, 24, p);
+                FloatingItemEffect_Spawn(p->id, p->kind, 1, p->actor, &raised, &raised, 24, p);
             p->update = Trigger_UpdateLockedPause;
         } else {
             if (p->id <= 5)
-                sub_08017044(p->id, p->kind, 0, p->actor, &raised, &raised, 24, p);
+                FloatingItemEffect_Spawn(p->id, p->kind, 0, p->actor, &raised, &raised, 24, p);
             p->update = Trigger_UpdateActivation;
         }
         p->timer = 0;

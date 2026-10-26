@@ -16,7 +16,7 @@ s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
 u8 InventorySlot_PickRandom(void *, void *, void *);
 void Inventory_ClearItemSlot(s32);
-s32 sub_08017044(s32, s32, s32, s32, void *, void *, s32, void *);
+s32 FloatingItemEffect_Spawn(s32, s32, s32, s32, void *, void *, s32, void *);
 static inline u8 F6ECTest(u32 value, u32 mask)
 {
     if (value & mask)
@@ -53,7 +53,7 @@ void sub_080DF6EC(s32 unused, u8 *b, struct SceneActorRegistryResetView *a)
     pos.y += 200;
     if (!InventorySlot_PickRandom(context + 0x6A0, context + 0x6A2, context + 0x6A4))
         return;
-    if (sub_08017044(0, *(s16 *)(context + 0x6A2), 3, 0, &pos, &a->position, 0x18, a) < 0) {
+    if (FloatingItemEffect_Spawn(0, *(s16 *)(context + 0x6A2), 3, 0, &pos, &a->position, 0x18, a) < 0) {
         *(u16 *)(context + 0x6A0) |= mask;
         return;
     }

@@ -120,7 +120,7 @@ u32 TriggerManager_InsertTrigger(struct Trigger *);
 u32 TriggerManager_RemoveTrigger(struct Trigger *);
 u32 Trigger_Destroy(struct Trigger *);
 void Trigger_UpdateShake(struct Trigger *);
-void sub_080070D0(struct TriggerManager *, struct Trigger *);
+s32 Trigger_UpdateProximity(struct TriggerManager *, struct Trigger *);
 s32 Trigger_TryOpenNearby(struct TriggerOpener *);
 void Trigger_UpdateFalling(struct TriggerManager *, struct Trigger *);
 void Trigger_UpdateLanding(struct TriggerManager *, struct Trigger *);
