@@ -48,8 +48,6 @@ static inline void FloatingEffect_ProjectVec(struct Vec *out, struct Vec *v)
     out->y = out->y - gUnk_03005418.y + 80;
     out->z = out->z - gUnk_03005418.z;
 }
-#ifdef NONMATCHING
-// fuzzy: 97.3%
 // scope shape 6 (differences once low registers are set aside)
 // scope shape 54 (differences once low registers are set aside)
 void FloatingItemEffect_UpdateFlight(u8 *m, struct Effect *p, int index)
@@ -69,9 +67,11 @@ void FloatingItemEffect_UpdateFlight(u8 *m, struct Effect *p, int index)
     }
     t = p->timer;
     inv = 16 - t;
-    if (p->mode == 0)
-        FloatingEffect_ProjectVec(&to, (struct Vec *)(gUnknown_02000580[p->index] + 0x30));
-    else
+    if (p->mode == 0) {
+        u32 targetIndex = p->index;
+        u8 *target = gUnknown_02000580[targetIndex];
+        FloatingEffect_ProjectVec(&to, (struct Vec *)(target + 0x30));
+    } else
         FloatingEffect_ProjectVec(&to, p->target);
     FloatingEffect_ProjectVec(&from, &p->position);
     to.y -= 4;
@@ -82,8 +82,8 @@ void FloatingItemEffect_UpdateFlight(u8 *m, struct Effect *p, int index)
         *scale -= 2;
     s->scaleY = *scale;
     s->angle += 8;
-    s->position.x -= 8;
-    s->position.x += (64 - *scale) >> 3;
+    xl = (u16)s->position.x - 8;
+    s->position.x = xl + ((64 - *scale) >> 3);
     s->position.y -= 8;
     if (p->timer > 15) {
         if (p->pad6 == 0) {
@@ -101,6 +101,3 @@ void FloatingItemEffect_UpdateFlight(u8 *m, struct Effect *p, int index)
     } else
         p->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", FloatingItemEffect_UpdateFlight);
-#endif
