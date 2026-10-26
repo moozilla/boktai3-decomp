@@ -1,44 +1,40 @@
 #include "global.h"
+#include "player.h"
 
-#ifdef NONMATCHING
-// fuzzy: 95.7%
-// fix.py best version (reprinted C)
 s32 Div(s32, s32);
 
-static inline u32 FullState(u8 *p)
+static inline u32 MaskFlags(u32 *flags, u32 mask)
 {
-    if (!p)
-        return 0;
-    if ((*((u16 *)(p + 0x538))) != 0) {
-        if ((*((u16 *)(p + 0x534))) == 1)
-            goto ret1;
+    return *flags & mask;
+}
+static inline u8 HasFixedDelayFlag(struct Player *p)
+{
+    u8 result;
+    if (p) {
+        u32 flags = MaskFlags(&p->actionFlags, 0x40);
+        result = 1;
+        if (flags)
+            goto done;
     }
-    return 0;
-ret1:
-    return 1;
+    result = 0;
+done:
+    return result;
 }
-
-static inline u32 FullFlag(u8 *p)
+static inline s32 IsFixedDelay(struct Player *p)
 {
-    u32 *field;
-    u32 bits;
     if (!p)
         return 0;
-    field = (u32 *)(p + 0x448);
-    bits = 0x40;
-    if (*field & bits)
+    if (p->active && p->sceneMode == 1)
         return 1;
-    return 0;
+    return HasFixedDelayFlag(p);
 }
-// Remaining differences: boolean materialization belongs to the flag predicate rather than the state predicate.
 
 // confidence=low: flags and active modifiers choose and shorten the linked action delay.
 #define Player_ComputeLinkedActionDelay sub_0823C424
-s32 Player_ComputeLinkedActionDelay(u8 *p)
+s32 Player_ComputeLinkedActionDelay(struct Player *p)
 {
     s32 n;
-    s32 t;
-    if (FullState(p) || FullFlag(p))
+    if (IsFixedDelay(p))
         goto full;
     n = Div(0, 100);
     if (n > 16) {
@@ -48,17 +44,14 @@ s32 Player_ComputeLinkedActionDelay(u8 *p)
     } else if (n <= 8) {
         n = 9;
     }
-    if ((p[0x5B9] == 2) && (p[0x5BB] != 0)) {
+    if ((p->movementModifierKind == 2) && (p->movementModifierActive != 0)) {
         n -= 4;
     }
-    if (p[0x4F6] != 0) {
-        n -= p[0x4F6];
+    if (p->movementSpeedReduction != 0) {
+        n -= p->movementSpeedReduction;
     }
     if (n <= 1) {
         return 2;
     }
     return n;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0823C424);
-#endif
