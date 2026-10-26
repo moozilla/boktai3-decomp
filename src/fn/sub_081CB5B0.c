@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 void Palette_InterpolateBanks(void *dest, void *a, void *b, u32 amount, u32 count);
@@ -8,7 +9,6 @@ s32 PlayerParticleCloud_RequestStop(void);
 void Sound_PlaySong(u32 song);
 void sub_081D3620(void);
 void Actor_OnHiddenIdleUpdate(void);
-extern u8 *gUnk_030042E4;
 
 void sub_081CB5B0(u32 a, u8 *b, s32 c)
 {
@@ -16,7 +16,7 @@ void sub_081CB5B0(u32 a, u8 *b, s32 c)
         u32 zero = 0;
         b[9] = zero;
         b[7] = zero;
-        CpuSet(gUnk_030042E4 + 0x680, b + 0x1CC, 0x04000008);
+        CpuSet(gPaletteBankData + 0x680, b + 0x1CC, 0x04000008);
         Actor_PlayAnimationEntry(b, 0, 2, 1, 4);
         b[0x18] = zero;
         *(u32 *)(b + 0x10) = zero;
@@ -25,8 +25,8 @@ void sub_081CB5B0(u32 a, u8 *b, s32 c)
         case 0: {
             u32 t = *(u32 *)(b + 0x10);
             if (t <= 0x80) {
-                void *bank1 = gUnk_030042E4 + 0x680;
-                void *bank2 = gUnk_030042E4 + 0x2E80;
+                void *bank1 = gPaletteBankData + 0x680;
+                void *bank2 = gPaletteBankData + 0x2E80;
                 void *dest = b + 0x1CC;
                 Palette_InterpolateBanks(dest, bank1, bank2, t, 7);
             } else {
@@ -49,7 +49,7 @@ void sub_081CB5B0(u32 a, u8 *b, s32 c)
                 *(u16 *)(b + 0xE) = m;
             }
             if (c > 0x12C) {
-                CpuSet(gUnk_030042E4 + 0x680, b + 0x1CC, 0x04000008);
+                CpuSet(gPaletteBankData + 0x680, b + 0x1CC, 0x04000008);
                 PlayerParticleCloud_RequestStop();
                 b[7] = 1;
                 {

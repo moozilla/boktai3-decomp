@@ -249,3 +249,14 @@ descriptor in four functions, the floor switch's `T=` sprites `17C7`-`17CB`
 (a table), and `-t` values the GCL computes for `08055268`. Backlogged in
 favor of Studio and tooling work; the scenarios would also give runtime
 coverage of boss code for the decomp if picked up.
+
+## Data tracking on decomp.dev: ROM data and Studio structures (backlogged October 26, 2026)
+
+decomp.dev shows objdiff's data measures. Since October 26 they count RAM
+objects (`symbols/ram.csv`, [RAM.md](RAM.md)). ROM data is not counted: the
+tables, scripts, graphics and maps the Studio already decodes (`tools/studio/`,
+[ASSETS.md](ASSETS.md), `symbols/data.csv`). A ROM-data measure would need an
+inventory of `gen/data.s` ranges with a status per range: raw bytes, a
+structure with a decoder, or C/asset source that rebuilds identically. Then add
+those bytes to `total_data`/`matched_data` next to RAM, or report them as a
+separate category. Backlogged with the RAM accounting landed.

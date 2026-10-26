@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_020004BC;
+#include "ram.h"
 
 void ActorMarkerPool_ResetSingleton(void)
 {
-    gUnk_020004BC = 0;
+    gPanelSpritePool = 0;
 }

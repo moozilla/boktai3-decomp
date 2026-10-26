@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: creates weather particles with two terrain-adjusted endpoints.
 #define Weather_SpawnTerrainParticles sub_080177AC
@@ -30,8 +31,6 @@ struct Map {
     u16 rows[1];
 };
 extern struct Camera *gUnk_02000580;
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC, gUnk_03005308;
 #define RANDOM_TABLE ((u16 *)0x0203B400)
 u32 Weather_TestFlags(u32, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
@@ -40,8 +39,8 @@ void Effect_LinkToList(void *, u32);
 s32 Mod(s32, s32);
 static inline u32 Random(void)
 {
-    u32 n = (gUnk_03005308 + 1) & 0x3ff;
-    gUnk_03005308 = n;
+    u32 n = (gRandomIndex + 1) & 0x3ff;
+    gRandomIndex = n;
     return RANDOM_TABLE[n];
 }
 static inline s32 GroundHeight(struct Vec *position, s16 x, s16 z)
@@ -50,15 +49,15 @@ static inline s32 GroundHeight(struct Vec *position, s16 x, s16 z)
     u32 cell;
     u8 *tile;
     s32 slope, height;
-    if (col < 0 || row < 0 || (u32)col >= gUnk_030052F8 || (u32)row >= gUnk_030052FC)
+    if (col < 0 || row < 0 || (u32)col >= gTerrainWidth || (u32)row >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[row] + col;
+        cell = gTerrainMap->rows[row] + col;
     tile = TerrainModifiers_FindCellOverride(cell, 1);
     if (tile)
         tile += 4;
     else
-        tile = gUnk_030052F4->cells + 12 + cell * 4;
+        tile = gTerrainMap->cells + 12 + cell * 4;
     slope = tile[0] >> 4;
     height = (tile[0] & 15) << 8;
     switch (slope) {
@@ -73,8 +72,8 @@ static inline s32 GroundHeight(struct Vec *position, s16 x, s16 z)
 }
 static inline u32 RandomAt(u16 *table)
 {
-    u32 n = (gUnk_03005308 + 1) & 0x3ff;
-    gUnk_03005308 = n;
+    u32 n = (gRandomIndex + 1) & 0x3ff;
+    gRandomIndex = n;
     return table[n];
 }
 static inline void SetPoint(struct Part *out, struct Part *sample, struct Camera *camera, u32 index)

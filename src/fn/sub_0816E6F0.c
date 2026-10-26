@@ -5,7 +5,7 @@
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
@@ -23,7 +23,7 @@ static inline s32 Shift12(s32 value)
 static inline void RandomSpin(s16 *spin)
 {
     u16 *table = gUnk_0203B400;
-    u32 *index = &gUnk_03005308;
+    u32 *index = &gRandomIndex;
     u32 mask;
     u32 i;
     s32 v;
@@ -43,7 +43,7 @@ static inline void RandomSpin(s16 *spin)
 inline static void RandomSpin_0816E6F0(s16 *spin)
 {
     u16 *table = gUnk_0203B400;
-    u32 *index = &gUnk_03005308;
+    u32 *index = &gRandomIndex;
     u32 mask;
     u32 i;
     s32 v;

@@ -11,7 +11,7 @@ void BackgroundFlash_UpdateScrolling(struct BackgroundFlashController *controlle
         register u32 index asm("r0");
         u32 mask;
         u32 sample;
-        index = gUnk_03005308 + 1;
+        index = gRandomIndex + 1;
         mask = 1023;
         index &= mask;
         sample = table[index];
@@ -19,7 +19,7 @@ void BackgroundFlash_UpdateScrolling(struct BackgroundFlashController *controlle
         sample += 128;
         controller->retargetTimer = sample;
         index = (index + 1) & mask;
-        gUnk_03005308 = index;
+        gRandomIndex = index;
         index = table[index];
         index &= 7;
         index -= 1;

@@ -1,4 +1,4 @@
-#define gEffectRandomIndex  gUnk_03005308
+#define gEffectRandomIndex  gRandomIndex
 #define gEffectRandomValues gUnk_0203B400
 // Orange spine family and descriptive names are tentative (low confidence).
 #include "global.h"
@@ -13,7 +13,7 @@ struct OrangeSpine {
     u8 unk48[0x14a - 0x48];
     s16 defeatDelay;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);

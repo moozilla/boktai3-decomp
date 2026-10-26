@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 // confidence=low: projects a cosine-scaled speed opposite the actor side.
 #define Hresvelgr_SetCosineScaledVelocity sub_0819C8F8
@@ -20,7 +21,6 @@ struct BurstActor {
 };
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 void MotionEntry_CreateWithDelta(void *, void *, s32, s32);
 static inline s32 scale(s32 n)
 {

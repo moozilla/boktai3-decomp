@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: applies camera, collision, palette and shake presentation effects.
@@ -71,9 +72,8 @@ struct VanargandPresentation {
     s32 debugValue;
 };
 extern u16 gUnk_03005260[];
-extern u8 *gUnk_030042E4;
 extern u16 gUnk_03004FC0[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 void SceneActors_UpdateEffects(void *);
 void Camera_BlendOffset(void *, void *, s32);
@@ -113,8 +113,8 @@ static inline s32 Blend(s32 t, s32 first, s32 last, s32 duration)
 }
 static inline s32 RandomValue(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(u16 *)((gUnk_03005308 << 1) + RANDOM_TABLE_ADDR);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR);
 }
 static inline u32 TestActorFlag(u32 mask, struct VanargandPresentation *self)
 {
@@ -245,7 +245,7 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
                     s32 g;
                     s32 b;
                     s32 t;
-                    CpuSet(gUnk_030042E4 + 0xDE0, p->palette, 0x4000020);
+                    CpuSet(gPaletteBankData + 0xDE0, p->palette, 0x4000020);
                     CpuSet(p->fadeA, gUnk_03004FC0, 0x4000068);
                     t = p->transition;
                     r = Blend(t, 7, 19, 3);
@@ -269,17 +269,17 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
                 }
 
                 case 0x82:
-                    CpuSet(gUnk_030042E4 + 0x1040, p->palette, 0x4000020);
+                    CpuSet(gPaletteBankData + 0x1040, p->palette, 0x4000020);
                     CpuSet(p->fadeB, gUnk_03004FC0, 0x4000068);
                     break;
 
                 case 0x7F:
-                    CpuSet(gUnk_030042E4 + 0xFE0, p->palette, 0x4000018);
+                    CpuSet(gPaletteBankData + 0xFE0, p->palette, 0x4000018);
                     CpuSet(p->fadeC, gUnk_03004FC0, 0x4000068);
                     break;
 
                 default:
-                    CpuSet(gUnk_030042E4 + 0x3240, p->palette, 0x4000008);
+                    CpuSet(gPaletteBankData + 0x3240, p->palette, 0x4000008);
                     break;
             }
 

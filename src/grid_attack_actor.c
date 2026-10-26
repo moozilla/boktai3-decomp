@@ -171,8 +171,8 @@ void GridAttackActor_SpawnGridContact(struct GridAttackActor *p, int x, int z)
 
 static inline int GridAttack_RandomColumn(u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return sub_08249350(table[gUnk_03005308], 3);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return sub_08249350(table[gRandomIndex], 3);
 }
 
 void GridAttackActor_SpawnGridPattern(struct GridAttackActor *p)
@@ -233,7 +233,7 @@ static inline void GridAttack_ClearPoint(const void *source, struct GridAttackPo
 static inline u32 GridAttack_RandomValue(void)
 {
     const u16 *table = gUnk_0203B400;
-    u32 *index = &gUnk_03005308;
+    u32 *index = &gRandomIndex;
     *index = (*index + 1) & 1023;
     return table[*index];
 }
@@ -320,9 +320,9 @@ void GridAttackActor_ResetAttackAnimationHistory(struct GridAttackActor *p)
 int GridAttackActor_SelectAttackAnimation(struct GridAttackActor *p)
 {
     int start, i, index;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
     {
-        u32 offset = gUnk_03005308 * 2;
+        u32 offset = gRandomIndex * 2;
         {
             int value = *(u16 *)((u8 *)gUnk_0203B400 + offset);
             value &= 3;
@@ -363,7 +363,7 @@ void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p)
         size.x = 164;
         size.y = 16;
         size.z = 164;
-        indexPtr = &gUnk_03005308;
+        indexPtr = &gRandomIndex;
         mask = 1023;
         smallMask = 3;
         table = gUnk_0203B400;
@@ -568,7 +568,7 @@ void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
     p->counter++;
 }
 
-extern u32 gUnk_03005304;
+extern u32 gEffectRandomTableIndex;
 
 extern u16 gUnk_086141BC[];
 
@@ -582,9 +582,9 @@ void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
         GridAttack_SetFacingPinned(p, p->requestedAngle);
         GridAttackActor_ResetAttackAnimationHistory(p);
         GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
-        gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+        gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
         {
-            int random = gUnk_086141BC[gUnk_03005304];
+            int random = gUnk_086141BC[gEffectRandomTableIndex];
             if (random <= 32767)
                 Sound_PlaySongChecked(1356);
         }
@@ -976,9 +976,9 @@ int GridAttack_ApplyPendingDamage(struct GridAttackActor *p)
             return 1;
         }
         p->shake = 3;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 index = gUnk_03005308 * 2;
+            u32 index = gRandomIndex * 2;
             u32 value;
             value = *(u16 *)((u8 *)((u16 *)RANDOM_TABLE_ADDR) + index);
             p->shakeAngle = value;
@@ -1784,8 +1784,8 @@ void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *input)
     }
     if (p->reactionCooldown) {
         u32 angle;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-        angle = gUnk_0203B400[gUnk_03005308];
+        gRandomIndex = (gRandomIndex + 1) & 1023;
+        angle = gUnk_0203B400[gRandomIndex];
         *((s16 *)(((u8 *)p) + 0x8A4)) +=
             GridAttack_Truncate12(gUnk_086149C4[(angle + 64) & 255] * (p->reactionCooldown << 2));
         *((s16 *)(((u8 *)p) + 0x8A8)) +=
@@ -1893,31 +1893,31 @@ void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
                 if (base->effectVariant >= (1 << base->effectDuration))
                     break;
                 base->effectVariant++;
-                Palette_InterpolateBanks(palette, gUnk_030042E4,
-                                         gUnk_030042E4 + (base->effectId << 5), base->effectVariant,
-                                         base->effectDuration);
+                Palette_InterpolateBanks(palette, gPaletteBankData,
+                                         gPaletteBankData + (base->effectId << 5),
+                                         base->effectVariant, base->effectDuration);
                 base->animData.palette = palette;
                 break;
 
             case 2:
                 if (base->effectVariant > 0) {
                     base->effectVariant--;
-                    Palette_InterpolateBanks(palette, gUnk_030042E4,
-                                             gUnk_030042E4 + (base->effectId << 5),
+                    Palette_InterpolateBanks(palette, gPaletteBankData,
+                                             gPaletteBankData + (base->effectId << 5),
                                              base->effectVariant, base->effectDuration);
                 } else {
                     base->effectVariant = 0;
                     base->effectMode = 0;
                     base->effectId = 1;
-                    CpuSet(gUnk_030042E4 + 0x2BA0, palette, 0x04000008);
+                    CpuSet(gPaletteBankData + 0x2BA0, palette, 0x04000008);
                 }
                 base->animData.palette = palette;
                 break;
 
             case 3:
-                Palette_InterpolateBanks(palette, gUnk_030042E4,
-                                         gUnk_030042E4 + (base->effectId << 5), base->effectVariant,
-                                         base->effectDuration);
+                Palette_InterpolateBanks(palette, gPaletteBankData,
+                                         gPaletteBankData + (base->effectId << 5),
+                                         base->effectVariant, base->effectDuration);
                 base->animData.palette = palette;
                 if (!base->effectDirection) {
                     if ((++base->effectVariant) > 31) {
@@ -2042,9 +2042,9 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
         pk.z = Script_GetValue();
         facing = ((Script_GetValue() & 7) << 5) + 0xA0;
     } else {
-        pk.x = *(u16 *)((u8 *)gUnk_02000710 + 0x30);
-        pk.y = *(u16 *)((u8 *)gUnk_02000710 + 0x32);
-        pk.z = *(u16 *)((u8 *)gUnk_02000710 + 0x34);
+        pk.x = *(u16 *)((u8 *)gGameState + 0x30);
+        pk.y = *(u16 *)((u8 *)gGameState + 0x32);
+        pk.z = *(u16 *)((u8 *)gGameState + 0x34);
         facing = 0x40;
     }
 
@@ -2177,13 +2177,13 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
 
     p->contactReward = Script_GetKeywordValue(0x53, 0);
 
-    base = gUnk_030042E4;
+    base = gPaletteBankData;
     for (i = 0; i < 16; i++)
         CpuSet(base + 0x2BA0 + i * 0x20, p->palette + i * 0x20, 0x04000008);
-    base = gUnk_030042E4;
+    base = gPaletteBankData;
     for (i = 0; i < 16; i++)
         CpuSet(base + 0x3240, p->normalDamageGraphics + i * 0x20, 0x04000008);
-    base = gUnk_030042E4;
+    base = gPaletteBankData;
     for (i = 0; i < 16; i++)
         CpuSet(base + 0x3240, p->specialDamageGraphics + i * 0x20, 0x04000008);
 

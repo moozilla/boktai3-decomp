@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 // confidence=low: stores a randomized elevated travel point in the actor.
 #define Hresvelgr_SetRandomTravelTarget sub_0819C6AC
@@ -19,7 +20,6 @@ struct BurstActor {
 };
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 void MotionEntry_CreateWithDelta(void *, void *, s32, s32);
 static inline s32 scale(s32 n)
 {
@@ -40,8 +40,8 @@ static inline void add(struct BurstVector *d, struct BurstVector *a, struct Burs
 static inline s32 randomValue(u32 table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(u16 *)(offset + table);
 }
 // One variable holds the table address and later the angle (the ROM keeps both in r4): set twice,

@@ -1,6 +1,3 @@
-#define gTerrainMap    gUnk_030052F4
-#define gTerrainWidth  gUnk_030052F8
-#define gTerrainHeight gUnk_030052FC
 #include "global.h"
 #include "player.h"
 #include "engine.h"
@@ -8,9 +5,9 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
 static inline s32 cellIndex(s32 x, s32 z)
 {
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u8 *cellProperties(s32 cell)
 {
@@ -18,7 +15,7 @@ static inline u8 *cellProperties(s32 cell)
     if (properties)
         properties += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         properties = map->cells + offset;
     }

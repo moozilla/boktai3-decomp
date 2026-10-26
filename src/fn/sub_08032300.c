@@ -1,14 +1,14 @@
 #include "global.h"
+#include "game_state.h"
 struct Game {
     u8 pad0[0x5A8];
     s16 form;
     u8 pad5aa[0x2BE];
     u32 flags;
 };
-extern struct Game *gUnk_02000710;
 int TextState_GetPairSpeakerLabel(void)
 {
-    int v = gUnk_02000710->form;
+    int v = gGameState->form;
     int result;
     if (v == 1) {
         goto fallback;

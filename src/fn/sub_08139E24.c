@@ -1,7 +1,8 @@
 #define SpritePool_Create           ParticleBurstEffect_EnsureManager
 #define SpritePoolEntry_SetCallback ParticleBurstEffect_SetStateCallback
-#define gSpritePool                 gUnk_020004D0
+#define gSpritePool                 gSceneProcParticles
 #include "global.h"
+#include "ram.h"
 struct SpritePoolVector {
     u32 v[4];
 };
@@ -30,7 +31,6 @@ struct SpritePool {
 struct SpritePoolParams {
     u16 unk0, duration, unk4, value;
 };
-extern struct SpritePool *gUnk_020004D0;
 struct SpritePool *ParticleBurstEffect_EnsureManager(void);
 u8 SceneProcParticles_TestCapacity(struct SpritePool *, u32, u32);
 void SceneProcParticles_SubmitBounds(struct SpritePoolEntry *, void (*)(void), u32, u32);
@@ -54,12 +54,12 @@ s32 SpritePool_StartEntry(struct SpritePoolVector *position, void *owner, u32 un
     struct SpritePool *pool;
     s32 i;
     u32 key;
-    if (!gUnk_020004D0) {
+    if (!gSceneProcParticles) {
         pool = ParticleBurstEffect_EnsureManager();
         if (!pool)
             return -1;
     } else
-        pool = gUnk_020004D0;
+        pool = gSceneProcParticles;
     key = pool->counter;
     key = SpritePool_MakeKey(key, id);
     if (SceneProcParticles_TestCapacity(pool, key, 1))

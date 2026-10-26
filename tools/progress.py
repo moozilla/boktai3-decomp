@@ -374,6 +374,27 @@ def measures(total_b, done_b, count, done_count, *, units=None, complete_units=N
     }
 
 
+def data_measures():
+    """RAM objects from symbols/ram.csv (docs/RAM.md): total = inventoried
+    bytes, matched = declared once in a shared header, complete = no file
+    declares them any other way. No ROM needed."""
+    import ramlayout
+    m = ramlayout.measures()
+    total = m["total_data"]
+    pct = lambda v: 100 * v / total if total else 0.0
+    return {"total_data": str(total), "matched_data": str(m["matched_data"]),
+            "matched_data_percent": pct(m["matched_data"]), "complete_data": str(m["complete_data"]),
+            "complete_data_percent": pct(m["complete_data"])}
+
+
+def ram_lines(m):
+    if not int(m.get("total_data", 0)):
+        return []
+    return [f"RAM objects with one shared declaration (`symbols/ram.csv`, reported as data): "
+            f"**{m['matched_data_percent']:.1f}%** ({int(m['matched_data']):,} / {int(m['total_data']):,} bytes); "
+            f"no other declaration left: {m['complete_data_percent']:.1f}%.", ""]
+
+
 def collect_fuzzy(funcs, source_root):
     """{name: fuzzy percent} for NONMATCHING drafts (recorded by check.py
     --nonmatching --record; unrecorded drafts count as 0)."""
@@ -525,6 +546,10 @@ def main():
         subsystems = load_groups(funcs, sizes, SUBSYSTEMS, "game")
         report = make_report(funcs, sizes, done, libraries, pinned, subsystems, fuzzy, load_areas(),
                              load_asm_ranges(), categories)
+        report["measures"].update(data_measures())
+        m = report["measures"]
+        print(f"RAM data: {m['matched_data']}/{m['total_data']} bytes in a shared header "
+              f"({m['matched_data_percent']:.2f}%), {m['complete_data']} complete")
     if args.markdown:
         write_markdown(args.markdown, counted, sizes, done, total_b, done_b, pinned_b, fuzzy, report, categories,
                        asm_b=sum(sizes[n] for n in asm))
@@ -695,6 +720,7 @@ def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=N
              f"Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **{len(fuzzy)} functions**, "
              f"{100 * draft_b / total_b:.3f}% of code, mean fuzzy match {mean:.1f}%.", "",
              f"Intentional assembly (GBA header, crt0, SDK assembly; not counted above): {asm_b:,} bytes.", "",
+             *ram_lines(report["measures"]),
              "```", f"{bar(done_b / total_b, 50)} {100 * done_b / total_b:.2f}%", "```", "",
              "| Region | Functions | Matched | Bytes matched | |", "|---|---:|---:|---:|---|"]
     for lo, hi in regions:

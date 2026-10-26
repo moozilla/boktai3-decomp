@@ -23,7 +23,7 @@ struct ArmorSelection {
     u8 pad1121[0x1];
     s16 f1122;
 };
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 void ActorController_SetBehavior(void *, s32), ActorController_SetBehaviorIfFinished(void *, s32);
 u32 Armor_IsNearSavedPosition(void *);
 void Armor_SaveCurrentPosition(void *);
@@ -41,10 +41,10 @@ void Armor_SelectAlignedAttack(struct ArmorSelection *p)
         p->f1122--;
     if (((p->fb3d != 255) && (p->fb3c != 2)) && (p->fb3c != 19))
         return;
-    x = (*((s16 *)(gUnk_02000710 + 0x30))) - p->f48;
-    playerY = *((s16 *)(gUnk_02000710 + 0x32));
+    x = (*((s16 *)(gGameState + 0x30))) - p->f48;
+    playerY = *((s16 *)(gGameState + 0x32));
     actorY = p->f4a;
-    z = (*((s16 *)(gUnk_02000710 + 0x34))) - p->f4c;
+    z = (*((s16 *)(gGameState + 0x34))) - p->f4c;
     x = (x + 128) >> 8;
     z = (z + 128) >> 8;
     ax = x;

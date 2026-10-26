@@ -18,7 +18,7 @@ static inline u8 Test(u32 value, u32 mask)
 }
 static inline u16 *CounterAddress(u32 inputOffset)
 {
-    u8 *base = (void *)gUnk_02000710;
+    u8 *base = (void *)gGameState;
     u32 offset = inputOffset;
     return (void *)(base + offset);
 }
@@ -146,7 +146,7 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
     }
     actor = early;
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0, actor->category);
-    if (Test(gUnk_030053F4, 0x4800))
+    if (Test(gEngineFlags, 0x4800))
         return;
     {
         u32 mask = 0x8000;

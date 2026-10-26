@@ -7,7 +7,7 @@ static inline u8 *Properties(s32 index)
     if (p)
         return p + 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = index * 4 + 12;
         return map->cells + offset;
     }
@@ -36,7 +36,7 @@ s32 SceneGrid_ScanTerrainDirection(s32 start, s32 angle)
         if (properties)
             properties += 4;
         else {
-            struct EngineMap *map = gUnk_030052F4;
+            struct EngineMap *map = gTerrainMap;
             u32 offset = savedStart * 4 + 12;
             properties = map->cells + offset;
         }
@@ -56,7 +56,7 @@ s32 SceneGrid_ScanTerrainDirection(s32 start, s32 angle)
     best = 0;
     switch (direction) {
         case 0: {
-            struct EngineMap **location = &gUnk_030052F4;
+            struct EngineMap **location = &gTerrainMap;
             u32 offset;
             {
                 u32 initial = savedStart * 4;
@@ -119,7 +119,7 @@ s32 SceneGrid_ScanTerrainDirection(s32 start, s32 angle)
                 cell = cell + SceneGrid_Width();
             }
         case 2: {
-            struct EngineMap **location = &gUnk_030052F4;
+            struct EngineMap **location = &gTerrainMap;
             u32 offset;
             {
                 u32 initial = cell * 4;

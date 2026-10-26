@@ -1,7 +1,6 @@
-#define gEngineFlags gUnk_030053F4
 #include "global.h"
 #include "scene_actor_reset.h"
-extern u32 gUnk_030053F4;
+#include "engine.h"
 struct ActorRevealState {
     u8 unknown0[0x5BB];
     u8 revealTicks;
@@ -35,7 +34,7 @@ void ActorVisibility_TickRevealDelay(struct SceneActorRegistryResetView *a)
     struct ActorRevealState *s = a->context;
     if (Unavailable(a))
         return;
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
     }
     if (s->revealTicks) {
         *(u32 *)a->drawable &= ~1;

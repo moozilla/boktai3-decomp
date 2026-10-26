@@ -1,6 +1,6 @@
 #include "global.h"
 extern int gUnk_02000080, gUnk_02000084;
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
@@ -18,9 +18,9 @@ int Weather_ConfigureCooldown(void)
     if (result)
         result = Script_GetValue();
     else if (gUnk_02000084 > 0) {
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 offset = gUnk_03005308 * 2;
+            u32 offset = gRandomIndex * 2;
             result = Mod(*(u16 *)((u8 *)gUnk_0203B400 + offset), gUnk_02000084);
         }
     }

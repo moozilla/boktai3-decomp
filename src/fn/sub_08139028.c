@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "contact_swarm.h"
+#include "ram.h"
 struct BallisticSpriteVector {
     s32 x, y, z, w;
 };
@@ -22,7 +23,6 @@ struct BallisticSpriteEffect {
 };
 extern struct BallisticSpriteCamera *gUnk_020004B8;
 extern const s16 gUnk_086149C4[];
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 void Sound_PlaySong(u32);
 void SoundDelay_Update(struct BallisticSpriteEffect *);
@@ -150,7 +150,7 @@ static inline u32 BallisticSpriteEffect_StepAnimation(struct ContactSwarmSprite 
 }
 static inline u32 RandomValue(void)
 {
-    return gUnk_086141BC[gUnk_03005304];
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 // Tentative: update the initial drift and particle trail of a ballistic sprite.
 void BallisticSpriteEffect_UpdateLaunch(struct BallisticSpriteEffect *p)
@@ -179,9 +179,9 @@ void BallisticSpriteEffect_UpdateLaunch(struct BallisticSpriteEffect *p)
         struct {
             u32 x : 16, y : 16, z : 16, pad : 16;
         } offset;
-        gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+        gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
         offset.x = (RandomValue() & 15) - 7;
-        gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+        gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
         offset.y = (RandomValue() & 15) - 7;
         NativeParticle_CreateWithFlag(&p->sprite.position, 0, &offset, 1, 1, 0, 0);
     }

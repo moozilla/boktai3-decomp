@@ -10,7 +10,7 @@ struct Orbit {
     u8 pad142[2];
     u16 dx, dy, dz;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
@@ -29,13 +29,13 @@ void Sword_BeginTargetOrbit(u8 *p)
         s32 rotation = 0xa0 - angle;
         p[0x188] = rotation;
     }
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
     {
         register s32 turn asm("r1");
         s32 choice;
         u32 one;
         {
-            u32 offset = gUnk_03005308 * 2;
+            u32 offset = gRandomIndex * 2;
             register const u16 *table asm("r3") = gUnk_0203B400;
             choice = *(const u16 *)(offset + (u32)table);
         }

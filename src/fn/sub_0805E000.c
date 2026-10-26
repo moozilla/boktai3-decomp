@@ -2,5 +2,5 @@
 void SceneHud_SetKeyframePaletteBank(struct SceneInputWidget *target, u32 bank)
 {
     target->paletteBank = bank;
-    target->palette = (u16 *)(gUnk_030042E4 + (target->paletteBank << 5));
+    target->palette = (u16 *)(gPaletteBankData + (target->paletteBank << 5));
 }

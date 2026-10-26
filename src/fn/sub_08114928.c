@@ -7,6 +7,7 @@
  * truncates, and the case-2 offset/constant temporaries swap r3/r4.
  * The u8/u16 form keeps the timer address from being shared with the first GroupId. */
 #include "actor_attachment_state.h"
+#include "ram.h"
 struct Vec {
     s32 x, y, z, w;
 };
@@ -42,7 +43,6 @@ struct Profile {
     u8 unknown, type;
     u16 lifetime, unknown4, damage, parameter, threshold;
 };
-extern struct Manager *gUnk_020004C8;
 struct Manager *NativeEffect_EnsureManager(void);
 u8 EffectPool_CheckCapacity(struct Manager *, s32, s32, s32);
 void NativeEffect_InitTypeZeroSprite(struct Effect *);
@@ -74,12 +74,12 @@ s32 NativeEffect_CreateFromProfile(struct Vec *position, s32 height, struct Vec 
 {
     struct Manager *m;
     s32 i;
-    if (!gUnk_020004C8) {
+    if (!gSceneCallbackPool) {
         m = NativeEffect_EnsureManager();
         if (!m)
             return -1;
     } else
-        m = gUnk_020004C8;
+        m = gSceneCallbackPool;
     if (EffectPool_CheckCapacity(m, GroupId(m, group), required, allowGroups))
         return -1;
     for (i = 0; i < 16; i++) {

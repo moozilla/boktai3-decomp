@@ -1,6 +1,6 @@
 #include "scene_actor_contact_list.h"
 #include "player.h"
-extern u16 gUnk_02000544;
+#include "ram.h"
 struct SceneActorBehaviorContactObject {
     u8 unknown0[12];
     struct ContactPosition position;
@@ -10,7 +10,7 @@ u8 SceneActorBehavior_IsNearParticipant(struct SceneActorRegistryActor *actor)
     struct ContactPackedVector difference;
     s32 index = 0;
     s32 last;
-    s32 limit = gUnk_02000544;
+    s32 limit = gPlayerCount;
     struct Player **cursor;
     struct Player *player;
     struct SceneActorContactNode *node;

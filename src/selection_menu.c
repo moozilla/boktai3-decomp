@@ -89,7 +89,7 @@ void *SelectionMenu_Create(void *a, void *b);
 
 u8 *SelectionMenu_GetIconPalette(s32 i)
 {
-    return gUnk_030042E4 + (i + 0x373) * 0x20;
+    return gPaletteBankData + (i + 0x373) * 0x20;
 }
 
 void Presentation_SetActorIconFrame(struct SelectionMenu *p, struct SceneInputWidget *q, u8 *r)
@@ -398,7 +398,7 @@ void SelectionMenu_PositionInventoryMarkers(struct SelectionMenu *p)
         struct SceneInputWidget *g = &p->markers[i];
         /* Byte-index the owner first to preserve the original address-add order. */
         if (i <= 7)
-            index = ((struct GameState *)((u8 *)gUnk_02000710 + i * 2))->inventory[0];
+            index = ((struct GameState *)((u8 *)gGameState + i * 2))->inventory[0];
         else
             index = -1;
         if (index >= 0) {
@@ -417,7 +417,7 @@ void SelectionMenu_PositionEquipmentMarkers(struct SelectionMenu *p)
         struct SceneInputWidget *g = &p->markers[i];
         /* Same address-order adaptation as the inventory marker loop. */
         if (i <= 3)
-            index = ((struct GameState *)((u8 *)gUnk_02000710 + i * 2))->party[0];
+            index = ((struct GameState *)((u8 *)gGameState + i * 2))->party[0];
         else
             index = -1;
         if (index >= 0) {
@@ -619,7 +619,7 @@ void SelectionMenu_DrawStatistics(struct SelectionMenu *p)
     int b;
     SceneHud_DrawClock(p->statisticsPage);
     SceneHud_DrawNumericStatus(p->statisticsPage);
-    value = gUnk_02000710->level;
+    value = gGameState->level;
     if (value > 99) {
         value = 99;
     } else if (value < 0) {
@@ -654,7 +654,7 @@ void SelectionMenu_ActorAvailability(struct SelectionMenu *p)
     s16 *slot;
     p->availableSlots = 0xffff;
     {
-        struct GameState *base = gUnk_02000710;
+        struct GameState *base = gGameState;
         mask = 1;
         slot = base->inventory;
     }
@@ -953,7 +953,7 @@ void SelectionMenu_ReviewChoice(struct SelectionMenu *p)
         MessageWindow_SetMessageTable(p->promptMessages);
         {
             struct SelectionMenuActor *actor = &gUnk_08E6092C[p->result[0]];
-            if (gUnk_02000710->level >= actor->level || Inventory_HasItem(0x29))
+            if (gGameState->level >= actor->level || Inventory_HasItem(0x29))
                 MessageWindow_ShowMessage(1);
             else
                 MessageWindow_ShowMessage(2);
@@ -999,7 +999,7 @@ void SelectionMenu_Close(struct SelectionMenu *p)
         ScreenTransition_SendCommand(3, 4, 4, 4, 4, 0xffff, 0);
     if (p->frame == 20) {
         {
-            u32 *state = &gUnk_0300523C;
+            u32 *state = &gEnginePauseFlags;
             int mask;
             mask = ~4;
             *state &= mask;
@@ -1021,7 +1021,7 @@ void SelectionMenu_Hide(struct SelectionMenu *arg)
     g->flags |= 1;
     g = &p->panels[1];
     g->flags |= 1;
-    state = &gUnk_0300523C;
+    state = &gEnginePauseFlags;
     mask = 1;
     flags = &p->icons[0].flags;
     i = 18;
@@ -1129,7 +1129,7 @@ configure:
     ScrollingDialogue_RequestShow();
     {
         int mask = 4;
-        gUnk_0300523C |= mask;
+        gEnginePauseFlags |= mask;
     }
     return 0;
 }

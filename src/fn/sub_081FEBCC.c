@@ -1,9 +1,9 @@
 #include "global.h"
-extern u8 *gUnk_020005EC;
+#include "ram.h"
 void SunOrb_GetOrCreateManager(void);
 s32 SunOrb_GetSlotState(s32 i)
 {
-    u8 *g = gUnk_020005EC;
+    u8 *g = gSlotController;
     s32 r;
     s32 off;
     u8 *q;

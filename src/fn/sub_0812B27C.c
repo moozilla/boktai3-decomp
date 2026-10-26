@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000180;
+#include "ram.h"
 void Sprite_Remove(u8 *);
 void Collider_Remove(u8 *);
 struct Slot {
@@ -26,6 +26,6 @@ u32 FragmentProjectilePool_Cleanup(struct Pool *p)
             Collider_Remove(p->slots[i].collider);
         }
     }
-    gUnk_02000180 = 0;
+    gActorEffectManager = 0;
     return 0;
 }

@@ -1,5 +1,6 @@
 #include "global.h"
-#define gSmallCallbackPool gUnk_020001E8
+#include "ram.h"
+#define gSmallCallbackPool gCompactParticlePool
 struct SmallCallbackEntry {
     u8 pad0[0x1C];
     u8 sprite[4];
@@ -13,7 +14,6 @@ struct SmallCallbackPool {
     u8 pad0[0x18];
     struct SmallCallbackEntry entries[16];
 };
-extern struct SmallCallbackPool *gUnk_020001E8;
 void Sprite_Remove(void *);
 s32 CallbackPool_RemoveSmallSprites(struct SmallCallbackPool *pool)
 {
@@ -23,5 +23,5 @@ s32 CallbackPool_RemoveSmallSprites(struct SmallCallbackPool *pool)
             Sprite_Remove(pool->entries[i].sprite);
         }
     }
-    return (s32)(gUnk_020001E8 = 0);
+    return (s32)(gCompactParticlePool = 0);
 }

@@ -1,7 +1,6 @@
 #include "global.h"
-#define gSegmentDisplay gUnk_02000260
+#include "ram.h"
 struct SegmentDisplay;
-extern struct SegmentDisplay *gSegmentDisplay;
 void Sprite_Remove(void *);
 void Anim_Remove(void *);
 void Sound_StopSong(u32);

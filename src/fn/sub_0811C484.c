@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 /* tentative: counts a held charge, spawning particles, and fires the callback on release */
 
@@ -34,7 +35,6 @@ struct Self {
     u16 timer;
 };
 
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 
 void Sound_PlaySong(u32);
@@ -69,8 +69,8 @@ void ChargeMarker_TickHold(struct Self *self, struct Owner *owner, struct Input 
                     pos.y -= 16;
                     size.w = 0x16;
                     size.h = 0x14;
-                    gUnk_03005304 = (gUnk_03005304 + 1) & 0x3FF;
-                    n = gUnk_086141BC[gUnk_03005304];
+                    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
+                    n = gUnk_086141BC[gEffectRandomTableIndex];
                     n &= 3;
                     n++;
                     SpriteParticle_SpawnSingleFrameBatch(&pos, &owner->pos, &size, n, 1, r, r);

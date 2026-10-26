@@ -1,4 +1,6 @@
 #include "global.h"
+#include "render.h"
+#include "game_state.h"
 struct P {
     u8 pad[0x1e];
     u16 rounds;
@@ -12,8 +14,6 @@ struct Save {
     u8 pad[0x52];
     s16 selected;
 };
-extern struct Save *gUnk_02000710;
-extern u32 gUnk_0300523C;
 void WirelessGameMenu_SetStatusPanelState(struct P *, int);
 void WirelessGameMenu_SignalStatusPanel(struct P *);
 void Player_EnterStateTen(void);
@@ -22,7 +22,7 @@ void WirelessGame_GetSelectedEquipmentEffect(int);
 void Player_SetTransitionMode(void);
 static inline int item(void)
 {
-    struct Save *s = gUnk_02000710;
+    struct Save *s = gGameState;
     return *(s16 *)((u8 *)s + s->selected * 2 + 0x88);
 }
 void WirelessGameMenu_UpdateRoundPreparation(struct P *p)
@@ -47,7 +47,7 @@ void WirelessGameMenu_UpdateRoundPreparation(struct P *p)
         *entered = one;
         p->timer = zero;
         {
-            u32 *global = &gUnk_0300523C;
+            u32 *global = &gEnginePauseFlags;
             u32 mask = ~4;
             *global &= mask;
         }

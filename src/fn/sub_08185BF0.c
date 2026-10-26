@@ -17,8 +17,8 @@ struct ArmorScriptArgs {
     u32 count : 16, unused : 16;
     s32 *values;
 };
-extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
-extern u8 *gUnk_02000710;
+extern u32 gEngineFlags, gUnk_030053F0, gUnk_02000560;
+extern u8 *gGameState;
 extern const u8 gUnk_0824F004[];
 void sub_08159164(s32);
 void GameState_SetEventFlag(u32);
@@ -35,22 +35,19 @@ void Armor_FinalizeDefeat(struct Armor *p)
     s32 values[8];
     struct ArmorScriptArgs args;
     u32 mask = 0x400;
-    if (!((gUnk_030053F4 | gUnk_030053F0) & mask) && !Armor_TestDefeatBlocked()) {
+    if (!((gEngineFlags | gUnk_030053F0) & mask) && !Armor_TestDefeatBlocked()) {
         s32 v;
         u32 script;
         sub_08159164(p->rewardId);
-        H(gUnk_02000710, 0x87c) =
-            H(gUnk_02000710, 0x87c) < 9999 ? H(gUnk_02000710, 0x87c) + 1 : 9999;
-        H(gUnk_02000710, 0x538) =
-            H(gUnk_02000710, 0x538) < 9999 ? H(gUnk_02000710, 0x538) + 1 : 9999;
-        H(gUnk_02000710, 0x57e) =
-            H(gUnk_02000710, 0x57e) < 9999 ? H(gUnk_02000710, 0x57e) + 1 : 9999;
-        v = H(gUnk_02000710, 0x58c) + 1;
+        H(gGameState, 0x87c) = H(gGameState, 0x87c) < 9999 ? H(gGameState, 0x87c) + 1 : 9999;
+        H(gGameState, 0x538) = H(gGameState, 0x538) < 9999 ? H(gGameState, 0x538) + 1 : 9999;
+        H(gGameState, 0x57e) = H(gGameState, 0x57e) < 9999 ? H(gGameState, 0x57e) + 1 : 9999;
+        v = H(gGameState, 0x58c) + 1;
         if (v > 9999)
             v = 9999;
         else if (v < 0)
             v = 0;
-        H(gUnk_02000710, 0x58c) = v;
+        H(gGameState, 0x58c) = v;
         GameState_SetEventFlag(gUnk_0824F004[p->variant]);
         script = p->defeatScript;
         if (script) {

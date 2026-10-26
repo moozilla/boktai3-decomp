@@ -1,9 +1,9 @@
 #include "global.h"
+#include "engine.h"
+#include "ram.h"
 
-extern u32 gUnk_03005308, gUnk_03005304;
 extern u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
-extern u8 *gUnk_020005F8;
 
 struct CloneVec {
     s16 x, y, z, pad;
@@ -56,14 +56,14 @@ static inline void Vec_Diff(struct CloneVec *d, struct CloneVec *a, struct Clone
 
 static inline s32 RandomByte(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    return *(u8 *)(gUnk_03005308 * 2 + RANDOM_TABLE_ADDR);
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    return *(u8 *)(gRandomIndex * 2 + RANDOM_TABLE_ADDR);
 }
 
 static inline u16 RandomAngle(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 0x3ff;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3ff;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 
 static inline void Flags_Set(u8 *p, u32 m)
@@ -202,7 +202,7 @@ s32 PlayerClone_UpdateBehavior(u8 *s, s32 i)
                     Anim_SetKeyframes(
                         anim, res, (u16)((*((u32 *)(s + 0x31c))) + (*((u8 *)(s + 0x320)))), 2, 4);
                     *((u16 *)(s + 0x1c6)) = z;
-                    t = gUnk_020005F8;
+                    t = gDirectionalSpritePool;
                     if (!t)
                         return;
                     Anim_SelectPaletteBank(anim, 0x1f4);

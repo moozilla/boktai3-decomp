@@ -14,8 +14,8 @@ static inline u8 MatchesScene(s32 scene, struct GameState *state)
 u32 SceneActorControl_IsEnabledForScene(struct SceneActorControlSlot *slot)
 {
     u32 mode = gUnk_03005430.mode;
-    if (mode != 5 && mode != 0 && mode != 4 && (gUnk_02000710->flags868 & 2) &&
-        MatchesScene(slot->scene, gUnk_02000710))
+    if (mode != 5 && mode != 0 && mode != 4 && (gGameState->flags868 & 2) &&
+        MatchesScene(slot->scene, gGameState))
         return 1;
     return 0;
 }

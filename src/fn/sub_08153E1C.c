@@ -140,7 +140,6 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
 }
 
 extern const s16 gUnk_086149C4[];
-extern u8 *gUnk_030042E4;
 void SpiralTrail_CreateWithParticles(struct P *, s32, s32, s32, s32);
 void Player_SetAnimation(struct P *, s32, s32, s32);
 #define B(o) (*(u8 *)((u8 *)p + (o)))
@@ -154,6 +153,7 @@ static inline s32 Truncate(s32 v)
 }
 
 #include "scene_vec.h"
+#include "render.h"
 void Camera_SnapToWithoutCompletion(struct SceneVec *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 static inline void Face(struct P *p)

@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
@@ -8,8 +8,8 @@ void HealthRestoreEffect_UpdateRestoration(u8 *);
 static inline s32 rnd(u16 *table)
 {
     s32 v;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    v = table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    v = table[gRandomIndex];
     return v >> 3;
 }
 void HealthRestoreEffect_UpdateShake(u8 *p)

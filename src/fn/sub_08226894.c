@@ -1,14 +1,14 @@
 #include "global.h"
+#include "ram.h"
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-extern void *gUnk_03005420;
 void Camera_ReadMoveRate(void *);
 void Camera_FollowPlayer(s32);
 void Camera_FollowPlayerFromScript(void)
 {
     if (Script_SeekToKeyword(0x66)) {
         s32 v = Script_GetValue();
-        Camera_ReadMoveRate(gUnk_03005420);
+        Camera_ReadMoveRate(gActiveCamera);
         Camera_FollowPlayer(v);
     }
 }

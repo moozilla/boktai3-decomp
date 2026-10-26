@@ -1,5 +1,5 @@
 #include "global.h"
-#define gLinkPanel gUnk_020001C4
+#include "ram.h"
 struct LinkPanel {
     u8 pad0[0x1C];
     void *resource;
@@ -15,7 +15,6 @@ struct LinkPanel {
     u8 padF6D[7];
     s32 optionE;
 };
-extern struct LinkPanel *gUnk_020001C4;
 s32 Script_SeekToKeyword(u32);
 u32 Script_GetTextSourcePc(void);
 s32 Script_GetKeywordValue(u32, s32);
@@ -62,6 +61,6 @@ s32 LinkPanel_InitFromScript(struct LinkPanel *p)
         if (Script_GetKeywordValue('f', 0))
             ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, zero);
     }
-    gUnk_020001C4 = p;
+    gLinkPanel = p;
     return 1;
 }

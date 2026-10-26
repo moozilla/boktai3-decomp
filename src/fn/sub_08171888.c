@@ -34,7 +34,7 @@ void SceneHud_TickStatTransfer(struct SceneHudState *p)
         Sound_PlaySong(0x10C);
         GameState_EquipConsumableSlot(p->actionSelection);
         Player_RefreshEquipmentWithOptions(
-            p->actionOwner, &gUnk_08E60F80[p->comparisonProfiles[gUnk_02000710->party[0]]], -1);
+            p->actionOwner, &gUnk_08E60F80[p->comparisonProfiles[gGameState->party[0]]], -1);
         Hud_SetInteractionCallback(p, SceneHud_UpdateStatComparison, 1);
         sub_08171258(p);
         sub_08170D78(p);

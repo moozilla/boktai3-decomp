@@ -58,8 +58,8 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
             dz = target->z;
             dz -= position->z;
             direction = Math_Atan2(dx, dz);
-            randomIndex = (gUnk_03005308 + 1) & 1023;
-            gUnk_03005308 = randomIndex;
+            randomIndex = (gRandomIndex + 1) & 1023;
+            gRandomIndex = randomIndex;
             randomOffset = randomIndex * 2;
             randomTable = (const u16 *)RANDOM_TABLE_ADDR;
             randomOffset += (u32)randomTable;

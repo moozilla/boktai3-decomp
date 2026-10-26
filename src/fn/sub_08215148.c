@@ -1,6 +1,7 @@
 #define gSpriteTileResource gUnk_030042EC
-#define gSpriteTileCount    gUnk_030042F4
+#define gSpriteTileCount    gStaticTileCount
 #include "global.h"
+#include "render.h"
 struct SpriteTileResource {
     u32 unknown0;
     u16 tileCount;
@@ -11,11 +12,10 @@ struct SpriteTileDma {
     vu32 source, destination, control;
 };
 extern struct SpriteTileResource *gUnk_030042EC;
-extern u16 gUnk_030042F4;
 void SpriteTiles_LoadResource(struct SpriteTileResource *resource)
 {
     gUnk_030042EC = resource;
-    gUnk_030042F4 = resource->tileCount;
+    gStaticTileCount = resource->tileCount;
     {
         struct SpriteTileDma *dma = (struct SpriteTileDma *)0x040000d4;
         dma->source = (u32)resource + resource->dataOffset;

@@ -1,4 +1,6 @@
 #include "global.h"
+#include "render.h"
+#include "engine.h"
 
 // confidence=low: per-frame update for one scene actor's timers, palette transition and shadow state, and its spark and hit-record bookkeeping
 
@@ -13,8 +15,6 @@ void SparkParticle_Spawn(void *, s32, s32, s32, s32, s32);
 void SceneActorRecord_RecordPair(u16, u32);
 void SceneActorBehavior_UpdateColliders(void *);
 void SceneActorReaction_SinkAndRemove(void);
-extern u32 gUnk_030042E4;
-extern u32 gUnk_030053F4;
 extern u32 gUnk_020004B4;
 extern u32 gUnk_02000580[];
 extern u32 gUnk_02000478;
@@ -22,7 +22,6 @@ extern u32 gUnk_02000534;
 extern u32 gUnk_02000500;
 extern u16 gUnk_030039F0;
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);
 
@@ -66,7 +65,7 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
             if (p[8] == 0) {
                 AnimData_SelectPaletteBank(*(u8 **)(p + 4) + 0x2C, 0);
             } else {
-                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gUnk_030042E4 + (v << 5);
+                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gPaletteBankData + (v << 5);
             }
             *(u16 *)(p + 0x1E8) = 0;
             *flags &= 0xFFFF7FFF;
@@ -76,7 +75,7 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
             if (p[8] == 0) {
                 AnimData_SelectPaletteBank(*(u8 **)(p + 4) + 0x2C, 0);
             } else {
-                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gUnk_030042E4 + (v << 5);
+                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gPaletteBankData + (v << 5);
             }
             *(u16 *)(p + 0x1E8) = 0;
             *flags &= 0xFFFF7FFF;
@@ -102,7 +101,7 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
             if (p[8] == 0) {
                 AnimData_SelectPaletteBank(*(u8 **)(p + 4) + 0x2C, 0);
             } else {
-                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gUnk_030042E4 + (v << 5);
+                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gPaletteBankData + (v << 5);
             }
             *(s16 *)(p + 0x1EA) -= 1;
         } else {
@@ -110,7 +109,7 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
             if (p[8] == 0) {
                 AnimData_SelectPaletteBank(*(u8 **)(p + 4) + 0x2C, 0);
             } else {
-                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gUnk_030042E4 + (v << 5);
+                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gPaletteBankData + (v << 5);
             }
             *(s16 *)(p + 0x1EA) = 0;
             *flags &= 0xFDFFFFFF;
@@ -129,7 +128,7 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
             if (p[8] == 0) {
                 AnimData_SelectPaletteBank(*(u8 **)(p + 4) + 0x2C, 0);
             } else {
-                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gUnk_030042E4 + (v << 5);
+                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gPaletteBankData + (v << 5);
             }
             *(u16 *)(p + 0x1EA) = 0;
         } else {
@@ -145,7 +144,7 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
                 if (p[8] == 0) {
                     AnimData_SelectPaletteBank(*(u8 **)(p + 4) + 0x2C, 0);
                 } else {
-                    *(u32 *)(*(u8 **)(p + 4) + 0x68) = gUnk_030042E4 + (v << 5);
+                    *(u32 *)(*(u8 **)(p + 4) + 0x68) = gPaletteBankData + (v << 5);
                 }
                 *(s16 *)(p + 0x1EA) += 1;
             }
@@ -153,7 +152,7 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
     }
 
 after_timers:
-    if (gUnk_030053F4 & 0x4800) {
+    if (gEngineFlags & 0x4800) {
         if (gUnk_020004B4 == 0) {
             goto finish;
         }
@@ -164,7 +163,7 @@ after_timers:
     } else {
         r2 = 0;
     }
-    if (gUnk_030053F4 & 0x800) {
+    if (gEngineFlags & 0x800) {
         u8 *e = (u8 *)gUnk_02000580[r2];
         if (e != 0 && *(u16 *)(e + 0x538) != 0 && *(u16 *)(e + 0x534) == 4) {
             cond = 1;
@@ -287,12 +286,12 @@ finish:
             s32 pv;
             s32 n;
             s32 m;
-            idx = (gUnk_03005308 + 1) & 0x3FF;
+            idx = (gRandomIndex + 1) & 0x3FF;
             a18 = (a18 & 0xFFFF) | ((u32)((s16)(a18 >> 16) + gUnk_0203B400[idx] & 0xFF) << 16);
             idx = (idx + 1) & 0x3FF;
             pv = (s8)p[0x2B6] + ((gUnk_0203B400[idx] & 0x1F) - 16);
             idx = (idx + 1) & 0x3FF;
-            gUnk_03005308 = idx;
+            gRandomIndex = idx;
             n = (gUnk_0203B400[idx] & 7) + 4;
             m = (gUnk_0203B400[idx] & 0xF) + 8;
             SparkParticle_Spawn(&a18, 2, &a18, pv, n, m);

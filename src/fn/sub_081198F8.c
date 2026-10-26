@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 
 // confidence=low: recoil completion returns to the callback at 081198F8.
 
@@ -78,8 +79,8 @@ void Actor_ClampMovementSpeed(struct Obj *);
 void Glove_SetAnimationKeyframes(struct Glove *, s32);
 s32 ActorRecoil_UpdateMotion(struct Glove *);
 void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
-extern u32 gUnk_030053F4, gUnk_030053F0;
-extern u8 *gUnk_02000710, *gUnk_020004B4;
+extern u32 gEngineFlags, gUnk_030053F0;
+extern u8 *gUnk_020004B4;
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 void Trigger_ConsumePending(void *, s32);

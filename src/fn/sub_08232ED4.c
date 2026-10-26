@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Slot {
     u8 bytes[0x38];
 };
@@ -8,14 +9,13 @@ struct S {
     struct Slot slots[4];
     void *res;
 };
-extern struct S *gUnk_02000098;
 void *AnimData_FindEntry(u32);
 void ScreenOrbitEffect_InitSlot(void *, void *);
 u32 ScreenOrbitEffect_Init(struct S *s)
 {
     struct Slot *p;
     int i;
-    gUnk_02000098 = s;
+    gEffectQuad = s;
     *(void **)((u8 *)s + 0x100) = AnimData_FindEntry(0x1c1a);
     s->x = 0x78;
     s->y = 0x50;

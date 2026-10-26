@@ -1,7 +1,7 @@
 #include "motion_0818.h"
+#include "game_state.h"
 // MATCHING_CONCESSION: register-pinning
-extern u8 *gUnk_02000710;
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 u32 Math_Atan2(s32, s32);
@@ -9,7 +9,7 @@ s32 Div(s32, s32);
 void Armor_AcceleratePartTurn(struct Motion0818Object *);
 void Armor_InitPartLunge(struct Motion0818Object *p)
 {
-    u8 **player = &gUnk_02000710;
+    u8 **player = &gGameState;
     u8 *target;
     register s32 turn asm("r1");
     s32 choice;
@@ -17,9 +17,9 @@ void Armor_InitPartLunge(struct Motion0818Object *p)
     target = *player;
     p->angle = Math_Atan2(*(s16 *)(target + 0x30) - p->x, *(s16 *)(target + 0x34) - p->z);
     p->targetRotation = 0xA0 - p->angle;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
     {
-        u32 offset = gUnk_03005308 * 2;
+        u32 offset = gRandomIndex * 2;
         register const u16 *table asm("r3") = gUnk_0203B400;
         choice = *(const u16 *)(offset + (u32)table);
     }

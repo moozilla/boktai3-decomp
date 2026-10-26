@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "actor_attachment_state.h"
+#include "ram.h"
 static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
                                              struct DisplaySequenceState *state)
 {
@@ -147,7 +148,6 @@ struct Effect {
 };
 extern struct Camera *gUnk_020004B8;
 extern const s16 gUnk_086149C4[];
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 s32 Mod(s32, s32);
 void NativeParticle_CreateWithFlag(void *, s32, void *, s32, s32, s32, s32);
@@ -176,7 +176,7 @@ static inline void Project(struct Packed *out, struct Vec *pos, s32 h)
 }
 static inline u32 RandomValue(void)
 {
-    return gUnk_086141BC[gUnk_03005304];
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 // confidence=low: type three moves along a changing heading and emits trail particles.
 void NativeEffect_UpdateTurningTrail(struct Effect *p)
@@ -214,9 +214,9 @@ void NativeEffect_UpdateTurningTrail(struct Effect *p)
         struct {
             u32 x : 16, y : 16, z : 16, pad : 16;
         } offset;
-        gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+        gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
         offset.x = (RandomValue() & 15) - 7;
-        gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+        gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
         offset.y = (RandomValue() & 15) - 7;
         NativeParticle_CreateWithFlag(&p->sprite.position, 0, &offset, 1, 1, 0x200, 0);
     }

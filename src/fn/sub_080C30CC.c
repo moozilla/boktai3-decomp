@@ -8,7 +8,7 @@ void SceneActorPlacement_ConsumeShakeFlags(struct SceneActorRegistryActor *);
 void SceneActorTarget_OnBindingChanged(struct SceneActorRegistryActor *);
 static inline u8 sameRegion(u16 *region)
 {
-    if (gUnk_02000710->region == *region)
+    if (gGameState->region == *region)
         return 1;
     return 0;
 }
@@ -38,7 +38,7 @@ static inline void dispatch(void **callback, void *context)
 }
 static inline u32 engineFlags(u32 mask)
 {
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 void SceneActorBehavior_ActivatePendingControl(struct SceneActorRegistryActor *);
 s32 SceneActorBehavior_DispatchPendingFlags(struct SceneActorRegistryActor *);

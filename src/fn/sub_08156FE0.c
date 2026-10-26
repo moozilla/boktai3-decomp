@@ -1,15 +1,15 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #include "player.h"
+#include "engine.h"
+#include "ram.h"
 // confidence=low: action-mode gates and input select the player's next sequence.
-extern u32 gUnk_030053F4;
 struct PlayerPendingNotification {
     void *receiver;
     u32 flags;
     void *payload;
 };
 extern struct PlayerPendingNotification *gUnk_0200054C;
-extern u16 gUnk_02000594;
 void ActorSequence_Begin(struct Player *, s32, s32);
 void Player_BeginDirectionSequence(struct Player *, u32);
 void Player_StopMovementEffects(struct Player *);
@@ -72,7 +72,7 @@ s32 Player_SelectActionSequence(struct Player *p)
 {
     u32 mode;
     const u16 *keys;
-    if ((gUnk_030053F4 & 0x1000) && (u8)(p->tetherMode - 10) <= 1)
+    if ((gEngineFlags & 0x1000) && (u8)(p->tetherMode - 10) <= 1)
         return p->tetherMode;
     if (p->tetherMode != 0x17 && (s8)p->movementAnimationState >= 0 && p->tetherMode != 0x26) {
         p->interactionResetCounter = 0;
@@ -136,7 +136,7 @@ s32 Player_SelectActionSequence(struct Player *p)
                 ActorSequence_Begin(p, 0x1E, 0);
         } else
             ActorSequence_Begin(p, 0x1D, 0);
-        if (gUnk_0200054C && gUnk_02000594) {
+        if (gUnk_0200054C && gPlayerNotificationPending) {
             if (!(gUnk_0200054C->flags & 1)) {
                 if (gUnk_0200054C->flags & 0x10)
                     sub_08249244(gUnk_0200054C->receiver, 1, 60, gUnk_0200054C->payload);
@@ -144,7 +144,7 @@ s32 Player_SelectActionSequence(struct Player *p)
                     sub_08249244(gUnk_0200054C->receiver, 1, 60, gUnk_0200054C->payload);
             }
             gUnk_0200054C = 0;
-            gUnk_02000594 = 0;
+            gPlayerNotificationPending = 0;
         }
         Player_StopMovementEffects(p);
         goto end;

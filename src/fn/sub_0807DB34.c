@@ -82,8 +82,8 @@ static inline void Sub0807DB34_Turn(struct SceneActorRegistryResetView *actor,
 
     for (attempt = 0; attempt <= 3; attempt++) {
         u16 candidate;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-        candidate = (gUnk_0203B400[gUnk_03005308] & 3) << 6;
+        gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+        candidate = (gUnk_0203B400[gRandomIndex] & 3) << 6;
         if (candidate != oldDirection) {
             newDirection = candidate;
             break;
@@ -116,7 +116,7 @@ static inline s32 Sub0807DB34_FollowRoute(struct SceneActorRegistryResetView *ac
     cell = SceneActorTerrain_GetCellIndex(destination);
     destination->y = SceneActorTerrain_GetHeight(cell, destination);
 
-    if (gUnk_030053F4 & 0x4800) {
+    if (gEngineFlags & 0x4800) {
         target = *(u8 **)&actor->fieldDC;
         if (!target)
             goto failed;

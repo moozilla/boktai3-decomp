@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct RegionEntry {
     s16 group;
     u16 name;
@@ -45,7 +46,6 @@ struct Params310 {
 };
 extern struct Params310 gUnk_02000310;
 extern u16 gUnk_03005260[];
-extern s16 gUnk_03004BD8;
 void Sound_PlaySong(u32);
 void Time_OnRegionListSelect(struct RegionMenu *);
 void Time_ShowRegionMenu(struct RegionMenu *);
@@ -127,7 +127,7 @@ void Time_HandleRegionKeypad(struct RegionMenu *menu)
         case 1:
             if (menu->timer > (1 << menu->fadeSpeed)) {
                 {
-                    s16 *p = &gUnk_03004BD8;
+                    s16 *p = &gDispCntShadow;
                     s32 m = ~3;
                     *p &= m;
                 }

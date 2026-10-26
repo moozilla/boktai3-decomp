@@ -1,13 +1,13 @@
 // MATCHING_CONCESSION: register-pinning
 #include "stage_icon_display.h"
-extern u32 gUnk_03005304;
+#include "ram.h"
 extern const u16 gUnk_086141BC[];
 void StageIconDisplay_TickShake(struct StageIconDisplay *display)
 {
     if (!display->stateFrame)
         Sound_PlaySong(707);
     if (display->stateFrame < 8) {
-        register u32 *rng asm("r3") = &gUnk_03005304;
+        register u32 *rng asm("r3") = &gEffectRandomTableIndex;
         register u32 index asm("r1") = *rng + 1;
         u32 mask = 1023;
         const u16 *random;

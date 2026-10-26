@@ -108,7 +108,7 @@ void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *input)
                         Anim_LoadKeyframe(argument, &panel->display.gridResource, frame, 1);
                     }
                 }
-                currency = gUnk_02000710->unk7B0;
+                currency = gGameState->unk7B0;
                 if (currency < (s32)SceneItemValue_GetItemBaseValue(kind))
                     SceneHud_SetKeyframePaletteBank(widget, 0x374);
                 else

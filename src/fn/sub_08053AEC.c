@@ -44,17 +44,17 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
         x = point->x >> 8;
         z = point->z >> 8;
         position = point;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             cell = 0;
         else {
-            u32 row = gUnk_030052F4->rows[z];
+            u32 row = gTerrainMap->rows[z];
             cell = row + x;
         }
         properties = TerrainModifiers_FindCellOverride(cell, 1);
         if (properties)
             properties += 4;
         else {
-            struct EngineMap *map = gUnk_030052F4;
+            struct EngineMap *map = gTerrainMap;
             u32 offset = cell * 4 + 12;
             properties = map->cells + offset;
         }

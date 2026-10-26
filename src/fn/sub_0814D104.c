@@ -30,7 +30,7 @@ static inline u32 ReadHalf(struct Player *p, u32 offset)
 }
 static inline s32 ReadBonus(void)
 {
-    u8 *global = (u8 *)gUnk_02000710;
+    u8 *global = (u8 *)gGameState;
     u32 offset;
     s16 *field;
     offset = 0x876;

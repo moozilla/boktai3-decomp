@@ -41,15 +41,15 @@ void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
         register const u16 *table asm("r3") = gUnk_0203B400;
         p = (u16 *)&point;
         /* The two jitter samples are consumed before the next external call. */
-        seed = (gUnk_03005308 + 1) & 1023;
-        gUnk_03005308 = seed;
+        seed = (gRandomIndex + 1) & 1023;
+        gRandomIndex = seed;
         point = *position;
         if (!(i & 1)) {
             u32 index = (seed + 1) & 1023;
             const u16 *random = (const u16 *)(index * 2 + (u32)table);
             p[0] += offset + edgeJitter(random);
             index = (index + 1) & 1023;
-            gUnk_03005308 = index;
+            gRandomIndex = index;
             random = scatterAddress(index, table);
             scatter(&p[2], (u8 *)random);
         } else {
@@ -58,7 +58,7 @@ void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
             random = scatterAddress(index, table);
             scatter(&p[0], (u8 *)random);
             index = (index + 1) & 1023;
-            gUnk_03005308 = index;
+            gRandomIndex = index;
             random = (const u16 *)(index * 2 + (u32)table);
             p[2] += offset + edgeJitter(random);
         }
@@ -76,13 +76,13 @@ u8 Scene_CanEnterNeighborCell(struct SceneObject *object, s32 index, s32 directi
     u8 *dynamic;
     switch (direction) {
         case 0:
-            delta = -((s16 *)gUnk_030052F4->cells)[2];
+            delta = -((s16 *)gTerrainMap->cells)[2];
             break;
         case 1:
             delta = 1;
             break;
         case 2:
-            delta = ((s16 *)gUnk_030052F4->cells)[2];
+            delta = ((s16 *)gTerrainMap->cells)[2];
             break;
         case 3:
             delta = -1;
@@ -93,7 +93,7 @@ u8 Scene_CanEnterNeighborCell(struct SceneObject *object, s32 index, s32 directi
     if (dynamic)
         cell = (struct SceneCell *)(dynamic + 4);
     else
-        cell = (struct SceneCell *)(gUnk_030052F4->cells + 12 + neighbor * 4);
+        cell = (struct SceneCell *)(gTerrainMap->cells + 12 + neighbor * 4);
     if (cell) {
         if (!(cell->height >> 4)) {
             if ((u32)(cell->height & 15) < (u32)(*reference & 15))
@@ -127,13 +127,13 @@ u8 Scene_CheckNeighborHeight(struct SceneObject *object, s32 index, s32 directio
     u8 *dynamic;
     switch (direction) {
         case 0:
-            delta = -((s16 *)gUnk_030052F4->cells)[2];
+            delta = -((s16 *)gTerrainMap->cells)[2];
             break;
         case 1:
             delta = 1;
             break;
         case 2:
-            delta = ((s16 *)gUnk_030052F4->cells)[2];
+            delta = ((s16 *)gTerrainMap->cells)[2];
             break;
         case 3:
             delta = -1;
@@ -144,7 +144,7 @@ u8 Scene_CheckNeighborHeight(struct SceneObject *object, s32 index, s32 directio
     if (dynamic)
         cell = (struct SceneCell *)(dynamic + 4);
     else
-        cell = (struct SceneCell *)(gUnk_030052F4->cells + 12 + neighbor * 4);
+        cell = (struct SceneCell *)(gTerrainMap->cells + 12 + neighbor * 4);
     if (cell) {
         if ((u32)(cell->height & 15) >= (u32)(*reference & 15))
             return 1;
@@ -606,7 +606,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
     size.z = 32;
     particle = &point;
     table = gUnk_0203B400;
-    cursor = &gUnk_03005308;
+    cursor = &gRandomIndex;
     i = ({
         register s32 count asm("r1");
         asm("" : "=r"(count) : "0"(2));
@@ -724,7 +724,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
     switch (direction) {
         case 0:
             dz = -step;
-            delta = -((s16 *)gUnk_030052F4->cells)[2];
+            delta = -((s16 *)gTerrainMap->cells)[2];
             break;
         case 1:
             dx = step;
@@ -732,7 +732,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
             break;
         case 2:
             dz = step;
-            delta = ((s16 *)gUnk_030052F4->cells)[2];
+            delta = ((s16 *)gTerrainMap->cells)[2];
             break;
         case 3:
             dx = -step;
@@ -745,7 +745,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
     if (dynamic)
         cell = (struct SceneCell *)(dynamic + 4);
     else
-        cell = (struct SceneCell *)(gUnk_030052F4->cells + 12 + savedIndex * 4);
+        cell = (struct SceneCell *)(gTerrainMap->cells + 12 + savedIndex * 4);
     if (cell) {
         u32 heightByte = cell->height;
         u32 mask = 0xF0;
@@ -844,9 +844,9 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
 static inline s32 cellIndex(struct SceneVec *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 static inline struct SceneCell *getCell(s32 index)
@@ -856,7 +856,7 @@ static inline struct SceneCell *getCell(s32 index)
     if (dynamic)
         cell = (struct SceneCell *)(dynamic + 4);
     else
-        cell = (struct SceneCell *)(gUnk_030052F4->cells + 12 + index * 4);
+        cell = (struct SceneCell *)(gTerrainMap->cells + 12 + index * 4);
     return cell;
 }
 
@@ -874,13 +874,13 @@ s32 SceneObjects_TryPushNeighbor(struct SceneVec *position, s32 direction)
     delta = 0;
     switch (direction) {
         case 0:
-            delta = -((s16 *)gUnk_030052F4->cells)[2];
+            delta = -((s16 *)gTerrainMap->cells)[2];
             break;
         case 1:
             delta = 1;
             break;
         case 2:
-            delta = ((s16 *)gUnk_030052F4->cells)[2];
+            delta = ((s16 *)gTerrainMap->cells)[2];
             break;
         case 3:
             delta = -1;
@@ -1160,7 +1160,7 @@ void Palette_InterpolateBanks(void *, u32, u32, s32, s32);
 
 static inline u8 ownerIsCurrent(u32 owner)
 {
-    if (gUnk_02000710->region == (s32)owner)
+    if (gGameState->region == (s32)owner)
         return 1;
     return 0;
 }
@@ -1279,7 +1279,7 @@ s32 SceneObjects_InitPool(struct SceneObjectManager *p, void *unused)
     p->fading = 0;
     p->descending = 0;
     p->fade = 0;
-    b = gUnk_030042E4;
+    b = gPaletteBankData;
     p->fromA = (u32)(b + 0x80);
     p->fromB = (u32)(b + 0xa0);
     p->toA = (u32)(b + 0xc0);
@@ -1434,15 +1434,15 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
             coords->z;
         }) >>
         8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         index = 0;
     else
-        index = gUnk_030052F4->rows[z] + x;
+        index = gTerrainMap->rows[z] + x;
     dynamic = TerrainModifiers_FindCellOverride(index, 1);
     if (dynamic)
         cell = (struct SceneCell *)(dynamic + 4);
     else
-        cell = (struct SceneCell *)(gUnk_030052F4->cells + 12 + index * 4);
+        cell = (struct SceneCell *)(gTerrainMap->cells + 12 + index * 4);
     height = cell->height & 15;
     if (height < 15)
         height++;
@@ -1482,9 +1482,9 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     p->phase = clear;
     p->cooldown = clear;
     p->unk23 = 4;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
     p->randomPhase = Mod(({
-                             u32 offset = gUnk_03005308 * 2;
+                             u32 offset = gRandomIndex * 2;
                              register u16 *table asm("r2");
                              asm("" : "+r"(offset));
                              table = gUnk_0203B400;

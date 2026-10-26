@@ -3,8 +3,7 @@
 #include "game_state.h"
 
 // foundry draft (worker best 98.1%); what differs is mostly register allocation and instruction order
-#define gSunClock  gUnk_03005430
-#define gGameState gUnk_02000710
+#define gSunClock gUnk_03005430
 struct ClockPanelSnapshot {
     u8 bytes[0x20];
     u16 time;
@@ -34,10 +33,10 @@ void ClockPanel_CaptureSnapshot(struct ClockPanel *p)
     unsigned int new_var;
     new_var = 16;
     record = s->bytes;
-    src = (u8 *)gUnk_02000710 + 0x780;
+    src = (u8 *)gGameState + 0x780;
     for (i = 0; i < 16; i++)
         s->bytes[i] = src[i];
-    src = (u8 *)gUnk_02000710 + 0x790;
+    src = (u8 *)gGameState + 0x790;
     i = 0;
     values = s->values;
     record += 0xC0;

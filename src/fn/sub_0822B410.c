@@ -1,9 +1,8 @@
-#define gMusicSlotSongs       gUnk_03005470
 #define gMusicSlotPlayerTable gUnk_082643EC
 #include "global.h"
 #include "gba/m4a_internal.h"
+#include "ram.h"
 
-extern u16 gUnk_03005470[];
 extern const struct MusicPlayer gMusicSlotPlayerTable[];
 void m4aMPlayAllStop(void);
 

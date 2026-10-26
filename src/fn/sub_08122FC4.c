@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 #define SpriteNotice_GetManager SceneTrailEffect_EnsurePool
-#define gSpriteNoticeManager    gUnk_02000144
 struct SpriteNoticePosition {
     s16 x, y, z;
 };
@@ -18,7 +18,6 @@ struct SpriteNoticeManager {
     u8 task[0x18];
     void *animationData, *spriteData;
 };
-extern struct SpriteNoticeManager *gSpriteNoticeManager;
 struct SpriteNoticeManager *SpriteNotice_GetManager(void);
 struct SpriteNotice *SpriteNotice_AllocateSlot(struct SpriteNoticeManager *);
 void ParticleSprite_Initialize(void *, void *, u32);

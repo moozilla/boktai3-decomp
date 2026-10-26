@@ -1,4 +1,3 @@
-#define gGameState gUnk_02000710
 #include "global.h"
 #include "game_state.h"
 void GameState_MoveSlotEntry(s32 value, s32 slot)

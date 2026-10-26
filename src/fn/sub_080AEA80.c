@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_animation.h"
-extern u32 gUnk_03005308;
+#include "engine.h"
 
 void Vorn_SelectRetreatRoute(struct SceneActorAnimationView *, u32);
 static inline u8 ConsumeFlag(struct SceneActorAnimationView *p)
@@ -29,8 +29,8 @@ static inline s32 RandomByte(void)
 {
     u32 offset;
     register u16 *table asm("r4");
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    offset = gRandomIndex * 2;
     table = gUnk_0203B400;
     return *(u8 *)(offset + (u32)table);
 }

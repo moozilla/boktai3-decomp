@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 // confidence=low: creates a pooled projectile with optional spin and collider.
 #define SpriteProjectile_Create sub_08127590
 #ifdef NONMATCHING
@@ -160,11 +161,10 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
     return ended;
 }
 
-extern struct ProjectilePool *gUnk_02000164;
 void *SpriteProjectile_EnsurePool(void);
 struct Projectile *SpritePool10_AllocateSlot(void *);
-extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
-extern u32 gUnk_03005308;
+extern u32 gEngineFlags, gUnk_030053F0, gUnk_02000560;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 void AnimData_Load(void *, u32);
 void *ScriptProc_Start(u32, u16);
@@ -174,12 +174,12 @@ void AnimData_SelectPaletteBank(u32, s32);
 void sub_081274F4(void *, s32, s32, s32, s32);
 static inline u32 Rand(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    return gUnk_0203B400[gRandomIndex];
 }
 static inline u32 Busy(u32 mask)
 {
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 static inline u32 TestFlags(u32 *value, u32 mask)
 {
@@ -315,7 +315,7 @@ struct Projectile *SpriteProjectile_Create(struct ParticleVector *position0,
     register struct ParticleVector *position asm("sb") = position0;
     register u32 resource asm("r8") = resource0;
     register u32 script asm("sl") = script0;
-    register struct ProjectilePool *pool asm("r3") = gUnk_02000164;
+    register struct ProjectilePool *pool asm("r3") = gPooledSpriteManager;
     struct Projectile *p;
     if (!pool) {
         pool = SpriteProjectile_EnsurePool();

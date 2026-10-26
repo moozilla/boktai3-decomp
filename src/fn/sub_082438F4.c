@@ -43,10 +43,10 @@ s32 Player_UpdateLinkCore(struct Player *p)
     sub_0823A2E4(p);
     gUnk_02000560[p->slot] = p->kind;
     if (p->slot == LocalPlayer()) {
-        *(u16 *)((u8 *)gUnk_02000710 + 0x30) = p->position.x;
-        *(u16 *)((u8 *)gUnk_02000710 + 0x32) = p->position.y;
-        *(u16 *)((u8 *)gUnk_02000710 + 0x34) = p->position.z;
-        *(u16 *)((u8 *)gUnk_02000710 + 0x85E) = ((p->facing + 5) & 7) << 5;
+        *(u16 *)((u8 *)gGameState + 0x30) = p->position.x;
+        *(u16 *)((u8 *)gGameState + 0x32) = p->position.y;
+        *(u16 *)((u8 *)gGameState + 0x34) = p->position.z;
+        *(u16 *)((u8 *)gGameState + 0x85E) = ((p->facing + 5) & 7) << 5;
     }
     clearPtr = (u16 *)((u8 *)p + 0x54E);
     {

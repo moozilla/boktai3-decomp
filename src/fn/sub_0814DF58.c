@@ -3,7 +3,6 @@
 #include "player.h"
 #include "game_state.h"
 
-extern struct GameState *gUnk_02000710;
 #define EN_OFF   ((u32) & ((struct Player *)0)->statModifierContext.statBOverrideEnabled)
 #define MODE_OFF ((u32) & ((struct Player *)0)->statModifierContext.statBOverrideMode)
 #define LOADB(var, reg, off, p)                                                                    \
@@ -22,7 +21,7 @@ void Player_SubtractStatB(struct Player *p, s32 amount)
     if (en) {
         LOADB(mode, "r2", MODE_OFF, p);
         if (mode == 7) {
-            value = gUnk_02000710->unk77C;
+            value = gGameState->unk77C;
             goto have;
         }
     }
@@ -36,7 +35,7 @@ have:
     if (en) {
         LOADB(mode, "r1", MODE_OFF, p);
         if (mode == 7) {
-            gUnk_02000710->unk77C = value;
+            gGameState->unk77C = value;
             return;
         }
     }

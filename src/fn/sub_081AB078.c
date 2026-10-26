@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 // confidence=low: palette transition accompanies the leap motion track.
 // MATCHING_CONCESSION: register-pinning
 struct VanargandPart {
@@ -69,7 +70,6 @@ void VanargandAfterimagePool_Spawn(void *, void *);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
 void Vanargand_ResetPaletteTransition(struct Vanargand *);
 void CpuSet(const void *, void *, u32);
-extern u8 *gUnk_030042E4;
 extern u16 gUnk_03004FC0[];
 #define VANARGAND_PALETTE_ADDR 0x03004FC0 /* gUnk_03004FC0 */
 
@@ -131,7 +131,7 @@ void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
                 s32 t;
                 s32 r, g, b;
 
-                CpuSet(gUnk_030042E4 + 0xDE0, p->palette, 0x04000020);
+                CpuSet(gPaletteBankData + 0xDE0, p->palette, 0x04000020);
                 CpuSet(p->fadeA, gUnk_03004FC0, 0x04000068);
                 t = p->transition;
                 LERP(r, t, 7, 0x13, r1)
@@ -162,15 +162,15 @@ void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
                 break;
             }
             case 0x82:
-                CpuSet(gUnk_030042E4 + 0x1040, p->palette, 0x04000020);
+                CpuSet(gPaletteBankData + 0x1040, p->palette, 0x04000020);
                 CpuSet(p->fadeB, gUnk_03004FC0, 0x04000068);
                 break;
             case 0x7F:
-                CpuSet(gUnk_030042E4 + 0xFE0, p->palette, 0x04000018);
+                CpuSet(gPaletteBankData + 0xFE0, p->palette, 0x04000018);
                 CpuSet(p->fadeC, gUnk_03004FC0, 0x04000068);
                 break;
             default:
-                CpuSet(gUnk_030042E4 + 0x3240, self->palette, 0x04000008);
+                CpuSet(gPaletteBankData + 0x3240, self->palette, 0x04000008);
                 break;
         }
         Vanargand_ResetPaletteTransition(self);

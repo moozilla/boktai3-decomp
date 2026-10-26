@@ -29,7 +29,7 @@ void Player_UpdateChargedBurst(struct Player *p)
             angle = ((p->facing + 5) & 7) << 5;
             pos.x += scale(gUnk_086149C4[(angle + 64) & 255] * 150);
             pos.z += scale(gUnk_086149C4[angle] * 150);
-            power = gUnk_02000710->unk876 * 60 + 120;
+            power = gGameState->unk876 * 60 + 120;
             ChargedBurst_Create(&pos, 1 << p->movementRequestBlocked, power, angle, 90);
             p->actionEighteenEnabled = 1;
         } else

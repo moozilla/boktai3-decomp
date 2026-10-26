@@ -16,16 +16,16 @@ static inline u32 CellAt(struct ContactPosition *position)
 {
     s32 x = position->x >> 8;
     s32 z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u8 *CellData(u32 cell)
 {
     u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         return data + 4;
-    return gUnk_030052F4->cells + (cell * 4 + 12);
+    return gTerrainMap->cells + (cell * 4 + 12);
 }
 static inline s32 HeightAt(struct ContactPosition *position)
 {

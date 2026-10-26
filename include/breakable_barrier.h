@@ -2,6 +2,7 @@
 #define BREAKABLE_BARRIER_H
 #include "engine.h"
 #include "scene_object.h"
+#include "render.h"
 
 // Tentative: a task owning up to four wall segments (script 'p' positions, 'd' directions) that
 // the player has to destroy. Each segment is a sprite with a collider; hits flash it, spawn debris
@@ -37,8 +38,6 @@ struct BreakableBarrierManager {
     struct SceneVec positions[4];
     struct BreakableBarrier barriers[4];
 };
-
-extern u16 gUnk_03005214, gUnk_030051C4;
 
 void Collider_SetBodyProperties(void *, s32, s32, s32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);

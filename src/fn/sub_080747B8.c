@@ -81,7 +81,7 @@ s32 SceneActorMovement_UpdateAirborne(struct SceneActorRegistryResetView *actor)
         actor->motion.z += actor->secondaryMotion.z;
         return 0;
     }
-    cell = gUnk_030052F4->cells + (index * 4 + 12);
+    cell = gTerrainMap->cells + (index * 4 + 12);
 haveCell:
     kind = *cell >> 4;
     height = (*cell & 15) << 8;

@@ -1,5 +1,6 @@
-#define gCallbackPool gUnk_020004D0
+#define gCallbackPool gSceneProcParticles
 #include "global.h"
+#include "ram.h"
 struct CallbackPoolEntry {
     void *callback;
     u8 unknown04[0x5c];
@@ -16,11 +17,10 @@ struct CallbackPool {
     struct CallbackPoolEntry entries[6];
     u32 frame;
 };
-extern struct CallbackPool *gUnk_020004D0;
 void Sprite_Remove(void *);
 void CallbackPool_RemoveEntry(u32 i)
 {
-    struct CallbackPool *p = gUnk_020004D0;
+    struct CallbackPool *p = gSceneProcParticles;
     if (p && i < 6 && p->entries[i].spriteActive) {
         p->entries[i].active = 0;
         p->entries[i].kind = 0;

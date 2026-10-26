@@ -9,7 +9,7 @@ struct HudCounters {
     s16 counter7B0;
 };
 
-extern struct HudCounters *gUnk_02000710;
+extern struct HudCounters *gGameState;
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 void Hud_DrawCounter7B0(s32, s32);
 void Hud_DrawCounter50C(s32, s32);
@@ -25,8 +25,8 @@ void sub_081656E0(u8 *self)
         *p++ = 0xF024;
         p[0] = 0xF09B;
         p[1] = 0xF001;
-        if (gUnk_02000710->counter7B0 > 9999)
-            gUnk_02000710->counter7B0 = 9999;
+        if (gGameState->counter7B0 > 9999)
+            gGameState->counter7B0 = 9999;
         Hud_DrawCounter7B0(0x17, 1);
     } else if (mode == 1) {
         *p++ = 0xF025;
@@ -34,8 +34,8 @@ void sub_081656E0(u8 *self)
         *p++ = 0xF022;
         p[0] = 0xF09B;
         p[1] = 0xF030;
-        if (gUnk_02000710->counter50C > 9999)
-            gUnk_02000710->counter50C = 9999;
+        if (gGameState->counter50C > 9999)
+            gGameState->counter50C = 9999;
         Hud_DrawCounter50C(0x17, 1);
     } else {
         *p++ = 0xF0B9;
@@ -43,7 +43,7 @@ void sub_081656E0(u8 *self)
         *p++ = 0xF022;
         p[0] = 0xF0BB;
         p[1] = 0xF09B;
-        if (gUnk_02000710->counter77C > 9999)
-            gUnk_02000710->counter77C = 9999;
+        if (gGameState->counter77C > 9999)
+            gGameState->counter77C = 9999;
     }
 }

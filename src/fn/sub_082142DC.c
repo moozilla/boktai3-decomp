@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct S {
     u16 a, b, c, d, e, f, g;
     u16 h;
@@ -6,7 +7,6 @@ struct S {
     u16 j;
 };
 extern struct S gUnk_030042A0;
-extern u32 gUnk_03004290;
 extern u32 gUnk_030042C0[];
 extern u32 gUnk_030042C8[];
 extern u32 gUnk_030042D0[];
@@ -22,7 +22,7 @@ void Sprite_InitSystem(void)
     gUnk_030042A0.c = 0;
     gUnk_030042A0.g = 1;
     gUnk_030042A0.i = 0;
-    gUnk_03004290 = 0;
+    gRenderListIndex = 0;
     z = 0;
     c = gUnk_030042C8;
     b = gUnk_030042D0;

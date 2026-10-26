@@ -1,15 +1,12 @@
 #include "global.h"
+#include "render.h"
 
 // MATCHING_CONCESSION: register-pinning
 
 struct PaletteBank16 {
     u16 colors[16];
 };
-extern s32 gUnk_030051D4, gUnk_030051C8, gUnk_03004DAC, gUnk_030051CC;
-extern u8 *gUnk_030042E4;
-extern u16 gUnk_030051F0[];
 extern struct PaletteBank16 gUnk_03004DC0[];
-extern u16 gUnk_030051DC, gUnk_03005210, gUnk_03005214;
 void CpuFastSet(const void *src, void *dst, u32 control);
 
 static inline u32 isKey32E(u32 key)
@@ -31,30 +28,30 @@ static inline u32 isKey32E(u32 key)
 
 #define SKIP_TESTS(i)                                                                              \
     {                                                                                              \
-        u32 flags = gUnk_03005210;                                                                 \
+        u32 flags = gObjFadeFlags;                                                                 \
         if (flags & 1) {                                                                           \
-            u32 key = gUnk_030051F0[i];                                                            \
+            u32 key = gObjPaletteKeys[i];                                                          \
             if (key == 0x2A || key == 0x33 || key == 0x34 || key == 0x157 || key == 0 ||           \
                 key == 0x3A9 || key == 0x35)                                                       \
                 continue;                                                                          \
         }                                                                                          \
         if (flags & 2) {                                                                           \
-            u32 key = gUnk_030051F0[i];                                                            \
+            u32 key = gObjPaletteKeys[i];                                                          \
             if (key == 0x3AA || key == 0x23A || key == 0x3AA || key == 0x2A || key == 0x33 ||      \
                 key == 0x34)                                                                       \
                 continue;                                                                          \
         }                                                                                          \
         if (flags & 0x10) {                                                                        \
-            u32 key = gUnk_030051F0[i];                                                            \
+            u32 key = gObjPaletteKeys[i];                                                          \
             if (key == 0x2A || key == 0x33 || key == 0x34 || key - 0x283 <= 8)                     \
                 continue;                                                                          \
         }                                                                                          \
         if (flags & 0x20) {                                                                        \
-            if (isKey32E(gUnk_030051F0[i]))                                                        \
+            if (isKey32E(gObjPaletteKeys[i]))                                                      \
                 continue;                                                                          \
         }                                                                                          \
-        if (gUnk_03005210 & 0x40) {                                                                \
-            u32 key = gUnk_030051F0[i];                                                            \
+        if (gObjFadeFlags & 0x40) {                                                                \
+            u32 key = gObjPaletteKeys[i];                                                          \
             if (key - 0x3AA <= 5 || key - 0x1F7 <= 3)                                              \
                 continue;                                                                          \
         }                                                                                          \
@@ -65,61 +62,61 @@ void sub_08217430(void)
     register s32 level;
     s32 inverse;
     s32 i;
-    if ((gUnk_030051D4 == 0x40) && (gUnk_030051C8 == 0)) {
-        if (gUnk_03004DAC != 0x40) {
-            for (i = 0; i < gUnk_030051CC; i++) {
-                u8 **basePtr = &gUnk_030042E4;
-                u32 offset = gUnk_030051F0[i] << 5;
+    if (((*(s32 *)&gObjFadeLevel) == 0x40) && ((*(s32 *)&gObjPaletteEffect) == 0)) {
+        if ((*(s32 *)&gObjFadeApplied) != 0x40) {
+            for (i = 0; i < (*(s32 *)&gPaletteBanksInUse); i++) {
+                u8 **basePtr = &gPaletteBankData;
+                u32 offset = gObjPaletteKeys[i] << 5;
                 u8 *base = *basePtr;
                 register u8 *bank asm("r3") = base + offset;
                 asm("" : : "r"(offset), "r"(base));
                 CpuFastSet(bank, &gUnk_03004DC0[i], 8);
             }
         }
-        gUnk_03004DAC = gUnk_030051D4;
+        (*(s32 *)&gObjFadeApplied) = (*(s32 *)&gObjFadeLevel);
         return;
     }
-    level = gUnk_030051D4 >> 1;
+    level = (*(s32 *)&gObjFadeLevel) >> 1;
     inverse = 32 - level;
-    if (gUnk_030051DC == 0) {
+    if (gObjFadeColor == 0) {
         for (i = 0; i < 16; i++) {
             u16 *src;
             u16 *dst;
             s32 j;
             {
-                if (gUnk_03005210 & 1) {
-                    u32 key = gUnk_030051F0[i];
+                if (gObjFadeFlags & 1) {
+                    u32 key = gObjPaletteKeys[i];
                     if (((((((key == 0x2A) || (key == 0x33)) || (key == 0x34)) || (key == 0x157)) ||
                           (key == 0)) ||
                          (key == 0x3A9)) ||
                         (key == 0x35))
                         continue;
                 }
-                if (gUnk_03005210 & 2) {
-                    u32 key = gUnk_030051F0[i];
+                if (gObjFadeFlags & 2) {
+                    u32 key = gObjPaletteKeys[i];
                     if ((((((key == 0x3AA) || (key == 0x23A)) || (key == 0x3AA)) ||
                           (key == 0x2A)) ||
                          (key == 0x33)) ||
                         (key == 0x34))
                         continue;
                 }
-                if (gUnk_03005210 & 0x10) {
-                    u32 key = gUnk_030051F0[i];
+                if (gObjFadeFlags & 0x10) {
+                    u32 key = gObjPaletteKeys[i];
                     if ((((key == 0x2A) || (key == 0x33)) || (key == 0x34)) || ((key - 0x283) <= 8))
                         continue;
                 }
-                if (gUnk_03005210 & 0x20) {
-                    if (isKey32E(gUnk_030051F0[i]))
+                if (gObjFadeFlags & 0x20) {
+                    if (isKey32E(gObjPaletteKeys[i]))
                         continue;
                 }
-                if (gUnk_03005210 & 0x40) {
-                    u32 key = gUnk_030051F0[i];
+                if (gObjFadeFlags & 0x40) {
+                    u32 key = gObjPaletteKeys[i];
                     if (((key - 0x3AA) <= 5) || ((key - 0x1F7) <= 3))
                         continue;
                 }
             };
-            if (i < gUnk_030051CC)
-                src = (u16 *)(gUnk_030042E4 + (gUnk_030051F0[i] << 5));
+            if (i < (*(s32 *)&gPaletteBanksInUse))
+                src = (u16 *)(gPaletteBankData + (gObjPaletteKeys[i] << 5));
             else
                 src = gUnk_03004DC0[i].colors;
             dst = gUnk_03004DC0[i].colors;
@@ -136,13 +133,13 @@ void sub_08217430(void)
         }
 
     } else {
-        u32 rb = gUnk_030051DC & 0x7C1F;
-        u32 g = gUnk_030051DC & 0x3E0;
-        if (gUnk_030051C8 == 1) {
+        u32 rb = gObjFadeColor & 0x7C1F;
+        u32 g = gObjFadeColor & 0x3E0;
+        if ((*(s32 *)&gObjPaletteEffect) == 1) {
             s32 n;
             for (n = 0; n < 16; n++) {
                 u32 keep = 1;
-                u32 key = gUnk_030051F0[n];
+                u32 key = gObjPaletteKeys[n];
                 u16 *src;
                 u16 *dst;
                 s32 j;
@@ -156,11 +153,11 @@ void sub_08217430(void)
                 if (keep) {
                     dst = gUnk_03004DC0[n].colors;
                     for (j = 0; j < 16; j++)
-                        *(dst++) = gUnk_03005214;
+                        *(dst++) = gBgFadeColor;
 
                 } else {
-                    if (n < gUnk_030051CC)
-                        src = (u16 *)(gUnk_030042E4 + (gUnk_030051F0[n] << 5));
+                    if (n < (*(s32 *)&gPaletteBanksInUse))
+                        src = (u16 *)(gPaletteBankData + (gObjPaletteKeys[n] << 5));
                     else
                         src = gUnk_03004DC0[n].colors;
                     dst = gUnk_03004DC0[n].colors;
@@ -184,8 +181,8 @@ void sub_08217430(void)
                 u16 *dst;
                 s32 j;
                 {
-                    if (gUnk_03005210 & 1) {
-                        u32 key = gUnk_030051F0[i];
+                    if (gObjFadeFlags & 1) {
+                        u32 key = gObjPaletteKeys[i];
                         if (((((((key == 0x2A) || (key == 0x33)) || (key == 0x34)) ||
                                (key == 0x157)) ||
                               (key == 0)) ||
@@ -193,32 +190,32 @@ void sub_08217430(void)
                             (key == 0x35))
                             continue;
                     }
-                    if (gUnk_03005210 & 2) {
-                        u32 key = gUnk_030051F0[i];
+                    if (gObjFadeFlags & 2) {
+                        u32 key = gObjPaletteKeys[i];
                         if ((((((key == 0x3AA) || (key == 0x23A)) || (key == 0x3AA)) ||
                               (key == 0x2A)) ||
                              (key == 0x33)) ||
                             (key == 0x34))
                             continue;
                     }
-                    if (gUnk_03005210 & 0x10) {
-                        u32 key = gUnk_030051F0[i];
+                    if (gObjFadeFlags & 0x10) {
+                        u32 key = gObjPaletteKeys[i];
                         if ((((key == 0x2A) || (key == 0x33)) || (key == 0x34)) ||
                             ((key - 0x283) <= 8))
                             continue;
                     }
-                    if (gUnk_03005210 & 0x20) {
-                        if (isKey32E(gUnk_030051F0[i]))
+                    if (gObjFadeFlags & 0x20) {
+                        if (isKey32E(gObjPaletteKeys[i]))
                             continue;
                     }
-                    if (gUnk_03005210 & 0x40) {
-                        u32 key = gUnk_030051F0[i];
+                    if (gObjFadeFlags & 0x40) {
+                        u32 key = gObjPaletteKeys[i];
                         if (((key - 0x3AA) <= 5) || ((key - 0x1F7) <= 3))
                             continue;
                     }
                 };
-                if (i < gUnk_030051CC)
-                    src = (u16 *)(gUnk_030042E4 + (gUnk_030051F0[i] << 5));
+                if (i < (*(s32 *)&gPaletteBanksInUse))
+                    src = (u16 *)(gPaletteBankData + (gObjPaletteKeys[i] << 5));
                 else
                     src = gUnk_03004DC0[i].colors;
                 dst = gUnk_03004DC0[i].colors;
@@ -235,5 +232,5 @@ void sub_08217430(void)
             }
         }
     }
-    gUnk_03004DAC = gUnk_030051D4;
+    (*(s32 *)&gObjFadeApplied) = (*(s32 *)&gObjFadeLevel);
 }

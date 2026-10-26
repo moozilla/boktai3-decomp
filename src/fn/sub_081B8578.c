@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct SceneScriptHitSource {
     u8 unknown0[0x38];
@@ -13,7 +14,6 @@ struct SceneScriptHitObject {
     s16 hitCount;
     u16 unknownF0, flashTimer, flashPeriod;
 };
-extern u8 *gUnk_030042E4;
 void Sound_PlaySong(u32);
 
 void SceneScriptObject_ApplyHitFlash(struct SceneScriptHitSource *source, void *unused,
@@ -31,7 +31,7 @@ void SceneScriptObject_ApplyHitFlash(struct SceneScriptHitSource *source, void *
         context.object->flashTimer = 6;
         context.object->flashPeriod = 15;
         context.object->paletteBank = 0x192;
-        CpuSet(gUnk_030042E4 + 0x3240, context.object->palette, 0x04000008);
+        CpuSet(gPaletteBankData + 0x3240, context.object->palette, 0x04000008);
         Sound_PlaySong(0x13E);
     }
 }

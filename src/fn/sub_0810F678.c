@@ -1,9 +1,8 @@
 #include "global.h"
 #include "record_menu.h"
 #include "area_effect_link.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
-#define gActiveRecordMenu gUnk_020001D0
-extern struct RecordMenu *gUnk_020001D0;
 s32 Script_SeekToKeyword(u32);
 u32 Script_GetTextSourcePc(void);
 u32 Script_GetPc(void);
@@ -101,6 +100,6 @@ s32 RecordMenu_Initialize(struct RecordMenu *menu)
                 ScreenTransition_SendCommand(2, 5, 4, 4, 4, 65535, zero);
         }
     }
-    gUnk_020001D0 = menu;
+    gActiveRecordMenu = menu;
     return 1;
 }

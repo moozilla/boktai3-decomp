@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Vanargand {
     u8 pad0[0xAA];
     u8 fieldAA;
@@ -12,7 +13,6 @@ struct Vanargand {
     u8 block21C[0x30A];
     u16 field526;
 };
-extern struct Vanargand *gUnk_02000250;
 void Vanargand_StopActionSequence(void *);
 /* Registry routine 4D12: resets state fields of the Vanargand task
    (tentative; no options). */
@@ -29,7 +29,7 @@ static inline void setState(struct Vanargand *p, u8 state)
    state fields +0xAC..+0xC4) and mode 16; clears +0x526 (tentative). */
 void Vanargand_ResetFromScript(void)
 {
-    struct Vanargand *p = gUnk_02000250;
+    struct Vanargand *p = gSceneComposite;
     u8 mode;
     p->field526 = 0;
     setState(p, 14);

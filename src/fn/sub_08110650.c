@@ -80,7 +80,7 @@ void sub_08110650(struct LinkScorePanel *p)
                 p->skip = 1;
             LinkScorePanel_UpdateRollingNumber(p);
             LinkScorePanel_UpdateNumberReveal(p);
-            LinkScorePanel_SetNumber(p, 1, *(s16 *)((u8 *)gUnk_02000710 + 0x7b2));
+            LinkScorePanel_SetNumber(p, 1, *(s16 *)((u8 *)gGameState + 0x7b2));
             (*timer)++;
         }
     } else {

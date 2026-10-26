@@ -19,7 +19,7 @@ struct P {
 };
 extern u8 *gUnk_030053F8;
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 void Sound_PlayTrackedSong(int);
 void Anim_LoadKeyframe(void *, void *, int, int);
 
@@ -98,7 +98,7 @@ void WirelessResultPanel_UpdateOutcomeReveal(struct P *p)
         u32 mask;
         int value;
         int smallMask;
-        indexPointer = &gUnk_03005308;
+        indexPointer = &gRandomIndex;
         index = *indexPointer + 1;
         mask = 1023;
         index &= mask;

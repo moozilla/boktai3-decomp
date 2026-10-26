@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 /* tentative: positions sprite parts, easing two toward terrain clearance */
 
@@ -33,7 +34,6 @@ struct Cam {
     s32 x;
 };
 extern struct Cam *gUnk_020004B8;
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 s32 Terrain_GetCellClearance(struct Z *);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -41,8 +41,8 @@ void Actor_SetSpriteDepthOffsets(struct Sprite *p, s32 d);
 
 static inline int Rand(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 0x3FF;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 
 void Actor_UpdateShadowSpriteParts(struct Actor *a, struct Sprite *s)

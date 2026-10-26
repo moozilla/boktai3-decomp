@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 #define gArmorPaletteResources gUnk_0824E8A8
 #define gArmorPaletteBank      gUnk_0824E8F8
@@ -45,7 +46,6 @@ struct Armor {
     u8 kind; /* 0xb38 */
 };
 
-extern u8 *gUnk_030042E4;
 extern const u32 gUnk_0824E8A8[];
 extern const u8 gUnk_0824E8F8[];
 extern const u8 gUnk_0824E90C[];
@@ -69,7 +69,7 @@ void Armor_BindPaletteBanks(struct Armor *p)
         src = (u8 *)ScriptProc_Start(0x92b3, resource) + 0x14;
         tag = 0xf000 | resource;
     } else {
-        src = gUnk_030042E4 + 0x41e0;
+        src = gPaletteBankData + 0x41e0;
         tag = 0xf20f;
     }
     bank = gUnk_0824E8F8[index];

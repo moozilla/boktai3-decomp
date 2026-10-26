@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_02000190;
+#include "ram.h"
 
 void FragmentSpritePool_ResetSingleton(void)
 {
-    gUnk_02000190 = 0;
+    gScriptedColliderManager = 0;
 }

@@ -55,7 +55,7 @@ static inline void BeginContactTurn(void *obj, u32 saved)
         s32 tries = 0;
         s32 choice;
         const u16 *table = gUnk_0203B400;
-        u32 *randomIndex = &gUnk_03005308;
+        u32 *randomIndex = &gRandomIndex;
         u32 wrap;
         register u32 mask asm("r6");
         do {

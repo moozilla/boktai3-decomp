@@ -22,7 +22,7 @@ void InventoryGrid_UpdateStatPreview(struct SceneHudState *p)
         value = 120;
     t[0] = value * 5 + 100;
     sub_08164480(p, 1, 8, 10, p->actionOwner->currentStatB, t[0], 1);
-    Inventory_GetEquippedDescriptor((s16)gUnk_02000710->unk50, &descriptor);
+    Inventory_GetEquippedDescriptor((s16)gGameState->unk50, &descriptor);
     t[1] = 7;
     InventoryPanel_UpdateSelectedUnlock(p, 20, t[1], 0, p->comparisonOffsets[2]);
     InventoryPanel_UpdateSelectedEquipment(p, 26, 7, 0, p->comparisonOffsets[2]);

@@ -12,8 +12,8 @@ static inline s32 truncateShift12(s32 value)
 }
 static inline u32 nextRandom(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return ((const u16 *)RANDOM_TABLE_ADDR)[index];
 }
 void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactActor *slot, s32 index)

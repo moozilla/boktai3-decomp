@@ -78,7 +78,7 @@ static inline void effect2(u8 *p, int mode, int id, int duration)
     } else if (p[0x38e] == 1)
         p[0x38c] = 0;
 }
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void SceneActors_StopBackgroundFlash(void *);
 void BackgroundFlash_BeginAppearance(void *);
@@ -112,9 +112,9 @@ void SceneActorAnimation_UpdateFlashWindup(ActorAnimation *p, int tick)
             int age = tick >> 6;
             U8(p2, 0x399) = age;
         }
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 index = gUnk_03005308 * 2;
+            u32 index = gRandomIndex * 2;
             u16 *table;
             u32 random;
             table = ((u16 *)RANDOM_TABLE_ADDR);

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct Vec {
     s16 x, y, z;
@@ -17,7 +18,6 @@ struct Camera {
     u16 f82;
 };
 
-extern struct Camera *gUnk_03005420;
 extern struct Vec gUnk_030042A0;
 extern struct Vec gUnk_03005418;
 
@@ -45,13 +45,13 @@ static inline void updateScroll(void)
    (f1c == 0) refresh the scroll position from it plus the offset at 0x80. */
 void Camera_SetPosition(u16 *pos)
 {
-    struct Camera *c = gUnk_03005420;
+    struct Camera *c = gActiveCamera;
     if (c) {
         c->x = pos[0];
         c->y = pos[1];
         c->z = pos[2];
         Camera_ApplyPositionBounds(c, &c->x);
-        c = gUnk_03005420;
+        c = gActiveCamera;
         c->f54 = 1;
         if (c->f1c == 0) {
             gUnk_030042A0.x = c->x + c->f80;

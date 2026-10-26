@@ -1,8 +1,8 @@
 // Tentative names: PalFade_Start sets up a timed fade between two 16-colour palette rows.
 #include "global.h"
+#include "render.h"
 s32 Div(s32, s32);
 void PalFade_Start(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32 flags, s32 mode);
-extern u8 *gUnk_030042E4;
 struct PalFade {
     u16 out[32];
     u16 timer, duration, p1, p2, p3, p4;
@@ -49,14 +49,14 @@ void PalFade_Start(void *self, s32 p1, s32 p2, s32 p3, s32 p4, s32 duration, u32
         s16 *greenBase, *blueBase;
         accrBase = f->acc[0];
         if (j == 0) {
-            src1 = (u16 *)(gUnk_030042E4 + (p1 * 32));
-            src2 = (u16 *)(gUnk_030042E4 + (p3 * 32));
+            src1 = (u16 *)(gPaletteBankData + (p1 * 32));
+            src2 = (u16 *)(gPaletteBankData + (p3 * 32));
             slot = &((struct PalFadeOwner *)self)->renderers;
             if (mode == 1)
                 src2 = f->out;
         } else {
-            src1 = (u16 *)(gUnk_030042E4 + (p2 * 32));
-            src2 = (u16 *)(gUnk_030042E4 + (p4 * 32));
+            src1 = (u16 *)(gPaletteBankData + (p2 * 32));
+            src2 = (u16 *)(gPaletteBankData + (p4 * 32));
             slot = &((struct PalFadeOwner *)self)->renderers;
             if (mode == 1)
                 src2 = f->out + 16;

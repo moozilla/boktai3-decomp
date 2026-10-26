@@ -3,7 +3,7 @@
 #define B(o)       (*(u8 *)(p + (o)))
 #define H(o)       (*(u16 *)(p + (o)))
 #define ANIMATE(n) Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), n), 64, 1)
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern const s16 gUnk_086149C4[];
 u32 Player_ConsumeStateEntry(void *);
 void Player_SetActionPhase(void *, u8);
@@ -94,7 +94,7 @@ void Player_UpdateSustainedSpinAttack(u8 *p)
                     }
                 } else
                     enough = 1;
-                power = *(s16 *)(gUnk_02000710 + 0x40) + desc[1];
+                power = *(s16 *)(gGameState + 0x40) + desc[1];
                 if (!(**(u16 **)(p + 0x348) & 2) || !enough) {
                     Sound_StopSong(0xCC);
                     Player_SetActionPhase(p, 6);

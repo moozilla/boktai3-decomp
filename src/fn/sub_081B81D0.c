@@ -1,7 +1,8 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "palette_set.h"
-#define gPaletteBanks gUnk_030042E4
+#include "render.h"
+#define gPaletteBanks gPaletteBankData
 struct SceneScriptFadeWidget {
     u8 unknown0[6];
     u16 flags;
@@ -29,7 +30,6 @@ struct SceneScriptFadeObject {
     u16 finished;
     u16 counter;
 };
-extern u8 *gUnk_030042E4;
 extern const s16 gUnk_086149C4[];
 extern const s32 gUnk_0824F7A4[15];
 void CpuSet(const void *, void *, u32);

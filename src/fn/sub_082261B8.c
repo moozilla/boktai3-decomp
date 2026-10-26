@@ -1,10 +1,10 @@
 #include "global.h"
+#include "ram.h"
 /* Tentative: converts a 2D grid-style (x, y) pair to an isometric camera offset and applies it. */
 struct PackedXY {
     s16 x, y;
     u32 pad;
 };
-extern void *gUnk_03005420;
 void Camera_SetTargetOffset(s16 *);
 
 #define HALF(v) ((v) >= 0 ? (v) >> 1 : -(-(v) >> 1))
@@ -13,7 +13,7 @@ void Camera_SetIsometricOffset(u32 x, u32 y)
 {
     s16 out[4];
     struct PackedXY in;
-    if (gUnk_03005420 != 0) {
+    if (gActiveCamera != 0) {
         s32 a;
         s32 b;
         s32 t;

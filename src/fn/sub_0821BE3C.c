@@ -9,9 +9,9 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline s32 cellIndex(struct TerrainPos *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline s32 groundHeight(struct TerrainPos *position)
 {
@@ -21,7 +21,7 @@ static inline s32 groundHeight(struct TerrainPos *position)
     if (cell)
         cell += 4;
     else
-        cell = gUnk_030052F4->cells + 12 + index * 4;
+        cell = gTerrainMap->cells + 12 + index * 4;
     kind = *cell >> 4;
     height = (*cell & 15) << 8;
     switch (kind) {

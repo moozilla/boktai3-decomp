@@ -1,8 +1,8 @@
 #include "global.h"
+#include "ram.h"
 #define ScreenMote_Allocate      SpriteParticle_AllocateSlot
 #define ScreenMote_CreateManager SpriteParticle_GetOrCreateManager
-#define gScreenMoteManager       gUnk_020001E0
-#define gRandomCursor            gUnk_03005304
+#define gRandomCursor            gEffectRandomTableIndex
 #define gRandomValues            gUnk_086141BC
 /* Tentative screen-space particle family; coordinates are packed signed halves. */
 union ScreenMotePosition {
@@ -32,8 +32,6 @@ struct ScreenMoteManager {
     void *resource;
     struct ScreenMoteSprite sprites[1];
 };
-extern struct ScreenMoteManager *gUnk_020001E0;
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 struct ScreenMoteManager *SpriteParticle_GetOrCreateManager(void);
 struct ScreenMoteState *SpriteParticle_AllocateSlot(struct ScreenMoteManager *);
@@ -44,8 +42,8 @@ void Effect_SetPalette(struct ScreenMoteSprite *, u32);
 void SpriteDrawable_SelectTileFrame(struct ScreenMoteSprite *, void *, u32);
 static inline u32 NextRandom(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 0x3ff;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3ff;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 s32 ScreenMote_SpawnBatch(union ScreenMotePosition *origin, union ScreenMotePosition *target,
                           s16 *range, s32 count, u32 mode, u32 unused, u32 flags, u32 options)
@@ -56,7 +54,7 @@ s32 ScreenMote_SpawnBatch(union ScreenMotePosition *origin, union ScreenMotePosi
     s32 i;
     if (!origin)
         return -1;
-    m = gUnk_020001E0;
+    m = gScreenMoteManager;
     if (!m) {
         m = SpriteParticle_GetOrCreateManager();
         if (!m)

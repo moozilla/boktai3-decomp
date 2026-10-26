@@ -45,7 +45,7 @@ void SceneHud_DrawNumericStatus(u32 mode)
             }
         }
         {
-            struct GameState *state = gUnk_02000710;
+            struct GameState *state = gGameState;
             u32 offset;
             const s16 *field;
             s32 value;
@@ -96,7 +96,7 @@ void SceneHud_DrawNumericStatus(u32 mode)
                 output[1] = stored;
             }
         }
-        SceneHud_DrawDecimal(((struct SceneHudNumericView *)gUnk_02000710)->value50C, 10000, 24, 1,
+        SceneHud_DrawDecimal(((struct SceneHudNumericView *)gGameState)->value50C, 10000, 24, 1,
                              mode);
     } else {
         {
@@ -140,7 +140,7 @@ void SceneHud_DrawNumericStatus(u32 mode)
             }
         }
         {
-            struct GameState *state = gUnk_02000710;
+            struct GameState *state = gGameState;
             u32 offset;
             const s32 *field;
             s32 value;

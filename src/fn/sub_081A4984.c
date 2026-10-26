@@ -1,5 +1,5 @@
-#define gHresvelgrProjectilePool gUnk_02000244
 #include "global.h"
+#include "ram.h"
 struct ProjectilePosition {
     s16 x, y, z, pad;
 };
@@ -19,7 +19,6 @@ struct HresvelgrProjectilePool {
     u8 animation[0x4a];
     u16 count;
 };
-extern struct HresvelgrProjectilePool *gHresvelgrProjectilePool;
 struct HresvelgrProjectile *Hresvelgr_FindFreeProjectileSlot(void);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);

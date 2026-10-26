@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "render.h"
 
 struct NpcDisplayPalette {
     u8 unk_00[0xC];
@@ -27,7 +28,6 @@ struct SceneNpc {
     void (*stateCallback)(void);
 };
 
-extern u8 *gUnk_030042E4;
 void Palette_InterpolateBanks(void *, void *, void *, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
 u32 PlayerParticleCloud_Create(void *, u32);
@@ -44,14 +44,14 @@ void SceneNpc_UpdateParticleDisappearance(void *ctx, struct SceneNpc *npc, s32 t
         Actor_PlayAnimationEntry(npc, 0, 0, 8, 0);
         npc->phase = zero;
         npc->stateFrame = zero;
-        CpuSet(gUnk_030042E4 + 0x2AE0, npc->palette, 0x04000008);
+        CpuSet(gPaletteBankData + 0x2AE0, npc->palette, 0x04000008);
     }
     npc->displayFlags |= 1;
     switch (npc->phase) {
         case 0:
             if (npc->stateFrame <= 0x80) {
-                void *a = gUnk_030042E4 + 0x2AE0;
-                void *b = gUnk_030042E4 + 0x2B00;
+                void *a = gPaletteBankData + 0x2AE0;
+                void *b = gPaletteBankData + 0x2B00;
                 void *dest = npc->palette;
                 Palette_InterpolateBanks(dest, a, b, tick, 7);
                 {
@@ -85,7 +85,7 @@ void SceneNpc_UpdateParticleDisappearance(void *ctx, struct SceneNpc *npc, s32 t
         }
             if (tick > 0xF0) {
                 void (*callback)(void);
-                CpuSet(gUnk_030042E4 + 0x2AE0, npc->palette, 0x04000008);
+                CpuSet(gPaletteBankData + 0x2AE0, npc->palette, 0x04000008);
                 PlayerParticleCloud_RequestStop();
                 npc->done = 1;
                 callback = Actor_OnHiddenIdleUpdate;

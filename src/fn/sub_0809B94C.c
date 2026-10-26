@@ -8,7 +8,7 @@
 
 // Remaining differences: instruction ordering, address lifetimes, and registers.
 #include "scene_actor_reset.h"
-extern u32 gUnk_03005308;
+#include "engine.h"
 extern const u16 gUnk_0203B400[];
 extern u8 *gUnk_02000580[];
 s32 Mod(s32, s32);
@@ -57,8 +57,8 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u32 state, u3
 }
 static inline u32 Rand(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return gUnk_0203B400[gRandomIndex];
 }
 static inline s32 Quarter(s32 v)
 {

@@ -1,8 +1,7 @@
-#define gSceneCallbackPool gUnk_020004C8
 #include "global.h"
 #include "scene_callback_pool.h"
+#include "ram.h"
 void Memory_Clear(void *, u32);
-extern struct SceneCallbackPool *gUnk_020004C8;
 s32 SceneCallbackPool_Initialize(struct SceneCallbackPool *pool)
 {
     s32 i;

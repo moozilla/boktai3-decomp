@@ -17,9 +17,9 @@ static inline u32 counter(u32 slot, struct GameState *state)
 void Player_ResetStatus(struct Player *p)
 {
     p->statusFlags = 1;
-    if (*(s32 *)(counter(p->timedEventSlot, gUnk_02000710) + 0x628) < 0)
-        *(s32 *)(counter(p->timedEventSlot, gUnk_02000710) + 0x628) = 0;
-    if (*(s32 *)(counter(p->timedEventSlot, gUnk_02000710) + 0x628) == 0 &&
+    if (*(s32 *)(counter(p->timedEventSlot, gGameState) + 0x628) < 0)
+        *(s32 *)(counter(p->timedEventSlot, gGameState) + 0x628) = 0;
+    if (*(s32 *)(counter(p->timedEventSlot, gGameState) + 0x628) == 0 &&
         AreaEffect_TestPlayerCoverage((u8 *)p))
         set(&p->statusFlags, 0x10);
     if (p && masked(&p->statBonusFlags, 0x2000))

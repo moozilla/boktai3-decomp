@@ -62,9 +62,9 @@ struct EnvironmentState {
     u8 unk_00[0x876];
     s16 level;
 };
-extern struct EnvironmentState *gUnk_02000710;
+extern struct EnvironmentState *gGameState;
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 s32 Hresvelgr_GetEnvironmentalLevel(void *);
 void Hresvelgr_EmitRandomMotionBurst(void *);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
@@ -76,8 +76,8 @@ void Sound_PlaySongChecked(s32);
 static inline s32 nextRandom(const u16 *table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(u16 *)(offset + (u32)table);
 }
 static inline void spawnSparks(struct HresvelgrDamage *p)
@@ -178,7 +178,7 @@ s32 Hresvelgr_ApplyContactDamage(struct HresvelgrDamage *p)
     }
     if (!saved->environmentTimer) {
         if (!saved->timer314 && !saved->timer318 && Hresvelgr_GetEnvironmentalLevel(saved)) {
-            damage = gUnk_02000710->level * 5;
+            damage = gGameState->level * 5;
             spawnSparks(saved);
             Sound_PlaySongChecked(0x12a);
             saved->environmentTimer = 60;

@@ -6,6 +6,7 @@
 // Remaining differences: random-source lifetimes, sprite pointers and inlined sequence allocation.
 #define Ratatosk_SpawnAnimatedParticle sub_081FC26C
 #include "contact_swarm.h"
+#include "ram.h"
 struct Particle {
     u32 age;
     u8 pad4[8];
@@ -160,12 +161,11 @@ static inline void updatePlayback(struct Particle *eIn, struct DisplaySequenceSt
     }
 }
 
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 static inline u32 RandomSample(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 // confidence=low: randomizes a larger particle record and its sprite or sequence.
 inline static void updatePlayback_081FC26C(struct Particle *eIn, struct DisplaySequenceState *state,

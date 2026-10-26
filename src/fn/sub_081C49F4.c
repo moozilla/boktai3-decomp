@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "display_animation.h"
+#include "render.h"
 struct WheelSprite {
     u32 flags;
     u8 pad4[0xC];
@@ -24,7 +25,6 @@ struct Wheel {
     u8 palette[0x18];
     u8 paletteBuffer[0x20];
 };
-extern u8 *gUnk_030042E4;
 void TimePalette_InitTransition(void *, void *, void *, void *);
 void SceneMessages_RegisterReceiver(void *, void *, s32);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
@@ -161,8 +161,8 @@ s32 sub_081C49F4(struct Wheel *p, void *owner)
     struct WheelSprite *sprite = &p->sprite;
     u8 *resource = p->resource;
     AnimData_Load(resource, 0x2173);
-    TimePalette_InitTransition(p->palette, gUnk_030042E4 + 0x2D20, gUnk_030042E4 + 0x2D40,
-                               gUnk_030042E4 + 0x2D60);
+    TimePalette_InitTransition(p->palette, gPaletteBankData + 0x2D20, gPaletteBankData + 0x2D40,
+                               gPaletteBankData + 0x2D60);
     *((void **)Arg1(0xC, resource)) = p->paletteBuffer;
     p->paletteIndex = 0x169;
     Sprite_Init(sprite, resource, 0);

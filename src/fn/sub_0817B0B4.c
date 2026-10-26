@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: controls the actor palette fade and repeating pulse sequence
 struct PaletteActor {
@@ -7,7 +8,6 @@ struct PaletteActor {
     u8 pad508[0x6F8];
     u16 palette[16];
 };
-extern u8 *gUnk_030042E4;
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 void SceneVolume_ResetPendingSequence(void *);
 static inline s32 Fraction(s32 time, s32 end)
@@ -34,7 +34,7 @@ void BossSlot2_UpdateSequencePalette(struct PaletteActor *p)
                 register void *b asm("r6");
                 register u8 *base asm("r0");
                 p->timer++;
-                base = gUnk_030042E4;
+                base = gPaletteBankData;
                 a = base + 0x2E80;
                 b = base + 0x680;
                 Palette_InterpolateBanks(p->palette, a, b, Fraction((s8)p->timer, 1 << p->shift),
@@ -47,8 +47,8 @@ void BossSlot2_UpdateSequencePalette(struct PaletteActor *p)
                 void *a;
                 register void *b asm("r7");
                 p->timer++;
-                a = gUnk_030042E4 + 0x680;
-                b = gUnk_030042E4 + 0x2DE0;
+                a = gPaletteBankData + 0x680;
+                b = gPaletteBankData + 0x2DE0;
                 Palette_InterpolateBanks(p->palette, a, b, Fraction((s8)p->timer, 1 << p->shift),
                                          p->shift);
             } else
@@ -59,8 +59,8 @@ void BossSlot2_UpdateSequencePalette(struct PaletteActor *p)
                 void *a;
                 register void *b asm("r7");
                 p->timer++;
-                a = gUnk_030042E4 + 0x2DE0;
-                b = gUnk_030042E4 + 0x680;
+                a = gPaletteBankData + 0x2DE0;
+                b = gPaletteBankData + 0x680;
                 Palette_InterpolateBanks(p->palette, a, b, Fraction((s8)p->timer, 1 << p->shift),
                                          p->shift);
             } else
@@ -73,12 +73,12 @@ void BossSlot2_UpdateSequencePalette(struct PaletteActor *p)
             shift = p->shift - 1;
             half = 1 << shift;
             if (time < half) {
-                void *a = gUnk_030042E4 + 0x680;
-                void *b = gUnk_030042E4 + 0x2DE0;
+                void *a = gPaletteBankData + 0x680;
+                void *b = gPaletteBankData + 0x2DE0;
                 Palette_InterpolateBanks(p->palette, a, b, time, shift);
             } else {
-                void *a = gUnk_030042E4 + 0x2DE0;
-                void *b = gUnk_030042E4 + 0x680;
+                void *a = gPaletteBankData + 0x2DE0;
+                void *b = gPaletteBankData + 0x680;
                 Palette_InterpolateBanks(p->palette, a, b, time - half, shift);
             }
             break;

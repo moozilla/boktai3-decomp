@@ -4,7 +4,7 @@
 #define B(n) (*(u8 *)(p + (n)))
 #define H(n) (*(u16 *)(p + (n)))
 #define S(n) (*(s16 *)(p + (n)))
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern const s16 gUnk_086149C4[];
 s32 Player_GetMovementSpeed(void *);
 s32 Math_Atan2(s32, s32);
@@ -67,7 +67,7 @@ static inline u32 ReadHeldInput(u8 *p)
 }
 static inline s32 ReadHeldEnergy(void)
 {
-    u8 *global = gUnk_02000710;
+    u8 *global = gGameState;
     register u32 offset asm("r2");
     offset = 0x77C;
     asm("" : "+r"(offset));
@@ -126,7 +126,7 @@ void Player_UpdateHeldInteraction(u8 *arg)
                 song = 0x12E;
                 goto cue;
             }
-            if (*(s32 *)(gUnk_02000710 + 0x77C) <= 0)
+            if (*(s32 *)(gGameState + 0x77C) <= 0)
                 goto empty;
             Sound_PlaySong(0xD8);
             B(0x4FD) = 1;

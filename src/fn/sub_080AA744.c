@@ -1,6 +1,6 @@
 #include "global.h"
+#include "engine.h"
 
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 
@@ -79,8 +79,8 @@ void sub_080AA744(struct Actor080AA744 *actor)
         struct Trail080AA744Osc *seg = &trail->segments[i];
         if (Trail080AA744IsActive(seg) && !Trail080AA744IsHidden(seg)) {
             u16 r;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-            r = gUnk_0203B400[gUnk_03005308];
+            gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+            r = gUnk_0203B400[gRandomIndex];
             r &= mask;
             seg->offsetX = Trail080AA744FixedMul(gUnk_086149C4[(r + 0x40) & 0xFF], 12);
             seg->offsetY = 0;

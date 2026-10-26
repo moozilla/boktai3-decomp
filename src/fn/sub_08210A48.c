@@ -1,6 +1,6 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 u32 Collection_IsEntryUnlocked(u32 i)
 {
-    return *(u32 *)(gUnk_02000710 + 0x728) & (1 << i);
+    return *(u32 *)(gGameState + 0x728) & (1 << i);
 }

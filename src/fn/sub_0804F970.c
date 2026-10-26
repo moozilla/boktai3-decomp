@@ -8,7 +8,7 @@ static inline u8 tst(u32 *a, u32 m)
 void RepeatedEffect_TickUpperState(struct RepeatedEffect *p)
 {
     u32 m = 0x1000;
-    if (tst((u32 *)((u8 *)gUnk_02000710 + 0x868), m)) {
+    if (tst((u32 *)((u8 *)gGameState + 0x868), m)) {
         u16 *c = (u16 *)&p->balance;
         u32 v = *c + 1;
         *c = v;

@@ -1,12 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 
 // Draft: effect timer tick (screen transition at 0, collider refresh, shake).
 // Open: the original recomputes the u16 extension of the counter for the second
 // compare, and loads the pause-flag word after building the mask.
 
-extern u32 gUnk_0300523C;
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 void Sound_PlaySong(u32);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 s32 Collider_Refresh(void *);
@@ -23,14 +23,14 @@ void sub_082356E4(u8 *p)
     u16 *q;
     s32 n;
     if (*counter == 0) {
-        gUnk_0300523C = Mask(&gUnk_0300523C, ~4);
+        gEnginePauseFlags = Mask(&gEnginePauseFlags, ~4);
         Sound_PlaySong(0x67);
         ScreenTransition_SendCommand(2, 4, 0x1f, 0x1f, 0x1f, 0x1fff, 1);
     }
     if (*counter <= 5) {
         Collider_Refresh(p + 0x94);
     } else if (*counter == 6) {
-        gUnk_030053F4 &= ~1;
+        gEngineFlags &= ~1;
     }
     q = (u16 *)(p + 0x34e);
     n = *q + 1;

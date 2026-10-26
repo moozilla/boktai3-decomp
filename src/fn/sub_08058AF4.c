@@ -12,7 +12,7 @@ void ScenePanel_InitOverlay(struct ScenePanel *panel)
     resource.pointers[2] += (u32)original;
     {
         u32 mask = 0x800;
-        u16 *shadow = &gUnk_03004BD8;
+        u16 *shadow = &gDispCntShadow;
         *shadow = mask | *shadow;
     }
     Bg_SetPriority(3, 1);

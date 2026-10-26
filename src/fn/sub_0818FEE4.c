@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "game_state.h"
+#include "ram.h"
 
 struct NidhoggrPoolSequence {
     const volatile u16 *commands;
@@ -38,8 +40,6 @@ struct EffectDelta {
     s32 y : 16;
     s32 z : 16;
 };
-extern struct NidhoggrTarget *gUnk_02000710;
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
 s32 Callback_InvokeActor(void *, void *);
@@ -143,8 +143,8 @@ static inline void StepSequence(struct NidhoggrAnimatedSlot *owner)
 
 static inline s32 RandomValue(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 static inline void AddPosition(struct NidhoggrEffectVector *out,
                                struct NidhoggrEffectVector *position)
@@ -171,7 +171,7 @@ void Nidhoggr_UpdateSeekingAttackEffect(struct NidhoggrAnimatedSlot *owner)
         goto impact;
     {
         {
-            struct NidhoggrTarget **targetSlot = &gUnk_02000710;
+            struct NidhoggrTarget **targetSlot = &gGameState;
             struct NidhoggrTarget *target = *targetSlot;
             s32 targetX = target->x;
             /* Keep both address values live through the signed coordinate load. */

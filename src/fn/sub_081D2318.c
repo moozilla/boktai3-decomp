@@ -1,6 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #include "player.h"
+#include "engine.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -31,7 +32,6 @@ struct Context {
     struct Vec *target;
     struct Player *targetActor;
 };
-extern u32 gUnk_030053F4;
 s32 Math_Atan2(s32, s32);
 void TaggedSceneNpc_PlayTaggedAnimation(void *, s32, s32, s32, s32);
 void Actor_SetAttachmentEffect(void *, s32, s32, s32);
@@ -118,7 +118,7 @@ void TaggedSceneNpc_UpdateTargetFacing(struct Context *ctx, struct Npc *p)
             u8 angle = p->angle;
             p->savedAngle = angle;
         }
-        if (((ctx->targetActor && !AllowsFacing(ctx->targetActor)) && (!(gUnk_030053F4 & 0x200))) &&
+        if (((ctx->targetActor && !AllowsFacing(ctx->targetActor)) && (!(gEngineFlags & 0x200))) &&
             (p->attachmentEnabled)) {
             Actor_SetAttachmentEffect(p, 3, 0, 0);
         }

@@ -18,7 +18,7 @@ void ModifierMenu_InitializePreview(struct ModifierMenu *menu)
     origin.y = 80;
     origin.z = 0;
     mask = 0x800;
-    flags = (gUnk_030053F4 | gUnk_030053F0) & mask;
+    flags = (gEngineFlags | gUnk_030053F0) & mask;
     if (flags) {
         s32 id;
         struct ModifierMenuActor *actor = gUnk_020004B4;
@@ -38,5 +38,5 @@ void ModifierMenu_InitializePreview(struct ModifierMenu *menu)
     CharacterPreview_PositionParts(resource, model, &origin, 0);
     CharacterModel_SetAnimationFlags(model, 16);
     CharacterModel_SetComponentRenderMode(model, 1);
-    CharacterModel_InitPalettes(model, gUnk_02000710->unk81A);
+    CharacterModel_InitPalettes(model, gGameState->unk81A);
 }

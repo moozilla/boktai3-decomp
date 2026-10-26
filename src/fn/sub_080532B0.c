@@ -6,8 +6,8 @@ struct ActorMapView {
     u8 unknown8[0x1C];
     u16 rowOffsets[1];
 };
-extern struct ActorMapView *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
+extern struct ActorMapView *gTerrainMap;
+extern u32 gTerrainWidth, gTerrainHeight;
 extern u8 *gUnk_02000580;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
@@ -60,17 +60,17 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
         x = (s16) * (volatile u16 *)worldX >> 8;
         z = (s16) * (volatile u16 *)((u8 *)worldX + 4) >> 8;
         cache.world = (void *)worldX;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             index = 0;
         else {
-            u32 row = gUnk_030052F4->rowOffsets[z];
+            u32 row = gTerrainMap->rowOffsets[z];
             index = row + x;
         }
         cell = TerrainModifiers_FindCellOverride(index, 1);
         if (cell)
             cell += 4;
         else {
-            struct ActorMapView *map = gUnk_030052F4;
+            struct ActorMapView *map = gTerrainMap;
             u32 offset = index * 4 + 12;
             cell = map->cells + offset;
         }

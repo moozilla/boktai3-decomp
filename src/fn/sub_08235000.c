@@ -1,9 +1,9 @@
 #include "global.h"
+#include "engine.h"
 struct Vec50 {
     s32 x : 16, y : 16, z : 16;
 };
 extern u16 gUnk_03005418[];
-extern u32 gUnk_030053F4;
 void HealthRestoreEffect_InitAnimation(u8 *);
 void HealthRestoreEffect_InitParticlePool(u8 *);
 void sub_08234DC8(u8 *);
@@ -42,6 +42,6 @@ s32 HealthRestoreEffect_Init(u8 *p, u8 *owner)
     HealthRestoreEffect_InitParticlePool(p);
     *(void (**)(u8 *))(p + 0x274) = sub_08234DC8;
     *(u16 *)(p + 0x270) = zero;
-    gUnk_030053F4 |= 1;
+    gEngineFlags |= 1;
     return 0;
 }

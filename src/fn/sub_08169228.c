@@ -22,7 +22,7 @@ struct SceneHudSecondaryView {
 
 static inline s32 Player_IsEquipmentLocked(struct Player *owner)
 {
-    if (gUnk_030053F4 & 0x1000)
+    if (gEngineFlags & 0x1000)
         goto zero;
     if ((u8)(owner->actionMode - 1) <= 1)
         goto one;
@@ -33,7 +33,7 @@ one:
 }
 static inline s32 PauseMenu_IsEquipmentLocked(struct SceneHudState *p)
 {
-    if (gUnk_030053F4 & 0x1000)
+    if (gEngineFlags & 0x1000)
         goto zero;
     if ((u8)(p->actionOwner->actionMode - 1) <= 1)
         goto one;
@@ -75,7 +75,7 @@ void PauseMenu_UpdateEquipmentSelection(struct SceneHudState *p)
                 if (p->selection >= p->secondaryCount)
                     p->selection = 0;
                 {
-                    u16 *out = &gUnk_02000710->unk50;
+                    u16 *out = &gGameState->unk50;
                     *out = ((struct SceneHudSecondaryView *)p)->options[p->selection].value;
                 }
                 p->secondarySlideTimer = 8;
@@ -91,7 +91,7 @@ void PauseMenu_UpdateEquipmentSelection(struct SceneHudState *p)
                 if (p->tertiarySelection >= p->tertiaryVisible)
                     p->tertiarySelection = 0;
                 {
-                    s16 *out = &gUnk_02000710->actionAuxiliarySlot;
+                    s16 *out = &gGameState->actionAuxiliarySlot;
                     *out = (s8)p->tertiaryOptions[p->tertiarySelection].slot;
                 }
                 p->tertiarySlideTimer = 8;

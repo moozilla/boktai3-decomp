@@ -2,6 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "area_effect_link.h"
+#include "render.h"
 void SceneActorRecord_RecordPair(u16, u16);
 void Player_NotifyFirstSelectedSlot(u32, u32);
 void Player_RefreshLifeState(u32, u32);
@@ -13,7 +14,6 @@ void AnimData_SelectPaletteBank(void *, s32);
 void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
 void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
-extern u8 *gUnk_030042E4;
 extern u16 gUnk_030039F0;
 struct BurnState {
     u8 unknown0[0xAA];
@@ -22,7 +22,7 @@ struct BurnState {
     u16 durations[4];
     u16 count, active, timer;
 };
-#define STATS   ((u8 *)gUnk_02000710)
+#define STATS   ((u8 *)gGameState)
 #define H(p, n) (*(s16 *)((p) + (n)))
 struct GroupLink {
     u32 unknown0;
@@ -136,7 +136,7 @@ static inline s32 LocalPlayer(void)
 }
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u32 *owner = &actor->field2E0;
         register u32 mask asm("r2") = *owner;
         if (!(mask & 0x20) && mask) {
@@ -267,7 +267,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
                         AnimData_SelectPaletteBank((u8 *)p->drawable + 0x2C, bank);
                     else {
                         struct SceneActorRegistryResetView *q = actor;
-                        *(u8 **)((u8 *)q->drawable + 0x68) = gUnk_030042E4 + bank * 32;
+                        *(u8 **)((u8 *)q->drawable + 0x68) = gPaletteBankData + bank * 32;
                     }
                 }
                 {
@@ -308,7 +308,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
         void *control = *(void **)((u8 *)actor + 0x234);
         Reaction_SetControl(actor, 17, control);
     }
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         Player_NotifyFirstSelectedSlot(actor->field2E0, actor->field2D8);
         goto done;
     }
@@ -408,7 +408,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
     }
 
 record:
-    if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gUnk_030053F4, 0x4800) && !Flag2D0(actor, 0x800))
+    if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
         SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
     ((struct ContactCollider *)collider)->flags |= 4;
 done:

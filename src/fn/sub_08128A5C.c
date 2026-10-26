@@ -1,5 +1,5 @@
-#define gSpriteGroupPool gUnk_02000170
 #include "global.h"
+#include "ram.h"
 struct GroupSprite {
     u8 unknown[4];
     u8 active;
@@ -14,7 +14,6 @@ struct SpriteGroupPool {
     u32 activeMask;
     struct SpriteGroup groups[4];
 };
-extern struct SpriteGroupPool *gUnk_02000170;
 void Sprite_Remove(void *);
 static inline u8 IsActive(u32 *mask, s32 slot)
 {
@@ -36,5 +35,5 @@ struct SpriteGroupPool *SpriteGroupPool_Destroy(struct SpriteGroupPool *pool)
             }
         }
     }
-    return gUnk_02000170 = 0;
+    return gSpriteGroupPool = 0;
 }

@@ -13,9 +13,9 @@ void ScenePanel_InitRig(struct ScenePanel *input)
     rig->origin.z -= 32;
     rig->position = rig->origin;
     rig->position.y += 128;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    Mod(*(u16 *)(RANDOM_TABLE_ADDR + gUnk_03005308 * 2), 600);
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    Mod(*(u16 *)(RANDOM_TABLE_ADDR + gRandomIndex * 2), 600);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
     ScenePanelRig_InitSprites(rig);
     if (Script_SeekToKeyword('L'))
         power = Script_GetValue();
@@ -39,7 +39,7 @@ void ScenePanel_InitRig(struct ScenePanel *input)
         u32 mask63;
         asm("" : "+r"(table));
         {
-            u32 *initialIndex = &gUnk_03005308;
+            u32 *initialIndex = &gRandomIndex;
             randomIndex = initialIndex;
             next = *initialIndex + 1;
         }

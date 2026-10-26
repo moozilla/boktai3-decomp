@@ -1,9 +1,9 @@
 #include "global.h"
+#include "render.h"
 struct Elem {
     u32 flags;
     u8 pad[40];
 };
-extern u32 gUnk_0300523C;
 void HealthBurstEffect_StartBurst(u8 *);
 void HealthBurstEffect_UpdateBurstSprites(u8 *);
 void HealthBurstEffect_UpdateFadeOut(u8 *);
@@ -20,7 +20,7 @@ void HealthBurstEffect_UpdateBursts(u8 *p)
     HealthBurstEffect_UpdateBurstSprites(p);
     H(0x34e)++;
     if (H(0x34e) > 121) {
-        u32 *flags = &gUnk_0300523C;
+        u32 *flags = &gEnginePauseFlags;
         void (*next)(u8 *) = HealthBurstEffect_UpdateFadeOut;
         u32 one = 1;
         s32 addr = (s32)(p + 0xe8), end = (s32)(p + 0x114);

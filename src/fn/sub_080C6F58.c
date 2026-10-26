@@ -136,10 +136,10 @@ done: {
         u32 count;
         /* Retain the original RNG scratch lifetime; this literal is never dereferenced. */
         register u32 unused asm("r4") = 0x0403B714;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
             u32 mask = 0xFF;
-            direction = ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308] & mask;
+            direction = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex] & mask;
         }
         velocity.x = Scale8(gUnk_086149C4[(direction + 0x40) & 0xFF]);
         velocity.y = 0;
@@ -148,9 +148,9 @@ done: {
         size.x = 48;
         size.y = 0;
         size.z = 48;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 bits = ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+            u32 bits = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
             bits &= 1;
             count = bits + 2;
         }

@@ -1,5 +1,5 @@
 #include "global.h"
-extern void *gUnk_02000240;
+#include "ram.h"
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);
@@ -9,9 +9,9 @@ s32 EffectSpritePool_Initialize(void *);
 void *Hresvelgr_CreateEffectPool(void)
 {
     void *p;
-    if (gUnk_02000240 == 0) {
-        gUnk_02000240 = Task_Create(8, 0xBDC);
-        p = gUnk_02000240;
+    if (gMotionEntryManager == 0) {
+        gMotionEntryManager = Task_Create(8, 0xBDC);
+        p = gMotionEntryManager;
         if (p != 0) {
             Task_SetCallbacks(p, Hresvelgr_UpdateEffects, Hresvelgr_DestroyEffectPool);
             if (EffectSpritePool_Initialize(p) < 0) {
@@ -21,5 +21,5 @@ void *Hresvelgr_CreateEffectPool(void)
         }
         return p;
     }
-    return gUnk_02000240;
+    return gMotionEntryManager;
 }

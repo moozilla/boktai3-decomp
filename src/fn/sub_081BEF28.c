@@ -31,7 +31,7 @@ void SceneInventory_CompleteCategoryRemoval(struct SceneInventoryCategoryMenu *p
                 break;
             case 2: {
                 u32 address = p->slots[p->selection];
-                struct GameState *state = gUnk_02000710;
+                struct GameState *state = gGameState;
                 struct GameState *indexed;
                 s16 *slot;
                 address <<= 1;

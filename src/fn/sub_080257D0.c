@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
     u8 angle;
@@ -60,7 +61,6 @@ static inline int trunc12(int x)
 }
 int SceneActorGraphics_GetResourceId(void *);
 void TemporaryAnimationPool_CreateEntry(void *, int, int, int, void *);
-extern u8 *gUnk_030042E4;
 typedef struct {
     u32 a, b;
 } Point;
@@ -99,12 +99,12 @@ void SceneActorAnimation_UpdateChargeSlide(ActorAnimation *p, int tick)
             if (!(tick & 3)) {
                 if (!p2->type) {
                     int id = SceneActorGraphics_GetResourceId(p2);
-                    u8 *data = gUnk_030042E4 + id * 32;
+                    u8 *data = gPaletteBankData + id * 32;
                     TemporaryAnimationPool_CreateEntry((u8 *)p2 + 0x240, 8, 0x200, 0x9000, data);
                 } else {
                     int offset;
                     u8 *data;
-                    data = gUnk_030042E4;
+                    data = gPaletteBankData;
                     offset = 0x6740;
                     data += offset;
                     {

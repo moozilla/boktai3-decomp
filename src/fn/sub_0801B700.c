@@ -1,8 +1,8 @@
 #include "global.h"
 #include "scene_item_values.h"
+#include "ram.h"
 extern u8 gUnk_08E6092C[][0x20];
 extern u8 gUnk_08E60F80[][16];
-extern u32 gUnk_03005304;
 extern u16 gUnk_086141BC[];
 void sub_0801B600(u32 a, u32 b, struct SceneValueEquipment *c);
 void TransformMarker_CopyVector(u8 *p, u8 *q);
@@ -68,8 +68,8 @@ void sub_0801B700(struct TfCtx *p)
     }
     if (p->b8c)
         th <<= 1;
-    gUnk_03005304 = (gUnk_03005304 + 1) & 0x3ff;
-    if (gUnk_086141BC[gUnk_03005304] < th) {
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3ff;
+    if (gUnk_086141BC[gEffectRandomTableIndex] < th) {
         TransformMarker_CopyVector((u8 *)&p->cur, t3);
     } else {
         if (e->kind != p->cur.kind)
@@ -103,8 +103,8 @@ void sub_0801B700(struct TfCtx *p)
     Inventory_MarkEquipmentObtained(p->cur.kind);
     k = p->cur.kind;
     if ((s32)k < 0x20)
-        *(u32 *)((u8 *)gUnk_02000710 + 0x748) |= 1 << k;
+        *(u32 *)((u8 *)gGameState + 0x748) |= 1 << k;
     else
-        *(u32 *)((u8 *)gUnk_02000710 + 0x74c) |= 1 << (k - 0x20);
+        *(u32 *)((u8 *)gGameState + 0x74c) |= 1 << (k - 0x20);
     GameState_ClearConsumableSlot(p->b8b);
 }

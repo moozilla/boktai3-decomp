@@ -25,17 +25,17 @@ void sub_08077444(struct SceneActorPlacementView *actor, u32 pathId, u32 pathArg
         Path_GetPointPositionById((u16 *)&actor->position, pathId, pathArg);
         tileX = pos->x >> 8;
         tileZ = pos->z >> 8;
-        if (tileX < 0 || tileZ < 0 || tileX >= gUnk_030052F8 || tileZ >= gUnk_030052FC)
+        if (tileX < 0 || tileZ < 0 || tileX >= gTerrainWidth || tileZ >= gTerrainHeight)
             cell = 0;
         else
-            cell = gUnk_030052F4->rows[tileZ] + tileX;
+            cell = gTerrainMap->rows[tileZ] + tileX;
         actor->terrainCell = cell;
         cell = actor->terrainCell;
         override = TerrainModifiers_FindCellOverride(cell, 1);
         if (override)
             cellData = override + 4;
         else
-            cellData = gUnk_030052F4->cells + 12 + cell * 4;
+            cellData = gTerrainMap->cells + 12 + cell * 4;
         flagsByte = *cellData;
         type = flagsByte >> 4;
         height = (flagsByte & 0xF) << 8;

@@ -1,5 +1,7 @@
 #include "global.h"
-#define gRandomTableIndex gUnk_03005308
+#include "render.h"
+#include "engine.h"
+#define gRandomTableIndex gRandomIndex
 #define gRandomTable      gUnk_0203B400
 
 struct ScreenPaletteTransition {
@@ -12,8 +14,6 @@ struct ScreenPaletteTransition {
     u16 phase;
 };
 extern u32 gUnk_02000560;
-extern u16 gUnk_03004BD8;
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 ScalarApproach_StepSixteenth(s32, s32);
 s32 sub_08249350(s32, s32);
@@ -23,8 +23,8 @@ void ScreenPalette_ProjectPosition(int, s16 *, int, int);
 static inline int nextRandom(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)gUnk_0203B400);
 }
 
@@ -37,7 +37,7 @@ void ScreenPalette_UpdateState(struct ScreenPaletteTransition *s)
     switch (s->state) {
         case 0:
         hide: {
-            u16 *control = &gUnk_03004BD8;
+            u16 *control = &gDispCntShadow;
             u32 clear = ~0x200;
             *control = clear & *control;
         }
@@ -62,7 +62,7 @@ void ScreenPalette_UpdateState(struct ScreenPaletteTransition *s)
     }
     {
         u32 visible = 0x200;
-        gUnk_03004BD8 = visible | gUnk_03004BD8;
+        gDispCntShadow = visible | gDispCntShadow;
     }
     ScreenPalette_UpdateTransition(s);
     if (s->state > 1) {

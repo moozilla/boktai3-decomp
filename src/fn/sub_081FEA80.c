@@ -1,7 +1,8 @@
 #define RisingActorManager_EnsureCreated SunOrb_GetOrCreateManager
 #define RisingActor_SetCallback          SunOrb_SetUpdateCallback
-#define gRisingActorManager              gUnk_020005EC
+#define gRisingActorManager              gSlotController
 #include "global.h"
+#include "ram.h"
 struct RisingActor {
     u8 pad0[0x14];
     u8 controller[0xe0];
@@ -14,13 +15,12 @@ struct RisingActorManager {
     u8 pad1C[0x1c];
     struct RisingActor actors[1];
 };
-extern struct RisingActorManager *gUnk_020005EC;
 void SunOrb_GetOrCreateManager(void);
 void RisingActor_AdvanceHeight(void);
 void SunOrb_SetUpdateCallback(void *, void (*)(void));
 s32 RisingActorManager_BeginRaise(s32 index)
 {
-    struct RisingActorManager *manager = gUnk_020005EC;
+    struct RisingActorManager *manager = gSlotController;
     if (!manager) {
         SunOrb_GetOrCreateManager();
         return -1;

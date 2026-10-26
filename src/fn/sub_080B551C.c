@@ -29,14 +29,14 @@ u8 Skeleton_RerouteToTarget(void *obj)
         void *route;
         u8 ok;
         s32 result;
-        x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-        z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+        x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
+        z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
         target.x = (x << 8) + 0x80;
         data = TerrainModifiers_FindCellOverride(cell, 1);
         if (data)
             data += 4;
         else
-            data = gUnk_030052F4->cells + (cell * 4 + 12);
+            data = gTerrainMap->cells + (cell * 4 + 12);
         {
             u32 h = (*data & 15) << 8;
             targetPointer->y = h;

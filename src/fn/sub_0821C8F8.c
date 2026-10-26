@@ -58,8 +58,8 @@ s32 Div(s32, s32);
             out[0] = 1;                                                                            \
             break;                                                                                 \
         }                                                                                          \
-        cellX = Mod(*(u16 *)(out + 6), gUnk_030052F8);                                             \
-        cellZ = Div(*(u16 *)(out + 6), gUnk_030052F8);                                             \
+        cellX = Mod(*(u16 *)(out + 6), gTerrainWidth);                                             \
+        cellZ = Div(*(u16 *)(out + 6), gTerrainWidth);                                             \
         c.x = ((cellX + 1) << 8) - 1 - (ux) * stepX;                                               \
         c.z = ((cellZ + 1) << 8) - 1 - (uz) * stepZ;                                               \
         c.y = base.y;                                                                              \
@@ -100,8 +100,8 @@ void sub_0821C8F8(void *arg0, struct Position *arg1, struct Position *arg2, u32 
 
     tx = (s8)(pos->x >> 8);
     tz = (s8)(pos->z >> 8);
-    if (tx >= 0 && tz >= 0 && tx < gUnk_030052F8 && tz < gUnk_030052FC)
-        cell = gUnk_030052F4->rows[tz] + tx;
+    if (tx >= 0 && tz >= 0 && tx < gTerrainWidth && tz < gTerrainHeight)
+        cell = gTerrainMap->rows[tz] + tx;
     else
         cell = 0;
     *(u16 *)(out + 6) = cell;

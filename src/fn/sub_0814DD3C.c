@@ -1,11 +1,10 @@
 #include "global.h"
-
-extern u32 gUnk_030053F4;
+#include "engine.h"
 
 u32 Player_GetAttackAttributeFlags(u32 x)
 {
     u32 r;
-    if (gUnk_030053F4 & 0x1000) {
+    if (gEngineFlags & 0x1000) {
         r = 0;
     } else {
         switch (x) {

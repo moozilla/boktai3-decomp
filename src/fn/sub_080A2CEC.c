@@ -1,6 +1,7 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
+#include "engine.h"
 void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
@@ -15,7 +16,6 @@ static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 st
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 static inline u8 Hidden(struct SceneActorRegistryResetView *a)
 {
@@ -47,9 +47,9 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
         *(u16 *)((u8 *)actor + 0x2BC) = 60;
         {
-            u32 index = (gUnk_03005308 + 1) & 1023;
+            u32 index = (gRandomIndex + 1) & 1023;
             u32 value;
-            gUnk_03005308 = index;
+            gRandomIndex = index;
             index *= 2;
             {
                 const u16 *table = (const u16 *)0x0203B400;

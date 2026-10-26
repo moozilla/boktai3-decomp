@@ -1,7 +1,7 @@
 #include "interaction_marker.h"
 u32 InteractionMarker_IsPlayerNearby(struct InteractionMarker *marker)
 {
-    u16 state = (u16)gUnk_02000710->form - 3;
+    u16 state = (u16)gGameState->form - 3;
     struct InteractionMarkerPlayer *player;
     s32 x, z;
     if (state <= 2)

@@ -1,9 +1,9 @@
 #include "global.h"
+#include "ram.h"
 
 // foundry draft (worker best 87.3%); what differs is mostly register allocation and instruction order
 #define TerrainOverlay_QueueRemoveBody TerrainOverlay_QueueRemoveActor
 #define SceneBody_Release              SceneBody_Unregister
-#define gAnimatedBodyPool              gUnk_02000140
 
 struct AnimatedBodySlot {
     u8 animation[0x60];
@@ -20,7 +20,6 @@ struct AnimatedBodyPool {
     struct AnimatedBodySlot slots[4];
     u32 occupied;
 };
-extern struct AnimatedBodyPool *gUnk_02000140;
 void Anim_Remove(void *);
 u32 TerrainOverlay_QueueRemoveActor(u32 *);
 void SceneBody_Unregister(void *);
@@ -49,6 +48,6 @@ s32 AnimatedBodyPool_Destroy(struct AnimatedBodyPool *pool)
         }
         i++;
     } while (i <= 3);
-    gUnk_02000140 = 0;
+    gAnimatedBodyPool = 0;
     return 0;
 }

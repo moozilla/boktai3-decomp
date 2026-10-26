@@ -110,8 +110,7 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
         u32 visible = PlayerHasControlFlag();
         flags = &slot->flags;
         if (visible ||
-            ((*flags & 0x20) &&
-             ((struct SceneActorControlGameView *)gUnk_02000710)->parameter > 0) ||
+            ((*flags & 0x20) && ((struct SceneActorControlGameView *)gGameState)->parameter > 0) ||
             (u8)SceneActorControl_IsEnabledForScene(slot)) {
             if (!sprite->active)
                 Sprite_LinkToList(sprite, 0);

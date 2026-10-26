@@ -30,16 +30,16 @@ u32 sub_0821C254(struct SurfaceTrack *t, struct Pos *from, struct Pos *destinati
     struct TerrainGrid *grid;
     u16 idx;
     s32 diff;
-    if (gUnk_030052F4->cells == 0)
+    if (gTerrainMap->cells == 0)
         return 0;
-    grid = (struct TerrainGrid *)gUnk_030052F4->cells;
+    grid = (struct TerrainGrid *)gTerrainMap->cells;
     {
         s32 x = to->x >> 8, z = to->z >> 8;
         s32 index;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             index = 0;
         else
-            index = gUnk_030052F4->rows[z] + x;
+            index = gTerrainMap->rows[z] + x;
         idx = index;
     }
     if ((t->cell == idx) || sub_0821BF5C(from, to, kind))

@@ -11,9 +11,9 @@ u32 Terrain_ApplyBlocked(void *, const struct ContactPosition *,
 static inline s32 GetCell(struct SceneActorRouteTargetPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline s32 GetHeight(s32 cell, struct SceneActorRouteTargetPosition *p)
 {

@@ -1,6 +1,6 @@
 #include "global.h"
+#include "render.h"
 // MATCHING_CONCESSION: register-pinning
-extern u8 *gUnk_030042E4;
 extern const u8 gUnk_0824F174[];
 extern const u8 gUnk_0824F17C[];
 void *ScriptProc_Start(u32, u32);
@@ -80,7 +80,7 @@ void Armor_InitParts(struct ArmorInit *p, u32 count, u32 mode)
             partValue = 0;
             p->palette = 0x2BD;
             paletteIndex = p->palette;
-            paletteData = gUnk_030042E4 + (paletteIndex << 5);
+            paletteData = gPaletteBankData + (paletteIndex << 5);
             p->palettePtr = paletteData;
         } break;
 
@@ -89,7 +89,7 @@ void Armor_InitParts(struct ArmorInit *p, u32 count, u32 mode)
             partValue = 1;
             p->palette = 0x2BD;
             paletteIndex = p->palette;
-            paletteData = gUnk_030042E4 + (paletteIndex << 5);
+            paletteData = gPaletteBankData + (paletteIndex << 5);
             p->palettePtr = paletteData;
         } break;
 
@@ -115,7 +115,7 @@ void Armor_InitParts(struct ArmorInit *p, u32 count, u32 mode)
                 u8 *paletteData;
                 p->palette = 0x216;
                 paletteIndex = p->palette;
-                paletteData = gUnk_030042E4 + (paletteIndex << 5);
+                paletteData = gPaletteBankData + (paletteIndex << 5);
                 p->palettePtr = paletteData;
             }
             break;

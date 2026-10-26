@@ -1,6 +1,5 @@
 #include "global.h"
 #include "game_state.h"
-#define gGameState gUnk_02000710
 
 s32 Div(s32, s32);
 

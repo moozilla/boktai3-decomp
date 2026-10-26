@@ -1,7 +1,7 @@
 #include "saved_position_marker.h"
 u32 SavedPositionMarker_IsStoredPositionNearby(struct SavedPositionMarker *marker)
 {
-    struct GameState *state = gUnk_02000710;
+    struct GameState *state = gGameState;
     s32 dx = state->positionX - marker->position.x;
     s32 dz;
     if (dx < 0)

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct Transition {
     u8 pad0[0x18];
     u8 state, entered, index, lastIndex;
@@ -11,8 +12,7 @@ struct Transition {
     u16 fadeIn[64], fadeOut[64], x[64], y[64], width[64], height[64];
 };
 extern struct Transition *gUnk_020000E8;
-extern u32 gUnk_03004DA0;
-extern u16 gUnk_03004BD8, gUnk_03004FC0, gUnk_03005214, gUnk_030051C4, gUnk_03005260[];
+extern u16 gUnk_03004FC0, gUnk_03005260[];
 void MessageWindow_SetBounds(int, int, int, int);
 void MessageWindow_ShowMessage(int);
 void MessageWindow_Clear(void);
@@ -31,13 +31,13 @@ void DialogueTransition_UpdateSkipFadeOut(struct Transition *p)
     DialogueTransition_ConsumeStateEntry(p);
     if (p->endProcedure) {
         if (p->ticks > 15) {
-            u32 *brightness = &gUnk_03004DA0;
+            u32 *brightness = &gBgFadeLevel;
             int zero = 0;
             *brightness = zero;
             Script_Call(p->endProcedure, 0);
             p->endProcedure = zero;
             Task_Kill(p);
         } else
-            gUnk_03004DA0 = 64 - Div(p->ticks << 6, 16);
+            gBgFadeLevel = 64 - Div(p->ticks << 6, 16);
     }
 }

@@ -6,8 +6,8 @@ struct G {
     u8 pad[0x1c0];
     struct E e[1];
 };
-extern struct G *gUnk_02000710;
+extern struct G *gGameState;
 struct E *Inventory_GetEquipmentEntry(u32 i)
 {
-    return &gUnk_02000710->e[i];
+    return &gGameState->e[i];
 }

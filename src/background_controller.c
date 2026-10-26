@@ -202,10 +202,10 @@ s32 Background_Update(struct Background *p)
     if (p->flags & 64) {
         if (p->frame & 1) {
             u32 mask = (0x01000000u << p->layer) >> 16;
-            gUnk_03004BD8 = mask | gUnk_03004BD8;
+            gDispCntShadow = mask | gDispCntShadow;
         } else {
             u32 mask = (0x01000000u << p->layer) >> 16;
-            gUnk_03004BD8 &= ~mask;
+            gDispCntShadow &= ~mask;
         }
     }
     p->frame++;

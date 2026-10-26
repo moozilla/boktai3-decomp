@@ -27,7 +27,7 @@ struct TemporaryAnimationSlot *TemporaryAnimationPool_CreateEntry(u32 sequence, 
         animation->paletteIndex = paletteIndex;
         palette = paletteData;
         if (!palette)
-            palette = gUnk_030042E4 + paletteIndex * 32;
+            palette = gPaletteBankData + paletteIndex * 32;
         animation->paletteData = palette;
     }
     if (animation->flags & 128)

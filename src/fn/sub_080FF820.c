@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_020001A4;
+#include "ram.h"
 
 static inline u8 Tst(u32 m, s32 one, s32 i)
 {
@@ -10,7 +10,7 @@ static inline u8 Tst(u32 m, s32 one, s32 i)
 
 u8 *WoodenCrate_FindByName(u32 x)
 {
-    u8 *b = gUnk_020001A4;
+    u8 *b = gWoodenCrateManager;
     s32 i;
     u32 m;
     s32 one;

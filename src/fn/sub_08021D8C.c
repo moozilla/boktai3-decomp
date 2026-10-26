@@ -1,6 +1,6 @@
 #include "global.h"
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 void AnimatedParticles_EmitBurst(void *, int, int, int, int, int, int, int);
 void SceneActors_SpawnAmbientParticle(u8 *p)
 {
@@ -11,7 +11,7 @@ void SceneActors_SpawnAmbientParticle(u8 *p)
     int r;
     int cursor;
     u16 *table = gUnk_0203B400;
-    *(&cursor) = gUnk_03005308 + 1;
+    *(&cursor) = gRandomIndex + 1;
     {
         int mask = 0x3ff;
         cursor &= 0x3ff;
@@ -19,7 +19,7 @@ void SceneActors_SpawnAmbientParticle(u8 *p)
     r = table[cursor] & (k2 = 0x7f);
     position.x = *(s16 *)(p + 0x54) + r;
     cursor = (cursor + 1) & 0x3ff;
-    gUnk_03005308 = cursor;
+    gRandomIndex = cursor;
     cursor = table[cursor];
     {
         u16 *y = (u16 *)(p + 0x56);

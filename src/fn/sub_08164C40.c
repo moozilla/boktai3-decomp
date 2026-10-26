@@ -2,7 +2,7 @@
 
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: gauge source is the save-state counter at 0x618.
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern u16 gUnk_0300517C;
 extern u16 gUnk_0300517A;
 u16 *Hud_GetTilemapCell(s32, s32, s32);
@@ -17,7 +17,7 @@ void Hud_DrawStoredEnergyGauge(u8 *p, s32 mode)
     u8 *g;
     if (mode == 1) {
         background = 0x1f;
-        if (*(s16 *)(p + 0xa88) < *(s32 *)(gUnk_02000710 + 0x618)) {
+        if (*(s16 *)(p + 0xa88) < *(s32 *)(gGameState + 0x618)) {
             u16 *timer = (u16 *)(p + 0xa8a);
             s32 bit;
             ++*timer;
@@ -44,7 +44,7 @@ void Hud_DrawStoredEnergyGauge(u8 *p, s32 mode)
         gUnk_0300517C = background;
     if ((&gUnk_0300517C)[-1] != foreground)
         (&gUnk_0300517C)[-1] = foreground;
-    g = gUnk_02000710;
+    g = gGameState;
     cell = (u16 *)&*(s32 *)(g + 0x618);
     stored = *(s32 *)cell;
     *(u16 *)(p + 0xa88) = stored;

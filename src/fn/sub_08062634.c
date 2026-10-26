@@ -51,7 +51,7 @@ s32 SceneInventory_TickSaleTransition(struct SceneInventoryTail *input)
             case 0:
                 value = SceneItemValue_CalculateEquipment(selection);
                 asm("" : "+r"(value));
-                AddFunds(value, &gUnk_02000710);
+                AddFunds(value, &gGameState);
                 Inventory_RemoveEquipmentEntry(selection);
                 break;
             case 1: {
@@ -61,7 +61,7 @@ s32 SceneInventory_TickSaleTransition(struct SceneInventoryTail *input)
                 struct GameState **location;
                 value = SceneItemValue_CalculateItem(selection);
                 asm("" : "+r"(value));
-                location = &gUnk_02000710;
+                location = &gGameState;
                 AddFunds(value, location);
                 item = Inventory_GetItemId(selection);
                 if (item <= 31) {
@@ -84,7 +84,7 @@ s32 SceneInventory_TickSaleTransition(struct SceneInventoryTail *input)
             case 2:
                 value = SceneItemValue_CalculateConsumable(selection);
                 asm("" : "+r"(value));
-                AddFunds(value, &gUnk_02000710);
+                AddFunds(value, &gGameState);
                 GameState_ClearConsumableSlot(selection);
                 break;
         }

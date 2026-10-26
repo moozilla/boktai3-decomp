@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 void Camera_RequestShake(int);
 void SceneActors_SpawnAmbientParticle(void *);
 typedef struct {
@@ -11,9 +11,9 @@ void SceneActors_UpdateEffects(u8 *p)
 {
     Damage *damage;
     if (*(s16 *)(p + 0x94) > 0)
-        *(int *)(gUnk_02000710 + 0x618) = *(s16 *)(p + 0x94);
+        *(int *)(gGameState + 0x618) = *(s16 *)(p + 0x94);
     else
-        *(int *)(gUnk_02000710 + 0x618) = 0;
+        *(int *)(gGameState + 0x618) = 0;
     if (p[0xb4]) {
         Camera_RequestShake(p[0xb5]);
         p[0xb4]--;

@@ -18,9 +18,7 @@ void SceneActorAttachment_ReplaceResponseSlot(u8 *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void EffectGroup_SpawnPart(void *, s32, void *, void *, void *, s32, s32);
 extern u16 gUnk_030039F0;
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_030053F4;
 
 static inline u8 F0807D2E0_Test(u32 value, u32 mask)
 {
@@ -38,7 +36,7 @@ static inline s32 F0807D2E0_LocalPlayer(void)
 
 static inline u8 F0807D2E0_ShouldShow(struct SceneActorRegistryResetView *actor)
 {
-    if (F0807D2E0_Test(gUnk_030053F4, 0x4800)) {
+    if (F0807D2E0_Test(gEngineFlags, 0x4800)) {
         u32 *owner = &actor->field2E0;
         register u32 mask asm("r2") = *owner;
         if (!(mask & 0x20) && mask) {
@@ -122,12 +120,12 @@ void sub_0807D2E0(void *victim, u32 mode, struct ContactPosition *position, u32 
 
     if (a->flags2D4 & 0x2000) {
         for (i = 2; i >= 0; i--) {
-            u32 idx = (gUnk_03005308 + 1) & 0x3FF;
-            gUnk_03005308 = idx;
+            u32 idx = (gRandomIndex + 1) & 0x3FF;
+            gRandomIndex = idx;
             pack[0] = (pack[0] & 0xFFFF0000) | ((gUnk_0203B400[idx] & 0xF) - 7 & 0xFFFF);
             idx = (idx + 1) & 0x3FF;
             pack[0] = (pack[0] & 0xFFFF) | (((gUnk_0203B400[idx] & 0x1F) - 16) << 16);
-            gUnk_03005308 = idx;
+            gRandomIndex = idx;
             burst[0] = (pack[0] & 0xFFFF0000) | 5;
             burst[0] = (burst[0] & 0xFFFF) | (0xA0000);
             burst[1] = (burst[1] & 0xFFFF0000) | 5;
@@ -193,7 +191,7 @@ mode2:
         F0807D2E0_SetState(a, 3, 0, 0, 0x11, *(void **)((u8 *)a + 0x234));
         if (F0807D2E0_ShouldShow(a))
             F0807D2E0_ShowDamage(a);
-        if (!F0807D2E0_Test(gUnk_030053F4, 0x4800) && !(a->flags2D0 & 0x800))
+        if (!F0807D2E0_Test(gEngineFlags, 0x4800) && !(a->flags2D0 & 0x800))
             SceneActorRecord_RecordPair(gUnk_030039F0, a->id);
         if (category == 4 || category == 1) {
             hudPos[0] = (hudPos[0] & 0xFFFF0000) | 0x50;

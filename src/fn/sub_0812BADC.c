@@ -1,5 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+#include "engine.h"
+#include "ram.h"
 
 #ifdef NONMATCHING
 // fuzzy: 86.2%
@@ -41,10 +43,8 @@ struct Pool {
     u8 graphics[0x20];
     u32 used;
 };
-extern struct Pool *gUnk_02000184;
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 struct Pool *SlashEffect_GetOrCreateManager(void);
 struct Slash *SlashEffect_AllocateSlot(struct Pool *);
 void TwinSpriteEffect_InitGraphics(struct Slash *);
@@ -69,9 +69,9 @@ static inline s32 CellIndex(struct ContactPosition *p)
 {
     register s32 x asm("r3") = p->x >> 8;
     s32 z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u8 *CellData(s32 index)
 {
@@ -79,7 +79,7 @@ static inline u8 *CellData(s32 index)
     if (p)
         return p + 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u8 offset = (index * 4) + 12;
         return map->cells + offset;
     }
@@ -135,8 +135,8 @@ void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
             velocity->z = Truncate(gUnk_086149C4[masked] * magnitude);
         }
         {
-            u16 index = (gUnk_03005308 + 1) & 1023;
-            gUnk_03005308 = index;
+            u16 index = (gRandomIndex + 1) & 1023;
+            gRandomIndex = index;
             {
                 register u32 offset asm("r0") = index * 2;
                 const u16 *source;

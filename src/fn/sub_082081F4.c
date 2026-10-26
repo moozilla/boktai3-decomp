@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "engine.h"
 // confidence=low: collision callback records damage and emits sparks for selected source flags.
 struct Vec {
     u16 x, y, z, pad;
@@ -47,7 +48,6 @@ struct Target {
     u32 damageType;
 };
 extern const struct Vec gUnk_0824FE84;
-extern u32 gUnk_03005308;
 void Collision_CalculateDamageResponse(void *);
 void Sound_PlaySong(u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
@@ -98,7 +98,7 @@ void CannonTurret_ApplyHitReaction(struct Source *sourceInput, struct Hit *input
             s32 i;
             struct Vec *vel = &frame.velocity;
             struct Vec *pos = &frame.position;
-            u32 *index = &gUnk_03005308;
+            u32 *index = &gRandomIndex;
             u32 mask = 0x7f;
             i = 2;
             do {

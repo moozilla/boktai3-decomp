@@ -4,7 +4,7 @@ struct Counters {
     u8 f8, f9, fa;
 };
 extern struct Counters *gUnk_030053F8;
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 u8 Save_ReadHeader(void);
 void Memory_Clear(void *, s32);
 s32 GameState_LoadSessionOrInitDefaults(void)
@@ -15,7 +15,7 @@ s32 GameState_LoadSessionOrInitDefaults(void)
             Memory_Clear(gUnk_030053F8, 40);
         {
             u32 value = 5;
-            *(u16 *)(gUnk_02000710 + 0x12) = value;
+            *(u16 *)(gGameState + 0x12) = value;
         }
         {
             u32 value = 230;

@@ -110,9 +110,9 @@ static inline u32 MaskFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 static inline u32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u32 CellHeight(u32 cell, struct ContactPosition *position)
 {
@@ -121,7 +121,7 @@ static inline u32 CellHeight(u32 cell, struct ContactPosition *position)
     if (data)
         data += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         data = map->cells + offset;
     }
@@ -176,7 +176,7 @@ static inline u32 RandomDirectionExcept(u32 current)
     s32 i = 0;
     u32 d;
     do {
-        d = Random(gUnk_0203B400, &gUnk_03005308, 0x3FF, 3) << 6;
+        d = Random(gUnk_0203B400, &gRandomIndex, 0x3FF, 3) << 6;
         if (d != current)
             goto chosen;
     } while (++i <= 3);
@@ -221,7 +221,7 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
         dest->z = link->point->z;
         dest->y = CellHeight(CellIndex(dest), dest);
     }
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u8 *target = (u8 *)*targetp;
         if (!target)
             goto fail;

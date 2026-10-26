@@ -24,7 +24,7 @@ s32 MenuPanel_IsEntryEmpty(struct MenuPanel *panel, s32 index)
             break;
         case 2: {
             u32 address = entry;
-            struct GameState *game = gUnk_02000710;
+            struct GameState *game = gGameState;
             address <<= 1;
             address += (u32)game;
             if (((struct SceneInventoryConsumableSlot *)address)->id < 0)

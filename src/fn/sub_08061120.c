@@ -15,7 +15,7 @@ s32 SceneInventory_ClassifyEquipmentAction(struct SceneInventoryControlView *pan
         if (entry == 255 || entry < 0)
             goto invalid;
         {
-            s32 funds = gUnk_02000710->unk7B0;
+            s32 funds = gGameState->unk7B0;
             if (funds < Equipment_GetDefinition(entry)->baseValue)
                 goto invalid;
         }

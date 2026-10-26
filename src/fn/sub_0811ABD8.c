@@ -1,9 +1,8 @@
 #include "global.h"
+#include "ram.h"
 struct TerrainColumn {
     u16 cells[80];
 };
-extern struct TerrainColumn *gUnk_020001FC;
-extern u8 *gUnk_020001F8;
 struct TerrainProbePos {
     s16 x, y, z, pad;
 };
@@ -20,8 +19,8 @@ s32 sub_0811ABD8(s16 *base, s16 *offset, struct TerrainProbePos p)
     bx = base[0] < 0 ? 0 : base[0];
     p.x = bx + clampedX;
     x = p.x >> 5;
-    columns = &gUnk_020001FC;
-    column = *columns + gUnk_020001F8[x];
+    columns = &gTerrainColumns;
+    column = *columns + gTerrainColumnIndices[x];
     tileX = (clampedX &= 31) >> 3;
     tileZ = clampedZ >> 4;
     tileZ *= 4;

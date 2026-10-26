@@ -1,4 +1,6 @@
 #include "global.h"
+#include "engine.h"
+#include "ram.h"
 
 // confidence=low: emits one centered explosion and seven offset explosions.
 // MATCHING_CONCESSION: register-pinning
@@ -18,20 +20,18 @@ struct ImpactPool {
     u8 unknown0[0x5C];
     s16 parameterA, parameterB, parameterC;
 };
-extern struct ImpactPool *gUnk_02000244;
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 void ExplosionEffect_CreateConfigured(void *, s32, s32, s32, u32, s32, s32, s32);
 static inline s32 randomValue(const u16 *table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)table);
 }
 void Hresvelgr_EmitImpactExplosions(struct ImpactActor *actor)
 {
-    struct ImpactPool *pool = gUnk_02000244;
+    struct ImpactPool *pool = gHresvelgrProjectilePool;
     struct ImpactPosition position;
     s32 i;
     struct ImpactPosition *p = &position;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 /* tentative: spawns a jittered pair of particles moving left and right */
 
@@ -13,14 +14,13 @@ struct Actor {
     u8 field4A;
     u8 field4B;
 };
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 u32 ActorEffect_SpawnAtActorPos(struct Actor *, struct ParticleOffset *, struct ParticleOffset *,
                                 u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 static inline u32 ParticleRandom(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 /* Spawns two 0x3D99 particles from the actor: a shared jittered base offset
    (y = -32) and two velocity offsets, one leftward then one rightward (tentative). */

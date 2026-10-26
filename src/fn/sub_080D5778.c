@@ -21,9 +21,9 @@ static inline u32 PickTurn(u32 dir)
     s32 i;
     for (i = 0; i < 4; i++) {
         {
-            u32 index = (gUnk_03005308 + 1) & 1023;
+            u32 index = (gRandomIndex + 1) & 1023;
             u32 v;
-            gUnk_03005308 = index;
+            gRandomIndex = index;
             index *= 2;
             v = *(const u16 *)(index + (u32)gUnk_0203B400);
             d = (v & 3) << 6;
@@ -71,7 +71,7 @@ static inline u8 Arrive(void *obj)
     s32 cell;
     s32 player;
     Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
-    if (Chase_Test(gUnk_030053F4, 0x4800)) {
+    if (Chase_Test(gEngineFlags, 0x4800)) {
         register struct ChaseTarget *t asm("r1") = *slot;
         if (!t)
             goto invoke;
@@ -122,15 +122,15 @@ static inline u8 Arrive(void *obj)
     goto done;
 reroute: {
     struct ContactPosition *targetPointer = &target;
-    s32 x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-    s32 z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+    s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
+    s32 z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
     u8 *data;
     targetPointer->x = (x << 8) + 0x80;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
+        data = gTerrainMap->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
     if (Chase_TryRoute(obj, *(void **)(group + 0x1FC), &actor->position, &target))
@@ -167,7 +167,7 @@ static inline void PickRoute(struct SceneActorRegistryResetView *actor)
     route->choice = pick;
     route->step = 0;
     {
-        u8 *base = gUnk_030052F4->routes;
+        u8 *base = gTerrainMap->routes;
         route->point = base + *(u16 *)(route->definition + 2) + route->choice * 8;
     }
 }

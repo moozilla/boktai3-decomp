@@ -1,6 +1,7 @@
 #include "global.h"
 
 #include "scene_actor_reset.h"
+#include "engine.h"
 
 // confidence=low: Dog step gated on engine flags and context state; picks a random slot, sets the sound variant from health, and records the target distance and heading.
 
@@ -10,7 +11,6 @@
 
 // confidence=low: Dog step gated on engine flags and context state; picks a random slot, sets the sound variant from health, and records the target distance and heading.
 
-extern u32 gUnk_030053F4;
 extern u8 *gUnk_02000580[4];
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
@@ -39,7 +39,7 @@ void sub_080DF6EC(s32 unused, u8 *b, struct SceneActorRegistryResetView *a)
     u32 mask;
 
     mask = 0xFFFF;
-    if (F6ECTest(gUnk_030053F4, 0x4800))
+    if (F6ECTest(gEngineFlags, 0x4800))
         return;
     if (*(u16 *)(b + 0xA) != 1)
         return;

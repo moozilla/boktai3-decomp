@@ -70,7 +70,7 @@ static inline u8 Arrive(void *obj)
     s32 player;
     asm("" : "+r"(group));
     Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
-    if (Chase_Test(gUnk_030053F4, 0x4800)) {
+    if (Chase_Test(gEngineFlags, 0x4800)) {
         struct ChaseTarget *t = *slot;
         if (!t)
             goto invoke;
@@ -119,15 +119,15 @@ static inline u8 Arrive(void *obj)
     goto done;
 reroute: {
     struct ContactPosition *targetPointer = &target;
-    s32 x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-    s32 z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+    s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
+    s32 z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
     u8 *data;
     targetPointer->x = (x << 8) + 0x80;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
+        data = gTerrainMap->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
     if (Chase_TryRoute(obj, *(void **)(group + 0x1FC), &actor->position, targetPointer))

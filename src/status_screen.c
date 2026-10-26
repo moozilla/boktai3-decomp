@@ -219,7 +219,7 @@ void StatusScreen_Close(struct StatusScreen *p)
         Script_Call(p->script, &p->args);
         Task_Kill(p);
         {
-            u16 *flags = &gUnk_03004BD8;
+            u16 *flags = &gDispCntShadow;
             s32 mask;
             mask = ~256;
             mask &= *flags;

@@ -2,6 +2,7 @@
 #include "global.h"
 #include "display_animation.h"
 #include "contact_actor.h"
+#include "ram.h"
 struct WoodenCrate {
     u32 flags;
     u8 pad4[3];
@@ -28,7 +29,6 @@ struct WoodenCrateManager {
     u8 pad[0x18];
     void *animationData;
 };
-extern struct WoodenCrateManager *gUnk_020001A4;
 struct WoodenCrateManager *WoodenCrate_GetOrCreateManager(void);
 struct WoodenCrate *WoodenCrate_AllocateSlot(struct WoodenCrateManager *);
 void WoodenCrate_InitCollider(struct WoodenCrate *);

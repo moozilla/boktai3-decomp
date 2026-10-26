@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 
 #ifdef NONMATCHING
 // fuzzy: 77.8%
@@ -79,8 +80,8 @@ void ScenePool_ClampMotionSpeeds(struct Obj *);
 void Actor_ClampMovementSpeed(struct Obj *);
 void Glove_SetAnimationKeyframes(struct Glove *, s32);
 void ActorRecoil_UpdateMotion(struct Glove *);
-extern u32 gUnk_030053F4, gUnk_030053F0;
-extern u8 *gUnk_02000710, *gUnk_020004B4;
+extern u32 gEngineFlags, gUnk_030053F0;
+extern u8 *gUnk_020004B4;
 
 void StageIconDisplay_Create(s32, s32, void *, void *);
 void Glove_BeginStopping(void);

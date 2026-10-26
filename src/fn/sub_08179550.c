@@ -1,4 +1,4 @@
-#define gDisplayPalette gUnk_030042E4
+#define gDisplayPalette gPaletteBankData
 #include "global.h"
 #include "engine.h"
 struct NumericDisplayWidget {

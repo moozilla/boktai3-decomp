@@ -1,5 +1,4 @@
 #define gPlayerSlots gUnk_02000580
-#define gGameState   gUnk_02000710
 #include "global.h"
 #include "player.h"
 #include "game_state.h"

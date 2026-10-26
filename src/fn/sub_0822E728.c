@@ -1,4 +1,3 @@
-#define gGameState gUnk_02000710
 #include "global.h"
 #include "game_state.h"
 s32 GameState_GetUnlockEntry(s32 index);

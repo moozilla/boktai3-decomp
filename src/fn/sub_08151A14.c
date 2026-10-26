@@ -1,5 +1,6 @@
 #include "global.h"
 #include "player.h"
+#include "ram.h"
 
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
@@ -15,8 +16,8 @@ void Player_UpdateFacingSide(void *);
 extern const s16 gUnk_086149C4[];
 
 // confidence=low: motion seven rotates toward a target and pulses three palette colors.
-extern u8 *gUnk_02000710;
-extern u16 gUnk_02000518, gUnk_02000528;
+extern u8 *gGameState;
+extern u16 gUnk_02000528;
 static inline u32 Arg1(u32 k_, s32 green)
 {
     return (green << 5) | k_;
@@ -126,13 +127,13 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
     p->visualParameterC = green;
     if ((++(p->unk59F[1])) > 15)
         p->unk59F[1] = 0;
-    if ((*((s16 *)(gUnk_02000710 + 0x5A8))) != 2) {
-        gUnk_02000518 = 0;
+    if ((*((s16 *)(gGameState + 0x5A8))) != 2) {
+        gPlayerCueTimer = 0;
         gUnk_02000528 = 0;
     }
     if (gUnk_02000528) {
-        if (gUnk_02000518)
-            gUnk_02000518--;
+        if (gPlayerCueTimer)
+            gPlayerCueTimer--;
         else
             gUnk_02000528 = 0;
     }

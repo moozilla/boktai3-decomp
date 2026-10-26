@@ -111,7 +111,7 @@ s32 EffectManager_UpdateAll(struct EffectManager *manager)
     s32 i;
     u32 mask = 512;
     u32 flags;
-    flags = gUnk_030053F4 | gUnk_030053F0;
+    flags = gEngineFlags | gUnk_030053F0;
     mask &= flags;
     if (mask) {
         flags &= 256;
@@ -261,8 +261,8 @@ extern struct EffectAnimId gUnk_08604A18[][3];
 static inline u32 spawnRandom(const u16 *table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(u16 *)(offset + (u32)table);
 }
 
@@ -583,8 +583,8 @@ void EffectParticle_UpdateNone(void)
 static inline u32 randomValue(s32 reverse)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     if (reverse) {
         register u16 *table asm("r2") = gUnk_0203B400;
         return *(u16 *)(offset + (u32)table);
@@ -892,8 +892,8 @@ void EffectParticle_UpdateDriftBeforeHoming(struct EffectManager *manager, struc
 static inline u32 randomValueDirect(void)
 {
     u16 *table = gUnk_0203B400;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return table[gRandomIndex];
 }
 static inline u32 pausedMode(void)
 {

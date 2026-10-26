@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_020004B0;
+#include "ram.h"
 
 void LinkHandshake_ResetInstance(void)
 {
-    gUnk_020004B0 = 0;
+    gSlotMonitor = 0;
 }

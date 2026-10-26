@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "engine.h"
 
 struct RadialPosition {
     s16 x, y, z;
@@ -36,7 +37,6 @@ struct RadialBurst {
     struct RadialParticle particles[12];
 };
 
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
@@ -44,7 +44,7 @@ void RadialBurstEffect_UpdateParticle(void *);
 
 static inline u32 NextRandom(void)
 {
-    u32 *seed = &gUnk_03005308;
+    u32 *seed = &gRandomIndex;
     u16 index = *seed + 1;
     u32 mask = 1023;
     index &= mask;
@@ -76,7 +76,7 @@ void RadialBurstEffect_StartBurst(struct RadialBurst *owner, struct RadialPositi
         state->active = 1;
         {
             register u32 table asm("r3") = 0x0203B400;
-            u32 *seed = &gUnk_03005308;
+            u32 *seed = &gRandomIndex;
             u16 index = *seed + 1;
             u32 mask = 1023;
             index &= mask;

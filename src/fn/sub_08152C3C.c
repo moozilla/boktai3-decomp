@@ -325,9 +325,9 @@ void sub_08152C3C(struct CueActor *p)
         p->f4EE = 1;
         Sound_PlaySong(0x306);
         p->f1D0 &= ~1;
-        p->f1EC = (*((u16 *)(((u8 *)gUnk_02000710) + 0x30))) - 6;
-        p->f1EE = 450 + (*((u16 *)(((u8 *)gUnk_02000710) + 0x32)));
-        p->f1F0 = (*((u16 *)(((u8 *)gUnk_02000710) + 0x34))) + 6;
+        p->f1EC = (*((u16 *)(((u8 *)gGameState) + 0x30))) - 6;
+        p->f1EE = 450 + (*((u16 *)(((u8 *)gGameState) + 0x32)));
+        p->f1F0 = (*((u16 *)(((u8 *)gGameState) + 0x34))) + 6;
         Anim_SetSequence(((u8 *)p) + 0x218, *((void **)(((u8 *)p) + 0x22C)), 21, 0, 0);
         p->f228 = 0;
     }
@@ -340,8 +340,8 @@ void sub_08152C3C(struct CueActor *p)
         else
             p->f1EE += 10;
     }
-    if ((p->f1F2 == 1) && (((s16)p->f1EE) < ((*((s16 *)(((u8 *)gUnk_02000710) + 0x32))) + 220)))
-        p->f1EE = (*((u16 *)(((u8 *)gUnk_02000710) + 0x32))) + 220;
+    if ((p->f1F2 == 1) && (((s16)p->f1EE) < ((*((s16 *)(((u8 *)gGameState) + 0x32))) + 220)))
+        p->f1EE = (*((u16 *)(((u8 *)gGameState) + 0x32))) + 220;
     switch (p->f458) {
         case 0:
             if (((u8)(p->f3A4 - 2)) <= 4) {

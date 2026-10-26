@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct CollisionPoint {
     s32 x : 16;
     s32 y : 16;
@@ -28,7 +29,6 @@ struct ColManager {
     u8 header[0x18];
     struct Col entries[48];
 };
-extern struct ColManager *gUnk_020001E4;
 struct ColManager *Collectible_CreateManager(void);
 s32 Terrain_GetCellClearance(void *);
 void Collectible_UpdateEntry(void *);
@@ -42,12 +42,12 @@ s32 sub_08115AC8(s32 x, s32 y, s32 type, s32 hp)
 {
     struct ColManager *m;
     s32 i;
-    if (gUnk_020001E4 == NULL) {
+    if (gActorParticlePool == NULL) {
         m = Collectible_CreateManager();
         if (m == NULL)
             return -1;
     } else {
-        m = gUnk_020001E4;
+        m = gActorParticlePool;
     }
     for (i = 0; i < 48; i++) {
         if (!m->entries[i].st.active) {

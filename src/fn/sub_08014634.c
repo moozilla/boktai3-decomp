@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // confidence=low: fills the first inactive group with randomized bouncing particles.
 #define ParticleGroup_SpawnBouncing sub_08014634
 struct Vec {
@@ -36,8 +37,6 @@ struct Map {
     u8 pad8[28];
     u16 rows[1];
 };
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC, gUnk_03005308;
 #define gUnk_0203B400 ((u16 *)0x0203B400)
 extern u32 gUnk_08604B90[];
 u8 *TerrainModifiers_FindCellOverride(int, int);
@@ -45,9 +44,9 @@ void Effect_Remove(void *);
 static inline int CellIndex(struct Vec *p)
 {
     int x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0xffff;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 extern struct Manager *gUnk_02000060;
 struct Manager *ParticleManager_Create(void *, u32);
@@ -102,7 +101,7 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position, st
         resource = m->large;
     j = 0;
     asm("" : "+r"(rng));
-    rng = &gUnk_03005308;
+    rng = &gRandomIndex;
     pool = m->groups;
     g = pool;
     asm("" : "+r"(g));

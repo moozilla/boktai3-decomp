@@ -165,7 +165,7 @@ s32 sub_081B866C(struct SceneScriptObject *p, u32 caller)
         u32 mode = 0x04000008;
         s32 bank = PaletteIndex(p->state, p->parameter);
         p->resource.paletteIndex = bank;
-        CpuSet(gUnk_030042E4 + bank * 32, p->resource.palette, mode);
+        CpuSet(gPaletteBankData + bank * 32, p->resource.palette, mode);
     }
     SceneScriptObject_InitHitCollider(p);
     if (p->state == 12) {

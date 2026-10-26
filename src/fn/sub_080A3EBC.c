@@ -71,7 +71,7 @@ static inline u8 Flag16(u16 *p, u32 m)
 static inline u8 Slow(void)
 {
     u32 m = 32;
-    if (F(gUnk_02000710, 0x868, u32) & m)
+    if (F(gGameState, 0x868, u32) & m)
         return 1;
     return 0;
 }

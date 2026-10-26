@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 /* Provisional names and field interpretations; confidence low. */
-#define gNamedEntryPool gUnk_020001BC
 struct NamedEntry {
     u8 pad0[0x58];
     u32 name;
@@ -11,7 +11,6 @@ struct NamedEntryPool {
     struct NamedEntry entries[3];
     u32 used;
 };
-extern struct NamedEntryPool *gUnk_020001BC;
 static inline u8 IsUsed(u32 mask, s32 index, s32 one)
 {
     if (mask & (one << index))
@@ -20,7 +19,7 @@ static inline u8 IsUsed(u32 mask, s32 index, s32 one)
 }
 struct NamedEntry *Pool1BC_FindByName(u32 name)
 {
-    struct NamedEntryPool *pool = gUnk_020001BC;
+    struct NamedEntryPool *pool = gNamedEntryPool;
     struct NamedEntry *entry;
     s32 i;
     u32 used;

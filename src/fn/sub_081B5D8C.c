@@ -1,6 +1,7 @@
 #define gPairedSceneHalfStateCallbacks gUnk_086120A0
-#define gActorUpdatePaused             gUnk_0300523C
+#define gActorUpdatePaused             gEnginePauseFlags
 #include "global.h"
+#include "render.h"
 struct PairedSceneHalf {
     u8 unknown0[0x16D];
     u8 state;
@@ -14,7 +15,6 @@ struct PairedSceneActor {
     u8 unknown0[0x98];
     struct PairedSceneHalf halves[2];
 };
-extern u32 gUnk_0300523C;
 extern u32 gUnk_02000560;
 extern void *gPairedSceneHalfStateCallbacks[];
 void Vanargand_ClearPartContact(void *);
@@ -29,7 +29,7 @@ void PairedSceneActor_UpdateHalves(struct PairedSceneActor *actor)
     u8 *state;
     u32 *timer;
     u32 mask;
-    if (!(gUnk_0300523C & 7)) {
+    if (!(gEnginePauseFlags & 7)) {
         mask = 4;
         timer = &actor->halves[0].timer;
         state = &actor->halves[0].state;

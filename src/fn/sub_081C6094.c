@@ -1,7 +1,7 @@
 #include "global.h"
 extern u16 gUnk_03005260[];
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 void Sound_PlaySong(u32);
 void sub_081C62B4(u8 *);
 void ChallengeResult_SetState(void *, void (*)(void *));
@@ -23,9 +23,9 @@ void sub_081C6094(u8 *p)
         s32 i;
         for (i = 0; i < 6; i++) {
             s32 r;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+            gRandomIndex = (gRandomIndex + 1) & 0x3FF;
             do {
-                r = table[gUnk_03005308];
+                r = table[gRandomIndex];
             } while (0);
             ChallengeResult_LoadDigit(digit, resource, sub_08249350(r >> 4, 10));
             digit += 0x60;

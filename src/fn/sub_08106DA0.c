@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_020001B4;
+#include "ram.h"
 
 void Pool1B4_ResetInstance(void)
 {
-    gUnk_020001B4 = 0;
+    gRegionActorPool = 0;
 }

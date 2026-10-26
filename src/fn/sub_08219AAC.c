@@ -1,4 +1,6 @@
 #include "global.h"
+#include "render.h"
+#include "ram.h"
 struct Task {
     u8 pad[16];
     u16 f10;
@@ -6,8 +8,8 @@ struct Task {
     u8 f14, f15, f16, f17;
 };
 extern struct Task gUnk_03001668;
-extern u32 gUnk_03005278, gUnk_0300523C, gUnk_03005250;
-extern u16 gUnk_03005240, gUnk_03005274[4];
+extern u32 gUnk_03005278;
+extern u16 gUnk_03005240;
 void Heap_Initialize(void);
 void TaskSystem_InitLists(void);
 void ResourceRegistry_Initialize(void);
@@ -29,11 +31,11 @@ void TaskSystem_Initialize(void)
     task->f16 = 1;
     task->f10 = 0;
     Task_LinkToPriorityList(task);
-    gUnk_0300523C = 0;
+    gEnginePauseFlags = 0;
     gUnk_03005240 = 1;
-    gUnk_03005250 = 0;
+    gLinkMenuActive = 0;
     {
-        u16 *start = gUnk_03005274;
+        u16 *start = gSceneSelectionDisplaySlots;
         u32 value = 0x3FF;
         u16 *p = start;
         p += 3;

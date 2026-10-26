@@ -7,7 +7,7 @@ s32 ActorVariant_GetTableValue(u32, s32);
 u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void Sound_PlaySong(s32);
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 
 #define F8(o)  (*(u8 *)(p + (o)))
 #define F16(o) (*(u16 *)(p + (o)))
@@ -68,7 +68,7 @@ void Player_UpdateDeathSequence(u8 *p)
             F16(0x45A) = F16(0x45A) + 1;
             if (F16(0x45A) > 0x3b) {
                 Player_SetActionPhase(p, 5);
-                gUnk_030053F4 |= 0x400;
+                gEngineFlags |= 0x400;
             }
             break;
         case 5:

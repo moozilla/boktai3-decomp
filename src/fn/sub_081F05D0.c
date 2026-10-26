@@ -22,7 +22,7 @@ s32 SingletonSlot7_OnTargetContact(struct Slot7Target *target, s32 event, s32 am
     if (event == 0) {
         actor->flashTimer = 15;
         if (amount > 0) {
-            level = gUnk_02000710->unk876 + 1;
+            level = gGameState->unk876 + 1;
             if (level <= 2)
                 duration = (u16)actor->contactDuration;
             else if (level <= 5) {

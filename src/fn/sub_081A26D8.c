@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // confidence=low: updates render shake and cached bearings/distances to tracked positions.
 struct Vec {
     s16 x, y, z, pad;
@@ -26,7 +27,6 @@ struct Hresvelgr {
     u8 pad312[0x6a];
     u16 targetCount;
 };
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Hresvelgr_DispatchSceneMessages(void *);
@@ -55,8 +55,8 @@ void Hresvelgr_UpdateAnimationAndTargets(struct Hresvelgr *p)
     if (actor->shake) {
         u32 angle;
         s32 product, x, z;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-        angle = *(u16 *)(RANDOM_TABLE_ADDR + (gUnk_03005308 << 1));
+        gRandomIndex = (gRandomIndex + 1) & 1023;
+        angle = *(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1));
         product = gUnk_086149C4[(angle + 64) & 255] * (actor->shake << 2);
         if (product >= 0)
             x = product >> 12;

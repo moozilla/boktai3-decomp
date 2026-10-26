@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct RisingActorState {
     u8 pad0[6];
     u16 flags;
@@ -16,7 +17,6 @@ struct RisingActorManager {
     struct RisingActor actors[1];
 };
 void OrbitEffect_UpdateContraction(void);
-extern struct RisingActorManager *gUnk_020005EC;
 void Sound_StopSong(u32);
 void SunOrb_SetUpdateCallback(void *, void (*)(void));
 static inline void RisingActorState_SetFlag4(struct RisingActorState *state)
@@ -25,7 +25,7 @@ static inline void RisingActorState_SetFlag4(struct RisingActorState *state)
 }
 s32 sub_081FED40(s32 index)
 {
-    struct RisingActorManager *manager = gUnk_020005EC;
+    struct RisingActorManager *manager = gSlotController;
     if (!manager || !(manager->activeSlots & (1 << index)))
         return -1;
     RisingActorState_SetFlag4(&manager->actors[index].state);

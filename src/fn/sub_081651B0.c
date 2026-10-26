@@ -1,10 +1,10 @@
 #include "global.h"
 #include "scene_hud_display.h"
-extern u32 gUnk_030053F4;
+#include "engine.h"
 void Sound_PlaySong(u32);
 void SceneHud_PlayActionChangeCue(struct SceneHudState *p, u32 group, u32 mode, u32 selection)
 {
-    if (gUnk_030053F4 & 0x1000) {
+    if (gEngineFlags & 0x1000) {
         if (group == 0 && mode == 0 && selection - 1 <= 2 && selection != p->previousCueSelection)
             Sound_PlaySong(0x21C);
     } else {

@@ -1,5 +1,6 @@
-#define gDisplayControlShadow gUnk_03004BD8
+#define gDisplayControlShadow gDispCntShadow
 #include "global.h"
+#include "render.h"
 struct VanargandBackgroundAttachment {
     void *resource;
     void *position;
@@ -12,7 +13,6 @@ struct VanargandBackgroundAttachment {
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 u8 *sub_08216E54(u16);
 void ScreenPalette_ProjectPosition(s32, void *, s32, s32);
-extern u16 gUnk_03004BD8;
 static inline void Vanargand_ClearBackgroundOffset(void *destination)
 {
     volatile u32 zero = 0;
@@ -32,7 +32,7 @@ void Vanargand_InitBackgroundAttachment(u8 *owner, struct VanargandBackgroundAtt
     part->enabled = 0;
     part->state = 0;
     {
-        u16 *control = &gUnk_03004BD8;
+        u16 *control = &gDispCntShadow;
         s32 mask = ~0x200;
         *control = mask & *control;
     }

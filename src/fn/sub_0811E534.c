@@ -1,5 +1,5 @@
-#define gScriptRecordTable gUnk_02000208
 #include "global.h"
+#include "ram.h"
 struct ScriptAttributeModifier {
     s8 id;
     u8 kind;
@@ -15,11 +15,10 @@ struct AttributeModifierResult {
     u8 kind;
     u16 a, b, c, d;
 };
-extern struct ScriptRecordTable *gUnk_02000208;
 s32 ScriptRecord_FindAttributeModifier(struct AttributeModifierResult *out, s32 id)
 {
     struct ScriptRecordTable *p;
-    struct ScriptRecordTable *table = gUnk_02000208;
+    struct ScriptRecordTable *table = gScriptRecordTable;
     s32 i;
     if (table)
         goto search;

@@ -1,11 +1,6 @@
 #include "global.h"
+#include "render.h"
 
-extern void *gUnk_03004BC0[];
-extern u16 gUnk_03004BE0[];
-extern u16 gUnk_03004C08[];
-extern u16 gUnk_03004BD8, gUnk_03004C14, gUnk_03004BFC, gUnk_03004BB0, gUnk_03004BEC;
-extern s16 gUnk_03004BD0[4];
-extern u32 gUnk_03004BF8, gUnk_03004C00;
 void Bg_ClearAllTilemaps(void);
 
 #define REG16(a) (*(vu16 *)(a))
@@ -16,21 +11,21 @@ void sub_082156D8(u32 mode)
 
     Bg_ClearAllTilemaps();
     for (i = 0; i < 4; i++) {
-        gUnk_03004BC0[i] = 0;
-        gUnk_03004BE0[i] = 0;
-        gUnk_03004C08[i] = 0;
+        gBgTileUploadSrc[i] = 0;
+        gBgTileUploadParamA[i] = 0;
+        gBgTileUploadParamB[i] = 0;
     }
-    gUnk_03004BD8 = 0;
-    gUnk_03004C14 = 0x100;
-    gUnk_03004BFC = 0x100;
-    gUnk_03004BB0 = 0;
-    gUnk_03004BD0[0] = 0x100;
-    gUnk_03004BD0[1] = 0;
-    gUnk_03004BD0[2] = 0;
-    gUnk_03004BD0[3] = 0x100;
-    gUnk_03004BF8 = 0;
-    gUnk_03004C00 = 0;
-    gUnk_03004BEC = mode;
+    gDispCntShadow = 0;
+    gBgAffineScaleX = 0x100;
+    gBgAffineScaleY = 0x100;
+    gBgAffineAngle = 0;
+    gBgAffineMatrix[0] = 0x100;
+    gBgAffineMatrix[1] = 0;
+    gBgAffineMatrix[2] = 0;
+    gBgAffineMatrix[3] = 0x100;
+    gBgAffineRefX = 0;
+    gBgAffineRefY = 0;
+    gBgAffineMode = mode;
     switch (mode) {
         case 0:
             REG16(0x04000008) = 0x3F08;
@@ -48,6 +43,6 @@ void sub_082156D8(u32 mode)
     }
     {
         s32 mask = ~0xE00;
-        gUnk_03004BD8 &= mask;
+        gDispCntShadow &= mask;
     }
 }

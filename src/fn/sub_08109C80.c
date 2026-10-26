@@ -1,5 +1,7 @@
 #include "global.h"
 #include "engine.h"
+#include "render.h"
+#include "ram.h"
 struct ScriptPanel {
     u8 unk0[0x30];
     u32 counter;
@@ -30,15 +32,14 @@ s32 TextWindow_Create(s32, s32, s32, s32);
 void Hud_SetMode(s32);
 void TextWindow_StartPlayback(s32);
 void SpriteOam_ResetQueue(s32);
-extern u32 gUnk_03005250, gUnk_0300523C, gUnk_03004DA0, gUnk_030051D4, gUnk_03005408;
-extern u16 gUnk_03004BD8;
+extern u32 gUnk_03005408;
 s32 ScriptPanel_OpenTextWindow(struct ScriptPanel *p)
 {
     if (Registry1745_ConsumeStateEntry(p)) {
-        gUnk_03005250 = 0;
+        gLinkMenuActive = 0;
         {
             u32 mask = 4;
-            gUnk_0300523C |= mask;
+            gEnginePauseFlags |= mask;
         }
         p->windowReady = 0;
         p->hudReady = 0;
@@ -50,8 +51,8 @@ s32 ScriptPanel_OpenTextWindow(struct ScriptPanel *p)
         Sound_StopTrackedSong(0x33);
         Sound_StopAllTrackedSongs();
     }
-    gUnk_03004DA0 = 0x40;
-    gUnk_030051D4 = 0x40;
+    gBgFadeLevel = 0x40;
+    gObjFadeLevel = 0x40;
     if (!p->hudReady) {
         if (Hud_GetManager()) {
             Hud_RefreshSpriteFromScript();
@@ -65,7 +66,7 @@ s32 ScriptPanel_OpenTextWindow(struct ScriptPanel *p)
         TextWindow_Refresh(p->window, 1);
         TextWindow_StartPlayback(p->window);
         {
-            u16 *flags = &gUnk_03004BD8;
+            u16 *flags = &gDispCntShadow;
             u32 mask = ~0xE00;
             *flags = mask & *flags;
         }

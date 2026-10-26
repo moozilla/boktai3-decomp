@@ -66,7 +66,7 @@ extern void (*gUnk_086049E0[])(struct PooledInteractableManager *, struct Pooled
 
 static inline u8 sameRegion(s32 region)
 {
-    if (gUnk_02000710->region == region)
+    if (gGameState->region == region)
         return 1;
     return 0;
 }

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_hud_display.h"
 
-#define gSceneHud            gUnk_02000214
+#define gSceneHud            gFieldHud
 #define gSceneHudOwnerSource gUnk_020004B4
 #define gPartyActors         gUnk_02000580
 struct SceneHudOwnerSource {

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 #ifdef NONMATCHING
 // fuzzy: 93.3%
 
@@ -79,7 +80,6 @@ struct AxeActor {
     struct AxeContext *context;
 };
 extern const s16 gUnk_086149C4[];
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern u8 *gUnk_02000580;
 s32 Mod(s32, s32);
@@ -166,8 +166,8 @@ void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
         data->timer = 0;
     } else if (frame < 180) {
         if (Mod(frame, 4) == 0) {
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            if ((s32) * (const u8 *)&gUnk_0203B400[gUnk_03005308] <= 19) {
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            if ((s32) * (const u8 *)&gUnk_0203B400[gRandomIndex] <= 19) {
                 {
                     s32 direction = data->direction;
                     data->direction = -direction;

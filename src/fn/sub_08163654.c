@@ -10,7 +10,7 @@ struct P {
     u8 g[2];
     u16 d;
 };
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 extern u32 gUnk_030053D8;
 void GameOver_UpdateLetterAnimation(struct P *);
 void SceneLifecycle_RequestRestart(s32);
@@ -23,7 +23,7 @@ void GameOver_UpdateExit(struct P *p)
 {
     GameOver_UpdateLetterAnimation(p);
     if (p->c == 8) {
-        andm(&gUnk_030053F4, ~0x400);
+        andm(&gEngineFlags, ~0x400);
         gUnk_030053D8 = 0;
         SceneLifecycle_RequestRestart(p->f);
         Task_Kill(p);

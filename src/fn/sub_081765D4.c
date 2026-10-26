@@ -1,6 +1,7 @@
-#define gDisplayControlShadow gUnk_03004BD8
+#define gDisplayControlShadow gDispCntShadow
 #include "global.h"
 #include "background_controller.h"
+#include "render.h"
 struct PauseMenuDisplay {
     u8 unknown0[0x1E0];
     struct BackgroundLayer savedBackground;
@@ -18,9 +19,6 @@ struct PauseMenuDisplay {
     u8 unknown43E0[0x4CB];
     u8 selection;
 };
-extern u32 gUnk_03004290, gUnk_030051D8;
-extern u16 gUnk_0300521C, gUnk_03005234;
-extern u8 gUnk_03005230, gUnk_03005218;
 void sub_08215AC4(u32, u32);
 void Mosaic_ResetParameters(void);
 void SceneDialog_ConfigureVariantSlot(struct PauseMenuDisplay *);
@@ -29,29 +27,29 @@ void PauseMenu_SaveDisplayState(struct PauseMenuDisplay *s)
     u32 flags;
     u32 bgEnable;
     s->active = 1;
-    gUnk_03004290 = 1;
-    flags = gUnk_03004BD8;
+    gRenderListIndex = 1;
+    flags = gDispCntShadow;
     s->savedDisplay = flags;
     bgEnable = 0x100;
     flags &= ~bgEnable;
     flags &= ~0x200;
     flags &= ~0x400;
     flags &= ~0x800;
-    gUnk_03004BD8 = flags;
+    gDispCntShadow = flags;
     CpuSet(Video_GetBackgroundMap(1), s->savedMap, 0x04000200);
     s->savedBackground = gUnk_03004C30[1];
     s->savedBlend = *(vu16 *)0x04000050;
     s->savedBgControl = *(vu16 *)0x0400000A;
     *(vu16 *)0x04000050 = 0;
-    gUnk_030051D8 = 0x40;
+    gFadeMultiplier = 0x40;
     sub_08215AC4(1, 2);
     Bg_SetPriority(1, 1);
-    s->saved521C = gUnk_0300521C;
-    s->saved5234 = gUnk_03005234;
-    s->saved5230 = gUnk_03005230;
-    s->saved5218 = gUnk_03005218;
+    s->saved521C = gMosaicHalfword;
+    s->saved5234 = gMosaicParam;
+    s->saved5230 = gSpriteMosaicAttr;
+    s->saved5218 = gMosaicByte;
     Mosaic_ResetParameters();
-    gUnk_03004BD8 |= bgEnable;
+    gDispCntShadow |= bgEnable;
     s->state = 0;
     SceneDialog_ConfigureVariantSlot(s);
     s->selection = 0xFF;

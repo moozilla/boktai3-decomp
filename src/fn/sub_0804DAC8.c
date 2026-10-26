@@ -4,14 +4,14 @@ void StagedEffect_BlendAndShake(struct StagedEffect *effect)
 {
     u16 *random = (u16 *)RANDOM_TABLE_ADDR;
     u32 *new_var;
-    u32 index = (gUnk_03005308 + 1) & 0x3FF;
+    u32 index = (gRandomIndex + 1) & 0x3FF;
     u32 sample = random[index];
     u32 mask = 31;
     sample &= mask;
     sample -= 16;
     effect->shakeX = sample;
     index = (index + 1) & 0x3FF;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     new_var = &index;
     *(&sample) = random[*new_var];
     sample &= mask;

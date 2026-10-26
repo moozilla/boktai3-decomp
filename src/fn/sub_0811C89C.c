@@ -3,7 +3,7 @@
 
 // foundry draft (worker best 88.0%); what differs is mostly register allocation and instruction order
 #define CharacterPreview_SelectResource CharacterModel_GetPrimaryPaletteIndex
-#define gCharacterPaletteResource       gUnk_030042E4
+#define gCharacterPaletteResource       gPaletteBankData
 struct CharacterPreviewTileAllocator {
     u8 unknown0[0x38];
     s32 nextTile;
@@ -18,7 +18,7 @@ void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *p,
     s32 offset, i;
     struct CharacterPreviewPalette *flash = p;
     p->target = model;
-    flash->flashPalette = gUnk_030042E4 + 0x3240;
+    flash->flashPalette = gPaletteBankData + 0x3240;
     switch (model->view.metadata.kind) {
         case 0:
             resource = CharacterModel_GetPrimaryPaletteIndex(model);
@@ -42,8 +42,8 @@ void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *p,
     }
     p->paletteId = index + 0x379;
     {
-        const u8 *source = gUnk_030042E4 + (resource << 5);
-        p->normalPalette = gUnk_030042E4 + (p->paletteId << 5);
+        const u8 *source = gPaletteBankData + (resource << 5);
+        p->normalPalette = gPaletteBankData + (p->paletteId << 5);
         palette = model->activePalette;
         CpuSet(source, palette, 16);
     }

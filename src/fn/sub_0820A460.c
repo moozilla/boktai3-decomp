@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct Slot600 {
     u8 pad0[4];
     s32 name;
@@ -12,13 +13,12 @@ struct Slot600Manager {
     u32 used;
     struct Slot600 slots[8];
 };
-extern struct Slot600Manager *gUnk_02000600;
 void *FanCannonManager_Create(void);
 /* Script: in the eight-slot manager at 0x02000600 (created if missing, which
    fails the call), the used slot named -n sets +0x124 and clears +0x125 (tentative: start). */
 s32 Slot600_ActivateFromScript(void)
 {
-    struct Slot600Manager *manager = gUnk_02000600;
+    struct Slot600Manager *manager = gFanCannonManager;
     struct Slot600 *slot;
     s32 name, i;
     if (!manager) {

@@ -177,7 +177,7 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
             size.y = 16;
             size.z = 164;
             table = gUnk_0203B400;
-            indexPtr = &gUnk_03005308;
+            indexPtr = &gRandomIndex;
             index = *indexPtr;
             index++;
             mask = 1023;
@@ -243,7 +243,7 @@ void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
         size.y = 16;
         size.z = 164;
         table = gUnk_0203B400;
-        indexPtr = &gUnk_03005308;
+        indexPtr = &gRandomIndex;
         index = *indexPtr;
         index++;
         mask = 1023;
@@ -356,8 +356,8 @@ int BreakableBarriers_Initialize(struct BreakableBarrierManager *m)
         if (BreakableBarrier_Initialize(m, p, i) < 0)
             return -1;
     m->script = Script_GetKeywordValue('c', 0);
-    gUnk_03005214 = 0x1084;
-    gUnk_030051C4 = 0x1FFF;
+    gBgFadeColor = 0x1084;
+    gBgFadeBankMask = 0x1FFF;
     {
         int v = 64 - (int)(m->remaining * 40) / m->count;
         if (v > 63)

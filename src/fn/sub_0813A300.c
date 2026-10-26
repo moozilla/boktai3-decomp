@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_020004D4;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 SpritePairPool_Initialize(u8 *);
@@ -11,8 +11,8 @@ void FollowingSpriteEffect_DestroyManager(void);
 u8 *FollowingSpriteEffect_EnsureManager(void)
 {
     u8 *p;
-    if (gUnk_020004D4 != 0)
-        return gUnk_020004D4;
+    if (gSpritePairPool != 0)
+        return gSpritePairPool;
     p = Task_Create(0xa, 0x1d4);
     if (p != 0) {
         Task_SetCallbacks(p, PairCallbackPool_Update, FollowingSpriteEffect_DestroyManager);

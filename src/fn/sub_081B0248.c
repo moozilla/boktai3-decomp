@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_vec.h"
+#include "engine.h"
 
 struct VanargandPart {
     u8 unk_00[0x90];
@@ -9,7 +10,6 @@ struct VanargandPart {
 };
 extern const s16 gUnk_086149C4[];
 #define RANDOM_TABLE_ADDR 0x0203B400
-extern u32 gUnk_03005308;
 void *VanargandEffect_Create(s32, s32, struct SceneVec *, struct SceneVec *, u32);
 
 static inline s32 Scale(s32 value)
@@ -31,8 +31,8 @@ static inline void Add(struct SceneVec *out, struct SceneVec *base, struct Scene
 static inline s32 RandomValue(u32 table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(table + offset);
 }
 

@@ -3,7 +3,7 @@
 static inline u8 SceneActorContacts_AreDisabled(void)
 {
     u32 mask = 0x40;
-    if (gUnk_02000710->flags868 & mask)
+    if (gGameState->flags868 & mask)
         return 1;
     return 0;
 }

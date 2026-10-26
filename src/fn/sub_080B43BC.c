@@ -1,12 +1,12 @@
 #include "global.h"
+#include "render.h"
 
 extern const u8 gUnk_086108B0[];
 extern const u8 gUnk_08606038[];
-extern u8 *gUnk_030042E4;
-extern u8 *gUnk_02000710;
-extern u32 gUnk_030052F8;
-extern u32 gUnk_030052FC;
-extern u8 *gUnk_030052F4;
+extern u8 *gGameState;
+extern u32 gTerrainWidth;
+extern u32 gTerrainHeight;
+extern u8 *gTerrainMap;
 extern const u32 gUnk_08000008[];
 
 #define GL_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
@@ -132,8 +132,8 @@ static inline s32 Vorn_080B43BC_Arg(s32 dflt)
 /* terrain cell index from a packed position pair */
 static inline u32 Vorn_080B43BC_CellIndex(s32 x, s32 y)
 {
-    if (x >= 0 && y >= 0 && (u32)x < gUnk_030052F8 && (u32)y < gUnk_030052FC)
-        return *(u16 *)(gUnk_030052F4 + 0x24 + 2 * y) + x;
+    if (x >= 0 && y >= 0 && (u32)x < gTerrainWidth && (u32)y < gTerrainHeight)
+        return *(u16 *)(gTerrainMap + 0x24 + 2 * y) + x;
     return 0;
 }
 
@@ -145,7 +145,7 @@ static inline s32 Vorn_080B43BC_CellHeight(u32 idx, u8 *ref)
 
     cell = TerrainModifiers_FindCellOverride(idx, 1);
     if (cell == 0)
-        cp = (u8 *)(*(u32 *)(gUnk_030052F4 + 4) + (idx << 2) + 0xC);
+        cp = (u8 *)(*(u32 *)(gTerrainMap + 4) + (idx << 2) + 0xC);
     else
         cp = (u8 *)cell + 4;
     t = *cp >> 4;
@@ -402,7 +402,7 @@ s32 Vorn_Init(void *arg0)
     if (GL_AT(u8, 8) == 0)
         AnimData_SelectPaletteBank(GL_AT(u8 *, 4) + 0x2C);
     else
-        *(u8 **)(GL_AT(u8 *, 4) + 0x68) = gUnk_030042E4 + (r1v << 5);
+        *(u8 **)(GL_AT(u8 *, 4) + 0x68) = gPaletteBankData + (r1v << 5);
     if (GL_AT(u8, 8) == 1) {
         r1v = SceneActorScript_GetManagerField62();
         *(u16 *)(GL_AT(u8 *, 4) + 0x20 + 0x3A) = r1v - 0x5FFF;
@@ -503,15 +503,14 @@ s32 Vorn_Init(void *arg0)
     }
 
     if (GL_AT(u16, 0x2C0) & 2)
-        GL_AT(u16, 0x2FA) = *(u32 *)(gUnk_02000710 + 0x5A0);
+        GL_AT(u16, 0x2FA) = *(u32 *)(gGameState + 0x5A0);
     else
         GL_AT(u16, 0x2FA) = Region_FindContaining((u8 *)arg0 + 0x5C);
 
     if (GL_AT(u16, 0x2C0) & 0x40)
         GL_AT(u16, 0x13A) &= 0xFEFF;
 
-    if (Script_GetKeywordValue(0x53, 0) != 0 ||
-        *(u32 *)(gUnk_02000710 + 0x5A0) != GL_AT(u16, 0x2FA))
+    if (Script_GetKeywordValue(0x53, 0) != 0 || *(u32 *)(gGameState + 0x5A0) != GL_AT(u16, 0x2FA))
         SceneActorPlacement_HideActor(arg0, 0);
 
     SceneActorAnimation_SelectDirectionalEntry(arg0, 0);

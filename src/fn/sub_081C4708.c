@@ -1,13 +1,13 @@
 #include "global.h"
+#include "render.h"
 // MATCHING_CONCESSION: register-pinning
-#define gDisplayControlShadow gUnk_03004BD8
+#define gDisplayControlShadow gDispCntShadow
 #define gPaletteShadow        gUnk_03004FC0
 
 struct S {
     u8 pad[0x18];
     u8 *resource;
 };
-extern u16 gUnk_03004BD8;
 extern u16 gUnk_03004FC0[];
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void Bg_SetPriority(u32, s32);
@@ -26,7 +26,7 @@ void sub_081C4708(struct S *p)
     void *sun;
 
     {
-        u16 *control = &gUnk_03004BD8;
+        u16 *control = &gDispCntShadow;
         u32 mask = 0xfffff0ff;
         u16 v = *control;
         mask &= v;

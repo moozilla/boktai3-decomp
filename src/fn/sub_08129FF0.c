@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 #ifdef NONMATCHING
 // fuzzy: 90.0%
 // fix.py best (sweep after the inlined-insn fix)
@@ -177,8 +178,6 @@ struct Map {
     u8 pad8[0x1c];
     u16 rows[1];
 };
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void Sprite_Remove(void *);
 void Sound_PlaySong(u32);
@@ -186,15 +185,15 @@ static inline u16 Height(struct Vec *position)
 {
     s32 x = position->x >> 8, z = position->z >> 8, index, height, slope;
     u8 *cell;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         index = 0;
     else
-        index = gUnk_030052F4->rows[z] + x;
+        index = gTerrainMap->rows[z] + x;
     cell = TerrainModifiers_FindCellOverride(index, 1);
     if (cell)
         cell += 4;
     else
-        cell = gUnk_030052F4->cells + (index * 4 + 12);
+        cell = gTerrainMap->cells + (index * 4 + 12);
     slope = *cell >> 4;
     height = (*cell & 15) << 8;
     switch (slope) {
@@ -342,15 +341,15 @@ inline static u16 Height_UpdateFallingDisc(struct Vec *position)
     s32 height;
     s32 slope;
     u8 *cell;
-    if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) || (((u32)z) >= gUnk_030052FC))
+    if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight))
         index = 0;
     else
-        index = gUnk_030052F4->rows[z] + x;
+        index = gTerrainMap->rows[z] + x;
     cell = TerrainModifiers_FindCellOverride(index, 1);
     if (cell)
         cell += 4;
     else
-        cell = gUnk_030052F4->cells + ((index * 4) + 12);
+        cell = gTerrainMap->cells + ((index * 4) + 12);
     slope = (*cell) >> 4;
     height = ((*cell) & 15) << 8;
     switch (slope) {

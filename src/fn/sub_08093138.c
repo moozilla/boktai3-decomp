@@ -1,6 +1,6 @@
 #include "global.h"
+#include "engine.h"
 
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 
 #ifdef NONMATCHING
@@ -54,8 +54,8 @@ s32 sub_08093138(u8 *arg0)
         *(u16 *)(r + 0x430) = 0;
         return 1;
     }
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    idx = gUnk_03005308;
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    idx = gRandomIndex;
     t = *(u16 *)(r + 0x430) + (u8)gUnk_0203B400[idx] + 0x100;
     if (t > 0x400) {
         t = 0x400;

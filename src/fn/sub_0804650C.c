@@ -32,7 +32,7 @@ s32 ContactSequencePool_Update(struct ContactSequenceOwner *owner)
             }
         }
         {
-            u8 *bank = gUnk_030042E4;
+            u8 *bank = gPaletteBankData;
             u8 *first, *second;
             first = bank + 0x2C00;
             second = bank + 0x2CA0;

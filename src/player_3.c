@@ -1,4 +1,5 @@
 #include "player_3.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 
 /* Tentative role: select an effect flag from actor and global state. */
@@ -6,7 +7,7 @@
 static inline u8 global_mode(void)
 {
     u32 mask = 2;
-    if (gUnk_02000710->flags868 & mask)
+    if (gGameState->flags868 & mask)
         return 1;
     return 0;
 }
@@ -31,10 +32,10 @@ void Player_LoadVisualParameters(struct Player *p)
     u16 *t;
     s32 i;
     if (p->baseActionVariant <= 9) {
-        t = (u16 *)(gUnk_030042E4 + 0x6A0);
+        t = (u16 *)(gPaletteBankData + 0x6A0);
         i = p->baseActionVariant;
     } else {
-        t = (u16 *)(gUnk_030042E4 + 0x2F60);
+        t = (u16 *)(gPaletteBankData + 0x2F60);
         i = p->baseActionVariant;
         i -= 10;
     }
@@ -194,19 +195,19 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
         PaletteFade_ApplyBrightenedPalette(p);
     }
     if (!p->actionEighteenDuration) {
-        if (gUnk_030053F4 & 0x1000)
+        if (gEngineFlags & 0x1000)
             effect = WirelessGame_GetSelectedEquipmentEffect((s8)p->thresholdMode) - 1;
         else
             effect = Player_GetUsableEnchantment(p);
         if (effect >= 0) {
             p->actionRequestHold = effect + 0x16E;
-            source = (u16 *)(gUnk_030042E4 + p->actionRequestHold * 32);
+            source = (u16 *)(gPaletteBankData + p->actionRequestHold * 32);
             weight = Player_GetPalettePulseWeight(&p->actionRequestTimer);
             sub_0813C9B4(p, source, weight, 32 - weight, 5);
             if (++p->actionRequestTimer > 95)
                 p->actionRequestTimer = 0;
         } else if ((u16)(p->actionRequestTimer - 1) <= 78) {
-            source = (u16 *)(gUnk_030042E4 + p->actionRequestHold * 32);
+            source = (u16 *)(gPaletteBankData + p->actionRequestHold * 32);
             if ((u16)(p->actionRequestTimer - 33) <= 14)
                 p->actionRequestTimer = 48;
             if (p->actionRequestTimer <= 32) {
@@ -230,7 +231,7 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
         const u16 *source;
         p->actionRequestTimer = 0;
         if (p->actionEighteenDuration > 31) {
-            source = (u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            source = (u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
             if (!p->unk419) {
                 u32 *palette;
                 i = 0;
@@ -255,7 +256,7 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
                 p->visualObject->parameters = (u32)((u8 *)p + 0x380);
             }
         } else {
-            source = (u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            source = (u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
             weight = p->actionEighteenDuration;
             sub_0813C9B4(p, source, weight, 32 - weight, 5);
         }
@@ -286,7 +287,8 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
         p->actionRequestTimer = 0;
         if (p->actionEighteenDuration > 31) {
             {
-                const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+                const u16 *source =
+                    (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
                 u16 *destination, *base;
                 s32 i;
                 if (!p->unk419) {
@@ -313,7 +315,7 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
                 }
             }
         } else {
-            const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            const u16 *source = (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
             weight = p->actionEighteenDuration;
             sub_0813C9B4(p, source, weight, 32 - weight, 5);
             p->actionEighteenDuration++;
@@ -321,7 +323,7 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
     } else if (*(u16 *)((u8 *)p + 0xAE4) == 2) {
         const u16 *source;
         p->actionRequestTimer = 0;
-        source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+        source = (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
         weight = Player_GetPalettePulseWeight(&p->actionEighteenDuration);
         sub_0813C9B4(p, source, weight, 32 - weight, 5);
         if (++p->actionEighteenDuration > 95)
@@ -330,7 +332,8 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
         p->actionRequestTimer = 0;
         if (p->actionEighteenDuration > 31) {
             {
-                const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+                const u16 *source =
+                    (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
                 u16 *destination, *base;
                 s32 i;
                 if (!p->unk419) {
@@ -357,13 +360,13 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
                 }
             }
         } else {
-            const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            const u16 *source = (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
             weight = p->actionEighteenDuration;
             sub_0813C9B4(p, source, weight, 32 - weight, 5);
         }
         p->actionEighteenDuration--;
     } else if ((u16)(p->actionRequestTimer - 1) <= 78) {
-        const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionRequestHold * 32);
+        const u16 *source = (const u16 *)(gPaletteBankData + p->actionRequestHold * 32);
         if ((u16)(p->actionRequestTimer - 33) <= 14)
             p->actionRequestTimer = 48;
         if (p->actionRequestTimer <= 32) {
@@ -487,8 +490,8 @@ void EffectGroup_SpawnPart(void *, s32, struct SceneVec *, struct SceneVec *, st
 static inline int EffectRandomWith(const u16 *table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)table);
 }
 
@@ -660,8 +663,8 @@ extern u16 gUnk_02000504;
 static inline int Player_NextStatusRandom(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)gUnk_0203B400);
 }
 
@@ -720,7 +723,7 @@ void Player_ClearStateTimer(struct Player *p, s32 idx)
 {
     p->scriptStatus[idx] = 0;
     if (idx == 1) {
-        u16 v = gUnk_02000710->values08[4];
+        u16 v = gGameState->values08[4];
         p->catalogSavedOption = v;
     }
 }
@@ -733,18 +736,18 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
     s32 *resource;
     s32 i;
     if ((u8)(p->actionMode - 1) <= 1 || VisualBonusFlag(p, 0x20000000))
-        *(s32 *)(p->timedEventSlot * 4 + (u8 *)gUnk_02000710 + 0x628) = 0;
+        *(s32 *)(p->timedEventSlot * 4 + (u8 *)gGameState + 0x628) = 0;
     {
         u32 slot = p->timedEventSlot;
-        void *state = gUnk_02000710;
+        void *state = gGameState;
         resource = (s32 *)(slot * 4 + (u32)state + 0x628);
     }
     if (*resource > 0) {
         if (p->kind & 1) {
-            if (*resource <= gUnk_02000710->unk876)
+            if (*resource <= gGameState->unk876)
                 *resource = 0;
             else
-                *resource -= gUnk_02000710->unk876;
+                *resource -= gGameState->unk876;
         }
         mode = 6;
         *(u16 *)((u8 *)p + 0xAD0) = 64;
@@ -784,12 +787,12 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
                 if ((u8)(p->actionMode - 1) <= 1 || VisualBonusFlag(p, 0x20000000)) {
                     if (p->scriptStatus[i]) {
                         Player_NotifyActionCategories(p);
-                        p->catalogSavedOption = gUnk_02000710->values08[4];
+                        p->catalogSavedOption = gGameState->values08[4];
                     }
                     p->scriptStatus[i] = 0;
                 } else if (p->scriptStatus[i] && (p->kind & 1)) {
                     if (--p->scriptStatus[i] == 0)
-                        p->catalogSavedOption = gUnk_02000710->values08[4];
+                        p->catalogSavedOption = gGameState->values08[4];
                 }
                 break;
         }
@@ -1004,7 +1007,7 @@ void Player_InitOrbitingEffect(void *);
 void ConvergingEffects_InitSprites(void *);
 void DirectionalSpriteEffect_InitSprite(void *);
 extern u16 gUnk_02000550, gUnk_0200053C, gUnk_0200052C;
-extern u16 gUnk_02000558, gUnk_02000590;
+extern u16 gUnk_02000590;
 
 static inline u8 PlayerEffects_IsSceneModeFive(struct Player *p)
 {
@@ -1058,14 +1061,14 @@ void Player_InitEffects(struct Player *p)
     gUnk_02000550 = 0;
     gUnk_0200053C = 0;
     gUnk_0200052C = 1;
-    gUnk_02000558 = 1;
+    gForceDirectionMode = 1;
     gUnk_02000590 = 0;
     p->movementAnimationState = 255;
 }
 
 s16 sub_0813E0F0(void)
 {
-    return gUnk_02000710->unk876;
+    return gGameState->unk876;
 }
 
 s32 Div(s32, s32);
@@ -1078,7 +1081,7 @@ s32 Player_GetStateModifierBonus(struct Player *p)
         if (p->scriptStatus[i])
             return 10;
     }
-    if (*(s32 *)(p->timedEventSlot * 4 + (u8 *)gUnk_02000710 + 0x628))
+    if (*(s32 *)(p->timedEventSlot * 4 + (u8 *)gGameState + 0x628))
         return 10;
     if (p->movementModifierActive)
         return 10;
@@ -1112,14 +1115,14 @@ s32 Player_GetEnergyRatioModifier(struct Player *p)
 #define Player_GetLifeRatioModifier sub_0813E1B8
 s32 Player_GetLifeRatioModifier(void)
 {
-    return Div(gUnk_02000710->life * 10, gUnk_02000710->lifeMax);
+    return Div(gGameState->life * 10, gGameState->lifeMax);
 }
 
 s32 Player_ModifyValueByMissingLife(void *unused, s32 n)
 {
     s32 a = Div(n, 4);
-    s16 v1 = gUnk_02000710->lifeMax;
-    s32 b = Div(v1 - gUnk_02000710->life, v1);
+    s16 v1 = gGameState->lifeMax;
+    s32 b = Div(v1 - gGameState->life, v1);
     return a + n * b;
 }
 
@@ -1127,8 +1130,8 @@ s32 Player_ModifyValueByRemainingLife(void *unused, s32 n)
 {
     s32 a = Div(n, 10);
     s32 b = Div(n, 2);
-    s16 v1 = gUnk_02000710->lifeMax;
-    s32 c = Div(v1 - gUnk_02000710->life, v1);
+    s16 v1 = gGameState->lifeMax;
+    s32 c = Div(v1 - gGameState->life, v1);
     return n + a - b * c;
 }
 
@@ -1138,7 +1141,7 @@ s32 Player_ModifyValueByEquipmentLevel(struct PlayerModifierInput *p, s32 n)
 {
     u8 *t = Equipment_GetDefinition(p->equipment);
     s32 a = Div(Div(n, 2), 100 - t[2]);
-    s32 b = gUnk_02000710->level - t[2];
+    s32 b = gGameState->level - t[2];
 
     return n - b * a;
 }
@@ -1154,15 +1157,15 @@ s32 Player_GetScaledTargetFlagBonus(s32 unused0, s32 unused1, struct PlayerModif
 {
     u32 mask = 0x80;
     if (target->flags & mask)
-        return LimitTargetBonus(gUnk_02000710->targetFlagBonuses[0] >> 6);
+        return LimitTargetBonus(gGameState->targetFlagBonuses[0] >> 6);
     else if (target->flags & 0x100)
-        return LimitTargetBonus(gUnk_02000710->targetFlagBonuses[1] >> 6);
+        return LimitTargetBonus(gGameState->targetFlagBonuses[1] >> 6);
     else if (target->flags & 0x200)
-        return LimitTargetBonus(gUnk_02000710->targetFlagBonuses[2] >> 6);
+        return LimitTargetBonus(gGameState->targetFlagBonuses[2] >> 6);
     else if (target->flags & 0x400)
-        return LimitTargetBonus(gUnk_02000710->targetFlagBonuses[3] >> 6);
+        return LimitTargetBonus(gGameState->targetFlagBonuses[3] >> 6);
     else if (target->flags & 0x800)
-        return LimitTargetBonus(gUnk_02000710->targetFlagBonuses[4] >> 6);
+        return LimitTargetBonus(gGameState->targetFlagBonuses[4] >> 6);
     return 0;
 }
 
@@ -1172,8 +1175,8 @@ s32 Player_RollModifierBonus(void)
 {
     s32 r;
 
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
     if (r > 10) {
         r = 0;
     } else {
@@ -1265,8 +1268,8 @@ s32 Player_OnWeaponHitRollEffect1000(void)
 {
     s32 r;
 
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
     if (r > 10) {
         r = 0;
     } else {
@@ -1279,8 +1282,8 @@ s32 Player_OnWeaponHitRollEffect40000Low(void)
 {
     s32 r;
 
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
     if (r > 10) {
         r = 0;
     } else {
@@ -1293,8 +1296,8 @@ s32 Player_OnWeaponHitRollEffect40000High(void)
 {
     s32 r;
 
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
     if (r > 20) {
         r = 0;
     } else {
@@ -1307,8 +1310,8 @@ s32 Player_OnWeaponHitRollEffect80000Low(void)
 {
     s32 r;
 
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
     if (r > 10) {
         r = 0;
     } else {
@@ -1321,8 +1324,8 @@ s32 Player_OnWeaponHitRollEffect80000High(void)
 {
     s32 r;
 
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
     if (r > 20) {
         r = 0;
     } else {
@@ -1833,10 +1836,10 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
         if (current && i == EquipmentSlot(current))
             item = override;
         else {
-            if (*(s16 *)((u8 *)gUnk_02000710 + i * 2 + 0x58) < 0)
+            if (*(s16 *)((u8 *)gGameState + i * 2 + 0x58) < 0)
                 continue;
             item = GameState_GetConsumableDescriptor(
-                Inventory_GetConsumableId(*(s16 *)((u8 *)gUnk_02000710 + i * 2 + 0x58)));
+                Inventory_GetConsumableId(*(s16 *)((u8 *)gGameState + i * 2 + 0x58)));
         }
         for (effect = 0; effect <= 1; effect++) {
             u32 kind, amount;
@@ -2160,7 +2163,7 @@ extern const u16 gUnk_0861091C[], gUnk_08610940[];
 
 u32 ActorParameter_GetModeValue(s32 index)
 {
-    if (gUnk_030053F4 & 0x1000)
+    if (gEngineFlags & 0x1000)
         return gUnk_08610940[index];
     else
         return gUnk_0861091C[index];
@@ -2238,8 +2241,7 @@ s32 Player_HasRequiredEnergy(struct Player *p, s32 v)
 
 s32 Player_CanSpendSharedResource(struct Player *p, s32 v)
 {
-    if (*(s32 *)(p->timedEventSlot * 4 + (u8 *)gUnk_02000710 + 0x628) <= 0 &&
-        gUnk_02000710->unk876 >= v)
+    if (*(s32 *)(p->timedEventSlot * 4 + (u8 *)gGameState + 0x628) <= 0 && gGameState->unk876 >= v)
         return 1;
     return 0;
 }
@@ -2283,7 +2285,7 @@ s32 Player_SelectRequestedActionMode(struct Player *p)
         {
             switch (request->kind) {
                 case 3:
-                    if (gUnk_030053F4 & 0x1000)
+                    if (gEngineFlags & 0x1000)
                         return *mode;
                     return 19;
                 case 2:
@@ -2291,7 +2293,7 @@ s32 Player_SelectRequestedActionMode(struct Player *p)
                         Sound_PlaySong(0x192);
                         return *mode;
                     }
-                    if (gUnk_030053F4 & 0x1000)
+                    if (gEngineFlags & 0x1000)
                         return *mode;
                     return 10;
                 case 1:
@@ -2299,7 +2301,7 @@ s32 Player_SelectRequestedActionMode(struct Player *p)
                         Sound_PlaySong(0x192);
                         return *mode;
                     }
-                    if (gUnk_030053F4 & 0x1000)
+                    if (gEngineFlags & 0x1000)
                         return *mode;
                     return 11;
                 case 0:
@@ -2353,9 +2355,9 @@ s32 Player_GetSelectedAbility(struct Player *p)
 {
     if (p->actionMode != 6)
         /* Add the slot index before the field offset to retain the original address lifetime. */
-        return *(s16 *)((u8 *)gUnk_02000710 + gUnk_02000710->selected * 2 + 0x88);
+        return *(s16 *)((u8 *)gGameState + gGameState->selected * 2 + 0x88);
     gUnk_02000554 = 0;
-    if (gUnk_02000710->abilityVariant == 0)
+    if (gGameState->abilityVariant == 0)
         return 4;
     return 5;
 }
@@ -2363,7 +2365,7 @@ s32 Player_GetSelectedAbility(struct Player *p)
 void Player_InitActionRequest(struct Player *p)
 {
     struct PlayerActionRequest *request = (struct PlayerActionRequest *)&p->thresholdMode;
-    if (gUnk_030053F4 & 0x1000)
+    if (gEngineFlags & 0x1000)
         request->kind = 0xFF;
     else
         request->kind = Player_GetSelectedAbility(p);

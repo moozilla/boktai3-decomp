@@ -38,9 +38,9 @@ struct StagedEffect {
     const u16 *activePalette;
     u16 blendedPalette[16];
 };
-extern u16 *gUnk_030042E4;
+extern u16 *gPaletteBankData;
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 void StagedEffect_MarkOuterSprites(struct StagedEffect *);
 void StagedEffect_MarkOuterSpritesAlternate(struct StagedEffect *);
 void StagedEffect_BlendPalette(struct StagedEffect *, s32, s32, s32);

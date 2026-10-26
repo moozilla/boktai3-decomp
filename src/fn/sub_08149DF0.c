@@ -2,6 +2,7 @@
 #include "global.h"
 #include "player.h"
 #include "contact_swarm.h"
+#include "render.h"
 // confidence=low: action creates the spiral trail and advances its auxiliary sprite.
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_EmitQueuedEffects(struct Player *);
@@ -10,7 +11,6 @@ void Sound_PlaySong(u32);
 void SpiralTrail_CreateWithParticles(struct Player *, s32, s32, s32, s32);
 void Player_AddControlFlags(struct Player *, s32);
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);
-extern u8 *gUnk_030042E4;
 void ActorSequence_Begin(struct Player *, s32, s32);
 static inline s32 ScaleSequenceFrame(s32 weight, s32 speed)
 {
@@ -45,7 +45,7 @@ void Player_UpdateSpiralTrailAction(struct Player *p)
         u16 *resource = &p->spriteResource;
         u32 id = 0x16F;
         *resource = id;
-        p->actionVariantResource = (u32)(gUnk_030042E4 + id * 32);
+        p->actionVariantResource = (u32)(gPaletteBankData + id * 32);
     }
     state = (void *)((u8 *)p + 0x3FC);
     Anim_SetSequence(state, *(void **)((u8 *)p + 0x410), 0, p->heading, p->side);

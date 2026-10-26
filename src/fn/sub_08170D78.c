@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 // confidence=low: refreshes inventory icons and equipped-slot markers.
 #define PauseInventory_RefreshConsumableIcons sub_08170D78
 // MATCHING_CONCESSION: register-pinning
@@ -20,7 +21,6 @@ struct PauseWidget {
     s16 x, y, z, pad;
     u8 unknown28[0x38];
 };
-extern u8 *gUnk_02000710;
 s32 Inventory_GetConsumableId(u32);
 s32 GameState_IsConsumableSlotEquipped(u32);
 void Anim_LoadKeyframe(void *, void *, u16, u32);
@@ -67,7 +67,7 @@ void PauseInventory_RefreshConsumableIcons(u8 *p)
     i = 0;
     equippedWidget = (void *)(p + 0x1DE0);
     for (i = 0; i < 4; i++) {
-        u8 *state = gUnk_02000710;
+        u8 *state = gGameState;
         struct EquippedSlot *slot = (void *)(i * 2 + (u32)state);
         s32 id;
         s32 slotId = slot->id;

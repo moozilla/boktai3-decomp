@@ -1,7 +1,7 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define gMotionRandomIndex gUnk_03005308
+#define gMotionRandomIndex gRandomIndex
 #define gMotionRandomTable gUnk_0203B400
 typedef struct MotionDelta {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -23,7 +23,7 @@ typedef struct HresvelgrActor {
     u8 emitter[0x15c];
     u16 state;
 } HresvelgrActor;
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void Hresvelgr_SetAnimation(HresvelgrActor *, void *, void *, u32, u32, u32);
 void *MotionEntry_CreateWithDelta(u32, MotionDelta *, u32, u32);
@@ -32,8 +32,8 @@ s32 Callback_InvokeActor(void *, void *);
 static inline s32 nextRandom(const u16 *table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(u16 *)(offset + (u32)table);
 }
 static inline void emitBurst(u32 emitter)

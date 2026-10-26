@@ -1,8 +1,8 @@
 #include "global.h"
-extern u8 *gUnk_03005420;
+#include "ram.h"
 
 void sub_08225F40(void)
 {
-    if (gUnk_03005420 != NULL)
-        *(u16 *)(gUnk_03005420 + 0x54) = 0;
+    if (gActiveCamera != NULL)
+        *(u16 *)(gActiveCamera + 0x54) = 0;
 }

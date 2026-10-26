@@ -1,4 +1,3 @@
-#define gGameState                  gUnk_02000710
 #define gRegionActorUpdateCallbacks gUnk_086064FC
 #include "global.h"
 #include "game_state.h"
@@ -21,7 +20,7 @@ static inline u8 TestFlags(struct RegionActor *actor)
 static inline u8 IsCurrentRegion(struct RegionActor *actor)
 {
     s32 region = actor->region;
-    if (gUnk_02000710->region == region)
+    if (gGameState->region == region)
         return 1;
     return 0;
 }

@@ -2,6 +2,7 @@
 #define STATUS_SCREEN_H
 #include "global.h"
 #include "engine.h"
+#include "render.h"
 
 // Tentative: a full-screen status/info page. A background map and palette are loaded from script
 // resources, the page is revealed through a scanline-noise (horizontal offset) transition while
@@ -104,6 +105,5 @@ void *Video_GetBackgroundMap(u32);
 extern struct StatusScreen *gUnk_02000044; // the live status screen, or NULL
 extern struct BgMapInfo gUnk_03004C30[];
 extern u16 gUnk_03005260[]; // input: [1] = newly pressed keys
-extern u16 gUnk_03004BD8;   // flags, bit 8 set while a status screen is active (guess)
 
 #endif

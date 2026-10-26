@@ -2,7 +2,7 @@
 #include "script_utility.h"
 void SceneRangeWatch_CheckRange(struct SceneRangeWatch *p)
 {
-    s32 v = gUnk_02000710->unk876;
+    s32 v = gGameState->unk876;
     u32 r;
     if (p->minimum <= v && p->maximum >= v) {
         r = 1;

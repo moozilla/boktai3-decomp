@@ -10,19 +10,18 @@ u8 Mimic_TryPursuitRoute(void *);
 s32 Math_Atan2(s32, s32);
 void ActorShadow_Enable(void *);
 extern const s16 gUnk_086149C4[];
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 static inline void CellCenter(struct ContactPosition *out, u32 cell)
 {
-    s32 x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-    s32 z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+    s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
+    s32 z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
     u8 *data;
     out->x = (x << 8) + 0x80;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
+        data = gTerrainMap->cells + (cell * 4 + 12);
     out->y = (*data & 15) << 8;
     out->z = (z << 8) + 0x80;
 }
@@ -127,9 +126,9 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
             speed = 4;
         } else {
             RouteDelta(&delta, &actor->position, group);
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+            gRandomIndex = (gRandomIndex + 1) & 1023;
             {
-                u32 offset = gUnk_03005308 * 2;
+                u32 offset = gRandomIndex * 2;
                 u32 random = *(u16 *)(offset + (u32)gUnk_0203B400);
                 s32 base = SpeedBase(context);
                 speed = base + (random & 3);

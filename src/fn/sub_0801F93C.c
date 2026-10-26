@@ -42,7 +42,7 @@ static inline int Obj1F_Near(u8 *o, struct Obj1FPos *ref)
 }
 static inline struct Obj1FPos *Obj1F_Cam(void)
 {
-    return (struct Obj1FPos *)((u8 *)gUnk_02000710 + 0x30);
+    return (struct Obj1FPos *)((u8 *)gGameState + 0x30);
 }
 static inline void Obj1F_Append(u8 *self, u16 id)
 {
@@ -136,7 +136,7 @@ s32 sub_0801F93C(u8 *self)
         u16 id;
         *(u16 *)(o + 0x10) = o[0x39];
         if (o[0x44]) {
-            if (*(u32 *)((u8 *)gUnk_02000710 + 0x5A0) == *(u16 *)(o + 0x42))
+            if (*(u32 *)((u8 *)gGameState + 0x5A0) == *(u16 *)(o + 0x42))
                 *(u32 *)o &= ~1;
             else
                 *(u32 *)o |= 1;
@@ -185,7 +185,7 @@ s32 sub_0801F93C(u8 *self)
                 break;
             case 15:
                 SceneObject_UpdatePoseA(o);
-                if (*(s16 *)((u8 *)gUnk_02000710 + 0x876) <= 2)
+                if (*(s16 *)((u8 *)gGameState + 0x876) <= 2)
                     break;
                 if (Obj1F_Near(o, Obj1F_Cam()) && !SceneObjects_HasPrimaryId(self, id))
                     Obj1F_Append(self, id);

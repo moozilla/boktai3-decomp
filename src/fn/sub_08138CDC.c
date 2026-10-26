@@ -1,6 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #include "actor_attachment_sprite_playback.h"
+#include "engine.h"
 // confidence=low: follows the sound delay and switches to scatter trail at the height limit.
 struct Vec {
     s32 x, y, z, w;
@@ -30,7 +31,7 @@ struct Emitter {
 };
 extern struct Source *gUnk_020004F0[];
 extern struct Camera *gUnk_020004B8;
-extern u32 gUnk_030053F4, gUnk_030053F0;
+extern u32 gUnk_030053F0;
 s32 Div(s32, s32);
 u8 HeightProbe_IsBelowLimit(void *);
 void ParticleEmitter_UpdateScatterTrail(struct Emitter *);
@@ -74,7 +75,7 @@ static inline void GetOffset(struct Vec *out, s32 index)
 }
 static inline u32 TestMode(u32 mask)
 {
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 void ParticleEmitter_UpdateFlight(struct Emitter *p)
 {

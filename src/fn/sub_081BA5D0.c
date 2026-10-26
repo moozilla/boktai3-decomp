@@ -1,15 +1,15 @@
 #include "global.h"
 #include "engine.h"
-extern void *gUnk_0200025C;
+#include "ram.h"
 void Registry2388_OnUpdate(void *);
 void SelectionPanel_Destroy(void *);
 s32 Registry2388_InitializeFromScript(void *, void *);
 /* Registry routine 2388: creates its task (0x564 bytes) once and records it in
-   gUnk_0200025C; returns 0 if it already exists. */
+   gSelectionPanel; returns 0 if it already exists. */
 void *Registry2388_Create(void *arg)
 {
     void *p;
-    if (gUnk_0200025C)
+    if (gSelectionPanel)
         return 0;
     p = Task_Create(8, 0x564);
     if (p) {
@@ -19,6 +19,6 @@ void *Registry2388_Create(void *arg)
             return 0;
         }
     }
-    gUnk_0200025C = p;
+    gSelectionPanel = p;
     return p;
 }

@@ -1,7 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-#define gAnimPanelSavedSelections gUnk_020005C0
-extern u8 gUnk_020005C0[];
 struct AnimPanel {
     u8 unk0[0x34c];
     s32 selectionSecondary;

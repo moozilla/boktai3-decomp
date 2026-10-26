@@ -1,5 +1,5 @@
 #include "global.h"
-#define gEffectRandomTableIndex gUnk_03005304
+#include "ram.h"
 struct NidhoggrEffectVector {
     u16 x, y, z, pad;
 };
@@ -27,7 +27,6 @@ struct NidhoggrDistanceEffect {
     u8 phase, phaseTimer;
     s16 startX;
 };
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 extern const struct NidhoggrEffectPair gUnk_0824F29C, gUnk_0824F2A4;
 struct NidhoggrDistanceEffect *SceneEffectPool_AllocateSlot(void *);

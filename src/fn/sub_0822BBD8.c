@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+#include "game_state.h"
 extern u32 gUnk_0200060C, gUnk_03005404;
 void GameState_BackupRegionRange(void *, u32);
 u32 Save_AlignSizeToEightBytes(u32);
@@ -10,8 +10,8 @@ u32 Save_GetMainStateSize(void);
 u32 Save_WriteMainState(u32 arg)
 {
     u32 buffer, result, index;
-    *(u32 *)gUnk_02000710 = gUnk_0200060C;
-    GameState_BackupRegionRange(gUnk_02000710, 4);
+    *(u32 *)gGameState = gUnk_0200060C;
+    GameState_BackupRegionRange(gGameState, 4);
     buffer = Save_AlignSizeToEightBytes(1024);
     index = Save_GetPrimaryRegionBlock(arg, 0);
     index <<= 16;

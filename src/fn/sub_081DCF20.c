@@ -1,6 +1,5 @@
 #include "global.h"
 #include "game_state.h"
-#define gGameState gUnk_02000710
 struct TextEntry {
     u8 pad0[0x370];
     u32 useSavedName;

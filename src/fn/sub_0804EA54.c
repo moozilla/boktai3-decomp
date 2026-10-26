@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 struct S {
     u8 f[0x868];
     u32 fl;
@@ -11,7 +12,6 @@ struct O {
     u8 g[0xd];
     u8 b29;
 };
-extern struct S *gUnk_02000710;
 extern u32 gUnk_02000580;
 extern u16 gUnk_02000528;
 extern u16 gUnk_02000590;
@@ -36,7 +36,7 @@ s32 AreaEffect_Tick(struct O *o)
         o->b29 = 0;
     o->q = gUnk_02000580;
     if (o->q != 0) {
-        struct S *s = gUnk_02000710;
+        struct S *s = gGameState;
         if (s->v == 0) {
             if (AreaEffect_TestParticleMode(o) != 0)
                 AreaEffect_UpdateActionParticles(o);

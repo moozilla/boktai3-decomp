@@ -46,7 +46,7 @@ void sub_080AF2BC(struct SceneActorRegistryResetView *actor)
         Chase_ClearMotionFlags(actor, 0x80);
     }
 
-    if (Chase_Test(gUnk_030053F4, 0x4800)) {
+    if (Chase_Test(gEngineFlags, 0x4800)) {
         struct ChaseTarget *t = *(struct ChaseTarget **)((u8 *)actor + 0xDC);
         if (!t)
             goto invoke;
@@ -87,15 +87,15 @@ void sub_080AF2BC(struct SceneActorRegistryResetView *actor)
 
 reroute: {
     struct ContactPosition target;
-    s32 x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-    s32 z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+    s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
+    s32 z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
     u8 *data;
     target.x = (x << 8) + 0x80;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
+        data = gTerrainMap->cells + (cell * 4 + 12);
     target.y = (*data & 15) << 8;
     target.z = (z << 8) + 0x80;
     if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, &target))

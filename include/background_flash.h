@@ -15,12 +15,12 @@ struct BackgroundFlashController {
 static inline void BackgroundFlash_ShowLayer(void)
 {
     u32 visible = 0x200;
-    visible |= gUnk_03004BD8;
-    gUnk_03004BD8 = visible;
+    visible |= gDispCntShadow;
+    gDispCntShadow = visible;
 }
 static inline void BackgroundFlash_HideLayer(void)
 {
-    u16 *control = &gUnk_03004BD8;
+    u16 *control = &gDispCntShadow;
     u32 mask = ~0x200;
     u32 flags = *control;
     mask &= flags;

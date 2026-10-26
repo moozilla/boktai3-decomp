@@ -1,5 +1,6 @@
 #include "global.h"
 #include "contact_actor.h"
+#include "engine.h"
 struct DepartureOwner {
     u8 unknown0[0xAF];
     u8 complete, unknownB0, entry;
@@ -15,7 +16,6 @@ struct PackedPosition {
 };
 #define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 void Sound_PlaySong(u32);
 void SpriteParticle_InitParams(void *);
 void SpriteParticle_SetMotionParams(void *, u16, u16, u8, u32);
@@ -30,8 +30,8 @@ u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 /* Remaining differences: receiver aliases, packed positions and particle stack allocation. */
 static inline u32 Random(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return gUnk_0203B400[gRandomIndex];
 }
 static inline u32 Next(const u16 *table, u32 *randomIndex, u32 wrap)
 {
@@ -54,16 +54,16 @@ void SingletonSlot7_UpdateShakingDeparture(struct DepartureOwner *p, s32 frame)
     p->shakeX = 0;
     p->shakeZ = 0;
     if (frame <= 59) {
-        u32 index = (gUnk_03005308 + 1) & 1023;
+        u32 index = (gRandomIndex + 1) & 1023;
         p->shakeX = (gUnk_0203B400[index] & 7) - 4;
         index = (index + 1) & 1023;
-        gUnk_03005308 = index;
+        gRandomIndex = index;
         p->shakeZ = (gUnk_0203B400[index] & 7) - 4;
     } else if (p->flag304 && p->flag34C)
         *((u32 *)(((u8 *)p) + 0x5A0)) += 2;
     if ((frame & 1) && (frame > 60)) {
         const u16 *table = gUnk_0203B400;
-        u32 *randomIndex = &gUnk_03005308;
+        u32 *randomIndex = &gRandomIndex;
         u32 wrap = 1023;
         struct PackedPosition position;
         s32 dx;

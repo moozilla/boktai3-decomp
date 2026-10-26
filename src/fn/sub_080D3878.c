@@ -9,6 +9,7 @@
 // Remaining differences: flag-address materialization, late argument registers and zero lifetimes.
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
+#include "engine.h"
 void SceneActorMovement_UpdateAirborne(void *);
 void SceneActorMovement_UpdateHeight(void *);
 void SceneEffect_EmitPositionPattern(void *);
@@ -22,7 +23,6 @@ void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
-extern u32 gUnk_03005308;
 struct BatDrawable {
     u32 flags;
     u8 unknown4[4];
@@ -53,9 +53,9 @@ static inline void HideTile(struct SceneActorAnimationTile *tile)
 }
 static inline u32 Random4(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
+    u32 index = (gRandomIndex + 1) & 1023;
     u32 v;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     index *= 2;
     v = *(const u16 *)((u32)gUnk_0203B400 + index);
     v &= 3;
@@ -64,9 +64,9 @@ static inline u32 Random4(void)
 /* The first spark's index arithmetic; the burst below passes the table explicitly. */
 static inline u32 RandomFrom(const u16 *table)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
+    u32 index = (gRandomIndex + 1) & 1023;
     u32 v;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     index *= 2;
     v = *(const u16 *)((u32)table + index);
     v &= 3;

@@ -1,5 +1,5 @@
 #include "global.h"
-#define gSceneParticlePool gUnk_02000194
+#include "ram.h"
 struct SceneParticle {
     u32 flags;
     u8 unknown4[0x14];
@@ -25,14 +25,13 @@ struct SceneParticlePool {
     struct SceneParticle particles[26];
     u32 occupied;
 };
-extern struct SceneParticlePool *gUnk_02000194;
 void Effect_Remove(void *);
 void SceneParticle_Remove(void *unused, struct SceneParticle *particle)
 {
     if (particle->reset)
         particle->reset = 0;
     {
-        struct SceneParticlePool *pool = gUnk_02000194;
+        struct SceneParticlePool *pool = gSceneParticlePool;
         s32 index = particle->index;
         pool->occupied &= ~(1 << index);
     }

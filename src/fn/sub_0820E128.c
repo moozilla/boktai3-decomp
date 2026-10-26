@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_vec.h"
+#include "engine.h"
 struct PoisonHandBurst {
     u8 pad0[0x18];
     s32 frame;
@@ -13,7 +14,6 @@ struct PoisonHandBurst {
     s16 timer;
 };
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 void PoisonHand_RecordDefeat(void *);
 void *SpriteEffectController_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                     u32, s32, s32, u32, s32, u32, u32);
@@ -25,8 +25,8 @@ struct BurstVelocity {
 static inline s32 PoisonHand_NextSpread(const u16 *table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)table);
 }
 static inline void PoisonHand_CopyPosition(struct SceneVec *dst, struct SceneVec *src)

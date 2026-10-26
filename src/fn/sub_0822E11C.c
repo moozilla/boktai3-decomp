@@ -1,6 +1,6 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 void GameState_ClearConsumableSlot(u32 i)
 {
-    *(s16 *)(gUnk_02000710 + i * 2 + 0x160) = -1;
+    *(s16 *)(gGameState + i * 2 + 0x160) = -1;
 }

@@ -2,6 +2,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "area_effect_link.h"
+#include "render.h"
 void SceneActor_ClearReactionFlags(void *);
 u8 SceneActorBehavior_DispatchFlaggedCategory(void *);
 void SceneActorMovement_ProjectProbe(void *, u32, u32);
@@ -11,7 +12,6 @@ void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
 void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, s32);
-extern u8 *gUnk_030042E4;
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
@@ -29,7 +29,7 @@ static inline s32 LocalPlayer(void)
 }
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u32 *owner = &actor->field2E0;
         u32 mask = *owner;
         if (!(mask & 0x20) && mask) {
@@ -269,7 +269,7 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct SceneActorRegistryResetView 
                 if (actor->drawableKind == 0)
                     AnimData_SelectPaletteBank(((u8 *)actor->drawable) + 0x2C, bank);
                 else
-                    *((u8 **)(((u8 *)actor->drawable) + 0x68)) = gUnk_030042E4 + (bank * 32);
+                    *((u8 **)(((u8 *)actor->drawable) + 0x68)) = gPaletteBankData + (bank * 32);
                 {
                     u32 eight = 8;
                     actor->field1E8 = eight;

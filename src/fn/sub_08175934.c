@@ -1,4 +1,4 @@
-#define gPanelGameState gUnk_02000710
+#define gPanelGameState gGameState
 // Provisional panel family; field meanings follow static consumers.
 #include "global.h"
 #include "game_state.h"
@@ -11,7 +11,7 @@ u32 SceneCatalog_GetMappedState(void);
 void SelectionPanel_CaptureSettings(struct SelectionPanel *p)
 {
     p->state = 0;
-    p->setting10 = gUnk_02000710->values08[4];
+    p->setting10 = gGameState->values08[4];
     p->selection = SceneCatalog_GetMappedState();
-    p->setting14 = gUnk_02000710->unk14;
+    p->setting14 = gGameState->unk14;
 }

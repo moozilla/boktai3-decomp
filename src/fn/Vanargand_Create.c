@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-extern void *gUnk_02000250; /* the Vanargand boss task */
+#include "ram.h"
 void *SceneActors_GetBySlot(u32);
 void Vanargand_Update(void *);
 void SceneComposite_Destroy(void *);
@@ -10,8 +10,8 @@ s32 sub_081AE0C0(void *, void *);
 void *Vanargand_Create(void *arg)
 {
     void *p;
-    if (gUnk_02000250)
-        return gUnk_02000250;
+    if (gSceneComposite)
+        return gSceneComposite;
     p = SceneActors_GetBySlot(Script_GetKeywordValue('t', 5));
     if (p)
         return p;
@@ -23,6 +23,6 @@ void *Vanargand_Create(void *arg)
             return 0;
         }
     }
-    gUnk_02000250 = p;
+    gSceneComposite = p;
     return p;
 }

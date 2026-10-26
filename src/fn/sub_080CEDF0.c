@@ -38,7 +38,7 @@ static inline void Golem_Charge(void *ctx)
 {
     u8 *body = ctx;
     u8 *player;
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u8 *partner = *(u8 **)(body + 0xDC);
         s32 index;
         if (!partner)
@@ -121,7 +121,7 @@ void Golem_ChargeOrReturnHome(struct SceneActorRegistryResetView *actor)
     if (actor->field2B0) {
         Golem_Charge(body);
         *(u16 *)(body + 0x680) -= 0x1E;
-        coop = Test(gUnk_030053F4, 0x4800);
+        coop = Test(gEngineFlags, 0x4800);
         if (coop) {
             u8 *partner = (u8 *)actor->fieldDC;
             s32 index;

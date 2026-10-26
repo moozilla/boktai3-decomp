@@ -1,5 +1,4 @@
 #define Player_ComputeIndexedStatA Player_GetSpecialAttackPower
-#define gGameState                 gUnk_02000710
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
@@ -36,7 +35,7 @@ s32 Player_EvaluateItemStatA(struct PlayerActionEntry *item,
     modifiers = &context;
     override = &context.statBOverrideEnabled;
     entry = &context.actionEntry;
-    src = gUnk_02000710->party;
+    src = gGameState->party;
     dst = equipment;
     for (i = 3; i >= 0; i--)
         *dst++ = *src++;
@@ -45,7 +44,7 @@ s32 Player_EvaluateItemStatA(struct PlayerActionEntry *item,
     PlayerAction_RefreshFlagState(0, statValues, index);
     ActionRecord_CopyFromEntry(item, &descriptor);
     Player_BuildActionModifiers(0, modifiers, &descriptor);
-    value = (s16)gUnk_02000710->baseStats[2] + (s16)gUnk_02000710->statBonuses[2] + statValues[5];
+    value = (s16)gGameState->baseStats[2] + (s16)gGameState->statBonuses[2] + statValues[5];
     {
         u8 zero = 0;
         *override = zero;

@@ -63,7 +63,7 @@ s32 ContactBurst_Update(struct ContactBurst *effect)
         if (previous) {
             s32 index = 0;
             const u16 *randomTable = (const u16 *)RANDOM_TABLE_ADDR;
-            u32 *randomState = &gUnk_03005308;
+            u32 *randomState = &gRandomIndex;
             do {
                 u32 sample, frame;
                 s32 direction;

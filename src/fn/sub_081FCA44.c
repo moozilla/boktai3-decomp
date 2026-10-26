@@ -1,4 +1,5 @@
 #include "display_animation.h"
+#include "engine.h"
 #ifdef NONMATCHING
 // fuzzy: 51.0%
 // Remaining: loop-invariant pointers, packed playback temporaries, and register allocation.
@@ -56,7 +57,6 @@ struct ProjectilePool {
     u8 pad1C[4];
     struct ProjectileSlot slots[10];
 };
-extern u32 gUnk_030052F8, gUnk_030052FC, gUnk_03005308;
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 s32 Ratatosk_GetSelectedPointIndex(void);
@@ -78,16 +78,16 @@ static inline s32 Truncate(s32 v)
 static inline s32 CellIndex(struct ProjectilePosition *v)
 {
     s32 x = v->x >> 8, z = v->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u8 *Cell(s32 i)
 {
     u8 *cell = TerrainModifiers_FindCellOverride(i, 1);
     if (cell)
         return cell + 4;
-    return gUnk_030052F4->cells + 12 + i * 4;
+    return gTerrainMap->cells + 12 + i * 4;
 }
 static inline void StepAnimation(struct DisplaySequenceState *s, struct ProjectileSprite *sprite)
 {
@@ -186,8 +186,8 @@ s32 SceneProjectile_UpdatePool(struct ProjectilePool *pool)
                             Math_Atan2(target->x - position->x, target->z - position->z);
                         u32 random;
                         control->direction = direction;
-                        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-                        random = ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+                        gRandomIndex = (gRandomIndex + 1) & 1023;
+                        random = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
                         control->direction = direction - 8 + (random & 15);
                         control->word2C = 0;
                         control->speed = 18;

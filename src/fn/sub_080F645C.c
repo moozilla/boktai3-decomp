@@ -1,6 +1,6 @@
 #include "global.h"
 
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 void Sword_UpdateBodyPaletteRestore(void *);
 void ChildGroup_ShowDamageNumber(void *, u32, u32);
 void sub_080F421C(void);
@@ -15,7 +15,7 @@ static inline s32 clamp(s32 v)
         v = 0;
     return v;
 }
-#define INC(n) H(gUnk_02000710, n) = clamp(H(gUnk_02000710, n) + 1)
+#define INC(n) H(gGameState, n) = clamp(H(gGameState, n) + 1)
 struct SwordState {
     u8 pad0[0x8d];
     u8 flags;
@@ -56,10 +56,10 @@ void Sword_UpdateDamage(u8 *p)
             do {
                 setState((void *)p, 1, 6);
                 *(void (**)(void))(p + 0xcc8) = sub_080F421C;
-                H(gUnk_02000710, 0x87C) =
-                    H(gUnk_02000710, 0x87C) < 9999 ? H(gUnk_02000710, 0x87C) + 1 : 9999;
+                H(gGameState, 0x87C) =
+                    H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
                 {
-                    u8 *g = gUnk_02000710;
+                    u8 *g = gGameState;
                     u32 off = 0x538;
                     s16 *q;
                     u32 v;
@@ -72,28 +72,27 @@ void Sword_UpdateDamage(u8 *p)
                     flags = read;
                 }
                 do {
-                    *((s16 *)(gUnk_02000710 + 0x548)) =
-                        ((*((s16 *)(gUnk_02000710 + 0x548))) < 9999)
-                            ? ((*((s16 *)(gUnk_02000710 + 0x548))) + 1)
-                            : (9999);
+                    *((s16 *)(gGameState + 0x548)) = ((*((s16 *)(gGameState + 0x548))) < 9999)
+                                                         ? ((*((s16 *)(gGameState + 0x548))) + 1)
+                                                         : (9999);
                     if (flags & 0x80) {
-                        *((s16 *)(gUnk_02000710 + 0x58A)) =
-                            clamp((*((s16 *)(gUnk_02000710 + 0x58A))) + 1);
+                        *((s16 *)(gGameState + 0x58A)) =
+                            clamp((*((s16 *)(gGameState + 0x58A))) + 1);
                     } else if (flags & 0x100) {
-                        *((s16 *)(gUnk_02000710 + 0x58C)) =
-                            clamp((*((s16 *)(gUnk_02000710 + 0x58C))) + 1);
+                        *((s16 *)(gGameState + 0x58C)) =
+                            clamp((*((s16 *)(gGameState + 0x58C))) + 1);
                     } else if (flags & 0x200) {
-                        *((s16 *)(gUnk_02000710 + 0x58E)) =
-                            clamp((*((s16 *)(gUnk_02000710 + 0x58E))) + 1);
+                        *((s16 *)(gGameState + 0x58E)) =
+                            clamp((*((s16 *)(gGameState + 0x58E))) + 1);
                     } else if (flags & 0x400) {
-                        *((s16 *)(gUnk_02000710 + 0x590)) =
-                            clamp((*((s16 *)(gUnk_02000710 + 0x590))) + 1);
+                        *((s16 *)(gGameState + 0x590)) =
+                            clamp((*((s16 *)(gGameState + 0x590))) + 1);
                     } else {
                         u32 last = flags;
                         last &= 0x800;
                         if (last) {
-                            *((s16 *)(gUnk_02000710 + 0x592)) =
-                                clamp((*((s16 *)(gUnk_02000710 + 0x592))) + 1);
+                            *((s16 *)(gGameState + 0x592)) =
+                                clamp((*((s16 *)(gGameState + 0x592))) + 1);
                         }
                     }
                 } while (0);

@@ -3,10 +3,10 @@ struct A {
     u8 p[0xc];
     void *fc;
 };
-extern struct A *gUnk_030052F4;
+extern struct A *gTerrainMap;
 extern u32 gUnk_03001684;
 void Terrain_SetBoxes(void *v)
 {
-    gUnk_030052F4->fc = v;
+    gTerrainMap->fc = v;
     gUnk_03001684 = 0;
 }

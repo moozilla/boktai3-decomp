@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
-#define gNamePlaceholderScript gUnk_02000328
-extern const void *gUnk_02000328;
+extern const void *gNamePlaceholderScript;
 void Menu_DrawText(u32, u32, const u8 *);
 void Menu_EraseRect(u32, u32, u32, u32);
 void TextEntry_DrawName(const void *src)

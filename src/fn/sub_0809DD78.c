@@ -1,7 +1,7 @@
 #include "global.h"
+#include "render.h"
 
 extern const u8 gUnk_08605E78[];
-extern u8 *gUnk_030042E4;
 
 #define LUN_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
 
@@ -343,7 +343,7 @@ s32 sub_0809DD78(void *arg0)
     if (LUN_AT(u8, 8) == 0)
         AnimData_SelectPaletteBank(LUN_AT(u8 *, 4) + 0x2C);
     else
-        *(u8 **)(LUN_AT(u8 *, 4) + 0x68) = gUnk_030042E4 + (r1v << 5);
+        *(u8 **)(LUN_AT(u8 *, 4) + 0x68) = gPaletteBankData + (r1v << 5);
     if (LUN_AT(u8, 8) == 1) {
         r1v = SceneActorScript_GetManagerField62();
         *(u16 *)(LUN_AT(u8 *, 4) + 0x20 + 0x3A) = r1v - 0x5FFF;

@@ -1,13 +1,12 @@
 #define ActionEntry_CountUsedModifiers Inventory_CountEquipmentEffectEntries
-#define gGameState                     gUnk_02000710
-#define gPlayerSceneFlags              gUnk_030053F4
+#define gPlayerSceneFlags              gEngineFlags
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
 #include "scene_inventory_actions.h"
+#include "engine.h"
 s32 Inventory_CountEquipmentEffectEntries(struct PlayerActionEntry *);
 s32 Div(s32, s32);
-extern u32 gUnk_030053F4;
 static inline s32 ScaleActionStat(s32 product)
 {
     s32 result;
@@ -29,7 +28,7 @@ s32 Player_CalculateActionStat(struct Player *p, struct PlayerStatModifierContex
         count = Inventory_CountEquipmentEffectEntries(p->statModifierContext.actionEntry);
     }
     if (def->kind == 0x2F)
-        value = gUnk_02000710->level + 5;
+        value = gGameState->level + 5;
     else {
         value = def->statValue;
         if (p && !p->statModifierContext.actionEntry->remainingCharge)
@@ -68,8 +67,8 @@ s32 Player_CalculateActionStat(struct Player *p, struct PlayerStatModifierContex
                 break;
         }
     }
-    value += Div(gUnk_02000710->level + bonus, 3);
-    if ((gUnk_030053F4 & 0x1000) && def->kind == 0x24)
+    value += Div(gGameState->level + bonus, 3);
+    if ((gEngineFlags & 0x1000) && def->kind == 0x24)
         value -= 15;
     return value;
 }

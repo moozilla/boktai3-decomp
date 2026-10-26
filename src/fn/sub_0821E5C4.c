@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "engine.h"
 // see docs/MGS_GCL_MATCHING.md.
 struct RouteHeader {
     u8 pointCount;
@@ -18,10 +19,9 @@ struct Map {
     u8 pad0[0x10];
     u16 *routes;
 };
-extern struct Map *gUnk_030052F4;
 u32 Route_Start(struct RouteState *state, u32 route, u32 mode, u32 point)
 {
-    u16 *routes = gUnk_030052F4->routes;
+    u16 *routes = gTerrainMap->routes;
     struct RouteHeader *entry;
     register struct RouteHeader *header asm("r6");
     register u8 *points asm("r1");

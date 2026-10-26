@@ -3,7 +3,6 @@
 #include "contact_actor.h"
 
 #define Navigation_IsPointInRegion NavMesh_IsPointInsideRegion
-#define gTerrainMap                gUnk_030052F4
 struct NavigationRegion {
     u8 x0, z0, x1, z1;
     u8 unknown4[12];
@@ -19,7 +18,7 @@ struct NavigationResource {
 u32 NavMesh_IsPointInsideRegion(struct NavigationRegion *, const struct ContactPosition *, u32);
 u32 Navigation_FindContainingRegion(const struct ContactPosition *position)
 {
-    struct NavigationResource *resource = gUnk_030052F4->navigation;
+    struct NavigationResource *resource = gTerrainMap->navigation;
     s32 meshIndex, i;
     for (meshIndex = 0; meshIndex < resource->count; meshIndex++) {
         s32 off = meshIndex * 4;

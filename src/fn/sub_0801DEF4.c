@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 typedef struct {
     u32 words[8];
 } Resource;
@@ -8,7 +9,6 @@ int ResultTutorial_ReadScript(void *);
 void ResultMenu_CreateGraphics(void *);
 void ResultMenu_SetPhase(void *, void *);
 void ResultTutorial_Open(void *);
-extern u32 gUnk_0300523C;
 void Sound_PlayTrackedSong(int);
 int ResultTutorial_Initialize(u8 *p, void *owner)
 {
@@ -45,6 +45,6 @@ int ResultTutorial_Initialize(u8 *p, void *owner)
     ResultMenu_CreateGraphics(p);
     ResultMenu_SetPhase(p, ResultTutorial_Open);
     Sound_PlayTrackedSong(0xaa);
-    gUnk_0300523C |= four;
+    gEnginePauseFlags |= four;
     return 0;
 }

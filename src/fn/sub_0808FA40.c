@@ -2,9 +2,9 @@
 
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
+#include "engine.h"
 
 u8 sub_0812E118(u32, u32, u32, u32);
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 
 static inline s32 sub0808FA40_Quarter(s32 heading)
@@ -28,8 +28,8 @@ void sub_0808FA40(void *arg0, u32 arg1)
     s32 chosen, next, i;
 
     context = actor->context;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    actor->direction = gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    actor->direction = gUnk_0203B400[gRandomIndex];
     do {
         cell = actor->terrainCell;
         height = SceneActorTerrain_GetHeight(cell, &actor->position);

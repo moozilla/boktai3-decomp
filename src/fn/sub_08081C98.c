@@ -16,7 +16,7 @@ static inline void Reaction_Palette(struct SceneActorRegistryResetView *actor, u
     if (!actor->drawableKind)
         AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
     else
-        *(u8 **)((u8 *)actor->drawable + 0x68) = gUnk_030042E4 + bank * 32;
+        *(u8 **)((u8 *)actor->drawable + 0x68) = gPaletteBankData + bank * 32;
 }
 static inline void Reaction_SetWord(u32 *flags, u32 mask)
 {
@@ -44,8 +44,8 @@ static inline u32 Reaction_Flags(struct SceneActorRegistryResetView *actor, u32 
 }
 static inline u32 Reaction_Random(const u16 *table)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return table[index];
 }
 static inline void Reaction_SpawnPart(u8 *group)

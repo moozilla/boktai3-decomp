@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_03005308;
+#include "engine.h"
 extern const u16 gUnk_0203B400[];
 void SceneActorAnimation_SelectProfileEntry(void *, s32);
 void Anim_SetDurationScale(void *, u32);
@@ -56,9 +56,9 @@ void sub_0808EB98(struct Slime *p)
         Anim_SetDurationScale(p->drawable + 0x48, 0x40);
     }
     if (p->enabled != 0) {
-        u32 index = (gUnk_03005308 + 1) & 1023;
+        u32 index = (gRandomIndex + 1) & 1023;
         s32 r;
-        gUnk_03005308 = index;
+        gRandomIndex = index;
         r = *(u16 *)(index * 2 + (u32)gUnk_0203B400);
         r &= 0x1f;
         if (r <= 0x17)

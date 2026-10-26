@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_vec.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct PanelEffectSlot {
     void *update, *onComplete;
@@ -29,7 +30,6 @@ struct PanelEffectPool {
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
-extern u32 gUnk_03003A50;
 // confidence=low: dispatches two effect pools and advances live collision-effect positions.
 #define ScenePanelEffect_UpdatePool sub_0818ECFC
 static inline void ScenePanelEffect_InvokeCallback(void *slot, void *callback)
@@ -84,7 +84,7 @@ void ScenePanelEffect_UpdatePool(struct PanelEffectPool *pool)
                 position->z = position->z + motion->delta.z;
             }
             colliderPosition = &large->position;
-            if (!((gUnk_03003A50 ^ remaining) & 1)) {
+            if (!((gSceneEffectPalettePhase ^ remaining) & 1)) {
                 Collider_SetPosition(large->colliderCC, colliderPosition, 0);
                 Collider_SetPosition(large->collider120, colliderPosition, 0);
                 Collider_Refresh(large->colliderCC);

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 #ifdef NONMATCHING
 // fuzzy: 72.5%
 // fix.py best version (reprinted C)
@@ -58,7 +59,6 @@ struct SceneNpc {
 };
 
 extern u8 *gUnk_0200047C;
-extern u8 *gUnk_030042E4;
 
 void SceneMessages_SetPendingTrigger(void *, void *);
 s32 Math_Atan2(s32, s32);
@@ -223,26 +223,26 @@ void SceneNpc_DispatchCommands(struct SceneNpc *npc)
 
                 case 13:
                     npc->flags |= 4;
-                    CpuSet(gUnk_030042E4 + 0x2B00, npc->paletteBuf, 0x04000008);
+                    CpuSet(gPaletteBankData + 0x2B00, npc->paletteBuf, 0x04000008);
                     npc->palette = npc->paletteBuf;
                     break;
 
                 case 14:
                     npc->flags &= ~4;
-                    CpuSet(gUnk_030042E4 + 0x2B60, npc->paletteBuf, 0x04000008);
+                    CpuSet(gPaletteBankData + 0x2B60, npc->paletteBuf, 0x04000008);
                     npc->palette = npc->paletteBuf;
                     break;
 
                 case 16:
                     npc->flags &= ~4;
-                    CpuSet(gUnk_030042E4 + 0x2AE0, npc->paletteBuf, 0x04000008);
+                    CpuSet(gPaletteBankData + 0x2AE0, npc->paletteBuf, 0x04000008);
                     npc->palette = npc->paletteBuf;
                     break;
 
                 case 15:
                     npc->flags |= 4;
                     sub->h2E = 0;
-                    CpuSet(gUnk_030042E4 + 0x2AE0, npc->paletteBuf, 0x04000008);
+                    CpuSet(gPaletteBankData + 0x2AE0, npc->paletteBuf, 0x04000008);
                     npc->palette = npc->paletteBuf;
                     break;
 

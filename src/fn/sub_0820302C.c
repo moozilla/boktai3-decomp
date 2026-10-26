@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "display_animation.h"
+#include "engine.h"
 struct ProximitySequence {
     u8 pad0[0x3c];
     struct SceneVec position;
@@ -15,7 +16,6 @@ struct ProximitySequence {
     void *resource;
 };
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 s32 Mod(s32, s32);
 void ProximitySequence_TestPlayerDistance(void);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
@@ -30,8 +30,8 @@ struct BurstVelocity {
 static inline s32 ProximitySequence_NextSpread(const u16 *table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)table);
 }
 static inline void ProximitySequence_CopyPosition(struct SceneVec *dst, struct SceneVec *src)

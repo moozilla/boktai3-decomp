@@ -76,9 +76,9 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
 static inline u32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u32 CellHeight(struct ContactPosition *position, u32 cell)
 {
@@ -87,7 +87,7 @@ static inline u32 CellHeight(struct ContactPosition *position, u32 cell)
     if (data)
         data += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         data = map->cells + offset;
     }
@@ -108,7 +108,7 @@ done:
 }
 static inline u8 IsScenePaused(void)
 {
-    if (gUnk_030053F4 & 0x4800)
+    if (gEngineFlags & 0x4800)
         return 1;
     return 0;
 }
@@ -165,8 +165,8 @@ static inline u8 PickDirection(struct SceneActorRegistryResetView *actor)
     const u16 *table = gUnk_0203B400;
     i = 0;
     do {
-        gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-        direction = (table[gUnk_03005308] & 3) << 6;
+        gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+        direction = (table[gRandomIndex] & 3) << 6;
         if (direction != current)
             goto chosen;
     } while (++i <= 3);

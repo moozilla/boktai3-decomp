@@ -1,7 +1,8 @@
 #include "global.h"
+#include "render.h"
 
 #define PaletteEffect_GetPaletteIndex ActorResource_GetFixedId
-#define gEffectPaletteBanks           gUnk_030042E4
+#define gEffectPaletteBanks           gPaletteBankData
 struct PaletteEffect {
     u8 unknown0[0x394];
     void *palette;
@@ -14,7 +15,6 @@ struct PaletteEffect {
     u8 paletteDefault[0x200];
     u8 paletteAlternate[0x200];
 };
-extern u8 *gUnk_030042E4;
 s32 ActorResource_GetFixedId(struct PaletteEffect *);
 static inline void CpuSetArgs(int control, u8 *dest, void *source)
 {
@@ -35,7 +35,7 @@ void PaletteEffect_RefreshPalette(struct PaletteEffect *p)
             p->palette = p->paletteAlternate;
         else {
             void *dest;
-            void *source = gUnk_030042E4 + (bank << 5);
+            void *source = gPaletteBankData + (bank << 5);
             dest = p->paletteCopy;
             CpuSetArgs(0x04000008, p->paletteCopy, source);
             p->palette = dest;

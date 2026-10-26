@@ -83,13 +83,13 @@ void sub_080A34BC(struct SceneActorRegistryResetView *a)
     SceneActorMovement_ResolveRoutePosition(a);
 
     if (a->paletteOffset == 0) {
-        idx = (gUnk_03005308 + 1) & 0x3FF;
-        gUnk_03005308 = idx;
+        idx = (gRandomIndex + 1) & 0x3FF;
+        gRandomIndex = idx;
         if ((gUnk_0203B400[idx] & 3) == 0)
             goto recoveryC;
     } else {
-        idx = (gUnk_03005308 + 1) & 0x3FF;
-        gUnk_03005308 = idx;
+        idx = (gRandomIndex + 1) & 0x3FF;
+        gRandomIndex = idx;
         if ((gUnk_0203B400[idx] & 7) != 0)
             goto recoveryC;
     }
@@ -106,7 +106,7 @@ void sub_080A34BC(struct SceneActorRegistryResetView *a)
     a->flags114 &= ~1;
     a->word104 = 0;
     next = (idx + 1) & 0x3FF;
-    gUnk_03005308 = next;
+    gRandomIndex = next;
     ctx->delay = (gUnk_0203B400[next] & 0x7F) + 60;
     return;
 recoveryC:

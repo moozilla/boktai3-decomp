@@ -12,7 +12,7 @@ static inline u8 TestFlags(u32 flags, u32 mask)
 }
 static inline u8 IsDisposable(struct SceneActorTerrainCollisionView *actor)
 {
-    if (!TestFlags(gUnk_030053F4, 0x4800)) {
+    if (!TestFlags(gEngineFlags, 0x4800)) {
         u32 category = actor->category;
         if (category == 2 || category == 18 || category == 19 || category == 9 || category == 17 ||
             category == 20 || category == 14 || category == 10 || category == 23 || category == 22)

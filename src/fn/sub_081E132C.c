@@ -1,8 +1,9 @@
 #include "global.h"
 #include "game_state.h"
+#include "render.h"
 extern u16 gUnk_03005260[];
 extern u32 gUnk_020003A0[];
-extern u32 gUnk_0300546C, gUnk_0300523C, gUnk_030053E8;
+extern u32 gUnk_0300546C, gUnk_030053E8;
 void SelectionPalette_UpdatePulse(void *);
 void Sound_PlaySong(s32);
 void Menu_StartFadeOut(s32);
@@ -11,8 +12,8 @@ void Script_Call(u32, void *);
 void Script_SetEntryProcedure(s16 id);
 void Task_Kill(void *);
 #define W(o)    (*(s32 *)(p + (o)))
-#define H(o)    (*(s16 *)((u8 *)gUnk_02000710 + (o)))
-#define GS_W(o) (*(s32 *)((u8 *)gUnk_02000710 + (o)))
+#define H(o)    (*(s16 *)((u8 *)gGameState + (o)))
+#define GS_W(o) (*(s32 *)((u8 *)gGameState + (o)))
 // Task update: menu input (state 0), then fade out and run the chosen script (state 1).
 void GameStart_Update(u8 *p)
 {
@@ -73,7 +74,7 @@ void GameStart_Update(u8 *p)
                 } else if (W(0x4E0) == 1 && GS_W(0x5A4) != 0) {
                     gUnk_0300546C = 0;
                     Script_Call(gUnk_020003A0[2], 0);
-                    gUnk_0300523C = 0;
+                    gEnginePauseFlags = 0;
                     gUnk_030053E8 = 0x11;
                     Script_SetEntryProcedure(H(0x5A4));
                 }

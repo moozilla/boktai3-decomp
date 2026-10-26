@@ -1,7 +1,7 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define gRandomTableIndex gUnk_03005308
+#define gRandomTableIndex gRandomIndex
 #define gRandomTable      gUnk_0203B400
 
 extern u32 gRandomTableIndex;

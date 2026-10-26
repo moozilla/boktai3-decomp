@@ -1,13 +1,13 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
+#include "engine.h"
 s32 Mod(s32, s32);
 void Bee_ClearActionFlags(void *);
 void Bee_ConsumeFlag80(void *);
 void SceneActor_EndLinkedReaction(void *);
 void Sound_PlaySong(u32);
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
-extern u32 gUnk_03005308;
 static inline s32 Quarter(s32 v)
 {
     return v >= 0 ? v >> 2 : -(-v >> 2);
@@ -33,9 +33,9 @@ static inline u32 Test(u16 *f, u32 maskInput)
 }
 static inline u32 Random4(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
+    u32 index = (gRandomIndex + 1) & 1023;
     u32 v;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     index *= 2;
     v = *(const u16 *)((u32)RANDOM_TABLE_ADDR + index);
     v &= 3;

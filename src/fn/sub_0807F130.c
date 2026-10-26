@@ -92,15 +92,15 @@ s32 sub_0807F130(struct SceneActorRegistryResetView *actor)
     }
     cx = (s8)(position->x >> 8);
     cy = (s8)(position->y >> 8);
-    if (cx < 0 || cy < 0 || (u32)cx >= gUnk_030052F8 || (u32)cy >= gUnk_030052FC)
+    if (cx < 0 || cy < 0 || (u32)cx >= gTerrainWidth || (u32)cy >= gTerrainHeight)
         cell = 0;
     else
-        cell = *(u16 *)((u8 *)gUnk_030052F4 + 0x24 + cy * 2) + cx;
+        cell = *(u16 *)((u8 *)gTerrainMap + 0x24 + cy * 2) + cx;
     p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         p += 4;
     else
-        p = *(u8 **)((u8 *)gUnk_030052F4 + 4) + cell * 4 + 12;
+        p = *(u8 **)((u8 *)gTerrainMap + 4) + cell * 4 + 12;
     val = (*p & 0xF) << 8;
     switch (*p >> 4) {
         case 1:

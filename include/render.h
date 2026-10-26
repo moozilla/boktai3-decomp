@@ -1,0 +1,79 @@
+#ifndef GUARD_RENDER_H
+#define GUARD_RENDER_H
+
+#include "global.h"
+
+/* RAM objects; each row of symbols/ram.csv with header include/render.h. */
+extern u8 *gPaletteBankData; /* palette-bank data: 32-byte banks of sixteen RGB15 colors (AnimData_SelectPaletteBank) */
+extern u32 gVBlankDialogueState; /* scrolling-dialogue/video state copied during VBlank (guess) */
+extern u32 gRenderListIndex; /* active list index into the three render list-head pairs */
+extern u32 gSpriteRenderCallback; /* sprite render callback, called by the graphics task (function pointer) */
+extern u32 gProjectedSpriteCallback; /* projected-sprite queue callback (function pointer) */
+extern u32 gExtraRenderCallback; /* additional render callback (function pointer) */
+extern u16 gDynamicTileSum; /* tile count of the dynamic OBJ slots, reset and accumulated each frame */
+extern u16 gMainSpriteTileSum; /* tile count of the main sprites, reset and accumulated each frame */
+extern u16 gPaletteBankCount; /* palette resource bank count */
+extern s16 gObjTileCursor; /* OBJ tile allocation cursor (signed loads in the allocation tests) */
+extern u16 gQueuedObjSlotCount; /* queued dynamic OBJ graphics slot count */
+extern u16 gStaticTileCount; /* reserved/static OBJ tile count (some files read it signed) */
+extern u8 *gAnimResourceSection0C; /* resource-bank base plus header offset +0xC */
+extern u8 *gAnimResourceSection14; /* resource-bank base plus header offset +0x14 */
+extern u32 gArmTileUploadCount; /* ARM tile-upload request count */
+extern u16 gOamPriorityCounts[]; /* queued OAM entry count per priority (4) */
+extern s32 gOamCount; /* direct/final OAM entry count */
+extern s32 gPendingOamCount; /* depth-sorted pending OAM entry count */
+extern s32 gAffineRequestCount; /* affine request count, capped at 32 */
+extern u16 gBgAffineAngle; /* BG affine angle */
+extern void *gBgTileUploadSrc[]; /* per-layer pending tile-upload source (4) */
+extern s16 gBgAffineMatrix[4]; /* BG affine matrix coefficients */
+extern u16 gDispCntShadow; /* display control / BG visibility shadow */
+extern u16 gBgTileUploadParamA[]; /* per-layer tile-upload parameter (4) */
+extern u16 gBgAffineMode; /* BG affine/non-affine shadow mode */
+extern u16 gBgAffineMatrixBuffer[]; /* affine coefficients copied from gBgAffineMatrix, then uploaded (4) */
+extern u32 gBgAffineRefX; /* BG affine reference X accumulator */
+extern u16 gBgAffineScaleY; /* BG affine Y scale */
+extern u32 gBgAffineRefY; /* BG affine reference Y accumulator */
+extern u16 gBgTileUploadParamB[]; /* per-layer tile-upload parameter (4) */
+extern u16 gBgAffineScaleX; /* BG affine X scale */
+extern u32 gBgAffineRefBuffer[]; /* buffered affine X/Y reference (2) */
+extern u16 gBgScrollShadow[]; /* four BG horizontal/vertical scroll pairs (8) */
+extern u16 gWindowShadow0; /* window-control bound/shadow slot (which register: unknown) */
+extern u16 gWindowShadow1; /* window-control bound/shadow slot */
+extern u16 gWindowShadow2; /* window-control bound/shadow slot */
+extern u16 gWindowShadow3; /* window-control bound/shadow slot */
+extern u8 gSpriteHeightTiles[]; /* sprite height in tiles per shape/size index (16) */
+extern u8 gSpriteHeightPixels[]; /* sprite height in pixels per shape/size index (16) */
+extern u8 gSpriteTileArea[]; /* sprite tile count per shape/size index (16) */
+extern u8 gSpriteWidthTiles[]; /* sprite width in tiles per shape/size index (16) */
+extern u32 gSpriteShapeAttr[]; /* packed OAM shape/size attribute bits per index (16) */
+extern u8 gSpriteWidthPixels[]; /* sprite width in pixels per shape/size index (16) */
+extern s32 gBgFadeLevel; /* background fade level */
+extern u32 gObjPaletteBankCount; /* allocated object-palette bank count */
+extern u32 gBgFadeApplied; /* cached/applied background fade level */
+extern u32 gObjFadeApplied; /* cached/applied object fade level */
+extern s16 gBackdropOverride; /* backdrop override enabled flag */
+extern u32 gObjPaletteReserved; /* reserved object-palette allocation count */
+extern u16 gBgFadeBankMask; /* background-palette fade bank mask */
+extern u32 gObjPaletteEffect; /* object-palette refresh/effect control */
+extern u32 gPaletteBanksInUse; /* active/reserved palette-bank count */
+extern u16 gBackdropColor; /* backdrop RGB15 color */
+extern u32 gObjFadeLevel; /* object fade/effect level */
+extern u32 gFadeMultiplier; /* shared fade multiplier */
+extern u16 gObjFadeColor; /* object fade target color */
+extern u16 *gBgPaletteSource; /* current background palette upload source */
+extern u32 gGrayscaleControl; /* grayscale effect duration/control */
+extern u16 gObjPaletteKeys[]; /* object palette key per bank (16) */
+extern u16 gObjFadeFlags; /* object palette fade exclusion/control flags */
+extern u16 gBgFadeColor; /* background fade target color */
+extern u8 gMosaicByte; /* mosaic-related byte parameter (guess) */
+extern u16 gMosaicHalfword; /* mosaic-related halfword parameter (guess) */
+extern u32 gScanlineEffectLayer; /* scanline effect layer selector */
+extern u16 *gScanlineEffectSource; /* pending 160-line effect source; consumed then cleared */
+extern u32 gScanlineEffectMode; /* scanline effect mode (scroll/mosaic/brightness) */
+extern u32 gSpriteAttrFlags; /* sprite render/global attribute flags */
+extern u8 gSpriteMosaicAttr; /* sprite mosaic/global attribute byte */
+extern u16 gMosaicParam; /* packed mosaic parameter (byte and halfword accesses) */
+extern u16 gDefaultAnimFlags; /* default animation/widget flags */
+extern u32 gEnginePauseFlags; /* engine pause/suspend flags (bits 1-2: sound off; task list masks) */
+
+#endif

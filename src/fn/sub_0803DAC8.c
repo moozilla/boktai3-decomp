@@ -40,7 +40,7 @@ void ScenePool_ScheduleSpeedControl(struct ScenePoolEntry *entry)
         {
             {
                 s32 random;
-                register u32 *index asm("r0") = &gUnk_03005308;
+                register u32 *index asm("r0") = &gRandomIndex;
                 u32 next = (*index + 1) & 0x3ff;
                 *index = next;
                 random = *(const u8 *)((next << 1) + (u32)gUnk_0203B400);

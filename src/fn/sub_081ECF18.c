@@ -2,6 +2,7 @@
 #include "global.h"
 
 #include "contact_swarm.h"
+#include "ram.h"
 
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
 struct Drawable {
@@ -130,7 +131,6 @@ static inline u32 StepPlayback(struct Drawable *owner, struct DisplaySequenceSta
 void ActorDisplay_UpdateScreenAnchor(void *);
 void ActorDisplay_UpdateForegroundSprite(void *);
 void ActorDisplay_UpdateAccentSprite(void *);
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 // confidence=low: called by SceneActors_EnterIdleState.
 void SceneActors_UpdateIdleDisplay(u8 *input)
@@ -159,9 +159,9 @@ void SceneActors_UpdateIdleDisplay(u8 *input)
         Anim_SetSequence(state, *(void **)(context + 0x390), 4, 0, 0);
         StepPlayback(accent, state);
     }
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
     {
-        u32 value = gUnk_086141BC[gUnk_03005304];
+        u32 value = gUnk_086141BC[gEffectRandomTableIndex];
         u32 *offset = (u32 *)(context + 0x288);
         *offset = value & 1;
     }

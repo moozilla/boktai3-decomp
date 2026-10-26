@@ -38,7 +38,7 @@ struct Manager {
     struct Group groups[6];
 };
 extern struct Manager *gUnk_0200006C;
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void *FadingParticleManager_Create(u32, u32);
@@ -63,7 +63,7 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
         return -1;
     for (i = 0; i < 6; i++) {
         struct Group *g = &gUnk_0200006C->groups[i];
-        rng = &gUnk_03005308;
+        rng = &gRandomIndex;
         if (g->active == 0) {
             g->active = 1;
             g->count = count;

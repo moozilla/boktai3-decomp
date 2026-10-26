@@ -27,7 +27,7 @@ s32 sub_0821D4F0(struct Pos16 *start, s32 arg, s32 steps, s32 maxRise)
     struct Pos16 cur, next;
     s32 i, cell, r;
 
-    if (gUnk_030052F4->cells == NULL)
+    if (gTerrainMap->cells == NULL)
         return 0;
     r = 0;
     cur = *start;

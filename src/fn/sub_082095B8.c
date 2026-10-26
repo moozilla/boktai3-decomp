@@ -1,6 +1,5 @@
-#define gTerrainMap       gUnk_030052F4
-#define gTerrainMapWidth  gUnk_030052F8
-#define gTerrainMapHeight gUnk_030052FC
+#define gTerrainMapWidth  gTerrainWidth
+#define gTerrainMapHeight gTerrainHeight
 #include "global.h"
 #include "engine.h"
 #include "scene_vec.h"

@@ -10,9 +10,9 @@ struct Obj {
     u16 idle;
     u16 frac;
 };
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern u8 *gUnk_02000580;
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 extern u16 gUnk_03005260;
 void Solar_SaveExposureTimestamp(void);
 s32 SolarFruit_GetInventorySlot(s32);
@@ -24,16 +24,16 @@ static inline u32 Test(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-#define GS32(o) (*(s32 *)(gUnk_02000710 + (o)))
-#define GS16(o) (*(s16 *)(gUnk_02000710 + (o)))
+#define GS32(o) (*(s32 *)(gGameState + (o)))
+#define GS16(o) (*(s16 *)(gGameState + (o)))
 
 void sub_0822C598(struct Obj *obj)
 {
     if (gUnk_02000580 == NULL)
         return;
-    if (gUnk_030053F4 & 0x1800)
+    if (gEngineFlags & 0x1800)
         return;
-    if ((gUnk_030053F4 & 0x200) || *(s32 *)(gUnk_02000580 + 0x1c) == 2) {
+    if ((gEngineFlags & 0x200) || *(s32 *)(gUnk_02000580 + 0x1c) == 2) {
         s32 *p = &GS32(0x504);
         if (*p <= 29999) {
             if (GS16(0x874) > 0 && !(obj->frame & 0x3f)) {

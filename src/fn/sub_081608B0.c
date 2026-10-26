@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 
 struct Vec {
@@ -7,7 +8,6 @@ struct Vec {
     u32 z : 16;
     u32 pad : 16;
 };
-extern u32 gUnk_03005308;
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
@@ -51,8 +51,8 @@ s32 PlayerAttackEffect_EmitPaletteBaseTrail(u8 *p)
     if (state == 1) {
         s32 step, angle;
         if (W(0x584) == 0) {
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            I(0xC0) = Mod(*(u16 *)((gUnk_03005308 << 1) + RANDOM_TABLE_ADDR), 10) + 230;
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            I(0xC0) = Mod(*(u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR), 10) + 230;
         }
         angle = ((*P(0x58C) + 5) & 7) << 5;
         step = Div(768, D(0x10));

@@ -7,18 +7,18 @@
 
 static inline s32 Width(void)
 {
-    return *(s16 *)(gUnk_030052F4->cells + 4);
+    return *(s16 *)(gTerrainMap->cells + 4);
 }
 static inline s32 Height(void)
 {
-    return *(s16 *)(gUnk_030052F4->cells + 6);
+    return *(s16 *)(gTerrainMap->cells + 6);
 }
 static inline u8 *Cell(s32 cell)
 {
     u8 *override = TerrainModifiers_FindCellOverride(cell, 1);
     if (override)
         return override + 4;
-    return gUnk_030052F4->cells + (cell * 4 + 12);
+    return gTerrainMap->cells + (cell * 4 + 12);
 }
 static inline u32 Attributes(s32 cell)
 {

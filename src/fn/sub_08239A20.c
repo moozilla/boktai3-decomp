@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct LinkPalTarget {
     u8 pad0[0xc];
     u16 *palette;
@@ -25,7 +26,6 @@ struct LinkPlayerFade {
     u16 dstSlot;
     u16 fadeOut;
 };
-extern u8 *gUnk_030042E4;
 void LinkPlayer_LoadAnimationParameters(void *);
 s32 ActorEffect_SelectModeFlag(void *);
 void PaletteFade_ApplySelectiveBrightness(void *);
@@ -51,7 +51,7 @@ void sub_08239A20(struct LinkPlayerFade *p, s32 arg)
             u8 *src;
             s32 amount;
             p->dstSlot = index + 0x16e;
-            src = gUnk_030042E4 + p->dstSlot * 32;
+            src = gPaletteBankData + p->dstSlot * 32;
             if (p->fadeOut <= 0x1f)
                 amount = p->fadeOut;
             else if (p->fadeOut <= 0x2f)
@@ -65,7 +65,7 @@ void sub_08239A20(struct LinkPlayerFade *p, s32 arg)
             if (p->fadeOut > 0x5f)
                 p->fadeOut = 0;
         } else if ((u16)(p->fadeOut - 1) <= 0x4e) {
-            u8 *src = gUnk_030042E4 + p->dstSlot * 32;
+            u8 *src = gPaletteBankData + p->dstSlot * 32;
             s32 amount;
             if ((u16)(p->fadeOut - 0x21) <= 0xe)
                 p->fadeOut = 0x30;
@@ -89,7 +89,7 @@ void sub_08239A20(struct LinkPlayerFade *p, s32 arg)
     } else {
         p->fadeOut = 0;
         if (p->fadeIn > 0x1f) {
-            u16 *src = (u16 *)(gUnk_030042E4 + p->srcSlot * 32);
+            u16 *src = (u16 *)(gPaletteBankData + p->srcSlot * 32);
             if (p->flag == 0) {
                 u16 **slot;
                 u16 *dst;
@@ -115,7 +115,7 @@ void sub_08239A20(struct LinkPlayerFade *p, s32 arg)
                 p->target->palette = p->workPalette;
             }
         } else {
-            sub_08239848(p, gUnk_030042E4 + p->srcSlot * 32, p->fadeIn, 0x20 - p->fadeIn, 5);
+            sub_08239848(p, gPaletteBankData + p->srcSlot * 32, p->fadeIn, 0x20 - p->fadeIn, 5);
         }
         p->fadeIn--;
     }

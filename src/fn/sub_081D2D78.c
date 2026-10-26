@@ -30,7 +30,7 @@ struct FrostEmitter {
     struct FrostParticle particles[12];
     u32 enabled, age;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Anim_SetSequence(void *, void *, u16, u8, u8);
@@ -68,11 +68,11 @@ void FrostEmitter_SpawnParticle(struct FrostEmitter *input)
         /* Retain the unused hardware address from the inlined random generator. */
         observed = 0x0403B714;
         table = gUnk_0203B400;
-        index = (gUnk_03005308 + 1) & 1023;
+        index = (gRandomIndex + 1) & 1023;
         angle = ShiftRandom(table[index], 4);
         mask = 63;
         secondIndex = (index + 1) & 1023;
-        gUnk_03005308 = secondIndex;
+        gRandomIndex = secondIndex;
         sample = ShiftRandom(table[secondIndex], 4) & 1;
         velocity = &slot->velocity;
         angle &= mask;
@@ -80,10 +80,9 @@ void FrostEmitter_SpawnParticle(struct FrostEmitter *input)
         velocity->x = Scale(gUnk_086149C4[(angle + 64) & 255] * magnitude);
         velocity->y = 0;
         velocity->z = Scale(gUnk_086149C4[angle] * magnitude);
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         asm volatile("" : "+r"(observed));
-        slot->velocity.y =
-            (ShiftRandom(((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308], 4) & 3) + 4;
+        slot->velocity.y = (ShiftRandom(((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], 4) & 3) + 4;
         slot->active = 60;
         Anim_SetSequence(&slot->sequence, p->resource, 0, 0, 4);
         slot->flags &= ~1;

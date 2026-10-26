@@ -1,7 +1,8 @@
 #include "global.h"
+#include "ram.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define gPlayerCloneManager gUnk_020005F8
+#define gPlayerCloneManager gDirectionalSpritePool
 struct ClonePosition {
     u16 x, y, z, pad;
 };
@@ -40,11 +41,10 @@ struct PlayerCloneManager {
     u32 activeSlots;
     struct PlayerCloneReactionSlot slots[3];
 };
-extern struct PlayerCloneManager *gUnk_020005F8;
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 void PlayerClone_BeginActiveReactions(void)
 {
-    struct PlayerCloneManager *manager = gUnk_020005F8;
+    struct PlayerCloneManager *manager = gDirectionalSpritePool;
     u32 slotStride = 0x344;
     if (manager) {
         struct PlayerCloneReactionSlot *s = manager->slots;

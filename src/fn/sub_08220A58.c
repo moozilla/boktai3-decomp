@@ -1,6 +1,5 @@
-#define gEnginePauseFlags gUnk_0300523C
 #include "global.h"
-extern u32 gUnk_0300523C;
+#include "render.h"
 struct PositionQueue {
     u8 unknown0[0x18];
     void *source;
@@ -15,7 +14,7 @@ void Collision_ProcessPairs(void *, void *);
 s32 PositionQueue_FlushPending(struct PositionQueue *q)
 {
     if (q->ready) {
-        if (gUnk_0300523C) {
+        if (gEnginePauseFlags) {
             u32 *pending;
             q->ready = 0;
             pending = q->pending;

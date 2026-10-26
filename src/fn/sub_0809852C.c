@@ -1,10 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_helpers.h"
+#include "engine.h"
 struct GhostVisibilityState {
     u8 pad[0x558];
     u32 flags;
 };
-extern u32 gUnk_030053F4;
 static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inputMask)
 {
     u32 mask = inputMask;
@@ -83,7 +83,7 @@ void Ghost_TickVisibilityTransition(struct SceneActorRegistryResetView *input)
             return;
     }
     {
-        u32 ignored = gUnk_030053F4 & 0x4800;
+        u32 ignored = gEngineFlags & 0x4800;
         u32 counter;
         u32 value;
         asm volatile("" : "+r"(ignored));

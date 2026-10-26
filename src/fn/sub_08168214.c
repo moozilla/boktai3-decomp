@@ -4,8 +4,8 @@
 // fix.py best (sweep after the inlined-insn fix)
 #include "scene_hud_display.h"
 #include "player.h"
+#include "engine.h"
 
-extern u32 gUnk_030053F4;
 void PauseMenu_LoadAttributeIconFrame(void *, void *, s32);
 void PauseMenu_LoadEquipmentIconFrame(void *, void *, s32);
 void PauseMenu_LoadCategoryIconFrame(void *, void *, s32);
@@ -28,7 +28,7 @@ void sub_08168214(struct SceneHudState *p)
     s32 i;
     s32 k;
     s32 n;
-    if ((((u8)(p->actionOwner->actionMode - 1)) > 1) || (gUnk_030053F4 & 0x1000))
+    if ((((u8)(p->actionOwner->actionMode - 1)) > 1) || (gEngineFlags & 0x1000))
         wide = 1;
     for (i = 0; i < 3; i++) {
         n = p->primaryVisible;

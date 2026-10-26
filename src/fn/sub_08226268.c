@@ -14,7 +14,7 @@ struct Camera {
     struct Vec pos;
 };
 
-extern struct Camera *gUnk_03005420;
+extern struct Camera *gActiveCamera;
 extern struct Vec gUnk_030042A0;
 extern struct Vec gUnk_03005418;
 
@@ -28,7 +28,7 @@ static inline int project(int input)
    the scroll origin (gUnk_03005418) from its isometric projection. */
 void Camera_SnapTo(struct Vec *pos)
 {
-    struct Camera *c = gUnk_03005420;
+    struct Camera *c = gActiveCamera;
     if (c) {
         c->pos.x = pos->x;
         c->pos.y = pos->y;
@@ -46,7 +46,7 @@ void Camera_SnapTo(struct Vec *pos)
             out->y = xy - height;
             out->z = xy + height;
         }
-        gUnk_03005420->f1c = 1;
-        gUnk_03005420->f68 = 1;
+        gActiveCamera->f1c = 1;
+        gActiveCamera->f68 = 1;
     }
 }

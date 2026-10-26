@@ -1,7 +1,7 @@
 #include "global.h"
+#include "engine.h"
 
 extern u8 *gUnk_02000580;
-extern u32 gUnk_030053F4;
 extern u32 gUnk_02000560;
 
 // differs: constant-vs-load order of the three flag tests
@@ -10,7 +10,7 @@ u8 Scene_CanOpenMenu(void)
     u8 *p = gUnk_02000580;
     u32 one;
     u32 mask;
-    if (p && !(gUnk_030053F4 & 0x200)) {
+    if (p && !(gEngineFlags & 0x200)) {
         one = 1;
         if ((gUnk_02000560 & one) && (u8)(p[0x418] - 3) > 2) {
             mask = 0x100000;

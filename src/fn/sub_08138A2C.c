@@ -1,6 +1,6 @@
 #define SpriteSlots_Create PositionEffectDisplay_Create
-#define gSpriteSlots       gUnk_020004C0
 #include "global.h"
+#include "ram.h"
 struct SpriteSlot {
     u32 flags;
     u8 unk04[0x38];
@@ -13,11 +13,10 @@ struct SpriteSlots {
     u8 unk00[0x34];
     struct SpriteSlot slots[4];
 };
-extern struct SpriteSlots *gUnk_020004C0;
 struct SpriteSlots *PositionEffectDisplay_Create(void);
 s32 SpriteSlots_AttachSource(void *source)
 {
-    struct SpriteSlots *initial = gUnk_020004C0;
+    struct SpriteSlots *initial = gSpriteSlots;
     struct SpriteSlots *p;
     s32 i;
     if (!initial) {

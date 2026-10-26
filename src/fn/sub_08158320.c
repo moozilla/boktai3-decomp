@@ -10,14 +10,14 @@ void Collider_SetPosition(void *, void *, u32);
 void ActorShadow_Disable(void *);
 void ActorShadow_Enable(void *);
 s32 Mod(s32, s32);
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 static inline s32 randomValue(void)
 {
     u32 offset;
     register u32 base asm("r3");
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    offset = gUnk_03005308 << 1;
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    offset = gRandomIndex << 1;
     base = (u32)gUnk_0203B400;
     return *(u16 *)(offset + base);
 }

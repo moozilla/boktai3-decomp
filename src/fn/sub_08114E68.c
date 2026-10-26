@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct ParticleVec {
     s16 x, y, z, pad;
@@ -24,9 +25,8 @@ struct ParticleManager {
 };
 
 extern struct ParticleManager *gUnk_020001DC;
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 
 struct ParticleManager *EffectPool_CreateManager(void);
 struct ParticleEntry *NativeParticle_AllocateEntry(struct ParticleManager *);
@@ -44,7 +44,7 @@ static inline u16 random(u32 *seed)
 static inline u8 night(void)
 {
     u32 mask = 8;
-    if (*(u32 *)(gUnk_02000710 + 0x868) & mask)
+    if (*(u32 *)(gGameState + 0x868) & mask)
         return 1;
     return 0;
 }
@@ -72,9 +72,11 @@ s32 sub_08114E68(struct ParticleVec *position, s16 *range, s16 *spread, s32 coun
             *q1 = *position;
             if (spread) {
                 if (spread[0])
-                    e->position.x += Mod(random(&gUnk_03005304), spread[0] * 2) - spread[0];
+                    e->position.x +=
+                        Mod(random(&gEffectRandomTableIndex), spread[0] * 2) - spread[0];
                 if (spread[1])
-                    e->position.y += Mod(random(&gUnk_03005304), spread[1] * 2) - spread[1];
+                    e->position.y +=
+                        Mod(random(&gEffectRandomTableIndex), spread[1] * 2) - spread[1];
             }
             if (!range) {
                 e->velocity.x = 0;
@@ -84,11 +86,11 @@ s32 sub_08114E68(struct ParticleVec *position, s16 *range, s16 *spread, s32 coun
                 if (range[0] == 0)
                     v.x = 0;
                 else
-                    v.x = Mod(random(&gUnk_03005304), range[0]);
+                    v.x = Mod(random(&gEffectRandomTableIndex), range[0]);
                 if (range[1] == 0)
                     v.y = 0;
                 else
-                    v.y = Mod(random(&gUnk_03005304), range[1]);
+                    v.y = Mod(random(&gEffectRandomTableIndex), range[1]);
                 e->velocity = v;
             }
             ParticleSprite_Initialize(sprite, m->graphics, 0);
@@ -98,7 +100,7 @@ s32 sub_08114E68(struct ParticleVec *position, s16 *range, s16 *spread, s32 coun
             if (flag)
                 sequence = 14;
             Anim_SetSequence(m->animations[e->index], m->resource, sequence, 0,
-                             (u8)(Mod(random(&gUnk_03005304), 2) | animFlags));
+                             (u8)(Mod(random(&gEffectRandomTableIndex), 2) | animFlags));
             sprite->flags |= 0x11 | spriteFlags;
             sprite->priority = priority;
             e->active = 1;

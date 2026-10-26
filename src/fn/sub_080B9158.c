@@ -9,11 +9,11 @@
 // confidence=low: timed wander/turn state of a ground enemy: picks a heading, probes terrain heights and mesh, queues state switch
 #define B9158_AT(T, off) (*(T *)((u8 *)a + (off)))
 
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_030053F4;
-extern u8 *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
+extern u32 gEngineFlags;
+extern u8 *gTerrainMap;
+extern u32 gTerrainWidth, gTerrainHeight;
 extern u8 *gUnknown_02000580[];
 extern const s16 gUnk_086149C4[];
 
@@ -34,8 +34,8 @@ static inline s32 b9158_cell(u16 px, u16 py)
     s32 x = (s8)(px >> 8);
     s32 y = (s8)(py >> 8);
 
-    if (x >= 0 && y >= 0 && (u32)x < gUnk_030052F8 && (u32)y < gUnk_030052FC)
-        return *(u16 *)(gUnk_030052F4 + 0x24 + y * 2) + x;
+    if (x >= 0 && y >= 0 && (u32)x < gTerrainWidth && (u32)y < gTerrainHeight)
+        return *(u16 *)(gTerrainMap + 0x24 + y * 2) + x;
     return 0;
 }
 
@@ -49,7 +49,7 @@ static inline s32 b9158_height(s32 cell, u8 *pos)
     if (cp != 0)
         cp += 4;
     else
-        cp = *(u8 **)(gUnk_030052F4 + 4) + (cell << 2) + 0xC;
+        cp = *(u8 **)(gTerrainMap + 4) + (cell << 2) + 0xC;
     kind = *cp >> 4;
     h = (*cp & 0xF) << 8;
     if (kind == 1)
@@ -97,7 +97,7 @@ static inline void b9158_Enter(u8 *a)
     *(u16 *)(pos + 4) = *(u16 *)(node + 2);
     *(u16 *)(pos + 2) = b9158_height(b9158_cell(*(u16 *)pos, *(u16 *)(pos + 4)), pos);
 
-    if (gUnk_030053F4 & 0x4800) {
+    if (gEngineFlags & 0x4800) {
         u8 *slot = B9158_AT(u8 *, 0xDC);
         if (slot != 0) {
             u32 v = slot[8];
@@ -163,8 +163,8 @@ static inline void b9158_Enter(u8 *a)
         } else {
             cur = B9158_AT(u8, 0x59);
             for (i = 0; i <= 3; i++) {
-                gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-                rnd = (gUnk_0203B400[gUnk_03005308] & 3) << 6;
+                gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+                rnd = (gUnk_0203B400[gRandomIndex] & 3) << 6;
                 if (rnd != cur)
                     break;
             }
@@ -196,7 +196,7 @@ static inline void b9158_Enter(u8 *a)
         sub_0807E334(a);
         B9158_AT(u16, 0x2C2) = 0x20;
     } else {
-        s32 w = *(s16 *)(*(u8 **)(gUnk_030052F4 + 4) + 4);
+        s32 w = *(s16 *)(*(u8 **)(gTerrainMap + 4) + 4);
         s32 gx = Mod(cell, w);
         s32 gy = Div(cell, w);
 
@@ -234,8 +234,8 @@ void sub_080B9158(u8 *a)
 
     if (B9158_AT(u8, 0x2B2)) {
         B9158_AT(u8, 0x2B2) = 0;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-        speed = (gUnk_0203B400[gUnk_03005308] & 3) + 10;
+        gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+        speed = (gUnk_0203B400[gRandomIndex] & 3) + 10;
         d = SceneActorTerrain_FindOpenNeighborDirection(a, B9158_AT(u8, 0x2B6));
         if (d < 0) {
             SceneActorAnimation_SelectDirectionalEntry(a, 0xF);
@@ -252,8 +252,8 @@ void sub_080B9158(u8 *a)
         v = gUnk_086149C4[(d << 6) & 0xFF] * speed;
         B9158_AT(s16, 0x2F0) = v >= 0 ? v >> 12 : -((-v) >> 12);
         B9158_AT(u8, 0x59) = ((d + 2) & 3) << 6;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-        B9158_AT(u16, 0x2EE) = (gUnk_0203B400[gUnk_03005308] & 0xF) + 12;
+        gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+        B9158_AT(u16, 0x2EE) = (gUnk_0203B400[gRandomIndex] & 0xF) + 12;
         SceneActorAnimation_SelectDirectionalEntry(a, 0xE);
     }
 

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct ResultDrawing {
     u8 unk0[8];
     u32 flags;
@@ -32,7 +33,6 @@ struct WirelessResultPanel {
     u8 string1[0x10];
 };
 #define PANEL_U32(p, off) (*(u32 *)((u8 *)(p) + (off)))
-extern u16 gUnk_03004BD8;
 void *WirelessResultPanel_GetInstance(void);
 void Hud_SetMode(int);
 void Bg_ClearTilemap(int);
@@ -76,7 +76,7 @@ int sub_0803B700(int mode, int side, int time0, int time1, int score0, int score
     p->side = side;
     p->script = script;
     {
-        u16 *r = &gUnk_03004BD8;
+        u16 *r = &gDispCntShadow;
         u32 m = ~0xE00;
         *r = m & *r;
     }

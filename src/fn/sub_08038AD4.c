@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct Entry {
     u8 bytes[4], a, b, flag, kind;
     u32 timer;
@@ -25,7 +26,7 @@ struct Target {
     s16 current, maximum;
 };
 extern struct Actor *gUnk_02000580;
-extern u32 gUnk_03005308, gUnk_0300523C;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void Hud_RegisterTimer(u16 *);
 void WirelessGameMenu_SetStatusPanelState(struct P *, int);
@@ -45,7 +46,7 @@ static inline u32 test(u32 *flags, u32 mask)
 }
 static inline void set(u32 mask)
 {
-    gUnk_0300523C |= mask;
+    gEnginePauseFlags |= mask;
 }
 void WirelessGameMenu_UpdateActiveRound(struct P *input)
 {

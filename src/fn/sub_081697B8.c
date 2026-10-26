@@ -1,10 +1,10 @@
 #define SelectionPanel_RefreshPrimaryEntries PauseMenu_RefreshEquipmentSlotIcons
 #include "global.h"
+#include "engine.h"
 struct SelectionPanel {
     u8 pad[0xA40];
     void *owner;
 };
-extern u32 gUnk_030053F4;
 void PauseMenu_CreateSelectionWidgets(struct SelectionPanel *);
 void sub_08168850(struct SelectionPanel *);
 void SceneHud_RebuildPrimaryOptions(struct SelectionPanel *);
@@ -24,7 +24,7 @@ void SelectionPanel_RefreshAttachedPanel(struct SelectionPanel *p)
         SceneHud_UpdateSecondaryWidgets(p);
         PauseMenu_RefreshEquipmentSlotIcons(p);
         SceneHud_UpdateTertiaryWidgets(p);
-        if (gUnk_030053F4 & 0x1000)
+        if (gEngineFlags & 0x1000)
             Hud_SetElementGroupFlags(p);
         else
             SceneHud_RefreshWidgetVisibility(p);

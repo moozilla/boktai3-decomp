@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_020004D8;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 CompactSpritePool_Initialize(u8 *);
@@ -11,8 +11,8 @@ void PositionLinkedSprite_DestroyManager(void);
 u8 *PositionLinkedSprite_EnsureManager(void)
 {
     u8 *p;
-    if (gUnk_020004D8 != 0)
-        return gUnk_020004D8;
+    if (gCompactSpritePool != 0)
+        return gCompactSpritePool;
     p = Task_Create(0xa, 0xe4);
     if (p != 0) {
         Task_SetCallbacks(p, SpritePair_UpdateAnimation, PositionLinkedSprite_DestroyManager);

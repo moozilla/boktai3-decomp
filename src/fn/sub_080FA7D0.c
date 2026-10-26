@@ -1,6 +1,6 @@
 #include "global.h"
 
-extern s32 gUnk_03005308;
+extern s32 gRandomIndex;
 extern u8 gUnk_0203B400[];
 s32 Mod(s32, s32);
 u8 *Path_GetPointData(u8 *);
@@ -22,8 +22,8 @@ void Axe_SelectRandomRoutePoint(struct S080FA7D0 *s)
     struct E *e = &s->e;
     u8 v;
 
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    v = Mod(*(u16 *)(gUnk_0203B400 + (gUnk_03005308 << 1)), *e->p);
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    v = Mod(*(u16 *)(gUnk_0203B400 + (gRandomIndex << 1)), *e->p);
     if (v == e->a)
         v = Mod(v + 1, *e->p);
     e->a = v;

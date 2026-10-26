@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 #define SpriteGroup_Initialize PanelSequence_InitializeSprites
-#define gPanelSequence         gUnk_020001C8
 struct PanelSequence {
     u8 pad0[0x1C];
     void *palette;
@@ -24,7 +24,6 @@ struct PanelSelection {
     u8 count;
 };
 extern struct PanelSelection *gUnk_020004B4;
-extern struct PanelSequence *gUnk_020001C8;
 s32 Script_SeekToKeyword(u32);
 u32 Script_GetTextSourcePc(void);
 s32 Script_GetPc(void);
@@ -103,6 +102,6 @@ s32 PanelSequence_InitializeFromScript(struct PanelSequence *s)
     s->transition = 0;
     if (Script_GetKeywordValue('f', 0))
         ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, 0);
-    gUnk_020001C8 = s;
+    gPanelSequence = s;
     return 1;
 }

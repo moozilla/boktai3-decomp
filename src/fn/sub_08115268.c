@@ -1,7 +1,8 @@
-#define gParticleRandomIndex  gUnk_03005304
+#define gParticleRandomIndex  gEffectRandomTableIndex
 #define gParticleRandomValues gUnk_086141BC
 // Tentative family and semantic names; layouts follow observed field offsets.
 #include "global.h"
+#include "ram.h"
 struct ParticleOffset {
     s32 x : 16;
     s32 y : 16;
@@ -14,14 +15,13 @@ struct ParticleEmitter {
     u8 padE2[0xee - 0xe2];
     u8 variant;
 };
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 void sub_08113398(s16 *, struct ParticleOffset *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                   u32, u32);
 static inline u32 ParticleRandom(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 void ActorParticles_SpawnAlternatingBurst(struct ParticleEmitter *p)
 {

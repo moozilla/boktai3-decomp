@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // Remaining difference: first spark RNG cursor copy lands in r0 (original uses r7) and the 0x3ff mask in r7 (original r0).
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
@@ -45,7 +46,6 @@ struct Target {
     u32 damageType;
 };
 extern const struct Vec gUnk_0824FEA4;
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 void Collision_CalculateDamageResponse(void *);
 void Sound_PlaySong(u32);
@@ -99,7 +99,7 @@ void PoisonHand_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
             register s32 i asm("r6");
             struct Vec *vel = &frame.velocity;
             struct Vec *pos = &frame.position;
-            u32 *index = &gUnk_03005308;
+            u32 *index = &gRandomIndex;
             u32 mask = 0x7f;
             i = 2;
             do {

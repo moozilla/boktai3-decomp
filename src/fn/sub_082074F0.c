@@ -32,8 +32,8 @@ static inline u32 TestFlag(u32 mask, u32 *p)
 }
 static inline s32 CannonRandom(const u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return table[gRandomIndex];
 }
 static inline void CopyPosition(struct SceneVec *out, const struct SceneVec *in)
 {
@@ -46,7 +46,7 @@ static inline void CannonEffectOffset(struct SceneVec *v)
 s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
 {
     struct CannonCollider *collider;
-    if (TestPair(0x400, &gUnk_030053F4, &gUnk_030053F0) || TestFlag(4, &gUnk_02000560))
+    if (TestPair(0x400, &gEngineFlags, &gUnk_030053F0) || TestFlag(4, &gUnk_02000560))
         return 0;
     p->previousVisible = p->targetVisible;
     Callback_InvokeActor(p, p->state);

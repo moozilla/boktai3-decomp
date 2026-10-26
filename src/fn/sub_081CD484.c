@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 typedef struct {
     u16 id;
     u8 unk[4];
@@ -58,7 +59,6 @@ struct SceneNpc {
 };
 
 extern u8 *gUnk_0200047C;
-extern u8 *gUnk_030042E4;
 
 void SceneMessages_SetPendingTrigger(void *, void *);
 s32 Math_Atan2(s32, s32);
@@ -524,7 +524,7 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
                         bank = 0x34;
                     sub->bankA = bank;
                     if (sub->fadeMode == 0) {
-                        u8 *p = gUnk_030042E4 + (bank << 5);
+                        u8 *p = gPaletteBankData + (bank << 5);
                         Palette_InterpolateBanks(npc->paletteBuf, p, p, 2, 1);
                         sub->bankB = sub->bankA;
                     }

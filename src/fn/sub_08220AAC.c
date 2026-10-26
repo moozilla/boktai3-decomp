@@ -1,10 +1,9 @@
 #include "global.h"
-
-extern u8 *gUnk_03001688;
+#include "ram.h"
 
 void Collider_ResetManagerLists(void)
 {
-    u8 *p = gUnk_03001688;
+    u8 *p = gColliderManager;
     if (p != 0) {
         *(u8 **)(p + 0x18) = p + 0x28;
         *(u8 **)(p + 0x1c) = p + 0x7c;

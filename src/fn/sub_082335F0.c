@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "engine.h"
 
 struct ChargedBurstPosition {
     s16 x, y, z, unk_06;
@@ -20,7 +21,6 @@ struct ChargedBurst {
     u8 nextSpark, sparkDelay;
 };
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 
 #ifdef NONMATCHING
 // fuzzy: 71.4%
@@ -42,7 +42,7 @@ void ChargedBurst_EmitSpark(struct ChargedBurst *p)
         p->sparks[p->nextSpark].flags &= ~1;
         p->sparks[p->nextSpark].position = p->position;
         table = gUnk_0203B400;
-        seed = &gUnk_03005308;
+        seed = &gRandomIndex;
         index = *seed + 1;
         mask = 1023;
         index &= mask;

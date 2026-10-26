@@ -1,9 +1,8 @@
-#define gTrackedPlayerId gUnk_02000508
-#define gPlayerSlots     gUnk_02000580
+#define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "player.h"
-extern u16 gUnk_02000508;
+#include "ram.h"
 u8 SceneActorPath_FaceAndCheckStraightPath(void *);
 s32 Math_Atan2(s32, s32);
 struct SceneActorTrackingTarget {

@@ -1,5 +1,5 @@
 #include "global.h"
-#define gPooledSpriteManager gUnk_02000164
+#include "ram.h"
 struct PooledSprite {
     u8 unknown0[0xBC];
     u16 timer, state;
@@ -13,7 +13,6 @@ struct PooledSpriteManager {
     u8 unknown0[0x860];
     u32 allocated;
 };
-extern struct PooledSpriteManager *gUnk_02000164;
 u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
 void Sprite_Remove(void *);
 static inline void release(struct PooledSpriteManager *manager, s32 slot)
@@ -27,7 +26,7 @@ void PooledSprite_UpdateRemoval(void *unused, struct PooledSprite *sprite)
         sprite->timer = 0;
     }
     if (Sprite_BlinkUntilExpired(sprite, sprite->timer, 60, 40)) {
-        struct PooledSpriteManager *manager = gUnk_02000164;
+        struct PooledSpriteManager *manager = gPooledSpriteManager;
         s32 slot = sprite->slot;
         release(manager, slot);
         sprite->active = 0;

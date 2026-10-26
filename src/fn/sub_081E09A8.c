@@ -23,7 +23,7 @@ struct ScriptPromptTask {
 };
 
 extern u16 gUnk_03005260[];
-extern u32 gUnk_02000388[];
+extern u32 gScriptPromptSettings[];
 void Sound_PlaySong(u32);
 void Sound_PauseChannel10(u32);
 void Menu_StartFadeOut(s32);
@@ -86,9 +86,9 @@ void sub_081E09A8(struct ScriptPromptTask *s)
                 s->firstFlags |= 1;
                 s->thirdFlags |= 1;
                 if (s->result == 0)
-                    Script_Call(gUnk_02000388[3], 0);
+                    Script_Call(gScriptPromptSettings[3], 0);
                 else
-                    Script_Call(gUnk_02000388[2], 0);
+                    Script_Call(gScriptPromptSettings[2], 0);
                 Task_Kill(s);
             }
             s->fadeTimer++;

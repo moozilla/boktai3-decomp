@@ -1,6 +1,6 @@
-#define gActorParticlePool gUnk_020001E4
 // Tentative family and semantic names; layouts follow observed field offsets.
 #include "global.h"
+#include "ram.h"
 struct ActorParticleSlot {
     u8 animation[0x1c];
     u32 spriteFlags;
@@ -18,7 +18,6 @@ struct ActorParticlePool {
     u8 unknown[0x18];
     struct ActorParticleSlot slots[48];
 };
-extern struct ActorParticlePool *gUnk_020001E4;
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void *ScriptProc_Start(u16, u16);
@@ -36,6 +35,6 @@ s32 ActorParticles_InitPool(struct ActorParticlePool *pool)
         pool->slots[i].spriteFlags |= 0x11;
         pool->slots[i].spriteMode = 2;
     }
-    gUnk_020001E4 = pool;
+    gActorParticlePool = pool;
     return 0;
 }

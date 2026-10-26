@@ -1,4 +1,5 @@
 #include "scene_actor_reset.h"
+#include "engine.h"
 struct SlimeReactionContext {
     u8 unknown0[0x3d4];
     u16 timer, unknown3D6, unknown3D8, healthThreshold;
@@ -7,7 +8,6 @@ struct SlimeReactionContext {
     u8 unknown406[4];
     u16 flags;
 };
-extern u32 gUnk_03005308;
 void Slime_EmitTargetedReactionBurst(void *), Slime_RunPendingActionScript(void *),
     SceneActorControl_OnIdle(void);
 static inline void Clear(u16 *p, u32 mask)
@@ -91,8 +91,8 @@ u32 Slime_ResolveDamageReaction(struct SceneActorRegistryResetView *actor)
         if (actor->health < context->healthThreshold)
             Slime_RunPendingActionScript(actor);
         else {
-            u32 index = (gUnk_03005308 + 1) & 1023;
-            gUnk_03005308 = index;
+            u32 index = (gRandomIndex + 1) & 1023;
+            gRandomIndex = index;
             {
                 s32 random = *(const u8 *)(RANDOM_TABLE_ADDR + index * 2);
                 if (random <= 24)

@@ -18,7 +18,7 @@ s32 Script_TeleportToCell(void)
     struct Pos08227C2C *p;
     struct ScriptUtilityReference ref;
     s32 cell = Script_GetValue();
-    u8 *grid = gUnk_030052F4->cells;
+    u8 *grid = gTerrainMap->cells;
     if (grid) {
         if (cell >= *(s16 *)(grid + 4) * *(s16 *)(grid + 6)) {
             pos.x = 0;
@@ -35,7 +35,7 @@ s32 Script_TeleportToCell(void)
             if (props)
                 props += 4;
             else
-                props = gUnk_030052F4->cells + (cell * 4 + 12);
+                props = gTerrainMap->cells + (cell * 4 + 12);
             type = *props >> 4;
             h = (*props & 0xf) << 8;
             switch (type) {

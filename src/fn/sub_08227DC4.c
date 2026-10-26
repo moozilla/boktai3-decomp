@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_030053F8;
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 u8 Save_ReadHeader(void);
 void Settings_LoadOrInitializeDefaults(void)
 {
@@ -10,7 +10,7 @@ void Settings_LoadOrInitializeDefaults(void)
             u16 five = 5;
             s32 limit;
             u8 *p;
-            *(u16 *)(gUnk_02000710 + 0x12) = five;
+            *(u16 *)(gGameState + 0x12) = five;
             limit = 0xe6;
             p = gUnk_030053F8;
             *(s32 *)(p + 4) = limit;

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "render.h"
 
 struct Registry2388ResourceHeader {
     u32 words[8];
@@ -16,7 +17,6 @@ struct Registry2388Display {
     struct Registry2388Animation animations[13];
     struct Registry2388ResourceHeader resource;
 };
-extern u8 *gUnk_030042E4;
 void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 
 void Registry2388_InitializeAnimations(struct Registry2388Display *p)
@@ -30,7 +30,7 @@ void Registry2388_InitializeAnimations(struct Registry2388Display *p)
         p->resource = *resource;
         ResourceHeader_Relocate(&p->resource, resource);
         anim = p->animations;
-        palette = gUnk_030042E4 + 0x63c0;
+        palette = gPaletteBankData + 0x63c0;
         zero = 0;
         count = 12;
         do {

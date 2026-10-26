@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 
 // Register allocation: the original keeps y in r4 and the output pointer in r5; here they swap.
 struct V {
@@ -7,7 +8,6 @@ struct V {
 struct P {
     u32 x : 16, y : 16, z : 16, w : 16;
 };
-extern u8 *gUnk_02000710;
 extern struct V gUnk_03005418;
 void ShadowActor_UpdateTransition(void *);
 s32 __divsi3(s32, s32);
@@ -45,7 +45,7 @@ void sub_081982A0(u8 *p)
     s32 y, a, b, c;
     struct V *world;
     ShadowActor_UpdateTransition(p);
-    actor = gUnk_02000710;
+    actor = gGameState;
     in.x = *(u16 *)(actor + 0x30);
     in.y = *(u16 *)(actor + 0x32);
     in.z = *(u16 *)(actor + 0x34);
@@ -56,7 +56,7 @@ void sub_081982A0(u8 *p)
         else
             out.x = 0x10;
     }
-    a2 = gUnk_02000710;
+    a2 = gGameState;
     world = (struct V *)&in;
     y = *(s16 *)(a2 + 0x32);
     a = ({

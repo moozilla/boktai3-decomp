@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 extern u16 gUnk_03005418[];
 s32 __divsi3(s32, s32);
 void OrbitMotion_BeginDistanceWave(void *, void *, void *, u32, u32);
@@ -58,7 +59,6 @@ static inline void Project(u16 *screen, struct Vec *world)
 }
 
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 s32 sub_08249350(s32, s32);
 static inline void ApplyOffset(u16 *field, s32 random, s32 range)
 {
@@ -82,7 +82,7 @@ void ContactImpactEffect_UpdateShakingPosition(struct ContactImpactEffect *effec
         effect->shakeFlag = 1;
     range = *timer >> 2;
     table = gUnk_0203B400;
-    seed = &gUnk_03005308;
+    seed = &gRandomIndex;
     index = *seed + 1;
     mask = 0x3FF;
     index &= mask;

@@ -1,6 +1,7 @@
 #include "global.h"
 #include "actor_graphics_and_basic_states.h"
 #include "contact_actor.h"
+#include "render.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -42,7 +43,7 @@ void SceneActorGraphics_SelectResource(u8 *p)
                 *(void **)(p + 0x288) = p + 0x7c4;
             else {
                 {
-                    void *src = gUnk_030042E4 + resource * 32;
+                    void *src = gPaletteBankData + resource * 32;
                     register void *dst asm("r1") = p + 0x3c4;
                     CpuSet(src, dst, 0x4000008);
                 }
@@ -54,7 +55,7 @@ void SceneActorGraphics_SelectResource(u8 *p)
 
 #define SceneActorGraphics_OnDamageContact sub_08021F4C
 extern u8 *gUnk_02000580;
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void Sound_PlaySongChecked(u32);
@@ -93,7 +94,7 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
     Collision_CalculateDamageResponse(source, contact);
     if (((*((u32 *)(p + 0x358))) == 1) && (mode != 2))
         *((u16 *)(contact + 0x3e)) = 0;
-    if (!(gUnk_030053F4 & 0x1000))
+    if (!(gEngineFlags & 0x1000))
         PlayerStats_AddContactHundredths(source, contact, *((s16 *)(p + 0x380)));
     ((struct DamageContactActor *)p)->damage.value = *((u16 *)(contact + 0x3e));
     if ((*((u16 *)(contact + 0x3e))) == 0) {
@@ -125,7 +126,7 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
     PlayerStats_AddContactHundredths(source, contact, actor[0xe2]);
     if (((*((s32 *)(p + 0x33c))) > 0) && TestContactFlags((u32 *)(source + 0x38), 1))
         p[0x340] = 1;
-    if (!(gUnk_030053F4 & 0x1000))
+    if (!(gEngineFlags & 0x1000))
         return;
     if ((mode - 1) <= 1) {
         position = contact + 0xc;
@@ -138,7 +139,7 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
     if (!TestContactFlags((u32 *)(source + 0x38), 0x800000))
         return;
     {
-        u8 *stats = (u8 *)gUnk_02000710;
+        u8 *stats = (u8 *)gGameState;
         u32 offset = *((s16 *)(stats + 0x52)) << 1;
         item = (s16)(*((u16 *)(offset + (u32)stats + 0x88)) - 6);
     }
@@ -186,7 +187,7 @@ typedef struct {
 
 void SceneActorGraphics_InitBodyNoOp(void);
 
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 
 void SceneActorGraphics_InitializeBody(struct StateActor *p)
 {
@@ -202,7 +203,7 @@ void SceneActorGraphics_InitializeBody(struct StateActor *p)
     Collider_SetPosition(drawable, &p->worldPosition, 0);
     Collider_SetCallback(drawable, SceneActorGraphics_InitBodyNoOp, p);
     {
-        int test = gUnk_030053F4 & 0x1000;
+        int test = gEngineFlags & 0x1000;
         int flags;
         flags = 0;
         if (test)
@@ -303,7 +304,7 @@ s32 SceneActorGraphics_GetEffectState(struct StateActor *p)
     } else if (AreaEffect_IsPositionCovered(&p->target) == 0) {
         r = 0;
     } else {
-        r = *(s16 *)((u8 *)gUnk_02000710 + 0x876);
+        r = *(s16 *)((u8 *)gGameState + 0x876);
     }
     return r;
 }
@@ -489,7 +490,7 @@ end:
 typedef struct ParticleOffset {
     s16 x, y, z, pad;
 } ParticleOffset;
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 s32 SceneParticle_CreateParticles(const void *anchor, const ParticleOffset *offset,
                                   const void *range, const void *jitter, s32 count, u32 priority);
@@ -513,14 +514,14 @@ void sub_08022694(u8 *p)
     }
     for (i = 0; i < 4; i++) {
         const u16 *table = gUnk_0203B400;
-        u16 index = (gUnk_03005308 + 1) & 0x3FF;
+        u16 index = (gRandomIndex + 1) & 0x3FF;
         {
             u16 random = table[index];
             offset.x = ((random & 0x7F) + center.x) - 0x40;
         }
         offset.y = center.y;
         index = (index + 1) & 0x3FF;
-        gUnk_03005308 = index;
+        gRandomIndex = index;
         {
             u16 random = table[index];
             offset.z = ((random & 0x7F) + center.z) - 0x40;
@@ -534,7 +535,7 @@ struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
 
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 
 // confidence=low: five sparks 300 units above the actor; the large burst for big, otherwise a
 // smaller one shifted by the facing kept at 0xA8.
@@ -569,7 +570,7 @@ void sub_08022790(u8 *p, s32 big)
         size.z = 128;
     }
     table = gUnk_0203B400;
-    indexPtr = &gUnk_03005308;
+    indexPtr = &gRandomIndex;
     index = *indexPtr + 1;
     mask = 1023;
     index &= mask;
@@ -588,7 +589,7 @@ typedef struct BurstVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 } BurstVec;
 extern const BurstVec gUnk_08604D84[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 u16 Sqrt(u32);
 s32 Div(s32, s32);
@@ -611,16 +612,16 @@ void sub_08022878(BurstVec *p)
         u32 index;
         u16 len;
         u16 r;
-        index = (gUnk_03005308 + 1) & 0x3FF;
-        gUnk_03005308 = index;
+        index = (gRandomIndex + 1) & 0x3FF;
+        gRandomIndex = index;
         r = table[index] & 0x1f;
         pos->x = gUnk_08604D84[i].x + p->x - 0x10 + r;
         index = (index + 1) & 0x3FF;
-        gUnk_03005308 = index;
+        gRandomIndex = index;
         r = table[index] & 0x1f;
         pos->y = gUnk_08604D84[i].y + p->y - 0x10 + r;
         index = (index + 1) & 0x3FF;
-        gUnk_03005308 = index;
+        gRandomIndex = index;
         r = table[index] & 0x1f;
         pos->z = gUnk_08604D84[i].z + p->z - 0x10 + r;
         AnimatedParticles_EmitBurst(pos, 1, 0, 0x40, 0xc, 0xc, 4, 4);
@@ -657,7 +658,7 @@ void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
         size.x = 164;
         size.y = 16;
         size.z = 164;
-        indexPtr = &gUnk_03005308;
+        indexPtr = &gRandomIndex;
         mask = 1023;
         smallMask = 3;
         table = gUnk_0203B400;
@@ -751,13 +752,12 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
             }
             reactionAction(p, 1, 0, 0);
             reactionState(p, SceneActors_UpdateShrinkingReaction, 0x16);
-            if (gUnk_030053F4 & 0x1000) {
+            if (gEngineFlags & 0x1000) {
                 u8 *position = sprite + 0xc;
                 if (WirelessGame_TryAddCyclingItem(position)) {
-                    s32 d =
-                        actor[0x20e] -
-                        Math_Atan2(*(s16 *)(sprite + 0xc) - *(s16 *)((u8 *)gUnk_02000710 + 0x30),
-                                   *(s16 *)(sprite + 0x10) - *(s16 *)((u8 *)gUnk_02000710 + 0x34));
+                    s32 d = actor[0x20e] -
+                            Math_Atan2(*(s16 *)(sprite + 0xc) - *(s16 *)((u8 *)gGameState + 0x30),
+                                       *(s16 *)(sprite + 0x10) - *(s16 *)((u8 *)gGameState + 0x34));
                     if (d < 0)
                         d = -d;
                     if (d <= 0x20)
@@ -1033,8 +1033,6 @@ struct T {
 
 extern u8 *gUnk_0200047C;
 
-extern u8 *gUnk_030042E4;
-
 void SceneMessages_SetPendingTrigger(void *, void *);
 
 void CpuSet(const void *, void *, u32);
@@ -1191,7 +1189,7 @@ void SceneActors_DispatchCommands(struct S *s)
                                 t->palette = t->pal7C4;
                                 break;
                             default:
-                                CpuSet(gUnk_030042E4 + r * 32, t->pal3C4, 0x04000008);
+                                CpuSet(gPaletteBankData + r * 32, t->pal3C4, 0x04000008);
                                 t->palette = t->pal3C4;
                                 break;
                         }
@@ -2168,9 +2166,9 @@ static inline s32 ProbeCellAt(struct ProbePos *p)
 {
     s32 x = p->x >> 8;
     s32 z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 static inline u8 *ProbeCellProps(s32 cell)
@@ -2178,7 +2176,7 @@ static inline u8 *ProbeCellProps(s32 cell)
     u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         return p + 4;
-    return gUnk_030052F4->cells + (cell * 4 + 12);
+    return gTerrainMap->cells + (cell * 4 + 12);
 }
 
 #ifdef NONMATCHING
@@ -2306,7 +2304,7 @@ void SceneActorState_PlayAnimation7ThenRecover(struct S_0802429C *p)
         p2->ae = z2;
         p2->c4 = z2;
         p2->b0 = 1;
-        if (gUnk_030053F4 & 0x1000)
+        if (gEngineFlags & 0x1000)
             p2->h356 = z2;
         else
             p2->h356 = 0x5a;
@@ -2359,7 +2357,7 @@ void SceneActorState_PlayAnimation8ThenRecover(struct S_08024334 *p)
         p2->ae = z2;
         p2->c4 = z2;
         p2->b0 = 1;
-        if (gUnk_030053F4 & 0x1000)
+        if (gEngineFlags & 0x1000)
             p2->h356 = z2;
         else
             p2->h356 = 0x1E;
@@ -2483,7 +2481,7 @@ void SceneActorState_PlayAnimation10ThenRecover(struct S_08024440 *p)
         p2->ae = z2;
         p2->c4 = z2;
         p2->b0 = 1;
-        if (gUnk_030053F4 & 0x1000)
+        if (gEngineFlags & 0x1000)
             p2->h356 = z2;
         else
             p2->h356 = 0x1E;
@@ -2536,7 +2534,7 @@ void SceneActorState_PlayAnimation11ThenRecover(struct S_080244D8 *p)
         p2->ae = z2;
         p2->c4 = z2;
         p2->b0 = 1;
-        if (gUnk_030053F4 & 0x1000)
+        if (gEngineFlags & 0x1000)
             p2->h356 = z2;
         else
             p2->h356 = 0x1E;
@@ -2592,7 +2590,7 @@ void SceneActorState_PlayVariantAnimation12ThenRecover(struct S_08024570 *p)
             p2->ae = z2;
             p2->c4 = z2;
             p2->b0 = 1;
-            if (gUnk_030053F4 & 0x1000)
+            if (gEngineFlags & 0x1000)
                 p2->h356 = z2;
             else
                 p2->h356 = 0x5a;
@@ -2651,7 +2649,7 @@ void SceneActorState_PlayVariantAnimation13ThenRecover(struct S_0802461C *p)
             p2->ae = z2;
             p2->c4 = z2;
             p2->b0 = 1;
-            if (gUnk_030053F4 & 0x1000)
+            if (gEngineFlags & 0x1000)
                 p2->h356 = z2;
             else
                 p2->h356 = 0x96;
@@ -2783,7 +2781,7 @@ void SceneActorState_UpdateLongRecovery(struct S_080247AC *p)
         p2->ae = z2;
         p2->c4 = z2;
         p2->b0 = 1;
-        if (gUnk_030053F4 & 0x1000)
+        if (gEngineFlags & 0x1000)
             p2->h356 = z2;
         else
             p2->h356 = 0x5a;
@@ -2807,7 +2805,7 @@ struct VariantRecoveryActor {
     u8 pad3b0[9];
     u8 alternate;
 };
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 static inline u8 enterVariant(struct VariantRecoveryActor *p)
 {
     if (p->enter) {
@@ -2861,7 +2859,7 @@ void SceneActorState_UpdateVariantRecovery(struct VariantRecoveryActor *p)
             q->phase = zero;
             q->timer = zero;
             q->enter = 1;
-            if (gUnk_030053F4 & 0x1000)
+            if (gEngineFlags & 0x1000)
                 q->delay = zero;
             else
                 q->delay = 90;
@@ -2919,7 +2917,7 @@ void SceneActorState_UpdateAction20Recovery(struct S_08024944 *p)
             p2->ae = z2;
             p2->c4 = z2;
             p2->b0 = 1;
-            if (gUnk_030053F4 & 0x1000)
+            if (gEngineFlags & 0x1000)
                 p2->h356 = z2;
             else
                 p2->h356 = 0x5a;
@@ -2978,7 +2976,7 @@ void SceneActorState_UpdateAction21Recovery(struct S_080249F0 *p)
             p2->ae = z2;
             p2->c4 = z2;
             p2->b0 = 1;
-            if (gUnk_030053F4 & 0x1000)
+            if (gEngineFlags & 0x1000)
                 p2->h356 = z2;
             else
                 p2->h356 = 0x5a;
@@ -3039,7 +3037,7 @@ void SceneActorState_UpdateShortRecovery(struct S_08024AD4 *p)
         p2->ae = z2;
         p2->c4 = z2;
         p2->b0 = 1;
-        if (gUnk_030053F4 & 0x1000)
+        if (gEngineFlags & 0x1000)
             p2->h356 = z2;
         else
             p2->h356 = 0x1e;
@@ -3093,7 +3091,7 @@ void SceneActorState_WaitForFlagRelease(struct S_08024B60 *p)
         p2->ae = z2;
         p2->c4 = z2;
         p2->b0 = 1;
-        if (gUnk_030053F4 & 0x1000) {
+        if (gEngineFlags & 0x1000) {
             p2->h356 = z2;
         } else {
             p2->h356 = 0x1e;

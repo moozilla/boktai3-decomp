@@ -173,7 +173,7 @@ u32 WirelessGame_GetRoundCount(void)
 
 void sub_080397C0(void)
 {
-    gUnk_030053F4 |= 0x1000;
+    gEngineFlags |= 0x1000;
 }
 
 void WirelessGame_AddWeightedScore(int index, int amount)
@@ -264,7 +264,7 @@ void WirelessGame_BeginResults(void)
 
 u32 WirelessGame_GetSelectedEquipmentEffect(void)
 {
-    struct GameState *g = gUnk_02000710;
+    struct GameState *g = gGameState;
     u32 r;
     /* Add the selected offset before the table base: direct slots88 indexing
      * changes agbcc address/register ordering. */
@@ -296,7 +296,7 @@ void WirelessGameItem_SetRandomArcVelocity(struct WirelessGameItem *arg, int bas
     struct WirelessGameItem *p = arg;
     int base = baseArg;
     u16 *table = gUnk_0203B400;
-    u32 *state = &gUnk_03005308;
+    u32 *state = &gRandomIndex;
     u32 limit;
     u32 index;
     int random;
@@ -323,8 +323,8 @@ void WirelessGameItem_SetRandomArcVelocity(struct WirelessGameItem *arg, int bas
 
 void WirelessGameItem_SetRandomNegativeArcVelocity(struct WirelessGameItem *p, int base, int mask)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     {
         u32 offset = index * 2;
         int random;
@@ -394,8 +394,8 @@ static inline void Item_LoadFrame(struct WirelessGameItems *owner, struct Wirele
 static inline u32 Item_NextRandom(void)
 {
     register const u16 *t asm("r6") = gUnk_0203B400;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return t[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return t[gRandomIndex];
 }
 
 static inline void Item_Place(struct WirelessGameItem *p, struct WirelessGameSprite *sprite,
@@ -826,8 +826,8 @@ static inline int ScaleSine(int n)
 
 static inline u32 WirelessGame_Random(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return ((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
 
 static inline void WirelessGameItem_SetDrift(struct WirelessGameVector *drift, int angle)
@@ -1476,7 +1476,7 @@ void WirelessGameDisplay_UpdateRoundAnnouncement(struct WirelessGameDisplay *p)
         int bits;
         q = p->drawings;
         table = gUnk_0203B400;
-        state = &gUnk_03005308;
+        state = &gRandomIndex;
         index = *state + 1;
         limit = 1023;
         index &= limit;
@@ -1529,7 +1529,7 @@ void WirelessGameDisplay_UpdateShakeAnimation(struct WirelessGameDisplay *arg)
         int mask;
         q = p->drawings;
         table = gUnk_0203B400;
-        state = &gUnk_03005308;
+        state = &gRandomIndex;
         index = *state + 1;
         limit = 1023;
         index &= limit;

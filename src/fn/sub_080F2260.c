@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 /* Armor_UpdatePartColliders_080F2260: same as Armor_UpdatePartColliders but the scene comes from the owner at +0x160 (provisional name) */
 
 struct ArmorVector {
@@ -23,7 +24,6 @@ struct ArmorScene {
     u8 pad0[0x32];
     s16 height;
 };
-extern struct ArmorScene *gUnk_02000710;
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
 

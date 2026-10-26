@@ -20,7 +20,7 @@ void LinkSelection_AdvanceBitExchange(struct AreaEffectLinkState *p, u32 flags, 
         Registry1745_ToggleConnectionRole(p);
         LinkSession_UpdatePlayerValueAverage(p);
         p->sendBit = 0;
-        p->receiveBits = (u16)gUnk_02000710->unk874 >> 2;
+        p->receiveBits = (u16)gGameState->unk874 >> 2;
         i = 0;
         if (i < p->participantCount) {
             do {

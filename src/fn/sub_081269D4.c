@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_02000158;
+#include "ram.h"
 
 void BlinkingEffect_ResetSingleton(void)
 {
-    gUnk_02000158 = 0;
+    gSceneStatusIndicatorManager = 0;
 }

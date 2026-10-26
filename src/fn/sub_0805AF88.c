@@ -52,9 +52,9 @@ void ScenePanelRig_InitSecondarySprites(struct ScenePanelRig *rig)
         }
         sprite->position = owner->position;
         animated->phase = i << 5;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 offset = gUnk_03005308 * 2;
+            u32 offset = gRandomIndex * 2;
             const u8 *table;
             table = (void *)RANDOM_TABLE_ADDR;
             offset += (u32)table;

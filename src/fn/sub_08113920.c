@@ -4,6 +4,7 @@
 // confidence=low: profile-driven native effect motion and creation.
 /* Pointer spills, ring-mask allocation and a hoisted constant still differ. */
 #include "actor_attachment_state.h"
+#include "ram.h"
 static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
                                              struct DisplaySequenceState *state)
 {
@@ -150,7 +151,6 @@ struct Effect {
 };
 extern struct Camera *gUnk_020004B8;
 extern const s16 gUnk_086149C4[];
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 s32 Mod(s32, s32);
 void NativeParticle_CreateWithFlag(void *, s32, void *, s32, s32, s32, s32);
@@ -180,7 +180,7 @@ static inline u32 TrailRandom(void)
 {
     register u32 value asm("r0");
     typeof(value) t1;
-    value = (t1 = gUnk_086141BC[gUnk_03005304]);
+    value = (t1 = gUnk_086141BC[gEffectRandomTableIndex]);
     asm("" : "+r"(t1));
     value &= 7;
     asm("" : "+r"(value));
@@ -347,9 +347,9 @@ void NativeEffect_UpdateAcceleratingTrail(struct Effect *p)
             u32 z : 16;
             u32 pad : 16;
         } offset;
-        gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+        gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
         offset.x = TrailRandom() - 3;
-        gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+        gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
         offset.y = TrailRandom() - 3;
         NativeParticle_CreateWithFlag(&p->sprite.position, 0, &offset, 1, 1, 0x200, 0);
     }

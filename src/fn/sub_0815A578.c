@@ -6,7 +6,7 @@ struct Actor {
     u16 lifeMax, life, energyMax, energy;
 };
 extern struct Actor *gUnk_02000580[];
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 s32 Script_GetActorIndex(void);
 /* Script: life -l and energy -e (current and maximum) of the scripted actor
    picked by -i, mirrored into game state +0x28..+0x2E (tentative). Raw
@@ -20,9 +20,9 @@ void ScriptActor_SetLifeEnergyFromScript(void)
         a->energy = Script_GetKeywordValue('e', 0);
         a->lifeMax = a->life;
         a->energyMax = a->energy;
-        *(u16 *)(gUnk_02000710 + 0x28) = a->life;
-        *(u16 *)(gUnk_02000710 + 0x2C) = a->energy;
-        *(u16 *)(gUnk_02000710 + 0x2A) = a->life;
-        *(u16 *)(gUnk_02000710 + 0x2E) = a->energy;
+        *(u16 *)(gGameState + 0x28) = a->life;
+        *(u16 *)(gGameState + 0x2C) = a->energy;
+        *(u16 *)(gGameState + 0x2A) = a->life;
+        *(u16 *)(gGameState + 0x2E) = a->energy;
     }
 }

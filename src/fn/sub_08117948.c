@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
@@ -101,8 +102,8 @@ void PalFade_Start(void *, s32, u16, s32, s32, s32, s32, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(void *);
 s32 sub_08249240(void *, s32, u32);
 void ChargeMarker_TickHold(void *, void *, u32);
-extern u32 gUnk_030053F4, gUnk_030053F0;
-extern u8 *gUnk_02000710, *gUnk_020004B4;
+extern u32 gEngineFlags, gUnk_030053F0;
+extern u8 *gUnk_020004B4;
 void Glove_UpdateStopping(struct Glove *);
 
 // Action-pointer lifetimes, constant reuse and register allocation still differ.

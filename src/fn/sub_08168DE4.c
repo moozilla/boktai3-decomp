@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_0300523C;
+#include "render.h"
 void SelectionPanel_ClearTileColumns(u8 *);
 void SceneHud_ApplySecondarySelection(u8 *);
 void PauseMenu_ApplySelectedEquipment(u8 *);
@@ -21,6 +21,6 @@ void PauseMenu_FinishEquipmentSelection(u8 *p)
     p[0xC73] = 0;
     SceneHud_RefreshWidgetVisibility(p);
     Sound_RestartPlayer29And30Songs();
-    andm(&gUnk_0300523C, ~4);
+    andm(&gEnginePauseFlags, ~4);
     Hud_SetUpdateCallback(p, Hud_UpdateEquipmentPrompt);
 }

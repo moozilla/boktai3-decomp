@@ -22,9 +22,9 @@ void PlayerCue_InitAttackCollider(struct Player *p, void *position, u32 flags, s
     offset.z = 0;
     Collider_Init(collider, 0, 0x2001, 0, (0x10000u << p->movementRequestBlocked) >> 16, &size,
                   &offset);
-    if (gUnk_030053F4 & 0x1000) {
-        s32 bonus = gUnk_02000710->unk874;
-        s32 level = gUnk_02000710->level;
+    if (gEngineFlags & 0x1000) {
+        s32 bonus = gGameState->unk874;
+        s32 level = gGameState->level;
         bonus += 50;
         sum = level + bonus;
         Collider_SetAttackProperties(collider, sum, 40, 16, 0x40000, 10);

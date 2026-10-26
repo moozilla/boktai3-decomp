@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct P {
     u8 pad[0x20];
     u32 flags, timer;
@@ -6,12 +7,11 @@ struct P {
     u8 pad2[5];
     u8 mode;
 };
-extern u32 gUnk_0300523C;
 int WirelessExchange_ResolveOutcome(struct P *);
 int WirelessExchange_SendPacket(struct P *, int, const u32 *, int);
 static inline void set(u32 mask)
 {
-    gUnk_0300523C |= mask;
+    gEnginePauseFlags |= mask;
 }
 static inline u32 test(u32 *flags, u32 mask)
 {

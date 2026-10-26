@@ -1,6 +1,6 @@
 #include "contact_sequence_actor.h"
+#include "render.h"
 void ContactSequenceActor_Initialize(struct ContactSequenceOwner *, struct ContactSequenceActor *);
-extern u8 *gUnk_030042E4;
 s32 ContactSequencePool_Initialize(struct ContactSequenceOwner *owner, s32 initialHealth,
                                    u32 contactValue, s32 resourceValue, u32 script,
                                    u32 reactionValue)
@@ -20,6 +20,6 @@ s32 ContactSequencePool_Initialize(struct ContactSequenceOwner *owner, s32 initi
         --remaining;
         ++actor;
     } while (remaining >= 0);
-    CpuSet(gUnk_030042E4 + 0x2C00, owner->palette, 0x04000008);
+    CpuSet(gPaletteBankData + 0x2C00, owner->palette, 0x04000008);
     return 0;
 }

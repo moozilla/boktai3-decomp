@@ -36,9 +36,9 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
         if (gUnk_02000580[background->playerIndex]->targetActive) {
             register u32 angle asm("r0");
             if (gUnk_02000580[background->playerIndex]->transition == 4)
-                angle = ((u16)gUnk_02000710->unk85E + 128) & 255;
+                angle = ((u16)gGameState->unk85E + 128) & 255;
             else
-                angle = (u16)gUnk_02000710->unk85E;
+                angle = (u16)gGameState->unk85E;
             background->angle = angle;
             if (background->blendFrame <= 6) {
                 s32 weight, denominator;
@@ -61,7 +61,7 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
                 finalZ = (u16)gUnk_02000580[background->playerIndex]->target.z;
             }
         } else {
-            register struct GameState **gameAddress asm("r2") = &gUnk_02000710;
+            register struct GameState **gameAddress asm("r2") = &gGameState;
             s32 source = (*gameAddress)->unk85E;
             s32 angle = background->angle;
             register s32 difference asm("r1");

@@ -1,5 +1,5 @@
-#define gSceneProcSprites gUnk_020004CC
 #include "global.h"
+#include "ram.h"
 struct SceneProcSprite {
     u8 data[0x1c];
     u32 flags;
@@ -14,7 +14,6 @@ struct SceneProcSprites {
     u8 pad[0x1c];
     struct SceneProcSprite entries[4];
 };
-extern struct SceneProcSprites *gUnk_020004CC;
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void *ScriptProc_Start(u16, u16);
@@ -38,6 +37,6 @@ s32 SceneProcSprites_Initialize(struct SceneProcSprites *p)
         p->entries[i].flags |= 0x11;
         *((u8 *)&p->entries[i].flags + 7) = 1;
     }
-    gUnk_020004CC = p;
+    gSceneProcSprites = p;
     return 0;
 }

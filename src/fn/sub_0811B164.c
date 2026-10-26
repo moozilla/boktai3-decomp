@@ -1,8 +1,8 @@
 #include "global.h"
+#include "ram.h"
 
 // MATCHING_CONCESSION: register-pinning
 
-#define gSpatialIndex gUnk_02000200
 struct SpatialEntry {
     u32 flags;
     u8 unknown4[12];
@@ -26,7 +26,6 @@ struct SpatialCamera {
     u8 unknown0[0x44];
     s32 x, z;
 };
-extern struct SpatialIndex *gSpatialIndex;
 extern struct SpatialCamera *gUnk_020004B8;
 s32 Div(s32, s32);
 u8 SpatialIndex_RemoveEntry(struct SpatialEntry *);

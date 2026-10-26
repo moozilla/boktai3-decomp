@@ -1,6 +1,6 @@
 #include "global.h"
 
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u8 gUnk_0203B400[];
 struct P {
     u8 f[0x170];
@@ -13,8 +13,8 @@ void ActorPhase_OrbitParent(void);
 void Ivy_BeginChildRandomDelay(struct P *p)
 {
     u32 v;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    v = *(u16 *)(gUnk_0203B400 + gUnk_03005308 * 2);
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    v = *(u16 *)(gUnk_0203B400 + gRandomIndex * 2);
     p->a = (v & 0x40) + 0x1e;
     p->cb = ActorPhase_OrbitParent;
 }

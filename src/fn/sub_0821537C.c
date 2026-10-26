@@ -9,17 +9,17 @@ struct ObjGfxSlot {
     const void *src;
 };
 extern struct ObjGfxSlot gUnk_03001148[];
-extern s16 gUnk_030042D8;
-extern u16 gUnk_030042F0;
-extern s16 gUnk_030042F4;
+extern s16 gDynamicTileSum;
+extern u16 gQueuedObjSlotCount;
+extern s16 gStaticTileCount;
 void ObjGfx_LoadTiles(u32 start);
 
 void sub_0821537C(void)
 {
-    u32 dest = 0x06010000 + (gUnk_030042F4 * 32);
+    u32 dest = 0x06010000 + (gStaticTileCount * 32);
     struct ObjGfxSlot *slot = gUnk_03001148;
     s32 i;
-    s32 n = gUnk_030042F0;
+    s32 n = gQueuedObjSlotCount;
     if (n != 0) {
         vu32 *dmaRegs = (vu32 *)0x040000D4;
         u32 mode = 0x84000000;
@@ -35,10 +35,10 @@ void sub_0821537C(void)
         } while (--i != 0);
         asm(""
             :
-            : "r"(&gUnk_030042F0), "r"(&gUnk_030042F0), "r"(mode), "r"(dmaRegs), "r"(dmaRegs),
-              "r"(dmaRegs));
+            : "r"(&gQueuedObjSlotCount), "r"(&gQueuedObjSlotCount), "r"(mode), "r"(dmaRegs),
+              "r"(dmaRegs), "r"(dmaRegs));
     }
 
-    gUnk_030042F0 = 0;
-    ObjGfx_LoadTiles(gUnk_030042F4 + gUnk_030042D8);
+    gQueuedObjSlotCount = 0;
+    ObjGfx_LoadTiles(gStaticTileCount + gDynamicTileSum);
 }

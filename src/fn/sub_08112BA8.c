@@ -1,6 +1,7 @@
 #define SceneSlot_GetOrCreateRegistry ActorMarkerPool_EnsureSingleton
-#define gSceneSlotRegistry            gUnk_020004BC
+#define gSceneSlotRegistry            gPanelSpritePool
 #include "global.h"
+#include "ram.h"
 struct SceneSlot {
     u32 flags;
     u8 unknown4[0x38];
@@ -12,7 +13,6 @@ struct SceneSlotRegistry {
     u8 unknown0[0x34];
     struct SceneSlot slots[8];
 };
-extern struct SceneSlotRegistry *gUnk_020004BC;
 struct SceneSlotRegistry *ActorMarkerPool_EnsureSingleton(void);
 s32 SceneSlot_RegisterObject(void *object)
 {

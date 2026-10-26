@@ -1,11 +1,11 @@
 #include "global.h"
 #include "actor_graphics_and_basic_states.h"
 #include "contact_actor.h"
+#include "engine.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *);
 
 extern u8 *gUnk_02000580;
-extern u32 gUnk_030053F4;
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void Sound_PlaySongChecked(u32);
@@ -34,8 +34,6 @@ typedef struct {
 } Vec;
 
 void SceneActorGraphics_InitBodyNoOp(void);
-
-extern u32 gUnk_030053F4;
 
 void sub_08021F4C(u8 *, u8 *, u8 *);
 
@@ -146,8 +144,6 @@ end:
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-
-extern u32 gUnk_03005308;
 
 extern const u8 gUnk_08604DC4[], gUnk_08604DE4[], gUnk_08604E04[], gUnk_08604E24[];
 
@@ -876,7 +872,6 @@ struct VariantRecoveryActor {
     u8 pad3b0[9];
     u8 alternate;
 };
-extern u32 gUnk_030053F4;
 static inline u8 enterVariant(struct VariantRecoveryActor *p)
 {
     if (p->enter) {

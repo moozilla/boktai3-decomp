@@ -36,7 +36,7 @@ void BreakableProp_EmitBreakParticles(struct BreakableProp *prop)
     local.config.horizontalDecay = 255;
     local.config.horizontalDecayRange = 0;
     positionCache = &local.position.axes;
-    indexAddress = &gUnk_03005308;
+    indexAddress = &gRandomIndex;
     mask = 1023;
     range = 300;
     i = 5;

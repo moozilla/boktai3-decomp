@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 struct ActorPathPosition {
     s16 x, y, z, pad;
 };
@@ -13,7 +14,6 @@ struct PathPlayer {
     struct ActorPathPosition position;
 };
 extern struct PathPlayer *gUnk_02000580[];
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Nav_IsPositionInMesh(void *, struct ActorPathPosition *, struct ActorPathPosition *);
 void ProximityVolume_TranslateBounds(void *, struct ActorPathPosition *);
@@ -22,8 +22,8 @@ s32 ActorPosition_TestPath(struct ActorPathState *p, struct ActorPathPosition *d
 static inline u32 Random(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)gUnk_0203B400);
 }
 static inline void SetVec(struct ActorPathPosition *v, s16 x, s16 y, s16 z)

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 
 // confidence=low: clears actions and markers, emits defeat bursts, then selects recovery.
 
@@ -82,8 +83,8 @@ void ScenePool_ClampMotionSpeeds(struct Obj *);
 void Actor_ClampMovementSpeed(struct Obj *);
 void Glove_SetAnimationKeyframes(struct Glove *, s32);
 void ActorRecoil_UpdateMotion(struct Glove *);
-extern u32 gUnk_030053F4, gUnk_030053F0;
-extern u8 *gUnk_02000710, *gUnk_020004B4;
+extern u32 gEngineFlags, gUnk_030053F0;
+extern u8 *gUnk_020004B4;
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 void GameState_AddActionCount894(s32);
@@ -116,7 +117,7 @@ static inline void ClearFlags(u16 *p, s32 mask)
 }
 static inline u8 IsRecoveryEnabled(u32 mask)
 {
-    if (U32(gUnk_02000710, 0x868) & mask)
+    if (U32(gGameState, 0x868) & mask)
         return 1;
     return 0;
 }
@@ -206,7 +207,7 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
         CharacterModel_LoadSecondaryPalette(p->model, *style);
         {
             u32 mask = 0x800;
-            if ((gUnk_030053F4 | gUnk_030053F0) & mask) {
+            if ((gEngineFlags | gUnk_030053F0) & mask) {
                 u8 *peer = gUnk_020004B4;
                 if (peer) {
                     if (U8(peer, 0x53) != 1)
@@ -311,7 +312,7 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
         void (*callback)(void *);
         u32 zero;
         u32 mask = 0x800;
-        if (((gUnk_030053F4 | gUnk_030053F0) & mask) || IsRecoveryEnabled(0x100)) {
+        if (((gEngineFlags | gUnk_030053F0) & mask) || IsRecoveryEnabled(0x100)) {
             callback = (void (*)(void *))sub_08117F6C;
             zero = 0;
         } else {

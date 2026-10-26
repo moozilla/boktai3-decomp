@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 struct VecWords {
     u32 a, b;
 };
@@ -11,7 +12,6 @@ struct Panel {
     u8 pad592[0x5B2 - 0x592];
     s16 duration;
 };
-extern void *gUnk_02000260;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void AnimData_Load(void *, u32);
@@ -121,6 +121,6 @@ s32 ControlPanel_InitializeFromScript(u8 *input)
         *(s16 *)(p + 0x57E) = zero;
         *counter = zero;
     }
-    gUnk_02000260 = p;
+    gSegmentDisplay = p;
     return 0;
 }

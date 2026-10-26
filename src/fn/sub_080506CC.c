@@ -35,10 +35,10 @@ s32 CellGate_InitializeFromScript(struct CellGate *gate, u32 id)
         }
         z = coord->z >> 8;
     }
-    if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) || (((u32)z) >= gUnk_030052FC)) {
+    if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight)) {
         cell = 0;
     } else {
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     }
     gate->cell = cell;
     gate->height = ((struct ContactPosition *)&position)->y >> 8;

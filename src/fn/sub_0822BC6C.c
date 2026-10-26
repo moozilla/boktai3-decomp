@@ -1,6 +1,6 @@
 #include "global.h"
 extern void *gUnk_02000708;
-extern u32 *gUnk_02000710;
+extern u32 *gGameState;
 extern u32 gUnk_0200060C, gUnk_03005404;
 u32 Save_AlignSizeToEightBytes(u32);
 u32 Save_GetPrimaryRegionBlock(u32, u32), Save_GetMainStateSize(void);
@@ -11,9 +11,9 @@ u32 Save_ReadMainState(u32 arg)
     if (Save_ReadBlockWithRetries((u16)Save_GetPrimaryRegionBlock(arg, 0), gUnk_02000708, size) < 0)
         return 0;
     size = Save_AlignSizeToEightBytes(Save_GetMainStateSize());
-    if (Save_ReadBlockWithRetries((u16)Save_GetPrimaryRegionBlock(arg, 1), gUnk_02000710, size) < 0)
+    if (Save_ReadBlockWithRetries((u16)Save_GetPrimaryRegionBlock(arg, 1), gGameState, size) < 0)
         return 0;
-    if (*gUnk_02000710 != gUnk_0200060C)
+    if (*gGameState != gUnk_0200060C)
         return 0;
     return gUnk_03005404 = 1;
 }

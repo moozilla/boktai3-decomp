@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct FragmentActor {
     u8 unknown0[0x1c];
@@ -21,13 +22,12 @@ struct PackedVec {
     u32 w : 16;
 };
 
-extern struct FragmentPool *gUnk_02000190;
 void ScriptedColliderActor_Create(struct PackedVec *position, u32 variant, u32 a, u32 b, u32 c,
                                   u32 d);
 
 s32 sub_0812D58C(s16 *pos)
 {
-    struct FragmentPool *pool = gUnk_02000190;
+    struct FragmentPool *pool = gScriptedColliderManager;
     s32 i;
 
     if (pool == NULL)
@@ -42,7 +42,7 @@ s32 sub_0812D58C(s16 *pos)
 
 void sub_0812D5F0(void)
 {
-    struct FragmentPool *pool = gUnk_02000190;
+    struct FragmentPool *pool = gScriptedColliderManager;
     s32 i;
 
     if (pool != NULL) {

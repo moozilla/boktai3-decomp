@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_vec.h"
+#include "engine.h"
 struct FanSeq {
     const volatile u16 *commands;
     u8 flags, count, weight, duration;
@@ -62,7 +63,7 @@ struct DragonPuppyCombatView {
     (*(typeof(((struct DragonPuppyCombatView *)0)                                                  \
                   ->field) *)(p + (u32) & ((struct DragonPuppyCombatView *)0)->field))
 
-extern u32 gUnk_030053F0, gUnk_02000560, gUnk_03005308, gUnk_030053F4;
+extern u32 gUnk_030053F0, gUnk_02000560;
 void Sound_PlaySong(u32);
 void Collider_SetPosition(void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
@@ -72,12 +73,12 @@ void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void DragonPuppy_UpdateAttackWindup(void);
 static inline u32 Paused(u32 mask)
 {
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 static inline u32 RandomFrom(const u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    return table[gRandomIndex];
 }
 
 static inline void DragonPuppy_StepAnimation_UpdateCombat(u8 *p, void *sprite, struct FanSeq *s)

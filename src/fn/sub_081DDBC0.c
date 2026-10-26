@@ -1,5 +1,6 @@
 #include "global.h"
 #include "game_state.h"
+#include "ram.h"
 
 /* NameEntry_Update: per-frame task callback. State 0 handles the d-pad (with key repeat),
  * B (erase, or cancel on an empty name), SELECT (page toggle), START (jump to End) and A
@@ -21,7 +22,6 @@ struct NameEntryTask {
 };
 
 extern u16 gUnk_03005260[];
-extern u32 gUnk_02000328[];
 extern u8 gUnk_020005B4[];
 s32 Mod(s32, s32);
 void NameEntry_MoveCursorUp(struct NameEntryTask *);
@@ -81,7 +81,7 @@ void NameEntry_Update(struct NameEntryTask *p)
                     TextEntry_CopyInitialName(p, p->name);
                     p->position = 4;
                     if (p->slot)
-                        CpuSet(p->name, (u8 *)gUnk_02000710 + 0x790, 8);
+                        CpuSet(p->name, (u8 *)gGameState + 0x790, 8);
                     gUnk_020005B4[0] = p->position;
                     gUnk_020005B4[1] = p->selection;
                     gUnk_020005B4[p->slot + 2] = 0;
@@ -113,7 +113,7 @@ void NameEntry_Update(struct NameEntryTask *p)
                     if (p->selection == 0x56) {
                         s32 count = 0;
                         u8 *str = Text_LookupString(
-                            Script_ParseStringRef((const void *)gUnk_02000328[0]) + 0x54);
+                            Script_ParseStringRef((const void *)gNamePlaceholderScript[0]) + 0x54);
                         s32 i;
                         u8 *c;
                         for (i = 8, c = p->name + 8; i >= 0; c -= 2, i -= 2) {
@@ -127,7 +127,7 @@ void NameEntry_Update(struct NameEntryTask *p)
                         if (p->slot == 0)
                             CpuSet(p->name, PlayerName_GetBuffer(), 8);
                         else
-                            CpuSet(p->name, (u8 *)gUnk_02000710 + 0x790, 8);
+                            CpuSet(p->name, (u8 *)gGameState + 0x790, 8);
                         gUnk_020005B4[0] = p->position;
                         gUnk_020005B4[1] = p->selection;
                         Menu_StartFadeOut(p->fadeShift = 3);
@@ -158,16 +158,16 @@ void NameEntry_Update(struct NameEntryTask *p)
                 *(u32 *)((u8 *)p + 0xA8) |= 1;
                 *(u32 *)((u8 *)p + 0x20) |= 1;
                 if (p->result == 0) {
-                    Script_Call(gUnk_02000328[3], 0);
+                    Script_Call(gNamePlaceholderScript[3], 0);
                 } else {
-                    u32 v = gUnk_02000328[4];
+                    u32 v = gNamePlaceholderScript[4];
                     if (v == 0) {
-                        *(u16 *)((u8 *)gUnk_02000710 + 8) = v;
-                        *(u16 *)((u8 *)gUnk_02000710 + 0xA) = v;
-                        *(u16 *)((u8 *)gUnk_02000710 + 0xC) = v;
-                        *(u16 *)((u8 *)gUnk_02000710 + 0xE) = v;
+                        *(u16 *)((u8 *)gGameState + 8) = v;
+                        *(u16 *)((u8 *)gGameState + 0xA) = v;
+                        *(u16 *)((u8 *)gGameState + 0xC) = v;
+                        *(u16 *)((u8 *)gGameState + 0xE) = v;
                     }
-                    Script_Call(gUnk_02000328[2], 0);
+                    Script_Call(gNamePlaceholderScript[2], 0);
                 }
                 Task_Kill(p);
             }

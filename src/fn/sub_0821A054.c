@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct Task {
     struct Task *prev, *next;
     void (*update)(struct Task *), (*destroy)(struct Task *);
@@ -9,7 +10,6 @@ struct List {
     u32 mask;
 };
 extern struct List gUnk_03005280[14];
-extern u32 gUnk_0300523C;
 void Task_UnlinkFromPriorityList(struct Task *);
 void Heap_Free(struct Task *);
 void TaskSystem_RunFrame(void)
@@ -17,7 +17,7 @@ void TaskSystem_RunFrame(void)
     struct List *list = gUnk_03005280;
     s32 i;
     for (i = 0; i <= 13; i++, list++) {
-        if (!(gUnk_0300523C & list->mask)) {
+        if (!(gEnginePauseFlags & list->mask)) {
             struct Task *task = list->head;
             while (task) {
                 struct Task *following = task->next;

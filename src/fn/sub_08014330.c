@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 struct PGroup {
     u8 active, count, type, priority;
@@ -24,9 +25,6 @@ struct PEntry {
     u16 a, b;
     u16 c, d;
 };
-extern struct PMap *gUnk_030052F4;
-extern u32 gUnk_030052F8;
-extern u32 gUnk_030052FC;
 extern u32 gUnk_08604B90[];
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
@@ -61,17 +59,17 @@ void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
             s32 x = (s16) * (u16 *)(p + 0x28) >> 8;
             s32 y = (s16) * (u16 *)(p + 0x2c) >> 8;
             u32 t;
-            if (x < 0 || y < 0 || (u32)x >= gUnk_030052F8 || (u32)y >= gUnk_030052FC)
+            if (x < 0 || y < 0 || (u32)x >= gTerrainWidth || (u32)y >= gTerrainHeight)
                 t = 0xFFFF;
             else
-                t = gUnk_030052F4->rows[y] + x;
+                t = gTerrainMap->rows[y] + x;
             cell = (u16)t;
             if (cell != 0xFFFF) {
                 q = TerrainModifiers_FindCellOverride(cell, 1);
                 if (q)
                     q += 4;
                 else
-                    q = gUnk_030052F4->cells + 0xc + cell * 4;
+                    q = gTerrainMap->cells + 0xc + cell * 4;
                 if ((fl = *(u16 *)(q + 2)) & 0x20) {
                     v = 0xFFFF;
                     type = g->type;
@@ -80,7 +78,7 @@ void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
                     if (q)
                         q += 4;
                     else
-                        q = gUnk_030052F4->cells + 0xc + cell * 4;
+                        q = gTerrainMap->cells + 0xc + cell * 4;
                     v = (q[0] & 0xf) << 8;
                     type = g->type;
                 }

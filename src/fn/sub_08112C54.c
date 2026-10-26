@@ -1,9 +1,9 @@
 #include "global.h"
-extern u8 *gUnk_020004BC;
+#include "ram.h"
 void ActorMarkerPool_HideMarker(s32 i)
 {
     if (i >= 0) {
-        u8 *g = gUnk_020004BC;
+        u8 *g = gPanelSpritePool;
         if (g != 0) {
             s32 off = i * 0x60;
             u8 *q = g + 0x74;

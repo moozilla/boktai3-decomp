@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_020001A4;
+#include "ram.h"
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
 
@@ -24,5 +24,5 @@ u32 WoodenCrate_DestroyManager(u8 *p)
             Collider_Remove(e);
         }
     }
-    return gUnk_020001A4 = 0;
+    return gWoodenCrateManager = 0;
 }

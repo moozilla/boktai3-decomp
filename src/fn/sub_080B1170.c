@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
+#include "engine.h"
 
-#define gRandomIndex gUnk_03005308
 #define gRandomTable gUnk_0203B400
 struct SceneActorRandomReaction {
     u8 unknown0[0x690];
@@ -9,7 +9,6 @@ struct SceneActorRandomReaction {
     u8 unknown694[0x6d4 - 0x694];
     u16 flags;
 };
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 static inline u8 unavailable(struct SceneActorRegistryResetView *p)
 {
@@ -47,9 +46,9 @@ void SceneActor_TickRandomReaction(struct SceneActorRegistryResetView *p)
             context->timer--;
         } else {
             context->timer = context->period;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
+            gRandomIndex = (gRandomIndex + 1) & 0x3ff;
             {
-                s32 random = *(u8 *)&gUnk_0203B400[gUnk_03005308];
+                s32 random = *(u8 *)&gUnk_0203B400[gRandomIndex];
                 if (random > 0xbd) {
                     u32 behavior = 0x11;
                     p->state2A8 = 0;

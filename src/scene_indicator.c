@@ -101,10 +101,10 @@ int SceneIndicators_Update(struct SceneIndicators *m)
             SceneIndicator_Update(m, p);
     {
         int x = gUnk_02000580->x >> 8, y = gUnk_02000580->y >> 8, tile;
-        if (x < 0 || y < 0 || x >= gUnk_030052F8 || y >= gUnk_030052FC)
+        if (x < 0 || y < 0 || x >= gTerrainWidth || y >= gTerrainHeight)
             tile = 0;
         else
-            tile = gUnk_030052F4->rows[y] + x;
+            tile = gTerrainMap->rows[y] + x;
         m->tile = tile;
     }
     return 0;
@@ -168,10 +168,10 @@ int SceneIndicators_Initialize(struct SceneIndicators *m)
     }
     if (gUnk_02000580) {
         int x = gUnk_02000580->x >> 8, y = gUnk_02000580->y >> 8, tile;
-        if (x < 0 || y < 0 || x >= gUnk_030052F8 || y >= gUnk_030052FC)
+        if (x < 0 || y < 0 || x >= gTerrainWidth || y >= gTerrainHeight)
             tile = 0;
         else
-            tile = gUnk_030052F4->rows[y] + x;
+            tile = gTerrainMap->rows[y] + x;
         m->tile = tile;
     }
     return 0;
@@ -225,9 +225,9 @@ struct SceneIndicator *SceneIndicators_FindById(struct SceneIndicators *p, u32 k
 static inline int cellIndex(struct Vec *p)
 {
     int x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 static inline u8 *cell(int i)
@@ -235,7 +235,7 @@ static inline u8 *cell(int i)
     u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return p + 4;
-    return gUnk_030052F4->cells + 12 + i * 4;
+    return gTerrainMap->cells + 12 + i * 4;
 }
 
 // MATCHING_CONCESSION: register-pinning
@@ -358,10 +358,10 @@ int SceneIndicator_CreateFromScript(void)
         int z;
         x = (s16)raw >> 8;
         z = position->z >> 8;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             p->value = 0;
         else
-            p->value = gUnk_030052F4->rows[z] + x;
+            p->value = gTerrainMap->rows[z] + x;
     }
     p->active = 1;
     return 0;

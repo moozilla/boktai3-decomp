@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 struct FlickerMotion {
     u16 x, y;
@@ -18,7 +19,6 @@ struct HealthRestoreEffect {
     u8 unk_00[0x8C];
     struct FlickerParticle particles[8];
 };
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void FlickerParticle_UpdateMotion(struct FlickerParticle *);
@@ -43,7 +43,7 @@ void HealthRestoreEffect_StartParticleBurst(struct HealthRestoreEffect *effect)
 {
     const u16 *table = gUnk_0203B400;
     s32 i = 0;
-    u32 *index = &gUnk_03005308;
+    u32 *index = &gRandomIndex;
     u32 mask = 0x3FF;
     const s16 *sine = gUnk_086149C4;
     struct FlickerMotion *motion = &effect->particles[0].motion;

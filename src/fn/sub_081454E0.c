@@ -1,5 +1,6 @@
 #include "global.h"
 #include "player.h"
+#include "engine.h"
 
 void Sound_PlaySong(u32);
 s32 ActorVariant_GetTableValue(u32, s32);
@@ -10,7 +11,6 @@ u32 Player_ConsumeStateEntry(struct Player *);
 void WirelessGame_NotifyPlayerDefeated(void);
 void Player_AddControlFlags(struct Player *, u32);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, u8, u32, u32, u32, u32, u32);
-extern u32 gUnk_030053F4;
 void PlayerCue_EnterStandUpdate(void *);
 void PlayerCue_CompleteAction(void *);
 void Player_UpdateFacingSide(void *);
@@ -100,7 +100,7 @@ void Player_UpdateTerrainRecoil(struct Player *p)
             ActorSequence_Begin(p, 0x16, 0);
         } else if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x2A), 64, 1)) {
             Player_UpdateFacingSide(p);
-            if (p->positionResetTimer && !(gUnk_030053F4 & 0x1000)) {
+            if (p->positionResetTimer && !(gEngineFlags & 0x1000)) {
                 p->unk461[0] = 0;
                 ActorSequence_Begin(p, 0x15, 0);
             } else {

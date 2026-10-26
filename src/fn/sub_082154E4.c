@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct OamEntry {
     u32 attributes;
     u16 tile, depth;
@@ -10,8 +11,6 @@ struct Matrix {
 };
 extern struct OamEntry gUnk_03004390[], gUnk_030047A0[];
 extern struct Matrix gUnk_03004310[];
-extern s32 gUnk_0300479C, gUnk_03004798, gUnk_03004BA0;
-extern u16 gUnk_03004790[];
 extern s16 gUnk_086149C4[];
 extern u32 gUnk_03003A04;
 void CpuFastSet(const void *, void *, u32);
@@ -32,7 +31,7 @@ void SpriteOam_FinalizeQueue(void)
     CpuFastSet(&work.fill, work.heads, 0x1000040);
     {
         entry = gUnk_030047A0;
-        for (i = 0; i < gUnk_0300479C; i++) {
+        for (i = 0; i < gPendingOamCount; i++) {
             u32 depth = entry->depth;
             u8 *head = &work.heads[depth >> 8];
             entry->depth = depth | (*head);
@@ -42,14 +41,14 @@ void SpriteOam_FinalizeQueue(void)
     }
     {
         s32 sum;
-        sum = gUnk_03004798;
+        sum = gOamCount;
         for (i = 0; i < 4; i++) {
             base = gUnk_03004390;
             priorities[i] = sum;
-            sum += gUnk_03004790[i];
+            sum += gOamPriorityCounts[i];
         }
     }
-    count = gUnk_03004798;
+    count = gOamCount;
     for (i = 255; (i >= 0) && (count < 128); i--) {
         s32 index = work.heads[i];
         if (index != 255) {
@@ -78,9 +77,9 @@ void SpriteOam_FinalizeQueue(void)
         struct Matrix *matrix;
         entry = base;
         matrix = gUnk_03004310;
-        if (gUnk_03004BA0 > 31)
-            gUnk_03004BA0 = 32;
-        for (i = 0; i < gUnk_03004BA0; i++) {
+        if (gAffineRequestCount > 31)
+            gAffineRequestCount = 32;
+        for (i = 0; i < gAffineRequestCount; i++) {
             s32 angle;
             s32 sine, cosine, value;
             base = gUnk_086149C4;

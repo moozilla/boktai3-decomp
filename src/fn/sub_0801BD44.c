@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 typedef struct {
     u32 pad[2], flags;
     u8 unkC[0xe];
@@ -22,7 +23,6 @@ typedef struct {
     u8 unk1E[0xa];
 } Marker;
 extern u8 gUnk_0824DB28[];
-extern u8 *gUnk_030042E4;
 s32 Anim_LoadKeyframe(void *anim, void *data, u32 index, u32 mode);
 void Anim_SetKeyframes(void *anim, void *data, u32 index, u32 mode, u32 flags);
 void *AnimData_FindEntry(s32 id);
@@ -128,7 +128,7 @@ s32 sub_0801BD44(Ctx *p)
     Anim_LoadKeyframe(g, p->anim, 0xb8, 0);
     g->layer = layer1;
     g->flags &= ~1;
-    CpuSet(gUnk_030042E4 + 0x75a0, p->pal, 0x04000008);
+    CpuSet(gPaletteBankData + 0x75a0, p->pal, 0x04000008);
     g->unk3A = 0x8100;
     g->unk48 = p->unk84;
 

@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "engine.h"
 struct GlyphPosition {
     u16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -22,13 +23,12 @@ struct GlyphTrail {
     u8 pad78[4];
     struct GlyphSlot slots[4];
 };
-extern u32 gUnk_03005308;
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 static inline s32 RandomValue(const u16 *table)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return table[index];
 }
 static inline s32 Truncate(s32 value)

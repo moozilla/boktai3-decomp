@@ -1,8 +1,8 @@
 #include "global.h"
 
 #include "spark_particle.h"
+#include "engine.h"
 
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
@@ -11,8 +11,8 @@ u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 
 static inline u32 spark_0806A160_Random(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return gUnk_0203B400[gRandomIndex];
 }
 
 static inline s32 spark_0806A160_Spread(s32 range)

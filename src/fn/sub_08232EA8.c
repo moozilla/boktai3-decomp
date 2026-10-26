@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 void ScreenOrbitEffect_DestroySlot(void *, void *);
-extern u32 gUnk_02000098;
 u32 ScreenOrbitEffect_Destroy(u8 *s)
 {
     u8 *p = s + 0x20;
@@ -12,6 +12,6 @@ u32 ScreenOrbitEffect_Destroy(u8 *s)
         i--;
     } while (i >= 0);
     z = 0;
-    gUnk_02000098 = z;
+    gEffectQuad = z;
     return 0;
 }

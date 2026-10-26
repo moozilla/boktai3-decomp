@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct OrbConfig {
     u8 pad0[6];
     s8 angle;
@@ -41,7 +42,6 @@ struct OrbManager {
     u8 pad0[0x18];
     u32 mask;
 };
-extern struct OrbManager *gUnk_020005EC;
 extern const s16 gUnk_086149C4[];
 void SunOrb_GetOrCreateManager(void);
 u8 *SunOrb_FindFreeSlot(struct OrbManager *, s32 *);
@@ -62,7 +62,7 @@ static inline s32 scale(s32 value)
 // confidence=low: claims a free sun orb slot, copies the 0x20-byte config and starts it at pos.
 s32 SunOrb_CreateAtPosition(struct OrbConfig *cfg, struct Pos *pos)
 {
-    struct OrbManager *m = gUnk_020005EC;
+    struct OrbManager *m = gSlotController;
     s32 slot;
     struct Orb *o;
     struct OrbSprite *sa, *sb;

@@ -76,8 +76,8 @@ void SceneActorTerrain_ReadScriptParameters(void *);
 s32 SceneActorRegistry_LinkActor(void *);
 void *Region_FindContaining(void *);
 
-extern u8 *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
+extern u8 *gTerrainMap;
+extern u32 gTerrainWidth, gTerrainHeight;
 
 /* map cell index under a packed (x, y) position, or 0 when outside the map */
 static inline s32 b_cell(u16 px, u16 py)
@@ -85,8 +85,8 @@ static inline s32 b_cell(u16 px, u16 py)
     s32 x = (s8)(px >> 8);
     s32 y = (s8)(py >> 8);
 
-    if (x >= 0 && y >= 0 && (u32)x < gUnk_030052F8 && (u32)y < gUnk_030052FC)
-        return *(u16 *)(gUnk_030052F4 + 0x24 + y * 2) + x;
+    if (x >= 0 && y >= 0 && (u32)x < gTerrainWidth && (u32)y < gTerrainHeight)
+        return *(u16 *)(gTerrainMap + 0x24 + y * 2) + x;
     return 0;
 }
 
@@ -100,7 +100,7 @@ static inline s32 b_height(s32 cell, u8 *pos)
     if (cp != 0)
         cp += 4;
     else
-        cp = *(u8 **)(gUnk_030052F4 + 4) + (cell << 2) + 0xC;
+        cp = *(u8 **)(gTerrainMap + 4) + (cell << 2) + 0xC;
     kind = *cp >> 4;
     h = (*cp & 0xF) << 8;
     if (kind == 1)

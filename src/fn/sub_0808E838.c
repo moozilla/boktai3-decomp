@@ -54,8 +54,8 @@ void Slime_UpdateRandomWait(struct SceneActorRegistryResetView *actor)
     if (SceneActorReaction_TakePrepared(actor)) {
         u32 index;
         SelectAnimation((void *)actor, 15, 0);
-        index = (gUnk_03005308 + 1) & 1023;
-        gUnk_03005308 = index;
+        index = (gRandomIndex + 1) & 1023;
+        gRandomIndex = index;
         {
             u32 random = *(u16 *)(index * 2 + (u32)gUnk_0203B400);
             actor->field2C2 = random & 63;

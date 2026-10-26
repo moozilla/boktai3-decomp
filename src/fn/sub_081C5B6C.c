@@ -27,7 +27,7 @@ void sub_081C5B6C(u8 *p)
         Anim_LoadKeyframe(p + 0x78, source, (u16)(*(u32 *)(p + 0x2fc) + 0x50), 0);
         *(u16 *)(p + 0x112) = v = 0xD008;
         *(u8 **)(p + 0x120) = p + 0x2c0;
-        CpuSet(gUnk_030042E4 + 0x64E0, p + 0x2c0, 0x04000008);
+        CpuSet(gPaletteBankData + 0x64E0, p + 0x2c0, 0x04000008);
         *(u8 *)(p + 0x2e0) = zero;
     }
 }

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 struct Position {
     s16 x, y, z, pad;
@@ -7,7 +8,6 @@ struct Actor {
     u8 pad[0x1C];
     struct Position position;
 };
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
@@ -20,8 +20,8 @@ static inline s32 Scale(s32 x)
 }
 static inline u16 Rand(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     index *= 2;
     return *(const u16 *)((u32)gUnk_0203B400 + index);
 }

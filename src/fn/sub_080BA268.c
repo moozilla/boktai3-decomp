@@ -1,11 +1,11 @@
 #include "scene_actor_reset.h"
+#include "engine.h"
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void SceneActorReaction_ApplyThreshold(void);
 void Skeleton_InitializeCategoryProfile(void *);
 void Skeleton_InitVariantMotion(void *);
 void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
 void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 
@@ -31,8 +31,8 @@ static inline s32 Sub080BA268_Scale12(s32 x)
 }
 static inline u8 Sub080BA268_RandByte(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return ((const u8 *)gUnk_0203B400)[index * 2];
 }
 static inline void Sub080BA268_Polar(s32 angle, struct ContactPosition *v, s32 radius)

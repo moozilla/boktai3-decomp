@@ -1,10 +1,10 @@
 #include "global.h"
+#include "render.h"
 typedef struct {
     unsigned count : 16;
     unsigned reserved : 16;
     void *values;
 } Args;
-extern volatile u32 gUnk_0300523C;
 void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
 void Sound_PauseChannel10(int);
 void Script_Call(int, Args *);
@@ -28,7 +28,7 @@ int ResultTutorial_Close(u8 *p)
                 if (*(u16 *)(p + 0x7a0))
                     Script_Call(*(u16 *)(p + 0x7a0), &args);
                 {
-                    volatile u32 *flags = &gUnk_0300523C;
+                    volatile u32 *flags = &gEnginePauseFlags;
                     u32 mask;
                     mask = ~4;
                     *flags &= mask;

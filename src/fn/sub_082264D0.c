@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct S {
     u8 pad[0x1c];
     u16 f1c;
@@ -7,11 +8,10 @@ struct S {
     u16 f68;
     u16 f6a;
 };
-extern struct S *gUnk_03005420;
 void Camera_NotifyMoveComplete(struct S *);
 void Camera_FollowPlayer(s32 n)
 {
-    struct S *p = gUnk_03005420;
+    struct S *p = gActiveCamera;
     if (p) {
         if (n <= 1) {
             p->f1c = 0;

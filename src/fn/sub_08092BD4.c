@@ -13,7 +13,7 @@ static inline u8 *CellData(int i)
     u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return p + 4;
-    return gUnk_030052F4->cells + 12 + i * 4;
+    return gTerrainMap->cells + 12 + i * 4;
 }
 static inline void StepSequence(void *obj)
 {
@@ -159,10 +159,10 @@ void Bee_ResetRoute(struct SceneActorRegistryResetView *actor)
     actor->position = *source;
     {
         s32 x = source->x >> 8, z = source->z >> 8, index;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             index = 0;
         else
-            index = gUnk_030052F4->rows[z] + x;
+            index = gTerrainMap->rows[z] + x;
         actor->terrainCell = index;
         cellIndex = actor->terrainCell;
     }

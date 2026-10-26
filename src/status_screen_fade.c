@@ -1,4 +1,5 @@
 #include "status_screen.h"
+#include "engine.h"
 /* NumericOverlay_ClearActive: sets gUnk_02000048 (the live NumericOverlay pointer, per numeric_overlay.h) back to NULL; twin of NumericOverlay_Destroy in numeric_overlay.c */
 #define NumericOverlay_ClearActive sub_0800F4B8
 // MATCHING_CONCESSION: register-pinning
@@ -44,17 +45,17 @@ void StatusScreen_FadeAndExit(struct StatusScreen *p)
 void StatusScreen_WaitForStart(struct StatusScreen *p)
 {
     u32 mask = 256;
-    gUnk_03004BD8 &= ~mask;
+    gDispCntShadow &= ~mask;
     if (!StatusScreen_CheckConfirm(p)) {
         u32 old = p->delay;
         p->delay = old + 65535;
         asm("" : "+r"(old));
         if ((u16)old == 0) {
             {
-                register int flags asm("r1") = gUnk_03004BD8;
+                register int flags asm("r1") = gDispCntShadow;
                 {
                     int result = mask;
-                    gUnk_03004BD8 = result | flags;
+                    gDispCntShadow = result | flags;
                 }
             }
             {
@@ -142,12 +143,11 @@ void StatusScreen_FadeOutPalette(struct StatusScreen *p)
 }
 
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 static inline int StatusScreen_Random(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)gUnk_0203B400);
 }
 #ifdef NONMATCHING
@@ -233,7 +233,7 @@ int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
     u8 *map, *palette;
     gUnk_02000044 = p;
     {
-        u16 *flags = &gUnk_03004BD8;
+        u16 *flags = &gDispCntShadow;
         {
             int mask = ~256;
             mask &= *flags;

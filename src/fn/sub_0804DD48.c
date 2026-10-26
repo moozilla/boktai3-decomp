@@ -1,4 +1,5 @@
 #include "staged_effect.h"
+#include "game_state.h"
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
 void SceneMessages_RegisterReceiver(void *, u32, u32);
@@ -6,7 +7,6 @@ u32 StagedEffect_GetPaletteIndex(void);
 u32 Script_GetKeywordValue(u32, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
-extern u8 *gUnk_02000710;
 s32 StagedEffect_Initialize(struct StagedEffect *effect, u32 script)
 {
     s32 hide;
@@ -42,7 +42,7 @@ s32 StagedEffect_Initialize(struct StagedEffect *effect, u32 script)
         effect->position.axes.y = Script_GetValue();
         effect->position.axes.z = Script_GetValue();
     } else {
-        u8 *game = gUnk_02000710;
+        u8 *game = gGameState;
         effect->position.axes.x = *(u16 *)(game + 0x30);
         effect->position.axes.y = *(u16 *)(game + 0x32);
         effect->position.axes.z = *(u16 *)(game + 0x34);
@@ -93,7 +93,7 @@ s32 StagedEffect_Initialize(struct StagedEffect *effect, u32 script)
         sprite->renderMode = 1;
         i++;
     } while (i <= 4);
-    CpuSet(gUnk_030042E4 + 0x28D0, effect->blendedPalette, 0x4000008);
+    CpuSet(gPaletteBankData + 0x28D0, effect->blendedPalette, 0x4000008);
     effect->activePalette = effect->blendedPalette;
     effect->graphics.view.palette = effect->blendedPalette;
     return 0;

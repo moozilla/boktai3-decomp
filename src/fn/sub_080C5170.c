@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-#define gTerrainMap gUnk_030052F4
 
 struct ActorMotion {
     u8 pad0[0x682];

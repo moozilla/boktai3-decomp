@@ -1,6 +1,5 @@
-#define gTerrainMap       gUnk_030052F4
-#define gTerrainMapWidth  gUnk_030052F8
-#define gTerrainMapHeight gUnk_030052FC
+#define gTerrainMapWidth  gTerrainWidth
+#define gTerrainMapHeight gTerrainHeight
 #include "global.h"
 #include "engine.h"
 #include "scene_vec.h"
@@ -14,9 +13,9 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline s32 cellIndex(struct SceneVec *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 s32 Hresvelgr_HasAdjacentOverride(struct Hresvelgr *actor)
 {
@@ -26,7 +25,7 @@ s32 Hresvelgr_HasAdjacentOverride(struct Hresvelgr *actor)
         return 1;
     for (i = 0; i <= 2; i++) {
         s32 direction = actor->side + i;
-        s32 offset = gUnk_030052F4->neighborOffsets[direction & 3];
+        s32 offset = gTerrainMap->neighborOffsets[direction & 3];
         if (TerrainModifiers_FindCellOverride(cell + offset, 0))
             return 1;
     }

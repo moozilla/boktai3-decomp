@@ -1,9 +1,9 @@
 #include "contact_actor.h"
+#include "engine.h"
 
 // MATCHING_CONCESSION: register-pinning
 
 #define gRandomTable gUnk_0203B400
-#define gRandomIndex gUnk_03005308
 struct ProximityProjectileEmitter {
     u8 pad0[0x18];
     s32 frame;
@@ -13,7 +13,6 @@ struct ProximityProjectileEmitter {
     s16 disabled;
 };
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 void Combat_SpawnDirectionalProjectile(struct ProximityProjectileEmitter *, u8);
 void PinkSpine_RecordDefeat(struct ProximityProjectileEmitter *);
 struct SpriteEffectController *SpriteEffectController_Create(const struct ContactPosition *,
@@ -23,8 +22,8 @@ struct SpriteEffectController *SpriteEffectController_Create(const struct Contac
 static inline s32 randomValue(u32 table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)table);
 }
 static inline void copy(struct ContactPosition *d, const struct ContactPosition *s)

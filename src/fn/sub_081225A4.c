@@ -1,5 +1,5 @@
-#define gSpriteEffectPool gUnk_0200013C
 #include "global.h"
+#include "ram.h"
 struct SpriteEffectSlot {
     u8 sprite[0x90];
     u8 auxiliary[0x46];
@@ -11,7 +11,6 @@ struct SpriteEffectPool {
     u32 used;
     struct SpriteEffectSlot slots[8];
 };
-extern struct SpriteEffectPool *gUnk_0200013C;
 void Sprite_Remove(void *);
 void Shadow_Destroy(void *);
 static inline u8 IsUsed(struct SpriteEffectPool *p, u32 index)

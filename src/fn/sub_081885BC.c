@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 
 /* confidence=low: behavior 2 with the task-flag 4 set goes to 0x18, otherwise wait for 2 */
 
@@ -48,7 +49,6 @@ struct Sub081885BCTarget {
     s16 x, y, z;
 };
 
-extern void *gUnk_02000710;
 void ActorController_SetBehavior(void *, s32);
 void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);
@@ -90,7 +90,7 @@ static inline void sub_081885BC_Aim(struct Sub081885BCActor *p, s32 ax, s32 az, 
     struct Sub081885BCTarget *tgt;
     s32 dx, dz, dir;
 
-    tgt = (struct Sub081885BCTarget *)gUnk_02000710;
+    tgt = (struct Sub081885BCTarget *)gGameState;
     dx = tgt->x - p->x;
     dz = tgt->z - p->z;
     dir = (Math_Atan2(dx, dz) + 0x20) & 0xC0;
@@ -130,7 +130,7 @@ void sub_081885BC(void *arg0)
         p->behavior != 0x1C)
         return;
     {
-        struct Sub081885BCTarget *tgt = (struct Sub081885BCTarget *)gUnk_02000710;
+        struct Sub081885BCTarget *tgt = (struct Sub081885BCTarget *)gGameState;
         dx = tgt->x - p->x;
         dz = tgt->z - p->z;
     }

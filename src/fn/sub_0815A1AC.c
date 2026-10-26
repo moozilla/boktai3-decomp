@@ -1,11 +1,10 @@
 #include "global.h"
+#include "engine.h"
 struct SpawnOffset {
     u32 x : 16;
     u32 y : 16;
     u32 z : 16;
 };
-extern u32 gUnk_030053F4;
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 void Player_FlushQueuedEffects(u8 *);
 s32 EffectGroup_Spawn(void *, u32, u32, struct SpawnOffset *);
@@ -15,7 +14,7 @@ void sub_0815A1AC(u8 *p, u32 kind, s32 count)
 {
     struct SpawnOffset off;
     s32 i, spawned;
-    if (!(gUnk_030053F4 & 0x1000))
+    if (!(gEngineFlags & 0x1000))
         return;
     if (p[0x5bb] != 0) {
         u8 cur = p[0x5b9];
@@ -38,7 +37,7 @@ void sub_0815A1AC(u8 *p, u32 kind, s32 count)
         u32 *indexPtr;
         const u16 *table;
         table = gUnk_0203B400;
-        indexPtr = &gUnk_03005308;
+        indexPtr = &gRandomIndex;
         index = *indexPtr + 1;
         mask = 0x3ff;
         index &= mask;

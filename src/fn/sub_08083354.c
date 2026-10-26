@@ -59,8 +59,8 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
                 CpuSet(source, destination, control);
             }
         }
-        index = (gUnk_03005308 + 1) & 1023;
-        gUnk_03005308 = index;
+        index = (gRandomIndex + 1) & 1023;
+        gRandomIndex = index;
         index *= 2;
         {
             register const u16 *table asm("r3") = gUnk_0203B400;

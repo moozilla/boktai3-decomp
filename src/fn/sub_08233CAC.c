@@ -47,16 +47,16 @@ struct Cell {
 static inline s32 cellIndex(struct SceneVec *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline struct Cell *getCell(s32 index)
 {
     u8 *dynamic = TerrainModifiers_FindCellOverride(index, 1);
     if (dynamic)
         return (struct Cell *)(dynamic + 4);
-    return (struct Cell *)(gUnk_030052F4->cells + 12 + index * 4);
+    return (struct Cell *)(gTerrainMap->cells + 12 + index * 4);
 }
 static inline u8 LinkLevel(s32 player)
 {
@@ -68,10 +68,10 @@ void sub_08233CAC(struct SolarBomb *p)
 {
     s32 level;
     u16 cellFlags;
-    if (gUnk_030053F4 & 0x800)
+    if (gEngineFlags & 0x800)
         level = LinkLevel(p->owner->player);
     else
-        level = gUnk_02000710->unk876;
+        level = gGameState->unk876;
     if (p->timer) {
         if (p->primed)
             p->timer--;
@@ -120,7 +120,7 @@ void sub_08233CAC(struct SolarBomb *p)
         s32 i;
         if (p->primed)
             damage = 0x7D;
-        else if (gUnk_030053F4 & 0x800)
+        else if (gEngineFlags & 0x800)
             damage = p->owner->power * 3 + level * 10;
         else
             damage = Div(p->owner->power, 10) * level;

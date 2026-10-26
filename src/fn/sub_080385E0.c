@@ -1,4 +1,6 @@
 #include "global.h"
+#include "game_state.h"
+#include "ram.h"
 // Tentative menu/save views; field offsets are observed in this controller.
 struct TradeMenu {
     u8 pad0[0x24];
@@ -14,12 +16,10 @@ struct TradeSave {
     u8 pad54[0x14];
     s16 leftRows[16], rightRows[16];
 };
-extern struct TradeSave *gUnk_02000710;
-extern u32 gUnk_03003A50;
 extern u16 gUnk_03005260[];
 void WirelessGameMenu_ConsumeSelectedItem(struct TradeMenu *p)
 {
-    struct TradeSave *save = gUnk_02000710;
+    struct TradeSave *save = gGameState;
     s16 *selected = &save->leftSelected;
     int row;
     int item;

@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u8 gUnk_0203B400[];
 extern u8 *gUnk_02000580;
 u32 Callback_InvokeActor(u8 *, void *);
@@ -33,9 +33,9 @@ void Actor_OnTrackingAction(u8 *p, u32 tick)
     Actor_StepFacingAngle(p);
     Actor_SetFacingAnimationEntry(p, 1, 0, 1, 0, 0);
     if ((tick & 3) == 0) {
-        gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
+        gRandomIndex = (gRandomIndex + 1) & 0x3ff;
         {
-            s32 random = *(u8 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
+            s32 random = *(u8 *)((gRandomIndex << 1) + (u32)gUnk_0203B400);
             if (random <= 63) {
                 MotionPool_InitializeParams(buf);
                 MotionPool_SetLifetimeAndVelocity(buf, 0, 0xf0, p[9] + 0x80, 12);

@@ -11,7 +11,7 @@ struct EntryMenu {
 };
 extern u16 gUnk_03005260[];
 extern u32 gUnk_02000358[];
-extern u8 *gUnk_02000710, *gUnk_030053F8;
+extern u8 *gGameState, *gUnk_030053F8;
 void Password_MoveCursorUp(void *);
 void Password_MoveCursorDown(void *);
 void Password_MoveCursorRight(void *);
@@ -127,7 +127,7 @@ void Password_UpdateEntryMenu(struct EntryMenu *p)
             }
             if (code == 0) {
                 Sound_PlaySong(0x296);
-                playerValue = *(s16 *)(gUnk_02000710 + 0xA);
+                playerValue = *(s16 *)(gGameState + 0xA);
                 *(s32 *)(gUnk_030053F8 + 0x18) = playerValue;
                 Menu_StartFadeOut(p->fadeShift);
                 p->result = 1;

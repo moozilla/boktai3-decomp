@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 // The do/while(0) around `delay` raises its allocation weight (loop depth).
 struct ScheduledCollider {
@@ -16,7 +17,7 @@ struct ColliderScheduler {
     u32 unknown8;
     s32 count;
 };
-extern u32 gUnk_030053F4, gUnk_030053F0;
+extern u32 gUnk_030053F0;
 s32 Div(s32, s32);
 void Collider_ScheduleUpdates(void *unused, struct ColliderScheduler *scheduler)
 {
@@ -24,7 +25,7 @@ void Collider_ScheduleUpdates(void *unused, struct ColliderScheduler *scheduler)
     s32 enabled, quota, count, divisor, delay;
     u32 one;
     u32 mask = 0x800;
-    if ((gUnk_030053F4 | gUnk_030053F0) & mask)
+    if ((gEngineFlags | gUnk_030053F0) & mask)
         return;
     count = scheduler->count;
     if (count <= 0)

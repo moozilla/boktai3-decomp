@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_particle_burst.h"
+#include "engine.h"
 // confidence=low: spawns pooled particles with optional velocity ranges and position jitter.
 #define SceneParticleBurst_CreateWithRanges sub_08067E3C
 extern struct SceneParticleBurstPool *gUnk_02000130;
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 struct SceneParticleBurstPool *SceneParticleBurst_EnsureSingleton(u32, u32);
 struct SceneParticleBurstSlot *SceneParticleBurst_AllocateSlot(struct SceneParticleBurstPool *);
@@ -12,12 +12,12 @@ void ParticleSprite_Initialize(void *, const void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 static inline u32 Random(const u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return table[gRandomIndex];
 }
 static inline u8 SceneHasFlag(u32 mask)
 {
-    if (*(u32 *)((u8 *)gUnk_02000710 + 0x868) & mask)
+    if (*(u32 *)((u8 *)gGameState + 0x868) & mask)
         return 1;
     return 0;
 }

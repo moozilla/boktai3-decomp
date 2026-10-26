@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_vec.h"
+#include "engine.h"
 
 struct PoisonHandSprite {
     u32 flags;
@@ -56,7 +57,7 @@ struct PoisonHand {
 struct ParticleParameters {
     u32 words[14];
 };
-extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560, gUnk_03005308;
+extern u32 gUnk_030053F0, gUnk_02000560;
 extern u8 gUnk_0203B000[];
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
@@ -86,8 +87,8 @@ static inline u32 TestFlag(u32 mask, u32 *p)
 static inline u32 RandomFrom(const u16 *table)
 {
     table += 512;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    return table[gRandomIndex];
 }
 static inline u32 RandomValue(void)
 {
@@ -171,7 +172,7 @@ static inline void StepAnimation(struct PoisonHand *p, struct PoisonHandSprite *
 s32 PoisonHand_Update(struct PoisonHand *p)
 {
     struct PoisonHandCollider *collider;
-    if (TestPair(0x400, &gUnk_030053F4, &gUnk_030053F0) || TestFlag(4, &gUnk_02000560))
+    if (TestPair(0x400, &gEngineFlags, &gUnk_030053F0) || TestFlag(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, p->update);
     p->sprite.flags &= ~1;

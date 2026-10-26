@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "render.h"
 
 struct AnimData081979B4 {
     u8 pad0[6];
@@ -25,7 +26,6 @@ struct Task081979B4 {
     u8 pad22[2];
     u8 *tiles;
 };
-extern u8 *gUnk_030042E4;
 
 void PaletteEffect_ApplyBufferedPalette(struct Task081979B4 *t, s32 frame)
 {

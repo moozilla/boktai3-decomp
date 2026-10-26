@@ -4,7 +4,6 @@
 #include "game_state.h"
 #include "player.h"
 
-extern u32 gUnk_030052F8, gUnk_030052FC;
 struct LinkRef {
     u8 unk0[0x18];
     s16 bit;
@@ -66,17 +65,17 @@ s32 Player_ApplyTerrainDamage(struct Player *p)
     u8 *data;
     u32 flash;
 
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
+        data = gTerrainMap->cells + (cell * 4 + 12);
     if (FlagSet(*(u16 *)(data + 2), 0x40) && p->tetherStatusFlags == 0) {
-        if (FlagTest(0x4000, &gUnk_02000710->flags868))
+        if (FlagTest(0x4000, &gGameState->flags868))
             Player_SetTetherMode(p, 0x22, 0);
         else
             Player_SetTetherMode(p, 0x21, 0);

@@ -1,8 +1,8 @@
 #include "contact_actor.h"
+#include "engine.h"
 
 // confidence=low: spawns one trail particle at the position with a random heading and speed.
 
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 u32 SceneMovingParticle_CreateWithOptions(void *, void *, s32, s32, s32);
@@ -22,7 +22,7 @@ void SceneActorAnimation_SpawnTrailAtPosition(void *arg0, u32 arg1)
 {
     s16 velocity[3];
     s16 *v = velocity;
-    u32 *cursor = &gUnk_03005308;
+    u32 *cursor = &gRandomIndex;
     u32 index;
     u32 mask;
     s32 angle;

@@ -8,7 +8,7 @@
 #define H(n) (*(u16 *)(p + (n)))
 #define S(n) (*(s16 *)(p + (n)))
 #define W(n) (*(u32 *)(p + (n)))
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern const s16 gUnk_086149C4[];
 s32 Player_ConsumeStateEntry(void *);
 void ActorSequence_Begin(void *, s32, s32);
@@ -60,7 +60,7 @@ static inline u32 FlagMovement(u8 *p)
 }
 static inline u32 GlobalMask(u32 mask)
 {
-    return *(u32 *)(gUnk_02000710 + 0x868) & mask;
+    return *(u32 *)(gGameState + 0x868) & mask;
 }
 static inline u8 HasGlobalFlag(void)
 {

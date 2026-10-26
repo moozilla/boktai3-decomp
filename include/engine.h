@@ -11,6 +11,7 @@
 
 #include "global.h"
 #include "game_state.h"
+#include "render.h"
 
 /* ---- Globals ---------------------------------------------------------- */
 
@@ -25,7 +26,7 @@ struct Task {
 
 struct TaskList {
     struct Task *head;
-    u32 pauseMask; /* list is skipped while (gUnk_0300523C & pauseMask) */
+    u32 pauseMask; /* list is skipped while (gEnginePauseFlags & pauseMask) */
 };
 
 struct HeapBlock {
@@ -64,18 +65,15 @@ struct EngineMap {
     void *trapTops[64];
 };
 
-extern u32 gUnk_0300523C; /* engine pause/suspend flags (bits 1-2: sound off; list masks) */
-extern u16 gUnk_03005240; /* next Task id */
+extern u16 gUnk_03005240;                 /* next Task id */
 extern struct TaskList gUnk_03005280[14]; /* task lists by priority */
 extern struct HeapBlock gUnk_02000714;    /* head of the general heap (Heap_Alloc/Heap_Free) */
-extern struct GameState *gUnk_02000710;   /* main game-state block, see game_state.h */
-extern struct EngineMap *gUnk_030052F4;   /* current terrain map */
-extern u32 gUnk_030052F8, gUnk_030052FC;  /* terrain map width, height (cells) */
-extern u32 gUnk_03005308;                 /* index (0..1023) into the random table */
+extern struct EngineMap *gTerrainMap;     /* current terrain map */
+extern u32 gTerrainWidth, gTerrainHeight; /* terrain map width, height (cells) */
+extern u32 gRandomIndex;                  /* index (0..1023) into the random table */
 extern const u16 gUnk_0203B400[];         /* 1024 entry random table (guess) */
 extern const s16 gUnk_086149C4[];         /* sine table (guess) */
-extern u32 gUnk_030053F4; /* more engine flags (bit 10 mutes Sound_PlaySongChecked; guess) */
-extern u8 *gUnk_030042E4; /* 16-color palette banks used by AnimData_SelectPaletteBank */
+extern u32 gEngineFlags; /* more engine flags (bit 10 mutes Sound_PlaySongChecked; guess) */
 
 /* ---- Tasks and memory -------------------------------------------------- */
 
@@ -141,7 +139,7 @@ void Sprite_Init(void *sprite, void *animData,
 
 void AnimData_SelectPaletteBank(
     void *animData,
-    s32 index); /* select a 32-byte bank of sixteen RGB15 colors from gUnk_030042E4 */
+    s32 index); /* select a 32-byte bank of sixteen RGB15 colors from gPaletteBankData */
 
 s32 AnimData_Load(
     void *animData,

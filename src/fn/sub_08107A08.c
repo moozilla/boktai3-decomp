@@ -2,7 +2,7 @@
 #include "global.h"
 #include "display_animation.h"
 #include "scene_vec.h"
-#define gTileTriggerManager gUnk_020001B8
+#include "ram.h"
 struct TileTriggerManager {
     u8 unknown0[0x18];
     void *animationData;
@@ -21,7 +21,6 @@ struct TileTrigger {
     u8 forced, frame;
     s32 timer;
 };
-extern struct TileTriggerManager *gUnk_020001B8;
 void sub_08106E98(struct TileTrigger *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);

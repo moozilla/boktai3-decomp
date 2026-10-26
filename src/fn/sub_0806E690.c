@@ -26,7 +26,7 @@ haveSteps:
         limit = -(u32)steps;
         beyond = row + 1;
         {
-            struct EngineMap **base = &gUnk_030052F4;
+            struct EngineMap **base = &gTerrainMap;
             location = base;
         }
         if (count <= limit) {
@@ -60,7 +60,7 @@ haveSteps:
         register s32 before asm("r3");
         count = 1;
         before = row - 1;
-        location = &gUnk_030052F4;
+        location = &gTerrainMap;
         if (count <= steps) {
             register s32 next asm("r0") = row + 1;
             if (next <= 9) {

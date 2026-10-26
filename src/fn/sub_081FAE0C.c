@@ -2,6 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "scene_vec.h"
+#include "render.h"
 
 void SceneActors_Register(void *, s32);
 void SceneActors_Initialize(void *, void *, s32, void *, s32);
@@ -28,8 +29,6 @@ void *SunOrb_GetOrCreateManager(void);
 void *Ratatosk_CreateAnimatedParticlePool(void);
 void *Ratatosk_CreateParticlePool(void);
 s32 Mod(s32, s32);
-extern u8 *gUnk_030042E4;
-extern u32 gUnk_03005308;
 extern void *gUnknown_02000580;
 
 #define H8(off)  (*(u8 *)(a + (off)))
@@ -259,16 +258,16 @@ s32 sub_081FAE0C(void *arg0, void *arg1)
     Ratatosk_InitWideBodyCollider(a, zero);
     Ratatosk_InitOuterCollider(a);
 
-    base = gUnk_030042E4;
+    base = gPaletteBankData;
     for (i = 0; i < 16; i++) {
         CpuSet(base + 0x3E40 + i * 0x20, a + 0x4B8 + i * 0x20, 0x4000008);
     }
-    base = gUnk_030042E4;
+    base = gPaletteBankData;
     for (i = 0; i < 16; i++) {
         CpuSet(base + 0x3E40 + i * 0x20, a + 0x6B8 + i * 0x20, 0x4000008);
     }
     H16(0x6C2) = 0x1F;
-    base = gUnk_030042E4;
+    base = gPaletteBankData;
     for (i = 0; i < 16; i++) {
         CpuSet(base + 0x3240, a + 0x8B8 + i * 0x20, 0x4000008);
     }
@@ -312,7 +311,7 @@ s32 sub_081FAE0C(void *arg0, void *arg1)
     H16(0xE6C) = 0x80;
     H32(0xEF0) = 2;
 
-    zc = &gUnk_03005308;
+    zc = &gRandomIndex;
     *zc = (*zc + 1) & 0x3FF;
     k = Mod(gUnk_0203B400[*zc], 9);
     H32(0xE5C) = H32(0xCCC + k * 8);

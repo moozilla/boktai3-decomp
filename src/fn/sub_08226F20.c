@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -35,14 +36,13 @@ struct CameraState {
     u8 unknown8[10];
     s16 facing;
 };
-extern struct Player *gUnk_02000710;
 extern struct CameraState gUnk_030042A0;
 struct Body *SceneBody_GetById(u32);
 s32 Div(s32, s32);
 void Camera_NotifyMoveComplete(struct Camera *);
 void Camera_UpdatePositionMode(struct Camera *camera)
 {
-    struct Player *player = gUnk_02000710;
+    struct Player *player = gGameState;
     struct PackedVec target;
     struct Body *body;
     target.x = player->x + camera->offsetX;

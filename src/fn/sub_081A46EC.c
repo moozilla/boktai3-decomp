@@ -1,10 +1,10 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 f[4];
     u8 a;
     u8 g[0x5c - 5];
 };
-extern u32 gUnk_02000240;
 void Sprite_Remove(void *);
 void Hresvelgr_DestroyEffectPool(u8 *p)
 {
@@ -16,5 +16,5 @@ void Hresvelgr_DestroyEffectPool(u8 *p)
         e++;
         i--;
     } while (i >= 0);
-    gUnk_02000240 = 0;
+    gMotionEntryManager = 0;
 }

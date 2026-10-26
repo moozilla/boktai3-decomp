@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_0200016C;
+#include "ram.h"
 
 void DirectionalProjectile_ResetPool(void)
 {
-    gUnk_0200016C = 0;
+    gMovingSpritePool = 0;
 }

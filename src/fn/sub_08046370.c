@@ -42,7 +42,7 @@ void ContactSequenceActor_Update(struct ContactSequenceOwner *parent,
         if (!actor->flash) {
             actor->sprite.position = actor->position;
         } else {
-            u32 index = (gUnk_03005308 + 1) & 1023;
+            u32 index = (gRandomIndex + 1) & 1023;
             u32 direction;
             register u32 amplitude asm("r6");
             struct ContactPosition *offset;
@@ -52,7 +52,7 @@ void ContactSequenceActor_Update(struct ContactSequenceOwner *parent,
             const s16 *sine;
             register s32 x asm("r2");
             s32 value;
-            gUnk_03005308 = index;
+            gRandomIndex = index;
             sample = (const u8 *)RANDOM_TABLE_ADDR + index * 2;
             angleMask = 255;
             flash = actor->flash;

@@ -62,8 +62,8 @@ void TentacleActor_ReactToContact(struct SceneActorBehaviorContactView *source,
                 goto store;
             }
             if (!difference.x && !difference.z) {
-                gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-                direction = *(const u16 *)(gUnk_03005308 * 2 + table);
+                gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+                direction = *(const u16 *)(gRandomIndex * 2 + table);
             store:
                 FIELD(self, 0x108, u8) = direction;
             } else {

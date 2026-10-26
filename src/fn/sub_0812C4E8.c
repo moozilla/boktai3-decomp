@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+#include "engine.h"
 struct Fragment {
     u32 flags;
     u8 active, unknown5[3];
@@ -30,7 +31,6 @@ struct Pool {
     u32 used;
 };
 extern const s16 gUnk_086149C4[];
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 s32 Div(s32, s32);

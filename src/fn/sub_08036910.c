@@ -34,6 +34,7 @@ void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
+#include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -49,9 +50,8 @@ int Wireless_InitControllerFromScript(struct Engine *);
 void Task_SetCallbacks(void *, int, int);
 void Task_LinkToPriorityList(void *);
 void Heap_Free(void *);
-extern u32 gUnk_03005308, gUnk_0300546C;
+extern u32 gRandomIndex, gUnk_0300546C;
 extern const u16 gUnk_0203B400[];
-extern u8 gUnk_03003A50;
 struct Engine *Wireless_CreateController(void)
 {
     struct Engine **singleton = &gUnk_02000484;
@@ -70,7 +70,7 @@ struct Engine *Wireless_CreateController(void)
     Memory_Clear(p, size);
     random = SunClock_GetSecond();
     {
-        u32 *position = &gUnk_03005308;
+        u32 *position = &gRandomIndex;
         u32 index = *position + 1;
         u32 mask = 1023;
         const u16 *table;
@@ -84,7 +84,7 @@ struct Engine *Wireless_CreateController(void)
         index <<= 1;
         table = gUnk_0203B400;
         term = *(const u16 *)(index + (u32)table);
-        saltAddress = &gUnk_03003A50;
+        saltAddress = &gSceneEffectPalettePhase;
         byteMask = 255;
         salt = *saltAddress;
         random += term;

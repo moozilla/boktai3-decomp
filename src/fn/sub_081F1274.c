@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 #define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
 struct Slot7PackedPosition {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -8,8 +9,7 @@ extern void *gUnk_020004B8;
 extern u8 *gUnk_020004F0;
 extern u8 gUnk_03004FC0[];
 extern u8 gUnk_03005040[];
-extern u8 *gUnk_030042E4;
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 void Collider_SetFixedPositionWithYOffset(void *, void *, s32);
 void SpatialIndex_InsertEntry(void *);
@@ -42,8 +42,8 @@ static inline u8 IsSceneHidden(void)
 }
 static inline u32 Random(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return gUnk_0203B400[gRandomIndex];
 }
 static inline void CopyFourPalettes(u8 *source, u8 *dest)
 {
@@ -84,13 +84,13 @@ static inline void InterpolatePalettes(u8 *actor)
     if (count < limit) {
         s32 i;
         FIELD(actor, 0x5A8, u32) = ++count;
-        Palette_InterpolateBanks(actor + 0x3C8, gUnk_030042E4 + FIELD(actor, 0x5F4, u32) * 32,
-                                 gUnk_030042E4 + FIELD(actor, 0x5F8, u32) * 32, count, shift);
+        Palette_InterpolateBanks(actor + 0x3C8, gPaletteBankData + FIELD(actor, 0x5F4, u32) * 32,
+                                 gPaletteBankData + FIELD(actor, 0x5F8, u32) * 32, count, shift);
         FIELD(actor, 0x35C, void *) = actor + 0x3C8;
         Anim_SetDurationScale(actor + 0x2EC,
                               (u16)(Div(count * 192, 1 << FIELD(actor, 0x5AC, u32)) + 64));
-        Palette_InterpolateBanks(actor + 0x3E8, gUnk_030042E4 + FIELD(actor, 0x600, u32) * 32,
-                                 gUnk_030042E4 + FIELD(actor, 0x604, u32) * 32,
+        Palette_InterpolateBanks(actor + 0x3E8, gPaletteBankData + FIELD(actor, 0x600, u32) * 32,
+                                 gPaletteBankData + FIELD(actor, 0x604, u32) * 32,
                                  FIELD(actor, 0x5A8, u32), FIELD(actor, 0x5AC, u32));
         FIELD(actor, 0x378, void *) = actor + 0x3E8;
         for (i = 0; i <= 3; ++i)
@@ -118,7 +118,7 @@ static inline void EmitDepartureParticle(u8 *actor, u32 zero)
     u8 params[0x34];
     struct Slot7PackedPosition position;
     s32 dx, dz;
-    u32 index = (gUnk_03005308 + 1) & 1023;
+    u32 index = (gRandomIndex + 1) & 1023;
     position.x = (gUnk_0203B400[index] & 15) + FIELD(actor, 0x5D8, u16) - 8;
     index = (index + 1) & 1023;
     position.y = (gUnk_0203B400[index] & 7) + FIELD(actor, 0x5DA, u16) - 12;
@@ -126,7 +126,7 @@ static inline void EmitDepartureParticle(u8 *actor, u32 zero)
     index = (index + 1) & 1023;
     dx = ((gUnk_0203B400[index] & 15) - 8) << 10;
     index = (index + 1) & 1023;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     dz = -(s32)((gUnk_0203B400[index] & 7) << 10);
     SpriteParticle_InitParams(params);
     SpriteParticle_SetMotionParams(params, 0, (Random() & 15) + 0x34, 0, zero);
@@ -145,10 +145,10 @@ static inline void EmitDepartureParticle(u8 *actor, u32 zero)
             SpriteParticle_SetAnimationTrack(params, 0x31F4, 8);
         }
     } else {
-        index = (gUnk_03005308 + 1) & 1023;
+        index = (gRandomIndex + 1) & 1023;
         position.x = (gUnk_0203B400[index] & 15) + FIELD(actor, 0x324, u16) - 8;
         index = (index + 1) & 1023;
-        gUnk_03005308 = index;
+        gRandomIndex = index;
         position.y = (gUnk_0203B400[index] & 7) + FIELD(actor, 0x326, u16);
         position.z = 100;
         SpriteParticle_SetMotionParams(params, 0, 42, 0, zero);

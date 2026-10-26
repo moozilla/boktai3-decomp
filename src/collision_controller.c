@@ -115,9 +115,9 @@ static inline void resetIdle(struct CollisionManager *manager)
 
 static inline u32 randomDelay(u32 restart)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
     {
-        u32 offset = gUnk_03005308 * 2;
+        u32 offset = gRandomIndex * 2;
         u32 value;
         if (restart) {
             register u16 *table asm("r2") = gUnk_0203B400;
@@ -350,7 +350,7 @@ s32 CollisionController_UpdateAll(struct CollisionManager *input)
     s32 available;
     if ((u8)(mode - 4) <= 1 || mode == 0)
         goto pause;
-    if (gUnk_030053F4 & 2048)
+    if (gEngineFlags & 2048)
         available = stateMode();
     else {
         struct Player *actor;
@@ -418,7 +418,7 @@ s32 CollisionController_InitManager(struct CollisionManager *manager, void *owne
     if ((((u8)(mode - 4)) <= 1) || (mode == 0)) {
         goto pause;
     }
-    if (gUnk_030053F4 & 2048) {
+    if (gEngineFlags & 2048) {
         *(&available) = stateMode();
     } else {
         struct Player *actor;

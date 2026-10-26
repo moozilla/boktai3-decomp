@@ -3,7 +3,7 @@ s32 TerrainEdgeMarker_UpdateVisibility(struct TerrainMarkerManager *manager)
 {
     u32 visible = 0;
     u32 mode = manager->mode;
-    if (mode == 0 && gUnk_02000710->unk14 != 0) {
+    if (mode == 0 && gGameState->unk14 != 0) {
         if (manager->blinkFrame <= 47)
             visible = 1;
         manager->blinkFrame++;

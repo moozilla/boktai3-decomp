@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 /* Coordinates wrap at 16 bits when particle offsets are added. */
 struct FanVector {
     u16 x, y, z, pad;
@@ -19,7 +20,6 @@ struct FanCannon {
 struct ParticleParameters {
     u32 data[14];
 };
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
@@ -31,13 +31,13 @@ void EnemyParticle_Emit(void *, void *);
 
 static inline u32 RandomFrom(const u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    return table[gRandomIndex];
 }
 static inline const u16 *RandomAddress(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    return (const u16 *)RANDOM_TABLE_ADDR + gUnk_03005308;
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    return (const u16 *)RANDOM_TABLE_ADDR + gRandomIndex;
 }
 static inline s32 RandomRange(s32 range)
 {

@@ -1,7 +1,7 @@
 #define SpritePairPool_Create       FollowingSpriteEffect_EnsureManager
 #define SpritePairEntry_SetCallback FollowingSpriteEffect_SetStateCallback
-#define gSpritePairPool             gUnk_020004D4
 #include "global.h"
+#include "ram.h"
 struct SpritePairEntry {
     u8 pad0[0x44];
     u8 animData[0x1c];
@@ -31,7 +31,6 @@ struct SpritePairPool {
 struct SpritePairParams {
     u16 unk0, duration, unk4, value;
 };
-extern struct SpritePairPool *gUnk_020004D4;
 struct SpritePairPool *FollowingSpriteEffect_EnsureManager(void);
 u8 SpritePairPool_TestUnavailable(struct SpritePairPool *, u32, s32);
 void SpritePairEntry_CreateEffect(struct SpritePairEntry *, void (*)(void), u32, u32);
@@ -54,12 +53,12 @@ s32 SpritePairPool_StartEntry(void *position, u32 *height, u32 unused,
     struct SpritePairPool *pool;
     s32 i;
     u32 key;
-    if (!gUnk_020004D4) {
+    if (!gSpritePairPool) {
         pool = FollowingSpriteEffect_EnsureManager();
         if (!pool)
             return -1;
     } else
-        pool = gUnk_020004D4;
+        pool = gSpritePairPool;
     key = pool->counter;
     key = SpritePairPool_MakeKey(key, id);
     if (SpritePairPool_TestUnavailable(pool, key, 1))

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct HudPanel {
     u8 pad0[0x428];
     u16 a, b;
@@ -7,7 +8,6 @@ struct Hud {
     u8 pad0[0xA40];
     struct HudPanel *panel;
 };
-extern struct Hud *gUnk_02000214; /* field HUD/menu manager */
 void Hud_DrawHealthLabel(struct Hud *, s32, s32);
 void Hud_DrawHealthMeter(struct Hud *, s32, s32, s32, s32);
 void Hud_DrawEnergyLabel(struct Hud *, s32, s32);
@@ -17,7 +17,7 @@ void sub_08164480(struct Hud *, s32, s32, s32, s32, s32, s32);
    +0x428); tentative. */
 void Hud_ShowPanelFromScript(void)
 {
-    struct Hud *hud = gUnk_02000214;
+    struct Hud *hud = gFieldHud;
     if (hud) {
         s32 one;
         Hud_DrawHealthLabel(hud, 0, 1);

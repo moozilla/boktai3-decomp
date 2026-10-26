@@ -35,9 +35,9 @@ static inline u32 Random(u32 *rng)
 static inline s32 CellIndex(struct Vec *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 u8 *TerrainModifiers_FindCellOverride(u32, u32);
 static inline u8 *CellData(s32 index)
@@ -46,7 +46,7 @@ static inline u8 *CellData(s32 index)
     if (p)
         p += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = index * 4 + 12;
         p = map->cells + offset;
     }
@@ -104,7 +104,7 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
     t1 = 0x05000002;
     CpuSet(&local.zero, &local.velocity, t1);
     if (count > 0) {
-        u32 *rng = &gUnk_03005308;
+        u32 *rng = &gRandomIndex;
         s32 remaining = count;
         do {
             s32 height;

@@ -1,6 +1,6 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 void GameState_ClearChallengeCompletionFlags(void)
 {
-    *(u32 *)(gUnk_02000710 + 0x634) = 0;
+    *(u32 *)(gGameState + 0x634) = 0;
 }

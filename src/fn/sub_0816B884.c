@@ -9,9 +9,9 @@ void GameState_SetAreaFlagFromScript(void)
     if (Script_SeekToKeyword('s'))
         area = Script_GetValue();
     else
-        area = (s16)gUnk_02000710->savedX;
+        area = (s16)gGameState->savedX;
     if (Script_SeekToKeyword('i')) {
         s32 bit = Script_GetValue();
-        ((u32 *)gUnk_02000710->unk5C0)[area] |= 1 << bit;
+        ((u32 *)gGameState->unk5C0)[area] |= 1 << bit;
     }
 }

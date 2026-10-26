@@ -52,7 +52,7 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
                 SceneInventory_PrepareEquipmentDescriptor(p, &descriptor);
                 Inventory_SetEquipmentEntry(destination, &descriptor);
                 Inventory_GetEquipmentEntry(destination)->condition = 500;
-                ((struct SceneInventoryFunds *)gUnk_02000710)->funds -= definition->baseValue;
+                ((struct SceneInventoryFunds *)gGameState)->funds -= definition->baseValue;
                 break;
             }
             case 1: {
@@ -65,7 +65,7 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
                 *(&offset) = index + offset;
                 entries = catalog->catalog;
                 value = SceneItemValue_GetItemBaseValue(entries[offset]);
-                ((struct SceneInventoryFunds *)gUnk_02000710)->funds -= value;
+                ((struct SceneInventoryFunds *)gGameState)->funds -= value;
                 index += *page * 8;
                 entries += index;
                 Inventory_SetItemId(destination, *entries);
@@ -87,7 +87,7 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
                 index += *page * 8;
                 entries += index;
                 value = SceneItemValue_GetConsumableBaseValue(*entries);
-                ((struct SceneInventoryFunds *)gUnk_02000710)->funds -= value;
+                ((struct SceneInventoryFunds *)gGameState)->funds -= value;
                 break;
             }
         }

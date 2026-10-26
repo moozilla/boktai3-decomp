@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "engine.h"
 // confidence=low: collision callback records damage and emits sparks for selected source flags.
 // source/hit land in r6/r4 instead of r4/r6, and the first RNG-index read
 // uses r2 instead of r7 for the cursor.
@@ -48,7 +49,6 @@ struct Target {
     u32 damageType;
 };
 extern const struct Vec gUnk_0824FE4C;
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 void Collision_CalculateDamageResponse(void *);
 void Sound_PlaySong(u32);
@@ -102,7 +102,7 @@ void EnemyF426_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
             register s32 i asm("r6");
             struct Vec *vel = &frame.velocity;
             struct Vec *pos = &frame.position;
-            u32 *index = &gUnk_03005308;
+            u32 *index = &gRandomIndex;
             u32 mask = 0x7f;
             i = 2;
             do {

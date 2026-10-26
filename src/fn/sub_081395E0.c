@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 /* tentative: hides the sprite and spawns three randomly scattered bursts */
 
@@ -15,13 +16,14 @@ struct BurstActor {
     u8 state;
     u8 active;
 };
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 void Sound_PlaySong(u32);
 void SpriteEffect_CreateAtPosition(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                    u32, u32, u32);
 
-#define RAND() (gUnk_03005304 = (gUnk_03005304 + 1) & 1023, gUnk_086141BC[gUnk_03005304])
+#define RAND()                                                                                     \
+    (gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023,                               \
+     gUnk_086141BC[gEffectRandomTableIndex])
 
 void SpriteEffect_HideWithScatterBurst(struct BurstActor *actor)
 {

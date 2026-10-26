@@ -1,10 +1,10 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 f[0x4];
     u8 b;
     u8 pad[0x5b];
 };
-extern u32 gUnk_020004C0;
 void Sprite_Remove(void *);
 s32 PositionEffectDisplay_Destroy(u8 *s)
 {
@@ -18,6 +18,6 @@ s32 PositionEffectDisplay_Destroy(u8 *s)
         p++;
     } while (--i >= 0);
     z = 0;
-    gUnk_020004C0 = z;
+    gSpriteSlots = z;
     return 0;
 }

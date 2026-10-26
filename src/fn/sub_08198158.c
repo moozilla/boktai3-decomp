@@ -1,6 +1,6 @@
 #include "global.h"
 #include "game_state.h"
-#define gSavedGameState gUnk_02000710
+#define gSavedGameState gGameState
 struct OffsetSceneActor {
     u8 unknown0[0x30];
     u32 flags;

@@ -1,15 +1,15 @@
 #define gShakeRandomTable gUnk_0203B400
-#define gShakeRandomIndex gUnk_03005308
+#define gShakeRandomIndex gRandomIndex
 #include "global.h"
 #include "callback_pool.h"
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 s32 Mod(s32, s32);
 static inline u16 CallbackPool_NextRandom(void)
 {
     u16 *table = gUnk_0203B400;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    return table[gRandomIndex];
 }
 void CallbackPool_UpdateShake(struct CallbackPoolEntry *entry)
 {

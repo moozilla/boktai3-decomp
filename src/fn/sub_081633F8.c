@@ -35,7 +35,7 @@ void TransitionPanel_UpdateCostPrompt(struct TransitionPanel *p)
         MessageWindow_SetDisplayMode(1);
         MessageWindow_SetMessageTable(p->text);
         MessageWindow_SetNumberArgument(0, p->costs[p->selection]);
-        if (gUnk_02000710->unk7B0 >= p->costs[p->selection])
+        if (gGameState->unk7B0 >= p->costs[p->selection])
             MessageWindow_ShowMessage(0);
         else
             MessageWindow_ShowMessage(1);

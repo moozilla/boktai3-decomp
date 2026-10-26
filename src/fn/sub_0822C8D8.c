@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_030053F4;
+#include "engine.h"
 extern u8 *gUnk_020004B4;
 extern u16 gUnk_03005260[];
 extern u16 gUnk_030054B8;
@@ -7,7 +7,7 @@ extern u16 gUnk_030054B8;
 u16 sub_0822C8D8(u8 *p)
 {
     u16 *keys;
-    if (gUnk_030053F4 & 0x800) {
+    if (gEngineFlags & 0x800) {
         s32 i, k;
         if (gUnk_020004B4 == NULL) {
             k = 1;

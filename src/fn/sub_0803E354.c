@@ -29,7 +29,7 @@ s32 ScenePool_StateScheduleMotion(void *manager, struct ScenePoolActor *actor,
         ScenePool_ScheduleSpeedControl(entry);
         {
             const u16 *table = gUnk_0203B400;
-            u32 *index = &gUnk_03005308;
+            u32 *index = &gRandomIndex;
             u32 next;
             u32 indexMask;
             register u32 byteMask asm("r4");

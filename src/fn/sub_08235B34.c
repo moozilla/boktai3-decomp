@@ -4,7 +4,7 @@
 struct Vec5B {
     u32 x : 16, y : 16, z : 16;
 };
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 void Collider_Init(u8 *, s32, s32, s32, s32, struct Vec5B *, struct Vec5B *);
 void Collider_SetAttackProperties(u8 *, s32, s32, s32, s32, s32);
 void Collider_SetCallback(u8 *, void *, u8 *);
@@ -31,11 +31,11 @@ void sub_08235B34(u8 *arg)
         } else {
             s32 value;
             if ((*(u8 **)(p + 0x18))[0x418] == 6) {
-                value = *(s16 *)(gUnk_02000710 + 0x40) + 10;
+                value = *(s16 *)(gGameState + 0x40) + 10;
                 if (value > 99)
                     value = 99;
             } else
-                value = *(s16 *)(gUnk_02000710 + 0x40);
+                value = *(s16 *)(gGameState + 0x40);
             /* permuter find: reading uninitialised step steers register allocation */
             if (step) {
                 flags = 0;

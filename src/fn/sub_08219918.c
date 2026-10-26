@@ -1,6 +1,5 @@
 #include "global.h"
-
-extern u16 gUnk_03005238;
+#include "render.h"
 
 struct ClearedWidget {
     u16 f0;
@@ -51,9 +50,9 @@ s32 Widget_InitCleared(struct ClearedWidget *w, void *resource, u16 glyph, u32 f
         w->f4C = zero;
         w->f50 = zero;
         Anim_InitPositionedWidget(w, resource, glyph, flags, a, b, c, position);
-        gUnk_03005238++;
-        if (gUnk_03005238 == 0xFFFF)
-            gUnk_03005238 = zero;
+        gDefaultAnimFlags++;
+        if (gDefaultAnimFlags == 0xFFFF)
+            gDefaultAnimFlags = zero;
         w->f40 = -1;
         w->f44 = -1;
         w->f58 = 0;

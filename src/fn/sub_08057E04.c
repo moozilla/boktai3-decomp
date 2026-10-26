@@ -150,7 +150,7 @@ void ScenePanel_UpdateTimePalette(struct ScenePanel *input)
                 struct ScenePanelMainSprite *sprite = &panel->mainSprite;
                 if (ScenePanel_IsSpriteVisible(sprite)) {
                     s32 frame = ScenePanel_AdvancePaletteFrame(sprite);
-                    u8 **ram = &gUnk_030042E4;
+                    u8 **ram = &gPaletteBankData;
                     u32 offset;
                     u8 *ramBase;
                     register const u16 *target asm("r12");

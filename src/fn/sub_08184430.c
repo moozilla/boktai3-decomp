@@ -30,7 +30,7 @@ extern u32 gUnk_0824EE50[];
 extern u32 gUnk_0824EE60[];
 extern struct Pair gUnk_0824EE70;
 extern struct Pair gUnk_0824EE78;
-extern struct Player *gUnk_02000710;
+extern struct Player *gGameState;
 
 void Armor_SetAnimationFromStart(u32 a, u32 b);
 void Sound_PlaySongChecked(u32 a);
@@ -146,8 +146,8 @@ void ActorController_UpdateBreakApartTransition(u8 *p)
             c = (struct Collider *)(p + 0x190);
             c->size = gUnk_0824EE78;
             c->dir = gUnk_0824EE70;
-            p[0x1D2] = Math_Atan2(gUnk_02000710->x - *(s16 *)(p + 0x48),
-                                  gUnk_02000710->z - *(s16 *)(p + 0x4C));
+            p[0x1D2] =
+                Math_Atan2(gGameState->x - *(s16 *)(p + 0x48), gGameState->z - *(s16 *)(p + 0x4C));
         }
         case 3: {
             u8 *t = p + 0xB42;

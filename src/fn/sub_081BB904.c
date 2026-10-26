@@ -6,7 +6,7 @@ struct Keys {
     u16 pressed;
 };
 extern struct Keys gUnk_03005260;
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 
 s32 Anim_LoadKeyframe(void *, void *, u16, u32);
 void Anim_Step(void *, void *);
@@ -38,8 +38,8 @@ void SolarBank_UpdateTransferInput(struct SolarBankPanel *panel)
     u16 t;
 
     if (gUnk_03005260.pressed & 1) {
-        *(u32 *)(gUnk_02000710 + 0x77C) = BALANCE;
-        *(u16 *)(gUnk_02000710 + 0x7B0) = TRANSFER;
+        *(u32 *)(gGameState + 0x77C) = BALANCE;
+        *(u16 *)(gGameState + 0x7B0) = TRANSFER;
         Sound_PlaySong(0xdd);
         SolarBank_BeginClosing(panel);
         goto step;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 // MATCHING_CONCESSION: register-pinning
 
@@ -19,12 +20,10 @@ struct TargetRegistry {
     struct TargetEntry *head;
 };
 
-extern struct TargetRegistry *gUnk_02000598;
-
 struct TargetEntry *TargetRegistry_FindById(u32 id)
 {
     register u32 requestedId asm("r3") = id;
-    struct TargetRegistry *registry = gUnk_02000598;
+    struct TargetRegistry *registry = gSceneLinkList;
     if (registry) {
         struct TargetEntry *entry = registry->head;
         /* An ID mismatch repeats the same entry, as in the original routine. */

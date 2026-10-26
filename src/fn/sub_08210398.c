@@ -8,7 +8,7 @@ void ProjectileEmitter_EmitAttackFrame(void);
 void ProjectileEmitter_UpdateAttack(void);
 static inline u32 PauseFlags(u32 mask)
 {
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 static inline u32 TestFlags(u32 bits)
 {

@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#define gGameState gUnk_02000710
 #include "game_state.h"
 #include "player.h"
 #include "scene_hud_display.h"

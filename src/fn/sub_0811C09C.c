@@ -1,16 +1,15 @@
 #include "global.h"
 #include "scene_object.h"
+#include "ram.h"
 
-#define gRandomIndex  gUnk_03005304
 #define gRandomValues gUnk_086141BC
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 u32 ActorParticles_CreateAtOffset(void *, struct SceneExtent *, void *, u32, u32, u32, u32, u32,
                                   u32, u32, u32, u32, u32, u32, u32);
 static inline u16 NextRandom(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 0x3ff;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3ff;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 void ActorParticles_EmitOffsetBurst(void *actor)
 {

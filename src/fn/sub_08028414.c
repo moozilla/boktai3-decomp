@@ -2,7 +2,7 @@
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
 void SceneActors_SpawnDestructionParticles(u8 *p)
@@ -21,7 +21,7 @@ void SceneActors_SpawnDestructionParticles(u8 *p)
     size.y = 16;
     size.z = 164;
     table = gUnk_0203B400;
-    indexPtr = &gUnk_03005308;
+    indexPtr = &gRandomIndex;
     index = *indexPtr;
     index++;
     mask = 1023;

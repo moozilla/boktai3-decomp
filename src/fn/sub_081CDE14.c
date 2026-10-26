@@ -18,16 +18,16 @@ s32 SceneCharacter_UpdatePaletteFade(u8 *a, u8 *b)
 
     if (fade->mode == 1) {
         u32 idx = fade->bankA;
-        u8 *from = gUnk_030042E4 + (idx << 5);
-        u8 *to = gUnk_030042E4 + (fade->bankB << 5);
+        u8 *from = gPaletteBankData + (idx << 5);
+        u8 *to = gPaletteBankData + (fade->bankB << 5);
         Palette_InterpolateBanks(b + 0x1cc, from, to, counter, 6);
         if (counter > 62) {
             fade->mode = zero;
         }
     } else if (fade->mode == 2) {
         u32 idx = fade->bankB;
-        u8 *from = gUnk_030042E4 + (idx << 5);
-        u8 *to = gUnk_030042E4 + (fade->bankA << 5);
+        u8 *from = gPaletteBankData + (idx << 5);
+        u8 *to = gPaletteBankData + (fade->bankA << 5);
         Palette_InterpolateBanks(b + 0x1cc, from, to, counter, 6);
         if (counter > 62) {
             fade->mode = zero;
@@ -40,13 +40,13 @@ s32 SceneCharacter_UpdatePaletteFade(u8 *a, u8 *b)
         }
         if (counter <= 63) {
             u32 idx = fade->bankB;
-            u8 *from = gUnk_030042E4 + (idx << 5);
-            u8 *to = gUnk_030042E4 + (fade->bankA << 5);
+            u8 *from = gPaletteBankData + (idx << 5);
+            u8 *to = gPaletteBankData + (fade->bankA << 5);
             Palette_InterpolateBanks(b + 0x1cc, from, to, counter, 6);
         } else {
             u32 idx = fade->bankA;
-            u8 *from = gUnk_030042E4 + (idx << 5);
-            u8 *to = gUnk_030042E4 + (fade->bankB << 5);
+            u8 *from = gPaletteBankData + (idx << 5);
+            u8 *to = gPaletteBankData + (fade->bankB << 5);
             Palette_InterpolateBanks(b + 0x1cc, from, to, counter - 64, 6);
         }
     }

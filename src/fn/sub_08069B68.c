@@ -1,11 +1,11 @@
 #include "burst_emitter.h"
 void BurstEmitter_PlayAmbientSound(struct BurstEmitter *emitter)
 {
-    if (!(gUnk_030053F4 & 0x800) && !emitter->context) {
+    if (!(gEngineFlags & 0x800) && !emitter->context) {
         u32 frame = emitter->frame;
-        u32 random = (gUnk_03005308 + 1) & 0x3FF;
+        u32 random = (gRandomIndex + 1) & 0x3FF;
         u32 period;
-        gUnk_03005308 = random;
+        gRandomIndex = random;
         random <<= 1;
         period = *(u16 *)(random + (u32)gUnk_0203B400);
         period &= 3;

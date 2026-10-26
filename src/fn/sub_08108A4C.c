@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_020001BC;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 AnimatedTile_InitManager(u8 *);
@@ -11,8 +11,8 @@ void AnimatedTile_OnManagerDestroy(void);
 u8 *AnimatedTile_CreateManager(void)
 {
     u8 *p;
-    if (gUnk_020001BC != 0)
-        return gUnk_020001BC;
+    if (gNamedEntryPool != 0)
+        return gNamedEntryPool;
     p = Task_Create(0x8, 0x158);
     if (p != 0) {
         Task_SetCallbacks(p, CallbackSlots_DispatchActive, AnimatedTile_OnManagerDestroy);

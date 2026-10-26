@@ -19,8 +19,8 @@ static inline s32 truncateShift12(s32 value)
 }
 static inline u32 nextRandom(const u16 *table)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return table[index];
 }
 s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPosition *position,
@@ -35,7 +35,7 @@ s32 ContactActorPool_Start(struct ContactActorPool *pool, const struct ContactPo
     pool->fadeMode = 1;
     pool->fadeLevel = 63;
     {
-        u8 *bank = gUnk_030042E4;
+        u8 *bank = gPaletteBankData;
         void *first = bank + 0x5A60;
         void *second = bank + 0x5AA0;
         Palette_InterpolateBanks(((u8 *)pool) + 0x1700, first, second, 63, 6);

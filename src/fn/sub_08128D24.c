@@ -30,16 +30,16 @@ struct Feather {
 };
 static inline u32 Random(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return *(const u16 *)(index * 2 + RANDOM_TABLE_ADDR);
 }
 static inline s32 CellIndex(struct Vec *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 u8 *TerrainModifiers_FindCellOverride(u32, u32);
 static inline u8 *CellData(s32 index)
@@ -48,7 +48,7 @@ static inline u8 *CellData(s32 index)
     if (p)
         p += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = index * 4 + 12;
         p = map->cells + offset;
     }
@@ -88,7 +88,7 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
                     break;
 
                 case 1:
-                    current += *((s16 *)(gUnk_030052F4->cells + 4));
+                    current += *((s16 *)(gTerrainMap->cells + 4));
                     break;
 
                 case 2:
@@ -96,7 +96,7 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
                     break;
 
                 case 3:
-                    current -= *((s16 *)(gUnk_030052F4->cells + 4));
+                    current -= *((s16 *)(gTerrainMap->cells + 4));
                     break;
             }
 
@@ -108,8 +108,8 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
                 s32 x;
                 register s32 z asm("r8");
                 asm("" : "+r"(center));
-                x = Mod(current, *((s16 *)(gUnk_030052F4->cells + 4)));
-                z = Div(current, *((s16 *)(gUnk_030052F4->cells + 4)));
+                x = Mod(current, *((s16 *)(gTerrainMap->cells + 4)));
+                z = Div(current, *((s16 *)(gTerrainMap->cells + 4)));
                 center->x = (x << 8) + 128;
                 center->y = ((*CellData(current)) & 15) << 8;
                 center->z = (z << 8) + 128;
@@ -133,7 +133,7 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *p, struct Vec *spot, s32 cu
 
                 {
                     register const u16 *table asm("r5") = (const u16 *)0x0203B400;
-                    register u32 *rng asm("r4") = &gUnk_03005308;
+                    register u32 *rng asm("r4") = &gRandomIndex;
                     register u32 mask asm("r6") = 1023;
                     u32 index;
                     register u32 zero asm("r3");

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Tile {
     u8 pad0[0x8C];
     u32 key;
@@ -8,7 +9,6 @@ struct TileManager {
     struct Tile *tiles[12];
     u32 mask;
 };
-extern struct TileManager *gUnk_020001B8;
 static inline u8 Tst(u32 *m, s32 i)
 {
     if (*m & (1 << i))
@@ -19,7 +19,7 @@ static inline u8 Tst(u32 *m, s32 i)
    of the pool at 0x020001B8; NULL if none. */
 struct Tile *Pool1B8_FindByName(u32 key)
 {
-    struct TileManager *manager = gUnk_020001B8;
+    struct TileManager *manager = gTileTriggerManager;
     struct Tile **tiles = manager->tiles;
     s32 i;
     if (!manager->mask)

@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 #define FanCannonManager_RemoveCannon FanCannonManager_DestroySlot
-#define gFanCannonManager             gUnk_02000600
 struct FanCannon {
     u8 unknown0[0x180];
 };
@@ -11,7 +11,6 @@ struct FanCannonManager {
 };
 void Sound_StopSong(u32);
 void FanCannonManager_DestroySlot(struct FanCannonManager *, struct FanCannon *, u32);
-extern u32 gUnk_02000600;
 u32 FanCannonManager_Destroy(struct FanCannonManager *p)
 {
     struct FanCannon *cannon;
@@ -25,5 +24,5 @@ u32 FanCannonManager_Destroy(struct FanCannonManager *p)
         i++;
         cannon++;
     } while (i <= 7);
-    return gUnk_02000600 = 0;
+    return gFanCannonManager = 0;
 }

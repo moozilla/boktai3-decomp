@@ -34,7 +34,7 @@ static inline u8 IsUnavailable(struct SceneActorMotionView *argument)
 }
 static inline u8 HasGameFlag(u32 mask, u32 *savedOffset)
 {
-    register struct GameState *game = gUnk_02000710;
+    register struct GameState *game = gGameState;
     register u32 offset asm("r2");
     register u32 *flags;
     offset = (u8 *)&game->flags868 - (u8 *)game;
@@ -395,7 +395,7 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
                     if (cellData)
                         cellData += 4;
                     else {
-                        register struct EngineMap *map = gUnk_030052F4;
+                        register struct EngineMap *map = gTerrainMap;
                         register u32 offset asm("r0");
                         offset = cell * 4 + 12;
                         cellData = map->cells + offset;
@@ -567,7 +567,7 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
                                 register s32 z;
                                 register u32 attributes asm("r1");
                                 center = &cache.center;
-                                map = &gUnk_030052F4;
+                                map = &gTerrainMap;
                                 {
                                     register s32 width = *(s16 *)((*map)->cells + 4);
                                     asm("" : "+r"(width) : "r"(gameOffset), "r"(primary));

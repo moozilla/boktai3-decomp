@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: integrates group particles and bounces them against terrain.
 #define ParticleGroup_UpdateBouncing sub_0801404C
@@ -36,8 +37,6 @@ struct Map {
     u8 pad8[28];
     u16 rows[1];
 };
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC, gUnk_03005308;
 #define gUnk_0203B400 ((u16 *)0x0203B400)
 extern u32 gUnk_08604B90[];
 u8 *TerrainModifiers_FindCellOverride(int, int);
@@ -45,21 +44,21 @@ void Effect_Remove(void *);
 static inline int CellIndex(struct Vec *p)
 {
     int x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0xffff;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline struct Cell *Cell(int i)
 {
     u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return (void *)(p + 4);
-    return (void *)(gUnk_030052F4->cells + 12 + i * 4);
+    return (void *)(gTerrainMap->cells + 12 + i * 4);
 }
 static inline u32 Random(u16 *table)
 {
-    u32 r = (gUnk_03005308 + 1) & 0x3ff;
-    gUnk_03005308 = r;
+    u32 r = (gRandomIndex + 1) & 0x3ff;
+    gRandomIndex = r;
     return table[r];
 }
 static inline int Scale(int a, int b)

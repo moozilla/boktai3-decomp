@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
+#include "engine.h"
 // confidence=low: random neighboring directions with short hold durations.
 #ifdef NONMATCHING
 // fuzzy: 88.2%
@@ -133,14 +134,13 @@ struct ReleaseAnimation {
     struct DisplaySequenceState seq;
     const void *resource;
 };
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Player_GetSmoothedDirection(struct Player *);
 void Player_SetDirectionalVelocity(struct Player *, s32);
 static inline s32 RandomBits(u32 mask)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return gUnk_0203B400[index];
 }
 // confidence=low: selects nearby directions with randomized hold durations.

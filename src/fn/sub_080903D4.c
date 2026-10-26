@@ -1,5 +1,5 @@
 #include "scene_actor_reset.h"
-extern u32 gUnk_03005308;
+#include "engine.h"
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 u32 Slime_GetRandomVariantFlags(void *);
@@ -8,8 +8,8 @@ void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s
 static inline u16 Random(void)
 {
     const u16 *table = gUnk_0203B400;
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     index *= 2;
     return *(const u16 *)((u32)table + index);
 }

@@ -9,8 +9,8 @@ void Slime_StartWalkChoice(struct SceneActorRegistryResetView *actor)
     }
     if (actor->field2B3) {
         s32 r;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-        r = *(u16 *)(gUnk_03005308 * 2 + (u32)gUnk_0203B400);
+        gRandomIndex = (gRandomIndex + 1) & 1023;
+        r = *(u16 *)(gRandomIndex * 2 + (u32)gUnk_0203B400);
         r &= 31;
         if (r <= 23)
             Chase_SetCtl(actor, Slime_RollMoveFlag, 0);

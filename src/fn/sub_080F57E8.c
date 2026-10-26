@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 struct Obj {
     u8 pad0[0x1c];
     s16 x, y, z;
@@ -15,7 +16,6 @@ struct Obj {
     u8 pad188[5];
     u8 byte1DD;
 };
-extern u8 *gUnk_02000710;
 extern const s16 gUnk_086149C4[];
 u32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);

@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 int Div(int, int);
 int SceneActors_SetHealthLimits(u8 *p, int current, int maximum, int extra)
 {
@@ -20,7 +20,7 @@ int SceneActors_SetHealthLimits(u8 *p, int current, int maximum, int extra)
         }
         *dst = ratio;
     }
-    *(int *)(gUnk_02000710 + 0x61c) = *(s16 *)(p + 0x96);
-    *(int *)(gUnk_02000710 + 0x618) = *(s16 *)(p + 0x94);
+    *(int *)(gGameState + 0x61c) = *(s16 *)(p + 0x96);
+    *(int *)(gGameState + 0x618) = *(s16 *)(p + 0x94);
     return 0;
 }

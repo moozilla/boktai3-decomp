@@ -4,6 +4,6 @@
 /* Width is consumed signed by this group of scene-grid helpers. */
 static inline s32 SceneGrid_Width(void)
 {
-    return *(s16 *)(gUnk_030052F4->cells + 4);
+    return *(s16 *)(gTerrainMap->cells + 4);
 }
 #endif

@@ -16,7 +16,7 @@ void SceneInventory_BeginSaleConfirmation(struct SceneInventoryControlView *pane
         case 2: {
             const void *message = panel->consumableText;
             u32 address = panel->grid.savedSelection;
-            struct GameState *game = gUnk_02000710;
+            struct GameState *game = gGameState;
             s32 item;
             address <<= 1;
             address += (u32)game;

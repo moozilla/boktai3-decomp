@@ -8,7 +8,7 @@ struct A {
     u8 p[0x18];
     struct N *f18;
 };
-extern struct A *gUnk_030052F4;
+extern struct A *gTerrainMap;
 void TerrainModifiers_UnregisterCell(struct N *n)
 {
     struct N *prev = n->f8;
@@ -16,7 +16,7 @@ void TerrainModifiers_UnregisterCell(struct N *n)
     if (prev)
         prev->fc = next;
     else
-        gUnk_030052F4->f18 = next;
+        gTerrainMap->f18 = next;
     if (next)
         next->f8 = prev;
 }

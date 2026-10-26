@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_hud_display.h"
-#define gMenuMode gUnk_030051D8
-extern u32 gUnk_030051D8;
+#include "render.h"
+#define gMenuMode gFadeMultiplier
 void Hud_InitSelectionBounds(u32, u32);
 s32 MessageWindow_Clear(void);
 u32 ScrollingDialogue_ClearScript(void);
@@ -27,7 +27,7 @@ void SceneHud_FadeOutPage(struct SceneHudState *p)
             Hud_BeginRetryPanel(p);
         } else {
             PauseMenu_RestoreDisplayState(p);
-            gUnk_030051D8 = p->savedMenuMode;
+            gFadeMultiplier = p->savedMenuMode;
             Hud_SetUpdateCallback(p, SceneHud_FinishPageExit);
         }
     }

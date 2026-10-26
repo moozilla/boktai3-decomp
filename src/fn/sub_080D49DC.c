@@ -1,6 +1,7 @@
 #include "global.h"
 
 #include "scene_actor_reset.h"
+#include "engine.h"
 
 s32 SceneStimulus_FindOverlap(s32, s32, u32, u32, u32);
 u32 SceneActorContacts_ReleaseNode(void *);
@@ -16,8 +17,6 @@ extern const u16 gUnk_0203B400[];
 // confidence=low: per-frame terrain-route follower; probes map cells, gates on route checks and fires the restore callbacks.
 
 extern u16 gUnknown_02000580[];
-
-extern u32 gUnk_03005308;
 
 // confidence=low: per-frame terrain-route follower; probes map cells, gates on route checks and fires the restore callbacks.
 
@@ -39,7 +38,6 @@ s32 Div(s32, s32);
 void sub_0807E334(void *);
 void SceneActorControl_OnIdle(void);
 void SceneActorReaction_RestoreAfterDelay(void *, s32);
-extern u32 gUnk_030053F4;
 s32 Nav_IsPositionInMesh(void *, void *, void *);
 s32 Terrain_ApplyBlocked(void *, void *, void *);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
@@ -48,9 +46,9 @@ void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 // confidence=low: per-frame terrain-route follower; probes map cells, gates on route checks and fires the restore callbacks.
 static inline s32 sub080D49DC_Cell(s32 x, s32 z)
 {
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 static inline void sub080D49DC_Clip(struct ContactPosition *st, s32 cell)
@@ -63,7 +61,7 @@ static inline void sub080D49DC_Clip(struct ContactPosition *st, s32 cell)
     if (p)
         p += 4;
     else
-        p = gUnk_030052F4->cells + (cell * 4 + 12);
+        p = gTerrainMap->cells + (cell * 4 + 12);
     b = *p;
     v = (b & 0xF) << 8;
     switch (b >> 4) {
@@ -150,7 +148,7 @@ void sub_080D49DC(struct SceneActorRegistryResetView *actor)
         cell = sub080D49DC_Cell(cx, cy);
         sub080D49DC_Clip(state, cell);
 
-        if (gUnk_030053F4 & 0x4800) {
+        if (gEngineFlags & 0x4800) {
             p = motion->fieldDC;
             if (!p)
                 goto L734;
@@ -265,8 +263,8 @@ L4DA:
     /* 0x526: pick a palette-table slot that differs from dir (up to 4 tries) */
     n = 0;
     do {
-        t = (gUnk_03005308 + 1) & 0x3FF;
-        gUnk_03005308 = t;
+        t = (gRandomIndex + 1) & 0x3FF;
+        gRandomIndex = t;
         val = (gUnk_0203B400[t] & 3) << 6;
         if (val != dir)
             break;
@@ -302,14 +300,14 @@ L640:
     goto L74E;
 
 L67C:
-    mx = Mod(cellA, *(s16 *)(gUnk_030052F4->cells + 4));
-    dz = Div(cellA, *(s16 *)(gUnk_030052F4->cells + 4));
+    mx = Mod(cellA, *(s16 *)(gTerrainMap->cells + 4));
+    dz = Div(cellA, *(s16 *)(gTerrainMap->cells + 4));
     tmp.x = (mx << 8) + 0x80;
     p = TerrainModifiers_FindCellOverride(cellA, 1);
     if (p)
         tmp.y = (*((u8 *)p + 4) & 0xF) << 8;
     else
-        tmp.y = (*(gUnk_030052F4->cells + (cellA * 4 + 12)) & 0xF) << 8;
+        tmp.y = (*(gTerrainMap->cells + (cellA * 4 + 12)) & 0xF) << 8;
     tmp.z = (dz << 8) + 0x80;
     route = actor->routeObject;
     r = 0;

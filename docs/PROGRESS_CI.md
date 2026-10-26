@@ -146,7 +146,9 @@ top-level categories.
 Every accepted exact C match is used
 in the final ROM, so fuzzy, exact and linked code percentages coincide here.
 These are byte-weighted measures of the tracked code region, not percentages
-of functions or of the whole ROM. Data/asset reconstruction is not measured.
+of functions or of the whole ROM. The data measures (decomp.dev's "Matched data")
+count RAM objects with one shared declaration ([RAM.md](RAM.md)); ROM data and
+assets are not measured yet.
 
 ### Categories and hierarchy
 

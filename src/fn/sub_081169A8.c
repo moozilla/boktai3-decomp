@@ -2,6 +2,7 @@
 #include "global.h"
 #include "area_effect_link.h"
 #include "scene_actor_style.h"
+#include "engine.h"
 
 struct GloveMotion {
     u8 unk_00[0x44];
@@ -31,7 +32,7 @@ struct LinkStylePayload {
     struct SceneActorStyle style;
     u8 unk_1C[8];
 };
-extern u32 gUnk_030053F4, gUnk_030053F0;
+extern u32 gUnk_030053F0;
 void SceneActorStyle_InitializeFromGameState(void *);
 void Modifier_InitSourceInfo(void *, void *);
 void ModifierAction_InitializeSecondary(void *, void *);
@@ -63,7 +64,7 @@ void Glove_InitializeStyleModifiers(struct Glove *p)
 {
     struct GloveMotion *self = &p->motion;
     u32 mask = 0x800;
-    if ((gUnk_030053F4 | gUnk_030053F0) & mask) {
+    if ((gEngineFlags | gUnk_030053F0) & mask) {
         s32 player = p->participant;
         register struct AreaEffectLinkState *link asm("r1") = gUnk_020004B4;
         struct LinkStylePayload *payload;

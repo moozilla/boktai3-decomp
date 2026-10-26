@@ -1,12 +1,12 @@
 #include "global.h"
-extern u8 *gUnk_020005EC;
+#include "ram.h"
 void SunOrb_GetOrCreateManager(void);
 
 s32 sub_081FEA04(void)
 {
     s32 result;
     u8 *m;
-    if ((m = gUnk_020005EC) != NULL) {
+    if ((m = gSlotController) != NULL) {
         result = *(s32 *)(m + 0xef0);
     } else {
         SunOrb_GetOrCreateManager();

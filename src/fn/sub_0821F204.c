@@ -24,7 +24,7 @@ u32 NavMesh_IsPointInsideRegion(struct NavRegion *, struct Pos *, u32);
 
 u32 Nav_IsPositionInMesh(struct NavQuery *q, void *unused, struct Pos *pos)
 {
-    struct NavResource *resource = gUnk_030052F4->navigation;
+    struct NavResource *resource = gTerrainMap->navigation;
     u32 *new_var;
     s32 x = (s16)pos->x >> 8;
     s32 z = (s16)pos->z >> 8;
@@ -32,15 +32,15 @@ u32 Nav_IsPositionInMesh(struct NavQuery *q, void *unused, struct Pos *pos)
     u8 *props;
     u32 mask, flags;
     s32 meshIndex;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     props = TerrainModifiers_FindCellOverride(cell, 1);
     if (props)
         props += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         props = map->cells + offset;
     }

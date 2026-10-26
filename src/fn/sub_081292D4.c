@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -32,7 +33,6 @@ struct FeatherPool {
     void *sequences;
     u32 used;
 };
-extern struct FeatherPool *gUnk_02000174;
 void Sprite_Remove(void *);
 void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
@@ -179,7 +179,7 @@ void FeatherEffectPool_UpdateScatterAnimation(void *unused, struct Feather *p)
     if (p->sequence.index == 3 && !p->sequence.elapsed)
         FeatherEffectPool_SpawnGroundScatter(p, 4);
     if (Step(sprite, &p->sequence, p)) {
-        struct FeatherPool *pool = gUnk_02000174;
+        struct FeatherPool *pool = gFadingSpritePool;
         pool->used &= ~(1 << p->slot);
         p->state = 0;
         Sprite_Remove(p);

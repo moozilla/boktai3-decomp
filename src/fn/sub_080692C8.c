@@ -3,10 +3,9 @@
 
 #include "bouncing_object.h"
 #include "engine.h"
-extern u32 gUnk_030053F4;
 static inline u32 Blocked(u32 mask)
 {
-    u32 a = gUnk_030053F4;
+    u32 a = gEngineFlags;
     u32 b = gUnk_030053F0;
     return (a | b) & mask;
 }
@@ -36,7 +35,7 @@ struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
         return NULL;
     {
         u32 mask = 0x400;
-        if ((gUnk_030053F4 | gUnk_030053F0) & mask)
+        if ((gEngineFlags | gUnk_030053F0) & mask)
             return NULL;
     }
     {

@@ -1,7 +1,7 @@
 #include "global.h"
 
 #include "scene_actor_control_helpers.h"
-extern u32 gUnk_03005308;
+#include "engine.h"
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 extern u8 *gUnk_02000580[];
@@ -42,8 +42,8 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 
 }
 static inline u32 Rand(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return *(const u16 *)((index << 1) + (u32)gUnk_0203B400);
 }
 static inline void Fill(void *dst, u32 *tmp, u32 value)

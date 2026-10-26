@@ -11,7 +11,7 @@ struct CannonTurret {
     u8 pad128[2];
     s16 speed;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 struct SceneVec *Player_GetEffectivePosition(s32);
@@ -22,8 +22,8 @@ void SpriteEffectController_Create(void *, void *, u32, u32, u32, u32, u32, u32,
                                    s32, s32, u32, s32, u32, u32);
 static inline u32 RandomFrom(const u16 *table)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    return table[gRandomIndex];
 }
 static inline s32 Scale(s32 x)
 {

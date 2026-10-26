@@ -70,7 +70,7 @@ static inline u8 Sub08089340_TakeFlag(u8 *flag)
 
 static inline s32 Sub08089340_Width(void)
 {
-    return *(s16 *)(gUnk_030052F4->cells + 4);
+    return *(s16 *)(gTerrainMap->cells + 4);
 }
 
 static inline u8 *Sub08089340_Cell(s32 cell)
@@ -78,7 +78,7 @@ static inline u8 *Sub08089340_Cell(s32 cell)
     u8 *override = TerrainModifiers_FindCellOverride(cell, 1);
     if (override)
         return override + 4;
-    return gUnk_030052F4->cells + (cell * 4 + 12);
+    return gTerrainMap->cells + (cell * 4 + 12);
 }
 
 #ifdef NONMATCHING
@@ -193,10 +193,10 @@ void sub_08089340(struct Sub08089340Actor *actor)
             }
             x = phase->position.x >> 8;
             z = phase->position.z >> 8;
-            if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+            if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
                 target = 0;
             else
-                target = gUnk_030052F4->rows[z] + x;
+                target = gTerrainMap->rows[z] + x;
             {
                 u8 attributes = *Sub08089340_Cell(target);
                 height = (attributes & 15) << 8;

@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern void *gUnk_02000244;
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 sub_081A4DF0(void *, s32, s32, s32);
@@ -11,10 +11,10 @@ void Hresvelgr_DestroyProjectilePool(void);
 void *Hresvelgr_CreateProjectilePool(s32 a, s32 b, s32 c)
 {
     void *r;
-    if (gUnk_02000244 != 0)
-        return gUnk_02000244;
-    gUnk_02000244 = Task_Create(8, 0xEE4);
-    r = gUnk_02000244;
+    if (gHresvelgrProjectilePool != 0)
+        return gHresvelgrProjectilePool;
+    gHresvelgrProjectilePool = Task_Create(8, 0xEE4);
+    r = gHresvelgrProjectilePool;
     if (r != 0) {
         Task_SetCallbacks(r, Hresvelgr_UpdateProjectilePool, Hresvelgr_DestroyProjectilePool);
         if (sub_081A4DF0(r, a, b, c) < 0) {

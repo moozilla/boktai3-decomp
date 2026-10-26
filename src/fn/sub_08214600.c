@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct SpritePiece {
     u8 shape;
@@ -49,19 +50,10 @@ struct OamEntry {
     u16 depth;
 };
 
-extern u8 gUnk_03005230;
-extern u32 gUnk_0300522C;
-extern s32 gUnk_03004BA0;
 extern struct SpriteAffine gUnk_03004310[];
 extern const s16 gUnk_086149C4[];
-extern u8 *gUnk_030042FC;
-extern u8 *gUnk_030042F8;
-extern u8 gUnk_03004D90[], gUnk_03004D20[], gUnk_03004D30[];
-extern u32 gUnk_03004D50[];
-extern s32 gUnk_03004798, gUnk_0300479C;
 extern struct OamEntry gUnk_03004390[];
 extern struct OamEntry gUnk_030047A0[];
-extern u16 gUnk_03004790[];
 extern u32 gUnk_03003A04;
 s32 sub_082152E4(const void *src, s32 size);
 u32 Palette_CacheObjectBank(u32 key, void *src);
@@ -77,35 +69,35 @@ static inline s32 DIV4096(s32 v)
 
 static inline void Oam_PushImmediate(u32 a, u32 t)
 {
-    s32 n = gUnk_03004798;
+    s32 n = gOamCount;
     if (n <= 127) {
         gUnk_03004390[n].attributes = a;
         gUnk_03004390[n].tile = t;
-        gUnk_03004798 = n + 1;
+        gOamCount = n + 1;
         gUnk_03003A04 |= 1;
     }
 }
 static inline void Oam_PushSorted(u32 a, u32 t, s32 z, u32 priority)
 {
-    s32 n = gUnk_0300479C;
+    s32 n = gPendingOamCount;
     if (n <= 127) {
         struct OamEntry *e = &gUnk_030047A0[n];
         e->attributes = a;
         e->tile = t;
         e->depth = ((z + 128) & 0xFF) << 8;
-        gUnk_0300479C = n + 1;
-        gUnk_03004790[priority]++;
+        gPendingOamCount = n + 1;
+        gOamPriorityCounts[priority]++;
     }
 }
 static inline s32 Affine_Alloc(u8 rotation, s8 sx, s8 sy)
 {
     s32 n;
-    if (gUnk_03004BA0 > 31)
+    if (gAffineRequestCount > 31)
         return 0;
-    gUnk_03004310[gUnk_03004BA0].rotation = rotation;
-    gUnk_03004310[gUnk_03004BA0].scaleX = sx;
-    gUnk_03004310[gUnk_03004BA0].scaleY = sy;
-    n = gUnk_03004BA0++;
+    gUnk_03004310[gAffineRequestCount].rotation = rotation;
+    gUnk_03004310[gAffineRequestCount].scaleX = sx;
+    gUnk_03004310[gAffineRequestCount].scaleY = sy;
+    n = gAffineRequestCount++;
     return n;
 }
 
@@ -134,11 +126,12 @@ void sub_08214600(struct Sprite *p, s32 x, s32 y, s32 z)
     else if (z > 127)
         z = 127;
     attr = 0;
-    if (((gUnk_03005230 & 1) && p->priority != 0 && !(p->flags & 0x10000)) || (p->flags & 0x800))
+    if (((gSpriteMosaicAttr & 1) && p->priority != 0 && !(p->flags & 0x10000)) ||
+        (p->flags & 0x800))
         attr |= 0x1000;
     if (p->flags & 0x100)
         attr |= 0x800;
-    if (gUnk_0300522C != 0 && (p->flags & 0x4000))
+    if (gSpriteAttrFlags != 0 && (p->flags & 0x4000))
         attr |= 0x400;
     attr |= p->attributes;
     if (!(p->flags & 2)) {
@@ -170,7 +163,7 @@ void sub_08214600(struct Sprite *p, s32 x, s32 y, s32 z)
     frame = res->frames;
     frame += anim->frame;
     {
-        u8 *pieces = gUnk_030042FC + frame->pieceOffset;
+        u8 *pieces = gAnimResourceSection14 + frame->pieceOffset;
         if (p->flags & 4)
             x -= anim->x;
         else
@@ -190,9 +183,9 @@ void sub_08214600(struct Sprite *p, s32 x, s32 y, s32 z)
         u32 shape = piece->shape;
         s32 w, h, left, top;
         tile += prev;
-        w = gUnk_03004D90[shape];
-        h = gUnk_03004D20[shape];
-        prev = gUnk_03004D30[shape];
+        w = gSpriteWidthPixels[shape];
+        h = gSpriteHeightPixels[shape];
+        prev = gSpriteTileArea[shape];
         if (!(p->flags & 2)) {
             s32 right, bottom;
             if (p->flags & 4) {
@@ -240,12 +233,12 @@ void sub_08214600(struct Sprite *p, s32 x, s32 y, s32 z)
             if (left + w < 0 || left > 240 || top + h < 0 || top > 160)
                 continue;
         }
-        attrs[count] = ((left & 0x1FF) << 16) | (top & 0xFF) | attr | gUnk_03004D50[shape];
+        attrs[count] = ((left & 0x1FF) << 16) | (top & 0xFF) | attr | gSpriteShapeAttr[shape];
         tiles[count] = tile;
         count++;
     }
     if (count > 0) {
-        s32 base = sub_082152E4(gUnk_030042F8 + frame->tileOffset, frame->tileSize);
+        s32 base = sub_082152E4(gAnimResourceSection0C + frame->tileOffset, frame->tileSize);
         u32 extra =
             (priority << 10) |
             (Palette_CacheObjectBank(res->paletteKey + anim->paletteOffset, res->palette) << 12);

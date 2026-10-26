@@ -53,8 +53,8 @@ void ScenePanel_UpdateDetail(struct ScenePanel *p)
             s32 *total;
             s32 value;
             p->account->amount += p->timer;
-            *(s32 *)((u8 *)gUnk_02000710 + 0x50C) += p->timer * p->iconIndex;
-            total = &gUnk_02000710->unk51C;
+            *(s32 *)((u8 *)gGameState + 0x50C) += p->timer * p->iconIndex;
+            total = &gGameState->unk51C;
             value = *total + p->timer * p->iconIndex;
             if (value < 0)
                 value = 0x7FFFFFFF;

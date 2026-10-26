@@ -1,12 +1,12 @@
 #include "global.h"
-#define gDisplayControlShadow gUnk_03004BD8
+#include "render.h"
+#define gDisplayControlShadow gDispCntShadow
 #define gPaletteShadow        gUnk_03004FC0
 struct PaletteScreen {
     u8 task[0x18];
     u8 *background;
     u8 *palette;
 };
-extern u16 gUnk_03004BD8;
 extern u16 gUnk_03004FC0[];
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void *ScriptProc_Start(u16, u16);
@@ -18,7 +18,7 @@ void PaletteScreen_InitDisplayResources(struct PaletteScreen *p)
     u8 *palette;
     s32 layers[2];
     {
-        u16 *control = &gUnk_03004BD8;
+        u16 *control = &gDispCntShadow;
         u32 mask = 0xfffff0ff;
         u16 value = *control;
         mask &= value;

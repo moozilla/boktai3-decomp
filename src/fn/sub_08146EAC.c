@@ -1,6 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
+#include "engine.h"
+#include "ram.h"
 static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
     struct ContactSwarmSprite *sprite = sp;
@@ -120,8 +122,7 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
 }
 
 // confidence=low: motion eleven toggles actionMode two with a secondary sprite animation.
-extern u32 gUnk_030053F4;
-extern u16 gUnk_02000528, gUnk_02000518, gUnk_02000590;
+extern u16 gUnk_02000528, gUnk_02000590;
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_SetPendingCallback(struct Player *, void (*)(struct Player *));
 void Player_OnMotion11Exit(struct Player *);
@@ -157,26 +158,26 @@ void Player_UpdateAlternateFormCue(struct Player *p)
 {
     if (Player_ConsumeStateEntry(p)) {
         if (p->actionMode != 2) {
-            if (p->statHundredths > 999 || (gUnk_030053F4 & 0x1000) || p->kind == 2)
+            if (p->statHundredths > 999 || (gEngineFlags & 0x1000) || p->kind == 2)
                 p->statusValue = 4000;
-            V->sprite.position.y = 450 + *(u16 *)((u8 *)gUnk_02000710 + 0x32);
+            V->sprite.position.y = 450 + *(u16 *)((u8 *)gGameState + 0x32);
             V->sprite.position.pad = 1;
             B(0x432) = 2;
             B(0x433) = 1;
         } else {
-            V->sprite.position.y = *(u16 *)((u8 *)gUnk_02000710 + 0x32) + 220;
+            V->sprite.position.y = *(u16 *)((u8 *)gGameState + 0x32) + 220;
             V->sprite.position.pad = 0;
             B(0x432) = 0;
             B(0x433) = 1;
         }
-        if (p->statHundredths > 999 && !(gUnk_030053F4 & 0x1000) && p->kind != 2) {
+        if (p->statHundredths > 999 && !(gEngineFlags & 0x1000) && p->kind != 2) {
             p->actionEighteenParameter = 0x16E;
             p->actionEighteenDuration = 0;
             p->actionEighteenEnabled = 1;
         } else
             p->actionEighteenEnabled = 0;
         Sound_PlaySong(0x306);
-        if (p->statHundredths <= 999 && !(gUnk_030053F4 & 0x1000) && p->kind != 2)
+        if (p->statHundredths <= 999 && !(gEngineFlags & 0x1000) && p->kind != 2)
             W(0x1D0) |= 1;
         else {
             W(0x1D0) &= ~1;
@@ -189,7 +190,7 @@ void Player_UpdateAlternateFormCue(struct Player *p)
         p->terrainRecoveryCounter = 0;
         H(0x4EA) = 0;
     }
-    if (gUnk_030053F4 & 0x1000)
+    if (gEngineFlags & 0x1000)
         Player_AddControlFlags(p, 8);
     {
         u32 mask = 0x100000;
@@ -212,13 +213,13 @@ void Player_UpdateAlternateFormCue(struct Player *p)
             register u8 *volatile *address asm("r2");
             u8 *base;
             s32 y = *height;
-            address = (u8 *volatile *)&gUnk_02000710;
+            address = (u8 *volatile *)&gGameState;
             base = *address;
             if (y < *(s16 *)(base + 0x32) + 220)
                 *height = *(u16 *)(base + 0x32) + 220;
             game = *address;
         } else
-            game = *(u8 *volatile *)&gUnk_02000710;
+            game = *(u8 *volatile *)&gGameState;
         V->sprite.position.x = *(u16 *)(game + 0x30) - 6;
         V->sprite.position.z = *(u16 *)(game + 0x34) + 6;
     }
@@ -248,7 +249,7 @@ void Player_UpdateAlternateFormCue(struct Player *p)
             }
             p->resetValue6FC = 15;
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 8), 64, 1)) {
-                if (p->statHundredths > 999 || (gUnk_030053F4 & 0x1000) || p->kind == 2 ||
+                if (p->statHundredths > 999 || (gEngineFlags & 0x1000) || p->kind == 2 ||
                     p->actionMode == 2) {
                     if (p->actionMode != 2) {
                         Sound_PlaySong(0x4F3);
@@ -277,7 +278,7 @@ void Player_UpdateAlternateFormCue(struct Player *p)
                         u32 one = 1;
                         u32 duration = 1800;
                         gUnk_02000528 = one;
-                        gUnk_02000518 = duration;
+                        gPlayerCueTimer = duration;
                     }
                     ScreenTransition_SendCommand(0, 4, 31, 31, 20, 0x1FFF, 0);
                     gUnk_02000590++;

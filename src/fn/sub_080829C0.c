@@ -40,8 +40,8 @@ void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactVi
             return;
     }
     SceneActorBehavior_ApplyContactReaction(source, destination, (void *)actor);
-    index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     index *= 2;
     {
         register const u16 *table asm("r2") = gUnk_0203B400;

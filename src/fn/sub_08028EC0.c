@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct Actor {
     u8 pad0[0x3b9];
     u8 command;
@@ -12,7 +13,6 @@ int Script_GetKeywordValue(int, int);
 void SceneActors_StopBackgroundFlash(void *);
 void BackgroundFlash_BeginAlternating(void *);
 void BackgroundFlash_BeginAppearance(void *);
-extern u32 gUnk_0300523C;
 void Vampire_QueueDefaultCommand(void)
 {
     struct Actor *p = SceneActors_GetBySlot(0);

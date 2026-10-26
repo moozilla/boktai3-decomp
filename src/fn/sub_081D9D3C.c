@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 struct ProjectilePosition {
     s16 x, y, z, unk_06;
@@ -23,7 +24,6 @@ struct ProjectileEntry {
     u8 unk_B0[0x174 - 0xB0];
     struct ProjectilePosition previousPosition;
 };
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 void Sound_PlaySong(u32);
 void Projectile_InitializeParams(struct ProjectileParams *);
@@ -37,8 +37,8 @@ void SceneStimulus_AddUntagged(s32, s32, s32, s32, s32);
 static inline s32 RandomValue(void)
 {
     const u16 *sample = gUnk_0203B400;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    sample += gUnk_03005308;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    sample += gRandomIndex;
     return *sample;
 }
 static inline s32 DirectionSector(s8 angle)

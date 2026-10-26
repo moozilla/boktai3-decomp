@@ -22,23 +22,23 @@ s32 Path_PickRandomPoint(struct PathPos *out, u32 pathId)
         out->z = 0;
         return -1;
     }
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
     {
-        s32 sample = (*(&gUnk_0203B400))[gUnk_03005308];
+        s32 sample = (*(&gUnk_0203B400))[gRandomIndex];
         point = Mod(sample, def[0]);
     }
     Path_GetPointPositionById((u16 *)out, pathId, point);
     x = (s16)out->x >> 8;
     z = (s16)out->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     props = TerrainModifiers_FindCellOverride(cell, 1);
     if (props)
         props += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         props = map->cells + offset;
     }

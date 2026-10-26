@@ -1,8 +1,8 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 static inline u8 chk(u32 m)
 {
-    if (*(u32 *)(gUnk_02000710 + 0x868) & m)
+    if (*(u32 *)(gGameState + 0x868) & m)
         return 1;
     return 0;
 }

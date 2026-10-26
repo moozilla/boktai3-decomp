@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_vec.h"
 
-#define gParticleRandomIndex gUnk_03005308
+#define gParticleRandomIndex gRandomIndex
 #define gParticleRandomTable gUnk_0203B400
 struct PlayerOrbitParticle {
     u32 flags;
@@ -19,7 +19,7 @@ struct PlayerOrbitEffect {
     u16 frame;
 };
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 static inline s32 TruncateOrbitOffset(s32 value)
@@ -47,7 +47,7 @@ void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct Sc
             p->flags &= ~1;
             p->position = *position;
             randomTable = gUnk_0203B400;
-            randomIndex = &gUnk_03005308;
+            randomIndex = &gRandomIndex;
             index = *randomIndex;
             index++;
             mask = 0x3FF;
@@ -77,8 +77,8 @@ void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct Sc
         p->animationPhase = 0;
         p->state = 1;
         {
-            u32 index = (gUnk_03005308 + 1) & 0x3FF;
-            gUnk_03005308 = index;
+            u32 index = (gRandomIndex + 1) & 0x3FF;
+            gRandomIndex = index;
             {
                 u32 random = *(u16 *)((index << 1) + (u32)gUnk_0203B400);
                 u32 range = 7;

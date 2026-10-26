@@ -1,5 +1,6 @@
 #include "global.h"
-#define gSpritePair gUnk_020004D4
+#include "ram.h"
+#define gSpritePair gSpritePairPool
 struct SpritePairSlot {
     u32 callback;
     u8 pad04[0x5c];
@@ -15,11 +16,10 @@ struct SpritePair {
     u8 pad00[0x18];
     struct SpritePairSlot slots[2];
 };
-extern struct SpritePair *gUnk_020004D4;
 void Sprite_Remove(void *);
 void SpritePair_ReleaseSlot(u32 index, u32 remove)
 {
-    struct SpritePair *pair = gUnk_020004D4;
+    struct SpritePair *pair = gSpritePairPool;
     if (pair && index <= 1 && pair->slots[index].active) {
         pair->slots[index].state = 0;
         pair->slots[index].timer = 0;

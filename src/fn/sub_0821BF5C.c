@@ -15,9 +15,9 @@ u16 sub_0821BE3C(struct TerrainPos *a, struct TerrainPos *b);
 static inline s32 cellIndex(struct TerrainPos *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 #define CELL_AT(cell, index)                                                                       \
@@ -26,7 +26,7 @@ static inline s32 cellIndex(struct TerrainPos *pos)
         if (found)                                                                                 \
             cell = found + 4;                                                                      \
         else                                                                                       \
-            cell = gUnk_030052F4->cells + 12 + (index) * 4;                                        \
+            cell = gTerrainMap->cells + 12 + (index) * 4;                                          \
     }
 
 u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
@@ -52,7 +52,7 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
         if (found)
             toCell = found + 4;
         else
-            toCell = (gUnk_030052F4->cells + 12) + (toIndex * 4);
+            toCell = (gTerrainMap->cells + 12) + (toIndex * 4);
     };
     toFlags = *((u16 *)(toCell + 2));
     if (kind == 4) {
@@ -72,7 +72,7 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
         if (found)
             fromCell = found + 4;
         else
-            fromCell = (gUnk_030052F4->cells + 12) + (fromIndex * 4);
+            fromCell = (gTerrainMap->cells + 12) + (fromIndex * 4);
     };
     fromKind = (*fromCell) >> 4;
     toKind = (*toCell) >> 4;
@@ -80,21 +80,21 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
     if (fromKind == 1) {
         if ((diff != 1) && (diff != (-1)))
             return 1;
-        if ((gUnk_02000710->flags868 & 0x10) && (toFlags & 0x80))
+        if ((gGameState->flags868 & 0x10) && (toFlags & 0x80))
             goto ret1;
         if (toKind != 0)
             return 1;
         if ((to->z & 0xFF) <= 0x7F) {
-            n = toIndex - gUnk_030052F8;
+            n = toIndex - gTerrainWidth;
             found = TerrainModifiers_FindCellOverride(n, 1);
         } else {
-            n = toIndex + gUnk_030052F8;
+            n = toIndex + gTerrainWidth;
             found = TerrainModifiers_FindCellOverride(n, 1);
         }
         if (found)
             cell = found + 4;
         else
-            cell = (gUnk_030052F4->cells + 12) + (n * 4);
+            cell = (gTerrainMap->cells + 12) + (n * 4);
         if ((*cell) >> 4)
             goto ret1;
         if (((*cell) & 15) != ((*toCell) & 15))
@@ -103,9 +103,9 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
             goto ret1;
         return 1;
     } else if (fromKind == 2) {
-        if ((diff != gUnk_030052F8) && (diff != (-gUnk_030052F8)))
+        if ((diff != gTerrainWidth) && (diff != (-gTerrainWidth)))
             return 1;
-        if ((gUnk_02000710->flags868 & 0x10) && (toFlags & 0x80))
+        if ((gGameState->flags868 & 0x10) && (toFlags & 0x80))
             goto ret1;
         if (toKind != 0)
             return 1;
@@ -119,7 +119,7 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
         if (found)
             cell = found + 4;
         else
-            cell = (gUnk_030052F4->cells + 12) + (n * 4);
+            cell = (gTerrainMap->cells + 12) + (n * 4);
         if ((*cell) >> 4)
             goto ret1;
         if (((*cell) & 15) != ((*toCell) & 15))
@@ -128,7 +128,7 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
             goto ret1;
         return 1;
     } else {
-        if ((diff == gUnk_030052F8) || (diff == (-gUnk_030052F8))) {
+        if ((diff == gTerrainWidth) || (diff == (-gTerrainWidth))) {
             if (toKind != 2)
                 return 1;
             if ((to->x & 0xFF) <= 0x7F) {
@@ -139,23 +139,23 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
                 found = TerrainModifiers_FindCellOverride(n, 1);
             }
             if (!found)
-                cell = (gUnk_030052F4->cells + 12) + (n * 4);
+                cell = (gTerrainMap->cells + 12) + (n * 4);
             else
                 cell = found + 4;
         } else if ((diff == 1) || (diff == (-1))) {
             if (toKind != 1)
                 return 1;
             if ((to->z & 0xFF) <= 0x7F) {
-                n = fromIndex - gUnk_030052F8;
+                n = fromIndex - gTerrainWidth;
                 found = TerrainModifiers_FindCellOverride(n, 1);
             } else {
-                n = fromIndex + gUnk_030052F8;
+                n = fromIndex + gTerrainWidth;
                 found = TerrainModifiers_FindCellOverride(n, 1);
             }
             if (found)
                 cell = found + 4;
             else
-                cell = (gUnk_030052F4->cells + 12) + (n * 4);
+                cell = (gTerrainMap->cells + 12) + (n * 4);
         } else
             return 1;
         if ((*cell) >> 4)

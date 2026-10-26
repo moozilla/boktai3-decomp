@@ -1,6 +1,3 @@
-#define gTerrainMap    gUnk_030052F4
-#define gTerrainWidth  gUnk_030052F8
-#define gTerrainHeight gUnk_030052FC
 #include "global.h"
 #include "contact_actor.h"
 #include "engine.h"

@@ -3,7 +3,7 @@
 void SceneActorControl_StartStoredCurve(struct SceneActorRegistryResetView *actor)
 {
     struct ContactPosition position;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
     position = *(struct ContactPosition *)((u8 *)actor + 0x2FC);
     SceneActorControl_StartPositionCurve(actor, &position);
     {

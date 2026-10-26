@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
+#include "engine.h"
 
 /* Skeleton defeat state (tentative). On entry: releases attachments, clears the route and,
  * for categories 6/7, emits a bone burst through sub_08127590. Then three outcomes:
@@ -25,7 +26,6 @@ void Skeleton_InitializeCategoryProfile(void *);
 void Skeleton_InitVariantMotion(void *);
 void SceneActorReaction_TickHiddenTimeout(void);
 void SceneActorRecord_RecordPair(u32, u32);
-extern u32 gUnk_03005308;
 extern u16 gUnk_030039F0;
 
 struct SkeletonContext {
@@ -37,7 +37,7 @@ struct SkeletonContext {
     u32 flags;
 };
 
-#define STAT(n)  (*(s16 *)((u8 *)gUnk_02000710 + (n)))
+#define STAT(n)  (*(s16 *)((u8 *)gGameState + (n)))
 #define COUNT(n) Count(&STAT(n))
 #define INC(n)   STAT(n) = Clamp(STAT(n) + 1)
 
@@ -110,9 +110,9 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u3
 }
 static inline u32 RandomFrom(const u16 *table, u32 wrap, u32 bits)
 {
-    u32 index = (gUnk_03005308 + 1) & wrap;
+    u32 index = (gRandomIndex + 1) & wrap;
     u32 v;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     index *= 2;
     v = *(const u16 *)(index + (u32)table);
     v &= bits;
@@ -520,7 +520,7 @@ notHidden:
                 category == 0x18 || category == 0x19)
                 Sound_PlaySong(0xE5);
         }
-        if (!Test(gUnk_030053F4, 0x4800) && !Flag(actor, 0x800, 0x2D0))
+        if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
             SceneActorRecord_RecordPair(gUnk_030039F0, (u16)actor->id);
     }
     ActorShadow_Disable((u8 *)actor + 0x320);

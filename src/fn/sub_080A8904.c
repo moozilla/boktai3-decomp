@@ -1,11 +1,11 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
+#include "engine.h"
 #define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 #ifdef NONMATCHING
 // fuzzy: 81.2%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences concern local lifetimes, register allocation and ordering.
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 SceneActorTerrain_GetNeighborCell(void *, s32);
 u8 TentacleActor_HasVisitedRoute(void *, s32);
@@ -16,8 +16,8 @@ static inline s32 Abs(s32 x)
 }
 static inline s32 Random(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     index *= 2;
     return *(const u16 *)((u32)gUnk_0203B400 + index);
 }

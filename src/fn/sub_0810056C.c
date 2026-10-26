@@ -1,6 +1,7 @@
-#define gSceneContactFlags gUnk_030053F4
+#define gSceneContactFlags gEngineFlags
 #define gSwitchPlayer      gUnk_02000580
 #include "global.h"
+#include "engine.h"
 struct FloorSwitch {
     u32 flags;
     u8 pad4[8];
@@ -39,7 +40,6 @@ struct FloorSwitchPlayer {
     u8 pad0[0x418];
     u8 state;
 };
-extern u32 gUnk_030053F4;
 extern struct FloorSwitchPlayer *gUnk_02000580;
 struct FloorSwitchObjectList *SceneBody_GetRegistry(void);
 void FloorSwitch_SetOccupant(struct FloorSwitch *, u32);
@@ -61,7 +61,7 @@ void FloorSwitch_UpdateOccupancy(struct FloorSwitch *p)
     for (o = list->head; o; o = o->next) {
         if (o->flags & 2)
             continue;
-        if (!(gUnk_030053F4 & 0x800) && !o->kind) {
+        if (!(gEngineFlags & 0x800) && !o->kind) {
             if (!gUnk_02000580 || gUnk_02000580->state == 3)
                 continue;
         }

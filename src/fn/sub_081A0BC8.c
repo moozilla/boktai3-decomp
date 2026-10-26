@@ -68,8 +68,8 @@ static inline void SetHeading(struct Hresvelgr *p, s32 heading)
 static inline s32 RandomValue(const u16 *table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)((u32)table + offset);
 }
 static inline void SetVector(struct Vec *p, s32 x, s32 y, s32 z)
@@ -81,16 +81,16 @@ static inline void SetVector(struct Vec *p, s32 x, s32 y, s32 z)
 static inline s32 CellIndex(struct Vec *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u8 *CellProperties(s32 cell)
 {
     u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         return p + 4;
-    return (cell * 4 + 12) + gUnk_030052F4->cells;
+    return (cell * 4 + 12) + gTerrainMap->cells;
 }
 static inline s32 Height(struct Vec *p)
 {

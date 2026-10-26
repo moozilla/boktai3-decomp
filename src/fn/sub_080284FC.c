@@ -34,7 +34,6 @@ void SceneActors_SpawnDestructionParticles(void *);
 int SceneActorGraphics_GetEffectState(void *);
 void sub_08026FF0(void *);
 void sub_08027214(void *);
-extern u32 gUnk_03005308;
 
 static inline void Vampire_SetState(struct VampireDamage *p, void (*fn)(void *), int id)
 {
@@ -94,7 +93,7 @@ int Vampire_ApplyPendingDamage(struct VampireDamage *p)
     flaggedBit = ((u8 *)p)[0x20f] >> 3;
     flaggedBit &= 1;
     if ((((*((u32 *)(((u8 *)p) + 0x3ac))) & 1) && (((u8 *)p)[0x384] == 0)) &&
-        ((*((s16 *)(((u8 *)gUnk_02000710) + 0x876))) > 0)) {
+        ((*((s16 *)(((u8 *)gGameState) + 0x876))) > 0)) {
         *hit = 1;
         damage = p->health - (p->maxHealth / 2);
         if (damage < 0)
@@ -111,7 +110,7 @@ int Vampire_ApplyPendingDamage(struct VampireDamage *p)
     if ((*((u16 *)(((u8 *)p) + 0x350))) == 0) {
         if (((*((u16 *)(((u8 *)p) + 0x34e))) == 0) && SceneActorGraphics_GetEffectState(p)) {
             SceneActors_SpawnDestructionParticles(p);
-            damage = (*((s16 *)(((u8 *)gUnk_02000710) + 0x876))) * 5;
+            damage = (*((s16 *)(((u8 *)gGameState) + 0x876))) * 5;
             Sound_PlaySongChecked(0x12a);
             *((u16 *)(((u8 *)p) + 0x350)) = (t1 = 60);
         }
@@ -173,9 +172,9 @@ int Vampire_ApplyPendingDamage(struct VampireDamage *p)
             return 1;
         }
         ((u8 *)p)[0x399] = t1 - 52;
-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+        gRandomIndex = (gRandomIndex + 1) & 1023;
         {
-            u32 index = gUnk_03005308 * 2;
+            u32 index = gRandomIndex * 2;
             u32 value;
             value = *((u16 *)(((u8 *)0x0203B400) + index));
             ((u8 *)p)[0x398] = value;

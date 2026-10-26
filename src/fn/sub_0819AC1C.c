@@ -25,7 +25,7 @@ struct SceneOrbitTarget {
     s16 x, y, z;
 };
 
-extern struct SceneOrbitTarget *gUnk_02000710;
+extern struct SceneOrbitTarget *gGameState;
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 void SpriteComponent_Suspend(u8 *);
@@ -54,8 +54,8 @@ void SceneOrbitHazard_UpdateTravel(struct SceneOrbitHazard *hazard)
     s32 angle, sine, cosine;
     switch (hazard->phase) {
         case 0:
-            angle = Math_Atan2(gUnk_02000710->x - hazard->anchor->x,
-                               gUnk_02000710->z - hazard->anchor->z);
+            angle =
+                Math_Atan2(gGameState->x - hazard->anchor->x, gGameState->z - hazard->anchor->z);
             sine = gSineTable[angle & 255];
             cosine = gSineTable[(angle + 64) & 255];
             hazard->velocity.x = SceneOrbitHazard_ScaleVelocity(cosine * 15);

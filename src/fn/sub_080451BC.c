@@ -1,7 +1,7 @@
 #include "encoded_record.h"
+#include "engine.h"
 /* EncodedRecord_EncodeAlternateFields: Packs game state and name into the alternate record format then applies seeded masking and writes its checksum */
 #define EncodedRecord_EncodeAlternateFields sub_080451BC
-extern u32 gUnk_03005308;
 extern u8 *gUnk_030053F8;
 struct EncodedRecordSession {
     u8 unknown0[0x18];
@@ -19,8 +19,8 @@ void EncodedRecord_EncodeAlternateFields(u8 *record)
     s32 value;
     const u8 *name;
     u32 i;
-    randomIndex = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = randomIndex;
+    randomIndex = (gRandomIndex + 1) & 1023;
+    gRandomIndex = randomIndex;
     randomWord = ((const u16 *)RANDOM_TABLE_ADDR)[randomIndex];
     skip = (randomWord >> 8) & 7;
     bit = 16;
@@ -29,17 +29,17 @@ void EncodedRecord_EncodeAlternateFields(u8 *record)
     EncodedRecord_WriteBits(record, skip, &bit, 3, 6);
     EncodedRecord_WriteBits(record, ((struct EncodedRecordSession *)gUnk_030053F8)->value, &bit, 6,
                             6);
-    EncodedRecord_WriteBits(record, gUnk_02000710->unk660, &bit, 3, 6);
-    EncodedRecord_WriteBits(record, gUnk_02000710->unk662, &bit, 4, 6);
-    EncodedRecord_WriteBits(record, (s16)gUnk_02000710->counter538 >> 3, &bit, 8, 6);
-    EncodedRecord_WriteBits(record, gUnk_02000710->unk664, &bit, 7, 6);
-    EncodedRecord_WriteBits(record, gUnk_02000710->unk7B4, &bit, 6, 6);
+    EncodedRecord_WriteBits(record, gGameState->unk660, &bit, 3, 6);
+    EncodedRecord_WriteBits(record, gGameState->unk662, &bit, 4, 6);
+    EncodedRecord_WriteBits(record, (s16)gGameState->counter538 >> 3, &bit, 8, 6);
+    EncodedRecord_WriteBits(record, gGameState->unk664, &bit, 7, 6);
+    EncodedRecord_WriteBits(record, gGameState->unk7B4, &bit, 6, 6);
     EncodedRecord_WriteBits(record, 0, &bit, 6, 6);
-    EncodedRecord_WriteBits(record, gUnk_02000710->unk520 >> 12, &bit, 10, 6);
-    EncodedRecord_WriteBits(record, gUnk_02000710->unk51C >> 8, &bit, 8, 6);
-    EncodedRecord_WriteBits(record, Div(gUnk_02000710->unk614, 216000), &bit, 6, 6);
-    EncodedRecord_WriteBits(record, gUnk_02000710->unk536, &bit, 16, 6);
-    name = gUnk_02000710->playerName;
+    EncodedRecord_WriteBits(record, gGameState->unk520 >> 12, &bit, 10, 6);
+    EncodedRecord_WriteBits(record, gGameState->unk51C >> 8, &bit, 8, 6);
+    EncodedRecord_WriteBits(record, Div(gGameState->unk614, 216000), &bit, 6, 6);
+    EncodedRecord_WriteBits(record, gGameState->unk536, &bit, 16, 6);
+    name = gGameState->playerName;
     i = 0;
     if (*name) {
         name++;

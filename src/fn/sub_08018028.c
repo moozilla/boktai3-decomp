@@ -32,8 +32,8 @@ void Weather_EnterPhase(struct WeatherState *, int);
 void sub_08017684(struct WeatherState *);
 static inline u16 RAND(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
-    return *(const u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
+    gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+    return *(const u16 *)((gRandomIndex << 1) + (u32)gUnk_0203B400);
 }
 s32 Weather_Initialize(struct WeatherState *p)
 {
@@ -79,7 +79,7 @@ s32 Weather_Initialize(struct WeatherState *p)
             gUnk_0200008C += Mod(RAND(), p->delayRange);
     }
     if (Script_SeekToKeyword(0x63))
-        *(s32 *)((u8 *)gUnk_02000710 + 0x630) = Script_GetValue();
+        *(s32 *)((u8 *)gGameState + 0x630) = Script_GetValue();
     if (Script_SeekToKeyword(0x74)) {
         p->duration = Script_GetValue();
         p->durationRange = Script_GetValue();
@@ -90,23 +90,23 @@ s32 Weather_Initialize(struct WeatherState *p)
     Weather_SetRandomDuration(p);
     p->unknown20 = Script_GetKeywordValue(0x61, 1);
     {
-        u8 *base = (u8 *)gUnk_02000710;
+        u8 *base = (u8 *)gGameState;
         register u32 offset asm("r4") = 0x876;
         s16 *sensor;
         s32 storm;
         sensor = (void *)(base + offset);
         storm = *sensor;
-        *(s32 *)((u8 *)gUnk_02000710 + 0x630) += storm >> 2;
+        *(s32 *)((u8 *)gGameState + 0x630) += storm >> 2;
     }
-    if (*(s32 *)((u8 *)gUnk_02000710 + 0x630) >= gUnk_02000080)
-        *(s32 *)((u8 *)gUnk_02000710 + 0x630) = gUnk_02000080;
+    if (*(s32 *)((u8 *)gGameState + 0x630) >= gUnk_02000080)
+        *(s32 *)((u8 *)gGameState + 0x630) = gUnk_02000080;
     phase = 0;
-    if (gUnk_02000710->unk876 == 0) {
+    if (gGameState->unk876 == 0) {
         if (gUnk_0200008C > 0) {
             if (gUnk_0200008C <= 99)
                 gUnk_0200008C = 100;
             phase = 3;
-        } else if (*(s32 *)((u8 *)gUnk_02000710 + 0x630) == 0) {
+        } else if (*(s32 *)((u8 *)gGameState + 0x630) == 0) {
             s32 volume = Weather_GetStormVolume(p);
             if ((RAND() & 0x3F) < volume)
                 phase = 3;
@@ -128,7 +128,7 @@ s32 Weather_Initialize(struct WeatherState *p)
     p->f58 = Script_GetKeywordValue(0x4F, 0);
     {
         const u16 *table = gUnk_0203B400;
-        u32 *seed = &gUnk_03005308;
+        u32 *seed = &gRandomIndex;
         register u32 index asm("r1");
         u32 mask;
         register u32 sampleMask asm("r2");

@@ -25,8 +25,8 @@ struct SpawnOffsets {
     struct SpawnOffset e[4];
 };
 extern const struct SpawnOffsets gUnk_0824FE5C;
-extern struct PHTerrain *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
+extern struct PHTerrain *gTerrainMap;
+extern u32 gTerrainWidth, gTerrainHeight;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 s32 Script_GetValueSafe(void);
@@ -50,9 +50,9 @@ void TerrainOverlay_QueueAddActor(void *);
 static inline s32 EnemyD459_CellIndex(struct PHVec *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline void EnemyD459_StepAnimation(u8 *p, void *sprite, struct FanSeq *s)
 {

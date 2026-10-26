@@ -1,6 +1,6 @@
 #include "global.h"
+#include "game_state.h"
 extern u8 *gUnk_02000580[];
-extern u8 *gUnk_02000710;
 s32 Script_GetActorIndex(void);
 u32 ScriptActor_TestCounter628FromScript(void)
 {
@@ -9,7 +9,7 @@ u32 ScriptActor_TestCounter628FromScript(void)
     p = gUnk_02000580[i];
     if (p != 0) {
         u32 k = p[0x472];
-        u8 *b = gUnk_02000710;
+        u8 *b = gGameState;
         if (*(s32 *)(b + k * 4 + 0x628) > 0)
             goto one;
     }

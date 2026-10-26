@@ -30,11 +30,11 @@ struct Unk080D6DF8Delta {
 };
 static inline s32 GridWidth(void)
 {
-    return *(s16 *)(gUnk_030052F4->cells + 4);
+    return *(s16 *)(gTerrainMap->cells + 4);
 }
 static inline s32 GridHeight(void)
 {
-    return *(s16 *)(gUnk_030052F4->cells + 6);
+    return *(s16 *)(gTerrainMap->cells + 6);
 }
 
 static inline u8 CanReach(s32 cell, s32 goal, s32 y, u32 kind, s32 total)

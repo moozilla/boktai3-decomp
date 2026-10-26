@@ -101,9 +101,9 @@ void ScaledShadow_Initialize(void *, void *, u32, u32, u32, u32, u32, u32, u32, 
 static inline s32 cellIndex(struct FallingVec *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 static inline struct Cell *getCell(s32 index)
@@ -111,7 +111,7 @@ static inline struct Cell *getCell(s32 index)
     u8 *dynamic = TerrainModifiers_FindCellOverride(index, 1);
     if (dynamic)
         return (struct Cell *)(dynamic + 4);
-    return (struct Cell *)(gUnk_030052F4->cells + 12 + index * 4);
+    return (struct Cell *)(gTerrainMap->cells + 12 + index * 4);
 }
 
 s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, u32 health,
@@ -156,10 +156,10 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
         u32 slope;
         s32 height;
         pos = groundPos;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             index = 0;
         else
-            index = gUnk_030052F4->rows[z] + x;
+            index = gTerrainMap->rows[z] + x;
         cell = getCell(index);
         slope = cell->height >> 4;
         height = (cell->height & 15) << 8;
@@ -389,7 +389,7 @@ void FallingObject_UpdateShatter(struct FallingObject *object)
     if (object->entered) {
         object->entered = 0;
         FallingObject_ClearEffect(object);
-        if (!(gUnk_030053F4 & 2048)) {
+        if (!(gEngineFlags & 2048)) {
             low.x = -15;
             low.y = 8;
             low.z = -15;
@@ -427,7 +427,7 @@ void FallingObject_UpdateBounceAway(struct FallingObject *object)
     struct FallingPackedVec low, high;
     if (object->entered) {
         object->entered = 0;
-        if (!(gUnk_030053F4 & 2048)) {
+        if (!(gEngineFlags & 2048)) {
             low.x = -15;
             low.y = 8;
             low.z = -15;

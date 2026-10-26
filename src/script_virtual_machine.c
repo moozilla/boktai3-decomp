@@ -815,7 +815,7 @@ void GameState_SelectRamBase(void)
     u32 timer = *(vu16 *)0x0400010C;
     register u8 *base asm("r1") = gUnk_0203C400;
     base += (timer & 127) * 8;
-    gUnk_02000710 = (struct GameState *)base;
+    gGameState = (struct GameState *)base;
     gUnk_0200070C = base + 0xb00;
     gUnk_02000708 = base + 0x1600;
     gUnk_02000704 = base + 0x1a00;
@@ -825,39 +825,39 @@ void GameState_SelectRamBase(void)
 void GameState_ClearActiveRegions(void)
 {
     Memory_Clear(gUnk_02000708, 0x400);
-    Memory_Clear(gUnk_02000710, 0x89C);
+    Memory_Clear(gGameState, 0x89C);
 }
 
 void GameState_ResetActiveRegions(void)
 {
-    u16 v = *(u16 *)((u8 *)gUnk_02000710 + 0x744);
+    u16 v = *(u16 *)((u8 *)gGameState + 0x744);
     Memory_Clear(gUnk_02000708, 0x400);
-    Memory_Clear((u8 *)gUnk_02000710 + 0x30, 0x74A);
-    *(u16 *)((u8 *)gUnk_02000710 + 0x744) = v;
+    Memory_Clear((u8 *)gGameState + 0x30, 0x74A);
+    *(u16 *)((u8 *)gGameState + 0x744) = v;
     GameState_BackupActiveRegions();
 }
 
 void GameState_BackupActiveRegions(void)
 {
-    Memory_Copy(gUnk_0200070C, gUnk_02000710, 0x89C);
+    Memory_Copy(gUnk_0200070C, gGameState, 0x89C);
     Memory_Copy(gUnk_02000704, gUnk_02000708, 0x400);
 }
 
 void GameState_RestoreActiveRegions(void)
 {
-    Memory_Copy(gUnk_02000710, gUnk_0200070C, 0x89C);
+    Memory_Copy(gGameState, gUnk_0200070C, 0x89C);
     Memory_Copy(gUnk_02000708, gUnk_02000704, 0x400);
 }
 
 void GameState_BackupRegionRange(u8 *p, u32 n)
 {
-    s32 d = p - (u8 *)gUnk_02000710;
+    s32 d = p - (u8 *)gGameState;
     Memory_Copy(gUnk_0200070C + d, p, n);
 }
 
 u8 *GameState_GetBackupRegionPointer(u8 *p)
 {
-    s32 d = p - (u8 *)gUnk_02000710;
+    s32 d = p - (u8 *)gGameState;
     return gUnk_0200070C + d;
 }
 
@@ -910,7 +910,7 @@ u8 *Script_DecodeVariableValue(u8 *p, s32 *type, s32 *value)
     u8 *base, *end;
     *type = (descriptor >> 24) & 15;
     if ((descriptor & 0xF00000) == 0x800000)
-        base = (u8 *)gUnk_02000710;
+        base = (u8 *)gGameState;
     else if ((descriptor & 0xF00000) == 0x100000)
         base = gUnk_02000700;
     else
@@ -972,7 +972,7 @@ u8 *Script_AssignVariableOperand(u8 *p, s32 value)
     u32 descriptor = (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
     u8 *base, *end;
     if ((descriptor & 0xF00000) == 0x800000)
-        base = (u8 *)gUnk_02000710;
+        base = (u8 *)gGameState;
     else if ((descriptor & 0xF00000) == 0x100000)
         base = gUnk_02000700;
     else
@@ -1013,7 +1013,7 @@ void Script_WriteReferenceValue(struct ScriptUtilityReference *ref, s32 index, s
                      (ref->descriptor[2] << 8) | ref->descriptor[3];
     u8 *base;
     if ((descriptor & 0xF00000) == 0x800000)
-        base = (u8 *)gUnk_02000710;
+        base = (u8 *)gGameState;
     else if ((descriptor & 0xF00000) == 0x100000)
         base = gUnk_02000700;
     else
@@ -1031,7 +1031,7 @@ s32 Script_ReadReferenceValue(struct ScriptUtilityReference *ref, s32 index)
                      (ref->descriptor[2] << 8) | ref->descriptor[3];
     u8 *base;
     if ((descriptor & 0xF00000) == 0x800000)
-        base = (u8 *)gUnk_02000710;
+        base = (u8 *)gGameState;
     else if ((descriptor & 0xF00000) == 0x100000)
         base = gUnk_02000700;
     else

@@ -66,7 +66,7 @@ struct PlayerClonePool {
     s16 palette1[16];
     s16 palette2[16];
 };
-extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560;
+extern u32 gEngineFlags, gUnk_030053F0, gUnk_02000560;
 extern const s16 gUnk_086149C4[];
 s32 sub_08249240(void *, s32, void *);
 void PlayerClone_ReleaseSlot(struct PlayerClonePool *, struct PlayerClone *, s32);
@@ -96,7 +96,7 @@ static inline void Vec_Sum(struct CloneVec *d, struct CloneVec *a, struct CloneV
 }
 static inline u32 IsPaused(u32 mask)
 {
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 static inline u32 TestGlobal(u32 mask)
 {

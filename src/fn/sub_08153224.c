@@ -1,4 +1,5 @@
 #include "contact_swarm.h"
+#include "render.h"
 
 #ifdef NONMATCHING
 // fuzzy: 93.2%
@@ -62,7 +63,6 @@ void Player_RestartAnimationFromResource(struct P *);
 void Player_UpdateFacingSide(struct P *);
 u32 Player_SetAnimation(struct P *, u32, u32, u32);
 void SpiralTrail_CreateWithParticles(struct P *, s32, void *, s32, s32);
-extern u8 *gUnk_030042E4;
 s32 Player_ConsumeStateEntry(struct P *);
 s32 ActorVariant_GetTableValue(s32, s32);
 void Player_SetActionPhase(struct P *, s32);

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 struct RatatoskPosition {
     u32 xy, z;
@@ -75,7 +76,6 @@ s32 Ratatosk_IsPositionOutsideArena(void *);
 void SunOrb_FadeOutAll(s32);
 s32 Ratatosk_FindPointNearestPlayer(void *, s32);
 void SunOrb_SetMotionParams(void *, s32, s32, s32, s32);
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 // confidence=low: raises a sun orb at a player-near point; precise attack name tentative.
 void Ratatosk_UpdateSunOrbPlacement(struct Ratatosk *p)
@@ -96,9 +96,9 @@ void Ratatosk_UpdateSunOrbPlacement(struct Ratatosk *p)
             HALF(p, 0xe86) = 0;
             p->hasOrb = 0;
             HALF(p, 0xee2) = 0;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+            gRandomIndex = (gRandomIndex + 1) & 1023;
             {
-                s32 sample = (u8)((const u16 *)RANDOM_TABLE_ADDR)[gUnk_03005308];
+                s32 sample = (u8)((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
                 HALF(p, 0xf0e) = sample;
             }
             if (HALF(p, 0xf0e) > 128)

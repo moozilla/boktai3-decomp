@@ -99,15 +99,15 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
                     struct ChaseTarget *target = (void *)actor->fieldDC;
                     s32 cell = Chase_CellIndex(target->position.x >> 8, target->position.z >> 8);
                     struct ContactPosition *p = &center;
-                    s32 x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-                    s32 z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+                    s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
+                    s32 z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
                     u8 *data;
                     p->x = (x << 8) + 128;
                     data = TerrainModifiers_FindCellOverride(cell, 1);
                     if (data)
                         data += 4;
                     else
-                        data = gUnk_030052F4->cells + (cell * 4 + 12);
+                        data = gTerrainMap->cells + (cell * 4 + 12);
                     p->y = (*data & 15) << 8;
                     p->z = (z << 8) + 128;
                 }
@@ -128,15 +128,15 @@ void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
                     struct ChaseTarget *target = (void *)actor->fieldDC;
                     s32 cell = Chase_CellIndex(target->position.x >> 8, target->position.z >> 8);
                     struct ContactPosition *p = &center;
-                    s32 x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-                    register s32 z asm("sb") = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+                    s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
+                    register s32 z asm("sb") = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
                     u8 *data;
                     p->x = (x << 8) + 128;
                     data = TerrainModifiers_FindCellOverride(cell, 1);
                     if (data)
                         data += 4;
                     else
-                        data = gUnk_030052F4->cells + (cell * 4 + 12);
+                        data = gTerrainMap->cells + (cell * 4 + 12);
                     p->y = (*data & 15) << 8;
                     p->z = (z << 8) + 128;
                 }

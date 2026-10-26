@@ -8,10 +8,10 @@ struct G {
     u8 f00[0x600];
     u32 w600;
 };
-extern struct G *gUnk_02000710;
+extern struct G *gGameState;
 
 void Player_OnStateOneEvent(u32 a, u32 b, struct P *p)
 {
     if (p->d18 == 1)
-        gUnk_02000710->w600 += 4;
+        gGameState->w600 += 4;
 }

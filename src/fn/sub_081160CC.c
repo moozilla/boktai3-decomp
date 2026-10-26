@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -20,7 +21,6 @@ struct DropManager {
     u8 pad0[0x18];
     struct DropEntry entries[16];
 };
-extern struct DropManager *gUnk_020001E8;
 struct DropManager *SpriteDrop_CreateManager(void);
 s32 Terrain_GetCellClearance(void *);
 void SpriteDrop_UpdateEntry(struct DropEntry *);
@@ -35,12 +35,12 @@ s32 sub_081160CC(s32 x, s32 y, s32 kind)
 {
     struct DropManager *m;
     s32 i;
-    if (!gUnk_020001E8) {
+    if (!gCompactParticlePool) {
         m = SpriteDrop_CreateManager();
         if (!m)
             return -1;
     } else
-        m = gUnk_020001E8;
+        m = gCompactParticlePool;
     for (i = 0; i < 16; i++) {
         if (!E.active) {
             struct PackedVec size, offset, position;

@@ -1,4 +1,3 @@
-#define gEffectQuad gUnk_02000098
 #include "global.h"
 #include "area_effect_link.h"
 struct EffectQuadPosition {
@@ -15,7 +14,7 @@ struct EffectQuad {
     struct EffectQuadEntry entries[4];
     void *resource;
 };
-extern struct EffectQuad *gUnk_02000098;
+extern struct EffectQuad *gEffectQuad;
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 static inline s32 LocalPlayer(void)
 {
@@ -25,11 +24,11 @@ static inline s32 LocalPlayer(void)
 }
 void EffectQuad_StartRemoteEntry(s32 player, const struct EffectQuadPosition *position)
 {
-    if (gUnk_02000098) {
+    if (gEffectQuad) {
         if (LocalPlayer() != player) {
-            struct EffectQuadEntry *entry = &gUnk_02000098->entries[player];
+            struct EffectQuadEntry *entry = &gEffectQuad->entries[player];
             entry->position = *position;
-            SpriteDrawable_SelectTileFrame(entry->drawable, gUnk_02000098->resource, 0x33);
+            SpriteDrawable_SelectTileFrame(entry->drawable, gEffectQuad->resource, 0x33);
             {
                 u32 one = 1;
                 u32 zero = 0;

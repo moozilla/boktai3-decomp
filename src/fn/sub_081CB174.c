@@ -1,10 +1,10 @@
 #include "global.h"
+#include "render.h"
 
 #define B(o) (*(u8 *)((u8 *)p + (o)))
 #define H(o) (*(u16 *)((u8 *)p + (o)))
 
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
-extern u8 *gUnk_030042E4;
 extern const s16 gUnk_086149C4[];
 
 static inline s32 shift12(s32 x)
@@ -58,7 +58,7 @@ void StateActor_UpdateHoverBob(u32 a, void *p, u32 flags)
                 break;
         }
         Actor_PlayAnimationEntry(p, r, 1, 0, 4);
-        CpuSet(gUnk_030042E4 + 0x5C0, (u8 *)p + 0x1CC, 0x04000008);
+        CpuSet(gPaletteBankData + 0x5C0, (u8 *)p + 0x1CC, 0x04000008);
     }
     {
         u16 m = 0x400;

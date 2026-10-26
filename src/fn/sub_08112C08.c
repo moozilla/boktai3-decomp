@@ -1,9 +1,9 @@
 #include "global.h"
-extern u8 *gUnk_020004BC;
+#include "ram.h"
 void Sprite_Remove(void *);
 void ActorMarkerPool_RemoveMarker(u32 i)
 {
-    u8 *g = gUnk_020004BC;
+    u8 *g = gPanelSpritePool;
     if (g != 0 && i <= 7) {
         u32 off = i * 0x60;
         u8 *q = g + off;

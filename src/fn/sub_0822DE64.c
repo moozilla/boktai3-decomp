@@ -8,8 +8,8 @@ extern const struct Record gUnk_08E6092C[];
 void Inventory_ClearEquipmentEntry(s32 index);
 void Inventory_TryAddEquipmentEntry(struct Record *record);
 /* game state fields, addressed index-first as the original does */
-#define STATE_U16(offset) (*(u16 *)((u8 *)gUnk_02000710 + (offset)))
-#define SLOT68(i)         (*(s16 *)((u8 *)gUnk_02000710 + (i) * 2 + 0x68))
+#define STATE_U16(offset) (*(u16 *)((u8 *)gGameState + (offset)))
+#define SLOT68(i)         (*(s16 *)((u8 *)gGameState + (i) * 2 + 0x68))
 /* Script: clears game state +0x72C (two words), the 48 entries reset by
    Inventory_ClearEquipmentEntry, the eight slots at +0x68 and +0x50, then -n count, -w count
    record ids (each record of 08E6092C copied and passed to Inventory_TryAddEquipmentEntry) and
@@ -19,7 +19,7 @@ void GameState_ResetEntriesFromScript(void)
     s32 i, count;
     struct Record record;
     for (i = 0; i <= 1; i++)
-        *(u32 *)((u8 *)gUnk_02000710 + i * 4 + 0x72C) = 0;
+        *(u32 *)((u8 *)gGameState + i * 4 + 0x72C) = 0;
     for (i = 0; i <= 47; i++)
         Inventory_ClearEquipmentEntry(i);
     for (i = 0; i <= 7; i++)

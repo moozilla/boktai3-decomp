@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern u8 gUnk_03005430[];
 u32 SunClock_GetPackedDate(void);
 s32 SunClock_GetBaseHour(void), SunClock_GetBaseMinute(void);
@@ -7,7 +7,7 @@ void Clock_UnpackDate(s32 *, s32 *, s32 *, s32);
 u32 Clock_CalculateDateDifference(s32, s32, s32, s32, s32, s32);
 u32 Solar_HasExposureCooldownElapsed(void);
 s32 sub_0822CAA0(void);
-#define GS(type, offset) (*(type *)(gUnk_02000710 + (offset)))
+#define GS(type, offset) (*(type *)(gGameState + (offset)))
 
 void sub_0822CB08(void)
 {

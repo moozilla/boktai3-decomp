@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 
 // Tentative panel/save fields used to choose four distinct available entries.
 struct P {
@@ -15,8 +16,8 @@ struct Save {
     u8 pad2[0x34];
     s16 rightRows[16];
 };
-extern struct Save *gUnk_02000710;
-extern u32 gUnk_03003A50, gUnk_03005308;
+extern struct Save *gGameState;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void GameState_AddEquipment(int);
 int Mod(int, int);
@@ -27,7 +28,7 @@ void WirelessGameMenu_InitEquipmentChoices(struct P *p)
     register int start asm("r4");
     register int i asm("r5");
     u32 *random;
-    gUnk_02000710->selection = mask;
+    gGameState->selection = mask;
     GameState_AddEquipment(0);
     {
         u32 t = 1;
@@ -96,10 +97,10 @@ void WirelessGameMenu_InitEquipmentChoices(struct P *p)
             mask = t;
         }
     }
-    start = Mod(gUnk_03003A50, 12);
+    start = Mod(gSceneEffectPalettePhase, 12);
     i = 0;
     {
-        register u32 *t asm("r0") = &gUnk_03005308;
+        register u32 *t asm("r0") = &gRandomIndex;
         asm volatile("" : "+r"(t));
         random = t;
     }
@@ -110,7 +111,7 @@ void WirelessGameMenu_InitEquipmentChoices(struct P *p)
         int index;
         int byteOffset;
         {
-            struct Save **slot = &gUnk_02000710;
+            struct Save **slot = &gGameState;
             struct Save *save;
             s16 *row;
             save = *slot;
@@ -138,7 +139,7 @@ void WirelessGameMenu_InitEquipmentChoices(struct P *p)
                     t & bit;
                 }) != 0) {
                 {
-                    struct Save **slot = &gUnk_02000710;
+                    struct Save **slot = &gGameState;
                     struct Save *save;
                     save = *slot;
                     *(s16 *)(offset + (u32)save + 0x88) = item;
@@ -166,5 +167,5 @@ void WirelessGameMenu_InitEquipmentChoices(struct P *p)
         if (start > 11)
             start -= 12;
     } while (i <= 3);
-    gUnk_02000710->rightSelected = 0;
+    gGameState->rightSelected = 0;
 }

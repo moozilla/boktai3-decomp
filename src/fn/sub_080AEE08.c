@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
+#include "engine.h"
 
 #ifdef NONMATCHING
 // fuzzy: 86.4%
@@ -17,7 +18,6 @@ void SceneActor_CallContextScriptB(void *);
 void Vorn_SendMessage(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
-extern u32 gUnk_03005308;
 static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput, u32 off)
 {
     u32 mask = maskInput;
@@ -25,7 +25,7 @@ static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput,
 }
 static inline u32 Random4(void)
 {
-    register u32 *cursor asm("r3") = &gUnk_03005308;
+    register u32 *cursor asm("r3") = &gRandomIndex;
     u32 index = (*cursor + 1) & 1023;
     register u32 v asm("r1");
     *cursor = index;
@@ -37,9 +37,9 @@ static inline u32 Random4(void)
 /* The first spark's index arithmetic; the burst below passes the table explicitly. */
 static inline u32 RandomFrom(const u16 *table)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
+    u32 index = (gRandomIndex + 1) & 1023;
     u32 v;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     index *= 2;
     v = *(const u16 *)(index + (u32)table);
     v &= 3;
@@ -47,7 +47,7 @@ static inline u32 RandomFrom(const u16 *table)
 }
 inline static u32 Random4_UpdateDefeat(void)
 {
-    register u32 *cursor asm("r3") = &gUnk_03005308;
+    register u32 *cursor asm("r3") = &gRandomIndex;
     u32 index = ((*cursor) + 1) & 1023;
     register u32 v asm("r1");
     *cursor = index;

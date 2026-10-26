@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct P {
     u8 f[0x18];
@@ -8,14 +9,13 @@ struct P {
     u32 c;
     u8 d;
 };
-extern struct P *gUnk_020001B4;
 u32 ScriptProc_Start(s32, s32);
 
 s32 Pool128_InitManager(struct P *p)
 {
     p->a = ScriptProc_Start(0x922e, 0x1003);
     p->b = ScriptProc_Start(0x922e, 0x931e);
-    gUnk_020001B4 = p;
+    gRegionActorPool = p;
     p->c = 0;
     p->d = 0xff;
     return 0;

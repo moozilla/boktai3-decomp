@@ -6,7 +6,7 @@ void SceneInventory_ShowConsumableDescription(struct SceneInventoryPanel *panel)
     register const u8 *selectionPtr asm("r1") = &panel->selection;
     register u32 selection asm("r0") = *selectionPtr;
     if (selection <= 15) {
-        struct GameState *state = gUnk_02000710;
+        struct GameState *state = gGameState;
         struct GameState *indexed;
         indexed = (void *)(selection * 2 + (u32)state);
         item = indexed->table160[0];

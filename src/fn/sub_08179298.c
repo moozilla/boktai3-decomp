@@ -12,13 +12,13 @@ static inline u8 testFlag(u32 mask, u32 *flags)
 }
 /* Registry routine CC28: creates the field HUD/menu manager (0x02000214),
    choosing one of three creators by a game-state flag (+0x868 bit 7) and an
-   engine flag (gUnk_030053F4 bit 11). */
+   engine flag (gEngineFlags bit 11). */
 void *Hud_Create(u32 a, u32 b)
 {
     void *p;
-    if (testFlag(0x80, (u32 *)((u8 *)gUnk_02000710 + 0x868)))
+    if (testFlag(0x80, (u32 *)((u8 *)gGameState + 0x868)))
         p = Hud_CreateAlternateLayout(a, b);
-    else if (!(gUnk_030053F4 & 0x800))
+    else if (!(gEngineFlags & 0x800))
         p = Hud_CreateStandardLayout(a, b);
     else
         p = Hud_CreateEngineFlagVariant(a, b);

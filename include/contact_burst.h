@@ -12,7 +12,7 @@ struct ContactBurst {
     struct TransientEffectSprite sprite;
     struct ContactCollider collider;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 struct ContactBurst *ContactBurst_Create(const struct ContactPosition *);
 s32 ContactBurst_Update(struct ContactBurst *);
 s32 ContactBurst_Destroy(struct ContactBurst *);

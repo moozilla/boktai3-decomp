@@ -28,7 +28,7 @@ void Dog_SelectRetreatOrChase(struct SceneActorRegistryResetView *a)
                 return;
             if ((*(u32 *)&a->state2A8 & 0xFFFFFF) == 0xC0000)
                 return;
-            if (Chase_Test(gUnk_030053F4, 0x4800)) {
+            if (Chase_Test(gEngineFlags, 0x4800)) {
                 if (!SceneActorTarget_TrySelectNearestParticipant(a))
                     return;
             } else

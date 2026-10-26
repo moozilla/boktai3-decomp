@@ -28,7 +28,7 @@ struct PlayerBurstTask {
     void *sheet;
     struct BurstRecord particles[16];
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 void *AnimData_FindEntry(u32);
 void ParticleSprite_Initialize(void *, void *, s32);
@@ -37,8 +37,8 @@ void Effect_SetPalette(void *, s32);
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 static inline s32 RandomValue(const u16 *table)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return table[index];
 }
 static inline s32 Truncate(s32 value)

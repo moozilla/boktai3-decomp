@@ -12,7 +12,7 @@ void SceneActorEffects_EmitRandomOffsets(struct SceneActorRegistryActor *actor, 
     offset.z = 0;
     offset.padding = 0;
     if (count > 0) {
-        register u32 *index asm("r6") = &gUnk_03005308;
+        register u32 *index asm("r6") = &gRandomIndex;
         u32 mask = 0x3FF;
         register s32 left asm("r5") = count;
         do {

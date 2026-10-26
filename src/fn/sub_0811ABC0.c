@@ -1,6 +1,6 @@
 #include "global.h"
-extern u32 gUnk_020001FC;
+#include "ram.h"
 void Terrain_SetColumnDefinitions(u32 x)
 {
-    gUnk_020001FC = x;
+    gTerrainColumns = x;
 }

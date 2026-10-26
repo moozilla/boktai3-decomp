@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 p[0x3ac];
 };
@@ -8,7 +9,6 @@ struct A {
     u8 p1[0x38 - 0x1c];
     struct E e[4];
 };
-extern u32 gUnk_020005EC;
 void OrbitEffect_RemoveSlot(struct A *, struct E *, s32);
 void Sound_StopSong(u32);
 u32 OrbitEffect_DestroyManager(struct A *a)
@@ -22,5 +22,5 @@ u32 OrbitEffect_DestroyManager(struct A *a)
         e++;
     } while (i <= 3);
     Sound_StopSong(0x564);
-    return gUnk_020005EC = 0;
+    return gSlotController = 0;
 }

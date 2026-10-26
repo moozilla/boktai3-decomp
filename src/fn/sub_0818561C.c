@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+#include "game_state.h"
 struct P {
     u32 x : 16, y : 16, z : 16, w : 16;
 };
@@ -12,7 +12,7 @@ void Armor_UpdateFacingAction29(u8 *p)
     switch (*state) {
         case 0: {
             struct P v;
-            u8 *actor = gUnk_02000710;
+            u8 *actor = gGameState;
             s32 angle;
             v.x = *(u16 *)(actor + 0x30);
             v.y = *(u16 *)(actor + 0x32);

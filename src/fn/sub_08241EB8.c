@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "scene_vec.h"
+#include "render.h"
 
 struct PlayerSpiralPose {
     u8 unknown0[0x18];
@@ -40,7 +41,6 @@ void Player_PlayLocalSong(s32, u32);
 s32 Player_SetSecondaryActionFlags(struct PlayerSpiralPose *, u32);
 s32 Player_SetAnimationIndex(struct PlayerSpiralPose *, s32, s32);
 void SpiralTrail_CreateWithParticles(struct PlayerSpiralPose *, s32, s32, s32, s32);
-extern u8 *gUnk_030042E4;
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
     struct ContactSwarmSprite *sprite = sp;
@@ -178,7 +178,7 @@ void PlayerCue_UpdateSpiralPose(struct PlayerSpiralPose *p)
         }
     }
     Player_SetAnimationIndex(p, 0x9a, 0x40);
-    p->animationResource = ((u32)gUnk_030042E4) + 0x2DE0;
+    p->animationResource = ((u32)gPaletteBankData) + 0x2DE0;
     {
         register u32 offset asm("r3") = (u32) & ((struct PlayerSpiralPose *)0)->seq;
         struct DisplaySequenceState *seq;

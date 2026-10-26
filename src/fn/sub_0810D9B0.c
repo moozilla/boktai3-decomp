@@ -1,5 +1,6 @@
 #include "global.h"
 #include "game_state.h"
+#include "engine.h"
 #define TextWindow_Show TextWindow_StartPlayback
 struct RecordPanel {
     u8 pad0[0xCF4];
@@ -17,7 +18,7 @@ struct PanelSelection {
     u8 pad54[0xCC];
     struct PanelNameRecord record;
 };
-extern u32 gUnk_030053F4, gUnk_030053F0;
+extern u32 gUnk_030053F0;
 extern struct PanelSelection *gUnk_020004B4;
 s32 TextWindow_SetScript(s32, const u8 *);
 s32 TextWindow_Refresh(s32, s32);
@@ -36,13 +37,13 @@ void RecordPanel_ShowName(struct RecordPanel *p)
 {
     u8 *name;
     u32 mask = 0x800;
-    if ((gUnk_030053F4 | gUnk_030053F0) & mask) {
+    if ((gEngineFlags | gUnk_030053F0) & mask) {
         struct PanelNameRecord *record = GetNameRecord();
         if (!record)
             return;
         name = record->name;
     } else {
-        name = &gUnk_02000710->playerName[16];
+        name = &gGameState->playerName[16];
     }
     TextWindow_SetScript(p->windows[0], p->nameScript);
     TextWindow_Refresh(p->windows[0], 0);

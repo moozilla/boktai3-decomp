@@ -29,7 +29,7 @@ struct CloudTask {
     u32 sheet;
     u8 pad30[0x48 * 40];
 };
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern const u16 gUnk_086126C8[];
 extern const u32 gUnk_086126BC[];
 void SpriteDrawable_SelectTileFrame(void *, u32, u32);
@@ -50,7 +50,7 @@ u32 sub_081D31EC(u8 *p)
             u32 bit = 0x80;
             if (src->flags & bit) {
                 *(struct CloudPair *)(p + 0x24) = src->position;
-                if (*(s16 *)(gUnk_02000710 + 0x85e) == 0) {
+                if (*(s16 *)(gGameState + 0x85e) == 0) {
                     *(u16 *)(p + 0x24) += 0x14;
                     *(u16 *)(p + 0x26) += 0x1e0;
                     *(u16 *)(p + 0x28) -= 0x14;
@@ -69,7 +69,7 @@ u32 sub_081D31EC(u8 *p)
         case 3: {
             struct CloudSource *src = *(struct CloudSource **)(p + 0xb70);
             *(struct CloudPair *)(p + 0x24) = src->position;
-            if (*(s16 *)(gUnk_02000710 + 0x85e) == 0) {
+            if (*(s16 *)(gGameState + 0x85e) == 0) {
                 *(u16 *)(p + 0x24) += 0x14;
                 *(u16 *)(p + 0x26) += 0x1e0;
                 *(u16 *)(p + 0x28) -= 0x14;

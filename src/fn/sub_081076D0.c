@@ -2,7 +2,8 @@
 #include "global.h"
 #include "display_animation.h"
 #include "scene_vec.h"
-#define gTileTriggerManager gUnk_020001B8
+#include "engine.h"
+#include "ram.h"
 struct TileTriggerManager {
     u8 unknown0[0x18];
     void *animationData;
@@ -21,12 +22,10 @@ struct TileTrigger {
     u8 forced, frame;
     s32 timer;
 };
-extern struct TileTriggerManager *gUnk_020001B8;
 void sub_08106E98(struct TileTrigger *);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
 u32 Anim_SetSequence(void *, void *, u32, u32, u32);
-extern u32 gUnk_030053F4;
 void TileTrigger_EmitParticles(struct TileTrigger *);
 static inline u32 StepPlayback(struct TileTrigger *owner, struct DisplaySequenceState *state,
                                struct TileTrigger *base)
@@ -165,7 +164,7 @@ void TileTrigger_StepHold(struct TileTrigger *p)
                 switch (p->sequence) {
                     case 0:
                     case 1:
-                        if (gUnk_030053F4 & 0x800)
+                        if (gEngineFlags & 0x800)
                             Sound_PlaySong(0x26D);
                         else
                             Sound_PlaySong(0x1AB);

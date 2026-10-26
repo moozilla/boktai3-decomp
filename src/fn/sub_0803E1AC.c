@@ -69,9 +69,9 @@ s32 ScenePool_StateTrackFast(void *manager, struct ScenePoolActor *actor,
         flag = PlayerHasFlag(2);
         if (flag) {
             s32 random;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
+            gRandomIndex = (gRandomIndex + 1) & 0x3ff;
             {
-                u32 offset = gUnk_03005308 << 1;
+                u32 offset = gRandomIndex << 1;
                 register const u8 *table asm("r3");
                 table = (const u8 *)gUnk_0203B400;
                 random = *(const u8 *)(offset + (u32)table);

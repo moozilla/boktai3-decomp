@@ -6,7 +6,7 @@ struct Inv0822DD80 {
     u8 pad52[0x68 - 0x52];
     u16 slots[8];
 };
-extern struct Inv0822DD80 *gUnk_02000710;
+extern struct Inv0822DD80 *gGameState;
 u32 Inventory_IsEquipmentAssigned(s32);
 
 s32 Inventory_RemoveAssignedSlot(s32 slot)
@@ -20,7 +20,7 @@ s32 Inventory_RemoveAssignedSlot(s32 slot)
     for (; i <= 15; i++) {
         if (i == slot) {
             if (n <= 7) {
-                s16 *c = &gUnk_02000710->cursor;
+                s16 *c = &gGameState->cursor;
                 s32 cur = *c;
                 if (n == cur)
                     *c = 0;
@@ -37,6 +37,6 @@ s32 Inventory_RemoveAssignedSlot(s32 slot)
     for (; n <= 7; n++)
         list[n] = -1;
     for (i = 0; i <= 7; i++)
-        *(u16 *)((u8 *)gUnk_02000710 + i * 2 + 0x68) = list[i];
+        *(u16 *)((u8 *)gGameState + i * 2 + 0x68) = list[i];
     return 1;
 }

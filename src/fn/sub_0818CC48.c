@@ -1,8 +1,8 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define gPlayerObject     gUnk_02000710
-#define gRandomTableIndex gUnk_03005308
+#define gPlayerObject     gGameState
+#define gRandomTableIndex gRandomIndex
 #define gRandomTable      gUnk_0203B400
 extern u32 gRandomTableIndex;
 extern const u16 gRandomTable[];

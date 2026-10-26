@@ -1,8 +1,8 @@
 #include "global.h"
-extern u8 *gUnk_02000214;
+#include "ram.h"
 void Hud_StartMessageDisplayTimer(void)
 {
-    u8 *g = gUnk_02000214;
+    u8 *g = gFieldHud;
     if (g != 0)
         g[0xa6d] = 0x5a;
 }

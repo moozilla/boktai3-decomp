@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "proximity_emitter.h"
-extern u32 gUnk_030053F4;
+#include "engine.h"
 u32 TetherActor_IsState(u32);
 struct TileTrigger {
     u32 flags;
@@ -22,7 +22,7 @@ u8 TileTrigger_IsTetherNearby(struct TileTrigger *p)
     struct SceneVec *position;
     struct ContactPosition *target;
     s32 x, z;
-    if (gUnk_030053F4 & 0x800)
+    if (gEngineFlags & 0x800)
         return 0;
     if (TetherActor_IsState(6))
         return 0;

@@ -31,7 +31,7 @@ static inline s32 isVisible(void *scene)
 {
     void *saved = scene;
     s32 result;
-    if ((void *)gUnk_02000710->region == saved) {
+    if ((void *)gGameState->region == saved) {
         result = 1;
         asm("" : : "r"(result));
     } else {

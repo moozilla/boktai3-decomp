@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 s32 Storage_FindEquippedItemSlot(u32 a, s32 v)
 {
     s32 i;
@@ -13,7 +13,7 @@ found:
     goto end;
 setup:
     i = 0;
-    q = (s16 *)(gUnk_02000710 + 0x68);
+    q = (s16 *)(gGameState + 0x68);
     do {
         if (*q == v)
             goto found;

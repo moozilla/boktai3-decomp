@@ -6,9 +6,6 @@
 #define TerrainRegistration_Remove  TerrainModifiers_UnregisterCell
 #define TerrainRegistration_SetCell TerrainModifiers_RegisterCell
 #define gPlayers                    gUnk_02000580
-#define gTerrainMap                 gUnk_030052F4
-#define gTerrainWidth               gUnk_030052F8
-#define gTerrainHeight              gUnk_030052FC
 struct NamedObjectTerrainState {
     u8 unknown00[0xB6];
     u16 state;
@@ -41,7 +38,7 @@ static inline s32 GetCell(struct SceneVec *position, struct EngineMap *map)
     s32 x, z, cell;
     x = position->x >> 8;
     z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
         cell = map->rows[z] + x;
@@ -59,7 +56,7 @@ void NamedObject_UpdateTerrainRegistration(struct NamedObjectTerrainState *objec
     } else {
         if (HasFlag(1, &object->flags))
             return;
-        map = gUnk_030052F4;
+        map = gTerrainMap;
         if (!map)
             return;
         if (object->position.y != gUnk_02000580[0]->position.y)

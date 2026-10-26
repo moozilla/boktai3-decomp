@@ -5,7 +5,7 @@ struct OrbitBackground *OrbitBackground_CreateFromScript(u32 id)
     s32 k2;
     s32 player;
     u32 enabled;
-    if (gUnk_030053F4 & 0x800) {
+    if (gEngineFlags & 0x800) {
         if (!gUnk_020004B4) {
             k2 = 1;
             player = -k2;

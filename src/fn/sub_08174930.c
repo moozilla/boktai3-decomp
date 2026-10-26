@@ -47,7 +47,7 @@ void sub_08174930(struct SceneHudState *owner)
                 owner->categoryWidgets[i + 10].flags &= ~1;
                 Anim_LoadKeyframe(widget, owner->motionResource, (u16)id, 1);
                 PauseMenu_SetSpritePalette(widget, 0x373);
-                if (gUnk_02000710->level >= gUnk_08E6092C[id].requiredLevel)
+                if (gGameState->level >= gUnk_08E6092C[id].requiredLevel)
                     PauseMenu_SetSpritePalette(widget, 0x373);
                 else
                     PauseMenu_SetSpritePalette(widget, 0x374);

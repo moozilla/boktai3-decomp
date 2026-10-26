@@ -33,7 +33,7 @@ static inline void Golem_Charge(void *ctx)
 {
     u8 *body = ctx;
     u8 *player;
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u8 *partner = *(u8 **)(body + 0xDC);
         s32 index;
         if (!partner)

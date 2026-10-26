@@ -1,5 +1,6 @@
 #include "global.h"
-#define gEffectSlotPool gUnk_02000150
+#include "ram.h"
+#define gEffectSlotPool gSpriteBurstManager
 struct EffectSlot {
     u8 unknown[0x30];
     u16 timer;
@@ -13,14 +14,13 @@ struct EffectSlotPool {
     u8 unknown[0x69C];
     u32 allocated;
 };
-extern struct EffectSlotPool *gUnk_02000150;
 void Effect_Remove(void *);
 void EffectSlot_Release(void *unused, struct EffectSlot *slot)
 {
     if (slot->entered)
         slot->entered = 0;
     {
-        struct EffectSlotPool *pool = gUnk_02000150;
+        struct EffectSlotPool *pool = gSpriteBurstManager;
         s32 index = slot->index;
         pool->allocated &= ~(1 << index);
     }

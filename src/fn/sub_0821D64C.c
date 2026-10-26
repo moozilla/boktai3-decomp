@@ -10,11 +10,11 @@ struct A {
     u8 p[0x18];
     struct N *f18;
 };
-extern struct A *gUnk_030052F4;
+extern struct A *gTerrainMap;
 struct N *TerrainModifiers_FindCellOverride(u32 k, u32 m)
 {
     struct N *best;
-    struct N *n = gUnk_030052F4->f18;
+    struct N *n = gTerrainMap->f18;
     best = 0;
     for (; n; n = n->fc) {
         if ((n->f0 & m) == 0 && n->f2 == k) {

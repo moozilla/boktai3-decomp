@@ -15,7 +15,7 @@ void Player_PlayPositionEffect(void *, void *, u32, u32, void *, u32, u32);
 static inline u8 global_bit(void)
 {
     u32 mask = 1;
-    if (*(u32 *)((u8 *)gUnk_02000710 + 0x868) & mask)
+    if (*(u32 *)((u8 *)gGameState + 0x868) & mask)
         return TRUE;
     return FALSE;
 }

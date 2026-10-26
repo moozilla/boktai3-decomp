@@ -54,7 +54,6 @@ void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s3
 void ActorShadow_Disable(void *);
 void ActorParticles_SpawnWideBurst(void *);
 void SceneActorControl_OnIdle(void);
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 void Golem_OnUnusedState(void)
 {
@@ -66,9 +65,9 @@ static inline u32 Flags32At(struct SceneActorRegistryResetView *a, u32 mask)
 }
 static inline u32 RandomFrom(const u16 *table)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
+    u32 index = (gRandomIndex + 1) & 1023;
     u32 v;
-    gUnk_03005308 = index;
+    gRandomIndex = index;
     index *= 2;
     v = *(const u16 *)((u32)table + index);
     v &= 3;
@@ -222,7 +221,7 @@ static inline s32 Golem_CellHeight(u32 cell, u8 *pos)
     if (p)
         p += 4;
     else
-        p = (u8 *)((u32 *)gUnk_030052F4)[1] + cell * 4 + 0xC;
+        p = (u8 *)((u32 *)gTerrainMap)[1] + cell * 4 + 0xC;
     b = *p;
     h = (b & 0xF) << 8;
     if ((b >> 4) == 1)
@@ -235,9 +234,9 @@ static inline s32 Golem_CellHeight(u32 cell, u8 *pos)
 /* (x, z) in 1/256 units -> cell id; 0 when outside the map */
 static inline u32 Golem_CellIndex(s32 x, s32 z)
 {
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return *(u16 *)((u8 *)gUnk_030052F4 + 0x24 + z * 2) + x;
+    return *(u16 *)((u8 *)gTerrainMap + 0x24 + z * 2) + x;
 }
 
 static inline s32 Golem_PosHeight(u16 *pos)
@@ -330,7 +329,7 @@ static inline u32 Golem_Reposition(u8 *a, u32 variant)
     pos[2] = src[1];
     pos[1] = Golem_PosHeight(pos);
 
-    if (gUnk_030053F4 & 0x4800) {
+    if (gEngineFlags & 0x4800) {
         obj = GA(u8 *, 0xDC);
         slot = -1;
         if (obj) {
@@ -370,8 +369,8 @@ static inline u32 Golem_Reposition(u8 *a, u32 variant)
         if (!((GA(u16, 0x2D4) & 0x400) || (GB(u16, 0x40) & 4))) {
             v = dir;
             for (i = 0; i <= 3; i++) {
-                gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-                v = (gUnk_0203B400[gUnk_03005308] & 3) << 6;
+                gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+                v = (gUnk_0203B400[gRandomIndex] & 3) << 6;
                 if (v != (u32)dir)
                     break;
                 v = dir;
@@ -392,8 +391,8 @@ static inline u32 Golem_Reposition(u8 *a, u32 variant)
         GA(u16, 0x2C2) = 0x20;
         res = 0;
     } else {
-        s32 rem = Mod(cell, *(s16 *)((u8 *)((u32 *)gUnk_030052F4)[1] + 4));
-        s32 quo = Div(cell, *(s16 *)((u8 *)((u32 *)gUnk_030052F4)[1] + 4));
+        s32 rem = Mod(cell, *(s16 *)((u8 *)((u32 *)gTerrainMap)[1] + 4));
+        s32 quo = Div(cell, *(s16 *)((u8 *)((u32 *)gTerrainMap)[1] + 4));
         q[0] = (rem << 8) + 0x80;
         {
             u8 *o = TerrainModifiers_FindCellOverride(cell, 1);
@@ -401,7 +400,7 @@ static inline u32 Golem_Reposition(u8 *a, u32 variant)
             if (o)
                 b = *(o + 4);
             else
-                b = *((u8 *)((u32 *)gUnk_030052F4)[1] + cell * 4 + 0xC);
+                b = *((u8 *)((u32 *)gTerrainMap)[1] + cell * 4 + 0xC);
             q[1] = (b & 0xF) << 8;
         }
         q[2] = (quo << 8) + 0x80;
@@ -642,14 +641,14 @@ s32 Mod(s32, s32);
 s32 Div(s32, s32);
 static inline s32 DelayedRecovery_SceneActorTerrain_Width(void)
 {
-    return *(s16 *)(gUnk_030052F4->cells + 4);
+    return *(s16 *)(gTerrainMap->cells + 4);
 }
 static inline u8 *DelayedRecovery_SceneActorTerrain_GetCell(s32 cell)
 {
     u8 *override = TerrainModifiers_FindCellOverride(cell, 1);
     if (override)
         return override + 4;
-    return gUnk_030052F4->cells + (cell * 4 + 12);
+    return gTerrainMap->cells + (cell * 4 + 12);
 }
 static inline void DelayedRecovery_SceneActorTerrain_GetCenter(s32 cell,
                                                                struct ContactPosition *position)
@@ -759,9 +758,9 @@ static inline u32 DelayedRecovery_MaskFlags(struct SceneActorRegistryResetView *
 static inline u32 DelayedRecovery_CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u32 DelayedRecovery_CellHeight(u32 cell, struct ContactPosition *position)
 {
@@ -770,7 +769,7 @@ static inline u32 DelayedRecovery_CellHeight(u32 cell, struct ContactPosition *p
     if (data)
         data += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         data = map->cells + offset;
     }
@@ -826,7 +825,7 @@ static inline u32 DelayedRecovery_RandomDirectionExcept(u32 current)
     s32 i = 0;
     u32 d;
     do {
-        d = DelayedRecovery_Random(gUnk_0203B400, &gUnk_03005308, 0x3FF, 3) << 6;
+        d = DelayedRecovery_Random(gUnk_0203B400, &gRandomIndex, 0x3FF, 3) << 6;
         if (d != current)
             goto chosen;
     } while (++i <= 3);
@@ -873,7 +872,7 @@ static inline u8 DelayedRecovery_Chase(struct SceneActorRegistryResetView *input
         dest->z = link->point->z;
         dest->y = DelayedRecovery_CellHeight(DelayedRecovery_CellIndex(dest), dest);
     }
-    if (DelayedRecovery_Test(gUnk_030053F4, 0x4800)) {
+    if (DelayedRecovery_Test(gEngineFlags, 0x4800)) {
         u8 *target = (u8 *)*targetp;
         if (!target)
             goto fail;

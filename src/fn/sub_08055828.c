@@ -17,7 +17,7 @@ void ScriptKeyframe_UpdateEntry(struct ScriptKeyframeEntry *entry)
         entry->animation.display.position = entry->position;
     }
     if (entry->conditionalVisibility) {
-        if (!entry->hidden && gUnk_02000710->unk14)
+        if (!entry->hidden && gGameState->unk14)
             entry->animation.display.flags &= ~1;
         else
             entry->animation.display.flags |= 1;

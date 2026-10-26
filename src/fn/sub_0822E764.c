@@ -3,9 +3,9 @@
 s32 GameState_GetUnlockEntry(s32 index);
 void GameState_SetUnlockSlot(s32 index, s32 value);
 s32 GameState_HasUnlockedInventoryEntry(s32 value);
-#define STATE_S16(offset) (*(s16 *)((u8 *)gUnk_02000710 + (offset)))
-#define SLOT78(i)         (*(s16 *)((u8 *)gUnk_02000710 + (i) * 2 + 0x78))
-#define SLOT68(i)         (*(s16 *)((u8 *)gUnk_02000710 + (i) * 2 + 0x68))
+#define STATE_S16(offset) (*(s16 *)((u8 *)gGameState + (offset)))
+#define SLOT78(i)         (*(s16 *)((u8 *)gGameState + (i) * 2 + 0x78))
+#define SLOT68(i)         (*(s16 *)((u8 *)gGameState + (i) * 2 + 0x68))
 
 void sub_0822E764(s32 a, s32 b)
 {

@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "engine.h"
 
 struct FlickerParticle {
     u32 flags;
@@ -17,15 +18,14 @@ struct FlickerParticlePool {
     u8 unk_80[0x168 - 0x80];
     struct FlickerParticle particles[8];
 };
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void FlickerParticle_UpdateSecondaryMotion(struct FlickerParticle *);
 
 static inline s32 NextRandom(const u16 *table, s32 mask)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & mask;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & mask;
+    return table[gRandomIndex];
 }
 static inline s32 Scale(s32 value)
 {

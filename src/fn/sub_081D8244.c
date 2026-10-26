@@ -5,9 +5,9 @@ static inline s32 CellIndex(u16 *a)
 {
     s32 x = ((s16)a[0]) >> 8;
     s32 z = ((s16)a[2]) >> 8;
-    if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) || (((u32)z) >= gUnk_030052FC))
+    if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight))
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 s32 Task4E01_ResolveTerrainDirection(u16 *, s32);
 s32 sub_08249350(s32, s32);
@@ -40,7 +40,7 @@ s32 Task4E01_SelectTerrainTurn(u16 *a, u16 *b, s32 original)
     }
     cell = CellIndex(a);
     other = CellIndex(b);
-    width = gUnk_030052F8;
+    width = gTerrainWidth;
     if (((((cell + 1) == other) || ((cell - 1) == other)) || ((cell + width) == other)) ||
         ((cell - width) == other)) {
         far = 0;

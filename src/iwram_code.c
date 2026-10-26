@@ -2,29 +2,30 @@
 // COMPILER: agbcc_arm
 // CFLAGS: -O2 -mthumb-interwork
 #include "global.h"
+#include "ram.h"
 
 struct PaletteBank {
     u32 words[8];
 };
 
-extern s32 gUnk_03004DA4;
-extern u16 gUnk_030051F0[];
+extern s32 gObjPaletteBankCount;
+extern u16 gObjPaletteKeys[];
 extern struct PaletteBank gUnk_03004DC0[];
 
 /* Same cache as Palette_CacheObjectBank, with a word copy instead of CpuFastSet. */
 u32 Palette_CacheObjectBankArm(u32 key, u32 *src)
 {
     s32 i = 0;
-    for (; i < gUnk_03004DA4; i++)
-        if (gUnk_030051F0[i] == key)
+    for (; i < gObjPaletteBankCount; i++)
+        if (gObjPaletteKeys[i] == key)
             goto found;
-    if (gUnk_03004DA4 > 15)
+    if (gObjPaletteBankCount > 15)
         goto overflow;
     {
-        s32 n = gUnk_03004DA4;
+        s32 n = gObjPaletteBankCount;
         u32 *dst = gUnk_03004DC0[n].words;
         dst[0] = src[0];
-        gUnk_030051F0[n] = key;
+        gObjPaletteKeys[n] = key;
         dst[1] = src[1];
         dst[2] = src[2];
         dst[3] = src[3];
@@ -32,7 +33,7 @@ u32 Palette_CacheObjectBankArm(u32 key, u32 *src)
         dst[5] = src[5];
         dst[6] = src[6];
         dst[7] = src[7];
-        return gUnk_03004DA4++;
+        return gObjPaletteBankCount++;
     }
 found:
     return i;
@@ -73,8 +74,7 @@ struct IwObj {
     struct IwObj *next;
 };
 
-extern u32 gUnk_03003A50;
-extern u32 gUnk_03004290;
+extern u32 gRenderListIndex;
 extern struct IwObj *gUnk_030042C8[];
 extern u16 gUnk_03005418[];
 void sub_08000430(struct IwObj *, s32, s32, s32);
@@ -126,27 +126,27 @@ struct IwOamOut {
     u16 attr3;
 };
 
-extern u8 gUnk_03005230;
-extern u32 gUnk_0300522C;
-extern s32 gUnk_03004BA0;
+extern u8 gSpriteMosaicAttr;
+extern u32 gSpriteAttrFlags;
+extern s32 gAffineRequestCount;
 extern struct IwAffineParam gUnk_03004310[];
 extern s16 gUnk_086149C4[];
-extern u8 gUnk_03004D20[];
-extern u8 gUnk_03004D90[];
-extern u32 gUnk_03004D50[];
-extern u8 gUnk_03004D30[];
-extern u8 gUnk_03004D40[];
-extern u8 gUnk_03004D10[];
-extern s16 gUnk_030042E8;
-extern u16 gUnk_030042DC;
-extern u32 gUnk_03004304;
+extern u8 gSpriteHeightPixels[];
+extern u8 gSpriteWidthPixels[];
+extern u32 gSpriteShapeAttr[];
+extern u8 gSpriteTileArea[];
+extern u8 gSpriteWidthTiles[];
+extern u8 gSpriteHeightTiles[];
+extern s16 gObjTileCursor;
+extern u16 gMainSpriteTileSum;
+extern u32 gArmTileUploadCount;
 extern struct IwTileReq gUnk_02039000[];
-extern s32 gUnk_03004798;
+extern s32 gOamCount;
 extern struct IwOamOut gUnk_03004390[];
 extern u32 gUnk_03003A04;
-extern s32 gUnk_0300479C;
+extern s32 gPendingOamCount;
 extern struct IwOamOut gUnk_030047A0[];
-extern u16 gUnk_03004790[];
+extern u16 gOamPriorityCounts[];
 u32 Palette_CacheObjectBankArm(u32 key, u32 *src);
 
 static inline s32 IwScale6(s32 v)
@@ -163,10 +163,10 @@ static inline s32 IwScale12(s32 v)
 
 static inline s32 IwAddAffine(u8 angle, s32 a, s32 b)
 {
-    s32 n = gUnk_03004BA0;
+    s32 n = gAffineRequestCount;
     if (n > 0x1f)
         return 0;
-    gUnk_03004BA0 = n + 1;
+    gAffineRequestCount = n + 1;
     gUnk_03004310[n].angle = angle;
     gUnk_03004310[n].a = a;
     gUnk_03004310[n].b = b;
@@ -178,24 +178,24 @@ static inline s32 IwAllocTiles(struct IwObj *obj, u32 tile, s32 step, u8 tw, s32
     u32 slot, off;
     u8 *b = 0; /* Retain this initialization for matching compiler behavior. */
     u8 *src, *q;
-    if (gUnk_030042E8 + step >= 0x400)
+    if (gObjTileCursor + step >= 0x400)
         return -1;
-    slot = gUnk_03004304;
+    slot = gArmTileUploadCount;
     b = reqs;
     off = slot << 3;
     src = obj->tiles + (tile << 5);
     *(u8 **)(b + off) = src;
     q = b + off;
     *(u32 *)(q + 4) = (tw << 5) | (th << 16);
-    gUnk_03004304 = slot + 1;
+    gArmTileUploadCount = slot + 1;
     return 0;
 }
 
 static inline void IwPushOam(u32 attr01, u32 attr2)
 {
-    s32 c = gUnk_03004798;
+    s32 c = gOamCount;
     if (c <= 0x7f) {
-        gUnk_03004798 = c + 1;
+        gOamCount = c + 1;
         gUnk_03004390[c].attr01 = attr01;
         gUnk_03004390[c].attr2 = attr2;
         gUnk_03003A04 |= 1;
@@ -204,14 +204,14 @@ static inline void IwPushOam(u32 attr01, u32 attr2)
 
 static inline void IwPushOamZ(u32 attr01, u32 attr2, s32 z, u32 prio)
 {
-    s32 c = gUnk_0300479C;
+    s32 c = gPendingOamCount;
     if (c <= 0x7f) {
         struct IwOamOut *o = &gUnk_030047A0[c];
-        gUnk_0300479C = c + 1;
+        gPendingOamCount = c + 1;
         o->attr01 = attr01;
         o->attr2 = attr2;
         o->attr3 = (z + 0x80) << 8;
-        gUnk_03004790[prio]++;
+        gOamPriorityCounts[prio]++;
     }
 }
 
@@ -251,10 +251,10 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
         z = 0x7f;
 
     fl2 = 0;
-    if (((gUnk_03005230 & 1) && obj->priority != 0 && !(obj->flags & 0x10000)) ||
+    if (((gSpriteMosaicAttr & 1) && obj->priority != 0 && !(obj->flags & 0x10000)) ||
         (obj->flags & 0x800))
         fl2 |= 0x1000;
-    if (gUnk_0300522C != 0) {
+    if (gSpriteAttrFlags != 0) {
         if (obj->flags & 0x4000)
             fl2 |= 0x400;
     }
@@ -298,8 +298,8 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
     p = obj->spr;
     for (i = 0; i < obj->count; i++, p++) {
         u32 sz = p->size;
-        s32 wd = gUnk_03004D90[sz];
-        s32 ht = gUnk_03004D20[sz];
+        s32 wd = gSpriteWidthPixels[sz];
+        s32 ht = gSpriteHeightPixels[sz];
         u32 fl = fl2;
         s32 px, py;
 
@@ -401,7 +401,7 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
                 keys[j] = key;
             }
             attr3[n] = sz;
-            oam[n] = ((gUnk_03004D50[sz] | obj->attr) | ((py & 0xff) | ((px & 0x1ff) << 16)));
+            oam[n] = ((gSpriteShapeAttr[sz] | obj->attr) | ((py & 0xff) | ((px & 0x1ff) << 16)));
             oam[n] |= fl;
             n++;
         }
@@ -423,37 +423,37 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
         /* Deliberate matching reconstruction, not a claim about the original source.
            These distinct byte offsets preserve this compiler's pass behavior.
            Both paths recover the same properly aligned cursor address before use. */
-        cursorLastByte = (u8 *)&gUnk_030042E8 + sizeof(gUnk_030042E8) - 1;
-        cursorBase = (s16 *)(cursorLastByte - (sizeof(gUnk_030042E8) - 1));
+        cursorLastByte = (u8 *)&gObjTileCursor + sizeof(gObjTileCursor) - 1;
+        cursorBase = (s16 *)(cursorLastByte - (sizeof(gObjTileCursor) - 1));
         for (j = 0; j < n; j++) {
             u32 s = attr3[j];
             u32 t = tile[j];
-            u8 tw = gUnk_03004D40[s];
-            s32 th = gUnk_03004D10[s];
+            u8 tw = gSpriteWidthTiles[s];
+            s32 th = gSpriteHeightTiles[s];
             s32 r;
             u8 *reqs;
-            step = gUnk_03004D30[s];
+            step = gSpriteTileArea[s];
             reqs = ewram + 0x39000;
             cursor = cursorBase;
             r = IwAllocTiles(obj, t, step, tw, th, reqs);
             if (r < 0)
                 return;
             IwPushOam(oam[j], (u32)*cursor | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12));
-            gUnk_030042DC += step;
+            gMainSpriteTileSum += step;
             *cursor += step;
         }
     } else {
         ew2 = (u8 *)0x2000000;
-        cursorEnd = (u8 *)&gUnk_030042E8 + sizeof(gUnk_030042E8);
-        cursorBaseZ = (s16 *)(cursorEnd - sizeof(gUnk_030042E8));
+        cursorEnd = (u8 *)&gObjTileCursor + sizeof(gObjTileCursor);
+        cursorBaseZ = (s16 *)(cursorEnd - sizeof(gObjTileCursor));
         for (j = 0; j < n; j++) {
             u32 s = attr3[j];
             u32 t = tile[j];
-            u8 tw = gUnk_03004D40[s];
-            s32 th = gUnk_03004D10[s];
+            u8 tw = gSpriteWidthTiles[s];
+            s32 th = gSpriteHeightTiles[s];
             s32 r;
             u8 *reqs;
-            step = gUnk_03004D30[s];
+            step = gSpriteTileArea[s];
             reqs = ew2 + 0x39000;
             cursor = cursorBaseZ;
             r = IwAllocTiles(obj, t, step, tw, th, reqs);
@@ -461,7 +461,7 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
                 return;
             IwPushOamZ(oam[j], (u32)*cursor | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12), z,
                        obj->priority);
-            gUnk_030042DC += step;
+            gMainSpriteTileSum += step;
             *cursor += step;
         }
     }
@@ -474,8 +474,8 @@ void sub_08000E90(void)
     s32 x, y, z;
     struct IwVec s;
 
-    mask = ((gUnk_03003A50 & 1) ? 0x200 : 0x400) + 1;
-    for (o = gUnk_030042C8[gUnk_03004290]; o != 0; o = o->next) {
+    mask = ((gSceneEffectPalettePhase & 1) ? 0x200 : 0x400) + 1;
+    for (o = gUnk_030042C8[gRenderListIndex]; o != 0; o = o->next) {
         if (o->flags & mask)
             continue;
         if (!(o->flags & 0x10)) {
@@ -508,8 +508,8 @@ void sub_08001038(void)
     u32 mask;
     s32 x, y, z;
 
-    mask = ((gUnk_03003A50 & 1) ? 0x200 : 0x400) + 1;
-    for (o = gUnk_030042C8[gUnk_03004290]; o != 0; o = o->next) {
+    mask = ((gSceneEffectPalettePhase & 1) ? 0x200 : 0x400) + 1;
+    for (o = gUnk_030042C8[gRenderListIndex]; o != 0; o = o->next) {
         if (o->flags & mask)
             continue;
         x = (s16)(o->pos.x + o->dx);
@@ -536,8 +536,8 @@ void sub_08001120(void)
     s32 x, y, z;
     struct IwVec s;
 
-    mask = ((gUnk_03003A50 & 1) ? 0x200 : 0x400) + 1;
-    for (o = gUnk_030042C8[gUnk_03004290]; o != 0; o = o->next) {
+    mask = ((gSceneEffectPalettePhase & 1) ? 0x200 : 0x400) + 1;
+    for (o = gUnk_030042C8[gRenderListIndex]; o != 0; o = o->next) {
         if (o->flags & mask)
             continue;
         if (!(o->flags & 0x1000))
@@ -573,8 +573,8 @@ void sub_080012E0(void)
     s32 x, y, z;
     struct IwVec s;
 
-    mask = ((gUnk_03003A50 & 1) ? 0x200 : 0x400) + 1;
-    for (o = gUnk_030042C8[gUnk_03004290]; o != 0; o = o->next) {
+    mask = ((gSceneEffectPalettePhase & 1) ? 0x200 : 0x400) + 1;
+    for (o = gUnk_030042C8[gRenderListIndex]; o != 0; o = o->next) {
         if (o->flags & mask)
             continue;
         if (!(o->flags & 0x2000))

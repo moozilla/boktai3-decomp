@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern void *gUnk_02000258;
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 GrowthHazard_InitManager(void *);
@@ -18,6 +18,6 @@ void *GrowthHazard_CreateManager(void)
             return 0;
         }
     }
-    gUnk_02000258 = r;
+    gGrowthHazardManager = r;
     return r;
 }

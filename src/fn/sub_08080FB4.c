@@ -121,7 +121,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
     actor->fieldAA = 0;
     SetControl(actor);
     SetAnimation(actor, 1, 0, 2);
-    if ((!Test(gUnk_030053F4, 0x4800)) && (!Flag(actor, 0x800, 0x2D0))) {
+    if ((!Test(gEngineFlags, 0x4800)) && (!Flag(actor, 0x800, 0x2D0))) {
         SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
     }
     ActorShadow_Disable((u8 *)actor + 0x320);

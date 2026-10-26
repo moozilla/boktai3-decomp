@@ -2,6 +2,7 @@
 #include "global.h"
 #include "engine.h"
 #include "scene_vec.h"
+#include "ram.h"
 struct Frames {
     u16 *data;
     u8 flags, count, multiplier, duration;
@@ -39,7 +40,6 @@ struct TileTriggerManager {
     void *animationData;
     u8 resource[0x1C];
 };
-extern struct TileTriggerManager *gUnk_020001B8;
 struct TileTriggerManager *Pool1B8_Create(void);
 struct TileTrigger *Pool1B8_Allocate(struct TileTriggerManager *);
 void Pool1B8_EnterStateThree(struct TileTriggerManager *, struct TileTrigger *);
@@ -50,7 +50,7 @@ void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
 void sub_08107EBC(void)
 {
-    struct TileTriggerManager *manager = gUnk_020001B8;
+    struct TileTriggerManager *manager = gTileTriggerManager;
     struct TileTrigger *p;
     struct SceneVec pos;
     struct Frames *f;

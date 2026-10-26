@@ -104,10 +104,10 @@ void Trap_UpdateProbeContacts(struct TrapProbe *probe)
     gUnk_03001684 = 1;
     count = probe->count;
     i = 0;
-    for (; i < gUnk_030052F4->trapCount; i++) {
+    for (; i < gTerrainMap->trapCount; i++) {
         {
             {
-                struct TerrainTrap *trap = &gUnk_030052F4->traps[i];
+                struct TerrainTrap *trap = &gTerrainMap->traps[i];
                 if ((trap->f6 != probe->kind) && (trap->f6 != 0x14C9))
                     goto nextTrap;
                 if (Pressed(trap) && Contains(probe->position, trap)) {

@@ -1,6 +1,7 @@
 #define SpriteParticle_GetOrCreatePool SceneSpriteBurst_EnsureSingleton
-#define gSpriteParticlePool            gUnk_02000138
+#define gSpriteParticlePool            gSpriteGroup
 #include "global.h"
+#include "ram.h"
 
 struct SpriteParticlePosition {
     u32 xy, z;
@@ -28,7 +29,6 @@ struct SpriteParticlePool {
     u32 occupied;
     struct SpriteParticleSlot slots[8];
 };
-extern struct SpriteParticlePool *gUnk_02000138;
 struct SpriteParticlePool *SceneSpriteBurst_EnsureSingleton(void);
 struct SpriteParticleSlot *SpriteParticle_AllocateSlot_08121D14(struct SpriteParticlePool *);
 void Sprite_Init(void *, void *, u32);
@@ -44,12 +44,12 @@ s32 SpriteParticle_SpawnBatch(struct SpriteParticlePosition *position, s32 count
     s32 i;
     if (!position)
         return -1;
-    if (gUnk_02000138 == 0) {
+    if (gSpriteGroup == 0) {
         pool = SceneSpriteBurst_EnsureSingleton();
         if (!pool)
             return -1;
     } else {
-        pool = gUnk_02000138;
+        pool = gSpriteGroup;
     }
     for (i = 0; i < count; i++) {
         slot = SpriteParticle_AllocateSlot_08121D14(pool);

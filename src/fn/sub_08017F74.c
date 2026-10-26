@@ -6,7 +6,7 @@ struct Weather {
     u32 frame;
 };
 extern int (*const gUnk_08604C80[])(struct Weather *);
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern int gUnk_02000088, gUnk_02000478;
 void sub_08017510(void *);
 void WeatherParticles_Update(void *);
@@ -18,11 +18,11 @@ int Weather_Update(struct Weather *p)
     if (p->state > 1)
         sub_08017510(p);
     if (p->state == 3) {
-        *(s16 *)(gUnk_02000710 + 0x87a) = 32767;
+        *(s16 *)(gGameState + 0x87a) = 32767;
         gUnk_02000088 = 1;
     } else {
-        if (*(s16 *)(gUnk_02000710 + 0x87a) > 0)
-            (*(s16 *)(gUnk_02000710 + 0x87a))--;
+        if (*(s16 *)(gGameState + 0x87a) > 0)
+            (*(s16 *)(gGameState + 0x87a))--;
         gUnk_02000088 = 0;
     }
     if (gUnk_02000478 > 0)

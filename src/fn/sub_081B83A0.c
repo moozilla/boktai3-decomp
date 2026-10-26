@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_vec.h"
-#define gRandomIndex gUnk_03005308
 struct SceneScriptBurstObject {
     u8 unknown0[0x34];
     struct SceneVec position;
@@ -11,7 +10,7 @@ struct SceneScriptBurstObject {
     u8 unknownF8[0x13E - 0xF8];
     u16 counter;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void Task_Kill(void *);
 static inline s32 Sample(u32 table, u32 index)
@@ -59,7 +58,7 @@ void SceneScriptObject_UpdateBurst(struct SceneScriptBurstObject *object)
             s32 z;
             u16 index;
             s32 threshold;
-            index = (gUnk_03005308 + 1) & mask;
+            index = (gRandomIndex + 1) & mask;
             x = (Sample(table, index) >> 4) & 0x1f;
             index = (index + 1) & mask;
             y = (Sample(table, index) >> 4) & 0x1f;
@@ -72,7 +71,7 @@ void SceneScriptObject_UpdateBurst(struct SceneScriptBurstObject *object)
             v->y = y;
             v->z = z;
             index = (index + 1) & mask;
-            gUnk_03005308 = index;
+            gRandomIndex = index;
             threshold = ((AdvanceAndSample(&table, index) >> 4) & 0x7f) + 0x20;
             sub_08127590(position, &velocity, 0x83A6, 0x99CB, *statePtr, threshold, kind, zero,
                          PaletteIndex(*statePtr, *parameterPtr), zero, i & 1, zero, zero, zero,
@@ -81,8 +80,8 @@ void SceneScriptObject_UpdateBurst(struct SceneScriptBurstObject *object)
         } while (i <= 3);
     }
     counter = object->counter;
-    index = (gUnk_03005308 + 1) & 0x3ff;
-    gUnk_03005308 = index;
+    index = (gRandomIndex + 1) & 0x3ff;
+    gRandomIndex = index;
     if (counter >= ((s32)(((Sample(0x0203B400, index) >> 4) & 0x7f) + 0x20)))
         Task_Kill(object);
     else

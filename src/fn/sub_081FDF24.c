@@ -1,10 +1,11 @@
 #include "global.h"
+#include "engine.h"
 #ifdef NONMATCHING
 // fuzzy: 91.7%
 // fix.py best (sweep after the inlined-insn fix)
 // foundry draft (worker best 92.1%); what differs is mostly register allocation and instruction order
 #define gOrbitEffectRandomTable gUnk_0203B400
-#define gOrbitEffectRandomIndex gUnk_03005308
+#define gOrbitEffectRandomIndex gRandomIndex
 struct OrbitEffectPosition {
     s16 x, y, z, pad;
 };
@@ -29,14 +30,13 @@ struct OrbitEffect {
     u16 nextTrail, trailTimer;
 };
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 void SpriteDrawable_SelectTileFrame(struct OrbitTrailSprite *, void *, u32);
 void Effect_SetPalette(struct OrbitTrailSprite *, u32);
 static inline s32 RandomValue(const u16 *table)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)table);
 }
 void OrbitEffect_SpawnHomingTrail(struct OrbitEffect *p, struct OrbitEffectPosition *origin)

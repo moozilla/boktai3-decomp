@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-extern u32 gUnk_030053F4;
+#include "engine.h"
 extern u8 *gUnk_02000580[];
 s32 Math_Atan2(s32, s32);
 static inline u32 Flag(struct SceneActorRegistryResetView *a, u32 m, u32 off)
@@ -51,7 +51,7 @@ static inline u32 PlayerFlag(u8 *p, u32 mask)
 }
 static inline u8 Coop(void)
 {
-    if (gUnk_030053F4 & 0x4800)
+    if (gEngineFlags & 0x4800)
         return 1;
     return 0;
 }

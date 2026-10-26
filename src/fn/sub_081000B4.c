@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_020001A4;
+#include "ram.h"
 
 void WoodenCrate_ResetManager(void)
 {
-    gUnk_020001A4 = 0;
+    gWoodenCrateManager = 0;
 }

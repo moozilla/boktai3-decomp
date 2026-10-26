@@ -1,5 +1,5 @@
 #include "global.h"
-#define gSelectionPanel gUnk_0200025C
+#include "ram.h"
 struct SelectionPanelAnimation {
     u32 unknown0;
     u8 active;
@@ -11,7 +11,6 @@ struct SelectionPanel {
     u8 unknown500[0x58];
     void *list;
 };
-extern struct SelectionPanel *gUnk_0200025C;
 void Anim_Remove(void *);
 void SelectionPanel_Destroy(struct SelectionPanel *panel)
 {

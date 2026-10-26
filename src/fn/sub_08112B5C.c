@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_020004BC;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 PanelSpritePool_Init(u8 *);
@@ -11,8 +11,8 @@ void ActorMarkerPool_Destroy(void);
 u8 *ActorMarkerPool_EnsureSingleton(void)
 {
     u8 *p;
-    if (gUnk_020004BC != 0)
-        return gUnk_020004BC;
+    if (gPanelSpritePool != 0)
+        return gPanelSpritePool;
     p = Task_Create(0xa, 0x31c);
     if (p != 0) {
         Task_SetCallbacks(p, ActorMarkerPool_UpdateMarkers, ActorMarkerPool_Destroy);

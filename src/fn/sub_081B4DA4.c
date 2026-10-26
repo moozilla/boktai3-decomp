@@ -167,9 +167,9 @@ static inline s32 TerrainCell(struct SceneVec *v)
 {
     s32 x = v->x >> 8;
     s32 z = v->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline s32 TerrainHeight(struct SceneVec *v)
 {
@@ -181,7 +181,7 @@ static inline s32 TerrainHeight(struct SceneVec *v)
     if (props)
         props += 4;
     else
-        props = gUnk_030052F4->cells + (cell * 4 + 12);
+        props = gTerrainMap->cells + (cell * 4 + 12);
     attr = *props;
     kind = attr >> 4;
     height = (attr & 15) << 8;

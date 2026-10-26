@@ -72,14 +72,14 @@ static inline u8 *CellAt(struct FloorPoint *position)
     s32 x = position->x >> 8, z = position->z >> 8;
     s32 index;
     u8 *cell;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         index = 0;
     else
-        index = gUnk_030052F4->rows[z] + x;
+        index = gTerrainMap->rows[z] + x;
     cell = TerrainModifiers_FindCellOverride(index, 1);
     if (cell)
         return cell + 4;
-    return gUnk_030052F4->cells + 12 + index * 4;
+    return gTerrainMap->cells + 12 + index * 4;
 }
 static inline u32 GroundHeight(struct FloorPoint *position)
 {

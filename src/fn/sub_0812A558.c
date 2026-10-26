@@ -1,6 +1,5 @@
 #include "global.h"
 #define ActorEffect_SetDirection LinkedEffect_SetVariant
-#define gRandomIndex             gUnk_03005308
 #define gRandomTable             gUnk_0203B400
 struct EffectVector {
     s16 x, y, z;
@@ -23,7 +22,7 @@ struct ActorEffect {
     u8 pad177[3];
     u8 active;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 s32 Math_Atan2(s32, s32);
 void LinkedEffect_SetVariant(void *, u32);
@@ -47,7 +46,7 @@ void ActorEffect_OrientFromPositions(struct ActorEffectPosition *a, struct Actor
     void *direction;
     subtract(&delta, &b->position, &a->position);
     if (delta.x == 0 && delta.z == 0) {
-        u32 *cur = &gUnk_03005308;
+        u32 *cur = &gRandomIndex;
         index = (*cur + 1) & 0x3ff;
         *cur = index;
         angle = *((u8 *)(((u32)((u16 *)0x0203B400)) + (index * 2)));

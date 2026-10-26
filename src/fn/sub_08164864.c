@@ -7,9 +7,9 @@ struct HudSlotSource {
     u8 counts[4];
 };
 extern struct HudSlotSource *gUnk_020004B4;
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern u16 gUnk_03005174;
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 extern u32 gUnk_030053F0;
 u16 *Hud_GetTilemapCell(s32, u32, u32);
 void Sound_PlaySong(u32);
@@ -48,7 +48,7 @@ static inline u8 testFlag(u32 mask, u32 *flags)
 
 static inline u32 LinkFlags(u32 mask)
 {
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 
 void sub_08164864(u8 *hud, s32 mode, u32 x, u32 y)
@@ -61,7 +61,7 @@ void sub_08164864(u8 *hud, s32 mode, u32 x, u32 y)
 
     if (OWNER[0x457] == 0x23 && MODE != 8)
         goto blank;
-    if (*(s16 *)(gUnk_02000710 + 0x502) > 0x9C3 && MODE != 8) {
+    if (*(s16 *)(gGameState + 0x502) > 0x9C3 && MODE != 8) {
         u16 *timer = &BLINK;
         u32 bit = (*timer >> 4) & 1;
         blink = 1;
@@ -70,7 +70,7 @@ void sub_08164864(u8 *hud, s32 mode, u32 x, u32 y)
         if ((*timer & 0x3F) == 2)
             Sound_PlaySong(0x132);
         (*timer)++;
-    } else if (*(s16 *)(gUnk_02000710 + 0x502) > 0 && MODE != 8) {
+    } else if (*(s16 *)(gGameState + 0x502) > 0 && MODE != 8) {
         u16 *timer = &BLINK;
         u32 bit = (*timer >> 5) & 1;
         blink = 1;
@@ -92,7 +92,7 @@ void sub_08164864(u8 *hud, s32 mode, u32 x, u32 y)
         tiles = Hud_GetTilemapCell(0, x, y);
         if (mode == 1)
             pulse = 0x29F;
-        else if (testFlag(0x80, (u32 *)(gUnk_02000710 + 0x868)) || MODE == 8 ||
+        else if (testFlag(0x80, (u32 *)(gGameState + 0x868)) || MODE == 8 ||
                  testFlags((u32 *)(OWNER + 0x20), 0x10)) {
             u32 frame = PULSE;
             pulse = 0x29F;
@@ -115,7 +115,7 @@ void sub_08164864(u8 *hud, s32 mode, u32 x, u32 y)
         if (LinkFlags(0x800))
             count = SlotCount(OwnerIndex());
         else
-            count = *(s16 *)(gUnk_02000710 + 0x876);
+            count = *(s16 *)(gGameState + 0x876);
         *tiles++ = 0xD45F;
         for (i = 0; i < count; i++)
             *tiles++ = 0xD05D;
@@ -124,7 +124,7 @@ void sub_08164864(u8 *hud, s32 mode, u32 x, u32 y)
         *tiles = 0xD05F;
     }
     if ((u8)(MODE - 8) > 1) {
-        if (*(s32 *)(gUnk_02000710 + OWNER[0x472] * 4 + 0x628) > 0) {
+        if (*(s32 *)(gGameState + OWNER[0x472] * 4 + 0x628) > 0) {
             tiles = Hud_GetTilemapCell(0, 15, 17);
             for (i = 0; i < 5; i++)
                 *tiles++ = (i + 0x3B) | 0xD000u;

@@ -16,9 +16,9 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 static inline s32 sub_08027214_CellIndex(s32 x, s32 y)
 {
-    if (x < 0 || y < 0 || (u32)x >= gUnk_030052F8 || (u32)y >= gUnk_030052FC)
+    if (x < 0 || y < 0 || (u32)x >= gTerrainWidth || (u32)y >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[y] + x;
+    return gTerrainMap->rows[y] + x;
 }
 
 static inline s32 sub_08027214_Scale(s32 n)
@@ -81,7 +81,7 @@ void sub_08027214(u8 *p, s32 tick)
         p[0x385] = 0;
         RouteSpritePool_RequestFinishAll();
         SceneActors_StopBackgroundFlash(p);
-        if (gUnk_030053F4 & 0x1000) {
+        if (gEngineFlags & 0x1000) {
             WirelessGame_NotifyOpponentDefeated();
         }
     }
@@ -94,7 +94,7 @@ void sub_08027214(u8 *p, s32 tick)
     if (data) {
         data += 4;
     } else {
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
+        data = gTerrainMap->cells + (cell * 4 + 12);
     }
     kind = *data >> 4;
     d = (*data & 15) << 8;
@@ -111,7 +111,7 @@ void sub_08027214(u8 *p, s32 tick)
         if (data) {
             data += 4;
         } else {
-            data = gUnk_030052F4->cells + (cell * 4 + 12);
+            data = gTerrainMap->cells + (cell * 4 + 12);
         }
         if (*(u16 *)(data + 2) & 1) {
             p[0x385] = 8;

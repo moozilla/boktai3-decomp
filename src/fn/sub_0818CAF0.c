@@ -26,14 +26,14 @@ struct A {
     u8 b1de;
     u8 b1df;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u8 gUnk_0203B400[];
 void Armor_UpdatePartOrbit(void);
 void Armor_InitPartOrbitTimer(struct A *p)
 {
     u32 v;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    v = *(u16 *)(gUnk_0203B400 + gUnk_03005308 * 2);
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    v = *(u16 *)(gUnk_0203B400 + gRandomIndex * 2);
     v &= 0x40;
     p->w1d6 = v + 0x1e;
     p->fn = Armor_UpdatePartOrbit;

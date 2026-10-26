@@ -2,7 +2,7 @@
 void InteractionMarker_TickIdle(struct InteractionMarker *marker)
 {
     u32 nearby;
-    if ((!(gUnk_030053F4 & 0x200)) && (marker->inputCooldown <= 9)) {
+    if ((!(gEngineFlags & 0x200)) && (marker->inputCooldown <= 9)) {
         marker->inputCooldown++;
     }
     nearby = InteractionMarker_IsPlayerNearby(marker);

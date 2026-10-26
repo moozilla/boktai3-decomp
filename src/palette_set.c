@@ -33,11 +33,11 @@ int PaletteSet_Update(struct PaletteSet *p)
         for (i = 0; i < p->count; i++)
             PaletteSet_BlendOverlayColors(p, &p->palettes[i]);
     }
-    gUnk_03004DA4 = gUnk_030051CC;
-    gUnk_030051C0 = 0;
+    gObjPaletteBankCount = gPaletteBanksInUse;
+    gObjPaletteReserved = 0;
     for (i = 0; i < p->count; i++) {
         Palette_CacheObjectBank(p->palettes[i].slot, p->palettes[i].colors);
-        gUnk_030051C0++;
+        gObjPaletteReserved++;
     }
     p->previous = gUnk_03005430[15];
     p->current = gUnk_03005430[14];
@@ -71,7 +71,7 @@ int PaletteSet_Initialize(struct PaletteSet *p, u16 id)
              overlay += 56, entry++, i++) {
             entry->id = Script_GetValue();
             entry->slot = PaletteSet_GetSlotForId(entry->id) + offsets[i];
-            entry->source[0] = gUnk_030042E4 + (entry->slot << 5);
+            entry->source[0] = gPaletteBankData + (entry->slot << 5);
             entry->source[1] = (u8 *)entry->source[0] + 32;
             entry->source[2] = (u8 *)entry->source[1] + 32;
             entry->slot = PaletteSet_GetSlotForId(entry->id);

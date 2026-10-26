@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-extern u16 gUnk_03004BD8;
+#include "render.h"
 struct M {
     u8 pad[0x2B8];
     void *res;
@@ -15,7 +15,7 @@ void ChallengeMenu_InitBackgrounds(struct M *p)
     s32 value;
     s32 i;
     void *res;
-    u16 *g = &gUnk_03004BD8;
+    u16 *g = &gDispCntShadow;
     s32 mask = 0xFFFFF0FF;
     *g = mask & *g;
     sub_082157EC();

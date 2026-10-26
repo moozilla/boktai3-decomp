@@ -8,6 +8,7 @@
 // shared hit-flag expansion and temporary-register choices (see worker notes).
 #include "scene_actor_reset.h"
 #include "area_effect_link.h"
+#include "render.h"
 u8 SceneActorReaction_ApplyAreaDamage(void *);
 void SceneActor_ClearReactionFlags(void *);
 u8 SceneActorBehavior_DispatchFlaggedCategory(void *);
@@ -19,7 +20,6 @@ void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
 void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, s32);
-extern u8 *gUnk_030042E4;
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
@@ -43,7 +43,7 @@ static inline s32 LocalPlayer(void)
 }
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u32 *owner = &actor->field2E0;
         register u32 mask asm("r2") = *owner;
         if (!(mask & 0x20) && mask) {
@@ -297,7 +297,7 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
                 if (actor->drawableKind == 0)
                     AnimData_SelectPaletteBank(((u8 *)actor->drawable) + 0x2C, bank);
                 else
-                    *((u8 **)(((u8 *)actor->drawable) + 0x68)) = gUnk_030042E4 + (bank * k1);
+                    *((u8 **)(((u8 *)actor->drawable) + 0x68)) = gPaletteBankData + (bank * k1);
             }
             {
                 u32 eight = 8;

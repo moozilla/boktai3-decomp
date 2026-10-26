@@ -38,10 +38,10 @@ void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
         s32 x = (s16)(u16)world->x >> 8;
         s32 z = (s16)(u16)world->z >> 8;
         u32 index;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             index = 0;
         else
-            index = gUnk_030052F4->rows[z] + x;
+            index = gTerrainMap->rows[z] + x;
         entry->cellIndex = index;
     }
     if (Script_SeekToKeyword('t'))

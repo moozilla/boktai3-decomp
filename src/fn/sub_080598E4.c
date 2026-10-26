@@ -3,8 +3,8 @@
 static inline s32 randomValue(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)gUnk_0203B400);
 }
 static inline u32 getState(struct ScenePanelRig *rig)
@@ -16,8 +16,8 @@ static inline s32 randomFirst(void)
 {
     u32 offset;
     register const u16 *table asm("r4");
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     table = gUnk_0203B400;
     return *(const u16 *)(offset + (u32)table);
 }
@@ -55,7 +55,7 @@ void ScenePanelRig_TickResourceDrain(struct ScenePanelRig *rig)
             rig->resourceAccumulator -= drain * 40;
         }
         {
-            struct GameState *game = gUnk_02000710;
+            struct GameState *game = gGameState;
             s32 *remaining;
             register s32 value asm("r0");
             remaining = &game->unk618;
@@ -72,7 +72,7 @@ void ScenePanelRig_TickResourceDrain(struct ScenePanelRig *rig)
             u32 offset = 0x1343;
             u8 *warning = (void *)(offset + (u32)current);
             u32 stage = *warning;
-            if (stage == 0 && gUnk_02000710->unk618 <= gUnk_02000710->unk61C >> 2) {
+            if (stage == 0 && gGameState->unk618 <= gGameState->unk61C >> 2) {
                 *warning = 1;
                 {
                     struct SceneRigParentView *reload = *global;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: scrolls weather tilemap layers and adjusts their randomized drift.
 #define Weather_UpdateTilemapScroll sub_08017510
@@ -18,16 +19,15 @@ struct Camera {
     s16 x, y;
 };
 extern struct Camera gUnk_030042A0;
-extern u32 gUnk_03005308;
 #define RANDOM_TABLE ((u16 *)0x0203B400)
 s32 SceneTilemap_GetScrollDelta(void);
 s32 Div(s32, s32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 #define Random(table, cursor, mask)                                                                \
     ({                                                                                             \
-        u32 value = (gUnk_03005308 + 1) & 0x3ff;                                                   \
+        u32 value = (gRandomIndex + 1) & 0x3ff;                                                    \
         u32 sample;                                                                                \
-        gUnk_03005308 = value;                                                                     \
+        gRandomIndex = value;                                                                      \
         sample = (table)[value];                                                                   \
                                                                                                    \
         sample &= mask;                                                                            \
@@ -51,7 +51,7 @@ void Weather_UpdateTilemapScroll(struct Weather *p)
     y = gUnk_03005418[1] + gUnk_030042A0.y;
     if (!p->timer) {
         register u16 *table asm("r3") = RANDOM_TABLE;
-        register u32 *cursor asm("r4") = &gUnk_03005308;
+        register u32 *cursor asm("r4") = &gRandomIndex;
         asm("" : : "r"(table), "r"(cursor));
         p->timer = Random(table, cursor, 127) + 128;
         if (ReadAlternate(&p->alternate, &alternate))

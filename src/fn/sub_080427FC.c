@@ -69,9 +69,9 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
     } else {
         Sound_PlaySong(0x108);
         if (source->reactionFlags & mode) {
-            u32 index = (gUnk_03005308 + 1) & 1023;
+            u32 index = (gRandomIndex + 1) & 1023;
             u32 angle;
-            gUnk_03005308 = index;
+            gRandomIndex = index;
             angle = ((const u8 *)RANDOM_TABLE_ADDR)[index * 2];
             SparkParticle_Spawn(position, 1, gUnk_0824DE9C, angle, 3, 8, 2, 2);
         }

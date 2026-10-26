@@ -166,7 +166,7 @@ void SceneCharacter_PlaceFromScript(void)
     }
     if (palette >= 0) {
         if (k == 0x19) {
-            CpuSet(gUnk_030042E4 + palette * 32, npc->colors, 0x04000008);
+            CpuSet(gPaletteBankData + palette * 32, npc->colors, 0x04000008);
             npc->palette1C = palette;
             npc->palette1E = palette;
             {

@@ -1,19 +1,19 @@
 #define LinkMenu_DrawFourDigitNumber LinkScorePanel_SetNumber
-#define gRandomTableIndex            gUnk_03005304
+#define gRandomTableIndex            gEffectRandomTableIndex
 #define gRandomValues                gUnk_086141BC
 #include "global.h"
+#include "ram.h"
 struct LinkMenuCounter {
     u8 unknown0[0x1026];
     u16 counter;
 };
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 void LinkScorePanel_SetNumber(struct LinkMenuCounter *, s32, s32);
 static inline u32 nextRandom(void)
 {
     u32 value;
-    gUnk_03005304 = (gUnk_03005304 + 1) & 0x3FF;
-    value = gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
+    value = gUnk_086141BC[gEffectRandomTableIndex];
     return value;
 }
 void LinkMenu_DrawRandomizedFourDigitNumber(struct LinkMenuCounter *menu, s32 row)

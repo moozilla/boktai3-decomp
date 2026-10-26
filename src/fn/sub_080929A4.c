@@ -2,7 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_control_phase.h"
-extern u32 gUnk_03005308;
+#include "engine.h"
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 void CpuSet(const void *, void *, u32);
@@ -18,8 +18,8 @@ static inline s32 Shift(s32 n, u32 bits)
 }
 static inline u32 Rand(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(const u16 *)((gUnk_03005308 << 1) + 0x0203B400);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(const u16 *)((gRandomIndex << 1) + 0x0203B400);
 }
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
 {

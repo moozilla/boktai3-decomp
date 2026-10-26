@@ -1,6 +1,5 @@
 #include "global.h"
 #define RisingSprite_CreatePool RisingPuffPool_GetOrCreate
-#define gRisingSpritePool       gUnk_020004A0
 struct RisingSpritePosition {
     s16 x, y, z, pad;
 };
@@ -18,19 +17,19 @@ struct RisingSpritePool {
     struct RisingSprite sprites[8];
     u16 next;
 };
-extern struct RisingSpritePool *gUnk_020004A0;
+extern struct RisingSpritePool *gRisingSpritePool;
 void *RisingPuffPool_GetOrCreate(void);
 void RisingSprite_Spawn(struct RisingSpritePosition *position)
 {
     struct RisingSprite *p;
-    if (!gUnk_020004A0)
+    if (!gRisingSpritePool)
         RisingPuffPool_GetOrCreate();
-    p = &gUnk_020004A0->sprites[gUnk_020004A0->next];
+    p = &gRisingSpritePool->sprites[gRisingSpritePool->next];
     p->flags &= ~1;
     p->position = *position;
     p->frame = 0;
     p->active = 1;
-    gUnk_020004A0->next++;
-    if (gUnk_020004A0->next > 7)
-        gUnk_020004A0->next = 0;
+    gRisingSpritePool->next++;
+    if (gRisingSpritePool->next > 7)
+        gRisingSpritePool->next = 0;
 }

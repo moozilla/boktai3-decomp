@@ -14,8 +14,8 @@ struct CrowHopState {
 };
 static inline u32 Random(const u16 *table)
 {
-    u32 i = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = i;
+    u32 i = (gRandomIndex + 1) & 1023;
+    gRandomIndex = i;
     i *= 2;
     return *(const u16 *)((u32)table + i);
 }
@@ -54,15 +54,15 @@ static inline void ClearVector(struct ContactPosition *v)
 }
 static inline void CellPosition(struct ContactPosition *p, s32 cell)
 {
-    s32 x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-    s32 z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+    s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
+    s32 z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
     u8 *data;
     p->x = (x << 8) + 128;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
+        data = gTerrainMap->cells + (cell * 4 + 12);
     p->y = (*data & 15) << 8;
     p->z = (z << 8) + 128;
 }

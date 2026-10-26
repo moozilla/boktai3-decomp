@@ -34,9 +34,9 @@ void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *actor, struct ScenePoolEn
                 entry->speedControlPulse = 16;
             else if (metric < bounds->low)
                 entry->speedControlPulse = -16;
-            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
+            gRandomIndex = (gRandomIndex + 1) & 0x3ff;
             {
-                u32 random = *(const u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
+                u32 random = *(const u16 *)((gRandomIndex << 1) + (u32)gUnk_0203B400);
                 entry->speedControlDelay = (random & 31) + 60;
             }
         } else

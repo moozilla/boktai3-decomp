@@ -1,14 +1,13 @@
 #include "global.h"
 #include "player.h"
 #include "directional_force.h"
+#include "ram.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define gForceMagnitude     gUnk_02000550
-#define gForceThreshold     gUnk_0200052C
-#define gForceAngle         gUnk_0200053C
-#define gForceDirectionMode gUnk_02000558
-#define gSineTable          gUnk_086149C4
-extern u16 gUnk_02000558;
+#define gForceMagnitude gUnk_02000550
+#define gForceThreshold gUnk_0200052C
+#define gForceAngle     gUnk_0200053C
+#define gSineTable      gUnk_086149C4
 s32 Player_GetForceDirection(struct Player *);
 static inline u8 Player_IsActiveInSceneFive(struct Player *p)
 {

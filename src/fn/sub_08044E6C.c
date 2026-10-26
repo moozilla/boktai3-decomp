@@ -1,5 +1,5 @@
 #include "encoded_record.h"
-extern u32 gUnk_03005308;
+#include "engine.h"
 extern u8 *gUnk_030053F8;
 struct EncodedRecordSession {
     u8 unknown0[0x18];
@@ -16,8 +16,8 @@ void EncodedRecord_EncodeFields(u8 *record)
     s32 value;
     const u8 *name;
     u32 i;
-    randomIndex = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = randomIndex;
+    randomIndex = (gRandomIndex + 1) & 1023;
+    gRandomIndex = randomIndex;
     randomWord = ((const u16 *)RANDOM_TABLE_ADDR)[randomIndex];
     skip = (randomWord >> 8) & 7;
     bit = 16;
@@ -26,43 +26,43 @@ void EncodedRecord_EncodeFields(u8 *record)
     EncodedRecord_WriteBits(record, skip, &bit, 3, 6);
     EncodedRecord_WriteBits(record, ((struct EncodedRecordSession *)gUnk_030053F8)->value, &bit, 6,
                             6);
-    value = (s16)gUnk_02000710->counter538 >> 3;
+    value = (s16)gGameState->counter538 >> 3;
     if ((u32)value > 255)
         value = 255;
     EncodedRecord_WriteBits(record, value, &bit, 8, 6);
-    value = gUnk_02000710->unk664;
+    value = gGameState->unk664;
     if ((u32)value > 127)
         value = 127;
     EncodedRecord_WriteBits(record, value, &bit, 7, 6);
-    value = gUnk_02000710->unk75A;
+    value = gGameState->unk75A;
     if ((u32)value > 511)
         value = 511;
     EncodedRecord_WriteBits(record, value, &bit, 9, 6);
-    value = gUnk_02000710->unk7B4;
+    value = gGameState->unk7B4;
     if ((u32)value > 127)
         value = 127;
     EncodedRecord_WriteBits(record, value, &bit, 7, 6);
-    value = gUnk_02000710->unk75F;
+    value = gGameState->unk75F;
     if ((u32)value > 1)
         value = 1;
     EncodedRecord_WriteBits(record, value, &bit, 1, 6);
-    value = gUnk_02000710->unk75E;
+    value = gGameState->unk75E;
     EncodedRecord_WriteBits(record, value, &bit, 6, 6);
-    value = gUnk_02000710->unk520 >> 12;
+    value = gGameState->unk520 >> 12;
     if ((u32)value > 1023)
         value = 1023;
     EncodedRecord_WriteBits(record, value, &bit, 10, 6);
-    value = gUnk_02000710->unk51C >> 8;
+    value = gGameState->unk51C >> 8;
     if ((u32)value > 255)
         value = 255;
     EncodedRecord_WriteBits(record, value, &bit, 8, 6);
-    value = Div(gUnk_02000710->unk614, 216000);
+    value = Div(gGameState->unk614, 216000);
     if ((u32)value > 63)
         value = 63;
     EncodedRecord_WriteBits(record, value, &bit, 6, 6);
-    value = gUnk_02000710->unk536;
+    value = gGameState->unk536;
     EncodedRecord_WriteBits(record, value, &bit, 12, 6);
-    name = gUnk_02000710->playerName;
+    name = gGameState->playerName;
     i = 0;
     if (*name) {
         name++;

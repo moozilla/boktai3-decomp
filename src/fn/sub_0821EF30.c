@@ -42,8 +42,8 @@ s32 Path_SnapToRandomPointInBox(struct Pos16 *out, struct Pos16 *lo, struct Pos1
         return best;
     }
     {
-        u32 r = (gUnk_03005308 + 1) & 0x3FF;
-        gUnk_03005308 = r;
+        u32 r = (gRandomIndex + 1) & 0x3FF;
+        gRandomIndex = r;
         start = Mod(*(const u16 *)((u8 *)0x0203B400 + r * 2), def[0]);
     }
     Path_GetPointPosition(&pos, data, 0);

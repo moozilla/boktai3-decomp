@@ -54,7 +54,6 @@ void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void SceneActorMovement_ProjectProbe(void *, u32, u32);
 void SceneActorReaction_PlayStaggerBurst(void);
-extern u8 *gUnk_030042E4;
 static inline s32 LocalPlayer(void)
 {
     if (!gUnk_020004B4)
@@ -63,7 +62,7 @@ static inline s32 LocalPlayer(void)
 }
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         register u32 *owner asm("r1") = &actor->field2E0;
         register u32 mask asm("r2") = *owner;
         if (!(mask & 0x20) && mask) {
@@ -108,12 +107,11 @@ static inline void Fill(u32 *zero, void *dst)
 }
 s32 AreaEffect_ScaleGainAtPosition(void *, u32);
 s32 AreaEffect_ScaleLinkGainAtPosition(void *, u32);
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 static inline u32 RandomBits(u32 mask)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308] & mask;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return gUnk_0203B400[gRandomIndex] & mask;
 }
 static inline u32 ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
@@ -172,7 +170,7 @@ u8 SceneActorReaction_ApplyAreaDamage(struct SceneActorRegistryResetView *actor)
         if (actor->drawableKind == 0)
             AnimData_SelectPaletteBank(((u8 *)actor->drawable) + 0x2C, bank);
         else
-            *((u8 **)(((u8 *)actor->drawable) + 0x68)) = gUnk_030042E4 + (bank * 32);
+            *((u8 **)(((u8 *)actor->drawable) + 0x68)) = gPaletteBankData + (bank * 32);
         {
             u32 eight = 8;
             actor->field1E8 = eight;
@@ -220,7 +218,7 @@ u8 SceneActorReaction_ApplyAreaDamage(struct SceneActorRegistryResetView *actor)
             actor->field2B1 = 1;
         }
         actor->field2E0 = 32;
-        if ((!Test(gUnk_030053F4, 0x4800)) && (!Flag2D0(actor, 0x800)))
+        if ((!Test(gEngineFlags, 0x4800)) && (!Flag2D0(actor, 0x800)))
             SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
     } else {
         {
@@ -252,5 +250,7 @@ fail:
 
 #else
 #include "global.h"
+#include "render.h"
+#include "engine.h"
 INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ApplyAreaDamage);
 #endif

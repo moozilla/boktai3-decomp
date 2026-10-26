@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 struct ParticleVector {
     u16 x, y, z, unused;
 };
@@ -40,9 +41,8 @@ struct TerrainMap {
     u8 unknown8[0x1C];
     u16 rows[1];
 };
-extern struct TerrainMap *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
-extern struct ProjectilePool *gUnk_02000164;
+extern struct TerrainMap *gTerrainMap;
+extern u32 gTerrainWidth, gTerrainHeight;
 void *TerrainModifiers_FindCellOverride(u32, u32);
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
@@ -53,13 +53,13 @@ void Collider_Refresh(void *);
 static inline s32 Cell(struct ParticleVector *p)
 {
     s32 x = (s16)p->x >> 8, z = (s16)p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline void Release(struct Projectile *p)
 {
-    struct ProjectilePool *pool = gUnk_02000164;
+    struct ProjectilePool *pool = gPooledSpriteManager;
     s32 slot = p->slot;
     pool->allocated &= ~(1 << slot);
     p->active = 0;

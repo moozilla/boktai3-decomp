@@ -28,7 +28,7 @@ struct TimedHazardPool {
     u8 task[0x18];
     void *animation;
 };
-extern struct TimedHazardPool *gUnk_02000474;
+extern struct TimedHazardPool *gColliderSpritePool;
 void *ColliderSpritePool_Create(u32, u32);
 void TimedHazard_OnDamageContact();
 void TimedHazard_OnAttackContact();
@@ -44,7 +44,7 @@ static inline struct Cell *getCell(s32 index)
     u8 *dynamic = TerrainModifiers_FindCellOverride(index, 1);
     if (dynamic)
         return (struct Cell *)(dynamic + 4);
-    return (struct Cell *)(gUnk_030052F4->cells + 12 + index * 4);
+    return (struct Cell *)(gTerrainMap->cells + 12 + index * 4);
 }
 s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *position)
 {
@@ -52,7 +52,7 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *pos
     struct TimedHazard *p;
     struct HazardVec *pos;
     void *resource;
-    if (!gUnk_02000474 && !ColliderSpritePool_Create(0xC0DB, 0))
+    if (!gColliderSpritePool && !ColliderSpritePool_Create(0xC0DB, 0))
         return -1;
     p = Heap_Alloc(sizeof(*p));
     if (!p)
@@ -69,10 +69,10 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *pos
         u32 slope;
         s32 height;
         pos = groundPos;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             index = 0;
         else
-            index = gUnk_030052F4->rows[z] + x;
+            index = gTerrainMap->rows[z] + x;
         cell = getCell(index);
         slope = cell->height >> 4;
         height = (cell->height & 15) << 8;
@@ -129,7 +129,7 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *pos
         return -1;
     Sprite_Init(&p->sprite, resource, 1);
     p->sprite.priority = 2;
-    Anim_SetSequence(p->anim, gUnk_02000474->animation, 1, 0, 0);
+    Anim_SetSequence(p->anim, gColliderSpritePool->animation, 1, 0, 0);
     AnimData_SelectPaletteBank(resource, p->id + 0x153);
     if (p->delay == 0) {
         p->state = 1;
@@ -143,7 +143,7 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *pos
     p->unknown5 = 0;
     p->previous = 0;
     p->next = 0;
-    return TimedHazard_LinkInstance(gUnk_02000474, p);
+    return TimedHazard_LinkInstance(gColliderSpritePool, p);
 }
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);

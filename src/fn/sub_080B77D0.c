@@ -14,7 +14,7 @@ static inline u32 CellHeight(struct ContactPosition *position, u32 cell)
     if (data)
         data += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         data = map->cells + offset;
     }
@@ -40,7 +40,7 @@ static inline u32 CellShape(u32 cell)
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
+        data = gTerrainMap->cells + (cell * 4 + 12);
     return *data >> 4;
 }
 static inline s32 FacingQuarter(s32 heading)
@@ -51,7 +51,7 @@ static inline s32 FacingQuarter(s32 heading)
 }
 static inline s32 MapWidth(void)
 {
-    return *(s16 *)(gUnk_030052F4->cells + 4);
+    return *(s16 *)(gTerrainMap->cells + 4);
 }
 static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route,
                           struct ContactPosition *position, struct ContactPosition *destination)
@@ -108,7 +108,7 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
                 do {
                     if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         goto finishSouth;
-                    mapSlot = &gUnk_030052F4;
+                    mapSlot = &gTerrainMap;
                     next += *(s16 *)((*mapSlot)->cells + 4);
                     i++;
                 } while (i < steps);
@@ -132,19 +132,19 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
                 do {
                     if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         goto finishNorth;
-                    mapSlot = &gUnk_030052F4;
+                    mapSlot = &gTerrainMap;
                     next -= *(s16 *)((*mapSlot)->cells + 4);
                     i++;
                 } while (i < steps);
                 goto finishNorthLoaded;
             finishSouth:
-                mapSlot = &gUnk_030052F4;
+                mapSlot = &gTerrainMap;
             finishSouthLoaded:
                 chosen = next - *(s16 *)((*mapSlot)->cells + 4);
                 asm volatile("" : "+r"(mapSlot));
                 break;
             finishNorth:
-                mapSlot = &gUnk_030052F4;
+                mapSlot = &gTerrainMap;
             finishNorthLoaded:
                 chosen = next + *(s16 *)((*mapSlot)->cells + 4);
                 asm volatile("" : "+r"(mapSlot));

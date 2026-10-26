@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "engine.h"
 
 /* Tentative: emit a motion entry from a randomized point ahead or behind the actor. */
 
@@ -14,7 +15,6 @@ struct ActorReaction {
 };
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 void MotionEntry_CreateWithDelta(struct BurstVector *, struct BurstVector *, s32, s32);
 static inline s32 Scale(s32 value)
 {
@@ -39,15 +39,15 @@ static inline s32 RandomValue(void)
 {
     u32 table = (u32)gUnk_0203B400;
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + table);
 }
 static inline s32 RandomMode(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + 0x0203B400);
 }
 #ifdef NONMATCHING

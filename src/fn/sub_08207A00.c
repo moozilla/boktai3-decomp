@@ -6,6 +6,7 @@
 // (offset temps for inert/terrainEnabled and the terrain cell use r1/r2/r3 one step early).
 // MATCHING_CONCESSION: register-pinning
 #include "vulcan_cannon_worker.h"
+#include "engine.h"
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void *Script_GetValueSafe(void);
@@ -18,7 +19,6 @@ void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, s32, s32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-extern u32 gUnk_030052F8, gUnk_030052FC;
 static inline u32 VulcanCannon_StepAnimation_(struct VulcanCannon *owner)
 {
     struct DisplaySequenceSprite *sprite = &owner->display.sprite;
@@ -256,10 +256,10 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
         s32 x = position->x >> 8;
         s32 z = position->z >> 8;
         s32 index;
-        if ((((x < 0) || (z < 0)) || (((u32)x) >= gUnk_030052F8)) || (((u32)z) >= gUnk_030052FC))
+        if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z) >= gTerrainHeight))
             index = 0;
         else
-            index = gUnk_030052F4->rows[z] + x;
+            index = gTerrainMap->rows[z] + x;
         TerrainModifiers_RegisterCell(p->terrain, index, 0, p->display.spatial.position.y >> 8, 0,
                                       1);
     }

@@ -7,15 +7,13 @@
 #define SceneHud_TestActionFlag      Inventory_GetUsePermissionFlag
 #define SceneHud_GetActionEffectKind Inventory_GetItemUseCondition
 #define gActionDefinitions           gUnk_08E61280
-#define gGameState                   gUnk_02000710
 #define gPlayers                     gUnk_02000580
-extern struct GameState *gUnk_02000710;
 extern const struct SceneValueItemDefinition gUnk_08E61280[];
 u32 Inventory_GetUsePermissionFlag(u32);
 u32 Inventory_GetItemUseCondition(u32);
 static inline s32 GetTimedCounter(u32 slot)
 {
-    struct GameState *state = gUnk_02000710;
+    struct GameState *state = gGameState;
     struct GameState *entry = (struct GameState *)(slot * 4 + (u32)state);
     return entry->counters628[0];
 }
@@ -78,7 +76,7 @@ u32 SceneHud_CanApplySelectedAction(u32 action)
                 return 1;
             break;
         case 5:
-            entry = (struct GameState *)((s16)gUnk_02000710->unk50 * 2 + (u32)gUnk_02000710);
+            entry = (struct GameState *)((s16)gGameState->unk50 * 2 + (u32)gGameState);
             inventory = (s16 *)entry->inventory;
             if (InventoryPresent(inventory))
                 GetEquipment(inventory);

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct NameEntry {
     u8 pad0[0x348];
@@ -9,7 +10,6 @@ struct NameEntry {
     u8 buf[1];
 };
 
-extern const void *gUnk_02000328[];
 int Script_ParseStringRef(const void *);
 u8 *Text_LookupString(int);
 void TextEntry_DrawName(void *);
@@ -21,9 +21,9 @@ u32 NameEntry_AppendChar(struct NameEntry *p)
     u32 r;
     const void *ref;
     if (p->which == 0)
-        ref = gUnk_02000328[0];
+        ref = gNamePlaceholderScript[0];
     else
-        ref = gUnk_02000328[1];
+        ref = gNamePlaceholderScript[1];
     src = Text_LookupString(Script_ParseStringRef(ref) + p->base);
     dst[0] = src[0];
     dst[1] = src[1];

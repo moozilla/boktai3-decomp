@@ -64,7 +64,7 @@ void sub_08012134(void)
 
 void AnimatedHazard_WaitForPlayer(void *m, struct AnimatedHazard *p)
 {
-    if (gUnk_02000710->unk876 > 0)
+    if (gGameState->unk876 > 0)
         p->sprite.flags &= ~1;
     else
         p->sprite.flags |= 1;
@@ -426,7 +426,7 @@ static inline u8 *cell(int i)
     u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return p + 4;
-    return gUnk_030052F4->cells + 12 + i * 4;
+    return gTerrainMap->cells + 12 + i * 4;
 }
 
 int AnimatedHazard_Create(struct SceneVec *source, int damage, int hold)
@@ -451,10 +451,10 @@ int AnimatedHazard_Create(struct SceneVec *source, int damage, int hold)
         struct SceneVec *ground = &p->sprite.position;
         int x = ground->x >> 8, z = ground->z >> 8, index;
         pos = ground;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             index = 0;
         else
-            index = gUnk_030052F4->rows[z] + x;
+            index = gTerrainMap->rows[z] + x;
         c = cell(index);
         slope = *c >> 4;
         height = (*c & 15) << 8;
@@ -505,10 +505,10 @@ int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int dela
         struct SceneVec *ground = &p->sprite.position;
         int x = ground->x >> 8, z = ground->z >> 8, index;
         pos = ground;
-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             index = 0;
         else
-            index = gUnk_030052F4->rows[z] + x;
+            index = gTerrainMap->rows[z] + x;
         c = cell(index);
         slope = *c >> 4;
         height = (*c & 15) << 8;

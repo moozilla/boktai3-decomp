@@ -14,20 +14,20 @@ struct M {
     u16 c1;
     u16 c2;
 };
-extern struct M *gUnk_03001688;
+extern struct M *gColliderManager;
 void Collider_Remove(struct Nd *n)
 {
     struct Nd *prev, *cur;
-    if (gUnk_03001688 == 0)
+    if (gColliderManager == 0)
         return;
-    prev = gUnk_03001688->f18;
+    prev = gColliderManager->f18;
     cur = prev->next;
     while (cur) {
         if (cur == n) {
-            if (cur == gUnk_03001688->f20)
-                gUnk_03001688->f20 = prev;
+            if (cur == gColliderManager->f20)
+                gColliderManager->f20 = prev;
             prev->next = cur->next;
-            gUnk_03001688->c0--;
+            gColliderManager->c0--;
             break;
         }
         prev = cur;

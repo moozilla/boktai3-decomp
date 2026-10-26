@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 typedef struct {
     u32 pad[2], flags;
     u8 unkC[0xe];
@@ -7,7 +8,6 @@ typedef struct {
     s16 x, y, z;
     u8 tail[0x3a];
 } Graphic;
-extern u8 *gUnk_030042E4;
 s32 Anim_LoadKeyframe(void *anim, void *data, u32 index, u32 mode);
 void Anim_SetKeyframes(void *anim, void *data, u32 index, u32 mode, u32 flags);
 s32 Anim_Step(void *anim, void *data);
@@ -147,7 +147,7 @@ s32 sub_0801C24C(Ctx *p)
             *pCounter = 0;
     } else
         Anim_LoadKeyframe(g4, p->anim, 0xce, 0);
-    pal = (u16 *)(gUnk_030042E4 + 0x75a0);
+    pal = (u16 *)(gPaletteBankData + 0x75a0);
     k = *pFade;
     inv = 0x20 - k;
     r = inv * 31;

@@ -2,7 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_route.h"
-extern u32 gUnk_03005308;
+#include "engine.h"
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 extern u8 *gUnk_02000580[];
@@ -34,8 +34,8 @@ static inline s32 Shift(s32 n, u32 bits)
 }
 static inline u32 Rand(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return gUnk_0203B400[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return gUnk_0203B400[gRandomIndex];
 }
 static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
 {
@@ -149,9 +149,9 @@ static inline s32 CellIndex(const struct ContactPosition *position, struct Conta
     s32 x = position->x >> 8;
     s32 z = position->z >> 8;
     *saved = (void *)position;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 // confidence=low: follows the current route segment and renews its endpoint at the player.
 void Lun_SetMovementEndpoints(void *, void *);

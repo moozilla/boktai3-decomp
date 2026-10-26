@@ -25,7 +25,7 @@ void Player_RefreshBodyCollision(struct Player *p)
     /* The level-derived body amount is zero in every mode. */
     u32 amount;
     if (p->actionMode == 6) {
-        s32 level = gUnk_02000710->level + 10;
+        s32 level = gGameState->level + 10;
         if (level > 99)
             level = 99;
         amount = level * 0;

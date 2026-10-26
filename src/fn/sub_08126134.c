@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_02000150;
+#include "ram.h"
 
 void SceneMovingParticle_ResetPool(void)
 {
-    gUnk_02000150 = 0;
+    gSpriteBurstManager = 0;
 }

@@ -183,8 +183,8 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     m->paletteActive = 1;
     m->paletteMask = 63;
     {
-        void *first = gUnk_030042E4 + 0x5A60;
-        void *second = gUnk_030042E4 + 0x5AA0;
+        void *first = gPaletteBankData + 0x5A60;
+        void *second = gPaletteBankData + 0x5AA0;
         Palette_InterpolateBanks(m->palette, first, second, 63, 6);
     }
     p = m->pieces;
@@ -246,8 +246,8 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     m->paletteActive = 1;
     m->paletteMask = 63;
     {
-        void *first = gUnk_030042E4 + 0x5A60;
-        void *second = gUnk_030042E4 + 0x5AA0;
+        void *first = gPaletteBankData + 0x5A60;
+        void *second = gPaletteBankData + 0x5AA0;
         Palette_InterpolateBanks(m->palette, first, second, 63, 6);
     }
     p = m->pieces;
@@ -376,7 +376,7 @@ int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     {
         register int enabled asm("r8");
         m->timer = 0;
-        index = &gUnk_03005308;
+        index = &gRandomIndex;
         mask = 1023;
         remaining = 15;
         p = m->pieces;
@@ -813,8 +813,8 @@ int GroupObjects_Update(struct GroupObjects *m)
             }
         }
         if (m->paletteActive >= 0) {
-            void *first = gUnk_030042E4 + 0x5A60;
-            void *second = gUnk_030042E4 + 0x5AA0;
+            void *first = gPaletteBankData + 0x5A60;
+            void *second = gPaletteBankData + 0x5AA0;
             Palette_InterpolateBanks(m->palette, first, second, m->paletteMask, 6);
         }
         p = m->pieces;
@@ -846,8 +846,8 @@ int GroupObjects_Initialize(struct GroupObjects *m, int id)
     m->actor = 0;
     m->animation = ScriptProc_Start(0x922E, 0x5BB7);
     {
-        void *first = gUnk_030042E4 + 0x5A60;
-        void *second = gUnk_030042E4 + 0x5AA0;
+        void *first = gPaletteBankData + 0x5A60;
+        void *second = gPaletteBankData + 0x5AA0;
         Palette_InterpolateBanks(m->palette, first, second, 64, 6);
     }
     p = m->pieces;

@@ -3,7 +3,7 @@
 // confidence=low: the health burst's shake, as in HealthRestoreEffect_UpdateShake: jitters for
 // 8 frames, starts the burst at frame 30 (sound 0x285), fades the screen at frame 29 in mode 1,
 // then after frame 44 moves on to the bursts (mode 0) or sub_082356E4.
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
@@ -15,8 +15,8 @@ void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 static inline s32 rnd(u16 *table)
 {
     s32 v;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    v = table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    v = table[gRandomIndex];
     return v >> 3;
 }
 void sub_08235794(u8 *p)

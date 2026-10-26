@@ -30,7 +30,7 @@ s32 Params3D0_InitDisplay(u8 *p)
     TimeDisplay_InitBackgrounds(p);
     TimeDisplay_InitAnimatedObjects(p);
     if ((s16)gUnk_020003D0.b == 1) {
-        *(s32 *)(p + 0x724) = *(s16 *)((u8 *)gUnk_02000710 + 0x870);
+        *(s32 *)(p + 0x724) = *(s16 *)((u8 *)gGameState + 0x870);
         *(u32 *)(p + 0x20) &= ~1;
         *(u32 *)(p + 0x350) &= ~1;
         *(u32 *)(p + 0x3d8) &= ~1;
@@ -54,7 +54,7 @@ s32 Params3D0_InitDisplay(u8 *p)
     Sound_PlaySong(0xa4);
     *(s32 *)(p + 0x738) = gUnk_020003D0.f[0];
     Menu_StartFadeIn();
-    CpuSet(gUnk_030042E4 + 0x6220, p + 0x500, 0x100);
+    CpuSet(gPaletteBankData + 0x6220, p + 0x500, 0x100);
     v = 0x7fff;
     i = 15;
     q = (u16 *)(p + 0x71e);

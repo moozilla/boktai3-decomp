@@ -12,16 +12,16 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline s32 CellIndex(struct Position *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline u8 *CellData(s32 index)
 {
     u8 *p = TerrainModifiers_FindCellOverride(index, 1);
     if (p)
         return p + 4;
-    return gUnk_030052F4->cells + (index * 4 + 12);
+    return gTerrainMap->cells + (index * 4 + 12);
 }
 // confidence=low: compares base heights at positive subcell corners.
 s32 Terrain_HasHigherCorner(struct Position *p, s32 threshold)

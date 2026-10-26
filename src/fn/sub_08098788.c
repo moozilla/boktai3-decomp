@@ -7,7 +7,7 @@
 // fix.py best version (reprinted C)
 // Remaining differences: address scheduling, inlined tests and register allocation.
 #include "scene_actor_reset.h"
-extern u32 gUnk_030053F4;
+#include "engine.h"
 extern u8 *gUnk_02000580;
 extern s32 gUnk_02000478;
 extern u16 gUnk_02000534, gUnk_02000500;
@@ -96,7 +96,7 @@ static inline u32 PlayerFlag(u8 *p, u32 mask)
 }
 static inline u8 SaveFlag(u32 mask)
 {
-    if (*(u32 *)((u8 *)gUnk_02000710 + 0x868) & mask)
+    if (*(u32 *)((u8 *)gGameState + 0x868) & mask)
         return 1;
     return 0;
 }
@@ -131,17 +131,17 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
     }
     ctx = a->context;
     if (!Unavailable(a)) {
-        u32 discarded = gUnk_030053F4 & 0x4800;
+        u32 discarded = gEngineFlags & 0x4800;
         u32 *flags = (u32 *)(ctx + k1);
         s32 reveal;
         if (Flag(ctx, 0x100)) {
             reveal = SaveFlag(0x20);
         } else
-            reveal = *((s16 *)(((u8 *)gUnk_02000710) + 0x876));
+            reveal = *((s16 *)(((u8 *)gGameState) + 0x876));
         asm("" : : "r"(discarded));
         if (reveal > 0) {
             u32 mode;
-            if (gUnk_030053F4 & 0x800)
+            if (gEngineFlags & 0x800)
                 mode = PlayerMode();
             else {
                 if (gUnk_02000478 > 0)

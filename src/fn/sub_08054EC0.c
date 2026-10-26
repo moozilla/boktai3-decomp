@@ -28,9 +28,9 @@ void DisplayTrack_Update(struct DisplayTrack *track)
         } else {
             s32 i;
             const u16 *start =
-                (const u16 *)gUnk_030042E4 + (track->paletteBase + track->paletteStart) * 16;
+                (const u16 *)gPaletteBankData + (track->paletteBase + track->paletteStart) * 16;
             const u16 *end =
-                (const u16 *)gUnk_030042E4 + (track->paletteBase + track->paletteEnd) * 16;
+                (const u16 *)gPaletteBankData + (track->paletteBase + track->paletteEnd) * 16;
             s32 left = *duration - track->paletteFrame;
             u16 *savedFrame;
             u16 *defaultPalette;

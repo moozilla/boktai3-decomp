@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -19,22 +20,20 @@ struct Map {
     u8 pad8[28];
     u16 rows[1];
 };
-extern struct Map *gUnk_030052F4;
-extern u32 gUnk_030052F8, gUnk_030052FC;
 u8 *TerrainModifiers_FindCellOverride(int, int);
 static inline int cellIndex(struct Vec *p)
 {
     int x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline struct Cell *cell(int i)
 {
     u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return (void *)(p + 4);
-    return (void *)(gUnk_030052F4->cells + 12 + i * 4);
+    return (void *)(gTerrainMap->cells + 12 + i * 4);
 }
 static inline int noShadow(struct Cell *c)
 {

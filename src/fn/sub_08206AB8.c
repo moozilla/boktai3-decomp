@@ -1,8 +1,5 @@
 #include "global.h"
 #include "animated_hazard.h"
-#define gTerrainMap    gUnk_030052F4
-#define gTerrainWidth  gUnk_030052F8
-#define gTerrainHeight gUnk_030052FC
 struct VulcanCannon {
     u8 pad0[0x88];
     struct SceneVec position;

@@ -28,9 +28,9 @@ static inline s32 CellIndex(struct ContactPackedVector *position)
 {
     s32 x = position->x >> 8;
     s32 z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gUnk_030052F4->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 
 static inline s32 GroundHeight(s32 cell, struct ContactPackedVector *position)
@@ -41,7 +41,7 @@ static inline s32 GroundHeight(s32 cell, struct ContactPackedVector *position)
     if (definition)
         definition += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         definition = map->cells + offset;
     }

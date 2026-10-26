@@ -9,6 +9,6 @@ struct DirectionalForce {
 };
 extern struct DirectionalForce *gUnk_02000114;
 extern u16 gUnk_0200052C, gUnk_02000550, gUnk_0200053C;
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 s32 Mod(s32, s32);
 #endif

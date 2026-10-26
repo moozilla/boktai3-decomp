@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct Frames {
     u16 *data;
@@ -21,15 +22,14 @@ void SceneActors_EmitPeriodicParticles(void *, int);
 int SceneMover_StepPastScreenX(void *, int, int);
 int Player_GetHorizontalVelocity(void *);
 void Player_GetWorldPosition(int, void *);
-extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
 #define W(p, o) (*(s32 *)((u8 *)(p) + (o)))
 #define H(p, o) (*(s16 *)((u8 *)(p) + (o)))
 #define B(p, o) (*((u8 *)(p) + (o)))
 static inline int randomValue(void)
 {
-    gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
-    return gUnk_086141BC[gUnk_03005304];
+    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
+    return gUnk_086141BC[gEffectRandomTableIndex];
 }
 static inline void step(struct Frames *f, struct Render *r)
 {

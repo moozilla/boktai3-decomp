@@ -95,6 +95,7 @@ def link_object(obj, elf, *, syms=None, address=None):
 
     stub = ["\t.syntax unified"]
     missing = []
+    ram = build.ram_symbols()
     for name in undefined:
         key = name[:-6] if name.endswith("__addr") else name
         if key in syms:
@@ -104,6 +105,8 @@ def link_object(obj, elf, *, syms=None, address=None):
             if name.endswith("__addr"):
                 v &= ~1
             stub += [f"\t.global {name}", f"\t.set {name}, 0x{v:08X}"]
+        elif key in ram:
+            stub += [f"\t.global {name}", f"\t.set {name}, 0x{ram[key]:08X}"]
         else:
             m = re.search(r"_([0-9A-Fa-f]{8})$", name)
             if m:

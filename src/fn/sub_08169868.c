@@ -25,7 +25,7 @@ void SceneHud_CyclePrimarySecondaryOptions(struct SceneHudState *p)
         if (++p->selection >= p->secondaryCount)
             p->selection = 0;
         {
-            u16 *out = &gUnk_02000710->unk50;
+            u16 *out = &gGameState->unk50;
             *out = *(s8 *)((u8 *)p + (p->selection << 3) + 0xDA8);
         }
         p->secondarySlideTimer = 8;

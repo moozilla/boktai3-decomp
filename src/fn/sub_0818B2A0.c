@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct Sub {
     u8 pad[0x38];
@@ -28,7 +29,6 @@ struct Obj {
     u16 h112C;
 };
 
-extern u32 gUnk_03005304;
 extern u16 gUnk_086141BC[];
 extern void Armor_UpdateContactBoost(struct Obj *, s32, u32);
 extern void Armor_UpdateAccumulatedBehavior(struct Obj *, s32, u32);
@@ -81,8 +81,8 @@ void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 f
                         break;
                 }
             } else {
-                gUnk_03005304 = (gUnk_03005304 + 1) & 0x3FF;
-                v = gUnk_086141BC[gUnk_03005304];
+                gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
+                v = gUnk_086141BC[gEffectRandomTableIndex];
                 if (v > 0x3FFF) {
                     p->state = 2;
                     p->timer = 0x5A;
@@ -110,8 +110,8 @@ void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 f
                     *q = flag;
                 }
             } else if ((s16)sum > 400) {
-                gUnk_03005304 = (gUnk_03005304 + 1) & 0x3FF;
-                v = gUnk_086141BC[gUnk_03005304];
+                gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
+                v = gUnk_086141BC[gEffectRandomTableIndex];
                 if (v > 0x7FFF) {
                     p->state = 2;
                 } else {
@@ -200,8 +200,8 @@ void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 f
                 p->timer = 0x5A;
             } else if (p->keys & 1) {
                 if ((s16)p->acc > 400) {
-                    gUnk_03005304 = (gUnk_03005304 + 1) & 0x3FF;
-                    v = gUnk_086141BC[gUnk_03005304];
+                    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
+                    v = gUnk_086141BC[gEffectRandomTableIndex];
                     if (v > 0x7FFF) {
                         p->state = 2;
                         p->acc = 0;
@@ -212,8 +212,8 @@ void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 f
                     }
                 }
             } else {
-                gUnk_03005304 = (gUnk_03005304 + 1) & 0x3FF;
-                v = gUnk_086141BC[gUnk_03005304];
+                gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3FF;
+                v = gUnk_086141BC[gEffectRandomTableIndex];
                 if (v > 0x3FFF) {
                     p->state = 2;
                     p->timer = 0x5A;

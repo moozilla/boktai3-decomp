@@ -10,14 +10,14 @@ struct G {
     u8 f00[0x540];
     u32 w;
 };
-extern struct G *gUnk_030042E4;
+extern struct G *gPaletteBankData;
 
 void PlayerEffect_SetPaletteSource(struct P *p, u32 h, u32 w)
 {
     if (p != 0) {
         p->h1e = h;
         if (w == 0)
-            p->w24 = (u32)&gUnk_030042E4->w;
+            p->w24 = (u32)&gPaletteBankData->w;
         else
             p->w24 = w;
     }

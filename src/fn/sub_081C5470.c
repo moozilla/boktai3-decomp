@@ -1,6 +1,6 @@
 #include "global.h"
 
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 
 void ChallengeMenu_SetStoredRank(s32 a, s32 b, u32 c)
 {
@@ -10,7 +10,7 @@ void ChallengeMenu_SetStoredRank(s32 a, s32 b, u32 c)
     u8 *q;
     u32 k = 0xf;
     c &= k;
-    q = gUnk_02000710 + 0x658 + h;
+    q = gGameState + 0x658 + h;
     if (odd) {
         c <<= 4;
         *q &= k;

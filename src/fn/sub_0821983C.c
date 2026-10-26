@@ -1,11 +1,11 @@
 #include "global.h"
+#include "render.h"
 
 struct ContactPosition {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
 s32 Anim_InitPositionedWidget(void *, void *, u32, u32, u32, u32, u32, void *);
 
-extern u16 gUnk_03005238;
 void Anim_LinkToList(void *, u32);
 
 s32 Widget_InitLinked(u8 *w, void *resource, u16 glyph, u32 flags, u8 a, u8 b, u8 c,
@@ -44,9 +44,9 @@ s32 Widget_InitLinked(u8 *w, void *resource, u16 glyph, u32 flags, u8 a, u8 b, u
         *(u32 *)(w + 0x4c) = zero;
         *(u32 *)(w + 0x50) = zero;
         Anim_InitPositionedWidget(w, resource, glyph, flags, a, b, c, &pos);
-        gUnk_03005238++;
-        if (gUnk_03005238 == 0xFFFF)
-            gUnk_03005238 = zero;
+        gDefaultAnimFlags++;
+        if (gDefaultAnimFlags == 0xFFFF)
+            gDefaultAnimFlags = zero;
         *(u32 *)(w + 0x40) = -1;
         *(u32 *)(w + 0x44) = -1;
         *(u32 *)(w + 0x58) = zero;

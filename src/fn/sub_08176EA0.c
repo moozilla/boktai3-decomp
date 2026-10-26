@@ -1,20 +1,19 @@
 #include "global.h"
+#include "render.h"
 #define Hud_SetPhase        Hud_SetUpdateCallback
-#define gDisplayUpdateFlags gUnk_0300523C
+#define gDisplayUpdateFlags gEnginePauseFlags
 struct HudManager {
     u8 pad0[0xA12];
     u16 savedControl;
     u8 padA14[0x43E0 - 0xA14];
     u16 savedBlend[4];
 };
-extern u32 gUnk_0300523C, gUnk_030051D8;
-extern u16 gUnk_03005214, gUnk_030051C4, gUnk_030051DC, gUnk_03005210;
 s32 SceneHud_CanOpenFromStart(struct HudManager *);
 void Hud_SetUpdateCallback(struct HudManager *, void (*)(void));
 void SceneDialog_UpdateEntryFade(void);
 static inline void SetFlags(u32 mask)
 {
-    gUnk_0300523C |= mask;
+    gEnginePauseFlags |= mask;
 }
 s32 Hud_BeginSavedBlend(struct HudManager *p)
 {
@@ -23,11 +22,11 @@ s32 Hud_BeginSavedBlend(struct HudManager *p)
         result = 0;
     } else {
         SetFlags(4);
-        p->savedControl = gUnk_030051D8;
-        p->savedBlend[0] = gUnk_03005214;
-        p->savedBlend[1] = gUnk_030051C4;
-        p->savedBlend[2] = gUnk_030051DC;
-        p->savedBlend[3] = gUnk_03005210;
+        p->savedControl = gFadeMultiplier;
+        p->savedBlend[0] = gBgFadeColor;
+        p->savedBlend[1] = gBgFadeBankMask;
+        p->savedBlend[2] = gObjFadeColor;
+        p->savedBlend[3] = gObjFadeFlags;
         Hud_SetUpdateCallback(p, SceneDialog_UpdateEntryFade);
         result = 1;
     }

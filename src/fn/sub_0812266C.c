@@ -1,4 +1,6 @@
 #include "global.h"
+#include "engine.h"
+#include "ram.h"
 
 /* tentative: steps a keyframe state machine for a category-14 scene actor */
 
@@ -19,9 +21,7 @@ struct Obj {
     s16 bit;
     u16 flags140;
 };
-extern u8 *gUnk_02000140;
 extern const u8 gUnk_086106F0[];
-extern u32 gUnk_030053F4;
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 Anim_Step(void *, void *);
 void Anim_Remove(void *);
@@ -31,7 +31,7 @@ void SceneBody_Unregister(void *);
 
 s32 SceneActor14_UpdateAnimState(struct Obj *p)
 {
-    u8 *data = gUnk_02000140;
+    u8 *data = gAnimatedBodyPool;
     s32 idx;
 
     if (p->flags1D & 1) {
@@ -39,7 +39,7 @@ s32 SceneActor14_UpdateAnimState(struct Obj *p)
             Anim_SetKeyframes(p, data + 0x18, gUnk_086106F0[0x12], 2, 0);
             return 0;
         }
-        if (p->state == 0 && !(gUnk_030053F4 & 0x800))
+        if (p->state == 0 && !(gEngineFlags & 0x800))
             Sound_PlaySong(0x1A8);
         if (p->state == 1 && p->counter > 0) {
             data += 0x18;

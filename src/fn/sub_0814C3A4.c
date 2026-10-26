@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct C3A4Pos {
     s16 x, y, z;
@@ -15,10 +16,9 @@ struct C3A4Target {
 extern struct C3A4Target *gUnk_0200054C;
 extern u16 gUnk_02000510;
 extern u16 gUnk_02000530;
-extern u16 gUnk_02000594;
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 extern const s16 gUnk_086149C4[];
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 
 s32 Player_ConsumeStateEntry(u8 *);
 void Sound_PlaySong(u32);
@@ -90,7 +90,7 @@ void sub_0814C3A4(u8 *p)
     if (Player_ConsumeStateEntry(p)) {
         gUnk_02000510 = 0;
         gUnk_02000530 = 0;
-        gUnk_02000594 = 0;
+        gPlayerNotificationPending = 0;
         C3A4_U16(p, 0x274) = 0;
         gUnk_0200054C = 0;
         C3A4_U16(p, 0xAD6) = 0x16F;
@@ -106,7 +106,7 @@ void sub_0814C3A4(u8 *p)
         Player_SetPendingCallback(p, Player_OnGrabMotionExit);
         if (C3A4_U32(p, 0xA88) == 0)
             C3A4_U32(p, 0xA88) = (u32)ParticlePool_Create();
-        if (gUnk_030053F4 & 0x1000)
+        if (gEngineFlags & 0x1000)
             WirelessGame_ResetCyclingItemLatch();
         Player_EmitQueuedEffects(p);
         Player_NotifyActionCategories(p);
@@ -171,8 +171,8 @@ void sub_0814C3A4(u8 *p)
                     Player_SetActionPhase(p, 5);
                 } else {
                     s32 r = sub_08249244(t->body, 0, 0, t->unknown8);
-                    C3A4_U32(gUnk_02000710, 0xC00) += 8;
-                    gUnk_02000594 = 1;
+                    C3A4_U32(gGameState, 0xC00) += 8;
+                    gPlayerNotificationPending = 1;
                     if (r == 0) {
                         gUnk_0200054C = 0;
                         Player_SetActionPhase(p, 5);
@@ -219,7 +219,7 @@ void sub_0814C3A4(u8 *p)
                 s32 amount;
                 s32 base;
                 struct C3A4Pos vec;
-                if (gUnk_030053F4 & 0x1000)
+                if (gEngineFlags & 0x1000)
                     amount = 30;
                 else
                     amount = Player_ScaleLevelValue(2, 0x60);
@@ -241,7 +241,7 @@ void sub_0814C3A4(u8 *p)
                 vec.z = C3A4_Fx12(C3A4_Sin(base) * 64);
                 SceneParticle_CreateDefaultPriority(p + 0x10C, &vec, 0, 0, 1);
                 damage = amount;
-                if (gUnk_030053F4 & 0x1000)
+                if (gEngineFlags & 0x1000)
                     damage = 10;
                 C3A4_U16(p, 0x424) += damage;
                 if (C3A4_U16(p, 0x424) >= C3A4_U16(p, 0x426)) {

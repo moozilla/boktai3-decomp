@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Trap {
     u32 serial;
     u16 f4, f6, id, fa, flags, fe;
@@ -12,35 +13,34 @@ struct Context {
     struct Trap traps[64];
     u8 *tops[64];
 };
-extern struct Context *gUnk_030052F4;
-extern u32 gUnk_03005300;
+extern struct Context *gTerrainMap;
 void Trap_Register(struct Trap *trap, u8 *top)
 {
     s32 i, found, j;
-    if (gUnk_030052F4->count > 63)
+    if (gTerrainMap->count > 63)
         return;
-    if (!gUnk_03005300)
-        gUnk_03005300 = 1;
-    trap->serial = gUnk_03005300++;
+    if (!gTerrainTrapSerial)
+        gTerrainTrapSerial = 1;
+    trap->serial = gTerrainTrapSerial++;
     found = 0;
-    i = gUnk_030052F4->count;
+    i = gTerrainMap->count;
     while (i > 0) {
-        if (trap->id == gUnk_030052F4->traps[i - 1].id) {
+        if (trap->id == gTerrainMap->traps[i - 1].id) {
             found = 1;
             break;
         }
         i--;
     }
     if (!found) {
-        gUnk_030052F4->traps[gUnk_030052F4->count] = *trap;
-        gUnk_030052F4->tops[gUnk_030052F4->count] = top;
+        gTerrainMap->traps[gTerrainMap->count] = *trap;
+        gTerrainMap->tops[gTerrainMap->count] = top;
     } else {
-        for (j = gUnk_030052F4->count; j > i; j--) {
-            gUnk_030052F4->traps[j] = gUnk_030052F4->traps[j - 1];
-            gUnk_030052F4->tops[j] = gUnk_030052F4->tops[j - 1];
+        for (j = gTerrainMap->count; j > i; j--) {
+            gTerrainMap->traps[j] = gTerrainMap->traps[j - 1];
+            gTerrainMap->tops[j] = gTerrainMap->tops[j - 1];
         }
-        gUnk_030052F4->traps[i] = *trap;
-        gUnk_030052F4->tops[i] = top;
+        gTerrainMap->traps[i] = *trap;
+        gTerrainMap->tops[i] = top;
     }
-    gUnk_030052F4->count++;
+    gTerrainMap->count++;
 }

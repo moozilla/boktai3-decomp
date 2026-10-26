@@ -2,10 +2,10 @@
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
+#include "engine.h"
 
-#define gRandomTableIndex gUnk_03005308
+#define gRandomTableIndex gRandomIndex
 #define gRandomTable      gUnk_0203B400
-extern u32 gUnk_030053F4, gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void Player_CallEventScript(struct Player *, u32);
@@ -14,26 +14,26 @@ static inline u16 nextRandom(void)
 {
     register u32 table asm("r2");
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     table = (u32)gUnk_0203B400;
     offset += table;
     return *(const u16 *)offset;
 }
 void PlayerContact_UpdateThresholdEvent(struct Player *p)
 {
-    u32 zero = gUnk_030053F4 & 0x1000;
+    u32 zero = gEngineFlags & 0x1000;
     if (zero)
         return;
     if (p->actionMode != 1)
         goto clearReady;
     {
-        if ((s32)gUnk_02000710->unk600 < gUnk_02000710->contactThreshold) {
+        if ((s32)gGameState->unk600 < gGameState->contactThreshold) {
             goto clearPending;
         } else if (p->contactThresholdReady) {
             if (p->tetherMode <= 1) {
-                gUnk_02000710->unk600 = zero;
-                gUnk_02000710->contactThreshold = Mod(nextRandom(), 100) + 200;
+                gGameState->unk600 = zero;
+                gGameState->contactThreshold = Mod(nextRandom(), 100) + 200;
                 p->contactThresholdReady = zero;
                 Player_CallEventScript(p, 2);
                 PlayerBurst_Create(p);

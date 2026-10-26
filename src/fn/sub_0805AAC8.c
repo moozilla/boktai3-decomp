@@ -18,8 +18,8 @@ void ScenePanelRig_TickSprites(struct ScenePanelRig *rig, u32 palette)
         s32 offset;
         {
             register s32 sample asm("r0");
-            u32 index = (gUnk_03005308 + 1) & 1023;
-            gUnk_03005308 = index;
+            u32 index = (gRandomIndex + 1) & 1023;
+            gRandomIndex = index;
             sample = index << 1;
             sample = *(const u16 *)((u32)gUnk_0203B400 + sample);
             sample &= 15;

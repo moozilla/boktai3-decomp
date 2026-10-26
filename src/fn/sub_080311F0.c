@@ -59,7 +59,7 @@ int MessageWindow_OpenFromScript(void)
     MessageWindow_ApplyPalette(p);
     p->scriptIndex = Script_GetKeywordValue('i', p->scriptIndex);
     state->spacing = Script_GetKeywordValue('m', state->spacing);
-    state->lineWidth = Script_GetKeywordValue('w', (s16)gUnk_02000710->unk12);
+    state->lineWidth = Script_GetKeywordValue('w', (s16)gGameState->unk12);
     if (Script_SeekToKeyword('d')) {
         p->scrollMode = Script_GetValue();
         p->scrollStep = Script_GetValue();

@@ -6,6 +6,7 @@
 #define gLinkMenuState                 gUnk_020004B4
 #include "global.h"
 #include "area_effect_link.h"
+#include "engine.h"
 u8 Registry1745_ConsumeStateEntry(void *);
 void Registry1745_ClearParticipantCounters(void *);
 s32 Registry1745_CheckSessionReady(void *);
@@ -17,7 +18,6 @@ u8 LinkSession_ReceiveSelectionByte(void *, void *, s32, s32);
 void SlotState_ResetInactiveMode(void *);
 void ScriptPanel_OpenTextWindow(void);
 void LinkMenu_ShowChoiceMessage(void);
-extern u32 gUnk_03005308;
 s32 LinkMenu_ExchangeChoices(struct AreaEffectLinkState *p)
 {
     u8 *session = p->sessionData;
@@ -37,7 +37,7 @@ s32 LinkMenu_ExchangeChoices(struct AreaEffectLinkState *p)
     if (LinkSession_ReceiveSelectionByte(p, incoming, 0, 4) == 1) {
         Crc_ComputeCcitt16(incoming, 0, 2);
         SlotState_ResetInactiveMode(session);
-        gUnk_03005308 = *(u16 *)(session + 0x60) & 0x3ff;
+        gRandomIndex = *(u16 *)(session + 0x60) & 0x3ff;
         Registry1745_SetState(p, 10, LinkMenu_ShowChoiceMessage);
     }
     return 0;

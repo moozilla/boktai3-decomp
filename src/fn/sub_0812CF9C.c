@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_steering_actor.h"
+#include "engine.h"
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
 extern const s16 gUnk_086149C4[];
 void SceneMovingParticle_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
 static inline s32 Truncate(s32 v)
@@ -25,7 +25,7 @@ void SceneSlot_EmitPulse(struct ContactPosition *input)
     u32 mask;
     asm volatile("" : "+r"(opaque));
     {
-        register u32 index asm("r0") = ((cursor = &gUnk_03005308), *cursor + 1) & 1023;
+        register u32 index asm("r0") = ((cursor = &gRandomIndex), *cursor + 1) & 1023;
         const u8 *sample = (void *)(index * 2 + (u32)table);
         mask = 255;
         angle = *sample;

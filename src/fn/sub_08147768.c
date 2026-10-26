@@ -1,7 +1,7 @@
 #include "global.h"
 #include "player.h"
 // confidence=low: motion ten toggles actionMode between zero and one and refreshes equipment.
-extern u32 gUnk_030053F4, gUnk_02000560;
+extern u32 gEngineFlags, gUnk_02000560;
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_SetPendingCallback(struct Player *, void (*)(struct Player *));
 void Player_OnMotion10Exit(struct Player *);
@@ -28,7 +28,7 @@ static inline u32 TestModeFlags(u32 mask)
 void Player_UpdateFormChangeCue(struct Player *p)
 {
     if (Player_ConsumeStateEntry(p)) {
-        if (p->statHundredths > 999 || (gUnk_030053F4 & 0x1000) || p->kind == 2) {
+        if (p->statHundredths > 999 || (gEngineFlags & 0x1000) || p->kind == 2) {
             p->actionEighteenParameter = 0x16F;
             p->actionEighteenDuration = 0;
             p->actionEighteenEnabled = 1;
@@ -36,7 +36,7 @@ void Player_UpdateFormChangeCue(struct Player *p)
             p->actionEighteenEnabled = 0;
         Sound_PlaySong(0x306);
         if (p->actionMode != 1) {
-            if (p->statHundredths > 999 || (gUnk_030053F4 & 0x1000) || p->kind == 2) {
+            if (p->statHundredths > 999 || (gEngineFlags & 0x1000) || p->kind == 2) {
                 B(0x432) = 1;
                 B(0x433) = 1;
             }
@@ -51,7 +51,7 @@ void Player_UpdateFormChangeCue(struct Player *p)
         H(0x4EA) = 0;
     }
     p->statusValue = 4000;
-    if (gUnk_030053F4 & 0x1000)
+    if (gEngineFlags & 0x1000)
         Player_AddControlFlags(p, 8);
     {
         u32 mask = 0x100000;
@@ -89,7 +89,7 @@ void Player_UpdateFormChangeCue(struct Player *p)
             }
             p->resetValue6FC = 15;
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 8), 64, 1)) {
-                if (p->statHundredths > 999 || (gUnk_030053F4 & 0x1000) || p->actionMode == 1 ||
+                if (p->statHundredths > 999 || (gEngineFlags & 0x1000) || p->actionMode == 1 ||
                     TestModeFlags(2)) {
                     Player_SetActionPhase(p, 2);
                     p->statusValue = 4000;

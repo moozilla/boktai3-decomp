@@ -3,10 +3,10 @@
 /* GameState_SetRuntimeFlag100: Sets runtime flag 0x100 at game-state offset 0x868; specific meaning unknown */
 #define GameState_SetRuntimeFlag100 sub_0811D234
 
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 
 void sub_0811D234(void)
 {
     u32 m = 0x100;
-    *(u32 *)(gUnk_02000710 + 0x868) |= m;
+    *(u32 *)(gGameState + 0x868) |= m;
 }

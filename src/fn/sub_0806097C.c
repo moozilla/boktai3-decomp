@@ -1,9 +1,9 @@
 #include "scene_inventory_actions.h"
+#include "game_state.h"
 struct SceneInventoryOwnedConsumables {
     u8 unknown0[0x160];
     s16 id;
 };
-extern struct GameState *gUnk_02000710;
 void SceneInventory_BeginConsumableRemoveMove(struct SceneInventoryActionView *panel)
 {
     struct SceneInputPosition starts[2], targets[2];
@@ -16,7 +16,7 @@ void SceneInventory_BeginConsumableRemoveMove(struct SceneInventoryActionView *p
     {
         u32 address = panel->savedSelection;
         struct GameState *game;
-        game = gUnk_02000710;
+        game = gGameState;
         address <<= 1;
         address += (u32)game;
         frames[0] = ((struct SceneInventoryOwnedConsumables *)address)->id + 0x121;

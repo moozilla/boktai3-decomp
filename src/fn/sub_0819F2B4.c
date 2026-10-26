@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 /* tentative: adjacent-side variant of the random burst phase; the spread turns the other way */
 
@@ -34,7 +35,6 @@ struct ReactionIds {
 };
 extern const u32 gUnk_0824F734[2];
 extern const u32 gUnk_0824F744[2];
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 sub_08249350(s32, s32);
 void Hresvelgr_SetAnimation(struct ActorReaction *, void *, void *, u32, u32, u32);
@@ -62,8 +62,8 @@ static inline void add(struct ReactionVector *dst, struct ReactionVector *a,
 static inline int randomValue(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(const u16 *)(offset + (u32)gUnk_0203B400);
 }
 void Hresvelgr_UpdateAdjacentRandomBurstPhase(struct ActorReaction *actor, s32 frame)

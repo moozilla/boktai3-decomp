@@ -40,7 +40,7 @@ category10:
 selected:
     SceneActorRegistry_FindLiving(category);
     {
-        u8 **bankPointer = &gUnk_030042E4;
+        u8 **bankPointer = &gPaletteBankData;
         destinationOffset = destinationBank * 32;
         palettes = *bankPointer;
         sourceOffset = sourceBank * 32;

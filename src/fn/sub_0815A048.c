@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 extern u32 gUnk_0200054C;
-extern u16 gUnk_02000594;
 void Player_AddControlFlags(void *, u32);
 void Sound_PlaySong(u32);
 // confidence=low: forced variant clears movement state before starting or refreshing stun.
@@ -29,7 +29,7 @@ s32 Player_TryStartStun(u8 *p, s32 duration, s32 force)
             *(u8 *)(p + 0x4BE) = zeroByte;
             *(u16 *)(p + 0x442) = zeroHalf;
             gUnk_0200054C = zeroHalf;
-            gUnk_02000594 = zeroHalf;
+            gPlayerNotificationPending = zeroHalf;
         }
     }
     {

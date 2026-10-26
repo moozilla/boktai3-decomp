@@ -155,7 +155,7 @@ struct Pool {
     void *resource;
     u32 allocated;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Anim_SetSequence(struct Anim *, void *, u32, u32, u32);
@@ -165,8 +165,8 @@ s32 Div(s32, s32);
 void LinkedEffect_UpdateColliders(struct Effect *);
 static inline u32 RandomValue(void)
 {
-    u32 index = (gUnk_03005308 + 1) & 1023;
-    gUnk_03005308 = index;
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
     return gUnk_0203B400[index];
 }
 static inline s32 Truncate(s32 v)

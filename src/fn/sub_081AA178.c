@@ -31,12 +31,12 @@ u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
 s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 static inline s32 RandomValue(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    return *(u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
+    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+    return *(u16 *)((gRandomIndex << 1) + (u32)gUnk_0203B400);
 }
 void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
 {

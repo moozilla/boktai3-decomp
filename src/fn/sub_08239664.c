@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 /* tentative: copies a palette bank, optionally brightening each channel capped at 31 */
 
@@ -14,14 +15,12 @@ struct PalFadeObj {
     u8 brighten;
 };
 
-extern u8 *gUnk_030042E4;
-
 void PaletteFade_ApplySelectiveBrightness(struct PalFadeObj *p)
 {
     u16 *src;
     s32 i;
 
-    src = (u16 *)(gUnk_030042E4 + p->paletteBanks[p->bankIndex] * 32);
+    src = (u16 *)(gPaletteBankData + p->paletteBanks[p->bankIndex] * 32);
     if (p->brighten == 0) {
         if (p->copyAll == 0) {
             u16 *dst;

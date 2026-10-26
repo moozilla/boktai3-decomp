@@ -1,7 +1,7 @@
 #define PlayerOrbitEffect_SetUpdateCallback PlayerBurst_SetStateCallback
-#define gEnginePauseFlags                   gUnk_0300523C
 #include "global.h"
 #include "player.h"
+#include "render.h"
 struct PlayerOrbitEffect {
     u8 unknown0[0x1C];
     u8 animationData[0x20];
@@ -12,7 +12,6 @@ struct PlayerOrbitEffect {
     u8 unknown60[0x92];
     u16 frame;
 };
-extern u32 gUnk_0300523C;
 void Sound_PlaySong(u32);
 s32 Anim_Step(void *, void *);
 void PlayerOrbitEffect_UpdateStatTransfer(void);
@@ -22,7 +21,7 @@ void PlayerOrbitEffect_UpdateIntro(struct PlayerOrbitEffect *effect)
     struct Player *player;
     if (effect->frame == 0) {
         u32 mask = 4;
-        gUnk_0300523C |= mask;
+        gEnginePauseFlags |= mask;
         Sound_PlaySong(0x302);
         Sound_PlaySong(0x1FA);
     }

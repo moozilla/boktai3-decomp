@@ -1,5 +1,4 @@
 #include "global.h"
-#define gGameState gUnk_02000710
 #include "game_state.h"
 s32 InventoryPanel_CreateEntry(s32 *, s32, s32, s32, s32);
 s32 InventoryPanel_UpdateSelectedUnlock(void *, s32, s32, s32, s32);
@@ -20,13 +19,13 @@ void InventoryPanel_DrawStatComparison(u8 *p, s32 unlock, s32 equipment, s32 sel
 {
     s32 value, old, delta, item, kind;
     if (active) {
-        if ((s16)gUnk_02000710->unk50 <= 7) {
-            item = ((struct GameState *)((s16)gUnk_02000710->unk50 * 2 + (u32)gUnk_02000710))
-                       ->inventory[0];
+        if ((s16)gGameState->unk50 <= 7) {
+            item =
+                ((struct GameState *)((s16)gGameState->unk50 * 2 + (u32)gGameState))->inventory[0];
             kind = 0;
         } else {
-            item = ((struct GameState *)((s16)gUnk_02000710->unk50 * 2 + (u32)gUnk_02000710))
-                       ->inventory[0];
+            item =
+                ((struct GameState *)((s16)gGameState->unk50 * 2 + (u32)gGameState))->inventory[0];
             kind = 4;
         }
         if (InventoryPanel_CreateEntry(&value, position, item, 0, kind) < 0) {
@@ -44,13 +43,13 @@ void InventoryPanel_DrawStatComparison(u8 *p, s32 unlock, s32 equipment, s32 sel
             DrawComparison(p, 8, 3, value, delta, old);
         }
     } else if (selected) {
-        if ((s16)gUnk_02000710->unk50 <= 7) {
-            item = ((struct GameState *)((s16)gUnk_02000710->unk50 * 2 + (u32)gUnk_02000710))
-                       ->inventory[0];
+        if ((s16)gGameState->unk50 <= 7) {
+            item =
+                ((struct GameState *)((s16)gGameState->unk50 * 2 + (u32)gGameState))->inventory[0];
             kind = 0;
         } else {
-            item = ((struct GameState *)((s16)gUnk_02000710->unk50 * 2 + (u32)gUnk_02000710))
-                       ->inventory[0];
+            item =
+                ((struct GameState *)((s16)gGameState->unk50 * 2 + (u32)gGameState))->inventory[0];
             kind = 4;
         }
         if (InventoryPanel_CreateEntry(&value, position, item, 0, kind) < 0) {

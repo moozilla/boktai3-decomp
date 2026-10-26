@@ -42,9 +42,9 @@ void SceneEffectQueue_PostTypeZeroMessage(s32 arg)
     message.id = 0x382f;
     message.count = 3;
     message.values = values;
-    in.x = (u16)gUnk_02000710->positionX;
-    in.y = (u16)gUnk_02000710->positionY;
-    in.z = (u16)gUnk_02000710->positionZ;
+    in.x = (u16)gGameState->positionX;
+    in.y = (u16)gGameState->positionY;
+    in.z = (u16)gGameState->positionZ;
     output = &out;
     input = (struct ScreenPosition *)&in;
     x = input->x;

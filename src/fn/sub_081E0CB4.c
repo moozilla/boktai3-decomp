@@ -6,19 +6,19 @@ struct Settings {
     u8 *t;
     s32 o, c, p;
 };
-extern struct Settings gUnk_02000388;
+extern struct Settings gScriptPromptSettings;
 /* Script: -m and -t (script positions) and -o, -c, -p (values) into the
-   block at gUnk_02000388, next to ScriptMessage_SetFromScript's (tentative). */
+   block at gScriptPromptSettings, next to ScriptMessage_SetFromScript's (tentative). */
 void ScriptPrompt_SetFromScript(void)
 {
     if (Script_SeekToKeyword('m'))
-        gUnk_02000388.m = Script_GetPc();
+        gScriptPromptSettings.m = Script_GetPc();
     if (Script_SeekToKeyword('t'))
-        gUnk_02000388.t = Script_GetPc();
+        gScriptPromptSettings.t = Script_GetPc();
     if (Script_SeekToKeyword('o'))
-        gUnk_02000388.o = Script_GetValue();
+        gScriptPromptSettings.o = Script_GetValue();
     if (Script_SeekToKeyword('c'))
-        gUnk_02000388.c = Script_GetValue();
+        gScriptPromptSettings.c = Script_GetValue();
     if (Script_SeekToKeyword('p'))
-        gUnk_02000388.p = Script_GetValue();
+        gScriptPromptSettings.p = Script_GetValue();
 }

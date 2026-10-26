@@ -10,7 +10,7 @@ void Player_RecalculateDerivedStats(struct Player *p)
     register s32 i asm("r3");
     register u32 offset asm("r1") = 0x418;
     if (*((u8 *)p + offset) != 6) {
-        struct GameState *state = gUnk_02000710;
+        struct GameState *state = gGameState;
         register u16 *dest asm("r2");
         register u16 *stats asm("r1");
         register u16 cap asm("r4");
@@ -28,7 +28,7 @@ void Player_RecalculateDerivedStats(struct Player *p)
             stats++;
         } while (--i >= 0);
     } else {
-        s32 level = gUnk_02000710->level + 10;
+        s32 level = gGameState->level + 10;
         s32 remainder, quotient, value;
         u16 *dest;
         register u16 *stats asm("r2");
@@ -41,7 +41,7 @@ void Player_RecalculateDerivedStats(struct Player *p)
         remainder -= quotient * 3;
         value = quotient + 10;
         dest = p->derivedStats;
-        stats = (u16 *)gUnk_02000710;
+        stats = (u16 *)gGameState;
         cap = 120;
         i = 2;
         do {

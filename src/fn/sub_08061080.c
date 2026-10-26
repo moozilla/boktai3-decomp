@@ -13,7 +13,7 @@ s32 SceneInventory_ClassifyConsumableMove(struct SceneInventoryControlView *owne
         register s32 selected asm("r1");
         s32 second;
         {
-            struct GameState *state = gUnk_02000710;
+            struct GameState *state = gGameState;
             register struct GameState *slot asm("r0") = (void *)(saved * 2 + (u32)state);
             first = slot->table160[0];
             selected = panel->grid.selection;
@@ -44,7 +44,7 @@ s32 SceneInventory_ClassifyConsumableMove(struct SceneInventoryControlView *owne
                 {
                     u32 index = *selectedPtr;
                     struct GameState *state;
-                    state = gUnk_02000710;
+                    state = gGameState;
                     slot = (void *)(index * 2 + (u32)state);
                 }
                 {

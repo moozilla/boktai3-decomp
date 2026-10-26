@@ -22,17 +22,17 @@ s32 Mod(s32, s32);
 static inline u32 Random(void)
 {
     u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    offset = gRandomIndex * 2;
     return *(u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 static inline s32 scaleByDifficulty(s32 value)
 {
-    return Div((10 - gUnk_02000710->unk876) * value, 10);
+    return Div((10 - gGameState->unk876) * value, 10);
 }
 static inline s32 scaleUnlessFlagged(s32 value)
 {
-    if (gUnk_030053F4 & 0x800)
+    if (gEngineFlags & 0x800)
         return value;
     return scaleByDifficulty(value);
 }
@@ -46,7 +46,7 @@ void SceneEffectSchedule_AddFromScript(void)
     s32 time, delay;
     {
         u32 mask = 0x400;
-        if ((gUnk_030053F4 | gUnk_030053F0) & mask)
+        if ((gEngineFlags | gUnk_030053F0) & mask)
             return;
     }
     if (!gUnk_0200019C)

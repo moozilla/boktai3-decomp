@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_020004A0;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 RisingPuffPool_Init(u8 *);
@@ -11,8 +11,8 @@ void RisingPuffPool_DestroyTask(void);
 u8 *RisingPuffPool_GetOrCreate(void)
 {
     u8 *p;
-    if (gUnk_020004A0 != 0)
-        return gUnk_020004A0;
+    if (gRisingSpritePool != 0)
+        return gRisingSpritePool;
     p = Task_Create(0xa, 0x19c);
     if (p != 0) {
         Task_SetCallbacks(p, RisingPuffPool_UpdateTask, RisingPuffPool_DestroyTask);

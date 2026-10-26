@@ -13,7 +13,7 @@ static inline u8 *Properties(s32 index)
     if (p)
         return p + 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = index * 4 + 12;
         return map->cells + offset;
     }
@@ -38,10 +38,10 @@ s32 SceneGrid_TryRandomNearbyPosition(struct ContactPosition *output, void *unus
         register u32 rawZ asm("r0") = (u16)origin->z;
         z = (s16)rawZ >> 8;
     }
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         index = 0;
     else {
-        register u32 rowBase asm("r0") = gUnk_030052F4->rows[z];
+        register u32 rowBase asm("r0") = gTerrainMap->rows[z];
         index = rowBase + x;
     }
     column = Mod(index, SceneGrid_Width());
@@ -54,15 +54,15 @@ s32 SceneGrid_TryRandomNearbyPosition(struct ContactPosition *output, void *unus
         const u16 *base = gUnk_0203B400;
         samples = base;
     }
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
     {
-        s32 choice = Mod(samples[gUnk_03005308], spread);
+        s32 choice = Mod(samples[gRandomIndex], spread);
         s32 base = baseColumn;
         chosenColumn = choice + base;
     }
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
     {
-        s32 choice = Mod(samples[gUnk_03005308], spread);
+        s32 choice = Mod(samples[gRandomIndex], spread);
         s32 chosenRow;
         s32 base = baseRow;
         chosenRow = choice + base;

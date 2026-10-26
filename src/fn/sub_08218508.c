@@ -1,4 +1,6 @@
 #include "global.h"
+#include "render.h"
+#include "ram.h"
 // confidence=low: flag 0x1000 selects this sprite staging pass.
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
@@ -27,13 +29,11 @@ struct OamEntry {
     u32 attributes;
     u16 tile, depth;
 };
-extern u32 gUnk_03003A50, gUnk_03004290, gUnk_03003A04;
+extern u32 gUnk_03003A04;
 extern struct Drawable *gUnk_030042D0[];
-extern s32 gUnk_03004BA0, gUnk_03004798, gUnk_0300479C, gUnk_0300522C;
 extern struct Matrix gUnk_03004310[];
 extern struct OamEntry gUnk_03004390[], gUnk_030047A0[];
-extern u8 gUnk_03005230;
-extern u16 gUnk_03004790[], gUnk_03005418[];
+extern u16 gUnk_03005418[];
 static inline s32 UnsignedScale(u8 v)
 {
     return v;
@@ -52,14 +52,14 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
     struct Vec pos;
     struct Drawable *p;
     s32 *matrixCount;
-    u32 parity = gUnk_03003A50 & 1;
+    u32 parity = gSceneEffectPalettePhase & 1;
     u32 skip = 0x401;
     if (parity)
         skip = 0x201;
-    p = gUnk_030042D0[gUnk_03004290];
+    p = gUnk_030042D0[gRenderListIndex];
     if (!p)
         return;
-    matrixCount = &gUnk_03004BA0;
+    matrixCount = &gAffineRequestCount;
     do {
         s32 x, y;
         s32 z;
@@ -152,19 +152,19 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
             attr |= 0x10000000;
         if (flags & 8)
             attr |= 0x20000000;
-        if (gUnk_0300522C && (flags & 0x4000))
+        if (gSpriteAttrFlags && (flags & 0x4000))
             attr |= 0x400;
-        if (((gUnk_03005230 & 1) && p->priority && !(flags & 0x10000)) || (flags & 0x800))
+        if (((gSpriteMosaicAttr & 1) && p->priority && !(flags & 0x10000)) || (flags & 0x800))
             attr |= 0x1000;
         depth += p->depthOffset;
         if (flags & 0x20) {
             s32 tile = p->tile | (p->priority << 10) | (p->palette << 12);
-            s32 n = gUnk_03004798;
+            s32 n = gOamCount;
             if (n > 127)
                 goto next;
             gUnk_03004390[n].attributes = attr;
             gUnk_03004390[n].tile = tile;
-            gUnk_03004798 = n + 1;
+            gOamCount = n + 1;
             gUnk_03003A04 |= 1;
         } else {
             s32 tile, n;
@@ -177,14 +177,14 @@ void SpriteOam_QueueFlaggedProjectedSprites(void)
             tile = p->tile;
             priority = p->priority;
             tile = tile | (priority << 10) | (p->palette << 12);
-            n = gUnk_0300479C;
+            n = gPendingOamCount;
             if (n > 127)
                 goto next;
             gUnk_030047A0[n].attributes = attr;
             gUnk_030047A0[n].tile = tile;
             gUnk_030047A0[n].depth = ((depth + 128) & 255) << 8;
-            gUnk_0300479C = n + 1;
-            gUnk_03004790[priority]++;
+            gPendingOamCount = n + 1;
+            gOamPriorityCounts[priority]++;
         }
     next:
         p = p->next;

@@ -15,11 +15,11 @@ void SceneCharacter_UpdatePalettePulse(u8 *a, u8 *b)
     }
     t = Mod(*(u32 *)(b + 0x10), 128);
     if (t <= 64) {
-        u8 *bank = gUnk_030042E4;
+        u8 *bank = gPaletteBankData;
         u8 *from = bank + 0x680, *to = bank + 0x2e80;
         Palette_InterpolateBanks(b + 0x1cc, from, to, t, 6);
     } else {
-        u8 *bank = gUnk_030042E4;
+        u8 *bank = gPaletteBankData;
         u8 *from = bank + 0x2e80, *to = bank + 0x680;
         Palette_InterpolateBanks(b + 0x1cc, from, to, t - 64, 6);
     }

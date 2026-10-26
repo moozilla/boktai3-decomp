@@ -15,7 +15,6 @@ struct Unk08233760Object {
     u8 unknown90[0x17A];
     u16 timer;
 };
-extern u32 gUnk_03005308;
 void sub_0823350C(struct Unk08233760Object *);
 s32 Collider_Refresh(void *);
 void sub_08014634(u32, u32, void *, void *, void *, u32, u32);
@@ -25,15 +24,15 @@ static inline u32 TerrainHeight(struct ContactPosition *position)
     s32 x = position->x >> 8, z = position->z >> 8;
     u32 cell, flags, shape, height;
     u8 *data;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
+        data = gTerrainMap->cells + (cell * 4 + 12);
     flags = *data;
     shape = flags >> 4;
     {
@@ -61,7 +60,7 @@ void ChargedBurst_EmitTerminalDebris(struct Unk08233760Object *object)
         if (height > TerrainHeight(&object->position)) {
             struct Unk08233760PackedVec velocity, extent;
             const u16 *table = gUnk_0203B400;
-            u32 *seed = &gUnk_03005308;
+            u32 *seed = &gRandomIndex;
             register u32 i asm("r2") = *seed + 1;
             u32 mask = 1023;
             register u32 low asm("r9");

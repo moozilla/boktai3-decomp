@@ -14,18 +14,18 @@ struct M {
     u16 c1;
     u16 c2;
 };
-extern struct M *gUnk_03001688;
+extern struct M *gColliderManager;
 void Collider_Register(struct Nd *n)
 {
     struct Nd *p;
-    if (gUnk_03001688 == 0)
+    if (gColliderManager == 0)
         return;
-    p = gUnk_03001688->f18;
+    p = gColliderManager->f18;
     while ((p = p->next) != 0)
         if (p == n)
             return;
-    gUnk_03001688->f20->next = n;
+    gColliderManager->f20->next = n;
     n->next = 0;
-    gUnk_03001688->f20 = n;
-    gUnk_03001688->c0++;
+    gColliderManager->f20 = n;
+    gColliderManager->c0++;
 }

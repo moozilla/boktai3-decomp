@@ -1,10 +1,10 @@
 #include "global.h"
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 s32 SunClock_GetPhase(void);
 s32 Weather_GetStormVolume(s16 *p)
 {
     s32 r, v;
-    if (*(s16 *)(gUnk_02000710 + 0x612) != 0)
+    if (*(s16 *)(gGameState + 0x612) != 0)
         r = p[0x19];
     else
         r = (p[0x18] * p[0x19]) >> 6;

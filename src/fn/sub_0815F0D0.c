@@ -1,10 +1,10 @@
 #define Player_RefreshCueCollider Player_UpdateColliderRefreshCountdown
-#define gPlayerCueTimer           gUnk_02000518
 #define gPlayerCueActive          gUnk_02000528
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
-extern u16 gUnk_02000518, gUnk_02000528;
+#include "ram.h"
+extern u16 gUnk_02000528;
 void PlayerCue_Dispatch(void *);
 void Player_ResetStatus(void *);
 void Player_RecordInputTicks(void *);
@@ -30,13 +30,13 @@ s32 Player_Update(struct Player *p)
         Player_RecordInputTicks(p);
         Player_ConsumeActionCharge(p);
         Player_UpdateColliderRefreshCountdown(p);
-        if (gUnk_02000710->form != 2) {
-            gUnk_02000518 = 0;
+        if (gGameState->form != 2) {
+            gPlayerCueTimer = 0;
             gUnk_02000528 = 0;
         }
         if (gUnk_02000528) {
-            if (gUnk_02000518)
-                gUnk_02000518--;
+            if (gPlayerCueTimer)
+                gPlayerCueTimer--;
             else
                 gUnk_02000528 = 0;
         }

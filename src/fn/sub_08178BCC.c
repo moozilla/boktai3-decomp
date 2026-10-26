@@ -1,5 +1,4 @@
-#define gSceneHud     gUnk_02000214
-#define gSceneHudMode gUnk_020005A4
+#define gSceneHud gFieldHud
 #include "global.h"
 #include "scene_hud_display.h"
 #include "game_state.h"
@@ -16,7 +15,7 @@ static inline u32 TestFlags(u32 *flags, u32 mask)
 }
 static inline u8 OwnerWidgetsEnabled(u32 mask)
 {
-    if ((gUnk_02000710->flags868 & mask))
+    if ((gGameState->flags868 & mask))
         return 1;
     return 0;
 }

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 struct Vec {
     s16 x, y, z, pad;
@@ -23,7 +24,6 @@ struct ScriptCombatActor {
     u8 unknown198[0x34];
     void *sequence;
 };
-extern u32 gUnk_03005308;
 struct Vec *Player_GetEffectivePosition(u32);
 s32 Mod(s32, s32);
 s32 Math_Atan2(s32, s32);
@@ -38,8 +38,8 @@ void Anim_RestartSequence(void *, void *, u32, u32, u32);
 u32 ScriptCombatActor_TryProjectileAttack(void *);
 static inline s32 RandomValue(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return *(const u16 *)(RANDOM_TABLE_ADDR + gUnk_03005308 * 2);
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(const u16 *)(RANDOM_TABLE_ADDR + gRandomIndex * 2);
 }
 static inline s32 distanceSquared(struct Vec *a, struct Vec *b)
 {
@@ -97,7 +97,7 @@ u32 ScriptCombatActor_UpdateProjectileAttack(struct ScriptCombatActor *p)
         u32 mask;
         u32 index;
         table = (const u16 *)RANDOM_TABLE_ADDR;
-        cursor = &gUnk_03005308;
+        cursor = &gRandomIndex;
         index = *cursor;
         index++;
         mask = 1023;

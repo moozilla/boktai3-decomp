@@ -1,14 +1,13 @@
 #include "global.h"
 #include "scene_pool.h"
-#define Packet_Send    SceneMessages_Send
-#define gMessagePacket gUnk_020001F0
+#include "ram.h"
+#define Packet_Send SceneMessages_Send
 struct Packet {
     u16 id;
     u8 kind, zero;
     u16 reserved;
     u8 command, count;
 };
-extern struct Packet gUnk_020001F0;
 void SceneMessages_Send(struct Packet *);
 void Sound_PlayTrackedSong(int);
 void Glove_UpdateStopping(void);
@@ -18,7 +17,7 @@ static inline void clearDrawFlags(struct ScenePoolPlayerDraw *d, s16 mask)
 }
 void Glove_StopWithMessage(struct ScenePoolPlayer *glove)
 {
-    struct Packet *packet = &gUnk_020001F0;
+    struct Packet *packet = &gMessagePacket;
     u32 zero = 0;
     u32 one;
     packet->zero = zero;
@@ -27,7 +26,7 @@ void Glove_StopWithMessage(struct ScenePoolPlayer *glove)
     packet->count = zero;
     packet->kind = 4;
     packet->id = 0x7c56;
-    SceneMessages_Send(&gUnk_020001F0);
+    SceneMessages_Send(&gMessagePacket);
     {
         struct ScenePoolPlayerDraw *draw = &glove->gloveDraw;
         one = 1;

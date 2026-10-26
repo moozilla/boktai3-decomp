@@ -3,8 +3,8 @@
 #include "player.h"
 // confidence=low: phases coordinate attachment creation, facing and a fading control cue.
 extern u8 *gUnk_02000488;
-extern u8 *gUnk_02000710;
-extern u32 gUnk_030053F4;
+extern u8 *gGameState;
+extern u32 gEngineFlags;
 void Sound_PlaySong(u32);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, int, int, int, int);
 s32 Math_Atan2(s32, s32);
@@ -19,7 +19,7 @@ void Player_UpdateAttachmentCue(struct Player *p)
         case 0:
             if (!p->tetherFrame) {
                 s32 song = 0xE7;
-                if (gUnk_02000488 && *(s16 *)(gUnk_02000710 + 0x5AA) == 9)
+                if (gUnk_02000488 && *(s16 *)(gGameState + 0x5AA) == 9)
                     song = 0x3F6;
                 Sound_PlaySong(song);
                 p->kindTwoAttachmentDescriptor = 0;
@@ -53,7 +53,7 @@ void Player_UpdateAttachmentCue(struct Player *p)
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x32), 0x40, 1);
             if (++p->tetherFrame > 15) {
                 Player_SetActionPhase(p, 3);
-                gUnk_030053F4 |= 0x400;
+                gEngineFlags |= 0x400;
             }
             break;
         case 4:

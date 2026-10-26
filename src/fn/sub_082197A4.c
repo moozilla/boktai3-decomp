@@ -1,8 +1,7 @@
-#define gAnimationWidgetStamp gUnk_03005238
+#define gAnimationWidgetStamp gDefaultAnimFlags
 #include "global.h"
 #include "scene_input.h"
-
-extern u16 gUnk_03005238;
+#include "render.h"
 
 s32 Anim_InitPositionedWidget(struct SceneInputWidget *widget, void *resource, u16 glyph, u32 flags,
                               u8 attributeA, u8 attributeB, u8 attributeC,
@@ -10,7 +9,7 @@ s32 Anim_InitPositionedWidget(struct SceneInputWidget *widget, void *resource, u
 {
     if (Anim_SelectWidgetGlyph(widget, resource, glyph) < 0)
         return -1;
-    widget->stamp = gUnk_03005238;
+    widget->stamp = gDefaultAnimFlags;
     widget->flags |= flags;
     widget->fieldC = 0;
     widget->scale = 0x40;

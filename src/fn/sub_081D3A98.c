@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 struct PaletteTransitionTarget {
     u8 pad0[0xe];
     u8 direction;
@@ -16,7 +17,6 @@ struct PaletteTransition {
     u8 pad_a02[6];
     struct PaletteTransitionTarget *target;
 };
-extern u32 gUnk_03005308;
 void Dir_Decompose(u8, u8 *, u8 *, u32);
 int DisplayAnimation_SetEntry(void *, int, int, int, int, int, int);
 int DisplayAnimation_UpdatePlayback(void *);
@@ -33,8 +33,8 @@ void PaletteTransition_UpdateBlink(struct PaletteTransition *p)
         DisplayAnimation_SetEntry(p->anim, *index, p->dirX, p->dirY, one, t, 5);
         DisplayAnimation_UpdatePlayback(p->anim);
         if (DisplayAnimation_TestFinished(p->anim)) {
-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-            p->timer = Mod(*(u16 *)(RANDOM_TABLE_ADDR + (gUnk_03005308 << 1)), 0x20) + 0x3c;
+            gRandomIndex = (gRandomIndex + 1) & 1023;
+            p->timer = Mod(*(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1)), 0x20) + 0x3c;
         }
     } else {
         p->timer = t - 1;

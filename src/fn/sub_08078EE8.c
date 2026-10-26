@@ -1,9 +1,9 @@
 #include "global.h"
+#include "render.h"
 
-extern u8 *gUnk_030042E4;
-extern u32 gUnk_030053F4;
+extern u32 gEngineFlags;
 extern u32 gUnk_030053F0;
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern u32 gUnk_020004B4;
 extern s32 gUnk_02000478;
 extern u16 gUnk_02000534;
@@ -11,10 +11,10 @@ extern u16 gUnk_02000500;
 extern u8 *gUnknown_02000580[];
 extern u16 gUnk_030039F0;
 extern u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
-extern u32 gUnk_030052F8;
-extern u32 gUnk_030052FC;
-extern u8 *gUnk_030052F4;
+extern u32 gRandomIndex;
+extern u32 gTerrainWidth;
+extern u32 gTerrainHeight;
+extern u8 *gTerrainMap;
 
 #define A_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
 #define B_AT(T, off) (*(T *)((u8 *)a + (off)))
@@ -45,7 +45,7 @@ static inline void P78EE8_SetPalette(u8 *a, u32 idx)
     if (B_AT(u8, 8) == 0)
         AnimData_SelectPaletteBank(B_AT(u8 *, 4) + 0x2C, idx);
     else
-        *(u8 **)(B_AT(u8 *, 4) + 0x68) = gUnk_030042E4 + (idx << 5);
+        *(u8 **)(B_AT(u8 *, 4) + 0x68) = gPaletteBankData + (idx << 5);
 }
 
 /* actor exists and is dead/disabled */
@@ -118,8 +118,8 @@ static inline void P78EE8_SetMode(u8 *a, u8 mode, u8 sub, u32 cb, u8 b2b5)
 /* terrain cell index from a packed position pair */
 static inline u32 P78EE8_CellIndex(s32 x, s32 y)
 {
-    if (x >= 0 && y >= 0 && (u32)x < gUnk_030052F8 && (u32)y < gUnk_030052FC)
-        return *(u16 *)(gUnk_030052F4 + 0x24 + 2 * y) + x;
+    if (x >= 0 && y >= 0 && (u32)x < gTerrainWidth && (u32)y < gTerrainHeight)
+        return *(u16 *)(gTerrainMap + 0x24 + 2 * y) + x;
     return 0;
 }
 
@@ -131,7 +131,7 @@ static inline s32 P78EE8_CellHeight(u32 idx, u8 *ref)
 
     cell = TerrainModifiers_FindCellOverride(idx, 1);
     if (cell == 0)
-        cp = (u8 *)(*(u32 *)(gUnk_030052F4 + 4) + (idx << 2) + 0xC);
+        cp = (u8 *)(*(u32 *)(gTerrainMap + 4) + (idx << 2) + 0xC);
     else
         cp = (u8 *)cell + 4;
     t = *cp >> 4;
@@ -204,7 +204,7 @@ s32 sub_08078EE8(struct SceneActorRegistryActor *arg0_)
 
     /* region marker at +0x5CC based on level */
     if (A_AT(u32, 0x2CC) & 0x40000) {
-        v = *(s16 *)(gUnk_02000710 + 0x876);
+        v = *(s16 *)(gGameState + 0x876);
         if (v <= 2) {
             if (A_AT(u32, 0x2CC) & 0x10000)
                 A_AT(u16, 0x5CC) = 0x21;
@@ -310,7 +310,7 @@ s32 sub_08078EE8(struct SceneActorRegistryActor *arg0_)
     }
 
     /* scene transition when a special mode is active */
-    if (gUnk_030053F4 & 0x4800) {
+    if (gEngineFlags & 0x4800) {
         if (gUnk_020004B4 == 0)
             goto pal_done;
         res = *(s16 *)(gUnk_020004B4 + 0x18);
@@ -319,7 +319,7 @@ s32 sub_08078EE8(struct SceneActorRegistryActor *arg0_)
     } else {
         res = 0;
     }
-    if (gUnk_030053F4 & 0x800) {
+    if (gEngineFlags & 0x800) {
         u8 *o = gUnknown_02000580[res];
         if (o != 0) {
             u32 q = 0;
@@ -373,7 +373,7 @@ pal_done:
             A_AT(s16, 0xAA) = A_AT(s16, 0xA8);
         if (A_AT(s16, 0x9C) <= 0) {
             P78EE8_SetMode(arg0, 3, 0, A_AT(u32, 0x220), 0x11);
-            if (!(gUnk_030053F4 & 0x4800) && !(A_AT(u32, 0x2D0) & 0x800))
+            if (!(gEngineFlags & 0x4800) && !(A_AT(u32, 0x2D0) & 0x800))
                 SceneActorRecord_RecordPair(gUnk_030039F0, (u16)A_AT(u32, 0x50));
         } else if (A_AT(u32, 0x2CC) & 0x200) {
             P78EE8_SetMode(arg0, 3, 0, A_AT(u32, 0x230), 0x12);
@@ -564,7 +564,7 @@ pal_done:
 
             sparkPos[0] = A_AT(s32, 0x5C);
             sparkPos[1] = A_AT(s32, 0x60);
-            sparkIdx = (gUnk_03005308 + 1) & 0x3FF;
+            sparkIdx = (gRandomIndex + 1) & 0x3FF;
             ((s16 *)sparkPos)[1] = ((s16 *)sparkPos)[1] + *(u8 *)&gUnk_0203B400[sparkIdx];
             sparkIdx = (sparkIdx + 1) & 0x3FF;
             rb = (u8)((s8)baseAngle + (gUnk_0203B400[sparkIdx] & 0x1F) - 0x10);
@@ -574,7 +574,7 @@ pal_done:
             sparkIdx = (sparkIdx + 1) & 0x3FF;
             t = (gUnk_0203B400[sparkIdx] & 7) + 4;
             sparkIdx = (sparkIdx + 1) & 0x3FF;
-            gUnk_03005308 = sparkIdx;
+            gRandomIndex = sparkIdx;
             SparkParticle_Spawn(sparkPos, 2, sparkSpec, rb, t, (gUnk_0203B400[sparkIdx] & 7) + 8, 2,
                                 1);
         }

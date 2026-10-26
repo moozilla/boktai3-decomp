@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 typedef struct {
     u16 id;
@@ -10,7 +11,6 @@ typedef struct {
 } Entry;
 
 extern u8 *gUnk_0200047C;
-extern u32 gUnk_030051C8;
 
 void SceneMessages_SetPendingTrigger(void *, void *);
 void Trigger_ConsumePending(void *, s32);
@@ -74,7 +74,7 @@ s32 SceneCommands_Dispatch(u8 *p)
                     Trigger_ConsumePending(entry, 1);
                     break;
                 case 9:
-                    gUnk_030051C8 = 0;
+                    gObjPaletteEffect = 0;
                     Trigger_ConsumePending(entry, 1);
                     break;
             }

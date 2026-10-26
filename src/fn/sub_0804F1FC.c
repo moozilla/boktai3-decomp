@@ -29,10 +29,10 @@ void ResourceStation_UpdateDigits(struct ResourceStation *station)
         struct ResourceStationPosition *destination;
         s32 *digit;
         register s32 i asm("r5");
-        if (gUnk_02000710->unk77C > 9999)
-            gUnk_02000710->unk77C = 9999;
-        local.digits[0] = Div(gUnk_02000710->unk77C, 1000);
-        remainder = gUnk_02000710->unk77C - local.digits[0] * 1000;
+        if (gGameState->unk77C > 9999)
+            gGameState->unk77C = 9999;
+        local.digits[0] = Div(gGameState->unk77C, 1000);
+        remainder = gGameState->unk77C - local.digits[0] * 1000;
         local.digits[1] = Div(remainder, 100);
         remainder -= local.digits[1] * 100;
         local.digits[2] = Div(remainder, 10);

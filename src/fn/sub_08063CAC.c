@@ -22,15 +22,15 @@ void RoamingObject_InitializePosition(struct RoamingObject *owner)
     point = (u16 *)&position;
     x = (s16)point[0] >> 8;
     z = (s16)point[2] >> 8;
-    if (x < 0 || z < 0 || x >= gUnk_030052F8 || z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || x >= gTerrainWidth || z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gUnk_030052F4->rows[z] + x;
+        cell = gTerrainMap->rows[z] + x;
     definition = TerrainModifiers_FindCellOverride(cell, 1);
     if (definition)
         definition += 4;
     else {
-        struct EngineMap *map = gUnk_030052F4;
+        struct EngineMap *map = gTerrainMap;
         u32 offset = cell * 4 + 12;
         definition = map->cells + offset;
     }

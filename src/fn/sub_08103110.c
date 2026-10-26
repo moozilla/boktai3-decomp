@@ -262,10 +262,10 @@ void NamedObject_CreateFromScript(void)
         gUnk_02000580[0x701] |= 1;
         x = e->body.x >> 8;
         z = e->body.z >> 8;
-        if (x < 0 || z < 0 || x >= gUnk_030052F8 || z >= gUnk_030052FC)
+        if (x < 0 || z < 0 || x >= gTerrainWidth || z >= gTerrainHeight)
             cell = 0;
         else
-            cell = gUnk_030052F4->rows[z] + x;
+            cell = gTerrainMap->rows[z] + x;
         TerrainModifiers_RegisterCell(e->body.field48, cell, 0, e->body.height >> 8, 0xFF, 4);
         e->flags |= 1;
         Player_SetPositionAndSave(gUnk_02000580, &e->body.x);

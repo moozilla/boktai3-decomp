@@ -1,11 +1,10 @@
-#define gSceneSelectionDisplaySlots gUnk_03005274
 #include "global.h"
 #include "area_effect_link.h"
-extern u16 gUnk_03005274[];
+#include "ram.h"
 void LinkSelection_RecordSlotState(struct AreaEffectLinkState *p, u16 value, s32 slot, u32 *status,
                                    s32 skip)
 {
-    gUnk_03005274[slot] = value & 0x3f3;
+    gSceneSelectionDisplaySlots[slot] = value & 0x3f3;
     if (!skip) {
         if (p->sendBit <= 5) {
             u32 bit = (value >> 2) & 1;

@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 struct MotionPosition {
     u32 x : 16;
     s32 y : 16;
@@ -125,11 +126,10 @@ struct SpatialIndex {
     u8 unknown0[0x18];
     struct SpatialBucket buckets[10];
 };
-extern struct SpatialIndex *gUnk_02000200;
 void SpatialIndex_ScanBuckets(u32 flags)
 {
-    if (gUnk_02000200) {
-        struct SpatialIndex *index = gUnk_02000200;
+    if (gSpatialIndex) {
+        struct SpatialIndex *index = gSpatialIndex;
         s32 i = 0;
         u32 active = flags & 8;
         u32 passive = flags & 16;

@@ -1,9 +1,9 @@
 #define ScriptedColliderActors_EnsureManager FragmentSpritePool_GetOrCreate
 #define ScriptedColliderActor_InitCollider   LargeFragmentEffect_InitCollider
-#define gScriptedColliderManager             gUnk_02000190
 #include "global.h"
 #include "engine.h"
 #include "scene_vec.h"
+#include "ram.h"
 struct ScriptedColliderActor {
     u32 flags;
     u8 unknown4[3], priority;
@@ -24,14 +24,13 @@ struct ScriptedColliderManager {
     u8 task[0x18];
     u8 resource[0x1c];
 };
-extern struct ScriptedColliderManager *gUnk_02000190;
 struct ScriptedColliderManager *FragmentSpritePool_GetOrCreate(void);
 struct ScriptedColliderActor *SceneSlot_Allocate(struct ScriptedColliderManager *);
 void LargeFragmentEffect_InitCollider(void *, u32, u32, u32, u32, u32, u32, u32);
 void ScriptedColliderActor_Create(struct SceneVec *position, u32 variant, u32 a, u32 b, u32 c,
                                   u32 d)
 {
-    struct ScriptedColliderManager *manager = gUnk_02000190;
+    struct ScriptedColliderManager *manager = gScriptedColliderManager;
     struct ScriptedColliderActor *actor;
     if (!manager) {
         manager = FragmentSpritePool_GetOrCreate();

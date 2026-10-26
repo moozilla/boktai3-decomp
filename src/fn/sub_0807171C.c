@@ -23,10 +23,10 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
     actor->currentRoute = route;
     x = position->x >> 8;
     z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         computedCell = 0;
     else {
-        u32 row = gUnk_030052F4->rows[z];
+        u32 row = gTerrainMap->rows[z];
         computedCell = row + x;
     }
     {
@@ -41,7 +41,7 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + 12 + cell * 4;
+        data = gTerrainMap->cells + 12 + cell * 4;
     slope = *data >> 4;
     height = (*data & 15) << 8;
     switch (slope) {
@@ -113,7 +113,7 @@ void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
                 ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->animation, bank);
         else
             ((struct SceneActorRegistryTileDrawable *)actor->drawable)->palette =
-                gUnk_030042E4 + (bank << 5);
+                gPaletteBankData + (bank << 5);
     }
     {
         u32 mask = 0xFDFF7FFF;

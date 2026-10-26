@@ -1,6 +1,5 @@
 #include "global.h"
 #include "game_state.h"
-#define gGameState gUnk_02000710
 static inline s32 ClampRecord(s32 value)
 {
     s32 result = value;
@@ -17,7 +16,7 @@ s32 GameRecords_UpdateMinimum(u32 index, s32 value)
         return -1;
     value = ClampRecord(value);
     {
-        struct GameState *state = gUnk_02000710;
+        struct GameState *state = gGameState;
         record = (s32 *)(index * 4 + (u32)state + 0x7C8);
     }
     if (*record == -1 || *record > value)

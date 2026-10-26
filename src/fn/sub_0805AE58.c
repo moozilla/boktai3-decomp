@@ -9,7 +9,7 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
     s32 compare;
     u32 indexMask;
     register u32 one asm("r0");
-    u32 *randomIndex = &gUnk_03005308;
+    u32 *randomIndex = &gRandomIndex;
     {
         struct ScenePanelRig *input = rig;
         owner = input;

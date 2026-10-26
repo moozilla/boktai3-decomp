@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 #ifdef NONMATCHING
 // fuzzy: 81.1%
@@ -22,8 +23,7 @@ void Player_AddControlFlags(void *, u32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
 void Anim_SetSequence(void *, void *, s32, s32, s32);
 void PlayerCue_EnterStandUpdate(void *);
-extern u8 *gUnk_02000710;
-extern u8 *gUnk_030042E4;
+extern u8 *gGameState;
 static inline u32 FrameValue(const u16 *p)
 {
     return *p;
@@ -57,7 +57,7 @@ void Player_UpdateStateMotionCue(u8 *p)
         Sound_PlaySong(490);
         if (*((u16 *)(p + 0x530)))
             *((u16 *)(p + 0xC6)) = 45;
-        else if ((*((s32 *)((gUnk_02000710 + ((*((u8 *)(p + 0x472))) * 4)) + 0x628))) > 0)
+        else if ((*((s32 *)((gGameState + ((*((u8 *)(p + 0x472))) * 4)) + 0x628))) > 0)
             *((u16 *)(p + 0xC6)) = 46;
         else if (Event(p, 0x10000000))
             *((u16 *)(p + 0xC6)) = (t1 = 0x179);
@@ -75,7 +75,7 @@ void Player_UpdateStateMotionCue(u8 *p)
     Player_AddControlFlags(p, 64);
     Player_SetAnimation(p, 154, 64, 1);
     *((u64 *)(p + 0xAC)) = *((u64 *)(p + 0x30));
-    *((u32 *)(p + 0xD4)) = (u32)(gUnk_030042E4 + ((*((u16 *)(p + 0xC6))) * 32));
+    *((u32 *)(p + 0xD4)) = (u32)(gPaletteBankData + ((*((u16 *)(p + 0xC6))) * 32));
     if ((*((u16 *)(p + 0x45A))) <= 9) {
         struct Sequence *s = (void *)(p + 0x3FC);
         struct {

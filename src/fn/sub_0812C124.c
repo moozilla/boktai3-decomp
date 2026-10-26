@@ -1,8 +1,8 @@
 #include "global.h"
 #include "engine.h"
 #include "pursuing_actor.h"
+#include "ram.h"
 
-extern struct PursuingActorManager *gUnk_02000184;
 struct PackedPosition {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -22,7 +22,7 @@ static inline s32 OptionalValue(void)
 /* Request retirement for all chasing slashes. */
 void PursuingActor_RetireAll(void)
 {
-    struct PursuingActorManager *manager = gUnk_02000184;
+    struct PursuingActorManager *manager = gPursuingActorManager;
     u8 *active;
     s32 i, state, stride;
     if (manager) {
@@ -42,7 +42,7 @@ void PursuingActor_RetireAll(void)
 #define PursuingActor_RecoilAll sub_0812C158
 void PursuingActor_RecoilAll(void)
 {
-    struct PursuingActorManager *manager = gUnk_02000184;
+    struct PursuingActorManager *manager = gPursuingActorManager;
     u8 *active;
     s32 i, state, stride;
     u32 enteredOffset;

@@ -59,15 +59,15 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u3
 
 static inline void CellCenter(struct SceneVec *out, u32 cell)
 {
-    s32 x = Mod(cell, *(s16 *)(gUnk_030052F4->cells + 4));
-    s32 z = Div(cell, *(s16 *)(gUnk_030052F4->cells + 4));
+    s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
+    s32 z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
     u8 *data;
     out->x = (x << 8) + 0x80;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else
-        data = gUnk_030052F4->cells + (cell * 4 + 12);
+        data = gTerrainMap->cells + (cell * 4 + 12);
     out->y = (*data & 15) << 8;
     out->z = (z << 8) + 0x80;
 }

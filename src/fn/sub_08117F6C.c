@@ -1,4 +1,5 @@
 #include "global.h"
+#include "game_state.h"
 // MATCHING_CONCESSION: register-pinning
 
 struct Obj {
@@ -98,8 +99,8 @@ void PalFade_Start(void *, s32, u16, s32, s32, s32, s32, s32);
 s32 CharacterModel_GetPrimaryPaletteIndex(void *);
 s32 sub_08249240(void *, s32, u32);
 void ChargeMarker_TickHold(void *, void *, u32);
-extern u32 gUnk_030053F4, gUnk_030053F0;
-extern u8 *gUnk_02000710, *gUnk_020004B4;
+extern u32 gEngineFlags, gUnk_030053F0;
+extern u8 *gUnk_020004B4;
 void Glove_UpdateStopping(struct Glove *);
 
 void GameState_AddActionCount894(s32);
@@ -115,7 +116,7 @@ void Character_SetLowResourceColorEffect(void *, void *);
 #define Glove_UpdateRecoveryFlash sub_08117F6C
 static inline u32 LinkMode(u32 mask)
 {
-    return (gUnk_030053F4 | gUnk_030053F0) & mask;
+    return (gEngineFlags | gUnk_030053F0) & mask;
 }
 void Glove_UpdateRecoveryFlash(struct Glove *p)
 {

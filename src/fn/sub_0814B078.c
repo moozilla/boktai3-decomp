@@ -1,5 +1,7 @@
 #include "global.h"
 #include "player.h"
+#include "engine.h"
+#include "ram.h"
 
 // confidence=low: chooses the closest visible list entry and derives its travel duration.
 // MATCHING_CONCESSION: register-pinning
@@ -20,9 +22,7 @@ struct MotionTargets {
     u8 unknown[0x18];
     struct MotionTarget *first;
 };
-extern struct MotionTargets *gUnk_02000598;
 extern u16 gUnk_03005418[];
-extern u32 gUnk_030053F4;
 u16 Sqrt(u32);
 s32 Div(s32, s32);
 static inline s32 Project(s32 input)
@@ -61,9 +61,9 @@ struct MotionTarget *Player_SelectNearestMotionTarget(struct Player *arg, u32 li
     u32 distance = limit;
     struct MotionTarget *best;
     struct MotionTarget *entry;
-    if (!gUnk_02000598)
+    if (!gSceneLinkList)
         return 0;
-    entry = gUnk_02000598->first;
+    entry = gSceneLinkList->first;
     best = 0;
     if (entry)
         do {
@@ -88,7 +88,7 @@ struct MotionTarget *Player_SelectNearestMotionTarget(struct Player *arg, u32 li
                 square = (x * x) + (z * z);
                 asm("" : "+r"(square));
                 if (square < distance) {
-                    if (!(gUnk_030053F4 & 0x1000)) {
+                    if (!(gEngineFlags & 0x1000)) {
                         struct TargetPosition screen;
                         {
                             u32 relative = flags & 16;

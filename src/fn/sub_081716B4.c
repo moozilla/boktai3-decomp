@@ -64,8 +64,7 @@ void SceneHud_UpdateStatComparison(struct SceneHudState *p)
             GameState_UnequipConsumableSlot(slot);
             Sound_PlaySong(0xDD);
             Player_RefreshEquipmentWithOptions(
-                p->actionOwner, &gUnk_08E60F80[p->comparisonProfiles[gUnk_02000710->party[0]]],
-                none);
+                p->actionOwner, &gUnk_08E60F80[p->comparisonProfiles[gGameState->party[0]]], none);
             PlayerPanel_SnapshotValues(p);
             sub_08166534(p, 10, 6);
             sub_08170D78(p);

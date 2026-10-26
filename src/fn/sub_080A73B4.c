@@ -1,6 +1,7 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
+#include "engine.h"
 void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
@@ -64,7 +65,6 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
     *restart = 0;
 }
 
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void TentacleBody_GetDirectionFrame(u8, u32 *, u32 *);
@@ -75,9 +75,9 @@ void TentacleActor_SpawnSparkBurst(void *);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
 static inline u32 Random4(void)
 {
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
     {
-        u32 value = *(const u16 *)((gUnk_03005308 << 1) + (u32)gUnk_0203B400);
+        u32 value = *(const u16 *)((gRandomIndex << 1) + (u32)gUnk_0203B400);
         u32 mask = 3;
         return (mask & value) + 1;
     }

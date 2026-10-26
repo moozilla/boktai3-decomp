@@ -7,7 +7,7 @@ void Player_NotifyFirstSelectedSlot(u32, u32);
 void Player_RefreshLifeState(u32, u32);
 void sub_08159164(u32);
 extern u16 gUnk_030039F0;
-#define STATS   ((u8 *)gUnk_02000710)
+#define STATS   ((u8 *)gGameState)
 #define H(p, n) (*(s16 *)((p) + (n)))
 struct GroupLink {
     u32 unknown0;
@@ -122,7 +122,7 @@ u32 SceneActorReaction_RecordDefeat(struct SceneActorRegistryResetView *actor)
             actor->counter2AC = 0;
             actor->field2B1 = 1;
         }
-        if (Test(gUnk_030053F4, 0x4800)) {
+        if (Test(gEngineFlags, 0x4800)) {
             Player_NotifyFirstSelectedSlot(actor->field2E0, actor->field2D8);
             goto done;
         }
@@ -224,7 +224,7 @@ u32 SceneActorReaction_RecordDefeat(struct SceneActorRegistryResetView *actor)
             Player_RefreshLifeState(actor->field2D8, *((u8 *)actor + 0xA1));
         }
     record:
-        if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gUnk_030053F4, 0x4800) &&
+        if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gEngineFlags, 0x4800) &&
             !Flag2D0(actor, 0x800))
             SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
         ((struct ContactCollider *)collider)->flags |= 4;

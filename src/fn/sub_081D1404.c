@@ -5,13 +5,13 @@ struct Pair {
     u32 a, b;
 };
 extern const u16 gUnk_0203B400[];
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 s32 Mod(s32, s32);
 void Task_Kill(void *);
 void SceneNpc_SpawnTransitionParticle(void *, s32);
 void SceneNpc_UpdateTransitionParticles(void *);
 
-#define RAND() (gUnk_0203B400[gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF])
+#define RAND() (gUnk_0203B400[gRandomIndex = (gRandomIndex + 1) & 0x3FF])
 
 s32 SceneNpc_UpdateTransitionEffect(u8 *p)
 {
@@ -36,7 +36,7 @@ s32 SceneNpc_UpdateTransitionEffect(u8 *p)
             if (t != 0)
                 p[0x1f] = 2;
             tab = gUnk_0203B400;
-            cur = &gUnk_03005308;
+            cur = &gRandomIndex;
             *cur = (*cur + 1) & 0x3FF;
             {
                 s32 m = Mod(tab[*cur], 0x28);

@@ -27,7 +27,7 @@ s32 BouncingObject_UpdatePool(struct BouncingPool *input)
         *stopping = 1;
     } else {
         u32 mask = 0x400;
-        if (!((gUnk_030053F4 | gUnk_030053F0) & mask)) {
+        if (!((gEngineFlags | gUnk_030053F0) & mask)) {
             u32 blockedMask = 4;
             u32 blocked;
             blocked = gUnk_02000560 & blockedMask;

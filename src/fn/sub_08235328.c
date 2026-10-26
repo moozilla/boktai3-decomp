@@ -26,8 +26,8 @@ s32 Div(s32, s32);
 static inline u32 BurstRandom(void)
 {
     const u16 *table = gUnk_0203B400;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    return table[gUnk_03005308];
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return table[gRandomIndex];
 }
 
 static inline s32 ScaleTowardZero(s32 value, s32 shift)

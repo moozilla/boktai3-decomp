@@ -20,15 +20,15 @@ void TerrainEdgeMarker_Add(union TerrainMarkerPosition *position, s32 direction,
             s32 x = position->world.x >> 8;
             s32 z = position->world.z >> 8;
             u8 *cell;
-            if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+            if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
                 x = 0;
             else {
                 s32 addend = x;
-                u32 row = gUnk_030052F4->rows[z];
+                u32 row = gTerrainMap->rows[z];
                 x = row + addend;
             }
             {
-                u8 *cells = gUnk_030052F4->cells;
+                u8 *cells = gTerrainMap->cells;
                 if (!cells)
                     cell = 0;
                 else {

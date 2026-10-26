@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 // Provisional name: SoundTest_Destroy
 struct Sprite {
     u8 head[8];
@@ -37,7 +38,6 @@ u32 Sound_IsSongPlaying(s32);
 void Sound_StopSong(s32);
 void Sound_PlaySong(s32);
 void Anim_SetKeyframes(void *, void *, u16, s32, s32);
-extern u16 gUnk_03004BD8;
 void Anim_Remove(void *);
 // Release every sprite used by the sound-test menu.
 void SoundTest_Destroy(struct Viewer *p)
@@ -46,7 +46,7 @@ void SoundTest_Destroy(struct Viewer *p)
     struct Sprite *a, *b, *c;
     {
         s32 mask = 3;
-        gUnk_03004BD8 = ~mask & gUnk_03004BD8;
+        gDispCntShadow = ~mask & gDispCntShadow;
     }
     p->cursor.flags |= 1;
     p->panel.flags |= 1;

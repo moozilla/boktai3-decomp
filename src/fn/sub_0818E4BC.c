@@ -18,7 +18,7 @@ struct ArmorScene {
     u8 pad0[0x32];
     s16 height;
 };
-extern struct ArmorScene *gUnk_02000710;
+extern struct ArmorScene *gGameState;
 void Collider_SetPosition(void *, void *, u32);
 s32 Collider_Refresh(void *);
 
@@ -26,7 +26,7 @@ void Armor_UpdatePartColliders(struct ArmorPart *p)
 {
     struct ArmorVector position;
     struct ArmorVector delta;
-    delta.y = gUnk_02000710->height - (s16)(p->y - 220);
+    delta.y = gGameState->height - (s16)(p->y - 220);
     delta.x = delta.z = (delta.y * 724) >> 10;
     position.x = p->x + delta.x;
     position.y = p->y + delta.y;

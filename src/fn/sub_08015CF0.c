@@ -5,7 +5,7 @@ struct Config {
 struct Vec {
     s16 x, y, z, pad;
 };
-extern u32 gUnk_03005308;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern s16 gUnk_086149C4[];
 void AnimatedParticles_Create(int, void *, struct Config *);
@@ -29,9 +29,9 @@ void AnimatedParticles_EmitOffset(struct Vec *pos, int unused, int type, int fla
     s.v[5] = 0;
     s.v[6] = horizontal;
     s.v[7] = 0;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
     {
-        u32 offset = gUnk_03005308 * 2;
+        u32 offset = gRandomIndex * 2;
         u8 *sample = (u8 *)(offset + RANDOM_TABLE_ADDR);
         s.v[10] = *sample;
     }

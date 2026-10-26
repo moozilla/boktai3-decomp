@@ -37,7 +37,7 @@ struct Sun {
     u8 pad[0x12];
     s16 level;
 };
-extern struct Sun *gUnk_02000710;
+extern struct Sun *gGameState;
 extern u16 gUnk_03005260[];
 void sub_080316A4(void);
 void MessageWindow_UpdateFastPlayback(void);
@@ -54,7 +54,7 @@ static inline void setCallback(void *fn, struct Actor *p)
 }
 static inline s32 GetLevel(void)
 {
-    return gUnk_02000710->level;
+    return gGameState->level;
 }
 
 void sub_080313E4(struct Actor *p)

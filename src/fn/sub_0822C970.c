@@ -10,7 +10,7 @@ struct Context {
     u8 pad[0x874];
     s16 a, b;
 };
-extern u8 *gUnk_02000710;
+extern u8 *gGameState;
 extern u16 gUnk_030054C0, gUnk_030054C4;
 void Solar_StartMeasurement(void), sub_0822C598(struct Obj *);
 u16 sub_0822C8D8(u8 *);
@@ -34,12 +34,12 @@ void sub_0822C970(struct Obj *obj)
         case 2:
             obj->a = sub_0822C8D8((u8 *)obj);
             obj->b = Solar_GetLevelForIntensity(obj->a);
-            (*(s16 *)(gUnk_02000710 + 0x874)) = Solar_ApplyIntensityModifiers(obj->a);
-            (*(s16 *)(gUnk_02000710 + 0x876)) =
-                Solar_GetLevelForIntensity((*(s16 *)(gUnk_02000710 + 0x874)));
+            (*(s16 *)(gGameState + 0x874)) = Solar_ApplyIntensityModifiers(obj->a);
+            (*(s16 *)(gGameState + 0x876)) =
+                Solar_GetLevelForIntensity((*(s16 *)(gGameState + 0x874)));
             sub_0822C598(obj);
-            gUnk_030054C0 = (*(s16 *)(gUnk_02000710 + 0x874));
-            gUnk_030054C4 = (*(s16 *)(gUnk_02000710 + 0x876));
+            gUnk_030054C0 = (*(s16 *)(gGameState + 0x874));
+            gUnk_030054C4 = (*(s16 *)(gGameState + 0x876));
             break;
     }
 }

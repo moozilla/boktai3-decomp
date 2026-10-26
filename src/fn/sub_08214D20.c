@@ -1,4 +1,6 @@
 #include "global.h"
+#include "render.h"
+#include "ram.h"
 
 // Sprite list cull/draw, unscaled variant of Sprite_RenderScaledList.
 // The nested do/while(0) around the list-head load (likely a macro in the
@@ -22,7 +24,6 @@ struct Sprite {
     u32 previous;
     struct Sprite *next;
 };
-extern u32 gUnk_03003A50, gUnk_03004290;
 extern struct Sprite *gUnk_030042C0[];
 extern struct Vec gUnk_030042A0;
 void sub_08214600(struct Sprite *, s32, s32, s32);
@@ -36,14 +37,14 @@ void sub_08214D20(void)
     s32 z;
     u32 width, height;
     s32 left, top;
-    u32 parity = gUnk_03003A50 & 1;
+    u32 parity = gSceneEffectPalettePhase & 1;
     u32 skip = 0x401;
     if (parity) {
         skip = 0x201;
     }
     do {
         do {
-            p = gUnk_030042C0[gUnk_03004290];
+            p = gUnk_030042C0[gRenderListIndex];
             if (!p) {
                 return;
             }

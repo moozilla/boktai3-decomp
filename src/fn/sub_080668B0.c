@@ -4,7 +4,7 @@ static inline u8 AlternateMode(void)
 {
     u32 bit = 0x80;
     {
-        struct GameState *base = gUnk_02000710;
+        struct GameState *base = gGameState;
         register u32 offset asm("r3");
         u32 *flags;
         offset = 0x868;

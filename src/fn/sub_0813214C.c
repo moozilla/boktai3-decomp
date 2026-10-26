@@ -2,6 +2,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "area_effect_link.h"
+#include "render.h"
 /* Clears hit timers; at zero health hands control to the defeat target and records the defeat. */
 void SceneActorRecord_RecordPair(u16, u16);
 extern u16 gUnk_030039F0;
@@ -50,7 +51,6 @@ void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void SceneActorMovement_ProjectProbe(void *, u32, u32);
 void SceneActorReaction_PlayStaggerBurst(void);
-extern u8 *gUnk_030042E4;
 static inline s32 LocalPlayer(void)
 {
     if (!gUnk_020004B4)
@@ -59,7 +59,7 @@ static inline s32 LocalPlayer(void)
 }
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
-    if (Test(gUnk_030053F4, 0x4800)) {
+    if (Test(gEngineFlags, 0x4800)) {
         u32 *owner = &actor->field2E0;
         register u32 mask asm("r2") = *owner;
         if (!(mask & 0x20) && mask) {
@@ -114,7 +114,7 @@ void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *a
         if (actor->drawableKind == 0)
             AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
         else
-            *(u8 **)((u8 *)actor->drawable + 0x68) = gUnk_030042E4 + bank * 32;
+            *(u8 **)((u8 *)actor->drawable + 0x68) = gPaletteBankData + bank * 32;
         {
             u32 eight = 8;
             actor->field1E8 = eight;
@@ -165,7 +165,7 @@ void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *a
             actor->field2B1 = 1;
         }
         actor->field2E0 = 32;
-        if (!Test(gUnk_030053F4, 0x4800) && !Flag2D0(actor, 0x800))
+        if (!Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
             SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
     } else {
         {

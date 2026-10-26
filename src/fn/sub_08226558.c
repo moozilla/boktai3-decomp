@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 struct Camera {
     u8 pad[0x84];
@@ -9,26 +10,25 @@ struct Camera {
     u16 h8A;
 };
 
-extern struct Camera *gUnk_03005420;
-extern u32 gUnk_030053F4;
+extern struct Camera *gActiveCamera;
 
 void Camera_SetSway(s32 a, s32 b, s32 mode)
 {
-    if (gUnk_03005420 && !(gUnk_030053F4 & 0x800)) {
+    if (gActiveCamera && !(gEngineFlags & 0x800)) {
         if (b == 0 && mode == 1) {
-            gUnk_03005420->b84 = b;
-            gUnk_03005420->b85 = b;
-            gUnk_03005420->h86 = b;
-            gUnk_03005420->h88 = b;
+            gActiveCamera->b84 = b;
+            gActiveCamera->b85 = b;
+            gActiveCamera->h86 = b;
+            gActiveCamera->h88 = b;
         } else {
             struct Camera *c;
-            gUnk_03005420->b84 = 1;
-            c = gUnk_03005420;
+            gActiveCamera->b84 = 1;
+            c = gActiveCamera;
             c->h88 = a;
             c->h8A = b;
             if ((u16)b == 0)
                 c->h86 = c->h88;
-            gUnk_03005420->b85 = mode;
+            gActiveCamera->b85 = mode;
         }
     }
 }

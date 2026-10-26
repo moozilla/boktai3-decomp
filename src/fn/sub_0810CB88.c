@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern void *gUnk_020001C4;
 void RegistryF246_HideAnimations(void);
 void ScrollingDialogue_ClearScript(void);
 void ScrollingDialogue_HideImmediately(void);
@@ -9,7 +9,7 @@ void Task_Kill(void *);
 
 void RegistryF246_Close(void)
 {
-    if (gUnk_020001C4 != 0) {
+    if (gLinkPanel != 0) {
         RegistryF246_HideAnimations();
         ScrollingDialogue_ClearScript();
         ScrollingDialogue_HideImmediately();
@@ -17,6 +17,6 @@ void RegistryF246_Close(void)
         Bg_ClearTilemap(1);
         Bg_ClearTilemap(2);
         Bg_ClearTilemap(3);
-        Task_Kill(gUnk_020001C4);
+        Task_Kill(gLinkPanel);
     }
 }

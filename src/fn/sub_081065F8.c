@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+#include "ram.h"
 struct RegionSprite {
     struct ContactSwarmSprite sprite;
     u8 unknown2C[0x90 - 0x2C];
@@ -22,7 +23,6 @@ struct RegionSpriteManager {
     u8 unknown0[0x18];
     const void *sequenceResource, *alternateResource;
 };
-extern struct RegionSpriteManager *gUnk_020001B4;
 void ProximityActor_UpdateDamageAnimation(struct RegionSprite *);
 void sub_0810638C(struct RegionSprite *);
 static inline u8 Test(u32 *flags, u32 bit)
@@ -276,7 +276,7 @@ void AnimatedParticles_EmitChargeSparkle(s32, s32, s32, s32, void *);
 void RegionActor_AnimateRemoval(struct RegionSprite *input)
 {
     register struct RegionSprite *p asm("r5") = input;
-    struct RegionSpriteManager *manager = gUnk_020001B4;
+    struct RegionSpriteManager *manager = gRegionActorPool;
     struct DisplaySequenceState *sequence;
     if (manager) {
         u32 entered = p->entered;

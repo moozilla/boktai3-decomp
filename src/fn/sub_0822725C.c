@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine.h"
 
 struct Camera0822725C {
     u8 pad0[0x7e];
@@ -11,7 +12,6 @@ struct Camera0822725C {
     u16 target;
     u16 steps;
 };
-extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 extern s16 gUnk_030042A0[];
 s32 Div(s32, s32);
@@ -39,9 +39,9 @@ u32 Camera_UpdateShake(struct Camera0822725C *c)
             c->amp = c->cur;
     }
     if (c->amp) {
-        c->offX = DivArmMod(c->amp, gUnk_0203B400[gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF]) -
+        c->offX = DivArmMod(c->amp, gUnk_0203B400[gRandomIndex = (gRandomIndex + 1) & 0x3FF]) -
                   (c->amp >> 1);
-        c->offY = DivArmMod(c->amp, gUnk_0203B400[gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF]) -
+        c->offY = DivArmMod(c->amp, gUnk_0203B400[gRandomIndex = (gRandomIndex + 1) & 0x3FF]) -
                   (c->amp >> 1);
         gUnk_030042A0[0] += c->offX;
         gUnk_030042A0[2] += c->offY;
