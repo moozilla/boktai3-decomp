@@ -176,8 +176,10 @@ def cached(name, key_paths, make):
     except (OSError, ValueError, EOFError, pickle.UnpicklingError):
         value = make()
         os.makedirs(CACHE, exist_ok=True)
-        with open(path, "wb") as f:
+        tmp = f"{path}.{os.getpid()}"
+        with open(tmp, "wb") as f:
             pickle.dump((key, value), f)
+        os.replace(tmp, path)  # atomic: another command may be reading it
     _MEMO[name] = (key, value)
     return value
 
@@ -195,9 +197,23 @@ def inventory():
     return by_label, addr, sizes
 
 
+_LOCKS = {}
+
+
 def workdir(func):
+    """build/scope/[RUN/]FUNC, locked for the rest of this command: two commands on one function
+    under one SCOPE_RUN would overwrite each other's dumps, so the second waits for the first."""
+    import fcntl
     d = os.path.join(WORK, func)
     os.makedirs(d, exist_ok=True)
+    if d not in _LOCKS:
+        fd = os.open(os.path.join(d, ".lock"), os.O_RDWR | os.O_CREAT, 0o644)
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            print(f"(waiting: another scope command is using {os.path.relpath(d, ROOT)})", file=sys.stderr, flush=True)
+            fcntl.flock(fd, fcntl.LOCK_EX)
+        _LOCKS[d] = fd
     return d
 
 
@@ -294,20 +310,32 @@ def compile_draft(src, func, env=None):
     The dumps, uids and DWARF lines come from a -g compile. Without knobs the bytes are the real
     build's (no -g): where -g changes the code, those win and info["g_differs"] is set."""
     mine, a, info = compile_draft_g(src, func, env)
-    if has_knobs(resolve_knobs(src, func, env)):
+    env = resolve_knobs(src, func, env)
+    if needs_g(env):  # a knob naming insn uids: the -g compile is the only one it means anything in
+        if g_sensitive(src, func):
+            info["g_only"] = True
+            print(f"note: -g changes agbcc's code for {func}, and {', '.join(k for k in UID_KNOBS if env.get(k))}"
+                  " names insn uids, which only the -g compile has: these bytes are the -g compile's with the"
+                  " knob, not the build's. A MATCH here does not say the build would match.", file=sys.stderr)
         return mine, a, info
     plain = fast_compile(src, func, env, plain=True)
     if plain is not None and plain[0] != mine:
         if func not in _G_WARNED:
             _G_WARNED.add(func)
+            _, _, sizes = inventory()
+            g_match = mine == rom_bytes()[off(a):off(a) + sizes[rom_name(src, func)]]
             print(f"note: -g changes agbcc's code for {func}; the bytes here are the real build's (no -g),"
-                  " so C lines and insn uids in this listing are approximate", file=sys.stderr)
+                  " so C lines and insn uids in this listing are approximate"
+                  + ("; the -g compile MATCHES the ROM, so knobs that name insn uids (only -g has them) say"
+                     " nothing here: find what -g changes (loop.c reads line notes: a loop reversed or not)"
+                     if g_match else ""), file=sys.stderr)
         info.update(data=plain[2], lines={}, g_differs=True)
         mine = plain[0]
     return mine, a, info
 
 
 _G_WARNED = set()
+_UNINIT_WARNED = set()
 
 
 def arm_unit_exit(src, func):
@@ -333,10 +361,22 @@ def compile_draft_g(src, func, env=None):
     names = os.path.join(wd, "names.txt")  # AGBCC_DUMPPRI appends: pseudo numbers with C variable names
     if os.path.exists(names):
         os.remove(names)
-    r = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "-dp", "-da", "u.i", "-o", "u.s"],
+    # -Wuninitialized changes no code (150 units compared); a draft reading a variable it never set
+    # compiles to plausible bytes, so say so
+    r = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "-dp", "-da", "-Wuninitialized", "u.i", "-o", "u.s"],
                        cwd=wd, capture_output=True, text=True,
                        env=dict(os.environ, AGBCC_DUMPPRI=names, **(env or {})))
     open(os.path.join(wd, "stderr.txt"), "w").write(r.stderr)
+    uninit = []
+    for blk in re.split(r"(?m)^(?=.*In function `)", r.stderr):
+        m = re.search(r"In function `(\w+)'", blk)
+        if m and m.group(1) in (func, rom_name(src, func)):
+            uninit += re.findall(r":(\d+): warning: `(\w+)' might be used uninitialized", blk)
+    if uninit and func not in _UNINIT_WARNED:
+        _UNINIT_WARNED.add(func)
+        print("note: agbcc: " + ", ".join(f"`{v}' (line {ln})" for ln, v in uninit) + f" might be used"
+              f" uninitialized in {func}: the bytes read whatever the register held; give it its value",
+              file=sys.stderr)
     if r.returncode or "error" in r.stderr:
         errs = [ln.replace(ROOT + os.sep, "") for ln in r.stderr.splitlines() if ln.strip()]
         # the errors first: other functions' warnings would push them past the shown lines
@@ -757,7 +797,8 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
     print(f"{func}  {src}  ROM {len(rom_code)} B / draft {len(mine)} B  compile {t_compile:.1f}s"
           + (f"  [{knobs}]" if knobs else ""))
     if same:
-        print("MATCH")
+        print("MATCH" + ("  [the -g compile, which a uid knob needs; not the build's: see the note]"
+                         if info.get("g_only") else ""))
         return 0
     only_targets = nb and not nr and not nm and len(rom_code) == len(mine)
     print(f"{len(hunks)} hunk(s): {nr} ROM / {nm} draft insns differ"
@@ -1868,15 +1909,18 @@ def fast_preprocess(src, env=None, func=None):
     if h is None:
         work = os.path.join(WORK, "cache")
         os.makedirs(work, exist_ok=True)
-        tmp = os.path.join(work, "head.c")
+        rel = os.path.relpath(os.path.join(work, "head.c"), ROOT)
+        tmp = os.path.join(work, f"head{os.getpid()}.c")  # the process's own: commands of one run share work/
         open(tmp, "w").write(head)
-        rel = os.path.relpath(tmp, ROOT)
+        trel = os.path.relpath(tmp, ROOT)
         # how many newlines cpp leaves after its last marker depends on the last include (a guarded
         # header emits none); a marker of our own says where the body starts
-        out = re.sub(r"\n+\Z", "\n", build.sh(cpp_command(rel))) + f'# {last + 2} "{rel}"\n'
-        cmd = cpp_command(rel)
+        out = re.sub(r"\n+\Z", "\n", build.sh(cpp_command(trel))).replace(f'"{trel}"', f'"{rel}"')
+        out += f'# {last + 2} "{rel}"\n'
+        cmd = cpp_command(trel)
         e = cmd.index("-E") + 1
         defs = build.sh(cmd[:e] + ["-dM"] + cmd[e:])
+        os.remove(tmp)
         macros = set(re.findall(r"^#define (\w+)", defs, re.M)) | _DYNAMIC
         files = sorted({f for f in re.findall(r'^# \d+ "([^"<][^"]*)"', out, re.M) if os.path.exists(os.path.join(ROOT, f))})
         h = _HEADS[head] = (out, macros, [(f, os.path.getmtime(os.path.join(ROOT, f))) for f in files])
@@ -1907,6 +1951,27 @@ def has_knobs(env):
     return any(k.startswith(("AGBCC_", "CSE_")) for k in (env or {}))
 
 
+# Knobs that name insn uids. -g puts line notes between the insns, and notes take uids, so a uid
+# means another insn (or none) in the build's own compile (no -g): only these force a -g compile.
+# The others name pseudos (AGBCC_PRI, AGBCC_FORCE, CSE_NOCANON, CSE_KEEP) or count events
+# (AGBCC_SPILL, AGBCC_NOPRE, CSE_NOFOLLOW) and are compiled as the build compiles.
+UID_KNOBS = ("AGBCC_NOGIV", "AGBCC_GIV", "AGBCC_NOMOVE", "AGBCC_NOTIE", "CSE_WHY", "CSE_NOFOLLOW_JUMP")
+
+
+def needs_g(env):
+    return any((env or {}).get(k) for k in UID_KNOBS)
+
+
+def g_sensitive(src, func):
+    """Does -g change agbcc's code for FUNC in SRC (without knobs)? Storage_RefreshConsumableSlots: -g keeps
+    a loop counting up that the build's compile reverses, so a uid knob's MATCH there is the -g compile's."""
+    key = ("g", src, func, open(os.path.join(ROOT, src)).read())
+    if key not in _MEMO:
+        plain, g = fast_compile(src, func, {}, plain=True), fast_compile(src, func, {}, plain=False)
+        _MEMO[key] = plain is not None and g is not None and plain[0] != g[0]
+    return _MEMO[key]
+
+
 def fast_compile(src, func, env=None, plain=None):
     """(FUNC's bytes, address, data ranges) through scope's agbcc fork server (tools/scope/fast.py):
     a few ms per variant, bytes only. None when the unit cannot be served (then use compile_draft).
@@ -1916,19 +1981,21 @@ def fast_compile(src, func, env=None, plain=None):
         return None
     env = resolve_knobs(src, func, env)
     if plain is None:
-        plain = not has_knobs(env)
-    # -g as compile_draft has it: debug notes take insn uids, so without it the uids `why` and `insn`
-    # print name other insns here and uid knobs (AGBCC_NOMOVE, AGBCC_NOGIV, ...) in `try` miss. But -g
-    # is not always the same code (Storage_RefreshConsumableSlots: -g keeps a loop counting up that the
-    # plain compile reverses), so a compile without knobs, whose bytes are a verdict, goes without it.
+        plain = not needs_g(env)
+    # -g only for a knob that names insn uids (UID_KNOBS): debug notes take uids, so without -g the uids
+    # `why` and `insn` print name other insns. But -g is not always the same code
+    # (Storage_RefreshConsumableSlots: -g keeps a loop counting up that the plain compile reverses), so
+    # every other compile, whose bytes are a verdict, goes without it.
     flags = tuple(build.cflags_for(src)) + (() if plain else ("-g",))
     _, addr_all, _ = inventory()
     addr = addr_all[rom_name(src, func)]
     key = (flags, addr)
     f = _FAST.get(key)
     if f is None:
+        import atexit
         f = _FAST[key] = fast.Fast(INSTR, list(flags), build.AS, elf_syms(), addr,
                                    os.path.join(WORK, "cache"), fixup=inline_macros)
+        atexit.register(f.close)  # stops its agbcc servers and removes their directories
         os.makedirs(os.path.join(WORK, "cache"), exist_ok=True)
     knobs = {k: v for k, v in (env or {}).items() if k.startswith(("AGBCC_", "CSE_"))}
     code, err = f.bytes(fast_preprocess(src, env, func), (func, rom_name(src, func)), knobs)
@@ -1946,9 +2013,9 @@ def rom_bytes():
     return _ROMBYTES[0]
 
 
-def fast_score(src, func, env):
+def fast_score(src, func, env, plain=None):
     """(differing rows, count text) through the fork server, or None if the unit cannot be served."""
-    r = fast_compile(src, func, env)
+    r = fast_compile(src, func, env, plain=plain)
     if r is None:
         return None
     mine, addr, mdata = r
@@ -1980,13 +2047,16 @@ def score(src, func, env, full=False):
     if not full and os.environ.get("SCOPE_FAST") != "0":  # SCOPE_FAST=0: one-shot compiles (A/B, debugging)
         r = fast_score(src, func, env)
         if r is not None:
-            return r[0], {"counts": r[1], "shape": fast_score.shape if r[0] else 0,
-                          "fuzzy": fast_score.fuzzy if r[0] else 100.0}
+            info = {"counts": r[1], "shape": fast_score.shape if r[0] else 0,
+                    "fuzzy": fast_score.fuzzy if r[0] else 100.0}
+            if needs_g(env) and g_sensitive(src, func):
+                info.update(g_only=True, counts=r[1] + " [-g compile]")
+            return r[0], info
     mine, addr, info = compile_draft(src, func, env)
     _, _, sizes = inventory()
     rom_code = load_rom(verify=False)[off(addr):off(addr) + sizes[rom_name(src, func)]]
     if mine == rom_code:  # the listing can misalign a literal pool at a 2-byte offset; bytes decide
-        info.update(counts="MATCH", shape=0, fuzzy=100.0)
+        info.update(counts="MATCH" + (" [-g compile]" if info.get("g_only") else ""), shape=0, fuzzy=100.0)
         return 0, info
     with contextlib.redirect_stdout(io.StringIO()):
         report(src, func, rom_code, addr, mine, info, 0)
@@ -1995,8 +2065,8 @@ def score(src, func, env, full=False):
                                                               info["obj_offset"], len(mine))
     rom_rows = decode(rom_code, addr, rom_data(rom_name(src, func), addr, rom_code))
     draft_rows = decode(mine, addr, data)
-    info.update(counts=count_text(rows), shape=shape_distance(rom_rows, draft_rows),
-                fuzzy=fuzzy_percent(rom_rows, draft_rows))
+    info.update(counts=count_text(rows) + (" [-g compile]" if info.get("g_only") else ""),
+                shape=shape_distance(rom_rows, draft_rows), fuzzy=fuzzy_percent(rom_rows, draft_rows))
     return sum(1 for r in rows if r["tag"] != "="), info
 
 
@@ -2093,6 +2163,31 @@ def concession_sites(text):
     return out
 
 
+_ASSIGN = r"(?:=(?!=)|\+=|-=|\*=|/=|%=|&=|\|=|\^=|<<=|>>=|\+\+|--)"
+
+
+def sole_definitions(lines, i):
+    """Variables that the barrier on line I defines (an output-only `"=r"(x)` operand) and that nothing
+    else in the enclosing function sets. Removing such a barrier leaves x read with no value: same bytes
+    perhaps, but not C anyone wrote (a pinned register variable gets no uninitialized warning)."""
+    ln = lines[i]
+    outs = re.findall(r'"=[^"]*"\s*\(\s*(\w+)\s*\)', ln.split(":")[1] if ln.count(":") >= 1 else "")
+    if not outs:
+        return []
+    lo = next((j for j in range(i, -1, -1) if re.match(r"\w.*\)\s*\{?\s*$", lines[j]) and not lines[j][0].isspace()), 0)
+    hi = next((j for j in range(i, len(lines)) if lines[j].startswith("}")), len(lines) - 1)
+    body = "\n".join(lines[lo:i] + lines[i + 1:hi + 1])
+    sole = []
+    for x in outs:
+        x_re = re.escape(x)
+        if (re.search(rf"\b{x_re}\s*{_ASSIGN}", body) or re.search(rf"(\+\+|--|&)\s*{x_re}\b", body)
+                or re.search(rf'"[=+][^"]*"\s*\(\s*{x_re}\s*\)', body)):
+            continue
+        if re.search(rf"\b{x_re}\b", body):  # read somewhere, and this is its only definition
+            sole.append(x)
+    return sole
+
+
 def cmd_pins(src, func, env):
     """Phase 3 helper: remove each concession (register pin or empty asm barrier) in turn and report the
     cost, then greedily remove every one that does not add differences, and write the result."""
@@ -2127,13 +2222,20 @@ def cmd_pins(src, func, env):
     lines = text.split("\n")
     cost = []
     for n, (i, kind, rm) in enumerate(sites):
+        sole = sole_definitions(lines, i) if kind == "barrier" else []
+        if sole:  # never offered: without it the variable is read with no value
+            cost.append(None)
+            print(f"  line {i + 1:4d} {kind:7s} {lines[i].strip()[:70]:70s} -> kept: the only definition of"
+                  f" {', '.join(sole)} (write the value it should hold, then remove it)")
+            continue
         r = run("\n".join(rm(lines)), f"one{n}")
         cost.append(r)
         d = "compile fails" if r is None else f"{show(r)}, {r - base:+d}"
         print(f"  line {i + 1:4d} {kind:7s} {lines[i].strip()[:70]:70s} -> {d}")
     ls = lines
-    for i, _, rm in sorted(sites, key=lambda t: -t[0]):
-        ls = rm(ls)
+    for i, kind, rm in sorted(sites, key=lambda t: -t[0]):
+        if not (kind == "barrier" and sole_definitions(lines, i)):
+            ls = rm(ls)
     r = run("\n".join(ls), "none")
     print(f"  all removed: {show(r)}")
     # greedy: cheapest first, keep a removal if the count does not grow; remove from the bottom up so
@@ -2350,12 +2452,20 @@ def cmd_probe(src, func, env):
           f" {len(follows)} cse jump follows, {len(pres)} PRE replacements"
           + f", {len(givs)} loop induction values, {len(hoists)} loop invariant hoists"
           + (f"; trying the first {budget} (SCOPE_PROBE_MAX=N)" if len(cands) > budget else ""))
+    g_base = None
+    if g_sensitive(src, func) and any(k in UID_KNOBS for k, _, _ in cands[:budget]):
+        r = fast_score(src, func, env, plain=False)
+        g_base = r[0] if r else base
+        print(f"  note: -g changes this function's code ({base} differing without -g, {g_base} with it). The"
+              f" {'/'.join(sorted({k for k, _, _ in cands if k in UID_KNOBS}))} candidates name insn uids,"
+              " which exist only in the -g compile: they are scored against the -g count and marked"
+              " [-g compile]; such a hit says what the -g compile does, not the build.")
     hits = []
     for knob, val, what in cands[:budget]:
         prev = env.get(knob)
         n, inf = score(src, func, dict(env, **{knob: f"{prev},{val}" if prev else val}))
-        if n < base:
-            hits.append((n, knob, val, what, inf.get("counts", "MATCH") if n else "MATCH"))
+        if n < (g_base if g_base is not None and knob in UID_KNOBS else base):
+            hits.append((n, knob, val, what, inf.get("counts", "MATCH")))
     fix = {"CSE_NOCANON": "cse made this value the canonical register of a copy class (it lives longer"
                           " than the value it was copied from), so later tests and uses read it. In C make"
                           " the ROM-side value the longer-lived one (one shared variable, the copy kept"
@@ -3235,9 +3345,10 @@ def code_status():
                 files[known[n]] = rel
     if new != old:
         os.makedirs(CACHE, exist_ok=True)
-        with open(path + ".tmp", "wb") as f:
+        tmp = f"{path}.{os.getpid()}"  # the process's own: two commands at once raced on one .tmp
+        with open(tmp, "wb") as f:
             pickle.dump(new, f)
-        os.replace(path + ".tmp", path)
+        os.replace(tmp, path)
     return status, files
 
 
@@ -4368,7 +4479,7 @@ def cmd_try(src, func, variants, env):
     base_total = total(base_info) if base_n else 0
     for n, name, counts, change, info in rows:
         k = key(n, info)
-        mark = "MATCH" if n == 0 else ("better" if k is not None and k < base_k else
+        mark = ("-g" if info.get("g_only") else "MATCH") if n == 0 else ("better" if k is not None and k < base_k else
                                        "same" if k == base_k else "worse" if k is not None else "")
         t = total(info) if n else None
         if mark == "worse" and t is not None and base_total and t < base_total:
@@ -4383,7 +4494,10 @@ def cmd_try(src, func, variants, env):
               "  knob asked for is often worth keeping and stacking on (WORKER.md step 5).")
     if best and best[0] is not None and best[3] != "knob":
         print(f"\nnext: scope.py {best[1]} {func}   (the best variant's listing)")
-    return 0 if any(r[0] == 0 for r in rows) else 1
+    if any(r[4].get("g_only") for r in rows):
+        print("  [-g compile]: a knob that names insn uids is compiled with -g, and -g changes this function's"
+              " code; its count is the -g compile's, not the build's.")
+    return 0 if any(r[0] == 0 and not r[4].get("g_only") for r in rows) else 1
 
 
 def last_func():

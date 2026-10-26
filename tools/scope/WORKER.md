@@ -108,8 +108,17 @@ from the other differences, do not chase them.
 
 Knobs (what-ifs; they never go into the final C): `AGBCC_PRI=PSEUDO:+N`
 (raise a value's allocation priority), `AGBCC_FORCE=PSEUDO:REG`,
-`AGBCC_SPILL=K:REG` (reload's K-th choice), `CSE_KEEP=PSEUDO` (keep a
-register canonical in cse).
+`AGBCC_SPILL=K:D` (shift reload's K-th choice D places along its rotation),
+`CSE_KEEP=PSEUDO` (keep a register canonical in cse).
+
+Knobs compile as the build does (no `-g`), except those that name insn uids
+(`AGBCC_NOMOVE`, `AGBCC_NOGIV`, `AGBCC_GIV`, `AGBCC_NOTIE`, `CSE_NOFOLLOW_JUMP`):
+uids exist only in the `-g` compile. When `-g` changes a function's code
+(scope prints a note), their results are marked `[-g compile]` and a MATCH
+there is not the build's.
+
+Several scope commands can run at once, also under one `SCOPE_RUN`; two on
+the same function wait for each other (`waiting: another scope command ...`).
 
 ## What usually decides it (details: README.md "agbcc facts")
 

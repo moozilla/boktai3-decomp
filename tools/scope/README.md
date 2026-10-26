@@ -387,6 +387,25 @@ in the patch.
   hit each (reload/spill causes, PRE source expressions, repeated-block alignment, `why all`'s
   eight-hunk cap, fast-cache races, `-g` knob runs, `land` formatting the whole tree):
   [notes/subsystem-run_2026-10-25.md](../../notes/subsystem-run_2026-10-25.md).
+  Done (2026-10-26):
+  * Concurrent commands under one `SCOPE_RUN`: the assembler's `f.s`/`f.o`, the include-block
+    `head.c` and the pickle caches are per process (writes are atomic renames), and a function's
+    work directory is locked for the length of a command, so a second command on the same
+    function waits instead of reading the first one's dumps. Fork-server directories are removed
+    when their server closes.
+  * Knobs compile without `-g` unless they name insn uids (`UID_KNOBS`: NOMOVE, GIV, NOGIV, NOTIE,
+    CSE_WHY, CSE_NOFOLLOW_JUMP); 190 knob compiles over 40 drafts gave the same bytes both ways.
+    When `-g` changes the function's code (Storage_RefreshConsumableSlots: the `-g` compile
+    MATCHES, the build's is 13/13), uid-knob results are marked `[-g compile]` in the listing,
+    `try` (mark `-g`, not a MATCH exit) and `probe` (scored against the `-g` count, with a note).
+    The main listing's `-g` note says when the `-g` compile itself matches.
+  * `pins` keeps a barrier that is the only definition of a variable read later (an output-only
+    `"=r"(x)`; PlayerCue_UpdateRecoilSlide's `scratch`) and says so, instead of offering a
+    removal that leaves C reading an unset value.
+  * The `-g` compile runs with `-Wuninitialized` (same code on 150 units); scope prints agbcc's
+    "might be used uninitialized" warnings for FUNC (Vampire_ApplyPendingDamage's `t1`).
+    A pinned register variable gets no such warning (it is not a pseudo).
+  * `campaign.py land` formats only the landed file (it ran `make format` over the tree).
 
 * Done: trace summarizer and pseudo names (`why`). On RepeatedPairAttack it
   reproduces in one call what took ~15 calls of raw trace reading.
