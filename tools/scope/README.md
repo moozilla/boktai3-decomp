@@ -208,12 +208,31 @@ integer address (see the literal survey below).
     each side would need, live lengths in flow's units, and the
     `AGBCC_PRI`/`AGBCC_FORCE` what-if that confirms it;
 * for a reload register (operand not a pseudo before allocation): the reload
-  choice number and the rotation explanation, pointing at `spill`.
+  choice number, the spill registers as that choice saw them (free, shared
+  with another reload of the insn, holding a named pseudo, taken), the
+  previous three choices, and then either the concrete `AGBCC_SPILL=K:D` that
+  gives the ROM's register and the register the ROM's previous choice must
+  have taken (`the ROM's r3 means its previous choice took r2, not r0`), or
+  why no rotation gives it: a pseudo lives there (named), another reload of
+  the insn has it, pass 0 shares a register first, or it is not in the
+  function's spill set at all (SceneActorControl_UpdateWanderTarget's r3).
+  Inherited reloads since the previous choice are listed (they make no
+  choice); `why` on an inherited reload names the insn it reuses.
 
 `spill` greedily shifts reload's spill rotation (`AGBCC_SPILL=K:D`) before each
 reload choice from the first differing insn on, keeping shifts that shrink the
-diff (8-60 compiles, about 0.1 s each). A MATCH means the C has the right
-shape and pseudos and only reload's rotation state differs.
+diff. Each choice tries only the shifts that give it a different register (one
+per free register, from its X record), and the choices next to differing insns
+go first, so the budget is not spent on early choices (Player_GetSmoothedDirection:
+1 compile, was 7; GridAttackActor_OnDamageCollision: 2). A MATCH means the C
+has the right shape and pseudos and only reload's rotation state differs.
+
+The rotation records come from `AGBCC_DUMPPRI`: after each `R` line (choice K,
+insn, register, C line, value) an `X` line gives the index the scan started
+after and each spill register's code (`S` shared, `A` free, `L<n>` pseudo N
+lives there, `H` a hard register lives there, `T` another reload has it, `C`
+class, `M` mode); `I` lines record inherited reloads (insn, pseudo, spill
+index, the insn whose reload it reuses).
 
 It re-executes itself under `build/venv` for capstone. FUNC defaults to the
 function defined in the file's `#ifdef NONMATCHING` block; the ROM side is
@@ -439,7 +458,15 @@ in the patch.
     `why` on an insn gcse replaced or created names the PRE decision.
   * `why all` scores each concrete what-if it suggests (`-> 312 ROM / 319 draft (no change: not
     this decision, or not alone)`); sub_08176F70's suggested CSE_NOCANON knobs did nothing, which
-    the worker found by hand. `AGBCC_SPILL=K:D` placeholders are not scored.
+    the worker found by hand. Reload what-ifs are concrete now (below), so they are scored too.
+  * Reload rotation (the most-hit gap): `why` on a reload register prints the spill set as the
+    choice saw it and the concrete `AGBCC_SPILL=K:D` with the register the ROM's previous choice
+    must have taken, or names what rules the ROM's register out (a live pseudo, another reload,
+    pass-0 sharing, not a spill register: the "secondary scratch" case where 10:3 "did nothing"
+    because D is mod the spill count). sub_081C6780's `15:D`, where 15:1 did nothing, now reads
+    `15:2 ... previous choice took r0 or r4, not r2`. `spill` tries one shift per distinct
+    register, differing choices first, counts like the listing and lists only this function's
+    pins. Inheritance is logged (`I` records) and shown in `why` and `spill`.
   * `life` on a pseudo flow never sees (an alias cse or gcse removed) prints its sets, uses and
     last use after each pass up to the one that removed it, and what replaced it in each use. Such
     pseudos have no allocation record, so they are named from the C line of their first set, or as
@@ -469,8 +496,10 @@ in the patch.
   the usual question after an edit fixes one thing and breaks another.
 * Done: `why all`. It skips branches that only land elsewhere and says when an
   insn exists only in the final assembly or differs in shape, not registers.
-* The `spill` result is a classification, not a fix: next is a view of what
-  makes the ROM's reload count differ (insns needing reloads, by C line).
+* The `spill` result says which register the ROM's previous choice took, not
+  which C adds or removes the reload choices in between: next is a search over
+  that span's C (the values in high registers it lists, pins there) for the
+  edit that changes the count by the needed amount.
 * For gcse-born differences, automatically test bucket order with a few
   `AGBCC_GCSE_T` values (see below) and say whether order alone explains it.
 * Done: `try` (whole-file variants or one knob each, through the fork server; sub_0801A6D0's 32
@@ -973,11 +1002,11 @@ which is exactly `10:1`. Not tested.
   the span `spill` names. Open: a search over that span's C (the values in
   high registers it lists, pins there) that reports which edit changes the
   reload count by the needed amount, instead of leaving it to the worker.
-  ActorParticles_SpawnWideBurst shows a second reload gap: the ROM has
-  `movs r0, #7; mov ip, r0; mov r0, ip; ands r2, r0` and the draft drops
-  the `mov r0, ip` (reload inherits r0's 7 for the `ands`; the ROM's did
-  not). No command explains inheritance yet (reload1.c reg_reloaded_*:
-  which reload kept r0's contents, and what invalidated them in the ROM).
+  ActorParticles_SpawnWideBurst showed a second reload gap: the ROM has
+  `movs r0, #7; mov ip, r0; mov r0, ip; ands r2, r0` and the draft dropped
+  the `mov r0, ip` (reload inherited r0's 7 for the `ands`; the ROM's did
+  not). It has since matched; inheritance is now logged (`I` records) and
+  `why` on an inherited reload names the reload it reuses.
   Its second round matched with one empty barrier after `mask = 7`, which
   confirms the inheritance diagnosis; the plain-C form is still unknown.
   Power_EnterSleep needs an inline `svc #3` (SDK SystemCall), which agbcc

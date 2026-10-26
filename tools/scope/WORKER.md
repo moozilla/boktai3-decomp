@@ -115,7 +115,8 @@ from the other differences, do not chase them.
 
 Knobs (what-ifs; they never go into the final C): `AGBCC_PRI=PSEUDO:+N`
 (raise a value's allocation priority), `AGBCC_FORCE=PSEUDO:REG`,
-`AGBCC_SPILL=K:D` (shift reload's K-th choice D places along its rotation),
+`AGBCC_SPILL=K:D` (shift reload's K-th choice D places along its rotation; D is
+mod the number of spill registers, and `why` prints the D that gives the ROM's register),
 `CSE_KEEP=PSEUDO` (keep a register canonical in cse).
 
 Knobs compile as the build does (no `-g`), except those that name insn uids
@@ -178,9 +179,14 @@ the same function wait for each other (`waiting: another scope command ...`).
   index, `AGBCC_GIV=UID` steps it); a hit names the C line. `AGBCC_LOOP_TRACE=1` lists them.
 * **Expression shape with no `why` answer:** run `probe` before trying C forms; a
   matching `CSE_NOFOLLOW` or `AGBCC_NOPRE` says which cse/gcse decision it is.
-* **Reload rotation:** if `spill` says the difference is only reload's
+* **Reload rotation:** `why UID` on the differing register says which
+  register the ROM's previous reload choice must have taken (and the
+  `AGBCC_SPILL=K:D` that confirms it), or why no rotation gives the ROM's
+  register (a value living there, another reload of the insn, not a spill
+  register: then the ROM needed a reload register the draft doesn't, or had
+  fewer low registers free). If `spill` says the difference is only reload's
   choices, the fix is upstream (which values got no register, which
-  constants reload loads).
+  constants reload loads) in the span it names.
 
 ## Rules
 
