@@ -2,10 +2,6 @@
 #include "global.h"
 #include "game_state.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.2%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
 struct GameStartRes {
     u32 w[8];
 };
@@ -23,6 +19,9 @@ struct GameStartSprite {
     u32 flags;
     u8 unk04[0xC];
     u16 frame;
+    u8 unk12[0xA];
+    u16 x, y;
+    u8 unk20[0xC];
 };
 
 struct GameStartWidget {
@@ -30,12 +29,34 @@ struct GameStartWidget {
     u32 flags;
     u8 unk0C[0x14];
     u16 x;
-    u8 unk22[0x3E];
+    u16 y;
+    u8 unk24[0x3C];
 };
 struct GameStart {
-    u8 unk000[0x1d4];
+    u8 unk000[0x1C];
+    struct GameStartWidget background;
+    struct GameStartRes backgroundResource;
+    u8 unk09C[8];
+    struct GameStartWidget decoration;
+    struct GameStartRes decorationResource;
+    u8 unk124[8];
+    struct GameStartWidget title;
+    struct GameStartRes titleResource;
+    u8 unk1AC[8];
+    struct GameStartRes itemResource;
     struct GameStartWidget items[5];
     struct GameStartWidget choices[2];
+    struct GameStartSprite cursor;
+    struct GameStartAnim cursorData;
+    u8 unk4B0[0xC];
+    struct GameStartAnim cursorSequence;
+    s32 active;
+    u8 unk4D0[8];
+    s32 timer;
+    u8 unk4DC[8];
+    s32 saveIndex;
+    u8 unk4E8[4];
+    void *cursorResource;
 };
 
 extern u32 gUnk_020003A0[];
@@ -61,54 +82,6 @@ void GameStart_RunInitHook(void *);
 #define W(o)    (*(s32 *)(p + (o)))
 #define U16(o)  (*(u16 *)(p + (o)))
 #define GS_H(o) (*(s16 *)((u8 *)gUnk_02000710 + (o)))
-
-static inline void StepAnim(struct GameStartAnim *a, struct GameStartSprite *s)
-{
-    const volatile u16 *entry = a->data + a->frame;
-
-    s->frame = *entry >> 6;
-    {
-        u32 left = a->flags & 1;
-        if (left != (((*entry & 0x30) >> 4) & 1))
-            s->flags |= 4;
-        else
-            s->flags &= ~4;
-    }
-    {
-        /* Load the flags before materializing the shared mask. */
-        register u32 input asm("r0") = a->flags;
-        u32 mask = 2;
-        if ((u8)(mask & input) != (((*entry & 0x30) >> 4) & mask))
-            s->flags |= 8;
-        else
-            s->flags &= ~8;
-    }
-    if ((u16)++a->timer >= a->rate) {
-        a->timer = 0;
-        if (a->flags & 4) {
-            if (a->frame == 0) {
-                if (a->flags & 8)
-                    a->timer = a->rate;
-                else
-                    a->frame = a->count - 1;
-            } else {
-                a->frame--;
-            }
-        } else if ((u16)++a->frame >= a->count) {
-            if ((u8)(a->flags & 8)) {
-                a->timer = a->rate;
-                a->frame = a->count - 1;
-            } else {
-                a->frame = 0;
-            }
-        }
-        entry = a->data + a->frame;
-        a->factor = *entry & 15;
-        a->rate = (a->factor * a->scale) >> 6;
-        if (a->rate == 0)
-            a->rate = 1;
-    }
-}
 
 // Tentative: sets up the Game Start screen (backgrounds, widgets, cursor sprite, save state).
 inline static void StepAnim_Init(struct GameStartAnim *a, struct GameStartSprite *s)
@@ -164,8 +137,8 @@ s32 GameStart_Init(u8 *p)
     void *res;
     s32 i;
     Bg_ClearTilemap(0);
-    Bg_ClearTilemap(2);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
+    Bg_ClearTilemap(2);
     BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     Bg_ClearTilemap(3);
     {
@@ -176,51 +149,63 @@ s32 GameStart_Init(u8 *p)
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     CpuSet(((u8 *)ScriptProc_Start(0x92b3, 0x204)) + 0x14, gUnk_03004FC0, 0x100);
     res = ScriptProc_Start(0xcb05, 0xe2ab);
-    ResourceHeader_Relocate(p + 0x7c, res);
-    *((struct GameStartRes *)(p + 0x1b4)) = *((struct GameStartRes *)(p + 0x7c));
-    Widget_InitLinked(p + 0x1c, p + 0x7c, 0x36, 0x10, 0, 0, 0, 0);
-    ResourceHeader_Relocate(p + 0x104, res);
-    Widget_InitLinked(p + 0xa4, p + 0x104, 0x28, 0x10, 0, 0, 0, 0);
-    *((s32 *)(p + 0xac)) |= 1;
-    *((u16 *)(p + 0xc4)) = 0;
+    ResourceHeader_Relocate((u8 *)&((struct GameStart *)p)->backgroundResource, res);
+    ((struct GameStart *)p)->itemResource = ((struct GameStart *)p)->backgroundResource;
+    Widget_InitLinked((u8 *)&((struct GameStart *)p)->background,
+                      (u8 *)&((struct GameStart *)p)->backgroundResource, 0x36, 0x10, 0, 0, 0, 0);
+    ResourceHeader_Relocate((u8 *)&((struct GameStart *)p)->decorationResource, res);
+    Widget_InitLinked((u8 *)&((struct GameStart *)p)->decoration,
+                      (u8 *)&((struct GameStart *)p)->decorationResource, 0x28, 0x10, 0, 0, 0, 0);
+    ((struct GameStart *)p)->decoration.flags |= 1;
+    ((struct GameStart *)p)->decoration.x = 0;
     {
+        u16 *targetY = &((struct GameStart *)p)->decoration.y;
         s32 k1 = 0xffe0;
-        *((u16 *)(p + 0xc6)) = k1;
+        *targetY = k1;
     }
     {
         u32 group = 0xcb05;
-        asm("" : "+r"(group));
         res = ScriptProc_Start(group, 0x530d);
     }
-    ResourceHeader_Relocate(p + 0x18c, res);
-    Widget_InitLinked(p + 0x12c, p + 0x18c, 0x8a, 0x10, 0, 0, 0, 0);
-    *((u16 *)(p + 0x14c)) = 0;
-    *((u16 *)(p + 0x14e)) = 0xfff8;
-    AnimData_Load(p + 0x4a0, 0x593a);
-    Sprite_Init(p + 0x474, p + 0x4a0, 0x11);
-    *((u16 *)(p + 0x490)) = 0x18;
-    *((u16 *)(p + 0x492)) = 0x2c;
-    *((void **)(p + 0x4ec)) = ScriptProc_Start(0x922e, 0x4bbf);
-    Anim_SetSequence(p + 0x4bc, *((void **)(p + 0x4ec)), 0, 0, 0);
-    StepAnim_Init((struct GameStartAnim *)(p + 0x4bc), (struct GameStartSprite *)(p + 0x474));
+    ResourceHeader_Relocate((u8 *)&((struct GameStart *)p)->titleResource, res);
+    Widget_InitLinked((u8 *)&((struct GameStart *)p)->title,
+                      (u8 *)&((struct GameStart *)p)->titleResource, 0x8a, 0x10, 0, 0, 0, 0);
+    ((struct GameStart *)p)->title.x = 0;
+    {
+        u16 *targetY = &((struct GameStart *)p)->title.y;
+        s32 valueY = 0xfff8;
+        *targetY = valueY;
+    }
+    AnimData_Load((u8 *)&((struct GameStart *)p)->cursorData, 0x593a);
+    Sprite_Init((u8 *)&((struct GameStart *)p)->cursor, (u8 *)&((struct GameStart *)p)->cursorData,
+                0x11);
+    ((struct GameStart *)p)->cursor.x = 0x18;
+    ((struct GameStart *)p)->cursor.y = 0x2c;
+    ((struct GameStart *)p)->cursorResource = ScriptProc_Start(0x922e, 0x4bbf);
+    Anim_SetSequence((u8 *)&((struct GameStart *)p)->cursorSequence,
+                     ((struct GameStart *)p)->cursorResource, 0, 0, 0);
+    StepAnim_Init((struct GameStartAnim *)((u8 *)&((struct GameStart *)p)->cursorSequence),
+                  (struct GameStartSprite *)((u8 *)&((struct GameStart *)p)->cursor));
     pos.x = 0xa8;
     pos.y = 0x28;
     for (i = 0; i <= 4; i++) {
-        Widget_InitLinked((p + 0x1d4) + (i * 0x60), p + 0x1b4, (i == 2) ? (0x14) : (0), 0x30, 1, 0,
-                          0x3c, &pos);
-        *((u16 *)(p + (0x1f4 + (i * 0x60)))) += i * 8;
+        Widget_InitLinked((u8 *)&((struct GameStart *)p)->items[i],
+                          (u8 *)&((struct GameStart *)p)->itemResource, (i == 2) ? (0x14) : (0),
+                          0x30, 1, 0, 0x3c, &pos);
+        ((struct GameStart *)p)->items[i].x += i * 8;
         ((struct GameStart *)p)->items[i].flags |= 1;
     }
 
     pos.x = 0xc0;
     pos.y = 0x38;
     for (i = 0; i <= 1; i++) {
-        Widget_InitLinked((p + 0x3b4) + (i * 0x60), p + 0x1b4, 0, 0x30, 1, 0, 0x3c, &pos);
-        *((u16 *)(p + (0x3d4 + (i * 0x60)))) += i * 8;
+        Widget_InitLinked((u8 *)&((struct GameStart *)p)->choices[i],
+                          (u8 *)&((struct GameStart *)p)->itemResource, 0, 0x30, 1, 0, 0x3c, &pos);
+        ((struct GameStart *)p)->choices[i].x += i * 8;
         ((struct GameStart *)p)->choices[i].flags |= 1;
     }
 
-    *((s32 *)(p + 0x4d8)) = 0;
+    ((struct GameStart *)p)->timer = 0;
     if (gUnk_020003A0[6] == 1)
         Menu_StartFadeIn(0);
     else
@@ -229,16 +214,17 @@ s32 GameStart_Init(u8 *p)
         u8 *name = gUnk_020005C0;
         u8 *slot = gUnk_020005B4;
         u8 *end = name;
+        s32 blank = 0x41;
         u8 *q = name + 0x17;
         do {
-            *q = 0x41;
+            *q = blank;
             q--;
         } while (((s32)q) >= ((s32)end));
         name[0x18] = 0;
         slot[0] = 4;
         slot[1] = 0;
         if (gUnk_020003A0[6] == 0) {
-            *((s32 *)(p + 0x4e4)) = GameStart_LoadAvailableSave(p);
+            ((struct GameStart *)p)->saveIndex = GameStart_LoadAvailableSave(p);
             Sound_PlaySong(0xb3);
             goto check;
         }
@@ -247,13 +233,9 @@ s32 GameStart_Init(u8 *p)
         GameState_RestoreActiveRegions();
 check:
     if ((*((s16 *)(((u8 *)gUnk_02000710) + 0x86e))) == 0)
-        *((s32 *)(p + 0x4cc)) = 1;
+        ((struct GameStart *)p)->active = 1;
 
     GameStart_DrawSaveInfo(p);
     GameStart_RunInitHook(p);
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", GameStart_Init);
-#endif
