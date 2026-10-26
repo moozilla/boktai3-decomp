@@ -1,12 +1,6 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 96.8%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Left: fast-path bank address register (ROM r3 plus a copy), the flags & 0x20
-// ands operand order, and src/dst allocation in the first blend loop.
 
 struct PaletteBank16 {
     u16 colors[16];
@@ -68,13 +62,17 @@ static inline u32 isKey32E(u32 key)
 
 void sub_08217430(void)
 {
-    register s32 level asm("sl");
+    register s32 level;
     s32 inverse;
     s32 i;
     if ((gUnk_030051D4 == 0x40) && (gUnk_030051C8 == 0)) {
         if (gUnk_03004DAC != 0x40) {
             for (i = 0; i < gUnk_030051CC; i++) {
-                u8 *bank = gUnk_030042E4 + (gUnk_030051F0[i] << 5);
+                u8 **basePtr = &gUnk_030042E4;
+                u32 offset = gUnk_030051F0[i] << 5;
+                u8 *base = *basePtr;
+                register u8 *bank asm("r3") = base + offset;
+                asm("" : : "r"(offset), "r"(base));
                 CpuFastSet(bank, &gUnk_03004DC0[i], 8);
             }
         }
@@ -239,7 +237,3 @@ void sub_08217430(void)
     }
     gUnk_03004DAC = gUnk_030051D4;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08217430);
-#endif
