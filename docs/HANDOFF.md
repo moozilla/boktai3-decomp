@@ -2,148 +2,128 @@
 
 Tags: #process
 
-The entry point for a new agent or a thread after compaction. Read this file,
-then `docs/WORKER.md` before matching. Everything else is looked up, not read:
-[docs/INDEX.md](INDEX.md) maps every doc and note by topic, and
-`python3 tools/docindex.py ADDR` lists what has been written about a function.
-Dated progress reports live in [docs/history/](history/README.md); they are
-records, not instructions. Keep this file short: it describes the present.
+The entry point for a new agent or a thread after compaction. Read this file, then
+[docs/WORKER.md](WORKER.md) and [tools/scope/WORKER.md](../tools/scope/WORKER.md) before
+matching. Everything else is looked up, not read: [docs/INDEX.md](INDEX.md) maps every doc
+by topic, and `python3 tools/docindex.py ADDR` lists what has been written about a function.
+Keep this file short and about the present. The previous version (with the October recent-work
+list) is [history/HANDOFF_2026-10-23.md](history/HANDOFF_2026-10-23.md); older records are in
+[docs/history/](history/README.md).
 
-## Current state (2026-10-23)
+## The goal: four phases, aiming at the last one
 
-Numbers live in one place: [PROGRESS.md](../PROGRESS.md) (regenerated at batch
-integration with `python3 tools/progress.py --markdown PROGRESS.md`) and the
-README badges (live from decomp.dev). Don't copy totals into other files.
+The project owner splits the decomp into four phases:
+
+1. **Draft.** Every function in the game has C (an exact match or a guarded
+   `#ifdef NONMATCHING` draft with a fuzzy score).
+2. **Match.** Every function matches byte for byte. Concessions (register pins,
+   empty `asm("")` barriers) are allowed here as an interim.
+3. **No concessions.** Every match is plain C: no pins, no barriers, no
+   `*(u16 *)((u8 *)p + 0x172)` field access.
+4. **Cleanup.** Human-readable and organized: names, shared structs and headers,
+   enums, comments, a real source tree (contiguous units).
+
+Phase 1 is done: every function has C. The work now is phases 2 and 3, subsystem
+by subsystem, and phase 4 where it comes naturally.
+
+**Always aim for the final form.** When you touch a function, try for C that matches
+with no concessions and reads like the original authors wrote it. A pin is a last
+resort, used only where a knob proved an allocation decision you could not reproduce
+in C after real attempts. Easy matches with pins are interim work that phase 3 has to
+redo.
+
+**Work systematically, and don't spin wheels.** Go through a subsystem in ROM order.
+Don't sort for likely wins, and don't skip or defer the hard functions. Stay on a function
+until it matches, or until you can name the one compiler decision blocking it (proved with
+a knob, with the C spellings for it tried). Then record that as a scope gap. Measure
+progress by exact matches and removed concessions, not by fuzzy scores. Blind spelling
+sweeps don't count. When an approach stops paying, change the approach or the tool,
+not just the function.
+
+## Where things stand (2026-10-26)
+
+Numbers live only in [PROGRESS.md](../PROGRESS.md) (regenerated at batch integration) and
+the README badges. Use `python3 tools/progress.py` for the current figures and
+`progress.py --list-pinned` for the phase-3 list.
 
 | | |
 |---|---|
-| Build | `make` rebuilds the ROM byte-identical (SHA-1 `2651c5e6875ac60abff734510d152166d211c87c`, `build/boktai3.gba: OK`) |
+| Build | `make` rebuilds the ROM byte-identical (`build/boktai3.gba: OK`, SHA-1 `2651c5e6…`) |
+| Phase 1 | complete: every function has C |
+| Phase 2 | the remaining guarded drafts (PROGRESS.md "Nonmatching drafts"), by subsystem in PROGRESS.md; most left are Monsters and Scene actors |
+| Phase 3 | the Register-pinned share in PROGRESS.md; `scope.py FILE.c pins` and `tools/depin.py` remove them |
 | Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data |
-| Report | every function in one of ~490 subsystem units under 11 game categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
+| Report | every function in one of ~490 subsystem units under 11 categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
 
-Recent work, newest first (details in [history](history/README.md)):
+Recent:
 
-* **Vanargand initializer draft** (2026-10-23): improved the complete guarded
-  initializer with script-flag and palette lifetimes. No new exact match.
-  [Worker notes](../notes/cx-xhigh.md) retain the experiments and resume point
-  at 080D2584 after the campaign wrap-up marker. Combined ROM validation passed.
-* **Mummy damage and reaction drafts** (2026-10-23): matched the complete
-  timer-driven damage callback with four register pins and improved guarded
-  Golem, Mummy and Ghoul reaction drafts. [Worker notes](../notes/cx-xhigh.md)
-  explain the reload diagnosis, safe minimization and wrap-up boundary.
-  Both combined ROM validations passed.
-* **Script combat actor family recovered** (2026-10-23): the initializer, actor
-  update, projectile attack, collider setup and hit reaction now match exactly.
-  Tagged NPC continuation details are in [worker notes](../notes/cx-sol02.md).
+* **Subsystem scope run** (2026-10-25/26): 16 Codex gpt-6.1-sol workers, one or two per
+  subsystem, matched about 50 drafts in two hours. Batch 1 is
+  [moozilla/boktai3-decomp#849](https://github.com/moozilla/boktai3-decomp/pull/849).
+  Lessons (ROM order, no per-function budget, no blind sweeps) and how to run one are in
+  [tools/scope/subsystem/README.md](../tools/scope/subsystem/README.md); the results are in
+  [notes/subsystem-run_2026-10-25.md](../notes/subsystem-run_2026-10-25.md).
+* **ARM code**: `sub_08000430` (IWRAM, `src/iwram_code.c`) matched without pinning
+  through an instrumented ARM compiler (`agbcc_arm`; [notes/arm-08000430.md](../notes/arm-08000430.md)).
+  scope compiles Thumb only.
+* **Yu-Gi-Oh! EDS wiki vendored**: [external/eds/](external/eds/README.md), a catalog of
+  GCC 2.95 matching tricks from another agent-driven decomp.
 
-* **Mummy, reaction and Ivy reconstruction** (2026-10-23): checkpoint recovery and anchor approach match; complete guarded reaction and Ivy drafts preserve larger callbacks. [Worker notes](../notes/cx-sol05.md) identify the incomplete deep-pass resume point. Combined ROM builds passed.
-* **State actor campaign continuation** (2026-10-23): three control, palette and target-turn matches plus complete guarded drafts; resume details in [worker notes](../notes/cx-sol11.md).
-* **Effect constructors and actor colliders** (2026-10-23): sol02 recovers two
-  Nidhoggr attack-effect constructors and the script combat actor collider
-  initializer. Full draft work and remaining targets are in
-  [worker notes](../notes/cx-sol02.md).
+## The tools that matter now
 
-* **Every scene's procedures have working names** (2026-10-19):
-  `tools/assets/gclroles.py` names scene entries by area (`white_forest_3880`)
-  and 93% of their private procedures by role (`_stage`, `_doors`, `_enemies`,
-  `_after_cutscene_198`, `_on_arrival`, `exit_to_3107`), from how they are
-  referred to and what they call; the 59 most-referenced library procedures
-  got names by hand in `proc.csv` (`ensure_scene_actor_manager`,
-  `place_scene_npc`, `roll_item_drop`, `arm_defeat_count_event`...). The readable view and the Studio use them
-  (confidence `auto`); `gcl/names/proc.csv` still wins
-  ([gcl/README.md](../gcl/README.md#generated-names-for-scene-procedures)).
-* **A showcase scene in the game** (2026-10-17): `tools/showcase/` writes new
-  script procedures (a GCL assembler), dialogue, a cutscene table and stage
-  paths into a ROM copy, and `video.sh` records the result with sound. It
-  also corrected the cutscene dialogue decoding (each run is one message;
-  docs/CUTSCENES.md).
-* **Relatives: start from matched code that shares runs** (2026-10-17):
-  `tools/relatives.py ADDR --c` lists the matched functions that share long
-  instruction runs with an unmatched one (registers abstracted), how much each
-  explains, and their C. `--port --keep` ported 10 functions to exact matches
-  (clones whose matched sibling came later, and constant-only variants);
-  [tasks/relatives.md](tasks/relatives.md) ranks 594 unmatched functions where a
-  matched relative explains half or more. Step 2 of WORKER.md's loop.
-* **Saves decoded; a save at every checkpoint** (2026-10-17): two files of
-  three checksummed regions (script variables, game state, continuation;
-  ENGINE.md section 14). `tools/assets/saves.py` reads saves and VBA-M
-  savestates and writes saves; `saves.py bank --make` turns the 83-checkpoint
-  savestate bank (`../boktai3trans/saves`) into battery saves that boot
-  headless into their scene (all 83 checked). Story beats and scenes list
-  their checkpoints in Browse.
-* **Story progress and the first dungeon** (2026-10-17): story progress
-  (`r708[0x3C]`) is the quest log, 173 values; `tools/assets/story.py` and
-  Browse › Story list each beat with its scene, cutscene and the doors and
-  scripts that test it. The Sealed Prison is worked through room by room
-  ([gcl/examples/sealed_prison.md](../gcl/examples/sealed_prison.md)).
-  Areas keep the labeling pass's numbers when scenes are added (`areas.number`).
-* **Cutscenes decoded** (2026-10-17): every cutscene is a table of steps and
-  messages (`gEventBytecodePtrs`, 240 of them) that the matched SceneMessages
-  director plays; receivers are the player, NPCs, scene actors, camera,
-  screen and sound, each with its own command switch. `tools/assets/cutscenes.py`
-  prints them; the Studio's Browse › Cutscenes shows each with its timeline.
-  The prologue is worked through end to end ([gcl/examples/prologue.md](../gcl/examples/prologue.md),
-  `tests/prologue.txt`), and scene detection now finds 496 scenes (142 had
-  `scene_start` flags other than 1). Decomp targets: `cutscenes.py --targets`
-  (the player, NPC, scene-actor and camera dispatchers; [CUTSCENES](CUTSCENES.md)).
-* **Scripts (GCL) became readable** (2026-10-15/16): the scene scripts are
-  Konami GCL. `gcl/` holds recovered names (registry keys, commands,
-  variables, defines, parameters, 199 procedures), the debug prints'
-  translations and a worked example; the Studio's Scripts page shows a
-  readable Python-style view, grouped into Konami's source files (scenes,
-  library by category, shared; `tools/assets/gclfiles.py`) with single-use
-  helpers inlined on request. See [gcl/README.md](../gcl/README.md).
-* **Script decomp targets**: [tasks/script_targets.md](tasks/script_targets.md)
-  ranks the native routines scripts call that are still unmatched (95 used,
-  23 KB at the start). The campaign started 2026-10-16: thirteen batches matched 97
-  of them, all of the original top 15 included (`trap`, 081D0C04 and
-  `place_character`'s 081CE1BC too), plus shared callees such as
-  AnimData_Load and Hud_SetMode
-  ([notes](../notes/script-entry-points_2026-10-16.md)). The near-misses,
-  FloorSwitch_Create and A4FC are guarded drafts; most of what is left is
-  large and inlines the packed-command sprite stepper (an unpinned form is
-  one register copy short; see the notes, batch 10). Regenerate the list with
-  `python3 tools/assets/script_targets.py --markdown docs/tasks/script_targets.md`.
-* **30% reached** (2026-10-15) with a credit correction: retained assembly
-  falsely absorbed by small C helpers was removed from the count
-  ([ASM_OUTPUT_QC.md](ASM_OUTPUT_QC.md), [SCALAR_APPROACH.md](SCALAR_APPROACH.md)).
-* No permuter search or matching worker is running. Frozen searches and their
-  candidates: [PERMUTER_HANDOFF_2026-10-15.md](PERMUTER_HANDOFF_2026-10-15.md).
+| Tool | What |
+|---|---|
+| `tools/scope/scope.py` | the matching workbench: diff, `why`, knobs, `try`, `probe`, `pins`, `new`/`land`/`rename`. Spec and findings: [tools/scope/README.md](../tools/scope/README.md); loop: [tools/scope/WORKER.md](../tools/scope/WORKER.md) |
+| `tools/scope/subsystem/` | a Codex worker per subsystem, each in its own worktree; committer, watcher, batch integration ([README](../tools/scope/subsystem/README.md)) |
+| `tools/scope/campaign.py` | the per-function variant: one Codex worker per draft in the main checkout, landed by `campaign.py integrate` |
+| `tools/check.py FILE.c` | exact check of one unit (`--nonmatching --record` scores a draft) |
+| `tools/worktree.sh NAME`, `tools/base.sh` | a worker worktree in seconds, cloned from the built base `../b3-base` |
+| `tools/progress.py` | PROGRESS.md / PROGRESS.json; `--list-pinned` |
+| `tools/codex_quota.py [--floor N]` | Codex weekly quota left, from Codex's own session logs |
+| `tools/relatives.py`, `rasolve.py`, `fix.py`, `hint.py`, `permute.py` | when stuck ([WORKER.md](WORKER.md) "When stuck") |
+| `tools/docindex.py [ADDR / --tag T]` | who wrote about an address or topic |
+| `tools/emu/harness`, `tools/studio/serve.py` | headless mGBA runs; the Studio (text, sprites, maps, actors, scripts) |
 
-## Before you start: don't redo work
+## Running workers
 
-1. `python3 tools/docindex.py ADDR` (or `grep -rn ADDR docs notes gcl`): earlier
-   attempts, skip reasons, near-matches and names for that function or its range.
-2. `python3 tools/worklist.py --range A B` shows what is unmatched;
-   `grep ADDR symbols/functions.csv` the current name and its source.
-3. A `#ifdef NONMATCHING` draft may already exist (`grep -rln ADDR src`); start
-   from it and update its recorded score.
-4. For a subsystem, find its doc in [INDEX.md](INDEX.md) (by tag or address
-   range) before reading code.
+Multi-worker campaigns need the user's explicit go-ahead and a Codex quota floor the user
+sets (`tools/codex_quota.py`). Codex (gpt-6.1-sol, reasoning high) does the bulk work;
+a Claude session coordinates, reviews and integrates. Start small (one worker per subsystem),
+measure usage for about 10 minutes, then scale. 16 workers used about 25 points of the
+weekly quota per hour. Codex sessions die on transient capacity and 429 errors:
+`tools/scope/subsystem/watch.sh` resumes them. The Codex sandbox cannot write `.git`, so
+commits are made outside it (`committer.sh`).
 
-## Standing rules and preferences
+Integration is batched: one commit per matched function on the worker branches. The
+coordinator cherry-picks them onto one branch, reviews the diff (no hand-written
+instructions, concession markers, no experiment notes in comments), runs one full `make`
+(`build/boktai3.gba: OK`), regenerates PROGRESS (`python3 tools/progress.py --markdown PROGRESS.md`,
+commit both files), then opens the PR and merges it.
 
-The rules are in `CLAUDE.md` and `AGENTS.md`; these are the user's standing
-preferences gathered from the history:
+## Standing preferences (the owner's)
 
-* Batched integration: one function per commit on a working branch, one
-  reviewed combined build (`build/boktai3.gba: OK`) per merge into `main`.
-* Multi-worker matching campaigns need the user's explicit authorization
-  (they used to be tied to an allowance floor). Tooling, naming and docs do not.
-* Do not recheck the live decomp.dev page per batch; local reports and Actions
-  suffice (2026-10-09).
-* Report progress as a percentage and percentage-point gain, bytes second.
-* Register pinning is an authorized, counted concession
-  (`// MATCHING_CONCESSION: register-pinning`); hand-written instruction
-  bodies are never allowed.
+* The phases and "aim for the final form" above. Concessions are a last resort.
+* ROM order; no easy-first sorting; stay on a function until it matches or the blocking
+  decision is proved; no per-function compile budgets; no blind spelling sweeps.
+* **Tooling first.** Every scope gap a worker hits is the next tool change. Workers
+  report where scope was confusing, wrong or missing; fold that into
+  tools/scope/README.md "Gaps" and fix the tool.
+* **Over-explain.** The owner follows along to learn how decompilation works: say what you
+  are doing and why, in plain terms.
+* Batched integration; merge a batch PR right after opening it once the ROM build is OK.
+  Tooling- and docs-only PRs skip the ROM build.
+* Don't block on corpus-wide compile or equivalence sweeps; fix mismatches when they happen.
+* Report progress as a percentage and percentage-point gain, bytes second; totals only in
+  PROGRESS.md and the badges.
 * Provisional names are welcome when marked tentative; don't block matching on naming.
+* Never `rm -rf` (move to `~/.Trash`). US spelling. No personal information in commits
+  (`tools/pii_check.py` runs in the hooks and CI).
 
 ## Setting up
 
-The ROM is never committed (nor anything derived from it: `build/`, `gen/`,
-`extracted/`). On the current Mac everything is set up: `baserom.gba`,
-`build/venv` (`source build/venv/bin/activate`), `build/tools`, `gen/`.
-On a fresh machine:
+The ROM is never committed (nor anything derived from it: `build/`, `gen/`, `extracted/`).
+On the owner's Mac everything is set up: `baserom.gba`, `build/venv`, `build/tools`, `gen/`,
+the built base `../b3-base`, scope's compiler in `build/scope/agbcc/`. On a fresh machine:
 
 ```
 ln -s /path/to/rom.gba baserom.gba        # SHA-1 above (Japanese, U33J)
@@ -151,87 +131,30 @@ pip install -r requirements.txt            # plus arm-none-eabi binutils, cmake,
 make setup      # gbadisasm (patched), agbcc, armips, permuter, emulator harness
 make disasm     # ~15-20 min: gen/code.s, gen/code_sym.s, gen/data.s
 make            # must print build/boktai3.gba: OK
+sh tools/scope/build_agbcc.sh              # scope's instrumented agbcc
 ```
 
 README.md has the macOS details.
 
-## Matching a function (the inner loop)
+## Beyond matching
 
-```
-python3 tools/worklist.py --range 08000000 080492B0 --max-insns 80   # unmatched, easiest first
-python3 tools/asmat.py 0800E08C 60      # the asm
-python3 tools/check.py wip/sub_0800E08C.c   # side-by-side diff; ends MATCH/MISMATCH
-python3 tools/build.py                  # combined build: must print OK
-```
-
-`docs/WORKER.md` is the playbook (agbcc tricks, data/RAM declarations, unit
-rules, naming with `#define` aliases and `tools/promote_names.py`).
-[REGALLOC.md](REGALLOC.md) covers steering register allocation;
-[PERMUTER.md](PERMUTER.md) the order to try `tools/litsweep.py`,
-`tools/regsolve.py` and `tools/permute.py FILE --run SECS --focus auto`.
-
-Parallel workers (only when authorized): give each `docs/WORKER_ROUND.md`;
-the earlier worktree layout, ranges, merge and clone-seeding procedure are in
-[history: former section 5](history/2026-10-early-state.md#former-section-5-running-parallel-workers-what-worked).
-
-## Tools
-
-| Tool | What |
-|---|---|
-| `tools/build.py`, `tools/check.py`, `tools/worklist.py` | build, check one file, list unmatched |
-| `tools/clones.py --port [--loose]` | copy matched C to identical clone functions; run after merges |
-| `tools/progress.py` | numbers; `--json` for the decomp.dev report |
-| `tools/docindex.py [ADDR / --tag T]` | docs index; who wrote about an address or topic |
-| `tools/emu/harness`, `tools/mgba/` | headless mGBA scripted runs; desktop Centaur script ([CENTAUR.md](CENTAUR.md)) |
-| `tools/studio/serve.py` | the Studio: text, sprites, maps, actors, scripts, code, live view (port 8642) |
-| `tools/assets/gcx.py`, `gclview.py`, `gclfiles.py`, `gclnames.py`, `gcloptions.py`, `gclroles.py` | scripts: Konami-style and readable views, source files, hash names, option schemas, generated scene procedure names |
-| `tools/assets/script_targets.py` | native code reachable from scripts, ranked unmatched targets |
-| `tools/assets/stages.py`, `hp.py`, `sprites.py`, `text.py` | stage scripts, terrain, sprites, text bank |
-| `tools/script_trace.py`, `tools/function_context.py`, `tools/coverage.py` | runtime evidence: script calls, screens a function runs on |
-
-## Known-hard classes
-
-Solved patterns are in `docs/WORKER.md`. Still open:
-
-1. A constant derived from another constant's register instead of separate
-   literals (081A6108, 081A6EF8, 0813BA24, 0814DF0C).
-2. `movs r1,#3; ands r1,r0` with the result in the constant's register (081F612C family).
-3. Stack `s16[3]` vectors addressed through a callee-saved register (081C43B0 family).
-4. Loops agbcc hoists or strength-reduces where the original recomputes (0811E8B0, 080150D0).
-5. Pure register-allocation swaps: the permuter, or register pinning.
-6. `CgbSound`, the last m4a function: registers left (`notes/cgb.md`).
-7. Consumed-return ABI boundaries: drafts with defined results only
-   ([ASM_OUTPUT_QC.md](ASM_OUTPUT_QC.md)).
-
-## Open work
-
-* Decompile the script-facing routines ([tasks/script_targets.md](tasks/script_targets.md));
-  each match also names its options automatically.
-* Script naming: procedures that wrap still-unnamed natives; instance-name
-  hashes (`chara TYPE NAME`); resource names, where numbered families need one
-  confirmed member to anchor them ([gcl/README.md](../gcl/README.md)).
-* Translation units: merge `src/fn/*.c` into contiguous units with shared
-  headers and structs ([UNIT_WORKER.md](UNIT_WORKER.md)).
-* Coverage: record playthroughs with Centaur; little code is exercised by the scripted tests.
-* Debug scenarios: `tools/mgba/scenario.lua` (docs/CENTAUR.md) warps, calls
-  any procedure (spawners included), sets variables, moves the player and
-  screenshots. Next: scenarios that reach the large-sprite palette variants the
-  scene survey misses (attacks, bosses, menus; hook AnimData_SelectPaletteBank
-  as `tools/mgba/palette_survey.lua` does).
-* Stitched maps: the Studio's Dungeons tab places an area's room maps by their
-  doors. Next: backdrop-aware drawing for outdoor areas, floors stacked
-  separately, and the whole world from the area links.
-* Translation (separate repo [boktai3trans](https://github.com/moozilla/boktai3trans)):
-  inserter with box-width checks, VWF via `Text_DrawGlyph` (`08218D1C`).
+The decomp serves the owner's translation and modding work. Those threads are documented
+on their own: scripts are Konami GCL ([gcl/README.md](../gcl/README.md); readable views and
+generated procedure names), cutscenes ([CUTSCENES.md](CUTSCENES.md)), saves and story
+progress ([ENGINE.md](ENGINE.md) section 14, `tools/assets/saves.py`, `story.py`), assets
+([ASSETS.md](ASSETS.md)), the Studio (`tools/studio/serve.py`), a showcase scene written
+into a ROM copy (`tools/showcase/`), and the translation repo
+[boktai3trans](https://github.com/moozilla/boktai3trans). Their open items are in
+[history/HANDOFF_2026-10-23.md](history/HANDOFF_2026-10-23.md) ("Open work").
 
 ## Recording your work
 
-* Per-batch details (accepted sources, skips with reasons, near-matches) go in
-  `notes/TOPIC_YYYY-MM-DD.md` with a `Tags:` line; subsystem knowledge in its
-  `docs/` file (also with `Tags:`).
-* A short dated summary goes at the top of the day's `docs/history/YYYY-MM-DD.md`
-  with a `Tags:` line under its heading; then update "Current state" and
-  "Recent work" here, replacing what they say rather than appending.
-* Mention function addresses as 8-digit hex (`0821B858`) and ranges as
-  `A–B`, so `docindex.py` and grep find them.
+* Per-batch details (what matched, what did not and why, the scope gaps hit) go in
+  `notes/TOPIC_YYYY-MM-DD.md` with a `Tags:` line; subsystem knowledge in its `docs/` file
+  (also with `Tags:`).
+* A short dated summary goes at the top of the day's `docs/history/YYYY-MM-DD.md` with a
+  `Tags:` line under its heading. Then update "Where things stand" here, replacing what it
+  says rather than appending.
+* Mention function addresses as 8-digit hex (`0821B858`) and ranges as `A–B`, so
+  `docindex.py` and grep find them.
 * Run `python3 tools/docindex.py` after adding or renaming docs.

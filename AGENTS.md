@@ -1,8 +1,16 @@
 # Boktai 3 agent entry point
 
-Read `README.md`, `CLAUDE.md`, `docs/HANDOFF.md`, then `docs/WORKER.md`.
-Look everything else up in `docs/INDEX.md` (`python3 tools/docindex.py ADDR`).
-The matching and evidence requirements in those files apply to every model.
+Read `README.md`, `CLAUDE.md`, `docs/HANDOFF.md` (the four phases, current state,
+the owner's preferences), then `docs/WORKER.md` and `tools/scope/WORKER.md` (the
+matching loop). Look everything else up in `docs/INDEX.md`
+(`python3 tools/docindex.py ADDR`). The matching and evidence requirements in those
+files apply to every model.
+
+Aim for the final form: C that matches with no register pins or barriers and reads
+like the original authors wrote it. Work in ROM order through a subsystem and stay on
+a function until it matches or the blocking compiler decision is proved with a scope
+knob; concessions are a last resort. Codex subsystem workers get
+`tools/scope/subsystem/BRIEF.md` (see that directory's README).
 
 Use `build/venv/bin/python` (or activate `build/venv`) for local tooling.
 Worker checkouts must have their own build outputs; only `gen/`, the ROM,
@@ -21,10 +29,11 @@ Nonmatching drafts are committed on `main` inside `#ifdef NONMATCHING ... #else
 INCLUDE_ASM(...) #endif`, with a fuzzy score recorded by
 `tools/check.py --nonmatching --record`. They never count as exact progress.
 Do not create new WIP branches for drafts.
-Name functions `Subsystem_VerbNoun` (e.g. `SceneIndicator_CreateFromScript`).
-Workers add a file-local `#define Name sub_XXXXXXXX` alias; the integrator runs
-`tools/promote_names.py` before merging a batch, which moves aliases into
-`symbols/functions.csv` and rewrites all references (then `make format`, `make`).
+Name functions `Subsystem_VerbNoun` (e.g. `SceneIndicator_CreateFromScript`):
+`scope.py rename FUNC NEW` or `scope.py land FUNC --name NEW` writes
+`symbols/functions.csv` and rewrites every reference. Older drafts may carry a
+file-local `#define Name sub_XXXXXXXX` alias; `tools/promote_names.py` moves those
+into `symbols/functions.csv` (then `make format`, `make`).
 Provisional descriptive names are welcome: mark uncertain interpretations as
 tentative and correct them as understanding improves. Do not block matching on
 a naming investigation. Coverage tags describe observed execution.

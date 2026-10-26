@@ -224,7 +224,7 @@ Goal: C that compiles to byte-identical code for {func} with agbcc -O2 -mthumb-i
 
 Read {context} first: the ROM's assembly, declarations for what it calls, and the C of
 matched relatives (start from a relative's C when one covers most of the function).
-Read docs/WORKER.md sections "agbcc matching tips" and the "Wrong values in the right shape"
+Read docs/AGBCC_TIPS.md, including "Wrong values in the right shape"
 bullet for compiler idioms.
 
 Write your C to wip/{run}/{func}.c: `#include "global.h"`, local declarations, then the one

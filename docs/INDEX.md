@@ -13,10 +13,11 @@ sizes in the table tell you what a file costs. Two lookups beat reading:
 
 **Start here.** [README](../README.md) (build, layout) · [CLAUDE.md](../CLAUDE.md)
 and [AGENTS.md](../AGENTS.md) (rules) · [HANDOFF](HANDOFF.md) (current state) ·
-[WORKER](WORKER.md) (matching playbook) · [WORKER_ROUND](WORKER_ROUND.md) and
-[UNIT_WORKER](UNIT_WORKER.md) (worker briefs).
+[WORKER](WORKER.md) (matching playbook) · [scope](../tools/scope/README.md) (the matching
+workbench; [loop](../tools/scope/WORKER.md)) · [subsystem runs](../tools/scope/subsystem/README.md)
+(Codex workers per subsystem) · [UNIT_WORKER](UNIT_WORKER.md) (unit consolidation brief).
 
-**Matching craft.** [WORKER](WORKER.md) (agbcc tricks) · [AGBCC_RULES](AGBCC_RULES.md) (why agbcc chose it; `tools/why.py`) · [REGALLOC](REGALLOC.md) ·
+**Matching craft.** [scope facts](../tools/scope/README.md) ("agbcc facts established with scope") · [AGBCC_TIPS](AGBCC_TIPS.md) (pre-scope patterns) · [AGBCC_RULES](AGBCC_RULES.md) (why agbcc chose it; `tools/why.py`) · [REGALLOC](REGALLOC.md) ·
 [FOUNDRY](FOUNDRY.md) (asm-to-match pipeline and funnel numbers) · [BIG_FUNCTIONS](BIG_FUNCTIONS.md) (anchordiff, variants, rtlprobe: 500+ instruction functions) · [PERMUTER](PERMUTER.md) (permuter fork, regsolve, litsweep, chunks) ·
 [MODEL_BENCHMARK](MODEL_BENCHMARK.md) (explain.py/idioms.py vs check.py with Haiku/Sonnet) ·
 [COMPILER_REFERENCES](COMPILER_REFERENCES.md) · [EDS wiki](external/eds/README.md)
@@ -91,6 +92,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/ACTOR_ATTACHMENT.md](../docs/ACTOR_ATTACHMENT.md) | Actor attachment state and offsets | *#actors* | 9 |
 | [docs/ACTOR_ATTACHMENT_MANAGER.md](../docs/ACTOR_ATTACHMENT_MANAGER.md) | Attachment manager lifecycle and scene actor pool prefix | *#actors #scene #assets* | 8 |
 | [docs/AGBCC_RULES.md](../docs/AGBCC_RULES.md) | agbcc rules: why the compiler wrote it that way | #matching #regalloc #tooling | 4 |
+| [docs/AGBCC_TIPS.md](../docs/AGBCC_TIPS.md) | agbcc matching tips (pre-scope playbook) | #matching | 8 |
 | [docs/ANIMATION_081E.md](../docs/ANIMATION_081E.md) | Animation controller matching batch | *#scripts #animation #assets #matching* | 5 |
 | [docs/ASM_OUTPUT_QC.md](../docs/ASM_OUTPUT_QC.md) | Empty-asm outputs and return-value QC |  | 9 |
 | [docs/ASSETS.md](../docs/ASSETS.md) | Resources and asset formats | *#scripts #assets #text #tooling* | 33 |
@@ -114,13 +116,12 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/FINDINGS.md](../docs/FINDINGS.md) | Engine findings |  | 5 |
 | [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 34 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 14 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 9 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LEVEL_ADVANCE_DISPLAY.md](../docs/LEVEL_ADVANCE_DISPLAY.md) | Level advancement display (tentative presentation identity) |  | 4 |
 | [docs/LIBGCC.md](../docs/LIBGCC.md) | Floating-point runtime identification | *#library* | 4 |
 | [docs/LIBM.md](../docs/LIBM.md) | Math-library source matches | *#library #text* | 5 |
-| [docs/MANAGER_HANDOFF.md](../docs/MANAGER_HANDOFF.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/MENU_CONTEXT.md](../docs/MENU_CONTEXT.md) | Pause-menu config, sleep, and save context | *#menu* | 3 |
 | [docs/MGS_GCL_MATCHING.md](../docs/MGS_GCL_MATCHING.md) | Boktai 3 / MGS GCL matching evidence | *#scripts #matching* | 66 |
 | [docs/MODEL_BENCHMARK.md](../docs/MODEL_BENCHMARK.md) | Small-model matching benchmark: explain.py vs check.py | #matching #tooling | 13 |
@@ -198,8 +199,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/STACKED_ACTOR.md](../docs/STACKED_ACTOR.md) | Stacked display actor (tentative identity) | *#actors #particles #assets* | 5 |
 | [docs/TERRAIN_EDGE_MARKER.md](../docs/TERRAIN_EDGE_MARKER.md) | Terrain edge marker manager (tentative identity) | *#scripts* | 4 |
 | [docs/UNIT_WORKER.md](../docs/UNIT_WORKER.md) | Subsystem unit worker | *#text* | 4 |
-| [docs/WORKER.md](../docs/WORKER.md) | Worker brief: family-oriented matching | *#matching #process* | 27 |
-| [docs/WORKER_ROUND.md](../docs/WORKER_ROUND.md) | Standard round brief (only when workers are authorized) |  | 3 |
+| [docs/WORKER.md](../docs/WORKER.md) | Worker playbook: matching with scope | #matching #process | 7 |
 | [docs/tasks/m4a.md](../docs/tasks/m4a.md) | Task: lift the MP2K (m4a) sound library from pokeemerald | *#sound #library* | 3 |
 | [docs/tasks/relatives.md](../docs/tasks/relatives.md) | Unmatched functions with matched relatives | *#tooling* | 35 |
 | [docs/tasks/script_targets.md](../docs/tasks/script_targets.md) | Decomp targets: the code the scripts call | *#scripts #assets #tooling* | 2 |
@@ -214,7 +214,11 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-23-cx-sol08.md](../docs/history/2026-10-23-cx-sol08.md) | 2026-10-23 — cx-sol08 actor campaign batch | #actors #compiler-debugger #matching #mimic #particles #register-pinning #weather | 2 |
 | [docs/history/2026-10-23.md](../docs/history/2026-10-23.md) | Campaign sol05 session 2 wrap-up | #actors #animation #axe #bosses #camera #campaign #charge #compiler #effect-pool #effects #hresvelgr #inventory #ivy #linked-effect #map-menu #matching #monster-book #monsters #mummy #nidhoggr #nonmatching #palette #particles #player #ratatosk #reactions #register-pinning #registry-f3e4 #scene-actor #scene-actors #scene-npc #screamer #script-combat-actor #singleton-slot7 #slime #spider #sprite-effects #tentacle #terrain #vanargand #wireless | 19 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
+| [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
+| [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 16 |
+| [docs/history/WORKER_2026-10-24.md](../docs/history/WORKER_2026-10-24.md) | Worker brief: family-oriented matching |  | 27 |
+| [docs/history/WORKER_ROUND_2026-10-12.md](../docs/history/WORKER_ROUND_2026-10-12.md) | Standard round brief (only when workers are authorized) |  | 3 |
 | [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 17 |
 | [gcl/examples/prologue.md](../gcl/examples/prologue.md) | Worked example: the prologue, from New Game to the Sealed Prison | *#scripts #assets #tooling* | 9 |
 | [gcl/examples/scale_quiz.md](../gcl/examples/scale_quiz.md) | Worked example: the Blackbeard Brothers' scale quiz | *#scripts #assets #tooling* | 10 |
@@ -382,6 +386,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/stage-icon-display_2026-10-14.md](../notes/stage-icon-display_2026-10-14.md) | Staged keyframe icon display |  | 3 |
 | [notes/staged-effect_2026-10-14.md](../notes/staged-effect_2026-10-14.md) | Contiguous staged effect subsection (Sol, 2026-10-14) | *#tooling* | 4 |
 | [notes/sub_082392E8.md](../notes/sub_082392E8.md) | sub_082392E8.md | *#particles* | 1 |
+| [notes/subsystem-run_2026-10-25.md](../notes/subsystem-run_2026-10-25.md) | Subsystem scope run, 2026-10-25/26 | #process #tooling #matching | 4 |
 | [notes/tether-emission-palette_2026-10-14.md](../notes/tether-emission-palette_2026-10-14.md) | Tether actor emissions, palette and movement effects, October 14 | *#actors #tether #assets* | 8 |
 | [notes/tether-initialization_2026-10-14.md](../notes/tether-initialization_2026-10-14.md) | Tether initialization, charge and flagged terrain | *#actors #tether* | 7 |
 | [notes/tether-interaction_2026-10-14.md](../notes/tether-interaction_2026-10-14.md) | Tether actor entry, interaction and script controls | *#scripts #actors #tether* | 5 |

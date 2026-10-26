@@ -42,17 +42,25 @@ write `~`). The hooks in `.githooks` and the CI job run `tools/pii_check.py`.
 
 ## Decompiling a function
 
-1. Look at it: `python3 tools/asmat.py 0811D14C 60`. Ghidra's pseudo-C, if
-   you have the export (`tools/ghidra/README.md`), is a starting draft only.
-2. Write C in the unit's file. Unfinished neighbours stay as
-   `INCLUDE_ASM("asm/nonmatching", sub_XXXXXXXX);` so the unit stays contiguous.
-3. `make format`, then `make`. On a mismatch it prints the first differing address. Compare with
-   `arm-none-eabi-objdump -d build/src/<unit>.o` against `tools/asmat.py`.
+The project is in phases 2 and 3 of four (draft, match, no concessions, cleanup;
+`docs/HANDOFF.md`). Aim for the final form: matching C with no pins, written like
+the original. Go through a subsystem in ROM order and stay on a function until it
+matches. The loop is `tools/scope/WORKER.md`; the frame is `docs/WORKER.md`.
+
+1. Look at it: `python3 tools/scope/scope.py rom FUNC` (calls and literals named),
+   `scope.py like FUNC` and `tools/relatives.py FUNC --c` (similar matched C),
+   `scope.py fields OFF...` (structs with members at those offsets).
+2. Compile a copy of the unit with scope: `python3 tools/scope/scope.py FILE.c FUNC`
+   prints MATCH or the differing hunks with the C line and compiler pass behind each.
+   `why UID` explains a difference; confirm with a what-if knob
+   (`AGBCC_PRI=name:+N`, ...), then find C with the same effect.
+3. Land a match with `scope.py land FUNC` (merges into the unit, formats, checks
+   it); `tools/check.py FILE.c` is the exact check of one unit. Unfinished
+   neighbours stay as `INCLUDE_ASM("asm/nonmatching", sub_XXXXXXXX);`.
 4. Compiler facts: `agbcc -O2 -mthumb-interwork` (pret's agbcc). Leaf
-   functions push `lr`, which agbcc does and old_agbcc doesn't. Typical agbcc
-   tricks apply: declaration order changes register allocation, `do {} while`
-   vs `for` changes loop shape, a temporary variable affects the order of
-   `if`/`else` blocks.
+   functions push `lr`, which agbcc does and old_agbcc doesn't. scope's
+   findings: `tools/scope/README.md` "agbcc facts established with scope";
+   the Yu-Gi-Oh! EDS catalog: `docs/external/eds/matching-tricks.md`.
 5. Library code exists already. MP2K (`m4a`) functions match pokeemerald's
    `src/m4a.c` byte-for-byte (43 identified, see `symbols/functions.csv`),
    and `libagbsyscall` is standard. Use `tools/sigmatch.py OBJ.o` to find more
