@@ -25,6 +25,6 @@ init:
         sprite = (struct SparkParticleSprite *)((u8 *)sprite + sizeof(struct SparkParticle));
         i--;
     } while (i >= 0);
-    gUnk_02000168 = pool;
+    gSparkParticlePool = pool;
     return 0;
 }

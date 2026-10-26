@@ -3,8 +3,8 @@ void SceneActorProfiles_FreeAll(void);
 s32 SceneActorRegistry_DestroyManager(struct SceneActorRegistryManager *unusedManager)
 {
     SceneActorRegistry_DestroyActors();
-    Heap_Free(gUnk_020004AC);
+    Heap_Free(gSceneActorRegistryNode);
     SceneActorProfiles_FreeAll();
-    gUnk_020004A8 = 0;
+    gSceneActorRegistryManager = 0;
     return 0;
 }

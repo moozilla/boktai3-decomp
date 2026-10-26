@@ -62,7 +62,7 @@ struct DirectionalScriptArgs {
     s32 *values;
 };
 
-extern struct DirectionalManager *gUnk_02000038;
+extern struct DirectionalManager *gDirectionalManager;
 extern u32 gUnk_02000560;
 extern u16 gUnk_03005260[];
 extern void *gUnk_086049F4[];

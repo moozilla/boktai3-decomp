@@ -6,7 +6,7 @@
 /* Advance state-four actors without touching their entry latch. */
 void SceneSteeringActor_FinishSettledAll(void)
 {
-    struct SceneSteeringActorPool *pool = gUnk_02000188;
+    struct SceneSteeringActorPool *pool = gSceneSteeringActorPool;
     if (pool) {
         u32 replacement = 5;
         u8 *state = &pool->slots[0].state;

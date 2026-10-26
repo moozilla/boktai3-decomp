@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct ContactPosition {
     s16 x, y, z, pad;
 } __attribute__((aligned(4)));
@@ -30,7 +31,6 @@ struct SpreadShotExtent {
     u32 : 16;
 };
 struct PairSlotPool;
-extern struct PairSlotPool *gUnk_02000148;
 struct PairSlotPool *SceneTerrainProbe_EnsurePool(void);
 struct SpreadShot *PairSlotPool_Allocate(struct PairSlotPool *);
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
@@ -62,7 +62,7 @@ s32 SpreadShot_Create(struct ContactPosition *position, struct ContactPosition *
 
     if (!position)
         return -1;
-    pool = gUnk_02000148;
+    pool = gPairSlotPool;
     if (!pool) {
         pool = SceneTerrainProbe_EnsurePool();
         if (!pool)

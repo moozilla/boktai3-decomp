@@ -2,7 +2,7 @@
 void Widget_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
 void ScriptKeyframe_AddFromScript(void)
 {
-    struct ScriptKeyframeManager *manager = gUnk_02000498;
+    struct ScriptKeyframeManager *manager = gScriptKeyframeManager;
     struct ScriptKeyframeEntry *entry;
     struct ProjectedDisplayResource *resource;
     struct ContactPosition *position;
@@ -65,5 +65,5 @@ void ScriptKeyframe_AddFromScript(void)
     else
         entry->conditionalVisibility = value;
     entry->hidden = 0;
-    gUnk_02000498->count++;
+    gScriptKeyframeManager->count++;
 }

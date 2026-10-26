@@ -7,6 +7,6 @@ void SceneActorRegistry_InitializeList(struct SceneActorRegistryManager *manager
     node = manager->sentinel;
     node->next = 0;
     node->actor = 0;
-    gUnk_020004AC = node;
+    gSceneActorRegistryNode = node;
     manager->cursor = node;
 }

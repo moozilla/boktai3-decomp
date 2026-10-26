@@ -203,12 +203,12 @@ u32 TriggerManager_InsertTrigger(struct Trigger *p)
 {
     struct Trigger *t;
     p->previous = 0;
-    p->next = gUnk_02000030->head;
+    p->next = gTriggerManager->head;
     t = p->next;
     if (t) {
         t->previous = p;
     }
-    gUnk_02000030->head = p;
+    gTriggerManager->head = p;
     return 0;
 }
 u32 TriggerManager_RemoveTrigger(struct Trigger *p)
@@ -218,7 +218,7 @@ u32 TriggerManager_RemoveTrigger(struct Trigger *p)
     if (a) {
         a->next = b;
     } else {
-        gUnk_02000030->head = b;
+        gTriggerManager->head = b;
     }
     if (b) {
         b->previous = a;
@@ -362,7 +362,7 @@ s32 Trigger_UpdateProximity(struct TriggerManager *manager, struct Trigger *p)
 
 s32 Trigger_TryOpenNearby(struct TriggerOpener *actor)
 {
-    struct TriggerManager *manager = gUnk_02000030;
+    struct TriggerManager *manager = gTriggerManager;
     struct Trigger *p;
     s32 index;
     if (!manager)
@@ -683,7 +683,7 @@ void Trigger_UpdateOpeningAnimation(struct TriggerManager *manager, struct Trigg
             p->update = Trigger_UpdateActivation;
         }
         p->timer = 0;
-        Anim_SetSequence(p->animation, gUnk_02000030->resource, 6, 0, 0);
+        Anim_SetSequence(p->animation, gTriggerManager->resource, 6, 0, 0);
     } else
         p->timer++;
 }
@@ -822,7 +822,7 @@ void Trigger_UpdateLockedPause(struct TriggerManager *manager, struct Trigger *p
     if (p->timer > 31) {
         p->update = Trigger_UpdateLockedRecovery;
         p->timer = 0;
-        Anim_SetSequence(p->animation, gUnk_02000030->resource, 5, 0, 4);
+        Anim_SetSequence(p->animation, gTriggerManager->resource, 5, 0, 4);
     }
     p->timer++;
 }
@@ -1074,13 +1074,13 @@ u32 TriggerManager_DestroyManager(struct TriggerManager *s)
         Trigger_Destroy(n);
         n = next;
     }
-    gUnk_02000030 = 0;
+    gTriggerManager = 0;
     return 0;
 }
 s32 TriggerManager_Initialize(struct TriggerManager *p, void *unused)
 {
     s32 i;
-    gUnk_02000030 = p;
+    gTriggerManager = p;
     p->graphics = AnimData_FindEntry(7194);
     p->kind = 14454;
     p->resource = ScriptProc_Start(37422, 39666);
@@ -1133,10 +1133,10 @@ void *TriggerManager_InitManager(void *a, void *b)
 
 struct TriggerManager *TriggerManager_GetOrCreate(void)
 {
-    if (gUnk_02000030 == 0) {
+    if (gTriggerManager == 0) {
         return TriggerManager_InitManager(0, 0);
     }
-    return gUnk_02000030;
+    return gTriggerManager;
 }
 
 s32 Trigger_CreateDrop(struct SceneVec *position, s32 id, s32 kind, u32 script, u32 *arguments,

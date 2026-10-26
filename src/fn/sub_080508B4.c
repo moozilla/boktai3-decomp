@@ -6,8 +6,8 @@ u32 OrbitBackground_IsEnabled(void)
     if (value == 1)
         special = 1;
     if (!special) {
-        if (gUnk_0200048C)
-            return gUnk_0200048C->enabled;
+        if (gOrbitBackground)
+            return gOrbitBackground->enabled;
     }
     return 0;
 }

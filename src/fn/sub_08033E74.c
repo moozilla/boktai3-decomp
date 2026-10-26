@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 struct Transition {
     u8 pad0[0x18];
     u8 state, entered, index, lastIndex;
@@ -11,7 +12,6 @@ struct Transition {
     s16 delays[64];
     u16 fadeIn[64], fadeOut[64], x[64], y[64], width[64], height[64];
 };
-extern struct Transition *gUnk_020000E8;
 extern u16 gUnk_03004FC0, gUnk_03005260[];
 void MessageWindow_SetBounds(int, int, int, int);
 void MessageWindow_ShowMessage(int);
@@ -28,7 +28,7 @@ void DialogueTransition_SetState(struct Transition *, int);
 void DialogueTransition_ApplyEntryBounds(struct Transition *);
 int DialogueTransition_OnTaskDestroy(struct Transition *p)
 {
-    gUnk_020000E8 = 0;
+    gTransition = 0;
     MessageWindow_Clear();
     if (p->flags & 1)
         gDispCntShadow = p->savedRegister;

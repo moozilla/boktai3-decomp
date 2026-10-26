@@ -6,7 +6,7 @@
 #define EffectManager_ClearGlobal sub_0800A800
 void EffectManager_ClearGlobal(void)
 {
-    gUnk_02000040 = 0;
+    gEffectManager = 0;
 }
 
 u32 EffectManager_RemoveEffect(struct EffectManager *manager, struct Effect *effect)
@@ -22,7 +22,7 @@ u32 EffectManager_RemoveEffect(struct EffectManager *manager, struct Effect *eff
 
 s32 EffectManager_RemoveActiveEffects(void *unused)
 {
-    struct EffectManager *manager = gUnk_02000040;
+    struct EffectManager *manager = gEffectManager;
     struct Effect *effect;
     s32 i;
     if (manager == 0)
@@ -198,7 +198,7 @@ s32 EffectManager_DestroyManager(struct EffectManager *manager)
     }
     {
         u32 z = 0;
-        gUnk_02000040 = (struct EffectManager *)z;
+        gEffectManager = (struct EffectManager *)z;
     }
     return 0;
 }
@@ -207,7 +207,7 @@ s32 EffectManager_Init(struct EffectManager *manager, void *unused)
 {
     s32 i, j;
     struct EffectSprite *sprite;
-    gUnk_02000040 = manager;
+    gEffectManager = manager;
     manager->graphics = AnimData_FindEntry(0x1c1a);
     manager->animation = ScriptProc_Start(0x922e, 0xd1b8);
     for (i = 0; i < 6; i++) {
@@ -270,7 +270,7 @@ s32 EffectManager_SpawnParticles(s32 count, u32 type, u32 kind, struct EffectVec
                                  struct EffectVec *spread, s32 timerBase, s32 timerRange)
 {
     u32 lifetime;
-    struct EffectManager *manager = gUnk_02000040;
+    struct EffectManager *manager = gEffectManager;
     s32 reverse, i, n, phase;
     struct Effect *effect;
     if (!manager) {
@@ -408,7 +408,7 @@ s32 EffectManager_SpawnParticlesAt(s32 count, u32 type, u32 kind, struct EffectV
                                    struct EffectVec *positions, s32 timerBase, s32 timerRange)
 {
     u32 lifetime;
-    struct EffectManager *manager = gUnk_02000040;
+    struct EffectManager *manager = gEffectManager;
     s32 reverse, i, n, phase;
     struct Effect *effect;
     if (!manager) {
@@ -541,7 +541,7 @@ s32 EffectManager_SpawnParticlesAt(s32 count, u32 type, u32 kind, struct EffectV
 }
 s32 sub_0800B2F4(void)
 {
-    struct EffectManager *manager = gUnk_02000040;
+    struct EffectManager *manager = gEffectManager;
     s32 total, i;
     if (manager == NULL)
         return 0;
@@ -555,7 +555,7 @@ s32 sub_0800B2F4(void)
 }
 void EffectManager_ConvertHomingToDrift(void)
 {
-    struct EffectManager *manager = gUnk_02000040;
+    struct EffectManager *manager = gEffectManager;
     s32 i, n;
     if (!manager)
         return;

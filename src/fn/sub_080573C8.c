@@ -11,7 +11,7 @@ s32 LevelAdvanceDisplay_DestroyManager(struct LevelAdvanceManager *manager)
     }
     {
         u32 zero = 0;
-        gUnk_02000120 = (void *)zero;
+        gLevelAdvanceManager = (void *)zero;
     }
     return 0;
 }

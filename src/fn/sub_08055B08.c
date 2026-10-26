@@ -4,8 +4,8 @@ s32 ScriptKeyframe_DestroyManager(struct ScriptKeyframeManager *);
 s32 ScriptKeyframe_InitManager(struct ScriptKeyframeManager *, u32, u32, u32);
 struct ScriptKeyframeManager *ScriptKeyframe_CreateManagerFromScript(u32 arg1, u32 arg2)
 {
-    if (gUnk_02000498)
-        return gUnk_02000498;
+    if (gScriptKeyframeManager)
+        return gScriptKeyframeManager;
     {
         struct ScriptKeyframeManager *manager;
         u32 capacity;

@@ -18,7 +18,7 @@ struct ScriptKeyframeManager {
     u8 capacity, count, unknown1A[2];
     struct ScriptKeyframeEntry entries[1];
 };
-extern struct ScriptKeyframeManager *gUnk_02000498;
+extern struct ScriptKeyframeManager *gScriptKeyframeManager;
 struct ScriptKeyframeEntry *ScriptKeyframe_FindFromScript(void);
 void ScriptKeyframe_UpdateEntry(struct ScriptKeyframeEntry *);
 u32 ScriptKeyframe_TickManager(struct ScriptKeyframeManager *);

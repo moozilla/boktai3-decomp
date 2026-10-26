@@ -24,7 +24,6 @@ struct ParticleManager {
     u8 animations[32][16];
 };
 
-extern struct ParticleManager *gUnk_020001DC;
 extern const u16 gUnk_086141BC[];
 extern u8 *gGameState;
 
@@ -57,7 +56,7 @@ s32 sub_08114E68(struct ParticleVec *position, s16 *range, s16 *spread, s32 coun
     s32 i;
     if (!position)
         return -1;
-    m = gUnk_020001DC;
+    m = gParticleManager;
     if ((!m) && (!(m = EffectPool_CreateManager())))
         return -1;
     for (i = 0; i < count; i++) {

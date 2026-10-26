@@ -1,8 +1,8 @@
 #include "stage_icon_display.h"
 struct StageIconDisplay *StageIconDisplay_CreateFromScript(void)
 {
-    if (gUnk_0200011C)
-        return gUnk_0200011C;
+    if (gStageIconDisplay)
+        return gStageIconDisplay;
     {
         struct StageIconDisplay *display = Task_Create(4, sizeof(struct StageIconDisplay));
         if (display) {

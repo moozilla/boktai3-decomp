@@ -1,17 +1,17 @@
 #include "global.h"
 #include "engine.h"
-extern void *gUnk_020001A0;
+extern void *gSceneActorContactManager;
 void SceneActorContacts_Update(void *);
 void SceneActorContacts_Destroy(void *);
 s32 SceneActorContacts_SetOwner(void *, u16);
 /* Registry routine D854: returns the scene actor contact manager
-   (gUnk_020001A0), or creates it
+   (gSceneActorContactManager), or creates it
    (0x2C-byte task) for the given id. */
 void *SceneActorContacts_Create(u16 id)
 {
     void *p;
-    if (gUnk_020001A0)
-        return gUnk_020001A0;
+    if (gSceneActorContactManager)
+        return gSceneActorContactManager;
     p = Task_Create(8, 0x2C);
     if (p) {
         Task_SetCallbacks(p, SceneActorContacts_Update, SceneActorContacts_Destroy);

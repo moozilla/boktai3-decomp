@@ -40,7 +40,7 @@ void SceneActorRegistry_ResetEligibleCategoryState(void)
     struct SceneActorRegistryNode *node;
     register struct SceneActorRegistryActor *actor asm("r3");
     SceneActorRegistry_GetManager();
-    node = gUnk_020004AC;
+    node = gSceneActorRegistryNode;
     actor = node->actor;
     if (actor) {
         register u32 excluded asm("r10") = 0x20000;

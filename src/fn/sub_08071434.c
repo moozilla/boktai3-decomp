@@ -1,7 +1,7 @@
 #include "scene_actor_registry.h"
 void SceneActorRegistry_DestroyActors(void)
 {
-    struct SceneActorRegistryNode *node = gUnk_020004AC;
+    struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
     struct SceneActorRegistryActor *actor;
     if (node) {
         while ((actor = node->actor) != 0) {

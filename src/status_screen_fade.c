@@ -1,6 +1,7 @@
 #include "status_screen.h"
 #include "engine.h"
-/* NumericOverlay_ClearActive: sets gUnk_02000048 (the live NumericOverlay pointer, per numeric_overlay.h) back to NULL; twin of NumericOverlay_Destroy in numeric_overlay.c */
+#include "numeric_overlay.h"
+/* NumericOverlay_ClearActive: sets gNumericOverlay (the live NumericOverlay pointer, per numeric_overlay.h) back to NULL; twin of NumericOverlay_Destroy in numeric_overlay.c */
 #define NumericOverlay_ClearActive sub_0800F4B8
 // MATCHING_CONCESSION: register-pinning
 
@@ -59,7 +60,7 @@ void StatusScreen_WaitForStart(struct StatusScreen *p)
                 }
             }
             {
-                struct StatusScreen *target = gUnk_02000044;
+                struct StatusScreen *target = gStatusScreen;
                 {
                     register void (*state)(struct StatusScreen *) = StatusScreen_Reveal;
                     target->state = state;
@@ -223,7 +224,7 @@ int StatusScreen_Destroy(struct StatusScreen *p)
     gUnk_03003A00 = (void *)0x0400004C;
     gUnk_03004270 = 1;
     gUnk_03004274 = 0;
-    gUnk_02000044 = 0;
+    gStatusScreen = 0;
     return result;
 }
 
@@ -231,7 +232,7 @@ int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
 {
     int i;
     u8 *map, *palette;
-    gUnk_02000044 = p;
+    gStatusScreen = p;
     {
         u16 *flags = &gDispCntShadow;
         {
@@ -325,8 +326,7 @@ void *StatusScreen_Open(u32 arg)
     return obj;
 }
 
-extern u32 gUnk_02000048;
 void sub_0800F4B8(void)
 {
-    gUnk_02000048 = 0;
+    gNumericOverlay = 0;
 }

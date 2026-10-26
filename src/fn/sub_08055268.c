@@ -3,7 +3,7 @@
 void Anim_SetDurationScale(void *, u32);
 void DisplayTrack_AddFromScript(void)
 {
-    struct DisplayTrackManager *manager = gUnk_02000494;
+    struct DisplayTrackManager *manager = gDisplayTrackManager;
     struct DisplayTrack *track;
     struct ContactSwarmSprite *savedSprite;
     struct DisplayTrackGraphics *graphics;
@@ -191,5 +191,5 @@ void DisplayTrack_AddFromScript(void)
             Shadow_Initialize(track->ownedResource, &track->sprite.position, 0);
         }
     }
-    gUnk_02000494->count++;
+    gDisplayTrackManager->count++;
 }

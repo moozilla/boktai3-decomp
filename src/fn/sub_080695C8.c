@@ -23,6 +23,6 @@ s32 BouncingObject_DestroyPool(struct BouncingPool *input)
         }
         i++;
     } while (i < 12);
-    gUnk_0200014C = NULL;
+    gBouncingPool = NULL;
     return 0;
 }

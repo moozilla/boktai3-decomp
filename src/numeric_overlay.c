@@ -107,7 +107,7 @@ u32 NumericOverlay_Update(struct NumericOverlay *p)
 
 u32 NumericOverlay_Destroy(void)
 {
-    gUnk_02000048 = 0;
+    gNumericOverlay = 0;
 }
 
 // The status screen initializer without its timers, fades and scanline state: load the map and
@@ -119,7 +119,7 @@ s32 sub_0800F6F8(struct NumericOverlay *p, u16 id)
     u16 *tiles;
     u16 *buffer;
     int row;
-    gUnk_02000048 = p;
+    gNumericOverlay = p;
     p->id = id;
     p->flags = Script_GetKeywordValue('f', 0);
     p->mapId = 0x5AF3;

@@ -2,7 +2,7 @@
 #include "scene_actor_registry.h"
 s32 SceneActorRegistry_CountAvailable(void)
 {
-    struct SceneActorRegistryNode *node = gUnk_020004AC;
+    struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
     struct SceneActorRegistryActor *actor = node->actor;
     s32 count = 0;
     if (actor) {

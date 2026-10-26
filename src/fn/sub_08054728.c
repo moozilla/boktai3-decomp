@@ -13,6 +13,6 @@ s32 HitSwitch_DestroyManager(struct HitSwitchManager *manager)
         if (entry->cellRegistered)
             TerrainModifiers_UnregisterCell(&entry->cellRef);
     }
-    gUnk_02000490 = 0;
+    gHitSwitchManager = 0;
     return 0;
 }

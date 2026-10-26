@@ -5,8 +5,8 @@ s32 SpriteEffectController_DestroyPool(struct SpriteEffectControllerPool *);
 struct SpriteEffectControllerPool *SpriteEffectController_EnsurePool(void)
 {
     struct SpriteEffectControllerPool *p;
-    if (gUnk_02000178)
-        return gUnk_02000178;
+    if (gSpriteEffectControllerPool)
+        return gSpriteEffectControllerPool;
     p = Task_Create(10, sizeof(*p));
     if (p) {
         Task_SetCallbacks(p, (void (*)(void *))SpriteEffectController_UpdatePool,

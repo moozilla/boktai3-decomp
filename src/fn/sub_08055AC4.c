@@ -10,6 +10,6 @@ s32 ScriptKeyframe_DestroyManager(struct ScriptKeyframeManager *manager)
             i++;
         } while (i < manager->count);
     }
-    gUnk_02000498 = 0;
+    gScriptKeyframeManager = 0;
     return 0;
 }

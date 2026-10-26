@@ -44,7 +44,7 @@ struct AnimatedHazardManager {
     struct AnimatedHazard hazards[8];
 };
 
-extern struct AnimatedHazardManager *gUnk_02000050;
+extern struct AnimatedHazardManager *gAnimatedHazardManager;
 
 struct SceneVec *Player_GetEffectivePosition(s32);
 void Collider_SetAttackPowerAndForce(void *, s32, s32);

@@ -5,8 +5,8 @@ s32 RouteSpritePool_Initialize(struct RouteSpritePool *);
 struct RouteSpritePool *RouteSpritePool_Create(void)
 {
     struct RouteSpritePool *pool;
-    if (gUnk_02000198)
-        return gUnk_02000198;
+    if (gRouteSpritePool)
+        return gRouteSpritePool;
     pool = Task_Create(10, sizeof(*pool));
     if (pool) {
         Task_SetCallbacks(pool, (void (*)(void *))RouteSpritePool_Tick,

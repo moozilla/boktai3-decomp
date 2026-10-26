@@ -1,11 +1,11 @@
 #include "global.h"
 
-extern u8 *gUnk_02000090;
+extern u8 *gWeatherState;
 
 u32 Weather_IsActive(void)
 {
-    if (gUnk_02000090 != 0) {
-        if (gUnk_02000090[0x26] == 0) {
+    if (gWeatherState != 0) {
+        if (gWeatherState[0x26] == 0) {
             return 1;
         }
     }

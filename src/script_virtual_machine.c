@@ -1,4 +1,5 @@
 #include "script_virtual_machine.h"
+#include "ram.h"
 
 s32 Script_FindResourceKey(u32 key, u16 *tbl, s32 x, s32 lo, s32 hi)
 {
@@ -578,7 +579,7 @@ u32 *Script_ReadProcTable(u32 *p, u32 *n)
 u8 *Script_GetProcedure(u32 id, u32 *out)
 {
     u32 idx = (id & 0x7FFFFFFF) - 1;
-    struct ScriptProcedureTable *t = &gUnk_02000438;
+    struct ScriptProcedureTable *t = &gScriptProcedureTable;
     u32 *e = t->entries + idx;
     *out = ((u8 *)e)[3];
     return t->body + (e[0] & 0xFFFFFF);
@@ -650,7 +651,7 @@ static inline u32 read_word(u8 *p)
 s32 Script_LoadScript(u8 *p)
 {
     u32 count;
-    struct ScriptProcedureTable *ctx = &gUnk_02000438;
+    struct ScriptProcedureTable *ctx = &gScriptProcedureTable;
     u8 *base;
     gUnk_0200060C = read_word(p);
     p += 4;
@@ -691,7 +692,7 @@ struct Block0821AEDC {
 
 void sub_0821AEDC(struct Block0821AEDC *dst)
 {
-    dst[0] = *(struct Block0821AEDC *)&gUnk_02000438;
+    dst[0] = *(struct Block0821AEDC *)&gScriptProcedureTable;
     dst[1] = *(struct Block0821AEDC *)&gUnk_02000448;
 }
 
@@ -705,7 +706,7 @@ struct Block0821AF04 {
 
 void sub_0821AF04(struct Block0821AF04 *src)
 {
-    gUnk_02000438 = *(struct ScriptProcedureTable *)&src[0];
+    gScriptProcedureTable = *(struct ScriptProcedureTable *)&src[0];
     *(struct Block0821AF04 *)gUnk_02000448 = src[1];
 }
 
@@ -766,7 +767,7 @@ u32 Script_RunProcedureBlock(u32 a, const u8 *b, u32 c)
 void Script_RunMainBlock(void)
 {
     u32 x;
-    Script_RunBlock((u32)Script_DecodePacket(gUnk_02000438.mainBlock, &x),
+    Script_RunBlock((u32)Script_DecodePacket(gScriptProcedureTable.mainBlock, &x),
                     (struct ScriptUtilityArguments *)gUnk_08614184);
 }
 
@@ -1238,16 +1239,14 @@ s32 Script_CallFromOperands(void)
     return Script_Call(id, &args);
 }
 
-extern struct ScriptCommandTable gUnk_02000428;
-
 extern const u8 gUnk_0861418C[];
 
 void Script_RegisterBuiltinCommands(void)
 {
-    gUnk_02000428.next = 0;
-    gUnk_02000428.count = Div(0x30, 8);
-    gUnk_02000428.entries = (struct ScriptCommandEntry *)gUnk_0861418C;
-    Script_RegisterCommandTable(&gUnk_02000428);
+    gScriptCommandTable.next = 0;
+    gScriptCommandTable.count = Div(0x30, 8);
+    gScriptCommandTable.entries = (struct ScriptCommandEntry *)gUnk_0861418C;
+    Script_RegisterCommandTable(&gScriptCommandTable);
 }
 
 s32 Mod(s32, s32);

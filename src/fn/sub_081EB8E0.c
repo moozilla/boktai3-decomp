@@ -51,7 +51,7 @@ struct Obj53F8 {
     u8 pad0[0x10];
     s32 x10;
 };
-extern struct ScreenParams3F8Params gUnk_020003F8;
+extern struct ScreenParams3F8Params gScreenTextParameters;
 extern s32 gUnk_020005DC;
 extern struct Obj53F8 *gUnk_030053F8;
 extern u16 gUnk_03004FC0[];
@@ -114,7 +114,7 @@ void sub_081EB8E0(struct SpDisplay *p)
                 if (p->x1C == 1) {
                     Confirm(p);
                     p->x108 = 1;
-                    if (gUnk_020003F8.M == 2)
+                    if (gScreenTextParameters.M == 2)
                         p->x10C = 3;
                     else
                         p->x10C = 2;
@@ -123,13 +123,13 @@ void sub_081EB8E0(struct SpDisplay *p)
                 if (p->x1C == 2) {
                     Confirm(p);
                     p->x108 = 1;
-                    if (gUnk_020003F8.M == 2)
+                    if (gScreenTextParameters.M == 2)
                         p->x10C = 4;
                     else
                         p->x10C = 3;
                     break;
                 }
-                if (gUnk_020003F8.M != 0 && p->x1C == 3) {
+                if (gScreenTextParameters.M != 0 && p->x1C == 3) {
                     Confirm(p);
                     p->x108 = 1;
                     p->x10C = 4;
@@ -185,7 +185,7 @@ void sub_081EB8E0(struct SpDisplay *p)
                             p->x20C = 1;
                             p->x24 = 3;
                             gUnk_030053F8->x10 = magic;
-                            Menu_DrawStringRef(5, 10, gUnk_020003F8.mBlock, 2);
+                            Menu_DrawStringRef(5, 10, gScreenTextParameters.mBlock, 2);
                         }
                     } while (0);
                     idx++;
@@ -207,18 +207,18 @@ void sub_081EB8E0(struct SpDisplay *p)
                 p->wA8.flags |= 1;
                 p->w48.flags |= 1;
                 if (p->x10C == 0)
-                    Script_Call((u8 *)gUnk_020003F8.c, 0);
+                    Script_Call((u8 *)gScreenTextParameters.c, 0);
                 else if (p->x10C == 1)
-                    Script_Call((u8 *)gUnk_020003F8.b, 0);
+                    Script_Call((u8 *)gScreenTextParameters.b, 0);
                 else if (p->x10C == 2)
-                    Script_Call((u8 *)gUnk_020003F8.d, 0);
-                else if (gUnk_020003F8.M != 0) {
+                    Script_Call((u8 *)gScreenTextParameters.d, 0);
+                else if (gScreenTextParameters.M != 0) {
                     if (p->x10C == 4)
-                        Script_Call((u8 *)gUnk_020003F8.t, 0);
+                        Script_Call((u8 *)gScreenTextParameters.t, 0);
                     else
-                        Script_Call((u8 *)gUnk_020003F8.R, 0);
+                        Script_Call((u8 *)gScreenTextParameters.R, 0);
                 } else
-                    Script_Call((u8 *)gUnk_020003F8.R, 0);
+                    Script_Call((u8 *)gScreenTextParameters.R, 0);
                 Task_Kill(p);
             }
             p->x110++;

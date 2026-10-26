@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 p[0x160];
 };
@@ -8,7 +9,6 @@ struct A {
     u8 p1[0x1c - 0x1c];
     struct E e[3];
 };
-extern u32 gUnk_020005F4;
 void Collider_Remove(void *);
 void HomingProjectile_ReleaseSlot(struct A *, struct E *, s32);
 u32 HomingProjectile_DestroyManager(struct A *a)
@@ -23,5 +23,5 @@ u32 HomingProjectile_DestroyManager(struct A *a)
         i++;
         e++;
     } while (i <= 2);
-    return gUnk_020005F4 = 0;
+    return gHomingManager = 0;
 }

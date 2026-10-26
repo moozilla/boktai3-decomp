@@ -1,7 +1,7 @@
 #include "scene_actor_registry.h"
 struct SceneActorRegistryActor *SceneActorRegistry_FindAvailableAfterId(u32 id)
 {
-    struct SceneActorRegistryNode *node = gUnk_020004AC;
+    struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
     struct SceneActorRegistryActor *actor = node->actor;
     while (actor) {
         u32 offset = 0x2cc;

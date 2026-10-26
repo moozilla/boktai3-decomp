@@ -10,6 +10,6 @@ s32 AreaEffect_Destroy(struct AreaEffectManager *manager)
             i++;
         } while (i < manager->count);
     }
-    gUnk_0200010C = 0;
+    gAreaEffectManager = 0;
     return 0;
 }

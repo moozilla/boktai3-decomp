@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "choice_menu.h"
+#include "ram.h"
 struct Position {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -18,7 +19,6 @@ struct LinkedWidgetSet {
     struct ChoiceResource resource;
     struct LinkedWidgetSlot slots[8];
 };
-extern struct LinkedWidgetSet *gUnk_02000078;
 void Widget_InitLinked(void *, struct ChoiceResource *, s32, s32, s32, s32, s32, struct Position *);
 // confidence=low: loads resource CB05/5D04 and sets up eight linked widgets with frame 0x11.
 s32 LinkedWidgetSet_Init(struct LinkedWidgetSet *p)
@@ -26,7 +26,7 @@ s32 LinkedWidgetSet_Init(struct LinkedWidgetSet *p)
     struct ChoiceResource *resource;
     struct Position zero;
     s32 i;
-    gUnk_02000078 = p;
+    gLinkedWidgetSet = p;
     resource = ScriptProc_Start(0xCB05, 0x5D04);
     if (!resource)
         return -1;

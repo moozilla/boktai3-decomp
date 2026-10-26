@@ -37,7 +37,7 @@ struct HitSwitchScriptArgs {
     u32 unused : 16;
     s32 *values;
 };
-extern struct HitSwitchManager *gUnk_02000490;
+extern struct HitSwitchManager *gHitSwitchManager;
 void HitSwitch_SetUpdate(struct HitSwitchEntry *, void (*)(struct HitSwitchEntry *));
 void HitSwitch_RegisterCompletedCell(struct HitSwitchEntry *);
 void HitSwitch_UpdateStatic(struct HitSwitchEntry *);

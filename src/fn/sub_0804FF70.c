@@ -22,6 +22,6 @@ s32 RepeatedEffect_DestroyManager(struct RepeatedEffectManager *manager)
             i++;
         } while (i < manager->count);
     }
-    gUnk_02000110 = 0;
+    gRepeatedEffectManager = 0;
     return 0;
 }

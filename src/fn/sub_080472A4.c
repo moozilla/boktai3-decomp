@@ -13,7 +13,7 @@ s32 DamageNumberDisplay_Show(struct DamageNumberSource *source, u32 amount, u32 
                              const struct ContactPosition *position,
                              const struct ContactPosition *offset, s32 priority)
 {
-    struct DamageNumberDisplay *display = gUnk_02000074;
+    struct DamageNumberDisplay *display = gDamageNumberDisplay;
     u32 key;
     s32 index, result;
     if (!display) {

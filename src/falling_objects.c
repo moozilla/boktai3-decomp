@@ -1,12 +1,12 @@
 #include "falling_objects.h"
-/* FallingObjectManager_ClearGlobal: clears the global FallingObjectManager pointer (gUnk_0200046C); already aliased this way in src/falling_objects.c */
+/* FallingObjectManager_ClearGlobal: clears the global FallingObjectManager pointer (gFallingObjectManager); already aliased this way in src/falling_objects.c */
 #define FallingObjectManager_ClearGlobal sub_0800CBA0
 
 #define FallingObjectManager_ClearGlobal sub_0800CBA0
 
 void FallingObjectManager_ClearGlobal(void)
 {
-    gUnk_0200046C = 0;
+    gFallingObjectManager = 0;
 }
 
 void FallingObject_ReceiveHit(struct FallingHit *a, u32 unused, struct FallingObject *b)
@@ -73,8 +73,8 @@ void FallingObject_ClearEffect(void *object)
 u32 FallingObject_Destroy(struct FallingObject *s)
 {
     Sprite_Remove(&s->sprite);
-    if (gUnk_0200046C != 0)
-        FallingObjectManager_RemoveObject(gUnk_0200046C, s);
+    if (gFallingObjectManager != 0)
+        FallingObjectManager_RemoveObject(gFallingObjectManager, s);
     FallingObject_ClearEffect(s);
     if (s->collider != 0) {
         Collider_Remove(s->collider);
@@ -122,7 +122,7 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
     s32 variant;
     struct FallingVec *pos;
     void *resource;
-    if (!gUnk_0200046C && !FallingObjectManager_Create((void *)0xc0db, 0))
+    if (!gFallingObjectManager && !FallingObjectManager_Create((void *)0xc0db, 0))
         return -1;
     p = Heap_Alloc(sizeof(*p));
     if (!p)
@@ -251,13 +251,13 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
         p->sprite.scaleX = 64;
     }
     if (p->animated)
-        Anim_SetSequence(&p->anim, gUnk_0200046C->animation, 3, 0, 0);
+        Anim_SetSequence(&p->anim, gFallingObjectManager->animation, 3, 0, 0);
     ScaledShadow_Initialize(p->effect, pos, 80, 7, 107, 107, 3200, 1, 5, 1, 0);
     p->effectActive = 1;
     p->remove = 0;
     p->previous = 0;
     p->next = 0;
-    return FallingObjectManager_AddObject(gUnk_0200046C, p);
+    return FallingObjectManager_AddObject(gFallingObjectManager, p);
 }
 
 s32 FallingObject_CreateFromScript(void)
@@ -292,7 +292,7 @@ void FallingObject_UpdateFalling(struct FallingObject *object)
     if (object->entered) {
         object->entered = 0;
         if (object->animated)
-            Anim_SetSequence(&object->anim, gUnk_0200046C->animation, 3, 0, 0);
+            Anim_SetSequence(&object->anim, gFallingObjectManager->animation, 3, 0, 0);
     }
     object->position.y -= object->speed;
     if (object->position.y <= object->ground) {
@@ -340,7 +340,7 @@ void FallingObject_UpdateLanding(struct FallingObject *object)
 {
     if (object->entered) {
         object->entered = 0;
-        Anim_SetSequence(&object->anim, gUnk_0200046C->animation, 2, 0, 0);
+        Anim_SetSequence(&object->anim, gFallingObjectManager->animation, 2, 0, 0);
         FallingObject_ClearEffect(object);
         FadingParticleGroup_Spawn((FallingObject_Random() & 3) + 6, &object->position, 9, 20, 8, 8, 0, 256, 24,
                      16);
@@ -470,7 +470,7 @@ void FallingObject_UpdateWaiting(struct FallingObject *object)
 {
     if (object->entered) {
         object->entered = 0;
-        Anim_SetSequence(&object->anim, gUnk_0200046C->animation, 2, 0, 0);
+        Anim_SetSequence(&object->anim, gFallingObjectManager->animation, 2, 0, 0);
     }
     if (object->health <= 0 || object->timer++ > object->parameter) {
         FallingObject_SetState(object, 3);
@@ -501,7 +501,7 @@ void FallingObject_UpdateFinish(struct FallingObject *object)
 {
     if (object->entered) {
         object->entered = 0;
-        Anim_SetSequence(&object->anim, gUnk_0200046C->animation, 4, 0, 0);
+        Anim_SetSequence(&object->anim, gFallingObjectManager->animation, 4, 0, 0);
         if (object->collider) {
             u32 flags = ((u16 *)object->collider)[3];
             u32 result;
@@ -614,12 +614,12 @@ u32 FallingObjectManager_Destroy(struct FallingObjectManager *s)
         FallingObject_Destroy(n);
         n = next;
     }
-    return (u32)(gUnk_0200046C = 0);
+    return (u32)(gFallingObjectManager = 0);
 }
 
 s32 FallingObjectManager_Initialize(struct FallingObjectManager *p, void *unused)
 {
-    gUnk_0200046C = p;
+    gFallingObjectManager = p;
     p->animation = ScriptProc_Start(0x922E, 0x931E);
     p->head = 0;
     return 0;
@@ -628,8 +628,8 @@ s32 FallingObjectManager_Initialize(struct FallingObjectManager *p, void *unused
 void *FallingObjectManager_Create(void *a, u32 unused)
 {
     struct FallingObjectManager *p;
-    if (gUnk_0200046C != 0)
-        return gUnk_0200046C;
+    if (gFallingObjectManager != 0)
+        return gFallingObjectManager;
     p = Task_Create(8, 0x20);
     if (p != 0) {
         Task_SetCallbacks(p, (void *)FallingObjectManager_Update,

@@ -199,7 +199,7 @@ void ScenePanel_TickPulseRest(struct ScenePanel *);
 void ScenePanel_TickPulseTwelve(struct ScenePanel *);
 void ScenePanel_TickPulseThirteen(struct ScenePanel *);
 void ScenePanel_TickPulseTwo(struct ScenePanel *);
-extern struct ScenePanel *gUnk_020004A4;
+extern struct ScenePanel *gScenePanel;
 void ScenePanel_CallPendingScript(struct ScenePanel *, u32);
 union ScenePanelPosition;
 void ScenePanel_AddParticle(struct ScenePanel *, union ScenePanelPosition *,

@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_02000104;
+#include "ram.h"
 
 u32 WirelessResultPanel_GetInstance(void)
 {
-    return gUnk_02000104;
+    return gResultMenu;
 }

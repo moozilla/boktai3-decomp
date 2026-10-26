@@ -40,7 +40,7 @@ s32 SceneSteeringActor_DestroyPool(struct SceneSteeringActorPool *input)
     } while (i < 8);
     {
         u32 zero = 0;
-        gUnk_02000188 = (void *)zero;
+        gSceneSteeringActorPool = (void *)zero;
     }
     return 0;
 }

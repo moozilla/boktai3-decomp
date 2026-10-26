@@ -5,7 +5,7 @@ s32 WirelessLinkIndicator_Initialize(struct WirelessLinkIndicator *indicator)
     const struct ProjectedDisplayResource *resource;
     struct ProjectedDisplayResource *relocated;
     s32 result;
-    gUnk_020000F4 = indicator;
+    gWirelessLinkIndicator = indicator;
     resource = ScriptProc_Start(0xCB05, 0x7C8B);
     if (resource) {
         indicator->resource = *resource;

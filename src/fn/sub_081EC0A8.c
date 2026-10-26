@@ -13,27 +13,27 @@ struct ScreenParams3F8Params {
     s32 f;
     s32 M;
 };
-extern struct ScreenParams3F8Params gUnk_020003F8;
+extern struct ScreenParams3F8Params gScreenTextParameters;
 void ScreenParams3F8_SetFromScript(void)
 {
     if (Script_SeekToKeyword('m'))
-        gUnk_020003F8.mBlock = Script_GetPc();
+        gScreenTextParameters.mBlock = Script_GetPc();
     if (Script_SeekToKeyword('e'))
-        gUnk_020003F8.eBlock = Script_GetPc();
+        gScreenTextParameters.eBlock = Script_GetPc();
     if (Script_SeekToKeyword('b'))
-        gUnk_020003F8.b = Script_GetValue();
+        gScreenTextParameters.b = Script_GetValue();
     if (Script_SeekToKeyword('d'))
-        gUnk_020003F8.d = Script_GetValue();
+        gScreenTextParameters.d = Script_GetValue();
     if (Script_SeekToKeyword('R'))
-        gUnk_020003F8.R = Script_GetValue();
+        gScreenTextParameters.R = Script_GetValue();
     if (Script_SeekToKeyword('c'))
-        gUnk_020003F8.c = Script_GetValue();
+        gScreenTextParameters.c = Script_GetValue();
     if (Script_SeekToKeyword('t'))
-        gUnk_020003F8.t = Script_GetValue();
+        gScreenTextParameters.t = Script_GetValue();
     if (Script_SeekToKeyword('B'))
-        gUnk_020003F8.B = Script_GetValue();
+        gScreenTextParameters.B = Script_GetValue();
     if (Script_SeekToKeyword('f'))
-        gUnk_020003F8.f = Script_GetValue();
+        gScreenTextParameters.f = Script_GetValue();
     if (Script_SeekToKeyword('M'))
-        gUnk_020003F8.M = Script_GetValue();
+        gScreenTextParameters.M = Script_GetValue();
 }

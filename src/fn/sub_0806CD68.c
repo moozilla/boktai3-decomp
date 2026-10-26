@@ -7,7 +7,7 @@ static inline u8 Used(const u32 *mask, u32 bit)
 }
 void SceneSteeringActor_RequestRemovalAll(void)
 {
-    struct SceneSteeringActorPool *pool = gUnk_02000188;
+    struct SceneSteeringActorPool *pool = gSceneSteeringActorPool;
     u32 initial = (u32)pool + 0x3C;
     struct SceneSteeringActor *slot;
     s32 i;

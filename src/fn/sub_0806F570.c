@@ -2,8 +2,8 @@
 struct SceneEffectSchedule *SceneEffectSchedule_Create(u32 argument)
 {
     struct SceneEffectSchedule *manager;
-    if (gUnk_0200019C)
-        return gUnk_0200019C;
+    if (gSceneEffectSchedule)
+        return gSceneEffectSchedule;
     manager = Task_Create(10, sizeof(*manager));
     if (manager) {
         Task_SetCallbacks(manager, (void (*)(void *))SceneEffectSchedule_Tick,

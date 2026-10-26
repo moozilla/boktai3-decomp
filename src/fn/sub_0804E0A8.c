@@ -6,7 +6,7 @@ struct S {
     u8 g[0xa];
     s16 v;
 };
-extern u8 *gUnk_0200010C;
+extern u8 *gAreaEffectManager;
 s32 AreaEffect_FindContainingEntry(u8 *);
 s32 AreaEffect_ScaleResourceGain(s32);
 static inline u32 mk(u32 *a, u32 m)
@@ -31,7 +31,7 @@ s32 AreaEffect_ScaleGainAtPosition(u8 *a, s32 b)
     }
     if (AreaEffect_FindContainingEntry(a) >= 0)
         goto yes;
-    if (gUnk_0200010C[0x29] != 0)
+    if (gAreaEffectManager[0x29] != 0)
         goto yes;
 no:
     return 0;

@@ -23,7 +23,7 @@ struct DamageNumberDisplay {
     void *resource;
     struct DamageNumberGroup groups[4];
 };
-extern struct DamageNumberDisplay *gUnk_02000074;
+extern struct DamageNumberDisplay *gDamageNumberDisplay;
 static inline s32 DamageNumber_ProjectScale(s32 value)
 {
     if (value >= 0)

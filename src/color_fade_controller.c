@@ -1,6 +1,7 @@
 #include "global.h"
 #include "color_fade_controller.h"
 #include "render.h"
+#include "ram.h"
 
 void ColorFade_StepFadeOut(struct ColorFadeChannel *p)
 {
@@ -59,13 +60,11 @@ void ColorFade_UpdateChannel(struct ColorFadeChannel *p)
     }
 }
 
-extern struct ColorFadeController *gUnk_02000020;
-
 void ColorFade_ClearMode(struct ColorFadeChannel *);
 
 void ColorFade_SetImmediate(u32 a, u32 b, u32 c)
 {
-    struct ColorFadeController *s = gUnk_02000020;
+    struct ColorFadeController *s = gColorFadeController;
     if (s != 0) {
         gBgFadeLevel = a;
         gBgFadeBankMask = b;
@@ -201,14 +200,14 @@ u32 ColorFade_OnUpdate(struct ColorFadeController *p)
 
 void ColorFade_OnDestroy(void)
 {
-    gUnk_02000020 = 0;
+    gColorFadeController = 0;
 }
 
 void ColorFade_InitChannel(struct ColorFadeChannel *);
 
 s32 ColorFade_Init(struct ColorFadeController *s)
 {
-    gUnk_02000020 = s;
+    gColorFadeController = s;
     ColorFade_InitChannel(&s->channels[0]);
     ColorFade_InitChannel(&s->channels[1]);
     gBgFadeLevel = 0x40;
@@ -237,7 +236,7 @@ void *ColorFade_Create(void)
 
 s32 ColorFade_QueueCommand(u32 id, s32 cnt, u32 *src)
 {
-    struct ColorFadeController *s = gUnk_02000020;
+    struct ColorFadeController *s = gColorFadeController;
     s32 i;
     if (s == 0 || s->count > 7)
         return -1;

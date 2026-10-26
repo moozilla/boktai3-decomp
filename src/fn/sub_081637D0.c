@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);
@@ -6,11 +7,10 @@ s32 sub_08163700(void *);
 void Task_Kill(void *);
 void GameOver_OnUpdate(void);
 void GameOver_OnDestroy(void);
-extern void *gUnk_02000210;
 
 void *GameOver_Create(void)
 {
-    void *r = gUnk_02000210;
+    void *r = gGameOver;
     void *q;
     if (r == 0) {
         q = Task_Create(0xb, 0x354);

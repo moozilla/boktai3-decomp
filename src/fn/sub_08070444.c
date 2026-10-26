@@ -14,7 +14,7 @@ s32 SceneActorRegistry_CountLivingByCategoryAndField(s32 inputCategory, s32 inpu
     struct SceneActorRegistryActor *actor;
     s32 count;
     SceneActorRegistry_GetManager();
-    node = gUnk_020004AC;
+    node = gSceneActorRegistryNode;
     actor = node->actor;
     count = 0;
     if (actor) {

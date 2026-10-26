@@ -22,7 +22,7 @@ static inline u32 InvalidFlags(struct SceneActorRegistryActor *actor)
 }
 void SceneActorContacts_ReleaseInvalidOwners(void)
 {
-    struct SceneActorContactManager *manager = gUnk_020001A0;
+    struct SceneActorContactManager *manager = gSceneActorContactManager;
     struct SceneActorContactNode *node;
     if (!manager || Mod(manager->frame, 30))
         return;

@@ -1,9 +1,9 @@
 #include "global.h"
+#include "ram.h"
 struct P {
     u8 f0[0x340];
     u8 x;
 };
-extern struct P *gUnk_02000210;
 void GameOver_ShowGraphics(struct P *);
 void Hud_SetMode(s32);
 s32 Script_SeekToKeyword(s32);
@@ -11,7 +11,7 @@ s32 Script_GetValue(void);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void GameOver_StartFromScript(void)
 {
-    struct P *p = gUnk_02000210;
+    struct P *p = gGameOver;
     if (p != 0) {
         GameOver_ShowGraphics(p);
         Hud_SetMode(7);

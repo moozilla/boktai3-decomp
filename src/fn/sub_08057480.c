@@ -19,6 +19,6 @@ s32 LevelAdvanceDisplay_InitFromScript(struct LevelAdvanceManager *manager)
     }
     LevelAdvanceDisplay_InitSprite(manager);
     LevelAdvanceDisplay_InitParticles(manager);
-    gUnk_02000120 = manager;
+    gLevelAdvanceManager = manager;
     return 0;
 }

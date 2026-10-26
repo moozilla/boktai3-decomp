@@ -8,7 +8,7 @@ s32 SceneActorRegistry_CountLiving(void)
     SceneActorRegistry_GetManager();
     /* The allocated terminal node carries a NULL actor; an absent list head
      * is outside this helper's caller contract. */
-    node = gUnk_020004AC;
+    node = gSceneActorRegistryNode;
     actor = node->actor;
     count = 0;
     while (actor) {

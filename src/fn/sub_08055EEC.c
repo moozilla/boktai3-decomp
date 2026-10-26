@@ -12,7 +12,7 @@ s32 StageIconDisplay_Initialize(struct StageIconDisplay *display, s32 variant, u
     StageIconDisplay_InitAnimations(display, variant);
     {
         s32 status = StageIconDisplay_SelectUpdate(display, variant);
-        gUnk_0200011C = display;
+        gStageIconDisplay = display;
         display->revealedCount = 0;
         return status;
     }

@@ -5,6 +5,6 @@ s32 BouncingObject_InitializePool(struct BouncingPool *pool)
     pool->sequenceResource = ScriptProc_Start(0x922E, 0x871C);
     pool->used = 0;
     pool->stopping = 0;
-    gUnk_0200014C = pool;
+    gBouncingPool = pool;
     return 0;
 }

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 struct Blob {
     u32 words[8];
 };
@@ -16,7 +17,6 @@ struct LinkMenu {
     u32 flags;
     u8 pad5c[0x54];
 };
-extern struct LinkMenu *gUnk_020000F8;
 extern u16 gUnk_03005260[];
 extern u16 gUnk_03004FC0[];
 void TextWindowManager_DestroyAllWindows(void);
@@ -55,7 +55,7 @@ int WirelessStatusMenu_InitFromScript(struct LinkMenu *p)
     struct Blob *resource;
     struct Blob *blob;
     int zero;
-    gUnk_020000F8 = p;
+    gLinkMenu = p;
     PaletteLevels_Reset();
     if (!Script_SeekToKeyword(115))
         goto failed;

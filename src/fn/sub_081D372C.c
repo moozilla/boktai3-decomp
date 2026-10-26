@@ -1,14 +1,14 @@
 #include "global.h"
+#include "ram.h"
 
 struct S {
     u8 pad[0x1f];
     u8 b1f;
 };
-extern struct S *gUnk_02000298;
 
 s32 PlayerParticleCloud_RequestStop(void)
 {
-    struct S *p = gUnk_02000298;
+    struct S *p = gCloudTask;
     s32 r;
     if (p) {
         p->b1f = 1;

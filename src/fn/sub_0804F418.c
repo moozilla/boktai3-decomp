@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000114;
+extern u8 *gDirectionalForce;
 void Sprite_Remove(u8 *);
 void Anim_Remove(u8 *);
 void Collider_Remove(u8 *);

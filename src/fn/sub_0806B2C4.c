@@ -383,7 +383,7 @@ void SpriteEffectController_FadeAndDestroy(struct SpriteEffectControllerPool *un
         void *drawable = slot->drawable;
         u16 *age = &slot->frame;
         if ((u8)Sprite_BlinkUntilExpired(drawable, *age, 60, 40)) {
-            struct SpriteEffectControllerPool *p = gUnk_02000178;
+            struct SpriteEffectControllerPool *p = gSpriteEffectControllerPool;
             register s8 *index asm("r3") = &slot->index;
             p->used &= ~(1U << *index);
             slot->state = 0;

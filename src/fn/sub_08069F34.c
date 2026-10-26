@@ -3,6 +3,6 @@ void BurstEmitter_ResetPool(void);
 s32 BurstEmitter_InitPool(struct BurstEmitterPool *pool, u32 unused)
 {
     BurstEmitter_ResetPool();
-    gUnk_02000160 = pool;
+    gBurstEmitterPool = pool;
     return 0;
 }

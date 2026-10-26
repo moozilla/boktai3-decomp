@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 struct HomingVec {
     s16 x, y, z, pad;
 };
@@ -63,7 +64,6 @@ struct HomingManager {
     s32 count;
     u16 palettes[2][16];
 };
-extern struct HomingManager *gUnk_020005F4;
 extern void *const gUnk_08613FA8[];
 extern const s16 gUnk_086149C4[];
 void HomingProjectile_CreateManager(void);
@@ -188,7 +188,7 @@ static inline void StepSequence(struct HomingSprite *sprite, struct HomingSequen
 
 s32 HomingProjectile_Spawn(struct HomingParams *params, struct HomingVec *position)
 {
-    struct HomingManager *m = gUnk_020005F4;
+    struct HomingManager *m = gHomingManager;
     struct HomingSlot *p;
     s32 index;
     u16 animId, resourceId;

@@ -1,5 +1,5 @@
 #include "scene_actor_control.h"
-extern struct SceneActorControlManager *gUnk_02000128;
+#include "ram.h"
 u32 SceneActorControl_Destroy(struct SceneActorControlManager *p)
 {
     s32 i;
@@ -11,5 +11,5 @@ u32 SceneActorControl_Destroy(struct SceneActorControlManager *p)
             Collider_Remove(&slot->collider);
         }
     }
-    return (u32)(gUnk_02000128 = 0);
+    return (u32)(gSceneActorControlManager = 0);
 }

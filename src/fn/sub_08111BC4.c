@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct S {
     u8 f[0x1848];
     u16 a;
@@ -7,12 +8,11 @@ struct S {
     u16 h2;
     u32 w;
 };
-extern struct S *gUnk_020001D8;
 s32 Script_GetKeywordValue(s32, s32);
 s32 Div(s32, s32);
 void PaletteFade_StartScrollFromScript(void)
 {
-    struct S *g = gUnk_020001D8;
+    struct S *g = gPaletteFade;
     if (g != 0) {
         struct S *s = g;
         s->h = Script_GetKeywordValue(0x66, 0);

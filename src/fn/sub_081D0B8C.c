@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_02000274;
+#include "ram.h"
 void SceneMessages_UnregisterReceiver(u8 *);
 void ParticlePool_Destroy(u32);
 void GroundEffect_Destroy(u8 *);
@@ -10,5 +10,5 @@ s32 SceneNpc_OnDestroy(u8 *a, u8 *b)
     ParticlePool_Destroy(*(u32 *)(q + 4));
     if (q[0xd] != 0)
         GroundEffect_Destroy(b + 0x344);
-    gUnk_02000274 = 0;
+    gSceneNpc = 0;
 }

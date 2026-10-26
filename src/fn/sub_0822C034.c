@@ -1,18 +1,18 @@
 #include "global.h"
+#include "ram.h"
 
 /* Up to 16 region ids (positive; the list ends at the first id <= 0). */
 struct RegionList {
     u8 pad0[0x18];
     s32 regions[16];
 };
-extern struct RegionList *gUnk_03002600;
 u8 Terrain_IsPositionInBox(u16 region, void *position); /* position inside region? */
 
 /* The first listed region containing position, or -1; callers keep it as
    the object's region. */
 s32 Region_FindContaining(void *position)
 {
-    struct RegionList *list = gUnk_03002600;
+    struct RegionList *list = gRegionList;
     s32 i;
     s32 *region;
     if (list == 0)

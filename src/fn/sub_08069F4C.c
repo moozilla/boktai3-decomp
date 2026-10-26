@@ -2,8 +2,8 @@
 struct BurstEmitterPool *BurstEmitter_CreatePool(void)
 {
     struct BurstEmitterPool *pool;
-    if (gUnk_02000160)
-        return gUnk_02000160;
+    if (gBurstEmitterPool)
+        return gBurstEmitterPool;
     pool = Task_Create(10, sizeof(*pool));
     if (pool) {
         Task_SetCallbacks(pool, (void *)BurstEmitter_UpdatePool, (void *)BurstEmitter_DestroyPool);

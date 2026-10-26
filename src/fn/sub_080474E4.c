@@ -5,11 +5,11 @@ s32 TransientSpriteEffects_Spawn(u32 kind, u32 options, const struct ContactPosi
                                  const struct ContactPosition *velocity, u32 dragDelay, u32 drag)
 {
     s32 index;
-    if (!gUnk_020000A0 && !TransientSpriteEffects_Create(NULL, 0))
+    if (!gTransientSpriteEffects && !TransientSpriteEffects_Create(NULL, 0))
         return -1;
     index = 0;
     do {
-        struct TransientSpriteEffect *slot = &gUnk_020000A0->slots[index];
+        struct TransientSpriteEffect *slot = &gTransientSpriteEffects->slots[index];
         struct TransientEffectSprite *sprite = &slot->sprite;
         if (!slot->active) {
             s32 priority;

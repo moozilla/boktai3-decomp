@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Z {
     u8 f[0x20];
 };
@@ -6,10 +7,9 @@ struct Y {
     u8 f[0xc];
     u8 c;
 };
-extern u8 *gUnk_02000274;
 void SceneNpc_RequestRigAction(void)
 {
-    u8 *p = gUnk_02000274;
+    u8 *p = gSceneNpc;
     struct Y *q;
     if (p) {
         q = (struct Y *)(p + 0x20);

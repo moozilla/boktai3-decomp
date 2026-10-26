@@ -1,9 +1,8 @@
 #include "global.h"
-
-extern u32 gUnk_020004C4;
+#include "ram.h"
 
 s32 SceneDebrisPool_Initialize(u32 a)
 {
-    gUnk_020004C4 = a;
+    gDebrisPool = a;
     return 0;
 }

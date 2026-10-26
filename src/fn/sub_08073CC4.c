@@ -10,7 +10,7 @@ static inline void SceneActorProfile_SetEntry(struct SceneActorProfile *profile,
 }
 s32 SceneActorProfiles_Add(u32 category, u32 mode)
 {
-    struct SceneActorProfileList *registry = (void *)gUnk_020004A8->subsystem;
+    struct SceneActorProfileList *registry = (void *)gSceneActorRegistryManager->subsystem;
     struct SceneActorProfile *profile;
     if (registry->count > 11)
         return -1;

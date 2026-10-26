@@ -1,7 +1,7 @@
 #include "scene_actor_contact_list.h"
 void SceneActorContacts_ReleaseNode(struct SceneActorContactNode *input)
 {
-    struct SceneActorContactManager *manager = gUnk_020001A0;
+    struct SceneActorContactManager *manager = gSceneActorContactManager;
     struct SceneActorContactNode *node;
     if (!manager || !input)
         return;

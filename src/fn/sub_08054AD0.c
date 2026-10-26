@@ -7,6 +7,6 @@ struct HitSwitchManager *HitSwitch_CreateManager(void)
                           (void (*)(void *))HitSwitch_DestroyManager);
         manager->count = 0;
     }
-    gUnk_02000490 = manager;
+    gHitSwitchManager = manager;
     return manager;
 }

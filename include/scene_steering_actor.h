@@ -37,5 +37,5 @@ struct SceneSteeringActorPool {
     u32 used;
     struct SceneSteeringActor slots[8];
 };
-extern struct SceneSteeringActorPool *gUnk_02000188;
+extern struct SceneSteeringActorPool *gSceneSteeringActorPool;
 #endif

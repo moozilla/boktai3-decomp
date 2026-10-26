@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 struct DebrisPos {
     s16 x, y, z, pad;
 };
@@ -18,7 +19,6 @@ struct DebrisPool {
     u8 task[0x18];
     struct Debris entries[64];
 };
-extern struct DebrisPool *gUnk_020004C4;
 struct DebrisPool *SceneDebrisPool_EnsureSingleton(void);
 void PanelSprite_Create(struct Debris *, u32, u32, u32, u32, u32, u32, u32);
 void PanelKeyframeSprite_Create(struct Debris *, u32, u32, u32, u32);
@@ -32,12 +32,12 @@ s32 sub_08113398(struct DebrisPos *pos, struct DebrisPos *velocity, u32 a2, u32 
 {
     struct DebrisPool *pool;
     s32 i;
-    if (!gUnk_020004C4) {
+    if (!gDebrisPool) {
         pool = SceneDebrisPool_EnsureSingleton();
         if (!pool)
             return -1;
     } else
-        pool = gUnk_020004C4;
+        pool = gDebrisPool;
     for (i = 0; i <= 63; i++) {
         if (!pool->entries[i].active) {
             struct Debris *e = &pool->entries[i];

@@ -7,7 +7,7 @@ void ScenePanelRig_SetState(struct ScenePanelRig *rig, u32 state)
     }
     if (state == 2 && rig->state != 2) {
         ScenePanel_SetPresentationMode(rig->parent);
-        ((struct SceneRigParentView *)gUnk_020004A4)->activated = 1;
+        ((struct SceneRigParentView *)gScenePanel)->activated = 1;
     }
     rig->state = state;
     rig->stateFrame = 0;

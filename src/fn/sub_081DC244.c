@@ -19,7 +19,7 @@ struct ScreenMessage {
 };
 
 extern u16 gUnk_03005260[];
-extern u32 gUnk_020002F8[];
+extern u32 gScreenParams[];
 void Sound_PlaySong(u32);
 void TextWindow_Destroy(void *);
 s32 Script_Call(u32, void *);
@@ -35,41 +35,41 @@ void ScreenMessage_Update(struct ScreenMessage *s)
     switch (s->state) {
         case 0:
             if (gUnk_03005260[1] & 1) {
-                if (s->selection == 0 || gUnk_020002F8[2] == 0) {
+                if (s->selection == 0 || gScreenParams[2] == 0) {
                     Sound_PlaySong(0xDD);
                     TextWindow_Destroy(s->textWindow);
-                    if (gUnk_020002F8[2] != 0) {
+                    if (gScreenParams[2] != 0) {
                         s->firstFlags |= 1;
                         s->secondFlags |= 1;
                     }
-                    Script_Call(gUnk_020002F8[3], 0);
+                    Script_Call(gScreenParams[3], 0);
                     Task_Kill(s);
                 } else {
                     Sound_PlaySong(0xDE);
                     TextWindow_Destroy(s->textWindow);
-                    if (gUnk_020002F8[2] != 0) {
+                    if (gScreenParams[2] != 0) {
                         s->firstFlags |= 1;
                         s->secondFlags |= 1;
                     }
-                    Script_Call(gUnk_020002F8[4], 0);
+                    Script_Call(gScreenParams[4], 0);
                     Task_Kill(s);
                 }
             } else if (gUnk_03005260[1] & 2) {
-                if (gUnk_020002F8[2] == 0) {
+                if (gScreenParams[2] == 0) {
                     Sound_PlaySong(0xDD);
                     TextWindow_Destroy(s->textWindow);
-                    Script_Call(gUnk_020002F8[3], 0);
+                    Script_Call(gScreenParams[3], 0);
                     Task_Kill(s);
                 } else {
                     Sound_PlaySong(0xDE);
                     TextWindow_Destroy(s->textWindow);
                     s->firstFlags |= 1;
                     s->secondFlags |= 1;
-                    Script_Call(gUnk_020002F8[5], 0);
+                    Script_Call(gScreenParams[5], 0);
                     Task_Kill(s);
                 }
             }
-            if (gUnk_020002F8[2] == 1) {
+            if (gScreenParams[2] == 1) {
                 if (((gUnk_03005260[1] & 0x20) && s->selection == 1) ||
                     ((gUnk_03005260[1] & 0x10) && s->selection == 0)) {
                     s->selection = 1 - s->selection;
@@ -83,7 +83,7 @@ void ScreenMessage_Update(struct ScreenMessage *s)
         case 1:
             if (s->fadeTimer > (1 << s->fadeSpeed) || s->fadeSpeed == 0) {
                 TextWindow_Destroy(s->textWindow);
-                g = gUnk_020002F8;
+                g = gScreenParams;
                 if (g[2] != 0) {
                     s->firstFlags |= 1;
                     s->secondFlags |= 1;

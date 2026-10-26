@@ -1,4 +1,5 @@
 #include "palette_level_transitions.h"
+#include "ram.h"
 
 void Mosaic_SetParameters(u16, u8, u8);
 
@@ -60,14 +61,14 @@ void Mosaic_ResetParameters(void);
 u32 PaletteLevels_Destroy(void)
 {
     Mosaic_ResetParameters();
-    gUnk_02000070 = 0;
+    gPaletteLevels = 0;
     return 0;
 }
 
 s32 PaletteLevels_Initialize(struct PaletteLevels *s, u16 unused)
 {
     s32 i;
-    gUnk_02000070 = s;
+    gPaletteLevels = s;
     s->state = 0;
     s->first = 0;
     s->count = 0;
@@ -83,8 +84,8 @@ s32 PaletteLevels_Initialize(struct PaletteLevels *s, u16 unused)
 struct PaletteLevels *PaletteLevels_Create(u32 a, u32 unused)
 {
     struct PaletteLevels *p;
-    if (gUnk_02000070 != 0)
-        return gUnk_02000070;
+    if (gPaletteLevels != 0)
+        return gPaletteLevels;
     p = Task_Create(9, 0x34);
     if (p != 0) {
         Task_SetCallbacks(p, (void (*)(void *))PaletteLevels_Update,
@@ -99,7 +100,7 @@ struct PaletteLevels *PaletteLevels_Create(u32 a, u32 unused)
 
 int PaletteLevels_Configure(int mode, int first, int count, u8 *initial, u8 *target, u16 *periods)
 {
-    struct PaletteLevels *initialManager = gUnk_02000070;
+    struct PaletteLevels *initialManager = gPaletteLevels;
     struct PaletteLevels *p;
     int i;
     if (!initialManager) {
@@ -180,7 +181,7 @@ s32 PaletteLevels_ConfigureFromScript(void)
 
 void PaletteLevels_Reset(void)
 {
-    struct PaletteLevels *p = gUnk_02000070;
+    struct PaletteLevels *p = gPaletteLevels;
     int i;
     if (p) {
         Mosaic_ResetParameters();
@@ -198,9 +199,8 @@ void PaletteLevels_Reset(void)
 }
 
 /* This range's trailing reset belongs to the next subsystem's manager. */
-extern void *gUnk_02000078;
 #define FloatingEffectManager_ClearActive sub_08016890
 void FloatingEffectManager_ClearActive(void)
 {
-    gUnk_02000078 = 0;
+    gLinkedWidgetSet = 0;
 }

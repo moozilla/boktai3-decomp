@@ -24,7 +24,7 @@ s32 TemporaryAnimationPool_Initialize(struct TemporaryAnimationPool *pool)
     u32 fillZero;
     struct ContactPosition *point;
     struct ProjectedDisplayResource *savedResource;
-    gUnk_020000A8 = pool;
+    gTemporaryAnimationPool = pool;
     resource = ScriptProc_Start(0xCB05, 0xDE23);
     if (!resource) {
         result = -1;

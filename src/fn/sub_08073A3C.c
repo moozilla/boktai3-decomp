@@ -19,7 +19,7 @@ SceneActorContacts_SelectForActor(struct SceneActorRegistryActor *argument, u32 
     s32 distance;
     s32 selectionStatus;
     u8 *contactFlags;
-    manager = gUnk_020001A0;
+    manager = gSceneActorContactManager;
     if (SceneActorContacts_AreDisabled() || !manager)
         return 0;
     best = 0;

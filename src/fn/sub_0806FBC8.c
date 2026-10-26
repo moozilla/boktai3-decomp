@@ -4,11 +4,11 @@ void SceneActorRegistry_UnlinkActor(struct SceneActorRegistryActor *actor)
 {
     struct SceneActorRegistryManager *manager = SceneActorRegistry_GetManager();
     if (manager) {
-        struct SceneActorRegistryNode *node = gUnk_020004AC;
+        struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
         if (node) {
             struct SceneActorRegistryNode *next;
             if (node->actor == actor) {
-                gUnk_020004AC = node->next;
+                gSceneActorRegistryNode = node->next;
                 manager->cursor = node->next;
                 Heap_Free(node);
                 goto removed;

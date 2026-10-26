@@ -5,8 +5,8 @@ s32 BouncingObject_DestroyPool(struct BouncingPool *);
 struct BouncingPool *BouncingObject_EnsurePool(void)
 {
     struct BouncingPool *pool;
-    if (gUnk_0200014C)
-        return gUnk_0200014C;
+    if (gBouncingPool)
+        return gBouncingPool;
     pool = Task_Create(8, 0xFD0);
     if (pool) {
         Task_SetCallbacks(pool, (void (*)(void *))BouncingObject_UpdatePool,

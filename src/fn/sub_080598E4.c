@@ -67,7 +67,7 @@ void ScenePanelRig_TickResourceDrain(struct ScenePanelRig *rig)
             *remaining = value;
         }
         {
-            struct SceneRigParentView **global = (void *)&gUnk_020004A4;
+            struct SceneRigParentView **global = (void *)&gScenePanel;
             struct SceneRigParentView *current = *global;
             u32 offset = 0x1343;
             u8 *warning = (void *)(offset + (u32)current);

@@ -1,11 +1,11 @@
 // COMPILER: old_agbcc
 #include "global.h"
-/* DamageNumberDisplay_ResetInstance: Clears the global damage number display instance pointer at gUnk_02000074. */
+/* DamageNumberDisplay_ResetInstance: Clears the global damage number display instance pointer at gDamageNumberDisplay. */
 #define DamageNumberDisplay_ResetInstance sub_08046B28
 
-extern u32 gUnk_02000074;
+extern u32 gDamageNumberDisplay;
 
 void sub_08046B28(void)
 {
-    gUnk_02000074 = 0;
+    gDamageNumberDisplay = 0;
 }

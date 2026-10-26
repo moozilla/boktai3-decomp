@@ -33,7 +33,7 @@ struct OrbitBackgroundSelection {
     u8 unknown1A[0x42];
     u8 status[1];
 };
-extern struct OrbitBackground *gUnk_0200048C;
+extern struct OrbitBackground *gOrbitBackground;
 extern struct OrbitBackgroundSelection *gUnk_020004B4;
 extern struct OrbitBackgroundPlayer *gUnk_02000580[4];
 extern struct ContactPosition gUnk_030042A0;

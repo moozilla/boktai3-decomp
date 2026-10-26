@@ -1,7 +1,7 @@
 #include "hit_switch.h"
 u32 HitSwitch_GetCompletionFromScript(void)
 {
-    struct HitSwitchManager *manager = gUnk_02000490;
+    struct HitSwitchManager *manager = gHitSwitchManager;
     if (manager) {
         s32 tag;
         s32 i;

@@ -1046,7 +1046,7 @@ int WirelessGameItems_Destroy(struct WirelessGameItems *p)
         i++;
         q++;
     } while (i <= 15);
-    return (int)(gUnk_02000100 = 0);
+    return (int)(gWirelessGameItems = 0);
 }
 
 int WirelessGameItems_Init(struct WirelessGameItems *p)
@@ -1056,7 +1056,7 @@ int WirelessGameItems_Init(struct WirelessGameItems *p)
     u8 *current;
     u8 *pending;
     int i;
-    gUnk_02000100 = p;
+    gWirelessGameItems = p;
     resource = ScriptProc_Start(0xcb05, 0x5d04);
     if (!resource)
         return -1;
@@ -1103,7 +1103,7 @@ ok:
 // MATCHING_CONCESSION: register-pinning
 int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int index, int amount)
 {
-    struct WirelessGameItems *owner = gUnk_02000100;
+    struct WirelessGameItems *owner = gWirelessGameItems;
     struct WirelessGameItem *target;
     if (!owner)
         return -1;
@@ -1196,7 +1196,7 @@ int WirelessGameItems_QueueIncomingItem(int indexArg, int amountArg, int pending
     int index = indexArg;
     int amount = amountArg;
     int pendingFlag = pendingArg;
-    struct WirelessGameItems *owner = gUnk_02000100;
+    struct WirelessGameItems *owner = gWirelessGameItems;
     struct WirelessGameItem *target;
     if (!owner)
         return -1;
@@ -1302,7 +1302,7 @@ int WirelessGameItems_QueueIncomingItem(int indexArg, int amountArg, int pending
 
 void WirelessGameItems_StartOutgoingItems(void)
 {
-    struct WirelessGameItems *p = gUnk_02000100;
+    struct WirelessGameItems *p = gWirelessGameItems;
     if (p) {
         int i = 0;
         int state = 4;

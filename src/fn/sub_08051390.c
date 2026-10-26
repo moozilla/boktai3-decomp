@@ -8,5 +8,5 @@ void DirectionalForce_Destroy(void)
     gUnk_0200052C = 0;
     gUnk_02000550 = 0;
     gUnk_0200053C = 0;
-    gUnk_02000114 = 0;
+    gDirectionalForce = 0;
 }

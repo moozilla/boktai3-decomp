@@ -8,7 +8,7 @@ void ScenePanelRig_TickHideBurst(struct ScenePanelRig *rig)
     if (*counter <= 63) {
         if (*counter == 0) {
             ScenePanelRig_HideSprites(rig);
-            ((struct SceneRigParentView *)gUnk_020004A4)->activated = 1;
+            ((struct SceneRigParentView *)gScenePanel)->activated = 1;
         }
         {
             u32 frame = *counter;

@@ -6,7 +6,7 @@ struct CountdownTimer {
     u16 remaining, locked;
     u32 completionScriptId;
 };
-extern struct CountdownTimer *gUnk_0200049C;
+extern struct CountdownTimer *gCountdownTimer;
 void Hud_RegisterTimer(u16 *);
 void Hud_ClearTimer(void);
 void CountdownTimer_Stop(void);

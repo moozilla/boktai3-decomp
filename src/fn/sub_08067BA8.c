@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control.h"
+#include "ram.h"
 /* SceneActorControl_RequestAllDepartures: Requests departure and sets collider flags for every occupied slot not already departing */
 #define SceneActorControl_RequestAllDepartures sub_08067BA8
 #define SceneActorControl_RequestAllDepartures sub_08067BA8
-extern struct SceneActorControlManager *gUnk_02000128;
 static inline u8 IsUsed(struct SceneActorControlManager *p, u32 index)
 {
     u32 bit = 1U << index;
@@ -14,7 +14,7 @@ static inline u8 IsUsed(struct SceneActorControlManager *p, u32 index)
 }
 void SceneActorControl_RequestAllDepartures(void)
 {
-    struct SceneActorControlManager *p = gUnk_02000128;
+    struct SceneActorControlManager *p = gSceneActorControlManager;
     if (p) {
         s32 i;
         for (i = 0; i < 8; i++) {

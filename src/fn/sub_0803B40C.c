@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 struct Blob {
     u32 words[8];
 };
@@ -31,7 +32,6 @@ struct ResultMenu {
     int windows[4];
     u8 left[16], right[16];
 };
-extern struct ResultMenu *gUnk_02000104;
 int Script_SeekToKeyword(int);
 void *Script_GetTextSourcePc(void);
 void *ScriptProc_Start(int, int);
@@ -63,7 +63,7 @@ int WirelessResultPanel_Init(struct ResultMenu *arg)
     struct Sprite *sprite;
     struct Sprite *savedSprite;
     int flags;
-    gUnk_02000104 = p;
+    gResultMenu = p;
     if (Script_SeekToKeyword(115)) {
         void *value = Script_GetTextSourcePc();
         void **slot = &p->resource;

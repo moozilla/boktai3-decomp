@@ -49,7 +49,7 @@ struct ChoiceKeys {
     u16 held, pressed;
 };
 
-extern struct ChoiceMenu *gUnk_0200002C;
+extern struct ChoiceMenu *gChoiceMenu;
 extern struct ChoiceKeys gUnk_03005260;
 
 void ChoiceMenu_DispatchSelection(struct ChoiceMenu *p, s32 selection);

@@ -22,6 +22,6 @@ s32 OrbitBackground_Initialize(struct OrbitBackground *background, u32 id, u32 p
     background->position.z = gUnk_02000580[background->playerIndex]->position.z -
                              scale(gUnk_086149C4[background->angle & 255] * background->radius);
     OrbitBackground_Tick(background);
-    gUnk_0200048C = background;
+    gOrbitBackground = background;
     return 0;
 }

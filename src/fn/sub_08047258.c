@@ -5,8 +5,8 @@ u32 DamageNumberDisplay_Destroy(struct DamageNumberDisplay *);
 struct DamageNumberDisplay *DamageNumberDisplay_Create(void)
 {
     struct DamageNumberDisplay *display;
-    if (gUnk_02000074)
-        return gUnk_02000074;
+    if (gDamageNumberDisplay)
+        return gDamageNumberDisplay;
     display = Task_Create(9, sizeof(*display));
     if (display) {
         Task_SetCallbacks(display, (void (*)(void *))DamageNumberDisplay_Update,

@@ -761,7 +761,7 @@ void ScenePanel_ReadInitialMode(struct ScenePanel *input)
 
 void ScenePanel_SuppressMainPresentation(void)
 {
-    if (gUnk_020004A4) {
+    if (gScenePanel) {
         struct ScenePanel *panel;
         u8 mode;
         SCENE_PANEL_GLOBAL->skipMainSprite = 1;
@@ -773,7 +773,7 @@ void ScenePanel_SuppressMainPresentation(void)
 
 void ScenePanel_WriteFullScriptStatus(void)
 {
-    if (gUnk_020004A4) {
+    if (gScenePanel) {
         struct ScriptUtilityReference reference;
         s32 i;
         Script_ReadReference(&reference);
@@ -804,7 +804,7 @@ void ScenePanel_WriteFullScriptStatus(void)
 
 void ScenePanel_WriteScriptStatus(void)
 {
-    if (gUnk_020004A4) {
+    if (gScenePanel) {
         struct ScriptUtilityReference reference;
         s32 i;
         Script_ReadReference(&reference);
@@ -897,12 +897,12 @@ void ScenePanel_RegisterReceiver(struct ScenePanel *panel)
 
 void ScenePanel_ClearGlobal(void)
 {
-    gUnk_020004A4 = NULL;
+    gScenePanel = NULL;
 }
 
 u32 ScenePanel_IsPresent(void)
 {
-    u32 present = (u32)gUnk_020004A4;
+    u32 present = (u32)gScenePanel;
     if (present != 0)
         present = 1;
     return present;
@@ -1018,7 +1018,7 @@ s32 ScenePanel_DestroyLifecycle(struct ScenePanel *parent)
     }
     ScenePanel_DestroyParticles((void *)parent);
     ScenePanel_UnregisterReceiver((void *)parent);
-    gUnk_020004A4 = 0;
+    gScenePanel = 0;
     return 0;
 }
 
@@ -1050,15 +1050,15 @@ s32 ScenePanel_InitializeLifecycle(struct ScenePanel *parent)
         s32 mode = gGameState->unk876;
         parent->paletteMode = mode;
     }
-    gUnk_020004A4 = (void *)parent;
+    gScenePanel = (void *)parent;
     return 0;
 }
 
 struct ScenePanel *ScenePanel_Create(u32 actorId)
 {
     struct ScenePanel *panel;
-    if (gUnk_020004A4)
-        return gUnk_020004A4;
+    if (gScenePanel)
+        return gScenePanel;
     panel = Task_Create(9, 0x17E4);
     if (panel) {
         Task_SetCallbacks(panel, (void (*)(void *))ScenePanel_TickLifecycle,

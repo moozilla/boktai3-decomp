@@ -1,6 +1,6 @@
 #include "scene_particle_burst.h"
-extern struct SceneParticleBurstPool *gUnk_02000130;
+#include "ram.h"
 void SceneParticleBurst_ResetSingleton(void)
 {
-    gUnk_02000130 = 0;
+    gSceneParticleBurstPool = 0;
 }

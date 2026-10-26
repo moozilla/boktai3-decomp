@@ -174,7 +174,7 @@ struct SpriteEffectController *SpriteEffectController_Create(
     u32 one;
     graphicsId = graphicsInput;
     context = contextInput;
-    p = gUnk_02000178;
+    p = gSpriteEffectControllerPool;
     if (!p) {
         p = SpriteEffectController_EnsurePool();
         if (!p)

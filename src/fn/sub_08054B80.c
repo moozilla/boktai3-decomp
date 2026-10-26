@@ -5,7 +5,7 @@ struct DisplayTrackTagView {
 };
 struct DisplayTrack *DisplayTrack_FindFromScript(void)
 {
-    struct DisplayTrackManager **manager = &gUnk_02000494;
+    struct DisplayTrackManager **manager = &gDisplayTrackManager;
     struct DisplayTrackManager *current;
     struct DisplayTrackManager *loaded;
     s32 length;

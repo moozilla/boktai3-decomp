@@ -124,7 +124,7 @@ afterGravity:
         }
 
         if (!(ground3 > 0 && (cellFlags & 0x40) == 0) && np.y <= ground3) {
-            gUnk_0200014C->used &= ~(1u << obj->index);
+            gBouncingPool->used &= ~(1u << obj->index);
             obj->state = 0;
             Sprite_Remove(obj);
             Shadow_Destroy((u8 *)obj + 0xE4);

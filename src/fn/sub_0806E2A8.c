@@ -7,7 +7,7 @@ static inline u8 Occupied(u32 *mask, s32 index, u32 one)
 }
 void RouteSpritePool_RequestFinishAll(void)
 {
-    struct RouteSpritePool *pool = gUnk_02000198;
+    struct RouteSpritePool *pool = gRouteSpritePool;
     struct RouteSpriteActor *slot;
     s32 i;
     u32 one;

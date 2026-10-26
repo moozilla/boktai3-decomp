@@ -146,7 +146,7 @@ void SceneSteeringActor_CreateTravelActor(const struct ContactPosition *position
     struct DisplaySequenceState *sequence;
     const void **resourceSlot;
     u32 clear;
-    pool = gUnk_02000188;
+    pool = gSceneSteeringActorPool;
     if (!pool) {
         pool = SceneSteeringActor_EnsurePool();
         if (!pool)

@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_particle_burst.h"
 #include "engine.h"
+#include "ram.h"
 // confidence=low: spawns pooled particles with optional velocity ranges and position jitter.
 #define SceneParticleBurst_CreateWithRanges sub_08067E3C
-extern struct SceneParticleBurstPool *gUnk_02000130;
 extern const u16 gUnk_0203B400[];
 struct SceneParticleBurstPool *SceneParticleBurst_EnsureSingleton(u32, u32);
 struct SceneParticleBurstSlot *SceneParticleBurst_AllocateSlot(struct SceneParticleBurstPool *);
@@ -34,7 +34,7 @@ s32 SceneParticleBurst_CreateWithRanges(const struct ContactPosition *position,
     register const u16 *table asm("r10");
     if (!position)
         return -1;
-    pool = gUnk_02000130;
+    pool = gSceneParticleBurstPool;
     if (!pool) {
         pool = SceneParticleBurst_EnsureSingleton(0, 0);
         if (!pool)

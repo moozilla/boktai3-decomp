@@ -8,7 +8,7 @@ struct TemporaryAnimationSlot *TemporaryAnimationPool_CreateEntry(u32 sequence, 
                                                                   u32 flags, s32 paletteIndex,
                                                                   const void *paletteData)
 {
-    struct TemporaryAnimationPool *pool = gUnk_020000A8;
+    struct TemporaryAnimationPool *pool = gTemporaryAnimationPool;
     struct TemporaryAnimationSlot *slot;
     struct ProjectedDisplayEntry *animation;
     if (!pool) {

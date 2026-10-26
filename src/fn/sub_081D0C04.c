@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct PackedVec {
     u32 x : 16;
     u32 y : 16;
@@ -62,7 +63,6 @@ struct SceneNpc {
     void *callbacks[6];
 };
 extern void *gUnk_02000480;
-extern struct SceneNpc *gUnk_02000274;
 struct SceneNpc *Actor_Allocate(s32 name, s32 variant);
 s32 Actor_InitMotion(struct SceneNpc *, s32 name, struct PackedVec *, s32 angle);
 s32 Actor_InitDrawable(struct SceneNpc *, s32 kind, s32 a, s32 b, s32 c);
@@ -103,7 +103,7 @@ static inline void setBox(struct SceneNpc *npc, s32 width, s32 height)
 /* Registry routine BB34: creates a scene NPC (0x384-byte object from
    Actor_Allocate) named -n, variant -k (default 1), at -p x y z facing -d, with
    behavior -i (0-4: update callback, mode and state), records it in
-   gUnk_02000274 and registers it with the scene actor manager; -K also runs
+   gSceneNpc and registers it with the scene actor manager; -K also runs
    SceneNpc_EnterProjectedIdle on it. The facing computation needs register pins and an empty
    asm barrier (agbcc otherwise turns the arithmetic shift into a logical one). */
 void SceneNpc_CreateFromScript(void)
@@ -143,7 +143,7 @@ void SceneNpc_CreateFromScript(void)
     if (!npc) {
         return;
     }
-    gUnk_02000274 = npc;
+    gSceneNpc = npc;
     if (Actor_InitMotion(npc, name, &position, angle) < 0) {
         return;
     }

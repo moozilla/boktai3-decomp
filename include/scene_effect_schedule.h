@@ -19,7 +19,7 @@ struct SceneEffectSchedule {
     struct SceneEffectScheduleEntry entries[12];
     u32 occupiedMask;
 };
-extern struct SceneEffectSchedule *gUnk_0200019C;
+extern struct SceneEffectSchedule *gSceneEffectSchedule;
 extern u32 gUnk_030053F0, gUnk_02000560;
 struct SceneEffectScheduleEntry *SceneEffectSchedule_Allocate(struct SceneEffectSchedule *);
 s32 SceneEffectSchedule_Tick(struct SceneEffectSchedule *);

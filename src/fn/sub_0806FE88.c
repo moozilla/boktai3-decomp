@@ -20,7 +20,7 @@ void SceneActorRegistry_ScheduleAvailableActors(void)
 {
     s32 count = SceneActorRegistry_CountAvailable();
     if (count > 0) {
-        struct SceneActorRegistryNode *node = gUnk_020004AC;
+        struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
         struct SceneActorRegistryActor *actor = node->actor;
         s32 selected = 0;
         s32 quota;

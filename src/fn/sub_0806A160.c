@@ -33,7 +33,7 @@ s32 SparkParticle_Spawn(const struct ContactPosition *pos, u8 count,
     s32 index;
     s32 sequence;
 
-    pool = gUnk_02000168;
+    pool = gSparkParticlePool;
     if (pool == NULL) {
         pool = SparkParticle_CreatePool();
         if (pool == NULL) {

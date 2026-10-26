@@ -2,7 +2,7 @@
 #include "background_controller.h"
 /* Background_LoadLayerMap: Resolves a background resource via sub_08216E54, optionally finds the map id with Background_FindMapId, then calls Bg_SetLayerMap; matches docs' descr */
 #define Background_LoadLayerMap sub_080020BC
-/* ScrollingBackground_ClearSlots: Zeroes all four ScrollingBackground slots in gUnk_02000010, unlike the single-slot clear done by the destroy callback ScrollingBackground_Destroy */
+/* ScrollingBackground_ClearSlots: Zeroes all four ScrollingBackground slots in gScrollingBackgrounds, unlike the single-slot clear done by the destroy callback ScrollingBackground_Destroy */
 #define ScrollingBackground_ClearSlots sub_08002284
 
 /* Functions marked MATCHING_CONCESSION keep local register hints made with
@@ -214,7 +214,7 @@ s32 Background_Update(struct Background *p)
 
 u32 Background_Destroy(struct Background *p)
 {
-    gUnk_02000000[p->layer] = 0;
+    gBackgrounds[p->layer] = 0;
     return 0;
 }
 
@@ -233,7 +233,7 @@ s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig 
     s32 x;
     s32 y;
     short mode;
-    gUnk_02000000[c->layer] = p;
+    gBackgrounds[c->layer] = p;
     p->id = id;
     p->flags = c->flags;
     p->layer = c->layer;
@@ -593,7 +593,7 @@ void Background_QueueCommand(u32 layer, u32 type, s32 length, s32 *args)
     u32 commandType = type;
     s32 lengthLimit = length;
     s32 *input = args;
-    struct Background *p = gUnk_02000000[layer];
+    struct Background *p = gBackgrounds[layer];
     if (p && p->queue.count <= 7) {
         s32 j;
         p->queue.types[p->queue.count] = commandType;
@@ -629,13 +629,13 @@ void Background_QueueCommandFromScript(void)
     Background_QueueCommand(a, b, n, buf);
 }
 
-/* Clears the four ScrollingBackground slots in gUnk_02000010. Not listed in
+/* Clears the four ScrollingBackground slots in gScrollingBackgrounds. Not listed in
  * symbols/functions.csv; it sits between two units as raw bytes in gen/code.s,
  * so it is decompiled here to keep the subsystem contiguous. */
 
 void sub_08002284(void)
 {
-    u32 *base = (u32 *)gUnk_02000010;
+    u32 *base = (u32 *)gScrollingBackgrounds;
     u32 zero = 0;
     u32 *p = base + 3;
     do {
@@ -775,7 +775,7 @@ s32 ScrollingBackground_Update(struct ScrollingBackground *p)
 u32 ScrollingBackground_Destroy(struct ScrollingBackground *p)
 {
     /* The slot table is pointer-sized; a u32 view keeps the original access shape. */
-    u32 *q = (u32 *)gUnk_02000010;
+    u32 *q = (u32 *)gScrollingBackgrounds;
     u32 i = p->layer;
     q[i] = 0;
 }
@@ -787,7 +787,7 @@ s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id,
     u8 *resource;
     s32 x, y, scale, tx, ty;
     void *map;
-    gUnk_02000010[c->layer] = p;
+    gScrollingBackgrounds[c->layer] = p;
     p->id = id;
     p->flags = c->flags;
     p->layer = c->layer;
@@ -945,7 +945,7 @@ void *ScrollingBackground_CreateFromScript(u32 id)
 
 void ScrollingBackground_QueueCommand(u32 layer, u32 type, s32 length, s32 *args)
 {
-    struct ScrollingBackground *p = gUnk_02000010[layer];
+    struct ScrollingBackground *p = gScrollingBackgrounds[layer];
     if (p && p->queue.count <= 7) {
         s32 j;
         p->queue.types[p->queue.count] = type;

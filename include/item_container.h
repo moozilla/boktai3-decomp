@@ -113,7 +113,7 @@ struct TriggerScriptArgs {
     s32 *values;
 };
 
-extern struct TriggerManager *gUnk_02000030;
+extern struct TriggerManager *gTriggerManager;
 
 s32 Trigger_RunScript(struct Trigger *, u32 script, s32 event);
 u32 TriggerManager_InsertTrigger(struct Trigger *);

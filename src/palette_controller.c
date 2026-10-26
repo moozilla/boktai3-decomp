@@ -1,6 +1,6 @@
 #include "palette_controller.h"
 #include "render.h"
-/* Palette_ClearActiveController: zeroes gUnk_02000468 (the active controller pointer); identical body to the task's destroy callback Palette_Destroy */
+/* Palette_ClearActiveController: zeroes gPaletteController (the active controller pointer); identical body to the task's destroy callback Palette_Destroy */
 #define Palette_ClearActiveController sub_08002AD4
 /* Palette_NoOpCallback: empty stub with no identified caller or callee; placeholder callback body */
 #define Palette_NoOpCallback sub_08002E7C
@@ -29,7 +29,7 @@ u16 *Palette_GetColorSet(struct PaletteController *p, u32 set, u32 slot)
 
 void sub_08002AD4(void)
 {
-    gUnk_02000468 = 0;
+    gPaletteController = 0;
 }
 
 static inline void copy32(const void *source, void *dest, s32 size)
@@ -446,7 +446,7 @@ s32 Palette_Update(struct PaletteController *p)
 
 u32 Palette_Destroy(void)
 {
-    gUnk_02000468 = 0;
+    gPaletteController = 0;
 }
 
 extern u16 gUnk_03004FC0[];
@@ -461,7 +461,7 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
     struct PaletteTransition *t = &p->transition;
     struct PaletteWave *w = &p->wave;
     do {
-        gUnk_02000468 = p;
+        gPaletteController = p;
         p->pending = 0;
         t->callback = 0;
         p->hardware = gUnk_03004FC0;
@@ -549,8 +549,8 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
 struct PaletteController *Palette_GetOrCreate(void)
 {
     struct PaletteController *r;
-    if (gUnk_02000468 != 0)
-        return gUnk_02000468;
+    if (gPaletteController != 0)
+        return gPaletteController;
     r = Task_Create(11, 0xe94);
     if (r) {
         Task_SetCallbacks(r, Palette_Update, Palette_Destroy);
@@ -564,23 +564,23 @@ struct PaletteController *Palette_GetOrCreate(void)
 
 void Palette_SetBrightnessMode(u32 v)
 {
-    if (gUnk_02000468) {
-        struct PaletteTransition *t = &gUnk_02000468->transition;
+    if (gPaletteController) {
+        struct PaletteTransition *t = &gPaletteController->transition;
         t->mode = v;
     }
 }
 
 u8 Palette_IsDirty(void)
 {
-    if (gUnk_02000468 == 0)
+    if (gPaletteController == 0)
         return 0;
-    return gUnk_02000468->dirty;
+    return gPaletteController->dirty;
 }
 
 void Palette_SetBlend(u32 v)
 {
-    if (gUnk_02000468) {
-        gUnk_02000468->blend = v;
+    if (gPaletteController) {
+        gPaletteController->blend = v;
     }
 }
 
@@ -591,7 +591,7 @@ void sub_08003494(void)
 
 void Palette_ReplaceResource(u32 bank, u32 index, u32 resource, u32 flags)
 {
-    struct PaletteController *p = gUnk_02000468;
+    struct PaletteController *p = gPaletteController;
     if (p) {
         u8 *colors;
         u16 id = resource;
@@ -617,7 +617,7 @@ void Palette_ReplaceResource(u32 bank, u32 index, u32 resource, u32 flags)
 
 void Palette_ReplaceResourceFromScript(void)
 {
-    if (gUnk_02000468 != 0) {
+    if (gPaletteController != 0) {
         s32 a = Script_GetKeywordValue(0x73, 0);
         s32 b = Script_GetKeywordValue(0x69, 0);
         s32 c = Script_GetKeywordValue(0x6e, 0);
@@ -628,7 +628,7 @@ void Palette_ReplaceResourceFromScript(void)
 
 void Palette_StartSlide(u32 a, u32 b, u32 c)
 {
-    struct PaletteController *p = gUnk_02000468;
+    struct PaletteController *p = gPaletteController;
     if (p != 0) {
         struct PaletteSlide *q = &p->slide;
         q->start = a;
@@ -651,7 +651,7 @@ void Palette_StartSlideFromScript(void)
 
 void Palette_SetBrightnessFromScript(void)
 {
-    struct PaletteController *p = gUnk_02000468;
+    struct PaletteController *p = gPaletteController;
     if (p) {
         struct PaletteTransition *t = ({
             struct PaletteTransition *hint = &p->transition;
@@ -719,12 +719,12 @@ void Palette_SetBrightnessFromScript(void)
 
 u32 Palette_GetTransitionLevel(void)
 {
-    return gUnk_02000468 ? gUnk_02000468->transition.level : 0x40;
+    return gPaletteController ? gPaletteController->transition.level : 0x40;
 }
 
 u32 Palette_GetBrightness(void)
 {
-    struct PaletteController *q = gUnk_02000468;
+    struct PaletteController *q = gPaletteController;
     u32 r;
     if (q) {
         struct PaletteTransition *t = &q->transition;

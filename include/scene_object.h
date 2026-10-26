@@ -125,7 +125,7 @@ struct SceneObjectManager {
     struct SceneObject *objects;
 };
 
-extern struct SceneObjectManager *gUnk_02000024;
+extern struct SceneObjectManager *gSceneObjectManager;
 
 /* Engine helpers shared by the functions below. */
 void SceneParticleBurst_CreateWithPause(struct SceneVec *, s32, struct SceneExtent *, s32, s32,

@@ -42,7 +42,7 @@ struct RepeatedEffectManager {
     u16 count, unknown1A;
     struct RepeatedEffect entries[8];
 };
-extern struct RepeatedEffectManager *gUnk_02000110;
+extern struct RepeatedEffectManager *gRepeatedEffectManager;
 void RepeatedEffect_SetState(struct RepeatedEffect *, u8, void (*)(struct RepeatedEffect *));
 void RepeatedEffect_TickLowerTransition(struct RepeatedEffect *);
 void RepeatedEffect_TickLowerState(struct RepeatedEffect *);

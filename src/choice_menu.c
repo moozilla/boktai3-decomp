@@ -244,7 +244,7 @@ u32 ChoiceMenu_Destroy(struct ChoiceMenu *p)
 {
     Anim_Remove(&p->leftCursor);
     Anim_Remove(&p->rightCursor);
-    return gUnk_0200002C = 0;
+    return gChoiceMenu = 0;
 }
 
 void MessageWindow_SetBounds(u32, u32, u32, u32);
@@ -421,7 +421,7 @@ s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s3
     struct Dimensions dimensions;
     s32 initial;
     u16 *palette;
-    gUnk_0200002C = p;
+    gChoiceMenu = p;
     resource = ScriptProc_Start(0xCB05, 0x530D);
     if (!resource)
         return -1;
@@ -472,7 +472,7 @@ s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s3
 struct ChoiceMenu *ChoiceMenu_Create(void *window, s32 stringBase, void *callback, s32 *options)
 {
     struct ChoiceMenu *p;
-    if (gUnk_0200002C)
+    if (gChoiceMenu)
         return 0;
     p = Task_Create(11, 0x1E8);
     if (p) {
@@ -500,7 +500,7 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
     struct ChoiceMenu *p;
     s32 i;
     s32 *argumentBase;
-    if (gUnk_0200002C)
+    if (gChoiceMenu)
         return 0;
     if (Script_SeekToKeyword('r'))
         window = Script_GetTextSourcePc();
@@ -578,7 +578,7 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
 
 void ChoiceMenu_ReloadFromScript(void)
 {
-    struct ChoiceMenu *p = gUnk_0200002C;
+    struct ChoiceMenu *p = gChoiceMenu;
     if (p != 0 && Script_SeekToKeyword(0x72)) {
         p->window = Script_GetTextSourcePc();
         p->stringBase = Script_GetKeywordValue(0x69, 0);

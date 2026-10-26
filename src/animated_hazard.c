@@ -4,7 +4,7 @@
 
 struct AnimatedHazardManager *AnimatedHazard_GetManager(void)
 {
-    return gUnk_02000050;
+    return gAnimatedHazardManager;
 }
 
 void AnimatedHazard_SetState(void *unused, struct AnimatedHazard *p, u32 v)
@@ -358,7 +358,7 @@ u32 AnimatedHazardManager_Destroy(struct AnimatedHazardManager *s)
     for (i = 7; i >= 0; i--, e++) {
         AnimatedHazard_RemoveSprite(s, e);
     }
-    return gUnk_02000050 = 0;
+    return gAnimatedHazardManager = 0;
 }
 
 void AnimatedHazard_Initialize(struct AnimatedHazardManager *, struct AnimatedHazard *);
@@ -367,7 +367,7 @@ s32 AnimatedHazardManager_Initialize(struct AnimatedHazardManager *s)
 {
     struct AnimatedHazard *e;
     s32 i;
-    gUnk_02000050 = s;
+    gAnimatedHazardManager = s;
     s->script = ScriptProc_Start(0x922E, 0xE92A);
     if (AnimData_Load(s->animData, 0xCD6C) == 0)
         return -1;
@@ -387,8 +387,8 @@ u32 AnimatedHazardManager_Destroy(struct AnimatedHazardManager *);
 void *AnimatedHazardManager_Create(void)
 {
     struct AnimatedHazardManager *p;
-    if (gUnk_02000050 != 0)
-        return gUnk_02000050;
+    if (gAnimatedHazardManager != 0)
+        return gAnimatedHazardManager;
     p = Task_Create(8, 0x538);
     if (p != 0) {
         Task_SetCallbacks(p, (void (*)(void *))AnimatedHazardManager_Update,

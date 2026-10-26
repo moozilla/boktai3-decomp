@@ -9,7 +9,7 @@ static inline u8 Used(const u32 *mask, u32 bit)
 // velocity and moves it to state 4.
 void sub_0806CCC8(struct ContactPosition *target, s32 lifetime, s32 speed)
 {
-    struct SceneSteeringActorPool *pool = gUnk_02000188;
+    struct SceneSteeringActorPool *pool = gSceneSteeringActorPool;
     u32 initial = (u32)pool + 0x3C;
     struct SceneSteeringActor *slot;
     s32 i;

@@ -1,7 +1,7 @@
 #include "scene_actor_contact_list.h"
 void *SceneActorContacts_FindObjectById(u16 id)
 {
-    struct SceneActorContactManager *manager = gUnk_020001A0;
+    struct SceneActorContactManager *manager = gSceneActorContactManager;
     struct SceneActorContactNode *node;
     void *object;
     if (!manager)

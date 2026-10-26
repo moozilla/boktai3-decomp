@@ -1,4 +1,5 @@
 #include "global.h"
+#include "area_effect.h"
 
 struct S {
     u8 filler[0x24];
@@ -7,13 +8,12 @@ struct S {
     u8 c;
     u8 d;
 };
-extern struct S *gUnk_0200010C;
 
 s32 AreaEffect_InitializeLink(struct S *p)
 {
     p->b = 0;
     p->a = 0x1C7;
     p->d = 0;
-    gUnk_0200010C = p;
+    gAreaEffectManager = p;
     return 0;
 }

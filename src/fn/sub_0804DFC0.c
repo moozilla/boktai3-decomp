@@ -1,8 +1,8 @@
 #include "global.h"
-extern u8 *gUnk_0200010C;
+#include "area_effect.h"
 s32 AreaEffect_HasEnabledTerrainValue(u32 a)
 {
-    u8 *g = gUnk_0200010C;
+    u8 *g = gAreaEffectManager;
     u8 *np;
     s32 i;
     s32 n;

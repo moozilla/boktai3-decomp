@@ -25,7 +25,7 @@ struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
     register struct ContactPosition *target asm("r4") = inTarget;
     u32 shot = inShot;
     struct BouncingPool *pool;
-    pool = gUnk_0200014C;
+    pool = gBouncingPool;
     if (!pool) {
         pool = BouncingObject_EnsurePool();
         if (!pool)

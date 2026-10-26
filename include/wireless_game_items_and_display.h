@@ -92,7 +92,7 @@ struct WirelessGameExchange {
     u8 choice, counter;
 };
 struct WirelessGameExchange *WirelessExchange_Get(void);
-extern struct WirelessGameItems *gUnk_02000100;
+extern struct WirelessGameItems *gWirelessGameItems;
 int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *, int, int);
 int WirelessGameDisplay_Init(struct WirelessGameDisplay *);
 

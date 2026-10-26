@@ -1,7 +1,7 @@
 #include "scene_actor_registry.h"
 struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32 id)
 {
-    struct SceneActorRegistryNode *node = gUnk_020004AC;
+    struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
     struct SceneActorRegistryActor *actor;
     while ((actor = node->actor) != NULL) {
         if (actor->id == id)

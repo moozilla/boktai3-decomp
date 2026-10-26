@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control.h"
-extern struct SceneActorControlManager *gUnk_02000128;
+#include "ram.h"
 struct SceneActorControlManager *SceneActorControl_EnsureSingleton(void);
 struct SceneActorControlSlot *SceneActorControl_AllocateSlot(struct SceneActorControlManager *);
 void SceneActorControl_DecodeDirection(const void *, u8 *, u8 *);
@@ -153,7 +153,7 @@ static inline u8 *PreserveKind(u8 *flip, u32 value)
 s32 SceneActorControl_CreateFromPosition(const struct SceneActorControlInput *argument)
 {
     const struct SceneActorControlInput *input = argument;
-    register struct SceneActorControlManager *found asm("r0") = gUnk_02000128;
+    register struct SceneActorControlManager *found asm("r0") = gSceneActorControlManager;
     register struct SceneActorControlManager *p asm("r6");
     struct SceneActorControlSlot *slot;
     struct ContactPosition *saved;

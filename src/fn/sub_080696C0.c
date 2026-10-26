@@ -8,7 +8,7 @@ static inline u8 Occupied(const u32 *mask, u32 bit)
 s32 BouncingObject_GetNearbyHeading(const struct ContactPosition *input)
 {
     const struct ContactPosition *position = input;
-    struct BouncingPool *pool = gUnk_0200014C;
+    struct BouncingPool *pool = gBouncingPool;
     struct BouncingObject *slots;
     u32 *firstMask;
     u32 *used;

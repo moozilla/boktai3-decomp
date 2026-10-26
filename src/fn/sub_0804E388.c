@@ -17,7 +17,7 @@ static inline s32 cellIndex(s32 x, s32 z)
 }
 void AreaEffect_AddSpriteFromScript(void)
 {
-    struct AreaEffectManager *manager = gUnk_0200010C;
+    struct AreaEffectManager *manager = gAreaEffectManager;
     if (manager) {
         u8 *cursor = &manager->count;
         u32 n = *cursor;

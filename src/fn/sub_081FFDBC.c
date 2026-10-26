@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_020005F4;
+#include "ram.h"
 void HomingProjectile_InitializeSlot(u8 *, u8 *, s32);
 u32 HomingProjectile_InitManager(u8 *a)
 {
@@ -7,7 +7,7 @@ u32 HomingProjectile_InitManager(u8 *a)
     s32 i;
     u16 *q;
     u32 z;
-    gUnk_020005F4 = a;
+    gHomingManager = a;
     *(u32 *)(a + 0x18) = 0;
     e = a + 0x1c;
     i = 0;

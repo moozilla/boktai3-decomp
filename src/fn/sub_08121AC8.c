@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_0200012C;
 void Sprite_Remove(void *);
 
 static inline u8 Tst(u32 *m, s32 i)
@@ -21,5 +21,5 @@ u32 SceneColliderEffect_DestroyPool(u8 *p)
             Sprite_Remove(e);
         }
     }
-    return gUnk_0200012C = 0;
+    return gColliderEffectPool = 0;
 }

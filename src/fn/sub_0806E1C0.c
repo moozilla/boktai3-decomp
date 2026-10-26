@@ -21,7 +21,7 @@ s32 RouteSpritePool_Destroy(struct RouteSpritePool *pool)
     }
     {
         u32 zero = 0;
-        gUnk_02000198 = (void *)zero;
+        gRouteSpritePool = (void *)zero;
     }
     return 0;
 }

@@ -1,5 +1,6 @@
 #include "global.h"
-extern u8 *gUnk_02000274, *gUnk_02000480;
+#include "ram.h"
+extern u8 *gUnk_02000480;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetKeywordValue(s32, s32);
 u8 *Actor_FindById(void *, s32);
@@ -7,7 +8,7 @@ void SceneNpc_FollowSceneTarget(void);
 void SceneNpc_SetBehaviorTwoFromScript(void)
 {
     u8 *p;
-    if (!gUnk_02000274)
+    if (!gSceneNpc)
         return;
     if (Script_SeekToKeyword(0x6e)) {
         p = gUnk_02000480;
@@ -17,7 +18,7 @@ void SceneNpc_SetBehaviorTwoFromScript(void)
         if (!p)
             return;
     } else
-        p = gUnk_02000274;
+        p = gSceneNpc;
     {
         u8 *q = p + 0x21b;
         s32 zero = 0, one = 1;

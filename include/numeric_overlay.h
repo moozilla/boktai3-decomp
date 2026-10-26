@@ -18,7 +18,7 @@ struct NumericOverlay {
     u16 pad2A;
 };
 
-extern struct NumericOverlay *gUnk_02000048; // the live overlay, or NULL
+extern struct NumericOverlay *gNumericOverlay; // the live overlay, or NULL
 
 u16 *NumericOverlay_GetTileMapPtr(u32 bg, u32 x, s32 y); // same as StatusScreen_GetTilePtr
 void sub_0800F4EC(struct NumericOverlay *);

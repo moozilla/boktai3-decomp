@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct Motion {
     u8 pad0[9];
     u8 angle;
@@ -29,7 +30,6 @@ struct Player {
     s16 x, y, z;
 };
 extern void *gUnk_02000480;
-extern struct SceneNpc *gUnk_02000274;
 extern struct Player *gUnk_02000580[];
 struct SceneNpc *Actor_FindById(void *manager, s32 name);
 s32 Math_Atan2(s32 dx, s32 dz);
@@ -62,14 +62,14 @@ static inline void setAngle(struct SceneNpc *npc, s32 angle)
     npc->angle = npc->motion.angle;
 }
 /* Registry routine 8918: puts scene NPC -n (default: the last one created,
-   gUnk_02000274) into the scripted state (mode 0x10, state 14, update
+   gSceneNpc) into the scripted state (mode 0x10, state 14, update
    sub_081CEE50), then -p x y z, -d angle, -w face the player, -s sets flag 1. */
 void SceneNpc_CommandFromScript(void)
 {
     struct SceneNpc *npc;
     u8 mode;
     void (*update)(void);
-    if (!gUnk_02000274)
+    if (!gSceneNpc)
         return;
     if (Script_SeekToKeyword('n')) {
         void *manager = gUnk_02000480;
@@ -79,7 +79,7 @@ void SceneNpc_CommandFromScript(void)
         if (!npc)
             return;
     } else
-        npc = gUnk_02000274;
+        npc = gSceneNpc;
     mode = 0x10;
     npc->field2 = 0;
     npc->field3 = 0;

@@ -10,7 +10,7 @@ static inline u8 SceneActorRegistry_IsPaused(void)
 void SceneActorRegistry_AdvanceInactiveActors(struct SceneActorRegistryManager *unusedManager)
 {
     if (SceneActorRegistry_IsPaused()) {
-        struct SceneActorRegistryNode *node = gUnk_020004AC;
+        struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
         if (node) {
             struct SceneActorRegistryActor *actor = node->actor;
             if (actor) {

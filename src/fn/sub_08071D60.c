@@ -10,7 +10,7 @@ s32 SceneActorRegistry_InitializeManager(struct SceneActorRegistryManager *manag
     manager->field62 = 0;
     manager->mode = 3;
     SceneActorRegistry_InitializeList(manager);
-    gUnk_020004A8 = manager;
+    gSceneActorRegistryManager = manager;
     /* The caller tests this retained subsystem address as a signed status. */
     return (s32)Memory_ClearWordPair(manager->subsystem);
 }

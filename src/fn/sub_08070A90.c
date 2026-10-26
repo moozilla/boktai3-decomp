@@ -20,7 +20,7 @@ void SceneActorRegistry_SetMovementModesFromScript(void)
     s32 mode;
     if (!SceneActorRegistry_GetManager())
         return;
-    node = gUnk_020004AC;
+    node = gSceneActorRegistryNode;
     actor = node->actor;
     mode = Script_GetKeywordValue('d', 0);
     if (actor) {

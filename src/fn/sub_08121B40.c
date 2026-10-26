@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_0200012C;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 SceneColliderEffect_InitPool(u8 *);
@@ -11,8 +11,8 @@ void SceneColliderEffect_DestroyPool(void);
 u8 *SceneColliderEffect_EnsurePool(void)
 {
     u8 *p;
-    if (gUnk_0200012C != 0)
-        return gUnk_0200012C;
+    if (gColliderEffectPool != 0)
+        return gColliderEffectPool;
     p = Task_Create(0xa, 0x2cc);
     if (p != 0) {
         Task_SetCallbacks(p, ActionGroup_RunSelectedCallbacks, SceneColliderEffect_DestroyPool);
