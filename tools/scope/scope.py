@@ -23,6 +23,8 @@
   scope.py FILE.c frame         stack slots, ROM against draft, with the pseudo (C variable) in each
   scope.py FILE.c hoist         loop-invariant motion pass by pass: what loop.c moved out, what stayed, why
   scope.py FILE.c giv           loop strength reduction: each induction value, loop.c's benefit and decision
+  scope.py FILE.c pre           gcse's PRE replacements: expression, where it is computed and inserted, the
+                                line it replaced, and each one's AGBCC_NOPRE=k score
   scope.py FILE.c put SNIPPET.c [FUNC]   SNIPPET.c (FUNC's definition, with its structs/helpers above) in
                                 place of FUNC's definition, then the score: no hand edits of the unit copy
   scope.py todo [N] [addr|prior|size]   functions with no C yet (phase 1), in ROM order
@@ -1100,11 +1102,101 @@ def live_insns(wd, reg):
     return out
 
 
+def early_names(wd, func):
+    """pseudo -> C name for user variables that never reach allocation (cse or gcse removed them, so
+    AGBCC_DUMPPRI has no record): the name assigned on the C line of the variable's first set at expand."""
+    path = os.path.join(wd, "u.i.rtl")
+    src = os.path.join(wd, "u.i")
+    if not os.path.exists(path) or not os.path.exists(src):
+        return {}
+    known = pseudo_names(wd, func)
+    text = open(src).read().split("\n")
+    lines = uid_lines(wd)
+    files = {}  # cpp line markers: map the dump's C lines back onto u.i
+    out = {}
+    for u, _, r in insn_list(wd, "rtl"):
+        m = re.match(r"\(set \(reg/v(?:/\w)*:\w+ (\d+)\)", r)
+        if not m or int(m.group(1)) in known or int(m.group(1)) in out or u not in lines:
+            continue
+        files.setdefault("map", source_line_map(text))
+        code = files["map"].get(lines[u], "")
+        a = re.findall(r"\b([A-Za-z_]\w*)\s*(?:\[[^\]]*\])?\s*=(?!=)", code)
+        if len(a) == 1:
+            out[int(m.group(1))] = a[0]
+            continue
+        # an inline helper's parameter copy (fact 15): the sets sit on the call's line, one per parameter
+        if "inl" not in files:
+            whole = "\n".join(text)
+            files["inl"] = {f.group(1): [re.findall(r"(\w+)\s*(?:\[\d*\])?$", x.strip())[0]
+                                         for x in f.group(2).split(",") if re.search(r"\w\s*$", x.strip())]
+                            for f in re.finditer(r"\binline\b[^;{()]*?\b(\w+)\s*\(([^()]*)\)\s*\{", whole)}
+        calls = [c for c in re.findall(r"\b(\w+)\s*\(", code) if files["inl"].get(c)]
+        if calls:
+            n = files.setdefault(("n", lines[u], calls[0]), [0])
+            params = files["inl"][calls[0]]
+            if n[0] < len(params):
+                out[int(m.group(1))] = f"{params[n[0]]}@{calls[0]}"
+            n[0] += 1
+    return out
+
+
+def source_line_map(pre_lines):
+    """C line number in the main file -> its text, from the preprocessed unit's line markers."""
+    out, cur, main = {}, None, None
+    for ln in pre_lines:
+        m = re.match(r'# (\d+) "([^"]+)"', ln)
+        if m:
+            main = main or m.group(2)
+            cur = int(m.group(1)) if m.group(2) == main else None
+            continue
+        if cur is not None:
+            out[cur] = ln
+            cur += 1
+    return out
+
+
+def eliminated_life(wd, func, reg, name):
+    """For a pseudo flow never sees: its sets and uses in each dump up to the pass that removed it, and
+    what that pass put in its place. cse's canonical-register choice (fact 4) compares these last uses."""
+    lines = uid_lines(wd)
+    pat = re.compile(r"\(reg(?:/\w)*:\w+ %d\)" % reg)
+    at = lambda u: f"{u} (line {lines[u]})" if lines.get(u) else str(u)
+    prev = None
+    print(f"pseudo {reg} ({name}): no live length (flow never sees it); the passes before:")
+    for p in ("rtl", "jump", "cse", "gcse", "loop", "cse2", "flow"):
+        il = insn_list(wd, p)
+        if not il:
+            continue
+        mine = [(u, r) for u, _, r in il if pat.search(r)]
+        if not mine:
+            if prev:
+                after = {u: r for u, _, r in il}
+                repl = []
+                for u, r in prev[1]:
+                    if u in after:
+                        new = sorted(set(regs_of(after[u])) - set(regs_of(r)))
+                        repl.append(f"{at(u)}: {', '.join(map(str, new)) or 'folded'}")
+                    else:
+                        repl.append(f"{at(u)}: insn gone")
+                print(f"  {p}: removed it. In its uses: " + "; ".join(repl[:8])
+                      + (" ..." if len(repl) > 8 else ""))
+            break
+        sets = [u for u, r in mine if re.match(r"\(set " + pat.pattern, r)]
+        uses = [u for u, r in mine if u not in sets or len(pat.findall(r)) > 1]
+        print(f"  after {p:6}: set at {', '.join(at(u) for u in sets) or '-'}; used at"
+              f" {', '.join(at(u) for u in uses[:10]) or '-'}{' ...' if len(uses) > 10 else ''}"
+              + (f"; last use {at(uses[-1])}" if uses else ""))
+        prev = (p, mine)
+    print("  cse makes the longer-lived of two equal registers canonical (fact 4): compare this last use with"
+          " the value it copied (`life` on that one); an alias that outlives its source takes over its uses")
+
+
 def cmd_life(names, func):
     """What makes up a pseudo's live length: the insns flow counted (liveness across branches), grouped
-    by C line. Pass pseudo numbers or C variable names (names survive edits; numbers shift)."""
+    by C line. Pass pseudo numbers or C variable names (names survive edits; numbers shift). A pseudo
+    that cse or gcse removed gets its sets and uses before that pass instead."""
     wd = workdir(func)
-    pn = pseudo_names(wd, func)
+    pn = {**early_names(wd, func), **pseudo_names(wd, func)}
     lines = uid_lines(wd)
     recs = alloc_records(wd, func)
     flow = live_lengths(wd, "flow")
@@ -1116,6 +1208,9 @@ def cmd_life(names, func):
         for reg in regs:
             ins = live_insns(wd, reg)
             rec = recs.get(reg)
+            if not ins and reg not in flow:
+                eliminated_life(wd, func, reg, pn.get(reg, "-"))
+                continue
             pri = (f", priority {rec[2]} ({rec[3]} refs{ref_note(wd, reg, rec[3])}, live {rec[4]} at allocation)"
                    if rec and rec[0] == "G" else "")
             print(f"pseudo {reg} ({pn.get(reg, '-')}): flow live length {flow.get(reg, '?')}{pri};"
@@ -2498,6 +2593,7 @@ def cmd_probe(src, func, env):
     follows = {int(m.group(1)): int(m.group(2))
                for m in re.finditer(r"follow k=(\d+) pass=1 jump=\d+ label=\d+ line=(\d+)", tr)}
     pres = sorted({int(m.group(1)) for m in re.finditer(r"pre k=(\d+) insn=(\d+) expr=\d+", tr)})
+    pre_of = {r["k"]: r for r in pre_records(wd, info["obj_name"])}
     fnames = (func, rom_name(src, func))
     givs = {}  # insn uid -> (addr|reg, reduced?) for loop strength reduction in this function
     for m in re.finditer(r"giv fn=(\w+) insn=(\d+) type=(\w+) (?:benefit=-?\d+ lifetime=\d+ )?reduce=(\w+)", tr):
@@ -2552,7 +2648,8 @@ def cmd_probe(src, func, env):
     cands = ([("CSE_NOCANON", str(n), who(n) + (f", made canonical over {who(copied[n])}" if n in copied else ""))
               for n in sorted(heads)]
              + [("CSE_NOFOLLOW", str(k), f"cse follow of the jump at line {ln}") for k, ln in sorted(follows.items())]
-             + [("AGBCC_NOPRE", str(k), f"PRE replacement {k}") for k in pres]
+             + [("AGBCC_NOPRE", str(k), pre_text(wd, info["obj_name"], pre_of[k]) if k in pre_of
+                 else f"PRE replacement {k}") for k in pres]
              + [("AGBCC_NOMOVE", str(u), f"loop invariant hoist of {who(r)} (insn {u}, line {lines.get(u, '?')};"
                  f" threshold {t} x lifetime {life} >= {n} insns)") for u, (r, t, life, n) in sorted(hoists.items())]
              + [("AGBCC_NOGIV" if red else "AGBCC_GIV", str(u),
@@ -2585,9 +2682,11 @@ def cmd_probe(src, func, env):
            "CSE_NOFOLLOW": "cse carried what it knew (a constant in a register, an equal value) past"
                            " this jump into its target. In C keep the value from being known there:"
                            " another mode (a `(u8)` narrow constant), or recompute it after the branch.",
-           "AGBCC_NOPRE": "gcse found this computation redundant and reused an earlier register. The"
-                          " ROM recomputed it: spell it differently (another base or offset form) so"
-                          " PRE does not see the same expression.",
+           "AGBCC_NOPRE": "gcse found this computation redundant and reused the reaching register (computed"
+                          " where it says). The ROM recomputed it: make the occurrences different expressions"
+                          " to gcse (another base pointer; an offset Thumb encodes inline vs one loaded from"
+                          " the pool, fact 2) or read the value from a variable set once. `pre` lists every"
+                          " PRE decision with its C lines and score.",
            "AGBCC_NOGIV": "loop.c turned this per-iteration computation into its own register stepped"
                           " each pass (strength reduction; often a post-increment address). First check"
                           " the ROM listing: if the ROM also steps it (a post-increment or an add of the"
@@ -2734,7 +2833,6 @@ def cmd_why_all(src, func, env, rng=None):
     for g in orders:
         g["unique_insn"] = unique(g)
     groups = {i: g for i, g in enumerate(causes + sure + common)}
-    json.dump(list(groups.values()), open(os.path.join(wd, 'why-all.json'), 'w'), indent=2)
     first = details.splitlines()[0] if details else func
     scope_note = [ln for ln in details.splitlines() if re.match(r"\(\d+ of \d+ hunks in", ln)]
     print(first.split('; per hunk:')[0] + f"; {len(groups)} distinct mechanism(s)"
@@ -2742,15 +2840,31 @@ def cmd_why_all(src, func, env, rng=None):
     shown = causes + sure
     if len(shown) < 12:
         shown += common[:12 - len(shown)]
+    base_n = None
     for item in shown[:12]:
         us = ', '.join(map(str, item['uids']))
         title = item['title']
         print('  - ' + title[:300] + ('...' if len(title) > 300 else '') + (f" [insns {us}]" if us else ''))
         if item['knob']:
-            print('    what-if: ' + item['knob'])
+            verdict = ""
+            k, _, v = item['knob'].partition("=")
+            if v and not re.search(r":D\b", v):  # a concrete knob: say what it does (some suggestions do nothing)
+                try:
+                    if base_n is None:
+                        base_n = score(src, func, env)[0]
+                    m, inf = score(src, func, dict(env, **{k: f"{env[k]},{v}" if env.get(k) else v}))
+                    item["knob_result"] = inf.get("counts", "MATCH") if m else "MATCH"
+                    verdict = (f" -> {item['knob_result']}" + (" (better)" if m < base_n else " (worse)" if m > base_n
+                               else " (no change: not this decision, or not alone)"))
+                except SystemExit as e:
+                    verdict = f" -> {str(e.code).splitlines()[0][:80]}"
+            print('    what-if: ' + item['knob'] + verdict)
     if not groups:
         # Preserve the actionable no-UID/branch-only diagnosis, rather than inventing a mechanism.
         print('\n'.join(details.splitlines()[1:8]))
+    if base_n is not None:
+        score(src, func, env, full=True)  # leave the workdir's dumps at the unmodified draft
+    json.dump(list(groups.values()), open(os.path.join(wd, 'why-all.json'), 'w'), indent=2)
     rest = [g for g in groups.values() if g not in shown[:12]]
     if rest:
         nc = sum(1 for g in rest if g in common)
@@ -3085,7 +3199,7 @@ def first_real_use(wd, uid):
     return None
 
 
-def explain_substitution(wd, p, uid, gone, nm, at):
+def explain_substitution(wd, p, uid, gone, nm, at, func=None):
     """A pass took pseudos out of insn UID: say what each one held (its set in the previous dump) and whether
     the pass folded that set into this insn."""
     prev = PASSES[max(0, PASSES.index(p) - 1)]
@@ -3106,6 +3220,18 @@ def explain_substitution(wd, p, uid, gone, nm, at):
                 " earlier copy of the same value"}.get(p, f"{p} substituted it")
         print(f"    {nm(g)} was set by {at(st[0])}: {st[1][:90]}; {what}"
               + (" (that insn is gone)." if folded else "."))
+    if p == "gcse":
+        explain_pre(wd, func, uid)
+
+
+def explain_pre(wd, func, uid):
+    """The PRE decisions insn UID takes part in (replaced, inserted by gcse, or a copy into a reaching register)."""
+    for r in pre_records(wd, func):
+        role = ("was replaced" if uid == r["redundant"] else "is gcse's own computation" if uid in r["inserted"]
+                else "copies the value" if uid in (c for c, _ in r["copies"]) else None)
+        if role:
+            print(f"    insn {uid} {role}: " + pre_text(wd, func, r)
+                  + f". AGBCC_NOPRE={r['k']} undoes it; `pre` scores every PRE decision")
 
 
 def relative_order(wd, u, p):
@@ -3375,6 +3501,9 @@ def cmd_why(src, func, uid, env, via=None):
         print(f"  this is a shape difference ({row['rom'].split()[0]} vs {row['draft'].split()[0]}), not a"
               " register choice: compare the RTL (`scope.py insn UID`) with what the ROM implies")
         explain_move2add(wd, uid, row, at)
+    if trail and trail[0].startswith("gcse"):  # born in gcse: one of PRE's own computations or copies
+        print("  gcse created this insn:")
+        explain_pre(wd, info["obj_name"], uid)
     trace = parse_trace(open(os.path.join(wd, "stderr.txt")).read(), info["obj_name"])
     for p, gone, new in changes:
         if p not in ("cse", "cse2") or not new:
@@ -3383,7 +3512,7 @@ def cmd_why(src, func, uid, env, via=None):
                 explain_regmove(wd, uid, gone, new, nm, at)
             elif p not in ("greg", "lreg"):
                 print(f"  {p} replaced {', '.join(nm(r) for r in gone)} by {', '.join(nm(r) for r in new) or 'nothing'}.")
-                explain_substitution(wd, p, uid, gone, nm, at)
+                explain_substitution(wd, p, uid, gone, nm, at, info["obj_name"])
             continue
         n = 1 if p == "cse" else 2
         t = trace.get(n, {"why": [], "eqv": []})
@@ -3870,6 +3999,125 @@ def item_names(text):
              or re.match(r"\s*extern\b[^;]*?\b(\w+)\s*(?:\[[^\]]*\])?\s*;", t, re.S))
         out.append((m.group(1) if m else None, t))
     return out
+
+
+def pre_records(wd, func):
+    """gcse's PRE decisions for FUNC, from its own dump (u.i.gcse): [{k, expr, rtl, reaching, redundant: uid,
+    bb, inserted: [uid], copies: [(uid, from_uid)]}], one per replaced insn in the order AGBCC_NOPRE counts
+    them (pre_delete's pre_count; it restarts in each gcse pass, which -O2 runs once)."""
+    path = os.path.join(wd, "u.i.gcse")
+    if not os.path.exists(path):
+        return []
+    text = open(path).read()
+    out, table, k = [], {}, 0
+    ins, cop = {}, {}
+    for blk in re.split(r"(?m)^(?=Expression hash table|PRE GCSE of)", text):
+        if blk.startswith("Expression hash table"):
+            table, ins, cop, k = {}, {}, {}, 0
+            for m in re.finditer(r"^Index (\d+) \(hash value \d+\)\n((?:  .*\n)+)", blk, re.M):
+                table[int(m.group(1))] = one_line(m.group(2))
+        for m in re.finditer(r"^PRE/HOIST: end of bb (\d+), insn (\d+), copying expression (\d+) to reg (\d+)", blk, re.M):
+            ins.setdefault(int(m.group(3)), []).append(int(m.group(2)))
+        for m in re.finditer(r"^PRE: bb (\d+), insn (\d+), copying expression (\d+) in insn (\d+) to reg (\d+)", blk, re.M):
+            cop.setdefault(int(m.group(3)), []).append((int(m.group(2)), int(m.group(4))))
+        for m in re.finditer(r"^PRE: redundant insn (\d+) \(expression (\d+)\) in bb (\d+), reaching reg is (\d+)", blk, re.M):
+            k += 1
+            e = int(m.group(2))
+            out.append({"k": k, "expr": e, "rtl": table.get(e, "?"), "reaching": int(m.group(4)),
+                        "redundant": int(m.group(1)), "bb": int(m.group(3)), "inserted": ins.get(e, []),
+                        "copies": cop.get(e, [])})
+    # insertions and copies are printed after the replacements of their pass: attach them now
+    for r in out:
+        r["inserted"] = r["inserted"] or ins.get(r["expr"], [])
+        r["copies"] = r["copies"] or cop.get(r["expr"], [])
+    return out
+
+
+@by_dumps("u.i.cse", "u.i.cse2")
+def pool_values(wd):
+    """.LCn -> what the literal-pool entry holds (`FlickerParticle_UpdateMotion`, `0x3FF`), from the REG_EQUAL
+    note cse puts on a load of it; the pool's own labels are gone from the final assembly."""
+    out = {}
+    for p in ("cse", "cse2"):
+        path = os.path.join(wd, "u.i." + p)
+        if not os.path.exists(path):
+            continue
+        for m in re.finditer(r'\(symbol_ref/u:SI \("\*\.LC(\d+)"\)\) 0\)\)[^\n]*\n\s*\(expr_list:REG_EQU\w+ (.*)',
+                             open(path).read()):
+            v = m.group(2)
+            s = re.match(r'\(symbol_ref(?:/\w)*:SI \("([^"]+)"\)\)', v)
+            c = re.match(r"\(const_int (-?\d+)\)", v)
+            out.setdefault(f".LC{m.group(1)}", s.group(1) if s else f"{int(c.group(1)) & 0xFFFFFFFF:#x}" if c
+                           else v.rstrip(")")[:60])
+    return out
+
+
+def pre_parts(wd, func, r, srclines=None):
+    """(expression in C terms, at(uid) formatter) for one PRE record: pseudos named, a pool load's value."""
+    names, lines = pseudo_names(wd, func), uid_lines(wd)
+    def at(u):
+        ln = lines.get(u)
+        c = srclines[ln - 1].strip() if srclines and ln and ln <= len(srclines) else ""
+        return (f"insn {u} (line {ln}" + (f": `{c[:60]}`" if c else "") + ")") if ln else f"insn {u}"
+    expr = re.sub(r"\(reg(?:/\w)*:(\w+) (\d+)\)", lambda m: f"(reg {m.group(2)}" + (
+        f" `{names[int(m.group(2))]}`" if int(m.group(2)) in names else "") + ")", r["rtl"])
+    lc = re.search(r'"\*(\.LC\d+)"', r["rtl"])
+    if lc:
+        expr = f"the literal-pool load of {pool_values(wd).get(lc.group(1), lc.group(1))} {expr}"
+    return expr, at
+
+
+def pre_text(wd, func, r, srclines=None):
+    """One PRE record in one line (probe and why): the replaced insn, the expression, where gcse put its own copy."""
+    expr, at = pre_parts(wd, func, r, srclines)
+    s = f"PRE replacement {r['k']}: {at(r['redundant'])} reuses {expr} from reaching register {r['reaching']}"
+    if r["copies"]:
+        s += f", copied there after {', '.join(at(o) for _, o in r['copies'])}"
+    if r["inserted"]:
+        s += f", computed by gcse at the end of the block of {', '.join(at(u) for u in r['inserted'])}"
+    return s
+
+
+def cmd_pre(src, func, env):
+    """gcse's PRE decisions in C terms, one block per expression, each replacement scored with AGBCC_NOPRE=k
+    (the function without that one replacement)."""
+    n, info = score(src, func, env, full=True)
+    wd = info["wd"]
+    rows = json.load(open(os.path.join(wd, "diff.json"))) if os.path.exists(os.path.join(wd, "diff.json")) else []
+    recs = pre_records(wd, info["obj_name"])
+    srclines = open(os.path.join(ROOT, src)).read().splitlines()
+    print(f"{func}: {info.get('counts') or 'MATCH'}; {len(recs)} PRE replacement(s) of"
+          f" {len({r['expr'] for r in recs})} expression(s)")
+    differing = {r["uid"] for r in rows if r.get("uid") and r["tag"] != "="}
+    scores = {}
+    for r in recs:
+        prev = env.get("AGBCC_NOPRE")
+        m, inf = score(src, func, dict(env, AGBCC_NOPRE=f"{prev},{r['k']}" if prev else str(r["k"])))
+        scores[r["k"]] = (m, inf.get("counts", "MATCH") if m else "MATCH")
+    score(src, func, env, full=True)  # leave the workdir's dumps at the unmodified draft
+    for e in dict.fromkeys(r["expr"] for r in recs):
+        group = [r for r in recs if r["expr"] == e]
+        expr, at = pre_parts(wd, info["obj_name"], group[0], srclines)
+        print(f"  expression {e}: {expr} -> reaching register {group[0]['reaching']}")
+        if group[0]["copies"]:
+            print(f"    computed in C at: {', '.join(at(o) for _, o in group[0]['copies'])} (gcse copies each"
+                  f" result into {group[0]['reaching']})")
+        if group[0]["inserted"]:
+            print(f"    gcse inserted its own computation at the end of the block of:"
+                  f" {', '.join(at(u) for u in group[0]['inserted'])} (before the block's final compare or"
+                  " jump, after any C there: fact 1)")
+        for r in group:
+            m, counts = scores[r["k"]]
+            touched = differing & {r["redundant"], *r["inserted"], *(c for c, _ in r["copies"])}
+            print(f"    replaces {at(r['redundant'])}: AGBCC_NOPRE={r['k']} gives {counts}"
+                  + (" (better)" if m < n else " (worse)" if m > n else " (no change)")
+                  + (f"; insn {', '.join(map(str, sorted(touched)))} of it differs" if touched else ""))
+    if recs:
+        print("  A replacement the ROM does not make (NOPRE better): the ROM computes that value again there. In C,"
+              " make the occurrences different expressions to gcse (another base pointer; an offset Thumb"
+              " encodes inline vs one from the pool, fact 2), or read the value from a variable set once. One"
+              " the ROM makes and the draft does not: write both occurrences as the same expression.")
+    return 0
 
 
 def cmd_giv(src, func, env):
@@ -4834,7 +5082,7 @@ def validate_cli(args):
     elif rest and rest[0] == "pins":
         if len([a for a in rest if a != "--all"]) > 2:
             cli_error("FILE.c pins [FUNC] [--all]")
-    elif any(a in rest for a in ("probe", "shape", "frame", "hoist", "spill")):
+    elif any(a in rest for a in ("probe", "shape", "frame", "hoist", "spill", "pre")):
         if len(rest) > 2:
             cli_error("FILE.c COMMAND [FUNC]")
     elif len(rest) > 1:
@@ -4981,6 +5229,10 @@ def main():
         rest.remove("shape")
         func = source_function(src, rest[0] if rest else None)
         return cmd_shape(src, func, env)
+    if "pre" in rest:  # FILE.c pre [FUNC]: gcse's PRE replacements in C terms, each scored with AGBCC_NOPRE
+        rest.remove("pre")
+        func = source_function(src, rest[0] if rest else None)
+        return cmd_pre(src, func, env)
     if "giv" in rest:  # FILE.c giv [FUNC]: loop strength reduction, each induction value and loop.c's decision
         rest.remove("giv")
         func = source_function(src, rest[0] if rest else None)
