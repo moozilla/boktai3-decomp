@@ -100,7 +100,6 @@ static inline void IwProject(struct IwVec *screen, struct IwVec *world)
     screen->z = sum + vertical - gUnk_03005418[2];
 }
 
-// MATCHING_CONCESSION: register-pinning
 struct IwSpr {
     u8 flags;
     u8 size;
@@ -174,24 +173,23 @@ static inline s32 IwAddAffine(u8 angle, s32 a, s32 b)
     return n;
 }
 
-#define IW_QUEUE_TILES(r, obj, tile, step, tw, th, b)                                              \
-    if (gUnk_030042E8 + (step) >= 0x400)                                                           \
-        r = -1;                                                                                    \
-    else {                                                                                         \
-        u32 slot;                                                                                  \
-        u32 off;                                                                                   \
-        u8 *src;                                                                                   \
-        u8 *q;                                                                                     \
-        slot = gUnk_03004304;                                                                      \
-        r = 0;                                                                                     \
-        b = reqs;                                                                                  \
-        off = slot << 3;                                                                           \
-        src = (obj)->tiles + ((tile) << 5);                                                        \
-        *(u8 **)(b + off) = src;                                                                   \
-        q = b + off;                                                                               \
-        *(u32 *)(q + 4) = ((tw) << 5) | ((th) << 16);                                              \
-        gUnk_03004304 = slot + 1;                                                                  \
-    }
+static inline s32 IwAllocTiles(struct IwObj *obj, u32 tile, s32 step, u8 tw, s32 th, u8 *reqs)
+{
+    u32 slot, off;
+    u8 *b = 0; /* Retain this initialization for matching compiler behavior. */
+    u8 *src, *q;
+    if (gUnk_030042E8 + step >= 0x400)
+        return -1;
+    slot = gUnk_03004304;
+    b = reqs;
+    off = slot << 3;
+    src = obj->tiles + (tile << 5);
+    *(u8 **)(b + off) = src;
+    q = b + off;
+    *(u32 *)(q + 4) = (tw << 5) | (th << 16);
+    gUnk_03004304 = slot + 1;
+    return 0;
+}
 
 static inline void IwPushOam(u32 attr01, u32 attr2)
 {
@@ -238,11 +236,11 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
     u8 *ewram;
     u8 *ew2;
     s32 step;
-    u8 *b = 0;
-    u8 *b2 = 0;
-    s16 *c;
-    s16 *cnt;
-    s16 *cnt2;
+    s16 *cursor;
+    s16 *cursorBase;
+    s16 *cursorBaseZ;
+    u8 *cursorLastByte;
+    u8 *cursorEnd;
 
     f4 = obj->flags & 4;
     f8 = obj->flags & 8;
@@ -414,63 +412,57 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
 
     {
         u8 *pal = obj->palSrc;
-        for (j = 0; j < nKeys; j++)
+        for (j = 0; j < nKeys; j++) {
             bankIdx[j] =
                 Palette_CacheObjectBankArm(obj->palBase + keys[j], (u32 *)(pal + (keys[j] << 5)));
+        }
     }
 
     if (obj->flags & 0x20) {
         ewram = (u8 *)0x2000000;
-        /* The pinned temporary tells cse2 (after loop) that cnt is &gUnk_030042E8 while gcse
-           never sees the address, so the hoisted c = cnt keeps its own pool load into sl. */
-        {
-            register s16 *h asm("r3") = &gUnk_030042E8;
-            cnt = h;
-            h = 0;
-        }
+        /* Deliberate matching reconstruction, not a claim about the original source.
+           These distinct byte offsets preserve this compiler's pass behavior.
+           Both paths recover the same properly aligned cursor address before use. */
+        cursorLastByte = (u8 *)&gUnk_030042E8 + sizeof(gUnk_030042E8) - 1;
+        cursorBase = (s16 *)(cursorLastByte - (sizeof(gUnk_030042E8) - 1));
         for (j = 0; j < n; j++) {
             u32 s = attr3[j];
             u32 t = tile[j];
-            s32 tw = gUnk_03004D40[s];
+            u8 tw = gUnk_03004D40[s];
             s32 th = gUnk_03004D10[s];
             s32 r;
             u8 *reqs;
             step = gUnk_03004D30[s];
             reqs = ewram + 0x39000;
-            c = cnt;
-            IW_QUEUE_TILES(r, obj, t, step, tw, th, b);
+            cursor = cursorBase;
+            r = IwAllocTiles(obj, t, step, tw, th, reqs);
             if (r < 0)
                 return;
-            IwPushOam(oam[j],
-                      (u32)*c | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12));
+            IwPushOam(oam[j], (u32)*cursor | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12));
             gUnk_030042DC += step;
-            *c += step;
+            *cursor += step;
         }
     } else {
         ew2 = (u8 *)0x2000000;
-        {
-            register s16 *h asm("r3") = &gUnk_030042E8;
-            cnt2 = h;
-            h = 0;
-        }
+        cursorEnd = (u8 *)&gUnk_030042E8 + sizeof(gUnk_030042E8);
+        cursorBaseZ = (s16 *)(cursorEnd - sizeof(gUnk_030042E8));
         for (j = 0; j < n; j++) {
             u32 s = attr3[j];
             u32 t = tile[j];
-            s32 tw = gUnk_03004D40[s];
+            u8 tw = gUnk_03004D40[s];
             s32 th = gUnk_03004D10[s];
             s32 r;
             u8 *reqs;
             step = gUnk_03004D30[s];
             reqs = ew2 + 0x39000;
-            c = cnt2;
-            IW_QUEUE_TILES(r, obj, t, step, tw, th, b2);
+            cursor = cursorBaseZ;
+            r = IwAllocTiles(obj, t, step, tw, th, reqs);
             if (r < 0)
                 return;
-            IwPushOamZ(oam[j],
-                       (u32)*c | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12), z,
+            IwPushOamZ(oam[j], (u32)*cursor | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12), z,
                        obj->priority);
             gUnk_030042DC += step;
-            *c += step;
+            *cursor += step;
         }
     }
 }
