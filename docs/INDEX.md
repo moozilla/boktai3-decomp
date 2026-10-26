@@ -19,7 +19,8 @@ and [AGENTS.md](../AGENTS.md) (rules) · [HANDOFF](HANDOFF.md) (current state) �
 **Matching craft.** [WORKER](WORKER.md) (agbcc tricks) · [AGBCC_RULES](AGBCC_RULES.md) (why agbcc chose it; `tools/why.py`) · [REGALLOC](REGALLOC.md) ·
 [FOUNDRY](FOUNDRY.md) (asm-to-match pipeline and funnel numbers) · [BIG_FUNCTIONS](BIG_FUNCTIONS.md) (anchordiff, variants, rtlprobe: 500+ instruction functions) · [PERMUTER](PERMUTER.md) (permuter fork, regsolve, litsweep, chunks) ·
 [MODEL_BENCHMARK](MODEL_BENCHMARK.md) (explain.py/idioms.py vs check.py with Haiku/Sonnet) ·
-[COMPILER_REFERENCES](COMPILER_REFERENCES.md) · [SCALAR_APPROACH](SCALAR_APPROACH.md)
+[COMPILER_REFERENCES](COMPILER_REFERENCES.md) · [EDS wiki](external/eds/README.md)
+(Yu-Gi-Oh! EDS matching-tricks catalog, vendored, MIT) · [SCALAR_APPROACH](SCALAR_APPROACH.md)
 (angle/scalar helpers) · [ASM_OUTPUT_QC](ASM_OUTPUT_QC.md) (ABI and credit audits) ·
 [CANDIDATES](CANDIDATES.md) · [PERMUTER_HANDOFF](PERMUTER_HANDOFF_2026-10-15.md) ·
 [DRAFT_INVENTORY](DRAFT_INVENTORY_2026-10-09.md) · libraries:

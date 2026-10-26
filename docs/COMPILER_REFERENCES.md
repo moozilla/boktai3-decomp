@@ -6,6 +6,10 @@ mixes compiler versions and architectures. Use its patterns as hypotheses;
 MIPS delay slots, PS2 floating-point pools and architecture-specific loads do
 not establish what this project's Thumb compiler will emit.
 
+The Yu-Gi-Oh! EDS decomp (100% matching, same GCC 2.95 middle end) has a long
+matching-tricks catalog; it is copied with its MIT notice in
+[external/eds](external/eds/README.md), together with notes on what carries over.
+
 The following small probes were compiled locally with the pinned agbcc and
 the project's `-O2 -mthumb-interwork -fhex-asm` flags. They are useful shapes to
 recognize, not replacements for checking the surrounding function:
