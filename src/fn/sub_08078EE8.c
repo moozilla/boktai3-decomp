@@ -1,8 +1,8 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 
 extern u32 gEngineFlags;
-extern u32 gUnk_030053F0;
 extern u8 *gGameState;
 extern u32 gUnk_020004B4;
 extern s32 gUnk_02000478;

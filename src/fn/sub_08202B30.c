@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 struct Pos {
     s16 x, y, z, pad;
 };
@@ -64,7 +65,6 @@ struct Pool {
     u32 mask;
     struct Entry e[16];
 };
-extern struct Pool *gUnk_020005FC;
 extern const s16 gUnk_086149C4[];
 struct Pool *ProjectilePool_Create(void);
 struct Entry *ProjectilePool_FindFreeSlot(struct Pool *, s32 *);
@@ -191,7 +191,7 @@ static inline void StepPlayback(struct Entry *e, struct Obj *sprite, struct Anim
 #define o ((struct Obj *)pos)
 s32 Projectile_SpawnFromConfig(struct Params *params, struct Pos *pos)
 {
-    struct Pool *pool = gUnk_020005FC;
+    struct Pool *pool = gProjectilePool;
     struct Entry *e;
     s32 slot;
     u8 *q;

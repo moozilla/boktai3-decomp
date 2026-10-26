@@ -10,11 +10,11 @@ struct List {
     struct Task *head;
     u32 pad;
 };
-extern struct List gUnk_03005280[];
+extern struct List gTaskLists[];
 
 struct Task *Task_FindById(u16 id)
 {
-    struct List *l = gUnk_03005280;
+    struct List *l = gTaskLists;
     s32 i = 0;
     do {
         struct Task *t = l->head;

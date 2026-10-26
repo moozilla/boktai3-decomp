@@ -1,13 +1,13 @@
 #include "global.h"
 #include "render.h"
 #include "game_state.h"
+#include "ram.h"
 struct V {
     s16 x, y, z;
 };
 struct P {
     u32 x : 16, y : 16, z : 16, w : 16;
 };
-extern u8 *gUnk_02000218;
 extern struct V gUnk_03005418;
 static inline s32 sh(s32 v)
 {
@@ -36,7 +36,7 @@ s32 SceneEffectQueue_QueueTypeTwoEffect(void)
     struct V out;
     u8 *g, *actor;
     s32 next, left, stride;
-    if (!gUnk_02000218 || (gEnginePauseFlags & 7))
+    if (!gSceneEffectQueue || (gEnginePauseFlags & 7))
         goto fail;
     actor = gGameState;
     in.x = *(u16 *)(actor + 0x30);
@@ -49,7 +49,7 @@ s32 SceneEffectQueue_QueueTypeTwoEffect(void)
         if (position > 120)
             left = 0;
     }
-    g = gUnk_02000218;
+    g = gSceneEffectQueue;
     next = g[0x1e];
     next++;
     if (next > 1)

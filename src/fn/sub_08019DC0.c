@@ -1,9 +1,9 @@
 #include "global.h"
-extern u8 *gUnk_020000B0;
+#include "ram.h"
 void Sprite_LinkToList(u8 *, int);
 u32 SpritePool_Activate(u8 *p, u32 callback, u32 context)
 {
-    u8 *manager = gUnk_020000B0;
+    u8 *manager = gSpritePoolManager;
     u32 id;
     if (!manager || p[4])
         return 0;

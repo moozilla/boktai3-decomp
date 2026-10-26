@@ -1,9 +1,9 @@
 #include "global.h"
 #include "render.h"
 #include "engine.h"
+#include "ram.h"
 #define gScreenMoteCallbacks gUnk_086108EC
 #define gEffectPauseFlags    gEngineFlags
-#define gScenePauseFlags     gUnk_030053F0
 #define gFrameCounter        gEnginePauseFlags
 /* State options at 0x14 control updates while paused or throttled. */
 struct ScreenMoteState {
@@ -18,7 +18,6 @@ struct ScreenMoteManager {
     u8 unknown0[0x51c];
     struct ScreenMoteState states[32];
 };
-extern u32 gUnk_030053F0;
 extern void *gUnk_086108EC[];
 s32 sub_08249240(void *, void *, void *);
 s32 ScreenMote_UpdateManager(struct ScreenMoteManager *m)
@@ -30,7 +29,7 @@ s32 ScreenMote_UpdateManager(struct ScreenMoteManager *m)
     i = 31;
     do {
         if (*(u32 *)(fields + 12)) {
-            if (((gEngineFlags | gUnk_030053F0) & pauseMask) ||
+            if (((gEngineFlags | gScenePauseFlags) & pauseMask) ||
                 ((gEngineFlags & 0x800) && (gEnginePauseFlags & 7))) {
                 if (*(u16 *)fields & 1)
                     goto next;

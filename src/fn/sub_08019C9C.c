@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 typedef struct {
     u16 *data;
@@ -17,7 +18,6 @@ typedef struct {
     Sprite sprite;
     Anim anim;
 } Slot;
-extern void *gUnk_020000B0;
 int SpritePool_AdvanceAnimation(Slot *arg)
 {
     register Slot *p asm("ip") = arg;
@@ -25,7 +25,7 @@ int SpritePool_AdvanceAnimation(Slot *arg)
     Anim *a;
     u16 *frame;
     int done;
-    if (!gUnk_020000B0)
+    if (!gSpritePoolManager)
         return 0;
     sprite = &p->sprite;
     a = &p->anim;

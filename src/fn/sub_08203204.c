@@ -2,6 +2,7 @@
 #include "global.h"
 #include "display_animation.h"
 #include "scene_vec.h"
+#include "ram.h"
 struct CannonEmitter {
     u8 pad0[0x18];
     struct SceneVec initialPosition;
@@ -160,10 +161,10 @@ static inline u32 CannonEmitter_StepAnimation(struct CannonEmitter *owner,
     return ended;
 }
 
-extern u32 gUnk_030053F0, gUnk_02000560;
+extern u32 gUnk_02000560;
 static inline u32 CannonEmitter_TestPause(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 static inline u32 CannonEmitter_TestMode(u32 mask)
 {

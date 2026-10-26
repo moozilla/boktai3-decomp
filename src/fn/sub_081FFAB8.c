@@ -2,6 +2,7 @@
 #include "global.h"
 #include "display_animation.h"
 #include "engine.h"
+#include "ram.h"
 #ifdef NONMATCHING
 // fuzzy: 91.7%
 // fix.py best version (reprinted C)
@@ -62,13 +63,13 @@ struct HomingManager {
     u8 unknown43C[4];
     u16 palettes[2][16];
 };
-extern u32 gUnk_030053F0, gUnk_02000560;
+extern u32 gUnk_02000560;
 extern const s16 gUnk_086149C4[];
 void HomingProjectile_ReleaseSlot(struct HomingManager *, struct HomingSlot *, s32);
 
 static inline u32 TestPause(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 static inline s32 Scale(s32 x)
 {

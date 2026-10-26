@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct TextState {
     u8 pad0[0xd];
     u8 count;
@@ -9,14 +10,13 @@ struct Window {
     u8 pad0[0x18];
     struct TextState text;
 };
-extern struct Window *gUnk_020000E0;
 s32 Script_GetValue(void);
 s32 Script_SeekToKeyword(s32);
 u32 Script_GetPc(void);
 
 s32 sub_08033518(void)
 {
-    struct Window *p = gUnk_020000E0;
+    struct Window *p = gScrollingDialogue;
     if (p != 0) {
         struct TextState *t = &p->text;
         t->count = 0;

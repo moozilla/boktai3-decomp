@@ -28,12 +28,12 @@ struct Engine {
     void *head, *tail;
 };
 extern struct Engine *gUnk_02000484;
-extern u8 gUnk_020000EC;
 void Memory_Clear(void *, int);
 #define gRfuLinkStatus    gUnk_03006A80
 #define gRfuSlotStatusUNI gUnk_03006A60
 #define gRfuSlotStatusNI  gUnk_03006A70
 #include "rfu_compat.h"
+#include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;

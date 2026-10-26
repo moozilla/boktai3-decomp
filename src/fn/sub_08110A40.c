@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_020001D4;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 sub_08110894(u8 *);
@@ -11,8 +11,8 @@ void SaveMenu_Destroy(void);
 u8 *SaveMenu_CreateFromScript(void)
 {
     u8 *p;
-    if (gUnk_020001D4 != 0)
-        return gUnk_020001D4;
+    if (gSaveMenu != 0)
+        return gSaveMenu;
     p = Task_Create(0xb, 0x1034);
     if (p != 0) {
         Task_SetCallbacks(p, SaveMenu_Update, SaveMenu_Destroy);

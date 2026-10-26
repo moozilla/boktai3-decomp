@@ -1,12 +1,12 @@
 #include "global.h"
 #include "engine.h"
-extern void *gUnk_020005AC; /* the Hresvelgr task */
+#include "ram.h"
 void *SceneActors_GetBySlot(u32);
 void ActorReaction_Tick(void *);
 void Hresvelgr_Destroy(void *);
 s32 sub_081A2C80(void *, void *);
 /* Registry routine C077: returns the singleton in slot -t (default 1), or
-   creates the Hresvelgr task and records it in gUnk_020005AC. */
+   creates the Hresvelgr task and records it in gHresvelgr. */
 void *Hresvelgr_Create(void *arg)
 {
     void *p = SceneActors_GetBySlot(Script_GetKeywordValue('t', 1));
@@ -20,6 +20,6 @@ void *Hresvelgr_Create(void *arg)
             return 0;
         }
     }
-    gUnk_020005AC = p;
+    gHresvelgr = p;
     return p;
 }

@@ -2,6 +2,7 @@
 #include "global.h"
 #include "render.h"
 #include "engine.h"
+#include "ram.h"
 struct EffectUpdateState {
     u16 flags;
     u8 type, pad13;
@@ -20,7 +21,6 @@ struct EffectUpdatePool {
     u8 pad0[0x720];
     struct EffectUpdateEntry entries[32];
 };
-extern u32 gUnk_030053F0;
 extern void *gUnk_086106B4[];
 s32 sub_08249240(void *, void *, void *);
 s32 EffectPool_UpdateEntries(struct EffectUpdatePool *pool)
@@ -31,7 +31,7 @@ s32 EffectPool_UpdateEntries(struct EffectUpdatePool *pool)
     s32 i = 31;
     do {
         if (state->active) {
-            if (((gEngineFlags | gUnk_030053F0) & mask) ||
+            if (((gEngineFlags | gScenePauseFlags) & mask) ||
                 ((gEngineFlags & 0x800) && (gEnginePauseFlags & 7))) {
                 if (state->flags & 1)
                     goto next;

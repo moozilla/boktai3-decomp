@@ -1,5 +1,5 @@
 #include "global.h"
-extern void *gUnk_02000064;
+#include "ram.h"
 int FragmentManager_Initialize(u8 *m)
 {
     int i = 0;
@@ -14,6 +14,6 @@ int FragmentManager_Initialize(u8 *m)
         i = next;
     } while (i <= 3);
     *(u32 *)(m + 24) = 0;
-    gUnk_02000064 = m;
+    gFragmentManager = m;
     return 0;
 }

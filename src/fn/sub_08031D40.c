@@ -1,5 +1,5 @@
 #include "global.h"
-extern void *gUnk_020000DC;
+#include "ram.h"
 void *Task_Create(int, int);
 void Task_SetCallbacks(void *, void *, void *);
 void Task_Kill(void *);
@@ -8,7 +8,7 @@ void MessageWindow_OnDestroy(void);
 int sub_0803198C(void *, void *);
 void *MessageWindow_Create(void *config)
 {
-    void *p = gUnk_020000DC;
+    void *p = gMessageWindow;
     if (!p) {
         p = Task_Create(12, 720);
         if (p) {

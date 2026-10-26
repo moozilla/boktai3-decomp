@@ -1,6 +1,7 @@
 #include "sprite_effect_controller.h"
 #include "engine.h"
-extern u32 gUnk_030053F0, gUnk_02000560;
+#include "ram.h"
+extern u32 gUnk_02000560;
 extern void *gUnk_08605B84[];
 void SpriteEffectController_QueueColliders(struct SpriteEffectControllerPool *);
 static inline u8 IsUsed(struct SpriteEffectControllerPool *p, u32 index)
@@ -20,7 +21,7 @@ s32 SpriteEffectController_UpdatePool(struct SpriteEffectControllerPool *input)
     } while (0);
     if (p->used) {
         u32 mask = 0x400;
-        if ((gEngineFlags | gUnk_030053F0) & mask) {
+        if ((gEngineFlags | gScenePauseFlags) & mask) {
             return 0;
         }
         {

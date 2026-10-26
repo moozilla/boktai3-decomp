@@ -1,10 +1,10 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 f[4];
     u8 a;
     u8 g[0x178 - 5];
 };
-extern s32 gUnk_0200023C;
 void Sprite_Remove(void *);
 void ScaledShadow_Destroy(void *);
 void Collider_Remove(void *);
@@ -22,5 +22,5 @@ void Hresvelgr_DestroyHomingShotPool(struct E *e)
         e++;
         i--;
     } while (i >= 0);
-    gUnk_0200023C = 0;
+    gEffectPoolManager = 0;
 }

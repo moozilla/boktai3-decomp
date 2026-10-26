@@ -1,6 +1,5 @@
 #include "global.h"
-
-extern void *gUnk_02000264;
+#include "ram.h"
 
 void AnimData_SelectPaletteBank(void *, u32);
 s32 Script_GetValue(void);
@@ -10,7 +9,7 @@ void SparkleEmitter_UpdateEmitting(void *);
 
 void SparkleEmitter_ReconfigureFromScript(void)
 {
-    u8 *p = (u8 *)gUnk_02000264;
+    u8 *p = (u8 *)gSparkleEmitter;
     s32 v776;
     s32 v774;
     s32 v768;

@@ -1,6 +1,7 @@
 #define gMeterOwnerSource gUnk_020004B4
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct MeterDisplayWidget {
     u8 unknown0[8];
     u32 flags;
@@ -24,7 +25,6 @@ struct MeterOwnerSource {
     s16 index;
 };
 extern struct MeterOwnerSource *gMeterOwnerSource;
-extern u32 gUnk_030053F0;
 s32 ViewportGauge_ComputeFill(struct MeterDisplay *, s32);
 static inline s32 OwnerIndex(void)
 {
@@ -35,7 +35,7 @@ static inline s32 OwnerIndex(void)
 void MeterDisplay_UpdateOwnerMeters(struct MeterDisplay *s)
 {
     u32 mask = 0x800;
-    if ((gEngineFlags | gUnk_030053F0) & mask) {
+    if ((gEngineFlags | gScenePauseFlags) & mask) {
         s->widgets[0].x = ViewportGauge_ComputeFill(s, OwnerIndex());
         s->widgets[1].x = ViewportGauge_ComputeFill(s, OwnerIndex() ^ 1);
     } else {

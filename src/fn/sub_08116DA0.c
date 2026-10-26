@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct MotionActorState {
     u8 unknown0[0x68];
     u32 pending;
@@ -18,7 +19,7 @@ struct MotionActor {
     u8 unknown8F6[0x16];
     u32 script;
 };
-extern u32 gUnk_030053F0, gEngineFlags;
+extern u32 gEngineFlags;
 void Hud_SetMode(s32);
 void Script_Call(u32, void *);
 void MotionActor_RunDelayedScript(struct MotionActor *actor)
@@ -33,7 +34,7 @@ void MotionActor_RunDelayedScript(struct MotionActor *actor)
     }
     if (actor->scriptTimer > 60 && actor->script) {
         u32 mask = 0x800;
-        if (!((gEngineFlags | gUnk_030053F0) & mask))
+        if (!((gEngineFlags | gScenePauseFlags) & mask))
             Hud_SetMode(7);
         Script_Call(actor->script, 0);
         actor->script = 0;

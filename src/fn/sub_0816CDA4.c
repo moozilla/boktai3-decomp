@@ -1,6 +1,6 @@
 #include "global.h"
-extern u16 gUnk_020005A0;
+#include "ram.h"
 u32 Inventory_GetUsePermissionFlag(u32 bit)
 {
-    return gUnk_020005A0 & (1 << bit);
+    return gInventoryUseFlags & (1 << bit);
 }

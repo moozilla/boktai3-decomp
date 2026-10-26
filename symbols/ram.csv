@@ -14,44 +14,44 @@ addr,name,size,kind,decl,header,confidence,notes
 02000048,gNumericOverlay,4,object,extern struct NumericOverlay *gNumericOverlay;,include/numeric_overlay.h,low,
 0200004C,gSceneIndicators,4,object,extern struct SceneIndicators *gSceneIndicators;,include/scene_indicator.h,low,
 02000050,gAnimatedHazardManager,4,object,extern struct AnimatedHazardManager *gAnimatedHazardManager;,include/animated_hazard.h,low,
-02000054,gUnk_02000054,4,object,,,,
-02000058,gUnk_02000058,4,object,,,,
-0200005C,gUnk_0200005C,4,object,,,,
+02000054,gShadowManager,4,object,extern u32 gShadowManager;,include/ram.h,low,shadow task singleton (Shadow_*)
+02000058,gScaledShadowManager,4,object,extern u32 gScaledShadowManager;,include/ram.h,low,scaled shadow manager singleton (ScaledShadow_*)
+0200005C,gSceneActorEffectsManager,4,object,extern void *gSceneActorEffectsManager;,include/ram.h,low,scene actor effects manager (SceneActorEffects_*)
 02000060,gUnk_02000060,4,object,,,,
-02000064,gUnk_02000064,4,object,,,,
-02000068,gUnk_02000068,4,object,,,,
-0200006C,gUnk_0200006C,4,object,,,,
+02000064,gFragmentManager,4,object,extern u32 gFragmentManager;,include/ram.h,low,fragment manager singleton (FragmentManager_*)
+02000068,gAnimatedParticleManager,4,object,extern u32 gAnimatedParticleManager;,include/ram.h,low,animated particle manager (AnimatedParticleManager_*)
+0200006C,gFadingParticleManager,4,object,extern void *gFadingParticleManager;,include/ram.h,low,fading particle manager (FadingParticleManager_*)
 02000070,gPaletteLevels,4,object,extern struct PaletteLevels *gPaletteLevels;,include/palette_level_transitions.h,low,
 02000074,gDamageNumberDisplay,4,object,extern struct DamageNumberDisplay *gDamageNumberDisplay;,include/damage_number_display.h,low,
 02000078,gLinkedWidgetSet,4,object,extern struct LinkedWidgetSet *gLinkedWidgetSet;,include/ram.h,low,
-0200007C,gUnk_0200007C,4,object,,,,
+0200007C,gScanlineWave,4,object,extern u32 gScanlineWave;,include/ram.h,low,scanline wave effect task (ScanlineWave_*)
 02000080,gUnk_02000080,4,object,,,,
 02000084,gUnk_02000084,4,object,,,,
 02000088,gUnk_02000088,4,object,,,,
 0200008C,gUnk_0200008C,4,object,,,,
 02000090,gWeatherState,4,object,extern struct WeatherState *gWeatherState;,include/ram.h,low,
-02000094,gUnk_02000094,4,object,,,,
+02000094,gPaletteCycle,4,object,extern u32 gPaletteCycle;,include/ram.h,low,palette cycle task (PaletteCycle_*)
 02000098,gEffectQuad,4,object,extern u32 gEffectQuad;,include/ram.h,low,
-0200009C,gUnk_0200009C,4,object,,,,
+0200009C,gCircleWindow,4,object,extern u32 gCircleWindow;,include/ram.h,low,circle window task (CircleWindow_*)
 020000A0,gTransientSpriteEffects,4,object,extern struct TransientSpriteEffects *gTransientSpriteEffects;,include/transient_sprite_effects.h,low,
-020000A4,gUnk_020000A4,4,object,,,,
+020000A4,gTileAnimation,4,object,extern u32 gTileAnimation;,include/ram.h,low,tile animation task (TileAnimation_*)
 020000A8,gTemporaryAnimationPool,4,object,extern struct TemporaryAnimationPool *gTemporaryAnimationPool;,include/temporary_animation_pool.h,low,
-020000AC,gUnk_020000AC,4,object,,,,
-020000B0,gUnk_020000B0,4,object,,,,
+020000AC,gTransientSpritePool,4,object,extern u8 *gTransientSpritePool;,include/ram.h,low,transient sprite pool (TransientSpritePool_*)
+020000B0,gSpritePoolManager,4,object,extern u32 gSpritePoolManager;,include/ram.h,low,sprite pool singleton (SpritePool_*)
 020000B8,gUnk_020000B8,24,object,,,,
 020000D8,gUnk_020000D8,,interior,,,,gUnk_020000B8 +0x20
-020000DC,gUnk_020000DC,4,object,,,,
-020000E0,gUnk_020000E0,4,object,,,,
+020000DC,gMessageWindow,4,object,extern struct Actor *gMessageWindow;,include/ram.h,low,message window (MessageWindow_*)
+020000E0,gScrollingDialogue,4,object,extern struct Window *gScrollingDialogue;,include/ram.h,low,scrolling dialogue window (ScrollingDialogue_*)
 020000E4,gWindowManager,4,object,extern struct WindowManager *gWindowManager;,include/ram.h,low,
 020000E8,gTransition,4,object,extern struct Transition *gTransition;,include/ram.h,low,
-020000EC,gUnk_020000EC,1,object,,,,
+020000EC,gWirelessSessionState,1,object,extern u8 gWirelessSessionState;,include/ram.h,low,wireless session state byte (Wireless_*)
 020000F0,gUnk_020000F0,4,object,,,,
 020000F4,gWirelessLinkIndicator,4,object,extern struct WirelessLinkIndicator *gWirelessLinkIndicator;,include/wireless_link_indicator.h,low,
 020000F8,gLinkMenu,4,object,extern struct LinkMenu *gLinkMenu;,include/ram.h,low,
-020000FC,gUnk_020000FC,4,object,,,,
+020000FC,gWirelessTradeMenu,4,object,extern u32 gWirelessTradeMenu;,include/ram.h,low,wireless trade/exchange menu (WirelessTradeMenu_*)
 02000100,gWirelessGameItems,4,object,extern struct WirelessGameItems *gWirelessGameItems;,include/wireless_game_items_and_display.h,low,
 02000104,gResultMenu,4,object,extern struct ResultMenu *gResultMenu;,include/ram.h,low,
-02000108,gUnk_02000108,4,object,,,,
+02000108,gScenePool,4,object,extern u32 gScenePool;,include/ram.h,low,scene pool manager (ScenePool_*)
 0200010C,gAreaEffectManager,4,object,extern struct AreaEffectManager *gAreaEffectManager;,include/area_effect.h,low,
 02000110,gRepeatedEffectManager,4,object,extern struct RepeatedEffectManager *gRepeatedEffectManager;,include/repeated_effect.h,low,
 02000114,gDirectionalForce,4,object,extern struct DirectionalForce *gDirectionalForce;,include/directional_force.h,low,
@@ -70,7 +70,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000148,gPairSlotPool,4,object,extern struct PairSlotPool *gPairSlotPool;,include/ram.h,low,
 0200014C,gBouncingPool,4,object,extern struct BouncingPool *gBouncingPool;,include/bouncing_object.h,low,
 02000150,gSpriteBurstManager,4,object,extern u32 gSpriteBurstManager;,include/ram.h,low,
-02000154,gUnk_02000154,4,object,,,,
+02000154,gScriptedParticlePool,4,object,extern u8 *gScriptedParticlePool;,include/ram.h,low,scripted particle pool (ScriptedParticle_*)
 02000158,gSceneStatusIndicatorManager,4,object,extern u32 gSceneStatusIndicatorManager;,include/ram.h,low,
 0200015C,gBurstSparkPool,4,object,extern struct BurstSparkPool *gBurstSparkPool;,include/ram.h,low,
 02000160,gBurstEmitterPool,4,object,extern struct BurstEmitterPool *gBurstEmitterPool;,include/burst_emitter.h,low,
@@ -80,18 +80,18 @@ addr,name,size,kind,decl,header,confidence,notes
 02000170,gSpriteGroupPool,4,object,extern struct FragmentBurstPool *gSpriteGroupPool;,include/ram.h,low,
 02000174,gFadingSpritePool,4,object,extern struct FeatherPool *gFadingSpritePool;,include/ram.h,low,
 02000178,gSpriteEffectControllerPool,4,object,extern struct SpriteEffectControllerPool *gSpriteEffectControllerPool;,include/sprite_effect_controller.h,low,
-0200017C,gUnk_0200017C,4,object,,,,
+0200017C,gSunDiscPool,4,object,extern u8 *gSunDiscPool;,include/ram.h,low,sun disc pool (SunDiscPool_*)
 02000180,gActorEffectManager,4,object,extern u8 *gActorEffectManager;,include/ram.h,low,
 02000184,gPursuingActorManager,4,object,extern struct Pool *gPursuingActorManager;,include/ram.h,low,
 02000188,gSceneSteeringActorPool,4,object,extern struct SceneSteeringActorPool *gSceneSteeringActorPool;,include/scene_steering_actor.h,low,
-0200018C,gUnk_0200018C,4,object,,,,
+0200018C,gFragmentEffectManager,4,object,extern u8 *gFragmentEffectManager;,include/ram.h,low,fragment effect manager (FragmentEffect_*)
 02000190,gScriptedColliderManager,4,object,extern u32 gScriptedColliderManager;,include/ram.h,low,
 02000194,gSceneParticlePool,4,object,extern struct SceneParticlePool *gSceneParticlePool;,include/ram.h,low,
 02000198,gRouteSpritePool,4,object,extern struct RouteSpritePool *gRouteSpritePool;,include/route_sprite_actor.h,low,
 0200019C,gSceneEffectSchedule,4,object,extern struct SceneEffectSchedule *gSceneEffectSchedule;,include/scene_effect_schedule.h,low,
 020001A0,gSceneActorContactManager,4,object,extern struct SceneActorContactManager *gSceneActorContactManager;,include/scene_actor_contacts.h,low,
 020001A4,gWoodenCrateManager,4,object,extern u8 *gWoodenCrateManager;,include/ram.h,low,
-020001A8,gUnk_020001A8,4,object,,,,
+020001A8,gFloorSwitchManager,4,object,extern u32 gFloorSwitchManager;,include/ram.h,low,floor switch manager (FloorSwitch_*)
 020001AC,gUnk_020001AC,4,object,,,,
 020001B0,gUnk_020001B0,4,object,,,,
 020001B4,gRegionActorPool,4,object,extern struct RegionSpriteManager *gRegionActorPool;,include/ram.h,low,
@@ -102,7 +102,7 @@ addr,name,size,kind,decl,header,confidence,notes
 020001C8,gPanelSequence,4,object,extern u32 gPanelSequence;,include/ram.h,low,
 020001CC,gUnk_020001CC,4,object,,,,
 020001D0,gActiveRecordMenu,4,object,extern u32 gActiveRecordMenu;,include/ram.h,low,
-020001D4,gUnk_020001D4,4,object,,,,
+020001D4,gSaveMenu,4,object,extern u32 gSaveMenu;,include/ram.h,low,save menu task (SaveMenu_*)
 020001D8,gPaletteFade,4,object,extern struct PaletteFade *gPaletteFade;,include/ram.h,low,
 020001DC,gParticleManager,4,object,extern struct ParticleManager *gParticleManager;,include/ram.h,low,
 020001E0,gScreenMoteManager,4,object,extern u32 gScreenMoteManager;,include/ram.h,low,
@@ -117,24 +117,24 @@ addr,name,size,kind,decl,header,confidence,notes
 0200020C,gActorManager,4,object,extern void *gActorManager;,include/ram.h,low,
 02000210,gGameOver,4,object,extern struct GameOver *gGameOver;,include/ram.h,low,
 02000214,gFieldHud,4,object,extern u8 *gFieldHud;,include/ram.h,low,
-02000218,gUnk_02000218,4,object,,,,
+02000218,gSceneEffectQueue,4,object,extern u8 *gSceneEffectQueue;,include/ram.h,low,scene effect queue (SceneEffectQueue_*)
 0200021C,gUnk_0200021C,4,object,,,,
 02000220,gUnk_02000220,4,object,,,,
 0200022C,gUnk_0200022C,4,object,,,,
 02000230,gUnk_02000230,4,object,,,,
 02000234,gUnk_02000234,4,object,,,,
 02000238,gDirectionBurstEmitter,4,object,extern void *gDirectionBurstEmitter;,include/ram.h,low,
-0200023C,gUnk_0200023C,4,object,,,,
+0200023C,gEffectPoolManager,4,object,extern void *gEffectPoolManager;,include/ram.h,low,effect pool (EffectPool_*)
 02000240,gMotionEntryManager,4,object,extern void *gMotionEntryManager;,include/ram.h,low,
 02000244,gHresvelgrProjectilePool,4,object,extern void *gHresvelgrProjectilePool;,include/ram.h,low,
 02000250,gSceneComposite,4,object,extern void *gSceneComposite;,include/ram.h,low,
-02000254,gUnk_02000254,4,object,,,,
+02000254,gVanargandPartController,4,object,extern void *gVanargandPartController;,include/ram.h,low,Vanargand part controller
 02000258,gGrowthHazardManager,4,object,extern u32 gGrowthHazardManager;,include/ram.h,low,
 0200025C,gSelectionPanel,4,object,extern u8 *gSelectionPanel;,include/ram.h,low,
 02000260,gSegmentDisplay,4,object,extern u32 gSegmentDisplay;,include/ram.h,low,
-02000264,gUnk_02000264,4,object,,,,
+02000264,gSparkleEmitter,4,object,extern void *gSparkleEmitter;,include/ram.h,low,sparkle emitter (SparkleEmitter_*)
 02000268,gUnk_02000268,4,object,,,,
-0200026C,gUnk_0200026C,4,object,,,,
+0200026C,gShipWheel,4,object,extern u32 gShipWheel;,include/ram.h,low,ship wheel task (ShipWheel_*)
 02000274,gSceneNpc,4,object,extern struct SceneNpc *gSceneNpc;,include/ram.h,low,
 02000278,gUnk_02000278,,object,,,,
 02000298,gCloudTask,4,object,extern struct CloudTask *gCloudTask;,include/ram.h,low,
@@ -160,7 +160,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000458,gUnk_02000458,,interior,,,,gUnk_02000448 +0x10
 02000468,gPaletteController,4,object,extern struct PaletteController *gPaletteController;,include/palette_controller.h,low,
 0200046C,gFallingObjectManager,4,object,extern struct FallingObjectManager *gFallingObjectManager;,include/falling_objects.h,low,
-02000470,gUnk_02000470,4,object,,,,
+02000470,gShadowRegistry,4,object,extern u32 gShadowRegistry;,include/ram.h,low,shadow registry task (ShadowRegistry_*)
 02000474,gColliderSpritePool,4,object,extern u32 gColliderSpritePool;,include/ram.h,low,
 02000478,gUnk_02000478,4,object,,,,
 0200047C,gUnk_0200047C,4,object,,,,
@@ -211,24 +211,24 @@ addr,name,size,kind,decl,header,confidence,notes
 02000594,gPlayerNotificationPending,2,object,extern u16 gPlayerNotificationPending;,include/ram.h,low,
 02000598,gSceneLinkList,4,object,extern struct MotionTargets *gSceneLinkList;,include/ram.h,low,
 0200059C,gUnk_0200059C,4,object,,,,
-020005A0,gUnk_020005A0,2,object,,,,
+020005A0,gInventoryUseFlags,2,object,extern u16 gInventoryUseFlags;,include/ram.h,low,inventory use-permission flags
 020005A4,gSceneHudMode,2,object,extern u16 gSceneHudMode;,include/ram.h,low,
 020005A8,gUnk_020005A8,2,object,,,,
-020005AC,gUnk_020005AC,4,object,,,,
+020005AC,gHresvelgr,4,object,extern void *gHresvelgr;,include/ram.h,low,Hresvelgr boss task (Hresvelgr_Create/Destroy)
 020005B4,gUnk_020005B4,2,object,,,,
 020005C0,gAnimPanelSavedSelections,1A,object,extern u8 gAnimPanelSavedSelections[];,include/ram.h,low,
 020005DC,gUnk_020005DC,4,object,,,,
 020005E0,gParticlePool,4,object,extern struct ParticlePool *gParticlePool;,include/ram.h,low,
-020005E4,gUnk_020005E4,4,object,,,,
-020005E8,gUnk_020005E8,4,object,,,,
+020005E4,gRatatoskParticlePool,4,object,extern u32 gRatatoskParticlePool;,include/ram.h,low,Ratatosk animated particle pool
+020005E8,gSceneProjectilePool,4,object,extern u32 gSceneProjectilePool;,include/ram.h,low,scene projectile pool (SceneProjectile_*)
 020005EC,gSlotController,4,object,extern u8 *gSlotController;,include/ram.h,low,
-020005F0,gUnk_020005F0,4,object,,,,
+020005F0,gSpriteParticleManager,4,object,extern u32 gSpriteParticleManager;,include/ram.h,low,sprite particle manager (SpriteParticle_*)
 020005F4,gHomingManager,4,object,extern struct HomingManager *gHomingManager;,include/ram.h,low,
 020005F8,gDirectionalSpritePool,4,object,extern u8 *gDirectionalSpritePool;,include/ram.h,low,
-020005FC,gUnk_020005FC,4,object,,,,
+020005FC,gProjectilePool,4,object,extern u32 gProjectilePool;,include/ram.h,low,projectile pool (ProjectilePool_*)
 02000600,gFanCannonManager,4,object,extern struct Slot600Manager *gFanCannonManager;,include/ram.h,low,
-02000604,gUnk_02000604,4,object,,,,
-02000608,gUnk_02000608,4,object,,,,
+02000604,gEnemyParticlePool,4,object,extern u32 gEnemyParticlePool;,include/ram.h,low,enemy particle pool (EnemyParticle_*)
+02000608,gForgingBook,4,object,extern u32 gForgingBook;,include/ram.h,low,forging book task (ForgingBook_*)
 0200060C,gUnk_0200060C,4,object,,,,
 02000610,gUnk_02000610,70,object,,,,
 02000700,gUnk_02000700,4,object,,,,
@@ -282,7 +282,7 @@ addr,name,size,kind,decl,header,confidence,notes
 030025F8,gUnk_030025F8,4,object,,,,
 030025FC,gUnk_030025FC,4,object,,,,
 03002600,gRegionList,4,object,extern struct RegionList *gRegionList;,include/ram.h,low,
-03002604,gUnk_03002604,4,object,,,,
+03002604,gSolarController,4,object,extern u8 *gSolarController;,include/ram.h,low,solar sensor controller (Solar_*)
 03002608,gUnk_03002608,4,object,,,,
 030035B0,gUnk_030035B0,4,object,,,,
 030035B4,gUnk_030035B4,4,object,,,,
@@ -408,13 +408,13 @@ addr,name,size,kind,decl,header,confidence,notes
 03005234,gMosaicParam,2,object,extern u16 gMosaicParam;,include/render.h,high physical shape; provisional semantic name,packed mosaic parameter (byte and halfword accesses)
 03005238,gDefaultAnimFlags,2,object,extern u16 gDefaultAnimFlags;,include/render.h,high physical shape; provisional semantic name,default animation/widget flags
 0300523C,gEnginePauseFlags,4,object,extern u32 gEnginePauseFlags;,include/render.h,high physical shape; provisional semantic name,engine pause/suspend flags (bits 1-2: sound off; task list masks)
-03005240,gUnk_03005240,2,object,,,,
+03005240,gNextTaskId,2,object,extern u16 gNextTaskId;,include/engine.h,,"next Task id (unique, never 0)"
 03005250,gLinkMenuActive,4,object,extern u32 gLinkMenuActive;,include/ram.h,low,
 03005260,gUnk_03005260,10,object,,,,
 03005270,gUnk_03005270,2,object,,,,
 03005274,gSceneSelectionDisplaySlots,A,object,extern u16 gSceneSelectionDisplaySlots[];,include/ram.h,low,
 03005278,gUnk_03005278,,interior,,,,gUnk_03005274 +0x4
-03005280,gUnk_03005280,70,object,,,,
+03005280,gTaskLists,70,object,extern struct TaskList gTaskLists[14];,include/engine.h,,task lists by priority
 030052F0,gUnk_030052F0,4,object,,,,
 030052F4,gTerrainMap,4,object,extern struct EngineMap *gTerrainMap;,include/engine.h,low,
 030052F8,gTerrainWidth,4,object,extern u32 gTerrainWidth;,include/engine.h,low,
@@ -441,7 +441,7 @@ addr,name,size,kind,decl,header,confidence,notes
 030053E4,gUnk_030053E4,4,object,,,,
 030053E8,gUnk_030053E8,4,object,,,,
 030053EC,gUnk_030053EC,4,object,,,,
-030053F0,gUnk_030053F0,4,object,,,,
+030053F0,gScenePauseFlags,4,object,extern u32 gScenePauseFlags;,include/ram.h,low,scene pause/mute flags (bit tests across effects and actors)
 030053F4,gEngineFlags,4,object,extern u32 gEngineFlags;,include/engine.h,low,
 030053F8,gUnk_030053F8,4,object,,,,
 030053FC,gUnk_030053FC,4,object,,,,

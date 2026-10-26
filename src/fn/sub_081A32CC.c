@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u8 *gUnk_020005AC;
+#include "ram.h"
 
 u16 Hresvelgr_GetAnimationIdentifier(void)
 {
-    return *(u16 *)(gUnk_020005AC + 0x1F8);
+    return *(u16 *)(gHresvelgr + 0x1F8);
 }

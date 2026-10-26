@@ -9,7 +9,7 @@ struct Task {
 };
 extern struct Task gUnk_03001668;
 extern u32 gUnk_03005278;
-extern u16 gUnk_03005240;
+extern u16 gNextTaskId;
 void Heap_Initialize(void);
 void TaskSystem_InitLists(void);
 void ResourceRegistry_Initialize(void);
@@ -32,7 +32,7 @@ void TaskSystem_Initialize(void)
     task->f10 = 0;
     Task_LinkToPriorityList(task);
     gEnginePauseFlags = 0;
-    gUnk_03005240 = 1;
+    gNextTaskId = 1;
     gLinkMenuActive = 0;
     {
         u16 *start = gSceneSelectionDisplaySlots;

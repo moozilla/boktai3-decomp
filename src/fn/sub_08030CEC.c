@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct TextState {
     u8 pad0[0x1c];
@@ -17,13 +18,12 @@ struct MsgWin {
     u8 pad1ec[0x2c];
     u32 flags;
 };
-extern struct MsgWin *gUnk_020000DC;
 void *MessageWindow_GetStringAtOffset(struct MsgWin *, int);
 void TextState_Reset(void *);
 
 s32 sub_08030CEC(void *script, u32 count, u32 frame, u16 *frames)
 {
-    struct MsgWin *p = gUnk_020000DC;
+    struct MsgWin *p = gMessageWindow;
     if (p != 0) {
         struct TextState *state = &p->state;
         s32 i;

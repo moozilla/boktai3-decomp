@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 #define gMotionActorSlots gUnk_020004F0
 struct MotionActorAnimation {
     u8 unknown0[0x60];
@@ -18,7 +19,6 @@ struct MotionActor {
     u8 unknown874[0x84];
     s8 slot;
 };
-extern u32 gUnk_030053F0;
 extern struct MotionActor *gUnk_020004F0[];
 void Anim_Remove(void *);
 void Sound_StopSong(u32);
@@ -37,7 +37,7 @@ s32 MotionActor_Destroy(struct MotionActor *actor)
     SpatialIndex_RemoveEntry(&state->resource);
     {
         u32 mask = 0x800;
-        if (!((gEngineFlags | gUnk_030053F0) & mask))
+        if (!((gEngineFlags | gScenePauseFlags) & mask))
             SceneMessages_UnregisterReceiver(&actor->display);
     }
     Sound_StopSong(0x87);

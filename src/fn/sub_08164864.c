@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct HudSlotSource {
     u8 unknown0[0x18];
@@ -10,7 +11,6 @@ extern struct HudSlotSource *gUnk_020004B4;
 extern u8 *gGameState;
 extern u16 gUnk_03005174;
 extern u32 gEngineFlags;
-extern u32 gUnk_030053F0;
 u16 *Hud_GetTilemapCell(s32, u32, u32);
 void Sound_PlaySong(u32);
 
@@ -48,7 +48,7 @@ static inline u8 testFlag(u32 mask, u32 *flags)
 
 static inline u32 LinkFlags(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 
 void sub_08164864(u8 *hud, s32 mode, u32 x, u32 y)

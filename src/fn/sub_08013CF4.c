@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_02000470;
+#include "ram.h"
 void *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 ShadowRegistry_InitTask(void *);
@@ -10,8 +10,8 @@ void ShadowRegistry_OnDestroy(void);
 void *ShadowRegistry_CreateTask(void)
 {
     void *p;
-    if (gUnk_02000470 != 0)
-        return (void *)gUnk_02000470;
+    if (gShadowRegistry != 0)
+        return (void *)gShadowRegistry;
     p = Task_Create(9, 0x1c);
     if (p != 0) {
         Task_SetCallbacks(p, ShadowRegistry_OnUpdate, ShadowRegistry_OnDestroy);

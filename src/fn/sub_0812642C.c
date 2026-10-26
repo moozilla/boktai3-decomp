@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 // fix.py best version (reprinted C)
-extern u8 *gUnk_02000154;
 extern u16 gUnk_0203B400[];
 extern u32 gRandomIndex;
 u8 *ScriptedParticle_EnsurePool(void);
@@ -18,7 +18,7 @@ void SpriteParticle_Create(u32 *a, s32 b, s32 c, s32 d, s32 e, u32 f, s32 g, s32
         u32 x;
         u32 y;
     };
-    u8 *context = gUnk_02000154;
+    u8 *context = gScriptedParticlePool;
     u8 *s;
     u8 *resource;
     u8 *fields;

@@ -1,7 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "vulcan_cannon_worker.h"
-extern u32 gUnk_030053F0, gUnk_02000560;
+#include "ram.h"
+extern u32 gUnk_02000560;
 void VulcanCannon_UpdateTargeting(void);
 void VulcanCannon_UpdateDefeatEffects(void);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
@@ -46,7 +47,7 @@ static inline void CannonEffectOffset(struct SceneVec *v)
 s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
 {
     struct CannonCollider *collider;
-    if (TestPair(0x400, &gEngineFlags, &gUnk_030053F0) || TestFlag(4, &gUnk_02000560))
+    if (TestPair(0x400, &gEngineFlags, &gScenePauseFlags) || TestFlag(4, &gUnk_02000560))
         return 0;
     p->previousVisible = p->targetVisible;
     Callback_InvokeActor(p, p->state);

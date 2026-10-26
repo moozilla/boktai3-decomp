@@ -27,7 +27,7 @@ struct ColliderVector {
     s16 x, y, z;
 };
 extern const struct ColliderVector gUnk_08610710, gUnk_08610718, gUnk_08610720;
-extern u32 gUnk_030053F0, gUnk_02000560;
+extern u32 gUnk_02000560;
 struct SceneScheduledEffect *sub_0812298C(void *);
 void SceneBody_Init(struct ScheduledEffectBody *, u32, struct ContactPosition *, u32, u32, void *);
 void SceneBody_SetSprite(struct ScheduledEffectBody *, struct ScheduledEffectSprite *);
@@ -44,7 +44,7 @@ struct SceneScheduledEffect *SceneScheduledEffect_Create(const struct ContactPos
     struct ScheduledEffectSprite *sprite;
     {
         u32 mask = 0x400;
-        if ((gEngineFlags | gUnk_030053F0) & mask)
+        if ((gEngineFlags | gScenePauseFlags) & mask)
             return 0;
     }
     {

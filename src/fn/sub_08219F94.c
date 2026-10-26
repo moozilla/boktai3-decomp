@@ -9,11 +9,11 @@ struct List {
     struct Task *head;
     u32 pad;
 };
-extern struct List gUnk_03005280[];
+extern struct List gTaskLists[];
 
 void Task_UnlinkFromPriorityList(struct Task *t)
 {
-    struct List *l = &gUnk_03005280[t->f14];
+    struct List *l = &gTaskLists[t->f14];
     struct Task *prev = t->prev;
     struct Task *next = t->next;
     if (prev != 0)

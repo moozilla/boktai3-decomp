@@ -111,7 +111,7 @@ s32 EffectManager_UpdateAll(struct EffectManager *manager)
     s32 i;
     u32 mask = 512;
     u32 flags;
-    flags = gEngineFlags | gUnk_030053F0;
+    flags = gEngineFlags | gScenePauseFlags;
     mask &= flags;
     if (mask) {
         flags &= 256;

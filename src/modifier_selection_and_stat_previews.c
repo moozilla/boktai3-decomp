@@ -1,4 +1,5 @@
 #include "modifier_list.h"
+#include "ram.h"
 
 s32 Modifier_CollectSources(struct ModifierSelection *, struct ModifierSelection *,
                             struct ModifierRecord *, u32);
@@ -483,13 +484,11 @@ s32 ModifierMenu_CommitSecondarySource(struct ModifierMenu *p)
     return 0;
 }
 
-extern u32 gUnk_030053F0;
-
 void Registry1745_SetMenuRequest(u32);
 
 static inline u32 TestFlags(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 
 void ModifierMenu_CloseScript(struct ModifierMenu *menu)

@@ -29,7 +29,6 @@ struct Engine {
     void *head, *tail;
 };
 extern struct Engine *gUnk_02000484;
-extern u8 gUnk_020000EC;
 void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
@@ -38,6 +37,7 @@ void Memory_Clear(void *, int);
 // the SDK header): its argument order only matches with int parameters.
 #define rfu_clearSlot rfu_clearSlot_sdk
 #include "rfu_compat.h"
+#include "ram.h"
 #undef rfu_clearSlot
 u16 rfu_clearSlot(int connTypeFlag, int slotStatusIndex);
 static inline void setOperation(struct Engine *p, int op, int zero)

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 struct ConfirmPanel {
     u8 f0[0x18];
@@ -20,7 +21,6 @@ struct ConfirmPanel {
     u8 fD2D;
     u16 fD2E;
 };
-extern u32 gUnk_030053F0;
 extern u16 gUnk_03005260[];
 void Bg_SetLayerMap(u32, void *, u16);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
@@ -48,7 +48,7 @@ static inline u8 TestSel(struct ConfirmPanel *p)
 static inline u32 LinkActive(void)
 {
     u32 mask = 0x800;
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 
 static inline void Refresh(struct ConfirmPanel *p)

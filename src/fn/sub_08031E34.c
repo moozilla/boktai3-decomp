@@ -1,13 +1,13 @@
 #include "global.h"
+#include "ram.h"
 
 struct S {
     u8 f[0x19c];
     u32 a;
 };
-extern struct S *gUnk_020000DC;
 u32 MessageWindow_GetTextCompletionState(void)
 {
-    struct S *p = gUnk_020000DC;
+    struct S *p = gMessageWindow;
     if (!p)
         return 0;
     return p->a;

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "modifier_list.h"
 #include "engine.h"
-extern u32 gUnk_030053F0;
+#include "ram.h"
 s32 StatModifier_AddForGlobalMode(void *arg, s32 value)
 {
     struct StatModifier *modifier = arg;
@@ -13,7 +13,7 @@ s32 StatModifier_AddForGlobalMode(void *arg, s32 value)
         } while (0);
     {
         u16 mask = 0x800;
-        if (!((gEngineFlags | gUnk_030053F0) & mask) || modifier->owner->mode == 1)
+        if (!((gEngineFlags | gScenePauseFlags) & mask) || modifier->owner->mode == 1)
             do {
                 return input;
             } while (0);

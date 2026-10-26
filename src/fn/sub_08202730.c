@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct ProjPos {
     s16 x, y, z, pad;
 };
@@ -53,7 +54,6 @@ struct ProjPool {
     u32 mask;
     struct ProjEntry e[16];
 };
-extern u32 gUnk_030053F0;
 extern u32 gUnk_02000560;
 void ProjectilePool_ReleaseSlot(struct ProjPool *, struct ProjEntry *, s32);
 u8 *TerrainModifiers_FindCellOverride(int, int);
@@ -100,7 +100,7 @@ s32 ProjectilePool_Update(struct ProjPool *pool)
     s32 i;
     {
         u32 mask = 0x400;
-        if ((gEngineFlags | gUnk_030053F0) & mask)
+        if ((gEngineFlags | gScenePauseFlags) & mask)
             return 0;
     }
     {

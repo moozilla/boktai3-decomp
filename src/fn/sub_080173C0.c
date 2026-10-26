@@ -1,5 +1,5 @@
 #include "global.h"
-extern void *gUnk_0200007C;
+#include "ram.h"
 int Script_GetKeywordValue(int, int);
 void *Task_Create(int, int);
 void Task_SetCallbacks(void *, void *, void *);
@@ -10,8 +10,8 @@ void Task_Kill(void *);
 void *ScanlineWave_Create(int id)
 {
     void *p;
-    if (gUnk_0200007C)
-        return gUnk_0200007C;
+    if (gScanlineWave)
+        return gScanlineWave;
     if (Script_GetKeywordValue('a', 0))
         p = Task_Create(11, 628);
     else

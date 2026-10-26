@@ -2,6 +2,7 @@
 #define gNamedObjectStateCallbacks    gUnk_086064CC
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct NamedObjectPosition {
     u32 xy, zp;
 };
@@ -21,7 +22,6 @@ struct NamedObjectManager {
     struct NamedObject objects[12];
     u32 activeMask;
 };
-extern u32 gUnk_030053F0;
 extern s32 gUnk_02000560;
 extern void *gUnk_086064CC[];
 void NamedObject_RegisterFollowCells(struct NamedObject *);
@@ -49,7 +49,7 @@ u32 NamedObject_UpdatePool(struct NamedObjectManager *manager)
     {
         u32 mask = 0x400;
         s32 mask2 = 4;
-        if ((mask & (gEngineFlags | gUnk_030053F0)) || testMask()) {
+        if ((mask & (gEngineFlags | gScenePauseFlags)) || testMask()) {
             Sound_StopSong(0x158);
             Sound_StopSong(0x261);
             Sound_StopSong(0x289);

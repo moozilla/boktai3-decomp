@@ -1,9 +1,9 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_020000DC;
 u32 MessageWindow_IsCreated(void)
 {
-    u32 x = gUnk_020000DC;
+    u32 x = gMessageWindow;
     if (x != 0)
         x = 1;
     return x;

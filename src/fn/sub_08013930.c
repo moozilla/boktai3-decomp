@@ -1,5 +1,5 @@
 #include "global.h"
-extern void *gUnk_02000058;
+#include "ram.h"
 void *ScaledShadowManager_Create(int, int);
 void ScaledShadow_Update(void *);
 void ScaledShadow_UpdateNoOp(void *);
@@ -9,7 +9,7 @@ void ScaledShadowManager_AddShadow(void *, void *);
 int ScaledShadow_Initialize(u8 *p, void *source, int scale, int min, int max, int extra,
                             int maxHeight, int minHeight, int shift, int nearShift, int mode)
 {
-    void *m = gUnk_02000058;
+    void *m = gScaledShadowManager;
     u8 *resource, *sprite;
     int zero;
     if (!m) {

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct State {
     u8 pad[0x15];
@@ -29,7 +30,6 @@ struct Actor {
     void *resource;
     void *callback;
 };
-extern struct Actor *gUnk_020000DC;
 void AnimData_SelectPaletteBank(void *, int);
 int Anim_SetSequence(struct Frames *, void *, u16, int, int);
 int MessageWindow_UpdateSpeakerPortrait(struct Actor *p)

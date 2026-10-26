@@ -3,7 +3,7 @@ struct Manager {
     u8 pad[24];
     u8 *resource;
 };
-extern struct Manager *gUnk_02000054;
+extern struct Manager *gShadowManager;
 void *ShadowTask_Create(int, int);
 void Shadow_UpdateTerrain(void *);
 void ActorShadow_UpdateNone(void *);
@@ -14,7 +14,7 @@ int Shadow_Initialize(u8 *p, void *source, int mode)
 {
     u8 *sprite;
     int zero;
-    if (!gUnk_02000054 && !ShadowTask_Create(0, 0))
+    if (!gShadowManager && !ShadowTask_Create(0, 0))
         return -1;
     zero = 0;
     p[0] = zero;
@@ -27,15 +27,15 @@ int Shadow_Initialize(u8 *p, void *source, int mode)
     else
         *(void (**)(void *))(p + 0x34) = ActorShadow_UpdateNone;
     sprite = p + 12;
-    ParticleSprite_Initialize(sprite, gUnk_02000054->resource, 512);
+    ParticleSprite_Initialize(sprite, gShadowManager->resource, 512);
     Effect_SetOrigin(sprite, -8, -8);
     {
-        u8 *resource = gUnk_02000054->resource;
+        u8 *resource = gShadowManager->resource;
         int width = p[0x16] >> 3, height = p[0x17] >> 3;
         *(u16 *)(p + 0x14) = width * height * 34 + *(u16 *)(resource + 4);
     }
     p[0x1c] = 252;
     p[0x1b] = 2;
-    ShadowList_Insert(gUnk_02000054, p);
+    ShadowList_Insert(gShadowManager, p);
     return 0;
 }

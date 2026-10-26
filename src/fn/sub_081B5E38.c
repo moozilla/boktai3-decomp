@@ -1,12 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 
 void Anim_Remove(void *);
 void Collider_Remove(void *);
 void Sprite_Remove(void *);
 void ScaledShadow_Destroy(void *);
 void SceneLink_RemoveNode(void *);
-extern void *gUnk_02000254;
 // confidence=low: removes the controller animation and both embedded part records.
 #define Vanargand_DestroyPartController sub_081B5E38
 void Vanargand_DestroyPartController(u8 *controller)
@@ -35,6 +35,6 @@ void Vanargand_DestroyPartController(u8 *controller)
     } while (--i >= 0);
     {
         u32 zero = 0;
-        gUnk_02000254 = (void *)zero;
+        gVanargandPartController = (void *)zero;
     }
 }

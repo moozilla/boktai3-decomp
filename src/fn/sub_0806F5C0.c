@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "game_state.h"
+#include "ram.h"
 struct SceneEffectEntry {
     s16 x, y, z;
     u8 pad6[2];
@@ -13,7 +14,6 @@ struct SceneEffectEntry {
     void *effect;
 };
 extern void *gSceneEffectSchedule;
-extern u32 gUnk_030053F0;
 struct SceneEffectEntry *SceneEffectSchedule_Allocate(void *);
 void *SceneScheduledEffect_Create(struct SceneEffectEntry *, u16 name, s32 time, u8 d, u8 f, s32, s32 ax, s32 ay,
                    s32 az, s32 delay, u16 flagged);
@@ -46,7 +46,7 @@ void SceneEffectSchedule_AddFromScript(void)
     s32 time, delay;
     {
         u32 mask = 0x400;
-        if ((gEngineFlags | gUnk_030053F0) & mask)
+        if ((gEngineFlags | gScenePauseFlags) & mask)
             return;
     }
     if (!gSceneEffectSchedule)

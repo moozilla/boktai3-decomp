@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 
 struct PanelWidget {
     u8 f0[8];
@@ -24,7 +25,6 @@ struct SelectionPanel {
     u8 buf[1];
 };
 extern u32 gEngineFlags;
-extern u32 gUnk_030053F0;
 s32 ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *);
 void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, u32);
@@ -52,7 +52,7 @@ void sub_0810DB0C(struct SelectionPanel *p)
         p->fixed[i] = 0xFFFF;
         {
             u32 mask = 0x800;
-            if ((gEngineFlags | gUnk_030053F0) & mask)
+            if ((gEngineFlags | gScenePauseFlags) & mask)
                 p->widgets[i].flags |= 1;
         }
     }

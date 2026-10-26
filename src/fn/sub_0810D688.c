@@ -1,10 +1,10 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct RecordPanel {
     u8 pad0[0x268];
     u32 spriteFlags;
 };
-extern u32 gUnk_030053F0;
 s32 SelectionPanel_GetSelection(struct RecordPanel *);
 s32 GameState_GetChallengeBestScore(u32);
 void Video_DrawBackgroundRowMarkers(u32, u32);
@@ -22,7 +22,7 @@ void RecordPanel_DrawTime(struct RecordPanel *p)
     index = SelectionPanel_GetSelection(p);
     time = GameState_GetChallengeBestScore(index);
     mask = 0x800;
-    if ((gEngineFlags | gUnk_030053F0) & mask) {
+    if ((gEngineFlags | gScenePauseFlags) & mask) {
         index -= 6;
         if (time < 0)
             goto unavailable;

@@ -37,7 +37,7 @@ struct Manager {
     void *animations;
     struct Group groups[6];
 };
-extern struct Manager *gUnk_0200006C;
+extern struct Manager *gFadingParticleManager;
 extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
@@ -59,10 +59,10 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
 {
     s32 i, j;
     u32 *rng;
-    if (gUnk_0200006C == NULL && FadingParticleManager_Create(0, 0) == NULL)
+    if (gFadingParticleManager == NULL && FadingParticleManager_Create(0, 0) == NULL)
         return -1;
     for (i = 0; i < 6; i++) {
-        struct Group *g = &gUnk_0200006C->groups[i];
+        struct Group *g = &gFadingParticleManager->groups[i];
         rng = &gRandomIndex;
         if (g->active == 0) {
             g->active = 1;
@@ -94,7 +94,7 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
                 p->motion.sprite.position = *position;
                 sub_08217E40(&p->motion.sprite, 0);
                 p->motion.sprite.flags &= ~1;
-                Anim_SetSequence(&p->motion.anim, gUnk_0200006C->animations, 3, 0, 0);
+                Anim_SetSequence(&p->motion.anim, gFadingParticleManager->animations, 3, 0, 0);
             }
             return 0;
         }

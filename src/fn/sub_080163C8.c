@@ -1,5 +1,5 @@
 #include "global.h"
-extern void *gUnk_0200006C;
+#include "ram.h"
 void *AnimData_FindEntry(int);
 void *ScriptProc_Start(int, int);
 void Effect_Initialize(void *, void *, int);
@@ -8,7 +8,7 @@ int FadingParticleManager_Initialize(u8 *m)
 {
     int i;
     int clear;
-    gUnk_0200006C = m;
+    gFadingParticleManager = m;
     *(void **)(m + 28) = AnimData_FindEntry(0x1c1a);
     *(void **)(m + 32) = ScriptProc_Start(0x922e, 0xd1b8);
     i = 0;

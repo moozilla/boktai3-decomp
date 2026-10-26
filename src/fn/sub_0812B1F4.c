@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 /* Tentative family name; visual identity is not yet established. */
 #define gActorEffectStateCallbacks gUnk_086107C8
 struct ActorEffect {
@@ -13,13 +14,13 @@ struct ActorEffectManager {
     u32 used;
     struct ActorEffect slots[8];
 };
-extern u32 gUnk_030053F0, gUnk_02000560;
+extern u32 gUnk_02000560;
 extern void *gUnk_086107C8[];
 s32 sub_08249240(void *, void *, void *);
 static inline u32 paused(void)
 {
     u32 mask = 0x400;
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 static inline u32 locked(void)
 {

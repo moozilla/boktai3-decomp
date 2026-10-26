@@ -6,7 +6,7 @@ struct Task {
     u8 pad12[2];
     u8 f14;
 };
-extern u16 gUnk_03005240;
+extern u16 gNextTaskId;
 struct Task *Heap_Alloc(u32);
 void Memory_Clear(struct Task *, u32);
 void Task_LinkToPriorityList(struct Task *);
@@ -18,10 +18,10 @@ struct Task *Task_Create(u32 a, u32 b)
         return 0;
     Memory_Clear(t, b);
     t->f14 = a;
-    if (gUnk_03005240 == 0)
-        gUnk_03005240++;
-    t->f10 = gUnk_03005240;
-    gUnk_03005240++;
+    if (gNextTaskId == 0)
+        gNextTaskId++;
+    t->f10 = gNextTaskId;
+    gNextTaskId++;
     Task_LinkToPriorityList(t);
     return t;
 }

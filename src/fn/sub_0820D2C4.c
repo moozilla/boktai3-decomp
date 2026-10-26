@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct Pos {
     s16 x, y, z, pad;
 };
@@ -54,7 +55,7 @@ struct Pool {
     u32 mask;
     struct Entry e[16];
 };
-extern u32 gUnk_02000560, gUnk_030053F0;
+extern u32 gUnk_02000560;
 extern const s16 gUnk_086149C4[];
 void EnemyParticle_ReleaseSlot(struct Pool *, struct Entry *, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
@@ -84,7 +85,7 @@ s32 EnemyParticle_UpdatePool(struct Pool *pool)
     struct Entry *base, *cursor;
     s32 i;
     u32 pause = 0x400;
-    if ((gEngineFlags | gUnk_030053F0) & pause)
+    if ((gEngineFlags | gScenePauseFlags) & pause)
         return 0;
     {
         u32 busy = 4;

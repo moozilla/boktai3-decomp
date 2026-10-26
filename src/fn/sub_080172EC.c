@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Wave {
     u8 pad[24];
     u16 id, target, mode;
@@ -8,7 +9,6 @@ struct Wave {
     u16 bank;
     s16 samples[1][288];
 };
-extern struct Wave *gUnk_0200007C;
 extern const s16 gUnk_086149C4[];
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
@@ -21,7 +21,7 @@ int ScanlineWave_Initialize(struct Wave *p, int id)
     int wrap;
     const s16 *table;
     int mask;
-    gUnk_0200007C = p;
+    gScanlineWave = p;
     p->id = id;
     p->target = Script_GetKeywordValue('t', 0);
     p->mode = Script_GetKeywordValue('m', 0);

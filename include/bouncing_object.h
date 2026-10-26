@@ -32,7 +32,7 @@ struct BouncingContact {
 };
 extern void *gUnk_08605B6C[];
 extern u32 gUnk_02000560;
-extern u32 gUnk_030053F0;
+extern u32 gScenePauseFlags;
 struct BouncingPool *BouncingObject_EnsurePool(void);
 void Shadow_Initialize(void *, struct ContactPosition *, s32);
 void BouncingObject_InitializeColliders(struct BouncingObject *, s16, s16);

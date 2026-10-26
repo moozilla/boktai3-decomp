@@ -1,5 +1,6 @@
 #include "global.h"
 #include "game_state.h"
+#include "ram.h"
 
 // confidence=low: clears actions and markers, emits defeat bursts, then selects recovery.
 
@@ -83,7 +84,7 @@ void ScenePool_ClampMotionSpeeds(struct Obj *);
 void Actor_ClampMovementSpeed(struct Obj *);
 void Glove_SetAnimationKeyframes(struct Glove *, s32);
 void ActorRecoil_UpdateMotion(struct Glove *);
-extern u32 gEngineFlags, gUnk_030053F0;
+extern u32 gEngineFlags;
 extern u8 *gUnk_020004B4;
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
@@ -207,7 +208,7 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
         CharacterModel_LoadSecondaryPalette(p->model, *style);
         {
             u32 mask = 0x800;
-            if ((gEngineFlags | gUnk_030053F0) & mask) {
+            if ((gEngineFlags | gScenePauseFlags) & mask) {
                 u8 *peer = gUnk_020004B4;
                 if (peer) {
                     if (U8(peer, 0x53) != 1)
@@ -312,7 +313,7 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
         void (*callback)(void *);
         u32 zero;
         u32 mask = 0x800;
-        if (((gEngineFlags | gUnk_030053F0) & mask) || IsRecoveryEnabled(0x100)) {
+        if (((gEngineFlags | gScenePauseFlags) & mask) || IsRecoveryEnabled(0x100)) {
             callback = (void (*)(void *))sub_08117F6C;
             zero = 0;
         } else {

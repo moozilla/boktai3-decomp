@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 struct Pos {
     s16 x, y, z, pad;
 };
@@ -53,7 +54,6 @@ struct Pool {
     u32 mask;
     struct Entry e[32];
 };
-extern struct Pool *gUnk_020005F0;
 extern const s16 gUnk_086149C4[];
 void SpriteParticle_CreateManager(void);
 struct Entry *SpriteParticle_FindFreeSlot(struct Pool *, s32 *);
@@ -178,7 +178,7 @@ static inline void StepPlayback(struct Obj *sprite, struct Anim *state, u32 one)
 }
 s32 SpriteParticle_Emit(struct Params *params, struct Pos *pos)
 {
-    struct Pool *pool = gUnk_020005F0;
+    struct Pool *pool = gSpriteParticleManager;
     struct Entry *e;
     s32 slot;
     struct Obj *o;

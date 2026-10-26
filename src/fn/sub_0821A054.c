@@ -9,12 +9,12 @@ struct List {
     struct Task *head;
     u32 mask;
 };
-extern struct List gUnk_03005280[14];
+extern struct List gTaskLists[14];
 void Task_UnlinkFromPriorityList(struct Task *);
 void Heap_Free(struct Task *);
 void TaskSystem_RunFrame(void)
 {
-    struct List *list = gUnk_03005280;
+    struct List *list = gTaskLists;
     s32 i;
     for (i = 0; i <= 13; i++, list++) {
         if (!(gEnginePauseFlags & list->mask)) {

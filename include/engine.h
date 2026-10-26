@@ -19,9 +19,9 @@ struct Task {
     struct Task *prev, *next;
     void (*update)(struct Task *);  /* called every frame while alive */
     void (*destroy)(struct Task *); /* called once after Task_Kill */
-    u16 id;                         /* unique, never 0 (gUnk_03005240 counter) */
+    u16 id;                         /* unique, never 0 (gNextTaskId counter) */
     u16 flags;                      /* bit 0: marked for deletion */
-    u8 list;                        /* index into gUnk_03005280 (priority list, 0..13) */
+    u8 list;                        /* index into gTaskLists (priority list, 0..13) */
 };
 
 struct TaskList {
@@ -65,8 +65,8 @@ struct EngineMap {
     void *trapTops[64];
 };
 
-extern u16 gUnk_03005240;                 /* next Task id */
-extern struct TaskList gUnk_03005280[14]; /* task lists by priority */
+extern u16 gNextTaskId;                   /* next Task id */
+extern struct TaskList gTaskLists[14];    /* task lists by priority */
 extern struct HeapBlock gUnk_02000714;    /* head of the general heap (Heap_Alloc/Heap_Free) */
 extern struct EngineMap *gTerrainMap;     /* current terrain map */
 extern u32 gTerrainWidth, gTerrainHeight; /* terrain map width, height (cells) */
@@ -101,7 +101,7 @@ s32 sub_08249240(void *arg0, void *arg1, void *function);
 void Sound_PlaySong(u32 song); /* m4aSongNumStart, remembering the song per track unless muted */
 
 void Sound_PlaySongChecked(
-    u32 song); /* Sound_PlaySong unless a flag in gUnk_030053F0/F4 is set (guess) */
+    u32 song); /* Sound_PlaySong unless a flag in gScenePauseFlags/F4 is set (guess) */
 
 void Sound_StopSong(u32 song);
 

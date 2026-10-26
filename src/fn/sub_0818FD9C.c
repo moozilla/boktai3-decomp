@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct NidhoggrEffectVector {
     u16 x, y, z, pad;
 };
@@ -25,7 +26,7 @@ struct NidhoggrAttachedEffect {
     struct NidhoggrEffectVector *anchor;
     struct NidhoggrEffectVector offset;
 };
-extern u32 gEngineFlags, gUnk_030053F0, gUnk_02000560;
+extern u32 gEngineFlags, gUnk_02000560;
 extern const struct NidhoggrEffectPair gUnk_0824F264, gUnk_0824F26C;
 struct NidhoggrAttachedEffect *SceneEffectPool_AllocateSlot(void *);
 void SceneEffect_ResetState(void *);
@@ -47,7 +48,7 @@ void Nidhoggr_CreateAttachedAttackEffect(u8 *owner, struct NidhoggrEffectVector 
     u8 *animation;
     u8 *collider;
     u32 mask = 0x400;
-    if ((gEngineFlags | gUnk_030053F0) & mask)
+    if ((gEngineFlags | gScenePauseFlags) & mask)
         return;
     {
         u32 mask = 4;

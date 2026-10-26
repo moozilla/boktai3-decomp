@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_02000058;
+#include "ram.h"
 
 void ScaledShadowManager_OnTaskDestroy(void)
 {
-    gUnk_02000058 = 0;
+    gScaledShadowManager = 0;
 }

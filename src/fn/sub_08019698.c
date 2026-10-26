@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 typedef struct {
     u16 id, time;
     u8 active, count, frame, frames, unpaused, dirty, remove, pad;
@@ -10,7 +11,6 @@ typedef struct {
     Channel channels[8];
     void *tiles;
 } Manager;
-extern Manager *gUnk_020000A4;
 int Script_GetKeywordValue(int, int);
 void *Heap_Alloc(int);
 void Memory_Clear(void *, int);
@@ -21,7 +21,7 @@ int TileAnimation_Initialize(Manager *p)
     int i, resource, mode;
     Channel *q;
     void *data;
-    gUnk_020000A4 = p;
+    gTileAnimation = p;
     p->count = Script_GetKeywordValue('s', 32);
     p->tiles = Heap_Alloc(p->count * 32);
     if (p->tiles) {

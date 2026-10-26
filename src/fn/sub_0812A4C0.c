@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_0200017C;
+#include "ram.h"
 void AnimData_Load(u8 *, u32);
 u32 ScriptProc_Start(u32, u32);
 s32 SunDiscPool_Init(u8 *p)
@@ -8,6 +8,6 @@ s32 SunDiscPool_Init(u8 *p)
     *(u32 *)(p + 0x34) = ScriptProc_Start(0x922E, 0x1752);
     *(u32 *)(p + 0x38) = 0;
     *(u32 *)(p + 0xC0C) = 0;
-    gUnk_0200017C = p;
+    gSunDiscPool = p;
     return 0;
 }

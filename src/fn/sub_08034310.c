@@ -29,11 +29,11 @@ struct Engine {
     void *head, *tail;
 };
 extern struct Engine *gUnk_02000484;
-extern u8 gUnk_020000EC;
 void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
+#include "ram.h"
 void String_CopyPadded(const void *, void *, int);
 int WirelessController_BuildPeerRosterPacket(struct Engine *p)
 {

@@ -2,10 +2,10 @@
 #include "scene_hud_display.h"
 #include "player.h"
 #include "engine.h"
-extern u32 gUnk_030053F0;
+#include "ram.h"
 static inline u32 TestFlags(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 s32 SceneHud_CanOpenSecondarySelection(struct SceneHudState *p)
 {

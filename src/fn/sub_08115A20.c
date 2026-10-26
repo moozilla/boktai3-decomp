@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-extern u32 gUnk_030053F0;
+#include "ram.h"
 struct S {
     u8 f[0xee];
     u8 st;
@@ -13,7 +13,7 @@ void GameState_AddActionCount892(u32);
 void Collectible_ApplyPickupReward(struct S *s, struct T *t)
 {
     u32 m = 0x800;
-    if (((gEngineFlags | gUnk_030053F0) & m) == 0 && t->b == 1) {
+    if (((gEngineFlags | gScenePauseFlags) & m) == 0 && t->b == 1) {
         switch (s->st) {
             case 0:
                 GameState_AddActionCount892(1);

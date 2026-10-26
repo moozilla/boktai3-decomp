@@ -75,7 +75,7 @@ typedef s32 (*EffectParticleUpdate)(struct EffectManager *, struct Effect *, s32
 extern struct EffectManager *gEffectManager;
 extern s16 gUnk_086149C4[];
 extern u32 gUnk_02000560;
-extern u32 gEngineFlags, gUnk_030053F0;
+extern u32 gEngineFlags, gScenePauseFlags;
 extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern struct EffectAnimId gUnk_08604A30[][3];

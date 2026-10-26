@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_02000054;
+#include "ram.h"
 
 void ShadowTask_Destroy(void)
 {
-    gUnk_02000054 = 0;
+    gShadowManager = 0;
 }

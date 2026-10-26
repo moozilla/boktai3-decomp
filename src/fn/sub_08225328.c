@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Task {
     u8 pad[16];
     u16 f10;
@@ -7,7 +8,6 @@ struct Task {
     s32 state, counter;
 };
 extern u32 gEngineFlags;
-extern u32 gUnk_030053F0;
 extern u32 gUnk_030053EC;
 extern u32 gUnk_03005410;
 extern u32 gUnk_030053E8;
@@ -43,7 +43,7 @@ void SceneLifecycle_InitManager(void)
     Script_RegisterEngineCommands();
     Script_RegisterBuiltinCommands();
     gEngineFlags = 0;
-    gUnk_030053F0 = 0;
+    gScenePauseFlags = 0;
     gUnk_030053EC = 0;
     gUnk_03005410 = 0;
     gUnk_030053E8 = 0;

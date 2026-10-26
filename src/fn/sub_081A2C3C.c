@@ -1,8 +1,8 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 f[0x54];
 };
-extern s32 gUnk_020005AC;
 void SceneActors_Destroy(void);
 void Anim_Remove(void *);
 void ScaledShadow_Destroy(void *);
@@ -23,6 +23,6 @@ s32 Hresvelgr_Destroy(u8 *p)
         i--;
     } while (i >= 0);
     z = 0;
-    gUnk_020005AC = z;
+    gHresvelgr = z;
     return 0;
 }

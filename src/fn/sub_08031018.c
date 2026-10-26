@@ -1,10 +1,10 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_020000DC;
 u32 TextState_SetString(u8 *, u32, u32);
 u32 MessageWindow_SetStringArgument(u32 a, u32 b)
 {
-    u8 *p = gUnk_020000DC;
+    u8 *p = gMessageWindow;
     u32 r;
     if (p == 0)
         r = 0;

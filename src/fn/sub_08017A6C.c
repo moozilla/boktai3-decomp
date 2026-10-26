@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: checks light, cooldown, and random volume before entering storm phase one.
 #define Weather_UpdateStormTrigger sub_08017A6C
@@ -11,7 +12,7 @@ struct Weather {
     u8 enabled, flags;
 };
 extern u8 *gGameState;
-extern u32 gEngineFlags, gUnk_030053F0, gRandomIndex;
+extern u32 gEngineFlags, gRandomIndex;
 extern s32 gUnk_02000080, gUnk_02000084;
 #define RANDOM_TABLE ((u16 *)0x0203B400)
 void Palette_SetBrightnessMode(s32);
@@ -31,7 +32,7 @@ static inline void ClearDisplayFlag(u16 *display, u32 mask)
 }
 static inline u32 IsPaused(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 static inline s32 Random(void)
 {

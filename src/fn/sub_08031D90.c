@@ -1,12 +1,12 @@
 #include "global.h"
+#include "ram.h"
 struct Actor {
     u8 pad[0x1A];
     u8 rect[4];
 };
-extern struct Actor *gUnk_020000DC;
 int MessageWindow_GetTextBounds(int *out)
 {
-    struct Actor *p = gUnk_020000DC;
+    struct Actor *p = gMessageWindow;
     int result;
     if (!p)
         goto fail;

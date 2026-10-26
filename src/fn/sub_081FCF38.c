@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 p[0x1c0];
 };
@@ -8,7 +9,6 @@ struct A {
     u8 p1[0x20 - 0x1c];
     struct E e[10];
 };
-extern u32 gUnk_020005E8;
 void SceneProjectile_ReleaseSlot(struct A *, struct E *, s32);
 u32 SceneProjectile_OnPoolDestroy(struct A *a)
 {
@@ -20,5 +20,5 @@ u32 SceneProjectile_OnPoolDestroy(struct A *a)
         i++;
         e++;
     } while (i <= 9);
-    return gUnk_020005E8 = 0;
+    return gSceneProjectilePool = 0;
 }

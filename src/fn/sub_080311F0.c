@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "game_state.h"
+#include "ram.h"
 struct State {
     u8 pad0[9];
     u8 lineWidth;
@@ -24,7 +25,6 @@ struct Actor {
     u8 pad19c[8];
     void *script;
 };
-extern struct Actor *gUnk_020000DC;
 void *Script_GetTextSourcePc(void);
 void MessageWindow_SetMessageTable(void *);
 int MessageWindow_SetBounds(int x, int y, int width, int height);
@@ -32,7 +32,7 @@ int MessageWindow_LoadPalette(struct Actor *, int);
 void MessageWindow_ApplyPalette(struct Actor *);
 int MessageWindow_OpenFromScript(void)
 {
-    struct Actor *p = gUnk_020000DC;
+    struct Actor *p = gMessageWindow;
     struct State *state;
     if (!p)
         return -1;

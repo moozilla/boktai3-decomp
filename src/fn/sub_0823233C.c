@@ -1,5 +1,5 @@
 #include "global.h"
-extern void *gUnk_0200005C;
+#include "ram.h"
 void Effect_Remove(void *);
 void EffectGroup_Unlink(void *, void *);
 u32 SceneActorEffects_DestroyGroup(u8 *s)
@@ -11,7 +11,7 @@ u32 SceneActorEffects_DestroyGroup(u8 *s)
         p += 0x48;
         i--;
     } while (i >= 0);
-    if (gUnk_0200005C)
-        EffectGroup_Unlink(gUnk_0200005C, s);
+    if (gSceneActorEffectsManager)
+        EffectGroup_Unlink(gSceneActorEffectsManager, s);
     return 0;
 }

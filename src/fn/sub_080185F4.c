@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_02000094;
+#include "ram.h"
 
 void PaletteCycle_Destroy(void)
 {
-    gUnk_02000094 = 0;
+    gPaletteCycle = 0;
 }

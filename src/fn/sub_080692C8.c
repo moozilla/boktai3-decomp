@@ -6,7 +6,7 @@
 static inline u32 Blocked(u32 mask)
 {
     u32 a = gEngineFlags;
-    u32 b = gUnk_030053F0;
+    u32 b = gScenePauseFlags;
     return (a | b) & mask;
 }
 static inline void SetFlag(u32 *flags, u32 mask)
@@ -35,7 +35,7 @@ struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
         return NULL;
     {
         u32 mask = 0x400;
-        if ((gEngineFlags | gUnk_030053F0) & mask)
+        if ((gEngineFlags | gScenePauseFlags) & mask)
             return NULL;
     }
     {

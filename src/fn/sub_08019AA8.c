@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_020000B0;
+#include "ram.h"
 void AnimData_Load(u8 *, u32);
 void Sprite_InitUnlinked(u8 *, u8 *, u32);
 u32 SpritePool_Initialize(u8 *p)
@@ -7,7 +7,7 @@ u32 SpritePool_Initialize(u8 *p)
     u8 *e;
     u8 *q;
     s32 i;
-    gUnk_020000B0 = p;
+    gSpritePoolManager = p;
     e = p + 0x18;
     i = 0xf;
     do {

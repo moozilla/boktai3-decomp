@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_02000068;
+#include "ram.h"
 void Sprite_Remove(u8 *);
 u32 AnimatedParticleManager_Destroy(u8 *s)
 {
@@ -15,7 +15,7 @@ u32 AnimatedParticleManager_Destroy(u8 *s)
     } while (i >= 0);
     {
         u32 z = 0;
-        gUnk_02000068 = z;
+        gAnimatedParticleManager = z;
     }
     return 0;
 }
