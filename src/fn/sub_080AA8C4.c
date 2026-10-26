@@ -1,10 +1,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
-#ifdef NONMATCHING
-// fuzzy: 87.5%
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: segment address lifetimes and register allocation.
+// MATCHING_CONCESSION: register-pinning
 struct TrailSegment {
     u8 unknown0[0x1c];
     struct ContactPosition position;
@@ -43,26 +40,9 @@ static inline u8 IsInactive(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-static inline s32 Shift(s32 value, s32 bits)
+static inline s32 Height(s32 cell, struct ContactPosition *position)
 {
-    if (value >= 0)
-        return value >> bits;
-    return -(-value >> bits);
-}
-static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
-                         const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
-}
-static inline s32 LengthSquared(struct ContactPosition *p)
-{
-    return p->x * p->x + p->y * p->y + p->z * p->z;
-}
-
-static inline s32 Height(s32 cell, struct ContactPosition *p)
-{
+    register struct ContactPosition *p asm("r6") = position;
     u32 attr = *SceneActorTerrain_GetCell(cell);
     u32 kind = attr >> 4;
     u32 mask = 15;
@@ -95,7 +75,7 @@ void TentacleActor_AlignSegmentsToTerrain(struct SceneActorRegistryResetView *ac
 {
     struct TentacleTrail *trail;
     s32 i;
-    u32 k1 = 0x3f2;
+    u32 positionY = (u32) & ((struct TentacleTrail *)0)->segments[0].position.y;
     if (IsInactive(actor))
         return;
     do {
@@ -106,28 +86,33 @@ void TentacleActor_AlignSegmentsToTerrain(struct SceneActorRegistryResetView *ac
     for (i = 0; i < trail->segmentCount; i++) {
         struct TrailSegment *segment = &trail->segments[i];
         if (TestSegment(segment, 2) && (!TestSegment(segment, 1))) {
-            s16 height =
-                Height(SceneActorTerrain_GetCellIndex(&segment->position), &segment->position);
-            s32 y = *((s16 *)((((u8 *)trail) + (i * 296)) + k1));
+            s32 rawHeight = Height(
+                SceneActorTerrain_GetCellIndex(&segment->position),
+                (struct ContactPosition *)((u8 *)trail + i * sizeof(struct TrailSegment) + (u32) &
+                                           ((struct TentacleTrail *)0)->segments[0].position));
+            s32 height = rawHeight;
+            s16 y;
+            asm("" : "+r"(height), "+r"(rawHeight));
+            y = segment->position.y;
             if (y != height) {
                 if (y < height) {
                     s32 delta = height - y;
                     if (!NearHeight(delta, delta, 255))
-                        *((s16 *)((((u8 *)trail) + (i * 296)) + k1)) = actor->position.y;
+                        *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
+                                  positionY)) = actor->position.y;
                     else
-                        *((s16 *)((((u8 *)trail) + (i * 296)) + k1)) = height;
+                        *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
+                                  positionY)) = height;
                 } else {
-                    s32 delta = height - y;
+                    s32 delta = rawHeight - y;
                     if (Abs(delta) > 256)
-                        *((s16 *)((((u8 *)trail) + (i * 296)) + k1)) = actor->position.y;
+                        *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
+                                  positionY)) = actor->position.y;
                     else
-                        *((s16 *)((((u8 *)trail) + (i * 296)) + k1)) += Div(delta, 10);
+                        *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
+                                  positionY)) += Div(delta, 10);
                 }
             }
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", TentacleActor_AlignSegmentsToTerrain);
-#endif
