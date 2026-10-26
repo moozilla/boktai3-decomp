@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 extern u32 gUnk_0300523C;
 extern s16 gUnk_086149C4[];
@@ -6,9 +7,21 @@ void Sound_PlaySong(u32);
 void MusicSlots_StopAllAndRetainResumable(void);
 void HealthRestoreEffect_StartParticleBurst(u8 *);
 void HealthRestoreEffect_UpdateShake(u8 *);
-#define H(o) (*(u16 *)(p + (o)))
-#define S(o) (*(s16 *)(p + (o)))
-#define W(o) (*(u32 *)(p + (o)))
+struct HealthRestoreEntry {
+    u8 unk00[0x24];
+    u32 spriteFlags;
+    u8 unk28[0x14];
+    u16 screenX, screenY;
+    u8 unk40[0x10];
+    u8 scale[2];
+    u8 unk52[0x2A];
+    s16 targetX, targetY;
+    u8 unk80[4];
+    s16 startX, startY;
+    u8 unk88[0x1E8];
+    u16 timer, unk272;
+    void (*callback)(u8 *);
+};
 static inline s32 scale12(s32 v)
 {
     if (v >= 0)
@@ -20,46 +33,40 @@ static inline s32 scale12(s32 v)
 // confidence=low: the 16-frame entry of the health restore effect. Stops the music, then slides
 // the sprite from its start to its target position with a sine bob; afterwards it starts the
 // shake.
-#ifdef NONMATCHING
-// fuzzy: 90.7%
-// fix.py best after the inlined-insn fix
-// ROM keeps the incremented timer untruncated in a copy for the 0x50/0x51 bytes; u8 t adds a truncation and wider types fold +1+0x22.
-void sub_08234DC8(u8 *p)
+void sub_08234DC8(struct HealthRestoreEntry *p)
 {
     u16 *timer;
     s32 y;
-    u16 t;
-    if ((*((u16 *)(p + 0x270))) == 0) {
+    register u32 scaleTimer asm("r1");
+    u32 value;
+    if (p->timer == 0) {
         MusicSlots_StopAllAndRetainResumable();
         {
             s32 four = 4;
             gUnk_0300523C |= four;
         }
-    } else if ((*((u16 *)(p + 0x270))) == 1) {
+    } else if (p->timer == 1) {
         Sound_PlaySong(0xE6);
-        *((u32 *)(p + 0x24)) &= ~1;
+        p->spriteFlags &= ~1;
     }
-    timer = &(*((u16 *)(p + 0x270)));
-    t = ++(*timer);
-    if ((*timer) > 15) {
-        *((u32 *)(p + 0x24)) &= ~2;
-        HealthRestoreEffect_StartParticleBurst(p);
-        *((void (**)(u8 *))(p + 0x274)) = HealthRestoreEffect_UpdateShake;
+    timer = &p->timer;
+    value = *timer + 1;
+    scaleTimer = value;
+    *timer = value;
+    if ((u16)value > 15) {
+        p->spriteFlags &= ~2;
+        HealthRestoreEffect_StartParticleBurst((u8 *)p);
+        p->callback = HealthRestoreEffect_UpdateShake;
         *timer = 0;
         Sound_PlaySong(0x284);
         return;
     }
     {
-        s32 v = t + 0x22;
-        p[0x51] = v;
-        p[0x50] = v;
+        s32 v = scaleTimer + 0x22;
+        p->scale[1] = v;
+        p->scale[0] = v;
     }
-    *((u16 *)(p + 0x3C)) =
-        Div(((*((s16 *)(p + 0x7C))) * (*timer)) + ((*((s16 *)(p + 0x84))) * (16 - (*timer))), 16);
-    y = Div(((*((s16 *)(p + 0x7E))) * (*timer)) + ((*((s16 *)(p + 0x86))) * (16 - (*timer))), 16);
-    *((u16 *)(p + 0x3E)) = y - scale12(gUnk_086149C4[Div((*timer) << 7, 20) & 0xFF] << 4);
+    p->screenX = Div((p->targetX * (*timer)) + (p->startX * (16 - (*timer))), 16);
+    y = Div((p->targetY * (*timer)) + (p->startY * (16 - (*timer))), 16);
+    p->screenY = y - scale12(gUnk_086149C4[Div((*timer) << 7, 20) & 0xFF] << 4);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08234DC8);
-#endif
