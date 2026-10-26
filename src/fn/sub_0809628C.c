@@ -1,31 +1,39 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 88.0%
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining difference: the script value array (values[]) stores go through a hoisted sp+0x24 base register instead of direct sp-relative stores; script/offset temporaries then shift registers.
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
-void SceneActorEffects_AdvanceSteps(void *, u32);
 void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 void Bee_ConsumeFlag80(void *);
-void SceneActor_EndLinkedReaction(void *);
 void Sound_PlaySong(u32);
 void EffectManager_SpawnParticlesAt(u32, u32, u32, void *, void *, u32, u32);
 s32 Mod(s32, s32);
 extern u32 gUnk_03005308;
+struct GhostDefeatContext {
+    u8 unknown0[0x5BC];
+    u8 particleStyle;
+};
+struct GhostDefeatScriptView {
+    u8 unknown0[0x1F8];
+    u16 scriptId;
+    u8 unknown1FA[2];
+    s32 parameters[3];
+};
 static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput, u32 off)
 {
     u32 mask = maskInput;
-    return off == 0x2D4 ? *(u16 *)((u8 *)actor + off) & mask : *(u32 *)((u8 *)actor + off) & mask;
+    return off == 0x2D4 ? actor->flags2D4 & mask : actor->flags2D0 & mask;
+}
+static inline void Ghost_SetScriptValue(s32 value, s32 *entry)
+{
+    *entry = value;
 }
 // confidence=low: defeat control; emits debris sprites, runs the defeat script, then returns to idle.
 void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
 {
-    u8 *ctx = actor->context;
+    struct GhostDefeatContext *ctx = actor->context;
     struct {
         u16 x;
         u16 y;
@@ -53,49 +61,46 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             pos = &actor->position;
             {
                 u16 *a = (u16 *)pos;
-                u16 *b = (u16 *)(((u8 *)actor) + 0x5E);
-                u16 *c = (u16 *)(((u8 *)actor) + 0x60);
+                u16 *b = (u16 *)&actor->position.y;
+                u16 *c = (u16 *)&actor->position.z;
                 px = *a;
                 py = *b;
                 pz = *c;
             }
             {
-                register u16 *q asm("r1") = &pieces[0].x;
-                register s32 n asm("r2") = 2;
+                u16 *q = &pieces[0].x;
+                s32 n = 2;
                 i = n;
                 do {
                     q[0] = px;
                     q[1] = py;
                     q[2] = pz;
-                    q += 4;
+                    q += sizeof(pieces[0]) / sizeof(*q);
                 } while ((--i) >= 0);
             }
-            EffectManager_SpawnParticlesAt(count, 0, *((u8 *)(ctx + 0x5BC)), pos, pieces, 300, 120);
+            EffectManager_SpawnParticlesAt(count, 0, ctx->particleStyle, pos, pieces, 300, 120);
         }
     }
     if (!actor->field2B3)
         return;
     actor->field2B0 = 1;
     SceneActorBehavior_CallTerrainScript(actor);
+    script = ((struct GhostDefeatScriptView *)actor)->scriptId;
     if (script) {
         s32 values[8];
         struct ScriptUtilityArguments arguments;
-        values[0] = actor->position.x;
-        {
-            typeof(values[1]) *q1 = &values[1];
-            *q1 = actor->position.y;
-        }
-        values[2] = actor->position.z;
-        values[3] = *((s32 *)(((u8 *)actor) + 0x1FC));
-        values[4] = *((s32 *)(((u8 *)actor) + 0x200));
-        values[5] = *((s32 *)(((u8 *)actor) + 0x204));
-        values[6] = *((s32 *)(((u8 *)actor) + 0x2E0));
-        values[7] = actor->id;
+        Ghost_SetScriptValue(actor->position.x, &values[0]);
+        Ghost_SetScriptValue(actor->position.y, &values[1]);
+        Ghost_SetScriptValue(actor->position.z, &values[2]);
+        Ghost_SetScriptValue(((struct GhostDefeatScriptView *)actor)->parameters[0], &values[3]);
+        Ghost_SetScriptValue(((struct GhostDefeatScriptView *)actor)->parameters[1], &values[4]);
+        Ghost_SetScriptValue(((struct GhostDefeatScriptView *)actor)->parameters[2], &values[5]);
+        Ghost_SetScriptValue(actor->field2E0, &values[6]);
+        Ghost_SetScriptValue(actor->id, &values[7]);
         arguments.count = 8;
         arguments.values = values;
         Script_Call(script, &arguments);
     }
-    script = *((u16 *)(((u8 *)actor) + 0x1F8));
     {
         u32 mask = 0x4000;
         u16 *flags;
@@ -138,7 +143,3 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Ghost_UpdateDefeat);
-#endif
