@@ -130,6 +130,9 @@ python3 tools/scope/scope.py FILE.c why all [RANGE]   why on the first real diff
                                                   RANGE: 0xLO-0xHI ROM addresses, +0x40-+0x80 offsets, 120-180 C lines)
 python3 tools/scope/scope.py FILE.c spill         is the whole difference reload's spill rotation?
 python3 tools/scope/scope.py FILE.c life NAME...  the insns flow counts toward a pseudo's live length, by C line
+                                                  (a pseudo cse/gcse removed: its sets and uses before that pass)
+python3 tools/scope/scope.py FILE.c pre           gcse's PRE replacements by expression: C names, pool values, where
+                                                  it is computed and inserted, the lines replaced, AGBCC_NOPRE=k scores
 python3 tools/scope/scope.py A.c vs B.c [FUNC]    two drafts' allocation side by side: rank, priority, refs/live, prefs, register
 python3 tools/scope/scope.py FILE.c pins          remove each register pin / empty asm barrier in turn: its cost; then greedy free removal
 python3 tools/scope/scope.py FILE.c try V.c...     score whole-file variants (or `try KNOB={a,b}`: one variant per knob value), best first (by shape distance), ~12 ms each
@@ -428,6 +431,19 @@ in the patch.
     alignment; some functions count a few more (Storage_RefreshConsumableSlots 13+13 -> 15+15).
     `SCOPE_ALIGN=difflib` gives the old alignment; listings over 6M cells use it. `frame`'s
     slot votes and the order explainer read these rows.
+  * PRE in C terms: `pre_records` reads gcse's own dump (expression table, insertions, copies,
+    replacements); `pre` prints one block per expression (pseudos named, a literal-pool load named
+    by cse's REG_EQUAL note: HealthRestoreEffect_StartParticleBurst's `FlickerParticle_UpdateMotion`),
+    where gcse inserted its own computation (end of a block, fact 1), the C lines it replaced and
+    each replacement's `AGBCC_NOPRE=k` score. `probe` describes NOPRE candidates the same way, and
+    `why` on an insn gcse replaced or created names the PRE decision.
+  * `why all` scores each concrete what-if it suggests (`-> 312 ROM / 319 draft (no change: not
+    this decision, or not alone)`); sub_08176F70's suggested CSE_NOCANON knobs did nothing, which
+    the worker found by hand. `AGBCC_SPILL=K:D` placeholders are not scored.
+  * `life` on a pseudo flow never sees (an alias cse or gcse removed) prints its sets, uses and
+    last use after each pass up to the one that removed it, and what replaced it in each use. Such
+    pseudos have no allocation record, so they are named from the C line of their first set, or as
+    an inline helper's parameter (`p@FlagFour`, `mode@IsMode`).
   * `why all`'s summary lists causes first, then order differences of insns that occur once in the
     ROM listing, and counts (does not list) moves of insns that occur several times (`movs rN, #0`,
     stack stores), which can be paired with another copy; cse substitutions into one register are

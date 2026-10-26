@@ -81,7 +81,8 @@ not by the percentage. Keep going on one function until it matches.
 Other commands:
 
 ```
-scope.py FILE.c life NAME...        insns that count toward a value's live length, by C line
+scope.py FILE.c life NAME...        insns that count toward a value's live length, by C line (for an alias
+                                    cse removed: its uses and last use before cse, which canonicity compares)
 scope.py A.c vs B.c                 two drafts' register allocation side by side
 scope.py FILE.c spill               is the whole difference reload's spill rotation? (SCOPE_SPILL_MAX=42 compiles)
 scope.py FILE.c probe               is it one cse/gcse/loop decision (cse canonical register, jump follow,
@@ -97,6 +98,8 @@ scope.py FILE.c hoist               loop-invariant motion by pass: what moved, w
                                     re-set lever scored for each hoisted variable
 scope.py FILE.c giv                 loop strength reduction: each induction value with its C line, loop.c's
                                     benefit and lifetime, and whether it was reduced, kept or eliminated
+scope.py FILE.c pre                 gcse's PRE replacements: the expression, where it is computed and where gcse
+                                    inserted it, the C lines it replaced, and AGBCC_NOPRE=k's score for each
 scope.py FILE.c insn UID            one RTL insn through every compiler pass
 scope.py FILE.c uses REG...         which insns use a pseudo after each pass
 ```
