@@ -1,15 +1,9 @@
 #include "global.h"
 #include "player.h"
 
-#ifdef NONMATCHING
-// fuzzy: 78.7%
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: register allocation; reviewed body has no structural differences.
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: table-driven weapon cue and combo phases drive the attack collider.
 #define Player_UpdateWeaponCueCombo sub_0814D9C4
-#define H(n)                        (*(u16 *)(p + (n)))
-#define B(n)                        (*(p + (n)))
 struct PlayerActionCueInfo {
     u8 unknown0[0x15];
     u8 cueIndex;
@@ -39,87 +33,108 @@ s32 Player_IsActionCueReady(void *);
 s32 Player_HasWeaponComboEntry(void *);
 void sub_0814D264(void *, s32);
 void ActorSequence_Begin(void *, u32, u32);
-static inline void SetHistorySentinel(u8 *p)
+struct WeaponCuePlayer {
+    u8 unk0[0x348];
+    const u16 *inputKeys;
+    u8 unk34C[0x428 - 0x34C];
+    u16 currentStatB;
+    u8 unk42A[0x458 - 0x42A];
+    u8 phase, unk459;
+    u16 timer;
+    u8 unk45C[0xAAE - 0x45C];
+    u16 comboIndex;
+    u8 unkAB0[0xBF0 - 0xAB0];
+    void *actionEntry;
+    u8 unkBF4[2], comboPending, unkBF7;
+    u16 unkBF8[3], contactParameter;
+    u8 unkC00[0xA];
+    u16 contactTimer;
+    u8 unkC0C[0xE];
+    u16 historySentinel;
+    u8 unkC1C[0x68];
+    void *actionDisplay;
+};
+static inline void SetHistorySentinel(struct WeaponCuePlayer *p)
 {
-    u16 *field = (u16 *)(p + 0xC1A);
+    u16 *field = &p->historySentinel;
     u32 missing = 0xFFFF;
     *field = missing;
 }
-static inline void ClearContactTimer(u8 *p)
+static inline void ClearContactTimer(struct WeaponCuePlayer *p)
 {
-    u16 *timer = (u16 *)(p + 0xC0A);
+    u16 *timer = &p->contactTimer;
     u32 zero = 0;
     *timer = zero;
 }
-void Player_UpdateWeaponCueCombo(u8 *p)
+void Player_UpdateWeaponCueCombo(struct WeaponCuePlayer *p)
 {
     struct PlayerActionCueInfo info;
-    register const u8 *record asm("r4");
+    const struct WeaponCueRecord *record;
     s32 forced = 0;
-    typeof(record) t1;
-    ActionRecord_CopyFromEntry(*((void **)(p + 0xBF0)), &info);
-    record = (t1 = (const void *)(gUnk_08E5FA6C + (info.cueIndex << 6)));
-    asm("" : : "r"(t1));
+    ActionRecord_CopyFromEntry(p->actionEntry, &info);
+    record = (const struct WeaponCueRecord *)gUnk_08E5FA6C + info.cueIndex;
     Player_AddControlFlags(p, 0x100);
-    switch (*(p + 0x458)) {
+    switch (p->phase) {
         case 0: {
-            u16 *timer = &(*((u16 *)(p + 0x45A)));
+            register u16 *timer = &(p->timer);
             if (!(*timer))
                 Player_SelectActionVariant(p);
-            if (Player_SetAnimation(p, Player_SelectActionCue(p), *((const u16 *)record), 2)) {
-                *((u16 *)(p + 0xAAE)) = 0;
+            if (Player_SetAnimation(p, Player_SelectActionCue(p), record->speed, 2)) {
+                p->comboIndex = 0;
                 Player_SetActionPhase(p, 1);
             }
             ++(*timer);
-            FrameDisplay_UpdateSprite(*((void **)(((u8 *)p) + 0xC84)));
+            FrameDisplay_UpdateSprite(p->actionDisplay);
             break;
         }
 
         case 1:
             Player_UpdateAttackFacing(p);
-            Player_SetAnimation(p, Player_SelectActionCue(p), *((const u16 *)record), 2);
-            if (!((*(*((u16 **)(p + 0x348)))) & 2)) {
+            Player_SetAnimation(p, Player_SelectActionCue(p), record->speed, 2);
+            if (!((*(p->inputKeys)) & 2)) {
                 Player_InitializeActionContact(p);
                 Player_SetActionPhase(p, 2);
             } else
-                ++(*((u16 *)(p + 0x45A)));
+                ++(p->timer);
             break;
 
         case 2: {
-            u32 offset = ((*((u16 *)(p + 0xAAE))) * 12) + 4;
-            const u8 *phase = record + offset;
-            Player_SetAnimation(p, Player_SelectActionCue(p), *((const u16 *)record), 2);
-            if ((++(*((u16 *)(p + 0x45A)))) > (*((const u16 *)(phase + 4)))) {
+            register u32 offset asm("r0") = p->comboIndex * sizeof(struct WeaponCuePhase);
+            register const struct WeaponCuePhase *phase asm("r6") =
+                (const struct WeaponCuePhase *)((u8 *)record->phases + offset);
+            Player_SetAnimation(p, Player_SelectActionCue(p), record->speed, 2);
+            if ((++(p->timer)) > (phase->delay)) {
                 SetHistorySentinel(p);
                 Player_SetActionPhase(p, 3);
             }
-            if ((*((u16 **)(p + 0x348)))[1] & 2)
-                *(p + 0xBF6) = 1;
+            if ((p->inputKeys)[1] & 2)
+                p->comboPending = 1;
             ClearContactTimer(p);
             break;
         }
 
         case 3: {
-            u32 offset = ((*((u16 *)(p + 0xAAE))) * 12) + 4;
-            const u8 *phase = record + offset;
-            if (!(*((u16 *)(p + 0x45A)))) {
+            register u32 offset asm("r0") = p->comboIndex * sizeof(struct WeaponCuePhase);
+            register const struct WeaponCuePhase *phase =
+                (const struct WeaponCuePhase *)((u8 *)record->phases + offset);
+            if (!(p->timer)) {
                 s32 cost = Player_UpdateStatThreshold(p);
-                if ((*((u16 *)(p + 0x428))) <= cost)
-                    *((u16 *)(p + 0x428)) = 0;
+                if ((p->currentStatB) <= cost)
+                    p->currentStatB = 0;
                 else
-                    *((u16 *)(p + 0x428)) -= cost;
+                    p->currentStatB -= cost;
             }
-            ++(*((u16 *)(p + 0x45A)));
-            *((u16 *)(p + 0xBFE)) = 10;
-            if ((*((u16 **)(p + 0x348)))[1] & 2)
-                *(p + 0xBF6) = 1;
-            if (phase[1])
+            ++(p->timer);
+            p->contactParameter = 10;
+            if ((p->inputKeys)[1] & 2)
+                p->comboPending = 1;
+            if (phase->forced)
                 forced = 1;
-            if (Player_SetAnimation(p, Player_SelectActionCue(p), *((const u16 *)(phase + 6)), 2) ||
+            if (Player_SetAnimation(p, Player_SelectActionCue(p), phase->speed, 2) ||
                 Player_IsActionCueReady(p)) {
-                if ((*(p + 0xBF6)) && Player_HasWeaponComboEntry(p)) {
-                    *(p + 0xBF6) = 0;
-                    ++(*((u16 *)(p + 0xAAE)));
+                if ((p->comboPending) && Player_HasWeaponComboEntry(p)) {
+                    p->comboPending = 0;
+                    ++(p->comboIndex);
                     Player_SetActionPhase(p, 2);
                 } else
                     Player_SetActionPhase(p, 4);
@@ -129,23 +144,24 @@ void Player_UpdateWeaponCueCombo(u8 *p)
         }
 
         case 4: {
-            u32 offset = ((*((u16 *)(p + 0xAAE))) * 12) + 4;
-            const u8 *phase = record + offset;
-            ++(*((u16 *)(p + 0x45A)));
-            Player_SetAnimation(p, Player_SelectActionCue(p), *((const u16 *)(phase + 6)), 2);
-            if ((*((u16 *)(p + 0x45A))) > (*((const u16 *)(phase + 10))))
+            register u32 offset asm("r0") = p->comboIndex * sizeof(struct WeaponCuePhase);
+            register const struct WeaponCuePhase *phase asm("r6") =
+                (const struct WeaponCuePhase *)((u8 *)record->phases + offset);
+            ++(p->timer);
+            Player_SetAnimation(p, Player_SelectActionCue(p), phase->speed, 2);
+            if ((p->timer) > (phase->releaseDuration))
                 Player_SetActionPhase(p, 5);
             break;
         }
 
         case 5: {
-            u8 *pending = p + 0xBF6;
+            u8 *pending = &p->comboPending;
             u32 zero = 0;
             *pending = zero;
-            if (Player_SetAnimation(p, Player_SelectActionCue(p), *((const u16 *)record), 2) ||
-                ((*((u16 *)(p + 0x45A))) > 30)) {
+            if (Player_SetAnimation(p, Player_SelectActionCue(p), record->speed, 2) ||
+                ((p->timer) > 30)) {
                 ActorSequence_Begin(p, 0, 0);
-                *((u16 *)(p + 0xAAE)) = zero;
+                p->comboIndex = zero;
             }
             break;
         }
@@ -155,7 +171,3 @@ void Player_UpdateWeaponCueCombo(u8 *p)
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0814D9C4);
-#endif
