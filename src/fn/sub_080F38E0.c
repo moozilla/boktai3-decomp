@@ -3,9 +3,6 @@
 struct CGPos080F38E0 {
     u16 x, y, z, w;
 };
-struct CGPair080F38E0 {
-    u32 a, b;
-};
 struct CGKid080F38E0 {
     u32 flags;
     u8 pad4[2];
@@ -58,7 +55,7 @@ s32 Callback_InvokeActor(void *, void *);
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 
-static inline u8 Group080F38E0_EnterState(struct Group080F38E0 *p)
+static inline u8 ChildGroup_TakeEntryFlag(struct Group080F38E0 *p)
 {
     u32 mask = 1;
     u32 flags = p->flags;
@@ -75,17 +72,30 @@ static inline u8 Group080F38E0_EnterState(struct Group080F38E0 *p)
     return 0;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 49.8%
-// scope shape 52 (differences once low registers are set aside)
-void sub_080F38E0(struct Group080F38E0 *p)
+static inline u32 ChildGroup_Jitter(u32 value, const u16 *base)
 {
-    u32 idx;
+    u32 mask = 31;
+    value &= mask;
+    return value + *base - 15;
+}
+
+static inline u32 ChildGroup_RandomValue(void)
+{
+    const u16 *table = gUnk_0203B400;
+    u32 *index = &gUnk_03005308;
+    *index = (*index + 1) & 1023;
+    return table[*index];
+}
+
+// scope shape 52 (differences once low registers are set aside)
+#define ChildGroup_UpdateTransitionJitter sub_080F38E0
+void ChildGroup_UpdateTransitionJitter(struct Group080F38E0 *p)
+{
     s32 i;
 
     // confidence=low: per-frame update of the child group: resets kid flags, snapshots
     // position, cycles the random table into the position, then runs the callback.
-    if (Group080F38E0_EnterState(p)) {
+    if (ChildGroup_TakeEntryFlag(p)) {
         p->f498[0] = p->pos.x;
         p->f498[1] = p->pos.y;
         p->f498[2] = p->pos.z;
@@ -101,19 +111,14 @@ void sub_080F38E0(struct Group080F38E0 *p)
         }
         p->b4B0 = 0;
         p->h4B4 = 0;
-        *(struct CGPair080F38E0 *)&p->saved = *(struct CGPair080F38E0 *)&p->pos;
+        p->saved = p->pos;
         p->callbackCF0 = Ivy_InitColorTransition;
         p->fieldD53 = 0;
     }
     if (p->counterDA0 > 0) {
-        u16 *tbl = (u16 *)gUnk_0203B400;
-        idx = (gUnk_03005308 + 1) & 0x3FF;
-        p->pos.x = (u16)((tbl[idx] & 0x1F) + p->saved.x - 15);
-        idx = (idx + 1) & 0x3FF;
-        p->pos.y = (u16)((tbl[idx] & 0x1F) + p->saved.y - 15);
-        idx = (idx + 1) & 0x3FF;
-        gUnk_03005308 = idx;
-        p->pos.z = (u16)((tbl[idx] & 0x1F) + p->saved.z - 15);
+        p->pos.x = ChildGroup_Jitter(ChildGroup_RandomValue(), &p->saved.x);
+        p->pos.y = ChildGroup_Jitter(ChildGroup_RandomValue(), &p->saved.y);
+        p->pos.z = ChildGroup_Jitter(ChildGroup_RandomValue(), &p->saved.z);
         p->counterDA0--;
     }
     p->fieldCFC = 0;
@@ -121,6 +126,3 @@ void sub_080F38E0(struct Group080F38E0 *p)
         Callback_InvokeActor(p, p->callbackCF0);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080F38E0);
-#endif
