@@ -100,8 +100,7 @@ static inline void IwProject(struct IwVec *screen, struct IwVec *world)
     screen->z = sum + vertical - gUnk_03005418[2];
 }
 
-#ifdef NONMATCHING
-// fuzzy: 55.4%
+// MATCHING_CONCESSION: register-pinning
 struct IwSpr {
     u8 flags;
     u8 size;
@@ -132,7 +131,7 @@ extern u8 gUnk_03005230;
 extern u32 gUnk_0300522C;
 extern s32 gUnk_03004BA0;
 extern struct IwAffineParam gUnk_03004310[];
-extern const s16 gUnk_086149C4[];
+extern s16 gUnk_086149C4[];
 extern u8 gUnk_03004D20[];
 extern u8 gUnk_03004D90[];
 extern u32 gUnk_03004D50[];
@@ -153,9 +152,7 @@ u32 Palette_CacheObjectBankArm(u32 key, u32 *src);
 
 static inline s32 IwScale6(s32 v)
 {
-    if (v >= 0)
-        return v >> 6;
-    return -((-v) >> 6);
+    return v >= 0 ? v >> 6 : -((-v) >> 6);
 }
 
 static inline s32 IwScale12(s32 v)
@@ -177,17 +174,24 @@ static inline s32 IwAddAffine(u8 angle, s32 a, s32 b)
     return n;
 }
 
-static inline s32 IwQueueTiles(struct IwObj *obj, u32 tile, s32 step, s32 tw, s32 th)
-{
-    u32 slot;
-    if (gUnk_030042E8 + step >= 0x400)
-        return -1;
-    slot = gUnk_03004304;
-    ((struct IwTileReq *)0x02039000)[slot].src = obj->tiles + (tile << 5);
-    ((struct IwTileReq *)0x02039000)[slot].desc = (tw << 5) | (th << 16);
-    gUnk_03004304 = slot + 1;
-    return 0;
-}
+#define IW_QUEUE_TILES(r, obj, tile, step, tw, th, b)                                              \
+    if (gUnk_030042E8 + (step) >= 0x400)                                                           \
+        r = -1;                                                                                    \
+    else {                                                                                         \
+        u32 slot;                                                                                  \
+        u32 off;                                                                                   \
+        u8 *src;                                                                                   \
+        u8 *q;                                                                                     \
+        slot = gUnk_03004304;                                                                      \
+        r = 0;                                                                                     \
+        b = reqs;                                                                                  \
+        off = slot << 3;                                                                           \
+        src = (obj)->tiles + ((tile) << 5);                                                        \
+        *(u8 **)(b + off) = src;                                                                   \
+        q = b + off;                                                                               \
+        *(u32 *)(q + 4) = ((tw) << 5) | ((th) << 16);                                              \
+        gUnk_03004304 = slot + 1;                                                                  \
+    }
 
 static inline void IwPushOam(u32 attr01, u32 attr2)
 {
@@ -204,10 +208,11 @@ static inline void IwPushOamZ(u32 attr01, u32 attr2, s32 z, u32 prio)
 {
     s32 c = gUnk_0300479C;
     if (c <= 0x7f) {
+        struct IwOamOut *o = &gUnk_030047A0[c];
         gUnk_0300479C = c + 1;
-        gUnk_030047A0[c].attr01 = attr01;
-        gUnk_030047A0[c].attr2 = attr2;
-        gUnk_030047A0[c].attr3 = (z + 0x80) << 8;
+        o->attr01 = attr01;
+        o->attr2 = attr2;
+        o->attr3 = (z + 0x80) << 8;
         gUnk_03004790[prio]++;
     }
 }
@@ -230,6 +235,14 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
     u32 f4, f8;
     struct IwSpr *p;
     s32 j;
+    u8 *ewram;
+    u8 *ew2;
+    s32 step;
+    u8 *b = 0;
+    u8 *b2 = 0;
+    s16 *c;
+    s16 *cnt;
+    s16 *cnt2;
 
     f4 = obj->flags & 4;
     f8 = obj->flags & 8;
@@ -287,28 +300,29 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
     p = obj->spr;
     for (i = 0; i < obj->count; i++, p++) {
         u32 sz = p->size;
-        s32 ht = gUnk_03004D20[sz];
         s32 wd = gUnk_03004D90[sz];
+        s32 ht = gUnk_03004D20[sz];
         u32 fl = fl2;
         s32 px, py;
 
         if (!(obj->flags & 2)) {
-            s32 x0 = p->dx;
-            s32 y0 = p->dy;
-            s32 x1 = x0 + wd;
-            s32 y1 = y0 + ht;
+            s32 x1, y1;
+            px = p->dx;
+            py = p->dy;
+            x1 = px + wd;
+            y1 = py + ht;
             if (f4) {
-                s32 t = x0;
-                x0 = -x1;
+                s32 t = px;
+                px = -x1;
                 x1 = -t;
             }
             if (f8) {
-                s32 t = y0;
-                y0 = -y1;
+                s32 t = py;
+                py = -y1;
                 y1 = -t;
             }
-            px = x0 + x;
-            py = y0 + y;
+            px += x;
+            py += y;
             if (f4 != (p->flags & 4))
                 fl |= 0x10000000;
             if (f8 != (p->flags & 8))
@@ -347,9 +361,10 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
             fl |= (u32)affTbl[idx] << 25;
             rx = IwScale12(sx * cosv - ey * sinv);
             px = rx - hx;
-            ry = IwScale12(sinv * sx + ey * cosv);
+            ry = IwScale12(sx * sinv + ey * cosv);
             py = ry - hy;
             if ((fl & 0x300) == 0x300) {
+                s32 h2 = ht * 2;
                 px = px - hx;
                 py = py - hy;
                 px += x;
@@ -358,7 +373,7 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
                     continue;
                 if (px > 0xF0)
                     continue;
-                if (py + ht * 2 < 0)
+                if (py + h2 < 0)
                     continue;
                 if (py > 0xA0)
                     continue;
@@ -378,18 +393,18 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
 
         {
             u32 key;
-            s32 k;
             tile[n] = p->tile & 0xfff;
             key = p->tile >> 12;
-            for (k = 0; k < nKeys && keys[k] != key; k++)
+            for (j = 0; j < nKeys && keys[j] != key; j++)
                 ;
-            keyIdx[n] = k;
-            if (k == nKeys) {
-                nKeys = k + 1;
-                keys[k] = key;
+            keyIdx[n] = j;
+            if (j == nKeys) {
+                nKeys = j + 1;
+                keys[j] = key;
             }
             attr3[n] = sz;
-            oam[n] = gUnk_03004D50[sz] | obj->attr | ((py & 0xff) | ((px & 0x1ff) << 16)) | fl;
+            oam[n] = ((gUnk_03004D50[sz] | obj->attr) | ((py & 0xff) | ((px & 0x1ff) << 16)));
+            oam[n] |= fl;
             n++;
         }
     }
@@ -397,42 +412,69 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
     if (n <= 0)
         return;
 
-    for (j = 0; j < nKeys; j++)
-        bankIdx[j] = Palette_CacheObjectBankArm(obj->palBase + keys[j],
-                                                (u32 *)(obj->palSrc + (keys[j] << 5)));
+    {
+        u8 *pal = obj->palSrc;
+        for (j = 0; j < nKeys; j++)
+            bankIdx[j] =
+                Palette_CacheObjectBankArm(obj->palBase + keys[j], (u32 *)(pal + (keys[j] << 5)));
+    }
 
     if (obj->flags & 0x20) {
+        ewram = (u8 *)0x2000000;
+        /* The pinned temporary tells cse2 (after loop) that cnt is &gUnk_030042E8 while gcse
+           never sees the address, so the hoisted c = cnt keeps its own pool load into sl. */
+        {
+            register s16 *h asm("r3") = &gUnk_030042E8;
+            cnt = h;
+            h = 0;
+        }
         for (j = 0; j < n; j++) {
             u32 s = attr3[j];
-            s32 step = gUnk_03004D30[s];
+            u32 t = tile[j];
             s32 tw = gUnk_03004D40[s];
             s32 th = gUnk_03004D10[s];
-            if (IwQueueTiles(obj, tile[j], step, tw, th) < 0)
+            s32 r;
+            u8 *reqs;
+            step = gUnk_03004D30[s];
+            reqs = ewram + 0x39000;
+            c = cnt;
+            IW_QUEUE_TILES(r, obj, t, step, tw, th, b);
+            if (r < 0)
                 return;
             IwPushOam(oam[j],
-                      (u32)gUnk_030042E8 | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12));
+                      (u32)*c | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12));
             gUnk_030042DC += step;
-            gUnk_030042E8 += step;
+            *c += step;
         }
     } else {
+        ew2 = (u8 *)0x2000000;
+        {
+            register s16 *h asm("r3") = &gUnk_030042E8;
+            cnt2 = h;
+            h = 0;
+        }
         for (j = 0; j < n; j++) {
             u32 s = attr3[j];
-            s32 step = gUnk_03004D30[s];
+            u32 t = tile[j];
             s32 tw = gUnk_03004D40[s];
             s32 th = gUnk_03004D10[s];
-            if (IwQueueTiles(obj, tile[j], step, tw, th) < 0)
+            s32 r;
+            u8 *reqs;
+            step = gUnk_03004D30[s];
+            reqs = ew2 + 0x39000;
+            c = cnt2;
+            IW_QUEUE_TILES(r, obj, t, step, tw, th, b2);
+            if (r < 0)
                 return;
             IwPushOamZ(oam[j],
-                       (u32)gUnk_030042E8 | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12), z,
+                       (u32)*c | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12), z,
                        obj->priority);
             gUnk_030042DC += step;
-            gUnk_030042E8 += step;
+            *c += step;
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08000430);
-#endif
+
 void sub_08000E90(void)
 {
     struct IwObj *o;
