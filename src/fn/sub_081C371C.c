@@ -4,7 +4,9 @@ s32 __divsi3(s32, s32);
 void OrbitMotion_BeginDistanceWave(void *, void *, void *, u32, u32);
 void ContactImpactEffect_UpdateContact(void);
 struct ContactImpactEffect {
-    u8 unknown0[0x3C];
+    u8 unknown0[0x34];
+    u32 spriteFlags;
+    u8 unknown38[4];
     u8 byte3C, byte3D;
     u8 unknown3E[0x12];
     u16 screenX, screenY, screenZ, screenPad;
@@ -16,7 +18,9 @@ struct ContactImpactEffect {
     u32 shakeFlag;
     s16 worldX, worldY, worldZ, worldPad;
     s16 targetX, targetY, targetZ, targetPad;
-    u8 unknownEC[0xC];
+    u32 moveTimer;
+    u32 unknownF0;
+    void (*callback)(void);
     s32 shakeTimer;
 };
 
@@ -64,10 +68,6 @@ static inline void SetCallback(void (*callback)(void), void (**slot)(void))
 
 // confidence=low: initializes linear world movement and a scale ramp without a motion track.
 #define ContactImpactEffect_BeginInterpolatedPosition sub_081C371C
-#ifdef NONMATCHING
-// fuzzy: 93.0%
-// fix.py best (sweep after the inlined-insn fix)
-// Full reconstruction; destination/origin pointer copies and projection registers still differ.
 static inline void Project_081C371C(u16 *screen, struct Vec *world)
 {
     s32 x = world->x;
@@ -100,15 +100,15 @@ void ContactImpactEffect_BeginInterpolatedPosition(struct ContactImpactEffect *i
             origin = out;
             FromScreen(out, from, 0);
             FromScreen((struct Vec *)(&effect->targetX), destination, 0);
-            Project_081C371C(&effect->screenX, origin);
+            Project_081C371C(&effect->screenX, (struct Vec *)&effect->worldX);
         } else if (effect->coordinateMode == 1) {
             struct Vec *origin = (struct Vec *)(&effect->worldX);
             *origin = *from;
             *((struct Vec *)(&effect->targetX)) = *destination;
-            Project_081C371C(&effect->screenX, origin);
+            Project_081C371C(&effect->screenX, (struct Vec *)&effect->worldX);
         }
         effect->shakeThreshold = duration;
-        *((u32 *)(((u8 *)effect) + 0xEC)) = 0;
+        effect->moveTimer = 0;
         if (rampFrom < 0)
             effect->rampFrom = (s8)effect->byte3C;
         else
@@ -116,14 +116,9 @@ void ContactImpactEffect_BeginInterpolatedPosition(struct ContactImpactEffect *i
         effect->rampTo = finalScale;
         effect->byte3C = effect->rampFrom;
         effect->byte3D = effect->rampFrom;
-        *((u32 *)(((u8 *)effect) + 0x34)) &= ~1;
-        SetCallback(ContactImpactEffect_UpdateInterpolatedPosition,
-                    (void *)(((u8 *)effect) + 0xF4));
+        effect->spriteFlags &= ~1;
+        SetCallback(ContactImpactEffect_UpdateInterpolatedPosition, &effect->callback);
         effect->shakeTimer = 0;
         effect->shakeFlag = 0;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081C371C);
-#endif
