@@ -1,6 +1,4 @@
 #include "engine.h"
-#ifdef NONMATCHING
-// fuzzy: 70.7%
 // fix.py best (sweep after the inlined-insn fix)
 struct TrapPosition {
     s16 x, y, z;
@@ -26,11 +24,13 @@ static inline u32 Pressed(struct TerrainTrap *trap)
     }
     return 1;
 }
-static inline s32 Contains(struct TrapPosition *position, struct TrapRectangle *rect, s32 count)
+static inline s32 Contains(struct TrapPosition *position, struct TerrainTrap *trap)
 {
+    struct TrapRectangle *rect = trap->f28;
     s32 i = 0;
+    s32 count = trap->fe;
     if (i < count) {
-        s32 x = position->x;
+        s16 x = position->x;
         do {
             if (x >= rect->minX && x < rect->maxX && position->z >= rect->minZ &&
                 position->z < rect->maxZ)
@@ -41,6 +41,7 @@ static inline s32 Contains(struct TrapPosition *position, struct TrapRectangle *
     }
     return 0;
 }
+
 static inline s32 Append(struct TrapProbe *p, s32 count, const u32 *serial, volatile s32 *index)
 {
     s32 i;
@@ -61,11 +62,14 @@ static inline s32 Remove(struct TrapProbe *p, s32 count, const u32 *serial, vola
     for (i = 0; i < count; i++) {
         if (p->serials[i] == *serial) {
             *index = i;
-            for (; i < count; i++) {
-                if (i < count - 1)
-                    p->serials[i] = p->serials[i + 1];
-                else
-                    p->serials[i] = 0;
+            {
+                s32 j;
+                for (j = i; j < count; j++) {
+                    if (j < count - 1)
+                        p->serials[j] = p->serials[j + 1];
+                    else
+                        p->serials[j] = 0;
+                }
             }
             return 1;
         }
@@ -74,12 +78,11 @@ static inline s32 Remove(struct TrapProbe *p, s32 count, const u32 *serial, vola
 }
 // confidence=low: reconciles a probe's ten tracked trap serials and dispatches enter/stay/leave events.
 #define Trap_UpdateProbeContacts sub_0821DE30
-inline static s32 Append_0821DE30(struct TrapProbe *p, s32 count, const u32 *serial,
-                                  volatile s32 *index)
+inline static s32 Append_0821DE30(u32 *serials, s32 count, const u32 *serial, volatile s32 *index)
 {
     s32 i;
     for (i = 0; i < count; i++)
-        if (p->serials[i] == (*serial)) {
+        if (serials[i] == (*serial)) {
             *index = i;
             return 1;
         }
@@ -87,8 +90,7 @@ inline static s32 Append_0821DE30(struct TrapProbe *p, s32 count, const u32 *ser
     if (count > 9)
         return 2;
     {
-        typeof(p->serials[count]) *q1 = &p->serials[count];
-        *q1 = *serial;
+        serials[count] = *serial;
     }
     *index = count;
     return 0;
@@ -102,15 +104,14 @@ void Trap_UpdateProbeContacts(struct TrapProbe *probe)
     gUnk_03001684 = 1;
     count = probe->count;
     i = 0;
-    if (i < gUnk_030052F4->trapCount) {
+    for (; i < gUnk_030052F4->trapCount; i++) {
         {
-            typeof(gUnk_030052F4->trapCount) v1 = gUnk_030052F4->trapCount;
-            do {
+            {
                 struct TerrainTrap *trap = &gUnk_030052F4->traps[i];
                 if ((trap->f6 != probe->kind) && (trap->f6 != 0x14C9))
                     goto nextTrap;
-                if (Pressed(trap) && Contains(probe->position, trap->f28, trap->fe)) {
-                    s32 result = Append_0821DE30(probe, count, &trap->serial, &index);
+                if (Pressed(trap) && Contains(probe->position, trap)) {
+                    s32 result = Append_0821DE30(probe->serials, count, &trap->serial, &index);
                     if (result == 0) {
                         if ((((trap->f4 == 0xDD2) || (trap->f4 == 0x14C9)) ||
                              (trap->f4 == 0x1516)) ||
@@ -128,14 +129,8 @@ void Trap_UpdateProbeContacts(struct TrapProbe *probe)
                         Trap_DispatchEvent(probe, trap, 0xD5CC);
                 }
             nextTrap:
-                i++;
-
-            } while (i <= (v1 - 1));
+            }
         }
     }
     probe->count = count;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0821DE30);
-#endif
