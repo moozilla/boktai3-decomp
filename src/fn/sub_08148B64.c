@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "player.h"
+#include "render.h"
 // confidence=low: action pulses a spiral effect while alternating the folded facing.
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
@@ -129,7 +130,6 @@ void Player_AddControlFlags(struct Player *, u32);
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
 void Player_UpdateFacingSide(struct Player *);
-extern u8 *gUnk_030042E4;
 void Sound_PlaySong(u32);
 void Player_UpdateSpiralDisorientation(struct Player *p)
 {
@@ -172,7 +172,7 @@ void Player_UpdateSpiralDisorientation(struct Player *p)
     }
     Player_SetAnimation(p, 0x9A, 64, 1);
     p->spriteResource = 0x16F;
-    p->actionVariantResource = (u32)(gUnk_030042E4 + (p->spriteResource << 5));
+    p->actionVariantResource = (u32)(gPaletteBankData + (p->spriteResource << 5));
     Anim_SetSequence(&((struct ReleaseAnimation *)p)->seq, *(const void **)((u8 *)p + 0x40C), 0,
                      p->heading, p->side);
     Step(&((struct ReleaseAnimation *)p)->sprite, &((struct ReleaseAnimation *)p)->seq);

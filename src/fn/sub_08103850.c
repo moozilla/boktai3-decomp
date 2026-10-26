@@ -58,7 +58,7 @@ u32 NamedObject_UpdatePool(struct NamedObjectManager *manager)
             return 0;
         }
     }
-    if (!(gUnk_0300523C & 8)) {
+    if (!(gEnginePauseFlags & 8)) {
         for (i = 0; i < 12; i++) {
             u32 *active = &manager->activeMask;
             if (isActive(*active, 1 << i)) {

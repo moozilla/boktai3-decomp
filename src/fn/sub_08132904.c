@@ -55,7 +55,6 @@ void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void SceneActorMovement_ProjectProbe(void *, u32, u32);
 void SceneActorReaction_PlayStaggerBurst(void);
-extern u8 *gUnk_030042E4;
 static inline s32 LocalPlayer(void)
 {
     if (!gUnk_020004B4)
@@ -188,7 +187,7 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
         if (actor->drawableKind == 0)
             AnimData_SelectPaletteBank(((u8 *)actor->drawable) + 0x2C, bank);
         else
-            *((u8 **)(((u8 *)actor->drawable) + 0x68)) = gUnk_030042E4 + (bank * 32);
+            *((u8 **)(((u8 *)actor->drawable) + 0x68)) = gPaletteBankData + (bank * 32);
         {
             u32 eight = 8;
             actor->field1E8 = eight;
@@ -270,5 +269,6 @@ fail:
 
 #else
 #include "global.h"
+#include "render.h"
 INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ApplyLinkedAreaDamage);
 #endif

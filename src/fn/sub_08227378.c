@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct Camera {
     u8 pad0[0x1c];
@@ -9,7 +10,6 @@ struct Camera {
     u16 f5C;
 };
 extern u32 gUnk_030053F4;
-extern u32 gUnk_0300523C;
 extern s16 gUnk_030042A0[];
 extern s16 gUnk_03005418[];
 void Camera_DispatchCommands(struct Camera *);
@@ -36,7 +36,7 @@ u32 Camera_Update(struct Camera *c)
     if (!(gUnk_030053F4 & 0x800)) {
         Camera_DispatchCommands(c);
     }
-    if (!(gUnk_0300523C & 4)) {
+    if (!(gEnginePauseFlags & 4)) {
         sub_08226CF8(c);
         if (c->f1C == 0) {
             gUnk_030042A0[0] = c->f58;

@@ -13,7 +13,7 @@ void BackgroundFlash_UpdateAppearing(struct BackgroundFlashController *controlle
         controller->page = 0;
     }
     visible = 0x200;
-    control = &gUnk_03004BD8;
+    control = &gDispCntShadow;
     previous = *control;
     do {
         flags = visible;

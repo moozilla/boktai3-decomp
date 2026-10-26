@@ -32,7 +32,7 @@ void KeyTrigger_Update(struct Task08197EC4 *t)
                 break;
         }
     }
-    if (((t->flags & 2) || !(gUnk_0300523C & 7)) && (t->flags & 1) &&
+    if (((t->flags & 2) || !(gEnginePauseFlags & 7)) && (t->flags & 1) &&
         (gUnk_03005260[1] & t->keys)) {
         if (t->script1)
             Script_RunBlock(t->script1, t->args);

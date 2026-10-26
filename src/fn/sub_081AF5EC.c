@@ -1,6 +1,6 @@
 #include "global.h"
+#include "render.h"
 
-extern u32 gUnk_0300523C;
 struct A {
     u8 f[0x28];
     u16 v;
@@ -11,7 +11,7 @@ void Task_Kill(void *);
 
 void Vanargand_UpdateTransientEffect(struct A *p)
 {
-    u32 t = gUnk_0300523C & 7;
+    u32 t = gEnginePauseFlags & 7;
     if (t == 0) {
         p->v = (p->c >> 4) + 6;
         p->c++;

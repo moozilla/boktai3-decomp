@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+#include "render.h"
 
 #ifdef NONMATCHING
 // fuzzy: 94.1%
@@ -160,7 +161,6 @@ void Player_RestartAnimationFromResource(struct P *);
 void Player_UpdateFacingSide(struct P *);
 u32 Player_SetAnimation(struct P *, u32, u32, u32);
 void SpiralTrail_CreateWithParticles(struct P *, s32, void *, s32, s32);
-extern u8 *gUnk_030042E4;
 // confidence=low: motion 13 alternates facing while growing a spiral trail.
 static inline void Step_UpdateSpiralMotion(struct ContactSwarmSprite *sprite,
                                            struct DisplaySequenceState *state)
@@ -316,7 +316,7 @@ void PlayerCue_UpdateSpiralMotion(struct P *p)
         u32 resource = 0x16F;
         *((u16 *)(((u8 *)p) + 0xC6)) = resource;
         asm("" : "+r"(resource));
-        *((void **)(((u8 *)p) + 0xD4)) = gUnk_030042E4 + (resource << 5);
+        *((void **)(((u8 *)p) + 0xD4)) = gPaletteBankData + (resource << 5);
     }
     Anim_SetSequence(&p->seq, (void *)p->resource, 0, p->facing, p->flip);
     Step_UpdateSpiralMotion(&p->sprite, &p->seq);

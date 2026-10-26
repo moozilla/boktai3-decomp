@@ -1,9 +1,9 @@
 #include "global.h"
-extern u16 gUnk_03004BD8;
+#include "render.h"
 void Anim_Remove(u8 *);
 void ScreenParams2E8_DestroyScreen(u8 *p)
 {
-    u16 *r = &gUnk_03004BD8;
+    u16 *r = &gDispCntShadow;
     u32 m = ~3;
     *r = m & *r;
     *(u32 *)(p + 0x4c) |= 1;

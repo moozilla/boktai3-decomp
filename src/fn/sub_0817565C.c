@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 void PauseMenu_CloseTextWindows(u8 *);
 void Hud_SetupBackgroundLayer(u8 *, u32, u32, u32, u32);
 void PauseMenu_HideAllSprites(u8 *);
@@ -32,7 +33,6 @@ void SceneHud_SetPairedIcons(u8 *, u32, s32);
 void SceneCatalog_SetDescription(u8 *, s32);
 void InventoryGrid_UpdateModifierPreview(void);
 void Presentation_UpdateAllocationSelection(void);
-extern u16 gUnk_03004BD8;
 void Hud_InitStatusMenu(u8 *s)
 {
     u8 *p;
@@ -90,7 +90,7 @@ void Hud_InitStatusMenu(u8 *s)
         MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, zero);
     }
     {
-        u16 *reg = &gUnk_03004BD8;
+        u16 *reg = &gDispCntShadow;
         s32 mask = ~0x200;
         mask &= *reg;
         *reg = mask;

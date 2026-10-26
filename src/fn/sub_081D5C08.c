@@ -1,5 +1,5 @@
 #include "global.h"
-extern u16 gUnk_03004BD8;
+#include "render.h"
 extern u8 gUnk_03004FC0[], gUnk_03004CC0[];
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
@@ -9,7 +9,7 @@ void sub_08215EB4(u32, u32, u32, u32, u32, u32, u32, u32);
 u32 MonsterBook_SetupPageBackgrounds(u8 *s, u32 value)
 {
     u32 mask = 0xF00;
-    u16 *reg = &gUnk_03004BD8;
+    u16 *reg = &gDispCntShadow;
     void *p, *q;
     u32 color;
     u16 *dst;

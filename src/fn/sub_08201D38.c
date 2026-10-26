@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 // MATCHING_CONCESSION: register-pinning
 struct DisplaySequenceState {
     const volatile u16 *commands;
@@ -66,7 +67,6 @@ struct ScriptCombatActorState {
 extern u32 gUnk_030053F4;
 extern u32 gUnk_030053F0;
 extern u32 gUnk_02000560;
-extern u8 *gUnk_030042E4;
 void AnimData_SelectPaletteBank(void *, u32 animation);
 void Collider_SetPosition(void *collider, void *position, u32 value);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
@@ -195,7 +195,7 @@ u32 ScriptCombatActor_UpdateState(struct ScriptCombatActorState *p)
     } else {
         register struct ActorColliderView *disabled asm("r2") = &p->col;
         disabled->flags |= 4;
-        p->ptr5c = gUnk_030042E4 + 0x36e0;
+        p->ptr5c = gPaletteBankData + 0x36e0;
         c = disabled;
     }
     {
@@ -219,7 +219,7 @@ u32 ScriptCombatActor_UpdateState(struct ScriptCombatActorState *p)
                     TerrainModifiers_UnregisterCell(&p->w1d0);
                 Anim_RestartSequence(&p->seq, (void *)p->w1cc, 2, 0, 0);
                 AnimData_SelectPaletteBank(p->anim, 0x1b7);
-                p->ptr5c = gUnk_030042E4 + 0x36e0;
+                p->ptr5c = gPaletteBankData + 0x36e0;
                 p->timer18c = 0;
                 p->timer = 0;
                 p->fn15c = ScriptCombatActor_UpdateDefeatEffect;

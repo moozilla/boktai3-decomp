@@ -133,7 +133,7 @@ static inline void Palette(struct SceneActorRegistryResetView *a, u32 bank)
     if (a->drawableKind == 0)
         AnimData_SelectPaletteBank((u8 *)a->drawable + 0x2C, bank);
     else
-        *(u8 **)((u8 *)a->drawable + 0x68) = gUnk_030042E4 + bank * 32;
+        *(u8 **)((u8 *)a->drawable + 0x68) = gPaletteBankData + bank * 32;
 }
 
 void SceneActorTerrain_DisableCollision(void *);
@@ -164,7 +164,7 @@ void Octopus_ReturnToRoutePoint(struct SceneActorRegistryResetView *actor)
             if (kind == 0)
                 AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, v);
             else
-                *(u8 **)((u8 *)actor->drawable + 0x68) = gUnk_030042E4 + v * 32;
+                *(u8 **)((u8 *)actor->drawable + 0x68) = gPaletteBankData + v * 32;
         }
         Hide(actor);
         ((struct OctopusDrawable *)actor->drawable)->mode = 3;

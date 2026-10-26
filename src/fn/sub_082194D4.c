@@ -1,7 +1,7 @@
 #include "global.h"
 
-extern s32 gUnk_03005220, gUnk_03005228;
-extern u16 *gUnk_03005224;
+extern s32 gScanlineEffectLayer, gScanlineEffectMode;
+extern u16 *gScanlineEffectSource;
 extern u16 *gUnk_03004278;
 extern vu16 *gUnk_03003A00;
 extern u16 gUnk_03004270, gUnk_03004274;
@@ -18,12 +18,12 @@ void sub_082194D4(void)
     buffer = (u16 *)ScanlineEffect_GetBuffer();
     Memory_Clear(buffer, 320);
     target = (vu16 *)0x0400001C;
-    switch (gUnk_03005228) {
+    switch (gScanlineEffectMode) {
         case 0:
-            target = ScanlineEffect_GetHorizontalScrollRegister(gUnk_03005220);
+            target = ScanlineEffect_GetHorizontalScrollRegister(gScanlineEffectLayer);
             break;
         case 1:
-            target = ScanlineEffect_GetVerticalScrollRegister(gUnk_03005220);
+            target = ScanlineEffect_GetVerticalScrollRegister(gScanlineEffectLayer);
             break;
         case 2:
             Mosaic_ResetParameters();
@@ -37,5 +37,5 @@ void sub_082194D4(void)
     gUnk_03003A00 = target;
     gUnk_03004270 = 1;
     gUnk_03004274 = 0;
-    gUnk_03005224 = 0;
+    gScanlineEffectSource = 0;
 }

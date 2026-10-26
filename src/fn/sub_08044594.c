@@ -121,7 +121,7 @@ u32 ContactSwarm_Update(struct ContactSwarm *poolInput)
         {
             u8 *fadeActive = &pool->fadeActive;
             if (*fadeActive) {
-                u8 *bank = gUnk_030042E4;
+                u8 *bank = gPaletteBankData;
                 u32 firstOffset = 0x5A60;
                 void *first = bank + firstOffset;
                 void *second = bank + firstOffset + 0x80;

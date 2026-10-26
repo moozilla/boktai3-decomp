@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 // confidence=low: menu ownership follows Params3D0_CreateDisplay.
 
 // confidence=low: menu ownership follows Params3D0_CreateDisplay; option meanings remain tentative.
@@ -22,7 +23,6 @@ struct Message {
 };
 extern struct Parameters gUnk_020003D0;
 extern u16 gUnk_03005260[];
-extern u8 *gUnk_030042E4;
 extern u8 *gUnk_02000710;
 extern const s32 gUnk_08613D80[];
 s32 TimeDisplay_GetCurrentMonth(void);
@@ -161,11 +161,11 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 u8 *output;
                 if (p->paletteStep <= (1 << p->unused760)) {
                     *((u32 *)(((u8 *)p) + 0xA8)) &= ~1;
-                    source_2 = gUnk_030042E4 + 0x6240;
+                    source_2 = gPaletteBankData + 0x6240;
                     input = (u8 *)p + 0x520;
                     output = (u8 *)p + 0x700;
                     Palette_InterpolateBanks(input, output, source_2, p->paletteStep, p->unused760);
-                    source = gUnk_030042E4 + 0x6260;
+                    source = gPaletteBankData + 0x6260;
                     Palette_InterpolateBanks((u8 *)p + 0x540, output, source, p->paletteStep,
                                              p->unused760);
                     *(void **)((u8 *)p + 0xE8) = (u8 *)p + 0x500;
@@ -192,11 +192,11 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 u8 *output;
                 if (p->paletteStep <= (1 << p->unused760)) {
                     *((u32 *)(((u8 *)p) + 0xA8)) &= ~1;
-                    source_3 = gUnk_030042E4 + 0x6240;
+                    source_3 = gPaletteBankData + 0x6240;
                     input = (u8 *)p + 0x520;
                     output = (u8 *)p + 0x700;
                     Palette_InterpolateBanks(input, output, source_3, p->paletteStep, p->unused760);
-                    source = gUnk_030042E4 + 0x6260;
+                    source = gPaletteBankData + 0x6260;
                     Palette_InterpolateBanks((u8 *)p + 0x540, output, source, p->paletteStep,
                                              p->unused760);
                     *(void **)((u8 *)p + 0xE8) = (u8 *)p + 0x500;

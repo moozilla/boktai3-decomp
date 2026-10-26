@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct AxePaletteTransition {
     u16 colors[16];
@@ -12,7 +13,6 @@ struct AxePaletteContext {
     u8 unk_708[0xE4C - 0x708];
     u32 flags;
 };
-extern u16 *gUnk_030042E4;
 s32 Div(s32, s32);
 
 // confidence=low: fades a palette bank toward another, filling per-channel deltas over duration frames
@@ -20,7 +20,7 @@ void sub_080FB620(void *object, s32 destinationBank, s32 sourceBank, s32 duratio
 {
     struct AxePaletteContext *context = object;
     struct AxePaletteTransition *transition = &context->transition;
-    u16 **bankPointer = &gUnk_030042E4;
+    u16 **bankPointer = &gPaletteBankData;
     s32 destinationOffset = destinationBank * 32;
     u16 *palettes = *bankPointer;
     const u16 *source = &palettes[sourceBank * 16];

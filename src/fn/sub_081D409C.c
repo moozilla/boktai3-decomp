@@ -51,7 +51,7 @@ void PaletteTransition_LoadSource(u8 *p, s32 id)
         src = (u8 *)ScriptProc_Start(0x92B3, resource) + 0x14;
         color = resource | 0xF000;
     } else {
-        src = gUnk_030042E4 + 0x41E0;
+        src = gPaletteBankData + 0x41E0;
         color = 0xF20F;
     }
     bank = gUnk_0824FC50[index];

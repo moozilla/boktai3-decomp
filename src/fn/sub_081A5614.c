@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 // Tentative: palette ownership follows adjacent Vanargand transition routines.
 struct PaletteTransition {
@@ -15,7 +16,6 @@ struct PaletteTransition {
     u8 padF28[0xc];
     s32 stage;
 };
-extern u8 *gUnk_030042E4;
 extern u16 gUnk_03004FC0[];
 void Vanargand_BlendPaletteBanks(void *, void *, void *, s32, s32, s32);
 void Vanargand_ResetPaletteTransition(struct PaletteTransition *);
@@ -66,20 +66,20 @@ static inline void RestorePalette(struct PaletteTransition *p)
         selector = 0x7f;
     switch (selector) {
         case 0x6f:
-            CpuSet(gUnk_030042E4 + 0xde0, p->output, 0x4000020);
+            CpuSet(gPaletteBankData + 0xde0, p->output, 0x4000020);
             CpuSet(p->first, gUnk_03004FC0, 0x4000068);
             SetStageColors(p->stage);
             break;
         case 0x82:
-            CpuSet(gUnk_030042E4 + 0x1040, p->output, 0x4000020);
+            CpuSet(gPaletteBankData + 0x1040, p->output, 0x4000020);
             CpuSet(p->second, gUnk_03004FC0, 0x4000068);
             break;
         case 0x7f:
-            CpuSet(gUnk_030042E4 + 0xfe0, p->output, 0x4000018);
+            CpuSet(gPaletteBankData + 0xfe0, p->output, 0x4000018);
             CpuSet(p->third, gUnk_03004FC0, 0x4000068);
             break;
         default:
-            CpuSet(gUnk_030042E4 + 0x3240, p->output, 0x4000008);
+            CpuSet(gPaletteBankData + 0x3240, p->output, 0x4000008);
             break;
     }
     Vanargand_ResetPaletteTransition(p);
@@ -136,8 +136,8 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
                 u8 *source;
                 u8 *target;
                 p->frame++;
-                source = gUnk_030042E4 + (selector * 32);
-                target = gUnk_030042E4 + 0x1040;
+                source = gPaletteBankData + (selector * 32);
+                target = gPaletteBankData + 0x1040;
                 Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 4);
                 Vanargand_BlendPaletteBanks(gUnk_03004FC0, p->first, p->second, p->frame, p->shift,
                                             13);
@@ -151,8 +151,8 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
                 u8 *source;
                 u8 *target;
                 p->frame++;
-                source = gUnk_030042E4 + (selector * 32);
-                target = gUnk_030042E4 + 0xf60;
+                source = gPaletteBankData + (selector * 32);
+                target = gPaletteBankData + 0xf60;
                 Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 1);
             } else {
                 Vanargand_ResetPaletteTransition(p);
@@ -164,8 +164,8 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
                 u8 *source;
                 u8 *target;
                 p->frame++;
-                source = gUnk_030042E4 + (selector * 32);
-                target = gUnk_030042E4 + 0xf80;
+                source = gPaletteBankData + (selector * 32);
+                target = gPaletteBankData + 0xf80;
                 Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 1);
             } else {
                 Vanargand_ResetPaletteTransition(p);
@@ -177,8 +177,8 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
                 u8 *source;
                 u8 *target;
                 p->frame++;
-                source = gUnk_030042E4 + 0xf60;
-                target = gUnk_030042E4 + (selector * 32);
+                source = gPaletteBankData + 0xf60;
+                target = gPaletteBankData + (selector * 32);
                 Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 1);
             } else {
                 RestorePalette(p);
@@ -191,8 +191,8 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
                 u8 *source;
                 u8 *target;
                 p->frame++;
-                source = gUnk_030042E4 + 0xf80;
-                target = gUnk_030042E4 + (selector * 32);
+                source = gPaletteBankData + 0xf80;
+                target = gPaletteBankData + (selector * 32);
                 Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 1);
             } else {
                 RestorePalette(p);

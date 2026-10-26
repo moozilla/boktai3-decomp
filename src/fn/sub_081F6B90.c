@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 // MATCHING_CONCESSION: register-pinning
 
 struct Vec {
@@ -31,7 +32,6 @@ struct Actor {
 #define H(p, o) (*(u16 *)((u8 *)(p) + (o)))
 #define W(p, o) (*(u32 *)((u8 *)(p) + (o)))
 extern u8 *gUnk_0200047C;
-extern u8 *gUnk_030042E4;
 void SceneMessages_SetPendingTrigger(void *, void *);
 u32 Trigger_ConsumePending(void *, s32);
 u32 ActorResource_GetFixedId(void *);
@@ -103,7 +103,7 @@ static inline void Palette_SelectResource(u8 *p, u32 id)
     else if (originalId == 501)
         palette->data = p + 0xab8;
     else {
-        CpuSet(gUnk_030042E4 + (id *= 32), palette->buffer, 0x04000008);
+        CpuSet(gPaletteBankData + (id *= 32), palette->buffer, 0x04000008);
         palette->data = palette->buffer;
     }
 }

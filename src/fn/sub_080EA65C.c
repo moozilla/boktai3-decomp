@@ -137,7 +137,7 @@ static inline void Palette(struct SceneActorRegistryResetView *a, u32 bank)
     if (a->drawableKind == 0)
         AnimData_SelectPaletteBank((u8 *)a->drawable + 0x2C, bank);
     else
-        *(u8 **)((u8 *)a->drawable + 0x68) = gUnk_030042E4 + bank * 32;
+        *(u8 **)((u8 *)a->drawable + 0x68) = gPaletteBankData + bank * 32;
 }
 
 void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s32 frame)

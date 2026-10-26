@@ -1,5 +1,6 @@
 #include "global.h"
 #include "actor_animation_controller.h"
+#include "render.h"
 
 // Provisional name: ActorPalette_BeginFade
 
@@ -231,8 +232,6 @@ extern u8 *gUnk_02000710;
 
 extern u16 gUnk_03005260[];
 
-extern u32 gUnk_0300523C;
-
 u8 Math_Atan2(s32, s32);
 
 void Actor_SetInteractionControlFlag(u8 *);
@@ -302,7 +301,7 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
         return;
     if (!(gUnk_03005260[1] & 1))
         return;
-    if (gUnk_0300523C & 4)
+    if (gEnginePauseFlags & 4)
         return;
     if (*(u32 *)(owner + 0x1c) == 4)
         return;

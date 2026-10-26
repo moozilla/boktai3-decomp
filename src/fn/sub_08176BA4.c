@@ -1,6 +1,5 @@
 #include "global.h"
-extern u16 gUnk_03004BD8, gUnk_03005214, gUnk_030051C4, gUnk_030051DC, gUnk_03005210;
-extern u32 gUnk_0300523C;
+#include "render.h"
 void Hud_InitSelectionBounds(u32, u32);
 void Hud_UpdateEquipmentPrompt(void *);
 void Hud_SetUpdateCallback(void *, void (*)(void *));
@@ -36,11 +35,11 @@ void SceneHud_FinishPageExit(u8 *p)
     if (!*timer) {
         *(vu16 *)0x04000050 = *(u16 *)(p + 0xa10);
         if (*(u16 *)(p + 0x43d8) & 0x200)
-            gUnk_03004BD8 |= 0x200;
+            gDispCntShadow |= 0x200;
         if (*(u16 *)(p + 0x43d8) & 0x400)
-            gUnk_03004BD8 |= 0x400;
+            gDispCntShadow |= 0x400;
         if (*(u16 *)(p + 0x43d8) & 0x800)
-            gUnk_03004BD8 |= 0x800;
+            gDispCntShadow |= 0x800;
     }
     {
         u32 next = *(u16 *)(p + 0xa4c) + 1;
@@ -48,11 +47,11 @@ void SceneHud_FinishPageExit(u8 *p)
         *(u16 *)(p + 0xa4c) = next;
         if ((u16)next > 16) {
             Hud_SetUpdateCallback(p, Hud_UpdateEquipmentPrompt);
-            gUnk_03005214 = *(u16 *)(p + 0x43e0);
-            gUnk_030051C4 = *(u16 *)(p + 0x43e2);
-            gUnk_030051DC = *(u16 *)(p + 0x43e4);
-            gUnk_03005210 = *(u16 *)(p + 0x43e6);
-            clearFlags(&gUnk_0300523C, ~4);
+            gBgFadeColor = *(u16 *)(p + 0x43e0);
+            gBgFadeBankMask = *(u16 *)(p + 0x43e2);
+            gObjFadeColor = *(u16 *)(p + 0x43e4);
+            gObjFadeFlags = *(u16 *)(p + 0x43e6);
+            clearFlags(&gEnginePauseFlags, ~4);
             Sound_ResumePersistentSongs();
             if (p[0x487c]) {
                 HealthBurstEffect_Create(*(void **)(p + 0xa40), p[0x487d]);

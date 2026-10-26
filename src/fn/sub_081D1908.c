@@ -1,6 +1,6 @@
 #include "global.h"
+#include "render.h"
 // The palette binding at actor offset 0x148 is distinct from the main graphics palette.
-extern u8 *gUnk_030042E4;
 extern u16 gUnk_02000278[];
 s32 Div(s32, s32);
 struct PaletteBinding {
@@ -13,8 +13,8 @@ static inline void SetPalette(struct PaletteBinding *binding, u16 *palette)
 }
 void SceneNpc_BlendPalette(u8 *actor, s32 step, s32 length)
 {
-    const u16 *source = (u16 *)(gUnk_030042E4 + 0x6120);
-    const u16 *target = (u16 *)(gUnk_030042E4 + 0x6140);
+    const u16 *source = (u16 *)(gPaletteBankData + 0x6120);
+    const u16 *target = (u16 *)(gPaletteBankData + 0x6140);
     u16 *output = gUnk_02000278;
     s32 i;
     s32 inverse;

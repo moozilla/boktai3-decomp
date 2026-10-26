@@ -1,12 +1,13 @@
 #include "global.h"
+#include "render.h"
 struct Task {
     u8 pad[24];
     s32 state, counter;
 };
 extern u32 gUnk_03005408, gUnk_030054B0, gUnk_03003A08, gUnk_030053E8, gUnk_030053FC;
-extern u32 gUnk_0300523C, gUnk_030053DC, gUnk_03005414, gUnk_030051D8, gUnk_0300540C;
+extern u32 gUnk_030053DC, gUnk_03005414, gUnk_0300540C;
 extern u32 gUnk_030053F4, gUnk_03005404, gUnk_030053E4, gUnk_030053D8;
-extern u16 gUnk_03005260, gUnk_030039F0, gUnk_03004BD8;
+extern u16 gUnk_03005260, gUnk_030039F0;
 extern u8 *gUnk_02000710;
 extern u32 *gUnk_030053F8;
 void System_ShutdownAndSoftReset(void);
@@ -67,7 +68,7 @@ update: {
         case 1:
             if (task->counter <= 0) {
                 if (gUnk_030053E8) {
-                    if (gUnk_0300523C & 2)
+                    if (gEnginePauseFlags & 2)
                         break;
                     if (!SceneLifecycle_IsTransitionBlocked()) {
                         gUnk_030053DC = 0;
@@ -75,20 +76,20 @@ update: {
                         gUnk_030053FC = state;
                         {
                             u32 mask = ~14;
-                            gUnk_0300523C = mask & gUnk_0300523C;
+                            gEnginePauseFlags = mask & gEnginePauseFlags;
                         }
                         TaskSystem_KillBelowPersistenceLevel(1);
                         task->counter = 3;
                         {
-                            u16 *ptr = &gUnk_03004BD8;
+                            u16 *ptr = &gDispCntShadow;
                             u32 mask = ~0xE00;
                             *ptr = mask & *ptr;
                         }
-                        gUnk_030051D8 = 0x40;
+                        gFadeMultiplier = 0x40;
                         break;
                     }
                 }
-                if (!(gUnk_0300523C & 2))
+                if (!(gEnginePauseFlags & 2))
                     gUnk_0300540C++;
                 break;
             }
@@ -99,8 +100,8 @@ update: {
             SceneLifecycle_ReleaseSceneResources();
             if (gUnk_030053F4 & 0x200) {
                 gUnk_030053F4 &= ~0x200;
-                if (gUnk_0300523C & 8)
-                    gUnk_0300523C &= ~8;
+                if (gEnginePauseFlags & 8)
+                    gEnginePauseFlags &= ~8;
             }
             if (gUnk_030053E8 & 0x10)
                 GameState_BackupActiveRegions();

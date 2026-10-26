@@ -1,4 +1,5 @@
 #include "palette_controller.h"
+#include "render.h"
 /* Palette_ClearActiveController: zeroes gUnk_02000468 (the active controller pointer); identical body to the task's destroy callback Palette_Destroy */
 #define Palette_ClearActiveController sub_08002AD4
 /* Palette_NoOpCallback: empty stub with no identified caller or callee; placeholder callback body */
@@ -450,10 +451,6 @@ u32 Palette_Destroy(void)
 
 extern u16 gUnk_03004FC0[];
 
-extern s32 gUnk_03004DA0, gUnk_03004DA8;
-
-extern u16 gUnk_03005214, gUnk_030051C4;
-
 static inline u16 blendEnabled(struct PaletteController *p)
 {
     return p->flags & 8;
@@ -468,10 +465,10 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
         p->pending = 0;
         t->callback = 0;
         p->hardware = gUnk_03004FC0;
-        gUnk_03004DA0 = 64;
-        gUnk_03004DA8 = 64;
-        gUnk_03005214 = 0x1084;
-        gUnk_030051C4 = 0;
+        gBgFadeLevel = 64;
+        gBgFadeApplied = 64;
+        gBgFadeColor = 0x1084;
+        gBgFadeBankMask = 0;
         p->flags = Script_GetKeywordValue('f', 0);
         if (Script_SeekToKeyword('p')) {
             s32 i = 0;

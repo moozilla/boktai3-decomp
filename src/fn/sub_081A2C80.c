@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 // confidence=low: Hresvelgr setup: reads script keywords into the 0x358-0x372 parameter block, creates the pools, sets callbacks and animation state.
 
@@ -24,7 +25,6 @@ struct F2C80Block {
     u32 w[8];
 };
 extern void *gUnk_02000710;
-extern void *gUnk_030042E4;
 s32 Script_GetKeywordValue(s32, s32);
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
@@ -193,7 +193,7 @@ s32 sub_081A2C80(void *arg0, void *arg1)
     }
     off = 0;
     for (i = 15; i >= 0; i--) {
-        CpuSet((u8 *)gUnk_030042E4 + 0x5E00 + off, self + 0x424 + off, 0x04000008);
+        CpuSet((u8 *)gPaletteBankData + 0x5E00 + off, self + 0x424 + off, 0x04000008);
         off += 0x20;
     }
     {

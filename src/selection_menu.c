@@ -89,7 +89,7 @@ void *SelectionMenu_Create(void *a, void *b);
 
 u8 *SelectionMenu_GetIconPalette(s32 i)
 {
-    return gUnk_030042E4 + (i + 0x373) * 0x20;
+    return gPaletteBankData + (i + 0x373) * 0x20;
 }
 
 void Presentation_SetActorIconFrame(struct SelectionMenu *p, struct SceneInputWidget *q, u8 *r)
@@ -999,7 +999,7 @@ void SelectionMenu_Close(struct SelectionMenu *p)
         ScreenTransition_SendCommand(3, 4, 4, 4, 4, 0xffff, 0);
     if (p->frame == 20) {
         {
-            u32 *state = &gUnk_0300523C;
+            u32 *state = &gEnginePauseFlags;
             int mask;
             mask = ~4;
             *state &= mask;
@@ -1021,7 +1021,7 @@ void SelectionMenu_Hide(struct SelectionMenu *arg)
     g->flags |= 1;
     g = &p->panels[1];
     g->flags |= 1;
-    state = &gUnk_0300523C;
+    state = &gEnginePauseFlags;
     mask = 1;
     flags = &p->icons[0].flags;
     i = 18;
@@ -1129,7 +1129,7 @@ configure:
     ScrollingDialogue_RequestShow();
     {
         int mask = 4;
-        gUnk_0300523C |= mask;
+        gEnginePauseFlags |= mask;
     }
     return 0;
 }

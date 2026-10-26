@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
     u8 angle;
@@ -49,7 +50,6 @@ int Interp_Step(void *, void *);
 void Sound_PlaySongChecked(int);
 int SceneActorGraphics_GetResourceId(void *);
 void TemporaryAnimationPool_CreateEntry(void *, int, int, int, void *);
-extern u8 *gUnk_030042E4;
 void SceneActorAnimation_UpdateChargeApproach(ActorAnimation *p, int tick)
 {
     ActorAnimation *p2 = p;
@@ -96,7 +96,7 @@ void SceneActorAnimation_UpdateChargeApproach(ActorAnimation *p, int tick)
             if (!(tick & 3)) {
                 int id = SceneActorGraphics_GetResourceId(p2);
                 {
-                    u8 *data = gUnk_030042E4 + id * 32;
+                    u8 *data = gPaletteBankData + id * 32;
                     TemporaryAnimationPool_CreateEntry((u8 *)p2 + 0x240, 8, 0x200, 0x9000, data);
                 }
             }

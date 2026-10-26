@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_input.h"
-#define gScenePaletteBanks gUnk_030042E4
+#define gScenePaletteBanks gPaletteBankData
 struct SceneInventoryCategoryMenu {
     u8 unknown0[0x13F8];
     struct SceneInputWidget categoryWidget;
@@ -8,7 +8,7 @@ struct SceneInventoryCategoryMenu {
 };
 void SceneInventory_ResetCategoryPalette(struct SceneInventoryCategoryMenu *p)
 {
-    u16 *palette = (u16 *)(gUnk_030042E4 + 0x7540);
+    u16 *palette = (u16 *)(gPaletteBankData + 0x7540);
     p->categoryWidget.palette = palette;
     p->categoryWidget.paletteBank = 0x3AA;
     p->targetWidget.palette = palette;

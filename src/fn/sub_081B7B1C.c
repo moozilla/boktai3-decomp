@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 typedef struct GrowthHazardManager {
     u8 unk_00[0x18];
@@ -8,7 +9,6 @@ typedef struct GrowthHazardManager {
     u16 palette[2][16];
 } Obj;
 
-extern u8 *gUnk_030042E4;
 extern const u32 gUnk_08612154[];
 void Sound_PlaySong(u32);
 
@@ -34,16 +34,17 @@ void GrowthHazard_UpdateSharedFlash(Obj *manager)
         if (manager->flash[channel]) {
             manager->flash[channel]--;
             if (manager->flash[channel] == 0)
-                CpuSet(gUnk_030042E4 + 0x1AA0, manager->palette[channel], 0x04000008);
+                CpuSet(gPaletteBankData + 0x1AA0, manager->palette[channel], 0x04000008);
             else if (manager->flash[channel] > 15) {
                 const u32 *banks = gUnk_08612154;
-                CpuSet(gUnk_030042E4 + banks[channel] * 32, manager->palette[channel], 0x04000008);
+                CpuSet(gPaletteBankData + banks[channel] * 32, manager->palette[channel],
+                       0x04000008);
             } else {
                 s32 flash = manager->flash[channel];
                 s32 inverse = 16 - flash;
                 const u32 *banks = gUnk_08612154;
-                u16 *from = (u16 *)(gUnk_030042E4 + banks[channel] * 32);
-                u16 *to = (u16 *)(gUnk_030042E4 + 0x1AA0);
+                u16 *from = (u16 *)(gPaletteBankData + banks[channel] * 32);
+                u16 *to = (u16 *)(gPaletteBankData + 0x1AA0);
                 s32 colorIndex;
                 u32 channelMask;
                 colorIndex = 0;

@@ -127,7 +127,7 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
                 ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->animation, bank);
         else
             ((struct SceneActorRegistryTileDrawable *)actor->drawable)->palette =
-                gUnk_030042E4 + (bank << 5);
+                gPaletteBankData + (bank << 5);
     }
     {
         u32 mask = 0xFDFF7FFF;

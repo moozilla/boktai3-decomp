@@ -16,7 +16,7 @@ static inline void Reaction_Palette(struct SceneActorRegistryResetView *actor, u
     if (!actor->drawableKind)
         AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
     else
-        *(u8 **)((u8 *)actor->drawable + 0x68) = gUnk_030042E4 + bank * 32;
+        *(u8 **)((u8 *)actor->drawable + 0x68) = gPaletteBankData + bank * 32;
 }
 static inline void Reaction_SetWord(u32 *flags, u32 mask)
 {

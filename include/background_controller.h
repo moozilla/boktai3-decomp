@@ -2,6 +2,7 @@
 #define GUARD_BACKGROUND_CONTROLLER_H
 
 #include "engine.h"
+#include "render.h"
 
 /*
  * Background controllers (ROM 080015AC-08002AA8). Two task families share
@@ -123,7 +124,7 @@ struct ScrollingBackgroundConfig {
 /* Per-layer state in the hardware scroll registers (48-byte stride). */
 /* gUnk_03004C30[bg], 0x30 bytes per background. x/y are the layer's full
  * scroll in map pixels (for the stage, BG2: 0x03004CB0/CB2); Bg_UpdateScrollShadow masks
- * them to 8 bits into gUnk_03004C20 (BG0-3 HOFS/VOFS), which sub_08213FD8 copies
+ * them to 8 bits into gBgScrollShadow (BG0-3 HOFS/VOFS), which sub_08213FD8 copies
  * to REG_BG0HOFS.. in VBlank. World position -> BG2 map pixel: docs/ASSETS.md. */
 struct BackgroundLayer {
     u16 flags;
@@ -178,7 +179,6 @@ extern struct ScrollingBackground *gUnk_02000010[];
 extern struct BackgroundLayer gUnk_03004C30[];
 extern struct Camera gUnk_030042A0;
 extern s16 gUnk_03005418[2];
-extern u16 gUnk_03004BD8;
 extern u16 gUnk_02000550, gUnk_0200053C;
 
 /* Engine functions used by this unit. */

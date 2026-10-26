@@ -5,6 +5,7 @@
 #include "contact_actor.h"
 #include "scene_object.h"
 #include "contact_swarm.h"
+#include "render.h"
 struct ScenePanel;
 struct ScenePanelInteractionPlayer;
 struct TetherActor;
@@ -173,7 +174,6 @@ struct ScenePanel {
     u8 unknown17D8[0xC];
 };
 extern const u16 gUnk_08605A88[];
-extern u16 gUnk_03004BD8;
 void ScenePanel_SetChannelValue(struct ScenePanel *, s32, u16);
 void ScenePanel_SetState(struct ScenePanel *, void (*)(struct ScenePanel *));
 s32 ScenePanel_GetPaletteOffset(struct ScenePanel *);

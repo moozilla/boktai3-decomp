@@ -148,7 +148,7 @@ s32 ContactSwarm_SpawnPairedAdvanceCount(struct ContactSwarm *pool,
         *level = 20;
         reverse = &pool->fadeReverse;
         *reverse = zero;
-        bank = gUnk_030042E4;
+        bank = gPaletteBankData;
         first = bank + 0x5A60;
         second = (bank + 0x5A60) + 0x80;
         Palette_InterpolateBanks(pool->palette, first, second, *level, 5);

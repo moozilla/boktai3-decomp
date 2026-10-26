@@ -19,7 +19,7 @@ s32 ContactActorPool_Initialize(struct ContactActorPool *pool, u32 mode, u32 res
     pool->mode = mode;
     pool->sequenceResource = ScriptProc_Start(0x922E, 0x5BB7);
     {
-        u8 *bank = gUnk_030042E4;
+        u8 *bank = gPaletteBankData;
         void *first = bank + 0x5A60;
         void *second = bank + 0x5AA0;
         Palette_InterpolateBanks((u8 *)pool + 0x1700, first, second, 64, 6);

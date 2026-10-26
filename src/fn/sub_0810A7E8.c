@@ -5,6 +5,7 @@
 #define gLinkMenuState             gUnk_020004B4
 #include "global.h"
 #include "area_effect_link.h"
+#include "render.h"
 u8 Registry1745_ConsumeStateEntry(void *);
 s32 Registry1745_CheckSessionReady(void *);
 void Registry1745_BeginShutdown(void *, void (*)(void));
@@ -32,15 +33,14 @@ static inline u8 IsChoiceMode(u32 value, u32 mask)
         return 1;
     return 0;
 }
-extern u32 gUnk_03004DA0, gUnk_030051D4;
 s32 LinkMenu_ShowReadyMessage(struct AreaEffectLinkState *p)
 {
     s32 count, i, limit;
     u32 mask;
     if (Registry1745_ConsumeStateEntry(p)) {
         s32 *window;
-        gUnk_03004DA0 = 0x40;
-        gUnk_030051D4 = 0x40;
+        gBgFadeLevel = 0x40;
+        gObjFadeLevel = 0x40;
         Hud_RefreshSpriteFromScript();
         Hud_SetMode(5);
         p->menuTextWindow = TextWindow_Create(1, 6, 28, 6);

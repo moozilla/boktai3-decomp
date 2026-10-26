@@ -44,17 +44,17 @@ void StatusScreen_FadeAndExit(struct StatusScreen *p)
 void StatusScreen_WaitForStart(struct StatusScreen *p)
 {
     u32 mask = 256;
-    gUnk_03004BD8 &= ~mask;
+    gDispCntShadow &= ~mask;
     if (!StatusScreen_CheckConfirm(p)) {
         u32 old = p->delay;
         p->delay = old + 65535;
         asm("" : "+r"(old));
         if ((u16)old == 0) {
             {
-                register int flags asm("r1") = gUnk_03004BD8;
+                register int flags asm("r1") = gDispCntShadow;
                 {
                     int result = mask;
-                    gUnk_03004BD8 = result | flags;
+                    gDispCntShadow = result | flags;
                 }
             }
             {
@@ -233,7 +233,7 @@ int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
     u8 *map, *palette;
     gUnk_02000044 = p;
     {
-        u16 *flags = &gUnk_03004BD8;
+        u16 *flags = &gDispCntShadow;
         {
             int mask = ~256;
             mask &= *flags;

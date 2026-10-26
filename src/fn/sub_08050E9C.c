@@ -1,6 +1,6 @@
 #include "orbit_background.h"
+#include "render.h"
 extern u16 gUnk_02000528;
-extern u16 gUnk_03004BD8;
 void *ScriptProc_Start(u16, u16);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, void *);
 void Bg_SetPriority(u32, u32);
@@ -17,16 +17,16 @@ void OrbitBackground_LoadResource(struct OrbitBackground *p)
     if (v == 1)
         f = 1;
     if (f != 0) {
-        u16 *r = &gUnk_03004BD8;
+        u16 *r = &gDispCntShadow;
         u32 m = ~0x200;
         *r = *r & m;
         p->specialMode = 1;
     } else {
         if (p->enabled != 0) {
             u32 m = 0x200;
-            gUnk_03004BD8 |= m;
+            gDispCntShadow |= m;
         } else {
-            u16 *r = &gUnk_03004BD8;
+            u16 *r = &gDispCntShadow;
             u32 m = ~0x200;
             *r = *r & m;
         }

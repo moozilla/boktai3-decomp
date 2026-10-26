@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 /* Pair entries and resource copy follow the ROM's sliding word stores. */
 /* confidence=low: Vampire actor setup from its script block (keywords 0x74..0x72), then graphics, event and contact objects. */
@@ -27,7 +28,6 @@ void SceneActorAnimation_UpdateEig(void);
 /* confidence=low: Vampire actor setup from its script block (keywords 0x74..0x72), then graphics, event and contact objects. */
 extern u8 *gUnknown_02000580[];
 extern u16 gUnk_02000710[];
-extern u8 *gUnk_030042E4;
 extern const void *gUnk_0824DC78;
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
@@ -321,7 +321,7 @@ int sub_08028F78(void *arg0, void *arg1)
             *(u32 *)(s + 0x3AC) = v;
     }
 
-    palette = gUnk_030042E4;
+    palette = gPaletteBankData;
     ScaledShadow_Initialize(s + 0x2A0, s + 0x260, 0x40, 0x40);
     ScaledShadow_SetGraphic(s + 0x2A0, 0x1C1B, 7);
 

@@ -1,9 +1,8 @@
 #include "global.h"
-
-extern u16 gUnk_03005238;
+#include "render.h"
 
 u32 Anim_ResetDefaultFlags(void)
 {
-    gUnk_03005238 = 0;
+    gDefaultAnimFlags = 0;
     return 0;
 }

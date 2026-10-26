@@ -1,5 +1,6 @@
 #include "global.h"
-extern u32 gUnk_0300523C, gUnk_030053F4;
+#include "render.h"
+extern u32 gUnk_030053F4;
 void HealthRestoreEffect_StartParticleBurst(u8 *);
 void Sound_PlaySong(u32);
 void Sound_ResumePersistentSongs(void);
@@ -21,7 +22,7 @@ void HealthRestoreEffect_UpdateCompletion(u8 *p)
         u32 mask, value;
         u32 *flags;
         Sound_ResumePersistentSongs();
-        flags = &gUnk_0300523C;
+        flags = &gEnginePauseFlags;
         mask = ~4;
         clear(flags, mask);
         value = gUnk_030053F4;

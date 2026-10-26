@@ -1,7 +1,8 @@
 #include "global.h"
+#include "render.h"
 #define ActorReaction_CommitRequestedState  Hresvelgr_ApplyRequestedAction
 #define ActorReaction_ResetFlagsAndDispatch Hresvelgr_UpdateBehaviorMode
-#define gActorUpdatePaused                  gUnk_0300523C
+#define gActorUpdatePaused                  gEnginePauseFlags
 #define gActorUpdateLatch                   gUnk_02000550
 struct ActorReaction {
     u8 unknown0[0xAB];
@@ -11,7 +12,6 @@ struct ActorReaction {
     u8 unknownB0[0x34];
     u32 ticks;
 };
-extern u32 gUnk_0300523C;
 extern u16 gUnk_02000550;
 void Hresvelgr_UpdateAnimationAndTargets(struct ActorReaction *);
 void Hresvelgr_UpdateBehaviorMode(struct ActorReaction *);

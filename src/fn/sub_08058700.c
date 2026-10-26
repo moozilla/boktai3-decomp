@@ -15,7 +15,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             goto hide;
         {
             u32 mask = 0x200;
-            u16 *shadow = &gUnk_03004BD8;
+            u16 *shadow = &gDispCntShadow;
             *shadow = mask | *shadow;
         }
         if (value > 31) {
@@ -47,7 +47,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             s32 alpha;
             {
                 u32 mask = 0x200;
-                u16 *shadow = &gUnk_03004BD8;
+                u16 *shadow = &gDispCntShadow;
                 *shadow = mask | *shadow;
             }
             if (++panel->mode > 63)
@@ -172,7 +172,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             }
             {
                 u32 mask = 0x200;
-                u16 *shadow = &gUnk_03004BD8;
+                u16 *shadow = &gDispCntShadow;
                 *shadow = mask | *shadow;
             }
             {
@@ -203,7 +203,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
     }
     return;
 hide: {
-    u16 *shadow = &gUnk_03004BD8;
+    u16 *shadow = &gDispCntShadow;
     u32 mask = ~0x200;
     mask &= *shadow;
     *shadow = mask;

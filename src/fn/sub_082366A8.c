@@ -1,6 +1,5 @@
 #include "global.h"
-
-extern u8 *gUnk_030042E4;
+#include "render.h"
 
 struct GlowVector {
     s16 x, y, z, pad;
@@ -61,7 +60,7 @@ void sub_082366A8(struct GlowUnit *p, struct GlowVector *pos)
     sprite->position = *pos;
     sprite->position.z += 0x18;
     sprite->flags |= 0x400;
-    sprite->palette = gUnk_030042E4 + id * 32;
+    sprite->palette = gPaletteBankData + id * 32;
     fill = 0x3DEF;
     start = &sprite->colors[0];
     flag = &sprite->f6C;

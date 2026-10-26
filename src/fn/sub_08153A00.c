@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+#include "render.h"
 // confidence=low: tentative player cue role; see callback body.
 // Signed scaling sign tests and direction-store layout still differ.
 struct P {
@@ -161,7 +162,6 @@ void Player_RestartAnimationFromResource(struct P *);
 void Player_UpdateFacingSide(struct P *);
 u32 Player_SetAnimation(struct P *, u32, u32, u32);
 void SpiralTrail_CreateWithParticles(struct P *, s32, void *, s32, s32);
-extern u8 *gUnk_030042E4;
 // confidence=low: state-four variant uses eight-facing animation and axis-dependent speed.
 void PlayerCue_UpdateSideWalkTarget(struct P *p)
 {

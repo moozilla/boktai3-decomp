@@ -1,15 +1,14 @@
 #include "global.h"
+#include "render.h"
 struct Background {
     u8 pad[0x20];
     u16 x, y;
     u8 tail[0xc];
 };
-extern u16 gUnk_03004C20[], gUnk_03004BEC, gUnk_03004BF0[], gUnk_03004BD0[];
 extern struct Background gUnk_03004C30[];
-extern u32 gUnk_03004C18[], gUnk_03004BF8, gUnk_03004C00;
 void Bg_UpdateScrollShadow(void)
 {
-    u16 *dst = gUnk_03004C20;
+    u16 *dst = gBgScrollShadow;
     struct Background *src = gUnk_03004C30;
     u32 mask;
     dst[0] = src[0].x & 0xff;
@@ -17,20 +16,20 @@ void Bg_UpdateScrollShadow(void)
     dst[1] = mask & src[0].y;
     dst[2] = mask & src[1].x;
     dst[3] = mask & src[1].y;
-    if (!gUnk_03004BEC) {
+    if (!gBgAffineMode) {
         dst[4] = mask & src[2].x;
         dst[5] = mask & src[2].y;
         dst[6] = mask & *(u16 *)((u8 *)src + 0xb0);
         dst[7] = mask & *(u16 *)((u8 *)src + 0xb2);
     } else {
-        u16 *a = gUnk_03004BF0, *b = gUnk_03004BD0;
+        u16 *a = gBgAffineMatrixBuffer, *b = gBgAffineMatrix;
         u32 *c;
         a[0] = b[0];
         a[1] = b[1];
         a[2] = b[2];
         a[3] = b[3];
-        c = gUnk_03004C18;
-        c[0] = gUnk_03004BF8;
-        c[1] = gUnk_03004C00;
+        c = gBgAffineRefBuffer;
+        c[0] = gBgAffineRefX;
+        c[1] = gBgAffineRefY;
     }
 }

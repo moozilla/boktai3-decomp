@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct SceneSelection {
     u8 pad0[0x1a];
@@ -9,7 +10,7 @@ struct SceneSelection {
     u16 command;
     u16 *slots;
 };
-extern u32 gUnk_03005250, gUnk_03004DA0, gUnk_030051D4, gUnk_0300523C;
+extern u32 gUnk_03005250;
 u8 Registry1745_ConsumeStateEntry(struct SceneSelection *);
 s32 Registry1745_CheckSessionReady(struct SceneSelection *);
 void Registry1745_BeginShutdown(struct SceneSelection *, void (*)(void));
@@ -34,13 +35,13 @@ s32 SceneSelection_WaitForSlotTransition(struct SceneSelection *p)
     s32 count, i, length;
     gUnk_03005250 = 1;
     if (Registry1745_ConsumeStateEntry(p)) {
-        gUnk_03004DA0 = 0x40;
-        gUnk_030051D4 = 0x40;
+        gBgFadeLevel = 0x40;
+        gObjFadeLevel = 0x40;
         Sound_FadeOutChannel10(1);
     }
     if (p->timer == 1) {
         u32 mask = 4;
-        gUnk_0300523C |= mask;
+        gEnginePauseFlags |= mask;
     }
     if (Registry1745_CheckSessionReady(p) < 0) {
         Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
@@ -65,7 +66,7 @@ s32 SceneSelection_WaitForSlotTransition(struct SceneSelection *p)
         p->command = 0x2000;
         count = 4;
         {
-            u32 *flags = &gUnk_0300523C;
+            u32 *flags = &gEnginePauseFlags;
             u32 mask = ~count;
             *flags &= mask;
         }

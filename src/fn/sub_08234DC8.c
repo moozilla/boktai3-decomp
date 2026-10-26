@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-extern u32 gUnk_0300523C;
+#include "render.h"
 extern s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 void Sound_PlaySong(u32);
@@ -43,7 +43,7 @@ void sub_08234DC8(struct HealthRestoreEntry *p)
         MusicSlots_StopAllAndRetainResumable();
         {
             s32 four = 4;
-            gUnk_0300523C |= four;
+            gEnginePauseFlags |= four;
         }
     } else if (p->timer == 1) {
         Sound_PlaySong(0xE6);

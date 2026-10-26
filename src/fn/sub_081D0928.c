@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 #ifdef NONMATCHING
 // fuzzy: 90.2%
 // fix.py best (sweep after the inlined-insn fix)
@@ -12,7 +13,6 @@ struct Camera {
     s32 x;
 };
 extern struct Camera *gUnk_020004B8;
-extern u8 *gUnk_030042E4;
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
 extern const s16 gUnk_086149C4[];
@@ -100,13 +100,13 @@ s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
         if ((m & (*((u16 *)(p + 0xc)))) != 0) {
             s32 t;
             if ((*((s16 *)(q + 0xe))) <= 0x3f) {
-                u8 *g = gUnk_030042E4;
+                u8 *g = gPaletteBankData;
                 void *s1 = g + 0x2AE0;
                 void *s2 = g + 0x2B00;
                 void *d = p + 0x1CC;
                 Palette_InterpolateBanks(d, s1, s2, *((s16 *)(q + 0xe)), 6);
             } else {
-                u8 *g = gUnk_030042E4;
+                u8 *g = gPaletteBankData;
                 void *s1 = g + 0x2AE0;
                 void *s2 = g + 0x2B00;
                 void *d = p + 0x1CC;

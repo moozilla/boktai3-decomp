@@ -1893,31 +1893,31 @@ void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
                 if (base->effectVariant >= (1 << base->effectDuration))
                     break;
                 base->effectVariant++;
-                Palette_InterpolateBanks(palette, gUnk_030042E4,
-                                         gUnk_030042E4 + (base->effectId << 5), base->effectVariant,
-                                         base->effectDuration);
+                Palette_InterpolateBanks(palette, gPaletteBankData,
+                                         gPaletteBankData + (base->effectId << 5),
+                                         base->effectVariant, base->effectDuration);
                 base->animData.palette = palette;
                 break;
 
             case 2:
                 if (base->effectVariant > 0) {
                     base->effectVariant--;
-                    Palette_InterpolateBanks(palette, gUnk_030042E4,
-                                             gUnk_030042E4 + (base->effectId << 5),
+                    Palette_InterpolateBanks(palette, gPaletteBankData,
+                                             gPaletteBankData + (base->effectId << 5),
                                              base->effectVariant, base->effectDuration);
                 } else {
                     base->effectVariant = 0;
                     base->effectMode = 0;
                     base->effectId = 1;
-                    CpuSet(gUnk_030042E4 + 0x2BA0, palette, 0x04000008);
+                    CpuSet(gPaletteBankData + 0x2BA0, palette, 0x04000008);
                 }
                 base->animData.palette = palette;
                 break;
 
             case 3:
-                Palette_InterpolateBanks(palette, gUnk_030042E4,
-                                         gUnk_030042E4 + (base->effectId << 5), base->effectVariant,
-                                         base->effectDuration);
+                Palette_InterpolateBanks(palette, gPaletteBankData,
+                                         gPaletteBankData + (base->effectId << 5),
+                                         base->effectVariant, base->effectDuration);
                 base->animData.palette = palette;
                 if (!base->effectDirection) {
                     if ((++base->effectVariant) > 31) {
@@ -2177,13 +2177,13 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
 
     p->contactReward = Script_GetKeywordValue(0x53, 0);
 
-    base = gUnk_030042E4;
+    base = gPaletteBankData;
     for (i = 0; i < 16; i++)
         CpuSet(base + 0x2BA0 + i * 0x20, p->palette + i * 0x20, 0x04000008);
-    base = gUnk_030042E4;
+    base = gPaletteBankData;
     for (i = 0; i < 16; i++)
         CpuSet(base + 0x3240, p->normalDamageGraphics + i * 0x20, 0x04000008);
-    base = gUnk_030042E4;
+    base = gPaletteBankData;
     for (i = 0; i < 16; i++)
         CpuSet(base + 0x3240, p->specialDamageGraphics + i * 0x20, 0x04000008);
 

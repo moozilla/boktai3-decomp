@@ -1,8 +1,9 @@
-#define gLinkMenuFlags  gUnk_0300523C
+#define gLinkMenuFlags  gEnginePauseFlags
 #define gLinkMenuActive gUnk_03005250
 #include "global.h"
 #include "area_effect_link.h"
 #include "game_state.h"
+#include "render.h"
 u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);
 s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
 void Registry1745_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));
@@ -12,7 +13,7 @@ void LinkSelection_WaitForParticipantChoices(void);
 void LinkSelection_UpdateParticipantScores(struct AreaEffectLinkState *);
 void PaletteLevels_Reset(void);
 void Sound_FadeOutChannel10(u32);
-extern u32 gUnk_0300523C, gUnk_03005250;
+extern u32 gUnk_03005250;
 static inline u16 GetSlot(struct AreaEffectLinkState *p, s32 i)
 {
     if (i < 0)
@@ -35,7 +36,7 @@ s32 LinkSelection_WaitForReadyParticipants(struct AreaEffectLinkState *p)
         s16 *counter;
         u16 value;
         s32 increment;
-        gUnk_0300523C |= mask;
+        gEnginePauseFlags |= mask;
         PaletteLevels_Reset();
         Sound_FadeOutChannel10(6);
         gUnk_03005250 = 0;

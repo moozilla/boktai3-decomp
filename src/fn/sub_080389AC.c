@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct P {
     u8 pad[0x1e];
     u16 rounds;
@@ -13,7 +14,6 @@ struct Save {
     s16 selected;
 };
 extern struct Save *gUnk_02000710;
-extern u32 gUnk_0300523C;
 void WirelessGameMenu_SetStatusPanelState(struct P *, int);
 void WirelessGameMenu_SignalStatusPanel(struct P *);
 void Player_EnterStateTen(void);
@@ -47,7 +47,7 @@ void WirelessGameMenu_UpdateRoundPreparation(struct P *p)
         *entered = one;
         p->timer = zero;
         {
-            u32 *global = &gUnk_0300523C;
+            u32 *global = &gEnginePauseFlags;
             u32 mask = ~4;
             *global &= mask;
         }

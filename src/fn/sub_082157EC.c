@@ -1,7 +1,5 @@
 #include "global.h"
-extern u16 gUnk_03004BD8;
-extern u32 gUnk_03004BC0[];
-extern u16 gUnk_03004BE0[], gUnk_03004C08[];
+#include "render.h"
 extern const u32 gUnk_086140CC[];
 void Bg_ClearTilemap(s32);
 struct Dma {
@@ -11,7 +9,7 @@ void sub_082157EC(void)
 {
     u32 zero;
     s32 i;
-    gUnk_03004BD8 = 0;
+    gDispCntShadow = 0;
     Bg_ClearTilemap(0);
     Bg_ClearTilemap(1);
     Bg_ClearTilemap(2);
@@ -27,9 +25,9 @@ void sub_082157EC(void)
     zero = 0;
     for (; i <= 3; i++) {
         struct Dma *dma = (struct Dma *)0x040000d4;
-        gUnk_03004BC0[i] = zero;
-        gUnk_03004BE0[i] = zero;
-        gUnk_03004C08[i] = zero;
+        gBgTileUploadSrc[i] = zero;
+        gBgTileUploadParamA[i] = zero;
+        gBgTileUploadParamB[i] = zero;
         dma->src = (u32)gUnk_086140CC;
         dma->dst = 0x06000000 + i * 0x4000;
         dma->ctl = 0x84000008;

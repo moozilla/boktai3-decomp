@@ -1,6 +1,6 @@
 #include "global.h"
-#define gDisplayControlShadow gUnk_03004BD8
-extern u16 gUnk_03004BD8;
+#include "render.h"
+#define gDisplayControlShadow gDispCntShadow
 struct SceneBackgroundOwner {
     u8 unknown0[0x35c];
     void *script;
@@ -11,7 +11,7 @@ void SceneObject_StartBackgroundScript(struct SceneBackgroundOwner *p)
 {
     u32 layers[1];
     void *script;
-    u16 *control = &gUnk_03004BD8;
+    u16 *control = &gDispCntShadow;
     u32 mask = 0xfffff0ff;
     u32 flags;
     mask &= *control;

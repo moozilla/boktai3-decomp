@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct P {
     u8 pad[0x20];
     u32 flags, timer;
@@ -6,7 +7,6 @@ struct P {
     u8 pad2[0x18];
     u8 flag;
 };
-extern u32 gUnk_0300523C;
 void PaletteLevels_Reset(void);
 int WirelessExchange_SendPacket(struct P *, int, const u32 *, int);
 void WirelessGameMenu_SetStatusPanelState(struct P *, int);
@@ -15,7 +15,7 @@ void WirelessGameItems_StartOutgoingItems(void);
 void Hud_ClearTimer(void);
 static inline void set(u32 mask)
 {
-    gUnk_0300523C |= mask;
+    gEnginePauseFlags |= mask;
 }
 void WirelessGameMenu_UpdateRoundHandshake(struct P *p)
 {

@@ -10,19 +10,19 @@ void BackgroundFlash_UpdateDisappearing(struct BackgroundFlashController *contro
     do {
         BackgroundFlash_TakeEntryFlag(controller);
         visible = 0x200;
-        previous = gUnk_03004BD8;
+        previous = gDispCntShadow;
     } while (0);
     flags = visible;
     flags |= previous;
     do {
-        gUnk_03004BD8 = flags;
+        gDispCntShadow = flags;
         frame = controller->stateFrame;
     } while (0);
     if (frame <= 9) {
         if (!(frame & 1))
-            gUnk_03004BD8 = flags & ~visible;
+            gDispCntShadow = flags & ~visible;
     } else {
         BackgroundFlash_SetState(controller, 0);
-        gUnk_03004BD8 &= ~visible;
+        gDispCntShadow &= ~visible;
     }
 }

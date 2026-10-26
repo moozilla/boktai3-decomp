@@ -3,7 +3,6 @@
 #define SceneActor_DispatchAction      BossSlot2_ResetAndRunPhaseCallback
 #define SceneActor_SelectStateCallback BossSlot2_InitStateDispatch
 #define SceneActor_RunUnfrozenState    BossSlot2_RunUnpausedStateCallback
-#define gEnginePauseFlags              gUnk_0300523C
 struct SceneActorPausedUpdate {
     u8 pad0[0x4f6];
     s16 pauseClass;

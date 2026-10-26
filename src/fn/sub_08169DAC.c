@@ -1,8 +1,8 @@
 #include "global.h"
-extern u32 gUnk_0300523C;
+#include "render.h"
 void PauseMenu_RefreshStatusPanel(void *);
 void Hud_OnUnpausedRefresh(void *p)
 {
-    if (!(gUnk_0300523C & 1))
+    if (!(gEnginePauseFlags & 1))
         PauseMenu_RefreshStatusPanel(p);
 }

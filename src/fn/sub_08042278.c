@@ -1,11 +1,11 @@
 #include "script_selector.h"
-extern u32 gUnk_03004DA0;
+#include "render.h"
 extern u32 gUnk_030051A0[];
 void ScriptSelector_MoveSelection(struct ScriptSelector *, s32);
 s32 ScriptSelector_InitializeTask(struct ScriptSelector *selector)
 {
     s32 result;
-    gUnk_03004DA0 = 0x40;
+    gBgFadeLevel = 0x40;
     if (!Script_SeekToKeyword('s'))
         goto failed;
     {

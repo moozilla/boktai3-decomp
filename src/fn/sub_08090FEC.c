@@ -1,7 +1,7 @@
 #include "global.h"
+#include "render.h"
 
 extern const u8 gUnk_086108B0[];
-extern u8 *gUnk_030042E4;
 
 #define SLM_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
 
@@ -283,7 +283,7 @@ s32 Slime_Init(void *arg0)
     if (SLM_AT(u8, 8) == 0)
         AnimData_SelectPaletteBank(SLM_AT(u8 *, 4) + 0x2C);
     else
-        *(u8 **)(SLM_AT(u8 *, 4) + 0x68) = gUnk_030042E4 + (r1v << 5);
+        *(u8 **)(SLM_AT(u8 *, 4) + 0x68) = gPaletteBankData + (r1v << 5);
     if (SLM_AT(u8, 8) == 1) {
         r1v = SceneActorScript_GetManagerField62();
         *(u16 *)(SLM_AT(u8 *, 4) + 0x20 + 0x3A) = r1v - 0x5FFF;

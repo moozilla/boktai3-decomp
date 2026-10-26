@@ -93,7 +93,7 @@ s32 StagedEffect_Initialize(struct StagedEffect *effect, u32 script)
         sprite->renderMode = 1;
         i++;
     } while (i <= 4);
-    CpuSet(gUnk_030042E4 + 0x28D0, effect->blendedPalette, 0x4000008);
+    CpuSet(gPaletteBankData + 0x28D0, effect->blendedPalette, 0x4000008);
     effect->activePalette = effect->blendedPalette;
     effect->graphics.view.palette = effect->blendedPalette;
     return 0;

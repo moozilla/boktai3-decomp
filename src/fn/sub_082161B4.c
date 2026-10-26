@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct BgResource {
     u8 signature[2];
     u16 unk02;
@@ -29,14 +30,13 @@ struct BgLayer {
     void *map;
 };
 extern struct BgLayer gUnk_03004C30[];
-extern u16 gUnk_03004BD8;
 void sub_08215AC4(s32 bg, s32 mode);
 void Bg_SetTileUpload(s32 bg, u32 tiles, s32 offset, u16 size);
 void Text_ClearGlyphCache(void);
 void *Video_GetBackgroundMap(u32);
 static inline void enableBg(s32 bits)
 {
-    gUnk_03004BD8 |= bits;
+    gDispCntShadow |= bits;
 }
 /* Sets up the background layers of a map resource for one of eight layer
    modes: picks the BGs (sub_08215AC4) and DISPCNT bits, loads the tiles

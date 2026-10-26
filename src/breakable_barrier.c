@@ -356,8 +356,8 @@ int BreakableBarriers_Initialize(struct BreakableBarrierManager *m)
         if (BreakableBarrier_Initialize(m, p, i) < 0)
             return -1;
     m->script = Script_GetKeywordValue('c', 0);
-    gUnk_03005214 = 0x1084;
-    gUnk_030051C4 = 0x1FFF;
+    gBgFadeColor = 0x1084;
+    gBgFadeBankMask = 0x1FFF;
     {
         int v = 64 - (int)(m->remaining * 40) / m->count;
         if (v > 63)

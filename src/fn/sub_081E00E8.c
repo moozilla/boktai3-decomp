@@ -1,9 +1,9 @@
 #include "global.h"
-extern u16 gUnk_03004BD8;
+#include "render.h"
 void Anim_Remove(void *);
 void Password_DestroyEntryMenu(u8 *p)
 {
-    u16 *q = &gUnk_03004BD8;
+    u16 *q = &gDispCntShadow;
     u32 m = ~3;
     *q = m & *q;
     Anim_Remove(p + 0x2c0);

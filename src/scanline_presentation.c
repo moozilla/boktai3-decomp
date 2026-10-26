@@ -1,4 +1,5 @@
 #include "scanline_presentation.h"
+#include "render.h"
 
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
@@ -37,7 +38,7 @@ s32 Div(s32, s32);
 void ScanlinePresentation_UpdateFadeIn(struct ScanlinePresentation *s)
 {
     if (s->mode == 0)
-        gUnk_03004DA0 = Div(s->phase << 6, s->duration);
+        gBgFadeLevel = Div(s->phase << 6, s->duration);
     s->phase++;
     if (s->phase > s->duration) {
         s->phase = s->duration;
@@ -49,7 +50,7 @@ void ScanlinePresentation_UpdateFadeOut(struct ScanlinePresentation *s)
 {
     u32 k;
     if (s->mode == 0)
-        gUnk_03004DA0 = Div(s->phase << 6, s->duration);
+        gBgFadeLevel = Div(s->phase << 6, s->duration);
     s->phase--;
     k = 0;
     if (s->phase < 0) {
@@ -71,7 +72,7 @@ static inline void hide(struct ScanlineLayer *p)
 int ScanlinePresentation_Update(struct ScanlinePresentation *p)
 {
     if (p->mode == 0)
-        gUnk_030051D4 = gUnk_03004DA0;
+        gObjFadeLevel = gBgFadeLevel;
     if (p->cancellable && (gUnk_03005260[1] & 3)) {
         hide(&p->layers[0]);
         hide(&p->layers[1]);
@@ -80,7 +81,7 @@ int ScanlinePresentation_Update(struct ScanlinePresentation *p)
         hide(&p->layers[4]);
         hide(&p->layers[5]);
         if (p->mode == 0)
-            gUnk_030051D4 = gUnk_03004DA0 = 0;
+            gObjFadeLevel = gBgFadeLevel = 0;
         if (p->script)
             Script_Call(p->script, 0);
         Task_Kill(p);
@@ -152,7 +153,6 @@ int ScanlinePresentation_Destroy(struct ScanlinePresentation *p)
 }
 
 extern u16 gUnk_03004FC0[];
-extern u16 gUnk_03005214, gUnk_030051C4, gUnk_030051DC, gUnk_03005210;
 extern u8 gUnk_03004C30[];
 void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 s32 ResourceHeader_Relocate(void *, void *);
@@ -278,12 +278,12 @@ s32 sub_0800DC90(struct ScanlinePresentation *p)
         Mosaic_SetParameters(0, 0, 0x10);
     }
     if (*mode == 0) {
-        gUnk_03004DA0 = 0;
-        gUnk_03005214 = 0x1084;
-        gUnk_030051C4 = 0xFFFF;
-        gUnk_030051D4 = 0;
-        gUnk_030051DC = 0x1084;
-        gUnk_03005210 = 0;
+        gBgFadeLevel = 0;
+        gBgFadeColor = 0x1084;
+        gBgFadeBankMask = 0xFFFF;
+        gObjFadeLevel = 0;
+        gObjFadeColor = 0x1084;
+        gObjFadeFlags = 0;
     }
     return 0;
 }

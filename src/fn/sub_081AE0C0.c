@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
@@ -59,7 +60,6 @@ s32 __divsi3(s32, s32);
 void Sound_PlaySong(u32);
 void Vanargand_ResetPaletteTransition(struct Vanargand *);
 void CpuSet(const void *, void *, u32);
-extern u8 *gUnk_030042E4;
 extern u16 gUnk_03004FC0[];
 
 #define LERP(dst, t, from, to, tag)                                                                \
@@ -105,7 +105,7 @@ static inline void restorePalette(struct Vanargand *p, struct Vanargand *self)
             s32 t;
             s32 r, g, b;
 
-            CpuSet(gUnk_030042E4 + 0xDE0, p->palette, 0x04000020);
+            CpuSet(gPaletteBankData + 0xDE0, p->palette, 0x04000020);
             CpuSet(p->fadeA, gUnk_03004FC0, 0x04000068);
             t = p->transition;
             LERP(r, t, 7, 0x13, r1)
@@ -136,15 +136,15 @@ static inline void restorePalette(struct Vanargand *p, struct Vanargand *self)
             break;
         }
         case 0x82:
-            CpuSet(gUnk_030042E4 + 0x1040, p->palette, 0x04000020);
+            CpuSet(gPaletteBankData + 0x1040, p->palette, 0x04000020);
             CpuSet(p->fadeB, gUnk_03004FC0, 0x04000068);
             break;
         case 0x7F:
-            CpuSet(gUnk_030042E4 + 0xFE0, p->palette, 0x04000018);
+            CpuSet(gPaletteBankData + 0xFE0, p->palette, 0x04000018);
             CpuSet(p->fadeC, gUnk_03004FC0, 0x04000068);
             break;
         default:
-            CpuSet(gUnk_030042E4 + 0x3240, self->palette, 0x04000008);
+            CpuSet(gPaletteBankData + 0x3240, self->palette, 0x04000008);
             break;
     }
     Vanargand_ResetPaletteTransition(self);
@@ -342,7 +342,7 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
     } else
         SceneActors_SetEventScripts(self, 0, 0);
     SceneActors_Initialize(self, arg, type, &position, flags);
-    CpuSet(gUnk_030042E4 + 0xDE0, p->palette, 0x04000080);
+    CpuSet(gPaletteBankData + 0xDE0, p->palette, 0x04000080);
     CpuSet(ScriptProc_Start(0x92B3, 0x454B) + 0x14, p->fadeA, 0x04000080);
     CpuSet(ScriptProc_Start(0x92B3, 0xEEE9) + 0x14, p->fadeB, 0x04000080);
     CpuSet(ScriptProc_Start(0x92B3, 0xF392) + 0x14, p->fadeC, 0x04000080);
@@ -386,7 +386,7 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
             setMode(self, 2, 0, 9);
             changeState(self, 29, Vanargand_OnAlternateStopState);
             p->attachment = Vanargand_CreatePartController((u8 *)p + 0x17C, p->palette, 0);
-            CpuSet(gUnk_030042E4 + 0x1040, p->palette, 0x04000020);
+            CpuSet(gPaletteBankData + 0x1040, p->palette, 0x04000020);
             CpuSet(p->fadeB, gUnk_03004FC0, 0x04000068);
             Vanargand_ResetPaletteTransition(p);
             placeBody(self);

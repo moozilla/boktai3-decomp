@@ -1,18 +1,17 @@
 #include "global.h"
-
-extern u16 gUnk_03004CF0, gUnk_03004CFC, gUnk_03004D08, gUnk_03004CF8;
+#include "render.h"
 
 void Video_SetWindowBounds(u32 n, u32 a, u32 b, u32 c, u32 d)
 {
     if (n == 0) {
-        gUnk_03004CF0 = (a << 8) | c;
-        *(vu16 *)0x04000040 = gUnk_03004CF0;
-        gUnk_03004CFC = (b << 8) | d;
-        *(vu16 *)0x04000044 = gUnk_03004CFC;
+        gWindowShadow0 = (a << 8) | c;
+        *(vu16 *)0x04000040 = gWindowShadow0;
+        gWindowShadow2 = (b << 8) | d;
+        *(vu16 *)0x04000044 = gWindowShadow2;
     } else {
-        gUnk_03004D08 = (a << 8) | c;
-        *(vu16 *)0x04000042 = gUnk_03004D08;
-        gUnk_03004CF8 = (b << 8) | d;
-        *(vu16 *)0x04000046 = gUnk_03004CF8;
+        gWindowShadow3 = (a << 8) | c;
+        *(vu16 *)0x04000042 = gWindowShadow3;
+        gWindowShadow1 = (b << 8) | d;
+        *(vu16 *)0x04000046 = gWindowShadow1;
     }
 }

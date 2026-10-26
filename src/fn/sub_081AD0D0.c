@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 struct VanargandPart {
     u8 pad0[0x10];
     u16 state;
@@ -43,7 +44,6 @@ struct Vanargand {
 void Sound_PlaySong(u32);
 void Vanargand_ResetPaletteTransition(struct Vanargand *);
 void CpuSet(const void *, void *, u32);
-extern u8 *gUnk_030042E4;
 extern u16 gUnk_03004FC0[];
 
 #define LERP(dst, t, from, to, tag)                                                                \
@@ -89,7 +89,7 @@ static inline void restorePalette(struct Vanargand *p, struct Vanargand *self)
             s32 t;
             s32 r, g, b;
 
-            CpuSet(gUnk_030042E4 + 0xDE0, p->palette, 0x04000020);
+            CpuSet(gPaletteBankData + 0xDE0, p->palette, 0x04000020);
             CpuSet(p->fadeA, gUnk_03004FC0, 0x04000068);
             t = p->transition;
             LERP(r, t, 7, 0x13, r1)
@@ -120,15 +120,15 @@ static inline void restorePalette(struct Vanargand *p, struct Vanargand *self)
             break;
         }
         case 0x82:
-            CpuSet(gUnk_030042E4 + 0x1040, p->palette, 0x04000020);
+            CpuSet(gPaletteBankData + 0x1040, p->palette, 0x04000020);
             CpuSet(p->fadeB, gUnk_03004FC0, 0x04000068);
             break;
         case 0x7F:
-            CpuSet(gUnk_030042E4 + 0xFE0, p->palette, 0x04000018);
+            CpuSet(gPaletteBankData + 0xFE0, p->palette, 0x04000018);
             CpuSet(p->fadeC, gUnk_03004FC0, 0x04000068);
             break;
         default:
-            CpuSet(gUnk_030042E4 + 0x3240, self->palette, 0x04000008);
+            CpuSet(gPaletteBankData + 0x3240, self->palette, 0x04000008);
             break;
     }
     Vanargand_ResetPaletteTransition(self);

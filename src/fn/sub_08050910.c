@@ -61,11 +61,11 @@ void OrbitBackground_UpdateVisibility(struct OrbitBackground *input)
     }
 enable: {
     u32 mask = 512;
-    gUnk_03004BD8 = mask | gUnk_03004BD8;
+    gDispCntShadow = mask | gDispCntShadow;
 }
     return;
 disable: {
-    u16 *control = &gUnk_03004BD8;
+    u16 *control = &gDispCntShadow;
     u32 mask = ~512;
     *control = mask & *control;
 }

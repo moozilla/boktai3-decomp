@@ -1,5 +1,5 @@
 #include "global.h"
-extern int gUnk_030051C8;
+#include "render.h"
 void ColorFade_QueueCommand(int, int, void *);
 void SceneCommands_BlendPalette(void *p, void *unused, u8 *message)
 {
@@ -13,7 +13,7 @@ void SceneCommands_BlendPalette(void *p, void *unused, u8 *message)
     out[5] = 0;
     out[6] = *(s16 *)(message + 0x12);
     if (*(s16 *)(message + 0x14) == 1)
-        gUnk_030051C8 = 1;
+        gObjPaletteEffect = 1;
     if (!out[2] && !out[3] && !out[4]) {
         out[2] = 4;
         out[3] = 4;

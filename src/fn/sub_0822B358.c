@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct SongEntry {
     void *header;
@@ -6,7 +7,6 @@ struct SongEntry {
     u16 me;
 };
 extern const struct SongEntry gSongTable[];
-extern u32 gUnk_0300523C;
 extern u16 gUnk_03005470[]; /* song playing on each music player */
 void m4aSongNumStop(u16);
 
@@ -15,7 +15,7 @@ void m4aSongNumStop(u16);
    is cleared. */
 void Sound_StopSong(u32 song)
 {
-    u32 off = gUnk_0300523C & 6;
+    u32 off = gEnginePauseFlags & 6;
     if (off) {
         m4aSongNumStop(song);
     } else {

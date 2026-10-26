@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 // confidence=low: per-frame update for one scene actor's timers, palette transition and shadow state, and its spark and hit-record bookkeeping
 
@@ -13,7 +14,6 @@ void SparkParticle_Spawn(void *, s32, s32, s32, s32, s32);
 void SceneActorRecord_RecordPair(u16, u32);
 void SceneActorBehavior_UpdateColliders(void *);
 void SceneActorReaction_SinkAndRemove(void);
-extern u32 gUnk_030042E4;
 extern u32 gUnk_030053F4;
 extern u32 gUnk_020004B4;
 extern u32 gUnk_02000580[];
@@ -66,7 +66,7 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
             if (p[8] == 0) {
                 AnimData_SelectPaletteBank(*(u8 **)(p + 4) + 0x2C, 0);
             } else {
-                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gUnk_030042E4 + (v << 5);
+                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gPaletteBankData + (v << 5);
             }
             *(u16 *)(p + 0x1E8) = 0;
             *flags &= 0xFFFF7FFF;
@@ -76,7 +76,7 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
             if (p[8] == 0) {
                 AnimData_SelectPaletteBank(*(u8 **)(p + 4) + 0x2C, 0);
             } else {
-                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gUnk_030042E4 + (v << 5);
+                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gPaletteBankData + (v << 5);
             }
             *(u16 *)(p + 0x1E8) = 0;
             *flags &= 0xFFFF7FFF;
@@ -102,7 +102,7 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
             if (p[8] == 0) {
                 AnimData_SelectPaletteBank(*(u8 **)(p + 4) + 0x2C, 0);
             } else {
-                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gUnk_030042E4 + (v << 5);
+                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gPaletteBankData + (v << 5);
             }
             *(s16 *)(p + 0x1EA) -= 1;
         } else {
@@ -110,7 +110,7 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
             if (p[8] == 0) {
                 AnimData_SelectPaletteBank(*(u8 **)(p + 4) + 0x2C, 0);
             } else {
-                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gUnk_030042E4 + (v << 5);
+                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gPaletteBankData + (v << 5);
             }
             *(s16 *)(p + 0x1EA) = 0;
             *flags &= 0xFDFFFFFF;
@@ -129,7 +129,7 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
             if (p[8] == 0) {
                 AnimData_SelectPaletteBank(*(u8 **)(p + 4) + 0x2C, 0);
             } else {
-                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gUnk_030042E4 + (v << 5);
+                *(u32 *)(*(u8 **)(p + 4) + 0x68) = gPaletteBankData + (v << 5);
             }
             *(u16 *)(p + 0x1EA) = 0;
         } else {
@@ -145,7 +145,7 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
                 if (p[8] == 0) {
                     AnimData_SelectPaletteBank(*(u8 **)(p + 4) + 0x2C, 0);
                 } else {
-                    *(u32 *)(*(u8 **)(p + 4) + 0x68) = gUnk_030042E4 + (v << 5);
+                    *(u32 *)(*(u8 **)(p + 4) + 0x68) = gPaletteBankData + (v << 5);
                 }
                 *(s16 *)(p + 0x1EA) += 1;
             }

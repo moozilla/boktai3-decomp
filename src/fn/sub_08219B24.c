@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct PadState {
     u16 held;
@@ -8,7 +9,6 @@ struct PadState {
 };
 extern u16 gUnk_03005270;
 extern u32 gUnk_03005250;
-extern u32 gUnk_0300523C;
 extern struct PadState gUnk_03005260[2];
 extern u16 gUnk_03005274[2];
 
@@ -33,7 +33,7 @@ void sub_08219B24(void)
             keys = 0;
             PAD_UPDATE(i, keys);
         }
-    } else if (!(gUnk_0300523C & 1)) {
+    } else if (!(gEnginePauseFlags & 1)) {
         for (i = 0; i < 2; i++) {
             if (gUnk_03005274[i] == 0xFFFF)
                 keys = 0;

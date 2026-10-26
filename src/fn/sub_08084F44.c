@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 /* Script_GetPc() ? Script_GetValue() : dflt, inlined at every use */
 
@@ -18,7 +19,6 @@ void SceneActorControl_TryActivateProximity(void);
 
 // confidence=low: bat enemy setup: script parameters, animation tables, callback tables
 extern const u8 gUnk_08605C74[];
-extern u8 *gUnk_030042E4;
 
 #define BAT_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
 
@@ -293,7 +293,7 @@ s32 Bat_Init(void *arg0)
     if (BAT_AT(u8, 8) == 0)
         AnimData_SelectPaletteBank(BAT_AT(u8 *, 4) + 0x2C);
     else
-        *(u8 **)(BAT_AT(u8 *, 4) + 0x68) = gUnk_030042E4 + (r1v << 5);
+        *(u8 **)(BAT_AT(u8 *, 4) + 0x68) = gPaletteBankData + (r1v << 5);
     if (BAT_AT(u8, 8) == 1) {
         r1v = SceneActorScript_GetManagerField62();
         *(u16 *)(BAT_AT(u8 *, 4) + 0x20 + 0x3A) = r1v - 0x5FFF;

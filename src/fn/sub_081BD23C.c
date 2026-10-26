@@ -1,5 +1,6 @@
-#define gScreenFlags gUnk_03004BD8
+#define gScreenFlags gDispCntShadow
 #include "global.h"
+#include "render.h"
 struct StatGaugePreview {
     u8 unknown0[0x18];
     u8 backgroundData[0x40];
@@ -15,7 +16,6 @@ void DarkLoan_HideDisplay(void *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void Script_Call(u32, struct DirectionalScriptArgs *);
 void Task_Kill(void *);
-extern u16 gUnk_03004BD8;
 void StatGauge_UpdateClosing(struct StatGaugePreview *p)
 {
     Anim_Step(p->backgroundAnim, p->backgroundData);

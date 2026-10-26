@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct Weather {
     u8 pad[24];
     u32 timer;
@@ -12,9 +13,8 @@ struct Weather {
     int bank;
 };
 extern u8 *gUnk_02000710;
-extern u16 gUnk_03004BD8;
 extern u32 gUnk_030053F4, gUnk_030053F0;
-extern int gUnk_0200008C, gUnk_02000478, gUnk_030051E4;
+extern int gUnk_0200008C, gUnk_02000478;
 extern u8 gUnk_03005430[];
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
@@ -36,7 +36,7 @@ static inline int randomValue(void)
 static inline void flags(void)
 {
     int mask = 512;
-    gUnk_03004BD8 = mask | gUnk_03004BD8;
+    gDispCntShadow = mask | gDispCntShadow;
     {
         int bit = 4096;
         *(u32 *)(gUnk_02000710 + 0x868) |= bit;
@@ -69,7 +69,7 @@ int Weather_ActiveStorm(struct Weather *p)
     if (!Weather_TestFlags(p->flags, 8)) {
         if (!p->countdown) {
             if (!(gUnk_030053F4 & 1024) && gUnk_02000478 > 0) {
-                gUnk_030051E4 = 5;
+                gGrayscaleControl = 5;
                 Sound_PlaySong(103);
             }
             Weather_SetRandomDuration(p);

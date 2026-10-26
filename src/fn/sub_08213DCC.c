@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct Dma {
     vu32 src, dest, control;
 };
@@ -8,8 +9,8 @@ struct Task {
     u8 p12[2];
     u8 b14, b15, b16;
 };
-extern u32 gUnk_0300426C, gUnk_03001110, gUnk_0300522C, gUnk_03003A08, gUnk_03003A50, gUnk_03004264;
-extern u16 gUnk_0300427C, gUnk_030042F0;
+extern u32 gUnk_0300426C, gUnk_03001110, gUnk_03003A08, gUnk_03003A50, gUnk_03004264;
+extern u16 gUnk_0300427C;
 extern struct Task gUnk_03001118, gUnk_03001130;
 void Mosaic_Initialize(void);
 void sub_082156D8(u32);
@@ -70,13 +71,13 @@ void InterruptsAndVideo_InitRuntime(void)
     *(vu16 *)0x04000004 = (*(vu16 *)0x04000004 & 0xff) | 0x4000;
     *(vu16 *)0x04000208 = 1;
     *(vu16 *)0x04000132 = zero;
-    gUnk_0300522C = zero;
+    gSpriteAttrFlags = zero;
     Mosaic_Initialize();
     sub_082156D8(0);
     Video_SetWindowBounds(0, 0, 0, 240, 160);
     Video_SetWindowBounds(1, 0, 0, 240, 160);
     Video_SetWindowLayerMasks(0x3f, 1, 0, 0);
-    gUnk_030042F0 = zero;
+    gQueuedObjSlotCount = zero;
     gUnk_03003A08 = zero;
     Sprite_InitSystem();
     ObjShape_InitTables();

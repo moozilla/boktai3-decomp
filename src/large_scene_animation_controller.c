@@ -3,6 +3,7 @@
 #include "large_scene_animation_controller.h"
 #include "game_state.h"
 #include "engine.h"
+#include "render.h"
 
 void SceneAnimation_UpdateSlotAnimation10(struct Nidhoggr *p, s32 i)
 {
@@ -1035,8 +1036,6 @@ void Nidhoggr_UpdatePartMotion(struct Nidhoggr *t)
         Callback_InvokeActor(q, *q);
 }
 
-extern u16 gUnk_03004BD8;
-
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 
 void Bg_SetPriority(u32, u32);
@@ -1062,7 +1061,7 @@ void Nidhoggr_InitBackgrounds(struct Nidhoggr *t)
     index = 2;
     Bg_SetupLayers(3, 0, t->bgScript, 0, 0, 1, &index);
     BgGfx_LoadTilemapSimple(1, 0, 0, 0, 0);
-    Or16(0xc00, &gUnk_03004BD8);
+    Or16(0xc00, &gDispCntShadow);
     t->bgScrollX = 0;
     t->bgScrollY = 0;
     t->bgMode = 0;
@@ -1797,8 +1796,8 @@ void Nidhoggr_InitParts(void *arg0)
             Nidhoggr_OrPartFlags(collider, flags);
         }
     }
-    TimePalette_InitTransition(t->paletteTransition, gUnk_030042E4 + 0x3500, gUnk_030042E4 + 0x3560,
-                               gUnk_030042E4 + 0x3580);
+    TimePalette_InitTransition(t->paletteTransition, gPaletteBankData + 0x3500,
+                               gPaletteBankData + 0x3560, gPaletteBankData + 0x3580);
     Nidhoggr_SetPaletteIndex(&((struct NidhoggrPaletteRow *)&t->rows[21])->paletteIndex, 0xf1a3);
     Nidhoggr_SetPalette(&((struct NidhoggrPaletteRow *)&t->rows[21])->palette, &t->rowBlink[18]);
 }
@@ -2282,7 +2281,7 @@ void Nidhoggr_PlayNearbyRandomSound(struct Vec08194CB8 *pos)
 
 /* Tentative: called once per frame from Nidhoggr_Update, drives a death-flash effect while
  * t->flags[1] (0x724D) counts down (Blend_SetAlpha from a fade table gUnk_0824F588, toggling
- * bg blend bits in gUnk_03004BD8, and refreshing t->altColliders[0] at 0x5DFC), otherwise
+ * bg blend bits in gDispCntShadow, and refreshing t->altColliders[0] at 0x5DFC), otherwise
  * sets bits in t->flags[2] (0x724E); also calls sub_08194858/sub_0819494C (part completion)
  * further down. 564 bytes; not attempted byte-for-byte this pass. confidence=low. */
 
@@ -2294,13 +2293,13 @@ void Nidhoggr_UpdateDamageFlashAndPartAnimations(struct Nidhoggr *t)
     if (t->flags[1]) {
         s32 n = 0x1e - t->flags[1];
         if (n <= 0xf) {
-            Or16(0x200, &gUnk_03004BD8);
+            Or16(0x200, &gDispCntShadow);
             Blend_SetAlpha(1, 0x10, gUnk_0824F588[n]);
             Collider_Refresh(&t->altColliders[0]);
         } else {
             t->flags[2] |= 0x10;
             {
-                u16 *g = &gUnk_03004BD8;
+                u16 *g = &gDispCntShadow;
                 u32 m = ~0x200;
                 *g = *g & m;
             }
@@ -2309,7 +2308,7 @@ void Nidhoggr_UpdateDamageFlashAndPartAnimations(struct Nidhoggr *t)
         t->flags[1]--;
     } else {
         {
-            u16 *g = &gUnk_03004BD8;
+            u16 *g = &gDispCntShadow;
             u32 m = ~0x200;
             *g = *g & m;
         }

@@ -1,5 +1,5 @@
 #define GameState_GetActionDescriptionIndex SolarFruit_GetInventorySlot
-#define gAnimationPaletteData               gUnk_030042E4
+#define gAnimationPaletteData               gPaletteBankData
 #include "global.h"
 #include "scene_hud_display.h"
 #include "game_state.h"
@@ -41,9 +41,11 @@ void SceneHud_RefreshEquippedActionIcons(struct SceneHudState *p)
             a->flags &= ~1;
         }
         if (description <= 5)
-            CpuSet(gUnk_030042E4 + ((0x349 + description) << 5), p->comparisonPalette, 0x4000008);
+            CpuSet(gPaletteBankData + ((0x349 + description) << 5), p->comparisonPalette,
+                   0x4000008);
         else
-            CpuSet(gUnk_030042E4 + ((0x18A + description) << 5), p->comparisonPalette, 0x4000008);
+            CpuSet(gPaletteBankData + ((0x18A + description) << 5), p->comparisonPalette,
+                   0x4000008);
         p->comparisonActionWidget.paletteBank = 0xB000;
         p->comparisonActionWidget.palette = p->comparisonPalette;
     }

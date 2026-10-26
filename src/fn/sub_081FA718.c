@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct HalfBits {
     s32 bits : 16;
 };
@@ -50,7 +51,6 @@ struct Actor {
 #define W(o) (*(u32 *)(p + (o)))
 extern const s16 gUnk_086149C4[];
 extern u32 gUnk_02000560;
-extern u8 *gUnk_030042E4;
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
 void ScaledShadow_Disable(void *);
@@ -264,19 +264,19 @@ void Ratatosk_UpdateCollidersAndPalette(u8 *p)
         if (B(0x4ae) == 1) {
             if (S(0x4ac) < (1 << B(0x4af))) {
                 B(0x4ac)++;
-                Palette_InterpolateBanks(palette, gUnk_030042E4 + base * 32,
-                                         gUnk_030042E4 + bank * 32, S(0x4ac), B(0x4af));
+                Palette_InterpolateBanks(palette, gPaletteBankData + base * 32,
+                                         gPaletteBankData + bank * 32, S(0x4ac), B(0x4af));
             }
         } else if (B(0x4ae) == 2) {
             if (S(0x4ac) > 0) {
                 B(0x4ac)--;
-                Palette_InterpolateBanks(palette, gUnk_030042E4 + base * 32,
-                                         gUnk_030042E4 + bank * 32, S(0x4ac), B(0x4af));
+                Palette_InterpolateBanks(palette, gPaletteBankData + base * 32,
+                                         gPaletteBankData + bank * 32, S(0x4ac), B(0x4af));
             } else
                 PaletteEffect_RefreshPalette(p);
         } else if (B(0x4ae) == 3) {
-            Palette_InterpolateBanks(palette, gUnk_030042E4 + base * 32, gUnk_030042E4 + bank * 32,
-                                     S(0x4ac), B(0x4af));
+            Palette_InterpolateBanks(palette, gPaletteBankData + base * 32,
+                                     gPaletteBankData + bank * 32, S(0x4ac), B(0x4af));
             if (!B(0x4ad)) {
                 B(0x4ac)++;
                 if (S(0x4ac) > 31) {
@@ -291,7 +291,7 @@ void Ratatosk_UpdateCollidersAndPalette(u8 *p)
                 }
             }
         } else if (B(0x4ae) == 4) {
-            Palette_InterpolateBanks(palette, gUnk_030042E4 + base * 32, p + 0x6b8, S(0x4ac),
+            Palette_InterpolateBanks(palette, gPaletteBankData + base * 32, p + 0x6b8, S(0x4ac),
                                      B(0x4af));
             if (!B(0x4ad)) {
                 B(0x4ac)++;

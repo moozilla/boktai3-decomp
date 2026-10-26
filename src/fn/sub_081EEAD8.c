@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 // confidence=low: fades sprite palettes before emitting dispersal particles.
 #ifdef NONMATCHING
 // fuzzy: 94.6%
@@ -14,7 +15,6 @@ struct PackedVec {
     s32 z : 16;
     s32 pad : 16;
 };
-extern u8 *gUnk_030042E4;
 extern u16 gUnk_03005040[4][16];
 extern u32 gUnk_03005304;
 extern const u16 gUnk_086141BC[];
@@ -54,12 +54,12 @@ void SceneActors_UpdatePaletteDispersal(struct P *arg)
             register u8 *src asm("r4");
             register u8 *dest asm("r5");
             (*((s32 *)(((u8 *)p) + 0x5a8)))++;
-            Palette_InterpolateBanks(((u8 *)p) + 0x3c8, gUnk_030042E4 + 0x60,
-                                     gUnk_030042E4 + 0x3ec0, *((s32 *)(((u8 *)p) + 0x5a8)),
+            Palette_InterpolateBanks(((u8 *)p) + 0x3c8, gPaletteBankData + 0x60,
+                                     gPaletteBankData + 0x3ec0, *((s32 *)(((u8 *)p) + 0x5a8)),
                                      *((s32 *)(((u8 *)p) + 0x5ac)));
             *((void **)(((u8 *)p) + 0x35c)) = ((u8 *)p) + 0x3c8;
-            Palette_InterpolateBanks(((u8 *)p) + 0x3e8, gUnk_030042E4 + 0x40,
-                                     gUnk_030042E4 + 0x3ea0, *((s32 *)(((u8 *)p) + 0x5a8)),
+            Palette_InterpolateBanks(((u8 *)p) + 0x3e8, gPaletteBankData + 0x40,
+                                     gPaletteBankData + 0x3ea0, *((s32 *)(((u8 *)p) + 0x5a8)),
                                      *((s32 *)(((u8 *)p) + 0x5ac)));
             *((void **)(((u8 *)p) + 0x378)) = ((u8 *)p) + 0x3e8;
             i = 0;

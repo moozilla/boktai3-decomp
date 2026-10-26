@@ -53,7 +53,7 @@ s32 ModifierMenu_InitializeGraphics(struct ModifierMenu *menu)
         remaining--;
         object++;
     } while (remaining >= 0);
-    Palette_CopyBank(menu->palette, gUnk_030042E4 + 0x64e0);
+    Palette_CopyBank(menu->palette, gPaletteBankData + 0x64e0);
     object = &menu->displays[1];
     object->tile = 0x9010;
     object->palette = menu->palette;

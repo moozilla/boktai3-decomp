@@ -1,6 +1,7 @@
 #ifndef SCANLINE_PRESENTATION_H
 #define SCANLINE_PRESENTATION_H
 #include "engine.h"
+#include "render.h"
 
 // Tentative: a full-screen effect that fades per-scanline horizontal offsets (a noise ripple or
 // wave, two buffers of 160 entries swapped each frame) in and out around a set of six layers.
@@ -37,8 +38,6 @@ struct ScanlinePresentation {
     struct ScanlineLayer layers[6];
 };
 
-extern u32 gUnk_030051D4;
-extern s32 gUnk_03004DA0;
 extern u16 gUnk_03005260[];
 
 void ScanlinePresentation_UpdateNoise(struct ScanlinePresentation *p);

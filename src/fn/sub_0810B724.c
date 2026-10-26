@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "render.h"
 
 struct Reg1745Run {
     u8 pad0[0x1c];
@@ -21,7 +22,7 @@ struct Reg1745Hdr {
 };
 
 extern u32 gUnk_020001C0;
-extern u32 gUnk_03005408, gUnk_0300523C, gUnk_030053FC;
+extern u32 gUnk_03005408, gUnk_030053FC;
 extern struct Reg1745Hdr *gUnk_020004B4;
 s32 Serial_ReceivePacket(u32);
 s32 SerialLink_QueueSendWord(u32);
@@ -32,11 +33,11 @@ void System_ShutdownAndSoftReset(void);
 
 static inline void FlagSet(u32 m)
 {
-    gUnk_0300523C |= m;
+    gEnginePauseFlags |= m;
 }
 static inline void FlagClear(u32 m)
 {
-    gUnk_0300523C &= ~m;
+    gEnginePauseFlags &= ~m;
 }
 
 u32 Registry1745_RunSession(struct Reg1745Run *p)

@@ -1,6 +1,6 @@
 #include "global.h"
+#include "render.h"
 
-extern u32 gUnk_0300523C;
 struct E {
     s32 v;
     u8 f[0x48];
@@ -15,7 +15,7 @@ void VanargandAfterimagePool_Update(struct A *p)
 {
     s32 i;
     struct E *e = p->e;
-    if ((gUnk_0300523C & 7) == 0) {
+    if ((gEnginePauseFlags & 7) == 0) {
         for (i = 0; i <= 7; i++) {
             if (e->v > 0)
                 VanargandAfterimagePool_UpdateSlot(p, &p->e[i], i);

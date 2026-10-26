@@ -1,6 +1,7 @@
 #include "global.h"
 #include "actor_graphics_and_basic_states.h"
 #include "contact_actor.h"
+#include "render.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -42,7 +43,7 @@ void SceneActorGraphics_SelectResource(u8 *p)
                 *(void **)(p + 0x288) = p + 0x7c4;
             else {
                 {
-                    void *src = gUnk_030042E4 + resource * 32;
+                    void *src = gPaletteBankData + resource * 32;
                     register void *dst asm("r1") = p + 0x3c4;
                     CpuSet(src, dst, 0x4000008);
                 }
@@ -1033,8 +1034,6 @@ struct T {
 
 extern u8 *gUnk_0200047C;
 
-extern u8 *gUnk_030042E4;
-
 void SceneMessages_SetPendingTrigger(void *, void *);
 
 void CpuSet(const void *, void *, u32);
@@ -1191,7 +1190,7 @@ void SceneActors_DispatchCommands(struct S *s)
                                 t->palette = t->pal7C4;
                                 break;
                             default:
-                                CpuSet(gUnk_030042E4 + r * 32, t->pal3C4, 0x04000008);
+                                CpuSet(gPaletteBankData + r * 32, t->pal3C4, 0x04000008);
                                 t->palette = t->pal3C4;
                                 break;
                         }

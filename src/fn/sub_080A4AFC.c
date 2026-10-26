@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 #define SP_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
 #define SV(d)         (Script_GetPc() ? Script_GetValue() : (d))
@@ -89,7 +90,6 @@ void *Region_FindContaining(void *);
 extern u32 *gUnk_030052F4;
 extern u32 gUnk_030052F8;
 extern u32 gUnk_030052FC;
-extern u8 *gUnk_030042E4;
 extern u8 *gUnk_02000710;
 
 /* terrain height probe: (x, y) world pos -> cell id -> height offset */
@@ -335,7 +335,7 @@ s32 Spider_Init(u8 *arg0)
     if (SP_AT(u8, 8) == 0)
         AnimData_SelectPaletteBank(SP_AT(u8 *, 4) + 0x2C);
     else
-        *(u8 **)(SP_AT(u8 *, 4) + 0x68) = gUnk_030042E4 + (r1v << 5);
+        *(u8 **)(SP_AT(u8 *, 4) + 0x68) = gPaletteBankData + (r1v << 5);
     if (SP_AT(u8, 8) == 1)
         *(u16 *)(SP_AT(u8 *, 4) + 0x5A) = SceneActorScript_GetManagerField62() - 0x5FFF;
 

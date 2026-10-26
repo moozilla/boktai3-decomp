@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 /* Sprite resource bank (header at 0x03004300): entries of 12 bytes from +0x18. */
 struct AnimResourceEntry {
@@ -28,7 +29,6 @@ struct AnimData {
     u8 *data14;
 };
 extern struct AnimResourceHeader *gUnk_03004300;
-extern u8 *gUnk_030042E4;
 /* Fills anim from the resource entry with this id; 0 if there is none. */
 s32 AnimData_Load(struct AnimData *anim, u32 id)
 {
@@ -61,7 +61,7 @@ s32 AnimData_Load(struct AnimData *anim, u32 id)
     anim->fieldB = entry->field7;
     anim->field4 = 0;
     anim->palette = info[1];
-    anim->paletteData = gUnk_030042E4 + anim->palette * 32;
+    anim->paletteData = gPaletteBankData + anim->palette * 32;
     anim->data10 = ((u32 *)info)[1] + baseC;
     anim->data14 = entry->offset + base10;
     return 1;

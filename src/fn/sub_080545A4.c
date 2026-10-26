@@ -10,9 +10,9 @@ void HitSwitch_UpdateSharedFlash(struct HitSwitchManager *manager)
     if (manager->flash) {
         manager->flash--;
         if (manager->flash == 0)
-            CpuSet(gUnk_030042E4 + 0x1AA0, manager->palette, 0x04000008);
+            CpuSet(gPaletteBankData + 0x1AA0, manager->palette, 0x04000008);
         else if (manager->flash > 15)
-            CpuSet(gUnk_030042E4 + 0x1AC0, manager->palette, 0x04000008);
+            CpuSet(gPaletteBankData + 0x1AC0, manager->palette, 0x04000008);
         else {
             s32 inverse;
             u16 *destination;
@@ -23,7 +23,7 @@ void HitSwitch_UpdateSharedFlash(struct HitSwitchManager *manager)
             register u32 mask asm("r12");
             u8 *bank;
             inverse = 16 - flash;
-            bank = gUnk_030042E4;
+            bank = gPaletteBankData;
             {
                 u16 *address = (u16 *)(bank + 0x1AC0);
                 from = address;

@@ -1,10 +1,10 @@
 #include "global.h"
+#include "render.h"
 struct Vec50 {
     s32 x : 16, y : 16, z : 16;
 };
 extern u16 gUnk_03005418[];
 extern u32 gUnk_030053F4;
-extern u32 gUnk_0300523C;
 void sub_082359CC(u8 *);
 void HealthBurstEffect_InitParticlePool(u8 *);
 void sub_08235B34(u8 *);
@@ -62,7 +62,7 @@ s32 sub_08235C30(u8 *p, u8 *owner, u16 mode)
     gUnk_030053F4 |= 1;
     {
         u32 mask = 4;
-        gUnk_0300523C |= mask;
+        gEnginePauseFlags |= mask;
     }
     if (*(u16 *)(p + 0x34c) == 0)
         HealthBurstEffect_InitSprites(p);

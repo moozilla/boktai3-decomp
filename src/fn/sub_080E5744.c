@@ -5,6 +5,7 @@
 // script helper scopes and register allocation remain nonmatching.
 #include "scene_actor_control_motion.h"
 #include "scene_actor_terrain.h"
+#include "render.h"
 #define U8(p, n)  (*((u8 *)(p) + (n)))
 #define U16(p, n) (*(u16 *)((u8 *)(p) + (n)))
 #define S16(p, n) (*(s16 *)((u8 *)(p) + (n)))
@@ -36,7 +37,6 @@ void SceneActorReaction_SinkAndRemove(void);
 void SceneActorReaction_ResolveDamage(void);
 void SceneActorPlacement_PlayResponseAndResetState(void);
 void SceneActorScript_OnCommand(void);
-extern u8 *gUnk_030042E4;
 extern u8 *gUnk_02000580[];
 void SceneActor_RefreshLivingCountAndProfile(void *);
 void TargetRegistry_RegisterActor(void *, void *, void *);
@@ -558,7 +558,7 @@ s32 Dog_Init(struct SceneActorRegistryResetView *a)
     if (!a->drawableKind)
         AnimData_SelectPaletteBank((u8 *)a->drawable + 0x2C, a->basePaletteBank + a->paletteOffset);
     else
-        PTR(a->drawable, 0x68) = gUnk_030042E4 + (a->basePaletteBank + a->paletteOffset) * 32;
+        PTR(a->drawable, 0x68) = gPaletteBankData + (a->basePaletteBank + a->paletteOffset) * 32;
     if (a->drawableKind == 1)
         U16(a->drawable, 0x5A) = SceneActorScript_GetManagerField62() - 0x5FFF;
     InitializeCallbacks(a);

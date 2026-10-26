@@ -1,13 +1,8 @@
 #include "global.h"
+#include "render.h"
 
 extern s16 gUnk_03004C10;
 extern s16 gUnk_03004BE8;
-extern u16 gUnk_03004BB0;
-extern u16 gUnk_03004C14;
-extern u16 gUnk_03004BFC;
-extern s16 gUnk_03004BD0[4];
-extern s32 gUnk_03004BF8;
-extern s32 gUnk_03004C00;
 extern const s16 gUnk_086149C4[];
 
 s32 __divsi3(s32, s32);
@@ -32,20 +27,22 @@ void Bg_SetAffineTransform(s32 x, s32 y, s32 angle, u16 scaleX, s32 scaleY)
 {
     gUnk_03004C10 = x;
     gUnk_03004BE8 = y;
-    gUnk_03004BB0 = angle;
-    gUnk_03004C14 = scaleX;
-    gUnk_03004BFC = scaleY;
+    gBgAffineAngle = angle;
+    gBgAffineScaleX = scaleX;
+    gBgAffineScaleY = scaleY;
     /* The table uses 12 fractional bits; the affine matrix uses eight. */
-    gUnk_03004BD0[0] = FixedMultiply((gUnk_086149C4[(gUnk_03004BB0 + 64) & 255] >> 4),
-                                     FixedDivide(256, gUnk_03004C14));
-    gUnk_03004BD0[1] =
-        FixedMultiply((gUnk_086149C4[gUnk_03004BB0 & 255] >> 4), FixedDivide(256, gUnk_03004C14));
-    gUnk_03004BD0[2] =
-        FixedMultiply((-gUnk_086149C4[gUnk_03004BB0 & 255] >> 4), FixedDivide(256, gUnk_03004BFC));
-    gUnk_03004BD0[3] = FixedMultiply((gUnk_086149C4[(gUnk_03004BB0 + 64) & 255] >> 4),
-                                     FixedDivide(256, gUnk_03004BFC));
-    gUnk_03004BF8 = ((120 - gUnk_03004C10) << 8) - 120 * gUnk_03004BD0[0] - 80 * gUnk_03004BD0[1];
-    gUnk_03004C00 = ((120 - gUnk_03004BE8) << 8) - 120 * gUnk_03004BD0[2] - 80 * gUnk_03004BD0[3];
+    gBgAffineMatrix[0] = FixedMultiply((gUnk_086149C4[(gBgAffineAngle + 64) & 255] >> 4),
+                                       FixedDivide(256, gBgAffineScaleX));
+    gBgAffineMatrix[1] = FixedMultiply((gUnk_086149C4[gBgAffineAngle & 255] >> 4),
+                                       FixedDivide(256, gBgAffineScaleX));
+    gBgAffineMatrix[2] = FixedMultiply((-gUnk_086149C4[gBgAffineAngle & 255] >> 4),
+                                       FixedDivide(256, gBgAffineScaleY));
+    gBgAffineMatrix[3] = FixedMultiply((gUnk_086149C4[(gBgAffineAngle + 64) & 255] >> 4),
+                                       FixedDivide(256, gBgAffineScaleY));
+    gBgAffineRefX =
+        ((120 - gUnk_03004C10) << 8) - 120 * gBgAffineMatrix[0] - 80 * gBgAffineMatrix[1];
+    gBgAffineRefY =
+        ((120 - gUnk_03004BE8) << 8) - 120 * gBgAffineMatrix[2] - 80 * gBgAffineMatrix[3];
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08215B18);

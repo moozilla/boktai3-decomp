@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_vec.h"
+#include "render.h"
 
 static inline void SetVector(struct SceneVec *v, s32 x, s32 y, s32 z, s32 pad)
 {
@@ -16,7 +17,6 @@ struct SceneHudPrompt {
 };
 extern const u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
-extern u32 gUnk_0300523C;
 s32 Mod(s32, s32);
 void *SpriteEffectController_Create(const struct SceneVec *, const struct SceneVec *, u32, u32, u32,
                                     u32, u32, u32, u32, u32, u32, u32, s32, s32, s32, s32, s32,
@@ -77,7 +77,7 @@ void Hud_UpdateEquipmentPrompt(struct SceneHudPrompt *hud)
         if (!hud->effectCountdown)
             hud->effectCountdown = 1;
     }
-    if (!(gUnk_0300523C & 1)) {
+    if (!(gEnginePauseFlags & 1)) {
         Hud_RefreshActivePanel(hud);
         if (PauseMenu_TryBeginEquipmentSelection(hud))
             Sound_PlaySong(0x10C);

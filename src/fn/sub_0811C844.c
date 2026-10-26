@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_030042E4;
+#include "render.h"
 s32 CharacterModel_GetPrimaryPaletteIndex(u8 *);
 void CharacterModel_InitPalettes(u8 *s, s32 n)
 {
@@ -7,8 +7,8 @@ void CharacterModel_InitPalettes(u8 *s, s32 n)
     u8 *d;
     s32 i;
     u32 c;
-    a = gUnk_030042E4 + (CharacterModel_GetPrimaryPaletteIndex(s) << 5);
-    b = gUnk_030042E4 + ((n + 0x379) << 5);
+    a = gPaletteBankData + (CharacterModel_GetPrimaryPaletteIndex(s) << 5);
+    b = gPaletteBankData + ((n + 0x379) << 5);
     d = s + 0x210;
     CpuSet(a, d, 0x10);
     CpuSet(b, s + 0x230, 0x10);

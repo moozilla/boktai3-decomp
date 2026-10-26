@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: checks light, cooldown, and random volume before entering storm phase one.
 #define Weather_UpdateStormTrigger sub_08017A6C
@@ -10,7 +11,6 @@ struct Weather {
     u8 enabled, flags;
 };
 extern u8 *gUnk_02000710;
-extern u16 gUnk_03004BD8;
 extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_03005308;
 extern s32 gUnk_02000080, gUnk_02000084;
 #define RANDOM_TABLE ((u16 *)0x0203B400)
@@ -59,7 +59,7 @@ s32 Weather_UpdateStormTrigger(struct Weather *p)
         p->entered = 0;
         ClearStormFlag();
         Palette_SetBrightnessMode(0);
-        ClearDisplayFlag(&gUnk_03004BD8, ~0x200);
+        ClearDisplayFlag(&gDispCntShadow, ~0x200);
     }
     if (!Weather_TestFlags(p->flags, 2)) {
         s32 volume = Weather_GetStormVolume(p);

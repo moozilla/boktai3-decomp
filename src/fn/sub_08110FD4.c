@@ -1,5 +1,6 @@
 #include "global.h"
 #include "background_controller.h"
+#include "render.h"
 #define TilemapPanel_LoadScriptMap SceneTilemap_LoadLayoutFromScript
 #define gTilemapPanel              gUnk_020004B8
 struct TilemapPanel {
@@ -19,7 +20,6 @@ struct TilemapPanel {
     u16 *screenMap;
 };
 extern struct TilemapPanel *gUnk_020004B8;
-extern u16 gUnk_03004BD8;
 
 extern const u8 gUnk_0860B2D0[], gUnk_08607DB0[], gUnk_08606550[];
 extern const u8 gUnk_0860E3D0[], gUnk_0860A470[], gUnk_08609610[];
@@ -64,7 +64,7 @@ s32 TilemapPanel_Initialize(struct TilemapPanel *p)
     *(vu16 *)0x04000018 = 0;
     {
         u32 mask = 0x400;
-        gUnk_03004BD8 = mask | gUnk_03004BD8;
+        gDispCntShadow = mask | gDispCntShadow;
     }
     gUnk_03004C30[2].y = 0;
     TilemapPanel_DrawRegion(p, 0, 0, 0, 0, 8, 1, 4, 20, 0, 0);

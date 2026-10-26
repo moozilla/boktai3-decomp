@@ -1,6 +1,7 @@
 #ifndef PALETTE_SET_H
 #define PALETTE_SET_H
 #include "engine.h"
+#include "render.h"
 
 // Tentative: a task holding up to six 16 color palettes that are blended between two source
 // variants and an overlay, then uploaded to palette slots every frame.
@@ -24,7 +25,6 @@ struct PaletteSet {
 };
 
 extern u8 gUnk_03005430[]; // game state bytes (14: current, 15: previous; guess)
-extern u32 gUnk_03004DA4, gUnk_030051CC, gUnk_030051C0;
 
 int Palette_GetTransitionLevel(void);
 int Palette_GetBrightness(void);

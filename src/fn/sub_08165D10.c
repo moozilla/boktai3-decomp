@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 struct PaletteBlendHud {
     u8 f0[0xA18];
     u16 buf[16];
@@ -9,7 +10,6 @@ struct PaletteBlendHud {
     u8 duration;
     u8 active;
 };
-extern u16 *gUnk_030042E4;
 s32 Div(s32, s32);
 s32 SceneHud_TickPaletteBlend(struct PaletteBlendHud *p0)
 {
@@ -23,8 +23,8 @@ s32 SceneHud_TickPaletteBlend(struct PaletteBlendHud *p0)
     u32 channelShift = 5;
     if (!p->active)
         return 1;
-    fromPalette = (u16 *)(((u8 *)gUnk_030042E4) + (p->from << channelShift));
-    toPalette = (u16 *)(((u8 *)gUnk_030042E4) + (p->to << channelShift));
+    fromPalette = (u16 *)(((u8 *)gPaletteBankData) + (p->from << channelShift));
+    toPalette = (u16 *)(((u8 *)gPaletteBankData) + (p->to << channelShift));
     framep = &p->frame;
     ++*framep;
     durp = &p->duration;

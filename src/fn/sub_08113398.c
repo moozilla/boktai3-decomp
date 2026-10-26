@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct DebrisPos {
     s16 x, y, z, pad;
 };
@@ -18,7 +19,6 @@ struct DebrisPool {
     struct Debris entries[64];
 };
 extern struct DebrisPool *gUnk_020004C4;
-extern u8 *gUnk_030042E4;
 struct DebrisPool *SceneDebrisPool_EnsureSingleton(void);
 void PanelSprite_Create(struct Debris *, u32, u32, u32, u32, u32, u32, u32);
 void PanelKeyframeSprite_Create(struct Debris *, u32, u32, u32, u32);
@@ -68,7 +68,7 @@ s32 sub_08113398(struct DebrisPos *pos, struct DebrisPos *velocity, u32 a2, u32 
                 PanelKeyframeSprite_Create(e, a2, a4, a11, a12);
                 visual = e->visual;
                 if (palette >= 0)
-                    visual->palette = gUnk_030042E4 + palette * 32;
+                    visual->palette = gPaletteBankData + palette * 32;
             }
             switch (motion) {
                 case 0:

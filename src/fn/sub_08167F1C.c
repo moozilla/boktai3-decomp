@@ -1,5 +1,6 @@
-#define gSpriteTileBase gUnk_030042E4
+#define gSpriteTileBase gPaletteBankData
 #include "global.h"
+#include "render.h"
 
 /* HUD interpretation and descriptive names are tentative. */
 struct HudIcon {
@@ -20,7 +21,6 @@ struct HudIconOffset {
     u32 z : 16;
     u32 pad : 16;
 };
-extern u8 *gUnk_030042E4;
 void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void Hud_InitializeThreeIcons(struct Hud *hud)
 {
@@ -39,6 +39,6 @@ void Hud_InitializeThreeIcons(struct Hud *hud)
         offset.x = (i + 14) * 8;
         Widget_InitLinked(icon, hud->resource, 0x29, 0x10031, zero, zero, 60, &offset);
         icon->tile = zero;
-        hud->icons[j].tiles = gUnk_030042E4 + (icon->tile << 5);
+        hud->icons[j].tiles = gPaletteBankData + (icon->tile << 5);
     }
 }

@@ -1,5 +1,5 @@
 #include "global.h"
-extern u16 gUnk_03004BD8;
+#include "render.h"
 extern u8 gUnk_03004FC0[];
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
@@ -20,7 +20,7 @@ void Presentation_InitializeBackground(void)
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     one = 1;
     {
-        u16 *g = &gUnk_03004BD8;
+        u16 *g = &gDispCntShadow;
         u32 a = ~1;
         u32 b = *g;
         a &= b;

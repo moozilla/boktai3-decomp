@@ -890,8 +890,8 @@ void TetherActor_UpdateGlow(struct TetherActor *actor)
 
 void TetherActor_BlendPalette(struct TetherActor *s)
 {
-    u16 *a = (u16 *)(gUnk_030042E4 + (s->paletteIndex + 0x283) * 32);
-    u16 *b = (u16 *)(gUnk_030042E4 + 0x5160);
+    u16 *a = (u16 *)(gPaletteBankData + (s->paletteIndex + 0x283) * 32);
+    u16 *b = (u16 *)(gPaletteBankData + 0x5160);
     s32 inv = 64 - s->paletteBlend;
     s32 weight = s->paletteBlend;
     s32 i = 0;

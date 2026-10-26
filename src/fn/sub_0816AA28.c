@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_030051D8;
+#include "render.h"
 void Hud_InitSelectionBounds(s32, s32);
 void MessageWindow_Clear(void);
 void ScrollingDialogue_ClearScript(void);
@@ -23,7 +23,7 @@ void sub_0816AA28(u8 *hud)
     }
     if (++*timer > 18) {
         PauseMenu_RestoreDisplayState(hud);
-        gUnk_030051D8 = *(u16 *)(hud + 0xa12);
+        gFadeMultiplier = *(u16 *)(hud + 0xa12);
         Hud_SetUpdateCallback(hud, SceneHud_FinishPageExit);
     }
 }

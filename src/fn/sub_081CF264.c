@@ -61,15 +61,15 @@ void SceneNpc_UpdateTransitionFade(void *ctx, struct SceneNpc *npc, s32 tick)
     }
     if (npc->callback(npc) != 1) {
         if (tick == 0) {
-            CpuSet(gUnk_030042E4 + 0x2B00, npc->palette, 0x04000008);
+            CpuSet(gPaletteBankData + 0x2B00, npc->palette, 0x04000008);
         } else {
             fade = tick - 0x50;
             if (fade <= 0x1F) {
-                u8 *a = gUnk_030042E4 + 0x2B00;
-                u8 *b = gUnk_030042E4 + 0x2AE0;
+                u8 *a = gPaletteBankData + 0x2B00;
+                u8 *b = gPaletteBankData + 0x2AE0;
                 Palette_InterpolateBanks(npc->palette, a, b, fade, 5);
             } else if (tick == 0x70) {
-                CpuSet(gUnk_030042E4 + 0x2AE0, npc->palette, 0x04000008);
+                CpuSet(gPaletteBankData + 0x2AE0, npc->palette, 0x04000008);
             }
         }
         {

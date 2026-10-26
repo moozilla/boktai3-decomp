@@ -1,0 +1,487 @@
+addr,name,size,kind,decl,header,confidence,notes
+02000000,gUnk_02000000,10,object,,,,
+02000010,gUnk_02000010,10,object,,,,
+02000020,gUnk_02000020,4,object,,,,
+02000024,gUnk_02000024,4,object,,,,
+02000028,gUnk_02000028,4,object,,,,
+0200002C,gUnk_0200002C,4,object,,,,
+02000030,gUnk_02000030,4,object,,,,
+02000034,gUnk_02000034,4,object,,,,
+02000038,gUnk_02000038,4,object,,,,
+0200003C,gUnk_0200003C,4,object,,,,
+02000040,gUnk_02000040,4,object,,,,
+02000044,gUnk_02000044,4,object,,,,
+02000048,gUnk_02000048,4,object,,,,
+0200004C,gUnk_0200004C,4,object,,,,
+02000050,gUnk_02000050,4,object,,,,
+02000054,gUnk_02000054,4,object,,,,
+02000058,gUnk_02000058,4,object,,,,
+0200005C,gUnk_0200005C,4,object,,,,
+02000060,gUnk_02000060,4,object,,,,
+02000064,gUnk_02000064,4,object,,,,
+02000068,gUnk_02000068,4,object,,,,
+0200006C,gUnk_0200006C,4,object,,,,
+02000070,gUnk_02000070,4,object,,,,
+02000074,gUnk_02000074,4,object,,,,
+02000078,gUnk_02000078,4,object,,,,
+0200007C,gUnk_0200007C,4,object,,,,
+02000080,gUnk_02000080,4,object,,,,
+02000084,gUnk_02000084,4,object,,,,
+02000088,gUnk_02000088,4,object,,,,
+0200008C,gUnk_0200008C,4,object,,,,
+02000090,gUnk_02000090,4,object,,,,
+02000094,gUnk_02000094,4,object,,,,
+02000098,gUnk_02000098,4,object,,,,
+0200009C,gUnk_0200009C,4,object,,,,
+020000A0,gUnk_020000A0,4,object,,,,
+020000A4,gUnk_020000A4,4,object,,,,
+020000A8,gUnk_020000A8,4,object,,,,
+020000AC,gUnk_020000AC,4,object,,,,
+020000B0,gUnk_020000B0,4,object,,,,
+020000B8,gUnk_020000B8,24,object,,,,
+020000D8,gUnk_020000D8,,interior,,,,gUnk_020000B8 +0x20
+020000DC,gUnk_020000DC,4,object,,,,
+020000E0,gUnk_020000E0,4,object,,,,
+020000E4,gUnk_020000E4,4,object,,,,
+020000E8,gUnk_020000E8,4,object,,,,
+020000EC,gUnk_020000EC,1,object,,,,
+020000F0,gUnk_020000F0,4,object,,,,
+020000F4,gUnk_020000F4,4,object,,,,
+020000F8,gUnk_020000F8,4,object,,,,
+020000FC,gUnk_020000FC,4,object,,,,
+02000100,gUnk_02000100,4,object,,,,
+02000104,gUnk_02000104,4,object,,,,
+02000108,gUnk_02000108,4,object,,,,
+0200010C,gUnk_0200010C,4,object,,,,
+02000110,gUnk_02000110,4,object,,,,
+02000114,gUnk_02000114,4,object,,,,
+02000118,gUnk_02000118,4,object,,,,
+0200011C,gUnk_0200011C,4,object,,,,
+02000120,gUnk_02000120,4,object,,,,
+02000124,gUnk_02000124,4,object,,,,
+02000128,gUnk_02000128,4,object,,,,
+0200012C,gUnk_0200012C,4,object,,,,
+02000130,gUnk_02000130,4,object,,,,
+02000134,gUnk_02000134,4,object,,,,
+02000138,gUnk_02000138,4,object,,,,
+0200013C,gUnk_0200013C,4,object,,,,
+02000140,gUnk_02000140,4,object,,,,
+02000144,gUnk_02000144,4,object,,,,
+02000148,gUnk_02000148,4,object,,,,
+0200014C,gUnk_0200014C,4,object,,,,
+02000150,gUnk_02000150,4,object,,,,
+02000154,gUnk_02000154,4,object,,,,
+02000158,gUnk_02000158,4,object,,,,
+0200015C,gUnk_0200015C,4,object,,,,
+02000160,gUnk_02000160,4,object,,,,
+02000164,gUnk_02000164,4,object,,,,
+02000168,gUnk_02000168,4,object,,,,
+0200016C,gUnk_0200016C,4,object,,,,
+02000170,gUnk_02000170,4,object,,,,
+02000174,gUnk_02000174,4,object,,,,
+02000178,gUnk_02000178,4,object,,,,
+0200017C,gUnk_0200017C,4,object,,,,
+02000180,gUnk_02000180,4,object,,,,
+02000184,gUnk_02000184,4,object,,,,
+02000188,gUnk_02000188,4,object,,,,
+0200018C,gUnk_0200018C,4,object,,,,
+02000190,gUnk_02000190,4,object,,,,
+02000194,gUnk_02000194,4,object,,,,
+02000198,gUnk_02000198,4,object,,,,
+0200019C,gUnk_0200019C,4,object,,,,
+020001A0,gUnk_020001A0,4,object,,,,
+020001A4,gUnk_020001A4,4,object,,,,
+020001A8,gUnk_020001A8,4,object,,,,
+020001AC,gUnk_020001AC,4,object,,,,
+020001B0,gUnk_020001B0,4,object,,,,
+020001B4,gUnk_020001B4,4,object,,,,
+020001B8,gUnk_020001B8,4,object,,,,
+020001BC,gUnk_020001BC,4,object,,,,
+020001C0,gUnk_020001C0,4,object,,,,
+020001C4,gUnk_020001C4,4,object,,,,
+020001C8,gUnk_020001C8,4,object,,,,
+020001CC,gUnk_020001CC,4,object,,,,
+020001D0,gUnk_020001D0,4,object,,,,
+020001D4,gUnk_020001D4,4,object,,,,
+020001D8,gUnk_020001D8,4,object,,,,
+020001DC,gUnk_020001DC,4,object,,,,
+020001E0,gUnk_020001E0,4,object,,,,
+020001E4,gUnk_020001E4,4,object,,,,
+020001E8,gUnk_020001E8,4,object,,,,
+020001F0,gUnk_020001F0,8,object,,,,
+020001F8,gUnk_020001F8,4,object,,,,
+020001FC,gUnk_020001FC,4,object,,,,
+02000200,gUnk_02000200,4,object,,,,
+02000204,gUnk_02000204,4,object,,,,
+02000208,gUnk_02000208,4,object,,,,
+0200020C,gUnk_0200020C,4,object,,,,
+02000210,gUnk_02000210,4,object,,,,
+02000214,gUnk_02000214,4,object,,,,
+02000218,gUnk_02000218,4,object,,,,
+0200021C,gUnk_0200021C,4,object,,,,
+02000220,gUnk_02000220,4,object,,,,
+0200022C,gUnk_0200022C,4,object,,,,
+02000230,gUnk_02000230,4,object,,,,
+02000234,gUnk_02000234,4,object,,,,
+02000238,gUnk_02000238,4,object,,,,
+0200023C,gUnk_0200023C,4,object,,,,
+02000240,gUnk_02000240,4,object,,,,
+02000244,gUnk_02000244,4,object,,,,
+02000250,gUnk_02000250,4,object,,,,
+02000254,gUnk_02000254,4,object,,,,
+02000258,gUnk_02000258,4,object,,,,
+0200025C,gUnk_0200025C,4,object,,,,
+02000260,gUnk_02000260,4,object,,,,
+02000264,gUnk_02000264,4,object,,,,
+02000268,gUnk_02000268,4,object,,,,
+0200026C,gUnk_0200026C,4,object,,,,
+02000274,gUnk_02000274,4,object,,,,
+02000278,gUnk_02000278,,object,,,,
+02000298,gUnk_02000298,4,object,,,,
+020002A0,gUnk_020002A0,20,object,,,,
+020002C0,gUnk_020002C0,28,object,,,,
+020002E8,gUnk_020002E8,10,object,,,,
+020002F8,gUnk_020002F8,18,object,,,,
+02000310,gUnk_02000310,14,object,,,,
+02000328,gUnk_02000328,18,object,,,,
+02000340,gUnk_02000340,14,object,,,,
+02000358,gUnk_02000358,1C,object,,,,
+02000378,gUnk_02000378,C,object,,,,
+02000388,gUnk_02000388,14,object,,,,
+020003A0,gUnk_020003A0,1C,object,,,,
+020003C0,gUnk_020003C0,8,object,,,,
+020003C8,gUnk_020003C8,4,object,,,,
+020003D0,gUnk_020003D0,28,object,,,,
+020003F8,gUnk_020003F8,28,object,,,,
+02000420,gUnk_02000420,8,object,,,,
+02000428,gUnk_02000428,C,object,,,,
+02000438,gUnk_02000438,10,object,,,,
+02000448,gUnk_02000448,14,object,,,,
+02000458,gUnk_02000458,,interior,,,,gUnk_02000448 +0x10
+02000468,gUnk_02000468,4,object,,,,
+0200046C,gUnk_0200046C,4,object,,,,
+02000470,gUnk_02000470,4,object,,,,
+02000474,gUnk_02000474,4,object,,,,
+02000478,gUnk_02000478,4,object,,,,
+0200047C,gUnk_0200047C,4,object,,,,
+02000480,gUnk_02000480,4,object,,,,
+02000484,gUnk_02000484,4,object,,,,
+02000488,gUnk_02000488,4,object,,,,
+0200048C,gUnk_0200048C,4,object,,,,
+02000490,gUnk_02000490,4,object,,,,
+02000494,gUnk_02000494,4,object,,,,
+02000498,gUnk_02000498,4,object,,,,
+0200049C,gUnk_0200049C,4,object,,,,
+020004A0,gUnk_020004A0,4,object,,,,
+020004A4,gUnk_020004A4,4,object,,,,
+020004A8,gUnk_020004A8,4,object,,,,
+020004AC,gUnk_020004AC,4,object,,,,
+020004B0,gUnk_020004B0,4,object,,,,
+020004B4,gUnk_020004B4,4,object,,,,
+020004B8,gUnk_020004B8,4,object,,,,
+020004BC,gUnk_020004BC,4,object,,,,
+020004C0,gUnk_020004C0,4,object,,,,
+020004C4,gUnk_020004C4,4,object,,,,
+020004C8,gUnk_020004C8,4,object,,,,
+020004CC,gUnk_020004CC,4,object,,,,
+020004D0,gUnk_020004D0,4,object,,,,
+020004D4,gUnk_020004D4,4,object,,,,
+020004D8,gUnk_020004D8,14,object,,,,
+020004F0,gUnk_020004F0,C,object,,,,
+02000500,gUnk_02000500,4,object,,,,
+02000504,gUnk_02000504,2,object,,,,
+02000508,gUnk_02000508,A,object,,,,
+02000514,gUnk_02000514,2,object,,,,
+02000518,gUnk_02000518,8,object,,,,
+02000520,gUnk_02000520,8,object,,,,
+02000528,gUnk_02000528,2,object,,,,
+0200052C,gUnk_0200052C,6,object,,,,
+02000534,gUnk_02000534,8,object,,,,
+0200053C,gUnk_0200053C,2,object,,,,
+02000544,gUnk_02000544,2,object,,,,
+02000548,gUnk_02000548,8,object,,,,
+0200054C,gUnk_0200054C,,interior,,,,gUnk_02000548 +0x4
+02000550,gUnk_02000550,2,object,,,,
+02000554,gUnk_02000554,2,object,,,,
+02000558,gUnk_02000558,2,object,,,,
+02000560,gUnk_02000560,14,object,,,,
+02000570,gUnk_02000570,,interior,,,,gUnk_02000560 +0x10
+02000580,gUnk_02000580,14,object,,,,
+02000590,gUnk_02000590,,interior,,,,gUnk_02000580 +0x10
+02000594,gUnk_02000594,2,object,,,,
+02000598,gUnk_02000598,4,object,,,,
+0200059C,gUnk_0200059C,4,object,,,,
+020005A0,gUnk_020005A0,2,object,,,,
+020005A4,gUnk_020005A4,2,object,,,,
+020005A8,gUnk_020005A8,2,object,,,,
+020005AC,gUnk_020005AC,4,object,,,,
+020005B4,gUnk_020005B4,2,object,,,,
+020005C0,gUnk_020005C0,1A,object,,,,
+020005DC,gUnk_020005DC,4,object,,,,
+020005E0,gUnk_020005E0,4,object,,,,
+020005E4,gUnk_020005E4,4,object,,,,
+020005E8,gUnk_020005E8,4,object,,,,
+020005EC,gUnk_020005EC,4,object,,,,
+020005F0,gUnk_020005F0,4,object,,,,
+020005F4,gUnk_020005F4,4,object,,,,
+020005F8,gUnk_020005F8,4,object,,,,
+020005FC,gUnk_020005FC,4,object,,,,
+02000600,gUnk_02000600,4,object,,,,
+02000604,gUnk_02000604,4,object,,,,
+02000608,gUnk_02000608,4,object,,,,
+0200060C,gUnk_0200060C,4,object,,,,
+02000610,gUnk_02000610,70,object,,,,
+02000700,gUnk_02000700,4,object,,,,
+02000704,gUnk_02000704,4,object,,,,
+02000708,gUnk_02000708,4,object,,,,
+0200070C,gUnk_0200070C,4,object,,,,
+02000710,gUnk_02000710,4,object,,,,
+02000714,gUnk_02000714,10,object,,,,
+0201F400,gUnk_0201F400,4,object,,,,
+02037000,gUnk_02037000,,object,,,,
+02039000,gUnk_02039000,8,object,,,,
+0203B000,gUnk_0203B000,8,object,,,,
+0203B400,gUnk_0203B400,802,object,,,,
+0203C400,gUnk_0203C400,,object,,,,
+03000000,gUnk_03000000,FC,object,,,,
+03001110,gUnk_03001110,4,object,,,,
+03001118,gUnk_03001118,18,object,,,,
+03001130,gUnk_03001130,18,object,,,,
+03001148,gUnk_03001148,8,object,,,,
+03001548,gUnk_03001548,2,object,,,,
+0300154C,gUnk_0300154C,2,object,,,,
+0300154E,gUnk_0300154E,2,object,,,,
+03001550,gUnk_03001550,2,object,,,,
+03001552,gUnk_03001552,2,object,,,,
+03001554,gUnk_03001554,2,object,,,,
+03001556,gUnk_03001556,2,object,,,,
+03001558,gUnk_03001558,2,object,,,,
+03001560,gUnk_03001560,1,object,,,,
+03001660,gUnk_03001660,4,object,,,,
+03001664,gUnk_03001664,4,object,,,,
+03001668,gUnk_03001668,18,object,,,,
+03001680,gUnk_03001680,4,object,,,,
+03001684,gUnk_03001684,4,object,,,,
+03001688,gUnk_03001688,4,object,,,,
+03001690,gUnk_03001690,4,object,,,,
+03001694,gUnk_03001694,4,object,,,,
+03001698,gUnk_03001698,4,object,,,,
+0300169C,gUnk_0300169C,4,object,,,,
+030016A0,gUnk_030016A0,4,object,,,,
+030016A4,gUnk_030016A4,4,object,,,,
+030016A8,gUnk_030016A8,82,object,,,,
+030016E8,gUnk_030016E8,,interior,,,,gUnk_030016A8 +0x40
+03001728,gUnk_03001728,,interior,,,,gUnk_030016E8 +0x40
+0300172A,gUnk_0300172A,2,object,,,,
+0300172C,gUnk_0300172C,4,object,,,,
+03001730,gUnk_03001730,4,object,,,,
+03001734,gUnk_03001734,4,object,,,,
+03001738,gUnk_03001738,,object,,,,
+030025A0,gUnk_030025A0,20,object,,,,
+030025E8,gUnk_030025E8,E,object,,,,
+030025F8,gUnk_030025F8,4,object,,,,
+030025FC,gUnk_030025FC,4,object,,,,
+03002600,gUnk_03002600,4,object,,,,
+03002604,gUnk_03002604,4,object,,,,
+03002608,gUnk_03002608,4,object,,,,
+030035B0,gUnk_030035B0,4,object,,,,
+030035B4,gUnk_030035B4,4,object,,,,
+030035B8,gUnk_030035B8,4,object,,,,
+030035BC,gUnk_030035BC,4,object,,,,
+030035C0,gUnk_030035C0,4,object,,,,
+030035C6,gUnk_030035C6,1,object,,,,
+030035C8,gUnk_030035C8,,object,,,,
+030035E0,gUnk_030035E0,,object,,,,
+030035F0,SoundMainRAM_Buffer,402,object,,,,
+030039F0,gUnk_030039F0,,interior,,,,SoundMainRAM_Buffer +0x400
+03003A00,gUnk_03003A00,4,object,,,,
+03003A04,gUnk_03003A04,4,object,,,,
+03003A08,gUnk_03003A08,4,object,,,,
+03003A10,gUnk_03003A10,34,object,,,,
+03003A14,gUnk_03003A14,,interior,,,,gUnk_03003A10 +0x4
+03003A44,gUnk_03003A44,4,object,,,,
+03003A48,gUnk_03003A48,4,object,,,,
+03003A4C,gUnk_03003A4C,4,object,,,,
+03003A50,gUnk_03003A50,4,object,,,,
+03003A60,gUnk_03003A60,800,object,,,,
+03004260,gUnk_03004260,4,object,,,,
+03004264,gUnk_03004264,4,object,,,,
+03004268,gUnk_03004268,4,object,,,,
+0300426C,gUnk_0300426C,4,object,,,,
+03004270,gUnk_03004270,2,object,,,,
+03004274,gUnk_03004274,2,object,,,,
+03004278,gUnk_03004278,4,object,,,,
+0300427C,gUnk_0300427C,2,object,,,,
+03004280,gVBlankDialogueState,4,object,extern u32 gVBlankDialogueState;,include/render.h,high physical shape; provisional semantic name,scrolling-dialogue/video state copied during VBlank (guess)
+03004290,gRenderListIndex,4,object,extern u32 gRenderListIndex;,include/render.h,high physical shape; provisional semantic name,active list index into the three render list-head pairs
+03004294,gSpriteRenderCallback,4,object,extern u32 gSpriteRenderCallback;,include/render.h,high physical shape; provisional semantic name,"sprite render callback, called by the graphics task (function pointer)"
+030042A0,gUnk_030042A0,14,object,,,high physical shape; provisional semantic name,Inline camera/render state; merged field map
+030042B4,gProjectedSpriteCallback,4,object,extern u32 gProjectedSpriteCallback;,include/render.h,high physical shape; provisional semantic name,projected-sprite queue callback (function pointer)
+030042B8,gExtraRenderCallback,4,object,extern u32 gExtraRenderCallback;,include/render.h,high physical shape; provisional semantic name,additional render callback (function pointer)
+030042C0,gUnk_030042C0,8,object,,,high physical shape; provisional semantic name,Sprite list heads; init loop clears two entries
+030042C8,gUnk_030042C8,8,object,,,high physical shape; provisional semantic name,Animation/main sprite list heads; init loop clears two entries
+030042D0,gUnk_030042D0,8,object,,,high physical shape; provisional semantic name,Drawable/effect list heads; init loop clears two entries
+030042D8,gDynamicTileSum,2,object,extern u16 gDynamicTileSum;,include/render.h,high physical shape; provisional semantic name,"tile count of the dynamic OBJ slots, reset and accumulated each frame"
+030042DC,gMainSpriteTileSum,2,object,extern u16 gMainSpriteTileSum;,include/render.h,high physical shape; provisional semantic name,"tile count of the main sprites, reset and accumulated each frame"
+030042E0,gPaletteBankCount,2,object,extern u16 gPaletteBankCount;,include/render.h,high physical shape; provisional semantic name,palette resource bank count
+030042E4,gPaletteBankData,4,object,extern u8 *gPaletteBankData;,include/render.h,high physical shape; provisional semantic name,Palette-bank data pointer; pointee is a repeated bank array
+030042E8,gObjTileCursor,2,object,extern s16 gObjTileCursor;,include/render.h,high physical shape; provisional semantic name,OBJ tile allocation cursor (signed loads in the allocation tests)
+030042EC,gUnk_030042EC,4,object,,,high physical shape; provisional semantic name,Loaded static sprite-tile resource header
+030042F0,gQueuedObjSlotCount,2,object,extern u16 gQueuedObjSlotCount;,include/render.h,high physical shape; provisional semantic name,queued dynamic OBJ graphics slot count
+030042F4,gStaticTileCount,2,object,extern u16 gStaticTileCount;,include/render.h,high physical shape; provisional semantic name,reserved/static OBJ tile count (some files read it signed)
+030042F8,gAnimResourceSection0C,4,object,extern u8 *gAnimResourceSection0C;,include/render.h,high physical shape; provisional semantic name,resource-bank base plus header offset +0xC
+030042FC,gAnimResourceSection14,4,object,extern u8 *gAnimResourceSection14;,include/render.h,high physical shape; provisional semantic name,resource-bank base plus header offset +0x14
+03004300,gUnk_03004300,4,object,,,high physical shape; provisional semantic name,Current animation resource header
+03004304,gArmTileUploadCount,4,object,extern u32 gArmTileUploadCount;,include/render.h,high physical shape; provisional semantic name,ARM tile-upload request count
+03004310,gUnk_03004310,80,object,,,high physical shape; provisional semantic name,"4-byte entries: angle u8, scaleX s8, scaleY s8, one unresolved byte"
+03004390,gUnk_03004390,400,object,,,high physical shape; provisional semantic name,Final 8-byte OAM entries
+03004790,gOamPriorityCounts,8,object,extern u16 gOamPriorityCounts[];,include/render.h,high physical shape; provisional semantic name,queued OAM entry count per priority (4)
+03004798,gOamCount,4,object,extern s32 gOamCount;,include/render.h,high physical shape; provisional semantic name,direct/final OAM entry count
+0300479C,gPendingOamCount,4,object,extern s32 gPendingOamCount;,include/render.h,high physical shape; provisional semantic name,depth-sorted pending OAM entry count
+030047A0,gUnk_030047A0,400,object,,,high physical shape; provisional semantic name,Pending depth-sorted OAM entries
+03004BA0,gAffineRequestCount,4,object,extern s32 gAffineRequestCount;,include/render.h,high physical shape; provisional semantic name,"affine request count, capped at 32"
+03004BB0,gBgAffineAngle,2,object,extern u16 gBgAffineAngle;,include/render.h,high physical shape; provisional semantic name,BG affine angle
+03004BC0,gBgTileUploadSrc,10,object,extern void *gBgTileUploadSrc[];,include/render.h,high physical shape; provisional semantic name,per-layer pending tile-upload source (4)
+03004BD0,gBgAffineMatrix,8,object,extern s16 gBgAffineMatrix[4];,include/render.h,high physical shape; provisional semantic name,BG affine matrix coefficients
+03004BD8,gDispCntShadow,2,object,extern u16 gDispCntShadow;,include/render.h,high physical shape; provisional semantic name,display control / BG visibility shadow
+03004BE0,gBgTileUploadParamA,8,object,extern u16 gBgTileUploadParamA[];,include/render.h,high physical shape; provisional semantic name,per-layer tile-upload parameter (4)
+03004BEC,gBgAffineMode,2,object,extern u16 gBgAffineMode;,include/render.h,high physical shape; provisional semantic name,BG affine/non-affine shadow mode
+03004BF0,gBgAffineMatrixBuffer,8,object,extern u16 gBgAffineMatrixBuffer[];,include/render.h,high physical shape; provisional semantic name,"affine coefficients copied from gBgAffineMatrix, then uploaded (4)"
+03004BF8,gBgAffineRefX,4,object,extern u32 gBgAffineRefX;,include/render.h,high physical shape; provisional semantic name,BG affine reference X accumulator
+03004BFC,gBgAffineScaleY,2,object,extern u16 gBgAffineScaleY;,include/render.h,high physical shape; provisional semantic name,BG affine Y scale
+03004C00,gBgAffineRefY,4,object,extern u32 gBgAffineRefY;,include/render.h,high physical shape; provisional semantic name,BG affine reference Y accumulator
+03004C08,gBgTileUploadParamB,8,object,extern u16 gBgTileUploadParamB[];,include/render.h,high physical shape; provisional semantic name,per-layer tile-upload parameter (4)
+03004C14,gBgAffineScaleX,2,object,extern u16 gBgAffineScaleX;,include/render.h,high physical shape; provisional semantic name,BG affine X scale
+03004C18,gBgAffineRefBuffer,8,object,extern u32 gBgAffineRefBuffer[];,include/render.h,high physical shape; provisional semantic name,buffered affine X/Y reference (2)
+03004C20,gBgScrollShadow,10,object,extern u16 gBgScrollShadow[];,include/render.h,high physical shape; provisional semantic name,four BG horizontal/vertical scroll pairs (8)
+03004C30,gUnk_03004C30,C0,object,,,high physical shape; provisional semantic name,Four 0x30-byte records; merged field map
+03004CC0,gUnk_03004CC0,,interior,,,high physical shape; provisional semantic name,"gUnk_03004C30 +0x90; Fourth background-layer record, same physical object"
+03004CF0,gWindowShadow0,2,object,extern u16 gWindowShadow0;,include/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot (which register: unknown)
+03004CF8,gWindowShadow1,2,object,extern u16 gWindowShadow1;,include/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot
+03004CFC,gWindowShadow2,2,object,extern u16 gWindowShadow2;,include/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot
+03004D08,gWindowShadow3,2,object,extern u16 gWindowShadow3;,include/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot
+03004D10,gSpriteHeightTiles,10,object,extern u8 gSpriteHeightTiles[];,include/render.h,high physical shape; provisional semantic name,sprite height in tiles per shape/size index (16)
+03004D20,gSpriteHeightPixels,10,object,extern u8 gSpriteHeightPixels[];,include/render.h,high physical shape; provisional semantic name,sprite height in pixels per shape/size index (16)
+03004D30,gSpriteTileArea,10,object,extern u8 gSpriteTileArea[];,include/render.h,high physical shape; provisional semantic name,sprite tile count per shape/size index (16)
+03004D40,gSpriteWidthTiles,10,object,extern u8 gSpriteWidthTiles[];,include/render.h,high physical shape; provisional semantic name,sprite width in tiles per shape/size index (16)
+03004D50,gSpriteShapeAttr,40,object,extern u32 gSpriteShapeAttr[];,include/render.h,high physical shape; provisional semantic name,packed OAM shape/size attribute bits per index (16)
+03004D90,gSpriteWidthPixels,10,object,extern u8 gSpriteWidthPixels[];,include/render.h,high physical shape; provisional semantic name,sprite width in pixels per shape/size index (16)
+03004DA0,gBgFadeLevel,4,object,extern s32 gBgFadeLevel;,include/render.h,high physical shape; provisional semantic name,background fade level
+03004DA4,gObjPaletteBankCount,4,object,extern u32 gObjPaletteBankCount;,include/render.h,high physical shape; provisional semantic name,allocated object-palette bank count
+03004DA8,gBgFadeApplied,4,object,extern u32 gBgFadeApplied;,include/render.h,high physical shape; provisional semantic name,cached/applied background fade level
+03004DAC,gObjFadeApplied,4,object,extern u32 gObjFadeApplied;,include/render.h,high physical shape; provisional semantic name,cached/applied object fade level
+03004DB0,gBackdropOverride,2,object,extern s16 gBackdropOverride;,include/render.h,high physical shape; provisional semantic name,backdrop override enabled flag
+03004DC0,gUnk_03004DC0,200,object,,,high physical shape; provisional semantic name,Sixteen object palette banks of 16 colors
+03004FC0,gUnk_03004FC0,200,object,,,high physical shape; provisional semantic name,Sixteen background palette banks; interior labels below alias colors
+03004FE0,gUnk_03004FE0,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x20; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
+03005000,gUnk_03005000,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x40; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
+03005020,gUnk_03005020,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x60; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
+030050E0,gUnk_030050E0,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x120; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
+03005140,gUnk_03005140,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x180; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
+03005160,gUnk_03005160,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x1A0; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
+03005164,gUnk_03005164,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x1A4; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
+03005174,gUnk_03005174,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x1B4; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
+03005176,gUnk_03005176,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x1B6; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
+0300517C,gUnk_0300517C,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x1BC; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
+03005180,gUnk_03005180,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x1C0; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
+030051A0,gUnk_030051A0,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x1E0; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
+030051C0,gObjPaletteReserved,4,object,extern u32 gObjPaletteReserved;,include/render.h,high physical shape; provisional semantic name,reserved object-palette allocation count
+030051C4,gBgFadeBankMask,2,object,extern u16 gBgFadeBankMask;,include/render.h,high physical shape; provisional semantic name,background-palette fade bank mask
+030051C8,gObjPaletteEffect,4,object,extern u32 gObjPaletteEffect;,include/render.h,high physical shape; provisional semantic name,object-palette refresh/effect control
+030051CC,gPaletteBanksInUse,4,object,extern u32 gPaletteBanksInUse;,include/render.h,high physical shape; provisional semantic name,active/reserved palette-bank count
+030051D0,gBackdropColor,2,object,extern u16 gBackdropColor;,include/render.h,high physical shape; provisional semantic name,backdrop RGB15 color
+030051D4,gObjFadeLevel,4,object,extern u32 gObjFadeLevel;,include/render.h,high physical shape; provisional semantic name,object fade/effect level
+030051D8,gFadeMultiplier,4,object,extern u32 gFadeMultiplier;,include/render.h,high physical shape; provisional semantic name,shared fade multiplier
+030051DC,gObjFadeColor,2,object,extern u16 gObjFadeColor;,include/render.h,high physical shape; provisional semantic name,object fade target color
+030051E0,gBgPaletteSource,4,object,extern u16 *gBgPaletteSource;,include/render.h,high physical shape; provisional semantic name,current background palette upload source
+030051E4,gGrayscaleControl,4,object,extern u32 gGrayscaleControl;,include/render.h,high physical shape; provisional semantic name,grayscale effect duration/control
+030051F0,gObjPaletteKeys,20,object,extern u16 gObjPaletteKeys[];,include/render.h,high physical shape; provisional semantic name,object palette key per bank (16)
+03005210,gObjFadeFlags,2,object,extern u16 gObjFadeFlags;,include/render.h,high physical shape; provisional semantic name,object palette fade exclusion/control flags
+03005214,gBgFadeColor,2,object,extern u16 gBgFadeColor;,include/render.h,high physical shape; provisional semantic name,background fade target color
+03005218,gMosaicByte,1,object,extern u8 gMosaicByte;,include/render.h,high physical shape; provisional semantic name,mosaic-related byte parameter (guess)
+0300521C,gMosaicHalfword,2,object,extern u16 gMosaicHalfword;,include/render.h,high physical shape; provisional semantic name,mosaic-related halfword parameter (guess)
+03005220,gScanlineEffectLayer,4,object,extern u32 gScanlineEffectLayer;,include/render.h,high physical shape; provisional semantic name,scanline effect layer selector
+03005224,gScanlineEffectSource,4,object,extern u16 *gScanlineEffectSource;,include/render.h,high physical shape; provisional semantic name,pending 160-line effect source; consumed then cleared
+03005228,gScanlineEffectMode,4,object,extern u32 gScanlineEffectMode;,include/render.h,high physical shape; provisional semantic name,scanline effect mode (scroll/mosaic/brightness)
+0300522C,gSpriteAttrFlags,4,object,extern u32 gSpriteAttrFlags;,include/render.h,high physical shape; provisional semantic name,sprite render/global attribute flags
+03005230,gSpriteMosaicAttr,1,object,extern u8 gSpriteMosaicAttr;,include/render.h,high physical shape; provisional semantic name,sprite mosaic/global attribute byte
+03005234,gMosaicParam,2,object,extern u16 gMosaicParam;,include/render.h,high physical shape; provisional semantic name,packed mosaic parameter (byte and halfword accesses)
+03005238,gDefaultAnimFlags,2,object,extern u16 gDefaultAnimFlags;,include/render.h,high physical shape; provisional semantic name,default animation/widget flags
+0300523C,gEnginePauseFlags,4,object,extern u32 gEnginePauseFlags;,include/render.h,high physical shape; provisional semantic name,engine pause/suspend flags (bits 1-2: sound off; task list masks)
+03005240,gUnk_03005240,2,object,,,,
+03005250,gUnk_03005250,4,object,,,,
+03005260,gUnk_03005260,10,object,,,,
+03005270,gUnk_03005270,2,object,,,,
+03005274,gUnk_03005274,A,object,,,,
+03005278,gUnk_03005278,,interior,,,,gUnk_03005274 +0x4
+03005280,gUnk_03005280,70,object,,,,
+030052F0,gUnk_030052F0,4,object,,,,
+030052F4,gUnk_030052F4,4,object,,,,
+030052F8,gUnk_030052F8,4,object,,,,
+030052FC,gUnk_030052FC,4,object,,,,
+03005300,gUnk_03005300,4,object,,,,
+03005304,gUnk_03005304,4,object,,,,
+03005308,gUnk_03005308,4,object,,,,
+0300530C,gUnk_0300530C,2,object,,,,
+03005310,gUnk_03005310,4,object,,,,
+03005314,gUnk_03005314,4,object,,,,
+03005318,gUnk_03005318,4,object,,,,
+0300531C,gUnk_0300531C,4,object,,,,
+03005320,gUnk_03005320,2,object,,,,
+03005324,gUnk_03005324,4,object,,,,
+03005330,gUnk_03005330,2,object,,,,
+03005340,gUnk_03005340,10,object,,,,
+03005350,gUnk_03005350,2,object,,,,
+03005370,gUnk_03005370,10,object,,,,
+03005380,gUnk_03005380,2,object,,,,
+03005390,gUnk_03005390,48,object,,,,
+030053D8,gUnk_030053D8,4,object,,,,
+030053DC,gUnk_030053DC,4,object,,,,
+030053E0,gUnk_030053E0,4,object,,,,
+030053E4,gUnk_030053E4,4,object,,,,
+030053E8,gUnk_030053E8,4,object,,,,
+030053EC,gUnk_030053EC,4,object,,,,
+030053F0,gUnk_030053F0,4,object,,,,
+030053F4,gUnk_030053F4,4,object,,,,
+030053F8,gUnk_030053F8,4,object,,,,
+030053FC,gUnk_030053FC,4,object,,,,
+03005400,gUnk_03005400,4,object,,,,
+03005404,gUnk_03005404,4,object,,,,
+03005408,gUnk_03005408,4,object,,,,
+0300540C,gUnk_0300540C,4,object,,,,
+03005410,gUnk_03005410,4,object,,,,
+03005414,gUnk_03005414,4,object,,,,
+03005418,gUnk_03005418,8,object,,,,
+03005420,gUnk_03005420,4,object,,,,
+03005428,gUnk_03005428,2,object,,,,
+03005430,gUnk_03005430,24,object,,,,
+03005460,gUnk_03005460,8,object,,,,
+0300546C,gUnk_0300546C,4,object,,,,
+03005470,gUnk_03005470,3E,object,,,,
+030054B0,gUnk_030054B0,4,object,,,,
+030054B4,gUnk_030054B4,2,object,,,,
+030054B8,gUnk_030054B8,2,object,,,,
+030054BC,gUnk_030054BC,2,object,,,,
+030054C0,gUnk_030054C0,2,object,,,,
+030054C4,gUnk_030054C4,2,object,,,,
+030054D0,gUnk_030054D0,C,object,,,,
+030054E0,gSoundInfo,FB0,object,,,,
+03006490,gMPlayJumpTable,90,object,,,,
+03006520,gCgbChans,40,object,,,,
+030069E0,gMPlayMemAccArea,,object,,,,
+03006A30,gUnk_03006A30,4,object,,,,
+03006A34,gUnk_03006A34,4,object,,,,
+03006A38,gUnk_03006A38,4,object,,,,
+03006A3C,gUnk_03006A3C,4,object,,,,
+03006A40,gUnk_03006A40,4,object,,,,
+03006A44,gUnk_03006A44,4,object,,,,
+03006A48,gUnk_03006A48,4,object,,,,
+03006A4C,gUnk_03006A4C,4,object,,,,
+03006A50,gUnk_03006A50,4,object,,,,
+03006A60,gUnk_03006A60,24,object,,,,
+03006A70,gUnk_03006A70,,interior,,,,gUnk_03006A60 +0x10
+03006A80,gUnk_03006A80,,interior,,,,gUnk_03006A70 +0x10
+03006A84,gUnk_03006A84,4,object,,,,
+03006A88,gUnk_03006A88,4,object,,,,
+03006A90,gUnk_03006A90,C,object,,,,
+03006A9C,gUnk_03006A9C,1564,object,,,,

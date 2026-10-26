@@ -3,13 +3,13 @@
 /* SceneActorReaction_ApplyEscalatingHit: for category-1 actors flagged 4 at +0x2DC, applies a hit whose damage doubles per stored hit count (+0x47E), shows HUD/damage numbers, restarts the route and flashes the palette; returns 1 when applied (provisional) */
 #include "scene_actor_reset.h"
 #include "area_effect_link.h"
+#include "render.h"
 void SceneActorEffects_EmitRandomOffsets(void *, s32, u32, u32, s32, s32);
 void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
 void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void SceneBody_StartRoute(void *, void *, int, int, int);
 void AnimData_SelectPaletteBank(void *, s32);
-extern u8 *gUnk_030042E4;
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
@@ -152,7 +152,7 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct SceneActorRegistryResetView *act
                 if (actor->drawableKind == 0)
                     AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
                 else
-                    FIELD(actor->drawable, 0x68, u8 *) = gUnk_030042E4 + bank * 32;
+                    FIELD(actor->drawable, 0x68, u8 *) = gPaletteBankData + bank * 32;
             }
             {
                 u32 bit = 0x2000000;

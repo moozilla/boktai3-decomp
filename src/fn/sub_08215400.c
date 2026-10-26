@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct Entry {
     u32 src;
     u16 size, count;
@@ -7,7 +8,6 @@ struct Dma {
     vu32 src, dest, control;
 };
 extern struct Entry gUnk_02039000[];
-extern u32 gUnk_03004304;
 void ObjGfx_LoadTiles(u32 start)
 {
     u32 i;
@@ -17,7 +17,7 @@ void ObjGfx_LoadTiles(u32 start)
 
     i = 0;
     /* Save the queue length before reusing src for the tile source address. */
-    src = gUnk_03004304;
+    src = gArmTileUploadCount;
     if (i < src) {
         u32 entryCount = src;
         do {
@@ -38,5 +38,5 @@ void ObjGfx_LoadTiles(u32 start)
             entry++;
         } while (i < entryCount);
     }
-    gUnk_03004304 = 0;
+    gArmTileUploadCount = 0;
 }

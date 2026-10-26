@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "render.h"
 
 struct AnimData08197A50 {
     u8 pad0[6];
@@ -25,7 +26,6 @@ struct Task08197A50 {
     u8 pad22[2];
     u8 *tiles;
 };
-extern u8 *gUnk_030042E4;
 
 void PaletteEffect_UpdateSharedOverride(void *task)
 {
@@ -39,7 +39,7 @@ void PaletteEffect_UpdateSharedOverride(void *task)
             t->tiles = anim->data->tiles;
             anim->data->id = 0x192;
             {
-                u8 *tiles = gUnk_030042E4 + 0x3240;
+                u8 *tiles = gPaletteBankData + 0x3240;
                 anim->data->tiles = tiles;
             }
         }
@@ -48,7 +48,7 @@ void PaletteEffect_UpdateSharedOverride(void *task)
             t->id = sprite->id;
             t->tiles = sprite->tiles;
             sprite->id = 0x192;
-            sprite->tiles = gUnk_030042E4 + 0x3240;
+            sprite->tiles = gPaletteBankData + 0x3240;
         }
     }
     if (t->b1e == 0)

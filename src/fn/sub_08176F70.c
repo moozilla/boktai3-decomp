@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 #define P8(o)  (*(u8 *)((u8 *)p + (o)))
 #define P16(o) (*(u16 *)((u8 *)p + (o)))
@@ -13,7 +14,6 @@ void *ScriptProc_Start(u16, u16);
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
-extern u8 *gUnk_030042E4;
 
 #define WI(w, par, id, type, a, b, pos)                                                            \
     Widget_InitLinked((w), (par), (id), (type), (a), (b), 60, (pos))
@@ -300,7 +300,7 @@ void sub_08176F70(u8 *p)
     w = p + 0x164;
     Widget_InitLinked(p + 0x4304, w, 2, 0x91, 0, 0, 0, 0);
     Widget_InitLinked(p + 0x42A4, w, 0, 0x91, 0, 0, 0, 0);
-    CpuSet(gUnk_030042E4 + 0x7540, p + 0x43B4, 0x04000008);
+    CpuSet(gPaletteBankData + 0x7540, p + 0x43B4, 0x04000008);
 }
 #else
 INCLUDE_ASM("asm/nonmatching", sub_08176F70);

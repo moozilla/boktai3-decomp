@@ -1,6 +1,6 @@
 #include "global.h"
+#include "render.h"
 
-extern u8 *gUnk_030042E4;
 void VariantSprite_SelectAnimation(void *, u32);
 s32 ForgingBook_IsWeaponDiscovered(u32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
@@ -16,7 +16,7 @@ struct FbPreview {
 s32 ForgingBook_RefreshCategoryPreview(u8 *p)
 {
     *((u8 *)(p + 0xbe5)) = 2;
-    CpuSet(gUnk_030042E4 + 0x540, p + 0xaec, 0x10);
+    CpuSet(gPaletteBankData + 0x540, p + 0xaec, 0x10);
     switch (*((s16 *)(p + 0xb60))) {
         case 0:
             *((u16 *)(p + 0xb0c)) = 0;
@@ -110,7 +110,7 @@ s32 ForgingBook_RefreshCategoryPreview(u8 *p)
                 if ((*category) == 4)
                     PlayerAttackEffect_SetEmissionState(2);
             } else {
-                struct FbPreview *src = (struct FbPreview *)(gUnk_030042E4 + 0x6a0);
+                struct FbPreview *src = (struct FbPreview *)(gPaletteBankData + 0x6a0);
                 u16 value = src->a;
                 *((u16 *)(p + 0xaf6)) = value;
                 value = src->b;

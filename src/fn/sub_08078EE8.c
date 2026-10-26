@@ -1,6 +1,6 @@
 #include "global.h"
+#include "render.h"
 
-extern u8 *gUnk_030042E4;
 extern u32 gUnk_030053F4;
 extern u32 gUnk_030053F0;
 extern u8 *gUnk_02000710;
@@ -45,7 +45,7 @@ static inline void P78EE8_SetPalette(u8 *a, u32 idx)
     if (B_AT(u8, 8) == 0)
         AnimData_SelectPaletteBank(B_AT(u8 *, 4) + 0x2C, idx);
     else
-        *(u8 **)(B_AT(u8 *, 4) + 0x68) = gUnk_030042E4 + (idx << 5);
+        *(u8 **)(B_AT(u8 *, 4) + 0x68) = gPaletteBankData + (idx << 5);
 }
 
 /* actor exists and is dead/disabled */

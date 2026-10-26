@@ -1,6 +1,7 @@
 // confidence=low: inferred from player cue phases and animation consumers.
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
+#include "render.h"
 // confidence=low: tentative cue role from callback phases.
 
 struct P {
@@ -135,7 +136,6 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
     }
 }
 
-extern u8 *gUnk_030042E4;
 void SpiralTrail_CreateWithParticles(struct P *, s32, s32, s32, s32);
 void Player_SetAnimation(struct P *, s32, s32, s32);
 #define B(o) (*(u8 *)((u8 *)p + (o)))
@@ -167,7 +167,7 @@ void PlayerCue_UpdateSpiralRecovery(struct P *p)
         u32 resource;
         resource = 0x16F;
         *target = resource;
-        W(0xD4) = (u32)(gUnk_030042E4 + (resource << 5));
+        W(0xD4) = (u32)(gPaletteBankData + (resource << 5));
     }
     {
         register u32 offset asm("r3") = 0x3FC;

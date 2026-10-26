@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 #ifdef NONMATCHING
 // fuzzy: 81.1%
@@ -23,7 +24,6 @@ s32 Player_SetAnimation(void *, s32, s32, s32);
 void Anim_SetSequence(void *, void *, s32, s32, s32);
 void PlayerCue_EnterStandUpdate(void *);
 extern u8 *gUnk_02000710;
-extern u8 *gUnk_030042E4;
 static inline u32 FrameValue(const u16 *p)
 {
     return *p;
@@ -75,7 +75,7 @@ void Player_UpdateStateMotionCue(u8 *p)
     Player_AddControlFlags(p, 64);
     Player_SetAnimation(p, 154, 64, 1);
     *((u64 *)(p + 0xAC)) = *((u64 *)(p + 0x30));
-    *((u32 *)(p + 0xD4)) = (u32)(gUnk_030042E4 + ((*((u16 *)(p + 0xC6))) * 32));
+    *((u32 *)(p + 0xD4)) = (u32)(gPaletteBankData + ((*((u16 *)(p + 0xC6))) * 32));
     if ((*((u16 *)(p + 0x45A))) <= 9) {
         struct Sequence *s = (void *)(p + 0x3FC);
         struct {

@@ -2,13 +2,13 @@
 #include "global.h"
 #include "display_animation.h"
 #include "scene_vec.h"
+#include "render.h"
 // confidence=low: handles collision damage, defeat effects, palette flashing and animation.
 #define OrangeSpine_UpdateDamageState sub_0820F378
 #ifdef NONMATCHING
 // fuzzy: 83.6%
 // Remaining: burst-vector packing, pointer lifetimes and animation register allocation.
 extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560, gUnk_03005308;
-extern u8 *gUnk_030042E4;
 extern const u16 gUnk_0203B400[];
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);

@@ -1,4 +1,4 @@
-#define gDisplayControlShadow gUnk_03004BD8
+#define gDisplayControlShadow gDispCntShadow
 #define gBgPaletteShadow      gUnk_03004FC0
 #include "global.h"
 #include "engine.h"

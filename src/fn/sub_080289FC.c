@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 // confidence=low: per-frame scene actor update: applies queued health costs, drives the overlay and body
 // collider state from the action flags, runs two countdowns, picks the palette bank, steps the effect
@@ -17,7 +18,6 @@ void Palette_InterpolateBanks(void *, void *, void *, u32, u32);
 void CameraTracking_Update(void *);
 void SceneActors_SpawnAmbientParticlePair(void *);
 void SceneActors_StopBackgroundFlash(void *);
-extern u8 *gUnk_030042E4;
 
 #ifdef NONMATCHING
 // fuzzy: 37.5%
@@ -125,23 +125,23 @@ void sub_080289FC(void *arg0)
             s32 ip = (s8)*effScale;
             if (ip < (1 << *dur)) {
                 *effScale += 1;
-                Palette_InterpolateBanks(dst, gUnk_030042E4 + (def << 5),
-                                         gUnk_030042E4 + (res << 5), (s8)*effScale, *dur);
+                Palette_InterpolateBanks(dst, gPaletteBankData + (def << 5),
+                                         gPaletteBankData + (res << 5), (s8)*effScale, *dur);
                 *(u8 **)(p + 0x288) = dst;
             }
         } else if (*(u8 *)(p + 0x38E) == 2) {
             if ((s8)*effScale > 0) {
                 *effScale -= 1;
-                Palette_InterpolateBanks(dst, gUnk_030042E4 + (def << 5),
-                                         gUnk_030042E4 + (res << 5), (s8)*effScale, *dur);
+                Palette_InterpolateBanks(dst, gPaletteBankData + (def << 5),
+                                         gPaletteBankData + (res << 5), (s8)*effScale, *dur);
                 *(u8 **)(p + 0x288) = dst;
             } else {
                 SceneActorGraphics_SelectResource(p);
             }
         } else if (*(u8 *)(p + 0x38E) == 3) {
             s32 amt = (s8)*effScale;
-            Palette_InterpolateBanks(dst, gUnk_030042E4 + (def << 5), gUnk_030042E4 + (res << 5),
-                                     amt, *dur);
+            Palette_InterpolateBanks(dst, gPaletteBankData + (def << 5),
+                                     gPaletteBankData + (res << 5), amt, *dur);
             *(u8 **)(p + 0x288) = dst;
             if (*(u8 *)(p + 0x38D) == 0) {
                 *effScale += 1;

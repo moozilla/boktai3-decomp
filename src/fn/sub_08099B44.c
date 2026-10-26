@@ -5,6 +5,7 @@
 // helper boundaries, stack layout and animation register allocation.
 #include "scene_actor_control_motion.h"
 #include "scene_actor_terrain.h"
+#include "render.h"
 #define U8(p, n)  (*((u8 *)(p) + (n)))
 #define U16(p, n) (*(u16 *)((u8 *)(p) + (n)))
 #define S16(p, n) (*(s16 *)((u8 *)(p) + (n)))
@@ -55,7 +56,6 @@ void SceneActorScript_OnCommand(void);
 void Ghost_OnActorUpdate(void);
 void Ghost_Destroy(void);
 extern const u8 gUnk_08605E14[];
-extern u8 *gUnk_030042E4;
 extern u8 *gUnk_02000580[];
 struct GhostRoutePoint {
     s16 x, z;
@@ -529,7 +529,7 @@ s32 Ghost_Init(struct SceneActorRegistryResetView *a)
     if (!a->drawableKind)
         AnimData_SelectPaletteBank((u8 *)a->drawable + 0x2C, a->basePaletteBank + a->paletteOffset);
     else
-        PTR(a->drawable, 0x68) = gUnk_030042E4 + (a->basePaletteBank + a->paletteOffset) * 32;
+        PTR(a->drawable, 0x68) = gPaletteBankData + (a->basePaletteBank + a->paletteOffset) * 32;
     if (a->drawableKind == 1)
         U16(a->drawable, 0x5A) = SceneActorScript_GetManagerField62() - 0x5FFF;
     U16(a, 0x1DC) = a->basePaletteBank;

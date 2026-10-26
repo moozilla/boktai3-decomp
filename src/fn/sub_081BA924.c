@@ -1,13 +1,13 @@
 #define gRegistry3F74ObjPalette gUnk_03005020
-#define gDisplayControlShadow   gUnk_03004BD8
+#define gDisplayControlShadow   gDispCntShadow
 #include "global.h"
+#include "render.h"
 
 struct Registry3F74Object {
     u8 unknown[0x18];
     void *background;
     u16 *palettes;
 };
-extern u16 gUnk_03004BD8;
 extern u16 gUnk_03005020[];
 void Bg_SetPriority(u32, s32);
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
@@ -23,7 +23,7 @@ void Registry3F74_InitBackground(struct Registry3F74Object *p)
     u8 *resource;
     s32 layers[2];
     {
-        u16 *control = &gUnk_03004BD8;
+        u16 *control = &gDispCntShadow;
         u32 mask = ~0xF00;
         u32 flags = *control;
         mask &= flags;
@@ -33,9 +33,9 @@ void Registry3F74_InitBackground(struct Registry3F74Object *p)
     Hud_SetMode(7);
     {
         u32 flags = 0xC00;
-        flags |= gUnk_03004BD8;
+        flags |= gDispCntShadow;
         flags |= 0x100;
-        gUnk_03004BD8 = flags;
+        gDispCntShadow = flags;
     }
     p->background = sub_08216E54(0xDC87);
     layers[0] = 1;

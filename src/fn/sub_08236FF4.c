@@ -1,7 +1,6 @@
 #include "global.h"
+#include "render.h"
 // MATCHING_CONCESSION: register-pinning
-
-extern u8 *gUnk_030042E4;
 
 struct AtVector {
     s16 x, y, z, pad;
@@ -70,7 +69,7 @@ void AttachmentSprite_Setup(struct AtUnit *p0, struct AtVector *pos0)
     sprite->position.y += p->offset.y;
     sprite->position.z += p->offset.z;
     sprite->flags |= 0x400;
-    sprite->palette = gUnk_030042E4 + id * 32;
+    sprite->palette = gPaletteBankData + id * 32;
     fill = 0x3DEF;
     start = &sprite->colors[0];
     flag = &sprite->f6C;

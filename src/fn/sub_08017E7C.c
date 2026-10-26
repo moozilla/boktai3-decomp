@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct Weather {
     u8 pad[24];
     u32 timer;
@@ -7,7 +8,6 @@ struct Weather {
     void *script0, *script;
 };
 extern u8 *gUnk_02000710;
-extern u16 gUnk_03004BD8;
 extern int gUnk_02000080, gUnk_02000084;
 extern u16 gUnk_0203B400[];
 extern u32 gUnk_03005308;
@@ -33,15 +33,15 @@ int Weather_StormEnd(struct Weather *p)
             Script_Call(p->script, 0);
     }
     mask = 512;
-    gUnk_03004BD8 = mask | gUnk_03004BD8;
+    gDispCntShadow = mask | gDispCntShadow;
     if (p->timer <= 9 && !(p->timer & 1))
-        gUnk_03004BD8 &= ~mask;
+        gDispCntShadow &= ~mask;
     if (p->timer <= 7)
         sub_080177AC(p, 3, 10, 10);
     if (p->timer > 29) {
         Weather_EnterPhase(p, 0);
         {
-            u16 *reg = &gUnk_03004BD8;
+            u16 *reg = &gDispCntShadow;
             u32 m;
             m = ~512;
             *reg = m & *reg;

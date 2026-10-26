@@ -1,9 +1,9 @@
 #include "global.h"
+#include "render.h"
 struct Dma {
     vu32 src, dest, control;
 };
 extern u32 gUnk_03003A04, gUnk_03003A08, gUnk_03004260;
-extern u16 gUnk_03004BD8;
 extern u8 gUnk_03004390[];
 void Bg_UpdateScrollShadow(void);
 void InterruptsAndVideo_WaitForVBlank(void);
@@ -38,7 +38,7 @@ u32 InterruptsAndVideo_OnVideoUploadTask(void)
     disp = (vu16 *)0x04000000;
     *disp &= 0xe0ff;
     if (!gUnk_03003A08) {
-        u16 mask = gUnk_03004BD8;
+        u16 mask = gDispCntShadow;
         *disp |= mask | 0x1000;
     }
     sub_08219134();

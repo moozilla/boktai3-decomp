@@ -11,7 +11,7 @@ void SelectionPanel_RefreshPrimaryIfReady(struct SceneHudState *);
 int WirelessGame_ToggleItemMode(void);
 void SceneHud_UpdateOptionControls(struct SceneHudState *p)
 {
-    if (!(gUnk_0300523C & 1) && p->controlMode <= 2) {
+    if (!(gEnginePauseFlags & 1) && p->controlMode <= 2) {
         SceneHud_CyclePrimarySecondaryOptions(p);
         if (p->pulseFrame <= 63)
             Hud_DrawHealthMeter(p, 0, 4, 1, 1);

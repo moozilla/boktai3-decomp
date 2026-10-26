@@ -1,6 +1,7 @@
-#define gDisplayControlShadow gUnk_03004BD8
+#define gDisplayControlShadow gDispCntShadow
 #include "global.h"
 #include "background_controller.h"
+#include "render.h"
 struct PauseMenuDisplay {
     u8 unknown0[0x18];
     u32 resource;
@@ -24,9 +25,6 @@ struct PauseMenuDisplay {
     u8 unknown43E0[0x4CB];
     u8 selection;
 };
-extern u32 gUnk_03004290;
-extern u16 gUnk_0300521C, gUnk_03005234;
-extern u8 gUnk_03005230, gUnk_03005218;
 void sub_08215AC4(u32, u32);
 void PauseMenu_HideAllSprites(void *);
 void MessageWindow_Clear(void);
@@ -40,26 +38,26 @@ void PauseMenu_RestoreDisplayState(struct PauseMenuDisplay *s)
     u32 flags;
     void *map;
     s->active = 0;
-    gUnk_03004290 = 0;
+    gRenderListIndex = 0;
     bgEnable = 0x100;
-    flags = gUnk_03004BD8;
+    flags = gDispCntShadow;
     flags &= ~bgEnable;
     flags &= ~0x200;
-    gUnk_03004BD8 = flags;
+    gDispCntShadow = flags;
     PauseMenu_HideAllSprites(s);
     sub_08215AC4(1, 0);
     map = Video_GetBackgroundMap(1);
     CpuSet(s->savedMap, map, 0x04000200);
     gUnk_03004C30[1] = s->savedBackground;
     *(vu16 *)0x0400000A = s->savedBgControl;
-    gUnk_0300521C = 1;
-    gUnk_03005234 = s->saved5234;
-    gUnk_03005230 = s->saved5230;
-    gUnk_03005218 = s->saved5218;
+    gMosaicHalfword = 1;
+    gMosaicParam = s->saved5234;
+    gSpriteMosaicAttr = s->saved5230;
+    gMosaicByte = s->saved5218;
     MessageWindow_Clear();
     ScrollingDialogue_RequestHide();
     PauseMenu_CloseTextWindows(s);
-    gUnk_03004BD8 |= bgEnable;
+    gDispCntShadow |= bgEnable;
     Hud_SetupBackgroundLayer(s, s->resource, 0, 0, s->parameter);
     s->transition0 = 0;
     s->transition1 = 0;

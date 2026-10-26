@@ -143,7 +143,7 @@ void SceneActorRegistry_UpdateActors(struct SceneActorRegistryManager *manager)
                             AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
                         else
                             ((struct SceneActorRegistryTileDrawable *)actor->drawable)->palette =
-                                gUnk_030042E4 + (bank << 5);
+                                gPaletteBankData + (bank << 5);
                     } else if (actor->flags2D0 & 0x200000) {
                         SceneActorPalette_BeginTransition(
                             actor->paletteBank, actor->basePaletteBank + actor->paletteOffset, 0,

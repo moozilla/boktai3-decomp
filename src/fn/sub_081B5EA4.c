@@ -1,13 +1,13 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_vec.h"
+#include "render.h"
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, u32);
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void CpuSet(const void *, void *, u32);
 void PairedSceneActor_InitializeHalf(void *, s32, s32);
-extern u8 *gUnk_030042E4;
 extern const s16 gUnk_086149C4[];
 static inline s32 Scale(s32 x)
 {
@@ -57,14 +57,14 @@ s32 Vanargand_InitializePartController(u8 *boss, s32 arg, u8 *palettes, s32 mode
     Widget_InitLinked(animation, resource, 0, 16, 3, 1, 60, 0);
     Anim_SetKeyframes(animation, resource, 0, 1, 0);
     if (!palettes)
-        source = gUnk_030042E4 + 0xe00;
+        source = gPaletteBankData + 0xe00;
     else
         source = palettes + 0x20;
     CpuSet(source, boss + 0x514, 0x04000010);
     CpuSet(source, boss + 0x4d4, 0x04000010);
-    source = gUnk_030042E4 + 0x3240;
+    source = gPaletteBankData + 0x3240;
     CpuSet(source, boss + 0x554, 0x04000008);
-    source = gUnk_030042E4 + 0x1060;
+    source = gPaletteBankData + 0x1060;
     CpuSet(source, boss + 0x574, 0x04000010);
     *((u32 *)(boss + 0x20)) |= 1;
     *((void **)(boss + 0x4d0)) = ScriptProc_Start(0x922e, 0x572b);

@@ -2,8 +2,8 @@
 #include "global.h"
 #include "display_animation.h"
 #include "scene_vec.h"
+#include "render.h"
 extern u32 gUnk_030053F4, gUnk_030053F0, gUnk_02000560, gUnk_03005308;
-extern u8 *gUnk_030042E4;
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
@@ -188,7 +188,7 @@ s32 EnemyD459_Update(u8 *p)
                 *z = v;
             }
             AnimData_SelectPaletteBank(p + 0x50, 0x1b7);
-            *(u8 **)(p + 0x5c) = gUnk_030042E4 + 0x44a0;
+            *(u8 **)(p + 0x5c) = gPaletteBankData + 0x44a0;
             H(0x130) = 0;
             *(void **)(p + 0x108) = EnemyD459_UpdateDeath;
             W(0x18) = 0;

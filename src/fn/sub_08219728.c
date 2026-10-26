@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct GlyphEntry {
     u16 a, b, c, d, e, f, g, h;
@@ -24,7 +25,6 @@ struct Widget {
     u32 data;
     u32 extra;
 };
-extern u8 *gUnk_030042E4;
 
 s32 Anim_SelectWidgetGlyph(struct Widget *w, struct GlyphRes *res, u16 index)
 {
@@ -45,7 +45,7 @@ s32 Anim_SelectWidgetGlyph(struct Widget *w, struct GlyphRes *res, u16 index)
     w->w36 = zero;
     if (w->palette == 0) {
         w->w3a = res->palette;
-        w->palette = gUnk_030042E4 + (w->w3a << 5);
+        w->palette = gPaletteBankData + (w->w3a << 5);
     }
     w->w38 = e->b;
     w->data = res->base + e->off;

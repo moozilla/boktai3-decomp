@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct BgHeader {
     u8 p0[0xC];
     u32 u0C;
@@ -23,7 +24,6 @@ struct BgLayerState {
     u32 w24, w28, w2C;
 };
 extern struct BgLayerState gUnk_03004C30[];
-extern u16 gUnk_03004BD8;
 void *memcpy(void *, const void *, u32);
 void Bg_SetTileUpload(s32, u32, s32, s32);
 void Bg_SetPriority(s32, s32);
@@ -72,7 +72,7 @@ void Bg_SetupLayer(s32 layer, u16 mode, u32 base, s32 unused, s32 x, s32 y, s32 
             goto skip;
     }
     {
-        register u16 *g asm("r2") = &gUnk_03004BD8;
+        register u16 *g asm("r2") = &gDispCntShadow;
         register u16 cur asm("r1");
         cur = *g;
         *g = cur | bits;

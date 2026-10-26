@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 #define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
 struct Slot7PackedPosition {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -8,7 +9,6 @@ extern void *gUnk_020004B8;
 extern u8 *gUnk_020004F0;
 extern u8 gUnk_03004FC0[];
 extern u8 gUnk_03005040[];
-extern u8 *gUnk_030042E4;
 extern u32 gUnk_03005308;
 extern const u16 gUnk_0203B400[];
 void Collider_SetFixedPositionWithYOffset(void *, void *, s32);
@@ -84,13 +84,13 @@ static inline void InterpolatePalettes(u8 *actor)
     if (count < limit) {
         s32 i;
         FIELD(actor, 0x5A8, u32) = ++count;
-        Palette_InterpolateBanks(actor + 0x3C8, gUnk_030042E4 + FIELD(actor, 0x5F4, u32) * 32,
-                                 gUnk_030042E4 + FIELD(actor, 0x5F8, u32) * 32, count, shift);
+        Palette_InterpolateBanks(actor + 0x3C8, gPaletteBankData + FIELD(actor, 0x5F4, u32) * 32,
+                                 gPaletteBankData + FIELD(actor, 0x5F8, u32) * 32, count, shift);
         FIELD(actor, 0x35C, void *) = actor + 0x3C8;
         Anim_SetDurationScale(actor + 0x2EC,
                               (u16)(Div(count * 192, 1 << FIELD(actor, 0x5AC, u32)) + 64));
-        Palette_InterpolateBanks(actor + 0x3E8, gUnk_030042E4 + FIELD(actor, 0x600, u32) * 32,
-                                 gUnk_030042E4 + FIELD(actor, 0x604, u32) * 32,
+        Palette_InterpolateBanks(actor + 0x3E8, gPaletteBankData + FIELD(actor, 0x600, u32) * 32,
+                                 gPaletteBankData + FIELD(actor, 0x604, u32) * 32,
                                  FIELD(actor, 0x5A8, u32), FIELD(actor, 0x5AC, u32));
         FIELD(actor, 0x378, void *) = actor + 0x3E8;
         for (i = 0; i <= 3; ++i)

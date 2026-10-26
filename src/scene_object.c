@@ -1279,7 +1279,7 @@ s32 SceneObjects_InitPool(struct SceneObjectManager *p, void *unused)
     p->fading = 0;
     p->descending = 0;
     p->fade = 0;
-    b = gUnk_030042E4;
+    b = gPaletteBankData;
     p->fromA = (u32)(b + 0x80);
     p->fromB = (u32)(b + 0xa0);
     p->toA = (u32)(b + 0xc0);

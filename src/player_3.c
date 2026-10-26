@@ -31,10 +31,10 @@ void Player_LoadVisualParameters(struct Player *p)
     u16 *t;
     s32 i;
     if (p->baseActionVariant <= 9) {
-        t = (u16 *)(gUnk_030042E4 + 0x6A0);
+        t = (u16 *)(gPaletteBankData + 0x6A0);
         i = p->baseActionVariant;
     } else {
-        t = (u16 *)(gUnk_030042E4 + 0x2F60);
+        t = (u16 *)(gPaletteBankData + 0x2F60);
         i = p->baseActionVariant;
         i -= 10;
     }
@@ -200,13 +200,13 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
             effect = Player_GetUsableEnchantment(p);
         if (effect >= 0) {
             p->actionRequestHold = effect + 0x16E;
-            source = (u16 *)(gUnk_030042E4 + p->actionRequestHold * 32);
+            source = (u16 *)(gPaletteBankData + p->actionRequestHold * 32);
             weight = Player_GetPalettePulseWeight(&p->actionRequestTimer);
             sub_0813C9B4(p, source, weight, 32 - weight, 5);
             if (++p->actionRequestTimer > 95)
                 p->actionRequestTimer = 0;
         } else if ((u16)(p->actionRequestTimer - 1) <= 78) {
-            source = (u16 *)(gUnk_030042E4 + p->actionRequestHold * 32);
+            source = (u16 *)(gPaletteBankData + p->actionRequestHold * 32);
             if ((u16)(p->actionRequestTimer - 33) <= 14)
                 p->actionRequestTimer = 48;
             if (p->actionRequestTimer <= 32) {
@@ -230,7 +230,7 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
         const u16 *source;
         p->actionRequestTimer = 0;
         if (p->actionEighteenDuration > 31) {
-            source = (u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            source = (u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
             if (!p->unk419) {
                 u32 *palette;
                 i = 0;
@@ -255,7 +255,7 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
                 p->visualObject->parameters = (u32)((u8 *)p + 0x380);
             }
         } else {
-            source = (u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            source = (u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
             weight = p->actionEighteenDuration;
             sub_0813C9B4(p, source, weight, 32 - weight, 5);
         }
@@ -286,7 +286,8 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
         p->actionRequestTimer = 0;
         if (p->actionEighteenDuration > 31) {
             {
-                const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+                const u16 *source =
+                    (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
                 u16 *destination, *base;
                 s32 i;
                 if (!p->unk419) {
@@ -313,7 +314,7 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
                 }
             }
         } else {
-            const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            const u16 *source = (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
             weight = p->actionEighteenDuration;
             sub_0813C9B4(p, source, weight, 32 - weight, 5);
             p->actionEighteenDuration++;
@@ -321,7 +322,7 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
     } else if (*(u16 *)((u8 *)p + 0xAE4) == 2) {
         const u16 *source;
         p->actionRequestTimer = 0;
-        source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+        source = (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
         weight = Player_GetPalettePulseWeight(&p->actionEighteenDuration);
         sub_0813C9B4(p, source, weight, 32 - weight, 5);
         if (++p->actionEighteenDuration > 95)
@@ -330,7 +331,8 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
         p->actionRequestTimer = 0;
         if (p->actionEighteenDuration > 31) {
             {
-                const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+                const u16 *source =
+                    (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
                 u16 *destination, *base;
                 s32 i;
                 if (!p->unk419) {
@@ -357,13 +359,13 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
                 }
             }
         } else {
-            const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionEighteenParameter * 32);
+            const u16 *source = (const u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
             weight = p->actionEighteenDuration;
             sub_0813C9B4(p, source, weight, 32 - weight, 5);
         }
         p->actionEighteenDuration--;
     } else if ((u16)(p->actionRequestTimer - 1) <= 78) {
-        const u16 *source = (const u16 *)(gUnk_030042E4 + p->actionRequestHold * 32);
+        const u16 *source = (const u16 *)(gPaletteBankData + p->actionRequestHold * 32);
         if ((u16)(p->actionRequestTimer - 33) <= 14)
             p->actionRequestTimer = 48;
         if (p->actionRequestTimer <= 32) {

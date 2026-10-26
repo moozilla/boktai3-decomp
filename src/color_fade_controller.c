@@ -1,5 +1,6 @@
 #include "global.h"
 #include "color_fade_controller.h"
+#include "render.h"
 
 void ColorFade_StepFadeOut(struct ColorFadeChannel *p)
 {
@@ -60,50 +61,36 @@ void ColorFade_UpdateChannel(struct ColorFadeChannel *p)
 
 extern struct ColorFadeController *gUnk_02000020;
 
-extern u32 gUnk_03004DA0;
-
-extern u16 gUnk_030051C4;
-
-extern u16 gUnk_03005214;
-
-extern u32 gUnk_030051D4;
-
-extern u16 gUnk_030051DC;
-
-extern u32 gUnk_030051C8;
-
 void ColorFade_ClearMode(struct ColorFadeChannel *);
 
 void ColorFade_SetImmediate(u32 a, u32 b, u32 c)
 {
     struct ColorFadeController *s = gUnk_02000020;
     if (s != 0) {
-        gUnk_03004DA0 = a;
-        gUnk_030051C4 = b;
-        gUnk_03005214 = c;
-        gUnk_030051D4 = a;
-        gUnk_030051DC = c;
-        gUnk_030051C8 = 0;
+        gBgFadeLevel = a;
+        gBgFadeBankMask = b;
+        gBgFadeColor = c;
+        gObjFadeLevel = a;
+        gObjFadeColor = c;
+        gObjPaletteEffect = 0;
         ColorFade_ClearMode(&s->channels[0]);
         ColorFade_ClearMode(&s->channels[1]);
     }
 }
 
-extern u16 gUnk_03005210;
-
 void ColorFade_PublishOutputs(struct ColorFadeController *s)
 {
     struct ColorFadeChannel *p = &s->channels[0];
     if (p->mode != 0) {
-        gUnk_03004DA0 = p->level;
-        gUnk_030051C4 = p->start;
-        gUnk_03005214 = p->color;
+        gBgFadeLevel = p->level;
+        gBgFadeBankMask = p->start;
+        gBgFadeColor = p->color;
     }
     p = &s->channels[1];
     if (p->mode != 0) {
-        gUnk_030051D4 = p->level;
-        gUnk_03005210 = p->target;
-        gUnk_030051DC = p->color;
+        gObjFadeLevel = p->level;
+        gObjFadeFlags = p->target;
+        gObjFadeColor = p->color;
     }
 }
 
@@ -217,10 +204,6 @@ void ColorFade_OnDestroy(void)
     gUnk_02000020 = 0;
 }
 
-extern u32 gUnk_03004DA8;
-
-extern u32 gUnk_03004DAC;
-
 void ColorFade_InitChannel(struct ColorFadeChannel *);
 
 s32 ColorFade_Init(struct ColorFadeController *s)
@@ -228,15 +211,15 @@ s32 ColorFade_Init(struct ColorFadeController *s)
     gUnk_02000020 = s;
     ColorFade_InitChannel(&s->channels[0]);
     ColorFade_InitChannel(&s->channels[1]);
-    gUnk_03004DA0 = 0x40;
-    gUnk_03004DA8 = 0x40;
-    gUnk_03005214 = 0x1084;
-    gUnk_030051C4 = 0;
-    gUnk_030051D4 = 0x40;
-    gUnk_03004DAC = 0x40;
-    gUnk_030051DC = 0x1084;
-    gUnk_03005210 = 0;
-    return gUnk_030051C8 = 0;
+    gBgFadeLevel = 0x40;
+    gBgFadeApplied = 0x40;
+    gBgFadeColor = 0x1084;
+    gBgFadeBankMask = 0;
+    gObjFadeLevel = 0x40;
+    gObjFadeApplied = 0x40;
+    gObjFadeColor = 0x1084;
+    gObjFadeFlags = 0;
+    return gObjPaletteEffect = 0;
 }
 
 void *ColorFade_Create(void)

@@ -8,7 +8,7 @@ void ScenePanel_InitBackground(struct ScenePanel *panel)
     Bg_SetupLayers(3, 0, map, 0, 0, 1, &id);
     Bg_SetLayerMap(1, panel->backgroundMap, 0);
     {
-        u16 *control = &gUnk_03004BD8;
+        u16 *control = &gDispCntShadow;
         s32 mask = ~0x200;
         *control = mask & *control;
     }

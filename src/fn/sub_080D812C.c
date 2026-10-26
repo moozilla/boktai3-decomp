@@ -2,6 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "area_effect_link.h"
+#include "render.h"
 void SceneActorRecord_RecordPair(u16, u16);
 void Player_NotifyFirstSelectedSlot(u32, u32);
 void Player_RefreshLifeState(u32, u32);
@@ -13,7 +14,6 @@ void AnimData_SelectPaletteBank(void *, s32);
 void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
 void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
-extern u8 *gUnk_030042E4;
 extern u16 gUnk_030039F0;
 struct BurnState {
     u8 unknown0[0xAA];
@@ -267,7 +267,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
                         AnimData_SelectPaletteBank((u8 *)p->drawable + 0x2C, bank);
                     else {
                         struct SceneActorRegistryResetView *q = actor;
-                        *(u8 **)((u8 *)q->drawable + 0x68) = gUnk_030042E4 + bank * 32;
+                        *(u8 **)((u8 *)q->drawable + 0x68) = gPaletteBankData + bank * 32;
                     }
                 }
                 {

@@ -156,6 +156,20 @@ def build_c(src, obj):
     stamp(os.path.join(ROOT, obj), key)
 
 
+def ram_symbols():
+    """Named RAM objects from symbols/ram.csv: {name: address}.
+
+    gUnk_02XXXXXX/gUnk_03XXXXXX names link from their suffix; a real name needs
+    its row in the inventory (docs/RAM.md)."""
+    import csv
+    path = os.path.join(ROOT, "symbols", "ram.csv")
+    if not os.path.exists(path):
+        return {}
+    with open(path, newline="") as f:
+        return {r["name"]: int(r["addr"], 16) for r in csv.DictReader(f)
+                if r["name"] and not re.search(r"_0[23][0-9A-F]{6}$", r["name"])}
+
+
 def wait_for_cloud_setup():
     """A cloud session's start hook (tools/cloud_setup.sh --session) may still be
     rebuilding in the background; wait for it instead of racing it."""
@@ -231,6 +245,7 @@ def main():
     ld += [f"    {o}(.text)" for o in objs]
     ld += ["  }", "  /DISCARD/ : { *(.comment) *(.ARM.attributes) }", "}"]
     ld += [f"{name} = 0x{addr};" for name, addr in sorted(syms)]
+    ld += [f"{name} = 0x{addr:08X};" for name, addr in sorted(ram_symbols().items())]
     ld += open(os.path.join(ROOT, "build", "c_labels.ld")).read().splitlines()
     ram = os.path.join(ROOT, "symbols", "ram.ld")
     if os.path.exists(ram):

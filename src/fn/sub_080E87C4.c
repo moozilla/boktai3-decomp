@@ -1,7 +1,7 @@
 #include "global.h"
+#include "render.h"
 
 extern const u8 gUnk_086108B0[];
-extern u8 *gUnk_030042E4;
 extern u8 *gUnk_02000710;
 extern u32 gUnk_030052F8;
 extern u32 gUnk_030052FC;
@@ -382,7 +382,7 @@ s32 Mimic_Init(void *arg0)
     if (GL_AT(u8, 8) == 0)
         AnimData_SelectPaletteBank(GL_AT(u8 *, 4) + 0x2C);
     else
-        *(u8 **)(GL_AT(u8 *, 4) + 0x68) = gUnk_030042E4 + (r1v << 5);
+        *(u8 **)(GL_AT(u8 *, 4) + 0x68) = gPaletteBankData + (r1v << 5);
     if (GL_AT(u8, 8) == 1) {
         r1v = SceneActorScript_GetManagerField62();
         *(u16 *)(GL_AT(u8 *, 4) + 0x20 + 0x3A) = r1v - 0x5FFF;

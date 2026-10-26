@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 #define GH_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
 #define SV(d)         (Script_GetPc() ? Script_GetValue() : (d))
@@ -95,7 +96,6 @@ void *Region_FindContaining(void *);
 extern u32 *gUnk_030052F4;
 extern u32 gUnk_030052F8;
 extern u32 gUnk_030052FC;
-extern u8 *gUnk_030042E4;
 extern u8 *gUnk_02000710;
 
 /* terrain height probe: (x, y) world pos -> cell id -> height offset */
@@ -350,7 +350,7 @@ s32 sub_0808D1D8(u8 *arg0)
     if (GH_AT(u8, 8) == 0)
         AnimData_SelectPaletteBank(GH_AT(u8 *, 4) + 0x2C);
     else
-        *(u8 **)(GH_AT(u8 *, 4) + 0x68) = gUnk_030042E4 + (r1v << 5);
+        *(u8 **)(GH_AT(u8 *, 4) + 0x68) = gPaletteBankData + (r1v << 5);
     if (GH_AT(u8, 8) == 1)
         *(u16 *)(GH_AT(u8 *, 4) + 0x5A) = SceneActorScript_GetManagerField62() - 0x5FFF;
     GH_AT(u16, 0x1DC) = GH_AT(u16, 0x1E0) + 4;
