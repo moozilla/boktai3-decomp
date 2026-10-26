@@ -75,9 +75,10 @@ make shifttest   # move all data by 64 KiB and compare emulator screenshots
 make mod         # build/mod.gba from edited text and assets
 ```
 
-To match a function: `python3 tools/asmat.py ADDR`, write C under `src/`,
-`python3 tools/check.py FILE`, then `make`. The workflow and compiler notes are
-in [CLAUDE.md](CLAUDE.md) and [docs/WORKER.md](docs/WORKER.md).
+To match a function: `python3 tools/scope/scope.py rom FUNC` to read it, write C
+under `src/`, `python3 tools/scope/scope.py FILE.c FUNC` to compare it with the ROM
+and see why it differs, then `make`. The workflow and compiler notes are in
+[docs/WORKER.md](docs/WORKER.md) and [tools/scope/](tools/scope/README.md).
 
 ## Studio
 

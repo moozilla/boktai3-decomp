@@ -3,7 +3,12 @@
 Dated progress entries moved out of `docs/HANDOFF.md` on 2026-10-16, verbatim, one file per day.
 They are records, not instructions: numbers, allowances and "currently" statements are historical.
 Don't read them in full. Grep: `grep -rn 08160EA4 docs notes` (a function), `grep -rln '#tether' docs/history` (a topic),
-or scan the table below. Each entry has a `Tags:` line under its heading (vocabulary in `docs/INDEX.md`).
+or scan the table below.
+
+Superseded entry docs, kept verbatim when the scope workflow replaced them (2026-10-26):
+[HANDOFF_2026-10-23.md](HANDOFF_2026-10-23.md) (recent work through Oct 23, open non-matching work),
+[WORKER_2026-10-24.md](WORKER_2026-10-24.md) (wip/explain.py playbook, fix.py/hint.py, orchestration safeguards),
+[WORKER_ROUND_2026-10-12.md](WORKER_ROUND_2026-10-12.md), [MANAGER_HANDOFF_2026-10-19.md](MANAGER_HANDOFF_2026-10-19.md). Each entry has a `Tags:` line under its heading (vocabulary in `docs/INDEX.md`).
 
 | File | Entry | Tags | Addresses |
 |---|---|---|---:|

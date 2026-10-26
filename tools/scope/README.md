@@ -383,6 +383,11 @@ in the patch.
 
 ### Gaps (next work on the tool)
 
+* **From the first subsystem run (2026-10-25)**: 16 Codex workers' reports, grouped by how many
+  hit each (reload/spill causes, PRE source expressions, repeated-block alignment, `why all`'s
+  eight-hunk cap, fast-cache races, `-g` knob runs, `land` formatting the whole tree):
+  [notes/subsystem-run_2026-10-25.md](../../notes/subsystem-run_2026-10-25.md).
+
 * Done: trace summarizer and pseudo names (`why`). On RepeatedPairAttack it
   reproduces in one call what took ~15 calls of raw trace reading.
 * Done: order. `why all` compares each hunk with low registers blanked; an
