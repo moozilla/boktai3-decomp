@@ -2,13 +2,26 @@
 #include "scene_actor_script.h"
 #include "engine.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.0%
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: ground-height lookup temporaries (r0/r1/r3 swap) and a derived pool constant.
-#define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 struct Pair8 {
     u32 a, b;
+};
+struct CrowSpawnState {
+    u8 unknown0[0x59];
+    u8 option59;
+    u8 unknown5A[0x3D4 - 0x5A];
+    u32 flags;
+    u8 unknown3D8;
+    u8 distance;
+    u16 angleOffset;
+    u8 option;
+    u8 unknown3DD;
+    u16 groundHeight;
+    u32 radiusSquared;
+    u8 unknown3E4[4];
+    u16 cell;
+    u16 heightOffset;
+    u8 unknown3EC[0x434 - 0x3EC];
+    struct Pair8 position;
 };
 static inline s32 ReadOrZero(void)
 {
@@ -22,50 +35,23 @@ static inline u32 CellAt(s32 x, s32 z)
         return 0;
     return gUnk_030052F4->rows[z] + x;
 }
-static inline s32 GroundHeight(u32 cell, struct ContactPosition *position)
+inline static s32 Crow_GetGroundHeight(u16 cell, struct ContactPosition *position)
 {
     u8 *override = TerrainModifiers_FindCellOverride(cell, 1);
     u8 *data;
-    register u32 type asm("r2");
+    u32 type;
     s32 height;
     if (override)
         data = override + 4;
     else
-        data = gUnk_030052F4->cells + 12 + cell * 4;
-    type = data[0] >> 4;
-    height = data[0] & 15;
-    height <<= 8;
-    {
-        u32 slope;
-        if (type == 1)
-            goto alongZ;
-        if (type == 2)
-            goto alongX;
-        goto finished;
-    alongZ:
-        slope = (u8)position->z;
-        goto subtract;
-    alongX:
-        slope = (u8)position->x;
-    subtract:
-        height -= slope;
-    }
-finished:
-    return height;
-}
-inline static s32 GroundHeight_ReadSpawnScript(s16 cell, struct ContactPosition *position)
-{
-    u8 *override = TerrainModifiers_FindCellOverride(cell, 1);
-    u8 *data;
-    register u32 type asm("r2");
-    s16 height;
-    if (override)
-        data = override + 4;
-    else
         data = (gUnk_030052F4->cells + 12) + (cell * 4);
-    type = data[0] >> 4;
-    height = data[0] & 15;
-    height <<= 8;
+    height = data[0];
+    type = (u32)height >> 4;
+    {
+        u32 level = 15;
+        level &= height;
+        height = level << 8;
+    }
     {
         u32 slope;
         if (type == 1)
@@ -90,20 +76,20 @@ finished:
 void Crow_ReadSpawnScript(void *input)
 {
     struct SceneActorScriptPositionView *actor = input;
-    void *s = input;
+    struct CrowSpawnState *s = input;
     if (Script_SeekToKeyword(0x50)) {
         u32 value;
         u32 distance;
         u32 offset;
         {
-            u32 *radius = &(*((u32 *)(((u8 *)s) + 0x3E0)));
+            u32 *radius = &(s->radiusSquared);
             *radius = ReadOrZero();
         }
-        *((u8 *)(((u8 *)s) + 0x3DC)) = ReadOrZero();
+        s->option = ReadOrZero();
         distance = ReadOrZero();
-        *((u8 *)(((u8 *)s) + 0x3D9)) = distance;
+        s->distance = distance;
         if (((u8)distance) <= 0x19)
-            *((u8 *)(((u8 *)s) + 0x3D9)) = 0x1A;
+            s->distance = 0x1A;
         gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
         value = *((const u16 *)((gUnk_03005308 * 2) + ((u32)gUnk_0203B400)));
         value &= 0x3F;
@@ -111,23 +97,22 @@ void Crow_ReadSpawnScript(void *input)
             offset = Script_GetValue() + value;
         else
             offset = value;
-        *((u16 *)(((u8 *)s) + 0x3DA)) = offset;
+        s->angleOffset = offset;
         if (Script_GetPc() && Script_GetValue()) {
             u32 mask = 4;
-            u32 *flags = &(*((u32 *)(((u8 *)s) + 0x3D4)));
+            u32 *flags = &(s->flags);
             *flags |= mask;
         }
         {
-            u32 *radius = &(*((u32 *)(((u8 *)s) + 0x3E0)));
+            u32 *radius = &(s->radiusSquared);
             *radius = (*radius) * (*radius);
         }
     }
-    *((u8 *)(((u8 *)actor) + 0x59)) = Script_GetKeywordValue(0x64, 0);
+    ((struct CrowSpawnState *)actor)->option59 = Script_GetKeywordValue(0x64, 0);
     if (Script_SeekToKeyword(0x70)) {
         u16 *height;
         u16 *cx;
         u16 *cz;
-        register u32 offset asm("r3");
         struct Pair8 *copy;
         actor->position.x = ReadOrZero();
         actor->position.y = ReadOrZero();
@@ -141,7 +126,7 @@ void Crow_ReadSpawnScript(void *input)
                 value = 0;
             actor->position.z = value;
         }
-        copy = &(*((struct Pair8 *)(((u8 *)s) + 0x434)));
+        copy = &s->position;
         *copy = *((struct Pair8 *)(&actor->position));
         asm("" : "+r"(copy));
         cx = (u16 *)copy;
@@ -150,28 +135,22 @@ void Crow_ReadSpawnScript(void *input)
         {
             u32 cell = actor->cellIndex;
             s32 gh;
-            offset = 0x434;
-            asm("" : "+r"(offset));
-            gh = GroundHeight_ReadSpawnScript(cell, (void *)(((u8 *)s) + offset));
+            gh = Crow_GetGroundHeight(cell, (void *)&s->position);
             actor->groundHeight = gh;
         }
         {
             u16 y = *height;
             actor->heightOffset = y;
-            *((u16 *)(((u8 *)s) + 0x3EA)) = y;
+            s->heightOffset = y;
         }
         *height = actor->groundHeight;
         {
             u16 cell = actor->cellIndex;
-            *((u16 *)(((u8 *)s) + 0x3E8)) = cell;
+            s->cell = cell;
         }
         {
             u16 gh = actor->groundHeight;
-            *((u16 *)(((u8 *)s) + 0x3DE)) = gh;
+            s->groundHeight = gh;
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Crow_ReadSpawnScript);
-#endif

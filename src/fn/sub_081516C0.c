@@ -1,11 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.1%
-// fix.py best version (reprinted C)
 // confidence=low: tentative cue role inferred from named callers (PlayerCue_RunTo).
-struct P {
+struct PlayerRunTo {
     u8 pad0[0x30];
     s16 x, xf, y, yf, vx, vxf, vy, vyf;
     u8 pad1[0x28F - 0x40];
@@ -17,17 +14,17 @@ struct P {
     u8 pad4[0x45A - 0x419];
     u16 frame;
     u8 pad5[0x58C - 0x45C];
-    void (*fn)(struct P *);
+    void (*fn)(struct PlayerRunTo *);
     s16 tx, txf, ty, tyf;
     u8 pad6[5];
     s8 finalDir;
     u8 pad7[0xAD6 - 0x59E];
     u16 overlayA, overlayB;
 };
-void Player_AddControlFlags(struct P *, u32);
-void PlayerCue_CompleteAction(struct P *);
-void PlayerCue_EnterStandUpdate(struct P *);
-void Player_SetAnimation(struct P *, s32, s32, s32);
+void Player_AddControlFlags(struct PlayerRunTo *, u32);
+void PlayerCue_CompleteAction(struct PlayerRunTo *);
+void PlayerCue_EnterStandUpdate(struct PlayerRunTo *);
+void Player_SetAnimation(struct PlayerRunTo *, s32, s32, s32);
 s32 ActorVariant_GetTableValue(s32, s32);
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
@@ -42,31 +39,28 @@ static inline s32 Truncate(s32 v)
 static inline s32 Mul32(s32 v)
 {
     register s32 k asm("r3");
-    asm("" : "+r"(v));
     k = 0x20;
     asm("" : "+r"(k));
     return v * k;
 }
 static inline s32 Scale(s32 v, s32 k)
 {
-    if (k == 40) {
-        v = ((v << 2) + v) << 3;
-    } else {
-        v = k * v;
-    }
-    if (v >= 0)
-        return v >> 6;
-    return -((-v) >> 6);
+    s32 product;
+    if (k == 40)
+        product = ((v << 2) + v) << 3;
+    else
+        product = v * k;
+    if (product >= 0)
+        return product >> 6;
+    return -((-product) >> 6);
 }
 
-// Only register choices differ: the 0x20 multiplier pin (r3) shifts temporaries in the velocity block.
-void PlayerCue_UpdateRunTo(struct P *p)
+void PlayerCue_UpdateRunTo(struct PlayerRunTo *p)
 {
     s32 dx;
     s32 dy;
     s32 angle;
     s32 dist;
-    typeof(p->vy) t1;
     if (p->frame == 0)
         Sound_PlaySong(0x298);
     dx = p->tx - p->x;
@@ -82,11 +76,10 @@ void PlayerCue_UpdateRunTo(struct P *p)
         } else {
             {
                 register s32 t asm("r0") = ((u16)angle) + 0x70;
-                register s32 d asm("r1");
+                register s32 d;
                 asm("" : "+r"(t));
                 t >>= 5;
                 d = t & 7;
-                asm("" : "+r"(d));
                 p->dir = d;
             }
         }
@@ -118,19 +111,34 @@ void PlayerCue_UpdateRunTo(struct P *p)
     {
         s32 vy;
         p->vx = Truncate(Mul32(gUnk_086149C4[(angle + 64) & 255]));
-        vy = Truncate(Mul32(gUnk_086149C4[angle & 255]));
+        {
+            register u32 scratch asm("r3");
+            s32 sine;
+            // Keep r3 live across the load; scratch is consumed only by empty constraints.
+            asm("" : "=r"(scratch));
+            sine = gUnk_086149C4[angle & 255];
+            asm("" : : "r"(scratch));
+            vy = Truncate(Mul32(sine));
+        }
         p->vy = vy;
-        if (p->scaleAxis == 1) {
-            t1 = p->vy;
-            if (vy < 0)
-                p->vy = Scale(t1, 40);
-            else
-                p->vy = Scale(p->vy, 0x34);
-        } else if (p->scaleAxis == 2) {
-            if (p->vx < 0)
-                p->vx = Scale(p->vx, 40);
-            else
-                p->vx = Scale(p->vx, 0x34);
+        {
+            register u32 scratch asm("r3");
+            u32 axis;
+            // Keep r3 live across the load; scratch is consumed only by empty constraints.
+            asm("" : "=r"(scratch));
+            axis = p->scaleAxis;
+            asm("" : : "r"(scratch));
+            if (axis == 1) {
+                if (vy < 0)
+                    p->vy = Scale(p->vy, 40);
+                else
+                    p->vy = Scale(p->vy, 0x34);
+            } else if (axis == 2) {
+                if (p->vx < 0)
+                    p->vx = Scale(p->vx, 40);
+                else
+                    p->vx = Scale(p->vx, 0x34);
+            }
         }
     }
     p->dir = ((((angle + 16) & 255) >> 5) + 3) & 7;
@@ -143,6 +151,3 @@ void PlayerCue_UpdateRunTo(struct P *p)
     }
     Player_SetAnimation(p, ActorVariant_GetTableValue(p->variant, 1), 0x20, 1);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateRunTo);
-#endif

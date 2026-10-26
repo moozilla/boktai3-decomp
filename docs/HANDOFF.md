@@ -58,8 +58,9 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 Recent:
 
 * **Subsystem scope run** (2026-10-25/26): 16 Codex gpt-6.1-sol workers, one or two per
-  subsystem, matched about 50 drafts in two hours. Batch 1 is
-  [moozilla/boktai3-decomp#849](https://github.com/moozilla/boktai3-decomp/pull/849).
+  subsystem, matched 65 drafts in 4.5 hours for half the weekly Codex quota (77.0% -> 78.6%;
+  [#849](https://github.com/moozilla/boktai3-decomp/pull/849),
+  [#854](https://github.com/moozilla/boktai3-decomp/pull/854)).
   Lessons (ROM order, no per-function budget, no blind sweeps) and how to run one are in
   [tools/scope/subsystem/README.md](../tools/scope/subsystem/README.md); the results are in
   [notes/subsystem-run_2026-10-25.md](../notes/subsystem-run_2026-10-25.md).

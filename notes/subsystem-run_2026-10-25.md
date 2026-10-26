@@ -11,25 +11,26 @@ quota left.
 
 ## Results
 
-At 01:20 (about 1h45 in, quota 99% -> 62%): about 50 functions matched, 25 of them integrated in batch 1
-([moozilla/boktai3-decomp#849](https://github.com/moozilla/boktai3-decomp/pull/849): 77.0% -> 77.6%
-of code, 15 of 25 without pins). The rest follow in batch 2.
+The run stopped at 04:06 PDT when the quota reached 50% left (99% at the start; about 25 points an
+hour with 16 workers, less as they finished). **65 functions matched**: 77.0% -> 78.6% of code,
+without register pinning 55.2% -> 56.0%; drafts left 454 -> 389. Integrated in two batches:
+[moozilla/boktai3-decomp#849](https://github.com/moozilla/boktai3-decomp/pull/849) (25) and
+[moozilla/boktai3-decomp#854](https://github.com/moozilla/boktai3-decomp/pull/854) (40).
 
 | Worker | Queue | Matched | Note |
 |---|---:|---:|---|
-| monsters (top half) | 86 | 12 | best rate: high-fuzzy drafts at the top of the queue |
+| monsters (top half) | 86 | 20 | best rate: high-fuzzy drafts at the top of the queue; ran 4.5 h |
+| effects (top half) | 29 | 8 | |
 | player (top half) | 19 | 7 | 1 on the first pass, 6 more on the second |
-| effects (top half) | 29 | 6 | |
-| menus (top half) | 11 | 5 | finished |
-| engine | 11 | 3 | finished |
-| field (top half) | 7 | 3 | |
+| menus (top half) | 11 | 5 | |
+| actors2 | 56 | 4 | still on its first pass at the stop |
 | player2 | 19 | 4 | |
-| menus2 | 10 | 2 | finished |
+| engine | 11 | 3 | |
+| field (top half) | 7 | 3 | |
 | actors (top half) | 56 | 2 | closed out functions with scripted spelling sweeps |
-| actors2 | 56 | 2 | |
-| bosses (top half) | 12 | 1 | finished |
-| bosses2 | 12 | 1 | finished; the hardest bosses (95-950 differing insns) |
-| effects2, field2, link, monsters2 | 28, 7, 6, 85 | 1 each | monsters2 swept 85 functions with scripts |
+| effects2, menus2 | 28, 10 | 2 each | |
+| bosses, bosses2 | 12, 12 | 1 each | bosses2 had the hardest bosses (95-950 differing insns) |
+| field2, link, monsters2 | 7, 6, 85 | 1 each | monsters2 swept 85 functions with scripts |
 
 ## What went wrong, and the changes made
 

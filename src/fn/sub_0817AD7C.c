@@ -1,9 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.4%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining differences: stack-vector lifetime and low-register allocation.
 // confidence=low: emits four bobbing actors in a circular formation around this boss
 struct FormationActor {
     u8 pad0[0x54];
@@ -22,13 +18,6 @@ void SceneSteeringActor_CreateBobbingActor(void *, void *, s32, s32, s32, s32, s
 extern u32 gUnk_03005308;
 extern u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
-static inline s32 RandomValue(void)
-{
-    u32 offset;
-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
-    offset = gUnk_03005308 * 2;
-    return *(u16 *)(offset + (u32)gUnk_0203B400);
-}
 static inline s32 Scale(s32 value)
 {
     if (value >= 0)
@@ -50,7 +39,7 @@ inline static s32 RandomValue_SpawnBobbingFormation(void)
     u32 offset;
     gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
     offset = gUnk_03005308 * 2;
-    return *((u16 *)(offset + ((u32)(*((typeof(gUnk_0203B400) *)0x0203B400)))));
+    return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 
 void BossSlot2_SpawnBobbingFormation(struct FormationActor *p)
@@ -63,9 +52,12 @@ void BossSlot2_SpawnBobbingFormation(struct FormationActor *p)
     s32 direction;
     s16 position[4];
     s16 *origin;
+    register s16 *vector asm("r4");
     SceneActors_StartUnmirroredAnimation(p, &p->animation, p->animationState, 0x12D, 2, 4);
     base = ((RandomValue_SpawnBobbingFormation() >> 8) & 1) << 5;
     mask = 255;
+    vector = position;
+    asm("" : : "r"(vector));
     direction = base + 16;
     offset = 0;
     origin = p->position;
@@ -83,7 +75,3 @@ void BossSlot2_SpawnBobbingFormation(struct FormationActor *p)
         offset += 64;
     } while ((--count) >= 0);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", BossSlot2_SpawnBobbingFormation);
-#endif

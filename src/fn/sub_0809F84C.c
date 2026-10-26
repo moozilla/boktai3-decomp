@@ -1,13 +1,17 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.3%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining differences: defined vector padding, inline clamps, argument order and registers.
-
-extern u8 *gUnk_02000580;
+struct CrowDrawableView {
+    u32 flags;
+    u16 unknown4;
+    u8 direction;
+};
+struct CrowPlayerView {
+    u8 pad[0x30];
+    struct ContactPosition position;
+};
+extern struct CrowPlayerView *gUnk_02000580;
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 
@@ -51,11 +55,10 @@ static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
     out->x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
     out->y = 0;
     out->z = Scale(gUnk_086149C4[angle & 255] * speed, 12);
-    // The original copies this scratch halfword without initializing it.
-    out->pad = 0;
 }
-static inline s32 Minimum(s32 n, s32 min)
+static inline s32 Minimum(s32 n, s32 min, s32 *out)
 {
+    *out = n;
     n = n > 0 ? n : min;
     return n;
 }
@@ -91,15 +94,14 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
     s32 angle;
     s32 turn;
     s32 step;
-    typeof(delta.x) t1;
-    typeof(delta.z) t2;
+    s16 t1;
+    s16 t2;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        *((u32 *)actor->drawable) |= 2;
+        ((struct CrowDrawableView *)actor->drawable)->flags |= 2;
         SetControl(actor, actor->entryTarget224, 2);
     }
     if (state->approachTime < ((s32)actor->counter2AC)) {
-        Delta(&delta, &actor->position,
-              (struct ContactPosition *)((*((typeof(gUnk_02000580) *)0x02000580)) + 0x30));
+        Delta(&delta, &actor->position, &(*(struct CrowPlayerView **)0x02000580)->position);
         t1 = delta.x;
         t2 = delta.z;
         angle = Math_Atan2(t1, t2);
@@ -108,11 +110,11 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
             turn = -turn;
         if (turn <= 11) {
             state->approachTurns = 0;
-            *((u32 *)actor->drawable) &= ~2;
+            ((struct CrowDrawableView *)actor->drawable)->flags &= ~2;
             SetState(actor, 0, 2, 0);
             return;
         }
-        step = Minimum(Scale(turn, 2), 4);
+        step = Minimum(Scale(turn, 2), 4, &step);
         if (step > 8)
             step = 8;
         if (state->approachTurns > 20) {
@@ -128,12 +130,9 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
         SetState(actor, 0, 0, 4);
         return;
     } else if (state->orbitRange > actor->distanceF0) {
-        Delta(&delta, (struct ContactPosition *)((*((typeof(gUnk_02000580) *)0x02000580)) + 0x30),
-              &actor->position);
+        Delta(&delta, &(*(struct CrowPlayerView **)0x02000580)->position, &actor->position);
         angle = Math_Atan2(delta.x, delta.z);
-        turn = Normalize(((angle + 64) & 255) - actor->direction);
-        if (turn < 0)
-            turn = -turn;
+        turn = Magnitude(Normalize(((angle + 64) & 255) - actor->direction));
         if (turn <= 63)
             angle += 64;
         else
@@ -144,8 +143,7 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
             step = 2;
         goto clamp;
     } else {
-        Delta(&delta, &actor->position,
-              (struct ContactPosition *)((*((typeof(gUnk_02000580) *)0x02000580)) + 0x30));
+        Delta(&delta, &actor->position, &(*(struct CrowPlayerView **)0x02000580)->position);
         angle = Math_Atan2(delta.x, delta.z);
         turn = Normalize(angle - actor->direction);
         if (turn < 0)
@@ -154,7 +152,7 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
             SetState(actor, 0, 0, 4);
             return;
         }
-        step = Minimum(Scale(turn, 3), 2);
+        step = Minimum(Scale(turn, 3), 2, &step);
     clamp:
         if (step > 6)
             step = 6;
@@ -162,13 +160,14 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
     Polar(&velocity, actor->direction, state->speed);
     actor->motion = velocity;
     if (!state->turnDelay) {
-        turn = Normalize(angle - actor->direction);
-        if (turn > 0)
+        s32 difference = Normalize(angle - actor->direction);
+        asm("" : "+r"(difference) : "r"(angle));
+        if (difference > 0)
             actor->direction += step;
         else
             actor->direction -= step;
-        *(((u8 *)actor->drawable) + 6) = 0x9F - actor->direction;
-        if ((*((u16 *)(((u8 *)actor) + 0x1E6))) == 0)
+        ((struct CrowDrawableView *)actor->drawable)->direction = 0x9F - actor->direction;
+        if (actor->paletteOffset == 0)
             state->turnDelay = 4;
         else
             state->turnDelay = 2;
@@ -177,7 +176,3 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
         state->turnDelay--;
     actor->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Crow_SteerAroundPlayer);
-#endif

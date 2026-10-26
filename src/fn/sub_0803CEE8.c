@@ -1,88 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "scene_pool.h"
-struct WirelessSceneActor {
-    u8 unknown0[4];
-    u32 terrainFlags, previousTerrainFlags;
-    u8 unknownC[4];
-    struct ScenePoolVec32 position;
-    s32 motion[3];
-    u8 unknown2c[0xc];
-    s32 heightA, heightB;
-    u32 flags40;
-    u8 colorEffect[4];
-    u8 unknown48[3];
-    u8 paletteIndex;
-    u8 unknown4c[0xc];
-    u16 timerA, timerB;
-    s32 parameter;
-    u8 unknown60[8];
-    u8 preview[0x58];
-    s32 forwardBias;
-    u8 unknownc4[0x468];
-    u8 contactIndex[0x40];
-    u32 motionFlags;
-    u8 unknown570[0x3c];
-    s32 forwardSpeed, verticalSpeed, lateralSpeed;
-    u8 unknown5b8[4];
-    s32 previousX;
-    u8 unknown5c0[4];
-    s32 previousZ;
-    u8 unknown5c8[4];
-    s32 impulse[4];
-    s32 offsetX;
-    u8 unknown5e0[0xc];
-    s8 impulseFrames;
-    u8 unknown5ed[3];
-    u16 heading;
-    u8 unknown5f2[0xe];
-    u8 model[0x250];
-    s8 marker;
-    u8 unknown851[3];
-    u32 index;
-    u8 unknown858[8];
-    u32 controlFlags;
-};
-void ScenePool_InitActorAppearance(void *, struct ScenePoolEntry *, u32, u32);
-void Terrain_ResolveActorMotion(void *);
-void Character_GetHeightAdjustedPosition(void *, struct Vec16 *);
-void SpatialIndex_SetPosition(void *, s32, s32, s32);
-void Collider_SetContactParameter(void *, s32);
-void ScenePool_ResetProximityContact(void *);
-void CharacterModel_ClearAnimationFlags(void *, u32);
-void ScenePool_UpdateActorDrawablePosition(void *);
 
-void Character_SetLowResourceColorEffect(void *, void *);
-void ActorMarkerPool_ShowMarker(s32);
-void Actor_ClampMovementSpeed(void *);
-
-struct Vec16 {
-    s16 x, y, z;
-};
-
-static inline s32 Scale(s32 n)
-{
-    return n >= 0 ? n >> 12 : -((-n) >> 12);
-}
-
-/* Layout of the actor as this function sees it (offsets from the ROM). */
-
-// confidence=low: wireless scene actor setup; initializes model, style and drain state, steps the impulse decay, derives heading and a terrain bounce, then clears the index.
-
-/* Layout of the actor as this function sees it (offsets from the ROM). */
-
-// confidence=low: wireless scene actor setup; initializes model, style and drain state, steps the impulse decay, derives heading and a terrain bounce, then clears the index.
-void WirelessObj_InitCollisionVolumes(void *);
-void ActorSprite_InitPartDrawings(void *, void *, u32);
-void CharacterModel_SetAnimationFlags(void *, int);
-s32 Div(s32, s32);
-void Modifier_InitDrainState(void *, void *, u16, u8);
-void ActorStats_ConfigureScaledParameters(void *, int, int, int, int, int, int);
-void CharacterModel_SetPrimaryAppearance(void *, void *);
-void ActorMarkerPool_HideMarker(int);
-void SceneActorStyle_Initialize(void *, int, int, int, int, int, int, u32, u32);
-void ActorAction_InitializeMode(void *, void *, int);
-void CharacterPreview_InitializePalette(void *, void *, u8);
-
-/* Layout of the actor as this function sees it (offsets from the ROM). */
 struct Sub0803CEE8Actor {
     u8 unk00[4];
     u32 terrainFlags;
@@ -122,14 +40,41 @@ struct Sub0803CEE8Actor {
     s32 index;
 };
 
-#ifdef NONMATCHING
-// fuzzy: 58.1%
-// scope shape 41 (differences once low registers are set aside)
+void WirelessObj_InitCollisionVolumes(void *);
+void ActorSprite_InitPartDrawings(void *, void *, u32);
+void CharacterModel_SetAnimationFlags(void *, int);
+s32 Div(s32, s32);
+void Modifier_InitDrainState(void *, void *, u16, u8);
+void ActorStats_ConfigureScaledParameters(void *, int, int, int, int, int, int);
+void CharacterModel_SetPrimaryAppearance(void *, void *);
+void ActorMarkerPool_HideMarker(int);
+void SceneActorStyle_Initialize(void *, int, int, int, int, int, int, u32, u32);
+void ActorAction_InitializeMode(void *, void *, int);
+void CharacterPreview_InitializePalette(void *, void *, u8);
+void Terrain_ResolveActorMotion(void *);
+void Actor_ClampMovementSpeed(void *);
+void ScenePool_UpdateActorDrawablePosition(void *);
+
+static inline void Wireless_SetStyle(u32 c1, u32 c2, u32 c3, u32 c4, struct Sub0803CEE8Actor *a)
+{
+    register u8 *p asm("r0") = a->styleBytes;
+    *p = c1;
+    p += 2;
+    *p = c2;
+    p -= 1;
+    *p = c3;
+    p += 3;
+    *p = c4;
+}
 // confidence=low: wireless scene actor setup; initializes model, style and drain state, steps the impulse decay, derives heading and a terrain bounce, then clears the index.
 int sub_0803CEE8(void *unused, struct Sub0803CEE8Actor *a)
 {
+    s32 frames;
+    s32 limit;
     s32 speed;
     s32 dx, dz;
+    s32 *previousX;
+    s32 *previousZ;
     s32 *vert;
     s32 *ox;
     s32 *i1;
@@ -139,20 +84,7 @@ int sub_0803CEE8(void *unused, struct Sub0803CEE8Actor *a)
 
     WirelessObj_InitCollisionVolumes(a);
     a->selfPtr = a;
-    {
-        u8 *p = a->styleBytes;
-        u8 c1 = 0xC;
-        u8 c2 = 0x12;
-        u8 c3 = 6;
-        u8 c4 = 0;
-        *p = c1;
-        p += 2;
-        *p = c2;
-        p -= 1;
-        *p = c3;
-        p += 3;
-        *p = c4;
-    }
+    Wireless_SetStyle(0xC, 0x12, 6, 0, a);
     ActorSprite_InitPartDrawings(a, a->model, 0x3D99);
     CharacterModel_SetAnimationFlags(a->model, 1);
 
@@ -160,19 +92,23 @@ int sub_0803CEE8(void *unused, struct Sub0803CEE8Actor *a)
     if (speed > 0xF000)
         speed = 0xF000;
     a->verticalSpeed += 0x200;
+    frames = a->impulseFrames;
     vert = &a->verticalSpeed;
-    if (a->impulseFrames > 0) {
+    if (frames > 0) {
         a->offsetX += a->impulse[0];
         a->impulse[0] += Div(-a->impulse[0], a->impulseFrames);
         a->impulse[1] += Div(-a->impulse[1], a->impulseFrames);
         a->impulse[2] += Div(-a->impulse[2], a->impulseFrames);
         a->impulseFrames--;
+        ox = &a->offsetX;
+        i1 = &a->impulse[1];
+        i2 = &a->impulse[2];
     } else {
         Memory_Clear(a->impulse, 0x10);
+        ox = &a->offsetX;
+        i1 = &a->impulse[1];
+        i2 = &a->impulse[2];
     }
-    ox = &a->offsetX;
-    i1 = &a->impulse[1];
-    i2 = &a->impulse[2];
 
     Actor_ClampMovementSpeed(a);
     a->motion[0] = *ox + speed - a->previousX;
@@ -181,15 +117,18 @@ int sub_0803CEE8(void *unused, struct Sub0803CEE8Actor *a)
 
     dx = (*ox - a->previousX) >> 12;
     dz = (a->position.z - a->previousZ) >> 12;
-    if (speed > 0x3000)
+    limit = 0x3000;
+    previousX = &a->previousX;
+    previousZ = &a->previousZ;
+    if (speed > limit)
         dx = 0x80;
     if (dx == 0 && dz == 0) {
         a->heading = 0xFFFF;
     } else {
         a->heading = (Math_Atan2(dx, dz) >> 5) << 5;
     }
-    a->previousX = *ox;
-    a->previousZ = a->position.z;
+    *previousX = *ox;
+    *previousZ = a->position.z;
 
     Terrain_ResolveActorMotion(a);
     above = (u32) ~(a->heightB >> 12) >> 31;
@@ -216,6 +155,3 @@ int sub_0803CEE8(void *unused, struct Sub0803CEE8Actor *a)
     a->index = -1;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0803CEE8);
-#endif

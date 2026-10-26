@@ -1,11 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 // confidence=low: projects the source and positions a timed icon around the screen center.
 #define ScreenOrbitEffect_UpdateFixedSlot sub_08232BE8
-#ifdef NONMATCHING
-// fuzzy: 77.7%
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining: projection and sprite-pointer lifetimes, branch layout and registers.
 struct OrbitVec {
     s16 x, y, z, pad;
 };
@@ -33,22 +28,9 @@ static inline s32 Scale4096(s32 n)
 {
     return n >= 0 ? n >> 12 : -(-n >> 12);
 }
-static inline void Project(struct OrbitVec *out, struct OrbitVec *world)
+static inline u32 Distance(struct OrbitVec *p, struct OrbitOwner *owner)
 {
-    s32 sum, height, low;
-    s32 x = world->x;
-    register s32 z asm("r2") = world->z;
-    out->x = Scale32((x - z) * 3);
-    sum = Scale32((x + z) * 3);
-    height = Scale32(world->y * 3);
-    low = sum - height;
-    sum += height;
-    out->x = out->x - gUnk_03005418.x + 120;
-    out->y = low - gUnk_03005418.y + 80;
-    out->z = sum - gUnk_03005418.z;
-}
-static inline u32 Distance(struct OrbitVec *p, struct OrbitVec *center)
-{
+    struct OrbitVec *center = &owner->center;
     s32 dx = p->x - center->x, dz = p->z - center->z;
     return dx * dx + dz * dz;
 }
@@ -60,7 +42,7 @@ static inline void Place(struct OrbitSlot *p)
     p->position.z = 0;
     p->priority = 160 - p->angle;
 }
-static inline u32 TakeFlag(u8 *flag)
+static inline u8 TakeFlag(u8 *flag)
 {
     if (*flag) {
         *flag = 0;
@@ -68,13 +50,13 @@ static inline u32 TakeFlag(u8 *flag)
     }
     return 0;
 }
-static inline void Project_08232BE8(struct OrbitVec *out, struct OrbitVec *world)
+static inline void Project(struct OrbitVec *out, struct OrbitVec *world)
 {
     s32 sum;
     s32 height;
     s32 low;
     s32 x = world->x;
-    register s32 z asm("r2") = world->z;
+    s32 z = world->z;
     out->x = Scale32((x - z) * 3);
     sum = Scale32((x + z) * 3);
     height = Scale32(world->y * 3);
@@ -82,32 +64,36 @@ static inline void Project_08232BE8(struct OrbitVec *out, struct OrbitVec *world
     sum += height;
     out->x = out->x - gUnk_03005418.x + 120;
     out->y = low - gUnk_03005418.y + 80;
-    out->z = sum - gUnk_03005418.z;
+    sum -= (u16)gUnk_03005418.z;
+    out->z = sum;
 }
 
-void ScreenOrbitEffect_UpdateFixedSlot(struct OrbitOwner *context, struct OrbitSlot *input)
+void ScreenOrbitEffect_UpdateFixedSlot(struct OrbitOwner *context, struct OrbitSlot *input0)
 {
-    register struct OrbitOwner *owner asm("r8") = context;
+    struct OrbitOwner *owner = context;
+    struct OrbitSlot *input = input0;
     u32 entered = TakeFlag(&input->enter);
-    asm("" : "+r"(entered));
     if (entered) {
         struct OrbitVec projected;
-        Project_08232BE8(&projected, &input->world);
-        input->angle = Math_Atan2(projected.x - owner->center.x, projected.z - owner->center.z);
+        Project(&projected, &input->world);
         {
-            s32 k1 = 4095;
-            if ((Distance(&projected, &owner->center) > k1) && ((input->age & 31) <= 16))
-                Place(input);
-            else
+            struct OrbitVec *center = &owner->center;
+            struct OrbitVec *screen = &projected;
+            input->angle = Math_Atan2(projected.x - owner->center.x, screen->z - center->z);
+        }
+        {
+            if ((Distance(&projected, owner) <= 4095) || ((input->age & 31) > 16))
                 input->flags |= 1;
+            else
+                Place(input);
         }
     } else {
         struct OrbitVec projected;
-        Project_08232BE8(&projected, &input->world);
-        if ((Distance(&projected, &owner->center) > 4095) && ((input->age & 31) <= 16))
-            Place(input);
-        else
+        Project(&projected, &input->world);
+        if ((Distance(&projected, owner) <= 4095) || ((input->age & 31) > 16))
             input->flags |= 1;
+        else
+            Place(input);
     }
     if (input->age > 59) {
         input->state = 0;
@@ -116,7 +102,3 @@ void ScreenOrbitEffect_UpdateFixedSlot(struct OrbitOwner *context, struct OrbitS
     }
     input->age++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08232BE8);
-#endif

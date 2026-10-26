@@ -1,12 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 85.3%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// confidence=low: spawns one particle (kind 0/1 picks tile frames) into a 16-slot pool.
-// Remaining difference: random-index/table register allocation in the position jitter.
 #include "scene_vec.h"
 
 #define gParticleRandomIndex gUnk_03005308
@@ -33,11 +27,12 @@ static inline s32 TruncatePoolOffset(s32 value)
 {
     return value >= 0 ? value >> 12 : -(-value >> 12);
 }
-void sub_081639E4(struct ParticlePool *inPool, struct SceneVec *position, s32 angle, u32 kind)
+#define ParticlePool_SpawnJitteredParticle sub_081639E4
+void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct SceneVec *position,
+                                        s32 angle, u32 kind)
 {
     s32 i;
     struct PoolParticle *p;
-    asm("" : "+r"(position));
     for (i = 0; i < 16; i++) {
         if (!inPool->particles[i].active) {
             break;
@@ -48,16 +43,18 @@ void sub_081639E4(struct ParticlePool *inPool, struct SceneVec *position, s32 an
         {
             u32 range;
             u32 mask;
-            u32 index;
+            register u32 index asm("r1");
+            register u16 *table asm("r6");
             p = &inPool->particles[i];
             p->flags &= ~1;
             p->position = *position;
+            table = gUnk_0203B400;
             index = gUnk_03005308;
             index++;
             mask = 0x3FF;
             index &= mask;
             {
-                u32 random = (*((typeof(gUnk_0203B400) *)0x0203B400))[index];
+                u32 random = table[index];
                 s32 x = (u16)p->position.x;
                 x -= 63;
                 range = 0x7F;
@@ -67,11 +64,11 @@ void sub_081639E4(struct ParticlePool *inPool, struct SceneVec *position, s32 an
             index = (index + 1) & mask;
             gUnk_03005308 = index;
             {
-                u32 random = (*((typeof(gUnk_0203B400) *)0x0203B400))[index];
+                u32 random = table[index];
                 s32 z = (u16)p->position.z;
                 z -= 63;
-                p->position.z = z + random;
                 random &= range;
+                p->position.z = z + random;
             }
         }
         p->position.y += 128;
@@ -94,8 +91,7 @@ void sub_081639E4(struct ParticlePool *inPool, struct SceneVec *position, s32 an
             u32 index = (gUnk_03005308 + 1) & 0x3FF;
             gUnk_03005308 = index;
             {
-                u32 random =
-                    *((u16 *)((index << 1) + ((u32)(*((typeof(gUnk_0203B400) *)0x0203B400)))));
+                u32 random = *(u16 *)((index << 1) + RANDOM_TABLE_ADDR);
                 u32 range = 7;
                 p->lifetime = (random & range) + 8;
             }
@@ -104,7 +100,3 @@ void sub_081639E4(struct ParticlePool *inPool, struct SceneVec *position, s32 an
         p->kind = kind;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081639E4);
-#endif

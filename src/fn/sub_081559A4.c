@@ -1,13 +1,7 @@
 // confidence=low: inferred from player cue phases and animation consumers.
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 81.2%
 // fix.py best (sweep after the inlined-insn fix)
 // confidence=low: timed held-action phases, animation and completion script.
-#define H(o) (*(u16 *)(p + (o)))
-#define W(o) (*(u32 *)(p + (o)))
-#define B(o) (*(u8 *)(p + (o)))
 void Player_AddControlFlags(void *, u32);
 s32 ActorVariant_GetTableValue(u32, u32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
@@ -26,78 +20,116 @@ struct Call {
     u32 pad : 16;
     s32 *values;
 };
-static inline u32 held(u8 *p, u32 mask)
+struct ChargePosition {
+    s16 x, y, z, pad;
+};
+struct TimedChargePlayer {
+    u8 unk0[0x20];
+    u32 flags;
+    u8 unk24[0x324];
+    const u16 *inputKeys;
+    u8 unk34C[0x56];
+    u8 heading;
+    u8 side;
+    u8 facing;
+    u8 unk3A5[0x73];
+    u8 actionMode;
+    u8 unk419[0x3F];
+    u8 phase;
+    u8 unk459[0x1];
+    u16 frame;
+    u8 unk45C[0x9C];
+    u16 count;
+    u8 unk4FA[0x3];
+    u8 soundActive;
+    u8 unk4FE[0x2A];
+    u16 timeLeft;
+    u16 elapsed;
+    u16 duration;
+    u8 unk52E[0x76];
+    u32 script;
+    u8 unk5A8[0x154];
+    u16 effectTimer;
+    u8 unk6FE[0x382];
+    struct ChargePosition origin;
+};
+static inline u32 held(struct TimedChargePlayer *p, u32 mask)
 {
-    return W(0x20) & mask;
+    return p->flags & mask;
 }
-void Player_UpdateTimedChargeAction(u8 *actor)
+void Player_UpdateTimedChargeAction(struct TimedChargePlayer *actor)
 {
-    register u8 *p asm("r4") = actor;
+    struct TimedChargePlayer *p = actor;
     Player_AddControlFlags(p, 8);
-    switch (*((u8 *)(p + 0x458))) {
+    switch (p->phase) {
         case 0:
-            Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 0), 64, 1);
-            if ((*((u16 *)((*((u32 *)(p + 0x348))) + 2))) & 1)
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0), 64, 1);
+            if ((p->inputKeys[1]) & 1)
                 ActorSequence_Begin(p, 7, 1);
             break;
 
         case 1: {
-            u16 *frame = (u16 *)(p + 0x45A);
+            u16 *frame = &p->frame;
             if (!(*frame)) {
-                *((u8 *)(p + 0x3A4)) = 4;
-                *((u8 *)(p + 0x3A2)) = 1;
-                *((u8 *)(p + 0x3A3)) = 0;
+                p->facing = 4;
+                p->heading = 1;
+                p->side = 0;
                 Player_SetActionOrigin(p);
                 (*frame)++;
             }
-            *((u16 *)(p + 0x6FC)) = 15;
-            if (!Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 8), 64, 1))
+            p->effectTimer = 15;
+            if (!Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 8), 64, 1))
                 break;
             Sound_PlaySong(203);
-            if (!((*((u16 *)(*((u32 *)(p + 0x348))))) & 1))
+            if (!((p->inputKeys[0]) & 1))
                 goto release;
             if (held(p, 16)) {
                 Sound_PlaySong(216);
-                *((u8 *)(p + 0x4FD)) = 1;
-                *((u16 *)(p + 0x4F8)) = 0;
+                p->soundActive = 1;
+                p->count = 0;
                 ActorSequence_Begin(p, 7, 2);
                 break;
             }
-            *((u16 *)(p + 0x4F8)) = 0;
+            p->count = 0;
             goto pause;
         }
 
         case 2: {
-            u16 *count = (u16 *)(p + 0x4F8);
-            *((u32 *)(p + 0x20)) |= 160;
+            u32 flags = 160;
+            u16 *count;
+            p->flags |= flags;
+            count = &p->count;
             if ((*count) <= 4) {
-                if (((++(*count)) == 5) && (!(*((u8 *)(p + 0x418)))))
+                if (((++(*count)) == 5) && (!(p->actionMode)))
                     Sound_PlaySong(296);
             }
-            Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 9), 64, 1);
-            *((u16 *)(p + 0x6FC)) = 30;
-            ConvergingEffects_EmitNearParticle(p, p + 0xA80);
-            if (!((*((u16 *)(*((u32 *)(p + 0x348))))) & 1)) {
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 9), 64, 1);
+            p->effectTimer = 30;
+            ConvergingEffects_EmitNearParticle(p, &p->origin);
+            if (!((p->inputKeys[0]) & 1)) {
                 Sound_StopSong(216);
-                *((u8 *)(p + 0x4FD)) = 0;
+                p->soundActive = 0;
                 goto release;
             }
             if (!held(p, 16)) {
                 Sound_StopSong(216);
-                *((u8 *)(p + 0x4FD)) = 0;
+                p->soundActive = 0;
             pause:
                 ActorSequence_Begin(p, 7, 3);
 
                 goto end;
             }
             {
-                u32 elapsed = (u16)((*((s16 *)(gUnk_02000710 + 0x876))) + (*((u16 *)(p + 0x52A))));
-                *((u16 *)(p + 0x52A)) = elapsed;
-                if (elapsed >= (*((u16 *)(p + 0x52C)))) {
+                s32 elapsed = *((s16 *)(gUnk_02000710 + 0x876));
+                elapsed += p->elapsed;
+                p->elapsed = elapsed;
+                if ((u16)elapsed >= (p->duration)) {
+                    u32 *scriptPtr;
                     u32 script;
                     Hud_ClearTimer();
                     ActorSequence_Begin(p, 7, 5);
-                    script = *((u32 *)(p + 0x5A4));
+                    scriptPtr = &p->script;
+                    script = *scriptPtr;
                     if (script) {
                         s32 value;
                         struct Call call;
@@ -106,7 +138,7 @@ void Player_UpdateTimedChargeAction(u8 *actor)
                         do {
                             value = 1;
                         } while (0);
-                        *((u32 *)(p + 0x5A4)) = 0;
+                        *scriptPtr = 0;
                         Script_Call(script, &call);
                     }
                 }
@@ -114,11 +146,12 @@ void Player_UpdateTimedChargeAction(u8 *actor)
             }
         }
 
-        case 3:
-            *((u32 *)(p + 0x20)) |= 128;
-            Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 10), 64, 1);
-            *((u16 *)(p + 0x6FC)) = 30;
-            if (!((*((u16 *)(*((u32 *)(p + 0x348))))) & 1)) {
+        case 3: {
+            u32 flags = 128;
+            p->flags |= flags;
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 10), 64, 1);
+            p->effectTimer = 30;
+            if (!((p->inputKeys[0]) & 1)) {
             release:
                 ActorSequence_Begin(p, 7, 4);
 
@@ -126,50 +159,47 @@ void Player_UpdateTimedChargeAction(u8 *actor)
             }
             if (held(p, 16)) {
                 Sound_PlaySong(216);
-                *((u8 *)(p + 0x4FD)) = 1;
-                *((u16 *)(p + 0x4F8)) = 0;
+                p->soundActive = 1;
+                p->count = 0;
                 ActorSequence_Begin(p, 7, 2);
             }
             break;
-
+        }
         case 4:
-            *((u16 *)(p + 0x6FC)) = 15;
-            if (Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 11), 64,
-                                    1)) {
+            p->effectTimer = 15;
+            if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 11), 64, 1)) {
                 Player_UpdateFacingSide(p);
                 ActorSequence_Begin(p, 7, 0);
             }
             break;
 
         case 5:
-            Player_SetAnimation(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 9), 64, 1);
-            *((u16 *)(p + 0x6FC)) = 30;
-            ConvergingEffects_EmitNearParticle(p, p + 0xA80);
+            Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 9), 64, 1);
+            p->effectTimer = 30;
+            ConvergingEffects_EmitNearParticle(p, &p->origin);
             break;
     }
 
 end:
-    if ((*((u8 *)(p + 0x458))) != 5) {
-        if (!(--(*((u16 *)(p + 0x528))))) {
+    if ((p->phase) != 5) {
+        if (!(--(p->timeLeft))) {
+            u32 *scriptPtr;
             u32 script;
             Hud_ClearTimer();
             Sound_StopSong(216);
             Player_UpdateFacingSide(p);
             PlayerCue_EnterStandUpdate(p);
-            script = *((u32 *)(p + 0x5A4));
+            scriptPtr = &p->script;
+            script = *scriptPtr;
             if (script) {
                 s32 value;
                 struct Call call;
                 call.count = 1;
                 call.values = &value;
                 value = 0;
-                *((u32 *)(p + 0x5A4)) = 0;
+                *scriptPtr = 0;
                 Script_Call(script, &call);
             }
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateTimedChargeAction);
-#endif
