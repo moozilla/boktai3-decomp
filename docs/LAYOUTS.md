@@ -9,7 +9,8 @@ has many partial declarations. `gUnk_030042A0` has 15 (`struct Vec`, `struct Cam
 `gUnk_02000710` has 48, counting casts like `(struct BarrierGame *)gUnk_02000710`.
 Bytes one file pads are often named in another. `tools/layoutmerge.py` connects
 these declarations. Use it before inventing names for padding, when writing a shared
-header (phase 4), or when two drafts disagree about a field.
+header (phase 4), or when two drafts disagree about a field. The objects themselves,
+their names and shared declarations are in `symbols/ram.csv` ([RAM.md](RAM.md)).
 
 ```bash
 python3 tools/layoutmerge.py --summary
