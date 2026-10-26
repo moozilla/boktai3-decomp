@@ -1,9 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 70.1%
-// fix.py best (sweep after the inlined-insn fix)
-// twin.py transplant from a matched near-clone
-// 31 differing instruction runs; first diff at +0x4 (adds r7, r0, #0 vs adds r6, r0, #0)
 void Bg_SetLayerMap(u32, u32, u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void DarkLoan_HideSprites(u8 *);
@@ -16,76 +12,100 @@ void AnimData_SelectPaletteBank(u8 *, u32);
 void MessageWindow_ShowMessage(u32);
 void DarkLoan_UpdateAdjustment(void);
 void DarkLoan_SetState(u8 *, void (*)(void));
-void StatGauge_BeginAdjustment(u8 *s)
+struct StatGaugeWidget {
+    u8 pad0[8];
+    u32 flags;
+    u8 padC[0x54];
+};
+struct StatGaugeState {
+    u8 pad0[0x18];
+    u8 resource[0x40];
+    struct StatGaugeWidget widgets[22];
+    u32 extraFlags;
+    u8 pad89C[0x28];
+    u8 palette[0x1C];
+    u32 layerMap;
+    u8 pad8E4[0xA];
+    u16 adjustment;
+    u8 pad8F0[8];
+    u16 state[10];
+};
+
+void StatGauge_BeginAdjustment(u8 *context)
 {
-    u32 zero;
+    register u8 *s;
+    register s32 count;
     u32 latezero;
-    u32 mask;
-    u32 mask2;
+    register u32 mask asm("r4");
+    register u32 mask2 asm("r1");
     s8 mask3;
     u32 value;
-    struct Word8 {
-        u8 pad[8];
-        u32 flags;
-    };
-    u8 *resource;
+    register u8 *resource asm("r6");
     u32 *p;
-    u32 *q;
+    register u32 *q;
     u32 *initial;
-    s32 i;
-    s32 j;
-    typeof(p) c1;
-    Bg_SetLayerMap(0, *((u32 *)(s + 0x8E0)), 4);
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
+    register u32 *c1 asm("r2");
+    s = context;
+    Bg_SetLayerMap(0, ((struct StatGaugeState *)s)->layerMap, 4);
+    count = 0;
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, count);
     DarkLoan_HideSprites(s);
-    value = *((u32 *)(s + 0x60));
+    value = ((struct StatGaugeState *)s)->widgets[0].flags;
     value &= (mask = ~1);
-    *((u32 *)(s + 0x60)) = value;
-    Anim_SetKeyframes(s + 0x58, resource = s + 0x18, 5, 1, zero);
-    *((u32 *)(s + 0x240)) &= mask;
-    Anim_LoadKeyframe(s + 0x238, resource, 0x12, 1);
-    *((u16 *)(s + 0x8EE)) = zero;
+    ((struct StatGaugeState *)s)->widgets[0].flags = value;
+    Anim_SetKeyframes((u8 *)&((struct StatGaugeState *)s)->widgets[0],
+                      resource = ((struct StatGaugeState *)s)->resource, 5, 1, count);
+    ((struct StatGaugeState *)s)->widgets[5].flags &= mask;
+    Anim_LoadKeyframe((u8 *)&((struct StatGaugeState *)s)->widgets[5], resource, 0x12, 1);
+    ((struct StatGaugeState *)s)->adjustment = count;
+    /* Continue from the resource block to the first widget's flags. */
     resource += 0x48;
-    initial = (u32 *)(s + 0x2A0);
-    i = 3;
+    initial = &((struct StatGaugeState *)s)->widgets[6].flags;
+    count = 3;
     do {
         *initial &= mask;
         initial = (u32 *)(((u8 *)initial) + 0x60);
-    } while ((--i) >= 0);
+    } while ((--count) >= 0);
     DarkLoan_UpdateBalanceDigits(s);
     StatGauge_DrawPreview(s);
-    *((u32 *)(s + 0x5A0)) &= (mask2 = ~1);
-    q = (u32 *)(resource + 0x5A0);
-    p = (u32 *)(resource + 0x3C0);
+    {
+        u32 flags = ((struct StatGaugeState *)s)->widgets[14].flags;
+        flags &= (mask2 = ~1);
+        ((struct StatGaugeState *)s)->widgets[14].flags = flags;
+    }
+    q = &((struct StatGaugeState *)resource)->widgets[14].flags;
+    p = &((struct StatGaugeState *)resource)->widgets[9].flags;
     c1 = p;
-    j = 3;
+    count = 3;
     do {
         *c1 &= mask2;
         *q &= mask2;
         q = (u32 *)(((u8 *)q) + 0x60);
-        p = (u32 *)(((u8 *)c1) + 0x60);
-    } while ((--j) >= 0);
+        c1 = (u32 *)(((u8 *)c1) + 0x60);
+    } while ((--count) >= 0);
     latezero = 0;
     DarkLoan_UpdateAdjustmentDigits(s);
+    ((struct StatGaugeState *)s)->state[8] = latezero;
+    ((struct StatGaugeState *)s)->state[9] = latezero;
     {
-        u16 *d1 = (u16 *)(s + 0x8F8);
-        d1[8] = latezero;
+        struct StatGaugeWidget *widget = &((struct StatGaugeState *)s)->widgets[19];
+        widget->flags &= (mask3 = ~1);
     }
-    *((u16 *)(s + 0x90A)) = latezero;
-    ((struct Word8 *)(s + 0x778))->flags &= (mask3 = ~1);
-    *((u32 *)(s + 0x898)) &= mask3;
-    AnimData_SelectPaletteBank(s + 0x8C4, 0x1B4);
-    ((struct Word8 *)(s + 0x7D8))->flags &= mask3;
-    ((struct Word8 *)(s + 0x838))->flags &= mask3;
+    ((struct StatGaugeState *)s)->extraFlags &= mask3;
+    AnimData_SelectPaletteBank(((struct StatGaugeState *)s)->palette, 0x1B4);
+    {
+        struct StatGaugeWidget *widget = &((struct StatGaugeState *)s)->widgets[20];
+        widget->flags &= mask3;
+    }
+    {
+        struct StatGaugeWidget *widget = &((struct StatGaugeState *)s)->widgets[21];
+        widget->flags &= mask3;
+    }
     MessageWindow_ShowMessage(4);
-    *((u16 *)(s + 0x8FA)) = latezero;
-    *((u16 *)(s + 0x8FC)) = latezero;
-    *((u16 *)(s + 0x8FE)) = latezero;
-    *((u16 *)(s + 0x900)) = latezero;
-    *((u16 *)(s + 0x8F8)) = latezero;
+    ((struct StatGaugeState *)s)->state[1] = latezero;
+    ((struct StatGaugeState *)s)->state[2] = latezero;
+    ((struct StatGaugeState *)s)->state[3] = latezero;
+    ((struct StatGaugeState *)s)->state[4] = latezero;
+    ((struct StatGaugeState *)s)->state[0] = latezero;
     DarkLoan_SetState(s, DarkLoan_UpdateAdjustment);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", StatGauge_BeginAdjustment);
-#endif
