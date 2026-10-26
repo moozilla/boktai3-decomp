@@ -1,13 +1,16 @@
 #include "scene_actor_chase.h"
 // MATCHING_CONCESSION: register-pinning
 
-#ifdef NONMATCHING
-// fuzzy: 89.0%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
 // confidence=low: periodically probes a randomized heading and updates the Spider route endpoint and cooldown.
 
-// RNG/vector allocation, route argument lifetimes, and timer-store scheduling still differ.
+struct SpiderMovementView {
+    u8 pad[0x310];
+    struct ContactPosition goal;
+};
+struct SpiderGroupView {
+    u8 pad[0x1FC];
+    void *mesh;
+};
 struct Transform {
     u8 pad[9];
     u8 facing;
@@ -28,56 +31,79 @@ static inline u8 Test(struct SpiderContext *ctx, u32 mask)
     return 0;
 }
 
-inline static u32 Arg1(u32 k_, struct SceneActorRegistryResetView *input)
+static inline struct ContactPosition *Spider_GetGoal(u32 offset,
+                                                     struct SceneActorRegistryResetView *input)
 {
-    return ((u8 *)input) + k_;
+    return (void *)((u8 *)input + offset);
 }
 
+static inline u32 RandomChoice(u32 *counter, const u16 *table, u32 mask)
+{
+    u32 index = (*counter + 1) & mask;
+    u32 value;
+    *counter = index;
+    value = table[index];
+    return value & 3;
+}
+static inline u8 SelectHeading(u16 random, u8 *direction)
+{
+    s32 angle = (random & 127) - 63;
+    return angle + *direction;
+}
+static inline s32 ReadCounter(struct SceneActorRegistryResetView *actor)
+{
+    register u32 offset asm("r1") = (u32) & ((struct SceneActorRegistryResetView *)0)->counter2AC;
+    s32 *counter = (void *)((u8 *)actor + offset);
+    asm("" : : "r"(offset));
+    return *counter;
+}
 void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
 {
     struct SpiderContext *ctx = input->context;
-    u8 *group = (u8 *)(&input->group);
-    register struct Transform *transform asm("r5") = (void *)(((u8 *)input) + 0x50);
+    struct SpiderGroupView *group = (void *)&input->group;
+    register struct Transform *transform asm("r5") = (void *)&input->id;
     struct ContactPackedVector target;
     register const u16 *table asm("r6") = gUnk_0203B400;
     register u32 *indexAddress asm("sl") = &gUnk_03005308;
+    u32 rawIndex = *indexAddress + 1;
     register u32 mask asm("sb") = 1023;
-    u16 index = ((*indexAddress) + 1) & mask;
+    u16 index = rawIndex & mask;
     u16 distance = table[index] & mask;
     u8 heading;
-    s32 angle;
+    u8 *field;
     distance += 256;
     index = (index + 1) & mask;
-    *indexAddress = index;
+    field = (void *)indexAddress;
+    *(u32 *)field = index;
     {
-        typeof(table[index]) v1 = table[index];
-        angle = (v1 & 127) - 63;
+        u16 sample = table[index];
+        field = &input->direction;
+        heading = SelectHeading(sample, field);
     }
-    heading = angle + transform->facing;
-    if (Mod(input->counter2AC, 30) == 0) {
+    if (Mod(ReadCounter(input), 30) == 0) {
         if (ctx->timer > 0)
             goto decrement;
         target.x = ((gUnk_086149C4[(heading + 64) & 255] * distance) >> 14) + transform->position.x;
         target.y = transform->position.y;
         target.z = ((gUnk_086149C4[heading] * distance) >> 14) + transform->position.z;
-        if (!Nav_IsPositionInMesh(*((void **)(((u8 *)input) + 0x5D0)), &input->position,
-                                  (void *)(&target))) {
+        if (!Nav_IsPositionInMesh(input->routeObject, &input->position, (void *)(&target))) {
             if (!Test(ctx, 16))
                 input->field2C2 = 64;
             SceneActorMovement_ResolveRoutePosition(input);
             ctx->timer = 0;
         } else {
-            *((struct ContactPosition *)(((u8 *)input) + 0x310)) =
-                *((struct ContactPosition *)(&target));
-            if (!(table[ *indexAddress = ((*indexAddress) + 1) & mask] & 3))
+            ((struct SpiderMovementView *)input)->goal = *((struct ContactPosition *)(&target));
+            if (!(RandomChoice(indexAddress, table, mask)))
                 input->field2C2 = 16;
             else
                 input->field2C2 = 64;
             {
-                void *mesh = *((void **)(group + 0x1FC));
+                void *mesh = group->mesh;
+                struct ContactPosition *to;
                 struct ContactPosition *from = &transform->position;
-                struct ContactPosition *to = (void *)Arg1(0x310, input);
-                u8 moved = Chase_TryRoute(input, mesh, from, to);
+                u8 moved;
+                to = Spider_GetGoal((u32) & ((struct SpiderMovementView *)0)->goal, input);
+                moved = Chase_TryRoute(input, mesh, from, to);
                 if (!moved) {
                     SceneActorMovement_ResolveRoutePosition(input);
                     ctx->timer = moved;
@@ -99,7 +125,3 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
     }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Spider_UpdateWanderGoal);
-#endif
