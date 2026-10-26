@@ -1,6 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.4%
 // fix.py best after the inlined-insn fix
 struct HomingVec {
     s16 x, y, z, pad;
@@ -105,6 +104,32 @@ static inline void Face(struct HomingSlot *p, struct HomingParams *params, u32 s
     Anim_SetSequence(&p->sequence, p->resource, (u16)sequence, flips[0], *saved);
 }
 
+static inline void FaceFinal(struct HomingSlot *p, struct HomingParams *params, u32 sequence,
+                             u32 one)
+{
+    u8 direction;
+    u8 flips[2];
+    u8 *first;
+    u8 *second;
+    u8 *saved;
+    u32 check;
+    direction = (((u16)params->angle + 0x60) >> 6) & 3;
+    first = &flips[0];
+    second = &flips[1];
+    check = (u8)(direction - 1);
+    saved = second;
+    if (check <= 1)
+        *first = one;
+    else
+        *first = 0;
+    if (direction > 1)
+        *second = 1;
+    else
+        *second = 0;
+    asm("" : : "r"(saved) : "r5");
+    Anim_SetSequence(&p->sequence, p->resource, (u16)sequence, flips[0], *saved);
+}
+
 static inline void Aim(struct HomingSlot *p, struct HomingParams *params)
 {
     struct HomingVec *player = Player_GetEffectivePosition(0);
@@ -114,11 +139,9 @@ static inline void Aim(struct HomingSlot *p, struct HomingParams *params)
 
 static inline void SetRiseHeight(struct HomingSlot *p, u16 height)
 {
-    register u32 offset asm("r0") = 0x12a;
-    asm("" : "+r"(offset));
+    register u32 offset = 0x12a;
     {
         register s16 *dest asm("r2") = (void *)((u8 *)p + offset);
-        asm("" : "+r"(dest));
         *dest = height;
     }
 }
@@ -140,7 +163,7 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
     u32 sequence;
     switch (*state) {
         case 0: {
-            register u32 one asm("r5");
+            register u32 one;
             u32 time = p->lifetime;
             one = 1;
             asm("" : "+r"(one));
@@ -159,7 +182,7 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
         }
 
         case 1: {
-            register u16 *delay asm("r2") = &p->params.delay;
+            register u16 *delay = &p->params.delay;
             s32 limit = (slot * 30) + 30;
             asm("" : "+r"(delay));
             if (p->lifetime > (limit + (*delay))) {
@@ -224,7 +247,7 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                 }
             }
             sequence = (params->variant == 0) ? (7) : (0);
-            Face(p, params, sequence, 1);
+            FaceFinal(p, params, sequence, 1);
             p->state = 3;
             {
                 struct HomingCollider *collider = &p->primaryCollider;
@@ -242,28 +265,23 @@ u32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                 SetRiseHeight(p, p->target.y - ((30 - (limit - elapsed)) * 2));
             }
             {
-                register u32 spriteOffset asm("r1");
-                register u32 timerOffset asm("r2");
-                register struct HomingSprite *sprite asm("r0");
-                register s16 *timer asm("r4");
+                register u32 spriteOffset;
+                register u32 timerOffset;
+                register struct HomingSprite *sprite;
+                register s16 *timer;
                 spriteOffset = 0x10c;
-                asm("" : "+r"(spriteOffset));
                 sprite = (void *)(((u8 *)p) + spriteOffset);
-                asm("" : "+r"(sprite));
                 timerOffset = 0x15e;
-                asm("" : "+r"(timerOffset));
                 timer = (void *)(((u8 *)p) + timerOffset);
-                asm("" : "+r"(timer));
-                if (Sprite_BlinkUntilExpired(sprite, *timer, 0x2d, 0x5a))
-                    return 1;
-                (*timer)++;
+                {
+                    s32 timerValue = *timer;
+                    if (Sprite_BlinkUntilExpired(sprite, timerValue, 0x2d, 0x5a))
+                        return 1;
+                    (*timer)++;
+                }
             }
             break;
     }
 
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", HomingProjectile_UpdateDefaultState);
-#endif
