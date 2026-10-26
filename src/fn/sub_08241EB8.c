@@ -2,13 +2,16 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 
-#ifdef NONMATCHING
-// fuzzy: 96.9%
-// fix.py best version (reprinted C)
-// Remaining differences: register allocation (r1/r3 swaps) in the head and tail.
-
-struct P {
-    u8 pad0[0x14C];
+struct PlayerSpiralPose {
+    u8 unknown0[0x18];
+    u32 song;
+    u8 unknown1C[0x30 - 0x1C];
+    struct SceneVec position;
+    u8 unknown38[0xAC - 0x38];
+    struct SceneVec savedPosition;
+    u8 unknownB4[0xD4 - 0xB4];
+    u32 animationResource;
+    u8 unknownD8[0x14C - 0xD8];
     struct ContactSwarmSprite sprite;
     u8 pad1[0x3A2 - 0x14C - sizeof(struct ContactSwarmSprite)];
     u8 facing, flip, dir;
@@ -17,25 +20,27 @@ struct P {
     u32 unknown40C;
     const void *resource;
     const void *resource2;
-    u8 pad3[0x458 - 0x418];
+    u8 pad3[0x457 - 0x418];
+    u8 tetherMode;
     u8 phase;
     u8 pad4;
     u16 timer;
-    u8 pad5[0x4E8 - 0x45C];
+    u8 unknown45C[8];
+    u8 completion0, completion1;
+    u8 pad5[0x4E8 - 0x466];
     u16 scale;
     u8 pad6[0x58C - 0x4EA];
-    void (*fn)(struct P *);
+    void (*fn)(struct PlayerSpiralPose *);
+    u8 unknown590[0xAD6 - 0x590];
+    u16 trailResource, trailWindow;
 };
-void Player_SetTetherMode(struct P *, s32, s32);
-void LinkPlayer_FlushPendingEffects(struct P *);
+void Player_SetTetherMode(struct PlayerSpiralPose *, s32, s32);
+void LinkPlayer_FlushPendingEffects(struct PlayerSpiralPose *);
 void Player_PlayLocalSong(s32, u32);
-s32 Player_SetSecondaryActionFlags(struct P *, u32);
-s32 Player_SetAnimationIndex(struct P *, s32, s32);
-void SpiralTrail_CreateWithParticles(struct P *, s32, s32, s32, s32);
+s32 Player_SetSecondaryActionFlags(struct PlayerSpiralPose *, u32);
+s32 Player_SetAnimationIndex(struct PlayerSpiralPose *, s32, s32);
+void SpiralTrail_CreateWithParticles(struct PlayerSpiralPose *, s32, s32, s32, s32);
 extern u8 *gUnk_030042E4;
-#define B(o) (*(u8 *)((u8 *)p + (o)))
-#define H(o) (*(u16 *)((u8 *)p + (o)))
-#define W(o) (*(u32 *)((u8 *)p + (o)))
 static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceState *st)
 {
     struct ContactSwarmSprite *sprite = sp;
@@ -148,51 +153,76 @@ static inline void Step(struct ContactSwarmSprite *sp, struct DisplaySequenceSta
 }
 
 // confidence=low: an alternate-form cue that counts up while sliding the pose window
-static inline u32 Arg1(u32 k_, struct P *p)
+void PlayerCue_UpdateSpiralPose(struct PlayerSpiralPose *p)
 {
-    return ((u8 *)p) + k_;
-}
-
-void PlayerCue_UpdateSpiralPose(struct P *p)
-{
-    if ((*((u8 *)(((u8 *)p) + 0x457))) != 0xe) {
+    if (p->tetherMode != 0xe) {
         Player_SetTetherMode(p, 0xe, 0);
-        *((u16 *)(((u8 *)p) + 0xAD8)) = 0;
+        p->trailWindow = 0;
         LinkPlayer_FlushPendingEffects(p);
-        Player_PlayLocalSong(*((u32 *)(((u8 *)p) + 0x18)), 0x39A);
+        Player_PlayLocalSong(p->song, 0x39A);
         SpiralTrail_CreateWithParticles(p, 1, 0, 0x20, 0x38);
     }
     {
-        u8 t = p->timer;
-        s32 c = 7;
-        if ((c & t) >= (c - (t >> 2))) {
+        register u32 timerOffset asm("r3") = (u32) & ((struct PlayerSpiralPose *)0)->timer;
+        u32 t;
+        register s32 c asm("r1");
+        register u32 low asm("r2");
+        t = *(u16 *)((u8 *)p + timerOffset);
+        asm("" : : "r"(timerOffset));
+        c = 7;
+        low = c;
+        low &= t;
+        if ((s32)low >= (c - (s32)(t >> 2))) {
             Player_SetSecondaryActionFlags(p, 0x41);
-            *((struct SceneVec *)(((u8 *)p) + 0xAC)) = *((struct SceneVec *)(((u8 *)p) + 0x30));
+            p->savedPosition = p->position;
         }
     }
     Player_SetAnimationIndex(p, 0x9a, 0x40);
-    *((u32 *)(((u8 *)p) + 0xD4)) = ((u32)gUnk_030042E4) + 0x2DE0;
-    Anim_SetSequence(&p->seq, p->resource, 0, p->facing, p->flip);
-    Step(&p->sprite, &p->seq);
-    *((u16 *)(((u8 *)p) + 0xAD6)) = 0x16F;
-    *((u16 *)(((u8 *)p) + 0xAD8)) += 3;
+    p->animationResource = ((u32)gUnk_030042E4) + 0x2DE0;
     {
-        register u32 mask asm("r2");
-        mask = 0xFFFF;
-        asm("" : "+r"(mask));
-        if ((*((u16 *)Arg1(0xAD8, p))) > 0x20)
-            *((u16 *)(((u8 *)p) + 0xAD8)) = 0x20;
+        register u32 offset asm("r3") = (u32) & ((struct PlayerSpiralPose *)0)->seq;
+        struct DisplaySequenceState *seq;
+        asm("" : "+r"(offset));
+        seq = (struct DisplaySequenceState *)((u8 *)p + offset);
+        Anim_SetSequence(seq, p->resource, 0, p->facing, p->flip);
         {
-            u32 nt = (*((u16 *)(((u8 *)p) + 0x45A))) + 1;
-            *((u16 *)(((u8 *)p) + 0x45A)) = nt;
+            register u32 spriteOffset asm("r3") = (u32) & ((struct PlayerSpiralPose *)0)->sprite;
+            asm("" : "+r"(spriteOffset));
+            Step((struct ContactSwarmSprite *)((u8 *)p + spriteOffset), seq);
+        }
+    }
+    {
+        register u32 offset asm("r2") = (u32) & ((struct PlayerSpiralPose *)0)->trailResource;
+        register u16 *target asm("r1");
+        u32 resource;
+        asm("" : "+r"(offset));
+        target = (u16 *)((u8 *)p + offset);
+        resource = 0x16F;
+        *target = resource;
+    }
+    {
+        u32 window;
+        register u32 mask asm("r2");
+        register u32 temp asm("r3");
+        register u32 windowOffset asm("r3") = (u32) & ((struct PlayerSpiralPose *)0)->trailWindow;
+        u16 *windowField;
+        asm("" : "+r"(windowOffset));
+        windowField = (u16 *)((u8 *)p + windowOffset);
+        window = *windowField + 3;
+        *windowField = window;
+        temp = 0xFFFF;
+        asm("" : "+r"(temp));
+        mask = temp;
+        if ((u16)window > 0x20)
+            *windowField = 0x20;
+        {
+            u32 nt = p->timer + 1;
+            p->timer = nt;
             if ((nt & mask) > 0x1f) {
-                *((u8 *)(((u8 *)p) + 0x464)) = 1;
-                *((u8 *)(((u8 *)p) + 0x465)) = 1;
+                p->completion0 = 1;
+                p->completion1 = 1;
                 Player_SetTetherMode(p, 0, 0);
             }
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateSpiralPose);
-#endif
