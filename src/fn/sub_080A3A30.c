@@ -1,10 +1,5 @@
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 94.0%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining differences: address lifetimes, register allocation, and instruction scheduling.
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: targets player zero and starts the contact pursuit control.
 extern u8 *gUnk_02000580;
@@ -15,6 +10,11 @@ struct PursuitContext {
     u8 pad[0x628];
     s16 timer, delay;
     u16 flags;
+};
+struct SpiderPursuitGroup {
+    u8 unknown0[0x1FC];
+    void *mesh;
+    struct ContactPosition *point;
 };
 static inline u8 Blocked(struct SceneActorRegistryResetView *a)
 {
@@ -79,13 +79,12 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     struct PursuitContext *ctx;
     u8 *group;
     u8 ready;
-    register void **mesh asm("sl");
+    void **mesh;
     struct ContactPosition **point;
     void *terrain;
     void *dest;
     s32 result;
-    typeof(mesh) c1;
-    u32 k1;
+    register u32 motionMask asm("r9");
     if (Blocked(a))
         return;
     if (!gUnk_02000580)
@@ -95,25 +94,24 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     ready = HasFlag(ctx, 1);
     if (ready)
         return;
-    asm("" : "+r"(mesh));
-    mesh = (void **)(group + 0x1FC);
-    c1 = mesh;
+    mesh = &((struct SpiderPursuitGroup *)group)->mesh;
     if (!Nav_IsPositionInMesh(*mesh, &a->position, gUnk_02000580 + 0x30))
         return;
-    point = (void *)(group + (k1 = 0x200));
+    motionMask = 0x200;
+    point = &((struct SpiderPursuitGroup *)group)->point;
     *(*point) = a->position;
     (*point)->pad = ready;
     a->fieldDC = (u32)(gUnk_02000580 + 0x24);
     SetState(a, 0, 0, 7);
     SetControl(a, a->entryTarget228, 1);
-    terrain = *c1;
+    terrain = *mesh;
     dest = (void *)(a->fieldDC + 12);
     if (Nav_IsPositionInMesh(terrain, &a->position, dest) &&
         (result = Terrain_ApplyBlocked(terrain, &a->position, dest))) {
         if (result != 2)
             Memory_Clear(&a->motion, 8);
     } else {
-        ClearMotion_BeginPlayerPursuit(a, k1);
+        ClearMotion_BeginPlayerPursuit(a, motionMask);
     }
     SetFlags(a, 0x4010);
     a->field2C2 = Div(64, 3);
@@ -123,7 +121,3 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     }
     ctx->timer = 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Spider_BeginPlayerPursuit);
-#endif
