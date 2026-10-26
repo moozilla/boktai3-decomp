@@ -1,6 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 72.9%
 // fix.py best (sweep after the inlined-insn fix)
 struct CloudPosition {
     s16 x, y, z, pad;
@@ -62,6 +60,12 @@ static inline s32 Truncate(s32 value)
         return value >> 12;
     return -((-value) >> 12);
 }
+static inline void SetPosition(struct CloudSprite *sprite, s32 angle, s32 radius)
+{
+    sprite->position.x = Truncate(gUnk_086149C4[(angle + 64) & 255] * radius);
+    sprite->position.y = 0;
+    sprite->position.z = Truncate(gUnk_086149C4[angle] * radius);
+}
 // confidence=low: initializes forty particles around the player, with one of two sheets.
 #define PlayerParticleCloud_Initialize sub_081D33A0
 s32 PlayerParticleCloud_Initialize(struct CloudTask *p, const union CloudPackedPosition *input,
@@ -73,7 +77,6 @@ s32 PlayerParticleCloud_Initialize(struct CloudTask *p, const union CloudPackedP
     u32 sheet;
     u32 frameBase;
     struct CloudPlayer *player;
-    typeof(particle->angle) t1;
     gUnk_02000298 = p;
     player = gUnk_02000580[0];
     p->player = player;
@@ -106,25 +109,26 @@ s32 PlayerParticleCloud_Initialize(struct CloudTask *p, const union CloudPackedP
     p->duration = 4;
     particle = p->particles;
     for (i = 0; i <= 39; i++, particle++) {
-        const u16 *table = (const u16 *)0x0203B400;
+        const u16 *table;
         s32 angle;
         s32 radius;
+        s32 speed;
         struct CloudSprite *sprite;
+        void *sheetData;
         particle->kind = 1;
         particle->frame = 0;
         particle->timer = i & 3;
+        table = (const u16 *)0x0203B400;
         particle->duration = (RandomValue(table) & 3) + 4;
-        particle->angle = (t1 = RandomValue(table));
-        particle->speed = RandomValue(table) | 0xFFFFFF80;
+        particle->angle = RandomValue(table);
+        speed = RandomValue(table) | -128;
+        particle->speed = speed;
         particle->delay = Mod(RandomValue(table), 100) + 600;
         particle->lifetime = 1200;
-        sprite = &p->particles[i].sprite;
-        ParticleSprite_Initialize(sprite, p->sheet, 0);
-        angle = t1;
-        radius = RandomValue(table) & 31;
-        sprite->position.x = Truncate(gUnk_086149C4[(angle + 64) & 255] * radius);
-        sprite->position.y = 0;
-        sprite->position.z = Truncate(gUnk_086149C4[angle] * radius);
+        sheetData = p->sheet;
+        sprite = &particle->sprite;
+        ParticleSprite_Initialize(sprite, sheetData, 0);
+        SetPosition(sprite, particle->angle, RandomValue(table) & 31);
         Effect_SetOrigin(sprite, -4, -4);
         SpriteDrawable_SelectTileFrame(sprite, p->sheet, p->frameBase + particle->frame);
         if (mode == 1)
@@ -137,11 +141,8 @@ s32 PlayerParticleCloud_Initialize(struct CloudTask *p, const union CloudPackedP
         particle->motionZ = 0;
         particle->origin = sprite->position;
         particle->anchor = &p->anchor;
+        table = (const u16 *)0x0203B400;
     }
 
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081D33A0);
-#endif
