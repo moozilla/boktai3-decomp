@@ -57,7 +57,11 @@ not by the percentage. Keep going on one function until it matches.
 2. Pick the first real difference (ignore branch offsets: they follow from
    size differences above them). Ask:
    `python3 tools/scope/scope.py build/scope/drafts/NAME.c why UID`
-   (or `why all` for the first difference of every hunk).
+   (or `why all` for the first difference of every hunk, 24 at most; `why all 0xLO-0xHI`
+   takes a ROM address range, `+0x40-+0x80` offsets, `120-180` C lines).
+   `why all` lists causes first; order differences of insns that occur several times
+   in the function (`movs rN, #0`, stack stores) are only counted, since such a copy
+   can be paired with another one: look at the causes first.
 3. Read the explanation. It names the mechanism and a lever, and usually a
    what-if knob. **Confirm with the knob before changing C**: e.g.
    `python3 tools/scope/scope.py build/scope/drafts/NAME.c AGBCC_PRI=97:+768`.
@@ -77,7 +81,8 @@ not by the percentage. Keep going on one function until it matches.
 Other commands:
 
 ```
-scope.py FILE.c life NAME...        insns that count toward a value's live length, by C line
+scope.py FILE.c life NAME...        insns that count toward a value's live length, by C line (for an alias
+                                    cse removed: its uses and last use before cse, which canonicity compares)
 scope.py A.c vs B.c                 two drafts' register allocation side by side
 scope.py FILE.c spill               is the whole difference reload's spill rotation? (SCOPE_SPILL_MAX=42 compiles)
 scope.py FILE.c probe               is it one cse/gcse/loop decision (cse canonical register, jump follow,
@@ -93,6 +98,8 @@ scope.py FILE.c hoist               loop-invariant motion by pass: what moved, w
                                     re-set lever scored for each hoisted variable
 scope.py FILE.c giv                 loop strength reduction: each induction value with its C line, loop.c's
                                     benefit and lifetime, and whether it was reduced, kept or eliminated
+scope.py FILE.c pre                 gcse's PRE replacements: the expression, where it is computed and where gcse
+                                    inserted it, the C lines it replaced, and AGBCC_NOPRE=k's score for each
 scope.py FILE.c insn UID            one RTL insn through every compiler pass
 scope.py FILE.c uses REG...         which insns use a pseudo after each pass
 ```
@@ -108,8 +115,17 @@ from the other differences, do not chase them.
 
 Knobs (what-ifs; they never go into the final C): `AGBCC_PRI=PSEUDO:+N`
 (raise a value's allocation priority), `AGBCC_FORCE=PSEUDO:REG`,
-`AGBCC_SPILL=K:REG` (reload's K-th choice), `CSE_KEEP=PSEUDO` (keep a
-register canonical in cse).
+`AGBCC_SPILL=K:D` (shift reload's K-th choice D places along its rotation),
+`CSE_KEEP=PSEUDO` (keep a register canonical in cse).
+
+Knobs compile as the build does (no `-g`), except those that name insn uids
+(`AGBCC_NOMOVE`, `AGBCC_NOGIV`, `AGBCC_GIV`, `AGBCC_NOTIE`, `CSE_NOFOLLOW_JUMP`):
+uids exist only in the `-g` compile. When `-g` changes a function's code
+(scope prints a note), their results are marked `[-g compile]` and a MATCH
+there is not the build's.
+
+Several scope commands can run at once, also under one `SCOPE_RUN`; two on
+the same function wait for each other (`waiting: another scope command ...`).
 
 ## What usually decides it (details: README.md "agbcc facts")
 

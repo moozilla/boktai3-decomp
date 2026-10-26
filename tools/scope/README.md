@@ -126,9 +126,13 @@ python3 tools/scope/scope.py FILE.c KNOB=V ...    same compile with instrumented
 python3 tools/scope/scope.py insn UID [FUNC]      one RTL insn through every pass
 python3 tools/scope/scope.py uses REG... [PASS...] which insns (uid@C line) use a pseudo after each pass
 python3 tools/scope/scope.py FILE.c why UID       why insn UID has the registers it has (see below)
-python3 tools/scope/scope.py FILE.c why all       why on the first real difference of each hunk (<= 8)
+python3 tools/scope/scope.py FILE.c why all [RANGE]   why on the first real difference of each hunk (SCOPE_WHY_MAX=24;
+                                                  RANGE: 0xLO-0xHI ROM addresses, +0x40-+0x80 offsets, 120-180 C lines)
 python3 tools/scope/scope.py FILE.c spill         is the whole difference reload's spill rotation?
 python3 tools/scope/scope.py FILE.c life NAME...  the insns flow counts toward a pseudo's live length, by C line
+                                                  (a pseudo cse/gcse removed: its sets and uses before that pass)
+python3 tools/scope/scope.py FILE.c pre           gcse's PRE replacements by expression: C names, pool values, where
+                                                  it is computed and inserted, the lines replaced, AGBCC_NOPRE=k scores
 python3 tools/scope/scope.py A.c vs B.c [FUNC]    two drafts' allocation side by side: rank, priority, refs/live, prefs, register
 python3 tools/scope/scope.py FILE.c pins          remove each register pin / empty asm barrier in turn: its cost; then greedy free removal
 python3 tools/scope/scope.py FILE.c try V.c...     score whole-file variants (or `try KNOB={a,b}`: one variant per knob value), best first (by shape distance), ~12 ms each
@@ -387,6 +391,64 @@ in the patch.
   hit each (reload/spill causes, PRE source expressions, repeated-block alignment, `why all`'s
   eight-hunk cap, fast-cache races, `-g` knob runs, `land` formatting the whole tree):
   [notes/subsystem-run_2026-10-25.md](../../notes/subsystem-run_2026-10-25.md).
+  Done (2026-10-26):
+  * Concurrent commands under one `SCOPE_RUN`: the assembler's `f.s`/`f.o`, the include-block
+    `head.c` and the pickle caches are per process (writes are atomic renames), and a function's
+    work directory is locked for the length of a command, so a second command on the same
+    function waits instead of reading the first one's dumps. Fork-server directories are removed
+    when their server closes.
+  * Knobs compile without `-g` unless they name insn uids (`UID_KNOBS`: NOMOVE, GIV, NOGIV, NOTIE,
+    CSE_WHY, CSE_NOFOLLOW_JUMP); 190 knob compiles over 40 drafts gave the same bytes both ways.
+    When `-g` changes the function's code (Storage_RefreshConsumableSlots: the `-g` compile
+    MATCHES, the build's is 13/13), uid-knob results are marked `[-g compile]` in the listing,
+    `try` (mark `-g`, not a MATCH exit) and `probe` (scored against the `-g` count, with a note).
+    The main listing's `-g` note says when the `-g` compile itself matches.
+  * `pins` keeps a barrier that is the only definition of a variable read later (an output-only
+    `"=r"(x)`; PlayerCue_UpdateRecoilSlide's `scratch`) and says so, instead of offering a
+    removal that leaves C reading an unset value.
+  * The `-g` compile runs with `-Wuninitialized` (same code on 150 units); scope prints agbcc's
+    "might be used uninitialized" warnings for FUNC (Vampire_ApplyPendingDamage's `t1`).
+    A pinned register variable gets no such warning (it is not a pseudo).
+  * `campaign.py land` formats only the landed file (it ran `make format` over the tree).
+  * `why all` analyzes up to `SCOPE_WHY_MAX` hunks (24; was a fixed 8) and takes a range of ROM
+    addresses, offsets or C lines; the summary names the first hunk left out and the range that
+    reaches it. Speed: the dump compile (`compile_draft_g`) now compiles FUNC with the unit cut
+    after its body and earlier non-inline functions reduced to prototypes (`diagnostic_source`;
+    `SCOPE_TRIM=0` compiles the whole unit). FUNC's code, dumps, names.txt records and lines were
+    the same on 199 random units (global label numbers aside). The dump readers (`uid_lines`,
+    `insn_list`, `pseudo_names`, `dump_func`, `born_passes`) are memoised on the dump files'
+    stamps. Nidhoggr_ApplyPartDamage (4,000-line unit): 10.5 s -> 1.4 s; sub_08193874: over 120 s
+    (the workers' "minutes") -> 3.3 s for 24 hunks.
+  * Repeated blocks: `align` was difflib's greedy longest block on full instruction text, which in a
+    function of repeated blocks anchors on the wrong copy, then paired whatever was left by position
+    (`ldr r4, [r7, #0x24]` beside an unrelated `adds r0, r0, r1`). It is now an exact LCS (numpy,
+    ~2 ms for 400 insns, 10 ms for 1,000) that pairs the most same-shape insns (low registers
+    blanked) and, among those, the most identical ones; leftover insns pair only with the same
+    operation and operand form (`sub sp, #0x1c` / `sub sp, #0x20`) and otherwise stay one-sided.
+    Same-shape first rather than identical first: identical first gives the lowest count but pairs
+    an insn with a coincidentally identical one of the next statement instead of its twin
+    (PaletteFade_StartFromScript). Over 149 drafts the differing insns fell 3% against the old
+    alignment; some functions count a few more (Storage_RefreshConsumableSlots 13+13 -> 15+15).
+    `SCOPE_ALIGN=difflib` gives the old alignment; listings over 6M cells use it. `frame`'s
+    slot votes and the order explainer read these rows.
+  * PRE in C terms: `pre_records` reads gcse's own dump (expression table, insertions, copies,
+    replacements); `pre` prints one block per expression (pseudos named, a literal-pool load named
+    by cse's REG_EQUAL note: HealthRestoreEffect_StartParticleBurst's `FlickerParticle_UpdateMotion`),
+    where gcse inserted its own computation (end of a block, fact 1), the C lines it replaced and
+    each replacement's `AGBCC_NOPRE=k` score. `probe` describes NOPRE candidates the same way, and
+    `why` on an insn gcse replaced or created names the PRE decision.
+  * `why all` scores each concrete what-if it suggests (`-> 312 ROM / 319 draft (no change: not
+    this decision, or not alone)`); sub_08176F70's suggested CSE_NOCANON knobs did nothing, which
+    the worker found by hand. `AGBCC_SPILL=K:D` placeholders are not scored.
+  * `life` on a pseudo flow never sees (an alias cse or gcse removed) prints its sets, uses and
+    last use after each pass up to the one that removed it, and what replaced it in each use. Such
+    pseudos have no allocation record, so they are named from the C line of their first set, or as
+    an inline helper's parameter (`p@FlagFour`, `mode@IsMode`).
+  * `why all`'s summary lists causes first, then order differences of insns that occur once in the
+    ROM listing, and counts (does not list) moves of insns that occur several times (`movs rN, #0`,
+    stack stores), which can be paired with another copy; cse substitutions into one register are
+    one line (sub_08176F70: eleven copies replaced by pseudo 63). why-all.json is in that order,
+    with `unique_insn` on order items.
 
 * Done: trace summarizer and pseudo names (`why`). On RepeatedPairAttack it
   reproduces in one call what took ~15 calls of raw trace reading.
@@ -422,9 +484,11 @@ in the patch.
 * `tools/check.py` run under the venv python (scope re-execs into it) skips
   the per-draft fuzzy score; land calls it with the system `python3`.
 
-* `frame` pairs ROM and draft stack slots by voting over aligned rows; where the
-  alignment is off (a hunk of inserted code), a slot can be paired with the wrong
-  draft offset. Pair by the insn uid of each access instead.
+* `frame` pairs ROM and draft stack slots by voting over aligned rows (the LCS alignment
+  above, 2026-10-26); where whole blocks differ a slot can still pair with the wrong
+  draft offset (sub_0821C8F8's quadrant objects). The ROM has no uids, so a better
+  pairing needs the accesses' C objects on the draft side matched to the ROM's
+  access pattern (which offsets each block reads), not row votes.
 * `hoist` explains the draft side only. When the ROM keeps an invariant in the
   loop, the tool cannot tell which "stays" reason the original source used.
   Open case: a table used in one basic block (sub_081A0EA4 and the other
