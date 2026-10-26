@@ -2,14 +2,12 @@
 #define gSpriteOamCount       gPendingOamCount
 #define gSpriteOamAffineCount gAffineRequestCount
 #define gSpriteOamQueueHeads  gOamPriorityCounts
-#define gSpriteOamBuffer      gUnk_03004390
 #include "global.h"
 #include "render.h"
 struct SpriteOamEntry {
     u32 attributes;
     u32 unknown4;
 };
-extern struct SpriteOamEntry gUnk_03004390[128];
 void SpriteOam_ResetQueue(s32 clear)
 {
     u16 *p, *base;
@@ -28,7 +26,7 @@ void SpriteOam_ResetQueue(s32 clear)
     *count = 0;
     *affine = 0;
     if (clear) {
-        struct SpriteOamEntry *entry = gUnk_03004390;
+        struct SpriteOamEntry *entry = gOamBuffer;
         u32 hidden = 0x200;
         s32 i = 127;
         do {

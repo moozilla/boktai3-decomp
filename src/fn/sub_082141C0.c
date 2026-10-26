@@ -4,7 +4,6 @@ struct Dma {
     vu32 src, dest, control;
 };
 extern u32 gUnk_03003A04, gUnk_03003A08, gUnk_03004260;
-extern u8 gUnk_03004390[];
 void Bg_UpdateScrollShadow(void);
 void InterruptsAndVideo_WaitForVBlank(void);
 void ScanlineEffect_StageTransfer(void);
@@ -24,7 +23,7 @@ u32 InterruptsAndVideo_OnVideoUploadTask(void)
     flags = &gUnk_03003A04;
     if (*flags & 1) {
         struct Dma *dma = (struct Dma *)0x040000d4;
-        dma->src = (u32)gUnk_03004390;
+        dma->src = (u32)gOamBuffer;
         dma->dest = 0x07000000;
         dma->control = 0x84000100;
         (void)dma->control;

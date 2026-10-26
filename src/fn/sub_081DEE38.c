@@ -1,10 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 
 struct ResourceHeader {
     u32 words[8];
 };
-extern u8 gUnk_03004FC0[];
 extern u32 gUnk_02000340[];
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
@@ -47,7 +47,7 @@ s32 Time_InitializeDateMenu(u8 *s)
     value = 2;
     Bg_SetupLayers(2, 0, bg, 0, zero, one = 1, &value);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
-    CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14, gUnk_03004FC0, 0x100);
+    CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14, gBgPaletteBuffer, 0x100);
     bank = 0xCB05;
     resource = ScriptProc_Start(bank, 0xE2AB);
     first = s + 0x78;

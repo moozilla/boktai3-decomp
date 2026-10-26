@@ -1,4 +1,3 @@
-#define gBgPaletteShadow gUnk_03004FC0
 #include "global.h"
 
 struct Registry2388PaletteController {
@@ -11,7 +10,7 @@ struct Registry2388PaletteController {
     u8 pad524[4];
     u16 flags;
 };
-extern u8 gBgPaletteShadow[];
+extern u8 gBgPaletteBuffer[];
 void Registry2388_BlendPaletteBanks(u8 *, u8 *, u8 *, int, int, int);
 
 void Registry2388_BlendTimedPalettes(struct Registry2388PaletteController *p)
@@ -29,18 +28,18 @@ void Registry2388_BlendTimedPalettes(struct Registry2388PaletteController *p)
         case 2:
             if (!extra)
                 extra = base + 0x100;
-            Registry2388_BlendPaletteBanks(gBgPaletteShadow, base + 0x60, base + 0xc0, p->elapsed,
+            Registry2388_BlendPaletteBanks(gBgPaletteBuffer, base + 0x60, base + 0xc0, p->elapsed,
                                            p->shift, 2);
-            Registry2388_BlendPaletteBanks(gBgPaletteShadow + 0x40, base + 0xa0, extra, p->elapsed,
+            Registry2388_BlendPaletteBanks(gBgPaletteBuffer + 0x40, base + 0xa0, extra, p->elapsed,
                                            p->shift, 1);
             break;
         case 1:
         case 3:
             if (!extra)
                 extra = base + 0x100;
-            Registry2388_BlendPaletteBanks(gBgPaletteShadow, base + 0xc0, base, p->elapsed,
+            Registry2388_BlendPaletteBanks(gBgPaletteBuffer, base + 0xc0, base, p->elapsed,
                                            p->shift, 2);
-            Registry2388_BlendPaletteBanks(gBgPaletteShadow + 0x40, extra, base + 0x40, p->elapsed,
+            Registry2388_BlendPaletteBanks(gBgPaletteBuffer + 0x40, extra, base + 0x40, p->elapsed,
                                            p->shift, 1);
             break;
     }

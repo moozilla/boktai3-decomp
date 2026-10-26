@@ -25,7 +25,7 @@ void AnimData_SelectPaletteBank(void *, u32);
 s32 sub_081F0678(void);
 void SingletonSlot7_InitDisplaySprites(u8 *) __asm__("SingletonSlot7_InitDisplaySprites");
 extern u32 gUnk_020004B8;
-extern u8 gUnk_03004FC0[], gUnk_03005040[];
+extern u8 gBgPaletteBuffer[], gUnk_03005040[];
 void CpuSet(const void *, void *, u32);
 
 #define F(ty, off) (*(ty *)(p + (off)))
@@ -178,7 +178,7 @@ s32 SingletonSlot7_InitFromScript(u8 *p, s32 id)
             *((u16 *)(p + 0x5E4)) = 0;
         }
     } else {
-        u8 *src = gUnk_03004FC0 + 0x80;
+        u8 *src = gBgPaletteBuffer + 0x80;
         u8 *dst = p + 0x508;
         s32 i = 3;
         do {

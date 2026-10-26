@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct RegionEntry {
     s16 group;
     u16 name;
@@ -46,7 +47,6 @@ struct TimeState {
 };
 extern struct Params310 gUnk_02000310;
 extern struct TimeState *gUnk_030053F8;
-extern u8 gUnk_03004FC0[];
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
@@ -84,7 +84,7 @@ u32 Time_LoadRegionList(struct RegionMenu *menu)
     value = 3;
     Bg_SetupLayers(2, 0, tiles, 0, zero, 1, &value);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
-    CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14, gUnk_03004FC0, 0x100);
+    CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14, gBgPaletteBuffer, 0x100);
     Script_SetPc((u8 *)gUnk_02000310.table);
     n = 0;
     while (n <= 64 && Script_GetPc()) {

@@ -2,6 +2,7 @@
 #include "global.h"
 #include "game_state.h"
 #include "ram.h"
+#include "render.h"
 
 struct GameStartRes {
     u32 w[8];
@@ -62,7 +63,6 @@ struct GameStart {
 
 extern u32 gUnk_020003A0[];
 extern u8 gUnk_020005B4[];
-extern u16 gUnk_03004FC0[];
 
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
@@ -147,7 +147,7 @@ s32 GameStart_Init(u8 *p)
         Bg_SetupLayers(2, 0, bg, 0, 0, 1, &layers);
     }
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
-    CpuSet(((u8 *)ScriptProc_Start(0x92b3, 0x204)) + 0x14, gUnk_03004FC0, 0x100);
+    CpuSet(((u8 *)ScriptProc_Start(0x92b3, 0x204)) + 0x14, gBgPaletteBuffer, 0x100);
     res = ScriptProc_Start(0xcb05, 0xe2ab);
     ResourceHeader_Relocate((u8 *)&((struct GameStart *)p)->backgroundResource, res);
     ((struct GameStart *)p)->itemResource = ((struct GameStart *)p)->backgroundResource;

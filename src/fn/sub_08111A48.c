@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "render.h"
 #ifdef NONMATCHING
 // fuzzy: 52.9%
 // fix.py best (sweep after the inlined-insn fix)
@@ -18,7 +19,6 @@ struct PaletteFade {
     u8 pad1828[0xC];
     s32 slot, target, rate;
 };
-extern u16 gUnk_03004FC0[];
 void PaletteFade_SetTransitionParameters(struct PaletteFade *, s32 slot, s32 target, s32 rate,
                                          s32 frames);
 void PaletteFade_AdvanceColors(struct PaletteFade *);
@@ -48,7 +48,7 @@ void PaletteFade_StartFromScript(void)
     p = gPaletteFade;
     PaletteFade_SetTransitionParameters(p, slot, target, rate, frames);
     if (frames <= 0) {
-        u16 *from = &gUnk_03004FC0[p->slot * 16];
+        u16 *from = &gBgPaletteBuffer[p->slot * 16];
         u16 *to = &p->targets[p->target * 16];
         s32 i;
         for (i = 0; i <= 15; i++) {

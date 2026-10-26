@@ -2,13 +2,11 @@
 #include "render.h"
 // MATCHING_CONCESSION: register-pinning
 #define gDisplayControlShadow gDispCntShadow
-#define gPaletteShadow        gUnk_03004FC0
 
 struct S {
     u8 pad[0x18];
     u8 *resource;
 };
-extern u16 gUnk_03004FC0[];
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void Bg_SetPriority(u32, s32);
 u8 *sub_08216E54(u16);
@@ -48,5 +46,5 @@ void sub_081C4708(struct S *p)
     }
     sub_08215D40(2, script, 1, &cmd, field);
     sun = SceneTransition_StartSunScript();
-    CpuSet((u8 *)sun + 0x14, gUnk_03004FC0, 0x04000080);
+    CpuSet((u8 *)sun + 0x14, gBgPaletteBuffer, 0x04000080);
 }

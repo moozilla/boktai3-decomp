@@ -4952,8 +4952,6 @@ u32 TimeDisplay_GetCurrentMonth(void)
 
 /* Initialize the controller's background layers and palette. */
 
-extern u8 gUnk_03004FC0[];
-
 void Bg_ClearTilemap(u32);
 
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
@@ -4981,7 +4979,7 @@ void TimeDisplay_InitBackgrounds(u8 *p)
     Bg_SetupLayers(2, 0, resource, 0, 0, 1, &layer);
     Bg_SetPriority(3, 3);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
-    CpuSet((u8 *)ScriptProc_Start(0x92b3, 0x91d) + 20, gUnk_03004FC0, 256);
+    CpuSet((u8 *)ScriptProc_Start(0x92b3, 0x91d) + 20, gBgPaletteBuffer, 256);
 }
 
 void ResourceHeader_Relocate(u8 *, void *);

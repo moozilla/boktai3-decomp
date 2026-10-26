@@ -72,7 +72,6 @@ struct VanargandPresentation {
     s32 debugValue;
 };
 extern u16 gUnk_03005260[];
-extern u16 gUnk_03004FC0[];
 extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 void SceneActors_UpdateEffects(void *);
@@ -131,7 +130,7 @@ static inline void StorePalettePair(u32 value)
     u16 *palette;
     /* Preserve the packed color before computing the palette addresses. */
     asm("" : "+r"(color));
-    palette = gUnk_03004FC0;
+    palette = gBgPaletteBuffer;
     palette[0x5A / 2] = color;
     palette[0x10E / 2] = color;
 }
@@ -246,7 +245,7 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
                     s32 b;
                     s32 t;
                     CpuSet(gPaletteBankData + 0xDE0, p->palette, 0x4000020);
-                    CpuSet(p->fadeA, gUnk_03004FC0, 0x4000068);
+                    CpuSet(p->fadeA, gBgPaletteBuffer, 0x4000068);
                     t = p->transition;
                     r = Blend(t, 7, 19, 3);
                     g = Blend(t, 0, 18, 3);
@@ -255,7 +254,7 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
                     r |= b << 10;
                     {
                         u16 color = r;
-                        u16 *palette = gUnk_03004FC0;
+                        u16 *palette = gBgPaletteBuffer;
                         palette[0x56 / 2] = color;
                         palette[0x10C / 2] = color;
                     }
@@ -270,12 +269,12 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
 
                 case 0x82:
                     CpuSet(gPaletteBankData + 0x1040, p->palette, 0x4000020);
-                    CpuSet(p->fadeB, gUnk_03004FC0, 0x4000068);
+                    CpuSet(p->fadeB, gBgPaletteBuffer, 0x4000068);
                     break;
 
                 case 0x7F:
                     CpuSet(gPaletteBankData + 0xFE0, p->palette, 0x4000018);
-                    CpuSet(p->fadeC, gUnk_03004FC0, 0x4000068);
+                    CpuSet(p->fadeC, gBgPaletteBuffer, 0x4000068);
                     break;
 
                 default:

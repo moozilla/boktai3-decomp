@@ -449,8 +449,6 @@ u32 Palette_Destroy(void)
     gPaletteController = 0;
 }
 
-extern u16 gUnk_03004FC0[];
-
 static inline u16 blendEnabled(struct PaletteController *p)
 {
     return p->flags & 8;
@@ -464,7 +462,7 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
         gPaletteController = p;
         p->pending = 0;
         t->callback = 0;
-        p->hardware = gUnk_03004FC0;
+        p->hardware = gBgPaletteBuffer;
         gBgFadeLevel = 64;
         gBgFadeApplied = 64;
         gBgFadeColor = 0x1084;

@@ -1,14 +1,13 @@
 #define gDisplayControlShadow gDispCntShadow
-#define gBgPaletteShadow      gUnk_03004FC0
 #include "global.h"
 #include "engine.h"
+#include "render.h"
 
 struct Registry2388PaletteController {
     u8 pad0[0x1c];
     u8 *palettes;
 };
 extern u16 gDisplayControlShadow;
-extern u8 gBgPaletteShadow[];
 void sub_082157EC(void);
 void Hud_SetMode(s32);
 u8 *sub_08216E54(u16);
@@ -35,5 +34,5 @@ void Registry2388_InitializeBackground(struct Registry2388PaletteController *p)
     Bg_SetPriority(3, 3);
     Bg_SetPriority(2, 2);
     p->palettes = (u8 *)ScriptProc_Start(0x92b3, 0x7e1e) + 0x14;
-    CpuSet(p->palettes, gBgPaletteShadow, 0x04000080);
+    CpuSet(p->palettes, gBgPaletteBuffer, 0x04000080);
 }

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct ScreenParams3F8Params {
     u8 *mBlock;
     u8 *eBlock;
@@ -54,7 +55,6 @@ struct Obj53F8 {
 extern struct ScreenParams3F8Params gScreenTextParameters;
 extern s32 gUnk_020005DC;
 extern struct Obj53F8 *gUnk_030053F8;
-extern u16 gUnk_03004FC0[];
 s32 ScreenParams3F8_SelectValidDataBank(struct SpDisplay *);
 void Bg_ClearTilemap(s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);

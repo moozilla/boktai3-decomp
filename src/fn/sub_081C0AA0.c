@@ -1,13 +1,11 @@
 #include "global.h"
 #include "render.h"
 #define gDisplayControlShadow gDispCntShadow
-#define gPaletteShadow        gUnk_03004FC0
 struct PaletteScreen {
     u8 task[0x18];
     u8 *background;
     u8 *palette;
 };
-extern u16 gUnk_03004FC0[];
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void *ScriptProc_Start(u16, u16);
 void Bg_SetPriority(u32, s32);
@@ -36,5 +34,5 @@ void PaletteScreen_InitDisplayResources(struct PaletteScreen *p)
     Bg_SetPriority(3, 3);
     palette = (u8 *)ScriptProc_Start(0x92b3, 0x3cca) + 0x14;
     p->palette = palette;
-    CpuSet(palette, gUnk_03004FC0, 0x4000080);
+    CpuSet(palette, gBgPaletteBuffer, 0x4000080);
 }

@@ -6,7 +6,6 @@
 struct PaletteBank16 {
     u16 colors[16];
 };
-extern struct PaletteBank16 gUnk_03004DC0[];
 void CpuFastSet(const void *src, void *dst, u32 control);
 
 static inline u32 isKey32E(u32 key)
@@ -70,7 +69,7 @@ void sub_08217430(void)
                 u8 *base = *basePtr;
                 register u8 *bank asm("r3") = base + offset;
                 asm("" : : "r"(offset), "r"(base));
-                CpuFastSet(bank, &gUnk_03004DC0[i], 8);
+                CpuFastSet(bank, &((struct PaletteBank16 *)gObjPaletteBuffer)[i], 8);
             }
         }
         (*(s32 *)&gObjFadeApplied) = (*(s32 *)&gObjFadeLevel);
@@ -118,8 +117,8 @@ void sub_08217430(void)
             if (i < (*(s32 *)&gPaletteBanksInUse))
                 src = (u16 *)(gPaletteBankData + (gObjPaletteKeys[i] << 5));
             else
-                src = gUnk_03004DC0[i].colors;
-            dst = gUnk_03004DC0[i].colors;
+                src = ((struct PaletteBank16 *)gObjPaletteBuffer)[i].colors;
+            dst = ((struct PaletteBank16 *)gObjPaletteBuffer)[i].colors;
             for (j = 0; j < 16; j++) {
                 u32 c = *src;
                 *dst = ((((((u16)c) & 0x7C1F) * level) & 0xF83E0) |
@@ -151,7 +150,7 @@ void sub_08217430(void)
                     ((key - 0x1F7) <= 3))
                     keep = 0;
                 if (keep) {
-                    dst = gUnk_03004DC0[n].colors;
+                    dst = ((struct PaletteBank16 *)gObjPaletteBuffer)[n].colors;
                     for (j = 0; j < 16; j++)
                         *(dst++) = gBgFadeColor;
 
@@ -159,8 +158,8 @@ void sub_08217430(void)
                     if (n < (*(s32 *)&gPaletteBanksInUse))
                         src = (u16 *)(gPaletteBankData + (gObjPaletteKeys[n] << 5));
                     else
-                        src = gUnk_03004DC0[n].colors;
-                    dst = gUnk_03004DC0[n].colors;
+                        src = ((struct PaletteBank16 *)gObjPaletteBuffer)[n].colors;
+                    dst = ((struct PaletteBank16 *)gObjPaletteBuffer)[n].colors;
                     for (j = 0; j < 16; j++) {
                         u32 c = *src;
                         *dst = (((((((u16)c) & 0x7C1F) * level) + (rb * inverse)) & 0xF83E0) |
@@ -217,8 +216,8 @@ void sub_08217430(void)
                 if (i < (*(s32 *)&gPaletteBanksInUse))
                     src = (u16 *)(gPaletteBankData + (gObjPaletteKeys[i] << 5));
                 else
-                    src = gUnk_03004DC0[i].colors;
-                dst = gUnk_03004DC0[i].colors;
+                    src = ((struct PaletteBank16 *)gObjPaletteBuffer)[i].colors;
+                dst = ((struct PaletteBank16 *)gObjPaletteBuffer)[i].colors;
                 for (j = 0; j < 16; j++) {
                     u32 c = *src;
                     *dst = (((((((u16)c) & 0x7C1F) * level) + (rb * inverse)) & 0xF83E0) |

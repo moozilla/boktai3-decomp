@@ -44,16 +44,9 @@ struct SpriteAffine {
     s8 scaleX, scaleY;
     u8 pad;
 };
-struct OamEntry {
-    u32 attributes;
-    u16 tile;
-    u16 depth;
-};
 
 extern struct SpriteAffine gUnk_03004310[];
 extern const s16 gUnk_086149C4[];
-extern struct OamEntry gUnk_03004390[];
-extern struct OamEntry gUnk_030047A0[];
 extern u32 gUnk_03003A04;
 s32 sub_082152E4(const void *src, s32 size);
 u32 Palette_CacheObjectBank(u32 key, void *src);
@@ -71,8 +64,8 @@ static inline void Oam_PushImmediate(u32 a, u32 t)
 {
     s32 n = gOamCount;
     if (n <= 127) {
-        gUnk_03004390[n].attributes = a;
-        gUnk_03004390[n].tile = t;
+        gOamBuffer[n].attributes = a;
+        gOamBuffer[n].tile = t;
         gOamCount = n + 1;
         gUnk_03003A04 |= 1;
     }
@@ -81,7 +74,7 @@ static inline void Oam_PushSorted(u32 a, u32 t, s32 z, u32 priority)
 {
     s32 n = gPendingOamCount;
     if (n <= 127) {
-        struct OamEntry *e = &gUnk_030047A0[n];
+        struct OamEntry *e = &gPendingOamBuffer[n];
         e->attributes = a;
         e->tile = t;
         e->depth = ((z + 128) & 0xFF) << 8;

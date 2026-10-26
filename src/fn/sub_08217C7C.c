@@ -2,7 +2,7 @@
 
 extern u16 *Palette_GetBackgroundBuffer(void);
 extern u16 *gBgPaletteSource;
-extern u16 gUnk_03004FC0[][16];
+extern u16 gBgPaletteBuffer[][16];
 extern s16 gBackdropOverride, gBackdropColor;
 void CpuSet(const void *, void *, u32);
 
@@ -25,7 +25,7 @@ void sub_08217C7C(void)
 
     gBgPaletteSource = (u16 *)buffer;
     for (i = 0; i <= 12; i++) {
-        u16 *src = gUnk_03004FC0[i];
+        u16 *src = gBgPaletteBuffer[i];
         u16 *dst = buffer[i];
         for (j = 0; j < 16; j++) {
             *dst = Gray(*src);
@@ -34,7 +34,7 @@ void sub_08217C7C(void)
         }
     }
     for (i = 13; i < 16; i++) {
-        CpuSet(gUnk_03004FC0[i], buffer[i], 0x04000008);
+        CpuSet(gBgPaletteBuffer[i], buffer[i], 0x04000008);
     }
     if (gBackdropOverride) {
         gBackdropColor = Gray(gBackdropColor);

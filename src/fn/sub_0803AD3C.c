@@ -18,7 +18,6 @@ struct LinkMenu {
     u8 pad5c[0x54];
 };
 extern u16 gUnk_03005260[];
-extern u16 gUnk_03004FC0[];
 void TextWindowManager_DestroyAllWindows(void);
 void PaletteLevels_Reset(void);
 void SpriteOam_ResetQueue(int);
@@ -53,5 +52,5 @@ void WirelessResultPanel_InitBackground(struct LinkMenu *p, int layer)
     zero = 0;
     Bg_SetupLayers(1, 0, resource, 0, zero, 1, &layer);
     BgGfx_LoadTilemapSimple(2, 0, 0, 0, zero);
-    CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x26BB) + 0x14, gUnk_03004FC0, 256);
+    CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x26BB) + 0x14, gBgPaletteBuffer, 256);
 }

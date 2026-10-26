@@ -1,7 +1,7 @@
 #include "global.h"
 extern s32 gObjPaletteBankCount;
 extern u16 gObjPaletteKeys[];
-extern u8 gUnk_03004DC0[];
+extern u8 gObjPaletteBuffer[];
 u32 Palette_CacheObjectBank(u32 key, void *src)
 {
     s32 i = 0;
@@ -14,7 +14,7 @@ u32 Palette_CacheObjectBank(u32 key, void *src)
     {
         s32 n = gObjPaletteBankCount;
         gObjPaletteKeys[n] = key;
-        CpuFastSet(src, gUnk_03004DC0 + n * 32, 8);
+        CpuFastSet(src, gObjPaletteBuffer + n * 32, 8);
         return gObjPaletteBankCount++;
     }
 found:

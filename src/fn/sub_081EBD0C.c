@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct ScreenParams3F8Params {
     u8 *mBlock;
     u8 *eBlock;
@@ -52,7 +53,6 @@ struct Obj53F8 {
 extern struct ScreenParams3F8Params gScreenTextParameters;
 extern s32 gUnk_020005DC;
 extern struct Obj53F8 *gUnk_030053F8;
-extern u16 gUnk_03004FC0[];
 s32 ScreenParams3F8_SelectValidDataBank(struct SpDisplay *);
 void Bg_ClearTilemap(s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
@@ -142,7 +142,7 @@ s32 sub_081EBD0C(struct SpDisplay *p)
         opt = 0xF;
     Bg_SetupLayers(2, 0, gfx, 0, 0, 1, &opt);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
-    CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x81B) + 0x14, gUnk_03004FC0, 0x100);
+    CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x81B) + 0x14, gBgPaletteBuffer, 0x100);
     ResourceHeader_Relocate(res, ScriptProc_Start(0xCB05, 0x530D));
     if (gScreenTextParameters.M)
         Widget_InitLinked(w1, res, 0xD9, 0x10, 0, 0, 0, 0);

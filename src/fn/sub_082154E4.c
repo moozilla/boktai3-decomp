@@ -1,15 +1,10 @@
 #include "global.h"
 #include "render.h"
-struct OamEntry {
-    u32 attributes;
-    u16 tile, depth;
-};
 struct Matrix {
     u8 angle;
     s8 scaleX, scaleY;
     u8 pad;
 };
-extern struct OamEntry gUnk_03004390[], gUnk_030047A0[];
 extern struct Matrix gUnk_03004310[];
 extern s16 gUnk_086149C4[];
 extern u32 gUnk_03003A04;
@@ -30,7 +25,7 @@ void SpriteOam_FinalizeQueue(void)
     work.fill = -1;
     CpuFastSet(&work.fill, work.heads, 0x1000040);
     {
-        entry = gUnk_030047A0;
+        entry = gPendingOamBuffer;
         for (i = 0; i < gPendingOamCount; i++) {
             u32 depth = entry->depth;
             u8 *head = &work.heads[depth >> 8];
@@ -43,7 +38,7 @@ void SpriteOam_FinalizeQueue(void)
         s32 sum;
         sum = gOamCount;
         for (i = 0; i < 4; i++) {
-            base = gUnk_03004390;
+            base = gOamBuffer;
             priorities[i] = sum;
             sum += gOamPriorityCounts[i];
         }
@@ -55,10 +50,10 @@ void SpriteOam_FinalizeQueue(void)
             do {
                 s32 *next;
                 struct OamEntry *queued;
-                queued = &gUnk_030047A0[index];
+                queued = &gPendingOamBuffer[index];
                 next = &priorities[(queued->tile >> 10) & 3];
                 if ((*next) < 128) {
-                    gUnk_03004390[*next] = *queued;
+                    gOamBuffer[*next] = *queued;
                     count++;
                     (*next)++;
                 }

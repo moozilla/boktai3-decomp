@@ -32,7 +32,7 @@ void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void EncodedRecord_EncodeFields(void *);
 void EncodedRecord_FormatRows(void *, void *, void *, int);
 void *Script_GetTextSourcePc(void);
-extern u16 gUnk_03004FC0[];
+extern u16 gBgPaletteBuffer[];
 extern u16 gUnk_030051A0[];
 extern u16 gUnk_03005260[];
 

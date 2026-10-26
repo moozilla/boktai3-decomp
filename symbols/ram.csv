@@ -334,11 +334,11 @@ addr,name,size,kind,decl,header,confidence,notes
 03004300,gUnk_03004300,4,object,,,high physical shape; provisional semantic name,Current animation resource header
 03004304,gArmTileUploadCount,4,object,extern u32 gArmTileUploadCount;,include/render.h,high physical shape; provisional semantic name,ARM tile-upload request count
 03004310,gUnk_03004310,80,object,,,high physical shape; provisional semantic name,"4-byte entries: angle u8, scaleX s8, scaleY s8, one unresolved byte"
-03004390,gUnk_03004390,400,object,,,high physical shape; provisional semantic name,Final 8-byte OAM entries
+03004390,gOamBuffer,400,object,extern struct OamEntry gOamBuffer[];,include/render.h,high physical shape; provisional semantic name,"final OAM entries, 8 bytes each (128)"
 03004790,gOamPriorityCounts,8,object,extern u16 gOamPriorityCounts[];,include/render.h,high physical shape; provisional semantic name,queued OAM entry count per priority (4)
 03004798,gOamCount,4,object,extern s32 gOamCount;,include/render.h,high physical shape; provisional semantic name,direct/final OAM entry count
 0300479C,gPendingOamCount,4,object,extern s32 gPendingOamCount;,include/render.h,high physical shape; provisional semantic name,depth-sorted pending OAM entry count
-030047A0,gUnk_030047A0,400,object,,,high physical shape; provisional semantic name,Pending depth-sorted OAM entries
+030047A0,gPendingOamBuffer,400,object,extern struct OamEntry gPendingOamBuffer[];,include/render.h,high physical shape; provisional semantic name,pending depth-sorted OAM entries (128)
 03004BA0,gAffineRequestCount,4,object,extern s32 gAffineRequestCount;,include/render.h,high physical shape; provisional semantic name,"affine request count, capped at 32"
 03004BB0,gBgAffineAngle,2,object,extern u16 gBgAffineAngle;,include/render.h,high physical shape; provisional semantic name,BG affine angle
 03004BC0,gBgTileUploadSrc,10,object,extern void *gBgTileUploadSrc[];,include/render.h,high physical shape; provisional semantic name,per-layer pending tile-upload source (4)
@@ -371,8 +371,8 @@ addr,name,size,kind,decl,header,confidence,notes
 03004DA8,gBgFadeApplied,4,object,extern u32 gBgFadeApplied;,include/render.h,high physical shape; provisional semantic name,cached/applied background fade level
 03004DAC,gObjFadeApplied,4,object,extern u32 gObjFadeApplied;,include/render.h,high physical shape; provisional semantic name,cached/applied object fade level
 03004DB0,gBackdropOverride,2,object,extern s16 gBackdropOverride;,include/render.h,high physical shape; provisional semantic name,backdrop override enabled flag
-03004DC0,gUnk_03004DC0,200,object,,,high physical shape; provisional semantic name,Sixteen object palette banks of 16 colors
-03004FC0,gUnk_03004FC0,200,object,,,high physical shape; provisional semantic name,Sixteen background palette banks; interior labels below alias colors
+03004DC0,gObjPaletteBuffer,200,object,extern u16 gObjPaletteBuffer[][16];,include/render.h,high physical shape; provisional semantic name,sixteen object palette banks of 16 colors
+03004FC0,gBgPaletteBuffer,200,object,extern u16 gBgPaletteBuffer[];,include/render.h,high physical shape; provisional semantic name,sixteen background palette banks of 16 colors; labels inside it are interior rows
 03004FE0,gUnk_03004FE0,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x20; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
 03005000,gUnk_03005000,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x40; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
 03005020,gUnk_03005020,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x60; Interior palette bank/color address, not evidence of an independent scalar/array allocation"

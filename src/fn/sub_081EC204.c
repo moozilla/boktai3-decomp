@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 gUnk_03004FC0[];
+#include "render.h"
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
@@ -35,7 +35,7 @@ u32 Results_Initialize(u8 *s)
     Bg_SetupLayers(2, 0, a, 0, zero, 1, &value);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     p = (u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14;
-    CpuSet(p, gUnk_03004FC0, size = 0x100);
+    CpuSet(p, gBgPaletteBuffer, size = 0x100);
     bank = 0xCB05;
     q = ScriptProc_Start(bank, 0xE2AB);
     obj = s + 0x78;

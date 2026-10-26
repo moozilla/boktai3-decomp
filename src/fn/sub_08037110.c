@@ -18,7 +18,6 @@ struct LinkMenu {
     u8 pad5c[0x54];
 };
 extern u16 gUnk_03005260[];
-extern u16 gUnk_03004FC0[];
 void TextWindowManager_DestroyAllWindows(void);
 void PaletteLevels_Reset(void);
 void SpriteOam_ResetQueue(int);

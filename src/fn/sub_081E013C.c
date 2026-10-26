@@ -1,6 +1,6 @@
 #include "global.h"
+#include "render.h"
 extern u32 gUnk_02000358[];
-extern u8 gUnk_03004FC0[];
 void AnimPanel_LoadSelections(u8 *);
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
@@ -66,7 +66,7 @@ u32 Password_InitializeEntryMenu(u8 *s)
     Bg_SetupLayers(2, 0, a, 0, zero, one, &value);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     q = (u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14;
-    CpuSet(q, gUnk_03004FC0, size = 0x100);
+    CpuSet(q, gBgPaletteBuffer, size = 0x100);
     bank = 0xCB05;
     p = ScriptProc_Start(bank, 0xE2AB);
     first = s + 0x78;

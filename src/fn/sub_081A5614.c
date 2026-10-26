@@ -16,7 +16,6 @@ struct PaletteTransition {
     u8 padF28[0xc];
     s32 stage;
 };
-extern u16 gUnk_03004FC0[];
 void Vanargand_BlendPaletteBanks(void *, void *, void *, s32, s32, s32);
 void Vanargand_ResetPaletteTransition(struct PaletteTransition *);
 void CpuSet(const void *, void *, u32);
@@ -44,8 +43,8 @@ static inline void SetStageColors(s32 stage)
     green = Interpolate(0, 18, stage, 3);
     blue = Interpolate(0, 19, stage, 3);
     color = red | (green << 5) | (blue << 10);
-    gUnk_03004FC0[0x56 / 2] = color;
-    gUnk_03004FC0[0x10c / 2] = color;
+    gBgPaletteBuffer[0x56 / 2] = color;
+    gBgPaletteBuffer[0x10c / 2] = color;
     {
         s32 red, green, blue;
         u16 nextColor;
@@ -53,8 +52,8 @@ static inline void SetStageColors(s32 stage)
         green = Interpolate(0, 29, stage, 3);
         blue = Interpolate(0, 31, stage, 3);
         nextColor = red | (green << 5) | (blue << 10);
-        gUnk_03004FC0[0x5a / 2] = nextColor;
-        gUnk_03004FC0[0x10e / 2] = nextColor;
+        gBgPaletteBuffer[0x5a / 2] = nextColor;
+        gBgPaletteBuffer[0x10e / 2] = nextColor;
     }
 }
 
@@ -67,16 +66,16 @@ static inline void RestorePalette(struct PaletteTransition *p)
     switch (selector) {
         case 0x6f:
             CpuSet(gPaletteBankData + 0xde0, p->output, 0x4000020);
-            CpuSet(p->first, gUnk_03004FC0, 0x4000068);
+            CpuSet(p->first, gBgPaletteBuffer, 0x4000068);
             SetStageColors(p->stage);
             break;
         case 0x82:
             CpuSet(gPaletteBankData + 0x1040, p->output, 0x4000020);
-            CpuSet(p->second, gUnk_03004FC0, 0x4000068);
+            CpuSet(p->second, gBgPaletteBuffer, 0x4000068);
             break;
         case 0x7f:
             CpuSet(gPaletteBankData + 0xfe0, p->output, 0x4000018);
-            CpuSet(p->third, gUnk_03004FC0, 0x4000068);
+            CpuSet(p->third, gBgPaletteBuffer, 0x4000068);
             break;
         default:
             CpuSet(gPaletteBankData + 0x3240, p->output, 0x4000008);
@@ -108,8 +107,8 @@ static inline void BlendStageColors(s32 frame, s32 stage, s32 duration)
     green = Interpolate(startGreen, endGreen, frame, duration);
     blue = Interpolate(startBlue, endBlue, frame, duration);
     color = (red | (green << 5)) | (blue << 10);
-    gUnk_03004FC0[0x56 / 2] = color;
-    gUnk_03004FC0[0x10c / 2] = color;
+    gBgPaletteBuffer[0x56 / 2] = color;
+    gBgPaletteBuffer[0x10c / 2] = color;
     startRed = Interpolate(21, 24, stage, 3);
     endRed = Interpolate(21, 24, stage + 1, 3);
     startGreen = Interpolate(0, 29, stage, 3);
@@ -120,8 +119,8 @@ static inline void BlendStageColors(s32 frame, s32 stage, s32 duration)
     nextGreen = Interpolate(startGreen, endGreen, frame, duration);
     nextBlue = Interpolate(startBlue, endBlue, frame, duration);
     color = (nextRed | (nextGreen << 5)) | (nextBlue << 10);
-    gUnk_03004FC0[0x5a / 2] = color;
-    gUnk_03004FC0[0x10e / 2] = color;
+    gBgPaletteBuffer[0x5a / 2] = color;
+    gBgPaletteBuffer[0x10e / 2] = color;
 }
 
 void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
@@ -139,8 +138,8 @@ void Vanargand_UpdatePaletteTransition(struct PaletteTransition *p)
                 source = gPaletteBankData + (selector * 32);
                 target = gPaletteBankData + 0x1040;
                 Vanargand_BlendPaletteBanks(p->output, source, target, p->frame, p->shift, 4);
-                Vanargand_BlendPaletteBanks(gUnk_03004FC0, p->first, p->second, p->frame, p->shift,
-                                            13);
+                Vanargand_BlendPaletteBanks(gBgPaletteBuffer, p->first, p->second, p->frame,
+                                            p->shift, 13);
             } else {
                 Vanargand_ResetPaletteTransition(p);
             }

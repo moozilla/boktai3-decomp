@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 // Provisional name: SoundTest_Initialize
 struct Sprite {
     u8 head[8];
@@ -39,7 +40,6 @@ u32 Sound_IsSongPlaying(s32);
 void Sound_StopSong(s32);
 void Sound_PlaySong(s32);
 void Anim_SetKeyframes(void *, void *, u16, s32, s32);
-extern u16 gUnk_03004FC0[];
 void Bg_ClearTilemap(s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
 void *ScriptProc_Start(s32, s32);
@@ -80,7 +80,7 @@ s32 SoundTest_Initialize(struct Viewer *p)
         Bg_SetupLayers(2, 0, background, 0, 0, 1, &option);
     }
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
-    CpuSet((u8 *)ScriptProc_Start(0x92b3, 0x204) + 20, gUnk_03004FC0, 256);
+    CpuSet((u8 *)ScriptProc_Start(0x92b3, 0x204) + 20, gBgPaletteBuffer, 256);
     asset = ScriptProc_Start(0xcb05, 0xe2ab);
     ResourceHeader_Relocate(&p->backgroundResource, asset);
     p->digitsResource = p->backgroundResource;

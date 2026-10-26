@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 // Provisional name: Presentation_Update
 struct Sequence {
     u8 p0[0x18];
@@ -33,7 +34,6 @@ void Anim_SetKeyframes(void *, void *, s32, s32, s32);
 void Presentation_UpdateLayerAnimations(void *);
 void Presentation_ClearTilemap(void);
 extern u16 gUnk_03005260[];
-extern u16 gUnk_03004FC0;
 void Task_Kill(void *);
 void Script_Call(void *, void *);
 void Presentation_UpdateDropShakeBlink(void *);
@@ -89,7 +89,7 @@ s32 Presentation_Update(struct Sequence *p)
         p->frameTimer++;
     }
     if (p->result == 1) {
-        u16 *dest = &gUnk_03004FC0;
+        u16 *dest = &gBgPaletteBuffer;
         u32 value = 0x1084;
         *dest = value;
     }

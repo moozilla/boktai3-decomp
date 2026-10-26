@@ -1,6 +1,6 @@
 #include "global.h"
 #include "render.h"
-extern u8 gUnk_03004FC0[], gUnk_03004CC0[];
+extern u8 gUnk_03004CC0[];
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void Bg_SetPriority(u32, u32);
@@ -30,7 +30,7 @@ u32 MonsterBook_SetupPageBackgrounds(u8 *s, u32 value)
     BgGfx_LoadTilemapAtPosition(2, 0, 0);
     q = (u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14;
     *(void **)(s + 0x1C) = q;
-    dst = (u16 *)gUnk_03004FC0;
+    dst = (u16 *)gBgPaletteBuffer;
     CpuSet(q, dst, 0x30);
     color = 0x73FF;
     i = 15;

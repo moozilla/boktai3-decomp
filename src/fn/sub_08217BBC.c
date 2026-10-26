@@ -5,7 +5,7 @@ extern u8 *gBgPaletteSource;
 extern s32 gPaletteBanksInUse;
 extern u16 *gPaletteBankData;
 extern u16 gObjPaletteKeys[];
-extern u16 gUnk_03004DC0[][16];
+extern u16 gObjPaletteBuffer[][16];
 
 // Rewrites every object palette bank as greyscale (banks tagged 0x3AA are skipped).
 void sub_08217BBC(void)
@@ -22,8 +22,8 @@ void sub_08217BBC(void)
         if (i < gPaletteBanksInUse)
             src = (u16 *)((u8 *)gPaletteBankData + (gObjPaletteKeys[i] << 5));
         else
-            src = gUnk_03004DC0[i];
-        dst = gUnk_03004DC0[i];
+            src = gObjPaletteBuffer[i];
+        dst = gObjPaletteBuffer[i];
         tag = gObjPaletteKeys[i];
         next = i + 1;
         if (tag != 0x3AA) {
