@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 90.4%
-// twin.py transplant from a matched near-clone
 struct HudPos {
     s16 x, y, z, pad;
 };
@@ -37,16 +34,20 @@ static inline void SetPos(struct HudPos *pos, s32 x, s32 y)
     pos->y = y;
     pos->z = 0;
 }
-static inline void Show(struct HudSprite *s)
+static inline void Show(struct HudSprite *s, s32 *mask)
 {
-    s->flags &= ~1;
+    u32 flags = s->flags;
+    *mask = ~1;
+    s->flags = flags & *mask;
 }
 void sub_08166534(struct HudPanel *p, s32 col, s32 row)
 {
     s32 i;
     s32 j;
+    s32 showMask;
     u16 *cell;
     for (i = 0; i <= 2; i++) {
+        showMask = ~1;
         p->shown[i] = p->stats->values[i];
         if (p->shown[i] > 100)
             p->shown[i] = 100;
@@ -62,13 +63,9 @@ void sub_08166534(struct HudPanel *p, s32 col, s32 row)
         SetPos(&p->numbers[(i * 3) + 2].pos, (col * 8) + 16, (row + i) * 8);
         {
             struct HudPanel *q = (struct HudPanel *)((i * 0x120) + ((u32)p));
-            Show(&q->numbers[0]);
-            Show(&q->numbers[1]);
-            Show(&q->numbers[2]);
+            Show(&q->numbers[0], &showMask);
+            Show(&q->numbers[1], &showMask);
+            Show(&q->numbers[2], &showMask);
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08166534);
-#endif
