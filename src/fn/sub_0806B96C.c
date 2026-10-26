@@ -45,7 +45,7 @@ s32 SpriteEffectController_DestroyPool(struct SpriteEffectControllerPool *input)
     }
     {
         u32 zero = 0;
-        gUnk_02000178 = (void *)zero;
+        gSpriteEffectControllerPool = (void *)zero;
     }
     return 0;
 }

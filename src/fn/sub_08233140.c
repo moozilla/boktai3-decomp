@@ -1,8 +1,8 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 /* Tentative: allocate a transient sprite from the pool, copy render state into it and link it into the draw list. */
 // MATCHING_CONCESSION: register-pinning
-extern u8 *gUnk_020000AC;
 u8 *SpritePool_CreateSingleton(void);
 u8 *TransientSpritePool_FindFreeSlot(u8 *);
 void Sprite_CopyRenderState(void *, void *, void *, void *);
@@ -14,7 +14,7 @@ u8 *TransientSprite_Spawn(void *a, void *b, u32 id, u32 flags, s32 palette, u8 *
     u8 *sprite;
     u8 *extra;
     u8 *q;
-    u8 *pool = gUnk_020000AC;
+    u8 *pool = gTransientSpritePool;
     if (pool == 0) {
         pool = SpritePool_CreateSingleton();
         if (pool == 0)

@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_02000154;
+#include "ram.h"
 void Sprite_Remove(u8 *);
 u32 ScriptedParticle_DestroyPool(u8 *p)
 {
@@ -15,6 +15,6 @@ u32 ScriptedParticle_DestroyPool(u8 *p)
         n--;
     } while (n >= 0);
     z = 0;
-    gUnk_02000154 = z;
+    gScriptedParticlePool = z;
     return z;
 }

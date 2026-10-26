@@ -1,7 +1,7 @@
 #include "global.h"
+#include "ram.h"
 
-extern void *gUnk_0200006C;
 void sub_08015F54(void)
 {
-    gUnk_0200006C = 0;
+    gFadingParticleManager = 0;
 }

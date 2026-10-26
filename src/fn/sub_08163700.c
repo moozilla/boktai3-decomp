@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct GameOver {
     u8 pad0[0x338];
     const u8 *script;
@@ -10,7 +11,6 @@ struct GameOver {
     u8 pad34E[2];
     u32 parameter;
 };
-extern struct GameOver *gUnk_02000210;
 void TransitionPanel_InitSprites(void *);
 void TransitionPanel_InitOverlay(void *);
 s32 Script_SeekToKeyword(s32);
@@ -42,7 +42,7 @@ s32 GameOver_Initialize(struct GameOver *p)
         p->parameter = Script_GetValue();
     else
         p->parameter = present;
-    gUnk_02000210 = p;
+    gGameOver = p;
     p->finished = 0;
     return 0;
 }

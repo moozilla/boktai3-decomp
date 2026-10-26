@@ -1,6 +1,6 @@
 #include "scene_actor_control.h"
-extern struct SceneActorControlManager *gUnk_02000128;
+#include "ram.h"
 void SceneActorControl_ResetSingleton(void)
 {
-    gUnk_02000128 = 0;
+    gSceneActorControlManager = 0;
 }

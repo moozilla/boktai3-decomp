@@ -97,7 +97,7 @@ void SpriteEffectController_UpdateBouncing(struct SpriteEffectControllerPool *un
             goto tickTimer;
         if (*flags & 1) {
             struct SpriteEffectDrawablePrefix *drawable;
-            gUnk_02000178->used &= ~(1 << controller->index);
+            gSpriteEffectControllerPool->used &= ~(1 << controller->index);
             controller->state = 0;
             {
                 u16 *reloadFlags = flags;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct SunDiscVec {
     u16 x, y, z, pad;
@@ -17,7 +18,6 @@ struct SunDiscSprite {
     s16 velX, velY, velZ, pad92;
 };
 
-extern u8 *gUnk_0200017C;
 extern const s16 gUnk_086149C4[];
 u8 *SunDiscPool_GetOrCreate(void);
 u32 *SunDiscPool_AllocSprite(u8 *);
@@ -42,7 +42,7 @@ void SunDiscPool_SpawnDisc(const struct SunDiscVec *fromArg, const struct SunDis
     s32 b = bArg;
     u32 zero;
     struct SunDiscSprite *sprite;
-    u8 *pool = gUnk_0200017C;
+    u8 *pool = gSunDiscPool;
     struct SunDiscSprite *s;
     struct SunDiscDelta delta;
     s32 angle;

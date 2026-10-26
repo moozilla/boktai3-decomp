@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 p[0x1c0];
 };
@@ -8,13 +9,12 @@ struct A {
     u8 p1[0x20 - 0x1c];
     struct E e[10];
 };
-extern struct A *gUnk_020005E8;
 void SceneProjectile_InitSlot(struct A *, struct E *, s32);
 u32 SceneProjectile_InitPool(struct A *a)
 {
     struct E *e;
     s32 i;
-    gUnk_020005E8 = a;
+    gSceneProjectilePool = a;
     a->w18 = 0;
     e = a->e;
     i = 0;

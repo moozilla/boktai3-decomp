@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 // confidence=low: updates homing effect entries, animation, trails and lifetime.
 
@@ -51,7 +52,6 @@ struct Pool {
     u8 unknown38[4];
     u32 allocated;
 };
-extern struct Pool *gUnk_0200023C;
 struct Entry *EffectPool_FindIdleActiveEntry(void);
 void Anim_SetSequence(void *, void *, s32, s32, s32);
 void ScaledShadow_Enable(void *);
@@ -67,7 +67,7 @@ static inline void polar(struct Vec *v, s32 angle, s32 radius)
 }
 void EffectPool_AllocateEntry(struct Vec *position, s32 angle, s32 speed, s32 interval)
 {
-    struct Pool *pool = gUnk_0200023C;
+    struct Pool *pool = gEffectPoolManager;
     struct Entry *entry = EffectPool_FindIdleActiveEntry();
     if (entry) {
         pool->allocated++;

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct PackedVec {
     u32 x : 16;
     u32 y : 16;
@@ -69,7 +70,6 @@ struct SceneNpc {
     void *callbacks[6];
 };
 extern void *gUnk_02000480;
-extern struct SceneNpc *gUnk_02000274;
 struct SceneNpc *Actor_Allocate(s32 name, s32 variant);
 s32 Actor_InitMotion(struct SceneNpc *, s32 name, struct PackedVec *, s32 angle);
 s32 Actor_InitDrawable(struct SceneNpc *, s32 kind, s32 a, s32 b, s32 c);

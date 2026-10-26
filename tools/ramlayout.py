@@ -340,6 +340,10 @@ def cmd_unify(a):
                 if renames.get(m.group(2)) == m.group(1):
                     aliased.add((p, m.group(1)))
             new[p] = alias.sub(lambda m: "" if renames.get(m.group(2)) == m.group(1) else m.group(0), t)
+            # any other macro name for a renamed object: spell the object's name instead
+            for m in alias.finditer(new[p]):
+                if m.group(2) in renames and m.group(1) not in renames.values():
+                    new[p] = re.sub(rf"\b{m.group(1)}\b", m.group(2), new[p].replace(m.group(0), "", 1))
             # a file's own macro that spells another object with one of the new names: inline it
             for m in alias.finditer(new[p]):
                 if m.group(1) in set(renames.values()) and renames.get(m.group(2)) != m.group(1):
@@ -354,6 +358,16 @@ def cmd_unify(a):
         for p, t in new.items():
             if pat.search(t):
                 new[p] = pat.sub(lambda m: renames[m.group(1)], t)
+    defs = [(" ".join(d.split()), d.strip()) for d in a.define]
+    if defs:
+        a.all = True        # a new tag in the header reaches every includer
+        h = new[a.header]
+        for key, d in defs:
+            tag = re.match(r"(struct|union)\s+\w+", key).group(0)
+            if not re.search(rf"^{tag}\s*{{", h, re.M):
+                at = h.index("/* RAM objects")
+                h = h[:at] + d + "\n\n" + h[at:]
+        new[a.header] = h
     renamed = dict(new)
     hdr_inc = os.path.basename(a.header)
     # every declaration the header will hold: earlier rows and this batch
@@ -393,7 +407,7 @@ def cmd_unify(a):
                 t = drop_decl(t, m, decls, idx)
                 if p.endswith(".h") or hdr_inc not in includes(t):
                     t = add_include(t, a.header)
-            new[p] = t
+            new[p] = drop_defs(t, defs)
         h = new[a.header]
         if not any(norm(s, d[i], name, name) == c for _, s, d, i in declarations(h, name)):
             line = decl.strip() + (f" /* {note} */" if note else "")
@@ -512,6 +526,17 @@ def cmd_unify(a):
           f"or keep their own ({len(kept.get('own', []))})")
 
 
+def drop_defs(t, defs):
+    """Remove file-scope struct definitions identical to one in `defs`."""
+    for key, _ in defs:
+        tag = re.match(r"(struct|union)\s+\w+", key).group(0)
+        for m in re.finditer(rf"^{tag}\s*{{.*?^}};[ \t]*\n", t, re.M | re.S):
+            if " ".join(m.group(0).split()) == key:
+                t = t[:m.start()] + t[m.end():]
+                break
+    return t
+
+
 def adopt(t, canon, header, cast):
     """`t` with every declaration of the header's objects removed, so the
     header's declarations apply; with cast=True a different declaration
@@ -532,7 +557,7 @@ def adopt(t, canon, header, cast):
             return None
         if exprs:
             e = exprs.pop()
-            t = re.sub(rf"(?<![\w&.>]){name}\b", lambda _: e, t)
+            t = re.sub(rf"(?<![\w.>]){name}\b", lambda _: e, t)
     return add_include(t, header)
 
 
@@ -564,7 +589,8 @@ def view(spec, declarator, name, canon, lvalue=True):
     canon_array = canon.rstrip().endswith("]")
     if not dims:
         if canon_array:
-            return None
+            # a scalar view of an array: its first element
+            return None if stars else f"(*({spec} *){name})"
         if stars and not lvalue:
             return f"(({spec} {'*' * stars}){name})"
         return f"(*({spec} {'*' * stars}*)&{name})"
@@ -672,6 +698,9 @@ def main():
     s.add_argument("--decl", help="the declaration, e.g. 'extern u8 *gPaletteBankData;'")
     s.add_argument("--batch", help="file of ADDR | DECL | NOTE lines")
     s.add_argument("--all", action="store_true", help="also compile every includer of the target header")
+    s.add_argument("--define", action="append", default=[],
+                   help="a struct definition the declarations need, e.g. 'struct OamEntry { u32 a; };' "
+                        "(goes in the header; identical copies in files that include it are removed)")
     s.add_argument("--header", required=True)
     s.add_argument("--note", default="")
     s.add_argument("--dry-run", action="store_true")

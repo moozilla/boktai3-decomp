@@ -1,5 +1,6 @@
 #include "global.h"
 #include "game_state.h"
+#include "ram.h"
 #ifdef NONMATCHING
 // fuzzy: 97.2%
 // fix.py best (sweep after the inlined-insn fix)
@@ -84,7 +85,7 @@ void Actor_ClampMovementSpeed(struct Obj *);
 void Glove_SetAnimationKeyframes(struct Glove *, s32);
 s32 ActorRecoil_UpdateMotion(struct Glove *);
 void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
-extern u32 gEngineFlags, gUnk_030053F0;
+extern u32 gEngineFlags;
 extern u8 *gUnk_020004B4;
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
@@ -109,7 +110,7 @@ void SceneTilemap_SetScrollSource(void *);
 void Glove_RegisterMessageReceiver(void *);
 static inline u32 Mode(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 static inline s32 Slot(void)
 {
@@ -125,7 +126,7 @@ static inline void SetCallback(struct Glove *p, void (*fn)(void *), s32 zero)
 }
 static inline u32 Mode_1(void)
 {
-    return (gEngineFlags | gUnk_030053F0) & 0x800;
+    return (gEngineFlags | gScenePauseFlags) & 0x800;
 }
 
 inline static void SetCallback_1(struct Glove *p, void (*fn)(void *))

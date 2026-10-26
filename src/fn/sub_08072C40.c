@@ -1,7 +1,7 @@
 #include "scene_actor_contact_list.h"
 void SceneActorContacts_RemoveNode(struct SceneActorContactNode *node)
 {
-    struct SceneActorContactManager *manager = gUnk_020001A0;
+    struct SceneActorContactManager *manager = gSceneActorContactManager;
     if (manager) {
         struct SceneActorContactNode *current = manager->head;
         struct SceneActorContactNode *previous = NULL;

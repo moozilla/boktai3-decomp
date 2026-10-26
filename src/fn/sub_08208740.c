@@ -7,7 +7,8 @@
 #include "display_animation.h"
 #include "scene_vec.h"
 #include "engine.h"
-extern u32 gUnk_030053F0, gUnk_02000560;
+#include "ram.h"
+extern u32 gUnk_02000560;
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
 void Collider_SetPosition(void *, void *, u32);
@@ -31,7 +32,7 @@ static inline u32 RandomFrom(const u16 *table)
 }
 static inline u32 Paused(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 struct ColliderView {
     u8 pad[6];

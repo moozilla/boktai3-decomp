@@ -12,7 +12,7 @@ struct TemporaryAnimationPool {
     struct ProjectedDisplayResource resource;
     struct TemporaryAnimationSlot slots[16];
 };
-extern struct TemporaryAnimationPool *gUnk_020000A8;
+extern struct TemporaryAnimationPool *gTemporaryAnimationPool;
 s32 TemporaryAnimationPool_Update(struct TemporaryAnimationPool *);
 s32 TemporaryAnimationPool_Destroy(struct TemporaryAnimationPool *);
 s32 TemporaryAnimationPool_Initialize(struct TemporaryAnimationPool *);

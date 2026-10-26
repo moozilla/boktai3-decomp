@@ -8,5 +8,5 @@ s32 TransientSpriteEffects_Destroy(struct TransientSpriteEffects *pool)
             Sprite_Remove(&slot->sprite);
         ++index;
     } while (index <= 15);
-    return (s32)(gUnk_020000A0 = NULL);
+    return (s32)(gTransientSpriteEffects = NULL);
 }

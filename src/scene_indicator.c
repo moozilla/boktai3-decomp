@@ -2,7 +2,7 @@
 
 struct SceneIndicators *SceneIndicators_GetInstance(void)
 {
-    return gUnk_0200004C;
+    return gSceneIndicators;
 }
 
 struct PackedVec {
@@ -117,7 +117,7 @@ u32 SceneIndicators_Destroy(struct SceneIndicators *s)
     for (i = 15; i >= 0; i--, e++) {
         SceneIndicator_Destroy(s, e);
     }
-    return (u32)(gUnk_0200004C = 0);
+    return (u32)(gSceneIndicators = 0);
 }
 
 #include "scene_indicator.h"
@@ -126,7 +126,7 @@ int SceneIndicators_Initialize(struct SceneIndicators *m)
     int i;
     struct IndicatorAnimation *a;
     struct SceneIndicator *first;
-    gUnk_0200004C = m;
+    gSceneIndicators = m;
     m->count = 0;
     if (Script_SeekToKeyword('t')) {
         for (i = 0, a = m->animations; i < 4; a++, i++) {
@@ -180,8 +180,8 @@ int SceneIndicators_Initialize(struct SceneIndicators *m)
 struct SceneIndicators *SceneIndicators_Create(void)
 {
     struct SceneIndicators *p;
-    if (gUnk_0200004C != 0)
-        return gUnk_0200004C;
+    if (gSceneIndicators != 0)
+        return gSceneIndicators;
     p = Task_Create(0x8, 0xbd0);
     if (p != 0) {
         Task_SetCallbacks(p, SceneIndicators_Update, SceneIndicators_Destroy);

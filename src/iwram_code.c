@@ -10,7 +10,7 @@ struct PaletteBank {
 
 extern s32 gObjPaletteBankCount;
 extern u16 gObjPaletteKeys[];
-extern struct PaletteBank gUnk_03004DC0[];
+extern struct PaletteBank gObjPaletteBuffer[];
 
 /* Same cache as Palette_CacheObjectBank, with a word copy instead of CpuFastSet. */
 u32 Palette_CacheObjectBankArm(u32 key, u32 *src)
@@ -23,7 +23,7 @@ u32 Palette_CacheObjectBankArm(u32 key, u32 *src)
         goto overflow;
     {
         s32 n = gObjPaletteBankCount;
-        u32 *dst = gUnk_03004DC0[n].words;
+        u32 *dst = gObjPaletteBuffer[n].words;
         dst[0] = src[0];
         gObjPaletteKeys[n] = key;
         dst[1] = src[1];
@@ -142,10 +142,10 @@ extern u16 gMainSpriteTileSum;
 extern u32 gArmTileUploadCount;
 extern struct IwTileReq gUnk_02039000[];
 extern s32 gOamCount;
-extern struct IwOamOut gUnk_03004390[];
+extern struct IwOamOut gOamBuffer[];
 extern u32 gUnk_03003A04;
 extern s32 gPendingOamCount;
-extern struct IwOamOut gUnk_030047A0[];
+extern struct IwOamOut gPendingOamBuffer[];
 extern u16 gOamPriorityCounts[];
 u32 Palette_CacheObjectBankArm(u32 key, u32 *src);
 
@@ -196,8 +196,8 @@ static inline void IwPushOam(u32 attr01, u32 attr2)
     s32 c = gOamCount;
     if (c <= 0x7f) {
         gOamCount = c + 1;
-        gUnk_03004390[c].attr01 = attr01;
-        gUnk_03004390[c].attr2 = attr2;
+        gOamBuffer[c].attr01 = attr01;
+        gOamBuffer[c].attr2 = attr2;
         gUnk_03003A04 |= 1;
     }
 }
@@ -206,7 +206,7 @@ static inline void IwPushOamZ(u32 attr01, u32 attr2, s32 z, u32 prio)
 {
     s32 c = gPendingOamCount;
     if (c <= 0x7f) {
-        struct IwOamOut *o = &gUnk_030047A0[c];
+        struct IwOamOut *o = &gPendingOamBuffer[c];
         gPendingOamCount = c + 1;
         o->attr01 = attr01;
         o->attr2 = attr2;

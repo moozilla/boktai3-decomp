@@ -1,7 +1,7 @@
 #include "global.h"
-extern u32 gUnk_02000064;
+#include "ram.h"
 
 void sub_08014C98(void)
 {
-    gUnk_02000064 = 0;
+    gFragmentManager = 0;
 }

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct TextState {
     u8 x, y, left, top, width, height, palette, style;
     u8 entered, mode, skip, busy, padC, choiceCount, padE, fresh, pad10, voice, toggle, lastWidth,
@@ -31,7 +32,6 @@ struct WindowManager {
     s32 nextId;
     struct TextWindow *head;
 };
-extern struct WindowManager *gUnk_020000E4;
 void *Heap_Alloc(int);
 void Memory_Clear(void *, int);
 void Heap_Free(void *);
@@ -56,7 +56,7 @@ static inline void TextWindow_Link(struct WindowManager *p, struct TextWindow *w
 }
 int TextWindow_Create(int x, int y, int width, int height)
 {
-    struct WindowManager *p = gUnk_020000E4;
+    struct WindowManager *p = gWindowManager;
     struct TextWindow *w;
     struct TextState *text;
     if (!p)

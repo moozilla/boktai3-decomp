@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct DisplaySequenceState {
     const volatile u16 *commands;
@@ -65,7 +66,6 @@ struct ScriptCombatActorState {
     u8 w1d0[4];
 };
 extern u32 gEngineFlags;
-extern u32 gUnk_030053F0;
 extern u32 gUnk_02000560;
 void AnimData_SelectPaletteBank(void *, u32 animation);
 void Collider_SetPosition(void *collider, void *position, u32 value);
@@ -176,7 +176,7 @@ u32 ScriptCombatActor_UpdateState(struct ScriptCombatActorState *p)
 {
     register struct ActorColliderView *c asm("r4");
     u32 m = 0x400;
-    if ((gEngineFlags | gUnk_030053F0) & m)
+    if ((gEngineFlags | gScenePauseFlags) & m)
         return 0;
     {
         u32 m2 = 4;

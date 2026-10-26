@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 gUnk_03004FC0[];
+#include "render.h"
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
@@ -8,7 +8,7 @@ void ResourceHeader_Relocate(u8 *, void *);
 void Widget_InitLinked(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 void Menu_StartFadeIn(u32);
 void ScriptPrompt_ResetDisplay(u8 *);
-extern u32 gUnk_020002F8[];
+extern u32 gScreenParams[];
 u32 TextWindow_Create(u32, u32, u32, u32);
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
@@ -37,8 +37,8 @@ u32 ScreenMessage_Initialize(u8 *s)
     Bg_SetupLayers(2, 0, a, 0, zero, one = 1, &value);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     p = (u8 *)ScriptProc_Start(0x92B3, 0x81B) + 0x14;
-    CpuSet(p, gUnk_03004FC0, 0x100);
-    global = gUnk_020002F8;
+    CpuSet(p, gBgPaletteBuffer, 0x100);
+    global = gScreenParams;
     if (global[2] == 1) {
         u32 x, y;
         resource = ScriptProc_Start(0xCB05, 0x530D);

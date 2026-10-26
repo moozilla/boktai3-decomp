@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 // fix.py best (sweep after the inlined-insn fix)
 struct CloudPosition {
     s16 x, y, z, pad;
@@ -38,7 +39,6 @@ struct CloudTask {
     struct CloudParticle particles[40];
     struct CloudPlayer *player;
 };
-extern struct CloudTask *gUnk_02000298;
 extern struct CloudPlayer *gUnk_02000580[];
 extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
@@ -77,7 +77,7 @@ s32 PlayerParticleCloud_Initialize(struct CloudTask *p, const union CloudPackedP
     u32 sheet;
     u32 frameBase;
     struct CloudPlayer *player;
-    gUnk_02000298 = p;
+    gCloudTask = p;
     player = gUnk_02000580[0];
     p->player = player;
     position = *input;

@@ -1,7 +1,7 @@
 #include "repeated_effect.h"
 s32 RepeatedEffect_RequestNearby(struct RepeatedEffectPosition *point)
 {
-    struct RepeatedEffectManager *manager = gUnk_02000110;
+    struct RepeatedEffectManager *manager = gRepeatedEffectManager;
     struct RepeatedEffect *entry;
     struct RepeatedEffectPosition *position;
     u8 *state;

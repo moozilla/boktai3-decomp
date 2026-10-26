@@ -84,5 +84,69 @@ extern u16 gTrackedPlayerId;
 extern u32 gActorParticlePool;
 extern u32 gGrowthHazardManager;
 extern struct FragmentBurstPool *gSpriteGroupPool;
+extern struct ColorFadeController *gColorFadeController;
+extern struct LinkedWidgetSet *gLinkedWidgetSet;
+extern struct WeatherState *gWeatherState;
+extern struct WindowManager *gWindowManager;
+extern struct Transition *gTransition;
+extern struct LinkMenu *gLinkMenu;
+extern struct ResultMenu *gResultMenu;
+extern struct SceneActorControlManager *gSceneActorControlManager;
+extern struct ColliderEffectPool *gColliderEffectPool;
+extern struct SceneParticleBurstPool *gSceneParticleBurstPool;
+extern struct PairSlotPool *gPairSlotPool;
+extern struct BurstSparkPool *gBurstSparkPool;
+extern struct PaletteFade *gPaletteFade;
+extern struct ParticleManager *gParticleManager;
+extern struct GameOver *gGameOver;
+extern struct SceneNpc *gSceneNpc;
+extern struct CloudTask *gCloudTask;
+extern struct ScreenParams gScreenParams;
+extern struct ScreenTextParameters gScreenTextParameters;
+extern struct ScriptCommandTable gScriptCommandTable;
+extern struct DebrisPool *gDebrisPool;
+extern struct ParticlePool *gParticlePool;
+extern struct HomingManager *gHomingManager;
+extern struct CommandSet gCommandSet;
+extern struct RegionList *gRegionList;
+extern struct Snapshot gSnapshot;
+extern u32 gShadowManager;              /* shadow task singleton (Shadow_*) */
+extern u32 gScaledShadowManager;        /* scaled shadow manager singleton (ScaledShadow_*) */
+extern void *gSceneActorEffectsManager; /* scene actor effects manager (SceneActorEffects_*) */
+extern u32 gFragmentManager;            /* fragment manager singleton (FragmentManager_*) */
+extern u32 gAnimatedParticleManager;    /* animated particle manager (AnimatedParticleManager_*) */
+extern void *gFadingParticleManager;    /* fading particle manager (FadingParticleManager_*) */
+extern u32 gScanlineWave;               /* scanline wave effect task (ScanlineWave_*) */
+extern u32 gPaletteCycle;               /* palette cycle task (PaletteCycle_*) */
+extern u32 gCircleWindow;               /* circle window task (CircleWindow_*) */
+extern u32 gTileAnimation;              /* tile animation task (TileAnimation_*) */
+extern u8 *gTransientSpritePool;        /* transient sprite pool (TransientSpritePool_*) */
+extern u32 gSpritePoolManager;          /* sprite pool singleton (SpritePool_*) */
+extern struct Actor *gMessageWindow;    /* message window (MessageWindow_*) */
+extern struct Window *gScrollingDialogue; /* scrolling dialogue window (ScrollingDialogue_*) */
+extern u8 gWirelessSessionState;          /* wireless session state byte (Wireless_*) */
+extern u32 gWirelessTradeMenu;            /* wireless trade/exchange menu (WirelessTradeMenu_*) */
+extern u32 gScenePool;                    /* scene pool manager (ScenePool_*) */
+extern u8 *gScriptedParticlePool;         /* scripted particle pool (ScriptedParticle_*) */
+extern u8 *gSunDiscPool;                  /* sun disc pool (SunDiscPool_*) */
+extern u8 *gFragmentEffectManager;        /* fragment effect manager (FragmentEffect_*) */
+extern u32 gFloorSwitchManager;           /* floor switch manager (FloorSwitch_*) */
+extern u32 gSaveMenu;                     /* save menu task (SaveMenu_*) */
+extern u8 *gSceneEffectQueue;             /* scene effect queue (SceneEffectQueue_*) */
+extern void *gEffectPoolManager;          /* effect pool (EffectPool_*) */
+extern void *gVanargandPartController;    /* Vanargand part controller */
+extern void *gSparkleEmitter;             /* sparkle emitter (SparkleEmitter_*) */
+extern u32 gShipWheel;                    /* ship wheel task (ShipWheel_*) */
+extern u16 gInventoryUseFlags;            /* inventory use-permission flags */
+extern void *gHresvelgr;                  /* Hresvelgr boss task (Hresvelgr_Create/Destroy) */
+extern u32 gRatatoskParticlePool;         /* Ratatosk animated particle pool */
+extern u32 gSceneProjectilePool;          /* scene projectile pool (SceneProjectile_*) */
+extern u32 gSpriteParticleManager;        /* sprite particle manager (SpriteParticle_*) */
+extern u32 gProjectilePool;               /* projectile pool (ProjectilePool_*) */
+extern u32 gEnemyParticlePool;            /* enemy particle pool (EnemyParticle_*) */
+extern u32 gForgingBook;                  /* forging book task (ForgingBook_*) */
+extern u32 gShadowRegistry;               /* shadow registry task (ShadowRegistry_*) */
+extern u8 *gSolarController;              /* solar sensor controller (Solar_*) */
+extern u32 gScenePauseFlags; /* scene pause/mute flags (bit tests across effects and actors) */
 
 #endif

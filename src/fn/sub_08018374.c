@@ -1,9 +1,9 @@
 #include "global.h"
-extern u8 *gUnk_02000090;
+#include "ram.h"
 int Weather_EnterPhase(void *, int);
 int Weather_Stop(void)
 {
-    u8 *p = gUnk_02000090;
+    u8 *p = gWeatherState;
     int state;
     if (!p)
         return -1;

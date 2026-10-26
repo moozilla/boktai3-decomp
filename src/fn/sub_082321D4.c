@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_0200005C;
+#include "ram.h"
 
 void SceneActorEffects_DestroyManager(void)
 {
-    gUnk_0200005C = 0;
+    gSceneActorEffectsManager = 0;
 }

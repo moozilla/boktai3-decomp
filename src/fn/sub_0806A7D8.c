@@ -50,7 +50,7 @@ void SpriteEffectController_TickAnimation(struct SpriteEffectControllerPool *unu
             goto tickTimer;
         if (*flags & 1) {
             struct SpriteEffectDrawablePrefix *drawable;
-            gUnk_02000178->used &= ~(1 << controller->index);
+            gSpriteEffectControllerPool->used &= ~(1 << controller->index);
             controller->state = 0;
             {
                 register u16 *reloadFlags asm("r2") = flags;

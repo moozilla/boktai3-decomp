@@ -2,6 +2,6 @@
 s32 RepeatedEffect_InitManager(struct RepeatedEffectManager *manager)
 {
     manager->count = 0;
-    gUnk_02000110 = manager;
+    gRepeatedEffectManager = manager;
     return 0;
 }

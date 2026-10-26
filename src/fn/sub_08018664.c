@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "render.h"
 struct PaletteBlendEntry {
     u16 *source, *target, *base;
     u8 count, fieldD, frames, fieldF, speedS, speedD, w, W, field14;
@@ -11,7 +12,6 @@ struct PaletteBlender {
     u16 colors[256];
     struct PaletteBlendEntry entries[16];
 };
-extern u16 gUnk_03004FC0[16][16];
 struct PaletteBlender *PaletteCycle_Create(void);
 /* Registry routine 3A89: adds a palette blend entry to the palette blend task
    (0x02000094, created on demand; up to 16): -s and -d palette, color and
@@ -56,12 +56,12 @@ s32 PaletteBlend_AddFromScript(void)
     if (sb == 1)
         e->source = &p->colors[sp * 16 + sc];
     else
-        e->source = &gUnk_03004FC0[sp][sc];
+        e->source = &((u16(*)[16])gBgPaletteBuffer)[sp][sc];
     if (db == 1)
         e->target = &p->colors[dp * 16 + dc];
     else
-        e->target = &gUnk_03004FC0[dp][dc];
-    e->base = &gUnk_03004FC0[bp][bc];
+        e->target = &((u16(*)[16])gBgPaletteBuffer)[dp][dc];
+    e->base = &((u16(*)[16])gBgPaletteBuffer)[bp][bc];
     e->count = Script_GetKeywordValue('n', 1);
     e->fieldD = 0;
     e->field14 = 0;

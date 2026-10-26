@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Blob {
     u32 w[8];
 };
@@ -114,10 +115,9 @@ struct P *WirelessPeerPanel_Create(void)
     }
     return p;
 }
-extern struct P *gUnk_020000FC;
 struct P *WirelessExchange_Get(void)
 {
-    return gUnk_020000FC;
+    return gWirelessTradeMenu;
 }
 void *WirelessExchange_GetPeerEntry(int i)
 {

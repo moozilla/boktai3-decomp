@@ -5,6 +5,6 @@ s32 DisplayTrack_InitManager(struct DisplayTrackManager *manager, u32 unused1, u
     u32 zero = 0;
     manager->capacity = capacity;
     manager->count = zero;
-    gUnk_02000494 = manager;
+    gDisplayTrackManager = manager;
     return 0;
 }

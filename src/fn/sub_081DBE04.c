@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 gUnk_03004FC0[];
+#include "render.h"
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
@@ -33,7 +33,7 @@ u32 ScreenParams2E8_InitScreen(u8 *s)
     Bg_SetupLayers(2, 0, a, 0, zero, one = 1, &value);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     p = (u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14;
-    CpuSet(p, gUnk_03004FC0, 0x100);
+    CpuSet(p, gBgPaletteBuffer, 0x100);
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
     obj = s + 0xA4;
     ResourceHeader_Relocate(obj, resource);

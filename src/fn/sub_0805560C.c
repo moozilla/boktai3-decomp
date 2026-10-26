@@ -4,8 +4,8 @@ s32 DisplayTrack_DestroyManager(struct DisplayTrackManager *);
 s32 DisplayTrack_InitManager(struct DisplayTrackManager *, u32, u32, u32);
 struct DisplayTrackManager *DisplayTrack_CreateManagerFromScript(u32 arg1, u32 arg2)
 {
-    if (gUnk_02000494)
-        return gUnk_02000494;
+    if (gDisplayTrackManager)
+        return gDisplayTrackManager;
     {
         struct DisplayTrackManager *manager;
         u32 capacity;

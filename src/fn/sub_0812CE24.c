@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_0200018C;
+#include "ram.h"
 
 void FragmentEffect_ResetManagerReference(void)
 {
-    gUnk_0200018C = 0;
+    gFragmentEffectManager = 0;
 }

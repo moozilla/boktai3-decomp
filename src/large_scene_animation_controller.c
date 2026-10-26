@@ -3186,8 +3186,6 @@ void Nidhoggr_UpdateFastReturn(struct Nidhoggr *t)
     }
 }
 
-extern u32 gUnk_030053F0;
-
 extern u32 gUnk_02000560;
 
 void Camera_RequestShake(u32);
@@ -3279,7 +3277,7 @@ void Nidhoggr_UpdateTimedAttackSequence(struct Nidhoggr *t)
             break;
         case 7:
             if (!t->flags[1]) {
-                if (!Tst2(0x400, &gEngineFlags, &gUnk_030053F0) && !Tst32(4, &gUnk_02000560))
+                if (!Tst2(0x400, &gEngineFlags, &gScenePauseFlags) && !Tst32(4, &gUnk_02000560))
                     SceneAnimation_InitTimedCollider(t);
                 else {
                     Nidhoggr_UnregisterTerrainCells(t);
@@ -3768,7 +3766,7 @@ s32 Nidhoggr_Update(struct Nidhoggr *t)
 {
     Nidhoggr_CheckActivationTriggers(t);
     Nidhoggr_UpdateState(t);
-    if (Tst2(0x400, &gEngineFlags, &gUnk_030053F0) || Tst32(4, &gUnk_02000560))
+    if (Tst2(0x400, &gEngineFlags, &gScenePauseFlags) || Tst32(4, &gUnk_02000560))
         t->flags[0] = 0;
     if (t->flags[0]) {
         Collider_Refresh(&t->altColliders[0]);

@@ -9,7 +9,7 @@ struct WirelessLinkIndicator {
     struct ProjectedDisplayResource resource;
     struct ProjectedDisplayEntry animation;
 };
-extern struct WirelessLinkIndicator *gUnk_020000F4;
+extern struct WirelessLinkIndicator *gWirelessLinkIndicator;
 void WirelessLinkIndicator_SelectStrengthFrame(struct WirelessLinkIndicator *, s32);
 void WirelessLinkIndicator_UpdateLinkStatus(struct WirelessLinkIndicator *);
 s32 WirelessLinkIndicator_Initialize(struct WirelessLinkIndicator *);

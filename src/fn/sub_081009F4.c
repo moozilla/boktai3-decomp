@@ -1,10 +1,9 @@
 #include "global.h"
-
-extern u8 *gUnk_020001A8;
+#include "ram.h"
 
 s32 FloorSwitch_InitManager(u8 *obj)
 {
-    gUnk_020001A8 = obj;
+    gFloorSwitchManager = obj;
     *(u32 *)(obj + 0x498) = 0;
     return 0;
 }

@@ -29,7 +29,7 @@ struct Save {
     u8 pad[0x58];
     s16 values[4];
 };
-extern struct Menu *gUnk_020000FC;
+extern struct Menu *gWirelessTradeMenu;
 extern u8 gSceneEffectPalettePhase, gUnk_0203B400[];
 extern u32 gRandomIndex;
 void *Script_GetKeywordValue(int, int);
@@ -56,7 +56,7 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
     int i;
     u8 *item;
     u16 *cursor;
-    gUnk_020000FC = p;
+    gWirelessTradeMenu = p;
     p->listener = Script_GetKeywordValue(101, 0);
     p->secondListener = Script_GetKeywordValue(114, 0);
     p->count = 0;

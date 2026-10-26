@@ -49,7 +49,7 @@ static inline void SelectDirection(u32 angle, u8 *row, u8 *flip)
     }
 }
 
-extern u32 gEngineFlags, gUnk_030053F0, gUnk_02000560;
+extern u32 gEngineFlags, gUnk_02000560;
 struct FeatherPool *FeatherEffectPool_GetOrCreate(void);
 struct Feather *FeatherEffectPool_AllocEntry(struct FeatherPool *);
 // confidence=low: creates a directional feather effect with palette and scatter variants.
@@ -72,7 +72,7 @@ struct Feather *FeatherEffectPool_CreateDirectional(struct Vec *position, u32 an
     }
     {
         u32 mask = 0x400;
-        if ((gEngineFlags | gUnk_030053F0) & mask)
+        if ((gEngineFlags | gScenePauseFlags) & mask)
             return 0;
     }
     {

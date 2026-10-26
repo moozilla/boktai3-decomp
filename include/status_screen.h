@@ -102,7 +102,7 @@ extern const u16 gUnk_08604B3C[]; // default phase durations
 void Bg_SetPriority(u32, s32);
 void Bg_SetupLayer(u32, u32, void *, s32, s32, s32, s32, void *);
 void *Video_GetBackgroundMap(u32);
-extern struct StatusScreen *gUnk_02000044; // the live status screen, or NULL
+extern struct StatusScreen *gStatusScreen; // the live status screen, or NULL
 extern struct BgMapInfo gUnk_03004C30[];
 extern u16 gUnk_03005260[]; // input: [1] = newly pressed keys
 

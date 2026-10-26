@@ -5,8 +5,8 @@ s32 SceneSteeringActor_DestroyPool(struct SceneSteeringActorPool *);
 struct SceneSteeringActorPool *SceneSteeringActor_EnsurePool(void)
 {
     struct SceneSteeringActorPool *pool;
-    if (gUnk_02000188)
-        return gUnk_02000188;
+    if (gSceneSteeringActorPool)
+        return gSceneSteeringActorPool;
     pool = Task_Create(10, sizeof(*pool));
     if (pool) {
         Task_SetCallbacks(pool, (void (*)(void *))SceneSteeringActor_UpdatePool,

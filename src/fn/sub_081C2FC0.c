@@ -1,5 +1,5 @@
 #include "global.h"
-extern void *gUnk_02000264;
+#include "ram.h"
 void *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void *), void (*)(void *));
 s32 SparkleEmitter_Initialize(void *, void *);
@@ -9,9 +9,9 @@ void SparkleEmitter_OnTaskDestroy(void *);
 void *SparkleEmitter_CreateFromScript(void *a)
 {
     void *p;
-    if (gUnk_02000264 != 0)
-        return gUnk_02000264;
-    p = gUnk_02000264 = Task_Create(8, 0x780);
+    if (gSparkleEmitter != 0)
+        return gSparkleEmitter;
+    p = gSparkleEmitter = Task_Create(8, 0x780);
     if (p != 0) {
         Task_SetCallbacks(p, SparkleEmitter_OnTaskUpdate, SparkleEmitter_OnTaskDestroy);
         if (SparkleEmitter_Initialize(p, a) < 0) {

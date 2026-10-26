@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_0200017C;
+#include "ram.h"
 
 void SunDiscPool_ResetSingleton(void)
 {
-    gUnk_0200017C = 0;
+    gSunDiscPool = 0;
 }

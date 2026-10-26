@@ -21,7 +21,7 @@ u8 SceneActorRegistry_LinkActor(struct SceneActorRegistryActor *actor)
     struct SceneActorRegistryNode *head, *node;
     if (!manager)
         return 0;
-    head = gUnk_020004AC;
+    head = gSceneActorRegistryNode;
     if (TrackPairs() && !SceneActorRecord_CanRecordPair(gUnk_030039F0, (u16)actor->id))
         return 0;
     if (manager->field32 > 19 || SceneActorRegistry_FindById(actor->id))
@@ -30,7 +30,7 @@ u8 SceneActorRegistry_LinkActor(struct SceneActorRegistryActor *actor)
     Memory_Clear(node, 8);
     node->actor = actor;
     node->next = head;
-    gUnk_020004AC = node;
+    gSceneActorRegistryNode = node;
     SceneActorRegistry_MarkCategoryOne(actor->category);
     {
         u32 mask = 0x02000000;

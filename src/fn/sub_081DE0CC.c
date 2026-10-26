@@ -2,13 +2,13 @@
 #include "global.h"
 #include "game_state.h"
 #include "ram.h"
+#include "render.h"
 
 /* NameEntry_Initialize: reads the script's "b" (name slot) and "d" (initial name) keywords,
  * loads the slot's current name, counts its blank trailing pairs to place the cursor, then
  * sets up the keyboard backgrounds and six widgets. (guess) */
 
 extern u8 gUnk_020005B4[];
-extern u8 gUnk_03004FC0[];
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 u8 *Script_GetPc(void);
@@ -122,7 +122,7 @@ s32 NameEntry_Initialize(u8 *s)
         value = zero1;
         Bg_SetupLayers(2, 0, bg, 0, zero1, one1, &value);
         BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero1);
-        CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14, gUnk_03004FC0, 0x100);
+        CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14, gBgPaletteBuffer, 0x100);
         res = ScriptProc_Start(0xCB05, 0xE2AB);
         ResourceHeader_Relocate(s + 0x78, res);
         if (*(u32 *)(s + 0x370) == 0)

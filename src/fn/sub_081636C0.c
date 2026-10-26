@@ -1,9 +1,9 @@
 #include "global.h"
+#include "ram.h"
 struct P {
     u8 f0[0x342];
     u8 e;
 };
-extern u32 gUnk_02000210;
 void Sprite_Remove(u8 *);
 void Anim_Remove(u8 *);
 u32 GameOver_OnDestroy(u8 *p)
@@ -18,5 +18,5 @@ u32 GameOver_OnDestroy(u8 *p)
         }
         Anim_Remove(p + 0x2b8);
     }
-    return gUnk_02000210 = 0;
+    return gGameOver = 0;
 }

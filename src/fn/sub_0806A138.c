@@ -10,7 +10,7 @@ s32 SparkParticle_DestroyPool(struct SparkParticlePool *pool)
     } while (i >= 0);
     {
         u32 zero = 0;
-        gUnk_02000168 = (struct SparkParticlePool *)zero;
+        gSparkParticlePool = (struct SparkParticlePool *)zero;
     }
     return 0;
 }

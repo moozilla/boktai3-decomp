@@ -14,7 +14,7 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
     u32 zero;
     u32 one;
     u8 *graphics;
-    pool = gUnk_02000198;
+    pool = gRouteSpritePool;
     if (!pool) {
         pool = RouteSpritePool_Create();
         if (!pool)

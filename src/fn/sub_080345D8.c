@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 struct Engine {
     u8 pad0[0x18];
     u8 pad18, bits, pad1a, entered, flag, pad1d, state, flag1f, mode, index;
@@ -26,7 +27,6 @@ struct Engine {
     void *head, *tail;
 };
 extern struct Engine *gUnk_02000484;
-extern u8 gUnk_020000EC;
 void Memory_Clear(void *, int);
 struct Message {
     u8 pad0[0x14];
@@ -213,7 +213,7 @@ checkStop:
 stop:
     reset(p, 28, 0);
 inactive:
-    gUnk_020000EC = 0;
+    gWirelessSessionState = 0;
     goto done;
 done:;
 }

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "area_effect.h"
 struct E {
     u8 f[0xc6];
     u8 on;
@@ -12,7 +13,6 @@ struct O {
     u8 f[0x26];
     u8 n;
 };
-extern struct O *gUnk_0200010C;
 struct P {
     s16 x;
     s16 pad;
@@ -20,7 +20,7 @@ struct P {
 };
 s32 AreaEffect_IsPositionCovered(struct P *p)
 {
-    struct O *o = gUnk_0200010C;
+    struct O *o = gAreaEffectManager;
     s32 i;
     s32 n;
     if (o != 0)

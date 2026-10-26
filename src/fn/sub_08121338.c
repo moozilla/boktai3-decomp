@@ -2,7 +2,6 @@
 
 #include "engine.h"
 #include "ram.h"
-extern u32 gUnk_030053F0;
 u8 *RegistryA8CB_FindEntryByName(void *, s32);
 void SpatialIndex_RemoveEntry(u8 *);
 void SceneMessages_UnregisterReceiver(u8 *);
@@ -23,7 +22,7 @@ void RegistryA8CB_ResetFromScript(void)
         SpatialIndex_RemoveEntry(p + 0x56C);
         {
             u32 mask = 0x800;
-            if (!((gEngineFlags | gUnk_030053F0) & mask))
+            if (!((gEngineFlags | gScenePauseFlags) & mask))
                 SceneMessages_UnregisterReceiver(e + 0x858);
         }
     }

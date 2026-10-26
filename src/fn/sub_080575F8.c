@@ -1,7 +1,7 @@
 #include "countdown_timer.h"
 struct CountdownTimer *CountdownTimer_CreateFromScript(void *unused1, void *unused2)
 {
-    struct CountdownTimer *timer = gUnk_0200049C, *created;
+    struct CountdownTimer *timer = gCountdownTimer, *created;
     if (!timer) {
         created = Task_Create(8, sizeof(struct CountdownTimer));
         if (created) {

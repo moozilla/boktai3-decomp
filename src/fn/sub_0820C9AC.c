@@ -6,7 +6,8 @@
 // fix.py best version (reprinted C)
 // Remaining differences: pause branch layout, random-table lifetimes, stack slots and explicit callback return.
 #include "screamer_playback.h"
-extern u32 gUnk_030053F0, gUnk_02000560;
+#include "ram.h"
+extern u32 gUnk_02000560;
 extern u8 gUnk_0203B000[];
 void SceneDrawablePair_SetFlags(void);
 void Screamer_HandleDefeat(void *);
@@ -25,7 +26,7 @@ struct ScreamerParticleParameters {
 };
 static inline u32 PauseFlags(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 static inline u32 TestFlags(u32 *flags, u32 mask)
 {

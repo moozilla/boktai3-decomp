@@ -1,10 +1,11 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-extern u32 gUnk_030053F0, gUnk_02000560;
+#include "ram.h"
+extern u32 gUnk_02000560;
 static inline u32 IsSuspended(void)
 {
     u32 mask = 0x400;
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 static inline u32 HasOverride(void)
 {

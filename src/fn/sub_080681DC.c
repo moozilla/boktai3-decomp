@@ -1,5 +1,5 @@
 #include "scene_particle_burst.h"
-extern struct SceneParticleBurstPool *gUnk_02000130;
+#include "ram.h"
 static inline u8 IsUsed(u32 *used, u32 index)
 {
     u32 one = 1;
@@ -18,7 +18,7 @@ s32 SceneParticleBurst_Destroy(struct SceneParticleBurstPool *p)
     }
     {
         u32 zero = 0;
-        gUnk_02000130 = (void *)zero;
+        gSceneParticleBurstPool = (void *)zero;
     }
     return 0;
 }

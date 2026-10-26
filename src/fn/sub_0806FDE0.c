@@ -9,6 +9,6 @@ void SceneActorRegistry_AdvanceCursor(struct SceneActorRegistryManager *manager)
             state[0xF] = mask | state[0xF];
             manager->cursor = node->next;
         } else
-            manager->cursor = gUnk_020004AC;
+            manager->cursor = gSceneActorRegistryNode;
     }
 }

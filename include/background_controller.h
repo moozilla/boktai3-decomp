@@ -174,8 +174,8 @@ struct BackgroundMapEntry {
 };
 
 /* Shared globals (task pointer tables are indexed by layer). */
-extern struct Background *gUnk_02000000[];
-extern struct ScrollingBackground *gUnk_02000010[];
+extern struct Background *gBackgrounds[];
+extern struct ScrollingBackground *gScrollingBackgrounds[];
 extern struct BackgroundLayer gUnk_03004C30[];
 extern struct Camera gUnk_030042A0;
 extern s16 gUnk_03005418[2];

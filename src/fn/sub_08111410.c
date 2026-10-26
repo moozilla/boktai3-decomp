@@ -1,5 +1,4 @@
 #include "global.h"
-#define gPaletteBuffer gUnk_03004FC0
 struct PaletteFade {
     u8 unknown0[0x24];
     u16 *targets;
@@ -8,7 +7,7 @@ struct PaletteFade {
     u8 unknown1828[12];
     s32 slot;
 };
-extern u16 gUnk_03004FC0[16][16];
+extern u16 gBgPaletteBuffer[16][16];
 void PaletteFade_AdvanceColors(struct PaletteFade *p)
 {
     s32 i;
@@ -16,8 +15,8 @@ void PaletteFade_AdvanceColors(struct PaletteFade *p)
         p->red[p->slot][i] += p->deltaR[p->slot][i];
         p->green[p->slot][i] += p->deltaG[p->slot][i];
         p->blue[p->slot][i] += p->deltaB[p->slot][i];
-        gUnk_03004FC0[p->slot][i] = (p->red[p->slot][i] >> 24) |
-                                    ((p->green[p->slot][i] >> 24) << 5) |
-                                    ((p->blue[p->slot][i] >> 24) << 10);
+        gBgPaletteBuffer[p->slot][i] = (p->red[p->slot][i] >> 24) |
+                                       ((p->green[p->slot][i] >> 24) << 5) |
+                                       ((p->blue[p->slot][i] >> 24) << 10);
     }
 }

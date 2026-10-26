@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 p[0xB0];
 };
@@ -8,7 +9,6 @@ struct A {
     u8 p1[0x1C - 0x1c];
     struct E e[24];
 };
-extern u32 gUnk_02000604;
 void EnemyParticle_ReleaseSlot(struct A *, struct E *, s32);
 u32 EnemyParticle_DestroyPool(struct A *a)
 {
@@ -20,5 +20,5 @@ u32 EnemyParticle_DestroyPool(struct A *a)
         i++;
         e++;
     } while (i <= 0xF);
-    return gUnk_02000604 = 0;
+    return gEnemyParticlePool = 0;
 }

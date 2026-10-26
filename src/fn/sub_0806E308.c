@@ -10,7 +10,7 @@ static inline u8 Occupied(u32 *mask, s32 index)
 }
 u8 RouteSpritePool_IsFull(void)
 {
-    struct RouteSpritePool *pool = gUnk_02000198;
+    struct RouteSpritePool *pool = gRouteSpritePool;
     s32 i;
     if (!pool) {
         pool = RouteSpritePool_Create();

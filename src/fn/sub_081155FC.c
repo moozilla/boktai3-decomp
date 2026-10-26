@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-extern u32 gUnk_030053F0;
+#include "ram.h"
 void Player_GetWorldPosition(u32, s32 *);
 static inline s32 absolute(s32 x)
 {
@@ -13,7 +13,7 @@ u32 Collectible_IsNearPlayer(u8 *s)
     s32 v[4];
     s32 i;
     u32 mask = 0x800;
-    if ((gEngineFlags | gUnk_030053F0) & mask) {
+    if ((gEngineFlags | gScenePauseFlags) & mask) {
         i = 0;
         s += 0xDC;
         do {

@@ -48,7 +48,7 @@ static inline void Sub08072854_Sink(struct SceneActorRegistryResetView *actor, v
 // confidence=low: walks the registered actor list; for each enabled actor outside the excluded categories, a sinking cell hands it to its sink callback, and a cell with bit 0x80 (while the global flag 0x10 is set and actor+0x178 is 0) aims it at the cell centre
 void sub_08072854(void)
 {
-    struct SceneActorRegistryNode *node = gUnk_020004AC;
+    struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
     struct SceneActorRegistryResetView *actor;
 
     if (!node)

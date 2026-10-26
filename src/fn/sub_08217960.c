@@ -7,7 +7,7 @@
 // Remaining differences: loop setup, mask hoisting, backdrop temporaries and register allocation.
 extern s32 gBgFadeLevel, gFadeMultiplier, gBgFadeApplied;
 extern u16 *gBgPaletteSource;
-extern u16 gUnk_03004FC0[], gBgFadeBankMask, gBgFadeColor;
+extern u16 gBgPaletteBuffer[], gBgFadeBankMask, gBgFadeColor;
 extern s16 gBackdropOverride, gBackdropColor;
 u16 *Palette_GetBackgroundBuffer(void);
 void Palette_ApplyBackgroundFade(void)
@@ -24,7 +24,7 @@ void Palette_ApplyBackgroundFade(void)
     u32 rb;
     register u32 g asm("r10");
     if (value == 64) {
-        gBgPaletteSource = gUnk_03004FC0;
+        gBgPaletteSource = gBgPaletteBuffer;
         return;
     }
     if (value == 0) {
@@ -36,7 +36,7 @@ void Palette_ApplyBackgroundFade(void)
                 }
 
             } else {
-                src = gUnk_03004FC0 + (i * 16);
+                src = gBgPaletteBuffer + (i * 16);
                 for (j = 0; j < 16; j++) {
                     *(dst++) = *(src++);
                 }
@@ -50,7 +50,7 @@ void Palette_ApplyBackgroundFade(void)
     other = 32 - level;
     gBgPaletteSource = buffer;
     if (!gBgFadeColor) {
-        src = gUnk_03004FC0;
+        src = gBgPaletteBuffer;
         dst = buffer;
         for (i = 0; i < 16; i++) {
             if ((gBgFadeBankMask >> i) & 1) {
@@ -76,7 +76,7 @@ void Palette_ApplyBackgroundFade(void)
             u8 k1 = 0x3e0;
             g = gBgFadeColor & k1;
         }
-        src = gUnk_03004FC0;
+        src = gBgPaletteBuffer;
         dst = buffer;
         for (i = 0; i < 16; i++) {
             if ((gBgFadeBankMask >> i) & 1) {

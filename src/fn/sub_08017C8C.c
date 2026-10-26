@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 struct Weather {
     u8 pad[24];
     u32 timer;
@@ -13,7 +14,7 @@ struct Weather {
     int bank;
 };
 extern u8 *gGameState;
-extern u32 gEngineFlags, gUnk_030053F0;
+extern u32 gEngineFlags;
 extern int gUnk_0200008C, gUnk_02000478;
 extern u8 gUnk_03005430[];
 extern u16 gUnk_0203B400[];
@@ -51,7 +52,7 @@ static inline int light(struct Weather *p)
 static inline int interrupted(void)
 {
     int mask = 1024;
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 int Weather_ActiveStorm(struct Weather *p)
 {

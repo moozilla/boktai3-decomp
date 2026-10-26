@@ -152,7 +152,6 @@ int ScanlinePresentation_Destroy(struct ScanlinePresentation *p)
     return 0;
 }
 
-extern u16 gUnk_03004FC0[];
 extern u8 gUnk_03004C30[];
 void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 s32 ResourceHeader_Relocate(void *, void *);
@@ -187,7 +186,7 @@ s32 sub_0800DC90(struct ScanlinePresentation *p)
     u16 *q;
     s32 w;
 
-    gUnk_03004FC0[0] = 0x1084;
+    gBgPaletteBuffer[0] = 0x1084;
     attr.b = 0;
     attr.a = 0;
     p->fade = 0;

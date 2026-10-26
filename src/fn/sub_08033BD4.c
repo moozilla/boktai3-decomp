@@ -1,12 +1,12 @@
 #include "global.h"
 #include "engine.h"
-extern void *gUnk_020000E4; /* text window manager */
+#include "ram.h"
 s32 TextWindowManager_OnUpdate(void *);
 s32 TextWindowManager_OnDestroy(void *);
 s32 TextWindowManager_Init(void *);
 void *TextWindowManager_Create(void)
 {
-    void *p = gUnk_020000E4;
+    void *p = gWindowManager;
     if (!p) {
         p = Task_Create(12, 0x20);
         if (p) {

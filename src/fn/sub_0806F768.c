@@ -2,7 +2,7 @@
 struct SceneEffectScheduleEntry *SceneEffectSchedule_FindById(u32);
 void SceneEffectSchedule_RemoveFromScript(void)
 {
-    struct SceneEffectSchedule *manager = gUnk_0200019C;
+    struct SceneEffectSchedule *manager = gSceneEffectSchedule;
     s32 id;
     struct SceneEffectScheduleEntry *entry;
     if (!manager)

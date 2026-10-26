@@ -4,7 +4,7 @@
 #include "script_reference.h"
 #include "scene_panel_config.h"
 
-#define SCENE_PANEL_GLOBAL ((struct ScenePanel *)gUnk_020004A4)
+#define SCENE_PANEL_GLOBAL ((struct ScenePanel *)gScenePanel)
 void ScenePanel_InitRig(struct ScenePanel *);
 void ScenePanel_InitBackground(struct ScenePanel *);
 void ScenePanel_InitOverlay(struct ScenePanel *);

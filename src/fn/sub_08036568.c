@@ -28,7 +28,6 @@ struct Engine {
     void *head, *tail;
 };
 extern struct Engine *gUnk_02000484;
-extern u8 gUnk_020000EC;
 void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
@@ -94,7 +93,7 @@ static inline void publishInputs(struct Engine *p)
 int Wireless_UpdateParentUniSession(struct Engine *p)
 {
     p->flag31 = 0;
-    while (*(volatile u8 *)&gUnk_020000EC == 1)
+    while (*(volatile u8 *)&gWirelessSessionState == 1)
         ;
     sub_08223BC0(0);
     {
@@ -112,7 +111,7 @@ int Wireless_UpdateParentUniSession(struct Engine *p)
     WirelessController_RestoreLocalInput(p);
     Wireless_BuildParentUniPacket(p);
     if (!gUnk_03006A80->linkLossSlotFlag && p->flag36) {
-        gUnk_020000EC = 1;
+        gWirelessSessionState = 1;
         if (!((u8 *)p)[0xE8]) {
             rfu_UNI_changeAndReadySendData(p->mode, (u8 *)p + 0x70, 16);
             RfuManager_SendData(1);

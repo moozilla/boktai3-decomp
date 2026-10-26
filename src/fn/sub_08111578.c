@@ -17,7 +17,7 @@ struct PaletteFade {
     s32 remainingTargets;
     u32 flags;
 };
-extern u16 gUnk_03004FC0[16][16];
+extern u16 gBgPaletteBuffer[16][16];
 s32 Div(s32, s32);
 
 #ifdef NONMATCHING
@@ -26,7 +26,7 @@ s32 Div(s32, s32);
 void sub_08111578(struct PaletteFade *p)
 {
     s32 fromOffset = p->slot * 16;
-    u16 *fromBase = &gUnk_03004FC0[0][0];
+    u16 *fromBase = &gBgPaletteBuffer[0][0];
     u16 *from;
     u16 *targets = p->targets;
     u16 *to = targets + p->target * 16;

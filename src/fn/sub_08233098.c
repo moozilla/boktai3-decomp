@@ -1,12 +1,12 @@
 #include "global.h"
+#include "ram.h"
 void AnimData_Load(void *, u32);
 void Sprite_InitUnlinked(void *, void *, u32);
-extern u8 *gUnk_020000AC;
 u32 TransientSpritePool_Init(u8 *s)
 {
     u8 *p;
     s32 i;
-    gUnk_020000AC = s;
+    gTransientSpritePool = s;
     p = s + 0x18;
     i = 0xf;
     do {

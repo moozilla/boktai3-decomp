@@ -1,5 +1,5 @@
 #include "modifier_list.h"
-extern u32 gUnk_030053F0;
+#include "ram.h"
 void ModifierMenu_ValidateSavedSelection(struct ModifierMenu *);
 void ModifierMenu_LoadSavedSelection(struct ModifierMenu *);
 void ModifierMenu_LoadTextSources(struct ModifierMenu *);
@@ -21,7 +21,7 @@ s32 ModifierMenu_Initialize(struct ModifierMenu *menu)
     ModifierMenu_ValidateSavedSelection(menu);
     ModifierMenu_LoadSavedSelection(menu);
     mask = 0x800;
-    flags = (gEngineFlags | gUnk_030053F0) & mask;
+    flags = (gEngineFlags | gScenePauseFlags) & mask;
     /* The masked value is zero or 0x800: negation extracts its nonzero flag. */
     menu->specialHeader = Script_GetKeywordValue('E', (0 - flags) >> 31);
     menu->script = (void *)Script_GetKeywordValue('e', 0);

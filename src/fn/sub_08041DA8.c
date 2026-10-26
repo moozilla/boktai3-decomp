@@ -1,5 +1,5 @@
 #include "modifier_list.h"
-extern u16 gUnk_03004FC0[];
+#include "render.h"
 void Palette_UpdateHighlightPulse(u16 *, u8 *);
 void PaletteFade_CycleMenuColors(void *);
 void CharacterModel_UpdatePairedAnimations(void *, s32);
@@ -10,7 +10,7 @@ void ModifierMenu_UpdatePreviewAppearance(struct ModifierMenu *menu)
         PaletteFade_CycleMenuColors((u8 *)menu + 0x3C);
         CharacterModel_UpdatePairedAnimations((u8 *)menu + 0xE34, 0);
     } else {
-        u16 *palette = gUnk_03004FC0;
+        u16 *palette = gBgPaletteBuffer;
         u32 color = 0x73FF;
         u16 *p;
         s32 i;

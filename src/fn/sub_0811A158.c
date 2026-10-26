@@ -1,6 +1,7 @@
 #include "global.h"
 #include "game_state.h"
 #include "engine.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
@@ -15,7 +16,6 @@ struct Vec16 {
 #define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
 #define U32(p, o) (*(u32 *)((u8 *)(p) + (o)))
 #define S32(p, o) (*(s32 *)((u8 *)(p) + (o)))
-extern u32 gUnk_030053F0;
 extern u8 *gUnk_020004B4;
 extern s32 gUnk_020004E0[];
 extern const s16 gUnk_086149C4[];
@@ -41,7 +41,7 @@ static inline s32 Scale(s32 v)
 }
 static inline u32 LinkMode(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 #define Flag(p, mask) ((p) && (U16(p, 0x8F4) & (mask)))
 static inline u8 Inactive(u8 *p)

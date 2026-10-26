@@ -3,6 +3,6 @@ void SceneScheduledEffect_EnsureSingleton(void);
 s32 SceneEffectSchedule_Initialize(struct SceneEffectSchedule *manager, u32 unusedArgument)
 {
     SceneScheduledEffect_EnsureSingleton();
-    gUnk_0200019C = manager;
+    gSceneEffectSchedule = manager;
     return 0;
 }

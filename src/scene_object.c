@@ -335,7 +335,7 @@ static inline UpdateFn fallCallback(void)
 
 void Scene_DropObjectsAbove(struct SceneObject *object)
 {
-    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObjectManager *manager = gSceneObjectManager;
     struct SceneObject *p = manager->objects;
     s32 i;
     for (i = 0; i < manager->count; i++, p++) {
@@ -391,7 +391,7 @@ u32 SceneObjects_DestroyObject(struct SceneObject *object)
 
 s32 SceneObjects_DestroyAllObjects(void)
 {
-    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObjectManager *manager = gSceneObjectManager;
     struct SceneObject *object;
     s32 i;
     if (manager == 0)
@@ -409,7 +409,7 @@ s32 SceneObjects_DestroyAllObjects(void)
 
 s32 Scene_ActivateTypeOneObjects(void)
 {
-    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObjectManager *manager = gSceneObjectManager;
     struct SceneObject *p;
     s32 i;
     if (!manager)
@@ -434,7 +434,7 @@ s32 Scene_ActivateTypeOneObjects(void)
 // MATCHING_CONCESSION: register-pinning
 s32 Scene_StopSelectedObject(void)
 {
-    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObjectManager *manager = gSceneObjectManager;
     register u32 id asm("r6");
     struct SceneObject *p;
     register s32 i asm("r5");
@@ -465,7 +465,7 @@ s32 Scene_StopSelectedObject(void)
 
 s32 SceneObjects_DestroyObjectsByScriptId(void)
 {
-    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObjectManager *manager = gSceneObjectManager;
     u32 id;
     struct SceneObject *object;
     s32 i;
@@ -864,7 +864,7 @@ s32 SceneObjects_TryPushNeighbor(struct SceneVec *position, s32 direction)
 {
     s32 delta, index;
     struct SceneCell *origin;
-    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObjectManager *manager = gSceneObjectManager;
     struct SceneObject *p;
     s32 i;
     if (!manager)
@@ -1258,7 +1258,7 @@ u32 SceneObjects_DestroyTask(struct SceneObjectManager *manager)
 {
     SceneObjects_DestroyAllObjects();
     Heap_Free((u32)manager->objects);
-    return (u32)(gUnk_02000024 = 0);
+    return (u32)(gSceneObjectManager = 0);
 }
 
 /* Allocate the object pool (default 8 objects) and initialize the palette-fade state. */
@@ -1267,7 +1267,7 @@ s32 SceneObjects_InitPool(struct SceneObjectManager *p, void *unused)
 {
     void *m;
     u8 *b;
-    gUnk_02000024 = p;
+    gSceneObjectManager = p;
     if (p->count == 0)
         p->count = 8;
     m = Heap_Alloc(p->count * sizeof(struct SceneObject));
@@ -1294,8 +1294,8 @@ s32 SceneObjects_InitPool(struct SceneObjectManager *p, void *unused)
 struct SceneObjectManager *SceneObjects_CreateTask(void *a)
 {
     struct SceneObjectManager *p;
-    if (gUnk_02000024 != 0)
-        return gUnk_02000024;
+    if (gSceneObjectManager != 0)
+        return gSceneObjectManager;
     p = Task_Create(8, 0x74);
     if (p != 0) {
         Task_SetCallbacks(p, (void (*)(void))SceneObjects_Update,
@@ -1372,7 +1372,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
                               s32 animation, u32 script)
 {
     struct SceneExtent size, offset;
-    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObjectManager *manager = gSceneObjectManager;
     struct SceneObject *p;
     register struct SceneDraw *draw asm("r5");
     register struct SceneVec *pos asm("r9");
@@ -1592,7 +1592,7 @@ s32 SceneObjects_CreateFromScript(void)
 
 s32 SceneObjects_SwitchPaletteFromScript(void)
 {
-    struct SceneObjectManager *manager = gUnk_02000024;
+    struct SceneObjectManager *manager = gSceneObjectManager;
     struct SceneObject *p;
     struct SceneDraw *draw;
     s32 id, mode, sound;

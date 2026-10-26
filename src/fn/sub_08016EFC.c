@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_02000078;
+#include "ram.h"
 void Anim_Remove(u8 *);
 u32 FloatingEffectManager_Destroy(u8 *p)
 {
@@ -11,6 +11,6 @@ u32 FloatingEffectManager_Destroy(u8 *p)
     }
     {
         u32 z = 0;
-        gUnk_02000078 = z;
+        gLinkedWidgetSet = z;
     }
 }

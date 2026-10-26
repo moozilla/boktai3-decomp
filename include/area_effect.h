@@ -40,7 +40,7 @@ struct AreaEffectManager {
     struct AreaEffectEntry entries[16];
     u16 resourceFractions[4];
 };
-extern struct AreaEffectManager *gUnk_0200010C;
+extern struct AreaEffectManager *gAreaEffectManager;
 extern const u16 gUnk_08605A78[], gUnk_08605A80[];
 extern u32 gEngineFlags, gUnk_02000560;
 extern u16 gUnk_03005260;

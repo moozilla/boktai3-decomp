@@ -8,7 +8,7 @@ void HitSwitch_ReceiveCollision(struct SceneCollider *other, void *unused,
         if (other->contactFlags2 & mask) {
             entry->hitCount++;
             *cooldown = mask;
-            gUnk_02000490->hitPending = 1;
+            gHitSwitchManager->hitPending = 1;
         }
     }
 }

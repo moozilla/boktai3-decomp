@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 // confidence=low: per-frame update applies pending damage, starts the death sequence and steps the
 // sprite animation.
 #ifdef NONMATCHING
@@ -73,7 +74,6 @@ struct S {
     u8 terrain[4];
 };
 extern u32 gEngineFlags;
-extern u32 gUnk_030053F0;
 extern u32 gUnk_02000560;
 extern u32 gRandomIndex;
 void AnimData_SelectPaletteBank(void *, u32 animation);
@@ -102,7 +102,7 @@ inline static u32 TestFlag_UpdateDamageState(s16 mask, u32 *p)
 u32 EnemyF426_UpdateDamageState(struct S *p)
 {
     struct Col *c;
-    if (TestPair(0x400, &gEngineFlags, &gUnk_030053F0) ||
+    if (TestPair(0x400, &gEngineFlags, &gScenePauseFlags) ||
         TestFlag_UpdateDamageState(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, p->fn);

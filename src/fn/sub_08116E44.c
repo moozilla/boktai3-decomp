@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct Position {
     s32 x, y, z;
@@ -73,7 +74,7 @@ struct ScriptArgs {
     s32 *values;
 };
 extern struct LinkMenu *gUnk_020004B4;
-extern u32 gEngineFlags, gUnk_030053F0;
+extern u32 gEngineFlags;
 void Registry1745_SetMenuRequest(u32);
 s32 GameState_GetResultIndex(void);
 void Script_Call(u32, void *);
@@ -125,7 +126,7 @@ static inline void AddFlags(u32 mask, u16 *flags)
 }
 static inline u32 LinkFlags(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 static inline void SetCallback(struct Glove *p, void (*callback)(void *), u32 zero)
 {

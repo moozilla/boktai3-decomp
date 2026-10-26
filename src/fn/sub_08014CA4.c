@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 // confidence=low: allocates a fragment group with randomized direction and lifetime.
 #define FragmentGroup_SpawnRadial sub_08014CA4
 struct Vec {
@@ -25,7 +26,6 @@ struct Manager {
     u8 pad[32];
     struct Group groups[4];
 };
-extern struct Manager *gUnk_02000064;
 extern u32 gRandomIndex;
 extern u16 gUnk_08604C42[], gUnk_08604C30[];
 extern s16 gUnk_086149C4[];
@@ -73,9 +73,9 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
     u8 *animData;
     typeof(lifetimes) t1;
     typeof(rng) t2;
-    if ((!gUnk_02000064) && (!FragmentManager_Create(0, 0)))
+    if ((!gFragmentManager) && (!FragmentManager_Create(0, 0)))
         return -1;
-    m = gUnk_02000064;
+    m = gFragmentManager;
     if (count > 6)
         count = 6;
     j = 0;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct ScreenParams3F8Params {
     u8 *mBlock;
     u8 *eBlock;
@@ -49,10 +50,9 @@ struct Obj53F8 {
     u8 pad0[0x10];
     s32 x10;
 };
-extern struct ScreenParams3F8Params gUnk_020003F8;
+extern struct ScreenParams3F8Params gScreenTextParameters;
 extern s32 gUnk_020005DC;
 extern struct Obj53F8 *gUnk_030053F8;
-extern u16 gUnk_03004FC0[];
 s32 ScreenParams3F8_SelectValidDataBank(struct SpDisplay *);
 void Bg_ClearTilemap(s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
@@ -81,10 +81,10 @@ s32 sub_081EBD0C(struct SpDisplay *p)
     s32 opt;
     void *gfx;
 
-    if (gUnk_020003F8.B == 1)
+    if (gScreenTextParameters.B == 1)
         p->x1C = gUnk_020005DC;
-    if (gUnk_020003F8.M != 0) {
-        if (gUnk_020003F8.M == 1)
+    if (gScreenTextParameters.M != 0) {
+        if (gScreenTextParameters.M == 1)
             p->x24 = 4;
         else
             p->x24 = 3;
@@ -121,11 +121,11 @@ s32 sub_081EBD0C(struct SpDisplay *p)
         p->x1CC[i] = 0;
     }
     p->x144 = 0;
-    if (gUnk_020003F8.f == 0)
+    if (gScreenTextParameters.f == 0)
         p->x210 = 600;
     else
-        p->x210 = gUnk_020003F8.f;
-    if (gUnk_020003F8.M == 0 && gUnk_020003F8.B == 0) {
+        p->x210 = gScreenTextParameters.f;
+    if (gScreenTextParameters.M == 0 && gScreenTextParameters.B == 0) {
         p->x148 = ScreenParams3F8_SelectValidDataBank(p);
         if (p->x148 == -1)
             p->x108 = 3;
@@ -142,9 +142,9 @@ s32 sub_081EBD0C(struct SpDisplay *p)
         opt = 0xF;
     Bg_SetupLayers(2, 0, gfx, 0, 0, 1, &opt);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
-    CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x81B) + 0x14, gUnk_03004FC0, 0x100);
+    CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x81B) + 0x14, gBgPaletteBuffer, 0x100);
     ResourceHeader_Relocate(res, ScriptProc_Start(0xCB05, 0x530D));
-    if (gUnk_020003F8.M)
+    if (gScreenTextParameters.M)
         Widget_InitLinked(w1, res, 0xD9, 0x10, 0, 0, 0, 0);
     else
         Widget_InitLinked(w1, res, 0xD1, 0x10, 0, 0, 0, 0);
@@ -158,34 +158,34 @@ s32 sub_081EBD0C(struct SpDisplay *p)
     }
     if (p->x148 >= 0) {
         Menu_EraseRect(1, 4, 0x1C, 9);
-        if (gUnk_020003F8.M != 0) {
-            if (gUnk_020003F8.M == 1) {
-                Menu_DrawStringRef(1, 4, gUnk_020003F8.mBlock, 0);
-                Menu_DrawStringRef(1, 7, gUnk_020003F8.mBlock, 1);
-                Menu_DrawStringRef(1, 10, gUnk_020003F8.mBlock, 2);
-                Menu_DrawStringRef(1, 13, gUnk_020003F8.mBlock, 3);
+        if (gScreenTextParameters.M != 0) {
+            if (gScreenTextParameters.M == 1) {
+                Menu_DrawStringRef(1, 4, gScreenTextParameters.mBlock, 0);
+                Menu_DrawStringRef(1, 7, gScreenTextParameters.mBlock, 1);
+                Menu_DrawStringRef(1, 10, gScreenTextParameters.mBlock, 2);
+                Menu_DrawStringRef(1, 13, gScreenTextParameters.mBlock, 3);
             } else {
-                Menu_DrawStringRef(1, 4, gUnk_020003F8.mBlock, 0);
-                Menu_DrawStringRef(1, 7, gUnk_020003F8.mBlock, 2);
-                Menu_DrawStringRef(1, 10, gUnk_020003F8.mBlock, 3);
+                Menu_DrawStringRef(1, 4, gScreenTextParameters.mBlock, 0);
+                Menu_DrawStringRef(1, 7, gScreenTextParameters.mBlock, 2);
+                Menu_DrawStringRef(1, 10, gScreenTextParameters.mBlock, 3);
             }
         } else {
-            Menu_DrawStringRef(9, 4, gUnk_020003F8.mBlock, 0);
-            Menu_DrawStringRef(10, 7, gUnk_020003F8.mBlock, 1);
+            Menu_DrawStringRef(9, 4, gScreenTextParameters.mBlock, 0);
+            Menu_DrawStringRef(10, 7, gScreenTextParameters.mBlock, 1);
             if (p->x24 == 3)
-                Menu_DrawStringRef(5, 10, gUnk_020003F8.mBlock, 2);
+                Menu_DrawStringRef(5, 10, gScreenTextParameters.mBlock, 2);
         }
         ScrollingDialogue_ClearScript();
         ScrollingDialogue_RequestShow();
         ScrollingDialogue_ClearScript();
         {
-            u8 *e = gUnk_020003F8.eBlock;
+            u8 *e = gScreenTextParameters.eBlock;
             s32 base = p->x1C;
             ScrollingDialogue_SetScript(Text_LookupString(Script_ParseStringRef(e) + base));
         }
     } else {
         Menu_EraseRect(1, 6, 0x1C, 6);
-        Menu_DrawStringRef(1, 6, gUnk_020003F8.mBlock, 3);
+        Menu_DrawStringRef(1, 6, gScreenTextParameters.mBlock, 3);
         *(u32 *)((u8 *)p + 0x50) |= 1;
     }
     p->x114 = 3;

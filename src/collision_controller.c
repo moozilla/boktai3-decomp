@@ -1,12 +1,12 @@
 #include "collision_controller.h"
-/* CollisionController_ClearGlobal: Zeroes gUnk_0200003C; matches the ClearGlobal pattern already used by EffectManager_ClearGlobal and is hinted by the file's own #define. */
+/* CollisionController_ClearGlobal: Zeroes gCollisionManager; matches the ClearGlobal pattern already used by EffectManager_ClearGlobal and is hinted by the file's own #define. */
 #define CollisionController_ClearGlobal sub_08009E30
 // MATCHING_CONCESSION: register-pinning
 
 #define CollisionController_ClearGlobal sub_08009E30
 void CollisionController_ClearGlobal(void)
 {
-    gUnk_0200003C = 0;
+    gCollisionManager = 0;
 }
 
 struct CollisionSlot *CollisionController_FindFreeSlot(struct CollisionManager *manager)
@@ -404,7 +404,7 @@ s32 CollisionController_DestroyManager(struct CollisionManager *manager)
     }
     {
         u32 z = 0;
-        gUnk_0200003C = (struct CollisionManager *)z;
+        gCollisionManager = (struct CollisionManager *)z;
     }
     return 0;
 }
@@ -413,7 +413,7 @@ s32 CollisionController_InitManager(struct CollisionManager *manager, void *owne
 {
     u32 mode;
     s32 available;
-    gUnk_0200003C = manager;
+    gCollisionManager = manager;
     mode = gUnk_03005430.mode;
     if ((((u8)(mode - 4)) <= 1) || (mode == 0)) {
         goto pause;
@@ -463,7 +463,7 @@ struct CollisionManager *CollisionController_CreateManager(void *owner, u32 unus
 s32 CollisionController_ScriptCreate(void)
 {
     struct SceneExtent position;
-    struct CollisionManager *manager = gUnk_0200003C;
+    struct CollisionManager *manager = gCollisionManager;
     struct CollisionSlot *p;
     if (!manager) {
         manager = CollisionController_CreateManager(0, 0);
@@ -516,7 +516,7 @@ s32 CollisionController_ScriptGetActiveCount(void)
     struct CollisionManager *manager;
     s32 i;
     struct CollisionSlot *slot;
-    manager = gUnk_0200003C;
+    manager = gCollisionManager;
     count = 0;
     if (manager != 0) {
         slot = manager->slots;
@@ -536,7 +536,7 @@ s32 CollisionController_ScriptGetActiveCount(void)
 
 void CollisionController_ScriptRemoveAll(void)
 {
-    struct CollisionManager *manager = gUnk_0200003C;
+    struct CollisionManager *manager = gCollisionManager;
     s32 i;
     struct CollisionSlot *slot;
     if (manager == 0)

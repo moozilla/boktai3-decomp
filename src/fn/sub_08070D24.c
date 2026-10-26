@@ -38,7 +38,7 @@ struct SceneActorRegistryActor *
 SceneActorRegistry_FindNearestCategoryActor(const struct ContactPosition *input)
 {
     const struct ContactPosition *position = input;
-    struct SceneActorRegistryNode *node = gUnk_020004AC;
+    struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
     struct SceneActorRegistryActor *actor = node->actor;
     s32 bestDistance = 10000000;
     struct SceneActorRegistryActor *best = 0;

@@ -14,7 +14,6 @@ struct ActorManager {
     u8 task[0x18];
     struct ManagedActor actors[1];
 };
-extern u32 gUnk_030053F0;
 void Anim_Remove(void *);
 void SpatialIndex_RemoveEntry(void *);
 void SceneMessages_UnregisterReceiver(void *);
@@ -31,7 +30,7 @@ static inline void DestroyActors(struct ActorManager *manager, s32 i, u32 mask)
             } while (--j >= 0);
             actor = &manager->actors[i];
             SpatialIndex_RemoveEntry(actor->contact);
-            if (!((gEngineFlags | gUnk_030053F0) & mask))
+            if (!((gEngineFlags | gScenePauseFlags) & mask))
                 SceneMessages_UnregisterReceiver(actor->drawable);
         }
     } while (++i <= 0);

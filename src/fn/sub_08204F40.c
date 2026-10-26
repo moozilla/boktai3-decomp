@@ -4,7 +4,8 @@
 #include "scene_vec.h"
 #include "render.h"
 #include "engine.h"
-extern u32 gUnk_030053F0, gUnk_02000560;
+#include "ram.h"
+extern u32 gUnk_02000560;
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
@@ -135,7 +136,7 @@ static inline void StepAnimation(u8 *p, void *sprite, struct DisplaySequenceStat
 s32 EnemyD459_Update(u8 *p)
 {
     struct ColliderView *collider;
-    if (TestPair(0x400, &gEngineFlags, &gUnk_030053F0) || TestFlag(4, &gUnk_02000560))
+    if (TestPair(0x400, &gEngineFlags, &gScenePauseFlags) || TestFlag(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, *(void **)(p + 0x108));
     W(0x24) &= ~1;

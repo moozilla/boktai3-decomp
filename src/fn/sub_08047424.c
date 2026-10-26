@@ -13,7 +13,7 @@ s32 TransientSpriteEffects_Initialize(struct TransientSpriteEffects *pool, void 
     s32 result;
     register union TransientPackedPosition position asm("r5");
     volatile s32 savedIndex;
-    gUnk_020000A0 = pool;
+    gTransientSpriteEffects = pool;
     {
         u32 zPaddingMask = 0xFFFF0000;
         asm("" : : "r"(zPaddingMask));

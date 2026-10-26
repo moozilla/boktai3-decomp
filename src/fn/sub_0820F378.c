@@ -4,12 +4,13 @@
 #include "scene_vec.h"
 #include "render.h"
 #include "engine.h"
+#include "ram.h"
 // confidence=low: handles collision damage, defeat effects, palette flashing and animation.
 #define OrangeSpine_UpdateDamageState sub_0820F378
 #ifdef NONMATCHING
 // fuzzy: 83.6%
 // Remaining: burst-vector packing, pointer lifetimes and animation register allocation.
-extern u32 gUnk_030053F0, gUnk_02000560;
+extern u32 gUnk_02000560;
 extern const u16 gUnk_0203B400[];
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
@@ -142,7 +143,7 @@ static inline void StepAnimation(u8 *p, void *sprite, struct DisplaySequenceStat
 s32 OrangeSpine_UpdateDamageState(u8 *p)
 {
     struct ColliderView *collider;
-    if (TestPair(0x400, &gEngineFlags, &gUnk_030053F0) || TestFlag(4, &gUnk_02000560))
+    if (TestPair(0x400, &gEngineFlags, &gScenePauseFlags) || TestFlag(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, *(void **)(p + 0x108));
     W(0x24) &= ~1;

@@ -9,7 +9,7 @@ static inline u8 Tst(u32 m, s32 one, s32 i)
 
 struct SceneEffectScheduleEntry *SceneEffectSchedule_FindById(u32 x)
 {
-    u8 *b = (u8 *)gUnk_0200019C;
+    u8 *b = (u8 *)gSceneEffectSchedule;
     s32 i;
     u32 m;
     s32 one;

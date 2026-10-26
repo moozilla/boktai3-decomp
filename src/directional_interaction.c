@@ -362,7 +362,7 @@ s32 DirectionalController_DestroyManager(struct DirectionalManager *manager)
         Sprite_Remove(&p->drawable);
     if (manager->slots)
         Heap_Free(manager->slots);
-    gUnk_02000038 = 0;
+    gDirectionalManager = 0;
     return 0;
 }
 
@@ -370,7 +370,7 @@ s32 DirectionalController_InitManager(struct DirectionalManager *manager, void *
 {
     struct DirectionalController *p;
     s32 i;
-    gUnk_02000038 = manager;
+    gDirectionalManager = manager;
     manager->count = Script_GetKeywordValue('n', 1);
     manager->selected = -1;
     manager->pending = -1;
@@ -399,8 +399,8 @@ s32 DirectionalController_InitManager(struct DirectionalManager *manager, void *
 void *DirectionalController_CreateManagerTask(void *a)
 {
     struct DirectionalManager *p;
-    if (gUnk_02000038 != 0)
-        return gUnk_02000038;
+    if (gDirectionalManager != 0)
+        return gDirectionalManager;
     p = Task_Create(8, 0x30);
     if (p != 0) {
         Task_SetCallbacks(p, (void (*)(void))DirectionalController_UpdateAll,
@@ -417,7 +417,7 @@ s32 DirectionalController_ScriptCreate(void)
 {
     struct DirectionalPackedVec position;
     s32 findRegion;
-    struct DirectionalManager *manager = gUnk_02000038;
+    struct DirectionalManager *manager = gDirectionalManager;
     struct DirectionalController *p;
     s32 i;
     s32 id;
@@ -498,7 +498,7 @@ fail:
 
 s32 DirectionalController_ScriptRelease(void)
 {
-    struct DirectionalManager *manager = gUnk_02000038;
+    struct DirectionalManager *manager = gDirectionalManager;
     if (!manager || manager->selected < 0 || manager->selected >= manager->count)
         return -1;
     DirectionalController_ReleaseTarget(manager, manager->selected);
@@ -509,7 +509,7 @@ s32 DirectionalController_ScriptRelease(void)
 s32 DirectionalController_ScriptMove(void)
 {
     struct DirectionalPackedVec position;
-    struct DirectionalManager *manager = gUnk_02000038;
+    struct DirectionalManager *manager = gDirectionalManager;
     struct DirectionalController *p;
     if (!manager)
         goto fail;

@@ -257,7 +257,7 @@ s32 Breakable_DestroyManager(struct PooledInteractableManager *manager)
         Heap_Free(manager->slots);
         manager->slots = 0;
     }
-    gUnk_02000034 = 0;
+    gPooledInteractableManager = 0;
 }
 
 s32 Breakable_InitManager(struct PooledInteractableManager *manager)
@@ -265,7 +265,7 @@ s32 Breakable_InitManager(struct PooledInteractableManager *manager)
     s32 i;
     u32 bytes;
     struct PooledInteractable *slot;
-    gUnk_02000034 = manager;
+    gPooledInteractableManager = manager;
     for (i = 0; i < 3; i++) {
         struct PooledResource *resource = ScriptProc_Start(0xcb05, gUnk_086049C8[i]);
         if (!resource)
@@ -285,8 +285,8 @@ s32 Breakable_InitManager(struct PooledInteractableManager *manager)
 void *Breakable_GetOrCreateManager(void)
 {
     void *p;
-    if (gUnk_02000034 != 0)
-        return (void *)gUnk_02000034;
+    if (gPooledInteractableManager != 0)
+        return (void *)gPooledInteractableManager;
     p = Task_Create(10, 0x80);
     if (p != 0) {
         Task_SetCallbacks(p, (void (*)(void))Breakable_UpdateAll,
@@ -331,7 +331,7 @@ static inline s32 groundHeight(struct SceneVec *position)
 s32 Breakable_ScriptCreate(void)
 {
     struct SceneVec position;
-    struct PooledInteractableManager *manager = gUnk_02000034;
+    struct PooledInteractableManager *manager = gPooledInteractableManager;
     struct PooledInteractable *slot;
     s32 placed;
     void *drawable;
@@ -419,7 +419,7 @@ s32 Breakable_ScriptCreate(void)
 
 void Breakable_ScriptSetTimeout(void)
 {
-    struct PooledInteractableManager *manager = gUnk_02000034;
+    struct PooledInteractableManager *manager = gPooledInteractableManager;
     if (manager) {
         s32 id = Script_GetKeywordValue('n', 0), timeout = Script_GetKeywordValue('d', -1);
         struct PooledInteractable *slot = manager->slots;
@@ -432,7 +432,7 @@ void Breakable_ScriptSetTimeout(void)
 
 void Breakable_ScriptSetState(void)
 {
-    struct PooledInteractableManager *g = gUnk_02000034;
+    struct PooledInteractableManager *g = gPooledInteractableManager;
     if (g != 0) {
         u32 id = Script_GetKeywordValue(0x6e, 0);
         s32 m1 = -1;

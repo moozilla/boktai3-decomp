@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_02000298;
 u32 Task_Create(u32, u32);
 void Task_SetCallbacks(u32, void (*)(void), void (*)(void));
 s32 sub_081D33A0(u32, u32, u32);
@@ -11,8 +11,8 @@ void PlayerParticleCloud_Destroy(void);
 u32 PlayerParticleCloud_Create(u32 a, u32 b)
 {
     u32 r;
-    if (gUnk_02000298 != 0)
-        return gUnk_02000298;
+    if (gCloudTask != 0)
+        return gCloudTask;
     {
         r = Task_Create(0xa, 0xb74);
         if (r != 0) {

@@ -1,5 +1,5 @@
 #include "wireless_link_indicator.h"
 struct WirelessLinkIndicator *WirelessLinkIndicator_Get(void)
 {
-    return gUnk_020000F4;
+    return gWirelessLinkIndicator;
 }

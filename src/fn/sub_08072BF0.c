@@ -1,7 +1,7 @@
 #include "scene_actor_contact_list.h"
 u8 SceneActorContacts_RegisterNode(struct SceneActorContactNode *node, void *object, u32 kind)
 {
-    struct SceneActorContactManager *manager = gUnk_020001A0;
+    struct SceneActorContactManager *manager = gSceneActorContactManager;
     struct SceneActorContactNode *current;
     if (!manager || (s32)manager->count > 5)
         return 0;

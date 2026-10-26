@@ -3,8 +3,8 @@ struct SceneActorRegistryManager *SceneActorRegistry_CreateManager(u32 resourceI
 {
     u32 resource = (u16)resourceId, secondary = (u16)context;
     struct SceneActorRegistryManager *manager;
-    if (gUnk_020004A8)
-        return gUnk_020004A8;
+    if (gSceneActorRegistryManager)
+        return gSceneActorRegistryManager;
     {
         manager = Task_Create(8, sizeof(*manager));
         if (manager) {

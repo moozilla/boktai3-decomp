@@ -3,12 +3,11 @@
 #define AreaEffect_SetModeFromScript sub_0804E1E0
 #define AreaEffect_SetModeFromScript sub_0804E1E0
 #include "engine.h"
-
-extern u8 *gUnk_0200010C;
+#include "area_effect.h"
 
 void AreaEffect_SetModeFromScript(void)
 {
-    u8 *g = gUnk_0200010C;
+    u8 *g = gAreaEffectManager;
     if (g) {
         s32 found = Script_SeekToKeyword(0x74);
         if (found)

@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 
 #define PROJECTILE_RANDOM_TABLE ((const u16 *)0x0203B400)
 
@@ -74,7 +75,6 @@ struct Behaviors {
     void *callback[3];
 };
 extern const struct Behaviors gUnk_0824FE28;
-extern struct Pool *gUnk_020005E8;
 extern const s16 gUnk_086149C4[];
 extern u32 gRandomIndex;
 void SceneProjectile_CreatePool(void);
@@ -216,7 +216,7 @@ static inline void StepPlayback(struct Entry *e, struct Obj *sprite, struct Anim
 s32 Projectile_SpawnAtPosition(struct Params *params, struct Pos *pos)
 {
     struct Behaviors behaviors = gUnk_0824FE28;
-    struct Pool *pool = gUnk_020005E8;
+    struct Pool *pool = gSceneProjectilePool;
     struct Entry *e;
     s32 slot;
     u8 *q;

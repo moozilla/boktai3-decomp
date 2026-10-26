@@ -1,5 +1,5 @@
 #include "global.h"
-extern void *gUnk_0200026C;
+#include "ram.h"
 void *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void *), void (*)(void *));
 s32 sub_081C49F4(void *, void *);
@@ -9,8 +9,8 @@ void ShipWheel_OnDestroy(void *);
 void *ShipWheel_Create(void *a)
 {
     void *p;
-    if (gUnk_0200026C != 0)
-        return gUnk_0200026C;
+    if (gShipWheel != 0)
+        return gShipWheel;
     p = Task_Create(0xb, 0xe4);
     if (p != 0) {
         Task_SetCallbacks(p, ShipWheel_Update, ShipWheel_OnDestroy);
@@ -19,6 +19,6 @@ void *ShipWheel_Create(void *a)
             return 0;
         }
     }
-    gUnk_0200026C = p;
+    gShipWheel = p;
     return p;
 }

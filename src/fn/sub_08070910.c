@@ -16,7 +16,7 @@ void sub_08070910(void)
 
     if (!SceneActorRegistry_GetManager())
         return;
-    node = gUnk_020004AC;
+    node = gSceneActorRegistryNode;
     actor = node->actor;
     keyword = Script_GetKeywordValue(0x6d, 0);
     if (!actor)

@@ -1,11 +1,11 @@
 #include "global.h"
 #include "game_state.h"
+#include "area_effect.h"
 struct S {
     u8 f[0x868];
     u32 fl;
 };
 extern u8 *gUnk_020004B4;
-extern u8 *gUnk_0200010C;
 s32 AreaEffect_FindContainingEntry(u8 *);
 static inline u32 mk(u32 *a, u32 m)
 {
@@ -37,7 +37,7 @@ s32 AreaEffect_IsLinkPlayerCovered(u8 *a)
         if (tst(mk(&g->fl, m)) != 0)
             goto yes;
     }
-    if (gUnk_0200010C == 0)
+    if (gAreaEffectManager == 0)
         goto no;
     if (AreaEffect_FindContainingEntry(a + 0x30) >= 0)
         goto yes;

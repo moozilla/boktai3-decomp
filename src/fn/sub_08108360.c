@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "engine.h"
+#include "ram.h"
 #define gTileTriggerStateCallbacks gUnk_08606510
 struct TileTrigger {
     u32 flags;
@@ -21,7 +22,7 @@ struct TileTriggerManager {
     struct TileTrigger *tiles[12];
     u32 used;
 };
-extern u32 gUnk_030053F0, gUnk_02000560;
+extern u32 gUnk_02000560;
 extern void *gUnk_08606510[];
 s32 Callback_InvokeActor(void *, void *);
 static inline u8 Used(u32 *mask, s32 i)
@@ -32,7 +33,7 @@ static inline u8 Used(u32 *mask, s32 i)
 }
 static inline u32 TestPair(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 s32 TileTrigger_TickManager(struct TileTriggerManager *manager)
 {

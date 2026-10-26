@@ -1,6 +1,5 @@
 #include "global.h"
 #include "render.h"
-extern u8 gUnk_03004FC0[];
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
@@ -36,7 +35,7 @@ void Presentation_InitializeBackground(void)
     for (i = 13; i <= 15;) {
         u32 offset = i * 32;
         s32 next = i + 1;
-        dest = (u16 *)(gUnk_03004FC0 + offset);
+        dest = (u16 *)(((u8 *)gBgPaletteBuffer) + offset);
         for (j = 15; j >= 0; j--) {
             *dest = *src;
             src++;

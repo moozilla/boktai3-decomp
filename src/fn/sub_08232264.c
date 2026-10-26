@@ -22,7 +22,7 @@ struct EffectGroup {
     struct EffectGroupEntry entries[4];
     void (*update)(struct EffectGroup *);
 };
-extern struct EffectManager *gUnk_0200005C;
+extern struct EffectManager *gSceneActorEffectsManager;
 struct EffectManager *SceneActorEffects_CreateManager(void *, void *);
 void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
@@ -33,7 +33,7 @@ void sub_08231444(struct EffectGroup *);
 // scene actor effect manager, creating the manager if needed.
 s32 sub_08232264(struct EffectGroup *group, void *owner, s32 mode, s32 kind, s32 variant)
 {
-    struct EffectManager *manager = gUnk_0200005C;
+    struct EffectManager *manager = gSceneActorEffectsManager;
     struct EffectGroupEntry *entry;
     s32 i;
     if (manager == NULL) {
@@ -56,10 +56,10 @@ s32 sub_08232264(struct EffectGroup *group, void *owner, s32 mode, s32 kind, s32
         entry->x = 0;
         entry->y = 0;
         entry->z = 0;
-        ParticleSprite_Initialize(entry->sprite, gUnk_0200005C->animData, 0x11);
+        ParticleSprite_Initialize(entry->sprite, gSceneActorEffectsManager->animData, 0x11);
         Effect_SetOrigin(entry->sprite, -8, -8);
         entry->sprite[0xF] = 2;
-        Anim_SetSequence(entry->anim, gUnk_0200005C->sequence, 0, 0, 0);
+        Anim_SetSequence(entry->anim, gSceneActorEffectsManager->sequence, 0, 0, 0);
     }
     ActiveList_PrependNode(manager, group);
     return 0;

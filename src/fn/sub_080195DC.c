@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_020000A4;
+#include "ram.h"
 
 u32 TileAnimation_GetTask(void)
 {
-    return gUnk_020000A4;
+    return gTileAnimation;
 }

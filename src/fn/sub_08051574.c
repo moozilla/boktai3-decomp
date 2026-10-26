@@ -5,8 +5,8 @@ void DirectionalForce_Destroy(void);
 struct DirectionalForce *DirectionalForce_CreateFromScript(u32 id)
 {
     struct DirectionalForce *force;
-    if (gUnk_02000114)
-        return gUnk_02000114;
+    if (gDirectionalForce)
+        return gDirectionalForce;
     force = Task_Create(9, 0x30);
     if (force) {
         Task_SetCallbacks(force, (void (*)(void *))DirectionalForce_Tick,

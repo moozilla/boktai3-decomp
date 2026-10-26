@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_02000064;
+#include "ram.h"
 void Sprite_Remove(u8 *);
 u32 FragmentManager_Destroy(u8 *p)
 {
@@ -19,5 +19,5 @@ u32 FragmentManager_Destroy(u8 *p)
         }
         i = next;
     } while (i <= 3);
-    return gUnk_02000064 = 0;
+    return gFragmentManager = 0;
 }

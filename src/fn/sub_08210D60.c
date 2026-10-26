@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct Tile {
     u8 p0[0x18];
     u16 h18;
@@ -6,7 +7,6 @@ struct Tile {
     u16 h20, h22;
 };
 extern struct Tile gUnk_03004CC0;
-extern u16 gUnk_03004FC0[];
 void Bg_SetPriority(u32, u32);
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
@@ -33,7 +33,7 @@ void Collection_LoadPageBackground(u8 *p)
     }
     Bg_SetPriority(3, 3);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
-    CpuSet(ScriptProc_Start(0x92b3, 0x204) + 0x14, gUnk_03004FC0, 0x100);
+    CpuSet(ScriptProc_Start(0x92b3, 0x204) + 0x14, gBgPaletteBuffer, 0x100);
     count = 0;
     max = Collection_GetPageEntryCount(*(s16 *)(p + 0xb80));
     row = 0;

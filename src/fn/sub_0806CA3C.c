@@ -154,7 +154,7 @@ void SceneSteeringActor_CreateBobbingActor(const struct ContactPosition *positio
     u32 paletteToken;
     u32 clear;
     void *shadow;
-    pool = gUnk_02000188;
+    pool = gSceneSteeringActorPool;
     if (!pool) {
         pool = SceneSteeringActor_EnsurePool();
         if (!pool)

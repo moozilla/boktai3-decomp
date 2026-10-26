@@ -1,9 +1,9 @@
 #include "global.h"
-extern u8 *gUnk_0200006C;
+#include "ram.h"
 void FadingParticleGroup_Update(u8 *);
 u32 FadingParticleManager_Update(u8 *s)
 {
-    u8 **gp = &gUnk_0200006C;
+    u8 **gp = &gFadingParticleManager;
     u32 off = 0x24;
     s32 i = 5;
     u8 *e;

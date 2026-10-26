@@ -1,13 +1,13 @@
 #include "global.h"
+#include "ram.h"
 struct Manager {
     u8 pad[0x1c];
     u16 mode;
 };
-extern struct Manager *gUnk_02000298;
 
 s32 sub_081D3704(void)
 {
-    struct Manager *m = gUnk_02000298;
+    struct Manager *m = gCloudTask;
     s32 i;
     if (m == NULL)
         return -1;

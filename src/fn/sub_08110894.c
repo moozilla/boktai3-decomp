@@ -1,7 +1,7 @@
 #include "global.h"
 #include "area_effect_link.h"
+#include "ram.h"
 
-extern void *gUnk_020001D4;
 s32 Script_SeekToKeyword(u32);
 u32 Script_GetTextSourcePc(void);
 u32 Script_GetPc(void);
@@ -73,6 +73,6 @@ s32 sub_08110894(u8 *p)
     }
     if (Script_GetKeywordValue('f', 0))
         ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xffff, 0);
-    gUnk_020001D4 = p;
+    gSaveMenu = p;
     return 1;
 }

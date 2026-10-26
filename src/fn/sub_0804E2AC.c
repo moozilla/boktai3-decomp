@@ -9,7 +9,7 @@ struct PackedPoint {
 };
 void AreaEffect_AddRectangleFromScript(void)
 {
-    struct AreaEffectManager *manager = gUnk_0200010C;
+    struct AreaEffectManager *manager = gAreaEffectManager;
     s32 k2 = 1;
     if (manager) {
         u8 *cursor = &manager->count;

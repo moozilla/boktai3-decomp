@@ -7,7 +7,7 @@ struct SceneActorRegistryActor *SceneActorRegistry_FindLiving(u32 unusedCategory
     SceneActorRegistry_GetManager();
     /* The allocated terminal node carries a NULL actor; an absent list head
      * is outside this helper's caller contract. */
-    node = gUnk_020004AC;
+    node = gSceneActorRegistryNode;
     actor = node->actor;
     while (actor) {
         if (actor->health > 0) {

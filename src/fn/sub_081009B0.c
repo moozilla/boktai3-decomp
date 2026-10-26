@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_020001A8;
 void Sprite_Remove(void *);
 
 static inline u8 Tst(u32 *m, s32 i)
@@ -31,7 +31,7 @@ u32 FloorSwitch_OnManagerDestroy(struct S *b)
     }
     {
         u32 z = 0;
-        gUnk_020001A8 = z;
+        gFloorSwitchManager = z;
     }
     return 0;
 }

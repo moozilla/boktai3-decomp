@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct MsgTextState {
     u8 pad0[9];
@@ -59,7 +60,6 @@ struct MsgWin {
     void (*fnDone)(void);
 };
 
-extern void *gUnk_020000DC;
 void MessageWindow_ClearTextCompletion(void);
 void TextWindow_InitializeGraphics(void);
 void TextWindow_FillTileGraphics(void);
@@ -87,7 +87,7 @@ int sub_0803198C(void *arg0, void *arg1)
     u32 bit = 1;
     void (**fnSlot)(void);
 
-    gUnk_020000DC = p;
+    gMessageWindow = p;
     st = &p->state;
     TextWindow_InitializeGraphics();
     TextWindow_FillTileGraphics();

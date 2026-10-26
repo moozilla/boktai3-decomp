@@ -4,7 +4,7 @@ s32 TemporaryAnimationPool_Destroy(struct TemporaryAnimationPool *);
 s32 TemporaryAnimationPool_Initialize(struct TemporaryAnimationPool *);
 struct TemporaryAnimationPool *TemporaryAnimationPool_Create(void)
 {
-    struct TemporaryAnimationPool *pool = gUnk_020000A8;
+    struct TemporaryAnimationPool *pool = gTemporaryAnimationPool;
     if (!pool) {
         pool = Task_Create(10, sizeof(*pool));
         if (pool) {

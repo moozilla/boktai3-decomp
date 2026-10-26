@@ -46,7 +46,7 @@ struct SpriteEffectControllerPool {
     u32 used;
     struct SpriteEffectController slots[24];
 };
-extern struct SpriteEffectControllerPool *gUnk_02000178;
+extern struct SpriteEffectControllerPool *gSpriteEffectControllerPool;
 void SpriteEffectController_QueueColliders(struct SpriteEffectControllerPool *);
 void SpriteEffectController_RefreshCollider(struct SpriteEffectController *,
                                             struct ContactPosition *);

@@ -33,7 +33,7 @@ void SceneActorRegistry_ResetCategoryControl(void)
     struct SceneActorRegistryNode *node;
     register struct SceneActorRegistryActor *actor asm("r3");
     SceneActorRegistry_GetManager();
-    node = gUnk_020004AC;
+    node = gSceneActorRegistryNode;
     actor = node->actor;
     if (actor) {
         u32 disabled = 0x40;

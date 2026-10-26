@@ -18,7 +18,7 @@ s32 SceneEffectSchedule_Tick(struct SceneEffectSchedule *manager)
         return 0;
     {
         u32 mask = 0x400;
-        if ((gEngineFlags | gUnk_030053F0) & mask)
+        if ((gEngineFlags | gScenePauseFlags) & mask)
             return 0;
     }
     {

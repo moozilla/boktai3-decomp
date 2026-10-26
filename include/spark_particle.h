@@ -34,7 +34,7 @@ struct SparkParticlePool {
     const struct SparkParticleResource *graphics;
     u32 activeCount;
 };
-extern struct SparkParticlePool *gUnk_02000168;
+extern struct SparkParticlePool *gSparkParticlePool;
 s32 SparkParticle_UpdatePool(struct SparkParticlePool *);
 s32 SparkParticle_DestroyPool(struct SparkParticlePool *);
 s32 SparkParticle_Spawn(const struct ContactPosition *, u8, const struct ContactPosition *, s32,

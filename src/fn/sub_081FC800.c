@@ -1,5 +1,4 @@
-#define gSceneProjectilePool gUnk_020005E8
-#define gPlayer              gUnk_02000580
+#define gPlayer gUnk_02000580
 #include "global.h"
 struct SceneProjectileState {
     u16 unknown;

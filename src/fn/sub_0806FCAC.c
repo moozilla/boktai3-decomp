@@ -2,7 +2,7 @@
 #include "scene_actor_registry.h"
 void SceneActorRegistry_SendToCategoryPaletteOffset(u8 category, u8 palette, void *data)
 {
-    struct SceneActorRegistryNode *node = gUnk_020004AC;
+    struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
     if (node) {
         while (node->next) {
             struct SceneActorRegistryActor *actor = node->actor;

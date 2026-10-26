@@ -2,8 +2,8 @@
 struct SparkParticlePool *SparkParticle_CreatePool(void)
 {
     struct SparkParticlePool *pool;
-    if (gUnk_02000168)
-        return gUnk_02000168;
+    if (gSparkParticlePool)
+        return gSparkParticlePool;
     pool = Task_Create(9, sizeof(*pool));
     if (pool) {
         Task_SetCallbacks(pool, (void *)SparkParticle_UpdatePool,

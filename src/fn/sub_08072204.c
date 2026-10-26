@@ -5,7 +5,7 @@
 #define SceneActorPalette_BindActiveTransition sub_08072204
 void SceneActorPalette_BindActiveTransition(struct SceneActorRegistryActor *actor)
 {
-    struct SceneActorPaletteManagerView *manager = (void *)gUnk_020004A8;
+    struct SceneActorPaletteManagerView *manager = (void *)gSceneActorRegistryManager;
     register struct SceneActorPaletteTransition *transition asm("r3") = (void *)manager;
     if (!manager)
         return;

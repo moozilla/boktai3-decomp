@@ -1,8 +1,8 @@
 #include "scene_actor_contacts.h"
 void SceneActorContacts_TickCooldowns(void)
 {
-    if (gUnk_020001A0) {
-        struct SceneActorContactNode *node = gUnk_020001A0->head;
+    if (gSceneActorContactManager) {
+        struct SceneActorContactNode *node = gSceneActorContactManager->head;
         while (node) {
             u16 cooldown = node->cooldown;
             if (cooldown)

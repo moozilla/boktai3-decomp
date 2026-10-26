@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct EffectManager {
     u8 unknown0[0x3c];
     s32 activeCount;
@@ -13,12 +14,11 @@ struct EffectEntry {
     u8 pad[0x8];
     void *motions[1];
 };
-extern struct EffectManager *gUnk_0200023C;
 void MotionEntry_SetEnabled(void *, u32);
 void ScaledShadow_Disable(void *);
 void EffectEntry_Release(struct EffectEntry *e)
 {
-    struct EffectManager *m = gUnk_0200023C;
+    struct EffectManager *m = gEffectPoolManager;
     if (e) {
         s32 i;
         m->activeCount--;

@@ -1,8 +1,8 @@
 #include "global.h"
-extern u8 *gUnk_0200018C;
+#include "ram.h"
 void sub_0812CE64(void)
 {
-    u8 *s = gUnk_0200018C;
+    u8 *s = gFragmentEffectManager;
     s32 i;
     if (s) {
         u8 v = 3;

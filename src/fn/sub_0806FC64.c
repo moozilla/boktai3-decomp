@@ -1,7 +1,7 @@
 #include "scene_actor_registry.h"
 void SceneActorRegistry_SendToCategory(u8 a, void *data)
 {
-    struct SceneActorRegistryNode *n = gUnk_020004AC;
+    struct SceneActorRegistryNode *n = gSceneActorRegistryNode;
     if (n != 0) {
         while (n->next != 0) {
             struct SceneActorRegistryActor *o = n->actor;

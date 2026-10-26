@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "contact_swarm.h"
+#include "ram.h"
 struct Particle {
     u32 age;
     u8 pad4[8];
@@ -26,7 +27,6 @@ struct ParticleConfig {
     u8 pad0C[8];
     u32 kind;
 };
-extern struct ParticlePool *gUnk_020005E0;
 extern void *const gUnk_08613F60[];
 extern const s16 gUnk_086149C4[];
 void *Ratatosk_CreateParticlePool(void);
@@ -158,7 +158,7 @@ static inline struct ContactSwarmSprite *updatePlayback(struct Particle *eIn,
 
 s32 SceneParticles_SpawnAtPosition(struct ParticleConfig *config, struct ContactPosition *position)
 {
-    struct ParticlePool *pool = gUnk_020005E0;
+    struct ParticlePool *pool = gParticlePool;
     register struct Particle *e asm("r5");
     s32 slot;
     u32 zero2;

@@ -1,11 +1,10 @@
 // COMPILER: old_agbcc
 #include "global.h"
+#include "ram.h"
 /* SaveMenu_ClearSingleton: Clears the global menu task pointer */
 #define SaveMenu_ClearSingleton sub_08110A8C
 
-extern u32 gUnk_020001D4;
-
 void sub_08110A8C(void)
 {
-    gUnk_020001D4 = 0;
+    gSaveMenu = 0;
 }

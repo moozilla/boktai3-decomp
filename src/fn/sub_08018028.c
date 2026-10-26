@@ -2,6 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 #define Weather_Initialize sub_08018028
 #include "background_controller.h"
+#include "ram.h"
 struct WeatherState {
     u8 task[0x20];
     u8 unknown20, flags;
@@ -18,7 +19,6 @@ struct WeatherState {
     u8 pad5C[4];
     u8 *resource;
 };
-extern struct WeatherState *gUnk_02000090;
 extern s32 gUnk_0200008C;
 extern s32 gUnk_02000080;
 
@@ -40,7 +40,7 @@ s32 Weather_Initialize(struct WeatherState *p)
     u8 *resource;
     void *map;
     s32 phase;
-    gUnk_02000090 = p;
+    gWeatherState = p;
     if ((p->night = Script_GetKeywordValue(0x73, 0)) != 0)
         resource = sub_08216E54(0xB7D3);
     else

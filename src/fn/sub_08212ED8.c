@@ -1,11 +1,11 @@
 #include "global.h"
+#include "ram.h"
 void *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 void Task_Kill(void *);
 s32 ForgingBook_InitializeFromScript(void *, u32);
 void sub_0821290C(void);
 void ForgingBook_OnTaskDestroy(void);
-extern void *gUnk_02000608;
 void *ForgingBook_Create(u32 a)
 {
     void *p = Task_Create(8, 0xbf0);
@@ -16,6 +16,6 @@ void *ForgingBook_Create(u32 a)
             return 0;
         }
     }
-    gUnk_02000608 = p;
+    gForgingBook = p;
     return p;
 }

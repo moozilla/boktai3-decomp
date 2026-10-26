@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_0200009C;
+#include "ram.h"
 u32 Script_GetKeywordValue(u32, u32);
 void *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
@@ -11,8 +11,8 @@ void *CircleWindow_Create(u32 a)
 {
     void *p;
     u32 r = Script_GetKeywordValue(0x61, 0);
-    if (gUnk_0200009C != 0)
-        return (void *)gUnk_0200009C;
+    if (gCircleWindow != 0)
+        return (void *)gCircleWindow;
     if (r != 0) {
         p = Task_Create(0xb, 0x2b0);
     } else {

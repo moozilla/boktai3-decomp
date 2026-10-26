@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct State {
     u8 pad0[15];
@@ -42,7 +43,6 @@ struct Actor {
     void *resource;
     void *callback;
 };
-extern struct Actor *gUnk_020000DC;
 int MessageWindow_UpdateSpeakerPortrait(struct Actor *);
 void sub_080316A4(void);
 void MessageWindow_UpdateImmediatePlayback(void);
@@ -66,7 +66,7 @@ static inline u8 getMode(struct Actor *p, u32 offset)
 }
 int MessageWindow_ShowMessage(int index)
 {
-    struct Actor *p = gUnk_020000DC;
+    struct Actor *p = gMessageWindow;
     if (p) {
         void *script = p->script;
         struct State *state = &p->state;

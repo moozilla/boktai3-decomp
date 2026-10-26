@@ -15,7 +15,7 @@ struct StageIconDisplay {
     u32 completionScriptId;
     void (*update)(struct StageIconDisplay *);
 };
-extern struct StageIconDisplay *gUnk_0200011C;
+extern struct StageIconDisplay *gStageIconDisplay;
 void StageIconDisplay_SetUpdate(struct StageIconDisplay *, void (*)(struct StageIconDisplay *));
 void StageIconDisplay_NotifyNative(struct StageIconDisplay *);
 void StageIconDisplay_CallCompletionScript(struct StageIconDisplay *);

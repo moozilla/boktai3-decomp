@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct SceneNpc {
     u8 pad0[2];
     u8 field2, field3, mode;
@@ -15,7 +16,6 @@ struct SceneNpc {
     void *update;
 };
 extern void *gUnk_02000480;
-extern struct SceneNpc *gUnk_02000274;
 struct SceneNpc *Actor_FindById(void *manager, s32 name);
 void DisplayAnimation_SetFlags(void *, s32);
 void Actor_DisableShadow(struct SceneNpc *);
@@ -28,7 +28,7 @@ void SceneNpc_StopFromScript(void)
     struct SceneNpc *npc;
     u8 mode;
     void (*update)(void);
-    if (!gUnk_02000274)
+    if (!gSceneNpc)
         return;
     if (Script_SeekToKeyword('n')) {
         void *manager = gUnk_02000480;
@@ -38,7 +38,7 @@ void SceneNpc_StopFromScript(void)
         if (!npc)
             return;
     } else
-        npc = gUnk_02000274;
+        npc = gSceneNpc;
     mode = 0x11;
     npc->field2 = 0;
     npc->field3 = 0;

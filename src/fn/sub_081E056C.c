@@ -1,9 +1,9 @@
 #include "global.h"
+#include "render.h"
 
 extern const u8 gUnk_086136D8[];
 extern const u8 gUnk_086136E4[];
 extern u8 *gUnk_02000378[];
-extern u16 gUnk_03004FC0[];
 void EncodedRecord_EncodeFields(void *);
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
@@ -71,7 +71,7 @@ s32 sub_081E056C(u8 *p)
         Bg_SetupLayers(2, 0, res, 0, 0, 1, &size);
     }
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
-    CpuSet(ScriptProc_Start(0x92b3, 0x204) + 0x14, gUnk_03004FC0, 0x100);
+    CpuSet(ScriptProc_Start(0x92b3, 0x204) + 0x14, gBgPaletteBuffer, 0x100);
     ResourceHeader_Relocate(p + 0x78, ScriptProc_Start(0xcb05, 0xe2ab));
     Widget_InitLinked(p + 0x18, p + 0x78, 0x39, 0x10, 0, 0, 0, 0);
 

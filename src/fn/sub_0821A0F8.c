@@ -10,12 +10,12 @@ struct List {
     struct Task *head;
     u32 pad;
 };
-extern struct List gUnk_03005280[];
+extern struct List gTaskLists[];
 s32 Task_Kill(struct Task *);
 
 void TaskSystem_KillBelowPersistenceLevel(s32 prio)
 {
-    struct List *l = gUnk_03005280;
+    struct List *l = gTaskLists;
     s32 i = 0;
     do {
         struct Task *t = l->head;

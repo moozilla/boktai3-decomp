@@ -1,15 +1,15 @@
 #include "global.h"
-extern u16 gUnk_020005A0;
+#include "ram.h"
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void Inventory_SetUsePermissionFlagsFromScript(void)
 {
     s32 i;
-    gUnk_020005A0 = 0;
+    gInventoryUseFlags = 0;
     if (Script_SeekToKeyword(0x66)) {
         for (i = 0; i <= 3; i++) {
             if (Script_GetValue())
-                gUnk_020005A0 |= 1 << i;
+                gInventoryUseFlags |= 1 << i;
         }
     }
 }

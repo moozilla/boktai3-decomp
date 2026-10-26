@@ -61,7 +61,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
     u32 special;
     u32 category;
     SceneActorRegistry_GetManager();
-    node = gUnk_020004AC;
+    node = gSceneActorRegistryNode;
     actor = node->actor;
     special = Script_GetKeywordValue('s', 0);
     category = Script_GetKeywordValue('k', 0);

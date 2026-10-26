@@ -6,19 +6,19 @@
 
 void SceneController_ClearGlobal(void)
 {
-    gUnk_02000028 = 0;
+    gTerrainModifierManager = 0;
 }
 
 u32 TerrainModifiers_AddToList(struct TerrainModifier *p)
 {
     struct TerrainModifier *t;
     p->previous = 0;
-    t = gUnk_02000028->head;
+    t = gTerrainModifierManager->head;
     p->next = t;
     if (t) {
         t->previous = p;
     }
-    gUnk_02000028->head = p;
+    gTerrainModifierManager->head = p;
     return 0;
 }
 
@@ -29,7 +29,7 @@ u32 TerrainModifiers_RemoveFromList(struct TerrainModifier *p)
     if (prev) {
         prev->next = next;
     } else {
-        gUnk_02000028->head = next;
+        gTerrainModifierManager->head = next;
     }
     if (next) {
         next->previous = prev;
@@ -55,7 +55,7 @@ static inline s32 cellIndex(struct TerrainVec *pos)
 s32 TerrainModifiers_Create(s32 id, struct TerrainVec *position, s32 kind, s32 tile, s32 flags)
 {
     struct TerrainModifier *p;
-    if (!gUnk_02000028 && !TerrainModifierManager_Create(0x2153, 0))
+    if (!gTerrainModifierManager && !TerrainModifierManager_Create(0x2153, 0))
         return 0;
     p = Heap_Alloc(36);
     if (!p)
@@ -81,7 +81,7 @@ u32 TerrainModifiers_Destroy(struct TerrainModifier *n)
         TerrainModifiers_UnregisterCell(n->registration);
         n->active = 0;
     }
-    if (gUnk_02000028 != 0)
+    if (gTerrainModifierManager != 0)
         TerrainModifiers_RemoveFromList(n);
     Heap_Free(n);
     return 0;
@@ -90,9 +90,9 @@ u32 TerrainModifiers_Destroy(struct TerrainModifier *n)
 s32 TerrainModifiers_DestroyAll(void)
 {
     struct TerrainModifier *n;
-    if (gUnk_02000028 == 0)
+    if (gTerrainModifierManager == 0)
         return -1;
-    n = gUnk_02000028->head;
+    n = gTerrainModifierManager->head;
     while (n != 0) {
         struct TerrainModifier *next = n->next;
         TerrainModifiers_Destroy(n);
@@ -104,9 +104,9 @@ s32 TerrainModifiers_DestroyAll(void)
 s32 TerrainModifiers_DestroyById(u16 id)
 {
     struct TerrainModifier *n;
-    if (gUnk_02000028 == 0)
+    if (gTerrainModifierManager == 0)
         return -1;
-    n = gUnk_02000028->head;
+    n = gTerrainModifierManager->head;
     while (n != 0) {
         struct TerrainModifier *next = n->next;
         if (n->id == id)
@@ -119,9 +119,9 @@ s32 TerrainModifiers_DestroyById(u16 id)
 s32 TerrainModifiers_Deactivate(u16 id)
 {
     struct TerrainModifier *n;
-    if (gUnk_02000028 == 0)
+    if (gTerrainModifierManager == 0)
         return -1;
-    n = gUnk_02000028->head;
+    n = gTerrainModifierManager->head;
     while (n != 0) {
         struct TerrainModifier *next = n->next;
         if (n->id == id && n->active != 0) {
@@ -138,9 +138,9 @@ s32 TerrainModifiers_Activate(u32 id)
     struct TerrainModifier *e;
     struct TerrainModifier *n;
     u16 k = id;
-    if (gUnk_02000028 == 0)
+    if (gTerrainModifierManager == 0)
         return -1;
-    e = gUnk_02000028->head;
+    e = gTerrainModifierManager->head;
     while (e != 0) {
         n = e->next;
         if (e->id == k && e->active == 0) {
@@ -158,9 +158,9 @@ void TerrainModifiers_InitCell(void *, s32, s32, s32, s32, s32);
 s32 TerrainModifiers_Change(s32 id, s32 tile, s32 kind, s32 flags, s32 cell, s32 height)
 {
     struct TerrainModifier *p;
-    if (!gUnk_02000028)
+    if (!gTerrainModifierManager)
         return -1;
-    p = gUnk_02000028->head;
+    p = gTerrainModifierManager->head;
     while (p) {
         struct TerrainModifier *next = p->next;
         if (p->id == id) {
@@ -189,13 +189,13 @@ u32 TerrainModifierManager_Update(void)
 u32 TerrainModifierManager_Destroy(void)
 {
     TerrainModifiers_DestroyAll();
-    gUnk_02000028 = 0;
+    gTerrainModifierManager = 0;
     return 0;
 }
 
 s32 TerrainModifierManager_Init(struct TerrainModifierManager *p, s32 unused)
 {
-    gUnk_02000028 = p;
+    gTerrainModifierManager = p;
     p->head = 0;
     return 0;
 }

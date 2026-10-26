@@ -17,7 +17,7 @@ static inline void KeepFlags(u32 mask, u32 *field)
 }
 void SceneActorPalette_ClearCompletedTransitions(void)
 {
-    struct SceneActorPaletteManagerView *manager = (void *)gUnk_020004A8;
+    struct SceneActorPaletteManagerView *manager = (void *)gSceneActorRegistryManager;
     s32 pending;
     if (!manager || !TestP(0x2000, &manager->flags))
         return;

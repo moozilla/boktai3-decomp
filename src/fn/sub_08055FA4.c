@@ -24,7 +24,7 @@ s32 StageIconDisplay_InitFromScript(struct StageIconDisplay *display)
     StageIconDisplay_InitAnimations(display, variant);
     {
         s32 status = StageIconDisplay_SelectUpdate(display, variant);
-        gUnk_0200011C = display;
+        gStageIconDisplay = display;
         return status;
     }
 }

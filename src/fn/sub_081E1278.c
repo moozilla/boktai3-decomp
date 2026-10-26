@@ -1,13 +1,12 @@
 #include "global.h"
+#include "render.h"
 // Names are tentative, based on the static state transitions and memory writes.
-#define gPaletteShadow gUnk_03004FC0
 struct SelectionPalette {
     u8 unknown[0x4cc];
     s32 selection;
     u8 unknown4D0[0x4e8 - 0x4d0];
     s32 pulseTimer;
 };
-extern u16 gUnk_03004FC0[];
 void SelectionPalette_UpdatePulse(struct SelectionPalette *p)
 {
     u16 first = 0, second = 0;
@@ -39,6 +38,6 @@ void SelectionPalette_UpdatePulse(struct SelectionPalette *p)
         *color = 27;
     if (++p->pulseTimer >= base + 50)
         p->pulseTimer = base;
-    gUnk_03004FC0[45] = first;
-    gUnk_03004FC0[44] = second;
+    gBgPaletteBuffer[45] = first;
+    gBgPaletteBuffer[44] = second;
 }

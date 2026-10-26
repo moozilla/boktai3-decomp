@@ -1,11 +1,11 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_02000078;
 u32 FloatingEffectManager_Create(void);
 
 u32 FloatingEffectManager_GetOrCreate(void)
 {
-    u32 r = gUnk_02000078;
+    u32 r = gLinkedWidgetSet;
     if (r == 0) {
         return FloatingEffectManager_Create();
     }

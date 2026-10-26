@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 struct FanCannon {
     u8 pad00[0xf4];
@@ -11,7 +12,6 @@ struct FanCannonManager {
     u32 occupiedSlots;
     struct FanCannon slots[8];
 };
-extern u32 gUnk_030053F0;
 extern u32 gUnk_02000560;
 extern u16 gUnk_02000550;
 extern u16 gUnk_0200053C;
@@ -24,7 +24,7 @@ u32 FanCannonManager_Update(struct FanCannonManager *p)
     u32 mask = 0x400;
     struct FanCannon *slot;
     s32 i;
-    if ((gEngineFlags | gUnk_030053F0) & mask)
+    if ((gEngineFlags | gScenePauseFlags) & mask)
         return 0;
     {
         u32 pauseMask = 4;

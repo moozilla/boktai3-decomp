@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Entry {
     u8 state;
     u8 pad[0x1f];
@@ -11,11 +12,10 @@ struct Manager {
     u8 pad2[0x12];
     struct Entry entries[40];
 };
-extern struct Manager *gUnk_02000298;
 
 s32 sub_081D36D4(void)
 {
-    struct Manager *m = gUnk_02000298;
+    struct Manager *m = gCloudTask;
     struct Entry *e;
     u32 value;
     s32 i;

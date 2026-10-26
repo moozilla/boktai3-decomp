@@ -9,6 +9,6 @@ s32 TemporaryAnimationPool_Destroy(struct TemporaryAnimationPool *pool)
         --remaining;
         ++slot;
     } while (remaining >= 0);
-    gUnk_020000A8 = NULL;
+    gTemporaryAnimationPool = NULL;
     return 0;
 }

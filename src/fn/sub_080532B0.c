@@ -371,6 +371,6 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
             }
         }
     }
-    gUnk_02000118 = actor;
+    gStackedActor = actor;
     return 0;
 }

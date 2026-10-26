@@ -10,7 +10,7 @@ s32 DamageNumberDisplay_Initialize(struct DamageNumberDisplay *display)
     s32 remaining;
     struct DamageNumberGroup *nextGroup;
     s32 nextIndex;
-    gUnk_02000074 = display;
+    gDamageNumberDisplay = display;
     display->resource = AnimData_FindEntry(0x1C1C);
     display->activeMask = 0;
     group = display->groups;

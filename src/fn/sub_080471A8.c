@@ -7,5 +7,5 @@ u32 DamageNumberDisplay_Destroy(struct DamageNumberDisplay *display)
         DamageNumberDisplay_RemoveGroup(display, index);
         ++index;
     } while (index <= 3);
-    return (u32)(gUnk_02000074 = NULL);
+    return (u32)(gDamageNumberDisplay = NULL);
 }

@@ -10,7 +10,7 @@ Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **389 functions**,
 
 Intentional assembly (GBA header, crt0, SDK assembly; not counted above): 4,916 bytes.
 
-RAM objects with one shared declaration (`symbols/ram.csv`, reported as data): **6.0%** (960 / 16,077 bytes); no other declaration left: 3.3%.
+RAM objects with one shared declaration (`symbols/ram.csv`, reported as data): **29.2%** (4,695 / 16,077 bytes); no other declaration left: 5.9%.
 
 ```
 ███████████████████████████████████████░░░░░░░░░░░ 78.60%

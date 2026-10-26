@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000090;
+#include "ram.h"
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 sub_08018028(u8 *);
@@ -9,8 +9,8 @@ void Weather_Destroy(void);
 u8 *Weather_Create(void)
 {
     u8 *r;
-    if (gUnk_02000090 != 0)
-        return gUnk_02000090;
+    if (gWeatherState != 0)
+        return gWeatherState;
     r = Task_Create(9, 0x8ec);
     if (r) {
         Task_SetCallbacks(r, Weather_Update, Weather_Destroy);

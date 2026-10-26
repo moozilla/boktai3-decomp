@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_0200012C;
+#include "ram.h"
 
 void SceneColliderEffect_ClearPool(void)
 {
-    gUnk_0200012C = 0;
+    gColliderEffectPool = 0;
 }

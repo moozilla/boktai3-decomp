@@ -1,5 +1,6 @@
 #include "global.h"
 #include "game_state.h"
+#include "ram.h"
 struct State {
     u8 pad0[7];
     u8 pending, entered, mode, skip;
@@ -47,7 +48,6 @@ struct Actor {
     void *resource;
     void *callback;
 };
-extern struct Actor *gUnk_020000DC;
 int MessageWindow_UpdateSpeakerPortrait(struct Actor *);
 void sub_080316A4(void);
 void MessageWindow_ClearTextCompletion(void);

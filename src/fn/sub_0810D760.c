@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
-extern u32 gUnk_030053F0;
 s32 TextWindow_Create(u32, u32, u32, u32);
 s32 TextWindow_SetScript(s32 id, const u8 *script);
 s32 TextWindow_Refresh(s32 id, s32 index);
@@ -31,7 +31,7 @@ void sub_0810D760(struct RecordPanel *p)
     p->win[6] = TextWindow_Create(13, 15, 16, 2);
     mask = 0x800;
     q = p;
-    if ((gEngineFlags | gUnk_030053F0) & mask) {
+    if ((gEngineFlags | gScenePauseFlags) & mask) {
         for (i = 0; i <= 5; i++) {
             TextWindow_SetScript(p->win[i + 1], p->script);
             n = p->page * 6 + i;

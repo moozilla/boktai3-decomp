@@ -13,7 +13,7 @@ s32 StageIconDisplay_Destroy(struct StageIconDisplay *display)
     } while (--i >= 0);
     {
         u32 zero = 0;
-        gUnk_0200011C = (void *)zero;
+        gStageIconDisplay = (void *)zero;
     }
     return 0;
 }

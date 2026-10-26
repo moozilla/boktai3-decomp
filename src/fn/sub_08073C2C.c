@@ -1,7 +1,7 @@
 #include "scene_actor_profile.h"
 s32 SceneActorProfiles_FindDefaultIndex(u32 category)
 {
-    struct SceneActorProfileList *list = (void *)gUnk_020004A8->subsystem;
+    struct SceneActorProfileList *list = (void *)gSceneActorRegistryManager->subsystem;
     struct SceneActorProfile *head = list->head;
     struct SceneActorProfile *profile;
     s32 count;

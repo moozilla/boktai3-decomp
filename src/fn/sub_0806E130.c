@@ -1,5 +1,6 @@
 #include "route_sprite_actor.h"
-extern u32 gUnk_030053F0, gUnk_02000560;
+#include "ram.h"
+extern u32 gUnk_02000560;
 static inline u8 Occupied(u32 *mask, s32 index)
 {
     if (*mask & (1 << index))
@@ -9,7 +10,7 @@ static inline u8 Occupied(u32 *mask, s32 index)
 static inline u32 Paused(void)
 {
     u32 mask = 0x400;
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 static inline u32 Locked(void)
 {

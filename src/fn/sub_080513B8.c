@@ -129,6 +129,6 @@ s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id
             force->delay = value;
             break;
     }
-    gUnk_02000114 = force;
+    gDirectionalForce = force;
     return status;
 }

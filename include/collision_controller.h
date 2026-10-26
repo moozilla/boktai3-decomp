@@ -73,7 +73,7 @@ struct CollisionScene {
     u8 mode;
 };
 
-extern struct CollisionManager *gUnk_0200003C;
+extern struct CollisionManager *gCollisionManager;
 extern struct CollisionScene gUnk_03005430;
 extern s32 gUnk_02000478;
 extern u16 gUnk_02000534, gUnk_02000500;

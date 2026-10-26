@@ -17,7 +17,7 @@ struct PaletteLevels {
     s8 current[4], target[4]; /* 0x2C, 0x30: 0..15 */
 };
 
-extern struct PaletteLevels *gUnk_02000070;
+extern struct PaletteLevels *gPaletteLevels;
 
 void PaletteLevels_Increase(struct PaletteLevels *p);
 void PaletteLevels_Decrease(struct PaletteLevels *p);

@@ -163,7 +163,7 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
 
 void *SpriteProjectile_EnsurePool(void);
 struct Projectile *SpritePool10_AllocateSlot(void *);
-extern u32 gEngineFlags, gUnk_030053F0, gUnk_02000560;
+extern u32 gEngineFlags, gUnk_02000560;
 extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 void AnimData_Load(void *, u32);
@@ -179,7 +179,7 @@ static inline u32 Rand(void)
 }
 static inline u32 Busy(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 static inline u32 TestFlags(u32 *value, u32 mask)
 {

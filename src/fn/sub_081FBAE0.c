@@ -1,8 +1,8 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 p[0x74];
 };
-extern u8 *gUnk_020005E0;
 void OverlaySlot_Initialize(u8 *, struct E *, s32);
 void AnimData_Load(u8 *, u32);
 u32 ScriptProc_Start(u32, u32);
@@ -10,7 +10,7 @@ u32 RatatoskParticle_Init(u8 *a)
 {
     struct E *e;
     s32 i;
-    gUnk_020005E0 = a;
+    gParticlePool = a;
     *(u32 *)(a + 0x18) = 0;
     e = (struct E *)(a + 0x38);
     i = 0;

@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_020000E0;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 ScrollingDialogue_Init(u8 *);
@@ -11,8 +11,8 @@ void ScrollingDialogue_OnTaskDestroy(void);
 u8 *ScrollingDialogue_Create(void)
 {
     u8 *p;
-    if (gUnk_020000E0 != 0)
-        return gUnk_020000E0;
+    if (gScrollingDialogue != 0)
+        return gScrollingDialogue;
     p = Task_Create(0x3, 0x19c);
     if (p != 0) {
         Task_SetCallbacks(p, ScrollingDialogue_OnTaskUpdate, ScrollingDialogue_OnTaskDestroy);

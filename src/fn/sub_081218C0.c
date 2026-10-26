@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct EffectPosition {
     u16 x, y, z, unk_06;
@@ -44,7 +45,6 @@ struct ColliderEffectPool {
     u8 graphics[0x1C];
     void *sequence;
 };
-extern struct ColliderEffectPool *gUnk_0200012C;
 extern const s16 gUnk_086149C4[];
 struct ColliderEffectPool *SceneColliderEffect_EnsurePool(void);
 struct ColliderEffect *SceneColliderEffect_AllocateSprite(struct ColliderEffectPool *);
@@ -64,7 +64,7 @@ static inline s32 TruncateShift(s32 value, u32 shift)
 
 void SceneColliderEffect_SpawnAimedSprite(struct EffectTransform *from, struct EffectTarget *target, u32 a, u32 b, u32 c)
 {
-    struct ColliderEffectPool *loaded = gUnk_0200012C;
+    struct ColliderEffectPool *loaded = gColliderEffectPool;
     struct ColliderEffectPool *pool;
     struct ColliderEffect *effect;
     struct ColliderEffect *sprite;

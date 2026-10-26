@@ -28,11 +28,11 @@ struct Engine {
     void *head, *tail;
 };
 extern struct Engine *gUnk_02000484;
-extern u8 gUnk_020000EC;
 void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
+#include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -49,7 +49,7 @@ int Wireless_UpdateConnectionSession(struct Engine *argument)
 {
     struct Engine *p = argument;
     if (p->pad18) {
-        volatile u8 *busy = &gUnk_020000EC;
+        volatile u8 *busy = &gWirelessSessionState;
         int initial = *busy;
         u8 *lost = &p->flag35;
         if (initial == 1) {
@@ -65,7 +65,7 @@ int Wireless_UpdateConnectionSession(struct Engine *argument)
         {
             int mode = gUnk_03006A80->parentChild;
             if (mode == 1) {
-                gUnk_020000EC = mode;
+                gWirelessSessionState = mode;
                 rfu_REQ_sendData(1);
             }
         }

@@ -16,6 +16,6 @@ s32 DisplayTrack_DestroyManager(struct DisplayTrackManager *manager)
             Heap_Free(*resource);
         }
     }
-    gUnk_02000494 = 0;
+    gDisplayTrackManager = 0;
     return 0;
 }

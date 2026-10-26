@@ -20,7 +20,7 @@ static inline u8 TestP(u32 mask, u32 *p)
 u32 SceneActorPalette_IsTransitionComplete(void)
 {
     u32 id;
-    struct SceneActorPaletteManagerView *manager = (void *)gUnk_020004A8;
+    struct SceneActorPaletteManagerView *manager = (void *)gSceneActorRegistryManager;
     if (manager == NULL || !TestP(0x2000, &manager->flags))
         return 1;
     if (Test(gEngineFlags, 0x4800))

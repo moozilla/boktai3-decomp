@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 #define Callback_Invoke Callback_InvokeActor
-#define gCallbackPool   gUnk_02000218
 struct CallbackPoolEntry {
     u32 active;
     void *destroy;
@@ -16,7 +16,6 @@ struct CallbackPool {
     struct CallbackPoolEntry entries[1];
     struct CallbackPoolSlot slots[4];
 };
-extern struct CallbackPool *gUnk_02000218;
 void Callback_InvokeActor(void *, void *);
 s32 CallbackPool_Destroy(struct CallbackPool *pool)
 {
@@ -47,5 +46,5 @@ s32 CallbackPool_Destroy(struct CallbackPool *pool)
             slot->destroy = 0;
         }
     }
-    return (u32)(gUnk_02000218 = 0);
+    return (u32)(gSceneEffectQueue = 0);
 }

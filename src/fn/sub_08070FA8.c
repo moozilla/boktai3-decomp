@@ -70,7 +70,7 @@ static inline u8 Stopped(void)
 #define SceneActorRegistry_UpdateActors sub_08070FA8
 void SceneActorRegistry_UpdateActors(struct SceneActorRegistryManager *manager)
 {
-    struct SceneActorRegistryNode *node = gUnk_020004AC;
+    struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
     struct SceneActorRegistryActor *actor;
     union RegistryParticleVector velocity, bounds, position;
     if (!node)

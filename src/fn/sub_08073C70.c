@@ -1,7 +1,7 @@
 #include "scene_actor_profile.h"
 struct SceneActorProfile *SceneActorProfiles_Find(u32 id, u32 mode)
 {
-    struct SceneActorProfileList *list = (void *)gUnk_020004A8->subsystem;
+    struct SceneActorProfileList *list = (void *)gSceneActorRegistryManager->subsystem;
     struct SceneActorProfile *profile = list->head;
     s32 count = 0;
     if (profile) {

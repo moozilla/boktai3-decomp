@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_020001A8;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 FloorSwitch_InitManager(u8 *);
@@ -11,8 +11,8 @@ void FloorSwitch_OnManagerDestroy(void);
 u8 *FloorSwitch_GetOrCreateManager(void)
 {
     u8 *p;
-    if (gUnk_020001A8 != 0)
-        return gUnk_020001A8;
+    if (gFloorSwitchManager != 0)
+        return gFloorSwitchManager;
     p = Task_Create(8, 0x49c);
     if (p != 0) {
         Task_SetCallbacks(p, SpriteSlots_UpdateActive, FloorSwitch_OnManagerDestroy);

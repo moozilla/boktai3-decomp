@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_02000148;
+#include "ram.h"
 
 void SceneTerrainProbe_OnPoolDestroy(void)
 {
-    gUnk_02000148 = 0;
+    gPairSlotPool = 0;
 }

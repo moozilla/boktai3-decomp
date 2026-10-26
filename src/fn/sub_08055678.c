@@ -1,7 +1,7 @@
 #include "script_keyframe_pool.h"
 struct ScriptKeyframeEntry *ScriptKeyframe_FindFromScript(void)
 {
-    struct ScriptKeyframeManager **manager = &gUnk_02000498;
+    struct ScriptKeyframeManager **manager = &gScriptKeyframeManager;
     struct ScriptKeyframeManager *current, *loaded;
     s32 length;
     u32 tag;

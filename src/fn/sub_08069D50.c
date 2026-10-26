@@ -3,7 +3,7 @@ s32 BurstEmitter_Create(const struct ContactPosition *position, u32 mode, u32 co
                         s32 c, s32 d)
 {
     if (position) {
-        struct BurstEmitterPool *pool = gUnk_02000160;
+        struct BurstEmitterPool *pool = gBurstEmitterPool;
         if (!pool) {
             pool = BurstEmitter_CreatePool();
             if (!pool)

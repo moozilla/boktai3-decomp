@@ -3,6 +3,11 @@
 
 #include "global.h"
 
+struct OamEntry {
+    u32 attributes;
+    u16 tile, depth;
+};
+
 /* RAM objects; each row of symbols/ram.csv with header include/render.h. */
 extern u8 *gPaletteBankData; /* palette-bank data: 32-byte banks of sixteen RGB15 colors (AnimData_SelectPaletteBank) */
 extern u32 gVBlankDialogueState; /* scrolling-dialogue/video state copied during VBlank (guess) */
@@ -75,5 +80,9 @@ extern u8 gSpriteMosaicAttr; /* sprite mosaic/global attribute byte */
 extern u16 gMosaicParam; /* packed mosaic parameter (byte and halfword accesses) */
 extern u16 gDefaultAnimFlags; /* default animation/widget flags */
 extern u32 gEnginePauseFlags; /* engine pause/suspend flags (bits 1-2: sound off; task list masks) */
+extern struct OamEntry gOamBuffer[]; /* final OAM entries, 8 bytes each (128) */
+extern struct OamEntry gPendingOamBuffer[]; /* pending depth-sorted OAM entries (128) */
+extern u16 gBgPaletteBuffer[]; /* sixteen background palette banks of 16 colors; labels inside it are interior rows */
+extern u16 gObjPaletteBuffer[][16]; /* sixteen object palette banks of 16 colors */
 
 #endif

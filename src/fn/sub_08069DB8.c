@@ -13,7 +13,7 @@ static inline s32 BurstEmitter_GetScriptShort(void)
 }
 void BurstEmitter_CreateFromScript(void)
 {
-    struct BurstEmitterPool *pool = gUnk_02000160;
+    struct BurstEmitterPool *pool = gBurstEmitterPool;
     struct BurstEmitter *emitter;
     s32 a, b, c, d;
     if (!pool) {

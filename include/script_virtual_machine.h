@@ -18,7 +18,7 @@
  * see Text_LookupString), 2 string data base, 3 a fourth resource (guess). */
 extern u8 *gUnk_02000448[4];
 
-/* The currently loaded script's procedure table (gUnk_02000438). `entries` holds
+/* The currently loaded script's procedure table (gScriptProcedureTable). `entries` holds
  * one packed word per procedure: low 24 bits an offset from `body`, high byte
  * metadata (returned by Script_GetProcedure). `mainBlock` is the bytecode run
  * when no entry procedure is selected (Script_RunMainBlock). */
@@ -28,7 +28,7 @@ struct ScriptProcedureTable {
     u8 *body;
     u8 *mainBlock;
 };
-extern struct ScriptProcedureTable gUnk_02000438;
+extern struct ScriptProcedureTable gScriptProcedureTable;
 
 /* A registered table of native script commands (gUnk_02000458 is the head of
  * the list). Script_ExecuteNativeCommand looks a command id up by key and

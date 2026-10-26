@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct TextState {
     u8 x, y, left, top, width, height, palette, style;
     u8 entered, mode, skip, busy, padC, choiceCount, padE, fresh, pad10, voice, toggle, lastWidth,
@@ -31,7 +32,6 @@ struct WindowManager {
     s32 nextId;
     struct TextWindow *head;
 };
-extern struct WindowManager *gUnk_020000E4;
 void *Heap_Alloc(int);
 void Memory_Clear(void *, int);
 void Heap_Free(void *);
@@ -50,7 +50,7 @@ const u8 *TextWindow_ResolveString(struct TextWindow *, int);
 int TextWindow_Destroy(int);
 void TextWindowManager_DestroyAllWindows(void)
 {
-    struct WindowManager *p = gUnk_020000E4;
+    struct WindowManager *p = gWindowManager;
     struct TextWindow *w;
     if (p) {
         w = p->head;

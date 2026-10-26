@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct CloudPosition {
     u16 x, y, z, pad;
 };
@@ -14,12 +15,11 @@ struct CloudTask {
     u8 pad0[0x30];
     struct CloudParticle particles[40];
 };
-extern struct CloudTask *gUnk_02000298;
 // confidence=low: scatters particle anchors horizontally and raises them by sixteen units.
 #define PlayerParticleCloud_ScatterAnchors sub_081D3620
 s32 PlayerParticleCloud_ScatterAnchors(void)
 {
-    struct CloudTask *p = gUnk_02000298;
+    struct CloudTask *p = gCloudTask;
     struct CloudParticle *particle;
     register const u16 *table asm("r5");
     s32 i;

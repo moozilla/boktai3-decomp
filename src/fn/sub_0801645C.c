@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_0200006C;
+#include "ram.h"
 void *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 FadingParticleManager_Initialize(void *, void *);
@@ -10,8 +10,8 @@ void FadingParticleManager_Destroy(void);
 void *FadingParticleManager_Create(void *a)
 {
     void *p;
-    if (gUnk_0200006C != 0)
-        return (void *)gUnk_0200006C;
+    if (gFadingParticleManager != 0)
+        return (void *)gFadingParticleManager;
     p = Task_Create(10, 0xcfc);
     if (p != 0) {
         Task_SetCallbacks(p, FadingParticleManager_Update, FadingParticleManager_Destroy);

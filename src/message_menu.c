@@ -7,7 +7,7 @@ void MessageMenu_LoadBackground(struct MessageMenu *m, int id)
     Bg_SetupLayers(1, 0, map, 0, 0, 1, &id);
     BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     m->palette = (u8 *)ScriptProc_Start(0x92B3, 0x204) + 20;
-    CpuSet(m->palette, gUnk_03004FC0, 256);
+    CpuSet(m->palette, gBgPaletteBuffer, 256);
 }
 
 int MessageMenu_CreateTextWindows(struct MessageMenu *m)

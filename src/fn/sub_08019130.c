@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -11,7 +12,6 @@ struct Circle {
     u16 rows[2][160];
     struct Vec center;
 };
-extern struct Circle *gUnk_0200009C;
 extern u8 *gUnk_02000580[];
 extern struct Vec gUnk_03005418;
 int Script_GetKeywordValue(int, int);
@@ -28,7 +28,7 @@ static inline int project(int input)
 int CircleWindow_Initialize(struct Circle *p)
 {
     int i;
-    gUnk_0200009C = p;
+    gCircleWindow = p;
     p->time = 0;
     p->bank = 0;
     p->direction = Script_GetKeywordValue('m', 0);

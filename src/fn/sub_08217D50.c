@@ -5,7 +5,7 @@ extern u8 *gBgPaletteSource;
 extern s32 gPaletteBanksInUse;
 extern u16 *gPaletteBankData;
 extern u16 gObjPaletteKeys[];
-extern u16 gUnk_03004DC0[][16];
+extern u16 gObjPaletteBuffer[][16];
 
 void Palette_RefreshObjectBanks(void)
 {
@@ -18,7 +18,7 @@ void Palette_RefreshObjectBanks(void)
     gBgPaletteSource = Palette_GetBackgroundBuffer();
     for (i = 0; i < gPaletteBanksInUse; i = next) {
         src = (u16 *)((u8 *)gPaletteBankData + (gObjPaletteKeys[i] << 5));
-        dst = gUnk_03004DC0[i];
+        dst = gObjPaletteBuffer[i];
         next = i + 1;
         j = 15;
         do {

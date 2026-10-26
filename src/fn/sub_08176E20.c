@@ -2,7 +2,7 @@
 #include "player.h"
 #include "scene_hud_display.h"
 #include "engine.h"
-extern u32 gUnk_030053F0;
+#include "ram.h"
 u32 SceneHud_CanOpenFromStart(struct SceneHudState *p)
 {
     struct Player *player;
@@ -11,7 +11,7 @@ u32 SceneHud_CanOpenFromStart(struct SceneHudState *p)
         if (player && player->kind == 1 && player->actionMode != 6 && !(player->statusFlags & 1) &&
             p->controlMode <= 2) {
             u32 mask = 0x201;
-            if ((gEngineFlags | gUnk_030053F0) & mask)
+            if ((gEngineFlags | gScenePauseFlags) & mask)
                 return 0;
             if (player->historyDirectionMode != 1)
                 return 1;

@@ -1,14 +1,15 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "pink_spine_playback.h"
+#include "ram.h"
 /* Species identity is tentative. The update callback increments age after animation. */
-extern u32 gUnk_030053F0, gUnk_02000560;
+extern u32 gUnk_02000560;
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void ProjectileEmitter_EmitAttackFrame(void);
 void ProjectileEmitter_UpdateAttack(void);
 static inline u32 PauseFlags(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 static inline u32 TestFlags(u32 bits)
 {

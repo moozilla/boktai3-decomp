@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_02000298;
 struct E {
     u8 pad[0x48];
 };
@@ -16,5 +16,5 @@ u32 PlayerParticleCloud_Destroy(u8 *p)
     for (i = 39; i >= 0; i--, e += 0x48) {
         Effect_Remove(e + 0x20);
     }
-    return gUnk_02000298 = 0;
+    return gCloudTask = 0;
 }

@@ -26,7 +26,7 @@ s32 StackedActor_Destroy(struct StackedActor *actor)
         i--;
     } while (i >= 0);
     SceneMessages_UnregisterReceiver(trigger);
-    if (gUnk_02000118)
-        gUnk_02000118 = 0;
+    if (gStackedActor)
+        gStackedActor = 0;
     return 0;
 }

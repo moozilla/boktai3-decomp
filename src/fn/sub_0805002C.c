@@ -2,7 +2,7 @@
 #include "contact_actor.h"
 void RepeatedEffect_AddFromScript(void)
 {
-    struct RepeatedEffectManager *manager = gUnk_02000110;
+    struct RepeatedEffectManager *manager = gRepeatedEffectManager;
     s32 tag, initialState, bodyEnabled, behaviorFlags, constrainCell;
     struct ContactPackedVector position;
     if (!manager)

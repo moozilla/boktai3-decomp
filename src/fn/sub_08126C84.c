@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_0200015C;
+#include "ram.h"
 void Sprite_Remove(u8 *);
 u32 BurstSpark_DestroyPool(u8 *p)
 {
@@ -15,6 +15,6 @@ u32 BurstSpark_DestroyPool(u8 *p)
         n--;
     } while (n >= 0);
     z = 0;
-    gUnk_0200015C = z;
+    gBurstSparkPool = z;
     return z;
 }

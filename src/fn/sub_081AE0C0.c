@@ -60,7 +60,6 @@ s32 __divsi3(s32, s32);
 void Sound_PlaySong(u32);
 void Vanargand_ResetPaletteTransition(struct Vanargand *);
 void CpuSet(const void *, void *, u32);
-extern u16 gUnk_03004FC0[];
 
 #define LERP(dst, t, from, to, tag)                                                                \
     {                                                                                              \
@@ -106,7 +105,7 @@ static inline void restorePalette(struct Vanargand *p, struct Vanargand *self)
             s32 r, g, b;
 
             CpuSet(gPaletteBankData + 0xDE0, p->palette, 0x04000020);
-            CpuSet(p->fadeA, gUnk_03004FC0, 0x04000068);
+            CpuSet(p->fadeA, gBgPaletteBuffer, 0x04000068);
             t = p->transition;
             LERP(r, t, 7, 0x13, r1)
             LERP(g, t, 0, 0x12, g1)
@@ -115,7 +114,7 @@ static inline void restorePalette(struct Vanargand *p, struct Vanargand *self)
             r |= b << 10;
             {
                 u16 color = r;
-                u16 *pal = gUnk_03004FC0;
+                u16 *pal = gBgPaletteBuffer;
                 pal[0x56 / 2] = color;
                 pal[0x10C / 2] = color;
             }
@@ -129,7 +128,7 @@ static inline void restorePalette(struct Vanargand *p, struct Vanargand *self)
                 u32 color = (u16)r;
                 // Complete packing before materializing the second palette address.
                 asm("" : : "r"(color));
-                pal = gUnk_03004FC0;
+                pal = gBgPaletteBuffer;
                 pal[0x5A / 2] = color;
                 pal[0x10E / 2] = color;
             }
@@ -137,11 +136,11 @@ static inline void restorePalette(struct Vanargand *p, struct Vanargand *self)
         }
         case 0x82:
             CpuSet(gPaletteBankData + 0x1040, p->palette, 0x04000020);
-            CpuSet(p->fadeB, gUnk_03004FC0, 0x04000068);
+            CpuSet(p->fadeB, gBgPaletteBuffer, 0x04000068);
             break;
         case 0x7F:
             CpuSet(gPaletteBankData + 0xFE0, p->palette, 0x04000018);
-            CpuSet(p->fadeC, gUnk_03004FC0, 0x04000068);
+            CpuSet(p->fadeC, gBgPaletteBuffer, 0x04000068);
             break;
         default:
             CpuSet(gPaletteBankData + 0x3240, self->palette, 0x04000008);
@@ -387,7 +386,7 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
             changeState(self, 29, Vanargand_OnAlternateStopState);
             p->attachment = Vanargand_CreatePartController((u8 *)p + 0x17C, p->palette, 0);
             CpuSet(gPaletteBankData + 0x1040, p->palette, 0x04000020);
-            CpuSet(p->fadeB, gUnk_03004FC0, 0x04000068);
+            CpuSet(p->fadeB, gBgPaletteBuffer, 0x04000068);
             Vanargand_ResetPaletteTransition(p);
             placeBody(self);
             FIELD(u16, p, 0x5C2) = 1;

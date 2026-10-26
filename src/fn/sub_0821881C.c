@@ -25,14 +25,9 @@ struct Matrix {
     s8 scaleX, scaleY;
     u8 pad;
 };
-struct OamEntry {
-    u32 attributes;
-    u16 tile, depth;
-};
 extern u32 gUnk_03003A04;
 extern struct Drawable *gUnk_030042D0[];
 extern struct Matrix gUnk_03004310[];
-extern struct OamEntry gUnk_03004390[], gUnk_030047A0[];
 extern u16 gUnk_03005418[];
 static inline s32 UnsignedScale(u8 v)
 {
@@ -162,8 +157,8 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
             s32 n = gOamCount;
             if (n > 127)
                 goto next;
-            gUnk_03004390[n].attributes = attr;
-            gUnk_03004390[n].tile = tile;
+            gOamBuffer[n].attributes = attr;
+            gOamBuffer[n].tile = tile;
             gOamCount = n + 1;
             gUnk_03003A04 |= 1;
         } else {
@@ -180,9 +175,9 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
             n = gPendingOamCount;
             if (n > 127)
                 goto next;
-            gUnk_030047A0[n].attributes = attr;
-            gUnk_030047A0[n].tile = tile;
-            gUnk_030047A0[n].depth = ((depth + 128) & 255) << 8;
+            gPendingOamBuffer[n].attributes = attr;
+            gPendingOamBuffer[n].tile = tile;
+            gPendingOamBuffer[n].depth = ((depth + 128) & 255) << 8;
             gPendingOamCount = n + 1;
             gOamPriorityCounts[priority]++;
         }

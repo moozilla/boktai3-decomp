@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_0200006C;
+#include "ram.h"
 void Effect_Remove(u8 *);
 u32 FadingParticleManager_Destroy(u8 *p)
 {
@@ -24,7 +24,7 @@ u32 FadingParticleManager_Destroy(u8 *p)
     } while (i <= 5);
     {
         u32 z = 0;
-        gUnk_0200006C = z;
+        gFadingParticleManager = z;
     }
     return 0;
 }

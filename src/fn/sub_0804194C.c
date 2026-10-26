@@ -1,5 +1,5 @@
 #include "modifier_list.h"
-extern u32 gUnk_030053F0;
+#include "ram.h"
 extern struct ModifierMenuActor *gUnk_020004B4;
 void ActorSprite_InitPartDrawings(u8 *, u8 *, u32);
 void ModifierMenu_RefreshPreviewModel(struct ModifierMenu *);
@@ -18,7 +18,7 @@ void ModifierMenu_InitializePreview(struct ModifierMenu *menu)
     origin.y = 80;
     origin.z = 0;
     mask = 0x800;
-    flags = (gEngineFlags | gUnk_030053F0) & mask;
+    flags = (gEngineFlags | gScenePauseFlags) & mask;
     if (flags) {
         s32 id;
         struct ModifierMenuActor *actor = gUnk_020004B4;

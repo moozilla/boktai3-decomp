@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct State {
     u8 pad0[15];
     u8 fresh;
@@ -43,7 +44,6 @@ struct Actor {
     void *resource;
     void *callback;
 };
-extern struct Actor *gUnk_020000DC;
 int MessageWindow_UpdateSpeakerPortrait(struct Actor *);
 void sub_080316A4(void);
 void MessageWindow_UpdateImmediatePlayback(void);

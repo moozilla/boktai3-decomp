@@ -198,7 +198,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             }
             BgGfx_LoadTilemapSimple(1, tileX, tileY, screenX, screenY + panel->shakeOffset);
             if (--panel->mode == 0)
-                ScenePanel_CallPendingScript(gUnk_020004A4, 9);
+                ScenePanel_CallPendingScript(gScenePanel, 9);
         }
     }
     return;

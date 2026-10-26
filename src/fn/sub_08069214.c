@@ -12,7 +12,7 @@ void BouncingObject_TickRemoval(struct BouncingPool *unused, struct BouncingObje
         object->enter = 0;
     }
     {
-        struct BouncingPool *pool = gUnk_0200014C;
+        struct BouncingPool *pool = gBouncingPool;
         s32 id;
         u32 *used;
         index = &object->index;

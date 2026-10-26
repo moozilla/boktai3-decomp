@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec16 {
     s16 x, y, z;
@@ -38,7 +39,6 @@ struct FloorSwitch {
     u8 field8A, field8B;
     u16 field8C, field8E;
 };
-extern void *gUnk_020001A8;
 void *FloorSwitch_GetOrCreateManager(void);
 struct FloorSwitch *FloorSwitch_AllocateSlot(void *);
 struct SceneObjectList *SceneBody_GetRegistry(void);
@@ -63,7 +63,7 @@ static inline u8 FloorSwitch_InCurrentRegion(struct FloorSwitch *e)
    script; a switch placed under a scene object starts pressed. */
 void FloorSwitch_Create(void)
 {
-    void *manager = gUnk_020001A8;
+    void *manager = gFloorSwitchManager;
     struct FloorSwitch *e;
     struct FloorSwitch *p;
     struct Vec16 delta;

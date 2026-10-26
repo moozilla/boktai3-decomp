@@ -1,7 +1,8 @@
 #include "global.h"
 #include "scene_actor_registry.h"
 #include "game_state.h"
-extern u32 gUnk_030053F0, gUnk_02000560;
+#include "ram.h"
+extern u32 gUnk_02000560;
 void SceneActorPlacement_HideActor(struct SceneActorRegistryActor *, s32);
 void SceneActorPlacement_ShowActor(struct SceneActorRegistryActor *, s32);
 void sub_08075588(struct SceneActorRegistryActor *);
@@ -42,7 +43,7 @@ static inline void dispatch(void **callback, void *context)
 }
 static inline u32 engineFlags(u32 mask)
 {
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 s32 SceneActor_UpdateActiveCallbacks(struct SceneActorRegistryActor *p)
 {

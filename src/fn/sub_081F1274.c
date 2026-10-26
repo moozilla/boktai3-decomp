@@ -7,7 +7,6 @@ struct Slot7PackedPosition {
 };
 extern void *gUnk_020004B8;
 extern u8 *gUnk_020004F0;
-extern u8 gUnk_03004FC0[];
 extern u8 gUnk_03005040[];
 extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
@@ -56,7 +55,7 @@ static inline void CopyFourPalettes(u8 *source, u8 *dest)
 }
 static inline void FlashPalette(u8 *actor)
 {
-    u8 *dest = gUnk_03004FC0 + 0x80;
+    u8 *dest = ((u8 *)gBgPaletteBuffer) + 0x80;
     s32 i = 3;
     do {
         CpuSet(actor + 0x3A8, dest, 0x10);
@@ -67,7 +66,7 @@ static inline void FlashPalette(u8 *actor)
     FIELD(actor, 0x378, void *) = actor + 0x3A8;
     FIELD(actor, 0x5C2, u16)--;
     if (FIELD(actor, 0x5C2, u16) == 0) {
-        CopyFourPalettes(actor + 0x508, gUnk_03004FC0 + 0x80);
+        CopyFourPalettes(actor + 0x508, ((u8 *)gBgPaletteBuffer) + 0x80);
         AnimData_SelectPaletteBank(actor + 0x350, FIELD(actor, 0x5FC, u32));
         AnimData_SelectPaletteBank(actor + 0x36C, FIELD(actor, 0x608, u32));
     }
@@ -220,7 +219,7 @@ void SingletonSlot7_UpdatePresentation(u8 *actor)
                 Sound_PlaySong(0x13E);
         }
         if (FIELD(actor, 0x94, s16) <= 0 && FIELD(actor, 0x5E2, s16) == 0 && actor[0xB3] == 1) {
-            CopyFourPalettes(actor + 0x508, gUnk_03004FC0 + 0x80);
+            CopyFourPalettes(actor + 0x508, ((u8 *)gBgPaletteBuffer) + 0x80);
             Script_Call(FIELD(actor, 0x588, u32), 0);
             FIELD(actor, 0x5E2, u16) = 1;
         }

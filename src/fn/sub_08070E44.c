@@ -6,7 +6,7 @@
 struct SceneActorRegistryActor *SceneActorRegistry_FindAvailableFilteredAfterId(u32 inputId)
 {
     u32 id = inputId;
-    struct SceneActorRegistryNode *node = gUnk_020004AC;
+    struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
     struct SceneActorRegistryActor *actor = node->actor;
     if (actor) {
         u32 mask = 1;

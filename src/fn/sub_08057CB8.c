@@ -50,7 +50,7 @@ void ScenePanel_InitTimePalette(struct ScenePanel *input)
         destination += 16;
         source += 16;
     } while (--i >= 0);
-    destination = gUnk_03004FC0;
+    destination = gBgPaletteBuffer;
     source = colors;
     i = 2;
     do {

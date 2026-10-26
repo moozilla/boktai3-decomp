@@ -1,9 +1,8 @@
 #include "global.h"
-
-extern u32 gUnk_02000148;
+#include "ram.h"
 
 s32 SceneTerrainProbe_InitPool(u32 a)
 {
-    gUnk_02000148 = a;
+    gPairSlotPool = a;
     return 0;
 }

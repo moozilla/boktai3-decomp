@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 /* EffectGroup_Spawn: sets a 4-part effect group kind (installing its update callback), spawns one part at the source position projected to screen space plus an offset, and toggles flag 0x200 on all parts for kind 2 (provisional name) */
 
 struct Unk082315A8Vec {
@@ -32,7 +33,6 @@ struct Unk082315A8Graphics {
     u8 unknown0[0x1C];
     void *animation;
 };
-extern struct Unk082315A8Graphics *gUnk_0200005C;
 extern s16 gUnk_03005418[];
 extern const u16 gUnk_08E879A0[];
 void sub_08231444(void);
@@ -56,7 +56,7 @@ static inline s32 Scale(s32 v)
 s32 EffectGroup_Spawn(struct Unk082315A8Group *group, u32 kind, u32 parameter,
                       struct Unk082315A8Vec *position)
 {
-    struct Unk082315A8Graphics *graphics = gUnk_0200005C;
+    struct Unk082315A8Graphics *graphics = gSceneActorEffectsManager;
     u32 spawned;
     struct Unk082315A8Vec delta;
     struct Unk082315A8Part *part;

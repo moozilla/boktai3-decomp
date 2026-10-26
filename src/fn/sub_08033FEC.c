@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 struct Transition {
     u8 pad0[0x18];
     u8 state, entered, index, lastIndex;
@@ -11,8 +12,7 @@ struct Transition {
     s16 delays[64];
     u16 fadeIn[64], fadeOut[64], x[64], y[64], width[64], height[64];
 };
-extern struct Transition *gUnk_020000E8;
-extern u16 gUnk_03004FC0, gUnk_03005260[];
+extern u16 gUnk_03005260[];
 void MessageWindow_SetBounds(int, int, int, int);
 void MessageWindow_ShowMessage(int);
 void MessageWindow_Clear(void);
@@ -30,7 +30,7 @@ int Script_GetKeywordValue(int, int);
 int DialogueTransition_LoadFromScript(struct Transition *);
 int sub_08033FEC(struct Transition *p)
 {
-    gUnk_020000E8 = p;
+    gTransition = p;
     p->flags = Script_GetKeywordValue(102, 0);
     if (p->flags & 1) {
         int previous = gDispCntShadow;

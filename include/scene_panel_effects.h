@@ -77,5 +77,5 @@ void Effect_SetOrigin(struct ScenePanelParticle *, s32, s32);
 void Effect_SetPalette(struct ScenePanelParticle *, u32);
 u32 SunClock_GetPhase(void);
 
-extern u16 gUnk_03004FC0[];
+extern u16 gBgPaletteBuffer[];
 #endif

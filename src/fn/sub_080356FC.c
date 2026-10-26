@@ -28,11 +28,11 @@ struct Engine {
     void *head, *tail;
 };
 extern struct Engine *gUnk_02000484;
-extern u8 gUnk_020000EC;
 void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
+#include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -137,7 +137,7 @@ lastMore:
 receive:
     Wireless_UpdateUniAcknowledgedSlots(p);
     Wireless_ReceiveParentUniPackets(p);
-    gUnk_020000EC = 0;
+    gWirelessSessionState = 0;
     goto done;
 added: {
     u8 *slots = &p->selected;
@@ -197,6 +197,6 @@ stop:
 error:
     sub_082238F0(1);
     setOperation(p, 28, 0);
-    gUnk_020000EC = 0;
+    gWirelessSessionState = 0;
 done:;
 }

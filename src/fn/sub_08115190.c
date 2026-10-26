@@ -1,11 +1,11 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 f[0x13];
     s8 idx;
     u8 p[4];
     u32 v;
 };
-extern u32 gUnk_020001DC;
 void Effect_Remove(void *);
 s32 NativeParticle_DestroyManager(u8 *g)
 {
@@ -19,7 +19,7 @@ s32 NativeParticle_DestroyManager(u8 *g)
     } while (i >= 0);
     {
         u32 z = 0;
-        gUnk_020001DC = z;
+        gParticleManager = z;
     }
     return 0;
 }

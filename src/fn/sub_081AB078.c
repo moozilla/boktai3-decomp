@@ -70,8 +70,7 @@ void VanargandAfterimagePool_Spawn(void *, void *);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
 void Vanargand_ResetPaletteTransition(struct Vanargand *);
 void CpuSet(const void *, void *, u32);
-extern u16 gUnk_03004FC0[];
-#define VANARGAND_PALETTE_ADDR 0x03004FC0 /* gUnk_03004FC0 */
+#define VANARGAND_PALETTE_ADDR 0x03004FC0 /* gBgPaletteBuffer */
 
 static inline s32 Scale8(s32 n)
 {
@@ -132,7 +131,7 @@ void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
                 s32 r, g, b;
 
                 CpuSet(gPaletteBankData + 0xDE0, p->palette, 0x04000020);
-                CpuSet(p->fadeA, gUnk_03004FC0, 0x04000068);
+                CpuSet(p->fadeA, gBgPaletteBuffer, 0x04000068);
                 t = p->transition;
                 LERP(r, t, 7, 0x13, r1)
                 LERP(g, t, 0, 0x12, g1)
@@ -141,7 +140,7 @@ void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
                 r |= b << 10;
                 {
                     u16 color = r;
-                    u16 *pal = gUnk_03004FC0;
+                    u16 *pal = gBgPaletteBuffer;
                     pal[0x56 / 2] = color;
                     pal[0x10C / 2] = color;
                 }
@@ -163,11 +162,11 @@ void Vanargand_UpdatePaletteLeap(struct Vanargand *p, s32 frame)
             }
             case 0x82:
                 CpuSet(gPaletteBankData + 0x1040, p->palette, 0x04000020);
-                CpuSet(p->fadeB, gUnk_03004FC0, 0x04000068);
+                CpuSet(p->fadeB, gBgPaletteBuffer, 0x04000068);
                 break;
             case 0x7F:
                 CpuSet(gPaletteBankData + 0xFE0, p->palette, 0x04000018);
-                CpuSet(p->fadeC, gUnk_03004FC0, 0x04000068);
+                CpuSet(p->fadeC, gBgPaletteBuffer, 0x04000068);
                 break;
             default:
                 CpuSet(gPaletteBankData + 0x3240, self->palette, 0x04000008);

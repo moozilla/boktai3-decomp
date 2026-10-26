@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 p[0xb8];
 };
@@ -8,13 +9,12 @@ struct A {
     u8 p1[0x1c - 0x1c];
     struct E e[32];
 };
-extern struct A *gUnk_020005F0;
 void SpritePool_InitEntry(struct A *, struct E *, s32);
 u32 sub_081FEFFC(struct A *a)
 {
     struct E *e;
     s32 i;
-    gUnk_020005F0 = a;
+    gSpriteParticleManager = a;
     a->w18 = 0;
     e = a->e;
     i = 0;

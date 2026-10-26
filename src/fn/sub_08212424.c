@@ -1,5 +1,5 @@
 #include "global.h"
-extern u16 gUnk_03004FC0[];
+#include "render.h"
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 u8 *ScriptProc_Start(u32, u32);
@@ -21,5 +21,5 @@ void ForgingBook_InitBackgrounds(u8 *p)
     Bg_SetupLayers(2, 0, res, 0, 0, 1, &size);
     Bg_SetPriority(3, 2);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
-    CpuSet(ScriptProc_Start(0x92b3, 0x204) + 0x14, gUnk_03004FC0, 0x100);
+    CpuSet(ScriptProc_Start(0x92b3, 0x204) + 0x14, gBgPaletteBuffer, 0x100);
 }

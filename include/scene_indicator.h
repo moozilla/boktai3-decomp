@@ -58,7 +58,7 @@ struct SceneActor {
     s16 y;
 };
 
-extern struct SceneIndicators *gUnk_0200004C;
+extern struct SceneIndicators *gSceneIndicators;
 extern struct SceneActor *gUnk_02000580;
 
 struct SceneIndicators *SceneIndicators_GetInstance(void);

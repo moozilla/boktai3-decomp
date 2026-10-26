@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_0200015C;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 BurstSpark_InitPool(u8 *);
@@ -11,8 +11,8 @@ void BurstSpark_DestroyPool(void);
 u8 *BurstSpark_EnsurePool(void)
 {
     u8 *p;
-    if (gUnk_0200015C != 0)
-        return gUnk_0200015C;
+    if (gBurstSparkPool != 0)
+        return gBurstSparkPool;
     p = Task_Create(0xa, 0x2038);
     if (p != 0) {
         Task_SetCallbacks(p, EffectPool_UpdateActive, BurstSpark_DestroyPool);

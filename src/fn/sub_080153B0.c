@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -32,7 +33,6 @@ struct Manager {
     struct Piece pieces[32];
 };
 void Sprite_Remove(void *);
-extern struct Manager *gUnk_02000068;
 extern u16 gUnk_08604C54[];
 void *ScriptProc_Start(int, int);
 int AnimData_Load(void *, int);
@@ -47,7 +47,7 @@ int AnimatedParticleManager_Initialize(struct Manager *m)
     struct Obj *o;
     struct Anim *a;
     u8 *r;
-    gUnk_02000068 = m;
+    gAnimatedParticleManager = m;
     for (i = 0; i <= 1; i++)
         m->resources[i] = ScriptProc_Start(0x922e, gUnk_08604C54[i]);
     zero.x = 0;

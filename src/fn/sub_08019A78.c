@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_020000B0;
+#include "ram.h"
 void Sprite_Remove(u8 *);
 u32 SpritePool_Destroy(u8 *p)
 {
@@ -11,6 +11,6 @@ u32 SpritePool_Destroy(u8 *p)
         i--;
         e += 0xb0;
     } while (i >= 0);
-    gUnk_020000B0 = 0;
+    gSpritePoolManager = 0;
     return 0;
 }

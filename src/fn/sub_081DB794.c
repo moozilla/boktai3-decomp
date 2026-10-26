@@ -1,12 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 // confidence=low: background, labels, animations and menu selection initialization.
 // fix.py best (sweep after the inlined-insn fix)
 struct Rect {
     u16 x, y, width, height;
 };
 extern u32 gUnk_020002C0[];
-extern u16 gUnk_03004FC0[];
 void Bg_ClearTilemap(s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
 void *ScriptProc_Start(s32, s32);
@@ -47,7 +47,7 @@ s32 Options_InitScreen(u8 *arg)
     Bg_SetupLayers(2, 0, background, 0, zero, one = 1, &layer);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     palette = ScriptProc_Start(0x92B3, 0x204);
-    CpuSet(((u8 *)palette) + 0x14, gUnk_03004FC0, 0x100);
+    CpuSet(((u8 *)palette) + 0x14, gBgPaletteBuffer, 0x100);
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
     graphics = p + 0x84;
     ResourceHeader_Relocate(graphics, resource);

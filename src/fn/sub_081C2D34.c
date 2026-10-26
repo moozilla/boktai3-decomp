@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct E {
     u8 pad[0x38];
 };
@@ -7,7 +8,6 @@ struct S {
     struct E e[32];
     u8 g[0x734 - 0x18 - 0x700];
 };
-extern u32 gUnk_02000264;
 void Sprite_Remove(void *);
 void SceneMessages_UnregisterReceiver(void *);
 void SparkleEmitter_OnTaskDestroy(struct S *p)
@@ -21,5 +21,5 @@ void SparkleEmitter_OnTaskDestroy(struct S *p)
     }
     z = 0;
     SceneMessages_UnregisterReceiver((u8 *)p + 0x734);
-    gUnk_02000264 = z;
+    gSparkleEmitter = z;
 }

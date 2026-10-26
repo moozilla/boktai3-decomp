@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct StateSprite {
     u8 unk0[0x13A];
     s16 state;
@@ -10,7 +11,7 @@ struct StateSpritePool {
     struct StateSprite slots[4];
     u32 occupiedMask;
 };
-extern u32 gUnk_030053F0, gUnk_02000560;
+extern u32 gUnk_02000560;
 extern void *gUnk_08610704[];
 s32 Callback_InvokeActor(void *, void *);
 static inline u8 Occupied(u32 *mask, s32 i)
@@ -22,7 +23,7 @@ static inline u8 Occupied(u32 *mask, s32 i)
 static inline u32 Paused(void)
 {
     u32 mask = 0x400;
-    return (gEngineFlags | gUnk_030053F0) & mask;
+    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 static inline u32 Locked(void)
 {

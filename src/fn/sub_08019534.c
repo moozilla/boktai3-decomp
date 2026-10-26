@@ -1,10 +1,10 @@
 #include "global.h"
+#include "render.h"
 typedef struct {
     u8 pad[24];
     int time, frame;
     u16 colors[256];
 } PaletteFrames;
-extern u16 gUnk_03004FC0[];
 int Palette_IsDirty(void);
 void PaletteFrames_CaptureColors(PaletteFrames *);
 int PaletteFrames_Update(PaletteFrames *p)
@@ -17,7 +17,7 @@ int PaletteFrames_Update(PaletteFrames *p)
         if (++p->frame > 6)
             p->frame = 0;
         for (i = 0; i < 16; i++)
-            gUnk_03004FC0[i] = p->colors[p->frame * 16 + i];
+            gBgPaletteBuffer[i] = p->colors[p->frame * 16 + i];
     }
     return 0;
 }

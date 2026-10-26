@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 // Tentative result-menu offsets from the contiguous callback family.
 struct Drawing {
     u8 bytes[0x60];
@@ -13,7 +14,6 @@ struct ResultMenu {
     void *onClose, *resource;
     int windows[4];
 };
-extern struct ResultMenu *gUnk_02000104;
 extern void *gUnk_08605814[];
 extern u16 gUnk_03005260[];
 void Sound_PauseChannel10(int);
@@ -48,6 +48,6 @@ int WirelessResultPanel_Destroy(struct ResultMenu *p)
         mask &= *shadow;
         *shadow = mask;
     }
-    gUnk_02000104 = 0;
+    gResultMenu = 0;
     return 0;
 }

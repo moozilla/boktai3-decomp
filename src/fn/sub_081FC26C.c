@@ -34,7 +34,6 @@ struct ParticleConfig {
     u32 kind;
     u32 behavior;
 };
-extern struct ParticlePool *gUnk_020005E4;
 extern void *const gUnk_08613F6C[];
 extern const s16 gUnk_086149C4[];
 void *Ratatosk_CreateAnimatedParticlePool(void);
@@ -287,7 +286,7 @@ inline static void updatePlayback_081FC26C(struct Particle *eIn, struct DisplayS
 
 s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct ContactPosition *position)
 {
-    struct ParticlePool *pool = gUnk_020005E4;
+    struct ParticlePool *pool = gRatatoskParticlePool;
     struct Particle *e;
     struct ContactSwarmSprite *sprite;
     s32 slot;
