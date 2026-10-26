@@ -23,6 +23,7 @@ workbench; [loop](../tools/scope/WORKER.md)) · [subsystem runs](../tools/scope/
 [COMPILER_REFERENCES](COMPILER_REFERENCES.md) · [EDS wiki](external/eds/README.md)
 (Yu-Gi-Oh! EDS matching-tricks catalog, vendored, MIT) · [SCALAR_APPROACH](SCALAR_APPROACH.md)
 (angle/scalar helpers) · [ASM_OUTPUT_QC](ASM_OUTPUT_QC.md) (ABI and credit audits) ·
+[LAYOUTS](LAYOUTS.md) (one offset map per RAM object from every file's structs, casts and the ROM; `tools/layoutmerge.py`) ·
 [CANDIDATES](CANDIDATES.md) · [PERMUTER_HANDOFF](PERMUTER_HANDOFF_2026-10-15.md) ·
 [DRAFT_INVENTORY](DRAFT_INVENTORY_2026-10-09.md) · libraries:
 [LIBGCC](LIBGCC.md), [LIBM](LIBM.md), [RTC](RTC.md), [EEPROM](EEPROM.md), [RFU](RFU.md),
@@ -119,6 +120,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 9 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
+| [docs/LAYOUTS.md](../docs/LAYOUTS.md) | RAM object layouts merged across files | #tooling #matching | 7 |
 | [docs/LEVEL_ADVANCE_DISPLAY.md](../docs/LEVEL_ADVANCE_DISPLAY.md) | Level advancement display (tentative presentation identity) |  | 4 |
 | [docs/LIBGCC.md](../docs/LIBGCC.md) | Floating-point runtime identification | *#library* | 4 |
 | [docs/LIBM.md](../docs/LIBM.md) | Math-library source matches | *#library #text* | 5 |
@@ -216,7 +218,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
-| [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 16 |
+| [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
 | [docs/history/WORKER_2026-10-24.md](../docs/history/WORKER_2026-10-24.md) | Worker brief: family-oriented matching |  | 27 |
 | [docs/history/WORKER_ROUND_2026-10-12.md](../docs/history/WORKER_ROUND_2026-10-12.md) | Standard round brief (only when workers are authorized) |  | 3 |
 | [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 17 |
