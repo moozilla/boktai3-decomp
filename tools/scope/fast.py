@@ -140,11 +140,13 @@ class Server:
         return self.prefix_asm() + open(out).read()
 
     def close(self):
+        import shutil
         try:
             os.close(self.req_w)
         except OSError:
             pass
         self.proc.wait()
+        shutil.rmtree(self.dir, ignore_errors=True)
 
 
 def elf_sections(data):
@@ -256,8 +258,10 @@ def place(obj, own, rom_syms, address):
     return bytes(text[start:end]), start, funcs, missing
 
 
-def assemble(assembler, asm, workdir, tag="f"):
-    """Object bytes for ASM, or (None, stderr)."""
+def assemble(assembler, asm, workdir, tag=None):
+    """Object bytes for ASM, or (None, stderr). The files are the process's own: several scope
+    commands under one SCOPE_RUN share WORKDIR, and a shared f.o was read after another replaced it."""
+    tag = tag or f"f{os.getpid()}"
     s_path, o_path = os.path.join(workdir, tag + ".s"), os.path.join(workdir, tag + ".o")
     asm = re.sub(r"^(\w+):\n", lambda m: f"{m[1]}:\n\t.global {m[1]}__addr\n{m[1]}__addr:\n"
                  if not m[1].startswith(".") else m[0], asm, flags=re.M)
@@ -265,7 +269,10 @@ def assemble(assembler, asm, workdir, tag="f"):
     r = subprocess.run(assembler + ["-o", o_path, s_path], capture_output=True, text=True)
     if r.returncode:
         return None, r.stderr
-    return open(o_path, "rb").read(), ""
+    obj = open(o_path, "rb").read()
+    for path in (s_path, o_path):
+        os.remove(path)
+    return obj, ""
 
 
 class Fast:

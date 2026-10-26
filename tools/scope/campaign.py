@@ -834,7 +834,9 @@ def cmd_land(args):
     if not (pins or bars) and marker in merged:
         merged = re.sub(r"^// MATCHING_CONCESSION: register-pinning\n", "", merged, flags=re.M)
     open(target, "w").write(merged)
-    subprocess.run(["make", "format"], cwd=tree, capture_output=True)
+    # the landed file only: `make format` over the tree rewrote 26 unrelated files in one worktree
+    fmt = os.path.join(tree, "build", "venv", "bin", "clang-format")
+    subprocess.run([fmt if os.path.exists(fmt) else "clang-format", "-i", r["src"]], cwd=tree, capture_output=True)
     chk = subprocess.run(["python3", "tools/check.py", r["src"]], cwd=tree, capture_output=True, text=True)
     last = (chk.stdout + chk.stderr).strip().splitlines()[-1:]
     ok = bool(last) and ": MATCH" in last[0]
