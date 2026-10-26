@@ -645,7 +645,7 @@
     or perhaps its old hard reg has been commandeered for reloads.
 --- a/reload1.c
 +++ b/reload1.c
-@@ -208,7 +208,91 @@
+@@ -208,7 +208,96 @@
  /* Index of last register assigned as a spill register.  We allocate in
     a round-robin fashion.  */
  static int last_spill_reg;
@@ -715,6 +715,11 @@
 +extern void agbcc_instr_init ();
 +extern char *current_function_name;
 +extern char *agbcc_const_label ();
++static int agbcc_start;
++static char agbcc_xbuf[1024];
++
++static void agbcc_spill_status ();
++
 +static int
 +agbcc_spill_shift (k)
 +     int k;
@@ -737,7 +742,7 @@
  /* Describes order of preference for putting regs into spill_regs.
     Contains the numbers of all the hard regs, in order most preferred first.
     This order is different for each function.
-@@ -590,6 +674,8 @@
+@@ -590,6 +679,8 @@
    init_recog ();
  
    failure = 0;
@@ -746,7 +751,7 @@
  
    reload_firstobj = (char *) obstack_alloc (&reload_obstack, 0);
  
-@@ -815,6 +901,9 @@
+@@ -815,6 +906,9 @@
    
    /* Initialize to -1, which means take the first spill register.  */
    last_spill_reg = -1;
@@ -756,7 +761,7 @@
  
    spilled_pseudos = ALLOCA_REG_SET ();
  
-@@ -1076,6 +1165,14 @@
+@@ -1076,6 +1170,14 @@
        if (reg_equiv_address[i])
  	addr = reg_equiv_address[i];
  
@@ -771,7 +776,7 @@
        if (addr)
  	{
  	  if (reg_renumber[i] < 0)
-@@ -2257,6 +2354,11 @@
+@@ -2257,6 +2359,11 @@
      {
        register rtx x;
        int inherent_size = PSEUDO_REGNO_BYTES (i);
@@ -783,7 +788,7 @@
        int total_size = MAX (inherent_size, reg_max_ref_width[i]);
        int adjust = 0;
  
-@@ -5028,6 +5130,28 @@
+@@ -5028,6 +5135,91 @@
     If NOERROR is nonzero, we return 1 if successful,
     or 0 if we couldn't find a spill reg and we didn't change anything.  */
  
@@ -809,10 +814,73 @@
 +  return "-";
 +}
 +
++/* AGBCC_DUMPPRI: after reload choice K (an R line), one X line with the rotation
++   it scanned: the index it started after (START, -1 = from the first) and every
++   spill register's standing at this insn, in spill_regs order:
++     S  pass 0 would take it (free here, and already used by a reload of this insn)
++     A  free here (pass 1 takes the first of these when pass 0 finds none)
++     L<n>  pseudo N lives in it across this insn (not a spill register here)
++     H  a hard register live here (an argument, a return value) or otherwise kept out
++     T  taken by another reload of this insn in an overlapping period
++     C  not in the reload's register class; M  cannot hold its mode
++   PASS is the pass that chose.  Built before the choice is marked in use, printed
++   after the R line.  scope.py reads it to say which register any rotation could
++   give here, and the AGBCC_SPILL shift that gives the ROM's.  */
++static void
++agbcc_spill_status (chain, r, k, start, pass)
++     struct insn_chain *chain;
++     int r, k, start, pass;
++{
++  int c;
++  char *b = agbcc_xbuf;
++  int class = (int) reload_reg_class[r];
++  b += sprintf (b, "X %s %d %d start=%d pass=%d", current_function_name, k,
++	   INSN_UID (chain->insn), start, pass);
++  for (c = 0; c < n_spills; c++)
++    {
++      int reg = spill_regs[c];
++      int fr = reload_reg_free_p (reg, reload_opnum[r], reload_when_needed[r])
++	|| (reload_in[r] && ! TEST_HARD_REG_BIT (reload_reg_used, reg)
++	    && reload_reg_free_for_value_p (reg, reload_opnum[r],
++					    reload_when_needed[r], reload_in[r],
++					    reload_out[r], r, 1));
++      b += sprintf (b, " %d:", reg);
++      if (! TEST_HARD_REG_BIT (chain->used_spill_regs, reg))
++	{
++	  int p, who = -1;
++	  for (p = FIRST_PSEUDO_REGISTER; p < max_regno; p++)
++	    if (reg_renumber[p] >= 0 && reg_renumber[p] <= reg
++		&& reg_renumber[p] + HARD_REGNO_NREGS (reg_renumber[p], PSEUDO_REGNO_MODE (p)) > reg
++		&& (REGNO_REG_SET_P (chain->live_before, p)
++		    || REGNO_REG_SET_P (chain->live_after, p)))
++	      {
++		who = p;
++		break;
++	      }
++	  if (who >= 0)
++	    b += sprintf (b, "L%d", who);
++	  else
++	    b += sprintf (b, "H");
++	}
++      else if (! fr)
++	b += sprintf (b, "T");
++      else if (! TEST_HARD_REG_BIT (reg_class_contents[class], reg))
++	b += sprintf (b, "C");
++      else if (! HARD_REGNO_MODE_OK (reg, reload_mode[r]))
++	b += sprintf (b, "M");
++      else if (TEST_HARD_REG_BIT (reload_reg_used_at_all, reg)
++	       && ! TEST_HARD_REG_BIT (reload_reg_used_for_inherit, reg))
++	b += sprintf (b, "S");
++      else
++	b += sprintf (b, "A");
++    }
++  sprintf (b, "\n");
++}
++
  static int
  allocate_reload_reg (chain, r, last_reload, noerror)
       struct insn_chain *chain;
-@@ -5066,6 +5190,27 @@
+@@ -5066,6 +5258,28 @@
       reloads A and B can share regs.  These need two regs.
       Suppose A and B are given different regs.
       That leaves none for C.  */
@@ -837,10 +905,20 @@
 +      last_spill_reg = ((last_spill_reg + d) % n_spills + n_spills) % n_spills;
 +    agbcc_reload_count++;
 +  }
++  agbcc_start = (noerror || ! force_group) ? last_spill_reg : -1;
    for (pass = 0; pass < 2; pass++)
      {
        /* I is the index in spill_regs.
-@@ -5203,6 +5348,28 @@
+@@ -5194,6 +5408,8 @@
+ 	       && ! HARD_REGNO_MODE_OK (regno, GET_MODE (reload_out[r]))))
+ 	  {
+ 	    /* The reg is OK.  */
++	    if (agbcc_dump)
++	      agbcc_spill_status (chain, r, agbcc_reload_count - 1, agbcc_start, pass);
+ 	    last_spill_reg = i;
+ 
+ 	    /* Mark as in use for this insn the reload regs we use
+@@ -5203,6 +5419,29 @@
  
  	    reload_reg_rtx[r] = new;
  	    reload_spill_index[r] = spill_regs[i];
@@ -865,10 +943,33 @@
 +		fprintf (agbcc_dump, "R %s %d %d %d %d %s %s\n", current_function_name,
 +			 agbcc_reload_count - 1, INSN_UID (insn), spill_regs[i], line, file,
 +			 v);
++		fputs (agbcc_xbuf, agbcc_dump);
 +	      }
  	    return 1;
  	  }
      }
+@@ -5617,6 +5856,10 @@
+ 			      reload_override_in[r] = last_reg;
+ 			      reload_inheritance_insn[r]
+ 				= reg_reloaded_insn[i];
++			      if (agbcc_dump)
++				fprintf (agbcc_dump, "I %s %d %d %d %d override\n",
++					 current_function_name, INSN_UID (insn), regno, i,
++					 INSN_UID (reg_reloaded_insn[i]));
+ 			    }
+ 			  else
+ 			    {
+@@ -5632,6 +5875,10 @@
+ 			      reload_inherited[r] = 1;
+ 			      reload_inheritance_insn[r]
+ 				= reg_reloaded_insn[i];
++			      if (agbcc_dump)
++				fprintf (agbcc_dump, "I %s %d %d %d %d inherit\n",
++					 current_function_name, INSN_UID (insn), regno, i,
++					 INSN_UID (reg_reloaded_insn[i]));
+ 			      reload_spill_index[r] = i;
+ 			      for (k = 0; k < nr; k++)
+ 				SET_HARD_REG_BIT (reload_reg_used_for_inherit,
 --- a/stmt.c
 +++ b/stmt.c
 @@ -49,6 +49,7 @@
