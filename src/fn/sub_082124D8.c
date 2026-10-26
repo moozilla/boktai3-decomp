@@ -1,7 +1,6 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 82.4%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining: constant/register materialization order in the tail, widget loop base address.
@@ -14,7 +13,21 @@ struct IbPos {
 struct IbWidget {
     u8 b0[8];
     u32 flags;
-    u8 rest[0x54];
+    u8 restC[0x14];
+    struct IbPos position;
+    u8 rest28[0x38];
+};
+struct IbHalfword {
+    u16 value;
+};
+struct IbSprite {
+    u8 pad0[7];
+    u8 visible;
+    u8 scaleX, scaleY;
+    u8 padA[6];
+    u16 style;
+    u8 pad12[10];
+    struct IbPos position;
 };
 struct IbCamera {
     u16 x, y, z;
@@ -34,8 +47,13 @@ u32 ForgingBook_InitSprites(u8 *p)
     struct IbRes *res;
     struct IbPos pos;
     s32 i;
-    u8 *w;
-    u32 t1;
+    struct IbSprite *sprite;
+    void *animation;
+    u16 coordinate;
+    u32 zero;
+    u32 loopZero;
+    register struct IbPos *posPtr asm("r4");
+    struct IbWidget *w;
     res = ScriptProc_Start(0xcb05, 0xe2ab);
     *((struct IbRes *)(p + 0x24)) = *res;
     ResourceHeader_Relocate(p + 0x24, res);
@@ -66,30 +84,33 @@ u32 ForgingBook_InitSprites(u8 *p)
     ResourceHeader_Relocate(p + 0x388, res);
     pos.x = 0x58;
     pos.y = 0x18;
-    w = p + 0x3a8;
-    for (i = 0; i < 18; i++) {
-        Widget_InitLinked(w, p + 0x388, (u16)(0xf0 + i), t1 = 0x10, 0, 0, 0, 0);
-        *((u16 *)(w + 0x20)) = pos.x;
-        *((u16 *)(w + 0x22)) = pos.y;
-        *((u16 *)(w + 0x24)) = 0;
+    for (i = 0, loopZero = 0, posPtr = &pos, w = (void *)(p + 0x3a8); i < 18; i++) {
+        Widget_InitLinked(w, p + 0x388, (u16)(0xf0 + i), 0x10, loopZero, loopZero, loopZero,
+                          loopZero);
+        w->position.x = posPtr->x;
+        w->position.y = posPtr->y;
+        w->position.z = loopZero;
         if (Mod(i, 6) == 5) {
-            pos.x = 0x58;
-            pos.y += 0x18;
+            posPtr->x = 0x58;
+            posPtr->y += 0x18;
         } else {
-            pos.x += 0x18;
+            posPtr->x += 0x18;
         }
-        w += t1 + 80;
+        ++w;
     }
 
+    zero = 0;
     {
         u32 *r5 = (u32 *)(p + 0x10c);
         CpuSet((void *)(*r5), p + 0x364, 0x10);
         *r5 = (u32)(p + 0x364);
-        *((u16 *)(p + 0xfe)) = 0xe010;
+        ((struct IbHalfword *)(p + 0xfe))->value = 0xe010;
     }
-    res = ScriptProc_Start(0xcb05, 0xde23);
-    ResourceHeader_Relocate(p + 0xa68, res);
-    Widget_InitLinked(p + 0xa88, p + 0xa68, 0, 0, 0, 1, 0, 0);
+    {
+        struct IbRes *objectRes = ScriptProc_Start(0xcb05, 0xde23);
+        ResourceHeader_Relocate(p + 0xa68, objectRes);
+    }
+    Widget_InitLinked(p + 0xa88, p + 0xa68, zero, zero, zero, 1, zero, zero);
     *((u32 *)(p + 0xa90)) &= ~1;
     *((u8 *)(p + 0xaa2)) = 2;
     {
@@ -97,24 +118,26 @@ u32 ForgingBook_InitSprites(u8 *p)
         CpuSet((void *)(*r5), p + 0xaec, 0x10);
         *r5 = (u32)(p + 0xaec);
     }
-    *((u16 *)(p + 0xaa8)) = gUnk_030042A0.x - 456;
-    *((u16 *)(p + 0xaaa)) = gUnk_030042A0.y;
-    *((u16 *)(p + 0xaac)) = gUnk_030042A0.z + 336;
+    coordinate = gUnk_030042A0.x - 456;
+    *((u16 *)(p + 0xaa8)) = coordinate;
+    coordinate = gUnk_030042A0.y;
+    *((u16 *)(p + 0xaaa)) = coordinate;
+    coordinate = gUnk_030042A0.z + 336;
+    *((u16 *)(p + 0xaac)) = coordinate;
     *((u8 *)(p + 0xae8)) = 3;
     *((u8 *)(p + 0xae9)) = 1;
-    *((void **)(p + 0xb58)) = ActorDebris_Create(p + 0xa88, p + 0xaac, p + 0xae9);
+    *((void **)(p + 0xb58)) = ActorDebris_Create(p + 0xa88, p + 0xae8, p + 0xae9);
     *((void **)(p + 0xb5c)) = PlayerAttackEffect_Create(p + 0xa88, p + 0xbe6, p + 0xae9);
-    AnimData_Load(p + 0xb3c, 0x1c1b);
-    Sprite_Init(p + 0xb10, p + 0xb3c, 0x212);
-    *((u16 *)(p + 0xb20)) = 5;
+    animation = p + 0xb3c;
+    AnimData_Load(animation, 0x1c1b);
+    animation = p + 0xb3c;
+    sprite = (void *)(p + 0xb10);
+    Sprite_Init(sprite, animation, 0x212);
+    sprite->style = 5;
     *((u8 *)(p + 0xb17)) = 1;
     *((u16 *)(p + 0xb2c)) = 0x2e;
     *((u16 *)(p + 0xb2e)) = 0x48;
-    *((u16 *)(p + 0xb30)) = 0;
+    *((u16 *)(p + 0xb30)) = zero;
     *((u8 *)(p + 0xb18)) = 0x40;
     *((u8 *)(p + 0xb19)) = 0x40;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", ForgingBook_InitSprites);
-#endif
