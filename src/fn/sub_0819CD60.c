@@ -1,8 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 81.9%
-// Remaining differences: register allocation, stack lifetimes and instruction ordering.
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -30,12 +26,16 @@ static inline void Normalize(struct Vec *v)
         out->z = Div(out->z * speed, length);
     }
 }
+static inline s32 Dot(struct Vec *a, struct Vec *b)
+{
+    return a->x * b->x + a->z * b->z;
+}
 void Hresvelgr_SteerTowardTarget(struct Actor *input)
 {
     struct Actor *a = input;
     struct Vec delta, left, right;
-    register struct Vec *v asm("r5") = &a->steering;
-    register s32 y asm("r9");
+    register struct Vec *v = &a->steering;
+    register s32 y;
     struct Vec *out = &delta;
     struct Vec *target = &a->target, *position = &a->position;
     delta.x = target->x - position->x;
@@ -68,10 +68,10 @@ void Hresvelgr_SteerTowardTarget(struct Actor *input)
         q->y = yy;
         q->z = z;
     }
-    if (v->x * left.x + v->z * left.z <= v->x * delta.x + v->z * delta.z) {
+    if (Dot(v, &left) <= Dot(v, &delta)) {
         v->x = delta.x;
         v->z = delta.z;
-    } else if (left.x * delta.x + left.z * delta.z <= right.x * delta.x + right.z * delta.z)
+    } else if (Dot(&left, &delta) <= Dot(&right, &delta))
         *v = right;
     else
         *v = left;
@@ -79,7 +79,3 @@ void Hresvelgr_SteerTowardTarget(struct Actor *input)
     v->y = y;
     a->velocity = *v;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_SteerTowardTarget);
-#endif
