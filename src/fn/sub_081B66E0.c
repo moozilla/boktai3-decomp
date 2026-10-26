@@ -1,10 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 97.1%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// foundry draft (worker best 83.0%); what differs is mostly register allocation and instruction order
 
 /* Tentative Vanargand family; the two vectors are copied as eight-byte records. */
 
@@ -66,32 +61,30 @@ s32 VanargandEffect_Initialize(struct VanargandEffect *effect, s32 variant, s32 
     }
     AnimData_SelectPaletteBank(effect->animation, palette);
     {
-        typeof(effect->variant) *q1 = &effect->variant;
-        *q1 = variant;
+        typeof(effect->variant) *variantPtr = &effect->variant;
+        *variantPtr = variant;
     }
     {
-        typeof(effect->delay) *q2 = &effect->delay;
-        *q2 = delay;
+        typeof(effect->delay) *delayPtr = &effect->delay;
+        *delayPtr = delay;
     }
     {
-        typeof(effect->lifetime) *q3 = &effect->lifetime;
-        *q3 = 30;
+        typeof(effect->lifetime) *lifetimePtr = &effect->lifetime;
+        *lifetimePtr = 30;
+        asm("" ::: "r1");
     }
     {
-        typeof(effect->position) *q4 = &effect->position;
-        *q4 = *position;
+        typeof(effect->position) *effectPosition = &effect->position;
+        *effectPosition = *position;
         {
-            typeof(effect->motion.data) *q5 = &effect->motion.data;
-            *q5 = 0;
+            struct MotionTrack *motion = &effect->motion;
+            const void **data = &motion->data;
+            *data = 0;
+            motion->active = 0;
+            motion->mode = 0;
+            motion->cursor = 0;
         }
-        effect->motion.active = 0;
-        effect->motion.mode = 0;
-        effect->motion.cursor = 0;
         MotionTrack_Initialize(&effect->motion, &effect->position, 0, target, 0);
         return 0;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", VanargandEffect_Initialize);
-#endif

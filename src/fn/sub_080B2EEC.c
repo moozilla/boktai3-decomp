@@ -1,10 +1,7 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.5%
-// fix.py best (sweep after the inlined-insn fix)
-// foundry draft (worker best 89.2%); what differs is mostly register allocation and instruction order
 #define gRandomTableIndex gUnk_03005308
 #define gRandomTable      gUnk_0203B400
 extern u32 gUnk_03005308;
@@ -17,17 +14,20 @@ static inline u8 Inactive(struct SceneActorRegistryResetView *p)
     if (p) {
         u32 mask = 0x40;
         u32 offset = 0x2D4;
-        if (*(u16 *)((u8 *)p + offset) & mask)
-            return 1;
+        if (p->flags2D4 & mask)
+            goto inactive;
         {
             u32 mask = 0x20000;
             offset -= 4;
-            if (*(u32 *)((u8 *)p + offset) & mask)
-                return 1;
+            if (p->flags2D0 & mask)
+                goto inactive;
         }
-        if (p->health <= 0)
-            return 1;
+        if (p->health > 0)
+            goto active;
+    inactive:
+        return 1;
     }
+active:
     return 0;
 }
 static inline u8 Test(u16 *p, u32 mask)
@@ -48,7 +48,7 @@ static inline void Clear(u32 *p, u32 mask)
 inline static s32 RandomByte_TrySoloAction(void)
 {
     gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
-    return *((const u8 *)((*((typeof(gUnk_0203B400) *)0x0203B400)) + gUnk_03005308));
+    return (u8)((const u16 *)0x0203B400)[gUnk_03005308];
 }
 
 void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
@@ -56,6 +56,7 @@ void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
     struct SceneActorRegistryResetView *q = p;
     u8 zero;
     s32 t1;
+    u32 timer;
     if (Inactive(p))
         return;
     {
@@ -72,9 +73,11 @@ void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
         return;
     if (SceneActorRegistry_CountLiving() > 1)
         return;
-    zero = q->timer68D;
+    timer = q->timer68D;
+    zero = timer;
+    asm("" : "+r"(zero));
     if (zero)
-        q->timer68D = zero - 1;
+        q->timer68D = timer - 1;
     else {
         q->timer68D = 0xF0;
         if (RandomByte_TrySoloAction() <= 0x9F)
@@ -103,7 +106,3 @@ void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
         p->word104 = zero;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActor_TrySoloAction);
-#endif

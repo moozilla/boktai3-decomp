@@ -1,9 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 89.1%
-// fix.py best version (reprinted C)
-// Open: GetSelectionCount sets its 0 result before the tests, and the clamped
-// store reuses the &s->count address instead of recomputing it after the join.
 #define SpriteGroup_Initialize PanelSequence_InitializeSprites
 #define gPanelSequence         gUnk_020001C8
 struct PanelSequence {
@@ -54,11 +50,21 @@ ret1:
     return &p->count;
 }
 
+static inline void PanelSequence_SetUpdate(struct PanelSequence *s,
+                                           void (*update)(struct PanelSequence *))
+{
+    s->update = update;
+}
+static inline u8 PanelSequence_ClampSelectionCount(u8 value, s32 max)
+{
+    register s32 result asm("r1") = value;
+    if (result > max)
+        return max;
+    return result;
+}
 s32 PanelSequence_InitializeFromScript(struct PanelSequence *s)
 {
     u8 *count;
-    int n;
-    typeof(*count) t1;
     if (Script_SeekToKeyword('s')) {
         s->source = Script_GetTextSourcePc();
         if (!s->source)
@@ -78,10 +84,8 @@ s32 PanelSequence_InitializeFromScript(struct PanelSequence *s)
     count = GetSelectionCount();
     if (!count)
         return -1;
-    t1 = *count;
-    *((volatile u8 *)(&s->count)) = t1;
-    n = (n > 10) ? (10) : (*((volatile u8 *)(&s->count)));
-    s->count = n;
+    s->count = *count;
+    s->count = PanelSequence_ClampSelectionCount(s->count, 10);
     Bg_ClearTilemap(3);
     Bg_ClearTilemap(2);
     Bg_ClearTilemap(1);
@@ -94,7 +98,7 @@ s32 PanelSequence_InitializeFromScript(struct PanelSequence *s)
     ModifierMenu_InitSelectionSnapshot(s->indicators, s->palette);
     LinkPanel_CreateTextWindows(s);
     LinkPanel_StartDescriptions(s);
-    s->update = PanelSequence_UpdateDelay;
+    PanelSequence_SetUpdate(s, PanelSequence_UpdateDelay);
     s->entering = 1;
     s->transition = 0;
     if (Script_GetKeywordValue('f', 0))
@@ -102,6 +106,3 @@ s32 PanelSequence_InitializeFromScript(struct PanelSequence *s)
     gUnk_020001C8 = s;
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", PanelSequence_InitializeFromScript);
-#endif

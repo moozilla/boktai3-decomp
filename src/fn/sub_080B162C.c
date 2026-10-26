@@ -1,10 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 
-#ifdef NONMATCHING
-// fuzzy: 97.2%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
 void SceneActor_SelectDistantRoutePoint(void *, void *, void *, u32);
 u8 Vorn_SelectUphillTurn(void *, void *);
 static inline u32 MotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
@@ -31,7 +26,6 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
     return 0;
 }
 // confidence=low: periodically probes uphill destinations and queues a delayed route action.
-// Remaining differences: flag pointer lifetimes, mask scheduling, and reset offsets.
 static inline void Chase_SetState_1(struct SceneActorRegistryResetView *actor, u32 s, u32 p)
 {
     actor->state2A8 = s;
@@ -41,9 +35,9 @@ static inline void Chase_SetState_1(struct SceneActorRegistryResetView *actor, u
     actor->field2B1 = 1;
 }
 
-static inline u8 Chase_Test_(s16 value, u32 mask)
+static inline u8 Chase_Test_(const u16 *value, u32 mask)
 {
-    if (value & mask)
+    if (*value & mask)
         return 1;
     return 0;
 }
@@ -52,6 +46,13 @@ inline static u32 Chase_Bits32_1(struct SceneActorRegistryResetView *actor_, u32
 {
     u32 *field = &actor_->flags2CC;
     return (*field) & mask;
+}
+
+static inline u32 Vorn_GetRandomBits(u32 mask)
+{
+    u32 index = (gUnk_03005308 + 1) & 1023;
+    gUnk_03005308 = index;
+    return ((const u16 *)0x0203B400)[index] & mask;
 }
 
 void Vorn_TryUphillRoute(struct SceneActorRegistryResetView *actor)
@@ -75,9 +76,9 @@ void Vorn_TryUphillRoute(struct SceneActorRegistryResetView *actor)
         return;
     }
     *((u16 *)(context + 0x6BC)) = *((u16 *)(context + 0x6BE));
-    if (((s32)Chase_RandomBits(255)) <= 189)
+    if (((s32)Vorn_GetRandomBits(255)) <= 189)
         return;
-    if (Chase_Test_(*flags, 0x1D))
+    if (Chase_Test_(flags, 0x1D))
         return;
     point = (void *)(context + 0x6B0);
     SceneActor_SelectDistantRoutePoint(context, point, &actor->position, 0x400000);
@@ -91,7 +92,7 @@ void Vorn_TryUphillRoute(struct SceneActorRegistryResetView *actor)
     Chase_SetState_1(actor, 3, 1);
     Chase_SetCtl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     {
-        u32 duration = (((u16)Chase_RandomBits(0xFFFF)) & 15) + 30;
+        u32 duration = (((u16)Vorn_GetRandomBits(0xFFFF)) & 15) + 30;
         struct SceneActorReactionCommand *command = (void *)(group + 0x8C);
         void *payload = actor->entryTarget228;
         u32 kind = 19;
@@ -102,12 +103,7 @@ void Vorn_TryUphillRoute(struct SceneActorRegistryResetView *actor)
         command->kind = kind;
     }
     {
-        register u32 mask asm("r0") = 8;
-        asm("" : "+r"(mask));
+        u16 mask = 8;
         *flags = mask | (*flags);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Vorn_TryUphillRoute);
-#endif

@@ -10,8 +10,11 @@ struct ObjBlockH {
     u16 h0;
 };
 
-#ifdef NONMATCHING
-// fuzzy: 99.8%
+struct SceneObjectState {
+    u8 prefix[0x82];
+    u16 timer;
+};
+
 // confidence=low: places a raisable scene object (blocks/gates with 10 facings) on its terrain cell.
 void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
 {
@@ -119,13 +122,12 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             *(u16 *)((u8 *)obj + 0x72) = t;
         }
     } else if (obj->variant == 1) {
-        u16 *p = (u16 *)((u8 *)obj + 0x82);
-        u8 z8 = 0;
-        *p = 0;
-        obj->variant = z8;
+        struct SceneObjectState *p = (void *)obj;
+        p->timer = 0;
+        obj->variant = 0;
         obj->callback = SceneObject_UpdateRaised;
-        obj->b39 = z8;
-        obj->b3a = z8;
+        obj->b39 = 0;
+        obj->b3a = 0;
         obj->block->w6 &= 0xfffc;
         obj->block->w6 |= 2;
         ((struct ObjBlockH *)obj->block)->h0 |= 1;
@@ -143,6 +145,3 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
     *(u32 *)((u8 *)obj + 0x64) = 0;
     SceneParticleBurst_EnsureSingleton(0, 0);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0801F058);
-#endif

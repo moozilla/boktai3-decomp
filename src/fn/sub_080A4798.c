@@ -18,14 +18,12 @@ static inline s32 Dot(struct ContactPosition *a, struct ContactPosition *b)
     return a->x * b->x + a->z * b->z;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 95.7%
 // scope shape 6 (differences once low registers are set aside)
 // confidence=low: aims a route cursor at the first waypoint that lies ahead of the target, else picks a random one
 void sub_080A4798(struct SceneActorRegistryResetView *actor)
 {
-    struct RouteCursor *route = (struct RouteCursor *)(((u8 *)actor) + 0x448);
     u8 *group = (u8 *)(&actor->group);
+    struct RouteCursor *route = (struct RouteCursor *)(group + 0x74);
     u8 selected = 0;
     struct ChaseTarget *t;
     struct ContactPosition dir;
@@ -63,6 +61,3 @@ void sub_080A4798(struct SceneActorRegistryResetView *actor)
         route->entry = entry;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080A4798);
-#endif

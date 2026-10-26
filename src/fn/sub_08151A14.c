@@ -1,8 +1,6 @@
 #include "global.h"
 #include "player.h"
 
-#ifdef NONMATCHING
-// fuzzy: 84.2%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: tentative cue role inferred from named callers and callback behavior.
@@ -24,11 +22,6 @@ static inline u32 Arg1(u32 k_, s32 green)
     return (green << 5) | k_;
 }
 
-static inline u32 Arg2(u32 k_, struct Player *p)
-{
-    return p->facing - k_;
-}
-
 void PlayerCue_UpdateTurningPalette(struct Player *p)
 {
     s32 a;
@@ -38,14 +31,12 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
     switch (p->tetherPhase) {
         case 0:
             if (p->tetherFrame > 1) {
-                s32 dir;
                 if (p->targetFacing < p->facing)
-                    dir = Arg2(1, p);
+                    p->facing = (p->facing - 1) & 7;
                 else
-                    dir = p->facing + 1;
+                    p->facing = (p->facing + 1) & 7;
                 {
-                    typeof(p->facing) *q1 = &p->facing;
-                    *q1 = dir & 7;
+
                     Player_UpdateFacingSide(p);
                     p->heading--;
                     p->tetherFrame = 0;
@@ -114,37 +105,35 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
             break;
     }
 
-    if ((*(((u8 *)p) + 0x5A0)) <= 7) {
-        a = *(((u8 *)p) + 0x5A0);
+    if ((p->unk59F[1]) <= 7) {
+        a = p->unk59F[1];
         b = 8 - a;
     } else {
-        a = 16 - (*(((u8 *)p) + 0x5A0));
-        b = (*(((u8 *)p) + 0x5A0)) - 8;
+        a = 16 - (p->unk59F[1]);
+        b = (p->unk59F[1]) - 8;
     }
     red = ((30 * a) + (19 * b)) >> 3;
     green = ((13 * a) + (12 * b)) >> 3;
-    *((u16 *)(((u8 *)p) + 0x36A)) = Arg1(0x2C00, green) | red;
+    green = Arg1(0x2C00, green) | red;
+    p->visualParameterA = green;
     red = ((31 * a) + (25 * b)) >> 3;
     green = ((18 * a) + (12 * b)) >> 3;
-    *((u16 *)(((u8 *)p) + 0x36C)) = ((green << 5) | 0x2C00) | red;
+    green = Arg1(0x2C00, green) | red;
+    p->visualParameterB = green;
     red = (31 * (a + b)) >> 3;
     green = ((22 * a) + (13 * b)) >> 3;
-    *((u16 *)(((u8 *)p) + 0x37A)) = ((green << 5) | 0x2C00) | red;
-    if ((++(*(((u8 *)p) + 0x5A0))) > 15)
-        *(((u8 *)p) + 0x5A0) = 0;
+    green = Arg1(0x2C00, green) | red;
+    p->visualParameterC = green;
+    if ((++(p->unk59F[1])) > 15)
+        p->unk59F[1] = 0;
     if ((*((s16 *)(gUnk_02000710 + 0x5A8))) != 2) {
         gUnk_02000518 = 0;
         gUnk_02000528 = 0;
     }
     if (gUnk_02000528) {
-        u16 n = gUnk_02000518;
-        if (n)
-            gUnk_02000518 = n - 1;
+        if (gUnk_02000518)
+            gUnk_02000518--;
         else
-            gUnk_02000528 = n;
+            gUnk_02000528 = 0;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateTurningPalette);
-#endif

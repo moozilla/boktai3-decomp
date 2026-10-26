@@ -15,13 +15,10 @@ struct AxePaletteContext {
 extern u16 *gUnk_030042E4;
 s32 Div(s32, s32);
 
-#ifdef NONMATCHING
-// fuzzy: 92.5%
-// scope shape 14 (differences once low registers are set aside)
 // confidence=low: fades a palette bank toward another, filling per-channel deltas over duration frames
-void sub_080FB620(struct AxePaletteContext *context, s32 destinationBank, s32 sourceBank,
-                  s32 duration)
+void sub_080FB620(void *object, s32 destinationBank, s32 sourceBank, s32 duration)
 {
+    struct AxePaletteContext *context = object;
     struct AxePaletteTransition *transition = &context->transition;
     u16 **bankPointer = &gUnk_030042E4;
     s32 destinationOffset = destinationBank * 32;
@@ -29,11 +26,9 @@ void sub_080FB620(struct AxePaletteContext *context, s32 destinationBank, s32 so
     const u16 *source = &palettes[sourceBank * 16];
     const u16 *destination;
     s32 i;
-    s32 count;
     transition->destinationBank = destinationBank;
     destination = (void *)((u8 *)palettes + destinationOffset);
     i = 0;
-    count = 15;
     do {
         s32 color;
         s32 red, green, blue;
@@ -52,13 +47,10 @@ void sub_080FB620(struct AxePaletteContext *context, s32 destinationBank, s32 so
         transition->blue[i] = blue << 8;
         destination++;
         i++;
-    } while (--count >= 0);
+    } while (i < 16);
     transition->remaining = duration;
     {
         u32 mask = 2;
         context->flags = mask | context->flags;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080FB620);
-#endif

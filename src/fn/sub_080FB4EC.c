@@ -27,8 +27,6 @@ struct S080FB4EC_Actor {
 };
 void AnimData_SelectPaletteBank(void *, u32 animation);
 
-#ifdef NONMATCHING
-// fuzzy: 99.4%
 // scope shape 2 (differences once low registers are set aside)
 // confidence=low: steps the Axe palette-fade state machine in the context and selects a palette bank when one is queued.
 void sub_080FB4EC(struct S080FB4EC_Actor *a)
@@ -45,7 +43,10 @@ void sub_080FB4EC(struct S080FB4EC_Actor *a)
         ctx->unkED0 = 0;
     }
     if (ctx->unkED1) {
-        AnimData_SelectPaletteBank(a->drawable->unk0 + 0x2C, a->unk1E0 + a->unk1E6);
+        void *drawable = a->drawable->unk0 + 0x2C;
+        u16 *palette = &a->unk1E0;
+        u16 *offset = &a->unk1E6;
+        AnimData_SelectPaletteBank(drawable, *palette + *offset);
         ctx->unkED1 = 0;
         return;
     }
@@ -78,6 +79,3 @@ void sub_080FB4EC(struct S080FB4EC_Actor *a)
         ctx->unkECE = 0;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080FB4EC);
-#endif
