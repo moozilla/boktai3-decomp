@@ -54,6 +54,7 @@ Everything is kept in build/scope/FUNC/ for follow-up queries:
   u.s         agbcc output with insn uids   u.i.PASS   RTL after each pass
   stderr.txt  the compiler's stderr (knob traces such as CSE_DEBUG go here)
 """
+import collections
 import difflib
 import json
 import os
@@ -1949,6 +1950,150 @@ def reload_records(wd, func):
     return out
 
 
+@by_dumps("names.txt")
+def spill_states(wd, func):
+    """{k: {"uid", "start", "pass", "regs": [spill regs in rotation order], "st": {reg: code}}} from the X
+    line after each R line: the rotation reload choice K scanned (it starts after index START; -1 = a group
+    reload, always from the first) and each spill register's standing at its insn: S shared (pass 0 takes
+    these first), A free, L<n> pseudo N lives there, H a hard register lives there, T another reload of
+    the insn has it, C not in the class, M wrong mode."""
+    func = dump_func(wd, func)
+    path = os.path.join(wd, "names.txt")
+    out = {}
+    for ln in open(path) if os.path.exists(path) else []:
+        p = ln.split()
+        if p[0] == "X" and len(p) > 5 and p[1] == func:
+            regs, st = [], {}
+            for f in p[6:]:
+                r, c = f.split(":")
+                regs.append(int(r))
+                st[int(r)] = c
+            out[int(p[2])] = {"uid": int(p[3]), "start": int(p[4][6:]), "pass": int(p[5][5:]), "regs": regs,
+                              "st": st}
+    return out
+
+
+@by_dumps("names.txt")
+def inherit_records(wd, func):
+    """[(uid, pseudo, spill index, from uid, kind)] from AGBCC_DUMPPRI's I lines: reloads that reused a
+    register still holding the value from an earlier insn's reload (inherit), or read it from there
+    (override). Neither makes a reload choice, so neither advances the spill rotation."""
+    func = dump_func(wd, func)
+    path = os.path.join(wd, "names.txt")
+    out = []
+    for ln in open(path) if os.path.exists(path) else []:
+        p = ln.split()
+        if p[0] == "I" and len(p) > 6 and p[1] == func:
+            out.append((int(p[2]), int(p[3]), int(p[4]), int(p[5]), p[6]))
+    return out
+
+
+SPILL_WORDS = {"S": "shared (another reload of this insn uses it; pass 0 takes these first)", "A": "free",
+               "H": "holds a hard-register value live here (an argument or return value)",
+               "T": "taken by another reload of this insn", "C": "not in the reload's class",
+               "M": "cannot hold the reload's mode"}
+
+
+def spill_pick(x, start):
+    """The register allocate_reload_reg takes for X's reload when the rotation starts after index START."""
+    regs, n = x["regs"], len(x["regs"])
+    order = [(start + 1 + j) % n for j in range(n)] if start >= 0 else range(n)
+    for ok in ("S", "SA"):
+        for j in order:
+            if x["st"][regs[j]] in ok:
+                return regs[j]
+    return None
+
+
+def spill_shifts(x, want):
+    """[D] (1 <= D < n) such that AGBCC_SPILL=K:D makes X's reload take WANT; [] if no rotation can."""
+    n = len(x["regs"])
+    if x["start"] < 0:
+        return []
+    return [d for d in range(1, n) if spill_pick(x, (x["start"] + d) % n) == want]
+
+
+def spill_word(code, nm):
+    if code.startswith("L"):
+        return f"holds pseudo {nm(int(code[1:]))}"
+    return SPILL_WORDS.get(code, code)
+
+
+def explain_spill(wd, func, k, want, got, nm, at, indent="    "):
+    """Why reload choice K took GOT and what gives the ROM's WANT: the spill set as the choice saw it, the
+    concrete AGBCC_SPILL shift (and so which register the previous choice must have taken), or why no
+    rotation reaches WANT here. Returns (shift or None, one-line conclusion, detail lines)."""
+    xs = spill_states(wd, func)
+    x = xs.get(k)
+    if not x:
+        return None, "", []
+    out = []
+    print = out.append  # noqa: A001 (the lines go back to the caller)
+    rel = reload_records(wd, func)
+    regs, n = x["regs"], len(x["regs"])
+    def rn(r):
+        return "r%d" % r
+    print(f"{indent}spill registers at this insn, in rotation order: "
+          + ", ".join(f"{rn(r)} {spill_word(x['st'][r], nm)}" for r in regs))
+    prev = [r for r in rel if r[0] < k][-3:]
+    if x["start"] < 0:
+        print(f"{indent}this is a group reload: it always scans from {rn(regs[0])}, whatever the rotation")
+    else:
+        took = regs[x["start"]]
+        print(f"{indent}the scan starts after {rn(took)}, the register the previous choice took"
+              + (" (" + "; ".join(f"#{q} {rn(g)} for {at(u)}" for q, u, g, _, _ in reversed(prev)) + ")"
+                 if prev else ""))
+    pos = {u: i for i, (u, _, _) in enumerate(insn_list(wd, "greg"))}
+    lo, hi = pos.get(prev[-1][1], -1) if prev else -1, pos.get(x["uid"], 1 << 30)
+    inh = [r for r in inherit_records(wd, func) if lo <= pos.get(r[0], -2) <= hi]
+    if inh:
+        print(f"{indent}inherited since the previous choice (no choice made, the rotation does not move): "
+              + "; ".join(f"{at(u)} reuses {rn(regs[i]) if 0 <= i < n else 'r?'} from {at(f)}"
+                          for u, _, i, f, _ in inh[:4]))
+    if want not in regs:
+        per = collections.Counter(u for _, u, _, _, _ in rel)
+        u, most = per.most_common(1)[0] if per else (None, 0)
+        print(f"{indent}{rn(want)} is not one of this function's spill registers ({', '.join(map(rn, regs))}),"
+              " so no rotation gives it. Reload's spill set is the registers some insn's reloads needed,"
+              f" free low registers first (find_reload_regs); the most any draft insn takes is {most}"
+              + (f" ({at(u)})" if u else "") + f". {rn(want)} in the ROM's set means a ROM insn needed more"
+              " reload registers at once (a reload the draft's C does not make, such as a secondary scratch"
+              " for a constant or an address), or had fewer low registers free (a value living there that"
+              f" the draft keeps elsewhere: `scope.py FILE.c uses {rn(want)}`)")
+        return None, f"; {rn(want)} is not a spill register here", out
+    code = x["st"][want]
+    ds = spill_shifts(x, want)
+    if ds:
+        d = ds[0]
+        need = sorted({regs[(x["start"] + e) % n] for e in ds}, key=regs.index)
+        print(f"{indent}AGBCC_SPILL={k}:{d} gives {rn(want)}: the ROM's previous choice took"
+              f" {' or '.join(map(rn, need))}, not {rn(regs[x['start']])}. Each choice advances the rotation to"
+              " the register it took, so the ROM made a different number of reload choices before this"
+              " (one more or fewer per place, mod "
+              f"{n}), or one of the previous choices took a different register; an inherited reload makes no"
+              " choice")
+        return d, (f"; the ROM's {rn(want)} means its previous choice took {' or '.join(map(rn, need))},"
+                   f" not {rn(regs[x['start']])}"), out
+    if code.startswith("L"):
+        print(f"{indent}no rotation gives {rn(want)}: pseudo {nm(int(code[1:]))} lives in it across this insn. In the"
+              f" ROM that value is elsewhere or dead here: its allocation differs"
+              f" (`scope.py FILE.c life {code[1:]}`)")
+    elif code == "T":
+        o = [f"#{q} for {at(u)}" for q, u, g, _, _ in rel if u == x["uid"] and g == want and q != k]
+        print(f"{indent}no rotation gives {rn(want)}: another reload of this insn has it"
+              + (f" ({', '.join(o)})" if o else "") + ". The ROM gave that reload a different register,"
+              " or made the reloads in another order")
+    elif code == "A" and any(c == "S" for c in x["st"].values()):
+        sh = [rn(r) for r in regs if x["st"][r] == "S"]
+        print(f"{indent}no rotation gives {rn(want)}: pass 0 first takes a register another reload of this"
+              f" insn already uses ({', '.join(sh)}), and only then a free one. In the ROM the insn's other"
+              f" reload did not use {sh[0]}, or used {rn(want)}")
+    else:
+        print(f"{indent}no rotation gives {rn(want)}: it {spill_word(code, nm)}")
+    why = (f"pseudo {nm(int(code[1:]))} lives in {rn(want)} here" if code.startswith("L") else spill_word(code, nm))
+    return None, f"; no rotation gives {rn(want)} ({why[:80]})", out
+
+
 _FAST = {}
 _ROMDEC = {}
 
@@ -2310,6 +2455,16 @@ def count_text(rows):
     return f"{nr} ROM / {nm} draft" + (f" (+{nb} moved branch{'es' if nb > 1 else ''})" if nb else "")
 
 
+def function_lines(text, func):
+    """The 1-based line numbers of FUNC's definition in TEXT (a list of lines), or an empty range."""
+    for i, ln in enumerate(text):
+        if re.match(rf"^\w[^;=(]*\b{re.escape(func)}\s*\(", ln) and not ln.rstrip().endswith(";"):
+            for j in range(i + 1, len(text)):
+                if text[j].startswith("}"):
+                    return range(i + 1, j + 2)
+    return range(0)
+
+
 def rotation_hints(src, wd, func, rel, k, d, regs, order):
     """What lies between reload choice K-1 and K that decides how many choices the ROM made there."""
     prev = next((r for r in rel if r[0] == k - 1), None)
@@ -2326,9 +2481,13 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
     print(f"    between reload {k - 1} (line {prev[3] if prev else '?'}) and {k} (line {cur[3]}): the ROM's"
           f" rotation is {d} step(s) on (list {' '.join('r%d' % r for r in regs)}), so it made more (or"
           f" fewer, mod {len(regs)}) reload choices here. C lines in the span: {', '.join(map(str, cl))}")
-    pins = [i + 1 for i, t in enumerate(text) if re.search(r"register\b[^;]*asm\s*\(", t)]
+    used_lines = set(lines.values())
+    fl = function_lines(text, func)
+    pins = [i + 1 for i, t in enumerate(text) if re.search(r"register\b[^;]*asm\s*\(", t)
+            and (i + 1 in used_lines or i + 1 in fl)]
     if pins:
-        print(f"      register pins in the file (each removes the reload of its value): lines"
+        print(f"      register pins in this function and its inlined helpers (each removes the reload of its"
+              f" value): lines"
               f" {', '.join(map(str, pins))}")
     used = {}
     for u, _, r in insn_list(wd, "lreg"):
@@ -2525,46 +2684,88 @@ def cmd_calls(src, func, env):
 
 def cmd_spill(src, func, env):
     """Is the whole difference reload's spill rotation? Greedily shift the rotation (AGBCC_SPILL) before
-    each reload choice, from the first differing instruction on, keeping shifts that reduce the diff."""
+    each reload choice, from the first differing instruction on, keeping shifts that reduce the diff.
+    Each choice tries only the shifts that give it a different register (its X record says which), and
+    the choices that serve differing insns go first."""
     base, info = score(src, func, env, full=True)
     wd = info["wd"]
     rel = reload_records(wd, info["obj_name"])
+    xs = spill_states(wd, info["obj_name"])
     order = [u for u, _, _ in insn_list(wd, "greg")]
     pos = {u: i for i, u in enumerate(order)}
     rows = json.load(open(os.path.join(wd, "diff.json")))
-    first = min((pos[r["uid"]] for r in rows if r["tag"] != "=" and r["uid"] in pos), default=0)
+    bad = [pos[r["uid"]] for r in rows if r["tag"] != "=" and r["uid"] in pos]
+    first = min(bad, default=0)
     regs = sorted({r[2] for r in rel})
-    print(f"{func}: {base} differing insns; {len(rel)} reload register choices, spill registers seen"
-          f" {', '.join('r%d' % r for r in regs)}")
+    if xs:
+        regs = next(iter(xs.values()))["regs"]
+    print(f"{func}: {count_text(rows)} differ ({base} by spill's count); {len(rel)} reload register choices,"
+          f" spill registers {', '.join('r%d' % r for r in regs)}")
     budget = int(os.environ.get("SCOPE_SPILL_MAX", "42"))
-    spec, best, tried, accepted = [], base, 0, []
-    print(f"  searching up to {budget} compiles (SCOPE_SPILL_MAX=N to change); each reload choice costs 7")
-    for k, uid, reg, line, lab in rel:
+
+    def shifts(k, got):  # [(D, register it gives)], one D per register other than GOT
+        x = xs.get(k)
+        if not x:
+            return [(d, None) for d in range(1, 8)]
+        out, seen = [], {got}
+        for d in range(1, len(x["regs"])) if x["start"] >= 0 else []:
+            g = spill_pick(x, (x["start"] + d) % len(x["regs"]))
+            if g not in seen:
+                seen.add(g)
+                out.append((d, g))
+        return out
+
+    def near(uid):  # the choice serves a differing insn (its own, or one of the few after it)
+        p = pos.get(uid)
+        return p is not None and any(p <= q <= p + 3 for q in bad)
+
+    cands = [r for r in rel if pos.get(r[1], 1 << 30) >= first - 2]
+    cands = [r for r in cands if near(r[1])] + [r for r in cands if not near(r[1])]
+    spec, best, tried, accepted, skipped = [], base, 0, [], []
+    print(f"  searching up to {budget} compiles (SCOPE_SPILL_MAX=N to change); choices next to differing"
+          " insns first, each trying only the shifts that give it another register")
+    for k, uid, reg, line, lab in cands:
         if best == 0:
             break
-        if tried + 7 > budget:
-            print(f"  stopped at the budget ({tried} compiles); later reload choices were not tried")
-            break
-        if pos.get(uid, 1 << 30) < first - 2:
+        opts = shifts(k, reg)
+        if not opts:
+            continue
+        if tried + len(opts) > budget:
+            skipped.append(k)
             continue
         cand = None
-        for d in range(1, 8):
+        for d, g in opts:
             tried += 1
             n, _ = score(src, func, dict(env, AGBCC_SPILL=",".join(spec + [f"{k}:{d}"])))
             if n < best and (cand is None or n < cand[0]):
-                cand = (n, d)
+                cand = (n, d, g)
         if cand:
             best = cand[0]
             spec.append(f"{k}:{cand[1]}")
-            print(f"  reload {k} (insn {uid}, line {line}, {lab}, got r{reg}): shift {cand[1]} -> {best} differ")
+            gives = f" -> r{cand[2]}" if cand[2] is not None else ""
+            print(f"  reload {k} (insn {uid}, line {line}, {lab}, got r{reg}{gives}): shift {cand[1]} ->"
+                  f" {best} differ")
             accepted.append((k, cand[1]))
+    if skipped and best:
+        print(f"  over the budget, not tried: choices {', '.join('#%d' % k for k in sorted(skipped)[:12])}"
+              + (" ..." if len(skipped) > 12 else ""))
     for k, d in accepted:
         rotation_hints(src, wd, info["obj_name"], rel, k, d, regs, order)
+    inh = inherit_records(wd, info["obj_name"])
+    if inh and best:
+        lines = uid_lines(wd)
+        near_inh = [r for r in inh if near(r[0])]
+        if near_inh:
+            print("  inherited reloads next to differing insns (no choice, so they do not move the rotation;"
+                  " the ROM may have reloaded afresh here, or inherited where the draft reloads): "
+                  + "; ".join(f"insn {u} (line {lines.get(u, '?')}) from insn {f}" for u, _, _, f, _ in near_inh[:6]))
     print(f"  {tried} compiles. " + (f"MATCH with AGBCC_SPILL={','.join(spec)}: the C's shape is right; only"
           " reload's round-robin spill choice differs (last_spill_reg, reload1.c). The ROM made a different"
           " number of reload choices, or had a different spill set, before these points."
           if best == 0 else f"best {best} differing with AGBCC_SPILL={','.join(spec) or '(none)'}:"
-          " the rotation is not the whole story."))
+          + (f" {len(skipped)} choice(s) were over the budget: raise SCOPE_SPILL_MAX, or `why` their insns"
+             if skipped else " the rotation is not the whole story (`why UID` on a differing insn says which"
+             " registers its choice could take)")))
     return 0
 
 
@@ -3579,13 +3780,30 @@ def cmd_why(src, func, uid, env, via=None):
         if rec:
             k, u, reg, line, lab = rec
             served = "" if u == uid else f" for {at(u)}"
-            print(f"  reload: {rname(got)} is reload register choice #{k}{served} (value {lab}). Reload hands out"
-                  f" spill registers round-robin (last_spill_reg, reload1.c), so the ROM's {rname(want)} means a"
-                  f" different rotation state here: a different number of earlier reloads or spill set.")
-            print(f"    what-if: AGBCC_SPILL={k}:D shifts the rotation before this choice;"
-                  f" `scope.py FILE.c spill` searches all of them")
+            d, short, detail = explain_spill(wd, info["obj_name"], k, want, got, nm, at)
+            print(f"  reload: {rname(got)} is reload register choice #{k}{served} (value {lab})" + (short or
+                  f". Reload hands out spill registers round-robin (last_spill_reg, reload1.c), so the ROM's"
+                  f" {rname(want)} means a different rotation state here, or a different spill set."))
+            if short:
+                print("    reload hands out spill registers round-robin (last_spill_reg, reload1.c)")
+            for ln in detail:
+                print(ln)
+            if d:
+                print(f"    what-if: AGBCC_SPILL={k}:{d}")
+            elif not spill_states(wd, info["obj_name"]):
+                print(f"    what-if: AGBCC_SPILL={k}:D shifts the rotation before this choice;"
+                      f" `scope.py FILE.c spill` searches all of them")
         else:
-            print(f"  {rname(got)} is not a pseudo before allocation and no reload record names it here")
+            inh = next((r for u in nxt for r in inherit_records(wd, info["obj_name"]) if r[0] == u), None)
+            if inh:
+                u, ps, si, f, kind = inh
+                print(f"  reload: {rname(got)} for {at(u)} is inherited: reload reused the register that still"
+                      f" held {nm(ps)} from the reload at {at(f)}, so no choice was made. The ROM's"
+                      f" {rname(want)} means the ROM reloaded it afresh, or inherited from a reload that"
+                      " took another register; a store, call or other reload between the two insns that"
+                      " clobbers the register stops inheritance")
+            else:
+                print(f"  {rname(got)} is not a pseudo before allocation and no reload record names it here")
     print(f"  raw traces: {os.path.relpath(wd, ROOT)}/stderr.txt")
     return 0
 
