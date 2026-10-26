@@ -1,8 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 85.9%
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining: the 0xFFFFD000 tile attribute mask is copied from the literal pool through a second register in the original.
 s32 Div(s32, s32);
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 extern u16 gUnk_03005178;
@@ -10,8 +6,8 @@ void StatGauge_Draw(s32 style, s32 x, s32 y, s32 current, s32 maximum, s32 attr)
 {
     s32 whole;
     s32 partial;
-    u32 filled;
-    u32 empty;
+    s32 filled;
+    s32 empty;
     u16 *out;
     s32 i;
     if (current == 0) {
@@ -34,25 +30,18 @@ void StatGauge_Draw(s32 style, s32 x, s32 y, s32 current, s32 maximum, s32 attr)
     if (gUnk_03005178 != attr)
         gUnk_03005178 = attr;
     for (i = 0; i < whole; i++) {
-        s32 mask = -12288;
-        *(out++) = filled | mask;
+        *(out++) = filled | 0xd000;
     }
 
     if (partial) {
-        s16 mask = -12288;
         s32 diff = partial;
         diff -= 8;
         diff = filled - diff;
-        *(out++) = diff | mask;
+        *(out++) = diff | 0xd000;
         i++;
     }
     while (i <= 9) {
-        s32 mask = -12288;
-        *(out++) = empty | mask;
+        *(out++) = empty | 0xd000;
         i++;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", StatGauge_Draw);
-#endif
