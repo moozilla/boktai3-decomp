@@ -1,0 +1,24 @@
+#ifndef GUARD_MENU_PARAMETERS_H
+#define GUARD_MENU_PARAMETERS_H
+
+#include "global.h"
+
+/* Keyword letters are the script options; their roles remain provisional. */
+struct OptionMenuCallbackNames {
+    s32 g, o, s, c, r, l, d, f;
+};
+struct OptionMenuParameters {
+    union {
+        struct OptionMenuCallbackNames keyword;
+        u32 entries[8];
+    } callbacks;
+};
+extern struct OptionMenuParameters gOptionMenuParameters;
+
+struct ChoiceMenuParameters {
+    u8 *mBlock, *eBlock;
+    s32 s, r, x, c, n, b, n2, p;
+};
+extern struct ChoiceMenuParameters gChoiceMenuParameters;
+
+#endif

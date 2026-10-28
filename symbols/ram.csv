@@ -139,7 +139,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000278,gSceneNpcBlendPalette,20,object,extern u16 gSceneNpcBlendPalette[16];,include/ram.h,,sixteen-color output palette blended by SceneNpc_BlendPalette
 02000298,gCloudTask,4,object,extern struct CloudTask *gCloudTask;,include/ram.h,low,
 020002A0,gOptionMenuParameters,20,object,extern struct OptionMenuParameters gOptionMenuParameters;,include/menu_parameters.h,low,option-menu callbacks; keyword names retained; indexed and named views share eight words
-020002C0,gUnk_020002C0,28,object,,,,
+020002C0,gChoiceMenuParameters,28,object,extern struct ChoiceMenuParameters gChoiceMenuParameters;,include/menu_parameters.h,low,provisional choice-menu parameters; script keyword fields retained; n2 is also called value
 020002E8,gUnk_020002E8,10,object,,,,
 020002F8,gScreenParams,18,object,extern struct ScreenParams gScreenParams;,include/ram.h,low,
 02000310,gUnk_02000310,14,object,,,,
