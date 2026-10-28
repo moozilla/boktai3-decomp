@@ -25,7 +25,7 @@ void *SingletonSlot7_CreateEffectPool(void);
 void AnimData_SelectPaletteBank(void *, u32);
 s32 sub_081F0678(void);
 void SingletonSlot7_InitDisplaySprites(u8 *) __asm__("SingletonSlot7_InitDisplaySprites");
-extern u32 gUnk_020004B8;
+extern u32 gSceneCamera;
 extern u8 gUnk_03005040[];
 void CpuSet(const void *, void *, u32);
 
@@ -72,7 +72,7 @@ s32 SingletonSlot7_InitFromScript(u8 *p, s32 id)
         shared = Script_GetValue();
         hasShared = 1;
     }
-    if (gUnk_020004B8)
+    if (gSceneCamera)
         *((u16 *)(p + 0x5EE)) = 1;
     else
         *((u16 *)(p + 0x5EE)) = zero;
@@ -152,7 +152,7 @@ s32 SingletonSlot7_InitFromScript(u8 *p, s32 id)
                     *s4 = 1;
                 }
             }
-            if (gUnk_020004B8)
+            if (gSceneCamera)
                 Sound_PlaySong(0x586);
         }
     }

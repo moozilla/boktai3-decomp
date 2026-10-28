@@ -6,7 +6,7 @@
 struct Slot7PackedPosition {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-extern void *gUnk_020004B8;
+extern void *gSceneCamera;
 extern u8 *gUnk_020004F0;
 extern u8 gUnk_03005040[];
 extern const u16 gUnk_0203B400[];
@@ -168,7 +168,7 @@ void SingletonSlot7_UpdatePresentation(u8 *actor)
         if (FIELD(actor, 0x5D0, u16) == 0)
             FIELD(actor, 0x9C, u32) &= ~4;
     }
-    if (gUnk_020004B8) {
+    if (gSceneCamera) {
         Collider_SetFixedPositionWithYOffset(actor + 0x17C, actor + 0x268, 0);
         FIELD(actor, 0x590, u32) = 0;
         FIELD(actor, 0x1BC, u32) &= ~1;

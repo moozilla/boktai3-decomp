@@ -51,7 +51,7 @@ struct Glove {
 extern struct GloveCamera {
     u8 unknown0[0x44];
     s32 x;
-} *gUnk_020004B8;
+} *gSceneCamera;
 extern struct GloveGlobals {
     u8 unknown0[0x24], bank;
 } *gSceneEventDispatchState;
@@ -108,7 +108,7 @@ s32 Glove_DispatchCommands(struct Glove *p)
     }
     {
         struct GlovePosition *pos = &p->screenPosition;
-        pos->x = (state->x >> 12) - gUnk_020004B8->x;
+        pos->x = (state->x >> 12) - gSceneCamera->x;
         pos->y = ((state->z + (state->y + state->height)) >> 12) + 90;
         pos->z = state->z >> 12;
     }

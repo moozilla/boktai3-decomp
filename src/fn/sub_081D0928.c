@@ -2,6 +2,7 @@
 #include "global.h"
 #include "render.h"
 #include "engine.h"
+#include "background_controller.h"
 #ifdef NONMATCHING
 // fuzzy: 90.2%
 // fix.py best (sweep after the inlined-insn fix)
@@ -13,7 +14,6 @@ struct Camera {
     u8 pad[0x44];
     s32 x;
 };
-extern struct Camera *gUnk_020004B8;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Actor_UpdateVisibilityAndShadow(u32, u8 *);
@@ -68,7 +68,7 @@ s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
             asm("" : "+r"(addr));
             adj = *((s32 *)addr);
         }
-        dst->x = (pos[0] >> 12) - gUnk_020004B8->x;
+        dst->x = (pos[0] >> 12) - gSceneCamera->x;
         dst->y = ((pos[2] + (pos[1] + adj)) >> 12) + 0x60;
         dst->z = pos[2] >> 12;
         {
@@ -122,7 +122,7 @@ s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
                     struct ContactPosition *pos = &pos_;
                     s32 *pp = (s32 *)(p + 0x300);
                     s32 adj = *((s32 *)(p + 0x328));
-                    pos->x = (pp[0] >> 12) - gUnk_020004B8->x;
+                    pos->x = (pp[0] >> 12) - gSceneCamera->x;
                     pos->y = ((pp[2] + (pp[1] + adj)) >> 12) + 0x60;
                     pos->z = pp[2] >> 12;
                     {

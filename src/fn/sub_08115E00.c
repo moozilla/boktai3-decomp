@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
+#include "background_controller.h"
 // Updates a dropped sprite only when its manager requests an animation tick.
 struct Render {
     u32 flags;
@@ -18,7 +19,6 @@ struct Drop {
     u8 padA2[0xB1 - 0xA2];
     u8 tick;
 };
-extern u8 *gUnk_020004B8;
 void SpatialIndex_SetPosition(void *, s32, s32, s32);
 void SpatialIndex_InsertEntry(void *);
 u8 SpriteDrop_IsNearPlayer(void *);
@@ -33,7 +33,7 @@ void SpriteDrop_UpdateEntry(struct Drop *p)
     u32 duration, flags, bit;
     struct Render *render;
     if (p->tick) {
-        p->screenY = p->y - *(s32 *)(gUnk_020004B8 + 0x48);
+        p->screenY = p->y - *(s32 *)(((u8 *)gSceneCamera) + 0x48);
         p->screenZ = p->z;
         p->render.flags &= ~1;
         {
@@ -152,7 +152,7 @@ void SpriteDrop_UpdateEntry(struct Drop *p)
 
         p->tick = 0;
     }
-    p->screenX = p->x - *(s32 *)(gUnk_020004B8 + 0x44);
+    p->screenX = p->x - *(s32 *)(((u8 *)gSceneCamera) + 0x44);
     if (SpriteDrop_IsNearPlayer(p))
         SpatialIndex_InsertEntry((u8 *)p + 0x5C);
 }

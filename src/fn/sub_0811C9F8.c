@@ -36,7 +36,7 @@ struct Camera {
     s32 x;
 };
 
-extern struct Camera *gUnk_020004B8;
+extern struct Camera *gSceneCamera;
 
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
@@ -104,7 +104,7 @@ void ActorSprite_InitPartDrawings(struct Actor *actor, struct Owner *owner, u32 
         Anim_SetKeyframes(d, res, animId, 1, 0);
         Anim_Step(d, res);
         pos = &posv;
-        pos->x = (actor->x >> 12) - gUnk_020004B8->x;
+        pos->x = (actor->x >> 12) - gSceneCamera->x;
         pos->y = ((actor->z + (actor->y + actor->height)) >> 12) + 0x5A;
         pos->z = z = actor->z >> 12;
         pos->x += dx;

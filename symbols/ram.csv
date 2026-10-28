@@ -178,7 +178,7 @@ addr,name,size,kind,decl,header,confidence,notes
 020004AC,gSceneActorRegistryNode,4,object,extern struct SceneActorRegistryNode *gSceneActorRegistryNode;,include/scene_actor_registry.h,low,
 020004B0,gSlotMonitor,4,object,extern u32 gSlotMonitor;,include/ram.h,low,
 020004B4,gUnk_020004B4,4,object,,,,
-020004B8,gUnk_020004B8,4,object,,,,
+020004B8,gSceneCamera,4,object,extern struct Camera *gSceneCamera;,include/background_controller.h,low,scene camera object
 020004BC,gPanelSpritePool,4,object,extern u8 *gPanelSpritePool;,include/ram.h,low,
 020004C0,gSpriteSlots,4,object,extern u32 gSpriteSlots;,include/ram.h,low,
 020004C4,gDebrisPool,4,object,extern struct DebrisPool *gDebrisPool;,include/ram.h,low,

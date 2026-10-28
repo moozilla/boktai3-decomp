@@ -64,7 +64,7 @@ struct Obj {
 extern struct Camera {
     u8 pad[0x44];
     s32 x;
-} *gUnk_020004B8;
+} *gSceneCamera;
 extern struct Globals {
     u8 pad[36], bank;
 } *gSceneEventDispatchState;
@@ -113,7 +113,7 @@ int SceneActor_DispatchCommands(struct Obj *p)
     }
     {
         struct Vec3s *v = &p->pos;
-        v->x = (self->x >> 12) - gUnk_020004B8->x;
+        v->x = (self->x >> 12) - gSceneCamera->x;
         v->y = ((self->z + (self->y + self->h)) >> 12) + 90;
         v->z = self->z >> 12;
     }

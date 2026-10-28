@@ -1,5 +1,5 @@
-#define gTrailCamera gUnk_020004B8
 #include "global.h"
+#include "background_controller.h"
 struct SpriteTrail {
     u8 entered, state;
     u8 pad2[2];
@@ -11,7 +11,6 @@ struct SpriteTrail {
     u8 pad88[0x40];
     u32 spriteFlags;
 };
-extern u8 *gUnk_020004B8;
 void SpriteTrail_UpdatePositions(struct SpriteTrail *);
 s32 SceneTilemap_GetScrollDelta(void);
 void *SingletonSlot7_CreateImpactSprite(void *, s32, s32);
@@ -35,7 +34,7 @@ void SpriteTrail_BeginImpact(void *unused, struct SpriteTrail *p)
     delta = SceneTilemap_GetScrollDelta() >> 12;
     pos = (u8 *)&p->position;
     out = &screen.x;
-    screen.x = (*(s32 *)(pos) >> 12) - *(s32 *)(gUnk_020004B8 + 0x44);
+    screen.x = (*(s32 *)(pos) >> 12) - *(s32 *)(((u8 *)gSceneCamera) + 0x44);
     y = *(s32 *)(pos + 4);
     z = *(s32 *)(pos + 8);
     out[1] = ((z + y) >> 12) + 0x60;

@@ -3,6 +3,7 @@
 #include "actor_attachment_sprite_playback.h"
 #include "engine.h"
 #include "ram.h"
+#include "background_controller.h"
 // confidence=low: follows the sound delay and switches to scatter trail at the height limit.
 struct Vec {
     s32 x, y, z, w;
@@ -31,7 +32,6 @@ struct Emitter {
     u8 owner;
 };
 extern struct Source *gUnk_020004F0[];
-extern struct Camera *gUnk_020004B8;
 s32 Div(s32, s32);
 u8 HeightProbe_IsBelowLimit(void *);
 void ParticleEmitter_UpdateScatterTrail(struct Emitter *);
@@ -107,7 +107,7 @@ void ParticleEmitter_UpdateFlight(struct Emitter *p)
         struct Vec *pos = &p->position;
         struct ContactPosition *dst = &p->sprite.position;
         u32 yOff = p->yOffset;
-        dst->x = (pos->x >> 12) - gUnk_020004B8->x;
+        dst->x = (pos->x >> 12) - gSceneCamera->x;
         dst->y = ((s32)(pos->z + (pos->y + yOff)) >> 12) + 0x60;
         dst->z = pos->z >> 12;
     }
