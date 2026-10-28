@@ -40,6 +40,7 @@ from romlib import ROOT  # noqa: E402
 CSV = os.path.join(ROOT, "symbols", "ram.csv")
 COLS = ["addr", "name", "size", "kind", "decl", "header", "confidence", "notes"]
 RAM = [(0x02000000, 0x02040000), (0x03000000, 0x03008000)]
+PROTECTED = {"src/iwram_code.c"}    # unify leaves these files alone (their declarations still count)
 
 
 def is_ram(v):
@@ -553,6 +554,10 @@ def cmd_unify(a):
             end = h.rindex("#endif")
             h = h[:end].rstrip("\n") + "\n" + line + "\n\n" + h[end:]
             new[a.header] = h
+    for p in PROTECTED:     # never edited: its declarations count as leftovers
+        if p in texts:
+            new[p] = texts[p]
+            blocked.discard(p)
     changed = [p for p in new if new[p] != texts.get(p)]
     # A file needs compiling when its text changed or it includes a changed
     # header. Extern lines appended to the target header cannot change code

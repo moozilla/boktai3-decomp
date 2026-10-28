@@ -76,7 +76,7 @@ struct IwObj {
 
 extern u32 gRenderListIndex;
 extern struct IwObj *gUnk_030042C8[];
-extern u16 gCameraOrigin[];
+extern u16 gUnk_03005418[];
 void sub_08000430(struct IwObj *, s32, s32, s32);
 
 static inline s32 IwProjectScale(s32 value)
@@ -95,9 +95,9 @@ static inline void IwProject(struct IwVec *screen, struct IwVec *world)
     scaledSum = IwProjectScale(3 * (x + z));
     sum = scaledSum;
     vertical = IwProjectScale(3 * world->y);
-    screen->x = (u16)screen->x - gCameraOrigin[0] + 120;
-    screen->y = sum - vertical - gCameraOrigin[1] + 80;
-    screen->z = sum + vertical - gCameraOrigin[2];
+    screen->x = (u16)screen->x - gUnk_03005418[0] + 120;
+    screen->y = sum - vertical - gUnk_03005418[1] + 80;
+    screen->z = sum + vertical - gUnk_03005418[2];
 }
 
 struct IwSpr {
