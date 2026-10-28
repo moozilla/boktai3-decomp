@@ -43,3 +43,5 @@ address declarations: their default builds match and their draft mismatches
 are unchanged. Before/after assembly agrees in both modes for all 265 units
 reached by the original declarations and headers. A protected-file exclusion
 and field-remapping support in ramlayout would make this migration faster.
+
+- **03000000 `gIwramCode` (unified):** Startup instruction buffer, unsized because its copied extent comes from ROM symbol subtraction; ramlayout proves unchanged startup code. New-header probe requires a precreated header skeleton.
