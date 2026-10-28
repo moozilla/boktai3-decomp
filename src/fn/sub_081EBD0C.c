@@ -51,7 +51,7 @@ struct Obj53F8 {
     u8 pad0[0x10];
     s32 x10;
 };
-extern struct Obj53F8 *gUnk_030053F8;
+extern struct Obj53F8 *gSessionState;
 s32 ScreenParams3F8_SelectValidDataBank(struct SpDisplay *);
 void Bg_ClearTilemap(s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
@@ -87,7 +87,7 @@ s32 sub_081EBD0C(struct SpDisplay *p)
             p->x24 = 4;
         else
             p->x24 = 3;
-    } else if (gUnk_030053F8->x10 == 0x369F)
+    } else if (gSessionState->x10 == 0x369F)
         p->x24 = 3;
     else
         p->x24 = 2;

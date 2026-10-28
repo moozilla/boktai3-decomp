@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "runtime.h"
 struct Menu {
     u8 pad0[0x24];
     u32 timer;
@@ -15,7 +16,6 @@ struct Save {
     u8 pad0[12];
     int score;
 };
-extern struct Save *gUnk_030053F8;
 int Save_WriteHeader(void);
 void TextWindow_Refresh(int, int);
 void Sound_PlaySong(int);
@@ -27,7 +27,7 @@ void WirelessTradeMenu_UpdateSaveResult(struct Menu *p)
         int score;
         int delta;
         p->entered = 0;
-        save = &gUnk_030053F8;
+        save = &gSessionState;
         score = (*save)->score;
         delta = p->delta;
         score += delta;

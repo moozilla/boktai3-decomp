@@ -43,7 +43,7 @@ struct TimeState {
     u8 pad0[0x18];
     u32 region;
 };
-extern struct TimeState *gUnk_030053F8;
+extern struct TimeState *gSessionState;
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
@@ -68,7 +68,7 @@ u32 Time_LoadRegionList(struct RegionMenu *menu)
     if (gRegionMenuParameters.flag == 1)
         menu->selected = 6;
     else
-        menu->selected = gUnk_030053F8->region;
+        menu->selected = gSessionState->region;
     if (menu->selected == 0)
         menu->selected = 1;
     menu->fadeSpeed = zero = 0;

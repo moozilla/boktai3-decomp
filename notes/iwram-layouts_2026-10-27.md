@@ -169,3 +169,8 @@ and field-remapping support in ramlayout would make this migration faster.
 - **030053E4 `gRuntimeFrameCounter` (unified):** Incremented on every scene lifecycle task update; ramlayout before/after checks passed.
 - **030053E8 `gSceneTransitionFlags` (unified):** Pending scene transition flags, including active-region backup/restore bits; ramlayout before/after checks passed.
 - **030053EC `gSceneControlWord1` (unified):** Cleared by Engine_ClearControlFlags; finer meaning unresolved; ramlayout before/after checks passed.
+
+- **030053F8 `gSessionState` (unified):** Persistent/session state pointer; byte base preserves existing subsystem-specific pointee views; ramlayout before/after checks passed.
+- **030053FC `gSceneTransitionActive` (unified):** Set during transition cleanup and cleared when the scene starts; ramlayout before/after checks passed.
+- **03005400 `gSceneInitWord1` (unified):** Initialized to zero by the scene lifecycle manager; semantic name provisional; ramlayout before/after checks passed.
+- **03005404 `gSleepResumePending` (unified):** Set after BIOS Stop and consumed by scene runtime refresh; ramlayout before/after checks passed.

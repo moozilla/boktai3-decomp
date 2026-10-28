@@ -1,7 +1,7 @@
 #include "global.h"
+#include "runtime.h"
 #include "ram.h"
 extern u32 *gGameState;
-extern u32 gUnk_03005404;
 u32 Save_AlignSizeToEightBytes(u32);
 u32 Save_GetPrimaryRegionBlock(u32, u32), Save_GetMainStateSize(void);
 s32 Save_ReadBlockWithRetries(u32, void *, u32);
@@ -16,5 +16,5 @@ u32 Save_ReadMainState(u32 arg)
         return 0;
     if (*gGameState != gSaveStateSignature)
         return 0;
-    return gUnk_03005404 = 1;
+    return gSleepResumePending = 1;
 }

@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "runtime.h"
 
 // Tentative result panel and drawable offsets.
 struct Drawing {
@@ -17,7 +18,6 @@ struct P {
     u8 pad25[0x93];
     struct Drawing drawing;
 };
-extern u8 *gUnk_030053F8;
 extern u16 gUnk_0203B400[];
 extern u32 gRandomIndex;
 void Sound_PlayTrackedSong(int);
@@ -44,7 +44,7 @@ void WirelessResultPanel_UpdateOutcomeReveal(struct P *p)
             }
         }
         {
-            u8 **address = &gUnk_030053F8;
+            u8 **address = &gSessionState;
             int maximum;
             asm("" : "+r"(address));
             count = *(u16 *)(*address + 0x14) + 1;
@@ -70,7 +70,7 @@ void WirelessResultPanel_UpdateOutcomeReveal(struct P *p)
                         count = maximum;
                 }
                 {
-                    u8 **address = &gUnk_030053F8;
+                    u8 **address = &gSessionState;
                     *(u16 *)(*address + 0x16) = count;
                 }
             } else if (resultValue == 1) {

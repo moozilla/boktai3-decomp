@@ -443,10 +443,10 @@ addr,name,size,kind,decl,header,confidence,notes
 030053EC,gSceneControlWord1,4,object,extern u32 gSceneControlWord1;,include/runtime.h,,Cleared by Engine_ClearControlFlags; finer meaning unresolved
 030053F0,gScenePauseFlags,4,object,extern u32 gScenePauseFlags;,include/ram.h,low,scene pause/mute flags (bit tests across effects and actors)
 030053F4,gEngineFlags,4,object,extern u32 gEngineFlags;,include/engine.h,low,
-030053F8,gUnk_030053F8,4,object,,,,
-030053FC,gUnk_030053FC,4,object,,,,
-03005400,gUnk_03005400,4,object,,,,
-03005404,gUnk_03005404,4,object,,,,
+030053F8,gSessionState,4,object,extern u8 *gSessionState;,include/runtime.h,,Persistent/session state pointer; byte base preserves existing subsystem-specific pointee views
+030053FC,gSceneTransitionActive,4,object,extern u32 gSceneTransitionActive;,include/runtime.h,,Set during transition cleanup and cleared when the scene starts
+03005400,gSceneInitWord1,4,object,extern u32 gSceneInitWord1;,include/runtime.h,,Initialized to zero by the scene lifecycle manager; semantic name provisional
+03005404,gSleepResumePending,4,object,extern u32 gSleepResumePending;,include/runtime.h,,Set after BIOS Stop and consumed by scene runtime refresh
 03005408,gUnk_03005408,4,object,,,,
 0300540C,gUnk_0300540C,4,object,,,,
 03005410,gUnk_03005410,4,object,,,,

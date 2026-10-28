@@ -1,7 +1,7 @@
 #include "global.h"
 #include "game_state.h"
 #include "ram.h"
-extern u32 gUnk_03005404;
+#include "runtime.h"
 void GameState_BackupRegionRange(void *, u32);
 u32 Save_AlignSizeToEightBytes(u32);
 u32 Save_GetPrimaryRegionBlock(u32, u32);
@@ -27,5 +27,5 @@ u32 Save_WriteMainState(u32 arg)
     result = Save_WriteBlockWithRetries(index, GameState_GetBackupStateBase(), buffer);
     if (result != buffer + 8)
         return 0;
-    return gUnk_03005404 = 1;
+    return gSleepResumePending = 1;
 }

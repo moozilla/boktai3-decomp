@@ -1,6 +1,6 @@
 #include "global.h"
+#include "runtime.h"
 extern u8 gUnk_03005430[];
-extern u32 gUnk_03005404;
 void Clock_UnpackDate(s32 *, s32 *, s32 *, u32);
 u32 Clock_PackDate(s32, s32, s32);
 s32 Clock_DaysInMonth(s32, s32);
@@ -34,7 +34,7 @@ void SunClock_TickFrame(void)
                     p[8] = Clock_CalculateWeekday(year, month, day);
                 }
             }
-            gUnk_03005404 = 1;
+            gSleepResumePending = 1;
             {
                 u8 *other = gUnk_03005430;
                 if (*(u16 *)(other + 12) == *(u16 *)(p + 4)) {

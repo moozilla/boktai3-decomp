@@ -1,8 +1,8 @@
 #include "encoded_record.h"
 #include "engine.h"
+#include "runtime.h"
 /* EncodedRecord_EncodeAlternateFields: Packs game state and name into the alternate record format then applies seeded masking and writes its checksum */
 #define EncodedRecord_EncodeAlternateFields sub_080451BC
-extern u8 *gUnk_030053F8;
 struct EncodedRecordSession {
     u8 unknown0[0x18];
     u32 value;
@@ -27,7 +27,7 @@ void EncodedRecord_EncodeAlternateFields(u8 *record)
     EncodedRecord_WriteBits(record, 0, &bit, 2, 6);
     EncodedRecord_WriteBits(record, 1, &bit, 3, 6);
     EncodedRecord_WriteBits(record, skip, &bit, 3, 6);
-    EncodedRecord_WriteBits(record, ((struct EncodedRecordSession *)gUnk_030053F8)->value, &bit, 6,
+    EncodedRecord_WriteBits(record, ((struct EncodedRecordSession *)gSessionState)->value, &bit, 6,
                             6);
     EncodedRecord_WriteBits(record, gGameState->unk660, &bit, 3, 6);
     EncodedRecord_WriteBits(record, gGameState->unk662, &bit, 4, 6);

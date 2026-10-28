@@ -5,12 +5,12 @@ struct S {
     u8 fa;
     u8 fb;
 };
-extern struct S *gUnk_030053F8;
+extern struct S *gSessionState;
 void GameState_ClearSessionFlags(void)
 {
-    if (gUnk_030053F8) {
-        gUnk_030053F8->f9 = 0;
-        gUnk_030053F8->fb = 0;
-        gUnk_030053F8->fa = 0;
+    if (gSessionState) {
+        gSessionState->f9 = 0;
+        gSessionState->fb = 0;
+        gSessionState->fa = 0;
     }
 }

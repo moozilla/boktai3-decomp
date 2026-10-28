@@ -23,7 +23,7 @@ struct Global {
     u8 pad[12];
     u32 money;
 };
-extern struct Global *gUnk_030053F8;
+extern struct Global *gSessionState;
 int Wireless_IsSessionActive(void);
 void WirelessGameMenu_OnResultPanelClosed(void);
 void sub_0803B700(int, int, void *, void *, u32, u32, void *);
@@ -46,7 +46,7 @@ void WirelessTradeMenu_UpdateResultsPanel(struct P *p)
         left = (u8 *)(offset + (u32)p->left);
         right = (u8 *)(offset + (u32)p->right);
         side = Wireless_IsSessionActive();
-        money = gUnk_030053F8->money;
+        money = gSessionState->money;
         sub_0803B700(side, p->mode, left, right, p->reward, money,
                      WirelessGameMenu_OnResultPanelClosed);
     }

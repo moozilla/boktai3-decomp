@@ -53,7 +53,7 @@ struct Obj53F8 {
     u8 pad0[0x10];
     s32 x10;
 };
-extern struct Obj53F8 *gUnk_030053F8;
+extern struct Obj53F8 *gSessionState;
 s32 ScreenParams3F8_SelectValidDataBank(struct SpDisplay *);
 void Bg_ClearTilemap(s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
@@ -183,7 +183,7 @@ void sub_081EB8E0(struct SpDisplay *p)
                             Sound_PlaySong(0x296);
                             p->x20C = 1;
                             p->x24 = 3;
-                            gUnk_030053F8->x10 = magic;
+                            gSessionState->x10 = magic;
                             Menu_DrawStringRef(5, 10, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 2);
                         }
                     } while (0);

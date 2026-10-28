@@ -1,4 +1,5 @@
 #include "global.h"
+#include "runtime.h"
 struct S {
     u8 pad[0xc];
     u32 fc;
@@ -6,10 +7,9 @@ struct S {
     u16 f14;
     u16 f16;
 };
-extern struct S *gUnk_030053F8;
 void GameState_ResetSessionCounters(void)
 {
-    struct S *p = gUnk_030053F8;
+    struct S *p = gSessionState;
     if (p) {
         p->fc = 0;
         p->f10 = 0;

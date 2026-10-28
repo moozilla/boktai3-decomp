@@ -79,5 +79,12 @@ extern u32 gRuntimeFrameCounter; /* Incremented on every scene lifecycle task up
 extern u32
     gSceneTransitionFlags; /* Pending scene transition flags, including active-region backup/restore bits */
 extern u32 gSceneControlWord1; /* Cleared by Engine_ClearControlFlags; finer meaning unresolved */
+extern u8 *
+    gSessionState; /* Persistent/session state pointer; byte base preserves existing subsystem-specific pointee views */
+extern u32
+    gSceneTransitionActive; /* Set during transition cleanup and cleared when the scene starts */
+extern u32
+    gSceneInitWord1; /* Initialized to zero by the scene lifecycle manager; semantic name provisional */
+extern u32 gSleepResumePending; /* Set after BIOS Stop and consumed by scene runtime refresh */
 
 #endif

@@ -5,12 +5,11 @@ struct Task {
     u8 pad[24];
     s32 state, counter;
 };
-extern u32 gUnk_03005408, gUnk_030054B0, gUnk_030053FC;
+extern u32 gUnk_03005408, gUnk_030054B0;
 extern u32 gUnk_03005414, gUnk_0300540C;
-extern u32 gEngineFlags, gUnk_03005404;
+extern u32 gEngineFlags;
 extern u16 gUnk_03005260;
 extern u8 *gGameState;
-extern u32 *gUnk_030053F8;
 void System_ShutdownAndSoftReset(void);
 void SceneLifecycle_InitSceneState(void);
 void Script_ResetLocalVariables(void);
@@ -63,7 +62,7 @@ update: {
         ran_procedure:;
             *active = state;
             task->state = next;
-            gUnk_030053FC = state;
+            gSceneTransitionActive = state;
             break;
         }
         case 1:
@@ -74,7 +73,7 @@ update: {
                     if (!SceneLifecycle_IsTransitionBlocked()) {
                         gSceneControlWord0 = 0;
                         gUnk_03005414 = 0;
-                        gUnk_030053FC = state;
+                        gSceneTransitionActive = state;
                         {
                             u32 mask = ~14;
                             gEnginePauseFlags = mask & gEnginePauseFlags;
@@ -114,12 +113,12 @@ update: {
             break;
     }
 }
-    if (gUnk_03005404) {
+    if (gSleepResumePending) {
         SunClock_Refresh();
-        gUnk_03005404 = 0;
+        gSleepResumePending = 0;
     }
-    if (*gUnk_030053F8 <= 0xFFFFFFFE)
-        (*gUnk_030053F8)++;
+    if (*((u32 *)gSessionState) <= 0xFFFFFFFE)
+        (*((u32 *)gSessionState))++;
     gRuntimeFrameCounter++;
     if (gPlayTimeCounterEnabled) {
         s32 *counter = (s32 *)(gGameState + 0x614);
