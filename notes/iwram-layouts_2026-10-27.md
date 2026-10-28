@@ -87,3 +87,5 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03001738 `gRfuApiBuffer` (unified):** RFU API workspace passed to rfu_initializeAPI with size 0xE64; ramlayout before/after checks passed.
 
 - **030025A0 `gSceneLifecycleTask` (struct):** Scene lifecycle task shares the scheduler header and names its two trailing state/counter words. Initializer exact and identical in both modes.
+
+- **030025F8 `gSceneBodyRegistry` (struct):** Shared registry task pointer and pointee layout with first/last list heads at +18/+1C. All six consumers exact and unchanged in both compiler modes.

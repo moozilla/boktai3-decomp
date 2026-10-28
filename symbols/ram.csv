@@ -279,7 +279,7 @@ addr,name,size,kind,decl,header,confidence,notes
 03001738,gRfuApiBuffer,,object,extern u8 gRfuApiBuffer[];,include/serial.h,,RFU API workspace passed to rfu_initializeAPI with size 0xE64
 030025A0,gSceneLifecycleTask,20,object,extern struct SceneRuntimeTask gSceneLifecycleTask;,include/runtime.h,high callback identity,Static scene lifecycle task; common scheduler header followed by state and counter words
 030025E8,gCommandSet,E,object,extern struct CommandSet gCommandSet;,include/ram.h,low,
-030025F8,gUnk_030025F8,4,object,,,,
+030025F8,gSceneBodyRegistry,4,object,extern struct SceneBodyRegistry *gSceneBodyRegistry;,include/scene_body_registry.h,high field offsets and subsystem,Scene body registry task pointer; linked-list first/last pointers at +18/+1C
 030025FC,gUnk_030025FC,4,object,,,,
 03002600,gRegionList,4,object,extern struct RegionList *gRegionList;,include/ram.h,low,
 03002604,gSolarController,4,object,extern u8 *gSolarController;,include/ram.h,low,solar sensor controller (Solar_*)

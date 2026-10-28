@@ -1,6 +1,6 @@
 #include "global.h"
-extern u32 gUnk_030025F8;
+#include "scene_body_registry.h"
 void SceneBody_DestroyRegistryTask(void)
 {
-    gUnk_030025F8 = 0;
+    gSceneBodyRegistry = 0;
 }
