@@ -27,4 +27,10 @@ struct MessageMenuParameters {
 };
 extern struct MessageMenuParameters gMessageMenuParameters;
 
+struct RegionMenuParameters {
+    u8 *nBlock;
+    u32 table, confirmProc, cancelProc, flag;
+};
+extern struct RegionMenuParameters gRegionMenuParameters;
+
 #endif

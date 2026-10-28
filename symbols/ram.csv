@@ -142,7 +142,7 @@ addr,name,size,kind,decl,header,confidence,notes
 020002C0,gChoiceMenuParameters,28,object,extern struct ChoiceMenuParameters gChoiceMenuParameters;,include/menu_parameters.h,low,provisional choice-menu parameters; script keyword fields retained; n2 is also called value
 020002E8,gMessageMenuParameters,10,object,extern struct MessageMenuParameters gMessageMenuParameters;,include/menu_parameters.h,low,provisional message-menu parameters; script keyword fields retained
 020002F8,gScreenParams,18,object,extern struct ScreenParams gScreenParams;,include/ram.h,low,
-02000310,gUnk_02000310,14,object,,,,
+02000310,gRegionMenuParameters,14,object,extern struct RegionMenuParameters gRegionMenuParameters;,include/menu_parameters.h,low,"region-menu script block, table and callbacks; merges keyword and consumer names"
 02000328,gNamePlaceholderScript,18,object,extern u32 gNamePlaceholderScript[];,include/ram.h,low,
 02000340,gUnk_02000340,14,object,,,,
 02000358,gUnk_02000358,1C,object,,,,
