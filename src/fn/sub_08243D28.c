@@ -1,18 +1,16 @@
 #include "global.h"
 #include "runtime.h"
-extern u32 gUnk_03006A4C, gUnk_03006A3C, gUnk_03006A38;
-extern s32 gUnk_03006A48;
 void Solar_OnTimerInterrupt(void)
 {
     u32 pins = *(vu16 *)0x080000C4;
     u32 shadow = gSolarGpioShadow;
     u32 light;
     *(vu16 *)0x080000C4 = shadow;
-    *(vu16 *)0x0400010C = -gUnk_03006A4C;
+    *(vu16 *)0x0400010C = -gSolarTimerPeriod;
     light = 8;
     light &= pins;
-    gUnk_03006A3C = light;
-    if (gUnk_03006A38) {
+    gSolarLightBit = light;
+    if (gSolarMeasuring) {
         switch (gSolarMeasurementPhase) {
             case 0:
                 if (gSolarInterruptCounter <= 9)
@@ -28,7 +26,7 @@ void Solar_OnTimerInterrupt(void)
                 break;
             case 1:
                 if (light != 0) {
-                    gUnk_03006A48 = gSolarInterruptCounter >> 1;
+                    gSolarMeasurement = gSolarInterruptCounter >> 1;
                     gSolarMeasurementPhase = 2;
                 }
                 gSolarLastInput = light;

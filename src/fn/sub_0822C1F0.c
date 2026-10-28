@@ -1,4 +1,5 @@
 #include "global.h"
+#include "runtime.h"
 struct S {
     u8 p[0x19];
     u8 b;
@@ -6,7 +7,6 @@ struct S {
     u16 h;
 };
 extern struct S *gSolarController;
-extern u16 gUnk_030054BC;
 void Solar_StartMeasurement(void);
 void Solar_ResumeMeasurement(void)
 {
@@ -17,6 +17,6 @@ void Solar_ResumeMeasurement(void)
             gSolarController->h = 0;
             Solar_StartMeasurement();
         }
-        gUnk_030054BC = 0;
+        gSolarPaused = 0;
     }
 }

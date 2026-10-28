@@ -1,8 +1,8 @@
 #include "global.h"
 #include "engine.h"
+#include "runtime.h"
 extern u8 *gUnk_020004B4;
 extern u16 gUnk_03005260[];
-extern u16 gUnk_030054B8;
 
 u16 sub_0822C8D8(u8 *p)
 {
@@ -19,12 +19,12 @@ u16 sub_0822C8D8(u8 *p)
         keys = gUnk_03005260;
     if (keys[0] & 1) {
         if (keys[0] & 0x200) {
-            if (!(++*(u16 *)(p + 0x22) & 1) && gUnk_030054B8 < 0x8c)
-                gUnk_030054B8++;
+            if (!(++*(u16 *)(p + 0x22) & 1) && gSolarSimulatedIntensity < 0x8c)
+                gSolarSimulatedIntensity++;
         } else if (keys[0] & 0x100) {
-            if (!(++*(u16 *)(p + 0x22) & 1) && gUnk_030054B8 != 0)
-                gUnk_030054B8--;
+            if (!(++*(u16 *)(p + 0x22) & 1) && gSolarSimulatedIntensity != 0)
+                gSolarSimulatedIntensity--;
         }
     }
-    return gUnk_030054B8;
+    return gSolarSimulatedIntensity;
 }

@@ -137,5 +137,41 @@ extern u32 gSceneControlWord2; /* Cleared by Engine_ClearControlFlags; finer mea
 /* 0x03005414 */
 extern u32
     gSceneControlWord3; /* Cleared during transitions and by Engine_ClearControlFlags; finer meaning unresolved */
+/* 0x030054B4 */
+extern u16
+    gSolarControlFlag; /* solar control flag set by sub_0822C180 and cleared by sub_0822C18C; purpose tentative */
+/* 0x030054B8 */
+extern u16
+    gSolarSimulatedIntensity; /* simulated solar intensity ramping 0..140 (0x8C), returned by sub_0822C8D8 */
+/* 0x030054BC */
+extern u16
+    gSolarPaused; /* solar task paused flag: set by Solar_PauseMeasurement, cleared by Solar_ResumeMeasurement */
+/* 0x030054C0 */
+extern u16
+    gSolarSavedLevel; /* copy of the current solar level (game state +0x874), restored by sub_0822CA5C */
+/* 0x030054C4 */
+extern u16
+    gSolarSavedCachedLevel; /* copy of the cached solar level (game state +0x876), restored by sub_0822CA5C */
+/* 0x03006A30 */
+extern u32
+    gSolarSensorParam0; /* solar sensor timer parameter, set to 255 by Solar_InitTimer (meaning tentative) */
+/* 0x03006A34 */
+extern u32
+    gSolarGpioSaved; /* cartridge GPIO data read by Solar_InitTimer; cleared by Solar_Enable */
+/* 0x03006A38 */
+extern u32
+    gSolarMeasuring; /* solar measurement active flag (Solar_StartMeasurement sets, Solar_InitTimer clears) */
+/* 0x03006A3C */
+extern u32 gSolarLightBit; /* light-detect bit (GPIO bit 3) sampled by Solar_OnTimerInterrupt */
+/* 0x03006A40 */
+extern u32
+    gSolarSensorParam1; /* solar sensor parameter, set to 1 by Solar_InitTimer (meaning tentative) */
+/* 0x03006A44 */
+extern u32
+    gSolarSensorParam2; /* solar sensor parameter, set to 4 by Solar_InitTimer (meaning tentative) */
+/* 0x03006A48 */
+extern s32 gSolarMeasurement; /* measured solar value (counter >> 1), -1 while none */
+/* 0x03006A4C */
+extern u32 gSolarTimerPeriod; /* timer 3 period in cycles (0x3128); reload is its negation */
 
 #endif

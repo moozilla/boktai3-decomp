@@ -459,24 +459,24 @@ addr,name,size,kind,decl,header,confidence,notes
 0300546C,gUnk_0300546C,4,object,,,,
 03005470,gMusicSlotSongs,3E,object,extern u16 gMusicSlotSongs[];,include/ram.h,low,
 030054B0,gUnk_030054B0,4,object,,,,
-030054B4,gUnk_030054B4,2,object,,,,
-030054B8,gUnk_030054B8,2,object,,,,
-030054BC,gUnk_030054BC,2,object,,,,
-030054C0,gUnk_030054C0,2,object,,,,
-030054C4,gUnk_030054C4,2,object,,,,
+030054B4,gSolarControlFlag,2,object,extern u16 gSolarControlFlag;,include/runtime.h,low,solar control flag set by sub_0822C180 and cleared by sub_0822C18C; purpose tentative
+030054B8,gSolarSimulatedIntensity,2,object,extern u16 gSolarSimulatedIntensity;,include/runtime.h,low,"simulated solar intensity ramping 0..140 (0x8C), returned by sub_0822C8D8"
+030054BC,gSolarPaused,2,object,extern u16 gSolarPaused;,include/runtime.h,low,"solar task paused flag: set by Solar_PauseMeasurement, cleared by Solar_ResumeMeasurement"
+030054C0,gSolarSavedLevel,2,object,extern u16 gSolarSavedLevel;,include/runtime.h,low,"copy of the current solar level (game state +0x874), restored by sub_0822CA5C"
+030054C4,gSolarSavedCachedLevel,2,object,extern u16 gSolarSavedCachedLevel;,include/runtime.h,low,"copy of the cached solar level (game state +0x876), restored by sub_0822CA5C"
 030054D0,gSnapshot,C,object,extern struct Snapshot gSnapshot;,include/ram.h,low,
 030054E0,gSoundInfo,FB0,object,,,,
 03006490,gMPlayJumpTable,90,object,,,,
 03006520,gCgbChans,40,object,,,,
 030069E0,gMPlayMemAccArea,,object,,,,
-03006A30,gUnk_03006A30,4,object,,,,
-03006A34,gUnk_03006A34,4,object,,,,
-03006A38,gUnk_03006A38,4,object,,,,
-03006A3C,gUnk_03006A3C,4,object,,,,
-03006A40,gUnk_03006A40,4,object,,,,
-03006A44,gUnk_03006A44,4,object,,,,
-03006A48,gUnk_03006A48,4,object,,,,
-03006A4C,gUnk_03006A4C,4,object,,,,
+03006A30,gSolarSensorParam0,4,object,extern u32 gSolarSensorParam0;,include/runtime.h,low,"solar sensor timer parameter, set to 255 by Solar_InitTimer (meaning tentative)"
+03006A34,gSolarGpioSaved,4,object,extern u32 gSolarGpioSaved;,include/runtime.h,low,cartridge GPIO data read by Solar_InitTimer; cleared by Solar_Enable
+03006A38,gSolarMeasuring,4,object,extern u32 gSolarMeasuring;,include/runtime.h,low,"solar measurement active flag (Solar_StartMeasurement sets, Solar_InitTimer clears)"
+03006A3C,gSolarLightBit,4,object,extern u32 gSolarLightBit;,include/runtime.h,low,light-detect bit (GPIO bit 3) sampled by Solar_OnTimerInterrupt
+03006A40,gSolarSensorParam1,4,object,extern u32 gSolarSensorParam1;,include/runtime.h,low,"solar sensor parameter, set to 1 by Solar_InitTimer (meaning tentative)"
+03006A44,gSolarSensorParam2,4,object,extern u32 gSolarSensorParam2;,include/runtime.h,low,"solar sensor parameter, set to 4 by Solar_InitTimer (meaning tentative)"
+03006A48,gSolarMeasurement,4,object,extern s32 gSolarMeasurement;,include/runtime.h,low,"measured solar value (counter >> 1), -1 while none"
+03006A4C,gSolarTimerPeriod,4,object,extern u32 gSolarTimerPeriod;,include/runtime.h,low,timer 3 period in cycles (0x3128); reload is its negation
 03006A50,gUnk_03006A50,4,object,,,,
 03006A60,gUnk_03006A60,24,object,,,,
 03006A70,gUnk_03006A70,,interior,,,,gUnk_03006A60 +0x10

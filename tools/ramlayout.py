@@ -638,6 +638,8 @@ def cmd_unify(a):
             r["size"] = f"{size:X}"
         if note:
             r["notes"] = note
+        if a.confidence:
+            r["confidence"] = a.confidence
     save(rows)
     if fallback:
         print(f"  {len(fallback)} files could not include {a.header} and keep their declarations: "
@@ -839,6 +841,7 @@ def main():
                         "(goes in the header; identical copies in files that include it are removed)")
     s.add_argument("--header", required=True)
     s.add_argument("--note", default="")
+    s.add_argument("--confidence", default="low", help="confidence column for these rows (default low; '' keeps it)")
     s.add_argument("--dry-run", action="store_true")
     s.add_argument("--jobs", type=int, default=os.cpu_count())
     a = ap.parse_args()
