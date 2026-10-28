@@ -69,5 +69,15 @@ extern u16
 extern u32
     gLcgState; /* Independent 32-bit linear-congruential state, initialized to 123456 and advanced by Random_Next15 */
 extern s32 gResourceRegistryCount; /* High-water count of resource-registry entries, capped at 32 */
+extern u32
+    gPlayTimeCounterEnabled; /* Enables the persistent play-time counter at game-state +0x614 */
+extern u32
+    gSceneControlWord0; /* Cleared by scene transitions and Engine_ClearControlFlags; finer meaning unresolved */
+extern u32
+    gSceneInitWord0; /* Initialized to zero by the scene lifecycle manager; semantic name provisional */
+extern u32 gRuntimeFrameCounter; /* Incremented on every scene lifecycle task update */
+extern u32
+    gSceneTransitionFlags; /* Pending scene transition flags, including active-region backup/restore bits */
+extern u32 gSceneControlWord1; /* Cleared by Engine_ClearControlFlags; finer meaning unresolved */
 
 #endif

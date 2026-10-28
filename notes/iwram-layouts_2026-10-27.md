@@ -162,3 +162,10 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03005380 `gSerialPacketReadIndex` (unified):** Current read index in the four-entry multiplayer packet ring; ramlayout before/after checks passed.
 
 - **03005390 `gRfuLinkManager` (struct):** All 32 consumers share the SDK-named manager prefix, byte/halfword event union at +14, VBlank timers and configuration/callback tail through +44. Every unit matches; both compiler modes preserve instructions. One raw byte-array read required the named parentAck_flag member to retain a base-plus-3 load rather than an interior literal.
+
+- **030053D8 `gPlayTimeCounterEnabled` (unified):** Enables the persistent play-time counter at game-state +0x614; ramlayout before/after checks passed.
+- **030053DC `gSceneControlWord0` (unified):** Cleared by scene transitions and Engine_ClearControlFlags; finer meaning unresolved; ramlayout before/after checks passed.
+- **030053E0 `gSceneInitWord0` (unified):** Initialized to zero by the scene lifecycle manager; semantic name provisional; ramlayout before/after checks passed.
+- **030053E4 `gRuntimeFrameCounter` (unified):** Incremented on every scene lifecycle task update; ramlayout before/after checks passed.
+- **030053E8 `gSceneTransitionFlags` (unified):** Pending scene transition flags, including active-region backup/restore bits; ramlayout before/after checks passed.
+- **030053EC `gSceneControlWord1` (unified):** Cleared by Engine_ClearControlFlags; finer meaning unresolved; ramlayout before/after checks passed.

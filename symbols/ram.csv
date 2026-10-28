@@ -435,12 +435,12 @@ addr,name,size,kind,decl,header,confidence,notes
 03005370,gSerialReceivePackets,10,object,extern s16 gSerialReceivePackets[];,include/ram.h,low,
 03005380,gSerialPacketReadIndex,2,object,extern u16 gSerialPacketReadIndex;,include/serial.h,,Current read index in the four-entry multiplayer packet ring
 03005390,gRfuLinkManager,48,object,extern struct RfuLinkManager gRfuLinkManager;,include/rfu_manager.h,high merged layout and SDK correspondence,"RFU link manager: named SDK prefix, byte/halfword event parameter union at +14, two VBlank timers, configuration/callback tail through +44"
-030053D8,gUnk_030053D8,4,object,,,,
-030053DC,gUnk_030053DC,4,object,,,,
-030053E0,gUnk_030053E0,4,object,,,,
-030053E4,gUnk_030053E4,4,object,,,,
-030053E8,gUnk_030053E8,4,object,,,,
-030053EC,gUnk_030053EC,4,object,,,,
+030053D8,gPlayTimeCounterEnabled,4,object,extern u32 gPlayTimeCounterEnabled;,include/runtime.h,,Enables the persistent play-time counter at game-state +0x614
+030053DC,gSceneControlWord0,4,object,extern u32 gSceneControlWord0;,include/runtime.h,,Cleared by scene transitions and Engine_ClearControlFlags; finer meaning unresolved
+030053E0,gSceneInitWord0,4,object,extern u32 gSceneInitWord0;,include/runtime.h,,Initialized to zero by the scene lifecycle manager; semantic name provisional
+030053E4,gRuntimeFrameCounter,4,object,extern u32 gRuntimeFrameCounter;,include/runtime.h,,Incremented on every scene lifecycle task update
+030053E8,gSceneTransitionFlags,4,object,extern u32 gSceneTransitionFlags;,include/runtime.h,,"Pending scene transition flags, including active-region backup/restore bits"
+030053EC,gSceneControlWord1,4,object,extern u32 gSceneControlWord1;,include/runtime.h,,Cleared by Engine_ClearControlFlags; finer meaning unresolved
 030053F0,gScenePauseFlags,4,object,extern u32 gScenePauseFlags;,include/ram.h,low,scene pause/mute flags (bit tests across effects and actors)
 030053F4,gEngineFlags,4,object,extern u32 gEngineFlags;,include/engine.h,low,
 030053F8,gUnk_030053F8,4,object,,,,

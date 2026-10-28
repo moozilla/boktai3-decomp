@@ -5,9 +5,9 @@ struct Task {
     u8 pad[24];
     s32 state, counter;
 };
-extern u32 gUnk_03005408, gUnk_030054B0, gUnk_030053E8, gUnk_030053FC;
-extern u32 gUnk_030053DC, gUnk_03005414, gUnk_0300540C;
-extern u32 gEngineFlags, gUnk_03005404, gUnk_030053E4, gUnk_030053D8;
+extern u32 gUnk_03005408, gUnk_030054B0, gUnk_030053FC;
+extern u32 gUnk_03005414, gUnk_0300540C;
+extern u32 gEngineFlags, gUnk_03005404;
 extern u16 gUnk_03005260;
 extern u8 *gGameState;
 extern u32 *gUnk_030053F8;
@@ -48,7 +48,7 @@ update: {
             active = &gSceneEntryActive;
             next = 1;
             *active = next;
-            gUnk_030053E8 = state;
+            gSceneTransitionFlags = state;
             task->counter = state;
             SceneLifecycle_InitSceneState();
             Script_ResetLocalVariables();
@@ -68,11 +68,11 @@ update: {
         }
         case 1:
             if (task->counter <= 0) {
-                if (gUnk_030053E8) {
+                if (gSceneTransitionFlags) {
                     if (gEnginePauseFlags & 2)
                         break;
                     if (!SceneLifecycle_IsTransitionBlocked()) {
-                        gUnk_030053DC = 0;
+                        gSceneControlWord0 = 0;
                         gUnk_03005414 = 0;
                         gUnk_030053FC = state;
                         {
@@ -104,9 +104,9 @@ update: {
                 if (gEnginePauseFlags & 8)
                     gEnginePauseFlags &= ~8;
             }
-            if (gUnk_030053E8 & 0x10)
+            if (gSceneTransitionFlags & 0x10)
                 GameState_BackupActiveRegions();
-            else if (gUnk_030053E8 & 0x100) {
+            else if (gSceneTransitionFlags & 0x100) {
                 GameState_RestoreActiveRegions();
                 Script_SetEntryProcedure(*(s16 *)(gGameState + 0x5A4));
             }
@@ -120,8 +120,8 @@ update: {
     }
     if (*gUnk_030053F8 <= 0xFFFFFFFE)
         (*gUnk_030053F8)++;
-    gUnk_030053E4++;
-    if (gUnk_030053D8) {
+    gRuntimeFrameCounter++;
+    if (gPlayTimeCounterEnabled) {
         s32 *counter = (s32 *)(gGameState + 0x614);
         if (*counter <= 0x7FFFFFFE)
             (*counter)++;

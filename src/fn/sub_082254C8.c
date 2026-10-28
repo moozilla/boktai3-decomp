@@ -1,6 +1,5 @@
 #include "global.h"
 #include "runtime.h"
-extern u32 gUnk_030053E8;
 void SceneLifecycle_InitSceneState(void);
 void Script_ResetLocalVariables(void);
 s32 Script_Call(u32, void *);
@@ -9,7 +8,7 @@ void Script_RunMainBlock(void);
 bool32 sub_082254C8(u8 *scene)
 {
     u32 id;
-    gUnk_030053E8 = 0;
+    gSceneTransitionFlags = 0;
     *(u32 *)(scene + 0x1c) = 0;
     SceneLifecycle_InitSceneState();
     Script_ResetLocalVariables();
