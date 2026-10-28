@@ -7,7 +7,6 @@
 // fuzzy: 76.9%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining: packed velocity temporaries, loop and pointer/register lifetimes.
-extern struct SceneParticlePool *gUnk_02000134;
 struct SceneParticleSlot *SceneParticle_AllocateSlot(struct SceneParticlePool *);
 s32 Mod(s32, s32);
 void ParticleSprite_Initialize(void *, const void *, u32);
@@ -28,7 +27,7 @@ s32 SceneParticle_CreateAnchoredRanges(const struct ContactPosition *position,
     const u16 *table;
     if (!position)
         return -1;
-    pool = gUnk_02000134;
+    pool = gSceneParticleEmitterPool;
     if (!pool)
         return -1;
     i = 0;

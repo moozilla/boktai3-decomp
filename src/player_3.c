@@ -659,7 +659,6 @@ s32 SceneActor_SelectEffectDisplayMode(struct Player *p, s32 mode)
 
 void Player_EmitQueuedEffects(struct Player *);
 s32 Mod(s32, s32);
-extern u16 gUnk_02000504;
 static inline int Player_NextStatusRandom(void)
 {
     u32 offset;
@@ -702,7 +701,7 @@ void sub_0813D834(struct Player *p, s32 inputKind, u32 inputDuration)
                 u32 current = *(u16 *)((u8 *)timers + scaled);
                 offset = scaled;
                 if (!current) {
-                    u16 *target = &gUnk_02000504;
+                    u16 *target = &gPlayerSavedMenuOption;
                     s32 random = Mod(Player_NextStatusRandom(), 7);
                     s32 selection = (s8)p->catalogSavedOption + 1;
                     selection += random;
@@ -1006,8 +1005,6 @@ void Player_InitDirectionalEffectPair(void *);
 void Player_InitOrbitingEffect(void *);
 void ConvergingEffects_InitSprites(void *);
 void DirectionalSpriteEffect_InitSprite(void *);
-extern u16 gUnk_02000550, gUnk_0200053C, gUnk_0200052C;
-extern u16 gUnk_02000590;
 
 static inline u8 PlayerEffects_IsSceneModeFive(struct Player *p)
 {
@@ -1058,11 +1055,11 @@ void Player_InitEffects(struct Player *p)
     p->movementRequestTarget.x = 0;
     p->movementRequestTarget.y = 0;
     p->movementRequestTarget.z = 0;
-    gUnk_02000550 = 0;
-    gUnk_0200053C = 0;
-    gUnk_0200052C = 1;
+    gPlayerBackgroundState = 0;
+    gPlayerBackgroundMode = 0;
+    gPlayerDirectionLatch = 1;
     gForceDirectionMode = 1;
-    gUnk_02000590 = 0;
+    gPlayerEffectPendingCount = 0;
     p->movementAnimationState = 255;
 }
 
@@ -2349,14 +2346,12 @@ void Player_SetActionRequest(struct Player *p, s32 kind)
     }
 }
 
-extern s16 gUnk_02000554;
-
 s32 Player_GetSelectedAbility(struct Player *p)
 {
     if (p->actionMode != 6)
         /* Add the slot index before the field offset to retain the original address lifetime. */
         return *(s16 *)((u8 *)gGameState + gGameState->selected * 2 + 0x88);
-    gUnk_02000554 = 0;
+    gPlayerAbilityLatched = 0;
     if (gGameState->abilityVariant == 0)
         return 4;
     return 5;
@@ -2379,7 +2374,7 @@ void Player_InitActionRequest(struct Player *p)
     } else {
         request->duration = ActorParameter_GetModeValue(request->kind);
         request->enabled = Player_IsEnchantmentAvailable(p, request->kind);
-        request->latched = gUnk_02000554;
+        request->latched = gPlayerAbilityLatched;
         if (!request->enabled)
             request->latched = 0;
     }

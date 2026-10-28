@@ -9,8 +9,7 @@
 #include "scene_actor_reset.h"
 #include "engine.h"
 #include "player.h"
-extern s32 gUnk_02000478;
-extern u16 gUnk_02000534, gUnk_02000500;
+#include "ram.h"
 void ActorShadow_Disable(void *);
 void Ghost_TickVisibilityTransition(void *);
 void ActorTick_DecrementCounterAA(void *);
@@ -86,7 +85,7 @@ static inline u8 PlayerMode(void)
 static inline u8 GlobalMode(void)
 {
     u32 result = 0;
-    if (gUnk_02000534 && gUnk_02000500 == 4)
+    if (gPlayerPassageState && gPlayerInteractionMode == 4)
         result = 1;
     return result;
 }
@@ -144,7 +143,7 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
             if (gEngineFlags & 0x800)
                 mode = PlayerMode();
             else {
-                if (gUnk_02000478 > 0)
+                if (gWeatherCollisionTimer > 0)
                     goto hide;
                 if ((*(u8 **)gPlayers) && PlayerFlag_1((*(u8 **)gPlayers)))
                     goto hide;

@@ -466,6 +466,13 @@ def cmd_unify(a):
         for n in names_of(r):
             if n != name:
                 renames[n] = name
+    # files that kept a placeholder name for an earlier row of the header get it renamed too
+    earlier = set()
+    for r in rows:
+        if r["header"] == a.header and r["decl"] and r["name"] != placeholder(r["addr"]) \
+                and placeholder(r["addr"]) not in renames:
+            renames[placeholder(r["addr"])] = r["name"]
+            earlier.add(r["name"])
     pat = re.compile(r"\b(" + "|".join(renames) + r")\b") if renames else None
     # `#define NAME gUnk_X` was a file's own name for the object: now redundant
     alias = re.compile(r"^[ \t]*#[ \t]*define[ \t]+(\w+)[ \t]+(\w+)[ \t]*(?://[^\n]*|/\*.*?\*/)?[ \t]*\n", re.M)
@@ -485,7 +492,7 @@ def cmd_unify(a):
                 if m.group(1) in set(renames.values()) and renames.get(m.group(2)) != m.group(1):
                     new[p] = re.sub(rf"\b{m.group(1)}\b", m.group(2), new[p].replace(m.group(0), "", 1))
                     aliased.add((p, "inlined:" + m.group(1)))
-    taken = {n: p for p, t in new.items() for n in set(renames.values())
+    taken = {n: p for p, t in new.items() for n in set(renames.values()) - earlier
              if (p, n) not in aliased and re.search(rf"\b{n}\b", t)}
     taken = {n: p for n, p in taken.items() if n not in {r["name"] for r, _, _ in jobs}}
     # a name the target header already declares as this very object is not taken

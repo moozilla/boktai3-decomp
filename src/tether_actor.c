@@ -1,5 +1,6 @@
 #include "tether_actor.h"
 #include "engine.h"
+#include "ram.h"
 
 #define TetherActor_GetStatusTag sub_08049F54
 
@@ -1210,15 +1211,13 @@ void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
 
 // fix.py best (sweep after the inlined-insn fix)
 
-extern u16 gUnk_02000550, gUnk_0200052C, gUnk_0200053C;
-
 static inline void slopePush(struct TetherActor *actor, s32 octant)
 {
     s32 angle = (octant + 1) << 5;
     s32 cosine = gUnk_086149C4[(angle + 64) & 255];
     s32 sine = gUnk_086149C4[angle & 255];
-    actor->movementDelta.x -= scaleOffset(gUnk_02000550 * cosine);
-    actor->movementDelta.z -= scaleOffset(gUnk_02000550 * sine);
+    actor->movementDelta.x -= scaleOffset(gPlayerBackgroundState * cosine);
+    actor->movementDelta.z -= scaleOffset(gPlayerBackgroundState * sine);
 }
 
 static inline u32 NeighborHeight(s32 cell)
@@ -1237,23 +1236,24 @@ inline static void slopePush_AdjustSlopeMovement(struct TetherActor *actor, s32 
     cosine = table[(angle + 64) & 255];
     sine = table[angle & 255];
     do {
-        actor->movementDelta.x -= scaleOffset(gUnk_02000550 * cosine);
+        actor->movementDelta.x -= scaleOffset(gPlayerBackgroundState * cosine);
     } while (0);
-    actor->movementDelta.z -= scaleOffset(gUnk_02000550 * sine);
+    actor->movementDelta.z -= scaleOffset(gPlayerBackgroundState * sine);
 }
 
 void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
 {
     s32 neighbor;
     s32 octant;
-    if (((actor->kind != 9) || (actor->state == 11)) || (gUnk_02000550 < gUnk_0200052C))
+    if (((actor->kind != 9) || (actor->state == 11)) ||
+        (gPlayerBackgroundState < gPlayerDirectionLatch))
         return;
     if (!actor->movementProbe) {
         void *probe = &actor->movementProbeStorage;
         CellObject_Init(probe, &actor->position);
         actor->movementProbe = probe;
     }
-    octant = ((gUnk_0200053C + 112) & 255) >> 5;
+    octant = ((gPlayerBackgroundMode + 112) & 255) >> 5;
     neighbor = 0;
     if (octant & 1) {
         if (octant == 1)

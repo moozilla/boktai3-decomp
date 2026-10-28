@@ -9,6 +9,7 @@
 #include "display_animation.h"
 #include "actor_attachment_sprite_playback.h"
 #include "player.h"
+#include "ram.h"
 struct NamedObjectSprite {
     u32 flags;
     u8 pad4[3];
@@ -55,7 +56,6 @@ struct NamedObjectManager {
     u32 field1370;
     u32 field1374;
 };
-extern struct NamedObjectManager *gUnk_020001AC;
 struct NamedObject *NamedObject_AllocateSlot(struct NamedObjectManager *);
 void Path_GetPointPositionById(void *, u32, u32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
@@ -90,11 +90,11 @@ static inline void readOptional(u32 *dst)
         *dst = 0;
 }
 /* Registry routine A4FC: creates a named scene object (-n) of kind -k (0-3)
-   in the gUnk_020001AC object pool, with heights -Y, sprite rows -T and
+   in the gNamedActorManager object pool, with heights -Y, sprite rows -T and
    optional terrain registration (-f). */
 void NamedObject_CreateFromScript(void)
 {
-    struct NamedObjectManager *manager = gUnk_020001AC;
+    struct NamedObjectManager *manager = gNamedActorManager;
     struct NamedObject *e;
     struct NamedObjectSprite *sprite;
     u32 sequence;

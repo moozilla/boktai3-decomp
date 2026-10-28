@@ -293,12 +293,10 @@ void SceneActorGraphics_OscillateScale(Actor *p)
     }
 }
 
-extern u16 gUnk_02000590;
-
 s32 SceneActorGraphics_GetEffectState(struct StateActor *p)
 {
     s32 r;
-    if (gUnk_02000590 != 0) {
+    if (gPlayerEffectPendingCount != 0) {
         r = 4;
     } else if (AreaEffect_IsPositionCovered(&p->target) == 0) {
         r = 0;

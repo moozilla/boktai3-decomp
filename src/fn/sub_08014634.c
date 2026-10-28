@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 // confidence=low: fills the first inactive group with randomized bouncing particles.
 #define ParticleGroup_SpawnBouncing sub_08014634
 struct Vec {
@@ -48,7 +49,6 @@ static inline int CellIndex(struct Vec *p)
         return 0xffff;
     return gTerrainMap->rows[z] + x;
 }
-extern struct Manager *gUnk_02000060;
 struct Manager *ParticleManager_Create(void *, u32);
 s32 Mod(s32, s32);
 void sub_08217E40(void *, s32);
@@ -71,7 +71,7 @@ static inline void ClearFlag(volatile u32 *p, u32 mask)
 s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position, struct Vec *velocity,
                                 struct Vec *spread, s32 lifetime, s32 lifetimeMask)
 {
-    struct Manager *m = gUnk_02000060;
+    struct Manager *m = gParticleGroupManager;
     u8 *resource;
     struct Group *g;
     struct Group *pool;

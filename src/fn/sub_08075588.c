@@ -19,9 +19,6 @@ void SceneActorBehavior_UpdateColliders(void *);
 void SceneActorReaction_SinkAndRemove(void);
 extern u32 gLinkSession;
 extern u32 gPlayers[];
-extern u32 gUnk_02000478;
-extern u32 gUnk_02000534;
-extern u32 gUnk_02000500;
 s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);
 
@@ -170,12 +167,12 @@ after_timers:
         } else {
             cond = 0;
         }
-    } else if (gUnk_02000478 > 0) {
+    } else if ((*(u32 *)&gWeatherCollisionTimer) > 0) {
         cond = 1;
     } else if (gPlayers[r2] != 0 && (*(u32 *)(gPlayers[r2] + 0x448) & 0x10) != 0) {
         cond = 1;
     } else {
-        cond = (gUnk_02000534 != 0 && gUnk_02000500 == 4);
+        cond = ((*(u32 *)&gPlayerPassageState) != 0 && (*(u32 *)&gPlayerInteractionMode) == 4);
     }
     if (cond) {
         if ((*flags & 0x20000) == 0) {

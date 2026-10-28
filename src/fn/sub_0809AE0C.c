@@ -1,11 +1,11 @@
 #include "scene_actor_reset.h"
 #include "player.h"
+#include "ram.h"
 
 void SceneActorControl_OnIdle(void);
 void Player_IncrementActionSpeedBonus(struct Player *player, u32 value);
 void Player_QueueStatusEffect(struct Player *player, s32 effect);
 void Sound_PlaySong(u32 song);
-extern u16 gUnk_02000534, gUnk_02000500;
 extern struct Player *gUnknown_02000580;
 
 struct sub0809AE0C_Context {
@@ -65,7 +65,7 @@ void sub_0809AE0C(void *unused, struct ContactCollider *other,
     }
     distance = actor->position.y - gUnknown_02000580->position.y;
     {
-        s32 fast = gUnk_02000534 != 0 && gUnk_02000500 == 5;
+        s32 fast = gPlayerPassageState != 0 && gPlayerInteractionMode == 5;
         if (fast || gUnknown_02000580->actionMode == 4) {
             limit = 0x3C;
         } else {

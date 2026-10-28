@@ -6,9 +6,6 @@
 
 extern u8 *gGameState;
 extern u32 gLinkSession;
-extern s32 gUnk_02000478;
-extern u16 gUnk_02000534;
-extern u16 gUnk_02000500;
 extern u8 *gUnknown_02000580[];
 
 #define A_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
@@ -326,7 +323,7 @@ s32 sub_08078EE8(struct SceneActorRegistryActor *arg0_)
         }
     } else {
         u8 *o;
-        if (gUnk_02000478 > 0) {
+        if (gWeatherCollisionTimer > 0) {
             res = 1;
         } else {
             o = gUnknown_02000580[res];
@@ -334,7 +331,7 @@ s32 sub_08078EE8(struct SceneActorRegistryActor *arg0_)
                 res = 1;
             } else {
                 res = 0;
-                if (gUnk_02000534 != 0 && gUnk_02000500 == 4)
+                if (gPlayerPassageState != 0 && gPlayerInteractionMode == 4)
                     res = 1;
             }
         }
