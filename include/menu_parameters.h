@@ -52,4 +52,10 @@ struct ScriptMessageParameters {
 };
 extern struct ScriptMessageParameters gScriptMessageParameters;
 
+struct ListMenuParameters {
+    u8 *mBlock, *aBlock;
+    s32 l, F, f, c, b;
+};
+extern struct ListMenuParameters gListMenuParameters;
+
 #endif

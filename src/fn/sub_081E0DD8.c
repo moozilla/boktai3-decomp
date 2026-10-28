@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "game_state.h"
+#include "menu_parameters.h"
 
 struct GameStartSeqs {
     u32 seq[3];
@@ -19,7 +20,6 @@ struct GameStartSprite {
 extern const struct GameStartSeqs gUnk_0824FD50;
 extern const u8 gUnk_0824FD5C[];
 extern const u8 gUnk_0824FDBC[];
-extern u32 gUnk_020003A0[];
 
 void *memcpy(void *, const void *, u32);
 void Bg_ClearTilemap(u32);
@@ -136,7 +136,7 @@ void GameStart_DrawSaveInfo(u8 *p)
         Menu_EraseRect(3, 10, 24, 2);
         *zp = 0;
         CpuSet(zp, text, 0x05000008);
-        s = Text_LookupString(Script_ParseStringRef((void *)gUnk_020003A0[1]) +
+        s = Text_LookupString(Script_ParseStringRef((void *)gListMenuParameters.aBlock) +
                               SceneSequence_GetSelectedMessage());
         q = text;
         while (*s)
@@ -179,18 +179,18 @@ void GameStart_DrawSaveInfo(u8 *p)
         Anim_LoadKeyframe(tens, levelRes, (u16)Mod(level, 10), 0);
         *(u32 *)(tens + 8) &= ~1;
         *(u32 *)(tens + 0x68) &= ~1;
-        s = Text_LookupString(Script_ParseStringRef((void *)gUnk_020003A0[0]) + 3);
+        s = Text_LookupString(Script_ParseStringRef((void *)gListMenuParameters.mBlock) + 3);
         Menu_EraseRect(0x15, 7, 3, 2);
         Menu_DrawText(0x15, 7, s);
     } else {
         for (i = 0; i <= 8; i++)
             Bg_SetTilemapEntry(3, i + 8, 6, 1, 0, 2);
         W(0x474) |= 1;
-        s = Text_LookupString(Script_ParseStringRef((void *)gUnk_020003A0[0]) + 2);
+        s = Text_LookupString(Script_ParseStringRef((void *)gListMenuParameters.mBlock) + 2);
         Menu_EraseRect(8, 6, 0x12, 2);
         Menu_DrawText(8, 6, s);
     }
-    s = Text_LookupString(Script_ParseStringRef((void *)gUnk_020003A0[0]) + 9);
+    s = Text_LookupString(Script_ParseStringRef((void *)gListMenuParameters.mBlock) + 9);
     Menu_EraseRect(3, 0xe, 0x18, 2);
     Menu_DrawText(3, 0xe, s);
 }
