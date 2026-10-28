@@ -58,6 +58,9 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
+* **Second subsystem run with RAM layout workers** (2026-10-27): 29 more matches (to 79.7%) and RAM
+  objects with one shared declaration 29% -> 75%; gpt-6.1-terra tried and dropped for Sol
+  ([notes/subsystem-run_2026-10-27.md](../notes/subsystem-run_2026-10-27.md)).
 * **Subsystem scope run** (2026-10-25/26): 16 Codex gpt-6.1-sol workers, one or two per
   subsystem, matched 65 drafts in 4.5 hours for half the weekly Codex quota (77.0% -> 78.6%;
   [#849](https://github.com/moozilla/boktai3-decomp/pull/849),

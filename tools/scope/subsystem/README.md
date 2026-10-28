@@ -5,7 +5,8 @@ Tags: #process #tooling
 A run gives each game subsystem (report category) a Codex worker in its own worktree. The worker
 goes through the subsystem's NONMATCHING drafts in ROM order with `tools/scope` and commits one
 function per match on its own branch; the coordinator integrates the branches in reviewed batches.
-First used on 2026-10-25 (results: [notes/subsystem-run_2026-10-25.md](../../../notes/subsystem-run_2026-10-25.md)).
+First used on 2026-10-25 (results: [notes/subsystem-run_2026-10-25.md](../../../notes/subsystem-run_2026-10-25.md)),
+again on 2026-10-27 with RAM layout workers ([notes/subsystem-run_2026-10-27.md](../../../notes/subsystem-run_2026-10-27.md)).
 
 ## Running one
 
@@ -16,12 +17,15 @@ sh tools/base.sh                                   # the shared built base new w
 python3 tools/scope/subsystem/queues.py build/subsystem/q --exclude src/iwram_code.c   # one queue per category
 tools/scope/subsystem/launch.sh sc-bosses build/subsystem/q/bosses.json "Bosses"     # one per subsystem
 nohup tools/scope/subsystem/committer.sh > build/subsystem/committer.log 2>&1 &      # makes the commits
-tools/scope/subsystem/watch.sh 50 &                # resume transient failures; stop all at 50% quota left
+DEADLINE=2300 tools/scope/subsystem/watch.sh 2 &  # resume failures and early stops; stop all at 2% left or 23:00
 tools/scope/subsystem/status.sh                    # progress and quota
 tools/scope/subsystem/integrate.sh 2               # cherry-pick new matches onto claude/sc-batch-2
 ```
 
-`--exclude` keeps units another effort owns out of the queues. Every launch needs the user's
+`MODEL=...` before launch.sh picks another Codex model (default gpt-6.1-sol). A layout worker:
+`BRIEF=tools/scope/subsystem/LAYOUT_BRIEF.md launch.sh sc-layout-x build/subsystem/q/layout.json "ASSIGNMENT"`
+with `echo '[]' > layout.json`, and `build/draft_units.txt` (every queued unit, which it must not edit) copied
+into its worktree first. `--exclude` keeps units another effort owns out of the queues. Every launch needs the user's
 authorization and a quota floor (`tools/codex_quota.py`); start with one worker per subsystem,
 measure for 10 minutes, then decide. 16 workers burned about 25 points of the weekly quota per hour.
 
@@ -42,6 +46,8 @@ merge it, and append `build/subsystem/integrated.pending` to `build/subsystem/in
 | `watch.sh FLOOR [N]` | resumes workers that died on capacity/429/5xx errors (up to 5 times); stops all at FLOOR |
 | `resume.sh NAME`, `stopall.sh`, `status.sh` | by hand |
 | `integrate.sh N` | batch branch from the workers' `Match FUNC` commits |
+| `LAYOUT_BRIEF.md` | the RAM layout worker prompt (ramlayout.py unify, shared structs; commits via build/commits/) |
+| `linemerge.py FILE...` | resolves diff3 conflict hunks (`git checkout --conflict=diff3 -- FILE`) by an order-preserving three-way merge: lines, then tokens, then a declarations-only merge; re-check the unit afterwards |
 
 Inside a worktree a worker uses `build/scope/campaign/FUNC/` (start.c, base.c, variants, result.json,
 REPORT.md, best.c) and lands a match with `python3 tools/scope/campaign.py land FUNC .`, which merges
@@ -63,3 +69,19 @@ read them after a run, they are the next tool changes.
 * Transient `Selected model is at capacity` and `429 Too Many Requests` errors end a `codex exec`
   session; `codex exec resume ID` continues it (watch.sh does this).
 * Codex's MCP servers (e.g. a stale cloudflare-api OAuth token) log errors at startup; harmless.
+
+## Lessons from the second run (2026-10-27)
+
+* **gpt-6.1-terra did worse than gpt-6.1-sol** on the same kind of queue (the second ROM half of
+  Monsters and Scene actors): in 50 minutes its two workers finished 2 functions with no match (one
+  near-miss with 27 pins), and one ended its session after one function with "the run is incomplete".
+  They used about as many tokens per session as Sol. Sol's 13 workers finished 21 functions with
+  9 matches in the same time. Terra was replaced by Sol on its queues.
+* Workers can end their turn with work left; watch.sh now resumes them with "the task is the whole
+  queue" when a queue still has functions without a `done` file.
+* 17 Sol workers burned about 40 points of the weekly quota per hour at peak (13 workers: 16 per hour
+  in the first half hour), more than the first run's 16 workers. Measure again after 20 minutes.
+* Two layout workers split by address (IWRAM, EWRAM) still edited the declaration blocks of the
+  same consumer files, and each branch never saw the other's edits; 9 of their commits conflicted at
+  integration. Integrate layout branches early and often, or give the second one the first one's
+  merged state.
