@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
+#include "engine_globals.h"
 
 // Tentative panel/save fields used to choose four distinct available entries.
 struct P {
@@ -17,7 +18,6 @@ struct Save {
     s16 rightRows[16];
 };
 extern struct Save *gGameState;
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void GameState_AddEquipment(int);
 int Mod(int, int);

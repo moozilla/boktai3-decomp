@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "engine_globals.h"
 
 struct PanelWidget {
     u8 f0[8];
@@ -24,7 +25,6 @@ struct SelectionPanel {
     s32 proc1;
     u8 buf[1];
 };
-extern u32 gEngineFlags;
 s32 ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *);
 void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, u32);

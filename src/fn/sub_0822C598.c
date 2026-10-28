@@ -1,4 +1,6 @@
 #include "global.h"
+#include "engine_globals.h"
+#include "input.h"
 /* Solar exposure tick, called from Solar_UpdateMeasurement after each
  * sample: accumulates exposure totals in the game-state block (offsets
  * 0x504, 0x520, 0x528, 0x77C) every 64 frames. Field roles are tentative. */
@@ -12,8 +14,6 @@ struct Obj {
 };
 extern u8 *gGameState;
 extern u8 *gUnk_02000580;
-extern u32 gEngineFlags;
-extern u16 gPadState;
 void Solar_SaveExposureTimestamp(void);
 s32 SolarFruit_GetInventorySlot(s32);
 s32 Div(s32, s32);
@@ -46,7 +46,7 @@ void sub_0822C598(struct Obj *obj)
             Solar_SaveExposureTimestamp();
         }
     } else {
-        if (gPadState)
+        if ((*(u16 *)gPadState))
             obj->idle = 0;
         else if (obj->idle <= 0x383)
             obj->idle++;

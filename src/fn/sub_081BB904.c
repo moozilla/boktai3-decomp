@@ -1,11 +1,11 @@
 #include "global.h"
 #include "solar_bank_panel.h"
+#include "input.h"
 
 struct Keys {
     u16 held;
     u16 pressed;
 };
-extern struct Keys gPadState;
 extern u8 *gGameState;
 
 s32 Anim_LoadKeyframe(void *, void *, u16, u32);
@@ -37,19 +37,19 @@ void SolarBank_UpdateTransferInput(struct SolarBankPanel *panel)
     s32 v;
     u16 t;
 
-    if (gPadState.pressed & 1) {
+    if ((*(struct Keys *)gPadState).pressed & 1) {
         *(u32 *)(gGameState + 0x77C) = BALANCE;
         *(u16 *)(gGameState + 0x7B0) = TRANSFER;
         Sound_PlaySong(0xdd);
         SolarBank_BeginClosing(panel);
         goto step;
     }
-    if (gPadState.pressed & 2) {
+    if ((*(struct Keys *)gPadState).pressed & 2) {
         Sound_PlaySong(0xde);
         SolarBank_BeginSelection(panel);
         goto step;
     }
-    if (gPadState.held & 0x20) {
+    if ((*(struct Keys *)gPadState).held & 0x20) {
         u32 *bal = &BALANCE;
         u32 *xfer;
         u16 *hold;
@@ -106,7 +106,7 @@ void SolarBank_UpdateTransferInput(struct SolarBankPanel *panel)
                 SolarBank_RefreshAmountDigits(panel);
             }
         }
-    } else if ((t = gPadState.held & 0x10) != 0) {
+    } else if ((t = (*(struct Keys *)gPadState).held & 0x10) != 0) {
         register u32 balOffset asm("r1") = 0x6F8;
         u32 *bal;
         u32 *xfer;

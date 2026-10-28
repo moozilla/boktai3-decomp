@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "engine_globals.h"
 
 #ifdef NONMATCHING
 // fuzzy: 90.1%
@@ -111,8 +112,6 @@ struct Map {
     u8 pad8[0x1c];
     u16 rows[1];
 };
-extern struct Map *gTerrainMap;
-extern u32 gTerrainWidth, gTerrainHeight;
 extern u8 *gGameState;
 void *TerrainModifiers_FindCellOverride(s32, s32);
 void Task_Kill(void *);
@@ -128,7 +127,7 @@ static inline s32 cellAt(struct Vec *v)
     s32 x = v->x >> 8, z = v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gTerrainMap->rows[z] + x;
+    return ((struct Map *)gTerrainMap)->rows[z] + x;
 }
 static inline u16 cellFlags(s32 index)
 {
@@ -136,7 +135,7 @@ static inline u16 cellFlags(s32 index)
     if (v)
         v += 4;
     else
-        v = gTerrainMap->cells + (index * 4 + 12);
+        v = ((struct Map *)gTerrainMap)->cells + (index * 4 + 12);
     return *(u16 *)(v + 2);
 }
 struct Anim {

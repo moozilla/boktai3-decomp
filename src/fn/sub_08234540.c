@@ -1,6 +1,6 @@
 #include "global.h"
+#include "engine_globals.h"
 
-extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 u32 AnimData_FindEntry(u32);

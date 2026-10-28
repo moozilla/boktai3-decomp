@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "engine_globals.h"
 
 struct CloneVec {
     s16 x, y, z, unk_06;
@@ -67,7 +68,7 @@ struct PlayerClonePool {
     s16 palette1[16];
     s16 palette2[16];
 };
-extern u32 gEngineFlags, gUnk_02000560;
+extern u32 gUnk_02000560;
 extern const s16 gUnk_086149C4[];
 s32 sub_08249240(void *, s32, void *);
 void PlayerClone_ReleaseSlot(struct PlayerClonePool *, struct PlayerClone *, s32);

@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include "ram.h"
+#include "runtime.h"
 
 /* Sun clock state at gSunClock: a base time, two times A and B, their
  * spans from the base, and the light phase/level derived from them. */
@@ -25,7 +26,6 @@ struct SunClock {
 };
 /* 0x03005430 */
 extern struct SunClock gSunClock;
-extern u8 *gSessionState;
 u32 SunClock_GetBaseHour(void);
 u32 SunClock_GetBaseMinute(void);
 s32 Div(s32, s32);

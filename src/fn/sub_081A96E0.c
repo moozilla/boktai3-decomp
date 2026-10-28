@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "engine_globals.h"
 struct Pair {
     u8 pad0[0x205];
     u8 first;
@@ -38,7 +39,6 @@ u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
 s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 static inline s32 RandomValue(void)
 {

@@ -2,6 +2,8 @@
 #define RESULT_PROMPT_H
 #include "global.h"
 #include "engine.h"
+#include "input.h"
+#include "runtime.h"
 
 // Tentative: a timed text prompt. It shows a message window, waits 60 frames, asks Save_WriteAlternateSlotAndSelect
 // for a result (1 selects the first text, otherwise the second), then closes after A is pressed
@@ -21,8 +23,6 @@ struct ResultPromptArgs {
     s32 *values;
 };
 
-extern s32 gSceneDialogActive;
-extern u16 gPadState[]; // [1] = newly pressed keys
 
 u8 Save_WriteAlternateSlotAndSelect(void);
 void Hud_SetMode(s32);

@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "engine_globals.h"
 
 struct Vec {
     s16 x, y, z, pad;
@@ -39,7 +40,6 @@ struct Manager {
     struct Group groups[6];
 };
 extern struct Manager *gFadingParticleManager;
-extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void *FadingParticleManager_Create(u32, u32);

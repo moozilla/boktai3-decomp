@@ -2,6 +2,7 @@
 #define GUARD_SCENE_EFFECT_SCHEDULE_H
 #include "engine.h"
 #include "contact_actor.h"
+#include "ram.h"
 struct SceneScheduledEffect {
     u8 unknown0[0x13e];
     s16 state;
@@ -20,7 +21,7 @@ struct SceneEffectSchedule {
     u32 occupiedMask;
 };
 extern struct SceneEffectSchedule *gSceneEffectSchedule;
-extern u32 gScenePauseFlags, gUnk_02000560;
+extern u32 gUnk_02000560;
 struct SceneEffectScheduleEntry *SceneEffectSchedule_Allocate(struct SceneEffectSchedule *);
 s32 SceneEffectSchedule_Tick(struct SceneEffectSchedule *);
 void SceneEffectSchedule_Destroy(void *);

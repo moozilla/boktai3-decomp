@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 
 #ifdef NONMATCHING
 // fuzzy: 83.4%
@@ -20,7 +21,6 @@ void SpinningApproach_DampReturnMovement(void);
 void Armor_CapturePartMotionEndpoint(void *);
 void Sound_PlaySongChecked(u32);
 s32 Math_Atan2(s32, s32);
-extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 

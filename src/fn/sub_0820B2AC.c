@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 
 struct DragonPuppyPosition {
     s16 x, y, z, unk_06;
@@ -30,7 +31,6 @@ struct DragonPuppy {
 };
 
 extern const u16 gUnk_0203B400[];
-extern u32 gRandomIndex;
 void DragonPuppy_HandleDefeat(struct DragonPuppy *);
 void DragonPuppy_UpdateAttackTiming(void);
 void Anim_SetSequence(void *, void *, u32, u32, u32);

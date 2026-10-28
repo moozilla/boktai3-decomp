@@ -2,6 +2,7 @@
 #define GUARD_SCENE_INPUT_H
 #include "engine.h"
 #include "contact_actor.h"
+#include "input.h"
 
 struct SceneInputResource {
     u32 words[8];
@@ -35,7 +36,6 @@ struct SceneInputPair {
     u16 frame, duration;
 };
 
-extern u16 gPadState[];
 s32 Anim_SelectWidgetGlyph(void *, void *, u32);
 void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 void Palette_UpdateHighlightPulse(u16 *, u8 *);

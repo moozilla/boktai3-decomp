@@ -1,6 +1,7 @@
 #ifndef GUARD_ROAMING_OBJECT_H
 #define GUARD_ROAMING_OBJECT_H
 #include "contact_swarm.h"
+#include "engine_globals.h"
 /* Two neighboring 0x144-byte actors share this observed layout. Identity is tentative. */
 struct RoamingObject {
     u8 task[0x18];
@@ -25,7 +26,6 @@ struct RoamingObject {
     void (*update)(struct RoamingObject *);
 };
 extern const s16 gUnk_086149C4[];
-extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 void RoamingObject_SetState(struct RoamingObject *, u16);
 void RoamingObjectB_SetState(struct RoamingObject *, u16);

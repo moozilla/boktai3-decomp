@@ -1,6 +1,7 @@
 #include "stacked_actor.h"
 #include "input.h"
-extern u32 gEngineFlags, gUnk_02000560;
+#include "engine_globals.h"
+extern u32 gUnk_02000560;
 extern u8 *gUnk_02000580;
 s32 StackedActor_IsPlayerNearby(struct StackedActor *);
 void Sound_PlaySong(u32);

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 
 struct NavHdr {
     u16 count;
@@ -28,13 +29,12 @@ struct World {
     u8 pad[0x14];
     struct NavHdr *nav;
 };
-extern struct World *gTerrainMap;
 u32 NavMesh_IsPointInsideRegion(void *, struct Vec2 *, u32);
 
 // Declared non-void without a return statement: r0 is left unset.
 u32 ProximityVolume_TranslateBounds(struct Probe *out, struct Vec2 *pos)
 {
-    struct NavHdr *hdr = gTerrainMap->nav;
+    struct NavHdr *hdr = ((struct World *)gTerrainMap)->nav;
     s32 i, j;
 
     out->region = 0xff;

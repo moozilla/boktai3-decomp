@@ -5,24 +5,25 @@
 // fuzzy: 90.3%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
-extern u16 gUnk_0300172A, gUnk_03001728, gUnk_03005330, gUnk_03005380;
-extern u16 gUnk_03005350[];
+extern u16 gSerialActiveSendWord, gSerialQueuedSendWord, gSerialQueuedPacketCount,
+    gSerialPacketReadIndex;
+extern u16 gSerialPacketQueue[];
 #define IO(a) (*(volatile u16 *)(a))
 static inline void CopyQueued(u16 *out)
 {
-    u16 *q = gUnk_03005350;
-    out[0] = q[gUnk_03005380 * 4];
-    out[1] = *(gUnk_03005380 * 4 + &gUnk_03005350[1]);
-    out[2] = *(gUnk_03005380 * 4 + &gUnk_03005350[2]);
-    out[3] = *(gUnk_03005380 * 4 + &gUnk_03005350[3]);
+    u16 *q = gSerialPacketQueue;
+    out[0] = q[gSerialPacketReadIndex * 4];
+    out[1] = *(gSerialPacketReadIndex * 4 + &gSerialPacketQueue[1]);
+    out[2] = *(gSerialPacketReadIndex * 4 + &gSerialPacketQueue[2]);
+    out[3] = *(gSerialPacketReadIndex * 4 + &gSerialPacketQueue[3]);
 }
 static inline void QueuePacket(u16 *in, u32 pos)
 {
-    u16 *q = gUnk_03005350;
+    u16 *q = gSerialPacketQueue;
     q[pos * 4] = in[0];
-    *(pos * 4 + &gUnk_03005350[1]) = in[1];
-    *(pos * 4 + &gUnk_03005350[2]) = in[2];
-    *(pos * 4 + &gUnk_03005350[3]) = in[3];
+    *(pos * 4 + &gSerialPacketQueue[1]) = in[1];
+    *(pos * 4 + &gSerialPacketQueue[2]) = in[2];
+    *(pos * 4 + &gSerialPacketQueue[3]) = in[3];
 }
 static inline void CopyPacket(u16 *out, u16 *in)
 {
@@ -33,15 +34,15 @@ static inline void CopyPacket(u16 *out, u16 *in)
 }
 static inline void AdvanceSend(void)
 {
-    if (gUnk_0300172A & 0x4000) {
-        gUnk_0300172A = gUnk_03001728;
-        gUnk_03001728 = 0x4000;
+    if (gSerialActiveSendWord & 0x4000) {
+        gSerialActiveSendWord = gSerialQueuedSendWord;
+        gSerialQueuedSendWord = 0x4000;
     }
 }
 void Serial_ServiceInterrupt(void)
 {
     u32 control;
-    typeof(gUnk_03005380) t1;
+    typeof(gSerialPacketReadIndex) t1;
     u32 k2 = 2;
     *((volatile u16 *)0x04000120);
     gSerialTransferStatus = 0;
@@ -71,46 +72,46 @@ void Serial_ServiceInterrupt(void)
             bits |= word;
         if (!(bits & 0x4000)) {
             if (gSerialReceivePending) {
-                u32 pos = (gUnk_03005380 + gUnk_03005330) & 3;
-                gUnk_03005350[pos * 4] = first;
-                *((pos * 4) + (&gUnk_03005350[1])) = latest[1];
-                *((pos * 4) + (&gUnk_03005350[k2])) = latest[k2];
-                *((pos * 4) + (&gUnk_03005350[3])) = latest[3];
-                ++gUnk_03005330;
-                gUnk_0300172A = 0x4000;
+                u32 pos = (gSerialPacketReadIndex + gSerialQueuedPacketCount) & 3;
+                gSerialPacketQueue[pos * 4] = first;
+                *((pos * 4) + (&gSerialPacketQueue[1])) = latest[1];
+                *((pos * 4) + (&gSerialPacketQueue[k2])) = latest[k2];
+                *((pos * 4) + (&gSerialPacketQueue[3])) = latest[3];
+                ++gSerialQueuedPacketCount;
+                gSerialActiveSendWord = 0x4000;
             } else {
-                if (gUnk_03005330) {
+                if (gSerialQueuedPacketCount) {
                     volatile u16 count;
                     CopyQueued(receive);
                     {
                         u8 k1 = 3;
-                        gUnk_03005380 = (t1 = (gUnk_03005380 + 1) & k1);
+                        gSerialPacketReadIndex = (t1 = (gSerialPacketReadIndex + 1) & k1);
                     }
-                    count = gUnk_03005330;
-                    --gUnk_03005330;
-                    QueuePacket(latest, (t1 + gUnk_03005330) & 3);
-                    gUnk_03005330 = count;
+                    count = gSerialQueuedPacketCount;
+                    --gSerialQueuedPacketCount;
+                    QueuePacket(latest, (t1 + gSerialQueuedPacketCount) & 3);
+                    gSerialQueuedPacketCount = count;
                 } else {
                     receive[0] = first;
                     receive[1] = latest[1];
                     receive[k2] = latest[k2];
                     receive[3] = latest[3];
                 }
-                gUnk_0300172A = gUnk_03001728;
-                gUnk_03001728 = 0x4000;
+                gSerialActiveSendWord = gSerialQueuedSendWord;
+                gSerialQueuedSendWord = 0x4000;
                 gSerialReceiveIndex = 1 - gSerialReceiveIndex;
                 gSerialReceivePending = 1;
             }
-        } else if ((!gSerialReceivePending) && gUnk_03005330) {
+        } else if ((!gSerialReceivePending) && gSerialQueuedPacketCount) {
             CopyQueued(receive);
-            gUnk_03005380 = (gUnk_03005380 + 1) & 3;
-            --gUnk_03005330;
+            gSerialPacketReadIndex = (gSerialPacketReadIndex + 1) & 3;
+            --gSerialQueuedPacketCount;
             AdvanceSend();
             gSerialReceiveIndex = 1 - gSerialReceiveIndex;
             gSerialReceivePending = 1;
         } else
             AdvanceSend();
-        *((volatile u16 *)0x0400012A) = gUnk_0300172A;
+        *((volatile u16 *)0x0400012A) = gSerialActiveSendWord;
         gSerialConnectionRole = ((*((volatile u16 *)0x04000128)) >> 4) & 3;
         gSerialLatestPacketIndex = 1 - gSerialLatestPacketIndex;
     }

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 // MATCHING_CONCESSION: register-pinning
 // Cleanup: angle and RNG temporaries use local register hints.
 /* Tentative role: periodically spawn an inward-moving effect in a four-slot ring. */
@@ -24,7 +25,6 @@ typedef struct State {
 } State;
 extern const s16 gUnk_086149C4[];
 extern u8 gUnk_0203B400[];
-extern u32 gRandomIndex;
 extern u8 *gGameState;
 void SpriteDrawable_SelectTileFrame(Effect *, void *, s32);
 static inline s32 random_value(void)

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 struct ArmorDecisionActor {
     u8 pad0[0x18];
     u16 taskFlags;
@@ -27,7 +28,6 @@ struct ArmorDecisionTarget {
     s16 x, y, z;
 };
 extern struct ArmorDecisionTarget *gGameState;
-extern u32 gRandomIndex;
 void ActorController_SetBehavior(void *, s32);
 void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);

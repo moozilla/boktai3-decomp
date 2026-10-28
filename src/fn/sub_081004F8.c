@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning (register pin and empty asm operand hint)
 #include "global.h"
+#include "engine_globals.h"
 struct FloorSwitch {
     u32 flags;
     u8 pad4[8];
@@ -25,7 +26,6 @@ struct FloorSwitch {
 void FloorSwitch_RunStateScript(struct FloorSwitch *);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sound_PlaySong(u32);
-extern u32 gEngineFlags;
 void FloorSwitch_Release(struct FloorSwitch *p)
 {
     u16 *flags = &p->flags88;

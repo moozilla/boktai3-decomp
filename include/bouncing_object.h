@@ -1,6 +1,7 @@
 #ifndef GUARD_BOUNCING_OBJECT_H
 #define GUARD_BOUNCING_OBJECT_H
 #include "contact_swarm.h"
+#include "ram.h"
 /* Separate twelve-slot family; not the preceding anchored-particle pool. */
 struct BouncingObject {
     struct ContactSwarmSprite sprite;
@@ -32,7 +33,6 @@ struct BouncingContact {
 };
 extern void *gUnk_08605B6C[];
 extern u32 gUnk_02000560;
-extern u32 gScenePauseFlags;
 struct BouncingPool *BouncingObject_EnsurePool(void);
 void Shadow_Initialize(void *, struct ContactPosition *, s32);
 void BouncingObject_InitializeColliders(struct BouncingObject *, s16, s16);

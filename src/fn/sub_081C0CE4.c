@@ -1,8 +1,8 @@
 #include "global.h"
 #include "game_state.h"
 #include "input.h"
+#include "engine_globals.h"
 
-extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const u8 gUnk_0824F960[];
 extern const u8 gUnk_0824F968[];

@@ -1,6 +1,7 @@
 #ifndef GUARD_DAMAGE_NUMBER_DISPLAY_H
 #define GUARD_DAMAGE_NUMBER_DISPLAY_H
 #include "contact_actor.h"
+#include "render.h"
 /* Tentative floating-number family: four groups, each with four 0x28 glyphs. */
 struct DamageNumberGlyph {
     u32 unknown0;
@@ -30,7 +31,6 @@ static inline s32 DamageNumber_ProjectScale(s32 value)
         return value >> 5;
     return -((-value) >> 5);
 }
-extern u16 gCameraOrigin[];
 static inline void DamageNumber_ProjectPosition(struct ContactPosition *screen,
                                                 const struct ContactPosition *world)
 {

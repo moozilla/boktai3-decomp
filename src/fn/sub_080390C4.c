@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "game_state.h"
+#include "engine_globals.h"
 // Tentative wireless selection/menu layout from observed offsets.
 struct Slot {
     u8 counts[4];
@@ -31,7 +32,6 @@ struct Save {
 };
 extern struct Menu *gWirelessTradeMenu;
 extern u8 gSceneEffectPalettePhase, gUnk_0203B400[];
-extern u32 gRandomIndex;
 void *Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 void *Script_GetPc(void);

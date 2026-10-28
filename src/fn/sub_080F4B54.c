@@ -1,6 +1,6 @@
 #include "global.h"
+#include "engine_globals.h"
 
-extern u32 gRandomIndex;
 extern u8 gUnk_0203B400[];
 struct P {
     u8 f[0x170];

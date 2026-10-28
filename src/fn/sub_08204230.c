@@ -3,6 +3,7 @@
 // confidence=low: parses the spawn script (position, attack, health, timing keywords), loads
 // graphics and the first animation frame, and installs the idle callback.
 #include "scene_vec.h"
+#include "engine_globals.h"
 struct PHVec {
     s16 x, y, z, pad;
 };
@@ -15,8 +16,6 @@ struct PHTerrain {
     u8 pad[0x24];
     u16 rows[1];
 };
-extern struct PHTerrain *gTerrainMap;
-extern u32 gTerrainWidth, gTerrainHeight;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void AnimData_Load(void *, u32);
@@ -39,7 +38,7 @@ static inline s32 EnemyF426_CellIndex(struct PHVec *v)
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gTerrainMap->rows[z] + x;
+    return ((struct PHTerrain *)gTerrainMap)->rows[z] + x;
 }
 static inline void EnemyF426_StepAnimation(u8 *p, void *sprite, struct FanSeq *s)
 {

@@ -1,13 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "stacked_actor.h"
+#include "engine_globals.h"
 struct ActorMapView {
     u8 unknown0[4];
     u8 *cells;
     u8 unknown8[0x1C];
     u16 rowOffsets[1];
 };
-extern struct ActorMapView *gTerrainMap;
-extern u32 gTerrainWidth, gTerrainHeight;
 extern u8 *gUnk_02000580;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
@@ -63,14 +62,14 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
         if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             index = 0;
         else {
-            u32 row = gTerrainMap->rowOffsets[z];
+            u32 row = ((struct ActorMapView *)gTerrainMap)->rowOffsets[z];
             index = row + x;
         }
         cell = TerrainModifiers_FindCellOverride(index, 1);
         if (cell)
             cell += 4;
         else {
-            struct ActorMapView *map = gTerrainMap;
+            struct ActorMapView *map = ((struct ActorMapView *)gTerrainMap);
             u32 offset = index * 4 + 12;
             cell = map->cells + offset;
         }

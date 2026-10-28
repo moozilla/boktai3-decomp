@@ -1,6 +1,7 @@
 #include "global.h"
 #include "ram.h"
 #include "render.h"
+#include "engine_globals.h"
 
 struct HudSlotSource {
     u8 unknown0[0x18];
@@ -10,7 +11,6 @@ struct HudSlotSource {
 };
 extern struct HudSlotSource *gUnk_020004B4;
 extern u8 *gGameState;
-extern u32 gEngineFlags;
 u16 *Hud_GetTilemapCell(s32, u32, u32);
 void Sound_PlaySong(u32);
 

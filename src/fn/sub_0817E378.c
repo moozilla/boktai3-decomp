@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 #ifdef NONMATCHING
 // fuzzy: 44.3%
 // fix.py best (sweep after the inlined-insn fix)
@@ -16,7 +17,6 @@ struct A {
     s8 rnd;
     u8 count;
 };
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 void Callback_InvokeActor(void *, u32);

@@ -1,6 +1,7 @@
 #ifndef GUARD_CONTACT_BURST_H
 #define GUARD_CONTACT_BURST_H
 #include "transient_sprite_effects.h"
+#include "engine_globals.h"
 /* Tentative contact-triggered aura; source is a caller-owned world position. */
 struct ContactBurst {
     u8 task[0x18];
@@ -12,7 +13,6 @@ struct ContactBurst {
     struct TransientEffectSprite sprite;
     struct ContactCollider collider;
 };
-extern u32 gRandomIndex;
 struct ContactBurst *ContactBurst_Create(const struct ContactPosition *);
 s32 ContactBurst_Update(struct ContactBurst *);
 s32 ContactBurst_Destroy(struct ContactBurst *);

@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
+#include "engine_globals.h"
 struct NidhoggrEffectVector {
     u16 x, y, z, pad;
 };
@@ -18,7 +19,7 @@ struct NidhoggrFallingEffect {
     u8 unknown180[4];
     u8 *boss;
 };
-extern u32 gEngineFlags, gUnk_02000560;
+extern u32 gUnk_02000560;
 extern const struct NidhoggrEffectPair gUnk_0824F27C, gUnk_0824F274;
 extern struct NidhoggrEffectPair gUnk_0824F284;
 struct NidhoggrFallingEffect *SceneEffectPool_AllocateSlot(void *);

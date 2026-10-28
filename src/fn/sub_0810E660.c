@@ -1,10 +1,10 @@
 #include "global.h"
 #include "ram.h"
+#include "engine_globals.h"
 s32 Registry1745_GetSessionState(void);
 void ScrollingDialogue_HideImmediately(void);
 void Task_Kill(void *);
 void Callback_InvokeActor(void *, u32);
-extern u32 gEngineFlags;
 struct SceneCallbackTask {
     u8 unknown[0xCE4];
     u32 callback;

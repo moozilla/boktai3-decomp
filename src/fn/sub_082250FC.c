@@ -2,12 +2,12 @@
 #include "render.h"
 #include "runtime.h"
 #include "ram.h"
+#include "engine_globals.h"
+#include "input.h"
 struct Task {
     u8 pad[24];
     s32 state, counter;
 };
-extern u32 gEngineFlags;
-extern u16 gPadState;
 extern u8 *gGameState;
 void System_ShutdownAndSoftReset(void);
 void SceneLifecycle_InitSceneState(void);
@@ -25,11 +25,11 @@ void SunClock_Refresh(void);
 s32 SceneLifecycle_UpdateTask(struct Task *task)
 {
     if (!gSceneDialogActive) {
-        if (!(gPadState & 2))
+        if (!((*(u16 *)gPadState) & 2))
             goto update;
-        if (!(gPadState & 1))
+        if (!((*(u16 *)gPadState) & 1))
             goto update;
-        if ((12 & gPadState) != 12)
+        if ((12 & (*(u16 *)gPadState)) != 12)
             goto update;
         System_ShutdownAndSoftReset();
         return 0;

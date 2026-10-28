@@ -2,6 +2,7 @@
 // confidence=low: SceneActorAnimation_UpdateWalkToPosition (sub_0802EA90) at a fixed speed of 5,
 // stopping within 10 units, for a tagged scene NPC.
 #include "global.h"
+#include "engine_globals.h"
 
 // 32 differing instruction runs; size +4 bytes; first diff at +0xA (adds r5, r1, #0 vs adds r4, r1, #0)
 struct Vec {
@@ -44,8 +45,6 @@ struct Map {
     u8 pad8[28];
     u16 rows[1];
 };
-extern struct Map *gTerrainMap;
-extern u32 gTerrainWidth, gTerrainHeight;
 u8 *TerrainModifiers_FindCellOverride(int, int);
 extern const s16 gUnk_086149C4[];
 int TaggedSceneNpc_PlayTaggedAnimation(struct Actor *, int, int, int, int);
@@ -66,7 +65,7 @@ static inline u8 *cell(int i)
     u8 *p = TerrainModifiers_FindCellOverride(i, 1);
     if (p)
         return p + 4;
-    return gTerrainMap->cells + 12 + i * 4;
+    return ((struct Map *)gTerrainMap)->cells + 12 + i * 4;
 }
 static inline int height(struct Vec *pos)
 {
@@ -74,7 +73,7 @@ static inline int height(struct Vec *pos)
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         index = 0;
     else
-        index = gTerrainMap->rows[z] + x;
+        index = ((struct Map *)gTerrainMap)->rows[z] + x;
     return (*cell(index) & 15) << 8;
 }
 // confidence=low: advances toward the scripted position using the current movement angle.

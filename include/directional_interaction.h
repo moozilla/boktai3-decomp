@@ -3,6 +3,7 @@
 #include "global.h"
 #include "game_state.h"
 #include "player.h"
+#include "input.h"
 
 /*
  * Directional interaction controllers (tentative): invisible trigger zones kept in a small pool
@@ -64,7 +65,6 @@ struct DirectionalScriptArgs {
 
 extern struct DirectionalManager *gDirectionalManager;
 extern u32 gUnk_02000560;
-extern u16 gPadState[];
 extern void *gUnk_086049F4[];
 
 /* Engine helpers. */

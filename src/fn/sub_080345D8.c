@@ -2,6 +2,7 @@
 #include "global.h"
 #include "ram.h"
 #include "rfu_manager.h"
+#include "rfu_compat.h"
 struct Engine {
     u8 pad0[0x18];
     u8 pad18, bits, pad1a, entered, flag, pad1d, state, flag1f, mode, index;
@@ -32,7 +33,6 @@ struct ModeState {
     u8 pad0;
     u8 mode;
 };
-extern struct ModeState *gRfuLinkStatus;
 static inline void reset(struct Engine *p, int operation, int zero)
 {
     p->flag = zero;
@@ -126,7 +126,7 @@ reset5:
     reset(p, 5, 0);
     goto done;
 mode: {
-    int mode = gRfuLinkStatus->mode;
+    int mode = ((struct ModeState *)gRfuLinkStatus)->mode;
     if (!mode)
         reset(p, 5, mode);
     else

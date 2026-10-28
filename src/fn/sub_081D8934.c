@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "input.h"
 void *ResourceRegistry_GetResource(u16);
 void Task4E01_ClearTrailSprites(void *);
 void Task4E01_SpawnTrailSprite(void *, void *);
@@ -8,7 +9,6 @@ void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
 void Task4E01_UpdateTrailSprites(void *, void *);
 void Task4E01_UpdateTimedSprite(void);
-extern u16 gPadState;
 
 struct ImpactSprite {
     u32 flags;
@@ -75,7 +75,7 @@ s32 Task4E01_UpdateTrailImpact(u8 *p)
         u32 f = *(u32 *)(p + 4);
         *(u32 *)(p + 4) = f & clr;
     }
-    mask = gPadState & 2;
+    mask = (*(u16 *)gPadState) & 2;
     if (mask == 0) {
         s16 *timer = (s16 *)(p + 0x1a4);
         u8 *collider;

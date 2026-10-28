@@ -1,11 +1,11 @@
 #include "global.h"
 #include "render.h"
+#include "input.h"
 
 struct Keys {
     u16 held;
     u16 pressed;
 };
-extern struct Keys gPadState;
 struct FrameTable {
     s32 v[4];
 };
@@ -56,19 +56,19 @@ s32 sub_0821290C(u8 *m)
     u32 moved = 0;
 
     if (EXITING == 0) {
-        if (gPadState.pressed & 2) {
+        if ((*(struct Keys *)gPadState).pressed & 2) {
             ScreenTransition_SendCommand(1, FADE, 4, 4, 4, 0xffff, moved);
             EXITING = 1;
             Sound_PlaySong(0x119);
         } else {
-            if (gPadState.pressed & 0x200) {
+            if ((*(struct Keys *)gPadState).pressed & 0x200) {
                 if (--CATEGORY < 0)
                     CATEGORY = 9;
                 COL = moved;
                 ROW = moved;
                 Sound_PlaySong(0x10a);
                 catChanged = 1;
-            } else if (gPadState.pressed & 0x100) {
+            } else if ((*(struct Keys *)gPadState).pressed & 0x100) {
                 if (++CATEGORY > 9)
                     CATEGORY = moved;
                 COL = moved;
@@ -76,22 +76,22 @@ s32 sub_0821290C(u8 *m)
                 Sound_PlaySong(0x10a);
                 catChanged = 1;
             }
-            if ((gPadState.pressed & 0x40) &&
+            if (((*(struct Keys *)gPadState).pressed & 0x40) &&
                 (SceneGrid_IsCellBeforeLimit(COL, ROW - 1, CATEGORY))) {
                 ROW--;
                 moved = 1;
                 Sound_PlaySong(0xdc);
-            } else if ((gPadState.pressed & 0x80) &&
+            } else if (((*(struct Keys *)gPadState).pressed & 0x80) &&
                        (SceneGrid_IsCellBeforeLimit(COL, ROW + 1, CATEGORY))) {
                 ROW++;
                 moved = 1;
                 Sound_PlaySong(0xdc);
-            } else if ((gPadState.pressed & 0x20) &&
+            } else if (((*(struct Keys *)gPadState).pressed & 0x20) &&
                        (SceneGrid_IsCellBeforeLimit(COL - 1, ROW, CATEGORY))) {
                 COL--;
                 moved = 1;
                 Sound_PlaySong(0xdc);
-            } else if ((gPadState.pressed & 0x10) &&
+            } else if (((*(struct Keys *)gPadState).pressed & 0x10) &&
                        (SceneGrid_IsCellBeforeLimit(COL + 1, ROW, CATEGORY))) {
                 COL++;
                 moved = 1;

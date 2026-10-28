@@ -36,6 +36,7 @@ void Memory_Clear(void *, int);
 #include "rfu_compat.h"
 #include "game_state.h"
 #include "ram.h"
+#include "engine_globals.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -52,7 +53,6 @@ int SunClock_GetBaseHour(void);
 void WirelessText_EncodeString(const void *, void *, int);
 void Wireless_InitSessionConfig(void *, int, int, int, int, const void *, const void *);
 extern u16 gUnk_0203B400[];
-extern u32 gRandomIndex;
 struct Game {
     u8 pad[0x780];
     u8 playerName[8];

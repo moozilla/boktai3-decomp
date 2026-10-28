@@ -1,12 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
+#include "engine_globals.h"
 
 // Draft: effect timer tick (screen transition at 0, collider refresh, shake).
 // Open: the original recomputes the u16 extension of the counter for the second
 // compare, and loads the pause-flag word after building the mask.
 
-extern u32 gEngineFlags;
 void Sound_PlaySong(u32);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 s32 Collider_Refresh(void *);

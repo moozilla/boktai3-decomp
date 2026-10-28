@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
+#include "engine_globals.h"
 struct ParticleVector {
     u16 x, y, z, unused;
 };
@@ -41,8 +42,6 @@ struct TerrainMap {
     u8 unknown8[0x1C];
     u16 rows[1];
 };
-extern struct TerrainMap *gTerrainMap;
-extern u32 gTerrainWidth, gTerrainHeight;
 void *TerrainModifiers_FindCellOverride(u32, u32);
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
@@ -55,7 +54,7 @@ static inline s32 Cell(struct ParticleVector *p)
     s32 x = (s16)p->x >> 8, z = (s16)p->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gTerrainMap->rows[z] + x;
+    return ((struct TerrainMap *)gTerrainMap)->rows[z] + x;
 }
 static inline void Release(struct Projectile *p)
 {
