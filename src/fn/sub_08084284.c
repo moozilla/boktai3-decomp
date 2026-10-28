@@ -2,9 +2,9 @@
 
 #include "scene_actor_control_helpers.h"
 #include "engine.h"
+#include "player.h"
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
-extern u8 *gUnk_02000580[];
 s32 Math_Atan2(s32, s32);
 s32 Callback_InvokeActor(void *, void *);
 void CpuSet(const void *, void *, u32);
@@ -87,7 +87,7 @@ void SceneActorControl_WanderAroundPlayer(struct SceneActorRegistryResetView *ac
             struct ContactPosition target;
             u32 angle;
             angle = (u8)Rand();
-            target = *(struct ContactPosition *)(gUnk_02000580[0] + 0x30);
+            target = *(struct ContactPosition *)(((u8 **)gPlayers)[0] + 0x30);
             target.x += Shift(gUnk_086149C4[angle], 4);
             target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 4);
             SceneActorControl_StartPositionCurve(actor, &target);

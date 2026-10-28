@@ -56,7 +56,7 @@ void Player_ConfigureActionSelectionDisplay(struct Player *p)
             p->statModifierContext.actionSelectionDisplay, selection,
             Player_GetAttackElementType(p->statModifierContext.statBOverrideMode));
     {
-        u8 value = ((u8 *)gUnk_02000580[0])[0x2D];
+        u8 value = ((u8 *)gPlayers[0])[0x2D];
         Projectile_SetFlightParams(p->statModifierContext.actionSelectionDisplay, 0, 60, value, 24);
     }
     Projectile_SetCollisionSize(p->statModifierContext.actionSelectionDisplay, 16, 100, 16);

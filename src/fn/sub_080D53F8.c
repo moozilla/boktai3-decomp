@@ -107,7 +107,7 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
         Chase_SetBehavior(actor, 13);
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *((void **)(group + 0x1fc)), 32,
                                                              32, speed)) {
-        if (PlayerFlags(&gUnk_02000580[0]->flags, 8) && (!(*((u16 *)(body + 0x6d2))))) {
+        if (PlayerFlags(&gPlayers[0]->flags, 8) && (!(*((u16 *)(body + 0x6d2))))) {
             if (Mummy_RequestStraightRoute(actor))
                 return;
         }

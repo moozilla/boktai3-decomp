@@ -1,4 +1,3 @@
-#define gPlayerSlots     gUnk_02000580
 #define gPlayerSlotFlags gUnk_02000560
 #include "global.h"
 #include "area_effect_link.h"
@@ -27,13 +26,13 @@ s32 SceneActorTarget_FindNearestEligiblePlayer(const struct ContactPosition *pos
     if (session)
         count = session->participantCount;
     for (i = 0; i < count; i++) {
-        struct AreaEffectPlayer *player = gPlayerSlots[i];
+        struct AreaEffectPlayer *player = gPlayers[i];
         if (player && !TestSlot(i) && !TestField(&player->flags, 0x20000)) {
             s32 cell = SceneActorTerrain_GetCellIndex((void *)&player->position);
             u8 *data = SceneActorTerrain_GetCell(cell);
             if (!Test(*(u16 *)(data + 2), 0x43)) {
                 s32 distance;
-                SceneActorTerrain_Subtract(&delta, (void *)&gPlayerSlots[i]->position, position);
+                SceneActorTerrain_Subtract(&delta, (void *)&gPlayers[i]->position, position);
                 distance = delta.x * delta.x + delta.z * delta.z;
                 if (distance < bestDistance) {
                     bestDistance = distance;

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
+#include "player.h"
 
 void SceneActorMovement_ResolveRoutePosition(void *);
 
@@ -47,7 +48,6 @@ static inline u32 Test32(u32 *p, u32 m)
     return *p & m;
 }
 
-extern u8 *gUnk_02000580[];
 u8 SceneActorPlacement_BeginContactRoute(void *);
 s32 Math_Atan2(s32, s32);
 u8 sub_0821D4F0(void *, void *, u32, u32);
@@ -110,11 +110,11 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
     if (!HasFlag(c, 2)) {
         if (SceneActorPlacement_BeginContactRoute(a))
             return 1;
-        if (Test32(&((struct SpiderApproachPlayer *)gUnk_02000580[0])->flags, 0x20000))
+        if (Test32(&((struct SpiderApproachPlayer *)gPlayers[0])->flags, 0x20000))
             return 0;
     } else if (SceneActorPlacement_BeginContactRoute(a))
         return 1;
-    candidate = gUnk_02000580[0];
+    candidate = gPlayers[0];
     if (!candidate)
         return 0;
     player = candidate;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 struct CountdownTask {
     u8 unknown0[0x18];
     u16 frame, interval;
@@ -11,7 +12,6 @@ struct CountdownPlayer {
     u8 transitionPhase, unknown459;
     u16 transitionFrame;
 };
-extern struct CountdownPlayer *gUnk_02000580;
 extern u8 *gGameState;
 void Hud_UpdateCountdownDisplay(s32, s32, u32);
 void Player_EnterKindFour(struct CountdownPlayer *);
@@ -20,7 +20,8 @@ s32 Countdown_Tick(struct CountdownTask *task)
 {
     s32 done;
     s32 *remaining;
-    if (gUnk_02000580 && gUnk_02000580->state == 1) {
+    if ((*(struct CountdownPlayer **)gPlayers) &&
+        (*(struct CountdownPlayer **)gPlayers)->state == 1) {
         done = 0;
         remaining = (s32 *)(gGameState + 0x618);
         if (*remaining > 0) {
@@ -36,14 +37,14 @@ s32 Countdown_Tick(struct CountdownTask *task)
             done = 1;
         }
         if (done) {
-            if (*((u8 *)gUnk_02000580 + 0x457) != 0x18) {
-                Player_EnterKindFour(gUnk_02000580);
+            if (*((u8 *)(*(struct CountdownPlayer **)gPlayers) + 0x457) != 0x18) {
+                Player_EnterKindFour((*(struct CountdownPlayer **)gPlayers));
                 {
-                    u8 *transition = &gUnk_02000580->transition;
+                    u8 *transition = &(*(struct CountdownPlayer **)gPlayers)->transition;
                     s32 zero = 0;
                     *transition = 0x24;
-                    gUnk_02000580->transitionPhase = zero;
-                    gUnk_02000580->transitionFrame = zero;
+                    (*(struct CountdownPlayer **)gPlayers)->transitionPhase = zero;
+                    (*(struct CountdownPlayer **)gPlayers)->transitionFrame = zero;
                 }
                 Task_Kill(task);
             }

@@ -2,6 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "engine.h"
+#include "player.h"
 #ifdef NONMATCHING
 // fuzzy: 92.3%
 // fix.py best version (reprinted C)
@@ -96,7 +97,6 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 b)
 // confidence=low: distance thresholds select recovery routes.
 extern const u8 gUnk_0824E230[];
 extern const u16 gUnk_0203B400[];
-extern u8 *gUnk_02000580[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 
 u8 Vorn_SelectReachableEscapeCell(void *, u32);
@@ -128,7 +128,7 @@ static inline u8 SelectRoute(struct SceneActorRegistryResetView *actor)
     dest->z = point->point[1];
     dest->y = CellHeight(dest, CellIndex(dest));
     cell = CellIndex((struct ContactPosition *)((u8 *)*slot + 12));
-    if (cell == actor->terrainCell || PlayerFlags(gUnk_02000580[0], 0x20000)) {
+    if (cell == actor->terrainCell || PlayerFlags(((u8 **)gPlayers)[0], 0x20000)) {
         SceneActor_DispatchContextAction(actor->context, 0);
         return 0;
     }
@@ -178,7 +178,7 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
             actor->direction = (random & 63) + actor->fieldE9;
         }
         if (!actor->fieldDC)
-            actor->fieldDC = (u32)(gUnk_02000580[0] + 0x24);
+            actor->fieldDC = (u32)(((u8 **)gPlayers)[0] + 0x24);
         if ((!SelectRoute(actor)) && (!Vorn_SelectReachableEscapeCell(actor, old)))
             return 0;
         SetControl(actor, SceneActorControl_OnIdle, 0x10);
@@ -191,7 +191,7 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
             actor->direction = (random & 63) + actor->fieldE9;
         }
         if (!actor->fieldDC)
-            actor->fieldDC = (u32)(gUnk_02000580[0] + 0x24);
+            actor->fieldDC = (u32)(((u8 **)gPlayers)[0] + 0x24);
         if ((!SelectRoute(actor)) && (!Vorn_SelectReachableEscapeCell(actor, c1)))
             return 0;
         SetControl(actor, SceneActorControl_OnIdle, 0x10);

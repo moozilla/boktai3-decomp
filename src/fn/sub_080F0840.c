@@ -2,7 +2,6 @@
 #include "scene_actor_reset.h"
 #include "player.h"
 
-#define gPlayerSlots gUnk_02000580
 void *SceneActor_FindNearbyPlayerTarget(struct SceneActorRegistryResetView *actor)
 {
     void *target = 0;
@@ -28,7 +27,7 @@ void *SceneActor_FindNearbyPlayerTarget(struct SceneActorRegistryResetView *acto
         struct ContactPosition *delta = &difference;
         const struct ContactPosition *origin = &actor->position;
         {
-            u32 address = (u32)gUnk_02000580;
+            u32 address = (u32)gPlayers;
             slot = (struct Player **)address;
         }
         i = 0;

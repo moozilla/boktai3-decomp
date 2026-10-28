@@ -2,6 +2,7 @@
 #include "golem_2.h"
 #include "script_utility.h"
 #include "engine.h"
+#include "player.h"
 
 extern const u8 gUnk_08606134[];
 
@@ -669,7 +670,6 @@ u8 sub_0812F3CC(void *);
 void SceneActorReaction_RestoreAfterDelay(void *);
 
 void Sound_PlaySong(u32);
-extern u8 *gUnk_02000580[4];
 
 #define F8(a, o)  (*(u8 *)((u8 *)(a) + (o)))
 #define F16(a, o) (*(u16 *)((u8 *)(a) + (o)))
@@ -879,12 +879,12 @@ static inline u8 DelayedRecovery_Chase(struct SceneActorRegistryResetView *input
         slot = DelayedRecovery_PlayerSlot(target);
         if (slot < 0)
             goto fail;
-        cell = *(u16 *)((u8 *)PTR(gUnk_02000580[slot], 0x40) + 6);
+        cell = *(u16 *)((u8 *)PTR(gPlayers[slot], 0x40) + 6);
     } else {
         cell = DelayedRecovery_CellIndex((struct ContactPosition *)(*targetp + 0xC));
         slot = 0;
     }
-    if (cell == actor->terrainCell || DelayedRecovery_Flag32(gUnk_02000580[slot], 0x20000, 0x20)) {
+    if (cell == actor->terrainCell || DelayedRecovery_Flag32(gPlayers[slot], 0x20000, 0x20)) {
         u16 busy = DelayedRecovery_Flag16(actor, 0x400, 0x2D4);
         u16 blocked;
         if (busy)

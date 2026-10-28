@@ -5,6 +5,7 @@
 // confidence=low: carries a player position request along a motion track
 #include "display_animation.h"
 #include "scene_vec.h"
+#include "player.h"
 struct ActorStatusPart {
     u32 spriteFlags;
     u8 unknown4[0xc];
@@ -25,7 +26,6 @@ struct ActorStatusPart {
 };
 void MotionTrack_Initialize(void *, const void *, const void *, const void *, u32);
 void MotionTrack_Update(void *);
-extern u8 *gUnk_02000580;
 void Player_BeginPositionRequest(void *, const void *, u32, u32, u32, u32, u32, u32, u32);
 static inline u32 StepPlayback(struct ActorStatusPart *owner, struct DisplaySequenceState *sequence,
                                struct ActorStatusPart *base, u32 one)
@@ -217,7 +217,7 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
                     out[2] = position->z;
                 }
                 if (!p->variant) {
-                    u8 *player = gUnk_02000580;
+                    u8 *player = (*(u8 **)gPlayers);
                     u32 one = 1;
                     if (TestFlags((u32 *)(player + 0x20), 0x40000))
                         goto complete;
@@ -225,10 +225,11 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
                                                 currentState, currentState, one);
                     motion = p->motion;
                 } else {
-                    if (TestFlags((u32 *)(gUnk_02000580 + 0x20), 0x40000))
+                    if (TestFlags((u32 *)((*(u8 **)gPlayers) + 0x20), 0x40000))
                         goto complete;
-                    Player_BeginPositionRequest(gUnk_02000580, &playerTarget, 0, 0, currentState,
-                                                currentState, currentState, currentState, 2);
+                    Player_BeginPositionRequest((*(u8 **)gPlayers), &playerTarget, 0, 0,
+                                                currentState, currentState, currentState,
+                                                currentState, 2);
                     motion = p->motion;
                 }
                 MotionTrack_Update(motion);

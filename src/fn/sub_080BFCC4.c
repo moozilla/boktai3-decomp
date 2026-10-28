@@ -29,7 +29,7 @@ struct SkelPlayer {
     u8 unknown24[0x1C];
     struct SkelPlayerCell *cell;
 };
-extern struct SkelPlayer *gUnk_02000580[4];
+extern struct SkelPlayer *gPlayers[4];
 
 struct SkelSaved {
     void *target;
@@ -270,12 +270,12 @@ static inline void ReturnHome(void *ctx)
         slot = PlayerSlot(*target);
         if (slot < 0)
             goto fail;
-        cell = gUnk_02000580[slot]->cell->cell;
+        cell = gPlayers[slot]->cell->cell;
     } else {
         cell = CellIndex((struct ContactPosition *)(*target + 12));
         slot = 0;
     }
-    if (cell == actor->terrainCell || (gUnk_02000580[slot]->flags & (mask = 0x20000))) {
+    if (cell == actor->terrainCell || (gPlayers[slot]->flags & (mask = 0x20000))) {
         u16 busy;
         mask = 0x400;
         busy = actor->flags2D4 & mask;

@@ -2,7 +2,6 @@
 #include "scene_actor_reset.h"
 #include "player.h"
 
-#define gPlayerSlots     gUnk_02000580
 #define gPlayerSlotFlags gUnk_02000560
 extern u32 gUnk_02000560[4];
 static inline s32 Square(s32 x)
@@ -16,7 +15,7 @@ u8 SceneActor_FindNearbyActivePlayer(struct SceneActorRegistryResetView *p)
     struct ContactPosition difference;
     struct ContactPosition *delta = &difference;
     struct ContactPosition *position = &p->position;
-    struct Player **cursor = gUnk_02000580;
+    struct Player **cursor = gPlayers;
     do {
         u32 indexOffset = i << 2;
         struct Player *player = *cursor;

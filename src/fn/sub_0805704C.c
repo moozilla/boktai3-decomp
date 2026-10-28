@@ -25,7 +25,7 @@ void LevelAdvanceDisplay_UpdateParticle(struct LevelAdvanceParticle *input, void
         {
             register u32 x asm("r0");
             register u32 playerX asm("r6");
-            player = gUnk_02000580[0];
+            player = gPlayers[0];
             x = (u16)particle->offsetX;
             playerX = (u16)player->position.world.x;
             particle->position.world.x = x + playerX;

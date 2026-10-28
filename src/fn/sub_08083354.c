@@ -134,7 +134,7 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
                 }
             }
             SceneActorControl_StartPositionCurve(
-                actor, (const struct ContactPosition *)&gUnk_02000580[0]->position);
+                actor, (const struct ContactPosition *)&gPlayers[0]->position);
             {
                 register u32 phase = 2;
                 register u32 stateOffset asm("r2") = 0x2A8;

@@ -3,7 +3,6 @@
 #include "scene_actor_terrain.h"
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
-extern u8 *gUnk_02000580[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void CpuSet(const void *, void *, u32);
@@ -76,6 +75,7 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 phase, u32 b
 
 #include "scene_actor_animation.h"
 #include "engine.h"
+#include "player.h"
 void Ghost_GetDirectionalFrame(u8, u32 *, u32 *);
 s32 Mod(s32, s32);
 void Player_SubtractEnergy(void *, u32);
@@ -149,7 +149,7 @@ void Ghost_UpdateEnergyDrainAnimation(struct SceneActorAnimationView *actor)
     u8 *elapsed;
     if (Take(&actor->directionalEntryFlag)) {
         {
-            u32 value = gUnk_02000580[0][0x4F4];
+            u32 value = ((u8 **)gPlayers)[0][0x4F4];
             u8 *p = body + 0x5BE;
             u32 zero = 0;
             *p = value;
@@ -162,15 +162,15 @@ void Ghost_UpdateEnergyDrainAnimation(struct SceneActorAnimationView *actor)
     Select(actor, selection, variant, flags);
     if (*(u16 *)((u8 *)actor + 0x1E6) == 0) {
         if (Mod(*(u16 *)((u8 *)actor + 0x2CA), body[0x560]) == 0)
-            Player_SubtractEnergy(gUnk_02000580[0], *(u16 *)((u8 *)actor + 0xB4));
+            Player_SubtractEnergy(((u8 **)gPlayers)[0], *(u16 *)((u8 *)actor + 0xB4));
     } else if (*(u16 *)((u8 *)actor + 0x1E6) == 1) {
         if (Mod(*(u16 *)((u8 *)actor + 0x2CA), body[0x560]) == 0)
-            Player_SubtractEnergy(gUnk_02000580[0], *(u16 *)((u8 *)actor + 0xB4));
-        if (gUnk_02000580[0])
-            sub_0813D834(gUnk_02000580[0], 1, 900);
+            Player_SubtractEnergy(((u8 **)gPlayers)[0], *(u16 *)((u8 *)actor + 0xB4));
+        if (((u8 **)gPlayers)[0])
+            sub_0813D834(((u8 **)gPlayers)[0], 1, 900);
     }
     {
-        s32 start = body[0x5BE], now = gUnk_02000580[0][0x4F4];
+        s32 start = body[0x5BE], now = ((u8 **)gPlayers)[0][0x4F4];
         if (now < start) {
             s32 wrapped = WrapCounter(start);
             delta = now - wrapped;

@@ -14,7 +14,7 @@ void sub_0807E334(struct SceneActorRegistryResetView *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 s32 Callback_InvokeActor(void *, void *);
 
-extern u8 *gUnk_02000580[4];
+extern u8 *gPlayers[4];
 #define PTR(a, o) (*(void **)((u8 *)(a) + (o)))
 struct GolemRoutePoint {
     s16 x, z;
@@ -247,12 +247,12 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
         slot = PlayerSlot(target);
         if (slot < 0)
             goto fail;
-        cell = *(u16 *)((u8 *)PTR(gUnk_02000580[slot], 0x40) + 6);
+        cell = *(u16 *)((u8 *)PTR(gPlayers[slot], 0x40) + 6);
     } else {
         cell = CellIndex((struct ContactPosition *)(*targetp + 0xC));
         slot = 0;
     }
-    if (cell == actor->terrainCell || Flag32(gUnk_02000580[slot], 0x20000, 0x20)) {
+    if (cell == actor->terrainCell || Flag32(gPlayers[slot], 0x20000, 0x20)) {
         u16 busy = Flag16(actor, 0x400, 0x2D4);
         u16 blocked;
         if (busy)
@@ -354,7 +354,7 @@ void Golem_ResumeRouteAfterControl(struct SceneActorRegistryResetView *actor)
                 if (!SceneActorTarget_TrySelectNearestParticipant(actor))
                     return;
             } else
-                actor->fieldDC = (u32)(gUnk_02000580[0] + 0x24);
+                actor->fieldDC = (u32)(gPlayers[0] + 0x24);
             if (Chase(actor))
                 actor->field2C2 = 0x20;
         } else {

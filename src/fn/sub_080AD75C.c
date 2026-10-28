@@ -178,7 +178,7 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 t
         } else if (ContextFlags_080AD75C(ctx))
             SceneActor_DispatchContextAction(ctx, 1);
         else {
-            actor->fieldDC = ((u32)gUnk_02000580[0]) + 0x24;
+            actor->fieldDC = ((u32)gPlayers[0]) + 0x24;
             *action |= 16;
             (*((struct ContactPosition **)(group + 0x200)))->pad = 0;
             if ((!Skeleton_RerouteToTarget(actor)) &&

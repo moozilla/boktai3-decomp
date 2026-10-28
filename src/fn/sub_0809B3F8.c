@@ -5,7 +5,6 @@
 #include "scene_actor_terrain.h"
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
-extern u8 *gUnk_02000580[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void CpuSet(const void *, void *, u32);
@@ -42,6 +41,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 
 
 #include "scene_actor_animation.h"
 #include "engine.h"
+#include "player.h"
 void Lun_GetDirectionalFrame(u8, u32 *, u32 *);
 s32 Mod(s32, s32);
 void Player_SubtractEnergy(void *, u32);

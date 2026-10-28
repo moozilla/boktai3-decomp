@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_reset.h"
-extern u8 *gUnk_02000580;
+#include "player.h"
 void SceneActorControl_OnIdle(void);
 void Sound_PlaySong(u32);
 static inline u8 Blocked(struct SceneActorRegistryResetView *input)
@@ -88,7 +88,7 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
                 asm volatile("" : : "r"(test) : "memory");
             }
             {
-                u8 *player = gUnk_02000580;
+                u8 *player = (*(u8 **)gPlayers);
                 u32 three;
                 three = 3;
                 player[0x4F6] += 3;

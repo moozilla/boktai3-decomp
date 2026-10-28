@@ -206,7 +206,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000558,gForceDirectionMode,2,object,extern u16 gForceDirectionMode;,include/ram.h,low,
 02000560,gUnk_02000560,10,object,,,,
 02000570,gPlayerSolarActionPending,2,object,extern u16 gPlayerSolarActionPending;,include/ram.h,low,provisional: solar action pending flag; separate from four slot words
-02000580,gUnk_02000580,10,object,,,,
+02000580,gPlayers,10,object,extern struct Player *gPlayers[4];,include/player.h,low,the four player actors (slot 0 is the local player)
 02000590,gPlayerEffectPendingCount,2,object,extern u16 gPlayerEffectPendingCount;,include/ram.h,low,provisional: pending player effect count; separate from actor pointers
 02000594,gPlayerNotificationPending,2,object,extern u16 gPlayerNotificationPending;,include/ram.h,low,
 02000598,gSceneLinkList,4,object,extern struct MotionTargets *gSceneLinkList;,include/ram.h,low,

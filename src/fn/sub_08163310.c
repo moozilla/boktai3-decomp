@@ -18,7 +18,7 @@ void TransitionPanel_TryBeginClose(struct TransitionPanel *p)
     if ((gEngineFlags | gScenePauseFlags) & mask) {
         GameOver_ShowGraphics(p);
         Hud_SetMode(7);
-        if ((u8)(gUnk_02000580[0]->tetherMode - 0x21) <= 1) {
+        if ((u8)(gPlayers[0]->tetherMode - 0x21) <= 1) {
             p->deferClose = 1;
         } else {
             ScreenTransition_SendCommand(3, 5, 4, 4, 4, 0x1FFF, 2);

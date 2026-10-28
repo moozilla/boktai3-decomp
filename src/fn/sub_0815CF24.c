@@ -1,7 +1,7 @@
 #include "global.h"
 
 #include "engine.h"
-extern u8 *gUnk_02000580[];
+#include "player.h"
 s32 Script_GetActorIndex(void);
 s32 ScriptActor_GetDirectionFromScript(void);
 s32 ScriptActor_GetCueOptionFromScript(void);
@@ -11,7 +11,7 @@ void PlayerCue_BeginMode27(u8 *, s32, s32, s32);
 void ScriptActor_FaceFromScript(void)
 {
     s32 i = Script_GetActorIndex();
-    u8 *actor = gUnk_02000580[i];
+    u8 *actor = gPlayers[i];
     if (actor) {
         s32 a = ScriptActor_GetDirectionFromScript();
         s32 b = ScriptActor_GetCueOptionFromScript();

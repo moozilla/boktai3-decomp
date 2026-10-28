@@ -6,6 +6,7 @@
 #include "scene_actor_control_motion.h"
 #include "scene_actor_terrain.h"
 #include "render.h"
+#include "player.h"
 #define U8(p, n)  (*((u8 *)(p) + (n)))
 #define U16(p, n) (*(u16 *)((u8 *)(p) + (n)))
 #define S16(p, n) (*(s16 *)((u8 *)(p) + (n)))
@@ -37,7 +38,6 @@ void SceneActorReaction_SinkAndRemove(void);
 void SceneActorReaction_ResolveDamage(void);
 void SceneActorPlacement_PlayResponseAndResetState(void);
 void SceneActorScript_OnCommand(void);
-extern u8 *gUnk_02000580[];
 void SceneActor_RefreshLivingCountAndProfile(void *);
 void TargetRegistry_RegisterActor(void *, void *, void *);
 void SceneActorCollision_InitGateColliders(void *);

@@ -2,9 +2,9 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "engine.h"
+#include "player.h"
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
-extern u8 *gUnk_02000580[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void CpuSet(const void *, void *, u32);
@@ -99,7 +99,7 @@ void Bee_ApproachSavedPlayerPosition(struct SceneActorRegistryResetView *actor)
     if (Take(&actor->field2B1)) {
         actor->direction = *((u8 *)actor + 0xE9);
         Control(actor, Bee_UpdateRecoveryAnimation, 0x26);
-        *(struct SavedPair *)(body + 0x450) = *(struct SavedPair *)(gUnk_02000580[0] + 0x30);
+        *(struct SavedPair *)(body + 0x450) = *(struct SavedPair *)(((u8 **)gPlayers)[0] + 0x30);
         {
             u32 value = body[0x429];
             body[0x3DC] = value;

@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-extern u8 *gUnk_02000580;
+#include "player.h"
 void SceneActorControl_OnIdle(void);
 void Sound_PlaySong(u32);
 struct LinkedReactionContext {

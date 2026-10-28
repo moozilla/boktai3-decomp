@@ -1502,6 +1502,7 @@ void GridAttack_UpdateActionController(struct GridAttackActor *p)
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "scene_vec.h"
+#include "player.h"
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
 struct Drawable {
     struct ContactSwarmSprite sprite;
@@ -1974,7 +1975,6 @@ u32 GridAttackActor_Destroy(struct GridAttackActor *p)
     return 0;
 }
 
-extern u8 *gUnk_02000580[];
 void SceneActors_Register(void *, s32);
 s32 SceneActors_Initialize(void *, u32, s32, void *, s32);
 void SceneActors_SetHealthLimits(void *, s32, s32, s32);
@@ -2024,7 +2024,7 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
         u32 *target = (u32 *)&p->targetPosition;
         u32 *slot = (u32 *)&p->damageSource;
         for (i = 0; i < count; i++) {
-            u32 value = (u32)gUnk_02000580[i];
+            u32 value = (u32)gPlayers[i];
             if (value) {
                 *slot = value;
                 value += 0x30;

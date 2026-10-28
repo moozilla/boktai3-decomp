@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
+#include "player.h"
 #define F(p, o, T) (*(T *)((u8 *)(p) + (o)))
 void SceneActorMovement_ResolveRoutePosition(void *);
 
@@ -37,7 +38,6 @@ static inline u32 Test32(u32 *p, u32 m)
     return *p & m;
 }
 
-extern u8 *gUnk_02000580[];
 u8 SceneActorPlacement_BeginContactRoute(void *);
 s32 Math_Atan2(s32, s32);
 u8 sub_0821D4F0(void *, void *, u32, u32);
@@ -81,7 +81,7 @@ u8 SceneActorPlacement_BeginNearbyPlayerContact(struct SceneActorRegistryResetVi
         return 0;
     if (SceneActorPlacement_BeginContactRoute(a))
         return 1;
-    player = gUnk_02000580[0];
+    player = ((u8 **)gPlayers)[0];
     if (Test32((void *)(player + 0x20), 0x20000))
         return 0;
     if (SaveFlags(a, &flags, 128))
@@ -94,9 +94,9 @@ u8 SceneActorPlacement_BeginNearbyPlayerContact(struct SceneActorRegistryResetVi
         angle = -angle;
     if (angle > 32)
         return 0;
-    if (!sub_0821D4F0(transform + 12, gUnk_02000580[0] + 0x30, 5, 256))
+    if (!sub_0821D4F0(transform + 12, ((u8 **)gPlayers)[0] + 0x30, 5, 256))
         return 0;
-    a->fieldDC = (u32)(gUnk_02000580[0] + 0x24);
+    a->fieldDC = (u32)(((u8 **)gPlayers)[0] + 0x24);
     State(a, 12);
     Control(a, F(nav, 0x48, void *), 26);
     sub_080A4798(a);

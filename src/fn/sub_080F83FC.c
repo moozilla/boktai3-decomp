@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 struct PhaseSprite {
     u32 flags;
     u8 pad4[2];
@@ -48,8 +49,6 @@ static inline void clearFlags(u32 *p, u32 mask)
     *p &= ~mask;
 }
 
-#define gPhaseTarget gUnk_02000580
-extern u8 *gUnk_02000580;
 void ActorShadow_Disable(void *);
 void ActorPhase_SelectDistantWaypoint(struct PhaseActor *, void *, void *, s32);
 void ActorPhase_UpdateSpriteRestore(void);
@@ -70,7 +69,7 @@ void ActorPhase_WaitBeforeRelocation(struct PhaseActor *s, s32 frame)
     s->sprite->flags |= 1;
     ActorShadow_Disable((u8 *)s + 0x320);
     if (frame > data[0xe40]) {
-        ActorPhase_SelectDistantWaypoint(s, (u8 *)s + 0x5c, gUnk_02000580 + 0x30, 0x40000);
+        ActorPhase_SelectDistantWaypoint(s, (u8 *)s + 0x5c, (*(u8 **)gPlayers) + 0x30, 0x40000);
         {
             void (*next)(void) = ActorPhase_UpdateSpriteRestore;
             u32 id = 0x25;

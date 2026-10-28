@@ -11,7 +11,7 @@ void InteractionMarker_TickInteraction(struct InteractionMarker *marker)
     else
         marker->height = 0;
     marker->primary.sprite.position.y = marker->position.y + marker->height;
-    if (marker->height == 0 && gUnk_02000580[0]->action == 0) {
+    if (marker->height == 0 && gPlayers[0]->action == 0) {
         marker->primary.sprite.flags &= ~0x200;
         marker->primary.sprite.priority = 3;
         marker->secondary.sprite.flags |= 1;

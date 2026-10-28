@@ -1,9 +1,8 @@
-#define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "scene_actor_reset.h"
+#include "player.h"
 void Ghost_UpdateWaitingAnimation(void);
 void Ghost_StartMovementToPosition(void *, void *);
-extern u8 *gUnk_02000580[4];
 struct RouteActorDestinationState {
     u8 unknown0[0x622];
     u16 delayDuration, delay;
@@ -42,7 +41,7 @@ void Ghost_ApproachPlayer(struct SceneActorRegistryResetView *actor)
         state->delay = state->delayDuration;
     }
     if (actor->field2B0)
-        Ghost_StartMovementToPosition(actor, gUnk_02000580[0] + 0x30);
+        Ghost_StartMovementToPosition(actor, ((u8 **)gPlayers)[0] + 0x30);
     else
         actor->counter2AC++;
 }

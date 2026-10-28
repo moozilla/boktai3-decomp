@@ -1,9 +1,9 @@
 #include "global.h"
+#include "player.h"
 struct G0894 {
     u8 pad[0x32];
     s16 y;
 };
-extern struct G0894 *gUnk_02000580;
 static inline u8 test0894(u8 *p)
 {
     u8 *q = p + 0xDC;
@@ -18,7 +18,7 @@ s32 Crow_TryActivatePlayerProximityResponse(u8 *s)
     u8 *p;
     if (!test0894(s))
         goto zero;
-    d = *(s16 *)(s + 0x5E) - gUnk_02000580->y;
+    d = *(s16 *)(s + 0x5E) - (*(struct G0894 **)gPlayers)->y;
     if (d < 0)
         d = -d;
     if (d > 0x200)

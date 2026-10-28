@@ -99,7 +99,7 @@ struct ScenePoolSpeedBounds {
     s32 emergencyHigh, high, low, activeHigh, activeLow;
 };
 /* Position and flag consumers identify this separate player-pointer array.
- * This is not the gUnk_02000580 Player array from player.h. */
+ * This is not the gPlayers Player array from player.h. */
 struct ScenePoolPlayerDraw {
     u8 unknown0[0x16];
     u16 flags;

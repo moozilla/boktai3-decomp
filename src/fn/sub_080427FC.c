@@ -42,7 +42,7 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
     PlayerStats_AddContactHundredths(source, other, 2);
     actor = SceneActors_GetBySlot(0);
     if (actor) {
-        u32 playerMode = gUnk_02000580[0]->actionMode;
+        u32 playerMode = gPlayers[0]->actionMode;
         if ((actor->mode == 1) && (playerMode != 2)) {
             other->cost = mode;
         }

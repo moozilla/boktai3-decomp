@@ -3,10 +3,10 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_route.h"
 #include "engine.h"
+#include "player.h"
 // Zero-store scheduling and the approach speed load still occur in a different order.
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
-extern u8 *gUnk_02000580[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void CpuSet(const void *, void *, u32);
@@ -201,7 +201,7 @@ void Crow_ApproachPlayerThenRecoil(struct SceneActorRegistryResetView *actor)
         struct ContactPosition *saved;
         Control(actor, Crow_UpdateDirectionalPose, 0x25);
         saved = (void *)(body + 0x3fc);
-        *((struct SavedPair *)saved) = *((struct SavedPair *)((*gUnk_02000580) + 0x30));
+        *((struct SavedPair *)saved) = *((struct SavedPair *)((*((u8 **)gPlayers)) + 0x30));
         Fill(body + 0x42c, zero, 0);
         Delta(&delta, &actor->position, saved);
         actor->direction = Math_Atan2(delta.x, delta.z);

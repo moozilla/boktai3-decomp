@@ -1,15 +1,15 @@
 #include "global.h"
+#include "player.h"
 struct S {
     u8 f[0x1c];
     s32 a;
 };
-extern struct S *gUnk_02000580;
 u32 PlayerCue_IsStateFour(void)
 {
     u32 r;
-    if (!gUnk_02000580)
+    if (!(*(struct S **)gPlayers))
         goto z;
-    if (gUnk_02000580->a == 4)
+    if ((*(struct S **)gPlayers)->a == 4)
         goto o;
 z:
     r = 0;

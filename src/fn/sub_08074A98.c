@@ -53,7 +53,7 @@ void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *actor)
                 playerRelative = 0;
             asm("" : "+r"(playerRelative));
             if (playerRelative) {
-                height = (u16)gUnk_02000580[0]->position.y;
+                height = (u16)gPlayers[0]->position.y;
                 goto haveHeight;
             }
         }

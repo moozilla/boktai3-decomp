@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "player.h"
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
@@ -167,7 +168,6 @@ static inline void changeState(struct Vanargand *p, s32 state, void *callback)
     }
 }
 
-extern u8 *gUnk_02000580[];
 s32 Script_GetKeywordValue(u32, s32);
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetValue(void);
@@ -238,7 +238,7 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
     {
         u8 **target = (void *)((u8 *)p + 0x110);
         u8 **slot = (void *)((u8 *)p + 0x10C);
-        u8 **player = gUnk_02000580;
+        u8 **player = gPlayers;
         s32 count = 1;
         do {
             u8 *value = *player;

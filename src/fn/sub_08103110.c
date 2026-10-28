@@ -8,6 +8,7 @@
 // original does not cross-jump.
 #include "display_animation.h"
 #include "actor_attachment_sprite_playback.h"
+#include "player.h"
 struct NamedObjectSprite {
     u32 flags;
     u8 pad4[3];
@@ -55,7 +56,6 @@ struct NamedObjectManager {
     u32 field1374;
 };
 extern struct NamedObjectManager *gUnk_020001AC;
-extern u8 *gUnk_02000580;
 struct NamedObject *NamedObject_AllocateSlot(struct NamedObjectManager *);
 void Path_GetPointPositionById(void *, u32, u32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
@@ -257,9 +257,9 @@ void NamedObject_CreateFromScript(void)
         }
         NamedObject_ClearAttachmentFlag(manager->field1370, 0);
         manager->field1370 = e->name;
-        Player_AddAttachmentFlags(gUnk_02000580, 1, e->name);
+        Player_AddAttachmentFlags((*(u8 **)gPlayers), 1, e->name);
         e->flags |= 8;
-        gUnk_02000580[0x701] |= 1;
+        (*(u8 **)gPlayers)[0x701] |= 1;
         x = e->body.x >> 8;
         z = e->body.z >> 8;
         if (x < 0 || z < 0 || x >= gTerrainWidth || z >= gTerrainHeight)
@@ -268,7 +268,7 @@ void NamedObject_CreateFromScript(void)
             cell = gTerrainMap->rows[z] + x;
         TerrainModifiers_RegisterCell(e->body.field48, cell, 0, e->body.height >> 8, 0xFF, 4);
         e->flags |= 1;
-        Player_SetPositionAndSave(gUnk_02000580, &e->body.x);
+        Player_SetPositionAndSave((*(u8 **)gPlayers), &e->body.x);
         if (follow == 2) {
             TetherActor_SetPosition(&e->body.x);
             NamedObject_ClearAttachmentFlag(manager->field1374, 1);

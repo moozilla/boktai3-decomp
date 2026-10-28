@@ -1,5 +1,4 @@
 #define Player_GetScriptSlot Script_GetActorIndex
-#define gPlayers             gUnk_02000580
 #include "global.h"
 #include "player.h"
 s32 Script_GetActorIndex(void);
@@ -9,7 +8,7 @@ s32 Player_TestScriptStatus(void)
 {
     struct Player *p;
     s32 index = Script_GetActorIndex();
-    p = gUnk_02000580[index];
+    p = gPlayers[index];
     if (p == 0 || Script_SeekToKeyword(0x73) == 0)
         goto fail;
     index = Script_GetValue();

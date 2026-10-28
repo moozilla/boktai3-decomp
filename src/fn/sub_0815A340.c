@@ -1,10 +1,9 @@
 #include "global.h"
-
-extern u8 *gUnk_02000580;
+#include "player.h"
 
 void Player_SetFlag740(void)
 {
-    u8 *g = gUnk_02000580;
+    u8 *g = (*(u8 **)gPlayers);
 
     if (g != 0) {
         g[0x740] = 1;

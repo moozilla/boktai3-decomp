@@ -3,13 +3,13 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_control_motion.h"
 #include "scene_actor_animation.h"
+#include "player.h"
 // confidence=low: positions player before setting release phase
 struct Status {
     u8 pad[0x160];
     u32 flags, state, timer;
     u8 a, b, entered, phase, done;
 };
-extern void *gUnk_02000580;
 void Player_ApplyPositionRequest(void *, void *, u32, u32, u32, u32, u32, u32);
 static inline void StepSequence(void *obj)
 {
@@ -143,7 +143,7 @@ void ActorStatus_BeginPlayerRelease(u8 *ownerArg, struct Status *status)
     }
     switch (s->state) {
         case 0:
-            Player_ApplyPositionRequest(gUnk_02000580, (u8 *)s + 0x1c, 80, 32, 128, 0, 0, 0);
+            Player_ApplyPositionRequest((*(void **)gPlayers), (u8 *)s + 0x1c, 80, 32, 128, 0, 0, 0);
             {
                 void *data = *(void **)(owner + 0x4d0);
                 register void *seq asm("r4");

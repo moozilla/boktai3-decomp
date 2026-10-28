@@ -18,7 +18,7 @@ s32 ScriptActor_TestFacingPointFromScript(void)
     struct ScriptActorPackedPoint point;
     struct Player *actor, *player;
     s32 index = Script_GetActorIndex();
-    actor = gUnk_02000580[index];
+    actor = gPlayers[index];
     player = actor;
     if (actor != NULL && actor->tetherMode == 12 && Script_SeekToKeyword('p')) {
         s32 dx, dz, direction, angle;

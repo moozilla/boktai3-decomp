@@ -6,6 +6,7 @@
 #include "scene_actor_control_motion.h"
 #include "scene_actor_terrain.h"
 #include "render.h"
+#include "player.h"
 #define U8(p, n)  (*((u8 *)(p) + (n)))
 #define U16(p, n) (*(u16 *)((u8 *)(p) + (n)))
 #define S16(p, n) (*(s16 *)((u8 *)(p) + (n)))
@@ -56,7 +57,6 @@ void SceneActorScript_OnCommand(void);
 void Ghost_OnActorUpdate(void);
 void Ghost_Destroy(void);
 extern const u8 gUnk_08605E14[];
-extern u8 *gUnk_02000580[];
 struct GhostRoutePoint {
     s16 x, z;
 };
@@ -504,7 +504,7 @@ s32 Ghost_Init(struct SceneActorRegistryResetView *a)
     } else
         U16(a, 0x564) = a->groundHeight2BE;
     U16(a, 0x622) = Script_GetKeywordValue('l', 0);
-    POS(a, 0x604) = POS(gUnk_02000580[0], 0x30);
+    POS(a, 0x604) = POS(gPlayers[0], 0x30);
     if (Script_SeekToKeyword('P')) {
         U8(a, 0x560) = Value(0);
         U8(a, 0x561) = Value(0);

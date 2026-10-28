@@ -1,10 +1,10 @@
 #include "global.h"
-extern u8 *gUnk_02000580;
+#include "player.h"
 extern int gUnk_08604D54[][3];
 int SceneObject_CheckActorCompatibility(void *unused, u8 *p)
 {
     int i = 0, result;
-    int actor = gUnk_02000580[0x3a4];
+    int actor = (*(u8 **)gPlayers)[0x3a4];
     int *ids;
     int *table = &gUnk_08604D54[0][0];
     {

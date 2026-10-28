@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 struct Target {
     u8 pad[8];
     u8 player;
@@ -11,7 +12,6 @@ struct PlayerFlags {
     u8 pad[0x20];
     u32 flags;
 };
-extern struct PlayerFlags *gUnk_02000580[];
 extern u32 gUnk_02000560[];
 // confidence=low: tests whether the collision target is absent or its player is unavailable.
 u8 SceneActor_IsCollisionTargetUnavailable(struct Actor *actor)
@@ -19,7 +19,7 @@ u8 SceneActor_IsCollisionTargetUnavailable(struct Actor *actor)
     struct Target *target = actor->target;
     if (target) {
         if (target->player <= 3) {
-            struct PlayerFlags *player = gUnk_02000580[target->player];
+            struct PlayerFlags *player = gPlayers[target->player];
             u32 mask = 0x20000;
             if (player->flags & mask)
                 return 1;

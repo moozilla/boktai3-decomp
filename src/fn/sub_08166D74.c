@@ -1,8 +1,8 @@
 #include "global.h"
 #include "scene_item_values.h"
 #include "game_state.h"
+#include "player.h"
 /* Tentative inventory display family, inferred from slot and item consumers. */
-extern void *gUnk_02000580;
 s32 GameState_GetUnlockEntry(s32);
 void ActionRecord_CopyFromEntry(struct SceneValueEquipment *, void *);
 void *Player_CalculatePreviewActionStat(void *, s32, void *, struct SceneValueEquipment *, s32);
@@ -31,7 +31,8 @@ s32 InventoryPanel_CreateEntry(void **out, s32 position, s32 index, s32 slotMode
         ActionRecord_CopyFromEntry(equipment, data);
     }
     if (data[0] != 255) {
-        *out = Player_CalculatePreviewActionStat(gUnk_02000580, position, data, equipment, kind);
+        *out = Player_CalculatePreviewActionStat((*(void **)gPlayers), position, data, equipment,
+                                                 kind);
         result = kind;
     } else {
         result = -1;

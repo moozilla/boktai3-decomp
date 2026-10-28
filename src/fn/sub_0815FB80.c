@@ -29,8 +29,8 @@ void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *p)
         Sound_PlaySong(0x303);
         Sound_PlaySong(0x1FB);
     }
-    gUnk_02000580[0]->animation.flags |= 1;
-    ActorShadow_Disable(gUnk_02000580[0]->shadow);
+    gPlayers[0]->animation.flags |= 1;
+    ActorShadow_Disable(gPlayers[0]->shadow);
     if (*frame <= 7) {
         animation = p->animation;
         data = p->animationData;
@@ -122,10 +122,10 @@ void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *p)
         }
         pos->x = p->owner->position.x;
         p->position.z = p->owner->position.z - ((104 - *frame) << 5);
-        if (p->position.y > gUnk_02000580[0]->position.y)
+        if (p->position.y > gPlayers[0]->position.y)
             p->position.y -= 10;
         else
-            p->position.y = gUnk_02000580[0]->position.y;
+            p->position.y = gPlayers[0]->position.y;
     }
     Anim_Step(animation, data);
     if (p->owner->currentStatA > p->targetStatA) {

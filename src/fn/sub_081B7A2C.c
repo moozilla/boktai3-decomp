@@ -6,7 +6,6 @@
 // MATCHING_CONCESSION: register-pinning
 // foundry draft (worker best 99.1%); what differs is mostly register allocation and instruction order
 #define GrowthHazard_EmitRevealEffects GrowthHazard_PlayImpactEffect
-#define gPlayers                       gUnk_02000580
 
 /* Tentative growth-hazard view, consistent with AnimatedMarker_BeginReveal. */
 struct GrowthHazardCollider {

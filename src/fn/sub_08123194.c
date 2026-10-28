@@ -244,7 +244,7 @@ u8 sub_08123194(struct BounceShot *s, s32 angle, u32 next)
             s32 direction = (quadrant >> 6) & 3;
             s32 preferred;
             s32 target;
-            struct AreaEffectPlayer *player = gUnk_02000580[0];
+            struct AreaEffectPlayer *player = gPlayers[0];
             if (!player)
                 preferred = 0;
             else {

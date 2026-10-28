@@ -3,9 +3,9 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_route.h"
 #include "engine.h"
+#include "player.h"
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
-extern u8 *gUnk_02000580[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void CpuSet(const void *, void *, u32);
@@ -171,10 +171,10 @@ void Lun_RenewPlayerRoute(struct SceneActorRegistryResetView *actor)
     Scale(actor);
     Lun_UpdateSway(actor);
     if (Approach(actor, (void *)(body + 0x3E8), speed) && sub_0809CCF4(actor)) {
-        Lun_SetMovementEndpoints(actor, gUnk_02000580[0] + 0x30);
+        Lun_SetMovementEndpoints(actor, ((u8 **)gPlayers)[0] + 0x30);
         sub_0809CCF4(actor);
         State(actor, 0, 0, 1);
-        Delta(&delta, &actor->position, (void *)(gUnk_02000580[0] + 0x30));
+        Delta(&delta, &actor->position, (void *)(((u8 **)gPlayers)[0] + 0x30));
         *((u8 *)actor + 0x3CD) = Math_Atan2(delta.x, delta.z);
     }
     actor->counter2AC++;

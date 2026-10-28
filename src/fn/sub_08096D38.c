@@ -2,6 +2,7 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "engine.h"
+#include "player.h"
 #ifdef NONMATCHING
 // fuzzy: 90.4%
 // fix.py best (sweep after the inlined-insn fix)
@@ -12,7 +13,6 @@ struct GhostPlayer {
     u8 pad[0x30];
     struct ContactPosition position;
 };
-extern struct GhostPlayer *gUnk_02000580;
 void Ghost_EmitAfterimage(struct SceneActorRegistryResetView *);
 void sub_08098344(void *, void *);
 s32 Math_Atan2(s32, s32);
@@ -166,7 +166,7 @@ void Ghost_AdvanceApproachRoute(struct SceneActorRegistryResetView *actor)
             Polar_1(&target, angle);
             Add(&target, &actor->position);
         } else {
-            target = gUnk_02000580->position;
+            target = (*(struct GhostPlayer **)gPlayers)->position;
         }
         Delta(&delta, &actor->position, &target);
         route->distance = Quarter((delta.x * delta.x) + (delta.z * delta.z));

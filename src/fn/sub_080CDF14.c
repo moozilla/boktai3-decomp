@@ -1,11 +1,11 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
+#include "player.h"
 /* Golem: build up charge while the target player is not dazzled; charge at the partner when ready and in reach (kind 0x28), else approach (kind 0x23) (tentative) */
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 u8 sub_0821D4F0(void *, void *, u32, u32);
 void Golem_UpdateChargeWindup(void);
 void Golem_UpdateRouteMotion(void);
-extern u8 *gUnk_02000580[4];
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -41,9 +41,9 @@ static inline void Golem_Charge(void *ctx)
         index = PlayerSlot(partner);
         if (index < 0)
             goto charge;
-        player = gUnk_02000580[index];
+        player = gPlayers[index];
     } else
-        player = gUnk_02000580[0];
+        player = gPlayers[0];
     {
         u32 mask = 0x20000;
         if (*(u32 *)(player + 0x20) & mask)

@@ -6,6 +6,7 @@
 // confidence=low: moves a paired half and holds/releases player position requests.
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
+#include "player.h"
 // Remaining differences: Packed-animation allocation, request-call setup, and shared phase-entry tails differ.
 // confidence=low: moves a paired half toward the player, then holds and releases the position request.
 struct PairPosition {
@@ -36,7 +37,6 @@ struct CapturePlayer {
     u8 pad0[0x20];
     u32 flags;
 };
-extern struct CapturePlayer *gUnk_02000580;
 void MotionTrack_Initialize(void *, void *, void *, s32, s32);
 void MotionTrack_Update(void *);
 void Player_BeginPositionRequest(void *, void *, s32, s32, s32, s32, s32, s32, s32);
@@ -202,12 +202,14 @@ void PairedSceneActor_UpdatePlayerCapture(struct PairOwner *owner, struct PairHa
             }
             copyPosition(&position, &half->position);
             if (half->mode == 0) {
-                if (!(gUnk_02000580->flags & 0x40000))
-                    Player_BeginPositionRequest(gUnk_02000580, &position, 0, 0, 1, 0, 0, 0, 1);
+                if (!((*(struct CapturePlayer **)gPlayers)->flags & 0x40000))
+                    Player_BeginPositionRequest((*(struct CapturePlayer **)gPlayers), &position, 0,
+                                                0, 1, 0, 0, 0, 1);
                 else
                     goto abortCapture;
-            } else if (!(gUnk_02000580->flags & 0x40000))
-                Player_BeginPositionRequest(gUnk_02000580, &position, 0, 0, 0, 0, 0, 0, 2);
+            } else if (!((*(struct CapturePlayer **)gPlayers)->flags & 0x40000))
+                Player_BeginPositionRequest((*(struct CapturePlayer **)gPlayers), &position, 0, 0,
+                                            0, 0, 0, 0, 2);
             else
                 goto abortCapture;
             goto advanceTrack;
@@ -231,7 +233,8 @@ void PairedSceneActor_UpdatePlayerCapture(struct PairOwner *owner, struct PairHa
             break;
 
         case 2:
-            Player_ApplyPositionRequest(gUnk_02000580, &half->position, 80, 32, 128, 0, 0, 0);
+            Player_ApplyPositionRequest((*(struct CapturePlayer **)gPlayers), &half->position, 80,
+                                        32, 128, 0, 0, 0);
             Anim_SetSequence(&half->sequence, owner->resource, 9, (u8)half->mode, 0);
             StepSequence(half);
             setPhase(half, 3);

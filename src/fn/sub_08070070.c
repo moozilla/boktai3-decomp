@@ -322,7 +322,7 @@ modeOne: {
     }
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     {
-        struct Player **players = gUnk_02000580;
+        struct Player **players = gPlayers;
         register u32 offset asm("r6") = 0x5d0;
         register void **field asm("r0");
         asm("" : "+r"(offset) : "r"(players));

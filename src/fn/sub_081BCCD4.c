@@ -1,6 +1,7 @@
 #include "global.h"
 #include "input.h"
-extern u8 *gGameState, *gUnk_02000580;
+#include "player.h"
+extern u8 *gGameState;
 void Anim_Step(void *, void *);
 void Sound_PlaySong(u32);
 void DarkLoan_BeginClosing(void *);
@@ -23,8 +24,8 @@ void DarkLoan_UpdateAdjustment(u8 *s)
     s32 i;
     Anim_Step(s + 0x58, s + 0x18);
     if (!W(0x8F4)) {
-        balance = (u16 *)(gUnk_02000580 + 0x428);
-        limit = (u16 *)(gUnk_02000580 + 0x42A);
+        balance = (u16 *)((*(u8 **)gPlayers) + 0x428);
+        limit = (u16 *)((*(u8 **)gPlayers) + 0x42A);
     } else {
         balance = (u16 *)(gGameState + 0x2C);
         limit = (u16 *)(gGameState + 0x2E);

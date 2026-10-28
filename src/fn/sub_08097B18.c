@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-extern u8 *gUnk_02000580;
+#include "player.h"
 struct LinkedReactionContext {
     u8 unknown0[0x558];
     u32 flags;
@@ -30,7 +30,7 @@ void SceneActor_EndLinkedReaction(struct SceneActorRegistryResetView *actor)
     {
         u32 mask = 0x80;
         if (TestFlags(state->flags, mask)) {
-            u8 *count = gUnk_02000580 + 0x4F6;
+            u8 *count = (*(u8 **)gPlayers) + 0x4F6;
             *count -= 3;
             {
                 u32 *flags = &state->flags;

@@ -8,7 +8,7 @@
 // Remaining differences: address scheduling, inlined tests and register allocation.
 #include "scene_actor_reset.h"
 #include "engine.h"
-extern u8 *gUnk_02000580;
+#include "player.h"
 extern s32 gUnk_02000478;
 extern u16 gUnk_02000534, gUnk_02000500;
 void ActorShadow_Disable(void *);
@@ -74,7 +74,7 @@ done:
 }
 static inline u8 PlayerMode(void)
 {
-    u8 *p = gUnk_02000580;
+    u8 *p = (*(u8 **)gPlayers);
     if (p) {
         u32 result = 0;
         if (*(u16 *)(p + 0x538) && *(u16 *)(p + 0x534) == 4)
@@ -146,7 +146,7 @@ u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a)
             else {
                 if (gUnk_02000478 > 0)
                     goto hide;
-                if (gUnk_02000580 && PlayerFlag_1(gUnk_02000580))
+                if ((*(u8 **)gPlayers) && PlayerFlag_1((*(u8 **)gPlayers)))
                     goto hide;
                 mode = GlobalMode();
             }

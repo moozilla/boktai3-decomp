@@ -1,6 +1,6 @@
 #include "global.h"
 #include "game_state.h"
-extern void *gUnk_02000580;
+#include "player.h"
 s32 Inventory_GetEquipmentId(s32);
 void Inventory_SetEquipmentEntry(s32, const void *);
 s32 Inventory_AddAssignedSlot(u32);
@@ -43,7 +43,7 @@ s32 Inventory_AddEquipmentFromRecord(const void *record)
         *(u16 *)(*gp + 0x50) = 0;
         Inventory_AddAssignedSlot(idx);
         Hud_RefreshInventoryDisplay();
-        p = gUnk_02000580;
+        p = (*(void **)gPlayers);
         if (p)
             Player_BeginDescriptorAction(p, Inventory_GetEquipmentEntry(idx));
     }

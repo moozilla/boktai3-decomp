@@ -64,13 +64,13 @@ static inline u8 Dog_RerouteToTarget(void *obj)
         }
         if (player < 0)
             goto invoke;
-        cell = gUnk_02000580[player]->cell[3];
+        cell = gPlayers[player]->cell[3];
     } else {
         struct ChaseTarget *t = *slot;
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
         player = 0;
     }
-    if (cell != actor->terrainCell && !Chase_Bits32(&gUnk_02000580[player]->flags, 0x20000))
+    if (cell != actor->terrainCell && !Chase_Bits32(&gPlayers[player]->flags, 0x20000))
         goto reroute;
     if (Dog_ReadMotionFlags(actor, 0x400))
         goto done;

@@ -17,7 +17,7 @@ void SceneActorRecord_RecordPair(u16, u32);
 void SceneActorBehavior_UpdateColliders(void *);
 void SceneActorReaction_SinkAndRemove(void);
 extern u32 gLinkSession;
-extern u32 gUnk_02000580[];
+extern u32 gPlayers[];
 extern u32 gUnk_02000478;
 extern u32 gUnk_02000534;
 extern u32 gUnk_02000500;
@@ -164,7 +164,7 @@ after_timers:
         r2 = 0;
     }
     if (gEngineFlags & 0x800) {
-        u8 *e = (u8 *)gUnk_02000580[r2];
+        u8 *e = (u8 *)gPlayers[r2];
         if (e != 0 && *(u16 *)(e + 0x538) != 0 && *(u16 *)(e + 0x534) == 4) {
             cond = 1;
         } else {
@@ -172,7 +172,7 @@ after_timers:
         }
     } else if (gUnk_02000478 > 0) {
         cond = 1;
-    } else if (gUnk_02000580[r2] != 0 && (*(u32 *)(gUnk_02000580[r2] + 0x448) & 0x10) != 0) {
+    } else if (gPlayers[r2] != 0 && (*(u32 *)(gPlayers[r2] + 0x448) & 0x10) != 0) {
         cond = 1;
     } else {
         cond = (gUnk_02000534 != 0 && gUnk_02000500 == 4);
@@ -301,7 +301,7 @@ finish:
     if (r4 == 0) {
         cond = (*(u16 *)(p + 0x2C0) & 2) != 0;
         if (cond) {
-            *(u32 *)(p + 0xDC) = (u32)(gUnk_02000580[0] + 0x24);
+            *(u32 *)(p + 0xDC) = (u32)(gPlayers[0] + 0x24);
         }
         if (*(u32 *)(p + 0xDC) != 0) {
             u8 *tgt = *(u8 **)(p + 0xDC);

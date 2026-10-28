@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "player.h"
 struct ActorPathPosition {
     s16 x, y, z, pad;
 };
@@ -13,7 +14,6 @@ struct PathPlayer {
     u8 unknown0[0x30];
     struct ActorPathPosition position;
 };
-extern struct PathPlayer *gUnk_02000580[];
 extern const u16 gUnk_0203B400[];
 s32 Nav_IsPositionInMesh(void *, struct ActorPathPosition *, struct ActorPathPosition *);
 void ProximityVolume_TranslateBounds(void *, struct ActorPathPosition *);
@@ -47,7 +47,7 @@ s32 sub_0817A918(struct ActorPathState *p)
     struct ActorPathPosition base;
     s32 i, n;
     struct ActorPathState *self = p;
-    base = gUnk_02000580[0]->position;
+    base = ((struct PathPlayer **)gPlayers)[0]->position;
     SetVec(&candidates[0], 0x100, 0, 0x100);
     SetVec(&candidates[1], 0x100, 0, -0x100);
     SetVec(&candidates[2], -0x100, 0, 0x100);

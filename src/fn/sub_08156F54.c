@@ -4,8 +4,8 @@
 #include "tether_actor.h"
 
 /* The tether header retains a distinct legacy player view. */
-#define gUnk_02000580 gTetherPlayerView
-#undef gUnk_02000580
+#define gPlayers gTetherPlayerView
+#undef gPlayers
 s32 TetherActor_TestMatchingStatus(u32, u32, u32, u32);
 s32 Player_TestTetherActionInput(struct Player *p)
 {

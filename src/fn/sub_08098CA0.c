@@ -2,13 +2,13 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "engine.h"
+#include "player.h"
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_0203B400[];
 struct GhostPlayer {
     u8 pad[0x30];
     struct ContactPosition position;
 };
-extern struct GhostPlayer *gUnk_02000580;
 void Ghost_EmitAfterimage(struct SceneActorRegistryResetView *);
 void sub_08098344(void *, void *);
 s32 Math_Atan2(s32, s32);
@@ -88,7 +88,7 @@ void Ghost_FollowPlayerLoop(struct SceneActorRegistryResetView *actor)
         }
         actor->word104 = 0;
         route->index = 0;
-        target = gUnk_02000580->position;
+        target = (*(struct GhostPlayer **)gPlayers)->position;
         observed = 0x0403B714;
         angle = RandomFirst(255);
         Polar(&delta, angle, 512);
@@ -115,7 +115,7 @@ void Ghost_FollowPlayerLoop(struct SceneActorRegistryResetView *actor)
         actor->position.x = route->points[8].x;
         actor->position.z = route->points[8].z;
         route->index = 0;
-        target = gUnk_02000580->position;
+        target = (*(struct GhostPlayer **)gPlayers)->position;
         Polar(&delta, Facing(Random(), &actor->fieldE9) & 255, 512);
         target.x += delta.x;
         target.z += delta.z;

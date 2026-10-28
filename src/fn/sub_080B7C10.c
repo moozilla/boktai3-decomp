@@ -25,7 +25,7 @@ struct ApproachPlayer {
     u8 unknown24[0x1C];
     struct ApproachPlayerCell *cell;
 };
-extern struct ApproachPlayer *gUnk_02000580[4];
+extern struct ApproachPlayer *gPlayers[4];
 
 struct ApproachSaved {
     void *target;
@@ -225,12 +225,12 @@ static inline u8 ReturnHome(void *p)
         }
         if (slot < 0)
             goto fail;
-        cell = gUnk_02000580[slot]->cell->cell;
+        cell = gPlayers[slot]->cell->cell;
     } else {
         cell = CellIndex((struct ContactPosition *)(*target + 12));
         slot = 0;
     }
-    if (cell == actor->terrainCell || (gUnk_02000580[slot]->flags & (mask = 0x20000))) {
+    if (cell == actor->terrainCell || (gPlayers[slot]->flags & (mask = 0x20000))) {
         mask = 0x400;
         test = MotionFlags(actor, mask);
         if (test)
@@ -311,14 +311,14 @@ void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *actor)
         }
     } else if (actor->distanceF0 > context->farDistance) {
         if (!actor->fieldDC)
-            actor->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
+            actor->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
         if (ReturnHome(actor)) {
             SetControl(actor, group->entryControl41C, 0x1A);
             SetState(actor, 0, 0, 12);
         }
     } else {
         if (!actor->fieldDC)
-            actor->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
+            actor->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
         if (ReturnHome(actor)) {
             SetControl(actor, group->entryControl41C, 0x1A);
             SetState(actor, 0, 0, 12);

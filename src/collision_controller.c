@@ -78,7 +78,7 @@ void CollisionController_UpdateIdleAnimationPaused(u32 x, struct CollisionSlot *
 
 static inline s32 stateMode(void)
 {
-    struct Player *a = gUnk_02000580[0];
+    struct Player *a = gPlayers[0];
     if (a) {
         u32 active = a->active;
         s32 yes = 0;
@@ -356,7 +356,7 @@ s32 CollisionController_UpdateAll(struct CollisionManager *input)
         struct Player *actor;
         if (gWeatherCollisionTimer > 0)
             goto pause;
-        actor = gUnk_02000580[0];
+        actor = gPlayers[0];
         if (actor) {
             u32 *address = &actor->actionFlags;
             u32 mask = 16;
@@ -425,7 +425,7 @@ s32 CollisionController_InitManager(struct CollisionManager *manager, void *owne
         if (gWeatherCollisionTimer > 0) {
             goto pause;
         }
-        actor = gUnk_02000580[0];
+        actor = gPlayers[0];
         if (actor) {
             u32 *address = &actor->actionFlags;
             u32 mask = 16;

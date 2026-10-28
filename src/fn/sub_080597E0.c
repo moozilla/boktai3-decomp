@@ -32,8 +32,8 @@ void ScenePanelRig_RandomizeMovement(struct ScenePanelRig *input)
     ScenePanelRig_InitMovement(rig);
     table = gUnk_0203B400;
     rig->speed = randomByte(table) + 192;
-    angle = Math_Atan2(gUnk_02000580[0]->position.x - rig->origin.x,
-                       gUnk_02000580[0]->position.z - rig->origin.z);
+    angle = Math_Atan2(gPlayers[0]->position.x - rig->origin.x,
+                       gPlayers[0]->position.z - rig->origin.z);
     facing = rig->angle >> 4;
     angle -= 256;
     difference = (facing - angle) & 255;

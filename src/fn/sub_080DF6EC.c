@@ -2,6 +2,7 @@
 
 #include "scene_actor_reset.h"
 #include "engine.h"
+#include "player.h"
 
 // confidence=low: Dog step gated on engine flags and context state; picks a random slot, sets the sound variant from health, and records the target distance and heading.
 
@@ -11,7 +12,6 @@
 
 // confidence=low: Dog step gated on engine flags and context state; picks a random slot, sets the sound variant from health, and records the target distance and heading.
 
-extern u8 *gUnk_02000580[4];
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
 u8 InventorySlot_PickRandom(void *, void *, void *);
@@ -49,7 +49,7 @@ void sub_080DF6EC(s32 unused, u8 *b, struct SceneActorRegistryResetView *a)
         return;
     if (mode != 0 && mode != 2)
         return;
-    pos = *(struct ContactPosition *)(gUnk_02000580[0] + 0x30);
+    pos = *(struct ContactPosition *)(((u8 **)gPlayers)[0] + 0x30);
     pos.y += 200;
     if (!InventorySlot_PickRandom(context + 0x6A0, context + 0x6A2, context + 0x6A4))
         return;
@@ -73,7 +73,7 @@ void sub_080DF6EC(s32 unused, u8 *b, struct SceneActorRegistryResetView *a)
     else
         a->reactionSoundVariant = a->health;
     *(u16 *)(context + 0x6A0) = 0xFFFF;
-    a->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
+    a->fieldDC = (u32)((u8 *)((u8 **)gPlayers)[0] + 0x24);
     a->field2E0 = 1;
     a->field2D8 = 0;
     a->field2DC = 0;
@@ -84,7 +84,7 @@ void sub_080DF6EC(s32 unused, u8 *b, struct SceneActorRegistryResetView *a)
     *(u16 *)((u8 *)a + 0x178) = 0x1E;
     a->field2E6 = 1;
     if (F6ECTest(a->flags2C0, 2))
-        a->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
+        a->fieldDC = (u32)((u8 *)((u8 **)gPlayers)[0] + 0x24);
     else if (a->fieldDC == 0)
         return;
     obj = (u8 *)a->fieldDC;

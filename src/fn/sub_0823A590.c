@@ -16,7 +16,7 @@ void Player_NotifyFirstSelectedSlot(u32 slots, u32 flags)
     else
         return;
     if (flags & 0x17) {
-        player = gUnk_02000580[slot];
+        player = gPlayers[slot];
         if (player && player->kind == 1)
             Player_ApplyPeriodicStatChanges(player);
     }

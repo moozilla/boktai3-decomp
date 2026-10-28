@@ -385,7 +385,7 @@ s32 DirectionalController_InitManager(struct DirectionalManager *manager, void *
     for (i = 0; i < manager->count; i++, p++)
         if (DirectionalController_InitSlot(manager, p, i) < 0)
             goto fail;
-    manager->actor = gUnk_02000580[0];
+    manager->actor = gPlayers[0];
     if (manager->actor)
         manager->position = manager->actor->position;
     else {

@@ -1,13 +1,13 @@
 #include "global.h"
 #include "engine.h"
+#include "player.h"
 
-extern u8 *gUnk_02000580;
 extern u32 gUnk_02000560;
 
 // differs: constant-vs-load order of the three flag tests
 u8 Scene_CanOpenMenu(void)
 {
-    u8 *p = gUnk_02000580;
+    u8 *p = (*(u8 **)gPlayers);
     u32 one;
     u32 mask;
     if (p && !(gEngineFlags & 0x200)) {

@@ -28,7 +28,7 @@ void AreaEffect_UpdateLinkPlayerResources(struct AreaEffectManager *manager)
     register s32 i asm("r3") = 0;
     u16 *fractions = object->resourceFractions;
     do {
-        struct AreaEffectPlayer *player = gUnk_02000580[i];
+        struct AreaEffectPlayer *player = gPlayers[i];
         s32 next = i + 1;
         if (player && player->stateTag == 1) {
             u32 mode = playerMode(player);

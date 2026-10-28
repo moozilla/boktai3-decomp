@@ -43,14 +43,13 @@ void SceneStatusIndicator_UpdateBlink(void *owner, struct StatusSlot *input)
     if (gEngineFlags & 0x800) {
         s32 local;
         if (gLinkSession && (local = gLinkSession->localPlayer) >= 0) {
-            if (!PlayerInMode(gUnk_02000580[local]))
+            if (!PlayerInMode(gPlayers[local]))
                 goto checkActive;
             goto show;
         }
     } else {
         if (gWeatherCollisionTimer > 0 ||
-            (gUnk_02000580[0] && TestMask((u32 *)((u8 *)gUnk_02000580[0] + 0x448), 16)) ||
-            GlobalMode())
+            (gPlayers[0] && TestMask((u32 *)((u8 *)gPlayers[0] + 0x448), 16)) || GlobalMode())
             active = 1;
     }
 checkActive:

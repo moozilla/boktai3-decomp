@@ -1,10 +1,9 @@
 #define RouteActor_SetDestination Lun_BeginMoveToPosition
-#define gPlayerSlots              gUnk_02000580
 #include "global.h"
 #include "scene_actor_reset.h"
+#include "player.h"
 void Lun_UpdateWaitingAnimation(void);
 void Lun_BeginMoveToPosition(void *, void *);
-extern u8 *gUnk_02000580[4];
 struct RouteActorDestinationState {
     u8 unknown0[0x442];
     u16 delayDuration, delay;
@@ -43,7 +42,7 @@ void RouteActor_UpdatePlayerDestinationPhase(struct SceneActorRegistryResetView 
         state->delay = state->delayDuration;
     }
     if (actor->field2B0)
-        Lun_BeginMoveToPosition(actor, gUnk_02000580[0] + 0x30);
+        Lun_BeginMoveToPosition(actor, ((u8 **)gPlayers)[0] + 0x30);
     else
         actor->counter2AC++;
 }

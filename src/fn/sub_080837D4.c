@@ -32,7 +32,7 @@ void SceneActorControl_ConsumeLiftFlag(struct SceneActorRegistryResetView *actor
     struct SceneActorControlMotionState *state;
     if (IsUnavailable(actor))
         return;
-    if (!gUnk_02000580[0])
+    if (!gPlayers[0])
         return;
     state = SceneActorControl_GetMotionState(actor);
     if (LiftFlag(state)) {

@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "player.h"
 
 #define PairedSceneActor_IsFinished PairedSceneActor_AreSelectedHalvesFinished
-#define gPlayer                     gUnk_02000580
 struct Vanargand {
     u8 pad0[0x9C];
     u32 flags;
@@ -20,7 +20,6 @@ struct Vanargand {
     u8 pad570[8];
     u32 resetTimer;
 };
-extern void *gUnk_02000580;
 s32 Callback_InvokeActor(void *, void *);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
 s32 Player_RequestTimedReset(void *, u32);
@@ -66,7 +65,7 @@ void Vanargand_UpdatePairedAttack(struct Vanargand *p)
             } else if (PairedSceneActor_IsFinished(p->attachment)) {
                 s32 count = ScenePair_CountPositiveCounters(p->attachment);
                 if (count > 0) {
-                    void *player = gPlayer;
+                    void *player = (*(void **)gPlayers);
                     u32 duration = count * 72;
                     Player_RequestTimedReset(player, duration);
                     p->resetTimer = duration;

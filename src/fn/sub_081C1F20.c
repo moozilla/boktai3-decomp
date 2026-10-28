@@ -31,9 +31,9 @@ void ControlPanel_BeginIdle(struct S *p, u32 flag)
     Camera_FollowPlayerWithoutCompletion(8);
     ControlPanel_HideInteractionDisplay(p);
 
-    gUnk_02000580[0]->kind = 2;
-    *((u8 *)gUnk_02000580[0] + 0x457) = 0;
-    *((u8 *)gUnk_02000580[0] + 0x457 + 1) = 0;
+    gPlayers[0]->kind = 2;
+    *((u8 *)gPlayers[0] + 0x457) = 0;
+    *((u8 *)gPlayers[0] + 0x457 + 1) = 0;
 
     if (flag == 0) {
         StageIconDisplay_Create(1, 0, SegmentDisplay_CallSelectionScript, p);

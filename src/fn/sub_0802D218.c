@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "player.h"
 extern u8 gUnk_0203B400[];
-extern u8 *gUnk_02000580;
 u32 Callback_InvokeActor(u8 *, void *);
 void Actor_StepFacingAngle(u8 *);
 void Actor_SetFacingAnimationEntry(u8 *, u32, u32, u32, u32, u32);
@@ -39,7 +39,7 @@ void Actor_OnTrackingAction(u8 *p, u32 tick)
             if (random <= 63) {
                 MotionPool_InitializeParams(buf);
                 MotionPool_SetLifetimeAndVelocity(buf, 0, 0xf0, p[9] + 0x80, 12);
-                MotionPool_SetTracking(buf, 0xb4, *(u32 *)(gUnk_02000580 + 0x24), 1);
+                MotionPool_SetTracking(buf, 0xb4, *(u32 *)((*(u8 **)gPlayers) + 0x24), 1);
                 MotionPool_SetContact(buf, 0, 0x200004, 0x64, 0x32, 0x28);
                 MotionPool_SetBounds(buf, 0x10, 0x10, 0x10);
                 MotionPool_SetGraphics(buf, 0x61f9, 0x29, 0x29f);

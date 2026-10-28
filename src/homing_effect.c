@@ -226,7 +226,7 @@ s32 EffectManager_Init(struct EffectManager *manager, void *unused)
     manager->counter = 0;
     {
         struct Player *actor = ({
-            struct Player *a = gUnk_02000580[0];
+            struct Player *a = gPlayers[0];
             a;
         });
         manager->actor = actor;
@@ -278,7 +278,7 @@ s32 EffectManager_SpawnParticles(s32 count, u32 type, u32 kind, struct EffectVec
         if (!manager)
             return -1;
     }
-    if (!gUnk_02000580[0])
+    if (!gPlayers[0])
         return 0;
     if (type & 0xF0)
         reverse = 1;

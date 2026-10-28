@@ -1,5 +1,5 @@
-#define gPlayer gUnk_02000580
 #include "global.h"
+#include "player.h"
 struct SceneProjectileState {
     u16 unknown;
     u16 lifetime;
@@ -23,7 +23,6 @@ struct ProjectilePoolState {
     u32 contactFlag;
 };
 extern struct ProjectilePoolState *gSceneProjectilePool;
-extern u8 *gPlayer;
 s32 Player_StartForcedStun(u8 *, s32);
 void Sound_PlaySong(u32);
 void SceneProjectile_RespondToContact(void *unused, struct ProjectileContact *contact,
@@ -33,8 +32,8 @@ void SceneProjectile_RespondToContact(void *unused, struct ProjectileContact *co
     if (p->state.mode == 1 && contact->kind == 1)
         gSceneProjectilePool->contactFlag = 1;
     if (p->state.mode == 0) {
-        if (gPlayer[0x457] != 26 && *(u16 *)(gPlayer + 0x4D8) == 0) {
-            if (Player_StartForcedStun(gPlayer, 90) == 1)
+        if ((*(u8 **)gPlayers)[0x457] != 26 && *(u16 *)((*(u8 **)gPlayers) + 0x4D8) == 0) {
+            if (Player_StartForcedStun((*(u8 **)gPlayers), 90) == 1)
                 Sound_PlaySong(1400);
         }
     }

@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
+#include "player.h"
 typedef struct {
     u16 id;
     u8 unk[4];
@@ -151,7 +152,6 @@ struct Camera {
     u8 pad[0x30];
     struct PackedVec position;
 };
-extern struct Camera *gUnk_02000580;
 void *memset(void *, s32, u32);
 void *SceneMessages_FindScript(s32);
 void Trigger_CreateDrop(void *, s32, s32, void *, void *, s32, s32, s32);
@@ -207,7 +207,7 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
                     struct PackedVec pos;
                     s32 a = m[4], b = m[5];
                     struct Vec *p = &npc->motion.pos;
-                    pos = gUnk_02000580->position;
+                    pos = (*(struct Camera **)gPlayers)->position;
                     pos.y += 200;
                     FloatingItemEffect_Spawn(a, b, 3, 0, &pos, p, 24, p);
                 } break;

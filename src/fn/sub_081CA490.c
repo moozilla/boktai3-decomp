@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "player.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 86.4%
@@ -20,7 +21,6 @@ void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
 
 extern const u16 gUnk_0203B400[];
-extern void *gUnk_02000580[];
 void Sound_PlaySong(u32);
 u8 Callback_InvokeActor(void *, u32);
 void sub_080148CC(s32, s32, void *, s32, s32, s32, s32, s32, s32, s32, s32);
@@ -146,7 +146,7 @@ void StateActor_UpdateEightWayBurst(u32 a, struct S *p, s32 tick)
         sub_080148CC(2, 0x26, &position, 64, RandomFrom(table) & 63, ten, 4, 4, 4, fourteen, 4);
         sub_080148CC(2, 0x26, &position, 128, RandomFrom(table) & 63, ten, 4, 4, 4, fourteen, 4);
         sub_080148CC(2, 0x26, &position, 192, RandomFrom(table) & 63, ten, 4, 4, 4, fourteen, 4);
-        PlayerCue_BeginModeSeven(gUnk_02000580[0], 2);
+        PlayerCue_BeginModeSeven(gPlayers[0], 2);
     }
     if (DisplayAnimation_TestFinished(p->d4)) {
         switch (p->b18) {

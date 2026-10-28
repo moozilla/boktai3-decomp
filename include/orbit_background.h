@@ -36,7 +36,7 @@ struct OrbitBackgroundSelection {
 };
 extern struct OrbitBackground *gOrbitBackground;
 extern struct OrbitBackgroundSelection *gLinkSession;
-extern struct OrbitBackgroundPlayer *gUnk_02000580[4];
+extern struct OrbitBackgroundPlayer *gPlayers[4];
 extern const s16 gUnk_086149C4[];
 void OrbitBackground_ResetOrbit(struct OrbitBackground *);
 void OrbitBackground_UpdateVisibility(struct OrbitBackground *);

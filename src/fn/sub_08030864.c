@@ -25,7 +25,7 @@ struct Manager {
     struct Vec *target;
     struct Player *player;
 };
-extern struct Player *gUnk_02000580[4];
+extern struct Player *gPlayers[4];
 int Weather_GetType(void);
 int SunClock_GetBaseHour(void);
 int SunClock_GetBaseMinute(void);

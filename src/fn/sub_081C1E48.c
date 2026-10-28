@@ -1,5 +1,6 @@
 #include "global.h"
 #include "script_utility.h"
+#include "player.h"
 // MATCHING_CONCESSION: register-pinning
 
 struct ControlPanelCounter {
@@ -11,7 +12,6 @@ struct ControlPanelCounter {
     u16 accumulator;
     u16 threshold;
 };
-extern u8 *gUnk_02000580;
 u32 ControlPanel_GetInputMultiplier(struct ControlPanelCounter *);
 void ControlPanel_ApplyMultiplierMode(struct ControlPanelCounter *);
 
@@ -19,7 +19,7 @@ s32 sub_081C1E48(struct ControlPanelCounter *p)
 {
     s32 step;
     u32 multiplier;
-    u16 *level = (u16 *)(gUnk_02000580 + 0x522);
+    u16 *level = (u16 *)((*(u8 **)gPlayers) + 0x522);
     if (*level == 0)
         step = 0;
     else if (*level <= 3)

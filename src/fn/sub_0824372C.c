@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000580[4];
+#include "player.h"
 extern u8 *gLinkSession;
 s32 Script_GetOptionalIValue(void);
 bool32 Script_SeekToKeyword(s32);
@@ -10,7 +10,7 @@ void Player_InitializeActionState(u8 *, u8 *);
 void sub_0824372C(void)
 {
     s32 i = Script_GetOptionalIValue();
-    u8 *player = gUnk_02000580[i];
+    u8 *player = gPlayers[i];
     if (player != NULL && Script_SeekToKeyword('w')) {
         s32 v = Script_GetValue();
         s8 *slot = (s8 *)(player + 0x549);

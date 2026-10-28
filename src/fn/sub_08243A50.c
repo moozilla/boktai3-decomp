@@ -40,7 +40,7 @@ s32 Player_OnCreate(struct Player *p, void *script)
         *(u16 *)((u8 *)gGameState + 0x34) = p->position.z;
         *(u16 *)((u8 *)gGameState + 0x85E) = ((p->facing + 5) & 7) << 5;
     }
-    gUnk_02000580[p->movementRequestBlocked] = p;
+    gPlayers[p->movementRequestBlocked] = p;
     gPlayerCount++;
     return 0;
 }

@@ -27,13 +27,13 @@ void NamedObject_MoveAttachedPlayer(struct NamedObject *object)
 {
     struct SceneVec target;
     struct NamedObjectManager *manager = gNamedActorManager;
-    if (gUnk_02000580[0] && object->name == manager->playerName) {
+    if (gPlayers[0] && object->name == manager->playerName) {
         if (!testFlag(0x100, &object->flags)) {
-            target.x = gUnk_02000580[0]->position.x + object->offset.x;
-            target.y = gUnk_02000580[0]->position.y + object->offset.y;
-            target.z = gUnk_02000580[0]->position.z + object->offset.z;
-            NamedObject_ResolveAttachmentPosition(&target, &gUnk_02000580[0]->position, object);
-            Player_SetPositionAndSave(gUnk_02000580[0], &target);
+            target.x = gPlayers[0]->position.x + object->offset.x;
+            target.y = gPlayers[0]->position.y + object->offset.y;
+            target.z = gPlayers[0]->position.z + object->offset.z;
+            NamedObject_ResolveAttachmentPosition(&target, &gPlayers[0]->position, object);
+            Player_SetPositionAndSave(gPlayers[0], &target);
         }
         {
             u32 mask = ~0x100;

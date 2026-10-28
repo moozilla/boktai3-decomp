@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 
 // confidence=low: requests player contact damage and adds the returned amount to boss health.
 
@@ -35,7 +36,6 @@ struct DrainActor {
     u8 pad5B4[0x7B8 - 0x5B4];
     u8 collision[3][0x20];
 };
-extern struct PlayerDrainTarget *gUnk_02000580[];
 extern u32 gUnk_02000560;
 void Vanargand_SetPendingCue(void *, u16);
 s32 Player_BeginPositionRequest(void *, void *, s32, s32, s32, s32, s32, s32, s32);
@@ -89,12 +89,12 @@ void Vanargand_UpdatePlayerDrain(struct DrainActor *p)
         SetPosition(&initial, 128, 0, 128);
         initialBase = &initial;
         AddPosition(&initial, &p->position, initialBase);
-        target = gUnk_02000580[0];
+        target = gPlayers[0];
         one = 1;
         if (!TestFlags(&target->flags, 0x40000)) {
             void *animation;
             void *drawable;
-            Player_BeginPositionRequest(gUnk_02000580[0], &initial, 0, 0, 0, 0, one, 0, 2);
+            Player_BeginPositionRequest(gPlayers[0], &initial, 0, 0, 0, 0, one, 0, 2);
             animation = p->animation;
             drawable = p->drawable;
             switch ((s32)p->player->mode) {

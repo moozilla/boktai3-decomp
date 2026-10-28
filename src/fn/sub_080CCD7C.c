@@ -336,12 +336,12 @@ static inline u8 Golem_Chase(struct SceneActorRegistryResetView *input)
         slot = SlotIndex(target);
         if (slot < 0)
             goto fail;
-        cell = *(u16 *)((u8 *)PTR(gUnk_02000580[slot], 0x40) + 6);
+        cell = *(u16 *)((u8 *)PTR(gPlayers[slot], 0x40) + 6);
     } else {
         cell = CellIndex((struct ContactPosition *)(*targetp + 0xC));
         slot = 0;
     }
-    if (cell == actor->terrainCell || Flag32(gUnk_02000580[slot], 0x20000, 0x20)) {
+    if (cell == actor->terrainCell || Flag32(gPlayers[slot], 0x20000, 0x20)) {
         u16 busy = Flag16(actor, 0x400, 0x2D4);
         u16 blocked;
         if (busy)
@@ -427,7 +427,7 @@ void Golem_UpdateChargePursuit(struct SceneActorRegistryResetView *actor)
         index = SlotIndex(partner);
         if (index < 0)
             goto route;
-        if (IsDazzled(gUnk_02000580[index])) {
+        if (IsDazzled(gPlayers[index])) {
             u32 mask = 0x80000;
             u8 held = Test(body->flags628, mask);
             if (!held) {
@@ -435,7 +435,7 @@ void Golem_UpdateChargePursuit(struct SceneActorRegistryResetView *actor)
                 return;
             }
         }
-    } else if (IsDazzled(gUnk_02000580[0])) {
+    } else if (IsDazzled(gPlayers[0])) {
         u32 mask = 0x80000;
         u8 held = Test(body->flags628, mask);
         if (!held) {
@@ -491,11 +491,11 @@ route:
                         index = SlotIndex(partner);
                         if (index < 0)
                             goto recover;
-                        if (IsDazzled(gUnk_02000580[index]))
+                        if (IsDazzled(gPlayers[index]))
                             goto recover;
                         body->charge688 = 400;
                     } else {
-                        if (IsDazzled(gUnk_02000580[0]))
+                        if (IsDazzled(gPlayers[0]))
                             goto recover;
                         body->charge688 = 400;
                     }

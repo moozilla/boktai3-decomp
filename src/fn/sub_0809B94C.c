@@ -9,8 +9,8 @@
 // Remaining differences: instruction ordering, address lifetimes, and registers.
 #include "scene_actor_reset.h"
 #include "engine.h"
+#include "player.h"
 extern const u16 gUnk_0203B400[];
-extern u8 *gUnk_02000580[];
 s32 Mod(s32, s32);
 void SparkParticle_Spawn(void *, u32, void *, s32, s32, s32, s32, s32);
 void Lun_ResumeAfterLiftPenalty(void);
@@ -153,7 +153,7 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
             } else if (*((u16 *)(ctx + 0x444))) {
                 SetFlag(&a->flags2D4, 0x100);
                 *((u16 *)(ctx + 0x444)) = *((u16 *)(ctx + 0x442));
-                Lun_BeginMoveToPosition(a, gUnk_02000580[0] + 0x30);
+                Lun_BeginMoveToPosition(a, ((u8 **)gPlayers)[0] + 0x30);
                 SetState(a, 0, 2, 1);
                 SceneActorControl_ResetCollisionFlags(a);
             } else {

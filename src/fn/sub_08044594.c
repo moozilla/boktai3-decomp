@@ -116,8 +116,8 @@ u32 ContactSwarm_Update(struct ContactSwarm *poolInput)
 {
     struct ContactSwarm *pool = poolInput;
     if (poolInput->activeMask) {
-        if (gUnk_02000580[0])
-            pool->target = *(const struct ContactPosition *)&gUnk_02000580[0]->position;
+        if (gPlayers[0])
+            pool->target = *(const struct ContactPosition *)&gPlayers[0]->position;
         {
             u8 *fadeActive = &pool->fadeActive;
             if (*fadeActive) {

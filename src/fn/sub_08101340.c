@@ -55,9 +55,9 @@ void NamedObject_UpdateMovementSound(u8 *manager)
             }
         }
     }
-    if (Player_TestAttachmentFlags(gUnk_02000580[0], 1))
+    if (Player_TestAttachmentFlags(gPlayers[0], 1))
         attached = 1;
-    objects = NamedObject_FindByName(*(u16 *)((u8 *)gUnk_02000580[0] + 0x476));
+    objects = NamedObject_FindByName(*(u16 *)((u8 *)gPlayers[0] + 0x476));
     if (!objects)
         return;
     if (objects->field_E0 & 4)

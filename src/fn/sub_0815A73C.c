@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "player.h"
 struct ItemDef {
     u16 unknown0;
     u16 actionKind;
@@ -21,7 +22,6 @@ struct ItemUser {
     u8 padADA[0xAE8 - 0xADA];
     u8 numberOffset[8];
 };
-extern struct ItemUser *gUnk_02000580[];
 s32 Script_GetActorIndex(void);
 s32 Div(s32, s32);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
@@ -38,7 +38,7 @@ void sub_0815A73C(void)
     const struct ItemDef *def;
     const struct ItemDef *table;
     s32 i = Script_GetActorIndex();
-    p = gUnk_02000580[i];
+    p = gPlayers[i];
     if ((p == ((void *)0)) || (!Script_SeekToKeyword(0x45)))
         return;
     item = Script_GetValue();

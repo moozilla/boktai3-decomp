@@ -5,7 +5,7 @@
 #include "engine.h"
 
 extern const u16 gUnk_0203B400[];
-extern u8 *gUnk_02000580[];
+extern u8 *gPlayers[];
 s32 sub_0812F3CC(struct SceneActorRegistryResetView *);
 void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView *, u32, u32, u8);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
@@ -157,14 +157,14 @@ void sub_080E3874(struct SceneActorRegistryResetView *actor)
                 state = -1;
             if (state < 0)
                 goto fallback;
-            cell = *(u16 *)(*(u8 **)(gUnk_02000580[state] + 0x40) + 6);
+            cell = *(u16 *)(*(u8 **)(gPlayers[state] + 0x40) + 6);
         } else {
             u16 *p = *(u16 **)(a + 0xDC);
             state = 0;
             cell = Dog080E3874_CellIndex(p[6], p[8]);
         }
         if (cell != *(u16 *)(a + 0x2F4)) {
-            if (!(*(u32 *)(gUnk_02000580[state] + 0x20) & 0x20000))
+            if (!(*(u32 *)(gPlayers[state] + 0x20) & 0x20000))
                 goto navigate;
         }
         if (*(u16 *)(a + 0x2D4) & 0x400)

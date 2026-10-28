@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-extern u8 *gUnk_02000580;
+#include "player.h"
 struct GhostPlayerReaction {
     u8 unknown0[0x558];
     u32 flags;
@@ -103,12 +103,12 @@ void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
         return;
     state = actor->context;
     {
-        u8 **players = &gUnk_02000580;
+        u8 **players = &(*(u8 **)gPlayers);
         u8 **slots;
         slots = players;
-        Delta(&delta, &state->previousPlayer, (void *)(gUnk_02000580 + 0x30));
+        Delta(&delta, &state->previousPlayer, (void *)((*(u8 **)gPlayers) + 0x30));
     }
-    state->previousPlayer = *(struct ContactPosition *)(gUnk_02000580 + 0x30);
+    state->previousPlayer = *(struct ContactPosition *)((*(u8 **)gPlayers) + 0x30);
     if (state->delay) {
         state->delay--;
         return;
@@ -124,7 +124,7 @@ void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
         u32 mask = ~2;
         reaction->flags = mask & reaction->flags;
     }
-    height = actor->position.y - *(s16 *)(gUnk_02000580 + 0x32);
+    height = actor->position.y - *(s16 *)((*(u8 **)gPlayers) + 0x32);
     if (height < 0)
         height = -height;
     if (height > 512)
@@ -133,7 +133,7 @@ void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
         return;
     active = ContextFlag(state, 0x10, &savedFlags);
     if (active) {
-        if (*(u16 *)(gUnk_02000580 + 0x428) == 0)
+        if (*(u16 *)((*(u8 **)gPlayers) + 0x428) == 0)
             return;
         ZeroState(actor, 4);
         state->timer = state->interval;

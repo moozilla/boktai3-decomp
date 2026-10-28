@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 
 // confidence=low: axe attack behavior inferred from orbit and trail state updates.
 
@@ -35,7 +36,6 @@ struct AxeActor {
     struct AxeTrail *trail;
 };
 extern s16 gUnk_086149C4[];
-extern u8 *gUnk_02000580;
 void Axe_UpdateTrailColliders(void *);
 void ActorPhase_EmitTrailSprite(void *, struct Vec *, u32);
 void Sound_PlaySong(u32);
@@ -122,7 +122,7 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
         Advance(&trail->position, &trail->velocity);
         trail->angle -= trail->angleDecay;
         {
-            u8 **gp = &gUnk_02000580;
+            u8 **gp = &gPlayers;
             struct Vec *d;
             d = &delta;
             Difference(d, (void *)(*gp + 0x30), &trail->position);

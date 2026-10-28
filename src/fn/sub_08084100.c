@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000580;
+#include "player.h"
 static inline u8 Test(u8 *s)
 {
     u8 *p = s + 0xDC;
@@ -20,7 +20,7 @@ u32 SceneActorControl_TryActivateProximityResponse(u8 *s)
         mask &= p[15];
         p[15] = mask;
     }
-    distance = *(s16 *)(s + 0x5E) - *(s16 *)(gUnk_02000580 + 0x32);
+    distance = *(s16 *)(s + 0x5E) - *(s16 *)((*(u8 **)gPlayers) + 0x32);
     if (distance < 0)
         distance = -distance;
     if (distance > 0x200)

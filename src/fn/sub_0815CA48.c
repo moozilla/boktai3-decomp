@@ -1,7 +1,7 @@
 #include "global.h"
 
 #include "engine.h"
-extern u8 *gUnk_02000580[];
+#include "player.h"
 s32 Script_GetActorIndex(void);
 void PlayerCue_OverlaySet(u8 *, s32);
 void ScriptActor_EnableCompletionScript(u8 *);
@@ -10,7 +10,7 @@ void ScriptActor_EnableCompletionScript(u8 *);
 void ScriptActor_RequestFromScript(void)
 {
     s32 i = Script_GetActorIndex();
-    u8 *actor = gUnk_02000580[i];
+    u8 *actor = gPlayers[i];
     if (actor && Script_SeekToKeyword('p')) {
         PlayerCue_OverlaySet(actor, Script_GetValue() + 0x16E);
         ScriptActor_EnableCompletionScript(actor);

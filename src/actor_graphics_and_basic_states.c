@@ -3,6 +3,7 @@
 #include "contact_actor.h"
 #include "render.h"
 #include "engine_globals.h"
+#include "player.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -55,7 +56,6 @@ void SceneActorGraphics_SelectResource(u8 *p)
 }
 
 #define SceneActorGraphics_OnDamageContact sub_08021F4C
-extern u8 *gUnk_02000580;
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void Sound_PlaySongChecked(u32);
@@ -90,7 +90,7 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
     u16 responseValue;
     if (*((u16 *)(p + 0x34e)))
         return;
-    mode = gUnk_02000580[0x418];
+    mode = (*(u8 **)gPlayers)[0x418];
     Collision_CalculateDamageResponse(source, contact);
     if (((*((u32 *)(p + 0x358))) == 1) && (mode != 2))
         *((u16 *)(contact + 0x3e)) = 0;
@@ -728,7 +728,7 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
     switch (kind) {
         case 0: {
             s32 shown = damage;
-            if (*(u32 *)((u8 *)p + 0x358) == 1 && gUnk_02000580[0x418] != 2) {
+            if (*(u32 *)((u8 *)p + 0x358) == 1 && (*(u8 **)gPlayers)[0x418] != 2) {
                 shown = 0;
                 result = 0;
             }
@@ -2202,7 +2202,7 @@ void sub_08023FE8(State_08023F98 *p)
         r = sub_08022624(actor, actor[0x174], (struct BoxSearchPosition *)&min,
                          (struct BoxSearchPosition *)&max);
         if (r >= 0) {
-            u8 *q = (&gUnk_02000580)[r];
+            u8 *q = (&(*(u8 **)gPlayers))[r];
             u32 mask = 0x40000;
             if (!(*(u32 *)(q + 0x20) & mask)) {
                 actor[0x395] = r;

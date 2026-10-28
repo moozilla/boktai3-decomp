@@ -5,7 +5,7 @@
 #include "scene_vec.h"
 
 /*
- * The player actor. gUnk_02000580 holds four pointers (one per player slot; slot 0 is the local
+ * The player actor. gPlayers holds four pointers (one per player slot; slot 0 is the local
  * player, the other slots are used by the multiplayer code, guess). Built from the offsets seen
  * across src/ (partial views in src/fn/*.c); unknown ranges are u8 unkXXX[N]. Names are
  * provisional.
@@ -352,6 +352,6 @@ struct Player {
     void *updateCallback;          /* 0xCA4: called with the player each update */
 };
 
-extern struct Player *gUnk_02000580[4];
+extern struct Player *gPlayers[4];
 
 #endif

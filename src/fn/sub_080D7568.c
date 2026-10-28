@@ -88,13 +88,13 @@ static inline u8 Mummy_Arrive(void *obj)
             Callback_InvokeActor(actor, *(void **)(group + 0x224));
             goto done;
         }
-        cell = gUnk_02000580[player]->cell[3];
+        cell = gPlayers[player]->cell[3];
     } else {
         struct ChaseTarget *t = *slot;
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
         player = 0;
     }
-    if (cell != actor->terrainCell && !Chase_Bits32(&gUnk_02000580[player]->flags, 0x20000))
+    if (cell != actor->terrainCell && !Chase_Bits32(&gPlayers[player]->flags, 0x20000))
         goto reroute;
     if (Chase_MotionFlags(actor, 0x400))
         goto done;
@@ -173,7 +173,7 @@ u8 Mummy_ProcessContactPursuit(struct SceneActorRegistryResetView *actor)
     cell = *((u16 *)((*((u8 **)(((u8 *)(*target)) + 0x1C))) + 6));
     if (*((u32 *)(((u8 *)actor) + 0x100))) {
         if (Test16(&actor->flags2C0, 2))
-            *target = (void *)(((u8 *)gUnk_02000580[0]) + 0x24);
+            *target = (void *)(((u8 *)gPlayers[0]) + 0x24);
         else if (!(*target))
             goto threshold;
         {

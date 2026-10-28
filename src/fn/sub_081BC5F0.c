@@ -1,4 +1,3 @@
-#define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "player.h"
 #include "game_state.h"
@@ -13,8 +12,8 @@ void StatGauge_DrawPreview(struct StatGaugePreview *p)
 {
     s32 current, maximum;
     if (p->exitScript == 0) {
-        current = gPlayerSlots[0]->currentStatB + p->bonus;
-        maximum = gPlayerSlots[0]->maximumStatB;
+        current = gPlayers[0]->currentStatB + p->bonus;
+        maximum = gPlayers[0]->maximumStatB;
     } else {
         current = (s16)gGameState->unk2c + p->bonus;
         maximum = *(s16 *)gGameState->unk2E;

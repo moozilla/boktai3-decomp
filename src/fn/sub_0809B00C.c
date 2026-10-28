@@ -1,6 +1,6 @@
-#define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "scene_actor_reset.h"
+#include "player.h"
 struct ActorParticipantProgress {
     u8 unknown0[0x3D8];
     u8 interval;
@@ -9,7 +9,6 @@ struct ActorParticipantProgress {
     u8 unknown3DC[0xA];
     u8 elapsed, start;
 };
-extern u8 *gUnk_02000580;
 s32 Mod(s32, s32);
 void SceneActorAnimation_SelectProfileEntry(void *, s32);
 void PlayerContact_ApplySyntheticContact(void *, u32, u32, u32, u32, u32);
@@ -32,7 +31,7 @@ void ActorBehavior_TickParticipantProgress(struct SceneActorRegistryResetView *a
     s32 delta;
     u8 *elapsed;
     if (TakePrepared(a)) {
-        s->start = gUnk_02000580[0x4F4];
+        s->start = (*(u8 **)gPlayers)[0x4F4];
         s->accumulated = 0;
     }
     SceneActorAnimation_SelectProfileEntry(a, 14);
@@ -43,7 +42,7 @@ void ActorBehavior_TickParticipantProgress(struct SceneActorRegistryResetView *a
             u32 first = a->fieldB4;
             u32 second = a->fieldBC;
             u32 last = a->fieldCC;
-            PlayerContact_ApplySyntheticContact(gUnk_02000580, first, second, 0, value, last);
+            PlayerContact_ApplySyntheticContact((*(u8 **)gPlayers), first, second, 0, value, last);
         } else {
             {
                 u32 increment = a->fieldB4;
@@ -52,16 +51,16 @@ void ActorBehavior_TickParticipantProgress(struct SceneActorRegistryResetView *a
             }
             if (s->accumulated > 100) {
                 if (*mode == 1)
-                    Player_QueueStatusEffect(gUnk_02000580, 1);
+                    Player_QueueStatusEffect((*(u8 **)gPlayers), 1);
                 else
-                    Player_QueueStatusEffect(gUnk_02000580, 2);
+                    Player_QueueStatusEffect((*(u8 **)gPlayers), 2);
                 s->accumulated = 0;
             }
         }
     }
     {
         s32 start = s->start;
-        s32 now = gUnk_02000580[0x4F4];
+        s32 now = (*(u8 **)gPlayers)[0x4F4];
         if (now < start) {
             s32 wrapped = WrapCounter(start);
             delta = now - wrapped;

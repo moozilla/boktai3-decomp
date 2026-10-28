@@ -1,6 +1,6 @@
-#define gProximityPlayer gUnk_02000580
 #include "global.h"
 #include "contact_actor.h"
+#include "player.h"
 struct ProximityVolume {
     u8 unknown0[8];
     struct ContactPosition position;
@@ -11,12 +11,11 @@ struct ProximityPlayer {
     u8 unknown0[0x30];
     struct ContactPosition position;
 };
-extern struct ProximityPlayer *gUnk_02000580;
 s32 Nav_IsPositionInMesh(void *, void *, void *);
 u32 sub_0821F2EC(void *, void *, void *);
 u32 ProximityVolume_ContainsPlayer(struct ProximityVolume *volume)
 {
-    struct ContactPosition *player = &gUnk_02000580->position;
+    struct ContactPosition *player = &(*(struct ProximityPlayer **)gPlayers)->position;
     void *bounds = volume->bounds;
     struct ContactPosition *position = &volume->position;
     if (Nav_IsPositionInMesh(bounds, position, player) && sub_0821F2EC(bounds, position, player))

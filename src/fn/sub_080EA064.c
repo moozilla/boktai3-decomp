@@ -4,6 +4,7 @@
 #include "scene_vec.h"
 #include "gba/macro.h"
 #include "gba/syscall.h"
+#include "player.h"
 
 struct Player;
 s32 Div(s32, s32);
@@ -17,7 +18,6 @@ void SceneHud_SetTimedState(u32, s32, u32, u32, u32, u32);
 void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
 u32 Octopus_GetAnimationStatus(struct SceneActorRegistryResetView *);
 void Octopus_UpdateActiveState(void);
-extern u8 *gUnk_02000580;
 extern s16 *gLinkSession;
 
 struct OctopusContext {
@@ -205,7 +205,7 @@ void Octopus_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
     struct ContactPosition position;
     s32 index;
     if (SceneActorReaction_TakePrepared(actor)) {
-        context->startTick = gUnk_02000580[0x4F4];
+        context->startTick = (*(u8 **)gPlayers)[0x4F4];
         {
             u16 *destination = &actor->colliderA.flags;
             u32 flags = *destination;
@@ -252,7 +252,7 @@ void Octopus_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
             if (IsIdle(player))
                 goto release;
             start = context->startTick;
-            cur = gUnk_02000580[0x4F4];
+            cur = (*(u8 **)gPlayers)[0x4F4];
             if (cur < start) {
                 s32 wrapped = WrapCounter(start);
                 elapsed = cur - wrapped;

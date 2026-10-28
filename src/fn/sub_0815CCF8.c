@@ -1,9 +1,9 @@
 #include "global.h"
 #include "engine.h"
+#include "player.h"
 struct PackedVec {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };
-extern u8 *gUnk_02000580[];
 s32 Script_GetActorIndex(void);
 s32 ScriptActor_GetDirectionFromScript(void);
 s32 ScriptActor_GetCueOptionFromScript(void);
@@ -17,7 +17,7 @@ void ScriptActor_TurnFromScript(void)
     struct PackedVec point;
     u8 *actor;
     s32 i = Script_GetActorIndex();
-    actor = gUnk_02000580[i];
+    actor = gPlayers[i];
     if (actor) {
         s32 f, direction, e;
         if (Script_SeekToKeyword('f'))

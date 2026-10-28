@@ -1,4 +1,3 @@
-#define gPlayerSlots        gUnk_02000580
 #define gDirectionSineTable gUnk_086149C4
 #include "global.h"
 #include "player.h"
@@ -20,7 +19,7 @@ static inline s32 Scale(s32 value)
 void PlayerContact_GetOffsetPosition(s32 slot, struct SceneVec *out)
 {
     struct SceneVec pos;
-    struct Player *p = gPlayerSlots[slot];
+    struct Player *p = gPlayers[slot];
     s32 angle, x, z;
     if (!p->statModifierContext.statBOverrideEnabled)
         SetPosition(&pos, p->position.x, p->position.y + 200, p->position.z);

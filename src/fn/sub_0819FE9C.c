@@ -37,7 +37,7 @@ struct Hresvelgr {
     u8 pad372[0x2a];
     struct Vec target, step, savedPosition;
 };
-extern void *gUnk_02000580;
+extern void *gPlayers;
 void ActionState_Reset(void *);
 void ActionState_AdvanceState(void *);
 void ActionState_SetState(void *, u32);
@@ -271,8 +271,8 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
         case 5:
             if (!action->frame) {
                 Hresvelgr_SetAnimation(saved, saved->animation, saved->animationData, 12, 2, 0);
-                Player_ApplyPositionRequest(gUnk_02000580, &actor->position, 1, actor->heading, 50,
-                                            0, saved->releaseHeight, 0);
+                Player_ApplyPositionRequest(gPlayers, &actor->position, 1, actor->heading, 50, 0,
+                                            saved->releaseHeight, 0);
                 action->frame = 1;
             }
             if (actor->pulse)

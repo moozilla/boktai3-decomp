@@ -13,13 +13,13 @@ s32 OrbitBackground_Initialize(struct OrbitBackground *background, u32 id, u32 p
     OrbitBackground_LoadResource(background);
     OrbitBackground_ResetOrbit(background);
     background->position.x =
-        gUnk_02000580[background->playerIndex]->position.x -
+        gPlayers[background->playerIndex]->position.x -
         scale(gUnk_086149C4[(background->angle + 64) & 255] * background->radius);
     {
-        struct OrbitBackgroundPlayer *actor = gUnk_02000580[background->playerIndex];
+        struct OrbitBackgroundPlayer *actor = gPlayers[background->playerIndex];
         background->position.y = (((128 - actor->heightScale) * 150) >> 7) + (u16)actor->position.y;
     }
-    background->position.z = gUnk_02000580[background->playerIndex]->position.z -
+    background->position.z = gPlayers[background->playerIndex]->position.z -
                              scale(gUnk_086149C4[background->angle & 255] * background->radius);
     OrbitBackground_Tick(background);
     gOrbitBackground = background;

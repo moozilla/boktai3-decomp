@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 typedef struct {
     s16 x, y, z, pad;
 } Vec;
@@ -6,7 +7,6 @@ typedef struct {
     u8 pad[48];
     Vec position;
 } Actor;
-extern Actor *gUnk_02000580;
 int ResultMenu_IsPhaseStart(void *);
 void ResultMenu_SendCommand(void *, int, int, void *);
 void PlayerCue_BeginModeSeven(void *, int);
@@ -16,7 +16,7 @@ void ResultMenu_SetPhase(void *, void (*)(void));
 void Transformation_Reveal(void);
 void Transformation_Charge(u8 *p)
 {
-    Actor *actor = gUnk_02000580;
+    Actor *actor = (*(Actor **)gPlayers);
     Actor *positionActor = actor;
     u16 param;
     Vec pos;
