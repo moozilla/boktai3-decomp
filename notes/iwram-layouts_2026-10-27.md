@@ -85,3 +85,5 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03001728 `gSerialQueuedSendWord` (unified):** Queued multiplayer send word, moved into the active word when ready; ramlayout before/after checks passed.
 - **0300172A `gSerialActiveSendWord` (unified):** Current multiplayer send word, with protocol status bits; ramlayout before/after checks passed.
 - **03001738 `gRfuApiBuffer` (unified):** RFU API workspace passed to rfu_initializeAPI with size 0xE64; ramlayout before/after checks passed.
+
+- **030025A0 `gSceneLifecycleTask` (struct):** Scene lifecycle task shares the scheduler header and names its two trailing state/counter words. Initializer exact and identical in both modes.
