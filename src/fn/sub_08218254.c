@@ -20,13 +20,6 @@ struct Drawable {
     u8 pad1e[4];
     struct Drawable *next;
 };
-struct Matrix {
-    u8 angle;
-    s8 scaleX, scaleY;
-    u8 pad;
-};
-extern struct Drawable *gUnk_030042D0[];
-extern struct Matrix gUnk_03004310[];
 extern u16 gUnk_03005418[];
 static inline s32 UnsignedScale(u8 v)
 {
@@ -49,7 +42,7 @@ void SpriteOam_QueueCameraRelativeSprites(void)
     u32 skip = 0x401;
     if (parity)
         skip = 0x201;
-    p = gUnk_030042D0[gRenderListIndex];
+    p = gDrawableListHeads[gRenderListIndex];
     if (!p)
         return;
     matrixCount = &gAffineRequestCount;
@@ -111,9 +104,9 @@ void SpriteOam_QueueCameraRelativeSprites(void)
                 matrix = 0;
             else {
                 s32 *count = matrixCount;
-                gUnk_03004310[*count].angle = angle;
-                gUnk_03004310[*count].scaleX = sx;
-                gUnk_03004310[*count].scaleY = sy;
+                gSpriteAffineParams[*count].angle = angle;
+                gSpriteAffineParams[*count].scaleX = sx;
+                gSpriteAffineParams[*count].scaleY = sy;
                 {
                     register s32 old asm("r0") = *count;
                     matrix = old;

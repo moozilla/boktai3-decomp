@@ -2,6 +2,7 @@
 #include "engine.h"
 #include "render.h"
 #include "ram.h"
+#include "runtime.h"
 struct ScriptPanel {
     u8 unk0[0x30];
     u32 counter;
@@ -32,7 +33,6 @@ s32 TextWindow_Create(s32, s32, s32, s32);
 void Hud_SetMode(s32);
 void TextWindow_StartPlayback(s32);
 void SpriteOam_ResetQueue(s32);
-extern u32 gUnk_03005408;
 s32 ScriptPanel_OpenTextWindow(struct ScriptPanel *p)
 {
     if (Registry1745_ConsumeStateEntry(p)) {
@@ -73,6 +73,6 @@ s32 ScriptPanel_OpenTextWindow(struct ScriptPanel *p)
         SpriteOam_ResetQueue(1);
     }
     if (p->counter <= 29)
-        gUnk_03005408 = 1;
+        gSceneDialogActive = 1;
     return 0;
 }

@@ -20,5 +20,20 @@ extern u16 gSerialActiveSendWord; /* Current multiplayer send word, with protoco
 extern u8 gRfuApiBuffer[]; /* RFU API workspace passed to rfu_initializeAPI with size 0xE64 */
 extern u8 gRfuIrqSlots
     []; /* Interior view of interrupt dispatch table entry 1, passed as RFU handler slots; not an independent allocation */
+extern u16
+    gSerialMultiplayer1Word; /* Last word sampled from SIOMULTI1 by the byte-transfer interrupt */
+extern s32
+    gSerialPeer1Interrupts; /* Counter advanced by the SIOMULTI1 byte-transfer handler; tentative name */
+extern u32
+    gSerialInitialized; /* Set to 1 by Serial_InitMultiplayer; no semantic reader observed here */
+extern s32
+    gSerialPeer0Interrupts; /* Counter advanced by the SIOMULTI0 byte-transfer handler; tentative name */
+extern u16
+    gSerialMultiplayer0Word; /* Last word sampled from SIOMULTI0 by the byte-transfer interrupt */
+extern u16 gSerialQueuedPacketCount; /* Number of queued four-halfword multiplayer packets */
+extern u16 gSerialPacketQueue
+    [4][4]; /* Four queued packets of four halfwords, with ring indices masked by 3 */
+extern u16
+    gSerialPacketReadIndex; /* Current read index in the four-entry multiplayer packet ring */
 
 #endif

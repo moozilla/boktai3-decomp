@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "runtime.h"
 
 struct PadState {
     u16 held;
@@ -8,7 +9,6 @@ struct PadState {
     u16 released;
     u16 pad;
 };
-extern u16 gUnk_03005270;
 extern struct PadState gUnk_03005260[2];
 
 #define PAD_UPDATE(i, k)                                                                           \
@@ -24,9 +24,9 @@ void sub_08219B24(void)
     s32 i;
     u16 keys, old;
 
-    gUnk_03005270 = *(vu16 *)0x04000130;
+    gHardwareKeys = *(vu16 *)0x04000130;
     if (gLinkMenuActive == 0) {
-        keys = 0x3FF ^ gUnk_03005270;
+        keys = 0x3FF ^ gHardwareKeys;
         PAD_UPDATE(0, keys);
         for (i = 1; i < 2; i++) {
             keys = 0;

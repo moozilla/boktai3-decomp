@@ -1,14 +1,13 @@
 #include "global.h"
 #include "scene_hud_display.h"
 #include "player.h"
+#include "render.h"
 #define SceneHud_GetTilemapCell Hud_GetTilemapCell
-#define gSceneHudMeterPulse     gUnk_03005174
 struct SceneHudSlotCounts {
     u8 unknown0[0x5C];
     u8 counts[4];
 };
 extern struct SceneHudSlotCounts *gUnk_020004B4;
-extern u16 gSceneHudMeterPulse;
 u16 *SceneHud_GetTilemapCell(s32, u32, u32);
 static inline u32 testFlags(const u32 *flags, u32 mask)
 {
@@ -44,8 +43,8 @@ void SceneHud_DrawSlotMeter(struct SceneHudState *hud, s32 mode, u32 x, u32 y)
         hud->meterPulseFrame = 0x34;
         pulse = 0x177;
     }
-    if (gSceneHudMeterPulse != pulse)
-        gSceneHudMeterPulse = pulse;
+    if (gBgPaletteBank13Color10 != pulse)
+        gBgPaletteBank13Color10 = pulse;
     count = slotCount(hud->actionOwner->slot);
     *tiles++ = 0xD45F;
     for (i = 0; i < count; i++)

@@ -24,7 +24,6 @@ struct Sprite {
     u32 previous;
     struct Sprite *next;
 };
-extern struct Sprite *gUnk_030042C0[];
 void sub_08214600(struct Sprite *, s32, s32, s32);
 static inline s32 div8(s32 v)
 {
@@ -43,7 +42,7 @@ void sub_08214D20(void)
     }
     do {
         do {
-            p = gUnk_030042C0[gRenderListIndex];
+            p = gSpriteListHeads[gRenderListIndex];
             if (!p) {
                 return;
             }

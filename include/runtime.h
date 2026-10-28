@@ -54,5 +54,44 @@ extern u32
     gDialogueScrollOffset; /* Dialogue scroll/tick offset copied into the video IRQ shadow; tentative name */
 extern u32
     gDialogueModeLatched; /* VBlank-latched dialogue state controlling the two-phase video IRQ; tentative name */
+extern u8
+    gInterruptCode[0x800]; /* IWRAM interrupt dispatcher copy, 512 words copied from IntrMain */
+extern u32
+    gVBlankUploadPending; /* Set by VBlank and cleared when the video upload task finishes; tentative name */
+extern u32 gVBlankFrameCounter; /* Counter incremented after VBlank clock/link updates */
+extern u32
+    gDialogueScrollLatched; /* Dialogue scroll offset latched in VBlank and read as a byte by the secondary video IRQ */
+extern u32 gVideoInterruptsEnabled; /* Gates video register updates and link/clock work in VBlank */
+extern u16
+    gVideoTransferControl; /* Runtime transfer-control flag initialized to 1 and cleared around save/wireless transfer; tentative name */
+extern u16
+    gHardwareKeys; /* Raw active-low KEYINPUT sampled before per-player input records are updated */
+extern u32
+    gLcgState; /* Independent 32-bit linear-congruential state, initialized to 123456 and advanced by Random_Next15 */
+extern s32 gResourceRegistryCount; /* High-water count of resource-registry entries, capped at 32 */
+extern u32
+    gPlayTimeCounterEnabled; /* Enables the persistent play-time counter at game-state +0x614 */
+extern u32
+    gSceneControlWord0; /* Cleared by scene transitions and Engine_ClearControlFlags; finer meaning unresolved */
+extern u32
+    gSceneInitWord0; /* Initialized to zero by the scene lifecycle manager; semantic name provisional */
+extern u32 gRuntimeFrameCounter; /* Incremented on every scene lifecycle task update */
+extern u32
+    gSceneTransitionFlags; /* Pending scene transition flags, including active-region backup/restore bits */
+extern u32 gSceneControlWord1; /* Cleared by Engine_ClearControlFlags; finer meaning unresolved */
+extern u8 *
+    gSessionState; /* Persistent/session state pointer; byte base preserves existing subsystem-specific pointee views */
+extern u32
+    gSceneTransitionActive; /* Set during transition cleanup and cleared when the scene starts */
+extern u32
+    gSceneInitWord1; /* Initialized to zero by the scene lifecycle manager; semantic name provisional */
+extern u32 gSleepResumePending; /* Set after BIOS Stop and consumed by scene runtime refresh */
+extern s32
+    gSceneDialogActive; /* Shared scene-dialog activity/control flag, retaining existing provisional aliases */
+extern u32
+    gSceneUnpausedFrames; /* Counter incremented while the scene is not paused; provisional semantic name */
+extern u32 gSceneControlWord2; /* Cleared by Engine_ClearControlFlags; finer meaning unresolved */
+extern u32
+    gSceneControlWord3; /* Cleared during transitions and by Engine_ClearControlFlags; finer meaning unresolved */
 
 #endif

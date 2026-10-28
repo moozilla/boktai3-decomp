@@ -9,7 +9,6 @@ struct DirectionalForce {
     u16 magnitude, targetMagnitude, angle, targetAngle, delay, unknown2E;
 };
 extern struct DirectionalForce *gDirectionalForce;
-extern u16 gPlayerBackgroundState;
 extern u32 gRandomIndex;
 s32 Mod(s32, s32);
 #endif

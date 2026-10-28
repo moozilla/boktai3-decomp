@@ -1,11 +1,11 @@
 #include "global.h"
 #include "engine.h"
 #include "menu_parameters.h"
+#include "runtime.h"
 
 struct Params3D0Gfx {
     u8 pad[0x6220];
 };
-extern u8 *gUnk_030053F8;
 
 void TimeDisplay_InitBackgrounds(void *);
 void TimeDisplay_InitAnimatedObjects(void *);
@@ -42,7 +42,7 @@ s32 Params3D0_InitDisplay(u8 *p)
     if (gTimeDisplayParameters.M == 1)
         *(s32 *)(p + 0x728) = 1;
     else
-        *(s32 *)(p + 0x728) = gUnk_030053F8[9] ? 4 : 3;
+        *(s32 *)(p + 0x728) = gSessionState[9] ? 4 : 3;
     *(s32 *)(p + 0x740) = 0;
     *(s32 *)(p + 0x744) = 0;
     Sound_PlaySong(0xa4);

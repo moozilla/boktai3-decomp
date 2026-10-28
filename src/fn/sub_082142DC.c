@@ -1,8 +1,5 @@
 #include "global.h"
 #include "render.h"
-extern u32 gUnk_030042C0[];
-extern u32 gUnk_030042C8[];
-extern u32 gUnk_030042D0[];
 void ObjGfx_ResetAllocationCounters(void);
 void SpriteOam_ResetQueue(u32);
 void Sprite_InitSystem(void)
@@ -17,9 +14,9 @@ void Sprite_InitSystem(void)
     gCamera.unk10 = 0;
     gRenderListIndex = 0;
     z = 0;
-    c = gUnk_030042C8;
-    b = gUnk_030042D0;
-    a = gUnk_030042C0;
+    c = gMainSpriteListHeads;
+    b = gDrawableListHeads;
+    a = gSpriteListHeads;
     for (i = 1; i >= 0; i--) {
         *a++ = z;
         *b++ = z;

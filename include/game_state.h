@@ -163,11 +163,7 @@ struct GameState {
 extern struct GameState *gGameState;
 
 /* Backup of gGameState, and the active/backup pair of the shared
- * script-variable region (0x400 bytes each); gUnk_02000700 is the separate,
+ * script-variable region (0x400 bytes each); gScriptLocalVariables is the separate,
  * unbacked local-variable region. Selected together by GameState_SelectRamBase. */
-extern u8 *gUnk_0200070C;
-extern u8 *gUnk_02000708;
-extern u8 *gUnk_02000704;
-extern u8 *gUnk_02000700;
 
 #endif

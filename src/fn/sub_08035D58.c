@@ -32,6 +32,7 @@ void Memory_Clear(void *, int);
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
+#include "rfu_manager.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -39,11 +40,6 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-struct Event {
-    u8 pad[0x14];
-    u16 code, value;
-};
-extern struct Event gUnk_03005390;
 void Wireless_UpdateUniAcknowledgedSlots(struct Engine *);
 void Wireless_ReceiveParentUniPackets(struct Engine *);
 void Wireless_ProcessChildUniExchange(struct Engine *);
@@ -135,27 +131,27 @@ lastMore:
     goto done;
 added: {
     u8 *slots = &p->selected;
-    int incoming = (u8)gUnk_03005390.code;
-    *slots |= (u8)gUnk_03005390.code;
+    int incoming = (u8)gRfuLinkManager.event.words.code;
+    *slots |= (u8)gRfuLinkManager.event.words.code;
 }
     goto done;
 removed: {
     u8 *slots = &p->selected;
-    int incoming = (u8)gUnk_03005390.code;
+    int incoming = (u8)gRfuLinkManager.event.words.code;
     *slots &= ~incoming;
 }
     goto done;
 disconnected: {
     u8 *slots = &p->selected;
-    struct Event *event = &gUnk_03005390;
+    struct RfuLinkManager *event = &gRfuLinkManager;
     int zero;
     int remaining;
-    int incoming = (u8)event->code;
+    int incoming = (u8)event->event.words.code;
     int selected = *slots & ~incoming;
     zero = 0;
     *slots = selected;
     ((u8 *)p)[0xE9] = 1;
-    Wireless_RemoveConnectedSlots(p, (u8)event->code);
+    Wireless_RemoveConnectedSlots(p, (u8)event->event.words.code);
     remaining = p->scratch[3];
     if (remaining != 1) {
         goto done;
@@ -172,7 +168,7 @@ disconnected: {
     goto done;
 lost: {
     int remaining;
-    Wireless_RemoveConnectedSlots(p, (u8)gUnk_03005390.code);
+    Wireless_RemoveConnectedSlots(p, (u8)gRfuLinkManager.event.words.code);
     remaining = p->scratch[3];
     if (remaining != 1) {
         goto done;

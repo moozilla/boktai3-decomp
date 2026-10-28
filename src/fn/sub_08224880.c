@@ -1,32 +1,21 @@
 #include "global.h"
-struct S {
-    u8 pad[4];
-    u8 f4;
-    u8 f5;
-    u8 pad6[0xa];
-    u8 f10;
-    u8 pad11[0x13];
-    u8 f24;
-    u8 pad25[3];
-    u16 a28[4];
-};
-extern struct S gUnk_03005390;
+#include "rfu_manager.h"
 extern u16 *gUnk_03006A70[];
 void rfu_clearSlot(u32, u32);
 void RfuManager_NotifyEvent(u32, u32);
 void RfuManager_FinishSlotReception(void)
 {
-    struct S *s = &gUnk_03005390;
-    if (s->f4 == 0xf) {
+    struct RfuLinkManager *s = &gRfuLinkManager;
+    if (s->state == 0xf) {
         u16 **t = gUnk_03006A70;
-        u32 i = s->f10;
+        u32 i = s->child_slot;
         if (*t[i] == 0x26) {
             u32 z = 0;
-            s->f5 = z;
-            s->f4 = z;
+            s->next_state = z;
+            s->state = z;
             rfu_clearSlot(4, i);
-            s->f24 &= ~(1 << s->f10);
-            s->a28[s->f10] = z;
+            s->nameAcceptTimer.active &= ~(1 << s->child_slot);
+            s->nameAcceptTimer.count[s->child_slot] = z;
             RfuManager_NotifyEvent(0x24, 0);
         }
     }

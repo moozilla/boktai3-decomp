@@ -21,7 +21,7 @@ struct ResultPromptArgs {
     s32 *values;
 };
 
-extern s32 gUnk_03005408;
+extern s32 gSceneDialogActive;
 extern u16 gUnk_03005260[]; // [1] = newly pressed keys
 
 u8 Save_WriteAlternateSlotAndSelect(void);

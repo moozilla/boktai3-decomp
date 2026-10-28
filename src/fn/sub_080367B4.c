@@ -32,6 +32,7 @@ void Memory_Clear(void *, int);
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
+#include "runtime.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -39,7 +40,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-extern u32 gUnk_0300546C, gUnk_03005408;
+extern u32 gUnk_0300546C;
 void Solar_PauseMeasurement(void);
 void Solar_ResumeMeasurement(void);
 void Task_UnlinkFromPriorityList(void *);
@@ -89,7 +90,7 @@ int Wireless_UpdateControllerTask(struct Engine *p)
         Solar_ResumeMeasurement();
     } else {
         if ((u16)(p->operation - 9) <= 17)
-            gUnk_03005408 = 1;
+            gSceneDialogActive = 1;
         p->ticks++;
         p->frameCounter++;
     }

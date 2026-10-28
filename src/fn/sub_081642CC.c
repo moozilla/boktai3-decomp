@@ -1,7 +1,7 @@
 #include "global.h"
+#include "render.h"
 
 // confidence=low: health meter drawn as a 10-cell bar (8 steps per cell).
-extern u16 gUnk_03005176;
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 Div(s32, s32);
 
@@ -56,8 +56,8 @@ void Hud_DrawHealthMeterCells(u8 *p, s32 mode, s32 row, s32 col, s32 cap, s32 va
         else
             cell = Hud_GetTilemapCell(0, row - 1, col);
     }
-    if (gUnk_03005176 != color)
-        gUnk_03005176 = color;
+    if (gBgPaletteBank13Color11 != color)
+        gBgPaletteBank13Color11 = color;
     if (mode != 0 && cap != 0)
         *cell++ = endTile | 0xd400;
     for (n = 0; n < full; n++)

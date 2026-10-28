@@ -805,31 +805,29 @@ void Script_ResetLocalVariables(void)
 
 /* Select timer-jittered storage for the game-state regions. */
 
-extern u8 gUnk_0203C400[];
-
 // MATCHING_CONCESSION: register-pinning
 void GameState_SelectRamBase(void)
 {
     u32 timer = *(vu16 *)0x0400010C;
-    register u8 *base asm("r1") = gUnk_0203C400;
+    register u8 *base asm("r1") = gGameStateStorage;
     base += (timer & 127) * 8;
     gGameState = (struct GameState *)base;
-    gUnk_0200070C = base + 0xb00;
-    gUnk_02000708 = base + 0x1600;
-    gUnk_02000704 = base + 0x1a00;
-    gUnk_02000700 = base + 0x1e00;
+    gBackupGameState = base + 0xb00;
+    gGameVariables = base + 0x1600;
+    gBackupGameVariables = base + 0x1a00;
+    gScriptLocalVariables = base + 0x1e00;
 }
 
 void GameState_ClearActiveRegions(void)
 {
-    Memory_Clear(gUnk_02000708, 0x400);
+    Memory_Clear(gGameVariables, 0x400);
     Memory_Clear(gGameState, 0x89C);
 }
 
 void GameState_ResetActiveRegions(void)
 {
     u16 v = *(u16 *)((u8 *)gGameState + 0x744);
-    Memory_Clear(gUnk_02000708, 0x400);
+    Memory_Clear(gGameVariables, 0x400);
     Memory_Clear((u8 *)gGameState + 0x30, 0x74A);
     *(u16 *)((u8 *)gGameState + 0x744) = v;
     GameState_BackupActiveRegions();
@@ -837,31 +835,31 @@ void GameState_ResetActiveRegions(void)
 
 void GameState_BackupActiveRegions(void)
 {
-    Memory_Copy(gUnk_0200070C, gGameState, 0x89C);
-    Memory_Copy(gUnk_02000704, gUnk_02000708, 0x400);
+    Memory_Copy(gBackupGameState, gGameState, 0x89C);
+    Memory_Copy(gBackupGameVariables, gGameVariables, 0x400);
 }
 
 void GameState_RestoreActiveRegions(void)
 {
-    Memory_Copy(gGameState, gUnk_0200070C, 0x89C);
-    Memory_Copy(gUnk_02000708, gUnk_02000704, 0x400);
+    Memory_Copy(gGameState, gBackupGameState, 0x89C);
+    Memory_Copy(gGameVariables, gBackupGameVariables, 0x400);
 }
 
 void GameState_BackupRegionRange(u8 *p, u32 n)
 {
     s32 d = p - (u8 *)gGameState;
-    Memory_Copy(gUnk_0200070C + d, p, n);
+    Memory_Copy(gBackupGameState + d, p, n);
 }
 
 u8 *GameState_GetBackupRegionPointer(u8 *p)
 {
     s32 d = p - (u8 *)gGameState;
-    return gUnk_0200070C + d;
+    return gBackupGameState + d;
 }
 
 void Script_ClearLocalVariables(void)
 {
-    Memory_Clear(gUnk_02000700, 0x400);
+    Memory_Clear(gScriptLocalVariables, 0x400);
 }
 
 struct ScriptShortArrayView {
@@ -910,9 +908,9 @@ u8 *Script_DecodeVariableValue(u8 *p, s32 *type, s32 *value)
     if ((descriptor & 0xF00000) == 0x800000)
         base = (u8 *)gGameState;
     else if ((descriptor & 0xF00000) == 0x100000)
-        base = gUnk_02000700;
+        base = gScriptLocalVariables;
     else
-        base = gUnk_02000708;
+        base = gGameVariables;
     base += descriptor & 0xFFFF;
     if (((descriptor >> 24) & 0xF0) == 0x20) {
         end = Script_DecodeOperand(p + 4, &ignored, &first);
@@ -972,9 +970,9 @@ u8 *Script_AssignVariableOperand(u8 *p, s32 value)
     if ((descriptor & 0xF00000) == 0x800000)
         base = (u8 *)gGameState;
     else if ((descriptor & 0xF00000) == 0x100000)
-        base = gUnk_02000700;
+        base = gScriptLocalVariables;
     else
-        base = gUnk_02000708;
+        base = gGameVariables;
     base += descriptor & 0xFFFF;
     if (((descriptor >> 24) & 0xF0) == 0x20) {
         end = Script_DecodeOperand(p + 4, &ignored, &first);
@@ -1013,9 +1011,9 @@ void Script_WriteReferenceValue(struct ScriptUtilityReference *ref, s32 index, s
     if ((descriptor & 0xF00000) == 0x800000)
         base = (u8 *)gGameState;
     else if ((descriptor & 0xF00000) == 0x100000)
-        base = gUnk_02000700;
+        base = gScriptLocalVariables;
     else
-        base = gUnk_02000708;
+        base = gGameVariables;
     base += descriptor & 0xFFFF;
     if (((descriptor >> 24) & 0xF0) == 0x20)
         index += ref->index;
@@ -1031,9 +1029,9 @@ s32 Script_ReadReferenceValue(struct ScriptUtilityReference *ref, s32 index)
     if ((descriptor & 0xF00000) == 0x800000)
         base = (u8 *)gGameState;
     else if ((descriptor & 0xF00000) == 0x100000)
-        base = gUnk_02000700;
+        base = gScriptLocalVariables;
     else
-        base = gUnk_02000708;
+        base = gGameVariables;
     base += descriptor & 0xFFFF;
     if (((descriptor >> 24) & 0xF0) == 0x20)
         index += ref->index;
@@ -1053,9 +1051,9 @@ u8 *Script_BackupVariableOperand(u8 *p)
     value = Script_ReadReferenceValue(&ref, 0);
     descriptor = (r[0] << 24) | (r[1] << 16) | (r[2] << 8) | r[3];
     if ((descriptor & 0xF00000) == 0x800000)
-        base = gUnk_0200070C;
+        base = gBackupGameState;
     else
-        base = gUnk_02000704;
+        base = gBackupGameVariables;
     base += descriptor & 0xFFFF;
     if (((descriptor >> 24) & 0xF0) == 0x20)
         index += *(u16 *)(r + 6);
@@ -1074,9 +1072,9 @@ s32 Script_ReadBackupVariableOperand(u8 *p)
     Script_DecodeVariableReference(p, &ref);
     descriptor = (r[0] << 24) | (r[1] << 16) | (r[2] << 8) | r[3];
     if ((descriptor & 0xF00000) == 0x800000)
-        base = gUnk_0200070C;
+        base = gBackupGameState;
     else
-        base = gUnk_02000704;
+        base = gBackupGameVariables;
     base += descriptor & 0xFFFF;
     if (((descriptor >> 24) & 0xF0) == 0x20)
         index += *(u16 *)(r + 6);
@@ -1086,12 +1084,12 @@ s32 Script_ReadBackupVariableOperand(u8 *p)
 
 u8 *GameState_GetBackupStateBase(void)
 {
-    return gUnk_0200070C;
+    return gBackupGameState;
 }
 
 u8 *GameState_GetBackupVariableBase(void)
 {
-    return gUnk_02000704;
+    return gBackupGameVariables;
 }
 
 s32 Div(s32, s32);

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "rfu_manager.h"
 struct Engine {
     u8 pad0[0x1c];
     u8 flag;
@@ -19,15 +20,10 @@ struct Engine {
     u8 pad48[0xec];
     u8 recv[0x40];
 };
-struct LinkManager {
-    u8 pad0[0x14];
-    u16 param[2];
-};
 struct LinkStatus {
     u8 pad0[2];
     u8 count;
 };
-extern struct LinkManager gUnk_03005390;
 extern struct LinkStatus *gUnk_03006A80;
 int RfuManager_SendData(int);
 int sub_082238F0(int);
@@ -54,13 +50,13 @@ void sub_080347D8(u8 msg)
             setOperation(p, 6, 0);
             break;
         case 0x20:
-            p->allowed = gUnk_03005390.param[0];
+            p->allowed = gRfuLinkManager.event.param[0];
             break;
         case 0x21:
             setOperation(p, 6, 0);
             break;
         case 0x22:
-            p->index = gUnk_03005390.param[0];
+            p->index = gRfuLinkManager.event.param[0];
             rfu_setRecvBuffer(0x20, p->index, p->recv, 0x40);
             setOperation(p, 0xe, 0);
             break;
@@ -79,17 +75,17 @@ void sub_080347D8(u8 msg)
             setOperation(p, 6, 0);
             break;
         case 0x31:
-            p->selected |= (u8)gUnk_03005390.param[0];
+            p->selected |= (u8)gRfuLinkManager.event.param[0];
             p->timer = p->operation;
             setOperation(p, 0x10, 0);
             break;
         case 0x32:
-            p->selected &= ~(u8)gUnk_03005390.param[0];
+            p->selected &= ~(u8)gRfuLinkManager.event.param[0];
             setOperation(p, p->timer, 0);
             break;
         case 0x30:
         case 0x33:
-            p->selected &= ~(u8)gUnk_03005390.param[0];
+            p->selected &= ~(u8)gRfuLinkManager.event.param[0];
             if (p->operation > 0xf) {
                 setOperation(p, 0x1d, 0);
                 sub_082238F0(1);
@@ -99,7 +95,7 @@ void sub_080347D8(u8 msg)
             break;
         case 0x40:
             setOperation(p, 0xb, 0);
-            p->selected &= ~(u8)gUnk_03005390.param[0];
+            p->selected &= ~(u8)gRfuLinkManager.event.param[0];
             break;
         case 0x42:
             setOperation(p, 0x20, 0);

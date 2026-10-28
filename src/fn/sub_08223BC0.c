@@ -1,6 +1,7 @@
 #include "global.h"
 #define gRfuLinkStatus gUnk_03006A80
 #include "rfu_compat.h"
+#include "rfu_manager.h"
 struct RfuConfig {
     u8 maxMFrame, mcTimer;
     u16 availSlotFlag;
@@ -9,17 +10,6 @@ struct RfuConfig {
     const u8 *gname;
     const u8 *uname;
 };
-struct Manager {
-    u8 f0, f1;
-    volatile u8 f2;
-    u8 f3, f4, f5, f6, f7, f8, f9, fa, fb, fc, fd, fe, ff;
-    u8 f10, f11, f12, p13;
-    u16 f14, f16, f18, f1a, f1c, f1e;
-    u8 pad20[0x1C];
-    struct RfuConfig *config;
-    u32 f40;
-};
-extern struct Manager gUnk_03005390;
 void RfuManager_NotifyEvent(u8, u8);
 void RfuManager_StepSlotTimer(u32);
 u32 RfuManager_ResetAndCheckAdapter(void);
@@ -33,32 +23,32 @@ void RfuManager_DropFailingTargets(void);
    then services link recovery and the child slots. */
 void sub_08223BC0(u32 arg)
 {
-    if (gUnk_03005390.f40 == 0 && gUnk_03005390.f4 != 0) {
-        gUnk_03005390.f4 = 0;
+    if (gRfuLinkManager.unk40 == 0 && gRfuLinkManager.state != 0) {
+        gRfuLinkManager.state = 0;
         return;
     }
-    if (gUnk_03005390.f7)
+    if (gRfuLinkManager.pcswitch_flag)
         RfuManager_StepSlotTimer(arg);
     do {
-        if (gUnk_03005390.f4) {
+        if (gRfuLinkManager.state) {
             rfu_waitREQComplete();
-            gUnk_03005390.fe = 1;
-            switch (gUnk_03005390.f4) {
+            gRfuLinkManager.active = 1;
+            switch (gRfuLinkManager.state) {
                 case 23: {
                     u32 result = RfuManager_ResetAndCheckAdapter();
                     u8 event = result == 0x8001 ? 0x44 : 0xFF;
-                    gUnk_03005390.f5 = 0;
-                    gUnk_03005390.f4 = 0;
+                    gRfuLinkManager.next_state = 0;
+                    gRfuLinkManager.state = 0;
                     RfuManager_NotifyEvent(event, 0);
                     break;
                 }
                 case 1:
                     if (RfuManager_ResetAndCheckAdapter() == 0x8001) {
-                        gUnk_03005390.f4 = gUnk_03005390.f5;
-                        gUnk_03005390.f5 = 3;
+                        gRfuLinkManager.state = gRfuLinkManager.next_state;
+                        gRfuLinkManager.next_state = 3;
                     } else {
-                        gUnk_03005390.f5 = 0;
-                        gUnk_03005390.f4 = 0;
+                        gRfuLinkManager.next_state = 0;
+                        gRfuLinkManager.state = 0;
                         RfuManager_NotifyEvent(0xFF, 0);
                     }
                     break;
@@ -66,14 +56,14 @@ void sub_08223BC0(u32 arg)
                     rfu_REQ_reset();
                     break;
                 case 3:
-                    rfu_REQ_configSystem(gUnk_03005390.config->availSlotFlag,
-                                         gUnk_03005390.config->maxMFrame,
-                                         gUnk_03005390.config->mcTimer);
+                    rfu_REQ_configSystem(gRfuLinkManager.config->availSlotFlag,
+                                         gRfuLinkManager.config->maxMFrame,
+                                         gRfuLinkManager.config->mcTimer);
                     break;
                 case 4:
                     rfu_REQ_configGameData(
-                        gUnk_03005390.config->mbootFlag, gUnk_03005390.config->serialNo,
-                        gUnk_03005390.config->gname, gUnk_03005390.config->uname);
+                        gRfuLinkManager.config->mbootFlag, gRfuLinkManager.config->serialNo,
+                        gRfuLinkManager.config->gname, gRfuLinkManager.config->uname);
                     break;
                 case 5:
                     rfu_REQ_startSearchChild();
@@ -94,7 +84,7 @@ void sub_08223BC0(u32 arg)
                     rfu_REQ_endSearchParent();
                     break;
                 case 12:
-                    rfu_REQ_startConnectParent(gUnk_03005390.f1e);
+                    rfu_REQ_startConnectParent(gRfuLinkManager.work);
                     break;
                 case 13:
                     rfu_REQ_pollConnectParent();
@@ -119,9 +109,9 @@ void sub_08223BC0(u32 arg)
                     break;
             }
             rfu_waitREQComplete();
-            gUnk_03005390.fe = 0;
+            gRfuLinkManager.active = 0;
         }
-    } while ((u8)(gUnk_03005390.f4 - 0x12) <= 1);
+    } while ((u8)(gRfuLinkManager.state - 0x12) <= 1);
     if (gRfuLinkStatus->parentChild == 1 && RfuManager_UpdateLinkRecovery(0))
         return;
     RfuManager_UpdateChildAdmissions();

@@ -2,13 +2,10 @@
 #include "ram.h"
 #include "serial.h"
 void sub_08223044(void);
-extern u32 gUnk_03005314;
-extern u16 gUnk_03005330, gUnk_03005380;
-extern u16 gUnk_03005350[][4];
 s32 sub_08223180(void)
 {
     s32 i, j;
-    gUnk_03005314 = 1;
+    gSerialInitialized = 1;
     sub_08223044();
     gSerialReceivePending = 0;
     gSerialActiveSendWord = 0x4000;
@@ -31,10 +28,10 @@ s32 sub_08223180(void)
     gSerialLatestPackets[6] = -1;
     gSerialLatestPackets[7] = -1;
     gSerialLatestPacketIndex = 0;
-    gUnk_03005330 = 0;
-    gUnk_03005380 = 0;
+    gSerialQueuedPacketCount = 0;
+    gSerialPacketReadIndex = 0;
     for (i = 0; i < 4; i++)
         for (j = 0; j < 4; j++)
-            gUnk_03005350[i][j] |= -1;
+            gSerialPacketQueue[i][j] |= -1;
     return 0;
 }

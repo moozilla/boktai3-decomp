@@ -1,12 +1,6 @@
 #include "global.h"
 #include "render.h"
 #include "runtime.h"
-struct Matrix {
-    u8 angle;
-    s8 scaleX, scaleY;
-    u8 pad;
-};
-extern struct Matrix gUnk_03004310[];
 extern s16 gUnk_086149C4[];
 void CpuFastSet(const void *, void *, u32);
 s32 Div(s32, s32);
@@ -69,9 +63,9 @@ void SpriteOam_FinalizeQueue(void)
     }
 
     {
-        struct Matrix *matrix;
+        struct SpriteAffineParam *matrix;
         entry = base;
-        matrix = gUnk_03004310;
+        matrix = gSpriteAffineParams;
         if (gAffineRequestCount > 31)
             gAffineRequestCount = 32;
         for (i = 0; i < gAffineRequestCount; i++) {

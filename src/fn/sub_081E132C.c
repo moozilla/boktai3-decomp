@@ -2,8 +2,9 @@
 #include "game_state.h"
 #include "render.h"
 #include "menu_parameters.h"
+#include "runtime.h"
 extern u16 gUnk_03005260[];
-extern u32 gUnk_0300546C, gUnk_030053E8;
+extern u32 gUnk_0300546C;
 void SelectionPalette_UpdatePulse(void *);
 void Sound_PlaySong(s32);
 void Menu_StartFadeOut(s32);
@@ -75,7 +76,7 @@ void GameStart_Update(u8 *p)
                     gUnk_0300546C = 0;
                     Script_Call(gListMenuParameters.l, 0);
                     gEnginePauseFlags = 0;
-                    gUnk_030053E8 = 0x11;
+                    gSceneTransitionFlags = 0x11;
                     Script_SetEntryProcedure(H(0x5A4));
                 }
                 Task_Kill(p);

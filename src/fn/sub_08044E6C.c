@@ -1,6 +1,6 @@
 #include "encoded_record.h"
 #include "engine.h"
-extern u8 *gUnk_030053F8;
+#include "runtime.h"
 struct EncodedRecordSession {
     u8 unknown0[0x18];
     u32 value;
@@ -24,7 +24,7 @@ void EncodedRecord_EncodeFields(u8 *record)
     EncodedRecord_WriteBits(record, 0, &bit, 2, 6);
     EncodedRecord_WriteBits(record, 1, &bit, 3, 6);
     EncodedRecord_WriteBits(record, skip, &bit, 3, 6);
-    EncodedRecord_WriteBits(record, ((struct EncodedRecordSession *)gUnk_030053F8)->value, &bit, 6,
+    EncodedRecord_WriteBits(record, ((struct EncodedRecordSession *)gSessionState)->value, &bit, 6,
                             6);
     value = (s16)gGameState->counter538 >> 3;
     if ((u32)value > 255)

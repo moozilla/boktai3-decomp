@@ -1,6 +1,7 @@
 #define MenuPanel_SetCallback Hud_SetInteractionCallback
 // Provisional panel family; field meanings follow static consumers.
 #include "global.h"
+#include "runtime.h"
 struct SelectionPanel {
     u8 unk0[0xA4E];
     u16 timer;
@@ -9,7 +10,6 @@ struct SelectionPanel {
     u8 unk48BD[0xB];
     u32 window;
 };
-extern u32 gUnk_03005408;
 void SceneCatalog_SelectDescription(u32);
 void TextWindow_Clear(u32);
 void SceneHud_SetPairedIcons(void *, s32, s32);
@@ -18,7 +18,7 @@ void PauseMenu_BeginSleepPrompt(void);
 void Power_EnterSleep(void);
 void SelectionPanel_WaitThenSleep(struct SelectionPanel *p)
 {
-    gUnk_03005408 = 1;
+    gSceneDialogActive = 1;
     if (++p->timer > 119) {
         SceneCatalog_SelectDescription(0x11);
         TextWindow_Clear(p->window);

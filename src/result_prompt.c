@@ -3,7 +3,7 @@
 int ResultPrompt_Update(struct ResultPrompt *p)
 {
     if (p->result < 120)
-        gUnk_03005408 = 1;
+        gSceneDialogActive = 1;
     if (p->result < 0) {
         if (p->timer == 60) {
             p->result = Save_WriteAlternateSlotAndSelect();

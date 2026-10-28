@@ -114,3 +114,68 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03003A48 `gDialogueScrollOffset` (unified):** Dialogue scroll/tick offset copied into the video IRQ shadow; tentative name; ramlayout before/after checks passed.
 - **03003A4C `gDialogueModeLatched` (unified):** VBlank-latched dialogue state controlling the two-phase video IRQ; tentative name; ramlayout before/after checks passed.
 - **03003A00 `gUnk_03003A00` (skipped):** Protected status_screen_fade.c inherits its declaration from status_screen.h; restoring the protected source after the header rename leaves the old name undeclared. Object fully rolled back.
+
+- **03003A60 `gInterruptCode` (unified):** IWRAM interrupt dispatcher copy, 512 words copied from IntrMain; ramlayout before/after checks passed.
+- **03004260 `gVBlankUploadPending` (unified):** Set by VBlank and cleared when the video upload task finishes; tentative name; ramlayout before/after checks passed.
+- **03004264 `gVBlankFrameCounter` (unified):** Counter incremented after VBlank clock/link updates; ramlayout before/after checks passed.
+- **03004268 `gDialogueScrollLatched` (unified):** Dialogue scroll offset latched in VBlank and read as a byte by the secondary video IRQ; ramlayout before/after checks passed.
+- **0300426C `gVideoInterruptsEnabled` (unified):** Gates video register updates and link/clock work in VBlank; ramlayout before/after checks passed.
+- **0300427C `gVideoTransferControl` (unified):** Runtime transfer-control flag initialized to 1 and cleared around save/wireless transfer; tentative name; ramlayout before/after checks passed.
+- **03004270 `gUnk_03004270` (skipped):** Protected status_screen_fade.c inherits its old HBlank DMA declaration; the header rename makes the restored source fail compilation. Rolled back.
+- **03004274 `gUnk_03004274` (skipped):** Protected status_screen_fade.c inherits its old HBlank DMA declaration; the header rename makes the restored source fail compilation. Rolled back.
+- **03004278 `gUnk_03004278` (skipped):** Protected status_screen_fade.c inherits its old HBlank DMA declaration; the header rename makes the restored source fail compilation. Rolled back.
+
+- **030042C0 `gSpriteListHeads` (unified):** Two sprite render-list heads, selected by gRenderListIndex; pointees retain subsystem views; ramlayout before/after checks passed.
+- **030042C8 `gMainSpriteListHeads` (unified):** Two main/animation sprite-list heads; protected ARM source retains its address declaration; ramlayout before/after checks passed.
+- **030042D0 `gDrawableListHeads` (unified):** Two drawable/effect render-list heads, selected by gRenderListIndex; ramlayout before/after checks passed.
+
+- **030042EC `gSpriteTileResource` (struct):** Loader and lookup views merged: tile count +4, entry count +6, relative tile-data offset +8, eight-byte entries from +C. All three direct consumers exact in both modes.
+
+- **03004300 `gAnimationResource` (struct):** Shared animation bank header has count +4, relative section offsets +C/+10/+14 and 12-byte entries from +18. Loader and lookup remain exact in both modes.
+
+- **03004310 `gSpriteAffineParams` (struct):** Shared 32-entry affine array has u8 angle, s8 X/Y scales and an unresolved tail byte. All six converted consumers exact in both modes; untouched ARM source also matches in both modes under its original address declaration.
+
+- **03004FE0 `gBgPaletteBank1` (unified):** Interior background palette bank 1, at gBgPaletteBuffer +0x20 bytes; ramlayout before/after checks passed.
+- **03005000 `gBgPaletteBank2` (unified):** Interior background palette bank 2, at gBgPaletteBuffer +0x40 bytes; ramlayout before/after checks passed.
+- **03005020 `gBgPaletteBank3` (unified):** Interior background palette bank 3, at gBgPaletteBuffer +0x60 bytes; ramlayout before/after checks passed.
+- **030050E0 `gBgPaletteBank9` (unified):** Interior background palette bank 9, at gBgPaletteBuffer +0x120 bytes; ramlayout before/after checks passed.
+- **03005140 `gBgPaletteBank12` (unified):** Interior background palette bank 12, at gBgPaletteBuffer +0x180 bytes; ramlayout before/after checks passed.
+- **03005164 `gBgPaletteBank13Color2` (unified):** Interior view starting at background palette bank 13 color 2; ramlayout before/after checks passed.
+- **03005174 `gBgPaletteBank13Color10` (unified):** Interior background palette bank 13 color 10; ramlayout before/after checks passed.
+- **03005176 `gBgPaletteBank13Color11` (unified):** Interior background palette bank 13 color 11; ramlayout before/after checks passed.
+- **0300517C `gBgPaletteBank13Color14` (unified):** Interior background palette bank 13 color 14; ramlayout before/after checks passed.
+- **03005180 `gBgPaletteBank14` (unified):** Interior background palette bank 14, at gBgPaletteBuffer +0x1C0 bytes; ramlayout before/after checks passed.
+- **030051A0 `gBgPaletteBank15` (unified):** Interior background palette bank 15, at gBgPaletteBuffer +0x1E0 bytes; ramlayout before/after checks passed.
+- **03005160 `gUnk_03005160` (skipped):** Existing scene_input_panel.h byte-array and status_screen.h halfword-array exports conflict when render.h exposes one shared bank type; ramlayout reports 123 compiler failures and writes nothing. Other palette aliases are unaffected.
+
+- **03005260 `gUnk_03005260` (skipped):** Protected selection_menu.c inherits the key declaration through shared UI headers. Restoring the source after renaming those headers makes the old name undeclared; the attempted migration was fully rolled back.
+- **03005270 `gHardwareKeys` (unified):** Raw active-low KEYINPUT sampled before per-player input records are updated; ramlayout before/after checks passed.
+- **03005278 `gLcgState` (unified):** Independent 32-bit linear-congruential state, initialized to 123456 and advanced by Random_Next15; ramlayout before/after checks passed.
+- **030052F0 `gResourceRegistryCount` (unified):** High-water count of resource-registry entries, capped at 32; ramlayout before/after checks passed.
+- **0300530C `gSerialMultiplayer1Word` (unified):** Last word sampled from SIOMULTI1 by the byte-transfer interrupt; ramlayout before/after checks passed.
+- **03005310 `gSerialPeer1Interrupts` (unified):** Counter advanced by the SIOMULTI1 byte-transfer handler; tentative name; ramlayout before/after checks passed.
+- **03005314 `gSerialInitialized` (unified):** Set to 1 by Serial_InitMultiplayer; no semantic reader observed here; ramlayout before/after checks passed.
+- **03005318 `gSerialPeer0Interrupts` (unified):** Counter advanced by the SIOMULTI0 byte-transfer handler; tentative name; ramlayout before/after checks passed.
+- **03005320 `gSerialMultiplayer0Word` (unified):** Last word sampled from SIOMULTI0 by the byte-transfer interrupt; ramlayout before/after checks passed.
+- **03005330 `gSerialQueuedPacketCount` (unified):** Number of queued four-halfword multiplayer packets; ramlayout before/after checks passed.
+- **03005350 `gSerialPacketQueue` (unified):** Four queued packets of four halfwords, with ring indices masked by 3; ramlayout before/after checks passed.
+- **03005380 `gSerialPacketReadIndex` (unified):** Current read index in the four-entry multiplayer packet ring; ramlayout before/after checks passed.
+
+- **03005390 `gRfuLinkManager` (struct):** All 32 consumers share the SDK-named manager prefix, byte/halfword event union at +14, VBlank timers and configuration/callback tail through +44. Every unit matches; both compiler modes preserve instructions. One raw byte-array read required the named parentAck_flag member to retain a base-plus-3 load rather than an interior literal.
+
+- **030053D8 `gPlayTimeCounterEnabled` (unified):** Enables the persistent play-time counter at game-state +0x614; ramlayout before/after checks passed.
+- **030053DC `gSceneControlWord0` (unified):** Cleared by scene transitions and Engine_ClearControlFlags; finer meaning unresolved; ramlayout before/after checks passed.
+- **030053E0 `gSceneInitWord0` (unified):** Initialized to zero by the scene lifecycle manager; semantic name provisional; ramlayout before/after checks passed.
+- **030053E4 `gRuntimeFrameCounter` (unified):** Incremented on every scene lifecycle task update; ramlayout before/after checks passed.
+- **030053E8 `gSceneTransitionFlags` (unified):** Pending scene transition flags, including active-region backup/restore bits; ramlayout before/after checks passed.
+- **030053EC `gSceneControlWord1` (unified):** Cleared by Engine_ClearControlFlags; finer meaning unresolved; ramlayout before/after checks passed.
+
+- **030053F8 `gSessionState` (unified):** Persistent/session state pointer; byte base preserves existing subsystem-specific pointee views; ramlayout before/after checks passed.
+- **030053FC `gSceneTransitionActive` (unified):** Set during transition cleanup and cleared when the scene starts; ramlayout before/after checks passed.
+- **03005400 `gSceneInitWord1` (unified):** Initialized to zero by the scene lifecycle manager; semantic name provisional; ramlayout before/after checks passed.
+- **03005404 `gSleepResumePending` (unified):** Set after BIOS Stop and consumed by scene runtime refresh; ramlayout before/after checks passed.
+
+- **03005408 `gSceneDialogActive` (unified):** Shared scene-dialog activity/control flag, retaining existing provisional aliases; ramlayout before/after checks passed.
+- **0300540C `gSceneUnpausedFrames` (unified):** Counter incremented while the scene is not paused; provisional semantic name; ramlayout before/after checks passed.
+- **03005410 `gSceneControlWord2` (unified):** Cleared by Engine_ClearControlFlags; finer meaning unresolved; ramlayout before/after checks passed.
+- **03005414 `gSceneControlWord3` (unified):** Cleared during transitions and by Engine_ClearControlFlags; finer meaning unresolved; ramlayout before/after checks passed.

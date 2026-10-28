@@ -1,7 +1,8 @@
 #include "global.h"
 #include "ram.h"
+#include "runtime.h"
 extern u32 gUnk_03004278, gUnk_03003A00;
-extern u16 gUnk_03004270, gUnk_03004274, gUnk_0300427C;
+extern u16 gUnk_03004270, gUnk_03004274;
 extern u32 gUnk_020004B4;
 void m4aMPlayAllStop(void);
 void m4aSoundVSyncOff(void);
@@ -18,7 +19,7 @@ u32 System_ShutdownAndSoftReset(void)
     gUnk_03003A00 = 0;
     gUnk_03004270 = 0;
     gUnk_03004274 = 0;
-    gUnk_0300427C = 0;
+    gVideoTransferControl = 0;
     m4aMPlayAllStop();
     m4aSoundVSyncOff();
     InterruptsAndVideo_WaitForVBlank();

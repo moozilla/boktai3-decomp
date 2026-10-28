@@ -1,6 +1,6 @@
 #define SceneDialog_SetPhase Hud_SetInteractionCallback
-#define gSceneDialogActive   gUnk_03005408
 #include "global.h"
+#include "runtime.h"
 struct SceneDialog {
     u8 pad0[0x5c];
     const u8 *script;
@@ -9,7 +9,6 @@ struct SceneDialog {
     u8 padA50[0x48C8 - 0xA50];
     s32 window;
 };
-extern u32 gUnk_03005408;
 void TextWindow_SetBounds(s32, s32, s32, s32, s32);
 s32 TextWindow_SetScript(s32, const u8 *);
 s32 TextWindow_Refresh(s32, s32);
@@ -19,7 +18,7 @@ void SceneDialog_SelectResultPhase(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 void SceneDialog_BeginTimedMessage(struct SceneDialog *p)
 {
-    gUnk_03005408 = 1;
+    gSceneDialogActive = 1;
     if (!p->timer) {
         TextWindow_SetBounds(p->window, 2, 6, 26, 6);
         TextWindow_SetScript(p->window, p->script);

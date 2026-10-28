@@ -2,8 +2,6 @@
 #include "ram.h"
 #include "serial.h"
 void Serial_ResetMultiplayer_082230AC(void);
-extern u16 gUnk_03005330, gUnk_03005380;
-extern u16 gUnk_03005350[][4];
 void SerialLink_ResetMultiplayer(void)
 {
     s32 i, j;
@@ -29,9 +27,9 @@ void SerialLink_ResetMultiplayer(void)
     gSerialLatestPackets[6] = -1;
     gSerialLatestPackets[7] = -1;
     gSerialLatestPacketIndex = 0;
-    gUnk_03005330 = 0;
-    gUnk_03005380 = 0;
+    gSerialQueuedPacketCount = 0;
+    gSerialPacketReadIndex = 0;
     for (i = 0; i < 4; i++)
         for (j = 0; j < 4; j++)
-            gUnk_03005350[i][j] |= -1;
+            gSerialPacketQueue[i][j] |= -1;
 }

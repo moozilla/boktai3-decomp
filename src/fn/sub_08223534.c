@@ -1,37 +1,25 @@
 #include "global.h"
-struct S {
-    u8 f0;
-    u8 f1;
-    u8 pad[2];
-    u8 f4;
-    u8 f5;
-    u8 f6;
-    u8 f7;
-    u8 f8;
-    u8 pad2[4];
-    u8 fd;
-};
-extern struct S gUnk_03005390;
+#include "rfu_manager.h"
 u32 rfu_REQBN_softReset_and_checkID(void);
 void RfuManager_CompletePendingMscCycle(void);
 u32 RfuManager_ResetAndCheckAdapter(void)
 {
     u32 r = rfu_REQBN_softReset_and_checkID();
-    struct S *s;
+    struct RfuLinkManager *s;
     u32 c;
     if (r == 0x8001)
-        gUnk_03005390.f8 = 1;
-    c = gUnk_03005390.f4;
-    s = &gUnk_03005390;
+        gRfuLinkManager.RFU_powerOn_flag = 1;
+    c = gRfuLinkManager.state;
+    s = &gRfuLinkManager;
     if (c != 0x17 && c != 1) {
-        s->f5 = 0;
-        s->f4 = 0;
+        s->next_state = 0;
+        s->state = 0;
     }
-    s->f7 = 0;
-    s->fd = 0;
-    s->f1 = 0;
-    s->f0 = 0;
-    s->f6 = 0xff;
+    s->pcswitch_flag = 0;
+    s->reserveDisconnectSlot_flag = 0;
+    s->acceptCount = 0;
+    s->acceptSlot_flag = 0;
+    s->parent_child = 0xff;
     RfuManager_CompletePendingMscCycle();
     return r;
 }

@@ -1,24 +1,19 @@
 #include "global.h"
-struct Entry {
-    u16 id;
-    u8 flags, pad;
-    void *data;
-};
-extern struct Entry gUnk_0203B000[];
-extern s32 gUnk_030052F0;
-struct Entry *ResourceRegistry_AllocateEntry(void)
+#include "runtime.h"
+#include "resource_registry.h"
+struct ResourceRegistryEntry *ResourceRegistry_AllocateEntry(void)
 {
     s32 i;
-    struct Entry *entry;
+    struct ResourceRegistryEntry *entry;
     do {
-        for (entry = gUnk_0203B000, i = 0; i < gUnk_030052F0; i++, entry++) {
+        for (entry = gResourceRegistryEntries, i = 0; i < gResourceRegistryCount; i++, entry++) {
             do {
                 if (!(entry->flags & 0x80))
                     return entry;
             } while (0);
         }
-        gUnk_030052F0++;
-        if (gUnk_030052F0 > 31)
+        gResourceRegistryCount++;
+        if (gResourceRegistryCount > 31)
             return 0;
     } while (0);
     return entry;

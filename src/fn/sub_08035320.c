@@ -32,6 +32,7 @@ void Memory_Clear(void *, int);
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
+#include "rfu_manager.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -39,11 +40,10 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-extern u8 gUnk_03005390[];
 void Wireless_UpdateUniAcknowledgedSlots(struct Engine *p)
 {
     u8 *seen = (u8 *)p + 0xE7;
-    int bits = (gUnk_03005390[3] << 1) | *seen;
+    int bits = (gRfuLinkManager.parentAck_flag << 1) | *seen;
     int zero = 0;
     int offset;
     int expected;

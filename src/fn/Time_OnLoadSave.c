@@ -10,7 +10,7 @@ struct TimeState {
     u8 pad0[0x18];
     u32 region;
 };
-extern struct TimeState *gUnk_030053F8;
+extern struct TimeState *gSessionState;
 extern u8 gUnk_03005430[];
 s32 Script_GetValueSafe(void);
 u8 *Script_SetPc(u8 *pc);
@@ -39,9 +39,9 @@ void Time_OnLoadSave(void)
             entries[n].latitude = Script_GetValue();
         }
     }
-    region = gUnk_030053F8->region;
+    region = gSessionState->region;
     if (region - 1 > 52) {
-        gUnk_030053F8->region = 6;
+        gSessionState->region = 6;
         region = 6;
     }
     Time_CalculateSunriseSunset(entries[region].latitude, entries[region].longitude, 0);

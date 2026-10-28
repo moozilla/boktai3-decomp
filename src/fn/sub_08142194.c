@@ -3,22 +3,18 @@
 
 // confidence=low: action phases push neighboring scene objects and emit position effects.
 
-#ifdef NONMATCHING
-// fuzzy: 89.5%
-// fix.py best (sweep after the inlined-insn fix)
-// foundry draft (worker best 91.4%); what differs is mostly register allocation and instruction order
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-struct Cell {
+struct TerrainCell {
     u16 unk0;
     u16 flags;
 };
-struct Q {
+struct PushTargetFlags {
     u16 pad;
     u16 flags;
 };
-struct P {
+struct PlayerPushState {
     u8 pad0[0x20];
     u32 flags;
     u8 pad24[0x30 - 0x24];
@@ -29,7 +25,7 @@ struct P {
     u8 pad9a[0xa0 - 0x9a];
     u16 aa0;
     u8 pada2[0x348 - 0xa2];
-    struct Q *q348;
+    struct PushTargetFlags *q348;
     s16 target;
     u8 pad34e[0x3a0 - 0x34e];
     u16 a3a0;
@@ -74,7 +70,7 @@ static inline int scale(int v)
         return v >> 12;
     return -((-v) >> 12);
 }
-static inline int tileIndex(struct PackedVec *v)
+static inline int tileIndex(struct PackedVec *const v)
 {
     int x = v->x >> 8, z = v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -88,27 +84,27 @@ static inline u8 *cell(int i)
         return p + 4;
     return gTerrainMap->cells + 12 + i * 4;
 }
-static inline int heightAt(struct PackedVec *v, int i)
+static inline int heightAt(struct PackedVec *const v, int i)
 {
     u8 *c = cell(i);
     int slope = *c >> 4;
-    int h = (*c & 15) << 8;
+    int height = (*c & 15) << 8;
     switch (slope) {
         case 1:
-            h -= (u8)v->z;
+            height -= (u8)v->z;
             break;
         case 2:
-            h -= (u8)v->x;
+            height -= (u8)v->x;
             break;
     }
-    return h;
+    return height;
 }
 
 static inline void orFlags(u32 *a, u32 m)
 {
     *a |= m;
 }
-static inline int isTwo(struct P *p)
+static inline int isTwo(struct PlayerPushState *p)
 {
     int r;
     u16 q = p->a538;
@@ -118,9 +114,15 @@ static inline int isTwo(struct P *p)
     return r;
 }
 
-void Player_UpdateObjectPush(struct P *p)
+static inline u32 CellHasFlag(u16 flags, u32 mask)
 {
-    s32 sb;
+    u32 m = mask;
+    return flags & m;
+}
+
+void Player_UpdateObjectPush(struct PlayerPushState *p)
+{
+    s32 animation;
     u8 state;
     struct PackedVec v;
     struct PackedVec a;
@@ -130,14 +132,14 @@ void Player_UpdateObjectPush(struct P *p)
         ActorSequence_Begin(p, 0, 0);
         return;
     }
-    if ((p->state == 1) && (p->state & p->q348->flags))
+    if ((p->state == 1) && (p->q348->flags & 1))
         Player_SetActionPhase(p, 2);
     state = p->state;
     switch (state) {
         case 0:
             orFlags(&p->flags, 4);
-            sb = ActorVariant_GetTableValue(p->type, 2);
-            if (p->a3a0 != sb) {
+            animation = ActorVariant_GetTableValue(p->type, 2);
+            if (p->a3a0 != animation) {
                 Sound_PlaySong(0xd0);
                 p->a3a4 = (p->dir + 4) & 7;
                 if (p->dir > 4) {
@@ -148,25 +150,25 @@ void Player_UpdateObjectPush(struct P *p)
                     p->a3a3 = state;
                 }
             }
-            if (Player_SetAnimation(p, sb, 0x40, 1) == 0)
+            if (Player_SetAnimation(p, animation, 0x40, 1) == 0)
                 return;
             Player_SetActionPhase(p, 1);
             return;
 
         case 1: {
             int t;
-            int d4;
-            int d5;
-            s8 h;
-            int h2;
+            int previousDirection;
+            int nextDirection;
+            s32 height;
+            int nextHeight;
             orFlags(&p->flags, 8);
             p->a4a4 = state;
             t = p->target;
-            d4 = (p->dir + 7) & 7;
-            d5 = (p->dir + 1) & 7;
-            sb = ActorVariant_GetTableValue(p->type, 3);
+            previousDirection = (p->dir + 7) & 7;
+            nextDirection = (p->dir + 1) & 7;
+            animation = ActorVariant_GetTableValue(p->type, 3);
             p->a7c8 = state;
-            if ((t != d4) && (t != d5)) {
+            if ((t != previousDirection) && (t != nextDirection)) {
                 if (Player_IsWithinCoordinateBand(p)) {
                     if (SceneObjects_TryPushNeighborByIndex(&p->pos, p->a3a4) > 0) {
                         if ((p != 0) && isTwo(p)) {
@@ -181,25 +183,41 @@ void Player_UpdateObjectPush(struct P *p)
                 int s;
                 int idx;
                 int d;
+                int angle, scaled;
                 d = p->dir;
-                t = ((((t - d) * 2) + 8) + d) & 7;
-                t = (t + 1) & 7;
+                {
+                    int turn = (t - d) * 2 + 8;
+                    d += turn;
+                    d &= 7;
+                    t = d + 1;
+                    t &= 7;
+                }
                 v = p->pos;
                 v.x -= scale(gUnk_086149C4[((t << 5) + 0x40) & 0xff] * 50);
-                s = t << 5;
-                v.z -= scale(gUnk_086149C4[s & 0xff] * 50);
+                angle = t << 5;
+                scaled = gUnk_086149C4[angle & 0xff] * 50;
+                s = angle;
+                v.z -= scale(scaled);
                 idx = tileIndex(&v);
-                h = heightAt(&v, tileIndex(&v));
-                if ((h > (p->pos.y - 0x80)) && (h < (p->pos.y + 0x80))) {
-                    if (!Player_IsStatusBit3ActionActive(((struct Cell *)cell(idx))->flags)) {
+                {
+                    struct PackedVec *probe = &v;
+                    height = heightAt(probe, tileIndex(probe));
+                }
+                if ((height > (p->pos.y - 0x80)) && (height < (p->pos.y + 0x80))) {
+                    if (!Player_IsStatusBit3ActionActive(
+                            ((struct TerrainCell *)cell(idx))->flags)) {
                         v.x -= scale(gUnk_086149C4[((((p->dir + 1) & 7) << 5) + 0x40) & 0xff] * 50);
                         v.z -= scale(gUnk_086149C4[((p->dir + 1) & 7) << 5] * 50);
-                        h2 = heightAt(&v, tileIndex(&v));
-                        if (h2 >= (h + 0xc8)) {
-                            if (!(((struct Cell *)cell(tileIndex(&v)))->flags & 4)) {
+                        {
+                            struct PackedVec *probe = &v;
+                            nextHeight = heightAt(probe, tileIndex(probe));
+                        }
+                        if (nextHeight >= (height + 0xc8)) {
+                            if (!(CellHasFlag(((struct TerrainCell *)cell(tileIndex(&v)))->flags,
+                                              4))) {
                                 int m;
                                 u16 q;
-                                sb = ActorVariant_GetTableValue(p->type);
+                                animation = ActorVariant_GetTableValue(p->type);
                                 q = p->aa0;
                                 m = 0;
                                 if (q) {
@@ -214,7 +232,7 @@ void Player_UpdateObjectPush(struct P *p)
                     }
                 }
             }
-            Player_SetAnimation(p, sb, 0x40, 1);
+            Player_SetAnimation(p, animation, 0x40, 1);
             if (((p->a3a0 == ActorVariant_GetTableValue(p->type, 4)) && (p->aa0 == 0)) &&
                 (p->a98 == 1))
                 Sound_PlaySong(0xdb);
@@ -258,7 +276,7 @@ void Player_UpdateObjectPush(struct P *p)
             c = p->pos;
             c.x -= scale(gUnk_086149C4[((((p->dir + 1) & 7) << 5) + 0x40) & 0xff] * 50);
             c.z -= scale(gUnk_086149C4[((p->dir + 1) & 7) << 5] * 50);
-            if (((struct Cell *)cell(tileIndex(&c)))->flags & 0x100)
+            if (CellHasFlag(((struct TerrainCell *)cell(tileIndex(&c)))->flags, 0x100))
                 Player_PlayPositionEffect(p, &p->pos, 0x100, 1, &a, 1, 0xeb);
             else
                 Player_PlayPositionEffect(p, &p->pos, 0x100, 1, &a, 0, 0xec);
@@ -269,7 +287,3 @@ void Player_UpdateObjectPush(struct P *p)
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Player_UpdateObjectPush);
-#endif

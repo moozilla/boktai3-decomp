@@ -5,8 +5,6 @@
 struct Dma {
     vu32 src, dest, control;
 };
-extern u32 gUnk_0300426C, gUnk_03004264;
-extern u16 gUnk_0300427C;
 void Mosaic_Initialize(void);
 void sub_082156D8(u32);
 void Video_SetWindowBounds(u32, u32, u32, u32, u32);
@@ -52,10 +50,10 @@ void InterruptsAndVideo_InitRuntime(void)
     *(vu16 *)0x04000208 = zero;
     (void)*(vu16 *)0x04000200;
     *(vu16 *)0x04000200 = zero;
-    gUnk_0300426C = 1;
+    gVideoInterruptsEnabled = 1;
     gVideoIrqPhase = zero;
     byteOne = 1;
-    gUnk_0300427C = 1;
+    gVideoTransferControl = 1;
     mask = 0x2000;
     *(vu16 *)0x04000200 = mask;
     *(vu16 *)0x04000200 |= 0x1000;
@@ -83,7 +81,7 @@ void InterruptsAndVideo_InitRuntime(void)
     Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, Sprite_RenderScaledList,
                              sub_08219624);
     gSceneEffectPalettePhase = zero;
-    gUnk_03004264 = zero;
+    gVBlankFrameCounter = zero;
     a = &gVideoUploadTask;
     Task_SetCallbacks(a, InterruptsAndVideo_OnVideoUploadTask, 0);
     b = &gGraphicsUpdateTask;

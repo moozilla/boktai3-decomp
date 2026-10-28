@@ -1,18 +1,7 @@
 #include "global.h"
-extern u16 gPlayerCount;
-extern u16 gPlayerInteractionMode;
-extern u16 gPlayerScriptState;
-extern u16 gPlayerPassageState;
-extern u16 gPlayerEffectPendingCount;
-extern u16 gPlayerSolarActionPending;
-extern u16 gPlayerActionPending;
-extern u16 gPlayerCueTimer;
+#include "ram.h"
 extern u32 gUnk_02000560[4];
 extern u32 gUnk_02000580[4];
-extern u16 gTrackedPlayerId[4];
-extern u16 gPlayerInitialSlotValues[2];
-extern u16 gPlayerDirectionLatch, gPlayerBackgroundState, gPlayerBackgroundMode,
-    gPlayerAbilityLatched;
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: clears the link-mode shared arrays and counters in the movement-state tail.
 #define Player_ResetLinkState sub_08158C14
@@ -26,7 +15,7 @@ void Player_ResetLinkState(void)
     *(u16 *)0x02000544 = 0;
     for (i = 0; i < 4; i++) {
         gUnk_02000580[i] = 0;
-        gTrackedPlayerId[i] = 0;
+        ((u16 *)&gTrackedPlayerId)[i] = 0;
         gUnk_02000560[i] = 0;
     }
 

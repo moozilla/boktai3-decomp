@@ -49,6 +49,45 @@ struct ObjGfxSlot {
 
 extern struct ObjGfxSlot gObjGfxSlots[128];
 
+struct SpriteTileEntry {
+    u16 id;
+    u8 unk02[6];
+};
+
+struct SpriteTileResource {
+    u32 unk00;
+    u16 tileCount, entryCount;
+    u32 dataOffset;
+    struct SpriteTileEntry entries[1];
+};
+
+extern struct SpriteTileResource *gSpriteTileResource;
+
+struct AnimResourceEntry {
+    u16 id;
+    u8 field2, unk03;
+    u8 field4, field5, field6, field7;
+    u32 offset;
+};
+
+struct AnimResourceHeader {
+    u32 unk00;
+    s32 count;
+    u8 unk08[4];
+    u32 offsetC, offset10, offset14;
+    struct AnimResourceEntry entries[1];
+};
+
+extern struct AnimResourceHeader *gAnimationResource;
+
+struct SpriteAffineParam {
+    u8 angle;
+    s8 scaleX, scaleY;
+    u8 unk03;
+};
+
+extern struct SpriteAffineParam gSpriteAffineParams[32];
+
 /* RAM objects; each row of symbols/ram.csv with header include/render.h. */
 extern u8 *gPaletteBankData; /* palette-bank data: 32-byte banks of sixteen RGB15 colors (AnimData_SelectPaletteBank) */
 extern u32 gVBlankDialogueState; /* scrolling-dialogue/video state copied during VBlank (guess) */
@@ -135,5 +174,19 @@ extern u16 gSavedWinIn; /* Saved WININ register */
 extern u16 gSavedWinOut; /* Saved WINOUT register */
 extern u8 gTextTileUploadIndices[]; /* Queued text tile indices; bounded storage precedes its count, original guard permits index 256 */
 extern u32 gTextTileUploadCount; /* Number of queued text tile DMA uploads */
+extern void *gSpriteListHeads[2]; /* Two sprite render-list heads, selected by gRenderListIndex; pointees retain subsystem views */
+extern void *gMainSpriteListHeads[2]; /* Two main/animation sprite-list heads; protected ARM source retains its address declaration */
+extern void *gDrawableListHeads[2]; /* Two drawable/effect render-list heads, selected by gRenderListIndex */
+extern u16 gBgPaletteBank1[]; /* Interior background palette bank 1, at gBgPaletteBuffer +0x20 bytes */
+extern u16 gBgPaletteBank2[]; /* Interior background palette bank 2, at gBgPaletteBuffer +0x40 bytes */
+extern u16 gBgPaletteBank3[]; /* Interior background palette bank 3, at gBgPaletteBuffer +0x60 bytes */
+extern u16 gBgPaletteBank9[]; /* Interior background palette bank 9, at gBgPaletteBuffer +0x120 bytes */
+extern u16 gBgPaletteBank12[]; /* Interior background palette bank 12, at gBgPaletteBuffer +0x180 bytes */
+extern u16 gBgPaletteBank13Color2[]; /* Interior view starting at background palette bank 13 color 2 */
+extern u16 gBgPaletteBank13Color10; /* Interior background palette bank 13 color 10 */
+extern u16 gBgPaletteBank13Color11; /* Interior background palette bank 13 color 11 */
+extern u16 gBgPaletteBank13Color14; /* Interior background palette bank 13 color 14 */
+extern u16 gBgPaletteBank14[]; /* Interior background palette bank 14, at gBgPaletteBuffer +0x1C0 bytes */
+extern u16 gBgPaletteBank15[]; /* Interior background palette bank 15, at gBgPaletteBuffer +0x1E0 bytes */
 
 #endif

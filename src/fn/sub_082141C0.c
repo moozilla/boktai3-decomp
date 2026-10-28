@@ -4,7 +4,6 @@
 struct Dma {
     vu32 src, dest, control;
 };
-extern u32 gUnk_03004260;
 void Bg_UpdateScrollShadow(void);
 void InterruptsAndVideo_WaitForVBlank(void);
 void ScanlineEffect_StageTransfer(void);
@@ -42,5 +41,5 @@ u32 InterruptsAndVideo_OnVideoUploadTask(void)
         *disp |= mask | 0x1000;
     }
     sub_08219134();
-    return gUnk_03004260 = 0;
+    return gVBlankUploadPending = 0;
 }

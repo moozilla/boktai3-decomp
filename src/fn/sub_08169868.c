@@ -1,12 +1,11 @@
 #include "global.h"
 #include "scene_hud_display.h"
 #include "game_state.h"
+#include "render.h"
 
 // foundry draft (worker best 99.2%); what differs is mostly register allocation and instruction order
 
 #define SceneHud_RefreshPrimaryOptions SelectionPanel_RefreshVisibleEntries
-#define gSceneHudInput                 gUnk_03005164
-extern u16 gUnk_03005164[];
 void SelectionPanel_RefreshVisibleEntries(struct SceneHudState *);
 void SceneHud_RefreshSecondaryOptions(struct SceneHudState *);
 void SceneHud_TickWidgetSlides(struct SceneHudState *);
@@ -32,5 +31,5 @@ void SceneHud_CyclePrimarySecondaryOptions(struct SceneHudState *p)
         SceneHud_RefreshSecondaryOptions(p);
     }
     SceneHud_TickWidgetSlides(p);
-    Palette_UpdateHighlightPulse(gUnk_03005164, &p->unknown13F0);
+    Palette_UpdateHighlightPulse(gBgPaletteBank13Color2, &p->unknown13F0);
 }

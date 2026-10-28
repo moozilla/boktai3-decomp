@@ -1,15 +1,14 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
-
-extern u32 gUnk_030053EC, gUnk_03005410, gUnk_030053DC, gUnk_03005414;
+#include "runtime.h"
 
 void Engine_ClearControlFlags(void)
 {
     gEngineFlags = 0;
     gScenePauseFlags = 0;
-    gUnk_030053EC = 0;
-    gUnk_03005410 = 0;
-    gUnk_030053DC = 0;
-    gUnk_03005414 = 0;
+    gSceneControlWord1 = 0;
+    gSceneControlWord2 = 0;
+    gSceneControlWord0 = 0;
+    gSceneControlWord3 = 0;
 }

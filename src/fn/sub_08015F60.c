@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 struct Vec {
@@ -45,20 +46,17 @@ void *FadingParticleManager_Create(u32, u32);
 s32 Mod(s32, s32);
 void sub_08217E40(void *, u32);
 void Anim_SetSequence(void *, void *, u32, u32, u32);
-static inline u16 FadingParticles_NextRandom(u32 *r)
+static inline u16 FadingParticles_NextRandom(u32 *r, const u16 *table)
 {
     *r = (*r + 1) & 1023;
-    return gUnk_0203B400[*r];
+    return table[*r];
 }
-#ifdef NONMATCHING
-// fuzzy: 82.7%
-// scope shape 38 (differences once low registers are set aside)
-// scope shape 79 (differences once low registers are set aside)
 s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lifeRange, s32 speed,
-                 s32 speedRange, s32 angle, s32 angleRange, s32 rise, s32 riseRange)
+                              s32 speedRange, s32 angle, s32 angleRange, s32 rise, s32 riseRange)
 {
     s32 i, j;
     u32 *rng;
+    register const u16 *table asm("r6");
     if (gFadingParticleManager == NULL && FadingParticleManager_Create(0, 0) == NULL)
         return -1;
     for (i = 0; i < 6; i++) {
@@ -69,38 +67,52 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
             g->count = count;
             if ((u8)count > 8)
                 g->count = 8;
-            for (j = 0; j < g->count; j++) {
-                struct Particle *p = &g->particles[j];
-                s32 a;
-                p->active = 1;
-                if (lifeRange == 0)
-                    p->lifetime = life;
-                else
-                    p->lifetime = life + Mod(FadingParticles_NextRandom(rng), lifeRange);
-                if (speedRange == 0)
-                    p->speed = speed;
-                else
-                    p->speed = speed + Mod(FadingParticles_NextRandom(rng), speedRange);
-                if (angleRange == 0)
-                    a = angle;
-                else
-                    a = angle + Mod(FadingParticles_NextRandom(rng), angleRange);
-                p->motion.velocity.x = gUnk_086149C4[(u8)(a + 64)];
-                p->motion.velocity.z = gUnk_086149C4[(u8)a];
-                if (riseRange == 0)
-                    p->motion.velocity.y = rise;
-                else
-                    p->motion.velocity.y = rise + Mod(FadingParticles_NextRandom(rng), riseRange);
-                p->motion.sprite.position = *position;
-                sub_08217E40(&p->motion.sprite, 0);
-                p->motion.sprite.flags &= ~1;
-                Anim_SetSequence(&p->motion.anim, gFadingParticleManager->animations, 3, 0, 0);
+            j = 0;
+            if (j < g->count) {
+                struct Anim *anim;
+                struct Sprite *sprite;
+                struct Particle *p;
+                table = gUnk_0203B400;
+                anim = &g->particles[0].motion.anim;
+                sprite = &g->particles[0].motion.sprite;
+                p = &g->particles[0];
+                do {
+                    s32 a;
+                    register const s16 *sine asm("r2");
+                    p->active = 1;
+                    if (lifeRange == 0)
+                        p->lifetime = life;
+                    else
+                        p->lifetime = life + Mod(FadingParticles_NextRandom(rng, table), lifeRange);
+                    if (speedRange == 0)
+                        p->speed = speed;
+                    else
+                        p->speed = speed + Mod(FadingParticles_NextRandom(rng, table), speedRange);
+                    if (angleRange == 0)
+                        a = angle;
+                    else
+                        a = angle + Mod(FadingParticles_NextRandom(rng, table), angleRange);
+                    sine = gUnk_086149C4;
+
+                    p->motion.velocity.x = sine[(a + 64) & 255];
+                    p->motion.velocity.z = sine[a & 255];
+                    if (riseRange == 0)
+                        p->motion.velocity.y = rise;
+                    else
+                        p->motion.velocity.y =
+                            rise + Mod(FadingParticles_NextRandom(rng, table), riseRange);
+                    p->motion.sprite.position = *position;
+                    sub_08217E40(sprite, 0);
+                    p->motion.sprite.flags &= ~1;
+                    Anim_SetSequence(anim, gFadingParticleManager->animations, 3, 0, 0);
+                    anim = (struct Anim *)((u8 *)anim + sizeof(struct Particle));
+                    sprite = (struct Sprite *)((u8 *)sprite + sizeof(struct Particle));
+                    p++;
+                    j++;
+                } while (j < g->count);
             }
             return 0;
         }
     }
     return -1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", FadingParticleGroup_Spawn);
-#endif

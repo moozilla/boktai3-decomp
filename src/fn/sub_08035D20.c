@@ -32,6 +32,7 @@ void Memory_Clear(void *, int);
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
+#include "runtime.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -41,7 +42,6 @@ static inline void setOperation(struct Engine *p, int op, int zero)
 }
 void Bg_ClearTilemap(void);
 int WirelessController_SetLocalInput(struct Engine *, int);
-extern u16 gUnk_03005270;
 int Wireless_PublishLocalInputAlternate(struct Engine *p)
 {
     if (p->pending) {
@@ -49,7 +49,7 @@ int Wireless_PublishLocalInputAlternate(struct Engine *p)
         Bg_ClearTilemap();
     }
     {
-        int input = gUnk_03005270;
+        int input = gHardwareKeys;
         int mask = 0x2000;
         input |= mask;
         WirelessController_SetLocalInput(p, input);

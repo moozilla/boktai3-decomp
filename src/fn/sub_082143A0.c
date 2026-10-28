@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct N {
     u8 pad0[0x4];
     u8 f4;
@@ -8,7 +9,6 @@ struct N {
     struct N *prev;
     struct N *next;
 };
-extern struct N *gUnk_030042C0[];
 void Sprite_UnlinkFromList(struct N *n, u32 i)
 {
     struct N *p = n->prev;
@@ -17,7 +17,7 @@ void Sprite_UnlinkFromList(struct N *n, u32 i)
     if (p)
         p->next = q;
     else
-        gUnk_030042C0[i] = q;
+        gSpriteListHeads[i] = q;
     if (q)
         q->prev = p;
 }
