@@ -616,17 +616,34 @@ def cmd_unify(a):
                 return err
             # its own declaration differs: the shared one if the code is
             # unchanged, else its own (if the header stays out of sight),
-            # else its own view as a cast at each use
+            # else its own view as a cast at each use. With --cast the cast
+            # comes before keeping the own declaration, and objects whose
+            # shared type changes nothing are taken without a cast.
             err = None
-            for how, t in (("shared", adopt(new[p], canon, a.header, cast=False)), ("own", renamed[p]),
-                           ("cast", adopt(new[p], canon, a.header, cast=True))):
+            order = [("shared", adopt(new[p], canon, a.header, cast=False)), ("own", renamed[p]),
+                     ("cast", adopt(new[p], canon, a.header, cast=True))]
+            if a.cast:
+                order[1], order[2] = order[2], order[1]
+            for how, t in order:
                 if t is None:
                     continue
                 err = same(p, t)
                 if err is None:
+                    if how == "cast" and a.cast:
+                        t = refine(p, t)
                     chosen[p] = (how, t)
                     return None
             return err
+
+        def refine(p, t):
+            """Take the shared type for each object where that leaves the assembly unchanged."""
+            names = sorted(n for n, ps in differ.items() if p in ps)
+            keep = set()
+            for n in names:
+                trial = adopt(new[p], canon, a.header, cast=True, shared=keep | {n})
+                if trial is not None and same(p, trial) is None:
+                    keep.add(n)
+            return adopt(new[p], canon, a.header, cast=True, shared=keep)
         with concurrent.futures.ThreadPoolExecutor(a.jobs) as ex:
             failed = [x for x in ex.map(after, verify) if x]
         for p, (how, t) in chosen.items():
@@ -686,7 +703,7 @@ def drop_defs(t, defs):
     return t
 
 
-def adopt(t, canon, header, cast):
+def adopt(t, canon, header, cast, shared=()):
     """`t` with every declaration of the header's objects removed, so the
     header's declarations apply; with cast=True a different declaration
     becomes a cast at each use instead."""
@@ -696,7 +713,7 @@ def adopt(t, canon, header, cast):
         exprs = set()
         for m, spec, decls, idx in reversed(declarations(t, name)):
             own = norm(spec, decls[idx], name, name)
-            if own != c and cast:
+            if own != c and cast and name not in shared:
                 e = view(spec, decls[idx], name, c, assigned(t, name))
                 if e is None:
                     return None
@@ -853,6 +870,9 @@ def main():
     s.add_argument("addr", nargs="?")
     s.add_argument("--decl", help="the declaration, e.g. 'extern u8 *gPaletteBankData;'")
     s.add_argument("--batch", help="file of ADDR | DECL | NOTE lines")
+    s.add_argument("--cast", action="store_true",
+                   help="a file whose declaration differs gets the shared one with casts at the uses "
+                        "that need its own type, before keeping its own declaration")
     s.add_argument("--all", action="store_true", help="also compile every includer of the target header")
     s.add_argument("--define", action="append", default=[],
                    help="a struct definition the declarations need, e.g. 'struct OamEntry { u32 a; };' "

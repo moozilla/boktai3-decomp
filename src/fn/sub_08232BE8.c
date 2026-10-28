@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 // confidence=low: projects the source and positions a timed icon around the screen center.
 #define ScreenOrbitEffect_UpdateFixedSlot sub_08232BE8
 struct OrbitVec {
@@ -17,7 +18,6 @@ struct OrbitOwner {
     u8 unknown0[0x18];
     struct OrbitVec center;
 };
-extern struct OrbitVec gCameraOrigin;
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 static inline s32 Scale32(s32 n)
@@ -62,9 +62,9 @@ static inline void Project(struct OrbitVec *out, struct OrbitVec *world)
     height = Scale32(world->y * 3);
     low = sum - height;
     sum += height;
-    out->x = out->x - gCameraOrigin.x + 120;
-    out->y = low - gCameraOrigin.y + 80;
-    sum -= (u16)gCameraOrigin.z;
+    out->x = out->x - (*(struct OrbitVec *)gCameraOrigin).x + 120;
+    out->y = low - (*(struct OrbitVec *)gCameraOrigin).y + 80;
+    sum -= (u16)(*(struct OrbitVec *)gCameraOrigin).z;
     out->z = sum;
 }
 

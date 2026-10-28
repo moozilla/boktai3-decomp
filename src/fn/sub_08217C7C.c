@@ -1,9 +1,7 @@
 #include "global.h"
+#include "render.h"
 
 extern u16 *Palette_GetBackgroundBuffer(void);
-extern u16 *gBgPaletteSource;
-extern u16 gBgPaletteBuffer[][16];
-extern s16 gBackdropOverride, gBackdropColor;
 void CpuSet(const void *, void *, u32);
 
 static inline u32 Gray(s32 color)
@@ -25,7 +23,7 @@ void sub_08217C7C(void)
 
     gBgPaletteSource = (u16 *)buffer;
     for (i = 0; i <= 12; i++) {
-        u16 *src = gBgPaletteBuffer[i];
+        u16 *src = ((u16(*)[16])gBgPaletteBuffer)[i];
         u16 *dst = buffer[i];
         for (j = 0; j < 16; j++) {
             *dst = Gray(*src);
@@ -34,9 +32,9 @@ void sub_08217C7C(void)
         }
     }
     for (i = 13; i < 16; i++) {
-        CpuSet(gBgPaletteBuffer[i], buffer[i], 0x04000008);
+        CpuSet(((u16(*)[16])gBgPaletteBuffer)[i], buffer[i], 0x04000008);
     }
     if (gBackdropOverride) {
-        gBackdropColor = Gray(gBackdropColor);
+        (*(s16 *)&gBackdropColor) = Gray((*(s16 *)&gBackdropColor));
     }
 }

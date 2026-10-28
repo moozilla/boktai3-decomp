@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 #ifdef NONMATCHING
 // fuzzy: 89.4%
 // fix.py best (sweep after the inlined-insn fix)
@@ -19,7 +20,6 @@ struct BgScroll {
     u8 pad[0x80];
     u16 x;
 };
-extern struct BgScroll gUnk_03004C30;
 s32 Mod(s32, s32);
 void TilemapPanel_DrawRegion(struct TilemapPanel *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                              s32);
@@ -43,7 +43,7 @@ void sub_08110C9C(struct TilemapPanel *p)
     s32 cellWidth;
     sx = Mod(p->scrollX, 256);
     Mod(scroll[1], 256);
-    gUnk_03004C30.x = sx;
+    (*(struct BgScroll *)gBgRecords).x = sx;
     limit = scroll[4] - 12;
     right = p->scrollX + 240;
     diff = p->drawnX - right;

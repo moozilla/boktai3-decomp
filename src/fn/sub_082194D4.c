@@ -1,10 +1,6 @@
 #include "global.h"
+#include "render.h"
 
-extern s32 gScanlineEffectLayer, gScanlineEffectMode;
-extern u16 *gScanlineEffectSource;
-extern u16 *gScanlineDmaSource;
-extern vu16 *gScanlineDmaTarget;
-extern u16 gScanlineDmaCount, gScanlineDmaMode;
 u8 *ScanlineEffect_GetBuffer(void);
 vu16 *ScanlineEffect_GetHorizontalScrollRegister(s32);
 vu16 *ScanlineEffect_GetVerticalScrollRegister(s32);
@@ -18,7 +14,7 @@ void sub_082194D4(void)
     buffer = (u16 *)ScanlineEffect_GetBuffer();
     Memory_Clear(buffer, 320);
     target = (vu16 *)0x0400001C;
-    switch (gScanlineEffectMode) {
+    switch ((*(s32 *)&gScanlineEffectMode)) {
         case 0:
             target = ScanlineEffect_GetHorizontalScrollRegister(gScanlineEffectLayer);
             break;

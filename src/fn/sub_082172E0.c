@@ -1,21 +1,19 @@
 #include "global.h"
-extern s32 gPaletteBanksInUse;
-extern u16 gObjPaletteKeys[];
-extern u8 gObjPaletteBuffer[];
+#include "render.h"
 u32 Palette_CacheReservedObjectBank(u32 key, void *src)
 {
     s32 i = 0;
     u32 result;
-    for (; i < gPaletteBanksInUse; i++)
+    for (; i < (*(s32 *)&gPaletteBanksInUse); i++)
         if (gObjPaletteKeys[i] == key)
             goto found;
-    if (gPaletteBanksInUse > 1)
+    if ((*(s32 *)&gPaletteBanksInUse) > 1)
         goto overflow;
     {
-        s32 n = gPaletteBanksInUse;
+        s32 n = (*(s32 *)&gPaletteBanksInUse);
         gObjPaletteKeys[n] = key;
-        CpuFastSet(src, gObjPaletteBuffer + n * 32, 8);
-        return gPaletteBanksInUse++;
+        CpuFastSet(src, ((u8 *)gObjPaletteBuffer) + n * 32, 8);
+        return (*(s32 *)&gPaletteBanksInUse)++;
     }
 found:
     return i;

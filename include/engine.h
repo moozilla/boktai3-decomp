@@ -145,7 +145,7 @@ s32 AnimData_Load(
     void *animData,
     s32 id); /* (guess) fill from the resource entry with this id (header 0x03004300) */
 
-void *AnimData_FindEntry(s32 id); /* (guess) entry with this id in header gUnk_030042EC, or NULL */
+void *AnimData_FindEntry(s32 id); /* (guess) entry with this id in header gSpriteTileResource, or NULL */
 
 u32 Anim_SetSequence(void *anim, void *data, u32 sequence, u32 row,
                      u32 flags); /* (guess) 1 if restarted */

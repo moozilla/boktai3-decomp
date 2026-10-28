@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct PaletteFade {
     u8 unk_00[0x24];
@@ -17,7 +18,6 @@ struct PaletteFade {
     s32 remainingTargets;
     u32 flags;
 };
-extern u16 gBgPaletteBuffer[16][16];
 s32 Div(s32, s32);
 
 #ifdef NONMATCHING
@@ -26,7 +26,7 @@ s32 Div(s32, s32);
 void sub_08111578(struct PaletteFade *p)
 {
     s32 fromOffset = p->slot * 16;
-    u16 *fromBase = &gBgPaletteBuffer[0][0];
+    u16 *fromBase = &((u16(*)[16])gBgPaletteBuffer)[0][0];
     u16 *from;
     u16 *targets = p->targets;
     u16 *to = targets + p->target * 16;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -21,7 +22,6 @@ struct Effect {
     u8 pad20[4];
     struct Sprite sprite;
 };
-extern struct Vec gCameraOrigin;
 static inline int project(int input)
 {
     int v = input * 3;
@@ -43,9 +43,9 @@ void FloatingEffect_Project(struct Effect *p)
     height = project(in->y);
     {
         int y = xy - height, z = xy + height;
-        out->x = out->x - gCameraOrigin.x + 120;
-        out->y = y - gCameraOrigin.y + 80;
-        out->z = z - gCameraOrigin.z;
+        out->x = out->x - (*(struct Vec *)gCameraOrigin).x + 120;
+        out->y = y - (*(struct Vec *)gCameraOrigin).y + 80;
+        out->z = z - (*(struct Vec *)gCameraOrigin).z;
     }
     s->position.x -= 8;
     s->position.y -= 8;
