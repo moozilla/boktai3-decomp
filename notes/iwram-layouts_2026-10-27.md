@@ -105,3 +105,12 @@ and field-remapping support in ramlayout would make this migration faster.
 - **030035E0 `gSoftSingleNaN` (struct):** libgcc single-precision NaN object shares its 16-byte number representation; both compiler modes preserve instructions and the per-unit ROM check is exact.
 
 - **030035F0 `SoundMainRAM_Buffer` (unified):** MP2K RAM instruction buffer copied with CpuCopy32 size 0x400; next script procedure word is a separate object; ramlayout before/after checks passed.
+
+- **030039F0 `gScriptEntryProcedure` (unified):** Script entry procedure selected by Script_SetEntryProcedure; separate from the preceding MP2K buffer; ramlayout before/after checks passed.
+- **03003A04 `gVideoUploadFlags` (unified):** Video upload dirty flags; bit 0 requests OAM upload; ramlayout before/after checks passed.
+- **03003A08 `gSceneEntryActive` (unified):** Set while scene-entry script runs; suppresses part of video upload task; ramlayout before/after checks passed.
+- **03003A14 `gRfuIrqSlots` (unified):** Interior view of interrupt dispatch table entry 1, passed as RFU handler slots; not an independent allocation; ramlayout before/after checks passed.
+- **03003A44 `gVBlankOccurred` (unified):** VBlank wait latch, volatile for interrupt polling; ramlayout before/after checks passed.
+- **03003A48 `gDialogueScrollOffset` (unified):** Dialogue scroll/tick offset copied into the video IRQ shadow; tentative name; ramlayout before/after checks passed.
+- **03003A4C `gDialogueModeLatched` (unified):** VBlank-latched dialogue state controlling the two-phase video IRQ; tentative name; ramlayout before/after checks passed.
+- **03003A00 `gUnk_03003A00` (skipped):** Protected status_screen_fade.c inherits its declaration from status_screen.h; restoring the protected source after the header rename leaves the old name undeclared. Object fully rolled back.

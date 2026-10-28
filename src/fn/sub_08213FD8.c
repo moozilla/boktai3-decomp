@@ -1,12 +1,13 @@
 #include "global.h"
 #include "render.h"
+#include "runtime.h"
 // MATCHING_CONCESSION: register-pinning
 // VBlank handler: sound, BG scroll/affine registers, HBlank DMA, link/clock ticks.
 // mode, count and affine are pinned (register-pinning concession).
 struct Dma {
     vu32 src, dest, control;
 };
-extern u32 gUnk_03003A44, gUnk_0300426C, gUnk_03004268, gUnk_03003A48, gUnk_03003A4C;
+extern u32 gUnk_0300426C, gUnk_03004268;
 extern u16 gUnk_03004270;
 extern u32 gUnk_03004278, gUnk_03003A00, gUnk_03004260, gUnk_03004264;
 extern s16 gUnk_03004274;
@@ -17,13 +18,13 @@ void SunClock_TickFrame(void);
 void sub_08213FD8(void)
 {
     m4aSoundVSync();
-    gUnk_03003A44 = 1;
+    gVBlankOccurred = 1;
     if (gUnk_0300426C) {
         vu16 *regs;
         u16 *offset;
         register s32 mode asm("r3");
-        gUnk_03004268 = gUnk_03003A48;
-        gUnk_03003A4C = gVBlankDialogueState;
+        gUnk_03004268 = gDialogueScrollOffset;
+        gDialogueModeLatched = gVBlankDialogueState;
         regs = (vu16 *)0x04000010;
         offset = gBgScrollShadow;
         *regs = offset[0];

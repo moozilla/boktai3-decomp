@@ -1,8 +1,8 @@
 #include "global.h"
-extern vu32 gUnk_03003A44;
+#include "runtime.h"
 void InterruptsAndVideo_WaitForVBlank(void)
 {
-    gUnk_03003A44 = 0;
-    while (gUnk_03003A44 == 0)
+    gVBlankOccurred = 0;
+    while (gVBlankOccurred == 0)
         ;
 }

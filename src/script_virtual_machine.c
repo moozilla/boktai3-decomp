@@ -1,5 +1,6 @@
 #include "script_virtual_machine.h"
 #include "ram.h"
+#include "runtime.h"
 
 s32 Script_FindResourceKey(u32 key, u16 *tbl, s32 x, s32 lo, s32 hi)
 {
@@ -778,11 +779,9 @@ s32 Script_DiscardValueIfZero(void)
     return 0;
 }
 
-extern u16 gUnk_030039F0;
-
 void Script_SetEntryProcedure(u16 v)
 {
-    gUnk_030039F0 = v;
+    gScriptEntryProcedure = v;
 }
 
 void Script_InitRuntime(void)

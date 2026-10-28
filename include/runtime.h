@@ -44,5 +44,15 @@ extern u32
     gSolarEnabled; /* Software sensor-enable flag, set by Solar_Enable and cleared by Solar_Disable */
 extern u8
     gRtcProtected; /* RTC GPIO protection flag set by Rtc_Protect and cleared by Rtc_Initialize */
+extern u16
+    gScriptEntryProcedure; /* Script entry procedure selected by Script_SetEntryProcedure; separate from the preceding MP2K buffer */
+extern u32 gVideoUploadFlags; /* Video upload dirty flags; bit 0 requests OAM upload */
+extern u32
+    gSceneEntryActive; /* Set while scene-entry script runs; suppresses part of video upload task */
+extern vu32 gVBlankOccurred; /* VBlank wait latch, volatile for interrupt polling */
+extern u32
+    gDialogueScrollOffset; /* Dialogue scroll/tick offset copied into the video IRQ shadow; tentative name */
+extern u32
+    gDialogueModeLatched; /* VBlank-latched dialogue state controlling the two-phase video IRQ; tentative name */
 
 #endif

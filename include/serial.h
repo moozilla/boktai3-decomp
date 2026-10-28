@@ -18,5 +18,7 @@ extern u16
     gSerialQueuedSendWord; /* Queued multiplayer send word, moved into the active word when ready */
 extern u16 gSerialActiveSendWord; /* Current multiplayer send word, with protocol status bits */
 extern u8 gRfuApiBuffer[]; /* RFU API workspace passed to rfu_initializeAPI with size 0xE64 */
+extern u8 gRfuIrqSlots
+    []; /* Interior view of interrupt dispatch table entry 1, passed as RFU handler slots; not an independent allocation */
 
 #endif

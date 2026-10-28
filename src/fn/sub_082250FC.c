@@ -1,13 +1,14 @@
 #include "global.h"
 #include "render.h"
+#include "runtime.h"
 struct Task {
     u8 pad[24];
     s32 state, counter;
 };
-extern u32 gUnk_03005408, gUnk_030054B0, gUnk_03003A08, gUnk_030053E8, gUnk_030053FC;
+extern u32 gUnk_03005408, gUnk_030054B0, gUnk_030053E8, gUnk_030053FC;
 extern u32 gUnk_030053DC, gUnk_03005414, gUnk_0300540C;
 extern u32 gEngineFlags, gUnk_03005404, gUnk_030053E4, gUnk_030053D8;
-extern u16 gUnk_03005260, gUnk_030039F0;
+extern u16 gUnk_03005260;
 extern u8 *gGameState;
 extern u32 *gUnk_030053F8;
 void System_ShutdownAndSoftReset(void);
@@ -44,14 +45,14 @@ update: {
             u32 *active;
             u32 next;
             gUnk_030054B0 = state;
-            active = &gUnk_03003A08;
+            active = &gSceneEntryActive;
             next = 1;
             *active = next;
             gUnk_030053E8 = state;
             task->counter = state;
             SceneLifecycle_InitSceneState();
             Script_ResetLocalVariables();
-            procedure = gUnk_030039F0;
+            procedure = gScriptEntryProcedure;
             if (!procedure)
                 goto no_procedure;
             Script_Call(procedure, 0);

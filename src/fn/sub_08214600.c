@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "runtime.h"
 
 struct SpritePiece {
     u8 shape;
@@ -47,7 +48,6 @@ struct SpriteAffine {
 
 extern struct SpriteAffine gUnk_03004310[];
 extern const s16 gUnk_086149C4[];
-extern u32 gUnk_03003A04;
 s32 sub_082152E4(const void *src, s32 size);
 u32 Palette_CacheObjectBank(u32 key, void *src);
 
@@ -67,7 +67,7 @@ static inline void Oam_PushImmediate(u32 a, u32 t)
         gOamBuffer[n].attributes = a;
         gOamBuffer[n].tile = t;
         gOamCount = n + 1;
-        gUnk_03003A04 |= 1;
+        gVideoUploadFlags |= 1;
     }
 }
 static inline void Oam_PushSorted(u32 a, u32 t, s32 z, u32 priority)

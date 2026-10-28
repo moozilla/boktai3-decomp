@@ -1,14 +1,13 @@
 #include "global.h"
 #include "runtime.h"
 
-extern u32 gUnk_03003A4C;
 extern u8 gUnk_03004268;
 void m4aSoundMain(void);
 
 void sub_08214144(void)
 {
     if (gVideoIrqPhase == 0) {
-        if (gUnk_03003A4C != 0) {
+        if (gDialogueModeLatched != 0) {
             *(vu16 *)0x04000004 &= 0xff;
             *(vu16 *)0x04000004 |= 0x9000;
             gVideoIrqPhase = 1;

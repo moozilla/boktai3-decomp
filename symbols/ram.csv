@@ -293,15 +293,15 @@ addr,name,size,kind,decl,header,confidence,notes
 030035C8,gSoftDoubleNaN,14,object,extern struct SoftDoubleNumber gSoftDoubleNaN;,include/libgcc_numbers.h,high library source correspondence,libgcc software double-precision NaN object; 20-byte fp-bit-base number layout
 030035E0,gSoftSingleNaN,10,object,extern struct SoftSingleNumber gSoftSingleNaN;,include/libgcc_numbers.h,high library source correspondence,libgcc software floating-point NaN number object; shared fp-bit-base layout
 030035F0,SoundMainRAM_Buffer,402,object,extern u8 SoundMainRAM_Buffer[0x400];,include/sound.h,,MP2K RAM instruction buffer copied with CpuCopy32 size 0x400; next script procedure word is a separate object
-030039F0,gUnk_030039F0,2,object,,,,Separate script entry-procedure word immediately after the bounded 0x400-byte MP2K code buffer
+030039F0,gScriptEntryProcedure,2,object,extern u16 gScriptEntryProcedure;,include/runtime.h,,Script entry procedure selected by Script_SetEntryProcedure; separate from the preceding MP2K buffer
 03003A00,gUnk_03003A00,4,object,,,,
-03003A04,gUnk_03003A04,4,object,,,,
-03003A08,gUnk_03003A08,4,object,,,,
+03003A04,gVideoUploadFlags,4,object,extern u32 gVideoUploadFlags;,include/runtime.h,,Video upload dirty flags; bit 0 requests OAM upload
+03003A08,gSceneEntryActive,4,object,extern u32 gSceneEntryActive;,include/runtime.h,,Set while scene-entry script runs; suppresses part of video upload task
 03003A10,gSerialInterruptState,34,object,extern u8 gSerialInterruptState[];,include/ram.h,low,
-03003A14,gUnk_03003A14,,interior,,,,gUnk_03003A10 +0x4
-03003A44,gUnk_03003A44,4,object,,,,
-03003A48,gUnk_03003A48,4,object,,,,
-03003A4C,gUnk_03003A4C,4,object,,,,
+03003A14,gRfuIrqSlots,,interior,extern u8 gRfuIrqSlots[];,include/serial.h,,"Interior view of interrupt dispatch table entry 1, passed as RFU handler slots; not an independent allocation"
+03003A44,gVBlankOccurred,4,object,extern vu32 gVBlankOccurred;,include/runtime.h,,"VBlank wait latch, volatile for interrupt polling"
+03003A48,gDialogueScrollOffset,4,object,extern u32 gDialogueScrollOffset;,include/runtime.h,,Dialogue scroll/tick offset copied into the video IRQ shadow; tentative name
+03003A4C,gDialogueModeLatched,4,object,extern u32 gDialogueModeLatched;,include/runtime.h,,VBlank-latched dialogue state controlling the two-phase video IRQ; tentative name
 03003A50,gSceneEffectPalettePhase,4,object,extern u32 gSceneEffectPalettePhase;,include/ram.h,low,
 03003A60,gUnk_03003A60,800,object,,,,
 03004260,gUnk_03004260,4,object,,,,

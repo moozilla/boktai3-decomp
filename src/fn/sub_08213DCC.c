@@ -5,7 +5,7 @@
 struct Dma {
     vu32 src, dest, control;
 };
-extern u32 gUnk_0300426C, gUnk_03003A08, gUnk_03004264;
+extern u32 gUnk_0300426C, gUnk_03004264;
 extern u16 gUnk_0300427C;
 void Mosaic_Initialize(void);
 void sub_082156D8(u32);
@@ -74,7 +74,7 @@ void InterruptsAndVideo_InitRuntime(void)
     Video_SetWindowBounds(1, 0, 0, 240, 160);
     Video_SetWindowLayerMasks(0x3f, 1, 0, 0);
     gQueuedObjSlotCount = zero;
-    gUnk_03003A08 = zero;
+    gSceneEntryActive = zero;
     Sprite_InitSystem();
     ObjShape_InitTables();
     Anim_ResetDefaultFlags();
