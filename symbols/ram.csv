@@ -247,7 +247,7 @@ addr,name,size,kind,decl,header,confidence,notes
 03001110,gVideoIrqPhase,4,object,extern u32 gVideoIrqPhase;,include/runtime.h,,Two-phase video/sound IRQ handler latch; toggled by sub_08214144 (tentative name)
 03001118,gVideoUploadTask,18,object,extern struct RuntimeTask gVideoUploadTask;,include/runtime.h,high callback identity; unresolved task bytes,Static task calling InterruptsAndVideo_OnVideoUploadTask at priority 0; +16 initialized to 1 with unresolved meaning
 03001130,gGraphicsUpdateTask,18,object,extern struct RuntimeTask gGraphicsUpdateTask;,include/runtime.h,high callback identity; unresolved task bytes,Static task calling InterruptsAndVideo_OnGraphicsUpdateTask at priority 13; +16 initialized to 1 with unresolved meaning
-03001148,gUnk_03001148,8,object,,,,
+03001148,gObjGfxSlots,400,object,extern struct ObjGfxSlot gObjGfxSlots[128];,include/render.h,high,"128 queued OBJ tile uploads, each 8 bytes; allocation rejects count above 127 and the next object starts at 03001548"
 03001548,gUnk_03001548,2,object,,,,
 0300154C,gUnk_0300154C,2,object,,,,
 0300154E,gUnk_0300154E,2,object,,,,

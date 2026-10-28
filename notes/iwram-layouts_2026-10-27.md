@@ -51,3 +51,5 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03001118 `gVideoUploadTask` (struct):** Static scheduler task identified by its video-upload callback and priority 0. RuntimeTask preserves the scheduler header; +16 remains semantically unresolved. InitRuntime matches with identical compiler output in both modes.
 
 - **03001130 `gGraphicsUpdateTask` (struct):** Static scheduler task identified by its graphics-update callback and priority 13, sharing RuntimeTask with the video-upload task. InitRuntime still matches in both modes.
+
+- **03001148 `gObjGfxSlots` (struct):** 128 eight-byte OBJ tile-upload slots, proven by allocator limit and next address 03001548; both consumers exact in both compiler modes. Inventory extent corrected from one entry to 0x400 bytes.

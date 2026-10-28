@@ -41,6 +41,14 @@ struct BackgroundLayer {
 
 extern struct BackgroundLayer gBgRecords[4];
 
+struct ObjGfxSlot {
+    u16 size;
+    u16 offset;
+    const void *src;
+};
+
+extern struct ObjGfxSlot gObjGfxSlots[128];
+
 /* RAM objects; each row of symbols/ram.csv with header include/render.h. */
 extern u8 *gPaletteBankData; /* palette-bank data: 32-byte banks of sixteen RGB15 colors (AnimData_SelectPaletteBank) */
 extern u32 gVBlankDialogueState; /* scrolling-dialogue/video state copied during VBlank (guess) */
