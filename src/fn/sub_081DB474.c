@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "menu_parameters.h"
 struct Rect {
     u32 xy;
     u16 width, height;
@@ -10,7 +11,6 @@ struct Message {
     void *values;
 };
 extern u16 gUnk_03005260[];
-extern u32 gUnk_020002C0[];
 void Sound_PlaySong(s32);
 void Menu_StartFadeOut(s32);
 void Menu_EraseRect(s32, s32, s32, s32);
@@ -78,16 +78,16 @@ void Options_UpdateScreen(u8 *p)
                     if (--W(0x20) < 0)
                         W(0x20) = 8;
                     Menu_EraseRect(9, 12, 18, 2);
-                    Menu_DrawStringRef(9, 12, gUnk_020002C0[1], W(0x20));
+                    Menu_DrawStringRef(9, 12, gChoiceMenuParameters.eBlock, W(0x20));
                 }
                 if (gUnk_03005260[1] & 0x10) {
                     Sound_PlaySong(0xDC);
                     if (++W(0x20) > 8)
                         W(0x20) = 0;
                     Menu_EraseRect(9, 12, 18, 2);
-                    Menu_DrawStringRef(9, 12, gUnk_020002C0[1], W(0x20));
+                    Menu_DrawStringRef(9, 12, gChoiceMenuParameters.eBlock, W(0x20));
                 }
-                gUnk_020002C0[8] = W(0x20);
+                gChoiceMenuParameters.n2 = W(0x20);
             }
             {
                 u32 mask = 0xFFFF0000;
@@ -113,16 +113,16 @@ void Options_UpdateScreen(u8 *p)
                 W(0x13C) |= state;
                 W(0xB4) |= state;
                 W(0x2C) |= state;
-                Script_Call(gUnk_020002C0[9], 0);
+                Script_Call(gChoiceMenuParameters.p, 0);
                 if (W(0x2D0) == 0)
-                    Script_Call(gUnk_020002C0[5], 0);
+                    Script_Call(gChoiceMenuParameters.c, 0);
                 else if (W(0x2D0) == 1)
-                    Script_Call(gUnk_020002C0[2], 0);
+                    Script_Call(gChoiceMenuParameters.s, 0);
                 else if (W(0x2D0) == 2)
-                    Script_Call(gUnk_020002C0[3], 0);
+                    Script_Call(gChoiceMenuParameters.r, 0);
                 else {
                     value = W(0x20);
-                    Script_Call(gUnk_020002C0[4], &message);
+                    Script_Call(gChoiceMenuParameters.x, &message);
                 }
                 Task_Kill(p);
             }
