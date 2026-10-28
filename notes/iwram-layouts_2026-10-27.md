@@ -73,3 +73,15 @@ and field-remapping support in ramlayout would make this migration faster.
 
 - **03001680 `gMessageQueueBufferIndex` (unified):** Active double-buffered message queue index, toggled by MessageQueue_SwapBuffers; ramlayout before/after checks passed.
 - **03001684 `gTrapDispatchStarted` (unified):** Set by Trap_UpdateProbeContacts and reset when boxes are loaded; ramlayout before/after checks passed.
+
+- **03001690 `gSerialByteReceiveWrite` (unified):** Write cursor of the 64-byte serial receive ring; ramlayout before/after checks passed.
+- **03001694 `gSerialByteReceiveRead` (unified):** Read cursor of the 64-byte serial receive ring; ramlayout before/after checks passed.
+- **03001698 `gSerialByteReceiveCount` (unified):** Queued receive-byte count; ramlayout before/after checks passed.
+- **0300169C `gSerialByteSendWrite` (unified):** Write cursor of the 64-byte serial send ring; ramlayout before/after checks passed.
+- **030016A0 `gSerialByteSendRead` (unified):** Read cursor of the 64-byte serial send ring; ramlayout before/after checks passed.
+- **030016A4 `gSerialByteSendCount` (unified):** Queued send-byte count; ramlayout before/after checks passed.
+- **030016A8 `gSerialByteReceiveBuffer` (unified):** 64-byte receive ring; independent from the adjacent send ring; ramlayout before/after checks passed.
+- **030016E8 `gSerialByteSendBuffer` (unified):** 64-byte send ring with its own literal base; prior interior classification was adjacency; ramlayout before/after checks passed.
+- **03001728 `gSerialQueuedSendWord` (unified):** Queued multiplayer send word, moved into the active word when ready; ramlayout before/after checks passed.
+- **0300172A `gSerialActiveSendWord` (unified):** Current multiplayer send word, with protocol status bits; ramlayout before/after checks passed.
+- **03001738 `gRfuApiBuffer` (unified):** RFU API workspace passed to rfu_initializeAPI with size 0xE64; ramlayout before/after checks passed.

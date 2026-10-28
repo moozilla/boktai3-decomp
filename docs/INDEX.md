@@ -306,7 +306,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/grid_attack_actor.md](../notes/grid_attack_actor.md) | Grid attack actor unit consolidation | #grid-attack-actor #unit #matching #080297E8 #0802C678 | 5 |
 | [notes/interaction-marker_2026-10-14.md](../notes/interaction-marker_2026-10-14.md) | Interaction marker, 080537D0–08053D8C |  | 3 |
 | [notes/ivy-matching.md](../notes/ivy-matching.md) | Ivy (080ED914..080F0B8C): matching notes | #matching | 2 |
-| [notes/iwram-layouts_2026-10-27.md](../notes/iwram-layouts_2026-10-27.md) | Shared IWRAM object layouts (2026-10-27) | #matching #tooling #ram | 6 |
+| [notes/iwram-layouts_2026-10-27.md](../notes/iwram-layouts_2026-10-27.md) | Shared IWRAM object layouts (2026-10-27) | #matching #tooling #ram | 7 |
 | [notes/large_scene_animation_controller.md](../notes/large_scene_animation_controller.md) | Large scene animation controller = Nidhoggr boss (081915E0-0819792C) | *#scene #animation* | 5 |
 | [notes/link-field2.md](../notes/link-field2.md) | Field objects and hazards: open near misses (wip/field2) | *#particles #animation #assets* | 3 |
 | [notes/link-menus_2026-10-12.md](../notes/link-menus_2026-10-12.md) | Wireless menus and result panels | *#panel #menu #wireless* | 4 |

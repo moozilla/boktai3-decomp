@@ -1,15 +1,16 @@
 #include "global.h"
 #include "ram.h"
+#include "serial.h"
 void sub_08223044(void);
-extern u16 gUnk_0300172A, gUnk_03001728, gUnk_03005330, gUnk_03005380;
+extern u16 gUnk_03005330, gUnk_03005380;
 extern u16 gUnk_03005350[][4];
 void SerialLink_InitMultiplayer(void)
 {
     s32 i, j;
     sub_08223044();
     gSerialReceivePending = 0;
-    gUnk_0300172A = 0x4000;
-    gUnk_03001728 = 0x4000;
+    gSerialActiveSendWord = 0x4000;
+    gSerialQueuedSendWord = 0x4000;
     gSerialReceivePackets[0] = 65535;
     gSerialReceivePackets[1] = -1;
     gSerialReceivePackets[2] = -1;

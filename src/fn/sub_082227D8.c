@@ -1,8 +1,7 @@
 #include "global.h"
 #include "ram.h"
+#include "serial.h"
 
-extern s32 gUnk_03001690, gUnk_03001698, gUnk_030016A0, gUnk_030016A4;
-extern u8 gUnk_030016A8[64], gUnk_030016E8[64];
 extern s32 gUnk_03005318;
 extern u16 gUnk_03005320;
 
@@ -22,16 +21,16 @@ void sub_082227D8(void)
             gSerialTransferStatus = -8;
     } else {
         if ((a & 0x2000) && a != c) {
-            gUnk_030016A8[gUnk_03001690] = a;
-            gUnk_03001690 = (gUnk_03001690 + 1) & 0x3F;
-            gUnk_03001698++;
+            gSerialByteReceiveBuffer[gSerialByteReceiveWrite] = a;
+            gSerialByteReceiveWrite = (gSerialByteReceiveWrite + 1) & 0x3F;
+            gSerialByteReceiveCount++;
         }
-        if (gUnk_03001698 > 0x3E)
+        if (gSerialByteReceiveCount > 0x3E)
             send |= 0x4000;
-        if (gUnk_030016A4 > 0 && !(a & 0x4000)) {
-            send |= gUnk_030016E8[gUnk_030016A0];
-            gUnk_030016A0 = (gUnk_030016A0 + 1) & 0x3F;
-            gUnk_030016A4--;
+        if (gSerialByteSendCount > 0 && !(a & 0x4000)) {
+            send |= gSerialByteSendBuffer[gSerialByteSendRead];
+            gSerialByteSendRead = (gSerialByteSendRead + 1) & 0x3F;
+            gSerialByteSendCount--;
             send |= 0x2000;
         }
         if (send == 0xFFFF)

@@ -263,20 +263,20 @@ addr,name,size,kind,decl,header,confidence,notes
 03001680,gMessageQueueBufferIndex,4,object,extern u32 gMessageQueueBufferIndex;,include/runtime.h,,"Active double-buffered message queue index, toggled by MessageQueue_SwapBuffers"
 03001684,gTrapDispatchStarted,4,object,extern u32 gTrapDispatchStarted;,include/runtime.h,,Set by Trap_UpdateProbeContacts and reset when boxes are loaded
 03001688,gColliderManager,4,object,extern u8 *gColliderManager;,include/ram.h,low,
-03001690,gUnk_03001690,4,object,,,,
-03001694,gUnk_03001694,4,object,,,,
-03001698,gUnk_03001698,4,object,,,,
-0300169C,gUnk_0300169C,4,object,,,,
-030016A0,gUnk_030016A0,4,object,,,,
-030016A4,gUnk_030016A4,4,object,,,,
-030016A8,gUnk_030016A8,82,object,,,,
-030016E8,gUnk_030016E8,,interior,,,,gUnk_030016A8 +0x40
-03001728,gUnk_03001728,,interior,,,,gUnk_030016E8 +0x40
-0300172A,gUnk_0300172A,2,object,,,,
+03001690,gSerialByteReceiveWrite,4,object,extern s32 gSerialByteReceiveWrite;,include/serial.h,,Write cursor of the 64-byte serial receive ring
+03001694,gSerialByteReceiveRead,4,object,extern s32 gSerialByteReceiveRead;,include/serial.h,,Read cursor of the 64-byte serial receive ring
+03001698,gSerialByteReceiveCount,4,object,extern s32 gSerialByteReceiveCount;,include/serial.h,,Queued receive-byte count
+0300169C,gSerialByteSendWrite,4,object,extern s32 gSerialByteSendWrite;,include/serial.h,,Write cursor of the 64-byte serial send ring
+030016A0,gSerialByteSendRead,4,object,extern s32 gSerialByteSendRead;,include/serial.h,,Read cursor of the 64-byte serial send ring
+030016A4,gSerialByteSendCount,4,object,extern s32 gSerialByteSendCount;,include/serial.h,,Queued send-byte count
+030016A8,gSerialByteReceiveBuffer,82,object,extern u8 gSerialByteReceiveBuffer[64];,include/serial.h,,64-byte receive ring; independent from the adjacent send ring
+030016E8,gSerialByteSendBuffer,40,object,extern u8 gSerialByteSendBuffer[64];,include/serial.h,,"Separate 64-byte serial send ring; direct literal base, not part of receive ring"
+03001728,gSerialQueuedSendWord,2,object,extern u16 gSerialQueuedSendWord;,include/serial.h,,Separate queued multiplayer send word; not part of either byte ring
+0300172A,gSerialActiveSendWord,2,object,extern u16 gSerialActiveSendWord;,include/serial.h,,"Current multiplayer send word, with protocol status bits"
 0300172C,gSerialReceiveIndex,4,object,extern u32 gSerialReceiveIndex;,include/ram.h,low,
 03001730,gSerialReceivePending,4,object,extern u32 gSerialReceivePending;,include/ram.h,low,
 03001734,gSerialLatestPacketIndex,4,object,extern u32 gSerialLatestPacketIndex;,include/ram.h,low,
-03001738,gUnk_03001738,,object,,,,
+03001738,gRfuApiBuffer,,object,extern u8 gRfuApiBuffer[];,include/serial.h,,RFU API workspace passed to rfu_initializeAPI with size 0xE64
 030025A0,gUnk_030025A0,20,object,,,,
 030025E8,gCommandSet,E,object,extern struct CommandSet gCommandSet;,include/ram.h,low,
 030025F8,gUnk_030025F8,4,object,,,,
