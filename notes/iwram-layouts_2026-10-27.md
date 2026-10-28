@@ -66,3 +66,5 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03001558 `gSavedWinOut` (unified):** Saved WINOUT register; ramlayout before/after checks passed.
 - **03001560 `gTextTileUploadIndices` (unified):** Queued text tile indices; bounded storage precedes its count, original guard permits index 256; ramlayout before/after checks passed.
 - **03001660 `gTextTileUploadCount` (unified):** Number of queued text tile DMA uploads; ramlayout before/after checks passed.
+
+- **03001664 `gFontResource` (struct):** Shared 12-byte font header has two glyph counts and two relocated data addresses; narrow/wide names tentative. All seven consumers exact and unchanged in both compiler modes.
