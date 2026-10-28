@@ -147,9 +147,10 @@ Every accepted exact C match is used
 in the final ROM, so fuzzy, exact and linked code percentages coincide here.
 These are byte-weighted measures of the tracked code region, not percentages
 of functions or of the whole ROM. The data measures (decomp.dev's "Matched data")
-count RAM objects with one shared declaration ([RAM.md](RAM.md)). ROM data and
-assets are measured in PROGRESS.md only, not yet reported to decomp.dev
-([DATA_TRACKING.md](DATA_TRACKING.md)).
+are ROM data: bytes rebuilt from an editable, meaningful source, in seven
+data-only categories by kind (`rom_graphics` ... `rom_other`) with data-only
+units from `symbols/rom_data.csv` ([DATA_TRACKING.md](DATA_TRACKING.md)). RAM
+objects ([RAM.md](RAM.md)) are tracked in PROGRESS.md only.
 
 ### Categories and hierarchy
 

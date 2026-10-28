@@ -150,8 +150,9 @@ struct's member names, and merging the per-file structs is the job of
 
 ## Accounting
 
-`tools/progress.py` reports the inventory as the objdiff **data** measures, so
-decomp.dev's "Matched data" tracks it. It needs no ROM:
+`tools/progress.py` reports the inventory in PROGRESS.md and its summary (since
+2026-10-27 no longer to decomp.dev, whose data measures are ROM data;
+[DATA_TRACKING.md](DATA_TRACKING.md)). It needs no ROM:
 
 - `total_data`: bytes of all `object` rows with a size;
 - `matched_data`: objects whose header holds their declaration (unified, even if
