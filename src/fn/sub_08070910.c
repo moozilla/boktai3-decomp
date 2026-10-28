@@ -1,11 +1,66 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 void SceneActorControl_OnIdle(u8 *);
 
-#ifdef NONMATCHING
-// fuzzy: 36.1%
+static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u16 **saved, u32 excluded)
+{
+    u16 *flags = &actor->flags2D4;
+    register u32 value asm("r0") = *flags;
+    register u32 mask asm("r2") = 0x40;
+    value &= mask;
+    *saved = flags;
+    if (value)
+        goto one;
+    value = actor->flags2D0;
+    mask = excluded;
+    value &= mask;
+    if (value)
+        goto one;
+    if (actor->health > 0)
+        goto zero;
+one:
+    return 1;
+zero:
+    return 0;
+}
+
+static inline u8 HasMovementFlag(struct SceneActorRegistryActor *actor, u32 mask)
+{
+    if (actor->flags2C0 & mask)
+        return 1;
+    return 0;
+}
+
+static inline void ResetState(struct SceneActorRegistryActor *actor, u32 state, u32 zero)
+{
+    actor->state2A8 = state;
+    actor->phase2A9 = zero;
+    actor->behavior2AA = zero;
+    actor->counter2AC = zero;
+    actor->field2B1 = 1;
+}
+
+static inline void ResetControl(struct SceneActorRegistryActor *actor, const void *callback,
+                                u32 substate, u32 zero)
+{
+    actor->field2B2 = 1;
+    actor->field2B0 = zero;
+    actor->unknown2B5[0] = substate;
+    actor->control = callback;
+    actor->field2C8 = zero;
+    {
+        u32 *flags = &actor->flags114;
+        u32 mask = ~1;
+        u32 value = *flags;
+        value &= mask;
+        *flags = value;
+    }
+    actor->field104 = zero;
+}
+
 // scope shape 67 (differences once low registers are set aside)
 // confidence=low: walks the scene actor list and, for available actors with flag 0x100 in flags2C0, resets their script state.
 void sub_08070910(void)
@@ -21,40 +76,39 @@ void sub_08070910(void)
     keyword = Script_GetKeywordValue(0x6d, 0);
     if (!actor)
         return;
-    do {
-        u32 unavailable;
-        if (actor->flags2D4 & 0x40)
-            unavailable = 1;
-        else if (actor->flags2D0 & 0x20000)
-            unavailable = 1;
-        else if (actor->health <= 0)
-            unavailable = 1;
-        else
-            unavailable = 0;
-        if (!unavailable) {
-            if (actor->flags2C0 & 0x100) {
-                actor->state2A8 = 2;
-                actor->phase2A9 = 0;
-                actor->behavior2AA = 0;
-                actor->counter2AC = 0;
-                actor->field2B1 = 1;
-                if (keyword == 0) {
-                    actor->field2B2 = 1;
-                    actor->field2B0 = keyword;
-                    actor->unknown2B5[0] = 16;
-                    actor->control = SceneActorControl_OnIdle;
-                    actor->field2C8 = keyword;
-                    actor->flags114 &= ~1;
-                    actor->field104 = keyword;
+    {
+        u32 movementMask = 0x100;
+        u32 zero = 0;
+        const void *callback = SceneActorControl_OnIdle;
+        u32 substate = 16;
+        u32 excluded = 0x20000;
+        do {
+            u16 *flags;
+            u32 changeMask;
+            u32 unavailable = IsUnavailable(actor, &flags, excluded);
+            if (!unavailable) {
+                if (HasMovementFlag(actor, movementMask)) {
+                    ResetState(actor, 2, zero);
+                    if (keyword == 0) {
+                        ResetControl(actor, callback, substate, keyword);
+                    }
+                    {
+                        changeMask = 0x4000;
+                        {
+                            register u32 mask asm("r0") = changeMask;
+                            u32 value = *flags;
+                            mask |= value;
+                            *flags = mask;
+                        }
+                    }
+                    {
+                        changeMask = 8;
+                        actor->flags2D0 = actor->flags2D0 | changeMask;
+                    }
                 }
-                actor->flags2D4 |= 0x4000;
-                actor->flags2D0 |= 8;
             }
-        }
-        node = node->next;
-        actor = node->actor;
-    } while (actor);
+            node = node->next;
+            actor = node->actor;
+        } while (actor);
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08070910);
-#endif
