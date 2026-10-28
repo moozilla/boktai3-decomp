@@ -80,6 +80,14 @@ struct AnimResourceHeader {
 
 extern struct AnimResourceHeader *gAnimationResource;
 
+struct SpriteAffineParam {
+    u8 angle;
+    s8 scaleX, scaleY;
+    u8 unk03;
+};
+
+extern struct SpriteAffineParam gSpriteAffineParams[32];
+
 /* RAM objects; each row of symbols/ram.csv with header include/render.h. */
 extern u8 *gPaletteBankData; /* palette-bank data: 32-byte banks of sixteen RGB15 colors (AnimData_SelectPaletteBank) */
 extern u32 gVBlankDialogueState; /* scrolling-dialogue/video state copied during VBlank (guess) */

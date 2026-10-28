@@ -333,7 +333,7 @@ addr,name,size,kind,decl,header,confidence,notes
 030042FC,gAnimResourceSection14,4,object,extern u8 *gAnimResourceSection14;,include/render.h,high physical shape; provisional semantic name,resource-bank base plus header offset +0x14
 03004300,gAnimationResource,4,object,extern struct AnimResourceHeader *gAnimationResource;,include/render.h,high merged loader/lookup layout,"Animation resource header: count +4, relative section offsets +C/+10/+14, 12-byte entries from +18"
 03004304,gArmTileUploadCount,4,object,extern u32 gArmTileUploadCount;,include/render.h,high physical shape; provisional semantic name,ARM tile-upload request count
-03004310,gUnk_03004310,80,object,,,high physical shape; provisional semantic name,"4-byte entries: angle u8, scaleX s8, scaleY s8, one unresolved byte"
+03004310,gSpriteAffineParams,80,object,extern struct SpriteAffineParam gSpriteAffineParams[32];,include/render.h,high physical layout,"32 four-byte sprite affine parameters: u8 angle, s8 scaleX/scaleY, unresolved tail byte; protected ARM source retains address declaration"
 03004390,gOamBuffer,400,object,extern struct OamEntry gOamBuffer[];,include/render.h,high physical shape; provisional semantic name,"final OAM entries, 8 bytes each (128)"
 03004790,gOamPriorityCounts,8,object,extern u16 gOamPriorityCounts[];,include/render.h,high physical shape; provisional semantic name,queued OAM entry count per priority (4)
 03004798,gOamCount,4,object,extern s32 gOamCount;,include/render.h,high physical shape; provisional semantic name,direct/final OAM entry count

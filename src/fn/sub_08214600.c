@@ -40,13 +40,7 @@ struct Sprite {
     struct SpriteAnim anim;
     u32 attributes;
 };
-struct SpriteAffine {
-    u8 rotation;
-    s8 scaleX, scaleY;
-    u8 pad;
-};
 
-extern struct SpriteAffine gUnk_03004310[];
 extern const s16 gUnk_086149C4[];
 s32 sub_082152E4(const void *src, s32 size);
 u32 Palette_CacheObjectBank(u32 key, void *src);
@@ -87,9 +81,9 @@ static inline s32 Affine_Alloc(u8 rotation, s8 sx, s8 sy)
     s32 n;
     if (gAffineRequestCount > 31)
         return 0;
-    gUnk_03004310[gAffineRequestCount].rotation = rotation;
-    gUnk_03004310[gAffineRequestCount].scaleX = sx;
-    gUnk_03004310[gAffineRequestCount].scaleY = sy;
+    gSpriteAffineParams[gAffineRequestCount].angle = rotation;
+    gSpriteAffineParams[gAffineRequestCount].scaleX = sx;
+    gSpriteAffineParams[gAffineRequestCount].scaleY = sy;
     n = gAffineRequestCount++;
     return n;
 }
