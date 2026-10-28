@@ -19,7 +19,7 @@ void ProximityEmitter_TickActive(struct ProximityEmitter *emitter)
 {
     u16 *nearby = &emitter->nearby;
     if (*nearby == 0) {
-        if (ProximityEmitter_IsTetherNearby(emitter) && gUnk_02000488->activation == 1) {
+        if (ProximityEmitter_IsTetherNearby(emitter) && gTetherActor->activation == 1) {
             *nearby = 1;
             {
                 register u32 offset asm("r2") = 0x260;

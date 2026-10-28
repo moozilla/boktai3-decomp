@@ -166,7 +166,7 @@ addr,name,size,kind,decl,header,confidence,notes
 0200047C,gSceneEventDispatchState,4,object,extern struct SceneEventDispatchState *gSceneEventDispatchState;,include/scene_event_dispatch.h,low,double-buffered scene event receiver state
 02000480,gSceneActorListManager,4,object,extern void *gSceneActorListManager;,include/ram.h,low,provisional: scene actor list and packet-queue manager
 02000484,gWirelessController,4,object,extern struct Engine *gWirelessController;,include/ram.h,low,wireless controller singleton; existing per-unit Engine views retained
-02000488,gUnk_02000488,4,object,,,,
+02000488,gTetherActor,4,object,extern struct TetherActor *gTetherActor;,include/tether_actor.h,low,tether actor singleton
 0200048C,gOrbitBackground,4,object,extern struct OrbitBackground *gOrbitBackground;,include/orbit_background.h,low,
 02000490,gHitSwitchManager,4,object,extern struct HitSwitchManager *gHitSwitchManager;,include/hit_switch.h,low,
 02000494,gDisplayTrackManager,4,object,extern struct DisplayTrackManager *gDisplayTrackManager;,include/display_track.h,low,

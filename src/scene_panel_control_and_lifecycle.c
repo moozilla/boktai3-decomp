@@ -20,7 +20,7 @@ s32 ScenePanel_IsWithinHorizontalRadius(const struct ContactPosition *first,
 s32 ScenePanel_CanAcquireTether(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
-    struct TetherActor *tether = gUnk_02000488;
+    struct TetherActor *tether = gTetherActor;
     if (tether) {
         struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
         if (player->kindValue == 1 && player->tetherMode == 6) {
@@ -68,7 +68,7 @@ s32 ScenePanel_CanAcceptPlayer(struct ScenePanel *input)
 s32 ScenePanel_IsTetherDistant(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
-    if (ScenePanel_IsWithinHorizontalRadius(&gUnk_02000488->position, &panel->center, 800) != 0)
+    if (ScenePanel_IsWithinHorizontalRadius(&gTetherActor->position, &panel->center, 800) != 0)
         return 0;
     return 1;
 }
@@ -107,11 +107,11 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
             u16 *sourceFrame = framePointer;
             divisor = 6 - *sourceFrame;
         }
-        sourceX = gUnk_02000488->position.x;
+        sourceX = gTetherActor->position.x;
         previousWeight = divisor - 1;
         position.x = Div(sourceX * previousWeight + panel->center.x, divisor);
-        position.z = Div(gUnk_02000488->position.z * previousWeight + panel->center.z, divisor);
-        direction = gUnk_02000488->heading;
+        position.z = Div(gTetherActor->position.z * previousWeight + panel->center.z, divisor);
+        direction = gTetherActor->heading;
         if (*framePointer & 1) {
             u32 facing = direction;
             asm("" : "+r"(facing));
@@ -125,10 +125,10 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
         }
         TetherActor_SetInteractionTarget(&position, direction);
     } else if (frame == 6) {
-        gUnk_02000488->state = 12;
-        gUnk_02000488->position = panel->center;
+        gTetherActor->state = 12;
+        gTetherActor->position = panel->center;
         {
-            u8 *heading = &gUnk_02000488->heading;
+            u8 *heading = &gTetherActor->heading;
             register u32 zero asm("r0");
             zero = 0;
             *heading = zero;
@@ -178,7 +178,7 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
         PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
         PlayerCue_ReleaseControl(SCENE_PANEL_PLAYER);
         Sound_PlaySong(490);
-        gUnk_02000488->state = 14;
+        gTetherActor->state = 14;
         ScenePanelRig_SetState(&panel->rig, 1);
         ScenePanel_SetEffectState((void *)panel, 10);
     }
@@ -197,7 +197,7 @@ void ScenePanel_WaitTetherOrActiveSubject(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
     s32 i, count;
-    if (gUnk_02000488->state != 12 && ScenePanel_CanAcquireTether((void *)panel)) {
+    if (gTetherActor->state != 12 && ScenePanel_CanAcquireTether((void *)panel)) {
         PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, 0);
         panel->variant = 1;
         ScenePanel_SetEffectState((void *)panel, 1);
@@ -326,7 +326,7 @@ void ScenePanel_WaitTransitionGate(struct ScenePanel *input)
         *frame += 1;
     else if (!panel->gateC12) {
         Sound_PlaySong(490);
-        gUnk_02000488->state = 14;
+        gTetherActor->state = 14;
         ScenePanel_SetEffectState(input, 9);
     }
 }
@@ -334,7 +334,7 @@ void ScenePanel_WaitTransitionGate(struct ScenePanel *input)
 void ScenePanel_WaitTetherDirectedState(struct ScenePanel *input)
 {
     struct ScenePanel *panel = (void *)input;
-    if (gUnk_02000488->state == 13) {
+    if (gTetherActor->state == 13) {
         ScenePanelRig_SetState(&panel->rig, 1);
         ScenePanel_SetEffectState(input, 10);
     }
@@ -386,7 +386,7 @@ void ScenePanel_WaitTetherReturn(struct ScenePanel *input)
         panel->variant = 2;
         ScenePanel_SetEffectState(input, 1);
     } else if (ScenePanel_IsTetherDistant(input)) {
-        struct TetherActor *tether = gUnk_02000488;
+        struct TetherActor *tether = gTetherActor;
         s32 sourceX = tether->position.x;
         struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
         s32 x = sourceX - player->position.x;
@@ -400,8 +400,8 @@ void ScenePanel_WaitTetherReturn(struct ScenePanel *input)
             PlayerCue_Stand(player, direction);
             PlayerCue_StateMotion(SCENE_PANEL_PLAYER, 0);
         }
-        TetherActor_BeginAuxiliaryState(gUnk_02000488);
-        sub_08226380(16, &gUnk_02000488->position);
+        TetherActor_BeginAuxiliaryState(gTetherActor);
+        sub_08226380(16, &gTetherActor->position);
         ScenePanel_SetEffectState(input, 13);
         ScenePanel_CallPendingScript(input, 6);
     }
@@ -413,7 +413,7 @@ void ScenePanel_AdvanceTetherReturn(struct ScenePanel *input)
     panel->effectFrame++;
     switch (panel->effectFrame) {
         case 33: {
-            struct TetherActor *tether = gUnk_02000488;
+            struct TetherActor *tether = gTetherActor;
             s32 sourceX = tether->position.x;
             struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
             s32 x = sourceX - player->position.x;
@@ -701,14 +701,14 @@ void ScenePanel_InitializeInteraction(struct ScenePanel *input)
                 option = Script_GetValue();
             else
                 option = 0;
-            if (option && gUnk_02000488) {
+            if (option && gTetherActor) {
                 s32 active;
                 u32 count;
-                u8 *tetherState = &gUnk_02000488->state;
+                u8 *tetherState = &gTetherActor->state;
                 active = 0;
                 *tetherState = 12;
-                gUnk_02000488->position = panel->center;
-                gUnk_02000488->heading = 0;
+                gTetherActor->position = panel->center;
+                gTetherActor->heading = 0;
                 count = panel->subjectCount;
                 if (active < (s32)count) {
                     struct ScenePanelSubject **subject = panel->subjects;
@@ -732,13 +732,13 @@ void ScenePanel_InitializeInteraction(struct ScenePanel *input)
         case 1: {
             ScenePanel_InitRig((void *)panel);
             ScenePanel_InitResourceConfiguration((void *)panel);
-            gUnk_02000488->state = 12;
-            gUnk_02000488->position = panel->center;
-            gUnk_02000488->heading = 0;
-            gUnk_02000488->unknown1B = mode;
-            if (gUnk_02000488->kind == 6)
+            gTetherActor->state = 12;
+            gTetherActor->position = panel->center;
+            gTetherActor->heading = 0;
+            gTetherActor->unknown1B = mode;
+            if (gTetherActor->kind == 6)
                 panel->resourceScale = 80;
-            else if (gUnk_02000488->kind == 7)
+            else if (gTetherActor->kind == 7)
                 panel->resourceScale = 120;
             else
                 panel->resourceScale = 100;
@@ -779,8 +779,8 @@ void ScenePanel_WriteFullScriptStatus(void)
         Script_ReadReference(&reference);
         Script_WriteReferenceValue(&reference, 0, SCENE_PANEL_GLOBAL->initialMode);
         Script_ReadReference(&reference);
-        if (gUnk_02000488) {
-            if (gUnk_02000488->state == 12)
+        if (gTetherActor) {
+            if (gTetherActor->state == 12)
                 Script_WriteReferenceValue(&reference, 0, 1);
             else
                 Script_WriteReferenceValue(&reference, 0, 0);
@@ -808,8 +808,8 @@ void ScenePanel_WriteScriptStatus(void)
         struct ScriptUtilityReference reference;
         s32 i;
         Script_ReadReference(&reference);
-        if (gUnk_02000488) {
-            if (gUnk_02000488->state == 12)
+        if (gTetherActor) {
+            if (gTetherActor->state == 12)
                 Script_WriteReferenceValue(&reference, 0, 1);
             else
                 Script_WriteReferenceValue(&reference, 0, 0);
@@ -1033,7 +1033,7 @@ s32 ScenePanel_InitializeLifecycle(struct ScenePanel *parent)
         struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
         parent->savedPlayer = player;
     }
-    parent->savedTether = gUnk_02000488;
+    parent->savedTether = gTetherActor;
     ScenePanel_InitAnchorPositions((void *)parent);
     ScenePanel_ReadInitialMode((void *)parent);
     if (Script_SeekToKeyword('n'))
