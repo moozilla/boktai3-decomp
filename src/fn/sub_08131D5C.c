@@ -8,7 +8,6 @@
 #include "area_effect_link.h"
 /* Clears hit timers; at zero health hands control to the defeat target and records the defeat. */
 void SceneActorRecord_RecordPair(u16, u16);
-extern u16 gScriptEntryProcedure;
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -252,5 +251,6 @@ fail:
 #include "global.h"
 #include "render.h"
 #include "engine.h"
+#include "ram.h"
 INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ApplyAreaDamage);
 #endif

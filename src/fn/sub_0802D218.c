@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gRandomIndex;
+#include "ram.h"
 extern u8 gUnk_0203B400[];
 extern u8 *gUnk_02000580;
 u32 Callback_InvokeActor(u8 *, void *);

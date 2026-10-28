@@ -12,7 +12,6 @@ struct Weather {
     u8 enabled, flags;
 };
 extern u8 *gGameState;
-extern u32 gEngineFlags, gRandomIndex;
 #define RANDOM_TABLE ((u16 *)0x0203B400)
 void Palette_SetBrightnessMode(s32);
 u32 Weather_TestFlags(u32, u32);

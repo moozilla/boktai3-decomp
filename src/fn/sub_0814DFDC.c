@@ -1,7 +1,7 @@
 #include "global.h"
 #include "player.h"
+#include "ram.h"
 // confidence=low: descriptor meanings remain tentative; creates the selected attack display projectile.
-extern u32 gEngineFlags;
 extern u8 *gGameState;
 s32 Player_GetSelectedSlotActionScale(void);
 s32 ActorResponse_Apply(struct Player *, s32);

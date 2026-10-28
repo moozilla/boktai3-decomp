@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Trap {
     u32 serial;
     u16 f4, f6, id, fa, flags, fe;
@@ -12,32 +13,31 @@ struct Context {
     struct Trap traps[64];
     u8 *tops[64];
 };
-extern struct Context *gTerrainMap;
 s32 Script_SeekToKeyword(s32);
 void *Script_GetPc(void);
 s32 Script_GetValue(void);
 u32 sub_0821E2F8(void)
 {
-    s32 n = gTerrainMap->count;
+    s32 n = ((struct Context *)gTerrainMap)->count;
     Script_SeekToKeyword('n');
     while (Script_GetPc()) {
-        struct Trap *src = gTerrainMap->traps;
+        struct Trap *src = ((struct Context *)gTerrainMap)->traps;
         s32 kept;
         s32 id;
         s32 i;
         u8 **tsrc;
-        tsrc = gTerrainMap->tops;
+        tsrc = ((struct Context *)gTerrainMap)->tops;
         kept = 0;
         id = Script_GetValue();
         for (i = 0; i < n; i++, src++, tsrc++) {
             if (id != src->id) {
-                gTerrainMap->traps[kept] = *src;
-                gTerrainMap->tops[kept] = *tsrc;
+                ((struct Context *)gTerrainMap)->traps[kept] = *src;
+                ((struct Context *)gTerrainMap)->tops[kept] = *tsrc;
                 kept++;
             }
         }
         n = kept;
     }
-    gTerrainMap->count = n;
+    ((struct Context *)gTerrainMap)->count = n;
     return 0;
 }

@@ -40,7 +40,6 @@ struct CloudTask {
     struct CloudPlayer *player;
 };
 extern struct CloudPlayer *gUnk_02000580[];
-extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 void *AnimData_FindEntry(u32);
 s32 Mod(s32, s32);

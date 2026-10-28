@@ -45,12 +45,10 @@ struct FanManager {
     u8 p0[0x18];
     u32 used;
 };
-extern u32 gTerrainWidth, gTerrainHeight;
 struct FanTerrain {
     u8 pad[0x24];
     u16 rows[1];
 };
-extern struct FanTerrain *gTerrainMap;
 void *FanCannonManager_Create(void);
 struct FanCannon *FanCannonManager_FindFreeSlot(struct FanManager *, s32 *);
 s32 Script_SeekToKeyword(s32);
@@ -74,7 +72,7 @@ static inline s32 Fan_Cell(struct FanVec *v)
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gTerrainMap->rows[z] + x;
+    return ((struct FanTerrain *)gTerrainMap)->rows[z] + x;
 }
 static inline void Fan_Step(struct FanCannon *p, void *sprite, struct FanSeq *s)
 {

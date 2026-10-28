@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct A {
     u8 f0[6];
     u8 b6;
@@ -26,7 +27,6 @@ struct A {
     u8 b1de;
     u8 b1df;
 };
-extern u32 gRandomIndex;
 extern u8 gUnk_0203B400[];
 void Armor_UpdatePartOrbit(void);
 void Armor_InitPartOrbitTimer(struct A *p)

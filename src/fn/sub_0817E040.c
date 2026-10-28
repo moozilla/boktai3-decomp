@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct VolumeActor {
     u8 pad0[0x51];
@@ -82,14 +83,12 @@ static inline s32 Scale(int x)
     return -(-x >> 12);
 }
 
-extern u32 gTerrainWidth, gTerrainHeight;
 struct TerrainMap {
     u32 unknown;
     u8 *cells;
     u8 pad8[0x1C];
     u16 rows[1];
 };
-extern struct TerrainMap *gTerrainMap;
 u8 *TerrainModifiers_FindCellOverride(u32, int);
 static inline int TerrainHeight(s16 *position)
 {
@@ -100,12 +99,12 @@ static inline int TerrainHeight(s16 *position)
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
     else
-        cell = gTerrainMap->rows[z] + x;
+        cell = ((struct TerrainMap *)gTerrainMap)->rows[z] + x;
     data = TerrainModifiers_FindCellOverride(cell, 1);
     if (data)
         data += 4;
     else {
-        struct TerrainMap *map = gTerrainMap;
+        struct TerrainMap *map = ((struct TerrainMap *)gTerrainMap);
         u32 offset = cell * 4 + 12;
         data = map->cells + offset;
     }

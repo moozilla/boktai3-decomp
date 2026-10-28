@@ -1,7 +1,6 @@
 #include "global.h"
 #include "ram.h"
 extern s16 gUnk_0203B400[1024];
-extern u32 gRandomIndex;
 s32 Random_Next15(void);
 void Random_InitValueTable(void)
 {

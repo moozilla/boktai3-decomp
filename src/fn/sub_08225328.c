@@ -1,7 +1,6 @@
 #include "global.h"
 #include "ram.h"
 #include "runtime.h"
-extern u32 gEngineFlags;
 extern u8 *gGameState;
 void Script_InitActorRegistry(void);
 void SceneLifecycle_ResetSceneRegistries(void);

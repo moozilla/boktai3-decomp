@@ -46,7 +46,6 @@ int Wireless_InitControllerFromScript(struct Engine *);
 void Task_SetCallbacks(void *, int, int);
 void Task_LinkToPriorityList(void *);
 void Heap_Free(void *);
-extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 struct Engine *Wireless_CreateController(void)
 {

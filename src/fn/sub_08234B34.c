@@ -1,6 +1,6 @@
 #include "global.h"
 #include "render.h"
-extern u32 gEngineFlags;
+#include "ram.h"
 void HealthRestoreEffect_StartParticleBurst(u8 *);
 void Sound_PlaySong(u32);
 void Sound_ResumePersistentSongs(void);

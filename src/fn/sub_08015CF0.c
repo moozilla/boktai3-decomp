@@ -1,11 +1,11 @@
 #include "global.h"
+#include "ram.h"
 struct Config {
     u16 v[20];
 };
 struct Vec {
     s16 x, y, z, pad;
 };
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern s16 gUnk_086149C4[];
 void AnimatedParticles_Create(int, void *, struct Config *);

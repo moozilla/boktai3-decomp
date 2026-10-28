@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 
 struct E {
     u32 flags;
@@ -24,7 +25,6 @@ struct S {
     u16 timer;
 };
 extern const s16 gUnk_086149C4[];
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 u32 AnimData_FindEntry(u32);
 void ParticleSprite_Initialize(void *, u32, u32);

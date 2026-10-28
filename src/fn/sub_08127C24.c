@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 struct ParticleVector {
     u16 x, y, z, unused;
 };
@@ -29,8 +30,6 @@ struct TerrainMap {
     u8 unknown8[0x1C];
     u16 rows[1];
 };
-extern struct TerrainMap *gTerrainMap;
-extern u32 gTerrainWidth, gTerrainHeight;
 void *TerrainModifiers_FindCellOverride(u32, u32);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
@@ -39,14 +38,14 @@ static inline s32 Cell(struct ParticleVector *p)
     s32 x = (s16)p->x >> 8, z = (s16)p->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gTerrainMap->rows[z] + x;
+    return ((struct TerrainMap *)gTerrainMap)->rows[z] + x;
 }
 static inline u8 *Properties(u32 cell)
 {
     u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         return p + 4;
-    return gTerrainMap->cells + (cell * 4 + 12);
+    return ((struct TerrainMap *)gTerrainMap)->cells + (cell * 4 + 12);
 }
 static inline s32 Height(u32 cell, struct ParticleVector *p)
 {
@@ -201,7 +200,7 @@ inline static s32 Cell_X(u16 inputX, struct ParticleVector *p, struct ParticleVe
     *saved = p;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gTerrainMap->rows[z] + x;
+    return ((struct TerrainMap *)gTerrainMap)->rows[z] + x;
 }
 
 void TimedSprite_UpdateBallisticFlight(void *unused, struct Projectile *input)

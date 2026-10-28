@@ -4,7 +4,6 @@
 void Bg_SetPriority(u32, u32);
 extern u32 gUnk_02000580;
 extern u8 gUnk_08E60F0C[];
-extern u32 gEngineFlags;
 extern u8 *gGameState;
 void Inventory_InitEquipmentEntryFromDescriptor(u8 *, u8 *);
 u32 Script_SeekToKeyword(u32);

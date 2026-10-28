@@ -1,7 +1,8 @@
 #include "global.h"
 #include "player.h"
+#include "ram.h"
 // confidence=low: motion ten toggles actionMode between zero and one and refreshes equipment.
-extern u32 gEngineFlags, gUnk_02000560;
+extern u32 gUnk_02000560;
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_SetPendingCallback(struct Player *, void (*)(struct Player *));
 void Player_OnMotion10Exit(struct Player *);

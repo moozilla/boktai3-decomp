@@ -2,6 +2,7 @@
 #define GUARD_RUNTIME_H
 
 #include "global.h"
+#include "ram.h"
 
 /* Static scheduler tasks used by the video runtime (0x18-byte task header). */
 struct RuntimeTask {
@@ -59,9 +60,6 @@ extern u32
 /* 0x030035C6 */
 extern u8
     gRtcProtected; /* RTC GPIO protection flag set by Rtc_Protect and cleared by Rtc_Initialize */
-/* 0x030039F0 */
-extern u16
-    gScriptEntryProcedure; /* Script entry procedure selected by Script_SetEntryProcedure; separate from the preceding MP2K buffer */
 /* 0x03003A04 */
 extern u32 gVideoUploadFlags; /* Video upload dirty flags; bit 0 requests OAM upload */
 /* 0x03003A08 */

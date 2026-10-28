@@ -1,12 +1,10 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 
 extern const u8 gUnk_086108B0[];
 extern const u8 gUnk_08606038[];
 extern u8 *gGameState;
-extern u32 gTerrainWidth;
-extern u32 gTerrainHeight;
-extern u8 *gTerrainMap;
 extern const u32 gUnk_08000008[];
 
 #define GL_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
@@ -133,7 +131,7 @@ static inline s32 Vorn_080B43BC_Arg(s32 dflt)
 static inline u32 Vorn_080B43BC_CellIndex(s32 x, s32 y)
 {
     if (x >= 0 && y >= 0 && (u32)x < gTerrainWidth && (u32)y < gTerrainHeight)
-        return *(u16 *)(gTerrainMap + 0x24 + 2 * y) + x;
+        return *(u16 *)(((u8 *)gTerrainMap) + 0x24 + 2 * y) + x;
     return 0;
 }
 
@@ -145,7 +143,7 @@ static inline s32 Vorn_080B43BC_CellHeight(u32 idx, u8 *ref)
 
     cell = TerrainModifiers_FindCellOverride(idx, 1);
     if (cell == 0)
-        cp = (u8 *)(*(u32 *)(gTerrainMap + 4) + (idx << 2) + 0xC);
+        cp = (u8 *)(*(u32 *)(((u8 *)gTerrainMap) + 4) + (idx << 2) + 0xC);
     else
         cp = (u8 *)cell + 4;
     t = *cp >> 4;

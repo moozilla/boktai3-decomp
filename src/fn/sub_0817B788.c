@@ -1,8 +1,8 @@
 #include "global.h"
 #include "actor_state.h"
+#include "ram.h"
 #define gActorAnimationRandomIndex  gRandomIndex
 #define gActorAnimationRandomValues gUnk_0203B400
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 s32 ActorMovement_CanReachTarget(struct ActorState *);
 s32 SceneVolume_GetActivityState(struct ActorState *);

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct RestoreOwner {
     u8 unk_00[0x424];
@@ -27,7 +28,6 @@ struct HealthRestoreEffect {
     u16 unk_272;
     void (*state)(struct HealthRestoreEffect *);
 };
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 s32 Div(s32, s32);
 s32 Mod(s32, s32);

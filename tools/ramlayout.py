@@ -511,7 +511,9 @@ def cmd_unify(a):
     renamed = dict(new)
     hdr_inc = inc_name(a.header)
     # every declaration the header will hold: earlier rows and this batch
-    canon = {r["name"]: parse_decl(r["decl"])[0] for r in rows if r["header"] == a.header and r["decl"]}
+    rng = parse_range(a.range)
+    canon = {r["name"]: parse_decl(r["decl"])[0] for r in rows
+             if r["header"] == a.header and r["decl"] and in_range(r, rng)}
     canon.update({parse_decl(d)[1]: parse_decl(d)[0] for _, d, _ in jobs})
     differ, blocked = {}, set()
     for p in sorted(new):
@@ -873,6 +875,8 @@ def main():
     s.add_argument("--cast", action="store_true",
                    help="a file whose declaration differs gets the shared one with casts at the uses "
                         "that need its own type, before keeping its own declaration")
+    s.add_argument("--range", help="LO-HI (hex): only this address range's rows of the header are enforced "
+                                   "(the rest of the header's declarations are left alone)")
     s.add_argument("--all", action="store_true", help="also compile every includer of the target header")
     s.add_argument("--define", action="append", default=[],
                    help="a struct definition the declarations need, e.g. 'struct OamEntry { u32 a; };' "

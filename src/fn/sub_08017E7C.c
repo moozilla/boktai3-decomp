@@ -10,7 +10,6 @@ struct Weather {
 };
 extern u8 *gGameState;
 extern u16 gUnk_0203B400[];
-extern u32 gRandomIndex;
 void Palette_SetBrightnessMode(int);
 void Script_Call(void *, int);
 void Weather_EnterPhase(void *, int);

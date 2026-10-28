@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 #ifdef NONMATCHING
 // fuzzy: 80.8%
 // fix.py best (sweep after the inlined-insn fix)
@@ -161,7 +162,6 @@ struct Pool {
     void *resource;
     u32 allocated;
 };
-extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Anim_SetSequence(struct Anim *, void *, u32, u32, u32);

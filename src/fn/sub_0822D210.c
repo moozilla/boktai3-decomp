@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gRandomIndex;
+#include "ram.h"
 extern u8 gUnk_0203B400[];
 s32 Mod(s32, s32);
 u32 Inventory_RollIcePopStick(void)

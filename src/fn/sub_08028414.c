@@ -1,8 +1,8 @@
 #include "global.h"
+#include "ram.h"
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
 void SceneActors_SpawnDestructionParticles(u8 *p)

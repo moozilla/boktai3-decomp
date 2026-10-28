@@ -2,7 +2,6 @@
 #include "ram.h"
 // fix.py best version (reprinted C)
 extern u16 gUnk_0203B400[];
-extern u32 gRandomIndex;
 u8 *ScriptedParticle_EnsurePool(void);
 u8 *ScriptedParticle_AllocateSlot(u8 *);
 void AnimData_Load(u8 *, u32);

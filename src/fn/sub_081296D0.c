@@ -1,7 +1,7 @@
 #include "global.h"
 #include "ram.h"
 extern void (*const gUnk_086107A0[])(void);
-extern u32 gEngineFlags, gUnk_02000560;
+extern u32 gUnk_02000560;
 void sub_08249240(u8 *, u8 *, void (*)(void));
 static inline u8 test(u32 *p, u32 mask)
 {

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 // confidence=low: maintains paired-half presentation, colliders and completion flags.
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: updates each half's visible position, colliders and completion transition.
@@ -50,7 +51,6 @@ struct PairOwner {
     u8 pad0[0x5B4];
     u32 activeMask;
 };
-extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 void Collider_SetPosition(void *, void *, s32);
 void Collider_Refresh(void *);

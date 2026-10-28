@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gEngineFlags;
+#include "ram.h"
 void Camera_RequestShake(s32);
 s32 Collider_Refresh(u8 *);
 void Task_Kill(u8 *);

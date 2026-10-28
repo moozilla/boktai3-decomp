@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 // confidence=low: phase-dependent combat selection inferred from state and distance tests
 #ifdef NONMATCHING
 // fuzzy: 83.3%
@@ -29,7 +30,6 @@ s32 SceneVolume_CanActivate(void *);
 void SceneSteeringActor_RequestRemovalAll(void);
 u8 Callback_InvokeActor(void *, void *);
 extern void *gUnk_08611C6C[];
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 static inline s32 RandomValue(void)
 {

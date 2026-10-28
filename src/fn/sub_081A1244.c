@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 #define gRandomValues gUnk_0203B400
 struct ActorReaction {
@@ -18,7 +19,6 @@ struct ActorReaction {
     u8 unknown1B4[0x168];
     s16 motion[4];
 };
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void Hresvelgr_SetAnimation(struct ActorReaction *, void *, void *, u32, u32, u32);
 s32 sub_08249350(s32, s32);

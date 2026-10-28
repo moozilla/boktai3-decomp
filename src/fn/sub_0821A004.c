@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct Task {
     u8 pad[0x10];
@@ -6,7 +7,6 @@ struct Task {
     u8 pad12[2];
     u8 f14;
 };
-extern u16 gNextTaskId;
 struct Task *Heap_AllocFromEnd(u32);
 void Memory_Clear(struct Task *, u32);
 void Task_LinkToPriorityList(struct Task *);

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct Vec {
     s16 x, y, z, w;
@@ -14,7 +15,6 @@ struct P {
     u8 b5B9;
 };
 
-extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 
 s32 EffectGroup_Spawn(void *, s32, s32, struct Vec *);

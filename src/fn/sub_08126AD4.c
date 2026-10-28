@@ -22,7 +22,6 @@ struct BurstSparkPool {
     u8 pad0[0x18];
     u8 animation[0x1C];
 };
-extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 struct BurstSparkPool *BurstSpark_EnsurePool(void);

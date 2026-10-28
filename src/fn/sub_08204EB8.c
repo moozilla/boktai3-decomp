@@ -1,10 +1,10 @@
 #include "global.h"
+#include "ram.h"
 struct V {
     u16 x;
     u16 y;
     u32 z;
 };
-extern u32 gRandomIndex;
 struct R {
     u8 a;
     u8 b;

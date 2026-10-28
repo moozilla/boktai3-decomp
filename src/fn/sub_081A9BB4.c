@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 // confidence=low: facing and active-half mask choose the side for randomized commands 8/11.
 struct Pair {
     u8 pad0[0x205];
@@ -39,7 +40,6 @@ u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
 s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
-extern u32 gRandomIndex;
 static inline s32 RandomValue(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;

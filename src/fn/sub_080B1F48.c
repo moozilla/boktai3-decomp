@@ -1,8 +1,8 @@
 #include "global.h"
+#include "ram.h"
 /* Vorn_SelectRandomBehavior: Selects a different random eight-byte behavior entry and resets its cursor; behavior interpretation is tentative */
 #define Vorn_SelectRandomBehavior sub_080B1F48
 
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 u8 *Path_GetPointData(u8 *);

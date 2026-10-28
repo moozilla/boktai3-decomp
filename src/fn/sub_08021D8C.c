@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 extern u16 gUnk_0203B400[];
-extern u32 gRandomIndex;
 void AnimatedParticles_EmitBurst(void *, int, int, int, int, int, int, int);
 void SceneActors_SpawnAmbientParticle(u8 *p)
 {

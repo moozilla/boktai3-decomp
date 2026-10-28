@@ -293,7 +293,7 @@ addr,name,size,kind,decl,header,confidence,notes
 030035C8,gSoftDoubleNaN,14,object,extern struct SoftDoubleNumber gSoftDoubleNaN;,include/libgcc_numbers.h,high library source correspondence,libgcc software double-precision NaN object; 20-byte fp-bit-base number layout
 030035E0,gSoftSingleNaN,10,object,extern struct SoftSingleNumber gSoftSingleNaN;,include/libgcc_numbers.h,high library source correspondence,libgcc software floating-point NaN number object; shared fp-bit-base layout
 030035F0,SoundMainRAM_Buffer,402,object,extern u8 SoundMainRAM_Buffer[0x400];,include/sound.h,,MP2K RAM instruction buffer copied with CpuCopy32 size 0x400; next script procedure word is a separate object
-030039F0,gScriptEntryProcedure,2,object,extern u16 gScriptEntryProcedure;,include/runtime.h,,Script entry procedure selected by Script_SetEntryProcedure; separate from the preceding MP2K buffer
+030039F0,gScriptEntryProcedure,2,object,extern u16 gScriptEntryProcedure;,include/ram.h,,Script entry procedure selected by Script_SetEntry
 03003A00,gScanlineDmaTarget,4,object,extern void *gScanlineDmaTarget;,include/render.h,,"HBlank DMA0 destination: the I/O register the scanline effect writes (BGnHOFS, BGnVOFS, MOSAIC, BLDY)"
 03003A04,gVideoUploadFlags,4,object,extern u32 gVideoUploadFlags;,include/runtime.h,,Video upload dirty flags; bit 0 requests OAM upload
 03003A08,gSceneEntryActive,4,object,extern u32 gSceneEntryActive;,include/runtime.h,,Set while scene-entry script runs; suppresses part of video upload task
@@ -408,7 +408,7 @@ addr,name,size,kind,decl,header,confidence,notes
 03005234,gMosaicParam,2,object,extern u16 gMosaicParam;,include/render.h,high physical shape; provisional semantic name,packed mosaic parameter (byte and halfword accesses)
 03005238,gDefaultAnimFlags,2,object,extern u16 gDefaultAnimFlags;,include/render.h,high physical shape; provisional semantic name,default animation/widget flags
 0300523C,gEnginePauseFlags,4,object,extern u32 gEnginePauseFlags;,include/render.h,high physical shape; provisional semantic name,engine pause/suspend flags (bits 1-2: sound off; task list masks)
-03005240,gNextTaskId,2,object,extern u16 gNextTaskId;,include/engine.h,,"next Task id (unique, never 0)"
+03005240,gNextTaskId,2,object,extern u16 gNextTaskId;,include/ram.h,,"next Task id (unique, never 0)"
 03005250,gLinkMenuActive,4,object,extern u32 gLinkMenuActive;,include/ram.h,low,
 03005260,gPadState,10,object,extern u16 gPadState[];,include/input.h,low,"input state: two slots of {held, pressed, released, pad}; updated by sub_08219B24"
 03005270,gHardwareKeys,2,object,extern u16 gHardwareKeys;,include/runtime.h,,Raw active-low KEYINPUT sampled before per-player input records are updated
@@ -416,12 +416,12 @@ addr,name,size,kind,decl,header,confidence,notes
 03005278,gLcgState,4,object,extern u32 gLcgState;,include/runtime.h,,"Independent LCG state, separate from gRandomIndex at 03005274; initialized to 123456 and advanced by Random_Next15"
 03005280,gTaskLists,70,object,extern struct TaskList gTaskLists[14];,include/engine.h,,task lists by priority
 030052F0,gResourceRegistryCount,4,object,extern s32 gResourceRegistryCount;,include/runtime.h,,"High-water count of resource-registry entries, capped at 32"
-030052F4,gTerrainMap,4,object,extern struct EngineMap *gTerrainMap;,include/engine.h,low,
-030052F8,gTerrainWidth,4,object,extern u32 gTerrainWidth;,include/engine.h,low,
-030052FC,gTerrainHeight,4,object,extern u32 gTerrainHeight;,include/engine.h,low,
+030052F4,gTerrainMap,4,object,extern struct EngineMap *gTerrainMap;,include/ram.h,low,current terrain map
+030052F8,gTerrainWidth,4,object,extern u32 gTerrainWidth;,include/ram.h,low,terrain map width (cells)
+030052FC,gTerrainHeight,4,object,extern u32 gTerrainHeight;,include/ram.h,low,terrain map height (cells)
 03005300,gTerrainTrapSerial,4,object,extern u32 gTerrainTrapSerial;,include/ram.h,low,
 03005304,gEffectRandomTableIndex,4,object,extern u32 gEffectRandomTableIndex;,include/ram.h,low,
-03005308,gRandomIndex,4,object,extern u32 gRandomIndex;,include/engine.h,low,
+03005308,gRandomIndex,4,object,extern u32 gRandomIndex;,include/ram.h,low,index (0..1023) into the random table
 0300530C,gSerialMultiplayer1Word,2,object,extern u16 gSerialMultiplayer1Word;,include/serial.h,,Last word sampled from SIOMULTI1 by the byte-transfer interrupt
 03005310,gSerialPeer1Interrupts,4,object,extern s32 gSerialPeer1Interrupts;,include/serial.h,,Counter advanced by the SIOMULTI1 byte-transfer handler; tentative name
 03005314,gSerialInitialized,4,object,extern u32 gSerialInitialized;,include/serial.h,,Set to 1 by Serial_InitMultiplayer; no semantic reader observed here
@@ -442,7 +442,7 @@ addr,name,size,kind,decl,header,confidence,notes
 030053E8,gSceneTransitionFlags,4,object,extern u32 gSceneTransitionFlags;,include/runtime.h,,"Pending scene transition flags, including active-region backup/restore bits"
 030053EC,gSceneControlWord1,4,object,extern u32 gSceneControlWord1;,include/runtime.h,,Cleared by Engine_ClearControlFlags; finer meaning unresolved
 030053F0,gScenePauseFlags,4,object,extern u32 gScenePauseFlags;,include/ram.h,low,scene pause/mute flags (bit tests across effects and actors)
-030053F4,gEngineFlags,4,object,extern u32 gEngineFlags;,include/engine.h,low,
+030053F4,gEngineFlags,4,object,extern u32 gEngineFlags;,include/ram.h,low,more engine flags (bit 10 mutes Sound_PlaySongChecked; guess)
 030053F8,gSessionState,4,object,extern u8 *gSessionState;,include/runtime.h,,Persistent/session state pointer; byte base preserves existing subsystem-specific pointee views
 030053FC,gSceneTransitionActive,4,object,extern u32 gSceneTransitionActive;,include/runtime.h,,Set during transition cleanup and cleared when the scene starts
 03005400,gSceneInitWord1,4,object,extern u32 gSceneInitWord1;,include/runtime.h,,Initialized to zero by the scene lifecycle manager; semantic name provisional

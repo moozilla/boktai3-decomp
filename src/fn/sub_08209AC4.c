@@ -59,8 +59,6 @@ struct FanTerrain {
     u8 pad[0x24];
     u16 rows[1];
 };
-extern struct FanTerrain *gTerrainMap;
-extern u32 gTerrainWidth, gTerrainHeight, gRandomIndex;
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void FanCannon_Activate(struct FanCannon *);
@@ -93,7 +91,7 @@ static inline s32 Fan_Cell(struct FanVec *v)
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gTerrainMap->rows[z] + x;
+    return ((struct FanTerrain *)gTerrainMap)->rows[z] + x;
 }
 static inline void Fan_Step(struct FanCannon *p, void *sprite, struct FanSeq *s)
 {

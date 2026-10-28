@@ -1,5 +1,6 @@
 #include "global.h"
 #include "input.h"
+#include "ram.h"
 
 // Tentative result-panel layout: six displayed values settle in three stages.
 struct P {
@@ -9,7 +10,6 @@ struct P {
 };
 
 extern u16 gUnk_0203B400[];
-extern u32 gRandomIndex;
 int Mod(int, int);
 void Sound_PlaySong(int);
 void Anim_DrawDecimalDigits(void *, void *, int, int, int, int, int, int, int);

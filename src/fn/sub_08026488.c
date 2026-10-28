@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
     u8 angle;
@@ -78,7 +79,6 @@ static inline void effect2(u8 *p, int mode, int id, int duration)
     } else if (p[0x38e] == 1)
         p[0x38c] = 0;
 }
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void SceneActors_StopBackgroundFlash(void *);
 void BackgroundFlash_BeginAppearance(void *);

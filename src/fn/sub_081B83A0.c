@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_vec.h"
+#include "ram.h"
 struct SceneScriptBurstObject {
     u8 unknown0[0x34];
     struct SceneVec position;
@@ -10,7 +11,6 @@ struct SceneScriptBurstObject {
     u8 unknownF8[0x13E - 0xF8];
     u16 counter;
 };
-extern u32 gRandomIndex;
 void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void Task_Kill(void *);
 static inline s32 Sample(u32 table, u32 index)

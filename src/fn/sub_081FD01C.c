@@ -76,7 +76,6 @@ struct Behaviors {
 };
 extern const struct Behaviors gUnk_0824FE28;
 extern const s16 gUnk_086149C4[];
-extern u32 gRandomIndex;
 void SceneProjectile_CreatePool(void);
 struct Entry *Projectile_FindFreeSlot(struct Pool *, s32 *);
 void Projectile_SetBehaviorCallback(struct Params *, void *);
