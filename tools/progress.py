@@ -443,23 +443,36 @@ def add_rom_data(report, units=None):
 
 
 def rom_data_lines(units=None):
-    """PROGRESS.md: ROM data matched per kind, identified, GCL decompiled."""
+    """PROGRESS.md: ROM data matched per kind (scripts apart), identified, LZ77 recompression."""
     import romdata
     units = romdata.measure() if units is None else units
     total = sum(u["size"] for u in units)
     matched = sum(u["matched"] for u in units)
-    ident = sum(u["identified"] for u in units)
-    dec = sum(u["decompiled"] for u in units)
-    lines = [f"**ROM data matched: {100 * matched / total:.2f}%** ({matched:,} / {total:,} bytes; "
-             f"reported to decomp.dev as data). Matched = rebuilt from an editable, meaningful source "
-             f"([docs/DATA_TRACKING.md](docs/DATA_TRACKING.md)); extracted `.bin` files count 0. "
-             f"Format identified (not a match): {100 * ident / total:.1f}%. "
-             f"GCL compiled from source but not fully annotated: {dec:,} bytes. "
-             f"Named data symbols: {romdata.named_symbols()}.", "",
+    data = [u for u in units if u["kind"] != "scripts"]
+    dt, dm, di = (sum(u[k] for u in data) for k in ("size", "matched", "identified"))
+    lz_e, lz_c = sum(u["lz_exact"] for u in units), sum(u["lz_content"] for u in units)
+    lines = ["## ROM data", "",
+             f"**ROM data matched: {100 * matched / total:.2f}%** ({matched:,} / {total:,} bytes, scripts "
+             f"included; decomp.dev's data measure). A byte is matched when a project tool decodes it to an "
+             f"editable form and re-encodes it byte-exact, verified by `tools/data_roundtrip.py` "
+             f"(`symbols/data_roundtrip.csv`; [docs/DATA_TRACKING.md](docs/DATA_TRACKING.md)).", "",
+             f"Data without scripts: **{100 * dm / dt:.2f}%** matched ({dm:,} / {dt:,} bytes); format identified "
+             f"(a decoder exists, not a match): {100 * di / dt:.1f}%. LZ77 blocks matched by content: "
+             f"{lz_e + lz_c:,} bytes, of which tools/lz77.py recompresses {lz_e:,} byte-exact "
+             f"({100 * lz_e / max(lz_e + lz_c, 1):.1f}%). Named data symbols: {romdata.named_symbols()}.", "",
              "| ROM data | Bytes | Matched | Identified | |", "|---|---:|---:|---:|---|"]
     for kind, label, size, m, i, _ in romdata.by_kind(units):
-        lines.append(f"| {label} | {size:,} | {100 * m / size:.1f}% | {100 * i / size:.1f}% | `{bar(m / size, 20)}` |")
-    return lines + [""]
+        if kind != "scripts":
+            lines.append(f"| {label} | {size:,} | {100 * m / size:.1f}% | {100 * i / size:.1f}% | `{bar(m / size, 20)}` |")
+    sc = [u for u in units if u["kind"] == "scripts"]
+    st, sm, sd = (sum(u[k] for u in sc) for k in ("size", "matched", "decompiled"))
+    lines += ["", "## Scripts (GCL)", "",
+              f"The event scripts, tracked like code but apart from the game's C (on decomp.dev they are the "
+              f"`ROM data: Scripts (GCL)` category): {st:,} bytes of GCL bytecode and its tables. "
+              f"**Matched (decompiles, recompiles byte-exact and is named): {100 * sm / st:.1f}%** ({sm:,} bytes); "
+              f"round-trips but unnamed: {100 * sd / st:.1f}% ({sd:,} bytes). Per procedure, from "
+              f"`gcl/progress.csv`; no GCL compiler exists yet."]
+    return lines
 
 
 def ram_lines(m):
@@ -799,7 +812,6 @@ def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=N
              f"{100 * draft_b / total_b:.3f}% of code, mean fuzzy match {mean:.1f}%.", "",
              f"Intentional assembly (GBA header, crt0, SDK assembly; not counted above): {asm_b:,} bytes.", "",
              *ram_lines(ram or {}),
-             *rom_data_lines(),
              "```", f"{bar(done_b / total_b, 50)} {100 * done_b / total_b:.2f}%", "```", "",
              "| Region | Functions | Matched | Bytes matched | |", "|---|---:|---:|---:|---|"]
     for lo, hi in regions:
@@ -810,6 +822,7 @@ def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=N
         if not fs:
             continue
         lines.append(f"| `{lo:08X}–{hi:08X}` | {len(fs)} | {nd} | {100 * db / max(tb, 1):.1f}% | `{bar(db / max(tb, 1), 20)}` |")
+    lines += ["", *rom_data_lines()]
     if report and categories:
         lines += subsystem_lines(report, categories)
     Path(out).write_text("\n".join(lines) + "\n")

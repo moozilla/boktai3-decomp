@@ -233,25 +233,39 @@ class AreaCategoryTest(unittest.TestCase):
         self.assertEqual(sum(u['size'] for u in units), romdata.ROM_DATA_END - romdata.ROM_DATA_START)
         kinds = {u['kind'] for u in units}
         self.assertEqual(kinds, {k for k, _ in romdata.KINDS})
-        text = [u for u in units if u['kind'] == 'text']
-        self.assertTrue(all(u['matched'] == u['size'] for u in text))
+        actors = [u for u in units if u['kind'] == 'actors']
+        self.assertEqual([u['unit'] for u in actors], ['Actor registry'])
 
-    def test_split_formats_and_decompiled_gcl_earn_nothing(self):
+    def test_matched_is_the_verified_roundtrip_and_named_gcl(self):
         import romdata
         with tempfile.TemporaryDirectory() as tmp:
-            units, manifest, gcl = Path(tmp) / 'u.csv', Path(tmp) / 'm.csv', Path(tmp) / 'g.csv'
+            units, rt, gcl = Path(tmp) / 'u.csv', Path(tmp) / 'r.csv', Path(tmp) / 'g.csv'
             end = romdata.ROM_DATA_END
             units.write_text('start,end,kind,unit,identified,evidence\n'
-                             f'0824DAFC,08300000,tables,A,0,\n08300000,08400000,graphics,B,1048576,\n'
+                             '0824DAFC,08300000,actors,A,0,\n08300000,08400000,graphics,B,1048576,\n'
                              f'08400000,{end:08X},scripts,C,0,\n')
-            manifest.write_text('name,start,end,format,file,description\n'
-                                'reg,0824DB00,0824DC00,keyed_callbacks,x,\n'
-                                'arc,08300000,08400000,resource_archive,x,\n')
+            rt.write_text('# comment\nstart,end,what,tool,level\n'
+                          '0824DB00,0824DC00,actor_registry,datafmt/keyed_callbacks,exact\n'
+                          '08300000,08300100,map,map,lz-exact\n08300080,08300180,map,map,lz-content\n'
+                          '08400000,08400100,stray,x,exact\n')
             gcl.write_text('proc,start,size,status\n1,08400000,256,matched\n2,08400100,64,decompiled\n')
-            got = {u['unit']: u for u in romdata.measure(units, manifest, gcl)}
+            got = {u['unit']: u for u in romdata.measure(units, rt, gcl)}
         self.assertEqual(got['A']['matched'], 0x100)
-        self.assertEqual(got['B']['matched'], 0)
+        self.assertEqual(got['B']['matched'], 0x180)  # overlapping ranges count once
+        self.assertEqual((got['B']['lz_exact'], got['B']['lz_content']), (0x100, 0x100))
+        # scripts are credited only from gcl/progress.csv, never from the data manifest
         self.assertEqual((got['C']['matched'], got['C']['decompiled']), (256, 64))
+
+    def test_committed_roundtrip_manifest_is_inside_the_data_region(self):
+        import romdata
+        rows = romdata.load_roundtrip()
+        self.assertTrue(rows)
+        for s, e, what, tool, level in rows:
+            self.assertTrue(romdata.ROM_DATA_START <= s < e <= romdata.ROM_DATA_END, (s, e, what))
+            self.assertIn(level, ('exact', 'lz-exact', 'lz-content'))
+        units = romdata.measure()
+        self.assertTrue(all(u['matched'] <= u['size'] for u in units))
+        self.assertEqual([u['matched'] for u in units if u['kind'] == 'tables'], [0] * 3)
 
     def test_rom_units_must_be_contiguous(self):
         import romdata
@@ -274,7 +288,7 @@ class AreaCategoryTest(unittest.TestCase):
             self.assertEqual(len(u['metadata']['progress_categories']), 1)
             self.assertEqual(u['measures']['total_code'], '0')
         cats = [c for c in report['categories'] if c['id'].startswith('rom_')]
-        self.assertEqual(len(cats), 7)
+        self.assertEqual(len(cats), 8)
         for key in ('total_data', 'matched_data'):
             self.assertEqual(sum(int(c['measures'][key]) for c in cats), int(m[key]))
             self.assertEqual(sum(int(u['measures'][key]) for u in data_units), int(m[key]))

@@ -11,7 +11,7 @@ import csv
 import io
 import struct
 
-# how the source holds the bytes (tools/progress.py ROM data measure, docs/DATA_TRACKING.md)
+# how the build source holds the bytes (informational; see datafmt/__init__.py)
 SOURCE = "decoded"
 
 

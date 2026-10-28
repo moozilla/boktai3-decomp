@@ -8,18 +8,18 @@ symbols/rom_data.csv lists the units: contiguous half-open ranges covering
 ROM_DATA_START-ROM_DATA_END, each with a kind, a name, and the bytes whose
 format is identified (decoded by a tool or the Studio; reviewed, not a match).
 
-A byte is **matched** only when the build emits it from an editable, meaningful
-source that rebuilds it byte-exact:
+A byte is **matched** when a project tool decodes it to an editable,
+meaningful form and re-encodes that form to the same bytes, verified by
+tools/data_roundtrip.py against a local ROM and recorded (ranges and tool
+names only) in symbols/data_roundtrip.csv. The build need not use that form.
+For LZ77 blocks the decompressed content must round-trip; whether
+recompression is byte-exact is reported separately (level lz-exact).
 
-* a data/manifest.csv range whose format declares SOURCE = "decoded"
-  (tools/datafmt); a "split" format (resource archives: opaque .bin entries)
-  earns nothing;
-* a GCL procedure that gcl/progress.csv marks "matched" (compiled from GCL
-  source and fully annotated); "decompiled" procedures (compiled from source,
-  annotation incomplete) are counted separately and earn nothing.
+GCL scripts (kind "scripts") are matched per procedure instead, from
+gcl/progress.csv: "matched" = decompiles and recompiles byte-exact and is
+named; "decompiled" = round-trips but unnamed (counted apart, not matched).
 """
 import csv
-import importlib
 from pathlib import Path
 import sys
 
@@ -32,11 +32,13 @@ ROM_DATA_END = 0x08E88144    # end of used ROM; the zero padding after it is fre
 UNITS = ROOT / "symbols/rom_data.csv"
 MANIFEST = ROOT / "data/manifest.csv"
 GCL_PROGRESS = ROOT / "gcl/progress.csv"
+ROUNDTRIP = ROOT / "symbols/data_roundtrip.csv"
 SYMBOLS = ROOT / "symbols/data.csv"
 
 # report category id, label, in report order
 KINDS = [("graphics", "Graphics"), ("palettes", "Palettes"), ("sound", "Sound"), ("text", "Text"),
-         ("tables", "Tables (code rodata)"), ("scripts", "Scripts (GCL)"), ("other", "Other/unknown")]
+         ("actors", "Actors"), ("tables", "Tables (code rodata)"), ("scripts", "Scripts (GCL)"),
+         ("other", "Other/unknown")]
 CATEGORY_PREFIX = "rom_"
 LABEL_PREFIX = "ROM data: "
 
@@ -58,35 +60,58 @@ def load_units(path=UNITS):
     return rows
 
 
-def matched_ranges(manifest=MANIFEST, gcl=GCL_PROGRESS):
-    """([start, end) matched spans, [start, end) GCL-decompiled-only spans)."""
+def load_roundtrip(path=ROUNDTRIP):
+    """[(start, end, what, tool, level)] from the round-trip manifest."""
+    if not Path(path).exists():
+        return []
+    with open(path, newline="", encoding="utf-8") as f:
+        rows = csv.DictReader(ln for ln in f if not ln.startswith("#"))
+        return [(int(r["start"], 16), int(r["end"], 16), r["what"], r["tool"], r["level"]) for r in rows]
+
+
+def load_gcl(path=GCL_PROGRESS):
+    """([matched spans], [decompiled-only spans]) of GCL procedures."""
     matched, decompiled = [], []
-    with open(manifest, newline="", encoding="utf-8") as f:
-        for r in csv.DictReader(f):
-            mod = importlib.import_module("datafmt." + r["format"])
-            if getattr(mod, "SOURCE", "split") == "decoded":
-                matched.append((int(r["start"], 16), int(r["end"], 16)))
-    if Path(gcl).exists():
-        with open(gcl, newline="", encoding="utf-8") as f:
+    if Path(path).exists():
+        with open(path, newline="", encoding="utf-8") as f:
             for r in csv.DictReader(f):
                 a = int(r["start"], 16)
-                span = (a, a + int(r["size"]))
-                {"matched": matched, "decompiled": decompiled}[r["status"]].append(span)
+                {"matched": matched, "decompiled": decompiled}[r["status"]].append((a, a + int(r["size"])))
     return matched, decompiled
+
+
+def union(spans):
+    out = []
+    for a, b in sorted(spans):
+        if out and a <= out[-1][1]:
+            out[-1][1] = max(out[-1][1], b)
+        else:
+            out.append([a, b])
+    return out
 
 
 def overlap(spans, a, b):
     return sum(max(0, min(b, y) - max(a, x)) for x, y in spans)
 
 
-def measure(units=UNITS, manifest=MANIFEST, gcl=GCL_PROGRESS):
-    """Units with size, matched, identified and GCL-decompiled bytes."""
-    matched, decompiled = matched_ranges(manifest, gcl)
+def measure(units=UNITS, roundtrip=ROUNDTRIP, gcl=GCL_PROGRESS):
+    """Units with size, matched, identified, GCL-decompiled bytes, and the
+    LZ77 split of their matched bytes (lz_exact, lz_content)."""
+    rt = load_roundtrip(roundtrip)
+    data = union((s, e) for s, e, *_ in rt)
+    lz_exact = union((s, e) for s, e, _, _, lv in rt if lv == "lz-exact")
+    lz_content = union((s, e) for s, e, _, _, lv in rt if lv == "lz-content")
+    gm, gd = load_gcl(gcl)
+    gm, gd = union(gm), union(gd)
     out = []
     for r in load_units(units):
-        size = r["end"] - r["start"]
-        m = overlap(matched, r["start"], r["end"])
-        out.append({**r, "size": size, "matched": m, "decompiled": overlap(decompiled, r["start"], r["end"]),
+        a, b = r["start"], r["end"]
+        if r["kind"] == "scripts":
+            m, dec = overlap(gm, a, b), overlap(gd, a, b)
+        else:
+            m, dec = overlap(data, a, b), 0
+        out.append({**r, "size": b - a, "matched": m, "decompiled": dec,
+                    "lz_exact": overlap(lz_exact, a, b), "lz_content": overlap(lz_content, a, b),
                     "label": dict(KINDS)[r["kind"]]})
     return out
 

@@ -27,7 +27,7 @@ import re
 import struct
 
 RESIZABLE = True
-# how the source holds the bytes (tools/progress.py ROM data measure, docs/DATA_TRACKING.md)
+# how the build source holds the bytes (informational; see datafmt/__init__.py)
 SOURCE = "decoded"
 TABLE = 0x08D6B1F8  # entry table, after the four section words
 ANCHORS = (TABLE, 0x08D74DDC)  # loaded by Text_LookupString

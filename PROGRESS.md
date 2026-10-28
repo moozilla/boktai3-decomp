@@ -12,18 +12,6 @@ Intentional assembly (GBA header, crt0, SDK assembly; not counted above): 4,916 
 
 RAM objects with one shared declaration (`symbols/ram.csv`, tracked here only): **91.9%** (23,751 / 25,855 bytes); no other declaration left: 76.1%.
 
-**ROM data matched: 3.48%** (446,538 / 12,822,088 bytes; reported to decomp.dev as data). Matched = rebuilt from an editable, meaningful source ([docs/DATA_TRACKING.md](docs/DATA_TRACKING.md)); extracted `.bin` files count 0. Format identified (not a match): 99.1%. GCL compiled from source but not fully annotated: 0 bytes. Named data symbols: 10.
-
-| ROM data | Bytes | Matched | Identified | |
-|---|---:|---:|---:|---|
-| Graphics | 7,096,380 | 0.0% | 100.0% | `░░░░░░░░░░░░░░░░░░░░` |
-| Palettes | 135,524 | 0.0% | 100.0% | `░░░░░░░░░░░░░░░░░░░░` |
-| Sound | 3,876,396 | 0.0% | 99.4% | `░░░░░░░░░░░░░░░░░░░░` |
-| Text | 440,754 | 100.0% | 100.0% | `████████████████████` |
-| Tables (code rodata) | 85,156 | 6.8% | 6.8% | `█░░░░░░░░░░░░░░░░░░░` |
-| Scripts (GCL) | 794,422 | 0.0% | 100.0% | `░░░░░░░░░░░░░░░░░░░░` |
-| Other/unknown | 393,456 | 0.0% | 97.3% | `░░░░░░░░░░░░░░░░░░░░` |
-
 ```
 ████████████████████████████████████████░░░░░░░░░░ 79.66%
 ```
@@ -40,6 +28,26 @@ RAM objects with one shared declaration (`symbols/ram.csv`, tracked here only): 
 | `081C0000–08200000` | 1385 | 1346 | 86.0% | `█████████████████░░░` |
 | `08200000–08240000` | 1777 | 1751 | 90.7% | `██████████████████░░` |
 | `08240000–0824DAFA` | 290 | 290 | 100.0% | `████████████████████` |
+
+## ROM data
+
+**ROM data matched: 74.79%** (9,589,097 / 12,822,088 bytes, scripts included; decomp.dev's data measure). A byte is matched when a project tool decodes it to an editable form and re-encodes it byte-exact, verified by `tools/data_roundtrip.py` (`symbols/data_roundtrip.csv`; [docs/DATA_TRACKING.md](docs/DATA_TRACKING.md)).
+
+Data without scripts: **79.73%** matched (9,589,097 / 12,027,666 bytes); format identified (a decoder exists, not a match): 99.1%. LZ77 blocks matched by content: 1,680,000 bytes, of which tools/lz77.py recompresses 1,680,000 byte-exact (100.0%). Named data symbols: 10.
+
+| ROM data | Bytes | Matched | Identified | |
+|---|---:|---:|---:|---|
+| Graphics | 7,096,380 | 74.9% | 100.0% | `███████████████░░░░░` |
+| Palettes | 135,524 | 100.0% | 100.0% | `████████████████████` |
+| Sound | 3,876,396 | 85.3% | 99.4% | `█████████████████░░░` |
+| Text | 440,754 | 100.0% | 100.0% | `████████████████████` |
+| Actors | 5,784 | 100.0% | 100.0% | `████████████████████` |
+| Tables (code rodata) | 79,372 | 0.0% | 0.0% | `░░░░░░░░░░░░░░░░░░░░` |
+| Other/unknown | 393,456 | 97.3% | 97.3% | `███████████████████░` |
+
+## Scripts (GCL)
+
+The event scripts, tracked like code but apart from the game's C (on decomp.dev they are the `ROM data: Scripts (GCL)` category): 794,422 bytes of GCL bytecode and its tables. **Matched (decompiles, recompiles byte-exact and is named): 0.0%** (0 bytes); round-trips but unnamed: 0.0% (0 bytes). Per procedure, from `gcl/progress.csv`; no GCL compiler exists yet.
 
 ## By subsystem
 

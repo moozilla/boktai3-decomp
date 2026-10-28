@@ -53,7 +53,7 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 | Phase 2 | the remaining guarded drafts (PROGRESS.md "Nonmatching drafts"), by subsystem in PROGRESS.md; most left are Monsters and Scene actors |
 | Phase 3 | the Register-pinned share in PROGRESS.md; `scope.py FILE.c pins` and `tools/depin.py` remove them |
 | Phase 4 | [EWRAM declaration/layout worker batch](../notes/ewram-layout_2026-10-27.md) prepared with per-unit validation; protected-dependent objects deferred and combined ROM validation pending integration |
-| Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data. decomp.dev's data measure is ROM data rebuilt from editable source, by kind ([DATA_TRACKING.md](DATA_TRACKING.md)); RAM is tracked in PROGRESS.md |
+| Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data. decomp.dev's data measure is ROM data that round-trips through an editable form (`tools/data_roundtrip.py`), by kind ([DATA_TRACKING.md](DATA_TRACKING.md)); RAM is tracked in PROGRESS.md |
 | Report | every function in one of ~490 subsystem units under 11 categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
 
 Recent:
