@@ -17,7 +17,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000054,gShadowManager,4,object,extern u32 gShadowManager;,include/ram.h,low,shadow task singleton (Shadow_*)
 02000058,gScaledShadowManager,4,object,extern u32 gScaledShadowManager;,include/ram.h,low,scaled shadow manager singleton (ScaledShadow_*)
 0200005C,gSceneActorEffectsManager,4,object,extern void *gSceneActorEffectsManager;,include/ram.h,low,scene actor effects manager (SceneActorEffects_*)
-02000060,gUnk_02000060,4,object,,,,
+02000060,gParticleGroupManager,4,object,extern void *gParticleGroupManager;,include/ram.h,,provisional: six-group particle manager singleton (ParticleManager_Initialize)
 02000064,gFragmentManager,4,object,extern u32 gFragmentManager;,include/ram.h,low,fragment manager singleton (FragmentManager_*)
 02000068,gAnimatedParticleManager,4,object,extern u32 gAnimatedParticleManager;,include/ram.h,low,animated particle manager (AnimatedParticleManager_*)
 0200006C,gFadingParticleManager,4,object,extern void *gFadingParticleManager;,include/ram.h,low,fading particle manager (FadingParticleManager_*)
@@ -25,10 +25,10 @@ addr,name,size,kind,decl,header,confidence,notes
 02000074,gDamageNumberDisplay,4,object,extern struct DamageNumberDisplay *gDamageNumberDisplay;,include/damage_number_display.h,low,
 02000078,gLinkedWidgetSet,4,object,extern struct LinkedWidgetSet *gLinkedWidgetSet;,include/ram.h,low,
 0200007C,gScanlineWave,4,object,extern u32 gScanlineWave;,include/ram.h,low,scanline wave effect task (ScanlineWave_*)
-02000080,gUnk_02000080,4,object,,,,
-02000084,gUnk_02000084,4,object,,,,
-02000088,gUnk_02000088,4,object,,,,
-0200008C,gUnk_0200008C,4,object,,,,
+02000080,gWeatherCooldownBase,4,object,extern s32 gWeatherCooldownBase;,include/ram.h,,"weather cooldown base, configured by Weather_ConfigureCooldown"
+02000084,gWeatherCooldownRange,4,object,extern s32 gWeatherCooldownRange;,include/ram.h,,random range added to the weather cooldown
+02000088,gStormActive,4,object,extern u32 gStormActive;,include/ram.h,,set while Weather_Update is in storm phase 3
+0200008C,gStormTimer,4,object,extern s32 gStormTimer;,include/ram.h,,provisional: storm duration/delay countdown shared by weather phases
 02000090,gWeatherState,4,object,extern struct WeatherState *gWeatherState;,include/ram.h,low,
 02000094,gPaletteCycle,4,object,extern u32 gPaletteCycle;,include/ram.h,low,palette cycle task (PaletteCycle_*)
 02000098,gEffectQuad,4,object,extern u32 gEffectQuad;,include/ram.h,low,

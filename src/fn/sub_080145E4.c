@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_02000060;
+#include "ram.h"
 void *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 ParticleManager_Initialize(void *, void *);
@@ -10,8 +10,8 @@ void ParticleManager_Kill(void);
 void *ParticleManager_Create(void *a)
 {
     void *p;
-    if (gUnk_02000060 != 0)
-        return (void *)gUnk_02000060;
+    if (gParticleGroupManager != 0)
+        return (void *)gParticleGroupManager;
     p = Task_Create(10, 0xabc);
     if (p != 0) {
         Task_SetCallbacks(p, ParticleManager_Update, ParticleManager_Kill);

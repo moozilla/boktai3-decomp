@@ -148,5 +148,12 @@ extern u32 gForgingBook;                  /* forging book task (ForgingBook_*) *
 extern u32 gShadowRegistry;               /* shadow registry task (ShadowRegistry_*) */
 extern u8 *gSolarController;              /* solar sensor controller (Solar_*) */
 extern u32 gScenePauseFlags; /* scene pause/mute flags (bit tests across effects and actors) */
+extern void *
+    gParticleGroupManager; /* provisional: six-group particle manager singleton (ParticleManager_Initialize) */
+extern s32
+    gWeatherCooldownBase; /* weather cooldown base, configured by Weather_ConfigureCooldown */
+extern s32 gWeatherCooldownRange; /* random range added to the weather cooldown */
+extern u32 gStormActive;          /* set while Weather_Update is in storm phase 3 */
+extern s32 gStormTimer; /* provisional: storm duration/delay countdown shared by weather phases */
 
 #endif
