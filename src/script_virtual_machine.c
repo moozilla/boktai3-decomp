@@ -501,13 +501,13 @@ void Script_ResetStacks(void)
 
 void Script_ClearCommandTables(void)
 {
-    gUnk_02000458 = 0;
+    gScriptCommandTables = 0;
 }
 
 u32 Script_RegisterCommandTable(struct ScriptCommandTable *n)
 {
-    n->next = gUnk_02000458;
-    gUnk_02000458 = n;
+    n->next = gScriptCommandTables;
+    gScriptCommandTables = n;
     return 0;
 }
 
@@ -518,9 +518,9 @@ s32 sub_0821ABF8(struct ScriptCommandTable *n)
 {
     struct ScriptCommandTable *cur;
     struct ScriptCommandTable *prev;
-    if (gUnk_02000458 == n)
-        gUnk_02000458 = n->next;
-    cur = gUnk_02000458;
+    if (gScriptCommandTables == n)
+        gScriptCommandTables = n->next;
+    cur = gScriptCommandTables;
     prev = cur;
     while (cur != 0) {
         if (cur == n) {
@@ -535,7 +535,7 @@ s32 sub_0821ABF8(struct ScriptCommandTable *n)
 
 struct ScriptCommandEntry *Script_FindCommand(u32 key)
 {
-    struct ScriptCommandTable *b = gUnk_02000458;
+    struct ScriptCommandTable *b = gScriptCommandTables;
     while (b) {
         struct ScriptCommandEntry *e = b->entries;
         s32 n = b->count;
@@ -636,7 +636,7 @@ void *sub_0821AD98(void *table, u32 key, s32 count)
 
 u8 *Text_LookupString(s32 id)
 {
-    u8 **sections = gUnk_02000448;
+    u8 **sections = gScriptSectionBases;
     u8 *e = (u8 *)((id << 2) + (u32)sections[1]);
     u32 v = (e[3] << 24) | (e[2] << 16) | (e[1] << 8) | e[0];
     return sections[2] + (v & 0x7FFFFFFF);
@@ -659,10 +659,10 @@ s32 Script_LoadScript(u8 *p)
     base = (u8 *)Script_ReadProcTable((u32 *)p, &count);
     ctx->entries = (u32 *)p;
     ctx->count = count;
-    gUnk_02000448[0] = base;
-    gUnk_02000448[1] = base + read_word(base + 4);
-    gUnk_02000448[2] = base + read_word(base + 8);
-    gUnk_02000448[3] = base + read_word(base + 12);
+    gScriptSectionBases[0] = base;
+    gScriptSectionBases[1] = base + read_word(base + 4);
+    gScriptSectionBases[2] = base + read_word(base + 8);
+    gScriptSectionBases[3] = base + read_word(base + 12);
     base += read_word(base);
     ctx->body = base + 4;
     {
@@ -680,7 +680,7 @@ s32 Script_LoadScript(u8 *p)
 
 u8 *sub_0821AED0(void)
 {
-    return gUnk_02000448[3] + 4;
+    return gScriptSectionBases[3] + 4;
 }
 
 /* Script_SaveContext: Copies the loaded script context and section pointers into caller storage */
@@ -694,7 +694,7 @@ struct Block0821AEDC {
 void sub_0821AEDC(struct Block0821AEDC *dst)
 {
     dst[0] = *(struct Block0821AEDC *)&gScriptProcedureTable;
-    dst[1] = *(struct Block0821AEDC *)&gUnk_02000448;
+    dst[1] = *(struct Block0821AEDC *)&gScriptSectionBases;
 }
 
 /* Script_RestoreContext: Restores the loaded script context and section pointers from caller storage */
@@ -708,7 +708,7 @@ struct Block0821AF04 {
 void sub_0821AF04(struct Block0821AF04 *src)
 {
     gScriptProcedureTable = *(struct ScriptProcedureTable *)&src[0];
-    *(struct Block0821AF04 *)gUnk_02000448 = src[1];
+    *(struct Block0821AF04 *)gScriptSectionBases = src[1];
 }
 
 u32 Script_ExecuteBlock(u8 *p, u32 a, u32 b)

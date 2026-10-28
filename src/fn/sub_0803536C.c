@@ -28,7 +28,6 @@ struct Engine {
     u8 message[0x204];
     void *head, *tail;
 };
-extern struct Engine *gUnk_02000484;
 void Memory_Clear(void *, int);
 #define gRfuLinkStatus    gUnk_03006A80
 #define gRfuSlotStatusUNI gUnk_03006A60

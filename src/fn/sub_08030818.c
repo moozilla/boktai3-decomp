@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -24,7 +25,6 @@ struct Manager {
     struct Vec *target;
     struct Player *player;
 };
-extern struct Manager *gUnk_02000480;
 extern struct Player *gUnk_02000580[4];
 int Weather_GetType(void);
 int SunClock_GetBaseHour(void);
@@ -37,7 +37,7 @@ int SceneActorManager_Init(struct Manager *m)
 {
     int zero;
     struct Player *player;
-    gUnk_02000480 = m;
+    gSceneActorListManager = m;
     zero = 0;
     m->ticks = zero;
     m->head = zero;

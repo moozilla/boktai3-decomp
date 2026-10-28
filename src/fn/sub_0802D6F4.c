@@ -1,10 +1,10 @@
 #include "global.h"
-extern void *gUnk_02000480;
+#include "ram.h"
 void *Heap_Alloc(int);
 void Memory_Clear(void *, int);
 void *Actor_Allocate(int unused, int variant)
 {
-    if (gUnk_02000480) {
+    if (gSceneActorListManager) {
         int size = 0x384;
         u8 *p = Heap_Alloc(size);
         if (p) {

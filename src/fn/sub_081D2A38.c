@@ -69,7 +69,6 @@ struct SceneNpc {
     void *update;
     void *callbacks[6];
 };
-extern void *gUnk_02000480;
 struct SceneNpc *Actor_Allocate(s32 name, s32 variant);
 s32 Actor_InitMotion(struct SceneNpc *, s32 name, struct PackedVec *, s32 angle);
 s32 Actor_InitDrawable(struct SceneNpc *, s32 kind, s32 a, s32 b, s32 c);
@@ -126,7 +125,7 @@ void TaggedSceneNpc_Create(u32 tag)
     s32 model = 0xE00E;
     void (*updates[2])(void);
     u8 mode;
-    void *manager = gUnk_02000480;
+    void *manager = gSceneActorListManager;
     s32 name;
     s32 variant;
     s32 angle;

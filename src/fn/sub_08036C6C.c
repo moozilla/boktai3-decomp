@@ -2,11 +2,11 @@
 /* Wireless_GetLocalIdentityData: Tentatively returns the local identity storage beginning at controller offset 0x50 */
 #define Wireless_GetLocalIdentityData sub_08036C6C
 
-extern u8 *gUnk_02000484;
+extern u8 *gWirelessController;
 
 u8 *sub_08036C6C(void)
 {
-    if (gUnk_02000484 == NULL)
+    if (gWirelessController == NULL)
         return NULL;
-    return gUnk_02000484 + 0x50;
+    return gWirelessController + 0x50;
 }

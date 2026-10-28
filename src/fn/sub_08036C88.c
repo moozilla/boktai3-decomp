@@ -1,12 +1,12 @@
 #include "global.h"
 
-extern u8 *gUnk_02000484;
+extern u8 *gWirelessController;
 
 u16 Wireless_GetLocalSessionId(void)
 {
     u16 r;
-    if (gUnk_02000484)
-        r = *(u16 *)(gUnk_02000484 + 0x6C);
+    if (gWirelessController)
+        r = *(u16 *)(gWirelessController + 0x6C);
     else
         r = 0;
     return r;

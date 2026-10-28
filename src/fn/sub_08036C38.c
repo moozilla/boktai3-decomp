@@ -1,10 +1,10 @@
 #include "global.h"
 
-extern u8 *gUnk_02000484;
+extern u8 *gWirelessController;
 
 void Wireless_RequestResetConnection(void)
 {
-    if (gUnk_02000484) {
-        gUnk_02000484[0x3D] = 1;
+    if (gWirelessController) {
+        gWirelessController[0x3D] = 1;
     }
 }

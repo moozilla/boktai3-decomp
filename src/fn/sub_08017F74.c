@@ -8,7 +8,6 @@ struct Weather {
 };
 extern int (*const gUnk_08604C80[])(struct Weather *);
 extern u8 *gGameState;
-extern int gUnk_02000478;
 void sub_08017510(void *);
 void WeatherParticles_Update(void *);
 int Weather_Update(struct Weather *p)
@@ -26,8 +25,8 @@ int Weather_Update(struct Weather *p)
             (*(s16 *)(gGameState + 0x87a))--;
         gStormActive = 0;
     }
-    if (gUnk_02000478 > 0)
-        gUnk_02000478--;
+    if (gWeatherCollisionTimer > 0)
+        gWeatherCollisionTimer--;
     WeatherParticles_Update(p);
     p->frame++;
     return 0;

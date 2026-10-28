@@ -180,6 +180,13 @@ extern struct F3E4Actor *gRegistryF3E4Actor; /* provisional: registry F3E4 singl
 extern u16
     gSceneNpcBlendPalette[16]; /* sixteen-color output palette blended by SceneNpc_BlendPalette */
 extern u8
-    *gScriptedActorController; /* provisional: singleton scripted actor animation controller */
+    *gScriptedActorController;     /* provisional: singleton scripted actor animation controller */
+extern u8 *gScriptSectionBases[4]; /* four resolved section bases from the loaded script header */
+extern struct ScriptCommandTable *
+    gScriptCommandTables; /* registered native command-table list head; separate from section bases */
+extern s32 gWeatherCollisionTimer;   /* provisional: shared weather and collision countdown */
+extern void *gSceneActorListManager; /* provisional: scene actor list and packet-queue manager */
+extern struct Engine *
+    gWirelessController; /* wireless controller singleton; existing per-unit Engine views retained */
 
 #endif

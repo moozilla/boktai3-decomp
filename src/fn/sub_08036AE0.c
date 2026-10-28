@@ -6,11 +6,11 @@ struct S {
     u32 f4;
     u32 f8;
 };
-extern struct S *gUnk_02000484;
+extern struct S *gWirelessController;
 
 u16 Wireless_GetOperation(void)
 {
-    if (gUnk_02000484 == 0)
+    if (gWirelessController == 0)
         return 0;
-    return gUnk_02000484->f2;
+    return gWirelessController->f2;
 }

@@ -15,7 +15,6 @@ struct Weather {
 };
 extern u8 *gGameState;
 extern u32 gEngineFlags;
-extern int gUnk_02000478;
 extern u8 gUnk_03005430[];
 extern u16 gUnk_0203B400[];
 extern u32 gRandomIndex;
@@ -69,7 +68,7 @@ int Weather_ActiveStorm(struct Weather *p)
     }
     if (!Weather_TestFlags(p->flags, 8)) {
         if (!p->countdown) {
-            if (!(gEngineFlags & 1024) && gUnk_02000478 > 0) {
+            if (!(gEngineFlags & 1024) && gWeatherCollisionTimer > 0) {
                 gGrayscaleControl = 5;
                 Sound_PlaySong(103);
             }
@@ -79,7 +78,7 @@ int Weather_ActiveStorm(struct Weather *p)
                 if (p->countdown == 5)
                     ScreenTransition_SendCommand(0, 2, 31, 31, 31, 8191, 0);
                 else if (p->countdown == 3)
-                    gUnk_02000478 = 6;
+                    gWeatherCollisionTimer = 6;
             }
             p->countdown--;
         }

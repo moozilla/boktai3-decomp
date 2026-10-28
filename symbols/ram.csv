@@ -156,16 +156,16 @@ addr,name,size,kind,decl,header,confidence,notes
 02000420,gScreenDelayParameters,8,object,extern struct ScreenDelayParameters gScreenDelayParameters;,include/ram.h,low,
 02000428,gScriptCommandTable,C,object,extern struct ScriptCommandTable gScriptCommandTable;,include/ram.h,low,
 02000438,gScriptProcedureTable,10,object,extern struct ScriptProcedureTable gScriptProcedureTable;,include/script_virtual_machine.h,low,
-02000448,gUnk_02000448,14,object,,,,
-02000458,gUnk_02000458,,interior,,,,gUnk_02000448 +0x10
+02000448,gScriptSectionBases,10,object,extern u8 *gScriptSectionBases[4];,include/ram.h,,four resolved section bases from the loaded script header
+02000458,gScriptCommandTables,4,object,extern struct ScriptCommandTable *gScriptCommandTables;,include/ram.h,,registered native command-table list head; separate from section bases
 02000468,gPaletteController,4,object,extern struct PaletteController *gPaletteController;,include/palette_controller.h,low,
 0200046C,gFallingObjectManager,4,object,extern struct FallingObjectManager *gFallingObjectManager;,include/falling_objects.h,low,
 02000470,gShadowRegistry,4,object,extern u32 gShadowRegistry;,include/ram.h,low,shadow registry task (ShadowRegistry_*)
 02000474,gColliderSpritePool,4,object,extern u32 gColliderSpritePool;,include/ram.h,low,
-02000478,gUnk_02000478,4,object,,,,
+02000478,gWeatherCollisionTimer,4,object,extern s32 gWeatherCollisionTimer;,include/ram.h,,provisional: shared weather and collision countdown
 0200047C,gUnk_0200047C,4,object,,,,
-02000480,gUnk_02000480,4,object,,,,
-02000484,gUnk_02000484,4,object,,,,
+02000480,gSceneActorListManager,4,object,extern void *gSceneActorListManager;,include/ram.h,,provisional: scene actor list and packet-queue manager
+02000484,gWirelessController,4,object,extern struct Engine *gWirelessController;,include/ram.h,,wireless controller singleton; existing per-unit Engine views retained
 02000488,gUnk_02000488,4,object,,,,
 0200048C,gOrbitBackground,4,object,extern struct OrbitBackground *gOrbitBackground;,include/orbit_background.h,low,
 02000490,gHitSwitchManager,4,object,extern struct HitSwitchManager *gHitSwitchManager;,include/hit_switch.h,low,

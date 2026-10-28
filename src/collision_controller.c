@@ -354,7 +354,7 @@ s32 CollisionController_UpdateAll(struct CollisionManager *input)
         available = stateMode();
     else {
         struct Player *actor;
-        if (gUnk_02000478 > 0)
+        if (gWeatherCollisionTimer > 0)
             goto pause;
         actor = gUnk_02000580[0];
         if (actor) {
@@ -422,7 +422,7 @@ s32 CollisionController_InitManager(struct CollisionManager *manager, void *owne
         *(&available) = stateMode();
     } else {
         struct Player *actor;
-        if (gUnk_02000478 > 0) {
+        if (gWeatherCollisionTimer > 0) {
             goto pause;
         }
         actor = gUnk_02000580[0];

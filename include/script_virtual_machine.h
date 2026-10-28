@@ -12,11 +12,11 @@
 #include "engine.h"
 #include "script_reference.h"
 #include "script_utility.h"
+#include "ram.h"
 
-/* Resolved section base pointers from the loaded script header (gUnk_02000448):
+/* Resolved section base pointers from the loaded script header (gScriptSectionBases):
  * 0 unknown/adjacent to the proc table, 1 string offset table (4-byte records,
  * see Text_LookupString), 2 string data base, 3 a fourth resource (guess). */
-extern u8 *gUnk_02000448[4];
 
 /* The currently loaded script's procedure table (gScriptProcedureTable). `entries` holds
  * one packed word per procedure: low 24 bits an offset from `body`, high byte
@@ -30,7 +30,7 @@ struct ScriptProcedureTable {
 };
 extern struct ScriptProcedureTable gScriptProcedureTable;
 
-/* A registered table of native script commands (gUnk_02000458 is the head of
+/* A registered table of native script commands (gScriptCommandTables is the head of
  * the list). Script_ExecuteNativeCommand looks a command id up by key and
  * invokes its callback. */
 struct ScriptCommandEntry {
@@ -42,7 +42,6 @@ struct ScriptCommandTable {
     s32 count;
     struct ScriptCommandEntry *entries;
 };
-extern struct ScriptCommandTable *gUnk_02000458;
 
 /* Interpreter state (gUnk_02000610). `stack` backs both the keyword/control
  * stack (growing up from its base, via keywordSp) and the call argument stack

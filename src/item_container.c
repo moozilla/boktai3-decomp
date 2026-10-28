@@ -1,9 +1,9 @@
 #include "global.h"
 #include "item_container.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 
 extern u32 gUnk_02000560[];
-extern s32 gUnk_02000478;
 extern u16 gUnk_02000534, gUnk_02000500;
 
 void ScaledShadow_Destroy(void *);
@@ -976,7 +976,7 @@ s32 TriggerManager_Update(struct TriggerManager *input)
                     if (candidate) {
                         if (!trigger->started)
                             goto showObject;
-                        else if (gUnk_02000478 > 0) {
+                        else if (gWeatherCollisionTimer > 0) {
                             candidate->flags &= ~1;
                             trigger->flash = 0;
                             trigger->tick = 0;
@@ -1348,7 +1348,7 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
             if (gEngineFlags & 2048) {
                 available = stateMode();
             } else {
-                if (gUnk_02000478 > 0)
+                if (gWeatherCollisionTimer > 0)
                     goto reveal;
                 if (gUnk_02000580[0] && (({
                         u32 *flags = &gUnk_02000580[0]->actionFlags;

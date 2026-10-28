@@ -24,7 +24,7 @@ struct Emitter {
     void *resource;
     u16 first, second;
 };
-extern struct ActorList *gUnk_02000480;
+extern struct ActorList *gSceneActorListManager;
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 void sub_0821C8F8(void *, struct Position *, struct Position *, u32, u32, u32);
@@ -64,9 +64,9 @@ void SceneActorAnimation_EmitTowardNearbyActors(struct Emitter *emitter)
     struct Actor *actor;
     struct Position offset;
     const s16 *table;
-    if ((!gUnk_02000480) || (gEngineFlags & 0x200))
+    if ((!gSceneActorListManager) || (gEngineFlags & 0x200))
         return;
-    actor = gUnk_02000480->head;
+    actor = gSceneActorListManager->head;
     if (!actor)
         return;
     table = gUnk_086149C4;
