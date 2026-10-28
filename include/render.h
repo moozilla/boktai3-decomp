@@ -49,6 +49,20 @@ struct ObjGfxSlot {
 
 extern struct ObjGfxSlot gObjGfxSlots[128];
 
+struct SpriteTileEntry {
+    u16 id;
+    u8 unk02[6];
+};
+
+struct SpriteTileResource {
+    u32 unk00;
+    u16 tileCount, entryCount;
+    u32 dataOffset;
+    struct SpriteTileEntry entries[1];
+};
+
+extern struct SpriteTileResource *gSpriteTileResource;
+
 /* RAM objects; each row of symbols/ram.csv with header include/render.h. */
 extern u8 *gPaletteBankData; /* palette-bank data: 32-byte banks of sixteen RGB15 colors (AnimData_SelectPaletteBank) */
 extern u32 gVBlankDialogueState; /* scrolling-dialogue/video state copied during VBlank (guess) */

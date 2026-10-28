@@ -326,7 +326,7 @@ addr,name,size,kind,decl,header,confidence,notes
 030042E0,gPaletteBankCount,2,object,extern u16 gPaletteBankCount;,include/render.h,high physical shape; provisional semantic name,palette resource bank count
 030042E4,gPaletteBankData,4,object,extern u8 *gPaletteBankData;,include/render.h,high physical shape; provisional semantic name,Palette-bank data pointer; pointee is a repeated bank array
 030042E8,gObjTileCursor,2,object,extern s16 gObjTileCursor;,include/render.h,high physical shape; provisional semantic name,OBJ tile allocation cursor (signed loads in the allocation tests)
-030042EC,gUnk_030042EC,4,object,,,high physical shape; provisional semantic name,Loaded static sprite-tile resource header
+030042EC,gSpriteTileResource,4,object,extern struct SpriteTileResource *gSpriteTileResource;,include/render.h,high merged loader/lookup layout,"Static sprite tile resource header: tile count +4, entry count +6, relative data offset +8, eight-byte lookup entries from +C"
 030042F0,gQueuedObjSlotCount,2,object,extern u16 gQueuedObjSlotCount;,include/render.h,high physical shape; provisional semantic name,queued dynamic OBJ graphics slot count
 030042F4,gStaticTileCount,2,object,extern u16 gStaticTileCount;,include/render.h,high physical shape; provisional semantic name,reserved/static OBJ tile count (some files read it signed)
 030042F8,gAnimResourceSection0C,4,object,extern u8 *gAnimResourceSection0C;,include/render.h,high physical shape; provisional semantic name,resource-bank base plus header offset +0xC

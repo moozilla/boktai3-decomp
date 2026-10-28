@@ -128,3 +128,5 @@ and field-remapping support in ramlayout would make this migration faster.
 - **030042C0 `gSpriteListHeads` (unified):** Two sprite render-list heads, selected by gRenderListIndex; pointees retain subsystem views; ramlayout before/after checks passed.
 - **030042C8 `gMainSpriteListHeads` (unified):** Two main/animation sprite-list heads; protected ARM source retains its address declaration; ramlayout before/after checks passed.
 - **030042D0 `gDrawableListHeads` (unified):** Two drawable/effect render-list heads, selected by gRenderListIndex; ramlayout before/after checks passed.
+
+- **030042EC `gSpriteTileResource` (struct):** Loader and lookup views merged: tile count +4, entry count +6, relative tile-data offset +8, eight-byte entries from +C. All three direct consumers exact in both modes.
