@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "runtime.h"
 
 extern u32 gEngineFlags;
 extern u8 *gGameState;
@@ -9,7 +10,6 @@ extern s32 gUnk_02000478;
 extern u16 gUnk_02000534;
 extern u16 gUnk_02000500;
 extern u8 *gUnknown_02000580[];
-extern u16 gUnk_030039F0;
 extern u16 gUnk_0203B400[];
 extern u32 gRandomIndex;
 extern u32 gTerrainWidth;
@@ -374,7 +374,7 @@ pal_done:
         if (A_AT(s16, 0x9C) <= 0) {
             P78EE8_SetMode(arg0, 3, 0, A_AT(u32, 0x220), 0x11);
             if (!(gEngineFlags & 0x4800) && !(A_AT(u32, 0x2D0) & 0x800))
-                SceneActorRecord_RecordPair(gUnk_030039F0, (u16)A_AT(u32, 0x50));
+                SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)A_AT(u32, 0x50));
         } else if (A_AT(u32, 0x2CC) & 0x200) {
             P78EE8_SetMode(arg0, 3, 0, A_AT(u32, 0x230), 0x12);
         } else {

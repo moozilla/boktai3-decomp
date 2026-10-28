@@ -7,6 +7,7 @@
 // confidence=low: hit reaction for a victim actor; mode 0/1 sets a stagger state, mode 2 a knockback path, then shows damage and sparks.
 
 #include "area_effect_link.h"
+#include "runtime.h"
 
 // confidence=low: hit reaction for a victim actor; mode 0/1 sets a stagger state, mode 2 a knockback path, then shows damage and sparks.
 
@@ -17,7 +18,6 @@ void SceneActorRecord_RecordPair(u32, u32);
 void SceneActorAttachment_ReplaceResponseSlot(u8 *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void EffectGroup_SpawnPart(void *, s32, void *, void *, void *, s32, s32);
-extern u16 gUnk_030039F0;
 extern const u16 gUnk_0203B400[];
 
 static inline u8 F0807D2E0_Test(u32 value, u32 mask)
@@ -192,7 +192,7 @@ mode2:
         if (F0807D2E0_ShouldShow(a))
             F0807D2E0_ShowDamage(a);
         if (!F0807D2E0_Test(gEngineFlags, 0x4800) && !(a->flags2D0 & 0x800))
-            SceneActorRecord_RecordPair(gUnk_030039F0, a->id);
+            SceneActorRecord_RecordPair(gScriptEntryProcedure, a->id);
         if (category == 4 || category == 1) {
             hudPos[0] = (hudPos[0] & 0xFFFF0000) | 0x50;
             SparkParticle_Spawn(&a->colliderA, 0x14, &a->position, 0, 2, 1, 0, 0x20);

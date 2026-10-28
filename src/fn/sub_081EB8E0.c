@@ -2,6 +2,7 @@
 #include "render.h"
 #include "ram.h"
 #include "input.h"
+#include "runtime.h"
 struct ScreenParams3F8Params {
     u8 *mBlock;
     u8 *eBlock;
@@ -54,7 +55,6 @@ struct Obj53F8 {
     u8 pad0[0x10];
     s32 x10;
 };
-extern struct Obj53F8 *gSessionState;
 s32 ScreenParams3F8_SelectValidDataBank(struct SpDisplay *);
 void Bg_ClearTilemap(s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
@@ -183,7 +183,7 @@ void sub_081EB8E0(struct SpDisplay *p)
                             Sound_PlaySong(0x296);
                             p->x20C = 1;
                             p->x24 = 3;
-                            gSessionState->x10 = magic;
+                            ((struct Obj53F8 *)gSessionState)->x10 = magic;
                             Menu_DrawStringRef(5, 10, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 2);
                         }
                     } while (0);

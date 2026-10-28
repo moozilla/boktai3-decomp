@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "runtime.h"
 struct ScreenParams3F8Params {
     u8 *mBlock;
     u8 *eBlock;
@@ -51,7 +52,6 @@ struct Obj53F8 {
     u8 pad0[0x10];
     s32 x10;
 };
-extern struct Obj53F8 *gSessionState;
 s32 ScreenParams3F8_SelectValidDataBank(struct SpDisplay *);
 void Bg_ClearTilemap(s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
@@ -87,7 +87,7 @@ s32 sub_081EBD0C(struct SpDisplay *p)
             p->x24 = 4;
         else
             p->x24 = 3;
-    } else if (gSessionState->x10 == 0x369F)
+    } else if (((struct Obj53F8 *)gSessionState)->x10 == 0x369F)
         p->x24 = 3;
     else
         p->x24 = 2;
