@@ -290,7 +290,7 @@ addr,name,size,kind,decl,header,confidence,notes
 030035BC,gSolarGpioShadow,4,object,extern u32 gSolarGpioShadow;,include/runtime.h,,GPIO output/control shadow used by solar timer phases
 030035C0,gSolarEnabled,4,object,extern u32 gSolarEnabled;,include/runtime.h,,"Software sensor-enable flag, set by Solar_Enable and cleared by Solar_Disable"
 030035C6,gRtcProtected,1,object,extern u8 gRtcProtected;,include/runtime.h,,RTC GPIO protection flag set by Rtc_Protect and cleared by Rtc_Initialize
-030035C8,gUnk_030035C8,,object,,,,
+030035C8,gSoftDoubleNaN,14,object,extern struct SoftDoubleNumber gSoftDoubleNaN;,include/libgcc_numbers.h,high library source correspondence,libgcc software double-precision NaN object; 20-byte fp-bit-base number layout
 030035E0,gUnk_030035E0,,object,,,,
 030035F0,SoundMainRAM_Buffer,402,object,,,,
 030039F0,gUnk_030039F0,,interior,,,,SoundMainRAM_Buffer +0x400
