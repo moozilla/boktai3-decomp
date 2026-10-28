@@ -805,13 +805,11 @@ void Script_ResetLocalVariables(void)
 
 /* Select timer-jittered storage for the game-state regions. */
 
-extern u8 gUnk_0203C400[];
-
 // MATCHING_CONCESSION: register-pinning
 void GameState_SelectRamBase(void)
 {
     u32 timer = *(vu16 *)0x0400010C;
-    register u8 *base asm("r1") = gUnk_0203C400;
+    register u8 *base asm("r1") = gGameStateStorage;
     base += (timer & 127) * 8;
     gGameState = (struct GameState *)base;
     gBackupGameState = base + 0xb00;
