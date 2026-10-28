@@ -1,17 +1,17 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 struct Pair {
     u32 a, b;
 };
-extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void Task_Kill(void *);
 void SceneNpc_SpawnTransitionParticle(void *, s32);
 void SceneNpc_UpdateTransitionParticles(void *);
 
-#define RAND() (gUnk_0203B400[gRandomIndex = (gRandomIndex + 1) & 0x3FF])
+#define RAND() (gRandomTable[gRandomIndex = (gRandomIndex + 1) & 0x3FF])
 
 s32 SceneNpc_UpdateTransitionEffect(u8 *p)
 {
@@ -35,7 +35,7 @@ s32 SceneNpc_UpdateTransitionEffect(u8 *p)
             *(u32 *)(p + 0x74) = zero;
             if (t != 0)
                 p[0x1f] = 2;
-            tab = gUnk_0203B400;
+            tab = gRandomTable;
             cur = &gRandomIndex;
             *cur = (*cur + 1) & 0x3FF;
             {

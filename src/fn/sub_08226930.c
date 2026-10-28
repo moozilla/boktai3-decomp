@@ -13,7 +13,7 @@ struct Vec {
     u16 x, y, z, w;
 };
 
-extern u8 *gUnk_0200047C;
+extern u8 *gSceneEventDispatchState;
 
 void SceneMessages_SetPendingTrigger(void *, void *);
 void Camera_SetMessageCompletionMode(u8 *);
@@ -33,10 +33,10 @@ void Camera_DispatchCommands(u8 *p)
     struct Vec pan;
 
     i = 0;
-    if (i < entry->count[gUnk_0200047C[0x24]])
+    if (i < entry->count[gSceneEventDispatchState[0x24]])
         do {
             u16 *message;
-            u8 *controller = gUnk_0200047C;
+            u8 *controller = gSceneEventDispatchState;
             message = entry->messages[controller[0x24]][i];
             SceneMessages_SetPendingTrigger(entry, message);
             switch (((u8 *)message)[6]) {
@@ -74,5 +74,5 @@ void Camera_DispatchCommands(u8 *p)
                     break;
             }
             i++;
-        } while (i < entry->count[gUnk_0200047C[0x24]]);
+        } while (i < entry->count[gSceneEventDispatchState[0x24]]);
 }

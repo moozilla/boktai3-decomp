@@ -1,12 +1,12 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 struct Registry6A37 {
     u8 pad0[0x1C];
     u16 x, y;
     u8 pad20[0x68 - 0x20];
     s32 timer;
 };
-extern u16 gUnk_0203B400[];
 s32 sub_08249350(s32, s32);
 void Registry6A37_UpdateBackgroundScroll(struct Registry6A37 *);
 void SceneTransition_BeginFirstScroll(struct Registry6A37 *);
@@ -20,7 +20,7 @@ void sub_081C45E0(struct Registry6A37 *p)
     u32 mask;
     s32 timer, range, random;
     Registry6A37_UpdateBackgroundScroll(p);
-    table = gUnk_0203B400;
+    table = gRandomTable;
     seed = &gRandomIndex;
     index = *seed + 1;
     mask = 0x3FF;

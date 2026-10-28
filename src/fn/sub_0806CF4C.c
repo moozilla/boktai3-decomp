@@ -1,11 +1,11 @@
 #include "scene_steering_actor.h"
+#include "player.h"
 /* SceneSteeringActor_CreateFixedOriginTravelActor: Creates a travel actor at fixed coordinates aimed toward the primary player */
 #define SceneSteeringActor_CreateFixedOriginTravelActor sub_0806CF4C
 struct SceneSteeringPlayerView {
     u8 unknown0[0x30];
     struct ContactPosition position;
 };
-extern struct SceneSteeringPlayerView *gUnk_02000580[4];
 void SceneSteeringActor_CreateTravelActor(const struct ContactPosition *,
                                           const struct ContactPosition *, s32, s32, s32, s32, s32,
                                           s32, s32, s32, s32, s32, s32);
@@ -25,7 +25,7 @@ void SceneSteeringActor_CreateFixedTravelActor(void)
     origin.packed.x = 0x980;
     origin.packed.y = 0x2DC;
     origin.packed.z = 0x880;
-    location = &gUnk_02000580[0];
+    location = &gPlayers[0];
     delta = &difference;
     {
         struct SceneSteeringPlayerView *player = *location;

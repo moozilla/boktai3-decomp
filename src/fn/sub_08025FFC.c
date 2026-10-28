@@ -81,12 +81,12 @@ void sub_08025FFC(Actor08025FFC *p, s32 arg)
         copy[1] = src[1];
         base = p->q[0x2d];
         idx = (gRandomIndex + 1) & 0x3ff;
-        a = gUnk_0203B400[idx] & f;
+        a = gRandomTable[idx] & f;
         base = base + a;
         base -= 8;
         idx = (idx + 1) & 0x3ff;
         gRandomIndex = idx;
-        b = gUnk_0203B400[idx] & 0x7f;
+        b = gRandomTable[idx] & 0x7f;
         nb = b + 0x20;
         d[0] = s08025FFC_Trunc12(gUnk_086149C4[(base + 0x40) & 0xff] * nb);
         d[1] = 0;

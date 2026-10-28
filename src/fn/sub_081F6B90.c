@@ -31,7 +31,7 @@ struct Actor {
 #define B(p, o) (*(u8 *)((u8 *)(p) + (o)))
 #define H(p, o) (*(u16 *)((u8 *)(p) + (o)))
 #define W(p, o) (*(u32 *)((u8 *)(p) + (o)))
-extern u8 *gUnk_0200047C;
+extern u8 *gSceneEventDispatchState;
 void SceneMessages_SetPendingTrigger(void *, void *);
 u32 Trigger_ConsumePending(void *, s32);
 u32 ActorResource_GetFixedId(void *);
@@ -118,9 +118,9 @@ void Ratatosk_DispatchSceneCommands(u8 *p)
         struct PackedVec packed;
     } position;
     s32 i = 0;
-    if (i < entry->count[gUnk_0200047C[0x24]])
+    if (i < entry->count[gSceneEventDispatchState[0x24]])
         do {
-            u8 *controller = gUnk_0200047C;
+            u8 *controller = gSceneEventDispatchState;
             s16 *message = entry->messages[controller[0x24]][i];
             SceneMessages_SetPendingTrigger(entry, message);
             switch (((u8 *)message)[6]) {
@@ -277,5 +277,5 @@ void Ratatosk_DispatchSceneCommands(u8 *p)
             PaletteEffect_RefreshPalette(p);
             clearAnim((void *)(p + 0x34c));
             ScaledShadow_Enable(p + 0x40c);
-        } while (++i < entry->count[gUnk_0200047C[0x24]]);
+        } while (++i < entry->count[gSceneEventDispatchState[0x24]]);
 }

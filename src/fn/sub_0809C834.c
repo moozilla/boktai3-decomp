@@ -1,7 +1,7 @@
 #include "global.h"
 /* SceneActor_BeginLinkedIdleReaction_0809C834: SceneActor_BeginLinkedIdleReaction variant with other offsets/flags and without the collider flag clear (provisional name) */
 #include "scene_actor_reset.h"
-extern u8 *gUnk_02000580;
+#include "player.h"
 void SceneActorControl_OnIdle(void);
 void Sound_PlaySong(u32);
 struct LinkedReactionContext {

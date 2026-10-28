@@ -1,6 +1,7 @@
 #include "global.h"
 #include "game_state.h"
 #include "ram.h"
+#include "player.h"
 struct S {
     u8 f[0x868];
     u32 fl;
@@ -13,7 +14,6 @@ struct O {
     u8 g[0xd];
     u8 b29;
 };
-extern u32 gUnk_02000580;
 s32 AreaEffect_TestParticleMode(struct O *);
 void AreaEffect_UpdateActionParticles(struct O *);
 void AreaEffect_HideSprites(struct O *);
@@ -33,7 +33,7 @@ s32 AreaEffect_Tick(struct O *o)
 {
     if (o->b29 != 0)
         o->b29 = 0;
-    o->q = gUnk_02000580;
+    o->q = (*(u32 *)gPlayers);
     if (o->q != 0) {
         struct S *s = gGameState;
         if (s->v == 0) {

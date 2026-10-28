@@ -1,11 +1,11 @@
 #include "global.h"
+#include "player.h"
 
 s32 Script_GetKeywordValue(s32, s32);
 struct Actor {
     u8 pad[0x424];
     u16 lifeMax, life, energyMax, energy;
 };
-extern struct Actor *gUnk_02000580[];
 extern u8 *gGameState;
 s32 Script_GetActorIndex(void);
 /* Script: life -l and energy -e (current and maximum) of the scripted actor
@@ -14,7 +14,7 @@ s32 Script_GetActorIndex(void);
 void ScriptActor_SetLifeEnergyFromScript(void)
 {
     s32 i = Script_GetActorIndex();
-    struct Actor *a = gUnk_02000580[i];
+    struct Actor *a = gPlayers[i];
     if (a) {
         a->life = Script_GetKeywordValue('l', 0);
         a->energy = Script_GetKeywordValue('e', 0);

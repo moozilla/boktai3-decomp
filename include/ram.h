@@ -99,7 +99,7 @@ extern u32 gSpriteNoticeManager;
 /* 0x03001688 */
 extern u8 *gColliderManager;
 extern void *gSceneComposite;
-extern u16 gTrackedPlayerId;
+extern u16 gTrackedPlayerId[4];
 extern u32 gActorParticlePool;
 extern u32 gGrowthHazardManager;
 extern struct FragmentBurstPool *gSpriteGroupPool;
@@ -257,5 +257,7 @@ extern u32
 /* 0x0300546C */
 extern u32
     gClockSynced; /* nonzero once the clock has been synced from the RTC; SunClock_Refresh syncs while it is zero */
+/* 0x0203B400 */
+extern const u16 gRandomTable[]; /* random value table indexed by gRandomIndex (1024 entries) */
 
 #endif

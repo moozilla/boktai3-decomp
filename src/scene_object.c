@@ -39,7 +39,7 @@ void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
     size.z = 32;
     for (i = 0; i < 10; i++) {
         u32 seed;
-        register const u16 *table asm("r3") = gUnk_0203B400;
+        register const u16 *table asm("r3") = gRandomTable;
         p = (u16 *)&point;
         /* The two jitter samples are consumed before the next external call. */
         seed = (gRandomIndex + 1) & 1023;
@@ -606,7 +606,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
     size.y = 0;
     size.z = 32;
     particle = &point;
-    table = gUnk_0203B400;
+    table = gRandomTable;
     cursor = &gRandomIndex;
     i = ({
         register s32 count asm("r1");
@@ -1486,7 +1486,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
                              u32 offset = gRandomIndex * 2;
                              register u16 *table asm("r2");
                              asm("" : "+r"(offset));
-                             table = gUnk_0203B400;
+                             table = gRandomTable;
                              asm("" : "+r"(table));
                              *(u16 *)(offset + (u32)table);
                          }),

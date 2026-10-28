@@ -1,10 +1,10 @@
 #include "global.h"
 #include "game_state.h"
+#include "area_effect_link.h"
 struct S {
     u8 f[0x868];
     u32 fl;
 };
-extern u8 *gUnk_020004B4;
 s32 AreaEffect_FindContainingEntry(u8 *);
 s32 AreaEffect_ScaleLinkResourceGain(s32);
 static inline u32 mk(u32 *a, u32 m)
@@ -25,7 +25,7 @@ static inline u16 g62(u8 *p)
 }
 s32 AreaEffect_ScaleLinkGainAtPosition(u8 *a, s32 gain)
 {
-    if (g62(gUnk_020004B4) == 0)
+    if (g62(gLinkSession) == 0)
         goto no;
     {
         u32 m = 2;

@@ -2,9 +2,9 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "engine.h"
-extern const u16 gUnk_0203B400[];
+#include "player.h"
+#include "ram.h"
 extern const s16 gUnk_086149C4[];
-extern u8 *gUnk_02000580[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void CpuSet(const void *, void *, u32);
@@ -38,7 +38,7 @@ static inline s32 Shift(s32 n, u32 bits)
 static inline u32 Rand(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gUnk_0203B400[gRandomIndex];
+    return gRandomTable[gRandomIndex];
 }
 static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
 {

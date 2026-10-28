@@ -1,8 +1,8 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "engine.h"
+#include "ram.h"
 
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void DirectionalEffect_AddParticle(void *, void *, void *, void *);
 
@@ -27,10 +27,10 @@ void Player_EmitScatterEffect(void *task, struct SceneVec *center, u32 yaw, u32 
 {
     struct Vec16 pos, vel;
     s32 r, v;
-    pos.x = (randomValue(gUnk_0203B400) & 0x1F) + center->x - 15;
-    pos.y = (randomValue(gUnk_0203B400) & 0x1F) + center->y - 15;
-    pos.z = (randomValue(gUnk_0203B400) & 0x1F) + center->z - 15;
-    r = (randomValue(gUnk_0203B400) & 3) + 5;
+    pos.x = (randomValue(gRandomTable) & 0x1F) + center->x - 15;
+    pos.y = (randomValue(gRandomTable) & 0x1F) + center->y - 15;
+    pos.z = (randomValue(gRandomTable) & 0x1F) + center->z - 15;
+    r = (randomValue(gRandomTable) & 3) + 5;
     vel.y = scale(gUnk_086149C4[(yaw + 64) & 255] * r);
     v = -scale(gUnk_086149C4[yaw & 255] * r);
     vel.x = scale(gUnk_086149C4[(pitch + 64) & 255] * v);

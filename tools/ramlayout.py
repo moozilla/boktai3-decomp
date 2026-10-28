@@ -466,6 +466,13 @@ def cmd_unify(a):
         for n in names_of(r):
             if n != name:
                 renames[n] = name
+    # files that kept a placeholder name for an earlier row of the header get it renamed too
+    earlier = set()
+    for r in rows:
+        if r["header"] == a.header and r["decl"] and r["name"] != placeholder(r["addr"]) \
+                and placeholder(r["addr"]) not in renames:
+            renames[placeholder(r["addr"])] = r["name"]
+            earlier.add(r["name"])
     pat = re.compile(r"\b(" + "|".join(renames) + r")\b") if renames else None
     # `#define NAME gUnk_X` was a file's own name for the object: now redundant
     alias = re.compile(r"^[ \t]*#[ \t]*define[ \t]+(\w+)[ \t]+(\w+)[ \t]*(?://[^\n]*|/\*.*?\*/)?[ \t]*\n", re.M)
@@ -485,7 +492,7 @@ def cmd_unify(a):
                 if m.group(1) in set(renames.values()) and renames.get(m.group(2)) != m.group(1):
                     new[p] = re.sub(rf"\b{m.group(1)}\b", m.group(2), new[p].replace(m.group(0), "", 1))
                     aliased.add((p, "inlined:" + m.group(1)))
-    taken = {n: p for p, t in new.items() for n in set(renames.values())
+    taken = {n: p for p, t in new.items() for n in set(renames.values()) - earlier
              if (p, n) not in aliased and re.search(rf"\b{n}\b", t)}
     taken = {n: p for n, p in taken.items() if n not in {r["name"] for r, _, _ in jobs}}
     # a name the target header already declares as this very object is not taken
@@ -539,6 +546,18 @@ def cmd_unify(a):
     # header reaches every file that includes it, which cannot fall back
     blocked |= {p for p in new if p.endswith(".h") and p != a.header}
     # a file that declares one of them differently cannot include the header
+    # (earlier rows of the header lose their repeated declarations too)
+    for name in sorted(set(canon) - {parse_decl(d)[1] for _, d, _ in jobs}):
+        for p in sorted(new):
+            if p == a.header or p in blocked or not re.search(rf"\b{name}\b", new[p]):
+                continue
+            t = new[p]
+            for m, spec, decls, idx in reversed(declarations(t, name)):
+                if norm(spec, decls[idx], name, name) == canon[name]:
+                    t = drop_decl(t, m, decls, idx)
+                    if p.endswith(".h") or hdr_inc not in includes(t):
+                        t = add_include(t, a.header)
+            new[p] = t
     for r, decl, note in jobs:
         c, name = parse_decl(decl)
         for p in sorted(new):
@@ -695,6 +714,73 @@ def cmd_unify(a):
           f"or keep their own ({len(kept.get('own', []))})")
 
 
+def cmd_dedupe(a):
+    """Drop other headers' declarations that repeat a row's shared one, including the row's header instead."""
+    rows = [r for r in load() if r["decl"] and r["header"] and r["addr"].upper().startswith(tuple(a.prefix))]
+    texts = {p: read(p) for p in sources()}
+    new = dict(texts)
+    for r in rows:
+        c, name = parse_decl(r["decl"])
+        hdr = r["header"]
+        for p in sorted(new):
+            if not p.endswith(".h") or p == hdr or not re.search(rf"\b{name}\b", new[p]):
+                continue
+            # a header the row's header includes (directly or not) would form a cycle
+            seen, todo = set(), [hdr]
+            while todo:
+                for inc in includes(new[todo.pop()]):
+                    q = next((x for x in new if x.endswith("/" + inc)), None)
+                    if q and q not in seen:
+                        seen.add(q)
+                        todo.append(q)
+            if p in seen:
+                continue
+            t = new[p]
+            hit = False
+            for m, spec, decls, idx in reversed(declarations(t, name)):
+                if norm(spec, decls[idx], name, name) == c:
+                    t = drop_decl(t, m, decls, idx)
+                    hit = True
+            if hit:
+                new[p] = add_include(t, hdr)
+    changed = [p for p in new if new[p] != texts[p]]
+    print(f"{len(changed)} headers change: " + " ".join(changed))
+    if a.dry_run:
+        return
+
+    def asm(args):
+        p, t = args
+        return {nm: compile_asm(p, t, nm) for nm in ((False, True) if "NONMATCHING" in t else (False,))}
+
+    def includers(cur, hdr):
+        closure, grew = {os.path.basename(hdr)}, True
+        while grew:
+            grew = False
+            for p, t in cur.items():
+                if p.endswith(".h") and os.path.basename(p) not in closure and includes(t) & closure:
+                    closure.add(os.path.basename(p))
+                    grew = True
+        return sorted(p for p, t in cur.items() if p.endswith(".c") and includes(t) & closure)
+    cur, kept = dict(texts), []
+    for h in changed:
+        trial = dict(cur)
+        trial[h] = new[h]
+        verify = includers(trial, h)
+        with concurrent.futures.ThreadPoolExecutor(a.jobs) as ex:
+            before = list(ex.map(asm, [(p, cur[p]) for p in verify]))
+            write(trial, [h])       # compile_asm reads headers from the tree
+            after = list(ex.map(asm, [(p, trial[p]) for p in verify]))
+        bad = [p for p, b, f in zip(verify, before, after) if any(f[k] != v for k, v in b.items() if "ERROR" not in v[:9])]
+        if bad:
+            write(cur, [h])
+            print(f"  {h}: skipped, assembly differs in {len(bad)} files: {" ".join(bad[:10])}")
+            continue
+        cur = trial
+        kept.append(h)
+        print(f"  {h}: ok ({len(verify)} files)")
+    formatted(texts, cur, kept)
+
+
 def drop_defs(t, defs):
     """Remove file-scope struct definitions identical to one in `defs`."""
     for key, _ in defs:
@@ -759,7 +845,7 @@ def view(spec, declarator, name, canon, lvalue=True):
     if not dims:
         if canon_array:
             # a scalar view of an array: its first element
-            return None if stars else f"(*({spec} *){name})"
+            return f"(*({spec} {'*' * stars}*){name})"
         if stars and not lvalue:
             return f"(({spec} {'*' * stars}){name})"
         return f"(*({spec} {'*' * stars}*)&{name})"
@@ -889,9 +975,13 @@ def main():
     s.add_argument("--confidence", default="low", help="confidence column for these rows (default low; '' keeps it)")
     s.add_argument("--dry-run", action="store_true")
     s.add_argument("--jobs", type=int, default=os.cpu_count())
+    s = sub.add_parser("dedupe", help="drop headers' repeats of a row's shared declaration")
+    s.add_argument("--prefix", action="append", default=["02"], help="address prefix of the rows to process")
+    s.add_argument("--dry-run", action="store_true")
+    s.add_argument("--jobs", type=int, default=os.cpu_count())
     a = ap.parse_args()
     {"check": cmd_check, "show": cmd_show, "seed": cmd_seed, "unify": cmd_unify,
-     "annotate": cmd_annotate, "users": cmd_users}[a.cmd](a)
+     "annotate": cmd_annotate, "users": cmd_users, "dedupe": cmd_dedupe}[a.cmd](a)
 
 
 if __name__ == "__main__":

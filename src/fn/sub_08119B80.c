@@ -51,10 +51,10 @@ struct Glove {
 extern struct GloveCamera {
     u8 unknown0[0x44];
     s32 x;
-} *gUnk_020004B8;
+} *gSceneCamera;
 extern struct GloveGlobals {
     u8 unknown0[0x24], bank;
-} *gUnk_0200047C;
+} *gSceneEventDispatchState;
 void Glove_UpdateRecoil(void *);
 void Glove_UpdateImpactRecoil(void *);
 void Glove_UpdateStaggerRecoil(void *);
@@ -108,16 +108,16 @@ s32 Glove_DispatchCommands(struct Glove *p)
     }
     {
         struct GlovePosition *pos = &p->screenPosition;
-        pos->x = (state->x >> 12) - gUnk_020004B8->x;
+        pos->x = (state->x >> 12) - gSceneCamera->x;
         pos->y = ((state->z + (state->y + state->height)) >> 12) + 90;
         pos->z = state->z >> 12;
     }
     queue = &p->queue;
     i = 0;
-    if (i < queue->count[gUnk_0200047C->bank])
+    if (i < queue->count[gSceneEventDispatchState->bank])
         do {
             {
-                struct GloveGlobals *g = gUnk_0200047C;
+                struct GloveGlobals *g = gSceneEventDispatchState;
                 cmd = queue->commands[g->bank][i];
             }
             switch (cmd->type) {
@@ -184,5 +184,5 @@ s32 Glove_DispatchCommands(struct Glove *p)
                     break;
             }
             SceneMessages_SetPendingTrigger(queue, cmd);
-        } while (++i < queue->count[gUnk_0200047C->bank]);
+        } while (++i < queue->count[gSceneEventDispatchState->bank]);
 }

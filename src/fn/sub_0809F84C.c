@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_actor_control_phase.h"
+#include "player.h"
 
 struct CrowDrawableView {
     u32 flags;
@@ -11,7 +12,6 @@ struct CrowPlayerView {
     u8 pad[0x30];
     struct ContactPosition position;
 };
-extern struct CrowPlayerView *gUnk_02000580;
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 

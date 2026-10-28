@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "render.h"
+#include "ram.h"
 s32 __divsi3(s32, s32);
 void OrbitMotion_BeginDistanceWave(void *, void *, void *, u32, u32);
 void ContactImpactEffect_UpdateContact(void);
@@ -58,7 +59,6 @@ static inline void Project(u16 *screen, struct Vec *world)
     screen[2] = depth - gCameraOrigin[2];
 }
 
-extern const u16 gUnk_0203B400[];
 s32 sub_08249350(s32, s32);
 static inline void ApplyOffset(u16 *field, s32 random, s32 range)
 {
@@ -81,7 +81,7 @@ void ContactImpactEffect_UpdateShakingPosition(struct ContactImpactEffect *effec
     if (*timer >= effect->shakeThreshold)
         effect->shakeFlag = 1;
     range = *timer >> 2;
-    table = gUnk_0203B400;
+    table = gRandomTable;
     seed = &gRandomIndex;
     index = *seed + 1;
     mask = 0x3FF;

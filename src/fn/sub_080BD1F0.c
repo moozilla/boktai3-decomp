@@ -352,7 +352,7 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             range.x = 80;
             range.y = 60;
             range.z = 60;
-            table = gUnk_0203B400;
+            table = gRandomTable;
             SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0x20,
                                 count, life, size, one = 1);
             SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0x40,
@@ -502,7 +502,7 @@ notHidden:
             range.x = 80;
             range.y = 60;
             range.z = 60;
-            table = gUnk_0203B400;
+            table = gRandomTable;
             SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0x20,
                                 count, life, size, one = 1);
             SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0x40,

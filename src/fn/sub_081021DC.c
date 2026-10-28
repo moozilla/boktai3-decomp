@@ -27,8 +27,8 @@ void NamedObject_ConstrainPlayer(struct NamedObject *o)
     struct SceneVec delta;
     s32 i;
     for (i = 0; i < 1; i++) {
-        if (gUnk_02000580[i]) {
-            if ((s16)o->state != 4 && Player_TestAttachmentFlags(gUnk_02000580[i], 1)) {
+        if (gPlayers[i]) {
+            if ((s16)o->state != 4 && Player_TestAttachmentFlags(gPlayers[i], 1)) {
                 s32 x, z, cell;
                 if (!HasFlag(8, &o->flags))
                     return;
@@ -38,9 +38,8 @@ void NamedObject_ConstrainPlayer(struct NamedObject *o)
                     cell = 0;
                 else
                     cell = gTerrainMap->rows[z] + x;
-                if (!(NamedObject_IsMapCellOccupied(cell) &&
-                      gUnk_02000580[i]->position.y == o->y)) {
-                    Difference(&delta, (struct SceneVec *)&o->x, &gUnk_02000580[i]->position);
+                if (!(NamedObject_IsMapCellOccupied(cell) && gPlayers[i]->position.y == o->y)) {
+                    Difference(&delta, (struct SceneVec *)&o->x, &gPlayers[i]->position);
                     if (delta.x > gUnk_086064C4.x || delta.x < -gUnk_086064C4.x ||
                         delta.y > gUnk_086064C4.y || delta.y < -gUnk_086064C4.y ||
                         delta.z > gUnk_086064C4.z || delta.z < -gUnk_086064C4.z) {
@@ -55,7 +54,7 @@ void NamedObject_ConstrainPlayer(struct NamedObject *o)
                         delta.x = o->x + delta.x;
                         delta.y = o->y;
                         delta.z = o->z + delta.z;
-                        Player_SetPositionAndSave(gUnk_02000580[i], &delta);
+                        Player_SetPositionAndSave(gPlayers[i], &delta);
                         SetFlag2(0x100, (u16 *)&o->flags);
                     }
                 }

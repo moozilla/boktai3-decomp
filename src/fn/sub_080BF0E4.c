@@ -29,7 +29,7 @@ struct SkeletonPlayer {
     u8 unknown24[0x1C];
     struct SkeletonPlayerCell *cell;
 };
-extern struct SkeletonPlayer *gUnk_02000580[4];
+extern struct SkeletonPlayer *gPlayers[4];
 
 struct SkeletonSavedControl {
     void *target;
@@ -304,7 +304,7 @@ static inline u32 PickDirection(u32 current)
     for (i = 0; i <= 3; i++) {
         u32 next;
         gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-        next = (gUnk_0203B400[gRandomIndex] & 3) << 6;
+        next = (gRandomTable[gRandomIndex] & 3) << 6;
         if (next != current)
             return next;
     }
@@ -364,12 +364,12 @@ static inline void ReturnHome(struct SceneActorRegistryResetView *outer)
         slot = PlayerSlot(*target);
         if (slot < 0)
             goto fail;
-        cell = gUnk_02000580[slot]->cell->cell;
+        cell = gPlayers[slot]->cell->cell;
     } else {
         cell = CellIndex((struct ContactPosition *)(*target + 12));
         slot = 0;
     }
-    if (cell == actor->terrainCell || Flags32(&gUnk_02000580[slot]->flags, 0x20000)) {
+    if (cell == actor->terrainCell || Flags32(&gPlayers[slot]->flags, 0x20000)) {
         u16 busy = Flags2D4(actor, 0x400);
         u8 zero;
         if (busy)

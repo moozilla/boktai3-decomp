@@ -85,12 +85,12 @@ void sub_080A34BC(struct SceneActorRegistryResetView *a)
     if (a->paletteOffset == 0) {
         idx = (gRandomIndex + 1) & 0x3FF;
         gRandomIndex = idx;
-        if ((gUnk_0203B400[idx] & 3) == 0)
+        if ((gRandomTable[idx] & 3) == 0)
             goto recoveryC;
     } else {
         idx = (gRandomIndex + 1) & 0x3FF;
         gRandomIndex = idx;
-        if ((gUnk_0203B400[idx] & 7) != 0)
+        if ((gRandomTable[idx] & 7) != 0)
             goto recoveryC;
     }
     a->state2A8 = 0;
@@ -107,7 +107,7 @@ void sub_080A34BC(struct SceneActorRegistryResetView *a)
     a->word104 = 0;
     next = (idx + 1) & 0x3FF;
     gRandomIndex = next;
-    ctx->delay = (gUnk_0203B400[next] & 0x7F) + 60;
+    ctx->delay = (gRandomTable[next] & 0x7F) + 60;
     return;
 recoveryC:
     a->state2A8 = 0;

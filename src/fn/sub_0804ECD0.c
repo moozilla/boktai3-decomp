@@ -17,7 +17,7 @@ static inline u32 playerMode(struct AreaEffectPlayer *player)
 static inline u32 linkValue(s32 index)
 {
     register s32 selected asm("r3") = index;
-    struct AreaEffectLinkState *link = gUnk_020004B4;
+    struct AreaEffectLinkState *link = gLinkSession;
     if (!link || selected < 0)
         return 0;
     return link->playerValues[selected];
@@ -28,7 +28,7 @@ void AreaEffect_UpdateLinkPlayerResources(struct AreaEffectManager *manager)
     register s32 i asm("r3") = 0;
     u16 *fractions = object->resourceFractions;
     do {
-        struct AreaEffectPlayer *player = gUnk_02000580[i];
+        struct AreaEffectPlayer *player = gPlayers[i];
         s32 next = i + 1;
         if (player && player->stateTag == 1) {
             u32 mode = playerMode(player);

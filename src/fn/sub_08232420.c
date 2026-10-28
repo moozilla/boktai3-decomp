@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "ram.h"
 struct HazardVec {
     s16 x, y, z, pad;
 };
@@ -28,7 +29,6 @@ struct TimedHazardPool {
     u8 task[0x18];
     void *animation;
 };
-extern struct TimedHazardPool *gColliderSpritePool;
 void *ColliderSpritePool_Create(u32, u32);
 void TimedHazard_OnDamageContact();
 void TimedHazard_OnAttackContact();
@@ -52,7 +52,7 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *pos
     struct TimedHazard *p;
     struct HazardVec *pos;
     void *resource;
-    if (!gColliderSpritePool && !ColliderSpritePool_Create(0xC0DB, 0))
+    if (!((struct TimedHazardPool *)gColliderSpritePool) && !ColliderSpritePool_Create(0xC0DB, 0))
         return -1;
     p = Heap_Alloc(sizeof(*p));
     if (!p)
@@ -129,7 +129,7 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *pos
         return -1;
     Sprite_Init(&p->sprite, resource, 1);
     p->sprite.priority = 2;
-    Anim_SetSequence(p->anim, gColliderSpritePool->animation, 1, 0, 0);
+    Anim_SetSequence(p->anim, ((struct TimedHazardPool *)gColliderSpritePool)->animation, 1, 0, 0);
     AnimData_SelectPaletteBank(resource, p->id + 0x153);
     if (p->delay == 0) {
         p->state = 1;
@@ -143,7 +143,7 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *pos
     p->unknown5 = 0;
     p->previous = 0;
     p->next = 0;
-    return TimedHazard_LinkInstance(gColliderSpritePool, p);
+    return TimedHazard_LinkInstance(((struct TimedHazardPool *)gColliderSpritePool), p);
 }
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);

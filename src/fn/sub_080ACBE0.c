@@ -15,7 +15,7 @@ void SceneActor_AimArcAtPlayer(struct SceneActorRegistryResetView *actor)
 {
     struct ContactPosition delta;
     struct SceneActorRegistrySequenceDrawable *drawable = actor->drawable;
-    struct Player **slots = gUnk_02000580;
+    struct Player **slots = gPlayers;
     struct ContactPosition *out = &delta;
     const struct ContactPosition *own = &drawable->position;
     const struct SceneVec *player = &slots[0]->position;

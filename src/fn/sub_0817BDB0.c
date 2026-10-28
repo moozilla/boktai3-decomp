@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 struct VolumeActor {
     u8 pad0[0x51];
@@ -83,7 +84,6 @@ static inline s32 Scale(int x)
     return -(-x >> 12);
 }
 
-extern u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void Path_GetPointPositionById(void *, int, int);
 s32 SceneVolume_GetActivityState(void *);
@@ -101,7 +101,7 @@ static inline u8 TakeQueued(struct VolumeActor *p)
 }
 static inline s32 RandomValue(void)
 {
-    u16 *values = gUnk_0203B400;
+    u16 *values = gRandomTable;
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;

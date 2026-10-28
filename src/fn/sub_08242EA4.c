@@ -1,4 +1,5 @@
 #include "global.h"
+#include "area_effect_link.h"
 
 struct P2 {
     u32 a, b;
@@ -7,7 +8,6 @@ struct Link {
     u8 pad[0x5c];
     u8 arr[1];
 };
-extern struct Link *gUnk_020004B4;
 extern void *gUnk_08E87B0C[];
 void Player_AccumulateActionCharge(u8 *, s32);
 void sub_082420D4(u8 *);
@@ -23,10 +23,10 @@ void Player_SetSecondaryActionFlags(u8 *, s32);
 static inline long long LinkGet(s32 i)
 {
     u8 v;
-    if (gUnk_020004B4 == 0 || i < 0)
+    if (((struct Link *)gLinkSession) == 0 || i < 0)
         v = 0;
     else
-        v = gUnk_020004B4->arr[i];
+        v = ((struct Link *)gLinkSession)->arr[i];
     return v;
 }
 

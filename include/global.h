@@ -20,7 +20,7 @@ asm(".include \"asm/macros.inc\"");
 #define DEBUG_NOP()                                                                                \
     do {                                                                                           \
     } while (0)
-#define RANDOM_TABLE_ADDR 0x0203B400 /* gUnk_0203B400 */
+#define RANDOM_TABLE_ADDR 0x0203B400 /* gRandomTable */
 
 /* libagbsyscall */
 void CpuSet(const void *src, void *dest, u32 control);

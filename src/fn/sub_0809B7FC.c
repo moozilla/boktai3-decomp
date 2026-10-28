@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
+#include "player.h"
 
 // confidence=low: resumes pursuit or waiting after the lifted-player penalty window.
 
@@ -7,7 +8,6 @@ void SceneActorControl_ConsumeLiftFlagPenalty(void *);
 void SceneActorControl_ResetCollisionFlags(void *);
 void Lun_BeginMoveToPosition(void *, void *);
 void Lun_UpdateWaitingAnimation(void);
-extern u8 *gUnk_02000580;
 
 static inline u8 TakeFlag(u8 *p)
 {
@@ -75,7 +75,7 @@ void Lun_ResumeAfterLiftPenalty(struct SceneActorRegistryResetView *input, s32 e
             flags = flags | (*p);
             *p = flags;
             *((u16 *)(ctx + 0x444)) = *((u16 *)(ctx + 0x442));
-            Lun_BeginMoveToPosition(input, gUnk_02000580 + 0x30);
+            Lun_BeginMoveToPosition(input, (*(u8 **)gPlayers) + 0x30);
             SetState(input, 2, 0, zero8);
         } else {
             u32 zero = delay;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "background_controller.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s32 x, y, z, pad;
@@ -25,7 +26,6 @@ struct Camera {
     u8 pad0[0x44];
     s32 x;
 };
-extern struct Camera *gUnk_020004B8;
 struct Trail *MotionEffectPool_FindFreeEntry(struct Pool *, s32 *);
 void Vector3_CopyComponents(struct Vec *, struct Vec *);
 void Sprite_LinkToList(void *, int);
@@ -63,7 +63,7 @@ s32 SpriteTrail_CreateMotionEffect(struct Pool *pool, struct Vec *start, struct 
     history = p->history;
     for (i = 3; i >= 0;) {
         Vector3_CopyComponents(history, position);
-        sprite->x = (p->position.x >> 12) - gUnk_020004B8->x;
+        sprite->x = (p->position.x >> 12) - gSceneCamera->x;
         {
             s32 y = position->y;
             s32 z = position->z;
@@ -81,7 +81,7 @@ s32 SpriteTrail_CreateMotionEffect(struct Pool *pool, struct Vec *start, struct 
     i = 2;
     sprite = tail;
     for (; i >= 0;) {
-        sprite->x = (p->position.x >> 12) - gUnk_020004B8->x;
+        sprite->x = (p->position.x >> 12) - gSceneCamera->x;
         {
             s32 y = position->y;
             s32 z = position->z;

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 
 struct Trail080AA744Osc {
@@ -80,7 +80,7 @@ void sub_080AA744(struct Actor080AA744 *actor)
         if (Trail080AA744IsActive(seg) && !Trail080AA744IsHidden(seg)) {
             u16 r;
             gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-            r = gUnk_0203B400[gRandomIndex];
+            r = gRandomTable[gRandomIndex];
             r &= mask;
             seg->offsetX = Trail080AA744FixedMul(gUnk_086149C4[(r + 0x40) & 0xFF], 12);
             seg->offsetY = 0;

@@ -1,7 +1,7 @@
 #include "scene_event_dispatch.h"
 static inline s32 Count(struct SceneEventReceiver *receiver)
 {
-    u8 *phase = &gUnk_0200047C->phase;
+    u8 *phase = &gSceneEventDispatchState->phase;
     u8 *count = receiver->count;
     return count[*phase];
 }
@@ -10,7 +10,7 @@ s32 SceneAudioEvent_DispatchPending(struct SceneEventDispatchTask *owner)
     struct SceneEventReceiver *receiver = &owner->receiver;
     s32 i = 0;
     while (i < Count(receiver)) {
-        struct SceneEventDispatchState *state = gUnk_0200047C;
+        struct SceneEventDispatchState *state = gSceneEventDispatchState;
         struct SceneEventCommand *command;
         command = receiver->pending[state->phase][i];
         SceneMessages_SetPendingTrigger(receiver, command);

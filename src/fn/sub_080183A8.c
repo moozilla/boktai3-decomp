@@ -1,7 +1,6 @@
 #include "global.h"
 #include "ram.h"
 #include "engine_globals.h"
-extern u16 gUnk_0203B400[];
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 int Mod(int, int);
@@ -21,7 +20,7 @@ int Weather_ConfigureCooldown(void)
         gRandomIndex = (gRandomIndex + 1) & 1023;
         {
             u32 offset = gRandomIndex * 2;
-            result = Mod(*(u16 *)((u8 *)gUnk_0203B400 + offset), gWeatherCooldownRange);
+            result = Mod(*(u16 *)((u8 *)gRandomTable + offset), gWeatherCooldownRange);
         }
     }
     gWeatherCooldownBase = base;

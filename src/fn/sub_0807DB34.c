@@ -83,7 +83,7 @@ static inline void Sub0807DB34_Turn(struct SceneActorRegistryResetView *actor,
     for (attempt = 0; attempt <= 3; attempt++) {
         u16 candidate;
         gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-        candidate = (gUnk_0203B400[gRandomIndex] & 3) << 6;
+        candidate = (gRandomTable[gRandomIndex] & 3) << 6;
         if (candidate != oldDirection) {
             newDirection = candidate;
             break;

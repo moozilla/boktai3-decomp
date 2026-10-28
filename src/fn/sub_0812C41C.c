@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_steering_actor.h"
 #include "engine.h"
-extern const u16 gUnk_0203B400[];
+#include "ram.h"
 extern const s16 gUnk_086149C4[];
 void SceneMovingParticle_Create(struct ContactPosition *, struct ContactPosition *, s32, s32);
 static inline s32 Truncate(s32 v)
@@ -16,7 +16,7 @@ void FragmentEffect_SpawnRandomParticle(struct ContactPosition *input)
     /* The original materializes this dead literal across its inlined RNG.
      * Keep the defined value live only for register-allocation matching. */
     register u32 opaque asm("r12") = 0x0403b714;
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     struct ContactPosition velocity;
     struct ContactPosition *v;
     s32 angle;
@@ -59,7 +59,7 @@ void FragmentEffect_SpawnRandomParticle(struct ContactPosition *input)
         register const u16 *source asm("r2");
         *cursor = (*cursor + 1) & 1023;
         offset = *cursor * 2;
-        source = gUnk_0203B400;
+        source = gRandomTable;
         {
             u32 value = *(const u16 *)(offset + (u32)source);
             {

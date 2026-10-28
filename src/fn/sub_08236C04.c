@@ -46,7 +46,7 @@ void ParticleBurst_EmitOrbitParticle(u8 *owner, struct Unk08236C04Position *orig
         struct Unk08236C04Particle *sprite;
 
         p->active = 1;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         seed = &gRandomIndex;
         i = *seed + 1;
         mask = 1023;

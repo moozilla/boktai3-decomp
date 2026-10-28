@@ -3,16 +3,16 @@
 s32 Callback_InvokeActor(void *, void (*)(void));
 void SessionMenu_InvokeCallback(void)
 {
-    struct AreaEffectLinkState *p = gUnk_020004B4;
+    struct AreaEffectLinkState *p = gLinkSession;
     DEBUG_NOP();
     if (p) {
-        struct AreaEffectLinkState *q = gUnk_020004B4;
+        struct AreaEffectLinkState *q = gLinkSession;
         switch (q->unavailable) {
             case 0:
                 Callback_InvokeActor(q, q->menuCallback);
                 break;
             case 1:
-                Callback_InvokeActor(gUnk_020004B4, gUnk_020004B4->menuCallback);
+                Callback_InvokeActor(gLinkSession, gLinkSession->menuCallback);
                 break;
         }
     }

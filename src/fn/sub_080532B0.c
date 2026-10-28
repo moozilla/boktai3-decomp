@@ -1,13 +1,13 @@
 // MATCHING_CONCESSION: register-pinning
 #include "stacked_actor.h"
 #include "engine_globals.h"
+#include "player.h"
 struct ActorMapView {
     u8 unknown0[4];
     u8 *cells;
     u8 unknown8[0x1C];
     u16 rowOffsets[1];
 };
-extern u8 *gUnk_02000580;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 u8 *TerrainModifiers_FindCellOverride(u32, u32);
@@ -276,8 +276,8 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
                     Sound_PlaySong(0x160);
                     actor->unknown380 = one;
                     ScriptUtility_SetControlFlag(0);
-                    Player_SetPositionAndSave(gUnk_02000580, cache.world);
-                    PlayerCue_Hide(gUnk_02000580);
+                    Player_SetPositionAndSave((*(u8 **)gPlayers), cache.world);
+                    PlayerCue_Hide((*(u8 **)gPlayers));
                     actor->sprite.flags &= ~1;
                     {
                         u32 tile = actor->paletteBase + 2;

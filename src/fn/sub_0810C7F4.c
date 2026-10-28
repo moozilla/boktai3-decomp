@@ -1,5 +1,6 @@
 #include "global.h"
 #include "input.h"
+#include "area_effect_link.h"
 struct LinkSlot {
     u8 cur, prev, state;
     u8 pad3[0x5fc - 3];
@@ -27,7 +28,6 @@ struct LinkPanel {
     u8 padF6D;
     u16 timer;
 };
-extern u8 *gUnk_020004B4;
 void Bg_SetLayerMap(u32, void *, u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void RegistryF246_ShowSlotDefaultFrame(struct LinkPanel *, s32);
@@ -45,23 +45,23 @@ void Sound_PlaySong(u32);
 
 static inline s32 peerStatus(s32 i)
 {
-    if (!gUnk_020004B4)
+    if (!(*(u8 **)&gLinkSession))
         return 0;
     {
-        u8 *statuses = gUnk_020004B4 + 0x64;
+        u8 *statuses = (*(u8 **)&gLinkSession) + 0x64;
         return statuses[i];
     }
 }
 static inline u8 unavailable(void)
 {
-    if (gUnk_020004B4 && gUnk_020004B4[0x2c] == 1)
+    if ((*(u8 **)&gLinkSession) && (*(u8 **)&gLinkSession)[0x2c] == 1)
         return 1;
     return 0;
 }
 
 static inline s32 GetPeer(void)
 {
-    u8 *st = gUnk_020004B4;
+    u8 *st = (*(u8 **)&gLinkSession);
     s32 r = -1;
     if (st)
         r = *(u16 *)(st + 0x1a);

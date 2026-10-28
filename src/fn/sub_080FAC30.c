@@ -1,9 +1,8 @@
-#define gSceneHeightState   gUnk_02000580
 #define gHoverAnimationData gUnk_0824E318
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
-extern u8 *gUnk_02000580;
+#include "player.h"
 extern const u8 gUnk_0824E318[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 struct HoverControlContext {
@@ -30,7 +29,7 @@ void SceneActorControl_InitializeHoverState(struct SceneActorRegistryResetView *
     context->enabled = 1;
     context->counter = 0;
     context->savedFlags = actor->flags130;
-    context->savedPosition = *(struct ContactPosition *)(gSceneHeightState + 0x30);
+    context->savedPosition = *(struct ContactPosition *)((*(u8 **)gPlayers) + 0x30);
     Fill(&context->vectorF04, &zero);
     Fill(&context->vectorF0C, &zero);
     Fill(&context->vectorF14, &zero);

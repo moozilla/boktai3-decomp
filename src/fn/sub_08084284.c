@@ -2,9 +2,9 @@
 
 #include "scene_actor_control_helpers.h"
 #include "engine.h"
-extern const u16 gUnk_0203B400[];
+#include "player.h"
+#include "ram.h"
 extern const s16 gUnk_086149C4[];
-extern u8 *gUnk_02000580[];
 s32 Math_Atan2(s32, s32);
 s32 Callback_InvokeActor(void *, void *);
 void CpuSet(const void *, void *, u32);
@@ -42,7 +42,7 @@ static inline u32 Rand(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
-    return *(const u16 *)((index << 1) + (u32)gUnk_0203B400);
+    return *(const u16 *)((index << 1) + (u32)gRandomTable);
 }
 static inline void Fill(void *dst, u32 *tmp, u32 value)
 {
@@ -87,7 +87,7 @@ void SceneActorControl_WanderAroundPlayer(struct SceneActorRegistryResetView *ac
             struct ContactPosition target;
             u32 angle;
             angle = (u8)Rand();
-            target = *(struct ContactPosition *)(gUnk_02000580[0] + 0x30);
+            target = *(struct ContactPosition *)(((u8 **)gPlayers)[0] + 0x30);
             target.x += Shift(gUnk_086149C4[angle], 4);
             target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 4);
             SceneActorControl_StartPositionCurve(actor, &target);

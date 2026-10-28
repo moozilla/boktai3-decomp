@@ -1,11 +1,11 @@
 #include "global.h"
+#include "player.h"
 
-extern u8 *gUnk_02000580;
 void Player_ApplyPeriodicStatChanges(u8 *);
 
 void Player_RefreshLifeState(void)
 {
-    if (gUnk_02000580 != 0) {
-        Player_ApplyPeriodicStatChanges(gUnk_02000580);
+    if ((*(u8 **)gPlayers) != 0) {
+        Player_ApplyPeriodicStatChanges((*(u8 **)gPlayers));
     }
 }

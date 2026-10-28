@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control.h"
 #include "engine.h"
-extern const u16 gUnk_0203B400[];
+#include "ram.h"
 void SceneActorControl_TickJitter(void *unused, struct SceneActorControlSlot *slot)
 {
     register s16 *timer asm("r5") = &slot->timer;
@@ -17,7 +17,7 @@ void SceneActorControl_TickJitter(void *unused, struct SceneActorControlSlot *sl
         }
     } else {
         if (remaining > 10) {
-            const u16 *table = gUnk_0203B400;
+            const u16 *table = gRandomTable;
             u32 mask;
             s32 jitter;
             u32 index;

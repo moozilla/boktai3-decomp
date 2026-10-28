@@ -110,7 +110,7 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
                 return;
             }
         } else {
-            actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
+            actor->fieldDC = (u32)gPlayers[0] + 0x24;
         }
         p = &actor->fieldDC;
         {

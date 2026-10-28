@@ -114,8 +114,8 @@ void Ivy_UpdateGrabAttempt(struct SceneActorRegistryResetView *actor)
             position.z = actor->position.z + gUnk_08606384[flip][sequence->index].z;
             target = (void *)actor->fieldDC;
             if (target->kind <= 3) {
-                Player_BeginPositionRequest(((void **)gUnk_02000580)[target->kind],
-                                            (void *)(&position), 0, 0, flip, 0, 0, 0, 0);
+                Player_BeginPositionRequest(((void **)gPlayers)[target->kind], (void *)(&position),
+                                            0, 0, flip, 0, 0, 0, 0);
             } else if (target->kind == 4) {
                 struct SceneActorRegistryResetView *victim = target->actor;
                 *((u16 *)(((u8 *)victim) + 0x178)) = 0;

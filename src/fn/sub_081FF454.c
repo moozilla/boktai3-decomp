@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 // fix.py best after the inlined-insn fix
 struct HomingVec {
     s16 x, y, z, pad;
@@ -58,7 +59,6 @@ struct HomingSlot {
     s16 flashTimer;
     s16 blinkTimer;
 };
-extern u16 gUnk_0203B400[];
 void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);
 struct HomingVec *Player_GetEffectivePosition(s32);
@@ -75,7 +75,7 @@ static inline void SpawnTrail(struct HomingSlot *p)
     u32 seed, t;
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
     seed = gRandomIndex;
-    t = *(u8 *)&gUnk_0203B400[seed];
+    t = *(u8 *)&gRandomTable[seed];
     SpriteParticle_CreateDefaultVariant4384(&p->origin, 0x28, 0x20, 0xc, 4, 0x18, t, 0x20, 0x20, 3,
                                             2, 0x200);
 }
@@ -151,7 +151,7 @@ inline static void SpawnTrail_UpdateDefaultState(struct HomingSlot *p)
     u32 t;
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
     seed = gRandomIndex;
-    t = *((u8 *)(&(*((typeof(gUnk_0203B400) *)0x0203B400))[seed]));
+    t = *((u8 *)(&(*((typeof(gRandomTable) *)0x0203B400))[seed]));
     SpriteParticle_CreateDefaultVariant4384(&p->origin, 0x28, 0x20, 0xc, 4, 0x18, t, 0x20, 0x20, 3,
                                             2, 0x200);
 }

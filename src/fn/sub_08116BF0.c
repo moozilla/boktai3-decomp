@@ -9,12 +9,12 @@ struct G {
     u8 f[0x758];
     s16 h;
 };
-extern struct Q *gUnk_020004F0;
+extern struct Q *gParticipantActors;
 extern struct G *gGameState;
 void Character_SetLowResourceColorEffect(void *, void *);
 void Player_RestoreCurrentHealth(void)
 {
-    struct Q *q = gUnk_020004F0;
+    struct Q *q = gParticipantActors;
     if (q != 0) {
         q->v = gGameState->h;
         Character_SetLowResourceColorEffect(q->a, q->b);

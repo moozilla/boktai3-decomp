@@ -2,8 +2,8 @@
 #include "global.h"
 #include "ram.h"
 #include "engine_globals.h"
+#include "player.h"
 void Bg_SetPriority(u32, u32);
-extern u32 gUnk_02000580;
 extern u8 gUnk_08E60F0C[];
 extern u8 *gGameState;
 void Inventory_InitEquipmentEntryFromDescriptor(u8 *, u8 *);
@@ -48,7 +48,7 @@ u32 SceneHud_InitFromScript(u8 *s)
     *(u16 *)(s + offset) = zero;
     value = gSceneHudMode;
     s[0x1414] = value;
-    value = gUnk_02000580;
+    value = (*(u32 *)gPlayers);
     *(u32 *)(s + 0xA40) = value;
     Inventory_InitEquipmentEntryFromDescriptor(gUnk_08E60F0C, s + 0x4884);
     if (Script_SeekToKeyword(0x4E))

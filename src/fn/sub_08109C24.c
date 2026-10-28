@@ -1,5 +1,6 @@
 #include "global.h"
 #include "sun_clock.h"
+#include "area_effect_link.h"
 struct ClockPanelSnapshot {
     u8 unk0[0x20];
     u16 time;
@@ -19,12 +20,11 @@ struct ClockState {
     u8 unk0[0x18];
     s16 mode;
 };
-extern struct ClockState *gUnk_020004B4;
 u8 SunClock_GetPhase(void);
 void ClockPanel_CaptureTime(struct ClockPanel *p)
 {
     struct ClockPanelSnapshot *snapshot = &p->snapshot;
-    struct ClockState **state = &gUnk_020004B4;
+    struct ClockState **state = &gLinkSession;
     s32 i;
     for (i = 0; i < 2; i++) {
         p->values[i] = 0;

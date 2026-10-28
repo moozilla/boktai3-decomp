@@ -9,7 +9,7 @@ s32 CellGate_TestTraversalMode(struct CellGate *gate)
             x = 1;
     }
     if (x == 0) {
-        u32 t = gUnk_02000580->actionMode;
+        u32 t = gPlayers->actionMode;
         if (t == 3)
             goto yes;
         if (t != 4)

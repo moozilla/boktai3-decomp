@@ -33,7 +33,6 @@ struct Pool {
     u32 used;
 };
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
 struct Pool *SlashEffect_GetOrCreateManager(void);
 struct Slash *SlashEffect_AllocateSlot(struct Pool *);
 void TwinSpriteEffect_InitGraphics(struct Slash *);

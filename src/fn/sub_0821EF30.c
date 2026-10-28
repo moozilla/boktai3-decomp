@@ -1,6 +1,6 @@
 #include "terrain_cell_probe.h"
 
-// The random table (gUnk_0203B400) is addressed by its numeric address here; the
+// The random table (gRandomTable) is addressed by its numeric address here; the
 // symbol form changes reload order and register choice in the loop.
 
 u8 *Path_GetDefinition(u32 id);

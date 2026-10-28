@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct Position {
     s16 x, y, z, pad;
@@ -8,7 +9,6 @@ struct Actor {
     u8 pad[0x1C];
     struct Position position;
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void CallbackPool_SpawnHitParticles(void *);
@@ -23,7 +23,7 @@ static inline u16 Rand(void)
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
     index *= 2;
-    return *(const u16 *)((u32)gUnk_0203B400 + index);
+    return *(const u16 *)((u32)gRandomTable + index);
 }
 static inline void Polar(s32 angle, struct Position *v, s32 radius)
 {

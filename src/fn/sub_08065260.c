@@ -45,7 +45,7 @@ void ActorAttachment_TickRisingPart(struct ActorAttachmentSlotView *slot)
             s32 step;
             u32 previous;
             random <<= 1;
-            table = (const u16 *)gUnk_0203B400;
+            table = (const u16 *)gRandomTable;
             step = *(u16 *)(random + (u32)table);
             step >>= 4;
             step &= 7;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
@@ -71,7 +72,6 @@ static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
     d->z = b->z + a->z;
 }
 // confidence=low: fires a player-homing projectile at a facing-dependent offset.
-extern u8 *gUnk_02000580;
 void Projectile_InitParameters(void *);
 void Projectile_SetLaunchParameters(void *, u16, u32, u8, u32);
 void Projectile_SetHomingParameters(void *, s32, void *, s32);
@@ -105,7 +105,7 @@ void Ratatosk_UpdateHomingShot(struct Actor *p, s32 tick)
         }
         Projectile_InitParameters(params);
         Projectile_SetLaunchParameters(params, 0, 180, (direction + 5) << 5, 24);
-        Projectile_SetHomingParameters(params, 180, gUnk_02000580 + 0x30, 4);
+        Projectile_SetHomingParameters(params, 180, (*(u8 **)gPlayers) + 0x30, 4);
         Projectile_SetSpriteParameters(params, 0x8e5a, 0, 499);
         Projectile_SetScriptProcedure(params, 0x4363, 3);
         Projectile_SetCollisionParameters(params, 0, 0x80000, H(0xeae), H(0xeb0), H(0xeb2));

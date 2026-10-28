@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 #ifdef NONMATCHING
 // fuzzy: 83.4%
@@ -21,7 +22,6 @@ void SpinningApproach_DampReturnMovement(void);
 void Armor_CapturePartMotionEndpoint(void *);
 void Sound_PlaySongChecked(u32);
 s32 Math_Atan2(s32, s32);
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 
 struct PartVector {
@@ -117,7 +117,7 @@ void Armor_OnPartDamageCollision(u8 *attack, u8 *response, u8 *part)
             Delta(&delta, (void *)(response + 0xC), (void *)(attack + 0xC));
             if ((delta.x == 0) && (delta.z == 0)) {
                 gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-                angle = gUnk_0203B400[gRandomIndex];
+                angle = gRandomTable[gRandomIndex];
             } else {
                 angle = Math_Atan2(delta.x, delta.z);
             }

@@ -1,12 +1,12 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 #include "engine.h"
+#include "ram.h"
 #define FIELD(p, o, T) (*(T *)((u8 *)(p) + (o)))
 #ifdef NONMATCHING
 // fuzzy: 81.2%
 // fix.py best (sweep after the inlined-insn fix)
 // Remaining differences concern local lifetimes, register allocation and ordering.
-extern const u16 gUnk_0203B400[];
 s32 SceneActorTerrain_GetNeighborCell(void *, s32);
 u8 TentacleActor_HasVisitedRoute(void *, s32);
 void TentacleActor_RecordVisitedRoute(void *, s32);
@@ -19,7 +19,7 @@ static inline s32 Random(void)
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
     index *= 2;
-    return *(const u16 *)((u32)gUnk_0203B400 + index);
+    return *(const u16 *)((u32)gRandomTable + index);
 }
 void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *actor)
 {

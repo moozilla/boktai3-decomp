@@ -1,5 +1,6 @@
 #include "global.h"
 #include "modifier_list.h"
+#include "background_controller.h"
 
 // foundry draft (worker best 88.0%); what differs is mostly register allocation and instruction order
 #define CharacterPreview_SelectResource CharacterModel_GetPrimaryPaletteIndex
@@ -8,7 +9,6 @@ struct CharacterPreviewTileAllocator {
     u8 unknown0[0x38];
     s32 nextTile;
 };
-extern struct CharacterPreviewTileAllocator *gUnk_020004B8;
 s32 CharacterModel_GetPrimaryPaletteIndex(void *);
 void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *p,
                                         struct CharacterPreviewModel *model, s32 index)
@@ -49,7 +49,7 @@ void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *p,
     }
     CpuSet(p->normalPalette, model->normalPalette, 16);
     {
-        struct CharacterPreviewTileAllocator **ap = &gUnk_020004B8;
+        struct CharacterPreviewTileAllocator **ap = &gSceneCamera;
         struct CharacterPreviewTileAllocator **lp;
         lp = ap;
         offset = 0;

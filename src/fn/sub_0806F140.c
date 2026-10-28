@@ -3,7 +3,7 @@ extern u32 gUnk_02000560[4];
 struct Player *SceneActorQuery_FindPlayerInBounds(const struct SceneVec *center,
                                                   const struct SceneVec *radius, s32 slot)
 {
-    struct Player *p = gUnk_02000580[slot];
+    struct Player *p = gPlayers[slot];
     if (!p)
         goto absent;
     {

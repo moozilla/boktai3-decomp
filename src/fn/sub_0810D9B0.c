@@ -2,6 +2,7 @@
 #include "game_state.h"
 #include "engine.h"
 #include "ram.h"
+#include "area_effect_link.h"
 #define TextWindow_Show TextWindow_StartPlayback
 struct RecordPanel {
     u8 pad0[0xCF4];
@@ -19,14 +20,13 @@ struct PanelSelection {
     u8 pad54[0xCC];
     struct PanelNameRecord record;
 };
-extern struct PanelSelection *gUnk_020004B4;
 s32 TextWindow_SetScript(s32, const u8 *);
 s32 TextWindow_Refresh(s32, s32);
 void TextWindow_SetString(s32, s32, void *);
 void TextWindow_StartPlayback(s32);
 static inline struct PanelNameRecord *GetNameRecord(void)
 {
-    struct PanelSelection *p = gUnk_020004B4;
+    struct PanelSelection *p = gLinkSession;
     if (!p)
         return 0;
     if (p->type != 1)

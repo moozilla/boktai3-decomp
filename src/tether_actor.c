@@ -1,5 +1,6 @@
 #include "tether_actor.h"
 #include "engine.h"
+#include "ram.h"
 
 #define TetherActor_GetStatusTag sub_08049F54
 
@@ -613,31 +614,31 @@ void TetherActor_UpdateSegments(struct TetherActor *actor)
     u32 angle;
     s32 priority;
     s32 i;
-    if ((*gUnk_02000580)->tetherMode != 6) {
+    if ((*gPlayers)->tetherMode != 6) {
         s32 n;
         for (n = 0, segment = actor->segments; n < 7; n++, segment++)
             segment->flags |= 1;
 
         return;
     }
-    angle = (((*gUnk_02000580)->heading + 1) & 7) * 32;
+    angle = (((*gPlayers)->heading + 1) & 7) * 32;
     x = gUnk_086149C4[(angle + 64) & 255];
     z = gUnk_086149C4[angle & 255];
-    if ((*gUnk_02000580)->side) {
+    if ((*gPlayers)->side) {
         offsetX = scaleOffsetR(20 * (z - x));
         offsetZ = scaleOffsetR(20 * (x + z));
     } else {
         offsetX = scaleOffsetR(20 * (x + z));
         offsetZ = scaleOffsetR(20 * (z - x));
     }
-    start.x = (*gUnk_02000580)->position.x + offsetX;
-    start.y = (*gUnk_02000580)->position.y + 220;
-    start.z = (*gUnk_02000580)->position.z + offsetZ;
+    start.x = (*gPlayers)->position.x + offsetX;
+    start.y = (*gPlayers)->position.y + 220;
+    start.z = (*gPlayers)->position.z + offsetZ;
     angle = ((actor->heading + 5) & 7) * 32;
     end.x = actor->position.x + scaleOffsetR(100 * gUnk_086149C4[(angle + 64) & 255]);
     end.y = actor->position.y - 50;
     end.z = actor->position.z + scaleOffsetR(100 * gUnk_086149C4[angle & 255]);
-    priority = ((*gUnk_02000580)->heading == 4) ? (-20) : (-2);
+    priority = ((*gPlayers)->heading == 4) ? (-20) : (-2);
     segment = actor->segments;
     i = 0;
     do {
@@ -1149,11 +1150,11 @@ void TetherActor_SelectInteractionState(struct TetherActor *actor)
     actor->currentValue = actor->maximumValue;
     asm("" ::: "r3");
     if (!actor->interactionEnabled || actor->statusFlags)
-        TetherActor_SetState(gUnk_02000488, 0);
+        TetherActor_SetState(gTetherActor, 0);
     else if (TetherActor_TestInteractionPath(actor))
-        TetherActor_SetState(gUnk_02000488, 3);
+        TetherActor_SetState(gTetherActor, 3);
     else
-        TetherActor_SetState(gUnk_02000488, 4);
+        TetherActor_SetState(gTetherActor, 4);
 }
 
 // MATCHING_CONCESSION: register-pinning
@@ -1210,15 +1211,13 @@ void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
 
 // fix.py best (sweep after the inlined-insn fix)
 
-extern u16 gUnk_02000550, gUnk_0200052C, gUnk_0200053C;
-
 static inline void slopePush(struct TetherActor *actor, s32 octant)
 {
     s32 angle = (octant + 1) << 5;
     s32 cosine = gUnk_086149C4[(angle + 64) & 255];
     s32 sine = gUnk_086149C4[angle & 255];
-    actor->movementDelta.x -= scaleOffset(gUnk_02000550 * cosine);
-    actor->movementDelta.z -= scaleOffset(gUnk_02000550 * sine);
+    actor->movementDelta.x -= scaleOffset(gPlayerBackgroundState * cosine);
+    actor->movementDelta.z -= scaleOffset(gPlayerBackgroundState * sine);
 }
 
 static inline u32 NeighborHeight(s32 cell)
@@ -1237,23 +1236,24 @@ inline static void slopePush_AdjustSlopeMovement(struct TetherActor *actor, s32 
     cosine = table[(angle + 64) & 255];
     sine = table[angle & 255];
     do {
-        actor->movementDelta.x -= scaleOffset(gUnk_02000550 * cosine);
+        actor->movementDelta.x -= scaleOffset(gPlayerBackgroundState * cosine);
     } while (0);
-    actor->movementDelta.z -= scaleOffset(gUnk_02000550 * sine);
+    actor->movementDelta.z -= scaleOffset(gPlayerBackgroundState * sine);
 }
 
 void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
 {
     s32 neighbor;
     s32 octant;
-    if (((actor->kind != 9) || (actor->state == 11)) || (gUnk_02000550 < gUnk_0200052C))
+    if (((actor->kind != 9) || (actor->state == 11)) ||
+        (gPlayerBackgroundState < gPlayerDirectionLatch))
         return;
     if (!actor->movementProbe) {
         void *probe = &actor->movementProbeStorage;
         CellObject_Init(probe, &actor->position);
         actor->movementProbe = probe;
     }
-    octant = ((gUnk_0200053C + 112) & 255) >> 5;
+    octant = ((gPlayerBackgroundMode + 112) & 255) >> 5;
     neighbor = 0;
     if (octant & 1) {
         if (octant == 1)
@@ -1333,7 +1333,7 @@ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
 
 void TetherActor_ClearInstance(void)
 {
-    gUnk_02000488 = 0;
+    gTetherActor = 0;
 }
 
 // MATCHING_CONCESSION: register-pinning
@@ -1420,23 +1420,23 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
         struct ContactPackedVector v;
         struct ContactPosition p;
     } corner;
-    if (!gUnk_02000488)
+    if (!gTetherActor)
         goto no;
-    dx = position->x - gUnk_02000488->position.x;
-    dz = position->z - gUnk_02000488->position.z;
+    dx = position->x - gTetherActor->position.x;
+    dz = position->z - gTetherActor->position.z;
     if (dx * dx + dz * dz > 48400)
         goto no;
-    state = gUnk_02000488->state;
+    state = gTetherActor->state;
     if ((u8)(state - 16) <= 1)
         goto yes;
     if ((u8)state != 0 && (u8)state != 3 && (u8)state != 4)
         goto no;
-    if (!TetherActor_TestMatchingStatus(tag, flags, gUnk_02000488->statusTag,
-                                        gUnk_02000488->statusFlags))
+    if (!TetherActor_TestMatchingStatus(tag, flags, gTetherActor->statusTag,
+                                        gTetherActor->statusFlags))
         goto no;
     NEAR_CELL(own, position->x, position->z);
     {
-        struct ContactPosition *p = &gUnk_02000488->position;
+        struct ContactPosition *p = &gTetherActor->position;
         s32 cx = p->x >> 8;
         s32 cz = p->z >> 8;
         if (cx < 0 || cz < 0 || (u32)cx >= gTerrainWidth || (u32)cz >= gTerrainHeight)
@@ -1449,7 +1449,7 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
     if (own == other + 1 || own == other - 1 ||
         own == other + ((s16 *)(map = gTerrainMap)->cells)[2] ||
         own == other - ((s16 *)map->cells)[2]) {
-        diff = position->y - gUnk_02000488->position.y;
+        diff = position->y - gTetherActor->position.y;
         if (diff < 0)
             diff = -diff;
         if (diff > 255)
@@ -1457,7 +1457,7 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
     yes:
         return 1;
     }
-    diff = position->y - gUnk_02000488->position.y;
+    diff = position->y - gTetherActor->position.y;
     if (diff < 0)
         diff = -diff;
     if (diff > 255)
@@ -1497,7 +1497,7 @@ no:
 
 void TetherActor_SetInteractionTarget(struct ContactPosition *a, u32 b)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (p) {
         p->targetPosition = *a;
         p->targetPosition.pad = b;
@@ -1506,7 +1506,7 @@ void TetherActor_SetInteractionTarget(struct ContactPosition *a, u32 b)
 
 struct ContactPosition *TetherActor_GetPosition(void)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (!p)
         return 0;
     return &p->position;
@@ -1514,7 +1514,7 @@ struct ContactPosition *TetherActor_GetPosition(void)
 
 u32 TetherActor_CopySampledPosition(struct ContactPosition *a)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     u32 r;
     if (p) {
         *a = p->sampledPosition;
@@ -1530,7 +1530,7 @@ u32 TetherActor_CopySampledPosition(struct ContactPosition *a)
 
 u32 TetherActor_IsState(u32 a)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (!p)
         return 0;
     if (p->state == a)
@@ -1540,7 +1540,7 @@ u32 TetherActor_IsState(u32 a)
 
 void TetherActor_SetInteractionPathFromScript(void)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (p) {
         void *a;
         void *b;
@@ -1565,15 +1565,15 @@ void TetherActor_SetInteractionPathFromScript(void)
 
 void TetherActor_ResetInteraction(void)
 {
-    if (gUnk_02000488) {
-        TetherActor_SetState(gUnk_02000488, 0);
-        gUnk_02000488->interactionReset = 1;
+    if (gTetherActor) {
+        TetherActor_SetState(gTetherActor, 0);
+        gTetherActor->interactionReset = 1;
     }
 }
 
 void TetherActor_RequestPaletteBlend(u32 a)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (p)
         p->blendRequested = a;
 }
@@ -1582,7 +1582,7 @@ void TetherActor_RequestPaletteBlend(u32 a)
 
 u32 TetherActor_CanStartInteraction(void)
 {
-    struct TetherActor *actor = gUnk_02000488;
+    struct TetherActor *actor = gTetherActor;
     u32 result;
     if (!actor)
         goto no;
@@ -1610,7 +1610,7 @@ u32 TetherActor_CanStartInteraction(void)
 
 void TetherActor_StartInteractionEffect(void)
 {
-    struct TetherActor *actor = gUnk_02000488;
+    struct TetherActor *actor = gTetherActor;
     u32 state;
     u32 savedState;
     register u32 zero asm("r3");
@@ -1649,7 +1649,7 @@ done:;
 
 u32 TetherActor_IsStateOne(void)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (!p)
         return 0;
     if (p->state == 1)
@@ -1659,7 +1659,7 @@ u32 TetherActor_IsStateOne(void)
 
 s32 TetherActor_GetParameter(void)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     s32 r;
     if (p)
         r = p->parameter;
@@ -1670,14 +1670,14 @@ s32 TetherActor_GetParameter(void)
 
 void TetherActor_SetParameter(u32 a)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (p)
         p->parameter = a;
 }
 
 void TetherActor_BeginDetachedState(u32 a)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (p) {
         u8 *q;
         if (a)
@@ -1696,7 +1696,7 @@ void TetherActor_BeginDetachedState(u32 a)
 
 void TetherActor_BeginDisplayPositionState(void)
 {
-    struct TetherActor *g = gUnk_02000488;
+    struct TetherActor *g = gTetherActor;
     if (g != 0) {
         struct ContactPosition *d;
         TetherActor_SetState(g, 8);
@@ -1710,7 +1710,7 @@ void TetherActor_BeginDisplayPositionState(void)
 
 u32 TetherActor_GetStatusFlags(void)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     u32 r;
     if (p)
         r = p->statusFlags;
@@ -1721,7 +1721,7 @@ u32 TetherActor_GetStatusFlags(void)
 
 u32 TetherActor_TestStatusFlags(u32 m)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (!p)
         return 0;
     if (p->statusFlags & m)
@@ -1733,36 +1733,36 @@ u32 TetherActor_TestStatusFlags(u32 m)
 
 u16 TetherActor_GetStatusTag(void)
 {
-    if (gUnk_02000488 == NULL)
+    if (gTetherActor == NULL)
         return 0;
-    return gUnk_02000488->statusTag;
+    return gTetherActor->statusTag;
 }
 
 void TetherActor_AddStatusFlags(u32 a, u32 b)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (p) {
         p->statusFlags |= a;
-        gUnk_02000488->statusTag = b;
+        gTetherActor->statusTag = b;
     }
 }
 
 void TetherActor_RemoveStatusFlags(u32 m)
 {
-    struct TetherActor *g = gUnk_02000488;
+    struct TetherActor *g = gTetherActor;
     if (g != 0) {
         u8 *q = &g->statusFlags;
         u32 z;
         u8 v = *q & ~m;
         z = 0;
         *q = v;
-        gUnk_02000488->statusTag = z;
+        gTetherActor->statusTag = z;
     }
 }
 
 u32 TetherActor_CopyPosition(struct ContactPosition *a)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     u32 r;
     if (p) {
         *a = p->position;
@@ -1774,7 +1774,7 @@ u32 TetherActor_CopyPosition(struct ContactPosition *a)
 
 void TetherActor_SetPosition(struct ContactPosition *a)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (p) {
         /* Engine display positions expose two words; coordinates use the aligned view. */
         struct ContactPosition **pp;
@@ -1790,7 +1790,7 @@ void TetherActor_SetPosition(struct ContactPosition *a)
 
 u32 TetherActor_BeginKindFourStateNine(void)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (!p)
         return 0;
     if (p->kind != 4)
@@ -1803,7 +1803,7 @@ u32 TetherActor_BeginKindFourStateNine(void)
 
 u32 TetherActor_BeginKindFourStateTen(void)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (!p)
         return 0;
     if (p->kind != 4)
@@ -1814,12 +1814,12 @@ u32 TetherActor_BeginKindFourStateTen(void)
 
 u32 TetherActor_RequestKindNineAction(u32 a, u32 b)
 {
-    if (gUnk_02000488) {
-        if (!ScenePanel_IsPresent(gUnk_02000488)) {
-            if (gUnk_02000488->kind == 9) {
-                gUnk_02000488->actionRequested = 1;
-                gUnk_02000488->actionAngle = b;
-                gUnk_02000488->actionMagnitude = a;
+    if (gTetherActor) {
+        if (!ScenePanel_IsPresent(gTetherActor)) {
+            if (gTetherActor->kind == 9) {
+                gTetherActor->actionRequested = 1;
+                gTetherActor->actionAngle = b;
+                gTetherActor->actionMagnitude = a;
                 return 1;
             }
         }
@@ -1829,7 +1829,7 @@ u32 TetherActor_RequestKindNineAction(u32 a, u32 b)
 
 u8 TetherActor_GetRequestStatus(void)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     u8 r;
     if (p)
         r = p->requestStatus;
@@ -1840,7 +1840,7 @@ u8 TetherActor_GetRequestStatus(void)
 
 u8 TetherActor_GetRequestMode(void)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     u8 r;
     if (p)
         r = p->requestMode;
@@ -1855,7 +1855,7 @@ u8 TetherActor_GetRequestMode(void)
 
 void TetherActor_BeginDirectedState(struct ContactPosition *position)
 {
-    struct TetherActor *actor = gUnk_02000488;
+    struct TetherActor *actor = gTetherActor;
     if (actor) {
         struct Player *player;
         struct TetherActor *savedActor;
@@ -1863,9 +1863,9 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
         s32 dz;
         actor->directedTarget = *position;
         TetherActor_SetState(actor, 15);
-        savedActor = gUnk_02000488;
+        savedActor = gTetherActor;
         savedActor->directedStep = 16;
-        player = gUnk_02000580[0];
+        player = gPlayers[0];
         {
             s32 playerX = player->position.x;
             struct ContactPosition *targetPosition = &savedActor->directedTarget;
@@ -1879,7 +1879,7 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
             angle = (angle + 16) & 255;
             asm("" : "+r"(angle));
             angle >>= 5;
-            target = gUnk_02000488;
+            target = gTetherActor;
             angle = (angle + 7) & 7;
             {
                 u32 offset = 0x46C;
@@ -1905,7 +1905,7 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
             }
         }
         {
-            register u8 *target asm("r0") = (u8 *)gUnk_02000488;
+            register u8 *target asm("r0") = (u8 *)gTetherActor;
             register u32 offset asm("r3");
             offset = 0x46A;
             asm("" : "+r"(offset));
@@ -1916,7 +1916,7 @@ void TetherActor_BeginDirectedState(struct ContactPosition *position)
 
 void TetherActor_WriteTransformToScript(void)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     u32 buf[2];
     if (p) {
         Script_ReadReference(buf);
@@ -1932,7 +1932,7 @@ void TetherActor_WriteTransformToScript(void)
 
 void TetherActor_SetTransformFromScript(void)
 {
-    struct TetherActor *actor = gUnk_02000488;
+    struct TetherActor *actor = gTetherActor;
     if (actor) {
         if (Script_SeekToKeyword('p')) {
             struct ContactPosition *position;
@@ -1982,14 +1982,14 @@ void TetherActor_SetTransformFromScript(void)
 
 void TetherActor_RequestPositionSample(void)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (p)
         p->destroyRequested = 1;
 }
 
 void TetherActor_StartAuxiliaryState(void)
 {
-    struct TetherActor *p = gUnk_02000488;
+    struct TetherActor *p = gTetherActor;
     if (p) {
         if (p->state != 5) {
             if (p->statusFlags == 0)
@@ -2791,21 +2791,21 @@ u32 TetherActor_SelectNextState(struct TetherActor *p)
         case 0:
         case 3:
         case 4:
-            if (gUnk_02000580[0]->tetherMode == 6)
+            if (gPlayers[0]->tetherMode == 6)
                 goto r1;
             break;
         case 1:
-            if (gUnk_02000580[0]->tetherMode == 6) {
+            if (gPlayers[0]->tetherMode == 6) {
             r1:
                 return 1;
             }
             return 0;
         case 0x10:
-            if (gUnk_02000580[0]->tetherMode == 6)
+            if (gPlayers[0]->tetherMode == 6)
                 goto r11;
             break;
         case 0x11:
-            if (gUnk_02000580[0]->tetherMode == 6) {
+            if (gPlayers[0]->tetherMode == 6) {
             r11:
                 return 0x11;
             }
@@ -2914,7 +2914,7 @@ void TetherActor_UpdateIdleState(struct TetherActor *p)
 void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
 {
     u8 *properties = cellProperties(
-        cellIndex_0804B6A4(gUnk_02000580[0]->position.x >> 8, gUnk_02000580[0]->position.z >> 8));
+        cellIndex_0804B6A4(gPlayers[0]->position.x >> 8, gPlayers[0]->position.z >> 8));
     u32 attributes = *(u16 *)(properties + 2);
     struct ContactPosition *position;
     s32 playerCell;
@@ -2923,8 +2923,7 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
     attributes &= 1;
     position = &actor->position;
     if (attributes == 0) {
-        s32 playerHeight =
-            surfaceHeight((const struct ContactPosition *)&gUnk_02000580[0]->position);
+        s32 playerHeight = surfaceHeight((const struct ContactPosition *)&gPlayers[0]->position);
         s32 height, difference;
         asm("" : "+r"(actor));
         {
@@ -2955,9 +2954,9 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
         s32 x;
         s32 z;
         u32 raw;
-        raw = (u16)gUnk_02000580[0]->position.x;
+        raw = (u16)gPlayers[0]->position.x;
         x = (s16)raw >> 8;
-        raw = (u16)gUnk_02000580[0]->position.z;
+        raw = (u16)gPlayers[0]->position.z;
         z = (s16)raw >> 8;
         playerCell = cellIndex_0804B6A4(x, z);
         raw = (u16)position->x;
@@ -2967,22 +2966,22 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
         actorCell = cellIndex_0804B6A4(x, z);
     }
     if (actorCell == playerCell + 1) {
-        gUnk_02000580[0]->position.x = ((position->x >> 8) << 8) + 2;
+        gPlayers[0]->position.x = ((position->x >> 8) << 8) + 2;
         return;
     }
     if (actorCell == playerCell - 1) {
-        gUnk_02000580[0]->position.x = (((position->x >> 8) + 1) << 8) - 2;
+        gPlayers[0]->position.x = (((position->x >> 8) + 1) << 8) - 2;
         return;
     }
     rowStride = *(s16 *)(gTerrainMap->cells + 4);
     if (actorCell == playerCell + rowStride)
-        gUnk_02000580[0]->position.z = ((actor->position.z >> 8) << 8) + 2;
+        gPlayers[0]->position.z = ((actor->position.z >> 8) << 8) + 2;
     else if (actorCell == playerCell - rowStride)
-        gUnk_02000580[0]->position.z = (((actor->position.z >> 8) + 1) << 8) - 2;
+        gPlayers[0]->position.z = (((actor->position.z >> 8) + 1) << 8) - 2;
     else {
         asm("" : : "r"(rowStride), "r"(playerCell));
-        gUnk_02000580[0]->position.x = position->x;
-        gUnk_02000580[0]->position.z = actor->position.z;
+        gPlayers[0]->position.x = position->x;
+        gPlayers[0]->position.z = actor->position.z;
     }
 }
 
@@ -3006,11 +3005,11 @@ static inline s32 TetherActor_Cosine150(s32 angle)
 
 void TetherActor_LimitPlayerDistance(struct TetherActor *actor)
 {
-    s32 angle = (((*gUnk_02000580)->facing + 1) & 7) << 5;
+    s32 angle = (((*gPlayers)->facing + 1) & 7) << 5;
     s32 offsetX = TetherActor_Cosine70(angle);
     s32 offsetZ = TetherActor_Sine70(angle);
-    s32 dx = (*gUnk_02000580)->position.x + offsetX - actor->position.x;
-    s32 dz = (*gUnk_02000580)->position.z + offsetZ - actor->position.z;
+    s32 dx = (*gPlayers)->position.x + offsetX - actor->position.x;
+    s32 dz = (*gPlayers)->position.z + offsetZ - actor->position.z;
     if (dx * dx + dz * dz > 22500) {
         s32 radialZ, targetX, targetZ;
         angle = Math_Atan2(dx, dz);
@@ -3019,10 +3018,10 @@ void TetherActor_LimitPlayerDistance(struct TetherActor *actor)
         radialZ = truncateShift(gUnk_086149C4[angle & 255] * 150, 12);
         targetX = actor->position.x - offsetX + dx;
         targetZ = actor->position.z - offsetZ + radialZ;
-        (*gUnk_02000580)->position.x = truncateShift((*gUnk_02000580)->position.x * 3 + targetX, 2);
-        (*gUnk_02000580)->position.z = truncateShift((*gUnk_02000580)->position.z * 3 + targetZ, 2);
+        (*gPlayers)->position.x = truncateShift((*gPlayers)->position.x * 3 + targetX, 2);
+        (*gPlayers)->position.z = truncateShift((*gPlayers)->position.z * 3 + targetZ, 2);
         TetherActor_BlockPlayerAcrossTerrain(actor);
-        (*gUnk_02000580)->colliderPosition = (*gUnk_02000580)->position;
+        (*gPlayers)->colliderPosition = (*gPlayers)->position;
     }
 }
 
@@ -3678,7 +3677,7 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
     TetherActor_SetEntry(actor, 0);
     if (++actor->stateFrame > 255) {
         TetherActor_RemoveAuxiliarySprite(actor);
-        TetherActor_SetState(gUnk_02000488, 0);
+        TetherActor_SetState(gTetherActor, 0);
         if (actor->interactionScriptId) {
             u32 script = actor->interactionScriptId;
             actor->interactionScriptId = 0;
@@ -4142,11 +4141,11 @@ s32 TetherActor_Tick(struct TetherActor *actor)
         return 0;
     }
     if (actor->kind == 9 && actor->requestMode == 0 && actor->onActionScriptId == 0 &&
-        gUnk_02000580[0] && gUnk_02000580[0]->kind == 1 && gUnk_02000580[0]->tetherMode != 24) {
-        Player_EnterKindFour(gUnk_02000580[0]);
-        gUnk_02000580[0]->tetherMode = 36;
-        gUnk_02000580[0]->tetherPhase = 0;
-        gUnk_02000580[0]->tetherFrame = 0;
+        gPlayers[0] && gPlayers[0]->kind == 1 && gPlayers[0]->tetherMode != 24) {
+        Player_EnterKindFour(gPlayers[0]);
+        gPlayers[0]->tetherMode = 36;
+        gPlayers[0]->tetherPhase = 0;
+        gPlayers[0]->tetherFrame = 0;
     }
     actor->shakeX = 0;
     actor->shakeZ = 0;
@@ -4176,7 +4175,7 @@ struct TetherActor *TetherActor_Destroy(struct TetherActor *p)
     Collider_Remove(&p->chargeCollider);
     TetherActor_RemoveSegments(p);
     TetherActor_RemoveAuxiliarySprite(p);
-    return gUnk_02000488 = 0;
+    return gTetherActor = 0;
 }
 
 s32 TetherActor_InitializeFromScript(struct TetherActor *actor, u32 entry, u32 unused)
@@ -4204,15 +4203,15 @@ s32 TetherActor_InitializeFromScript(struct TetherActor *actor, u32 entry, u32 u
         actor->onActionScriptId = Script_GetKeywordValue('b', 0);
     } else
         actor->requestMode = 0;
-    gUnk_02000488 = actor;
+    gTetherActor = actor;
     return 0;
 }
 
 struct TetherActor *TetherActor_CreateFromScript(u32 a, u32 b)
 {
     struct TetherActor *r;
-    if (gUnk_02000488 != 0)
-        return gUnk_02000488;
+    if (gTetherActor != 0)
+        return gTetherActor;
     r = Task_Create(9, 0x484);
     if (r) {
         Task_SetCallbacks(r, (void (*)(void *))TetherActor_Tick,

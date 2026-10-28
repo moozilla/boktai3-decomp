@@ -166,7 +166,7 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
                 }
                 if (!(tick & 7)) {
                     struct Vec pos;
-                    const u16 *table = gUnk_0203B400;
+                    const u16 *table = gRandomTable;
                     s32 rawX = RandomValue(table);
                     s32 px = actor->position.x;
                     // Not `% 512`: as the whole right-hand side, expand_divmod would

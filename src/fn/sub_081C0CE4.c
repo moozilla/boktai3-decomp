@@ -2,8 +2,8 @@
 #include "game_state.h"
 #include "input.h"
 #include "engine_globals.h"
+#include "ram.h"
 
-extern const u16 gUnk_0203B400[];
 extern const u8 gUnk_0824F960[];
 extern const u8 gUnk_0824F968[];
 extern const u8 gUnk_0824F970[];
@@ -52,7 +52,7 @@ static inline void sub081C0CE4_Enter(struct Sub081C0CE4Task *task, s32 state)
 static inline u8 sub081C0CE4_RandomDigit(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return Mod(gUnk_0203B400[gRandomIndex], 10) + '0';
+    return Mod(gRandomTable[gRandomIndex], 10) + '0';
 }
 
 #ifdef NONMATCHING
@@ -170,7 +170,7 @@ void sub_081C0CE4(struct Sub081C0CE4Task *task)
                 for (i = 0; i < 8; i++) {
                     gRandomIndex = (gRandomIndex + 1) & 1023;
                     Anim_LoadKeyframe(&task->entries[i], task->keyframeData,
-                                      (u16)Mod(gUnk_0203B400[gRandomIndex], 10), 1);
+                                      (u16)Mod(gRandomTable[gRandomIndex], 10), 1);
                     task->entries[i].flags8 &= ~1;
                 }
                 if (task->timer & 1)

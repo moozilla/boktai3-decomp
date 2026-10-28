@@ -5,10 +5,10 @@ s32 AreaEffect_ScaleLinkResourceGain(s32 gain)
 {
     u32 value;
     register u32 product asm("r2");
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         value = 0;
     else
-        value = gUnk_020004B4->value;
+        value = gLinkSession->value;
     product = value;
     product *= gain;
     return Div(product, 140);

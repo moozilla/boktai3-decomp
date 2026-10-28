@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "background_controller.h"
 
 // MATCHING_CONCESSION: register-pinning
 
@@ -26,7 +27,6 @@ struct SpatialCamera {
     u8 unknown0[0x44];
     s32 x, z;
 };
-extern struct SpatialCamera *gUnk_020004B8;
 s32 Div(s32, s32);
 u8 SpatialIndex_RemoveEntry(struct SpatialEntry *);
 void SpatialIndex_InsertEntry(struct SpatialEntry *);
@@ -47,8 +47,8 @@ void SpatialIndex_SetPosition(struct SpatialEntry *entry, s32 x, s32 y, s32 z)
     s32 bucket;
     if (!index)
         return;
-    entry->screenX = entry->x - gUnk_020004B8->x;
-    entry->screenZ = entry->z - gUnk_020004B8->z;
+    entry->screenX = entry->x - ((struct SpatialCamera *)gSceneCamera)->x;
+    entry->screenZ = entry->z - ((struct SpatialCamera *)gSceneCamera)->z;
     if (!index->bucketWidth)
         bucket = 0;
     else

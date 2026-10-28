@@ -50,7 +50,7 @@ void TentacleActor_ReactToContact(struct SceneActorBehaviorContactView *source,
         register long long direction asm("r1");
         difference.x = (u16)left->x - (u16)right->x;
         delta->y = (u16)left->y - (u16)right->y;
-        table = (u32)gUnk_0203B400;
+        table = (u32)gRandomTable;
         delta->z = (u16)left->z - (u16)right->z;
         distance = difference.x * difference.x + difference.z * difference.z;
         if (distance < FIELD(target, 0x8EC, u32)) {

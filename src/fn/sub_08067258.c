@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control.h"
+#include "player.h"
 struct SceneActorControlPlayerView {
     u8 unknown0[0x20];
     u32 flags;
@@ -10,7 +11,6 @@ struct SceneActorControlGameView {
     u8 unknown0[0x876];
     s16 parameter;
 };
-extern struct SceneActorControlPlayerView *gUnk_02000580[4];
 void Sprite_LinkToList(void *, u32);
 void Sprite_UnlinkFromList(void *, u32);
 void SceneActorControl_TickJitter(struct SceneActorControlManager *,
@@ -21,7 +21,7 @@ void SceneActorControl_TryActivateNearby(struct SceneActorControlSlot *);
 static inline u8 PlayerHasControlFlag(void)
 {
     u32 mask = 0x80000;
-    if (gUnk_02000580[0]->flags & mask)
+    if (((struct SceneActorControlPlayerView **)gPlayers)[0]->flags & mask)
         return 1;
     return 0;
 }
@@ -49,7 +49,7 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
     delta = (s16)(initialFlags & 0x10);
     if (delta) {
         s32 parameter = slot->parameter;
-        s32 current = gUnk_02000580[0]->parameter;
+        s32 current = ((struct SceneActorControlPlayerView **)gPlayers)[0]->parameter;
 
         if (current < parameter) {
             s32 wrapped = parameter - 256;

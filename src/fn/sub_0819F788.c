@@ -26,7 +26,6 @@ struct Hresvelgr {
     struct Vec offsets[2];
 };
 extern const struct Sequences gUnk_0824F72C;
-extern const u16 gUnk_0203B400[];
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 void Sound_PlaySong(u32);
@@ -69,7 +68,7 @@ void Hresvelgr_UpdateAlternatingVolley(struct Hresvelgr *actor)
         index = &gRandomIndex;
         i = 3;
         do {
-            register const u16 *table asm("r6") = gUnk_0203B400;
+            register const u16 *table asm("r6") = gRandomTable;
             register u32 *firstIndex asm("r3") = index;
             register u32 localIndex asm("r4");
             s32 random;

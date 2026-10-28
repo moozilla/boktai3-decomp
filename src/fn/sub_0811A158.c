@@ -2,6 +2,7 @@
 #include "game_state.h"
 #include "engine.h"
 #include "ram.h"
+#include "area_effect_link.h"
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
@@ -16,7 +17,6 @@ struct Vec16 {
 #define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
 #define U32(p, o) (*(u32 *)((u8 *)(p) + (o)))
 #define S32(p, o) (*(s32 *)((u8 *)(p) + (o)))
-extern u8 *gUnk_020004B4;
 extern s32 gUnk_020004E0[];
 extern const s16 gUnk_086149C4[];
 void Character_GetHeightAdjustedPosition(void *, struct Vec16 *);
@@ -54,14 +54,14 @@ static inline u8 Inactive(u8 *p)
 }
 static inline s32 LocalParticipant(void)
 {
-    u8 *p = gUnk_020004B4;
+    u8 *p = gLinkSession;
     if (!p)
         return -1;
     return S16(p, 0x18);
 }
 static inline s32 ParticipantStat(s32 slot)
 {
-    u8 *p = gUnk_020004B4;
+    u8 *p = gLinkSession;
     if (!p || slot < 0)
         return 0;
     return p[0x5C + slot];

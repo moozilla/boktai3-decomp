@@ -2,7 +2,6 @@
 #include "background_controller.h"
 #include "render.h"
 #define TilemapPanel_LoadScriptMap SceneTilemap_LoadLayoutFromScript
-#define gTilemapPanel              gUnk_020004B8
 struct TilemapPanel {
     u8 pad0[0x1c];
     const u8 *tileData;
@@ -19,7 +18,6 @@ struct TilemapPanel {
     s32 width, height;
     u16 *screenMap;
 };
-extern struct TilemapPanel *gUnk_020004B8;
 
 extern const u8 gUnk_0860B2D0[], gUnk_08607DB0[], gUnk_08606550[];
 extern const u8 gUnk_0860E3D0[], gUnk_0860A470[], gUnk_08609610[];
@@ -69,7 +67,7 @@ s32 TilemapPanel_Initialize(struct TilemapPanel *p)
     gBgRecords[2].y = 0;
     TilemapPanel_DrawRegion(p, 0, 0, 0, 0, 8, 1, 4, 20, 0, 0);
     p->value40 = 0x100;
-    gUnk_020004B8 = p;
+    gSceneCamera = p;
     SceneEffect_ExecuteCommandList(p->tiles, p->tileCount);
     p->value38 = 0xa000;
     return 0;

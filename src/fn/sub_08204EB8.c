@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 struct V {
     u16 x;
     u16 y;
@@ -9,7 +10,6 @@ struct R {
     u8 a;
     u8 b;
 } __attribute__((packed));
-extern struct R gUnk_0203B400[];
 void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);
 void EnemyD459_RecordDefeat(void *);
@@ -23,7 +23,7 @@ s32 EnemyD459_UpdateDeath(u8 *p)
             *q = *((struct V *)(p + 0x40));
             q->y += 200;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-            r = (*(&gUnk_0203B400[gRandomIndex])).a;
+            r = (*(&((struct R *)gRandomTable)[gRandomIndex])).a;
             SpriteParticle_CreateDefaultVariant4384(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
         }
         if ((*((s32 *)(p + 0x18))) == 12) {

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
-extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 
 void ScenePool_SetSpeedControlSchedule(u8 *p, s32 a, s32 lo, s32 hi)
@@ -13,7 +13,7 @@ void ScenePool_SetSpeedControlSchedule(u8 *p, s32 a, s32 lo, s32 hi)
     v = lo;
     if (n != 0) {
         gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-        v += Mod(*(const u16 *)((gRandomIndex << 1) + (u32)gUnk_0203B400), n);
+        v += Mod(*(const u16 *)((gRandomIndex << 1) + (u32)gRandomTable), n);
     }
     *(s32 *)(p + 0x170) = v;
 }

@@ -1,16 +1,15 @@
 #include "global.h"
 /* Provisional names and field interpretations; confidence low. */
 #include "area_effect_link.h"
-#define gLinkSession gUnk_020004B4
 struct LinkSessionData {
     u8 unknown0[0x84];
     s8 playerKinds[5];
 };
 static inline struct LinkSessionData *LinkSession_GetData(void)
 {
-    if (!gUnk_020004B4 || gUnk_020004B4->unavailable)
+    if (!gLinkSession || gLinkSession->unavailable)
         return 0;
-    return (struct LinkSessionData *)gUnk_020004B4->sessionData;
+    return (struct LinkSessionData *)gLinkSession->sessionData;
 }
 s32 LinkSession_ClearFirstPlayerKind(void *unused, s32 value)
 {

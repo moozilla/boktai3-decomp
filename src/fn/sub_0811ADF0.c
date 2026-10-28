@@ -1,13 +1,12 @@
 /* Provisional family and semantic names; inferred from static accesses and callers. */
 #include "global.h"
 #include "scene_pool.h"
+#include "ram.h"
 struct TerrainCoordinate {
     s32 x : 16;
     s32 y : 16;
     s32 z : 16;
 };
-extern u8 *gTerrainColumnIndices;
-extern u8 *gTerrainColumns;
 s32 Terrain_GetHeightAtPosition(struct ScenePoolVec32 *position)
 {
     struct TerrainCoordinate point;
@@ -18,7 +17,7 @@ s32 Terrain_GetHeightAtPosition(struct ScenePoolVec32 *position)
     column = point.x < 0 ? 0 : point.x;
     row = point.z < 0 ? 0 : point.z;
     index = column >> 5;
-    data = gTerrainColumns + gTerrainColumnIndices[index] * 160;
+    data = ((u8 *)gTerrainColumns) + gTerrainColumnIndices[index] * 160;
     cell = (column & 31) >> 3;
     offset = row >> 3;
     if (offset > 7)

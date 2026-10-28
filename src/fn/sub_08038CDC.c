@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 struct Entry {
     u8 bytes[4], a, b, flag, kind;
     u16 timer, pad;
@@ -11,7 +12,6 @@ struct P {
     struct Entry entry;
 };
 extern u32 gUnk_02000560;
-extern void *gUnk_02000580;
 void PaletteLevels_Reset(void);
 void WirelessExchange_CaptureLocalResult(struct P *);
 int WirelessExchange_SendPacket(struct P *, int, const u32 *, int);
@@ -39,7 +39,7 @@ void WirelessGameMenu_UpdateRoundResultExchange(struct P *p)
         {
             u32 mask = 4;
             if (!(gUnk_02000560 & mask))
-                PlayerCue_Stand(gUnk_02000580, -1);
+                PlayerCue_Stand((*(void **)gPlayers), -1);
         }
     }
     if (p->timer > 29 && test(&p->flags, 0xc0) == 0xc0) {

@@ -29,7 +29,7 @@ void RouteSpriteActor_TickHopToRandomPoint(struct RouteSpritePool *pool,
         actor->sprite.flags &= ~1;
         actor->moveTimer = 20;
         actor->animationEnded = 0;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         actor->heading = RandomWith(table);
         Polar(&actor->target, actor->heading, (RandomWith(table) & 0xFF) + 0x40);
         {

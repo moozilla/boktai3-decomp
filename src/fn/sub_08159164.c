@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "player.h"
 extern u8 *gGameState;
-extern u8 *gUnk_02000580[];
 s32 Div(s32, s32);
 static inline u32 Bonus(u8 *p, u32 mask)
 {
@@ -41,10 +41,10 @@ void Player_AddExperience(s32 input)
     s32 amount = input;
     if (*(s16 *)(gGameState + 0x5A8) == 6)
         return;
-    if (!Both(gUnk_02000580[0])) {
-        if (Bonus(gUnk_02000580[0], 0x8000))
+    if (!Both(gPlayers[0])) {
+        if (Bonus(gPlayers[0], 0x8000))
             amount = (amount * 3) >> 1;
-        else if (Bonus(gUnk_02000580[0], 0x10000))
+        else if (Bonus(gPlayers[0], 0x10000))
             amount = Div(amount, 2);
     }
     {

@@ -63,7 +63,7 @@ s32 SceneActor_AcquireCollisionTarget(struct SceneActorRegistryResetView *actor)
             goto collision;
         goto zero;
     } else {
-        d = actor->position.y - gUnk_02000580[0]->position.y;
+        d = actor->position.y - gPlayers[0]->position.y;
         if (d < 0)
             d = -d;
         if (d > 0x200)

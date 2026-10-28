@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_020004B4;
+#include "area_effect_link.h"
 
 s32 Div(s32, s32);
 void Camera_SnapToWithoutCompletion(void *);
@@ -17,9 +17,9 @@ struct Q {
 
 static inline s32 ControllerId(void)
 {
-    if (!gUnk_020004B4)
+    if (!((u8 *)gLinkSession))
         return -1;
-    return *(s16 *)(gUnk_020004B4 + 0x18);
+    return *(s16 *)(((u8 *)gLinkSession) + 0x18);
 }
 // confidence=low: smooths the camera anchor toward actor position and motion offset.
 #define Player_SmoothCameraAnchor sub_0823B7A4

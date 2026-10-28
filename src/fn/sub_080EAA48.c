@@ -6,6 +6,7 @@
 #include "scene_vec.h"
 #include "gba/macro.h"
 #include "gba/syscall.h"
+#include "player.h"
 
 struct Player;
 s32 Div(s32, s32);
@@ -19,8 +20,7 @@ void SceneHud_SetTimedState(u32, s32, u32, u32, u32, u32);
 void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
 u32 Octopus_GetAnimationStatus(struct SceneActorRegistryResetView *);
 void Octopus_UpdateActiveState(void);
-extern u8 *gUnk_02000580;
-extern s16 *gUnk_020004B4;
+extern s16 *gLinkSession;
 
 struct OctopusContext {
     u8 unknown0[0x628];

@@ -50,7 +50,7 @@ u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *i
             asm("" : "+r"(delta), "+r"(left));
             count = initialCount;
             {
-                register struct Player **initial asm("r0") = gUnk_02000580;
+                register struct Player **initial asm("r0") = gPlayers;
                 asm("" : "+r"(initial));
                 playerSlot = initial;
             }

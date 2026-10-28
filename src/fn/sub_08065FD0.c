@@ -289,7 +289,7 @@ gotManager:
         {
             u32 offset = gRandomIndex * 2;
             register const u16 *table asm("r2");
-            table = gUnk_0203B400;
+            table = gRandomTable;
             Mod(*(u16 *)(offset + (u32)table), 3);
         }
         {

@@ -26,7 +26,7 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
         rig->turnStep--;
     timer = &rig->turnDuration;
     if (--*timer == 0) {
-        register const u16 *table asm("r3") = gUnk_0203B400;
+        register const u16 *table asm("r3") = gRandomTable;
         u32 *cursor = &gRandomIndex;
         u32 mask;
         register u32 index asm("r1");
@@ -46,7 +46,7 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
     angle = rig->angle >> 4;
     timer = &rig->verticalStep;
     if (--*timer == 0) {
-        const u16 *table = gUnk_0203B400;
+        const u16 *table = gRandomTable;
         u32 *cursor = &gRandomIndex;
         u32 mask;
         register u32 index asm("r0");

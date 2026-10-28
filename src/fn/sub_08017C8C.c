@@ -16,7 +16,6 @@ struct Weather {
 };
 extern u8 *gGameState;
 extern u8 gSunClock[];
-extern u16 gUnk_0203B400[];
 void Palette_SetBrightnessMode(int);
 int Weather_TestFlags(int, int);
 void Weather_SetRandomDuration(void *);
@@ -30,7 +29,7 @@ static inline int randomValue(void)
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    return *(u16 *)((u8 *)gUnk_0203B400 + offset);
+    return *(u16 *)((u8 *)gRandomTable + offset);
 }
 static inline void flags(void)
 {

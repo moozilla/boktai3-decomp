@@ -25,8 +25,8 @@ struct LinkState {
     u8 unknown0[0x18];
     s16 player;
 };
-extern struct LinkState *gUnk_020004B4;
-extern struct Player *gUnk_02000580[4];
+extern struct LinkState *gLinkSession;
+extern struct Player *gPlayers[4];
 s32 Div(s32, s32);
 
 // Moves a secondary camera point (pos) by mode: follow the player, hold, pan to `target`,
@@ -41,11 +41,11 @@ void sub_08226CF8(struct Camera2 *camera)
     switch (camera->mode) {
         case 0:
             if (gEngineFlags & 0x800) {
-                struct LinkState *link = gUnk_020004B4;
+                struct LinkState *link = gLinkSession;
                 {
                     s16 index;
                     if (link && (index = link->player) >= 0) {
-                        struct Player **table = gUnk_02000580;
+                        struct Player **table = gPlayers;
                         struct Player **p = table + index;
                         if (*p) {
                             camera->pos.x = (*p)->x;

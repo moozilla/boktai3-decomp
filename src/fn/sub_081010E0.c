@@ -1,5 +1,6 @@
 #include "global.h"
 #include "contact_actor.h"
+#include "player.h"
 struct NamedObjectLift {
     u8 pad0[0x58];
     struct ContactPosition motion;
@@ -18,7 +19,6 @@ struct LiftPlayer {
     u8 pad[0x30];
     struct ContactPosition position;
 };
-extern struct LiftPlayer *gUnk_02000580;
 void NamedActor_PlayMovementSound(struct NamedObjectLift *);
 u32 Player_TestAttachmentFlags(struct LiftPlayer *, u32);
 void Player_SetPositionAndSave(struct LiftPlayer *, struct ContactPosition *);
@@ -56,7 +56,7 @@ void NamedObject_UpdateVerticalTravel(struct NamedObjectLift *object)
 {
     struct ContactPosition delta;
     Memory_Clear(&object->motion, 8);
-    Delta(&gUnk_02000580, &delta, &object->position);
+    Delta(&(*(struct LiftPlayer **)gPlayers), &delta, &object->position);
     if (object->entered) {
         NamedActor_PlayMovementSound(object);
         object->entered = 0;
@@ -69,10 +69,10 @@ void NamedObject_UpdateVerticalTravel(struct NamedObjectLift *object)
         if (object->upperHeight > object->position.y)
             return;
         object->position.y = object->upperHeight;
-        if (Player_TestAttachmentFlags(gUnk_02000580, 1)) {
-            delta = gUnk_02000580->position;
+        if (Player_TestAttachmentFlags((*(struct LiftPlayer **)gPlayers), 1)) {
+            delta = (*(struct LiftPlayer **)gPlayers)->position;
             ((struct ContactPosition *)&delta)->y = object->position.y;
-            Player_SetPositionAndSave(gUnk_02000580, &delta);
+            Player_SetPositionAndSave((*(struct LiftPlayer **)gPlayers), &delta);
             Or(0x100, &object->flags);
             object->motion.y = 0;
         }
@@ -85,10 +85,10 @@ void NamedObject_UpdateVerticalTravel(struct NamedObjectLift *object)
         if (object->lowerHeight < object->position.y)
             return;
         object->position.y = object->lowerHeight;
-        if (Player_TestAttachmentFlags(gUnk_02000580, 1)) {
-            delta = gUnk_02000580->position;
+        if (Player_TestAttachmentFlags((*(struct LiftPlayer **)gPlayers), 1)) {
+            delta = (*(struct LiftPlayer **)gPlayers)->position;
             ((struct ContactPosition *)&delta)->y = object->position.y;
-            Player_SetPositionAndSave(gUnk_02000580, &delta);
+            Player_SetPositionAndSave((*(struct LiftPlayer **)gPlayers), &delta);
             Or(0x100, &object->flags);
             object->motion.y = 0;
         }

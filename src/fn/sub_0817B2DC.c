@@ -24,9 +24,9 @@ void sub_0817B2DC(struct BlinkActor *p)
     struct ScenePanelReceiver *receiver;
     receiver = &p->receiver;
     i = 0;
-    if (i < p->receiver.count[gUnk_0200047C->bank]) {
+    if (i < p->receiver.count[gSceneEventDispatchState->bank]) {
         do {
-            struct ScenePanelCommandGlobals *globals = gUnk_0200047C;
+            struct ScenePanelCommandGlobals *globals = gSceneEventDispatchState;
             s32 op;
             struct BlinkCommand *command =
                 (struct BlinkCommand *)receiver->commands[globals->bank][i];
@@ -76,6 +76,6 @@ void sub_0817B2DC(struct BlinkActor *p)
             }
 
             i++;
-        } while (i < receiver->count[gUnk_0200047C->bank]);
+        } while (i < receiver->count[gSceneEventDispatchState->bank]);
     }
 }

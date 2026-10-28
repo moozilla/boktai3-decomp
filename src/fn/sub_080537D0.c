@@ -6,7 +6,7 @@ u32 InteractionMarker_IsPlayerNearby(struct InteractionMarker *marker)
     s32 x, z;
     if (state <= 2)
         return 0;
-    player = gUnk_02000580[0];
+    player = gPlayers[0];
     if (player->busy)
         return 0;
     x = player->position.x - marker->position.x;

@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
 #include "player.h"
-extern struct Player *gUnk_02000580[];
 s32 Script_GetActorIndex(void);
 s32 Script_ReadPositionOption(s16 *);
 void CellObject_Init(void *, void *);
@@ -10,7 +9,7 @@ void Player_StopActionSounds(struct Player *);
 void sub_0815A444(void)
 {
     s32 i = Script_GetActorIndex();
-    struct Player *p = gUnk_02000580[i];
+    struct Player *p = gPlayers[i];
     if (p && Script_ReadPositionOption((s16 *)&p->position)) {
         if (Script_SeekToKeyword('d')) {
             p->facing = Script_GetValue();

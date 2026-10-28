@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 u32 AnimData_FindEntry(u32);
 void ParticleSprite_Initialize(void *, u32, s32);
@@ -51,7 +51,7 @@ void SpiralBurst_InitParticles(u8 *p)
     struct SbE88 *e;
     {
         u32 next;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         next = gRandomIndex + 1;
         mask = 1023;
         gRandomIndex = next & mask;

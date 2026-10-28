@@ -1,6 +1,6 @@
 #include "global.h"
-extern u8 *gHomingManager;
+#include "ram.h"
 u32 HomingProjectile_GetActiveCount(void)
 {
-    return *(u32 *)(gHomingManager + 0x43c);
+    return *(u32 *)(((u8 *)gHomingManager) + 0x43c);
 }

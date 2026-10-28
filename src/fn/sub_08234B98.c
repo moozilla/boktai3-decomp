@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 struct RestoreOwner {
     u8 unk_00[0x424];
@@ -28,7 +29,6 @@ struct HealthRestoreEffect {
     u16 unk_272;
     void (*state)(struct HealthRestoreEffect *);
 };
-extern u16 gUnk_0203B400[];
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 void Sound_StopSong(u32);
@@ -60,7 +60,7 @@ void HealthRestoreEffect_UpdateRestoration(struct HealthRestoreEffect *p)
         Sound_StopSong(0x259);
         done = 1;
     }
-    table = gUnk_0203B400;
+    table = gRandomTable;
     p->x = p->targetX + Mod(rnd(table), 3) - 1;
     p->y = p->targetY + Mod(rnd(table), 3) - 1;
     if ((p->frame & 7) == 0) {

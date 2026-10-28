@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "engine.h"
-extern u8 *gUnk_02000580[];
+#include "player.h"
 s32 Math_Atan2(s32, s32);
 static inline u32 Flag(struct SceneActorRegistryResetView *a, u32 m, u32 off)
 {
@@ -123,9 +123,9 @@ void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollide
                         index = 2;
                     else
                         index = 3;
-                    player = gUnk_02000580[index];
+                    player = gPlayers[index];
                 } else
-                    player = gUnk_02000580[0];
+                    player = gPlayers[0];
                 if (!PlayerFlag(player, 0x20000)) {
                     u16 *p = (void *)(state + 0x688);
                     u32 value = 400;

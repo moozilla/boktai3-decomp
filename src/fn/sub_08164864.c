@@ -9,7 +9,7 @@ struct HudSlotSource {
     u8 unknown1A[0x5C - 0x1A];
     u8 counts[4];
 };
-extern struct HudSlotSource *gUnk_020004B4;
+extern struct HudSlotSource *gLinkSession;
 extern u8 *gGameState;
 u16 *Hud_GetTilemapCell(s32, u32, u32);
 void Sound_PlaySong(u32);
@@ -22,16 +22,16 @@ void Sound_PlaySong(u32);
 
 static inline s32 OwnerIndex(void)
 {
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         return -1;
-    return gUnk_020004B4->index;
+    return gLinkSession->index;
 }
 
 static inline u8 SlotCount(s32 slot)
 {
-    if (!gUnk_020004B4 || slot < 0)
+    if (!gLinkSession || slot < 0)
         return 0;
-    return gUnk_020004B4->counts[slot];
+    return gLinkSession->counts[slot];
 }
 
 static inline u32 testFlags(const u32 *flags, u32 mask)

@@ -1,9 +1,9 @@
 #include "scene_actor_control.h"
+#include "player.h"
 struct SceneActorControlPlayer {
     u8 unknown0[0x4F3];
     u8 parameter;
 };
-extern struct SceneActorControlPlayer *gUnk_02000580[4];
 void TetherActor_SetParameter(s32);
 void SceneActorControl_ClearUnusedParameters(struct SceneActorControlManager *p)
 {
@@ -18,7 +18,7 @@ void SceneActorControl_ClearUnusedParameters(struct SceneActorControlManager *p)
         }
     }
     if (!first)
-        gUnk_02000580[0]->parameter = 0xFF;
+        ((struct SceneActorControlPlayer **)gPlayers)[0]->parameter = 0xFF;
     if (!second)
         TetherActor_SetParameter(-1);
 }

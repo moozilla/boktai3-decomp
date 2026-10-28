@@ -37,7 +37,7 @@ struct Map {
     u8 pad8[28];
     u16 rows[1];
 };
-#define gUnk_0203B400 ((u16 *)0x0203B400)
+#define gRandomTable ((u16 *)0x0203B400)
 extern u32 gUnk_08604B90[];
 u8 *TerrainModifiers_FindCellOverride(int, int);
 void Effect_Remove(void *);
@@ -78,7 +78,7 @@ void ParticleGroup_UpdateBouncing(struct Manager *m, struct Group *g)
     alive = 0;
     i = 0;
     if (i < g->count) {
-        u16 *table = gUnk_0203B400;
+        u16 *table = gRandomTable;
         asm("" : "+r"(table));
         p = g->particles;
         asm("" : "+r"(p));

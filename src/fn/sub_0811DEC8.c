@@ -1,11 +1,11 @@
 #include "global.h"
+#include "ram.h"
 struct S {
     u32 a;
 };
-extern struct S *gScriptRecordTable;
 struct S *Modifier_GetTableTask(void)
 {
-    if (!gScriptRecordTable)
+    if (!(*(struct S **)&gScriptRecordTable))
         return 0;
-    return &gScriptRecordTable->a;
+    return &(*(struct S **)&gScriptRecordTable)->a;
 }

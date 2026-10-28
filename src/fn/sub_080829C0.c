@@ -44,7 +44,7 @@ void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactVi
     gRandomIndex = index;
     index *= 2;
     {
-        register const u16 *table asm("r2") = gUnk_0203B400;
+        register const u16 *table asm("r2") = gRandomTable;
         {
             u16 *entry = (void *)(index + (u32)table);
             sample = *entry;

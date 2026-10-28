@@ -1,5 +1,6 @@
 #include "global.h"
 #include "input.h"
+#include "area_effect_link.h"
 
 #ifdef NONMATCHING
 // fuzzy: 87.1%
@@ -31,7 +32,6 @@ struct LinkReadyState {
     u8 pad72[2];
     u8 missed[2];
 };
-extern u8 *gUnk_020004B4;
 s32 Serial_ReadLatestPacket(u16 *);
 u8 Registry1745_ConsumeStateEntry(void *);
 u8 Registry1745_HasParticipantCount(void *, s32);
@@ -84,8 +84,8 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
         p->timer = 0;
         p->requested = 0;
         p->countdown = 40;
-        if (gUnk_020004B4)
-            gUnk_020004B4[0x2c] = 0;
+        if (((u8 *)gLinkSession))
+            ((u8 *)gLinkSession)[0x2c] = 0;
         base = p->ready;
         q = &p->ready[1];
         do {
@@ -94,8 +94,8 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
     }
     if (!Registry1745_HasParticipantCount(p, 2)) {
         p->requested = 0;
-        if (gUnk_020004B4)
-            gUnk_020004B4[0x2c] = 0;
+        if (((u8 *)gLinkSession))
+            ((u8 *)gLinkSession)[0x2c] = 0;
         for (i = 0; i <= 1; i++) {
             p->presence[i] = 0;
             p->ready[i] = 0;
@@ -188,8 +188,8 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
                 }
                 allReady = 0;
                 p->ready[i] = 0;
-                if (gUnk_020004B4)
-                    gUnk_020004B4[0x2c] = 0;
+                if (((u8 *)gLinkSession))
+                    ((u8 *)gLinkSession)[0x2c] = 0;
             }
         }
 
@@ -201,8 +201,8 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
             }
 
         if (Mode_1(*p->selection, mask)) {
-            if (gUnk_020004B4)
-                gUnk_020004B4[0x2c] = 1;
+            if (((u8 *)gLinkSession))
+                ((u8 *)gLinkSession)[0x2c] = 1;
             if (p->countdown) {
                 p->countdown--;
                 if (((p->count != 2) || (p->count != readyCount)) || other)
@@ -225,8 +225,8 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
                         p->mode = k1;
                     }
                     p->requested = 0;
-                    if (gUnk_020004B4)
-                        gUnk_020004B4[0x2c] = 1;
+                    if (((u8 *)gLinkSession))
+                        ((u8 *)gLinkSession)[0x2c] = 1;
                 }
                 p->presence[0] = 3;
             } else {

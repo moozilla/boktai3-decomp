@@ -1,8 +1,8 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 #define ChildGroup_UpdateVerticalOscillation Ivy_UpdateBobbing
 #define gChildGroupRandomIndex               gRandomIndex
-#define gChildGroupRandomTable               gUnk_0203B400
 struct ChildGroup {
     u8 pad0[0x8D];
     u8 flags;
@@ -17,7 +17,6 @@ struct ChildGroup {
     u8 padD2E[0x27];
     u8 mode;
 };
-extern u16 gUnk_0203B400[];
 void sub_080F33BC(struct ChildGroup *);
 void Sword_UpdateSpinningLungeAttack(struct ChildGroup *);
 void Sword_UpdateThrustAttack(struct ChildGroup *);

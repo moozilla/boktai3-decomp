@@ -1,6 +1,6 @@
 #include "global.h"
+#include "background_controller.h"
 
-#define gActorDisplayCamera gUnk_020004B8
 struct WorldPosition {
     s32 x, y, z;
 };
@@ -32,7 +32,6 @@ struct DisplayCamera {
 struct PackedAnchor {
     s16 x, y, z;
 };
-extern struct DisplayCamera *gUnk_020004B8;
 void SceneActors_UpdateDelayedMovement(void);
 void BgGfx_LoadTilemapAtPosition(u32, u32, u32);
 void ActorDisplay_UpdateScreenAnchor(struct ActorDisplay *actor)
@@ -47,7 +46,7 @@ void ActorDisplay_UpdateScreenAnchor(struct ActorDisplay *actor)
         if (position->x < threshold)
             position->x = limit;
         screen = &actor->screen;
-        screen->x = (position->x >> 12) - gUnk_020004B8->x;
+        screen->x = (position->x >> 12) - ((struct DisplayCamera *)gSceneCamera)->x;
         {
             s32 y = position->y;
             s32 z = position->z;

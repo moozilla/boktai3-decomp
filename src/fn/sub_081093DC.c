@@ -1,9 +1,9 @@
 #include "global.h"
-extern u8 *gUnk_020004B4;
+#include "area_effect_link.h"
 
 bool32 sub_081093DC(void)
 {
-    if (gUnk_020004B4 == 0 || gUnk_020004B4[0x1e] == 0)
+    if (((u8 *)gLinkSession) == 0 || ((u8 *)gLinkSession)[0x1e] == 0)
         return FALSE;
     return TRUE;
 }

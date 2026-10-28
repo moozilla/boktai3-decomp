@@ -1,4 +1,5 @@
 #include "global.h"
+#include "area_effect_link.h"
 struct SceneMenuRecord {
     u8 data[0x3E];
     u16 checksum;
@@ -16,7 +17,6 @@ struct SceneMenuPeer {
     u8 pad0[0x18];
     s16 state;
 };
-extern struct SceneMenuPeer *gUnk_020004B4;
 u8 Registry1745_ConsumeStateEntry(struct SceneMenu *);
 void Registry1745_ClearParticipantCounters(struct SceneMenu *);
 void ClockPanel_CaptureTime(struct SceneMenu *);
@@ -55,7 +55,8 @@ s32 SceneMenu_UpdateRecords(struct SceneMenu *object)
         return -1;
     }
     if (HasRecordInput(p)) {
-        if (gUnk_020004B4 && (gUnk_020004B4->state == 0)) {
+        if ((*(struct SceneMenuPeer **)&gLinkSession) &&
+            ((*(struct SceneMenuPeer **)&gLinkSession)->state == 0)) {
             Registry1745_SetState(p, 7, LinkMenu_UpdateSelection);
         } else {
             Registry1745_SetState(p, 8, LinkMenu_WaitSelectionMode);
@@ -76,7 +77,8 @@ s32 SceneMenu_UpdateRecords(struct SceneMenu *object)
             i++;
         } while (i < p->count);
     }
-    if (((completed == p->count) && gUnk_020004B4) && (gUnk_020004B4->state == 0)) {
+    if (((completed == p->count) && (*(struct SceneMenuPeer **)&gLinkSession)) &&
+        ((*(struct SceneMenuPeer **)&gLinkSession)->state == 0)) {
         p->flags = 0x1800;
     }
 }

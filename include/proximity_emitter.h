@@ -25,7 +25,7 @@ struct ProximityEmitterPlayer {
     u8 unknown0[0x255];
     u8 activation;
 };
-extern struct ProximityEmitterPlayer *gUnk_02000488;
+extern struct ProximityEmitterPlayer *gTetherActor;
 struct ContactPosition *TetherActor_GetPosition(void);
 void TetherActor_RequestPaletteBlend(u32);
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);

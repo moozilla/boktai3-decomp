@@ -34,7 +34,7 @@ static inline u16 Debris_EarlyRandom(void)
 }
 static inline u16 Debris_NextRandom(void)
 {
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return table[gRandomIndex];
 }

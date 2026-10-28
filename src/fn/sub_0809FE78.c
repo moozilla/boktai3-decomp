@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
+#include "player.h"
 
-extern u8 *gUnk_02000580;
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Callback_InvokeActor(void *, void *);
@@ -84,7 +84,7 @@ void Crow_ApproachPlayer(struct SceneActorRegistryResetView *actor)
             SetState(actor, 0, 0, 1);
             return;
         }
-        pp = &gUnk_02000580;
+        pp = &gPlayers;
         Delta(&delta, &actor->position, (struct ContactPosition *)(*pp + 0x30));
         if (Magnitude(Normalize(Math_Atan2(delta.x, delta.z) - actor->direction)) > 0x40) {
             SetState(actor, 0, 0, 1);

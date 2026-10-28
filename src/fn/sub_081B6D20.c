@@ -1,6 +1,7 @@
 #define gEffectSineTable gUnk_086149C4
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct EffectPosition {
     s16 x, y, z, pad;
@@ -27,7 +28,6 @@ struct PooledEffect {
     struct EffectCollider collider, healthCollider;
 };
 extern const s16 gUnk_086149C4[];
-extern const u8 gUnk_0203B400[];
 struct EffectPosition *SceneActors_GetAvailablePosition(void);
 s32 Math_Atan2(s32, s32);
 void Vec16_Lerp(void *, void *, void *, int, int);

@@ -165,7 +165,6 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
 void *SpriteProjectile_EnsurePool(void);
 struct Projectile *SpritePool10_AllocateSlot(void *);
 extern u32 gUnk_02000560;
-extern const u16 gUnk_0203B400[];
 void AnimData_Load(void *, u32);
 void *ScriptProc_Start(u32, u16);
 void Sprite_Init(void *, void *, s32);
@@ -175,7 +174,7 @@ void sub_081274F4(void *, s32, s32, s32, s32);
 static inline u32 Rand(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    return gUnk_0203B400[gRandomIndex];
+    return gRandomTable[gRandomIndex];
 }
 static inline u32 Busy(u32 mask)
 {

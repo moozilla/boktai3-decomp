@@ -2,9 +2,9 @@
 
 #include "scene_actor_control_helpers.h"
 #include "engine.h"
-extern const u16 gUnk_0203B400[];
+#include "player.h"
+#include "ram.h"
 extern const s16 gUnk_086149C4[];
-extern u8 *gUnk_02000580[];
 s32 Math_Atan2(s32, s32);
 s32 Callback_InvokeActor(void *, void *);
 void CpuSet(const void *, void *, u32);
@@ -120,7 +120,7 @@ void sub_080844B8(struct SceneActorRegistryResetView *actor)
             u32 angle;
             struct ContactPosition target;
             angle = (u8)Rand();
-            target = ((struct PlayerPositionView *)gUnk_02000580[0])->position;
+            target = ((struct PlayerPositionView *)gPlayers[0])->position;
             target.x += Shift(gUnk_086149C4[angle], 3);
             target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 3);
             SceneActorControl_InitPositionCurveEndpoints(actor, &target);
@@ -138,7 +138,7 @@ void sub_080844B8(struct SceneActorRegistryResetView *actor)
         body->timer = timer;
         if ((timer << 16) == 0) {
             SceneActorControl_StartPositionCurve(
-                actor, &((struct PlayerPositionView *)gUnk_02000580[0])->position);
+                actor, &((struct PlayerPositionView *)gPlayers[0])->position);
             {
                 u32 mask = 8;
                 u32 *flags = &body->flags;
@@ -154,7 +154,7 @@ void sub_080844B8(struct SceneActorRegistryResetView *actor)
                 struct ContactPosition target;
                 u32 angle;
                 angle = (u8)Rand();
-                target = ((struct PlayerPositionView *)gUnk_02000580[0])->position;
+                target = ((struct PlayerPositionView *)gPlayers[0])->position;
                 target.x += Shift(gUnk_086149C4[angle], 3);
                 target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 3);
                 SceneActorControl_InitPositionCurveEndpoints(actor, &target);

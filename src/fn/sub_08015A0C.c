@@ -2,12 +2,12 @@
 #include "breakable_prop.h"
 #include "scene_vec.h"
 #include "engine.h"
+#include "ram.h"
 
-extern const u16 gUnk_0203B400[];
 static inline u16 Particles_NextRandom(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gUnk_0203B400[gRandomIndex];
+    return gRandomTable[gRandomIndex];
 }
 #ifdef NONMATCHING
 // fuzzy: 64.0%

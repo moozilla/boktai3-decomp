@@ -130,7 +130,7 @@ void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *i
                 stateTest = 0;
                 zeroWord = 0;
                 *flags = mask | loaded;
-                SceneActorControl_StartPositionCurve(actor, &gUnk_02000580[0]->position);
+                SceneActorControl_StartPositionCurve(actor, &gPlayers[0]->position);
                 {
                     u32 phase = 2;
                     register u32 offset asm("r2") = 0x2A8;

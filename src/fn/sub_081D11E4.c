@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 struct TransitionParticleState {
     u16 x, y, z;
@@ -21,7 +22,6 @@ struct TransitionEffect {
     u8 unk_66[0x16];
     struct TransitionParticle particles[8];
 };
-extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 
 /* Negative angles scatter a particle around the origin; other angles start at the origin. */
@@ -38,7 +38,7 @@ void SceneNpc_SpawnTransitionParticle(struct TransitionEffect *effect, s32 angle
             state->active = 1;
             state->angle = angle;
             state->age = 0;
-            table = gUnk_0203B400;
+            table = gRandomTable;
             seed = &gRandomIndex;
             {
                 u32 index = *seed + 1;

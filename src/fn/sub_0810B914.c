@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "area_effect_link.h"
 struct Registry1745Settings {
     u8 pad0[0x15C];
     u32 field15C;
@@ -46,7 +47,6 @@ struct Registry1745 {
     u8 padDC[4];
     struct Registry1745Settings settings;
 };
-extern struct Registry1745 *gUnk_020004B4;
 void Task_LinkToPriorityList(void *);
 void sub_08223180(void);
 void Registry1745_ResetTransferCounters(void *);
@@ -57,12 +57,12 @@ void Hud_SetMode(s32);
 void SessionMenu_Destroy(void *);
 void ScriptPanel_ConfirmSelection(void);
 void Registry1745_RunSession(void);
-/* Registry routine 1745: creates the singleton at gUnk_020004B4 (0x268
+/* Registry routine 1745: creates the singleton at gLinkSession (0x268
    bytes) from the script options; returns the existing one if there is one,
    or 0 when a required option is missing. */
 struct Registry1745 *Registry1745_Create(void)
 {
-    struct Registry1745 *existing = gUnk_020004B4;
+    struct Registry1745 *existing = gLinkSession;
     void *m;
     struct Registry1745 *p;
     struct Registry1745Settings *settings;
@@ -79,7 +79,7 @@ struct Registry1745 *Registry1745_Create(void)
     Memory_Clear(m, 0x268);
     p = m;
     settings = &p->settings;
-    gUnk_020004B4 = p;
+    gLinkSession = p;
     Task_SetCallbacks(p, 0, SessionMenu_Destroy);
     {
         s32 one = 1;

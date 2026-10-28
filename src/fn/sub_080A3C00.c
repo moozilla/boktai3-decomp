@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 inline static u8 blocked2048(u8 *c)
 {
     u32 mask;
@@ -26,10 +27,9 @@ zero:
     return 0;
 }
 
-extern u8 *gUnk_02000580;
 void Spider_ClearGroupFlag(u8 *s)
 {
-    if (blocked2048(s) == 0 && *(s8 *)(gUnk_02000580 + 0x4F3) < 0) {
+    if (blocked2048(s) == 0 && *(s8 *)((*(u8 **)gPlayers) + 0x4F3) < 0) {
         u8 *q = *(u8 **)(s + 0x3D0);
         u16 *flags = (u16 *)(q + 0x62C);
         u32 mask = -3;

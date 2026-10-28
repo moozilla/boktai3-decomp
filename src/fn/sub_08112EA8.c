@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "actor_attachment_state.h"
+#include "background_controller.h"
 struct Visual {
     u8 unknown0[0x1c];
     struct ContactSwarmSprite sprite;
@@ -24,7 +25,6 @@ struct Camera {
 struct Packed {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };
-extern struct Camera *gUnk_020004B8;
 s32 Div(s32, s32);
 s32 Terrain_GetCellClearance(void *);
 void SceneDebris_OnMotionEnd(struct Debris *);
@@ -203,8 +203,8 @@ void SceneDebris_UpdateBouncingMotion(struct Debris *p)
         p->velocity.y = Div(-p->velocity.y * p->restitution, 10);
         p->velocity.x = Div(p->velocity.y * p->restitution, 10);
     }
-    projected.x = p->position.x - gUnk_020004B8->x;
-    projected.y = p->position.y - gUnk_020004B8->y;
+    projected.x = p->position.x - gSceneCamera->x;
+    projected.y = p->position.y - gSceneCamera->y;
     projected.z = 0;
     if (!p->visualType) {
         struct Visual *visual = p->visual;

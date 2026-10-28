@@ -58,7 +58,7 @@ void NamedObject_RegisterFollowCells(struct NamedObject *objectArg)
     u16 *flags;
     u8 *registration;
     if (!manager || object->name != manager->followName || object->kind == 2 ||
-        *((u8 *)gUnk_02000580[0] + 0x457) != 6 || (s16)object->state != 3) {
+        *((u8 *)gPlayers[0] + 0x457) != 6 || (s16)object->state != 3) {
         ActorGroup_ReleaseMember(object);
         return;
     }

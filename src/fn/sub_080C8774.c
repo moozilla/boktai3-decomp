@@ -2,6 +2,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+#include "player.h"
 // confidence=low: Golem initialization installs this displacement recovery callback.
 #ifdef NONMATCHING
 // fuzzy: 95.8%
@@ -15,7 +16,6 @@ s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPositio
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
 void sub_0807E334(struct SceneActorRegistryResetView *);
 void Sound_PlaySong(u32);
-extern u8 *gUnk_02000580[4];
 
 #define F8(a, o)  (*(u8 *)((u8 *)(a) + (o)))
 #define F16(a, o) (*(u16 *)((u8 *)(a) + (o)))
@@ -197,7 +197,7 @@ static inline u32 RandomDirectionExcept(u32 current)
 {
     s32 i;
     for (i = 0; i <= 3; i++) {
-        u32 d = Random(gUnk_0203B400, &gRandomIndex, 0x3FF, 3) << 6;
+        u32 d = Random(gRandomTable, &gRandomIndex, 0x3FF, 3) << 6;
         if (d != current)
             return d;
     }
@@ -247,12 +247,12 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
         slot = PlayerSlot(target);
         if (slot < 0)
             goto fail;
-        cell = *(u16 *)((u8 *)PTR(gUnk_02000580[slot], 0x40) + 6);
+        cell = *(u16 *)((u8 *)PTR(gPlayers[slot], 0x40) + 6);
     } else {
         cell = CellIndex((struct ContactPosition *)(*targetp + 0xC));
         slot = 0;
     }
-    if (cell == actor->terrainCell || Flag32(gUnk_02000580[slot], 0x20000, 0x20)) {
+    if (cell == actor->terrainCell || Flag32(gPlayers[slot], 0x20000, 0x20)) {
         u16 busy = Flag16(actor, 0x400, 0x2D4);
         u16 blocked;
         if (busy)
@@ -366,7 +366,7 @@ void Golem_ResumeBehaviorAfterDisplacement(struct SceneActorRegistryResetView *a
                 u16 mask = 4;
                 *flags = mask | *flags;
             }
-            actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
+            actor->fieldDC = (u32)gPlayers[0] + 0x24;
             if (Chase(actor) || TryMove(actor, PTR(group, 0x1FC), &actor->position,
                                         (struct ContactPosition *)(actor->fieldDC + 12))) {
                 void *target = PTR(group, 0x48);
@@ -375,7 +375,7 @@ void Golem_ResumeBehaviorAfterDisplacement(struct SceneActorRegistryResetView *a
             } else
                 goto invoke;
         } else {
-            actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
+            actor->fieldDC = (u32)gPlayers[0] + 0x24;
             {
                 u32 mask = 0x90;
                 actor->flags2CC |= mask;

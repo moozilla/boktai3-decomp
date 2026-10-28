@@ -4,6 +4,7 @@
 /* tentative: per-frame active state: counts down, re-arms the collider and restarts the animation */
 
 #include "actor_attachment_sprite_playback.h"
+#include "background_controller.h"
 
 struct BurstPos {
     s32 x, y, z, w;
@@ -30,7 +31,6 @@ struct BurstEntry {
     u8 state;
     u32 value;
 };
-extern struct BurstCamera *gUnk_020004B8;
 extern const u8 gUnk_086108E8[];
 void Memory_Clear(void *, s32);
 void Collider_SetFixedPositionWithYOffset(void *, struct BurstPos *, u32);
@@ -67,7 +67,7 @@ skip: {
     struct BurstPos *pos = &p->position;
     struct ContactPosition *dst = &p->sprite.position;
     u32 yOff = p->yOffset;
-    dst->x = (pos->x >> 12) - gUnk_020004B8->x;
+    dst->x = (pos->x >> 12) - ((struct BurstCamera *)gSceneCamera)->x;
     dst->y = ((s32)(pos->z + (pos->y + yOff)) >> 12) + 0x60;
     dst->z = pos->z >> 12;
 }

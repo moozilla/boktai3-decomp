@@ -2,7 +2,6 @@
 #include "ram.h"
 #include "engine_globals.h"
 // fix.py best version (reprinted C)
-extern u16 gUnk_0203B400[];
 u8 *ScriptedParticle_EnsurePool(void);
 u8 *ScriptedParticle_AllocateSlot(u8 *);
 void AnimData_Load(u8 *, u32);
@@ -52,7 +51,7 @@ void SpriteParticle_Create(u32 *a, s32 b, s32 c, s32 d, s32 e, u32 f, s32 g, s32
     Sprite_Init(s, resource, 0);
     Anim_SetSequence(s + 0x48, *((void **)(context + 0x18)), (u16)p, (u8)q, zero);
     AnimData_SelectPaletteBank(resource, r);
-    table = gUnk_0203B400;
+    table = gRandomTable;
     rng = &gRandomIndex;
     mask = 0x3FF;
     *rng = ((*rng) + 1) & 0x3FF;

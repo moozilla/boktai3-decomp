@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "engine.h"
+#include "ram.h"
 struct Fragment {
     u32 flags;
     u8 active, unknown5[3];
@@ -31,7 +32,6 @@ struct Pool {
     u32 used;
 };
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void FragmentEffect_SpawnRandomParticle(struct ContactPosition *);

@@ -6,7 +6,7 @@ struct ScenePanelCommandGlobals {
     u8 unknown0[0x24];
     u8 bank;
 };
-extern struct ScenePanelCommandGlobals *gUnk_0200047C;
+extern struct ScenePanelCommandGlobals *gSceneEventDispatchState;
 u32 SceneMessages_SetPendingTrigger(void *, void *);
 void SceneMessages_UnregisterReceiver(void *);
 s32 SceneMessages_RegisterReceiver(void *, u32, u32);

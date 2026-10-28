@@ -3,6 +3,7 @@
 // confidence=low: planar debris lifetime follows completion of its visual animation.
 /* ROM copies an uninitialized projected depth halfword; keep it uninitialized to match. */
 #include "actor_attachment_state.h"
+#include "background_controller.h"
 struct Visual {
     u8 unknown0[0x1c];
     struct ContactSwarmSprite sprite;
@@ -26,7 +27,6 @@ struct Camera {
 struct Packed {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };
-extern struct Camera *gUnk_020004B8;
 s32 Div(s32, s32);
 s32 Terrain_GetCellClearance(void *);
 void SceneDebris_OnMotionEnd(struct Debris *);
@@ -180,8 +180,8 @@ void SceneDebris_UpdateAnimatedMotion(struct Debris *p)
     }
     p->position.x = p->position.x + p->velocity.x;
     p->position.y = p->position.y + p->velocity.y;
-    projected.x = p->position.x - gUnk_020004B8->x;
-    projected.y = p->position.y - gUnk_020004B8->y;
+    projected.x = p->position.x - gSceneCamera->x;
+    projected.y = p->position.y - gSceneCamera->y;
     output = (void *)&projected;
     if (!p->visualType) {
         struct Visual *visual = p->visual;

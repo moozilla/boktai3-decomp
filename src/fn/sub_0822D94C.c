@@ -1,6 +1,6 @@
 #include "global.h"
+#include "player.h"
 extern u8 *gGameState;
-extern void *gUnk_02000580;
 struct EquipEntry {
     u32 w[4];
 };
@@ -26,10 +26,10 @@ void Inventory_SwapEquipmentEntries(s32 a, s32 b)
         s16 *q = (s16 *)(i * 2 + (u32)g + 0x68);
         if (*q == a) {
             *q = b;
-            Player_SetWeaponInstance(gUnk_02000580, eb);
+            Player_SetWeaponInstance((*(void **)gPlayers), eb);
         } else if (*q == b) {
             *q = a;
-            Player_SetWeaponInstance(gUnk_02000580, ea);
+            Player_SetWeaponInstance((*(void **)gPlayers), ea);
         }
     }
     n = 0;

@@ -2,7 +2,6 @@
 #include "scene_actor_reset.h"
 #include "player.h"
 
-#define gScenePlayers gUnk_02000580
 static inline void SubtractPosition(s16 *delta, const struct SceneVec *a,
                                     const struct ContactPosition *b)
 {
@@ -37,7 +36,7 @@ void *SceneActorTarget_FindNearbyPlayer(struct SceneActorRegistryResetView *acto
     excluded = 0x1000;
     difference = delta;
     position = &actor->position;
-    players = gScenePlayers;
+    players = gPlayers;
     count = 0;
     do {
         struct Player *player = *players;

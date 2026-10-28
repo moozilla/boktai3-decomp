@@ -3,10 +3,9 @@
 #include "player.h"
 #include "game_state.h"
 #include "engine.h"
+#include "ram.h"
 
 #define gRandomTableIndex gRandomIndex
-#define gRandomTable      gUnk_0203B400
-extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void Player_CallEventScript(struct Player *, u32);
 void *PlayerBurst_Create(void *);
@@ -16,7 +15,7 @@ static inline u16 nextRandom(void)
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    table = (u32)gUnk_0203B400;
+    table = (u32)gRandomTable;
     offset += table;
     return *(const u16 *)offset;
 }

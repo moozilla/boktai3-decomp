@@ -2,7 +2,6 @@
 #define LinkMenu_SetState          Registry1745_SetState
 #define LinkMenu_CheckSession      Registry1745_CheckSessionReady
 #define LinkMenu_ResetSelection    Registry1745_BeginShutdown
-#define gLinkMenuState             gUnk_020004B4
 #include "global.h"
 #include "area_effect_link.h"
 #include "render.h"

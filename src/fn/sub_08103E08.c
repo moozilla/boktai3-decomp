@@ -1,7 +1,7 @@
 #include "global.h"
 #include "ram.h"
+#include "player.h"
 
-extern u8 *gUnk_02000580[];
 u8 *NamedObject_GetFollowTarget(void);
 void Player_ClearAttachmentFlags(u8 *, s32);
 static inline void clearBits(s16 *p, s32 mask)
@@ -17,10 +17,10 @@ void NamedObject_ReleaseFromScript(void)
     u8 *e = NamedObject_GetFollowTarget();
     *(u32 *)(manager + 0x1370) = 0;
     {
-        u8 *player = gUnk_02000580[0];
+        u8 *player = ((u8 **)gPlayers)[0];
         *(u8 **)(player + 0x40) = player + 0x284;
         Player_ClearAttachmentFlags(player, 1);
     }
     clearBits((s16 *)(e + 0xB8), ~8);
-    gUnk_02000580[0][0x701] &= 0xFE;
+    ((u8 **)gPlayers)[0][0x701] &= 0xFE;
 }

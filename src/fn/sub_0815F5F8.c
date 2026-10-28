@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct TargetPosition {
     s16 x, y, z;
@@ -17,7 +18,6 @@ struct TargetRegistry {
     u8 unk_00[0x18];
     struct TargetEntry *first;
 };
-extern struct TargetRegistry *gSceneLinkList;
 s32 Math_Atan2(s32, s32);
 
 static inline s32 AngleDifference(const s32 angle, const s32 direction)
@@ -33,9 +33,9 @@ struct TargetEntry *TargetRegistry_FindNearestInCone(struct TargetPosition *posi
     struct TargetEntry *best;
     s32 distance;
     s32 otherAngle;
-    if (!gSceneLinkList)
+    if (!((struct TargetRegistry *)gSceneLinkList))
         return 0;
-    entry = gSceneLinkList->first;
+    entry = ((struct TargetRegistry *)gSceneLinkList)->first;
     best = 0;
     distance = range * range;
     if (entry) {

@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "actor_attachment_state.h"
+#include "background_controller.h"
 struct FixedPosition {
     s32 x, y, z;
 };
@@ -31,7 +32,6 @@ struct Camera {
     u8 unknown0[0x44];
     s32 x;
 };
-extern struct Camera *gUnk_020004B8;
 s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
 {
     struct MarkerPool *base = pool;
@@ -61,7 +61,7 @@ s32 ActorMarkerPool_UpdateMarkers(struct MarkerPool *pool)
                 const struct FixedPosition *read = *anchorSlot;
                 anchor = read;
             }
-            cursor->sprite.position.x = (anchor->x >> 12) - gUnk_020004B8->x;
+            cursor->sprite.position.x = (anchor->x >> 12) - gSceneCamera->x;
             anchor = *anchorSlot;
             cursor->sprite.position.y = ((anchor->z + anchor->y) >> 12) + 0x5c;
             sprite = sprites;

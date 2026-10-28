@@ -1,4 +1,5 @@
 #include "global.h"
+#include "area_effect_link.h"
 struct LinkPanel {
     u8 pad0[0xf44];
     u32 script;
@@ -11,7 +12,6 @@ struct LinkPanel {
     u8 delay;
     u8 connection;
 };
-extern u8 *gUnk_020004B4;
 s32 LinkPanel_GetConnectionStatus(struct LinkPanel *);
 s32 Registry1745_GetSessionState(void);
 void ScrollingDialogue_ClearScript(void);
@@ -21,16 +21,16 @@ void ScrollingDialogue_SetScript(const u8 *);
 void ScrollingDialogue_SetNumberArgument(s32, s32);
 static inline u8 connected(void)
 {
-    if (gUnk_020004B4 && gUnk_020004B4[0x1d])
+    if ((*(u8 **)&gLinkSession) && (*(u8 **)&gLinkSession)[0x1d])
         return 1;
     return 0;
 }
 static inline s32 peerStatus(s32 i)
 {
-    if (!gUnk_020004B4)
+    if (!(*(u8 **)&gLinkSession))
         return 0;
     {
-        u8 *statuses = gUnk_020004B4 + 0x64;
+        u8 *statuses = (*(u8 **)&gLinkSession) + 0x64;
         return statuses[i];
     }
 }

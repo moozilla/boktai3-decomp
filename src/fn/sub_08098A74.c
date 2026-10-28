@@ -3,7 +3,7 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_route.h"
-extern u8 *gUnk_02000580[];
+#include "player.h"
 static inline u8 Take(u8 *p)
 {
     if (*p) {
@@ -107,7 +107,7 @@ void Ghost_FollowDrainedPlayer(struct SceneActorRegistryResetView *actor)
     u8 taken = Take(&actor->field2B1);
     if (taken) {
         Control(actor, Ghost_UpdateEnergyDrainAnimation, 0x23);
-        SaveInitialPlayer((void *)(context + 0x5EC), gUnk_02000580);
+        SaveInitialPlayer((void *)(context + 0x5EC), ((u8 **)gPlayers));
         {
             u32 mask = 0x100;
             *flags = mask | (*flags);
@@ -122,14 +122,14 @@ void Ghost_FollowDrainedPlayer(struct SceneActorRegistryResetView *actor)
         u32 scale = 64;
         actor->field1EA = scale;
         Delta(&delta, (struct ContactPosition *)(context + 0x5EC),
-              (void *)((*gUnk_02000580) + 0x30));
+              (void *)((*((u8 **)gPlayers)) + 0x30));
         actor->motion.x += delta.x;
         actor->motion.z += delta.z;
         *((struct ContactPosition *)(context + 0x5EC)) =
-            *((struct ContactPosition *)((*gUnk_02000580) + 0x30));
+            *((struct ContactPosition *)((*((u8 **)gPlayers)) + 0x30));
         Scale(actor, flags);
     }
-    if (actor->field2B0 || ((*((u16 *)(gUnk_02000580[0] + 0x428))) == 0)) {
+    if (actor->field2B0 || ((*((u16 *)(((u8 **)gPlayers)[0] + 0x428))) == 0)) {
         Sound_PlaySong(0x3CC);
         State(actor, 3);
         Control(actor, SceneActorControl_OnIdle, 0x10);

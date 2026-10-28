@@ -14,7 +14,6 @@ struct C3A4Target {
     u32 flags, unknown8;
     struct C3A4Target *next;
 };
-extern struct C3A4Target *gUnk_0200054C;
 extern u16 gUnk_02000510;
 extern u16 gUnk_02000530;
 extern const s16 gUnk_086149C4[];
@@ -92,7 +91,7 @@ void sub_0814C3A4(u8 *p)
         gUnk_02000530 = 0;
         gPlayerNotificationPending = 0;
         C3A4_U16(p, 0x274) = 0;
-        gUnk_0200054C = 0;
+        (*(struct C3A4Target **)&gPlayerPendingActor) = 0;
         C3A4_U16(p, 0xAD6) = 0x16F;
         C3A4_U16(p, 0xAD8) = 0x20;
         Sound_PlaySong(0x39E);
@@ -122,8 +121,8 @@ void sub_0814C3A4(u8 *p)
             else
                 PlayerAnimation_SelectSecondaryKeyframes(p, 0xE9, 0x40);
             C3A4_CopyPosition(p);
-            gUnk_0200054C = sub_0814C248(p);
-            if (gUnk_0200054C == 0) {
+            (*(struct C3A4Target **)&gPlayerPendingActor) = sub_0814C248(p);
+            if ((*(struct C3A4Target **)&gPlayerPendingActor) == 0) {
                 C3A4_U32(p, 0x20) |= 0x4000;
             } else {
                 Player_SetActionPhase(p, 1);
@@ -132,21 +131,21 @@ void sub_0814C3A4(u8 *p)
             C3A4_U16(p, 0x45A)++;
             if (C3A4_U16(p, 0x45A) <= 0x1D)
                 return;
-            gUnk_0200054C = sub_0814C248(p);
-            if (gUnk_0200054C)
+            (*(struct C3A4Target **)&gPlayerPendingActor) = sub_0814C248(p);
+            if ((*(struct C3A4Target **)&gPlayerPendingActor))
                 return;
             Player_SetActionPhase(p, 5);
             return;
         }
         case 1: {
-            struct C3A4Target *t = gUnk_0200054C;
+            struct C3A4Target *t = (*(struct C3A4Target **)&gPlayerPendingActor);
             s32 dx = t->body->pos.x - C3A4_S16(p, 0x10C);
             s32 dy;
             s32 dz;
             s32 angle;
-            t = gUnk_0200054C;
+            t = (*(struct C3A4Target **)&gPlayerPendingActor);
             dy = t->body->pos.y - C3A4_S16(p, 0x10E);
-            t = gUnk_0200054C;
+            t = (*(struct C3A4Target **)&gPlayerPendingActor);
             dz = t->body->pos.z - C3A4_S16(p, 0x110);
             angle = Math_Atan2(dx, dz);
             if (dx * dx + dz * dz + dy * dy > 0x8FF) {
@@ -165,23 +164,24 @@ void sub_0814C3A4(u8 *p)
                 if (C3A4_U16(p, 0x45A) > 0x59)
                     Player_SetActionPhase(p, 6);
             } else {
-                t = gUnk_0200054C;
+                t = (*(struct C3A4Target **)&gPlayerPendingActor);
                 if (t->flags & 1) {
-                    gUnk_0200054C = 0;
+                    (*(struct C3A4Target **)&gPlayerPendingActor) = 0;
                     Player_SetActionPhase(p, 5);
                 } else {
                     s32 r = sub_08249244(t->body, 0, 0, t->unknown8);
                     C3A4_U32(gGameState, 0xC00) += 8;
                     gPlayerNotificationPending = 1;
                     if (r == 0) {
-                        gUnk_0200054C = 0;
+                        (*(struct C3A4Target **)&gPlayerPendingActor) = 0;
                         Player_SetActionPhase(p, 5);
                     } else {
                         s32 base;
                         s32 quarter;
                         p[0x3A4] = ((((angle + 0x20) & 0xFF) >> 6) * 2 + 3) & 7;
-                        if (!(gUnk_0200054C->flags & 0x10))
-                            ((u8 *)gUnk_0200054C->body)[9] = ((p[0x3A4] + 5) & 7) << 5;
+                        if (!((*(struct C3A4Target **)&gPlayerPendingActor)->flags & 0x10))
+                            ((u8 *)(*(struct C3A4Target **)&gPlayerPendingActor)->body)[9] =
+                                ((p[0x3A4] + 5) & 7) << 5;
                         base = ((angle + 0x60) & 0xFF) >> 6;
                         quarter = base;
                         C3A4_SetFacing(p, quarter);
@@ -195,7 +195,7 @@ void sub_0814C3A4(u8 *p)
             return;
         }
         case 2: {
-            struct C3A4Target *t = gUnk_0200054C;
+            struct C3A4Target *t = (*(struct C3A4Target **)&gPlayerPendingActor);
             s32 r;
             s32 damage;
             if (t->flags & 1) {
@@ -203,7 +203,7 @@ void sub_0814C3A4(u8 *p)
                     C3A4_Hit(t, 1, 0x3C);
                 else
                     C3A4_Hit(t, 1, 0x3C);
-                gUnk_0200054C = 0;
+                (*(struct C3A4Target **)&gPlayerPendingActor) = 0;
                 Player_UpdateFacingSide(p);
                 PlayerAnimation_SelectSecondaryKeyframes(p, 0xE9, 0x40);
                 Player_SetActionPhase(p, 6);
@@ -223,13 +223,13 @@ void sub_0814C3A4(u8 *p)
                     amount = 30;
                 else
                     amount = Player_ScaleLevelValue(2, 0x60);
-                t = gUnk_0200054C;
+                t = (*(struct C3A4Target **)&gPlayerPendingActor);
                 if (t->flags & 0x10)
                     r = sub_08249244(t->body, 0, amount, t->unknown8);
                 else
                     r = sub_08249244(t->body, 0, amount, t->unknown8);
                 if (r != 1) {
-                    gUnk_0200054C = 0;
+                    (*(struct C3A4Target **)&gPlayerPendingActor) = 0;
                     Player_UpdateFacingSide(p);
                     Player_SetActionPhase(p, 6);
                     return;
@@ -259,12 +259,12 @@ void sub_0814C3A4(u8 *p)
                 Player_SetActionPhase(p, 2);
             } else {
                 Player_AddControlFlags(p, 8);
-                t = gUnk_0200054C;
+                t = (*(struct C3A4Target **)&gPlayerPendingActor);
                 if (t->flags & 0x10)
                     C3A4_Hit(t, 1, 0x3C);
                 else
                     C3A4_Hit(t, 1, 0x3C);
-                gUnk_0200054C = 0;
+                (*(struct C3A4Target **)&gPlayerPendingActor) = 0;
                 Player_SetActionPhase(p, 6);
             }
             gUnk_02000530 = 0;

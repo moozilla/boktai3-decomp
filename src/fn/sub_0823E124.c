@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 extern const s16 gUnk_086149C4[];
-extern u16 gUnk_0203B400[];
 
 struct BitVec {
     u32 x : 16, y : 16, z : 16, pad : 16;
@@ -22,7 +22,7 @@ void Player_EmitRandomSpark(void *p, struct SceneVec *in, u32 angle, u32 extra)
 {
     struct BitVec a, b;
     s32 k;
-    u16 *tbl = gUnk_0203B400;
+    u16 *tbl = gRandomTable;
     a.x = (RAND() % 32) + in->x - 15;
     a.y = (RAND() % 32) + in->y - 15;
     a.z = (RAND() % 32) + in->z - 15;

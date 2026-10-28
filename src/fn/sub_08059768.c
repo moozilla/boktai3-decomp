@@ -4,7 +4,7 @@ static inline s32 randomValue(void)
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+    return *(const u16 *)(offset + (u32)gRandomTable);
 }
 s32 ScenePanelRig_SelectActiveSubject(struct ScenePanelRig *rig)
 {

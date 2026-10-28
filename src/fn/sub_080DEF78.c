@@ -91,7 +91,7 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     {
         s32 k2 = 127;
-        if (((u8)gUnk_0203B400[gRandomIndex]) <= k2)
+        if (((u8)gRandomTable[gRandomIndex]) <= k2)
             context[k1] = 1;
         else
             context[k1] = 0;

@@ -14,7 +14,7 @@ void Slime_RollMoveFlag(struct SceneActorRegistryResetView *actor)
         register u32 *g asm("r0") = &gRandomIndex;
         idx = (*g + 1) & 1023;
         *g = idx;
-        r = *(u8 *)(idx * 2 + (u32)gUnk_0203B400);
+        r = *(u8 *)(idx * 2 + (u32)gRandomTable);
         if (r <= 7)
             r = 0x10;
         else if (r <= 13)

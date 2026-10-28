@@ -71,7 +71,7 @@ static inline s32 groundHeight(struct SceneVec *position)
 }
 static inline s32 stateMode(void)
 {
-    struct Player *state = gUnk_02000580[0];
+    struct Player *state = gPlayers[0];
     if (state) {
         u32 active = state->active;
         s32 yes = 0;
@@ -251,7 +251,7 @@ void Trigger_UpdateShake(struct Trigger *p)
             p->position->x = p->baseX;
             p->position->z = p->baseZ;
         } else {
-            const u16 *table = gUnk_0203B400;
+            const u16 *table = gRandomTable;
             unsigned short random;
             gRandomIndex = (gRandomIndex + 1) & 1023;
             random = table[gRandomIndex];
@@ -376,7 +376,7 @@ s32 Trigger_TryOpenNearby(struct TriggerOpener *actor)
             if (!nearby(p->position, point, actor))
                 goto next;
         }
-        state = gUnk_02000580[index];
+        state = gPlayers[index];
         if (state && state->actionMode == 6 && p->condition == 1) {
             if (!manager->soundDelay) {
                 Sound_PlaySong(402);
@@ -910,7 +910,7 @@ s32 TriggerManager_Update(struct TriggerManager *input)
     {
         struct Player **table;
         i = 0;
-        table = gUnk_02000580;
+        table = gPlayers;
         for (; i < 4; i++) {
             struct Player *actor;
             asm("" : "+r"(i));
@@ -984,8 +984,8 @@ s32 TriggerManager_Update(struct TriggerManager *input)
                             s32 available;
                             if (gEngineFlags & 2048)
                                 available = stateMode();
-                            else if (gUnk_02000580[0] && ({
-                                         u32 *flags = &gUnk_02000580[0]->actionFlags;
+                            else if (gPlayers[0] && ({
+                                         u32 *flags = &gPlayers[0]->actionFlags;
                                          u32 mask = 16;
                                          *flags &mask;
                                      }))
@@ -1087,7 +1087,7 @@ s32 TriggerManager_Initialize(struct TriggerManager *p, void *unused)
     for (i = 0; i < 4; i++) {
         struct Player *actor;
         actor = ({
-            struct Player *a = gUnk_02000580[i];
+            struct Player *a = gPlayers[i];
             a;
         });
         p->actors[i] = actor;
@@ -1349,8 +1349,8 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
             } else {
                 if (gWeatherCollisionTimer > 0)
                     goto reveal;
-                if (gUnk_02000580[0] && (({
-                        u32 *flags = &gUnk_02000580[0]->actionFlags;
+                if (gPlayers[0] && (({
+                        u32 *flags = &gPlayers[0]->actionFlags;
                         u32 mask = 16;
                         *flags &mask;
                     })))

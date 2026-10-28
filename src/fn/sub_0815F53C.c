@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 
 struct O {
     u8 f00[0x30];
@@ -7,11 +8,10 @@ struct O {
     u8 f10d[0x457 - 0x10D];
     u8 c57;
 };
-extern struct O *gUnk_02000580[];
 
 u8 *Player_GetEffectivePosition(u32 i)
 {
-    struct O *o = gUnk_02000580[i];
+    struct O *o = gPlayers[i];
     if (o == 0)
         return 0;
     if (o->c57 == 0x26 || o->c57 == 0xc)

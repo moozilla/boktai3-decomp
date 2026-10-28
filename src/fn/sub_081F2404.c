@@ -28,7 +28,7 @@ struct Camera {
     s32 x;
 };
 /* Read the camera pointer separately for each projected position. */
-extern struct Camera *volatile gUnk_020004B8;
+extern struct Camera *volatile gSceneCamera;
 void Vector3_CopyComponents(struct Vec *, struct Vec *);
 
 void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
@@ -44,7 +44,7 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
     if (!(*flags & 1)) {
         struct Vec *position = &p->position;
         struct ScreenPosition *out = &p->head[0].screen;
-        out->x = (p->position.x >> 12) - gUnk_020004B8->x;
+        out->x = (p->position.x >> 12) - gSceneCamera->x;
         {
             s32 y = position->y;
             s32 z = position->z;
@@ -64,7 +64,7 @@ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
     }
     for (; i >= 0;) {
         struct ScreenPosition *out = &next->screen;
-        next->screen.x = (position->x >> 12) - gUnk_020004B8->x;
+        next->screen.x = (position->x >> 12) - gSceneCamera->x;
         {
             s32 y = position->y;
             s32 z = position->z;

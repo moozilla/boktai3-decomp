@@ -75,13 +75,13 @@ static inline u8 Mummy_Arrive(void *obj)
         }
         if (player < 0)
             goto invoke;
-        cell = gUnk_02000580[player]->cell[3];
+        cell = gPlayers[player]->cell[3];
     } else {
         struct ChaseTarget *t = *slot;
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
         player = 0;
     }
-    if (cell != actor->terrainCell && !Chase_Bits32(&gUnk_02000580[player]->flags, 0x20000))
+    if (cell != actor->terrainCell && !Chase_Bits32(&gPlayers[player]->flags, 0x20000))
         goto reroute;
     if (Chase_MotionFlags(actor, 0x400))
         return 0;
@@ -138,7 +138,7 @@ void Mummy_ResumePlayerPursuit(struct SceneActorRegistryResetView *actor)
     }
     if (actor->field2B0) {
         body->flags6F2 &= ~0x800;
-        actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
+        actor->fieldDC = (u32)gPlayers[0] + 0x24;
         if (Mummy_Arrive(actor)) {
             struct MummyDelayedControl *packet;
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);

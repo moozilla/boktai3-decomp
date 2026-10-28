@@ -3,6 +3,8 @@
 #include "contact_actor.h"
 #include "render.h"
 #include "engine_globals.h"
+#include "player.h"
+#include "ram.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -55,7 +57,6 @@ void SceneActorGraphics_SelectResource(u8 *p)
 }
 
 #define SceneActorGraphics_OnDamageContact sub_08021F4C
-extern u8 *gUnk_02000580;
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void Sound_PlaySongChecked(u32);
@@ -90,7 +91,7 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
     u16 responseValue;
     if (*((u16 *)(p + 0x34e)))
         return;
-    mode = gUnk_02000580[0x418];
+    mode = (*(u8 **)gPlayers)[0x418];
     Collision_CalculateDamageResponse(source, contact);
     if (((*((u32 *)(p + 0x358))) == 1) && (mode != 2))
         *((u16 *)(contact + 0x3e)) = 0;
@@ -292,12 +293,10 @@ void SceneActorGraphics_OscillateScale(Actor *p)
     }
 }
 
-extern u16 gUnk_02000590;
-
 s32 SceneActorGraphics_GetEffectState(struct StateActor *p)
 {
     s32 r;
-    if (gUnk_02000590 != 0) {
+    if (gPlayerEffectPendingCount != 0) {
         r = 4;
     } else if (AreaEffect_IsPositionCovered(&p->target) == 0) {
         r = 0;
@@ -488,7 +487,6 @@ end:
 typedef struct ParticleOffset {
     s16 x, y, z, pad;
 } ParticleOffset;
-extern const u16 gUnk_0203B400[];
 s32 SceneParticle_CreateParticles(const void *anchor, const ParticleOffset *offset,
                                   const void *range, const void *jitter, s32 count, u32 priority);
 
@@ -510,7 +508,7 @@ void sub_08022694(u8 *p)
         center.z = 0x40;
     }
     for (i = 0; i < 4; i++) {
-        const u16 *table = gUnk_0203B400;
+        const u16 *table = gRandomTable;
         u16 index = (gRandomIndex + 1) & 0x3FF;
         {
             u16 random = table[index];
@@ -564,7 +562,7 @@ void sub_08022790(u8 *p, s32 big)
         size.y = 16;
         size.z = 128;
     }
-    table = gUnk_0203B400;
+    table = gRandomTable;
     indexPtr = &gRandomIndex;
     index = *indexPtr + 1;
     mask = 1023;
@@ -584,7 +582,6 @@ typedef struct BurstVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 } BurstVec;
 extern const BurstVec gUnk_08604D84[];
-extern const u16 gUnk_0203B400[];
 u16 Sqrt(u32);
 s32 Div(s32, s32);
 void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
@@ -602,7 +599,7 @@ void sub_08022878(BurstVec *p)
     BurstVec pos[1], vel[1];
     center.y += 0xc8;
     for (i = 0; i < 8; i++) {
-        const u16 *table = gUnk_0203B400;
+        const u16 *table = gRandomTable;
         u32 index;
         u16 len;
         u16 r;
@@ -655,7 +652,7 @@ void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
         indexPtr = &gRandomIndex;
         mask = 1023;
         smallMask = 3;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         index = (*indexPtr + 1) & mask;
         angle = (u8)table[index];
         index = (index + 1) & mask;
@@ -728,7 +725,7 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
     switch (kind) {
         case 0: {
             s32 shown = damage;
-            if (*(u32 *)((u8 *)p + 0x358) == 1 && gUnk_02000580[0x418] != 2) {
+            if (*(u32 *)((u8 *)p + 0x358) == 1 && (*(u8 **)gPlayers)[0x418] != 2) {
                 shown = 0;
                 result = 0;
             }
@@ -1025,7 +1022,7 @@ struct T {
     void *flash;
 };
 
-extern u8 *gUnk_0200047C;
+extern u8 *gSceneEventDispatchState;
 
 void SceneMessages_SetPendingTrigger(void *, void *);
 
@@ -1062,10 +1059,10 @@ void SceneActors_DispatchCommands(struct S *s)
     s32 i;
 
     i = 0;
-    if (i < entry->count[gUnk_0200047C[0x24]])
+    if (i < entry->count[gSceneEventDispatchState[0x24]])
         do {
             s16 *m;
-            u8 *controller = gUnk_0200047C;
+            u8 *controller = gSceneEventDispatchState;
             m = entry->messages[controller[0x24]][i];
             SceneMessages_SetPendingTrigger(entry, m);
             switch (((u8 *)m)[6]) {
@@ -1227,7 +1224,7 @@ void SceneActors_DispatchCommands(struct S *s)
                     break;
             }
             i++;
-        } while (i < entry->count[gUnk_0200047C[0x24]]);
+        } while (i < entry->count[gSceneEventDispatchState[0x24]]);
 }
 
 #else
@@ -2202,7 +2199,7 @@ void sub_08023FE8(State_08023F98 *p)
         r = sub_08022624(actor, actor[0x174], (struct BoxSearchPosition *)&min,
                          (struct BoxSearchPosition *)&max);
         if (r >= 0) {
-            u8 *q = (&gUnk_02000580)[r];
+            u8 *q = (&(*(u8 **)gPlayers))[r];
             u32 mask = 0x40000;
             if (!(*(u32 *)(q + 0x20) & mask)) {
                 actor[0x395] = r;

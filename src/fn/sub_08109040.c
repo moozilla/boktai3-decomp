@@ -1,5 +1,5 @@
 #include "global.h"
-#define gSelectionSlots gUnk_020004B4
+#include "area_effect_link.h"
 struct SelectionSlots {
     u8 pad0[0x53];
     u8 busy;
@@ -7,12 +7,11 @@ struct SelectionSlots {
     u8 slotView[0x84];
     s8 values[5];
 };
-extern struct SelectionSlots *gUnk_020004B4;
 static inline void *SelectionSlots_GetView(void)
 {
-    if (!gUnk_020004B4 || gUnk_020004B4->busy)
+    if (!((struct SelectionSlots *)gLinkSession) || ((struct SelectionSlots *)gLinkSession)->busy)
         return 0;
-    return gUnk_020004B4->slotView;
+    return ((struct SelectionSlots *)gLinkSession)->slotView;
 }
 s32 SelectionSlots_ClearValue(void *unused, s32 value)
 {
@@ -24,7 +23,7 @@ s32 SelectionSlots_ClearValue(void *unused, s32 value)
     do {
         m = 0xFF;
     } while (0);
-    slot = gUnk_020004B4->values;
+    slot = ((struct SelectionSlots *)gLinkSession)->values;
     i = 4;
     do {
         if (*slot == value) {

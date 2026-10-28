@@ -4,7 +4,7 @@ void LevelAdvanceDisplay_StartLevelAnimation(struct LevelAdvanceManager *manager
     s32 i;
     manager->sprite.flags &= ~1;
     manager->sprite.frame = 0;
-    manager->sprite.position = gUnk_02000580[0]->position;
+    manager->sprite.position = gPlayers[0]->position;
     manager->sprite.position.world.y += 250;
     manager->frame = 0;
     manager->active = 1;

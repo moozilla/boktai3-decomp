@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+#include "player.h"
 /* Golem_ChargeOrReturnHome: builds up charge and cools the charge timer; if the target player is dazzled goes idle (kind 0x27), else charges at the partner when ready (kind 0x28); otherwise walks back to the centre of its home cell, idling there once within reach (tentative) */
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 u8 sub_0821D4F0(void *, void *, u32, u32);
@@ -10,7 +11,6 @@ void Golem_UpdateChargeStop(void);
 void sub_080C47B8(struct ContactPosition *);
 s32 sub_080C47DC(u8 *);
 s32 Math_Atan2(s32, s32);
-extern u8 *gUnk_02000580[4];
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -46,9 +46,9 @@ static inline void Golem_Charge(void *ctx)
         index = PlayerSlot(partner);
         if (index < 0)
             goto charge;
-        player = gUnk_02000580[index];
+        player = gPlayers[index];
     } else
-        player = gUnk_02000580[0];
+        player = gPlayers[0];
     {
         u32 mask = 0x20000;
         if (*(u32 *)(player + 0x20) & mask)
@@ -131,7 +131,7 @@ void Golem_ChargeOrReturnHome(struct SceneActorRegistryResetView *actor)
             if (index < 0)
                 goto check;
             {
-                u8 *player = gUnk_02000580[index];
+                u8 *player = gPlayers[index];
                 u32 mask = 0x20000;
                 if (!(*(u32 *)(player + 0x20) & mask))
                     goto check;
@@ -140,7 +140,7 @@ void Golem_ChargeOrReturnHome(struct SceneActorRegistryResetView *actor)
             SetPhase(actor, 2, 3);
             return;
         } else {
-            u8 *player = gUnk_02000580[0];
+            u8 *player = gPlayers[0];
             u32 mask = 0x20000;
             if (!(*(u32 *)(player + 0x20) & mask))
                 goto check;

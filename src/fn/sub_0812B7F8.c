@@ -1,4 +1,3 @@
-#define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "player.h"
 #include "pursuing_actor.h"
@@ -17,7 +16,7 @@ void PursuingActor_TurnTowardPlayer(struct PursuingActor *actor)
     }
     if (!actor->turnTimer)
         return;
-    players = gUnk_02000580;
+    players = gPlayers;
     out = &delta;
     right = &actor->position;
     left = &players[0]->position;

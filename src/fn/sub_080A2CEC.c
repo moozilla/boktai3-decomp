@@ -2,6 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 #include "engine.h"
+#include "ram.h"
 void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
@@ -16,7 +17,6 @@ static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 st
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-extern const u16 gUnk_0203B400[];
 static inline u8 Hidden(struct SceneActorRegistryResetView *a)
 {
     u32 mask = 1;

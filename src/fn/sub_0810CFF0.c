@@ -43,7 +43,7 @@ void sub_0810CFF0(struct LinkPreviewPanel *panel)
     s32 i;
     struct LinkMenuPosition pos;
     for (i = 0; i <= 1; i++) {
-        struct AreaEffectLinkState *link = gUnk_020004B4;
+        struct AreaEffectLinkState *link = gLinkSession;
         u8 *payload;
         struct LinkPreview *preview;
         u8 *model;

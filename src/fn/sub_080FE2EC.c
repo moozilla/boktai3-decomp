@@ -1,8 +1,8 @@
 #include "global.h"
 #include "scene_actor_reset.h"
+#include "player.h"
 void Axe_UpdateWaitingAnimation(void);
 void Axe_BeginMoveToPosition(void *, void *);
-extern u8 *gUnk_02000580[4];
 static inline u8 TakeFlag(u8 *p)
 {
     if (*p) {
@@ -37,7 +37,7 @@ void Axe_UpdatePlayerDestinationPhase(struct SceneActorRegistryResetView *actor)
         group->field418 = group->field416;
     }
     if (actor->field2B0)
-        Axe_BeginMoveToPosition(actor, gUnk_02000580[0] + 0x30);
+        Axe_BeginMoveToPosition(actor, ((u8 **)gPlayers)[0] + 0x30);
     else
         actor->counter2AC++;
 }

@@ -56,14 +56,14 @@ void sub_080AF2BC(struct SceneActorRegistryResetView *actor)
             Callback_InvokeActor(actor, *(void **)(group + 0x224));
             return;
         }
-        cell = gUnk_02000580[player]->cell[3];
+        cell = gPlayers[player]->cell[3];
     } else {
         struct ChaseTarget *t = *(struct ChaseTarget **)((u8 *)actor + 0xDC);
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
         player = 0;
     }
 
-    if (cell != actor->terrainCell && !Chase_Bits32(&gUnk_02000580[player]->flags, 0x20000))
+    if (cell != actor->terrainCell && !Chase_Bits32(&gPlayers[player]->flags, 0x20000))
         goto reroute;
     if (Chase_MotionFlags(actor, 0x400))
         return;

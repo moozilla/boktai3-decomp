@@ -18,8 +18,8 @@ struct ScanlineScroll {
 };
 static inline u8 IsPlayerScrollBlocked(void)
 {
-    if (gUnk_020004F0[0]) {
-        u32 flags = gUnk_020004F0[0]->flags;
+    if (gParticipantActors[0]) {
+        u32 flags = gParticipantActors[0]->flags;
         if (flags & 5)
             return 1;
     }

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "scene_pool.h"
 struct GloveDraw {
     u8 pad0[0x16];
     u16 flags;
@@ -13,7 +14,6 @@ struct Glove {
     u8 pad870[0x58];
     struct GloveDraw draw;
 };
-extern struct Glove *gUnk_020004F0[];
 void Glove_UpdateRecoil(void);
 /* Registry routine E3EE (Glove): starts glove -i (default 0): active, update
    Glove_UpdateRecoil, timer 0, draw flag 1. */
@@ -21,7 +21,7 @@ void Glove_StartFromScript(void)
 {
     struct Glove *glove;
     s32 i = Script_GetKeywordValue('i', 0);
-    glove = gUnk_020004F0[i];
+    glove = gParticipantActors[i];
     if (glove) {
         void (*update)(void) = Glove_UpdateRecoil;
         u8 *active = &glove->active;

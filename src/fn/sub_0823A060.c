@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 struct LinkSide {
     u8 pad0[0x18];
     s16 side;
@@ -23,12 +24,11 @@ struct LinkAura {
     u8 pad53A[0xaf2 - 0x53a];
     u16 fade;
 };
-extern struct LinkSide *gUnk_020004B4;
-extern struct LinkAura *gUnk_02000580[];
+extern struct LinkSide *gLinkSession;
 void Player_PlayLocalSong(s32, s32);
 static inline s32 LinkAura_LocalSide(void)
 {
-    struct LinkSide *a = gUnk_020004B4;
+    struct LinkSide *a = gLinkSession;
     if (a == 0)
         return -1;
     return a->side;
@@ -93,7 +93,7 @@ void sub_0823A060(struct LinkAura *p)
                 p->selFlags |= 0x200;
                 p->flags |= 0x200;
                 LinkAura_SetFlags(&p->f20, 0x20000);
-            } else if ((other = gUnk_02000580[side]) != 0 && LinkAura_IsInStateFour(other)) {
+            } else if ((other = gPlayers[side]) != 0 && LinkAura_IsInStateFour(other)) {
                 p->selFlags |= 0x200;
                 p->flags |= 0x200;
                 LinkAura_SetFlags(&p->f20, 0x20000);

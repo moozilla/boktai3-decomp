@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000580[];
+#include "player.h"
 void Task_Kill(void *);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
@@ -58,7 +58,7 @@ s32 PlayerOrbitEffect_UpdateMovingParticle(struct OrbitParticle *p)
         Collider_SetPosition((u8 *)p + 0x60, &p->x, 0);
         Collider_Refresh((u8 *)p + 0x60);
         {
-            u32 *flags = (u32 *)(gUnk_02000580[0] + 0x20);
+            u32 *flags = (u32 *)(((u8 **)gPlayers)[0] + 0x20);
             u32 bits = 0x80002;
             *flags |= bits;
         }

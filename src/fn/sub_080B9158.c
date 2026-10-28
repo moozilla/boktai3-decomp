@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 /* map cell index under a packed (x, y) position, or 0 when outside the map */
 
@@ -10,7 +11,6 @@
 // confidence=low: timed wander/turn state of a ground enemy: picks a heading, probes terrain heights and mesh, queues state switch
 #define B9158_AT(T, off) (*(T *)((u8 *)a + (off)))
 
-extern u16 gUnk_0203B400[];
 extern u8 *gUnknown_02000580[];
 extern const s16 gUnk_086149C4[];
 
@@ -161,7 +161,7 @@ static inline void b9158_Enter(u8 *a)
             cur = B9158_AT(u8, 0x59);
             for (i = 0; i <= 3; i++) {
                 gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-                rnd = (gUnk_0203B400[gRandomIndex] & 3) << 6;
+                rnd = (gRandomTable[gRandomIndex] & 3) << 6;
                 if (rnd != cur)
                     break;
             }
@@ -232,7 +232,7 @@ void sub_080B9158(u8 *a)
     if (B9158_AT(u8, 0x2B2)) {
         B9158_AT(u8, 0x2B2) = 0;
         gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-        speed = (gUnk_0203B400[gRandomIndex] & 3) + 10;
+        speed = (gRandomTable[gRandomIndex] & 3) + 10;
         d = SceneActorTerrain_FindOpenNeighborDirection(a, B9158_AT(u8, 0x2B6));
         if (d < 0) {
             SceneActorAnimation_SelectDirectionalEntry(a, 0xF);
@@ -250,7 +250,7 @@ void sub_080B9158(u8 *a)
         B9158_AT(s16, 0x2F0) = v >= 0 ? v >> 12 : -((-v) >> 12);
         B9158_AT(u8, 0x59) = ((d + 2) & 3) << 6;
         gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-        B9158_AT(u16, 0x2EE) = (gUnk_0203B400[gRandomIndex] & 0xF) + 12;
+        B9158_AT(u16, 0x2EE) = (gRandomTable[gRandomIndex] & 0xF) + 12;
         SceneActorAnimation_SelectDirectionalEntry(a, 0xE);
     }
 

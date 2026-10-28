@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 // Cleanup: remove the angle register hint while retaining exact codegen.
 /* Tentative role: periodically spawn an inward-moving effect in a four-slot ring. */
 typedef struct Point {
@@ -23,16 +24,15 @@ typedef struct State {
     Effect effects[4];
 } State;
 extern const s16 gUnk_086149C4[];
-extern u8 gUnk_0203B400[];
 void SpriteDrawable_SelectTileFrame(Effect *, void *, s32);
 static inline s32 random_value(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(u16 *)((u8 *)gUnk_0203B400 + (gRandomIndex << 1));
+    return *(u16 *)((u8 *)gRandomTable + (gRandomIndex << 1));
 }
 static inline s32 random_first(void)
 {
-    u8 *table = gUnk_0203B400;
+    u8 *table = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return *(u16 *)(table + (gRandomIndex << 1));
 }

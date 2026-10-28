@@ -4,7 +4,7 @@
 s32 Mod(s32, s32);
 static inline u8 Tick(void)
 {
-    u8 *player = (void *)gUnk_02000580[0];
+    u8 *player = (void *)gPlayers[0];
     register u32 offset asm("r3") = 0x4F4;
     asm("" : "+r"(offset) : "r"(player));
     return *(player + offset);

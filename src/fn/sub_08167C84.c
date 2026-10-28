@@ -3,6 +3,7 @@
 #include "scene_vec.h"
 #include "render.h"
 #include "engine.h"
+#include "ram.h"
 
 static inline void SetVector(struct SceneVec *v, s32 x, s32 y, s32 z, s32 pad)
 {
@@ -16,7 +17,6 @@ struct SceneHudPrompt {
     u8 unk_00[0xA6D];
     u8 effectCountdown;
 };
-extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void *SpriteEffectController_Create(const struct SceneVec *, const struct SceneVec *, u32, u32, u32,
                                     u32, u32, u32, u32, u32, u32, u32, s32, s32, s32, s32, s32,
@@ -44,7 +44,7 @@ void Hud_UpdateEquipmentPrompt(struct SceneHudPrompt *hud)
     u32 resource = 0xD43F;
     if (hud->effectCountdown) {
         if (hud->effectCountdown > 30) {
-            register const u16 *table asm("r6") = gUnk_0203B400;
+            register const u16 *table asm("r6") = gRandomTable;
             u32 *index = &gRandomIndex;
             s32 x, y, z;
             s32 px, py, life;

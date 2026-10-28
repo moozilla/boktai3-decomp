@@ -1,6 +1,7 @@
 #include "global.h"
 
 #include "engine.h"
+#include "scene_pool.h"
 struct GloveDraw {
     u8 pad0[0x16];
     s16 flags;
@@ -14,7 +15,6 @@ struct Glove {
     u8 pad870[0x58];
     struct GloveDraw draw;
 };
-extern struct Glove *gUnk_020004F0[];
 void Glove_UpdateStopping(void);
 static inline void clearDrawFlags(struct GloveDraw *d, s32 mask)
 {
@@ -26,7 +26,7 @@ void Glove_StopFromScript(void)
 {
     struct Glove *glove;
     s32 i = Script_GetKeywordValue('i', 0);
-    glove = gUnk_020004F0[i];
+    glove = gParticipantActors[i];
     if (glove) {
         void (*update)(void) = Glove_UpdateStopping;
         u8 *active = &glove->active;

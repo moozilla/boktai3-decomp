@@ -373,7 +373,7 @@ void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         range.x = 80;
         range.y = 60;
         range.z = 60;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0x20, count,
                             life, size = 2, 1);
         SparkParticle_Spawn(&actor->position, RandomFrom(table, wrap, bits), &range, 0x40, count,

@@ -1,17 +1,17 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 typedef struct Vec4 {
     s16 x, y, z, w;
 } Vec4;
-extern u8 gUnk_0203B400[];
 void EffectGroup_FadeFirstActive(void *);
 void Player_PlayLocalSong(u32, u32);
 s32 EffectGroup_SpawnPart(void *, u32, Vec4 *, Vec4 *, Vec4 *, u32, u32);
 
 static inline s32 Random(void)
 {
-    u8 *table = gUnk_0203B400;
+    u8 *table = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return *(u16 *)(table + (gRandomIndex << 1));
 }

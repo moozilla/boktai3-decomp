@@ -4,7 +4,7 @@
 void ScenePool_SetSpeedControlSchedule(struct ScenePoolEntry *, s32, s32, s32);
 static inline u8 PlayerHasFlag(u32 mask)
 {
-    if (gUnk_020004F0[0] && (gUnk_020004F0[0]->flags & mask))
+    if (gParticipantActors[0] && (gParticipantActors[0]->flags & mask))
         return 1;
     return 0;
 }
@@ -43,7 +43,7 @@ void ScenePool_ScheduleSpeedControl(struct ScenePoolEntry *entry)
                 register u32 *index asm("r0") = &gRandomIndex;
                 u32 next = (*index + 1) & 0x3ff;
                 *index = next;
-                random = *(const u8 *)((next << 1) + (u32)gUnk_0203B400);
+                random = *(const u8 *)((next << 1) + (u32)gRandomTable);
                 if (random <= 31)
                     ScenePool_SetSpeedControlSchedule(base, 2, 2, 4);
                 else if (random <= 63)

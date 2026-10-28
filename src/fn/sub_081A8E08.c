@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "player.h"
 
 // confidence=low: selects a player-mode collision copy and completes a position request.
 #define Vanargand_UpdateCaptureSetup sub_081A8E08
@@ -24,7 +25,6 @@ struct CaptureActor {
     u8 drawable[0x7B8 - 0x1EC];
     u8 collision[3][0x20];
 };
-extern void *gUnk_02000580[];
 void Vanargand_SetPendingCue(void *, u16);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 void *Player_GetCollisionData(void);
@@ -89,7 +89,7 @@ void Vanargand_UpdateCaptureSetup(struct CaptureActor *p)
     }
     if (p->ready) {
         SceneActors_StartUnmirroredAnimation(p, q->animation, q->drawable, 3, 0, 2);
-        Player_ApplyPositionRequest(gUnk_02000580[0], ((u8 *)q) + 0x1AC, 128, 32, 120, 0, 0, 0);
+        Player_ApplyPositionRequest(gPlayers[0], ((u8 *)q) + 0x1AC, 128, 32, 120, 0, 0, 0);
         p->active = 1;
     }
 }

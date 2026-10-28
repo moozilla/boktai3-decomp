@@ -64,10 +64,10 @@ struct Obj {
 extern struct Camera {
     u8 pad[0x44];
     s32 x;
-} *gUnk_020004B8;
+} *gSceneCamera;
 extern struct Globals {
     u8 pad[36], bank;
-} *gUnk_0200047C;
+} *gSceneEventDispatchState;
 
 s32 CharacterModel_GetPrimaryPaletteIndex(u8 *);
 void PalFade_Start(struct Obj *, s32, s32, s32, s32, s32, s32, s32);
@@ -113,16 +113,16 @@ int SceneActor_DispatchCommands(struct Obj *p)
     }
     {
         struct Vec3s *v = &p->pos;
-        v->x = (self->x >> 12) - gUnk_020004B8->x;
+        v->x = (self->x >> 12) - gSceneCamera->x;
         v->y = ((self->z + (self->y + self->h)) >> 12) + 90;
         v->z = self->z >> 12;
     }
     queue = &p->queue;
     i = 0;
-    if (i < queue->count[gUnk_0200047C->bank])
+    if (i < queue->count[gSceneEventDispatchState->bank])
         do {
             {
-                struct Globals *g = gUnk_0200047C;
+                struct Globals *g = gSceneEventDispatchState;
                 cmd = queue->commands[g->bank][i];
             }
             switch (cmd->type) {
@@ -162,5 +162,5 @@ int SceneActor_DispatchCommands(struct Obj *p)
                     break;
             }
             SceneMessages_SetPendingTrigger(queue, cmd);
-        } while (++i < queue->count[gUnk_0200047C->bank]);
+        } while (++i < queue->count[gSceneEventDispatchState->bank]);
 }

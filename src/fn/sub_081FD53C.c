@@ -1,12 +1,12 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "engine.h"
+#include "ram.h"
 
 struct OrbitEffect {
     u8 unk_00[0x50];
     struct SceneVec position;
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 void SpriteEffectController_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32,
@@ -33,8 +33,8 @@ void OrbitEffect_SpawnInwardParticle(struct OrbitEffect *effect)
     struct SceneVec *origin = &effect->position;
     u32 angle;
     *pos = *origin;
-    pos->x += -512 + (u8)RandomValue(gUnk_0203B400) * 4;
-    pos->z += -512 + (u8)RandomValue(gUnk_0203B400) * 4;
+    pos->x += -512 + (u8)RandomValue(gRandomTable) * 4;
+    pos->z += -512 + (u8)RandomValue(gRandomTable) * 4;
     angle = (u8)Math_Atan2(origin->x - pos->x, origin->z - pos->z);
     Polar(&velocity, angle, 32);
     SpriteEffectController_Create(&position, &velocity, 0x1C1E, 0xD43F, 0, 0, 17, 0, 2, 6, 0, 5, 0,

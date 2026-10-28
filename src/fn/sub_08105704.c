@@ -1,6 +1,5 @@
 #define ProximityActor_TestFlags Pool184_TestStatusFlags
 #define ProximityActor_SetFlags  Pool184_AddStatusFlags
-#define gPlayers                 gUnk_02000580
 #include "global.h"
 #include "proximity_actor.h"
 u8 Pool184_TestStatusFlags(struct ProximityActor *, u32);
@@ -12,7 +11,7 @@ void ProximityActor_CheckPlayerRange(struct ProximityActor *actor)
     struct SceneVec delta;
     s32 distance;
     if (!Pool184_TestStatusFlags(actor, 1)) {
-        ProximityActor_Subtract(&delta, &actor->position, &gUnk_02000580[0]->position);
+        ProximityActor_Subtract(&delta, &actor->position, &gPlayers[0]->position);
         distance = delta.x * delta.x + delta.z * delta.z;
         actor->distanceSquared = distance;
         if (actor->distanceSquared < actor->triggerDistanceSquared) {

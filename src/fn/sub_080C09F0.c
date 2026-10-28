@@ -21,7 +21,7 @@ s32 Callback_InvokeActor(void *, void *);
 s32 Math_Atan2(s32, s32);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
-extern u8 *gUnk_02000580[4];
+extern u8 *gPlayers[4];
 
 struct SkeletonChaseBody {
     u8 unknown0[0x6DC];
@@ -180,7 +180,7 @@ static inline u32 PickTurn(u32 dir)
             u32 v;
             gRandomIndex = index;
             index *= 2;
-            v = *(const u16 *)(index + (u32)gUnk_0203B400);
+            v = *(const u16 *)(index + (u32)gRandomTable);
             d = (v & 3) << 6;
         }
         if (d != dir)
@@ -244,13 +244,13 @@ static inline void Approach(void *ctx)
             Callback_InvokeActor(actor, *(void **)(group + 0x224));
             return;
         }
-        cell = *(u16 *)(*(u8 **)(gUnk_02000580[index] + 0x40) + 6);
+        cell = *(u16 *)(*(u8 **)(gPlayers[index] + 0x40) + 6);
     } else {
         cell = CellIndex((struct ContactPosition *)(*partnerp + 0xC));
         index = 0;
     }
     if (cell != actor->terrainCell) {
-        u8 *player = gUnk_02000580[index];
+        u8 *player = gPlayers[index];
         u32 mask = 0x20000;
         if (!(*(u32 *)(player + 0x20) & mask))
             goto move;

@@ -174,7 +174,7 @@ void RouteSpriteActor_TickWandering(struct RouteSpritePool *pool, struct RouteSp
                 register u32 table asm("r3");
                 gRandomIndex = (gRandomIndex + 1) & 1023;
                 offset = gRandomIndex * 2;
-                table = (u32)gUnk_0203B400;
+                table = (u32)gRandomTable;
                 value = *(const u16 *)(offset + table);
             }
             angleOffset = 0x15A;

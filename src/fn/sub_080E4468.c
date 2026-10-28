@@ -42,7 +42,7 @@ void Dog_ChasePlayer(struct SceneActorRegistryResetView *actor)
     {
         struct DogAnim *anim;
         s32 distance;
-        Delta(&target, &actor->position, (struct ContactPosition *)((u8 *)gUnk_02000580[0] + 0x30));
+        Delta(&target, &actor->position, (struct ContactPosition *)((u8 *)gPlayers[0] + 0x30));
         distance = target.x * target.x + target.z * target.z;
         anim = (struct DogAnim *)((u8 *)actor->drawable + 0x48);
         if ((anim->frame == 6 || anim->frame == 0xC || anim->frame == 0x13 ||
@@ -51,7 +51,7 @@ void Dog_ChasePlayer(struct SceneActorRegistryResetView *actor)
             SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->category);
             Chase_SetBehavior(actor, 0x10);
             *(struct ContactPosition *)(context + 0x6D8) =
-                *(struct ContactPosition *)((u8 *)gUnk_02000580[0] + 0x30);
+                *(struct ContactPosition *)((u8 *)gPlayers[0] + 0x30);
             {
                 u32 chasing = 0x80;
                 if (actor->flags2D4 & chasing) {

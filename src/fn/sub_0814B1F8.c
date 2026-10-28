@@ -1,10 +1,10 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 extern u8 *gUnk_02000538;
 extern u32 gUnk_0200051C;
 extern u32 gUnk_02000524;
-extern u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 
 #define PL_AT(T, off) (*(T *)((u8 *)p + (off)))
@@ -58,7 +58,7 @@ static inline s32 Player_0814B1F8_Fix(s32 v)
 static inline s32 Player_0814B1F8_Rand(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    return gUnk_0203B400[gRandomIndex];
+    return gRandomTable[gRandomIndex];
 }
 
 #ifdef NONMATCHING

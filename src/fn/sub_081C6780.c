@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "input.h"
+#include "ram.h"
 #ifdef NONMATCHING
 // fuzzy: 55.0%
 // fix.py best (sweep after the inlined-insn fix)
@@ -35,15 +36,14 @@ struct StateActor {
     u8 pad190[0x2CC - 0x190];
     void (*update)(void *);
 };
-extern u8 *gUnk_0200047C;
-extern const u16 gUnk_0203B400[];
+extern u8 *gSceneEventDispatchState;
 s32 Math_Atan2(s32, s32);
 void SceneMessages_SetPendingTrigger(void *, void *);
 void sub_0802EA90(void *);
 static inline s32 RandomPart(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return (gUnk_0203B400[gRandomIndex] >> 4) & 1023;
+    return (gRandomTable[gRandomIndex] >> 4) & 1023;
 }
 static inline void ResetMotion(struct StateActor *actor, u32 behavior)
 {
@@ -62,8 +62,8 @@ void StateActor_ProcessDirectionMessages(struct StateActor *actor)
     struct Receiver *receiver = &actor->receiver;
     s32 i;
     u32 k1;
-    for (i = 0; i < receiver->counts[gUnk_0200047C[0x24]]; i++) {
-        struct Command *command = receiver->commands[gUnk_0200047C[0x24]][i];
+    for (i = 0; i < receiver->counts[gSceneEventDispatchState[0x24]]; i++) {
+        struct Command *command = receiver->commands[gSceneEventDispatchState[0x24]][i];
         switch (command->kind) {
             case 4:
                 actor->target.x = command->data.position.x;

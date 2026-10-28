@@ -1,9 +1,8 @@
 #include "global.h"
 #include "actor_state.h"
 #include "engine_globals.h"
-#define gActorAnimationRandomIndex  gRandomIndex
-#define gActorAnimationRandomValues gUnk_0203B400
-extern u16 gUnk_0203B400[];
+#include "ram.h"
+#define gActorAnimationRandomIndex gRandomIndex
 s32 ActorMovement_CanReachTarget(struct ActorState *);
 s32 SceneVolume_GetActivityState(struct ActorState *);
 s32 SceneVolume_FindNearbyPosition(struct ActorState *);
@@ -24,7 +23,7 @@ static inline s32 RandomValue(void)
     u32 offset;
     gActorAnimationRandomIndex = (gActorAnimationRandomIndex + 1) & 0x3ff;
     offset = gActorAnimationRandomIndex * 2;
-    return *(u16 *)(offset + (u32)gActorAnimationRandomValues);
+    return *(u16 *)(offset + (u32)gRandomTable);
 }
 void ActorState_UpdateRandomAnimation(struct ActorStateOwner *owner)
 {

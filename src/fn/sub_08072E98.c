@@ -25,7 +25,7 @@ u8 SceneActorContacts_TestPlayerCondition(struct SceneActorContactObjectView *ob
         default:
             return 0;
     }
-    player = gUnk_02000580[slot];
+    player = gPlayers[slot];
     if (!player)
         return 0;
     if (!mode) {

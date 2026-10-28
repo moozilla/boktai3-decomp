@@ -1,17 +1,17 @@
 #include "global.h"
+#include "area_effect_link.h"
 struct S {
     u8 pad[0x18];
     s16 x18;
 };
-extern struct S *gUnk_020004B4;
 void Script_ReadReference(void *);
 void Script_WriteReferenceValue(void *, u32, s32);
 
 static inline s32 GetValue(void)
 {
-    if (!gUnk_020004B4)
+    if (!((struct S *)gLinkSession))
         return -1;
-    return gUnk_020004B4->x18;
+    return ((struct S *)gLinkSession)->x18;
 }
 s32 sub_081091AC(void)
 {

@@ -39,7 +39,7 @@ s32 SceneArc_Create(const struct ScenePoolVec32 *from, const struct ScenePoolVec
     {
         struct ScenePoolVec32 *position = &slot->position;
         struct SceneVec *screen = &slot->sprite.screen;
-        screen->x = (slot->position.x >> 12) - gUnk_020004B8->x;
+        screen->x = (slot->position.x >> 12) - gSceneCamera->x;
         {
             s32 y = position->y;
             screen->y = ((position->z + y) >> 12) + 96;

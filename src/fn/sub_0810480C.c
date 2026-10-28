@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "player.h"
 // Register allocation and a few load/order choices still differ.
 // MATCHING_CONCESSION: register-pinning
 struct ActorGroupMember {
@@ -52,7 +53,6 @@ static inline s32 WrapAngle(s32 x)
         x += 256;
     return x;
 }
-extern u8 *gUnk_02000580[];
 u8 ProximityActor_IsPlayerInsideOriginRange(void *);
 void ActorGroup_UpdateMemberSway(struct ActorGroupMember *);
 void Sound_PlaySong(u32);
@@ -86,7 +86,7 @@ void ActorGroup_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
     if (p->frame & 1) {
         if (ProximityActor_IsPlayerInsideOriginRange(p)) {
             u32 m8 = 8;
-            u8 *b8 = gUnk_02000580[0];
+            u8 *b8 = ((u8 **)gPlayers)[0];
             u32 fl;
             asm("" : "+r"(m8));
             fl = *(u32 *)(b8 + 0x20);
@@ -96,7 +96,7 @@ void ActorGroup_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
                     active = 1;
                 else
                     active = 0;
-                if (!active && gUnk_02000580[0][0x418] != 3) {
+                if (!active && ((u8 **)gPlayers)[0][0x418] != 3) {
                     if (p->previousDistanceSquared != p->distanceSquared && p->turnStep == 0) {
                         p->turnStep = 4;
                         p->health--;

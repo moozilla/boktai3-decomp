@@ -1,5 +1,5 @@
 #include "stacked_actor.h"
-extern u8 *gUnk_0200047C;
+extern u8 *gSceneEventDispatchState;
 u32 SceneMessages_SetPendingTrigger(void *, void *);
 void StackedActor_RaiseLift(struct StackedActor *);
 void StackedActor_LowerLift(struct StackedActor *);
@@ -7,7 +7,7 @@ void StackedActor_ConsumeTriggers(struct StackedActor *actor)
 {
     u8 *receiver = actor->trigger;
     s32 i = 0;
-    u8 **manager = &gUnk_0200047C;
+    u8 **manager = &gSceneEventDispatchState;
     u8 *counts = (u8 *)actor + 0x1E;
     if (i >= counts[(*manager)[0x24]]) {
         goto done;

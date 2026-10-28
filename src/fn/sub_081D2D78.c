@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 #define FrostEmitter_SpawnParticle sub_081D2D78
 struct FrostVec {
     u16 x, y, z, pad;
@@ -31,7 +32,6 @@ struct FrostEmitter {
     struct FrostParticle particles[12];
     u32 enabled, age;
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Anim_SetSequence(void *, void *, u16, u8, u8);
 static inline s32 ShiftRandom(u16 value, s32 shift)
@@ -67,7 +67,7 @@ void FrostEmitter_SpawnParticle(struct FrostEmitter *input)
         slot->position = *p->source;
         /* Retain the unused hardware address from the inlined random generator. */
         observed = 0x0403B714;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         index = (gRandomIndex + 1) & 1023;
         angle = ShiftRandom(table[index], 4);
         mask = 63;

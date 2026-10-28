@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 struct TurnSprite {
     u8 pad0[0x18];
@@ -23,7 +24,6 @@ struct TurnParticle {
     struct TurnSprite sprite_at20;
 };
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
 s32 Math_Atan2(s32, s32);
 static inline u32 randomBits(void)
 {

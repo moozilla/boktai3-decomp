@@ -1,5 +1,5 @@
-#define gActorDisplayCamera gUnk_020004B8
 #include "global.h"
+#include "background_controller.h"
 struct WorldPosition {
     s32 x, y, z;
 };
@@ -22,7 +22,6 @@ struct DisplayCamera {
     u8 pad[0x44];
     s32 x;
 };
-extern struct DisplayCamera *gUnk_020004B8;
 s32 Player_GetHorizontalVelocity(s32);
 s32 ActorMotion_AdvanceTowardScreenTarget(struct ScreenMovingActor *actor, s32 target)
 {
@@ -44,7 +43,7 @@ s32 ActorMotion_AdvanceTowardScreenTarget(struct ScreenMovingActor *actor, s32 t
     position->x += *speed;
     actor->position.z = actor->targetZ;
     screen = &actor->screen;
-    screen->x = (position->x >> 12) - gUnk_020004B8->x;
+    screen->x = (position->x >> 12) - ((struct DisplayCamera *)gSceneCamera)->x;
     {
         s32 y = position->y;
         s32 z = position->z;

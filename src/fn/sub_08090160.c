@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 // confidence=low: emits three debris particles during the Slime death reaction.
 
@@ -13,7 +14,6 @@ struct Actor {
     u8 pad2[4];
     u16 b;
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void sub_08127590(void *, void *, u32, u32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 static inline s32 Scale(s32 x)
@@ -24,7 +24,7 @@ static inline s32 Scale(s32 x)
 }
 static inline u16 Rand(void)
 {
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
     index *= 2;

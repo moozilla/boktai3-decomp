@@ -1,15 +1,15 @@
 #include "global.h"
+#include "area_effect_link.h"
 struct S {
     u8 p[0x18];
     s16 id;
 };
-extern struct S *gUnk_020004B4;
 void Sound_PlaySong(u32);
 static inline s32 gid(void)
 {
-    if (gUnk_020004B4 == 0)
+    if (((struct S *)gLinkSession) == 0)
         return -1;
-    return gUnk_020004B4->id;
+    return ((struct S *)gLinkSession)->id;
 }
 void Player_PlayLocalSong(s32 a, u32 b)
 {

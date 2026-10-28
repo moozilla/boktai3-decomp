@@ -1,4 +1,5 @@
 #include "global.h"
+#include "background_controller.h"
 
 struct Vec {
     s16 x, y, z, pad;
@@ -31,7 +32,6 @@ struct Camera {
     u8 pad[0x44];
     s32 x;
 };
-extern struct Camera *gUnk_020004B8;
 void DisplayAnimation_SetFlags(void *, s32);
 void GroundEffect_Initialize(void *, void *, s32);
 void SceneNpc_UpdateProjectedVisible(void);
@@ -43,7 +43,7 @@ void SceneNpc_EnterProjectedIdle(void *unused, struct SceneNpc *npc)
     void (*update)(void);
     DisplayAnimation_SetFlags(npc->display, 0x10);
     position = &npc->position;
-    projection->x = (position->x + gUnk_020004B8->x) << 12;
+    projection->x = (position->x + gSceneCamera->x) << 12;
     projection->z = position->z << 12;
     zero = 0;
     projection->y = zero;

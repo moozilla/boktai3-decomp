@@ -232,5 +232,7 @@ void *ScrollingBackground_Create(u16 id, struct ScrollingBackgroundConfig *c);
 void *ScrollingBackground_CreateFromScript(u32 id);
 void ScrollingBackground_QueueCommand(u32 layer, u32 type, s32 length, s32 *args);
 void ScrollingBackground_QueueCommandFromScript(void);
+/* 0x020004B8 */
+extern struct Camera *gSceneCamera; /* scene camera object */
 
 #endif

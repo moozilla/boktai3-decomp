@@ -1,4 +1,3 @@
-#define gLinkSession               gUnk_020004B4
 #define MenuSprite_LoadPalettePair CharacterModel_InitPalettes
 #include "global.h"
 #include "area_effect_link.h"
@@ -19,9 +18,9 @@ void CharacterModel_SetComponentRenderMode(void *, s32);
 void CharacterModel_InitPalettes(void *, s32);
 static inline s32 localPlayer(void)
 {
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         return -1;
-    return gUnk_020004B4->localPlayer;
+    return gLinkSession->localPlayer;
 }
 static inline u8 validSelection(s32 i)
 {
@@ -37,7 +36,7 @@ yes:
 void LinkMenu_LoadSelectionSprite(struct LinkMenu *menu)
 {
     s32 i = menu->selected;
-    struct AreaEffectLinkState *link = gUnk_020004B4;
+    struct AreaEffectLinkState *link = gLinkSession;
     if (link && link->unavailable == 1 && validSelection(i)) {
         u8 *payload = link->incomingPayload + i * 0x24;
         if (payload) {

@@ -15,7 +15,7 @@ void ActorAttachment_TickNarrowShake(void *unused, struct ActorAttachmentSlotVie
             int r;
             u32 v;
             gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-            r = Mod(*(u16 *)((gRandomIndex << 1) + (u32)gUnk_0203B400), 2);
+            r = Mod(*(u16 *)((gRandomIndex << 1) + (u32)gRandomTable), 2);
             v = (u16)sprite->position.x;
             v -= 1;
             sprite->position.x = v + r;

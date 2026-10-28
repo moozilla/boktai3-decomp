@@ -28,7 +28,7 @@ s32 ScenePool_StateScheduleMotion(void *manager, struct ScenePoolActor *actor,
     if (!entry->delayA) {
         ScenePool_ScheduleSpeedControl(entry);
         {
-            const u16 *table = gUnk_0203B400;
+            const u16 *table = gRandomTable;
             u32 *index = &gRandomIndex;
             u32 next;
             u32 indexMask;

@@ -226,7 +226,7 @@ s32 EffectManager_Init(struct EffectManager *manager, void *unused)
     manager->counter = 0;
     {
         struct Player *actor = ({
-            struct Player *a = gUnk_02000580[0];
+            struct Player *a = gPlayers[0];
             a;
         });
         manager->actor = actor;
@@ -278,7 +278,7 @@ s32 EffectManager_SpawnParticles(s32 count, u32 type, u32 kind, struct EffectVec
         if (!manager)
             return -1;
     }
-    if (!gUnk_02000580[0])
+    if (!gPlayers[0])
         return 0;
     if (type & 0xF0)
         reverse = 1;
@@ -391,7 +391,7 @@ s32 EffectManager_SpawnParticles(s32 count, u32 type, u32 kind, struct EffectVec
             sub_08217E40(sprite, 0);
             /* Dead, but it sets table in a second block, so loop.c keeps the load
                in the body as the ROM does (flow drops the store later). */
-            table = gUnk_0203B400;
+            table = gRandomTable;
         }
         for (; n <= 3; n++) {
             struct EffectSprite *sprite = &effect->particles[n].sprite;
@@ -450,7 +450,7 @@ s32 EffectManager_SpawnParticlesAt(s32 count, u32 type, u32 kind, struct EffectV
             else
                 src = pos;
             p->state = 1;
-            table = gUnk_0203B400;
+            table = gRandomTable;
             p->timer = timerBase + Mod(spawnRandom(table), timerRange);
             p->lifetime = lifetime;
             p->speed = (spawnRandom(table) & 3) + 4;
@@ -526,7 +526,7 @@ s32 EffectManager_SpawnParticlesAt(s32 count, u32 type, u32 kind, struct EffectV
             sub_08217E40(sprite, 0);
             /* Dead, but it sets table in a second block, so loop.c keeps the load
                in the body as the ROM does (flow drops the store later). */
-            table = gUnk_0203B400;
+            table = gRandomTable;
         }
         for (; n <= 3; n++) {
             struct EffectSprite *sprite = &effect->particles[n].sprite;
@@ -586,10 +586,10 @@ static inline u32 randomValue(s32 reverse)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
     if (reverse) {
-        register u16 *table asm("r2") = gUnk_0203B400;
+        register u16 *table asm("r2") = gRandomTable;
         return *(u16 *)(offset + (u32)table);
     }
-    return *(u16 *)(offset + (u32)gUnk_0203B400);
+    return *(u16 *)(offset + (u32)gRandomTable);
 }
 static inline s32 scale(s32 input)
 {
@@ -891,7 +891,7 @@ void EffectParticle_UpdateDriftBeforeHoming(struct EffectManager *manager, struc
 
 static inline u32 randomValueDirect(void)
 {
-    u16 *table = gUnk_0203B400;
+    u16 *table = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return table[gRandomIndex];
 }

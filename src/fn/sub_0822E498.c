@@ -1,6 +1,6 @@
 #include "global.h"
 #include "game_state.h"
-extern u8 *gUnk_02000580[];
+#include "player.h"
 void Equipment_AssignUniqueSlot(s32 slot, s32 id); /* sets slot */
 void Hud_RefreshEquipmentDisplay(void);
 void Player_SetActionRequest(u8 *actor, s32 id);
@@ -18,8 +18,8 @@ void GameState_AddEquipment(s32 id)
             Equipment_AssignUniqueSlot(i, id);
             gGameState->selected = i;
             Hud_RefreshEquipmentDisplay();
-            if (i == gGameState->selected && gUnk_02000580[0])
-                Player_SetActionRequest(gUnk_02000580[0], id);
+            if (i == gGameState->selected && gPlayers[0])
+                Player_SetActionRequest(gPlayers[0], id);
             return;
         }
     }

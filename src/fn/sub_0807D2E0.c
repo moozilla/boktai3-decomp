@@ -8,6 +8,7 @@
 
 #include "area_effect_link.h"
 #include "runtime.h"
+#include "ram.h"
 
 // confidence=low: hit reaction for a victim actor; mode 0/1 sets a stagger state, mode 2 a knockback path, then shows damage and sparks.
 
@@ -18,7 +19,6 @@ void SceneActorRecord_RecordPair(u32, u32);
 void SceneActorAttachment_ReplaceResponseSlot(u8 *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void EffectGroup_SpawnPart(void *, s32, void *, void *, void *, s32, s32);
-extern const u16 gUnk_0203B400[];
 
 static inline u8 F0807D2E0_Test(u32 value, u32 mask)
 {
@@ -29,9 +29,9 @@ static inline u8 F0807D2E0_Test(u32 value, u32 mask)
 
 static inline s32 F0807D2E0_LocalPlayer(void)
 {
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         return -1;
-    return gUnk_020004B4->localPlayer;
+    return gLinkSession->localPlayer;
 }
 
 static inline u8 F0807D2E0_ShouldShow(struct SceneActorRegistryResetView *actor)
@@ -122,9 +122,9 @@ void sub_0807D2E0(void *victim, u32 mode, struct ContactPosition *position, u32 
         for (i = 2; i >= 0; i--) {
             u32 idx = (gRandomIndex + 1) & 0x3FF;
             gRandomIndex = idx;
-            pack[0] = (pack[0] & 0xFFFF0000) | ((gUnk_0203B400[idx] & 0xF) - 7 & 0xFFFF);
+            pack[0] = (pack[0] & 0xFFFF0000) | ((gRandomTable[idx] & 0xF) - 7 & 0xFFFF);
             idx = (idx + 1) & 0x3FF;
-            pack[0] = (pack[0] & 0xFFFF) | (((gUnk_0203B400[idx] & 0x1F) - 16) << 16);
+            pack[0] = (pack[0] & 0xFFFF) | (((gRandomTable[idx] & 0x1F) - 16) << 16);
             gRandomIndex = idx;
             burst[0] = (pack[0] & 0xFFFF0000) | 5;
             burst[0] = (burst[0] & 0xFFFF) | (0xA0000);

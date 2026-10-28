@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_event_dispatch.h"
 typedef struct {
     u16 id;
     u8 kind, flags;
@@ -21,10 +22,9 @@ typedef struct {
     Receiver self;
 } Controller;
 
-extern Controller *gUnk_0200047C;
 int SceneMessages_FindScript(int id)
 {
-    Controller *p = gUnk_0200047C;
+    Controller *p = gSceneEventDispatchState;
     int i;
     if (p)
         goto scan;

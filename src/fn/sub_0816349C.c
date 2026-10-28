@@ -54,7 +54,7 @@ void TransitionPanel_UpdateCostSelection(struct TransitionPanel *p)
         mask = 1;
         MessageWindow_Clear();
         Hud_SetMode(7);
-        Player_AdvanceTetherPhase(gUnk_02000580[0]);
+        Player_AdvanceTetherPhase(gPlayers[0]);
         Sound_FadeOutChannel10(2);
         p->timer = decision;
         p->choice = mask;

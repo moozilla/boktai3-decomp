@@ -1,4 +1,5 @@
 #include "global.h"
+#include "area_effect_link.h"
 struct LinkPanelPeer {
     u8 pad0[0x53];
     u8 active;
@@ -19,7 +20,6 @@ struct LinkPanel {
     u8 pad31C[0x624];
     struct LinkPanelEntry entries[2];
 };
-extern struct LinkPanelPeer *gUnk_020004B4;
 void LinkPanel_SelectActiveAnimation(struct LinkPanel *, s32);
 void RegistryF246_ShowSlotReadyFrame(struct LinkPanel *, s32);
 void RegistryF246_ShowSlotDefaultFrame(struct LinkPanel *, s32);
@@ -39,7 +39,7 @@ void LinkPanel_UpdateAnimations(struct LinkPanel *p)
     s32 i;
     struct LinkPanelPeer *peer;
     for (i = 0; i <= 1; i++) {
-        peer = gUnk_020004B4;
+        peer = gLinkSession;
         if (peer && peer->active == 1 && valid(i) && (u8 *)peer + (0x120 + i * 0x40)) {
             if (p->entries[i].timer > 30) {
                 if (p->entries[i].state > 1)

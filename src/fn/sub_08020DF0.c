@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_event_dispatch.h"
 typedef struct {
     u16 id;
     u8 kind, flags;
@@ -21,14 +22,13 @@ typedef struct {
     Receiver self;
 } Controller;
 
-extern Controller *gUnk_0200047C;
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);
 int Script_GetPc(void);
 int SceneMessages_ScriptStart(void)
 {
-    Controller *p = gUnk_0200047C;
+    Controller *p = gSceneEventDispatchState;
     Receiver *self;
     u8 *countPtr;
     int countA;

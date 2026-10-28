@@ -1,8 +1,8 @@
 #include "global.h"
 #include "render.h"
 #include "engine.h"
+#include "ram.h"
 #define gRandomTableIndex gRandomIndex
-#define gRandomTable      gUnk_0203B400
 
 struct ScreenPaletteTransition {
     u8 unknown0[4];
@@ -14,7 +14,6 @@ struct ScreenPaletteTransition {
     u16 phase;
 };
 extern u32 gUnk_02000560;
-extern const u16 gUnk_0203B400[];
 s32 ScalarApproach_StepSixteenth(s32, s32);
 s32 sub_08249350(s32, s32);
 void ScreenPalette_UpdateTransition(struct ScreenPaletteTransition *);
@@ -25,7 +24,7 @@ static inline int nextRandom(void)
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+    return *(const u16 *)(offset + (u32)gRandomTable);
 }
 
 void ScreenPalette_UpdateState(struct ScreenPaletteTransition *s)

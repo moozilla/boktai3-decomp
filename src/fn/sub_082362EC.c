@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 struct RadialPosition {
     s16 x, y, z;
@@ -37,7 +38,6 @@ struct RadialBurst {
     struct RadialParticle particles[12];
 };
 
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void RadialBurstEffect_UpdateParticle(void *);

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 struct FlickerMotion {
     u16 x, y;
@@ -19,7 +20,6 @@ struct HealthRestoreEffect {
     u8 unk_00[0x8C];
     struct FlickerParticle particles[8];
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void FlickerParticle_UpdateMotion(struct FlickerParticle *);
 
@@ -41,7 +41,7 @@ static inline s32 Scale(s32 value)
 // Initialize the eight outward-moving particles used by the health restore effect.
 void HealthRestoreEffect_StartParticleBurst(struct HealthRestoreEffect *effect)
 {
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     s32 i = 0;
     u32 *index = &gRandomIndex;
     u32 mask = 0x3FF;

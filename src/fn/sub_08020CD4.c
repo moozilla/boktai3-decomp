@@ -1,17 +1,17 @@
 #include "global.h"
-extern void *gUnk_0200047C;
+#include "scene_event_dispatch.h"
 int SceneMessages_LinkReceiver(void *, void *);
 int SceneMessages_RegisterReceiver(u8 *p, int id, int kind)
 {
     int result;
-    if (gUnk_0200047C) {
+    if (gSceneEventDispatchState) {
         int zero = 0;
         *(u16 *)p = id;
         p[2] = kind;
         p[6] = zero;
         p[7] = zero;
         p[3] = zero;
-        result = SceneMessages_LinkReceiver(gUnk_0200047C, p);
+        result = SceneMessages_LinkReceiver(gSceneEventDispatchState, p);
     } else
         result = -1;
     return result;

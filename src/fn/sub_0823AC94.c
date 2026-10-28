@@ -1,9 +1,9 @@
 #include "global.h"
-extern u8 *gUnk_020004B4;
+#include "area_effect_link.h"
 u8 *LinkPlayer_GetSessionPlayerData(u8 *s)
 {
     s32 i = *(s32 *)(s + 0x18);
-    u8 *g = gUnk_020004B4;
+    u8 *g = gLinkSession;
     u8 *r;
     if (g == 0 || g[0x53] != 0 || i < 0)
         r = 0;

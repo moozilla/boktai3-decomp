@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 struct DragonPuppyPosition {
     s16 x, y, z, unk_06;
@@ -30,14 +31,13 @@ struct DragonPuppy {
     s16 attackIndex;
 };
 
-extern const u16 gUnk_0203B400[];
 void DragonPuppy_HandleDefeat(struct DragonPuppy *);
 void DragonPuppy_UpdateAttackTiming(void);
 void Anim_SetSequence(void *, void *, u32, u32, u32);
 
 static inline u32 NextRandom(void)
 {
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return table[gRandomIndex];
 }

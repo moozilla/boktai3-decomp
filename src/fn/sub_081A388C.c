@@ -35,7 +35,6 @@ struct Entry {
     void *trails[4];
 };
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
 extern const u32 gUnk_0824F760[4];
 s32 sub_08249350(s32, s32);
 void *Player_GetEffectivePosition(s32);

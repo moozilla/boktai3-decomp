@@ -1,7 +1,7 @@
 #define gRandomCursor gRandomIndex
-#define gRandomValues gUnk_0203B400
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct ScreenMotionPhase {
     u8 unknown0[0x1AE];
     u16 duration;
@@ -11,12 +11,11 @@ struct ScreenMotionPhase {
     u16 elapsed;
     u16 delay;
 };
-extern const u16 gUnk_0203B400[];
 void Sound_PlaySong(u32);
 static inline s32 NextRandomByte(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    return *(const u8 *)&gUnk_0203B400[gRandomIndex];
+    return *(const u8 *)&gRandomTable[gRandomIndex];
 }
 void ScreenPhase_DampenMotion(struct ScreenMotionPhase *screen)
 {

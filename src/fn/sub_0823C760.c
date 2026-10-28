@@ -1,6 +1,5 @@
 #include "global.h"
-
-extern u8 *gUnk_020004B4;
+#include "area_effect_link.h"
 
 s32 sub_0823C4B4(u8 *);
 s32 LinkPlayer_HasSlotValueAtLeast(u8 *, s32);
@@ -23,7 +22,7 @@ void sub_0823C760(u8 *p)
             s32 v;
             Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x392);
             slot = *(s32 *)(p + 0x18);
-            base = gUnk_020004B4;
+            base = gLinkSession;
             if (base == 0 || slot < 0)
                 v = 0;
             else {

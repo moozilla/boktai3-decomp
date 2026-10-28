@@ -1,11 +1,11 @@
 #include "global.h"
+#include "player.h"
 struct ItemAgingDefinition {
     u8 unknown0[4];
     u16 agingLimit; /* aging state reaches agingLimit * 32 before the item changes */
     u8 unknown6[10];
 };
 extern const struct ItemAgingDefinition gUnk_08E61280[];
-extern u8 *gUnk_02000580;
 s32 Inventory_GetItemId(u32);
 void Inventory_SetItemId(u32, s32);
 s32 Inventory_GetItemStateValue(u32);
@@ -27,7 +27,7 @@ void sub_0822D2E0(s32 amount)
         s32 value;
         if (id < 0 || gUnk_08E61280[id].agingLimit == 0)
             continue;
-        if (gUnk_02000580 && Flags_Test((u32 *)(gUnk_02000580 + 0x444), 0x100000))
+        if ((*(u8 **)gPlayers) && Flags_Test((u32 *)((*(u8 **)gPlayers) + 0x444), 0x100000))
             amount *= 2;
         value = Inventory_GetItemStateValue(i) + amount;
         if (value > 0x7FFF)

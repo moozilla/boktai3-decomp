@@ -2,6 +2,7 @@
 #include "render.h"
 #include "engine.h"
 #include "runtime.h"
+#include "ram.h"
 
 // confidence=low: per-frame update for one scene actor's timers, palette transition and shadow state, and its spark and hit-record bookkeeping
 
@@ -16,12 +17,8 @@ void SparkParticle_Spawn(void *, s32, s32, s32, s32, s32);
 void SceneActorRecord_RecordPair(u16, u32);
 void SceneActorBehavior_UpdateColliders(void *);
 void SceneActorReaction_SinkAndRemove(void);
-extern u32 gUnk_020004B4;
-extern u32 gUnk_02000580[];
-extern u32 gUnk_02000478;
-extern u32 gUnk_02000534;
-extern u32 gUnk_02000500;
-extern const u16 gUnk_0203B400[];
+extern u32 gLinkSession;
+extern u32 gPlayers[];
 s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);
 
@@ -153,10 +150,10 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
 
 after_timers:
     if (gEngineFlags & 0x4800) {
-        if (gUnk_020004B4 == 0) {
+        if (gLinkSession == 0) {
             goto finish;
         }
-        r2 = *(s16 *)(gUnk_020004B4 + 0x18);
+        r2 = *(s16 *)(gLinkSession + 0x18);
         if (r2 < 0) {
             goto finish;
         }
@@ -164,18 +161,18 @@ after_timers:
         r2 = 0;
     }
     if (gEngineFlags & 0x800) {
-        u8 *e = (u8 *)gUnk_02000580[r2];
+        u8 *e = (u8 *)gPlayers[r2];
         if (e != 0 && *(u16 *)(e + 0x538) != 0 && *(u16 *)(e + 0x534) == 4) {
             cond = 1;
         } else {
             cond = 0;
         }
-    } else if (gUnk_02000478 > 0) {
+    } else if ((*(u32 *)&gWeatherCollisionTimer) > 0) {
         cond = 1;
-    } else if (gUnk_02000580[r2] != 0 && (*(u32 *)(gUnk_02000580[r2] + 0x448) & 0x10) != 0) {
+    } else if (gPlayers[r2] != 0 && (*(u32 *)(gPlayers[r2] + 0x448) & 0x10) != 0) {
         cond = 1;
     } else {
-        cond = (gUnk_02000534 != 0 && gUnk_02000500 == 4);
+        cond = ((*(u32 *)&gPlayerPassageState) != 0 && (*(u32 *)&gPlayerInteractionMode) == 4);
     }
     if (cond) {
         if ((*flags & 0x20000) == 0) {
@@ -287,13 +284,13 @@ finish:
             s32 n;
             s32 m;
             idx = (gRandomIndex + 1) & 0x3FF;
-            a18 = (a18 & 0xFFFF) | ((u32)((s16)(a18 >> 16) + gUnk_0203B400[idx] & 0xFF) << 16);
+            a18 = (a18 & 0xFFFF) | ((u32)((s16)(a18 >> 16) + gRandomTable[idx] & 0xFF) << 16);
             idx = (idx + 1) & 0x3FF;
-            pv = (s8)p[0x2B6] + ((gUnk_0203B400[idx] & 0x1F) - 16);
+            pv = (s8)p[0x2B6] + ((gRandomTable[idx] & 0x1F) - 16);
             idx = (idx + 1) & 0x3FF;
             gRandomIndex = idx;
-            n = (gUnk_0203B400[idx] & 7) + 4;
-            m = (gUnk_0203B400[idx] & 0xF) + 8;
+            n = (gRandomTable[idx] & 7) + 4;
+            m = (gRandomTable[idx] & 0xF) + 8;
             SparkParticle_Spawn(&a18, 2, &a18, pv, n, m);
         }
     }
@@ -301,7 +298,7 @@ finish:
     if (r4 == 0) {
         cond = (*(u16 *)(p + 0x2C0) & 2) != 0;
         if (cond) {
-            *(u32 *)(p + 0xDC) = (u32)(gUnk_02000580[0] + 0x24);
+            *(u32 *)(p + 0xDC) = (u32)(gPlayers[0] + 0x24);
         }
         if (*(u32 *)(p + 0xDC) != 0) {
             u8 *tgt = *(u8 **)(p + 0xDC);

@@ -23,7 +23,7 @@ void SceneActorAttachment_RetargetNearestPlayer(struct RetargetActorView *input,
     initialCount = gPlayerCount;
     if ((s32)nearest < initialCount) {
         struct ContactPosition *delta = &difference;
-        struct Player **slot = gUnk_02000580;
+        struct Player **slot = gPlayers;
         s32 count = initialCount;
         do {
             struct Player *player = *slot;

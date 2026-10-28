@@ -38,7 +38,7 @@ void Skeleton_TryTriggerAction(struct SkeletonActor *s)
         return;
 
     {
-        struct Player *player = gUnk_02000580[0];
+        struct Player *player = gPlayers[0];
         mask = 0x20000;
         if (player->statusFlags & mask)
             return;

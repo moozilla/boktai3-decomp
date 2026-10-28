@@ -1,5 +1,5 @@
 #include "stacked_actor.h"
-extern u8 *gUnk_02000580;
+#include "player.h"
 void PlayerCue_Motion7Variant3(u8 *, u32, u32);
 void StackedActor_EmitRisingParticles(struct StackedActor *actor)
 {
@@ -7,7 +7,7 @@ void StackedActor_EmitRisingParticles(struct StackedActor *actor)
     u32 frame;
     u32 shifted;
     if (actor->frame == 16) {
-        PlayerCue_Motion7Variant3(gUnk_02000580, 4, 0);
+        PlayerCue_Motion7Variant3((*(u8 **)gPlayers), 4, 0);
     }
     frame = actor->frame;
     shifted = frame << 16;

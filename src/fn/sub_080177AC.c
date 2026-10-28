@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "player.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: creates weather particles with two terrain-adjusted endpoints.
 #define Weather_SpawnTerrainParticles sub_080177AC
@@ -30,7 +31,6 @@ struct Map {
     u8 pad8[28];
     u16 rows[1];
 };
-extern struct Camera *gUnk_02000580;
 #define RANDOM_TABLE ((u16 *)0x0203B400)
 u32 Weather_TestFlags(u32, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
@@ -97,7 +97,7 @@ static inline void SetPoint(struct Part *out, struct Part *sample, struct Camera
 }
 s32 Weather_SpawnTerrainParticles(struct Weather *p, s32 count, s32 delay, s32 delayRange)
 {
-    struct Camera *camera = gUnk_02000580;
+    struct Camera *camera = (*(struct Camera **)gPlayers);
     s32 i;
     u16 *timer;
     u32 remaining;

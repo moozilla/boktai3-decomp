@@ -1,5 +1,5 @@
 #include "named_object.h"
-extern u8 *gUnk_02000580[];
+#include "player.h"
 static inline u8 HasFlag(u32 mask, s16 *flags)
 {
     if ((u16)*flags & mask)
@@ -72,7 +72,7 @@ void NamedObject_UpdateContactTrigger(struct NamedObject *o)
             if (o->timer > o->limit - 10)
                 SetFlag2(0x20, (u16 *)&o->flags);
         }
-        found = NamedObject_FindNearPosition(gUnk_02000580[0] + 0x30);
+        found = NamedObject_FindNearPosition(((u8 **)gPlayers)[0] + 0x30);
         if (found) {
             if (found->name == o->name) {
                 if (!HasFlag(0x1000, &o->flags) && o->timer == 0) {

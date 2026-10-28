@@ -2,6 +2,8 @@
 #include "golem_2.h"
 #include "script_utility.h"
 #include "engine.h"
+#include "player.h"
+#include "ram.h"
 
 extern const u8 gUnk_08606134[];
 
@@ -54,7 +56,6 @@ void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s3
 void ActorShadow_Disable(void *);
 void ActorParticles_SpawnWideBurst(void *);
 void SceneActorControl_OnIdle(void);
-extern const u16 gUnk_0203B400[];
 void Golem_OnUnusedState(void)
 {
 }
@@ -135,7 +136,7 @@ void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         rangeB.y = 60;
         rangeB.z = 60;
         {
-            register const u16 *table asm("sl") = gUnk_0203B400;
+            register const u16 *table asm("sl") = gRandomTable;
             s32 duration;
             s32 scale;
             SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x20, 4,
@@ -370,7 +371,7 @@ static inline u32 Golem_Reposition(u8 *a, u32 variant)
             v = dir;
             for (i = 0; i <= 3; i++) {
                 gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-                v = (gUnk_0203B400[gRandomIndex] & 3) << 6;
+                v = (gRandomTable[gRandomIndex] & 3) << 6;
                 if (v != (u32)dir)
                     break;
                 v = dir;
@@ -669,7 +670,6 @@ u8 sub_0812F3CC(void *);
 void SceneActorReaction_RestoreAfterDelay(void *);
 
 void Sound_PlaySong(u32);
-extern u8 *gUnk_02000580[4];
 
 #define F8(a, o)  (*(u8 *)((u8 *)(a) + (o)))
 #define F16(a, o) (*(u16 *)((u8 *)(a) + (o)))
@@ -825,7 +825,7 @@ static inline u32 DelayedRecovery_RandomDirectionExcept(u32 current)
     s32 i = 0;
     u32 d;
     do {
-        d = DelayedRecovery_Random(gUnk_0203B400, &gRandomIndex, 0x3FF, 3) << 6;
+        d = DelayedRecovery_Random(gRandomTable, &gRandomIndex, 0x3FF, 3) << 6;
         if (d != current)
             goto chosen;
     } while (++i <= 3);
@@ -879,12 +879,12 @@ static inline u8 DelayedRecovery_Chase(struct SceneActorRegistryResetView *input
         slot = DelayedRecovery_PlayerSlot(target);
         if (slot < 0)
             goto fail;
-        cell = *(u16 *)((u8 *)PTR(gUnk_02000580[slot], 0x40) + 6);
+        cell = *(u16 *)((u8 *)PTR(gPlayers[slot], 0x40) + 6);
     } else {
         cell = DelayedRecovery_CellIndex((struct ContactPosition *)(*targetp + 0xC));
         slot = 0;
     }
-    if (cell == actor->terrainCell || DelayedRecovery_Flag32(gUnk_02000580[slot], 0x20000, 0x20)) {
+    if (cell == actor->terrainCell || DelayedRecovery_Flag32(gPlayers[slot], 0x20000, 0x20)) {
         u16 busy = DelayedRecovery_Flag16(actor, 0x400, 0x2D4);
         u16 blocked;
         if (busy)

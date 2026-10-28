@@ -36,7 +36,7 @@ void RecordMenu_LoadPlayerSprites(struct RecMenu *menu)
 {
     s32 i, next;
     for (i = 0; i <= 1; i = next) {
-        struct AreaEffectLinkState *link = gUnk_020004B4;
+        struct AreaEffectLinkState *link = gLinkSession;
         u8 *payload;
         struct RecSlot *slot;
         struct RecSlotOrigin origin;

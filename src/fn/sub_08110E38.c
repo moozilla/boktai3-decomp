@@ -1,6 +1,6 @@
 #include "global.h"
 void Heap_Free(u32);
-extern u32 gUnk_020004B8;
+extern u32 gSceneCamera;
 struct S {
     u8 f[0x24];
     u32 a;
@@ -11,5 +11,5 @@ u32 SceneTilemap_Destroy(struct S *p)
 {
     Heap_Free(p->a);
     Heap_Free(p->b);
-    return gUnk_020004B8 = 0;
+    return gSceneCamera = 0;
 }

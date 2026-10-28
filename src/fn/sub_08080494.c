@@ -162,7 +162,7 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
         u32 mode;
         u32 flag;
         {
-            const u16 *raw = gUnk_0203B400;
+            const u16 *raw = gRandomTable;
             table = raw;
         }
         SparkParticle_Spawn(&actor->position, (FirstRandom(table) & 3) + 1, rangePointer, 32, 4,

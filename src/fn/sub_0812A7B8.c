@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -156,7 +157,6 @@ struct Pool {
     void *resource;
     u32 allocated;
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Anim_SetSequence(struct Anim *, void *, u32, u32, u32);
 s32 Math_Atan2(s32, s32);
@@ -167,7 +167,7 @@ static inline u32 RandomValue(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
-    return gUnk_0203B400[index];
+    return gRandomTable[index];
 }
 static inline s32 Truncate(s32 v)
 {

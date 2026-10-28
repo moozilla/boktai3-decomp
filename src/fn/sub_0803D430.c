@@ -16,7 +16,7 @@ s32 sub_0803D430(struct ScenePoolManager *m)
     } while (0);
     m->playerMask = 0;
     for (i = 0; i < 2; i++) {
-        struct ScenePoolPlayer *player = gUnk_020004F0[i];
+        struct ScenePoolPlayer *player = gParticipantActors[i];
         if (player == ((void *)0)) {
             do {
                 m->playerPositions[i][0] = 0;

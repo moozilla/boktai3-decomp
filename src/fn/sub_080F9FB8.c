@@ -1,8 +1,8 @@
 #include "scene_actor_control_phase.h"
+#include "player.h"
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void Axe_EmitMotionTrail(void *);
-extern u8 *gUnk_02000580;
 extern const s16 gUnk_086149C4[];
 static inline s32 Normalize(s32 a)
 {
@@ -91,7 +91,7 @@ void Axe_UpdatePursuit(struct SceneActorRegistryResetView *actor)
     Axe_EmitMotionTrail(actor);
     if (context->distance > actor->distanceF0) {
         s32 difference;
-        FromPlayer(&gUnk_02000580, &delta, actor);
+        FromPlayer(&gPlayers, &delta, actor);
         angle = Math_Atan2(delta.x, delta.z);
         difference = Normalize(((angle + 64) & 255) - actor->direction);
         if (difference < 0)
@@ -106,7 +106,7 @@ void Axe_UpdatePursuit(struct SceneActorRegistryResetView *actor)
             step = 2;
     } else {
         s32 difference, magnitude;
-        ToPlayer(&gUnk_02000580, &delta, &actor->position);
+        ToPlayer(&gPlayers, &delta, &actor->position);
         angle = Math_Atan2(delta.x, delta.z);
         difference = Normalize(angle - actor->direction);
         magnitude = Abs(difference);

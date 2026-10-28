@@ -1,4 +1,3 @@
-#define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "player.h"
 struct FieldHud {
@@ -11,7 +10,7 @@ s32 Callback_InvokeActor(void *, void *);
 void InventoryPanel_UpdateCallbackGroups(struct FieldHud *);
 s32 Hud_UpdateWithCallback(struct FieldHud *hud)
 {
-    struct Player *player = gUnk_02000580[0];
+    struct Player *player = gPlayers[0];
     void *callback;
     hud->player = player;
     callback = hud->updateCallback;

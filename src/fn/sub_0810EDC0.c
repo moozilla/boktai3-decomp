@@ -1,4 +1,5 @@
 #include "global.h"
+#include "area_effect_link.h"
 struct H {
     u8 filler[0x14E4];
     u32 a;
@@ -15,20 +16,19 @@ struct G2 {
     u8 e[0x10];
     u8 g[1];
 };
-extern struct G2 *gUnk_020004B4;
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
 void TextWindow_SetString(u32, u32, void *);
 void TextWindow_StartPlayback(u32);
 void LinkLobbyPanel_RefreshPlayerNames(struct H *h)
 {
-    struct G2 *g = gUnk_020004B4;
+    struct G2 *g = gLinkSession;
     if (g != 0 && g->b == 1 && g->a != 0) {
         TextWindow_SetScript(h->c, h->a);
         TextWindow_Refresh(h->c, 0);
         TextWindow_SetString(h->c, 1, g->c);
         TextWindow_StartPlayback(h->c);
-        g = gUnk_020004B4;
+        g = gLinkSession;
         if (g != 0 && g->b == 1 && g->e != 0) {
             TextWindow_SetScript(h->d, h->a);
             TextWindow_Refresh(h->d, 1);

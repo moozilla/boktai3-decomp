@@ -2,6 +2,7 @@
 
 #include "scene_actor_registry.h"
 #include "engine.h"
+#include "ram.h"
 
 // confidence=low: spawns a sprite-effect burst at the actor (random offset, heading-based velocity) and returns a table entry.
 
@@ -19,7 +20,6 @@ struct Sub080DE6E0Vel {
     s16 x, y, z;
 };
 
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_086061E4[][8];
 void SpriteEffectController_Create(void *, const void *, s32, u32, u32, u32, u32, u32, u32, u32,
@@ -61,7 +61,7 @@ u16 sub_080DE6E0(struct SceneActorRegistryActor *actor)
     type = actor->paletteOffset;
     if (type == 3 || type == 1) {
         if (sb->kind == 7 || sb->kind == 5 || sb->kind == 1) {
-            const u16 *table = gUnk_0203B400;
+            const u16 *table = gRandomTable;
 
             idx = (gRandomIndex + 1) & 1023;
             pos.x = (table[idx] & 63) - 48 + actor->position.x;

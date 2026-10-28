@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-extern u8 *gUnk_02000580[];
+#include "player.h"
 s32 Script_GetActorIndex(void);
 void sub_0815C73C(u8 *actor, s32 mode, s32 c, s32 a);
 /* Script: sub_0815C73C on the scripted actor chosen by -i with mode -m; modes
@@ -9,7 +9,7 @@ void ScriptActor_SetModeFromScript(void)
 {
     u8 *actor;
     s32 i = Script_GetActorIndex();
-    actor = gUnk_02000580[i];
+    actor = gPlayers[i];
     if (actor && Script_SeekToKeyword('m')) {
         s32 mode = Script_GetValue();
         s32 c, a;

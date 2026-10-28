@@ -44,7 +44,6 @@ struct Pool {
     u32 used;
 };
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
 struct Pool *SlashEffect_GetOrCreateManager(void);
 struct Slash *SlashEffect_AllocateSlot(struct Pool *);
 void TwinSpriteEffect_InitGraphics(struct Slash *);
@@ -140,7 +139,7 @@ void PursuingActor_UpdateRecoil(struct Pool *pool, struct Slash *p)
             {
                 register u32 offset asm("r0") = index * 2;
                 const u16 *source;
-                source = gUnk_0203B400;
+                source = gRandomTable;
                 {
                     u32 sample = *((const u16 *)(((u32)source) + offset));
                     p->velocity.y = (sample & 15) + 8;

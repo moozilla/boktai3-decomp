@@ -4,6 +4,7 @@
 #include "render.h"
 #include "ram.h"
 #include "runtime.h"
+#include "area_effect_link.h"
 
 struct Reg1745Run {
     u8 pad0[0x1c];
@@ -24,7 +25,6 @@ struct Reg1745Hdr {
     s16 field18;
 };
 
-extern struct Reg1745Hdr *gUnk_020004B4;
 s32 Serial_ReceivePacket(u32);
 s32 SerialLink_QueueSendWord(u32);
 void SerialLink_StartTransferIfIdle(void);
@@ -56,7 +56,8 @@ u32 Registry1745_RunSession(struct Reg1745Run *p)
         gLinkSessionStep = 3;
         st = p->state;
         if (st > 4) {
-            if (gUnk_020004B4 && gUnk_020004B4->field18 == 0 && st != 0x19 && st != 0x1b)
+            if ((*(struct Reg1745Hdr **)&gLinkSession) &&
+                (*(struct Reg1745Hdr **)&gLinkSession)->field18 == 0 && st != 0x19 && st != 0x1b)
                 SerialLink_StartTransferIfIdle();
         } else if (p->field1D == 0 && st != 0x19 && st != 0x1b)
             SerialLink_StartTransferIfIdle();

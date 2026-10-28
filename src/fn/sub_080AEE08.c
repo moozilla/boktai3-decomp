@@ -30,7 +30,7 @@ static inline u32 Random4(void)
     register u32 v asm("r1");
     *cursor = index;
     index *= 2;
-    v = *(const u16 *)(index + (u32)gUnk_0203B400);
+    v = *(const u16 *)(index + (u32)gRandomTable);
     v &= 3;
     return v + 1;
 }
@@ -52,7 +52,7 @@ inline static u32 Random4_UpdateDefeat(void)
     register u32 v asm("r1");
     *cursor = index;
     index *= 2;
-    v = *((const u16 *)(index + ((u32)(*((typeof(gUnk_0203B400) *)0x0203B400)))));
+    v = *((const u16 *)(index + ((u32)(*((typeof(gRandomTable) *)0x0203B400)))));
     v &= 3;
     return v + 1;
 }
@@ -100,7 +100,7 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         rangeB.y = 60;
         rangeB.z = t1 + 52;
         {
-            register const u16 *table asm("r4") = *((typeof(gUnk_0203B400) *)0x0203B400);
+            register const u16 *table asm("r4") = *((typeof(gRandomTable) *)0x0203B400);
             register s32 duration asm("r8");
             register s32 scale asm("sl");
             register s32 count asm("r9");

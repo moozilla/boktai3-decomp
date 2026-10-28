@@ -163,10 +163,10 @@ addr,name,size,kind,decl,header,confidence,notes
 02000470,gShadowRegistry,4,object,extern u32 gShadowRegistry;,include/ram.h,low,shadow registry task (ShadowRegistry_*)
 02000474,gColliderSpritePool,4,object,extern u32 gColliderSpritePool;,include/ram.h,low,
 02000478,gWeatherCollisionTimer,4,object,extern s32 gWeatherCollisionTimer;,include/ram.h,low,provisional: shared weather and collision countdown
-0200047C,gUnk_0200047C,4,object,,,,
+0200047C,gSceneEventDispatchState,4,object,extern struct SceneEventDispatchState *gSceneEventDispatchState;,include/scene_event_dispatch.h,low,double-buffered scene event receiver state
 02000480,gSceneActorListManager,4,object,extern void *gSceneActorListManager;,include/ram.h,low,provisional: scene actor list and packet-queue manager
 02000484,gWirelessController,4,object,extern struct Engine *gWirelessController;,include/ram.h,low,wireless controller singleton; existing per-unit Engine views retained
-02000488,gUnk_02000488,4,object,,,,
+02000488,gTetherActor,4,object,extern struct TetherActor *gTetherActor;,include/tether_actor.h,low,tether actor singleton
 0200048C,gOrbitBackground,4,object,extern struct OrbitBackground *gOrbitBackground;,include/orbit_background.h,low,
 02000490,gHitSwitchManager,4,object,extern struct HitSwitchManager *gHitSwitchManager;,include/hit_switch.h,low,
 02000494,gDisplayTrackManager,4,object,extern struct DisplayTrackManager *gDisplayTrackManager;,include/display_track.h,low,
@@ -177,8 +177,8 @@ addr,name,size,kind,decl,header,confidence,notes
 020004A8,gSceneActorRegistryManager,4,object,extern struct SceneActorRegistryManager *gSceneActorRegistryManager;,include/scene_actor_registry.h,low,
 020004AC,gSceneActorRegistryNode,4,object,extern struct SceneActorRegistryNode *gSceneActorRegistryNode;,include/scene_actor_registry.h,low,
 020004B0,gSlotMonitor,4,object,extern u32 gSlotMonitor;,include/ram.h,low,
-020004B4,gUnk_020004B4,4,object,,,,
-020004B8,gUnk_020004B8,4,object,,,,
+020004B4,gLinkSession,4,object,extern struct AreaEffectLinkState *gLinkSession;,include/area_effect_link.h,low,link session / menu peer object
+020004B8,gSceneCamera,4,object,extern struct Camera *gSceneCamera;,include/background_controller.h,low,scene camera object
 020004BC,gPanelSpritePool,4,object,extern u8 *gPanelSpritePool;,include/ram.h,low,
 020004C0,gSpriteSlots,4,object,extern u32 gSpriteSlots;,include/ram.h,low,
 020004C4,gDebrisPool,4,object,extern struct DebrisPool *gDebrisPool;,include/ram.h,low,
@@ -187,10 +187,10 @@ addr,name,size,kind,decl,header,confidence,notes
 020004D0,gSceneProcParticles,4,object,extern u32 gSceneProcParticles;,include/ram.h,low,
 020004D4,gSpritePairPool,4,object,extern u32 gSpritePairPool;,include/ram.h,low,
 020004D8,gCompactSpritePool,4,object,extern u8 *gCompactSpritePool;,include/ram.h,low,
-020004F0,gUnk_020004F0,8,object,,,,
+020004F0,gParticipantActors,8,object,extern struct ScenePoolPlayer *gParticipantActors[2];,include/scene_pool.h,low,per-participant actors
 02000500,gPlayerInteractionMode,2,object,extern u16 gPlayerInteractionMode;,include/ram.h,low,provisional: player interaction and passage mode halfword
 02000504,gPlayerSavedMenuOption,2,object,extern u16 gPlayerSavedMenuOption;,include/ram.h,low,saved menu option restored when the second script-status slot is set
-02000508,gTrackedPlayerId,2,object,extern u16 gTrackedPlayerId;,include/ram.h,low,
+02000508,gTrackedPlayerId,8,object,extern u16 gTrackedPlayerId[4];,include/ram.h,low,
 02000514,gPlayerLinkAttackBonus,2,object,extern u16 gPlayerLinkAttackBonus;,include/ram.h,low,provisional: link action-mode attack bonus override
 02000518,gPlayerCueTimer,2,object,extern u16 gPlayerCueTimer;,include/ram.h,low,
 02000520,gPlayerScriptState,2,object,extern u16 gPlayerScriptState;,include/ram.h,low,provisional: shared player script-state halfword
@@ -206,7 +206,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000558,gForceDirectionMode,2,object,extern u16 gForceDirectionMode;,include/ram.h,low,
 02000560,gUnk_02000560,10,object,,,,
 02000570,gPlayerSolarActionPending,2,object,extern u16 gPlayerSolarActionPending;,include/ram.h,low,provisional: solar action pending flag; separate from four slot words
-02000580,gUnk_02000580,10,object,,,,
+02000580,gPlayers,10,object,extern struct Player *gPlayers[4];,include/player.h,low,the four player actors (slot 0 is the local player)
 02000590,gPlayerEffectPendingCount,2,object,extern u16 gPlayerEffectPendingCount;,include/ram.h,low,provisional: pending player effect count; separate from actor pointers
 02000594,gPlayerNotificationPending,2,object,extern u16 gPlayerNotificationPending;,include/ram.h,low,
 02000598,gSceneLinkList,4,object,extern struct MotionTargets *gSceneLinkList;,include/ram.h,low,
@@ -241,7 +241,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02037000,gBgMapWorkBuffer,2000,object,extern u8 gBgMapWorkBuffer[0x2000];,include/ram.h,low,"background map work buffer, cleared for 0x2000 bytes"
 02039000,gObjTileUploadRequests,8,object,extern struct ObjTileUploadRequest gObjTileUploadRequests[];,include/obj_tile_upload.h,low,eight-byte rectangular tile-upload records; descriptor aliases two halfwords; protected ARM producer retained
 0203B000,gResourceRegistryEntries,100,object,extern struct ResourceRegistryEntry gResourceRegistryEntries[32];,include/resource_registry.h,low,"32-entry resource registry; id, flags and data pointer; protected draft views retained"
-0203B400,gUnk_0203B400,800,object,,,,
+0203B400,gRandomTable,800,object,extern const u16 gRandomTable[];,include/ram.h,low,random value table indexed by gRandomIndex (1024 entries)
 0203C400,gGameStateStorage,,object,extern u8 gGameStateStorage[];,include/ram.h,low,backing storage for timer-jittered game-state and variable regions
 03000000,gIwramCode,FC,object,extern u8 gIwramCode[];,include/runtime.h,low,IWRAM instruction buffer populated from Palette_CacheObjectBankArm through AgbMain__addr at startup; extent is not inferred from the partial RFU read
 03001110,gVideoIrqPhase,4,object,extern u32 gVideoIrqPhase;,include/runtime.h,low,Two-phase video/sound IRQ handler latch; toggled by sub_08214144 (tentative name)

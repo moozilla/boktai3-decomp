@@ -1,12 +1,12 @@
 #include "global.h"
-extern u32 gUnk_02000580;
+#include "player.h"
 void ResourceStation_InitializeSprite(u8 *);
 void ResourceStation_SetTriggerPosition(u8 *);
 void ResourceStation_InitializeCollider(u8 *);
 void ResourceStation_InitializeDigits(u8 *);
 s32 ResourceStation_Initialize(u8 *p, u32 v)
 {
-    u32 g = gUnk_02000580;
+    u32 g = (*(u32 *)gPlayers);
     u32 z;
     u16 *h;
     *(u32 *)(p + 0x25c) = g;

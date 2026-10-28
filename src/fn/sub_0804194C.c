@@ -1,6 +1,6 @@
 #include "modifier_list.h"
 #include "ram.h"
-extern struct ModifierMenuActor *gUnk_020004B4;
+#include "area_effect_link.h"
 void ActorSprite_InitPartDrawings(u8 *, u8 *, u32);
 void ModifierMenu_RefreshPreviewModel(struct ModifierMenu *);
 void CharacterPreview_PositionParts(u8 *, u8 *, struct ModifierPreviewOrigin *, u32);
@@ -21,7 +21,7 @@ void ModifierMenu_InitializePreview(struct ModifierMenu *menu)
     flags = (gEngineFlags | gScenePauseFlags) & mask;
     if (flags) {
         s32 id;
-        struct ModifierMenuActor *actor = gUnk_020004B4;
+        struct ModifierMenuActor *actor = gLinkSession;
         if (!actor) {
             id = -1;
         } else {

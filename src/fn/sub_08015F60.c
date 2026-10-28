@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 struct Vec {
     s16 x, y, z, pad;
@@ -39,8 +40,6 @@ struct Manager {
     void *animations;
     struct Group groups[6];
 };
-extern struct Manager *gFadingParticleManager;
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void *FadingParticleManager_Create(u32, u32);
 s32 Mod(s32, s32);
@@ -57,10 +56,11 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
     s32 i, j;
     u32 *rng;
     register const u16 *table asm("r6");
-    if (gFadingParticleManager == NULL && FadingParticleManager_Create(0, 0) == NULL)
+    if ((*(struct Manager **)&gFadingParticleManager) == NULL &&
+        FadingParticleManager_Create(0, 0) == NULL)
         return -1;
     for (i = 0; i < 6; i++) {
-        struct Group *g = &gFadingParticleManager->groups[i];
+        struct Group *g = &(*(struct Manager **)&gFadingParticleManager)->groups[i];
         rng = &gRandomIndex;
         if (g->active == 0) {
             g->active = 1;
@@ -72,7 +72,7 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
                 struct Anim *anim;
                 struct Sprite *sprite;
                 struct Particle *p;
-                table = gUnk_0203B400;
+                table = gRandomTable;
                 anim = &g->particles[0].motion.anim;
                 sprite = &g->particles[0].motion.sprite;
                 p = &g->particles[0];
@@ -104,7 +104,8 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
                     p->motion.sprite.position = *position;
                     sub_08217E40(sprite, 0);
                     p->motion.sprite.flags &= ~1;
-                    Anim_SetSequence(anim, gFadingParticleManager->animations, 3, 0, 0);
+                    Anim_SetSequence(
+                        anim, (*(struct Manager **)&gFadingParticleManager)->animations, 3, 0, 0);
                     anim = (struct Anim *)((u8 *)anim + sizeof(struct Particle));
                     sprite = (struct Sprite *)((u8 *)sprite + sizeof(struct Particle));
                     p++;

@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "background_controller.h"
 
 /* tentative: positions two sprites relative to camera and steps their frame animation */
 
@@ -45,8 +46,6 @@ struct PairCamera {
     s32 x;
 };
 
-extern struct PairCamera *gUnk_020004B8;
-
 s32 SpritePair_UpdateAnimation(struct PairManager *m)
 {
     s32 i = 0;
@@ -59,7 +58,8 @@ s32 SpritePair_UpdateAnimation(struct PairManager *m)
         const u16 *entry;
         if (!e->active)
             continue;
-        e->sprite.position.x = (e->pos->x >> 12) - (s16)(gUnk_020004B8->x - 16);
+        e->sprite.position.x =
+            (e->pos->x >> 12) - (s16)(((struct PairCamera *)gSceneCamera)->x - 16);
         e->sprite.position.y = ((e->pos->z + e->pos->y + *e->offset) >> 12) + 0x4e;
         o = &e->sprite;
         a = &e->anim;

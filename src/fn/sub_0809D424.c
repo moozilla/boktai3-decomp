@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000580;
+#include "player.h"
 void SceneActorControl_OnIdle(void);
 struct S {
     u8 pad[0xDC];

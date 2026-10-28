@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 struct Armor {
     u8 pad0[0xd4];
     u16 position[3];
@@ -10,12 +11,11 @@ struct Armor {
 struct ArmorProjectileOffset {
     u16 x, y, z, pad;
 };
-extern u8 *gUnk_02000580;
 extern const struct ArmorProjectileOffset gUnk_0824EFDC[];
 void ActorEffect_Spawn(u16 *, void *, s32, s32, s32, s32, s32, s32, s32, s32);
 void Armor_SpawnPairedProjectiles(struct Armor *p)
 {
-    u8 *owner = gUnk_02000580;
+    u8 *owner = (*(u8 **)gPlayers);
     s32 direction = p->direction >> 6;
     s32 i = 0;
     u16 pos[3];

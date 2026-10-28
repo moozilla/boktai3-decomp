@@ -1,4 +1,3 @@
-#define gSceneEventDispatchState gUnk_0200047C
 #include "global.h"
 #include "scene_event_dispatch.h"
 

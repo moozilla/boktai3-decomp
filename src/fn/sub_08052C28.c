@@ -1,5 +1,5 @@
 #include "stacked_actor.h"
-extern u8 *gUnk_02000580;
+#include "player.h"
 void PlayerCue_Motion7Turn(u8 *, u32, u32);
 s32 StackedActor_IsTetherNearby(struct StackedActor *);
 s32 TetherActor_BeginKindFourStateNine(void);
@@ -15,9 +15,9 @@ void StackedActor_BeginPlayerInteraction(struct StackedActor *o)
     *pb = v;
     o->sprite.position.y = o->world.y + o->lift;
     if (o->lift == 0) {
-        if (gUnk_02000580[0x457] == 0) {
+        if ((*(u8 **)gPlayers)[0x457] == 0) {
             u8 *pf;
-            PlayerCue_Motion7Turn(gUnk_02000580, 4, 0);
+            PlayerCue_Motion7Turn((*(u8 **)gPlayers), 4, 0);
             pf = &o->tetherAccepted;
             *pf = 0;
             if (StackedActor_IsTetherNearby(o)) {

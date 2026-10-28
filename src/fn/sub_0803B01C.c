@@ -2,6 +2,7 @@
 #include "global.h"
 #include "runtime.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 // Tentative result panel and drawable offsets.
 struct Drawing {
@@ -19,7 +20,6 @@ struct P {
     u8 pad25[0x93];
     struct Drawing drawing;
 };
-extern u16 gUnk_0203B400[];
 void Sound_PlayTrackedSong(int);
 void Anim_LoadKeyframe(void *, void *, int, int);
 
@@ -92,7 +92,7 @@ void WirelessResultPanel_UpdateOutcomeReveal(struct P *p)
     }
     if (p->timer <= 7) {
         struct Drawing *drawing = &p->drawing;
-        u16 *table = gUnk_0203B400;
+        u16 *table = gRandomTable;
         register u32 *indexPointer asm("r2");
         register u32 index asm("r0");
         u32 mask;
