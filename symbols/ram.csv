@@ -230,7 +230,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000604,gEnemyParticlePool,4,object,extern u32 gEnemyParticlePool;,include/ram.h,low,enemy particle pool (EnemyParticle_*)
 02000608,gForgingBook,4,object,extern u32 gForgingBook;,include/ram.h,low,forging book task (ForgingBook_*)
 0200060C,gSaveStateSignature,4,object,extern u32 gSaveStateSignature;,include/ram.h,,main-state save signature checked when reading and written before saving
-02000610,gUnk_02000610,70,object,,,,
+02000610,gScriptVm,70,object,extern struct ScriptVm gScriptVm;,include/script_virtual_machine.h,low,"script interpreter pc, result, keyword and argument stack pointers; shared 0x70-byte layout"
 02000700,gUnk_02000700,4,object,,,,
 02000704,gUnk_02000704,4,object,,,,
 02000708,gUnk_02000708,4,object,,,,

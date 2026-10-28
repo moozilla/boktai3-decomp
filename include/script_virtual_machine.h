@@ -43,7 +43,7 @@ struct ScriptCommandTable {
     struct ScriptCommandEntry *entries;
 };
 
-/* Interpreter state (gUnk_02000610). `stack` backs both the keyword/control
+/* Interpreter state (gScriptVm). `stack` backs both the keyword/control
  * stack (growing up from its base, via keywordSp) and the call argument stack
  * (growing up from stack + 25, via argSp) -- the two are never deep at once. */
 struct ScriptVm {
@@ -53,7 +53,7 @@ struct ScriptVm {
     u32 stack[24];
     u32 *argSp;
 };
-extern struct ScriptVm gUnk_02000610;
+extern struct ScriptVm gScriptVm;
 
 /* ---- Resource lookup (archive keyed by extension/name hash pair) -------- */
 
@@ -88,7 +88,7 @@ void Script_PopCtrlNextKeyword(void);
 
 void Script_ResetStacks(void);
 
-/* ---- Script cursor (gUnk_02000610.pc) ----------------------------------- */
+/* ---- Script cursor (gScriptVm.pc) ----------------------------------- */
 
 void Script_SetPc(u8 *p);
 /* Script_SeekToKeyword, Script_GetPc, Script_ParseStringRef, Script_GetKeywordValue: engine.h */
