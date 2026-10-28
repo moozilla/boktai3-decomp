@@ -1,5 +1,5 @@
 #include "stacked_actor.h"
-extern u8 *gUnk_02000580;
+#include "player.h"
 void PlayerCue_ReleaseControl(u8 *);
 void ScriptUtility_ClearControlFlag(void);
 s32 Script_Call(u32, void *);
@@ -12,7 +12,7 @@ void StackedActor_FinishPlayerInteraction(struct StackedActor *actor)
         actor->height--;
         StackedActor_UpdateSegments(actor);
     } else {
-        PlayerCue_ReleaseControl(gUnk_02000580);
+        PlayerCue_ReleaseControl((*(u8 **)gPlayers));
         ScriptUtility_ClearControlFlag();
         actor->shadow.flags &= ~1;
         if (actor->removeAfterUse)

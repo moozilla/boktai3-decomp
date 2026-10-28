@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "engine.h"
+#include "ram.h"
 #define ActorTrail_ResetPositions     TentacleActor_ResetSegmentPositions
 #define ActorTrail_CopyTerrainSamples TentacleActor_ResetRouteHistory
-extern const u16 gUnk_0203B400[];
 struct ActorTrail {
     u8 unknown0[0x875];
     u8 field875;
@@ -34,7 +34,7 @@ void ActorTrail_ResetAtSavedPosition(struct SceneActorRegistryResetView *actor)
         u32 value, mask;
         gRandomIndex = index;
         index *= 2;
-        value = *(const u16 *)((u32)gUnk_0203B400 + index);
+        value = *(const u16 *)((u32)gRandomTable + index);
         mask = 3;
         trail->variant = mask & value;
     }

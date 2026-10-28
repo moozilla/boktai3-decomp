@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 // confidence=low: updates homing effect entries, animation, trails and lifetime.
 
@@ -39,7 +40,6 @@ struct Entry {
     void *trails[4];
 };
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
 extern const u32 gUnk_0824F760[4];
 s32 sub_08249350(s32, s32);
 void *Player_GetEffectivePosition(s32);
@@ -192,7 +192,7 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
             s32 index;
             u32 types[4];
             s32 angle, sample;
-            const u16 *table = gUnk_0203B400;
+            const u16 *table = gRandomTable;
             gRandomIndex = (gRandomIndex + 1) & 1023;
             sample = table[gRandomIndex];
             index = Mod((sample >> 3) & 15, 4);

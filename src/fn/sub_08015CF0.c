@@ -1,12 +1,12 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 struct Config {
     u16 v[20];
 };
 struct Vec {
     s16 x, y, z, pad;
 };
-extern u16 gUnk_0203B400[];
 extern s16 gUnk_086149C4[];
 void AnimatedParticles_Create(int, void *, struct Config *);
 static inline int scale(int a, int b)

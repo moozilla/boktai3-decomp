@@ -31,7 +31,7 @@ void sub_08017684(struct WeatherState *);
 static inline u16 RAND(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    return *(const u16 *)((gRandomIndex << 1) + (u32)gUnk_0203B400);
+    return *(const u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
 }
 s32 Weather_Initialize(struct WeatherState *p)
 {
@@ -125,7 +125,7 @@ s32 Weather_Initialize(struct WeatherState *p)
     p->f54 = Script_GetKeywordValue(0x43, 0);
     p->f58 = Script_GetKeywordValue(0x4F, 0);
     {
-        const u16 *table = gUnk_0203B400;
+        const u16 *table = gRandomTable;
         u32 *seed = &gRandomIndex;
         register u32 index asm("r1");
         u32 mask;

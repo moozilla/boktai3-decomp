@@ -34,7 +34,7 @@ s32 ContactActorPool_Initialize(struct ContactActorPool *pool, u32 mode, u32 res
     index = 0;
     if (index < pool->mode) {
         const struct ContactPosition **target = pool->targets;
-        struct Player **player = gUnk_02000580;
+        struct Player **player = gPlayers;
         do {
             *target++ = (const void *)((u8 *)*player++ + 0x30);
             index++;

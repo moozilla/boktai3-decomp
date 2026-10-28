@@ -1,11 +1,10 @@
-#define gPlayerLinkSelection gUnk_020004B4
 #include "global.h"
 #include "area_effect_link.h"
 static inline u32 PlayerLink_GetActionMode(void)
 {
-    if (gUnk_020004B4 == 0 || gUnk_020004B4->unavailable)
+    if (gLinkSession == 0 || gLinkSession->unavailable)
         return 0;
-    return gUnk_020004B4->incomingPayload[0x3c];
+    return gLinkSession->incomingPayload[0x3c];
 }
 s32 PlayerLink_IsActionModeAllowed(void)
 {

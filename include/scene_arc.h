@@ -61,5 +61,5 @@ struct SceneArcCamera {
     u8 unknown0[0x44];
     s32 x;
 };
-extern struct SceneArcCamera *gUnk_020004B8;
+extern struct SceneArcCamera *gSceneCamera;
 #endif

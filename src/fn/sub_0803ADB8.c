@@ -1,6 +1,7 @@
 #include "global.h"
 #include "input.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 // Tentative result-panel layout: six displayed values settle in three stages.
 struct P {
@@ -9,7 +10,6 @@ struct P {
     u8 state, entered, a, b, c, d, e, f;
 };
 
-extern u16 gUnk_0203B400[];
 int Mod(int, int);
 void Sound_PlaySong(int);
 void Anim_DrawDecimalDigits(void *, void *, int, int, int, int, int, int, int);
@@ -29,7 +29,7 @@ void WirelessResultPanel_UpdateRollingNumbers(struct P *p)
     if (gPadState[1] & 0x30F)
         p->timer = 100;
     if (p->timer <= 29) {
-        u16 *table = gUnk_0203B400;
+        u16 *table = gRandomTable;
         a = randomValue(table, 99);
         d = randomValue(table, 99);
     } else {
@@ -37,7 +37,7 @@ void WirelessResultPanel_UpdateRollingNumbers(struct P *p)
         d = p->d;
     }
     if (p->timer <= 59) {
-        u16 *table = gUnk_0203B400;
+        u16 *table = gRandomTable;
         b = randomValue(table, 60);
         e = randomValue(table, 60);
     } else {
@@ -45,7 +45,7 @@ void WirelessResultPanel_UpdateRollingNumbers(struct P *p)
         e = p->e;
     }
     if (p->timer <= 89) {
-        u16 *table = gUnk_0203B400;
+        u16 *table = gRandomTable;
         c = randomValue(table, 99);
         f = randomValue(table, 99);
     } else {

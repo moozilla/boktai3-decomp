@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 // confidence=low: updates render shake and cached bearings/distances to tracked positions.
 struct Vec {
     s16 x, y, z, pad;
@@ -27,7 +28,6 @@ struct Hresvelgr {
     u8 pad312[0x6a];
     u16 targetCount;
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Hresvelgr_DispatchSceneMessages(void *);
 void Obj_StepPosition(void *);

@@ -4,13 +4,13 @@
 // Remaining differences are flag-pointer lifetimes, PRE spills, turn-loop allocation, and address reloads.
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+#include "player.h"
 
 s32 Callback_InvokeActor(void *, void *);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
 void sub_0807E334(struct SceneActorRegistryResetView *);
 void Sound_PlaySong(u32);
-extern u8 *gUnk_02000580[4];
 
 #define F8(a, o)  (*(u8 *)((u8 *)(a) + (o)))
 #define F16(a, o) (*(u16 *)((u8 *)(a) + (o)))
@@ -198,7 +198,7 @@ static inline u32 RandomDirectionExcept(u32 current)
 {
     s32 i;
     for (i = 0; i <= 3; i++) {
-        u32 d = Random(gUnk_0203B400, &gRandomIndex, 0x3FF, 3) << 6;
+        u32 d = Random(gRandomTable, &gRandomIndex, 0x3FF, 3) << 6;
         if (d != current)
             return d;
     }
@@ -249,12 +249,12 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
         slot = PlayerSlot(target);
         if (slot < 0)
             goto fail;
-        cell = *(u16 *)((u8 *)PTR(gUnk_02000580[slot], 0x40) + 6);
+        cell = *(u16 *)((u8 *)PTR(gPlayers[slot], 0x40) + 6);
     } else {
         cell = CellIndex((struct ContactPosition *)(*targetp + 0xC));
         slot = 0;
     }
-    if (cell == actor->terrainCell || Flag32(gUnk_02000580[slot], 0x20000, 0x20)) {
+    if (cell == actor->terrainCell || Flag32(gPlayers[slot], 0x20000, 0x20)) {
         u16 busy = Flag16(actor, 0x400, 0x2D4);
         u16 blocked;
         if (busy)
@@ -388,7 +388,7 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         index = (gRandomIndex + 1) & 1023;
         gRandomIndex = index;
         index *= 2;
-        sample = *(const u16 *)((u32)gUnk_0203B400 + index);
+        sample = *(const u16 *)((u32)gRandomTable + index);
         sample &= 3;
         sample += 1;
         SparkParticle_Spawn(&actor->position, sample, &range, actor->direction + 128, 10, 6, 2, 2);
@@ -428,7 +428,7 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         u32 index = (gRandomIndex + 1) & 1023;
         s32 sample;
         gRandomIndex = index;
-        sample = gUnk_0203B400[index];
+        sample = gRandomTable[index];
         choice = Mod(sample >> 3, route->points->count);
         if (choice == route->index)
             choice = Mod(choice + 1, route->points->count);
@@ -474,7 +474,7 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     }
     if (MaskFlags(actor, 0x80)) {
         *actorFlags |= 0x80;
-        actor->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
+        actor->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
         if (Chase(actor) || RetryTarget(actor, group)) {
             *(u16 *)(group + 0x40) |= 4;
             {
@@ -488,7 +488,7 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     } else {
         *actorFlags |= 0x10;
         (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-        actor->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
+        actor->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
         if (!Chase(actor) && !RetryTarget(actor, group)) {
         failed:
             Callback_InvokeActor(actor, *(void **)(group + 0x224));

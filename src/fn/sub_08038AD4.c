@@ -1,6 +1,8 @@
 #include "global.h"
 #include "render.h"
 #include "engine_globals.h"
+#include "player.h"
+#include "ram.h"
 struct Entry {
     u8 bytes[4], a, b, flag, kind;
     u32 timer;
@@ -26,8 +28,6 @@ struct Target {
     u8 pad[0x94];
     s16 current, maximum;
 };
-extern struct Actor *gUnk_02000580;
-extern u16 gUnk_0203B400[];
 void Hud_RegisterTimer(u16 *);
 void WirelessGameMenu_SetStatusPanelState(struct P *, int);
 void Sound_PlayTrackedSong(int);
@@ -78,7 +78,7 @@ void WirelessGameMenu_UpdateActiveRound(struct P *input)
                 view->timer;
             })),
             60) == 0) {
-        struct Actor *actor = gUnk_02000580;
+        struct Actor *actor = (*(struct Actor **)gPlayers);
         struct Target *target = SceneActors_GetBySlot(0);
         int a, b;
         struct Entry *e;

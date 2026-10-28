@@ -1,4 +1,3 @@
-#define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "player.h"
 #include "render.h"
@@ -12,7 +11,7 @@ s32 Hud_RefreshPlayerBinding(struct FieldHud *hud)
 {
     if (!(gEnginePauseFlags & 1)) {
         u32 slot = hud->playerSlot;
-        struct Player *player = gUnk_02000580[slot];
+        struct Player *player = gPlayers[slot];
         hud->player = player;
         SceneHud_RefreshGameplayDisplay(hud);
     }

@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_02000580[4];
+#include "player.h"
 s32 Script_GetActorIndex(void);
 bool32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
@@ -10,7 +10,7 @@ void PlayerCue_Windblown(u8 *, s32, s32);
 void sub_0815D394(void)
 {
     s32 i = Script_GetActorIndex();
-    u8 *actor = gUnk_02000580[i];
+    u8 *actor = gPlayers[i];
     if (actor != NULL) {
         s32 value;
         if (Script_SeekToKeyword('r'))

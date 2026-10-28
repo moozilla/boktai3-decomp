@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 /* grid cell id of tile (x, y), 0 when outside the map */
 
@@ -26,7 +27,6 @@ s32 Terrain_ApplyBlocked(void *, void *, void *);
 void Memory_Clear(void *, u32);
 void Callback_InvokeActor(void *, void *);
 
-extern u16 gUnk_0203B400[];
 extern u8 *gUnknown_02000580[];
 
 /* grid cell id of tile (x, y), 0 when outside the map */
@@ -104,7 +104,7 @@ static inline void f0750_RerollFacing(u8 *arg0)
 
     for (i = 0; i <= 3; i++) {
         gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-        rnd = (gUnk_0203B400[gRandomIndex] & 3) << 6;
+        rnd = (gRandomTable[gRandomIndex] & 3) << 6;
         if (rnd != facing)
             break;
         rnd = facing;

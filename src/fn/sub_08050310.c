@@ -1,7 +1,7 @@
 #include "cell_gate.h"
 s32 CellGate_TestForcedPassage(struct CellGate *p)
 {
-    struct CellGatePlayer *g = gUnk_02000580;
+    struct CellGatePlayer *g = gPlayers;
     if (g->transitionMode == 4) {
         u32 v = g->direction;
         if (v == 1) {
@@ -22,7 +22,7 @@ s32 CellGate_TestForcedPassage(struct CellGate *p)
                 x = 1;
         }
         if (x == 0) {
-            u32 t = gUnk_02000580->actionMode;
+            u32 t = gPlayers->actionMode;
             if (t == 3)
                 goto call;
             if (t != 4)

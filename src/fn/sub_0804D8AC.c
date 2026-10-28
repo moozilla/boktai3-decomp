@@ -12,21 +12,21 @@ struct G {
     u8 pad[0x24];
     u8 idx;
 };
-extern struct G *gUnk_0200047C;
+extern struct G *gSceneEventDispatchState;
 void SceneMessages_SetPendingTrigger(struct L *, struct E *);
 s32 StagedEffect_CheckScriptCompletion(u8 *p)
 {
     struct L *l = (struct L *)(p + 0x18);
     s32 i = 0;
-    if (i < l->n[gUnk_0200047C->idx]) {
+    if (i < l->n[gSceneEventDispatchState->idx]) {
         do {
-            struct G *g = gUnk_0200047C;
+            struct G *g = gSceneEventDispatchState;
             struct E *e = (struct E *)l->e[g->idx][i];
             SceneMessages_SetPendingTrigger(l, e);
             if (e->t == 3)
                 return 1;
             i++;
-        } while (i < l->n[gUnk_0200047C->idx]);
+        } while (i < l->n[gSceneEventDispatchState->idx]);
     }
     return 0;
 }

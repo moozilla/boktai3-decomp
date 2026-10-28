@@ -1,5 +1,5 @@
 #include "global.h"
-#define gLinkSession gUnk_020004B4
+#include "area_effect_link.h"
 struct LinkPanel {
     u8 pad0[0x13FD];
     u8 selection;
@@ -15,13 +15,13 @@ struct LinkSession {
     u8 pad54[0xCC];
     struct LinkTimeRecord peers[2];
 };
-extern struct LinkSession *gUnk_020004B4;
 void LinkPanel_DrawTime(struct LinkTimeRecord *, u8 *, u32, s32);
 static inline struct LinkTimeRecord *getPeer(s32 i)
 {
-    if (!gUnk_020004B4 || gUnk_020004B4->active != 1)
+    if (!(*(struct LinkSession **)&gLinkSession) ||
+        (*(struct LinkSession **)&gLinkSession)->active != 1)
         return NULL;
-    return &gUnk_020004B4->peers[i];
+    return &(*(struct LinkSession **)&gLinkSession)->peers[i];
 }
 static inline s32 clampIndex(s32 index, s32 low, s32 high)
 {

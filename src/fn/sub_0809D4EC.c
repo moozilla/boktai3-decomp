@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_control_helpers.h"
-
-extern u8 *gUnk_02000580;
+#include "player.h"
 
 static inline u8 Test(u32 value, u32 mask)
 {
@@ -23,7 +22,7 @@ void SceneActorControl_ConsumeLiftFlagPenalty(struct SceneActorRegistryResetView
     if (!LiftFlag((void *)SceneActorControl_GetMotionState(actor)))
         return;
     if (actor->paletteOffset == 0) {
-        u8 *p = gUnk_02000580 + 0x4F6;
+        u8 *p = (*(u8 **)gPlayers) + 0x4F6;
         *p = *p - 1;
     }
     {

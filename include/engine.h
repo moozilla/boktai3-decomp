@@ -14,6 +14,7 @@
 #include "game_state.h"
 #include "render.h"
 #include "heap.h"
+#include "ram.h"
 
 /* ---- Globals ---------------------------------------------------------- */
 
@@ -57,7 +58,7 @@ struct EngineMap {
     void *trapTops[64];
 };
 
-extern const u16 gUnk_0203B400[];         /* 1024 entry random table (guess) */
+#include "ram.h"
 extern const s16 gUnk_086149C4[];         /* sine table (guess) */
 
 /* ---- Tasks and memory -------------------------------------------------- */

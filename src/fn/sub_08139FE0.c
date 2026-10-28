@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "actor_attachment_state.h"
+#include "background_controller.h"
 
 struct FollowingPosition {
     s32 x, y, z, w;
@@ -23,7 +24,6 @@ struct FollowingEffect {
     u16 duration;
     u8 active, entered;
 };
-extern struct FollowingCamera *gUnk_020004B8;
 s32 Div(s32, s32);
 void Collider_SetFixedPositionWithYOffset(void *, struct FollowingPosition *, s32);
 void SpatialIndex_InsertEntry(void *);
@@ -174,7 +174,7 @@ void FollowingSpriteEffect_UpdateFollowing(struct FollowingEffect *p)
     pos->x += delta;
     height = *p->height - 0x20000;
     dst = &p->sprite.position;
-    dst->x = (pos->x >> 12) - gUnk_020004B8->x;
+    dst->x = (pos->x >> 12) - ((struct FollowingCamera *)gSceneCamera)->x;
     dst->y = ((s32)(pos->z + (pos->y + height)) >> 12) + 0x60;
     dst->z = pos->z >> 12;
     FollowingSpriteEffect_StepSprite(&p->sprite, &p->anim);

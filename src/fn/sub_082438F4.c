@@ -6,7 +6,7 @@ struct LinkRef {
     u8 unk0[0x18];
     s16 bit;
 };
-extern struct LinkRef *gUnk_020004B4;
+extern struct LinkRef *gLinkSession;
 extern u32 gUnk_02000560[];
 void Player_ResetActionState(struct Player *);
 s32 Player_ApplyTerrainDamage(struct Player *);
@@ -19,9 +19,9 @@ void sub_0823A2E4(struct Player *);
 void sub_0821DE30(void *);
 static inline s32 LocalPlayer(void)
 {
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         return -1;
-    return gUnk_020004B4->bit;
+    return gLinkSession->bit;
 }
 #define F(T, off) (*(T *)((u8 *)p + (off)))
 s32 Player_UpdateLinkCore(struct Player *p)

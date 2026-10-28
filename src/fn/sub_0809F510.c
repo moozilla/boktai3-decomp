@@ -1,10 +1,10 @@
 #include "global.h"
 #include "scene_actor_chase.h"
 #include "scene_actor_control_phase.h"
+#include "ram.h"
 
 // confidence=low: hops within the stored home terrain cell.
 
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 struct CrowHopState {
     u8 unknown0[0x3E8];
@@ -115,9 +115,9 @@ void Crow_HopWithinHomeCell(struct SceneActorRegistryResetView *actor)
         u32 angle;
         SetControl(actor, actor->savedTarget, 0);
         CellPosition(&local.home, state->homeCell);
-        actor->direction = angle = Random(gUnk_0203B400) & 255;
+        actor->direction = angle = Random(gRandomTable) & 255;
         ZeroVector(&local.zero, &state->velocity);
-        Polar(&state->velocity, angle, (Random(gUnk_0203B400) & 7) + 1);
+        Polar(&state->velocity, angle, (Random(gRandomTable) & 7) + 1);
         state->velocity.y = 14;
     }
     if ((u8)Callback_InvokeActor(actor, actor->update270))

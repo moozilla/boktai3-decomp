@@ -5,6 +5,7 @@
 /* Pointer spills, ring-mask allocation and a hoisted constant still differ. */
 #include "actor_attachment_state.h"
 #include "ram.h"
+#include "background_controller.h"
 static inline u32 ActorAttachment_StepSprite(struct ContactSwarmSprite *sprite,
                                              struct DisplaySequenceState *state)
 {
@@ -149,7 +150,6 @@ struct Effect {
     s32 direction;
     u32 timer;
 };
-extern struct Camera *gUnk_020004B8;
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_086141BC[];
 s32 Mod(s32, s32);
@@ -172,7 +172,7 @@ static inline void Direction(struct Packed *out, u8 angle, s32 speed)
 }
 static inline void Project(struct Packed *out, struct Vec *pos, s32 h)
 {
-    out->x = (pos->x >> 12) - gUnk_020004B8->x;
+    out->x = (pos->x >> 12) - gSceneCamera->x;
     out->y = ((s32)(pos->z + (pos->y + h)) >> 12) + 0x60;
     out->z = pos->z >> 12;
 }

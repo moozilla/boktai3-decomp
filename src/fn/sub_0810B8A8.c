@@ -1,5 +1,4 @@
 #include "global.h"
-#define gSessionMenu gUnk_020004B4
 #include "area_effect_link.h"
 #include "engine.h"
 #include "ram.h"
@@ -19,6 +18,6 @@ s32 SessionMenu_Destroy(struct AreaEffectLinkState *p)
     if (p->menuTextWindow >= 0 && TextWindow_Clear(p->menuTextWindow) == 0)
         p->menuTextWindow = -1;
     gClockSynced = 0;
-    gUnk_020004B4 = 0;
+    gLinkSession = 0;
     return 0;
 }

@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine_globals.h"
 #include "input.h"
+#include "player.h"
 /* Solar exposure tick, called from Solar_UpdateMeasurement after each
  * sample: accumulates exposure totals in the game-state block (offsets
  * 0x504, 0x520, 0x528, 0x77C) every 64 frames. Field roles are tentative. */
@@ -13,7 +14,6 @@ struct Obj {
     u16 frac;
 };
 extern u8 *gGameState;
-extern u8 *gUnk_02000580;
 void Solar_SaveExposureTimestamp(void);
 s32 SolarFruit_GetInventorySlot(s32);
 s32 Div(s32, s32);
@@ -29,11 +29,11 @@ static inline u32 Test(u32 *p, u32 mask)
 
 void sub_0822C598(struct Obj *obj)
 {
-    if (gUnk_02000580 == NULL)
+    if ((*(u8 **)gPlayers) == NULL)
         return;
     if (gEngineFlags & 0x1800)
         return;
-    if ((gEngineFlags & 0x200) || *(s32 *)(gUnk_02000580 + 0x1c) == 2) {
+    if ((gEngineFlags & 0x200) || *(s32 *)((*(u8 **)gPlayers) + 0x1c) == 2) {
         s32 *p = &GS32(0x504);
         if (*p <= 29999) {
             if (GS16(0x874) > 0 && !(obj->frame & 0x3f)) {
@@ -64,7 +64,8 @@ void sub_0822C598(struct Obj *obj)
                 }
                 if (GS32(0x77C) <= 9998) {
                     u32 q;
-                    if (gUnk_02000580 != NULL && Test((u32 *)(gUnk_02000580 + 0x444), 0x80000))
+                    if ((*(u8 **)gPlayers) != NULL &&
+                        Test((u32 *)((*(u8 **)gPlayers) + 0x444), 0x80000))
                         obj->frac += ((GS16(0x876) >> 1) + 5) * 2;
                     else
                         obj->frac += (GS16(0x876) >> 1) + 5;

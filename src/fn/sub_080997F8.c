@@ -1,10 +1,10 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "input.h"
+#include "player.h"
 
 // MATCHING_CONCESSION: register-pinning
 
-extern u8 *gUnk_02000580[];
 extern u32 gUnk_02000560;
 void SceneActorControl_OnIdle(void);
 
@@ -56,10 +56,10 @@ void Ghost_UpdateFacingTrigger(struct SceneActorRegistryResetView *actor)
             m;
         }))
         goto wait;
-    if (gUnk_02000580[0]) {
+    if (((u8 **)gPlayers)[0]) {
         u32 zero;
         s32 own = ((actor->direction + 0x20) & 0xFF) >> 5;
-        s32 player = ((gUnk_02000580[0][0x2D] + 0x20) & 0xFF) >> 5;
+        s32 player = ((((u8 **)gPlayers)[0][0x2D] + 0x20) & 0xFF) >> 5;
         s32 diff = ((own + 4) & 7) - player;
         if (diff < 0)
             diff = -diff;

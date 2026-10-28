@@ -1,13 +1,13 @@
 #include "global.h"
+#include "ram.h"
 struct T {
     u8 pad[0x1c];
     s32 count;
 };
-extern struct T *gScriptRecordTable;
 
 s32 sub_0811E3DC(void)
 {
-    if (!gScriptRecordTable)
+    if (!((struct T *)gScriptRecordTable))
         return 0;
-    return gScriptRecordTable->count;
+    return ((struct T *)gScriptRecordTable)->count;
 }

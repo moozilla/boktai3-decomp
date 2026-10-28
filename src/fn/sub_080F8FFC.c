@@ -1,7 +1,7 @@
 #include "rotation_phase.h"
+#include "player.h"
 
 // confidence=low: launches toward the player and brakes sprite rotation on arrival.
-extern u8 *gUnk_02000580;
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
@@ -78,7 +78,7 @@ void Axe_UpdateTargetLunge(struct SceneActorRegistryResetView *a, s32 frame)
         struct ContactPosition delta;
         sprite->flags |= 2;
         state->angularSpeed = 2;
-        Axe_DeltaFromPlayer(&gUnk_02000580, &delta, &a->position);
+        Axe_DeltaFromPlayer(&gPlayers, &delta, &a->position);
         if (a->health <= (state->healthThreshold)) {
             a->secondaryMotion.x = Div(delta.x, 44);
             a->secondaryMotion.y = 44;

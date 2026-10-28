@@ -1,8 +1,8 @@
-#define gNamedObjectRandomValues gUnk_0203B400
-#define gNamedObjectRandomIndex  gRandomIndex
+#define gNamedObjectRandomIndex gRandomIndex
 #include "global.h"
 #include "scene_vec.h"
 #include "engine.h"
+#include "ram.h"
 struct NamedObjectJitterState {
     u8 unknown00[0x1C];
     struct SceneVec position;
@@ -11,7 +11,6 @@ struct NamedObjectJitterState {
     u8 unknownBA[8];
     s16 verticalImpulse;
 };
-extern const u16 gUnk_0203B400[];
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 static inline u8 HasFlag(u32 mask, s16 *flags)
@@ -22,7 +21,7 @@ static inline u8 HasFlag(u32 mask, s16 *flags)
 }
 static inline u16 RandomValue(void)
 {
-    return gUnk_0203B400[gRandomIndex = (gRandomIndex + 1) & 0x3FF];
+    return gRandomTable[gRandomIndex = (gRandomIndex + 1) & 0x3FF];
 }
 static inline void ClearFlag(s32 mask, s16 *flags)
 {
@@ -40,11 +39,11 @@ void NamedObject_ApplyVerticalImpulseAndJitter(struct NamedObjectJitterState *ob
         object->position.x += Mod(RandomValue(), 12) - 6;
         {
             u32 next = (gRandomIndex + 1) & 0x3FF;
-            u32 value = gUnk_0203B400[next];
+            u32 value = gRandomTable[next];
             value &= 3;
             object->position.y += value;
             gRandomIndex = (next + 1) & 0x3FF;
-            object->position.z += Mod(gUnk_0203B400[gRandomIndex], 12) - 6;
+            object->position.z += Mod(gRandomTable[gRandomIndex], 12) - 6;
         }
     clear:
         ClearFlag(0x20, &object->flags);

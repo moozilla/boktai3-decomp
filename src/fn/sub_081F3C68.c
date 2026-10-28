@@ -110,7 +110,6 @@ static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
     d->z = a->z + b->z;
 }
 
-extern const u16 gUnk_0203B400[];
 struct Vec *Player_GetEffectivePosition(s32);
 s32 Div(s32, s32);
 void HomingProjectile_InitParams(void *);
@@ -125,7 +124,7 @@ s32 sub_08201160(void *, struct Vec *);
 static inline u32 randomB(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(const u16 *)(gRandomIndex * 2 + (u32)gUnk_0203B400);
+    return *(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
 }
 static inline void clampSpawn(struct Vec *spawn)
 {

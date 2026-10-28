@@ -5,7 +5,6 @@
 
 #define TerrainRegistration_Remove  TerrainModifiers_UnregisterCell
 #define TerrainRegistration_SetCell TerrainModifiers_RegisterCell
-#define gPlayers                    gUnk_02000580
 struct NamedObjectTerrainState {
     u8 unknown00[0xB6];
     u16 state;
@@ -59,7 +58,7 @@ void NamedObject_UpdateTerrainRegistration(struct NamedObjectTerrainState *objec
         map = gTerrainMap;
         if (!map)
             return;
-        if (object->position.y != gUnk_02000580[0]->position.y)
+        if (object->position.y != gPlayers[0]->position.y)
             return;
         cell = GetCell(&object->position, map);
         TerrainModifiers_RegisterCell(object->registration, cell, 0, object->position.y >> 8, 0xFF,

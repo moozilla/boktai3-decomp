@@ -41,7 +41,7 @@ s32 PlayerAttackEffect_EmitPaletteFourTrail(u8 *p)
         s32 angle, step;
         if (W(0x584) == 0) {
             gRandomIndex = (gRandomIndex + 1) & 1023;
-            // literal gUnk_0203B400 (checked macro): a constant address leaves the load to
+            // literal gRandomTable (checked macro): a constant address leaves the load to
             // reload, whose spill rotation gives the original r3/r4 choices
             I(0xC0) = Mod(*(u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR), 10) + 230;
         }

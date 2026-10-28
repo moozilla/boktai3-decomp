@@ -1,8 +1,8 @@
 #include "global.h"
 #include "engine.h"
 #include "input.h"
+#include "ram.h"
 // Tentative family name: actor animation/state handlers; specific actor identity unknown.
-#define gRandomTable gUnk_0203B400
 struct AnimationPosition {
     u32 packedXY, packedZ;
 };
@@ -22,7 +22,6 @@ struct AnimationActor {
     u8 padE64[8];
     u16 duration;
 };
-extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void AnimationActor_ProcessKeys(struct AnimationActor *p)
 {
@@ -38,7 +37,7 @@ void AnimationActor_ProcessKeys(struct AnimationActor *p)
         gRandomIndex = (gRandomIndex + 1) & 1023;
         q->position =
             *(struct AnimationPosition
-                  *)((Mod(*(const u16 *)(gRandomIndex * 2 + (u32)gUnk_0203B400), 9) * 8 + (u32)q) +
+                  *)((Mod(*(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable), 9) * 8 + (u32)q) +
                      0xccc);
         {
             u32 state = 2;

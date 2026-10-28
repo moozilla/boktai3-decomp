@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
-
-extern const u16 gUnk_0203B400[];
+#include "ram.h"
 
 #ifdef NONMATCHING
 // fuzzy: 21.7%
@@ -56,7 +55,7 @@ s32 sub_08093138(u8 *arg0)
     }
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
     idx = gRandomIndex;
-    t = *(u16 *)(r + 0x430) + (u8)gUnk_0203B400[idx] + 0x100;
+    t = *(u16 *)(r + 0x430) + (u8)gRandomTable[idx] + 0x100;
     if (t > 0x400) {
         t = 0x400;
     }

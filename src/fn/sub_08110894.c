@@ -22,7 +22,7 @@ void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 
 static inline s32 GetLocalPlayer(void)
 {
-    struct AreaEffectLinkState *state = gUnk_020004B4;
+    struct AreaEffectLinkState *state = gLinkSession;
     if (!state)
         return -1;
     return state->localPlayer;

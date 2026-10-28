@@ -313,7 +313,7 @@ s32 sub_081FAE0C(void *arg0, void *arg1)
 
     zc = &gRandomIndex;
     *zc = (*zc + 1) & 0x3FF;
-    k = Mod(gUnk_0203B400[*zc], 9);
+    k = Mod(gRandomTable[*zc], 9);
     H32(0xE5C) = H32(0xCCC + k * 8);
     H32(0xE60) = H32(0xCCC + k * 8 + 4);
 

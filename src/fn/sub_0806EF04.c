@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_020004B4;
+#include "area_effect_link.h"
 void SceneEffectSchedule_Reset(void);
 void SceneScheduledEffect_ResetSingleton(void);
 void Pool1B8_ResetInstance(void);
@@ -81,7 +81,7 @@ void SceneLifecycle_ResetSubsystems(void)
     FragmentSpritePool_ResetSingleton();
     ParticleEffectPool_ResetSingleton();
     LinkHandshake_ResetInstance();
-    gUnk_020004B4 = 0;
+    gLinkSession = 0;
     ActorMarkerPool_ResetSingleton();
     RegistryE7BC_ResetManager();
     AnimatedTile_ResetManager();

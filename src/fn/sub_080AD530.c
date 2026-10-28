@@ -43,7 +43,7 @@ void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *actor, s32 f
     } else if (ContextFlags(context, 0x1D))
         SceneActor_DispatchContextAction(context, 1);
     else {
-        actor->fieldDC = (u32)gUnk_02000580[0] + 0x24;
+        actor->fieldDC = (u32)gPlayers[0] + 0x24;
         {
             u32 mask = 16;
             actor->flags2CC |= mask;

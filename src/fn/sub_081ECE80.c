@@ -1,4 +1,5 @@
 #include "global.h"
+#include "background_controller.h"
 struct MoverPosition {
     s32 x, y, z;
 };
@@ -22,11 +23,10 @@ struct SceneMoverCamera {
     u8 pad[0x44];
     s32 x;
 };
-extern struct SceneMoverCamera *gUnk_020004B8;
 static inline void Project(struct MoverPosition *pos, struct MoverScreen *screen)
 {
     s32 y;
-    *(s16 *)screen = (pos->x >> 12) - gUnk_020004B8->x;
+    *(s16 *)screen = (pos->x >> 12) - ((struct SceneMoverCamera *)gSceneCamera)->x;
     y = pos->y;
     screen->y = ((pos->z + y) >> 12) + 96;
     screen->z = pos->z >> 12;
@@ -55,7 +55,7 @@ s32 SceneMover_StepPastScreenX(struct SceneMover *p0, s32 target0, s32 speed)
     {
         struct MoverScreen *ms = (struct MoverScreen *)screen;
         s32 sx = pos->x >> 12;
-        sx -= gUnk_020004B8->x;
+        sx -= ((struct SceneMoverCamera *)gSceneCamera)->x;
         screen[0] = sx;
         Project2(pos, ms);
     }

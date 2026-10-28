@@ -3,10 +3,10 @@
 #include "contact_actor.h"
 #include "engine.h"
 #include "ram.h"
+#include "player.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *);
 
-extern u8 *gUnk_02000580;
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void Sound_PlaySongChecked(u32);

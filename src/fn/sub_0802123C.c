@@ -10,7 +10,7 @@ typedef struct {
     void *next;
 } Entry;
 
-extern u8 *gUnk_0200047C;
+extern u8 *gSceneEventDispatchState;
 
 void SceneMessages_SetPendingTrigger(void *, void *);
 void Trigger_ConsumePending(void *, s32);
@@ -30,10 +30,10 @@ s32 SceneCommands_Dispatch(u8 *p)
     s32 i;
 
     i = 0;
-    if (i < entry->count[gUnk_0200047C[0x24]])
+    if (i < entry->count[gSceneEventDispatchState[0x24]])
         do {
             u8 *message;
-            u8 *controller = gUnk_0200047C;
+            u8 *controller = gSceneEventDispatchState;
             message = entry->messages[controller[0x24]][i];
             SceneMessages_SetPendingTrigger(entry, message);
             switch (message[6]) {
@@ -79,6 +79,6 @@ s32 SceneCommands_Dispatch(u8 *p)
                     break;
             }
             i++;
-        } while (i < entry->count[gUnk_0200047C[0x24]]);
+        } while (i < entry->count[gSceneEventDispatchState[0x24]]);
     return 0;
 }

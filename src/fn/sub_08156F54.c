@@ -3,11 +3,9 @@
 #include "player.h"
 #include "tether_actor.h"
 
-#define gTetherActor gUnk_02000488
 /* The tether header retains a distinct legacy player view. */
-#define gUnk_02000580 gTetherPlayerView
-#undef gUnk_02000580
-extern struct TetherActor *gUnk_02000488;
+#define gPlayers gTetherPlayerView
+#undef gPlayers
 s32 TetherActor_TestMatchingStatus(u32, u32, u32, u32);
 s32 Player_TestTetherActionInput(struct Player *p)
 {
@@ -15,7 +13,7 @@ s32 Player_TestTetherActionInput(struct Player *p)
         struct TetherActor **g;
         struct TetherActor *a;
         {
-            struct TetherActor **g0 = &gUnk_02000488;
+            struct TetherActor **g0 = &gTetherActor;
             a = *g0;
             g = g0;
             asm("" : "+r"(g));

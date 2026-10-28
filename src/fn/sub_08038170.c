@@ -18,7 +18,6 @@ struct ItemInfo {
     u8 pad[31];
 };
 extern struct Save *gGameState;
-extern u16 gUnk_0203B400[];
 int Mod(int, int);
 void Inventory_GetEquippedDescriptor(int, struct ItemInfo *);
 int GameState_GetUnlockEntry(int);
@@ -125,7 +124,7 @@ void WirelessGameMenu_InitItemChoices(struct P *input)
         {
             int off = index * 2;
             register int m asm("r2");
-            off = *(u16 *)((u8 *)gUnk_0203B400 + off);
+            off = *(u16 *)((u8 *)gRandomTable + off);
             m = moduloMask;
             asm("" : "+r"(m));
             start += off & m;
@@ -279,7 +278,7 @@ void WirelessGameMenu_InitItemChoices(struct P *input)
         {
             int off = index * 2;
             register int m asm("r2");
-            off = *(u16 *)((u8 *)gUnk_0203B400 + off);
+            off = *(u16 *)((u8 *)gRandomTable + off);
             m = moduloMask;
             asm("" : "+r"(m));
             start += off & m;

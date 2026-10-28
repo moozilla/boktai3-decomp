@@ -1,10 +1,9 @@
 #include "global.h"
-
-extern u8 *gUnk_020004B8;
+#include "background_controller.h"
 
 s32 SceneTilemap_IsActive(void)
 {
-    if (gUnk_020004B8 == NULL) {
+    if (gSceneCamera == NULL) {
         return 0;
     }
     return 1;

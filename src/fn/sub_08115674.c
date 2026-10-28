@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
+#include "background_controller.h"
 // Per-frame update of a pooled collectible: animates, tests proximity and handles pickup hit.
 struct Render {
     u32 flags;
@@ -25,7 +26,6 @@ struct Col {
     u8 padEE[1];
     u8 flagEF, padF0, tick;
 };
-extern u8 *gUnk_020004B8;
 void SpatialIndex_SetPosition(void *, s32, s32, s32);
 void SpatialIndex_InsertEntry(void *);
 u8 Collectible_IsNearPlayer(void *);
@@ -44,7 +44,7 @@ void Collectible_UpdateEntry(struct Col *p)
         s16 *yp, *zp, *xp;
         void *entry;
         yp = &p->y;
-        p->screenY = *yp - *(s32 *)(gUnk_020004B8 + 0x48);
+        p->screenY = *yp - *(s32 *)(((u8 *)gSceneCamera) + 0x48);
         zp = &p->z;
         p->screenZ = *zp;
         p->render.flags &= ~1;
@@ -175,7 +175,7 @@ void Collectible_UpdateEntry(struct Col *p)
 
         p->tick = 0;
     }
-    p->screenX = p->x - *(s32 *)(gUnk_020004B8 + 0x44);
+    p->screenX = p->x - *(s32 *)(((u8 *)gSceneCamera) + 0x44);
     if (Collectible_IsNearPlayer(p)) {
         u32 *f;
         u32 m;

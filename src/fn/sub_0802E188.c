@@ -1,5 +1,6 @@
 #include "global.h"
 #include "input.h"
+#include "player.h"
 // MATCHING_CONCESSION: register-pinning
 struct Position {
     s16 x, y, z, pad;
@@ -31,7 +32,6 @@ struct Context {
     struct Position *target;
     u8 *targetActor;
 };
-extern u8 *gUnk_02000580[];
 s32 Scene_CanOpenMenu(void);
 void Actor_SetAttachmentEffect(void *, s32, s32, s32);
 void Script_Call(u32, void *);
@@ -43,7 +43,7 @@ static inline u32 Flag(u32 *p, u32 mask)
 }
 static inline s32 PlayerKind(void)
 {
-    u8 *player = gUnk_02000580[0];
+    u8 *player = gPlayers[0];
     register u32 offset asm("r1") = 0x457;
     asm("" ::"r"(offset));
     return player[offset];

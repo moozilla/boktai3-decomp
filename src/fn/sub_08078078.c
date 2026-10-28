@@ -18,7 +18,7 @@ u8 SceneActorBehavior_IsNearParticipant(struct SceneActorRegistryActor *actor)
     if (index > limit)
         goto playersDone;
     last = limit;
-    cursor = gUnk_02000580;
+    cursor = gPlayers;
     do {
         player = *cursor;
         if (player) {

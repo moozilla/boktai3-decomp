@@ -9,7 +9,7 @@ union EmissionPosition {
 static inline u32 NextRandom(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gUnk_0203B400[gRandomIndex];
+    return gRandomTable[gRandomIndex];
 }
 void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpriteActor *input)
 {
@@ -38,7 +38,7 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
             register u16 *low asm("r0") = &actor->frames;
             frames = low;
             if (*low <= 9) {
-                const u16 *table = gUnk_0203B400;
+                const u16 *table = gRandomTable;
                 u32 *index;
                 register u32 next asm("r1");
                 u32 mask;

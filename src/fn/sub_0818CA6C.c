@@ -1,11 +1,10 @@
 #include "global.h"
+#include "ram.h"
 
 // MATCHING_CONCESSION: register-pinning
 #define gRandomTableIndex gRandomIndex
-#define gRandomTable      gUnk_0203B400
 
 extern u32 gRandomTableIndex;
-extern const u16 gRandomTable[];
 struct ArmorPart {
     u8 pad0[9];
     s8 stretchY;

@@ -5,7 +5,6 @@ struct ScenePoolNode {
     struct ScenePoolEntry *entry;
     struct ScenePoolNode *next;
 };
-extern struct ScenePoolPlayer *gUnk_020004F0[2];
 s32 Mod(s32, s32);
 u32 sub_08249498(u32, u32);
 void ScenePool_ReadActorBounds(s32, u32 *, u32 *, u32 *);
@@ -14,7 +13,7 @@ void *ScenePool_FindFreeActorSlot(void *);
 void sub_0803BC88(void *, struct ScenePoolEntry *, u32);
 static inline u8 PlayerHasFlag(u32 mask)
 {
-    if (gUnk_020004F0[0] && (gUnk_020004F0[0]->flags & mask))
+    if (gParticipantActors[0] && (gParticipantActors[0]->flags & mask))
         return 1;
     return 0;
 }

@@ -176,7 +176,7 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
             size.x = 164;
             size.y = 16;
             size.z = 164;
-            table = gUnk_0203B400;
+            table = gRandomTable;
             indexPtr = &gRandomIndex;
             index = *indexPtr;
             index++;
@@ -242,7 +242,7 @@ void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
         size.x = 164;
         size.y = 16;
         size.z = 164;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         indexPtr = &gRandomIndex;
         index = *indexPtr;
         index++;

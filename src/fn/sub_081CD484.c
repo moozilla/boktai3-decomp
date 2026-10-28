@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
+#include "player.h"
 typedef struct {
     u16 id;
     u8 unk[4];
@@ -58,7 +59,7 @@ struct SceneNpc {
     s32 speed2;
 };
 
-extern u8 *gUnk_0200047C;
+extern u8 *gSceneEventDispatchState;
 
 void SceneMessages_SetPendingTrigger(void *, void *);
 s32 Math_Atan2(s32, s32);
@@ -151,7 +152,6 @@ struct Camera {
     u8 pad[0x30];
     struct PackedVec position;
 };
-extern struct Camera *gUnk_02000580;
 void *memset(void *, s32, u32);
 void *SceneMessages_FindScript(s32);
 void Trigger_CreateDrop(void *, s32, s32, void *, void *, s32, s32, s32);
@@ -164,9 +164,9 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
 {
     Entry *entry = &npc->entry;
     s32 i = 0;
-    if (i < entry->count[gUnk_0200047C[0x24]])
+    if (i < entry->count[gSceneEventDispatchState[0x24]])
         do {
-            u8 *controller = gUnk_0200047C;
+            u8 *controller = gSceneEventDispatchState;
             s16 *m = entry->messages[controller[0x24]][i];
             SceneMessages_SetPendingTrigger(entry, m);
             switch (((u8 *)m)[6]) {
@@ -207,7 +207,7 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
                     struct PackedVec pos;
                     s32 a = m[4], b = m[5];
                     struct Vec *p = &npc->motion.pos;
-                    pos = gUnk_02000580->position;
+                    pos = (*(struct Camera **)gPlayers)->position;
                     pos.y += 200;
                     FloatingItemEffect_Spawn(a, b, 3, 0, &pos, p, 24, p);
                 } break;
@@ -635,5 +635,5 @@ void SceneNpc_DispatchCutsceneCommands(struct SceneNpc *npc)
                 } break;
             }
             i++;
-        } while (i < entry->count[gUnk_0200047C[0x24]]);
+        } while (i < entry->count[gSceneEventDispatchState[0x24]]);
 }

@@ -44,7 +44,7 @@ u32 SceneActorPlacement_ConsumeShakeFlags(struct SceneActorRegistryActor *argume
                 else
                     position =
                         &((struct SceneActorRegistryTileDrawable *)actor->drawable)->position;
-                table = gUnk_0203B400;
+                table = gRandomTable;
                 index = &gRandomIndex;
                 {
                     u32 next = *index + 1;
@@ -78,7 +78,7 @@ u32 SceneActorPlacement_ConsumeShakeFlags(struct SceneActorRegistryActor *argume
                 else
                     position =
                         &((struct SceneActorRegistryTileDrawable *)actor->drawable)->position;
-                table = gUnk_0203B400;
+                table = gRandomTable;
                 index = &gRandomIndex;
                 {
                     u32 next = *index + 1;

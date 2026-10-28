@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 struct FlickerParticle {
     u32 flags;
@@ -18,7 +19,6 @@ struct FlickerParticlePool {
     u8 unk_80[0x168 - 0x80];
     struct FlickerParticle particles[8];
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void FlickerParticle_UpdateSecondaryMotion(struct FlickerParticle *);
 
@@ -41,7 +41,7 @@ void FlickerParticle_StartSecondaryBurst(struct FlickerParticlePool *s)
     register const s16 *sine asm("r9") = gUnk_086149C4;
     struct FlickerParticlePool *cursor = s;
     u32 offset = 0;
-    register const u16 *table asm("r8") = gUnk_0203B400;
+    register const u16 *table asm("r8") = gRandomTable;
     for (i = 0; i < 8; i++) {
         s32 angle, radius;
         cursor->particles[0].x = s->x + 8;

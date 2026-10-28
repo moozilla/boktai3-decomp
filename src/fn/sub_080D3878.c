@@ -57,7 +57,7 @@ static inline u32 Random4(void)
     u32 v;
     gRandomIndex = index;
     index *= 2;
-    v = *(const u16 *)((u32)gUnk_0203B400 + index);
+    v = *(const u16 *)((u32)gRandomTable + index);
     v &= 3;
     return v + 1;
 }
@@ -151,7 +151,7 @@ void Mummy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 input)
                 rangeB.y = 60;
                 rangeB.z = 60;
                 {
-                    register const u16 *table asm("sl") = gUnk_0203B400;
+                    register const u16 *table asm("sl") = gRandomTable;
                     s32 duration;
                     s32 scale;
                     SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x20, 4,

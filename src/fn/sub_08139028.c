@@ -2,6 +2,7 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "ram.h"
+#include "background_controller.h"
 struct BallisticSpriteVector {
     s32 x, y, z, w;
 };
@@ -21,7 +22,6 @@ struct BallisticSpriteEffect {
     u8 entered, unk_D5, phase, unk_D7;
     u16 timer;
 };
-extern struct BallisticSpriteCamera *gUnk_020004B8;
 extern const s16 gUnk_086149C4[];
 extern const u16 gUnk_086141BC[];
 void Sound_PlaySong(u32);
@@ -171,7 +171,7 @@ void BallisticSpriteEffect_UpdateLaunch(struct BallisticSpriteEffect *p)
         struct BallisticSpriteVector *pos = &p->position;
         struct ContactPosition *dst = &p->sprite.position;
         u32 yOff = p->yOffset;
-        dst->x = (pos->x >> 12) - gUnk_020004B8->x;
+        dst->x = (pos->x >> 12) - ((struct BallisticSpriteCamera *)gSceneCamera)->x;
         dst->y = ((s32)(pos->z + (pos->y + yOff)) >> 12) + 0x60;
         dst->z = pos->z >> 12;
     }

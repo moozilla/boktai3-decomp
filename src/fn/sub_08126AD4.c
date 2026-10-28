@@ -23,7 +23,6 @@ struct BurstSparkPool {
     u8 pad0[0x18];
     u8 animation[0x1C];
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 struct BurstSparkPool *BurstSpark_EnsurePool(void);
 struct BurstSpark *BurstSpark_AllocateSlot(struct BurstSparkPool *);
@@ -41,7 +40,7 @@ static inline u32 LastRandom(void)
     gRandomIndex = index;
     {
         u32 offset = index * 2;
-        register const u16 *lastTable asm("r3") = gUnk_0203B400;
+        register const u16 *lastTable asm("r3") = gRandomTable;
         return *(const u16 *)(offset + (u32)lastTable);
     }
 }

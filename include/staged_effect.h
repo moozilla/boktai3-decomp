@@ -2,6 +2,7 @@
 #define GUARD_STAGED_EFFECT_H
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 /* Tentative identity: a five-sprite scripted burst/transition effect. */
 struct StagedEffectSprite {
     u32 flags;
@@ -40,7 +41,6 @@ struct StagedEffect {
     u16 blendedPalette[16];
 };
 extern u16 *gPaletteBankData;
-extern u16 gUnk_0203B400[];
 void StagedEffect_MarkOuterSprites(struct StagedEffect *);
 void StagedEffect_MarkOuterSpritesAlternate(struct StagedEffect *);
 void StagedEffect_BlendPalette(struct StagedEffect *, s32, s32, s32);

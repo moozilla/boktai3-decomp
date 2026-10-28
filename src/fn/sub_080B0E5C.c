@@ -1,6 +1,6 @@
-#define gPlayers gUnk_02000580
 /* Descriptive aliases and object roles are tentative (confidence: low). */
 #include "global.h"
+#include "player.h"
 struct PackedItemPosition {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -16,7 +16,6 @@ struct SceneActorItemLaunch {
     u8 unknown684[0x6d4 - 0x684];
     u16 flags;
 };
-extern struct ItemLaunchPlayer *gUnk_02000580[4];
 u8 SceneInventory_FindSlotByValue(s16 *, s16 *, s16 *, s32);
 s32 FloatingItemEffect_Spawn(s32, s32, s32, s32, void *, void *, s32, void *);
 void Inventory_ClearItemSlot(u32);
@@ -37,7 +36,7 @@ static inline u8 occupied(struct SceneActorItemLaunch *p)
 s32 SceneActor_TryLaunchItem13(struct SceneActorItemLaunch *p)
 {
     struct SceneActorItemLaunch *q = p;
-    struct PackedItemPosition pos = gUnk_02000580[0]->position;
+    struct PackedItemPosition pos = ((struct ItemLaunchPlayer **)gPlayers)[0]->position;
     pos.y += 200;
     if (occupied(p))
         return -1;

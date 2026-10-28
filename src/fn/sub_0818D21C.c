@@ -1,8 +1,8 @@
 #include "motion_0818.h"
 #include "game_state.h"
 #include "engine_globals.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 u32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
@@ -20,7 +20,7 @@ void Armor_InitPartLunge(struct Motion0818Object *p)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     {
         u32 offset = gRandomIndex * 2;
-        register const u16 *table asm("r3") = gUnk_0203B400;
+        register const u16 *table asm("r3") = gRandomTable;
         choice = *(const u16 *)(offset + (u32)table);
     }
     one = 1;

@@ -87,7 +87,7 @@ struct GroupObjects {
 
 extern struct GroupGlobals {
     u8 pad[36], bank;
-} *gUnk_0200047C;
+} *gSceneEventDispatchState;
 
 extern void (*gUnk_08604B48[])(struct GroupObjects *, struct GroupPiece *, int);
 
@@ -123,7 +123,7 @@ static inline int randomValue(void)
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+    return *(const u16 *)(offset + (u32)gRandomTable);
 }
 
 static inline int randomByte(const u16 *table)

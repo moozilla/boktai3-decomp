@@ -1,7 +1,7 @@
 #include "global.h"
 #include "ram.h"
 #include "engine_globals.h"
-extern u8 *gUnk_02000580;
+#include "player.h"
 extern u8 *gGameState;
 s32 Solar_GetLevelForIntensity(s32);
 s32 Solar_GetLevelUpperBound(s32);
@@ -18,8 +18,8 @@ s32 Solar_ApplyIntensityModifiers(s32 v)
 {
     if (gEngineFlags & 0x800)
         return v;
-    if (gUnk_02000580) {
-        u32 *flags = (u32 *)(gUnk_02000580 + 0x444);
+    if ((*(u8 **)gPlayers)) {
+        u32 *flags = (u32 *)((*(u8 **)gPlayers) + 0x444);
         u32 bit = 0x40000;
         if (*flags & bit) {
             s32 band = Solar_GetLevelForIntensity(v) * 2;

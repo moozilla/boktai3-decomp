@@ -1,11 +1,11 @@
 #include "global.h"
+#include "player.h"
 struct P {
     u8 pad[0x3c];
     u32 w3c;
     u8 pad1[0x77];
     u8 bb7;
 };
-extern u32 gUnk_02000580;
 s32 ResultMenu_IsPhaseStart(void);
 u8 ResultMenu_ConfigureLayers(u32, u32);
 void sub_0801BD44(struct P *);
@@ -21,7 +21,7 @@ void ResultMenu_UpdateIntro(struct P *p)
         z = 0;
         sub_0801BD44(p);
         ScreenTransition_SendCommand(0, 5, 4, 4, 4, 0xFFFF, z);
-        PlayerCue_BeginModeSeven(gUnk_02000580, 0);
+        PlayerCue_BeginModeSeven((*(u32 *)gPlayers), 0);
     }
     if (p->w3c > 0x1f) {
         ResultMenu_SetPhase(p, ResultMenu_Countdown);

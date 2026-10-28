@@ -3,8 +3,8 @@
 
 #include "route_sprite_actor.h"
 #include "engine.h"
+#include "ram.h"
 
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 extern void *gUnknown_02000580;
 s32 Mod(s32, s32);
@@ -98,7 +98,7 @@ void RouteSpriteActor_PlanWanderPath(struct RouteSpriteActor *actor)
     u8 index;
     s16 angle;
 
-    table = gUnk_0203B400;
+    table = gRandomTable;
     asm("" : "+r"(table));
     index = Mod(f0806D438_NextRandom(table), route->resource->pointCount);
     if (index == route->index) {

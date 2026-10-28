@@ -25,7 +25,7 @@ void PlayerOrbitEffect_UpdateIntro(struct PlayerOrbitEffect *effect)
         Sound_PlaySong(0x302);
         Sound_PlaySong(0x1FA);
     }
-    player = gUnk_02000580[0];
+    player = gPlayers[0];
     player->animation.flags |= 1;
     effect->height = (effect->height * 15 + player->position.y + 150) >> 4;
     Anim_Step(effect->animation, effect->animationData);

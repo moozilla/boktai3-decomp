@@ -1,10 +1,10 @@
 #include "global.h"
+#include "player.h"
 struct TradeMenu {
     u8 pad[0x24];
     u32 timer;
     u8 state, entered;
 };
-extern void *gUnk_02000580;
 void PlayerCue_ReleaseControl(void *);
 void WirelessGameMenu_UpdateStartupDelay(struct TradeMenu *p)
 {
@@ -17,7 +17,7 @@ void WirelessGameMenu_UpdateStartupDelay(struct TradeMenu *p)
         *state = two;
         p->entered = 1;
         p->timer = zero;
-        PlayerCue_ReleaseControl(gUnk_02000580);
+        PlayerCue_ReleaseControl((*(void **)gPlayers));
     }
     p->timer++;
 }

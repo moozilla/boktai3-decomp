@@ -2,6 +2,7 @@
 #include "contact_swarm.h"
 #include "player.h"
 #include "engine.h"
+#include "ram.h"
 // confidence=low: random neighboring directions with short hold durations.
 #ifdef NONMATCHING
 // fuzzy: 88.2%
@@ -134,14 +135,13 @@ struct ReleaseAnimation {
     struct DisplaySequenceState seq;
     const void *resource;
 };
-extern const u16 gUnk_0203B400[];
 s32 Player_GetSmoothedDirection(struct Player *);
 void Player_SetDirectionalVelocity(struct Player *, s32);
 static inline s32 RandomBits(u32 mask)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
-    return gUnk_0203B400[index];
+    return gRandomTable[index];
 }
 // confidence=low: selects nearby directions with randomized hold durations.
 static inline void Step_UpdateWaveringMovement(struct ContactSwarmSprite *sp,

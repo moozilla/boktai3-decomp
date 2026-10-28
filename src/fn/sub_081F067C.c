@@ -1,5 +1,5 @@
-#define gSceneTilemapController gUnk_020004B8
 #include "global.h"
+#include "background_controller.h"
 
 /* Tentative actor and motion-field interpretations, based on static accesses. */
 
@@ -26,14 +26,13 @@ struct SingletonSlot7Origin {
     u8 pad0[0x44];
     s32 x;
 };
-extern struct SingletonSlot7Origin *gSceneTilemapController;
 /* The checker ELF predates this callee's promoted name. */
 s32 Player_GetHorizontalVelocity(s32) __asm__("Player_GetHorizontalVelocity");
 
 void SingletonSlot7_SetMotionMode(struct SingletonSlot7Actor *p, u32 mode)
 {
     if (p->motionMode == 1)
-        p->worldX = (p->localX + gSceneTilemapController->x) << 12;
+        p->worldX = (p->localX + ((struct SingletonSlot7Origin *)gSceneCamera)->x) << 12;
     p->motionMode = mode;
     if (mode == 0) {
         p->targetX = p->localX;

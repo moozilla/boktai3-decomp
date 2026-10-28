@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "engine.h"
+#include "ram.h"
 struct PoisonHandBurst {
     u8 pad0[0x18];
     s32 frame;
@@ -14,7 +15,6 @@ struct PoisonHandBurst {
     u8 pad12E[0x16];
     s16 timer;
 };
-extern const u16 gUnk_0203B400[];
 void PoisonHand_RecordDefeat(void *);
 void *SpriteEffectController_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                     u32, s32, s32, u32, s32, u32, u32);
@@ -81,8 +81,8 @@ s32 PoisonHand_UpdateEmergence(struct PoisonHandBurst *input)
     u32 palette;
     PoisonHand_CopyPosition(&position, &p->position);
     PoisonHand_RaiseOrigin(&position);
-    angle = PoisonHand_NextSpread(gUnk_0203B400) & 255;
-    jitter = PoisonHand_NextSpread(gUnk_0203B400);
+    angle = PoisonHand_NextSpread(gRandomTable) & 255;
+    jitter = PoisonHand_NextSpread(gRandomTable);
     magnitude = p->spread;
     jitter &= 15;
     Polar(&velocity, angle, magnitude + jitter - 8);

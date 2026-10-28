@@ -2,7 +2,7 @@
 #include "global.h"
 #include "engine.h"
 #include "input.h"
-#define gRandomTable gUnk_0203B400
+#include "ram.h"
 struct RatatoskPosition {
     u32 packedXY, packedZ;
 };
@@ -35,7 +35,6 @@ struct Ratatosk {
     u8 padE98[0xef8 - 0xe98];
     u16 spawnClone;
 };
-extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 u32 HomingProjectile_GetActiveCount(void);
 static inline u8 ConsumeActivation(struct Ratatosk *p)
@@ -55,7 +54,7 @@ static inline u32 NextRandom(const u16 *table)
 static inline s32 RandomModulo(s32 divisor)
 {
     s32 bound = divisor;
-    return Mod(NextRandom(gUnk_0203B400), bound);
+    return Mod(NextRandom(gRandomTable), bound);
 }
 void PlayerClone_BeginActiveReactions(void);
 u32 PlayerClone_GetActiveCount(void);
@@ -125,7 +124,7 @@ void Ratatosk_UpdateCloneAttack(struct Ratatosk *p)
                         gRandomIndex = (gRandomIndex + 1) & 1023;
                         p->position =
                             *(struct RatatoskPosition *)((Mod(*(const u16 *)(gRandomIndex * 2 +
-                                                                             (u32)gUnk_0203B400),
+                                                                             (u32)gRandomTable),
                                                               9) *
                                                               8 +
                                                           (u32)p) +

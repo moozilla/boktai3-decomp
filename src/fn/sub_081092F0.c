@@ -1,4 +1,5 @@
 #include "global.h"
+#include "area_effect_link.h"
 
 struct P {
     u8 f[0x1c];
@@ -6,7 +7,6 @@ struct P {
     u8 g[7];
     u8 b;
 };
-extern struct P *gUnk_020004B4;
 void Sound_FadeOutChannel10(s32);
 
 static inline u8 chk(struct P *p)
@@ -18,8 +18,8 @@ static inline u8 chk(struct P *p)
 
 void Registry1745_SetSelectionResponse(u32 v)
 {
-    if (gUnk_020004B4 != 0) {
-        struct P *p = gUnk_020004B4;
+    if (gLinkSession != 0) {
+        struct P *p = gLinkSession;
         if (!chk(p)) {
             p->b = v;
             Sound_FadeOutChannel10(1);

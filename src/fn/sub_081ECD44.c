@@ -1,4 +1,5 @@
 #include "global.h"
+#include "background_controller.h"
 struct MoverPosition {
     s32 x, y, z;
 };
@@ -22,7 +23,6 @@ struct SceneMoverCamera {
     u8 pad[0x44];
     s32 x;
 };
-extern struct SceneMoverCamera *gUnk_020004B8;
 s32 Player_GetHorizontalVelocity(s32);
 s32 SceneMover_ApproachScreenX(struct SceneMover *p, s32 target)
 {
@@ -60,7 +60,7 @@ s32 SceneMover_ApproachScreenX(struct SceneMover *p, s32 target)
         pos->x += p->speedX;
         p->position.z = p->height;
         screen = &p->screen;
-        screen->x = (pos->x >> 12) - gUnk_020004B8->x;
+        screen->x = (pos->x >> 12) - ((struct SceneMoverCamera *)gSceneCamera)->x;
         {
             s32 y = pos->y;
             screen->y = ((pos->z + y) >> 12) + 96;

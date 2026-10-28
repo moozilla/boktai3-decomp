@@ -10,7 +10,7 @@ static inline u32 RetryDuration(void)
     u32 value;
     gRandomIndex = index;
     index *= 2;
-    value = *(const u16 *)(index + (u32)gUnk_0203B400);
+    value = *(const u16 *)(index + (u32)gRandomTable);
     value &= 31;
     return value + 10;
 }
@@ -21,7 +21,7 @@ static inline u32 NextRetryDuration(void)
     gRandomIndex = index;
     index *= 2;
     {
-        register const u16 *table asm("r2") = gUnk_0203B400;
+        register const u16 *table asm("r2") = gRandomTable;
         value = *(const u16 *)(index + (u32)table);
     }
     value &= 31;

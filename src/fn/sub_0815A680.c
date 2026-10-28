@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-extern u8 *gUnk_02000580[];
+#include "player.h"
 s32 Script_GetActorIndex(void);
 /* Script: tests flag -f (0-95) in the three flag words at +0x444 of the
    scripted actor chosen by -i; returns the masked word (nonzero if set). */
@@ -23,7 +23,7 @@ u32 ScriptActor_TestFlagFromScript(void)
     u8 *actor;
     u8 *flagActor;
     s32 i = Script_GetActorIndex();
-    actor = gUnk_02000580[i];
+    actor = gPlayers[i];
     flagActor = actor;
     if (actor && Script_SeekToKeyword('f')) {
         u32 flag = Script_GetValue();

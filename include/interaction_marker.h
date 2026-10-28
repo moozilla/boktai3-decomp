@@ -26,7 +26,7 @@ struct InteractionMarkerPlayer {
     u8 unknown458[0xC];
     u8 busy;
 };
-extern struct InteractionMarkerPlayer *gUnk_02000580[4];
+extern struct InteractionMarkerPlayer *gPlayers[4];
 extern u32 gUnk_02000560;
 u32 InteractionMarker_IsPlayerNearby(struct InteractionMarker *);
 void InteractionMarker_SetState(struct InteractionMarker *, void (*)(struct InteractionMarker *));

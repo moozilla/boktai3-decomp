@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 struct Vec {
     s16 x, y, z, pad;
@@ -47,7 +48,6 @@ struct ChoiceTable {
 };
 extern const struct ChoiceTable gUnk_0824FDF8, gUnk_0824FE08, gUnk_0824FE18;
 extern void *const gUnk_08613F04[];
-extern const u16 gUnk_0203B400[];
 u8 Callback_InvokeActor(void *, void *);
 struct Vec *Player_GetEffectivePosition(s32);
 void Ratatosk_BeginInterruptState(void *);
@@ -63,7 +63,7 @@ static inline u32 flags(struct Actor *p, u32 mask)
 static inline u32 randomB(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gUnk_0203B400[gRandomIndex];
+    return gRandomTable[gRandomIndex];
 }
 #define RANDOM_TABLE_ADDR 0x0203B400
 static inline s32 randomByte(void)

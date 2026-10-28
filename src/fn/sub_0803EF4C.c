@@ -28,14 +28,14 @@ static inline void ProjectArc(struct SceneArcSlot *slot, struct SceneArcSprite *
     s32 height = lift << 12;
     struct ScenePoolVec32 *position = &slot->position;
     struct SceneVec *screen = &sprite->screen;
-    screen->x = (slot->position.x >> 12) - gUnk_020004B8->x;
+    screen->x = (slot->position.x >> 12) - gSceneCamera->x;
     screen->y = ((position->z + (position->y - height)) >> 12) + 96;
     screen->z = position->z >> 12;
     screen->y = (u16)screen->y - lift;
 }
 static inline u8 PlayerSuspendsArc(void)
 {
-    if (gUnk_020004F0[0] && (gUnk_020004F0[0]->flags & 4))
+    if (gParticipantActors[0] && (gParticipantActors[0]->flags & 4))
         return 1;
     return 0;
 }

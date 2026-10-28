@@ -14,7 +14,7 @@ static inline void Or(u32 mask, u32 *flags)
 }
 static inline u8 PlayerHasFlag(u32 mask)
 {
-    if (gUnk_020004F0[0] && (gUnk_020004F0[0]->flags & mask))
+    if (gParticipantActors[0] && (gParticipantActors[0]->flags & mask))
         return 1;
     return 0;
 }
@@ -68,7 +68,7 @@ s32 ScenePool_StateCruise(void *manager, struct ScenePoolActor *actor, struct Sc
     rangeDone:;
     }
     {
-        const u16 *table = gUnk_0203B400;
+        const u16 *table = gRandomTable;
         u32 *index = &gRandomIndex;
         u32 next = *index + 1;
         u32 indexMask = 0x3ff;

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "rotation_phase.h"
+#include "player.h"
 // confidence=low: saves the player position and turns the axe before the attack callback.
 struct WindupContext {
     u8 unknown0[0xE3E];
@@ -11,7 +12,6 @@ struct WindupContext {
     u8 unknownED4[0x48];
     struct ContactPosition target;
 };
-extern u8 *gUnk_02000580;
 void Sound_PlaySong(u32);
 void Axe_UpdateTargetLunge(void);
 void Axe_UpdateTargetWindup(struct SceneActorRegistryResetView *actor, s32 elapsed)
@@ -22,7 +22,7 @@ void Axe_UpdateTargetWindup(struct SceneActorRegistryResetView *actor, s32 elaps
     if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         drawable->flags |= 2;
         state->direction = actor->fieldE9;
-        state->target = *(struct ContactPosition *)(gUnk_02000580 + 0x30);
+        state->target = *(struct ContactPosition *)((*(u8 **)gPlayers) + 0x30);
         state->active = 1;
         Sound_PlaySong(0x16F);
     }

@@ -2,15 +2,15 @@
 // MATCHING_CONCESSION: register-pinning
 static inline s32 localPlayer(void)
 {
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         return -1;
-    return gUnk_020004B4->localPlayer;
+    return gLinkSession->localPlayer;
 }
 static inline u32 linkValue(s32 index)
 {
-    if (!gUnk_020004B4 || index < 0)
+    if (!gLinkSession || index < 0)
         return 0;
-    return gUnk_020004B4->playerValues[index];
+    return gLinkSession->playerValues[index];
 }
 void AreaEffect_UpdateLinkVisibility(struct AreaEffectManager *manager)
 {

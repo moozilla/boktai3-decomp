@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_actor_reset.h"
+#include "player.h"
 
 // confidence=low: follows player displacement while the participant-progress control runs.
 
-extern u8 *gUnk_02000580;
 void ActorBehavior_TickParticipantProgress(void);
 void SceneActorControl_OnIdle(void);
 void SceneActorControl_ResetTargetFlags(void *);
@@ -53,16 +53,17 @@ void Lun_FollowParticipantDisplacement(struct SceneActorRegistryResetView *a)
     if (TakeFlag(&a->field2B1)) {
         SetControl(a, ActorBehavior_TickParticipantProgress, 0x23);
         *(struct ContactPosition *)(ctx + 0x414) =
-            *(struct ContactPosition *)(gUnk_02000580 + 0x30);
+            *(struct ContactPosition *)((*(u8 **)gPlayers) + 0x30);
         SceneActorControl_ResetTargetFlags(a);
     }
     {
-        u8 **players = &gUnk_02000580;
-        Delta(&delta, (void *)(ctx + 0x414), (void *)((*(new_var = &gUnk_02000580)) + 0x30));
+        u8 **players = &(*(u8 **)gPlayers);
+        Delta(&delta, (void *)(ctx + 0x414), (void *)((*(new_var = &(*(u8 **)gPlayers))) + 0x30));
     }
     a->motion.x += delta.x;
     a->motion.z += delta.z;
-    *(struct ContactPosition *)(ctx + 0x414) = *(struct ContactPosition *)(gUnk_02000580 + 0x30);
+    *(struct ContactPosition *)(ctx + 0x414) =
+        *(struct ContactPosition *)((*(u8 **)gPlayers) + 0x30);
     if (a->field2B0) {
         SetState(a, 0, 3, 0);
         SetControl(a, SceneActorControl_OnIdle, 0x10);

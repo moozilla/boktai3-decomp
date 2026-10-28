@@ -83,5 +83,5 @@ void SceneActorControl_RestartPositionCurve(struct SceneActorRegistryResetView *
         *field = 1;
     }
     ActorShadow_Enable((u8 *)actor + 0x320);
-    SceneActorControl_StartPositionCurve(actor, (void *)&gUnk_02000580[0]->position);
+    SceneActorControl_StartPositionCurve(actor, (void *)&gPlayers[0]->position);
 }

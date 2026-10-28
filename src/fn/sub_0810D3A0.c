@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
+#include "area_effect_link.h"
 #define SpriteGroup_Initialize PanelSequence_InitializeSprites
 struct PanelSequence {
     u8 pad0[0x1C];
@@ -23,7 +24,6 @@ struct PanelSelection {
     u8 pad54[0x1BC];
     u8 count;
 };
-extern struct PanelSelection *gUnk_020004B4;
 s32 Script_SeekToKeyword(u32);
 u32 Script_GetTextSourcePc(void);
 s32 Script_GetPc(void);
@@ -41,7 +41,7 @@ void PanelSequence_UpdateDelay(struct PanelSequence *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 static inline u8 *GetSelectionCount(void)
 {
-    struct PanelSelection *p = gUnk_020004B4;
+    struct PanelSelection *p = gLinkSession;
     if (p && (p->type == 1))
         goto ret1;
     return 0;

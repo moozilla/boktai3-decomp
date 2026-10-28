@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "display_animation.h"
+#include "background_controller.h"
 // Collectible defeat: launches a bouncing death animation, then expires.
 struct Render {
     u32 flags;
@@ -27,7 +28,6 @@ struct Col {
     u16 timer;
     void (*callback)(u8 *);
 };
-extern u8 *gUnk_020004B8;
 void SpatialIndex_RemoveEntry(void *);
 void ActorParticles_SpawnAlternatingBurst(void *);
 s32 Terrain_GetCellClearance(void *);
@@ -205,8 +205,8 @@ void Collectible_StartDeath(struct Col *p)
             *vyp = Div(-*vyp * 4, 10);
             *vxp = Div(*vyp * 4, 10);
         }
-        p->screenX = *xp - *(s32 *)(gUnk_020004B8 + 0x44);
-        p->screenY = *yp - *(s32 *)(gUnk_020004B8 + 0x48);
+        p->screenX = *xp - *(s32 *)(((u8 *)gSceneCamera) + 0x44);
+        p->screenY = *yp - *(s32 *)(((u8 *)gSceneCamera) + 0x48);
         tp = &p->timer;
         if (*tp > 0x1E)
             Sprite_BlinkUntilExpired((u8 *)p + 0x1C, *tp, 0x32, 0x50);

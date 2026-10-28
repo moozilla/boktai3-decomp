@@ -1,5 +1,7 @@
 #include "global.h"
 #include "engine.h"
+#include "player.h"
+#include "ram.h"
 
 #ifdef NONMATCHING
 // fuzzy: 86.5%
@@ -37,8 +39,6 @@ struct Actor {
     u8 padEe2[4];
     s16 angleLimit;
 };
-extern u8 *gUnk_02000580;
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 struct Vec *Player_GetEffectivePosition(s32);
 s32 Div(s32, s32);
@@ -71,7 +71,7 @@ static inline u8 consume(struct Actor *p)
 static inline u32 randomB(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gUnk_0203B400[gRandomIndex];
+    return gRandomTable[gRandomIndex];
 }
 static inline s32 trunc12(s32 v)
 {
@@ -148,11 +148,11 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Actor *p)
                     p->duration = 128;
                     polar(&scratch.offset, ((((((u8)randomB()) + 0x60) >> 6) & 3) * 64) + 64, 512);
                     sum_081F7FD0(&p->destination, &scratch.offset, &p->center);
-                    player = gUnk_02000580;
+                    player = (*(u8 **)gPlayers);
                     if (flag(player, 0x40000) != 1) {
                         Player_BeginInterpolatedMovement(player, &p->center, p->duration, 0, 476, 0,
                                                          0);
-                        p->previousAngle = *((u8 *)(((u8 *)gUnk_02000580) + 0x4f4));
+                        p->previousAngle = *((u8 *)(((u8 *)(*(u8 **)gPlayers)) + 0x4f4));
                         p->ended = 0;
                         Sound_PlaySong(0x569);
                     }
@@ -171,7 +171,7 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Actor *p)
 
         case 1: {
             s32 prev = p->previousAngle;
-            u8 *player = gUnk_02000580;
+            u8 *player = (*(u8 **)gPlayers);
             s32 amount = *((u8 *)(((u8 *)player) + 0x4f4));
             if (amount < prev)
                 amount -= prev - 256;
@@ -180,7 +180,7 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Actor *p)
             if (amount > p->angleLimit) {
                 if (p->ended)
                     goto finish;
-                Player_EndState25(gUnk_02000580);
+                Player_EndState25((*(u8 **)gPlayers));
                 p->ended = 1;
                 Sound_StopSong(0x569);
             }
@@ -218,7 +218,7 @@ void Ratatosk_UpdatePlayerOrbitAttack(struct Actor *p)
 
         case 2:
             if ((p->waitTimer == 13) && (!p->ended)) {
-                u8 *player = gUnk_02000580;
+                u8 *player = (*(u8 **)gPlayers);
                 if (flag(player, 0x40000) != 1)
                     Player_ApplyInterpolatedMovement(player, &p->center, 30, q->angle, 0, 42, 30,
                                                      0);

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 #ifdef NONMATCHING
 // fuzzy: 93.3%
 
@@ -80,8 +81,7 @@ struct AxeActor {
     struct AxeContext *context;
 };
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
-extern u8 *gUnk_02000580;
+extern u8 *gPlayers;
 s32 Mod(s32, s32);
 s32 Math_Atan2(s32, s32);
 void Sound_PlaySong(u32);
@@ -167,7 +167,7 @@ void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
     } else if (frame < 180) {
         if (Mod(frame, 4) == 0) {
             gRandomIndex = (gRandomIndex + 1) & 1023;
-            if ((s32) * (const u8 *)&gUnk_0203B400[gRandomIndex] <= 19) {
+            if ((s32) * (const u8 *)&gRandomTable[gRandomIndex] <= 19) {
                 {
                     s32 direction = data->direction;
                     data->direction = -direction;
@@ -175,7 +175,7 @@ void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
                 Sound_PlaySong(0x169);
             }
         }
-        Difference(&delta, (void *)P(gUnk_02000580, 0x30), &data->center);
+        Difference(&delta, (void *)P(gPlayers, 0x30), &data->center);
         data->heading = Math_Atan2(delta.x, delta.z);
         data->timer = 0;
     } else {
@@ -191,7 +191,7 @@ void Axe_UpdateOrbitAttack(struct AxeActor *p, s32 frame)
                 data->flags |= 4;
             }
         }
-        Difference(&delta, (void *)P(gUnk_02000580, 0x30), &data->center);
+        Difference(&delta, (void *)P(gPlayers, 0x30), &data->center);
         difference = Math_Atan2(delta.x, delta.z) - data->heading;
         if (difference > 128)
             difference -= 256;

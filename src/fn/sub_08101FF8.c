@@ -24,13 +24,13 @@ void NamedObject_UpdateEntryTrigger(struct NamedObject *o)
     s32 i;
     for (i = 0; i < 1; i++) {
         u32 outside = 0;
-        if (gUnk_02000580[i]) {
-            if (!Player_TestAttachmentFlags(gUnk_02000580[i], 1) &&
-                !Player_TestAttachmentFlags(gUnk_02000580[i], 2))
+        if (gPlayers[i]) {
+            if (!Player_TestAttachmentFlags(gPlayers[i], 1) &&
+                !Player_TestAttachmentFlags(gPlayers[i], 2))
                 return;
             if (HasFlag(8, &o->flags)) {
-                s32 x = gUnk_02000580[i]->position.x >> 8;
-                s32 z = gUnk_02000580[i]->position.z >> 8;
+                s32 x = gPlayers[i]->position.x >> 8;
+                s32 z = gPlayers[i]->position.z >> 8;
                 s32 cell;
                 u8 *data;
                 u16 attr;
@@ -47,7 +47,7 @@ void NamedObject_UpdateEntryTrigger(struct NamedObject *o)
                 if (attr & 0x40) {
                     if (!NamedObject_IsMapCellOccupied(cell)) {
                         struct SceneVec delta;
-                        Difference(&delta, (struct SceneVec *)&o->x, &gUnk_02000580[i]->position);
+                        Difference(&delta, (struct SceneVec *)&o->x, &gPlayers[i]->position);
                         if (o->field_E0 & 8) {
                             if (delta.x > gUnk_086064B4.x || delta.x < -gUnk_086064B4.x ||
                                 delta.y > gUnk_086064B4.y || delta.y < -gUnk_086064B4.y ||

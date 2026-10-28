@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 #define gParticleRandomIndex gRandomIndex
-#define gParticleRandomTable gUnk_0203B400
 struct PlayerOrbitParticle {
     u32 flags;
     u8 unknown4[0x14];
@@ -19,7 +19,6 @@ struct PlayerOrbitEffect {
     struct PlayerOrbitParticle particles[16];
     u16 frame;
 };
-extern u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 static inline s32 TruncateOrbitOffset(s32 value)
@@ -46,7 +45,7 @@ void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct Sc
             p = &effect->particles[i];
             p->flags &= ~1;
             p->position = *position;
-            randomTable = gUnk_0203B400;
+            randomTable = gRandomTable;
             randomIndex = &gRandomIndex;
             index = *randomIndex;
             index++;
@@ -80,7 +79,7 @@ void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct Sc
             u32 index = (gRandomIndex + 1) & 0x3FF;
             gRandomIndex = index;
             {
-                u32 random = *(u16 *)((index << 1) + (u32)gUnk_0203B400);
+                u32 random = *(u16 *)((index << 1) + (u32)gRandomTable);
                 u32 range = 7;
                 p->lifetime = (random & range) + 8;
             }

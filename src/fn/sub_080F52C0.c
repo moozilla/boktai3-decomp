@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 // confidence=low: computes a target-relative endpoint before accelerating the turn.
 
 struct Orbit {
@@ -11,7 +12,6 @@ struct Orbit {
     u8 pad142[2];
     u16 dx, dy, dz;
 };
-extern u16 gUnk_0203B400[];
 extern s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
@@ -36,7 +36,7 @@ void Sword_BeginTargetOrbit(u8 *p)
         u32 one;
         {
             u32 offset = gRandomIndex * 2;
-            register const u16 *table asm("r3") = gUnk_0203B400;
+            register const u16 *table asm("r3") = gRandomTable;
             choice = *(const u16 *)(offset + (u32)table);
         }
         one = 1;

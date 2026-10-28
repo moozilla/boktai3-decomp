@@ -2,6 +2,7 @@
 #include "game_state.h"
 #include "ram.h"
 #include "engine_globals.h"
+#include "area_effect_link.h"
 
 // confidence=low: clears actions and markers, emits defeat bursts, then selects recovery.
 
@@ -85,7 +86,6 @@ void ScenePool_ClampMotionSpeeds(struct Obj *);
 void Actor_ClampMovementSpeed(struct Obj *);
 void Glove_SetAnimationKeyframes(struct Glove *, s32);
 void ActorRecoil_UpdateMotion(struct Glove *);
-extern u8 *gUnk_020004B4;
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 void GameState_AddActionCount894(s32);
@@ -209,7 +209,7 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
         {
             u32 mask = 0x800;
             if ((gEngineFlags | gScenePauseFlags) & mask) {
-                u8 *peer = gUnk_020004B4;
+                u8 *peer = gLinkSession;
                 if (peer) {
                     if (U8(peer, 0x53) != 1)
                         peer = 0;

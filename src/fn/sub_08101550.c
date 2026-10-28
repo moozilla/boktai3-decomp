@@ -1,5 +1,4 @@
 #define gNamedObjectContactBounds gUnk_086064B4
-#define gPlayers                  gUnk_02000580
 #include "global.h"
 #include "player.h"
 struct NamedObjectContactBody {
@@ -16,7 +15,7 @@ static inline void Difference(struct SceneVec *d, const struct SceneVec *b,
 }
 u32 NamedObject_IsPlayerWithinContactBounds(struct NamedObjectContactBody *object)
 {
-    struct Player *player = gUnk_02000580[0];
+    struct Player *player = gPlayers[0];
     struct SceneVec delta;
     if (player) {
         Difference(&delta, &object->position, &player->position);

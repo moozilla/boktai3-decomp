@@ -17,7 +17,7 @@ void SceneActor_SetContactReactionDirection(struct SceneActorBehaviorView *actor
         delta->z = (u16)left->z - (u16)right->z;
         if (!difference.x && !difference.z) {
             gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-            actor->reactionDirection = *(const u16 *)(gRandomIndex * 2 + (u32)gUnk_0203B400);
+            actor->reactionDirection = *(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
         } else {
             actor->reactionDirection = Math_Atan2(difference.x, difference.z);
         }

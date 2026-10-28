@@ -23,7 +23,7 @@ s32 Player_Destroy(struct Player *p)
     Player_StopActionSounds(p);
     gPlayerPendingActor = 0;
     gPlayerNotificationPending = 0;
-    gUnk_02000580[p->movementRequestBlocked] = 0;
+    gPlayers[p->movementRequestBlocked] = 0;
     gPlayerCount--;
     gPlayerEffectPendingCount = 0;
     gPlayerSolarActionPending = 0;

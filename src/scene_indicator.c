@@ -100,7 +100,7 @@ int SceneIndicators_Update(struct SceneIndicators *m)
         if (p->active)
             SceneIndicator_Update(m, p);
     {
-        int x = gUnk_02000580->x >> 8, y = gUnk_02000580->y >> 8, tile;
+        int x = gPlayers->x >> 8, y = gPlayers->y >> 8, tile;
         if (x < 0 || y < 0 || x >= gTerrainWidth || y >= gTerrainHeight)
             tile = 0;
         else
@@ -166,8 +166,8 @@ int SceneIndicators_Initialize(struct SceneIndicators *m)
         for (i = 15; i >= 0; i--, p++)
             SceneIndicator_Initialize(m, p);
     }
-    if (gUnk_02000580) {
-        int x = gUnk_02000580->x >> 8, y = gUnk_02000580->y >> 8, tile;
+    if (gPlayers) {
+        int x = gPlayers->x >> 8, y = gPlayers->y >> 8, tile;
         if (x < 0 || y < 0 || x >= gTerrainWidth || y >= gTerrainHeight)
             tile = 0;
         else

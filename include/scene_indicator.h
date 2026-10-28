@@ -59,7 +59,7 @@ struct SceneActor {
 };
 
 extern struct SceneIndicators *gSceneIndicators;
-extern struct SceneActor *gUnk_02000580;
+extern struct SceneActor *gPlayers;
 
 struct SceneIndicators *SceneIndicators_GetInstance(void);
 void SceneIndicator_Initialize(struct SceneIndicators *m, struct SceneIndicator *p);

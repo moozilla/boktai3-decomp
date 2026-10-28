@@ -161,7 +161,7 @@ s32 Player_InitializeFromScript(struct Player *p, s32 slot)
     Player_InitEffects(p);
     Player_RegisterSceneMessageReceiver(p);
     Player_InitEventProcedureFromScript(p);
-    gUnk_02000580[p->movementRequestBlocked] = p;
+    gPlayers[p->movementRequestBlocked] = p;
     gPlayerCount++;
     if (!p->movementRequestBlocked) {
         Player_SaveStateSnapshot(p);

@@ -1,10 +1,10 @@
 #include "global.h"
-extern u8 *gUnk_020004B4;
+#include "area_effect_link.h"
 void Script_ReadReference(void *);
 void Script_WriteReferenceValue(void *, s32, s32);
 static inline u8 *getBlock(void)
 {
-    u8 *p = gUnk_020004B4;
+    u8 *p = gLinkSession;
     if (p) {
         u8 state = p[0x53];
         p += 0xE0;

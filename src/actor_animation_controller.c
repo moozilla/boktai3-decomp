@@ -2,6 +2,7 @@
 #include "actor_animation_controller.h"
 #include "render.h"
 #include "input.h"
+#include "ram.h"
 
 // Provisional name: ActorPalette_BeginFade
 
@@ -690,13 +691,11 @@ void Actor_UpdateInteractionSoundDelay(struct ActorAnimController *p)
     }
 }
 
-extern u8 *gUnk_020003C8;
-
 u8 *Actor_EnsureController(u32, u32);
 
 void Actor_BeginAnimationPhaseOne(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -718,7 +717,7 @@ void Actor_BeginAnimationPhaseOne(void)
 
 void Actor_BeginAnimationPhaseTwo(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -740,7 +739,7 @@ void Actor_BeginAnimationPhaseTwo(void)
 
 void Actor_BeginAnimationPhaseThree(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -762,7 +761,7 @@ void Actor_BeginAnimationPhaseThree(void)
 
 void Actor_BeginAnimationPhaseFour(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -784,7 +783,7 @@ void Actor_BeginAnimationPhaseFour(void)
 
 void Actor_BeginAnimationPhaseFive(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -806,7 +805,7 @@ void Actor_BeginAnimationPhaseFive(void)
 
 void Actor_BeginAnimationPhaseSix(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -828,7 +827,7 @@ void Actor_BeginAnimationPhaseSix(void)
 
 void Actor_BeginAnimationPhaseSeven(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -850,7 +849,7 @@ void Actor_BeginAnimationPhaseSeven(void)
 
 void Actor_BeginAnimationPhaseEight(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -895,7 +894,7 @@ static inline u32 mode_bits_v2(u8 *p, u32 mask)
 // MATCHING_CONCESSION: register-pinning
 void Actor_BeginScriptedAnimationPhaseNine(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0)
         return;
@@ -950,7 +949,7 @@ void ScriptUtility_ClearControlFlag(void);
 
 void sub_081E4B0C(u32 phase)
 {
-    struct G *g = (struct G *)gUnk_020003C8;
+    struct G *g = (struct G *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
         g = (struct G *)Actor_EnsureController(0xBB34, 0);
@@ -992,7 +991,7 @@ void sub_081E4B0C(u32 phase)
 
 void sub_081E4BD4(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -1018,7 +1017,7 @@ void sub_081E4BD4(void)
 
 void sub_081E4C74(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -1044,7 +1043,7 @@ void sub_081E4C74(void)
 
 void sub_081E4D14(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 3;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -1071,7 +1070,7 @@ void sub_081E4D14(void)
 // MATCHING_CONCESSION: register-pinning
 void Actor_BeginCurveToPosition(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -1129,7 +1128,7 @@ void Actor_BeginCurveToPosition(void)
 
 void Actor_BeginCurveToRest(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -1158,7 +1157,7 @@ void Actor_BeginCurveToRest(void)
 // MATCHING_CONCESSION: register-pinning
 void Actor_BeginScriptedCurve(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -1201,7 +1200,7 @@ void Actor_BeginScriptedCurve(void)
 // MATCHING_CONCESSION: register-pinning
 void Actor_SetFacingAndIdle(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -1248,7 +1247,7 @@ void Actor_SetFacingAndIdle(void)
 
 void Actor_BeginFadeAnimation(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -1272,7 +1271,7 @@ void Actor_BeginFadeAnimation(void)
 
 void Actor_BeginReverseFadeAnimation(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -1296,7 +1295,7 @@ void Actor_BeginReverseFadeAnimation(void)
 
 void Actor_BeginHide(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -1321,7 +1320,7 @@ void Actor_BeginHide(void)
 // MATCHING_CONCESSION: register-pinning
 void Actor_BeginPositionedEffect(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -1371,7 +1370,7 @@ void Actor_BeginPositionedEffect(void)
 
 void Actor_BeginRadialBurst(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     u32 three = 2;
     if (g == 0) {
         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
@@ -1395,7 +1394,7 @@ u8 *Actor_EnsureController(u32, u32);
 
 u8 Actor_GetFacingDirection(void)
 {
-    u8 *p = gUnk_020003C8;
+    u8 *p = gScriptedActorController;
     if (p == 0) {
         p = Actor_EnsureController(0xBB34, 0);
         if (p == 0)
@@ -1406,7 +1405,7 @@ u8 Actor_GetFacingDirection(void)
 
 void Actor_SetSpritePriorityFromScript(void)
 {
-    u8 *p = gUnk_020003C8;
+    u8 *p = gScriptedActorController;
     if (p == 0) {
         p = Actor_EnsureController(0xBB34, 0);
         if (p == 0)
@@ -1417,7 +1416,7 @@ void Actor_SetSpritePriorityFromScript(void)
 
 void Actor_SetPreviousAnimationStateFromScript(void)
 {
-    u8 *p = gUnk_020003C8;
+    u8 *p = gScriptedActorController;
     if (p == 0) {
         p = Actor_EnsureController(0xBB34, 0);
         if (p == 0)
@@ -4478,7 +4477,7 @@ s32 Actor_DestroyController(struct ActorAnimController *p)
     }
     if (SceneBody_GetById(*(u16 *)((u8 *)p + 0xf8a)))
         SceneBody_Unregister((u8 *)p + 0xe80);
-    gUnk_020003C8 = 0;
+    gScriptedActorController = 0;
 }
 
 struct ScriptInteractionChild {
@@ -4531,7 +4530,7 @@ static inline void interaction_state(struct ActorAnimController *g, u32 mode, u3
 void Actor_ConfigureInteractionChildFromScript(void)
 {
     struct Vec position;
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     struct ScriptInteractionChild *child;
     s32 i, j;
     u32 one = 1;
@@ -4658,7 +4657,7 @@ static inline void state(struct ActorAnimController *g, u32 mode, u32 phase)
 
 void Actor_ConfigureFromScript(void)
 {
-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
+    struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
     struct ActorSprite *obj;
     if (!g)
         g = (struct ActorAnimController *)Actor_EnsureController(0xbb34, 0);
@@ -4808,7 +4807,7 @@ s32 Actor_InitializeController(void *arg0)
     u16 *dst;
     s32 i;
     u32 mask;
-    gUnk_020003C8 = arg0;
+    gScriptedActorController = arg0;
     p->owner = gUnknown_02000580;
     obj = &p->obj;
     ActorInit_InitMainSprite(p, obj);
@@ -4883,7 +4882,7 @@ INCLUDE_ASM("asm/nonmatching", Actor_InitializeController);
 
 void Actor_RequestControllerRemoval(void)
 {
-    Task_Kill(gUnk_020003C8);
+    Task_Kill(gScriptedActorController);
 }
 
 /* Create the singleton animated controller and install its task callbacks. */
@@ -4897,8 +4896,8 @@ s32 Actor_InitializeController(void *);
 u8 *Actor_EnsureController(u32 resource, u32 unused)
 {
     struct ActorAnimController *p;
-    if (gUnk_020003C8)
-        return gUnk_020003C8;
+    if (gScriptedActorController)
+        return gScriptedActorController;
     p = Task_Create(11, 0xfa4);
     if (p) {
         p->resource = resource;

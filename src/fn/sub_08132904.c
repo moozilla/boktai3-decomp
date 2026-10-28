@@ -56,9 +56,9 @@ void SceneActorMovement_ProjectProbe(void *, u32, u32);
 void SceneActorReaction_PlayStaggerBurst(void);
 static inline s32 LocalPlayer(void)
 {
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         return -1;
-    return gUnk_020004B4->localPlayer;
+    return gLinkSession->localPlayer;
 }
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
@@ -107,10 +107,9 @@ static inline void Fill(u32 *zero, void *dst)
 }
 s32 AreaEffect_ScaleGainAtPosition(void *, u32);
 s32 AreaEffect_ScaleLinkGainAtPosition(void *, u32);
-extern const u16 gUnk_0203B400[];
 static inline u32 RandomBits(u32 mask)
 {
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
     return *(const u16 *)((u32)table + index * 2) & mask;
@@ -131,7 +130,7 @@ inline static u32 RandomBits_ApplyLinkedAreaDamage(u32 mask)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
-    return (*((const u16 *)(((u32)gUnk_0203B400) + (index * 2)))) & mask;
+    return (*((const u16 *)(((u32)gRandomTable) + (index * 2)))) & mask;
 }
 
 u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *actor)
@@ -270,5 +269,6 @@ fail:
 #include "render.h"
 #include "engine.h"
 #include "engine_globals.h"
+#include "ram.h"
 INCLUDE_ASM("asm/nonmatching", SceneActorReaction_ApplyLinkedAreaDamage);
 #endif

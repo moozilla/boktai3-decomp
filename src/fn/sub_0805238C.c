@@ -1,13 +1,14 @@
 #include "stacked_actor.h"
+#include "tether_actor.h"
 struct StackedActorTetherView {
     u8 unknown0[0x1A], mode, unknown1B[0x23A], phase;
 };
-extern struct StackedActorTetherView *gUnk_02000488;
 struct StackedActorPosition *TetherActor_GetPosition(void);
 s32 StackedActor_IsTetherNearby(struct StackedActor *o)
 {
     struct StackedActorPosition *v = TetherActor_GetPosition();
-    if (v != 0 && gUnk_02000488->mode == 4 && gUnk_02000488->phase <= 4) {
+    if (v != 0 && (*(struct StackedActorTetherView **)&gTetherActor)->mode == 4 &&
+        (*(struct StackedActorTetherView **)&gTetherActor)->phase <= 4) {
         s32 d = v->y - o->world.y;
         if (d < 0)
             d = -d;

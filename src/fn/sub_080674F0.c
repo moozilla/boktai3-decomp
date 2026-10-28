@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control.h"
+#include "player.h"
 struct SceneActorControlNearbyPlayer {
     u8 unknown0[0x30];
     struct ContactPosition position;
@@ -7,7 +8,6 @@ struct SceneActorControlNearbyPlayer {
     s8 controlIndex;
     u8 counter;
 };
-extern struct SceneActorControlNearbyPlayer *gUnk_02000580[4];
 u32 TetherActor_CopyPosition(struct ContactPosition *);
 u32 TetherActor_IsStateOne(void);
 s32 TetherActor_GetParameter(void);
@@ -56,7 +56,7 @@ static inline u8 TryPlayer(struct SceneActorControlSlot *input,
 void SceneActorControl_TryActivateNearby(struct SceneActorControlSlot *input)
 {
     register struct SceneActorControlSlot *slot asm("r6") = input;
-    struct SceneActorControlNearbyPlayer **location = &gUnk_02000580[0];
+    struct SceneActorControlNearbyPlayer **location = &gPlayers[0];
     register struct SceneActorControlNearbyPlayer *player asm("r5") = *location;
     struct ContactPosition delta;
     struct ContactPosition *q;

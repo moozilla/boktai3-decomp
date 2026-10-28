@@ -28,12 +28,12 @@ void InteractionMarker_TickIdle(struct InteractionMarker *marker)
                     edge &= pressed;
                 } while (0);
                 if (edge) {
-                    struct InteractionMarkerPlayer *player = gUnk_02000580[0];
+                    struct InteractionMarkerPlayer *player = gPlayers[0];
                     u32 blocked = 0x100000;
                     if (!(player->flags & blocked) && marker->inputCooldown > 9) {
                         marker->activationFrame = 8;
                         ScriptUtility_SetControlFlag(1);
-                        PlayerCue_WalkTo(gUnk_02000580[0], &marker->position, 0, 4);
+                        PlayerCue_WalkTo(gPlayers[0], &marker->position, 0, 4);
                         InteractionMarker_SetState(marker, InteractionMarker_TickInteraction);
                     }
                 }

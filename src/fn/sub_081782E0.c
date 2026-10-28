@@ -2,7 +2,7 @@
 #include "scene_hud_display.h"
 #include "engine.h"
 #include "ram.h"
-extern struct Player *gUnk_02000580[];
+#include "player.h"
 void SceneHud_RebuildPrimaryOptions(struct SceneHudState *);
 void PauseMenu_RefreshEquipmentSlotIcons(struct SceneHudState *);
 void sub_08168850(struct SceneHudState *);
@@ -14,7 +14,7 @@ void Hud_RefreshActivePanel(struct SceneHudState *);
 void SceneHud_RefreshControls(void)
 {
     if (((struct SceneHudState *)gFieldHud)) {
-        struct Player *owner = gUnk_02000580[0];
+        struct Player *owner = gPlayers[0];
         ((struct SceneHudState *)gFieldHud)->actionOwner = owner;
         if (((struct SceneHudState *)gFieldHud)->actionOwner) {
             SceneHud_RebuildPrimaryOptions(((struct SceneHudState *)gFieldHud));

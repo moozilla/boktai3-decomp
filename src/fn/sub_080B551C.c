@@ -17,7 +17,7 @@ u8 Skeleton_RerouteToTarget(void *obj)
         struct ChaseTarget *t = *slot;
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
     }
-    if (cell == actor->terrainCell || Chase_Bits32(&gUnk_02000580[0]->flags, 0x20000)) {
+    if (cell == actor->terrainCell || Chase_Bits32(&gPlayers[0]->flags, 0x20000)) {
         SceneActor_DispatchContextAction(*(void **)((u8 *)actor + 0x3D0), 0);
         goto done;
     }

@@ -11,7 +11,6 @@
 // fuzzy: 83.6%
 // Remaining: burst-vector packing, pointer lifetimes and animation register allocation.
 extern u32 gUnk_02000560;
-extern const u16 gUnk_0203B400[];
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
@@ -175,7 +174,7 @@ s32 OrangeSpine_UpdateDamageState(u8 *p)
             center = *(struct SceneVec *)(p + 0x40);
             center.y += 128;
             velocity.a.lo = -4;
-            table = gUnk_0203B400;
+            table = gRandomTable;
             velocity.a.hi = RandomFrom(table) & 7;
             velocity.b.lo = -4;
             spread.a.lo = 24;

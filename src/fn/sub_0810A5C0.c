@@ -3,7 +3,6 @@
 #define LinkMenu_CheckSession          Registry1745_CheckSessionReady
 #define LinkMenu_ResetSelection        Registry1745_BeginShutdown
 #define LinkMenu_ClearExchangeCounters Registry1745_ClearParticipantCounters
-#define gLinkMenuState                 gUnk_020004B4
 #include "global.h"
 #include "area_effect_link.h"
 #include "engine.h"
@@ -24,14 +23,14 @@ s32 LinkMenu_ExchangeChoices(struct AreaEffectLinkState *p)
     u8 *incoming;
     if (Registry1745_ConsumeStateEntry(p)) {
         Registry1745_ClearParticipantCounters(p);
-        if (gUnk_020004B4 && gUnk_020004B4->localPlayer == 0)
+        if (gLinkSession && gLinkSession->localPlayer == 0)
             p->exchangeText = Crc_ComputeCcitt16(&p->exchangeValue, 0, 2);
     }
     if (Registry1745_CheckSessionReady(p) < 0) {
         Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
-    if (gUnk_020004B4 && gUnk_020004B4->localPlayer == 0)
+    if (gLinkSession && gLinkSession->localPlayer == 0)
         ByteSequence_AdvanceEncodedValue(p, session + 0x12c, 4);
     incoming = session + 0x130;
     if (LinkSession_ReceiveSelectionByte(p, incoming, 0, 4) == 1) {

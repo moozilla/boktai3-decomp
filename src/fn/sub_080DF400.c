@@ -32,7 +32,7 @@ void Dog_SelectRetreatOrChase(struct SceneActorRegistryResetView *a)
                 if (!SceneActorTarget_TrySelectNearestParticipant(a))
                     return;
             } else
-                a->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
+                a->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
             {
                 void *route = *(void **)(group + 0x1FC);
                 struct ContactPosition *from = &a->position;

@@ -184,7 +184,7 @@ void GridAttackActor_SpawnGridPattern(struct GridAttackActor *p)
         GridAttackActor_SpawnGridContact(p, 1, 1);
         GridAttackActor_SpawnGridContact(p, 2, 1);
         {
-            u16 *table = gUnk_0203B400;
+            u16 *table = gRandomTable;
             GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 2);
             GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 3);
             GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 4);
@@ -194,7 +194,7 @@ void GridAttackActor_SpawnGridPattern(struct GridAttackActor *p)
         GridAttackActor_SpawnGridContact(p, 1, 1);
         GridAttackActor_SpawnGridContact(p, 2, 1);
         {
-            u16 *table = gUnk_0203B400;
+            u16 *table = gRandomTable;
             GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 2);
             GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 3);
             GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 4);
@@ -232,7 +232,7 @@ static inline void GridAttack_ClearPoint(const void *source, struct GridAttackPo
 
 static inline u32 GridAttack_RandomValue(void)
 {
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     u32 *index = &gRandomIndex;
     *index = (*index + 1) & 1023;
     return table[*index];
@@ -324,7 +324,7 @@ int GridAttackActor_SelectAttackAnimation(struct GridAttackActor *p)
     {
         u32 offset = gRandomIndex * 2;
         {
-            int value = *(u16 *)((u8 *)gUnk_0203B400 + offset);
+            int value = *(u16 *)((u8 *)gRandomTable + offset);
             value &= 3;
             start = value;
         }
@@ -366,7 +366,7 @@ void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p)
         indexPtr = &gRandomIndex;
         mask = 1023;
         smallMask = 3;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         index = (*indexPtr + 1) & mask;
         angle = (u8)table[index];
         index = (index + 1) & mask;
@@ -567,8 +567,6 @@ void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
     }
     p->counter++;
 }
-
-extern u32 gEffectRandomTableIndex;
 
 extern u16 gUnk_086141BC[];
 
@@ -1059,8 +1057,8 @@ void GridAttack_ProcessMessages(struct GridAttackActor *p)
     s32 i = 0;
     typeof(*((u16 *)(((u8 *)p) + 0x54))) t1;
     typeof((*((u16 *)(((u8 *)p) + 0x56))) + base->height) t2;
-    while (i < receiver->count[gUnk_0200047C->phase]) {
-        struct SceneEventCommand *command = receiver->pending[gUnk_0200047C->phase][i];
+    while (i < receiver->count[gSceneEventDispatchState->phase]) {
+        struct SceneEventCommand *command = receiver->pending[gSceneEventDispatchState->phase][i];
         s32 action;
         SceneMessages_SetPendingTrigger(receiver, command);
         switch (command->kind) {
@@ -1502,6 +1500,8 @@ void GridAttack_UpdateActionController(struct GridAttackActor *p)
 // MATCHING_CONCESSION: register-pinning
 #include "contact_swarm.h"
 #include "scene_vec.h"
+#include "player.h"
+#include "ram.h"
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
 struct Drawable {
     struct ContactSwarmSprite sprite;
@@ -1785,7 +1785,7 @@ void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *input)
     if (p->reactionCooldown) {
         u32 angle;
         gRandomIndex = (gRandomIndex + 1) & 1023;
-        angle = gUnk_0203B400[gRandomIndex];
+        angle = gRandomTable[gRandomIndex];
         *((s16 *)(((u8 *)p) + 0x8A4)) +=
             GridAttack_Truncate12(gUnk_086149C4[(angle + 64) & 255] * (p->reactionCooldown << 2));
         *((s16 *)(((u8 *)p) + 0x8A8)) +=
@@ -1974,7 +1974,6 @@ u32 GridAttackActor_Destroy(struct GridAttackActor *p)
     return 0;
 }
 
-extern u8 *gUnk_02000580[];
 void SceneActors_Register(void *, s32);
 s32 SceneActors_Initialize(void *, u32, s32, void *, s32);
 void SceneActors_SetHealthLimits(void *, s32, s32, s32);
@@ -2024,7 +2023,7 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *arg0, u32 arg1)
         u32 *target = (u32 *)&p->targetPosition;
         u32 *slot = (u32 *)&p->damageSource;
         for (i = 0; i < count; i++) {
-            u32 value = (u32)gUnk_02000580[i];
+            u32 value = (u32)gPlayers[i];
             if (value) {
                 *slot = value;
                 value += 0x30;

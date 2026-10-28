@@ -64,7 +64,7 @@ s32 sub_08083C38(struct SceneActorRegistryResetView *arg0)
         return 1;
     }
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    next = state->field3E0 + *(u8 *)(gRandomIndex * 2 + (u32)gUnk_0203B400) + 0x100;
+    next = state->field3E0 + *(u8 *)(gRandomIndex * 2 + (u32)gRandomTable) + 0x100;
     state->field3E0 = next;
     if ((u16)next > 0x400) {
         state->field3E0 = 0x400;

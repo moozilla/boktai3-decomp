@@ -1,10 +1,9 @@
 #include "global.h"
-
-extern u32 gUnk_020004B4;
+#include "area_effect_link.h"
 
 void Registry1745_SetCancelRequest(u32 v)
 {
-    if (gUnk_020004B4 != 0) {
-        *(u8 *)(gUnk_020004B4 + 0x21) = v;
+    if ((*(u32 *)&gLinkSession) != 0) {
+        *(u8 *)((*(u32 *)&gLinkSession) + 0x21) = v;
     }
 }

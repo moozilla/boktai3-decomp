@@ -29,12 +29,12 @@ void SceneActor_EasePlayerHeight(struct SceneActorRegistryResetView *actor)
     s32 offset;
     if (active && gPlayerInteractionMode == 5)
         special = 1;
-    if (special || gUnk_02000580[0]->actionMode == 4)
+    if (special || gPlayers[0]->actionMode == 4)
         offset = 100;
     else
         offset = 220;
     if (actor->field2B5 == 0x23) {
-        register s32 playerY asm("r0") = gUnk_02000580[0]->position.y;
+        register s32 playerY asm("r0") = gPlayers[0]->position.y;
         register s32 target asm("r1");
         s16 *height;
         target = playerY + offset;
@@ -45,7 +45,7 @@ void SceneActor_EasePlayerHeight(struct SceneActorRegistryResetView *actor)
         s32 delta;
         delta = ScaleWave(wave);
         {
-            s32 base = gUnk_02000580[0]->position.y + offset;
+            s32 base = gPlayers[0]->position.y + offset;
             s32 sum;
             sum = base + delta;
             delta = sum;

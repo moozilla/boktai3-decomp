@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 #define ActorEffect_SetDirection LinkedEffect_SetVariant
-#define gRandomTable             gUnk_0203B400
 struct EffectVector {
     s16 x, y, z;
 };
@@ -23,7 +23,6 @@ struct ActorEffect {
     u8 pad177[3];
     u8 active;
 };
-extern u16 gUnk_0203B400[];
 s32 Math_Atan2(s32, s32);
 void LinkedEffect_SetVariant(void *, u32);
 static inline void subtract(struct EffectVector *out, struct EffectVector *b,

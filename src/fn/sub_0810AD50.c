@@ -4,7 +4,7 @@
 #include "game_state.h"
 #include "engine.h"
 #include "ram.h"
-extern u8 *gUnk_020004F0[];
+#include "scene_pool.h"
 u8 Registry1745_ConsumeStateEntry(void *);
 s32 Registry1745_CheckSessionReady(void *);
 void Registry1745_BeginShutdown(void *, void *);
@@ -57,9 +57,9 @@ static inline u16 PackKeys(u32 value, u32 mode)
 }
 static inline s32 SessionState(void)
 {
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         return -1;
-    return gUnk_020004B4->unknown1C;
+    return gLinkSession->unknown1C;
 }
 s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
 {
@@ -86,16 +86,16 @@ s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
     if ((gEngineFlags | gScenePauseFlags) & mask) {
         s32 best = 0, bestIndex = -1, j;
         for (j = 0; j <= 1; j++) {
-            if (gUnk_020004F0[j]) {
-                gUnk_020004F0[j][0x8f9] = 0;
-                if (best < *(s32 *)(gUnk_020004F0[j] + 0x28)) {
-                    best = *(s32 *)(gUnk_020004F0[j] + 0x28);
+            if (((u8 **)gParticipantActors)[j]) {
+                ((u8 **)gParticipantActors)[j][0x8f9] = 0;
+                if (best < *(s32 *)(((u8 **)gParticipantActors)[j] + 0x28)) {
+                    best = *(s32 *)(((u8 **)gParticipantActors)[j] + 0x28);
                     bestIndex = j;
                 }
             }
         }
         if (bestIndex >= 0)
-            gUnk_020004F0[bestIndex][0x8f9] = 1;
+            ((u8 **)gParticipantActors)[bestIndex][0x8f9] = 1;
     }
     c->frames++;
     keys = *(vu16 *)0x04000130;

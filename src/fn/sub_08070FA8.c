@@ -1,8 +1,8 @@
 #include "scene_actor_palette.h"
 #include "engine.h"
+#include "ram.h"
 #ifdef NONMATCHING
 // fuzzy: 57.7%
-extern u16 gUnk_02000528;
 void Heap_Free(void *);
 void EffectGroup_SpawnPart(void *, s32, void *, void *, void *, s32, s32);
 union RegistryParticleVector {
@@ -62,7 +62,7 @@ static inline u8 TransitionComplete(struct SceneActorRegistryManager *p)
 static inline u8 Stopped(void)
 {
     u32 value = 0;
-    if (gUnk_02000528 == 1)
+    if (gPlayerActionPending == 1)
         value = 1;
     return value;
 }

@@ -4,6 +4,7 @@
 /* tentative: falls under gravity, lands with a sound and switches to the active state */
 
 #include "actor_attachment_sprite_playback.h"
+#include "background_controller.h"
 
 struct BurstPos {
     s32 x, y, z, w;
@@ -30,7 +31,6 @@ struct BurstEntry {
     u8 state;
     u32 value;
 };
-extern struct BurstCamera *gUnk_020004B8;
 void Memory_Clear(void *, s32);
 void Sound_PlaySong(u32);
 void Collider_SetFixedPositionWithYOffset(void *, struct BurstPos *, s32);
@@ -59,7 +59,7 @@ void ParticleBurstEffect_UpdateFalling(struct BurstEntry *p)
         struct BurstPos *pos = &p->position;
         struct ContactPosition *dst = &p->sprite.position;
         s32 yOff = p->yOffset;
-        dst->x = (pos->x >> 12) - gUnk_020004B8->x;
+        dst->x = (pos->x >> 12) - ((struct BurstCamera *)gSceneCamera)->x;
         dst->y = ((s32)(pos->z + (pos->y + yOff)) >> 12) + 0x60;
         dst->z = pos->z >> 12;
     }

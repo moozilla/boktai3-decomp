@@ -27,7 +27,7 @@ void sub_0817AEC8(u8 *p, int direction)
     int i = 0;
     s16 offset[4];
     {
-        const u16 *randomTable = gUnk_0203B400;
+        const u16 *randomTable = gRandomTable;
         asm("" : "+r"(randomTable));
         table = randomTable;
     }

@@ -7,7 +7,7 @@ void BurstEmitter_PlayAmbientSound(struct BurstEmitter *emitter)
         u32 period;
         gRandomIndex = random;
         random <<= 1;
-        period = *(u16 *)(random + (u32)gUnk_0203B400);
+        period = *(u16 *)(random + (u32)gRandomTable);
         period &= 3;
         period += 9;
         if (!Mod(frame, period))

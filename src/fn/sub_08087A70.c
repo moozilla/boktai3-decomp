@@ -20,7 +20,7 @@ struct ChasePlayer {
     u8 unknown24[0x1C];
     u16 *cell;
 };
-extern struct ChasePlayer *gUnk_02000580[];
+extern struct ChasePlayer *gPlayers[];
 
 struct ChaseTarget {
     u8 unknown0[8];
@@ -162,7 +162,7 @@ static inline u32 Chase_RandomBits(u32 mask)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
-    return gUnk_0203B400[index] & mask;
+    return gRandomTable[index] & mask;
 }
 static inline void Chase_BeginTurn(void *obj, u8 saved)
 {
@@ -209,13 +209,13 @@ static inline u8 Chase_Arrive(void *obj)
         }
         if (player < 0)
             goto invoke;
-        cell = gUnk_02000580[player]->cell[3];
+        cell = gPlayers[player]->cell[3];
     } else {
         struct ChaseTarget *t = *slot;
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
         player = 0;
     }
-    if (cell != actor->terrainCell && !Chase_Bits32(&gUnk_02000580[player]->flags, 0x20000))
+    if (cell != actor->terrainCell && !Chase_Bits32(&gPlayers[player]->flags, 0x20000))
         goto reroute;
     if (Chase_MotionFlags(actor, 0x400))
         goto done;
@@ -337,7 +337,7 @@ void Bat_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor, s32 
         index = (gRandomIndex + 1) & 1023;
         gRandomIndex = index;
         index *= 2;
-        sample = *(const u16 *)((u32)gUnk_0203B400 + index);
+        sample = *(const u16 *)((u32)gRandomTable + index);
         sample &= 3;
         SparkParticle_Spawn(&actor->position, sample + 1, &range, actor->direction + 128, 10, 6, 2,
                             2);
@@ -386,7 +386,7 @@ void Bat_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor, s32 
     if (actor->flags2D4 & 0x80) {
         actor->flags2CC |= 0x80;
         *(u16 *)(group + 0x40) |= 4;
-        actor->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
+        actor->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
         if (Chase_Arrive(actor) || RetryTarget(actor, group)) {
             Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
             Chase_SetBehavior(actor, 12);
@@ -394,7 +394,7 @@ void Bat_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor, s32 
         }
         goto failed;
     } else {
-        actor->fieldDC = (u32)((u8 *)gUnk_02000580[0] + 0x24);
+        actor->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
         actor->flags2CC |= 0x10;
         (*(struct ContactPosition **)(group + 0x200))->pad = 0;
         if (Chase_Arrive(actor) || RetryTarget(actor, group)) {

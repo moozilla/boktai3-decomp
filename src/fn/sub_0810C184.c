@@ -1,4 +1,5 @@
 #include "global.h"
+#include "area_effect_link.h"
 
 struct LPElem {
     u32 flags;
@@ -14,11 +15,10 @@ struct LPPeer {
     u8 pad0[0x1c];
     u8 mode;
 };
-extern struct LPPeer *gUnk_020004B4;
 
 void LinkPanel_SelectActiveAnimation(struct LPanel *p, s32 i)
 {
-    struct LPPeer *peer = gUnk_020004B4;
+    struct LPPeer *peer = gLinkSession;
     s32 mode = -1;
     if (peer)
         mode = peer->mode;

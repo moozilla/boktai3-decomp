@@ -94,7 +94,7 @@ void SpriteEffect_UpdateFallingShard(struct SpriteEffectPool *manager, struct Sp
         p->unkD0 = 0;
         low.x = -12;
         {
-            const u16 *table = gUnk_0203B400;
+            const u16 *table = gRandomTable;
             u32 *indexPtr = &gRandomIndex;
             u32 index = *indexPtr + 1;
             u32 mask = 1023;

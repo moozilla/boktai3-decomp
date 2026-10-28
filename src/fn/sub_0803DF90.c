@@ -16,7 +16,7 @@ static inline void Or(u32 mask, u32 *flags)
 }
 static inline u8 PlayerHasFlag(u32 mask)
 {
-    if (gUnk_020004F0[0] && (gUnk_020004F0[0]->flags & mask))
+    if (gParticipantActors[0] && (gParticipantActors[0]->flags & mask))
         return 1;
     return 0;
 }
@@ -139,7 +139,7 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
             {
                 u32 offset = gRandomIndex << 1;
                 register const u8 *table asm("r3");
-                table = (const u8 *)gUnk_0203B400;
+                table = (const u8 *)gRandomTable;
                 random = *((const u8 *)(offset + ((u32)table)));
             }
             if (random <= 127) {

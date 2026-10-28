@@ -1,4 +1,3 @@
-#define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "player.h"
@@ -36,10 +35,10 @@ s32 SceneActor_TryTrackNearbyPlayer(struct SceneActorRegistryResetView *actor,
     struct ContactPosition *position;
     u32 distance;
     struct SceneActorReactionMotion *motion;
-    if (playerId != gTrackedPlayerId)
+    if (playerId != gTrackedPlayerId[0])
         goto fail;
     {
-        struct Player *player = gPlayerSlots[0];
+        struct Player *player = gPlayers[0];
         u32 mask = 8;
         if (!(player->statusFlags & mask))
             goto fail;
@@ -69,9 +68,9 @@ s32 SceneActor_TryTrackNearbyPlayer(struct SceneActorRegistryResetView *actor,
         *flags = mask;
     }
     motion = (void *)&actor->fieldDC;
-    motion->fieldDC = (u32)((u8 *)gPlayerSlots[0] + 0x24);
+    motion->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
     if (IsPlayerTracked(actor))
-        motion->fieldDC = (u32)((u8 *)gPlayerSlots[0] + 0x24);
+        motion->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
     else if (!motion->fieldDC)
         goto ready;
     {

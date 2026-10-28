@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "background_controller.h"
 
 /* tentative: positions sprite parts, easing two toward terrain clearance */
 
@@ -33,7 +34,6 @@ struct Cam {
     u8 pad[0x44];
     s32 x;
 };
-extern struct Cam *gUnk_020004B8;
 extern const u16 gUnk_086141BC[];
 s32 Terrain_GetCellClearance(struct Z *);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -55,7 +55,7 @@ void Actor_UpdateShadowSpriteParts(struct Actor *a, struct Sprite *s)
     s16 *out;
 
     out = &pos.x;
-    pos.x = (a->x >> 12) - gUnk_020004B8->x;
+    pos.x = (a->x >> 12) - ((struct Cam *)gSceneCamera)->x;
     out[1] = ((a->z + (a->y + a->yOff)) >> 12) + 0x5A;
     out[2] = a->z >> 12;
     for (i = 0; i < 3; i++) {
@@ -64,7 +64,7 @@ void Actor_UpdateShadowSpriteParts(struct Actor *a, struct Sprite *s)
     }
     for (i = 3; i <= 4; i++) {
         s32 ax = a->x >> 12;
-        pos.x = ax - gUnk_020004B8->x;
+        pos.x = ax - ((struct Cam *)gSceneCamera)->x;
         tmp.a.hi = a->y >> 12;
         tmp.b.lo = a->z >> 12;
         switch (i) {

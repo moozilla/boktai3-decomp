@@ -50,5 +50,5 @@ void MeterDisplay_InitializeWidgets(struct MeterDisplay *s)
         widget++;
 
     } while (++i <= 1);
-    s->scale = Div(*(s32 *)(gUnk_020004B8->unknown0 + 0x28) << 5, 100);
+    s->scale = Div(*(s32 *)(gSceneCamera->unknown0 + 0x28) << 5, 100);
 }

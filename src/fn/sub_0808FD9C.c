@@ -33,7 +33,7 @@ void Slime_FollowPlayer(struct SceneActorRegistryResetView *actor)
         m->flags = v;
     }
     dst = &q->pos;
-    p = (struct P *)gUnk_02000580[0];
+    p = (struct P *)gPlayers[0];
     *dst = p->pos;
     new_var = 0;
     if (q->a >= q->b) {

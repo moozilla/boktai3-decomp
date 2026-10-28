@@ -1,8 +1,8 @@
 #include "state_actor.h"
 #include "engine.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
 void *SpriteEffectController_Create(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                     u32, u32, u32, u32, u32, s32, s32);
 static inline s32 Scale(s32 value)
@@ -25,8 +25,8 @@ void StateActor_SpawnRadialEffect(struct StateActor *actor)
     s32 angle, radiusBits, scaledZ;
     s32 radius, frames;
     struct StateActorPos *v;
-    angle = (u8)Random(gUnk_0203B400);
-    radiusBits = (Random(gUnk_0203B400) >> 4) & 63;
+    angle = (u8)Random(gRandomTable);
+    radiusBits = (Random(gRandomTable) >> 4) & 63;
     v = &velocity;
     radius = radiusBits + 32;
     v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);

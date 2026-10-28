@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 struct SceneVec {
     s16 x, y, z;
@@ -14,7 +15,6 @@ void TetherActor_BeginDetachedState(s32 mode);
 void ScriptTriggerActor_DispatchPendingScripts(struct TileTrigger *p);
 s32 EffectGroup_SpawnPart(void *, u32, void *, void *, void *, u32, u32);
 void SceneActorReaction_SinkAndRemove(void);
-extern const u16 gUnk_0203B400[];
 
 #ifdef NONMATCHING
 // fuzzy: 30.1%
@@ -81,12 +81,12 @@ void sub_08106E98(struct TileTrigger *arg0)
             for (n = 0; n < 3; n++) {
                 idx = gRandomIndex;
                 idx = (idx + 1) & 0x3FF;
-                vel.x = (gUnk_0203B400[idx] & 0xF) - 7;
+                vel.x = (gRandomTable[idx] & 0xF) - 7;
                 idx = (idx + 1) & 0x3FF;
-                vel.y = (gUnk_0203B400[idx] & 0x1F) - 16;
+                vel.y = (gRandomTable[idx] & 0x1F) - 16;
                 idx = (idx + 1) & 0x3FF;
                 gRandomIndex = idx;
-                vel.z = (gUnk_0203B400[idx] & 0xF) - 7;
+                vel.z = (gRandomTable[idx] & 0xF) - 7;
                 scale.x = 5;
                 scale.y = 10;
                 scale.z = 5;

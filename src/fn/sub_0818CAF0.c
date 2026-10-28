@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 struct A {
     u8 f0[6];
     u8 b6;
@@ -27,13 +28,12 @@ struct A {
     u8 b1de;
     u8 b1df;
 };
-extern u8 gUnk_0203B400[];
 void Armor_UpdatePartOrbit(void);
 void Armor_InitPartOrbitTimer(struct A *p)
 {
     u32 v;
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    v = *(u16 *)(gUnk_0203B400 + gRandomIndex * 2);
+    v = *(u16 *)(((u8 *)gRandomTable) + gRandomIndex * 2);
     v &= 0x40;
     p->w1d6 = v + 0x1e;
     p->fn = Armor_UpdatePartOrbit;

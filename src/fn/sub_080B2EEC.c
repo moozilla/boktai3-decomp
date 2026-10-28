@@ -4,7 +4,6 @@
 #include "engine.h"
 
 #define gRandomTableIndex gRandomIndex
-#define gRandomTable      gUnk_0203B400
 
 s32 SceneActorRegistry_CountLiving(void);
 s32 SceneActorRegistry_CountLivingByCategory(s32);
@@ -39,7 +38,7 @@ static inline u8 Test(u16 *p, u32 mask)
 static inline s32 RandomByte(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    return *(const u8 *)(gUnk_0203B400 + gRandomIndex);
+    return *(const u8 *)(gRandomTable + gRandomIndex);
 }
 static inline void Clear(u32 *p, u32 mask)
 {

@@ -3,6 +3,7 @@
 
 #include "scene_vec.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 #define gParticleRandomIndex gRandomIndex
 struct PoolParticle {
@@ -20,7 +21,6 @@ struct ParticlePool {
     void *resource;
     struct PoolParticle particles[16];
 };
-extern u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 static inline s32 TruncatePoolOffset(s32 value)
@@ -48,7 +48,7 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct Scen
             p = &inPool->particles[i];
             p->flags &= ~1;
             p->position = *position;
-            table = gUnk_0203B400;
+            table = gRandomTable;
             index = gRandomIndex;
             index++;
             mask = 0x3FF;

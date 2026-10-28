@@ -1,9 +1,9 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 /* Tentative name: selects a route point while avoiding the two recent indices. */
 
-extern u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 u8 *Path_GetPointData(u8 *);
 
@@ -18,7 +18,7 @@ struct SceneActorRouteHistory {
 
 static inline u32 Random(void)
 {
-    u16 *table = gUnk_0203B400;
+    u16 *table = gRandomTable;
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;

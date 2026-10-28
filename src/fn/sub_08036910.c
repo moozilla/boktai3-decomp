@@ -47,7 +47,6 @@ int Wireless_InitControllerFromScript(struct Engine *);
 void Task_SetCallbacks(void *, int, int);
 void Task_LinkToPriorityList(void *);
 void Heap_Free(void *);
-extern const u16 gUnk_0203B400[];
 struct Engine *Wireless_CreateController(void)
 {
     struct Engine **singleton = &gWirelessController;
@@ -78,7 +77,7 @@ struct Engine *Wireless_CreateController(void)
         index &= mask;
         *position = index;
         index <<= 1;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         term = *(const u16 *)(index + (u32)table);
         saltAddress = &gSceneEffectPalettePhase;
         byteMask = 255;

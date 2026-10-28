@@ -28,7 +28,7 @@ struct CellGatePlayer {
     u8 gateCount;
 };
 typedef void (*CellGateUpdate)(struct CellGate *);
-extern struct CellGatePlayer *gUnk_02000580;
+extern struct CellGatePlayer *gPlayers;
 s32 CellGate_TestPlayerHeight(struct CellGate *);
 s32 CellGate_TestPlayerCell(struct CellGate *);
 s32 CellGate_TestPlayerEdge(struct CellGate *, s32);

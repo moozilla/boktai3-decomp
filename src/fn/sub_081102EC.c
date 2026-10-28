@@ -1,4 +1,5 @@
 #include "global.h"
+#include "area_effect_link.h"
 struct G {
     u8 f[0x1c];
     u8 b;
@@ -11,7 +12,6 @@ struct S {
     u8 q[0x23];
     u8 c;
 };
-extern struct G *gUnk_020004B4;
 void SaveMenu_UpdateSlotCommit(void);
 static inline void set(struct S *s, void *fp, u8 st)
 {
@@ -21,7 +21,7 @@ static inline void set(struct S *s, void *fp, u8 st)
 }
 void SaveMenu_WaitForSaveTransition(struct S *s)
 {
-    struct G *g = gUnk_020004B4;
+    struct G *g = gLinkSession;
     s32 v = -1;
     if (g != 0)
         v = g->b;

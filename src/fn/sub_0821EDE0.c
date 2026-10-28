@@ -1,6 +1,5 @@
 #include "terrain_cell_probe.h"
-
-extern const u16 gUnk_0203B400[];
+#include "ram.h"
 
 u8 *Path_GetDefinition(u32 id);
 s32 Path_GetPointPositionById(u16 *, u32, u32);
@@ -23,7 +22,7 @@ s32 Path_SnapToRandomFarPoint(struct Pos16 *out, struct Pos16 *ref, u32 pathId, 
     {
         u32 r = (gRandomIndex + 1) & 0x3FF;
         gRandomIndex = r;
-        start = Mod(*(const u16 *)((u8 *)gUnk_0203B400 + r * 2), def[0]);
+        start = Mod(*(const u16 *)((u8 *)gRandomTable + r * 2), def[0]);
     }
     for (i = start; i < start + def[0]; i++) {
         s32 dx, dz;

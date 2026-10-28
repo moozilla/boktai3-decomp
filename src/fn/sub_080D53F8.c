@@ -32,7 +32,7 @@ u8 sub_0807AF94(void *);
 u8 Mummy_RequestStraightRoute(void *);
 static inline u32 Mummy_RandomBits(s16 mask)
 {
-    return gUnk_0203B400[gRandomIndex = (gRandomIndex + 1) & 1023] & mask;
+    return gRandomTable[gRandomIndex = (gRandomIndex + 1) & 1023] & mask;
 }
 
 static inline void BeginProbeTurn(void *obj, u32 saved)
@@ -107,7 +107,7 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
         Chase_SetBehavior(actor, 13);
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *((void **)(group + 0x1fc)), 32,
                                                              32, speed)) {
-        if (PlayerFlags(&gUnk_02000580[0]->flags, 8) && (!(*((u16 *)(body + 0x6d2))))) {
+        if (PlayerFlags(&gPlayers[0]->flags, 8) && (!(*((u16 *)(body + 0x6d2))))) {
             if (Mummy_RequestStraightRoute(actor))
                 return;
         }

@@ -16,7 +16,7 @@ void SceneActorEffects_EmitRandomOffsets(struct SceneActorRegistryActor *actor, 
         u32 mask = 0x3FF;
         register s32 left asm("r5") = count;
         do {
-            register const u16 *table asm("r4") = gUnk_0203B400;
+            register const u16 *table asm("r4") = gRandomTable;
             register s32 random asm("r0");
             *index = (*index + 1) & mask;
             random = table[*index];

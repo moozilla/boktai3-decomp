@@ -26,7 +26,7 @@ static inline u32 PickTurn(u32 dir)
             u32 v;
             gRandomIndex = index;
             index *= 2;
-            v = *(const u16 *)(index + (u32)gUnk_0203B400);
+            v = *(const u16 *)(index + (u32)gRandomTable);
             {
                 register u32 mask asm("r7") = 3;
                 d = (v & mask) << 6;
@@ -91,13 +91,13 @@ static inline u8 Arrive(void *obj)
 
             goto done;
         }
-        cell = gUnk_02000580[player]->cell[3];
+        cell = gPlayers[player]->cell[3];
     } else {
         struct ChaseTarget *t = *slot;
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
         player = 0;
     }
-    if ((cell != actor->terrainCell) && (!Chase_Bits32(&gUnk_02000580[player]->flags, 0x20000)))
+    if ((cell != actor->terrainCell) && (!Chase_Bits32(&gPlayers[player]->flags, 0x20000)))
         goto reroute;
     if (Chase_MotionFlags(actor, 0x400))
         goto done;
@@ -205,7 +205,7 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
     u8 *body = actor->context;
     u8 *group = (u8 *)(&actor->group);
     s32 goal = *((u16 *)((*((u8 **)(actor->fieldDC + 0x1c))) + 6));
-    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId)
+    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId[0])
         return 0;
     if (goal == actor->terrainCell)
         return 1;
@@ -215,7 +215,7 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
         Mummy_RequestStraightRoute(actor);
         return 0;
     }
-    actor->fieldDC = ((u32)gUnk_02000580[0]) + 0x24;
+    actor->fieldDC = ((u32)gPlayers[0]) + 0x24;
     Arrive(actor);
     return 0;
 }

@@ -1,11 +1,11 @@
 #include "global.h"
-extern u8 *gUnk_02000580[];
+#include "player.h"
 s32 Script_GetActorIndex(void);
 void ScriptActor_ClearField534FromScript(void)
 {
     u8 *p;
     s32 i = Script_GetActorIndex();
-    p = gUnk_02000580[i];
+    p = gPlayers[i];
     if (p) {
         u16 *a = (u16 *)(p + 0x534);
         u32 z;

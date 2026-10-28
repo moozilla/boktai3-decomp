@@ -1,5 +1,5 @@
-#define gEffectSourceActors gUnk_020004F0
 #include "global.h"
+#include "scene_pool.h"
 struct EffectPosition {
     s32 x, y, z, unused;
 };
@@ -19,7 +19,6 @@ struct OffsetEffectActor {
     u8 pad5CE[0x62C - 0x5CE];
     u32 effectId;
 };
-extern struct EffectSourceActor *gUnk_020004F0[];
 void SpriteTrail_CreateMotionEffect(u32, struct EffectPosition *, s32 *, u32, s32, s32);
 void Sound_PlaySong(u32);
 static inline void GetSourcePosition(s32 index, s32 *sourcePosition)
@@ -30,7 +29,7 @@ static inline void GetSourcePosition(s32 index, s32 *sourcePosition)
         sourcePosition[2] = 0;
         return;
     } else {
-        struct EffectSourceActor *other = gUnk_020004F0[index];
+        struct EffectSourceActor *other = gParticipantActors[index];
         if (other == 0) {
             sourcePosition[0] = 0;
             sourcePosition[1] = 0;

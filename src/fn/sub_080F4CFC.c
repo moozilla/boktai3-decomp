@@ -1,11 +1,11 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 #ifdef NONMATCHING
 // fuzzy: 96.8%
 // fix.py best version
 // foundry draft (worker best 91.4%); what differs is mostly register allocation and instruction order
-#define gRandomTable gUnk_0203B400
 struct PhaseTarget {
     u8 unknown0[0x30];
     s16 position[3];
@@ -38,7 +38,6 @@ struct PhaseActor {
     u8 unknown18B[2];
     s8 angularSpeed;
 };
-extern const u16 gRandomTable[];
 void Sword_UpdateHorizontalWaveFlight(void);
 void Sword_UpdateDepthWaveFlight(void);
 void ActorPhase_BeginLunge(struct PhaseActor *p)
@@ -70,7 +69,7 @@ void ActorPhase_BeginLunge(struct PhaseActor *p)
         gRandomIndex = (u16)((gRandomIndex + 1) & 1023);
         offset = gRandomIndex * 2;
         {
-            register u32 tb asm("r2") = (u32)gUnk_0203B400;
+            register u32 tb asm("r2") = (u32)gRandomTable;
             random = *((const u16 *)(offset + tb));
         }
         random &= 1;

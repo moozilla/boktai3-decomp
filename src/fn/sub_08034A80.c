@@ -52,7 +52,6 @@ int SunClock_GetPhase(void);
 int SunClock_GetBaseHour(void);
 void WirelessText_EncodeString(const void *, void *, int);
 void Wireless_InitSessionConfig(void *, int, int, int, int, const void *, const void *);
-extern u16 gUnk_0203B400[];
 struct Game {
     u8 pad[0x780];
     u8 playerName[8];
@@ -97,7 +96,7 @@ int WirelessController_UpdateAdapterSetup(struct Engine *p)
             p->ticks = zero;
             *pending = 1;
             base = Script_ParseStringRef(p->script);
-            table = gUnk_0203B400;
+            table = gRandomTable;
             randomIndex = &gRandomIndex;
             position = *randomIndex + 1;
             mask = 1023;

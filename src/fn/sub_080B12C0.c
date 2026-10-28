@@ -1,17 +1,16 @@
 #include "global.h"
 #include "route_sprite_actor.h"
 #include "engine.h"
+#include "ram.h"
 
 // MATCHING_CONCESSION: register-pinning
 #define Route_GetPoints Path_GetPointData
-#define gRandomTable    gUnk_0203B400
 struct SceneActorRouteSelection {
     u8 unknown0[0x2be];
     u16 groundHeight;
     u8 unknown2C0[0x6b8 - 0x2c0];
     s8 routeId;
 };
-extern const u16 gUnk_0203B400[];
 void Route_Start(struct RouteSpriteRoute *, s32, u32, u32);
 u8 *Path_GetPointData(const void *);
 s32 Mod(s32, s32);
@@ -24,7 +23,7 @@ static inline s32 randomValue(void)
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    table = gUnk_0203B400;
+    table = gRandomTable;
     return *(const u16 *)(offset + (u32)table);
 }
 void SceneActor_SelectDistantRoutePoint(struct SceneActorRouteSelection *p,

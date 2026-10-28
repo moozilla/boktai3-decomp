@@ -54,7 +54,7 @@ static inline void BeginContactTurn(void *obj, u32 saved)
         register s32 prior asm("r5") = actor->direction;
         s32 tries = 0;
         s32 choice;
-        const u16 *table = gUnk_0203B400;
+        const u16 *table = gRandomTable;
         u32 *randomIndex = &gRandomIndex;
         u32 wrap;
         register u32 mask asm("r6");

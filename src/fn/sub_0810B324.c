@@ -1,6 +1,6 @@
 #include "global.h"
+#include "area_effect_link.h"
 #define SceneMenu_SetState Registry1745_SetState
-#define gSceneMenuPeer     gUnk_020004B4
 struct SceneMenu {
     u8 pad0[0x30];
     u32 timer;
@@ -11,7 +11,6 @@ struct SceneMenu {
     u32 field260;
     u32 field264;
 };
-extern u8 *gUnk_020004B4;
 u8 Registry1745_ConsumeStateEntry(struct SceneMenu *);
 s32 Registry1745_CheckSessionReady(struct SceneMenu *);
 void Registry1745_BeginShutdown(struct SceneMenu *, void (*)(void));
@@ -27,8 +26,8 @@ s32 SceneMenu_BeginTimedMessage(struct SceneMenu *p)
     if (Registry1745_ConsumeStateEntry(p)) {
         p->field260 = 0;
         p->field264 = 0;
-        if (gUnk_020004B4)
-            gUnk_020004B4[0x52] = 1;
+        if (((u8 *)gLinkSession))
+            ((u8 *)gLinkSession)[0x52] = 1;
         p->window = TextWindow_Create(1, 6, 28, 6);
         TextWindow_SetScript(p->window, p->script);
         TextWindow_Refresh(p->window, 8);

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 /* Coordinates wrap at 16 bits when particle offsets are added. */
 struct FanVector {
     u16 x, y, z, pad;
@@ -20,7 +21,6 @@ struct FanCannon {
 struct ParticleParameters {
     u32 data[14];
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 void EnemyParticle_InitParameters(void *);
@@ -43,7 +43,7 @@ static inline s32 RandomRange(s32 range)
 {
     s32 result = 0;
     if (range)
-        result = Mod(RandomFrom(gUnk_0203B400), range);
+        result = Mod(RandomFrom(gRandomTable), range);
     return result;
 }
 static inline s32 Scale(s32 value)
@@ -108,7 +108,7 @@ u32 FanCannon_UpdateActive(struct FanCannon *p)
         /* Compute the wind vector alongside the particle position. */
         Polar(&velocity, angle, p->wind);
         velocity.y = 0;
-        frame = RandomFrom(gUnk_0203B400) & 3;
+        frame = RandomFrom(gRandomTable) & 3;
         if (frame == 3)
             frame = 2;
         frame += 17;
@@ -117,7 +117,7 @@ u32 FanCannon_UpdateActive(struct FanCannon *p)
             span = p->range - half;
             distance = half;
             if (span)
-                distance += Mod(RandomFrom(gUnk_0203B400), span);
+                distance += Mod(RandomFrom(gRandomTable), span);
             Polar(&offset, baseAngle, distance);
         } else {
             half = p->range >> 1;
@@ -128,9 +128,9 @@ u32 FanCannon_UpdateActive(struct FanCannon *p)
         EnemyParticle_InitParameters(&parameters);
         EnemyParticle_SetGraphicsParameters(&parameters, 0x7e7c, frame, 0x1bf);
         EnemyParticle_SetMotionParameters(&parameters, 0, 30, angle, p->maximumWind);
-        if (RandomFrom(gUnk_0203B400) & 1)
+        if (RandomFrom(gRandomTable) & 1)
             EnemyParticle_AddFlags(&parameters, 4);
-        if (RandomFrom(gUnk_0203B400) & 1)
+        if (RandomFrom(gRandomTable) & 1)
             EnemyParticle_AddFlags(&parameters, 8);
         EnemyParticle_Emit(&parameters, pos);
     }

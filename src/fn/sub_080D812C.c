@@ -130,9 +130,9 @@ zero:
 
 static inline s32 LocalPlayer(void)
 {
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         return -1;
-    return gUnk_020004B4->localPlayer;
+    return gLinkSession->localPlayer;
 }
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {

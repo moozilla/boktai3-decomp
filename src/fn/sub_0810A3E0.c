@@ -1,7 +1,6 @@
 #include "global.h"
 #define SessionMenu_SetState          Registry1745_SetState
 #define SessionMenu_ResetWithCallback Registry1745_BeginShutdown
-#define gSessionMenu                  gUnk_020004B4
 #include "area_effect_link.h"
 s32 Registry1745_CheckSessionReady(void *);
 void Registry1745_BeginShutdown(void *, void (*)(void));
@@ -17,7 +16,7 @@ s32 SessionMenu_WaitForSelection(struct AreaEffectLinkState *p)
         return -1;
     }
     if (p->menuElapsed > 120) {
-        if (gUnk_020004B4 && gUnk_020004B4->localPlayer == 0) {
+        if (gLinkSession && gLinkSession->localPlayer == 0) {
             Registry1745_SetState(p, 7, LinkMenu_UpdateSelection);
             RegistryF246_Close();
         } else {

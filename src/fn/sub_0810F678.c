@@ -20,7 +20,7 @@ void RecordMenu_UpdateRecords(struct RecordMenu *);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 static inline u8 *GetChoices(void)
 {
-    struct AreaEffectLinkState *state = gUnk_020004B4;
+    struct AreaEffectLinkState *state = gLinkSession;
     u32 result;
     if (!state)
         return 0;

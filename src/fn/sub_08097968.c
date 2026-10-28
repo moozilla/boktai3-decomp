@@ -3,6 +3,7 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_control_motion.h"
 #include "scene_actor_animation.h"
+#include "player.h"
 
 struct IvyPlacement {
     u32 xy, z;
@@ -124,7 +125,6 @@ static inline void Fill(void *dst, u32 *tmp, u32 v)
     *tmp = v;
     CpuSet(tmp, dst, 0x05000002);
 }
-extern u8 *gUnk_02000580[4];
 struct GhostMovement {
     u8 pad[0x558];
     u32 flags;
@@ -155,7 +155,7 @@ void Ghost_ResetMovementState(struct SceneActorRegistryResetView *actor)
     context->a = 0;
     context->b = 0;
     context->flags = actor->flags130;
-    context->placement = *(struct IvyPlacement *)(gUnk_02000580[0] + 0x30);
+    context->placement = *(struct IvyPlacement *)(((u8 **)gPlayers)[0] + 0x30);
     Fill((u8 *)context + 0x5EC, &tmp, 0);
     Fill((u8 *)context + 0x5F4, &tmp, 0);
     Fill((u8 *)context + 0x5FC, &tmp, 0);

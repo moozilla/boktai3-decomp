@@ -47,7 +47,7 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
 {
     struct NamedObjectVector target, delta;
     struct NamedObjectManager *manager;
-    struct Player *player = gUnk_02000580[0];
+    struct Player *player = gPlayers[0];
     target.x = player->position.x + object->offset.x;
     target.y = player->position.y + object->offset.y;
     target.z = player->position.z + object->offset.z;
@@ -65,7 +65,7 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
         {
             u32 f;
             u32 v;
-            u8 *p = (u8 *)gUnk_02000580[0] + 0x701;
+            u8 *p = (u8 *)gPlayers[0] + 0x701;
             f = *p;
             do {
                 v = 1 | f;
@@ -84,10 +84,10 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
         }
         {
             manager->playerName = 0;
-            *(u32 *)((u8 *)gUnk_02000580[0] + 0x40) = (u32)gUnk_02000580[0] + 0x284;
-            Player_ClearAttachmentFlags(gUnk_02000580[0], 5);
+            *(u32 *)((u8 *)gPlayers[0] + 0x40) = (u32)gPlayers[0] + 0x284;
+            Player_ClearAttachmentFlags(gPlayers[0], 5);
             clearFlag16(8, &object->flags);
-            ((u8 *)gUnk_02000580[0])[0x701] &= 0xFE;
+            ((u8 *)gPlayers[0])[0x701] &= 0xFE;
         }
     }
 }

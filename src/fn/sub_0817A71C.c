@@ -1,10 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-extern u16 gUnk_0203B400[];
 void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
 void SceneActors_EmitRandomBursts(u8 *p)
 {
@@ -25,7 +25,7 @@ void SceneActors_EmitRandomBursts(u8 *p)
         indexPtr = &gRandomIndex;
         mask = 1023;
         smallMask = 3;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         index = (*indexPtr + 1) & mask;
         angle = (u8)table[index];
         index = (index + 1) & mask;

@@ -2,7 +2,7 @@
 #include "ram.h"
 #include "runtime.h"
 #include "render.h"
-extern u32 gUnk_020004B4;
+#include "area_effect_link.h"
 void m4aMPlayAllStop(void);
 void m4aSoundVSyncOff(void);
 void InterruptsAndVideo_WaitForVBlank(void);
@@ -25,7 +25,7 @@ u32 System_ShutdownAndSoftReset(void)
     InterruptsAndVideo_WaitForVBlank();
     Solar_StopMeasurement();
     Rtc_Protect();
-    if (gUnk_020004B4 || gSlotMonitor)
+    if (gLinkSession || gSlotMonitor)
         Serial_StopCommunication();
     rfu_setREQCallback(0);
     rfu_REQ_stopMode();

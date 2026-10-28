@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_event_dispatch.h"
 typedef struct {
     u16 id;
     u8 kind, flags;
@@ -21,11 +22,10 @@ typedef struct {
     Receiver self;
 } Controller;
 
-extern Controller *gUnk_0200047C;
 int SceneMessages_RegisterReceiver(void *, int, int);
 int SceneMessages_Initialize(Controller *p, int id)
 {
-    gUnk_0200047C = p;
+    gSceneEventDispatchState = p;
     p->active = 0;
     p->scene = 0xffff;
     p->step = -1;

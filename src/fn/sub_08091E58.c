@@ -44,7 +44,7 @@ void sub_08091E58(struct SceneActorBehaviorContactView *source,
     gRandomIndex = index;
     index *= 2;
     {
-        register const u16 *table asm("r2") = gUnk_0203B400;
+        register const u16 *table asm("r2") = gRandomTable;
         {
             u16 *entry = (void *)(index + (u32)table);
             sample = *entry;

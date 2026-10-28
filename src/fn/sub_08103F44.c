@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_terrain.h"
 #include "ram.h"
-extern void *gUnk_02000580;
+#include "player.h"
 u32 Player_TestAttachmentFlags(void *, u32);
 static inline u32 Attributes(s32 cell)
 {
@@ -28,7 +28,7 @@ void NamedObject_PlayAdjacentExitSound(u8 *o)
     if (!manager)
         return;
     if (!(*(u32 *)(o + 0xE0) & 0x10)) {
-        if (!Player_TestAttachmentFlags(gUnk_02000580, 1))
+        if (!Player_TestAttachmentFlags((*(void **)gPlayers), 1))
             return;
         if (*(u32 *)(manager + 0x1370) != *(u32 *)(o + 0xDC))
             return;

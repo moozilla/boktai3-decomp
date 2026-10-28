@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 /* Tentative: per-frame update of a collider-carrying object (restart animation once, move colliders, advance timer). */
 struct ColliderObjectCtx {
     u8 pad[0x18];
@@ -16,14 +17,14 @@ struct ColliderObject {
     u8 pad40[0x28];
     u8 anim[1];
 };
-extern struct ColliderObjectCtx *gColliderSpritePool;
 
 void ColliderObject_Update(struct ColliderObject *p)
 {
     if (p->restart) {
         p->restart = 0;
         p->flags &= ~1;
-        Anim_SetSequence(p->anim, gColliderSpritePool->animation, 1, 0, 0);
+        Anim_SetSequence(p->anim, ((struct ColliderObjectCtx *)gColliderSpritePool)->animation, 1,
+                         0, 0);
     }
     if (p->health <= 0 || p->hold) {
         p->done = 1;

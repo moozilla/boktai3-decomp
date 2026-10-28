@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
@@ -36,7 +37,6 @@ struct Manager {
     u8 *resource;
     void *animations;
 };
-extern struct Manager *gFadingParticleManager;
 void Anim_SetDurationScale(void *, int);
 void Effect_Remove(void *);
 static inline int scale(int a, int b)
@@ -74,7 +74,7 @@ int FadingParticleGroup_Update(struct Group *g)
                 asm("" : : : "memory");
                 p->velocity.y -= 2;
                 Anim_SetDurationScale(anim, 16);
-                resource = gFadingParticleManager->resource;
+                resource = ((struct Manager *)gFadingParticleManager)->resource;
                 a = anim;
                 entry = p->anim.data + p->anim.frame;
                 frame = *entry >> 6;

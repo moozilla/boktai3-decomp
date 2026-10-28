@@ -5,7 +5,7 @@
 struct ScriptPosition {
     s32 x, y, z, unused;
 };
-/* gUnk_020004F0 is the player; +0x18 is its motion state (x at +0x28),
+/* gParticipantActors is the player; +0x18 is its motion state (x at +0x28),
  * +0x5F4 its viewport origin X. */
 struct MotionState {
     u8 unknown0[0x10];
@@ -15,13 +15,13 @@ s32 Script_GetKeywordValue(u32, s32);
 s32 Script_GetPc(void);
 s32 Script_GetValue(void);
 s32 Script_SeekToKeyword(u32);
-extern u8 *gUnk_020004F0;
+extern u8 *gParticipantActors;
 
 static inline void Actor_SetScreenPosition(u8 *self, struct ScriptPosition *pos)
 {
     u8 *player;
     struct MotionState *state;
-    player = gUnk_020004F0;
+    player = gParticipantActors;
     state = (struct MotionState *)(player + 0x18);
     *(s32 *)(self + 0x14) = pos->y << 12;
     *(s32 *)(self + 0x18) = pos->z << 12;

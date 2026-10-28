@@ -24,7 +24,7 @@ static inline void Dog_BeginRecoveryTurn(void *obj, u8 saved)
         register s32 prior asm("r7") = actor->direction;
         s32 tries = 0;
         s32 choice;
-        const u16 *table = gUnk_0203B400;
+        const u16 *table = gRandomTable;
         do {
             u32 index = (gRandomIndex + 1) & 1023;
             gRandomIndex = index;
@@ -63,13 +63,13 @@ static inline u8 Dog_RerouteToTarget(void *obj)
         }
         if (player < 0)
             goto invoke;
-        cell = gUnk_02000580[player]->cell[3];
+        cell = gPlayers[player]->cell[3];
     } else {
         struct ChaseTarget *t = *slot;
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
         player = 0;
     }
-    if (cell != actor->terrainCell && !Chase_Bits32(&gUnk_02000580[player]->flags, 0x20000))
+    if (cell != actor->terrainCell && !Chase_Bits32(&gPlayers[player]->flags, 0x20000))
         goto reroute;
     if (Dog_ReadMotionFlags(actor, 0x400))
         goto done;
@@ -176,7 +176,7 @@ s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
             a->flags2CC |= mask;
         }
         *(u16 *)(group + 0x40) = 4 | *(u16 *)(group + 0x40);
-        a->fieldDC = (u32)gUnk_02000580[0] + 0x24;
+        a->fieldDC = (u32)gPlayers[0] + 0x24;
         if (Dog_IsActionTimerExpired(a)) {
             if (!Dog_RerouteToTarget(a)) {
                 if (!Chase_TryRoute(a, *(void **)(group + 0x1FC), &a->position,
@@ -211,7 +211,7 @@ s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
         StartReactionAnimation(a);
         if (!a->fieldDC)
             return 0;
-        a->fieldDC = (u32)gUnk_02000580[0] + 0x24;
+        a->fieldDC = (u32)gPlayers[0] + 0x24;
         {
             u32 mask = 16;
             a->flags2CC |= mask;

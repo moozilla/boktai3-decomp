@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 struct CGPos080F38E0 {
     u16 x, y, z, w;
@@ -53,7 +54,6 @@ struct Group080F38E0 {
 };
 void Ivy_InitColorTransition(struct Group080F38E0 *);
 s32 Callback_InvokeActor(void *, void *);
-extern const u16 gUnk_0203B400[];
 
 static inline u8 ChildGroup_TakeEntryFlag(struct Group080F38E0 *p)
 {
@@ -81,7 +81,7 @@ static inline u32 ChildGroup_Jitter(u32 value, const u16 *base)
 
 static inline u32 ChildGroup_RandomValue(void)
 {
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     u32 *index = &gRandomIndex;
     *index = (*index + 1) & 1023;
     return table[*index];

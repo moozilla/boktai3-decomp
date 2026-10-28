@@ -1,4 +1,3 @@
-#define gPlayerSlots gUnk_02000580
 #include "global.h"
 #include "player.h"
 
@@ -10,7 +9,7 @@ struct PlayerSelection {
 struct Player *Player_FindMaskedSlot(const struct PlayerSelection *selection)
 {
     s32 i = 0;
-    struct Player **base = gUnk_02000580;
+    struct Player **base = gPlayers;
     s32 mask = selection->playerMask;
     s32 one = 1;
     struct Player **slot = base;

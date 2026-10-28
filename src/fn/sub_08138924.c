@@ -1,7 +1,6 @@
 #include "global.h"
 #include "display_animation.h"
 
-#define gPlayerSlotDisplay gSpriteSlots
 struct PlayerSlotDisplaySprite {
     u32 flags;
     u8 unknown4[3], priority;
@@ -20,7 +19,8 @@ struct PlayerSlotDisplay {
     struct PlayerSlotDisplaySlot slots[4];
     void *sequenceResource;
 };
-extern struct PlayerSlotDisplay *gPlayerSlotDisplay;
+#include "ram.h"
+#define gPlayerSlotDisplay (*(struct PlayerSlotDisplay **)&gSpriteSlots)
 s32 PlayerSlotDisplay_Initialize(struct PlayerSlotDisplay *input)
 {
     struct PlayerSlotDisplay *manager = input;

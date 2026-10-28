@@ -10,7 +10,6 @@ struct Weather {
     void *script0, *script;
 };
 extern u8 *gGameState;
-extern u16 gUnk_0203B400[];
 void Palette_SetBrightnessMode(int);
 void Script_Call(void *, int);
 void Weather_EnterPhase(void *, int);
@@ -52,7 +51,7 @@ int Weather_StormEnd(struct Weather *p)
             gRandomIndex = (gRandomIndex + 1) & 1023;
             {
                 u32 offset = gRandomIndex * 2;
-                r = *(u16 *)((u8 *)gUnk_0203B400 + offset);
+                r = *(u16 *)((u8 *)gRandomTable + offset);
             }
             *(int *)(gGameState + 0x630) += Mod(r, gWeatherCooldownRange);
         }

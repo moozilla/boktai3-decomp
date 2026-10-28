@@ -1,8 +1,8 @@
 #include "scene_actor_reset.h"
+#include "player.h"
 
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: targets player zero and starts the contact pursuit control.
-extern u8 *gUnk_02000580;
 u32 Nav_IsPositionInMesh(void *, void *, void *);
 s32 Terrain_ApplyBlocked(void *, void *, void *);
 s32 Div(s32, s32);
@@ -87,7 +87,7 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     register u32 motionMask asm("r9");
     if (Blocked(a))
         return;
-    if (!gUnk_02000580)
+    if (!(*(u8 **)gPlayers))
         return;
     ctx = a->context;
     group = (u8 *)(&a->group);
@@ -95,13 +95,13 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     if (ready)
         return;
     mesh = &((struct SpiderPursuitGroup *)group)->mesh;
-    if (!Nav_IsPositionInMesh(*mesh, &a->position, gUnk_02000580 + 0x30))
+    if (!Nav_IsPositionInMesh(*mesh, &a->position, (*(u8 **)gPlayers) + 0x30))
         return;
     motionMask = 0x200;
     point = &((struct SpiderPursuitGroup *)group)->point;
     *(*point) = a->position;
     (*point)->pad = ready;
-    a->fieldDC = (u32)(gUnk_02000580 + 0x24);
+    a->fieldDC = (u32)((*(u8 **)gPlayers) + 0x24);
     SetState(a, 0, 0, 7);
     SetControl(a, a->entryTarget228, 1);
     terrain = *mesh;

@@ -5,12 +5,12 @@
 // Parameter-save order and the first signed-load scratch still differ.
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "player.h"
 
 s32 Math_Atan2(s32, s32);
 void PlayerStats_AddContactHundredths(void *, void *, u32);
 s32 Player_IsSlotInActionTwelveOrThirtyEight(s32);
 void Collision_CalculateDamageResponse(void *);
-extern u8 *gUnk_02000580;
 struct ContactActor {
     u8 pad0[6];
     u16 flags;
@@ -43,7 +43,7 @@ struct ActorStatus {
 void ActorStatus_InitializeContact(struct ContactActor *input, struct ContactActor *other,
                                    struct ActorStatus *status)
 {
-    u8 *world = gUnk_02000580;
+    u8 *world = (*(u8 **)gPlayers);
     s32 strength;
     s32 shift;
     s32 scaled;

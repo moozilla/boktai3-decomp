@@ -513,7 +513,7 @@ void SceneActor_StartRandomizedEffect(struct Player *p)
         position.x = source->x;
         position.y = source->y + 128;
         position.z = source->z;
-        random = gUnk_0203B400;
+        random = gRandomTable;
         velocity.x = (EffectRandomWith(random) & 15) - 7;
         velocity.y = (EffectRandomWith(random) & 31) - 16;
         velocity.z = (EffectRandomWith(random) & 15) - 7;
@@ -576,17 +576,17 @@ void Player_QueueStatusEffect(struct Player *p, s32 a)
     }
 
     if (p->actionMode == 3) {
-        const u16 *t = gUnk_0203B400;
+        const u16 *t = gRandomTable;
         v.x = (EffectRandomWith(t) & 7) - 3;
         v.y = (EffectRandomWith(t) & 7) - 5;
         v.z = 0;
     } else if (p->actionMode == 4) {
-        const u16 *t = gUnk_0203B400;
+        const u16 *t = gRandomTable;
         v.x = (EffectRandomWith(t) & 7) - 3;
         v.y = (EffectRandomWith(t) & 7) - 3;
         v.z = 0;
     } else {
-        const u16 *t = gUnk_0203B400;
+        const u16 *t = gRandomTable;
         v.x = (EffectRandomWith(t) & 15) - 7;
         v.y = -(EffectRandomWith(t) & 31);
         v.z = 0;
@@ -659,13 +659,12 @@ s32 SceneActor_SelectEffectDisplayMode(struct Player *p, s32 mode)
 
 void Player_EmitQueuedEffects(struct Player *);
 s32 Mod(s32, s32);
-extern u16 gUnk_02000504;
 static inline int Player_NextStatusRandom(void)
 {
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+    return *(const u16 *)(offset + (u32)gRandomTable);
 }
 
 static inline u32 Player_ReadStatusBonusBits(u32 *flags, u32 mask)
@@ -702,7 +701,7 @@ void sub_0813D834(struct Player *p, s32 inputKind, u32 inputDuration)
                 u32 current = *(u16 *)((u8 *)timers + scaled);
                 offset = scaled;
                 if (!current) {
-                    u16 *target = &gUnk_02000504;
+                    u16 *target = &gPlayerSavedMenuOption;
                     s32 random = Mod(Player_NextStatusRandom(), 7);
                     s32 selection = (s8)p->catalogSavedOption + 1;
                     selection += random;
@@ -1006,8 +1005,6 @@ void Player_InitDirectionalEffectPair(void *);
 void Player_InitOrbitingEffect(void *);
 void ConvergingEffects_InitSprites(void *);
 void DirectionalSpriteEffect_InitSprite(void *);
-extern u16 gUnk_02000550, gUnk_0200053C, gUnk_0200052C;
-extern u16 gUnk_02000590;
 
 static inline u8 PlayerEffects_IsSceneModeFive(struct Player *p)
 {
@@ -1058,11 +1055,11 @@ void Player_InitEffects(struct Player *p)
     p->movementRequestTarget.x = 0;
     p->movementRequestTarget.y = 0;
     p->movementRequestTarget.z = 0;
-    gUnk_02000550 = 0;
-    gUnk_0200053C = 0;
-    gUnk_0200052C = 1;
+    gPlayerBackgroundState = 0;
+    gPlayerBackgroundMode = 0;
+    gPlayerDirectionLatch = 1;
     gForceDirectionMode = 1;
-    gUnk_02000590 = 0;
+    gPlayerEffectPendingCount = 0;
     p->movementAnimationState = 255;
 }
 
@@ -1176,7 +1173,7 @@ s32 Player_RollModifierBonus(void)
     s32 r;
 
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
+    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
     if (r > 10) {
         r = 0;
     } else {
@@ -1269,7 +1266,7 @@ s32 Player_OnWeaponHitRollEffect1000(void)
     s32 r;
 
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
+    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
     if (r > 10) {
         r = 0;
     } else {
@@ -1283,7 +1280,7 @@ s32 Player_OnWeaponHitRollEffect40000Low(void)
     s32 r;
 
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
+    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
     if (r > 10) {
         r = 0;
     } else {
@@ -1297,7 +1294,7 @@ s32 Player_OnWeaponHitRollEffect40000High(void)
     s32 r;
 
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
+    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
     if (r > 20) {
         r = 0;
     } else {
@@ -1311,7 +1308,7 @@ s32 Player_OnWeaponHitRollEffect80000Low(void)
     s32 r;
 
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
+    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
     if (r > 10) {
         r = 0;
     } else {
@@ -1325,7 +1322,7 @@ s32 Player_OnWeaponHitRollEffect80000High(void)
     s32 r;
 
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
+    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
     if (r > 20) {
         r = 0;
     } else {
@@ -2349,14 +2346,12 @@ void Player_SetActionRequest(struct Player *p, s32 kind)
     }
 }
 
-extern s16 gUnk_02000554;
-
 s32 Player_GetSelectedAbility(struct Player *p)
 {
     if (p->actionMode != 6)
         /* Add the slot index before the field offset to retain the original address lifetime. */
         return *(s16 *)((u8 *)gGameState + gGameState->selected * 2 + 0x88);
-    gUnk_02000554 = 0;
+    gPlayerAbilityLatched = 0;
     if (gGameState->abilityVariant == 0)
         return 4;
     return 5;
@@ -2379,7 +2374,7 @@ void Player_InitActionRequest(struct Player *p)
     } else {
         request->duration = ActorParameter_GetModeValue(request->kind);
         request->enabled = Player_IsEnchantmentAvailable(p, request->kind);
-        request->latched = gUnk_02000554;
+        request->latched = gPlayerAbilityLatched;
         if (!request->enabled)
             request->latched = 0;
     }

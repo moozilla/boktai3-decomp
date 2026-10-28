@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_0200047C;
+extern u8 *gSceneEventDispatchState;
 void SceneMessages_SetPendingTrigger(void *, void *);
 void SceneMessages_RunScript(void *, void *, void *);
 void SceneMessages_SetDelay(void *, void *, void *);
@@ -17,10 +17,10 @@ int SceneMessages_Dispatch(u8 *p)
     Entry *entry = (Entry *)(p + 0x78);
     int i;
     i = 0;
-    if (i < entry->count[gUnk_0200047C[0x24]]) {
+    if (i < entry->count[gSceneEventDispatchState[0x24]]) {
         do {
             u8 *message;
-            u8 *controller = gUnk_0200047C;
+            u8 *controller = gSceneEventDispatchState;
             message = entry->messages[controller[0x24]][i];
             SceneMessages_SetPendingTrigger(entry, message);
             switch (message[6]) {
@@ -35,7 +35,7 @@ int SceneMessages_Dispatch(u8 *p)
                     break;
             }
             i++;
-        } while (i < entry->count[gUnk_0200047C[0x24]]);
+        } while (i < entry->count[gSceneEventDispatchState[0x24]]);
     }
     return 0;
 }

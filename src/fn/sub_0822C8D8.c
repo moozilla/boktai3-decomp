@@ -2,18 +2,18 @@
 #include "engine.h"
 #include "runtime.h"
 #include "input.h"
-extern u8 *gUnk_020004B4;
+#include "area_effect_link.h"
 
 u16 sub_0822C8D8(u8 *p)
 {
     u16 *keys;
     if (gEngineFlags & 0x800) {
         s32 i, k;
-        if (gUnk_020004B4 == NULL) {
+        if (((u8 *)gLinkSession) == NULL) {
             k = 1;
             i = -k;
         } else
-            i = *(s16 *)(gUnk_020004B4 + 0x18);
+            i = *(s16 *)(((u8 *)gLinkSession) + 0x18);
         keys = &gPadState[i * 4];
     } else
         keys = gPadState;

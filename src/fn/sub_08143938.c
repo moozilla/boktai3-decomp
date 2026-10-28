@@ -1,10 +1,10 @@
 #include "global.h"
 #include "player.h"
+#include "tether_actor.h"
 struct MovementSpeedContext {
     u8 unknown0[0x1E];
     u16 reduction;
 };
-extern struct MovementSpeedContext *gUnk_02000488;
 s32 Div(s32, s32);
 static inline u8 IsFixedSpeed(struct Player *p)
 {
@@ -23,7 +23,7 @@ s32 Player_CalculateMovementSpeed(struct Player *p)
         speed = p->derivedStats[2];
         speed += 100;
         speed -= p->movementLoadPercent;
-        speed -= gUnk_02000488->reduction;
+        speed -= ((struct MovementSpeedContext *)gTetherActor)->reduction;
         speed = Div(speed * 12, 100);
         if (speed > 16)
             speed = 16;

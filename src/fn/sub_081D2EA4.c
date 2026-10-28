@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 // confidence=low: moves one frost particle, steps playback and hides it on expiry.
 #define FrostEmitter_UpdateParticle sub_081D2EA4
 struct FrostVec {
@@ -32,7 +33,6 @@ struct FrostEmitter {
     struct FrostParticle particles[12];
     u32 enabled, age;
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Anim_SetSequence(void *, void *, u16, u8, u8);
 void FrostEmitter_UpdateParticle(struct FrostParticle *input)

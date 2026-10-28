@@ -1,5 +1,7 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "player.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 86.4%
@@ -19,8 +21,6 @@ struct S {
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
 
-extern const u16 gUnk_0203B400[];
-extern void *gUnk_02000580[];
 void Sound_PlaySong(u32);
 u8 Callback_InvokeActor(void *, u32);
 void sub_080148CC(s32, s32, void *, s32, s32, s32, s32, s32, s32, s32, s32);
@@ -31,7 +31,7 @@ struct Vec {
 static inline s32 Random(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gUnk_0203B400[gRandomIndex];
+    return gRandomTable[gRandomIndex];
 }
 static inline s32 RandomFrom(const u16 *table)
 {
@@ -43,7 +43,7 @@ static inline s32 RandomFrom(const u16 *table)
 inline static s32 Random_081CA490(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return (*((typeof(gUnk_0203B400) *)0x0203B400))[gRandomIndex];
+    return (*((typeof(gRandomTable) *)0x0203B400))[gRandomIndex];
 }
 
 void StateActor_UpdateEightWayBurst(u32 a, struct S *p, s32 tick)
@@ -136,7 +136,7 @@ void StateActor_UpdateEightWayBurst(u32 a, struct S *p, s32 tick)
         register s32 fourteen asm("sl");
         struct Vec position = *((struct Vec *)(((u8 *)p) + 0x68));
         *((volatile s16 *)(&position)) += 200;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         sub_080148CC(4, 0x26, &position, 0, RandomFrom(table) & 63, 12, ten, 5, 8, 8, 5);
         sub_080148CC(4, 0x26, &position, 64, RandomFrom(table) & 63, 12, ten, 5, 8, 8, 5);
         sub_080148CC(4, 0x26, &position, 128, RandomFrom(table) & 63, 12, ten, 5, 8, 8, 5);
@@ -146,7 +146,7 @@ void StateActor_UpdateEightWayBurst(u32 a, struct S *p, s32 tick)
         sub_080148CC(2, 0x26, &position, 64, RandomFrom(table) & 63, ten, 4, 4, 4, fourteen, 4);
         sub_080148CC(2, 0x26, &position, 128, RandomFrom(table) & 63, ten, 4, 4, 4, fourteen, 4);
         sub_080148CC(2, 0x26, &position, 192, RandomFrom(table) & 63, ten, 4, 4, 4, fourteen, 4);
-        PlayerCue_BeginModeSeven(gUnk_02000580[0], 2);
+        PlayerCue_BeginModeSeven(gPlayers[0], 2);
     }
     if (DisplayAnimation_TestFinished(p->d4)) {
         switch (p->b18) {

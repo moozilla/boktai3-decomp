@@ -93,7 +93,7 @@ s32 ScenePool_StateLaunchArc(void *manager, struct ScenePoolActor *actor,
         {
             u32 offset = next << 1;
             register const u8 *table asm("r3");
-            table = (const u8 *)gUnk_0203B400;
+            table = (const u8 *)gRandomTable;
             random = *(const u8 *)(offset + (u32)table);
         }
         kind = entry->kind;

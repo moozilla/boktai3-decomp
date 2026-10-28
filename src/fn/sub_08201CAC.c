@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 struct V {
     u16 a;
     u16 b;
@@ -13,7 +14,6 @@ struct S {
     u8 p2[0x1a8 - 0x48];
     s16 h1a8;
 };
-extern u16 gUnk_0203B400[];
 void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);
 void ScriptCombatActor_RecordDefeat(void *);
@@ -28,7 +28,7 @@ u32 ScriptCombatActor_UpdateDefeatEffect(struct S *p)
             q[1] += 0xc8;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
             idx = gRandomIndex;
-            t = *(u8 *)&gUnk_0203B400[idx];
+            t = *(u8 *)&gRandomTable[idx];
             SpriteParticle_CreateDefaultVariant4384(&v, 0x80, 0x20, 0xc, 0xc, 0x18, t, 0x20, 0x20,
                                                     1, 2, 0x200);
         }

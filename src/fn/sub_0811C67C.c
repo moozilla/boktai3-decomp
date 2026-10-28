@@ -1,5 +1,4 @@
 #define Equipment_HasCategory GameState_HasEquippedConsumable
-#define gAreaEffectLinkState  gUnk_020004B4
 #include "global.h"
 #include "area_effect_link.h"
 #include "engine.h"
@@ -22,7 +21,7 @@ s32 ActorResource_SelectElementResource(s32 index)
     s32 count, selected;
     u32 mask = 0x800;
     if ((gEngineFlags | gScenePauseFlags) & mask) {
-        struct AreaEffectLinkState *link = gUnk_020004B4;
+        struct AreaEffectLinkState *link = gLinkSession;
         struct AreaEffectLinkResourceSlot *slot;
         if (!link || link->unavailable != 1 || !ValidIndex(index))
             return 0x378;

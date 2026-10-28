@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 #ifdef NONMATCHING
 // fuzzy: 85.9%
 // fix.py best version (reprinted C)
@@ -12,7 +13,6 @@ struct NamedActor {
     u8 padBA[0x26];
     u32 flagsE0;
 };
-extern void *gUnk_020001AC;
 struct NamedActor *NamedObject_FindByName(s32 name);
 void NamedActor_PlayMovementSound(struct NamedActor *);
 /* Script: for actor -n with flag 2 at +0xE0: +0xB6 = 2, then by -m (default
@@ -24,7 +24,7 @@ void NamedActor_SetMoveModeFromScript(void)
     s32 name = Script_GetKeywordValue('n', 0);
     struct NamedActor *actor;
     u32 k1 = 4;
-    if (gUnk_020001AC && name) {
+    if (gNamedActorManager && name) {
         actor = NamedObject_FindByName(name);
         if (actor && (actor->flagsE0 & 2)) {
             s32 two = 2;

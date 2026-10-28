@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 struct ActorMarkerFragment {
     u8 unk_00[0x24];
@@ -20,7 +21,6 @@ struct ActorMarker {
 };
 /* Two facing rows, each containing nine four-halfword fragment offsets. */
 extern const u16 gUnk_0824E818[];
-extern const u16 gUnk_0203B400[];
 void ActorMarker_InitBouncingParticles(struct ActorMarker *);
 void Sound_PlaySongChecked(u32);
 
@@ -61,7 +61,7 @@ void ActorMarker_LaunchFragments(struct ActorMarker *p, u32 fast)
     posZ = &p->position[2];
     posX = &p->position[0];
     table = gUnk_0824E818;
-    randomTable = gUnk_0203B400;
+    randomTable = gRandomTable;
     randomIndex = &gRandomIndex;
     offset = table + (row8 + row) * 4;
     do {

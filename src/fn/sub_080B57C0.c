@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+#include "player.h"
 
 struct ApproachRoutePoint {
     s16 x, z;
@@ -110,7 +111,6 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
         return 1;
     return 0;
 }
-extern u8 *gUnk_02000580[];
 s32 Div(s32, s32);
 static inline u8 Pending(u8 *context)
 {
@@ -145,7 +145,7 @@ void Skeleton_BeginStationaryPursuit(struct SceneActorRegistryResetView *a)
     if (*(u16 *)(context + 0x6D8))
         return;
     SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
-    a->fieldDC = (u32)(gUnk_02000580[0] + 0x24);
+    a->fieldDC = (u32)(((u8 **)gPlayers)[0] + 0x24);
     a->field2C2 = Div(64, 3);
     if (MotionFlags(a, 0x80))
         OrFlags(&group->flags414, 4);

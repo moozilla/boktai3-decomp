@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -22,7 +23,6 @@ struct Effect {
     struct Sprite sprite;
 };
 void FloatingEffect_Project(struct Effect *);
-extern void *gUnk_02000580[];
 void FloatingEffect_Wait(void *m, struct Effect *p)
 {
     if (p->entered) {
@@ -34,7 +34,7 @@ void FloatingEffect_Wait(void *m, struct Effect *p)
         u32 mode = p->mode;
         if (mode == 0) {
             u32 index = p->index;
-            if (gUnk_02000580[index])
+            if (gPlayers[index])
                 p->state = 6;
             else
                 p->state = 5;

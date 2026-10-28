@@ -2,7 +2,6 @@
 #include "engine.h"
 #include "ram.h"
 // MATCHING_CONCESSION: register-pinning
-#define gRandomTable gUnk_0203B400
 struct ReactionVector {
     s16 x, y, z, pad;
 };
@@ -32,7 +31,6 @@ struct ActorReaction {
 struct ReactionIds {
     u32 a, b;
 };
-extern const u16 gRandomTable[];
 void DirectionBurst_EmitOffset(const void *, u32, u32, u32, u32, u32);
 void Hresvelgr_SetAnimation(struct ActorReaction *, void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);

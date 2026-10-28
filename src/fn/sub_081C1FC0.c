@@ -37,7 +37,7 @@ struct ControlPanel {
     s32 totalLimit;
 };
 
-extern struct PanelPlayer *volatile gUnk_02000580;
+extern struct PanelPlayer *volatile gPlayers;
 extern struct PanelState *gGameState;
 void ControlPanel_UpdateGaugeIndicator(struct ControlPanel *);
 void Sound_StopSong(u32);
@@ -54,7 +54,7 @@ void ControlPanel_TickMultiplierTimer(struct ControlPanel *);
 
 void sub_081C1FC0(struct ControlPanel *p)
 {
-    struct PanelPlayer *pl = gUnk_02000580;
+    struct PanelPlayer *pl = gPlayers;
     u8 *kindp = &pl->kind;
     u32 kind = *kindp;
 
@@ -67,10 +67,10 @@ void sub_081C1FC0(struct ControlPanel *p)
         p->ticks++;
         ControlPanel_UpdateGaugeIndicator(p);
         done = 0;
-        q = gUnk_02000580;
+        q = gPlayers;
         q->x -= q->speed - 3;
         {
-            struct PanelPlayer *r = gUnk_02000580;
+            struct PanelPlayer *r = gPlayers;
             s16 x = r->x;
             q = r;
             if (x < 0x380) {
@@ -81,7 +81,7 @@ void sub_081C1FC0(struct ControlPanel *p)
             }
         }
         if (done) {
-            gUnk_02000580->kind = 1;
+            gPlayers->kind = 1;
             p->f57E++;
             Sound_StopSong(0x23A);
             Sound_StopSong(0x23B);
@@ -103,7 +103,7 @@ void sub_081C1FC0(struct ControlPanel *p)
             } else if (p->ticks >= p->tickLimit && total >= p->totalLimit) {
                 ControlPanel_BeginIdle(p, 1);
             } else {
-                Sound_SetChannel10Tempo(gUnk_02000580->speed * 96);
+                Sound_SetChannel10Tempo(gPlayers->speed * 96);
                 gGameState->balance -= v;
             }
         }
@@ -117,19 +117,19 @@ void sub_081C1FC0(struct ControlPanel *p)
             s32 zero = 0;
             s32 four = 4;
             *kindp = four;
-            gUnk_02000580->timer = zero;
-            gUnk_02000580->x = 0x380;
-            gUnk_02000580->y = 0x100;
-            gUnk_02000580->z = 0x580;
-            gUnk_02000580->flag3A2 = 1;
-            gUnk_02000580->flag3A3 = 1;
+            gPlayers->timer = zero;
+            gPlayers->x = 0x380;
+            gPlayers->y = 0x100;
+            gPlayers->z = 0x580;
+            gPlayers->flag3A2 = 1;
+            gPlayers->flag3A3 = 1;
             ScreenTransition_SendCommand(0, 5, four, 4, four, 0x1FFF, zero);
         }
     } else if (kind == 4) {
         if (pl->timer > 0x1F) {
             s32 zero = 0;
             *kindp = zero;
-            gUnk_02000580->timer = zero;
+            gPlayers->timer = zero;
             p->f588 = zero;
         }
     }

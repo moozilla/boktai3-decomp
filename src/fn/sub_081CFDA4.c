@@ -43,7 +43,7 @@ struct Camera {
     u8 pad[0x44];
     s32 x;
 };
-extern struct Camera *gUnk_020004B8;
+extern struct Camera *gSceneCamera;
 void GroundEffect_EnableProjection(void *);
 void Actor_PlayAnimationEntry(void *, s32, s32, s32, s32);
 s32 Player_GetHorizontalVelocity(s32);
@@ -78,7 +78,7 @@ static inline void facing(struct SceneNpc *npc, u32 angle)
 static inline void project(struct SceneNpc *npc, struct Vec *position)
 {
     struct Projection *projection = &npc->projection;
-    projection->x = (position->x + gUnk_020004B8->x) << 12;
+    projection->x = (position->x + gSceneCamera->x) << 12;
     projection->z = position->z << 12;
     projection->y = 0;
     projection->height = position->y << 12;
@@ -87,7 +87,7 @@ static inline void projectTarget(struct SceneNpc *npc)
 {
     struct Projection *projection = &npc->projection;
     struct Vec *position = &npc->target;
-    projection->x = (position->x + gUnk_020004B8->x) << 12;
+    projection->x = (position->x + gSceneCamera->x) << 12;
     projection->z = position->z << 12;
     projection->y = 0;
     projection->height = position->y << 12;

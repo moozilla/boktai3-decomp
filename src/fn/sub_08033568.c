@@ -1,13 +1,12 @@
 #include "global.h"
-
-extern u8 *gScrollingDialogue;
+#include "ram.h"
 
 s32 ScrollingDialogue_RequestShow(void)
 {
     s32 ret;
 
-    if (gScrollingDialogue) {
-        gScrollingDialogue[0x17D] = 1;
+    if (((u8 *)gScrollingDialogue)) {
+        ((u8 *)gScrollingDialogue)[0x17D] = 1;
         ret = 0;
     } else {
         ret = -1;

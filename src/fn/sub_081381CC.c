@@ -4,7 +4,6 @@
 
 // foundry draft (worker best 96.7%); what differs is mostly register allocation and instruction order
 #define PlayerValue_GetBand Solar_GetLevelForIntensity
-#define gLinkSession        gUnk_020004B4
 s32 PlayerValue_GetBand(s32);
 s32 Div(s32, s32);
 static inline u32 GetSelection(s32 player)

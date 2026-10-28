@@ -18,9 +18,9 @@ extern struct EffectQuad *gEffectQuad;
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 static inline s32 LocalPlayer(void)
 {
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         return -1;
-    return gUnk_020004B4->localPlayer;
+    return gLinkSession->localPlayer;
 }
 void EffectQuad_StartRemoteEntry(s32 player, const struct EffectQuadPosition *position)
 {

@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-extern u8 *gUnk_02000580[];
+#include "player.h"
 s32 Script_GetActorIndex(void);
 s32 ScriptActor_GetCueOptionFromScript(void);
 void PlayerCue_Motion7Front(u8 *actor, s32 f, s32 e);
@@ -13,7 +13,7 @@ void ScriptActor_EnterStateFourFromScript(void)
 {
     u8 *actor;
     s32 i = Script_GetActorIndex();
-    actor = gUnk_02000580[i];
+    actor = gPlayers[i];
     if (actor) {
         s32 e = ScriptActor_GetCueOptionFromScript();
         u8 state = actor[0x418];

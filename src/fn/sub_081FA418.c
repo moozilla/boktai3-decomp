@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 // confidence=low: slot checks gate a two-stage transfer of the player to a sun-orb position.
 struct Target {
     u32 distance;
@@ -11,7 +12,6 @@ struct Ratatosk {
 #define H(o) (*(s16 *)(p + (o)))
 #define U(o) (*(u16 *)(p + (o)))
 #define W(o) (*(u32 *)(p + (o)))
-extern u8 *gUnk_02000580;
 s32 SunOrb_GetSlotState(s32);
 s32 Ratatosk_FindActiveTargetNearestPlayer(void *);
 s32 SunOrb_IsFadingOut(s32);
@@ -34,7 +34,7 @@ void Ratatosk_UpdateSunOrbPlayerTransfer(u8 *p)
     s32 target;
     u8 *player;
     if (H(0xe7e) == 0 && H(0xe80) == 0 && SunOrb_GetSlotState(H(0xe4e)) <= 239 &&
-        SunOrb_GetSlotState(H(0xe4e)) > 30 && gUnk_02000580) {
+        SunOrb_GetSlotState(H(0xe4e)) > 30 && (*(u8 **)gPlayers)) {
         target = Ratatosk_FindActiveTargetNearestPlayer(p);
         if (target < 0)
             return;
@@ -42,7 +42,7 @@ void Ratatosk_UpdateSunOrbPlayerTransfer(u8 *p)
             return;
         if (((struct Ratatosk *)p)->targets[target].distance <= 0x3fff &&
             SlotController_IsSlotIdle(target) && target == Ratatosk_GetSelectedTargetIndex() &&
-            !*(u16 *)((player = gUnk_02000580) + 0x4d6) && !playerFlags(player, 0x40000)) {
+            !*(u16 *)((player = (*(u8 **)gPlayers)) + 0x4d6) && !playerFlags(player, 0x40000)) {
             if (!H(0xe82)) {
                 Player_ResetPositionState(
                     player, SunOrb_GetPositionFromManager(*(void **)(p + 0xf2c), target));
@@ -59,7 +59,7 @@ void Ratatosk_UpdateSunOrbPlayerTransfer(u8 *p)
                 s32 target = Ratatosk_FindActiveTargetNearestReference(p);
                 if (target < 0)
                     target = Ratatosk_GetSelectedTargetIndex();
-                player = gUnk_02000580;
+                player = (*(u8 **)gPlayers);
                 if (player[0x457] == 26) {
                     Player_ResetModePosition(
                         player, SunOrb_GetPositionFromManager(*(void **)(p + 0xf2c), target), 150);

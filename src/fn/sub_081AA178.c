@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 // confidence=low: command 9 alternates the selected pair halves for six timed attacks.
 // MATCHING_CONCESSION: register-pinning
 // Scope: byte-for-byte match with one retained register pin.
@@ -32,11 +33,10 @@ u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
 s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
-extern u16 gUnk_0203B400[];
 static inline s32 RandomValue(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    return *(u16 *)((gRandomIndex << 1) + (u32)gUnk_0203B400);
+    return *(u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
 }
 void Vanargand_UpdateRepeatedPairAttack(struct Vanargand *p)
 {

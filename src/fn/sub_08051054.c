@@ -6,11 +6,11 @@ struct OrbitBackground *OrbitBackground_CreateFromScript(u32 id)
     s32 player;
     u32 enabled;
     if (gEngineFlags & 0x800) {
-        if (!gUnk_020004B4) {
+        if (!gLinkSession) {
             k2 = 1;
             player = -k2;
         } else {
-            player = gUnk_020004B4->selected;
+            player = gLinkSession->selected;
         }
     } else if (Script_SeekToKeyword('i')) {
         player = Script_GetValue();

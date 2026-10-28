@@ -1,7 +1,7 @@
-#define gMeterOwnerSource gUnk_020004B4
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "area_effect_link.h"
 struct MeterDisplayWidget {
     u8 unknown0[8];
     u32 flags;
@@ -24,13 +24,12 @@ struct MeterOwnerSource {
     u8 unknown0[0x18];
     s16 index;
 };
-extern struct MeterOwnerSource *gMeterOwnerSource;
 s32 ViewportGauge_ComputeFill(struct MeterDisplay *, s32);
 static inline s32 OwnerIndex(void)
 {
-    if (!gMeterOwnerSource)
+    if (!((struct MeterOwnerSource *)gLinkSession))
         return -1;
-    return gMeterOwnerSource->index;
+    return ((struct MeterOwnerSource *)gLinkSession)->index;
 }
 void MeterDisplay_UpdateOwnerMeters(struct MeterDisplay *s)
 {

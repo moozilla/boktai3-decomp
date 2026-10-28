@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-extern const void *gNamePlaceholderScript;
+#include "ram.h"
 void Menu_DrawText(u32, u32, const u8 *);
 void Menu_EraseRect(u32, u32, u32, u32);
 void TextEntry_DrawName(const void *src)
@@ -13,8 +13,8 @@ void TextEntry_DrawName(const void *src)
     i = 4;
     do {
         if (!p[0] && !p[1]) {
-            u8 *placeholder =
-                Text_LookupString(Script_ParseStringRef(gNamePlaceholderScript) + 0x54);
+            u8 *placeholder = Text_LookupString(
+                Script_ParseStringRef((*(const void **)gNamePlaceholderScript)) + 0x54);
             p[0] = placeholder[0];
             p[1] = placeholder[1];
         }

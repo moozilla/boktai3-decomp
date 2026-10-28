@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
@@ -34,13 +35,11 @@ struct Manager {
     struct Piece pieces[32];
 };
 void Sprite_Remove(void *);
-extern struct Manager *gAnimatedParticleManager;
 extern u16 gUnk_08604C54[];
 void *ScriptProc_Start(int, int);
 int AnimData_Load(void *, int);
 void Sprite_InitUnlinked(void *, void *, int);
 void Anim_SetSequence(void *, void *, int, int, int);
-extern u16 gUnk_0203B400[];
 extern s16 gUnk_086149C4[];
 struct Config {
     u16 type, flags, pad, speed;
@@ -58,7 +57,7 @@ void Sprite_LinkToList(void *, int);
 static inline int rnd(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gUnk_0203B400[gRandomIndex];
+    return gRandomTable[gRandomIndex];
 }
 static inline int scale12(int a, int b)
 {
@@ -82,7 +81,7 @@ int AnimatedParticles_Create(int count, struct Vec *pos, struct Config *c)
     int i, emitted;
     u16 *table;
     u32 *index;
-    if (gAnimatedParticleManager)
+    if ((*(struct Manager **)&gAnimatedParticleManager))
         goto start;
     if (AnimatedParticleManager_Create(0, 0))
         goto start;
@@ -92,10 +91,10 @@ success:
 start:
     emitted = 0;
     i = 0;
-    table = gUnk_0203B400;
+    table = gRandomTable;
     index = &gRandomIndex;
     for (; i <= 31; i++) {
-        struct Piece *p = &gAnimatedParticleManager->pieces[i];
+        struct Piece *p = &(*(struct Manager **)&gAnimatedParticleManager)->pieces[i];
         struct Obj *o = &p->sprite;
         if (!p->active) {
             int pitch, yaw;
@@ -156,26 +155,30 @@ start:
                 AnimData_SelectPaletteBank(p->resource, 0x29f);
                 setFrame(&p->sprite, 32);
                 a = &p->anim;
-                Anim_SetSequence(a, gAnimatedParticleManager->resources[1], 6, 0, 0);
+                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
+                                 6, 0, 0);
             } else if (p->pad1 == 6) {
                 AnimData_Load(p->resource, 0x61f9);
                 AnimData_SelectPaletteBank(p->resource, 0x2a7);
                 setFrame(&p->sprite, 32);
                 a = &p->anim;
-                Anim_SetSequence(a, gAnimatedParticleManager->resources[1], 6, 0, 0);
+                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
+                                 6, 0, 0);
                 asm("" : : "r"(a), "i"(6));
             } else if (p->pad1 == 7) {
                 AnimData_Load(p->resource, 0x61f9);
                 AnimData_SelectPaletteBank(p->resource, 0x2a6);
                 setFrame(&p->sprite, 45);
                 a = &p->anim;
-                Anim_SetSequence(a, gAnimatedParticleManager->resources[1], 8, 0, 0);
+                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
+                                 8, 0, 0);
                 asm("" : : "r"(a), "i"(7));
             } else {
                 AnimData_Load(p->resource, 0x4384);
                 AnimData_SelectPaletteBank(p->resource, p->pad1 + 182);
                 a = &p->anim;
-                Anim_SetSequence(a, gAnimatedParticleManager->resources[0], 0, 0, 0);
+                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[0],
+                                 0, 0, 0);
             }
             saved = a;
             asm("" : "+r"(saved));

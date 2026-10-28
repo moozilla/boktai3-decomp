@@ -1,6 +1,6 @@
 #include "global.h"
+#include "area_effect_link.h"
 extern struct Manager *gEffectQuad;
-extern u8 *gUnk_020004B4;
 void SpriteDrawable_SelectTileFrame(void *, u32, s32);
 
 struct Pair {
@@ -24,9 +24,9 @@ struct Manager {
 
 static inline s32 GetCurrent(void)
 {
-    if (gUnk_020004B4 == NULL)
+    if (((u8 *)gLinkSession) == NULL)
         return -1;
-    return *(s16 *)(gUnk_020004B4 + 0x18);
+    return *(s16 *)(((u8 *)gLinkSession) + 0x18);
 }
 
 void sub_08232FD0(s32 index, struct Pair *pos)

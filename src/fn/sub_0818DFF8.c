@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 struct StretchBody {
@@ -83,7 +83,7 @@ void Armor_InitPartStretch(struct StretchPart *p)
         gRandomIndex = (gRandomIndex + 1) & 1023;
         {
             u32 offset = gRandomIndex * 2;
-            choice = *(const u16 *)(offset + (u32)gUnk_0203B400);
+            choice = *(const u16 *)(offset + (u32)gRandomTable);
         }
         choice &= one;
         {

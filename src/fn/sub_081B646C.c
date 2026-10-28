@@ -1,14 +1,13 @@
-#define gRandomTable gUnk_0203B400
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 struct PairedSceneActor;
 s32 PairedSceneActor_GetActiveMask(struct PairedSceneActor *);
 s32 PairedSceneActor_ApplyToSelectedHalves(struct PairedSceneActor *, u32, u32);
-extern u16 gUnk_0203B400[];
 static inline s32 NextRandom(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(u16 *)(gRandomIndex * 2 + (u32)gUnk_0203B400);
+    return *(u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
 }
 s32 PairedSceneActor_ApplyToActiveHalf(struct PairedSceneActor *p, u32 value)
 {

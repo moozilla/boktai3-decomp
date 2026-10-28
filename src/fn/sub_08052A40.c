@@ -1,8 +1,8 @@
 #include "stacked_actor.h"
 #include "input.h"
 #include "engine_globals.h"
+#include "player.h"
 extern u32 gUnk_02000560;
-extern u8 *gUnk_02000580;
 s32 StackedActor_IsPlayerNearby(struct StackedActor *);
 void Sound_PlaySong(u32);
 void AnimData_SelectPaletteBank(void *, u32);
@@ -16,8 +16,8 @@ void StackedActor_TickIdle(struct StackedActor *actor)
         if (nearby) {
             if (!actor->interactionEnabled) {
                 u32 mask = 1;
-                if ((gUnk_02000560 & mask) && gUnk_02000580[0x457] != 0x1D &&
-                    gUnk_02000580[0x457] != 0x1E && (gPadState[1] & 1))
+                if ((gUnk_02000560 & mask) && (*(u8 **)gPlayers)[0x457] != 0x1D &&
+                    (*(u8 **)gPlayers)[0x457] != 0x1E && (gPadState[1] & 1))
                     Sound_PlaySong(0x124);
             } else {
                 u16 *state = &actor->proximityState;
@@ -34,12 +34,12 @@ void StackedActor_TickIdle(struct StackedActor *actor)
                 {
                     u32 mask = 1;
                     if ((gUnk_02000560 & mask) && (gPadState[1] & 1)) {
-                        u8 *player = gUnk_02000580;
+                        u8 *player = (*(u8 **)gPlayers);
                         u32 playerMask = 0x100000;
                         if (!(*(u32 *)(player + 0x20) & playerMask) &&
                             actor->interactionDelay > 9) {
                             actor->animationPhase = 8;
-                            PlayerCue_WalkTo(gUnk_02000580, &actor->world, 0, 4);
+                            PlayerCue_WalkTo((*(u8 **)gPlayers), &actor->world, 0, 4);
                             StackedActor_SetUpdate(actor, StackedActor_BeginPlayerInteraction);
                         }
                     }

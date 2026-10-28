@@ -25,7 +25,7 @@ struct Manager {
     struct Vec *target;
     struct Player *player;
 };
-extern struct Player *gUnk_02000580[4];
+extern struct Player *gPlayers[4];
 int Weather_GetType(void);
 int SunClock_GetBaseHour(void);
 int SunClock_GetBaseMinute(void);
@@ -35,7 +35,7 @@ void sub_0802E04C(void *);
 int Actor_Destroy(struct Actor *);
 int SceneActorManager_Update(struct Manager *m)
 {
-    struct Player *player = gUnk_02000580[0];
+    struct Player *player = gPlayers[0];
     int zero;
     u8 *alias;
     m->player = player;

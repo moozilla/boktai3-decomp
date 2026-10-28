@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 struct Elem {
     u32 flags;
     u8 pad4[0x14];
@@ -10,7 +11,6 @@ struct Elem {
     void *data;
     void (*update)(struct Elem *);
 };
-extern u16 gUnk_0203B400[];
 void SpriteDrawable_SelectTileFrame(struct Elem *, void *, u32);
 void FlickerParticle_UpdateStationary(struct Elem *);
 s32 Mod(s32, s32);
@@ -27,7 +27,7 @@ void HealthRestoreEffect_InitSparkle(struct Elem *p)
     u32 zero;
     p->flags &= ~1;
     SpriteDrawable_SelectTileFrame(p, p->data, 2);
-    table = gUnk_0203B400;
+    table = gRandomTable;
     p->x = Mod(rnd(table), 80) + 24;
     zero = 0;
     p->y = (rnd(table) & 7) + 8;

@@ -2,6 +2,8 @@
 #include "global.h"
 #include "render.h"
 #include "engine.h"
+#include "background_controller.h"
+#include "ram.h"
 #ifdef NONMATCHING
 // fuzzy: 90.2%
 // fix.py best (sweep after the inlined-insn fix)
@@ -13,8 +15,6 @@ struct Camera {
     u8 pad[0x44];
     s32 x;
 };
-extern struct Camera *gUnk_020004B8;
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Actor_UpdateVisibilityAndShadow(u32, u8 *);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
@@ -36,7 +36,7 @@ static inline s32 Load(u32 addr)
 static inline s32 Rand(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    return *(const u16 *)(gRandomIndex * 2 + (u32)gUnk_0203B400);
+    return *(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
 }
 
 static inline s32 Truncate(s32 v)
@@ -68,7 +68,7 @@ s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
             asm("" : "+r"(addr));
             adj = *((s32 *)addr);
         }
-        dst->x = (pos[0] >> 12) - gUnk_020004B8->x;
+        dst->x = (pos[0] >> 12) - gSceneCamera->x;
         dst->y = ((pos[2] + (pos[1] + adj)) >> 12) + 0x60;
         dst->z = pos[2] >> 12;
         {
@@ -122,7 +122,7 @@ s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
                     struct ContactPosition *pos = &pos_;
                     s32 *pp = (s32 *)(p + 0x300);
                     s32 adj = *((s32 *)(p + 0x328));
-                    pos->x = (pp[0] >> 12) - gUnk_020004B8->x;
+                    pos->x = (pp[0] >> 12) - gSceneCamera->x;
                     pos->y = ((pp[2] + (pp[1] + adj)) >> 12) + 0x60;
                     pos->z = pp[2] >> 12;
                     {
@@ -133,7 +133,7 @@ s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
                         register u32 *cursor asm("r4");
                         asm volatile("" : "+r"(opaque));
                         {
-                            register const u16 *table asm("r5") = gUnk_0203B400;
+                            register const u16 *table asm("r5") = gRandomTable;
                             register u32 index asm("r0") =
                                 ((cursor = &gRandomIndex, (*cursor) + 1)) & 0x3FF;
                             r1 = (Load((index * 2) + ((u32)table)) >> 4) & 0x3F;
@@ -157,7 +157,7 @@ s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
                                 register u32 z asm("r2") = 0;
                                 vel->z = z;
                                 *cursor = ((*cursor) + 1) & 0x3FF;
-                                e = ((Load(((*cursor) * 2) + ((u32)gUnk_0203B400)) >> 4) & 0xF) +
+                                e = ((Load(((*cursor) * 2) + ((u32)gRandomTable)) >> 4) & 0xF) +
                                     0xF;
                                 SpriteEffectController_Create(&pos_, v8, 0x1C1E, 0xD43F, z, 0x10,
                                                               0x11, 1, 2, 1, z, e, z, z, z, z, -4,
