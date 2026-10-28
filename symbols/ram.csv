@@ -292,8 +292,8 @@ addr,name,size,kind,decl,header,confidence,notes
 030035C6,gRtcProtected,1,object,extern u8 gRtcProtected;,include/runtime.h,,RTC GPIO protection flag set by Rtc_Protect and cleared by Rtc_Initialize
 030035C8,gSoftDoubleNaN,14,object,extern struct SoftDoubleNumber gSoftDoubleNaN;,include/libgcc_numbers.h,high library source correspondence,libgcc software double-precision NaN object; 20-byte fp-bit-base number layout
 030035E0,gSoftSingleNaN,10,object,extern struct SoftSingleNumber gSoftSingleNaN;,include/libgcc_numbers.h,high library source correspondence,libgcc software floating-point NaN number object; shared fp-bit-base layout
-030035F0,SoundMainRAM_Buffer,402,object,,,,
-030039F0,gUnk_030039F0,,interior,,,,SoundMainRAM_Buffer +0x400
+030035F0,SoundMainRAM_Buffer,402,object,extern u8 SoundMainRAM_Buffer[0x400];,include/sound.h,,MP2K RAM instruction buffer copied with CpuCopy32 size 0x400; next script procedure word is a separate object
+030039F0,gUnk_030039F0,2,object,,,,Separate script entry-procedure word immediately after the bounded 0x400-byte MP2K code buffer
 03003A00,gUnk_03003A00,4,object,,,,
 03003A04,gUnk_03003A04,4,object,,,,
 03003A08,gUnk_03003A08,4,object,,,,

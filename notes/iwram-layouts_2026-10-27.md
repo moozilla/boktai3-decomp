@@ -103,3 +103,5 @@ and field-remapping support in ramlayout would make this migration faster.
 - **030035C8 `gSoftDoubleNaN` (struct):** libgcc double NaN object shares its 20-byte number layout in libgcc_numbers.h. Both compiler modes retain identical instructions; only internal long-branch label numbers differ. Per-unit ROM check exact; layout scanner misses the typedef-based block declaration.
 
 - **030035E0 `gSoftSingleNaN` (struct):** libgcc single-precision NaN object shares its 16-byte number representation; both compiler modes preserve instructions and the per-unit ROM check is exact.
+
+- **030035F0 `SoundMainRAM_Buffer` (unified):** MP2K RAM instruction buffer copied with CpuCopy32 size 0x400; next script procedure word is a separate object; ramlayout before/after checks passed.
