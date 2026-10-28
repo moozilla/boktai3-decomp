@@ -1,16 +1,10 @@
 #include "global.h"
 #include "engine.h"
+#include "menu_parameters.h"
 /* Parameters at 0x020003D0 (meaning unknown). */
-struct Params3D0 {
-    s32 g, o, l, s, d, c;
-    u16 t, b;
-    s32 f[2];
-    s32 M;
-};
-extern struct Params3D0 gUnk_020003D0;
 void Params3D0_SetFromScript(void)
 {
-    struct Params3D0 *p = &gUnk_020003D0;
+    struct TimeDisplayParameters *p = &gTimeDisplayParameters;
     p->M = 0;
     if (Script_SeekToKeyword('g'))
         p->g = Script_GetValue();
@@ -25,12 +19,12 @@ void Params3D0_SetFromScript(void)
     if (Script_SeekToKeyword('c'))
         p->c = Script_GetValue();
     if (Script_SeekToKeyword('t'))
-        p->t = Script_GetValue();
+        p->timeout = Script_GetValue();
     if (Script_SeekToKeyword('b'))
-        p->b = Script_GetValue();
+        p->silent = Script_GetValue();
     if (Script_SeekToKeyword('f')) {
-        p->f[0] = Script_GetValue();
-        p->f[1] = Script_GetValue();
+        p->fadeOut = Script_GetValue();
+        p->confirmFade = Script_GetValue();
     }
     if (Script_SeekToKeyword('M'))
         p->M = Script_GetValue();

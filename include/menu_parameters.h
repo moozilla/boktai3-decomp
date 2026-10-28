@@ -64,4 +64,12 @@ struct SoundTestParameters {
 };
 extern struct SoundTestParameters gSoundTestParameters;
 
+struct TimeDisplayParameters {
+    s32 g, o, l, s, d, c;
+    s16 timeout, silent;
+    s32 fadeOut, confirmFade;
+    s32 M;
+};
+extern struct TimeDisplayParameters gTimeDisplayParameters;
+
 #endif
