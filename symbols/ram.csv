@@ -237,8 +237,8 @@ addr,name,size,kind,decl,header,confidence,notes
 0200070C,gBackupGameState,4,object,extern u8 *gBackupGameState;,include/ram.h,,backup main-state region at selected base plus 0xB00
 02000710,gGameState,4,object,extern struct GameState *gGameState;,include/game_state.h,low,
 02000714,gHeapHead,10,object,extern struct HeapBlock gHeapHead;,include/heap.h,low,"general heap first block; prev/next, size/free flags and cleared trailing word"
-0201F400,gUnk_0201F400,4,object,,,,
-02037000,gUnk_02037000,,object,,,,
+0201F400,gHeapEndGuard,4,object,extern u32 gHeapEndGuard;,include/ram.h,,heap-end guard word expected to equal 0x516B92EE
+02037000,gBgMapWorkBuffer,2000,object,extern u8 gBgMapWorkBuffer[0x2000];,include/ram.h,,"background map work buffer, cleared for 0x2000 bytes"
 02039000,gUnk_02039000,8,object,,,,
 0203B000,gUnk_0203B000,8,object,,,,
 0203B400,gUnk_0203B400,802,object,,,,

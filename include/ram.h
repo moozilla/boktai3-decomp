@@ -217,8 +217,10 @@ extern u32
     gSaveStateSignature; /* main-state save signature checked when reading and written before saving */
 extern u8 *
     gScriptLocalVariables; /* 0x400-byte local script-variable region at selected base plus 0x1E00 */
-extern u8 *gBackupGameVariables; /* backup game-variable region at selected base plus 0x1A00 */
-extern u8 *gGameVariables;       /* active 0x400-byte game-variable region */
-extern u8 *gBackupGameState;     /* backup main-state region at selected base plus 0xB00 */
+extern u8 *gBackupGameVariables;    /* backup game-variable region at selected base plus 0x1A00 */
+extern u8 *gGameVariables;          /* active 0x400-byte game-variable region */
+extern u8 *gBackupGameState;        /* backup main-state region at selected base plus 0xB00 */
+extern u32 gHeapEndGuard;           /* heap-end guard word expected to equal 0x516B92EE */
+extern u8 gBgMapWorkBuffer[0x2000]; /* background map work buffer, cleared for 0x2000 bytes */
 
 #endif
