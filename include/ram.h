@@ -155,5 +155,14 @@ extern s32
 extern s32 gWeatherCooldownRange; /* random range added to the weather cooldown */
 extern u32 gStormActive;          /* set while Weather_Update is in storm phase 3 */
 extern s32 gStormTimer; /* provisional: storm duration/delay countdown shared by weather phases */
+extern u8
+    *gSceneActorRegistry[8]; /* eight scene actor registry slots (SceneActors_FindAvailable) */
+extern void
+    *gActorPoolManager; /* actor pool singleton; separate slot after the eight-entry registry */
+extern u32 gWirelessLastStatus; /* cached wireless status used when its controller is absent */
+extern struct ActorAttachmentManagerView
+    *gActorAttachmentManager; /* actor attachment manager singleton */
+extern struct SceneParticlePool
+    *gSceneParticleEmitterPool; /* provisional: scene particle emitter pool singleton */
 
 #endif

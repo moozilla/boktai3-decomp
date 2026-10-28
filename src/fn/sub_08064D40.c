@@ -3,7 +3,7 @@
 void ActorAttachment_BeginPartJitter(struct ActorAttachmentSlotView *slot, s32 indexInput)
 {
     s32 index = indexInput;
-    if (gUnk_02000124 != NULL) {
+    if (gActorAttachmentManager != NULL) {
         if (*slot->value <= slot->thresholds[index]) {
             u8 *status;
             s32 indexLow;

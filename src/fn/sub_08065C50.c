@@ -19,7 +19,7 @@ ActorAttachment_ReleaseResource(struct ActorAttachmentSlotView *incoming, u32 re
     asm("" : "+r"(slot));
     if (!slot)
         goto cleared;
-    manager = gUnk_02000124;
+    manager = gActorAttachmentManager;
     if (!manager)
         goto cleared;
     {

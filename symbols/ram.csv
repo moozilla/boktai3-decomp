@@ -38,14 +38,14 @@ addr,name,size,kind,decl,header,confidence,notes
 020000A8,gTemporaryAnimationPool,4,object,extern struct TemporaryAnimationPool *gTemporaryAnimationPool;,include/temporary_animation_pool.h,low,
 020000AC,gTransientSpritePool,4,object,extern u8 *gTransientSpritePool;,include/ram.h,low,transient sprite pool (TransientSpritePool_*)
 020000B0,gSpritePoolManager,4,object,extern u32 gSpritePoolManager;,include/ram.h,low,sprite pool singleton (SpritePool_*)
-020000B8,gUnk_020000B8,24,object,,,,
-020000D8,gUnk_020000D8,,interior,,,,gUnk_020000B8 +0x20
+020000B8,gSceneActorRegistry,20,object,extern u8 *gSceneActorRegistry[8];,include/ram.h,,eight scene actor registry slots (SceneActors_FindAvailable); eight-pointer loop ends before the independent 020000D8 slot
+020000D8,gActorPoolManager,4,object,extern void *gActorPoolManager;,include/ram.h,,actor pool singleton; separate slot after the eight-entry registry
 020000DC,gMessageWindow,4,object,extern struct Actor *gMessageWindow;,include/ram.h,low,message window (MessageWindow_*)
 020000E0,gScrollingDialogue,4,object,extern struct Window *gScrollingDialogue;,include/ram.h,low,scrolling dialogue window (ScrollingDialogue_*)
 020000E4,gWindowManager,4,object,extern struct WindowManager *gWindowManager;,include/ram.h,low,
 020000E8,gTransition,4,object,extern struct Transition *gTransition;,include/ram.h,low,
 020000EC,gWirelessSessionState,1,object,extern u8 gWirelessSessionState;,include/ram.h,low,wireless session state byte (Wireless_*)
-020000F0,gUnk_020000F0,4,object,,,,
+020000F0,gWirelessLastStatus,4,object,extern u32 gWirelessLastStatus;,include/ram.h,,cached wireless status used when its controller is absent
 020000F4,gWirelessLinkIndicator,4,object,extern struct WirelessLinkIndicator *gWirelessLinkIndicator;,include/wireless_link_indicator.h,low,
 020000F8,gLinkMenu,4,object,extern struct LinkMenu *gLinkMenu;,include/ram.h,low,
 020000FC,gWirelessTradeMenu,4,object,extern u32 gWirelessTradeMenu;,include/ram.h,low,wireless trade/exchange menu (WirelessTradeMenu_*)
@@ -58,11 +58,11 @@ addr,name,size,kind,decl,header,confidence,notes
 02000118,gStackedActor,4,object,extern struct StackedActor *gStackedActor;,include/stacked_actor.h,low,
 0200011C,gStageIconDisplay,4,object,extern struct StageIconDisplay *gStageIconDisplay;,include/stage_icon_display.h,low,
 02000120,gLevelAdvanceManager,4,object,extern struct LevelAdvanceManager *gLevelAdvanceManager;,include/level_advance_display.h,low,
-02000124,gUnk_02000124,4,object,,,,
+02000124,gActorAttachmentManager,4,object,extern struct ActorAttachmentManagerView *gActorAttachmentManager;,include/ram.h,,actor attachment manager singleton
 02000128,gSceneActorControlManager,4,object,extern struct SceneActorControlManager *gSceneActorControlManager;,include/ram.h,low,
 0200012C,gColliderEffectPool,4,object,extern struct ColliderEffectPool *gColliderEffectPool;,include/ram.h,low,
 02000130,gSceneParticleBurstPool,4,object,extern struct SceneParticleBurstPool *gSceneParticleBurstPool;,include/ram.h,low,
-02000134,gUnk_02000134,4,object,,,,
+02000134,gSceneParticleEmitterPool,4,object,extern struct SceneParticlePool *gSceneParticleEmitterPool;,include/ram.h,,provisional: scene particle emitter pool singleton
 02000138,gSpriteGroup,4,object,extern struct SpriteParticlePool *gSpriteGroup;,include/ram.h,low,
 0200013C,gSpriteEffectPool,4,object,extern struct SpriteEffectPool *gSpriteEffectPool;,include/ram.h,low,
 02000140,gAnimatedBodyPool,4,object,extern u8 *gAnimatedBodyPool;,include/ram.h,low,

@@ -3,7 +3,7 @@
 void ActorAttachment_TickWideShake(void *, struct ActorAttachmentSlotView *);
 void ActorAttachment_TickLandingBounce(struct ActorAttachmentSlotView *slot)
 {
-    struct ActorAttachmentManagerView *manager = gUnk_02000124;
+    struct ActorAttachmentManagerView *manager = gActorAttachmentManager;
     if (manager) {
         struct ContactSwarmSprite *sprite = &slot->sprite;
         sprite->flags &= ~1;

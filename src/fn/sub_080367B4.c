@@ -40,7 +40,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-extern u32 gUnk_020000F0, gUnk_0300546C, gUnk_03005408;
+extern u32 gUnk_0300546C, gUnk_03005408;
 void Solar_PauseMeasurement(void);
 void Solar_ResumeMeasurement(void);
 void Task_UnlinkFromPriorityList(void *);
@@ -55,7 +55,7 @@ void Wireless_UpdateChildNiSession(struct Engine *);
 int Wireless_UpdateControllerTask(struct Engine *p)
 {
     Solar_PauseMeasurement();
-    gUnk_020000F0 = p->flag33;
+    gWirelessLastStatus = p->flag33;
     switch (p->phase) {
         case 0:
             if (p->active)

@@ -34,7 +34,7 @@ s32 ActorAttachment_DestroyManager(struct ActorAttachmentManagerView *manager)
     }
     {
         struct ActorAttachmentManagerView *empty = 0;
-        gUnk_02000124 = empty;
+        gActorAttachmentManager = empty;
     }
     return 0;
 }

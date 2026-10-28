@@ -1,5 +1,5 @@
 #include "scene_particle_pool.h"
-extern struct SceneParticlePool *gUnk_02000134;
+#include "ram.h"
 extern void *gUnk_08605B5C[];
 static inline u8 Occupied(const u32 *mask, u32 bit)
 {
@@ -22,7 +22,7 @@ s32 SceneParticlePool_Destroy(struct SceneParticlePool *input)
     }
     {
         u32 zero = 0;
-        gUnk_02000134 = (void *)zero;
+        gSceneParticleEmitterPool = (void *)zero;
     }
     return 0;
 }

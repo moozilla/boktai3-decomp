@@ -4,6 +4,6 @@ s32 ActorAttachment_InitManager(struct ActorAttachmentManagerView *manager)
 {
     manager->occupiedMask = 0;
     ActorAttachment_LoadManagerResources((struct ActorAttachmentManagerResources *)manager);
-    gUnk_02000124 = manager;
+    gActorAttachmentManager = manager;
     return 0;
 }

@@ -1,11 +1,11 @@
 #include "global.h"
-extern u8 *gUnk_020000B8[8];
+#include "ram.h"
 u8 *SceneActors_FindAvailable(void)
 {
     u8 *found = 0;
     u8 **cursor;
     int i = 0;
-    cursor = gUnk_020000B8;
+    cursor = gSceneActorRegistry;
     do {
         u8 *p;
         p = *cursor;

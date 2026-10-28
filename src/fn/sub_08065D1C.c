@@ -16,7 +16,7 @@ ActorAttachment_ReleasePartsResource(struct ActorAttachmentSlotView *incoming, u
     asm("" : "+r"(matchUpdate));
     if (!slot)
         goto cleared;
-    manager = gUnk_02000124;
+    manager = gActorAttachmentManager;
     if (!manager)
         goto cleared;
     parts = slot->parts;
