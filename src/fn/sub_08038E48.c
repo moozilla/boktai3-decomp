@@ -1,4 +1,5 @@
 #include "global.h"
+#include "runtime.h"
 struct P {
     u8 pad[0x1e];
     u16 round;
@@ -23,7 +24,6 @@ struct Global {
     u8 pad[12];
     u32 money;
 };
-extern struct Global *gSessionState;
 int Wireless_IsSessionActive(void);
 void WirelessGameMenu_OnResultPanelClosed(void);
 void sub_0803B700(int, int, void *, void *, u32, u32, void *);
@@ -46,7 +46,7 @@ void WirelessTradeMenu_UpdateResultsPanel(struct P *p)
         left = (u8 *)(offset + (u32)p->left);
         right = (u8 *)(offset + (u32)p->right);
         side = Wireless_IsSessionActive();
-        money = gSessionState->money;
+        money = ((struct Global *)gSessionState)->money;
         sub_0803B700(side, p->mode, left, right, p->reward, money,
                      WirelessGameMenu_OnResultPanelClosed);
     }

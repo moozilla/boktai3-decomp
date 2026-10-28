@@ -1,6 +1,7 @@
 #include "global.h"
 #include "game_state.h"
 #include "ram.h"
+#include "input.h"
 struct State {
     u8 pad0[7];
     u8 pending, entered, mode, skip;
@@ -90,7 +91,6 @@ int MessageWindow_SetBounds(int, int, int, int);
 int TextState_StepPlayback(struct State *);
 void MessageWindow_UpdateIdle(void);
 void sub_080313E4(void);
-extern u16 gUnk_03005260[];
 void MessageWindow_UpdateFastPlayback(struct Actor *p)
 {
     struct State *state = &p->state;
@@ -114,7 +114,7 @@ void MessageWindow_UpdateFastPlayback(struct Actor *p)
         }
     }
     if (p->callback != MessageWindow_ClearTextCompletion && !p->scrollMode && p->pad183) {
-        u16 mask = gUnk_03005260[0] & 2;
+        u16 mask = gPadState[0] & 2;
         if (!mask) {
             setCallbackB(p, sub_080316A4);
             p->pad183 = mask;

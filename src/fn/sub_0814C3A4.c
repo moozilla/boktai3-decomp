@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "engine_globals.h"
 
 struct C3A4Pos {
     s16 x, y, z;
@@ -16,7 +17,6 @@ struct C3A4Target {
 extern struct C3A4Target *gUnk_0200054C;
 extern u16 gUnk_02000510;
 extern u16 gUnk_02000530;
-extern u32 gEngineFlags;
 extern const s16 gUnk_086149C4[];
 extern u8 *gGameState;
 

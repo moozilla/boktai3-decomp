@@ -1,6 +1,7 @@
 #ifndef GUARD_BURST_EMITTER_H
 #define GUARD_BURST_EMITTER_H
 #include "contact_swarm.h"
+#include "engine_globals.h"
 /* Tentative five-slot burst family; kind/ownership identities are unconfirmed. */
 struct BurstEmitter {
     struct ContactCollider collider;
@@ -17,7 +18,6 @@ struct BurstEmitterPool {
     struct BurstEmitter slots[5];
 };
 extern struct BurstEmitterPool *gBurstEmitterPool;
-extern u32 gEngineFlags;
 extern void *gUnk_08605B78[];
 void BurstEmitter_EmitFrame(struct BurstEmitter *);
 void BurstEmitter_PlayAmbientSound(struct BurstEmitter *);

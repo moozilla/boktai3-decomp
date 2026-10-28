@@ -1,7 +1,6 @@
 #include "global.h"
 #include "record_menu.h"
-extern u16 gUnk_03005260[];
-#define gMenuInput gUnk_03005260
+#include "input.h"
 void Bg_SetLayerMap(u32, void *, u16);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void Sound_PlaySong(u32);
@@ -27,7 +26,7 @@ void RecordMenu_UpdateRecords(struct RecordMenu *menu)
     PaletteFade_CycleMenuColors(menu->textPanel);
     if (menu->inputDelay <= 59)
         menu->inputDelay++;
-    else if (gUnk_03005260[1] & 11) {
+    else if (gPadState[1] & 11) {
         Sound_PlaySong(0xdd);
         {
             void (*next)(struct RecordMenu *) = RecordMenu_UpdateSelection;

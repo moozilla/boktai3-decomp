@@ -1,7 +1,4 @@
 #include "global.h"
-#define gRfuSlotStatusNI  gUnk_03006A70
-#define gRfuSlotStatusUNI gUnk_03006A60
-#define gRfuLinkStatus    gUnk_03006A80
 #include "rfu_compat.h"
 
 void RfuManager_RemoveSendTargets(u8 bm)

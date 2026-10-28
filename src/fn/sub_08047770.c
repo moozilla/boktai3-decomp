@@ -3,8 +3,8 @@
 #include "background_flash.h"
 void BackgroundFlash_UpdateScrolling(struct BackgroundFlashController *controller)
 {
-    s32 cameraX = gUnk_03005418[0] + gCamera.offsetX;
-    s32 cameraY = gUnk_03005418[1] + gCamera.offsetY;
+    s32 cameraX = ((s16 *)gCameraOrigin)[0] + gCamera.offsetX;
+    s32 cameraY = ((s16 *)gCameraOrigin)[1] + gCamera.offsetY;
     register u32 frame asm("r1");
     s32 x, y, tileX, tileY;
     if (!controller->retargetTimer) {

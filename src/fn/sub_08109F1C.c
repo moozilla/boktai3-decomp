@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 
 #ifdef NONMATCHING
 // fuzzy: 87.1%
@@ -31,7 +32,6 @@ struct LinkReadyState {
     u8 missed[2];
 };
 extern u8 *gUnk_020004B4;
-extern u16 gUnk_03005260[];
 s32 Serial_ReadLatestPacket(u16 *);
 u8 Registry1745_ConsumeStateEntry(void *);
 u8 Registry1745_HasParticipantCount(void *, s32);
@@ -135,7 +135,7 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
                 }
             }
 
-        } else if ((!p->busy) && (gUnk_03005260[1] & 8))
+        } else if ((!p->busy) && (gPadState[1] & 8))
             p->requested = 1;
     } else {
         s32 readyCount;
@@ -219,7 +219,7 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
         } else {
             p->countdown = 40;
             if ((((!p->busy) && (p->count == 2)) && (p->count == readyCount)) && (!other)) {
-                if ((gUnk_03005260[1] & 8) || p->requested) {
+                if ((gPadState[1] & 8) || p->requested) {
                     {
                         u16 k1 = 0x1400;
                         p->mode = k1;

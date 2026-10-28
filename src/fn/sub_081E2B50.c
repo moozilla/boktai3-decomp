@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "input.h"
 // Provisional name: Presentation_Update
 struct Sequence {
     u8 p0[0x18];
@@ -33,7 +34,6 @@ void Anim_LoadKeyframe(void *, void *, s32, s32);
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);
 void Presentation_UpdateLayerAnimations(void *);
 void Presentation_ClearTilemap(void);
-extern u16 gUnk_03005260[];
 void Task_Kill(void *);
 void Script_Call(void *, void *);
 void Presentation_UpdateDropShakeBlink(void *);
@@ -67,7 +67,7 @@ s32 Presentation_Update(struct Sequence *p)
             ScreenTransition_SendCommand(1, 4, 4, 4, 4, 0xffff, 0);
             p->result = 0;
             p->exitTimer = 1;
-        } else if (p->timer > 16 && (gUnk_03005260[1] & 11)) {
+        } else if (p->timer > 16 && (gPadState[1] & 11)) {
             ScreenTransition_SendCommand(1, 4, 4, 4, 4, 0xffff, 0);
             p->result = 1;
             p->exitTimer = 1;

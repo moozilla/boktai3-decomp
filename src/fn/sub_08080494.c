@@ -3,6 +3,7 @@
 // fuzzy: 98.9%
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
+#include "runtime.h"
 s32 SparkParticle_Spawn(const struct ContactPosition *, u8, const struct ContactPosition *, s32,
                         s32, s32, s32, u32);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
@@ -10,7 +11,6 @@ void ActorParticles_SpawnWideBurst(void *);
 void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorRecord_RecordPair(u16, u16);
-extern u16 gUnk_030039F0;
 static inline u32 NextRandom(const u16 *table)
 {
     u32 *index = &gRandomIndex;
@@ -228,7 +228,7 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
         }
     }
     if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
-        SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
+        SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->id);
     ActorShadow_Disable((u8 *)actor + 0x320);
 }
 

@@ -1,6 +1,8 @@
 #include "global.h"
 #include "game_state.h"
 #include "ram.h"
+#include "engine_globals.h"
+#include "input.h"
 #ifdef NONMATCHING
 // fuzzy: 97.2%
 // fix.py best (sweep after the inlined-insn fix)
@@ -85,13 +87,11 @@ void Actor_ClampMovementSpeed(struct Obj *);
 void Glove_SetAnimationKeyframes(struct Glove *, s32);
 s32 ActorRecoil_UpdateMotion(struct Glove *);
 void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
-extern u32 gEngineFlags;
 extern u8 *gUnk_020004B4;
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 void Trigger_ConsumePending(void *, s32);
 // Animation zero plays until recoil completes, then returns to its resting callback.
-extern u8 gUnk_03005260[];
 extern u8 *gUnk_020004F0[];
 extern u32 gUnk_020004E0[];
 void MotionActor_ParsePosition(void *);
@@ -244,7 +244,7 @@ s32 Glove_InitFromScript(struct Glove *p)
     SceneTilemap_SetScrollSource(gUnk_020004E0);
     gUnk_020004F0[p->participant] = p;
     Glove_RegisterMessageReceiver(p);
-    *((void **)(((u8 *)p) + 0x8c4)) = gUnk_03005260 + (p->participant * 8);
+    *((void **)(((u8 *)p) + 0x8c4)) = ((u8 *)gPadState) + (p->participant * 8);
     *((u32 *)(((u8 *)p) + 0x91c)) = p->participant;
     Memory_Clear(((u8 *)p) + 0x950, 8);
     return 0;

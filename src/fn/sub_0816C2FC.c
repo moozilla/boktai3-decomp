@@ -1,5 +1,4 @@
 /* Provisional names and object interpretation; offsets follow static accesses. */
-#define gMenuInput gUnk_03005260
 #include "global.h"
 struct MapMenu {
     u8 pad0[0x3828];
@@ -20,7 +19,7 @@ struct MapMenu {
 };
 extern struct {
     u16 held, pressed;
-} gUnk_03005260;
+} gPadState;
 u32 MapMenu_SelectDirection(struct MapMenu *);
 void Sound_PlaySong(u32);
 void SceneSequence_SelectEntryMessage(struct MapMenu *);
@@ -31,7 +30,7 @@ void MapScreen_StepDirectionalIndicators(struct MapMenu *);
 void MapMenu_UpdateInput(struct MapMenu *s)
 {
     u32 changed = 0;
-    if (gMenuInput.held & 1) {
+    if (gPadState.held & 1) {
         changed = MapMenu_SelectDirection(s);
         if (changed) {
             Sound_PlaySong(0xdc);
@@ -46,17 +45,17 @@ void MapMenu_UpdateInput(struct MapMenu *s)
             SceneSequence_SelectEntryMessage(s);
         }
     } else if (s->unlocked) {
-        if (gMenuInput.held & 0x20) {
+        if (gPadState.held & 0x20) {
             s->scrollX -= 2;
             changed = 1;
-        } else if (gMenuInput.held & 0x10) {
+        } else if (gPadState.held & 0x10) {
             s->scrollX += 2;
             changed = 1;
         }
-        if (gMenuInput.held & 0x40) {
+        if (gPadState.held & 0x40) {
             s->scrollY -= 2;
             changed = 1;
-        } else if (gMenuInput.held & 0x80) {
+        } else if (gPadState.held & 0x80) {
             s->scrollY += 2;
             changed = 1;
         }

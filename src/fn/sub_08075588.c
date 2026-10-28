@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "engine.h"
+#include "runtime.h"
 
 // confidence=low: per-frame update for one scene actor's timers, palette transition and shadow state, and its spark and hit-record bookkeeping
 
@@ -20,7 +21,6 @@ extern u32 gUnk_02000580[];
 extern u32 gUnk_02000478;
 extern u32 gUnk_02000534;
 extern u32 gUnk_02000500;
-extern u16 gUnk_030039F0;
 extern const u16 gUnk_0203B400[];
 s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);

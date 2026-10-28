@@ -1,5 +1,5 @@
 #include "global.h"
-extern u16 gUnk_03005418[];
+#include "render.h"
 
 s32 __divsi3(s32, s32);
 void MotionTrack_Update(u8 *);
@@ -110,9 +110,9 @@ void ContactImpactEffect_UpdateInterpolatedPosition(struct ContactImpactEffect *
         {
             s32 sy = sum - y;
             s32 depth = sum + y;
-            q[0] = q[0] - gUnk_03005418[0] + 120;
-            q[1] = sy - gUnk_03005418[1] + 80;
-            q[2] = depth - gUnk_03005418[2];
+            q[0] = q[0] - gCameraOrigin[0] + 120;
+            q[1] = sy - gCameraOrigin[1] + 80;
+            q[2] = depth - gCameraOrigin[2];
         }
     }
     {

@@ -29,8 +29,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
 void String_CopyPadded(const void *, void *, int);
@@ -74,20 +72,20 @@ int WirelessController_BuildPeerRosterPacket(struct Engine *p)
         if ((p->bits >> i) & 1)
             packet[3]++;
     packet[2] = (p->bits << 1) | 1;
-    String_CopyPadded(gUnk_03006A80->my.uname, packet + 4, 8);
-    *(u16 *)(packet + 0x36) = gUnk_03006A80->my.id;
+    String_CopyPadded(gRfuLinkStatus->my.uname, packet + 4, 8);
+    *(u16 *)(packet + 0x36) = gRfuLinkStatus->my.id;
     for (i = 0; i <= 3; i++) {
         int selected = (p->bits >> i) & 1;
         int next = i + 1;
         if (selected) {
-            String_CopyPadded(gUnk_03006A80->partner[i].uname, packet + 14 + i * 10, 8);
+            String_CopyPadded(gRfuLinkStatus->partner[i].uname, packet + 14 + i * 10, 8);
             {
                 int offset = next << 1;
                 u16 *ids;
                 asm("" : : "r"(offset));
                 ids = (u16 *)(packet + 0x36);
                 ids += next;
-                *ids = gUnk_03006A80->partner[i].id;
+                *ids = gRfuLinkStatus->partner[i].id;
             }
         }
     }

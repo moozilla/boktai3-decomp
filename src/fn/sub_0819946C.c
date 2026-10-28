@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "game_state.h"
+#include "render.h"
 
 struct ScreenPosition {
     s16 x, y, z;
@@ -14,7 +15,6 @@ struct Message {
     u32 count : 8;
     s16 *values;
 };
-extern struct ScreenPosition gUnk_03005418;
 void MessageQueue_PostMessage(struct Message *);
 
 static inline s32 ScaleProjection(s32 v)
@@ -55,9 +55,9 @@ void SceneEffectQueue_PostTypeZeroMessage(s32 arg)
     screenY = sum - height;
     zero = 0;
     depth = sum + height;
-    output->x = output->x - gUnk_03005418.x + 120;
-    output->y = screenY - gUnk_03005418.y + 80;
-    output->z = depth - gUnk_03005418.z;
+    output->x = output->x - (*(struct ScreenPosition *)gCameraOrigin).x + 120;
+    output->y = screenY - (*(struct ScreenPosition *)gCameraOrigin).y + 80;
+    output->z = depth - (*(struct ScreenPosition *)gCameraOrigin).z;
     if (out.x > 120)
         values[1] = zero;
     else

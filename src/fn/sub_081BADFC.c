@@ -1,7 +1,7 @@
 #include "global.h"
+#include "input.h"
 
 // Tentative selection-list interpretation; offsets are shared by neighboring cursor code.
-#define gCursorKeys gUnk_03005260
 
 struct SelectionEntry {
     s16 x, y;
@@ -18,7 +18,6 @@ struct SelectionList {
     s16 selected, entryCount;
     struct SelectionEntry entries[1];
 };
-extern u16 gUnk_03005260[2];
 void Sound_PlaySong(u32);
 s32 SelectionList_SelectNearestEnabledEntry(struct SelectionList *);
 void MenuCursor_SetPositionFromSelection(struct SelectionList *);
@@ -30,14 +29,14 @@ s32 SelectionList_ProcessCursorInput(struct SelectionList *list)
     s16 *cursor = &list->savedX;
     s32 step;
     s32 old, entry;
-    step = (gCursorKeys[0] & 2) ? 2 : 1;
-    if (gCursorKeys[0] & 0x20)
+    step = (gPadState[0] & 2) ? 2 : 1;
+    if (gPadState[0] & 0x20)
         cursor[0] -= step;
-    else if (gCursorKeys[0] & 0x10)
+    else if (gPadState[0] & 0x10)
         cursor[0] += step;
-    if (gCursorKeys[0] & 0x40)
+    if (gPadState[0] & 0x40)
         cursor[1] -= step;
-    else if (gCursorKeys[0] & 0x80)
+    else if (gPadState[0] & 0x80)
         cursor[1] += step;
     if (cursor[0] < 8)
         cursor[0] = 8;
@@ -47,7 +46,7 @@ s32 SelectionList_ProcessCursorInput(struct SelectionList *list)
         cursor[1] = 8;
     else if (cursor[1] > 160)
         cursor[1] = 160;
-    if (gCursorKeys[1] & 0x200) {
+    if (gPadState[1] & 0x200) {
         Sound_PlaySong(0xDC);
         if (list->selected >= 0) {
             old = list->selected;
@@ -55,7 +54,7 @@ s32 SelectionList_ProcessCursorInput(struct SelectionList *list)
             goto validate;
         }
         goto nearest;
-    } else if (gCursorKeys[1] & 0x100) {
+    } else if (gPadState[1] & 0x100) {
         Sound_PlaySong(0xDC);
         if (list->selected >= 0) {
             old = list->selected;

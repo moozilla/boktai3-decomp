@@ -1,5 +1,4 @@
 #include "global.h"
-#define gRfuLinkStatus gUnk_03006A80
 #include "rfu_compat.h"
 #include "rfu_manager.h"
 #define LMAN_MSG_INITIALIZE_COMPLETED                    0x00

@@ -1,9 +1,9 @@
 #include "global.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 void TimeResult_BeginFadeOut(void *);
 s32 sub_081C5FC4(u8 *p)
 {
-    u16 *k = gUnk_03005260;
+    u16 *k = gPadState;
     if (k[0] & 0x20)
         (*(u16 *)(p + 0x374))--;
     else if (k[0] & 0x10)

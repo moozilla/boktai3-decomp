@@ -28,8 +28,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
@@ -62,7 +60,7 @@ void Wireless_BeginChildTransfer(struct Engine *p)
         struct RfuLinkStatus **initial;
         u16 *mine;
         first = (u16 *)(((u8 *)p) + (*(&offset)));
-        initial = &gUnk_03006A80;
+        initial = &gRfuLinkStatus;
         mine = &(*initial)->my.id;
         if (*first != *mine) {
             struct RfuLinkStatus **cursor = initial;

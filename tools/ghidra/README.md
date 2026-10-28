@@ -22,3 +22,19 @@ functions in the code region and gbadisasm finds 7,868. The difference is
 mostly unreferenced or indirectly called code that Ghidra's aggressive seeding
 picks up; some of it is false. Cross-checking the two lists is a good way to
 find the remaining function-pointer tables.
+
+## Importing the project's names
+
+`ImportSymbols.java` applies `symbols/functions.csv`, `symbols/ram.csv` and
+`symbols/data.csv` to the analyzed project: function names, labels for RAM
+objects, and each object's C declaration as a plate comment.
+
+```
+python3 tools/symexport.py --ghidra build/symbols/ghidra.tsv
+$GHIDRA/support/analyzeHeadless build/ghidra shinbok -process baserom.gba -noanalysis \
+    -scriptPath tools/ghidra -postScript ImportSymbols.java build/symbols/ghidra.tsv
+```
+
+Add `--skip-placeholders` after the TSV to import only real names (not
+`sub_XXXXXXXX` / `gUnk_XXXXXXXX`). Run it before `ExportAll.java` and the
+decompiler output uses the project's names.

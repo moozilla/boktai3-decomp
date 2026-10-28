@@ -1,5 +1,6 @@
 #include "global.h"
 #include "game_state.h"
+#include "input.h"
 
 struct StageResults {
     u8 pad0[0x18];
@@ -20,7 +21,6 @@ struct StageResults {
     u8 blink;
     u16 timer;
 };
-extern u16 gUnk_03005260[];
 void Bg_SetLayerMap(u32, void *, u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 s32 TextWindow_SetScript(s32 id, const u8 *script);
@@ -102,7 +102,7 @@ void sub_08112508(struct StageResults *p)
         CharacterModel_UpdatePairedAnimations(p->models, 0);
         PaletteFade_CycleMenuColors(p->palette);
         StageResults_UpdateRecordBlink(p);
-        if (gUnk_03005260[1] & 0x30f) {
+        if (gPadState[1] & 0x30f) {
             Sound_PlaySong(0xdd);
             SetUpdate(p, MessagePanel_UpdateExitDelay, 1);
         } else {

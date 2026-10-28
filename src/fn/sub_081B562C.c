@@ -2,6 +2,7 @@
 #include "global.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
+#include "render.h"
 // Exact with register-pinning and empty-asm concessions.
 struct VanargandPart {
     struct ContactSwarmSprite sprite;
@@ -163,7 +164,6 @@ void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 s32 Anim_Step(void *, void *);
 void Sound_PlaySong(u32);
 void Vanargand_SpawnPartEmergenceEffects(void *);
-extern s16 gUnk_03005418[];
 static inline s32 Divide32(s32 value)
 {
     return value >= 0 ? value >> 5 : -((-value) >> 5);
@@ -303,7 +303,7 @@ void Vanargand_UpdatePartEmergence(u8 *boss, struct VanargandPart *p)
     }
 
     Project(&projected, p->basePosition);
-    projected.x = (projected.x - gUnk_03005418[0]) + 120;
-    projected.y = (projected.y - gUnk_03005418[1]) + 92;
+    projected.x = (projected.x - gCameraOrigin[0]) + 120;
+    projected.y = (projected.y - gCameraOrigin[1]) + 92;
     *((struct EmergenceProjection *)(boss + 0x38)) = projected;
 }

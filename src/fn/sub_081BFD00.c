@@ -1,5 +1,4 @@
 #define gStorageCategoryKeyframes gUnk_0824F928
-#define gStorageKeys              gUnk_03005260
 #include "global.h"
 #include "scene_input.h"
 
@@ -73,7 +72,7 @@ void Storage_UpdateBrowse(struct StorageMenu *p)
                 Anim_LoadKeyframe(p->groupAnimation, p->animationData,
                                   keyframes.entries[category >> 1][0], 0);
         }
-        if (gStorageKeys[1] & 2) {
+        if (gPadState[1] & 2) {
             Sound_PlaySong(0x119);
             ScreenTransition_SendCommand(1, 5, 4, 4, 4, 0xFFFF, 0);
             Storage_SetUpdateCallback(p, Storage_UpdateCloseDelay);

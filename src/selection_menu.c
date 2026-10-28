@@ -1,4 +1,5 @@
 #include "selection_menu.h"
+#include "render.h"
 #define Presentation_PlaySelectionSound sub_0801A0D0
 #define SelectionMenu_HideMarkers       sub_0801A614
 
@@ -38,7 +39,6 @@ void SelectionMenu_InitCursors(struct SelectionMenu *);
 void SelectionMenu_InitMarkers(struct SelectionMenu *);
 void sub_0801A6D0(struct SelectionMenu *);
 int SelectionMenu_NavigateGrid(struct SelectionMenu *);
-extern u8 gUnk_03005160[];
 u32 Script_GetTextSourcePc(void);
 
 u8 *SelectionMenu_GetIconPalette(s32 i);
@@ -249,19 +249,19 @@ int SelectionMenu_ConfigureLayers(int value, int mode)
     }
     {
         u8 *palette = ScriptProc_Start(0x92b3, 0x81b);
-        CpuSet(palette + 0x1b4, gUnk_03005160, 0x30);
+        CpuSet(palette + 0x1b4, gBgPaletteBank13, 0x30);
     }
     return result;
 }
 
 void SelectionMenu_HandleHorizontalInput(struct SelectionMenu *p)
 {
-    if ((gUnk_03005260[1] & 0x20) && p->horizontalChoice == 1) {
+    if ((gPadState[1] & 0x20) && p->horizontalChoice == 1) {
         p->horizontalChoice = 0;
         Anim_LoadKeyframe(&p->cursors[2], &p->panelResource, 0x4b, 0);
         Sound_PlaySong(0xdc);
     }
-    if ((gUnk_03005260[1] & 0x10) && p->horizontalChoice == 0) {
+    if ((gPadState[1] & 0x10) && p->horizontalChoice == 0) {
         p->horizontalChoice = 1;
         Anim_LoadKeyframe(&p->cursors[2], &p->panelResource, 0x4c, 0);
         Sound_PlaySong(0xdc);
@@ -783,15 +783,15 @@ int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
 {
     int index = p->selectedSlot;
     int direction = 0;
-    int pressedUp = gUnk_03005260[1] & 0x40;
-    u16 *held = gUnk_03005260;
+    int pressedUp = gPadState[1] & 0x40;
+    u16 *held = gPadState;
     if (pressedUp)
         direction = 1;
-    else if (gUnk_03005260[1] & 0x80)
+    else if (gPadState[1] & 0x80)
         direction = 2;
-    else if (gUnk_03005260[1] & 0x20)
+    else if (gPadState[1] & 0x20)
         direction = 4;
-    else if (gUnk_03005260[1] & 0x10)
+    else if (gPadState[1] & 0x10)
         direction = 8;
     if (!direction) {
         if (p->repeatTicks > 7) {
@@ -805,7 +805,7 @@ int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
                 direction |= 4;
             else if (held[0] & 0x10)
                 direction |= 8;
-        } else if (gUnk_03005260[0] & 0xf0)
+        } else if (gPadState[0] & 0xf0)
             p->repeatTicks++;
     }
     if (direction & 1) {
@@ -846,8 +846,8 @@ void SelectionMenu_Choose(struct SelectionMenu *p)
         case 0:
             if (SelectionMenu_ConsumeCallbackFlag(p))
                 SelectionMenu_RefreshActorPage(p);
-            if (gUnk_03005260[0] & 4) {
-                if (gUnk_03005260[1] & 1) {
+            if (gPadState[0] & 4) {
+                if (gPadState[1] & 1) {
                     if (++p->statisticsPage > 2)
                         p->statisticsPage = 0;
                     Sound_PlaySong(0xdc);
@@ -874,14 +874,14 @@ void SelectionMenu_Choose(struct SelectionMenu *p)
                     Sound_PlaySong(0xdc);
                     Presentation_UpdateActorGraphic(p, 0);
                 }
-                if (gUnk_03005260[1] & 1) {
+                if (gPadState[1] & 1) {
                     if (*Inventory_GetEquipmentEntry(p->selectedSlot) != 255 &&
                         ((1 << p->selectedSlot) & p->availableSlots))
                         SelectionMenu_StartAnimateChoice(p);
                     else
                         Sound_PlaySong(0x192);
                     return;
-                } else if (gUnk_03005260[1] & 2) {
+                } else if (gPadState[1] & 2) {
                     SelectionMenu_Back(p);
                     return;
                 }
@@ -891,8 +891,8 @@ void SelectionMenu_Choose(struct SelectionMenu *p)
         case 1:
             if (SelectionMenu_ConsumeCallbackFlag(p))
                 SelectionMenu_RefreshItemPage(p);
-            if (gUnk_03005260[0] & 4) {
-                if (gUnk_03005260[1] & 1) {
+            if (gPadState[0] & 4) {
+                if (gPadState[1] & 1) {
                     if (++p->statisticsPage > 2)
                         p->statisticsPage = 0;
                     Sound_PlaySong(0xdc);
@@ -923,7 +923,7 @@ void SelectionMenu_Choose(struct SelectionMenu *p)
                         Presentation_UpdateItemGraphic(p, 0);
                     }
                 }
-                if (gUnk_03005260[1] & 1) {
+                if (gPadState[1] & 1) {
                     if (Inventory_GetConsumableId(p->selectedSlot) >= 0) {
                         int selected = p->selectedSlot;
                         if ((1 << selected) & p->availableSlots)
@@ -933,7 +933,7 @@ void SelectionMenu_Choose(struct SelectionMenu *p)
                     } else
                         Sound_PlaySong(0x192);
                     return;
-                } else if (gUnk_03005260[1] & 2) {
+                } else if (gPadState[1] & 2) {
                     SelectionMenu_Back(p);
                     return;
                 }
@@ -997,8 +997,8 @@ void SelectionMenu_ReviewChoice(struct SelectionMenu *p)
         (&p->highlight)->flags |= 1;
         ScrollingDialogue_ClearScript();
     }
-    if (gUnk_03005260[0] & 4) {
-        if (gUnk_03005260[1] & 1) {
+    if (gPadState[0] & 4) {
+        if (gPadState[1] & 1) {
             if (++p->statisticsPage > 2)
                 p->statisticsPage = 0;
             Sound_PlaySong(0xdc);
@@ -1006,7 +1006,7 @@ void SelectionMenu_ReviewChoice(struct SelectionMenu *p)
     } else {
         SelectionMenu_HandleHorizontalInput(p);
         {
-            int keys = gUnk_03005260[1], mask;
+            int keys = gPadState[1], mask;
             mask = 1;
             asm("" : "+r"(mask));
             if (mask & keys) {

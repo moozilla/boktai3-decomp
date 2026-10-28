@@ -2,7 +2,7 @@
 #include "render.h"
 #include "ram.h"
 #include "runtime.h"
-extern u16 gNextTaskId;
+#include "engine_globals.h"
 void Heap_Initialize(void);
 void TaskSystem_InitLists(void);
 void ResourceRegistry_Initialize(void);

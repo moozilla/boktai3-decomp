@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "engine_globals.h"
 struct Weather {
     u8 pad[24];
     u32 timer;
@@ -14,10 +15,8 @@ struct Weather {
     int bank;
 };
 extern u8 *gGameState;
-extern u32 gEngineFlags;
-extern u8 gUnk_03005430[];
+extern u8 gSunClock[];
 extern u16 gUnk_0203B400[];
-extern u32 gRandomIndex;
 void Palette_SetBrightnessMode(int);
 int Weather_TestFlags(int, int);
 void Weather_SetRandomDuration(void *);
@@ -74,7 +73,7 @@ int Weather_ActiveStorm(struct Weather *p)
             }
             Weather_SetRandomDuration(p);
         } else {
-            if (gUnk_03005430[14] > 2) {
+            if (gSunClock[14] > 2) {
                 if (p->countdown == 5)
                     ScreenTransition_SendCommand(0, 2, 31, 31, 31, 8191, 0);
                 else if (p->countdown == 3)

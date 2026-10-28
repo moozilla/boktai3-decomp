@@ -7,6 +7,8 @@
         --header include/render.h [--note '...']
     python3 tools/ramlayout.py unify --batch FILE --header include/render.h   # ADDR | DECL | NOTE lines
     python3 tools/ramlayout.py seed [--kit DIR]  # (re)build rows from the ELF and layoutmerge
+    python3 tools/ramlayout.py annotate [--range LO-HI]   # put /* 0xADDR */ before each shared declaration
+    python3 tools/ramlayout.py users 03004290   # which functions access an address (needs layoutmerge output)
 
 Columns: addr, name, size (hex bytes, blank when unknown), kind (object, or
 interior for a label inside another object), decl (the one declaration, with
@@ -38,6 +40,7 @@ from romlib import ROOT  # noqa: E402
 CSV = os.path.join(ROOT, "symbols", "ram.csv")
 COLS = ["addr", "name", "size", "kind", "decl", "header", "confidence", "notes"]
 RAM = [(0x02000000, 0x02040000), (0x03000000, 0x03008000)]
+PROTECTED = {"src/iwram_code.c"}    # unify leaves these files alone (their declarations still count)
 
 
 def is_ram(v):
@@ -75,8 +78,14 @@ def sources():
     out = []
     for d, _, fs in os.walk(os.path.join(ROOT, "src")):
         out += [os.path.relpath(os.path.join(d, f), ROOT) for f in fs if f.endswith(".c")]
-    out += [os.path.join("include", f) for f in os.listdir(os.path.join(ROOT, "include")) if f.endswith(".h")]
+    for d, _, fs in os.walk(os.path.join(ROOT, "include")):
+        out += [os.path.relpath(os.path.join(d, f), ROOT) for f in fs if f.endswith(".h")]
     return sorted(out)
+
+
+def inc_name(path):
+    """How a source spells #include of this header: relative to include/."""
+    return path.removeprefix("include/")
 
 
 def read(path):
@@ -97,7 +106,8 @@ def split_top(s, sep=","):
     return parts + [cur]
 
 
-DECL = re.compile(r"^[ \t]*extern\s+([^;(){}=]*?)\s*;[ \t]*(/\*.*?\*/|//[^\n]*)?[ \t]*\n", re.M | re.S)
+ADDR_COMMENT = r"/\*\s*0x[0-9A-Fa-f]{8}\s*\*/"
+DECL = re.compile(r"^(?:[ \t]*" + ADDR_COMMENT + r"[ \t]*\n)?[ \t]*extern\s+([^;(){}=]*?)\s*;[ \t]*(/\*.*?\*/|//[^\n]*)?[ \t]*\n", re.M | re.S)
 
 
 def declarations(text, name):
@@ -220,6 +230,9 @@ def cmd_check(a):
     print(f"{len(objs)} objects ({sum(1 for r in objs if r['size'])} sized, {m['total_data']} bytes); "
           + ", ".join(f"{v} {k}" for k, v in sorted(counts.items())))
     print(f"declared in one header: {m['matched_data']} bytes; no other declaration left: {m['complete_data']} bytes")
+    miss = missing_comments(rows)
+    if miss:
+        print(f"{len(miss)} shared declarations lack their /* 0xADDR */ comment (python3 tools/ramlayout.py annotate)")
     sys.exit(1 if bad else 0)
 
 
@@ -238,6 +251,129 @@ def cmd_show(a):
     for d, ps in sorted(forms.items(), key=lambda kv: -len(kv[1])):
         print(f"  {len(ps):4}  {d}   e.g. {ps[0]}")
     print(f"  used by {len(i['uses'])} files")
+
+
+# --- address comments -----------------------------------------------------
+
+def annotated(text, r):
+    """`text` with the declaration of row `r` preceded by a `/* 0xADDR */` line, so
+    go-to-definition on the name shows where the object lives. Unchanged text
+    if the declaration isn't there (or shares its line with another)."""
+    if not (r.get("decl") and r.get("header")):
+        return text
+    canon, name = parse_decl(r["decl"])
+    for m, spec, decls, idx in declarations(text, name):
+        if len(decls) != 1 or norm(spec, decls[0], name, name) != canon:
+            continue
+        line = m.group(0)
+        at = line.index("extern")
+        at = line.rindex("\n", 0, at) + 1 if "\n" in line[:at] else 0      # start of the extern line
+        indent = line[at:len(line) - len(line[at:].lstrip(" \t"))]
+        return text[:m.start()] + f"{indent}/* 0x{r['addr']} */\n" + text[m.start() + at:]
+    return text
+
+
+def in_range(r, rng):
+    lo, hi = rng
+    return lo <= int(r["addr"], 16) <= hi
+
+
+def parse_range(s):
+    if not s:
+        return (0, 1 << 32)
+    lo, hi = (int(x, 16) for x in s.split("-"))
+    return (lo, hi)
+
+
+def clang_format(text, path):
+    cf = os.path.join(ROOT, "build", "venv", "bin", "clang-format")
+    if not os.path.exists(cf):
+        return text
+    out = subprocess.run([cf, "--assume-filename=" + path], input=text, cwd=ROOT,
+                         capture_output=True, text=True).stdout
+    return out or text
+
+
+def cmd_annotate(a):
+    rows = [r for r in load() if r["header"] and r["decl"] and in_range(r, parse_range(a.range))]
+    by_header = {}
+    for r in rows:
+        by_header.setdefault(r["header"], []).append(r)
+    done = 0
+    for h, rs in sorted(by_header.items()):
+        old = read(h)
+        new = old
+        for r in rs:
+            new = annotated(new, r)
+        if new == old:
+            continue
+        if clang_format(old, h) == old:         # keep a formatted header formatted
+            new = clang_format(new, h)
+        done += sum(1 for r in rs if annotated(old, r) != old)
+        if not a.dry_run:
+            write({h: new}, [h])
+    print(f"{done} declarations {'need' if a.dry_run else 'got'} an address comment")
+
+
+def missing_comments(rows):
+    """Rows whose shared declaration lacks its /* 0xADDR */ comment."""
+    out = []
+    texts = {}
+    for r in rows:
+        if r["header"] and r["decl"]:
+            t = texts.setdefault(r["header"], read(r["header"]))
+            if annotated(t, r) != t:
+                out.append(r)
+    return out
+
+
+# --- which functions access an object ---------------------------------------
+
+LAYOUTS = os.path.join(ROOT, "build", "layouts", "layouts.json")
+
+
+def cmd_users(a):
+    """Functions whose ROM code touches an address, from layoutmerge's literal-pool scan."""
+    rows = load()
+    try:
+        r = find(rows, a.addr)
+        lo = int(r["addr"], 16)
+        label = f"{r['addr']} {r['name']}"
+    except SystemExit:
+        lo = int(a.addr, 16)
+        label = f"{lo:08X}"
+        r = None
+    size = a.size or (int(r["size"], 16) if r and r["size"] else 1)
+    hi = lo + size
+    if not os.path.exists(LAYOUTS):
+        sys.exit("build/layouts/layouts.json is missing: run python3 tools/layoutmerge.py first")
+    lay = json.load(open(LAYOUTS))
+    by_func = {}
+    for key, e in lay.items():
+        name, space = key.rsplit(":", 1)
+        if space != ("pointee" if a.pointee else "direct"):
+            continue
+        base = e["addr"]
+        for acc in e.get("rom", []):
+            x = base + acc["off"]
+            if not lo <= x < hi:
+                continue
+            f = by_func.setdefault(acc["func"], {"ld": 0, "st": 0, "escape": 0, "bulk": 0, "offs": set(), "w": set()})
+            if acc["form"] == "escape":
+                f["escape"] += 1
+            elif acc["form"] == "bulk" or acc["form"].startswith("bulk"):
+                f["bulk"] += 1
+            else:
+                f["ld" if acc["load"] else "st"] += 1
+            f["offs"].add(x - lo)
+            if acc["width"]:
+                f["w"].add(acc["width"])
+    print(f"{label} (+0..+{size:X}){' pointee' if a.pointee else ''}: {len(by_func)} functions in ROM")
+    for fn, f in sorted(by_func.items()):
+        parts = [f"{f[k]} {k}" for k in ("ld", "st", "escape", "bulk") if f[k]]
+        offs = sorted(f["offs"])
+        where = ",".join(f"+{o:X}" for o in offs[:6]) + ("..." if len(offs) > 6 else "")
+        print(f"  {fn:28} {', '.join(parts):28} {where}")
 
 
 def find(rows, addr):
@@ -279,7 +415,7 @@ def includes(text):
 
 
 def add_include(text, header):
-    inc = os.path.basename(header)
+    inc = inc_name(header)
     if inc in includes(text):
         return text
     lines = text.split("\n")
@@ -352,6 +488,10 @@ def cmd_unify(a):
     taken = {n: p for p, t in new.items() for n in set(renames.values())
              if (p, n) not in aliased and re.search(rf"\b{n}\b", t)}
     taken = {n: p for n, p in taken.items() if n not in {r["name"] for r, _, _ in jobs}}
+    # a name the target header already declares as this very object is not taken
+    declared = {parse_decl(d)[1]: parse_decl(d)[0] for _, d, _ in jobs}
+    taken = {n: p for n, p in taken.items()
+             if not any(norm(s, dl[i], n, n) == declared[n] for _, s, dl, i in declarations(texts.get(a.header, ""), n))}
     if taken:
         sys.exit("names already used: " + ", ".join(f"{n} ({p})" for n, p in sorted(taken.items())))
     if pat:
@@ -369,9 +509,11 @@ def cmd_unify(a):
                 h = h[:at] + d + "\n\n" + h[at:]
         new[a.header] = h
     renamed = dict(new)
-    hdr_inc = os.path.basename(a.header)
+    hdr_inc = inc_name(a.header)
     # every declaration the header will hold: earlier rows and this batch
-    canon = {r["name"]: parse_decl(r["decl"])[0] for r in rows if r["header"] == a.header and r["decl"]}
+    rng = parse_range(a.range)
+    canon = {r["name"]: parse_decl(r["decl"])[0] for r in rows
+             if r["header"] == a.header and r["decl"] and in_range(r, rng)}
     canon.update({parse_decl(d)[1]: parse_decl(d)[0] for _, d, _ in jobs})
     differ, blocked = {}, set()
     for p in sorted(new):
@@ -385,7 +527,7 @@ def cmd_unify(a):
                         blocked.add(p)
     # headers the target includes, directly or not: they keep their declarations
     # (including the target from them would be a cycle)
-    by_base = {os.path.basename(p): p for p in new if p.endswith(".h")}
+    by_base = {inc_name(p): p for p in new if p.endswith(".h")}
     below, todo = set(), [a.header]
     while todo:
         for inc in includes(new[todo.pop()]):
@@ -403,27 +545,33 @@ def cmd_unify(a):
             if p == a.header or p in blocked or not re.search(rf"\b{name}\b", new[p]):
                 continue
             t = new[p]
-            for m, spec, decls, idx in reversed(declarations(t, name)):
+            found = declarations(t, name)
+            for m, spec, decls, idx in reversed(found):
                 t = drop_decl(t, m, decls, idx)
-                if p.endswith(".h") or hdr_inc not in includes(t):
-                    t = add_include(t, a.header)
+            if found and (p.endswith(".h") or hdr_inc not in includes(t)):
+                t = add_include(t, a.header)       # after the drops: it shifts every later position
             new[p] = drop_defs(t, defs)
         h = new[a.header]
         if not any(norm(s, d[i], name, name) == c for _, s, d, i in declarations(h, name)):
-            line = decl.strip() + (f" /* {note} */" if note else "")
-            h = h[:h.rindex("#endif")].rstrip("\n") + "\n" + line + "\n\n#endif\n"
+            line = f"/* 0x{r['addr']} */\n" + decl.strip() + (f" /* {note} */" if note else "")
+            end = h.rindex("#endif")
+            h = h[:end].rstrip("\n") + "\n" + line + "\n\n" + h[end:]
             new[a.header] = h
+    for p in PROTECTED:     # never edited: its declarations count as leftovers
+        if p in texts:
+            new[p] = texts[p]
+            blocked.discard(p)
     changed = [p for p in new if new[p] != texts.get(p)]
     # A file needs compiling when its text changed or it includes a changed
     # header. Extern lines appended to the target header cannot change code
     # that never names them, so it counts only when new or with --all.
-    hdrs = {os.path.basename(p) for p in changed if p.endswith(".h") and (p != a.header or created or a.all)}
+    hdrs = {inc_name(p) for p in changed if p.endswith(".h") and (p != a.header or created or a.all)}
     closure, grew = set(hdrs), True
     while grew:
         grew = False
         for p, t in new.items():
-            if p.endswith(".h") and os.path.basename(p) not in closure and includes(t) & closure:
-                closure.add(os.path.basename(p))
+            if p.endswith(".h") and inc_name(p) not in closure and includes(t) & closure:
+                closure.add(inc_name(p))
                 grew = True
     verify = sorted(p for p, t in new.items() if p.endswith(".c")
                     and (new[p] != texts.get(p) or includes(t) & closure or p in blocked))
@@ -436,6 +584,8 @@ def cmd_unify(a):
             print(f"  {n} differs in: {' '.join(sorted(ps))}")
         return
 
+    if created:
+        write(new, [a.header])      # the probe includes it from disk
     probe = compile_asm(next(p for p in sorted(new) if p.startswith("src/fn/")), f'#include "{hdr_inc}"\n', False)
     if "ERROR" in probe[:9]:
         sys.exit(f"{a.header} does not compile on its own:\n" + probe)
@@ -469,17 +619,34 @@ def cmd_unify(a):
                 return err
             # its own declaration differs: the shared one if the code is
             # unchanged, else its own (if the header stays out of sight),
-            # else its own view as a cast at each use
+            # else its own view as a cast at each use. With --cast the cast
+            # comes before keeping the own declaration, and objects whose
+            # shared type changes nothing are taken without a cast.
             err = None
-            for how, t in (("shared", adopt(new[p], canon, a.header, cast=False)), ("own", renamed[p]),
-                           ("cast", adopt(new[p], canon, a.header, cast=True))):
+            order = [("shared", adopt(new[p], canon, a.header, cast=False)), ("own", renamed[p]),
+                     ("cast", adopt(new[p], canon, a.header, cast=True))]
+            if a.cast:
+                order[1], order[2] = order[2], order[1]
+            for how, t in order:
                 if t is None:
                     continue
                 err = same(p, t)
                 if err is None:
+                    if how == "cast" and a.cast:
+                        t = refine(p, t)
                     chosen[p] = (how, t)
                     return None
             return err
+
+        def refine(p, t):
+            """Take the shared type for each object where that leaves the assembly unchanged."""
+            names = sorted(n for n, ps in differ.items() if p in ps)
+            keep = set()
+            for n in names:
+                trial = adopt(new[p], canon, a.header, cast=True, shared=keep | {n})
+                if trial is not None and same(p, trial) is None:
+                    keep.add(n)
+            return adopt(new[p], canon, a.header, cast=True, shared=keep)
         with concurrent.futures.ThreadPoolExecutor(a.jobs) as ex:
             failed = [x for x in ex.map(after, verify) if x]
         for p, (how, t) in chosen.items():
@@ -509,6 +676,8 @@ def cmd_unify(a):
             r["size"] = f"{size:X}"
         if note:
             r["notes"] = note
+        if a.confidence:
+            r["confidence"] = a.confidence
     save(rows)
     if fallback:
         print(f"  {len(fallback)} files could not include {a.header} and keep their declarations: "
@@ -537,7 +706,7 @@ def drop_defs(t, defs):
     return t
 
 
-def adopt(t, canon, header, cast):
+def adopt(t, canon, header, cast, shared=()):
     """`t` with every declaration of the header's objects removed, so the
     header's declarations apply; with cast=True a different declaration
     becomes a cast at each use instead."""
@@ -547,7 +716,7 @@ def adopt(t, canon, header, cast):
         exprs = set()
         for m, spec, decls, idx in reversed(declarations(t, name)):
             own = norm(spec, decls[idx], name, name)
-            if own != c and cast:
+            if own != c and cast and name not in shared:
                 e = view(spec, decls[idx], name, c, assigned(t, name))
                 if e is None:
                     return None
@@ -691,22 +860,36 @@ def main():
     s.add_argument("-v", "--verbose", action="store_true")
     s = sub.add_parser("show")
     s.add_argument("addr")
+    s = sub.add_parser("annotate", help="put /* 0xADDR */ before each shared declaration")
+    s.add_argument("--range", help="LO-HI, hex: only rows in this address range")
+    s.add_argument("--dry-run", action="store_true")
+    s = sub.add_parser("users", help="functions whose ROM code accesses an address (needs layoutmerge output)")
+    s.add_argument("addr", help="address or object name")
+    s.add_argument("--size", type=lambda x: int(x, 16), help="bytes (hex) to cover; default the row's size")
+    s.add_argument("--pointee", action="store_true", help="accesses through the pointer stored here")
     s = sub.add_parser("seed")
     s.add_argument("--kit", help="research kit directory with layout/reviewed_address_map.json")
     s = sub.add_parser("unify")
     s.add_argument("addr", nargs="?")
     s.add_argument("--decl", help="the declaration, e.g. 'extern u8 *gPaletteBankData;'")
     s.add_argument("--batch", help="file of ADDR | DECL | NOTE lines")
+    s.add_argument("--cast", action="store_true",
+                   help="a file whose declaration differs gets the shared one with casts at the uses "
+                        "that need its own type, before keeping its own declaration")
+    s.add_argument("--range", help="LO-HI (hex): only this address range's rows of the header are enforced "
+                                   "(the rest of the header's declarations are left alone)")
     s.add_argument("--all", action="store_true", help="also compile every includer of the target header")
     s.add_argument("--define", action="append", default=[],
                    help="a struct definition the declarations need, e.g. 'struct OamEntry { u32 a; };' "
                         "(goes in the header; identical copies in files that include it are removed)")
     s.add_argument("--header", required=True)
     s.add_argument("--note", default="")
+    s.add_argument("--confidence", default="low", help="confidence column for these rows (default low; '' keeps it)")
     s.add_argument("--dry-run", action="store_true")
     s.add_argument("--jobs", type=int, default=os.cpu_count())
     a = ap.parse_args()
-    {"check": cmd_check, "show": cmd_show, "seed": cmd_seed, "unify": cmd_unify}[a.cmd](a)
+    {"check": cmd_check, "show": cmd_show, "seed": cmd_seed, "unify": cmd_unify,
+     "annotate": cmd_annotate, "users": cmd_users}[a.cmd](a)
 
 
 if __name__ == "__main__":

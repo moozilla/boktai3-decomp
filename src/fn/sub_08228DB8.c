@@ -12,16 +12,14 @@
    priority above the clock address's (0.383 against 0.351) and day takes r3,
    as in the ROM; without them they swap r3/r4 (docs/REGALLOC.md). */
 
-#define C gUnk_03005430
-
 /* A and B in the same hour, B first: in the window unless between B and A */
 #define WRAP_WINDOW(day)                                                                           \
     {                                                                                              \
-        u8 m = C.baseMinute;                                                                       \
-        if (m < C.minuteB) {                                                                       \
+        u8 m = gSunClock.baseMinute;                                                               \
+        if (m < gSunClock.minuteB) {                                                               \
             day = 1;                                                                               \
         } else {                                                                                   \
-            if (m < C.minuteA)                                                                     \
+            if (m < gSunClock.minuteA)                                                             \
                 day = 0;                                                                           \
             else                                                                                   \
                 day = 1;                                                                           \
@@ -31,11 +29,11 @@
 /* A and B in the same hour, A first: in the window between A and B */
 #define PLAIN_WINDOW(day)                                                                          \
     {                                                                                              \
-        u8 m = C.baseMinute;                                                                       \
-        if (m < C.minuteA) {                                                                       \
+        u8 m = gSunClock.baseMinute;                                                               \
+        if (m < gSunClock.minuteA) {                                                               \
             day = 0;                                                                               \
         } else {                                                                                   \
-            if (m < C.minuteB)                                                                     \
+            if (m < gSunClock.minuteB)                                                             \
                 day = 1;                                                                           \
             else                                                                                   \
                 day = 0;                                                                           \
@@ -45,88 +43,88 @@
 u8 SunClock_GetPhase(void)
 {
     int day;
-    if (C.baseHour < C.hourA) {
-        if (C.hourB < C.hourA) {
-            if (C.baseHour < C.hourB) {
+    if (gSunClock.baseHour < gSunClock.hourA) {
+        if (gSunClock.hourB < gSunClock.hourA) {
+            if (gSunClock.baseHour < gSunClock.hourB) {
                 day = 1;
-            } else if (C.baseHour == C.hourB) {
-                u8 m = C.baseMinute;
+            } else if (gSunClock.baseHour == gSunClock.hourB) {
+                u8 m = gSunClock.baseMinute;
                 do {
                     day = 0;
                 } while (0);
-                if (m < C.minuteB)
+                if (m < gSunClock.minuteB)
                     day = 1;
             } else {
                 day = 0;
             }
-        } else if (C.hourB == C.hourA) {
-            u8 mB = C.minuteB;
+        } else if (gSunClock.hourB == gSunClock.hourA) {
+            u8 mB = gSunClock.minuteB;
             do {
                 day = 0;
             } while (0);
-            if (mB < C.minuteA)
+            if (mB < gSunClock.minuteA)
                 day = 1;
         } else {
             day = 0;
         }
-    } else if (C.baseHour == C.hourA) {
-        if (C.hourB == C.hourA) {
-            if (C.minuteB < C.minuteA) {
+    } else if (gSunClock.baseHour == gSunClock.hourA) {
+        if (gSunClock.hourB == gSunClock.hourA) {
+            if (gSunClock.minuteB < gSunClock.minuteA) {
                 WRAP_WINDOW(day);
-            } else if (C.minuteA < C.minuteB) {
+            } else if (gSunClock.minuteA < gSunClock.minuteB) {
                 PLAIN_WINDOW(day);
             } else {
                 day = 0;
             }
         } else {
-            u8 m = C.baseMinute;
+            u8 m = gSunClock.baseMinute;
             day = 1;
-            if (m < C.minuteA)
+            if (m < gSunClock.minuteA)
                 day = 0;
         }
     } else {
-        if (C.baseHour < C.hourB) {
+        if (gSunClock.baseHour < gSunClock.hourB) {
             day = 1;
-        } else if (C.baseHour == C.hourB) {
-            if (C.hourB == C.hourA) {
-                if (C.minuteB < C.minuteA) {
+        } else if (gSunClock.baseHour == gSunClock.hourB) {
+            if (gSunClock.hourB == gSunClock.hourA) {
+                if (gSunClock.minuteB < gSunClock.minuteA) {
                     WRAP_WINDOW(day);
-                } else if (C.minuteA < C.minuteB) {
+                } else if (gSunClock.minuteA < gSunClock.minuteB) {
                     PLAIN_WINDOW(day);
                 } else {
                     day = 0;
                 }
             } else {
-                u8 m = C.baseMinute;
+                u8 m = gSunClock.baseMinute;
                 do {
                     day = 0;
                 } while (0);
-                if (m < C.minuteB)
+                if (m < gSunClock.minuteB)
                     day = 1;
             }
-        } else if (C.hourB < C.hourA) {
+        } else if (gSunClock.hourB < gSunClock.hourA) {
             day = 1;
-        } else if (C.hourB == C.hourA) {
-            u8 mB = C.minuteB;
+        } else if (gSunClock.hourB == gSunClock.hourA) {
+            u8 mB = gSunClock.minuteB;
             do {
                 day = 0;
             } while (0);
-            if (mB < C.minuteA)
+            if (mB < gSunClock.minuteA)
                 day = 1;
         } else {
             day = 0;
         }
     }
     if (!day) {
-        if (C.spanAHour == 0)
+        if (gSunClock.spanAHour == 0)
             return 0;
-        if (C.spanBHour == 0)
+        if (gSunClock.spanBHour == 0)
             return 4;
         return 5;
     } else {
-        if (C.spanAHour == 0)
+        if (gSunClock.spanAHour == 0)
             return 1;
-        if (C.spanBHour == 0)
+        if (gSunClock.spanBHour == 0)
             return 3;
         return 2;
     }

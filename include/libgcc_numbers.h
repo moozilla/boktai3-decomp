@@ -26,8 +26,10 @@ struct SoftSingleNumber {
     } fraction;
 };
 
+/* 0x030035C8 */
 extern struct SoftDoubleNumber gSoftDoubleNaN;
 
+/* 0x030035E0 */
 extern struct SoftSingleNumber gSoftSingleNaN;
 
 #endif

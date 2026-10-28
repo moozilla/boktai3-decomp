@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 
 // confidence=low: steps the four entry weights and, on a timer, re-aims the pulse at the target.
 
@@ -47,7 +48,6 @@ struct ColorPulse {
     u8 padCF8[0xD80 - 0xCF8];
     u32 flagsD80;
 };
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern s16 gUnk_086149C4[];
 s32 Div(s32, s32);

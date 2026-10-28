@@ -10,6 +10,7 @@
  */
 
 #include "global.h"
+#include "engine_globals.h"
 #include "game_state.h"
 #include "render.h"
 #include "heap.h"
@@ -61,14 +62,10 @@ struct EngineMap {
     void *trapTops[64];
 };
 
-extern u16 gNextTaskId;                   /* next Task id */
+/* 0x03005280 */
 extern struct TaskList gTaskLists[14];    /* task lists by priority */
-extern struct EngineMap *gTerrainMap;     /* current terrain map */
-extern u32 gTerrainWidth, gTerrainHeight; /* terrain map width, height (cells) */
-extern u32 gRandomIndex;                  /* index (0..1023) into the random table */
 extern const u16 gUnk_0203B400[];         /* 1024 entry random table (guess) */
 extern const s16 gUnk_086149C4[];         /* sine table (guess) */
-extern u32 gEngineFlags; /* more engine flags (bit 10 mutes Sound_PlaySongChecked; guess) */
 
 /* ---- Tasks and memory -------------------------------------------------- */
 
@@ -140,7 +137,7 @@ s32 AnimData_Load(
     void *animData,
     s32 id); /* (guess) fill from the resource entry with this id (header 0x03004300) */
 
-void *AnimData_FindEntry(s32 id); /* (guess) entry with this id in header gUnk_030042EC, or NULL */
+void *AnimData_FindEntry(s32 id); /* (guess) entry with this id in header gSpriteTileResource, or NULL */
 
 u32 Anim_SetSequence(void *anim, void *data, u32 sequence, u32 row,
                      u32 flags); /* (guess) 1 if restarted */

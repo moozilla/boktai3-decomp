@@ -1,4 +1,3 @@
-#define gSunClock gUnk_03005430
 #include "global.h"
 #include "sun_clock.h"
 struct ClockPanelSnapshot {
@@ -33,7 +32,7 @@ void ClockPanel_CaptureTime(struct ClockPanel *p)
         p->second[i] = 0;
     }
     if (*state && (*state)->mode == 0)
-        snapshot->time = gUnk_03005430.extra6 * 15 + gUnk_03005430.extra7;
+        snapshot->time = gSunClock.extra6 * 15 + gSunClock.extra7;
     else
         snapshot->time = 0;
     snapshot->sun = SunClock_GetPhase();

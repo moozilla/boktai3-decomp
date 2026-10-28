@@ -29,8 +29,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
@@ -46,7 +44,7 @@ void Wireless_PollParentNiSend(struct Engine *p)
 {
     register int lost asm("r6") = 0;
     if (p->mask & 2) {
-        struct RfuSlotStatusNI **slots = gUnk_03006A70;
+        struct RfuSlotStatusNI **slots = gRfuSlotStatusNI;
         u8 *slot = &p->mode;
         int state = slots[*slot]->send.state;
         if (state == 0x26) {

@@ -1,4 +1,5 @@
 #include "orbit_background.h"
+#include "render.h"
 static inline s32 scale(s32 value, u32 shift)
 {
     if (value >= 0)
@@ -36,7 +37,7 @@ s32 OrbitBackground_Tick(struct OrbitBackground *background)
             }
         }
         {
-            s32 sourceX = gUnk_03005418[0];
+            s32 sourceX = ((s16 *)gCameraOrigin)[0];
             s32 screenX = screen.x;
             s32 x;
             s32 centerX;
@@ -46,7 +47,7 @@ s32 OrbitBackground_Tick(struct OrbitBackground *background)
             s32 centerY;
             x = sourceX - screenX;
             centerX = x + 128;
-            sourceY = gUnk_03005418[1];
+            sourceY = ((s16 *)gCameraOrigin)[1];
             screenY = screen.y;
             y = sourceY - screenY;
             centerY = y + 128;

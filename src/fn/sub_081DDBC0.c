@@ -1,6 +1,7 @@
 #include "global.h"
 #include "game_state.h"
 #include "ram.h"
+#include "input.h"
 
 /* NameEntry_Update: per-frame task callback. State 0 handles the d-pad (with key repeat),
  * B (erase, or cancel on an empty name), SELECT (page toggle), START (jump to End) and A
@@ -21,7 +22,6 @@ struct NameEntryTask {
     u8 name[0x10]; /* 0x374 */
 };
 
-extern u16 gUnk_03005260[];
 s32 Mod(s32, s32);
 void NameEntry_MoveCursorUp(struct NameEntryTask *);
 void NameEntry_MoveCursorDown(struct NameEntryTask *);
@@ -49,9 +49,9 @@ void NameEntry_Update(struct NameEntryTask *p)
         case 0:
             p->verticalHistory <<= 1;
             p->horizontalHistory <<= 1;
-            if (gUnk_03005260[0] & 0xC0)
+            if (gPadState[0] & 0xC0)
                 p->verticalHistory |= 1;
-            if (gUnk_03005260[0] & 0x30)
+            if (gPadState[0] & 0x30)
                 p->horizontalHistory |= 1;
             if (p->verticalHistory == 0xFFFF)
                 p->verticalRepeat++;
@@ -61,19 +61,17 @@ void NameEntry_Update(struct NameEntryTask *p)
                 p->horizontalRepeat++;
             else
                 p->horizontalRepeat = 1;
-            if ((gUnk_03005260[1] & 0x40) ||
-                (Mod(p->verticalRepeat, 5) == 0 && (gUnk_03005260[0] & 0x40)))
+            if ((gPadState[1] & 0x40) || (Mod(p->verticalRepeat, 5) == 0 && (gPadState[0] & 0x40)))
                 NameEntry_MoveCursorUp(p);
-            if ((gUnk_03005260[1] & 0x80) ||
-                (Mod(p->verticalRepeat, 5) == 0 && (gUnk_03005260[0] & 0x80)))
+            if ((gPadState[1] & 0x80) || (Mod(p->verticalRepeat, 5) == 0 && (gPadState[0] & 0x80)))
                 NameEntry_MoveCursorDown(p);
-            if ((gUnk_03005260[1] & 0x10) ||
-                (Mod(p->horizontalRepeat, 5) == 0 && (gUnk_03005260[0] & 0x10)))
+            if ((gPadState[1] & 0x10) ||
+                (Mod(p->horizontalRepeat, 5) == 0 && (gPadState[0] & 0x10)))
                 NameEntry_MoveCursorRight(p);
-            if ((gUnk_03005260[1] & 0x20) ||
-                (Mod(p->horizontalRepeat, 5) == 0 && (gUnk_03005260[0] & 0x20)))
+            if ((gPadState[1] & 0x20) ||
+                (Mod(p->horizontalRepeat, 5) == 0 && (gPadState[0] & 0x20)))
                 NameEntry_MoveCursorLeft(p);
-            if (gUnk_03005260[1] & 2) {
+            if (gPadState[1] & 2) {
                 Sound_PlaySong(0xDE);
                 r = sub_081DDB44(p);
                 if (r == 1) {
@@ -90,24 +88,24 @@ void NameEntry_Update(struct NameEntryTask *p)
                     break;
                 }
                 TextEntry_DrawName(p->name);
-            } else if (gUnk_03005260[1] & 4) {
+            } else if (gPadState[1] & 4) {
                 Sound_PlaySong(0xDD);
                 NameEntry_ToggleCharacterPage(p);
                 break;
-            } else if ((gUnk_03005260[1] & 8) && p->selection != 0x56) {
+            } else if ((gPadState[1] & 8) && p->selection != 0x56) {
                 Sound_PlaySong(0xDD);
                 p->selection = 0x56;
                 NameEntry_UpdateCursor(p);
                 break;
-            } else if ((gUnk_03005260[1] & 1) || (gUnk_03005260[1] & 8)) {
+            } else if ((gPadState[1] & 1) || (gPadState[1] & 8)) {
                 Sound_PlaySong(0xDD);
-                if (p->selection <= 0x54 && (gUnk_03005260[1] & 1)) {
+                if (p->selection <= 0x54 && (gPadState[1] & 1)) {
                     if (NameEntry_AppendChar(p) == 1) {
                         p->selection = 0x56;
                         NameEntry_UpdateCursor(p);
                     }
                 } else {
-                    if (p->selection == 0x55 && (gUnk_03005260[1] & 1))
+                    if (p->selection == 0x55 && (gPadState[1] & 1))
                         NameEntry_ToggleCharacterPage(p);
                     if (p->selection == 0x56) {
                         s32 count = 0;

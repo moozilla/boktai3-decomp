@@ -6,6 +6,7 @@
 #include "global.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_reaction.h"
+#include "engine_globals.h"
 
 void Skeleton_UpdateScriptWaitState(void);
 void sub_0807E334(void *);
@@ -13,7 +14,6 @@ s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
-extern u32 gRandomIndex;
 
 struct ChasePlayer {
     u8 unknown0[0x20];

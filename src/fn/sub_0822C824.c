@@ -1,4 +1,5 @@
 #include "global.h"
+#include "runtime.h"
 struct Obj {
     u8 pad[0x19];
     u8 state;
@@ -11,7 +12,6 @@ struct Context {
     s16 a, b;
 };
 extern u8 *gGameState;
-extern u16 gUnk_030054C0, gUnk_030054C4;
 void Solar_StartMeasurement(void), sub_0822C598(struct Obj *);
 s32 Solar_GetIntensity(void), Solar_GetLevelForIntensity(s32), Solar_ApplyIntensityModifiers(s32);
 void Solar_UpdateMeasurement(struct Obj *obj)
@@ -37,8 +37,8 @@ void Solar_UpdateMeasurement(struct Obj *obj)
             (*(s16 *)(gGameState + 0x876)) =
                 Solar_GetLevelForIntensity((*(s16 *)(gGameState + 0x874)));
             sub_0822C598(obj);
-            gUnk_030054C0 = (*(s16 *)(gGameState + 0x874));
-            gUnk_030054C4 = (*(s16 *)(gGameState + 0x876));
+            gSolarSavedLevel = (*(s16 *)(gGameState + 0x874));
+            gSolarSavedCachedLevel = (*(s16 *)(gGameState + 0x876));
             break;
     }
 }

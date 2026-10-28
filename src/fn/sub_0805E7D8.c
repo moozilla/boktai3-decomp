@@ -1,7 +1,7 @@
 #include "scene_input_navigation.h"
 u32 SceneInput_GetNavigationKeys(struct SceneInputGridView *grid)
 {
-    const volatile u16 *keys = gUnk_03005260;
+    const volatile u16 *keys = gPadState;
     u32 value = keys[1];
     u32 mask = 0xF0;
     u32 pressed;

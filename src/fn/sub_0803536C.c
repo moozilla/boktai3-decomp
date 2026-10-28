@@ -29,9 +29,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus    gUnk_03006A80
-#define gRfuSlotStatusUNI gUnk_03006A60
-#define gRfuSlotStatusNI  gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
@@ -48,7 +45,7 @@ int Wireless_ReceiveChildUniPacket(struct Engine *p)
     int result = 0;
     int slot;
     {
-        struct RfuSlotStatusUNI **slots = gUnk_03006A60;
+        struct RfuSlotStatusUNI **slots = gRfuSlotStatusUNI;
         slot = p->index;
         if (slots[slot]->recv.newDataFlag) {
             u8 *packet = (u8 *)p + 0x90;

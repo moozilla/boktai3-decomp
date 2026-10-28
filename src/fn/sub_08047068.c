@@ -36,9 +36,9 @@ s32 DamageNumberDisplay_UpdateLeaving(struct DamageNumberDisplay *display,
         vertical = DamageNumber_ProjectScale(3 * world->y);
         y = sum - vertical;
         depth = sum + vertical;
-        projected->x = (u16)projected->x - gUnk_03005418[0] + 120;
-        projected->y = y - gUnk_03005418[1] + 80;
-        projected->z = depth - gUnk_03005418[2];
+        projected->x = (u16)projected->x - gCameraOrigin[0] + 120;
+        projected->y = y - gCameraOrigin[1] + 80;
+        projected->z = depth - gCameraOrigin[2];
     }
     digit = group->digits;
     index = 0;

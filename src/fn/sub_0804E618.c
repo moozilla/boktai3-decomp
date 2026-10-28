@@ -1,4 +1,5 @@
 #include "area_effect.h"
+#include "input.h"
 void Player_AddEnergy(struct AreaEffectPlayer *, s32);
 static inline u32 test(u32 *value, u32 mask)
 {
@@ -15,7 +16,7 @@ void AreaEffect_AccumulatePlayerResource(struct AreaEffectManager *manager, s32 
     struct AreaEffectPlayer *player;
     if (gEngineFlags & 0x100) {
         object->idleFrame = 0;
-    } else if (gUnk_03005260) {
+    } else if ((*(u16 *)gPadState)) {
         object->idleFrame = 0;
     } else if (object->idleFrame <= 899) {
         object->idleFrame++;

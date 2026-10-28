@@ -5,8 +5,8 @@ struct L {
     u8 f2;
     u8 f3;
 };
-extern u16 *gUnk_03006A70[];
-extern struct L *gUnk_03006A80;
+extern u16 *gRfuSlotStatusNI[];
+extern struct L *gRfuLinkStatus;
 void rfu_clearSlot(u32, u32);
 void RfuManager_NotifyEvent(u32, u32);
 void RfuManager_RequestMscCycleCompletion(void);
@@ -18,7 +18,7 @@ void sub_082247CC(void)
     *(vu16 *)0x04000208 = 0;
     if (gRfuLinkManager.state == 0xf) {
         if (--gRfuLinkManager.nameAcceptTimer.count[gRfuLinkManager.child_slot] == 0 ||
-            *gUnk_03006A70[gRfuLinkManager.child_slot] == 0x27) {
+            *gRfuSlotStatusNI[gRfuLinkManager.child_slot] == 0x27) {
             RfuManager_RequestMscCycleCompletion();
             gRfuLinkManager.state = 0x18;
             rfu_clearSlot(4, gRfuLinkManager.child_slot);
@@ -33,7 +33,7 @@ void sub_082247CC(void)
         if (gRfuLinkManager.childClockSlave_flag == 0) {
             gRfuLinkManager.next_state = 0;
             gRfuLinkManager.state = 0;
-            RfuManager_DisconnectAndWait(gUnk_03006A80->f2 | gUnk_03006A80->f3);
+            RfuManager_DisconnectAndWait(gRfuLinkStatus->f2 | gRfuLinkStatus->f3);
             gRfuLinkManager.event.words.code = 0;
             RfuManager_NotifyEvent(0x25, 1);
         }

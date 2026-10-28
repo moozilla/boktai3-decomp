@@ -26,7 +26,7 @@ void sub_081740CC(struct SceneHudState *p)
         SceneHud_ShowEquipmentDetails(p);
         MenuDisplay_UpdateActionPrompt(p, 2);
     }
-    keys = gUnk_03005260[1];
+    keys = gPadState[1];
     if (keys & 1) {
         s32 assigned;
         Hud_SaveGridSelection(input);

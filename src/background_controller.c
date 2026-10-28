@@ -80,8 +80,8 @@ s32 Background_Update(struct Background *p)
         s32 cx, cy;
         register s32 bottom asm("r5");
         if (!gCamera.mode) {
-            cx = gUnk_03005418[0] + gCamera.offsetX;
-            cy = gUnk_03005418[1] + gCamera.offsetY;
+            cx = ((s16 *)gCameraOrigin)[0] + gCamera.offsetX;
+            cy = ((s16 *)gCameraOrigin)[1] + gCamera.offsetY;
         } else {
             cx = gCamera.position.x >> 3;
             cy = gCamera.position.y >> 3;
@@ -174,8 +174,8 @@ s32 Background_Update(struct Background *p)
             value;
         });
         if (p->flags & 32) {
-            x += gUnk_03005418[0] + gCamera.offsetX;
-            y += gUnk_03005418[1] + gCamera.offsetY;
+            x += ((s16 *)gCameraOrigin)[0] + gCamera.offsetX;
+            y += ((s16 *)gCameraOrigin)[1] + gCamera.offsetY;
         }
         {
             register s32 rowY asm("r5") = y;
@@ -250,8 +250,8 @@ s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig 
         offsetY = 0;
     }
     if (p->flags & 2) {
-        x = gUnk_03005418[0] + gCamera.offsetX;
-        y = gUnk_03005418[1] + gCamera.offsetY;
+        x = ((s16 *)gCameraOrigin)[0] + gCamera.offsetX;
+        y = ((s16 *)gCameraOrigin)[1] + gCamera.offsetY;
     } else {
         x = c->x;
         y = c->y;
@@ -750,8 +750,8 @@ s32 ScrollingBackground_Update(struct ScrollingBackground *p)
         layer->x = pixel(p->x);
         layer->y = pixel(p->y);
     }
-    cx = gUnk_03005418[0] + gCamera.offsetX;
-    cy = gUnk_03005418[1] + gCamera.offsetY;
+    cx = ((s16 *)gCameraOrigin)[0] + gCamera.offsetX;
+    cy = ((s16 *)gCameraOrigin)[1] + gCamera.offsetY;
     if (p->width)
         layer->x += Mod(cx - 120, p->width);
     else {
@@ -801,8 +801,8 @@ s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id,
         c->offsetY = dims->y;
     }
     if (p->flags & 2) {
-        x = gUnk_03005418[0] + gCamera.offsetX;
-        y = gUnk_03005418[1] + gCamera.offsetY;
+        x = ((s16 *)gCameraOrigin)[0] + gCamera.offsetX;
+        y = ((s16 *)gCameraOrigin)[1] + gCamera.offsetY;
         scale = c->scale;
     } else {
         x = c->x;

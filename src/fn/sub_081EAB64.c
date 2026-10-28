@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "menu_parameters.h"
+#include "input.h"
 // confidence=low: menu ownership follows Params3D0_CreateDisplay.
 
 // confidence=low: menu ownership follows Params3D0_CreateDisplay; option meanings remain tentative.
@@ -17,7 +18,6 @@ struct Message {
     u32 unused : 16;
     void *values;
 };
-extern u16 gUnk_03005260[];
 extern u8 *gGameState;
 extern const s32 gUnk_08613D80[];
 s32 TimeDisplay_GetCurrentMonth(void);
@@ -101,7 +101,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
             }
             break;
         case 1:
-            if ((gUnk_03005260[1] & 1) || (gUnk_03005260[1] & 10)) {
+            if ((gPadState[1] & 1) || (gPadState[1] & 10)) {
                 if (p->stateTimer > 10) {
                     p->skipped = 1;
                     p->unused760 = 1;
@@ -144,7 +144,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
             }
             break;
         case 5:
-            if ((gUnk_03005260[1] & 1) || (gUnk_03005260[1] & 10)) {
+            if ((gPadState[1] & 1) || (gPadState[1] & 10)) {
                 if (!p->skipped) {
                     p->skipped = 1;
                     p->paletteStep = 1 << p->unused760;
@@ -172,7 +172,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
             }
             break;
         case 6:
-            if ((gUnk_03005260[1] & 1) || (gUnk_03005260[1] & 8)) {
+            if ((gPadState[1] & 1) || (gPadState[1] & 8)) {
                 if (p->timer > (1 << p->fadeShift)) {
                     FLAGS(0x130) &= ~1;
                     p->state = 7;
@@ -223,9 +223,9 @@ void Params3D0_UpdateDisplay(struct Display *p)
             if (p->timer < (1 << p->fadeShift)) {
                 break;
             }
-            if ((gUnk_03005260[1] & 1) || (gUnk_03005260[1] & 0x38)) {
+            if ((gPadState[1] & 1) || (gPadState[1] & 0x38)) {
                 p->idleTimer = 0;
-                if ((gUnk_03005260[1] & 1) || (gUnk_03005260[1] & 8)) {
+                if ((gPadState[1] & 1) || (gPadState[1] & 8)) {
                     *(u16 *)(gGameState + 0x870) = p->selection;
                     if (p->selection == 0) {
                         Sound_PlaySong(0xE0);
@@ -248,14 +248,14 @@ void Params3D0_UpdateDisplay(struct Display *p)
                         }
                     }
                     break;
-                } else if (gUnk_03005260[1] & 0x20) {
+                } else if (gPadState[1] & 0x20) {
                     Sound_PlaySong(0x12B);
                     if ((--p->selection) < 0) {
                         p->selection = p->count - 1;
                     }
                     p->state = 11;
                     break;
-                } else if (gUnk_03005260[1] & 0x10) {
+                } else if (gPadState[1] & 0x10) {
                     Sound_PlaySong(0x12B);
                     if ((++p->selection) >= p->count) {
                         p->selection = 0;

@@ -29,8 +29,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
 void WirelessController_BuildPeerRosterPacket(struct Engine *);
@@ -41,7 +39,7 @@ int WirelessController_UpdatePeerRosterSend(struct Engine *p)
     register int bits asm("r2") = p->mask;
     if (bits & 2)
         goto fail;
-    if (gUnk_03006A80->linkLossSlotFlag)
+    if (gRfuLinkStatus->linkLossSlotFlag)
         goto fail;
     if (bits & 0xA0)
         goto fail;
@@ -64,7 +62,7 @@ run:
                 int unusedZero = 0;
                 p->mask = flags | mask;
             }
-            if (gUnk_03006A80->connSlotFlag)
+            if (gRfuLinkStatus->connSlotFlag)
                 p->mask |= 1;
         }
         p->pad1a = current;
@@ -80,12 +78,12 @@ run:
         if (one & flags) {
             if (!rfu_NI_setSendData(p->bits, 67, p->scratch, 64)) {
                 int slot = 0;
-                if (!(gUnk_03006A80->connSlotFlag & one)) {
+                if (!(gRfuLinkStatus->connSlotFlag & one)) {
                     do {
                         slot++;
                         if (slot > 3)
                             break;
-                    } while (!((gUnk_03006A80->connSlotFlag >> slot) & 1));
+                    } while (!((gRfuLinkStatus->connSlotFlag >> slot) & 1));
                 }
                 p->mode = slot;
                 p->mask = (p->mask & ~1) | 2;

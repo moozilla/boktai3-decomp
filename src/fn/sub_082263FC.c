@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct P {
     u32 a, b;
 };
@@ -12,15 +13,14 @@ struct S {
     struct P f74;
     u16 f7c;
 };
-extern struct S *gActiveCamera;
 s32 SceneBody_GetById(u32);
 void Camera_NotifyMoveComplete(struct S *);
 void Camera_PanToActor(u32 a, s32 n, struct P *b)
 {
-    if (gActiveCamera) {
-        gActiveCamera->f7c = a;
-        if (SceneBody_GetById(gActiveCamera->f7c)) {
-            struct S *p = gActiveCamera;
+    if (((struct S *)gActiveCamera)) {
+        ((struct S *)gActiveCamera)->f7c = a;
+        if (SceneBody_GetById(((struct S *)gActiveCamera)->f7c)) {
+            struct S *p = ((struct S *)gActiveCamera);
             p->f1c = 1;
             p->f74 = *b;
             if (n <= 1) {

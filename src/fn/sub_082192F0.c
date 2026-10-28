@@ -2,9 +2,6 @@
 #include "background_controller.h"
 #include "render.h"
 
-extern u16 *gUnk_03004278;
-extern vu16 *gUnk_03003A00;
-extern u16 gUnk_03004270, gUnk_03004274;
 u8 *ScanlineEffect_GetBuffer(void);
 vu16 *ScanlineEffect_GetHorizontalScrollRegister(s32);
 vu16 *ScanlineEffect_GetVerticalScrollRegister(s32);
@@ -45,9 +42,9 @@ void ScanlineEffect_StageTransfer(void)
                 buffer[i] = *(u16 *)(i * 2 + (u32)gScanlineEffectSource) & 31;
             break;
     }
-    gUnk_03004278 = buffer;
-    gUnk_03003A00 = target;
-    gUnk_03004270 = 1;
-    gUnk_03004274 = 1;
+    gScanlineDmaSource = buffer;
+    gScanlineDmaTarget = target;
+    gScanlineDmaCount = 1;
+    gScanlineDmaMode = 1;
     gScanlineEffectSource = 0;
 }

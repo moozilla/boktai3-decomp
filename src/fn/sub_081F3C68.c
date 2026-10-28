@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "engine_globals.h"
 // MATCHING_CONCESSION: register-pinning
 
 #ifdef NONMATCHING
@@ -109,7 +110,6 @@ static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
     d->z = a->z + b->z;
 }
 
-extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 struct Vec *Player_GetEffectivePosition(s32);
 s32 Div(s32, s32);

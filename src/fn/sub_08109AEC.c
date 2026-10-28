@@ -3,7 +3,6 @@
 #include "game_state.h"
 
 // foundry draft (worker best 98.1%); what differs is mostly register allocation and instruction order
-#define gSunClock gUnk_03005430
 struct ClockPanelSnapshot {
     u8 bytes[0x20];
     u16 time;
@@ -46,7 +45,7 @@ void ClockPanel_CaptureSnapshot(struct ClockPanel *p)
     for (i = 0; i < 5; i++)
         *values++ = GameState_GetChallengeBestScore(i + 6);
     if (!p->mode)
-        s->time = gUnk_03005430.extra6 * 15 + gUnk_03005430.extra7;
+        s->time = gSunClock.extra6 * 15 + gSunClock.extra7;
     else
         s->time = 0;
     i = 0;

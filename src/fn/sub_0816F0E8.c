@@ -1,6 +1,6 @@
-#define gMenuTransitionKeys        gUnk_03005260
 #define MenuTransition_SetCallback Hud_SetInteractionCallback
 #include "global.h"
+#include "input.h"
 void SceneHud_RefreshActionIcons(void *);
 void SceneHud_UpdateActionSelection(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
@@ -12,7 +12,6 @@ void InventoryPanel_ShowStatusIcons(void *);
 void MenuDisplay_UpdateActionPrompt(void *, int);
 void InventoryPanel_DrawStatComparison(void *, int, int, int, int, int);
 void MenuDisplay_SetPaletteOverrides(void *, int, int, int, int);
-extern u16 gUnk_03005260[];
 struct MenuMessageView {
     u8 pad[0x3c];
     void *resource;

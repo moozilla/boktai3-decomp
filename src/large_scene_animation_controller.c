@@ -1072,8 +1072,6 @@ struct Vec081935B8 {
     s16 x, y, z;
 };
 
-extern u16 gUnk_03005418[];
-
 void BgGfx_LoadTilemapAtPosition(u32, s32, s32);
 
 static inline s32 Shift5(s32 x)
@@ -1103,9 +1101,9 @@ void Nidhoggr_UpdateBackgroundScroll(struct Nidhoggr *t)
 {
     struct Vec081935B8 d;
     Project(&d, (struct Vec081935B8 *)&t->pos);
-    d.x = gUnk_03005418[0] - d.x;
-    d.y = gUnk_03005418[1] + 10 - d.y;
-    d.z = d.z - gUnk_03005418[2];
+    d.x = gCameraOrigin[0] - d.x;
+    d.y = gCameraOrigin[1] + 10 - d.y;
+    d.z = d.z - gCameraOrigin[2];
     {
         s16 tmp = d.x;
         t->bgScrollX = tmp;

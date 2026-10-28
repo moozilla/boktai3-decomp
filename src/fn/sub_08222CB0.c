@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 extern void Serial_ServiceInterrupt(void);
-extern void (*gSerialInterruptState[])(void);
 void Serial_EnableInterrupt(void)
 {
     *(volatile u16 *)0x04000208 = 0;

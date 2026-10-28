@@ -1,7 +1,6 @@
 /* Provisional names and object interpretation; offsets follow static accesses. */
 #define MapMenu_IsAreaUnlocked   GameState_GetMapRevealFlag
 #define MapMenu_RefreshSelection MapScreen_RefreshAreaDisplay
-#define gMenuInput               gUnk_03005260
 #include "global.h"
 struct MapMenuEntry {
     u8 area;
@@ -18,7 +17,7 @@ struct MapMenu {
 };
 extern struct {
     u16 held, pressed;
-} gUnk_03005260;
+} gPadState;
 u32 GameState_GetMapRevealFlag(u32);
 void MapScreen_RefreshAreaDisplay(struct MapMenu *);
 u32 MapMenu_SelectDirection(struct MapMenu *s)
@@ -26,7 +25,7 @@ u32 MapMenu_SelectDirection(struct MapMenu *s)
     struct MapMenuEntry *entries = s->entries;
     s32 index = -1;
     u32 result;
-    if (gUnk_03005260.pressed & 0x40) {
+    if (gPadState.pressed & 0x40) {
         if (s->adjacent[0] != -1) {
             index = s->adjacent[0];
             if (GameState_GetMapRevealFlag(entries[index].area))
@@ -34,7 +33,7 @@ u32 MapMenu_SelectDirection(struct MapMenu *s)
             else
                 s->unlocked = 0;
         }
-    } else if (gUnk_03005260.pressed & 0x80) {
+    } else if (gPadState.pressed & 0x80) {
         if (s->adjacent[1] != -1) {
             index = s->adjacent[1];
             if (GameState_GetMapRevealFlag(entries[index].area))
@@ -42,7 +41,7 @@ u32 MapMenu_SelectDirection(struct MapMenu *s)
             else
                 s->unlocked = 0;
         }
-    } else if (gUnk_03005260.pressed & 0x20) {
+    } else if (gPadState.pressed & 0x20) {
         if (s->adjacent[2] != -1) {
             index = s->adjacent[2];
             if (GameState_GetMapRevealFlag(entries[index].area))
@@ -50,7 +49,7 @@ u32 MapMenu_SelectDirection(struct MapMenu *s)
             else
                 s->unlocked = 0;
         }
-    } else if (gUnk_03005260.pressed & 0x10) {
+    } else if (gPadState.pressed & 0x10) {
         if (s->adjacent[3] != -1) {
             index = s->adjacent[3];
             if (GameState_GetMapRevealFlag(entries[index].area))

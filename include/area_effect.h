@@ -1,6 +1,7 @@
 #ifndef GUARD_AREA_EFFECT_H
 #define GUARD_AREA_EFFECT_H
 #include "game_state.h"
+#include "engine_globals.h"
 /* Tentative identity: scripted rectangular areas with optional display sprites. */
 struct AreaEffectPosition {
     s16 x, y, z, pad;
@@ -42,8 +43,7 @@ struct AreaEffectManager {
 };
 extern struct AreaEffectManager *gAreaEffectManager;
 extern const u16 gUnk_08605A78[], gUnk_08605A80[];
-extern u32 gEngineFlags, gUnk_02000560;
-extern u16 gUnk_03005260;
+extern u32 gUnk_02000560;
 void AreaEffect_SetBounds(struct AreaEffectEntry *, s32, struct AreaEffectPosition *, s32);
 void AreaEffect_AccumulatePlayerResource(struct AreaEffectManager *, s32);
 #endif

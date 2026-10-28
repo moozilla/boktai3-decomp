@@ -3,7 +3,7 @@ s32 SceneInventory_TickMoveSelection(struct SceneInventoryTail *p)
 {
     s32 result;
     SceneInputPanel_HighlightCompare(&p->display, p->highlight.colors);
-    if (gUnk_03005260[1] & 2) {
+    if (gPadState[1] & 2) {
         Sound_PlaySong(0xDE);
         switch (p->mode) {
             case 1:
@@ -14,7 +14,7 @@ s32 SceneInventory_TickMoveSelection(struct SceneInventoryTail *p)
                 SceneInventory_BeginAlternateSelection(p);
                 break;
         }
-    } else if (gUnk_03005260[1] & 1) {
+    } else if (gPadState[1] & 1) {
         result = 0;
         switch (p->category) {
             case 0:

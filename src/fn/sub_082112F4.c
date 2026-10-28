@@ -1,10 +1,10 @@
 #include "global.h"
+#include "input.h"
 
 struct Keys {
     u16 held;
     u16 pressed;
 };
-extern struct Keys gUnk_03005260;
 
 void Sound_PlaySong(u32);
 u32 CollectionMenu_IsValidGridPosition(s32, s32, s32);
@@ -32,14 +32,14 @@ s32 CollectionMenu_Update(u8 *m)
     u32 moved = 0;
 
     if (EXITING == 0) {
-        if (gUnk_03005260.pressed & 0x200) {
+        if ((*(struct Keys *)gPadState).pressed & 0x200) {
             if (--PAGE < 0)
                 PAGE = 2;
             COL = moved;
             ROW = moved;
             Sound_PlaySong(0x10a);
             pageChanged = 1;
-        } else if (gUnk_03005260.pressed & 0x100) {
+        } else if ((*(struct Keys *)gPadState).pressed & 0x100) {
             if (++PAGE > 2)
                 PAGE = moved;
             COL = moved;
@@ -47,28 +47,28 @@ s32 CollectionMenu_Update(u8 *m)
             Sound_PlaySong(0x10a);
             pageChanged = 1;
         }
-        if ((gUnk_03005260.pressed & 0x40) &&
+        if (((*(struct Keys *)gPadState).pressed & 0x40) &&
             (CollectionMenu_IsValidGridPosition(COL, ROW - 1, PAGE))) {
             ROW--;
             moved = 1;
             Sound_PlaySong(0xdc);
-        } else if ((gUnk_03005260.pressed & 0x80) &&
+        } else if (((*(struct Keys *)gPadState).pressed & 0x80) &&
                    (CollectionMenu_IsValidGridPosition(COL, ROW + 1, PAGE))) {
             ROW++;
             moved = 1;
             Sound_PlaySong(0xdc);
-        } else if ((gUnk_03005260.pressed & 0x20) &&
+        } else if (((*(struct Keys *)gPadState).pressed & 0x20) &&
                    (CollectionMenu_IsValidGridPosition(COL - 1, ROW, PAGE))) {
             COL--;
             moved = 1;
             Sound_PlaySong(0xdc);
-        } else if ((gUnk_03005260.pressed & 0x10) &&
+        } else if (((*(struct Keys *)gPadState).pressed & 0x10) &&
                    (CollectionMenu_IsValidGridPosition(COL + 1, ROW, PAGE))) {
             COL++;
             moved = 1;
             Sound_PlaySong(0xdc);
         }
-        if (gUnk_03005260.pressed & 2) {
+        if ((*(struct Keys *)gPadState).pressed & 2) {
             ScreenTransition_SendCommand(1, FADE, 4, 4, 4, 0xffff, 0);
             EXITING = 1;
             Sound_PlaySong(0x119);

@@ -1,5 +1,5 @@
-#define gStatGaugeInput gUnk_03005260
 #include "global.h"
+#include "input.h"
 struct StatGaugePalette {
     u8 unknown0[0x18];
     u16 colors[16];
@@ -25,12 +25,11 @@ void Sound_PlaySong(u32);
 void StatGauge_BeginAdjustment(struct StatGaugePreview *);
 void StatGauge_ConfirmPreview(struct StatGaugePreview *);
 void DarkLoan_BeginClosing(struct StatGaugePreview *);
-extern u16 gUnk_03005260[];
 void StatGauge_UpdateConfirmation(struct StatGaugePreview *p)
 {
     Anim_Step(p->backgroundAnim, p->backgroundData);
     Palette_UpdateHighlightPulse(p->palette->colors, &p->highlightPulse);
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         if (p->selection) {
             Sound_PlaySong(0xdd);
             StatGauge_BeginAdjustment(p);
@@ -41,13 +40,13 @@ void StatGauge_UpdateConfirmation(struct StatGaugePreview *p)
             else
                 DarkLoan_BeginClosing(p);
         }
-    } else if (gUnk_03005260[1] & 2) {
+    } else if (gPadState[1] & 2) {
         Sound_PlaySong(0xde);
         if (!p->exitScript)
             StatGauge_ConfirmPreview(p);
         else
             DarkLoan_BeginClosing(p);
-    } else if (gUnk_03005260[1] & 0x30) {
+    } else if (gPadState[1] & 0x30) {
         Sound_PlaySong(0xdc);
         p->selection = 1 - p->selection;
         if (p->selection)

@@ -1,6 +1,6 @@
-#define gMenuTransitionKeys        gUnk_03005260
 #define MenuTransition_SetCallback Hud_SetInteractionCallback
 #include "global.h"
+#include "input.h"
 void SceneHud_RefreshActionIcons(void *);
 void SceneHud_UpdateActionSelection(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
@@ -17,7 +17,6 @@ s32 MessageWindow_SetMessageTable(const void *);
 s32 MessageWindow_ShowMessage(s32);
 s32 MessageWindow_SetBounds(s32, s32, s32, s32);
 int MessageWindow_SetNumberArgument(int, int);
-extern u16 gUnk_03005260[];
 struct MenuMessageView {
     u8 pad[0x3c];
     void *resource;
@@ -41,7 +40,7 @@ void MenuTransition_UpdateTimedMessage(u8 *p)
         r = 0;
         *timer = next;
     }
-    if (*timer > 89 || (*timer > 15 && (gUnk_03005260[1] & 1))) {
+    if (*timer > 89 || (*timer > 15 && (gPadState[1] & 1))) {
         MessageWindow_SetDisplayMode(1);
         MessageWindow_SetBounds(0, 16, 30, 2);
         SceneHud_RefreshActionIcons(p);

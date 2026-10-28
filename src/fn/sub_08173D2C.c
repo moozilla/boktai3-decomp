@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_ShowEquipmentDetails(void *);
@@ -8,7 +9,6 @@ void Sound_PlaySong(int);
 void Hud_SaveGridSelection(void *);
 void SceneHud_TickEquipmentSwap(void);
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
-extern u16 gUnk_03005260[];
 void sub_08173D2C(u8 *p)
 {
     u8 *q = p + 0x4384;
@@ -18,10 +18,10 @@ void sub_08173D2C(u8 *p)
         SceneHud_ShowEquipmentDetails(p);
         MenuDisplay_UpdateActionPrompt(p, 2);
     }
-    if (gUnk_03005260[1] & 2) {
+    if (gPadState[1] & 2) {
         SceneHud_BeginEquipmentSelection(p);
         Sound_PlaySong(0xde);
-    } else if (1 & gUnk_03005260[1]) {
+    } else if (1 & gPadState[1]) {
         u8 *a;
         Sound_PlaySong(0xdd);
         Hud_SaveGridSelection(q);

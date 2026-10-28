@@ -1,6 +1,6 @@
-#define gPanelKeys gUnk_03005260
 #include "global.h"
 #include "game_state.h"
+#include "input.h"
 struct PanelAccount {
     u8 unk0[0x428];
     u16 amount;
@@ -37,7 +37,6 @@ struct ScenePanel {
     u16 previousSelection;
 };
 
-extern u16 gUnk_03005260[];
 s32 Anim_Step(void *, void *);
 void Sound_PlaySong(u32);
 void StatusPanel_BeginAnimatedTransition(void *);
@@ -46,7 +45,7 @@ void PauseMenu_UpdateQuantityInput(void *);
 void ScenePanel_UpdateDetail(struct ScenePanel *p)
 {
     Anim_Step(&p->mainSprite, p->keyframes);
-    if (gPanelKeys[1] & 1) {
+    if (gPadState[1] & 1) {
         if (p->timer == 0)
             Sound_PlaySong(0xDE);
         else {
@@ -62,7 +61,7 @@ void ScenePanel_UpdateDetail(struct ScenePanel *p)
             Sound_PlaySong(0xDD);
         }
         StatusPanel_BeginAnimatedTransition(p);
-    } else if (gPanelKeys[1] & 2) {
+    } else if (gPadState[1] & 2) {
         Sound_PlaySong(0xDE);
         ScenePanel_BeginSelection(p);
     } else

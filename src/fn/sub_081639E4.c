@@ -2,6 +2,7 @@
 #include "global.h"
 
 #include "scene_vec.h"
+#include "engine_globals.h"
 
 #define gParticleRandomIndex gRandomIndex
 struct PoolParticle {
@@ -20,7 +21,6 @@ struct ParticlePool {
     struct PoolParticle particles[16];
 };
 extern u16 gUnk_0203B400[];
-extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 static inline s32 TruncatePoolOffset(s32 value)

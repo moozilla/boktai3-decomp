@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct ShadowPosition {
     s16 x, y, z;
@@ -15,7 +16,6 @@ struct ShadowActor {
     void *pool;
     u8 entered, phase, animationEnded, state;
 };
-extern struct ShadowPosition gUnk_03005418;
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void SceneEntryPool_CreateEntry(void *, struct ShadowPosition *, u32);
 s32 __divsi3(s32, s32);
@@ -38,16 +38,16 @@ static inline void ProjectPosition(struct ShadowPosition *out, struct ShadowPosi
     b = ShiftTowardZero(3 * in->y, 5);
     c = a - b;
     d = a + b;
-    out->x = out->x - gUnk_03005418.x + 120;
-    out->y = c - gUnk_03005418.y + 80;
-    out->z = d - gUnk_03005418.z;
+    out->x = out->x - (*(struct ShadowPosition *)gCameraOrigin).x + 120;
+    out->y = c - (*(struct ShadowPosition *)gCameraOrigin).y + 80;
+    out->z = d - (*(struct ShadowPosition *)gCameraOrigin).z;
 }
 
 static inline void UnprojectPosition(struct ShadowPosition *out, struct ShadowPosition *in, s32 y)
 {
     s32 a, b, c;
-    a = in->x + gUnk_03005418.x - 120;
-    b = in->y + gUnk_03005418.y - 80;
+    a = in->x + (*(struct ShadowPosition *)gCameraOrigin).x - 120;
+    b = in->y + (*(struct ShadowPosition *)gCameraOrigin).y - 80;
     c = __divsi3((a + b) << 5, 3) + y;
     out->x = ShiftTowardZero(c, 1);
     out->y = y;

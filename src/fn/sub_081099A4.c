@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "runtime.h"
+#include "ram.h"
 struct MessagePanel {
     u8 unk0[0x20];
     void (*state)(struct MessagePanel *);
@@ -15,7 +16,6 @@ struct MessagePanel {
     u32 unk3C;
 };
 void Solar_PauseMeasurement(void);
-extern u32 gUnk_0300546C;
 static inline u8 MessagePanel_IsBlocking(struct MessagePanel *p)
 {
     if (p->flags & 1)
@@ -25,7 +25,7 @@ static inline u8 MessagePanel_IsBlocking(struct MessagePanel *p)
 s32 MessagePanel_Update(struct MessagePanel *p)
 {
     Solar_PauseMeasurement();
-    gUnk_0300546C = 1;
+    gClockSynced = 1;
     if (MessagePanel_IsBlocking(p))
         gSceneDialogActive = 1;
     Callback_InvokeActor(p, p->state);

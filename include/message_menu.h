@@ -2,6 +2,8 @@
 #define GUARD_MESSAGE_MENU_H
 
 #include "engine.h"
+#include "render.h"
+#include "input.h"
 
 struct MenuResource {
     u32 words[8];
@@ -32,9 +34,6 @@ void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
 void EncodedRecord_EncodeFields(void *);
 void EncodedRecord_FormatRows(void *, void *, void *, int);
 void *Script_GetTextSourcePc(void);
-extern u16 gBgPaletteBuffer[];
-extern u16 gBgPaletteBank15[];
-extern u16 gUnk_03005260[];
 
 void MessageMenu_LoadBackground(struct MessageMenu *m, int id);
 int MessageMenu_CreateTextWindows(struct MessageMenu *m);

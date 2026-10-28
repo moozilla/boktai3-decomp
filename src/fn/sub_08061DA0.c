@@ -12,9 +12,9 @@ s32 SceneInventory_TickModeMenu(struct SceneInventoryControlView *panel)
         goto handled;
     if (SceneInventory_HandlePageKeys(panel))
         goto handled;
-    if (gUnk_03005260[1] & 2)
+    if (gPadState[1] & 2)
         return 1;
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         switch (panel->mode) {
             case 4:
                 Sound_PlaySong(0x107);
@@ -34,7 +34,7 @@ s32 SceneInventory_TickModeMenu(struct SceneInventoryControlView *panel)
                 goto handled;
         }
     }
-    switch (gUnk_03005260[1] & 0xC0) {
+    switch (gPadState[1] & 0xC0) {
         case 0x40:
             panel->modeIndex--;
             if (panel->modeIndex > 3)

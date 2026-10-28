@@ -1,5 +1,6 @@
 #include "global.h"
 #include "menu_parameters.h"
+#include "input.h"
 // Provisional name: SoundTest_Update
 struct Sprite {
     u8 head[8];
@@ -38,7 +39,6 @@ u32 Sound_IsSongPlaying(s32);
 void Sound_StopSong(s32);
 void Sound_PlaySong(s32);
 void Anim_SetKeyframes(void *, void *, u16, s32, s32);
-extern u16 gUnk_03005260[];
 void Menu_StartFadeOut(s32);
 s32 SoundTest_StopSelection(void *);
 void SoundTest_UpdatePlaybackIndicators(void *);
@@ -55,7 +55,7 @@ void SoundTest_Update(struct Viewer *p)
     s32 direction, interval;
     switch (p->state) {
         case 0:
-            if ((gUnk_03005260[1] & 2) && SoundTest_StopSelection(p)) {
+            if ((gPadState[1] & 2) && SoundTest_StopSelection(p)) {
                 Menu_StartFadeOut(p->fadeShift);
                 p->state = 1;
                 p->exitFlag = 0;
@@ -63,14 +63,14 @@ void SoundTest_Update(struct Viewer *p)
                 break;
             }
             SoundTest_UpdatePlaybackIndicators(p);
-            if (gUnk_03005260[1] & 1)
+            if (gPadState[1] & 1)
                 SoundTest_PlaySelection(p);
-            if (gUnk_03005260[1] & 64) {
+            if (gPadState[1] & 64) {
                 if (--p->selection < 0)
                     p->selection = 2;
                 SoundTest_MoveCategoryCursor(p);
                 Sound_PlaySong(0x37c);
-            } else if (gUnk_03005260[1] & 128) {
+            } else if (gPadState[1] & 128) {
                 if (++p->selection > 2)
                     p->selection = 0;
                 SoundTest_MoveCategoryCursor(p);
@@ -78,16 +78,16 @@ void SoundTest_Update(struct Viewer *p)
             }
             direction = 0;
             interval = 5;
-            if (gUnk_03005260[1] & 32)
+            if (gPadState[1] & 32)
                 direction = 1;
-            else if (gUnk_03005260[1] & 16)
+            else if (gPadState[1] & 16)
                 direction = 2;
-            else if (gUnk_03005260[0] & 48) {
+            else if (gPadState[0] & 48) {
                 if (++p->repeatTimer > 14) {
                     if (p->repeatTimer > 199)
                         interval = 2;
                     if (Mod(p->repeatTimer, interval) == 0) {
-                        if (gUnk_03005260[0] & 32)
+                        if (gPadState[0] & 32)
                             direction = 1;
                         else
                             direction = 2;

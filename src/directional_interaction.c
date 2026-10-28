@@ -246,7 +246,7 @@ s32 DirectionalController_CheckInput(struct DirectionalManager *manager,
                 if (a == direction || b == direction || c == direction) {
                     u32 facing = manager->actor->facing;
                     if (facingAllowed(facing, a, b, c)) {
-                        if ((gUnk_03005260[1] & 1) && Actor_CanInteractWithController(manager, p)) {
+                        if ((gPadState[1] & 1) && Actor_CanInteractWithController(manager, p)) {
                             p->level = 5;
                             DirectionalController_SetMarkerFadeLevel(p, 0);
                             DirectionalController_SetState(p, 2);

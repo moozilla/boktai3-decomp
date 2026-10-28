@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 // MATCHING_CONCESSION: register-pinning
 struct Position {
     s16 x, y, z, pad;
@@ -30,7 +31,6 @@ struct Context {
     struct Position *target;
     u8 *targetActor;
 };
-extern u16 gUnk_03005260[];
 extern u8 *gUnk_02000580[];
 s32 Scene_CanOpenMenu(void);
 void Actor_SetAttachmentEffect(void *, s32, s32, s32);
@@ -58,7 +58,7 @@ static inline u32 ActorFlag(u32 mask, struct Actor *actor)
 void SceneActorAnimation_UpdateInteractionCue(struct Context *input)
 {
     struct Context *context = input;
-    s32 buttons = gUnk_03005260[1];
+    s32 buttons = gPadState[1];
     s32 pressed = 1;
     s32 kind;
     struct Actor *nearest;

@@ -1,6 +1,7 @@
 #ifndef GUARD_INTERACTION_MARKER_H
 #define GUARD_INTERACTION_MARKER_H
 #include "contact_swarm.h"
+#include "input.h"
 struct InteractionMarker {
     u8 task[0x18];
     u16 id;
@@ -27,7 +28,6 @@ struct InteractionMarkerPlayer {
 };
 extern struct InteractionMarkerPlayer *gUnk_02000580[4];
 extern u32 gUnk_02000560;
-extern u16 gUnk_03005260[];
 u32 InteractionMarker_IsPlayerNearby(struct InteractionMarker *);
 void InteractionMarker_SetState(struct InteractionMarker *, void (*)(struct InteractionMarker *));
 void InteractionMarker_TickIdle(struct InteractionMarker *);

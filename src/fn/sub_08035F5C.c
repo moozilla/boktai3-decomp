@@ -28,8 +28,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
@@ -49,7 +47,7 @@ int Wireless_TryStartParentNiSend(struct Engine *p)
     int index;
     if (flags & 2)
         goto failed;
-    links = &gUnk_03006A80;
+    links = &gRfuLinkStatus;
     if ((*links)->linkLossSlotFlag)
         goto failed;
     one = 1;

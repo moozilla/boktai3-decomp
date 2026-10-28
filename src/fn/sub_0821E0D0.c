@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 struct E {
     u8 p[0xa];
     u16 id;
@@ -12,11 +13,10 @@ struct A {
     u8 p[0xc];
     struct T *fc;
 };
-extern struct A *gTerrainMap;
 u32 sub_0821E0D0(u16 id)
 {
     s32 i = 0;
-    struct T *t = gTerrainMap->fc;
+    struct T *t = ((struct A *)gTerrainMap)->fc;
     if (i < t->n) {
         s32 n = t->n;
         u8 *p = (u8 *)t;

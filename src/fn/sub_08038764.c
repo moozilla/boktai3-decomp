@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 struct P {
     u8 pad[0x24];
     u32 timer;
@@ -12,7 +13,6 @@ struct P {
     u8 pad5[5];
     u32 requested;
 };
-extern u16 gUnk_03005260[];
 void WirelessGameMenu_InitItemChoices(struct P *);
 void WirelessGameMenu_InitEquipmentChoices(struct P *);
 void SceneHud_EnterOptionControls(void);
@@ -38,7 +38,7 @@ void WirelessGameMenu_UpdateSelection(struct P *p)
         p->wait = 6;
         WirelessGameMenu_SetStatusPanelState(p, 2);
     }
-    if (gUnk_03005260[1] & 8) {
+    if (gPadState[1] & 8) {
         p->requested = 1;
         p->countdown = 8;
     }

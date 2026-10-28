@@ -32,6 +32,7 @@ struct RfuLinkManager {
     u32 unk40, unk44;
 };
 
+/* 0x03005390 */
 extern struct RfuLinkManager gRfuLinkManager;
 
 #endif

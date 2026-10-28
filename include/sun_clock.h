@@ -2,8 +2,10 @@
 #define GUARD_SUN_CLOCK_H
 
 #include "global.h"
+#include "ram.h"
+#include "runtime.h"
 
-/* Sun clock state at gUnk_03005430: a base time, two times A and B, their
+/* Sun clock state at gSunClock: a base time, two times A and B, their
  * spans from the base, and the light phase/level derived from them. */
 struct SunClock {
     u32 stamp;               /* 0x00: Clock_PackDate */
@@ -19,18 +21,19 @@ struct SunClock {
     u8 spanAHour, spanAMinute; /* 0x12: A - base */
     u16 moonAgeTenths;         /* 0x14: tentative lunar age, in tenths of a day */
     u8 moonPhase;              /* 0x16: eight ranges of moonAgeTenths */
+    u8 pad17;
+    s32 sunriseSunsetArgs[3]; /* 0x18: arguments of Time_CalculateSunriseSunset */
 };
-extern struct SunClock gUnk_03005430;
-extern u8 *gSessionState;
+/* 0x03005430 */
+extern struct SunClock gSunClock;
 u32 SunClock_GetBaseHour(void);
 u32 SunClock_GetBaseMinute(void);
 s32 Div(s32, s32);
 u8 SunClock_GetPhase(void);
-extern u32 gUnk_0300546C;
 void Clock_SyncFromRtc(void);
 static inline void SunClock_Update(void)
 {
-    struct SunClock *c = &gUnk_03005430;
+    struct SunClock *c = &gSunClock;
     s32 bh, bm, ah, am, t;
     bh = c->hourB - c->baseHour;
     bm = c->minuteB - c->baseMinute;
@@ -86,4 +89,8 @@ static inline void SunClock_Update(void)
             break;
     }
 }
+/* 0x03005460 */
+extern u8 gRtcDateTime
+    [8]; /* RTC date/time bytes (BCD year, month, day, weekday, hour, minute, second) read and written by the Clock functions */
+
 #endif

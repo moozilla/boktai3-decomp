@@ -1,6 +1,7 @@
 #include "global.h"
 #include "ram.h"
 #include "rfu_manager.h"
+#include "rfu_compat.h"
 struct Engine {
     u8 pad0[0x1c];
     u8 flag;
@@ -24,7 +25,6 @@ struct LinkStatus {
     u8 pad0[2];
     u8 count;
 };
-extern struct LinkStatus *gUnk_03006A80;
 int RfuManager_SendData(int);
 int sub_082238F0(int);
 u16 rfu_setRecvBuffer(u8, u8, void *, u32);
@@ -66,7 +66,7 @@ void sub_080347D8(u8 msg)
         case 0x24: {
             s32 n;
             p->peers = 0;
-            n = gUnk_03006A80->count;
+            n = ((struct LinkStatus *)gRfuLinkStatus)->count;
             while (--n != 0)
                 p->peers++;
             break;

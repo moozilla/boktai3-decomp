@@ -1,5 +1,5 @@
 #include "global.h"
-#define gInputState                   gUnk_03005260
+#include "input.h"
 #define SelectionPanel_BeginSelection Registry2388_BeginFadeOut
 #define SelectionList_Confirm         MenuCursor_SetSelectionFlag
 struct SelectionList {
@@ -14,13 +14,12 @@ struct SelectionPanel {
     u8 unknown53C[0x1C];
     struct SelectionList *list;
 };
-extern u16 gUnk_03005260[];
 void Sound_PlaySong(u32);
 void Registry2388_BeginFadeOut(void *);
 void MenuCursor_SetSelectionFlag(void *);
 void SelectionPanel_ProcessConfirm(struct SelectionPanel *panel)
 {
-    if (gInputState[1] & 1) {
+    if (gPadState[1] & 1) {
         struct SelectionList *list = panel->list;
         u32 mask = 4;
         u32 flags = list->flags;

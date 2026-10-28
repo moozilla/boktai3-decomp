@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "input.h"
 struct Transition {
     u8 pad0[0x18];
     u8 state, entered, index, lastIndex;
@@ -12,7 +13,6 @@ struct Transition {
     s16 delays[64];
     u16 fadeIn[64], fadeOut[64], x[64], y[64], width[64], height[64];
 };
-extern u16 gUnk_03005260[];
 void MessageWindow_SetBounds(int, int, int, int);
 void MessageWindow_ShowMessage(int);
 void MessageWindow_Clear(void);
@@ -38,7 +38,7 @@ int DialogueTransition_OnTaskUpdate(struct Transition *p)
         int value = 0x1084;
         *reg = value;
     }
-    if ((gUnk_03005260[1] & 9) && p->endProcedure && p->state <= 2)
+    if ((gPadState[1] & 9) && p->endProcedure && p->state <= 2)
         DialogueTransition_SetState(p, 3);
     p->ticks++;
     return 0;

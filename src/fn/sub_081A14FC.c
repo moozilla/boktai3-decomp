@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 
 // confidence=low: five-phase action sequence for the Hresvelgr actor (state in +0x2F0); plays animations, emits burst particles and clears its per-frame halfword pair on exit.
 
@@ -62,9 +63,6 @@ s32 sub_08249498(u32, u32);
 s16 ScalarApproach_StepQuarter(s32, s32);
 s32 TerrainModifiers_FindCellOverride(s32, s32);
 void Sound_PlaySong(u32);
-extern u8 *gTerrainMap;
-extern s32 gTerrainWidth;
-extern s32 gTerrainHeight;
 
 // Next value from the shared random table (table at 0x0203B400, index at 0x03005308).
 static inline u16 sub_081A14FC_Next(void)
@@ -168,13 +166,14 @@ void sub_081A14FC(struct Sub081A14FCSelf *s, u32 frame)
                 s32 override;
                 u8 *p;
                 u8 v;
-                if (cx >= 0 && cy >= 0 && cx < gTerrainWidth && cy < gTerrainHeight)
-                    cell = ((u16 *)(gTerrainMap + 0x24))[cy] + cx;
+                if (cx >= 0 && cy >= 0 && cx < (*(s32 *)&gTerrainWidth) &&
+                    cy < (*(s32 *)&gTerrainHeight))
+                    cell = ((u16 *)(((u8 *)gTerrainMap) + 0x24))[cy] + cx;
                 override = TerrainModifiers_FindCellOverride(cell, 1);
                 if (override != 0)
                     p = (u8 *) override + 4;
                 else
-                    p = *(u8 **)gTerrainMap + 4 + cell * 4 + 0xC;
+                    p = *(u8 **)((u8 *)gTerrainMap) + 4 + cell * 4 + 0xC;
                 v = *p;
                 sp2c = (v & 0xF) << 8;
                 if ((v >> 4) == 1)

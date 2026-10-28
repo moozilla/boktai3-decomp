@@ -1,8 +1,8 @@
 #include "global.h"
+#include "input.h"
 
 /* tentative: action-grid input handler for a pause-menu item screen */
 
-extern u16 gUnk_03005260[];
 void sub_0816618C(void *, s32, s32);
 void Sound_PlaySong(s32);
 void Hud_SaveSecondaryGridSelection(void *);
@@ -88,7 +88,7 @@ void PauseMenu_UpdateItemActions(u8 *p)
         SceneHud_SetPairedIcons(p, 1, 5);
     else
         SceneHud_SetPairedIcons(p, 1, -1);
-    if (1 & gUnk_03005260[1]) {
+    if (1 & gPadState[1]) {
         u8 *q;
         Sound_PlaySong(0xdd);
         Hud_SaveSecondaryGridSelection(p + 0x4384);

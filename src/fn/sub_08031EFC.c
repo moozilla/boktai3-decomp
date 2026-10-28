@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct TextState {
     u8 x, y, left, top, width, height, palette, style;
     u8 entered, mode, skip, busy, padC, choiceCount, padE, fresh, pad10, voice, toggle, lastWidth,
@@ -10,7 +11,6 @@ struct TextState {
     u8 pad20[0xE8];
     u8 depth, styles[7];
 };
-extern u16 gUnk_03005428;
 extern const s16 gUnk_086055E0[];
 void Sound_PlaySong(int);
 void TextState_PlayGlyphSound(struct TextState *p, int c)
@@ -23,7 +23,7 @@ void TextState_PlayGlyphSound(struct TextState *p, int c)
         if (p->toggle)
             goto clear;
     }
-    if (c && c != gUnk_03005428)
+    if (c && c != gSilentGlyph)
         Sound_PlaySong(gUnk_086055E0[p->voice]);
     if (!p->toggle)
         goto set;

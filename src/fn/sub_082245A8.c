@@ -1,6 +1,4 @@
 #include "global.h"
-#define gRfuSlotStatusNI gUnk_03006A70
-#define gRfuLinkStatus   gUnk_03006A80
 #include "rfu_compat.h"
 #include "rfu_manager.h"
 void RfuManager_NotifyEvent(u8, u8);

@@ -1,6 +1,6 @@
 #define SceneMenuPanel_SetCallback Hud_SetInteractionCallback
-#define gMenuKeys                  gUnk_03005260
 #include "global.h"
+#include "input.h"
 struct SceneMenuPanel {
     u8 unknown0[0x3C];
     const void *text;
@@ -9,7 +9,6 @@ struct SceneMenuPanel {
     u8 unknownA50[0x3E11];
     u8 result;
 };
-extern u16 gMenuKeys[];
 s32 MessageWindow_SetMessageTable(const void *);
 s32 MessageWindow_SetDisplayMode(s32);
 s32 MessageWindow_SetBounds(s32, s32, s32, s32);
@@ -26,7 +25,7 @@ void SceneMenuPanel_ShowTimedResult(struct SceneMenuPanel *panel)
         MessageWindow_ShowMessage(panel->result + 112);
     }
     ++panel->delay;
-    if (panel->delay > 89 || (panel->delay > 15 && (gMenuKeys[1] & 1))) {
+    if (panel->delay > 89 || (panel->delay > 15 && (gPadState[1] & 1))) {
         MessageWindow_Clear();
         SceneMenuPanel_SetCallback(panel, MenuTransition_UpdateSelectionFade, 1);
     }

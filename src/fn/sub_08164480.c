@@ -1,11 +1,11 @@
 #include "global.h"
+#include "engine_globals.h"
 
 // MATCHING_CONCESSION: register-pinning
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: energy meter plus a 4-digit timer shown below it.
 extern u8 *gGameState;
-extern u32 gEngineFlags;
 extern u16 gUnk_03005178;
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 Hud_GetStyleTileIndex(s32, s32);

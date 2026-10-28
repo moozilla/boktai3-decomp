@@ -1,11 +1,11 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
+#include "input.h"
 
 // MATCHING_CONCESSION: register-pinning
 
 extern u8 *gUnk_02000580[];
 extern u32 gUnk_02000560;
-extern u16 gUnk_03005260[];
 void SceneActorControl_OnIdle(void);
 
 struct GhostTriggerContext {
@@ -48,7 +48,7 @@ void Ghost_UpdateFacingTrigger(struct SceneActorRegistryResetView *actor)
     zero8 = 0;
     actor->direction = actor->fieldE9;
     if (!({
-            u32 buttons = gUnk_03005260[1];
+            u32 buttons = gPadState[1];
             register u32 m asm("r0");
             one = 1;
             m = 1;

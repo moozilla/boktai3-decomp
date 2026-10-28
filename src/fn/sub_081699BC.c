@@ -19,9 +19,9 @@ void SceneHud_UpdateOptionControls(struct SceneHudState *p)
             ResultPanel_DrawCappedCounters(p, 0, 3, 1);
         if (++p->pulseFrame > 127)
             p->pulseFrame = 0;
-        if (gUnk_03005260[1] & 8)
+        if (gPadState[1] & 8)
             Hud_SetUpdateCallback(p, SelectionPanel_RefreshPrimaryIfReady);
-        else if (gUnk_03005260[1] & 4) {
+        else if (gPadState[1] & 4) {
             if (p->auxiliaryToggle = WirelessGame_ToggleItemMode())
                 Anim_LoadKeyframe(&p->controlAnimation, p->controlAnimationResource, 0x1B, 1);
             else

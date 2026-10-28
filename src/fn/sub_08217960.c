@@ -1,14 +1,11 @@
 #include "global.h"
+#include "render.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 90.7%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // Remaining differences: loop setup, mask hoisting, backdrop temporaries and register allocation.
-extern s32 gBgFadeLevel, gFadeMultiplier, gBgFadeApplied;
-extern u16 *gBgPaletteSource;
-extern u16 gBgPaletteBuffer[], gBgFadeBankMask, gBgFadeColor;
-extern s16 gBackdropOverride, gBackdropColor;
 u16 *Palette_GetBackgroundBuffer(void);
 void Palette_ApplyBackgroundFade(void)
 {
@@ -104,10 +101,10 @@ void Palette_ApplyBackgroundFade(void)
     if (gBackdropOverride) {
         u32 rb = gBgFadeColor & 0x7c1f;
         u32 g = gBgFadeColor & 0x3e0;
-        s32 old = gBackdropColor;
-        gBackdropColor = ((((level * (old & 0x7c1f)) + (rb * other)) & 0xf83e0) |
-                          (((level * (old & 0x3e0)) + (g * other)) & 0x7c00)) >>
-                         5;
+        s32 old = (*(s16 *)&gBackdropColor);
+        (*(s16 *)&gBackdropColor) = ((((level * (old & 0x7c1f)) + (rb * other)) & 0xf83e0) |
+                                     (((level * (old & 0x3e0)) + (g * other)) & 0x7c00)) >>
+                                    5;
     }
     gBgFadeApplied = value;
 }

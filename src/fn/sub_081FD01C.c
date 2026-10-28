@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
+#include "engine_globals.h"
 
 #define PROJECTILE_RANDOM_TABLE ((const u16 *)0x0203B400)
 
@@ -76,7 +77,6 @@ struct Behaviors {
 };
 extern const struct Behaviors gUnk_0824FE28;
 extern const s16 gUnk_086149C4[];
-extern u32 gRandomIndex;
 void SceneProjectile_CreatePool(void);
 struct Entry *Projectile_FindFreeSlot(struct Pool *, s32 *);
 void Projectile_SetBehaviorCallback(struct Params *, void *);

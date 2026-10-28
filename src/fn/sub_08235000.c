@@ -1,9 +1,9 @@
 #include "global.h"
 #include "engine.h"
+#include "render.h"
 struct Vec50 {
     s32 x : 16, y : 16, z : 16;
 };
-extern u16 gUnk_03005418[];
 void HealthRestoreEffect_InitAnimation(u8 *);
 void HealthRestoreEffect_InitParticlePool(u8 *);
 void sub_08234DC8(u8 *);
@@ -35,9 +35,9 @@ s32 HealthRestoreEffect_Init(u8 *p, u8 *owner)
     y = sum - vertical;
     zero = 0;
     depth = sum + vertical;
-    dest[0] = dest[0] - gUnk_03005418[0] + 120;
-    dest[1] = y - gUnk_03005418[1] + 80;
-    dest[2] = depth - gUnk_03005418[2];
+    dest[0] = dest[0] - gCameraOrigin[0] + 120;
+    dest[1] = y - gCameraOrigin[1] + 80;
+    dest[2] = depth - gCameraOrigin[2];
     HealthRestoreEffect_InitAnimation(p);
     HealthRestoreEffect_InitParticlePool(p);
     *(void (**)(u8 *))(p + 0x274) = sub_08234DC8;

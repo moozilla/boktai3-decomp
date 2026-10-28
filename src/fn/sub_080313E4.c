@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 struct State {
     u8 pad0[7];
     u8 pending, entered, mode, skip;
@@ -38,7 +39,6 @@ struct Sun {
     s16 level;
 };
 extern struct Sun *gGameState;
-extern u16 gUnk_03005260[];
 void sub_080316A4(void);
 void MessageWindow_UpdateFastPlayback(void);
 int TextWindow_BlankRect(int, int, int, int);
@@ -76,11 +76,11 @@ void sub_080313E4(struct Actor *p)
     } else if (p->waitCounter >= p->waitFrames) {
         p->waitFrames = result;
         p->waitCounter = result;
-        if (gUnk_03005260[0] & 2) {
+        if (gPadState[0] & 2) {
             p->fast = 1;
             result = 1;
         }
-        if (gUnk_03005260[1] & 1)
+        if (gPadState[1] & 1)
             result = 1;
         p->flags &= ~1;
     } else {

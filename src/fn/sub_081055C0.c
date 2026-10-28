@@ -1,13 +1,13 @@
 #include "global.h"
 #include "directional_interaction.h"
 #include "callback_pool.h"
+#include "engine_globals.h"
 
 // MATCHING_CONCESSION: register-pinning
 #define CallbackPool_RunSpawnScript ProximityActor_SetState
 #define gShakeRandomTable           gUnk_0203B400
 #define gShakeRandomIndex           gRandomIndex
 extern u16 gUnk_0203B400[];
-extern u32 gRandomIndex;
 static inline u32 NextRandom(u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;

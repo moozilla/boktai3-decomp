@@ -2,6 +2,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "engine_globals.h"
 // confidence=low: per-frame update applies pending damage, starts the death sequence and steps the
 // sprite animation.
 #ifdef NONMATCHING
@@ -73,9 +74,7 @@ struct S {
     u8 p168[0x174 - 0x168];
     u8 terrain[4];
 };
-extern u32 gEngineFlags;
 extern u32 gUnk_02000560;
-extern u32 gRandomIndex;
 void AnimData_SelectPaletteBank(void *, u32 animation);
 void Collider_SetPosition(void *collider, void *position, u32 value);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);

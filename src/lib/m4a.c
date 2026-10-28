@@ -17,9 +17,6 @@
 
 extern const u8 gCgb3Vol[];
 
-/* data defined elsewhere (see symbols/ram.ld) */
-extern struct SoundInfo gSoundInfo;
-
 u32 MidiKeyToFreq(struct WaveData *wav, u8 key, u8 fineAdjust)
 {
     u32 val1;

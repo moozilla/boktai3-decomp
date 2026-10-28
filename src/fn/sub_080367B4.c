@@ -28,8 +28,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
 #include "runtime.h"
@@ -40,7 +38,6 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-extern u32 gUnk_0300546C;
 void Solar_PauseMeasurement(void);
 void Solar_ResumeMeasurement(void);
 void Task_UnlinkFromPriorityList(void *);
@@ -83,7 +80,7 @@ int Wireless_UpdateControllerTask(struct Engine *p)
         setOperation(p, zero, zero);
     }
     if (p->pad1d) {
-        gUnk_0300546C = 0;
+        gClockSynced = 0;
         gWirelessController = 0;
         Task_UnlinkFromPriorityList(p);
         Heap_Free(p);

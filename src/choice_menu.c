@@ -1,4 +1,5 @@
 #include "choice_menu.h"
+#include "input.h"
 /* ChoiceMenu_Create: non-script constructor (already aliased via #define in choice_menu.c) that creates the task, installs ChoiceMenu_Update/ChoiceMenu_Destroy as callback */
 #define ChoiceMenu_Create sub_08006CD0
 
@@ -84,7 +85,8 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
     p->leftCursor.flags &= ~1;
     p->rightCursor.flags &= ~1;
     if (p->selected < 0) {
-        if ((gUnk_03005260.pressed & 240) || (!p->wakeDelay && (gUnk_03005260.pressed & 3))) {
+        if (((*(struct ChoiceKeys *)gPadState).pressed & 240) ||
+            (!p->wakeDelay && ((*(struct ChoiceKeys *)gPadState).pressed & 3))) {
             ChoiceMenu_Select(p, p->initial);
             Sound_PlaySong(263);
         } else if (p->wakeDelay)
@@ -92,7 +94,7 @@ s32 ChoiceMenu_HandleInput(struct ChoiceMenu *p)
     } else if (p->wakeDelay)
         p->wakeDelay--;
     else {
-        struct ChoiceKeys *initialKeys = &gUnk_03005260;
+        struct ChoiceKeys *initialKeys = &(*(struct ChoiceKeys *)gPadState);
         struct ChoiceKeys *keys;
         u8 *repeat;
         u32 pressed;
@@ -442,7 +444,7 @@ s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s3
     p->allowCancel = options[2];
     p->wakeDelay = 10;
     p->repeatDelay = 0;
-    p->held = gUnk_03005260.held;
+    p->held = (*(struct ChoiceKeys *)gPadState).held;
     p->left = options[3];
     p->top = options[4];
     p->maxWidth = options[5];

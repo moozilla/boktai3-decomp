@@ -29,8 +29,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
@@ -69,7 +67,7 @@ int Wireless_UpdatePeerHandshake(struct Engine *p)
         p->mask = value;
     }
 receive:;
-    if (gUnk_03006A70[p->mode]->recv.state == 0x46) {
+    if (gRfuSlotStatusNI[p->mode]->recv.state == 0x46) {
         u8 *base = (u8 *)p + p->mode * 4;
         u8 *message;
         message = base + 0xA8;
@@ -87,13 +85,13 @@ receive:;
         second = 0xFFBF;
         mask &= second;
         p->mask = mask;
-        p->flag35 |= gUnk_03006A80->connSlotFlag | gUnk_03006A80->linkLossSlotFlag;
+        p->flag35 |= gRfuLinkStatus->connSlotFlag | gRfuLinkStatus->linkLossSlotFlag;
         return 0;
     } else {
         int connected = p->bits;
         if (connected) {
             int blocked = bits & 0x168;
-            if (!blocked && connected == gUnk_03006A80->connSlotFlag) {
+            if (!blocked && connected == gRfuLinkStatus->connSlotFlag) {
                 if (WirelessController_ConsumeAdvanceRequest(p)) {
                     setOperation(p, 9, blocked);
                     return 0;

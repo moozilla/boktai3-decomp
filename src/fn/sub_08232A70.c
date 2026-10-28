@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 // confidence=low: projects the source and positions a timed icon around the screen center.
 #define ScreenOrbitEffect_UpdateTrackingSlot sub_08232A70
 struct OrbitVec {
@@ -17,7 +18,6 @@ struct OrbitOwner {
     u8 unknown0[0x18];
     struct OrbitVec center;
 };
-extern struct OrbitVec gUnk_03005418;
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 static inline s32 Scale32(s32 n)
@@ -48,10 +48,10 @@ static inline void Project(struct OrbitVec *out, struct OrbitVec *world)
     height = Scale32(world->y * 3);
     low = sum - height;
     sum += height;
-    out->x = out->x - gUnk_03005418.x + 120;
-    out->y = low - gUnk_03005418.y + 80;
+    out->x = out->x - (*(struct OrbitVec *)gCameraOrigin).x + 120;
+    out->y = low - (*(struct OrbitVec *)gCameraOrigin).y + 80;
     /* The translated depth is stored as a halfword. */
-    sum -= (u16)gUnk_03005418.z;
+    sum -= (u16)(*(struct OrbitVec *)gCameraOrigin).z;
     out->z = sum;
 }
 

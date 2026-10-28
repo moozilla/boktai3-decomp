@@ -1,7 +1,6 @@
 /* RFU_V1024 interrupt source from pinned pret/pokeemerald; docs/RFU.md. */
 // COMPILER: agbcc_arm
 // CFLAGS: -O2 -mthumb-interwork
-#define gSTWIStatus gUnk_03006A50
 #define IntrSIO32 sub_08244A38
 #define sio32intr_clock_master sub_08244A9C
 #define sio32intr_clock_slave sub_08244D2C

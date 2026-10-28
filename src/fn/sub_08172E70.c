@@ -1,7 +1,7 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #include "scene_hud_display.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 u32 SceneInput_NavigateGridKeys(void *, u32);
 void SceneHud_SetActionCursorPosition(void *, u32);
 void SceneHud_ShowSelectionDescription(void *);
@@ -34,7 +34,7 @@ void SceneHud_UpdateActionTransferSelection(struct SceneHudState *p)
     if (value <= 7)
         mode = 0;
     MenuDisplay_UpdateActionPrompt(p, mode);
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         u8 *source;
         u32 current;
         if (p->actionInput[1] <= 1) {
@@ -72,7 +72,7 @@ void SceneHud_UpdateActionTransferSelection(struct SceneHudState *p)
         p->categoryWidgets[p->actionSelection + 10].flags |= 1;
         p->categoryWidgets[p->actionCursor + 10].flags |= 1;
         Hud_SetInteractionCallback(p, SceneHud_FinishActionTransfer, 1);
-    } else if (gUnk_03005260[1] & 2) {
+    } else if (gPadState[1] & 2) {
         Hud_SetInteractionCallback(p, SceneHud_UpdateActionChoice, 1);
         SceneHud_ConfigureActionGrid(grid, 0, 0);
         p->categoryWidgets[6].flags |= 1;

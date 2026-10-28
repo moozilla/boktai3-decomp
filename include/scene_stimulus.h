@@ -16,6 +16,7 @@ struct SceneStimulusState {
     s32 ids[16]; /* exclusion-region ids */
 };
 
+/* 0x030025FC */
 extern struct SceneStimulusState *gSceneStimulusState;
 
 #endif

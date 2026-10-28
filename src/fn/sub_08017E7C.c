@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "engine_globals.h"
 struct Weather {
     u8 pad[24];
     u32 timer;
@@ -10,7 +11,6 @@ struct Weather {
 };
 extern u8 *gGameState;
 extern u16 gUnk_0203B400[];
-extern u32 gRandomIndex;
 void Palette_SetBrightnessMode(int);
 void Script_Call(void *, int);
 void Weather_EnterPhase(void *, int);

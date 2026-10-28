@@ -17,7 +17,7 @@ void sub_0800F4EC(struct NumericOverlay *unused)
     int row, col, n, base;
     register int *values asm("ip");
     u32 hours, minutes;
-    struct StatusGameState *c = &gUnk_03005430;
+    struct StatusGameState *c = &gSunClock;
     if (!c)
         return;
     if (c->mode == 0 || c->mode == 4 || c->mode == 5) {
@@ -125,7 +125,7 @@ s32 sub_0800F6F8(struct NumericOverlay *p, u16 id)
     p->flags = Script_GetKeywordValue('f', 0);
     p->mapId = 0x5AF3;
     p->paletteId = Script_GetKeywordValue('p', 0);
-    p->buffer = gUnk_03005160;
+    p->buffer = gBgPaletteBank13;
     p->bg = 0;
     map = ScriptProc_Start(0xC091, p->mapId);
     if (!map)

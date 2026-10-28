@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 
 struct TimePanel {
     u8 f0[0x80];
@@ -15,7 +16,6 @@ struct TimePanel {
     u8 selMax;
     u8 holdState;
 };
-extern u16 gUnk_03005260[];
 extern u8 gUnk_0860654C[];
 void Anim_SelectWidgetGlyph(void *, void *, u32);
 void RecordPanel_RefreshEntryLabels(struct TimePanel *);
@@ -28,12 +28,12 @@ void sub_0810DE88(struct TimePanel *p)
     u16 *keys;
     s32 changed = 0;
     if (p->cursorMax != 0) {
-        if (gUnk_03005260[1] & 0x220) {
+        if (gPadState[1] & 0x220) {
             p->cursor--;
             if (p->cursor < p->cursorMin)
                 p->cursor = p->cursorMax;
             changed = 1;
-        } else if (gUnk_03005260[1] & 0x110) {
+        } else if (gPadState[1] & 0x110) {
             p->cursor++;
             if (p->cursor > p->cursorMax)
                 p->cursor = p->cursorMin;
@@ -54,18 +54,18 @@ void sub_0810DE88(struct TimePanel *p)
         }
     }
     {
-        if (gUnk_03005260[1] & 0x40) {
+        if (gPadState[1] & 0x40) {
             p->selA--;
             if (p->selA < 0)
                 p->selA = p->selMax;
             changed = 1;
-        } else if (gUnk_03005260[1] & 0x80) {
+        } else if (gPadState[1] & 0x80) {
             p->selA++;
             if (p->selA > p->selMax)
                 p->selA = 0;
             changed = 1;
         }
-        keys = gUnk_03005260;
+        keys = gPadState;
         if (keys[0] & 0x40) {
             if (p->holdState & 0x80)
                 p->repeat = 0;

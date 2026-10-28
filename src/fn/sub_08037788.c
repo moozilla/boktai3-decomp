@@ -17,9 +17,8 @@ struct PeerMenu {
     u8 pad4f0[0x104];
     u8 draw[8];
 };
-#define gRfuLinkStatus gUnk_03006A80
 #include "rfu_compat.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 int Wireless_GetConnectedSlotMask(void);
 int Wireless_GetPeerHandshakeData(void);
 void TextWindow_Refresh(int, int);
@@ -43,13 +42,13 @@ void WirelessPeerMenu_UpdatePeerConfirmation(struct PeerMenu *p)
     }
     if (connected != p->previous) {
         r = p->rows;
-        if (connected && (connected == gUnk_03006A80->connSlotFlag)) {
+        if (connected && (connected == gRfuLinkStatus->connSlotFlag)) {
             if (Wireless_GetPeerHandshakeData()) {
                 u8 *name;
                 void *draw;
                 int bit;
                 i = 0;
-                alias = gUnk_03006A80->connSlotFlag;
+                alias = gRfuLinkStatus->connSlotFlag;
                 {
                     int tested = alias & 1;
                     bit = tested;
@@ -57,7 +56,7 @@ void WirelessPeerMenu_UpdatePeerConfirmation(struct PeerMenu *p)
                 name = p->name;
                 draw = ((u8 *)p) + 0x2d8;
                 if (!bit) {
-                    struct RfuLinkStatus **links = &gUnk_03006A80;
+                    struct RfuLinkStatus **links = &gRfuLinkStatus;
                     /* do-while(0) only keeps agbcc's block layout */
                     do {
                         i++;
@@ -69,9 +68,9 @@ void WirelessPeerMenu_UpdatePeerConfirmation(struct PeerMenu *p)
                 }
                 r = p->rows;
                 Memory_Clear(name, 24);
-                WirelessText_DecodeString(gUnk_03006A80->partner[i].gname, name, 11);
+                WirelessText_DecodeString(gRfuLinkStatus->partner[i].gname, name, 11);
                 {
-                    u8 *packet = gUnk_03006A80->partner[i].gname;
+                    u8 *packet = gRfuLinkStatus->partner[i].gname;
                     int value = packet[11] | (packet[12] << 8);
                     Anim_DrawDecimalDigits(draw, p->draw, value, 5, 0, 136, 70, 8, 0);
                 }
@@ -104,12 +103,12 @@ void WirelessPeerMenu_UpdatePeerConfirmation(struct PeerMenu *p)
         }
         p->previous = connected;
     }
-    if ((gUnk_03005260[1] & 1) && connected) {
+    if ((gPadState[1] & 1) && connected) {
         Wireless_RequestAdvanceConnection();
     }
     if (!r) {
     }
-    if (gUnk_03005260[1] & 2) {
+    if (gPadState[1] & 2) {
         if (connected) {
             Wireless_RequestDisconnectPeer();
         } else {

@@ -1,8 +1,8 @@
 #include "global.h"
 #include "scene_vec.h"
+#include "engine_globals.h"
 
 extern const s16 gUnk_086149C4[];
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 
 struct BitVec {

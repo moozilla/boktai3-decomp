@@ -2,6 +2,7 @@
 #include "player.h"
 #include "engine.h"
 #include "ram.h"
+#include "render.h"
 
 // confidence=low: chooses the closest visible list entry and derives its travel duration.
 // MATCHING_CONCESSION: register-pinning
@@ -22,7 +23,6 @@ struct MotionTargets {
     u8 unknown[0x18];
     struct MotionTarget *first;
 };
-extern u16 gUnk_03005418[];
 u16 Sqrt(u32);
 s32 Div(s32, s32);
 static inline s32 Project(s32 input)
@@ -50,9 +50,9 @@ static inline void ProjectPosition(struct TargetPosition *src, struct TargetPosi
     height = Project(src->y);
     y = projectedDepth - height;
     projectedZ = projectedDepth + height;
-    dst->x = (dst->x - gUnk_03005418[0]) + 120;
-    dst->y = (y - gUnk_03005418[1]) + 80;
-    dst->z = projectedZ - gUnk_03005418[2];
+    dst->x = (dst->x - gCameraOrigin[0]) + 120;
+    dst->y = (y - gCameraOrigin[1]) + 80;
+    dst->z = projectedZ - gCameraOrigin[2];
 }
 
 struct MotionTarget *Player_SelectNearestMotionTarget(struct Player *arg, u32 limit)

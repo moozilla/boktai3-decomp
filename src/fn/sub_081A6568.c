@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct Vec3s {
     s16 x, y, z;
 };
@@ -6,7 +7,6 @@ struct PositionedObject {
     u8 pad0[8];
     struct Vec3s pos;
 };
-extern u16 gUnk_03005418[];
 void BgGfx_LoadTilemapAtPosition(u32, s32, s32);
 static inline s32 Shift5(s32 x)
 {
@@ -33,8 +33,8 @@ void ScreenPalette_ProjectPositionAt88(struct PositionedObject *obj)
 {
     struct Vec3s d;
     Project(&d, &obj->pos);
-    d.x = gUnk_03005418[0] - d.x;
-    d.y = gUnk_03005418[1] - d.y;
-    d.z = d.z - gUnk_03005418[2];
+    d.x = gCameraOrigin[0] - d.x;
+    d.y = gCameraOrigin[1] - d.y;
+    d.z = d.z - gCameraOrigin[2];
     BgGfx_LoadTilemapAtPosition(2, d.x + 0x88, d.y + 0x6c);
 }

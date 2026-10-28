@@ -1,7 +1,6 @@
 #include "global.h"
 #include "ram.h"
-extern u32 gSpriteRenderCallback, gExtraRenderCallback, gProjectedSpriteCallback;
-extern s32 gGrayscaleControl;
+#include "render.h"
 void Palette_ResetObjectAllocation(void);
 void ObjGfx_ResetAllocationCounters(void);
 void sub_08249238(u32);
@@ -20,12 +19,12 @@ u32 InterruptsAndVideo_OnGraphicsUpdateTask(void)
     sub_08249238(gExtraRenderCallback);
     sub_08249238(gProjectedSpriteCallback);
     SpriteOam_FinalizeQueue();
-    if (gGrayscaleControl) {
+    if ((*(s32 *)&gGrayscaleControl)) {
         sub_08217C7C();
         sub_08217BBC();
-        if (gGrayscaleControl > 0)
-            gGrayscaleControl--;
-        if (!gGrayscaleControl)
+        if ((*(s32 *)&gGrayscaleControl) > 0)
+            (*(s32 *)&gGrayscaleControl)--;
+        if (!(*(s32 *)&gGrayscaleControl))
             Palette_RefreshObjectBanks();
     } else {
         Palette_ApplyBackgroundFade();

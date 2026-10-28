@@ -29,14 +29,13 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 
 // The original caller saw an int-width prototype for rfu_clearSlot (u8, u8 in
 // the SDK header): its argument order only matches with int parameters.
 #define rfu_clearSlot rfu_clearSlot_sdk
 #include "rfu_compat.h"
 #include "ram.h"
+#include "input.h"
 #undef rfu_clearSlot
 u16 rfu_clearSlot(int connTypeFlag, int slotStatusIndex);
 static inline void setOperation(struct Engine *p, int op, int zero)
@@ -49,7 +48,6 @@ static inline void setOperation(struct Engine *p, int op, int zero)
 int Wireless_BeginChildTransfer(struct Engine *);
 void Wireless_SetStatus(int);
 void RfuManager_RequestMscCycleCompletion(void);
-extern u16 gUnk_03005260[];
 static inline void requestUpdate(struct Engine *p)
 {
     int flags = p->mask;
@@ -87,7 +85,7 @@ int Wireless_UpdateChildHandshake(struct Engine *p)
     if (p->pending)
         p->pending = 0;
     {
-        struct RfuSlotStatusNI **slots = gUnk_03006A70;
+        struct RfuSlotStatusNI **slots = gRfuSlotStatusNI;
         register u8 *initial asm("r3") = &p->index;
         int state;
         state = slots[*initial]->recv.state;
@@ -108,7 +106,7 @@ int Wireless_UpdateChildHandshake(struct Engine *p)
             rfu_clearSlot(8, *slot);
         }
     }
-    if (gUnk_03005260[1] & 2)
+    if (gPadState[1] & 2)
         requestUpdate(p);
     flags = p->mask;
     if (!(flags & 64))
@@ -119,7 +117,7 @@ int Wireless_UpdateChildHandshake(struct Engine *p)
 send:;
     flags = p->mask;
     if (!(flags & 2)) {
-        if (!gUnk_03006A80->linkLossSlotFlag) {
+        if (!gRfuLinkStatus->linkLossSlotFlag) {
             u8 *data;
             int one = 1;
             asm("" : "+r"(one));
@@ -159,7 +157,7 @@ send:;
             goto complete;
     }
     {
-        struct RfuSlotStatusNI **slots = gUnk_03006A70;
+        struct RfuSlotStatusNI **slots = gRfuSlotStatusNI;
         int index;
         int state;
         index = *slot;

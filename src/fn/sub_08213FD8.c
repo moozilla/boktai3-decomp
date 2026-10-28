@@ -7,9 +7,6 @@
 struct Dma {
     vu32 src, dest, control;
 };
-extern u16 gUnk_03004270;
-extern u32 gUnk_03004278, gUnk_03003A00;
-extern s16 gUnk_03004274;
 void m4aSoundVSync(void);
 u32 WirelessController_IsCreated(void);
 void RfuManager_CheckVBlankSync(void);
@@ -65,13 +62,13 @@ void sub_08213FD8(void)
                 *ref = (xy[1] & 0x0fff0000) >> 16;
             }
         }
-        mode = gUnk_03004274;
+        mode = gScanlineDmaMode;
         if (mode) {
             register u32 count asm("r1");
             *(vu32 *)0x040000b8 = 0;
-            *(vu32 *)0x040000b0 = gUnk_03004278;
-            *(vu32 *)0x040000b4 = gUnk_03003A00;
-            count = gUnk_03004270;
+            *(vu32 *)0x040000b0 = (u32)gScanlineDmaSource;
+            *(vu32 *)0x040000b4 = (u32)gScanlineDmaTarget;
+            count = gScanlineDmaCount;
             if (mode != 1)
                 *(vu32 *)0x040000b8 = 0xa6600000 | count;
             else

@@ -1,6 +1,5 @@
-#define gBackgroundPalette gUnk_03005160
 #include "global.h"
-extern u16 gUnk_03005160[];
+#include "render.h"
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void Bg_SetLayerMap(u32, void *, u16);
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
@@ -15,5 +14,5 @@ void StatGauge_ResetBackground(struct StatGaugePreview *p)
     Bg_SetupLayers(0, 0, p->map, 0, 0, 1, &zero);
     Bg_SetLayerMap(0, p->map, 0);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
-    CpuSet(p->palette, gBackgroundPalette, 0x04000018);
+    CpuSet(p->palette, gBgPaletteBank13, 0x04000018);
 }

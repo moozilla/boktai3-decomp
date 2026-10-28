@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "runtime.h"
 struct RegionEntry {
     u16 group;
     u16 name;
@@ -10,8 +11,7 @@ struct TimeState {
     u8 pad0[0x18];
     u32 region;
 };
-extern struct TimeState *gSessionState;
-extern u8 gUnk_03005430[];
+extern u8 gSunClock[];
 s32 Script_GetValueSafe(void);
 u8 *Script_SetPc(u8 *pc);
 s32 Script_ReadValue(const void *);
@@ -39,11 +39,11 @@ void Time_OnLoadSave(void)
             entries[n].latitude = Script_GetValue();
         }
     }
-    region = gSessionState->region;
+    region = ((struct TimeState *)gSessionState)->region;
     if (region - 1 > 52) {
-        gSessionState->region = 6;
+        ((struct TimeState *)gSessionState)->region = 6;
         region = 6;
     }
     Time_CalculateSunriseSunset(entries[region].latitude, entries[region].longitude, 0);
-    gUnk_03005430[9] = 0;
+    gSunClock[9] = 0;
 }

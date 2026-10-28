@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_hud_display.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 void Sound_PlaySong(u32);
 void Hud_SaveSecondaryGridSelection(void *);
 void SceneHud_SetActionCursorPosition(void *, u32);
@@ -26,7 +26,7 @@ static inline u8 *SceneHud_GetActionInput(u8 *p)
 }
 void SceneHud_UpdateSecondaryActionSelection(u8 *p)
 {
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         u8 *grid;
         u8 *selected;
         Sound_PlaySong(0xdd);

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct Vec3 {
     s16 x, y, z;
@@ -23,7 +24,6 @@ struct PositionOwner {
     struct Vec3 position;
 };
 extern struct PositionOwner *gGameState;
-extern struct Vec3 gUnk_03005418;
 void Anim_SetKeyframes(void *, void *, u32, u32, u32);
 void ScaledShadow_Enable(void *);
 s32 __divsi3(s32, s32);
@@ -45,15 +45,15 @@ static inline void ProjectPosition(struct Vec3 *out, struct Vec3 *in)
     b = TruncateShift(3 * in->y, 5);
     c = a - b;
     d = a + b;
-    out->x = out->x - gUnk_03005418.x + 120;
-    out->y = c - gUnk_03005418.y + 80;
-    out->z = d - gUnk_03005418.z;
+    out->x = out->x - (*(struct Vec3 *)gCameraOrigin).x + 120;
+    out->y = c - (*(struct Vec3 *)gCameraOrigin).y + 80;
+    out->z = d - (*(struct Vec3 *)gCameraOrigin).z;
 }
 static inline void UnprojectPosition(struct Vec3 *out, struct Vec3 *in, s32 height)
 {
     s32 x, y, value;
-    x = in->x + gUnk_03005418.x - 120;
-    y = in->y + gUnk_03005418.y - 80;
+    x = in->x + (*(struct Vec3 *)gCameraOrigin).x - 120;
+    y = in->y + (*(struct Vec3 *)gCameraOrigin).y - 80;
     value = __divsi3((x + y) << 5, 3) + height;
     out->x = TruncateShift(value, 1);
     out->y = height;

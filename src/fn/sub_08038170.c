@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "engine_globals.h"
 // MATCHING_CONCESSION: register-pinning
 // Tentative panel/save fields for selecting two available entries in each group.
 struct P {
@@ -17,7 +18,6 @@ struct ItemInfo {
     u8 pad[31];
 };
 extern struct Save *gGameState;
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 int Mod(int, int);
 void Inventory_GetEquippedDescriptor(int, struct ItemInfo *);

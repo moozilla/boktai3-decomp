@@ -1,6 +1,7 @@
 #include "global.h"
 #include "actor_animation_controller.h"
 #include "render.h"
+#include "input.h"
 
 // Provisional name: ActorPalette_BeginFade
 
@@ -184,8 +185,6 @@ struct Vec {
     s16 x, y, z;
 };
 
-extern const u16 gUnk_03005418[];
-
 static inline s32 project(s32 input)
 {
     s32 v = input * 3;
@@ -201,9 +200,9 @@ static inline void screen(struct Vec *dst, struct Vec *src)
     height = project(src->y);
     y = depth - height;
     z = depth + height;
-    dst->x = dst->x - gUnk_03005418[0] + 120;
-    dst->y = y - gUnk_03005418[1] + 80;
-    dst->z = z - gUnk_03005418[2];
+    dst->x = dst->x - gCameraOrigin[0] + 120;
+    dst->y = y - gCameraOrigin[1] + 80;
+    dst->z = z - gCameraOrigin[2];
 }
 
 // Project the actor into screen space and clamp it to the visible display.
@@ -229,8 +228,6 @@ void Actor_ProjectAndClampToScreen(struct ActorAnimController *p)
 // Provisional name: Actor_TryInteraction
 
 extern u8 *gGameState;
-
-extern u16 gUnk_03005260[];
 
 u8 Math_Atan2(s32, s32);
 
@@ -299,7 +296,7 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
         height = -height;
     if (height > 119)
         return;
-    if (!(gUnk_03005260[1] & 1))
+    if (!(gPadState[1] & 1))
         return;
     if (gEnginePauseFlags & 4)
         return;
@@ -490,7 +487,7 @@ void Actor_RestoreSavedAnimationPlayback(u8 *p)
 
 /* Tentative role: arm the idle animation transition at its resting position. */
 
-extern u8 gUnk_03005430[];
+extern u8 gSunClock[];
 
 /* Provisional name: Actor_UpdateIdleWait */
 
@@ -523,7 +520,7 @@ void Actor_ArmRestIdleTransition(struct ActorAnimController *p)
     if (p->obj.x == 25 && p->obj.z == 0 && absolute(p->obj.y - 102) <= 9) {
         p->timer = 0;
         p->fn = Actor_UpdateIdleWait;
-        if (gUnk_03005430[14] == 5 || gUnk_03005430[14] == 0 || gUnk_03005430[14] == 4)
+        if (gSunClock[14] == 5 || gSunClock[14] == 0 || gSunClock[14] == 4)
             p->delay = 1800;
         else
             p->delay = 10800;
@@ -543,9 +540,9 @@ void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *);
 // MATCHING_CONCESSION: register-pinning
 void Actor_UpdateIdleWait(struct ActorAnimController *p)
 {
-    if (*(s32 *)gUnk_03005260) {
+    if (*(s32 *)gPadState) {
         p->timer = 0;
-        if (gUnk_03005430[14] == 5 || gUnk_03005430[14] == 0 || gUnk_03005430[14] == 4)
+        if (gSunClock[14] == 5 || gSunClock[14] == 0 || gSunClock[14] == 4)
             p->delay = 1800;
         else
             p->delay = 10800;
@@ -626,7 +623,7 @@ void ActorShadow_Enable(void *);
 // MATCHING_CONCESSION: register-pinning
 void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *p)
 {
-    if (*(s32 *)gUnk_03005260) {
+    if (*(s32 *)gPadState) {
         p->interrupted = 1;
         p->count = 0;
     }
@@ -686,7 +683,7 @@ void Actor_UpdateInteractionSoundDelay(struct ActorAnimController *p)
 {
     if (--p->delayCounter == 0) {
         p->otherFn = 0;
-        if ((u8)(gUnk_03005430[14] - 1) <= 2)
+        if ((u8)(gSunClock[14] - 1) <= 2)
             Sound_PlaySong(0x120);
         else
             SunClock_GetBaseHour();
@@ -1477,7 +1474,7 @@ void Actor_OnInteractionChildDelay(struct ActorAnimController *input, struct Act
     struct ActorAnimController *p = input;
     if (child_take_v2(c)) {
         p->timer = 10;
-        if (gUnk_03005430[14] != 5 && gUnk_03005430[14] != 0 && gUnk_03005430[14] != 4)
+        if (gSunClock[14] != 5 && gSunClock[14] != 0 && gSunClock[14] != 4)
             *((u8 *)p + 0xf6f) = 1;
         else
             *((u8 *)p + 0xf6f) = 0;
@@ -2450,7 +2447,7 @@ void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
             p->targetX = 25;
             p->targetY = 102;
             p->targetZ = 0;
-        } else if (gUnk_03005430[14] != 5 && gUnk_03005430[14] != 0 && gUnk_03005430[14] != 4) {
+        } else if (gSunClock[14] != 5 && gSunClock[14] != 0 && gSunClock[14] != 4) {
             p->targetX = 25;
             p->targetY = 92;
             p->targetZ = 0;
@@ -4703,7 +4700,7 @@ void Actor_ConfigureFromScript(void)
     if (Script_SeekToKeyword(0x63))
         W(0xf50) = Script_GetValue();
     g->phaseSelect = Script_GetKeywordValue(0x73, 0);
-    if (gUnk_03005430[14] != 5 && gUnk_03005430[14] != 0 && gUnk_03005430[14] != 4)
+    if (gSunClock[14] != 5 && gSunClock[14] != 0 && gSunClock[14] != 4)
         g->growFlag = 1;
     else
         g->growFlag = 0;

@@ -15,7 +15,7 @@ int PaletteSet_Update(struct PaletteSet *p)
 {
     int amount = Palette_GetTransitionLevel(), changed = 0, i;
     struct PaletteSetEntry *palette;
-    if (p->current != gUnk_03005430[14]) {
+    if (p->current != gSunClock[14]) {
         Palette_GetStateBlendIndices(&p->from, &p->to);
         goto refresh;
     }
@@ -39,8 +39,8 @@ int PaletteSet_Update(struct PaletteSet *p)
         Palette_CacheObjectBank(p->palettes[i].slot, p->palettes[i].colors);
         gObjPaletteReserved++;
     }
-    p->previous = gUnk_03005430[15];
-    p->current = gUnk_03005430[14];
+    p->previous = gSunClock[15];
+    p->current = gSunClock[14];
     return 0;
 }
 
@@ -81,8 +81,8 @@ int PaletteSet_Initialize(struct PaletteSet *p, u16 id)
     }
     Palette_GetStateBlendIndices(&p->from, &p->to);
     p->blend = 64;
-    p->previous = gUnk_03005430[15];
-    p->current = gUnk_03005430[14];
+    p->previous = gSunClock[15];
+    p->current = gSunClock[14];
     p->overlay = 0;
     for (i = 0; i < p->count; i++) {
         PaletteSet_BlendSourceColors(p, &p->palettes[i]);

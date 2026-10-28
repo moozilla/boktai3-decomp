@@ -2,8 +2,8 @@
 #define gShakeRandomIndex gRandomIndex
 #include "global.h"
 #include "callback_pool.h"
+#include "engine_globals.h"
 extern u16 gUnk_0203B400[];
-extern u32 gRandomIndex;
 s32 Mod(s32, s32);
 static inline u16 CallbackPool_NextRandom(void)
 {

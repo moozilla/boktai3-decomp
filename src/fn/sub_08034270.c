@@ -1,6 +1,7 @@
 #include "global.h"
 #include "ram.h"
 #include "rfu_manager.h"
+#include "rfu_compat.h"
 struct Engine {
     u8 pad0[0x18];
     u8 pad18, bits, pad1a, entered, flag, pad1d, state, flag1f, mode, index;
@@ -33,17 +34,16 @@ void Memory_Clear(void *, int);
 struct Record {
     u8 pad0, mode, pad2[6], count, pad9[13], status, pad17[9];
 };
-extern struct Record *gUnk_03006A80;
 void WirelessController_RebuildAvailablePeerList(struct Engine *p)
 {
     int i;
     int left, right, limit;
     p->count = 0;
     i = 0;
-    for (; i < gUnk_03006A80->count; i++) {
+    for (; i < ((struct Record *)gRfuLinkStatus)->count; i++) {
         if ((p->allowed >> i) & 1) {
             {
-                struct Record *base = gUnk_03006A80;
+                struct Record *base = ((struct Record *)gRfuLinkStatus);
                 int offset;
                 offset = i << 5;
                 base = (struct Record *)((u32)base + offset);

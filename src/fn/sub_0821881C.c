@@ -21,7 +21,6 @@ struct Drawable {
     u8 pad1e[4];
     struct Drawable *next;
 };
-extern u16 gUnk_03005418[];
 static inline s32 UnsignedScale(u8 v)
 {
     return v;
@@ -72,9 +71,9 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
                 height = project(in->y);
                 y = depth - height;
                 z = depth + height;
-                out->x = out->x - gUnk_03005418[0] + 120;
-                out->y = y - gUnk_03005418[1] + 80;
-                out->z = z - gUnk_03005418[2];
+                out->x = out->x - gCameraOrigin[0] + 120;
+                out->y = y - gCameraOrigin[1] + 80;
+                out->z = z - gCameraOrigin[2];
             }
             x = pos.x;
             y = pos.y;

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 struct Camera {
     u8 pad[0x7e];
     u16 shake;
@@ -9,8 +10,6 @@ struct Camera {
 struct Vec {
     s16 x, y, z;
 };
-extern struct Camera *gActiveCamera;
-extern struct Vec gUnk_03005418;
 static inline s32 scale(s32 input)
 {
     s32 value = input * 3;
@@ -44,12 +43,12 @@ static inline void project(struct Vec *out, struct CameraPosition *in)
 }
 void sub_082260D8(void)
 {
-    if (gActiveCamera) {
-        gCamera.position.x -= gActiveCamera->offsetX;
-        gCamera.position.z -= gActiveCamera->offsetZ;
-        project(&gUnk_03005418, &gCamera.position);
-        gActiveCamera->shake = 0;
-        gActiveCamera->offsetX = 0;
-        gActiveCamera->offsetZ = 0;
+    if (((struct Camera *)gActiveCamera)) {
+        gCamera.position.x -= ((struct Camera *)gActiveCamera)->offsetX;
+        gCamera.position.z -= ((struct Camera *)gActiveCamera)->offsetZ;
+        project(&gCameraOrigin, &gCamera.position);
+        ((struct Camera *)gActiveCamera)->shake = 0;
+        ((struct Camera *)gActiveCamera)->offsetX = 0;
+        ((struct Camera *)gActiveCamera)->offsetZ = 0;
     }
 }

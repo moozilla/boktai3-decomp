@@ -2,6 +2,8 @@
 #define HOMING_EFFECT_H
 #include "global.h"
 #include "player.h"
+#include "engine_globals.h"
+#include "ram.h"
 
 // Tentative: a pool of six particle effects (each four sprites) that drift around, home in on the
 // player actor and apply an effect to it when they arrive. Owned by a task (struct EffectManager).
@@ -75,8 +77,6 @@ typedef s32 (*EffectParticleUpdate)(struct EffectManager *, struct Effect *, s32
 extern struct EffectManager *gEffectManager;
 extern s16 gUnk_086149C4[];
 extern u32 gUnk_02000560;
-extern u32 gEngineFlags, gScenePauseFlags;
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern struct EffectAnimId gUnk_08604A30[][3];
 extern u32 gUnk_08604A60[];

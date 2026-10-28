@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 // Remaining: input/array address allocation and constant scheduling.
 struct AllocHud {
     u8 pad[0x48a8];
@@ -16,7 +17,6 @@ struct AllocSprite {
     u32 pad[2];
     u32 flags;
 };
-extern u16 gUnk_03005260[];
 void ResultPanel_DrawCappedCounters(void *, s32, s32, s32);
 void ResultPanel_DrawCappedSmallCounters(void *, s32, s32, s32);
 void PauseMenu_HidePromptIcons(void *);
@@ -55,7 +55,7 @@ void Presentation_UpdateAllocationSelection(u8 *p)
         }
         counts++;
     }
-    if (!any && (gUnk_03005260[0] & 4)) {
+    if (!any && (gPadState[0] & 4)) {
         u8 *modifier = p + 0xa58;
         any = 1;
         *modifier = any;
@@ -134,13 +134,13 @@ void Presentation_UpdateAllocationSelection(u8 *p)
         InventoryGrid_LayoutStatMarkers(p);
         Sound_PlaySong(0x19a);
     } else {
-        if ((gUnk_03005260[1] & 1) && p[0xa58]) {
+        if ((gPadState[1] & 1) && p[0xa58]) {
             Sound_PlaySong(0xdd);
             p[0x48ab] = 24;
             PauseMenu_SetConfirmationIndicator(p, 0);
             MenuDisplay_SetPaletteOverrides(p, 0, 0, 1, any);
             Hud_SetInteractionCallback(p, MenuSelection_ProcessConfirmation, 1);
-        } else if (gUnk_03005260[1] & 2) {
+        } else if (gPadState[1] & 2) {
             Sound_PlaySong(0xde);
             Presentation_InitListValues(p);
             Presentation_DrawEntryCount(p);

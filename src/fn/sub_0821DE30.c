@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "runtime.h"
+#include "input.h"
 // fix.py best (sweep after the inlined-insn fix)
 struct TrapPosition {
     s16 x, y, z;
@@ -14,12 +15,11 @@ struct TrapRectangle {
     s16 minX, minZ, maxX, maxZ;
     u8 pad8[4];
 };
-extern u16 gUnk_03005260[];
 void Trap_DispatchEvent(struct TrapProbe *, struct TerrainTrap *, u16);
 static inline u32 Pressed(struct TerrainTrap *trap)
 {
     if (trap->flags & 16) {
-        u32 value = gUnk_03005260[1] & trap->f20;
+        u32 value = gPadState[1] & trap->f20;
         return (-value | value) >> 31;
     }
     return 1;

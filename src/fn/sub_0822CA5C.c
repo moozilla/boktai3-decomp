@@ -1,7 +1,7 @@
 // COMPILER: old_agbcc
 #include "global.h"
+#include "runtime.h"
 extern u8 *gGameState;
-extern u16 gUnk_030054C0, gUnk_030054C4;
 void Solar_UpdateMeasurement(void);
 void Solar_InitControllerState(u8 *p)
 {
@@ -13,6 +13,6 @@ void Solar_InitControllerState(u8 *p)
         *(u16 *)(p + 0x20) = zero;
         *(u16 *)(p + 0x22) = zero;
     }
-    *(u16 *)(gGameState + 0x874) = gUnk_030054C0;
-    *(u16 *)(gGameState + 0x876) = gUnk_030054C4;
+    *(u16 *)(gGameState + 0x874) = gSolarSavedLevel;
+    *(u16 *)(gGameState + 0x876) = gSolarSavedCachedLevel;
 }

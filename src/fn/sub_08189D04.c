@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 74.9%
@@ -33,7 +34,6 @@ struct ArmorDecisionTarget {
     s16 x, y, z;
 };
 extern struct ArmorDecisionTarget *gGameState;
-extern u32 gRandomIndex;
 void ActorController_SetBehavior(void *, s32);
 void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);

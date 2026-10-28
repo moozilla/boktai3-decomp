@@ -4,7 +4,7 @@
 /* Recompute the spans and the phase, initializing the clock first if needed. */
 void SunClock_Refresh(void)
 {
-    if (!gUnk_0300546C)
+    if (!gClockSynced)
         Clock_SyncFromRtc();
     SunClock_Update();
 }
@@ -12,7 +12,7 @@ void SunClock_Refresh(void)
 /* Set time A (hour, minute), one hour later in daylight-saving mode. */
 void SunClock_SetSunrise(s32 hour, s32 minute)
 {
-    struct SunClock *c = &gUnk_03005430;
+    struct SunClock *c = &gSunClock;
     c->hourA = hour;
     c->minuteA = minute;
     if (gSessionState[0xb]) {
@@ -26,7 +26,7 @@ void SunClock_SetSunrise(s32 hour, s32 minute)
 /* Set time B (hour, minute), one hour later in daylight-saving mode. */
 void SunClock_SetSunset(s32 hour, s32 minute)
 {
-    struct SunClock *c = &gUnk_03005430;
+    struct SunClock *c = &gSunClock;
     c->hourB = hour;
     c->minuteB = minute;
     if (gSessionState[0xb]) {

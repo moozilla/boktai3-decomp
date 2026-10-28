@@ -1,6 +1,6 @@
 #include "global.h"
+#include "input.h"
 /* Tentative: consumable grid selection for the pause inventory discard flow. */
-extern u16 gUnk_03005260[];
 int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void PauseInventory_RefreshConsumableDescription(void *);
@@ -24,7 +24,7 @@ void sub_08171D5C(u8 *p)
         PauseInventory_RefreshConsumableDescription(p);
         MenuDisplay_UpdateActionPrompt(p, 3);
     }
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         u8 *slot;
         s32 equipped;
         Hud_SaveGridSelection(grid);
@@ -39,7 +39,7 @@ void sub_08171D5C(u8 *p)
             Hud_SetInteractionCallback(p, MotionSequence_ResolveSelection, 1);
             MenuDisplay_SetPaletteOverrides(p, 0, 0, 1, equipped);
         }
-    } else if (gUnk_03005260[1] & 2) {
+    } else if (gPadState[1] & 2) {
         Sound_PlaySong(0xDE);
         PauseInventory_ReturnToConsumableActions(p);
     }

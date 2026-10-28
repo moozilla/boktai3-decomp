@@ -20,7 +20,6 @@ struct Sprite {
     u32 previous;
     struct Sprite *next;
 };
-extern u16 gUnk_03005418[];
 void sub_08214600(struct Sprite *, s32, s32, s32);
 static inline s32 project(s32 input)
 {
@@ -36,9 +35,9 @@ static inline void screen(struct Vec *dst, struct Vec *src)
     height = project(src->y);
     y = depth - height;
     z = depth + height;
-    dst->x = dst->x - gUnk_03005418[0] + 120;
-    dst->y = y - gUnk_03005418[1] + 80;
-    dst->z = z - gUnk_03005418[2];
+    dst->x = dst->x - gCameraOrigin[0] + 120;
+    dst->y = y - gCameraOrigin[1] + 80;
+    dst->z = z - gCameraOrigin[2];
 }
 // Applies signed sprite scales and flip flags when testing resource bounds.
 void Sprite_RenderScaledList(void)

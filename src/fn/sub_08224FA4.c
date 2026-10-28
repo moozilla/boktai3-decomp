@@ -1,8 +1,7 @@
 #include "global.h"
 #include "ram.h"
 #include "runtime.h"
-extern u32 gUnk_03004278, gUnk_03003A00;
-extern u16 gUnk_03004270, gUnk_03004274;
+#include "render.h"
 extern u32 gUnk_020004B4;
 void m4aMPlayAllStop(void);
 void m4aSoundVSyncOff(void);
@@ -15,10 +14,10 @@ void rfu_REQ_stopMode(void);
 u16 rfu_waitREQComplete(void);
 u32 System_ShutdownAndSoftReset(void)
 {
-    gUnk_03004278 = 0;
-    gUnk_03003A00 = 0;
-    gUnk_03004270 = 0;
-    gUnk_03004274 = 0;
+    gScanlineDmaSource = 0;
+    gScanlineDmaTarget = 0;
+    gScanlineDmaCount = 0;
+    gScanlineDmaMode = 0;
     gVideoTransferControl = 0;
     m4aMPlayAllStop();
     m4aSoundVSyncOff();

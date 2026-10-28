@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gGameState;
-extern u8 gUnk_03005430[];
+extern u8 gSunClock[];
 u32 SunClock_GetPackedDate(void);
 s32 SunClock_GetBaseHour(void), SunClock_GetBaseMinute(void);
 s32 sub_0822CAA0(void)
@@ -14,8 +14,8 @@ s32 sub_0822CAA0(void)
     minute = SunClock_GetBaseMinute();
     gs = gGameState;
     *(s32 *)(gs + 0x4e8) = minute;
-    sunHour = gUnk_03005430[12];
-    sunMinute = gUnk_03005430[13];
+    sunHour = gSunClock[12];
+    sunMinute = gSunClock[13];
     flag = 0;
     if (*(s32 *)(gs + 0x4e4) < sunHour || (*(s32 *)(gs + 0x4e4) == sunHour && minute < sunMinute))
         flag = 1;

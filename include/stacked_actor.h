@@ -1,6 +1,7 @@
 #ifndef GUARD_STACKED_ACTOR_H
 #define GUARD_STACKED_ACTOR_H
 #include "game_state.h"
+#include "engine_globals.h"
 /* Tentative identity: an actor with three vertically stacked display segments. */
 struct StackedActorPosition {
     s16 x, y, z, pad;
@@ -43,7 +44,6 @@ struct StackedActor {
     u16 unknown380, frame;
     void (*update)(struct StackedActor *);
 };
-extern u32 gRandomIndex;
 extern struct StackedActor *gStackedActor;
 void StackedActor_SetUpdate(struct StackedActor *, void (*)(struct StackedActor *));
 void StackedActor_UpdateSegments(struct StackedActor *);

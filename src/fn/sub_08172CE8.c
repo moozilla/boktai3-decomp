@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_hud_display.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 void Sound_PlaySong(u32);
 int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_SetActionCursorPosition(void *, u32);
@@ -27,10 +27,10 @@ void SceneHud_UpdateActionChoice(struct SceneHudState *p)
     if (value <= 7)
         mode = 0;
     MenuDisplay_UpdateActionPrompt(p, mode);
-    if (gUnk_03005260[1] & 2) {
+    if (gPadState[1] & 2) {
         PauseInventory_ReturnToEquipmentSelection(p);
         Sound_PlaySong(0xde);
-    } else if (1 & gUnk_03005260[1]) {
+    } else if (1 & gPadState[1]) {
         Sound_PlaySong(0xdd);
         Hud_SaveGridSelection(q);
         p->categoryWidgets[6].flags &= ~1;

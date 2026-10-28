@@ -73,7 +73,7 @@ int ScanlinePresentation_Update(struct ScanlinePresentation *p)
 {
     if (p->mode == 0)
         gObjFadeLevel = gBgFadeLevel;
-    if (p->cancellable && (gUnk_03005260[1] & 3)) {
+    if (p->cancellable && (gPadState[1] & 3)) {
         hide(&p->layers[0]);
         hide(&p->layers[1]);
         hide(&p->layers[2]);
@@ -152,7 +152,6 @@ int ScanlinePresentation_Destroy(struct ScanlinePresentation *p)
     return 0;
 }
 
-extern u8 gUnk_03004C30[];
 void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 s32 ResourceHeader_Relocate(void *, void *);
 u32 Script_GetTextSourcePc(void);
@@ -270,7 +269,7 @@ s32 sub_0800DC90(struct ScanlinePresentation *p)
         MessageWindow_ShowMessage(message);
         MessageWindow_SetBounds(0, 7, 0x1A, 2);
         w = MessageWindow_GetRemainingTextWidth();
-        q = (u16 *)gUnk_03004C30;
+        q = (u16 *)gBgRecords;
         q[16] = w * 4 - 0x78;
         Mosaic_SetParameters(0, 0, 0x11);
     } else {

@@ -9,6 +9,7 @@ struct FontResource {
     u32 narrowGlyphData, wideGlyphData;
 };
 
+/* 0x03001664 */
 extern struct FontResource *gFontResource;
 
 #endif

@@ -346,7 +346,7 @@ s32 CollisionController_UpdateAll(struct CollisionManager *input)
     s32 paused = 0;
     s32 i;
     struct CollisionSlot *p;
-    u32 mode = gUnk_03005430.mode;
+    u32 mode = gSunClock.mode;
     s32 available;
     if ((u8)(mode - 4) <= 1 || mode == 0)
         goto pause;
@@ -414,7 +414,7 @@ s32 CollisionController_InitManager(struct CollisionManager *manager, void *owne
     u32 mode;
     s32 available;
     gCollisionManager = manager;
-    mode = gUnk_03005430.mode;
+    mode = gSunClock.mode;
     if ((((u8)(mode - 4)) <= 1) || (mode == 0)) {
         goto pause;
     }

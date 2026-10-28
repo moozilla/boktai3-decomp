@@ -8,6 +8,7 @@ struct SceneBodyRegistry {
     void *first, *last;
 };
 
+/* 0x030025F8 */
 extern struct SceneBodyRegistry *gSceneBodyRegistry;
 
 #endif

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "engine_globals.h"
 struct NidhoggrEffectVector {
     u16 x, y, z, pad;
 };
@@ -26,7 +27,7 @@ struct NidhoggrAttachedEffect {
     struct NidhoggrEffectVector *anchor;
     struct NidhoggrEffectVector offset;
 };
-extern u32 gEngineFlags, gUnk_02000560;
+extern u32 gUnk_02000560;
 extern const struct NidhoggrEffectPair gUnk_0824F264, gUnk_0824F26C;
 struct NidhoggrAttachedEffect *SceneEffectPool_AllocateSlot(void *);
 void SceneEffect_ResetState(void *);

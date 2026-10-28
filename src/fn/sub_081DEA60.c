@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 /* AnimPanel_HandleClockInput: up/down (with hold repeat) changes the selected year/month/day/hour/minute field with wraparound, then refreshes the digit animations */
 
 s32 Mod(s32, s32);
@@ -11,7 +12,6 @@ struct AnimPanelKeys {
     u16 held;
     u16 pressed;
 };
-extern struct AnimPanelKeys gUnk_03005260;
 
 /* Tentative clock-setting layout of the AnimPanel task. */
 struct AnimPanelClock {
@@ -34,13 +34,13 @@ void AnimPanel_HandleClockInput(struct AnimPanelClock *p)
     s32 dir = CLOCK_DIR_NONE;
     s32 days;
 
-    if (gUnk_03005260.pressed & 0x40) {
+    if ((*(struct AnimPanelKeys *)gPadState).pressed & 0x40) {
         dir = CLOCK_DIR_UP;
-    } else if (gUnk_03005260.pressed & 0x80) {
+    } else if ((*(struct AnimPanelKeys *)gPadState).pressed & 0x80) {
         dir = CLOCK_DIR_DOWN;
-    } else if (gUnk_03005260.held & 0xC0) {
+    } else if ((*(struct AnimPanelKeys *)gPadState).held & 0xC0) {
         if (++p->repeatTimer > 14 && Mod(p->repeatTimer, 5) == 0) {
-            if (gUnk_03005260.held & 0x40)
+            if ((*(struct AnimPanelKeys *)gPadState).held & 0x40)
                 dir = CLOCK_DIR_UP;
             else
                 dir = CLOCK_DIR_DOWN;

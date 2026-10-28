@@ -1,7 +1,6 @@
-#define gSceneInputKeys gUnk_03005260
 #include "global.h"
 #include "scene_hud_display.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_GetActionIconPosition(void *, int);
 void SceneHud_ShowActionPreview(void *);
@@ -24,7 +23,7 @@ void SceneHud_UpdateActionSwap(struct SceneHudState *p)
         SceneHud_ShowActionPreview(p);
     }
     MenuDisplay_UpdateActionPrompt(p, 4);
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         cursor = &p->actionCursor;
         if (!PauseMenu_CanSwapCategoryEntries(p, *cursor, *(selection = &p->actionSelection), 4)) {
             Sound_PlaySong(0x192);
@@ -39,7 +38,7 @@ void SceneHud_UpdateActionSwap(struct SceneHudState *p)
             p->categoryWidgets[*cursor + 10].flags |= 1;
             Hud_SetInteractionCallback(p, SceneHud_FinishActionSlide, 1);
         }
-    } else if (gUnk_03005260[1] & 2) {
+    } else if (gPadState[1] & 2) {
         Hud_SetInteractionCallback(p, PauseMenu_OnSwapSelectionUpdate, 1);
         Hud_RestoreGridSelection(input);
         Hud_SetGridPosition(input, p->actionInput[1], p->actionInput[2]);

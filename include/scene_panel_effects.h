@@ -2,6 +2,7 @@
 #define GUARD_SCENE_PANEL_EFFECTS_H
 #include "engine.h"
 #include "scene_vec.h"
+#include "render.h"
 struct ScenePanel;
 /* Additional view of ScenePanel's particle and time-phase palette consumers. */
 union ScenePanelPosition {
@@ -77,5 +78,4 @@ void Effect_SetOrigin(struct ScenePanelParticle *, s32, s32);
 void Effect_SetPalette(struct ScenePanelParticle *, u32);
 u32 SunClock_GetPhase(void);
 
-extern u16 gBgPaletteBuffer[];
 #endif

@@ -29,6 +29,44 @@ python3 tools/ramlayout.py show 03004BD8
 `show` prints the row, every distinct declaration in the sources with a count, and
 how many files use the object.
 
+## Finding things by address
+
+Each shared declaration has its address on the line above it:
+
+```c
+/* 0x03004290 */
+extern u32 gRenderListIndex; /* active list index into the three render list-head pairs */
+```
+
+Go-to-definition on a name lands on the comment as well as the declaration.
+`python3 tools/ramlayout.py annotate [--range LO-HI]` writes and fixes these
+(it is idempotent and keeps clang-formatted headers formatted); `unify` writes
+the comment for every declaration it adds, and `check` reports declarations
+that lack one.
+
+Which functions touch an address, from layoutmerge's literal-pool scan of the
+ROM (run `python3 tools/layoutmerge.py` first; it writes `build/layouts/`):
+
+```bash
+python3 tools/ramlayout.py users 03004290            # row name or address; loads, stores, escapes per function
+python3 tools/ramlayout.py users 03005418 --size 8   # a range, when the row has no size
+python3 tools/ramlayout.py users 02000710 --pointee  # accesses through the pointer stored there
+```
+
+Symbols for debuggers and Ghidra come from `symbols/ram.csv`,
+`symbols/functions.csv` and `symbols/data.csv`; no build or ROM is needed:
+
+```bash
+python3 tools/symexport.py                       # build/symbols/boktai3.sym and ghidra.tsv
+python3 tools/symexport.py --sym game.sym        # `ADDR NAME` lines (no$gba, armips style)
+python3 tools/symexport.py --ghidra syms.tsv --no-placeholders
+```
+
+In Ghidra, run `tools/ghidra/ImportSymbols.java` with the TSV as its argument
+(see `tools/ghidra/README.md`): it names functions and RAM objects and adds the
+C declaration as a plate comment. mGBA reads the symbols of `build/boktai3.elf`
+directly.
+
 ## Unifying an object
 
 Drafts declare RAM locally, each with its own spelling: `gUnk_030042E4` was
@@ -69,12 +107,36 @@ A batch file has one `ADDR | DECL | NOTE` line per object. The tool:
 
 The header must compile on its own; the tool checks that first.
 
+Options for sweeps:
+
+- `--cast`: a file whose declaration differs gets the shared one with its own type as a cast
+  at each use, before the tool falls back to keeping its own declaration. Objects whose shared
+  type changes nothing in that file are taken without a cast.
+- `--range LO-HI`: only the header's rows in this address range count as shared (so an IWRAM
+  sweep of `ram.h` leaves the EWRAM rows' declarations alone).
+- `--confidence ''`: keep the rows' confidence (the default sets `low`).
+- Re-running a header's rows (`ADDR | DECL |` lines, empty note) adopts whatever is left.
+- `src/iwram_code.c` is never edited (`PROTECTED` in `ramlayout.py`); its declarations still
+  count as leftovers.
+
+Two things the tool cannot see, which the full build catches: a declaration with parentheses
+(`void (*gX[])(void)`: give the type a typedef instead), and a header edit made by hand before
+a run (the "before" compile then fails and the file is skipped). Commit hand edits to headers
+after checking their includers, then run the sweep.
+
 ### Where declarations live
 
 - `include/render.h`: the renderer block `03004280`-`0300523F` (OAM, BG affine
   and scroll shadows, palette fade state), named from the audited address map.
 - `include/engine.h`, `include/game_state.h`: engine-wide objects already declared
   there: `gGameState`, `gTerrainMap`, `gRandomIndex`, `gEngineFlags`, ....
+- `include/engine_globals.h`: the engine-wide scalars and pointers that `engine.h` and
+  `runtime.h` used to declare (`gEngineFlags`, `gRandomIndex`, `gTerrainMap`, `gTerrainWidth`,
+  `gTerrainHeight`, `gNextTaskId`, `gScriptEntryProcedure`). Light on purpose, so any draft
+  can include it; `engine.h` and `runtime.h` include it for their users.
+- `include/input.h`: the pad state `gPadState`.
+- `include/rfu_compat.h` and `include/gba/m4a_internal.h`: the librfu and MP2K library objects, under
+  their SDK names.
 - `include/ram.h`: everything else for now. It is deliberately light: scalars,
   arrays of scalars and pointers to incomplete structs, no definitions. Any draft
   can include it without tag clashes, which `engine.h` doesn't allow for about 190

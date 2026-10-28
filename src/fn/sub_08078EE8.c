@@ -1,20 +1,16 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "runtime.h"
+#include "engine_globals.h"
 
-extern u32 gEngineFlags;
 extern u8 *gGameState;
 extern u32 gUnk_020004B4;
 extern s32 gUnk_02000478;
 extern u16 gUnk_02000534;
 extern u16 gUnk_02000500;
 extern u8 *gUnknown_02000580[];
-extern u16 gUnk_030039F0;
 extern u16 gUnk_0203B400[];
-extern u32 gRandomIndex;
-extern u32 gTerrainWidth;
-extern u32 gTerrainHeight;
-extern u8 *gTerrainMap;
 
 #define A_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
 #define B_AT(T, off) (*(T *)((u8 *)a + (off)))
@@ -119,7 +115,7 @@ static inline void P78EE8_SetMode(u8 *a, u8 mode, u8 sub, u32 cb, u8 b2b5)
 static inline u32 P78EE8_CellIndex(s32 x, s32 y)
 {
     if (x >= 0 && y >= 0 && (u32)x < gTerrainWidth && (u32)y < gTerrainHeight)
-        return *(u16 *)(gTerrainMap + 0x24 + 2 * y) + x;
+        return *(u16 *)(((u8 *)gTerrainMap) + 0x24 + 2 * y) + x;
     return 0;
 }
 
@@ -131,7 +127,7 @@ static inline s32 P78EE8_CellHeight(u32 idx, u8 *ref)
 
     cell = TerrainModifiers_FindCellOverride(idx, 1);
     if (cell == 0)
-        cp = (u8 *)(*(u32 *)(gTerrainMap + 4) + (idx << 2) + 0xC);
+        cp = (u8 *)(*(u32 *)(((u8 *)gTerrainMap) + 4) + (idx << 2) + 0xC);
     else
         cp = (u8 *)cell + 4;
     t = *cp >> 4;
@@ -374,7 +370,7 @@ pal_done:
         if (A_AT(s16, 0x9C) <= 0) {
             P78EE8_SetMode(arg0, 3, 0, A_AT(u32, 0x220), 0x11);
             if (!(gEngineFlags & 0x4800) && !(A_AT(u32, 0x2D0) & 0x800))
-                SceneActorRecord_RecordPair(gUnk_030039F0, (u16)A_AT(u32, 0x50));
+                SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)A_AT(u32, 0x50));
         } else if (A_AT(u32, 0x2CC) & 0x200) {
             P78EE8_SetMode(arg0, 3, 0, A_AT(u32, 0x230), 0x12);
         } else {

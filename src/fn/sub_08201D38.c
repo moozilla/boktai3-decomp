@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "engine_globals.h"
 // MATCHING_CONCESSION: register-pinning
 struct DisplaySequenceState {
     const volatile u16 *commands;
@@ -65,7 +66,6 @@ struct ScriptCombatActorState {
     u32 w1cc;
     u8 w1d0[4];
 };
-extern u32 gEngineFlags;
 extern u32 gUnk_02000560;
 void AnimData_SelectPaletteBank(void *, u32 animation);
 void Collider_SetPosition(void *collider, void *position, u32 value);

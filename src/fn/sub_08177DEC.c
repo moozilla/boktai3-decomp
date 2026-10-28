@@ -1,12 +1,12 @@
 #include "global.h"
 #include "ram.h"
+#include "engine_globals.h"
 struct HudElement { /* 0x60 bytes */
     u8 pad0[8];
     u32 flags;
     u8 padC[0x54];
 };
 extern u8 *gGameState;
-extern u32 gEngineFlags;
 void Hud_SetElementGroupFlags(u8 *);
 void Hud_HideAuxiliaryElements(u8 *);
 void Bg_ClearTilemap(s32);

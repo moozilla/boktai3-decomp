@@ -1,12 +1,12 @@
 #include "global.h"
 #include "runtime.h"
+#include "engine_globals.h"
 struct A {
     u8 p[0xc];
     void *fc;
 };
-extern struct A *gTerrainMap;
 void Terrain_SetBoxes(void *v)
 {
-    gTerrainMap->fc = v;
+    ((struct A *)gTerrainMap)->fc = v;
     gTrapDispatchStarted = 0;
 }

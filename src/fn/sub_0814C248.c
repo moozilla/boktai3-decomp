@@ -2,6 +2,7 @@
 #include "player.h"
 #include "engine.h"
 #include "ram.h"
+#include "render.h"
 
 // confidence=low: chooses the nearest visible list entry within a fixed squared-distance limit.
 // MATCHING_CONCESSION: register-pinning
@@ -22,7 +23,6 @@ struct MotionTargets {
     u8 unknown[0x18];
     struct MotionTarget *first;
 };
-extern u16 gUnk_03005418[];
 static inline s32 Project(s32 input)
 {
     s32 value = input * 3;
@@ -48,9 +48,9 @@ static inline void ProjectPosition(struct TargetPosition *src, struct TargetPosi
     height = Project(src->y);
     y = depth - height;
     projectedZ = depth + height;
-    dst->x = (dst->x - gUnk_03005418[0]) + 120;
-    dst->y = (y - gUnk_03005418[1]) + 80;
-    dst->z = projectedZ - gUnk_03005418[2];
+    dst->x = (dst->x - gCameraOrigin[0]) + 120;
+    dst->y = (y - gCameraOrigin[1]) + 80;
+    dst->z = projectedZ - gCameraOrigin[2];
 }
 
 struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *arg)

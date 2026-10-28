@@ -1,5 +1,5 @@
 #include "global.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 s32 SceneInput_NavigateGridKeys(void *, s32);
 void SceneHud_GetActionIconPosition(void *, s32);
 void SceneHud_ShowActionPreview(void *);
@@ -22,7 +22,7 @@ void PauseMenu_OnItemUseSelectionUpdate(u8 *p)
         SceneHud_ShowActionPreview(p);
     }
     MenuDisplay_UpdateActionPrompt(p, 4);
-    if (1 & gUnk_03005260[1]) {
+    if (1 & gPadState[1]) {
         Hud_SaveGridSelection(q);
         if (Inventory_GetQuantityByStorage(p[0x4860], p[0x438a]) < 0)
             Sound_PlaySong(0x192);
@@ -33,7 +33,7 @@ void PauseMenu_OnItemUseSelectionUpdate(u8 *p)
             MenuDisplay_SetPaletteOverrides(p, 0, 0, 1, 0);
             Hud_SetInteractionCallback(p, SceneHud_ResolveActionConfirmation, 1);
         }
-    } else if (2 & gUnk_03005260[1]) {
+    } else if (2 & gPadState[1]) {
         Sound_PlaySong(0xde);
         SceneHud_ReturnToActionGrid(p);
     }

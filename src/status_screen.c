@@ -109,7 +109,7 @@ void StatusScreen_DrawClock(struct StatusScreen *unused)
     register int *values asm(
         "ip"); // pin: values must be allocated before hours/minutes (AGBCC_PRI=values:+600), so it lands in ip
     u32 hours, minutes;
-    struct StatusGameState *c = &gUnk_03005430;
+    struct StatusGameState *c = &gSunClock;
     if (!c)
         return;
     if (c->mode == 0 || c->mode == 4 || c->mode == 5) {
@@ -194,7 +194,7 @@ void StatusScreen_RefreshDirtyDisplays(struct StatusScreen *s)
 
 int StatusScreen_CheckConfirm(struct StatusScreen *p)
 {
-    if ((gUnk_03005260[1] & 8) || (gUnk_03005260[1] & 1)) {
+    if ((gPadState[1] & 8) || (gPadState[1] & 1)) {
         ScreenTransition_SendCommand(3, 4, 4, 4, 4, 65535, 0);
         {
             register void (*state)(struct StatusScreen *) = StatusScreen_FadeAndExit;

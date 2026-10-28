@@ -26,7 +26,7 @@ map,palette,evidence
 296B,DAA7,BG palette RAM matched in a centaur capture
 2A27,00C7,BG palette RAM matched in a centaur capture
 2A2F,EB34,BG palette RAM matched in a centaur capture
-2C6E,17EE,BG palette RAM matched in a centaur capture
+2C6E,37EE,BG palette RAM matched in a centaur capture
 2DFB,A5B3,BG palette RAM matched in a centaur capture
 316C,A4B3,BG palette RAM matched in a centaur capture
 3334,2F53,BG palette RAM matched in a centaur capture
@@ -80,7 +80,7 @@ map,palette,evidence
 7C19,EB34,BG palette RAM matched in a centaur capture
 7E65,04C7,BG palette RAM matched in a centaur capture
 7EF2,17EE,BG palette RAM matched in a centaur capture
-7EFB,17EE,BG palette RAM matched in a centaur capture
+7EFB,57EE,BG palette RAM matched in a centaur capture
 802C,00C7,BG palette RAM matched in a centaur capture
 818B,EB34,BG palette RAM matched in a centaur capture
 8306,BB25,BG palette RAM matched in a centaur capture

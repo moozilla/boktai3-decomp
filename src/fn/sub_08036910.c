@@ -29,10 +29,9 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
+#include "engine_globals.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -48,7 +47,6 @@ int Wireless_InitControllerFromScript(struct Engine *);
 void Task_SetCallbacks(void *, int, int);
 void Task_LinkToPriorityList(void *);
 void Heap_Free(void *);
-extern u32 gRandomIndex, gUnk_0300546C;
 extern const u16 gUnk_0203B400[];
 struct Engine *Wireless_CreateController(void)
 {
@@ -100,7 +98,7 @@ struct Engine *Wireless_CreateController(void)
         ((u8 *)p)[0x16] = one;
         *(u16 *)((u8 *)p + 0x10) = (u32)existing;
         Task_LinkToPriorityList(p);
-        gUnk_0300546C = one;
+        gClockSynced = one;
         *singleton = p;
         return p;
     }

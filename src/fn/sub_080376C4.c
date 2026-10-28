@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 struct PeerMenu {
     u8 pad0[0x19];
     u8 state, entered, pad1b[5];
@@ -6,7 +7,6 @@ struct PeerMenu {
 };
 int Wireless_IsSessionActive(void);
 void Wireless_RequestAdvanceConnection(void);
-extern u16 gUnk_03005260[];
 void WirelessPeerMenu_UpdateCancelInput(struct PeerMenu *p)
 {
     if (p->entered)
@@ -14,7 +14,7 @@ void WirelessPeerMenu_UpdateCancelInput(struct PeerMenu *p)
     if (p->timer > 15) {
         int busy = Wireless_IsSessionActive();
         if (busy) {
-            if (gUnk_03005260[1] & 2) {
+            if (gPadState[1] & 2) {
                 Wireless_RequestAdvanceConnection();
                 {
                     u32 state = 7;
@@ -25,7 +25,7 @@ void WirelessPeerMenu_UpdateCancelInput(struct PeerMenu *p)
                 }
             }
         } else {
-            if (gUnk_03005260[1] & 0x200) {
+            if (gPadState[1] & 0x200) {
                 Wireless_RequestAdvanceConnection();
                 p->state = 7;
                 p->entered = 1;

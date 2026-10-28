@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "engine_globals.h"
 // confidence=low: emits four bobbing actors in a circular formation around this boss
 struct FormationActor {
     u8 pad0[0x54];
@@ -15,7 +16,6 @@ struct FormationActor {
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 void SceneSteeringActor_CreateBobbingActor(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32,
                                            s32, s32, s32);
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 static inline s32 Scale(s32 value)

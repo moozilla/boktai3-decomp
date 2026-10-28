@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 struct H {
     u8 p[4];
     s16 w;
@@ -8,10 +9,8 @@ struct A {
     u8 p[4];
     struct H *f4;
 };
-extern struct A *gTerrainMap;
-extern s32 gTerrainWidth, gTerrainHeight;
 void Terrain_UpdateSize(void)
 {
-    gTerrainWidth = gTerrainMap->f4->w;
-    gTerrainHeight = gTerrainMap->f4->h;
+    gTerrainWidth = ((struct A *)gTerrainMap)->f4->w;
+    gTerrainHeight = ((struct A *)gTerrainMap)->f4->h;
 }

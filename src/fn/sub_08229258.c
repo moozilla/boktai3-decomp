@@ -2,7 +2,7 @@
 struct Bytes {
     u8 b0, b1, b2, b3, b4, b5, b6, b7;
 };
-extern struct Bytes gUnk_03005460;
+extern struct Bytes gRtcDateTime;
 void Solar_PauseMeasurement(void);
 void Solar_ResumeMeasurement(void);
 void Clock_WaitCycles(s32);
@@ -27,7 +27,7 @@ u32 Clock_ReadValidatedRtcDateTime(void)
         old = *ie;
         *ie = zero;
         Clock_BeginRtcAccess();
-        status = (u8)Rtc_ReadDateTime(&gUnk_03005460);
+        status = (u8)Rtc_ReadDateTime(&gRtcDateTime);
         Clock_EndRtcAccess();
         *ie = old;
         *ime = 1;
@@ -39,33 +39,33 @@ u32 Clock_ReadValidatedRtcDateTime(void)
     Solar_ResumeMeasurement();
     if (status == 1) {
 
-        if ((gUnk_03005460.b0 & 0xf0) > 0x9f || (15 & gUnk_03005460.b0) > 9) {
+        if ((gRtcDateTime.b0 & 0xf0) > 0x9f || (15 & gRtcDateTime.b0) > 9) {
             status = -2;
-            gUnk_03005460.b0 = 0;
+            gRtcDateTime.b0 = 0;
         }
-        if ((u8)(gUnk_03005460.b1 - 1) > 0x11 || (15 & gUnk_03005460.b1) > 9) {
+        if ((u8)(gRtcDateTime.b1 - 1) > 0x11 || (15 & gRtcDateTime.b1) > 9) {
             status = -3;
-            gUnk_03005460.b1 = 1;
+            gRtcDateTime.b1 = 1;
         }
-        if ((u8)(gUnk_03005460.b2 - 1) > 0x30 || (15 & gUnk_03005460.b2) > 9) {
+        if ((u8)(gRtcDateTime.b2 - 1) > 0x30 || (15 & gRtcDateTime.b2) > 9) {
             status = -4;
-            gUnk_03005460.b2 = 1;
+            gRtcDateTime.b2 = 1;
         }
-        if (gUnk_03005460.b3 == 7) {
+        if (gRtcDateTime.b3 == 7) {
             status = -5;
-            gUnk_03005460.b3 = 0;
+            gRtcDateTime.b3 = 0;
         }
-        if (gUnk_03005460.b4 > 0x23 || (15 & gUnk_03005460.b4) > 9) {
+        if (gRtcDateTime.b4 > 0x23 || (15 & gRtcDateTime.b4) > 9) {
             status = -6;
-            gUnk_03005460.b4 = 0;
+            gRtcDateTime.b4 = 0;
         }
-        if (gUnk_03005460.b5 > 0x5f || (15 & gUnk_03005460.b5) > 9) {
+        if (gRtcDateTime.b5 > 0x5f || (15 & gRtcDateTime.b5) > 9) {
             status = -7;
-            gUnk_03005460.b5 = 0;
+            gRtcDateTime.b5 = 0;
         }
-        if (gUnk_03005460.b6 > 0x5f || (15 & gUnk_03005460.b6) > 9) {
+        if (gRtcDateTime.b6 > 0x5f || (15 & gRtcDateTime.b6) > 9) {
             status = -8;
-            gUnk_03005460.b6 = 0;
+            gRtcDateTime.b6 = 0;
         }
     }
     return status;

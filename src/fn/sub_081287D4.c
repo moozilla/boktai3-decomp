@@ -2,6 +2,7 @@
 #include "contact_actor.h"
 #include "engine.h"
 #include "ram.h"
+#include "render.h"
 
 struct FragmentSequence {
     const u16 *commands;
@@ -34,7 +35,6 @@ struct FragmentBurstPool {
     u8 graphics[0x1C];
     void *sequenceResource;
 };
-extern struct ContactPosition gUnk_03005418;
 struct FragmentBurstPool *FragmentBurst_EnsurePool(void);
 struct FragmentBurst *FragmentBurst_AllocateSpriteGroup(struct FragmentBurstPool *);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
@@ -118,9 +118,9 @@ void FragmentBurst_Create(struct ContactPosition *position, u32 amount, u32 kind
     height = ProjectScale(position->y);
     {
         s32 y = projected - height, depth = projected + height;
-        out->x = out->x - gUnk_03005418.x + 120;
-        out->y = y - gUnk_03005418.y + 80;
-        out->z = depth - gUnk_03005418.z;
+        out->x = out->x - (*(struct ContactPosition *)gCameraOrigin).x + 120;
+        out->y = y - (*(struct ContactPosition *)gCameraOrigin).y + 80;
+        out->z = depth - (*(struct ContactPosition *)gCameraOrigin).z;
     }
     for (i = 0; i < 4; i++) {
         struct FragmentSprite *sprite = &group->sprites[i];

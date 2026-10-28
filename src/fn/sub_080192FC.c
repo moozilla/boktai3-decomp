@@ -6,7 +6,7 @@ struct Clock {
     void *script;
     u8 armed[4];
 };
-extern u8 gUnk_03005430[];
+extern u8 gSunClock[];
 int SunClock_GetBaseHour(void);
 int SunClock_GetBaseMinute(void);
 int SunClock_GetSecond(void);
@@ -27,8 +27,8 @@ static inline int distance(int a, int b)
 }
 static inline int scheduled(int index)
 {
-    int h = gUnk_03005430[index] * 3600;
-    return h + gUnk_03005430[index + 1] * 60;
+    int h = gSunClock[index] * 3600;
+    return h + gSunClock[index + 1] * 60;
 }
 int ClockEvents_Update(struct Clock *p)
 {

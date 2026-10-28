@@ -1,7 +1,7 @@
 #include "contact_burst.h"
 #include "projected_display.h"
-extern u16 gUnk_03005418[];
 #include "directional_particles.h"
+#include "render.h"
 s32 DirectionalParticle_Spawn(struct DirectionalParticleSource *, u32, u32);
 static inline void projectPosition(struct ContactPosition *screen,
                                    const struct ContactPosition *world)
@@ -17,9 +17,9 @@ static inline void projectPosition(struct ContactPosition *screen,
     vertical = projectScale(3 * world->y);
     y = sum - vertical;
     depth = sum + vertical;
-    screen->x = (u16)screen->x - gUnk_03005418[0] + 120;
-    screen->y = y - gUnk_03005418[1] + 80;
-    screen->z = depth - gUnk_03005418[2];
+    screen->x = (u16)screen->x - gCameraOrigin[0] + 120;
+    screen->y = y - gCameraOrigin[1] + 80;
+    screen->z = depth - gCameraOrigin[2];
 }
 s32 ContactBurst_Update(struct ContactBurst *effect)
 {

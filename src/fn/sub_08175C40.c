@@ -1,11 +1,11 @@
 #include "global.h"
+#include "input.h"
 // MATCHING_CONCESSION: register-pinning
-extern u16 gUnk_03005260[];
 void Sound_PlaySong(u32);
 void MenuSelection_RefreshOptionText(u8 *);
 s32 MenuSelection_ProcessOptionInput(u8 *s)
 {
-    u32 keys = gUnk_03005260[1];
+    u32 keys = gPadState[1];
     u16 up;
     u32 m;
     u8 *row;

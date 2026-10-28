@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 // confidence=low: fills a particle group with randomized polar velocities.
 #define ParticleGroup_SpawnRadial sub_080148CC
 struct Vec {
@@ -36,8 +37,6 @@ struct Map {
     u8 pad8[28];
     u16 rows[1];
 };
-extern struct Map *gTerrainMap;
-extern u32 gTerrainWidth, gTerrainHeight, gRandomIndex;
 #define gUnk_0203B400 ((u16 *)0x0203B400)
 extern u32 gUnk_08604B90[];
 u8 *TerrainModifiers_FindCellOverride(int, int);
@@ -47,7 +46,7 @@ static inline int CellIndex(struct Vec *p)
     int x = p->x >> 8, z = p->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0xffff;
-    return gTerrainMap->rows[z] + x;
+    return ((struct Map *)gTerrainMap)->rows[z] + x;
 }
 extern struct Manager *gUnk_02000060;
 struct Manager *ParticleManager_Create(void *, u32);

@@ -3,6 +3,7 @@
 #include "global.h"
 #include "engine.h"
 #include "render.h"
+#include "input.h"
 
 // Tentative: a full-screen status/info page. A background map and palette are loaded from script
 // resources, the page is revealed through a scanline-noise (horizontal offset) transition while
@@ -23,7 +24,7 @@ struct StatusScreen {
     u16 id;
     u8 flags, bg;
     u16 mapId, paletteId;
-    u16 *buffer;      // working palette (gUnk_03005160), 2 banks of 16 colors
+    u16 *buffer;      // working palette (gBgPaletteBank13), 2 banks of 16 colors
     u16 *source;      // palette resource the fades blend towards
     u16 dirty;        // bit 0/1/2: numeric displays to redraw; bit 3: palette upload
     u16 delay;        // frames to wait before starting (keyword 'w')
@@ -54,7 +55,7 @@ struct StatusGameState {
     u8 counters[2];    // shown when mode is not 0, 4 or 5
     u8 altCounters[2]; // shown when mode is 0, 4 or 5
 };
-extern struct StatusGameState gUnk_03005430;
+extern struct StatusGameState gSunClock;
 
 u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y); // address of a tile in the background's tilemap
 void NumericDisplay_DrawPair(void *unused, int left, int right);
@@ -87,14 +88,10 @@ int StatusScreen_Update(struct StatusScreen *);
 int StatusScreen_Destroy(struct StatusScreen *);
 int StatusScreen_Initialize(struct StatusScreen *, u16 id);
 
-extern void *gUnk_03004278, *gUnk_03003A00; // HBlank DMA source and destination register (guess)
-extern u16 gUnk_03004270, gUnk_03004274;
-extern u16 gUnk_03005160[];
 extern const u16 gUnk_08604B3C[]; // default phase durations
 void Bg_SetPriority(u32, s32);
 void Bg_SetupLayer(u32, u32, void *, s32, s32, s32, s32, void *);
 void *Video_GetBackgroundMap(u32);
 extern struct StatusScreen *gStatusScreen; // the live status screen, or NULL
-extern u16 gUnk_03005260[];                // input: [1] = newly pressed keys
 
 #endif

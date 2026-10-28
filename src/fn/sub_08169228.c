@@ -48,11 +48,11 @@ void PauseMenu_UpdateEquipmentSelection(struct SceneHudState *p)
     ResultPanel_DrawCappedCounters(p, 0, 3, 1);
     ResultPanel_DrawCappedSmallCounters(p, 0, 3, 2);
     StatDisplay_DrawPlayerValue(p, 0, 3, 3);
-    if (!(gUnk_03005260[0] & 4) && !p->primarySlideTimer && !p->secondarySlideTimer &&
+    if (!(gPadState[0] & 4) && !p->primarySlideTimer && !p->secondarySlideTimer &&
         !p->tertiarySlideTimer) {
         PauseMenu_FinishEquipmentSelection(p);
     } else {
-        if ((gUnk_03005260[1] & 0x200) && !p->primarySlideTimer && p->primaryVisible) {
+        if ((gPadState[1] & 0x200) && !p->primarySlideTimer && p->primaryVisible) {
             struct Player *owner = p->actionOwner;
             if (owner->actionRequestBlocked || Player_IsEquipmentLocked(owner)) {
                 Sound_PlaySong(0x192);
@@ -66,7 +66,7 @@ void PauseMenu_UpdateEquipmentSelection(struct SceneHudState *p)
                 SelectionPanel_RefreshVisibleEntries(p);
             }
         }
-        if ((gUnk_03005260[1] & 0x100) && !p->secondarySlideTimer && p->secondaryCount) {
+        if ((gPadState[1] & 0x100) && !p->secondarySlideTimer && p->secondaryCount) {
             if (PauseMenu_IsEquipmentLocked(p)) {
                 Sound_PlaySong(0x192);
             } else {
@@ -82,7 +82,7 @@ void PauseMenu_UpdateEquipmentSelection(struct SceneHudState *p)
                 SceneHud_RefreshSecondaryOptions(p);
             }
         }
-        if (PauseMenu_GetSelectedListEntryType(p) && (gUnk_03005260[1] & 2) && p->tertiaryVisible) {
+        if (PauseMenu_GetSelectedListEntryType(p) && (gPadState[1] & 2) && p->tertiaryVisible) {
             if (PauseMenu_IsEquipmentLocked(p)) {
                 Sound_PlaySong(0x192);
             } else {

@@ -1,16 +1,16 @@
 #include "global.h"
 #include "runtime.h"
-extern u8 gUnk_03005430[];
+extern u8 gSunClock[];
 void Clock_UnpackDate(s32 *, s32 *, s32 *, u32);
 u32 Clock_PackDate(s32, s32, s32);
 s32 Clock_DaysInMonth(s32, s32);
 s32 Clock_CalculateWeekday(s32, s32, s32);
 void SunClock_TickFrame(void)
 {
-    if (++gUnk_03005430[7] > 59) {
+    if (++gSunClock[7] > 59) {
         u8 *p;
-        gUnk_03005430[7] = 0;
-        p = gUnk_03005430;
+        gSunClock[7] = 0;
+        p = gSunClock;
         if (++p[6] > 59) {
             p[6] = 0;
             if (++p[5] > 59) {
@@ -36,7 +36,7 @@ void SunClock_TickFrame(void)
             }
             gSleepResumePending = 1;
             {
-                u8 *other = gUnk_03005430;
+                u8 *other = gSunClock;
                 if (*(u16 *)(other + 12) == *(u16 *)(p + 4)) {
                     u16 *counter = (u16 *)(other + 20);
                     if (++*counter > 280)

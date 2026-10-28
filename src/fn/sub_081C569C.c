@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 struct ChallengeMenu {
     u8 pad000[0x2E2];
     u8 repeatTimer;
@@ -7,13 +8,12 @@ struct ChallengeMenu {
     u8 pad2E8[0x300 - 0x2E8];
     s32 selection;
 };
-extern u16 gUnk_03005260[];
 void ChallengeMenu_StartFadeOut(struct ChallengeMenu *);
 void Sound_PlaySong(s32);
 void SceneTextSelector_UpdatePanel(struct ChallengeMenu *);
 void sub_081C569C(struct ChallengeMenu *p)
 {
-    u16 *keys = gUnk_03005260;
+    u16 *keys = gPadState;
     u8 *timer;
     u32 repeatMask;
     u32 pendingKeys;

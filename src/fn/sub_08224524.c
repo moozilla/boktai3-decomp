@@ -1,7 +1,7 @@
 #include "global.h"
 #include "rfu_manager.h"
 
-extern u8 *gUnk_03006A80;
+extern u8 *gRfuLinkStatus;
 void RfuManager_UpdateLinkRecovery(u16);
 void RfuManager_CompletePendingMscCycle(void);
 u16 rfu_UNI_PARENT_getDRAC_ACK(u8 *);
@@ -15,7 +15,7 @@ void Rfu_ReqCallback(u16 a)
     u32 cb;
     gRfuLinkManager.active = 0;
     gRfuLinkManager.msc_exe_flag = 1;
-    zero = *gUnk_03006A80;
+    zero = *gRfuLinkStatus;
     if (zero == 0) {
         RfuManager_UpdateLinkRecovery(a);
         if (gRfuLinkManager.childClockSlave_flag != 1) {

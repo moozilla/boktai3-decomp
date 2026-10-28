@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine.h"
+#include "input.h"
 // Tentative family name: actor animation/state handlers; specific actor identity unknown.
-#define gPreviewKeys gUnk_03005260
 #define gRandomTable gUnk_0203B400
 struct AnimationPosition {
     u32 packedXY, packedZ;
@@ -26,7 +26,6 @@ struct AnimationActor {
     u8 padE6E[0xe96 - 0xe6e];
     s16 pendingCount;
 };
-extern u16 gUnk_03005260[];
 extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 u32 HomingProjectile_GetActiveCount(void);

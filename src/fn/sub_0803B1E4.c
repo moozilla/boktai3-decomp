@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 struct Blob {
     u32 words[8];
 };
@@ -18,7 +19,6 @@ struct ResultMenu {
     u8 pad70[0x48];
     struct Drawing draws[22];
 };
-extern u16 gUnk_03005260[];
 int Mod(int, int);
 void Sound_PlaySong(int);
 void Anim_DrawDecimalDigits(void *, void *, int, int, int, int, int, int, int);
@@ -37,7 +37,7 @@ void WirelessResultPanel_UpdatePointsTransfer(struct ResultMenu *p)
         p->entered = 0;
         p->step = 2;
     }
-    if (p->remaining > 8 && (gUnk_03005260[1] & 0x30F))
+    if (p->remaining > 8 && (gPadState[1] & 0x30F))
         p->step = 8;
     if (p->remaining >= p->step) {
         p->remaining = (u16)p->remaining - p->step;

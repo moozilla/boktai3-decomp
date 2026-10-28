@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 
 // Tentative result points animation; input skips to the completed display.
 struct P {
@@ -8,7 +9,6 @@ struct P {
     u8 pad1E[10];
     s16 points;
 };
-extern u16 gUnk_03005260[];
 int Mod(int, int);
 void Sound_PlaySong(int);
 void Anim_DrawDecimalDigits(void *, void *, int, int, int, int, int, int, int);
@@ -19,7 +19,7 @@ void WirelessResultPanel_UpdatePointsReveal(struct P *p)
     u8 *drawing;
     if (p->entered)
         p->entered = 0;
-    if (gUnk_03005260[1] & 0x30F)
+    if (gPadState[1] & 0x30F)
         p->timer = 128;
     if (p->timer <= 64) {
         value = (p->points * p->timer) >> 6;

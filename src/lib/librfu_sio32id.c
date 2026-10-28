@@ -9,13 +9,6 @@
 #define rfu_MBOOT_CHILD_inheritanceLinkStatus sub_08245744
 #define rfu_REQ_noise sub_0824826C
 #define IntrSIO32 sub_08244A38
-#define gSTWIStatus gUnk_03006A50
-#define gRfuLinkStatus gUnk_03006A80
-#define gRfuStatic gUnk_03006A84
-#define gRfuFixed gUnk_03006A88
-#define gRfuSlotStatusNI gUnk_03006A70
-#define gRfuSlotStatusUNI gUnk_03006A60
-#define gRfuSIO32Id gUnk_03006A90
 #define llsf_struct gUnk_08602CD0
 #define str_checkMbootLL gUnk_08602CFC
 #define Sio32ConnectionData gUnk_08602D08
@@ -25,18 +18,6 @@ void Sio32IDIntr(void);
 void Sio32IDInit(void);
 s32 Sio32IDMain(void);
 
-struct RfuSIO32Id
-{
-    u8 MS_mode;
-    u8 state;
-    u16 count;
-    u16 send_id;
-    u16 recv_id;
-    u16 unk8; // unused
-    u16 lastId;
-};
-
-extern struct RfuSIO32Id gRfuSIO32Id ;
 
 extern const u16 Sio32ConnectionData[4]; // NINTENDO
 extern const char Sio32IDLib_Var[];

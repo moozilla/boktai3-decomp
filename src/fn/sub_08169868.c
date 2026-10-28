@@ -11,7 +11,7 @@ void SceneHud_RefreshSecondaryOptions(struct SceneHudState *);
 void SceneHud_TickWidgetSlides(struct SceneHudState *);
 void SceneHud_CyclePrimarySecondaryOptions(struct SceneHudState *p)
 {
-    if ((gUnk_03005260[1] & 0x200) && !p->primarySlideTimer && p->primaryVisible > 1) {
+    if ((gPadState[1] & 0x200) && !p->primarySlideTimer && p->primaryVisible > 1) {
         Sound_PlaySong(0x10B);
         if (++p->primarySelection >= p->primaryVisible)
             p->primarySelection = 0;
@@ -19,7 +19,7 @@ void SceneHud_CyclePrimarySecondaryOptions(struct SceneHudState *p)
         p->primarySlideTimer = 8;
         SelectionPanel_RefreshVisibleEntries(p);
     }
-    if ((gUnk_03005260[1] & 0x100) && !p->secondarySlideTimer && p->secondaryCount > 1) {
+    if ((gPadState[1] & 0x100) && !p->secondarySlideTimer && p->secondaryCount > 1) {
         Sound_PlaySong(0x10B);
         if (++p->selection >= p->secondaryCount)
             p->selection = 0;

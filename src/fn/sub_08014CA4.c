@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
+#include "engine_globals.h"
 // confidence=low: allocates a fragment group with randomized direction and lifetime.
 #define FragmentGroup_SpawnRadial sub_08014CA4
 struct Vec {
@@ -27,7 +28,6 @@ struct Manager {
     u8 pad[32];
     struct Group groups[4];
 };
-extern u32 gRandomIndex;
 extern u16 gUnk_08604C42[], gUnk_08604C30[];
 extern s16 gUnk_086149C4[];
 #define RANDOM_TABLE ((u16 *)0x0203B400)

@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 gUnk_03005430[];
+extern u8 gSunClock[];
 s32 Clock_CheckRtcStatus(void);
 s32 Clock_SyncFromRtc(void);
 void Clock_WaitCycles(s32);
@@ -16,14 +16,14 @@ void Clock_CheckRtcDate(void)
     }
     if (status == 1) {
         if (Clock_SyncFromRtc() == 1)
-            gUnk_03005430[9] = 0;
+            gSunClock[9] = 0;
         else {
             SunClock_SetDateTime(2005, 7, 28, 12, 0, 0, status);
-            gUnk_03005430[9] = status;
+            gSunClock[9] = status;
         }
     } else {
         s32 one;
         SunClock_SetDateTime(2005, 7, 28, 12, 0, 0, one = 1);
-        gUnk_03005430[9] = one;
+        gSunClock[9] = one;
     }
 }

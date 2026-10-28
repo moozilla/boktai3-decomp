@@ -130,7 +130,7 @@ void Palette_PickTransitionColors(struct PaletteController *p, struct PaletteTra
 
 s32 Palette_GetBrightnessThreshold(void)
 {
-    u8 v = gUnk_03005430.state - 1;
+    u8 v = gSunClock.state - 1;
     if (v <= 2) {
         return 0x20;
     }
@@ -404,7 +404,7 @@ void Palette_ApplyFrame(struct PaletteController *p)
             Palette_SetPendingFlags(p, 7);
     }
     if (p->flags & 1) {
-        if (gUnk_03005430.state != p->previousState) {
+        if (gSunClock.state != p->previousState) {
             Palette_PickTransitionColors(p, t);
             t->level = 0;
         }
@@ -441,7 +441,7 @@ s32 Palette_Update(struct PaletteController *p)
     Palette_ApplyFrame(p);
     p->previousBlend = p->blend;
     t->previousBrightness = t->brightness;
-    p->previousState = gUnk_03005430.state;
+    p->previousState = gSunClock.state;
 }
 
 u32 Palette_Destroy(void)
@@ -539,7 +539,7 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
     if (p->current) {
         CpuSet(p->current, p->hardware, 0x04000068);
     }
-    p->previousState = gUnk_03005430.state;
+    p->previousState = gSunClock.state;
     t->mode = 0;
     return 0;
 }

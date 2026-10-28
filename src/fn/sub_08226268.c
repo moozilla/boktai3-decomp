@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 
 struct Vec {
     s16 x, y, z;
@@ -15,9 +16,6 @@ struct Camera {
     struct Vec pos;
 };
 
-extern struct Camera *gActiveCamera;
-extern struct Vec gUnk_03005418;
-
 static inline int project(int input)
 {
     int v = input * 3;
@@ -25,10 +23,10 @@ static inline int project(int input)
 }
 
 /* Camera command 1 (snap_to): move the camera to pos at once and recompute
-   the scroll origin (gUnk_03005418) from its isometric projection. */
+   the scroll origin (gCameraOrigin) from its isometric projection. */
 void Camera_SnapTo(struct Vec *pos)
 {
-    struct Camera *c = gActiveCamera;
+    struct Camera *c = ((struct Camera *)gActiveCamera);
     if (c) {
         c->pos.x = pos->x;
         c->pos.y = pos->y;
@@ -37,7 +35,7 @@ void Camera_SnapTo(struct Vec *pos)
         gCamera.position.y = c->pos.y;
         gCamera.position.z = c->pos.z;
         {
-            struct Vec *out = &gUnk_03005418;
+            struct Vec *out = &gCameraOrigin;
             struct CameraPosition *in = &gCamera.position;
             int xy, height, x = in->x, z = in->z;
             out->x = project(x - z);
@@ -46,7 +44,7 @@ void Camera_SnapTo(struct Vec *pos)
             out->y = xy - height;
             out->z = xy + height;
         }
-        gActiveCamera->f1c = 1;
-        gActiveCamera->f68 = 1;
+        ((struct Camera *)gActiveCamera)->f1c = 1;
+        ((struct Camera *)gActiveCamera)->f68 = 1;
     }
 }

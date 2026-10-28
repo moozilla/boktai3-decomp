@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
@@ -39,7 +40,6 @@ void *ScriptProc_Start(int, int);
 int AnimData_Load(void *, int);
 void Sprite_InitUnlinked(void *, void *, int);
 void Anim_SetSequence(void *, void *, int, int, int);
-extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern s16 gUnk_086149C4[];
 struct Config {

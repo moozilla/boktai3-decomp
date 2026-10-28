@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "render.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -13,7 +14,6 @@ struct Circle {
     struct Vec center;
 };
 extern u8 *gUnk_02000580[];
-extern struct Vec gUnk_03005418;
 int Script_GetKeywordValue(int, int);
 void CircleWindow_GenerateScanlines(void *, int);
 static inline int project(int input)
@@ -47,9 +47,9 @@ int CircleWindow_Initialize(struct Circle *p)
         height = project(in->y);
         {
             int y = xy - height, z = xy + height;
-            out->x = out->x - gUnk_03005418.x + 120;
-            out->y = y - gUnk_03005418.y + 80;
-            out->z = z - gUnk_03005418.z;
+            out->x = out->x - (*(struct Vec *)gCameraOrigin).x + 120;
+            out->y = y - (*(struct Vec *)gCameraOrigin).y + 80;
+            out->z = z - (*(struct Vec *)gCameraOrigin).z;
         }
         if (p->center.x < 0)
             p->center.x = 0;

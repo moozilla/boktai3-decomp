@@ -1,5 +1,5 @@
 #include "global.h"
-extern u16 gUnk_03005418[];
+#include "render.h"
 s32 __divsi3(s32, s32);
 void OrbitMotion_BeginDistanceWave(void *, void *, void *, u32, u32);
 void ContactImpactEffect_UpdateContact(void);
@@ -34,8 +34,8 @@ static inline s32 Scale(s32 value)
 }
 static inline void FromScreen(struct Vec *out, const struct Vec *screen, s32 offset)
 {
-    s32 x = screen->x + (s16)gUnk_03005418[0] - 120;
-    s32 y = screen->y + (s16)gUnk_03005418[1] - 80;
+    s32 x = screen->x + (s16)gCameraOrigin[0] - 120;
+    s32 y = screen->y + (s16)gCameraOrigin[1] - 80;
     out->x = Half(__divsi3((x + y) << 5, 3) + offset);
     out->y = offset;
     out->z = Half(__divsi3((y - x) << 5, 3) + offset);
@@ -52,9 +52,9 @@ static inline void ToScreen(struct Vec *screen, struct Vec *world)
     screen->y = sum - y;
     sum += y;
     screen->z = sum;
-    screen->x = screen->x - gUnk_03005418[0] + 120;
-    screen->y = screen->y - gUnk_03005418[1] + 80;
-    screen->z = screen->z - gUnk_03005418[2];
+    screen->x = screen->x - gCameraOrigin[0] + 120;
+    screen->y = screen->y - gCameraOrigin[1] + 80;
+    screen->z = screen->z - gCameraOrigin[2];
 }
 
 void sub_081C3B04(void);

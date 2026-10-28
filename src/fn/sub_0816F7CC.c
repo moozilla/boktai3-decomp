@@ -24,7 +24,7 @@ void SceneHud_ShowActionResultText(struct SceneHudState *s)
         MessageWindow_ShowMessage(0x77);
     }
     frame = ++s->actionTransferDelay;
-    if (frame > 89 || (frame > 15 && (gUnk_03005260[1] & 1))) {
+    if (frame > 89 || (frame > 15 && (gPadState[1] & 1))) {
         MessageWindow_SetBounds(0, 16, 30, 2);
         SceneHud_RefreshActionIcons(s);
         Hud_SetInteractionCallback(s, SceneHud_UpdateActionSelection, 1);

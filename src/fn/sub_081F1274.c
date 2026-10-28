@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
+#include "engine_globals.h"
 #define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
 struct Slot7PackedPosition {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -8,7 +9,6 @@ struct Slot7PackedPosition {
 extern void *gUnk_020004B8;
 extern u8 *gUnk_020004F0;
 extern u8 gUnk_03005040[];
-extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 void Collider_SetFixedPositionWithYOffset(void *, void *, s32);
 void SpatialIndex_InsertEntry(void *);

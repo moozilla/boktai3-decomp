@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 struct LinkSlot {
     u8 cur, prev, state;
     u8 pad3[0x5fc - 3];
@@ -27,7 +28,6 @@ struct LinkPanel {
     u16 timer;
 };
 extern u8 *gUnk_020004B4;
-extern u16 gUnk_03005260[];
 void Bg_SetLayerMap(u32, void *, u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void RegistryF246_ShowSlotDefaultFrame(struct LinkPanel *, s32);
@@ -123,7 +123,7 @@ void sub_0810C7F4(struct LinkPanel *p)
     if (p->timer <= 0x3b) {
         p->timer++;
     } else if (!unavailable()) {
-        if (gUnk_03005260[1] & 2) {
+        if (gPadState[1] & 2) {
             SetUpdate(p, SlotMenu_UpdateExitTransition, 1);
             Sound_PlaySong(0xde);
         } else {
