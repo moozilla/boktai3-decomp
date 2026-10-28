@@ -239,7 +239,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000714,gHeapHead,10,object,extern struct HeapBlock gHeapHead;,include/heap.h,low,"general heap first block; prev/next, size/free flags and cleared trailing word"
 0201F400,gHeapEndGuard,4,object,extern u32 gHeapEndGuard;,include/ram.h,,heap-end guard word expected to equal 0x516B92EE
 02037000,gBgMapWorkBuffer,2000,object,extern u8 gBgMapWorkBuffer[0x2000];,include/ram.h,,"background map work buffer, cleared for 0x2000 bytes"
-02039000,gUnk_02039000,8,object,,,,
+02039000,gObjTileUploadRequests,8,object,extern struct ObjTileUploadRequest gObjTileUploadRequests[];,include/obj_tile_upload.h,low,eight-byte rectangular tile-upload records; descriptor aliases two halfwords; protected ARM producer retained
 0203B000,gUnk_0203B000,8,object,,,,
 0203B400,gUnk_0203B400,802,object,,,,
 0203C400,gUnk_0203C400,,object,,,,
