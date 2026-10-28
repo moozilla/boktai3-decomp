@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_020000D8;
+#include "ram.h"
 void *Task_Create(u32, u32);
 void Task_SetCallbacks(void *, void (*)(void), void (*)(void));
 s32 ActorPool_InitManager(void *);
@@ -10,8 +10,8 @@ void ActorPool_DestroyCallback(void);
 void *ActorPool_CreateManager(void)
 {
     void *p;
-    if (gUnk_020000D8 != 0)
-        return (void *)gUnk_020000D8;
+    if (gActorPoolManager != 0)
+        return (void *)gActorPoolManager;
     p = Task_Create(8, 0x38);
     if (p != 0) {
         Task_SetCallbacks(p, ActorPool_UpdateCallback, ActorPool_DestroyCallback);

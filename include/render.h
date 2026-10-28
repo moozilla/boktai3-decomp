@@ -8,6 +8,47 @@ struct OamEntry {
     u16 tile, depth;
 };
 
+/* Inline render camera at 030042A0, distinct from the active camera task.
+ * The position's last halfword is carried by aggregate copies; meaning unknown. */
+struct CameraPosition {
+    s16 x, y, z;
+    u8 unk06[2];
+};
+
+struct CameraRenderState {
+    struct CameraPosition position;
+    s16 offsetX, offsetY;
+    u16 unk0C; /* initialized to 1 */
+    u8 unk0E[2];
+    u16 unk10; /* initialized to 0 */
+    s16 mode;
+};
+
+extern struct CameraRenderState gCamera;
+
+/* Four 0x30-byte BG records; scaleX/Y also hold overlay tile coordinates.
+ * flags and halfWidth/halfHeight have mode-dependent meanings (tentative). */
+struct BackgroundLayer {
+    u16 flags, layer;
+    u8 unk04[0xC];
+    u16 scaleX, scaleY;
+    s16 originX, originY;
+    s16 width, height;
+    s16 halfWidth, halfHeight;
+    s16 x, y;
+    u16 *extraData, *mapData, *map;
+};
+
+extern struct BackgroundLayer gBgRecords[4];
+
+struct ObjGfxSlot {
+    u16 size;
+    u16 offset;
+    const void *src;
+};
+
+extern struct ObjGfxSlot gObjGfxSlots[128];
+
 /* RAM objects; each row of symbols/ram.csv with header include/render.h. */
 extern u8 *gPaletteBankData; /* palette-bank data: 32-byte banks of sixteen RGB15 colors (AnimData_SelectPaletteBank) */
 extern u32 gVBlankDialogueState; /* scrolling-dialogue/video state copied during VBlank (guess) */
@@ -84,5 +125,15 @@ extern struct OamEntry gOamBuffer[]; /* final OAM entries, 8 bytes each (128) */
 extern struct OamEntry gPendingOamBuffer[]; /* pending depth-sorted OAM entries (128) */
 extern u16 gBgPaletteBuffer[]; /* sixteen background palette banks of 16 colors; labels inside it are interior rows */
 extern u16 gObjPaletteBuffer[][16]; /* sixteen object palette banks of 16 colors */
+extern u16 gBgMapCacheKey; /* Last compressed BG map resource key, compared before LZ77 unpacking (tentative cache name) */
+extern u16 gSavedDispCnt; /* DISPCNT saved by Video_SaveDisplayControl */
+extern u16 gSavedWindowShadow0; /* Saved window shadow slot 0 */
+extern u16 gSavedWindowShadow3; /* Saved window shadow slot 3 */
+extern u16 gSavedWindowShadow2; /* Saved window shadow slot 2 */
+extern u16 gSavedWindowShadow1; /* Saved window shadow slot 1 */
+extern u16 gSavedWinIn; /* Saved WININ register */
+extern u16 gSavedWinOut; /* Saved WINOUT register */
+extern u8 gTextTileUploadIndices[]; /* Queued text tile indices; bounded storage precedes its count, original guard permits index 256 */
+extern u32 gTextTileUploadCount; /* Number of queued text tile DMA uploads */
 
 #endif

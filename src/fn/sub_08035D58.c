@@ -27,7 +27,6 @@ struct Engine {
     u8 message[0x204];
     void *head, *tail;
 };
-extern struct Engine *gUnk_02000484;
 void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
@@ -55,7 +54,7 @@ void Wireless_OnParentNiSessionEvent(u8 command)
 {
     int key = command;
     int saved = key;
-    struct Engine *p = gUnk_02000484;
+    struct Engine *p = gWirelessController;
     if (!p) {
         goto done;
     }

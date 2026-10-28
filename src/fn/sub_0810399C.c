@@ -1,6 +1,6 @@
-#define gActorGroup gUnk_020001AC
 /* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
 #include "global.h"
+#include "ram.h"
 struct ActorGroupMember {
     u8 unk0[0xB8];
     u16 flags;
@@ -13,7 +13,6 @@ struct ActorGroup {
     struct ActorGroupMember members[12];
     u32 active;
 };
-extern void *gUnk_020001AC;
 void Sound_StopSong(u32);
 void TerrainModifiers_UnregisterCell(void *);
 void SceneBody_Unregister(void *);
@@ -46,5 +45,5 @@ u32 ActorGroup_Destroy(struct ActorGroup *group)
             Sprite_Remove(member);
         }
     }
-    return (u32)(gUnk_020001AC = 0);
+    return (u32)(gNamedActorManager = 0);
 }

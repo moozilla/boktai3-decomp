@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_pool.h"
 #include "background_controller.h"
+#include "render.h"
 struct ScanlineScroll {
     u8 unknown0[0x1848];
     u16 scroll;
@@ -30,9 +31,9 @@ void ScanlineScroll_AdvancePhases(struct ScanlineScroll *);
 void ScanlineEffect_SetSource(s32, s32, void *);
 void ScanlineScroll_Update(struct ScanlineScroll *p)
 {
-    if (p->lastMapX != gUnk_03004C30[3].x)
-        BgGfx_LoadTilemapSimple(3, gUnk_03004C30[3].x >> 3, 0, 0, 0);
-    p->lastMapX = gUnk_03004C30[3].x;
+    if (p->lastMapX != gBgRecords[3].x)
+        BgGfx_LoadTilemapSimple(3, gBgRecords[3].x >> 3, 0, 0, 0);
+    p->lastMapX = gBgRecords[3].x;
     ScanlineScroll_AdvancePhases(p);
     ScanlineEffect_SetSource(3, 0, p->offsets);
     if (p->moving && !IsPlayerScrollBlocked()) {
@@ -43,5 +44,5 @@ void ScanlineScroll_Update(struct ScanlineScroll *p)
         if (p->remaining <= 0)
             p->moving = 0;
     }
-    gUnk_03004C30[p->layer].x = p->scroll >> 7;
+    gBgRecords[p->layer].x = p->scroll >> 7;
 }

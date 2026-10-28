@@ -5,8 +5,8 @@ s32 ActorAttachment_DestroyManager(struct ActorAttachmentManagerView *);
 struct ActorAttachmentManagerView *ActorAttachment_CreateManager(void)
 {
     struct ActorAttachmentManagerView *manager;
-    if (gUnk_02000124)
-        return gUnk_02000124;
+    if (gActorAttachmentManager)
+        return gActorAttachmentManager;
     manager = Task_Create(9, 0xA20);
     if (manager) {
         Task_SetCallbacks(manager, (void (*)(void *))ActorAttachment_TickManager,

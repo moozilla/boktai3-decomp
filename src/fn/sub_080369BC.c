@@ -1,9 +1,9 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_02000484;
 void Wireless_UpdateControllerTask(void);
 void Wireless_UpdateController(void)
 {
-    if (gUnk_02000484)
+    if (gWirelessController)
         Wireless_UpdateControllerTask();
 }

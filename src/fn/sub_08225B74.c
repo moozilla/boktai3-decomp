@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct Obj {
     u8 pad0[8];
@@ -19,17 +20,13 @@ struct Obj {
     u32 *f2C;
     u32 *f30;
 };
-extern struct {
-    u8 pad[0x12];
-    s16 f12;
-} gUnk_030042A0;
 void sub_0821C8F8(void *, void *, void *, u32, u32, u32);
 
 void Obj_StepPosition(struct Obj *o)
 {
     void *p = o->f1C;
     if (p != 0) {
-        switch (gUnk_030042A0.f12) {
+        switch (gCamera.mode) {
             case 0:
                 sub_0821C8F8(p, &o->fC, &o->f14, o->f20, o->f22, o->f8);
                 break;

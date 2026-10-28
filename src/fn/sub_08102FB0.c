@@ -1,5 +1,5 @@
-#define gNamedObjectManager gUnk_020001AC
 #include "global.h"
+#include "ram.h"
 struct NamedObjectVector {
     s16 x, y, z, pad;
 };
@@ -17,7 +17,6 @@ struct NamedObjectManager {
     u8 pad0[0x1374];
     u32 tetherName;
 };
-extern struct NamedObjectManager *gUnk_020001AC;
 u32 TetherActor_CopyPosition(struct NamedObjectVector *);
 void TetherActor_SetPosition(struct NamedObjectVector *);
 static inline void subtractVector(struct NamedObjectVector *d, struct NamedObjectVector *a,
@@ -36,7 +35,7 @@ static inline u8 testFlag(u32 mask, u16 *flags)
 void NamedObject_MoveAttachedTether(struct NamedObject *object)
 {
     struct NamedObjectVector target, delta;
-    struct NamedObjectManager *manager = gUnk_020001AC;
+    struct NamedObjectManager *manager = gNamedActorManager;
     if (manager->tetherName == object->name) {
         TetherActor_CopyPosition(&target);
         subtractVector(&delta, &target, &object->position);

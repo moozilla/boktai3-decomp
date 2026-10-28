@@ -1,23 +1,15 @@
 #include "global.h"
 #include "gba/gba.h"
+#include "render.h"
 
 // MATCHING_CONCESSION: register-pinning
 // Upload queued tile slots to OBJ VRAM using DMA3.
-struct ObjGfxSlot {
-    u16 size;
-    u16 offset;
-    const void *src;
-};
-extern struct ObjGfxSlot gUnk_03001148[];
-extern s16 gDynamicTileSum;
-extern u16 gQueuedObjSlotCount;
-extern s16 gStaticTileCount;
 void ObjGfx_LoadTiles(u32 start);
 
 void sub_0821537C(void)
 {
-    u32 dest = 0x06010000 + (gStaticTileCount * 32);
-    struct ObjGfxSlot *slot = gUnk_03001148;
+    u32 dest = 0x06010000 + (((s16)gStaticTileCount) * 32);
+    struct ObjGfxSlot *slot = gObjGfxSlots;
     s32 i;
     s32 n = gQueuedObjSlotCount;
     if (n != 0) {
@@ -40,5 +32,5 @@ void sub_0821537C(void)
     }
 
     gQueuedObjSlotCount = 0;
-    ObjGfx_LoadTiles(gStaticTileCount + gDynamicTileSum);
+    ObjGfx_LoadTiles(((s16)gStaticTileCount) + ((s16)gDynamicTileSum));
 }

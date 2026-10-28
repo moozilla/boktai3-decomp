@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 // confidence=low: synchronizes collision, shadow and camera presentation.
 
@@ -64,7 +65,6 @@ struct Actor {
     u8 pad383[0x38C - 0x383];
     struct V attackBox;
 };
-extern u16 gUnk_02000550, gUnk_0200053C;
 extern u32 gUnk_02000560;
 extern const s16 gUnk_086149C4[];
 void SceneActors_UpdateEffects(void *);
@@ -175,10 +175,10 @@ void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
     else
         ScaledShadow_Enable((u8 *)p + 0x3B4);
     if (test(&*flags, 0x2000000)) {
-        gUnk_02000550 = p->sound;
-        gUnk_0200053C = p2->facing <= 1 ? 0 : 64;
+        gPlayerBackgroundState = p->sound;
+        gPlayerBackgroundMode = p2->facing <= 1 ? 0 : 64;
     } else {
-        gUnk_02000550 = 0;
+        gPlayerBackgroundState = 0;
         Sound_PauseChannel12(15);
     }
     if (p->timer312 > 0) {

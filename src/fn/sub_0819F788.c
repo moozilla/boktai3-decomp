@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: alternates side-specific sequences and emits four directional shots per pulse.
 struct Vec {
@@ -25,7 +26,6 @@ struct Hresvelgr {
     struct Vec offsets[2];
 };
 extern const struct Sequences gUnk_0824F72C;
-extern s32 gUnk_02000234;
 extern const u16 gUnk_0203B400[];
 void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -53,7 +53,7 @@ void Hresvelgr_UpdateAlternatingVolley(struct Hresvelgr *actor)
         Hresvelgr_SetAnimation(actor, actor->animation, actor->animationData,
                                sequences.ids[actor->side], 2, 68);
         Anim_SetFrameDurationScale(actor->animation, 8);
-        gUnk_02000234 = 0;
+        gHresvelgrVolleyCount = 0;
         Sound_PlaySong(0x4d2);
     }
     {
@@ -119,13 +119,13 @@ void Hresvelgr_UpdateAlternatingVolley(struct Hresvelgr *actor)
                     break;
             }
         } while (1);
-        if (gUnk_02000234 > 15) {
+        if (gHresvelgrVolleyCount > 15) {
             actor->finished = 1;
             Anim_SetFrameDurationScale(saved->animation, 64);
         } else {
             Hresvelgr_SetAnimation(saved, saved->animation, saved->animationData,
-                                   sequences.ids[(saved->side + gUnk_02000234) & 1], 2, 4);
-            gUnk_02000234++;
+                                   sequences.ids[(saved->side + gHresvelgrVolleyCount) & 1], 2, 4);
+            gHresvelgrVolleyCount++;
         }
     }
     {

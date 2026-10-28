@@ -37,7 +37,7 @@ ActorAttachment_CreateSinglePartSlot(u32 incomingFrame, struct ContactPosition *
     s32 i;
     savedZ = z;
     frame = (u8)incomingFrame;
-    existing = gUnk_02000124;
+    existing = gActorAttachmentManager;
     if (!existing) {
         manager = ActorAttachment_CreateManager();
         if (manager)

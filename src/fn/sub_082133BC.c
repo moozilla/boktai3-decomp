@@ -1,12 +1,5 @@
 #include "global.h"
 #include "render.h"
-struct Tile {
-    u8 p0[0x18];
-    u16 h18;
-    u8 p1A[6];
-    u16 h20, h22;
-};
-extern struct Tile gUnk_03004CC0;
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 u8 *ScriptProc_Start(u32, u32);
@@ -17,7 +10,7 @@ void ForgingBook_SetupPageBackground(u8 *p)
 {
     u32 size = 16;
     s32 max, count, row;
-    struct Tile *tile;
+    struct BackgroundLayer *tile;
     Bg_ClearTilemap(0);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     Bg_ClearTilemap(2);
@@ -35,14 +28,14 @@ void ForgingBook_SetupPageBackground(u8 *p)
     count = 0;
     max = CollectionBook_GetPageEntryCount(*(s16 *)(p + 0x6f4));
     row = 0;
-    tile = &gUnk_03004CC0;
+    tile = &gBgRecords[3];
     do {
         int next = row + 1;
         int x = 3, y = row * 5, i = 4;
         do {
-            tile->h18 = 16;
-            tile->h20 = 0;
-            tile->h22 = 0;
+            tile->width = 16;
+            tile->x = 0;
+            tile->y = 0;
             count++;
             if (count > max)
                 sub_08215EB4(3, x, y + 3, 4, 4, 1, 0, 2);

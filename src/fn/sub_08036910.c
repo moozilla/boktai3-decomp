@@ -28,7 +28,6 @@ struct Engine {
     u8 message[0x204];
     void *head, *tail;
 };
-extern struct Engine *gUnk_02000484;
 void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
@@ -53,7 +52,7 @@ extern u32 gRandomIndex, gUnk_0300546C;
 extern const u16 gUnk_0203B400[];
 struct Engine *Wireless_CreateController(void)
 {
-    struct Engine **singleton = &gUnk_02000484;
+    struct Engine **singleton = &gWirelessController;
     struct Engine *existing = *singleton;
     struct Engine *p;
     int size;

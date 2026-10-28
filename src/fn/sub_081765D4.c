@@ -37,7 +37,7 @@ void PauseMenu_SaveDisplayState(struct PauseMenuDisplay *s)
     flags &= ~0x800;
     gDispCntShadow = flags;
     CpuSet(Video_GetBackgroundMap(1), s->savedMap, 0x04000200);
-    s->savedBackground = gUnk_03004C30[1];
+    s->savedBackground = gBgRecords[1];
     s->savedBlend = *(vu16 *)0x04000050;
     s->savedBgControl = *(vu16 *)0x0400000A;
     *(vu16 *)0x04000050 = 0;

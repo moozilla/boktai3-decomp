@@ -1,11 +1,11 @@
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
+#include "runtime.h"
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void *BestiaryDisplay_GetEntryForActor(u32, u32);
 void GameState_SetEventFlag(void *);
 void SceneActorRecord_RecordPair(u16, u16);
-extern u16 gUnk_030039F0;
 static inline u8 IsPrimary(struct SceneActorRegistryResetView *actor)
 {
     if (actor->object == (void *)1)
@@ -122,7 +122,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
     SetControl(actor);
     SetAnimation(actor, 1, 0, 2);
     if ((!Test(gEngineFlags, 0x4800)) && (!Flag(actor, 0x800, 0x2D0))) {
-        SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
+        SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->id);
     }
     ActorShadow_Disable((u8 *)actor + 0x320);
     switch (actor->category) {

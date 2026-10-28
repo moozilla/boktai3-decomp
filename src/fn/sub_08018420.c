@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_02000088;
+#include "ram.h"
 
 u32 Weather_GetType(void)
 {
-    return gUnk_02000088;
+    return gStormActive;
 }

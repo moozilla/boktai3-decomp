@@ -1,7 +1,7 @@
 #include "global.h"
+#include "ram.h"
 #define ParticleEffect_RemoveSprites ActorBurst_RemovePrimarySprites
 #define ParticleEffect_RemoveEffects RadialBurstEffect_RemoveParticles
-#define gParticleEffectPendingCount  gUnk_02000590
 /* Tentative family name; fields are named by their observed use. */
 struct ParticleEffect {
     u8 pad[0x19];
@@ -11,7 +11,6 @@ struct ParticleEffect {
     u8 active;
     u8 suppressCleanup;
 };
-extern u16 gUnk_02000590;
 void sub_08235DB0(struct ParticleEffect *);
 void ActorBurst_RemovePrimarySprites(struct ParticleEffect *);
 void ActorBurst_RemoveGlowSprite(struct ParticleEffect *);
@@ -24,5 +23,5 @@ u32 ParticleEffect_Destroy(struct ParticleEffect *p)
     ActorBurst_RemoveGlowSprite(p);
     RadialBurstEffect_RemoveParticles(p);
     if (p->pending)
-        gUnk_02000590--;
+        gPlayerEffectPendingCount--;
 }

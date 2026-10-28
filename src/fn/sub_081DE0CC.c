@@ -8,7 +8,6 @@
  * loads the slot's current name, counts its blank trailing pairs to place the cursor, then
  * sets up the keyboard backgrounds and six widgets. (guess) */
 
-extern u8 gUnk_020005B4[];
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 u8 *Script_GetPc(void);
@@ -49,10 +48,10 @@ s32 NameEntry_Initialize(u8 *s)
         Script_GetPc();
     }
     if (gNamePlaceholderScript[4] == 1) {
-        if (gUnk_020005B4[*slot + 2] == 0)
+        if (gNameEntrySavedState[*slot + 2] == 0)
             *(u32 *)(s + 0x34C) = 0x56;
         goto player;
-    } else if (gUnk_020005B4[*slot + 2] == 0) {
+    } else if (gNameEntrySavedState[*slot + 2] == 0) {
         /* The slot value stays in r2 here; a three-argument call reproduces that. */
         ((void (*)(u8 *, u8 *, u32))TextEntry_CopyInitialName)(s, s + 0x374, *slot);
     } else if (*slot == 0) {
@@ -83,7 +82,7 @@ s32 NameEntry_Initialize(u8 *s)
         *(s32 *)(s + 0x350) = 4;
     }
     {
-        u8 *table = gUnk_020005B4;
+        u8 *table = gNameEntrySavedState;
         u32 *p = (u32 *)(s + 0x370);
         u32 idx = *p + 2;
         if (table[idx] == 0) {

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -24,7 +25,6 @@ struct Manager {
     struct Vec *target;
     struct Player *player;
 };
-extern struct Manager *gUnk_02000480;
 extern struct Player *gUnk_02000580[4];
 int Weather_GetType(void);
 int SunClock_GetBaseHour(void);
@@ -39,13 +39,13 @@ int SceneActorManager_Init(struct Manager *);
 void Task_Kill(void *);
 void SceneActorManager_Update(void);
 void SceneActorManager_Destroy(void);
-/* Registry routine 286F: returns the scene actor manager (gUnk_02000480,
+/* Registry routine 286F: returns the scene actor manager (gSceneActorListManager,
    which also holds the message packet queue), creating its task on first use. */
 struct Manager *SceneActorManager_Create(void)
 {
     struct Manager *p;
-    if (gUnk_02000480)
-        return gUnk_02000480;
+    if (gSceneActorListManager)
+        return gSceneActorListManager;
     p = Task_Create(9, 0x43c);
     if (p) {
         Task_SetCallbacks(p, SceneActorManager_Update, SceneActorManager_Destroy);

@@ -1,5 +1,6 @@
 #include "script_virtual_machine.h"
 #include "ram.h"
+#include "runtime.h"
 
 s32 Script_FindResourceKey(u32 key, u16 *tbl, s32 x, s32 lo, s32 hi)
 {
@@ -253,7 +254,7 @@ u8 *Script_DecodeOperand(u8 *p, s32 *type, s32 *value)
 
 void Script_ResetArgumentStack(void)
 {
-    gUnk_02000610.argSp = gUnk_02000610.stack + 25;
+    gScriptVm.argSp = gScriptVm.stack + 25;
 }
 
 u32 *Script_PushArgumentFrame(u32 a, u32 b)
@@ -261,10 +262,10 @@ u32 *Script_PushArgumentFrame(u32 a, u32 b)
     if (a == 0)
         return 0;
     else {
-        u32 *p = gUnk_02000610.argSp;
+        u32 *p = gScriptVm.argSp;
         u32 *q = p + b;
         *q++ = a;
-        gUnk_02000610.argSp = q;
+        gScriptVm.argSp = q;
         return p;
     }
 }
@@ -272,47 +273,47 @@ u32 *Script_PushArgumentFrame(u32 a, u32 b)
 void Script_RestoreArgumentStack(u32 *p)
 {
     if (p)
-        gUnk_02000610.argSp = p;
+        gScriptVm.argSp = p;
 }
 
 u32 Script_GetCallArgument(s32 n)
 {
     if (!n)
-        return gUnk_02000610.result;
+        return gScriptVm.result;
     else {
-        u32 *e = (u32 *)gUnk_02000610.argSp[-1];
+        u32 *e = (u32 *)gScriptVm.argSp[-1];
         return ((u32 *)e[1])[n - 1];
     }
 }
 
 u32 Script_GetStackArgument(s32 n)
 {
-    return *(u32 *)((u8 *)gUnk_02000610.argSp - (n * 4 + 4));
+    return *(u32 *)((u8 *)gScriptVm.argSp - (n * 4 + 4));
 }
 
 void Script_SetStackArgument(s32 n, u32 v)
 {
-    *(u32 *)((u8 *)gUnk_02000610.argSp - (n * 4 + 4)) = v;
+    *(u32 *)((u8 *)gScriptVm.argSp - (n * 4 + 4)) = v;
 }
 
 void Script_ResetKeywordStack(void)
 {
-    gUnk_02000610.keywordSp = gUnk_02000610.stack;
+    gScriptVm.keywordSp = gScriptVm.stack;
 }
 
 void Script_PushCtrlNextKeyword(u32 v)
 {
-    *gUnk_02000610.keywordSp++ = v;
+    *gScriptVm.keywordSp++ = v;
 }
 
 void Script_PopCtrlNextKeyword(void)
 {
-    gUnk_02000610.keywordSp--;
+    gScriptVm.keywordSp--;
 }
 
 void Script_SetPc(u8 *p)
 {
-    gUnk_02000610.pc = p;
+    gScriptVm.pc = p;
 }
 
 /* engine.h declares this s32(s32); the real parameter is a byte (the prologue
@@ -322,13 +323,13 @@ s32 Script_SeekToKeyword(s32 keyword)
 {
     u8 k = keyword;
     s32 a, b;
-    u8 *p = (u8 *)gUnk_02000610.keywordSp[-1];
+    u8 *p = (u8 *)gScriptVm.keywordSp[-1];
     for (;;) {
         p = Script_DecodeOperand(p, &a, &b);
         if (a == 0)
             return 0;
         if ((a & 0xF0) == 0x50 && (a >> 16) == k) {
-            gUnk_02000610.pc = (u8 *)b;
+            gScriptVm.pc = (u8 *)b;
             return b;
         }
     }
@@ -337,7 +338,7 @@ s32 Script_SeekToKeyword(s32 keyword)
 s32 Script_ReadNextKeyword(void)
 {
     s32 a, b;
-    u8 *p = gUnk_02000610.pc;
+    u8 *p = gScriptVm.pc;
     if (p == 0)
         return 0;
     if (*p == 0)
@@ -348,7 +349,7 @@ s32 Script_ReadNextKeyword(void)
             return 0;
         if ((a & 0xF0) != 0x50)
             continue;
-        gUnk_02000610.pc = (u8 *)b;
+        gScriptVm.pc = (u8 *)b;
         return a >> 16;
     }
 }
@@ -356,7 +357,7 @@ s32 Script_ReadNextKeyword(void)
 s32 Script_ReadValue(const void *p)
 {
     s32 a, b;
-    gUnk_02000610.pc = Script_DecodeOperand((u8 *)p, &a, &b);
+    gScriptVm.pc = Script_DecodeOperand((u8 *)p, &a, &b);
     return b;
 }
 
@@ -370,7 +371,7 @@ s32 Script_ReadVector32(u8 *p, s32 *destination)
         p = Script_DecodeOperand(p, &type, &value);
         vector[count] = value;
     }
-    gUnk_02000610.pc = p;
+    gScriptVm.pc = p;
     return 0;
 }
 
@@ -384,7 +385,7 @@ s32 Script_ReadVector16(u8 *p, s16 *destination)
         p = Script_DecodeOperand(p, &type, &value);
         vector[count] = value;
     }
-    gUnk_02000610.pc = p;
+    gScriptVm.pc = p;
     return 0;
 }
 
@@ -392,8 +393,8 @@ u32 Script_ReadValueSafe(u8 *p)
 {
     s32 a, b;
     if (p) {
-        gUnk_02000610.pc = Script_DecodeOperand(p, &a, &b);
-        if (gUnk_02000610.pc)
+        gScriptVm.pc = Script_DecodeOperand(p, &a, &b);
+        if (gScriptVm.pc)
             return b;
     }
     return 0;
@@ -408,13 +409,13 @@ s32 Script_ParseStringRef(const void *pc)
 {
     const u8 *p = pc;
     s32 v = (s16)((p[2] << 8) | p[1]);
-    gUnk_02000610.pc = (u8 *)p + 3;
+    gScriptVm.pc = (u8 *)p + 3;
     return v;
 }
 
 void Script_ReadReference(struct ScriptUtilityReference *ref)
 {
-    gUnk_02000610.pc = Script_DecodeVariableReference(Script_GetPc(), ref);
+    gScriptVm.pc = Script_DecodeVariableReference(Script_GetPc(), ref);
 }
 
 /* Gap: scans operands from a hidden cursor argument until the terminating zero
@@ -426,7 +427,7 @@ u8 *sub_0821AAF4(u8 *p)
     u8 **pc;
     do {
         p = Script_DecodeOperand(p, &type, &value);
-        pc = &gUnk_02000610.pc;
+        pc = &gScriptVm.pc;
     } while (type != 0);
     *pc = (u8 *)type;
     return p;
@@ -434,7 +435,7 @@ u8 *sub_0821AAF4(u8 *p)
 
 u8 *Script_GetPc(void)
 {
-    u8 *p = gUnk_02000610.pc;
+    u8 *p = gScriptVm.pc;
     if (p == 0 || *p == 0 || (*p & 0xF0) == 0x50)
         return 0;
     return p;
@@ -500,13 +501,13 @@ void Script_ResetStacks(void)
 
 void Script_ClearCommandTables(void)
 {
-    gUnk_02000458 = 0;
+    gScriptCommandTables = 0;
 }
 
 u32 Script_RegisterCommandTable(struct ScriptCommandTable *n)
 {
-    n->next = gUnk_02000458;
-    gUnk_02000458 = n;
+    n->next = gScriptCommandTables;
+    gScriptCommandTables = n;
     return 0;
 }
 
@@ -517,9 +518,9 @@ s32 sub_0821ABF8(struct ScriptCommandTable *n)
 {
     struct ScriptCommandTable *cur;
     struct ScriptCommandTable *prev;
-    if (gUnk_02000458 == n)
-        gUnk_02000458 = n->next;
-    cur = gUnk_02000458;
+    if (gScriptCommandTables == n)
+        gScriptCommandTables = n->next;
+    cur = gScriptCommandTables;
     prev = cur;
     while (cur != 0) {
         if (cur == n) {
@@ -534,7 +535,7 @@ s32 sub_0821ABF8(struct ScriptCommandTable *n)
 
 struct ScriptCommandEntry *Script_FindCommand(u32 key)
 {
-    struct ScriptCommandTable *b = gUnk_02000458;
+    struct ScriptCommandTable *b = gScriptCommandTables;
     while (b) {
         struct ScriptCommandEntry *e = b->entries;
         s32 n = b->count;
@@ -635,13 +636,11 @@ void *sub_0821AD98(void *table, u32 key, s32 count)
 
 u8 *Text_LookupString(s32 id)
 {
-    u8 **sections = gUnk_02000448;
+    u8 **sections = gScriptSectionBases;
     u8 *e = (u8 *)((id << 2) + (u32)sections[1]);
     u32 v = (e[3] << 24) | (e[2] << 16) | (e[1] << 8) | e[0];
     return sections[2] + (v & 0x7FFFFFFF);
 }
-
-extern u32 gUnk_0200060C;
 
 static inline u32 read_word(u8 *p)
 {
@@ -653,15 +652,15 @@ s32 Script_LoadScript(u8 *p)
     u32 count;
     struct ScriptProcedureTable *ctx = &gScriptProcedureTable;
     u8 *base;
-    gUnk_0200060C = read_word(p);
+    gSaveStateSignature = read_word(p);
     p += 4;
     base = (u8 *)Script_ReadProcTable((u32 *)p, &count);
     ctx->entries = (u32 *)p;
     ctx->count = count;
-    gUnk_02000448[0] = base;
-    gUnk_02000448[1] = base + read_word(base + 4);
-    gUnk_02000448[2] = base + read_word(base + 8);
-    gUnk_02000448[3] = base + read_word(base + 12);
+    gScriptSectionBases[0] = base;
+    gScriptSectionBases[1] = base + read_word(base + 4);
+    gScriptSectionBases[2] = base + read_word(base + 8);
+    gScriptSectionBases[3] = base + read_word(base + 12);
     base += read_word(base);
     ctx->body = base + 4;
     {
@@ -679,7 +678,7 @@ s32 Script_LoadScript(u8 *p)
 
 u8 *sub_0821AED0(void)
 {
-    return gUnk_02000448[3] + 4;
+    return gScriptSectionBases[3] + 4;
 }
 
 /* Script_SaveContext: Copies the loaded script context and section pointers into caller storage */
@@ -693,7 +692,7 @@ struct Block0821AEDC {
 void sub_0821AEDC(struct Block0821AEDC *dst)
 {
     dst[0] = *(struct Block0821AEDC *)&gScriptProcedureTable;
-    dst[1] = *(struct Block0821AEDC *)&gUnk_02000448;
+    dst[1] = *(struct Block0821AEDC *)&gScriptSectionBases;
 }
 
 /* Script_RestoreContext: Restores the loaded script context and section pointers from caller storage */
@@ -707,7 +706,7 @@ struct Block0821AF04 {
 void sub_0821AF04(struct Block0821AF04 *src)
 {
     gScriptProcedureTable = *(struct ScriptProcedureTable *)&src[0];
-    *(struct Block0821AF04 *)gUnk_02000448 = src[1];
+    *(struct Block0821AF04 *)gScriptSectionBases = src[1];
 }
 
 u32 Script_ExecuteBlock(u8 *p, u32 a, u32 b)
@@ -727,12 +726,12 @@ u32 Script_ExecuteBlock(u8 *p, u32 a, u32 b)
                 break;
             case 0x70:
                 p = Script_DecodePacket(p, &length);
-                gUnk_02000610.result = Script_CallInlineProcedure(p);
+                gScriptVm.result = Script_CallInlineProcedure(p);
                 p += length;
                 break;
             case 0x30:
                 p = Script_DecodePacket(p, &length);
-                gUnk_02000610.result = Script_EvalExpression(p);
+                gScriptVm.result = Script_EvalExpression(p);
                 p += length;
                 break;
             case 0:
@@ -749,8 +748,8 @@ done:
 u32 Script_RunBlock(u32 a, struct ScriptUtilityArguments *b)
 {
     if (Script_ExecuteBlock((u8 *)a, (u32)b, 0) == 1)
-        return gUnk_02000610.result;
-    return gUnk_02000610.result = 0;
+        return gScriptVm.result;
+    return gScriptVm.result = 0;
 }
 
 extern const u8 gUnk_08614184[];
@@ -760,8 +759,8 @@ u32 Script_RunProcedureBlock(u32 a, const u8 *b, u32 c)
     if (b == 0)
         b = gUnk_08614184;
     if (Script_ExecuteBlock((u8 *)a, (u32)b, c) == 1)
-        return gUnk_02000610.result;
-    return gUnk_02000610.result = 0;
+        return gScriptVm.result;
+    return gScriptVm.result = 0;
 }
 
 void Script_RunMainBlock(void)
@@ -778,11 +777,9 @@ s32 Script_DiscardValueIfZero(void)
     return 0;
 }
 
-extern u16 gUnk_030039F0;
-
 void Script_SetEntryProcedure(u16 v)
 {
-    gUnk_030039F0 = v;
+    gScriptEntryProcedure = v;
 }
 
 void Script_InitRuntime(void)
@@ -1188,7 +1185,7 @@ s32 Script_SetResultFromOperand(u8 *p)
 {
     s32 a, b;
     Script_DecodeOperand(p, &a, &b);
-    gUnk_02000610.result = b;
+    gScriptVm.result = b;
     return 0;
 }
 
@@ -1196,9 +1193,9 @@ s32 Script_ExecuteReturn(void)
 {
     u8 *p = Script_GetPc();
     if (p)
-        gUnk_02000610.result = Script_GetValue();
+        gScriptVm.result = Script_GetValue();
     else
-        gUnk_02000610.result = (u32)p;
+        gScriptVm.result = (u32)p;
     return 1;
 }
 
@@ -1352,7 +1349,7 @@ u32 Script_EvalExpression(u8 *p)
             p = Script_DecodeOperand(p, &frame.type, &frame.value);
             if (frame.type == 0x80) {
                 Script_ExecuteBlock((u8 *)frame.value, 0, 0);
-                ((struct Slot *)((u32)slot + 8))->value = gUnk_02000610.result;
+                ((struct Slot *)((u32)slot + 8))->value = gScriptVm.result;
             } else
                 ((struct Slot *)((u32)slot + 8))->value = frame.value;
             slot = (struct Slot *)((u32)slot + 8);

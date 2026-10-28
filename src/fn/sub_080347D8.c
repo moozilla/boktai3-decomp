@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Engine {
     u8 pad0[0x1c];
     u8 flag;
@@ -26,7 +27,6 @@ struct LinkStatus {
     u8 pad0[2];
     u8 count;
 };
-extern struct Engine *gUnk_02000484;
 extern struct LinkManager gUnk_03005390;
 extern struct LinkStatus *gUnk_03006A80;
 int RfuManager_SendData(int);
@@ -43,7 +43,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
 
 void sub_080347D8(u8 msg)
 {
-    struct Engine *p = gUnk_02000484;
+    struct Engine *p = gWirelessController;
     if (p == 0)
         return;
     switch (msg) {

@@ -3,6 +3,7 @@
 #include "scene_actor_reaction.h"
 #include "area_effect_link.h"
 #include "render.h"
+#include "runtime.h"
 void SceneActorRecord_RecordPair(u16, u16);
 void Player_NotifyFirstSelectedSlot(u32, u32);
 void Player_RefreshLifeState(u32, u32);
@@ -14,7 +15,6 @@ void AnimData_SelectPaletteBank(void *, s32);
 void SceneHud_SetTimedState(u32, s32, s32, s32, s32, s32);
 void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
-extern u16 gUnk_030039F0;
 struct BurnState {
     u8 unknown0[0xAA];
     u8 intensity;
@@ -409,7 +409,7 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
 
 record:
     if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
-        SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
+        SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->id);
     ((struct ContactCollider *)collider)->flags |= 4;
 done:
     burn->timer = 0;

@@ -2,6 +2,7 @@
 #define GUARD_ACTOR_ATTACHMENT_STATE_H
 #include "actor_attachment.h"
 #include "contact_swarm.h"
+#include "ram.h"
 struct ActorAttachmentPartResource {
     u32 unknown0;
     u16 tileBase;
@@ -43,7 +44,6 @@ struct ActorAttachmentManagerView {
     struct ActorAttachmentSlotView slots[8];
     u32 occupiedMask;
 };
-extern struct ActorAttachmentManagerView *gUnk_02000124;
 static inline u32 ActorAttachment_ReadByteFlags(const u8 *flags, u32 mask)
 {
     return *flags & mask;

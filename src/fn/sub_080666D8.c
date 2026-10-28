@@ -38,7 +38,7 @@ ActorAttachment_CreateFixedSpriteSlot(struct ContactPosition *anchor, void *upda
     struct ContactSwarmSprite *sprite;
     void *graphics, *sequence;
     s32 xOffset, zOffset;
-    existing = gUnk_02000124;
+    existing = gActorAttachmentManager;
     if (!existing) {
         manager = ActorAttachment_CreateManager();
         if (manager)

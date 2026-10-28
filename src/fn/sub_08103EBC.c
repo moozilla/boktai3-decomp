@@ -1,12 +1,12 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_020001AC;
 s32 Script_GetKeywordValue(s32, s32);
 u8 *NamedObject_FindByName(s32);
 void NamedActor_ClearFlag1000FromScript(void)
 {
     s32 r = Script_GetKeywordValue(0x6e, 0);
-    if (gUnk_020001AC != 0 && r != 0) {
+    if (gNamedActorManager != 0 && r != 0) {
         u8 *p = NamedObject_FindByName(r);
         if (p != 0) {
             u16 *q = (u16 *)(p + 0xb8);

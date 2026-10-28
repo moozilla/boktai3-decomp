@@ -1,8 +1,7 @@
-#define gSceneHud gFieldHud
 #include "global.h"
 #include "scene_hud_display.h"
 #include "game_state.h"
-extern struct SceneHudState *gSceneHud;
+#include "ram.h"
 extern u16 gSceneHudMode;
 void SceneHud_RemoveAnimations(struct SceneHudState *);
 void PauseMenu_RemoveHeaderAnimation(struct SceneHudState *);
@@ -45,6 +44,6 @@ s32 SceneHud_DestroyOwner(struct SceneHudState *s)
         } while (--count >= 0);
     }
     gSceneHudMode = s->mode;
-    gSceneHud = 0;
+    (*(struct SceneHudState **)&gFieldHud) = 0;
     return 0;
 }

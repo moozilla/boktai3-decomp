@@ -66,7 +66,7 @@ s32 TilemapPanel_Initialize(struct TilemapPanel *p)
         u32 mask = 0x400;
         gDispCntShadow = mask | gDispCntShadow;
     }
-    gUnk_03004C30[2].y = 0;
+    gBgRecords[2].y = 0;
     TilemapPanel_DrawRegion(p, 0, 0, 0, 0, 8, 1, 4, 20, 0, 0);
     p->value40 = 0x100;
     gUnk_020004B8 = p;

@@ -2,6 +2,7 @@
 #define GUARD_CELL_GATE_H
 #include "contact_swarm.h"
 #include "game_state.h"
+#include "ram.h"
 /* Tentative cell-local traversal gate; flags select behavior and constrained axis. */
 struct CellGate {
     u8 unknown0[0x18];
@@ -28,7 +29,6 @@ struct CellGatePlayer {
 };
 typedef void (*CellGateUpdate)(struct CellGate *);
 extern struct CellGatePlayer *gUnk_02000580;
-extern u16 gUnk_02000534, gUnk_02000500;
 s32 CellGate_TestPlayerHeight(struct CellGate *);
 s32 CellGate_TestPlayerCell(struct CellGate *);
 s32 CellGate_TestPlayerEdge(struct CellGate *, s32);

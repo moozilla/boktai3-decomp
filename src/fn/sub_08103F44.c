@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_actor_terrain.h"
-extern u8 *gUnk_020001AC;
+#include "ram.h"
 extern void *gUnk_02000580;
 u32 Player_TestAttachmentFlags(void *, u32);
 static inline u32 Attributes(s32 cell)
@@ -23,7 +23,7 @@ static inline u8 PlayExit(s32 cell, s32 height)
 }
 void NamedObject_PlayAdjacentExitSound(u8 *o)
 {
-    u8 *manager = gUnk_020001AC;
+    u8 *manager = gNamedActorManager;
     s32 x, z, cell, height;
     if (!manager)
         return;

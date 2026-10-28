@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 #include "engine.h"
 struct Grid {
     u8 pad0[8];
@@ -8,11 +9,6 @@ struct TerrainTask {
     u32 unk0;
     struct Grid *grid;
 };
-struct BgOffset {
-    u8 pad0[8];
-    s16 x, y;
-};
-extern struct BgOffset gUnk_030042A0;
 void Terrain_LoadHP(s32 hp);
 void Terrain_LoadGridResource(u16);
 void Terrain_LoadBoxesResource(u16);
@@ -58,13 +54,13 @@ void Terrain_LoadFromScript(void)
         if (mode == 0) {
             Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, Sprite_RenderScaledList,
                                      sub_08219624);
-            gUnk_030042A0.x = g->originX >> 4;
-            gUnk_030042A0.y = g->originY >> 4;
+            gCamera.offsetX = g->originX >> 4;
+            gCamera.offsetY = g->originY >> 4;
         } else {
             Video_SetRenderCallbacks(mode, SpriteOam_QueueCameraRelativeSprites, sub_08214D20,
                                      sub_0821964C);
-            gUnk_030042A0.x = 0;
-            gUnk_030042A0.y = 0;
+            gCamera.offsetX = 0;
+            gCamera.offsetY = 0;
         }
     }
 }

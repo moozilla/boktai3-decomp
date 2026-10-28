@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 /* tentative: travels to the nearest active growth hazard, lands on it and resets its cooldown */
 
@@ -28,7 +29,6 @@ typedef struct HresvelgrActor {
     u8 pad3A4[0x420 - 0x3A4];
     void *hazards;
 } HresvelgrActor;
-extern s32 gUnk_0200022C;
 void Hresvelgr_SetAnimation(void *, void *, void *, s32, s32, s32);
 void Sound_PlaySong(u32);
 s32 Callback_InvokeActor(void *, void *);
@@ -46,8 +46,9 @@ void Hresvelgr_UpdateHazardVisit(HresvelgrActor *p)
     }
     if (p->changed) {
         p->changed = 0;
-        gUnk_0200022C = GrowthHazard_FindNearestActiveEntry(p->hazards, &p->position, &p->target);
-        if (gUnk_0200022C >= 0) {
+        gHresvelgrHazardIndex =
+            GrowthHazard_FindNearestActiveEntry(p->hazards, &p->position, &p->target);
+        if (gHresvelgrHazardIndex >= 0) {
             Hresvelgr_SetAnimation(p, p->animation, p->animationResource, 0, 1, 4);
             ColliderActor_SetTargetPosition(p, &p->target);
             p->state = 0;
@@ -74,7 +75,7 @@ void Hresvelgr_UpdateHazardVisit(HresvelgrActor *p)
                 p->timer++;
             }
             if (p->landed && p->animationCompleted > 4) {
-                GrowthHazard_ResetEntryCooldown(self->hazards, gUnk_0200022C);
+                GrowthHazard_ResetEntryCooldown(self->hazards, gHresvelgrHazardIndex);
                 Anim_SetFrameDurationScale(self->animation, 0x40);
                 {
                     u8 st = 2;

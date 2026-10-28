@@ -1,5 +1,5 @@
-#define gOffsetActorAnimationRepeats gUnk_0200021C
 #include "global.h"
+#include "ram.h"
 struct OffsetActorAction {
     u8 state, pad1[3];
     u32 frame, unk8, unkC;
@@ -19,7 +19,6 @@ struct OffsetActor {
 void ActionState_Reset(void *);
 void ActionState_SetState(void *, u32);
 s32 Hresvelgr_HasAdjacentOverride(struct OffsetActor *);
-extern s32 gOffsetActorAnimationRepeats;
 static inline u8 Enter(struct OffsetActor *p)
 {
     if (p->entered) {

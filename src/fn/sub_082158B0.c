@@ -1,24 +1,18 @@
 #include "global.h"
 #include "render.h"
-struct Background {
-    u8 pad[0x20];
-    u16 x, y;
-    u8 tail[0xc];
-};
-extern struct Background gUnk_03004C30[];
 void Bg_UpdateScrollShadow(void)
 {
     u16 *dst = gBgScrollShadow;
-    struct Background *src = gUnk_03004C30;
+    struct BackgroundLayer *src = gBgRecords;
     u32 mask;
-    dst[0] = src[0].x & 0xff;
+    dst[0] = ((u16)src[0].x) & 0xff;
     mask = 0xff;
-    dst[1] = mask & src[0].y;
-    dst[2] = mask & src[1].x;
-    dst[3] = mask & src[1].y;
+    dst[1] = mask & ((u16)src[0].y);
+    dst[2] = mask & ((u16)src[1].x);
+    dst[3] = mask & ((u16)src[1].y);
     if (!gBgAffineMode) {
-        dst[4] = mask & src[2].x;
-        dst[5] = mask & src[2].y;
+        dst[4] = mask & ((u16)src[2].x);
+        dst[5] = mask & ((u16)src[2].y);
         dst[6] = mask & *(u16 *)((u8 *)src + 0xb0);
         dst[7] = mask & *(u16 *)((u8 *)src + 0xb2);
     } else {

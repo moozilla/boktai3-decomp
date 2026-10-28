@@ -1,11 +1,9 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "route_sprite_actor.h"
 #include "engine.h"
 
-/* confidence=low: picks the next route point, then builds the 12-point wander spline toward the source position */
-
-/* confidence=low: picks the next route point, then builds the 12-point wander spline toward the source position */
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 extern void *gUnknown_02000580;
@@ -23,16 +21,10 @@ static inline s32 f0806D438_T12(s32 value)
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
 
-static inline u32 f0806D438_NextRandom(void)
+static inline u32 f0806D438_NextRandom(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(const u16 *)((u32)gUnk_0203B400 + gRandomIndex * 2);
-}
-
-static inline u32 f0806D438_NextByte(void)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(const u8 *)((u32)gUnk_0203B400 + gRandomIndex * 2);
+    return table[gRandomIndex];
 }
 
 static inline void f0806D438_SubVec(struct ContactPosition *out, struct ContactPosition *a,
@@ -43,6 +35,20 @@ static inline void f0806D438_SubVec(struct ContactPosition *out, struct ContactP
     out->z = a->z - b->z;
 }
 
+struct WanderSource {
+    u8 unknown0[0x30];
+    struct ContactPosition position;
+};
+
+static inline struct ContactPosition *PrepareSourceDelta(void **source, struct ContactPosition *out,
+                                                         struct RouteSpriteActor *actor)
+{
+    struct WanderSource *origin = *source;
+    struct ContactPosition *target = &origin->position;
+    f0806D438_SubVec(out, &actor->sprite.position, target);
+    return target;
+}
+
 static inline void f0806D438_Polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
     v->x = f0806D438_T12(gUnk_086149C4[(angle + 64) & 255] * radius);
@@ -50,25 +56,51 @@ static inline void f0806D438_Polar(struct ContactPosition *v, s32 angle, s32 rad
     v->z = f0806D438_T12(gUnk_086149C4[angle & 255] * radius);
 }
 
-/* confidence=low: picks the next route point, then builds the 12-point wander spline toward the source position */
-#ifdef NONMATCHING
-// fuzzy: 46.7%
-// scope shape 175 (differences once low registers are set aside)
-void RouteSpriteActor_PlanWanderPath(struct RouteSpriteActor *actor)
+static inline void f0806D438_Curve(struct ContactPosition *out, struct ContactPosition *start,
+                                   struct ContactPosition *end, s32 tx, s32 tz, s32 t)
 {
-    struct RouteSpriteRoute *route = &actor->route;
-    struct ContactPosition *target;
-    struct ContactPosition *elevated;
-    struct ContactPosition polar;
-    struct ContactPosition start;
     struct ContactPosition offset;
     struct ContactPosition acc;
+    s32 q, p, twiceP, thriceQ, tangent, h11;
+    s32 scaled, value;
+    f0806D438_SubVec(&offset, end, start);
+    ZeroFill8(&acc);
+    q = f0806D438_T10(t * t);
+    p = f0806D438_T10(q * t);
+    twiceP = p * 2;
+    thriceQ = q * 3;
+    tangent = (p - 2 * q + t) * tz;
+    h11 = p - q;
+    scaled = ((twiceP - thriceQ + 1) * acc.x) * tx;
+    value = (thriceQ - twiceP) * offset.x;
+    value = scaled + value + tangent + h11;
+    out->x = start->x + f0806D438_T10(value);
+    scaled = ((twiceP - thriceQ + 1) * acc.y) * tx;
+    value = (-twiceP + thriceQ) * offset.y;
+    value = scaled + value + tangent + h11;
+    out->y = start->y + f0806D438_T10(value);
+    scaled = ((twiceP - thriceQ + 1) * acc.z) * tx;
+    value = (-twiceP + thriceQ) * offset.z;
+    value = scaled + value + tangent + h11;
+    out->z = start->z + f0806D438_T10(value);
+}
+
+void RouteSpriteActor_PlanWanderPath(struct RouteSpriteActor *actor)
+{
+    const u16 *table;
+    struct RouteSpriteRoute *route = &actor->route;
+    struct ContactPosition *target;
+    struct ContactPosition polar;
+    struct ContactPosition start;
     struct ContactPosition delta;
     s32 step, tx, tz, k;
-    s32 radius, t, q, p, h00, h01, h11, tangent;
-    u8 index, angle;
+    s32 radius;
+    u8 index;
+    s16 angle;
 
-    index = Mod(f0806D438_NextRandom(), route->resource->pointCount);
+    table = gUnk_0203B400;
+    asm("" : "+r"(table));
+    index = Mod(f0806D438_NextRandom(table), route->resource->pointCount);
     if (index == route->index) {
         index = Mod(index + 1, route->resource->pointCount);
     }
@@ -78,48 +110,35 @@ void RouteSpriteActor_PlanWanderPath(struct RouteSpriteActor *actor)
         (const struct RouteSpriteRoutePoint *)((u8 *)Path_GetPointData((u8 *)route->resource) +
                                                route->index * 8);
 
-    target = (struct ContactPosition *)((u8 *)gUnknown_02000580 + 0x30);
-    f0806D438_SubVec(&delta, &actor->sprite.position, target);
+    target = PrepareSourceDelta(&gUnknown_02000580, &delta, actor);
 
-    elevated = &actor->elevatedPosition;
-    *elevated = *target;
+    actor->elevatedPosition = *target;
     actor->prepared = 0;
 
-    angle = f0806D438_NextByte();
-    radius = f0806D438_NextByte() - 0x80;
-    f0806D438_Polar(&polar, angle, radius);
-    elevated->x = elevated->x + polar.x;
-    elevated->y = 0;
-    elevated->z = elevated->z + polar.z;
+    angle = f0806D438_NextRandom(table) & 255;
+    radius = f0806D438_NextRandom(table) & 255;
+    f0806D438_Polar(&polar, angle, radius - 0x80);
+    actor->elevatedPosition.x = actor->elevatedPosition.x + polar.x;
+    actor->elevatedPosition.z = actor->elevatedPosition.z + polar.z;
 
     start = actor->sprite.position;
-    *(u32 *)&start &= 0xFFFF;
+    {
+        u32 mask = 0xFFFF;
+        *(u32 *)&start = mask & *(u32 *)&start;
+    }
+    actor->elevatedPosition.y = 0;
 
     step = Div(0x400, 12);
     tx = actor->target.x << 7;
     tz = actor->target.z << 7;
 
     for (k = 0; k < 12; k++) {
-        struct ContactPosition *wp = &actor->waypoints[k];
-
-        t = step * (k + 1);
-        offset.x = elevated->x - start.x;
-        offset.y = elevated->y - start.y;
-        offset.z = elevated->z - start.z;
-        ZeroFill8(&acc);
-        q = f0806D438_T10(t * t);
-        p = f0806D438_T10(q * t);
-        tangent = (p - 2 * q + t) * tz;
-        h11 = p - q;
-        h00 = 2 * p - 3 * q + 1;
-        h01 = 3 * q - 2 * p;
-        wp->x = start.x + f0806D438_T10(tx * (acc.x * h00) + h01 * offset.x + tangent + h11);
-        wp->y = start.y + f0806D438_T10(tx * (acc.y * h00) + h01 * offset.y + tangent + h11);
-        wp->z = start.z + f0806D438_T10(tx * (acc.z * h00) + h01 * offset.z + tangent + h11);
+        s32 next = k + 1;
+        struct ContactPosition *wp = (struct ContactPosition *)((u32)actor + k * 8);
+        wp = (struct ContactPosition *)((u8 *)wp + (u32) &
+                                        ((struct RouteSpriteActor *)0)->waypoints);
+        f0806D438_Curve(wp, &start, &actor->elevatedPosition, tx, tz, step * next);
     }
 
-    actor->endpoint = *elevated;
+    actor->endpoint = actor->elevatedPosition;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", RouteSpriteActor_PlanWanderPath);
-#endif

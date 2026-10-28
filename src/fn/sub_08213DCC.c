@@ -1,18 +1,12 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "runtime.h"
 struct Dma {
     vu32 src, dest, control;
 };
-struct Task {
-    u8 p0[0x10];
-    u16 h10;
-    u8 p12[2];
-    u8 b14, b15, b16;
-};
-extern u32 gUnk_0300426C, gUnk_03001110, gUnk_03003A08, gUnk_03004264;
+extern u32 gUnk_0300426C, gUnk_03004264;
 extern u16 gUnk_0300427C;
-extern struct Task gUnk_03001118, gUnk_03001130;
 void Mosaic_Initialize(void);
 void sub_082156D8(u32);
 void Video_SetWindowBounds(u32, u32, u32, u32, u32);
@@ -36,7 +30,8 @@ void InterruptsAndVideo_InitRuntime(void)
     u8 byteZero, byteOne;
     struct Dma *dma;
     u32 mask;
-    struct Task *a, *b;
+    struct RuntimeTask *a;
+    struct RuntimeTask *b;
     fill = zero;
     dma = (struct Dma *)0x040000D4;
     dma->src = (u32)&fill;
@@ -58,7 +53,7 @@ void InterruptsAndVideo_InitRuntime(void)
     (void)*(vu16 *)0x04000200;
     *(vu16 *)0x04000200 = zero;
     gUnk_0300426C = 1;
-    gUnk_03001110 = zero;
+    gVideoIrqPhase = zero;
     byteOne = 1;
     gUnk_0300427C = 1;
     mask = 0x2000;
@@ -79,7 +74,7 @@ void InterruptsAndVideo_InitRuntime(void)
     Video_SetWindowBounds(1, 0, 0, 240, 160);
     Video_SetWindowLayerMasks(0x3f, 1, 0, 0);
     gQueuedObjSlotCount = zero;
-    gUnk_03003A08 = zero;
+    gSceneEntryActive = zero;
     Sprite_InitSystem();
     ObjShape_InitTables();
     Anim_ResetDefaultFlags();
@@ -89,16 +84,16 @@ void InterruptsAndVideo_InitRuntime(void)
                              sub_08219624);
     gSceneEffectPalettePhase = zero;
     gUnk_03004264 = zero;
-    a = &gUnk_03001118;
+    a = &gVideoUploadTask;
     Task_SetCallbacks(a, InterruptsAndVideo_OnVideoUploadTask, 0);
-    b = &gUnk_03001130;
+    b = &gGraphicsUpdateTask;
     Task_SetCallbacks(b, InterruptsAndVideo_OnGraphicsUpdateTask, 0);
-    a->b14 = byteZero;
-    a->b16 = byteOne;
-    a->h10 = zero;
-    b->b14 = 13;
-    b->b16 = byteOne;
-    b->h10 = zero;
+    a->priority = byteZero;
+    a->unk16 = byteOne;
+    a->id = zero;
+    b->priority = 13;
+    b->unk16 = byteOne;
+    b->id = zero;
     Task_LinkToPriorityList(a);
     Task_LinkToPriorityList(b);
 }

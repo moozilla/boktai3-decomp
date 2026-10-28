@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 #include "background_controller.h"
 /* Background_LoadLayerMap: Resolves a background resource via sub_08216E54, optionally finds the map id with Background_FindMapId, then calls Bg_SetLayerMap; matches docs' descr */
 #define Background_LoadLayerMap sub_080020BC
@@ -78,12 +79,12 @@ s32 Background_Update(struct Background *p)
     if (p->flags & 2) {
         s32 cx, cy;
         register s32 bottom asm("r5");
-        if (!gUnk_030042A0.mode) {
-            cx = gUnk_03005418[0] + gUnk_030042A0.offsetX;
-            cy = gUnk_03005418[1] + gUnk_030042A0.offsetY;
+        if (!gCamera.mode) {
+            cx = gUnk_03005418[0] + gCamera.offsetX;
+            cy = gUnk_03005418[1] + gCamera.offsetY;
         } else {
-            cx = gUnk_030042A0.x >> 3;
-            cy = gUnk_030042A0.y >> 3;
+            cx = gCamera.position.x >> 3;
+            cy = gCamera.position.y >> 3;
         }
         if (!(p->flags & 1)) {
             cx -= p->cameraOffsetX;
@@ -173,8 +174,8 @@ s32 Background_Update(struct Background *p)
             value;
         });
         if (p->flags & 32) {
-            x += gUnk_03005418[0] + gUnk_030042A0.offsetX;
-            y += gUnk_03005418[1] + gUnk_030042A0.offsetY;
+            x += gUnk_03005418[0] + gCamera.offsetX;
+            y += gUnk_03005418[1] + gCamera.offsetY;
         }
         {
             register s32 rowY asm("r5") = y;
@@ -237,7 +238,7 @@ s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig 
     p->id = id;
     p->flags = c->flags;
     p->layer = c->layer;
-    layer = &gUnk_03004C30[p->layer];
+    layer = &gBgRecords[p->layer];
     p->resource = c->resource;
     resource = sub_08216E54(p->resource);
     if (p->flags & 1) {
@@ -249,8 +250,8 @@ s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig 
         offsetY = 0;
     }
     if (p->flags & 2) {
-        x = gUnk_03005418[0] + gUnk_030042A0.offsetX;
-        y = gUnk_03005418[1] + gUnk_030042A0.offsetY;
+        x = gUnk_03005418[0] + gCamera.offsetX;
+        y = gUnk_03005418[1] + gCamera.offsetY;
     } else {
         x = c->x;
         y = c->y;
@@ -704,7 +705,7 @@ static inline s32 pixel(s16 v)
 
 s32 ScrollingBackground_Update(struct ScrollingBackground *p)
 {
-    struct BackgroundLayer *layer = &gUnk_03004C30[p->layer];
+    struct BackgroundLayer *layer = &gBgRecords[p->layer];
     s32 width, height;
     s32 cx, cy;
     ScrollingBackground_ApplyCommands(p);
@@ -713,8 +714,8 @@ s32 ScrollingBackground_Update(struct ScrollingBackground *p)
     width = p->width << 4;
     height = p->height << 4;
     if (p->flags & 8) {
-        s32 speed = gUnk_02000550 * (s16)p->speedScale;
-        s32 angle = (gUnk_0200053C + 160) & 255;
+        s32 speed = gPlayerBackgroundState * (s16)p->speedScale;
+        s32 angle = (gPlayerBackgroundMode + 160) & 255;
         s32 x, y;
         const s16 *sine = gUnk_086149C4;
         p->accumulatedX += sine[(angle + 64) & 255] * speed;
@@ -749,8 +750,8 @@ s32 ScrollingBackground_Update(struct ScrollingBackground *p)
         layer->x = pixel(p->x);
         layer->y = pixel(p->y);
     }
-    cx = gUnk_03005418[0] + gUnk_030042A0.offsetX;
-    cy = gUnk_03005418[1] + gUnk_030042A0.offsetY;
+    cx = gUnk_03005418[0] + gCamera.offsetX;
+    cy = gUnk_03005418[1] + gCamera.offsetY;
     if (p->width)
         layer->x += Mod(cx - 120, p->width);
     else {
@@ -791,7 +792,7 @@ s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id,
     p->id = id;
     p->flags = c->flags;
     p->layer = c->layer;
-    layer = &gUnk_03004C30[p->layer];
+    layer = &gBgRecords[p->layer];
     p->resource = c->resource;
     resource = sub_08216E54(p->resource);
     if (p->flags & 1) {
@@ -800,8 +801,8 @@ s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id,
         c->offsetY = dims->y;
     }
     if (p->flags & 2) {
-        x = gUnk_03005418[0] + gUnk_030042A0.offsetX;
-        y = gUnk_03005418[1] + gUnk_030042A0.offsetY;
+        x = gUnk_03005418[0] + gCamera.offsetX;
+        y = gUnk_03005418[1] + gCamera.offsetY;
         scale = c->scale;
     } else {
         x = c->x;

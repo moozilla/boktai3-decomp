@@ -1,19 +1,14 @@
 #include "global.h"
+#include "scene_body_registry.h"
 struct N {
     u8 pad[0x40];
     struct N *prev;
     struct N *next;
 };
-struct H {
-    u8 pad[0x18];
-    struct N *first;
-    struct N *last;
-};
-extern struct H *gUnk_030025F8;
 s32 SceneBody_FindByPointer(struct N *);
 s32 SceneBody_Unregister(struct N *n)
 {
-    struct H *h = gUnk_030025F8;
+    struct SceneBodyRegistry *h = gSceneBodyRegistry;
     if (h == 0 || n == 0 || SceneBody_FindByPointer(n) == 0)
         return 0;
     {

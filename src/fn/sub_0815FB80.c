@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 #include "player.h"
 // confidence=low: orbit animation drains current stat A to a target during the player transition.
 struct PlayerOrbitEffect {
@@ -12,7 +13,6 @@ struct PlayerOrbitEffect {
     u8 unknown64[0x8E];
     u16 frame, recoveryStep, targetStatA;
 };
-extern struct SceneVec gUnk_030042A0;
 void Sound_PlaySong(u32);
 void ActorShadow_Disable(void *);
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);
@@ -49,12 +49,12 @@ void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *p)
             Anim_SetKeyframes(animation, data, 0xE5, 1, 1);
         }
         {
-            struct SceneVec *origin = &gUnk_030042A0;
+            struct CameraPosition *origin = &gCamera.position;
             s32 offset = *frame << 5;
             offset -= 768;
             p->position.x = origin->x + offset;
         }
-        p->position.z = gUnk_030042A0.z - ((*frame - 16) << 7);
+        p->position.z = gCamera.position.z - ((*frame - 16) << 7);
         PlayerOrbitEffect_SpawnParticle(p, &p->position, 0x48);
     } else if (*frame <= 39) {
         animation = p->animation;
@@ -64,12 +64,12 @@ void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *p)
             Anim_SetKeyframes(animation, data, 0xE6, 1, 1);
         }
         {
-            struct SceneVec *origin = &gUnk_030042A0;
+            struct CameraPosition *origin = &gCamera.position;
             s32 offset = *frame << 5;
             offset -= 1280;
             p->position.x = origin->x - offset;
         }
-        p->position.z = gUnk_030042A0.z + ((*frame - 32) << 7);
+        p->position.z = gCamera.position.z + ((*frame - 32) << 7);
         PlayerOrbitEffect_SpawnParticle(p, &p->position, 0xC8);
     } else if (*frame <= 55) {
         animation = p->animation;
@@ -78,9 +78,9 @@ void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *p)
             *(u32 *)(p->animation + 8) |= 4;
             Anim_SetKeyframes(animation, data, 0xE5, 1, 1);
         }
-        p->position.x = gUnk_030042A0.x - ((*frame - 48) << 7);
+        p->position.x = gCamera.position.x - ((*frame - 48) << 7);
         {
-            struct SceneVec *origin = &gUnk_030042A0;
+            struct CameraPosition *origin = &gCamera.position;
             s32 offset = *frame << 5;
             offset -= 1280;
             p->position.z = origin->z + offset;
@@ -93,9 +93,9 @@ void PlayerOrbitEffect_UpdateStatTransfer(struct PlayerOrbitEffect *p)
             *(u32 *)(p->animation + 8) &= ~4;
             Anim_SetKeyframes(animation, data, 0xE6, 1, 1);
         }
-        p->position.x = gUnk_030042A0.x + ((*frame - 64) << 7);
+        p->position.x = gCamera.position.x + ((*frame - 64) << 7);
         {
-            struct SceneVec *origin = &gUnk_030042A0;
+            struct CameraPosition *origin = &gCamera.position;
             s32 offset = *frame << 5;
             offset -= 2304;
             p->position.z = origin->z + offset;

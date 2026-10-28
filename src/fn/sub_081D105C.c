@@ -15,7 +15,6 @@ struct SceneNpc {
     u8 blockD4[0x1F8];
     void *update;
 };
-extern void *gUnk_02000480;
 struct SceneNpc *Actor_FindById(void *manager, s32 name);
 void DisplayAnimation_SetFlags(void *, s32);
 void Actor_DisableShadow(struct SceneNpc *);
@@ -31,7 +30,7 @@ void SceneNpc_StopFromScript(void)
     if (!gSceneNpc)
         return;
     if (Script_SeekToKeyword('n')) {
-        void *manager = gUnk_02000480;
+        void *manager = gSceneActorListManager;
         if (!manager)
             return;
         npc = Actor_FindById(manager, Script_GetKeywordValue('n', 0));

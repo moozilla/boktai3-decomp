@@ -1,3 +1,4 @@
+#include "libgcc_numbers.h"
 /* Derived from pret/agbcc da598c1d918402c42c0c0d7128ba14567f3175e9,
  * libgcc/fp-bit-base.c (dp configuration). See docs/LIBGCC.md.
  * Original FSF license and linking exceptions are retained below. */
@@ -54,25 +55,8 @@ typedef unsigned int UDItype __attribute__ ((mode (DI)));
  typedef USItype halffractype;
  typedef DFtype FLO_type;
  typedef DItype intfrac;
-typedef enum
-{
-  CLASS_SNAN,
-  CLASS_QNAN,
-  CLASS_ZERO,
-  CLASS_NUMBER,
-  CLASS_INFINITY
-} fp_class_type;
-typedef struct
-{
-  fp_class_type class;
-  unsigned int sign;
-  int normal_exp;
-  union
-    {
-      fractype ll;
-      halffractype l[2];
-    } fraction;
-} fp_number_type;
+
+typedef struct SoftDoubleNumber fp_number_type;
 typedef union
 {
   FLO_type value;
@@ -91,8 +75,7 @@ __inline__
 static fp_number_type *
 nan ()
 {
-  extern fp_number_type gUnk_030035C8;
-  return &gUnk_030035C8;
+  return &gSoftDoubleNaN;
 }
 __inline__
 static int

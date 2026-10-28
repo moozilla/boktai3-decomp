@@ -13,8 +13,6 @@ struct FanCannonManager {
     struct FanCannon slots[8];
 };
 extern u32 gUnk_02000560;
-extern u16 gUnk_02000550;
-extern u16 gUnk_0200053C;
 void FanCannon_Update(struct FanCannonManager *, struct FanCannon *, s32);
 void FanCannon_UpdateActive(void);
 void Sound_StopSong(u32);
@@ -31,8 +29,8 @@ u32 FanCannonManager_Update(struct FanCannonManager *p)
         if (gUnk_02000560 & pauseMask)
             return 0;
     }
-    gUnk_02000550 = 0;
-    gUnk_0200053C = 0;
+    gPlayerBackgroundState = 0;
+    gPlayerBackgroundMode = 0;
     slot = p->slots;
     i = 0;
     do {

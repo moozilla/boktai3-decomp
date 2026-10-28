@@ -148,5 +148,72 @@ extern u32 gForgingBook;                  /* forging book task (ForgingBook_*) *
 extern u32 gShadowRegistry;               /* shadow registry task (ShadowRegistry_*) */
 extern u8 *gSolarController;              /* solar sensor controller (Solar_*) */
 extern u32 gScenePauseFlags; /* scene pause/mute flags (bit tests across effects and actors) */
+extern void *
+    gParticleGroupManager; /* provisional: six-group particle manager singleton (ParticleManager_Initialize) */
+extern s32
+    gWeatherCooldownBase; /* weather cooldown base, configured by Weather_ConfigureCooldown */
+extern s32 gWeatherCooldownRange; /* random range added to the weather cooldown */
+extern u32 gStormActive;          /* set while Weather_Update is in storm phase 3 */
+extern s32 gStormTimer; /* provisional: storm duration/delay countdown shared by weather phases */
+extern u8
+    *gSceneActorRegistry[8]; /* eight scene actor registry slots (SceneActors_FindAvailable) */
+extern void
+    *gActorPoolManager; /* actor pool singleton; separate slot after the eight-entry registry */
+extern u32 gWirelessLastStatus; /* cached wireless status used when its controller is absent */
+extern struct ActorAttachmentManagerView
+    *gActorAttachmentManager; /* actor attachment manager singleton */
+extern struct SceneParticlePool
+    *gSceneParticleEmitterPool; /* provisional: scene particle emitter pool singleton */
+extern struct NamedObjectManager
+    *gNamedActorManager;           /* named actor object pool singleton; provisional common name */
+extern void *gActorGroupPool;      /* four-slot actor group and callback pool singleton */
+extern u32 gLinkSessionStep;       /* provisional: Registry1745_RunSession diagnostic step marker */
+extern u8 *gConfirmPanel;          /* provisional: Registry3C9F confirmation panel singleton */
+extern void *gRegistryE7BCManager; /* provisional: registry E7BC pooled-object manager */
+extern s32 gOffsetActorAnimationRepeats; /* repeated offset-actor animation counter */
+extern s32 gHresvelgrAttackCount;        /* provisional: Hresvelgr attack-cycle counter */
+extern s32
+    gHresvelgrHazardIndex; /* nearest active growth hazard selected by Hresvelgr_UpdateHazardVisit */
+extern u32 gHresvelgrVolleyState;            /* provisional: Hresvelgr volley state word */
+extern s32 gHresvelgrVolleyCount;            /* alternating Hresvelgr volley pulse counter */
+extern struct F3E4Actor *gRegistryF3E4Actor; /* provisional: registry F3E4 singleton actor */
+extern u16
+    gSceneNpcBlendPalette[16]; /* sixteen-color output palette blended by SceneNpc_BlendPalette */
+extern u8
+    *gScriptedActorController;     /* provisional: singleton scripted actor animation controller */
+extern u8 *gScriptSectionBases[4]; /* four resolved section bases from the loaded script header */
+extern struct ScriptCommandTable *
+    gScriptCommandTables; /* registered native command-table list head; separate from section bases */
+extern s32 gWeatherCollisionTimer;   /* provisional: shared weather and collision countdown */
+extern void *gSceneActorListManager; /* provisional: scene actor list and packet-queue manager */
+extern struct Engine *
+    gWirelessController; /* wireless controller singleton; existing per-unit Engine views retained */
+extern u16 gPlayerInteractionMode; /* provisional: player interaction and passage mode halfword */
+extern u16
+    gPlayerSavedMenuOption; /* saved menu option restored when the second script-status slot is set */
+extern u16 gPlayerLinkAttackBonus; /* provisional: link action-mode attack bonus override */
+extern u16 gPlayerScriptState;     /* provisional: shared player script-state halfword */
+extern u16 gPlayerActionPending;   /* provisional: shared pending player-action counter */
+extern u16 gPlayerDirectionLatch;  /* provisional: direction and action latch halfword */
+extern u16 gPlayerPassageState;    /* provisional: shared player passage/interaction state */
+extern u16 gPlayerBackgroundMode;  /* provisional: background/player action mode halfword */
+extern u16
+    gPlayerInitialSlotValues[2]; /* two script-status values saved before the local player exists */
+extern void *
+    gPlayerPendingActor; /* provisional: pending player interaction/notification actor; independent of slot values */
+extern u16 gPlayerBackgroundState; /* provisional: shared background/player state halfword */
+extern u16
+    gPlayerAbilityLatched; /* provisional: ability request latch; ROM reader loads an unsigned halfword */
+extern u16
+    gPlayerSolarActionPending; /* provisional: solar action pending flag; separate from four slot words */
+extern u16
+    gPlayerEffectPendingCount; /* provisional: pending player effect count; separate from actor pointers */
+extern u8 *gPlayerAttackEffect; /* player attack effect singleton */
+extern u16 gHudResetFlag;       /* provisional: HUD flag initialized to one by Hud_ResetGlobals */
+extern u8 gNameEntrySavedState[4]; /* cursor position, selection and per-slot name-entry state */
+extern s32
+    gScreenTextSavedValue; /* provisional: value retained between screen-text menu instances */
+extern u32
+    gSaveStateSignature; /* main-state save signature checked when reading and written before saving */
 
 #endif

@@ -26,8 +26,8 @@ s32 DirectionalForce_Tick(struct DirectionalForce *force)
         force->angle = next;
     }
     asm("" ::: "memory");
-    gUnk_02000550 = force->magnitude >> 4;
-    gUnk_0200053C = force->angle >> 4;
+    gPlayerBackgroundState = force->magnitude >> 4;
+    gPlayerBackgroundMode = force->angle >> 4;
     switch ((s32)force->mode) {
         case 0:
         default:

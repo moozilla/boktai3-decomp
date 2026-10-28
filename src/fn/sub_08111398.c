@@ -1,9 +1,5 @@
 #include "global.h"
-struct E {
-    u8 f[0x20];
-    u16 h;
-    u8 p[0xe];
-};
+#include "render.h"
 struct S {
     u8 f[0x1844];
     u16 a;
@@ -12,9 +8,8 @@ struct S {
     u16 pad2;
     u8 c;
 };
-extern struct E gUnk_03004C30[];
 void BackgroundScroll_UpdateHorizontal(struct S *s)
 {
     s->b += s->a;
-    gUnk_03004C30[s->c].h = s->b >> 7;
+    gBgRecords[s->c].x = s->b >> 7;
 }

@@ -1,12 +1,12 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_02000484;
 void rfu_REQ_changeMasterSlave(void);
 void rfu_waitREQComplete(void);
 void rfu_REQ_recvData(void);
 void Wireless_OnChildUniClockEvent(u16 v)
 {
-    if (gUnk_02000484 != 0) {
+    if (gWirelessController != 0) {
         if (v == 0x27) {
             rfu_REQ_changeMasterSlave();
             rfu_waitREQComplete();

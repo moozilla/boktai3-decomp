@@ -1,12 +1,9 @@
 #include "global.h"
 
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 89.8%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 // confidence=low: energy meter plus a 4-digit timer shown below it.
-// Remaining differences: register choice for the tile cursor and repeated player-pointer reloads in the timer test.
 extern u8 *gGameState;
 extern u32 gEngineFlags;
 extern u16 gUnk_03005178;
@@ -14,23 +11,53 @@ u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 Hud_GetStyleTileIndex(s32, s32);
 s32 Div(s32, s32);
 
+/* Tentative meter, player and game-state fields used by this display. */
+struct HudMeterView {
+    u8 unknown0[0xA40];
+    u8 *player;
+    u8 unknownA44[0x1E];
+    u16 blinkTimer;
+    u8 unknownA64[0x35];
+    u8 timerVisible;
+};
+struct HudMeterPlayerView {
+    u8 unknown0[0x20];
+    u32 statusFlags;
+    u8 unknown24[0x3F4];
+    u8 kind;
+    u8 unknown419[0x2B];
+    u32 timerFlags;
+    u8 unknown448[4];
+    u32 timerFlags2;
+    u8 unknown450[0x7C8];
+    u8 mode;
+};
+struct HudMeterGameView {
+    u8 unknown0[0x77C];
+    s32 timer;
+    u8 unknown780[0xE8];
+    u32 flags;
+};
+#define HUD_OFFSET(member) ((u32) & ((struct HudMeterView *)0)->member)
+#define HUD_FIELD(member)  (*(typeof(((struct HudMeterView *)0)->member) *)(p + HUD_OFFSET(member)))
+#define PLAYER_FIELD(player, member)                                                               \
+    (*(typeof(((struct HudMeterPlayerView *)0)                                                     \
+                  ->member) *)((u8 *)(player) + (u32) & ((struct HudMeterPlayerView *)0)->member))
+#define GAME_FIELD(member)                                                                         \
+    (*(typeof(((struct HudMeterGameView *)0)->member) *)(gGameState + (u32) &                      \
+                                                         ((struct HudMeterGameView *)0)->member))
+
 static inline u32 TestBits(u32 v, u32 mask)
 {
     return v & mask;
 }
 
-#define PLAYER (*(u8 **)(p + 0xa40))
-
-static inline u32 Arg1(u32 k_, u8 *p)
+static inline u8 *Hud_ReadPlayer(u8 *p, u16 offset)
 {
-    return p + k_;
+    register u32 address asm("r0") = offset;
+    address += (u32)p;
+    return *(u8 *volatile *)address;
 }
-
-inline static u32 Arg2(u32 k_, u8 *p)
-{
-    return p + k_;
-}
-
 void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap)
 {
     s32 units;
@@ -58,9 +85,9 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
         partial = units - (full << 3);
     }
     {
-        u8 *player = *((u8 **)(p + 0xa40));
+        u8 *player = HUD_FIELD(player);
         u16 *c;
-        kind = *(player + 0x418);
+        kind = PLAYER_FIELD(player, kind);
         color = 0x1f;
         if (kind != 6)
             color = 0x35f;
@@ -69,8 +96,8 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
             emptyTile = 0x4b;
             endTile = 0x4c;
             m = 0x60;
-            if ((*((u32 *)(player + 0x20))) & m) {
-                u16 *timer = (u16 *)(p + 0xa62);
+            if (PLAYER_FIELD(player, statusFlags) & m) {
+                u16 *timer = &HUD_FIELD(blinkTimer);
                 s32 bit;
                 ++(*timer);
                 bit = ((*timer) >> 2) & 1;
@@ -108,17 +135,22 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
         if (cap != 0)
             *c = endTile | 0xd000;
     }
-    if (((!(gEngineFlags & 0x1000)) && (!((*((u32 *)(gGameState + 0x868))) & 0x80))) &&
-        (mode == 0)) {
-        if ((*((u8 **)(p + 0xa40))) && ((*((u32 *)((*((u8 **)(p + 0xa40))) + 0x444))) & 0x40))
-            goto digits;
-        if ((*((u8 **)(p + 0xa40))) && ((*((u32 *)((*((u8 **)Arg2(0xa40, p))) + 0x44c))) & 0x10))
-            goto digits;
-        if ((*((u8 *)((*((u8 **)Arg1(0xa40, p))) + 0xc18))) == 7) {
+    if (((!(gEngineFlags & 0x1000)) && (!(GAME_FIELD(flags) & 0x80))) && (mode == 0)) {
+        {
+            u8 *player = Hud_ReadPlayer(p, HUD_OFFSET(player));
+            if (player && TestBits(0x40, PLAYER_FIELD(player, timerFlags)))
+                goto digits;
+        }
+        {
+            u8 *player = Hud_ReadPlayer(p, HUD_OFFSET(player));
+            if (player && TestBits(0x10, PLAYER_FIELD(player, timerFlags2)))
+                goto digits;
+        }
+        if (PLAYER_FIELD(Hud_ReadPlayer(p, HUD_OFFSET(player)), mode) == 7) {
         digits:
-            digits[0] = Div(*((s32 *)(gGameState + 0x77c)), 1000);
+            digits[0] = Div(GAME_FIELD(timer), 1000);
 
-            rem = (*((s32 *)(gGameState + 0x77c))) - (digits[0] * 1000);
+            rem = (GAME_FIELD(timer)) - (digits[0] * 1000);
             digits[1] = Div(rem, 100);
             rem -= digits[1] * 100;
             digits[2] = Div(rem, 10);
@@ -130,17 +162,14 @@ void sub_08164480(u8 *p, s32 mode, s32 row, s32 col, s32 value, s32 max, s32 cap
                 *(cell++) = Hud_GetStyleTileIndex(*(dp++), 0) | (-0x3000);
             }
 
-            p[0xa99] = 1;
-        } else if (p[0xa99]) {
-            cell = Hud_GetTilemapCell(0, 9, 4);
-            for (i = 3; i >= 0; i--)
-                *(cell++) = 0xd000;
+            HUD_FIELD(timerVisible) = 1;
+        } else if (HUD_FIELD(timerVisible)) {
+            u16 *blank = Hud_GetTilemapCell(0, 9, 4);
+            s32 count;
+            for (count = 0; count < 4; count++)
+                *(blank++) = 0xD000;
 
-            p[0xa99] = 0;
+            HUD_FIELD(timerVisible) = 0;
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08164480);
-#endif

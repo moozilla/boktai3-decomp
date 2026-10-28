@@ -1,8 +1,9 @@
 #include "numeric_overlay.h"
+#include "render.h"
 
 u16 *NumericOverlay_GetTileMapPtr(u32 bg, u32 x, s32 y)
 {
-    struct BgMapInfo *t = &gUnk_03004C30[bg];
+    struct BackgroundLayer *t = &gBgRecords[bg];
     u16 *p = t->map;
     p = p + x;
     return p + (t->width << 1) * y;
@@ -33,7 +34,7 @@ void sub_0800F4EC(struct NumericOverlay *unused)
         base = 0x6a;
         for (col = 0; col < 4; col++)
             dst[col] = (shift + base + col) | -12288;
-        dst += gUnk_03004C30[0].width * 2;
+        dst += gBgRecords[0].width * 2;
     }
 
     dst = (s16 *)NumericOverlay_GetTileMapPtr(0, 8, 15);
@@ -48,7 +49,7 @@ void sub_0800F4EC(struct NumericOverlay *unused)
         int shift = row << 4;
         for (col = 0; col < n; col++)
             dst[col] = (shift + base + col) | -12288;
-        dst += gUnk_03004C30[0].width * 2;
+        dst += gBgRecords[0].width * 2;
     }
 
     digits[0] = Div(hours, 10);
@@ -64,7 +65,7 @@ void sub_0800F4EC(struct NumericOverlay *unused)
             int tile = *digit++ + 0x60;
             *out++ = shift + tile | -12288;
         }
-        dst += gUnk_03004C30[0].width * 2;
+        dst += gBgRecords[0].width * 2;
     }
 
     digits[0] = Div(minutes, 10);
@@ -81,7 +82,7 @@ void sub_0800F4EC(struct NumericOverlay *unused)
             int tile = *digit++ + 0x60;
             *out++ = shift + tile | -12288;
         }
-        dst += gUnk_03004C30[0].width * 2;
+        dst += gBgRecords[0].width * 2;
         row = next;
     }
 }
@@ -144,11 +145,11 @@ s32 sub_0800F6F8(struct NumericOverlay *p, u16 id)
     for (; row < 15; row++) {
         int col;
         col = 0;
-        if (col < gUnk_03004C30[0].width * 2) {
+        if (col < gBgRecords[0].width * 2) {
             do {
                 *tiles++ = 0xD000;
                 col++;
-            } while (col < gUnk_03004C30[0].width * 2);
+            } while (col < gBgRecords[0].width * 2);
         }
     }
 

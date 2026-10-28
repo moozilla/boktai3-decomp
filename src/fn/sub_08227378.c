@@ -10,7 +10,6 @@ struct Camera {
     u16 f5A;
     u16 f5C;
 };
-extern s16 gUnk_030042A0[];
 extern s16 gUnk_03005418[];
 void Camera_DispatchCommands(struct Camera *);
 void sub_08226CF8(struct Camera *);
@@ -39,17 +38,17 @@ u32 Camera_Update(struct Camera *c)
     if (!(gEnginePauseFlags & 4)) {
         sub_08226CF8(c);
         if (c->f1C == 0) {
-            gUnk_030042A0[0] = c->f58;
-            gUnk_030042A0[1] = c->f5A;
-            gUnk_030042A0[2] = c->f5C;
+            gCamera.position.x = c->f58;
+            gCamera.position.y = c->f5A;
+            gCamera.position.z = c->f5C;
         } else {
             Camera_UpdatePositionMode(c);
         }
         Camera_UpdateShake(c);
-        Camera_ApplyPositionBounds(c, gUnk_030042A0);
+        Camera_ApplyPositionBounds(c, (s16 *)&gCamera.position);
     }
     out = gUnk_03005418;
-    p = gUnk_030042A0;
+    p = (s16 *)&gCamera.position;
     a = p[0];
     b = p[2];
     out[0] = Scale(a - b);

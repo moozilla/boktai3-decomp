@@ -2,7 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 static inline u32 isSpecial(void)
 {
-    u32 value = gUnk_02000528;
+    u32 value = gPlayerActionPending;
     u32 result = 0;
     if (value == 1)
         result = 1;

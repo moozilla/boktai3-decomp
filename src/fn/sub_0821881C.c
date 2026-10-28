@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "runtime.h"
 // confidence=low: flag 0x2000 selects this sprite staging pass.
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
@@ -25,7 +26,6 @@ struct Matrix {
     s8 scaleX, scaleY;
     u8 pad;
 };
-extern u32 gUnk_03003A04;
 extern struct Drawable *gUnk_030042D0[];
 extern struct Matrix gUnk_03004310[];
 extern u16 gUnk_03005418[];
@@ -160,7 +160,7 @@ void SpriteOam_QueueOverlayProjectedSprites(void)
             gOamBuffer[n].attributes = attr;
             gOamBuffer[n].tile = tile;
             gOamCount = n + 1;
-            gUnk_03003A04 |= 1;
+            gVideoUploadFlags |= 1;
         } else {
             s32 tile, n;
             u32 priority;

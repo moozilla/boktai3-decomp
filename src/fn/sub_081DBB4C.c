@@ -1,4 +1,5 @@
 #include "global.h"
+#include "menu_parameters.h"
 /* ScreenParams2E8_UpdateScreen: per-frame state machine (blinking prompt, solar baseline capture and save header write, result message, fade out, return to script) */
 
 struct SaveScreenAnim {
@@ -29,7 +30,6 @@ struct SaveScreenScriptArgs {
 };
 
 extern u16 gUnk_03005260[];
-extern u32 gUnk_020002E8[];
 s32 Mod(s32, s32);
 void Menu_SetBackgroundMap(u32, u32);
 void Sound_PlaySong(u32);
@@ -87,7 +87,7 @@ void ScreenParams2E8_UpdateScreen(struct SaveScreen *s)
                 s->timer = 0;
                 s->state = 1;
             } else if (gUnk_03005260[1] & 2) {
-                if (gUnk_020002E8[3] == 0 && gUnk_020002E8[2] != 0) {
+                if (gMessageMenuParameters.f == 0 && gMessageMenuParameters.c != 0) {
                     Sound_PlaySong(0xDE);
                     s->state = 5;
                     s->unk38 = 0;
@@ -97,7 +97,7 @@ void ScreenParams2E8_UpdateScreen(struct SaveScreen *s)
         case 1:
             if (s->timer <= 59) {
                 if (Solar_CaptureBaseline() != 0) {
-                    if (gUnk_020002E8[3] == 0)
+                    if (gMessageMenuParameters.f == 0)
                         Save_WriteHeader();
                     s->timer = 0;
                     s->state = 2;
@@ -141,7 +141,7 @@ void ScreenParams2E8_UpdateScreen(struct SaveScreen *s)
                 MessageWindow_Clear();
                 s->anims[1].flags |= 1;
                 s->anims[2].flags |= 1;
-                Script_Call(gUnk_020002E8[1], &args);
+                Script_Call(gMessageMenuParameters.o, &args);
                 Task_Kill(s);
             }
             s->fadeTimer++;

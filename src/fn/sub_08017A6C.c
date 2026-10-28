@@ -13,7 +13,6 @@ struct Weather {
 };
 extern u8 *gGameState;
 extern u32 gEngineFlags, gRandomIndex;
-extern s32 gUnk_02000080, gUnk_02000084;
 #define RANDOM_TABLE ((u16 *)0x0203B400)
 void Palette_SetBrightnessMode(s32);
 u32 Weather_TestFlags(u32, u32);
@@ -74,8 +73,8 @@ s32 Weather_UpdateStormTrigger(struct Weather *p)
                     u8 *base = gGameState;
                     timer = StormTimer(base);
                 }
-                if (*timer >= gUnk_02000080)
-                    *timer = gUnk_02000080;
+                if (*timer >= gWeatherCooldownBase)
+                    *timer = gWeatherCooldownBase;
             } else {
                 s32 *timer = StormTimer(gGameState);
                 if (!*timer) {
@@ -87,9 +86,9 @@ s32 Weather_UpdateStormTrigger(struct Weather *p)
                         if (sample < volume)
                             goto beginStorm;
                     }
-                    *timer = gUnk_02000080;
-                    if (gUnk_02000084 > 0) {
-                        s32 random = Mod(RandomAt(table), gUnk_02000084);
+                    *timer = gWeatherCooldownBase;
+                    if (gWeatherCooldownRange > 0) {
+                        s32 random = Mod(RandomAt(table), gWeatherCooldownRange);
                         s32 *last = StormTimer(gGameState);
                         *last += random;
                     }

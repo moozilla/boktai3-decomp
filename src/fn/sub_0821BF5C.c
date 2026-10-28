@@ -1,18 +1,24 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "game_state.h"
 
-#ifdef NONMATCHING
-// fuzzy: 79.5%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
 struct TerrainPos {
     s16 x, y, z;
+};
+struct TerrainCell {
+    u8 shapeAndHeight;
+    u8 attribute;
+    u16 flags;
+};
+struct TerrainCellList {
+    u8 header[12];
+    struct TerrainCell cells[1];
 };
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 u16 sub_0821BE3C(struct TerrainPos *a, struct TerrainPos *b);
 
-static inline s32 cellIndex(struct TerrainPos *pos)
+static inline s32 TerrainCell_GetIndex(struct TerrainPos *pos)
 {
     s32 x = pos->x >> 8, z = pos->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -24,37 +30,34 @@ static inline s32 cellIndex(struct TerrainPos *pos)
     {                                                                                              \
         u8 *found = TerrainModifiers_FindCellOverride(index, 1);                                   \
         if (found)                                                                                 \
-            cell = found + 4;                                                                      \
+            cell = (struct TerrainCell *)(found + 4);                                              \
         else                                                                                       \
-            cell = gTerrainMap->cells + 12 + (index) * 4;                                          \
+            cell = &((struct TerrainCellList *)gTerrainMap->cells)->cells[index];                  \
     }
 
 u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
 {
     u16 toIndex;
     u16 fromIndex;
-    u8 *toCell;
-    u8 *fromCell;
-    u8 *cell;
-    u8 *other;
-    u8 *found;
+    struct TerrainCell *toCell;
+    struct TerrainCell *fromCell;
+    struct TerrainCell *cell;
     u16 toFlags;
     u32 mask;
     s32 limit;
-    s32 diff;
+    register s32 diff asm("r2");
     s32 n;
     u32 fromKind;
     u32 toKind;
-    u32 height;
-    toIndex = cellIndex(to);
+    toIndex = TerrainCell_GetIndex(to);
     {
         u8 *found = TerrainModifiers_FindCellOverride(toIndex, 1);
         if (found)
-            toCell = found + 4;
+            toCell = (struct TerrainCell *)(found + 4);
         else
-            toCell = (gTerrainMap->cells + 12) + (toIndex * 4);
+            toCell = &((struct TerrainCellList *)gTerrainMap->cells)->cells[toIndex];
     };
-    toFlags = *((u16 *)(toCell + 2));
+    toFlags = toCell->flags;
     if (kind == 4) {
         mask = 2;
         limit = 0x80;
@@ -66,16 +69,16 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
         goto ret1;
     if (sub_0821BE3C(from, to) > limit)
         goto ret1;
-    fromIndex = cellIndex(from);
+    fromIndex = TerrainCell_GetIndex(from);
     {
         u8 *found = TerrainModifiers_FindCellOverride(fromIndex, 1);
         if (found)
-            fromCell = found + 4;
+            fromCell = (struct TerrainCell *)(found + 4);
         else
-            fromCell = (gTerrainMap->cells + 12) + (fromIndex * 4);
+            fromCell = &((struct TerrainCellList *)gTerrainMap->cells)->cells[fromIndex];
     };
-    fromKind = (*fromCell) >> 4;
-    toKind = (*toCell) >> 4;
+    fromKind = fromCell->shapeAndHeight >> 4;
+    toKind = toCell->shapeAndHeight >> 4;
     diff = toIndex - fromIndex;
     if (fromKind == 1) {
         if ((diff != 1) && (diff != (-1)))
@@ -86,22 +89,23 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
             return 1;
         if ((to->z & 0xFF) <= 0x7F) {
             n = toIndex - gTerrainWidth;
-            found = TerrainModifiers_FindCellOverride(n, 1);
+            CELL_AT(cell, n);
         } else {
             n = toIndex + gTerrainWidth;
-            found = TerrainModifiers_FindCellOverride(n, 1);
+            CELL_AT(cell, n);
         }
-        if (found)
-            cell = found + 4;
-        else
-            cell = (gTerrainMap->cells + 12) + (n * 4);
-        if ((*cell) >> 4)
+        {
+            u32 cellHeight, referenceHeight;
+            if (cell->shapeAndHeight >> 4)
+                goto ret1;
+            cellHeight = cell->shapeAndHeight & 15;
+            referenceHeight = toCell->shapeAndHeight & 15;
+            if (cellHeight != referenceHeight)
+                goto ret1;
+            if (!(cell->flags & mask))
+                goto success;
             goto ret1;
-        if (((*cell) & 15) != ((*toCell) & 15))
-            goto ret1;
-        if ((*((u16 *)(cell + 2))) & mask)
-            goto ret1;
-        return 1;
+        }
     } else if (fromKind == 2) {
         if ((diff != gTerrainWidth) && (diff != (-gTerrainWidth)))
             return 1;
@@ -111,65 +115,63 @@ u32 sub_0821BF5C(struct TerrainPos *from, struct TerrainPos *to, u8 kind)
             return 1;
         if ((to->x & 0xFF) <= 0x7F) {
             n = toIndex - 1;
-            found = TerrainModifiers_FindCellOverride(n, 1);
+            CELL_AT(cell, n);
         } else {
             n = toIndex + 1;
-            found = TerrainModifiers_FindCellOverride(n, 1);
+            CELL_AT(cell, n);
         }
-        if (found)
-            cell = found + 4;
-        else
-            cell = (gTerrainMap->cells + 12) + (n * 4);
-        if ((*cell) >> 4)
+        {
+            u32 cellHeight, referenceHeight;
+            if (cell->shapeAndHeight >> 4)
+                goto ret1;
+            cellHeight = cell->shapeAndHeight & 15;
+            referenceHeight = toCell->shapeAndHeight & 15;
+            if (cellHeight != referenceHeight)
+                goto ret1;
+            if (!(cell->flags & mask))
+                goto success;
             goto ret1;
-        if (((*cell) & 15) != ((*toCell) & 15))
-            goto ret1;
-        if ((*((u16 *)(cell + 2))) & mask)
-            goto ret1;
-        return 1;
+        }
     } else {
+        n = fromIndex;
         if ((diff == gTerrainWidth) || (diff == (-gTerrainWidth))) {
             if (toKind != 2)
                 return 1;
             if ((to->x & 0xFF) <= 0x7F) {
-                n = fromIndex - 1;
-                found = TerrainModifiers_FindCellOverride(n, 1);
+                n--;
+                goto lookup;
             } else {
-                n = fromIndex + 1;
-                found = TerrainModifiers_FindCellOverride(n, 1);
+                n++;
+                goto lookup;
             }
-            if (!found)
-                cell = (gTerrainMap->cells + 12) + (n * 4);
-            else
-                cell = found + 4;
         } else if ((diff == 1) || (diff == (-1))) {
             if (toKind != 1)
                 return 1;
             if ((to->z & 0xFF) <= 0x7F) {
-                n = fromIndex - gTerrainWidth;
-                found = TerrainModifiers_FindCellOverride(n, 1);
+                n -= gTerrainWidth;
+            lookup:
+                CELL_AT(cell, n);
             } else {
-                n = fromIndex + gTerrainWidth;
-                found = TerrainModifiers_FindCellOverride(n, 1);
+                n += gTerrainWidth;
+                CELL_AT(cell, n);
             }
-            if (found)
-                cell = found + 4;
-            else
-                cell = (gTerrainMap->cells + 12) + (n * 4);
         } else
             return 1;
-        if ((*cell) >> 4)
+        {
+            u32 cellHeight, referenceHeight;
+            if (cell->shapeAndHeight >> 4)
+                goto ret1;
+            cellHeight = cell->shapeAndHeight & 15;
+            referenceHeight = fromCell->shapeAndHeight & 15;
+            if (cellHeight != referenceHeight)
+                goto ret1;
+            if (!(cell->flags & mask))
+                goto success;
             goto ret1;
-        if (((*cell) & 15) != ((*fromCell) & 15))
-            goto ret1;
-        if ((*((u16 *)(cell + 2))) & mask)
-            goto ret1;
-        return 1;
+        }
     }
 ret1:
     return 0;
+success:
+    return 1;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0821BF5C);
-#endif

@@ -1,10 +1,9 @@
 #include "global.h"
-
-extern u8 *gUnk_020001AC;
+#include "ram.h"
 
 u8 *NamedObject_FindByName(u32 key)
 {
-    u8 *base = gUnk_020001AC;
+    u8 *base = gNamedActorManager;
     s32 i = 0;
     u8 *a = base + 0x1c;
     u8 *b = base + 0xf8;

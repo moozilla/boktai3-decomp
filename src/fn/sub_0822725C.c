@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 #include "engine.h"
 
 struct Camera0822725C {
@@ -13,7 +14,6 @@ struct Camera0822725C {
     u16 steps;
 };
 extern const u16 gUnk_0203B400[];
-extern s16 gUnk_030042A0[];
 s32 Div(s32, s32);
 s32 DivArmMod(s32, s32);
 void Camera_NotifyMoveComplete(struct Camera0822725C *);
@@ -43,8 +43,8 @@ u32 Camera_UpdateShake(struct Camera0822725C *c)
                   (c->amp >> 1);
         c->offY = DivArmMod(c->amp, gUnk_0203B400[gRandomIndex = (gRandomIndex + 1) & 0x3FF]) -
                   (c->amp >> 1);
-        gUnk_030042A0[0] += c->offX;
-        gUnk_030042A0[2] += c->offY;
+        gCamera.position.x += c->offX;
+        gCamera.position.z += c->offY;
         c->amp = 0;
     } else {
         c->offX = 0;

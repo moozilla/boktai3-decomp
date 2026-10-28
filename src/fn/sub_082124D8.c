@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
@@ -29,10 +30,6 @@ struct IbSprite {
     u8 pad12[10];
     struct IbPos position;
 };
-struct IbCamera {
-    u16 x, y, z;
-};
-extern struct IbCamera gUnk_030042A0;
 struct IbRes *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
@@ -118,11 +115,11 @@ u32 ForgingBook_InitSprites(u8 *p)
         CpuSet((void *)(*r5), p + 0xaec, 0x10);
         *r5 = (u32)(p + 0xaec);
     }
-    coordinate = gUnk_030042A0.x - 456;
+    coordinate = ((u16)gCamera.position.x) - 456;
     *((u16 *)(p + 0xaa8)) = coordinate;
-    coordinate = gUnk_030042A0.y;
+    coordinate = ((u16)gCamera.position.y);
     *((u16 *)(p + 0xaaa)) = coordinate;
-    coordinate = gUnk_030042A0.z + 336;
+    coordinate = ((u16)gCamera.position.z) + 336;
     *((u16 *)(p + 0xaac)) = coordinate;
     *((u8 *)(p + 0xae8)) = 3;
     *((u8 *)(p + 0xae9)) = 1;

@@ -4,10 +4,7 @@
 #include "ram.h"
 
 // MATCHING_CONCESSION: register-pinning
-#define gForceMagnitude gUnk_02000550
-#define gForceThreshold gUnk_0200052C
-#define gForceAngle     gUnk_0200053C
-#define gSineTable      gUnk_086149C4
+#define gSineTable gUnk_086149C4
 s32 Player_GetForceDirection(struct Player *);
 static inline u8 Player_IsActiveInSceneFive(struct Player *p)
 {
@@ -38,21 +35,21 @@ void Player_ApplyDirectionalForce(struct Player *p)
     asm("" : "+r"(p));
     if (p && Player_TestForceBlock(&p->statBonusFlags, 0x80))
         return;
-    if (gForceMagnitude < gForceThreshold)
+    if (gPlayerBackgroundState < gPlayerDirectionLatch)
         return;
     if (gForceDirectionMode == 1)
         direction = Player_GetForceDirection(p);
     else
-        direction = ((((gForceAngle + 0x70) & 0xFF) >> 5) + 1) << 5;
+        direction = ((((gPlayerBackgroundMode + 0x70) & 0xFF) >> 5) + 1) << 5;
     x = gSineTable[(direction + 64) & 255];
     z = gSineTable[direction & 255];
     {
         s32 scaledX;
-        scaledX = Player_ScaleForce(gForceMagnitude * x);
+        scaledX = Player_ScaleForce(gPlayerBackgroundState * x);
         p->velocityX -= scaledX;
     }
     {
-        s32 scaledZ = Player_ScaleForce(gForceMagnitude * z);
+        s32 scaledZ = Player_ScaleForce(gPlayerBackgroundState * z);
         p->velocityZ -= scaledZ;
     }
 }

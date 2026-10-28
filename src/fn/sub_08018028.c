@@ -19,8 +19,6 @@ struct WeatherState {
     u8 pad5C[4];
     u8 *resource;
 };
-extern s32 gUnk_0200008C;
-extern s32 gUnk_02000080;
 
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
@@ -73,10 +71,10 @@ s32 Weather_Initialize(struct WeatherState *p)
         p->delay = 7200;
         p->delayRange = 3600;
     }
-    if (gUnk_0200008C > p->delay) {
-        gUnk_0200008C = p->delay;
+    if (gStormTimer > p->delay) {
+        gStormTimer = p->delay;
         if (p->delayRange)
-            gUnk_0200008C += Mod(RAND(), p->delayRange);
+            gStormTimer += Mod(RAND(), p->delayRange);
     }
     if (Script_SeekToKeyword(0x63))
         *(s32 *)((u8 *)gGameState + 0x630) = Script_GetValue();
@@ -98,13 +96,13 @@ s32 Weather_Initialize(struct WeatherState *p)
         storm = *sensor;
         *(s32 *)((u8 *)gGameState + 0x630) += storm >> 2;
     }
-    if (*(s32 *)((u8 *)gGameState + 0x630) >= gUnk_02000080)
-        *(s32 *)((u8 *)gGameState + 0x630) = gUnk_02000080;
+    if (*(s32 *)((u8 *)gGameState + 0x630) >= gWeatherCooldownBase)
+        *(s32 *)((u8 *)gGameState + 0x630) = gWeatherCooldownBase;
     phase = 0;
     if (gGameState->unk876 == 0) {
-        if (gUnk_0200008C > 0) {
-            if (gUnk_0200008C <= 99)
-                gUnk_0200008C = 100;
+        if (gStormTimer > 0) {
+            if (gStormTimer <= 99)
+                gStormTimer = 100;
             phase = 3;
         } else if (*(s32 *)((u8 *)gGameState + 0x630) == 0) {
             s32 volume = Weather_GetStormVolume(p);

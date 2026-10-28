@@ -1,4 +1,5 @@
 #include "global.h"
+#include "runtime.h"
 /* Hardware startup, subsystem initialization, then the task scheduler loop. */
 struct Dma {
     vu32 source, dest, control;
@@ -24,7 +25,7 @@ void Time_CalculateSunriseSunset(s32, s32, s32);
 void Script_InitRuntime(void);
 void SceneLifecycle_InitManager(void);
 void TaskSystem_RunFrame(void);
-extern u8 Palette_CacheObjectBankArm[], AgbMain__addr[], gUnk_03000000[];
+extern u8 Palette_CacheObjectBankArm[], AgbMain__addr[];
 void AgbMain(void)
 {
     u32 saved0, saved1, zero;
@@ -58,7 +59,7 @@ void AgbMain(void)
     Clock_CheckRtcDate();
     m4aSoundInit();
     InterruptsAndVideo_Initialize();
-    CpuSet(Palette_CacheObjectBankArm, gUnk_03000000,
+    CpuSet(Palette_CacheObjectBankArm, gIwramCode,
            (((s32)(AgbMain__addr - Palette_CacheObjectBankArm) / 4) & 0x1fffff) | 0x04000000);
     Eeprom_SetCapacity(64);
     SceneLifecycle_InitFrameCounterPointer();

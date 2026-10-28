@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 // confidence=low: energy-gated burst sequence with a held middle animation.
 #define B(n) (*(u8 *)(p + (n)))
@@ -6,7 +7,6 @@
 struct Position {
     s16 x, y, z, pad;
 };
-extern u16 gUnk_02000570;
 s32 Player_ConsumeStateEntry(void *);
 s32 Player_HasRequiredEnergy(void *, s32);
 void ActorSequence_Begin(void *, s32, s32);
@@ -32,7 +32,7 @@ void Player_UpdateHeldEnergyBurst(u8 *p)
 {
     if (Player_ConsumeStateEntry(p)) {
         B(0xAC9) = 0;
-        if (Player_HasRequiredEnergy(p, 100) && !gUnk_02000570)
+        if (Player_HasRequiredEnergy(p, 100) && !gPlayerSolarActionPending)
             B(0x4EE) = 1;
         else
             B(0x4EE) = 0;
@@ -77,7 +77,7 @@ void Player_UpdateHeldEnergyBurst(u8 *p)
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 8), 64, 1)) {
                 Sound_PlaySong(0xCB);
                 if (B(0x4EE) && !H(0x4A2))
-                    gUnk_02000570 = 1;
+                    gPlayerSolarActionPending = 1;
                 ActorSequence_Begin(p, 9, 2);
             }
             break;

@@ -53,7 +53,7 @@ struct Obj53F8 {
     s32 x10;
 };
 extern struct ScreenParams3F8Params gScreenTextParameters;
-extern s32 gUnk_020005DC;
+extern s32 gScreenTextSavedValue;
 extern struct Obj53F8 *gUnk_030053F8;
 s32 ScreenParams3F8_SelectValidDataBank(struct SpDisplay *);
 void Bg_ClearTilemap(s32);
@@ -87,7 +87,7 @@ void Task_Kill(void *);
 static inline void Confirm(struct SpDisplay *p)
 {
     Sound_PlaySong(0xDD);
-    gUnk_020005DC = p->x1C;
+    gScreenTextSavedValue = p->x1C;
     Menu_StartFadeOut(p->x114);
 }
 

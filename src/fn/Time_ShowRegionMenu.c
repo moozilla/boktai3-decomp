@@ -1,4 +1,5 @@
 #include "global.h"
+#include "menu_parameters.h"
 struct RegionEntry {
     s16 page;
     u8 pad[10];
@@ -12,7 +13,6 @@ struct RegionMenu {
     u8 pad5b0[4];
     s32 skipped;
 };
-extern u32 gUnk_02000310;
 void Menu_EraseRect(s32, s32, s32, s32);
 void Menu_DrawStringRef(s32, s32, u32, s32);
 void Time_ShowRegionMenu(struct RegionMenu *menu)
@@ -26,7 +26,7 @@ void Time_ShowRegionMenu(struct RegionMenu *menu)
         if (menu->entries[i].page == menu->page) {
             if (first == 1)
                 first = 0;
-            Menu_DrawStringRef(4, row + 7, gUnk_02000310, i);
+            Menu_DrawStringRef(4, row + 7, gRegionMenuParameters.nBlock, i);
             row += 2;
         }
         menu->skipped += first;

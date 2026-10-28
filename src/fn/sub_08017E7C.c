@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "ram.h"
 struct Weather {
     u8 pad[24];
     u32 timer;
@@ -8,7 +9,6 @@ struct Weather {
     void *script0, *script;
 };
 extern u8 *gGameState;
-extern int gUnk_02000080, gUnk_02000084;
 extern u16 gUnk_0203B400[];
 extern u32 gRandomIndex;
 void Palette_SetBrightnessMode(int);
@@ -46,15 +46,15 @@ int Weather_StormEnd(struct Weather *p)
             m = ~512;
             *reg = m & *reg;
         }
-        *(int *)(gGameState + 0x630) = gUnk_02000080;
-        if (gUnk_02000084 > 0) {
+        *(int *)(gGameState + 0x630) = gWeatherCooldownBase;
+        if (gWeatherCooldownRange > 0) {
             int r;
             gRandomIndex = (gRandomIndex + 1) & 1023;
             {
                 u32 offset = gRandomIndex * 2;
                 r = *(u16 *)((u8 *)gUnk_0203B400 + offset);
             }
-            *(int *)(gGameState + 0x630) += Mod(r, gUnk_02000084);
+            *(int *)(gGameState + 0x630) += Mod(r, gWeatherCooldownRange);
         }
         return 1;
     } else {

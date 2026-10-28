@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "runtime.h"
 struct TextState {
     u8 x, y, left, top, width, height, palette, style;
     u8 entered, mode, skip, busy, padC, choiceCount, padE, fresh, pad10, voice, toggle, lastWidth,
@@ -21,7 +22,6 @@ struct Window {
     s32 column, row, wait;
     const u8 *script;
 };
-extern u32 gUnk_03003A48;
 extern u16 gUnk_03005260[];
 extern const u8 gUnk_086056D0[];
 void TextWindow_BlankRect(int, int, int, int);
@@ -54,9 +54,9 @@ int ScrollingDialogue_OnTaskUpdate(struct Window *p)
         TextState_ClearSelectedChoices(t);
         ScrollingDialogue_UpdatePlayback(p);
         if (p->scrolling)
-            gUnk_03003A48 = p->ticks;
+            gDialogueScrollOffset = p->ticks;
         else
-            gUnk_03003A48 = 0;
+            gDialogueScrollOffset = 0;
         p->frames++;
         TextState_RunSelectedProcedures(t);
     }

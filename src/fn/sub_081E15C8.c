@@ -3,6 +3,7 @@
 #include "game_state.h"
 #include "ram.h"
 #include "render.h"
+#include "menu_parameters.h"
 
 struct GameStartRes {
     u32 w[8];
@@ -60,9 +61,6 @@ struct GameStart {
     u8 unk4E8[4];
     void *cursorResource;
 };
-
-extern u32 gUnk_020003A0[];
-extern u8 gUnk_020005B4[];
 
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
@@ -206,13 +204,13 @@ s32 GameStart_Init(u8 *p)
     }
 
     ((struct GameStart *)p)->timer = 0;
-    if (gUnk_020003A0[6] == 1)
+    if (gListMenuParameters.b == 1)
         Menu_StartFadeIn(0);
     else
         Menu_StartFadeIn(3);
-    if (gUnk_020003A0[6] == 0) {
+    if (gListMenuParameters.b == 0) {
         u8 *name = gAnimPanelSavedSelections;
-        u8 *slot = gUnk_020005B4;
+        u8 *slot = gNameEntrySavedState;
         u8 *end = name;
         s32 blank = 0x41;
         u8 *q = name + 0x17;
@@ -223,7 +221,7 @@ s32 GameStart_Init(u8 *p)
         name[0x18] = 0;
         slot[0] = 4;
         slot[1] = 0;
-        if (gUnk_020003A0[6] == 0) {
+        if (gListMenuParameters.b == 0) {
             ((struct GameStart *)p)->saveIndex = GameStart_LoadAvailableSave(p);
             Sound_PlaySong(0xb3);
             goto check;

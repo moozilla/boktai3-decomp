@@ -48,7 +48,7 @@ void PauseMenu_RestoreDisplayState(struct PauseMenuDisplay *s)
     sub_08215AC4(1, 0);
     map = Video_GetBackgroundMap(1);
     CpuSet(s->savedMap, map, 0x04000200);
-    gUnk_03004C30[1] = s->savedBackground;
+    gBgRecords[1] = s->savedBackground;
     *(vu16 *)0x0400000A = s->savedBgControl;
     gMosaicHalfword = 1;
     gMosaicParam = s->saved5234;

@@ -122,7 +122,6 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
 }
 
 // confidence=low: motion eleven toggles actionMode two with a secondary sprite animation.
-extern u16 gUnk_02000528, gUnk_02000590;
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_SetPendingCallback(struct Player *, void (*)(struct Player *));
 void Player_OnMotion11Exit(struct Player *);
@@ -277,11 +276,11 @@ void Player_UpdateAlternateFormCue(struct Player *p)
                     {
                         u32 one = 1;
                         u32 duration = 1800;
-                        gUnk_02000528 = one;
+                        gPlayerActionPending = one;
                         gPlayerCueTimer = duration;
                     }
                     ScreenTransition_SendCommand(0, 4, 31, 31, 20, 0x1FFF, 0);
-                    gUnk_02000590++;
+                    gPlayerEffectPendingCount++;
                     p->statHundredths = 0;
                 } else
                     p->actionMode = 0;
@@ -300,7 +299,7 @@ void Player_UpdateAlternateFormCue(struct Player *p)
             p->resetValue6FC = 30;
             if (++p->tetherFrame > 15)
                 Player_SetActionPhase(p, 4);
-            gUnk_02000590 = 0;
+            gPlayerEffectPendingCount = 0;
             break;
         case 4:
             p->resetValue6FC = 15;
@@ -328,7 +327,7 @@ void Player_UpdateAlternateFormCue(struct Player *p)
                     break;
                 }
             }
-            gUnk_02000590 = 0;
+            gPlayerEffectPendingCount = 0;
             Player_InitVisualResources(p);
             p->savedSpriteResource = 0xFFFF;
             p->actionEighteenDuration = 0;

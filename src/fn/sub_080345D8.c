@@ -26,7 +26,6 @@ struct Engine {
     u8 message[0x204];
     void *head, *tail;
 };
-extern struct Engine *gUnk_02000484;
 void Memory_Clear(void *, int);
 struct Message {
     u8 pad0[0x14];
@@ -48,7 +47,7 @@ static inline void reset(struct Engine *p, int operation, int zero)
 void WirelessController_OnLinkEvent(u8 command)
 {
     int key = command;
-    struct Engine *p = gUnk_02000484;
+    struct Engine *p = gWirelessController;
     if (!p)
         goto done;
     if (key == 0x33)

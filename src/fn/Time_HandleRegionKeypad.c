@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "menu_parameters.h"
 struct RegionEntry {
     s16 group;
     u16 name;
@@ -41,10 +42,6 @@ struct ScriptCallArgs {
     u32 unused : 16;
     s32 *values;
 };
-struct Params310 {
-    u32 unk0, unk4, confirmProc, cancelProc, flag;
-};
-extern struct Params310 gUnk_02000310;
 extern u16 gUnk_03005260[];
 void Sound_PlaySong(u32);
 void Time_OnRegionListSelect(struct RegionMenu *);
@@ -67,7 +64,7 @@ void Time_HandleRegionKeypad(struct RegionMenu *menu)
         case 0:
             if (gUnk_03005260[1] & 1) {
                 Sound_PlaySong(0xdd);
-                if (gUnk_02000310.flag == 1)
+                if (gRegionMenuParameters.flag == 1)
                     menu->fadeSpeed = 3;
                 else
                     menu->fadeSpeed = 0;
@@ -136,9 +133,9 @@ void Time_HandleRegionKeypad(struct RegionMenu *menu)
                 menu->anims[1].flags |= 1;
                 menu->anims[0].flags |= 1;
                 if (menu->confirmed == 0)
-                    Script_Call(gUnk_02000310.cancelProc, &args);
+                    Script_Call(gRegionMenuParameters.cancelProc, &args);
                 else
-                    Script_Call(gUnk_02000310.confirmProc, &args);
+                    Script_Call(gRegionMenuParameters.confirmProc, &args);
                 Task_Kill(menu);
             }
             menu->timer++;

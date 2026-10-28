@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 struct FanVec {
     s16 x, y, z, pad;
 };
@@ -60,7 +61,6 @@ struct FanTerrain {
 };
 extern struct FanTerrain *gTerrainMap;
 extern u32 gTerrainWidth, gTerrainHeight, gRandomIndex;
-extern u16 gUnk_02000550, gUnk_0200053C;
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void FanCannon_Activate(struct FanCannon *);
@@ -313,21 +313,21 @@ invoke:
             if (p->position.z - 0x80 < pl->z && p->position.z + 0x80 > pl->z &&
                 p->position.x < pl->x && Fan_Distance(p) < p->range * p->range &&
                 FanCannon_IsPathToPlayerClear(p)) {
-                gUnk_02000550 = p->wind;
+                gPlayerBackgroundState = p->wind;
                 if (!p->reverse)
-                    gUnk_0200053C = 0x80;
+                    gPlayerBackgroundMode = 0x80;
                 else
-                    gUnk_0200053C = direction;
+                    gPlayerBackgroundMode = direction;
             }
         } else {
             if (p->position.x - 0x80 < pl->x && p->position.x + 0x80 > pl->x &&
                 p->position.z < pl->z && Fan_Distance(p) < p->range * p->range &&
                 FanCannon_IsPathToPlayerClear(p)) {
-                gUnk_02000550 = p->wind;
+                gPlayerBackgroundState = p->wind;
                 if (!p->reverse)
-                    gUnk_0200053C = 0xc0;
+                    gPlayerBackgroundMode = 0xc0;
                 else
-                    gUnk_0200053C = 0x40;
+                    gPlayerBackgroundMode = 0x40;
             }
         }
     }

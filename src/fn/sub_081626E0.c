@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern void *gUnk_0200059C;
 void *Task_Create(s32, s32);
 void Task_SetCallbacks(void *, void *, void *);
 s32 sub_081625C0(void *, void *, void *, void *);
@@ -11,8 +11,8 @@ void PlayerAttackEffect_Destroy(void);
 void *PlayerAttackEffect_Create(void *a, void *b, void *c)
 {
     void *r;
-    if (gUnk_0200059C != 0)
-        return gUnk_0200059C;
+    if (gPlayerAttackEffect != 0)
+        return gPlayerAttackEffect;
     r = Task_Create(0xa, 0x5A8);
     if (r != 0) {
         Task_SetCallbacks(r, sub_0816233C, PlayerAttackEffect_Destroy);
@@ -21,6 +21,6 @@ void *PlayerAttackEffect_Create(void *a, void *b, void *c)
             return 0;
         }
     }
-    gUnk_0200059C = r;
+    gPlayerAttackEffect = r;
     return r;
 }

@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "runtime.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z;
@@ -24,11 +25,9 @@ struct Matrix {
     s8 scaleX, scaleY;
     u8 pad;
 };
-extern u32 gUnk_03003A04;
 extern struct Drawable *gUnk_030042D0[];
 extern struct Matrix gUnk_03004310[];
 extern u16 gUnk_03005418[];
-extern struct Vec gUnk_030042A0;
 static inline s32 UnsignedScale(u8 v)
 {
     return v;
@@ -69,10 +68,10 @@ void SpriteOam_QueueCameraRelativeSprites(void)
         if (t)
             goto next;
 
-        x = divide8(p->pos.x - gUnk_030042A0.x) + 120;
-        y = divide8(p->pos.y - gUnk_030042A0.y) + 80;
+        x = divide8(p->pos.x - gCamera.position.x) + 120;
+        y = divide8(p->pos.y - gCamera.position.y) + 80;
         {
-            register s32 result asm("r0") = p->pos.z - gUnk_030042A0.z;
+            register s32 result asm("r0") = p->pos.z - gCamera.position.z;
             z = result;
         }
         {
@@ -142,7 +141,7 @@ void SpriteOam_QueueCameraRelativeSprites(void)
             gOamBuffer[n].attributes = attr;
             gOamBuffer[n].tile = tile;
             gOamCount = n + 1;
-            gUnk_03003A04 |= 1;
+            gVideoUploadFlags |= 1;
         } else {
             s32 tile, n;
             u32 priority;

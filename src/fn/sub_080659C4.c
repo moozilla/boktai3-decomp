@@ -3,7 +3,7 @@ void ActorAttachment_UpdateValueFrame(struct ActorAttachmentSlotView *);
 u8 ActorAttachment_TickRemoval(void *, void *);
 void ActorAttachment_TickValueFrame(struct ActorAttachmentSlotView *slot)
 {
-    struct ActorAttachmentManagerView *manager = gUnk_02000124;
+    struct ActorAttachmentManagerView *manager = gActorAttachmentManager;
     if (manager != NULL) {
         struct ActorAttachmentManagerView *owner = manager;
         struct ContactSwarmSprite *sprite = &slot->sprite;

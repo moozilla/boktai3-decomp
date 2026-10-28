@@ -1,12 +1,12 @@
 #include "global.h"
 
 #include "engine.h"
+#include "ram.h"
 extern u8 *gUnk_02000580[];
-extern u16 gUnk_02000548[];
 extern const u16 gUnk_08610E24[];
 void sub_0813D834(u8 *, s32, s32);
 /* Script: value -t (default gUnk_08610E24[-s]) for slot -s (0 or 1) of the
-   player (sub_0813D834), or kept in gUnk_02000548 when there is no player
+   player (sub_0813D834), or kept in gPlayerInitialSlotValues when there is no player
    yet (tentative). */
 void Player_SetSlotValueFromScript(void)
 {
@@ -19,6 +19,6 @@ void Player_SetSlotValueFromScript(void)
         if (gUnk_02000580[0])
             sub_0813D834(gUnk_02000580[0], n, value);
         else
-            gUnk_02000548[n] = value;
+            gPlayerInitialSlotValues[n] = value;
     }
 }

@@ -1,8 +1,8 @@
 #include "global.h"
+#include "scene_stimulus.h"
 
-extern u32 gUnk_030025FC;
 
 void SceneStimulus_Reset(void)
 {
-    gUnk_030025FC = 0;
+    gSceneStimulusState = 0;
 }

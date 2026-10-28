@@ -26,128 +26,142 @@ struct Obj1FScriptArgs {
     u16 kind, unknown2;
     u8 *data;
 };
-/* Camera-relative proximity test used by every case: horizontal distance squared and |dy|. */
-static inline int Obj1F_Near(u8 *o, struct Obj1FPos *ref)
+struct Obj1FObject {
+    u32 flags;
+    u8 pad4[0xc];
+    u16 pose;
+    u8 pad12[0x1e];
+    void *callback;
+    u16 id;
+    u8 flags36;
+    u8 pad37[2];
+    u8 pose39;
+    u8 pad3a[6];
+    u8 kind, active;
+    u16 scene;
+    u8 gated;
+    u8 pad45[3];
+    u32 script;
+    u8 pad4c[4];
+    u8 scriptData[0x18];
+    struct Obj1FPos position;
+    u8 pad70[0x1c];
+};
+struct Obj1FController {
+    u8 pad0[0x18];
+    u16 messageId, count;
+    u8 primaryCount, secondaryCount;
+    u16 primary[4], secondary[4];
+    u8 pad2e[10];
+    u8 *messages;
+    u8 pad3c[0x3f0];
+    struct Obj1FObject *objects;
+};
+static inline s32 Obj1F_GetCellDistanceFromOrigin(struct Obj1FPos *p)
 {
-    s16 dx = *(s16 *)(o + 0x68) - ref->x;
-    s16 dy = *(s16 *)(o + 0x6A) - ref->y;
-    s16 dz = *(s16 *)(o + 0x6C) - ref->z;
-    if (dx * dx + dz * dz > 0x12CC6)
-        return 0;
-    if (dy < 0)
-        dy = -dy;
-    if (dy > 0xFE)
-        return 0;
-    return 1;
+    s32 x = p->x >> 8;
+    s32 z = p->z >> 8;
+    if (x < 0)
+        x = -x;
+    if (z < 0)
+        z = -z;
+    return x + z;
 }
-static inline struct Obj1FPos *Obj1F_Cam(void)
+static inline s32 Obj1F_Abs(s32 n)
 {
-    return (struct Obj1FPos *)((u8 *)gGameState + 0x30);
+    return n < 0 ? -n : n;
 }
-static inline void Obj1F_Append(u8 *self, u16 id)
+static inline u8 Obj1F_SceneMatches(u16 *scene)
 {
-    ((u16 *)(self + 0x1e))[self[0x1c]] = id;
-    self[0x1c]++;
+    if (*(u32 *)((u8 *)gGameState + 0x5a0) == *scene)
+        return 1;
+    return 0;
 }
-/* Poses an object, then also activates it when the tether position is near. */
-static inline void Obj1F_PoseATether(u8 *self, u8 *o, struct Obj1FPos *tmp)
-{
-    u16 id = *(u16 *)(o + 0x34);
-    if (o[0x36] & 1)
-        return;
-    SceneObject_UpdatePoseA(o);
-    if (Obj1F_Near(o, Obj1F_Cam()) && !SceneObjects_HasPrimaryId(self, id))
-        Obj1F_Append(self, id);
-    SceneObjects_AddPrimaryId(self, o);
-    if (!TetherActor_CopyPosition(tmp))
-        return;
-    if (!Obj1F_Near(o, tmp))
-        return;
-    if (SceneObjects_HasPrimaryId(self, id))
-        return;
-    Obj1F_Append(self, id);
-}
-static inline void Obj1F_PoseC(u8 *self, u8 *o, struct Obj1FPos *tmp, struct Obj1FScriptArgs *args)
-{
-    u16 id = *(u16 *)(o + 0x34);
-    if (o[0x36] & 1)
-        return;
-    SceneObject_UpdatePoseC(o);
-    if (Obj1F_Near(o, Obj1F_Cam()) && !SceneObjects_HasPrimaryId(self, id)) {
-        if (o[0x41] == 0) {
-            if ((gUnk_03005260[1] & 1) && !SceneObject_CheckActorCompatibility(self, o) &&
-                *(u32 *)(o + 0x48)) {
-                args->kind = 4;
-                args->data = o + 0x50;
-                Script_Call(*(u32 *)(o + 0x48), args);
-            }
-        } else {
-            Obj1F_Append(self, id);
-        }
-    }
-    if (TetherActor_CopyPosition(tmp) && Obj1F_Near(o, tmp) &&
-        !SceneObjects_HasPrimaryId(self, id) && o[0x41])
-        Obj1F_Append(self, id);
-}
-
-#ifdef NONMATCHING
-// fuzzy: 24.9%
-// scope shape 959 (differences once low registers are set aside)
 // confidence=low: SceneObjects per-frame update; handles queued activation messages, then classifies each object by its pose kind into the activate list, then diffs the two id lists.
-s32 sub_0801F93C(u8 *self)
+s32 sub_0801F93C(struct Obj1FController *self)
 {
     s32 n;
     s32 i;
     u8 *msg;
-    struct Obj1FPos tetherA, tetherB, tetherC, tetherD, tetherE, tetherF;
-    struct Obj1FScriptArgs argsA, argsB;
-    if (*(u16 *)(self + 0x1a) == 0)
+    struct Obj1FPos camera;
+    if (self->count == 0)
         return 0;
-    for (i = 0; i < self[0x1c]; i++)
-        ((u16 *)(self + 0x26))[i] = ((u16 *)(self + 0x1e))[i];
-    self[0x1d] = self[0x1c];
-    self[0x1c] = 0;
-    n = MessageQueue_GetMessagesById(*(u16 *)(self + 0x18), self + 0x38);
-    for (msg = *(u8 **)(self + 0x38); n-- > 0; msg += 8) {
-        u16 *m = *(u16 **)(msg + 4);
-        switch (m[0]) {
+    for (i = 0; i < self->primaryCount; i++)
+        self->secondary[i] = self->primary[i];
+    self->secondaryCount = self->primaryCount;
+    self->primaryCount = 0;
+    n = MessageQueue_GetMessagesById(self->messageId, &self->messages);
+    for (msg = self->messages; n-- > 0; msg += 8) {
+        switch ((*(u16 **)(msg + 4))[0]) {
             case 0:
-                SceneObjects_BeginActivation(self, m[1]);
+                SceneObjects_BeginActivation((u8 *)self, (*(u16 **)(msg + 4))[1]);
                 break;
             case 1:
-                SceneObjects_BeginDeactivation(self, m[1]);
+                SceneObjects_BeginDeactivation((u8 *)self, (*(u16 **)(msg + 4))[1]);
                 break;
             case 2:
-                SceneObjects_SetActive(self, m[1]);
+                SceneObjects_SetActive((u8 *)self, (*(u16 **)(msg + 4))[1]);
                 break;
             case 3:
-                SceneObjects_SetInactive(self, m[1]);
+                SceneObjects_SetInactive((u8 *)self, (*(u16 **)(msg + 4))[1]);
                 break;
             case 4:
-                SceneObjects_Lock(self, m[1]);
+                SceneObjects_Lock((u8 *)self, (*(u16 **)(msg + 4))[1]);
                 break;
             case 5:
-                SceneObjects_Unlock(self, m[1]);
+                SceneObjects_Unlock((u8 *)self, (*(u16 **)(msg + 4))[1]);
                 break;
         }
     }
-    for (i = 0; i < *(u16 *)(self + 0x1a); i++) {
-        u8 *o = *(u8 **)(self + 0x42C) + i * 0x8C;
-        u16 id;
-        *(u16 *)(o + 0x10) = o[0x39];
-        if (o[0x44]) {
-            if (*(u32 *)((u8 *)gGameState + 0x5A0) == *(u16 *)(o + 0x42))
-                *(u32 *)o &= ~1;
+    camera.x = ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->x;
+    camera.y = 0;
+    camera.z = ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->z;
+    Obj1F_GetCellDistanceFromOrigin(&camera);
+    for (i = 0; i < self->count; i++) {
+        struct Obj1FObject **base = &self->objects;
+        s32 offset = i * sizeof(struct Obj1FObject);
+        struct Obj1FObject *o = (struct Obj1FObject *)((u8 *)*base + offset);
+        o->pose = o->pose39;
+        if (o->gated) {
+            if (Obj1F_SceneMatches(&o->scene))
+                o->flags &= ~1;
             else
-                *(u32 *)o |= 1;
+                o->flags |= 1;
         }
-        id = *(u16 *)(o + 0x34);
-        switch (o[0x40]) {
-            case 0:
-                Obj1F_PoseATether(self, o, &tetherA);
+        switch (o->kind) {
+            case 0: {
+                struct Obj1FPos delta;
+                struct Obj1FPos tether;
+                if (o->flags36 & 1)
+                    break;
+                SceneObject_UpdatePoseA((u8 *)o);
+                delta = o->position;
+                delta.x -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->x;
+                delta.y -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->y;
+                delta.z -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->z;
+                if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
+                    Obj1F_Abs(delta.y) <= 0xFE && !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
+                    self->primary[self->primaryCount] = o->id;
+                    self->primaryCount++;
+                }
+                SceneObjects_AddPrimaryId((u8 *)self, (u8 *)o);
+                if (TetherActor_CopyPosition(&tether)) {
+                    struct Obj1FPos delta;
+                    delta = o->position;
+                    delta.x -= (&tether)->x;
+                    delta.y -= (&tether)->y;
+                    delta.z -= (&tether)->z;
+                    if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
+                        Obj1F_Abs(delta.y) <= 0xFE &&
+                        !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
+                        self->primary[self->primaryCount] = o->id;
+                        self->primaryCount++;
+                    }
+                }
                 break;
+            }
             case 1:
-                SceneObject_UpdatePoseB(o);
+                SceneObject_UpdatePoseB((u8 *)o);
                 break;
             case 2:
             case 8:
@@ -156,62 +170,217 @@ s32 sub_0801F93C(u8 *self)
             case 11:
             case 12:
             case 13:
-            case 14:
-                Obj1F_PoseC(self, o, &tetherB, &argsA);
+            case 14: {
+                struct Obj1FPos delta;
+                struct Obj1FScriptArgs args;
+                struct Obj1FPos tether;
+                if (o->flags36 & 1)
+                    break;
+                SceneObject_UpdatePoseC((u8 *)o);
+                delta = o->position;
+                delta.x -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->x;
+                delta.y -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->y;
+                delta.z -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->z;
+                if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
+                    Obj1F_Abs(delta.y) <= 0xFE && !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
+                    if (!o->active) {
+                        if ((gUnk_03005260[1] & 1) &&
+                            !SceneObject_CheckActorCompatibility((u8 *)self, (u8 *)o) &&
+                            o->script) {
+                            args.kind = 4;
+                            args.data = o->scriptData;
+                            Script_Call(o->script, &args);
+                        }
+                    } else {
+                        self->primary[self->primaryCount] = o->id;
+                        self->primaryCount++;
+                    }
+                }
+                if (TetherActor_CopyPosition(&tether)) {
+                    struct Obj1FPos delta;
+                    delta = o->position;
+                    delta.x -= (&tether)->x;
+                    delta.y -= (&tether)->y;
+                    delta.z -= (&tether)->z;
+                    if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
+                        Obj1F_Abs(delta.y) <= 0xFE &&
+                        !SceneObjects_HasPrimaryId((u8 *)self, o->id) && o->active) {
+                        self->primary[self->primaryCount] = o->id;
+                        self->primaryCount++;
+                    }
+                }
                 break;
+            }
+            case 4: {
+                struct Obj1FPos delta;
+                struct Obj1FPos tether;
+                if (o->flags36 & 1)
+                    break;
+                SceneObject_UpdatePoseA((u8 *)o);
+                delta = o->position;
+                delta.x -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->x;
+                delta.y -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->y;
+                delta.z -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->z;
+                if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
+                    Obj1F_Abs(delta.y) <= 0xFE && !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
+                    self->primary[self->primaryCount] = o->id;
+                    self->primaryCount++;
+                }
+                SceneObjects_AddPrimaryId((u8 *)self, (u8 *)o);
+                if (TetherActor_CopyPosition(&tether)) {
+                    struct Obj1FPos delta;
+                    delta = o->position;
+                    delta.x -= (&tether)->x;
+                    delta.y -= (&tether)->y;
+                    delta.z -= (&tether)->z;
+                    if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
+                        Obj1F_Abs(delta.y) <= 0xFE &&
+                        !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
+                        self->primary[self->primaryCount] = o->id;
+                        self->primaryCount++;
+                    }
+                }
+                break;
+            }
+            case 5: {
+                struct Obj1FPos delta;
+                struct Obj1FPos tether;
+                if (o->flags36 & 1)
+                    break;
+                SceneObject_UpdatePoseA((u8 *)o);
+                delta = o->position;
+                delta.x -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->x;
+                delta.y -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->y;
+                delta.z -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->z;
+                if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
+                    Obj1F_Abs(delta.y) <= 0xFE && !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
+                    self->primary[self->primaryCount] = o->id;
+                    self->primaryCount++;
+                }
+                SceneObjects_AddPrimaryId((u8 *)self, (u8 *)o);
+                if (TetherActor_CopyPosition(&tether)) {
+                    struct Obj1FPos delta;
+                    delta = o->position;
+                    delta.x -= (&tether)->x;
+                    delta.y -= (&tether)->y;
+                    delta.z -= (&tether)->z;
+                    if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
+                        Obj1F_Abs(delta.y) <= 0xFE &&
+                        !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
+                        self->primary[self->primaryCount] = o->id;
+                        self->primaryCount++;
+                    }
+                }
+                break;
+            }
+            case 6: {
+                struct Obj1FPos delta;
+                struct Obj1FPos tether;
+                if (o->flags36 & 1)
+                    break;
+                SceneObject_UpdatePoseA((u8 *)o);
+                delta = o->position;
+                delta.x -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->x;
+                delta.y -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->y;
+                delta.z -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->z;
+                if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
+                    Obj1F_Abs(delta.y) <= 0xFE && !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
+                    self->primary[self->primaryCount] = o->id;
+                    self->primaryCount++;
+                }
+                SceneObjects_AddPrimaryId((u8 *)self, (u8 *)o);
+                if (TetherActor_CopyPosition(&tether)) {
+                    struct Obj1FPos delta;
+                    delta = o->position;
+                    delta.x -= (&tether)->x;
+                    delta.y -= (&tether)->y;
+                    delta.z -= (&tether)->z;
+                    if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
+                        Obj1F_Abs(delta.y) <= 0xFE &&
+                        !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
+                        self->primary[self->primaryCount] = o->id;
+                        self->primaryCount++;
+                    }
+                }
+            }
             case 3:
             case 7:
-                if (!(o[0x36] & 1))
-                    SceneObject_UpdatePoseA(o);
+                if (!(o->flags36 & 1))
+                    SceneObject_UpdatePoseA((u8 *)o);
                 break;
-            case 4:
-                Obj1F_PoseATether(self, o, &tetherC);
-                break;
-            case 5:
-                Obj1F_PoseATether(self, o, &tetherD);
-                break;
-            case 6:
-                if (o[0x36] & 1)
-                    break;
-                SceneObject_UpdatePoseA(o);
-                if (Obj1F_Near(o, Obj1F_Cam()) && !SceneObjects_HasPrimaryId(self, id))
-                    Obj1F_Append(self, id);
-                SceneObjects_AddPrimaryId(self, o);
-                if (TetherActor_CopyPosition(&tetherE) && Obj1F_Near(o, &tetherE) &&
-                    !SceneObjects_HasPrimaryId(self, id))
-                    Obj1F_Append(self, id);
-                if (!(o[0x36] & 1))
-                    SceneObject_UpdatePoseA(o);
-                break;
-            case 15:
-                SceneObject_UpdatePoseA(o);
+            case 15: {
+                struct Obj1FPos delta;
+                SceneObject_UpdatePoseA((u8 *)o);
                 if (*(s16 *)((u8 *)gGameState + 0x876) <= 2)
                     break;
-                if (Obj1F_Near(o, Obj1F_Cam()) && !SceneObjects_HasPrimaryId(self, id))
-                    Obj1F_Append(self, id);
+                delta = o->position;
+                delta.x -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->x;
+                delta.y -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->y;
+                delta.z -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->z;
+                if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
+                    Obj1F_Abs(delta.y) <= 0xFE && !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
+                    self->primary[self->primaryCount] = o->id;
+                    self->primaryCount++;
+                }
                 break;
-            case 16:
-                Obj1F_PoseC(self, o, &tetherF, &argsB);
+            }
+            case 16: {
+                struct Obj1FPos delta;
+                struct Obj1FScriptArgs args;
+                struct Obj1FPos tether;
+                if (o->flags36 & 1)
+                    break;
+                SceneObject_UpdatePoseC((u8 *)o);
+                delta = o->position;
+                delta.x -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->x;
+                delta.y -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->y;
+                delta.z -= ((struct Obj1FPos *)((u8 *)gGameState + 0x30))->z;
+                if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
+                    Obj1F_Abs(delta.y) <= 0xFE && !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
+                    if (!o->active) {
+                        if ((gUnk_03005260[1] & 1) &&
+                            !SceneObject_CheckActorCompatibility((u8 *)self, (u8 *)o) &&
+                            o->script) {
+                            args.kind = 4;
+                            args.data = o->scriptData;
+                            Script_Call(o->script, &args);
+                        }
+                    } else {
+                        self->primary[self->primaryCount] = o->id;
+                        self->primaryCount++;
+                    }
+                }
+                if (TetherActor_CopyPosition(&tether)) {
+                    struct Obj1FPos delta;
+                    delta = o->position;
+                    delta.x -= (&tether)->x;
+                    delta.y -= (&tether)->y;
+                    delta.z -= (&tether)->z;
+                    if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
+                        Obj1F_Abs(delta.y) <= 0xFE &&
+                        !SceneObjects_HasPrimaryId((u8 *)self, o->id) && o->active) {
+                        self->primary[self->primaryCount] = o->id;
+                        self->primaryCount++;
+                    }
+                }
                 break;
+            }
         }
     }
-    for (i = 0; i < self[0x1d]; i++) {
-        u16 *p = (u16 *)(self + 0x26) + i;
-        if (!SceneObjects_HasPrimaryId(self, *p))
-            SceneObjects_BeginDeactivation(self, *p);
+    for (i = 0; i < self->secondaryCount; i++) {
+        if (!SceneObjects_HasPrimaryId((u8 *)self, self->secondary[i]))
+            SceneObjects_BeginDeactivation((u8 *)self, self->secondary[i]);
     }
-    for (i = 0; i < self[0x1c]; i++) {
-        u16 *p = (u16 *)(self + 0x1e) + i;
-        if (!SceneObjects_HasSecondaryId(self, *p))
-            SceneObjects_BeginActivation(self, *p);
+    for (i = 0; i < self->primaryCount; i++) {
+        if (!SceneObjects_HasSecondaryId((u8 *)self, self->primary[i]))
+            SceneObjects_BeginActivation((u8 *)self, self->primary[i]);
     }
-    for (i = 0; i < *(u16 *)(self + 0x1a); i++) {
-        u8 *o = *(u8 **)(self + 0x42C) + i * 0x8C;
-        if (*(void **)(o + 0x30))
-            Callback_InvokeActor(o, *(void **)(o + 0x30));
+    for (i = 0; i < self->count; i++) {
+        struct Obj1FObject **base = &self->objects;
+        s32 offset = i * sizeof(struct Obj1FObject);
+        struct Obj1FObject *o = (struct Obj1FObject *)((u8 *)*base + offset);
+        if (o->callback)
+            Callback_InvokeActor(o, o->callback);
     }
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0801F93C);
-#endif

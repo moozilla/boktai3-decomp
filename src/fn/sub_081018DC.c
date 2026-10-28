@@ -17,7 +17,7 @@ void NamedObject_UpdateRouteFollower(struct NamedObject *o)
     u32 *np;
     struct NamedObjectManager *m;
     if (o->stage) {
-        struct NamedObjectManager *manager = gUnk_020001AC;
+        struct NamedObjectManager *manager = gNamedActorManager;
         if (HasFlag(0x2000, &o->flags) || o->name == manager->followName) {
             if (o->script) {
                 struct NamedObjectArgs args;
@@ -39,7 +39,7 @@ void NamedObject_UpdateRouteFollower(struct NamedObject *o)
         o->timer = 0;
         o->stage = 0;
     }
-    managerPtr = &gUnk_020001AC;
+    managerPtr = &gNamedActorManager;
     if (!sub_08101094(o)) {
         route = o->route;
         step = route[3]++;

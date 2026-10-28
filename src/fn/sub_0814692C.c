@@ -1,7 +1,7 @@
 #include "global.h"
 #include "player.h"
+#include "ram.h"
 // confidence=low: energy-gated action creates ActorBurst and sets the shared burst latch.
-extern u16 gUnk_02000570;
 u32 Player_ConsumeStateEntry(struct Player *);
 s32 Player_HasRequiredEnergy(struct Player *, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
@@ -14,7 +14,7 @@ void Player_UpdateEnergyBurst(struct Player *p)
 {
     if (Player_ConsumeStateEntry(p)) {
         p->actionVariant = 0;
-        if (Player_HasRequiredEnergy(p, 100) && !gUnk_02000570)
+        if (Player_HasRequiredEnergy(p, 100) && !gPlayerSolarActionPending)
             p->actionEighteenEnabled = 1;
         else
             p->actionEighteenEnabled = 0;
@@ -62,7 +62,7 @@ void Player_UpdateEnergyBurst(struct Player *p)
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 8), 64, 1)) {
                 Sound_PlaySong(0xCB);
                 if (p->actionEighteenEnabled && !*(u16 *)((u8 *)p + 0x4A2))
-                    gUnk_02000570 = 1;
+                    gPlayerSolarActionPending = 1;
                 ActorSequence_Begin(p, 9, 2);
             }
             break;

@@ -1,8 +1,8 @@
 #include "global.h"
-extern u32 *gUnk_030025F8;
+#include "scene_body_registry.h"
 u32 *SceneBody_GetRegistry(void)
 {
-    if (gUnk_030025F8 == 0)
+    if (gSceneBodyRegistry == 0)
         return 0;
-    return gUnk_030025F8;
+    return (u32 *)gSceneBodyRegistry;
 }

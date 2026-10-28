@@ -1,7 +1,6 @@
-#define gCallbackPool gUnk_020001B0
 #include "global.h"
 #include "callback_pool.h"
-extern struct CallbackPool *gUnk_020001B0;
+#include "ram.h"
 void Sprite_Remove(void *);
 void Collider_Remove(void *);
 void ScaledShadow_Destroy(void *);
@@ -24,6 +23,6 @@ s32 CallbackPool_DestroyEntries(struct CallbackPool *pool)
             }
         }
     }
-    gUnk_020001B0 = 0;
+    gActorGroupPool = 0;
     return 0;
 }
