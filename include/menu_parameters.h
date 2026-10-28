@@ -58,4 +58,10 @@ struct ListMenuParameters {
 };
 extern struct ListMenuParameters gListMenuParameters;
 
+struct SoundTestParameters {
+    u8 *text;
+    u32 confirmProc;
+};
+extern struct SoundTestParameters gSoundTestParameters;
+
 #endif

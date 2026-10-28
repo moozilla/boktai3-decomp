@@ -1,4 +1,5 @@
 #include "global.h"
+#include "menu_parameters.h"
 // Provisional name: SoundTest_Update
 struct Sprite {
     u8 head[8];
@@ -38,7 +39,6 @@ void Sound_StopSong(s32);
 void Sound_PlaySong(s32);
 void Anim_SetKeyframes(void *, void *, u16, s32, s32);
 extern u16 gUnk_03005260[];
-extern void *gUnk_020003C0[];
 void Menu_StartFadeOut(s32);
 s32 SoundTest_StopSelection(void *);
 void SoundTest_UpdatePlaybackIndicators(void *);
@@ -104,7 +104,7 @@ void SoundTest_Update(struct Viewer *p)
         case 1:
             if (p->exitTimer > (1 << p->fadeShift)) {
                 if (!p->exitFlag)
-                    Script_Call(gUnk_020003C0[1], 0);
+                    Script_Call(gSoundTestParameters.confirmProc, 0);
                 Task_Kill(p);
             }
             p->exitTimer++;
