@@ -280,7 +280,7 @@ addr,name,size,kind,decl,header,confidence,notes
 030025A0,gSceneLifecycleTask,20,object,extern struct SceneRuntimeTask gSceneLifecycleTask;,include/runtime.h,high callback identity,Static scene lifecycle task; common scheduler header followed by state and counter words
 030025E8,gCommandSet,E,object,extern struct CommandSet gCommandSet;,include/ram.h,low,
 030025F8,gSceneBodyRegistry,4,object,extern struct SceneBodyRegistry *gSceneBodyRegistry;,include/scene_body_registry.h,high field offsets and subsystem,Scene body registry task pointer; linked-list first/last pointers at +18/+1C
-030025FC,gUnk_030025FC,4,object,,,,
+030025FC,gSceneStimulusState,4,object,extern struct SceneStimulusState *gSceneStimulusState;,include/scene_stimulus.h,high physical layout; provisional field semantics,Scene stimulus task pointer: eight 16-byte stimuli at +18 and sixteen exclusion-region ids at +98
 03002600,gRegionList,4,object,extern struct RegionList *gRegionList;,include/ram.h,low,
 03002604,gSolarController,4,object,extern u8 *gSolarController;,include/ram.h,low,solar sensor controller (Solar_*)
 03002608,gUnk_03002608,4,object,,,,

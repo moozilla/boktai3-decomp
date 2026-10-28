@@ -89,3 +89,5 @@ and field-remapping support in ramlayout would make this migration faster.
 - **030025A0 `gSceneLifecycleTask` (struct):** Scene lifecycle task shares the scheduler header and names its two trailing state/counter words. Initializer exact and identical in both modes.
 
 - **030025F8 `gSceneBodyRegistry` (struct):** Shared registry task pointer and pointee layout with first/last list heads at +18/+1C. All six consumers exact and unchanged in both compiler modes.
+
+- **030025FC `gSceneStimulusState` (struct):** Shared 0xD8-byte pointee: eight 16-byte stimuli at +18, sixteen exclusion ids at +98. All eleven consumers exact in both modes. ID keeps unsigned aging semantics and explicit signed interpretations in posting/overlap tests; signed storage would fold the original load/OR/store into a -1 store.
