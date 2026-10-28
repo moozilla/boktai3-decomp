@@ -21,4 +21,10 @@ struct ChoiceMenuParameters {
 };
 extern struct ChoiceMenuParameters gChoiceMenuParameters;
 
+struct MessageMenuParameters {
+    u8 *lBlock;
+    s32 o, c, f;
+};
+extern struct MessageMenuParameters gMessageMenuParameters;
+
 #endif

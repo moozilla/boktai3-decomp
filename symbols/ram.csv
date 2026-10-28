@@ -140,7 +140,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000298,gCloudTask,4,object,extern struct CloudTask *gCloudTask;,include/ram.h,low,
 020002A0,gOptionMenuParameters,20,object,extern struct OptionMenuParameters gOptionMenuParameters;,include/menu_parameters.h,low,option-menu callbacks; keyword names retained; indexed and named views share eight words
 020002C0,gChoiceMenuParameters,28,object,extern struct ChoiceMenuParameters gChoiceMenuParameters;,include/menu_parameters.h,low,provisional choice-menu parameters; script keyword fields retained; n2 is also called value
-020002E8,gUnk_020002E8,10,object,,,,
+020002E8,gMessageMenuParameters,10,object,extern struct MessageMenuParameters gMessageMenuParameters;,include/menu_parameters.h,low,provisional message-menu parameters; script keyword fields retained
 020002F8,gScreenParams,18,object,extern struct ScreenParams gScreenParams;,include/ram.h,low,
 02000310,gUnk_02000310,14,object,,,,
 02000328,gNamePlaceholderScript,18,object,extern u32 gNamePlaceholderScript[];,include/ram.h,low,
