@@ -447,10 +447,10 @@ addr,name,size,kind,decl,header,confidence,notes
 030053FC,gSceneTransitionActive,4,object,extern u32 gSceneTransitionActive;,include/runtime.h,,Set during transition cleanup and cleared when the scene starts
 03005400,gSceneInitWord1,4,object,extern u32 gSceneInitWord1;,include/runtime.h,,Initialized to zero by the scene lifecycle manager; semantic name provisional
 03005404,gSleepResumePending,4,object,extern u32 gSleepResumePending;,include/runtime.h,,Set after BIOS Stop and consumed by scene runtime refresh
-03005408,gUnk_03005408,4,object,,,,
-0300540C,gUnk_0300540C,4,object,,,,
-03005410,gUnk_03005410,4,object,,,,
-03005414,gUnk_03005414,4,object,,,,
+03005408,gSceneDialogActive,4,object,extern s32 gSceneDialogActive;,include/runtime.h,,"Shared scene-dialog activity/control flag, retaining existing provisional aliases"
+0300540C,gSceneUnpausedFrames,4,object,extern u32 gSceneUnpausedFrames;,include/runtime.h,,Counter incremented while the scene is not paused; provisional semantic name
+03005410,gSceneControlWord2,4,object,extern u32 gSceneControlWord2;,include/runtime.h,,Cleared by Engine_ClearControlFlags; finer meaning unresolved
+03005414,gSceneControlWord3,4,object,extern u32 gSceneControlWord3;,include/runtime.h,,Cleared during transitions and by Engine_ClearControlFlags; finer meaning unresolved
 03005418,gUnk_03005418,8,object,,,,
 03005420,gActiveCamera,4,object,extern u8 *gActiveCamera;,include/ram.h,low,
 03005428,gUnk_03005428,2,object,,,,

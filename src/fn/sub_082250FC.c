@@ -5,8 +5,7 @@ struct Task {
     u8 pad[24];
     s32 state, counter;
 };
-extern u32 gUnk_03005408, gUnk_030054B0;
-extern u32 gUnk_03005414, gUnk_0300540C;
+extern u32 gUnk_030054B0;
 extern u32 gEngineFlags;
 extern u16 gUnk_03005260;
 extern u8 *gGameState;
@@ -25,7 +24,7 @@ void Script_SetEntryProcedure(s32);
 void SunClock_Refresh(void);
 s32 SceneLifecycle_UpdateTask(struct Task *task)
 {
-    if (!gUnk_03005408) {
+    if (!gSceneDialogActive) {
         if (!(gUnk_03005260 & 2))
             goto update;
         if (!(gUnk_03005260 & 1))
@@ -35,7 +34,7 @@ s32 SceneLifecycle_UpdateTask(struct Task *task)
         System_ShutdownAndSoftReset();
         return 0;
     } else
-        gUnk_03005408 = 0;
+        gSceneDialogActive = 0;
 update: {
     u32 state = task->state;
     switch (state) {
@@ -72,7 +71,7 @@ update: {
                         break;
                     if (!SceneLifecycle_IsTransitionBlocked()) {
                         gSceneControlWord0 = 0;
-                        gUnk_03005414 = 0;
+                        gSceneControlWord3 = 0;
                         gSceneTransitionActive = state;
                         {
                             u32 mask = ~14;
@@ -90,7 +89,7 @@ update: {
                     }
                 }
                 if (!(gEnginePauseFlags & 2))
-                    gUnk_0300540C++;
+                    gSceneUnpausedFrames++;
                 break;
             }
             task->counter--;

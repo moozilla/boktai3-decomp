@@ -2,10 +2,6 @@
 #include "ram.h"
 #include "runtime.h"
 extern u32 gEngineFlags;
-extern u32 gUnk_03005410;
-extern u32 gUnk_03005414;
-extern u32 gUnk_03005408;
-extern u32 gUnk_0300540C;
 extern u32 gUnk_030054B0;
 extern u8 *gGameState;
 void Script_InitActorRegistry(void);
@@ -30,14 +26,14 @@ void SceneLifecycle_InitManager(void)
     gEngineFlags = 0;
     gScenePauseFlags = 0;
     gSceneControlWord1 = 0;
-    gUnk_03005410 = 0;
+    gSceneControlWord2 = 0;
     gSceneTransitionFlags = 0;
     gSceneControlWord0 = 0;
-    gUnk_03005414 = 0;
-    gUnk_03005408 = 0;
+    gSceneControlWord3 = 0;
+    gSceneDialogActive = 0;
     gSceneInitWord1 = 0;
     gSceneInitWord0 = 0;
-    gUnk_0300540C = 0;
+    gSceneUnpausedFrames = 0;
     gRuntimeFrameCounter = 0;
     gSceneTransitionActive = 0;
     gPlayTimeCounterEnabled = 0;

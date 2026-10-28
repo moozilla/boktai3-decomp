@@ -86,5 +86,12 @@ extern u32
 extern u32
     gSceneInitWord1; /* Initialized to zero by the scene lifecycle manager; semantic name provisional */
 extern u32 gSleepResumePending; /* Set after BIOS Stop and consumed by scene runtime refresh */
+extern s32
+    gSceneDialogActive; /* Shared scene-dialog activity/control flag, retaining existing provisional aliases */
+extern u32
+    gSceneUnpausedFrames; /* Counter incremented while the scene is not paused; provisional semantic name */
+extern u32 gSceneControlWord2; /* Cleared by Engine_ClearControlFlags; finer meaning unresolved */
+extern u32
+    gSceneControlWord3; /* Cleared during transitions and by Engine_ClearControlFlags; finer meaning unresolved */
 
 #endif

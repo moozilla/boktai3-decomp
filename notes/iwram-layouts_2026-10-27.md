@@ -174,3 +174,8 @@ and field-remapping support in ramlayout would make this migration faster.
 - **030053FC `gSceneTransitionActive` (unified):** Set during transition cleanup and cleared when the scene starts; ramlayout before/after checks passed.
 - **03005400 `gSceneInitWord1` (unified):** Initialized to zero by the scene lifecycle manager; semantic name provisional; ramlayout before/after checks passed.
 - **03005404 `gSleepResumePending` (unified):** Set after BIOS Stop and consumed by scene runtime refresh; ramlayout before/after checks passed.
+
+- **03005408 `gSceneDialogActive` (unified):** Shared scene-dialog activity/control flag, retaining existing provisional aliases; ramlayout before/after checks passed.
+- **0300540C `gSceneUnpausedFrames` (unified):** Counter incremented while the scene is not paused; provisional semantic name; ramlayout before/after checks passed.
+- **03005410 `gSceneControlWord2` (unified):** Cleared by Engine_ClearControlFlags; finer meaning unresolved; ramlayout before/after checks passed.
+- **03005414 `gSceneControlWord3` (unified):** Cleared during transitions and by Engine_ClearControlFlags; finer meaning unresolved; ramlayout before/after checks passed.

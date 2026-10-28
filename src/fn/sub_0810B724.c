@@ -24,7 +24,6 @@ struct Reg1745Hdr {
     s16 field18;
 };
 
-extern u32 gUnk_03005408;
 extern struct Reg1745Hdr *gUnk_020004B4;
 s32 Serial_ReceivePacket(u32);
 s32 SerialLink_QueueSendWord(u32);
@@ -47,7 +46,7 @@ u32 Registry1745_RunSession(struct Reg1745Run *p)
     struct Reg1745Run *q = p;
     gLinkSessionStep = 0;
     if (p->state > 4)
-        gUnk_03005408 = 1;
+        gSceneDialogActive = 1;
     gLinkSessionStep = 1;
     if (p->state > 2) {
         u32 st;
