@@ -236,7 +236,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000708,gGameVariables,4,object,extern u8 *gGameVariables;,include/ram.h,,active 0x400-byte game-variable region
 0200070C,gBackupGameState,4,object,extern u8 *gBackupGameState;,include/ram.h,,backup main-state region at selected base plus 0xB00
 02000710,gGameState,4,object,extern struct GameState *gGameState;,include/game_state.h,low,
-02000714,gUnk_02000714,10,object,,,,
+02000714,gHeapHead,10,object,extern struct HeapBlock gHeapHead;,include/heap.h,low,"general heap first block; prev/next, size/free flags and cleared trailing word"
 0201F400,gUnk_0201F400,4,object,,,,
 02037000,gUnk_02037000,,object,,,,
 02039000,gUnk_02039000,8,object,,,,

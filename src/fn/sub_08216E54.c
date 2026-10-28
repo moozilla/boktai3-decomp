@@ -1,10 +1,10 @@
 #include "global.h"
 #include "render.h"
+#include "heap.h"
 
 // MATCHING_CONCESSION: register-pinning
 void *ScriptProc_Start(u16 key, u16 context);
 void LZ77UnCompWram(const void *src, void *dest);
-extern u8 gUnk_02000714[];
 
 void *sub_08216E54(u16 id)
 {
@@ -19,8 +19,8 @@ void *sub_08216E54(u16 id)
         u8 *anchor, *heapBase;
         gBgMapCacheKey = key;
         /* The cache payload follows its four-byte header in the heap-relative buffer. */
-        anchor = gUnk_02000714 + 0x0201F400;
-        heapBase = gUnk_02000714;
+        anchor = ((u8 *)&gHeapHead) + 0x0201F400;
+        heapBase = ((u8 *)&gHeapHead);
         LZ77UnCompWram(res, (void *)0x02020400);
         anchor -= (u32)heapBase;
         anchor += 0x1004;
