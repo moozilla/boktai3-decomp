@@ -32,6 +32,7 @@ void Memory_Clear(void *, int);
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
+#include "rfu_manager.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -39,11 +40,6 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-struct Event {
-    u8 pad[0x14];
-    u16 code, value;
-};
-extern struct Event gUnk_03005390;
 void Wireless_UpdateUniAcknowledgedSlots(struct Engine *);
 void Wireless_ReceiveParentUniPackets(struct Engine *);
 void Wireless_ProcessChildUniExchange(struct Engine *);
@@ -126,20 +122,20 @@ receive:
     goto done;
 added: {
     u8 *slots = &p->selected;
-    int incoming = (u8)gUnk_03005390.code;
-    *slots |= (u8)gUnk_03005390.code;
+    int incoming = (u8)gRfuLinkManager.event.words.code;
+    *slots |= (u8)gRfuLinkManager.event.words.code;
 }
     goto done;
 removed: {
     u8 *slots = &p->selected;
-    int incoming = (u8)gUnk_03005390.code;
+    int incoming = (u8)gRfuLinkManager.event.words.code;
     *slots &= ~incoming;
 }
     goto done;
 disconnected: {
     u8 *slots = &p->selected;
     int zero;
-    int incoming = (u8)gUnk_03005390.code;
+    int incoming = (u8)gRfuLinkManager.event.words.code;
     int selected = *slots & ~incoming;
     zero = 0;
     *slots = selected;
@@ -151,23 +147,23 @@ reset:
     WirelessController_ResetSession(p);
     goto done;
 checkError: {
-    struct Event *event;
-    struct Event *initial = &gUnk_03005390;
-    int code = initial->code;
+    struct RfuLinkManager *event;
+    struct RfuLinkManager *initial = &gRfuLinkManager;
+    int code = initial->event.words.code;
     event = initial;
     if (code != 0x30) {
         goto valueCheck;
     }
-    if (event->value != 3) {
+    if (event->event.words.value != 3) {
         goto valueCheck;
     }
-    event->value = 0;
+    event->event.words.value = 0;
 valueCheck:;
 
     ;
     ;
     ;
-    if (!event->value) {
+    if (!event->event.words.value) {
         goto done;
     }
 }

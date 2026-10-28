@@ -160,3 +160,5 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03005330 `gSerialQueuedPacketCount` (unified):** Number of queued four-halfword multiplayer packets; ramlayout before/after checks passed.
 - **03005350 `gSerialPacketQueue` (unified):** Four queued packets of four halfwords, with ring indices masked by 3; ramlayout before/after checks passed.
 - **03005380 `gSerialPacketReadIndex` (unified):** Current read index in the four-entry multiplayer packet ring; ramlayout before/after checks passed.
+
+- **03005390 `gRfuLinkManager` (struct):** All 32 consumers share the SDK-named manager prefix, byte/halfword event union at +14, VBlank timers and configuration/callback tail through +44. Every unit matches; both compiler modes preserve instructions. One raw byte-array read required the named parentAck_flag member to retain a base-plus-3 load rather than an interior literal.

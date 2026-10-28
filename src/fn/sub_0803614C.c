@@ -32,6 +32,7 @@ void Memory_Clear(void *, int);
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
+#include "rfu_manager.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -42,11 +43,6 @@ static inline void setOperation(struct Engine *p, int op, int zero)
         *pending = 1;
     }
 }
-struct Event {
-    u8 pad[0x14];
-    u16 code, value;
-};
-extern struct Event gUnk_03005390;
 void Wireless_UpdateUniAcknowledgedSlots(struct Engine *);
 void Wireless_ReceiveParentUniPackets(struct Engine *);
 void Wireless_ProcessChildUniExchange(struct Engine *);
@@ -112,19 +108,19 @@ receive:
     goto done;
 added: {
     u8 *slots = &p->selected;
-    *slots |= (u8)gUnk_03005390.code;
+    *slots |= (u8)gRfuLinkManager.event.words.code;
 }
     goto done;
 removed: {
     u8 *slots = &p->selected;
-    int incoming = (u8)gUnk_03005390.code;
+    int incoming = (u8)gRfuLinkManager.event.words.code;
     *slots &= ~incoming;
 }
     goto done;
 disconnected: {
     u8 *slots = &p->selected;
     int zero;
-    int incoming = (u8)gUnk_03005390.code;
+    int incoming = (u8)gRfuLinkManager.event.words.code;
     int selected = *slots & ~incoming;
     zero = 0;
     *slots = selected;

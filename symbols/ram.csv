@@ -434,7 +434,7 @@ addr,name,size,kind,decl,header,confidence,notes
 03005350,gSerialPacketQueue,2,object,extern u16 gSerialPacketQueue[4][4];,include/serial.h,,"Four queued packets of four halfwords, with ring indices masked by 3"
 03005370,gSerialReceivePackets,10,object,extern s16 gSerialReceivePackets[];,include/ram.h,low,
 03005380,gSerialPacketReadIndex,2,object,extern u16 gSerialPacketReadIndex;,include/serial.h,,Current read index in the four-entry multiplayer packet ring
-03005390,gUnk_03005390,48,object,,,,
+03005390,gRfuLinkManager,48,object,extern struct RfuLinkManager gRfuLinkManager;,include/rfu_manager.h,high merged layout and SDK correspondence,"RFU link manager: named SDK prefix, byte/halfword event parameter union at +14, two VBlank timers, configuration/callback tail through +44"
 030053D8,gUnk_030053D8,4,object,,,,
 030053DC,gUnk_030053DC,4,object,,,,
 030053E0,gUnk_030053E0,4,object,,,,

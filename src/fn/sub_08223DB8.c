@@ -1,45 +1,35 @@
 #include "global.h"
+#include "rfu_manager.h"
 
-struct RfuMgr {
-    u8 pad0[4];
-    u8 f4;
-    u8 pad5;
-    u8 f6;
-    u8 f7;
-    u8 pad8[0x12];
-    u16 f1A;
-    u16 f1C;
-};
-extern struct RfuMgr gUnk_03005390;
 u32 sub_08249498(u32, u32);
 
 void RfuManager_StepSlotTimer(u32 a)
 {
-    if (gUnk_03005390.f7 == 5) {
-        gUnk_03005390.f6 = 1;
-        gUnk_03005390.f4 = 5;
-        gUnk_03005390.f1A = gUnk_03005390.f1C;
-        if (gUnk_03005390.f1A != 0) {
-            gUnk_03005390.f7 = 6;
+    if (gRfuLinkManager.pcswitch_flag == 5) {
+        gRfuLinkManager.parent_child = 1;
+        gRfuLinkManager.state = 5;
+        gRfuLinkManager.connect_period = gRfuLinkManager.pcswitch_period_bak;
+        if (gRfuLinkManager.connect_period != 0) {
+            gRfuLinkManager.pcswitch_flag = 6;
         } else {
-            gUnk_03005390.f7 = 1;
+            gRfuLinkManager.pcswitch_flag = 1;
         }
     }
-    if (gUnk_03005390.f7 == 1) {
-        gUnk_03005390.f6 = 1;
-        gUnk_03005390.f4 = 5;
-        gUnk_03005390.f1A = sub_08249498(a, 0x8c);
-        gUnk_03005390.f1C = 0x8c - gUnk_03005390.f1A;
-        if (gUnk_03005390.f1A != 0) {
-            gUnk_03005390.f7 = 2;
+    if (gRfuLinkManager.pcswitch_flag == 1) {
+        gRfuLinkManager.parent_child = 1;
+        gRfuLinkManager.state = 5;
+        gRfuLinkManager.connect_period = sub_08249498(a, 0x8c);
+        gRfuLinkManager.pcswitch_period_bak = 0x8c - gRfuLinkManager.connect_period;
+        if (gRfuLinkManager.connect_period != 0) {
+            gRfuLinkManager.pcswitch_flag = 2;
         } else {
-            gUnk_03005390.f7 = 3;
+            gRfuLinkManager.pcswitch_flag = 3;
         }
     }
-    if (gUnk_03005390.f7 == 3) {
-        gUnk_03005390.f6 = 0;
-        gUnk_03005390.f1A = 0x28;
-        gUnk_03005390.f7 = 4;
-        gUnk_03005390.f4 = 9;
+    if (gRfuLinkManager.pcswitch_flag == 3) {
+        gRfuLinkManager.parent_child = 0;
+        gRfuLinkManager.connect_period = 0x28;
+        gRfuLinkManager.pcswitch_flag = 4;
+        gRfuLinkManager.state = 9;
     }
 }
