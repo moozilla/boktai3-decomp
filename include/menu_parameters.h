@@ -33,4 +33,10 @@ struct RegionMenuParameters {
 };
 extern struct RegionMenuParameters gRegionMenuParameters;
 
+struct DateMenuParameters {
+    u8 unk0[8];
+    u32 confirmProc, cancelProc, flag;
+};
+extern struct DateMenuParameters gDateMenuParameters;
+
 #endif

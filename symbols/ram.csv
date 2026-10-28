@@ -144,7 +144,7 @@ addr,name,size,kind,decl,header,confidence,notes
 020002F8,gScreenParams,18,object,extern struct ScreenParams gScreenParams;,include/ram.h,low,
 02000310,gRegionMenuParameters,14,object,extern struct RegionMenuParameters gRegionMenuParameters;,include/menu_parameters.h,low,"region-menu script block, table and callbacks; merges keyword and consumer names"
 02000328,gNamePlaceholderScript,18,object,extern u32 gNamePlaceholderScript[];,include/ram.h,low,
-02000340,gUnk_02000340,14,object,,,,
+02000340,gDateMenuParameters,14,object,extern struct DateMenuParameters gDateMenuParameters;,include/menu_parameters.h,low,date-menu callbacks and flag; first eight bytes have no typed access in current evidence
 02000358,gUnk_02000358,1C,object,,,,
 02000378,gUnk_02000378,C,object,,,,
 02000388,gScriptPromptSettings,14,object,extern struct ScriptPromptSettings gScriptPromptSettings;,include/ram.h,low,
