@@ -257,19 +257,5 @@ extern u32
 /* 0x0300546C */
 extern u32
     gClockSynced; /* nonzero once the clock has been synced from the RTC; SunClock_Refresh syncs while it is zero */
-/* 0x03005240 */
-extern u16 gNextTaskId; /* next Task id (unique, never 0) */
-/* 0x030052F4 */
-extern struct EngineMap *gTerrainMap; /* current terrain map */
-/* 0x030052F8 */
-extern u32 gTerrainWidth; /* terrain map width (cells) */
-/* 0x030052FC */
-extern u32 gTerrainHeight; /* terrain map height (cells) */
-/* 0x03005308 */
-extern u32 gRandomIndex; /* index (0..1023) into the random table */
-/* 0x030053F4 */
-extern u32 gEngineFlags; /* more engine flags (bit 10 mutes Sound_PlaySongChecked; guess) */
-/* 0x030039F0 */
-extern u16 gScriptEntryProcedure; /* Script entry procedure selected by Script_SetEntry */
 
 #endif

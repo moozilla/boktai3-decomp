@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "ram.h"
 typedef struct ActorAnimation {
     u8 pad0[0x51];
     u8 angle;
@@ -58,6 +57,7 @@ static inline int trunc12(int x)
 {
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void ContactSwarm_SpawnCharge(void *, void *, int, int, int, int, int);
 static inline void vector(s16 *dst, int direction, int length)

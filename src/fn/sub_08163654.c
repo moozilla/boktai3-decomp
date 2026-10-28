@@ -1,6 +1,5 @@
 #include "global.h"
 #include "runtime.h"
-#include "ram.h"
 struct P {
     u8 f0[0x33C];
     u16 a;
@@ -12,6 +11,7 @@ struct P {
     u8 g[2];
     u16 d;
 };
+extern u32 gEngineFlags;
 void GameOver_UpdateLetterAnimation(struct P *);
 void SceneLifecycle_RequestRestart(s32);
 void Task_Kill(struct P *);

@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 
 /* Motion and activity fields following the drawable sprite header. */
 struct PoolParticleTail {
@@ -22,6 +21,7 @@ struct ParticlePool {
     void *resource;
     struct PoolParticle particles[16];
 };
+extern u32 gRandomIndex;
 void *AnimData_FindEntry(u32);
 void ParticleSprite_Initialize(void *, void *, u32);
 void Effect_SetOrigin(void *, s32, s32);

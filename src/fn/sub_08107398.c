@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_vec.h"
-#include "ram.h"
 
 struct TileTrigger {
     u8 unk_00[0x84];
@@ -8,6 +7,8 @@ struct TileTrigger {
     u8 unk_8C[0x2C];
     u16 sequence;
 };
+extern u32 gEngineFlags;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);

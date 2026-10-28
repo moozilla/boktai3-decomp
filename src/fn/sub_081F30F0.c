@@ -1,5 +1,5 @@
 #include "global.h"
-#include "ram.h"
+extern u32 gRandomIndex;
 extern u8 gUnk_0203B400[];
 s32 Mod(s32, s32);
 u8 *Ratatosk_GetRandomMovementPoint(u8 *p)

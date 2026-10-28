@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_vec.h"
-#include "ram.h"
 struct ScriptActorVec {
     s16 x, y, z, pad;
 };
@@ -38,6 +37,8 @@ struct ScriptActorTerrain {
     u8 pad[0x24];
     u16 rows[1];
 };
+extern struct ScriptActorTerrain *gTerrainMap;
+extern u32 gTerrainWidth, gTerrainHeight;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 void AnimData_Load(void *, u32);
@@ -57,7 +58,7 @@ static inline s32 ScriptActor_CellIndex(struct ScriptActorVec *v)
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct ScriptActorTerrain *)gTerrainMap)->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline void ScriptActor_StepAnimation(u8 *p, void *sprite, struct ScriptActorSequence *s)
 {

@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 
 struct Vec {
     s16 x, y, z, pad;
@@ -47,6 +46,7 @@ struct ChoiceTable {
 };
 extern const struct ChoiceTable gUnk_0824FDF8, gUnk_0824FE08, gUnk_0824FE18;
 extern void *const gUnk_08613F04[];
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 u8 Callback_InvokeActor(void *, void *);
 struct Vec *Player_GetEffectivePosition(s32);

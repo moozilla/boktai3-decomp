@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 struct Registry6A37 {
     u8 pad0[0x1C];
     u16 x, y;
@@ -7,6 +6,7 @@ struct Registry6A37 {
     s32 timer;
 };
 extern u16 gUnk_0203B400[];
+extern u32 gRandomIndex;
 s32 sub_08249350(s32, s32);
 void Registry6A37_UpdateBackgroundScroll(struct Registry6A37 *);
 void SceneTransition_BeginFirstScroll(struct Registry6A37 *);

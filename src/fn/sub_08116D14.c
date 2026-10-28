@@ -18,6 +18,7 @@ struct MotionActor {
     u8 unknown8F6[0x16];
     u32 script;
 };
+extern u32 gEngineFlags;
 void Hud_SetMode(s32);
 void Script_Call(u32, void *);
 static inline u32 MaskFlags(u8 *p, u32 mask)

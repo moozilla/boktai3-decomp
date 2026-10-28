@@ -77,6 +77,7 @@ void ScenePool_ClampMotionSpeeds(struct Obj *);
 void Actor_ClampMovementSpeed(struct Obj *);
 void Glove_SetAnimationKeyframes(struct Glove *, s32);
 void ActorRecoil_UpdateMotion(struct Glove *);
+extern u32 gEngineFlags;
 extern u8 *gUnk_020004B4;
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);

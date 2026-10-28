@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 #define gRandomTableIndex gRandomIndex
 #define gRandomTable      gUnk_0203B400
 
@@ -15,6 +14,7 @@ struct CombatActor {
     u8 pad34[0x136 - 0x34];
     s16 defeatEffectDisabled;
 };
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);

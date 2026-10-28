@@ -18,7 +18,7 @@ struct NidhoggrFallingEffect {
     u8 unknown180[4];
     u8 *boss;
 };
-extern u32 gUnk_02000560;
+extern u32 gEngineFlags, gUnk_02000560;
 extern const struct NidhoggrEffectPair gUnk_0824F2D4, gUnk_0824F2CC;
 extern struct NidhoggrEffectPair gUnk_0824F2DC;
 struct NidhoggrFallingEffect *SceneEffectPool_AllocateSlot(void *);

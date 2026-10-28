@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 struct Nd {
     struct Nd *next;
     u16 pad;
@@ -15,17 +14,18 @@ struct M {
     u16 c1;
     u16 c2;
 };
+extern struct M *gColliderManager;
 void Collider_Register(struct Nd *n)
 {
     struct Nd *p;
-    if (((struct M *)gColliderManager) == 0)
+    if (gColliderManager == 0)
         return;
-    p = ((struct M *)gColliderManager)->f18;
+    p = gColliderManager->f18;
     while ((p = p->next) != 0)
         if (p == n)
             return;
-    ((struct M *)gColliderManager)->f20->next = n;
+    gColliderManager->f20->next = n;
     n->next = 0;
-    ((struct M *)gColliderManager)->f20 = n;
-    ((struct M *)gColliderManager)->c0++;
+    gColliderManager->f20 = n;
+    gColliderManager->c0++;
 }

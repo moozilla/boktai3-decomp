@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 
 // MATCHING_CONCESSION: register-pinning
 #define gMotionRandomIndex gRandomIndex
@@ -24,6 +23,7 @@ typedef struct HresvelgrActor {
     u8 emitter[0x15c];
     u16 state;
 } HresvelgrActor;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void Hresvelgr_SetAnimation(HresvelgrActor *, void *, void *, u32, u32, u32);
 void *MotionEntry_CreateWithDelta(u32, MotionDelta *, u32, u32);

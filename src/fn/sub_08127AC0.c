@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "ram.h"
 struct ParticleVector {
     u16 x, y, z, unused;
 };
@@ -30,6 +29,8 @@ struct TerrainMap {
     u8 unknown8[0x1C];
     u16 rows[1];
 };
+extern struct TerrainMap *gTerrainMap;
+extern u32 gTerrainWidth, gTerrainHeight;
 void *TerrainModifiers_FindCellOverride(u32, u32);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);

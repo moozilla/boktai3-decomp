@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 
 s32 Player_SetAnimation(u8 *, s32, s32, s32);
 void Player_SetActionPhase(u8 *p, u8 v);
@@ -8,6 +7,7 @@ s32 ActorVariant_GetTableValue(u32, s32);
 u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void Sound_PlaySong(s32);
+extern u32 gEngineFlags;
 
 #define F8(o)  (*(u8 *)(p + (o)))
 #define F16(o) (*(u16 *)(p + (o)))

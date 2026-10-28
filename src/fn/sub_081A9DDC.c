@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 // confidence=low: paired commands 7 and 8 appear to prepare and alternate attacks.
 struct Vanargand {
     u8 pad0[0x9C];
@@ -26,6 +25,7 @@ u8 Callback_InvokeActor(void *, void *);
 void Vanargand_SetPairedMotionParameter(void *, u16);
 void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
 s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 static inline s32 RandomValue(void)
 {

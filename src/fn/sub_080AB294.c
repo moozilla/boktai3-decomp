@@ -1,7 +1,7 @@
 #include "global.h"
-#include "ram.h"
 // confidence=low: spawns six spark particles around the actor and plays a sound.
 extern u8 gUnk_0203B400[];
+extern s32 gRandomIndex;
 void SparkParticle_Spawn(u8 *, u32, void *, u32, u32, u32, u32, u32);
 void Sound_PlaySong(u32);
 struct VAB {

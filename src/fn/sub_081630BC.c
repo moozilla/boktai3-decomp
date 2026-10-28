@@ -1,5 +1,5 @@
 #include "global.h"
-#include "ram.h"
+extern u32 gEngineFlags;
 void Sound_StopSong(s32);
 void SceneLifecycle_RequestRestart(s32);
 static inline void andm(u32 *a, u32 m)

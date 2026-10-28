@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+extern u32 gEngineFlags;
 extern u8 *gUnk_02000580;
 extern u8 *gGameState;
 s32 Solar_GetLevelForIntensity(s32);

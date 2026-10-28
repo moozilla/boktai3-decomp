@@ -1,9 +1,9 @@
 #include "global.h"
-#include "ram.h"
 
 // confidence=low: the health burst's shake, as in HealthRestoreEffect_UpdateShake: jitters for
 // 8 frames, starts the burst at frame 30 (sound 0x285), fades the screen at frame 29 in mode 1,
 // then after frame 44 moves on to the bursts (mode 0) or sub_082356E4.
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);

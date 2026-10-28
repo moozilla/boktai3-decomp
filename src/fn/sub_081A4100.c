@@ -31,6 +31,7 @@ struct MotionCounts {
 extern const struct MotionCounts gUnk_0824F770;
 extern const u16 gUnk_08611F38[];
 #define RANDOM_TABLE_ADDR 0x0203B400
+extern u32 gRandomIndex;
 struct MotionEntry *Hresvelgr_FindInactiveEffect(void);
 void Sprite_ApplyAnimation(void *, void *);
 s32 Mod(s32, s32);

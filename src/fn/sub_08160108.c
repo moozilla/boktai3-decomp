@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 #ifdef NONMATCHING
 // fuzzy: 57.0%
 // fix.py best (sweep after the inlined-insn fix)
@@ -29,6 +28,7 @@ struct PlayerBurstTask {
     void *sheet;
     struct BurstRecord particles[16];
 };
+extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 void *AnimData_FindEntry(u32);
 void ParticleSprite_Initialize(void *, void *, s32);

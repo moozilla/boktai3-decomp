@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 struct Elem {
     u32 flags;
     u8 pad4[0x14];
@@ -10,6 +9,7 @@ struct Elem {
     void *data;
     void (*update)(struct Elem *);
 };
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void SpriteDrawable_SelectTileFrame(struct Elem *, void *, u32);
 void FlickerParticle_UpdateStationary(struct Elem *);

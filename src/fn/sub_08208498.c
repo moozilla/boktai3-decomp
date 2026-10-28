@@ -1,7 +1,6 @@
 #include "global.h"
 // MATCHING_CONCESSION: register-pinning
 #include "scene_vec.h"
-#include "ram.h"
 struct CannonTurret {
     u8 pad00[0x40];
     struct SceneVec position;
@@ -12,6 +11,7 @@ struct CannonTurret {
     u8 pad128[2];
     s16 speed;
 };
+extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 struct SceneVec *Player_GetEffectivePosition(s32);

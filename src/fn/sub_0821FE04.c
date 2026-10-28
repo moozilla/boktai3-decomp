@@ -1,18 +1,18 @@
 #include "global.h"
 #include "contact_actor.h"
-#include "ram.h"
 struct ColliderManager {
     u8 unknown0[0x1C];
     struct ContactCollider *prioritySentinel;
     u8 unknown20[0xB2];
     u16 priorityCount;
 };
+extern struct ColliderManager *gColliderManager;
 void Collider_InsertPriorityList(struct ContactCollider *node)
 {
     struct ContactCollider *entry;
-    if (!((struct ColliderManager *)gColliderManager))
+    if (!gColliderManager)
         return;
-    entry = ((struct ColliderManager *)gColliderManager)->prioritySentinel->next;
+    entry = gColliderManager->prioritySentinel->next;
     if (entry) {
         do {
             if (entry == node)
@@ -20,8 +20,8 @@ void Collider_InsertPriorityList(struct ContactCollider *node)
             entry = entry->next;
         } while (entry);
     }
-    entry = ((struct ColliderManager *)gColliderManager)->prioritySentinel;
+    entry = gColliderManager->prioritySentinel;
     node->next = entry->next;
     entry->next = node;
-    ((struct ColliderManager *)gColliderManager)->priorityCount++;
+    gColliderManager->priorityCount++;
 }

@@ -1,6 +1,5 @@
 #include "global.h"
-#include "ram.h"
-extern u32 gUnk_02000560;
+extern u32 gUnk_02000560, gEngineFlags;
 extern u8 *gGameState;
 s32 Div(s32, s32);
 void Anim_LoadKeyframe(void *, void *, u16, s32);

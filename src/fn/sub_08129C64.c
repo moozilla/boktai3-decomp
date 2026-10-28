@@ -1,6 +1,5 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "ram.h"
 
 struct Vec {
     s16 x, y, z, pad;
@@ -56,6 +55,8 @@ struct Map {
     u8 pad8[0x1c];
     u16 rows[1];
 };
+extern struct Map *gTerrainMap;
+extern u32 gTerrainWidth, gTerrainHeight;
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void Sprite_Remove(void *);
 void Sound_PlaySong(u32);
@@ -72,12 +73,12 @@ static inline u16 Height(struct Vec *position)
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         index = 0;
     else
-        index = ((struct Map *)gTerrainMap)->rows[z] + x;
+        index = gTerrainMap->rows[z] + x;
     cell = TerrainModifiers_FindCellOverride(index, 1);
     if (cell)
         cell += 4;
     else
-        cell = ((struct Map *)gTerrainMap)->cells + (index * 4 + 12);
+        cell = gTerrainMap->cells + (index * 4 + 12);
     slope = *cell >> 4;
     height = (*cell & 15) << 8;
     switch (slope) {

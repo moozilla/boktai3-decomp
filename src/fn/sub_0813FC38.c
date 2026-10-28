@@ -50,6 +50,7 @@ struct PlayerFC38 {
 };
 
 extern struct GameStateFC38 *gGameState;
+extern u32 gEngineFlags;
 extern struct InputKeysFC38 gPadState[];
 extern void *const gUnk_08610964[];
 

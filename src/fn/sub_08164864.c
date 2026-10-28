@@ -10,6 +10,7 @@ struct HudSlotSource {
 };
 extern struct HudSlotSource *gUnk_020004B4;
 extern u8 *gGameState;
+extern u32 gEngineFlags;
 u16 *Hud_GetTilemapCell(s32, u32, u32);
 void Sound_PlaySong(u32);
 

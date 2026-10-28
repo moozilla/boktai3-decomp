@@ -1,10 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
-#include "ram.h"
 // confidence=low: phases coordinate attachment creation, facing and a fading control cue.
 extern u8 *gUnk_02000488;
 extern u8 *gGameState;
+extern u32 gEngineFlags;
 void Sound_PlaySong(u32);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, int, int, int, int);
 s32 Math_Atan2(s32, s32);

@@ -1,7 +1,6 @@
 #define gCrateRandomValues gUnk_0203B400
 #define gCrateRandomIndex  gRandomIndex
 #include "global.h"
-#include "ram.h"
 struct CratePosition {
     u16 x, xHigh, y, yHigh;
 };
@@ -14,6 +13,7 @@ struct WoodenCrate {
     u8 shakeTimer;
 };
 extern u16 gUnk_0203B400[];
+extern u32 gRandomIndex;
 s32 Mod(s32, s32);
 void WoodenCrate_UpdateShake(struct WoodenCrate *p)
 {

@@ -163,7 +163,8 @@ static inline u32 Step(struct Projectile *owner, struct ParticleSequence *state,
 
 void *SpriteProjectile_EnsurePool(void);
 struct Projectile *SpritePool10_AllocateSlot(void *);
-extern u32 gUnk_02000560;
+extern u32 gEngineFlags, gUnk_02000560;
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 void AnimData_Load(void *, u32);
 void *ScriptProc_Start(u32, u16);

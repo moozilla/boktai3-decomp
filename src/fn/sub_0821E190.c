@@ -13,34 +13,34 @@ struct Context {
     struct Trap traps[64];
     u8 *tops[64];
 };
+extern struct Context *gTerrainMap;
 void Trap_Register(struct Trap *trap, u8 *top)
 {
     s32 i, found, j;
-    if (((struct Context *)gTerrainMap)->count > 63)
+    if (gTerrainMap->count > 63)
         return;
     if (!gTerrainTrapSerial)
         gTerrainTrapSerial = 1;
     trap->serial = gTerrainTrapSerial++;
     found = 0;
-    i = ((struct Context *)gTerrainMap)->count;
+    i = gTerrainMap->count;
     while (i > 0) {
-        if (trap->id == ((struct Context *)gTerrainMap)->traps[i - 1].id) {
+        if (trap->id == gTerrainMap->traps[i - 1].id) {
             found = 1;
             break;
         }
         i--;
     }
     if (!found) {
-        ((struct Context *)gTerrainMap)->traps[((struct Context *)gTerrainMap)->count] = *trap;
-        ((struct Context *)gTerrainMap)->tops[((struct Context *)gTerrainMap)->count] = top;
+        gTerrainMap->traps[gTerrainMap->count] = *trap;
+        gTerrainMap->tops[gTerrainMap->count] = top;
     } else {
-        for (j = ((struct Context *)gTerrainMap)->count; j > i; j--) {
-            ((struct Context *)gTerrainMap)->traps[j] =
-                ((struct Context *)gTerrainMap)->traps[j - 1];
-            ((struct Context *)gTerrainMap)->tops[j] = ((struct Context *)gTerrainMap)->tops[j - 1];
+        for (j = gTerrainMap->count; j > i; j--) {
+            gTerrainMap->traps[j] = gTerrainMap->traps[j - 1];
+            gTerrainMap->tops[j] = gTerrainMap->tops[j - 1];
         }
-        ((struct Context *)gTerrainMap)->traps[i] = *trap;
-        ((struct Context *)gTerrainMap)->tops[i] = top;
+        gTerrainMap->traps[i] = *trap;
+        gTerrainMap->tops[i] = top;
     }
-    ((struct Context *)gTerrainMap)->count++;
+    gTerrainMap->count++;
 }

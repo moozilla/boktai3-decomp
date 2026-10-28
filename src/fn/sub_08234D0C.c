@@ -1,5 +1,5 @@
 #include "global.h"
-#include "ram.h"
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);

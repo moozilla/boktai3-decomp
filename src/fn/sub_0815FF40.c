@@ -1,6 +1,5 @@
 #include "global.h"
 #include "render.h"
-#include "ram.h"
 
 static inline void andm(u32 *a, u32 m)
 {
@@ -13,6 +12,7 @@ struct P {
     u8 s9c[0x56];
     u16 hf2;
 };
+extern u32 gEngineFlags;
 
 s32 Collider_Refresh(void *);
 void Task_Kill(void *);

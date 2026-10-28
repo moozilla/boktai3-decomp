@@ -1,7 +1,7 @@
 #include "motion_0818.h"
 #include "game_state.h"
-#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 u32 Math_Atan2(s32, s32);

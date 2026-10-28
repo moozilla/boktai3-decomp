@@ -17,6 +17,7 @@ struct Save {
     s16 rightRows[16];
 };
 extern struct Save *gGameState;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void GameState_AddEquipment(int);
 int Mod(int, int);

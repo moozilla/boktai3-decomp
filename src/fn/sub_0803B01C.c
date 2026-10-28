@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "runtime.h"
-#include "ram.h"
 
 // Tentative result panel and drawable offsets.
 struct Drawing {
@@ -20,6 +19,7 @@ struct P {
     struct Drawing drawing;
 };
 extern u16 gUnk_0203B400[];
+extern u32 gRandomIndex;
 void Sound_PlayTrackedSong(int);
 void Anim_LoadKeyframe(void *, void *, int, int);
 

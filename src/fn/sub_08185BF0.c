@@ -18,7 +18,7 @@ struct ArmorScriptArgs {
     u32 count : 16, unused : 16;
     s32 *values;
 };
-extern u32 gUnk_02000560;
+extern u32 gEngineFlags, gUnk_02000560;
 extern u8 *gGameState;
 extern const u8 gUnk_0824F004[];
 void sub_08159164(s32);

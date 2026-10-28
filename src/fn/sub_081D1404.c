@@ -1,11 +1,11 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#include "ram.h"
 
 struct Pair {
     u32 a, b;
 };
 extern const u16 gUnk_0203B400[];
+extern u32 gRandomIndex;
 s32 Mod(s32, s32);
 void Task_Kill(void *);
 void SceneNpc_SpawnTransitionParticle(void *, s32);

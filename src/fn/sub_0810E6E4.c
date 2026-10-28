@@ -29,6 +29,7 @@ struct ConfirmPanel {
     u32 fD30;
     u32 fD34;
 };
+extern u32 gEngineFlags;
 s32 Script_SeekToKeyword(s32);
 void *Script_GetTextSourcePc(void);
 void *Script_GetPc(void);

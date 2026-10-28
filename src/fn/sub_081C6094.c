@@ -1,7 +1,7 @@
 #include "global.h"
 #include "input.h"
-#include "ram.h"
 extern u16 gUnk_0203B400[];
+extern u32 gRandomIndex;
 void Sound_PlaySong(u32);
 void sub_081C62B4(u8 *);
 void ChallengeResult_SetState(void *, void (*)(void *));

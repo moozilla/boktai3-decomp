@@ -6,7 +6,6 @@
 // Register choice for the z pointer (r7 in the ROM), the facing-index pointer
 // reloads and the Anim_SetSequence argument setup still differ.
 #include "scene_vec.h"
-#include "ram.h"
 struct PHVec {
     s16 x, y, z, pad;
 };
@@ -26,6 +25,8 @@ struct SpawnOffsets {
     struct SpawnOffset e[4];
 };
 extern const struct SpawnOffsets gUnk_0824FE5C;
+extern struct PHTerrain *gTerrainMap;
+extern u32 gTerrainWidth, gTerrainHeight;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 s32 Script_GetValueSafe(void);
@@ -51,7 +52,7 @@ static inline s32 EnemyD459_CellIndex(struct PHVec *v)
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct PHTerrain *)gTerrainMap)->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
 static inline void EnemyD459_StepAnimation(u8 *p, void *sprite, struct FanSeq *s)
 {

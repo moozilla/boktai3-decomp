@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 
 struct P0813B570 {
     u8 f0[0x332];
@@ -11,6 +10,7 @@ struct G0813B570 {
     u8 f0[0x2a];
     s16 v;
 };
+extern u32 gEngineFlags;
 extern struct G0813B570 *gGameState;
 
 s32 Player_GetMaxLife(struct P0813B570 *p)

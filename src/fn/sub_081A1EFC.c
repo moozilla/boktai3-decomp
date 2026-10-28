@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 
 struct PackedVector {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -65,6 +64,7 @@ struct EnvironmentState {
 };
 extern struct EnvironmentState *gGameState;
 extern u16 gUnk_0203B400[];
+extern u32 gRandomIndex;
 s32 Hresvelgr_GetEnvironmentalLevel(void *);
 void Hresvelgr_EmitRandomMotionBurst(void *);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);

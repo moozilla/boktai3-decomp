@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 int Script_SeekToKeyword(int);
 int Script_GetValue(void);

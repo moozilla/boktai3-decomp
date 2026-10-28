@@ -1,6 +1,6 @@
 #include "global.h"
-#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);

@@ -6,6 +6,7 @@ struct HudElement { /* 0x60 bytes */
     u8 padC[0x54];
 };
 extern u8 *gGameState;
+extern u32 gEngineFlags;
 void Hud_SetElementGroupFlags(u8 *);
 void Hud_HideAuxiliaryElements(u8 *);
 void Bg_ClearTilemap(s32);

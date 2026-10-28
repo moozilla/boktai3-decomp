@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
-#include "ram.h"
 // confidence=low: varying height offset suggests hovering during interaction.
 void Player_ClampInteractionVelocity(struct Player *);
 void Obj_StepPosition(void *);
@@ -11,6 +10,7 @@ void Collider_SetPosition(void *, void *, u32);
 void ActorShadow_Disable(void *);
 void ActorShadow_Enable(void *);
 s32 Mod(s32, s32);
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 static inline s32 randomValue(void)
 {

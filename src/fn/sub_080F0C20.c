@@ -1,6 +1,5 @@
 #include "global.h"
 #include "render.h"
-#include "ram.h"
 
 void sub_08081290(void);
 void sub_08080868(void);
@@ -111,6 +110,9 @@ void SceneActorTerrain_ReadScriptParameters(void *);
 s32 SceneActorRegistry_LinkActor(void *);
 void *Region_FindContaining(void *);
 
+extern u32 *gTerrainMap;
+extern u32 gTerrainWidth;
+extern u32 gTerrainHeight;
 extern u8 *gGameState;
 
 /* terrain height probe: (x, y) world pos -> cell id -> height offset */
@@ -125,14 +127,14 @@ static inline s32 Ivy_CellHeight(u16 *pos, u16 *cellOut)
     if (x < 0 || y < 0 || (u32)x >= gTerrainWidth || (u32)y >= gTerrainHeight)
         cell = 0;
     else
-        cell = *(u16 *)((u8 *)((u32 *)gTerrainMap) + 0x24 + y * 2) + x;
+        cell = *(u16 *)((u8 *)gTerrainMap + 0x24 + y * 2) + x;
     if (cellOut)
         *cellOut = cell;
     p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         p += 4;
     else
-        p = (u8 *)((u32 *)gTerrainMap)[1] + cell * 4 + 0xC;
+        p = (u8 *)gTerrainMap[1] + cell * 4 + 0xC;
     b = *p;
     h = (b & 0xF) << 8;
     if ((b >> 4) == 1)

@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
@@ -156,6 +155,7 @@ struct Pool {
     void *resource;
     u32 allocated;
 };
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Anim_SetSequence(struct Anim *, void *, u32, u32, u32);

@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 
 struct VolumeActor {
     u8 pad0[0x51];
@@ -84,6 +83,7 @@ static inline s32 Scale(int x)
 }
 
 extern u16 gUnk_0203B400[];
+extern u32 gRandomIndex;
 s32 Mod(s32, s32);
 void Path_GetPointPositionById(void *, int, int);
 s32 SceneVolume_GetActivityState(void *);

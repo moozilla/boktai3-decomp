@@ -52,6 +52,7 @@ int SunClock_GetBaseHour(void);
 void WirelessText_EncodeString(const void *, void *, int);
 void Wireless_InitSessionConfig(void *, int, int, int, int, const void *, const void *);
 extern u16 gUnk_0203B400[];
+extern u32 gRandomIndex;
 struct Game {
     u8 pad[0x780];
     u8 playerName[8];

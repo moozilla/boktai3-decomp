@@ -1,6 +1,5 @@
 #include "global.h"
 #include "render.h"
-#include "ram.h"
 struct Entry {
     u8 bytes[4], a, b, flag, kind;
     u32 timer;
@@ -27,6 +26,7 @@ struct Target {
     s16 current, maximum;
 };
 extern struct Actor *gUnk_02000580;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void Hud_RegisterTimer(u16 *);
 void WirelessGameMenu_SetStatusPanelState(struct P *, int);

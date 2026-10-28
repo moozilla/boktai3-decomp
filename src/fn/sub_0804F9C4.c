@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "repeated_effect.h"
-#include "ram.h"
+extern u32 gRandomIndex;
 void Sound_PlaySong(s32);
 void AnimatedParticles_EmitChargeSparkle(u32, u32, u32, u32, struct RepeatedEffectPosition *);
 void RepeatedEffect_TickUpperTransition(struct RepeatedEffect *effect)

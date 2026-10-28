@@ -6,6 +6,7 @@ struct Task {
     u8 pad[24];
     s32 state, counter;
 };
+extern u32 gEngineFlags;
 extern u16 gPadState;
 extern u8 *gGameState;
 void System_ShutdownAndSoftReset(void);

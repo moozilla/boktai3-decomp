@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 
 // MATCHING_CONCESSION: register-pinning
 
@@ -19,6 +18,7 @@ void ActorShadow_Enable(void *);
 void ActorDebris_Show(void *);
 void ActorDebris_Hide(void *);
 void PlayerEffect_SetPaletteSource(void *, u32, u32);
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 
 static inline u8 *offsetR1(u8 *p, u32 off)

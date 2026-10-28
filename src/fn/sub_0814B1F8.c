@@ -1,9 +1,10 @@
 #include "global.h"
-#include "ram.h"
 
 extern u8 *gUnk_02000538;
 extern u32 gUnk_0200051C;
 extern u32 gUnk_02000524;
+extern u32 gEngineFlags;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 

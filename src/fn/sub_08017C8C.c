@@ -14,8 +14,10 @@ struct Weather {
     int bank;
 };
 extern u8 *gGameState;
+extern u32 gEngineFlags;
 extern u8 gSunClock[];
 extern u16 gUnk_0203B400[];
+extern u32 gRandomIndex;
 void Palette_SetBrightnessMode(int);
 int Weather_TestFlags(int, int);
 void Weather_SetRandomDuration(void *);

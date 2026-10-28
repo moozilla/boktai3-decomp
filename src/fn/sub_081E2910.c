@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 // Provisional name: Presentation_UpdateDropShakeBlink
 // MATCHING_CONCESSION: register-pinning
 struct Sequence {
@@ -35,6 +34,7 @@ void Anim_SetKeyframes(void *, void *, s32, s32, s32);
 void Presentation_UpdateLayerAnimations(void *);
 void Presentation_ClearTilemap(void);
 extern u16 gUnk_0203B400[];
+extern u32 gRandomIndex;
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 static inline s32 random(u16 *input)

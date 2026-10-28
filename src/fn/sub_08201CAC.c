@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 struct V {
     u16 a;
     u16 b;
@@ -13,6 +12,7 @@ struct S {
     u8 p2[0x1a8 - 0x48];
     s16 h1a8;
 };
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
                                              u32, u32);

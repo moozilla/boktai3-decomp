@@ -17,6 +17,7 @@ struct ItemInfo {
     u8 pad[31];
 };
 extern struct Save *gGameState;
+extern u32 gRandomIndex;
 extern u16 gUnk_0203B400[];
 int Mod(int, int);
 void Inventory_GetEquippedDescriptor(int, struct ItemInfo *);

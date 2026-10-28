@@ -1,5 +1,4 @@
 #include "global.h"
-#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 #ifdef NONMATCHING
 // fuzzy: 86.4%
@@ -19,6 +18,7 @@ struct S {
 void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
 s32 DisplayAnimation_TestFinished(void *);
 
+extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 extern void *gUnk_02000580[];
 void Sound_PlaySong(u32);
