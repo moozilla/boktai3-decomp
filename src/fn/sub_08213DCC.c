@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "runtime.h"
 struct Dma {
     vu32 src, dest, control;
 };
@@ -10,7 +11,7 @@ struct Task {
     u8 p12[2];
     u8 b14, b15, b16;
 };
-extern u32 gUnk_0300426C, gUnk_03001110, gUnk_03003A08, gUnk_03004264;
+extern u32 gUnk_0300426C, gUnk_03003A08, gUnk_03004264;
 extern u16 gUnk_0300427C;
 extern struct Task gUnk_03001118, gUnk_03001130;
 void Mosaic_Initialize(void);
@@ -58,7 +59,7 @@ void InterruptsAndVideo_InitRuntime(void)
     (void)*(vu16 *)0x04000200;
     *(vu16 *)0x04000200 = zero;
     gUnk_0300426C = 1;
-    gUnk_03001110 = zero;
+    gVideoIrqPhase = zero;
     byteOne = 1;
     gUnk_0300427C = 1;
     mask = 0x2000;
