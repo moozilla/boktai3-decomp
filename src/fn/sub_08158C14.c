@@ -3,8 +3,8 @@ extern u16 gPlayerCount;
 extern u16 gPlayerInteractionMode;
 extern u16 gPlayerScriptState;
 extern u16 gPlayerPassageState;
-extern u16 gUnk_02000590;
-extern u16 gUnk_02000570;
+extern u16 gPlayerEffectPendingCount;
+extern u16 gPlayerSolarActionPending;
 extern u16 gPlayerActionPending;
 extern u16 gPlayerCueTimer;
 extern u32 gUnk_02000560[4];
@@ -33,8 +33,8 @@ void Player_ResetLinkState(void)
     gPlayerInteractionMode = 0;
     gPlayerScriptState = 0;
     gPlayerPassageState = 0;
-    firstCounter = &gUnk_02000590;
-    secondCounter = &gUnk_02000570;
+    firstCounter = &gPlayerEffectPendingCount;
+    secondCounter = &gPlayerSolarActionPending;
     thirdCounter = &gPlayerActionPending;
     fourthCounter = &gPlayerCueTimer;
     // Keep these addresses live together until the counter resets.

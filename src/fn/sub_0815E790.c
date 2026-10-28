@@ -1,7 +1,6 @@
 #include "global.h"
 #include "player.h"
 #include "ram.h"
-extern u16 gUnk_02000570;
 void Player_EmitQueuedEffects(struct Player *);
 void Player_StopActionSounds(struct Player *);
 void Player_RestoreCameraFollow(struct Player *);
@@ -26,7 +25,7 @@ void Player_EnterKindFour(struct Player *p)
     p->tetherFrame = 0;
     p->positionResetValue = 0;
     p->actionSelectionStamp = 0;
-    gUnk_02000570 = 0;
+    gPlayerSolarActionPending = 0;
     gPlayerActionPending = 0;
     gPlayerCueTimer = 0;
     Player_EmitQueuedEffects(p);

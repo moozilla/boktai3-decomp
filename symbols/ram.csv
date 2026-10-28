@@ -204,20 +204,20 @@ addr,name,size,kind,decl,header,confidence,notes
 02000550,gPlayerBackgroundState,2,object,extern u16 gPlayerBackgroundState;,include/ram.h,,provisional: shared background/player state halfword
 02000554,gPlayerAbilityLatched,2,object,extern u16 gPlayerAbilityLatched;,include/ram.h,,provisional: ability request latch; ROM reader loads an unsigned halfword
 02000558,gForceDirectionMode,2,object,extern u16 gForceDirectionMode;,include/ram.h,low,
-02000560,gUnk_02000560,14,object,,,,
-02000570,gUnk_02000570,,interior,,,,gUnk_02000560 +0x10
-02000580,gUnk_02000580,14,object,,,,
-02000590,gUnk_02000590,,interior,,,,gUnk_02000580 +0x10
+02000560,gUnk_02000560,10,object,,,,
+02000570,gPlayerSolarActionPending,2,object,extern u16 gPlayerSolarActionPending;,include/ram.h,,provisional: solar action pending flag; separate from four slot words
+02000580,gUnk_02000580,10,object,,,,
+02000590,gPlayerEffectPendingCount,2,object,extern u16 gPlayerEffectPendingCount;,include/ram.h,,provisional: pending player effect count; separate from actor pointers
 02000594,gPlayerNotificationPending,2,object,extern u16 gPlayerNotificationPending;,include/ram.h,low,
 02000598,gSceneLinkList,4,object,extern struct MotionTargets *gSceneLinkList;,include/ram.h,low,
-0200059C,gUnk_0200059C,4,object,,,,
+0200059C,gPlayerAttackEffect,4,object,extern u8 *gPlayerAttackEffect;,include/ram.h,,player attack effect singleton
 020005A0,gInventoryUseFlags,2,object,extern u16 gInventoryUseFlags;,include/ram.h,low,inventory use-permission flags
 020005A4,gSceneHudMode,2,object,extern u16 gSceneHudMode;,include/ram.h,low,
-020005A8,gUnk_020005A8,2,object,,,,
+020005A8,gHudResetFlag,2,object,extern u16 gHudResetFlag;,include/ram.h,,provisional: HUD flag initialized to one by Hud_ResetGlobals
 020005AC,gHresvelgr,4,object,extern void *gHresvelgr;,include/ram.h,low,Hresvelgr boss task (Hresvelgr_Create/Destroy)
-020005B4,gUnk_020005B4,2,object,,,,
+020005B4,gNameEntrySavedState,4,object,extern u8 gNameEntrySavedState[4];,include/ram.h,,"cursor position, selection and per-slot name-entry state"
 020005C0,gAnimPanelSavedSelections,1A,object,extern u8 gAnimPanelSavedSelections[];,include/ram.h,low,
-020005DC,gUnk_020005DC,4,object,,,,
+020005DC,gScreenTextSavedValue,4,object,extern s32 gScreenTextSavedValue;,include/ram.h,,provisional: value retained between screen-text menu instances
 020005E0,gParticlePool,4,object,extern struct ParticlePool *gParticlePool;,include/ram.h,low,
 020005E4,gRatatoskParticlePool,4,object,extern u32 gRatatoskParticlePool;,include/ram.h,low,Ratatosk animated particle pool
 020005E8,gSceneProjectilePool,4,object,extern u32 gSceneProjectilePool;,include/ram.h,low,scene projectile pool (SceneProjectile_*)
@@ -229,7 +229,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000600,gFanCannonManager,4,object,extern struct Slot600Manager *gFanCannonManager;,include/ram.h,low,
 02000604,gEnemyParticlePool,4,object,extern u32 gEnemyParticlePool;,include/ram.h,low,enemy particle pool (EnemyParticle_*)
 02000608,gForgingBook,4,object,extern u32 gForgingBook;,include/ram.h,low,forging book task (ForgingBook_*)
-0200060C,gUnk_0200060C,4,object,,,,
+0200060C,gSaveStateSignature,4,object,extern u32 gSaveStateSignature;,include/ram.h,,main-state save signature checked when reading and written before saving
 02000610,gUnk_02000610,70,object,,,,
 02000700,gUnk_02000700,4,object,,,,
 02000704,gUnk_02000704,4,object,,,,

@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 /* Tentative ParticleEffect/ParticleBurst family names (low confidence). */
-#define gParticleEffectPendingCount gUnk_02000590
 struct ParticleEffect {
     u8 pad0[0x19];
     u8 pending;
@@ -18,7 +18,6 @@ struct ParticleEffectOwner {
     u8 pad[0x1C];
     u32 state;
 };
-extern u16 gUnk_02000590;
 void PaletteTransition_UpdateOwnerFade(struct ParticleEffect *);
 void PlayerEffect_UpdatePhaseCallback(struct ParticleEffect *);
 void CallbackGroup_UpdateActive(struct ParticleEffect *);
@@ -30,7 +29,7 @@ u32 ParticleEffect_Update(struct ParticleEffect *p)
         return 0;
     }
     if (p->pending) {
-        gUnk_02000590--;
+        gPlayerEffectPendingCount--;
         p->pending = 0;
     }
     PaletteTransition_UpdateOwnerFade(p);

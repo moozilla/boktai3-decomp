@@ -51,7 +51,7 @@ struct Obj53F8 {
     s32 x10;
 };
 extern struct ScreenParams3F8Params gScreenTextParameters;
-extern s32 gUnk_020005DC;
+extern s32 gScreenTextSavedValue;
 extern struct Obj53F8 *gUnk_030053F8;
 s32 ScreenParams3F8_SelectValidDataBank(struct SpDisplay *);
 void Bg_ClearTilemap(s32);
@@ -82,7 +82,7 @@ s32 sub_081EBD0C(struct SpDisplay *p)
     void *gfx;
 
     if (gScreenTextParameters.B == 1)
-        p->x1C = gUnk_020005DC;
+        p->x1C = gScreenTextSavedValue;
     if (gScreenTextParameters.M != 0) {
         if (gScreenTextParameters.M == 1)
             p->x24 = 4;

@@ -642,8 +642,6 @@ u8 *Text_LookupString(s32 id)
     return sections[2] + (v & 0x7FFFFFFF);
 }
 
-extern u32 gUnk_0200060C;
-
 static inline u32 read_word(u8 *p)
 {
     return (p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0];
@@ -654,7 +652,7 @@ s32 Script_LoadScript(u8 *p)
     u32 count;
     struct ScriptProcedureTable *ctx = &gScriptProcedureTable;
     u8 *base;
-    gUnk_0200060C = read_word(p);
+    gSaveStateSignature = read_word(p);
     p += 4;
     base = (u8 *)Script_ReadProcTable((u32 *)p, &count);
     ctx->entries = (u32 *)p;

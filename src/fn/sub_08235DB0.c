@@ -2,7 +2,6 @@
 #include "ram.h"
 
 extern u8 *gGameState;
-extern u16 gUnk_02000590;
 
 struct CueTarget {
     u8 pad0[0x428];
@@ -27,7 +26,7 @@ void sub_08235DB0(struct CueTask *p)
             gPlayerActionPending = one;
             gPlayerCueTimer = time;
         }
-        gUnk_02000590++;
+        gPlayerEffectPendingCount++;
         p->started = 1;
     } else {
         *(u16 *)(gGameState + 0x3A) = 0;

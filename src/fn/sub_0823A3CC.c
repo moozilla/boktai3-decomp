@@ -5,7 +5,6 @@
 typedef struct Pos8 {
     u32 a, b;
 } Pos8;
-extern u16 gUnk_02000590;
 void sub_08232264(void *, void *, s32, s32, s32);
 void Shadow_Initialize(void *, void *, s32);
 void *SceneParticlePool_EnsureSingleton(void);
@@ -72,6 +71,6 @@ void LinkPlayer_InitializeActor(u8 *p)
     gPlayerBackgroundState = 0;
     gPlayerBackgroundMode = 0;
     gPlayerDirectionLatch = 1;
-    gUnk_02000590 = 0;
+    gPlayerEffectPendingCount = 0;
     p[0x4f3] = 0xff;
 }

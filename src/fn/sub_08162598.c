@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u32 gUnk_0200059C;
 s32 Sprite_Remove(u8 *);
 
 s32 PlayerAttackEffect_Destroy(u8 *p)
@@ -14,5 +14,5 @@ s32 PlayerAttackEffect_Destroy(u8 *p)
         i--;
     } while (i >= 0);
     z = 0;
-    gUnk_0200059C = z;
+    gPlayerAttackEffect = z;
 }

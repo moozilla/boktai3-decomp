@@ -204,5 +204,16 @@ extern void *
 extern u16 gPlayerBackgroundState; /* provisional: shared background/player state halfword */
 extern u16
     gPlayerAbilityLatched; /* provisional: ability request latch; ROM reader loads an unsigned halfword */
+extern u16
+    gPlayerSolarActionPending; /* provisional: solar action pending flag; separate from four slot words */
+extern u16
+    gPlayerEffectPendingCount; /* provisional: pending player effect count; separate from actor pointers */
+extern u8 *gPlayerAttackEffect; /* player attack effect singleton */
+extern u16 gHudResetFlag;       /* provisional: HUD flag initialized to one by Hud_ResetGlobals */
+extern u8 gNameEntrySavedState[4]; /* cursor position, selection and per-slot name-entry state */
+extern s32
+    gScreenTextSavedValue; /* provisional: value retained between screen-text menu instances */
+extern u32
+    gSaveStateSignature; /* main-state save signature checked when reading and written before saving */
 
 #endif

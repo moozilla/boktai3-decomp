@@ -62,8 +62,6 @@ struct GameStart {
     void *cursorResource;
 };
 
-extern u8 gUnk_020005B4[];
-
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
@@ -212,7 +210,7 @@ s32 GameStart_Init(u8 *p)
         Menu_StartFadeIn(3);
     if (gListMenuParameters.b == 0) {
         u8 *name = gAnimPanelSavedSelections;
-        u8 *slot = gUnk_020005B4;
+        u8 *slot = gNameEntrySavedState;
         u8 *end = name;
         s32 blank = 0x41;
         u8 *q = name + 0x17;

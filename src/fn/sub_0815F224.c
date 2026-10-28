@@ -10,7 +10,6 @@ void SceneBody_Unregister(void *);
 void Player_DestroyEffects(void *);
 void Player_UnregisterSceneMessageReceiver(void *);
 void Player_StopActionSounds(void *);
-extern u16 gUnk_02000590, gUnk_02000570;
 s32 Player_Destroy(struct Player *p)
 {
     SceneActorContacts_RemoveNode(&p->contactListNode);
@@ -26,8 +25,8 @@ s32 Player_Destroy(struct Player *p)
     gPlayerNotificationPending = 0;
     gUnk_02000580[p->movementRequestBlocked] = 0;
     gPlayerCount--;
-    gUnk_02000590 = 0;
-    gUnk_02000570 = 0;
+    gPlayerEffectPendingCount = 0;
+    gPlayerSolarActionPending = 0;
     gPlayerActionPending = 0;
     gPlayerCueTimer = 0;
     return 0;
