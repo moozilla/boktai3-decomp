@@ -259,7 +259,7 @@ addr,name,size,kind,decl,header,confidence,notes
 03001560,gTextTileUploadIndices,1,object,extern u8 gTextTileUploadIndices[];,include/render.h,,"Queued text tile indices; bounded storage precedes its count, original guard permits index 256"
 03001660,gTextTileUploadCount,4,object,extern u32 gTextTileUploadCount;,include/render.h,,Number of queued text tile DMA uploads
 03001664,gFontResource,4,object,extern struct FontResource *gFontResource;,include/text.h,high physical shape; tentative narrow/wide interpretation,Heap copy of a 12-byte font header: two u16 glyph counts and two relocated u32 glyph-data addresses
-03001668,gUnk_03001668,18,object,,,,
+03001668,gRootTask,18,object,extern struct RuntimeTask gRootTask;,include/runtime.h,high callback identity,Static scheduler root task calling TaskSystem_UpdateRoot at priority 0
 03001680,gUnk_03001680,4,object,,,,
 03001684,gUnk_03001684,4,object,,,,
 03001688,gColliderManager,4,object,extern u8 *gColliderManager;,include/ram.h,low,

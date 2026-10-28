@@ -15,6 +15,7 @@ struct RuntimeTask {
 
 extern struct RuntimeTask gVideoUploadTask;
 extern struct RuntimeTask gGraphicsUpdateTask;
+extern struct RuntimeTask gRootTask;
 
 /* RAM objects; each row of symbols/ram.csv with header include/runtime.h. */
 extern u8 gIwramCode

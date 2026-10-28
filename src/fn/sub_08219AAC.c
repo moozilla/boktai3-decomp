@@ -1,13 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
-struct Task {
-    u8 pad[16];
-    u16 f10;
-    u8 pad12[2];
-    u8 f14, f15, f16, f17;
-};
-extern struct Task gUnk_03001668;
+#include "runtime.h"
 extern u32 gUnk_03005278;
 extern u16 gNextTaskId;
 void Heap_Initialize(void);
@@ -15,21 +9,21 @@ void TaskSystem_InitLists(void);
 void ResourceRegistry_Initialize(void);
 void MessageQueue_InitBuffers(void);
 s32 TaskSystem_UpdateRoot(void);
-void Task_SetCallbacks(struct Task *, s32 (*)(void), void (*)(void));
-void Task_LinkToPriorityList(struct Task *);
+void Task_SetCallbacks(struct RuntimeTask *, s32 (*)(void), void (*)(void));
+void Task_LinkToPriorityList(struct RuntimeTask *);
 void TaskSystem_Initialize(void)
 {
-    struct Task *task;
+    struct RuntimeTask *task;
     Heap_Initialize();
     TaskSystem_InitLists();
     ResourceRegistry_Initialize();
     MessageQueue_InitBuffers();
     gUnk_03005278 = 123456;
-    task = &gUnk_03001668;
+    task = &gRootTask;
     Task_SetCallbacks(task, TaskSystem_UpdateRoot, 0);
-    task->f14 = 0;
-    task->f16 = 1;
-    task->f10 = 0;
+    task->priority = 0;
+    task->unk16 = 1;
+    task->id = 0;
     Task_LinkToPriorityList(task);
     gEnginePauseFlags = 0;
     gNextTaskId = 1;
