@@ -150,7 +150,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000388,gScriptPromptSettings,14,object,extern struct ScriptPromptSettings gScriptPromptSettings;,include/ram.h,low,
 020003A0,gListMenuParameters,1C,object,extern struct ListMenuParameters gListMenuParameters;,include/menu_parameters.h,low,provisional list-menu parameters; script keyword fields retained
 020003C0,gSoundTestParameters,8,object,extern struct SoundTestParameters gSoundTestParameters;,include/menu_parameters.h,low,sound-test text script and confirmation callback
-020003C8,gUnk_020003C8,4,object,,,,
+020003C8,gScriptedActorController,4,object,extern u8 *gScriptedActorController;,include/ram.h,,provisional: singleton scripted actor animation controller
 020003D0,gUnk_020003D0,28,object,,,,
 020003F8,gScreenTextParameters,28,object,extern struct ScreenTextParameters gScreenTextParameters;,include/ram.h,low,
 02000420,gScreenDelayParameters,8,object,extern struct ScreenDelayParameters gScreenDelayParameters;,include/ram.h,low,

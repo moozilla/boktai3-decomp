@@ -179,5 +179,7 @@ extern s32 gHresvelgrVolleyCount;            /* alternating Hresvelgr volley pul
 extern struct F3E4Actor *gRegistryF3E4Actor; /* provisional: registry F3E4 singleton actor */
 extern u16
     gSceneNpcBlendPalette[16]; /* sixteen-color output palette blended by SceneNpc_BlendPalette */
+extern u8
+    *gScriptedActorController; /* provisional: singleton scripted actor animation controller */
 
 #endif
