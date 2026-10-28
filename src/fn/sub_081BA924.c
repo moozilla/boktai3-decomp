@@ -1,5 +1,4 @@
-#define gRegistry3F74ObjPalette gUnk_03005020
-#define gDisplayControlShadow   gDispCntShadow
+#define gDisplayControlShadow gDispCntShadow
 #include "global.h"
 #include "render.h"
 
@@ -8,7 +7,6 @@ struct Registry3F74Object {
     void *background;
     u16 *palettes;
 };
-extern u16 gUnk_03005020[];
 void Bg_SetPriority(u32, s32);
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void Hud_SetMode(s32);
@@ -46,5 +44,5 @@ void Registry3F74_InitBackground(struct Registry3F74Object *p)
     resource = ScriptProc_Start(0x92B3, 0x771E);
     p->palettes = (u16 *)(resource + 0x14);
     Registry3F74_ApplyPaletteStep(p, SunClock_GetPhase());
-    CpuSet(resource + 0x74, gUnk_03005020, 0x04000008);
+    CpuSet(resource + 0x74, gBgPaletteBank3, 0x04000008);
 }

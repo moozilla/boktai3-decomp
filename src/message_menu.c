@@ -40,7 +40,7 @@ int MessageMenu_CreateTextWindows(struct MessageMenu *m)
     palette = ScriptProc_Start(0x92B3, 0x519C);
     if (!palette)
         return -1;
-    CpuSet(palette + 500, gUnk_030051A0, 0x04000008);
+    CpuSet(palette + 500, gBgPaletteBank15, 0x04000008);
     return 0;
 }
 

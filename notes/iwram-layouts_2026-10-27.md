@@ -134,3 +134,16 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03004300 `gAnimationResource` (struct):** Shared animation bank header has count +4, relative section offsets +C/+10/+14 and 12-byte entries from +18. Loader and lookup remain exact in both modes.
 
 - **03004310 `gSpriteAffineParams` (struct):** Shared 32-entry affine array has u8 angle, s8 X/Y scales and an unresolved tail byte. All six converted consumers exact in both modes; untouched ARM source also matches in both modes under its original address declaration.
+
+- **03004FE0 `gBgPaletteBank1` (unified):** Interior background palette bank 1, at gBgPaletteBuffer +0x20 bytes; ramlayout before/after checks passed.
+- **03005000 `gBgPaletteBank2` (unified):** Interior background palette bank 2, at gBgPaletteBuffer +0x40 bytes; ramlayout before/after checks passed.
+- **03005020 `gBgPaletteBank3` (unified):** Interior background palette bank 3, at gBgPaletteBuffer +0x60 bytes; ramlayout before/after checks passed.
+- **030050E0 `gBgPaletteBank9` (unified):** Interior background palette bank 9, at gBgPaletteBuffer +0x120 bytes; ramlayout before/after checks passed.
+- **03005140 `gBgPaletteBank12` (unified):** Interior background palette bank 12, at gBgPaletteBuffer +0x180 bytes; ramlayout before/after checks passed.
+- **03005164 `gBgPaletteBank13Color2` (unified):** Interior view starting at background palette bank 13 color 2; ramlayout before/after checks passed.
+- **03005174 `gBgPaletteBank13Color10` (unified):** Interior background palette bank 13 color 10; ramlayout before/after checks passed.
+- **03005176 `gBgPaletteBank13Color11` (unified):** Interior background palette bank 13 color 11; ramlayout before/after checks passed.
+- **0300517C `gBgPaletteBank13Color14` (unified):** Interior background palette bank 13 color 14; ramlayout before/after checks passed.
+- **03005180 `gBgPaletteBank14` (unified):** Interior background palette bank 14, at gBgPaletteBuffer +0x1C0 bytes; ramlayout before/after checks passed.
+- **030051A0 `gBgPaletteBank15` (unified):** Interior background palette bank 15, at gBgPaletteBuffer +0x1E0 bytes; ramlayout before/after checks passed.
+- **03005160 `gUnk_03005160` (skipped):** Existing scene_input_panel.h byte-array and status_screen.h halfword-array exports conflict when render.h exposes one shared bank type; ramlayout reports 123 compiler failures and writes nothing. Other palette aliases are unaffected.

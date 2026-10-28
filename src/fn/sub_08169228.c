@@ -2,8 +2,8 @@
 #include "scene_hud_display.h"
 #include "game_state.h"
 #include "player.h"
+#include "render.h"
 
-extern u16 gUnk_03005164[];
 void ResultPanel_DrawCappedCounters(struct SceneHudState *, s32, s32, s32);
 void ResultPanel_DrawCappedSmallCounters(struct SceneHudState *, s32, s32, s32);
 void StatDisplay_DrawPlayerValue(struct SceneHudState *, s32, s32, s32);
@@ -100,5 +100,5 @@ void PauseMenu_UpdateEquipmentSelection(struct SceneHudState *p)
         }
     }
     SceneHud_TickWidgetSlides(p);
-    Palette_UpdateHighlightPulse(gUnk_03005164, &p->unknown13F0);
+    Palette_UpdateHighlightPulse(gBgPaletteBank13Color2, &p->unknown13F0);
 }

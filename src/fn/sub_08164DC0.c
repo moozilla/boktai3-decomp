@@ -1,9 +1,9 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 
 // Remaining differences: loop-counter init is emitted before the hoisted 0xFFFFD000 literal in two loops.
 // confidence=low: transient gauges use two independent countdowns.
-extern u16 gUnk_0300517C;
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 Div(s32, s32);
 void StatDisplay_DrawTwoDigitCounter(s32);
@@ -59,10 +59,10 @@ void Hud_UpdateTransientStatGauge(u8 *p)
         draw = 1;
     }
     if (draw) {
-        if (gUnk_0300517C != background)
-            gUnk_0300517C = background;
-        if ((&gUnk_0300517C)[-1] != foreground)
-            (&gUnk_0300517C)[-1] = foreground;
+        if (gBgPaletteBank13Color14 != background)
+            gBgPaletteBank13Color14 = background;
+        if ((&gBgPaletteBank13Color14)[-1] != foreground)
+            (&gBgPaletteBank13Color14)[-1] = foreground;
         cell = Hud_GetTilemapCell(0, 29, 1);
         {
             s32 mk;

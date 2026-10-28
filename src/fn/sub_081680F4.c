@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 
 struct Hud {
     u8 pad0[0xc70];
@@ -8,7 +9,6 @@ struct Hud {
     u8 paletteState;
 };
 extern const u16 gUnk_08610E78[];
-extern u16 gUnk_03005164[];
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 PauseMenu_IsEquipmentSelectionEnabled(struct Hud *);
 void Palette_UpdateHighlightPulse(u16 *);
@@ -42,5 +42,5 @@ void Hud_LoadConditionalPaletteRows(struct Hud *input)
         register u32 zero asm("r0") = 0;
         *state = zero;
     }
-    Palette_UpdateHighlightPulse(gUnk_03005164);
+    Palette_UpdateHighlightPulse(gBgPaletteBank13Color2);
 }

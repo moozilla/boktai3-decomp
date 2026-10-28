@@ -1,8 +1,8 @@
 #include "global.h"
 #include "field_hud_widgets.h"
+#include "render.h"
 s32 Div(s32, s32);
 void CpuSet(const void *, void *, u32);
-extern u16 gUnk_03005180[];
 
 void FieldHud_UpdateGaugePalette(struct FieldHudWidgets *p)
 {
@@ -25,6 +25,6 @@ void FieldHud_UpdateGaugePalette(struct FieldHudWidgets *p)
         else
             palette[i + 1] = ((u16 *)p->paletteResource)[0xEE];
     }
-    CpuSet(palette, gUnk_03005180, 0x10);
+    CpuSet(palette, gBgPaletteBank14, 0x10);
     p->fill = level;
 }

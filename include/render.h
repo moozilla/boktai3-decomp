@@ -177,5 +177,16 @@ extern u32 gTextTileUploadCount; /* Number of queued text tile DMA uploads */
 extern void *gSpriteListHeads[2]; /* Two sprite render-list heads, selected by gRenderListIndex; pointees retain subsystem views */
 extern void *gMainSpriteListHeads[2]; /* Two main/animation sprite-list heads; protected ARM source retains its address declaration */
 extern void *gDrawableListHeads[2]; /* Two drawable/effect render-list heads, selected by gRenderListIndex */
+extern u16 gBgPaletteBank1[]; /* Interior background palette bank 1, at gBgPaletteBuffer +0x20 bytes */
+extern u16 gBgPaletteBank2[]; /* Interior background palette bank 2, at gBgPaletteBuffer +0x40 bytes */
+extern u16 gBgPaletteBank3[]; /* Interior background palette bank 3, at gBgPaletteBuffer +0x60 bytes */
+extern u16 gBgPaletteBank9[]; /* Interior background palette bank 9, at gBgPaletteBuffer +0x120 bytes */
+extern u16 gBgPaletteBank12[]; /* Interior background palette bank 12, at gBgPaletteBuffer +0x180 bytes */
+extern u16 gBgPaletteBank13Color2[]; /* Interior view starting at background palette bank 13 color 2 */
+extern u16 gBgPaletteBank13Color10; /* Interior background palette bank 13 color 10 */
+extern u16 gBgPaletteBank13Color11; /* Interior background palette bank 13 color 11 */
+extern u16 gBgPaletteBank13Color14; /* Interior background palette bank 13 color 14 */
+extern u16 gBgPaletteBank14[]; /* Interior background palette bank 14, at gBgPaletteBuffer +0x1C0 bytes */
+extern u16 gBgPaletteBank15[]; /* Interior background palette bank 15, at gBgPaletteBuffer +0x1E0 bytes */
 
 #endif

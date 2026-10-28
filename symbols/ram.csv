@@ -373,18 +373,18 @@ addr,name,size,kind,decl,header,confidence,notes
 03004DB0,gBackdropOverride,2,object,extern s16 gBackdropOverride;,include/render.h,high physical shape; provisional semantic name,backdrop override enabled flag
 03004DC0,gObjPaletteBuffer,200,object,extern u16 gObjPaletteBuffer[][16];,include/render.h,high physical shape; provisional semantic name,sixteen object palette banks of 16 colors
 03004FC0,gBgPaletteBuffer,200,object,extern u16 gBgPaletteBuffer[];,include/render.h,high physical shape; provisional semantic name,sixteen background palette banks of 16 colors; labels inside it are interior rows
-03004FE0,gUnk_03004FE0,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x20; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
-03005000,gUnk_03005000,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x40; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
-03005020,gUnk_03005020,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x60; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
-030050E0,gUnk_030050E0,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x120; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
-03005140,gUnk_03005140,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x180; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
+03004FE0,gBgPaletteBank1,,interior,extern u16 gBgPaletteBank1[];,include/render.h,high containment; per-use extent varies,"Interior background palette bank 1, at gBgPaletteBuffer +0x20 bytes"
+03005000,gBgPaletteBank2,,interior,extern u16 gBgPaletteBank2[];,include/render.h,high containment; per-use extent varies,"Interior background palette bank 2, at gBgPaletteBuffer +0x40 bytes"
+03005020,gBgPaletteBank3,,interior,extern u16 gBgPaletteBank3[];,include/render.h,high containment; per-use extent varies,"Interior background palette bank 3, at gBgPaletteBuffer +0x60 bytes"
+030050E0,gBgPaletteBank9,,interior,extern u16 gBgPaletteBank9[];,include/render.h,high containment; per-use extent varies,"Interior background palette bank 9, at gBgPaletteBuffer +0x120 bytes"
+03005140,gBgPaletteBank12,,interior,extern u16 gBgPaletteBank12[];,include/render.h,high containment; per-use extent varies,"Interior background palette bank 12, at gBgPaletteBuffer +0x180 bytes"
 03005160,gUnk_03005160,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x1A0; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
-03005164,gUnk_03005164,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x1A4; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
-03005174,gUnk_03005174,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x1B4; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
-03005176,gUnk_03005176,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x1B6; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
-0300517C,gUnk_0300517C,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x1BC; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
-03005180,gUnk_03005180,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x1C0; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
-030051A0,gUnk_030051A0,,interior,,,high containment; per-use extent varies,"gUnk_03004FC0 +0x1E0; Interior palette bank/color address, not evidence of an independent scalar/array allocation"
+03005164,gBgPaletteBank13Color2,,interior,extern u16 gBgPaletteBank13Color2[];,include/render.h,high containment; per-use extent varies,Interior view starting at background palette bank 13 color 2
+03005174,gBgPaletteBank13Color10,2,interior,extern u16 gBgPaletteBank13Color10;,include/render.h,high containment; per-use extent varies,Interior background palette bank 13 color 10
+03005176,gBgPaletteBank13Color11,2,interior,extern u16 gBgPaletteBank13Color11;,include/render.h,high containment; per-use extent varies,Interior background palette bank 13 color 11
+0300517C,gBgPaletteBank13Color14,2,interior,extern u16 gBgPaletteBank13Color14;,include/render.h,high containment; per-use extent varies,Interior background palette bank 13 color 14
+03005180,gBgPaletteBank14,,interior,extern u16 gBgPaletteBank14[];,include/render.h,high containment; per-use extent varies,"Interior background palette bank 14, at gBgPaletteBuffer +0x1C0 bytes"
+030051A0,gBgPaletteBank15,,interior,extern u16 gBgPaletteBank15[];,include/render.h,high containment; per-use extent varies,"Interior background palette bank 15, at gBgPaletteBuffer +0x1E0 bytes"
 030051C0,gObjPaletteReserved,4,object,extern u32 gObjPaletteReserved;,include/render.h,high physical shape; provisional semantic name,reserved object-palette allocation count
 030051C4,gBgFadeBankMask,2,object,extern u16 gBgFadeBankMask;,include/render.h,high physical shape; provisional semantic name,background-palette fade bank mask
 030051C8,gObjPaletteEffect,4,object,extern u32 gObjPaletteEffect;,include/render.h,high physical shape; provisional semantic name,object-palette refresh/effect control

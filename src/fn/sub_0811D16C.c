@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct S {
     u8 f[2];
     u16 a;
@@ -8,7 +9,6 @@ struct S {
     u8 h[0x10];
     u16 cnt;
 };
-extern u16 gUnk_03004FE0[];
 void PaletteFade_CycleMenuColors(u16 *p)
 {
     if (p[0x10] <= 1) {
@@ -21,7 +21,7 @@ void PaletteFade_CycleMenuColors(u16 *p)
         p[0x10] = 0;
         t = p[7];
         i = 7;
-        g = gUnk_03004FE0;
+        g = gBgPaletteBank1;
         q = p + 6;
         do {
             q[1] = q[0];
