@@ -1,13 +1,13 @@
 #include "global.h"
+#include "scene_event_dispatch.h"
 
 struct S {
     u8 f[0x1e];
     u8 a;
 };
-extern struct S *gUnk_0200047C;
 s32 SceneMessages_RequestAdvance(void)
 {
-    struct S *s = gUnk_0200047C;
+    struct S *s = gSceneEventDispatchState;
     if (s == 0)
         return -1;
     if (s->a != 0)

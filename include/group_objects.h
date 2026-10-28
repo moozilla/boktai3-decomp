@@ -87,7 +87,7 @@ struct GroupObjects {
 
 extern struct GroupGlobals {
     u8 pad[36], bank;
-} *gUnk_0200047C;
+} *gSceneEventDispatchState;
 
 extern void (*gUnk_08604B48[])(struct GroupObjects *, struct GroupPiece *, int);
 

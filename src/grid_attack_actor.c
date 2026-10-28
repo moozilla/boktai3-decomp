@@ -1059,8 +1059,8 @@ void GridAttack_ProcessMessages(struct GridAttackActor *p)
     s32 i = 0;
     typeof(*((u16 *)(((u8 *)p) + 0x54))) t1;
     typeof((*((u16 *)(((u8 *)p) + 0x56))) + base->height) t2;
-    while (i < receiver->count[gUnk_0200047C->phase]) {
-        struct SceneEventCommand *command = receiver->pending[gUnk_0200047C->phase][i];
+    while (i < receiver->count[gSceneEventDispatchState->phase]) {
+        struct SceneEventCommand *command = receiver->pending[gSceneEventDispatchState->phase][i];
         s32 action;
         SceneMessages_SetPendingTrigger(receiver, command);
         switch (command->kind) {

@@ -8,7 +8,7 @@ typedef struct {
     s16 *messages[2][4];
 } ArmorQueue;
 
-extern u8 *gUnk_0200047C;
+extern u8 *gSceneEventDispatchState;
 void SceneMessages_SetPendingTrigger(void *, void *);
 void ActorController_SetBehavior(void *, s32);
 u32 Trigger_ConsumePending(void *, u32);
@@ -47,10 +47,10 @@ void Armor_ApplySceneCommands(u8 *arg)
     ArmorQueue *q = (ArmorQueue *)(p + 0xADC);
     s32 i;
     i = 0;
-    if (i >= q->count[gUnk_0200047C[0x24]])
+    if (i >= q->count[gSceneEventDispatchState[0x24]])
         return;
     do {
-        u8 *scene = gUnk_0200047C;
+        u8 *scene = gSceneEventDispatchState;
         s16 *m = q->messages[scene[0x24]][i];
         SceneMessages_SetPendingTrigger(q, m);
         switch (((u8 *)m)[6]) {
@@ -170,5 +170,5 @@ void Armor_ApplySceneCommands(u8 *arg)
                 }
                 break;
         }
-    } while (++i < q->count[gUnk_0200047C[0x24]]);
+    } while (++i < q->count[gSceneEventDispatchState[0x24]]);
 }

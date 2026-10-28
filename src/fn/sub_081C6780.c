@@ -35,7 +35,7 @@ struct StateActor {
     u8 pad190[0x2CC - 0x190];
     void (*update)(void *);
 };
-extern u8 *gUnk_0200047C;
+extern u8 *gSceneEventDispatchState;
 extern const u16 gUnk_0203B400[];
 s32 Math_Atan2(s32, s32);
 void SceneMessages_SetPendingTrigger(void *, void *);
@@ -62,8 +62,8 @@ void StateActor_ProcessDirectionMessages(struct StateActor *actor)
     struct Receiver *receiver = &actor->receiver;
     s32 i;
     u32 k1;
-    for (i = 0; i < receiver->counts[gUnk_0200047C[0x24]]; i++) {
-        struct Command *command = receiver->commands[gUnk_0200047C[0x24]][i];
+    for (i = 0; i < receiver->counts[gSceneEventDispatchState[0x24]]; i++) {
+        struct Command *command = receiver->commands[gSceneEventDispatchState[0x24]][i];
         switch (command->kind) {
             case 4:
                 actor->target.x = command->data.position.x;

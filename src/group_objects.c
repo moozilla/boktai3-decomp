@@ -418,7 +418,7 @@ int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
 
 static inline int count(struct GroupQueue *q)
 {
-    u8 *bank = &gUnk_0200047C->bank;
+    u8 *bank = &gSceneEventDispatchState->bank;
     return q->count[*bank];
 }
 
@@ -427,7 +427,7 @@ int BoardPieces_DispatchCommands(struct GroupObjects *manager)
     struct GroupQueue *queue = &manager->queue;
     int i;
     for (i = 0; i < count(queue); i++) {
-        struct GroupGlobals *g = gUnk_0200047C;
+        struct GroupGlobals *g = gSceneEventDispatchState;
         {
             struct GroupCommand *cmd = queue->commands[g->bank][i];
             SceneMessages_SetPendingTrigger(queue, cmd);

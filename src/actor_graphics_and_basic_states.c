@@ -1025,7 +1025,7 @@ struct T {
     void *flash;
 };
 
-extern u8 *gUnk_0200047C;
+extern u8 *gSceneEventDispatchState;
 
 void SceneMessages_SetPendingTrigger(void *, void *);
 
@@ -1062,10 +1062,10 @@ void SceneActors_DispatchCommands(struct S *s)
     s32 i;
 
     i = 0;
-    if (i < entry->count[gUnk_0200047C[0x24]])
+    if (i < entry->count[gSceneEventDispatchState[0x24]])
         do {
             s16 *m;
-            u8 *controller = gUnk_0200047C;
+            u8 *controller = gSceneEventDispatchState;
             m = entry->messages[controller[0x24]][i];
             SceneMessages_SetPendingTrigger(entry, m);
             switch (((u8 *)m)[6]) {
@@ -1227,7 +1227,7 @@ void SceneActors_DispatchCommands(struct S *s)
                     break;
             }
             i++;
-        } while (i < entry->count[gUnk_0200047C[0x24]]);
+        } while (i < entry->count[gSceneEventDispatchState[0x24]]);
 }
 
 #else

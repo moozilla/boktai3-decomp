@@ -3810,7 +3810,7 @@ s32 Nidhoggr_Destroy(struct Nidhoggr *t)
 
 static inline int count(struct SceneEventReceiver *q)
 {
-    u8 *bank = &gUnk_0200047C->phase;
+    u8 *bank = &gSceneEventDispatchState->phase;
     return q->count[*bank];
 }
 
@@ -3819,7 +3819,7 @@ s32 Nidhoggr_UpdateCutscene(struct Nidhoggr *t)
     struct SceneEventReceiver *queue = &t->receiver;
     int i;
     for (i = 0; i < count(queue); i++) {
-        struct SceneEventDispatchState *g = gUnk_0200047C;
+        struct SceneEventDispatchState *g = gSceneEventDispatchState;
         struct SceneEventCommand *cmd = queue->pending[g->phase][i];
         switch (cmd->kind) {
             case 0:

@@ -19,7 +19,7 @@ struct SceneEventDispatchState {
     u8 unknown0[0x24];
     u8 phase;
 };
-extern struct SceneEventDispatchState *gUnk_0200047C;
+extern struct SceneEventDispatchState *gSceneEventDispatchState;
 void SceneMessages_SetPendingTrigger(struct SceneEventReceiver *, struct SceneEventCommand *);
 void SceneAudioEvent_PlaySong(struct SceneEventDispatchTask *, struct SceneEventReceiver *,
                               struct SceneEventCommand *);

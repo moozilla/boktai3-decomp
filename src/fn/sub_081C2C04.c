@@ -18,7 +18,7 @@ struct SparkleEmitter {
     u8 pad778[4];
     void (*update)(struct SparkleEmitter *);
 };
-extern u8 *gUnk_0200047C;
+extern u8 *gSceneEventDispatchState;
 void SceneMessages_SetPendingTrigger(void *, void *);
 void Trigger_ConsumePending(void *, s32);
 void AnimData_SelectPaletteBank(void *, u32);
@@ -28,7 +28,7 @@ void SparkleEmitter_UpdateEmitting(struct SparkleEmitter *);
 void SparkleEmitter_UpdateDraining(struct SparkleEmitter *);
 static inline u8 Entry_MessageCount(Entry *entry)
 {
-    u8 *controller = gUnk_0200047C;
+    u8 *controller = gSceneEventDispatchState;
     return entry->count[controller[0x24]];
 }
 
@@ -45,7 +45,7 @@ static inline void SparkleEmitter_SetTimer(struct SparkleEmitter *p, s32 timer)
 
 static inline s16 *Entry_GetMessage(Entry *entry, s32 i)
 {
-    u8 *controller = gUnk_0200047C;
+    u8 *controller = gSceneEventDispatchState;
     return entry->messages[controller[0x24]][i];
 }
 

@@ -163,7 +163,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000470,gShadowRegistry,4,object,extern u32 gShadowRegistry;,include/ram.h,low,shadow registry task (ShadowRegistry_*)
 02000474,gColliderSpritePool,4,object,extern u32 gColliderSpritePool;,include/ram.h,low,
 02000478,gWeatherCollisionTimer,4,object,extern s32 gWeatherCollisionTimer;,include/ram.h,low,provisional: shared weather and collision countdown
-0200047C,gUnk_0200047C,4,object,,,,
+0200047C,gSceneEventDispatchState,4,object,extern struct SceneEventDispatchState *gSceneEventDispatchState;,include/scene_event_dispatch.h,low,double-buffered scene event receiver state
 02000480,gSceneActorListManager,4,object,extern void *gSceneActorListManager;,include/ram.h,low,provisional: scene actor list and packet-queue manager
 02000484,gWirelessController,4,object,extern struct Engine *gWirelessController;,include/ram.h,low,wireless controller singleton; existing per-unit Engine views retained
 02000488,gUnk_02000488,4,object,,,,

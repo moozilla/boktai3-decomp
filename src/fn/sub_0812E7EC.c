@@ -61,7 +61,7 @@ struct SceneActorRegistryResetView {
     u8 unknown3CE[6];
     u8 group[0x200];
 };
-extern struct CommandScene *gUnk_0200047C;
+extern struct CommandScene *gSceneEventDispatchState;
 void SceneActorControl_OnIdle(void);
 u32 Trigger_ConsumePending(void *, u32);
 void SceneMessages_SetPendingTrigger(void *, void *);
@@ -138,10 +138,10 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
     receiver = &actor->receiver;
     category = actor->category;
     i = 0;
-    if (i >= receiver->counts[gUnk_0200047C->bank])
+    if (i >= receiver->counts[gSceneEventDispatchState->bank])
         return 1;
     do {
-        struct ActorCommand *command = receiver->commands[gUnk_0200047C->bank][i];
+        struct ActorCommand *command = receiver->commands[gSceneEventDispatchState->bank][i];
         switch (command->command) {
             case 0:
                 if (category == 18) {
@@ -288,7 +288,7 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
         }
         SceneMessages_SetPendingTrigger(receiver, command);
         ++i;
-    } while (i < receiver->counts[gUnk_0200047C->bank]);
+    } while (i < receiver->counts[gSceneEventDispatchState->bank]);
     return 1;
 }
 

@@ -23,7 +23,7 @@ struct Slot7CommandScene {
     u8 unknown0[0x24];
     u8 bank;
 };
-extern struct Slot7CommandScene *gUnk_0200047C;
+extern struct Slot7CommandScene *gSceneEventDispatchState;
 extern u16 gUnk_03005040[];
 void SceneMessages_SetPendingTrigger(void *, void *);
 u32 Trigger_ConsumePending(void *, u32);
@@ -86,9 +86,9 @@ void SingletonSlot7_DispatchPendingCommands(struct Slot7CommandOwner *input)
     u8 *actor = (u8 *)owner;
     struct Slot7Receiver *receiver = &owner->receiver;
     s32 i = 0;
-    if (i < receiver->count[gUnk_0200047C->bank])
+    if (i < receiver->count[gSceneEventDispatchState->bank])
         do {
-            struct Slot7Command *command = receiver->commands[gUnk_0200047C->bank][i];
+            struct Slot7Command *command = receiver->commands[gSceneEventDispatchState->bank][i];
             register s32 next asm("r9");
             u32 kind;
             SceneMessages_SetPendingTrigger(receiver, command);
@@ -236,7 +236,7 @@ void SingletonSlot7_DispatchPendingCommands(struct Slot7CommandOwner *input)
                     break;
             }
             i = next;
-        } while (i < receiver->count[gUnk_0200047C->bank]);
+        } while (i < receiver->count[gSceneEventDispatchState->bank]);
 }
 
 #else

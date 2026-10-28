@@ -1,5 +1,5 @@
 #include "global.h"
-extern void *gUnk_0200047C;
+#include "scene_event_dispatch.h"
 void *Task_Create(int, int);
 void Task_SetCallbacks(void *, void *, void *);
 int SceneMessages_Initialize(void *, int);
@@ -9,7 +9,7 @@ void SceneMessages_Destroy(void);
 void *SceneMessages_Create(int id)
 {
     void *p;
-    if (gUnk_0200047C)
+    if (gSceneEventDispatchState)
         return 0;
     p = Task_Create(2, 0xac);
     if (p) {

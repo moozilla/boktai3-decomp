@@ -55,7 +55,7 @@ struct Director {
     u8 pad0[0x24];
     u8 active;
 };
-extern struct Director *gUnk_0200047C;
+extern struct Director *gSceneEventDispatchState;
 void SceneMessages_SetPendingTrigger(void *, void *);
 void Trigger_ConsumePending(void *, s32);
 void Hresvelgr_OnActionTwentyEight(void *);
@@ -87,9 +87,9 @@ void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
     struct Hresvelgr *actor = p;
     struct Trigger *trigger = &p->trigger;
     s32 i = 0;
-    if (i < trigger->count[gUnk_0200047C->active]) {
+    if (i < trigger->count[gSceneEventDispatchState->active]) {
         do {
-            struct Director *director = gUnk_0200047C;
+            struct Director *director = gSceneEventDispatchState;
             struct Message *message = trigger->pending[director->active][i];
             SceneMessages_SetPendingTrigger(trigger, message);
             switch (message->command) {
@@ -151,6 +151,6 @@ void Hresvelgr_DispatchSceneMessages(struct Hresvelgr *p)
                     break;
             }
             i++;
-        } while (i < trigger->count[gUnk_0200047C->active]);
+        } while (i < trigger->count[gSceneEventDispatchState->active]);
     }
 }

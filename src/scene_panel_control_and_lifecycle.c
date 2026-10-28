@@ -861,9 +861,9 @@ void ScenePanel_DispatchCommands(struct ScenePanel *owner)
     struct ScenePanel *panel = (void *)owner;
     struct ScenePanelReceiver *receiver = &((struct ScenePanel *)owner)->receiver;
     s32 i = 0;
-    if (i < receiver->count[gUnk_0200047C->bank]) {
+    if (i < receiver->count[gSceneEventDispatchState->bank]) {
         do {
-            struct ScenePanelCommandGlobals *globals = gUnk_0200047C;
+            struct ScenePanelCommandGlobals *globals = gSceneEventDispatchState;
             struct ScenePanelCommand *command = receiver->commands[globals->bank][i];
             SceneMessages_SetPendingTrigger(receiver, command);
             switch (command->opcode) {
@@ -877,7 +877,7 @@ void ScenePanel_DispatchCommands(struct ScenePanel *owner)
                     break;
             }
             i++;
-        } while (i < receiver->count[gUnk_0200047C->bank]);
+        } while (i < receiver->count[gSceneEventDispatchState->bank]);
     }
 }
 
