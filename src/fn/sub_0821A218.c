@@ -1,16 +1,11 @@
 #include "global.h"
 #include "runtime.h"
-struct Entry {
-    u16 id;
-    u8 flags, pad;
-    void *data;
-};
-extern struct Entry gUnk_0203B000[];
+#include "resource_registry.h"
 void Heap_Free(void *);
 void ResourceRegistry_ClearEntries(u32 keep)
 {
     s32 retained = 0;
-    struct Entry *entry = gUnk_0203B000;
+    struct ResourceRegistryEntry *entry = gResourceRegistryEntries;
     s32 i = 0;
     while (i < gResourceRegistryCount) {
         if (entry->flags & 0x80) {

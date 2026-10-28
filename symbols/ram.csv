@@ -240,7 +240,7 @@ addr,name,size,kind,decl,header,confidence,notes
 0201F400,gHeapEndGuard,4,object,extern u32 gHeapEndGuard;,include/ram.h,,heap-end guard word expected to equal 0x516B92EE
 02037000,gBgMapWorkBuffer,2000,object,extern u8 gBgMapWorkBuffer[0x2000];,include/ram.h,,"background map work buffer, cleared for 0x2000 bytes"
 02039000,gObjTileUploadRequests,8,object,extern struct ObjTileUploadRequest gObjTileUploadRequests[];,include/obj_tile_upload.h,low,eight-byte rectangular tile-upload records; descriptor aliases two halfwords; protected ARM producer retained
-0203B000,gUnk_0203B000,8,object,,,,
+0203B000,gResourceRegistryEntries,100,object,extern struct ResourceRegistryEntry gResourceRegistryEntries[32];,include/resource_registry.h,low,"32-entry resource registry; id, flags and data pointer; protected draft views retained"
 0203B400,gUnk_0203B400,802,object,,,,
 0203C400,gUnk_0203C400,,object,,,,
 03000000,gIwramCode,FC,object,extern u8 gIwramCode[];,include/runtime.h,,IWRAM instruction buffer populated from Palette_CacheObjectBankArm through AgbMain__addr at startup; extent is not inferred from the partial RFU read
