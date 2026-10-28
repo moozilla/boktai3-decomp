@@ -34,7 +34,7 @@ void ResourceStation_CheckInteraction(struct ResourceStation *station)
                 register u8 *nearby asm("r0") = (u8 *)station + nearbyOffset;
                 *nearby = playerKind;
             }
-            sample = gUnk_02000534;
+            sample = gPlayerPassageState;
             blocked = 0;
             if (sample && gPlayerInteractionMode == 5)
                 blocked = 1;

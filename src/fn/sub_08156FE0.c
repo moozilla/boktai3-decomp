@@ -9,7 +9,6 @@ struct PlayerPendingNotification {
     u32 flags;
     void *payload;
 };
-extern struct PlayerPendingNotification *gUnk_0200054C;
 void ActorSequence_Begin(struct Player *, s32, s32);
 void Player_BeginDirectionSequence(struct Player *, u32);
 void Player_StopMovementEffects(struct Player *);
@@ -136,14 +135,19 @@ s32 Player_SelectActionSequence(struct Player *p)
                 ActorSequence_Begin(p, 0x1E, 0);
         } else
             ActorSequence_Begin(p, 0x1D, 0);
-        if (gUnk_0200054C && gPlayerNotificationPending) {
-            if (!(gUnk_0200054C->flags & 1)) {
-                if (gUnk_0200054C->flags & 0x10)
-                    sub_08249244(gUnk_0200054C->receiver, 1, 60, gUnk_0200054C->payload);
+        if ((*(struct PlayerPendingNotification **)&gPlayerPendingActor) &&
+            gPlayerNotificationPending) {
+            if (!((*(struct PlayerPendingNotification **)&gPlayerPendingActor)->flags & 1)) {
+                if ((*(struct PlayerPendingNotification **)&gPlayerPendingActor)->flags & 0x10)
+                    sub_08249244(
+                        (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->receiver, 1,
+                        60, (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->payload);
                 else
-                    sub_08249244(gUnk_0200054C->receiver, 1, 60, gUnk_0200054C->payload);
+                    sub_08249244(
+                        (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->receiver, 1,
+                        60, (*(struct PlayerPendingNotification **)&gPlayerPendingActor)->payload);
             }
-            gUnk_0200054C = 0;
+            (*(struct PlayerPendingNotification **)&gPlayerPendingActor) = 0;
             gPlayerNotificationPending = 0;
         }
         Player_StopMovementEffects(p);

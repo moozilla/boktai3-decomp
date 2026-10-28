@@ -194,15 +194,15 @@ addr,name,size,kind,decl,header,confidence,notes
 02000514,gPlayerLinkAttackBonus,2,object,extern u16 gPlayerLinkAttackBonus;,include/ram.h,,provisional: link action-mode attack bonus override
 02000518,gPlayerCueTimer,2,object,extern u16 gPlayerCueTimer;,include/ram.h,low,
 02000520,gPlayerScriptState,2,object,extern u16 gPlayerScriptState;,include/ram.h,,provisional: shared player script-state halfword
-02000528,gUnk_02000528,2,object,,,,
-0200052C,gUnk_0200052C,6,object,,,,
-02000534,gUnk_02000534,8,object,,,,
-0200053C,gUnk_0200053C,2,object,,,,
+02000528,gPlayerActionPending,2,object,extern u16 gPlayerActionPending;,include/ram.h,,provisional: shared pending player-action counter
+0200052C,gPlayerDirectionLatch,2,object,extern u16 gPlayerDirectionLatch;,include/ram.h,,provisional: direction and action latch halfword
+02000534,gPlayerPassageState,2,object,extern u16 gPlayerPassageState;,include/ram.h,,provisional: shared player passage/interaction state
+0200053C,gPlayerBackgroundMode,2,object,extern u16 gPlayerBackgroundMode;,include/ram.h,,provisional: background/player action mode halfword
 02000544,gPlayerCount,2,object,extern u16 gPlayerCount;,include/ram.h,low,
-02000548,gUnk_02000548,8,object,,,,
-0200054C,gUnk_0200054C,,interior,,,,gUnk_02000548 +0x4
-02000550,gUnk_02000550,2,object,,,,
-02000554,gUnk_02000554,2,object,,,,
+02000548,gPlayerInitialSlotValues,4,object,extern u16 gPlayerInitialSlotValues[2];,include/ram.h,,two script-status values saved before the local player exists
+0200054C,gPlayerPendingActor,4,object,extern void *gPlayerPendingActor;,include/ram.h,,provisional: pending player interaction/notification actor; independent of slot values
+02000550,gPlayerBackgroundState,2,object,extern u16 gPlayerBackgroundState;,include/ram.h,,provisional: shared background/player state halfword
+02000554,gPlayerAbilityLatched,2,object,extern u16 gPlayerAbilityLatched;,include/ram.h,,provisional: ability request latch; ROM reader loads an unsigned halfword
 02000558,gForceDirectionMode,2,object,extern u16 gForceDirectionMode;,include/ram.h,low,
 02000560,gUnk_02000560,14,object,,,,
 02000570,gUnk_02000570,,interior,,,,gUnk_02000560 +0x10

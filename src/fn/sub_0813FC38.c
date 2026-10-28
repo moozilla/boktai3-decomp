@@ -52,8 +52,6 @@ struct PlayerFC38 {
 extern struct GameStateFC38 *gGameState;
 extern u32 gEngineFlags;
 extern struct InputKeysFC38 gUnk_03005260[];
-extern u16 gUnk_02000548[2];
-extern u16 gUnk_02000534;
 extern void *const gUnk_08610964[];
 
 s32 Script_SeekToKeyword(s32);
@@ -83,7 +81,7 @@ s32 Player_InitActionMode(struct PlayerFC38 *p)
     Player_RecalculateDerivedStats(p);
     if (gEngineFlags & 0x1000) {
         void *cb = Player_UpdateLinkModeMovement;
-        u16 *q, *base = gUnk_02000548;
+        u16 *q, *base = gPlayerInitialSlotValues;
         u16 zero = 0;
         q = base + 1;
         do {
@@ -101,9 +99,9 @@ s32 Player_InitActionMode(struct PlayerFC38 *p)
     if (p->slot == 0) {
         p->unk534 = gPlayerInteractionMode;
         p->unk536 = gPlayerScriptState;
-        p->unk538 = gUnk_02000534;
+        p->unk538 = gPlayerPassageState;
         for (i = 0; i < 2; i++)
-            p->scriptStatus[i] = gUnk_02000548[i];
+            p->scriptStatus[i] = gPlayerInitialSlotValues[i];
     } else {
         s32 j;
         p->unk534 = 0;

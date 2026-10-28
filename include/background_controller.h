@@ -3,6 +3,7 @@
 
 #include "engine.h"
 #include "render.h"
+#include "ram.h"
 
 /*
  * Background controllers (ROM 080015AC-08002AA8). Two task families share
@@ -161,7 +162,6 @@ struct BackgroundMapEntry {
 extern struct Background *gBackgrounds[];
 extern struct ScrollingBackground *gScrollingBackgrounds[];
 extern s16 gUnk_03005418[2];
-extern u16 gUnk_02000550, gUnk_0200053C;
 
 /* Engine functions used by this unit. */
 s32 Script_ReadValue(u8 *);

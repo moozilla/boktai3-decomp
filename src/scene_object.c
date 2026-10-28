@@ -696,8 +696,6 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
     } while (i >= 0);
 }
 
-extern u16 gUnk_02000534;
-
 // MATCHING_CONCESSION: register-pinning
 s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
 {
@@ -711,7 +709,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
     u8 *dynamic;
     if (({
             u8 active = 0;
-            if (gUnk_02000534 && gPlayerInteractionMode == 2)
+            if (gPlayerPassageState && gPlayerInteractionMode == 2)
                 active = 1;
             active;
         }) ||

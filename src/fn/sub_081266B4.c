@@ -8,7 +8,6 @@ struct StatusSlot {
     u8 pad2A[2];
     u16 reset, timer;
 };
-extern u16 gUnk_02000534;
 static inline u8 PlayerInMode(struct AreaEffectPlayer *p)
 {
     if (p) {
@@ -22,7 +21,7 @@ static inline u8 PlayerInMode(struct AreaEffectPlayer *p)
 }
 static inline u8 GlobalMode(void)
 {
-    u32 value = gUnk_02000534;
+    u32 value = gPlayerPassageState;
     u32 active = 0;
     if (value && gPlayerInteractionMode == 4)
         active = 1;

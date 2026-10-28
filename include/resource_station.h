@@ -48,7 +48,6 @@ struct ResourceStation {
     u8 state, animationFrame, nearby, digitsVisible;
     u16 interactionVariant;
 };
-extern u16 gUnk_02000534;
 extern struct ResourceStationPosition gUnk_03005418;
 void AnimData_SelectPaletteBank(void *, s32);
 #endif

@@ -91,7 +91,7 @@ static inline s32 stateMode(void)
 
 static inline s32 globalMode(void)
 {
-    u32 active = gUnk_02000534;
+    u32 active = gPlayerPassageState;
     s32 yes = 0;
     if (active && gPlayerInteractionMode == 4)
         yes = 1;

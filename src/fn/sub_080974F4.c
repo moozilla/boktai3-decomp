@@ -4,7 +4,6 @@
 #include "ram.h"
 
 #define gSceneActorSineTable gUnk_086149C4
-extern u16 gUnk_02000534;
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 struct ActorHeightOscillation {
@@ -25,7 +24,7 @@ static inline s32 ScaleWave(s32 wave)
 void SceneActor_EasePlayerHeight(struct SceneActorRegistryResetView *actor)
 {
     struct ActorHeightOscillation *state = actor->context;
-    u32 active = gUnk_02000534;
+    u32 active = gPlayerPassageState;
     s32 special = 0;
     s32 offset;
     if (active && gPlayerInteractionMode == 5)

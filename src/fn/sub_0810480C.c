@@ -53,7 +53,6 @@ static inline s32 WrapAngle(s32 x)
     return x;
 }
 extern u8 *gUnk_02000580[];
-extern u16 gUnk_02000534;
 u8 ProximityActor_IsPlayerInsideOriginRange(void *);
 void ActorGroup_UpdateMemberSway(struct ActorGroupMember *);
 void Sound_PlaySong(u32);
@@ -93,7 +92,7 @@ void ActorGroup_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
             fl = *(u32 *)(b8 + 0x20);
             if (!(fl & m8)) {
                 s32 active;
-                if (gUnk_02000534 && !gPlayerInteractionMode)
+                if (gPlayerPassageState && !gPlayerInteractionMode)
                     active = 1;
                 else
                     active = 0;

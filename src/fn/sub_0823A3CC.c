@@ -1,12 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "area_effect_link.h"
+#include "ram.h"
 typedef struct Pos8 {
     u32 a, b;
 } Pos8;
-extern u16 gUnk_02000550;
-extern u16 gUnk_0200053C;
-extern u16 gUnk_0200052C;
 extern u16 gUnk_02000590;
 void sub_08232264(void *, void *, s32, s32, s32);
 void Shadow_Initialize(void *, void *, s32);
@@ -71,9 +69,9 @@ void LinkPlayer_InitializeActor(u8 *p)
     *(u16 *)(p + 0xae8) = 0;
     *(u16 *)(p + 0xaea) = 0;
     *(u16 *)(p + 0xaec) = 0;
-    gUnk_02000550 = 0;
-    gUnk_0200053C = 0;
-    gUnk_0200052C = 1;
+    gPlayerBackgroundState = 0;
+    gPlayerBackgroundMode = 0;
+    gPlayerDirectionLatch = 1;
     gUnk_02000590 = 0;
     p[0x4f3] = 0xff;
 }

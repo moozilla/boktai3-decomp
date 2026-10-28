@@ -17,7 +17,6 @@ extern const s16 gUnk_086149C4[];
 
 // confidence=low: motion seven rotates toward a target and pulses three palette colors.
 extern u8 *gGameState;
-extern u16 gUnk_02000528;
 static inline u32 Arg1(u32 k_, s32 green)
 {
     return (green << 5) | k_;
@@ -129,12 +128,12 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
         p->unk59F[1] = 0;
     if ((*((s16 *)(gGameState + 0x5A8))) != 2) {
         gPlayerCueTimer = 0;
-        gUnk_02000528 = 0;
+        gPlayerActionPending = 0;
     }
-    if (gUnk_02000528) {
+    if (gPlayerActionPending) {
         if (gPlayerCueTimer)
             gPlayerCueTimer--;
         else
-            gUnk_02000528 = 0;
+            gPlayerActionPending = 0;
     }
 }

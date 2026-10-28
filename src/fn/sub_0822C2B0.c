@@ -1,14 +1,14 @@
 #include "global.h"
+#include "ram.h"
 extern u32 gEngineFlags;
 extern u8 *gUnk_02000580;
 extern u8 *gGameState;
-extern u16 gUnk_02000528;
 s32 Solar_GetLevelForIntensity(s32);
 s32 Solar_GetLevelUpperBound(s32);
 s32 Solar_GetLevelLowerBound(s32);
 static inline s32 modeIs(s32 m)
 {
-    u16 mode = gUnk_02000528;
+    u16 mode = gPlayerActionPending;
     s32 r = 0;
     if (mode == m)
         r = 1;

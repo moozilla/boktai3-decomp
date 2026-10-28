@@ -2,7 +2,6 @@
 #include "global.h"
 #include "player.h"
 #include "ram.h"
-extern void *gUnk_0200054C;
 void Player_EmitQueuedEffects(struct Player *);
 void ActorSequence_Begin(struct Player *, s32, s32);
 static inline void SetFlags(u32 *flags, u32 mask)
@@ -22,7 +21,7 @@ void PlayerAction_BeginMode24(struct Player *p)
     p->positionResetCounter = 0;
     p->positionResetState = 0;
     p->particleEmissionCount = 0;
-    gUnk_0200054C = 0;
+    gPlayerPendingActor = 0;
     gPlayerNotificationPending = 0;
     ActorSequence_Begin(p, 0x18, 0);
 }

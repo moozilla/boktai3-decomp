@@ -1,12 +1,12 @@
 #include "global.h"
 #include "player.h"
 #include "engine.h"
+#include "ram.h"
 
 struct Terrain {
     u8 pad[4];
     u8 *cells;
 };
-extern u16 gUnk_0200053C;
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline u8 *Cell(s32 i)
 {
@@ -21,7 +21,7 @@ static inline s32 Width(void)
 }
 s32 Player_GetForceDirection(struct Player *p)
 {
-    s32 angle = ((gUnk_0200053C + 0x70) & 255);
+    s32 angle = ((gPlayerBackgroundMode + 0x70) & 255);
     s32 d;
     s32 offset;
     u32 h;

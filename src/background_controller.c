@@ -714,8 +714,8 @@ s32 ScrollingBackground_Update(struct ScrollingBackground *p)
     width = p->width << 4;
     height = p->height << 4;
     if (p->flags & 8) {
-        s32 speed = gUnk_02000550 * (s16)p->speedScale;
-        s32 angle = (gUnk_0200053C + 160) & 255;
+        s32 speed = gPlayerBackgroundState * (s16)p->speedScale;
+        s32 angle = (gPlayerBackgroundMode + 160) & 255;
         s32 x, y;
         const s16 *sine = gUnk_086149C4;
         p->accumulatedX += sine[(angle + 64) & 255] * speed;

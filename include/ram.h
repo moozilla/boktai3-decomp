@@ -193,5 +193,16 @@ extern u16
     gPlayerSavedMenuOption; /* saved menu option restored when the second script-status slot is set */
 extern u16 gPlayerLinkAttackBonus; /* provisional: link action-mode attack bonus override */
 extern u16 gPlayerScriptState;     /* provisional: shared player script-state halfword */
+extern u16 gPlayerActionPending;   /* provisional: shared pending player-action counter */
+extern u16 gPlayerDirectionLatch;  /* provisional: direction and action latch halfword */
+extern u16 gPlayerPassageState;    /* provisional: shared player passage/interaction state */
+extern u16 gPlayerBackgroundMode;  /* provisional: background/player action mode halfword */
+extern u16
+    gPlayerInitialSlotValues[2]; /* two script-status values saved before the local player exists */
+extern void *
+    gPlayerPendingActor; /* provisional: pending player interaction/notification actor; independent of slot values */
+extern u16 gPlayerBackgroundState; /* provisional: shared background/player state halfword */
+extern u16
+    gPlayerAbilityLatched; /* provisional: ability request latch; ROM reader loads an unsigned halfword */
 
 #endif
