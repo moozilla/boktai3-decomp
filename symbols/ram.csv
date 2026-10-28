@@ -146,7 +146,7 @@ addr,name,size,kind,decl,header,confidence,notes
 02000328,gNamePlaceholderScript,18,object,extern u32 gNamePlaceholderScript[];,include/ram.h,low,
 02000340,gDateMenuParameters,14,object,extern struct DateMenuParameters gDateMenuParameters;,include/menu_parameters.h,low,date-menu callbacks and flag; first eight bytes have no typed access in current evidence
 02000358,gSelectionMenuParameters,1C,object,extern struct SelectionMenuParameters gSelectionMenuParameters;,include/menu_parameters.h,low,provisional selection-menu parameters; script keyword fields retained
-02000378,gUnk_02000378,C,object,,,,
+02000378,gScriptMessageParameters,C,object,extern struct ScriptMessageParameters gScriptMessageParameters;,include/menu_parameters.h,low,"script-message text, script cursor and callback/value"
 02000388,gScriptPromptSettings,14,object,extern struct ScriptPromptSettings gScriptPromptSettings;,include/ram.h,low,
 020003A0,gUnk_020003A0,1C,object,,,,
 020003C0,gUnk_020003C0,8,object,,,,

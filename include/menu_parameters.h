@@ -45,4 +45,11 @@ struct SelectionMenuParameters {
 };
 extern struct SelectionMenuParameters gSelectionMenuParameters;
 
+struct ScriptMessageParameters {
+    u8 *text;
+    u8 *pc;
+    s32 value;
+};
+extern struct ScriptMessageParameters gScriptMessageParameters;
+
 #endif
