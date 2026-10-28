@@ -10,7 +10,7 @@ Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **360 functions**,
 
 Intentional assembly (GBA header, crt0, SDK assembly; not counted above): 4,916 bytes.
 
-RAM objects with one shared declaration (`symbols/ram.csv`, reported as data): **74.6%** (19,127 / 25,647 bytes); no other declaration left: 57.4%.
+RAM objects with one shared declaration (`symbols/ram.csv`, reported as data): **91.9%** (23,751 / 25,855 bytes); no other declaration left: 75.6%.
 
 ROM data (tables, graphics, text, scripts, sound; not in the data measure above, see [docs/DATA_TRACKING.md](docs/DATA_TRACKING.md)): 12,822,088 bytes. Emitted from decoded source: **3.5%** (446,538 bytes); from extracted resource files: 59.5%; `.incbin` of the base ROM (pointer words as symbols): 37.0%. Named data symbols: 10.
 
