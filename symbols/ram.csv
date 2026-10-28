@@ -243,75 +243,75 @@ addr,name,size,kind,decl,header,confidence,notes
 0203B000,gResourceRegistryEntries,100,object,extern struct ResourceRegistryEntry gResourceRegistryEntries[32];,include/resource_registry.h,low,"32-entry resource registry; id, flags and data pointer; protected draft views retained"
 0203B400,gUnk_0203B400,800,object,,,,
 0203C400,gGameStateStorage,,object,extern u8 gGameStateStorage[];,include/ram.h,low,backing storage for timer-jittered game-state and variable regions
-03000000,gIwramCode,FC,object,extern u8 gIwramCode[];,include/runtime.h,,IWRAM instruction buffer populated from Palette_CacheObjectBankArm through AgbMain__addr at startup; extent is not inferred from the partial RFU read
-03001110,gVideoIrqPhase,4,object,extern u32 gVideoIrqPhase;,include/runtime.h,,Two-phase video/sound IRQ handler latch; toggled by sub_08214144 (tentative name)
+03000000,gIwramCode,FC,object,extern u8 gIwramCode[];,include/runtime.h,low,IWRAM instruction buffer populated from Palette_CacheObjectBankArm through AgbMain__addr at startup; extent is not inferred from the partial RFU read
+03001110,gVideoIrqPhase,4,object,extern u32 gVideoIrqPhase;,include/runtime.h,low,Two-phase video/sound IRQ handler latch; toggled by sub_08214144 (tentative name)
 03001118,gVideoUploadTask,18,object,extern struct RuntimeTask gVideoUploadTask;,include/runtime.h,high callback identity; unresolved task bytes,Static task calling InterruptsAndVideo_OnVideoUploadTask at priority 0; +16 initialized to 1 with unresolved meaning
 03001130,gGraphicsUpdateTask,18,object,extern struct RuntimeTask gGraphicsUpdateTask;,include/runtime.h,high callback identity; unresolved task bytes,Static task calling InterruptsAndVideo_OnGraphicsUpdateTask at priority 13; +16 initialized to 1 with unresolved meaning
 03001148,gObjGfxSlots,400,object,extern struct ObjGfxSlot gObjGfxSlots[128];,include/render.h,high,"128 queued OBJ tile uploads, each 8 bytes; allocation rejects count above 127 and the next object starts at 03001548"
-03001548,gBgMapCacheKey,2,object,extern u16 gBgMapCacheKey;,include/render.h,,"Last compressed BG map resource key, compared before LZ77 unpacking (tentative cache name)"
-0300154C,gSavedDispCnt,2,object,extern u16 gSavedDispCnt;,include/render.h,,DISPCNT saved by Video_SaveDisplayControl
-0300154E,gSavedWindowShadow0,2,object,extern u16 gSavedWindowShadow0;,include/render.h,,Saved window shadow slot 0
-03001550,gSavedWindowShadow3,2,object,extern u16 gSavedWindowShadow3;,include/render.h,,Saved window shadow slot 3
-03001552,gSavedWindowShadow2,2,object,extern u16 gSavedWindowShadow2;,include/render.h,,Saved window shadow slot 2
-03001554,gSavedWindowShadow1,2,object,extern u16 gSavedWindowShadow1;,include/render.h,,Saved window shadow slot 1
-03001556,gSavedWinIn,2,object,extern u16 gSavedWinIn;,include/render.h,,Saved WININ register
-03001558,gSavedWinOut,2,object,extern u16 gSavedWinOut;,include/render.h,,Saved WINOUT register
-03001560,gTextTileUploadIndices,1,object,extern u8 gTextTileUploadIndices[];,include/render.h,,"Queued text tile indices; bounded storage precedes its count, original guard permits index 256"
-03001660,gTextTileUploadCount,4,object,extern u32 gTextTileUploadCount;,include/render.h,,Number of queued text tile DMA uploads
+03001548,gBgMapCacheKey,2,object,extern u16 gBgMapCacheKey;,include/render.h,low,"Last compressed BG map resource key, compared before LZ77 unpacking (tentative cache name)"
+0300154C,gSavedDispCnt,2,object,extern u16 gSavedDispCnt;,include/render.h,low,DISPCNT saved by Video_SaveDisplayControl
+0300154E,gSavedWindowShadow0,2,object,extern u16 gSavedWindowShadow0;,include/render.h,low,Saved window shadow slot 0
+03001550,gSavedWindowShadow3,2,object,extern u16 gSavedWindowShadow3;,include/render.h,low,Saved window shadow slot 3
+03001552,gSavedWindowShadow2,2,object,extern u16 gSavedWindowShadow2;,include/render.h,low,Saved window shadow slot 2
+03001554,gSavedWindowShadow1,2,object,extern u16 gSavedWindowShadow1;,include/render.h,low,Saved window shadow slot 1
+03001556,gSavedWinIn,2,object,extern u16 gSavedWinIn;,include/render.h,low,Saved WININ register
+03001558,gSavedWinOut,2,object,extern u16 gSavedWinOut;,include/render.h,low,Saved WINOUT register
+03001560,gTextTileUploadIndices,1,object,extern u8 gTextTileUploadIndices[];,include/render.h,low,"Queued text tile indices; bounded storage precedes its count, original guard permits index 256"
+03001660,gTextTileUploadCount,4,object,extern u32 gTextTileUploadCount;,include/render.h,low,Number of queued text tile DMA uploads
 03001664,gFontResource,4,object,extern struct FontResource *gFontResource;,include/text.h,high physical shape; tentative narrow/wide interpretation,Heap copy of a 12-byte font header: two u16 glyph counts and two relocated u32 glyph-data addresses
 03001668,gRootTask,18,object,extern struct RuntimeTask gRootTask;,include/runtime.h,high callback identity,Static scheduler root task calling TaskSystem_UpdateRoot at priority 0
-03001680,gMessageQueueBufferIndex,4,object,extern u32 gMessageQueueBufferIndex;,include/runtime.h,,"Active double-buffered message queue index, toggled by MessageQueue_SwapBuffers"
-03001684,gTrapDispatchStarted,4,object,extern u32 gTrapDispatchStarted;,include/runtime.h,,Set by Trap_UpdateProbeContacts and reset when boxes are loaded
+03001680,gMessageQueueBufferIndex,4,object,extern u32 gMessageQueueBufferIndex;,include/runtime.h,low,"Active double-buffered message queue index, toggled by MessageQueue_SwapBuffers"
+03001684,gTrapDispatchStarted,4,object,extern u32 gTrapDispatchStarted;,include/runtime.h,low,Set by Trap_UpdateProbeContacts and reset when boxes are loaded
 03001688,gColliderManager,4,object,extern u8 *gColliderManager;,include/ram.h,low,
-03001690,gSerialByteReceiveWrite,4,object,extern s32 gSerialByteReceiveWrite;,include/serial.h,,Write cursor of the 64-byte serial receive ring
-03001694,gSerialByteReceiveRead,4,object,extern s32 gSerialByteReceiveRead;,include/serial.h,,Read cursor of the 64-byte serial receive ring
-03001698,gSerialByteReceiveCount,4,object,extern s32 gSerialByteReceiveCount;,include/serial.h,,Queued receive-byte count
-0300169C,gSerialByteSendWrite,4,object,extern s32 gSerialByteSendWrite;,include/serial.h,,Write cursor of the 64-byte serial send ring
-030016A0,gSerialByteSendRead,4,object,extern s32 gSerialByteSendRead;,include/serial.h,,Read cursor of the 64-byte serial send ring
-030016A4,gSerialByteSendCount,4,object,extern s32 gSerialByteSendCount;,include/serial.h,,Queued send-byte count
-030016A8,gSerialByteReceiveBuffer,82,object,extern u8 gSerialByteReceiveBuffer[64];,include/serial.h,,64-byte receive ring; independent from the adjacent send ring
-030016E8,gSerialByteSendBuffer,40,object,extern u8 gSerialByteSendBuffer[64];,include/serial.h,,"Separate 64-byte serial send ring; direct literal base, not part of receive ring"
-03001728,gSerialQueuedSendWord,2,object,extern u16 gSerialQueuedSendWord;,include/serial.h,,Separate queued multiplayer send word; not part of either byte ring
-0300172A,gSerialActiveSendWord,2,object,extern u16 gSerialActiveSendWord;,include/serial.h,,"Current multiplayer send word, with protocol status bits"
+03001690,gSerialByteReceiveWrite,4,object,extern s32 gSerialByteReceiveWrite;,include/serial.h,low,Write cursor of the 64-byte serial receive ring
+03001694,gSerialByteReceiveRead,4,object,extern s32 gSerialByteReceiveRead;,include/serial.h,low,Read cursor of the 64-byte serial receive ring
+03001698,gSerialByteReceiveCount,4,object,extern s32 gSerialByteReceiveCount;,include/serial.h,low,Queued receive-byte count
+0300169C,gSerialByteSendWrite,4,object,extern s32 gSerialByteSendWrite;,include/serial.h,low,Write cursor of the 64-byte serial send ring
+030016A0,gSerialByteSendRead,4,object,extern s32 gSerialByteSendRead;,include/serial.h,low,Read cursor of the 64-byte serial send ring
+030016A4,gSerialByteSendCount,4,object,extern s32 gSerialByteSendCount;,include/serial.h,low,Queued send-byte count
+030016A8,gSerialByteReceiveBuffer,82,object,extern u8 gSerialByteReceiveBuffer[64];,include/serial.h,low,64-byte receive ring; independent from the adjacent send ring
+030016E8,gSerialByteSendBuffer,40,object,extern u8 gSerialByteSendBuffer[64];,include/serial.h,low,"Separate 64-byte serial send ring; direct literal base, not part of receive ring"
+03001728,gSerialQueuedSendWord,2,object,extern u16 gSerialQueuedSendWord;,include/serial.h,low,Separate queued multiplayer send word; not part of either byte ring
+0300172A,gSerialActiveSendWord,2,object,extern u16 gSerialActiveSendWord;,include/serial.h,low,"Current multiplayer send word, with protocol status bits"
 0300172C,gSerialReceiveIndex,4,object,extern u32 gSerialReceiveIndex;,include/ram.h,low,
 03001730,gSerialReceivePending,4,object,extern u32 gSerialReceivePending;,include/ram.h,low,
 03001734,gSerialLatestPacketIndex,4,object,extern u32 gSerialLatestPacketIndex;,include/ram.h,low,
-03001738,gRfuApiBuffer,,object,extern u8 gRfuApiBuffer[];,include/serial.h,,RFU API workspace passed to rfu_initializeAPI with size 0xE64
+03001738,gRfuApiBuffer,,object,extern u8 gRfuApiBuffer[];,include/serial.h,low,RFU API workspace passed to rfu_initializeAPI with size 0xE64
 030025A0,gSceneLifecycleTask,20,object,extern struct SceneRuntimeTask gSceneLifecycleTask;,include/runtime.h,high callback identity,Static scene lifecycle task; common scheduler header followed by state and counter words
 030025E8,gCommandSet,E,object,extern struct CommandSet gCommandSet;,include/ram.h,low,
 030025F8,gSceneBodyRegistry,4,object,extern struct SceneBodyRegistry *gSceneBodyRegistry;,include/scene_body_registry.h,high field offsets and subsystem,Scene body registry task pointer; linked-list first/last pointers at +18/+1C
 030025FC,gSceneStimulusState,4,object,extern struct SceneStimulusState *gSceneStimulusState;,include/scene_stimulus.h,high physical layout; provisional field semantics,Scene stimulus task pointer: eight 16-byte stimuli at +18 and sixteen exclusion-region ids at +98
 03002600,gRegionList,4,object,extern struct RegionList *gRegionList;,include/ram.h,low,
 03002604,gSolarController,4,object,extern u8 *gSolarController;,include/ram.h,low,solar sensor controller (Solar_*)
-03002608,gTransferSavedRuntimeFlag,4,object,extern u32 gTransferSavedRuntimeFlag;,include/runtime.h,,Saves 0300546C while save transfer suspends the runtime; semantic name tentative
-030035B0,gSolarMeasurementPhase,4,object,extern s32 gSolarMeasurementPhase;,include/runtime.h,,Solar timer-interrupt measurement phase
-030035B4,gSolarInterruptCounter,4,object,extern s32 gSolarInterruptCounter;,include/runtime.h,,Counter incremented during active sensor interrupts
-030035B8,gSolarLastInput,4,object,extern u32 gSolarLastInput;,include/runtime.h,,Last GPIO light-input bit observed by the timer handler; tentative name
-030035BC,gSolarGpioShadow,4,object,extern u32 gSolarGpioShadow;,include/runtime.h,,GPIO output/control shadow used by solar timer phases
-030035C0,gSolarEnabled,4,object,extern u32 gSolarEnabled;,include/runtime.h,,"Software sensor-enable flag, set by Solar_Enable and cleared by Solar_Disable"
-030035C6,gRtcProtected,1,object,extern u8 gRtcProtected;,include/runtime.h,,RTC GPIO protection flag set by Rtc_Protect and cleared by Rtc_Initialize
+03002608,gTransferSavedRuntimeFlag,4,object,extern u32 gTransferSavedRuntimeFlag;,include/runtime.h,low,Saves 0300546C while save transfer suspends the runtime; semantic name tentative
+030035B0,gSolarMeasurementPhase,4,object,extern s32 gSolarMeasurementPhase;,include/runtime.h,low,Solar timer-interrupt measurement phase
+030035B4,gSolarInterruptCounter,4,object,extern s32 gSolarInterruptCounter;,include/runtime.h,low,Counter incremented during active sensor interrupts
+030035B8,gSolarLastInput,4,object,extern u32 gSolarLastInput;,include/runtime.h,low,Last GPIO light-input bit observed by the timer handler; tentative name
+030035BC,gSolarGpioShadow,4,object,extern u32 gSolarGpioShadow;,include/runtime.h,low,GPIO output/control shadow used by solar timer phases
+030035C0,gSolarEnabled,4,object,extern u32 gSolarEnabled;,include/runtime.h,low,"Software sensor-enable flag, set by Solar_Enable and cleared by Solar_Disable"
+030035C6,gRtcProtected,1,object,extern u8 gRtcProtected;,include/runtime.h,low,RTC GPIO protection flag set by Rtc_Protect and cleared by Rtc_Initialize
 030035C8,gSoftDoubleNaN,14,object,extern struct SoftDoubleNumber gSoftDoubleNaN;,include/libgcc_numbers.h,high library source correspondence,libgcc software double-precision NaN object; 20-byte fp-bit-base number layout
 030035E0,gSoftSingleNaN,10,object,extern struct SoftSingleNumber gSoftSingleNaN;,include/libgcc_numbers.h,high library source correspondence,libgcc software floating-point NaN number object; shared fp-bit-base layout
-030035F0,SoundMainRAM_Buffer,402,object,extern u8 SoundMainRAM_Buffer[0x400];,include/sound.h,,MP2K RAM instruction buffer copied with CpuCopy32 size 0x400; next script procedure word is a separate object
-030039F0,gScriptEntryProcedure,2,object,extern u16 gScriptEntryProcedure;,include/engine_globals.h,,Script entry procedure selected by Script_SetEntryProcedure; separate from the preceding MP2K buffer
-03003A00,gScanlineDmaTarget,4,object,extern void *gScanlineDmaTarget;,include/render.h,,"HBlank DMA0 destination: the I/O register the scanline effect writes (BGnHOFS, BGnVOFS, MOSAIC, BLDY)"
-03003A04,gVideoUploadFlags,4,object,extern u32 gVideoUploadFlags;,include/runtime.h,,Video upload dirty flags; bit 0 requests OAM upload
-03003A08,gSceneEntryActive,4,object,extern u32 gSceneEntryActive;,include/runtime.h,,Set while scene-entry script runs; suppresses part of video upload task
+030035F0,SoundMainRAM_Buffer,402,object,extern u8 SoundMainRAM_Buffer[0x400];,include/sound.h,low,MP2K RAM instruction buffer copied with CpuCopy32 size 0x400; next script procedure word is a separate object
+030039F0,gScriptEntryProcedure,2,object,extern u16 gScriptEntryProcedure;,include/engine_globals.h,low,Script entry procedure selected by Script_SetEntryProcedure; separate from the preceding MP2K buffer
+03003A00,gScanlineDmaTarget,4,object,extern void *gScanlineDmaTarget;,include/render.h,low,"HBlank DMA0 destination: the I/O register the scanline effect writes (BGnHOFS, BGnVOFS, MOSAIC, BLDY)"
+03003A04,gVideoUploadFlags,4,object,extern u32 gVideoUploadFlags;,include/runtime.h,low,Video upload dirty flags; bit 0 requests OAM upload
+03003A08,gSceneEntryActive,4,object,extern u32 gSceneEntryActive;,include/runtime.h,low,Set while scene-entry script runs; suppresses part of video upload task
 03003A10,gSerialInterruptState,34,object,extern SerialIntrFunc gSerialInterruptState[];,include/ram.h,low,
-03003A14,gRfuIrqSlots,,interior,extern u8 gRfuIrqSlots[];,include/serial.h,,"Interior view of interrupt dispatch table entry 1, passed as RFU handler slots; not an independent allocation"
-03003A44,gVBlankOccurred,4,object,extern vu32 gVBlankOccurred;,include/runtime.h,,"VBlank wait latch, volatile for interrupt polling"
-03003A48,gDialogueScrollOffset,4,object,extern u32 gDialogueScrollOffset;,include/runtime.h,,Dialogue scroll/tick offset copied into the video IRQ shadow; tentative name
-03003A4C,gDialogueModeLatched,4,object,extern u32 gDialogueModeLatched;,include/runtime.h,,VBlank-latched dialogue state controlling the two-phase video IRQ; tentative name
+03003A14,gRfuIrqSlots,,interior,extern u8 gRfuIrqSlots[];,include/serial.h,low,"Interior view of interrupt dispatch table entry 1, passed as RFU handler slots; not an independent allocation"
+03003A44,gVBlankOccurred,4,object,extern vu32 gVBlankOccurred;,include/runtime.h,low,"VBlank wait latch, volatile for interrupt polling"
+03003A48,gDialogueScrollOffset,4,object,extern u32 gDialogueScrollOffset;,include/runtime.h,low,Dialogue scroll/tick offset copied into the video IRQ shadow; tentative name
+03003A4C,gDialogueModeLatched,4,object,extern u32 gDialogueModeLatched;,include/runtime.h,low,VBlank-latched dialogue state controlling the two-phase video IRQ; tentative name
 03003A50,gSceneEffectPalettePhase,4,object,extern u32 gSceneEffectPalettePhase;,include/ram.h,low,
-03003A60,gInterruptCode,800,object,extern u8 gInterruptCode[0x800];,include/runtime.h,,"IWRAM interrupt dispatcher copy, 512 words copied from IntrMain"
-03004260,gVBlankUploadPending,4,object,extern u32 gVBlankUploadPending;,include/runtime.h,,Set by VBlank and cleared when the video upload task finishes; tentative name
-03004264,gVBlankFrameCounter,4,object,extern u32 gVBlankFrameCounter;,include/runtime.h,,Counter incremented after VBlank clock/link updates
-03004268,gDialogueScrollLatched,4,object,extern u32 gDialogueScrollLatched;,include/runtime.h,,Dialogue scroll offset latched in VBlank and read as a byte by the secondary video IRQ
-0300426C,gVideoInterruptsEnabled,4,object,extern u32 gVideoInterruptsEnabled;,include/runtime.h,,Gates video register updates and link/clock work in VBlank
-03004270,gScanlineDmaCount,2,object,extern u16 gScanlineDmaCount;,include/render.h,,"HBlank DMA0 transfer count, 1 for the single-halfword/word-per-line transfers"
-03004274,gScanlineDmaMode,2,object,extern s16 gScanlineDmaMode;,include/render.h,,"HBlank DMA0 mode: 0 off, 1 halfword transfer, else word transfer (low confidence)"
-03004278,gScanlineDmaSource,4,object,extern void *gScanlineDmaSource;,include/render.h,,HBlank DMA0 source: the staged 160-line effect buffer (VBlank handler programs DMA0 SAD)
-0300427C,gVideoTransferControl,2,object,extern u16 gVideoTransferControl;,include/runtime.h,,Runtime transfer-control flag initialized to 1 and cleared around save/wireless transfer; tentative name
+03003A60,gInterruptCode,800,object,extern u8 gInterruptCode[0x800];,include/runtime.h,low,"IWRAM interrupt dispatcher copy, 512 words copied from IntrMain"
+03004260,gVBlankUploadPending,4,object,extern u32 gVBlankUploadPending;,include/runtime.h,low,Set by VBlank and cleared when the video upload task finishes; tentative name
+03004264,gVBlankFrameCounter,4,object,extern u32 gVBlankFrameCounter;,include/runtime.h,low,Counter incremented after VBlank clock/link updates
+03004268,gDialogueScrollLatched,4,object,extern u32 gDialogueScrollLatched;,include/runtime.h,low,Dialogue scroll offset latched in VBlank and read as a byte by the secondary video IRQ
+0300426C,gVideoInterruptsEnabled,4,object,extern u32 gVideoInterruptsEnabled;,include/runtime.h,low,Gates video register updates and link/clock work in VBlank
+03004270,gScanlineDmaCount,2,object,extern u16 gScanlineDmaCount;,include/render.h,low,"HBlank DMA0 transfer count, 1 for the single-halfword/word-per-line transfers"
+03004274,gScanlineDmaMode,2,object,extern s16 gScanlineDmaMode;,include/render.h,low,"HBlank DMA0 mode: 0 off, 1 halfword transfer, else word transfer (low confidence)"
+03004278,gScanlineDmaSource,4,object,extern void *gScanlineDmaSource;,include/render.h,low,HBlank DMA0 source: the staged 160-line effect buffer (VBlank handler programs DMA0 SAD)
+0300427C,gVideoTransferControl,2,object,extern u16 gVideoTransferControl;,include/runtime.h,low,Runtime transfer-control flag initialized to 1 and cleared around save/wireless transfer; tentative name
 03004280,gVBlankDialogueState,4,object,extern u32 gVBlankDialogueState;,include/render.h,high physical shape; provisional semantic name,scrolling-dialogue/video state copied during VBlank (guess)
 03004290,gRenderListIndex,4,object,extern u32 gRenderListIndex;,include/render.h,high physical shape; provisional semantic name,active list index into the three render list-head pairs
 03004294,gSpriteRenderCallback,4,object,extern u32 gSpriteRenderCallback;,include/render.h,high physical shape; provisional semantic name,"sprite render callback, called by the graphics task (function pointer)"
@@ -408,49 +408,49 @@ addr,name,size,kind,decl,header,confidence,notes
 03005234,gMosaicParam,2,object,extern u16 gMosaicParam;,include/render.h,high physical shape; provisional semantic name,packed mosaic parameter (byte and halfword accesses)
 03005238,gDefaultAnimFlags,2,object,extern u16 gDefaultAnimFlags;,include/render.h,high physical shape; provisional semantic name,default animation/widget flags
 0300523C,gEnginePauseFlags,4,object,extern u32 gEnginePauseFlags;,include/render.h,high physical shape; provisional semantic name,engine pause/suspend flags (bits 1-2: sound off; task list masks)
-03005240,gNextTaskId,2,object,extern u16 gNextTaskId;,include/engine_globals.h,,"next Task id (unique, never 0)"
+03005240,gNextTaskId,2,object,extern u16 gNextTaskId;,include/engine_globals.h,low,"next Task id (unique, never 0)"
 03005250,gLinkMenuActive,4,object,extern u32 gLinkMenuActive;,include/ram.h,low,
 03005260,gPadState,10,object,extern u16 gPadState[];,include/input.h,low,"input state: two slots of {held, pressed, released, pad}; updated by sub_08219B24"
-03005270,gHardwareKeys,2,object,extern u16 gHardwareKeys;,include/runtime.h,,Raw active-low KEYINPUT sampled before per-player input records are updated
+03005270,gHardwareKeys,2,object,extern u16 gHardwareKeys;,include/runtime.h,low,Raw active-low KEYINPUT sampled before per-player input records are updated
 03005274,gSceneSelectionDisplaySlots,A,object,extern u16 gSceneSelectionDisplaySlots[];,include/ram.h,low,
-03005278,gLcgState,4,object,extern u32 gLcgState;,include/runtime.h,,"Independent LCG state, separate from gRandomIndex at 03005274; initialized to 123456 and advanced by Random_Next15"
-03005280,gTaskLists,70,object,extern struct TaskList gTaskLists[14];,include/engine_globals.h,,task lists by priority
-030052F0,gResourceRegistryCount,4,object,extern s32 gResourceRegistryCount;,include/runtime.h,,"High-water count of resource-registry entries, capped at 32"
+03005278,gLcgState,4,object,extern u32 gLcgState;,include/runtime.h,low,"Independent LCG state, separate from gRandomIndex at 03005274; initialized to 123456 and advanced by Random_Next15"
+03005280,gTaskLists,70,object,extern struct TaskList gTaskLists[14];,include/engine_globals.h,low,task lists by priority
+030052F0,gResourceRegistryCount,4,object,extern s32 gResourceRegistryCount;,include/runtime.h,low,"High-water count of resource-registry entries, capped at 32"
 030052F4,gTerrainMap,4,object,extern struct EngineMap *gTerrainMap;,include/engine_globals.h,low,
 030052F8,gTerrainWidth,4,object,extern u32 gTerrainWidth;,include/engine_globals.h,low,
 030052FC,gTerrainHeight,4,object,extern u32 gTerrainHeight;,include/engine_globals.h,low,
 03005300,gTerrainTrapSerial,4,object,extern u32 gTerrainTrapSerial;,include/ram.h,low,
 03005304,gEffectRandomTableIndex,4,object,extern u32 gEffectRandomTableIndex;,include/ram.h,low,
 03005308,gRandomIndex,4,object,extern u32 gRandomIndex;,include/engine_globals.h,low,
-0300530C,gSerialMultiplayer1Word,2,object,extern u16 gSerialMultiplayer1Word;,include/serial.h,,Last word sampled from SIOMULTI1 by the byte-transfer interrupt
-03005310,gSerialPeer1Interrupts,4,object,extern s32 gSerialPeer1Interrupts;,include/serial.h,,Counter advanced by the SIOMULTI1 byte-transfer handler; tentative name
-03005314,gSerialInitialized,4,object,extern u32 gSerialInitialized;,include/serial.h,,Set to 1 by Serial_InitMultiplayer; no semantic reader observed here
-03005318,gSerialPeer0Interrupts,4,object,extern s32 gSerialPeer0Interrupts;,include/serial.h,,Counter advanced by the SIOMULTI0 byte-transfer handler; tentative name
+0300530C,gSerialMultiplayer1Word,2,object,extern u16 gSerialMultiplayer1Word;,include/serial.h,low,Last word sampled from SIOMULTI1 by the byte-transfer interrupt
+03005310,gSerialPeer1Interrupts,4,object,extern s32 gSerialPeer1Interrupts;,include/serial.h,low,Counter advanced by the SIOMULTI1 byte-transfer handler; tentative name
+03005314,gSerialInitialized,4,object,extern u32 gSerialInitialized;,include/serial.h,low,Set to 1 by Serial_InitMultiplayer; no semantic reader observed here
+03005318,gSerialPeer0Interrupts,4,object,extern s32 gSerialPeer0Interrupts;,include/serial.h,low,Counter advanced by the SIOMULTI0 byte-transfer handler; tentative name
 0300531C,gSerialConnectionRole,4,object,extern s32 gSerialConnectionRole;,include/ram.h,low,
-03005320,gSerialMultiplayer0Word,2,object,extern u16 gSerialMultiplayer0Word;,include/serial.h,,Last word sampled from SIOMULTI0 by the byte-transfer interrupt
+03005320,gSerialMultiplayer0Word,2,object,extern u16 gSerialMultiplayer0Word;,include/serial.h,low,Last word sampled from SIOMULTI0 by the byte-transfer interrupt
 03005324,gSerialTransferStatus,4,object,extern s32 gSerialTransferStatus;,include/ram.h,low,
-03005330,gSerialQueuedPacketCount,2,object,extern u16 gSerialQueuedPacketCount;,include/serial.h,,Number of queued four-halfword multiplayer packets
+03005330,gSerialQueuedPacketCount,2,object,extern u16 gSerialQueuedPacketCount;,include/serial.h,low,Number of queued four-halfword multiplayer packets
 03005340,gSerialLatestPackets,10,object,extern s16 gSerialLatestPackets[];,include/ram.h,low,
-03005350,gSerialPacketQueue,2,object,extern u16 gSerialPacketQueue[4][4];,include/serial.h,,"Four queued packets of four halfwords, with ring indices masked by 3"
+03005350,gSerialPacketQueue,2,object,extern u16 gSerialPacketQueue[4][4];,include/serial.h,low,"Four queued packets of four halfwords, with ring indices masked by 3"
 03005370,gSerialReceivePackets,10,object,extern s16 gSerialReceivePackets[];,include/ram.h,low,
-03005380,gSerialPacketReadIndex,2,object,extern u16 gSerialPacketReadIndex;,include/serial.h,,Current read index in the four-entry multiplayer packet ring
+03005380,gSerialPacketReadIndex,2,object,extern u16 gSerialPacketReadIndex;,include/serial.h,low,Current read index in the four-entry multiplayer packet ring
 03005390,gRfuLinkManager,48,object,extern struct RfuLinkManager gRfuLinkManager;,include/rfu_manager.h,high merged layout and SDK correspondence,"RFU link manager: named SDK prefix, byte/halfword event parameter union at +14, two VBlank timers, configuration/callback tail through +44"
-030053D8,gPlayTimeCounterEnabled,4,object,extern u32 gPlayTimeCounterEnabled;,include/runtime.h,,Enables the persistent play-time counter at game-state +0x614
-030053DC,gSceneControlWord0,4,object,extern u32 gSceneControlWord0;,include/runtime.h,,Cleared by scene transitions and Engine_ClearControlFlags; finer meaning unresolved
-030053E0,gSceneInitWord0,4,object,extern u32 gSceneInitWord0;,include/runtime.h,,Initialized to zero by the scene lifecycle manager; semantic name provisional
-030053E4,gRuntimeFrameCounter,4,object,extern u32 gRuntimeFrameCounter;,include/runtime.h,,Incremented on every scene lifecycle task update
-030053E8,gSceneTransitionFlags,4,object,extern u32 gSceneTransitionFlags;,include/runtime.h,,"Pending scene transition flags, including active-region backup/restore bits"
-030053EC,gSceneControlWord1,4,object,extern u32 gSceneControlWord1;,include/runtime.h,,Cleared by Engine_ClearControlFlags; finer meaning unresolved
+030053D8,gPlayTimeCounterEnabled,4,object,extern u32 gPlayTimeCounterEnabled;,include/runtime.h,low,Enables the persistent play-time counter at game-state +0x614
+030053DC,gSceneControlWord0,4,object,extern u32 gSceneControlWord0;,include/runtime.h,low,Cleared by scene transitions and Engine_ClearControlFlags; finer meaning unresolved
+030053E0,gSceneInitWord0,4,object,extern u32 gSceneInitWord0;,include/runtime.h,low,Initialized to zero by the scene lifecycle manager; semantic name provisional
+030053E4,gRuntimeFrameCounter,4,object,extern u32 gRuntimeFrameCounter;,include/runtime.h,low,Incremented on every scene lifecycle task update
+030053E8,gSceneTransitionFlags,4,object,extern u32 gSceneTransitionFlags;,include/runtime.h,low,"Pending scene transition flags, including active-region backup/restore bits"
+030053EC,gSceneControlWord1,4,object,extern u32 gSceneControlWord1;,include/runtime.h,low,Cleared by Engine_ClearControlFlags; finer meaning unresolved
 030053F0,gScenePauseFlags,4,object,extern u32 gScenePauseFlags;,include/ram.h,low,scene pause/mute flags (bit tests across effects and actors)
 030053F4,gEngineFlags,4,object,extern u32 gEngineFlags;,include/engine_globals.h,low,
-030053F8,gSessionState,4,object,extern u8 *gSessionState;,include/runtime.h,,Persistent/session state pointer; byte base preserves existing subsystem-specific pointee views
-030053FC,gSceneTransitionActive,4,object,extern u32 gSceneTransitionActive;,include/runtime.h,,Set during transition cleanup and cleared when the scene starts
-03005400,gSceneInitWord1,4,object,extern u32 gSceneInitWord1;,include/runtime.h,,Initialized to zero by the scene lifecycle manager; semantic name provisional
-03005404,gSleepResumePending,4,object,extern u32 gSleepResumePending;,include/runtime.h,,Set after BIOS Stop and consumed by scene runtime refresh
-03005408,gSceneDialogActive,4,object,extern s32 gSceneDialogActive;,include/runtime.h,,"Shared scene-dialog activity/control flag, retaining existing provisional aliases"
-0300540C,gSceneUnpausedFrames,4,object,extern u32 gSceneUnpausedFrames;,include/runtime.h,,Counter incremented while the scene is not paused; provisional semantic name
-03005410,gSceneControlWord2,4,object,extern u32 gSceneControlWord2;,include/runtime.h,,Cleared by Engine_ClearControlFlags; finer meaning unresolved
-03005414,gSceneControlWord3,4,object,extern u32 gSceneControlWord3;,include/runtime.h,,Cleared during transitions and by Engine_ClearControlFlags; finer meaning unresolved
+030053F8,gSessionState,4,object,extern u8 *gSessionState;,include/runtime.h,low,Persistent/session state pointer; byte base preserves existing subsystem-specific pointee views
+030053FC,gSceneTransitionActive,4,object,extern u32 gSceneTransitionActive;,include/runtime.h,low,Set during transition cleanup and cleared when the scene starts
+03005400,gSceneInitWord1,4,object,extern u32 gSceneInitWord1;,include/runtime.h,low,Initialized to zero by the scene lifecycle manager; semantic name provisional
+03005404,gSleepResumePending,4,object,extern u32 gSleepResumePending;,include/runtime.h,low,Set after BIOS Stop and consumed by scene runtime refresh
+03005408,gSceneDialogActive,4,object,extern s32 gSceneDialogActive;,include/runtime.h,low,"Shared scene-dialog activity/control flag, retaining existing provisional aliases"
+0300540C,gSceneUnpausedFrames,4,object,extern u32 gSceneUnpausedFrames;,include/runtime.h,low,Counter incremented while the scene is not paused; provisional semantic name
+03005410,gSceneControlWord2,4,object,extern u32 gSceneControlWord2;,include/runtime.h,low,Cleared by Engine_ClearControlFlags; finer meaning unresolved
+03005414,gSceneControlWord3,4,object,extern u32 gSceneControlWord3;,include/runtime.h,low,Cleared during transitions and by Engine_ClearControlFlags; finer meaning unresolved
 03005418,gCameraOrigin,8,object,extern u16 gCameraOrigin[];,include/render.h,low,"camera origin in world coordinates (x, y, z halfwords then padding): sprites and actors subtract it, then add the 120x80 screen center"
 03005420,gActiveCamera,4,object,extern u8 *gActiveCamera;,include/ram.h,low,
 03005428,gSilentGlyph,2,object,extern u16 gSilentGlyph;,include/ram.h,low,"glyph code that plays no text sound; set by Text_SetSilentCharacterFromScript, compared in TextState_PlayGlyphSound"
