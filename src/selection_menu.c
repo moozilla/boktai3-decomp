@@ -1,4 +1,5 @@
 #include "selection_menu.h"
+#include "render.h"
 #define Presentation_PlaySelectionSound sub_0801A0D0
 #define SelectionMenu_HideMarkers       sub_0801A614
 
@@ -38,7 +39,6 @@ void SelectionMenu_InitCursors(struct SelectionMenu *);
 void SelectionMenu_InitMarkers(struct SelectionMenu *);
 void sub_0801A6D0(struct SelectionMenu *);
 int SelectionMenu_NavigateGrid(struct SelectionMenu *);
-extern u8 gUnk_03005160[];
 u32 Script_GetTextSourcePc(void);
 
 u8 *SelectionMenu_GetIconPalette(s32 i);
@@ -249,7 +249,7 @@ int SelectionMenu_ConfigureLayers(int value, int mode)
     }
     {
         u8 *palette = ScriptProc_Start(0x92b3, 0x81b);
-        CpuSet(palette + 0x1b4, gUnk_03005160, 0x30);
+        CpuSet(palette + 0x1b4, gBgPaletteBank13, 0x30);
     }
     return result;
 }

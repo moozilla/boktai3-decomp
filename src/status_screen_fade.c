@@ -245,7 +245,7 @@ int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
     p->flags = Script_GetKeywordValue('f', 0);
     p->mapId = 0x5AF3;
     p->paletteId = Script_GetKeywordValue('p', 0);
-    p->buffer = gUnk_03005160;
+    p->buffer = gBgPaletteBank13;
     p->script = Script_GetKeywordValue('e', 0);
     if (Script_SeekToKeyword('a')) {
         p->args.values = p->values;

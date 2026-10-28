@@ -12,7 +12,7 @@ struct NumericOverlay {
     u16 id;
     u8 flags, bg;
     u16 mapId, paletteId;
-    u16 *buffer; // working palette (gUnk_03005160)
+    u16 *buffer; // working palette (gBgPaletteBank13)
     u16 *source; // palette resource
     u16 dirty;   // bit mask of displays to redraw (set to 15 by NumericOverlay_RefreshDisplay)
     u16 pad2A;

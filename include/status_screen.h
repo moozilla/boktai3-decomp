@@ -23,7 +23,7 @@ struct StatusScreen {
     u16 id;
     u8 flags, bg;
     u16 mapId, paletteId;
-    u16 *buffer;      // working palette (gUnk_03005160), 2 banks of 16 colors
+    u16 *buffer;      // working palette (gBgPaletteBank13), 2 banks of 16 colors
     u16 *source;      // palette resource the fades blend towards
     u16 dirty;        // bit 0/1/2: numeric displays to redraw; bit 3: palette upload
     u16 delay;        // frames to wait before starting (keyword 'w')
@@ -87,7 +87,6 @@ int StatusScreen_Update(struct StatusScreen *);
 int StatusScreen_Destroy(struct StatusScreen *);
 int StatusScreen_Initialize(struct StatusScreen *, u16 id);
 
-extern u16 gUnk_03005160[];
 extern const u16 gUnk_08604B3C[]; // default phase durations
 void Bg_SetPriority(u32, s32);
 void Bg_SetupLayer(u32, u32, void *, s32, s32, s32, s32, void *);

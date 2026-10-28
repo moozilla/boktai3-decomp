@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct NumberDisplay {
     s32 *source;
     s32 value, maximum;
@@ -11,7 +12,6 @@ struct NumberDisplay {
 void CpuSet(const void *, void *, u32);
 void Palette_InitColorTransition(void *, s32, s32, s32, s32, s32, s32, s32);
 u16 *Background_GetWrappedTileEntry(u32, s32, s32);
-extern u16 gUnk_03005160[];
 void FieldHud_UpdateNumberDisplay(struct NumberDisplay *p)
 {
     s32 value, digit;
@@ -35,7 +35,7 @@ void FieldHud_UpdateNumberDisplay(struct NumberDisplay *p)
     if (value < 0)
         value = 0;
     p->palette[7] = (p->red >> 4) | ((p->green >> 4) << 5) | ((p->blue >> 4) << 10);
-    CpuSet(p->palette, gUnk_03005160, 8);
+    CpuSet(p->palette, gBgPaletteBank13, 8);
     if (value <= p->threshold) {
         p->red += p->deltaR;
         p->green += p->deltaG;

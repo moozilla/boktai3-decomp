@@ -301,5 +301,9 @@ extern void *gScanlineDmaTarget; /* HBlank DMA0 destination: the I/O register th
 extern u16 gScanlineDmaCount; /* HBlank DMA0 transfer count, 1 for the single-halfword/word-per-line transfers */
 /* 0x03004274 */
 extern s16 gScanlineDmaMode; /* HBlank DMA0 mode: 0 off, 1 halfword transfer, else word transfer (low confidence) */
+/* 0x03005160 */
+extern u16 gBgPaletteBank13[]; /* Interior background palette bank 13, at gBgPaletteBuffer + 0x1A0 */
+/* 0x03004CC0 */
+extern struct BackgroundLayer gBgRecord3; /* Interior view of gBgRecords[3] (no consumer declares it separately) */
 
 #endif
