@@ -130,3 +130,5 @@ and field-remapping support in ramlayout would make this migration faster.
 - **030042D0 `gDrawableListHeads` (unified):** Two drawable/effect render-list heads, selected by gRenderListIndex; ramlayout before/after checks passed.
 
 - **030042EC `gSpriteTileResource` (struct):** Loader and lookup views merged: tile count +4, entry count +6, relative tile-data offset +8, eight-byte entries from +C. All three direct consumers exact in both modes.
+
+- **03004300 `gAnimationResource` (struct):** Shared animation bank header has count +4, relative section offsets +C/+10/+14 and 12-byte entries from +18. Loader and lookup remain exact in both modes.

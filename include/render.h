@@ -63,6 +63,23 @@ struct SpriteTileResource {
 
 extern struct SpriteTileResource *gSpriteTileResource;
 
+struct AnimResourceEntry {
+    u16 id;
+    u8 field2, unk03;
+    u8 field4, field5, field6, field7;
+    u32 offset;
+};
+
+struct AnimResourceHeader {
+    u32 unk00;
+    s32 count;
+    u8 unk08[4];
+    u32 offsetC, offset10, offset14;
+    struct AnimResourceEntry entries[1];
+};
+
+extern struct AnimResourceHeader *gAnimationResource;
+
 /* RAM objects; each row of symbols/ram.csv with header include/render.h. */
 extern u8 *gPaletteBankData; /* palette-bank data: 32-byte banks of sixteen RGB15 colors (AnimData_SelectPaletteBank) */
 extern u32 gVBlankDialogueState; /* scrolling-dialogue/video state copied during VBlank (guess) */

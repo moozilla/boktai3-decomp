@@ -331,7 +331,7 @@ addr,name,size,kind,decl,header,confidence,notes
 030042F4,gStaticTileCount,2,object,extern u16 gStaticTileCount;,include/render.h,high physical shape; provisional semantic name,reserved/static OBJ tile count (some files read it signed)
 030042F8,gAnimResourceSection0C,4,object,extern u8 *gAnimResourceSection0C;,include/render.h,high physical shape; provisional semantic name,resource-bank base plus header offset +0xC
 030042FC,gAnimResourceSection14,4,object,extern u8 *gAnimResourceSection14;,include/render.h,high physical shape; provisional semantic name,resource-bank base plus header offset +0x14
-03004300,gUnk_03004300,4,object,,,high physical shape; provisional semantic name,Current animation resource header
+03004300,gAnimationResource,4,object,extern struct AnimResourceHeader *gAnimationResource;,include/render.h,high merged loader/lookup layout,"Animation resource header: count +4, relative section offsets +C/+10/+14, 12-byte entries from +18"
 03004304,gArmTileUploadCount,4,object,extern u32 gArmTileUploadCount;,include/render.h,high physical shape; provisional semantic name,ARM tile-upload request count
 03004310,gUnk_03004310,80,object,,,high physical shape; provisional semantic name,"4-byte entries: angle u8, scaleX s8, scaleY s8, one unresolved byte"
 03004390,gOamBuffer,400,object,extern struct OamEntry gOamBuffer[];,include/render.h,high physical shape; provisional semantic name,"final OAM entries, 8 bytes each (128)"
