@@ -172,5 +172,12 @@ extern u8 *gConfirmPanel;          /* provisional: Registry3C9F confirmation pan
 extern void *gRegistryE7BCManager; /* provisional: registry E7BC pooled-object manager */
 extern s32 gOffsetActorAnimationRepeats; /* repeated offset-actor animation counter */
 extern s32 gHresvelgrAttackCount;        /* provisional: Hresvelgr attack-cycle counter */
+extern s32
+    gHresvelgrHazardIndex; /* nearest active growth hazard selected by Hresvelgr_UpdateHazardVisit */
+extern u32 gHresvelgrVolleyState;            /* provisional: Hresvelgr volley state word */
+extern s32 gHresvelgrVolleyCount;            /* alternating Hresvelgr volley pulse counter */
+extern struct F3E4Actor *gRegistryF3E4Actor; /* provisional: registry F3E4 singleton actor */
+extern u16
+    gSceneNpcBlendPalette[16]; /* sixteen-color output palette blended by SceneNpc_BlendPalette */
 
 #endif

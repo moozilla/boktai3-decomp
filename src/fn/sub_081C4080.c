@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct F3E4Actor {
     u8 pad0[0x18];
     u8 animData[0x1C];
@@ -27,7 +28,6 @@ struct F3E4Actor {
     void (*update)(void);
     u32 fieldF8;
 };
-extern struct F3E4Actor *gUnk_02000268;
 void RegistryF3E4_OnTaskUpdate(void *);
 void RegistryF3E4_OnTaskDestroy(void *);
 void SceneMessages_RegisterReceiver(void *, s32, s32);
@@ -42,13 +42,13 @@ static inline void setUpdate(void (*fn)(void), void (**slot)(void))
 {
     *slot = fn;
 }
-/* Registry routine F3E4: creates its task (gUnk_02000268, sprite 0x3641) for
+/* Registry routine F3E4: creates its task (gRegistryF3E4Actor, sprite 0x3641) for
    the given name: -p x y z (default 0), -c palette bank (+0x4B), registers it
    for scene messages, and -i nonzero starts it via RegistryF3E4_SetHidden, else idles
    with update RegistryF3E4_UpdateVisibleIdle (tentative). */
 struct F3E4Actor *RegistryF3E4_Create(u32 name)
 {
-    struct F3E4Actor **current = &gUnk_02000268;
+    struct F3E4Actor **current = &gRegistryF3E4Actor;
     struct F3E4Actor *p = Task_Create(8, 0xFC);
     u32 zero;
     if (p)
