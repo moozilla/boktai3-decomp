@@ -1,16 +1,45 @@
 #include "global.h"
 // confidence=low: consumes a nearby stimulus and attempts a tagged-position route.
 #define Mummy_TryStimulusRoute sub_080D453C
-#ifdef NONMATCHING
-// fuzzy: 57.0%
-// fix.py best (sweep after the inlined-insn fix)
-// Full control flow recovered; guard, helper lifetimes and flag ordering still differ.
 #include "scene_actor_chase.h"
 u8 SceneStimulus_FindOverlap(s16, s16, u16, u8, u16);
 void SceneActorPosition_ResolveTaggedPosition(void *, void *, void *, s8);
 u8 SceneActor_TryTrackNearbyPlayer(void *, void *, u32);
 void SceneGrid_SnapPositionToCellCenter(void *, u32);
 void SceneActorAttachment_RetargetNearestPlayer(void *, void *);
+struct MummyStimulusInfo {
+    u16 field4C, radius;
+    u32 field50;
+    u16 timer : 16;
+    u8 phase[1], kind;
+};
+struct MummyStimulusRouteLink {
+    u8 unknown0[8];
+    u16 *point;
+};
+struct MummyStimulusGroup {
+    u8 unknown0[0x40];
+    u16 flags, timerLimit, movementTimer;
+    u8 unknown46[6];
+    struct MummyStimulusInfo stimulus;
+    struct ContactPosition target;
+    u8 unknown60[4];
+    u32 cell;
+    void *control;
+    u8 unknown6C[8];
+    struct MummyStimulusRouteLink link;
+    u8 unknown80[0x17C];
+    void *route;
+    struct ContactPosition *destination;
+    u8 unknown204[0x20];
+    void *fallback;
+};
+struct MummyStimulusContext {
+    u8 unknown0[0x6EA];
+    u8 phase[1];
+    u8 unknown6EB[7];
+    u16 flags;
+};
 static inline u8 Mummy_TryRoute(u16 *flags, u32 mask, void *route, struct ContactPosition *from,
                                 struct ContactPosition *to)
 {
@@ -22,7 +51,7 @@ static inline u8 Mummy_TryRoute(u16 *flags, u32 mask, void *route, struct Contac
     result = Terrain_ApplyBlocked(route, from, to);
     if (result) {
         if (result != 2)
-            Memory_Clear((u8 *)from + 8, 8);
+            Memory_Clear(from + 1, 8);
         return 1;
     }
     *flags &= ~mask;
@@ -34,68 +63,97 @@ static inline u8 Mummy_TestContactFlags(struct SceneActorReactionMotion *motion,
         return 1;
     return 0;
 }
-static inline u8 Mummy_ShouldSkipStimulus(struct SceneActorRegistryResetView *a, u32 motion)
+static inline u16 KeepMotionFlags(struct SceneActorRegistryResetView *a, u32 mask, u16 **out)
 {
-    if (!(a->flags2CC & 0x200000) || (motion & 4) || (a->flags2CC & 0x100) ||
-        (a->flags2D4 & 0xE13F) || Mummy_TestContactFlags((void *)((u8 *)a + 0xDC), 16) ||
-        *(u16 *)((u8 *)a + 0x2B8) || *(u16 *)((u8 *)a + 0x178))
+    u16 *flags = &a->flags2D4;
+    u16 value = *flags;
+    value &= mask;
+    *out = flags;
+    return value;
+}
+static inline u32 ActorWordBits(struct SceneActorRegistryResetView *a, u32 mask)
+{
+    return a->flags2CC & mask;
+}
+static inline u16 ActorHalfBits(struct SceneActorRegistryResetView *a, u32 mask)
+{
+    u16 value = a->flags2D4;
+    value &= mask;
+    return value;
+}
+static inline u32 ClearActivity(u32 *flags, u32 mask)
+{
+    u32 value = *flags;
+    value &= mask;
+    *flags = value;
+    return value;
+}
+static inline u8 Mummy_ShouldSkipStimulus(u8 *object)
+{
+    struct SceneActorRegistryResetView *a = (void *)object;
+    u32 motion;
+    motion = ClearActivity(&a->flags2D0, 0xFEFFFFFF);
+    if (!ActorWordBits(a, 0x200000))
         return 1;
+    if (motion & 4)
+        return 1;
+    if (ActorWordBits(a, 0x100) || ActorHalfBits(a, 0xE13F) ||
+        Mummy_TestContactFlags((void *)&a->fieldDC, 16))
+        return 1;
+    if (((struct SceneActorRegistryResetView *)object)->field2B8)
+        return 1;
+    {
+        u16 *timer = &((struct SceneActorRegistryResetView *)object)->colliderA.responseValue;
+        object = (u8 *)timer;
+        if (*timer)
+            return 1;
+    }
     return 0;
 }
 u32 Mummy_TryStimulusRoute(struct SceneActorRegistryResetView *a)
 {
-    u8 *group;
-    u8 *body;
+    struct MummyStimulusGroup *group;
+    struct MummyStimulusContext *body;
     s8 tag;
     u32 started;
-    struct ContactPosition *target;
-    u32 motion;
-    {
-        u32 *flags = &a->flags2D0;
-        u32 mask = 0xFEFFFFFF;
-        motion = (*flags) & mask;
-        do {
-            *flags = motion;
-        } while (0);
-    }
-    if (Mummy_ShouldSkipStimulus(a, motion))
-        return 0;
-    group = (u8 *)(&a->group);
-    *((u8 *)(((u8 *)a) + 0x42A)) = 0;
+    u16 *motionFlags;
+    if (Mummy_ShouldSkipStimulus((u8 *)a))
+        goto failed;
+    group = (void *)&a->group;
+    ((struct MummyStimulusGroup *)&a->group)->stimulus.phase[0] = 0;
     started = 0;
     body = a->context;
-    tag = SceneStimulus_FindOverlap(a->position.x, a->position.z, *((u16 *)(((u8 *)a) + 0x422)),
-                                    *((u8 *)(((u8 *)a) + 0x42B)), *((u16 *)(((u8 *)a) + 0x50)));
+    tag = SceneStimulus_FindOverlap(
+        a->position.x, a->position.z, ((struct MummyStimulusGroup *)&a->group)->stimulus.radius,
+        ((struct MummyStimulusGroup *)&a->group)->stimulus.kind, (u16)a->id);
     if (tag < 0)
-        return 0;
-    if (!(*((u16 *)(((u8 *)a) + 0x428)))) {
-        *((u16 *)(((u8 *)a) + 0x428)) = 180;
-        Chase_SetCtl(a, *((void **)(group + 0x68)), 9);
+        goto failed;
+    if (!((struct MummyStimulusGroup *)&a->group)->stimulus.timer) {
+        ((struct MummyStimulusGroup *)&a->group)->stimulus.timer = 180;
+        Chase_SetCtl(a, group->control, 9);
         Chase_SetBehavior(a, 11);
         {
             u32 mask = 0x4000;
-            *((u16 *)(body + 0x6F2)) = mask | (*((u16 *)(body + 0x6F2)));
+            body->flags = mask | (body->flags);
         }
         started = 1;
     }
-    if (a->flags2D4 & 0x80) {
-        u16 *timer = (void *)(((u8 *)a) + 0x418);
+    if (KeepMotionFlags(a, 0x80, &motionFlags)) {
+        u16 *timer = &((struct MummyStimulusGroup *)&a->group)->movementTimer;
         *timer += 300;
-        if ((*timer) > (*((u16 *)(((u8 *)a) + 0x416))))
-            *timer = *((u16 *)(((u8 *)a) + 0x416));
+        if ((*timer) > (((struct MummyStimulusGroup *)&a->group)->timerLimit))
+            *timer = ((struct MummyStimulusGroup *)&a->group)->timerLimit;
     }
-    SceneActorPosition_ResolveTaggedPosition(group + 0x4C, ((u8 *)a) + 0x50,
-                                             *((void **)(group + 0x1FC)), tag);
-    target = (void *)(group + 0x58);
-    if (SceneActor_TryTrackNearbyPlayer(a, (void *)(group + 0x58), *((u32 *)(group + 0x64))))
-        return 1;
-    Chase_SnapToRoute(*((struct ContactPosition **)(group + 0x200)), group + 0x74);
-    (*((struct ContactPosition **)(group + 0x200)))->y = a->position.y;
-    (*((struct ContactPosition **)(group + 0x200)))->pad = 0;
-    SceneGrid_SnapPositionToCellCenter((void *)(group + 0x58), *((u32 *)(group + 0x64)));
-    if (!Mummy_TryRoute(&a->flags2D4, 0x200, *((void **)(group + 0x1FC)), &a->position,
-                        (void *)(group + 0x58))) {
-        Callback_InvokeActor(a, *((void **)(group + 0x224)));
+    SceneActorPosition_ResolveTaggedPosition(&group->stimulus, &a->id, group->route, tag);
+    if (SceneActor_TryTrackNearbyPlayer(a, &group->target, group->cell))
+        goto success;
+    Chase_SnapToRoute(group->destination, (u8 *)&group->link);
+    (group->destination)->y = a->position.y;
+    (group->destination)->pad = 0;
+    SceneGrid_SnapPositionToCellCenter(&group->target, group->cell);
+    if (!Mummy_TryRoute(motionFlags, 0x200, group->route, &a->position, &group->target)) {
+        Callback_InvokeActor(a, group->fallback);
+    success:
         return 1;
     }
     {
@@ -103,20 +161,22 @@ u32 Mummy_TryStimulusRoute(struct SceneActorRegistryResetView *a)
         a->flags2CC |= mask;
     }
     a->field2C2 = Div(64, 3);
-    a->flags2CC &= 0xFF7FFFFF;
-    body[0x6EA] = 4;
+    {
+        u32 mask = 0xFF7FFFFF;
+        a->flags2CC = mask & a->flags2CC;
+    }
+    body->phase[0] = 4;
     {
         u32 mask = 0x200;
-        a->flags2D4 = mask | a->flags2D4;
+        *motionFlags = mask | *motionFlags;
     }
     {
         u32 mask = 0x1000000;
         a->flags2D0 |= mask;
     }
-    SceneActorAttachment_RetargetNearestPlayer(a, (void *)(group + 0x58));
-    return started != 0;
+    SceneActorAttachment_RetargetNearestPlayer(a, &group->target);
+    if (started)
+        goto success;
+failed:
+    return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080D453C);
-#endif
