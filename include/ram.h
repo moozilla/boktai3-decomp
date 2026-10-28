@@ -215,5 +215,10 @@ extern s32
     gScreenTextSavedValue; /* provisional: value retained between screen-text menu instances */
 extern u32
     gSaveStateSignature; /* main-state save signature checked when reading and written before saving */
+extern u8 *
+    gScriptLocalVariables; /* 0x400-byte local script-variable region at selected base plus 0x1E00 */
+extern u8 *gBackupGameVariables; /* backup game-variable region at selected base plus 0x1A00 */
+extern u8 *gGameVariables;       /* active 0x400-byte game-variable region */
+extern u8 *gBackupGameState;     /* backup main-state region at selected base plus 0xB00 */
 
 #endif
