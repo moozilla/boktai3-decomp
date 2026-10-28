@@ -315,7 +315,7 @@ addr,name,size,kind,decl,header,confidence,notes
 03004280,gVBlankDialogueState,4,object,extern u32 gVBlankDialogueState;,include/render.h,high physical shape; provisional semantic name,scrolling-dialogue/video state copied during VBlank (guess)
 03004290,gRenderListIndex,4,object,extern u32 gRenderListIndex;,include/render.h,high physical shape; provisional semantic name,active list index into the three render list-head pairs
 03004294,gSpriteRenderCallback,4,object,extern u32 gSpriteRenderCallback;,include/render.h,high physical shape; provisional semantic name,"sprite render callback, called by the graphics task (function pointer)"
-030042A0,gUnk_030042A0,14,object,,,high physical shape; provisional semantic name,Inline camera/render state; merged field map
+030042A0,gCamera,14,object,extern struct CameraRenderState gCamera;,include/render.h,high physical shape; provisional semantic name,"Inline render camera; position, screen offsets and projection mode. +06 is copied, +0C/+10 initialized with unresolved meaning; distinct from active camera task."
 030042B4,gProjectedSpriteCallback,4,object,extern u32 gProjectedSpriteCallback;,include/render.h,high physical shape; provisional semantic name,projected-sprite queue callback (function pointer)
 030042B8,gExtraRenderCallback,4,object,extern u32 gExtraRenderCallback;,include/render.h,high physical shape; provisional semantic name,additional render callback (function pointer)
 030042C0,gUnk_030042C0,8,object,,,high physical shape; provisional semantic name,Sprite list heads; init loop clears two entries

@@ -25,7 +25,6 @@ struct Sprite {
     struct Sprite *next;
 };
 extern struct Sprite *gUnk_030042C0[];
-extern struct Vec gUnk_030042A0;
 void sub_08214600(struct Sprite *, s32, s32, s32);
 static inline s32 div8(s32 v)
 {
@@ -58,9 +57,9 @@ void sub_08214D20(void)
             goto next;
         }
         resource = p->resource;
-        x = div8(p->pos.x - gUnk_030042A0.x) + 120;
-        y = div8(p->pos.y - gUnk_030042A0.y) + 80;
-        z = p->pos.z - gUnk_030042A0.z;
+        x = div8(p->pos.x - gCamera.position.x) + 120;
+        y = div8(p->pos.y - gCamera.position.y) + 80;
+        z = p->pos.z - gCamera.position.z;
         if (!(p->flags & 64)) {
             if (p->flags & 4) {
                 left = x + resource->offsetX - resource->width;

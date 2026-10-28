@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct In {
     u8 pad[8];
     s16 f8;
@@ -8,12 +9,6 @@ struct Q {
     u32 f0;
     struct In *f4;
 };
-struct G {
-    u8 pad[8];
-    s16 f8;
-    s16 fa;
-};
-extern struct G gUnk_030042A0;
 s32 Script_GetKeywordValue(u32, u32);
 struct Q *ResourceRegistry_GetResource(u32);
 void Video_SetRenderCallbacks(u32, void (*)(void), void (*)(void), void (*)(void));
@@ -32,14 +27,14 @@ void Terrain_SetRenderModeFromScript(void)
         Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, Sprite_RenderScaledList,
                                  sub_08219624);
         if (p && p->f4) {
-            gUnk_030042A0.f8 = p->f4->f8 >> 4;
-            gUnk_030042A0.fa = p->f4->fa >> 4;
+            gCamera.offsetX = p->f4->f8 >> 4;
+            gCamera.offsetY = p->f4->fa >> 4;
             return;
         }
     } else {
         Video_SetRenderCallbacks(r, SpriteOam_QueueCameraRelativeSprites, sub_08214D20,
                                  sub_0821964C);
     }
-    gUnk_030042A0.f8 = 0;
-    gUnk_030042A0.fa = 0;
+    gCamera.offsetX = 0;
+    gCamera.offsetY = 0;
 }

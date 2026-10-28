@@ -36,7 +36,6 @@ struct OrbitBackgroundSelection {
 extern struct OrbitBackground *gOrbitBackground;
 extern struct OrbitBackgroundSelection *gUnk_020004B4;
 extern struct OrbitBackgroundPlayer *gUnk_02000580[4];
-extern struct ContactPosition gUnk_030042A0;
 extern s16 gUnk_03005418[];
 extern u16 gUnk_02000528;
 extern const s16 gUnk_086149C4[];

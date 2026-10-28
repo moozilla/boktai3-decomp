@@ -8,6 +8,24 @@ struct OamEntry {
     u16 tile, depth;
 };
 
+/* Inline render camera at 030042A0, distinct from the active camera task.
+ * The position's last halfword is carried by aggregate copies; meaning unknown. */
+struct CameraPosition {
+    s16 x, y, z;
+    u8 unk06[2];
+};
+
+struct CameraRenderState {
+    struct CameraPosition position;
+    s16 offsetX, offsetY;
+    u16 unk0C; /* initialized to 1 */
+    u8 unk0E[2];
+    u16 unk10; /* initialized to 0 */
+    s16 mode;
+};
+
+extern struct CameraRenderState gCamera;
+
 /* RAM objects; each row of symbols/ram.csv with header include/render.h. */
 extern u8 *gPaletteBankData; /* palette-bank data: 32-byte banks of sixteen RGB15 colors (AnimData_SelectPaletteBank) */
 extern u32 gVBlankDialogueState; /* scrolling-dialogue/video state copied during VBlank (guess) */

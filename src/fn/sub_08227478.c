@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 #include "game_state.h"
 #include "engine.h"
 #include "ram.h"
@@ -30,7 +31,6 @@ struct Camera {
     u32 f98;
 };
 
-extern struct Vec gUnk_030042A0;
 extern struct Vec gUnk_03005418;
 
 int SceneMessages_RegisterReceiver(u8 *p, int id, int kind);
@@ -44,7 +44,7 @@ static inline int project(int input)
 static inline void updateScroll(void)
 {
     struct Vec *out = &gUnk_03005418;
-    struct Vec *in = &gUnk_030042A0;
+    struct CameraPosition *in = &gCamera.position;
     int xy, height, x = in->x, z = in->z;
     out->x = project(x - z);
     xy = project(x + z);
@@ -67,9 +67,9 @@ s32 Camera_Initialize(struct Camera *c, u32 id)
     c->y = *(u16 *)(gs + 0x32) + 0x96;
     c->z = *(u16 *)(gs + 0x34);
     c->f8C = 0;
-    gUnk_030042A0.x = c->x;
-    gUnk_030042A0.y = c->y;
-    gUnk_030042A0.z = c->z;
+    gCamera.position.x = c->x;
+    gCamera.position.y = c->y;
+    gCamera.position.z = c->z;
     updateScroll();
     c->b84 = 0;
     c->b85 = 0;

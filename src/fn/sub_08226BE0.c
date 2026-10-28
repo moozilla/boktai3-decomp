@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 #include "ram.h"
 
 struct Rect {
@@ -9,7 +10,6 @@ struct Camera {
     u16 mode;
     u16 field8E, field90, field92, field94;
 };
-extern u8 gUnk_030042A0[];
 void Camera_ApplyPositionBounds(struct Camera *, void *);
 /* Camera mode 2 with limits from two ranges {start, ?, end} (+0x8E..+0x94),
    then Camera_ApplyPositionBounds (tentative). */
@@ -22,6 +22,6 @@ void Camera_SetBounds(struct Rect *a, struct Rect *b)
         c->field92 = b->w - b->x;
         c->field94 = b->w + b->x - b->y;
         c->mode = 2;
-        Camera_ApplyPositionBounds(c, gUnk_030042A0);
+        Camera_ApplyPositionBounds(c, &gCamera.position);
     }
 }

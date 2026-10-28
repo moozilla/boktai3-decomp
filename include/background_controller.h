@@ -134,15 +134,6 @@ struct BackgroundLayer {
     u8 unk24[12];
 };
 
-/* Camera block; x/y and offsetX/offsetY are read by all controllers. */
-struct Camera {
-    s16 x, y;
-    s16 unk4, unk6;
-    s16 offsetX, offsetY;
-    s16 unkC[3];
-    s16 mode;
-};
-
 /* Dimensions record found through a resource reference (x/y at 8/10). */
 struct BackgroundDimensions {
     s16 unk00[4];
@@ -177,7 +168,6 @@ struct BackgroundMapEntry {
 extern struct Background *gBackgrounds[];
 extern struct ScrollingBackground *gScrollingBackgrounds[];
 extern struct BackgroundLayer gUnk_03004C30[];
-extern struct Camera gUnk_030042A0;
 extern s16 gUnk_03005418[2];
 extern u16 gUnk_02000550, gUnk_0200053C;
 

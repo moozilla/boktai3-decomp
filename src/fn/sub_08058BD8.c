@@ -1,3 +1,4 @@
+#include "render.h"
 #include "scene_panel_overlay.h"
 
 // MATCHING_CONCESSION: register-pinning
@@ -78,8 +79,8 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
             projectedPointer->z = projectedZ;
         }
     }
-    centerX = projectedRead->x + gUnk_030042A0.offsetX;
-    centerY = projected.y + gUnk_030042A0.offsetY;
+    centerX = projectedRead->x + gCamera.offsetX;
+    centerY = projected.y + gCamera.offsetY;
     centerX = truncate3(centerX);
     centerY = truncate3(centerY) & ~1;
     centerX -= tileX;

@@ -1,3 +1,4 @@
+#include "render.h"
 #include "orbit_background.h"
 // MATCHING_CONCESSION: register-pinning
 static inline s32 scale(s32 value)
@@ -22,15 +23,15 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
             weight = 8 - background->blendFrame;
             denominator = weight + 1;
             background->position.x =
-                Div(background->position.x * weight + gUnk_030042A0.x, denominator);
+                Div(background->position.x * weight + gCamera.position.x, denominator);
             background->position.y =
-                Div(background->position.y * weight + gUnk_030042A0.y, denominator);
-            finalZ = Div(background->position.z * weight + gUnk_030042A0.z, denominator);
+                Div(background->position.y * weight + gCamera.position.y, denominator);
+            finalZ = Div(background->position.z * weight + gCamera.position.z, denominator);
         } else {
             background->blendFrame = 8;
-            background->position.x = gUnk_030042A0.x;
-            background->position.y = gUnk_030042A0.y;
-            finalZ = (u16)gUnk_030042A0.z;
+            background->position.x = gCamera.position.x;
+            background->position.y = gCamera.position.y;
+            finalZ = (u16)gCamera.position.z;
         }
     } else {
         if (gUnk_02000580[background->playerIndex]->targetActive) {

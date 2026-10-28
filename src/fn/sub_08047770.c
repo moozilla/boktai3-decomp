@@ -1,9 +1,10 @@
+#include "render.h"
 // MATCHING_CONCESSION: register-pinning
 #include "background_flash.h"
 void BackgroundFlash_UpdateScrolling(struct BackgroundFlashController *controller)
 {
-    s32 cameraX = gUnk_03005418[0] + gUnk_030042A0.offsetX;
-    s32 cameraY = gUnk_03005418[1] + gUnk_030042A0.offsetY;
+    s32 cameraX = gUnk_03005418[0] + gCamera.offsetX;
+    s32 cameraY = gUnk_03005418[1] + gCamera.offsetY;
     register u32 frame asm("r1");
     s32 x, y, tileX, tileY;
     if (!controller->retargetTimer) {

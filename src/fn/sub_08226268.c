@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct Vec {
     s16 x, y, z;
@@ -15,7 +16,6 @@ struct Camera {
 };
 
 extern struct Camera *gActiveCamera;
-extern struct Vec gUnk_030042A0;
 extern struct Vec gUnk_03005418;
 
 static inline int project(int input)
@@ -33,12 +33,12 @@ void Camera_SnapTo(struct Vec *pos)
         c->pos.x = pos->x;
         c->pos.y = pos->y;
         c->pos.z = pos->z;
-        gUnk_030042A0.x = c->pos.x;
-        gUnk_030042A0.y = c->pos.y;
-        gUnk_030042A0.z = c->pos.z;
+        gCamera.position.x = c->pos.x;
+        gCamera.position.y = c->pos.y;
+        gCamera.position.z = c->pos.z;
         {
             struct Vec *out = &gUnk_03005418;
-            struct Vec *in = &gUnk_030042A0;
+            struct CameraPosition *in = &gCamera.position;
             int xy, height, x = in->x, z = in->z;
             out->x = project(x - z);
             xy = project(x + z);
