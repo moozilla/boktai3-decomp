@@ -99,7 +99,7 @@ extern u32 gSpriteNoticeManager;
 /* 0x03001688 */
 extern u8 *gColliderManager;
 extern void *gSceneComposite;
-extern u16 gTrackedPlayerId;
+extern u16 gTrackedPlayerId[4];
 extern u32 gActorParticlePool;
 extern u32 gGrowthHazardManager;
 extern struct FragmentBurstPool *gSpriteGroupPool;

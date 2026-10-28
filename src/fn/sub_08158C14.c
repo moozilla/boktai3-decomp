@@ -15,7 +15,7 @@ void Player_ResetLinkState(void)
     *(u16 *)0x02000544 = 0;
     for (i = 0; i < 4; i++) {
         gPlayers[i] = 0;
-        ((u16 *)&gTrackedPlayerId)[i] = 0;
+        gTrackedPlayerId[i] = 0;
         gUnk_02000560[i] = 0;
     }
 

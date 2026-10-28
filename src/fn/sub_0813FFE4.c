@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 #include "engine.h"
 #include "contact_actor.h"
 void sub_0813FE30(void *);
@@ -7,7 +8,6 @@ void SceneBody_SetKeyframeDisplay(void *, void *);
 void SceneBody_SetMovementProbe(void *, void *, s32, s32);
 void SceneBody_SetPositionOffset(void *, void *);
 u32 SceneActorContacts_RegisterNode(void *, void *, u32);
-extern u16 gTrackedPlayerId[];
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void SceneBody_Init(void *, u32, struct ContactPackedVector *, u32, u32, void *);
 u32 Player_InitBodyFromScript(u8 *owner, s32 entry)

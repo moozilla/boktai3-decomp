@@ -160,7 +160,7 @@ u8 Mummy_ProcessContactPursuit(struct SceneActorRegistryResetView *actor)
         return 0;
     if (!Chase_Bits32(&actor->flags2D0, 0x1000000))
         return 0;
-    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId)
+    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId[0])
         return 0;
     target = (void *)(&actor->fieldDC);
     ((struct MummyContactState *)target)->flags |= 2;
@@ -210,7 +210,7 @@ u8 Mummy_ProcessContactPursuit(struct SceneActorRegistryResetView *actor)
         goto restore;
     if (actor->field2C2 != 64)
         return 0;
-    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId)
+    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId[0])
         return 0;
     actor->flags2D6 |= 0x100;
 restore:

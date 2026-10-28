@@ -766,7 +766,7 @@ def cmd_dedupe(a):
         bad = [p for p, b, f in zip(verify, before, after) if any(f[k] != v for k, v in b.items() if "ERROR" not in v[:9])]
         if bad:
             write(cur, [h])
-            print(f"  {h}: skipped, assembly differs in {len(bad)} files, e.g. {bad[0]}")
+            print(f"  {h}: skipped, assembly differs in {len(bad)} files: {" ".join(bad[:10])}")
             continue
         cur = trial
         kept.append(h)

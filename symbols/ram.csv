@@ -190,7 +190,7 @@ addr,name,size,kind,decl,header,confidence,notes
 020004F0,gParticipantActors,8,object,extern struct ScenePoolPlayer *gParticipantActors[2];,include/scene_pool.h,low,per-participant actors
 02000500,gPlayerInteractionMode,2,object,extern u16 gPlayerInteractionMode;,include/ram.h,low,provisional: player interaction and passage mode halfword
 02000504,gPlayerSavedMenuOption,2,object,extern u16 gPlayerSavedMenuOption;,include/ram.h,low,saved menu option restored when the second script-status slot is set
-02000508,gTrackedPlayerId,2,object,extern u16 gTrackedPlayerId;,include/ram.h,low,
+02000508,gTrackedPlayerId,8,object,extern u16 gTrackedPlayerId[4];,include/ram.h,low,
 02000514,gPlayerLinkAttackBonus,2,object,extern u16 gPlayerLinkAttackBonus;,include/ram.h,low,provisional: link action-mode attack bonus override
 02000518,gPlayerCueTimer,2,object,extern u16 gPlayerCueTimer;,include/ram.h,low,
 02000520,gPlayerScriptState,2,object,extern u16 gPlayerScriptState;,include/ram.h,low,provisional: shared player script-state halfword

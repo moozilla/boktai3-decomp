@@ -568,8 +568,6 @@ void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
     p->counter++;
 }
 
-extern u32 gEffectRandomTableIndex;
-
 extern u16 gUnk_086141BC[];
 
 // MATCHING_CONCESSION: register-pinning
@@ -1503,6 +1501,7 @@ void GridAttack_UpdateActionController(struct GridAttackActor *p)
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #include "player.h"
+#include "ram.h"
 // Drawable layout shared with ActorDisplay_UpdateForegroundSprite.
 struct Drawable {
     struct ContactSwarmSprite sprite;

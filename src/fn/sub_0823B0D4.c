@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 /* tentative: reads the script position and sets up the body, probe and contact node */
 
@@ -17,7 +18,6 @@ void CellObject_Init(void *, void *);
 void SceneBody_SetMovementProbe(void *, void *, s32, s32);
 u32 SceneBody_SetPositionOffset(void *, struct Vec16 *);
 u32 SceneActorContacts_RegisterNode(void *, void *, u32);
-extern u16 gTrackedPlayerId[];
 
 u32 KeyframeActor_InitBodyFromScript(u8 *p, u32 entry)
 {

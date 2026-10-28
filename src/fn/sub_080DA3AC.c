@@ -35,7 +35,7 @@ s32 SceneActor_TryTrackNearbyPlayer(struct SceneActorRegistryResetView *actor,
     struct ContactPosition *position;
     u32 distance;
     struct SceneActorReactionMotion *motion;
-    if (playerId != gTrackedPlayerId)
+    if (playerId != gTrackedPlayerId[0])
         goto fail;
     {
         struct Player *player = gPlayers[0];

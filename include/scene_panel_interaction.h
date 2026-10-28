@@ -21,7 +21,6 @@ struct ScenePanelInteractionPackedPosition {
     u32 z : 16;
 };
 
-extern struct TetherActor *gTetherActor;
 #define SCENE_PANEL_PLAYER ((struct ScenePanelInteractionPlayer *)gPlayers[0])
 s32 ScenePanel_IsWithinHorizontalRadius(const struct ContactPosition *,
                                         const struct ContactPosition *, s32);

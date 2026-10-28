@@ -205,7 +205,7 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
     u8 *body = actor->context;
     u8 *group = (u8 *)(&actor->group);
     s32 goal = *((u16 *)((*((u8 **)(actor->fieldDC + 0x1c))) + 6));
-    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId)
+    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId[0])
         return 0;
     if (goal == actor->terrainCell)
         return 1;
