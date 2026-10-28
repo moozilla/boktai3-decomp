@@ -3,6 +3,7 @@
 #include "ram.h"
 #include "engine_globals.h"
 #include "input.h"
+#include "area_effect_link.h"
 #ifdef NONMATCHING
 // fuzzy: 97.2%
 // fix.py best (sweep after the inlined-insn fix)
@@ -87,7 +88,6 @@ void Actor_ClampMovementSpeed(struct Obj *);
 void Glove_SetAnimationKeyframes(struct Glove *, s32);
 s32 ActorRecoil_UpdateMotion(struct Glove *);
 void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
-extern u8 *gUnk_020004B4;
 
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 void Trigger_ConsumePending(void *, s32);
@@ -114,9 +114,9 @@ static inline u32 Mode(u32 mask)
 }
 static inline s32 Slot(void)
 {
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         return -1;
-    return S16(gUnk_020004B4, 0x18);
+    return S16(gLinkSession, 0x18);
 }
 static inline void SetCallback(struct Glove *p, void (*fn)(void *), s32 zero)
 {
@@ -218,7 +218,7 @@ s32 Glove_InitFromScript(struct Glove *p)
     }
     if (Mode_1()) {
         if (p->participant == Slot()) {
-            void *ref = gUnk_020004B4;
+            void *ref = gLinkSession;
             void *optional;
             if (ref && ((*((u8 *)(((u8 *)ref) + 0x53))) == 1))
                 optional = ((u8 *)ref) + 0x260;

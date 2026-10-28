@@ -23,12 +23,12 @@ struct LinkAura {
     u8 pad53A[0xaf2 - 0x53a];
     u16 fade;
 };
-extern struct LinkSide *gUnk_020004B4;
+extern struct LinkSide *gLinkSession;
 extern struct LinkAura *gUnk_02000580[];
 void Player_PlayLocalSong(s32, s32);
 static inline s32 LinkAura_LocalSide(void)
 {
-    struct LinkSide *a = gUnk_020004B4;
+    struct LinkSide *a = gLinkSession;
     if (a == 0)
         return -1;
     return a->side;

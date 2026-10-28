@@ -6,7 +6,7 @@ void Registry1745_ToggleConnectionRole(struct AreaEffectLinkState *);
 void LinkSession_UpdatePlayerValueAverage(struct AreaEffectLinkState *);
 static inline u8 ReceiveBit(void)
 {
-    struct AreaEffectLinkState *p = gUnk_020004B4;
+    struct AreaEffectLinkState *p = gLinkSession;
     if (!p)
         return 0;
     return (p->receiveBits >> p->receiveBit) & 1;
@@ -29,7 +29,7 @@ void LinkSelection_AdvanceBitExchange(struct AreaEffectLinkState *p, u32 flags, 
             } while (i < p->participantCount);
         }
     }
-    if (gUnk_020004B4 && gUnk_020004B4->localPlayer == 0 && p->receiveBit == 5)
+    if (gLinkSession && gLinkSession->localPlayer == 0 && p->receiveBit == 5)
         *value |= 8;
     *value |= ReceiveBit() << 2;
     p->receiveBit++;

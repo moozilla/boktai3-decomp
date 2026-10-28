@@ -66,7 +66,7 @@ void Glove_InitializeStyleModifiers(struct Glove *p)
     u32 mask = 0x800;
     if ((gEngineFlags | gScenePauseFlags) & mask) {
         s32 player = p->participant;
-        register struct AreaEffectLinkState *link asm("r1") = gUnk_020004B4;
+        register struct AreaEffectLinkState *link asm("r1") = gLinkSession;
         struct LinkStylePayload *payload;
         s32 i;
         if (!link || link->unavailable != 1 || !ValidParticipant(player))

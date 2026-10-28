@@ -29,9 +29,9 @@ static inline u8 F0807D2E0_Test(u32 value, u32 mask)
 
 static inline s32 F0807D2E0_LocalPlayer(void)
 {
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         return -1;
-    return gUnk_020004B4->localPlayer;
+    return gLinkSession->localPlayer;
 }
 
 static inline u8 F0807D2E0_ShouldShow(struct SceneActorRegistryResetView *actor)

@@ -31,14 +31,14 @@ static inline s32 ClampScore(struct LinkScorePanel *panel)
 }
 void LinkScorePanel_UpdateDisplayedScore(struct LinkScorePanel *panel)
 {
-    struct AreaEffectLinkState *link = gUnk_020004B4;
+    struct AreaEffectLinkState *link = gLinkSession;
     struct AreaEffectLinkState *link2;
     s32 i, v;
     u8 ok;
 
     if (link == NULL || link->unavailable != 1)
         goto zero;
-    link2 = gUnk_020004B4;
+    link2 = gLinkSession;
     i = link2->localPlayer;
     if (i >= 0)
         goto hi;

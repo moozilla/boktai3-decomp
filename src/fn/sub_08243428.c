@@ -8,13 +8,13 @@ struct LinkRef {
     u8 unk0[0x18];
     s16 bit;
 };
-extern struct LinkRef *gUnk_020004B4;
+extern struct LinkRef *gLinkSession;
 
 static inline s32 LocalPlayer(void)
 {
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         return -1;
-    return gUnk_020004B4->bit;
+    return gLinkSession->bit;
 }
 
 static inline u32 Busy(struct Player *p)

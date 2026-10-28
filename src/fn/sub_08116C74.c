@@ -2,14 +2,13 @@
 #include "area_effect_link.h"
 #include "engine.h"
 #include "ram.h"
-#define gLinkSelection gUnk_020004B4
 struct LinkParticipant {
     u8 unknown0[0x8F8];
     s8 playerIndex;
 };
 static inline s32 LinkSelection_GetLocalPlayer(void)
 {
-    struct AreaEffectLinkState *selection = gUnk_020004B4;
+    struct AreaEffectLinkState *selection = gLinkSession;
     if (!selection)
         return -1;
     return selection->localPlayer;

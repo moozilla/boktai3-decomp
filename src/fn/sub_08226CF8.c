@@ -25,7 +25,7 @@ struct LinkState {
     u8 unknown0[0x18];
     s16 player;
 };
-extern struct LinkState *gUnk_020004B4;
+extern struct LinkState *gLinkSession;
 extern struct Player *gUnk_02000580[4];
 s32 Div(s32, s32);
 
@@ -41,7 +41,7 @@ void sub_08226CF8(struct Camera2 *camera)
     switch (camera->mode) {
         case 0:
             if (gEngineFlags & 0x800) {
-                struct LinkState *link = gUnk_020004B4;
+                struct LinkState *link = gLinkSession;
                 {
                     s16 index;
                     if (link && (index = link->player) >= 0) {

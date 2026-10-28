@@ -1,4 +1,5 @@
 #include "global.h"
+#include "area_effect_link.h"
 u16 *Hud_GetTilemapCell(int, int, int);
 struct SlotOwner {
     u8 unknown0[0x53];
@@ -6,13 +7,12 @@ struct SlotOwner {
     u8 unknown54[0x164 - 0x54];
     u8 slots[5];
 };
-extern struct SlotOwner *gUnk_020004B4;
 void SceneHud_DrawSlotMarkers(void)
 {
     u8 *src;
     u16 *dst;
     int i;
-    struct SlotOwner *owner = gUnk_020004B4;
+    struct SlotOwner *owner = gLinkSession;
     if (owner) {
         u8 f = owner->flag;
         src = owner->slots;

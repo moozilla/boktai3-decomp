@@ -177,7 +177,7 @@ addr,name,size,kind,decl,header,confidence,notes
 020004A8,gSceneActorRegistryManager,4,object,extern struct SceneActorRegistryManager *gSceneActorRegistryManager;,include/scene_actor_registry.h,low,
 020004AC,gSceneActorRegistryNode,4,object,extern struct SceneActorRegistryNode *gSceneActorRegistryNode;,include/scene_actor_registry.h,low,
 020004B0,gSlotMonitor,4,object,extern u32 gSlotMonitor;,include/ram.h,low,
-020004B4,gUnk_020004B4,4,object,,,,
+020004B4,gLinkSession,4,object,extern struct AreaEffectLinkState *gLinkSession;,include/area_effect_link.h,low,link session / menu peer object
 020004B8,gSceneCamera,4,object,extern struct Camera *gSceneCamera;,include/background_controller.h,low,scene camera object
 020004BC,gPanelSpritePool,4,object,extern u8 *gPanelSpritePool;,include/ram.h,low,
 020004C0,gSpriteSlots,4,object,extern u32 gSpriteSlots;,include/ram.h,low,

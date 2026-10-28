@@ -45,7 +45,7 @@ static inline s32 scale(s32 v)
 }
 static inline u16 linkValue(s32 index)
 {
-    struct AreaEffectLinkState *link = gUnk_020004B4;
+    struct AreaEffectLinkState *link = gLinkSession;
     if (!link || index < 0)
         return 0;
     return link->playerValues[index];

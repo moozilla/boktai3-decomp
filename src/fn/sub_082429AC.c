@@ -7,7 +7,7 @@ struct LinkRefs {
     u8 unk0[0x5c];
     u8 charge[8];
 };
-extern struct LinkRefs *gUnk_020004B4;
+extern struct LinkRefs *gLinkSession;
 extern u32 gUnk_08E87A90[];
 extern const s16 gUnk_086149C4[];
 void Player_AccumulateActionCharge(struct Player *, s32);
@@ -57,9 +57,9 @@ static inline void FlagOr(u32 m, u32 *f)
 }
 static inline u8 Charge(s32 slot)
 {
-    if (!gUnk_020004B4 || slot < 0)
+    if (!gLinkSession || slot < 0)
         return 0;
-    return gUnk_020004B4->charge[slot];
+    return gLinkSession->charge[slot];
 }
 static inline s32 IsScene5(struct Player *p)
 {

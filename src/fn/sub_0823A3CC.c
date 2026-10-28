@@ -17,9 +17,9 @@ void DirectionalEffect_Init(u8 *);
 
 static inline s32 LocalPlayer(void)
 {
-    if (gUnk_020004B4 == NULL)
+    if (gLinkSession == NULL)
         return -1;
-    return gUnk_020004B4->localPlayer;
+    return gLinkSession->localPlayer;
 }
 
 // confidence=low: initializes a link player actor: shadow, effects and state bytes.

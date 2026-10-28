@@ -64,7 +64,7 @@ struct RecScore {
     s16 losses;
     s16 draws;
 };
-extern struct RecActor *gUnk_020004B4;
+extern struct RecActor *gLinkSession;
 extern struct RecScore *gGameState;
 void Anim_SelectWidgetGlyph(void *, void *, u16);
 void Sound_PlayTrackedSong(u32);
@@ -80,7 +80,7 @@ static inline s32 Clamp999(s32 x)
 #define CLAMP_SCORE(field, off) *(s16 *)((u8 *)gGameState + off) = Clamp999(gGameState->field);
 static inline s32 ActorSide(void)
 {
-    struct RecActor *a = gUnk_020004B4;
+    struct RecActor *a = gLinkSession;
     if (a == 0)
         return -1;
     return a->side;
@@ -91,7 +91,7 @@ void RecordMenu_DrawRecords(struct RecordMenu *menu)
     u16 *cell;
     s32 i;
     {
-        struct RecActor *a = gUnk_020004B4;
+        struct RecActor *a = gLinkSession;
         u8 f;
         if (a != 0) {
             f = a->flag;
@@ -118,13 +118,13 @@ void RecordMenu_DrawRecords(struct RecordMenu *menu)
         menu->sprites[4].x = 0;
         menu->sprites[5].x = 0x90;
     } else if (rec->ticksA < rec->ticksB) {
-        if (gUnk_020004B4 != 0 && gUnk_020004B4->side == 0)
+        if (gLinkSession != 0 && gLinkSession->side == 0)
             gGameState->wins++;
         else
             gGameState->losses++;
         menu->sprites[4].x = 0;
         menu->sprites[5].x = 0x90;
-        if (gUnk_020004B4 != 0 && gUnk_020004B4->side == 0)
+        if (gLinkSession != 0 && gLinkSession->side == 0)
             Sound_PlayTrackedSong(0xa9);
     } else {
         s32 side = ActorSide();

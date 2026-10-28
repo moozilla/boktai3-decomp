@@ -1,6 +1,7 @@
 #include "global.h"
 #include "ram.h"
 #include "engine_globals.h"
+#include "area_effect_link.h"
 
 struct Position {
     s32 x, y, z;
@@ -74,7 +75,6 @@ struct ScriptArgs {
     u32 : 16;
     s32 *values;
 };
-extern struct LinkMenu *gUnk_020004B4;
 void Registry1745_SetMenuRequest(u32);
 s32 GameState_GetResultIndex(void);
 void Script_Call(u32, void *);
@@ -103,7 +103,7 @@ static inline void StoreValue(s32 *out, s32 value)
 }
 static inline u32 *LinkResult(void)
 {
-    struct LinkMenu *p = gUnk_020004B4;
+    struct LinkMenu *p = ((struct LinkMenu *)gLinkSession);
     u32 *result;
     if (p) {
         u32 type = p->type;
@@ -116,9 +116,9 @@ static inline u32 *LinkResult(void)
 }
 static inline s32 LinkParticipant(void)
 {
-    if (!gUnk_020004B4)
+    if (!((struct LinkMenu *)gLinkSession))
         return -1;
-    return gUnk_020004B4->participant;
+    return ((struct LinkMenu *)gLinkSession)->participant;
 }
 static inline void AddFlags(u32 mask, u16 *flags)
 {

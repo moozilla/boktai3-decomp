@@ -42,7 +42,7 @@ void SceneStatusIndicator_UpdateBlink(void *owner, struct StatusSlot *input)
         p->reset = active;
     if (gEngineFlags & 0x800) {
         s32 local;
-        if (gUnk_020004B4 && (local = gUnk_020004B4->localPlayer) >= 0) {
+        if (gLinkSession && (local = gLinkSession->localPlayer) >= 0) {
             if (!PlayerInMode(gUnk_02000580[local]))
                 goto checkActive;
             goto show;

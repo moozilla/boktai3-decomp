@@ -1,9 +1,8 @@
-#define gLinkSessionState gUnk_020004B4
 #include "global.h"
 #include "area_effect_link.h"
 s32 LinkSession_CountPlayerKind(s32 kind)
 {
-    struct AreaEffectLinkState *p = gUnk_020004B4;
+    struct AreaEffectLinkState *p = gLinkSession;
     s32 count, i;
     if (!p || p->unavailable || !p->sessionData)
         return -1;

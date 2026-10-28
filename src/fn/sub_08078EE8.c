@@ -5,7 +5,7 @@
 #include "engine_globals.h"
 
 extern u8 *gGameState;
-extern u32 gUnk_020004B4;
+extern u32 gLinkSession;
 extern s32 gUnk_02000478;
 extern u16 gUnk_02000534;
 extern u16 gUnk_02000500;
@@ -307,9 +307,9 @@ s32 sub_08078EE8(struct SceneActorRegistryActor *arg0_)
 
     /* scene transition when a special mode is active */
     if (gEngineFlags & 0x4800) {
-        if (gUnk_020004B4 == 0)
+        if (gLinkSession == 0)
             goto pal_done;
-        res = *(s16 *)(gUnk_020004B4 + 0x18);
+        res = *(s16 *)(gLinkSession + 0x18);
         if ((s32)res < 0)
             goto pal_done;
     } else {

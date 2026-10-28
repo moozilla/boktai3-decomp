@@ -56,9 +56,9 @@ void SceneActorMovement_ProjectProbe(void *, u32, u32);
 void SceneActorReaction_PlayStaggerBurst(void);
 static inline s32 LocalPlayer(void)
 {
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         return -1;
-    return gUnk_020004B4->localPlayer;
+    return gLinkSession->localPlayer;
 }
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {

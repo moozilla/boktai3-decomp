@@ -1,4 +1,5 @@
 #include "global.h"
+#include "area_effect_link.h"
 struct S {
     u32 f0[7];
     u32 g;
@@ -20,7 +21,6 @@ struct G {
     u8 f[0x1c];
     u8 b;
 };
-extern struct G *gUnk_020004B4;
 void LinkScorePanel_HideSprites(struct S *);
 void Bg_ClearTilemap(s32);
 void Bg_SetLayerMap(s32, u32, s32);
@@ -57,7 +57,7 @@ void LinkScorePanel_OnWaitSessionReady(struct S *s)
         Registry1745_RequestHandshakeStart();
         s->c24 = 0;
     }
-    g = gUnk_020004B4;
+    g = gLinkSession;
     v = -1;
     if (g != 0)
         v = g->b;

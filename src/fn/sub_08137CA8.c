@@ -1,4 +1,3 @@
-#define gLinkSession     gUnk_020004B4
 #define gPlayerSlots     gUnk_02000580
 #define gPlayerSlotFlags gUnk_02000560
 #include "global.h"

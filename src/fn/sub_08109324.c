@@ -1,8 +1,8 @@
 #include "global.h"
-extern u8 *gUnk_020004B4;
+#include "area_effect_link.h"
 
 void sub_08109324(void)
 {
-    if (gUnk_020004B4 != 0)
-        gUnk_020004B4[0x25] = 1;
+    if (((u8 *)gLinkSession) != 0)
+        ((u8 *)gLinkSession)[0x25] = 1;
 }

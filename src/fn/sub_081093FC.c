@@ -20,7 +20,7 @@ void LinkSession_CallPositionScript(struct AreaEffectPosition *position, s32 val
 {
     s32 values[6];
     struct LinkScriptArgs args;
-    struct AreaEffectLinkState *p = gUnk_020004B4;
+    struct AreaEffectLinkState *p = gLinkSession;
     if (LinkSession_GetData(p)) {
         values[0] = position->x;
         values[1] = position->y;

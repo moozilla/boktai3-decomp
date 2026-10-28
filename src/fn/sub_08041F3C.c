@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
-extern struct ModifierMenuActor *gUnk_020004B4;
+#include "area_effect_link.h"
 extern void (*const gUnk_086058EC[])(struct ModifierMenu *);
 void ModifierMenu_CloseScript(struct ModifierMenu *);
 void ModifierMenu_ClearDisplay(struct ModifierMenu *);
@@ -17,7 +17,7 @@ void ModifierMenu_UpdateCapacityFlash(struct ModifierMenu *);
 void ModifierMenu_DrawClockAndValue(void);
 static inline u32 actorInactive(void)
 {
-    struct ModifierMenuActor *actor = gUnk_020004B4;
+    struct ModifierMenuActor *actor = gLinkSession;
     register u32 value asm("r0");
     if (!actor || actor->active)
         goto available;

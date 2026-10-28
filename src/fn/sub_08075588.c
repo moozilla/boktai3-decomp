@@ -16,7 +16,7 @@ void SparkParticle_Spawn(void *, s32, s32, s32, s32, s32);
 void SceneActorRecord_RecordPair(u16, u32);
 void SceneActorBehavior_UpdateColliders(void *);
 void SceneActorReaction_SinkAndRemove(void);
-extern u32 gUnk_020004B4;
+extern u32 gLinkSession;
 extern u32 gUnk_02000580[];
 extern u32 gUnk_02000478;
 extern u32 gUnk_02000534;
@@ -153,10 +153,10 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
 
 after_timers:
     if (gEngineFlags & 0x4800) {
-        if (gUnk_020004B4 == 0) {
+        if (gLinkSession == 0) {
             goto finish;
         }
-        r2 = *(s16 *)(gUnk_020004B4 + 0x18);
+        r2 = *(s16 *)(gLinkSession + 0x18);
         if (r2 < 0) {
             goto finish;
         }

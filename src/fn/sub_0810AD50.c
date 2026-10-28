@@ -57,9 +57,9 @@ static inline u16 PackKeys(u32 value, u32 mode)
 }
 static inline s32 SessionState(void)
 {
-    if (!gUnk_020004B4)
+    if (!gLinkSession)
         return -1;
-    return gUnk_020004B4->unknown1C;
+    return gLinkSession->unknown1C;
 }
 s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
 {

@@ -7,7 +7,7 @@ struct SceneHudSlotCounts {
     u8 unknown0[0x5C];
     u8 counts[4];
 };
-extern struct SceneHudSlotCounts *gUnk_020004B4;
+extern struct SceneHudSlotCounts *gLinkSession;
 u16 *SceneHud_GetTilemapCell(s32, u32, u32);
 static inline u32 testFlags(const u32 *flags, u32 mask)
 {
@@ -15,9 +15,9 @@ static inline u32 testFlags(const u32 *flags, u32 mask)
 }
 static inline u8 slotCount(s32 slot)
 {
-    if (!gUnk_020004B4 || slot < 0)
+    if (!gLinkSession || slot < 0)
         return 0;
-    return gUnk_020004B4->counts[slot];
+    return gLinkSession->counts[slot];
 }
 void SceneHud_DrawSlotMeter(struct SceneHudState *hud, s32 mode, u32 x, u32 y)
 {

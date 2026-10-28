@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "scene_vec.h"
+#include "area_effect_link.h"
 struct SolarBombOwner {
     u8 pad0[0x18];
     s32 player;
@@ -33,7 +34,6 @@ struct LinkLevels {
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-extern struct LinkLevels *gUnk_020004B4;
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void SolarBomb_SetState(struct SolarBomb *, void (*)(struct SolarBomb *));
 void MovingEffect_AdvanceLifetime(struct SolarBomb *);
@@ -60,9 +60,9 @@ static inline struct Cell *getCell(s32 index)
 }
 static inline u8 LinkLevel(s32 player)
 {
-    if (!gUnk_020004B4 || player < 0)
+    if (!((struct LinkLevels *)gLinkSession) || player < 0)
         return 0;
-    return gUnk_020004B4->levels[player];
+    return ((struct LinkLevels *)gLinkSession)->levels[player];
 }
 void sub_08233CAC(struct SolarBomb *p)
 {

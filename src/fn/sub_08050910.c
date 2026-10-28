@@ -14,14 +14,14 @@ void OrbitBackground_UpdateVisibility(struct OrbitBackground *input)
     if (gEngineFlags & 0x800) {
         register s32 selected asm("r1");
         u32 status;
-        if (!gUnk_020004B4)
+        if (!gLinkSession)
             selected = -1;
         else
-            selected = gUnk_020004B4->selected;
-        if (!gUnk_020004B4 || selected < 0)
+            selected = gLinkSession->selected;
+        if (!gLinkSession || selected < 0)
             status = 0;
         else
-            status = gUnk_020004B4->status[selected];
+            status = gLinkSession->status[selected];
         asm("" : "+r"(status));
         if (status)
             background->enabled = 0;

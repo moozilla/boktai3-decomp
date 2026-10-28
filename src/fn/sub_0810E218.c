@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "area_effect_link.h"
 
 // foundry draft (worker best 96.2%); what differs is mostly register allocation and instruction order
 #define gRandomTable gUnk_0203B400
@@ -13,14 +14,13 @@ struct SelectionContext {
     u8 unknown54[0x1B8];
     u8 selection;
 };
-extern struct SelectionContext *gUnk_020004B4;
 extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 s32 SelectionPanel_GetSelection(struct SelectionPanel *);
 void SelectionPanel_CommitSelection(struct SelectionPanel *p)
 {
     unsigned int two;
-    struct SelectionContext *context = gUnk_020004B4;
+    struct SelectionContext *context = gLinkSession;
     if (context && context->mode == 1) {
         if (&context->selection) {
             u32 off = 0xD24;

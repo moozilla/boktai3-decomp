@@ -2,13 +2,12 @@
 #include "scene_hud_display.h"
 #include "ram.h"
 
-#define gSceneHudOwnerSource gUnk_020004B4
-#define gPartyActors         gUnk_02000580
+#define gPartyActors gUnk_02000580
 struct SceneHudOwnerSource {
     u8 unknown0[0x18];
     s16 index;
 };
-extern struct SceneHudOwnerSource *gSceneHudOwnerSource;
+extern struct SceneHudOwnerSource *gLinkSession;
 extern struct Player *gPartyActors[];
 
 void Hud_LoadLayoutResources(struct SceneHudState *);
@@ -16,9 +15,9 @@ void SceneHud_InitGameplayResources(struct SceneHudState *);
 void SceneHud_RefreshGameplayDisplay(struct SceneHudState *);
 static inline s32 OwnerIndex(void)
 {
-    if (!gSceneHudOwnerSource)
+    if (!gLinkSession)
         return -1;
-    return gSceneHudOwnerSource->index;
+    return gLinkSession->index;
 }
 s32 SceneHud_InitializeOwner(struct SceneHudState *s)
 {

@@ -1,6 +1,6 @@
 #include "global.h"
 extern u8 *gUnk_02000580[4];
-extern u8 *gUnk_020004B4;
+extern u8 *gLinkSession;
 s32 Script_GetOptionalIValue(void);
 bool32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
@@ -20,7 +20,7 @@ void sub_0824372C(void)
             LinkSession_CallPositionScript(player + 0x30, *slot);
         *slot = v;
         x = *slot;
-        g = gUnk_020004B4;
+        g = gLinkSession;
         if (g == NULL || g[0x53] != 0 || x < 0)
             g = NULL;
         else
