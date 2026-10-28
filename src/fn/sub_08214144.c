@@ -1,7 +1,6 @@
 #include "global.h"
 #include "runtime.h"
 
-extern u8 gUnk_03004268;
 void m4aSoundMain(void);
 
 void sub_08214144(void)
@@ -15,7 +14,7 @@ void sub_08214144(void)
         m4aSoundMain();
     } else {
         vu16 *r = (vu16 *)0x04000010;
-        u8 *q = &gUnk_03004268;
+        u8 *q = &gDialogueScrollLatched;
         u32 m = 0xff;
         *r = *q;
         *(vu16 *)0x04000004 = m & *(vu16 *)0x04000004;

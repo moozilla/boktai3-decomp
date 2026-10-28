@@ -54,5 +54,15 @@ extern u32
     gDialogueScrollOffset; /* Dialogue scroll/tick offset copied into the video IRQ shadow; tentative name */
 extern u32
     gDialogueModeLatched; /* VBlank-latched dialogue state controlling the two-phase video IRQ; tentative name */
+extern u8
+    gInterruptCode[0x800]; /* IWRAM interrupt dispatcher copy, 512 words copied from IntrMain */
+extern u32
+    gVBlankUploadPending; /* Set by VBlank and cleared when the video upload task finishes; tentative name */
+extern u32 gVBlankFrameCounter; /* Counter incremented after VBlank clock/link updates */
+extern u32
+    gDialogueScrollLatched; /* Dialogue scroll offset latched in VBlank and read as a byte by the secondary video IRQ */
+extern u32 gVideoInterruptsEnabled; /* Gates video register updates and link/clock work in VBlank */
+extern u16
+    gVideoTransferControl; /* Runtime transfer-control flag initialized to 1 and cleared around save/wireless transfer; tentative name */
 
 #endif

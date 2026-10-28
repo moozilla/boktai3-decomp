@@ -114,3 +114,13 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03003A48 `gDialogueScrollOffset` (unified):** Dialogue scroll/tick offset copied into the video IRQ shadow; tentative name; ramlayout before/after checks passed.
 - **03003A4C `gDialogueModeLatched` (unified):** VBlank-latched dialogue state controlling the two-phase video IRQ; tentative name; ramlayout before/after checks passed.
 - **03003A00 `gUnk_03003A00` (skipped):** Protected status_screen_fade.c inherits its declaration from status_screen.h; restoring the protected source after the header rename leaves the old name undeclared. Object fully rolled back.
+
+- **03003A60 `gInterruptCode` (unified):** IWRAM interrupt dispatcher copy, 512 words copied from IntrMain; ramlayout before/after checks passed.
+- **03004260 `gVBlankUploadPending` (unified):** Set by VBlank and cleared when the video upload task finishes; tentative name; ramlayout before/after checks passed.
+- **03004264 `gVBlankFrameCounter` (unified):** Counter incremented after VBlank clock/link updates; ramlayout before/after checks passed.
+- **03004268 `gDialogueScrollLatched` (unified):** Dialogue scroll offset latched in VBlank and read as a byte by the secondary video IRQ; ramlayout before/after checks passed.
+- **0300426C `gVideoInterruptsEnabled` (unified):** Gates video register updates and link/clock work in VBlank; ramlayout before/after checks passed.
+- **0300427C `gVideoTransferControl` (unified):** Runtime transfer-control flag initialized to 1 and cleared around save/wireless transfer; tentative name; ramlayout before/after checks passed.
+- **03004270 `gUnk_03004270` (skipped):** Protected status_screen_fade.c inherits its old HBlank DMA declaration; the header rename makes the restored source fail compilation. Rolled back.
+- **03004274 `gUnk_03004274` (skipped):** Protected status_screen_fade.c inherits its old HBlank DMA declaration; the header rename makes the restored source fail compilation. Rolled back.
+- **03004278 `gUnk_03004278` (skipped):** Protected status_screen_fade.c inherits its old HBlank DMA declaration; the header rename makes the restored source fail compilation. Rolled back.

@@ -6,7 +6,7 @@ struct Snapshot {
     u16 c, d;
 };
 extern u32 gUnk_03004278, gUnk_03003A00, gUnk_0300546C;
-extern u16 gUnk_03004270, gUnk_03004274, gUnk_0300427C;
+extern u16 gUnk_03004270, gUnk_03004274;
 void MusicSlots_StopAllAndRetainResumable(void), InterruptsAndVideo_WaitForVBlank(void),
     m4aSoundVSyncOff(void), m4aSoundVSyncOn(void), Solar_PauseMeasurement(void);
 u32 Solar_ResumeMeasurement(void);
@@ -14,7 +14,7 @@ u32 Save_ResumeRuntimeAfterTransfer(void)
 {
     struct Snapshot *snap = &gSnapshot;
     *(volatile u16 *)0x04000202 = 1;
-    gUnk_0300427C = 1;
+    gVideoTransferControl = 1;
     m4aSoundVSyncOn();
     InterruptsAndVideo_WaitForVBlank();
     *(volatile u16 *)0x04000208 = 0;
