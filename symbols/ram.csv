@@ -414,7 +414,7 @@ addr,name,size,kind,decl,header,confidence,notes
 03005270,gHardwareKeys,2,object,extern u16 gHardwareKeys;,include/runtime.h,,Raw active-low KEYINPUT sampled before per-player input records are updated
 03005274,gSceneSelectionDisplaySlots,A,object,extern u16 gSceneSelectionDisplaySlots[];,include/ram.h,low,
 03005278,gLcgState,4,object,extern u32 gLcgState;,include/runtime.h,,"Independent LCG state, separate from gRandomIndex at 03005274; initialized to 123456 and advanced by Random_Next15"
-03005280,gTaskLists,70,object,extern struct TaskList gTaskLists[14];,include/engine.h,,task lists by priority
+03005280,gTaskLists,70,object,extern struct TaskList gTaskLists[14];,include/engine_globals.h,,task lists by priority
 030052F0,gResourceRegistryCount,4,object,extern s32 gResourceRegistryCount;,include/runtime.h,,"High-water count of resource-registry entries, capped at 32"
 030052F4,gTerrainMap,4,object,extern struct EngineMap *gTerrainMap;,include/engine_globals.h,low,
 030052F8,gTerrainWidth,4,object,extern u32 gTerrainWidth;,include/engine_globals.h,low,

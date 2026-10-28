@@ -26,11 +26,6 @@ struct Task {
     u8 list;                        /* index into gTaskLists (priority list, 0..13) */
 };
 
-struct TaskList {
-    struct Task *head;
-    u32 pauseMask; /* list is skipped while (gEnginePauseFlags & pauseMask) */
-};
-
 
 /* Terrain/collision map header of the current scene. Terrain_LoadHP (08225C48)
  * fills it from the stage's "HP" resource (type AE6C, the third argument of the
@@ -62,8 +57,6 @@ struct EngineMap {
     void *trapTops[64];
 };
 
-/* 0x03005280 */
-extern struct TaskList gTaskLists[14];    /* task lists by priority */
 extern const u16 gUnk_0203B400[];         /* 1024 entry random table (guess) */
 extern const s16 gUnk_086149C4[];         /* sine table (guess) */
 

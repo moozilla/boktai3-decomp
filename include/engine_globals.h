@@ -5,8 +5,15 @@
 
 /* Engine-wide IWRAM objects (rows of symbols/ram.csv with header include/engine_globals.h).
  * Scalars and pointers to incomplete structs only, so any draft can include this. */
+struct TaskList {
+    struct Task *head;
+    u32 pauseMask; /* list is skipped while (gEnginePauseFlags & pauseMask) */
+};
+
 /* 0x03005240 */
 extern u16 gNextTaskId; /* next Task id (unique, never 0) */
+/* 0x03005280 */
+extern struct TaskList gTaskLists[14]; /* task lists by priority */
 /* 0x030052F4 */
 extern struct EngineMap *gTerrainMap; /* current terrain map */
 /* 0x030052F8 */
