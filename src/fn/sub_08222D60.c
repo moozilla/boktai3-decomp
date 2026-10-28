@@ -1,29 +1,27 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
+#include "serial.h"
 #ifdef NONMATCHING
 // fuzzy: 90.3%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
-extern u16 gSerialActiveSendWord, gSerialQueuedSendWord, gSerialQueuedPacketCount,
-    gSerialPacketReadIndex;
-extern u16 gSerialPacketQueue[];
 #define IO(a) (*(volatile u16 *)(a))
 static inline void CopyQueued(u16 *out)
 {
-    u16 *q = gSerialPacketQueue;
+    u16 *q = gSerialPacketQueue[0];
     out[0] = q[gSerialPacketReadIndex * 4];
-    out[1] = *(gSerialPacketReadIndex * 4 + &gSerialPacketQueue[1]);
-    out[2] = *(gSerialPacketReadIndex * 4 + &gSerialPacketQueue[2]);
-    out[3] = *(gSerialPacketReadIndex * 4 + &gSerialPacketQueue[3]);
+    out[1] = *(gSerialPacketReadIndex * 4 + &gSerialPacketQueue[0][1]);
+    out[2] = *(gSerialPacketReadIndex * 4 + &gSerialPacketQueue[0][2]);
+    out[3] = *(gSerialPacketReadIndex * 4 + &gSerialPacketQueue[0][3]);
 }
 static inline void QueuePacket(u16 *in, u32 pos)
 {
-    u16 *q = gSerialPacketQueue;
+    u16 *q = gSerialPacketQueue[0];
     q[pos * 4] = in[0];
-    *(pos * 4 + &gSerialPacketQueue[1]) = in[1];
-    *(pos * 4 + &gSerialPacketQueue[2]) = in[2];
-    *(pos * 4 + &gSerialPacketQueue[3]) = in[3];
+    *(pos * 4 + &gSerialPacketQueue[0][1]) = in[1];
+    *(pos * 4 + &gSerialPacketQueue[0][2]) = in[2];
+    *(pos * 4 + &gSerialPacketQueue[0][3]) = in[3];
 }
 static inline void CopyPacket(u16 *out, u16 *in)
 {
@@ -73,10 +71,10 @@ void Serial_ServiceInterrupt(void)
         if (!(bits & 0x4000)) {
             if (gSerialReceivePending) {
                 u32 pos = (gSerialPacketReadIndex + gSerialQueuedPacketCount) & 3;
-                gSerialPacketQueue[pos * 4] = first;
-                *((pos * 4) + (&gSerialPacketQueue[1])) = latest[1];
-                *((pos * 4) + (&gSerialPacketQueue[k2])) = latest[k2];
-                *((pos * 4) + (&gSerialPacketQueue[3])) = latest[3];
+                gSerialPacketQueue[0][pos * 4] = first;
+                *((pos * 4) + (&gSerialPacketQueue[0][1])) = latest[1];
+                *((pos * 4) + (&gSerialPacketQueue[0][k2])) = latest[k2];
+                *((pos * 4) + (&gSerialPacketQueue[0][3])) = latest[3];
                 ++gSerialQueuedPacketCount;
                 gSerialActiveSendWord = 0x4000;
             } else {

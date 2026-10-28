@@ -766,6 +766,8 @@ def view(spec, declarator, name, canon, lvalue=True):
     if not canon_array:
         return None
     rest = "".join(dims[1:])
+    if not stars and not rest and len(re.findall(r"\[[^\]]*\]", canon)) == 2:
+        return f"{name}[0]"       # a flat view of a two-dimensional array: its first row decays, no cast node
     t = f"{spec} {'*' * stars}*" if not rest else f"{spec} {'*' * stars}(*){rest}"
     return f"(({t}){name})"
 

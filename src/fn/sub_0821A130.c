@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 
 struct Task {
     u8 pad[4];
@@ -10,7 +11,6 @@ struct List {
     struct Task *head;
     u32 pad;
 };
-extern struct List gTaskLists[];
 
 struct Task *Task_FindById(u16 id)
 {

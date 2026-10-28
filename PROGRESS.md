@@ -10,7 +10,7 @@ Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **360 functions**,
 
 Intentional assembly (GBA header, crt0, SDK assembly; not counted above): 4,916 bytes.
 
-RAM objects with one shared declaration (`symbols/ram.csv`, tracked here only): **91.9%** (23,751 / 25,855 bytes); no other declaration left: 75.6%.
+RAM objects with one shared declaration (`symbols/ram.csv`, tracked here only): **91.9%** (23,751 / 25,855 bytes); no other declaration left: 76.1%.
 
 **ROM data matched: 3.48%** (446,538 / 12,822,088 bytes; reported to decomp.dev as data). Matched = rebuilt from an editable, meaningful source ([docs/DATA_TRACKING.md](docs/DATA_TRACKING.md)); extracted `.bin` files count 0. Format identified (not a match): 99.1%. GCL compiled from source but not fully annotated: 0 bytes. Named data symbols: 10.
 
