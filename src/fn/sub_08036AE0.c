@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct S {
     u8 pad0[56];
@@ -6,11 +7,10 @@ struct S {
     u32 f4;
     u32 f8;
 };
-extern struct S *gWirelessController;
 
 u16 Wireless_GetOperation(void)
 {
-    if (gWirelessController == 0)
+    if (((struct S *)gWirelessController) == 0)
         return 0;
-    return gWirelessController->f2;
+    return ((struct S *)gWirelessController)->f2;
 }
