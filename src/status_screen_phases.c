@@ -1,4 +1,5 @@
 #include "status_screen.h"
+#include "render.h"
 // MATCHING_CONCESSION: register-pinning
 // The optimization override reproduces BeginClose and Reveal; it is not historical compiler evidence.
 
@@ -27,7 +28,7 @@ void StatusScreen_BeginClose(struct StatusScreen *p)
 
 static inline int StatusScreen_MapWidth(int bg)
 {
-    return gUnk_03004C30[bg].width;
+    return gBgRecords[bg].width;
 }
 
 void sub_0800E974(struct StatusScreen *p)

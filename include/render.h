@@ -26,6 +26,21 @@ struct CameraRenderState {
 
 extern struct CameraRenderState gCamera;
 
+/* Four 0x30-byte BG records; scaleX/Y also hold overlay tile coordinates.
+ * flags and halfWidth/halfHeight have mode-dependent meanings (tentative). */
+struct BackgroundLayer {
+    u16 flags, layer;
+    u8 unk04[0xC];
+    u16 scaleX, scaleY;
+    s16 originX, originY;
+    s16 width, height;
+    s16 halfWidth, halfHeight;
+    s16 x, y;
+    u16 *extraData, *mapData, *map;
+};
+
+extern struct BackgroundLayer gBgRecords[4];
+
 /* RAM objects; each row of symbols/ram.csv with header include/render.h. */
 extern u8 *gPaletteBankData; /* palette-bank data: 32-byte banks of sixteen RGB15 colors (AnimData_SelectPaletteBank) */
 extern u32 gVBlankDialogueState; /* scrolling-dialogue/video state copied during VBlank (guess) */

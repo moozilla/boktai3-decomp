@@ -29,19 +29,19 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
     s32 slot;
     ScenePanel_CycleOverlayPalette(panel);
     {
-        struct SceneOverlayLayer *layer;
+        struct BackgroundLayer *layer;
         register u16 tx asm("r2");
         u16 ty;
         u16 *buffer;
         register u32 reloadScratch asm("r3");
         tx = tileX;
-        layer = &gUnk_03004CC0;
-        layer->tileX = tx;
+        layer = &gBgRecords[3];
+        layer->scaleX = tx;
         ty = tileY;
-        layer->tileY = ty;
-        layer->screenX = screenX;
-        layer->screenY = screenY;
-        buffer = layer->output;
+        layer->scaleY = ty;
+        layer->x = screenX;
+        layer->y = screenY;
+        buffer = layer->map;
         asm("" : : "r"(buffer));
         output = buffer;
         asm("" : : "r"(output));
@@ -175,7 +175,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
             if (maxX < 0 || maxY < 0 || minX > 31 || minY > 31)
                 goto nextSlot;
             {
-                struct SceneOverlayLayer *strideLayer = &gUnk_03004CC0;
+                struct BackgroundLayer *strideLayer = &gBgRecords[3];
                 blockStride = strideLayer->width >> 4;
             }
             if (target == 5) {
@@ -223,7 +223,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                         u32 mapBase = (u32)*mapSlot;
                         relative += mapBase;
                         copied->blocks = (void *)relative;
-                        gUnk_03004CC0.map = (void *)relative;
+                        gBgRecords[3].mapData = (void *)relative;
                         blocks = (void *)relative;
                     }
                 }
@@ -295,12 +295,12 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                                     /* Preserve the original destination spill while loading the tile table. */
                                     asm(""
                                         :
-                                        : "m"(((struct SceneOverlayLayer *)SCENE_OVERLAY_LAYER_ADDR)
-                                                  ->tiles),
+                                        : "m"(((struct BackgroundLayer *)SCENE_OVERLAY_LAYER_ADDR)
+                                                  ->extraData),
                                           "r"(parity));
                                     tileBuffer =
-                                        ((struct SceneOverlayLayer *)SCENE_OVERLAY_LAYER_ADDR)
-                                            ->tiles;
+                                        ((struct BackgroundLayer *)SCENE_OVERLAY_LAYER_ADDR)
+                                            ->extraData;
                                     tile <<= 3;
                                     tile += (u32)tileBuffer;
                                     pair = (void *)tile;
@@ -324,8 +324,8 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
                                         firstOutput = output + index;
                                     }
                                     tileBuffer =
-                                        ((struct SceneOverlayLayer *)SCENE_OVERLAY_LAYER_ADDR)
-                                            ->tiles;
+                                        ((struct BackgroundLayer *)SCENE_OVERLAY_LAYER_ADDR)
+                                            ->extraData;
                                     tile <<= 3;
                                     tile += (u32)tileBuffer;
                                     pair = (void *)tile;

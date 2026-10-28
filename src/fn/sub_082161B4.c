@@ -16,20 +16,6 @@ struct BgMapEntry {
     u32 unk04;
     u32 data;
 };
-struct BgLayer {
-    u16 resource;
-    u16 bg;
-    u8 pad4[0xC];
-    u16 scaleX, scaleY;
-    s16 x, y;
-    u16 width, height;
-    u16 width2, height2;
-    u16 field20, field22;
-    u32 extra;
-    u32 data;
-    void *map;
-};
-extern struct BgLayer gUnk_03004C30[];
 void sub_08215AC4(s32 bg, s32 mode);
 void Bg_SetTileUpload(s32 bg, u32 tiles, s32 offset, u16 size);
 void Text_ClearGlyphCache(void);
@@ -40,7 +26,7 @@ static inline void enableBg(s32 bits)
 }
 /* Sets up the background layers of a map resource for one of eight layer
    modes: picks the BGs (sub_08215AC4) and DISPCNT bits, loads the tiles
-   (Bg_SetTileUpload) and fills each layer's gUnk_03004C30 entry from the map
+   (Bg_SetTileUpload) and fills each layer's gBgRecords entry from the map
    entries, picked through maps[] for the first count layers. */
 void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgResource *res, u16 x, u16 y, s32 count,
                     s32 *maps)
@@ -138,7 +124,7 @@ void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgResource *res, u16 x, u16
         Bg_SetTileUpload(bgs[0], hdr.tiles, offset, hdr.count);
     for (i = 0; i < n; i++) {
         s32 bg = bgs[i];
-        struct BgLayer *layer = &gUnk_03004C30[bg];
+        struct BackgroundLayer *layer = &gBgRecords[bg];
         struct BgMapEntry *entries = (struct BgMapEntry *)hdr.maps;
         if (bg == 0)
             Text_ClearGlyphCache();
@@ -147,25 +133,25 @@ void Bg_SetupLayers(s32 mode, u16 resourceId, struct BgResource *res, u16 x, u16
         else
             entry = entries[i];
         entry.data += (u32)res;
-        layer->resource = resourceId;
-        layer->bg = bg;
-        layer->field20 = 0;
-        layer->field22 = 0;
+        layer->flags = resourceId;
+        layer->layer = bg;
+        layer->x = 0;
+        layer->y = 0;
         layer->scaleX = 0x1000;
         layer->scaleY = 0x1000;
         {
             s16 lx = (s16)x >> 4, ly = (s16)y >> 4;
-            layer->x = lx;
-            layer->y = ly;
+            layer->originX = lx;
+            layer->originY = ly;
         }
-        layer->extra = hdr.extra;
-        layer->data = entry.data;
+        layer->extraData = (u16 *)hdr.extra;
+        layer->mapData = (u16 *)entry.data;
         {
             u16 w, h;
             layer->width = w = entry.width;
             layer->height = h = entry.height;
-            layer->width2 = w;
-            layer->height2 = h;
+            layer->halfWidth = w;
+            layer->halfHeight = h;
         }
         layer->map = Video_GetBackgroundMap(bg);
     }

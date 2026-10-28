@@ -238,7 +238,7 @@ s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig 
     p->id = id;
     p->flags = c->flags;
     p->layer = c->layer;
-    layer = &gUnk_03004C30[p->layer];
+    layer = &gBgRecords[p->layer];
     p->resource = c->resource;
     resource = sub_08216E54(p->resource);
     if (p->flags & 1) {
@@ -705,7 +705,7 @@ static inline s32 pixel(s16 v)
 
 s32 ScrollingBackground_Update(struct ScrollingBackground *p)
 {
-    struct BackgroundLayer *layer = &gUnk_03004C30[p->layer];
+    struct BackgroundLayer *layer = &gBgRecords[p->layer];
     s32 width, height;
     s32 cx, cy;
     ScrollingBackground_ApplyCommands(p);
@@ -792,7 +792,7 @@ s32 ScrollingBackground_Initialize(struct ScrollingBackground *p, u16 id,
     p->id = id;
     p->flags = c->flags;
     p->layer = c->layer;
-    layer = &gUnk_03004C30[p->layer];
+    layer = &gBgRecords[p->layer];
     p->resource = c->resource;
     resource = sub_08216E54(p->resource);
     if (p->flags & 1) {

@@ -354,8 +354,8 @@ addr,name,size,kind,decl,header,confidence,notes
 03004C14,gBgAffineScaleX,2,object,extern u16 gBgAffineScaleX;,include/render.h,high physical shape; provisional semantic name,BG affine X scale
 03004C18,gBgAffineRefBuffer,8,object,extern u32 gBgAffineRefBuffer[];,include/render.h,high physical shape; provisional semantic name,buffered affine X/Y reference (2)
 03004C20,gBgScrollShadow,10,object,extern u16 gBgScrollShadow[];,include/render.h,high physical shape; provisional semantic name,four BG horizontal/vertical scroll pairs (8)
-03004C30,gUnk_03004C30,C0,object,,,high physical shape; provisional semantic name,Four 0x30-byte records; merged field map
-03004CC0,gUnk_03004CC0,,interior,,,high physical shape; provisional semantic name,"gUnk_03004C30 +0x90; Fourth background-layer record, same physical object"
+03004C30,gBgRecords,C0,object,extern struct BackgroundLayer gBgRecords[4];,include/render.h,high physical shape; provisional semantic name,Four 0x30-byte BG records; field names provisional where resource modes reuse storage. Protected drafts retain address declarations.
+03004CC0,gUnk_03004CC0,,interior,,,high physical shape; provisional semantic name,gBgRecords +0x90; record 3. Consumers use the shared array; literal reload constraints retain this address.
 03004CF0,gWindowShadow0,2,object,extern u16 gWindowShadow0;,include/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot (which register: unknown)
 03004CF8,gWindowShadow1,2,object,extern u16 gWindowShadow1;,include/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot
 03004CFC,gWindowShadow2,2,object,extern u16 gWindowShadow2;,include/render.h,high physical shape; provisional semantic name,window-control bound/shadow slot

@@ -3,10 +3,6 @@
 #include "background_controller.h"
 
 /* Partial tilemap view of the shared 0x30-byte background record. */
-struct SceneHudMapLayer {
-    u8 unknown0[0x2C];
-    u16 *map;
-};
 extern const u8 gUnk_0824DEB8[];
 extern const u16 gUnk_0824DEC0[], gUnk_0824DED0[];
 u16 *SceneHud_GetMapCell(u32, u32, u32);
