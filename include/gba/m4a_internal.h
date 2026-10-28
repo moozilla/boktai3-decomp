@@ -371,6 +371,7 @@ extern const struct Song gSongTable[];
 
 
 
+/* 0x030069E0 */
 extern u8 gMPlayMemAccArea[];
 
 //u8 gPokemonCrySong[52];
@@ -386,11 +387,13 @@ extern struct MusicPlayerTrack gPokemonCryTracks[];
 
 extern char SoundMainRAM[];
 
+/* 0x03006490 */
 extern MPlayFunc gMPlayJumpTable[];
 
 typedef void (*XcmdFunc)(struct MusicPlayerInfo *, struct MusicPlayerTrack *);
 extern const XcmdFunc gXcmdTable[];
 
+/* 0x03006520 */
 extern struct CgbChannel gCgbChans[];
 
 extern const u8 gScaleTable[];
@@ -499,5 +502,7 @@ void ply_xleng(struct MusicPlayerInfo *, struct MusicPlayerTrack *);
 void ply_xswee(struct MusicPlayerInfo *, struct MusicPlayerTrack *);
 void ply_xwait(struct MusicPlayerInfo *, struct MusicPlayerTrack *);
 void ply_xcmd_0D(struct MusicPlayerInfo *, struct MusicPlayerTrack *);
+/* 0x030054E0 */
+extern struct SoundInfo gSoundInfo; /* MP2K (m4a) global sound mixer state; pokeemerald SoundInfo */
 
 #endif // GUARD_GBA_M4A_INTERNAL_H

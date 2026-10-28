@@ -465,10 +465,10 @@ addr,name,size,kind,decl,header,confidence,notes
 030054C0,gSolarSavedLevel,2,object,extern u16 gSolarSavedLevel;,include/runtime.h,low,"copy of the current solar level (game state +0x874), restored by sub_0822CA5C"
 030054C4,gSolarSavedCachedLevel,2,object,extern u16 gSolarSavedCachedLevel;,include/runtime.h,low,"copy of the cached solar level (game state +0x876), restored by sub_0822CA5C"
 030054D0,gSnapshot,C,object,extern struct Snapshot gSnapshot;,include/ram.h,low,
-030054E0,gSoundInfo,FB0,object,,,,
-03006490,gMPlayJumpTable,90,object,,,,
-03006520,gCgbChans,40,object,,,,
-030069E0,gMPlayMemAccArea,,object,,,,
+030054E0,gSoundInfo,FB0,object,extern struct SoundInfo gSoundInfo;,include/gba/m4a_internal.h,high,MP2K (m4a) global sound mixer state; pokeemerald SoundInfo
+03006490,gMPlayJumpTable,90,object,extern MPlayFunc gMPlayJumpTable[];,include/gba/m4a_internal.h,high,MP2K music player command jump table (36 entries)
+03006520,gCgbChans,100,object,extern struct CgbChannel gCgbChans[];,include/gba/m4a_internal.h,high,MP2K Game Boy PSG channel state (4 channels)
+030069E0,gMPlayMemAccArea,10,object,extern u8 gMPlayMemAccArea[];,include/gba/m4a_internal.h,high,MP2K memacc scratch area (0x10 bytes)
 03006A30,gSolarSensorParam0,4,object,extern u32 gSolarSensorParam0;,include/runtime.h,low,"solar sensor timer parameter, set to 255 by Solar_InitTimer (meaning tentative)"
 03006A34,gSolarGpioSaved,4,object,extern u32 gSolarGpioSaved;,include/runtime.h,low,cartridge GPIO data read by Solar_InitTimer; cleared by Solar_Enable
 03006A38,gSolarMeasuring,4,object,extern u32 gSolarMeasuring;,include/runtime.h,low,"solar measurement active flag (Solar_StartMeasurement sets, Solar_InitTimer clears)"

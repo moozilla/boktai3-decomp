@@ -77,8 +77,14 @@ def sources():
     out = []
     for d, _, fs in os.walk(os.path.join(ROOT, "src")):
         out += [os.path.relpath(os.path.join(d, f), ROOT) for f in fs if f.endswith(".c")]
-    out += [os.path.join("include", f) for f in os.listdir(os.path.join(ROOT, "include")) if f.endswith(".h")]
+    for d, _, fs in os.walk(os.path.join(ROOT, "include")):
+        out += [os.path.relpath(os.path.join(d, f), ROOT) for f in fs if f.endswith(".h")]
     return sorted(out)
+
+
+def inc_name(path):
+    """How a source spells #include of this header: relative to include/."""
+    return path.removeprefix("include/")
 
 
 def read(path):
@@ -408,7 +414,7 @@ def includes(text):
 
 
 def add_include(text, header):
-    inc = os.path.basename(header)
+    inc = inc_name(header)
     if inc in includes(text):
         return text
     lines = text.split("\n")
@@ -502,7 +508,7 @@ def cmd_unify(a):
                 h = h[:at] + d + "\n\n" + h[at:]
         new[a.header] = h
     renamed = dict(new)
-    hdr_inc = os.path.basename(a.header)
+    hdr_inc = inc_name(a.header)
     # every declaration the header will hold: earlier rows and this batch
     canon = {r["name"]: parse_decl(r["decl"])[0] for r in rows if r["header"] == a.header and r["decl"]}
     canon.update({parse_decl(d)[1]: parse_decl(d)[0] for _, d, _ in jobs})
@@ -518,7 +524,7 @@ def cmd_unify(a):
                         blocked.add(p)
     # headers the target includes, directly or not: they keep their declarations
     # (including the target from them would be a cycle)
-    by_base = {os.path.basename(p): p for p in new if p.endswith(".h")}
+    by_base = {inc_name(p): p for p in new if p.endswith(".h")}
     below, todo = set(), [a.header]
     while todo:
         for inc in includes(new[todo.pop()]):
@@ -551,13 +557,13 @@ def cmd_unify(a):
     # A file needs compiling when its text changed or it includes a changed
     # header. Extern lines appended to the target header cannot change code
     # that never names them, so it counts only when new or with --all.
-    hdrs = {os.path.basename(p) for p in changed if p.endswith(".h") and (p != a.header or created or a.all)}
+    hdrs = {inc_name(p) for p in changed if p.endswith(".h") and (p != a.header or created or a.all)}
     closure, grew = set(hdrs), True
     while grew:
         grew = False
         for p, t in new.items():
-            if p.endswith(".h") and os.path.basename(p) not in closure and includes(t) & closure:
-                closure.add(os.path.basename(p))
+            if p.endswith(".h") and inc_name(p) not in closure and includes(t) & closure:
+                closure.add(inc_name(p))
                 grew = True
     verify = sorted(p for p, t in new.items() if p.endswith(".c")
                     and (new[p] != texts.get(p) or includes(t) & closure or p in blocked))
