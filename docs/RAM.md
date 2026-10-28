@@ -107,12 +107,36 @@ A batch file has one `ADDR | DECL | NOTE` line per object. The tool:
 
 The header must compile on its own; the tool checks that first.
 
+Options for sweeps:
+
+- `--cast`: a file whose declaration differs gets the shared one with its own type as a cast
+  at each use, before the tool falls back to keeping its own declaration. Objects whose shared
+  type changes nothing in that file are taken without a cast.
+- `--range LO-HI`: only the header's rows in this address range count as shared (so an IWRAM
+  sweep of `ram.h` leaves the EWRAM rows' declarations alone).
+- `--confidence ''`: keep the rows' confidence (the default sets `low`).
+- Re-running a header's rows (`ADDR | DECL |` lines, empty note) adopts whatever is left.
+- `src/iwram_code.c` is never edited (`PROTECTED` in `ramlayout.py`); its declarations still
+  count as leftovers.
+
+Two things the tool cannot see, which the full build catches: a declaration with parentheses
+(`void (*gX[])(void)`: give the type a typedef instead), and a header edit made by hand before
+a run (the "before" compile then fails and the file is skipped). Commit hand edits to headers
+after checking their includers, then run the sweep.
+
 ### Where declarations live
 
 - `include/render.h`: the renderer block `03004280`-`0300523F` (OAM, BG affine
   and scroll shadows, palette fade state), named from the audited address map.
 - `include/engine.h`, `include/game_state.h`: engine-wide objects already declared
   there: `gGameState`, `gTerrainMap`, `gRandomIndex`, `gEngineFlags`, ....
+- `include/engine_globals.h`: the engine-wide scalars and pointers that `engine.h` and
+  `runtime.h` used to declare (`gEngineFlags`, `gRandomIndex`, `gTerrainMap`, `gTerrainWidth`,
+  `gTerrainHeight`, `gNextTaskId`, `gScriptEntryProcedure`). Light on purpose, so any draft
+  can include it; `engine.h` and `runtime.h` include it for their users.
+- `include/input.h`: the pad state `gPadState`.
+- `include/rfu_compat.h` and `include/gba/m4a_internal.h`: the librfu and MP2K library objects, under
+  their SDK names.
 - `include/ram.h`: everything else for now. It is deliberately light: scalars,
   arrays of scalars and pointers to incomplete structs, no definitions. Any draft
   can include it without tag clashes, which `engine.h` doesn't allow for about 190
