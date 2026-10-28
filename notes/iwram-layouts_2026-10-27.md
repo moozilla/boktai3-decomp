@@ -124,3 +124,7 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03004270 `gUnk_03004270` (skipped):** Protected status_screen_fade.c inherits its old HBlank DMA declaration; the header rename makes the restored source fail compilation. Rolled back.
 - **03004274 `gUnk_03004274` (skipped):** Protected status_screen_fade.c inherits its old HBlank DMA declaration; the header rename makes the restored source fail compilation. Rolled back.
 - **03004278 `gUnk_03004278` (skipped):** Protected status_screen_fade.c inherits its old HBlank DMA declaration; the header rename makes the restored source fail compilation. Rolled back.
+
+- **030042C0 `gSpriteListHeads` (unified):** Two sprite render-list heads, selected by gRenderListIndex; pointees retain subsystem views; ramlayout before/after checks passed.
+- **030042C8 `gMainSpriteListHeads` (unified):** Two main/animation sprite-list heads; protected ARM source retains its address declaration; ramlayout before/after checks passed.
+- **030042D0 `gDrawableListHeads` (unified):** Two drawable/effect render-list heads, selected by gRenderListIndex; ramlayout before/after checks passed.

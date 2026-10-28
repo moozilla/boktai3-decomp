@@ -128,11 +128,11 @@ u32 Trigger_ConsumePending(
 
 /* ---- Sprites, animation, resources ------------------------------------- */
 
-void Sprite_Remove(void *sprite); /* unlink from pool gUnk_030042C0 (guess) */
+void Sprite_Remove(void *sprite); /* unlink from pool gSpriteListHeads (guess) */
 
-void Anim_Remove(void *anim); /* unlink from pool gUnk_030042C8 (guess) */
+void Anim_Remove(void *anim); /* unlink from pool gMainSpriteListHeads (guess) */
 
-void Effect_Remove(void *effect); /* unlink from pool gUnk_030042D0 (guess) */
+void Effect_Remove(void *effect); /* unlink from pool gDrawableListHeads (guess) */
 
 void Sprite_Init(void *sprite, void *animData,
                  s32 flags); /* (guess) set up an idle sprite object */

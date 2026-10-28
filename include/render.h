@@ -135,5 +135,8 @@ extern u16 gSavedWinIn; /* Saved WININ register */
 extern u16 gSavedWinOut; /* Saved WINOUT register */
 extern u8 gTextTileUploadIndices[]; /* Queued text tile indices; bounded storage precedes its count, original guard permits index 256 */
 extern u32 gTextTileUploadCount; /* Number of queued text tile DMA uploads */
+extern void *gSpriteListHeads[2]; /* Two sprite render-list heads, selected by gRenderListIndex; pointees retain subsystem views */
+extern void *gMainSpriteListHeads[2]; /* Two main/animation sprite-list heads; protected ARM source retains its address declaration */
+extern void *gDrawableListHeads[2]; /* Two drawable/effect render-list heads, selected by gRenderListIndex */
 
 #endif

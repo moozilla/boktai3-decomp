@@ -318,9 +318,9 @@ addr,name,size,kind,decl,header,confidence,notes
 030042A0,gCamera,14,object,extern struct CameraRenderState gCamera;,include/render.h,high physical shape; provisional semantic name,"Inline render camera; position, screen offsets and projection mode. +06 is copied, +0C/+10 initialized with unresolved meaning; distinct from active camera task."
 030042B4,gProjectedSpriteCallback,4,object,extern u32 gProjectedSpriteCallback;,include/render.h,high physical shape; provisional semantic name,projected-sprite queue callback (function pointer)
 030042B8,gExtraRenderCallback,4,object,extern u32 gExtraRenderCallback;,include/render.h,high physical shape; provisional semantic name,additional render callback (function pointer)
-030042C0,gUnk_030042C0,8,object,,,high physical shape; provisional semantic name,Sprite list heads; init loop clears two entries
-030042C8,gUnk_030042C8,8,object,,,high physical shape; provisional semantic name,Animation/main sprite list heads; init loop clears two entries
-030042D0,gUnk_030042D0,8,object,,,high physical shape; provisional semantic name,Drawable/effect list heads; init loop clears two entries
+030042C0,gSpriteListHeads,8,object,extern void *gSpriteListHeads[2];,include/render.h,high physical shape; provisional semantic name,"Two sprite render-list heads, selected by gRenderListIndex; pointees retain subsystem views"
+030042C8,gMainSpriteListHeads,8,object,extern void *gMainSpriteListHeads[2];,include/render.h,high physical shape; provisional semantic name,Two main/animation sprite-list heads; protected ARM source retains its address declaration
+030042D0,gDrawableListHeads,8,object,extern void *gDrawableListHeads[2];,include/render.h,high physical shape; provisional semantic name,"Two drawable/effect render-list heads, selected by gRenderListIndex"
 030042D8,gDynamicTileSum,2,object,extern u16 gDynamicTileSum;,include/render.h,high physical shape; provisional semantic name,"tile count of the dynamic OBJ slots, reset and accumulated each frame"
 030042DC,gMainSpriteTileSum,2,object,extern u16 gMainSpriteTileSum;,include/render.h,high physical shape; provisional semantic name,"tile count of the main sprites, reset and accumulated each frame"
 030042E0,gPaletteBankCount,2,object,extern u16 gPaletteBankCount;,include/render.h,high physical shape; provisional semantic name,palette resource bank count

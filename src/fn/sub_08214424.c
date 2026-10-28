@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 struct N {
     u8 pad0[0x4];
     u8 f4;
@@ -8,17 +9,16 @@ struct N {
     struct N *prev;
     struct N *next;
 };
-extern struct N *gUnk_030042C8[];
 s32 Anim_LinkToList(struct N *n, u32 i)
 {
     struct N *h;
     n->idx = i;
     n->f4 = 1;
     n->prev = 0;
-    h = gUnk_030042C8[i];
+    h = gMainSpriteListHeads[i];
     n->next = h;
     if (h)
         h->prev = n;
-    gUnk_030042C8[i] = n;
+    gMainSpriteListHeads[i] = n;
     return 0;
 }
