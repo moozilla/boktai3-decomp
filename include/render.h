@@ -293,5 +293,13 @@ extern u16 gBgPaletteBank13Color14; /* Interior background palette bank 13 color
 extern u16 gBgPaletteBank14[]; /* Interior background palette bank 14, at gBgPaletteBuffer +0x1C0 bytes */
 /* 0x030051A0 */
 extern u16 gBgPaletteBank15[]; /* Interior background palette bank 15, at gBgPaletteBuffer +0x1E0 bytes */
+/* 0x03004278 */
+extern void *gScanlineDmaSource; /* HBlank DMA0 source: the staged 160-line effect buffer (VBlank handler programs DMA0 SAD) */
+/* 0x03003A00 */
+extern void *gScanlineDmaTarget; /* HBlank DMA0 destination: the I/O register the scanline effect writes (BGnHOFS, BGnVOFS, MOSAIC, BLDY) */
+/* 0x03004270 */
+extern u16 gScanlineDmaCount; /* HBlank DMA0 transfer count, 1 for the single-halfword/word-per-line transfers */
+/* 0x03004274 */
+extern s16 gScanlineDmaMode; /* HBlank DMA0 mode: 0 off, 1 halfword transfer, else word transfer (low confidence) */
 
 #endif

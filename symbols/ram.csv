@@ -294,7 +294,7 @@ addr,name,size,kind,decl,header,confidence,notes
 030035E0,gSoftSingleNaN,10,object,extern struct SoftSingleNumber gSoftSingleNaN;,include/libgcc_numbers.h,high library source correspondence,libgcc software floating-point NaN number object; shared fp-bit-base layout
 030035F0,SoundMainRAM_Buffer,402,object,extern u8 SoundMainRAM_Buffer[0x400];,include/sound.h,,MP2K RAM instruction buffer copied with CpuCopy32 size 0x400; next script procedure word is a separate object
 030039F0,gScriptEntryProcedure,2,object,extern u16 gScriptEntryProcedure;,include/runtime.h,,Script entry procedure selected by Script_SetEntryProcedure; separate from the preceding MP2K buffer
-03003A00,gUnk_03003A00,4,object,,,,
+03003A00,gScanlineDmaTarget,4,object,extern void *gScanlineDmaTarget;,include/render.h,,"HBlank DMA0 destination: the I/O register the scanline effect writes (BGnHOFS, BGnVOFS, MOSAIC, BLDY)"
 03003A04,gVideoUploadFlags,4,object,extern u32 gVideoUploadFlags;,include/runtime.h,,Video upload dirty flags; bit 0 requests OAM upload
 03003A08,gSceneEntryActive,4,object,extern u32 gSceneEntryActive;,include/runtime.h,,Set while scene-entry script runs; suppresses part of video upload task
 03003A10,gSerialInterruptState,34,object,extern u8 gSerialInterruptState[];,include/ram.h,low,
@@ -308,9 +308,9 @@ addr,name,size,kind,decl,header,confidence,notes
 03004264,gVBlankFrameCounter,4,object,extern u32 gVBlankFrameCounter;,include/runtime.h,,Counter incremented after VBlank clock/link updates
 03004268,gDialogueScrollLatched,4,object,extern u32 gDialogueScrollLatched;,include/runtime.h,,Dialogue scroll offset latched in VBlank and read as a byte by the secondary video IRQ
 0300426C,gVideoInterruptsEnabled,4,object,extern u32 gVideoInterruptsEnabled;,include/runtime.h,,Gates video register updates and link/clock work in VBlank
-03004270,gUnk_03004270,2,object,,,,
-03004274,gUnk_03004274,2,object,,,,
-03004278,gUnk_03004278,4,object,,,,
+03004270,gScanlineDmaCount,2,object,extern u16 gScanlineDmaCount;,include/render.h,,"HBlank DMA0 transfer count, 1 for the single-halfword/word-per-line transfers"
+03004274,gScanlineDmaMode,2,object,extern s16 gScanlineDmaMode;,include/render.h,,"HBlank DMA0 mode: 0 off, 1 halfword transfer, else word transfer (low confidence)"
+03004278,gScanlineDmaSource,4,object,extern void *gScanlineDmaSource;,include/render.h,,HBlank DMA0 source: the staged 160-line effect buffer (VBlank handler programs DMA0 SAD)
 0300427C,gVideoTransferControl,2,object,extern u16 gVideoTransferControl;,include/runtime.h,,Runtime transfer-control flag initialized to 1 and cleared around save/wireless transfer; tentative name
 03004280,gVBlankDialogueState,4,object,extern u32 gVBlankDialogueState;,include/render.h,high physical shape; provisional semantic name,scrolling-dialogue/video state copied during VBlank (guess)
 03004290,gRenderListIndex,4,object,extern u32 gRenderListIndex;,include/render.h,high physical shape; provisional semantic name,active list index into the three render list-head pairs

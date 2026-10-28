@@ -169,10 +169,10 @@ void StatusScreen_UpdateScanlineNoise(struct StatusScreen *p)
     }
     for (i = p->bottom; i < 160; i++)
         p->rows[p->active][i] = 0;
-    gUnk_03004278 = p->rows[p->active];
-    gUnk_03003A00 = (void *)0x0400004C;
-    gUnk_03004270 = 1;
-    gUnk_03004274 = 1;
+    gScanlineDmaSource = p->rows[p->active];
+    gScanlineDmaTarget = (void *)0x0400004C;
+    gScanlineDmaCount = 1;
+    gScanlineDmaMode = 1;
     *amplitude += *delta;
     if (*amplitude < 0)
         *amplitude = 0;
@@ -187,10 +187,10 @@ void StatusScreen_ClearScanlineNoise(struct StatusScreen *p)
 {
     u32 zero = 0;
     CpuSet(&zero, p->rows, 0x05000091);
-    gUnk_03004278 = p->rows[p->active];
-    gUnk_03003A00 = (void *)0x0400004C;
-    gUnk_03004270 = 1;
-    gUnk_03004274 = 0;
+    gScanlineDmaSource = p->rows[p->active];
+    gScanlineDmaTarget = (void *)0x0400004C;
+    gScanlineDmaCount = 1;
+    gScanlineDmaMode = 0;
     p->noise = 0;
 }
 
@@ -220,10 +220,10 @@ int StatusScreen_Destroy(struct StatusScreen *p)
 {
     u32 zero = 0;
     int result = CpuSetResult(&zero, p->rows, 0x05000091);
-    gUnk_03004278 = p->rows[p->active];
-    gUnk_03003A00 = (void *)0x0400004C;
-    gUnk_03004270 = 1;
-    gUnk_03004274 = 0;
+    gScanlineDmaSource = p->rows[p->active];
+    gScanlineDmaTarget = (void *)0x0400004C;
+    gScanlineDmaCount = 1;
+    gScanlineDmaMode = 0;
     gStatusScreen = 0;
     return result;
 }

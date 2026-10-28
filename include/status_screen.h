@@ -87,8 +87,6 @@ int StatusScreen_Update(struct StatusScreen *);
 int StatusScreen_Destroy(struct StatusScreen *);
 int StatusScreen_Initialize(struct StatusScreen *, u16 id);
 
-extern void *gUnk_03004278, *gUnk_03003A00; // HBlank DMA source and destination register (guess)
-extern u16 gUnk_03004270, gUnk_03004274;
 extern u16 gUnk_03005160[];
 extern const u16 gUnk_08604B3C[]; // default phase durations
 void Bg_SetPriority(u32, s32);

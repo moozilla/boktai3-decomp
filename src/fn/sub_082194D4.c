@@ -2,9 +2,9 @@
 
 extern s32 gScanlineEffectLayer, gScanlineEffectMode;
 extern u16 *gScanlineEffectSource;
-extern u16 *gUnk_03004278;
-extern vu16 *gUnk_03003A00;
-extern u16 gUnk_03004270, gUnk_03004274;
+extern u16 *gScanlineDmaSource;
+extern vu16 *gScanlineDmaTarget;
+extern u16 gScanlineDmaCount, gScanlineDmaMode;
 u8 *ScanlineEffect_GetBuffer(void);
 vu16 *ScanlineEffect_GetHorizontalScrollRegister(s32);
 vu16 *ScanlineEffect_GetVerticalScrollRegister(s32);
@@ -33,9 +33,9 @@ void sub_082194D4(void)
             target = (vu16 *)0x04000054;
             break;
     }
-    gUnk_03004278 = buffer;
-    gUnk_03003A00 = target;
-    gUnk_03004270 = 1;
-    gUnk_03004274 = 0;
+    gScanlineDmaSource = buffer;
+    gScanlineDmaTarget = target;
+    gScanlineDmaCount = 1;
+    gScanlineDmaMode = 0;
     gScanlineEffectSource = 0;
 }
