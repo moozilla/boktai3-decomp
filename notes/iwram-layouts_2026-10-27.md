@@ -70,3 +70,6 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03001664 `gFontResource` (struct):** Shared 12-byte font header has two glyph counts and two relocated data addresses; narrow/wide names tentative. All seven consumers exact and unchanged in both compiler modes.
 
 - **03001668 `gRootTask` (struct):** Scheduler root task uses the shared RuntimeTask layout. Identity follows TaskSystem_UpdateRoot callback; initializer exact in both modes.
+
+- **03001680 `gMessageQueueBufferIndex` (unified):** Active double-buffered message queue index, toggled by MessageQueue_SwapBuffers; ramlayout before/after checks passed.
+- **03001684 `gTrapDispatchStarted` (unified):** Set by Trap_UpdateProbeContacts and reset when boxes are loaded; ramlayout before/after checks passed.

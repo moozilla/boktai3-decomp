@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "runtime.h"
 // fix.py best (sweep after the inlined-insn fix)
 struct TrapPosition {
     s16 x, y, z;
@@ -13,7 +14,6 @@ struct TrapRectangle {
     s16 minX, minZ, maxX, maxZ;
     u8 pad8[4];
 };
-extern u32 gUnk_03001684;
 extern u16 gUnk_03005260[];
 void Trap_DispatchEvent(struct TrapProbe *, struct TerrainTrap *, u16);
 static inline u32 Pressed(struct TerrainTrap *trap)
@@ -101,7 +101,7 @@ void Trap_UpdateProbeContacts(struct TrapProbe *probe)
     volatile s32 index = 0;
     s32 count;
     s32 i;
-    gUnk_03001684 = 1;
+    gTrapDispatchStarted = 1;
     count = probe->count;
     i = 0;
     for (; i < gTerrainMap->trapCount; i++) {
