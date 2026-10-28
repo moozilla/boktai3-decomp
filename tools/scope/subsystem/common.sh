@@ -7,5 +7,5 @@ MODEL=${MODEL:-gpt-6.1-sol}
 mkdir -p "$STATE"
 workers() { for W in "$WT"/sc-*; do [ -f "$W/build/scope/campaign/queue.json" ] && echo "$W"; done; }
 thread_id() { grep -o '"thread_id":"[0-9a-f-]*"' "$1/build/run.jsonl" 2>/dev/null | head -1 | cut -d'"' -f4; }
-alive() { pgrep -f "codex exec -m $MODEL -s workspace-write -C $1 " >/dev/null && return 0
+alive() { pgrep -f "codex exec -m [^ ]* -s workspace-write -C $1 " >/dev/null && return 0
           id=$(thread_id "$1"); [ -n "$id" ] && pgrep -f "codex exec resume.*$id" >/dev/null; }
