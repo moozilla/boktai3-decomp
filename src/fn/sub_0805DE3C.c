@@ -55,8 +55,8 @@ void SceneHud_DrawClock(u32 mode)
                 output[1] = stored;
             }
         }
-        SceneHud_DrawDecimal(gUnk_03005430.hourA, 10, 24, 0, 0);
-        SceneHud_DrawDecimal(gUnk_03005430.minuteA, 10, 27, 0, 0);
+        SceneHud_DrawDecimal(gSunClock.hourA, 10, 24, 0, 0);
+        SceneHud_DrawDecimal(gSunClock.minuteA, 10, 27, 0, 0);
     } else {
         {
             register u32 glyph asm("r2") = 0xF07C;
@@ -82,7 +82,7 @@ void SceneHud_DrawClock(u32 mode)
                 output[1] = stored;
             }
         }
-        SceneHud_DrawDecimal(gUnk_03005430.hourB, 10, 24, 0, 0);
-        SceneHud_DrawDecimal(gUnk_03005430.minuteB, 10, 27, 0, 0);
+        SceneHud_DrawDecimal(gSunClock.hourB, 10, 24, 0, 0);
+        SceneHud_DrawDecimal(gSunClock.minuteB, 10, 27, 0, 0);
     }
 }

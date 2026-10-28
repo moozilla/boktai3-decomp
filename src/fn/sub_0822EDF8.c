@@ -6,7 +6,6 @@ struct Snapshot {
     u32 a, b;
     u16 c, d;
 };
-extern u32 gUnk_0300546C;
 void MusicSlots_StopAllAndRetainResumable(void), InterruptsAndVideo_WaitForVBlank(void),
     m4aSoundVSyncOff(void), m4aSoundVSyncOn(void), Solar_PauseMeasurement(void);
 u32 Solar_ResumeMeasurement(void);
@@ -22,7 +21,7 @@ u32 Save_ResumeRuntimeAfterTransfer(void)
     gScanlineDmaTarget = snap->b;
     gScanlineDmaCount = snap->c;
     gScanlineDmaMode = snap->d;
-    gUnk_0300546C = gTransferSavedRuntimeFlag;
+    gClockSynced = gTransferSavedRuntimeFlag;
     *(volatile u16 *)0x04000208 = 1;
     return Solar_ResumeMeasurement();
 }

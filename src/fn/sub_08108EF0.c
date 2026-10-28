@@ -15,7 +15,6 @@ struct SlotMonitor {
     void (*callback)(void);
     u32 f80;
 };
-extern u32 gUnk_0300546C;
 void Solar_PauseMeasurement(void);
 void Serial_InitMultiplayer(void);
 void sub_08223180(void);
@@ -26,7 +25,7 @@ s32 SlotMonitor_Initialize(struct SlotMonitor *obj, s32 timeout, u32 param, u32 
 {
     gSlotMonitor = obj;
     Solar_PauseMeasurement();
-    gUnk_0300546C = 1;
+    gClockSynced = 1;
     Serial_InitMultiplayer();
     sub_08223180();
     if (timeout == 0)

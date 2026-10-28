@@ -1,11 +1,11 @@
 #include "global.h"
 #include "render.h"
 #include "runtime.h"
+#include "ram.h"
 struct Task {
     u8 pad[24];
     s32 state, counter;
 };
-extern u32 gUnk_030054B0;
 extern u32 gEngineFlags;
 extern u16 gUnk_03005260;
 extern u8 *gGameState;
@@ -42,7 +42,7 @@ update: {
             u16 procedure;
             u32 *active;
             u32 next;
-            gUnk_030054B0 = state;
+            gRegionOverride = state;
             active = &gSceneEntryActive;
             next = 1;
             *active = next;

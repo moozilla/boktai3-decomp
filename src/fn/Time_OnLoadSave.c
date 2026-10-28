@@ -11,7 +11,7 @@ struct TimeState {
     u32 region;
 };
 extern struct TimeState *gSessionState;
-extern u8 gUnk_03005430[];
+extern u8 gSunClock[];
 s32 Script_GetValueSafe(void);
 u8 *Script_SetPc(u8 *pc);
 s32 Script_ReadValue(const void *);
@@ -45,5 +45,5 @@ void Time_OnLoadSave(void)
         region = 6;
     }
     Time_CalculateSunriseSunset(entries[region].latitude, entries[region].longitude, 0);
-    gUnk_03005430[9] = 0;
+    gSunClock[9] = 0;
 }

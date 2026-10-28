@@ -1,4 +1,3 @@
-#define gSunClock gUnk_03005430
 #include "global.h"
 #include "sun_clock.h"
 

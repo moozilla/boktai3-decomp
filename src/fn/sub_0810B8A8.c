@@ -3,7 +3,6 @@
 #include "area_effect_link.h"
 #include "engine.h"
 #include "ram.h"
-extern u32 gUnk_0300546C;
 void Serial_StopCommunication(void);
 void Video_SetRenderCallbacks(s32, void (*)(void), void (*)(void), void (*)(void));
 void SpriteOam_QueueProjectedSprites(void);
@@ -19,7 +18,7 @@ s32 SessionMenu_Destroy(struct AreaEffectLinkState *p)
     gEngineFlags &= ~0x800;
     if (p->menuTextWindow >= 0 && TextWindow_Clear(p->menuTextWindow) == 0)
         p->menuTextWindow = -1;
-    gUnk_0300546C = 0;
+    gClockSynced = 0;
     gUnk_020004B4 = 0;
     return 0;
 }

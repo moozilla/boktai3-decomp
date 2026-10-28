@@ -4,7 +4,7 @@ struct SceneActorControlSystem {
     u8 unknown0[14];
     u8 mode;
 };
-extern struct SceneActorControlSystem gUnk_03005430;
+extern struct SceneActorControlSystem gSunClock;
 static inline u8 MatchesScene(s32 scene, struct GameState *state)
 {
     if (state->region == scene)
@@ -13,7 +13,7 @@ static inline u8 MatchesScene(s32 scene, struct GameState *state)
 }
 u32 SceneActorControl_IsEnabledForScene(struct SceneActorControlSlot *slot)
 {
-    u32 mode = gUnk_03005430.mode;
+    u32 mode = gSunClock.mode;
     if (mode != 5 && mode != 0 && mode != 4 && (gGameState->flags868 & 2) &&
         MatchesScene(slot->scene, gGameState))
         return 1;

@@ -3,9 +3,9 @@
 /* SunClock_GetWeekday: Returns the weekday index computed when the date changes */
 #define SunClock_GetWeekday sub_08228DAC
 
-extern u8 gUnk_03005430[];
+extern u8 gSunClock[];
 
 u8 sub_08228DAC(void)
 {
-    return gUnk_03005430[8];
+    return gSunClock[8];
 }

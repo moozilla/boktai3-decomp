@@ -3,8 +3,8 @@
 #include "render.h"
 #include "menu_parameters.h"
 #include "runtime.h"
+#include "ram.h"
 extern u16 gUnk_03005260[];
-extern u32 gUnk_0300546C;
 void SelectionPalette_UpdatePulse(void *);
 void Sound_PlaySong(s32);
 void Menu_StartFadeOut(s32);
@@ -70,10 +70,10 @@ void GameStart_Update(u8 *p)
                 if (W(0x4E0) == 0)
                     Script_Call(gListMenuParameters.c, 0);
                 else if (W(0x4E0) == 2) {
-                    gUnk_0300546C = 0;
+                    gClockSynced = 0;
                     Script_Call(gListMenuParameters.f, 0);
                 } else if (W(0x4E0) == 1 && GS_W(0x5A4) != 0) {
-                    gUnk_0300546C = 0;
+                    gClockSynced = 0;
                     Script_Call(gListMenuParameters.l, 0);
                     gEnginePauseFlags = 0;
                     gSceneTransitionFlags = 0x11;

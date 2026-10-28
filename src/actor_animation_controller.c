@@ -490,7 +490,7 @@ void Actor_RestoreSavedAnimationPlayback(u8 *p)
 
 /* Tentative role: arm the idle animation transition at its resting position. */
 
-extern u8 gUnk_03005430[];
+extern u8 gSunClock[];
 
 /* Provisional name: Actor_UpdateIdleWait */
 
@@ -523,7 +523,7 @@ void Actor_ArmRestIdleTransition(struct ActorAnimController *p)
     if (p->obj.x == 25 && p->obj.z == 0 && absolute(p->obj.y - 102) <= 9) {
         p->timer = 0;
         p->fn = Actor_UpdateIdleWait;
-        if (gUnk_03005430[14] == 5 || gUnk_03005430[14] == 0 || gUnk_03005430[14] == 4)
+        if (gSunClock[14] == 5 || gSunClock[14] == 0 || gSunClock[14] == 4)
             p->delay = 1800;
         else
             p->delay = 10800;
@@ -545,7 +545,7 @@ void Actor_UpdateIdleWait(struct ActorAnimController *p)
 {
     if (*(s32 *)gUnk_03005260) {
         p->timer = 0;
-        if (gUnk_03005430[14] == 5 || gUnk_03005430[14] == 0 || gUnk_03005430[14] == 4)
+        if (gSunClock[14] == 5 || gSunClock[14] == 0 || gSunClock[14] == 4)
             p->delay = 1800;
         else
             p->delay = 10800;
@@ -686,7 +686,7 @@ void Actor_UpdateInteractionSoundDelay(struct ActorAnimController *p)
 {
     if (--p->delayCounter == 0) {
         p->otherFn = 0;
-        if ((u8)(gUnk_03005430[14] - 1) <= 2)
+        if ((u8)(gSunClock[14] - 1) <= 2)
             Sound_PlaySong(0x120);
         else
             SunClock_GetBaseHour();
@@ -1477,7 +1477,7 @@ void Actor_OnInteractionChildDelay(struct ActorAnimController *input, struct Act
     struct ActorAnimController *p = input;
     if (child_take_v2(c)) {
         p->timer = 10;
-        if (gUnk_03005430[14] != 5 && gUnk_03005430[14] != 0 && gUnk_03005430[14] != 4)
+        if (gSunClock[14] != 5 && gSunClock[14] != 0 && gSunClock[14] != 4)
             *((u8 *)p + 0xf6f) = 1;
         else
             *((u8 *)p + 0xf6f) = 0;
@@ -2450,7 +2450,7 @@ void Actor_MoveAlongCurveToRest(struct ActorAnimController *p)
             p->targetX = 25;
             p->targetY = 102;
             p->targetZ = 0;
-        } else if (gUnk_03005430[14] != 5 && gUnk_03005430[14] != 0 && gUnk_03005430[14] != 4) {
+        } else if (gSunClock[14] != 5 && gSunClock[14] != 0 && gSunClock[14] != 4) {
             p->targetX = 25;
             p->targetY = 92;
             p->targetZ = 0;
@@ -4703,7 +4703,7 @@ void Actor_ConfigureFromScript(void)
     if (Script_SeekToKeyword(0x63))
         W(0xf50) = Script_GetValue();
     g->phaseSelect = Script_GetKeywordValue(0x73, 0);
-    if (gUnk_03005430[14] != 5 && gUnk_03005430[14] != 0 && gUnk_03005430[14] != 4)
+    if (gSunClock[14] != 5 && gSunClock[14] != 0 && gSunClock[14] != 4)
         g->growFlag = 1;
     else
         g->growFlag = 0;

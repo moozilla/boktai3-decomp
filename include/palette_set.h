@@ -24,7 +24,7 @@ struct PaletteSet {
     struct PaletteSetEntry palettes[PALETTE_SET_MAX];
 };
 
-extern u8 gUnk_03005430[]; // game state bytes (14: current, 15: previous; guess)
+extern u8 gSunClock[]; // game state bytes (14: current, 15: previous; guess)
 
 int Palette_GetTransitionLevel(void);
 int Palette_GetBrightness(void);

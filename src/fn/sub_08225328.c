@@ -2,7 +2,6 @@
 #include "ram.h"
 #include "runtime.h"
 extern u32 gEngineFlags;
-extern u32 gUnk_030054B0;
 extern u8 *gGameState;
 void Script_InitActorRegistry(void);
 void SceneLifecycle_ResetSceneRegistries(void);
@@ -39,7 +38,7 @@ void SceneLifecycle_InitManager(void)
     gPlayTimeCounterEnabled = 0;
     *(u32 *)(gGameState + 0x868) = 0;
     gSceneTransitionFlags = 0;
-    gUnk_030054B0 = 0;
+    gRegionOverride = 0;
     Settings_LoadOrInitializeDefaults();
     SceneLifecycle_ResetSubsystems();
     Random_InitValueTable();

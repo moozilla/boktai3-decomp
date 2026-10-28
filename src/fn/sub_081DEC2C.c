@@ -8,7 +8,7 @@ struct DateMenu {
     s32 oldYear, oldMonth, oldDay, oldHour, oldMinute;
 };
 extern u16 gUnk_03005260[];
-extern u8 gUnk_03005430[];
+extern u8 gSunClock[];
 void Sound_PlaySong(s32);
 void AnimPanel_HandleClockInput(void *);
 void SunClock_SetDateTime(s32, s32, s32, s32, s32, s32, s32);
@@ -48,7 +48,7 @@ void Time_UpdateDateMenu(struct DateMenu *p)
                 Sound_PlaySong(0xDD);
                 SunClock_SetDateTime(p->year, p->month, p->day, p->hour, p->minute, 0, 1);
                 Time_CalculateSunriseSunset(0x23A666, 0x8BC000, 0);
-                gUnk_03005430[9] = 0;
+                gSunClock[9] = 0;
                 Menu_StartFadeOut(p->fadeShift);
                 p->state = 1;
                 p->result = 1;

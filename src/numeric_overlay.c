@@ -17,7 +17,7 @@ void sub_0800F4EC(struct NumericOverlay *unused)
     int row, col, n, base;
     register int *values asm("ip");
     u32 hours, minutes;
-    struct StatusGameState *c = &gUnk_03005430;
+    struct StatusGameState *c = &gSunClock;
     if (!c)
         return;
     if (c->mode == 0 || c->mode == 4 || c->mode == 5) {

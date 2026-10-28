@@ -9,7 +9,7 @@ s32 SunClock_SetDateTime(s32 a, s32 b, s32 c, s32 hour, s32 minute, s32 extra, s
     struct SunClock *k;
     s32 result;
     u32 stamp = Clock_PackDate();
-    k = &gUnk_03005430;
+    k = &gSunClock;
     k->stamp = stamp;
     k->field8 = Clock_CalculateWeekday(a, b, c);
     k->baseHour = hour;

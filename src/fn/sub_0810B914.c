@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct Registry1745Settings {
     u8 pad0[0x15C];
     u32 field15C;
@@ -46,7 +47,6 @@ struct Registry1745 {
     struct Registry1745Settings settings;
 };
 extern struct Registry1745 *gUnk_020004B4;
-extern u32 gUnk_0300546C;
 void Task_LinkToPriorityList(void *);
 void sub_08223180(void);
 void Registry1745_ResetTransferCounters(void *);
@@ -89,7 +89,7 @@ struct Registry1745 *Registry1745_Create(void)
         zero = 0;
         p->field10 = (u32)existing;
         Task_LinkToPriorityList(p);
-        gUnk_0300546C = one;
+        gClockSynced = one;
         sub_08223180();
         p->field18 = 0xFFFF;
         p->field1E = zero;

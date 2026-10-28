@@ -54,7 +54,7 @@ struct StatusGameState {
     u8 counters[2];    // shown when mode is not 0, 4 or 5
     u8 altCounters[2]; // shown when mode is 0, 4 or 5
 };
-extern struct StatusGameState gUnk_03005430;
+extern struct StatusGameState gSunClock;
 
 u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y); // address of a tile in the background's tilemap
 void NumericDisplay_DrawPair(void *unused, int left, int right);

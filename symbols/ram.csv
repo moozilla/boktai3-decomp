@@ -453,12 +453,12 @@ addr,name,size,kind,decl,header,confidence,notes
 03005414,gSceneControlWord3,4,object,extern u32 gSceneControlWord3;,include/runtime.h,,Cleared during transitions and by Engine_ClearControlFlags; finer meaning unresolved
 03005418,gUnk_03005418,8,object,,,,
 03005420,gActiveCamera,4,object,extern u8 *gActiveCamera;,include/ram.h,low,
-03005428,gUnk_03005428,2,object,,,,
-03005430,gUnk_03005430,24,object,,,,
-03005460,gUnk_03005460,8,object,,,,
-0300546C,gUnk_0300546C,4,object,,,,
+03005428,gSilentGlyph,2,object,extern u16 gSilentGlyph;,include/ram.h,low,"glyph code that plays no text sound; set by Text_SetSilentCharacterFromScript, compared in TextState_PlayGlyphSound"
+03005430,gSunClock,24,object,extern struct SunClock gSunClock;,include/sun_clock.h,low,"sun clock state (base time, times A and B, spans, light phase); the object is 0x24 bytes"
+03005460,gRtcDateTime,8,object,extern u8 gRtcDateTime[8];,include/sun_clock.h,low,"RTC date/time bytes (BCD year, month, day, weekday, hour, minute, second) read and written by the Clock functions"
+0300546C,gClockSynced,4,object,extern u32 gClockSynced;,include/ram.h,low,nonzero once the clock has been synced from the RTC; SunClock_Refresh syncs while it is zero
 03005470,gMusicSlotSongs,3E,object,extern u16 gMusicSlotSongs[];,include/ram.h,low,
-030054B0,gUnk_030054B0,4,object,,,,
+030054B0,gRegionOverride,4,object,extern u32 gRegionOverride;,include/ram.h,low,"region override flag: set by Region_SetCurrentFromScript, cleared when the region list is destroyed"
 030054B4,gSolarControlFlag,2,object,extern u16 gSolarControlFlag;,include/runtime.h,low,solar control flag set by sub_0822C180 and cleared by sub_0822C18C; purpose tentative
 030054B8,gSolarSimulatedIntensity,2,object,extern u16 gSolarSimulatedIntensity;,include/runtime.h,low,"simulated solar intensity ramping 0..140 (0x8C), returned by sub_0822C8D8"
 030054BC,gSolarPaused,2,object,extern u16 gSolarPaused;,include/runtime.h,low,"solar task paused flag: set by Solar_PauseMeasurement, cleared by Solar_ResumeMeasurement"

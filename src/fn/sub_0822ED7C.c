@@ -6,7 +6,6 @@ struct Snapshot {
     u32 a, b;
     u16 c, d;
 };
-extern u32 gUnk_0300546C;
 void MusicSlots_StopAllAndRetainResumable(void), InterruptsAndVideo_WaitForVBlank(void),
     m4aSoundVSyncOff(void), m4aSoundVSyncOn(void), Solar_PauseMeasurement(void),
     Solar_ResumeMeasurement(void);
@@ -26,8 +25,8 @@ u32 Save_SuspendRuntimeForTransfer(void)
     m4aSoundVSyncOff();
     InterruptsAndVideo_WaitForVBlank();
     *(volatile u16 *)0x04000208 = 0;
-    gTransferSavedRuntimeFlag = gUnk_0300546C;
-    gUnk_0300546C = 1;
+    gTransferSavedRuntimeFlag = gClockSynced;
+    gClockSynced = 1;
     *(volatile u16 *)0x04000208 = 1;
     Solar_PauseMeasurement();
     return 0;

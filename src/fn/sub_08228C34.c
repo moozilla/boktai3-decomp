@@ -3,9 +3,9 @@
 /* SunClock_GetSunsetMinute: Returns the minute stored by the sunset setter */
 #define SunClock_GetSunsetMinute sub_08228C34
 
-extern u8 gUnk_03005430[];
+extern u8 gSunClock[];
 
 u8 sub_08228C34(void)
 {
-    return gUnk_03005430[13];
+    return gSunClock[13];
 }

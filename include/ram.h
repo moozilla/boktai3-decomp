@@ -246,5 +246,14 @@ extern u32 gHeapEndGuard;           /* heap-end guard word expected to equal 0x5
 extern u8 gBgMapWorkBuffer[0x2000]; /* background map work buffer, cleared for 0x2000 bytes */
 extern u8
     gGameStateStorage[]; /* backing storage for timer-jittered game-state and variable regions */
+/* 0x03005428 */
+extern u16
+    gSilentGlyph; /* glyph code that plays no text sound; set by Text_SetSilentCharacterFromScript, compared in TextState_PlayGlyphSound */
+/* 0x030054B0 */
+extern u32
+    gRegionOverride; /* region override flag: set by Region_SetCurrentFromScript, cleared when the region list is destroyed */
+/* 0x0300546C */
+extern u32
+    gClockSynced; /* nonzero once the clock has been synced from the RTC; SunClock_Refresh syncs while it is zero */
 
 #endif
