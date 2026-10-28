@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "engine_globals.h"
 struct Task {
     struct Task *prev, *next;
     void (*update)(struct Task *), (*destroy)(struct Task *);
@@ -9,7 +10,6 @@ struct List {
     struct Task *head;
     u32 mask;
 };
-extern struct List gTaskLists[14];
 void Task_UnlinkFromPriorityList(struct Task *);
 void Heap_Free(struct Task *);
 void TaskSystem_RunFrame(void)

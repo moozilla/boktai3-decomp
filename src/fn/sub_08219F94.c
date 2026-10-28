@@ -1,4 +1,5 @@
 #include "global.h"
+#include "engine_globals.h"
 
 struct Task {
     struct Task *prev, *next;
@@ -9,7 +10,6 @@ struct List {
     struct Task *head;
     u32 pad;
 };
-extern struct List gTaskLists[];
 
 void Task_UnlinkFromPriorityList(struct Task *t)
 {
