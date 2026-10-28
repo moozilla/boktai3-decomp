@@ -411,29 +411,29 @@ addr,name,size,kind,decl,header,confidence,notes
 03005240,gNextTaskId,2,object,extern u16 gNextTaskId;,include/engine.h,,"next Task id (unique, never 0)"
 03005250,gLinkMenuActive,4,object,extern u32 gLinkMenuActive;,include/ram.h,low,
 03005260,gUnk_03005260,10,object,,,,
-03005270,gUnk_03005270,2,object,,,,
+03005270,gHardwareKeys,2,object,extern u16 gHardwareKeys;,include/runtime.h,,Raw active-low KEYINPUT sampled before per-player input records are updated
 03005274,gSceneSelectionDisplaySlots,A,object,extern u16 gSceneSelectionDisplaySlots[];,include/ram.h,low,
-03005278,gUnk_03005278,,interior,,,,gUnk_03005274 +0x4
+03005278,gLcgState,4,object,extern u32 gLcgState;,include/runtime.h,,"Independent LCG state, separate from gRandomIndex at 03005274; initialized to 123456 and advanced by Random_Next15"
 03005280,gTaskLists,70,object,extern struct TaskList gTaskLists[14];,include/engine.h,,task lists by priority
-030052F0,gUnk_030052F0,4,object,,,,
+030052F0,gResourceRegistryCount,4,object,extern s32 gResourceRegistryCount;,include/runtime.h,,"High-water count of resource-registry entries, capped at 32"
 030052F4,gTerrainMap,4,object,extern struct EngineMap *gTerrainMap;,include/engine.h,low,
 030052F8,gTerrainWidth,4,object,extern u32 gTerrainWidth;,include/engine.h,low,
 030052FC,gTerrainHeight,4,object,extern u32 gTerrainHeight;,include/engine.h,low,
 03005300,gTerrainTrapSerial,4,object,extern u32 gTerrainTrapSerial;,include/ram.h,low,
 03005304,gEffectRandomTableIndex,4,object,extern u32 gEffectRandomTableIndex;,include/ram.h,low,
 03005308,gRandomIndex,4,object,extern u32 gRandomIndex;,include/engine.h,low,
-0300530C,gUnk_0300530C,2,object,,,,
-03005310,gUnk_03005310,4,object,,,,
-03005314,gUnk_03005314,4,object,,,,
-03005318,gUnk_03005318,4,object,,,,
+0300530C,gSerialMultiplayer1Word,2,object,extern u16 gSerialMultiplayer1Word;,include/serial.h,,Last word sampled from SIOMULTI1 by the byte-transfer interrupt
+03005310,gSerialPeer1Interrupts,4,object,extern s32 gSerialPeer1Interrupts;,include/serial.h,,Counter advanced by the SIOMULTI1 byte-transfer handler; tentative name
+03005314,gSerialInitialized,4,object,extern u32 gSerialInitialized;,include/serial.h,,Set to 1 by Serial_InitMultiplayer; no semantic reader observed here
+03005318,gSerialPeer0Interrupts,4,object,extern s32 gSerialPeer0Interrupts;,include/serial.h,,Counter advanced by the SIOMULTI0 byte-transfer handler; tentative name
 0300531C,gSerialConnectionRole,4,object,extern s32 gSerialConnectionRole;,include/ram.h,low,
-03005320,gUnk_03005320,2,object,,,,
+03005320,gSerialMultiplayer0Word,2,object,extern u16 gSerialMultiplayer0Word;,include/serial.h,,Last word sampled from SIOMULTI0 by the byte-transfer interrupt
 03005324,gSerialTransferStatus,4,object,extern s32 gSerialTransferStatus;,include/ram.h,low,
-03005330,gUnk_03005330,2,object,,,,
+03005330,gSerialQueuedPacketCount,2,object,extern u16 gSerialQueuedPacketCount;,include/serial.h,,Number of queued four-halfword multiplayer packets
 03005340,gSerialLatestPackets,10,object,extern s16 gSerialLatestPackets[];,include/ram.h,low,
-03005350,gUnk_03005350,2,object,,,,
+03005350,gSerialPacketQueue,2,object,extern u16 gSerialPacketQueue[4][4];,include/serial.h,,"Four queued packets of four halfwords, with ring indices masked by 3"
 03005370,gSerialReceivePackets,10,object,extern s16 gSerialReceivePackets[];,include/ram.h,low,
-03005380,gUnk_03005380,2,object,,,,
+03005380,gSerialPacketReadIndex,2,object,extern u16 gSerialPacketReadIndex;,include/serial.h,,Current read index in the four-entry multiplayer packet ring
 03005390,gUnk_03005390,48,object,,,,
 030053D8,gUnk_030053D8,4,object,,,,
 030053DC,gUnk_030053DC,4,object,,,,

@@ -64,5 +64,10 @@ extern u32
 extern u32 gVideoInterruptsEnabled; /* Gates video register updates and link/clock work in VBlank */
 extern u16
     gVideoTransferControl; /* Runtime transfer-control flag initialized to 1 and cleared around save/wireless transfer; tentative name */
+extern u16
+    gHardwareKeys; /* Raw active-low KEYINPUT sampled before per-player input records are updated */
+extern u32
+    gLcgState; /* Independent 32-bit linear-congruential state, initialized to 123456 and advanced by Random_Next15 */
+extern s32 gResourceRegistryCount; /* High-water count of resource-registry entries, capped at 32 */
 
 #endif

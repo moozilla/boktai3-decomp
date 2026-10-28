@@ -2,9 +2,6 @@
 #include "ram.h"
 #include "serial.h"
 
-extern s32 gUnk_03005318;
-extern u16 gUnk_03005320;
-
 /* Serial interrupt handler for the multiplayer link: reads the peer words,
    queues received data, sends the next queued byte and latches the role. */
 void sub_082227D8(void)
@@ -13,7 +10,7 @@ void sub_082227D8(void)
     u32 b = *(vu16 *)0x04000124;
     u32 c = *(vu16 *)0x04000126;
     u32 send = 0;
-    gUnk_03005320 = a;
+    gSerialMultiplayer0Word = a;
     if ((*(vu16 *)0x04000128 & 0x40) || b != 0xFFFF || c != b) {
         if (b != 0xFFFF || c != b)
             gSerialTransferStatus = -7;
@@ -42,5 +39,5 @@ void sub_082227D8(void)
                 gSerialTransferStatus = -5;
         }
     }
-    gUnk_03005318++;
+    gSerialPeer0Interrupts++;
 }

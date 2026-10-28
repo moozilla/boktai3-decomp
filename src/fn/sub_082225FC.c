@@ -2,9 +2,6 @@
 #include "ram.h"
 #include "serial.h"
 
-extern s32 gUnk_03005310;
-extern u16 gUnk_0300530C;
-
 /* Timer 3 handler for the multiplayer serial link: reads the three peer
    words, queues received data and sends the next queued byte. */
 void sub_082225FC(void)
@@ -13,7 +10,7 @@ void sub_082225FC(void)
     u32 b = *(vu16 *)0x04000124;
     u32 c = *(vu16 *)0x04000126;
     u32 send = 0;
-    gUnk_0300530C = a;
+    gSerialMultiplayer1Word = a;
     if ((*(vu16 *)0x04000128 & 0xC0) || b != 0xFFFF || c != b) {
         if (b != 0xFFFF || c != b)
             gSerialTransferStatus = -7;
@@ -39,5 +36,5 @@ void sub_082225FC(void)
     }
     *(vu16 *)0x04000128 |= 0x80;
     *(vu16 *)0x0400010C = 0xF5D8;
-    gUnk_03005310++;
+    gSerialPeer1Interrupts++;
 }

@@ -1,7 +1,7 @@
 #include "global.h"
-extern s32 gUnk_03005318;
+#include "serial.h"
 
 s32 sub_08222C70(void)
 {
-    return gUnk_03005318;
+    return gSerialPeer0Interrupts;
 }

@@ -147,3 +147,16 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03005180 `gBgPaletteBank14` (unified):** Interior background palette bank 14, at gBgPaletteBuffer +0x1C0 bytes; ramlayout before/after checks passed.
 - **030051A0 `gBgPaletteBank15` (unified):** Interior background palette bank 15, at gBgPaletteBuffer +0x1E0 bytes; ramlayout before/after checks passed.
 - **03005160 `gUnk_03005160` (skipped):** Existing scene_input_panel.h byte-array and status_screen.h halfword-array exports conflict when render.h exposes one shared bank type; ramlayout reports 123 compiler failures and writes nothing. Other palette aliases are unaffected.
+
+- **03005260 `gUnk_03005260` (skipped):** Protected selection_menu.c inherits the key declaration through shared UI headers. Restoring the source after renaming those headers makes the old name undeclared; the attempted migration was fully rolled back.
+- **03005270 `gHardwareKeys` (unified):** Raw active-low KEYINPUT sampled before per-player input records are updated; ramlayout before/after checks passed.
+- **03005278 `gLcgState` (unified):** Independent 32-bit linear-congruential state, initialized to 123456 and advanced by Random_Next15; ramlayout before/after checks passed.
+- **030052F0 `gResourceRegistryCount` (unified):** High-water count of resource-registry entries, capped at 32; ramlayout before/after checks passed.
+- **0300530C `gSerialMultiplayer1Word` (unified):** Last word sampled from SIOMULTI1 by the byte-transfer interrupt; ramlayout before/after checks passed.
+- **03005310 `gSerialPeer1Interrupts` (unified):** Counter advanced by the SIOMULTI1 byte-transfer handler; tentative name; ramlayout before/after checks passed.
+- **03005314 `gSerialInitialized` (unified):** Set to 1 by Serial_InitMultiplayer; no semantic reader observed here; ramlayout before/after checks passed.
+- **03005318 `gSerialPeer0Interrupts` (unified):** Counter advanced by the SIOMULTI0 byte-transfer handler; tentative name; ramlayout before/after checks passed.
+- **03005320 `gSerialMultiplayer0Word` (unified):** Last word sampled from SIOMULTI0 by the byte-transfer interrupt; ramlayout before/after checks passed.
+- **03005330 `gSerialQueuedPacketCount` (unified):** Number of queued four-halfword multiplayer packets; ramlayout before/after checks passed.
+- **03005350 `gSerialPacketQueue` (unified):** Four queued packets of four halfwords, with ring indices masked by 3; ramlayout before/after checks passed.
+- **03005380 `gSerialPacketReadIndex` (unified):** Current read index in the four-entry multiplayer packet ring; ramlayout before/after checks passed.

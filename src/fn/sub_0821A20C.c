@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern s32 gUnk_030052F0;
+#include "runtime.h"
 
 void ResourceRegistry_Initialize(void)
 {
-    gUnk_030052F0 = 0;
+    gResourceRegistryCount = 0;
 }

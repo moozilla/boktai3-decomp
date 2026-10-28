@@ -2,7 +2,6 @@
 #include "render.h"
 #include "ram.h"
 #include "runtime.h"
-extern u32 gUnk_03005278;
 extern u16 gNextTaskId;
 void Heap_Initialize(void);
 void TaskSystem_InitLists(void);
@@ -18,7 +17,7 @@ void TaskSystem_Initialize(void)
     TaskSystem_InitLists();
     ResourceRegistry_Initialize();
     MessageQueue_InitBuffers();
-    gUnk_03005278 = 123456;
+    gLcgState = 123456;
     task = &gRootTask;
     Task_SetCallbacks(task, TaskSystem_UpdateRoot, 0);
     task->priority = 0;
