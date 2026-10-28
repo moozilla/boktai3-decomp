@@ -387,53 +387,85 @@ def data_measures():
             "complete_data_percent": pct(m["complete_data"])}
 
 
-ROM_DATA_START = 0x0824DAFC  # first byte of gen/data.s (after the code's alignment)
-ROM_DATA_END = 0x08E88144    # end of used ROM; the zero padding after it is free space
-MANIFEST = Path(ROOT) / "data/manifest.csv"
-ROM_DATA_SYMBOLS = Path(ROOT) / "symbols/data.csv"
+def data_fields(total, matched):
+    pct = 100 * matched / total if total else 0.0
+    return {"total_data": str(total), "matched_data": str(matched), "matched_data_percent": pct,
+            "complete_data": str(matched), "complete_data_percent": pct}
 
 
-def rom_data_measures(manifest=MANIFEST, symbols=ROM_DATA_SYMBOLS):
-    """ROM data (tables, graphics, text, scripts, sound; docs/DATA_TRACKING.md),
-    kept apart from the RAM data measure. No ROM needed: total = the data
-    region; decoded = data/manifest.csv ranges whose format emits them from an
-    editable source (datafmt SOURCE "decoded"); split = ranges whose structure
-    is regenerated but whose pieces are opaque extracted files ("split"); the
-    rest is .incbin of the base ROM. named = symbols/data.csv rows in the
-    region (bytes only for rows with a size)."""
-    sys.path.insert(0, str(Path(ROOT) / "tools"))
-    import importlib
-    total = ROM_DATA_END - ROM_DATA_START
-    out = {"total": total, "decoded": 0, "split": 0, "named": 0, "named_bytes": 0, "ranges": []}
-    with open(manifest, newline="", encoding="utf-8") as f:
-        for r in csv.DictReader(f):
-            a, b = int(r["start"], 16), int(r["end"], 16)
-            kind = getattr(importlib.import_module("datafmt." + r["format"]), "SOURCE", "split")
-            out[kind] += b - a
-            out["ranges"].append((r["name"], a, b, kind))
-    with open(symbols, newline="", encoding="utf-8") as f:
-        for r in csv.DictReader(f):
-            if ROM_DATA_START <= int(r["addr"], 16) < ROM_DATA_END:
-                out["named"] += 1
-                out["named_bytes"] += int(r["size"], 16) if r["size"] else 0
-    out["raw"] = total - out["decoded"] - out["split"]
+def rom_data_units(units=None):
+    """objdiff units for ROM data (tools/romdata.py, docs/DATA_TRACKING.md): one per
+    symbols/rom_data.csv row, named "ROM data: KIND/UNIT", each in exactly one
+    category rom_KIND, with data measures only and one .rodata section item."""
+    import romdata
+    units = romdata.measure() if units is None else units
+    out = []
+    for u in units:
+        fields = data_fields(u["size"], u["matched"])
+        complete = u["matched"] == u["size"]
+        out.append({"name": f"{romdata.LABEL_PREFIX}{u['label']}/{u['unit']}",
+                    "measures": {"fuzzy_match_percent": fields["matched_data_percent"],
+                                 "total_code": "0", "matched_code": "0", "matched_code_percent": 0.0,
+                                 **fields, "total_functions": 0, "matched_functions": 0,
+                                 "matched_functions_percent": 0.0, "complete_code": "0",
+                                 "complete_code_percent": 0.0, "total_units": 1, "complete_units": int(complete)},
+                    "sections": [{"name": ".rodata", "size": str(u["size"]),
+                                  "fuzzy_match_percent": fields["matched_data_percent"],
+                                  "metadata": {"virtual_address": str(u["start"])}}],
+                    "functions": [],
+                    "metadata": {"complete": complete,
+                                 "progress_categories": [romdata.CATEGORY_PREFIX + u["kind"]]}})
     return out
 
 
-def rom_data_lines(d):
-    pct = lambda v: 100 * v / d["total"]
-    return [f"ROM data (tables, graphics, text, scripts, sound; not in the data measure above, see "
-            f"[docs/DATA_TRACKING.md](docs/DATA_TRACKING.md)): {d['total']:,} bytes. "
-            f"Emitted from decoded source: **{pct(d['decoded']):.1f}%** ({d['decoded']:,} bytes); "
-            f"from extracted resource files: {pct(d['split']):.1f}%; "
-            f"`.incbin` of the base ROM (pointer words as symbols): {pct(d['raw']):.1f}%. "
-            f"Named data symbols: {d['named']}.", ""]
+def add_rom_data(report, units=None):
+    """Headline data measures = ROM data only (RAM is tracked in PROGRESS.md,
+    not reported). One data-only category per kind; the headline unit counts
+    stay those of the code."""
+    import romdata
+    data_units = rom_data_units(units)
+    report["units"] += data_units
+    for kind, label in romdata.KINDS:
+        cid = romdata.CATEGORY_PREFIX + kind
+        selected = [u for u in data_units if u["metadata"]["progress_categories"] == [cid]]
+        if not selected:
+            continue
+        m = {key: selected[0]["measures"][key] for key in selected[0]["measures"]}
+        total = sum(int(u["measures"]["total_data"]) for u in selected)
+        matched = sum(int(u["measures"]["matched_data"]) for u in selected)
+        m.update(data_fields(total, matched), fuzzy_match_percent=100 * matched / total,
+                 total_units=len(selected), complete_units=sum(u["metadata"]["complete"] for u in selected))
+        report["categories"].append({"id": cid, "name": romdata.LABEL_PREFIX + label, "measures": m})
+    total = sum(int(u["measures"]["total_data"]) for u in data_units)
+    matched = sum(int(u["measures"]["matched_data"]) for u in data_units)
+    report["measures"].update(data_fields(total, matched))
+    return report
+
+
+def rom_data_lines(units=None):
+    """PROGRESS.md: ROM data matched per kind, identified, GCL decompiled."""
+    import romdata
+    units = romdata.measure() if units is None else units
+    total = sum(u["size"] for u in units)
+    matched = sum(u["matched"] for u in units)
+    ident = sum(u["identified"] for u in units)
+    dec = sum(u["decompiled"] for u in units)
+    lines = [f"**ROM data matched: {100 * matched / total:.2f}%** ({matched:,} / {total:,} bytes; "
+             f"reported to decomp.dev as data). Matched = rebuilt from an editable, meaningful source "
+             f"([docs/DATA_TRACKING.md](docs/DATA_TRACKING.md)); extracted `.bin` files count 0. "
+             f"Format identified (not a match): {100 * ident / total:.1f}%. "
+             f"GCL compiled from source but not fully annotated: {dec:,} bytes. "
+             f"Named data symbols: {romdata.named_symbols()}.", "",
+             "| ROM data | Bytes | Matched | Identified | |", "|---|---:|---:|---:|---|"]
+    for kind, label, size, m, i, _ in romdata.by_kind(units):
+        lines.append(f"| {label} | {size:,} | {100 * m / size:.1f}% | {100 * i / size:.1f}% | `{bar(m / size, 20)}` |")
+    return lines + [""]
 
 
 def ram_lines(m):
     if not int(m.get("total_data", 0)):
         return []
-    return [f"RAM objects with one shared declaration (`symbols/ram.csv`, reported as data): "
+    return [f"RAM objects with one shared declaration (`symbols/ram.csv`, tracked here only): "
             f"**{m['matched_data_percent']:.1f}%** ({int(m['matched_data']):,} / {int(m['total_data']):,} bytes); "
             f"no other declaration left: {m['complete_data_percent']:.1f}%.", ""]
 
@@ -589,17 +621,16 @@ def main():
         subsystems = load_groups(funcs, sizes, SUBSYSTEMS, "game")
         report = make_report(funcs, sizes, done, libraries, pinned, subsystems, fuzzy, load_areas(),
                              load_asm_ranges(), categories)
-        report["measures"].update(data_measures())
+        ram = data_measures()
+        print(f"RAM data: {ram['matched_data']}/{ram['total_data']} bytes in a shared header "
+              f"({ram['matched_data_percent']:.2f}%), {ram['complete_data']} complete")
+        add_rom_data(report)
         m = report["measures"]
-        print(f"RAM data: {m['matched_data']}/{m['total_data']} bytes in a shared header "
-              f"({m['matched_data_percent']:.2f}%), {m['complete_data']} complete")
-        d = rom_data_measures()
-        print(f"ROM data: {d['total']} bytes; decoded source {d['decoded']} ({100 * d['decoded'] / d['total']:.2f}%), "
-              f"extracted files {d['split']} ({100 * d['split'] / d['total']:.2f}%), raw {d['raw']}, "
-              f"{d['named']} named symbols")
+        print(f"ROM data (reported as data): {m['matched_data']}/{m['total_data']} bytes matched "
+              f"({m['matched_data_percent']:.2f}%)")
     if args.markdown:
         write_markdown(args.markdown, counted, sizes, done, total_b, done_b, pinned_b, fuzzy, report, categories,
-                       asm_b=sum(sizes[n] for n in asm))
+                       asm_b=sum(sizes[n] for n in asm), ram=ram)
         write_tree(Path(args.markdown).with_suffix(".json"), report, {a for n, a in funcs if n in pinned},
                    Path(ROOT) / "src")
     if args.json:
@@ -637,7 +668,7 @@ def write_tree(out, report, pinned_addrs, source_root):
     categories = {}
     for unit in report["units"]:
         top, name = unit["name"].split("/", 1)
-        if name.endswith(ASM_SUFFIX):
+        if name.endswith(ASM_SUFFIX) or not unit["functions"]:  # ROM data units have no functions
             continue
         fns = []
         for f in unit["functions"]:
@@ -749,7 +780,7 @@ def subsystem_lines(report, categories):
 
 
 def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=None, report=None,
-                   categories=None, asm_b=0):
+                   categories=None, asm_b=0, ram=None):
     fuzzy = fuzzy or {}
     draft_b = sum(sizes[n] for n in fuzzy)
     mean = sum(sizes[n] * p for n, p in fuzzy.items()) / draft_b if draft_b else 0
@@ -767,8 +798,8 @@ def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=N
              f"Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **{len(fuzzy)} functions**, "
              f"{100 * draft_b / total_b:.3f}% of code, mean fuzzy match {mean:.1f}%.", "",
              f"Intentional assembly (GBA header, crt0, SDK assembly; not counted above): {asm_b:,} bytes.", "",
-             *ram_lines(report["measures"]),
-             *rom_data_lines(rom_data_measures()),
+             *ram_lines(ram or {}),
+             *rom_data_lines(),
              "```", f"{bar(done_b / total_b, 50)} {100 * done_b / total_b:.2f}%", "```", "",
              "| Region | Functions | Matched | Bytes matched | |", "|---|---:|---:|---:|---|"]
     for lo, hi in regions:

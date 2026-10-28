@@ -262,4 +262,5 @@ those bytes to `total_data`/`matched_data` next to RAM, or report them as a
 separate category. Backlogged with the RAM accounting landed.
 
 Researched on October 27: [DATA_TRACKING.md](DATA_TRACKING.md) has the objdiff
-semantics, the current ROM data numbers (now in PROGRESS.md) and the plan.
+semantics, the current ROM data numbers and the plan; the report (ROM data as
+the headline data measure, categories by kind) landed the same day.

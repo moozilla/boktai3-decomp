@@ -110,7 +110,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/COMPILER_REFERENCES.md](../docs/COMPILER_REFERENCES.md) | Community references and checked agbcc patterns | *#assets #matching* | 4 |
 | [docs/CUTSCENES.md](../docs/CUTSCENES.md) | Cutscenes: the SceneMessages event tables | #scripts #scene #actors | 11 |
 | [docs/DATA.md](../docs/DATA.md) | Decoded data |  | 7 |
-| [docs/DATA_TRACKING.md](../docs/DATA_TRACKING.md) | Tracking ROM data like code | #data #progress #process | 15 |
+| [docs/DATA_TRACKING.md](../docs/DATA_TRACKING.md) | Tracking ROM data like code | #data #progress #process | 16 |
 | [docs/DEVLOG_2026-10-08.md](../docs/DEVLOG_2026-10-08.md) | Boktai 3 devlog for October 8 2026 | *#process* | 21 |
 | [docs/DRAFT_INVENTORY_2026-10-09.md](../docs/DRAFT_INVENTORY_2026-10-09.md) | Existing-draft inventory (October 9, 2026) | *#inventory #matching* | 12 |
 | [docs/EEPROM.md](../docs/EEPROM.md) | EEPROM SDK source matches | *#hardware #library* | 2 |
@@ -135,7 +135,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/PROCESS_REVIEW.md](../docs/PROCESS_REVIEW.md) | External research review and next experiments | *#scripts #process* | 13 |
 | [docs/PROGRESS_CI.md](../docs/PROGRESS_CI.md) | ROM-free progress reports | *#progress* | 13 |
 | [docs/PUSH20_2026-10-08.md](../docs/PUSH20_2026-10-08.md) | Matching push toward 20% code | *#matching* | 11 |
-| [docs/RAM.md](../docs/RAM.md) | RAM objects: the inventory and shared declarations | #tooling #matching #progress | 5 |
+| [docs/RAM.md](../docs/RAM.md) | RAM objects: the inventory and shared declarations | #tooling #matching #progress | 8 |
 | [docs/REGALLOC.md](../docs/REGALLOC.md) | Register allocation in agbcc, and how to steer it from C | *#matching #tooling* | 20 |
 | [docs/REPORT_SUBSYSTEMS.md](../docs/REPORT_SUBSYSTEMS.md) | Subsystem report organization | *#tooling #progress* | 10 |
 | [docs/RESEARCH_2026-10-12.md](../docs/RESEARCH_2026-10-12.md) | RESEARCH_2026-10-12.md |  | 28 |

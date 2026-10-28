@@ -11,7 +11,8 @@ data progress and show data diffs. Research of 2026-10-27; numbers below are fro
 ROM data here means everything in the cartridge that is not code: tables,
 graphics, maps, fonts, text, scripts and sound. It is a different thing from the
 **RAM** inventory (`symbols/ram.csv`, [RAM.md](RAM.md)), which decomp.dev's
-"data" measures count today.
+"data" measures counted until 2026-10-27. Since then the report's data measures
+are ROM data only (section 4), and RAM is tracked in PROGRESS.md alone.
 
 ## 1. How objdiff and decomp.dev measure data
 
@@ -166,110 +167,126 @@ exactly what objdiff calls a unit's `.rodata`.
 
 ## 3. Current numbers
 
-From `python3 tools/progress.py` (ROM-free, also in PROGRESS.md):
+From `python3 tools/progress.py` / `python3 tools/romdata.py` (ROM-free, in
+PROGRESS.md and the decomp.dev report), 2026-10-27:
 
-| ROM data region `0824DAFC–08E88144` | Bytes | Share |
-|---|---:|---:|
-| total | 12,822,088 | 100% |
-| emitted from decoded source (text bank, actor registry) | 446,538 | **3.5%** |
-| emitted from extracted resource files (archives) | 7,625,360 | 59.5% |
-| `.incbin` of the base ROM, pointer words as symbols (sound, tables, bytecode) | 4,750,190 | 37.0% |
-| named data symbols (`symbols/data.csv`) | 10 | |
-| Studio: format decoded (named or decoded level; needs the ROM, not in PROGRESS.md) | 12,316,745 | 96.1% |
-| Studio: format decoded and named | 3,651,846 | 28.5% |
+| ROM data region `0824DAFC–08E88144` | Bytes | Matched | Identified |
+|---|---:|---:|---:|
+| **all** | 12,822,088 | **3.48%** (446,538) | 99.1% |
+| Graphics | 7,096,380 | 0.0% | 100.0% |
+| Palettes | 135,524 | 0.0% | 100.0% |
+| Sound | 3,876,396 | 0.0% | 99.4% |
+| Text | 440,754 | 100.0% | 100.0% |
+| Tables (code rodata) | 85,156 | 6.8% (the actor registry) | 6.8% |
+| Scripts (GCL) | 794,422 | 0.0% | 100.0% |
+| Other/unknown | 393,456 | 0.0% | 97.3% |
 
-RAM, for comparison (the current decomp.dev data measure): 4,695 of 16,077 bytes
-(29.2%) with one shared declaration.
+How the build emits the region today: decoded source 3.5%, extracted resource
+files 59.5% (opaque `.bin`, matched 0), `.incbin` of the base ROM 37.0%. Named
+data symbols (`symbols/data.csv`): 10. The Studio's own levels (needs the ROM):
+96.1% decoded or named, 28.5% named; the inventory's 99.1% "identified" adds what
+the Studio view leaves out (archive headers, `HP` terrain, which `hp.py` decodes).
 
-## 4. The plan
+## 4. The report (implemented 2026-10-27)
 
-### What counts as matched ROM data
+The owner's rules: the headline data measure is ROM data; RAM leaves the
+decomp.dev report; "matched" is strict; one data-only category per kind.
 
-Two levels, mirroring code (matched C vs assembly), at byte granularity:
+### Matched: every byte understood and rebuilt from an editable, meaningful source
 
-1. **matched**: bytes emitted from a **decoded source** that rebuilds them
-   byte-exact: a datafmt range with `SOURCE = "decoded"`, or later a `const`
-   array in a C unit's `.rodata`, or an asset converted from an editable file
-   (PNG, JSON, `.s` song) that round-trips. Opaque `.bin` extracts don't count,
-   any more than `.incbin` does: they are the ROM's bytes in another file.
-2. **identified** (reported as a category, not as matched): bytes inside a
-   located object with a known format: split archive entries, and Studio
-   "decoded" blocks the build does not yet emit from source. This is the analog of
-   a function boundary with assembly: progress toward matching, not a match.
+A byte is **matched** only when the build emits it from a source a person can
+read and edit, and that source rebuilds it byte-exact. The format choice is
+flexible; the principle is not:
 
-Names are tracked separately, like function names: a named data symbol (from
-`symbols/data.csv` or a datafmt anchor) is a count, not a byte credit. Pointer
-symbolization (relocatability) is a build property, already complete (the shift
-test), and not progress by itself.
+| Kind | Matched when built from |
+|---|---|
+| Graphics (tiles, sprites, maps, fonts, animations) | PNG plus JSON metadata that round-trip byte-exact (compression included) |
+| Palettes | JSON or `.pal` |
+| Sound | pret-style m4a song `.s` files; voicegroups and the song table as source; samples as WAV/AIF |
+| Text | the decoded text bank (`text_bank`, as now) |
+| Tables (code `.rodata`) | typed C `const` arrays in the C units that use them (or an equally typed table source; the actor registry's CSV of keys and named callbacks counts) |
+| Scripts (GCL) | GCL source, fully annotated (below) |
+| Other/unknown | a decoded format of its own, as for the kinds above |
 
-`complete_data` (objdiff's "linked") would be the same as matched: everything is
-linked into the ROM in every build.
+Archives and opaque `.bin` extracts count **0** until every entry is matched
+under its own kind: extracting bytes into a file is not understanding them. So
+the 59.5% the archives emit from extracted files is not matched.
 
-### Keeping the RAM measure distinct
+**Identified** (the format is known: a tool or the Studio decodes it) is a
+PROGRESS.md number, not a match, the analog of a function boundary with assembly.
 
-objdiff's own definition puts RAM (`.bss`) and ROM constants (`.rodata`) in the
-same `total_data`. Adding 12.8 MB of ROM to 16 KB of RAM would bury the RAM
-measure, so report both separately, each a **report category** with only data
-measures:
+`complete_data` equals `matched_data`: everything is linked into every build.
 
-* `ram` (**RAM objects**): today's `symbols/ram.csv` accounting, unchanged;
-* `rom_data` (**ROM data**): the matched bytes above;
+**Scripts (GCL).** The unit of annotation is the **procedure**: procedure ids are
+stable table slots (`gcl/README.md`), each procedure has a byte extent in the
+bytecode, and names are kept per procedure (`gcl/names/proc.csv`, `param.csv`).
+Per script file is too coarse (files are inferred groupings) and per byte too
+fine to annotate. A procedure is
 
-and choose which one the headline `total_data`/`matched_data` carries. The
-recommendation: the headline becomes **ROM data**, because that is what other
-projects' data numbers mean to a reader (graphics, tables, text decompiled into
-source), and RAM stays one click away as its category. The alternative, keeping
-RAM in the headline, is also consistent; it is the owner's call. Either way the
-units must carry the measures too, since objdiff/decomp.dev expect a category's
-totals to be the sum of its units:
+* **decompiled** when the build compiles its GCL source to its exact bytes;
+* **matched** when it is decompiled *and* annotated: the procedure is named
+  (`names/proc.csv`), every procedure it calls or references is named, every
+  `chara`/`command` key it uses has a name (`names/chara.csv`, `command.csv`), the
+  variables it reads or writes are named (`names/var.csv`), and nothing unknown is
+  left: no unknown opcode, no raw-byte escape, no `unk`/`proc_NNNN` label.
 
-* add data units named `ROM data/<region>` (for example `ROM data/Text bank`,
-  `ROM data/Maps (C091)`, `ROM data/Sound`, `ROM data/Code rodata`), one per
-  manifest range or ROM_MAP region, with `progress_categories: ["rom_data"]`,
-  `total_data`/`matched_data`, and one `sections` item each (`.rodata`, size,
-  fuzzy percent = the matched share);
-* add one unit `RAM/objects` with `progress_categories: ["ram"]`, holding the RAM
-  measures that today exist only at the top level;
-* leave every code unit's data fields at 0, so the code categories are unaffected.
+The GCL compiler (not written yet; `gcl/src/` is the planned source) records the
+status per procedure in a committed `gcl/progress.csv` (`proc,start,size,status`,
+status `decompiled` or `matched`; addresses and sizes only, no script content), so
+the measure stays ROM-free like the function inventory. `tools/romdata.py`
+credits `matched` procedures' bytes and reports `decompiled` ones as a separate
+PROGRESS.md number. The procedure and pointer tables around the bytecode are to be
+credited once every procedure is matched (they are generated from the table of
+procedures); that rule waits for the compiler. Today no GCL is compiled, so Scripts is 0 matched, 0 decompiled.
 
-Check after the first such report that decomp.dev shows a data-only category and
-data-only units sensibly (it already renders a report whose units all have
-`total_data` 0).
+### The inventory and the report
 
-### Steps
+`symbols/rom_data.csv` (`start,end,kind,unit,identified,evidence`) splits the data
+region into 20 contiguous units, each of one kind; `tools/romdata.py` checks that
+they tile the region exactly. Matched bytes are computed, never typed: the
+overlap of a unit with `data/manifest.csv` ranges whose datafmt module declares
+`SOURCE = "decoded"`, plus `matched` GCL procedures. `identified` is a reviewed
+byte count (from the Studio's ROM view and the decoders in `tools/assets/`).
 
-1. **Done (this change):** `progress.py` computes the ROM data numbers from
-   `data/manifest.csv`, the datafmt `SOURCE` declarations and `symbols/data.csv`
-   (`rom_data_measures()`, ROM-free, unit-tested) and prints them in PROGRESS.md
-   and the summary. The decomp.dev report is unchanged.
-2. **Report it:** the categories and units above in `make_report`, plus the
-   headline choice. Small; needs the owner's decision on the headline.
-3. **Data inventory:** a `symbols/rom_data.csv` (address, size, name, format,
-   status), seeded from what already exists: the label extents in `gen/data.s`,
-   the Studio's `rom_tree()` blocks (archives by entry, sound by song and sample,
-   tilesets, large sprites), the ROM_MAP regions. ROM-free in CI like the function
-   inventory. It gives the report one item per data object, the Studio one source
-   of truth, and `symbolize.py` sizes for its labels (`.size`, `.type @object`).
-4. **Code `.rodata` into C** (2.3): move the 11 KB of tables after the code into
-   the C units that read them. Needs the link to place each object's `.rodata` in
-   ROM order after all `.text` (`*(.rodata)` in a second output pass) and the
-   asm units' slices of `0824DAFC–08250674` to follow the same order. Then a C
-   unit's `.rodata` matches or not, exactly like objdiff measures it.
-5. **More decoded formats**, largest first, each a datafmt module with
-   `SOURCE = "decoded"` that round-trips: palettes (`92B3`, the `9B1B` pool) as
-   JSON/`.pal`; MP2K songs, voicegroups and the song table as pret-style `.s` and
-   CSV (3.9 MB with the samples as `.bin`/`.aif`, which are already their own
-   format); the archive entries' LZ77 (needs a compressor that reproduces the
-   original bytes; try pret's `gbagfx` first) and then maps, terrain and tile
-   sheets as PNG/JSON; the event bytecode from the GCL sources (`gcl/`).
+`tools/progress.py --json` (`add_rom_data`):
+
+* headline `total_data`/`matched_data`/`complete_data`: ROM data only;
+* one category per kind, ids `rom_graphics`, `rom_palettes`, `rom_sound`,
+  `rom_text`, `rom_tables`, `rom_scripts`, `rom_other`, named `ROM data: Graphics`
+  and so on; their totals sum to the headline;
+* one unit per inventory row, named `ROM data: KIND/UNIT`, in exactly one of those
+  categories, with data measures only (code fields 0) and one `.rodata` section
+  item (size, virtual address, matched percent);
+* code units and code categories carry no data; the headline unit counts
+  (`total_units`, `complete_units`) stay those of the code, so the code numbers on
+  decomp.dev do not move.
+
+RAM (`symbols/ram.csv`) stays in PROGRESS.md and the summary as before and is no
+longer in the report. PROGRESS.json (the claude-mod tree) leaves out the data
+units, which have no functions.
+
+### Next steps
+
+1. **Code `.rodata` into C** (2.3): move the 11 KB of tables after the code into
+   the C units that read them as typed `const` arrays. Needs the link to place
+   each object's `.rodata` in ROM order after all `.text` (`*(.rodata)` in a
+   second output pass) and the asm units' slices of `0824DAFC–08250674` to follow
+   the same order. Then a C unit's `.rodata` matches or not, as objdiff measures it.
+2. **Palettes** (135 KB, simplest): `92B3` and the `9B1B` pool as JSON/`.pal`
+   with a datafmt module (`SOURCE = "decoded"`).
+3. **Sound** (3.9 MB): pret-style song `.s`, voicegroups and the song table as
+   source, samples as WAV/AIF (`tools/m4a.py` already walks all of it).
+4. **Graphics** (7.1 MB): an LZ77 compressor that reproduces the original bytes
+   (try pret's `gbagfx` first), then maps, tilesets and sprite sheets as PNG plus
+   JSON. Split the archive units by entry when entries start to match.
+5. **GCL**: a compiler from `gcl/src/` and `gcl/progress.csv` (above).
 6. **objdiff data diffs**: once data lives in `.rodata` sections with sized
-   symbols (steps 3-4), an `objdiff.json` can pair a target object per data unit
-   (assembled from the original `.incbin` slices) with the base object (built from
-   source) and objdiff shows the hex diff per table. Until then
-   `tools/datafmt/check.py` is the byte-exact check, and the report is written by
-   `progress.py` as now.
+   symbols, an `objdiff.json` can pair a target object per data unit (assembled
+   from the original `.incbin` slices) with the base object built from source,
+   and objdiff shows the hex diff per table. Until then `tools/datafmt/check.py`
+   is the byte-exact check.
 
-## Studio fix in the same change
+## Studio fix (2026-10-27)
 
 `atlas.py speaker_portraits()` looked for `thumb_func_start sub_0803232C` in
 `gen/code.s`; the function has been renamed (`TextState_ProcessTag`), so the

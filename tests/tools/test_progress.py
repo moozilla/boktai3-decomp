@@ -227,27 +227,63 @@ class AreaCategoryTest(unittest.TestCase):
     def test_asm_ranges_load(self):
         self.assertTrue(progress.load_asm_ranges())
 
-    def test_rom_data_measure_splits_by_source_kind(self):
+    def test_rom_data_units_cover_the_region_by_kind(self):
+        import romdata
+        units = romdata.measure()
+        self.assertEqual(sum(u['size'] for u in units), romdata.ROM_DATA_END - romdata.ROM_DATA_START)
+        kinds = {u['kind'] for u in units}
+        self.assertEqual(kinds, {k for k, _ in romdata.KINDS})
+        text = [u for u in units if u['kind'] == 'text']
+        self.assertTrue(all(u['matched'] == u['size'] for u in text))
+
+    def test_split_formats_and_decompiled_gcl_earn_nothing(self):
+        import romdata
         with tempfile.TemporaryDirectory() as tmp:
-            manifest, symbols = Path(tmp) / 'manifest.csv', Path(tmp) / 'data.csv'
+            units, manifest, gcl = Path(tmp) / 'u.csv', Path(tmp) / 'm.csv', Path(tmp) / 'g.csv'
+            end = romdata.ROM_DATA_END
+            units.write_text('start,end,kind,unit,identified,evidence\n'
+                             f'0824DAFC,08300000,tables,A,0,\n08300000,08400000,graphics,B,1048576,\n'
+                             f'08400000,{end:08X},scripts,C,0,\n')
             manifest.write_text('name,start,end,format,file,description\n'
-                                'reg,08603300,08603400,keyed_callbacks,data/x.csv,\n'
-                                'arc,08614DCC,08615DCC,resource_archive,build/res/x/index.txt,\n')
-            symbols.write_text('addr,name,size,kind,confidence,source,notes\n'
-                               '08000000,RomHeader,C0,header,high,spec,\n'
-                               '0870A230,gMenuBgTiles,1FE8,gfx-4bpp,high,x,\n'
-                               '0870C238,gMenuBgTilemaps,,tilemap,high,x,\n')
-            d = progress.rom_data_measures(manifest, symbols)
-        self.assertEqual(d['total'], progress.ROM_DATA_END - progress.ROM_DATA_START)
-        self.assertEqual((d['decoded'], d['split']), (0x100, 0x1000))
-        self.assertEqual(d['raw'], d['total'] - 0x1100)
-        self.assertEqual((d['named'], d['named_bytes']), (2, 0x1FE8))
+                                'reg,0824DB00,0824DC00,keyed_callbacks,x,\n'
+                                'arc,08300000,08400000,resource_archive,x,\n')
+            gcl.write_text('proc,start,size,status\n1,08400000,256,matched\n2,08400100,64,decompiled\n')
+            got = {u['unit']: u for u in romdata.measure(units, manifest, gcl)}
+        self.assertEqual(got['A']['matched'], 0x100)
+        self.assertEqual(got['B']['matched'], 0)
+        self.assertEqual((got['C']['matched'], got['C']['decompiled']), (256, 64))
 
-    def test_rom_data_measure_reads_the_committed_manifest(self):
-        d = progress.rom_data_measures()
-        self.assertGreater(d['decoded'], 0)
-        self.assertEqual(d['decoded'] + d['split'] + d['raw'], d['total'])
+    def test_rom_units_must_be_contiguous(self):
+        import romdata
+        with tempfile.TemporaryDirectory() as tmp:
+            units = Path(tmp) / 'u.csv'
+            units.write_text('start,end,kind,unit,identified,evidence\n0824DB00,08E88144,text,A,0,\n')
+            with self.assertRaises(ValueError):
+                romdata.load_units(units)
 
+    def test_report_data_is_rom_only_and_categories_sum_to_headline(self):
+        funcs = [('one', 0x08000100), ('two', 0x08000104)]
+        report = progress.make_report(funcs, dict(one=4, two=4), {'one'})
+        code = dict(report['measures'])
+        progress.add_rom_data(report)
+        m = report['measures']
+        for key in ('total_code', 'matched_code', 'total_functions', 'total_units', 'complete_units'):
+            self.assertEqual(m[key], code[key])
+        data_units = [u for u in report['units'] if int(u['measures'].get('total_data', '0'))]
+        for u in data_units:
+            self.assertEqual(len(u['metadata']['progress_categories']), 1)
+            self.assertEqual(u['measures']['total_code'], '0')
+        cats = [c for c in report['categories'] if c['id'].startswith('rom_')]
+        self.assertEqual(len(cats), 7)
+        for key in ('total_data', 'matched_data'):
+            self.assertEqual(sum(int(c['measures'][key]) for c in cats), int(m[key]))
+            self.assertEqual(sum(int(u['measures'][key]) for u in data_units), int(m[key]))
+        for c in cats:
+            members = [u for u in data_units if u['metadata']['progress_categories'] == [c['id']]]
+            self.assertEqual(sum(int(u['measures']['total_data']) for u in members), int(c['measures']['total_data']))
+        import romdata
+        self.assertEqual(int(m['total_data']), romdata.ROM_DATA_END - romdata.ROM_DATA_START)
+        json.dumps(report)
 
 if __name__ == '__main__':
     unittest.main()
