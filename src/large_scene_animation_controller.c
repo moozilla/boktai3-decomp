@@ -1462,9 +1462,11 @@ struct NidhoggrGroupHealth {
 
 void PaletteEffect_StartSpriteOverride(void *, s32, s32);
 
-#ifdef NONMATCHING
-// fuzzy: 91.9%
 // scope shape 8 (differences once low registers are set aside)
+static inline u8 *GetGroupStages(struct Nidhoggr *p)
+{
+    return ((struct NidhoggrGroupHealth *)p)->state;
+}
 s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, s32 amount)
 {
     struct Nidhoggr *p;
@@ -1482,6 +1484,8 @@ s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, 
     slot /= sizeof(p->colliders[0]);
     if (slot <= 1) {
         s32 quarter, half, threeQuarters;
+        u8 *stage;
+        u32 next;
         quarter = (s16)p->optionY >> 2;
         half = (s16)p->optionY >> 1;
         threeQuarters = ((s16)p->optionY * 3) >> 2;
@@ -1520,21 +1524,35 @@ s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, 
                 p->flags[2] |= 4;
         }
         if (((struct NidhoggrGroupHealth *)p)->hp[part] > threeQuarters) {
-            if (((struct NidhoggrGroupHealth *)p)->state[part] != 0)
-                ((struct NidhoggrGroupHealth *)p)->state[part] = 0;
+            if (*(stage = GetGroupStages(p) + part) != 0) {
+                next = 0;
+                goto setStage;
+            }
         } else if (((struct NidhoggrGroupHealth *)p)->hp[part] > half) {
-            if (((struct NidhoggrGroupHealth *)p)->state[part] != 1)
-                ((struct NidhoggrGroupHealth *)p)->state[part] = 1;
+            if (*(stage = GetGroupStages(p) + part) != 1) {
+                next = 1;
+                goto setStage;
+            }
         } else if (((struct NidhoggrGroupHealth *)p)->hp[part] > quarter) {
-            if (((struct NidhoggrGroupHealth *)p)->state[part] != 2)
-                ((struct NidhoggrGroupHealth *)p)->state[part] = 2;
+            if (*(stage = GetGroupStages(p) + part) != 2) {
+                next = 2;
+                goto setStage;
+            }
         } else if (((struct NidhoggrGroupHealth *)p)->hp[part] > 0) {
-            if (((struct NidhoggrGroupHealth *)p)->state[part] != 3)
-                ((struct NidhoggrGroupHealth *)p)->state[part] = 3;
+            if (*(stage = GetGroupStages(p) + part) != 3) {
+                next = 3;
+                goto setStage;
+            }
         } else {
-            if (((struct NidhoggrGroupHealth *)p)->state[part] != 4)
-                ((struct NidhoggrGroupHealth *)p)->state[part] = 4;
+            if (*(stage = GetGroupStages(p) + part) != 4) {
+                next = 4;
+                goto setStage;
+            }
         }
+        goto stageDone;
+    setStage:
+        *stage = next;
+    stageDone:;
     } else {
         switch (p->mode) {
             case 2:
@@ -1567,9 +1585,6 @@ s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, 
                 } else
                     return 0;
                 break;
-            case 6:
-            case 7:
-                return 0;
         }
         if (p->hp[part] <= 0)
             return 0;
@@ -1598,9 +1613,6 @@ s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, 
     }
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Nidhoggr_ApplyPartDamage);
-#endif
 
 /* Initialize Nidhoggr's part animations, attack/body colliders, target records,
  * and the time-dependent palette used by part 21. */
