@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
+#include "rfu_manager.h"
 struct Engine {
     u8 pad0[0x18];
     u8 pad18, bits, pad1a, entered, flag, pad1d, state, flag1f, mode, index;
@@ -26,13 +27,7 @@ struct Engine {
     u8 message[0x204];
     void *head, *tail;
 };
-extern struct Engine *gUnk_02000484;
 void Memory_Clear(void *, int);
-struct Message {
-    u8 pad0[0x14];
-    u8 bits;
-};
-extern struct Message gUnk_03005390;
 struct ModeState {
     u8 pad0;
     u8 mode;
@@ -48,7 +43,7 @@ static inline void reset(struct Engine *p, int operation, int zero)
 void WirelessController_OnLinkEvent(u8 command)
 {
     int key = command;
-    struct Engine *p = gUnk_02000484;
+    struct Engine *p = gWirelessController;
     if (!p)
         goto done;
     if (key == 0x33)
@@ -123,7 +118,7 @@ begin:
     reset(p, 5, key);
     goto done;
 addBits: {
-    register int incoming asm("r1") = gUnk_03005390.bits;
+    register int incoming asm("r1") = gRfuLinkManager.event.bytes.bits;
     p->bits = p->bits | incoming;
 }
     goto done;
@@ -141,25 +136,25 @@ mode: {
 selectedAdd: {
     u8 *slot = &p->selected;
     register int incoming asm("r1");
-    incoming = gUnk_03005390.bits;
+    incoming = gRfuLinkManager.event.bytes.bits;
     *slot = *slot | incoming;
 }
     goto done;
 selectedRemove: {
     u8 *slot = &p->selected;
     int incoming;
-    incoming = gUnk_03005390.bits;
+    incoming = gRfuLinkManager.event.bytes.bits;
     *slot = *slot & ~incoming;
 }
     goto done;
 release: {
-    register struct Message *message asm("r2") = &gUnk_03005390;
+    register struct RfuLinkManager *message asm("r2") = &gRfuLinkManager;
     u8 *selected;
     int incoming;
-    incoming = message->bits;
+    incoming = message->event.bytes.bits;
     p->bits &= ~incoming;
     selected = &p->selected;
-    incoming = message->bits;
+    incoming = message->event.bytes.bits;
     *selected &= ~incoming;
     {
         int zero = p->bits;
@@ -174,13 +169,13 @@ release: {
 }
     goto done;
 releaseOther: {
-    register struct Message *message asm("r2") = &gUnk_03005390;
+    register struct RfuLinkManager *message asm("r2") = &gRfuLinkManager;
     u8 *selected;
     int incoming;
-    incoming = message->bits;
+    incoming = message->event.bytes.bits;
     p->bits &= ~incoming;
     selected = &p->selected;
-    incoming = message->bits;
+    incoming = message->event.bytes.bits;
     *selected &= ~incoming;
     {
         int zero = p->bits;

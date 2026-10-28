@@ -3,6 +3,7 @@
 #include "global.h"
 #include "scene_object.h"
 #include "player.h"
+#include "ram.h"
 
 // Tentative: a pool of 16 small hit-detecting props (idle sprite, hit animation, then spawns an
 // effect burst) owned by a task, created from script. Each slot embeds a collider
@@ -75,8 +76,6 @@ struct CollisionScene {
 
 extern struct CollisionManager *gCollisionManager;
 extern struct CollisionScene gUnk_03005430;
-extern s32 gUnk_02000478;
-extern u16 gUnk_02000534, gUnk_02000500;
 extern void *gUnk_08604A00[2][3];
 
 void sub_08009E30(void);

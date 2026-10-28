@@ -1,8 +1,8 @@
 #include "global.h"
-extern s32 gUnk_02000484;
+#include "ram.h"
 s32 WirelessController_IsCreated(void)
 {
-    if (gUnk_02000484)
+    if (gWirelessController)
         return 1;
     return 0;
 }

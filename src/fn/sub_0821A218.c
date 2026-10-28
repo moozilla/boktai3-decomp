@@ -1,18 +1,13 @@
 #include "global.h"
-struct Entry {
-    u16 id;
-    u8 flags, pad;
-    void *data;
-};
-extern struct Entry gUnk_0203B000[];
-extern s32 gUnk_030052F0;
+#include "runtime.h"
+#include "resource_registry.h"
 void Heap_Free(void *);
 void ResourceRegistry_ClearEntries(u32 keep)
 {
     s32 retained = 0;
-    struct Entry *entry = gUnk_0203B000;
+    struct ResourceRegistryEntry *entry = gResourceRegistryEntries;
     s32 i = 0;
-    while (i < gUnk_030052F0) {
+    while (i < gResourceRegistryCount) {
         if (entry->flags & 0x80) {
             if ((entry->flags & 1) && !(keep & 1))
                 retained = i;
@@ -26,5 +21,5 @@ void ResourceRegistry_ClearEntries(u32 keep)
         i++;
         entry++;
     }
-    gUnk_030052F0 = retained + 1;
+    gResourceRegistryCount = retained + 1;
 }

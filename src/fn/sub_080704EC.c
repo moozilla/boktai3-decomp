@@ -1,10 +1,10 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
+#include "runtime.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 void SceneActorControl_OnIdle(u8 *);
 void SceneActorTerrain_DisableCollision(struct SceneActorRegistryActor *);
 void SceneActorRecord_RecordPair(u32, u32);
-extern u16 gUnk_030039F0;
 static inline u8 IsUnavailable(struct SceneActorRegistryActor *input)
 {
     register struct SceneActorRegistryActor *actor asm("r4") = input;
@@ -179,7 +179,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                 }
                 SceneActorTerrain_DisableCollision(actor);
                 if (!IsScenePaused() && !ReadSuppressionFlag(actor))
-                    SceneActorRecord_RecordPair(gUnk_030039F0, (u16)actor->id);
+                    SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->id);
             }
             goto next;
         ordinary: {

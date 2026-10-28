@@ -1,7 +1,7 @@
 #include "global.h"
-extern u32 gUnk_02000268;
+#include "ram.h"
 void RegistryF3E4_StartAppearing(u32);
 void RegistryF3E4_Show(void)
 {
-    RegistryF3E4_StartAppearing(gUnk_02000268);
+    RegistryF3E4_StartAppearing(gRegistryF3E4Actor);
 }

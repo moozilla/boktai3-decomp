@@ -1,5 +1,5 @@
 #include "global.h"
-#define gCameraPosition gUnk_030042A0
+#include "render.h"
 
 struct ForgingBook {
     u8 unknown[0xAA8];
@@ -9,10 +9,6 @@ struct ForgingBook {
     u8 unknownAAE[0xB2];
     s16 category;
 };
-struct ForgingBookCameraPosition {
-    u16 x, unknown, y;
-};
-extern struct ForgingBookCameraPosition gUnk_030042A0;
 void ForgingBook_RefreshEntrySprites(struct ForgingBook *);
 void SceneKeyframe_UpdateSelectionVisibility(struct ForgingBook *);
 void ForgingBook_RefreshCategoryPreview(struct ForgingBook *);
@@ -33,11 +29,11 @@ s32 ForgingBook_RefreshCategory(struct ForgingBook *book)
         ForgingBook_RefreshCategoryPreview(book);
     } else {
         if (book->category == 8) {
-            book->previewX = gUnk_030042A0.x - 466;
-            book->previewY = gUnk_030042A0.y + 308;
+            book->previewX = ((u16)gCamera.position.x) - 466;
+            book->previewY = ((u16)gCamera.position.z) + 308;
         } else {
-            book->previewX = gUnk_030042A0.x - 456;
-            book->previewY = gUnk_030042A0.y + 336;
+            book->previewX = ((u16)gCamera.position.x) - 456;
+            book->previewY = ((u16)gCamera.position.z) + 336;
         }
         ForgingBook_RefreshCategoryPreview(book);
     }

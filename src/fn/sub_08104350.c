@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "ram.h"
 struct Frames {
     u16 *data;
     u8 flags;
@@ -25,7 +26,6 @@ struct Context {
     u8 pad[0x18];
     void *resource;
 };
-extern struct Context *gUnk_020001B0;
 struct Context *Pool184_CreateManager(void);
 struct Member;
 struct Member *Pool184_Allocate(struct Context *);
@@ -194,7 +194,7 @@ static inline void Step(struct Member *m, struct Render *owner, struct Frames *s
 // confidence=low: script options initialize a member of Pool184's actor group.
 void ActorGroup_CreateFromScript(void)
 {
-    struct Context *pool = gUnk_020001B0;
+    struct Context *pool = gActorGroupPool;
     struct Member *p;
     struct Render *render;
     s32 c;

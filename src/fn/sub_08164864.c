@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "render.h"
 
 struct HudSlotSource {
     u8 unknown0[0x18];
@@ -9,7 +10,6 @@ struct HudSlotSource {
 };
 extern struct HudSlotSource *gUnk_020004B4;
 extern u8 *gGameState;
-extern u16 gUnk_03005174;
 extern u32 gEngineFlags;
 u16 *Hud_GetTilemapCell(s32, u32, u32);
 void Sound_PlaySong(u32);
@@ -110,8 +110,8 @@ void sub_08164864(u8 *hud, s32 mode, u32 x, u32 y)
             PULSE = 0x34;
             pulse = 0x177;
         }
-        if (gUnk_03005174 != pulse)
-            gUnk_03005174 = pulse;
+        if (gBgPaletteBank13Color10 != pulse)
+            gBgPaletteBank13Color10 = pulse;
         if (LinkFlags(0x800))
             count = SlotCount(OwnerIndex());
         else

@@ -29,7 +29,6 @@ struct Player {
     u8 pad0[0x30];
     s16 x, y, z;
 };
-extern void *gUnk_02000480;
 extern struct Player *gUnk_02000580[];
 struct SceneNpc *Actor_FindById(void *manager, s32 name);
 s32 Math_Atan2(s32 dx, s32 dz);
@@ -72,7 +71,7 @@ void SceneNpc_CommandFromScript(void)
     if (!gSceneNpc)
         return;
     if (Script_SeekToKeyword('n')) {
-        void *manager = gUnk_02000480;
+        void *manager = gSceneActorListManager;
         if (!manager)
             return;
         npc = Actor_FindById(manager, Script_GetKeywordValue('n', 0));

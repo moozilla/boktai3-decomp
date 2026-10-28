@@ -1,6 +1,6 @@
 #include "scene_actor_registry.h"
 #include "scene_actor_record.h"
-extern u16 gUnk_030039F0;
+#include "runtime.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32);
 u8 SceneActorRecord_CanRecordPair(u32, u32);
@@ -22,7 +22,7 @@ u8 SceneActorRegistry_LinkActor(struct SceneActorRegistryActor *actor)
     if (!manager)
         return 0;
     head = gSceneActorRegistryNode;
-    if (TrackPairs() && !SceneActorRecord_CanRecordPair(gUnk_030039F0, (u16)actor->id))
+    if (TrackPairs() && !SceneActorRecord_CanRecordPair(gScriptEntryProcedure, (u16)actor->id))
         return 0;
     if (manager->field32 > 19 || SceneActorRegistry_FindById(actor->id))
         return 0;

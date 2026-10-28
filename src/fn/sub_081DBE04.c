@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "menu_parameters.h"
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
@@ -8,7 +9,6 @@ void ResourceHeader_Relocate(u8 *, void *);
 void Widget_InitLinked(u8 *, u8 *, u32, u32, u32, u32, u32, u32);
 void Menu_StartFadeIn(u32);
 void ScriptPrompt_ResetDisplay(u8 *);
-extern u32 gUnk_020002E8[];
 void MessageWindow_SetPalette(u32);
 void MessageWindow_SetMessageTable(u32);
 void MessageWindow_ShowMessage(u32);
@@ -19,7 +19,7 @@ u32 ScreenParams2E8_InitScreen(u8 *s)
     u32 zero, one, value;
     void *a, *p, *resource;
     u8 *obj, *obj2, *obj3;
-    u32 *global;
+    struct MessageMenuParameters *global;
     Bg_ClearTilemap(0);
     zero = 0;
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
@@ -47,14 +47,14 @@ u32 ScreenParams2E8_InitScreen(u8 *s)
     *(u32 *)(s + 0xD4) &= ~1;
     *(u32 *)(s + 0x15C) |= one;
     MessageWindow_SetPalette(0xC486);
-    global = gUnk_020002E8;
-    MessageWindow_SetMessageTable(global[0]);
+    global = &gMessageMenuParameters;
+    MessageWindow_SetMessageTable(global->lBlock);
     MessageWindow_ShowMessage(0);
     MessageWindow_SetBounds(2, 3, 0x20, 6);
     MessageWindow_SetDisplayMode(1);
     *(u32 *)(s + 0x28) = one;
     *(u32 *)(s + 0x24) = one;
-    if (global[3] == 1)
+    if (global->f == 1)
         *(u32 *)(s + 0x40) = 3;
     else
         *(u32 *)(s + 0x40) = zero;

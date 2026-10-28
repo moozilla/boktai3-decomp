@@ -1,4 +1,5 @@
 #include "global.h"
+#include "menu_parameters.h"
 // Names are tentative, based on the static state transitions and memory writes.
 #define ScreenFade_BeginExit Menu_StartFadeOut
 #define gPromptKeys          gUnk_03005260
@@ -9,7 +10,6 @@ struct StartPrompt {
     s32 fadeTimer, fadeShift;
 };
 extern u16 gUnk_03005260[];
-extern u32 gUnk_02000378[];
 void Sound_PlaySong(u32);
 void Menu_StartFadeOut(s32);
 void Script_Call(u32, void *);
@@ -29,8 +29,8 @@ u32 StartPrompt_Update(struct StartPrompt *p)
             break;
         case 1:
             if (p->fadeTimer > (1 << p->fadeShift) || p->fadeShift == 0) {
-                if (gUnk_02000378[2])
-                    Script_Call(gUnk_02000378[2], 0);
+                if (gScriptMessageParameters.value)
+                    Script_Call(gScriptMessageParameters.value, 0);
                 Task_Kill(p);
             } else {
                 p->fadeTimer++;

@@ -56,14 +56,6 @@ struct StatusGameState {
 };
 extern struct StatusGameState gUnk_03005430;
 
-// Tilemap geometry of a background (element of gUnk_03004C30).
-struct BgMapInfo {
-    u8 pad0[0x18];
-    s16 width; // tiles per map row
-    u8 pad1A[0x12];
-    u16 *map;
-};
-
 u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y); // address of a tile in the background's tilemap
 void NumericDisplay_DrawPair(void *unused, int left, int right);
 void NumericDisplay_DrawStatusValues(struct StatusScreen *);
@@ -103,7 +95,6 @@ void Bg_SetPriority(u32, s32);
 void Bg_SetupLayer(u32, u32, void *, s32, s32, s32, s32, void *);
 void *Video_GetBackgroundMap(u32);
 extern struct StatusScreen *gStatusScreen; // the live status screen, or NULL
-extern struct BgMapInfo gUnk_03004C30[];
-extern u16 gUnk_03005260[]; // input: [1] = newly pressed keys
+extern u16 gUnk_03005260[];                // input: [1] = newly pressed keys
 
 #endif

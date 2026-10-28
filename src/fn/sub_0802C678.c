@@ -1,8 +1,7 @@
 #include "global.h"
-
-extern u32 gUnk_020000D8;
+#include "ram.h"
 
 u32 ActorPool_GetManager(void)
 {
-    return gUnk_020000D8;
+    return gActorPoolManager;
 }

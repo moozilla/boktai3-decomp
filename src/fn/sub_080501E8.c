@@ -18,10 +18,10 @@ s32 CellGate_TestPassage(struct CellGate *p)
         u32 f, v;
         if (a->actionMode == 3)
             goto yes;
-        v = gUnk_02000534;
+        v = gPlayerPassageState;
         f = 0;
         if (v != 0) {
-            if (gUnk_02000500 == 5)
+            if (gPlayerInteractionMode == 5)
                 f = 1;
         }
         if (f == 0) {

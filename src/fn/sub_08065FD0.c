@@ -44,7 +44,7 @@ ActorAttachment_CreateValueSpriteSlot(u32 incomingFrame, struct ContactPosition 
     frame = (u8)incomingFrame;
     countLow = (u16)countLow;
     thresholdCount = countLow;
-    existing = gUnk_02000124;
+    existing = gActorAttachmentManager;
     if (!existing) {
         manager = ActorAttachment_CreateManager();
         if (manager)

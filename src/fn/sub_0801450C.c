@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_02000060;
+#include "ram.h"
 void Effect_Remove(u8 *);
 u32 ParticleManager_Kill(u8 *p)
 {
@@ -24,7 +24,7 @@ u32 ParticleManager_Kill(u8 *p)
     } while (i <= 5);
     {
         u32 z = 0;
-        gUnk_02000060 = z;
+        gParticleGroupManager = z;
     }
     return 0;
 }

@@ -3,8 +3,8 @@
 void ActorAttachment_TickRisingPart(struct ActorAttachmentSlotView *slot)
 {
     s8 *finalSlotId;
-    if (gUnk_02000124) {
-        struct ActorAttachmentManagerView *manager = gUnk_02000124;
+    if (gActorAttachmentManager) {
+        struct ActorAttachmentManagerView *manager = gActorAttachmentManager;
         struct ActorAttachmentPartSprite *sprite = slot->parts;
         struct DisplaySequenceState *sequence = slot->sequences;
         const struct ActorAttachmentPartResource *resource;

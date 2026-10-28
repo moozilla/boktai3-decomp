@@ -2,6 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 #include "engine.h"
+#include "runtime.h"
 
 /* Ivy defeat state (tentative), a variant of Skeleton_UpdateDefeat (Skeleton_UpdateDefeat). On entry:
  * hides the actor, launches a particle burst through sub_08127590 and either plays cue 0xE5
@@ -23,7 +24,6 @@ void sub_08127590(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u
 void sub_08159164(u32);
 void Player_RefreshLifeState(u32, u32);
 void SceneActorRecord_RecordPair(u32, u32);
-extern u16 gUnk_030039F0;
 
 #define STAT(n)  (*(s16 *)((u8 *)gGameState + (n)))
 #define COUNT(n) Count(&STAT(n))
@@ -421,5 +421,5 @@ void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     sub_08159164(*(u32 *)((u8 *)actor + 0xAC));
     Player_RefreshLifeState(actor->field2D8, *((u8 *)actor + 0xA1));
     if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
-        SceneActorRecord_RecordPair(gUnk_030039F0, (u16)actor->id);
+        SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->id);
 }

@@ -1,6 +1,6 @@
 #include "global.h"
-extern u32 gUnk_030025FC;
+#include "scene_stimulus.h"
 u32 SceneStimulus_DestroyTask(void)
 {
-    gUnk_030025FC = 0;
+    gSceneStimulusState = 0;
 }

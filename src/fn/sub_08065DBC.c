@@ -42,7 +42,7 @@ ActorAttachment_CreateSpriteSlot(u32 frame, struct ContactPosition *anchor, void
     savedY = y;
     savedFollow = follow;
     startFrame = (u8)frame;
-    existing = gUnk_02000124;
+    existing = gActorAttachmentManager;
     if (!existing) {
         manager = ActorAttachment_CreateManager();
         if (manager)

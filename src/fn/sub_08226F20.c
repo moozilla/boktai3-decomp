@@ -1,8 +1,6 @@
 #include "global.h"
+#include "render.h"
 #include "game_state.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -11,7 +9,7 @@ struct Camera {
     u16 moving;
     u16 unknown1E;
     u8 unknown20[0x38];
-    struct Vec saved;
+    struct CameraPosition saved;
     u8 unknown60[8];
     u16 mode, timer;
     s16 x, y, z;
@@ -20,7 +18,7 @@ struct Camera {
     u16 unknown7A;
     u16 targetId;
     u8 unknown7E[0x1E];
-    struct Vec *source;
+    struct CameraPosition *source;
     u32 *enabled;
 };
 struct Player {
@@ -31,12 +29,6 @@ struct Body {
     u8 unknown0[12];
     s16 x, y, z;
 };
-struct CameraState {
-    struct Vec position;
-    u8 unknown8[10];
-    s16 facing;
-};
-extern struct CameraState gUnk_030042A0;
 struct Body *SceneBody_GetById(u32);
 s32 Div(s32, s32);
 void Camera_NotifyMoveComplete(struct Camera *);
@@ -50,8 +42,8 @@ void Camera_UpdatePositionMode(struct Camera *camera)
     target.z = player->z + camera->offsetZ;
     switch (camera->mode) {
         case 0: {
-            struct CameraState *state = &gUnk_030042A0;
-            if (state->facing == 0) {
+            struct CameraRenderState *state = &gCamera;
+            if (state->mode == 0) {
                 state->position.x = target.x;
                 state->position.y = target.y + 150;
             } else {
@@ -62,17 +54,17 @@ void Camera_UpdatePositionMode(struct Camera *camera)
             break;
         }
         case 1:
-            gUnk_030042A0.position.x = camera->x;
-            gUnk_030042A0.position.y = camera->y;
-            gUnk_030042A0.position.z = camera->z;
+            gCamera.position.x = camera->x;
+            gCamera.position.y = camera->y;
+            gCamera.position.z = camera->z;
             break;
         case 2:
-            gUnk_030042A0.position.x =
-                Div(gUnk_030042A0.position.x * (camera->timer - 1) + camera->x, camera->timer);
-            gUnk_030042A0.position.y =
-                Div(gUnk_030042A0.position.y * (camera->timer - 1) + camera->y, camera->timer);
-            gUnk_030042A0.position.z =
-                Div(gUnk_030042A0.position.z * (camera->timer - 1) + camera->z, camera->timer);
+            gCamera.position.x =
+                Div(gCamera.position.x * (camera->timer - 1) + camera->x, camera->timer);
+            gCamera.position.y =
+                Div(gCamera.position.y * (camera->timer - 1) + camera->y, camera->timer);
+            gCamera.position.z =
+                Div(gCamera.position.z * (camera->timer - 1) + camera->z, camera->timer);
             if (--camera->timer <= 1) {
                 camera->mode = 1;
                 Camera_NotifyMoveComplete(camera);
@@ -81,24 +73,24 @@ void Camera_UpdatePositionMode(struct Camera *camera)
         case 3: {
             body = SceneBody_GetById(camera->targetId);
             if (body) {
-                gUnk_030042A0.position.x = body->x + camera->offsetX;
-                gUnk_030042A0.position.y = body->y + camera->offsetY;
-                gUnk_030042A0.position.z = body->z + camera->offsetZ;
+                gCamera.position.x = body->x + camera->offsetX;
+                gCamera.position.y = body->y + camera->offsetY;
+                gCamera.position.z = body->z + camera->offsetZ;
             }
             break;
         }
         case 4: {
             body = SceneBody_GetById(camera->targetId);
             if (body) {
-                gUnk_030042A0.position.x = Div(gUnk_030042A0.position.x * (camera->timer - 1) +
-                                                   (body->x + camera->offsetX),
-                                               camera->timer);
-                gUnk_030042A0.position.y = Div(gUnk_030042A0.position.y * (camera->timer - 1) +
-                                                   (body->y + camera->offsetY),
-                                               camera->timer);
-                gUnk_030042A0.position.z = Div(gUnk_030042A0.position.z * (camera->timer - 1) +
-                                                   (body->z + camera->offsetZ),
-                                               camera->timer);
+                gCamera.position.x =
+                    Div(gCamera.position.x * (camera->timer - 1) + (body->x + camera->offsetX),
+                        camera->timer);
+                gCamera.position.y =
+                    Div(gCamera.position.y * (camera->timer - 1) + (body->y + camera->offsetY),
+                        camera->timer);
+                gCamera.position.z =
+                    Div(gCamera.position.z * (camera->timer - 1) + (body->z + camera->offsetZ),
+                        camera->timer);
                 if (--camera->timer <= 1) {
                     camera->mode = 3;
                     Camera_NotifyMoveComplete(camera);
@@ -107,24 +99,24 @@ void Camera_UpdatePositionMode(struct Camera *camera)
             break;
         }
         case 5:
-            gUnk_030042A0.position.x =
-                Div(gUnk_030042A0.position.x * (camera->timer - 1) + target.x, camera->timer);
-            gUnk_030042A0.position.y =
-                Div(gUnk_030042A0.position.y * (camera->timer - 1) + target.y + 150, camera->timer);
-            gUnk_030042A0.position.z =
-                Div(gUnk_030042A0.position.z * (camera->timer - 1) + target.z, camera->timer);
+            gCamera.position.x =
+                Div(gCamera.position.x * (camera->timer - 1) + target.x, camera->timer);
+            gCamera.position.y =
+                Div(gCamera.position.y * (camera->timer - 1) + target.y + 150, camera->timer);
+            gCamera.position.z =
+                Div(gCamera.position.z * (camera->timer - 1) + target.z, camera->timer);
             if (--camera->timer <= 1) {
                 camera->mode = 0;
                 Camera_NotifyMoveComplete(camera);
             }
             break;
         case 6:
-            gUnk_030042A0.position.x = Div(
-                gUnk_030042A0.position.x * (camera->timer - 1) + camera->saved.x, camera->timer);
-            gUnk_030042A0.position.y = Div(
-                gUnk_030042A0.position.y * (camera->timer - 1) + camera->saved.y, camera->timer);
-            gUnk_030042A0.position.z = Div(
-                gUnk_030042A0.position.z * (camera->timer - 1) + camera->saved.z, camera->timer);
+            gCamera.position.x =
+                Div(gCamera.position.x * (camera->timer - 1) + camera->saved.x, camera->timer);
+            gCamera.position.y =
+                Div(gCamera.position.y * (camera->timer - 1) + camera->saved.y, camera->timer);
+            gCamera.position.z =
+                Div(gCamera.position.z * (camera->timer - 1) + camera->saved.z, camera->timer);
             if (--camera->timer <= 1) {
                 camera->moving = 0;
                 Camera_NotifyMoveComplete(camera);
@@ -132,7 +124,7 @@ void Camera_UpdatePositionMode(struct Camera *camera)
             break;
         case 7:
             if (*camera->enabled)
-                gUnk_030042A0.position = *camera->source;
+                gCamera.position = *camera->source;
             break;
     }
 }

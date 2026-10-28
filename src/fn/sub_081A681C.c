@@ -1,7 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
-
-#define gScreenPaletteBuffer gUnk_030050E0
+#include "render.h"
 
 struct ScreenPaletteTransition {
     u8 unknown0[4];
@@ -11,7 +10,6 @@ struct ScreenPaletteTransition {
     u8 unknown15;
     u16 phase;
 };
-extern u8 gUnk_030050E0[];
 void Blend_SetAlpha(u32, s32, s32);
 void Palette_InterpolateBanks(void *, void *, void *, int, int);
 
@@ -26,16 +24,16 @@ void ScreenPalette_UpdateTransition(struct ScreenPaletteTransition *s)
     }
     if (s->phase <= 32) {
         s32 a = s->variant * 3 + 11;
-        Palette_InterpolateBanks(gScreenPaletteBuffer, palettes + a * 32,
+        Palette_InterpolateBanks(gBgPaletteBank9, palettes + a * 32,
                                  palettes + (s->variant * 3 + 10) * 32, s->phase, 5);
     } else if (s->phase <= 64) {
         s32 a = s->variant * 3 + 10;
-        Palette_InterpolateBanks(gScreenPaletteBuffer, palettes + a * 32,
+        Palette_InterpolateBanks(gBgPaletteBank9, palettes + a * 32,
                                  palettes + (s->variant * 3 + 9) * 32, s->phase - 32, 5);
     } else {
         u32 v = s->variant;
         register u32 index asm("r0") = v * 3;
         u32 bank = index + 9;
-        CpuSet(s->palettes + (bank << 5), gScreenPaletteBuffer, 0x04000008);
+        CpuSet(s->palettes + (bank << 5), gBgPaletteBank9, 0x04000008);
     }
 }

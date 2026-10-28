@@ -3,8 +3,8 @@
 void ActorAttachment_TickNarrowShake(void *, struct ActorAttachmentSlotView *);
 void ActorAttachment_TickAscendingSprite(struct ActorAttachmentSlotView *slot)
 {
-    if (gUnk_02000124) {
-        struct ActorAttachmentManagerView *manager = gUnk_02000124;
+    if (gActorAttachmentManager) {
+        struct ActorAttachmentManagerView *manager = gActorAttachmentManager;
         struct ContactSwarmSprite *sprite = &slot->sprite;
         struct DisplaySequenceState *sequence = slot->sequences;
         u32 ended = ActorAttachment_StepSprite(sprite, sequence);

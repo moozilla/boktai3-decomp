@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "runtime.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z;
@@ -19,16 +20,7 @@ struct Drawable {
     u8 pad1e[4];
     struct Drawable *next;
 };
-struct Matrix {
-    u8 angle;
-    s8 scaleX, scaleY;
-    u8 pad;
-};
-extern u32 gUnk_03003A04;
-extern struct Drawable *gUnk_030042D0[];
-extern struct Matrix gUnk_03004310[];
 extern u16 gUnk_03005418[];
-extern struct Vec gUnk_030042A0;
 static inline s32 UnsignedScale(u8 v)
 {
     return v;
@@ -50,7 +42,7 @@ void SpriteOam_QueueCameraRelativeSprites(void)
     u32 skip = 0x401;
     if (parity)
         skip = 0x201;
-    p = gUnk_030042D0[gRenderListIndex];
+    p = gDrawableListHeads[gRenderListIndex];
     if (!p)
         return;
     matrixCount = &gAffineRequestCount;
@@ -69,10 +61,10 @@ void SpriteOam_QueueCameraRelativeSprites(void)
         if (t)
             goto next;
 
-        x = divide8(p->pos.x - gUnk_030042A0.x) + 120;
-        y = divide8(p->pos.y - gUnk_030042A0.y) + 80;
+        x = divide8(p->pos.x - gCamera.position.x) + 120;
+        y = divide8(p->pos.y - gCamera.position.y) + 80;
         {
-            register s32 result asm("r0") = p->pos.z - gUnk_030042A0.z;
+            register s32 result asm("r0") = p->pos.z - gCamera.position.z;
             z = result;
         }
         {
@@ -112,9 +104,9 @@ void SpriteOam_QueueCameraRelativeSprites(void)
                 matrix = 0;
             else {
                 s32 *count = matrixCount;
-                gUnk_03004310[*count].angle = angle;
-                gUnk_03004310[*count].scaleX = sx;
-                gUnk_03004310[*count].scaleY = sy;
+                gSpriteAffineParams[*count].angle = angle;
+                gSpriteAffineParams[*count].scaleX = sx;
+                gSpriteAffineParams[*count].scaleY = sy;
                 {
                     register s32 old asm("r0") = *count;
                     matrix = old;
@@ -142,7 +134,7 @@ void SpriteOam_QueueCameraRelativeSprites(void)
             gOamBuffer[n].attributes = attr;
             gOamBuffer[n].tile = tile;
             gOamCount = n + 1;
-            gUnk_03003A04 |= 1;
+            gVideoUploadFlags |= 1;
         } else {
             s32 tile, n;
             u32 priority;

@@ -1,7 +1,7 @@
 #include "global.h"
+#include "menu_parameters.h"
 
 extern u16 gUnk_03005260[];
-extern u32 gUnk_020002A0[];
 
 struct ScriptArgs {
     u32 count : 16;
@@ -42,14 +42,14 @@ void OptionMenu_Update(struct OptionMenu *p)
     }
     if (gUnk_03005260[1] & 1) {
         if (p->sel == 1)
-            Script_Call(gUnk_020002A0[1], ap);
+            Script_Call(gOptionMenuParameters.callbacks.entries[1], ap);
         else
-            Script_Call(gUnk_020002A0[p->sel], 0);
+            Script_Call(gOptionMenuParameters.callbacks.entries[p->sel], 0);
         Task_Kill(p);
     } else {
         p->timer++;
         if (sub_08249350(p->timer, 600) == 0) {
-            Script_Call(gUnk_020002A0[6], 0);
+            Script_Call(gOptionMenuParameters.callbacks.entries[6], 0);
             Task_Kill(p);
         }
     }

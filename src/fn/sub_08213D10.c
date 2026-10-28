@@ -1,12 +1,12 @@
 #include "global.h"
 #include "ram.h"
+#include "runtime.h"
 // Provisional name: InterruptsAndVideo_Initialize
 /* Install interrupt handlers and clear video, sprite and palette memory. */
 struct Dma {
     vu32 source, dest, control;
 };
-extern u8 gUnk_0824FFA8[], gUnk_03003A60[];
-extern u32 gUnk_0300426C, gUnk_03003A44;
+extern u8 gUnk_0824FFA8[];
 void IntrMain(void);
 void InterruptsAndVideo_Initialize(void)
 {
@@ -17,12 +17,12 @@ void InterruptsAndVideo_Initialize(void)
     dma->control = 0x8400000D;
     dma->control;
     dma->source = (u32)IntrMain;
-    dma->dest = (u32)gUnk_03003A60;
+    dma->dest = (u32)gInterruptCode;
     dma->control = 0x84000200;
     dma->control;
-    *(u8 **)0x03007FFC = gUnk_03003A60;
-    gUnk_0300426C = 0;
-    gUnk_03003A44 = 0;
+    *(u8 **)0x03007FFC = gInterruptCode;
+    gVideoInterruptsEnabled = 0;
+    gVBlankOccurred = 0;
     fill = 0;
     dma->source = (u32)&fill;
     dma->dest = 0x06000000;

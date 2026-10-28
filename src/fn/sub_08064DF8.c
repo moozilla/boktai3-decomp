@@ -2,7 +2,7 @@
 #include "actor_attachment_orbit_playback.h"
 void ActorAttachment_TickDetachedParts(struct ActorAttachmentSlotView *slot)
 {
-    register struct ActorAttachmentManagerView *loaded asm("r0") = gUnk_02000124;
+    register struct ActorAttachmentManagerView *loaded asm("r0") = gActorAttachmentManager;
     if (loaded) {
         struct ActorAttachmentManagerView *manager = loaded;
         struct ActorAttachmentPartSprite *parts = slot->parts;

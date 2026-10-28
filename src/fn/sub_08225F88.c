@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 #include "ram.h"
 
 struct Vec {
@@ -18,7 +19,6 @@ struct Camera {
     u16 f82;
 };
 
-extern struct Vec gUnk_030042A0;
 extern struct Vec gUnk_03005418;
 
 void Camera_ApplyPositionBounds(struct Camera *, u16 *);
@@ -32,7 +32,7 @@ static inline int project(int input)
 static inline void updateScroll(void)
 {
     struct Vec *out = &gUnk_03005418;
-    struct Vec *in = &gUnk_030042A0;
+    struct CameraPosition *in = &gCamera.position;
     int xy, height, x = in->x, z = in->z;
     out->x = project(x - z);
     xy = project(x + z);
@@ -54,9 +54,9 @@ void Camera_SetPosition(u16 *pos)
         c = gActiveCamera;
         c->f54 = 1;
         if (c->f1c == 0) {
-            gUnk_030042A0.x = c->x + c->f80;
-            gUnk_030042A0.y = c->y;
-            gUnk_030042A0.z = c->z + c->f82;
+            gCamera.position.x = c->x + c->f80;
+            gCamera.position.y = c->y;
+            gCamera.position.z = c->z + c->f82;
             updateScroll();
         }
     }

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "menu_parameters.h"
 // confidence=low: menu ownership follows Params3D0_CreateDisplay.
 
 // confidence=low: menu ownership follows Params3D0_CreateDisplay; option meanings remain tentative.
@@ -11,17 +12,11 @@ struct Display {
     u32 lastState;
     s32 velocity, timer, slide, paletteStep, unused760, skipped, musicTimer;
 };
-struct Parameters {
-    void *g, *o, *l, *s, *d, *c;
-    s16 timeout, silent;
-    s32 fadeOut, confirmFade;
-};
 struct Message {
     u32 count : 16;
     u32 unused : 16;
     void *values;
 };
-extern struct Parameters gUnk_020003D0;
 extern u16 gUnk_03005260[];
 extern u8 *gGameState;
 extern const s32 gUnk_08613D80[];
@@ -52,7 +47,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
     struct Message message;
     message.count = 1;
     message.values = &value;
-    if (p->timer == p->musicTimer + 170 && gUnk_020003D0.silent == 0) {
+    if (p->timer == p->musicTimer + 170 && gTimeDisplayParameters.silent == 0) {
         switch (TimeDisplay_GetCurrentMonth() - 1) {
             case 2:
             case 3:
@@ -88,10 +83,10 @@ void Params3D0_UpdateDisplay(struct Display *p)
             } break;
         }
     }
-    if (p->idleTimer > gUnk_020003D0.timeout) {
+    if (p->idleTimer > gTimeDisplayParameters.timeout) {
         p->state = 13;
         p->result = 5;
-        p->fadeShift = gUnk_020003D0.fadeOut;
+        p->fadeShift = gTimeDisplayParameters.fadeOut;
         Menu_StartFadeOut(p->fadeShift);
         if (Sound_IsSongPlaying(0xA4)) {
             Sound_FadeOutChannel10(p->fadeShift);
@@ -234,13 +229,13 @@ void Params3D0_UpdateDisplay(struct Display *p)
                     *(u16 *)(gGameState + 0x870) = p->selection;
                     if (p->selection == 0) {
                         Sound_PlaySong(0xE0);
-                        p->fadeShift = gUnk_020003D0.confirmFade;
+                        p->fadeShift = gTimeDisplayParameters.confirmFade;
                         if (p->fadeShift <= 5) {
                             p->fadeShift = 6;
                         }
                     } else {
                         Sound_PlaySong(0xDD);
-                        p->fadeShift = gUnk_020003D0.confirmFade;
+                        p->fadeShift = gTimeDisplayParameters.confirmFade;
                     }
                     p->state = 13;
                     p->result = p->selection + 1;
@@ -347,18 +342,18 @@ void Params3D0_UpdateDisplay(struct Display *p)
             if (p->counter > (1 << p->fadeShift) || p->fadeShift == 0) {
                 TimeDisplay_HideAnimatedObjects(p);
                 if (p->result == 0) {
-                    Script_Call(gUnk_020003D0.c, 0);
+                    Script_Call(gTimeDisplayParameters.c, 0);
                 } else if (p->result == 1) {
-                    Script_Call(gUnk_020003D0.g, 0);
+                    Script_Call(gTimeDisplayParameters.g, 0);
                 } else if (p->result == 2) {
                     value = 0;
-                    Script_Call(gUnk_020003D0.o, &message);
+                    Script_Call(gTimeDisplayParameters.o, &message);
                 } else if (p->result == 3) {
-                    Script_Call(gUnk_020003D0.l, 0);
+                    Script_Call(gTimeDisplayParameters.l, 0);
                 } else if (p->result == 5) {
-                    Script_Call(gUnk_020003D0.d, 0);
+                    Script_Call(gTimeDisplayParameters.d, 0);
                 } else if (p->result == 4) {
-                    Script_Call(gUnk_020003D0.s, 0);
+                    Script_Call(gTimeDisplayParameters.s, 0);
                 }
                 Task_Kill(p);
             }

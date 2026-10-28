@@ -1,10 +1,9 @@
 #include "global.h"
-
-extern u8 *gUnk_020001AC;
+#include "ram.h"
 
 u8 *NamedObject_GetFollowTarget(void)
 {
-    u8 *g = gUnk_020001AC;
+    u8 *g = gNamedActorManager;
     s32 i = 0;
     u32 v = *(u32 *)(g + 0x1370);
     u8 *a = g + 0x1c;

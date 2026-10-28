@@ -27,12 +27,12 @@ struct Engine {
     u8 message[0x204];
     void *head, *tail;
 };
-extern struct Engine *gUnk_02000484;
 void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
+#include "runtime.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -40,7 +40,7 @@ static inline void setOperation(struct Engine *p, int op, int zero)
     p->ticks = zero;
     p->pending = 1;
 }
-extern u32 gUnk_020000F0, gUnk_0300546C, gUnk_03005408;
+extern u32 gUnk_0300546C;
 void Solar_PauseMeasurement(void);
 void Solar_ResumeMeasurement(void);
 void Task_UnlinkFromPriorityList(void *);
@@ -55,7 +55,7 @@ void Wireless_UpdateChildNiSession(struct Engine *);
 int Wireless_UpdateControllerTask(struct Engine *p)
 {
     Solar_PauseMeasurement();
-    gUnk_020000F0 = p->flag33;
+    gWirelessLastStatus = p->flag33;
     switch (p->phase) {
         case 0:
             if (p->active)
@@ -84,13 +84,13 @@ int Wireless_UpdateControllerTask(struct Engine *p)
     }
     if (p->pad1d) {
         gUnk_0300546C = 0;
-        gUnk_02000484 = 0;
+        gWirelessController = 0;
         Task_UnlinkFromPriorityList(p);
         Heap_Free(p);
         Solar_ResumeMeasurement();
     } else {
         if ((u16)(p->operation - 9) <= 17)
-            gUnk_03005408 = 1;
+            gSceneDialogActive = 1;
         p->ticks++;
         p->frameCounter++;
     }

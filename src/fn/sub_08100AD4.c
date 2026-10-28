@@ -1,7 +1,7 @@
-#define gNamedObjectManager       gUnk_020001AC
 #define gNamedObjectContactBounds gUnk_086064B4
 #include "global.h"
 #include "contact_actor.h"
+#include "ram.h"
 struct NamedObjectContactSlot {
     u8 unknown00[0x10C];
     struct ContactPosition position;
@@ -12,7 +12,6 @@ struct NamedObjectContactPool {
     struct NamedObjectContactSlot slots[12];
     u32 activeMask;
 };
-extern struct NamedObjectContactPool *gUnk_020001AC;
 extern const struct ContactPosition gUnk_086064B4;
 static inline u8 IsActive(u32 *mask, s32 i)
 {
@@ -29,7 +28,7 @@ static inline void Difference(struct ContactPosition *d, const struct ContactPos
 }
 struct NamedObjectContactSlot *NamedObject_FindNearPosition(const struct ContactPosition *position)
 {
-    struct NamedObjectContactPool *pool = gUnk_020001AC;
+    struct NamedObjectContactPool *pool = gNamedActorManager;
     struct ContactPosition delta;
     s32 i;
     if (!pool)

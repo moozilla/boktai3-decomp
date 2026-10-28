@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_hud_display.h"
+#include "ram.h"
 
-#define gSceneHud            gFieldHud
 #define gSceneHudOwnerSource gUnk_020004B4
 #define gPartyActors         gUnk_02000580
 struct SceneHudOwnerSource {
@@ -10,7 +10,6 @@ struct SceneHudOwnerSource {
 };
 extern struct SceneHudOwnerSource *gSceneHudOwnerSource;
 extern struct Player *gPartyActors[];
-extern struct SceneHudState *gSceneHud;
 
 void Hud_LoadLayoutResources(struct SceneHudState *);
 void SceneHud_InitGameplayResources(struct SceneHudState *);
@@ -46,6 +45,6 @@ s32 SceneHud_InitializeOwner(struct SceneHudState *s)
     one = 1;
     offset = 0xA5F;
     *(s8 *)((u8 *)s + offset) = -one;
-    gSceneHud = s;
+    (*(struct SceneHudState **)&gFieldHud) = s;
     return 0;
 }

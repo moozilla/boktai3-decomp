@@ -1,4 +1,5 @@
 #include "global.h"
+#include "menu_parameters.h"
 // Provisional name: SoundTest_DrawTrackName
 struct Sprite {
     u8 head[8];
@@ -32,7 +33,6 @@ struct Viewer {
 void Anim_LoadKeyframe(void *, void *, u16, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-extern u8 *gUnk_020003C0;
 void Bg_ClearTilemap(s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
 s32 Script_ParseStringRef(void *);
@@ -45,7 +45,7 @@ void SoundTest_DrawTrackName(struct Viewer *p)
     const char *text;
     Bg_ClearTilemap(0);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
-    text = Text_LookupString(Script_ParseStringRef(gUnk_020003C0) + p->textIndex);
+    text = Text_LookupString(Script_ParseStringRef(gSoundTestParameters.text) + p->textIndex);
     Menu_EraseRect(10, 4, 16, 2);
     Menu_DrawText(10, 4, text);
 }

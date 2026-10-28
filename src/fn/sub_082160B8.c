@@ -14,16 +14,6 @@ struct BgHeader {
     u32 u38;
     u32 u3C;
 };
-struct BgLayerState {
-    u16 mode;
-    u16 layer;
-    u8 p4[0xC];
-    u16 h10, h12, h14, h16, h18, h1A;
-    u8 p1C[4];
-    u16 h20, h22;
-    u32 w24, w28, w2C;
-};
-extern struct BgLayerState gUnk_03004C30[];
 void *memcpy(void *, const void *, u32);
 void Bg_SetTileUpload(s32, u32, s32, s32);
 void Bg_SetPriority(s32, s32);
@@ -34,13 +24,13 @@ void Bg_SetupLayer(s32 layer, u16 mode, u32 base, s32 unused, s32 x, s32 y, s32 
     struct BgHeader hdr;
     u16 bits;
     s32 px, py;
-    struct BgLayerState *st = &gUnk_03004C30[layer];
-    st->mode = mode;
+    struct BackgroundLayer *st = &gBgRecords[layer];
+    st->flags = mode;
     st->layer = layer;
-    st->h20 = 0;
-    st->h22 = 0;
-    st->h10 = 0x1000;
-    st->h12 = 0x1000;
+    st->x = 0;
+    st->y = 0;
+    st->scaleX = 0x1000;
+    st->scaleY = 0x1000;
     px = (s16)x >> 4;
     py = (s16)y >> 4;
     memcpy(&hdr, (void *)base, sizeof(hdr));
@@ -80,13 +70,13 @@ void Bg_SetupLayer(s32 layer, u16 mode, u32 base, s32 unused, s32 x, s32 y, s32 
 skip:
     Bg_SetTileUpload(layer, hdr.u14, base, hdr.s10);
     Bg_SetPriority(layer, priority);
-    st->h14 = px;
-    st->h16 = py;
-    st->h18 = hdr.u38;
-    st->h1A = hdr.u3C;
-    st->w24 = hdr.u1C;
-    st->w28 = hdr.u24;
-    st->w2C = map;
+    st->originX = px;
+    st->originY = py;
+    st->width = hdr.u38;
+    st->height = hdr.u3C;
+    st->extraData = (u16 *)hdr.u1C;
+    st->mapData = (u16 *)hdr.u24;
+    st->map = (u16 *)map;
     if (layer == 0)
         Text_ClearGlyphCache();
 }

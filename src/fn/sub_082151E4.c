@@ -2,22 +2,6 @@
 #include "render.h"
 
 /* Sprite resource bank (header at 0x03004300): entries of 12 bytes from +0x18. */
-struct AnimResourceEntry {
-    u16 id;
-    u8 field2;
-    u8 pad3;
-    u8 field4, field5, field6, field7;
-    u32 offset;
-};
-struct AnimResourceHeader {
-    u32 pad0;
-    s32 count;
-    u8 pad8[4];
-    u32 offsetC;
-    u32 offset10;
-    u8 pad14[4];
-    struct AnimResourceEntry entries[1];
-};
 struct AnimData {
     u8 field0, field1;
     u16 field2;
@@ -28,11 +12,10 @@ struct AnimData {
     u8 *data10;
     u8 *data14;
 };
-extern struct AnimResourceHeader *gUnk_03004300;
 /* Fills anim from the resource entry with this id; 0 if there is none. */
 s32 AnimData_Load(struct AnimData *anim, u32 id)
 {
-    struct AnimResourceHeader *header = gUnk_03004300;
+    struct AnimResourceHeader *header = gAnimationResource;
     u8 *base10, *baseC;
     struct AnimResourceEntry *entry;
     u16 *info;
@@ -43,7 +26,7 @@ s32 AnimData_Load(struct AnimData *anim, u32 id)
     base10 = (u8 *)header + header->offset10;
     found = 0;
     entry = header->entries;
-    for (i = 0; i < gUnk_03004300->count; entry++, i++) {
+    for (i = 0; i < gAnimationResource->count; entry++, i++) {
         if (entry->id == id) {
             found = 1;
             break;

@@ -1,9 +1,10 @@
 #include "status_screen.h"
+#include "render.h"
 // MATCHING_CONCESSION: register-pinning
 
 u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y)
 {
-    struct BgMapInfo *t = &gUnk_03004C30[bg];
+    struct BackgroundLayer *t = &gBgRecords[bg];
     u16 *p = t->map;
     p = p + x;
     return p + (t->width << 1) * y;
@@ -30,7 +31,7 @@ void NumericDisplay_DrawPair(void *unused, int left, int right)
             int tile = *digit++ + 32;
             *out++ = shift + tile | -12288;
         }
-        dst += gUnk_03004C30[0].width * 2;
+        dst += gBgRecords[0].width * 2;
     }
 
     digits[0] = Div(right, 10);
@@ -48,7 +49,7 @@ void NumericDisplay_DrawPair(void *unused, int left, int right)
                 int tile = *digit++ + 32;
                 *out++ = row + tile | -12288;
             }
-            dst += gUnk_03004C30[0].width * 2;
+            dst += gBgRecords[0].width * 2;
         }
         row = next;
     }
@@ -76,7 +77,7 @@ void NumericDisplay_DrawStatusValues(struct StatusScreen *unused)
             int tile = *digit++ + 32;
             *out++ = shift + tile | -12288;
         }
-        dst += gUnk_03004C30[0].width * 2;
+        dst += gBgRecords[0].width * 2;
     }
 
     digits[0] = Div(right, 10);
@@ -94,7 +95,7 @@ void NumericDisplay_DrawStatusValues(struct StatusScreen *unused)
                 int tile = *digit++ + 32;
                 *out++ = row + tile | -12288;
             }
-            dst += gUnk_03004C30[0].width * 2;
+            dst += gBgRecords[0].width * 2;
         }
         row = next;
     }
@@ -125,7 +126,7 @@ void StatusScreen_DrawClock(struct StatusScreen *unused)
         base = 0x6a;
         for (col = 0; col < 4; col++)
             dst[col] = (shift + base + col) | -12288;
-        dst += gUnk_03004C30[0].width * 2;
+        dst += gBgRecords[0].width * 2;
     }
 
     dst = (s16 *)StatusScreen_GetTilePtr(0, 8, 15);
@@ -140,7 +141,7 @@ void StatusScreen_DrawClock(struct StatusScreen *unused)
         int shift = row << 4;
         for (col = 0; col < n; col++)
             dst[col] = (shift + base + col) | -12288;
-        dst += gUnk_03004C30[0].width * 2;
+        dst += gBgRecords[0].width * 2;
     }
 
     digits[0] = Div(hours, 10);
@@ -156,7 +157,7 @@ void StatusScreen_DrawClock(struct StatusScreen *unused)
             int tile = *digit++ + 0x60;
             *out++ = shift + tile | -12288;
         }
-        dst += gUnk_03004C30[0].width * 2;
+        dst += gBgRecords[0].width * 2;
     }
 
     digits[0] = Div(minutes, 10);
@@ -173,7 +174,7 @@ void StatusScreen_DrawClock(struct StatusScreen *unused)
             int tile = *digit++ + 0x60;
             *out++ = shift + tile | -12288;
         }
-        dst += gUnk_03004C30[0].width * 2;
+        dst += gBgRecords[0].width * 2;
         row = next;
     }
 }

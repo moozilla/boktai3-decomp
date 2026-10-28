@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 #include "game_state.h"
 #include "engine.h"
 
@@ -24,14 +25,8 @@ struct LinkState {
     u8 unknown0[0x18];
     s16 player;
 };
-struct CameraState {
-    struct Vec position;
-    u8 unknown8[10];
-    s16 facing;
-};
 extern struct LinkState *gUnk_020004B4;
 extern struct Player *gUnk_02000580[4];
-extern struct CameraState gUnk_030042A0;
 s32 Div(s32, s32);
 
 // Moves a secondary camera point (pos) by mode: follow the player, hold, pan to `target`,
@@ -60,7 +55,7 @@ void sub_08226CF8(struct Camera2 *camera)
                     }
                 }
             } else {
-                if (gUnk_030042A0.facing == 0) {
+                if (gCamera.mode == 0) {
                     camera->pos.x = target.x;
                     camera->pos.y = target.y + 150;
                 } else {

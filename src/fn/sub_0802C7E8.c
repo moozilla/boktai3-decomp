@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Object {
     u8 pad0[0x50];
     u32 flags;
@@ -16,7 +17,6 @@ struct Manager {
     struct Object *head;
     u32 ticks, slot, serial;
 };
-extern struct Manager *gUnk_020000D8;
 extern u8 *gUnk_02000580[4];
 int ActorPool_UnlinkObject(struct Manager *, struct Object *);
 void Heap_Free(void *);
@@ -24,7 +24,7 @@ void ActorPool_RefreshTargets(struct Manager *);
 int ActorPool_InitManager(struct Manager *m)
 {
     int i;
-    gUnk_020000D8 = m;
+    gActorPoolManager = m;
     {
         int zero = 0;
         for (i = 3; i >= 0; i--)

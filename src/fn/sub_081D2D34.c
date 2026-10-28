@@ -1,6 +1,7 @@
 #include "global.h"
 
 #include "engine.h"
+#include "ram.h"
 struct Npc {
     u8 pad0[2];
     u8 field2, field3, mode;
@@ -11,13 +12,12 @@ struct Npc {
     u8 pad18[0x203];
     u8 field21B;
 };
-extern void *gUnk_02000480;
 struct Npc *Actor_FindById(void *, s32);
 /* Script: puts the scene NPC named -n into mode 0x1A (sets +0x21B, clears
    the state fields; tentative). */
 void SceneNpc_SetSpecialModeFromScript(void)
 {
-    void *manager = gUnk_02000480;
+    void *manager = gSceneActorListManager;
     struct Npc *npc;
     if (manager && (npc = Actor_FindById(manager, Script_GetKeywordValue('n', 0))) != 0) {
         u8 mode;

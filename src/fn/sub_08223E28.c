@@ -1,6 +1,7 @@
 #include "global.h"
 #define gRfuLinkStatus gUnk_03006A80
 #include "rfu_compat.h"
+#include "rfu_manager.h"
 #define LMAN_MSG_INITIALIZE_COMPLETED                    0x00
 #define LMAN_MSG_SEARCH_CHILD_PERIOD_EXPIRED             0x13
 #define LMAN_MSG_PARENT_FOUND                            0x20
@@ -38,43 +39,9 @@
 #define LMAN_STATE_MS_CHANGE                             0x13
 #define LMAN_STATE_BACK_STATE                            0x16
 
-typedef struct VblankTimerTag {
-    u8 active;
-    u16 count_max;
-    u16 count[RFU_CHILD_MAX];
-} VBL_TIMER;
 
-/* pret/pokeemerald AgbRfu_LinkManager.h: struct linkManagerTag (gUnk_03005390). */
-struct linkManagerTag {
-    u8 acceptSlot_flag;
-    u8 acceptCount;
-    vu8 childClockSlave_flag;
-    vu8 parentAck_flag;
-    u8 state;
-    u8 next_state;
-    u8 parent_child;
-    u8 pcswitch_flag;
-    u8 RFU_powerOn_flag;
-    u8 linkRecovery_enable;
-    u8 linkRecovery_start_flag;
-    u8 fastSearchParent_flag;
-    u8 connectSlot_flag_old;
-    u8 reserveDisconnectSlot_flag;
-    u8 active;
-    u8 msc_exe_flag;
-    u8 child_slot;
-    u8 state_bak[2];
-    u16 param[2];
-    u16 NI_failCounter_limit;
-    u16 connect_period;
-    u16 pcswitch_period_bak;
-    u16 work;
-    u16 *acceptable_serialNo_list;
-    VBL_TIMER nameAcceptTimer;
-    VBL_TIMER linkRecoveryTimer;
-};
-extern struct linkManagerTag gUnk_03005390;
-#define lman gUnk_03005390
+/* pret/pokeemerald AgbRfu_LinkManager.h: struct RfuLinkManager (gRfuLinkManager). */
+#define lman gRfuLinkManager
 void RfuManager_NotifyEvent(u8, u8);
 void RfuManager_DisconnectAndWait(u8);
 void RfuManager_CompletePendingMscCycle(void);
@@ -144,7 +111,7 @@ void RfuManager_ApplyRequestResult(u16 reqCommandId, u16 reqResult)
             case ID_SP_POLL_REQ:
                 if (reqResult == 0) {
                     status = RfuManager_FindAllowedParents();
-                    lman.param[0] = status;
+                    lman.event.param[0] = status;
                     if (status) {
                         RfuManager_NotifyEvent(LMAN_MSG_PARENT_FOUND, 1);
                     }
@@ -194,11 +161,11 @@ void RfuManager_ApplyRequestResult(u16 reqCommandId, u16 reqResult)
                         lman.state = LMAN_STATE_MS_CHANGE;
                         lman.next_state = LMAN_STATE_SEND_CHILD_NAME;
                         lman.work = 0x22;
-                        lman.param[0] = lman.child_slot;
+                        lman.event.param[0] = lman.child_slot;
                     } else {
                         lman.state = lman.next_state = LMAN_STATE_READY;
                         lman.work = 0x23;
-                        lman.param[0] = status;
+                        lman.event.param[0] = status;
                         if (lman.pcswitch_flag) {
                             lman.pcswitch_flag = PCSWITCH_2ND_SP_START;
                             lman.state = LMAN_STATE_START_SEARCH_PARENT;
@@ -210,7 +177,7 @@ void RfuManager_ApplyRequestResult(u16 reqCommandId, u16 reqResult)
                 break;
             case ID_CPR_START_REQ:
                 if (reqResult == 0) {
-                    lman.param[0] = gRfuLinkStatus->linkLossSlotFlag;
+                    lman.event.param[0] = gRfuLinkStatus->linkLossSlotFlag;
                     lman.state = lman.next_state = LMAN_STATE_POLL_LINK_RECOVERY;
                     for (lman.child_slot = 0; lman.child_slot < RFU_CHILD_MAX; lman.child_slot++) {
                         if ((gRfuLinkStatus->linkLossSlotFlag >> lman.child_slot) & 1) {
@@ -267,7 +234,7 @@ void RfuManager_ApplyRequestResult(u16 reqCommandId, u16 reqResult)
                             RfuManager_CompletePendingMscCycle();
                             RfuManager_DisconnectAndWait(gRfuLinkStatus->connSlotFlag |
                                                          gRfuLinkStatus->linkLossSlotFlag);
-                            lman.param[0] = status;
+                            lman.event.param[0] = status;
                             RfuManager_NotifyEvent(LMAN_MSG_CHILD_NAME_SEND_FAILED_AND_DISCONNECTED,
                                                    1);
                         }
@@ -299,12 +266,12 @@ void RfuManager_ApplyRequestResult(u16 reqCommandId, u16 reqResult)
     switch (reqCommandId) {
         case ID_DISCONNECT_REQ:
             if (reqResult == 0) {
-                lman.param[0] = *(rfu_getSTWIRecvBuffer() + 8);
-                RfuManager_RemoveSendTargets(lman.param[0]);
+                lman.event.param[0] = *(rfu_getSTWIRecvBuffer() + 8);
+                RfuManager_RemoveSendTargets(lman.event.param[0]);
                 if (lman.linkRecoveryTimer.active) {
-                    lman.linkRecoveryTimer.active &= ~lman.param[0];
+                    lman.linkRecoveryTimer.active &= ~lman.event.param[0];
                     for (i = 0; i < RFU_CHILD_MAX; i++) {
-                        if ((lman.param[0] >> i) & 1) {
+                        if ((lman.event.param[0] >> i) & 1) {
                             lman.linkRecoveryTimer.count[i] = 0;
                         }
                     }
@@ -312,13 +279,13 @@ void RfuManager_ApplyRequestResult(u16 reqCommandId, u16 reqResult)
                         lman.state = lman.next_state = LMAN_STATE_READY;
                     }
                 }
-                status = lman.acceptSlot_flag & lman.param[0];
+                status = lman.acceptSlot_flag & lman.event.param[0];
                 for (i = 0; i < RFU_CHILD_MAX; i++) {
                     if ((status >> i) & 1 && lman.acceptCount) {
                         lman.acceptCount--;
                     }
                 }
-                lman.acceptSlot_flag &= ~lman.param[0];
+                lman.acceptSlot_flag &= ~lman.event.param[0];
                 if (lman.pcswitch_flag) {
                     if (gRfuLinkStatus->parentChild == MODE_NEUTRAL) {
                         if (lman.pcswitch_flag == PCSWITCH_SC_LOCK) {
@@ -371,8 +338,8 @@ void RfuManager_ApplyRequestResult(u16 reqCommandId, u16 reqResult)
             rfu_waitREQComplete();
             return;
         } else {
-            lman.param[0] = reqCommandId;
-            lman.param[1] = reqResult;
+            lman.event.param[0] = reqCommandId;
+            lman.event.param[1] = reqResult;
             if (lman.active) {
                 lman.state = lman.next_state = LMAN_STATE_READY;
             }

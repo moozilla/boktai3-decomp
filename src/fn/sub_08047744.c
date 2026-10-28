@@ -1,6 +1,6 @@
 #include "background_flash.h"
-extern u8 gUnk_03005140[];
+#include "render.h"
 void BackgroundFlash_LoadPalette(void)
 {
-    CpuSet((u8 *)ScriptProc_Start(0x92B3, 0xE39B) + 0x194, gUnk_03005140, 0x04000008);
+    CpuSet((u8 *)ScriptProc_Start(0x92B3, 0xE39B) + 0x194, gBgPaletteBank12, 0x04000008);
 }

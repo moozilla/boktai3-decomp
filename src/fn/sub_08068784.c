@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_particle_pool.h"
-extern struct SceneParticlePool *gUnk_02000134;
+#include "ram.h"
 extern void *gUnk_08605B5C[];
 static inline u8 Occupied(const u32 *mask, u32 bit)
 {

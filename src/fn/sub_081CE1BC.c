@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct PackedVec {
     u32 x : 16;
     u32 y : 16;
@@ -64,7 +65,6 @@ struct SceneNpc {
     void *update;
     void *callbacks[6];
 };
-extern void *gUnk_02000480;
 s32 SceneCharacter_GetModelId(s32);
 s32 SceneCharacter_GetPaletteIndex(s32);
 s32 SceneCharacter_GetResourceVariant(s32);
@@ -123,7 +123,7 @@ void SceneCharacter_PlaceFromScript(void)
     struct PackedVec position;
     colorA = 0;
     sound = 0x34;
-    manager = gUnk_02000480;
+    manager = gSceneActorListManager;
     if (!manager) {
         return;
     }

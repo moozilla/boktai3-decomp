@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 #include "terrain_cell_probe.h"
 
 struct BurstSprite {
@@ -20,7 +21,6 @@ struct HealthBurstEffect {
     u16 age;
 };
 
-extern struct Pos16 gUnk_030042A0;
 s32 Div(s32, s32);
 
 static inline u32 BurstRandom(void)
@@ -83,7 +83,7 @@ void HealthBurstEffect_StartBurst(struct HealthBurstEffect *effect)
     x = ScaleTowardZero(gUnk_086149C4[(angle + 64) & 255] * radius, 12);
     z = ScaleTowardZeroResult(radius * gUnk_086149C4[angle] * 3, 13);
     sprite->flags &= ~1;
-    sprite->position = gUnk_030042A0;
+    sprite->position = *(struct Pos16 *)&gCamera.position;
     coordinateX = sprite->position.x - 75;
     sprite->position.x = coordinateX + (x - z);
     sprite->position.y += 850;

@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_input_navigation.h"
 
@@ -36,8 +37,6 @@ static inline void Storage_ClearOffset(u32 *offset)
     *offset = 0;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 90.1%
 void Storage_RefreshConsumableSlots(struct StorageCategoryWidgets *p)
 {
     s32 col, row;
@@ -106,6 +105,7 @@ void Storage_RefreshConsumableSlots(struct StorageCategoryWidgets *p)
         rowBytes += 0x180;
         /* Advance by the four carried slots processed in this row. */
         Storage_AdvanceSlotRow(&rowSlot);
+        asm("" : : "r"(row));
         row++;
         if (row > 3)
             break;
@@ -137,6 +137,7 @@ void Storage_RefreshConsumableSlots(struct StorageCategoryWidgets *p)
             }
             widget++;
             index++;
+            asm("" : : "r"(col));
             col++;
             if (col > 3)
                 break;
@@ -148,6 +149,3 @@ void Storage_RefreshConsumableSlots(struct StorageCategoryWidgets *p)
         equipped++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Storage_RefreshConsumableSlots);
-#endif

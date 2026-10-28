@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct BgResource {
     u8 signature[2];
@@ -16,20 +17,6 @@ struct BgMapEntry {
     u32 unk04;
     u32 data;
 };
-struct BgLayer {
-    u16 resource;
-    u16 bg;
-    u8 pad4[0xC];
-    u16 scaleX, scaleY;
-    s16 x, y;
-    u16 width, height;
-    u16 width2, height2;
-    u16 field20, field22;
-    u32 extra;
-    u32 data;
-    void *map;
-};
-extern struct BgLayer gUnk_03004C30[];
 void Text_ClearGlyphCache(void);
 /* Points background layer bg at map entry index of a map resource (data,
    size, scale 1.0); see Bg_SetupLayers. */
@@ -37,24 +24,24 @@ void Bg_SetLayerMap(s32 bg, struct BgResource *res, s32 index)
 {
     struct BgResource hdr;
     struct BgMapEntry entry;
-    struct BgLayer *layer;
+    struct BackgroundLayer *layer;
     if (bg == 0)
         Text_ClearGlyphCache();
     hdr = *res;
     hdr.maps += (u32)res;
     hdr.tiles += (u32)res;
     hdr.extra += (u32)res;
-    layer = &gUnk_03004C30[bg];
+    layer = &gBgRecords[bg];
     entry = ((struct BgMapEntry *)hdr.maps)[index];
     entry.data += (u32)res;
     layer->scaleX = 0x1000;
     layer->scaleY = 0x1000;
-    layer->data = entry.data;
+    layer->mapData = (u16 *)entry.data;
     {
         u16 w, h;
         layer->width = w = entry.width;
         layer->height = h = entry.height;
-        layer->width2 = w;
-        layer->height2 = h;
+        layer->halfWidth = w;
+        layer->halfHeight = h;
     }
 }

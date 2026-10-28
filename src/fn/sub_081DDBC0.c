@@ -22,7 +22,6 @@ struct NameEntryTask {
 };
 
 extern u16 gUnk_03005260[];
-extern u8 gUnk_020005B4[];
 s32 Mod(s32, s32);
 void NameEntry_MoveCursorUp(struct NameEntryTask *);
 void NameEntry_MoveCursorDown(struct NameEntryTask *);
@@ -82,9 +81,9 @@ void NameEntry_Update(struct NameEntryTask *p)
                     p->position = 4;
                     if (p->slot)
                         CpuSet(p->name, (u8 *)gGameState + 0x790, 8);
-                    gUnk_020005B4[0] = p->position;
-                    gUnk_020005B4[1] = p->selection;
-                    gUnk_020005B4[p->slot + 2] = 0;
+                    gNameEntrySavedState[0] = p->position;
+                    gNameEntrySavedState[1] = p->selection;
+                    gNameEntrySavedState[p->slot + 2] = 0;
                     Menu_StartFadeOut(p->fadeShift);
                     p->result = 0;
                     p->state = r;
@@ -128,8 +127,8 @@ void NameEntry_Update(struct NameEntryTask *p)
                             CpuSet(p->name, PlayerName_GetBuffer(), 8);
                         else
                             CpuSet(p->name, (u8 *)gGameState + 0x790, 8);
-                        gUnk_020005B4[0] = p->position;
-                        gUnk_020005B4[1] = p->selection;
+                        gNameEntrySavedState[0] = p->position;
+                        gNameEntrySavedState[1] = p->selection;
                         Menu_StartFadeOut(p->fadeShift = 3);
                         p->state = 1;
                         p->result = 1;

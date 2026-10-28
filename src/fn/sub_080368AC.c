@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct P {
     u8 pad[0x1c];
     u8 b1c;
@@ -15,7 +16,6 @@ struct P {
     u8 pad5[0x338];
     u32 w388;
 };
-extern u32 gUnk_020000F0;
 s32 Wireless_InitRfuApi(void);
 void WirelessController_ResetSession(struct P *);
 u32 Script_GetKeywordValue(u32, u32);
@@ -27,7 +27,7 @@ s32 Wireless_InitControllerFromScript(struct P *p)
     u8 *f = &p->b33;
     z = 0;
     *f = z;
-    gUnk_020000F0 = z;
+    gWirelessLastStatus = z;
     if (Wireless_InitRfuApi() < 0)
         goto fail;
     p->b1d = z;

@@ -1,16 +1,12 @@
 #include "global.h"
 #include "engine.h"
+#include "menu_parameters.h"
 /* Parameters at 0x020002C0 (meaning unknown). */
-struct ScreenParams2C0 {
-    u8 *mBlock, *eBlock;
-    s32 s, r, x, c, n, b, n2, p;
-};
-extern struct ScreenParams2C0 gUnk_020002C0;
 /* Script: -m and -e blocks, -s, -r, -x, -c, -n (two values, the second
    default 0), -b (default 0) and -p. */
 void ScreenParams2C0_SetFromScript(void)
 {
-    struct ScreenParams2C0 *p = &gUnk_020002C0;
+    struct ChoiceMenuParameters *p = &gChoiceMenuParameters;
     p->b = 0;
     p->n2 = 0;
     if (Script_SeekToKeyword('m'))

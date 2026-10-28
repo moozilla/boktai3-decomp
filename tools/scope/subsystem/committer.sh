@@ -13,8 +13,15 @@ while true; do
       if git -C "$W" diff --quiet -- "$src"; then touch "$d/committed"; continue; fi
       git -C "$W" add -- "$src" && git -C "$W" commit -q -m "$(cat "$c")
 
-Matched by a $MODEL scope worker (subsystem run $(basename "$W"))." && touch "$d/committed" \
+Matched by a $(cat "$W/build/model" 2>/dev/null || echo "$MODEL") scope worker (subsystem run $(basename "$W"))." && touch "$d/committed" \
         && echo "$(date +%T) $(basename "$W") committed $f"
+    done
+    # other work (e.g. layout workers): build/commits/N.msg is the message, N.files the paths to add
+    for m in "$W"/build/commits/*.msg; do
+      [ -e "$m" ] || continue
+      b=${m%.msg}; [ -e "$b.committed" ] && continue
+      (cd "$W" && xargs git add -- < "$b.files") && git -C "$W" commit -q -F "$m" && touch "$b.committed" \
+        && echo "$(date +%T) $(basename "$W") committed $(head -1 "$m")"
     done
   done
   sleep 45

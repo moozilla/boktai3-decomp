@@ -22,13 +22,13 @@ void ScanlineEffect_StageTransfer(void)
     switch ((*(s32 *)&gScanlineEffectMode)) {
         case 0:
             target = ScanlineEffect_GetHorizontalScrollRegister((*(s32 *)&gScanlineEffectLayer));
-            scroll = (u16)gUnk_03004C30[(*(s32 *)&gScanlineEffectLayer)].x & 0x1FF;
+            scroll = (u16)gBgRecords[(*(s32 *)&gScanlineEffectLayer)].x & 0x1FF;
             for (i = 0; i <= 159; i++)
                 buffer[i] = (*(u16 *)(i * 2 + (u32)gScanlineEffectSource) + scroll) & 0x1FF;
             break;
         case 1:
             target = ScanlineEffect_GetVerticalScrollRegister((*(s32 *)&gScanlineEffectLayer));
-            scroll = (u16)gUnk_03004C30[(*(s32 *)&gScanlineEffectLayer)].y & 0x1FF;
+            scroll = (u16)gBgRecords[(*(s32 *)&gScanlineEffectLayer)].y & 0x1FF;
             for (i = 0; i <= 159; i++)
                 buffer[i] = (*(u16 *)(i * 2 + (u32)gScanlineEffectSource) + scroll) & 0x1FF;
             break;

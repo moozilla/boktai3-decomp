@@ -1,6 +1,7 @@
 #ifndef GUARD_RESOURCE_STATION_H
 #define GUARD_RESOURCE_STATION_H
 #include "game_state.h"
+#include "ram.h"
 /* Tentative identity: a station that transfers stored resource into player+428. */
 struct ResourceStationPosition {
     s16 x, y, z, pad;
@@ -47,7 +48,6 @@ struct ResourceStation {
     u8 state, animationFrame, nearby, digitsVisible;
     u16 interactionVariant;
 };
-extern u16 gUnk_02000534, gUnk_02000500;
 extern struct ResourceStationPosition gUnk_03005418;
 void AnimData_SelectPaletteBank(void *, s32);
 #endif

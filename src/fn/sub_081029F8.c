@@ -1,5 +1,6 @@
 #include "global.h"
 #include "player.h"
+#include "ram.h"
 struct NamedObjectVector {
     s16 x, y, z, pad;
 };
@@ -17,7 +18,6 @@ struct NamedObjectManager {
     u8 pad0[0x1370];
     u32 playerName;
 };
-extern struct NamedObjectManager *gUnk_020001AC;
 extern const struct NamedObjectVector gUnk_086064B4;
 extern const struct NamedObjectVector gUnk_086064BC;
 void NamedObject_ClearAttachmentFlag(u32, s32);
@@ -52,7 +52,7 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
     target.y = player->position.y + object->offset.y;
     target.z = player->position.z + object->offset.z;
     subtractVector(&delta, &target, &object->position);
-    manager = gUnk_020001AC;
+    manager = gNamedActorManager;
     if (delta.x <= gUnk_086064B4.x && delta.x >= -gUnk_086064B4.x && delta.y <= gUnk_086064B4.y &&
         delta.y >= -gUnk_086064B4.y && delta.z <= gUnk_086064B4.z && delta.z >= -gUnk_086064B4.z) {
         NamedObject_ClearAttachmentFlag(manager->playerName, 0);

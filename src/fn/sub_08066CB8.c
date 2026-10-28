@@ -15,7 +15,7 @@ static inline u8 IsOccupied(u32 *mask, u32 bit)
 void ActorAttachment_ReleaseAll(void)
 {
     struct ActorAttachmentManagerView *manager;
-    struct ActorAttachmentManagerView *incoming = gUnk_02000124;
+    struct ActorAttachmentManagerView *incoming = gActorAttachmentManager;
     register s32 i asm("r3");
     register u32 *occupied asm("r10");
     s32 next;

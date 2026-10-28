@@ -1,4 +1,5 @@
 #include "global.h"
+#include "runtime.h"
 struct Message {
     u16 id;
     u8 unk2, count;
@@ -9,11 +10,10 @@ struct Buffer {
     struct Message entries[32];
     s16 values[64];
 };
-extern s32 gUnk_03001680;
 struct Buffer *MessageQueue_GetBuffers(void);
 s32 MessageQueue_GetMessagesById(u32 id, struct Message **out)
 {
-    struct Buffer *buffer = MessageQueue_GetBuffers() + (1 - gUnk_03001680);
+    struct Buffer *buffer = MessageQueue_GetBuffers() + (1 - gMessageQueueBufferIndex);
     struct Message *p = buffer->entries;
     s32 i = 0;
     s32 count, limit;

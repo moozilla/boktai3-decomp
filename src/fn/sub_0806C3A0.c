@@ -1,3 +1,4 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "scene_steering_actor.h"
@@ -17,16 +18,34 @@ static inline s32 Sub0806C3A0_Truncate(s32 v)
     return -((-v) >> 12);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 68.0%
+static inline void SubtractPosition(struct ContactPosition *out, const struct ContactPosition *b,
+                                    const struct ContactPosition *a)
+{
+    out->x = a->x - b->x;
+    out->y = a->y - b->y;
+    out->z = a->z - b->z;
+}
+
+static inline void AddPosition(struct ContactPosition *out, const struct ContactPosition *a,
+                               const struct ContactPosition *b)
+{
+    out->x = b->x + a->x;
+    out->y = b->y + a->y;
+    out->z = b->z + a->z;
+}
+
+static inline s32 ScaleSequenceWeight(s32 weight, s32 speed)
+{
+    return (speed * weight) >> 6;
+}
+
 // scope shape 90 (differences once low registers are set aside)
 // confidence=low: steers an actor toward its target, advances its frame sequence, and checks the terrain cell it moves into.
 void sub_0806C3A0(void *unused, struct SceneSteeringActor *p)
 {
-    s16 delta[3];
-    s16 moved[3];
+    struct ContactPosition delta;
     struct DisplaySequenceState *seq;
-    const u16 *cmd;
+    const volatile u16 *cmd;
     s32 dist2, cell, height;
 
     if (p->enter) {
@@ -37,19 +56,15 @@ void sub_0806C3A0(void *unused, struct SceneSteeringActor *p)
     }
     p->unknown5[1] = -p->direction;
 
-    delta[0] = p->target.x - p->position.x;
-    delta[1] = p->target.y - p->position.y;
-    delta[2] = p->target.z - p->position.z;
-    dist2 = delta[0] * delta[0] + delta[2] * delta[2];
+    SubtractPosition(&delta, &p->position, &p->target);
+    dist2 = delta.x * delta.x + delta.z * delta.z;
     SceneSteeringActor_TurnTowardTarget(p);
 
-    p->velocity.x = Sub0806C3A0_Truncate(p->speed * gUnk_086149C4[(u8)(p->direction + 0x40)]);
+    p->velocity.x = Sub0806C3A0_Truncate(p->speed * gUnk_086149C4[((p->direction + 0x40) & 255)]);
     p->velocity.z = Sub0806C3A0_Truncate(p->speed * gUnk_086149C4[p->direction]);
 
-    moved[0] = p->position.x + p->velocity.x;
-    moved[1] = p->position.y + p->velocity.y;
-    moved[2] = p->position.z + p->velocity.z;
-    cell = SceneActorTerrain_GetCellIndex((struct ContactPosition *)moved);
+    AddPosition(&delta, &p->velocity, &p->position);
+    cell = SceneActorTerrain_GetCellIndex(&delta);
     height = (*SceneActorTerrain_GetCell(cell) & 15) << 8;
     if (height >= p->position.y || height == 0) {
         p->state = 5;
@@ -57,9 +72,7 @@ void sub_0806C3A0(void *unused, struct SceneSteeringActor *p)
         return;
     }
 
-    p->position.x += p->velocity.x;
-    p->position.y += p->velocity.y;
-    p->position.z += p->velocity.z;
+    AddPosition(&p->position, &p->position, &p->velocity);
 
     if (Mod(p->stateFrame, 6) == 0) {
         if (p->speed < p->parameter) {
@@ -80,45 +93,123 @@ void sub_0806C3A0(void *unused, struct SceneSteeringActor *p)
     SceneSteeringActor_RefreshCollider(p);
     p->stateFrame++;
 
-    seq = &p->sequence;
-    cmd = seq->commands + seq->index;
-    p->frame = *cmd >> 6;
-    if ((seq->flags & 1) != ((*cmd & 0x30) >> 4 & 1))
-        p->flags |= 4;
-    else
-        p->flags &= ~4;
-    if ((seq->flags & 2) != ((*cmd & 0x30) >> 4 & 2))
-        p->flags |= 8;
-    else
-        p->flags &= ~8;
+    {
+        u32 ended, flags, bit;
+        register u32 duration asm("r2");
+        seq = &p->sequence;
+        cmd = (const volatile u16 *)((u32)p->sequence.commands + (seq->index << 1));
+        p->frame = *cmd >> 6;
+        {
+            u32 input = seq->flags;
+            register u32 first asm("r1");
+            u32 maskBit = 1;
+            bit = maskBit;
+            asm("" : "+r"(bit));
 
-    seq->elapsed++;
-    if ((u16)seq->elapsed >= seq->duration) {
-        seq->elapsed = 0;
-        if (seq->flags & 4) {
-            if (seq->index != 0) {
-                seq->index = seq->index - 1;
-            } else if (seq->flags & 8) {
-                seq->elapsed = seq->duration;
-            } else {
-                seq->index = seq->frameCount - 1;
-            }
-        } else {
-            seq->index++;
-            if ((u16)seq->index >= seq->frameCount) {
-                if (seq->flags & 8) {
-                    seq->elapsed = seq->duration;
-                    seq->index = seq->frameCount - 1;
-                } else {
-                    seq->index = 0;
-                }
+            first = bit;
+            first &= input;
+            {
+                u32 bits = *cmd;
+                u32 flip = 0x30;
+                flip &= bits;
+                flip >>= 4;
+                flip &= bit;
+
+                if (first != flip)
+                    p->flags |= 4;
+                else
+                    p->flags &= ~4;
             }
         }
-        cmd = seq->commands + seq->index;
-        seq->frameWeight = *cmd & 15;
-        seq->duration = (seq->speed * seq->frameWeight) >> 6;
-        if ((u8)seq->duration == 0)
-            seq->duration = 1;
+        {
+            u32 input = seq->flags;
+            u32 bit;
+            register u32 first asm("r1");
+            bit = 2;
+            asm("" : "+r"(bit));
+            first = bit;
+            first &= input;
+            asm("" : "+r"(first));
+            first = (u8)first;
+            if (first != (((*cmd & 0x30) >> 4) & bit))
+                p->flags |= 8;
+            else
+                p->flags &= ~8;
+        }
+        {
+            u32 elapsed = seq->elapsed + 1;
+            u32 mask;
+            register u32 temp asm("r1");
+            register u32 savedDuration asm("r3");
+            seq->elapsed = elapsed;
+            temp = 0xFFFF;
+            asm("" : "+r"(temp));
+            mask = temp;
+            duration = seq->duration;
+            elapsed = (u16)elapsed;
+            savedDuration = duration;
+            if (elapsed >= duration) {
+                seq->elapsed = 0;
+                flags = seq->flags;
+                if (flags & 4) {
+                    u32 index = seq->index;
+                    if (index == 0) {
+                        u32 hold = 8;
+                        hold &= flags;
+                        if (hold) {
+                            seq->elapsed = savedDuration;
+                        } else {
+                            seq->index = seq->frameCount - 1;
+                        }
+                        ended = 1;
+                    } else {
+                        seq->index = index - 1;
+                        ended = 0;
+                    }
+                } else {
+                    u32 index = seq->index + 1;
+                    u32 frameCount;
+                    u32 endFlag;
+                    seq->index = index;
+                    frameCount = seq->frameCount;
+                    if ((index & mask) >= frameCount) {
+                        endFlag = flags & 8;
+                        asm("" : "+r"(endFlag));
+                        endFlag = (u8)endFlag;
+                        if (endFlag) {
+                            seq->elapsed = duration;
+                            {
+                                u32 lastIndex = frameCount - 1;
+                                seq->index = lastIndex;
+                            }
+                        } else {
+                            seq->index = 0;
+                        }
+                        ended = 1;
+                    } else {
+                        ended = 0;
+                    }
+                }
+                {
+                    u32 offset = seq->index << 1;
+                    const volatile u16 *table;
+                    table = seq->commands;
+                    cmd = (const volatile u16 *)((u32)table + offset);
+                }
+                seq->frameWeight = *cmd & 15;
+                {
+                    s32 weight = seq->frameWeight;
+                    s32 speed;
+                    speed = seq->speed;
+                    speed = ScaleSequenceWeight(weight, speed);
+                    seq->duration = speed;
+                    if (!(u8)speed)
+                        seq->duration = 1;
+                }
+            } else {
+                ended = 0;
+            }
+        }
     }
 
     if (p->lifetime > 0) {
@@ -128,6 +219,3 @@ void sub_0806C3A0(void *unused, struct SceneSteeringActor *p)
         p->enter = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0806C3A0);
-#endif

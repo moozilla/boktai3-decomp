@@ -1,8 +1,8 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_02000484;
 
 u32 Wireless_IsSessionActive(void)
 {
-    return gUnk_02000484 ? gUnk_02000484[0x30] : 0x0;
+    return ((u8 *)gWirelessController) ? ((u8 *)gWirelessController)[0x30] : 0x0;
 }

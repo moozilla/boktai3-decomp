@@ -12,6 +12,7 @@
 #include "global.h"
 #include "game_state.h"
 #include "render.h"
+#include "heap.h"
 
 /* ---- Globals ---------------------------------------------------------- */
 
@@ -29,11 +30,6 @@ struct TaskList {
     u32 pauseMask; /* list is skipped while (gEnginePauseFlags & pauseMask) */
 };
 
-struct HeapBlock {
-    struct HeapBlock *prev, *next;
-    u32 size; /* low 20 bits: size including this 16 byte header; bit 31: free */
-    u32 unused;
-};
 
 /* Terrain/collision map header of the current scene. Terrain_LoadHP (08225C48)
  * fills it from the stage's "HP" resource (type AE6C, the third argument of the
@@ -67,7 +63,6 @@ struct EngineMap {
 
 extern u16 gNextTaskId;                   /* next Task id */
 extern struct TaskList gTaskLists[14];    /* task lists by priority */
-extern struct HeapBlock gUnk_02000714;    /* head of the general heap (Heap_Alloc/Heap_Free) */
 extern struct EngineMap *gTerrainMap;     /* current terrain map */
 extern u32 gTerrainWidth, gTerrainHeight; /* terrain map width, height (cells) */
 extern u32 gRandomIndex;                  /* index (0..1023) into the random table */
@@ -83,7 +78,7 @@ void Task_SetCallbacks(void *task, void (*update)(void *), void (*destroy)(void 
 
 void *Task_Create(u32 list, u32 size); /* allocate zeroed task of size bytes in a priority list */
 
-void *Heap_Alloc(s32 size); /* first-fit allocation from gUnk_02000714; NULL on failure */
+void *Heap_Alloc(s32 size); /* first-fit allocation from gHeapHead; NULL on failure */
 
 void Heap_Free(void *block); /* free and coalesce with neighbours */
 
@@ -128,11 +123,11 @@ u32 Trigger_ConsumePending(
 
 /* ---- Sprites, animation, resources ------------------------------------- */
 
-void Sprite_Remove(void *sprite); /* unlink from pool gUnk_030042C0 (guess) */
+void Sprite_Remove(void *sprite); /* unlink from pool gSpriteListHeads (guess) */
 
-void Anim_Remove(void *anim); /* unlink from pool gUnk_030042C8 (guess) */
+void Anim_Remove(void *anim); /* unlink from pool gMainSpriteListHeads (guess) */
 
-void Effect_Remove(void *effect); /* unlink from pool gUnk_030042D0 (guess) */
+void Effect_Remove(void *effect); /* unlink from pool gDrawableListHeads (guess) */
 
 void Sprite_Init(void *sprite, void *animData,
                  s32 flags); /* (guess) set up an idle sprite object */

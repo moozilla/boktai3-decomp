@@ -1,5 +1,6 @@
 #include "area_effect_link.h"
 #include "engine.h"
+#include "ram.h"
 struct StatusSlot {
     u32 flags;
     u8 pad4[0x24];
@@ -7,8 +8,6 @@ struct StatusSlot {
     u8 pad2A[2];
     u16 reset, timer;
 };
-extern s32 gUnk_02000478;
-extern u16 gUnk_02000534, gUnk_02000500;
 static inline u8 PlayerInMode(struct AreaEffectPlayer *p)
 {
     if (p) {
@@ -22,9 +21,9 @@ static inline u8 PlayerInMode(struct AreaEffectPlayer *p)
 }
 static inline u8 GlobalMode(void)
 {
-    u32 value = gUnk_02000534;
+    u32 value = gPlayerPassageState;
     u32 active = 0;
-    if (value && gUnk_02000500 == 4)
+    if (value && gPlayerInteractionMode == 4)
         active = 1;
     return active;
 }
@@ -49,7 +48,7 @@ void SceneStatusIndicator_UpdateBlink(void *owner, struct StatusSlot *input)
             goto show;
         }
     } else {
-        if (gUnk_02000478 > 0 ||
+        if (gWeatherCollisionTimer > 0 ||
             (gUnk_02000580[0] && TestMask((u32 *)((u8 *)gUnk_02000580[0] + 0x448), 16)) ||
             GlobalMode())
             active = 1;

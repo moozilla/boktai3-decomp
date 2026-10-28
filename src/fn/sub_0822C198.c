@@ -1,6 +1,6 @@
 #include "global.h"
 #include "ram.h"
-extern u8 *gUnk_030053F8;
+#include "runtime.h"
 s32 Solar_GetMeasurement(void);
 s32 Solar_CaptureBaseline(void)
 {
@@ -8,7 +8,7 @@ s32 Solar_CaptureBaseline(void)
         s32 v = Solar_GetMeasurement();
         if (v >= 0) {
             s32 w = v - 2;
-            *(s32 *)(gUnk_030053F8 + 4) = w;
+            *(s32 *)(gSessionState + 4) = w;
             return 1;
         }
     }

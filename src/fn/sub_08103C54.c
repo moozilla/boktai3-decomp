@@ -1,7 +1,7 @@
 #define ActorGroup_FindMemberByName NamedObject_FindByName
-#define gActorGroup                 gUnk_020001AC
 /* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
 #include "global.h"
+#include "ram.h"
 struct ActorGroupMember {
     u8 unk0[0xB4];
     s16 index;
@@ -18,7 +18,6 @@ struct ActorGroup {
     struct ActorGroupMember members[12];
     u32 active;
 };
-extern struct ActorGroup *gUnk_020001AC;
 s32 Script_GetKeywordValue(u32, s32);
 struct ActorGroupMember *NamedObject_FindByName(s32);
 void TerrainModifiers_UnregisterCell(void *);
@@ -46,9 +45,9 @@ void ActorGroup_RemoveFromScript(void)
     s32 name = Script_GetKeywordValue('n', 0);
     struct ActorGroupMember *member;
     struct ActorGroup *group;
-    if (gUnk_020001AC && name) {
+    if (gNamedActorManager && name) {
         member = NamedObject_FindByName(name);
-        group = gUnk_020001AC;
+        group = gNamedActorManager;
         if (MemberHasBit(member, 1)) {
             TerrainModifiers_UnregisterCell(member->effect);
             ClearFlags(member, 1);

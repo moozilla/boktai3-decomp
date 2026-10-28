@@ -1,7 +1,7 @@
 #include "global.h"
+#include "runtime.h"
 /* Reconstructed from B3 instructions; SIIRTC correspondence: docs/RTC.md. */
 // CFLAGS: -O0 -mthumb-interwork
-extern u8 gUnk_030035C6;
 u32 Rtc_WriteCommandByte(u8);
 u32 Rtc_WriteDataByte(u8);
 u8 Rtc_ReadDataByte(void);

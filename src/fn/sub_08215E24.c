@@ -1,22 +1,15 @@
 #include "global.h"
-
-struct TextLayer {
-    u8 pad0[0x18];
-    s16 stride;
-    u8 pad1a[0x12];
-    u16 *map;
-};
-extern struct TextLayer gUnk_03004C30[];
+#include "render.h"
 
 void sub_08215E24(s32 layer, s32 x, s32 y, s32 w, s32 h, s32 *src, s32 palette, s32 priority)
 {
     //BODY
-    struct TextLayer *l = &gUnk_03004C30[layer];
+    struct BackgroundLayer *l = &gBgRecords[layer];
     s32 stride;
     u16 *map;
     s32 xEnd, yEnd, x0;
     map = l->map;
-    stride = l->stride * 2;
+    stride = l->width * 2;
     xEnd = x + w;
     yEnd = h + y;
     x0 = x;

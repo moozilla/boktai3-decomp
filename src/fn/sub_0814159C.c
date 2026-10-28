@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 #include "player.h"
 
-extern struct SceneVec gUnk_030042A0;
 extern const s16 gUnk_086149C4[];
 void Player_ClampCameraOffsets(struct Player *);
 void Player_UpdateFacingSide(struct Player *);
@@ -18,9 +18,9 @@ void Player_UpdateCameraOffset(struct Player *p)
     s32 input;
     register s16 *history asm("r2");
     if (!p->cameraOffsetActive) {
-        p->cameraOffsetX = gUnk_030042A0.x - p->position.x;
-        p->cameraOffsetY = gUnk_030042A0.y - p->position.y - 150;
-        p->cameraOffsetZ = gUnk_030042A0.z - p->position.z;
+        p->cameraOffsetX = gCamera.position.x - p->position.x;
+        p->cameraOffsetY = gCamera.position.y - p->position.y - 150;
+        p->cameraOffsetZ = gCamera.position.z - p->position.z;
         p->cameraOffsetActive = 1;
         p->cameraOffsetUpdateState = 1;
         Player_ClampCameraOffsets(p);

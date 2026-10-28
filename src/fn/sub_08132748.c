@@ -1,8 +1,8 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
+#include "runtime.h"
 /* Clears hit timers; at zero health hands control to the defeat target and records the defeat. */
 void SceneActorRecord_RecordPair(u16, u16);
-extern u16 gUnk_030039F0;
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -78,7 +78,7 @@ void SceneActorReaction_EndHitCheckDefeat(struct SceneActorRegistryResetView *ac
     }
     actor->field2E0 = 32;
     if (!Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
-        SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
+        SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->id);
     {
         u32 mask = 0x2000;
         actor->flags2CC |= mask;

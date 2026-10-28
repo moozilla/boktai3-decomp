@@ -21,7 +21,7 @@ struct SunClock {
     u8 moonPhase;              /* 0x16: eight ranges of moonAgeTenths */
 };
 extern struct SunClock gUnk_03005430;
-extern u8 *gUnk_030053F8;
+extern u8 *gSessionState;
 u32 SunClock_GetBaseHour(void);
 u32 SunClock_GetBaseMinute(void);
 s32 Div(s32, s32);

@@ -1,14 +1,10 @@
 #include "global.h"
 #include "engine.h"
+#include "menu_parameters.h"
 /* Parameters at 0x020002E8 (meaning unknown). */
-struct ScreenParams2E8 {
-    u8 *lBlock;
-    s32 o, c, f;
-};
-extern struct ScreenParams2E8 gUnk_020002E8;
 void ScreenParams2E8_SetFromScript(void)
 {
-    struct ScreenParams2E8 *p = &gUnk_020002E8;
+    struct MessageMenuParameters *p = &gMessageMenuParameters;
     p->c = 0;
     p->f = 0;
     if (Script_SeekToKeyword('l'))

@@ -1,10 +1,9 @@
 #include "global.h"
-extern u16 gUnk_03005320;
-extern u16 gUnk_0300530C;
+#include "serial.h"
 
 bool32 sub_08222BF8(void)
 {
-    if ((gUnk_03005320 | gUnk_0300530C) != 0xffff)
+    if ((gSerialMultiplayer0Word | gSerialMultiplayer1Word) != 0xffff)
         return TRUE;
     return FALSE;
 }

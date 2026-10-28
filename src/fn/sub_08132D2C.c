@@ -1,12 +1,12 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
+#include "runtime.h"
 /* At zero health: hand control to the defeat target (kind 17), then bump the saturating defeat counters in the game-state block by category and weapon kind. */
 void SceneActorRecord_RecordPair(u16, u16);
 void SceneActorContacts_ReleaseNode(void *);
 void Player_NotifyFirstSelectedSlot(u32, u32);
 void Player_RefreshLifeState(u32, u32);
 void sub_08159164(u32);
-extern u16 gUnk_030039F0;
 #define STATS   ((u8 *)gGameState)
 #define H(p, n) (*(s16 *)((p) + (n)))
 struct GroupLink {
@@ -240,7 +240,7 @@ u32 SceneActorReaction_DefeatRecordStats(struct SceneActorRegistryResetView *act
     record:
         if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gEngineFlags, 0x4800) &&
             !Flag2D0(actor, 0x800))
-            SceneActorRecord_RecordPair(gUnk_030039F0, actor->id);
+            SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->id);
         ((struct ContactCollider *)collider)->flags |= 4;
     done:
         return 1;

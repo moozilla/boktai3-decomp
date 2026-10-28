@@ -32,7 +32,6 @@ struct Engine {
     u8 pad380[8];
     void *script;
 };
-extern struct Engine *gUnk_02000484;
 void Memory_Clear(void *, int);
 #define gRfuLinkStatus   gUnk_03006A80
 #define gRfuSlotStatusNI gUnk_03006A70

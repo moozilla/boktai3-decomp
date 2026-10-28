@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 struct Node {
     u8 pad0[4];
@@ -8,8 +9,6 @@ struct Node {
     struct Node *next;
 };
 
-extern struct Node *gUnk_030042C8[];
-
 void Anim_UnlinkFromList(struct Node *n, u32 i)
 {
     struct Node *prev = n->prev;
@@ -18,7 +17,7 @@ void Anim_UnlinkFromList(struct Node *n, u32 i)
     if (prev)
         prev->next = next;
     else
-        gUnk_030042C8[i] = next;
+        gMainSpriteListHeads[i] = next;
     if (next)
         next->prev = prev;
 }

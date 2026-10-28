@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "rfu_manager.h"
 struct Engine {
     u8 pad0[0x18];
     u8 pad18, bits, pad1a, entered, flag, pad1d, state, flag1f, mode, index;
@@ -28,13 +29,7 @@ struct Engine {
     u8 message[0x204];
     void *head, *tail;
 };
-extern struct Engine *gUnk_02000484;
 void Memory_Clear(void *, int);
-struct Message {
-    u8 pad0[0x14];
-    u8 bits;
-};
-extern struct Message gUnk_03005390;
 struct ModeState {
     u8 pad0;
     u8 mode;

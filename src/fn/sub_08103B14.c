@@ -1,6 +1,6 @@
-#define gActorGroup gUnk_020001AC
 /* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
 #include "global.h"
+#include "ram.h"
 struct ActorGroupMember {
     u8 unk0[0xB8];
     u16 flags;
@@ -13,7 +13,6 @@ struct ActorGroup {
     struct ActorGroupMember members[12];
     u32 active;
 };
-extern struct ActorGroup *gUnk_020001AC;
 u32 TetherActor_TestStatusFlags(u32);
 static inline u8 HasBit(u32 value, u32 mask)
 {
@@ -26,9 +25,9 @@ s32 ActorGroup_GetSelectedMemberId(void)
     struct ActorGroup *group;
     struct ActorGroupMember *member;
     s32 i;
-    if (!gUnk_020001AC)
+    if (!gNamedActorManager)
         goto fail;
-    group = gUnk_020001AC;
+    group = gNamedActorManager;
     if (!group->active)
         goto fail;
     if (TetherActor_TestStatusFlags(1))

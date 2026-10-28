@@ -40,7 +40,7 @@ progress by exact matches and removed concessions, not by fuzzy scores. Blind sp
 sweeps don't count. When an approach stops paying, change the approach or the tool,
 not just the function.
 
-## Where things stand (2026-10-26)
+## Where things stand (2026-10-27)
 
 Numbers live only in [PROGRESS.md](../PROGRESS.md) (regenerated at batch integration) and
 the README badges. Use `python3 tools/progress.py` for the current figures and
@@ -52,11 +52,15 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 | Phase 1 | complete: every function has C |
 | Phase 2 | the remaining guarded drafts (PROGRESS.md "Nonmatching drafts"), by subsystem in PROGRESS.md; most left are Monsters and Scene actors |
 | Phase 3 | the Register-pinned share in PROGRESS.md; `scope.py FILE.c pins` and `tools/depin.py` remove them |
+| Phase 4 | [EWRAM declaration/layout worker batch](../notes/ewram-layout_2026-10-27.md) prepared with per-unit validation; protected-dependent objects deferred and combined ROM validation pending integration |
 | Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data. ROM data emitted from decoded source is in PROGRESS.md; the plan to report it is [DATA_TRACKING.md](DATA_TRACKING.md) |
 | Report | every function in one of ~490 subsystem units under 11 categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
 
 Recent:
 
+* **Second subsystem run with RAM layout workers** (2026-10-27): 29 more matches (to 79.7%) and RAM
+  objects with one shared declaration 29% -> 75%; gpt-6.1-terra tried and dropped for Sol
+  ([notes/subsystem-run_2026-10-27.md](../notes/subsystem-run_2026-10-27.md)).
 * **Subsystem scope run** (2026-10-25/26): 16 Codex gpt-6.1-sol workers, one or two per
   subsystem, matched 65 drafts in 4.5 hours for half the weekly Codex quota (77.0% -> 78.6%;
   [#849](https://github.com/moozilla/boktai3-decomp/pull/849),

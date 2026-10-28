@@ -1,14 +1,11 @@
 #include "global.h"
+#include "render.h"
 
 struct Keys {
     u16 held;
     u16 pressed;
 };
 extern struct Keys gUnk_03005260;
-struct ForgingBookCameraPosition {
-    u16 x, unknown, y;
-};
-extern struct ForgingBookCameraPosition gUnk_030042A0;
 struct FrameTable {
     s32 v[4];
 };
@@ -149,8 +146,8 @@ s32 sub_0821290C(u8 *m)
                 PlayerAttackEffect_SetEmissionState(2);
         } else {
             if (FRAME == 0x28) {
-                PREVIEW_X = gUnk_030042A0.x - 456;
-                PREVIEW_Y = gUnk_030042A0.y + 336;
+                PREVIEW_X = ((u16)gCamera.position.x) - 456;
+                PREVIEW_Y = ((u16)gCamera.position.z) + 336;
                 *frame = 0;
                 ANIM_BASE = 3;
                 ANIM_AE9 = 1;

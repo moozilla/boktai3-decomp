@@ -18,7 +18,6 @@ struct Sprite {
     u32 previous;
     struct Sprite *next;
 };
-extern struct Sprite *gUnk_030042C0[];
 extern u16 gUnk_03005418[];
 void sub_08214600(struct Sprite *, s32, s32, s32);
 static inline s32 project(s32 input)
@@ -48,7 +47,7 @@ void Sprite_RenderUnflippedList(void)
     u32 skip = 0x401;
     if (parity)
         skip = 0x201;
-    p = gUnk_030042C0[gRenderListIndex];
+    p = gSpriteListHeads[gRenderListIndex];
     if (!p)
         return;
     do {

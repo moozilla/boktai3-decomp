@@ -1,7 +1,7 @@
 #define Player_SetAttachmentPosition Player_SetPositionAndSave
-#define gNamedObjectManager          gUnk_020001AC
 #include "global.h"
 #include "player.h"
+#include "ram.h"
 struct NamedObject {
     u8 pad0[0x58];
     struct SceneVec offset;
@@ -14,7 +14,6 @@ struct NamedObjectManager {
     u8 pad0[0x1370];
     u32 playerName;
 };
-extern struct NamedObjectManager *gUnk_020001AC;
 void NamedObject_ResolveAttachmentPosition(struct SceneVec *, struct SceneVec *,
                                            struct NamedObject *);
 void Player_SetPositionAndSave(struct Player *, struct SceneVec *);
@@ -27,7 +26,7 @@ static inline u8 testFlag(u32 mask, u16 *flags)
 void NamedObject_MoveAttachedPlayer(struct NamedObject *object)
 {
     struct SceneVec target;
-    struct NamedObjectManager *manager = gUnk_020001AC;
+    struct NamedObjectManager *manager = gNamedActorManager;
     if (gUnk_02000580[0] && object->name == manager->playerName) {
         if (!testFlag(0x100, &object->flags)) {
             target.x = gUnk_02000580[0]->position.x + object->offset.x;

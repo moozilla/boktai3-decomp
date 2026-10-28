@@ -1,4 +1,5 @@
 #include "global.h"
+#include "menu_parameters.h"
 
 struct DateMenu {
     u8 graphics[0x6D8];
@@ -7,7 +8,6 @@ struct DateMenu {
     s32 oldYear, oldMonth, oldDay, oldHour, oldMinute;
 };
 extern u16 gUnk_03005260[];
-extern u32 gUnk_02000340[];
 extern u8 gUnk_03005430[];
 void Sound_PlaySong(s32);
 void AnimPanel_HandleClockInput(void *);
@@ -60,9 +60,9 @@ void Time_UpdateDateMenu(struct DateMenu *p)
             if (p->timer > (1 << p->fadeShift)) {
                 MenuSprites_SetFlagBits(p);
                 if (p->result == 0)
-                    Script_Call(gUnk_02000340[3], 0);
+                    Script_Call(gDateMenuParameters.cancelProc, 0);
                 else
-                    Script_Call(gUnk_02000340[2], 0);
+                    Script_Call(gDateMenuParameters.confirmProc, 0);
                 Task_Kill(p);
             }
             p->timer++;

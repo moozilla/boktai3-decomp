@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_02000358;
+#include "menu_parameters.h"
 s32 Script_ParseStringRef(u32);
 const u8 *Text_LookupString(s32);
 void Menu_EraseRect(s32, s32, s32, s32);
@@ -30,7 +30,7 @@ void Password_BuildLabels(struct PwLabels *p)
                 dst = p->b3;
                 break;
         }
-        src = Text_LookupString(Script_ParseStringRef(gUnk_02000358) + off);
+        src = Text_LookupString(Script_ParseStringRef(gSelectionMenuParameters.pBlock) + off);
         while (*src) {
             *dst = *src;
             dst++;

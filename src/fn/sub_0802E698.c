@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -69,7 +70,6 @@ struct Actor {
     u8 turnState;
     struct Vec destination;
 };
-extern void *gUnk_02000480;
 struct Actor *Actor_FindById(void *, int);
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);

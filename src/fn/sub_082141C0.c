@@ -1,9 +1,9 @@
 #include "global.h"
 #include "render.h"
+#include "runtime.h"
 struct Dma {
     vu32 src, dest, control;
 };
-extern u32 gUnk_03003A04, gUnk_03003A08, gUnk_03004260;
 void Bg_UpdateScrollShadow(void);
 void InterruptsAndVideo_WaitForVBlank(void);
 void ScanlineEffect_StageTransfer(void);
@@ -20,7 +20,7 @@ u32 InterruptsAndVideo_OnVideoUploadTask(void)
     Bg_UpdateScrollShadow();
     InterruptsAndVideo_WaitForVBlank();
     ScanlineEffect_StageTransfer();
-    flags = &gUnk_03003A04;
+    flags = &gVideoUploadFlags;
     if (*flags & 1) {
         struct Dma *dma = (struct Dma *)0x040000d4;
         dma->src = (u32)gOamBuffer;
@@ -36,10 +36,10 @@ u32 InterruptsAndVideo_OnVideoUploadTask(void)
     TileAnimation_Upload();
     disp = (vu16 *)0x04000000;
     *disp &= 0xe0ff;
-    if (!gUnk_03003A08) {
+    if (!gSceneEntryActive) {
         u16 mask = gDispCntShadow;
         *disp |= mask | 0x1000;
     }
     sub_08219134();
-    return gUnk_03004260 = 0;
+    return gVBlankUploadPending = 0;
 }

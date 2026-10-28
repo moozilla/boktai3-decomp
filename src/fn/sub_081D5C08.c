@@ -1,6 +1,5 @@
 #include "global.h"
 #include "render.h"
-extern u8 gUnk_03004CC0[];
 void *ScriptProc_Start(u32, u32);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 void Bg_SetPriority(u32, u32);
@@ -15,12 +14,7 @@ u32 MonsterBook_SetupPageBackgrounds(u8 *s, u32 value)
     u16 *dst;
     s32 i;
     u32 zero, one;
-    struct Fields {
-        u8 pad[0x18];
-        u16 first;
-        u8 pad2[6];
-        u16 second, third;
-    } *fields;
+    struct BackgroundLayer *fields;
     mask |= *reg;
     *reg = mask;
     p = ScriptProc_Start(0xC091, 0x3536);
@@ -41,10 +35,10 @@ u32 MonsterBook_SetupPageBackgrounds(u8 *s, u32 value)
     }
     zero = 0;
     Bg_SetupLayers(2, 0, *(void **)(s + 0x18), 0, zero, one = 1, &value);
-    fields = (struct Fields *)gUnk_03004CC0;
-    fields->first = 0x10;
-    fields->second = zero;
-    fields->third = zero;
+    fields = &gBgRecords[3];
+    fields->width = 0x10;
+    fields->x = zero;
+    fields->y = zero;
     Bg_SetPriority(3, 3);
     sub_08215EB4(3, 4, 6, 8, 9, one, zero, 4);
     return 0;

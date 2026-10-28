@@ -1,5 +1,6 @@
 #include "global.h"
 #include "game_state.h"
+#include "ram.h"
 struct S {
     u8 f[0x868];
     u32 fl;
@@ -13,8 +14,6 @@ struct O {
     u8 b29;
 };
 extern u32 gUnk_02000580;
-extern u16 gUnk_02000528;
-extern u16 gUnk_02000590;
 s32 AreaEffect_TestParticleMode(struct O *);
 void AreaEffect_UpdateActionParticles(struct O *);
 void AreaEffect_HideSprites(struct O *);
@@ -49,11 +48,11 @@ s32 AreaEffect_Tick(struct O *o)
                 AreaEffect_ShowEnabledSprites(o);
         }
         {
-            u32 v = gUnk_02000528;
+            u32 v = gPlayerActionPending;
             u32 r = 0;
             if (v == 1)
                 r = 1;
-            if (r != 0 && gUnk_02000590 != 0)
+            if (r != 0 && gPlayerEffectPendingCount != 0)
                 o->b29 = 1;
         }
     }

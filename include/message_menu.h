@@ -33,7 +33,7 @@ void EncodedRecord_EncodeFields(void *);
 void EncodedRecord_FormatRows(void *, void *, void *, int);
 void *Script_GetTextSourcePc(void);
 extern u16 gBgPaletteBuffer[];
-extern u16 gUnk_030051A0[];
+extern u16 gBgPaletteBank15[];
 extern u16 gUnk_03005260[];
 
 void MessageMenu_LoadBackground(struct MessageMenu *m, int id);

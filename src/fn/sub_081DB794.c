@@ -1,12 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
+#include "menu_parameters.h"
 // confidence=low: background, labels, animations and menu selection initialization.
 // fix.py best (sweep after the inlined-insn fix)
 struct Rect {
     u16 x, y, width, height;
 };
-extern u32 gUnk_020002C0[];
 void Bg_ClearTilemap(s32);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
 void *ScriptProc_Start(s32, s32);
@@ -85,17 +85,17 @@ s32 Options_InitScreen(u8 *arg)
     ((struct OptionsHalfword *)(p + 0x16E))->value = 0xE010;
     Menu_EraseRect(4, 4, 24, 6);
     Menu_EraseRect(4, 12, 4, 2);
-    Menu_DrawStringRef(4, 4, gUnk_020002C0[0], 0);
-    Menu_DrawStringRef(4, 8, gUnk_020002C0[0], 1);
-    Menu_DrawStringRef(4, 12, gUnk_020002C0[0], 2);
-    *((u32 *)(p + 0x20)) = gUnk_020002C0[8];
+    Menu_DrawStringRef(4, 4, gChoiceMenuParameters.mBlock, 0);
+    Menu_DrawStringRef(4, 8, gChoiceMenuParameters.mBlock, 1);
+    Menu_DrawStringRef(4, 12, gChoiceMenuParameters.mBlock, 2);
+    *((u32 *)(p + 0x20)) = gChoiceMenuParameters.n2;
     Menu_EraseRect(9, 12, 18, 2);
-    Menu_DrawStringRef(9, 12, gUnk_020002C0[1], *((u32 *)(p + 0x20)));
-    if ((gUnk_020002C0[7] == 0) || (gUnk_020002C0[6] == 2))
+    Menu_DrawStringRef(9, 12, gChoiceMenuParameters.eBlock, *((u32 *)(p + 0x20)));
+    if ((gChoiceMenuParameters.b == 0) || (gChoiceMenuParameters.n == 2))
         *((u32 *)(p + 0x2D8)) = 3;
     else
         *((u32 *)(p + 0x2D8)) = zero;
     Menu_StartFadeIn(*((u32 *)(p + 0x2D8)));
-    *((u32 *)(p + 0x1C)) = gUnk_020002C0[6];
+    *((u32 *)(p + 0x1C)) = gChoiceMenuParameters.n;
     return 0;
 }

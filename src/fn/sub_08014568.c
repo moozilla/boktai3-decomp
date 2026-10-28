@@ -1,12 +1,12 @@
 #include "global.h"
-extern void *gUnk_02000060;
+#include "ram.h"
 void *AnimData_FindEntry(int);
 void Effect_Initialize(void *, void *, int);
 void Effect_SetOrigin(void *, int, int);
 int ParticleManager_Initialize(u8 *m)
 {
     int i;
-    gUnk_02000060 = m;
+    gParticleGroupManager = m;
     *(void **)(m + 28) = AnimData_FindEntry(0x1c1c);
     *(void **)(m + 32) = AnimData_FindEntry(0x1c1e);
     for (i = 0; i <= 5;) {

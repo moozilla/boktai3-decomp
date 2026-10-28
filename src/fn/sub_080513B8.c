@@ -46,7 +46,7 @@ s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id
         status = Script_SeekToKeyword('H');
         found = status;
         if (found) {
-            u16 *destination = &gUnk_0200052C;
+            u16 *destination = &gPlayerDirectionLatch;
             status = Script_GetValue();
             {
                 u32 value = status;
@@ -54,7 +54,7 @@ s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id
                 *destination = value;
             }
         } else {
-            u16 *destination = &gUnk_0200052C;
+            u16 *destination = &gPlayerDirectionLatch;
             *destination = found;
         }
     }

@@ -2,6 +2,7 @@
 #include "actor_graphics_and_basic_states.h"
 #include "contact_actor.h"
 #include "engine.h"
+#include "ram.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *);
 
@@ -50,8 +51,6 @@ typedef struct {
     u8 pad[0x344];
     s16 scale, min, max, step;
 } Actor;
-
-extern u16 gUnk_02000590;
 
 typedef struct ActorAnimation {
     u8 pad0[0x51];

@@ -1,12 +1,8 @@
 #include "global.h"
-struct Block {
-    struct Block *prev, *next;
-    u32 size, unused;
-};
-extern struct Block gUnk_02000714;
+#include "heap.h"
 void *Heap_Alloc(s32 bytes)
 {
-    struct Block *block = &gUnk_02000714;
+    struct HeapBlock *block = &gHeapHead;
     bytes += 15;
     bytes &= ~15;
     bytes += 16;
@@ -15,7 +11,7 @@ void *Heap_Alloc(s32 bytes)
         if ((flags & 0x80000000) && (s32)(flags & 0xFFFFF) >= bytes) {
             u32 remainder = (flags & 0xFFFFF) - bytes;
             if (remainder > 16) {
-                struct Block *next = (struct Block *)((u8 *)block + bytes);
+                struct HeapBlock *next = (struct HeapBlock *)((u8 *)block + bytes);
                 next->size = remainder | 0x80000000;
                 do {
                     next->prev = block;

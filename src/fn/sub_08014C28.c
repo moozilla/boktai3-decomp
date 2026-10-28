@@ -1,10 +1,10 @@
 #include "global.h"
-extern u8 *gUnk_02000060;
+#include "ram.h"
 void Effect_Remove(u8 *);
 
 void sub_08014C28(void)
 {
-    u8 *p = gUnk_02000060;
+    u8 *p = gParticleGroupManager;
     if (p != 0) {
         s32 i = 0;
         u32 z = 0;

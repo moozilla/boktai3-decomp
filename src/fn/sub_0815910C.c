@@ -1,12 +1,12 @@
 #include "global.h"
+#include "ram.h"
 extern u8 *gGameState;
-extern u16 gUnk_02000514;
 s32 sub_0815910C(u8 *item)
 {
     s32 bonus;
     s16 *level;
     if (*(s16 *)(gGameState + 0x5a8) == 6)
-        return gUnk_02000514;
+        return gPlayerLinkAttackBonus;
     bonus = 0;
     if (item == NULL)
         return (bonus + *(s16 *)(gGameState + 0x40)) >> 1;

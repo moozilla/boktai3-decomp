@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "menu_parameters.h"
 struct RegionEntry {
     s16 group;
     u16 name;
@@ -38,15 +39,11 @@ struct Rect16 {
     u32 z : 16;
     u32 w : 16;
 };
-struct Params310 {
-    u32 unk0, table, confirmProc, cancelProc, flag;
-};
 struct TimeState {
     u8 pad0[0x18];
     u32 region;
 };
-extern struct Params310 gUnk_02000310;
-extern struct TimeState *gUnk_030053F8;
+extern struct TimeState *gSessionState;
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void *ScriptProc_Start(u32, u32);
@@ -68,10 +65,10 @@ u32 Time_LoadRegionList(struct RegionMenu *menu)
     void *tiles;
     u32 value;
     struct Rect16 rect;
-    if (gUnk_02000310.flag == 1)
+    if (gRegionMenuParameters.flag == 1)
         menu->selected = 6;
     else
-        menu->selected = gUnk_030053F8->region;
+        menu->selected = gSessionState->region;
     if (menu->selected == 0)
         menu->selected = 1;
     menu->fadeSpeed = zero = 0;
@@ -85,7 +82,7 @@ u32 Time_LoadRegionList(struct RegionMenu *menu)
     Bg_SetupLayers(2, 0, tiles, 0, zero, 1, &value);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14, gBgPaletteBuffer, 0x100);
-    Script_SetPc((u8 *)gUnk_02000310.table);
+    Script_SetPc((u8 *)gRegionMenuParameters.table);
     n = 0;
     while (n <= 64 && Script_GetPc()) {
         group = Script_GetValue();

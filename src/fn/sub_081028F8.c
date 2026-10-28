@@ -1,5 +1,5 @@
-#define gNamedObjectManager gUnk_020001AC
 #include "global.h"
+#include "ram.h"
 struct NamedObject {
     u8 pad0[0xB8];
     s16 flags;
@@ -12,7 +12,6 @@ struct NamedObjectManager {
     struct NamedObject objects[12];
     u32 activeMask;
 };
-extern struct NamedObjectManager *gUnk_020001AC;
 static inline u8 isActive(u32 *mask, s32 index)
 {
     u32 bit = 1 << index;
@@ -22,7 +21,7 @@ static inline u8 isActive(u32 *mask, s32 index)
 }
 void NamedObject_ClearAttachmentFlag(u32 name, s32 tether)
 {
-    struct NamedObjectManager *manager = gUnk_020001AC;
+    struct NamedObjectManager *manager = gNamedActorManager;
     s32 i;
     if (manager->activeMask) {
         for (i = 0; i < 12; i++) {

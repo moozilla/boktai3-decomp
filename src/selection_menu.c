@@ -276,8 +276,6 @@ struct PanelSprite {
     u8 pad12[10];
     s16 x, y;
 };
-#ifdef NONMATCHING
-// fuzzy: 74.1%
 // scope shape 16 (differences once low registers are set aside)
 // scope shape 72 (differences once low registers are set aside)
 void sub_0801A218(struct SelectionMenu *m)
@@ -286,8 +284,9 @@ void sub_0801A218(struct SelectionMenu *m)
     long long attr;
     struct DisplaySequenceState *st;
     void *res;
-    struct SceneInputPanelDrawable *s;
+    register struct SceneInputPanelDrawable *s asm("r6");
     const u16 *entry;
+    register u32 flags asm("r4");
     ZeroFill8(&attr);
     Widget_InitLinked(&m->panels[0], &m->panelResource, 0xB4, 0x10, 0, 0, 0x3C, &attr);
     Widget_InitLinked(&m->panels[1], &m->panelResource, 0xB5, 0x10, 0, 0, 0x3C, &attr);
@@ -296,52 +295,89 @@ void sub_0801A218(struct SelectionMenu *m)
     AnimData_SelectPaletteBank(m->panel.graphics, 0x1F7);
     s = &m->panel;
     Sprite_Init(s, m->panel.graphics, 0x30);
+    Anim_RestartSequence(&a, res, 6, 0, 0);
     st = &a;
-    Anim_RestartSequence(st, res, 6, 0, 0);
     entry = st->commands + st->index;
     s->frame = *entry >> 6;
-    if ((u8)(st->flags & 1) != (((*entry & 0x30) >> 4) & 1))
-        s->flags |= 4;
-    else
-        s->flags &= ~4;
-    if ((u8)(st->flags & 2) != (((*entry & 0x30) >> 4) & 2))
-        s->flags |= 8;
-    else
-        s->flags &= ~8;
-    if (++st->elapsed >= st->duration) {
-        st->elapsed = 0;
-        if (st->flags & 4) {
-            if (st->index == 0) {
-                if (st->flags & 8)
-                    st->elapsed = st->duration;
-                else
-                    st->index = st->frameCount - 1;
-            } else {
-                st->index--;
-            }
-        } else {
-            if (++st->index >= st->frameCount) {
-                if ((u8)(st->flags & 8)) {
-                    st->elapsed = st->duration;
-                    st->index = st->frameCount - 1;
+    {
+        u32 bit;
+        register u32 first asm("r1");
+        u32 input = st->flags;
+        bit = 1;
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= input;
+        if (first != (((*entry & 0x30) >> 4) & bit))
+            s->flags |= 4;
+        else
+            s->flags &= ~4;
+    }
+    {
+        u32 bit;
+        register u32 first asm("r1");
+        flags = st->flags;
+        bit = 2;
+        asm("" : "+r"(bit));
+        first = bit;
+        first &= flags;
+        asm("" : "+r"(first));
+        first = (u8)first;
+        if (first != (((*entry & 0x30) >> 4) & bit))
+            s->flags |= 8;
+        else
+            s->flags &= ~8;
+    }
+    {
+        u32 elapsed = st->elapsed + 1;
+        u32 duration;
+        register u32 mask asm("r3");
+        register u32 maskSource asm("r1");
+        register u32 savedDuration asm("r6");
+        st->elapsed = elapsed;
+        maskSource = 0xFFFF;
+        asm("" : "+r"(maskSource));
+        mask = maskSource;
+        duration = st->duration;
+        elapsed = (u16)elapsed;
+        savedDuration = duration;
+        if (elapsed >= duration) {
+            register u32 tailFlags asm("r2");
+            st->elapsed = 0;
+            tailFlags = flags;
+            if (tailFlags & 4) {
+                if (st->index == 0) {
+                    if (tailFlags & 8)
+                        st->elapsed = savedDuration;
+                    else
+                        st->index = st->frameCount - 1;
                 } else {
-                    st->index = 0;
+                    st->index--;
+                }
+            } else {
+                u32 index = st->index + 1;
+                u32 frameCount;
+                st->index = index;
+                frameCount = st->frameCount;
+                if ((index & mask) >= frameCount) {
+                    if ((u8)(flags & 8)) {
+                        st->elapsed = st->duration;
+                        st->index = frameCount - 1;
+                    } else {
+                        st->index = 0;
+                    }
                 }
             }
+            entry = st->commands + st->index;
+            st->frameWeight = *(const volatile u16 *)entry & 15;
+            st->duration = (st->frameWeight * st->speed) >> 6;
+            if (!st->duration)
+                st->duration = 1;
         }
-        entry = st->commands + st->index;
-        st->frameWeight = *entry & 15;
-        st->duration = (st->frameWeight * st->speed) >> 6;
-        if (!st->duration)
-            st->duration = 1;
     }
     m->panel.priority = 0;
     m->panel.position.x = 8;
     m->panel.position.y = 0x50;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0801A218);
-#endif
 
 void SelectionMenu_InitCursors(struct SelectionMenu *p)
 {

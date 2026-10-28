@@ -1,9 +1,9 @@
 #include "global.h"
 #include "render.h"
+#include "menu_parameters.h"
 
 extern const u8 gUnk_086136D8[];
 extern const u8 gUnk_086136E4[];
-extern u8 *gUnk_02000378[];
 void EncodedRecord_EncodeFields(void *);
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
@@ -42,7 +42,7 @@ s32 sub_081E056C(u8 *p)
                 } while (j <= 7);
             }
             {
-                u8 *m = gUnk_02000378[0] + code;
+                u8 *m = gScriptMessageParameters.text + code;
                 *out++ = m[0];
                 *out++ = m[1];
             }
@@ -80,21 +80,21 @@ s32 sub_081E056C(u8 *p)
         return -1;
     for (i = 0; i <= 3; i++)
         TextWindow_SetString(*w, i, p + 0xa8 + i * 0x100);
-    TextWindow_SetScript(*w, gUnk_02000378[1]);
+    TextWindow_SetScript(*w, gScriptMessageParameters.pc);
     TextWindow_Refresh(*w, 0);
     TextWindow_StartPlayback(*w);
 
     w = (s32 *)(p + 0x4c4);
     if ((*w = TextWindow_Create(6, 17, 28, 1)) < 0)
         return -1;
-    TextWindow_SetScript(*w, gUnk_02000378[1]);
+    TextWindow_SetScript(*w, gScriptMessageParameters.pc);
     TextWindow_Refresh(*w, 1);
     TextWindow_StartPlayback(*w);
 
     w = (s32 *)(p + 0x4c8);
     if ((*w = TextWindow_Create(2, 11, 28, 2)) < 0)
         return -1;
-    TextWindow_SetScript(*w, gUnk_02000378[1]);
+    TextWindow_SetScript(*w, gScriptMessageParameters.pc);
     TextWindow_Refresh(*w, 2);
     TextWindow_StartPlayback(*w);
 

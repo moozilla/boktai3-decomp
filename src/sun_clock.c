@@ -15,7 +15,7 @@ void SunClock_SetSunrise(s32 hour, s32 minute)
     struct SunClock *c = &gUnk_03005430;
     c->hourA = hour;
     c->minuteA = minute;
-    if (gUnk_030053F8[0xb]) {
+    if (gSessionState[0xb]) {
         c->hourA = hour + 1;
         if (c->hourA > 23)
             c->hourA = hour - 23;
@@ -29,7 +29,7 @@ void SunClock_SetSunset(s32 hour, s32 minute)
     struct SunClock *c = &gUnk_03005430;
     c->hourB = hour;
     c->minuteB = minute;
-    if (gUnk_030053F8[0xb]) {
+    if (gSessionState[0xb]) {
         c->hourB = hour + 1;
         if (c->hourB > 23)
             c->hourB = hour - 23;
