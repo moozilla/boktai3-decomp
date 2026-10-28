@@ -3,6 +3,8 @@
 
 #include "global.h"
 
+typedef void (*SerialIntrFunc)(void);
+
 /* RAM objects; each row of symbols/ram.csv with header include/ram.h. */
 extern u8 *gPanelSpritePool;
 extern u8 *gDirectionalSpritePool;
@@ -62,7 +64,7 @@ extern s16 gSerialLatestPackets[];
 extern struct RegionSpriteManager *gRegionActorPool;
 extern u32 gEffectQuad;
 /* 0x03003A10 */
-extern u8 gSerialInterruptState[];
+extern SerialIntrFunc gSerialInterruptState[];
 extern u8 *gCompactSpritePool;
 /* 0x03005250 */
 extern u32 gLinkMenuActive;

@@ -297,7 +297,7 @@ addr,name,size,kind,decl,header,confidence,notes
 03003A00,gScanlineDmaTarget,4,object,extern void *gScanlineDmaTarget;,include/render.h,,"HBlank DMA0 destination: the I/O register the scanline effect writes (BGnHOFS, BGnVOFS, MOSAIC, BLDY)"
 03003A04,gVideoUploadFlags,4,object,extern u32 gVideoUploadFlags;,include/runtime.h,,Video upload dirty flags; bit 0 requests OAM upload
 03003A08,gSceneEntryActive,4,object,extern u32 gSceneEntryActive;,include/runtime.h,,Set while scene-entry script runs; suppresses part of video upload task
-03003A10,gSerialInterruptState,34,object,extern u8 gSerialInterruptState[];,include/ram.h,low,
+03003A10,gSerialInterruptState,34,object,extern SerialIntrFunc gSerialInterruptState[];,include/ram.h,low,
 03003A14,gRfuIrqSlots,,interior,extern u8 gRfuIrqSlots[];,include/serial.h,,"Interior view of interrupt dispatch table entry 1, passed as RFU handler slots; not an independent allocation"
 03003A44,gVBlankOccurred,4,object,extern vu32 gVBlankOccurred;,include/runtime.h,,"VBlank wait latch, volatile for interrupt polling"
 03003A48,gDialogueScrollOffset,4,object,extern u32 gDialogueScrollOffset;,include/runtime.h,,Dialogue scroll/tick offset copied into the video IRQ shadow; tentative name

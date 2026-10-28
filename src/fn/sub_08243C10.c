@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 #include "gba/io_reg.h"
 #include "runtime.h"
 void Solar_OnTimerInterrupt(void);
@@ -23,7 +24,7 @@ void Solar_InitTimer(void)
     REG_IE = 0;
     *(vu16 *)0x0400010C = 0;
     *(vu16 *)0x0400010E = 0xC0;
-    ((void (**)(void))gSerialInterruptState)[2] = Solar_OnTimerInterrupt;
+    gSerialInterruptState[2] = Solar_OnTimerInterrupt;
     gSolarGpioSaved = *(vu16 *)0x080000C4;
     *(vu16 *)0x080000C6 = 7;
     *(vu16 *)0x080000C8 = 1;

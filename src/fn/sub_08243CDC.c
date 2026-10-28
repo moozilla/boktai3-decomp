@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 #include "gba/io_reg.h"
-extern void (*gSerialInterruptState[])(void);
 void InterruptsAndVideo_OnUnusedInterrupt(void);
 void Solar_ShutdownTimer(void)
 {

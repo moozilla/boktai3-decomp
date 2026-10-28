@@ -2,6 +2,7 @@
 #include "actor_graphics_and_basic_states.h"
 #include "contact_actor.h"
 #include "render.h"
+#include "ram.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -55,7 +56,6 @@ void SceneActorGraphics_SelectResource(u8 *p)
 
 #define SceneActorGraphics_OnDamageContact sub_08021F4C
 extern u8 *gUnk_02000580;
-extern u32 gEngineFlags;
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 void Sound_PlaySongChecked(u32);
@@ -186,8 +186,6 @@ typedef struct {
 } Vec;
 
 void SceneActorGraphics_InitBodyNoOp(void);
-
-extern u32 gEngineFlags;
 
 void SceneActorGraphics_InitializeBody(struct StateActor *p)
 {
@@ -490,7 +488,6 @@ end:
 typedef struct ParticleOffset {
     s16 x, y, z, pad;
 } ParticleOffset;
-extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 s32 SceneParticle_CreateParticles(const void *anchor, const ParticleOffset *offset,
                                   const void *range, const void *jitter, s32 count, u32 priority);
@@ -534,8 +531,6 @@ void sub_08022694(u8 *p)
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-
-extern u32 gRandomIndex;
 
 // confidence=low: five sparks 300 units above the actor; the large burst for big, otherwise a
 // smaller one shifted by the facing kept at 0xA8.
@@ -589,7 +584,6 @@ typedef struct BurstVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 } BurstVec;
 extern const BurstVec gUnk_08604D84[];
-extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
 u16 Sqrt(u32);
 s32 Div(s32, s32);
@@ -2805,7 +2799,6 @@ struct VariantRecoveryActor {
     u8 pad3b0[9];
     u8 alternate;
 };
-extern u32 gEngineFlags;
 static inline u8 enterVariant(struct VariantRecoveryActor *p)
 {
     if (p->enter) {
