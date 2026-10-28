@@ -7,20 +7,26 @@
 extern u8 *gPanelSpritePool;
 extern u8 *gDirectionalSpritePool;
 extern void *gActorManager;
+/* 0x0300531C */
 extern s32 gSerialConnectionRole;
+/* 0x03005324 */
 extern s32 gSerialTransferStatus;
 extern u8 *gScriptRecordTable;
 extern u8 *gFieldHud;
 extern u8 *gSlotController;
 extern struct ScreenDelayParameters gScreenDelayParameters;
 extern u8 *gActorEffectManager;
+/* 0x03003A50 */
 extern u32 gSceneEffectPalettePhase;
 extern u32 gSpriteBurstManager;
 extern struct MotionTargets *gSceneLinkList;
 extern u32 gSpritePairPool;
+/* 0x03006A9C */
 extern const struct EEPROMConfig *gEEPROMConfig;
 extern u8 gAnimPanelSavedSelections[];
+/* 0x03005304 */
 extern u32 gEffectRandomTableIndex;
+/* 0x03005470 */
 extern u16 gMusicSlotSongs[];
 extern u8 *gTerrainColumnIndices;
 extern struct TerrainColumn *gTerrainColumns;
@@ -41,6 +47,7 @@ extern struct TileTriggerManager *gTileTriggerManager;
 extern struct SmallCallbackPool *gCompactParticlePool;
 extern void *gMotionEntryManager;
 extern u32 gLinkPanel;
+/* 0x03005274 */
 extern u16 gSceneSelectionDisplaySlots[];
 extern struct Pool *gPursuingActorManager;
 extern u32 gSpriteSlots;
@@ -48,12 +55,16 @@ extern u32 gScriptedColliderManager;
 extern u16 gPlayerNotificationPending;
 extern u32 gSegmentDisplay;
 extern u32 gActiveRecordMenu;
+/* 0x03001734 */
 extern u32 gSerialLatestPacketIndex;
+/* 0x03005340 */
 extern s16 gSerialLatestPackets[];
 extern struct RegionSpriteManager *gRegionActorPool;
 extern u32 gEffectQuad;
+/* 0x03003A10 */
 extern u8 gSerialInterruptState[];
 extern u8 *gCompactSpritePool;
+/* 0x03005250 */
 extern u32 gLinkMenuActive;
 extern u16 gPlayerCount;
 extern u16 gPlayerCueTimer;
@@ -61,12 +72,17 @@ extern struct SpriteParticlePool *gSpriteGroup;
 extern u32 gSceneStatusIndicatorManager;
 extern u8 *gSceneProcSprites;
 extern struct FeatherPool *gFadingSpritePool;
+/* 0x03005420 */
 extern u8 *gActiveCamera;
+/* 0x03005300 */
 extern u32 gTerrainTrapSerial;
 extern void *gDirectionBurstEmitter;
 extern u32 gNamePlaceholderScript[];
+/* 0x03001730 */
 extern u32 gSerialReceivePending;
+/* 0x0300172C */
 extern u32 gSerialReceiveIndex;
+/* 0x03005370 */
 extern s16 gSerialReceivePackets[];
 extern u32 gSceneCallbackPool;
 extern u8 *gWoodenCrateManager;
@@ -78,6 +94,7 @@ extern u16 gForceDirectionMode;
 extern u8 *gAnimatedBodyPool;
 extern u32 gRisingSpritePool;
 extern u32 gSpriteNoticeManager;
+/* 0x03001688 */
 extern u8 *gColliderManager;
 extern void *gSceneComposite;
 extern u16 gTrackedPlayerId;
@@ -107,8 +124,11 @@ extern struct ScriptCommandTable gScriptCommandTable;
 extern struct DebrisPool *gDebrisPool;
 extern struct ParticlePool *gParticlePool;
 extern struct HomingManager *gHomingManager;
+/* 0x030025E8 */
 extern struct CommandSet gCommandSet;
+/* 0x03002600 */
 extern struct RegionList *gRegionList;
+/* 0x030054D0 */
 extern struct Snapshot gSnapshot;
 extern u32 gShadowManager;              /* shadow task singleton (Shadow_*) */
 extern u32 gScaledShadowManager;        /* scaled shadow manager singleton (ScaledShadow_*) */
@@ -146,7 +166,9 @@ extern u32 gProjectilePool;               /* projectile pool (ProjectilePool_*) 
 extern u32 gEnemyParticlePool;            /* enemy particle pool (EnemyParticle_*) */
 extern u32 gForgingBook;                  /* forging book task (ForgingBook_*) */
 extern u32 gShadowRegistry;               /* shadow registry task (ShadowRegistry_*) */
-extern u8 *gSolarController;              /* solar sensor controller (Solar_*) */
+/* 0x03002604 */
+extern u8 *gSolarController; /* solar sensor controller (Solar_*) */
+/* 0x030053F0 */
 extern u32 gScenePauseFlags; /* scene pause/mute flags (bit tests across effects and actors) */
 extern void *
     gParticleGroupManager; /* provisional: six-group particle manager singleton (ParticleManager_Initialize) */

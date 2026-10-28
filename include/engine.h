@@ -61,13 +61,18 @@ struct EngineMap {
     void *trapTops[64];
 };
 
+/* 0x03005240 */
 extern u16 gNextTaskId;                   /* next Task id */
+/* 0x03005280 */
 extern struct TaskList gTaskLists[14];    /* task lists by priority */
+/* 0x030052F4 */
 extern struct EngineMap *gTerrainMap;     /* current terrain map */
 extern u32 gTerrainWidth, gTerrainHeight; /* terrain map width, height (cells) */
+/* 0x03005308 */
 extern u32 gRandomIndex;                  /* index (0..1023) into the random table */
 extern const u16 gUnk_0203B400[];         /* 1024 entry random table (guess) */
 extern const s16 gUnk_086149C4[];         /* sine table (guess) */
+/* 0x030053F4 */
 extern u32 gEngineFlags; /* more engine flags (bit 10 mutes Sound_PlaySongChecked; guess) */
 
 /* ---- Tasks and memory -------------------------------------------------- */
