@@ -545,10 +545,11 @@ def cmd_unify(a):
             if p == a.header or p in blocked or not re.search(rf"\b{name}\b", new[p]):
                 continue
             t = new[p]
-            for m, spec, decls, idx in reversed(declarations(t, name)):
+            found = declarations(t, name)
+            for m, spec, decls, idx in reversed(found):
                 t = drop_decl(t, m, decls, idx)
-                if p.endswith(".h") or hdr_inc not in includes(t):
-                    t = add_include(t, a.header)
+            if found and (p.endswith(".h") or hdr_inc not in includes(t)):
+                t = add_include(t, a.header)       # after the drops: it shifts every later position
             new[p] = drop_defs(t, defs)
         h = new[a.header]
         if not any(norm(s, d[i], name, name) == c for _, s, d, i in declarations(h, name)):

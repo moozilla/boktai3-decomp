@@ -1,7 +1,6 @@
 #include "global.h"
 #include "gba/io_reg.h"
 #include "runtime.h"
-extern void (*gSerialInterruptState[])(void);
 void Solar_OnTimerInterrupt(void);
 static inline u16 maskIE(u32 ie, u32 mask)
 {
@@ -24,7 +23,7 @@ void Solar_InitTimer(void)
     REG_IE = 0;
     *(vu16 *)0x0400010C = 0;
     *(vu16 *)0x0400010E = 0xC0;
-    gSerialInterruptState[2] = Solar_OnTimerInterrupt;
+    ((void (**)(void))gSerialInterruptState)[2] = Solar_OnTimerInterrupt;
     gSolarGpioSaved = *(vu16 *)0x080000C4;
     *(vu16 *)0x080000C6 = 7;
     *(vu16 *)0x080000C8 = 1;
