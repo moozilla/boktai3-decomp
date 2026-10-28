@@ -36,7 +36,7 @@ void ResourceStation_CheckInteraction(struct ResourceStation *station)
             }
             sample = gUnk_02000534;
             blocked = 0;
-            if (sample && gUnk_02000500 == 5)
+            if (sample && gPlayerInteractionMode == 5)
                 blocked = 1;
             if (blocked == 0) {
                 u32 kind;

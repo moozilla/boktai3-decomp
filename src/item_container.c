@@ -4,7 +4,7 @@
 // MATCHING_CONCESSION: register-pinning
 
 extern u32 gUnk_02000560[];
-extern u16 gUnk_02000534, gUnk_02000500;
+extern u16 gUnk_02000534;
 
 void ScaledShadow_Destroy(void *);
 s32 sub_0822D490(s32, s32);
@@ -86,7 +86,7 @@ static inline s32 globalMode(void)
 {
     u32 active = gUnk_02000534;
     s32 yes = 0;
-    if (active && gUnk_02000500 == 4)
+    if (active && gPlayerInteractionMode == 4)
         yes = 1;
     return yes;
 }

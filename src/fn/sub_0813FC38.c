@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 /* tentative: reads the action mode from the script and installs its callback and input slot */
 
@@ -52,7 +53,7 @@ extern struct GameStateFC38 *gGameState;
 extern u32 gEngineFlags;
 extern struct InputKeysFC38 gUnk_03005260[];
 extern u16 gUnk_02000548[2];
-extern u16 gUnk_02000500, gUnk_02000504, gUnk_02000520, gUnk_02000534;
+extern u16 gUnk_02000534;
 extern void *const gUnk_08610964[];
 
 s32 Script_SeekToKeyword(s32);
@@ -98,8 +99,8 @@ s32 Player_InitActionMode(struct PlayerFC38 *p)
     p->inputKeys = gUnk_03005260[p->slot].keys;
     Player_ClearDirectionHistory(p);
     if (p->slot == 0) {
-        p->unk534 = gUnk_02000500;
-        p->unk536 = gUnk_02000520;
+        p->unk534 = gPlayerInteractionMode;
+        p->unk536 = gPlayerScriptState;
         p->unk538 = gUnk_02000534;
         for (i = 0; i < 2; i++)
             p->scriptStatus[i] = gUnk_02000548[i];
@@ -113,7 +114,7 @@ s32 Player_InitActionMode(struct PlayerFC38 *p)
     }
     p->catalogSavedOption = gGameState->menuOption;
     if (p->scriptStatus[1] != 0)
-        p->catalogSavedOption = gUnk_02000504;
+        p->catalogSavedOption = gPlayerSavedMenuOption;
     p->actionLatch464 = 0;
     p->unk53C = 0;
     p->unk433 = 0;

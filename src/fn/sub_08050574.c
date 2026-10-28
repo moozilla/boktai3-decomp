@@ -5,7 +5,7 @@ s32 CellGate_TestTraversalMode(struct CellGate *gate)
     u32 w = gUnk_02000534;
     x = 0;
     if (w != 0) {
-        if (gUnk_02000500 == 5)
+        if (gPlayerInteractionMode == 5)
             x = 1;
     }
     if (x == 0) {

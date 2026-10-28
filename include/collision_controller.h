@@ -76,7 +76,7 @@ struct CollisionScene {
 
 extern struct CollisionManager *gCollisionManager;
 extern struct CollisionScene gUnk_03005430;
-extern u16 gUnk_02000534, gUnk_02000500;
+extern u16 gUnk_02000534;
 extern void *gUnk_08604A00[2][3];
 
 void sub_08009E30(void);

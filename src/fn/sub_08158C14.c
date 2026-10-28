@@ -1,7 +1,7 @@
 #include "global.h"
 extern u16 gPlayerCount;
-extern u16 gUnk_02000500;
-extern u16 gUnk_02000520;
+extern u16 gPlayerInteractionMode;
+extern u16 gPlayerScriptState;
 extern u16 gUnk_02000534;
 extern u16 gUnk_02000590;
 extern u16 gUnk_02000570;
@@ -29,8 +29,8 @@ void Player_ResetLinkState(void)
         gUnk_02000560[i] = 0;
     }
 
-    gUnk_02000500 = 0;
-    gUnk_02000520 = 0;
+    gPlayerInteractionMode = 0;
+    gPlayerScriptState = 0;
     gUnk_02000534 = 0;
     firstCounter = &gUnk_02000590;
     secondCounter = &gUnk_02000570;

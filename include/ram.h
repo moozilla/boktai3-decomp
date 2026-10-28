@@ -188,5 +188,10 @@ extern s32 gWeatherCollisionTimer;   /* provisional: shared weather and collisio
 extern void *gSceneActorListManager; /* provisional: scene actor list and packet-queue manager */
 extern struct Engine *
     gWirelessController; /* wireless controller singleton; existing per-unit Engine views retained */
+extern u16 gPlayerInteractionMode; /* provisional: player interaction and passage mode halfword */
+extern u16
+    gPlayerSavedMenuOption; /* saved menu option restored when the second script-status slot is set */
+extern u16 gPlayerLinkAttackBonus; /* provisional: link action-mode attack bonus override */
+extern u16 gPlayerScriptState;     /* provisional: shared player script-state halfword */
 
 #endif

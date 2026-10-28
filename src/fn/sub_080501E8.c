@@ -21,7 +21,7 @@ s32 CellGate_TestPassage(struct CellGate *p)
         v = gUnk_02000534;
         f = 0;
         if (v != 0) {
-            if (gUnk_02000500 == 5)
+            if (gPlayerInteractionMode == 5)
                 f = 1;
         }
         if (f == 0) {

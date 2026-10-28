@@ -93,7 +93,7 @@ static inline s32 globalMode(void)
 {
     u32 active = gUnk_02000534;
     s32 yes = 0;
-    if (active && gUnk_02000500 == 4)
+    if (active && gPlayerInteractionMode == 4)
         yes = 1;
     return yes;
 }

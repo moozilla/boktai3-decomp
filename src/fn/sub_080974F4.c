@@ -1,9 +1,10 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "player.h"
+#include "ram.h"
 
 #define gSceneActorSineTable gUnk_086149C4
-extern u16 gUnk_02000534, gUnk_02000500;
+extern u16 gUnk_02000534;
 extern const s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 struct ActorHeightOscillation {
@@ -27,7 +28,7 @@ void SceneActor_EasePlayerHeight(struct SceneActorRegistryResetView *actor)
     u32 active = gUnk_02000534;
     s32 special = 0;
     s32 offset;
-    if (active && gUnk_02000500 == 5)
+    if (active && gPlayerInteractionMode == 5)
         special = 1;
     if (special || gUnk_02000580[0]->actionMode == 4)
         offset = 100;

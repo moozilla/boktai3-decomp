@@ -3,7 +3,7 @@ static inline u8 specialMode(void)
 {
     u32 mode = gUnk_02000534;
     u32 result = 0;
-    if (mode && gUnk_02000500 == 5)
+    if (mode && gPlayerInteractionMode == 5)
         result = 1;
     return result;
 }
