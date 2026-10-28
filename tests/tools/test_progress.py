@@ -227,6 +227,27 @@ class AreaCategoryTest(unittest.TestCase):
     def test_asm_ranges_load(self):
         self.assertTrue(progress.load_asm_ranges())
 
+    def test_rom_data_measure_splits_by_source_kind(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest, symbols = Path(tmp) / 'manifest.csv', Path(tmp) / 'data.csv'
+            manifest.write_text('name,start,end,format,file,description\n'
+                                'reg,08603300,08603400,keyed_callbacks,data/x.csv,\n'
+                                'arc,08614DCC,08615DCC,resource_archive,build/res/x/index.txt,\n')
+            symbols.write_text('addr,name,size,kind,confidence,source,notes\n'
+                               '08000000,RomHeader,C0,header,high,spec,\n'
+                               '0870A230,gMenuBgTiles,1FE8,gfx-4bpp,high,x,\n'
+                               '0870C238,gMenuBgTilemaps,,tilemap,high,x,\n')
+            d = progress.rom_data_measures(manifest, symbols)
+        self.assertEqual(d['total'], progress.ROM_DATA_END - progress.ROM_DATA_START)
+        self.assertEqual((d['decoded'], d['split']), (0x100, 0x1000))
+        self.assertEqual(d['raw'], d['total'] - 0x1100)
+        self.assertEqual((d['named'], d['named_bytes']), (2, 0x1FE8))
+
+    def test_rom_data_measure_reads_the_committed_manifest(self):
+        d = progress.rom_data_measures()
+        self.assertGreater(d['decoded'], 0)
+        self.assertEqual(d['decoded'] + d['split'] + d['raw'], d['total'])
+
 
 if __name__ == '__main__':
     unittest.main()

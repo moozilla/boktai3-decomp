@@ -23,6 +23,10 @@ original bytes. Only structured tables are committed under data/; graphics,
 text and audio extract to the ignored build/ tree (see docs/DATA.md). A
 manifest file under build/ is extracted from the ROM when missing. A format
 module with RESIZABLE = True may encode to a different size; later data shifts.
+SOURCE says how the source holds the bytes, for the ROM data measure in
+tools/progress.py (docs/DATA_TRACKING.md): "decoded" (an editable form such as
+CSV rows or text strings) or "split" (the range's structure is regenerated but
+its pieces are opaque extracted files).
 """
 import csv
 import importlib

@@ -260,3 +260,6 @@ inventory of `gen/data.s` ranges with a status per range: raw bytes, a
 structure with a decoder, or C/asset source that rebuilds identically. Then add
 those bytes to `total_data`/`matched_data` next to RAM, or report them as a
 separate category. Backlogged with the RAM accounting landed.
+
+Researched on October 27: [DATA_TRACKING.md](DATA_TRACKING.md) has the objdiff
+semantics, the current ROM data numbers (now in PROGRESS.md) and the plan.
