@@ -4,7 +4,7 @@ start,end,kind,unit,identified,evidence
 082641EC,0857D8D8,sound,Samples and song table,3241985,"415 PCM samples and the 1483-entry song table (tools/studio/sound.py)"
 0857D8D8,08602CA0,sound,Songs,545736,"song headers and 5525 track streams (tools/m4a.py walk)"
 08602CA0,08603300,tables,Pointer tables before the registry,0,"located (ROM_MAP pointer tables)"
-08603300,08604998,tables,Actor registry,5784,"keyed_callbacks: data/actor_registry.csv"
+08603300,08604998,actors,Actor registry,5784,"keyed_callbacks: data/actor_registry.csv"
 08604998,08614DCC,tables,Dispatch tables,0,"Thumb function-pointer tables (actor/state dispatch); located"
 08614DCC,08617084,graphics,Animation scripts (922E),8888,"anm archive: animation scripts (tools/assets)"
 08617084,087C4C98,graphics,Maps (C091),1760276,"MP maps, LZ77 (tools/assets/tilesets.py, Studio Maps view)"

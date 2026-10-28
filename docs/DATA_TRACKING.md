@@ -168,123 +168,137 @@ exactly what objdiff calls a unit's `.rodata`.
 ## 3. Current numbers
 
 From `python3 tools/progress.py` / `python3 tools/romdata.py` (ROM-free, in
-PROGRESS.md and the decomp.dev report), 2026-10-27:
+PROGRESS.md and the decomp.dev report), 2026-10-28, after
+`tools/data_roundtrip.py` verified every block its codecs support:
 
-| ROM data region `0824DAFC–08E88144` | Bytes | Matched | Identified |
+| ROM data region `0824DAFC–08E88144` | Bytes | Matched (round-trips) | Identified |
 |---|---:|---:|---:|
-| **all** | 12,822,088 | **3.48%** (446,538) | 99.1% |
-| Graphics | 7,096,380 | 0.0% | 100.0% |
-| Palettes | 135,524 | 0.0% | 100.0% |
-| Sound | 3,876,396 | 0.0% | 99.4% |
+| **all** (decomp.dev headline) | 12,822,088 | **74.79%** (9,589,097) | 99.1% |
+| Graphics | 7,096,380 | 74.9% | 100.0% |
+| Palettes | 135,524 | 100.0% | 100.0% |
+| Sound | 3,876,396 | 85.3% | 99.4% |
 | Text | 440,754 | 100.0% | 100.0% |
-| Tables (code rodata) | 85,156 | 6.8% (the actor registry) | 6.8% |
+| Actors | 5,784 | 100.0% | 100.0% |
+| Tables (code rodata) | 79,372 | 0.0% | 0.0% |
 | Scripts (GCL) | 794,422 | 0.0% | 100.0% |
-| Other/unknown | 393,456 | 0.0% | 97.3% |
+| Other/unknown | 393,456 | 97.3% | 97.3% |
 
-How the build emits the region today: decoded source 3.5%, extracted resource
-files 59.5% (opaque `.bin`, matched 0), `.incbin` of the base ROM 37.0%. Named
-data symbols (`symbols/data.csv`): 10. The Studio's own levels (needs the ROM):
-96.1% decoded or named, 28.5% named; the inventory's 99.1% "identified" adds what
-the Studio view leaves out (archive headers, `HP` terrain, which `hp.py` decodes).
+All 1,680,000 bytes of LZ77 blocks (252 maps, 528 terrain entries) round-trip by
+content, and the greedy compressor of `tools/lz77.py` (longest match, nearest
+first, minimum displacement 2) reproduces every stored stream byte for byte, so
+the game's own compressor was that algorithm.
 
-## 4. The report (implemented 2026-10-27)
+How the build emits the region is a separate question: decoded source 3.5%,
+extracted resource files 59.5%, `.incbin` 37.0%. The build does not have to use
+the editable form for a byte to count.
+
+## 4. The report (revised 2026-10-28)
 
 The owner's rules: the headline data measure is ROM data; RAM leaves the
-decomp.dev report; "matched" is strict; one data-only category per kind.
+decomp.dev report and is tracked in PROGRESS.md; one data-only category per kind;
+"matched" means the content round-trips through a project tool, verified.
 
-### Matched: every byte understood and rebuilt from an editable, meaningful source
+### Matched: content round-trip, verified
 
-A byte is **matched** only when the build emits it from a source a person can
-read and edit, and that source rebuilds it byte-exact. The format choice is
-flexible; the principle is not:
+A byte is **matched** when a project tool (tools/assets, tools/studio,
+`tools/m4a.py`, datafmt, gcl) does both:
 
-| Kind | Matched when built from |
-|---|---|
-| Graphics (tiles, sprites, maps, fonts, animations) | PNG plus JSON metadata that round-trip byte-exact (compression included) |
-| Palettes | JSON or `.pal` |
-| Sound | pret-style m4a song `.s` files; voicegroups and the song table as source; samples as WAV/AIF |
-| Text | the decoded text bank (`text_bank`, as now) |
-| Tables (code `.rodata`) | typed C `const` arrays in the C units that use them (or an equally typed table source; the actor registry's CSV of keys and named callbacks counts) |
-| Scripts (GCL) | GCL source, fully annotated (below) |
-| Other/unknown | a decoded format of its own, as for the kinds above |
+1. decodes it to an editable, meaningful form: PNG plus JSON metadata for pixels,
+   JSON or `.pal` for palettes, WAV plus JSON for samples, JSON with named fields
+   for structures, CSV with named fields for tables, text for the text bank;
+2. re-encodes that form to the same bytes.
 
-Archives and opaque `.bin` extracts count **0** until every entry is matched
-under its own kind: extracting bytes into a file is not understanding them. So
-the 59.5% the archives emit from extracted files is not matched.
+The build does not have to consume that form. A viewer is not enough: the form
+must re-encode, so an edit loses nothing. Fields whose meaning is unknown stay as
+raw named numbers in the JSON (`unknown`, `h0`), as in `data/` (DATA.md); a block
+with bytes outside every known section (a nonzero gap) does not count. For LZ77
+blocks the decompressed content must round-trip; whether recompression is
+byte-exact is a separate number in PROGRESS.md (level `lz-exact` against
+`lz-content`), not a requirement.
 
-**Identified** (the format is known: a tool or the Studio decodes it) is a
-PROGRESS.md number, not a match, the analog of a function boundary with assembly.
+**Identified** (a decoder exists, no encoder) is a PROGRESS.md number, not a match.
 
-`complete_data` equals `matched_data`: everything is linked into every build.
+### Verifying without the ROM in CI
 
-**Scripts (GCL).** The unit of annotation is the **procedure**: procedure ids are
-stable table slots (`gcl/README.md`), each procedure has a byte extent in the
-bytecode, and names are kept per procedure (`gcl/names/proc.csv`, `param.csv`).
-Per script file is too coarse (files are inferred groupings) and per byte too
-fine to annotate. A procedure is
+`tools/data_roundtrip.py` (run locally with `build/venv/bin/python`, it needs the
+ROM, numpy and Pillow) runs each codec on every block it supports: decode, write
+the editable form (an in-memory PNG through Pillow, WAV through `wave`, JSON or CSV
+text), read it back, encode, compare. Blocks that come back byte-exact go to
+`symbols/data_roundtrip.csv` (`start,end,what,tool,level`): ranges and codec names
+only, no ROM bytes and no content hashes. `tools/romdata.py` and
+`tools/progress.py` read that manifest in CI. Re-run the checker after adding or
+changing a codec, then regenerate PROGRESS.
 
-* **decompiled** when the build compiles its GCL source to its exact bytes;
-* **matched** when it is decompiled *and* annotated: the procedure is named
-  (`names/proc.csv`), every procedure it calls or references is named, every
-  `chara`/`command` key it uses has a name (`names/chara.csv`, `command.csv`), the
-  variables it reads or writes are named (`names/var.csv`), and nothing unknown is
-  left: no unknown opcode, no raw-byte escape, no `unk`/`proc_NNNN` label.
+| Codec (`tool`) | Blocks | Editable form |
+|---|---|---|
+| `datafmt/text_bank` | the text bank | `bank.tsv` (strings via `data/charmap.tsv`, blobs) |
+| `datafmt/keyed_callbacks` | the actor registry | `data/actor_registry.csv` (key, callback name) |
+| `datafmt/resource_archive` | the 10 archive containers | JSON entry list (name hash, offset) |
+| `palette` | 195 `92B3` palettes, the `9B1B` pool | JSON: colors as `[r, g, b]` (+ the bit-15 flag), header words |
+| `font` | the `A635` font | PNG sheets of the 128 8×16 and 1,537 16×16 glyphs + JSON header |
+| `tileset` | the `CEEF` library | JSON tileset table and index lists + PNG of the 49,638-tile pool |
+| `map` | 287 `MP` maps (252 LZ77) | JSON layers (unblocked grids), metatiles (tile, flips, bank) + PNG own tiles |
+| `terrain` | 528 `HP` entries (LZ77) | JSON grid cells, boxes, paths, nav meshes |
+| `sprite` | 46 `CB05` packages | JSON frames, animations, parts, keys + PNG tile sheet |
+| `m4a` | 415 PCM and 16 wave samples, 81 voicegroups, the song table | WAV + JSON header; JSON voices (pret field names); CSV song table |
 
-The GCL compiler (not written yet; `gcl/src/` is the planned source) records the
-status per procedure in a committed `gcl/progress.csv` (`proc,start,size,status`,
-status `decompiled` or `matched`; addresses and sizes only, no script content), so
-the measure stays ROM-free like the function inventory. `tools/romdata.py`
-credits `matched` procedures' bytes and reports `decompiled` ones as a separate
-PROGRESS.md number. The procedure and pointer tables around the bytecode are to be
-credited once every procedure is matched (they are generated from the table of
-procedures); that rule waits for the compiler. Today no GCL is compiled, so Scripts is 0 matched, 0 decompiled.
+### Categories and units
 
-### The inventory and the report
+`symbols/rom_data.csv` (`start,end,kind,unit,identified,evidence`) tiles the data
+region with 20 units of one kind each (`romdata.py` checks the tiling). The report
+(`progress.py --json`, `add_rom_data`):
 
-`symbols/rom_data.csv` (`start,end,kind,unit,identified,evidence`) splits the data
-region into 20 contiguous units, each of one kind; `tools/romdata.py` checks that
-they tile the region exactly. Matched bytes are computed, never typed: the
-overlap of a unit with `data/manifest.csv` ranges whose datafmt module declares
-`SOURCE = "decoded"`, plus `matched` GCL procedures. `identified` is a reviewed
-byte count (from the Studio's ROM view and the decoders in `tools/assets/`).
+* headline `total_data`/`matched_data`/`complete_data`: ROM data only (scripts included);
+* one data-only category per kind: `rom_graphics`, `rom_palettes`, `rom_sound`,
+  `rom_text`, `rom_actors`, `rom_tables`, `rom_scripts`, `rom_other`, named
+  `ROM data: Graphics` and so on; their totals sum to the headline;
+* one unit per inventory row, `ROM data: KIND/UNIT`, in exactly one category, with
+  data measures only and one `.rodata` section item; code units carry no data, and
+  the headline unit counts stay those of the code.
 
-`tools/progress.py --json` (`add_rom_data`):
+**Actors** is its own category: the actor registry (`08603300–08604998`, 722
+key-to-constructor records) is the game's object type table. **Tables** is the
+code's constant data: the C files' `.rodata` (2.3) and the pointer and dispatch
+tables. They count as typed C `const` arrays in the units that use them, or as a
+CSV with named, typed fields that round-trips.
 
-* headline `total_data`/`matched_data`/`complete_data`: ROM data only;
-* one category per kind, ids `rom_graphics`, `rom_palettes`, `rom_sound`,
-  `rom_text`, `rom_tables`, `rom_scripts`, `rom_other`, named `ROM data: Graphics`
-  and so on; their totals sum to the headline;
-* one unit per inventory row, named `ROM data: KIND/UNIT`, in exactly one of those
-  categories, with data measures only (code fields 0) and one `.rodata` section
-  item (size, virtual address, matched percent);
-* code units and code categories carry no data; the headline unit counts
-  (`total_units`, `complete_units`) stay those of the code, so the code numbers on
-  decomp.dev do not move.
+**Scripts (GCL)** is a data category on decomp.dev (the UI has nowhere else for
+it), but PROGRESS.md gives it its own section beside code and data: the owner sees
+the scripts as code, separate from the game's C. Its bar stays higher, and it is
+credited only from `gcl/progress.csv`, never from the data manifest. The unit is
+the **procedure** (stable table slots, a byte extent each, names kept per procedure
+in `gcl/names/`). A procedure is **matched** when it decompiles to GCL, recompiles
+byte-exact *and* is named: the procedure, the procedures it references, its
+`chara`/`command` keys and its variables have names, and no unknown opcode or
+`unk`/`proc_NNNN` label is left. One that round-trips but is not fully named is
+reported next to it ("round-trips but unnamed"), not matched. The GCL compiler
+(planned `gcl/src/`) writes `gcl/progress.csv` (`proc,start,size,status`;
+addresses and sizes only). There is none yet, so both numbers are 0.
 
-RAM (`symbols/ram.csv`) stays in PROGRESS.md and the summary as before and is no
-longer in the report. PROGRESS.json (the claude-mod tree) leaves out the data
-units, which have no functions.
+### Gaps: a decoder but no encoder (next work, largest first)
+
+| Bytes | Kind | Block | Decoder today | Missing |
+|---:|---|---|---|---|
+| 1,770,664 | Graphics | `98F5` large sprites (381) | `tools/assets/bigsprites.py`, the Studio | a codec: frame/part tables to JSON, pixels to PNG |
+| 794,422 | Scripts | GCL bytecode and procedure tables | `tools/assets/gcx.py`, `gclview.py` | a GCL compiler from `gcl/src/`, then names |
+| 545,736 | Sound | song headers and 5,525 track streams | `tools/m4a.py` walk, Studio player | an m4a `.s` disassembler and assembler (pret macros) |
+| 79,372 | Tables | code `.rodata`, pointer and dispatch tables | none (located) | typed C arrays (2.3) or typed CSV |
+| 23,717 | Sound | keysplit tables, the player table, voicegroup gaps | partly (`sound.py`) | JSON for keysplits and the player table |
+| 10,664 | Other | the `CEAA` blob | none | a format |
+| 8,416 | Graphics | `922E` animation scripts (75) | partly (portrait animation in `atlas.py`) | a decoder and codec |
 
 ### Next steps
 
-1. **Code `.rodata` into C** (2.3): move the 11 KB of tables after the code into
-   the C units that read them as typed `const` arrays. Needs the link to place
-   each object's `.rodata` in ROM order after all `.text` (`*(.rodata)` in a
-   second output pass) and the asm units' slices of `0824DAFC–08250674` to follow
-   the same order. Then a C unit's `.rodata` matches or not, as objdiff measures it.
-2. **Palettes** (135 KB, simplest): `92B3` and the `9B1B` pool as JSON/`.pal`
-   with a datafmt module (`SOURCE = "decoded"`).
-3. **Sound** (3.9 MB): pret-style song `.s`, voicegroups and the song table as
-   source, samples as WAV/AIF (`tools/m4a.py` already walks all of it).
-4. **Graphics** (7.1 MB): an LZ77 compressor that reproduces the original bytes
-   (try pret's `gbagfx` first), then maps, tilesets and sprite sheets as PNG plus
-   JSON. Split the archive units by entry when entries start to match.
-5. **GCL**: a compiler from `gcl/src/` and `gcl/progress.csv` (above).
-6. **objdiff data diffs**: once data lives in `.rodata` sections with sized
-   symbols, an `objdiff.json` can pair a target object per data unit (assembled
-   from the original `.incbin` slices) with the base object built from source,
-   and objdiff shows the hex diff per table. Until then `tools/datafmt/check.py`
-   is the byte-exact check.
+1. Large sprites (1.77 MB): the biggest single gain.
+2. GCL compiler: Scripts, the owner's second code base.
+3. m4a song `.s` round-trip.
+4. Code `.rodata` into C: move the tables after the code into the C units that
+   read them as typed `const` arrays. The link must place each object's
+   `.rodata` in ROM order after all `.text`.
+5. objdiff data diffs: once data lives in `.rodata` sections with sized symbols,
+   an `objdiff.json` can pair a target object per data unit with one built from
+   source. Until then `tools/datafmt/check.py` and `tools/data_roundtrip.py` are
+   the byte-exact checks.
 
 ## Studio fix (2026-10-27)
 
