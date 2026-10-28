@@ -1,19 +1,10 @@
 #include "global.h"
 #include "engine.h"
+#include "menu_parameters.h"
 /* Parameters at 0x02000358 (meaning unknown). */
-struct ScreenParams358Params {
-    u8 *pBlock;
-    u8 *PBlock;
-    u8 *NBlock;
-    s32 s;
-    s32 f;
-    s32 c;
-    s32 S;
-};
-extern struct ScreenParams358Params gUnk_02000358;
 void ScreenParams358_SetFromScript(void)
 {
-    struct ScreenParams358Params *p = &gUnk_02000358;
+    struct SelectionMenuParameters *p = &gSelectionMenuParameters;
     p->S = 0;
     if (Script_SeekToKeyword('p'))
         p->pBlock = Script_GetPc();

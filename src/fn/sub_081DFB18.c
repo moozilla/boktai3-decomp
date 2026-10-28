@@ -1,5 +1,5 @@
 #include "global.h"
-extern u32 gUnk_02000358;
+#include "menu_parameters.h"
 extern u8 gUnk_0824FD3C[];
 void memcpy(void *, const void *, u32);
 s32 Div(s32, s32);
@@ -17,7 +17,7 @@ void sub_081DFB18(u8 *p, s32 n)
     x = (n - d * 6) * 2 + tbl[d][0];
     y = tbl[d][1];
     {
-        u32 base = Script_ParseStringRef(gUnk_02000358);
+        u32 base = Script_ParseStringRef(gSelectionMenuParameters.pBlock);
         s32 off = n * 4;
         u8 *a = p + 0x770;
         text = Text_LookupString(base + *(u32 *)(a + off));

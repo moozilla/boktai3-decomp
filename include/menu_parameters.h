@@ -39,4 +39,10 @@ struct DateMenuParameters {
 };
 extern struct DateMenuParameters gDateMenuParameters;
 
+struct SelectionMenuParameters {
+    u8 *pBlock, *PBlock, *NBlock;
+    s32 s, f, c, S;
+};
+extern struct SelectionMenuParameters gSelectionMenuParameters;
+
 #endif

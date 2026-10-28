@@ -1,6 +1,6 @@
 #include "global.h"
 #include "render.h"
-extern u32 gUnk_02000358[];
+#include "menu_parameters.h"
 void AnimPanel_LoadSelections(u8 *);
 void Bg_ClearTilemap(u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
@@ -51,7 +51,7 @@ u32 Password_InitializeEntryMenu(u8 *s)
     *oneptr = one;
     *(u16 *)(s + 0x364) = zero;
     AnimPanel_LoadSelections(s);
-    if (gUnk_02000358[6]) {
+    if (gSelectionMenuParameters.S) {
         *flags = 0x41;
     }
     Bg_ClearTilemap(0);
