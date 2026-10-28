@@ -125,5 +125,15 @@ extern struct OamEntry gOamBuffer[]; /* final OAM entries, 8 bytes each (128) */
 extern struct OamEntry gPendingOamBuffer[]; /* pending depth-sorted OAM entries (128) */
 extern u16 gBgPaletteBuffer[]; /* sixteen background palette banks of 16 colors; labels inside it are interior rows */
 extern u16 gObjPaletteBuffer[][16]; /* sixteen object palette banks of 16 colors */
+extern u16 gBgMapCacheKey; /* Last compressed BG map resource key, compared before LZ77 unpacking (tentative cache name) */
+extern u16 gSavedDispCnt; /* DISPCNT saved by Video_SaveDisplayControl */
+extern u16 gSavedWindowShadow0; /* Saved window shadow slot 0 */
+extern u16 gSavedWindowShadow3; /* Saved window shadow slot 3 */
+extern u16 gSavedWindowShadow2; /* Saved window shadow slot 2 */
+extern u16 gSavedWindowShadow1; /* Saved window shadow slot 1 */
+extern u16 gSavedWinIn; /* Saved WININ register */
+extern u16 gSavedWinOut; /* Saved WINOUT register */
+extern u8 gTextTileUploadIndices[]; /* Queued text tile indices; bounded storage precedes its count, original guard permits index 256 */
+extern u32 gTextTileUploadCount; /* Number of queued text tile DMA uploads */
 
 #endif

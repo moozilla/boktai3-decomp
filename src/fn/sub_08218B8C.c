@@ -1,14 +1,13 @@
 #include "global.h"
+#include "render.h"
 
-extern u32 gUnk_03001660;
-extern u8 gUnk_03001560[];
 void Memory_Copy(u32, u32, u32);
 
 void Text_QueueTileUpload(u32 v, u32 b)
 {
-    if (gUnk_03001660 <= 0x100) {
-        gUnk_03001560[gUnk_03001660] = v;
-        Memory_Copy(gUnk_03001660 * 32 + 0x02034C00, b, 0x20);
-        gUnk_03001660++;
+    if (gTextTileUploadCount <= 0x100) {
+        gTextTileUploadIndices[gTextTileUploadCount] = v;
+        Memory_Copy(gTextTileUploadCount * 32 + 0x02034C00, b, 0x20);
+        gTextTileUploadCount++;
     }
 }

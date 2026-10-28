@@ -55,3 +55,14 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03001148 `gObjGfxSlots` (struct):** 128 eight-byte OBJ tile-upload slots, proven by allocator limit and next address 03001548; both consumers exact in both compiler modes. Inventory extent corrected from one entry to 0x400 bytes.
 
 - **03001148 `gObjGfxSlots` (struct):** Correct the header-adoption counter signedness conflicts from the preceding commit: explicit s16 reads preserve the original unsigned shared declarations. Both units now pass ROM checks and match original compiler output in both modes.
+
+- **03001548 `gBgMapCacheKey` (unified):** Last compressed BG map resource key, compared before LZ77 unpacking (tentative cache name); ramlayout before/after checks passed.
+- **0300154C `gSavedDispCnt` (unified):** DISPCNT saved by Video_SaveDisplayControl; ramlayout before/after checks passed.
+- **0300154E `gSavedWindowShadow0` (unified):** Saved window shadow slot 0; ramlayout before/after checks passed.
+- **03001550 `gSavedWindowShadow3` (unified):** Saved window shadow slot 3; ramlayout before/after checks passed.
+- **03001552 `gSavedWindowShadow2` (unified):** Saved window shadow slot 2; ramlayout before/after checks passed.
+- **03001554 `gSavedWindowShadow1` (unified):** Saved window shadow slot 1; ramlayout before/after checks passed.
+- **03001556 `gSavedWinIn` (unified):** Saved WININ register; ramlayout before/after checks passed.
+- **03001558 `gSavedWinOut` (unified):** Saved WINOUT register; ramlayout before/after checks passed.
+- **03001560 `gTextTileUploadIndices` (unified):** Queued text tile indices; bounded storage precedes its count, original guard permits index 256; ramlayout before/after checks passed.
+- **03001660 `gTextTileUploadCount` (unified):** Number of queued text tile DMA uploads; ramlayout before/after checks passed.
