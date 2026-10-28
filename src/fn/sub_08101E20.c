@@ -1,5 +1,5 @@
 #include "global.h"
-extern u8 *gUnk_020001AC;
+#include "ram.h"
 
 static inline u8 Tst(u16 *m, s32 one)
 {
@@ -10,7 +10,7 @@ static inline u8 Tst(u16 *m, s32 one)
 
 u32 NamedObject_IsMapCellOccupied(u32 x)
 {
-    u8 *b = (u8 *)gUnk_020001AC;
+    u8 *b = (u8 *)gNamedActorManager;
     s32 i = 0;
     s32 one = 1;
     for (; i < 12; i++) {

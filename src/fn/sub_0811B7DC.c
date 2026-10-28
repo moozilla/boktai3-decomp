@@ -1,9 +1,8 @@
 #include "global.h"
-
-extern u32 gUnk_02000204;
+#include "ram.h"
 
 s32 RegistryE7BC_InitManager(u32 a)
 {
-    gUnk_02000204 = a;
+    gRegistryE7BCManager = a;
     return 0;
 }

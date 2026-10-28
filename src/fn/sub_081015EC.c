@@ -27,7 +27,7 @@ void NamedObject_UpdateContactTrigger(struct NamedObject *o)
     struct NamedObjectManager *m;
     u32 *np, name;
     if (o->stage) {
-        manager = gUnk_020001AC;
+        manager = gNamedActorManager;
         if (HasFlag(0x2000, &o->flags) || o->name == manager->followName) {
             if (o->script) {
                 if (o->kind == 2) {
@@ -57,7 +57,7 @@ void NamedObject_UpdateContactTrigger(struct NamedObject *o)
                     SetFlag2(2, (u16 *)&o->flags);
                 o->timer = 0;
                 o->stage = 1;
-                m = gUnk_020001AC;
+                m = gNamedActorManager;
                 np = &o->name;
                 if (*np == m->followName && o->exitScript) {
                     struct NamedObjectArgs args2;

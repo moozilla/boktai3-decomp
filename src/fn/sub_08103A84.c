@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_020001AC;
 u8 *Task_Create(u32, u32);
 void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
 s32 NamedObject_InitManager(u8 *);
@@ -11,8 +11,8 @@ void ActorGroup_Destroy(void);
 u8 *NamedObject_CreateManager(void)
 {
     u8 *p;
-    if (gUnk_020001AC != 0)
-        return gUnk_020001AC;
+    if (gNamedActorManager != 0)
+        return gNamedActorManager;
     p = Task_Create(5, 0x137c);
     if (p != 0) {
         Task_SetCallbacks(p, NamedObject_UpdatePool, ActorGroup_Destroy);

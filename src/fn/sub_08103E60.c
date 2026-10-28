@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-extern void *gUnk_020001AC;
+#include "ram.h"
 u8 *NamedObject_FindByName(s32 name);
 /* Script: for actor -n, a positive -h goes to +0xD8 and a positive -l to
    +0xD4 (tentative: high and low limits). */
@@ -8,7 +8,7 @@ void NamedActor_SetRangeFromScript(void)
 {
     s32 name = Script_GetKeywordValue('n', 0);
     u8 *actor;
-    if (gUnk_020001AC && name) {
+    if (gNamedActorManager && name) {
         actor = NamedObject_FindByName(name);
         if (actor) {
             s32 none = -1;

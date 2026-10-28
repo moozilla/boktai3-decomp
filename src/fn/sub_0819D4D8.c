@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 // confidence=low: requests movement around adjacent terrain overrides.
 
@@ -6,7 +7,6 @@ struct Action {
     u8 state, pad[3];
     u32 frame;
 };
-extern s32 gUnk_02000220;
 void ActionState_Reset(void *);
 void ActionState_SetState(void *, u32);
 void ActionState_AdvanceState(void *);

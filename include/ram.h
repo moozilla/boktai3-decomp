@@ -164,5 +164,13 @@ extern struct ActorAttachmentManagerView
     *gActorAttachmentManager; /* actor attachment manager singleton */
 extern struct SceneParticlePool
     *gSceneParticleEmitterPool; /* provisional: scene particle emitter pool singleton */
+extern struct NamedObjectManager
+    *gNamedActorManager;           /* named actor object pool singleton; provisional common name */
+extern void *gActorGroupPool;      /* four-slot actor group and callback pool singleton */
+extern u32 gLinkSessionStep;       /* provisional: Registry1745_RunSession diagnostic step marker */
+extern u8 *gConfirmPanel;          /* provisional: Registry3C9F confirmation panel singleton */
+extern void *gRegistryE7BCManager; /* provisional: registry E7BC pooled-object manager */
+extern s32 gOffsetActorAnimationRepeats; /* repeated offset-actor animation counter */
+extern s32 gHresvelgrAttackCount;        /* provisional: Hresvelgr attack-cycle counter */
 
 #endif

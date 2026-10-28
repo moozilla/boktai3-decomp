@@ -2,9 +2,10 @@
 #define GUARD_NAMED_OBJECT_H
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 /* Tentative: a scripted scene object (kinds 0-3) from the 12-slot pool owned by
- * gUnk_020001AC. Slots are 0x19C bytes. */
+ * gNamedActorManager. Slots are 0x19C bytes. */
 struct NamedObjectArgs {
     u16 count, pad;
     u32 *values;
@@ -36,7 +37,6 @@ struct NamedObjectManager {
     u32 followName;
     u32 tetherName;
 };
-extern struct NamedObjectManager *gUnk_020001AC;
 u8 sub_08101094(struct NamedObject *);
 void Route_AdvancePoint(void *);
 s32 Route_GetCurrentPointNodeId(void *);

@@ -2,6 +2,7 @@
 #include "global.h"
 #include "player.h"
 #include "terrain_cell_probe.h"
+#include "ram.h"
 struct NamedObject {
     u8 pad0[0xB6];
     u16 state;
@@ -20,7 +21,6 @@ struct NamedObjectManager {
     u8 pad0[0x1370];
     u32 followName;
 };
-extern struct NamedObjectManager *gUnk_020001AC;
 void ActorGroup_ReleaseMember(struct NamedObject *);
 void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 s32 Div(s32, s32);
@@ -50,7 +50,7 @@ static inline u8 HasBits(u16 *p)
 void NamedObject_RegisterFollowCells(struct NamedObject *objectArg)
 {
     register struct NamedObject *object asm("r8") = objectArg;
-    struct NamedObjectManager *manager = gUnk_020001AC;
+    struct NamedObjectManager *manager = gNamedActorManager;
     s32 base, cell, col, row;
     s32 i;
     struct Pos16 where;

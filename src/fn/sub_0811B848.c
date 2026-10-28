@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct PackedVec {
     u32 x : 16, y : 16, z : 16, pad : 16;
 };
@@ -7,7 +8,6 @@ struct E7BCObject {
     u8 pad0[0x40];
     s32 field40, active;
 };
-extern void *gUnk_02000204;
 void *RegistryE7BC_CreateManager(void);
 struct E7BCObject *RegistryE7BC_FindFreeObject(void *);
 void SpatialIndex_InitEntry(struct E7BCObject *, struct PackedVec *, struct PackedVec *,
@@ -29,7 +29,7 @@ static inline s32 optionalValue(void)
    (each x y z, missing values 0), then sets it up with SpatialIndex_InitEntry. */
 void RegistryE7BC_CreateFromScript(void)
 {
-    void *manager = gUnk_02000204;
+    void *manager = gRegistryE7BCManager;
     struct E7BCObject *e;
     struct PackedVec p;
     struct PackedVec s;

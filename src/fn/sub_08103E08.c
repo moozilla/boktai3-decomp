@@ -1,6 +1,6 @@
 #include "global.h"
+#include "ram.h"
 
-extern u8 *gUnk_020001AC;
 extern u8 *gUnk_02000580[];
 u8 *NamedObject_GetFollowTarget(void);
 void Player_ClearAttachmentFlags(u8 *, s32);
@@ -13,7 +13,7 @@ static inline void clearBits(s16 *p, s32 mask)
    clears the follow flags (tentative). */
 void NamedObject_ReleaseFromScript(void)
 {
-    u8 *manager = gUnk_020001AC;
+    u8 *manager = gNamedActorManager;
     u8 *e = NamedObject_GetFollowTarget();
     *(u32 *)(manager + 0x1370) = 0;
     {

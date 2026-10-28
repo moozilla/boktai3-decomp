@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-extern void *gUnk_020001AC;
+#include "ram.h"
 u8 *NamedObject_FindByName(s32 name);
 void Route_Start(void *route, u32 id, u32 point, u32 mode);
 static inline u8 optionalByte(void)
@@ -19,7 +19,7 @@ void NamedActor_SetRouteFromScript(void)
     s32 name = Script_GetKeywordValue('n', 0);
     u8 *actor;
     u32 id, point, mode;
-    if (gUnk_020001AC && name) {
+    if (gNamedActorManager && name) {
         actor = NamedObject_FindByName(name);
         id = 0;
         point = 0;

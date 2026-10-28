@@ -92,15 +92,15 @@ addr,name,size,kind,decl,header,confidence,notes
 020001A0,gSceneActorContactManager,4,object,extern struct SceneActorContactManager *gSceneActorContactManager;,include/scene_actor_contacts.h,low,
 020001A4,gWoodenCrateManager,4,object,extern u8 *gWoodenCrateManager;,include/ram.h,low,
 020001A8,gFloorSwitchManager,4,object,extern u32 gFloorSwitchManager;,include/ram.h,low,floor switch manager (FloorSwitch_*)
-020001AC,gUnk_020001AC,4,object,,,,
-020001B0,gUnk_020001B0,4,object,,,,
+020001AC,gNamedActorManager,4,object,extern struct NamedObjectManager *gNamedActorManager;,include/ram.h,,named actor object pool singleton; provisional common name
+020001B0,gActorGroupPool,4,object,extern void *gActorGroupPool;,include/ram.h,,four-slot actor group and callback pool singleton
 020001B4,gRegionActorPool,4,object,extern struct RegionSpriteManager *gRegionActorPool;,include/ram.h,low,
 020001B8,gTileTriggerManager,4,object,extern struct TileTriggerManager *gTileTriggerManager;,include/ram.h,low,
 020001BC,gNamedEntryPool,4,object,extern u32 gNamedEntryPool;,include/ram.h,low,
-020001C0,gUnk_020001C0,4,object,,,,
+020001C0,gLinkSessionStep,4,object,extern u32 gLinkSessionStep;,include/ram.h,,provisional: Registry1745_RunSession diagnostic step marker
 020001C4,gLinkPanel,4,object,extern u32 gLinkPanel;,include/ram.h,low,
 020001C8,gPanelSequence,4,object,extern u32 gPanelSequence;,include/ram.h,low,
-020001CC,gUnk_020001CC,4,object,,,,
+020001CC,gConfirmPanel,4,object,extern u8 *gConfirmPanel;,include/ram.h,,provisional: Registry3C9F confirmation panel singleton
 020001D0,gActiveRecordMenu,4,object,extern u32 gActiveRecordMenu;,include/ram.h,low,
 020001D4,gSaveMenu,4,object,extern u32 gSaveMenu;,include/ram.h,low,save menu task (SaveMenu_*)
 020001D8,gPaletteFade,4,object,extern struct PaletteFade *gPaletteFade;,include/ram.h,low,
@@ -112,14 +112,14 @@ addr,name,size,kind,decl,header,confidence,notes
 020001F8,gTerrainColumnIndices,4,object,extern u8 *gTerrainColumnIndices;,include/ram.h,low,
 020001FC,gTerrainColumns,4,object,extern struct TerrainColumn *gTerrainColumns;,include/ram.h,low,
 02000200,gSpatialIndex,4,object,extern struct SpatialIndex *gSpatialIndex;,include/ram.h,low,
-02000204,gUnk_02000204,4,object,,,,
+02000204,gRegistryE7BCManager,4,object,extern void *gRegistryE7BCManager;,include/ram.h,,provisional: registry E7BC pooled-object manager
 02000208,gScriptRecordTable,4,object,extern u8 *gScriptRecordTable;,include/ram.h,low,
 0200020C,gActorManager,4,object,extern void *gActorManager;,include/ram.h,low,
 02000210,gGameOver,4,object,extern struct GameOver *gGameOver;,include/ram.h,low,
 02000214,gFieldHud,4,object,extern u8 *gFieldHud;,include/ram.h,low,
 02000218,gSceneEffectQueue,4,object,extern u8 *gSceneEffectQueue;,include/ram.h,low,scene effect queue (SceneEffectQueue_*)
-0200021C,gUnk_0200021C,4,object,,,,
-02000220,gUnk_02000220,4,object,,,,
+0200021C,gOffsetActorAnimationRepeats,4,object,extern s32 gOffsetActorAnimationRepeats;,include/ram.h,,repeated offset-actor animation counter
+02000220,gHresvelgrAttackCount,4,object,extern s32 gHresvelgrAttackCount;,include/ram.h,,provisional: Hresvelgr attack-cycle counter
 0200022C,gUnk_0200022C,4,object,,,,
 02000230,gUnk_02000230,4,object,,,,
 02000234,gUnk_02000234,4,object,,,,

@@ -1,10 +1,10 @@
 #include "global.h"
+#include "ram.h"
 
 struct Action {
     u8 state, pad[3];
     u32 frame;
 };
-extern s32 gUnk_02000220;
 void ActionState_Reset(void *);
 void ActionState_SetState(void *, u32);
 void ActionState_AdvanceState(void *);
@@ -37,7 +37,7 @@ void Hresvelgr_UpdateAttackCycle(u8 *p)
         u16 *counter = (void *)(p + 0x318);
         u32 zero = 0;
         *counter = zero;
-        gUnk_02000220 = zero;
+        gHresvelgrAttackCount = zero;
         ActionState_Reset(a);
         ActionState_SetState(a, 0);
     }
@@ -94,7 +94,7 @@ void Hresvelgr_UpdateAttackCycle(u8 *p)
             if (!a->frame) {
                 Request(q, 16);
                 a->frame++;
-                gUnk_02000220++;
+                gHresvelgrAttackCount++;
             } else {
                 u32 mask = 0x40000000;
                 u32 flags = *(u32 *)(q + 0x9c);
@@ -146,7 +146,7 @@ void Hresvelgr_UpdateAttackCycle(u8 *p)
                 Request(q, 18);
                 a->frame++;
             } else if (q[0xaf]) {
-                if (gUnk_02000220 <= 5)
+                if (gHresvelgrAttackCount <= 5)
                     ActionState_SetState(a, 11);
                 else
                     ActionState_SetState(a, 12);

@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "render.h"
+#include "ram.h"
 
 struct Reg1745Run {
     u8 pad0[0x1c];
@@ -21,7 +22,6 @@ struct Reg1745Hdr {
     s16 field18;
 };
 
-extern u32 gUnk_020001C0;
 extern u32 gUnk_03005408, gUnk_030053FC;
 extern struct Reg1745Hdr *gUnk_020004B4;
 s32 Serial_ReceivePacket(u32);
@@ -43,64 +43,64 @@ static inline void FlagClear(u32 m)
 u32 Registry1745_RunSession(struct Reg1745Run *p)
 {
     struct Reg1745Run *q = p;
-    gUnk_020001C0 = 0;
+    gLinkSessionStep = 0;
     if (p->state > 4)
         gUnk_03005408 = 1;
-    gUnk_020001C0 = 1;
+    gLinkSessionStep = 1;
     if (p->state > 2) {
         u32 st;
         p->field48 = Serial_ReceivePacket(p->field40);
-        gUnk_020001C0 = 2;
+        gLinkSessionStep = 2;
         p->field44 = SerialLink_QueueSendWord(p->field3E);
-        gUnk_020001C0 = 3;
+        gLinkSessionStep = 3;
         st = p->state;
         if (st > 4) {
             if (gUnk_020004B4 && gUnk_020004B4->field18 == 0 && st != 0x19 && st != 0x1b)
                 SerialLink_StartTransferIfIdle();
         } else if (p->field1D == 0 && st != 0x19 && st != 0x1b)
             SerialLink_StartTransferIfIdle();
-        gUnk_020001C0 = 4;
+        gLinkSessionStep = 4;
     }
-    gUnk_020001C0 = 5;
+    gLinkSessionStep = 5;
     {
         u32 st = q->state;
         if (st > 4 && st != 0x19 && st != 0x1b && st != 0x1c) {
-            gUnk_020001C0 = 6;
+            gLinkSessionStep = 6;
             if (q->field48 == -3) {
                 if (st != 0xb)
                     FlagSet(1);
-                gUnk_020001C0 = 8;
+                gLinkSessionStep = 8;
                 if (q->field1F <= 0xfe) {
                     q->field1F++;
                     if (st > 4 && q->field1F > 0xe && gUnk_030053FC == 0)
                         Registry1745_BeginShutdown(q, ScriptPanel_OpenTextWindow);
                 }
-                gUnk_020001C0 = 9;
+                gLinkSessionStep = 9;
                 return 0;
             }
             FlagClear(1);
             q->field1F = 0;
-            gUnk_020001C0 = 10;
+            gLinkSessionStep = 10;
         }
     }
-    gUnk_020001C0 = 12;
+    gLinkSessionStep = 12;
     Callback_InvokeActor(p, *(void **)((u32)q + 0xb0));
     q->counter30++;
-    gUnk_020001C0 = 14;
+    gLinkSessionStep = 14;
     if (!({
             s32 done;
             if (p->field1E) {
                 Task_Kill(p);
                 if (p->state == 0) {
-                    gUnk_020001C0 = 15;
+                    gLinkSessionStep = 15;
                     System_ShutdownAndSoftReset();
                 } else {
                     u32 cb = *(u32 *)((u32)p + 0xcc);
                     if (cb) {
-                        gUnk_020001C0 = 16;
+                        gLinkSessionStep = 16;
                         Script_Call(cb, 0);
                     } else {
-                        gUnk_020001C0 = 17;
+                        gLinkSessionStep = 17;
                         System_ShutdownAndSoftReset();
                     }
                 }
@@ -110,6 +110,6 @@ u32 Registry1745_RunSession(struct Reg1745Run *p)
             asm("" : "+r"(done));
             done;
         }))
-        gUnk_020001C0 = 18;
+        gLinkSessionStep = 18;
     return 0;
 }
