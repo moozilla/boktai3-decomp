@@ -477,11 +477,28 @@ struct RfuStatic
     u32 totalPacketSize;
 };
 
+struct RfuSIO32Id
+{
+    u8 MS_mode;
+    u8 state;
+    u16 count;
+    u16 send_id;
+    u16 recv_id;
+    u16 unk8; // unused
+    u16 lastId;
+};
+
+/* 0x03006A50 */
 extern struct STWIStatus *gSTWIStatus;
+/* 0x03006A80 */
 extern struct RfuLinkStatus *gRfuLinkStatus;
+/* 0x03006A84 */
 extern struct RfuStatic *gRfuStatic;
+/* 0x03006A88 */
 extern struct RfuFixed *gRfuFixed;
+/* 0x03006A70 */
 extern struct RfuSlotStatusNI *gRfuSlotStatusNI[RFU_CHILD_MAX];
+/* 0x03006A60 */
 extern struct RfuSlotStatusUNI *gRfuSlotStatusUNI[RFU_CHILD_MAX];
 
 // librfu_sio32id
@@ -645,5 +662,7 @@ void STWI_send_TestModeREQ(u8 unk0, u8 unk1);
 void STWI_send_CPR_StartREQ(u16 unk0, u16 unk1, u8 unk2);
 void STWI_send_CPR_PollingREQ(void);
 void STWI_send_CPR_EndREQ(void);
+/* 0x03006A90 */
+extern struct RfuSIO32Id gRfuSIO32Id; /* RFU SIO32 ID negotiation state */
 
 #endif // GUARD_LIBRFU_H

@@ -28,8 +28,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
@@ -47,11 +45,11 @@ int Wireless_IsSessionConnected(void)
     if (p->active) {
         if (p->operation <= 4)
             goto absent;
-        if (gUnk_03006A80->parentChild == 255)
+        if (gRfuLinkStatus->parentChild == 255)
             goto absent;
         goto present;
     }
-    if (gUnk_03006A80->parentChild == 0)
+    if (gRfuLinkStatus->parentChild == 0)
         goto present;
 absent:
     return 0;

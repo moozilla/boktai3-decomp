@@ -33,7 +33,6 @@ struct Engine {
     u8 message[0x204];
     void *head, *tail;
 };
-#define gRfuLinkStatus gUnk_03006A80
 #include "rfu_compat.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {

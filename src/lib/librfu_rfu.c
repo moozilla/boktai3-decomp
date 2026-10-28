@@ -9,13 +9,6 @@
 #define rfu_MBOOT_CHILD_inheritanceLinkStatus sub_08245744
 #define rfu_REQ_noise sub_0824826C
 #define IntrSIO32 sub_08244A38
-#define gSTWIStatus gUnk_03006A50
-#define gRfuLinkStatus gUnk_03006A80
-#define gRfuStatic gUnk_03006A84
-#define gRfuFixed gUnk_03006A88
-#define gRfuSlotStatusNI gUnk_03006A70
-#define gRfuSlotStatusUNI gUnk_03006A60
-#define gRfuSIO32Id gUnk_03006A90
 #define llsf_struct gUnk_08602CD0
 #define str_checkMbootLL gUnk_08602CFC
 #define Sio32ConnectionData gUnk_08602D08
@@ -97,11 +90,6 @@ void rfu_STC_NI_receive_Sender(u8, u8, const struct RfuLocalStruct *, UNUSED con
 void rfu_STC_NI_initSlot_asRecvDataEntity(u8, struct NIComm *);
 void rfu_STC_NI_initSlot_asRecvControllData(u8, struct NIComm *);
 
-extern struct RfuSlotStatusUNI *gRfuSlotStatusUNI[RFU_CHILD_MAX] ;
-extern struct RfuSlotStatusNI *gRfuSlotStatusNI[RFU_CHILD_MAX] ;
-extern struct RfuLinkStatus *gRfuLinkStatus ;
-extern struct RfuStatic *gRfuStatic ;
-extern struct RfuFixed *gRfuFixed ;
 
 extern const struct LLSFStruct llsf_struct[2];
 

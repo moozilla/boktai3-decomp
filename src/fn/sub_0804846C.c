@@ -28,7 +28,7 @@ void WirelessLinkIndicator_UpdateLinkStatus(struct WirelessLinkIndicator *input)
                     }
                     ++index;
                 } while (index <= 3);
-                if (!gUnk_03006A80->connSlotFlag) {
+                if (!gRfuLinkStatus->connSlotFlag) {
                     WirelessLinkIndicator_SelectStrengthFrame(indicator, 0);
                 } else {
                     WirelessLinkIndicator_SelectStrengthFrame(indicator, strength);

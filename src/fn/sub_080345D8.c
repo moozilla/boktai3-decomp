@@ -32,7 +32,7 @@ struct ModeState {
     u8 pad0;
     u8 mode;
 };
-extern struct ModeState *gUnk_03006A80;
+extern struct ModeState *gRfuLinkStatus;
 static inline void reset(struct Engine *p, int operation, int zero)
 {
     p->flag = zero;
@@ -126,7 +126,7 @@ reset5:
     reset(p, 5, 0);
     goto done;
 mode: {
-    int mode = gUnk_03006A80->mode;
+    int mode = gRfuLinkStatus->mode;
     if (!mode)
         reset(p, 5, mode);
     else

@@ -29,8 +29,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
@@ -82,7 +80,7 @@ int Wireless_SelectParentFromInput(struct Engine *p)
                 int parentIndex = p->ids[index];
                 struct RfuLinkStatus *link;
                 int status;
-                link = gUnk_03006A80;
+                link = gRfuLinkStatus;
                 status = (u8)RfuManager_StartChildConnect(link->partner[parentIndex].id, 0);
                 if (!status) {
                     setOperation(p, 10, status);

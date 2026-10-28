@@ -28,8 +28,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 // The original caller saw an int-width prototype for rfu_clearSlot (u8, u8 in
 // the SDK header): its argument order only matches with int parameters.
 #define rfu_clearSlot rfu_clearSlot_sdk
@@ -41,7 +39,7 @@ void WirelessController_PollPeerRosterSend(struct Engine *p)
 {
     int changed = 0;
     if (p->mask & 2) {
-        struct RfuSlotStatusNI **slots = gUnk_03006A70;
+        struct RfuSlotStatusNI **slots = gRfuSlotStatusNI;
         int slot = p->mode;
         struct NIComm *s = &slots[slot]->send;
         {

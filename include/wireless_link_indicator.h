@@ -1,7 +1,6 @@
 #ifndef GUARD_WIRELESS_LINK_INDICATOR_H
 #define GUARD_WIRELESS_LINK_INDICATOR_H
 #include "projected_display.h"
-#define gRfuLinkStatus gUnk_03006A80
 #include "rfu_compat.h"
 struct WirelessLinkIndicator {
     u8 task[0x18];

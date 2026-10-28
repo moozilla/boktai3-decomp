@@ -1,13 +1,13 @@
 #include "global.h"
 #include "rfu_manager.h"
-extern u16 *gUnk_03006A70[];
+extern u16 *gRfuSlotStatusNI[];
 void rfu_clearSlot(u32, u32);
 void RfuManager_NotifyEvent(u32, u32);
 void RfuManager_FinishSlotReception(void)
 {
     struct RfuLinkManager *s = &gRfuLinkManager;
     if (s->state == 0xf) {
-        u16 **t = gUnk_03006A70;
+        u16 **t = gRfuSlotStatusNI;
         u32 i = s->child_slot;
         if (*t[i] == 0x26) {
             u32 z = 0;

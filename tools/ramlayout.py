@@ -481,6 +481,10 @@ def cmd_unify(a):
     taken = {n: p for p, t in new.items() for n in set(renames.values())
              if (p, n) not in aliased and re.search(rf"\b{n}\b", t)}
     taken = {n: p for n, p in taken.items() if n not in {r["name"] for r, _, _ in jobs}}
+    # a name the target header already declares as this very object is not taken
+    declared = {parse_decl(d)[1]: parse_decl(d)[0] for _, d, _ in jobs}
+    taken = {n: p for n, p in taken.items()
+             if not any(norm(s, dl[i], n, n) == declared[n] for _, s, dl, i in declarations(texts.get(a.header, ""), n))}
     if taken:
         sys.exit("names already used: " + ", ".join(f"{n} ({p})" for n, p in sorted(taken.items())))
     if pat:
@@ -540,7 +544,8 @@ def cmd_unify(a):
         h = new[a.header]
         if not any(norm(s, d[i], name, name) == c for _, s, d, i in declarations(h, name)):
             line = f"/* 0x{r['addr']} */\n" + decl.strip() + (f" /* {note} */" if note else "")
-            h = h[:h.rindex("#endif")].rstrip("\n") + "\n" + line + "\n\n#endif\n"
+            end = h.rindex("#endif")
+            h = h[:end].rstrip("\n") + "\n" + line + "\n\n" + h[end:]
             new[a.header] = h
     changed = [p for p in new if new[p] != texts.get(p)]
     # A file needs compiling when its text changed or it includes a changed

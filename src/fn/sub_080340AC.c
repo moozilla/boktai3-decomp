@@ -1,6 +1,7 @@
 #include "global.h"
 #include "ram.h"
 #include "rfu_manager.h"
+#include "rfu_compat.h"
 struct Engine {
     u8 pad0[0x18];
     u8 pad18, bits, pad1a, entered, flag, pad1d, state, flag1f, mode, index;
@@ -34,7 +35,6 @@ struct ModeState {
     u8 pad0;
     u8 mode;
 };
-extern struct ModeState *gUnk_03006A80;
 void WirelessController_ResetSession(struct Engine *p)
 {
     int zero = 0;

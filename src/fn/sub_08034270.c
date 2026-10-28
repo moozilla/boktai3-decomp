@@ -33,17 +33,17 @@ void Memory_Clear(void *, int);
 struct Record {
     u8 pad0, mode, pad2[6], count, pad9[13], status, pad17[9];
 };
-extern struct Record *gUnk_03006A80;
+extern struct Record *gRfuLinkStatus;
 void WirelessController_RebuildAvailablePeerList(struct Engine *p)
 {
     int i;
     int left, right, limit;
     p->count = 0;
     i = 0;
-    for (; i < gUnk_03006A80->count; i++) {
+    for (; i < gRfuLinkStatus->count; i++) {
         if ((p->allowed >> i) & 1) {
             {
-                struct Record *base = gUnk_03006A80;
+                struct Record *base = gRfuLinkStatus;
                 int offset;
                 offset = i << 5;
                 base = (struct Record *)((u32)base + offset);

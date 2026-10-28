@@ -29,8 +29,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 
 // The original caller saw an int-width prototype for rfu_clearSlot (u8, u8 in
 // the SDK header): its argument order only matches with int parameters.
@@ -87,7 +85,7 @@ int Wireless_UpdateChildHandshake(struct Engine *p)
     if (p->pending)
         p->pending = 0;
     {
-        struct RfuSlotStatusNI **slots = gUnk_03006A70;
+        struct RfuSlotStatusNI **slots = gRfuSlotStatusNI;
         register u8 *initial asm("r3") = &p->index;
         int state;
         state = slots[*initial]->recv.state;
@@ -119,7 +117,7 @@ int Wireless_UpdateChildHandshake(struct Engine *p)
 send:;
     flags = p->mask;
     if (!(flags & 2)) {
-        if (!gUnk_03006A80->linkLossSlotFlag) {
+        if (!gRfuLinkStatus->linkLossSlotFlag) {
             u8 *data;
             int one = 1;
             asm("" : "+r"(one));
@@ -159,7 +157,7 @@ send:;
             goto complete;
     }
     {
-        struct RfuSlotStatusNI **slots = gUnk_03006A70;
+        struct RfuSlotStatusNI **slots = gRfuSlotStatusNI;
         int index;
         int state;
         index = *slot;

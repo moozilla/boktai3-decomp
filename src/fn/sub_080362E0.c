@@ -28,8 +28,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
@@ -56,11 +54,11 @@ int Wireless_ExchangeChildNiPacket(struct Engine *argument)
             goto failed;
         }
     }
-    if (gUnk_03006A80->linkLossSlotFlag) {
+    if (gRfuLinkStatus->linkLossSlotFlag) {
         goto failed;
     }
     {
-        struct RfuSlotStatusNI **slots = gUnk_03006A70;
+        struct RfuSlotStatusNI **slots = gRfuSlotStatusNI;
         u8 *initial;
         int state;
         int index;
@@ -96,7 +94,7 @@ int Wireless_ExchangeChildNiPacket(struct Engine *argument)
         goto sendError;
     }
     index = 0;
-    links = &gUnk_03006A80;
+    links = &gRfuLinkStatus;
     if (!((*links)->connSlotFlag & one)) {
         struct RfuLinkStatus **cursor = links;
         int bit = 1;

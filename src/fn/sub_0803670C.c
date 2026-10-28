@@ -28,8 +28,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
@@ -60,7 +58,7 @@ void Wireless_UpdateParentNiSession(struct Engine *argument)
         *lost = 0;
     }
     {
-        int mode = gUnk_03006A80->parentChild;
+        int mode = gRfuLinkStatus->parentChild;
         if (mode == 1) {
             gWirelessSessionState = mode;
             RfuManager_SendData(1);

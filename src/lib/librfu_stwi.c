@@ -9,13 +9,6 @@
 #define rfu_MBOOT_CHILD_inheritanceLinkStatus sub_08245744
 #define rfu_REQ_noise sub_0824826C
 #define IntrSIO32 sub_08244A38
-#define gSTWIStatus gUnk_03006A50
-#define gRfuLinkStatus gUnk_03006A80
-#define gRfuStatic gUnk_03006A84
-#define gRfuFixed gUnk_03006A88
-#define gRfuSlotStatusNI gUnk_03006A70
-#define gRfuSlotStatusUNI gUnk_03006A60
-#define gRfuSIO32Id gUnk_03006A90
 #define llsf_struct gUnk_08602CD0
 #define str_checkMbootLL gUnk_08602CFC
 #define Sio32ConnectionData gUnk_08602D08
@@ -29,7 +22,6 @@ void STWI_stop_timer(void);
 s32 STWI_restart_Command(void);
 s32 STWI_reset_ClockCounter(void);
 
-extern struct STWIStatus *gSTWIStatus ;
 
 void STWI_init_all(struct RfuIntrStruct *interruptStruct, IntrFunc *interrupt, bool8 copyInterruptToRam)
 {

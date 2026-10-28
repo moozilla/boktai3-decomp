@@ -28,8 +28,6 @@ struct Engine {
     void *head, *tail;
 };
 void Memory_Clear(void *, int);
-#define gRfuLinkStatus   gUnk_03006A80
-#define gRfuSlotStatusNI gUnk_03006A70
 #include "rfu_compat.h"
 #include "ram.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
@@ -49,7 +47,7 @@ int Wireless_DisconnectAllSlots(struct Engine *p)
     if (p->pending)
         p->pending = 0;
     if ((u8)rfu_getMasterSlave() == 1) {
-        rfu_REQ_disconnect(gUnk_03006A80->connSlotFlag | gUnk_03006A80->linkLossSlotFlag);
+        rfu_REQ_disconnect(gRfuLinkStatus->connSlotFlag | gRfuLinkStatus->linkLossSlotFlag);
         rfu_waitREQComplete();
     }
 }

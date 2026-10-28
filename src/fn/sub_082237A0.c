@@ -8,7 +8,7 @@ struct RfuLink {
     u16 id;
     u8 pad16[10];
 };
-extern struct RfuLink *gUnk_03006A80;
+extern struct RfuLink *gRfuLinkStatus;
 u32 rfu_getMasterSlave(void);
 void RfuManager_NotifyEvent(u32, u32);
 
@@ -27,16 +27,16 @@ u32 RfuManager_StartChildConnect(u16 id, u16 b)
         return 2;
     }
     i = 0;
-    *(&count) = gUnk_03006A80->count;
-    if (i < count && gUnk_03006A80[0].id != id) {
-        struct RfuLink *l = gUnk_03006A80;
+    *(&count) = gRfuLinkStatus->count;
+    if (i < count && gRfuLinkStatus[0].id != id) {
+        struct RfuLink *l = gRfuLinkStatus;
         do {
             i++;
             if (i >= count)
                 break;
         } while (((struct RfuLink *)((u8 *)l + (i << 5)))->id != id);
     }
-    count = gUnk_03006A80->count;
+    count = gRfuLinkStatus->count;
     if (count == 0 || i == count) {
         gRfuLinkManager.event.words.code = 3;
         RfuManager_NotifyEvent(0xf3, 1);
