@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "ram.h"
 #include "background_controller.h"
+#include "scene_pool.h"
 // confidence=low: follows the sound delay and switches to scatter trail at the height limit.
 struct Vec {
     s32 x, y, z, w;
@@ -31,7 +32,6 @@ struct Emitter {
     u16 timer;
     u8 owner;
 };
-extern struct Source *gUnk_020004F0[];
 s32 Div(s32, s32);
 u8 HeightProbe_IsBelowLimit(void *);
 void ParticleEmitter_UpdateScatterTrail(struct Emitter *);
@@ -42,7 +42,7 @@ static inline void GetPosition(struct Vec *out, s32 index)
         out->y = 0;
         out->z = 0;
     } else {
-        struct Source *p = gUnk_020004F0[index];
+        struct Source *p = gParticipantActors[index];
         if (!p) {
             out->x = 0;
             out->y = 0;
@@ -61,7 +61,7 @@ static inline void GetOffset(struct Vec *out, s32 index)
         out->y = 0;
         out->z = 0;
     } else {
-        struct Source *p = gUnk_020004F0[index];
+        struct Source *p = gParticipantActors[index];
         if (!p) {
             out->x = 0;
             out->y = 0;

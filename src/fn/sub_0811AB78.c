@@ -4,7 +4,7 @@ s32 Glove_GetHorizontalBounds(s32 index, s32 *left, s32 *right)
 {
     struct ScenePoolPlayer *glove;
     if (index <= 1) {
-        glove = gUnk_020004F0[index];
+        glove = gParticipantActors[index];
         if (glove) {
             s32 x = glove->position[0];
             x -= ((glove->viewportOriginX >> 12) << 12);

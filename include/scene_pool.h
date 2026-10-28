@@ -119,5 +119,5 @@ struct ScenePoolPlayer {
     u8 unknown8e0[0x14];
     u16 flags;
 };
-extern struct ScenePoolPlayer *gUnk_020004F0[2];
+extern struct ScenePoolPlayer *gParticipantActors[2];
 #endif

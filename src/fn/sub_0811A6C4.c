@@ -92,7 +92,7 @@ extern u8 *gUnk_020004B4;
 void ActorParticles_UpdateEmitter(void *, void *, u32);
 void Trigger_ConsumePending(void *, s32);
 // Animation zero plays until recoil completes, then returns to its resting callback.
-extern u8 *gUnk_020004F0[];
+extern u8 *gParticipantActors[];
 extern u32 gUnk_020004E0[];
 void MotionActor_ParsePosition(void *);
 void CharacterModel_SetPrimaryAppearance(void *, void *);
@@ -242,7 +242,7 @@ s32 Glove_InitFromScript(struct Glove *p)
                                        *((u8 *)(((u8 *)self) + 0x4b)));
     ActorRecoil_InitCollisionVolumes(p);
     SceneTilemap_SetScrollSource(gUnk_020004E0);
-    gUnk_020004F0[p->participant] = p;
+    gParticipantActors[p->participant] = p;
     Glove_RegisterMessageReceiver(p);
     *((void **)(((u8 *)p) + 0x8c4)) = ((u8 *)gPadState) + (p->participant * 8);
     *((u32 *)(((u8 *)p) + 0x91c)) = p->participant;

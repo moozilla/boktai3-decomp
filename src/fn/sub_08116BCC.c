@@ -4,9 +4,9 @@ struct S {
     u8 f[0x74];
     u32 a;
 };
-extern struct S *gUnk_020004F0;
+extern struct S *gParticipantActors;
 void Player_SaveCurrentHealth(void)
 {
-    if (gUnk_020004F0)
-        *(u16 *)(gGameState + 0x758) = gUnk_020004F0->a;
+    if (gParticipantActors)
+        *(u16 *)(gGameState + 0x758) = gParticipantActors->a;
 }

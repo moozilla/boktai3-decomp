@@ -1,7 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
-#define gMotionActorSlots gUnk_020004F0
+#include "scene_pool.h"
 struct MotionActorAnimation {
     u8 unknown0[0x60];
 };
@@ -19,7 +19,6 @@ struct MotionActor {
     u8 unknown874[0x84];
     s8 slot;
 };
-extern struct MotionActor *gUnk_020004F0[];
 void Anim_Remove(void *);
 void Sound_StopSong(u32);
 void SceneMessages_UnregisterReceiver(void *);
@@ -46,6 +45,6 @@ s32 MotionActor_Destroy(struct MotionActor *actor)
     Sound_StopSong(0x8A);
     Sound_StopSong(0x8B);
     Sound_StopSong(0x93);
-    gUnk_020004F0[actor->slot] = 0;
+    gParticipantActors[actor->slot] = 0;
     return 0;
 }

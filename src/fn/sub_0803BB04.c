@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_pool.h"
 // MATCHING_CONCESSION: register-pinning
 struct Blob {
     u32 words[11];
@@ -17,11 +18,10 @@ struct Item {
     u8 pad2[0x13];
     u8 flag;
 };
-extern struct Player *gUnk_020004F0;
 void ActorStats_ConfigureScaledParameters(void *, int, int, int, int, int, int);
 void ScenePool_InitActorBounds(struct P *p, struct Item *item)
 {
-    struct Player *player = gUnk_020004F0;
+    struct Player *player = (*(struct Player **)gParticipantActors);
     int okay = 0;
     int x = 0;
     int z = 0;

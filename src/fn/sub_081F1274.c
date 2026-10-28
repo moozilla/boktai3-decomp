@@ -7,7 +7,7 @@ struct Slot7PackedPosition {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
 extern void *gSceneCamera;
-extern u8 *gUnk_020004F0;
+extern u8 *gParticipantActors;
 extern u8 gUnk_03005040[];
 extern const u16 gUnk_0203B400[];
 void Collider_SetFixedPositionWithYOffset(void *, void *, s32);
@@ -35,7 +35,7 @@ void Script_Call(u32, u32);
 /* Remaining differences: palette-loop hoisting, packed particle storage and owner lifetimes. */
 static inline u8 IsSceneHidden(void)
 {
-    if (gUnk_020004F0 && (FIELD(gUnk_020004F0, 0x8F4, u16) & 1))
+    if (gParticipantActors && (FIELD(gParticipantActors, 0x8F4, u16) & 1))
         return 1;
     return 0;
 }

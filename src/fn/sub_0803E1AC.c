@@ -11,7 +11,7 @@ static inline void Or(u32 mask, u32 *flags)
 }
 static inline u8 PlayerHasFlag(u32 mask)
 {
-    if (gUnk_020004F0[0] && (gUnk_020004F0[0]->flags & mask))
+    if (gParticipantActors[0] && (gParticipantActors[0]->flags & mask))
         return 1;
     return 0;
 }

@@ -187,7 +187,7 @@ addr,name,size,kind,decl,header,confidence,notes
 020004D0,gSceneProcParticles,4,object,extern u32 gSceneProcParticles;,include/ram.h,low,
 020004D4,gSpritePairPool,4,object,extern u32 gSpritePairPool;,include/ram.h,low,
 020004D8,gCompactSpritePool,4,object,extern u8 *gCompactSpritePool;,include/ram.h,low,
-020004F0,gUnk_020004F0,8,object,,,,
+020004F0,gParticipantActors,8,object,extern struct ScenePoolPlayer *gParticipantActors[2];,include/scene_pool.h,low,per-participant actors
 02000500,gPlayerInteractionMode,2,object,extern u16 gPlayerInteractionMode;,include/ram.h,low,provisional: player interaction and passage mode halfword
 02000504,gPlayerSavedMenuOption,2,object,extern u16 gPlayerSavedMenuOption;,include/ram.h,low,saved menu option restored when the second script-status slot is set
 02000508,gTrackedPlayerId,2,object,extern u16 gTrackedPlayerId;,include/ram.h,low,

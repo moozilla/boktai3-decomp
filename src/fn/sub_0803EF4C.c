@@ -35,7 +35,7 @@ static inline void ProjectArc(struct SceneArcSlot *slot, struct SceneArcSprite *
 }
 static inline u8 PlayerSuspendsArc(void)
 {
-    if (gUnk_020004F0[0] && (gUnk_020004F0[0]->flags & 4))
+    if (gParticipantActors[0] && (gParticipantActors[0]->flags & 4))
         return 1;
     return 0;
 }

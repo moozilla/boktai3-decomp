@@ -4,7 +4,7 @@
 void ScenePool_SetSpeedControlSchedule(struct ScenePoolEntry *, s32, s32, s32);
 static inline u8 PlayerHasFlag(u32 mask)
 {
-    if (gUnk_020004F0[0] && (gUnk_020004F0[0]->flags & mask))
+    if (gParticipantActors[0] && (gParticipantActors[0]->flags & mask))
         return 1;
     return 0;
 }

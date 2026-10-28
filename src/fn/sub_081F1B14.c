@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_pool.h"
 
 // MATCHING_CONCESSION: register-pinning
 
@@ -29,7 +30,6 @@ struct SingletonSlot7Player {
 struct SingletonSlot7Scroll {
     u32 a, b, c, d;
 };
-extern struct SingletonSlot7Player *gUnk_020004F0;
 /* Declaration aliases support the checker's ELF from before name promotion. */
 s32 Player_GetHorizontalVelocity(s32) __asm__("Player_GetHorizontalVelocity");
 void Player_GetWorldPosition(s32, s32 *) __asm__("Player_GetWorldPosition");
@@ -50,8 +50,8 @@ void sub_081F1274(struct SingletonSlot7Actor *);
 static inline u8 PlayerHasFlag(void)
 {
     u32 flags;
-    if (gUnk_020004F0) {
-        flags = gUnk_020004F0->flags;
+    if ((*(struct SingletonSlot7Player **)gParticipantActors)) {
+        flags = (*(struct SingletonSlot7Player **)gParticipantActors)->flags;
         if (flags & 1)
             return 1;
     }
