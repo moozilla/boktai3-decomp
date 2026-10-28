@@ -29,6 +29,44 @@ python3 tools/ramlayout.py show 03004BD8
 `show` prints the row, every distinct declaration in the sources with a count, and
 how many files use the object.
 
+## Finding things by address
+
+Each shared declaration has its address on the line above it:
+
+```c
+/* 0x03004290 */
+extern u32 gRenderListIndex; /* active list index into the three render list-head pairs */
+```
+
+Go-to-definition on a name lands on the comment as well as the declaration.
+`python3 tools/ramlayout.py annotate [--range LO-HI]` writes and fixes these
+(it is idempotent and keeps clang-formatted headers formatted); `unify` writes
+the comment for every declaration it adds, and `check` reports declarations
+that lack one.
+
+Which functions touch an address, from layoutmerge's literal-pool scan of the
+ROM (run `python3 tools/layoutmerge.py` first; it writes `build/layouts/`):
+
+```bash
+python3 tools/ramlayout.py users 03004290            # row name or address; loads, stores, escapes per function
+python3 tools/ramlayout.py users 03005418 --size 8   # a range, when the row has no size
+python3 tools/ramlayout.py users 02000710 --pointee  # accesses through the pointer stored there
+```
+
+Symbols for debuggers and Ghidra come from `symbols/ram.csv`,
+`symbols/functions.csv` and `symbols/data.csv`; no build or ROM is needed:
+
+```bash
+python3 tools/symexport.py                       # build/symbols/boktai3.sym and ghidra.tsv
+python3 tools/symexport.py --sym game.sym        # `ADDR NAME` lines (no$gba, armips style)
+python3 tools/symexport.py --ghidra syms.tsv --no-placeholders
+```
+
+In Ghidra, run `tools/ghidra/ImportSymbols.java` with the TSV as its argument
+(see `tools/ghidra/README.md`): it names functions and RAM objects and adds the
+C declaration as a plate comment. mGBA reads the symbols of `build/boktai3.elf`
+directly.
+
 ## Unifying an object
 
 Drafts declare RAM locally, each with its own spelling: `gUnk_030042E4` was
