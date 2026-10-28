@@ -1,6 +1,5 @@
+// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-
-#define FDE0_AT(T, off) (*(T *)(arg0 + (off)))
 
 struct FDE0Header {
     u32 w[8];
@@ -42,197 +41,353 @@ void ProximityVolume_TranslateBounds(void *, void *);
 void Task4E01_Destroy(void);
 void *TimedEffect_GetOrCreateManager(s32);
 
-#ifdef NONMATCHING
-// fuzzy: 56.6%
-// scope shape 279 (differences once low registers are set aside)
-// confidence=low: boss actor setup from its script, sprite and collider init, VRAM copies
-s32 sub_0817FDE0(u8 *arg0, u32 arg1)
+struct BossBody {
+    u8 pad0[0xC];
+    u8 position[8];
+    u8 pad14[0x34];
+};
+struct BossWidget {
+    u8 pad0[0x20];
+    u8 shadowPart[0x28];
+    u8 *tileData;
+    u8 pad4C[0x14];
+};
+struct CameraSetup {
+    u8 pad0[0x10];
+    u32 timer;
+    u32 distance;
+};
+struct BossContext {
+    u8 pad0[0x30];
+    s16 x, y, z;
+    u8 pad36[0x832];
+    u32 flags;
+};
+struct BossInit {
+    u8 pad0[0x48];
+    struct BossBody body;
+    u32 pending;
+    u8 pad94[0xE];
+    u8 impactState;
+    u8 padA3[0x1];
+    u32 impactTimer;
+    u8 padA8[0x3];
+    u8 animationReady;
+    u8 action;
+    u8 subaction;
+    u8 choice;
+    u8 padAF[0x1];
+    u8 queued;
+    u8 restart;
+    u8 padB2[0x1];
+    u8 special;
+    u8 padB4[0x10];
+    u32 timer;
+    u8 padC8[0x28];
+    u32 eventScripts[0x4];
+    void *animationCallback;
+    void *damageCallback;
+    void *stateCallback;
+    u32 targets[0x1A];
+    u8 targetCount;
+    u8 pad175[0x1];
+    u16 damage;
+    u8 pad178[0x54];
+    u8 attackCollider[0xA8];
+    u16 firstThreshold;
+    u16 secondThreshold;
+    u8 cell[0x10];
+    u8 bounds[0x24];
+    struct FDE0Header resource;
+    struct BossWidget widget;
+    u8 sprite[0xB0];
+    u8 shadow[0x40];
+    void *frostEmitter;
+    u8 pad420[0x8];
+    u8 volume[0x3C];
+    u32 signalTimer;
+    u8 pad468[0xE];
+    u8 signalPending;
+    u8 pad477[0x69];
+    u8 volumeEnabled;
+    u8 volumeState;
+    u8 pad4E2[0x3];
+    u8 volumeTimer;
+    u16 volumeFlags;
+    u8 pad4E8[0x2];
+    u8 mode;
+    u8 pad4EB[0x7];
+    s16 floorHeight;
+    u8 pad4F4[0x2];
+    u16 parameter;
+    u16 radius;
+    s16 colliderRadius;
+    u16 range;
+    s16 volumeParameter;
+    u16 height;
+    u8 pad502[0x2];
+    u8 effectState;
+    u8 pad505[0x1];
+    u8 effectIndex;
+    u8 effectCount;
+    u32 effectResource;
+    u8 effectEnabled;
+    u8 pad50D[0x12];
+    u8 active;
+    u8 pad520[0xE0];
+    u8 tiles0[0x200];
+    u8 tiles1[0x200];
+    u8 tiles2[0x200];
+    u8 tiles3[0x20];
+    u8 padC20[0x10];
+    struct CameraSetup camera;
+    u8 padC48[0x18];
+    u32 firstSummon;
+    u32 secondSummon;
+};
+
+static inline void SetDamageCallback(struct BossInit *p, void *callback)
 {
-    u32 pos[2];
+    p->damageCallback = callback;
+}
+static inline void SetStateCallback(struct BossInit *p, void *callback)
+{
+    p->stateCallback = callback;
+}
+
+// confidence=low: boss actor setup from its script, sprite and collider init, VRAM copies
+s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
+{
+    struct PackedPosition {
+        s32 x : 16;
+        s32 y : 16;
+        s32 z : 16;
+        s32 pad : 16;
+    } pos;
     s32 mode;
     s32 count;
-    s32 i;
+    register s32 i asm("r4");
     s32 sl;
     u32 flags;
     u8 *res;
     u32 *dst;
     u32 *src;
-    u8 *gp;
+    u8 *targets;
+    u32 *cameraTarget;
+    u8 *volumePosition;
+    u32 zero;
+    struct BossInit *actor = boss;
 
-    gp = *(u8 **)0x02000710;
-    *(u32 *)(gp + 0x868) |= 0x400;
+    {
+        struct BossContext *gp = *(struct BossContext **)0x02000710;
+        gp->flags |= 0x400;
+    }
 
     mode = Script_GetKeywordValue(0x74, 2);
     if (mode != 2)
         return -1;
-    SceneActors_Register(arg0, 2);
-    FDE0_AT(u16, 0x4F6) = Script_GetKeywordValue(0x42, 0);
-    FDE0_AT(u8, 0xB3) = Script_GetKeywordValue(0x69, 0);
+    SceneActors_Register((u8 *)actor, 2);
+    boss->parameter = Script_GetKeywordValue(0x42, 0);
+    boss->special = Script_GetKeywordValue(0x69, 0);
     count = Script_GetKeywordValue(0x50, 1);
-    FDE0_AT(u8, 0x174) = count;
-    dst = (u32 *)(arg0 + 0x10C);
-    src = (u32 *)0x02000580;
-    for (i = 0; i < FDE0_AT(u8, 0x174); i++) {
-        if (*src != 0) {
-            dst[0] = *src;
-            dst[1] = *src + 0x30;
-        } else {
-            dst[0] = 0;
-            dst[1] = 0;
-        }
-        dst++;
-        src++;
+    boss->targetCount = count;
+    i = 0;
+    if (i < boss->targetCount) {
+        targets = &boss->targetCount;
+        dst = boss->targets;
+        src = (u32 *)0x02000580;
+        do {
+            if (*src != 0) {
+                u32 value = *src;
+                dst[0] = value;
+                dst[1] = value + 0x30;
+            } else {
+                dst[0] = 0;
+                dst[1] = 0;
+            }
+            dst++;
+            src++;
+            i++;
+        } while (i < *targets);
     }
 
     res = ScriptProc_Start(0xCB05, 0xDE23);
     if (res == 0)
         return -1;
-    *(struct FDE0Header *)(arg0 + 0x2AC) = *(struct FDE0Header *)res;
-    ResourceHeader_Relocate(arg0 + 0x2AC, res);
+    boss->resource = *(struct FDE0Header *)res;
+    ResourceHeader_Relocate(&boss->resource, res);
 
     if (Script_SeekToKeyword(0x70)) {
-        pos[0] = (pos[0] & 0xFFFF0000) | (u16)Script_GetValue();
-        pos[0] = (pos[0] & 0x0000FFFF) | (Script_GetValue() << 16);
-        pos[1] = (pos[1] & 0xFFFF0000) | (u16)Script_GetValue();
+        pos.x = Script_GetValue();
+        pos.y = Script_GetValue();
+        pos.z = Script_GetValue();
         flags = ((Script_GetValue() << 29) + 0xA0000000u) >> 24;
     } else {
-        pos[0] = (pos[0] & 0xFFFF0000) | *(u16 *)(gp + 0x30);
-        pos[0] = (pos[0] & 0x0000FFFF) | (*(u16 *)(gp + 0x32) << 16);
-        pos[1] = (pos[1] & 0xFFFF0000) | *(u16 *)(gp + 0x34);
+        struct BossContext *gp = *(struct BossContext **)0x02000710;
+        pos.x = gp->x;
+        pos.y = gp->y;
+        pos.z = gp->z;
         flags = 0x40;
     }
-    FDE0_AT(s16, 0x4F2) = (s16)(pos[0] >> 16);
+    boss->floorHeight = pos.y;
 
     if (Script_SeekToKeyword(0x73)) {
         sl = Script_GetValue();
-        FDE0_AT(u16, 0x274) = Script_GetValue();
-        FDE0_AT(u16, 0x276) = Script_GetValue();
-        FDE0_AT(u16, 0x176) = Script_GetValue();
+        boss->firstThreshold = Script_GetValue();
+        boss->secondThreshold = Script_GetValue();
+        boss->damage = Script_GetValue();
     } else {
         sl = 0x3E8;
-        FDE0_AT(u16, 0x176) = 0x14;
+        boss->damage = 0x14;
     }
 
     if (Script_SeekToKeyword(0x61)) {
-        FDE0_AT(u16, 0x4F8) = Script_GetValue();
-        FDE0_AT(u16, 0x4FA) = Script_GetValue();
-        FDE0_AT(u16, 0x4FC) = Script_GetValue();
-        FDE0_AT(u16, 0x4FE) = Script_GetValue();
-        FDE0_AT(u16, 0x500) = Script_GetValue();
+        boss->radius = Script_GetValue();
+        boss->colliderRadius = Script_GetValue();
+        boss->range = Script_GetValue();
+        boss->volumeParameter = Script_GetValue();
+        boss->height = Script_GetValue();
     } else {
-        FDE0_AT(u16, 0x4F8) = 0x10;
-        FDE0_AT(u16, 0x4FA) = 0x10;
-        FDE0_AT(u16, 0x4FC) = 0x10;
-        FDE0_AT(u16, 0x4FE) = 0x10;
-        FDE0_AT(u16, 0x500) = 0x20;
+        boss->radius = 0x10;
+        boss->colliderRadius = 0x10;
+        boss->range = 0x10;
+        boss->volumeParameter = 0x10;
+        boss->height = 0x20;
     }
 
-    SceneActors_Initialize(arg0, arg1, mode, pos, flags);
-    CellObject_Init(arg0 + 0x278, pos);
-    SceneBody_SetMovementProbe(arg0 + 0x48, arg0 + 0x278, 0x23, 0x23);
-    TerrainOverlay_QueueAddActor(arg0 + 0x48);
-    Widget_InitLinked(arg0 + 0x2CC, arg0 + 0x2AC, 0, 0, 2, 0, 0x3C, pos);
-    Anim_SelectPaletteBank(arg0 + 0x2CC, 0x34);
-    SceneActors_StartUnmirroredAnimation(arg0, arg0 + 0x2CC, arg0 + 0x2AC, 0xF4, 1, 0);
-    SpriteComponent_Init(arg0 + 0x32C);
-    SpriteComponent_ConfigureCollider(arg0 + 0x32C, *(s16 *)(arg0 + 0x4FA), 0x40, 0x1E);
-    FDE0_AT(void *, 0x41C) = FrostEmitter_Create();
+    SceneActors_Initialize((u8 *)actor, arg1, mode, &pos, flags);
+    CellObject_Init(boss->cell, &pos);
+    SceneBody_SetMovementProbe(&actor->body, boss->cell, 0x23, 0x23);
+    TerrainOverlay_QueueAddActor(&actor->body);
+    Widget_InitLinked(&boss->widget, &boss->resource, 0, 0, 2, 0, 0x3C, &pos);
+    Anim_SelectPaletteBank(&boss->widget, 0x34);
+    SceneActors_StartUnmirroredAnimation((u8 *)actor, &boss->widget, &boss->resource, 0xF4, 1, 0);
+    SpriteComponent_Init(boss->sprite);
+    SpriteComponent_ConfigureCollider(boss->sprite, boss->colliderRadius, 0x40, 0x1E);
+    boss->frostEmitter = FrostEmitter_Create();
 
-    FDE0_AT(u8, 0x4EA) = 0;
-    FDE0_AT(u8, 0xAC) = 0;
-    FDE0_AT(u8, 0xAD) = 0;
-    FDE0_AT(u8, 0xAE) = 0;
-    FDE0_AT(u32, 0xC4) = 0;
-    FDE0_AT(u8, 0xB0) = 1;
-    FDE0_AT(u8, 0xAB) = 1;
-    FDE0_AT(void *, 0x100) = ActorAnimation_UpdateDirectional;
-    FDE0_AT(u32, 0x90) = 0;
-    FDE0_AT(u8, 0xB1) = 1;
-    FDE0_AT(u8, 0xA2) = 0;
-    FDE0_AT(u32, 0xA4) = 0;
-    FDE0_AT(void *, 0x104) = BossSlot2_ApplyPendingDamage;
-    FDE0_AT(void *, 0x108) = BossSlot2_InitStateDispatch;
+    actor->mode = 0;
+    actor->action = 0;
+    actor->subaction = 0;
+    actor->choice = 0;
+    actor->timer = 0;
+    actor->queued = 1;
+    {
+        void *callback = ActorAnimation_UpdateDirectional;
+        actor->animationReady = 1;
+        actor->animationCallback = callback;
+    }
+    actor->pending = 0;
+    actor->restart = 1;
+    actor->impactState = 0;
+    actor->impactTimer = 0;
+    SetDamageCallback(actor, BossSlot2_ApplyPendingDamage);
+    SetStateCallback(actor, BossSlot2_InitStateDispatch);
 
-    SceneActors_SetHealthLimits(arg0, sl, sl, 0);
-    ActorImpact_InitAttackCollider(arg0);
-    ActorImpact_InitBodyCollider(arg0, 0);
-    ActorImpact_InitCollider(arg0);
+    SceneActors_SetHealthLimits((u8 *)actor, sl, sl, 0);
+    ActorImpact_InitAttackCollider((u8 *)boss);
+    ActorImpact_InitBodyCollider((u8 *)boss, 0);
+    ActorImpact_InitCollider((u8 *)boss);
 
     if (Script_SeekToKeyword(0x65)) {
-        u32 *p = (u32 *)(arg0 + 0xC60);
-        p[0] = Script_GetValue();
-        p[1] = Script_GetValue();
+        u32 *p;
+        u32 clear;
+        cameraTarget = &actor->targets[1];
+        volumePosition = actor->body.position;
+        p = &boss->firstSummon;
+        i = 1;
+        do {
+            *p++ = Script_GetValue();
+        } while (--i >= 0);
     } else {
-        *(u32 *)(arg0 + 0xC64) = 0;
-        *(u32 *)(arg0 + 0xC60) = 0;
+        u32 *p;
+        u32 clear;
+        cameraTarget = &actor->targets[1];
+        volumePosition = actor->body.position;
+        clear = 0;
+        i = 1;
+        p = &boss->secondSummon;
+        do {
+            *p-- = clear;
+        } while (--i >= 0);
     }
 
     if (Script_SeekToKeyword(0x63)) {
         s32 a = Script_GetValue();
         s32 b = Script_GetValue();
-        SceneActors_SetEventScripts(arg0, a, b);
+        SceneActors_SetEventScripts((u8 *)actor, a, b);
     } else {
-        SceneActors_SetEventScripts(arg0, 0, 0);
+        SceneActors_SetEventScripts((u8 *)actor, 0, 0);
     }
 
     if (Script_SeekToKeyword(0x41)) {
-        u32 *p = (u32 *)(arg0 + 0xF0);
-        for (i = 0; i <= 3 && Script_GetPc() != 0; i++)
+        u32 *p;
+        i = 0;
+        p = actor->eventScripts;
+        for (; i <= 3 && Script_GetPc() != 0; i++)
             *p++ = Script_GetValue();
     }
 
-    SceneActors_InitConvergingParticles(arg0);
-    Shadow_Initialize(arg0 + 0x3DC, arg0 + 0x2EC, 0);
-    ProximityVolume_InitializeCallbacks(arg0 + 0x428);
-    ProximityVolume_SetParameter(arg0 + 0x428, *(s16 *)(arg0 + 0x4FE));
-    FDE0_AT(u8, 0x4E0) = 1;
-    FDE0_AT(u8, 0x4E1) = 0;
-    FDE0_AT(u8, 0x4E5) = 0;
-    FDE0_AT(u16, 0x4E6) = 0;
+    SceneActors_InitConvergingParticles((u8 *)boss);
+    Shadow_Initialize(boss->shadow, (u8 *)boss + 0x2EC, 0);
+    ProximityVolume_InitializeCallbacks(boss->volume);
+    ProximityVolume_SetParameter(boss->volume, boss->volumeParameter);
+    boss->volumeEnabled = 1;
+    boss->volumeState = 0;
+    boss->volumeTimer = 0;
+    boss->volumeFlags = 0;
 
     {
         u8 *srcp;
         u8 *dstp;
-        u32 off = 0x680;
-        dstp = arg0 + 0x600;
-        for (i = 15; i >= 0; i--) {
-            CpuSet(*(u8 **)0x030042E4 + off, dstp, 0x04000008);
+        u32 off;
+        u8 **tiles = (u8 **)0x030042E4;
+        dstp = boss->tiles0;
+        off = 0x680;
+        i = 15;
+        do {
+            srcp = *tiles + off;
+            CpuSet(srcp, dstp, 0x04000008);
             dstp += 0x20;
             off += 0x20;
-        }
+        } while (--i >= 0);
         srcp = *(u8 **)0x030042E4 + 0x3240;
-        dstp = arg0 + 0x800;
-        for (i = 15; i >= 0; i--) {
+        dstp = boss->tiles1;
+        i = 15;
+        do {
             CpuSet(srcp, dstp, 0x04000008);
             dstp += 0x20;
-        }
+        } while (--i >= 0);
         srcp = *(u8 **)0x030042E4 + 0x3240;
-        dstp = arg0 + 0xA00;
-        for (i = 15; i >= 0; i--) {
+        dstp = boss->tiles2;
+        i = 15;
+        do {
             CpuSet(srcp, dstp, 0x04000008);
             dstp += 0x20;
-        }
-        CpuSet(srcp, arg0 + 0xC00, 0x04000008);
+        } while (--i >= 0);
+        zero = 0;
+        CpuSet(srcp, boss->tiles3, 0x04000008);
     }
 
-    *(u8 **)(arg0 + 0x314) = arg0 + 0x600;
-    FDE0_AT(u8, 0x506) = 0;
-    FDE0_AT(u32, 0x508) = 0x34;
-    FDE0_AT(u8, 0x504) = 0;
-    FDE0_AT(u8, 0x507) = 5;
-    FDE0_AT(u8, 0x50C) = 1;
-    CameraFollow_Initialize(arg0 + 0xC30, FDE0_AT(u32, 0x110), arg0 + 0x2EC, 1);
-    *(u32 *)(arg0 + 0xC40) = 0;
-    *(u32 *)(arg0 + 0xC44) = 0x8C;
-    SceneActors_SetDamageCallback(arg0, arg0 + 0x1CC, sub_0817A7C8, FDE0_AT(u16, 0x176));
-    ProximityVolume_TranslateBounds(arg0 + 0x288, arg0 + 0x54);
+    boss->widget.tileData = boss->tiles0;
+    boss->effectIndex = zero;
+    boss->effectResource = 0x34;
+    boss->effectState = zero;
+    boss->effectCount = 5;
+    boss->effectEnabled = 1;
+    CameraFollow_Initialize(&boss->camera, *cameraTarget, (u8 *)boss + 0x2EC, 1);
+    {
+        struct CameraSetup *camera = &boss->camera;
+        u32 distance = 0x8C;
+        camera->timer = zero;
+        camera->distance = distance;
+    }
+    SceneActors_SetDamageCallback((u8 *)actor, boss->attackCollider, sub_0817A7C8, boss->damage);
+    ProximityVolume_TranslateBounds(boss->bounds, volumePosition);
     Task4E01_Destroy();
     TimedEffect_GetOrCreateManager(0x11);
-    FDE0_AT(u8, 0x476) = 0;
-    FDE0_AT(u32, 0x464) = 0;
-    FDE0_AT(u8, 0x51F) = 0;
+    boss->signalPending = zero;
+    boss->signalTimer = zero;
+    boss->active = zero;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0817FDE0);
-#endif
