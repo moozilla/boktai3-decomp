@@ -7,6 +7,8 @@
         --header include/render.h [--note '...']
     python3 tools/ramlayout.py unify --batch FILE --header include/render.h   # ADDR | DECL | NOTE lines
     python3 tools/ramlayout.py seed [--kit DIR]  # (re)build rows from the ELF and layoutmerge
+    python3 tools/ramlayout.py annotate [--range LO-HI]   # put /* 0xADDR */ before each shared declaration
+    python3 tools/ramlayout.py users 03004290   # which functions access an address (needs layoutmerge output)
 
 Columns: addr, name, size (hex bytes, blank when unknown), kind (object, or
 interior for a label inside another object), decl (the one declaration, with
@@ -97,7 +99,8 @@ def split_top(s, sep=","):
     return parts + [cur]
 
 
-DECL = re.compile(r"^[ \t]*extern\s+([^;(){}=]*?)\s*;[ \t]*(/\*.*?\*/|//[^\n]*)?[ \t]*\n", re.M | re.S)
+ADDR_COMMENT = r"/\*\s*0x[0-9A-Fa-f]{8}\s*\*/"
+DECL = re.compile(r"^(?:[ \t]*" + ADDR_COMMENT + r"[ \t]*\n)?[ \t]*extern\s+([^;(){}=]*?)\s*;[ \t]*(/\*.*?\*/|//[^\n]*)?[ \t]*\n", re.M | re.S)
 
 
 def declarations(text, name):
@@ -220,6 +223,9 @@ def cmd_check(a):
     print(f"{len(objs)} objects ({sum(1 for r in objs if r['size'])} sized, {m['total_data']} bytes); "
           + ", ".join(f"{v} {k}" for k, v in sorted(counts.items())))
     print(f"declared in one header: {m['matched_data']} bytes; no other declaration left: {m['complete_data']} bytes")
+    miss = missing_comments(rows)
+    if miss:
+        print(f"{len(miss)} shared declarations lack their /* 0xADDR */ comment (python3 tools/ramlayout.py annotate)")
     sys.exit(1 if bad else 0)
 
 
@@ -238,6 +244,129 @@ def cmd_show(a):
     for d, ps in sorted(forms.items(), key=lambda kv: -len(kv[1])):
         print(f"  {len(ps):4}  {d}   e.g. {ps[0]}")
     print(f"  used by {len(i['uses'])} files")
+
+
+# --- address comments -----------------------------------------------------
+
+def annotated(text, r):
+    """`text` with the declaration of row `r` preceded by a `/* 0xADDR */` line, so
+    go-to-definition on the name shows where the object lives. Unchanged text
+    if the declaration isn't there (or shares its line with another)."""
+    if not (r.get("decl") and r.get("header")):
+        return text
+    canon, name = parse_decl(r["decl"])
+    for m, spec, decls, idx in declarations(text, name):
+        if len(decls) != 1 or norm(spec, decls[0], name, name) != canon:
+            continue
+        line = m.group(0)
+        at = line.index("extern")
+        at = line.rindex("\n", 0, at) + 1 if "\n" in line[:at] else 0      # start of the extern line
+        indent = line[at:len(line) - len(line[at:].lstrip(" \t"))]
+        return text[:m.start()] + f"{indent}/* 0x{r['addr']} */\n" + text[m.start() + at:]
+    return text
+
+
+def in_range(r, rng):
+    lo, hi = rng
+    return lo <= int(r["addr"], 16) <= hi
+
+
+def parse_range(s):
+    if not s:
+        return (0, 1 << 32)
+    lo, hi = (int(x, 16) for x in s.split("-"))
+    return (lo, hi)
+
+
+def clang_format(text, path):
+    cf = os.path.join(ROOT, "build", "venv", "bin", "clang-format")
+    if not os.path.exists(cf):
+        return text
+    out = subprocess.run([cf, "--assume-filename=" + path], input=text, cwd=ROOT,
+                         capture_output=True, text=True).stdout
+    return out or text
+
+
+def cmd_annotate(a):
+    rows = [r for r in load() if r["header"] and r["decl"] and in_range(r, parse_range(a.range))]
+    by_header = {}
+    for r in rows:
+        by_header.setdefault(r["header"], []).append(r)
+    done = 0
+    for h, rs in sorted(by_header.items()):
+        old = read(h)
+        new = old
+        for r in rs:
+            new = annotated(new, r)
+        if new == old:
+            continue
+        if clang_format(old, h) == old:         # keep a formatted header formatted
+            new = clang_format(new, h)
+        done += sum(1 for r in rs if annotated(old, r) != old)
+        if not a.dry_run:
+            write({h: new}, [h])
+    print(f"{done} declarations {'need' if a.dry_run else 'got'} an address comment")
+
+
+def missing_comments(rows):
+    """Rows whose shared declaration lacks its /* 0xADDR */ comment."""
+    out = []
+    texts = {}
+    for r in rows:
+        if r["header"] and r["decl"]:
+            t = texts.setdefault(r["header"], read(r["header"]))
+            if annotated(t, r) != t:
+                out.append(r)
+    return out
+
+
+# --- which functions access an object ---------------------------------------
+
+LAYOUTS = os.path.join(ROOT, "build", "layouts", "layouts.json")
+
+
+def cmd_users(a):
+    """Functions whose ROM code touches an address, from layoutmerge's literal-pool scan."""
+    rows = load()
+    try:
+        r = find(rows, a.addr)
+        lo = int(r["addr"], 16)
+        label = f"{r['addr']} {r['name']}"
+    except SystemExit:
+        lo = int(a.addr, 16)
+        label = f"{lo:08X}"
+        r = None
+    size = a.size or (int(r["size"], 16) if r and r["size"] else 1)
+    hi = lo + size
+    if not os.path.exists(LAYOUTS):
+        sys.exit("build/layouts/layouts.json is missing: run python3 tools/layoutmerge.py first")
+    lay = json.load(open(LAYOUTS))
+    by_func = {}
+    for key, e in lay.items():
+        name, space = key.rsplit(":", 1)
+        if space != ("pointee" if a.pointee else "direct"):
+            continue
+        base = e["addr"]
+        for acc in e.get("rom", []):
+            x = base + acc["off"]
+            if not lo <= x < hi:
+                continue
+            f = by_func.setdefault(acc["func"], {"ld": 0, "st": 0, "escape": 0, "bulk": 0, "offs": set(), "w": set()})
+            if acc["form"] == "escape":
+                f["escape"] += 1
+            elif acc["form"] == "bulk" or acc["form"].startswith("bulk"):
+                f["bulk"] += 1
+            else:
+                f["ld" if acc["load"] else "st"] += 1
+            f["offs"].add(x - lo)
+            if acc["width"]:
+                f["w"].add(acc["width"])
+    print(f"{label} (+0..+{size:X}){' pointee' if a.pointee else ''}: {len(by_func)} functions in ROM")
+    for fn, f in sorted(by_func.items()):
+        parts = [f"{f[k]} {k}" for k in ("ld", "st", "escape", "bulk") if f[k]]
+        offs = sorted(f["offs"])
+        where = ",".join(f"+{o:X}" for o in offs[:6]) + ("..." if len(offs) > 6 else "")
+        print(f"  {fn:28} {', '.join(parts):28} {where}")
 
 
 def find(rows, addr):
@@ -410,7 +539,7 @@ def cmd_unify(a):
             new[p] = drop_defs(t, defs)
         h = new[a.header]
         if not any(norm(s, d[i], name, name) == c for _, s, d, i in declarations(h, name)):
-            line = decl.strip() + (f" /* {note} */" if note else "")
+            line = f"/* 0x{r['addr']} */\n" + decl.strip() + (f" /* {note} */" if note else "")
             h = h[:h.rindex("#endif")].rstrip("\n") + "\n" + line + "\n\n#endif\n"
             new[a.header] = h
     changed = [p for p in new if new[p] != texts.get(p)]
@@ -691,6 +820,13 @@ def main():
     s.add_argument("-v", "--verbose", action="store_true")
     s = sub.add_parser("show")
     s.add_argument("addr")
+    s = sub.add_parser("annotate", help="put /* 0xADDR */ before each shared declaration")
+    s.add_argument("--range", help="LO-HI, hex: only rows in this address range")
+    s.add_argument("--dry-run", action="store_true")
+    s = sub.add_parser("users", help="functions whose ROM code accesses an address (needs layoutmerge output)")
+    s.add_argument("addr", help="address or object name")
+    s.add_argument("--size", type=lambda x: int(x, 16), help="bytes (hex) to cover; default the row's size")
+    s.add_argument("--pointee", action="store_true", help="accesses through the pointer stored here")
     s = sub.add_parser("seed")
     s.add_argument("--kit", help="research kit directory with layout/reviewed_address_map.json")
     s = sub.add_parser("unify")
@@ -706,7 +842,8 @@ def main():
     s.add_argument("--dry-run", action="store_true")
     s.add_argument("--jobs", type=int, default=os.cpu_count())
     a = ap.parse_args()
-    {"check": cmd_check, "show": cmd_show, "seed": cmd_seed, "unify": cmd_unify}[a.cmd](a)
+    {"check": cmd_check, "show": cmd_show, "seed": cmd_seed, "unify": cmd_unify,
+     "annotate": cmd_annotate, "users": cmd_users}[a.cmd](a)
 
 
 if __name__ == "__main__":
