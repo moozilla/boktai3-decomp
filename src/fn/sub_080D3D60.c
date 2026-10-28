@@ -38,7 +38,7 @@ static inline u32 PickTurn(u32 dir, u32 mask)
             u32 v;
             gRandomIndex = index;
             index *= 2;
-            v = *((const u16 *)(index + ((u32)gUnk_0203B400)));
+            v = *((const u16 *)(index + ((u32)gRandomTable)));
             d = (v & mask) << 6;
         }
         if (d != dir)

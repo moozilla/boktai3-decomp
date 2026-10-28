@@ -2,6 +2,7 @@
 #include "global.h"
 #include "render.h"
 #include "engine_globals.h"
+#include "ram.h"
 #define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
 struct Slot7PackedPosition {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -9,7 +10,6 @@ struct Slot7PackedPosition {
 extern void *gSceneCamera;
 extern u8 *gParticipantActors;
 extern u8 gUnk_03005040[];
-extern const u16 gUnk_0203B400[];
 void Collider_SetFixedPositionWithYOffset(void *, void *, s32);
 void SpatialIndex_InsertEntry(void *);
 void CpuSet(const void *, void *, u32);
@@ -42,7 +42,7 @@ static inline u8 IsSceneHidden(void)
 static inline u32 Random(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gUnk_0203B400[gRandomIndex];
+    return gRandomTable[gRandomIndex];
 }
 static inline void CopyFourPalettes(u8 *source, u8 *dest)
 {
@@ -118,15 +118,15 @@ static inline void EmitDepartureParticle(u8 *actor, u32 zero)
     struct Slot7PackedPosition position;
     s32 dx, dz;
     u32 index = (gRandomIndex + 1) & 1023;
-    position.x = (gUnk_0203B400[index] & 15) + FIELD(actor, 0x5D8, u16) - 8;
+    position.x = (gRandomTable[index] & 15) + FIELD(actor, 0x5D8, u16) - 8;
     index = (index + 1) & 1023;
-    position.y = (gUnk_0203B400[index] & 7) + FIELD(actor, 0x5DA, u16) - 12;
+    position.y = (gRandomTable[index] & 7) + FIELD(actor, 0x5DA, u16) - 12;
     position.z = 100;
     index = (index + 1) & 1023;
-    dx = ((gUnk_0203B400[index] & 15) - 8) << 10;
+    dx = ((gRandomTable[index] & 15) - 8) << 10;
     index = (index + 1) & 1023;
     gRandomIndex = index;
-    dz = -(s32)((gUnk_0203B400[index] & 7) << 10);
+    dz = -(s32)((gRandomTable[index] & 7) << 10);
     SpriteParticle_InitParams(params);
     SpriteParticle_SetMotionParams(params, 0, (Random() & 15) + 0x34, 0, zero);
     if (FIELD(actor, 0x5A6, s16) == 0) {
@@ -145,10 +145,10 @@ static inline void EmitDepartureParticle(u8 *actor, u32 zero)
         }
     } else {
         index = (gRandomIndex + 1) & 1023;
-        position.x = (gUnk_0203B400[index] & 15) + FIELD(actor, 0x324, u16) - 8;
+        position.x = (gRandomTable[index] & 15) + FIELD(actor, 0x324, u16) - 8;
         index = (index + 1) & 1023;
         gRandomIndex = index;
-        position.y = (gUnk_0203B400[index] & 7) + FIELD(actor, 0x326, u16);
+        position.y = (gRandomTable[index] & 7) + FIELD(actor, 0x326, u16);
         position.z = 100;
         SpriteParticle_SetMotionParams(params, 0, 42, 0, zero);
         SetDepartureResource(actor, params, 2);

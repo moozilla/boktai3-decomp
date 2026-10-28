@@ -10,7 +10,7 @@
 #include "scene_actor_reset.h"
 #include "engine.h"
 #include "player.h"
-extern const u16 gUnk_0203B400[];
+#include "ram.h"
 s32 Mod(s32, s32);
 void SparkParticle_Spawn(void *, u32, void *, s32, s32, s32, s32, s32);
 void Lun_ResumeAfterLiftPenalty(void);
@@ -58,7 +58,7 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u32 state, u3
 static inline u32 Rand(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gUnk_0203B400[gRandomIndex];
+    return gRandomTable[gRandomIndex];
 }
 static inline s32 Quarter(s32 v)
 {

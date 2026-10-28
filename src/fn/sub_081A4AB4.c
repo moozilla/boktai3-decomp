@@ -20,7 +20,6 @@ struct ImpactPool {
     u8 unknown0[0x5C];
     s16 parameterA, parameterB, parameterC;
 };
-extern const u16 gUnk_0203B400[];
 void ExplosionEffect_CreateConfigured(void *, s32, s32, s32, u32, s32, s32, s32);
 static inline s32 randomValue(const u16 *table)
 {
@@ -38,7 +37,7 @@ void Hresvelgr_EmitImpactExplosions(struct ImpactActor *actor)
     for (i = 0; i < 8; i++) {
         *p = actor->position;
         if (i > 0) {
-            const u16 *table = gUnk_0203B400;
+            const u16 *table = gRandomTable;
             s32 dx = ((randomValue(table) >> 3) % 512) - 256;
             s32 dz;
             asm("" : "+r"(dx));

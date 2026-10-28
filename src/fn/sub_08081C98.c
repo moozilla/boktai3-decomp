@@ -52,7 +52,7 @@ static inline void Reaction_SpawnPart(u8 *group)
 {
     struct ContactPosition velocity, scale, position;
     const struct ContactPosition *source;
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     velocity.x = (Reaction_Random(table) & 15) - 7;
     velocity.y = (Reaction_Random(table) & 31) - 16;
     velocity.z = (Reaction_Random(table) & 15) - 7;

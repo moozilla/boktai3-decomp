@@ -178,7 +178,7 @@ s32 Task4E01_SpawnImpactChildren(u8 *input)
         randomIndex = &gRandomIndex;
         i = 0;
         do {
-            randomTable = gUnk_0203B400;
+            randomTable = gRandomTable;
             if (config->flags & 0x20) {
                 *(&gRandomIndex) = ((*(&gRandomIndex)) + 1) & 1023;
                 {

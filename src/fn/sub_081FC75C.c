@@ -1,6 +1,6 @@
 #define gRandomTableIndex gRandomIndex
-#define gRandomTable      gUnk_0203B400
 #include "global.h"
+#include "ram.h"
 struct SceneProjectile {
     u32 age;
     u32 flags;
@@ -10,7 +10,6 @@ struct SceneProjectile {
     s32 position[3];
 };
 extern u32 gRandomTableIndex;
-extern const u16 gRandomTable[];
 s32 Mod(s32, s32);
 void SlotMotion_Initialize(u8 *);
 void SceneParticles_SpawnAtPosition(u8 *, s32 *);

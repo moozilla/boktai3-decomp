@@ -59,7 +59,7 @@ void ChargedBurst_EmitTerminalDebris(struct Unk08233760Object *object)
         u32 height = object->height;
         if (height > TerrainHeight(&object->position)) {
             struct Unk08233760PackedVec velocity, extent;
-            const u16 *table = gUnk_0203B400;
+            const u16 *table = gRandomTable;
             u32 *seed = &gRandomIndex;
             register u32 i asm("r2") = *seed + 1;
             u32 mask = 1023;

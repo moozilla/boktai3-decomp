@@ -7,7 +7,7 @@ void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct S
                   u32);
 static inline s32 ActorParticles_NextRandom(void)
 {
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return table[gRandomIndex];
 }

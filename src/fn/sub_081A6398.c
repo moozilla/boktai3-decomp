@@ -1,9 +1,9 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 typedef struct ParticleOffset {
     u32 x : 16, y : 16, z : 16, pad : 16;
 } ParticleOffset;
-extern const u16 gUnk_0203B400[];
 s32 SceneParticle_CreateParticles(const void *anchor, const ParticleOffset *offset,
                                   const void *range, const void *jitter, s32 count, u32 priority);
 // confidence=low: emits four particles from the anchor at p + 0x54, each offset by a random
@@ -25,7 +25,7 @@ void sub_081A6398(u8 *p)
     fill = 0;
     ClearWords(src, dst, 0x05000002);
     for (i = 0; i < 4; i++) {
-        const u16 *table = gUnk_0203B400;
+        const u16 *table = gRandomTable;
         u16 index = (gRandomIndex + 1) & 0x3FF;
         {
             u16 random = table[index];

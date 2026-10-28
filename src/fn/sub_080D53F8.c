@@ -32,7 +32,7 @@ u8 sub_0807AF94(void *);
 u8 Mummy_RequestStraightRoute(void *);
 static inline u32 Mummy_RandomBits(s16 mask)
 {
-    return gUnk_0203B400[gRandomIndex = (gRandomIndex + 1) & 1023] & mask;
+    return gRandomTable[gRandomIndex = (gRandomIndex + 1) & 1023] & mask;
 }
 
 static inline void BeginProbeTurn(void *obj, u32 saved)

@@ -286,7 +286,7 @@ static inline u32 RandomDirectionExcept(u32 current)
     for (i = 0; i <= 3; i++) {
         u32 d;
         gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-        d = (gUnk_0203B400[gRandomIndex] & 3) << 6;
+        d = (gRandomTable[gRandomIndex] & 3) << 6;
         if (d != current)
             return d;
     }

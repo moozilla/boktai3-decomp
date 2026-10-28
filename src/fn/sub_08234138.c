@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 struct E {
     u32 flags;
@@ -25,7 +26,6 @@ struct S {
     u16 timer;
 };
 extern const s16 gUnk_086149C4[];
-extern u16 gUnk_0203B400[];
 u32 AnimData_FindEntry(u32);
 void ParticleSprite_Initialize(void *, u32, u32);
 void Effect_SetOrigin(void *, s32, s32);
@@ -41,7 +41,7 @@ static inline u32 rand8(void)
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    return *(const u8 *)(offset + (u32)gUnk_0203B400);
+    return *(const u8 *)(offset + (u32)gRandomTable);
 }
 static inline u32 rand16t(const u16 *t)
 {
@@ -63,7 +63,7 @@ void sub_08234138(struct S *p)
         SpriteDrawable_SelectTileFrame(e, p->frames, 7);
         Effect_SetPalette(e, 1);
         {
-            register const u16 *t asm("r5") = gUnk_0203B400;
+            register const u16 *t asm("r5") = gRandomTable;
             p->e[i].angle = (seed + i * 32 + (rand16t(t) & 15)) & 255;
             p->e[i].radius = (rand16t(t) & 0x1ff) + 256;
         }

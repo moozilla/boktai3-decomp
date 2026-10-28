@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "engine.h"
+#include "ram.h"
 
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void sub_0809345C(void *, void *);
@@ -59,7 +59,7 @@ static inline u16 Sub080941F4RandomMotion(void)
 
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    table = gUnk_0203B400;
+    table = gRandomTable;
     return *(const u16 *)(offset + (u32)table);
 }
 static inline u32 Sub080941F4Facing(u32 value, u8 *direction)

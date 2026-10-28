@@ -13,7 +13,7 @@ void Slime_TickWaitTimer(struct SceneActorRegistryResetView *actor)
         u32 index = (gRandomIndex + 1) & 1023;
         u32 random;
         gRandomIndex = index;
-        random = *(u16 *)(index * 2 + (u32)gUnk_0203B400);
+        random = *(u16 *)(index * 2 + (u32)gRandomTable);
         q->timer = (random & 63) + 0x40;
     }
     if (q->timer)

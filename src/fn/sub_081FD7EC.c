@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct OrbitVec {
     s16 x, y, z, pad;
 };
@@ -24,7 +25,6 @@ struct OrbitEffectState {
     u8 pad58[0xf4 - 0x58];
     s16 wide, count, phase;
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 extern const u32 gUnk_0824FE34[4];
 extern const u32 gUnk_08613F88[4];

@@ -296,7 +296,7 @@ void WirelessGameItem_SetRandomArcVelocity(struct WirelessGameItem *arg, int bas
 {
     struct WirelessGameItem *p = arg;
     int base = baseArg;
-    u16 *table = gUnk_0203B400;
+    u16 *table = gRandomTable;
     u32 *state = &gRandomIndex;
     u32 limit;
     u32 index;
@@ -329,7 +329,7 @@ void WirelessGameItem_SetRandomNegativeArcVelocity(struct WirelessGameItem *p, i
     {
         u32 offset = index * 2;
         int random;
-        random = *(u16 *)((u8 *)gUnk_0203B400 + offset);
+        random = *(u16 *)((u8 *)gRandomTable + offset);
         random &= mask;
         {
             int result = base + random;
@@ -394,7 +394,7 @@ static inline void Item_LoadFrame(struct WirelessGameItems *owner, struct Wirele
 
 static inline u32 Item_NextRandom(void)
 {
-    register const u16 *t asm("r6") = gUnk_0203B400;
+    register const u16 *t asm("r6") = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return t[gRandomIndex];
 }
@@ -1475,7 +1475,7 @@ void WirelessGameDisplay_UpdateRoundAnnouncement(struct WirelessGameDisplay *p)
         int value;
         int bits;
         q = p->drawings;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         state = &gRandomIndex;
         index = *state + 1;
         limit = 1023;
@@ -1528,7 +1528,7 @@ void WirelessGameDisplay_UpdateShakeAnimation(struct WirelessGameDisplay *arg)
         int value;
         int mask;
         q = p->drawings;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         state = &gRandomIndex;
         index = *state + 1;
         limit = 1023;

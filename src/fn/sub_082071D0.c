@@ -21,7 +21,7 @@ s32 VulcanCannon_UpdateDefeatEffects(struct VulcanCannon *p)
             CopyPosition(&position, &p->display.spatial.position);
             RaisePosition(&position);
             gRandomIndex = (gRandomIndex + 1) & 1023;
-            random = *(const u8 *)((u32)gUnk_0203B400 + gRandomIndex * 2);
+            random = *(const u8 *)((u32)gRandomTable + gRandomIndex * 2);
             SpriteParticle_CreateDefaultVariant4384(&position, 128, 32, 12, 12, 24, random, 32, 32,
                                                     1, 2, 512);
         }

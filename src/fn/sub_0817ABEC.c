@@ -1,10 +1,10 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 /* SceneActors_SpawnDestructionParticles_0817ABEC: same as SceneActors_SpawnDestructionParticles but spawns the sparks on the object itself (provisional name) */
 struct Packed {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
-extern u16 gUnk_0203B400[];
 void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
 void SceneActors_SpawnDestructionParticles_0817ABEC(u8 *p)
 {
@@ -21,7 +21,7 @@ void SceneActors_SpawnDestructionParticles_0817ABEC(u8 *p)
     size.x = 164;
     size.y = 16;
     size.z = 164;
-    table = gUnk_0203B400;
+    table = gRandomTable;
     indexPtr = &gRandomIndex;
     index = *indexPtr;
     index++;

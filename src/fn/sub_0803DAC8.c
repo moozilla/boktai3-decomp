@@ -43,7 +43,7 @@ void ScenePool_ScheduleSpeedControl(struct ScenePoolEntry *entry)
                 register u32 *index asm("r0") = &gRandomIndex;
                 u32 next = (*index + 1) & 0x3ff;
                 *index = next;
-                random = *(const u8 *)((next << 1) + (u32)gUnk_0203B400);
+                random = *(const u8 *)((next << 1) + (u32)gRandomTable);
                 if (random <= 31)
                     ScenePool_SetSpeedControlSchedule(base, 2, 2, 4);
                 else if (random <= 63)

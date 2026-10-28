@@ -1,12 +1,12 @@
 #include "global.h"
 #include "scene_actor_reset.h"
+#include "ram.h"
 
 // Remaining: route index byte uses r3 instead of r2.
 #define ActorRoute_SelectDistantPoint ActorPhase_SelectDistantWaypoint
 #define ActorRoute_RememberPoint      Axe_RecordRoutePoint
 #define ActorRoute_IsRecentPoint      Axe_IsRoutePointRecent
 #define gRandomTableIndex             gRandomIndex
-#define gRandomTable                  gUnk_0203B400
 struct RoutePointSelection {
     u16 id;
     u8 index, mode;
@@ -20,7 +20,6 @@ struct RouteSelectionPosition {
     s32 pad : 16;
 };
 extern u32 gRandomTableIndex;
-extern const u16 gRandomTable[];
 s32 Mod(s32, s32);
 void ActorRoute_RememberPoint(struct SceneActorRegistryResetView *, u32);
 u8 ActorRoute_IsRecentPoint(struct SceneActorRegistryResetView *, s32);
@@ -39,7 +38,7 @@ inline static u32 Random_SelectDistantWaypoint(void)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     {
         u32 offset = gRandomIndex * 2;
-        const u16 *table = *((typeof(gUnk_0203B400) *)0x0203B400);
+        const u16 *table = *((typeof(gRandomTable) *)0x0203B400);
         return *((u16 *)(offset + ((u32)table)));
     }
 }

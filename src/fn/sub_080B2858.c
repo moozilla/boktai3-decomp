@@ -3,6 +3,7 @@
 #include "scene_actor_terrain.h"
 #include "engine.h"
 #include "player.h"
+#include "ram.h"
 #ifdef NONMATCHING
 // fuzzy: 92.3%
 // fix.py best version (reprinted C)
@@ -96,7 +97,6 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 b)
 
 // confidence=low: distance thresholds select recovery routes.
 extern const u8 gUnk_0824E230[];
-extern const u16 gUnk_0203B400[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 
 u8 Vorn_SelectReachableEscapeCell(void *, u32);
@@ -105,7 +105,7 @@ static inline u32 RandomBits(u32 mask)
 {
     u32 value;
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    value = *(const u16 *)((gRandomIndex * 2) + (u32)gUnk_0203B400);
+    value = *(const u16 *)((gRandomIndex * 2) + (u32)gRandomTable);
     return value & mask;
 }
 static inline u32 PlayerFlags(u8 *player, u32 mask)

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 // MATCHING_CONCESSION: register-pinning
 
@@ -19,7 +20,6 @@ void ActorShadow_Enable(void *);
 void ActorDebris_Show(void *);
 void ActorDebris_Hide(void *);
 void PlayerEffect_SetPaletteSource(void *, u32, u32);
-extern const u16 gUnk_0203B400[];
 
 static inline u8 *offsetR1(u8 *p, u32 off)
 {
@@ -89,7 +89,7 @@ void Player_ApplyControlPresentation(u8 *p)
         u32 random;
         u32 mask;
         gRandomIndex = (gRandomIndex + 1) & 1023;
-        random = *(const u16 *)((gRandomIndex << 1) + (u32)gUnk_0203B400);
+        random = *(const u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
         mask = 15;
         jitter = (random & mask) - 7;
         H(0xAC) += jitter;

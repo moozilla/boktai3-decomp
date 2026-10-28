@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "render.h"
+#include "ram.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -17,12 +18,11 @@ struct Emitter {
     s16 angle, speed;
     u32 count;
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 struct Particle *ParticlePool_FindFreeEntry(struct Emitter *);
 static inline s32 random(void)
 {
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     u32 *indexPtr = &gRandomIndex;
     u32 index = *indexPtr + 1;
     u32 mask = 1023;

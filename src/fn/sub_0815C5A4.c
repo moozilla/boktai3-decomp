@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 struct Vec {
     s16 x, y, z, w;
@@ -14,8 +15,6 @@ struct P {
     u8 b5B8;
     u8 b5B9;
 };
-
-extern const u16 gUnk_0203B400[];
 
 s32 EffectGroup_Spawn(void *, s32, s32, struct Vec *);
 void Sound_PlaySong(s32);
@@ -33,17 +32,17 @@ void PlayerCue_ShakeEffect(struct P *p, s32 a)
     struct Vec v;
 
     if (p->state == 3) {
-        const u16 *t = gUnk_0203B400;
+        const u16 *t = gRandomTable;
         v.x = (randomWith(t) & 7) - 3;
         v.y = (randomWith(t) & 7) - 5;
         v.z = 0;
     } else if (p->state == 4) {
-        const u16 *t = gUnk_0203B400;
+        const u16 *t = gRandomTable;
         v.x = (randomWith(t) & 7) - 3;
         v.y = (randomWith(t) & 7) - 3;
         v.z = 0;
     } else {
-        const u16 *t = gUnk_0203B400;
+        const u16 *t = gRandomTable;
         v.x = (randomWith(t) & 15) - 7;
         v.y = -(randomWith(t) & 31);
         v.z = 0;

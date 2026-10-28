@@ -9,7 +9,7 @@ s32 ScenePool_SelectRepeatedDirection(void *owner, struct ScenePoolEntry *entry)
     if (history[0] > 4) {
         s32 random;
         gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-        random = *(const u8 *)((gRandomIndex << 1) + (u32)gUnk_0203B400);
+        random = *(const u8 *)((gRandomIndex << 1) + (u32)gRandomTable);
         if (random <= 127)
             goto forward;
         goto backward;

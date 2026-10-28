@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 struct PackedVector {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -64,7 +65,6 @@ struct EnvironmentState {
     s16 level;
 };
 extern struct EnvironmentState *gGameState;
-extern u16 gUnk_0203B400[];
 s32 Hresvelgr_GetEnvironmentalLevel(void *);
 void Hresvelgr_EmitRandomMotionBurst(void *);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
@@ -88,7 +88,7 @@ static inline void spawnSparks(struct HresvelgrDamage *p)
     size.x = 256;
     size.y = 256;
     size.z = 256;
-    table = gUnk_0203B400;
+    table = gRandomTable;
     angle = (u8)nextRandom(table);
     count = (nextRandom(table) & 3) + 2;
     speed = (nextRandom(table) & 3) + 20;
@@ -130,7 +130,7 @@ static inline void emitDebris(void *emitter)
 
     for (i = 0; i < 2; i++) {
         struct PackedVector delta = {0};
-        const u16 *table = gUnk_0203B400;
+        const u16 *table = gRandomTable;
         delta.x = (nextRandom(table) & 15) - 8;
         delta.y = nextRandom(table) & 7;
         delta.z = (nextRandom(table) & 15) - 8;

@@ -3,6 +3,7 @@
 #include "script_utility.h"
 #include "engine.h"
 #include "player.h"
+#include "ram.h"
 
 extern const u8 gUnk_08606134[];
 
@@ -55,7 +56,6 @@ void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s3
 void ActorShadow_Disable(void *);
 void ActorParticles_SpawnWideBurst(void *);
 void SceneActorControl_OnIdle(void);
-extern const u16 gUnk_0203B400[];
 void Golem_OnUnusedState(void)
 {
 }
@@ -136,7 +136,7 @@ void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         rangeB.y = 60;
         rangeB.z = 60;
         {
-            register const u16 *table asm("sl") = gUnk_0203B400;
+            register const u16 *table asm("sl") = gRandomTable;
             s32 duration;
             s32 scale;
             SparkParticle_Spawn(&actor->position, RandomFrom(table), &rangeB, 0x20, 4,
@@ -371,7 +371,7 @@ static inline u32 Golem_Reposition(u8 *a, u32 variant)
             v = dir;
             for (i = 0; i <= 3; i++) {
                 gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-                v = (gUnk_0203B400[gRandomIndex] & 3) << 6;
+                v = (gRandomTable[gRandomIndex] & 3) << 6;
                 if (v != (u32)dir)
                     break;
                 v = dir;
@@ -825,7 +825,7 @@ static inline u32 DelayedRecovery_RandomDirectionExcept(u32 current)
     s32 i = 0;
     u32 d;
     do {
-        d = DelayedRecovery_Random(gUnk_0203B400, &gRandomIndex, 0x3FF, 3) << 6;
+        d = DelayedRecovery_Random(gRandomTable, &gRandomIndex, 0x3FF, 3) << 6;
         if (d != current)
             goto chosen;
     } while (++i <= 3);

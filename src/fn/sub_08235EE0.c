@@ -48,7 +48,7 @@ void CallbackGroup_EmitAtPosition(u8 *owner, struct SpPosition *origin)
         struct SpParticle *sprite;
 
         p->active = 1;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         seed = &gRandomIndex;
         *(&i) = (*seed) + 1;
         mask = 1023;

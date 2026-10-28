@@ -2,8 +2,8 @@
 #include "scene_object.h"
 #include "callback_pool.h"
 #include "engine.h"
+#include "ram.h"
 
-extern const u16 gUnk_0203B400[];
 void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
                   u32);
 
@@ -15,7 +15,7 @@ static inline void ClearVector(void *dest, u32 *zero)
 
 static inline s32 NextRandom(void)
 {
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
     return table[gRandomIndex];
 }

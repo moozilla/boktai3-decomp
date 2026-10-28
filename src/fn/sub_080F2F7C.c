@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 // confidence=low: steps the four entry weights and, on a timer, re-aims the pulse at the target.
 
@@ -48,7 +49,6 @@ struct ColorPulse {
     u8 padCF8[0xD80 - 0xCF8];
     u32 flagsD80;
 };
-extern u16 gUnk_0203B400[];
 extern s16 gUnk_086149C4[];
 s32 Div(s32, s32);
 void PhaseObject_BeginEntryMotion(struct ColorPulse *);
@@ -83,7 +83,7 @@ void sub_080F2F7C(struct ColorPulse *p)
             p->posA = *(s16 *)((u8 *)p + 0xC4) - p->origin.x;
             p->posB = *(s16 *)((u8 *)p + 0xC8) - p->origin.z;
             gRandomIndex = (gRandomIndex + 1) & 1023;
-            sel = *(u8 *)&gUnk_0203B400[gRandomIndex];
+            sel = *(u8 *)&gRandomTable[gRandomIndex];
             p->origin.x = p->target->x + Div(gUnk_086149C4[(sel + 64) & 255] * 200, 4096);
             p->origin.y = p->target->y + 350;
             p->origin.z = p->target->z + Div(gUnk_086149C4[sel & 255] * 200, 4096);

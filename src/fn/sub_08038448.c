@@ -18,7 +18,6 @@ struct Save {
     s16 rightRows[16];
 };
 extern struct Save *gGameState;
-extern u16 gUnk_0203B400[];
 void GameState_AddEquipment(int);
 int Mod(int, int);
 
@@ -163,7 +162,7 @@ void WirelessGameMenu_InitEquipmentChoices(struct P *p)
         asm("" : "+r"(write));
         *write = index;
     }
-        start += Mod(gUnk_0203B400[index], 12);
+        start += Mod(gRandomTable[index], 12);
         if (start > 11)
             start -= 12;
     } while (i <= 3);

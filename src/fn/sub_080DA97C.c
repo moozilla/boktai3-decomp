@@ -28,7 +28,7 @@ static inline void ChooseRoute(struct SceneActorRegistryResetView *actor)
         s32 value;
         gRandomIndex = index;
         index *= 2;
-        value = *(const u16 *)((u32)gUnk_0203B400 + index);
+        value = *(const u16 *)((u32)gRandomTable + index);
         value >>= 3;
         choice = Mod(value, route->points->count);
     }

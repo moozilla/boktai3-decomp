@@ -2,6 +2,7 @@
 #include "scene_vec.h"
 #include "display_animation.h"
 #include "engine.h"
+#include "ram.h"
 struct ProximitySequence {
     u8 pad0[0x3c];
     struct SceneVec position;
@@ -15,7 +16,6 @@ struct ProximitySequence {
     u8 padF8[8];
     void *resource;
 };
-extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 void ProximitySequence_TestPlayerDistance(void);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
@@ -51,11 +51,11 @@ s32 ProximitySequence_EmitBurst(struct ProximitySequence *p)
     s32 random, base;
     ProximitySequence_CopyPosition(&position, &p->position);
     ProximitySequence_RaiseOrigin(&position);
-    random = ProximitySequence_NextSpread(gUnk_0203B400);
+    random = ProximitySequence_NextSpread(gRandomTable);
     base = p->spread - 8;
     velocity.x = base + (random & 15);
     velocity.y = 0;
-    velocity.z = base + (ProximitySequence_NextSpread(gUnk_0203B400) & 15);
+    velocity.z = base + (ProximitySequence_NextSpread(gRandomTable) & 15);
     if (!p->variant) {
         attributes = 0x100000;
         palette = 0x1c6;

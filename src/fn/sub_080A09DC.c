@@ -91,7 +91,7 @@ void Crow_ReadSpawnScript(void *input)
         if (((u8)distance) <= 0x19)
             s->distance = 0x1A;
         gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-        value = *((const u16 *)((gRandomIndex * 2) + ((u32)gUnk_0203B400)));
+        value = *((const u16 *)((gRandomIndex * 2) + ((u32)gRandomTable)));
         value &= 0x3F;
         if (Script_GetPc())
             offset = Script_GetValue() + value;

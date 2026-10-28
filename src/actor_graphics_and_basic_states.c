@@ -4,6 +4,7 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "player.h"
+#include "ram.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -488,7 +489,6 @@ end:
 typedef struct ParticleOffset {
     s16 x, y, z, pad;
 } ParticleOffset;
-extern const u16 gUnk_0203B400[];
 s32 SceneParticle_CreateParticles(const void *anchor, const ParticleOffset *offset,
                                   const void *range, const void *jitter, s32 count, u32 priority);
 
@@ -510,7 +510,7 @@ void sub_08022694(u8 *p)
         center.z = 0x40;
     }
     for (i = 0; i < 4; i++) {
-        const u16 *table = gUnk_0203B400;
+        const u16 *table = gRandomTable;
         u16 index = (gRandomIndex + 1) & 0x3FF;
         {
             u16 random = table[index];
@@ -564,7 +564,7 @@ void sub_08022790(u8 *p, s32 big)
         size.y = 16;
         size.z = 128;
     }
-    table = gUnk_0203B400;
+    table = gRandomTable;
     indexPtr = &gRandomIndex;
     index = *indexPtr + 1;
     mask = 1023;
@@ -584,7 +584,6 @@ typedef struct BurstVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 } BurstVec;
 extern const BurstVec gUnk_08604D84[];
-extern const u16 gUnk_0203B400[];
 u16 Sqrt(u32);
 s32 Div(s32, s32);
 void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
@@ -602,7 +601,7 @@ void sub_08022878(BurstVec *p)
     BurstVec pos[1], vel[1];
     center.y += 0xc8;
     for (i = 0; i < 8; i++) {
-        const u16 *table = gUnk_0203B400;
+        const u16 *table = gRandomTable;
         u32 index;
         u16 len;
         u16 r;
@@ -655,7 +654,7 @@ void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
         indexPtr = &gRandomIndex;
         mask = 1023;
         smallMask = 3;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         index = (*indexPtr + 1) & mask;
         angle = (u8)table[index];
         index = (index + 1) & mask;

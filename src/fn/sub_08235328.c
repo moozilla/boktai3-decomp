@@ -25,7 +25,7 @@ s32 Div(s32, s32);
 
 static inline u32 BurstRandom(void)
 {
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return table[gRandomIndex];
 }

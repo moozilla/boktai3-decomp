@@ -4,7 +4,7 @@
 #include "scene_actor_terrain.h"
 #include "engine.h"
 #include "player.h"
-extern const u16 gUnk_0203B400[];
+#include "ram.h"
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
@@ -30,7 +30,7 @@ static inline s32 Shift(s32 n, u32 bits)
 static inline u32 Rand(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(const u16 *)((gRandomIndex << 1) + (u32)gUnk_0203B400);
+    return *(const u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
 }
 
 static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)

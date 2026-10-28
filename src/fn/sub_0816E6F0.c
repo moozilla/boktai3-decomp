@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 struct TransitionSprite {
     u8 unknown0[8];
@@ -26,7 +27,6 @@ struct MenuTransition {
 };
 #define TRANSITION_OFFSET(field) ((u32) & ((struct MenuTransition *)0)->field)
 
-extern u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 void Anim_LoadKeyframe(void *, void *, u32, u32);
@@ -43,7 +43,7 @@ static inline s32 Shift12(s32 value)
 
 inline static void RandomSpin_0816E6F0(s16 *spin)
 {
-    u16 *table = gUnk_0203B400;
+    u16 *table = gRandomTable;
     u32 *index = &gRandomIndex;
     u32 mask;
     u32 i;

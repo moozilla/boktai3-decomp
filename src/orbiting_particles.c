@@ -23,7 +23,7 @@ void OrbitingParticles_SpawnOrb(struct OrbitingParticles *o, struct OrbitingPart
         if (o->duration < 0 || o->time < o->duration) {
             b->state = 1;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-            b->angle = *(const u16 *)((const u8 *)gUnk_0203B400 + gRandomIndex * 2);
+            b->angle = *(const u16 *)((const u8 *)gRandomTable + gRandomIndex * 2);
             b->rise = 0;
             b->sprite.flags &= ~1;
         }

@@ -5,7 +5,7 @@ static inline s32 randomValue(void)
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+    return *(const u16 *)(offset + (u32)gRandomTable);
 }
 static inline u32 getState(struct ScenePanelRig *rig)
 {
@@ -18,7 +18,7 @@ static inline s32 randomFirst(void)
     register const u16 *table asm("r4");
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    table = gUnk_0203B400;
+    table = gRandomTable;
     return *(const u16 *)(offset + (u32)table);
 }
 void ScenePanelRig_TickResourceDrain(struct ScenePanelRig *rig)

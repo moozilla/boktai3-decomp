@@ -37,7 +37,7 @@ struct Map {
     u8 pad8[28];
     u16 rows[1];
 };
-#define gUnk_0203B400 ((u16 *)0x0203B400)
+#define gRandomTable ((u16 *)0x0203B400)
 extern u32 gUnk_08604B90[];
 u8 *TerrainModifiers_FindCellOverride(int, int);
 void Effect_Remove(void *);

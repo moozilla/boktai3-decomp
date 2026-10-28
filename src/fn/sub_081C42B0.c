@@ -1,10 +1,10 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct EffectVector {
     s16 x, y, z, pad;
 };
 struct SpriteEffectController;
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 struct SpriteEffectController *SpriteEffectController_Create(const struct EffectVector *,
                                                              const struct EffectVector *, s32, u32,
@@ -35,7 +35,7 @@ void sub_081C42B0(s32 x, s32 y, u32 flags)
     pos->x = x;
     pos->y = y;
     pos->z = 0;
-    table = gUnk_0203B400;
+    table = gRandomTable;
     seed = &gRandomIndex;
     index = *seed + 1;
     mask = 0x3FF;

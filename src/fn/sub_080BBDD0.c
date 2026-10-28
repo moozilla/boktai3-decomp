@@ -181,7 +181,7 @@ static inline u8 Chase(struct SceneActorRegistryResetView *actor, struct Approac
 }
 static inline u32 RandomBits(u32 mask)
 {
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
     return table[index] & mask;

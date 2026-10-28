@@ -513,7 +513,7 @@ void SceneActor_StartRandomizedEffect(struct Player *p)
         position.x = source->x;
         position.y = source->y + 128;
         position.z = source->z;
-        random = gUnk_0203B400;
+        random = gRandomTable;
         velocity.x = (EffectRandomWith(random) & 15) - 7;
         velocity.y = (EffectRandomWith(random) & 31) - 16;
         velocity.z = (EffectRandomWith(random) & 15) - 7;
@@ -576,17 +576,17 @@ void Player_QueueStatusEffect(struct Player *p, s32 a)
     }
 
     if (p->actionMode == 3) {
-        const u16 *t = gUnk_0203B400;
+        const u16 *t = gRandomTable;
         v.x = (EffectRandomWith(t) & 7) - 3;
         v.y = (EffectRandomWith(t) & 7) - 5;
         v.z = 0;
     } else if (p->actionMode == 4) {
-        const u16 *t = gUnk_0203B400;
+        const u16 *t = gRandomTable;
         v.x = (EffectRandomWith(t) & 7) - 3;
         v.y = (EffectRandomWith(t) & 7) - 3;
         v.z = 0;
     } else {
-        const u16 *t = gUnk_0203B400;
+        const u16 *t = gRandomTable;
         v.x = (EffectRandomWith(t) & 15) - 7;
         v.y = -(EffectRandomWith(t) & 31);
         v.z = 0;
@@ -665,7 +665,7 @@ static inline int Player_NextStatusRandom(void)
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+    return *(const u16 *)(offset + (u32)gRandomTable);
 }
 
 static inline u32 Player_ReadStatusBonusBits(u32 *flags, u32 mask)
@@ -1176,7 +1176,7 @@ s32 Player_RollModifierBonus(void)
     s32 r;
 
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
+    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
     if (r > 10) {
         r = 0;
     } else {
@@ -1269,7 +1269,7 @@ s32 Player_OnWeaponHitRollEffect1000(void)
     s32 r;
 
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
+    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
     if (r > 10) {
         r = 0;
     } else {
@@ -1283,7 +1283,7 @@ s32 Player_OnWeaponHitRollEffect40000Low(void)
     s32 r;
 
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
+    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
     if (r > 10) {
         r = 0;
     } else {
@@ -1297,7 +1297,7 @@ s32 Player_OnWeaponHitRollEffect40000High(void)
     s32 r;
 
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
+    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
     if (r > 20) {
         r = 0;
     } else {
@@ -1311,7 +1311,7 @@ s32 Player_OnWeaponHitRollEffect80000Low(void)
     s32 r;
 
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
+    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
     if (r > 10) {
         r = 0;
     } else {
@@ -1325,7 +1325,7 @@ s32 Player_OnWeaponHitRollEffect80000High(void)
     s32 r;
 
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gRandomIndex << 1)), 100);
+    r = Mod(*(const u16 *)((const u8 *)gRandomTable + (gRandomIndex << 1)), 100);
     if (r > 20) {
         r = 0;
     } else {

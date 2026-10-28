@@ -32,7 +32,7 @@ void BurstEmitter_EmitFrame(struct BurstEmitter *emitter)
             index = 0;
             position = &emitter->position;
             asm("" : "+r"(position) : "r"(index) : "r0", "r1", "r2", "r3");
-            table = gUnk_0203B400;
+            table = gRandomTable;
             current = &gRandomIndex;
             for (; index <= 5; index++) {
                 u32 random = (*current + 1) & 0x3FF;
@@ -51,7 +51,7 @@ void BurstEmitter_EmitFrame(struct BurstEmitter *emitter)
             index = 0;
             position = &emitter->position;
             asm("" : "+r"(position) : "r"(index) : "r0", "r1", "r2", "r3");
-            table = gUnk_0203B400;
+            table = gRandomTable;
             current = &gRandomIndex;
             for (; index <= 7; index++) {
                 u32 random = (*current + 1) & 0x3FF;
@@ -72,7 +72,7 @@ void BurstEmitter_EmitFrame(struct BurstEmitter *emitter)
             position = &emitter->position;
             current = &gRandomIndex;
             mask = 0x3FF;
-            table = gUnk_0203B400;
+            table = gRandomTable;
             for (; index <= 15; index++) {
                 register u32 random asm("r1") = *current;
                 s32 value;

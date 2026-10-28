@@ -51,7 +51,7 @@ s32 SceneGrid_TryRandomNearbyPosition(struct ContactPosition *output, void *unus
     baseRow = row - spread;
     spread = spread * 2 + 1;
     {
-        const u16 *base = gUnk_0203B400;
+        const u16 *base = gRandomTable;
         samples = base;
     }
     gRandomIndex = (gRandomIndex + 1) & 1023;

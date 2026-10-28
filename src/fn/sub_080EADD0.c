@@ -11,6 +11,7 @@
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 #include "engine.h"
+#include "ram.h"
 
 void SpriteParticle_SpawnBatch(void *, u32, u32, u32, u32);
 void SceneActorBehavior_CallTerrainScript(void *);
@@ -20,7 +21,6 @@ void GameState_SetEventFlag(void *);
 void SceneActorRegistry_SendToActorId(u8, void *, u16);
 s32 Mod(s32, s32);
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
 
 #define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
 #define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))

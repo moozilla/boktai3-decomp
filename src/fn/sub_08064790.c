@@ -15,7 +15,7 @@ void ActorAttachment_TickWideShake(void *unused, struct ActorAttachmentSlotView 
             int r;
             u32 v;
             gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-            r = Mod(*(u16 *)((gRandomIndex << 1) + (u32)gUnk_0203B400), 0x14);
+            r = Mod(*(u16 *)((gRandomIndex << 1) + (u32)gRandomTable), 0x14);
             v = (u16)sprite->position.x;
             v -= 10;
             sprite->position.x = v + r;

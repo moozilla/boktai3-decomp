@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
@@ -60,16 +61,15 @@ static inline u8 ConsumeActivation(struct Actor *p)
     }
     return 0;
 }
-extern const u16 gUnk_0203B400[];
 static inline u32 Random(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(const u16 *)(gRandomIndex * 2 + (u32)gUnk_0203B400);
+    return *(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
 }
 static inline u32 RandomByte(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(const u8 *)(gRandomIndex * 2 + (u32)gUnk_0203B400);
+    return *(const u8 *)(gRandomIndex * 2 + (u32)gRandomTable);
 }
 void Ratatosk_GetPlayerOffsetFarthestFromSelf(void *, void *);
 s32 SunOrb_GetManagerStatus(void);

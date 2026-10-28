@@ -2,6 +2,7 @@
 
 #include "scene_actor_reset.h"
 #include "engine.h"
+#include "ram.h"
 
 s32 SceneStimulus_FindOverlap(s32, s32, u32, u32, u32);
 u32 SceneActorContacts_ReleaseNode(void *);
@@ -9,8 +10,6 @@ u32 SceneActorContacts_ReleaseNode(void *);
 void SceneActorAttachment_RetargetNearestPlayer(void *, void *);
 
 // confidence=low: per-frame terrain-route follower; probes map cells, gates on route checks and fires the restore callbacks.
-
-extern const u16 gUnk_0203B400[];
 
 // confidence=low: per-frame terrain-route follower; probes map cells, gates on route checks and fires the restore callbacks.
 
@@ -265,7 +264,7 @@ L4DA:
     do {
         t = (gRandomIndex + 1) & 0x3FF;
         gRandomIndex = t;
-        val = (gUnk_0203B400[t] & 3) << 6;
+        val = (gRandomTable[t] & 3) << 6;
         if (val != dir)
             break;
         n++;

@@ -1,11 +1,11 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 struct SpawnOffset {
     u32 x : 16;
     u32 y : 16;
     u32 z : 16;
 };
-extern const u16 gUnk_0203B400[];
 void Player_FlushQueuedEffects(u8 *);
 s32 EffectGroup_Spawn(void *, u32, u32, struct SpawnOffset *);
 void Sound_PlaySong(u32);
@@ -36,7 +36,7 @@ void sub_0815A1AC(u8 *p, u32 kind, s32 count)
         u32 mask;
         u32 *indexPtr;
         const u16 *table;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         indexPtr = &gRandomIndex;
         index = *indexPtr + 1;
         mask = 0x3ff;

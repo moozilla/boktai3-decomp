@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 // MATCHING_CONCESSION: register-pinning
 struct Vec {
     u16 x, y, z, pad;
@@ -45,7 +46,6 @@ struct Target {
     u32 damageType;
 };
 extern const struct Vec gUnk_0824FE9C;
-extern const u16 gUnk_0203B400[];
 void Collision_CalculateDamageResponse(void *);
 void Sound_PlaySong(u32);
 void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);

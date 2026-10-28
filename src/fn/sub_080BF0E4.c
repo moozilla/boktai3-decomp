@@ -304,7 +304,7 @@ static inline u32 PickDirection(u32 current)
     for (i = 0; i <= 3; i++) {
         u32 next;
         gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-        next = (gUnk_0203B400[gRandomIndex] & 3) << 6;
+        next = (gRandomTable[gRandomIndex] & 3) << 6;
         if (next != current)
             return next;
     }

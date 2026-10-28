@@ -26,7 +26,7 @@ struct RoamingObject {
     void (*update)(struct RoamingObject *);
 };
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
+extern const u16 gRandomTable[];
 void RoamingObject_SetState(struct RoamingObject *, u16);
 void RoamingObjectB_SetState(struct RoamingObject *, u16);
 #endif

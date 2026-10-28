@@ -57,7 +57,7 @@ void Slime_UpdateRandomWait(struct SceneActorRegistryResetView *actor)
         index = (gRandomIndex + 1) & 1023;
         gRandomIndex = index;
         {
-            u32 random = *(u16 *)(index * 2 + (u32)gUnk_0203B400);
+            u32 random = *(u16 *)(index * 2 + (u32)gRandomTable);
             actor->field2C2 = random & 63;
         }
         if (!actor->field2C2)

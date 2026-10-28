@@ -1,8 +1,8 @@
 #include "global.h"
 #include "engine.h"
 #include "input.h"
+#include "ram.h"
 // Tentative family name: actor animation/state handlers; specific actor identity unknown.
-#define gRandomTable gUnk_0203B400
 struct AnimationPosition {
     u32 packedXY, packedZ;
 };
@@ -26,7 +26,6 @@ struct AnimationActor {
     u8 padE6E[0xe96 - 0xe6e];
     s16 pendingCount;
 };
-extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 u32 HomingProjectile_GetActiveCount(void);
 static inline u8 ConsumeActivation(struct AnimationActor *p)
@@ -73,11 +72,11 @@ void AnimationActor_UpdateProjectileSequence(struct AnimationActor *p)
                 if (q->inputMode) {
                     p->duration = 128;
                     gRandomIndex = (gRandomIndex + 1) & 1023;
-                    p->position = *(
-                        struct AnimationPosition
-                            *)((Mod(*(const u16 *)(gRandomIndex * 2 + (u32)gUnk_0203B400), 9) * 8 +
-                                (u32)p) +
-                               0xccc);
+                    p->position =
+                        *(struct AnimationPosition
+                              *)((Mod(*(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable), 9) * 8 +
+                                  (u32)p) +
+                                 0xccc);
                 }
                 if (HomingProjectile_GetActiveCount() == 0)
                     p->animationFlag = 1;

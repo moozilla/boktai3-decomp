@@ -36,7 +36,7 @@ void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *actor, struct ScenePoolEn
                 entry->speedControlPulse = -16;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
             {
-                u32 random = *(const u16 *)((gRandomIndex << 1) + (u32)gUnk_0203B400);
+                u32 random = *(const u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
                 entry->speedControlDelay = (random & 31) + 60;
             }
         } else

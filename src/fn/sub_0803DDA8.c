@@ -68,7 +68,7 @@ s32 ScenePool_StateCruise(void *manager, struct ScenePoolActor *actor, struct Sc
     rangeDone:;
     }
     {
-        const u16 *table = gUnk_0203B400;
+        const u16 *table = gRandomTable;
         u32 *index = &gRandomIndex;
         u32 next = *index + 1;
         u32 indexMask = 0x3ff;

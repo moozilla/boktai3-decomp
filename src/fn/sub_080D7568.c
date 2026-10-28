@@ -45,7 +45,7 @@ static inline void Mummy_BeginTurn(void *obj, u8 saved)
         s32 tries = 0;
         s32 choice;
         for (;;) {
-            const u16 *table = gUnk_0203B400;
+            const u16 *table = gRandomTable;
             gRandomIndex = (gRandomIndex + 1) & 1023;
             choice = (table[gRandomIndex] & 3) << 6;
             if (choice != prior)

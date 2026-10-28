@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 struct BurstVector {
     s16 x, y, z, pad;
@@ -15,7 +16,6 @@ struct BurstActor {
     u8 side;
 };
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
 void MotionEntry_CreateWithDelta(void *, void *, s32, s32);
 static inline s32 scale(s32 n)
 {
@@ -45,7 +45,7 @@ void Hresvelgr_GetTravelTarget(struct BurstActor *object, struct BurstVector *ou
 {
     struct BurstActor *actor = object;
     if (out) {
-        register const u16 *table asm("r4") = gUnk_0203B400;
+        register const u16 *table asm("r4") = gRandomTable;
         s32 radius = (randomValue(table) >> 3) % 512 + 256;
         s32 sample = randomValue(table);
         s32 base = actor->side << 6;

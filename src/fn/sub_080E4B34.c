@@ -25,7 +25,7 @@ static inline void Dog_BeginRecoveryTurn(void *obj, u8 saved)
         s32 prior = actor->direction;
         s32 tries = 0;
         s32 choice;
-        const u16 *table = gUnk_0203B400;
+        const u16 *table = gRandomTable;
         do {
             u32 index = (gRandomIndex + 1) & 1023;
             gRandomIndex = index;

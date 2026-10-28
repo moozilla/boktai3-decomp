@@ -3,8 +3,8 @@
 #include "scene_actor_restoration.h"
 #include "scene_actor_control_helpers.h"
 #include "engine.h"
+#include "ram.h"
 
-extern const u16 gUnk_0203B400[];
 extern u8 *gPlayers[];
 s32 sub_0812F3CC(struct SceneActorRegistryResetView *);
 void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView *, u32, u32, u8);
@@ -19,7 +19,7 @@ static inline u32 Dog080E3874_Rand(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
-    return gUnk_0203B400[index];
+    return gRandomTable[index];
 }
 
 // Cell index for a position (its high byte is the cell coordinate), 0 outside the grid.

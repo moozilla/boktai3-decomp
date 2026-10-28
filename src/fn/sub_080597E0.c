@@ -20,7 +20,7 @@ static inline s32 randomGlobal(void)
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)gUnk_0203B400);
+    return *(const u16 *)(offset + (u32)gRandomTable);
 }
 void ScenePanelRig_RandomizeMovement(struct ScenePanelRig *input)
 {
@@ -30,7 +30,7 @@ void ScenePanelRig_RandomizeMovement(struct ScenePanelRig *input)
     u32 zero;
     s32 facing;
     ScenePanelRig_InitMovement(rig);
-    table = gUnk_0203B400;
+    table = gRandomTable;
     rig->speed = randomByte(table) + 192;
     angle = Math_Atan2(gPlayers[0]->position.x - rig->origin.x,
                        gPlayers[0]->position.z - rig->origin.z);

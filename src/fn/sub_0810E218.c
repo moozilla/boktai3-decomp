@@ -1,9 +1,9 @@
 #include "global.h"
 #include "engine.h"
 #include "area_effect_link.h"
+#include "ram.h"
 
 // foundry draft (worker best 96.2%); what differs is mostly register allocation and instruction order
-#define gRandomTable gUnk_0203B400
 struct SelectionPanel {
     u8 unknown0[0xD24];
     s8 column;
@@ -14,7 +14,6 @@ struct SelectionContext {
     u8 unknown54[0x1B8];
     u8 selection;
 };
-extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 s32 SelectionPanel_GetSelection(struct SelectionPanel *);
 void SelectionPanel_CommitSelection(struct SelectionPanel *p)

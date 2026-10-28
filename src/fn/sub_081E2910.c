@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
+#include "ram.h"
 // Provisional name: Presentation_UpdateDropShakeBlink
 // MATCHING_CONCESSION: register-pinning
 struct Sequence {
@@ -34,7 +35,6 @@ void Anim_LoadKeyframe(void *, void *, s32, s32);
 void Anim_SetKeyframes(void *, void *, s32, s32, s32);
 void Presentation_UpdateLayerAnimations(void *);
 void Presentation_ClearTilemap(void);
-extern u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 static inline s32 random(u16 *input)
@@ -61,26 +61,26 @@ void Presentation_UpdateDropShakeBlink(struct Sequence *p)
         }
         p->flags3 |= 1;
     } else if (p->state < 50) {
-        p->x1 = Mod(random(gUnk_0203B400), 5) + 58;
+        p->x1 = Mod(random(gRandomTable), 5) + 58;
         {
-            s32 y = (45 - p->state) * 2 + Mod(random(gUnk_0203B400), 5) - 2;
+            s32 y = (45 - p->state) * 2 + Mod(random(gRandomTable), 5) - 2;
             register s16 *dest asm("r3") = &p->y1;
             *dest = y;
         }
     } else if (p->state < 55) {
-        p->x1 = Mod(random(gUnk_0203B400), 5) + 58;
+        p->x1 = Mod(random(gRandomTable), 5) + 58;
         {
-            s32 y = (p->state - 55) * 2 + Mod(random(gUnk_0203B400), 5) - 2;
+            s32 y = (p->state - 55) * 2 + Mod(random(gRandomTable), 5) - 2;
             register s16 *dest asm("r3") = &p->y1;
             *dest = y;
         }
     } else if (p->state < 60) {
-        p->x1 = Mod(random(gUnk_0203B400), 5) + 58;
-        p->y1 = Mod(random(gUnk_0203B400), 5) - 2;
+        p->x1 = Mod(random(gRandomTable), 5) + 58;
+        p->y1 = Mod(random(gRandomTable), 5) - 2;
         p->flags3 |= 1;
     } else if (p->state < 80) {
-        p->x1 = Mod(random(gUnk_0203B400), 3) + 59;
-        p->y1 = Mod(random(gUnk_0203B400), 3) - 1;
+        p->x1 = Mod(random(gRandomTable), 3) + 59;
+        p->y1 = Mod(random(gRandomTable), 3) - 1;
         p->flags3 |= 1;
     } else if (p->state < 90) {
         p->x1 = 60;

@@ -120,10 +120,10 @@ static inline u32 randomDelay(u32 restart)
         u32 offset = gRandomIndex * 2;
         u32 value;
         if (restart) {
-            register u16 *table asm("r2") = gUnk_0203B400;
+            register u16 *table asm("r2") = gRandomTable;
             value = *(u16 *)(offset + (u32)table);
         } else
-            value = *(u16 *)((u8 *)gUnk_0203B400 + offset);
+            value = *(u16 *)((u8 *)gRandomTable + offset);
         value &= 127;
         value += 120;
         return value;

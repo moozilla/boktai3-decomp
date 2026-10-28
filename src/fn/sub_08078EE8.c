@@ -10,7 +10,6 @@ extern s32 gUnk_02000478;
 extern u16 gUnk_02000534;
 extern u16 gUnk_02000500;
 extern u8 *gUnknown_02000580[];
-extern u16 gUnk_0203B400[];
 
 #define A_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
 #define B_AT(T, off) (*(T *)((u8 *)a + (off)))
@@ -561,17 +560,17 @@ pal_done:
             sparkPos[0] = A_AT(s32, 0x5C);
             sparkPos[1] = A_AT(s32, 0x60);
             sparkIdx = (gRandomIndex + 1) & 0x3FF;
-            ((s16 *)sparkPos)[1] = ((s16 *)sparkPos)[1] + *(u8 *)&gUnk_0203B400[sparkIdx];
+            ((s16 *)sparkPos)[1] = ((s16 *)sparkPos)[1] + *(u8 *)&gRandomTable[sparkIdx];
             sparkIdx = (sparkIdx + 1) & 0x3FF;
-            rb = (u8)((s8)baseAngle + (gUnk_0203B400[sparkIdx] & 0x1F) - 0x10);
+            rb = (u8)((s8)baseAngle + (gRandomTable[sparkIdx] & 0x1F) - 0x10);
             sp[0] = (sp[0] & 0xFFFF0000) | 0x3C;
             sp[0] = (sp[0] & 0xFFFF) | 0x780000;
             sp[1] = (sp[1] & 0xFFFF0000) | 0x28;
             sparkIdx = (sparkIdx + 1) & 0x3FF;
-            t = (gUnk_0203B400[sparkIdx] & 7) + 4;
+            t = (gRandomTable[sparkIdx] & 7) + 4;
             sparkIdx = (sparkIdx + 1) & 0x3FF;
             gRandomIndex = sparkIdx;
-            SparkParticle_Spawn(sparkPos, 2, sparkSpec, rb, t, (gUnk_0203B400[sparkIdx] & 7) + 8, 2,
+            SparkParticle_Spawn(sparkPos, 2, sparkSpec, rb, t, (gRandomTable[sparkIdx] & 7) + 8, 2,
                                 1);
         }
     }

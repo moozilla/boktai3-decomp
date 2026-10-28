@@ -1,7 +1,6 @@
 #include "global.h"
 #include "engine.h"
-#define gRandomTable gUnk_0203B400
-extern const u16 gUnk_0203B400[];
+#include "ram.h"
 s32 Mod(s32, s32);
 s32 Path_GetPointPositionById(u16 *, u32, u32);
 struct ActorVariationState {

@@ -200,7 +200,7 @@ static inline s32 PickDirection(struct SceneActorRegistryResetView *actor)
     i = 0;
     for (;;) {
         {
-            const u16 *table = gUnk_0203B400;
+            const u16 *table = gRandomTable;
             gRandomIndex = (gRandomIndex + 1) & 0x3FF;
             direction = (table[gRandomIndex] & 3) << 6;
         }

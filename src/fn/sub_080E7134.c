@@ -2,6 +2,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reaction.h"
 #include "engine.h"
+#include "ram.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
@@ -10,7 +11,6 @@ u8 Mimic_TryPursuitRoute(void *);
 s32 Math_Atan2(s32, s32);
 void ActorShadow_Enable(void *);
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
 static inline void CellCenter(struct ContactPosition *out, u32 cell)
 {
     s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
@@ -129,7 +129,7 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
             gRandomIndex = (gRandomIndex + 1) & 1023;
             {
                 u32 offset = gRandomIndex * 2;
-                u32 random = *(u16 *)(offset + (u32)gUnk_0203B400);
+                u32 random = *(u16 *)(offset + (u32)gRandomTable);
                 s32 base = SpeedBase(context);
                 speed = base + (random & 3);
             }

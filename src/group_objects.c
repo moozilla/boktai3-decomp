@@ -333,7 +333,7 @@ int BoardPieces_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
             radius);
         *(struct PackedVec *)&p->target = origin;
         {
-            register const u16 *table asm("r2") = gUnk_0203B400;
+            register const u16 *table asm("r2") = gRandomTable;
             p->angle = randomWith(table);
             p->targetY = i * 16 + p->position.y;
             p->speed = (randomWith(table) & 7) + 7;
@@ -395,7 +395,7 @@ int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         asm("" : : "r"(zero), "r"(index), "r"(mask));
         angle = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
         p->direction = angle;
-        table = gUnk_0203B400;
+        table = gRandomTable;
         {
             register int random asm("r3") = BoardPieces_NextRandomValue(table, index, mask);
             angle -= 16;
@@ -515,7 +515,7 @@ void BoardPiece_Wander(struct GroupObjects *m, struct GroupPiece *p, int index)
             do {
                 do {
                     do {
-                        table = gUnk_0203B400;
+                        table = gRandomTable;
                     } while (0);
                 } while (0);
             } while (0);
@@ -557,7 +557,7 @@ void BoardPiece_ApproachTarget(struct GroupObjects *m, struct GroupPiece *p, int
         origin = &m->origin;
         p->direction = Math_Atan2(origin->x - p->position.x, origin->z - current->z);
         p->heading = Math_Atan2(p->target.x - p->position.x, p->target.z - current->z);
-        table = gUnk_0203B400;
+        table = gRandomTable;
         p->heading += (randomWith(table) & 31) - 16;
         p->speed = (randomWith(table) & 15) + 16;
     }
@@ -573,7 +573,7 @@ void BoardPiece_ApproachTarget(struct GroupObjects *m, struct GroupPiece *p, int
         if (p->speed == 0) {
             const u16 *table;
             p->heading = Math_Atan2(dx, dz);
-            table = gUnk_0203B400;
+            table = gRandomTable;
             p->heading += (randomWith(table) & 31) - 16;
             p->speed = (randomWith(table) & 31) + 32;
         } else
@@ -603,7 +603,7 @@ void BoardPiece_ConvergeOnTarget(struct GroupObjects *m, struct GroupPiece *p, i
         origin = &m->origin;
         p->direction = Math_Atan2(origin->x - p->position.x, origin->z - current->z);
         p->heading = Math_Atan2(p->target.x - p->position.x, p->target.z - current->z);
-        table = gUnk_0203B400;
+        table = gRandomTable;
         p->heading += (randomWith(table) & 31) - 16;
         p->speed = (randomWith(table) & 15) + 16;
     }
@@ -619,7 +619,7 @@ void BoardPiece_ConvergeOnTarget(struct GroupObjects *m, struct GroupPiece *p, i
         if (p->speed == 0) {
             const u16 *table;
             p->heading = Math_Atan2(dx, dz);
-            table = gUnk_0203B400;
+            table = gRandomTable;
             p->heading += (randomWith(table) & 31) - 16;
             p->speed = (randomWith(table) & 31) + 32;
         } else
@@ -660,14 +660,14 @@ void BoardPiece_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int in
         const u16 *table;
         p->active = 0;
         p->direction = Math_Atan2(target->x - position->x, target->z - position->z);
-        table = gUnk_0203B400;
+        table = gRandomTable;
         p->direction += (randomWith(table) & 31) - 16;
         p->speed = (randomWith(table) & 15) + 16;
     }
     if (p->speed == 0) {
         const u16 *table;
         p->direction = Math_Atan2(target->x - position->x, target->z - position->z);
-        table = gUnk_0203B400;
+        table = gRandomTable;
         p->direction += (randomWith(table) & 15) - 8;
         p->speed = (randomWith(table) & 15) + 16;
     } else
@@ -718,7 +718,7 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
             asm("" ::"r"(d));
             p->direction = Math_Atan2(ax, -p->offset.z);
         }
-        table = gUnk_0203B400;
+        table = gRandomTable;
         p->direction += (randomWith(table) & 15) - 7;
         p->speed = (randomWith(table) & 7) + 8;
     } else
@@ -760,7 +760,7 @@ void BoardPiece_HomeToTarget(struct GroupObjects *m, struct GroupPiece *p, int i
         const u16 *table;
         p->active = 0;
         p->direction = Math_Atan2(p->target.x - p->position.x, p->target.z - p->position.z);
-        table = gUnk_0203B400;
+        table = gRandomTable;
         p->direction += (randomWith(table) & 31) - 16;
         p->speed = (randomWith(table) & 15) + 16;
     }
@@ -776,7 +776,7 @@ void BoardPiece_HomeToTarget(struct GroupObjects *m, struct GroupPiece *p, int i
         if (p->speed == 0) {
             const u16 *table;
             p->direction = Math_Atan2(dx, dz);
-            table = gUnk_0203B400;
+            table = gRandomTable;
             p->direction += (randomWith(table) & 31) - 16;
             p->speed = (randomWith(table) & 31) + 32;
         } else

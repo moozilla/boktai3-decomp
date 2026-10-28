@@ -1,8 +1,8 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_indicator.h"
 #include "engine.h"
+#include "ram.h"
 
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void SpriteEffectController_Create(void *, const void *, s32, u32, u32, u32, u32, u32, u32, u32,
                                    u32, u32, s32, s32, s32, s32, s32, s32);
@@ -26,7 +26,7 @@ void LargeFragmentEffect_SpawnRandomParticle(struct Vec *position)
 {
     /* The inlined random helper retains this unused address. */
     register u32 opaque asm("r12") = 0x0403B714;
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     struct Vec velocity;
     struct Vec *v;
     u32 *cursor;

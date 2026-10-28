@@ -2,7 +2,6 @@
 #include "scene_hud_display.h"
 #include "game_state.h"
 #include "ram.h"
-extern u16 gSceneHudMode;
 void SceneHud_RemoveAnimations(struct SceneHudState *);
 void PauseMenu_RemoveHeaderAnimation(struct SceneHudState *);
 void PlayerPanel_RemoveEffects(struct SceneHudState *);

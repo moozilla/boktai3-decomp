@@ -133,7 +133,7 @@ void FragmentBurst_Create(struct ContactPosition *position, u32 amount, u32 kind
         struct FragmentSequence *sequence = &group->sequences[i];
         Anim_SetSequence(sequence, pool->sequenceResource, 15, 0, 0);
         gRandomIndex = (gRandomIndex + 1) & 1023;
-        randomTable = gUnk_0203B400;
+        randomTable = gRandomTable;
         {
             u32 value = randomTable[gRandomIndex];
             value &= 3;

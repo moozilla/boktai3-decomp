@@ -80,7 +80,7 @@ static inline u32 FallingObject_Random(void)
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    return *(u16 *)(offset + (u32)gUnk_0203B400);
+    return *(u16 *)(offset + (u32)gRandomTable);
 }
 
 static inline void FallingObject_SetState(struct FallingObject *object, u32 state)

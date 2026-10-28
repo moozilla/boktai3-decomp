@@ -944,7 +944,7 @@ void ScenePanel_UpdateApproachSprite(struct ScenePanel *panel)
         sprite->frame = 1;
         gRandomIndex = (gRandomIndex + 1) & 1023;
         offset = gRandomIndex * 2;
-        scale = *(const u16 *)(offset + (u32)gUnk_0203B400);
+        scale = *(const u16 *)(offset + (u32)gRandomTable);
         scale &= 15;
         scale += 72;
         panel->auxiliary.parameter9 = scale;

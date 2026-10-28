@@ -1,7 +1,7 @@
 #include "global.h"
 #include "input.h"
 #include "engine_globals.h"
-extern u16 gUnk_0203B400[];
+#include "ram.h"
 void Sound_PlaySong(u32);
 void sub_081C62B4(u8 *);
 void ChallengeResult_SetState(void *, void (*)(void *));
@@ -18,7 +18,7 @@ void sub_081C6094(u8 *p)
         ChallengeResult_SetState(p, TimeResult_UpdateResultHold);
     } else {
         u8 *resource = p + 0x38;
-        const u16 *table = gUnk_0203B400;
+        const u16 *table = gRandomTable;
         u8 *digit = p + 0x118;
         s32 i;
         for (i = 0; i < 6; i++) {

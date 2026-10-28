@@ -21,7 +21,7 @@ void ScenePanelRig_TickSprites(struct ScenePanelRig *rig, u32 palette)
             u32 index = (gRandomIndex + 1) & 1023;
             gRandomIndex = index;
             sample = index << 1;
-            sample = *(const u16 *)((u32)gUnk_0203B400 + sample);
+            sample = *(const u16 *)((u32)gRandomTable + sample);
             sample &= 15;
             sample -= 8;
             offset = sample;

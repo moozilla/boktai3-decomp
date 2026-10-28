@@ -31,7 +31,7 @@ static inline s32 RandomByte(void)
     register u16 *table asm("r4");
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
     offset = gRandomIndex * 2;
-    table = gUnk_0203B400;
+    table = gRandomTable;
     return *(u8 *)(offset + (u32)table);
 }
 void SceneActorPhase_SelectLinkedAnimation(struct SceneActorAnimationView *p)

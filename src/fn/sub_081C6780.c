@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "input.h"
+#include "ram.h"
 #ifdef NONMATCHING
 // fuzzy: 55.0%
 // fix.py best (sweep after the inlined-insn fix)
@@ -36,14 +37,13 @@ struct StateActor {
     void (*update)(void *);
 };
 extern u8 *gSceneEventDispatchState;
-extern const u16 gUnk_0203B400[];
 s32 Math_Atan2(s32, s32);
 void SceneMessages_SetPendingTrigger(void *, void *);
 void sub_0802EA90(void *);
 static inline s32 RandomPart(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return (gUnk_0203B400[gRandomIndex] >> 4) & 1023;
+    return (gRandomTable[gRandomIndex] >> 4) & 1023;
 }
 static inline void ResetMotion(struct StateActor *actor, u32 behavior)
 {

@@ -47,7 +47,7 @@ static inline u32 Random4(void)
     u32 v;
     gRandomIndex = index;
     index *= 2;
-    v = *(const u16 *)((u32)gUnk_0203B400 + index);
+    v = *(const u16 *)((u32)gRandomTable + index);
     v &= 3;
     return v + 1;
 }

@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 
 // foundry draft (worker best 98.4%); what differs is mostly register allocation and instruction order
 struct A {
@@ -18,7 +19,6 @@ struct A {
     void *obj;
 };
 
-extern const u16 gUnk_0203B400[];
 struct T {
     u32 v[2];
 };
@@ -26,7 +26,7 @@ extern const struct T gUnk_0824F790;
 static inline s32 rnd(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
-    return *(u16 *)(gRandomIndex * 2 + (u32)gUnk_0203B400);
+    return *(u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
 }
 void Vanargand_SetPendingCue(struct A *p, u16 v);
 s32 PairedSceneActor_GetActiveMask(void *o);

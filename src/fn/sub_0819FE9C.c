@@ -207,7 +207,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
                 ActionState_AdvanceState(action);
             else {
                 struct Vec delta;
-                const u16 *table = gUnk_0203B400;
+                const u16 *table = gRandomTable;
                 s32 rawX = RandomValue(table) >> 3;
                 u32 smallMask = 31;
                 u8 x = rawX & smallMask;
@@ -240,7 +240,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
                 ActionState_AdvanceState(action);
             } else {
                 struct Vec delta;
-                const u16 *table = gUnk_0203B400;
+                const u16 *table = gRandomTable;
                 s32 x = (RandomValue(table) >> 3) & 31;
                 s32 z = (RandomValue(table) >> 3) & 31;
                 // Preserve the shared random table across particle setup.

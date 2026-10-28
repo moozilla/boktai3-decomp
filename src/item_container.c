@@ -251,7 +251,7 @@ void Trigger_UpdateShake(struct Trigger *p)
             p->position->x = p->baseX;
             p->position->z = p->baseZ;
         } else {
-            const u16 *table = gUnk_0203B400;
+            const u16 *table = gRandomTable;
             unsigned short random;
             gRandomIndex = (gRandomIndex + 1) & 1023;
             random = table[gRandomIndex];

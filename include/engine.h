@@ -57,7 +57,7 @@ struct EngineMap {
     void *trapTops[64];
 };
 
-extern const u16 gUnk_0203B400[];         /* 1024 entry random table (guess) */
+extern const u16 gRandomTable[];         /* 1024 entry random table (guess) */
 extern const s16 gUnk_086149C4[];         /* sine table (guess) */
 
 /* ---- Tasks and memory -------------------------------------------------- */

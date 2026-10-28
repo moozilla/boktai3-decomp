@@ -162,7 +162,7 @@ static inline u32 Chase_RandomBits(u32 mask)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
-    return gUnk_0203B400[index] & mask;
+    return gRandomTable[index] & mask;
 }
 static inline void Chase_BeginTurn(void *obj, u8 saved)
 {
@@ -337,7 +337,7 @@ void Bat_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor, s32 
         index = (gRandomIndex + 1) & 1023;
         gRandomIndex = index;
         index *= 2;
-        sample = *(const u16 *)((u32)gUnk_0203B400 + index);
+        sample = *(const u16 *)((u32)gRandomTable + index);
         sample &= 3;
         SparkParticle_Spawn(&actor->position, sample + 1, &range, actor->direction + 128, 10, 6, 2,
                             2);

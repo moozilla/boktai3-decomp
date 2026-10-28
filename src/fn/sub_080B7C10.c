@@ -162,7 +162,7 @@ static inline u8 PickDirection(struct SceneActorRegistryResetView *actor)
     register u32 current asm("r5") = actor->direction;
     s32 i;
     u32 direction;
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     i = 0;
     do {
         gRandomIndex = (gRandomIndex + 1) & 0x3FF;

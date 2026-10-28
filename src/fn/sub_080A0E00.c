@@ -4,8 +4,8 @@
 #include "scene_actor_route.h"
 #include "engine.h"
 #include "player.h"
+#include "ram.h"
 // Zero-store scheduling and the approach speed load still occur in a different order.
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
@@ -36,7 +36,7 @@ static inline s32 Shift(s32 n, u32 bits)
 static inline u32 Rand(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gUnk_0203B400[gRandomIndex];
+    return gRandomTable[gRandomIndex];
 }
 static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
 {

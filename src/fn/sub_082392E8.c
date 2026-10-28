@@ -1,6 +1,7 @@
 #include "global.h"
 #include "area_effect_link.h"
 #include "engine_globals.h"
+#include "ram.h"
 typedef struct Point {
     u16 x, pad2, y, pad6;
 } Point;
@@ -24,7 +25,6 @@ typedef struct State {
     Effect effects[4];
 } State;
 extern const s16 gUnk_086149C4[];
-extern u8 gUnk_0203B400[];
 void SpriteDrawable_SelectTileFrame(Effect *, void *, s32);
 static inline s32 random_value(void)
 {
@@ -33,7 +33,7 @@ static inline s32 random_value(void)
 }
 static inline s32 random_first(void)
 {
-    u8 *table = gUnk_0203B400;
+    u8 *table = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return *(u16 *)(table + (gRandomIndex << 1));
 }

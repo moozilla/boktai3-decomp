@@ -63,7 +63,7 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
         gRandomIndex = index;
         index *= 2;
         {
-            register const u16 *table asm("r3") = gUnk_0203B400;
+            register const u16 *table asm("r3") = gRandomTable;
             u32 value = *(u16 *)(index + (u32)table);
             register u32 offset = 0x3EC;
 

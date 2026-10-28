@@ -257,5 +257,7 @@ extern u32
 /* 0x0300546C */
 extern u32
     gClockSynced; /* nonzero once the clock has been synced from the RTC; SunClock_Refresh syncs while it is zero */
+/* 0x0203B400 */
+extern const u16 gRandomTable[]; /* random value table indexed by gRandomIndex (1024 entries) */
 
 #endif

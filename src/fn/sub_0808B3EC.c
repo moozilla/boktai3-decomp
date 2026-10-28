@@ -164,7 +164,7 @@ static inline u32 Chase_RandomBits(u32 mask)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
-    return gUnk_0203B400[index] & mask;
+    return gRandomTable[index] & mask;
 }
 static inline void Chase_BeginTurn(void *obj, u8 saved)
 {

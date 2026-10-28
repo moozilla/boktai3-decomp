@@ -3,6 +3,7 @@
 #include "render.h"
 #include "engine.h"
 #include "background_controller.h"
+#include "ram.h"
 #ifdef NONMATCHING
 // fuzzy: 90.2%
 // fix.py best (sweep after the inlined-insn fix)
@@ -14,7 +15,6 @@ struct Camera {
     u8 pad[0x44];
     s32 x;
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void Actor_UpdateVisibilityAndShadow(u32, u8 *);
 void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
@@ -36,7 +36,7 @@ static inline s32 Load(u32 addr)
 static inline s32 Rand(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-    return *(const u16 *)(gRandomIndex * 2 + (u32)gUnk_0203B400);
+    return *(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
 }
 
 static inline s32 Truncate(s32 v)
@@ -133,7 +133,7 @@ s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
                         register u32 *cursor asm("r4");
                         asm volatile("" : "+r"(opaque));
                         {
-                            register const u16 *table asm("r5") = gUnk_0203B400;
+                            register const u16 *table asm("r5") = gRandomTable;
                             register u32 index asm("r0") =
                                 ((cursor = &gRandomIndex, (*cursor) + 1)) & 0x3FF;
                             r1 = (Load((index * 2) + ((u32)table)) >> 4) & 0x3F;
@@ -157,7 +157,7 @@ s32 SceneNpc_OnStateEffectUpdate(u32 a_, u8 *p_)
                                 register u32 z asm("r2") = 0;
                                 vel->z = z;
                                 *cursor = ((*cursor) + 1) & 0x3FF;
-                                e = ((Load(((*cursor) * 2) + ((u32)gUnk_0203B400)) >> 4) & 0xF) +
+                                e = ((Load(((*cursor) * 2) + ((u32)gRandomTable)) >> 4) & 0xF) +
                                     0xF;
                                 SpriteEffectController_Create(&pos_, v8, 0x1C1E, 0xD43F, z, 0x10,
                                                               0x11, 1, 2, 1, z, e, z, z, z, z, -4,

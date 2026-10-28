@@ -3,7 +3,7 @@
 #include "scene_actor_control_helpers.h"
 #include "engine.h"
 #include "player.h"
-extern const u16 gUnk_0203B400[];
+#include "ram.h"
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Callback_InvokeActor(void *, void *);
@@ -42,7 +42,7 @@ static inline u32 Rand(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
-    return *(const u16 *)((index << 1) + (u32)gUnk_0203B400);
+    return *(const u16 *)((index << 1) + (u32)gRandomTable);
 }
 static inline void Fill(void *dst, u32 *tmp, u32 value)
 {

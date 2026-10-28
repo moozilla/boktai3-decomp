@@ -25,7 +25,7 @@ static inline s32 NextRandom(void)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
     {
-        register const u16 *table asm("r2") = gUnk_0203B400;
+        register const u16 *table asm("r2") = gRandomTable;
         return *(const u16 *)(offset + (u32)table);
     }
 }

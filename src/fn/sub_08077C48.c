@@ -38,7 +38,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                     struct ContactPosition position;
                     u32 words[2];
                 } position;
-                const u16 *table = gUnk_0203B400;
+                const u16 *table = gRandomTable;
                 u32 mask;
                 {
                     register u32 index asm("r2");
@@ -137,7 +137,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                     struct ContactPosition position;
                     u32 words[2];
                 } position;
-                const u16 *table = gUnk_0203B400;
+                const u16 *table = gRandomTable;
                 u32 mask;
                 {
                     register u32 index asm("r2");
@@ -241,7 +241,7 @@ void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *acto
                     struct ContactPosition position;
                     u32 words[2];
                 } position;
-                register const u16 *table asm("r6") = gUnk_0203B400;
+                register const u16 *table asm("r6") = gRandomTable;
                 u32 mask;
                 {
                     register u32 index asm("r2");

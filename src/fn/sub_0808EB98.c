@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-extern const u16 gUnk_0203B400[];
+#include "ram.h"
 void SceneActorAnimation_SelectProfileEntry(void *, s32);
 void Anim_SetDurationScale(void *, u32);
 void Slime_RollMoveFlag(void *);
@@ -59,7 +59,7 @@ void sub_0808EB98(struct Slime *p)
         u32 index = (gRandomIndex + 1) & 1023;
         s32 r;
         gRandomIndex = index;
-        r = *(u16 *)(index * 2 + (u32)gUnk_0203B400);
+        r = *(u16 *)(index * 2 + (u32)gRandomTable);
         r &= 0x1f;
         if (r <= 0x17)
             SetNext(p, Slime_RollMoveFlag, 0);

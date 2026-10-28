@@ -1,8 +1,8 @@
 #include "scanline_presentation.h"
 #include "render.h"
 #include "engine.h"
+#include "ram.h"
 
-extern const u16 gUnk_0203B400[];
 #ifdef NONMATCHING
 // fuzzy: 66.9%
 // scope shape 38 (differences once low registers are set aside)
@@ -18,7 +18,7 @@ void ScanlinePresentation_UpdateNoise(struct ScanlinePresentation *p)
         s32 v;
         gRandomIndex = (gRandomIndex + 1) & 1023;
         offset = gRandomIndex * 2;
-        v = (*(u16 *)(offset + (u32)gUnk_0203B400) * p->amplitude) >> 18;
+        v = (*(u16 *)(offset + (u32)gRandomTable) * p->amplitude) >> 18;
         p->rows[p->active][i] = v | (v << 8);
     }
     for (i = p->end; i < 160; i++)

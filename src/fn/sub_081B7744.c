@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct GrowthHazardAnimationEvent {
     u8 unk0[4];
@@ -25,7 +26,6 @@ struct GrowthHazardManager {
     u8 unk0[0x19];
     u8 flags;
 };
-extern struct GrowthHazardManager *gGrowthHazardManager;
 u32 Hresvelgr_GetAnimationIdentifier(void);
 
 static inline u32 TestWord(u32 *value, u32 mask)
@@ -48,7 +48,7 @@ void GrowthHazard_ApplyAnimationEvent(struct GrowthHazardAnimationEvent *event, 
                     entry->eventCount++;
                     entry->cooldown = event->cooldown;
                     entry->mode = 0;
-                    gGrowthHazardManager->flags |= 1;
+                    ((struct GrowthHazardManager *)gGrowthHazardManager)->flags |= 1;
                 }
                 break;
             case 2:
@@ -57,7 +57,7 @@ void GrowthHazard_ApplyAnimationEvent(struct GrowthHazardAnimationEvent *event, 
                     if (--entry->remaining > 0) {
                         entry->cooldown = 0x20;
                         entry->mode = 1;
-                        gGrowthHazardManager->flags |= 2;
+                        ((struct GrowthHazardManager *)gGrowthHazardManager)->flags |= 2;
                     }
                 }
                 break;

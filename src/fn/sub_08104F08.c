@@ -1,13 +1,12 @@
-#define gShakeRandomTable gUnk_0203B400
 #define gShakeRandomIndex gRandomIndex
 #include "global.h"
 #include "callback_pool.h"
 #include "engine_globals.h"
-extern u16 gUnk_0203B400[];
+#include "ram.h"
 s32 Mod(s32, s32);
 static inline u16 CallbackPool_NextRandom(void)
 {
-    u16 *table = gUnk_0203B400;
+    u16 *table = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
     return table[gRandomIndex];
 }

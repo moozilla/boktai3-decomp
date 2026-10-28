@@ -198,7 +198,7 @@ static inline u32 RandomDirectionExcept(u32 current)
 {
     s32 i;
     for (i = 0; i <= 3; i++) {
-        u32 d = Random(gUnk_0203B400, &gRandomIndex, 0x3FF, 3) << 6;
+        u32 d = Random(gRandomTable, &gRandomIndex, 0x3FF, 3) << 6;
         if (d != current)
             return d;
     }
@@ -388,7 +388,7 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         index = (gRandomIndex + 1) & 1023;
         gRandomIndex = index;
         index *= 2;
-        sample = *(const u16 *)((u32)gUnk_0203B400 + index);
+        sample = *(const u16 *)((u32)gRandomTable + index);
         sample &= 3;
         sample += 1;
         SparkParticle_Spawn(&actor->position, sample, &range, actor->direction + 128, 10, 6, 2, 2);
@@ -428,7 +428,7 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         u32 index = (gRandomIndex + 1) & 1023;
         s32 sample;
         gRandomIndex = index;
-        sample = gUnk_0203B400[index];
+        sample = gRandomTable[index];
         choice = Mod(sample >> 3, route->points->count);
         if (choice == route->index)
             choice = Mod(choice + 1, route->points->count);

@@ -2,6 +2,7 @@
 #include "global.h"
 #include "game_state.h"
 #include "engine_globals.h"
+#include "ram.h"
 // Tentative wireless selection/menu layout from observed offsets.
 struct Slot {
     u8 counts[4];
@@ -30,8 +31,6 @@ struct Save {
     u8 pad[0x58];
     s16 values[4];
 };
-extern struct Menu *gWirelessTradeMenu;
-extern u8 gSceneEffectPalettePhase, gUnk_0203B400[];
 void *Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);
 void *Script_GetPc(void);
@@ -148,7 +147,7 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
         if (count) {
             int r;
             register int j asm("r5");
-            r = gSceneEffectPalettePhase;
+            r = (*(u8 *)&gSceneEffectPalettePhase);
             j = 0;
             if ((u32)j < count)
                 do {
@@ -201,7 +200,7 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
                         write = &gRandomIndex;
                         *write = x;
                         x <<= 1;
-                        table = gUnk_0203B400;
+                        table = gRandomTable;
                         r += *(u8 *)(x + (u32)table);
                     }
                     j++;
@@ -240,7 +239,7 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
             register int j asm("r5");
             u16 *q;
             u32 *random;
-            r = gSceneEffectPalettePhase;
+            r = (*(u8 *)&gSceneEffectPalettePhase);
             j = 0;
             if ((u32)j < count) {
                 q = rightBase;
@@ -302,7 +301,7 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
                         asm("" : "+r"(write));
                         *write = x;
                         x <<= 1;
-                        table = gUnk_0203B400;
+                        table = gRandomTable;
                         r += *(u8 *)(x + (u32)table);
                     }
                     q++;

@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
@@ -32,7 +31,7 @@ static inline s32 Shift(s32 n, u32 bits)
 static inline u32 Rand(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gUnk_0203B400[gRandomIndex];
+    return gRandomTable[gRandomIndex];
 }
 static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
 {
@@ -76,6 +75,7 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 phase, u32 b
 #include "scene_actor_animation.h"
 #include "engine.h"
 #include "player.h"
+#include "ram.h"
 void Ghost_GetDirectionalFrame(u8, u32 *, u32 *);
 s32 Mod(s32, s32);
 void Player_SubtractEnergy(void *, u32);

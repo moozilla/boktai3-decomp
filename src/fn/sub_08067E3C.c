@@ -4,7 +4,6 @@
 #include "ram.h"
 // confidence=low: spawns pooled particles with optional velocity ranges and position jitter.
 #define SceneParticleBurst_CreateWithRanges sub_08067E3C
-extern const u16 gUnk_0203B400[];
 struct SceneParticleBurstPool *SceneParticleBurst_EnsureSingleton(u32, u32);
 struct SceneParticleBurstSlot *SceneParticleBurst_AllocateSlot(struct SceneParticleBurstPool *);
 s32 Mod(s32, s32);
@@ -42,7 +41,7 @@ s32 SceneParticleBurst_CreateWithRanges(const struct ContactPosition *position,
     }
     i = 0;
     if (i < count) {
-        table = gUnk_0203B400;
+        table = gRandomTable;
         do {
             register struct SceneParticleBurstSlot *p;
             s16 sequence;

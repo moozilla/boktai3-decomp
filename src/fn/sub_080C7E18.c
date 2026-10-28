@@ -176,7 +176,7 @@ static inline u32 RandomDirectionExcept(u32 current)
     s32 i = 0;
     u32 d;
     do {
-        d = Random(gUnk_0203B400, &gRandomIndex, 0x3FF, 3) << 6;
+        d = Random(gRandomTable, &gRandomIndex, 0x3FF, 3) << 6;
         if (d != current)
             goto chosen;
     } while (++i <= 3);

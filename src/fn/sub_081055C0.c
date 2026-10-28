@@ -2,12 +2,11 @@
 #include "directional_interaction.h"
 #include "callback_pool.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 // MATCHING_CONCESSION: register-pinning
 #define CallbackPool_RunSpawnScript ProximityActor_SetState
-#define gShakeRandomTable           gUnk_0203B400
 #define gShakeRandomIndex           gRandomIndex
-extern u16 gUnk_0203B400[];
 static inline u32 NextRandom(u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
@@ -22,7 +21,7 @@ void ProximityActor_SetState(struct CallbackPoolEntry *entry, s32 count)
         args.count = 4;
         args.values = values;
         for (i = 0; i < count; i++) {
-            register u16 *table asm("r3") = gUnk_0203B400;
+            register u16 *table asm("r3") = gRandomTable;
             {
                 u32 random = NextRandom(table);
                 s32 position = entry->position.x - 64;

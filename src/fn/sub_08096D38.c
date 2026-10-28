@@ -3,12 +3,12 @@
 #include "scene_actor_control_phase.h"
 #include "engine.h"
 #include "player.h"
+#include "ram.h"
 #ifdef NONMATCHING
 // fuzzy: 90.4%
 // fix.py best (sweep after the inlined-insn fix)
 // fix.py best version (reprinted C)
 extern const s16 gUnk_086149C4[];
-extern const u16 gUnk_0203B400[];
 struct GhostPlayer {
     u8 pad[0x30];
     struct ContactPosition position;
@@ -58,7 +58,7 @@ static inline u32 RandomFirst(u32 bits)
 static inline u16 Random(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(const u16 *)(gRandomIndex * 2 + (u32)gUnk_0203B400);
+    return *(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
 }
 static inline u16 RandomMotion(void)
 {
@@ -66,7 +66,7 @@ static inline u16 RandomMotion(void)
     const u16 *table;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    table = gUnk_0203B400;
+    table = gRandomTable;
     return *(const u16 *)(offset + (u32)table);
 }
 static inline u32 Facing(u32 value, u8 *direction)

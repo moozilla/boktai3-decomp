@@ -1,5 +1,6 @@
 #include "global.h"
 #include "player.h"
+#include "ram.h"
 struct SceneProjectileState {
     u16 unknown;
     u16 lifetime;
@@ -22,7 +23,6 @@ struct ProjectilePoolState {
     u8 pad00[0x1C];
     u32 contactFlag;
 };
-extern struct ProjectilePoolState *gSceneProjectilePool;
 s32 Player_StartForcedStun(u8 *, s32);
 void Sound_PlaySong(u32);
 void SceneProjectile_RespondToContact(void *unused, struct ProjectileContact *contact,
@@ -30,7 +30,7 @@ void SceneProjectile_RespondToContact(void *unused, struct ProjectileContact *co
 {
     struct SceneProjectileState *state = (void *)((u8 *)p + 0x28);
     if (p->state.mode == 1 && contact->kind == 1)
-        gSceneProjectilePool->contactFlag = 1;
+        ((struct ProjectilePoolState *)gSceneProjectilePool)->contactFlag = 1;
     if (p->state.mode == 0) {
         if ((*(u8 **)gPlayers)[0x457] != 26 && *(u16 *)((*(u8 **)gPlayers) + 0x4D8) == 0) {
             if (Player_StartForcedStun((*(u8 **)gPlayers), 90) == 1)

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "ram.h"
 // confidence=low: BossSlot2 per-frame update: animation, shake, cached target bearings.
 struct Vec {
     s16 x, y, z, pad;
@@ -40,7 +41,6 @@ struct BossSlot2Tick {
     u8 pad512;
     u8 shake2;
 };
-extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
 void sub_0817B2DC(void *);
 void CellObject_Init(void *, void *);

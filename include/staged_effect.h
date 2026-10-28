@@ -40,7 +40,7 @@ struct StagedEffect {
     u16 blendedPalette[16];
 };
 extern u16 *gPaletteBankData;
-extern u16 gUnk_0203B400[];
+extern const u16 gRandomTable[];
 void StagedEffect_MarkOuterSprites(struct StagedEffect *);
 void StagedEffect_MarkOuterSpritesAlternate(struct StagedEffect *);
 void StagedEffect_BlendPalette(struct StagedEffect *, s32, s32, s32);

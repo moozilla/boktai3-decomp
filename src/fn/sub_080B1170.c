@@ -1,15 +1,14 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "engine.h"
+#include "ram.h"
 
-#define gRandomTable gUnk_0203B400
 struct SceneActorRandomReaction {
     u8 unknown0[0x690];
     u16 timer, period;
     u8 unknown694[0x6d4 - 0x694];
     u16 flags;
 };
-extern const u16 gUnk_0203B400[];
 static inline u8 unavailable(struct SceneActorRegistryResetView *p)
 {
     if (p) {
@@ -48,7 +47,7 @@ void SceneActor_TickRandomReaction(struct SceneActorRegistryResetView *p)
             context->timer = context->period;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
             {
-                s32 random = *(u8 *)&gUnk_0203B400[gRandomIndex];
+                s32 random = *(u8 *)&gRandomTable[gRandomIndex];
                 if (random > 0xbd) {
                     u32 behavior = 0x11;
                     p->state2A8 = 0;

@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine_globals.h"
-extern u16 gUnk_0203B400[];
+#include "ram.h"
 void AnimatedParticles_EmitBurst(void *, int, int, int, int, int, int, int);
 void SceneActors_SpawnAmbientParticle(u8 *p)
 {
@@ -10,7 +10,7 @@ void SceneActors_SpawnAmbientParticle(u8 *p)
     } position;
     int r;
     int cursor;
-    u16 *table = gUnk_0203B400;
+    u16 *table = gRandomTable;
     *(&cursor) = gRandomIndex + 1;
     {
         int mask = 0x3ff;

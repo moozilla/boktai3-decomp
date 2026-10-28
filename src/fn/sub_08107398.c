@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_vec.h"
 #include "engine_globals.h"
+#include "ram.h"
 
 struct TileTrigger {
     u8 unk_00[0x84];
@@ -8,13 +9,12 @@ struct TileTrigger {
     u8 unk_8C[0x2C];
     u16 sequence;
 };
-extern u16 gUnk_0203B400[];
 void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
                                              s32, s32);
 
 static inline u32 NextRandom(void)
 {
-    const u16 *table = gUnk_0203B400;
+    const u16 *table = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return table[gRandomIndex];
 }
