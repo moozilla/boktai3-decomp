@@ -28,4 +28,6 @@ struct SoftSingleNumber {
 
 extern struct SoftDoubleNumber gSoftDoubleNaN;
 
+extern struct SoftSingleNumber gSoftSingleNaN;
+
 #endif

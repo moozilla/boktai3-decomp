@@ -101,3 +101,5 @@ and field-remapping support in ramlayout would make this migration faster.
 - **030035C6 `gRtcProtected` (unified):** RTC GPIO protection flag set by Rtc_Protect and cleared by Rtc_Initialize; ramlayout before/after checks passed.
 
 - **030035C8 `gSoftDoubleNaN` (struct):** libgcc double NaN object shares its 20-byte number layout in libgcc_numbers.h. Both compiler modes retain identical instructions; only internal long-branch label numbers differ. Per-unit ROM check exact; layout scanner misses the typedef-based block declaration.
+
+- **030035E0 `gSoftSingleNaN` (struct):** libgcc single-precision NaN object shares its 16-byte number representation; both compiler modes preserve instructions and the per-unit ROM check is exact.
