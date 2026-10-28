@@ -1,7 +1,7 @@
 #include "global.h"
+#include "runtime.h"
 /* Reconstructed from B3 instructions; SIIRTC correspondence: docs/RTC.md. */
 // CFLAGS: -O0 -mthumb-interwork
-extern u8 gUnk_030035C6;
 u32 Rtc_WriteCommandByte(u8);
 u32 Rtc_WriteDataByte(u8);
 u8 Rtc_ReadDataByte(void);
@@ -13,9 +13,9 @@ struct Rtc {
 u8 Rtc_WriteStatus(struct Rtc *p)
 {
     u8 status;
-    if (gUnk_030035C6 == 1)
+    if (gRtcProtected == 1)
         return 0;
-    gUnk_030035C6 = 1;
+    gRtcProtected = 1;
     *(vu16 *)0x080000C4 = 1;
     *(vu16 *)0x080000C4 = 5;
     status = 0x40 | ((p->status & 4) << 3) | ((p->status & 2) << 2) | ((p->status & 1) << 1);
@@ -24,6 +24,6 @@ u8 Rtc_WriteStatus(struct Rtc *p)
     Rtc_WriteDataByte(status);
     *(vu16 *)0x080000C4 = 1;
     *(vu16 *)0x080000C4 = 1;
-    gUnk_030035C6 = 0;
+    gRtcProtected = 0;
     return 1;
 }

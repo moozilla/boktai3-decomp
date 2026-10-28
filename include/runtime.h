@@ -33,5 +33,16 @@ extern u32
     gMessageQueueBufferIndex; /* Active double-buffered message queue index, toggled by MessageQueue_SwapBuffers */
 extern u32
     gTrapDispatchStarted; /* Set by Trap_UpdateProbeContacts and reset when boxes are loaded */
+extern u32
+    gTransferSavedRuntimeFlag; /* Saves 0300546C while save transfer suspends the runtime; semantic name tentative */
+extern s32 gSolarMeasurementPhase; /* Solar timer-interrupt measurement phase */
+extern s32 gSolarInterruptCounter; /* Counter incremented during active sensor interrupts */
+extern u32
+    gSolarLastInput; /* Last GPIO light-input bit observed by the timer handler; tentative name */
+extern u32 gSolarGpioShadow; /* GPIO output/control shadow used by solar timer phases */
+extern u32
+    gSolarEnabled; /* Software sensor-enable flag, set by Solar_Enable and cleared by Solar_Disable */
+extern u8
+    gRtcProtected; /* RTC GPIO protection flag set by Rtc_Protect and cleared by Rtc_Initialize */
 
 #endif

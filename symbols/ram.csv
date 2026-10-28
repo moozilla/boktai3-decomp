@@ -283,13 +283,13 @@ addr,name,size,kind,decl,header,confidence,notes
 030025FC,gSceneStimulusState,4,object,extern struct SceneStimulusState *gSceneStimulusState;,include/scene_stimulus.h,high physical layout; provisional field semantics,Scene stimulus task pointer: eight 16-byte stimuli at +18 and sixteen exclusion-region ids at +98
 03002600,gRegionList,4,object,extern struct RegionList *gRegionList;,include/ram.h,low,
 03002604,gSolarController,4,object,extern u8 *gSolarController;,include/ram.h,low,solar sensor controller (Solar_*)
-03002608,gUnk_03002608,4,object,,,,
-030035B0,gUnk_030035B0,4,object,,,,
-030035B4,gUnk_030035B4,4,object,,,,
-030035B8,gUnk_030035B8,4,object,,,,
-030035BC,gUnk_030035BC,4,object,,,,
-030035C0,gUnk_030035C0,4,object,,,,
-030035C6,gUnk_030035C6,1,object,,,,
+03002608,gTransferSavedRuntimeFlag,4,object,extern u32 gTransferSavedRuntimeFlag;,include/runtime.h,,Saves 0300546C while save transfer suspends the runtime; semantic name tentative
+030035B0,gSolarMeasurementPhase,4,object,extern s32 gSolarMeasurementPhase;,include/runtime.h,,Solar timer-interrupt measurement phase
+030035B4,gSolarInterruptCounter,4,object,extern s32 gSolarInterruptCounter;,include/runtime.h,,Counter incremented during active sensor interrupts
+030035B8,gSolarLastInput,4,object,extern u32 gSolarLastInput;,include/runtime.h,,Last GPIO light-input bit observed by the timer handler; tentative name
+030035BC,gSolarGpioShadow,4,object,extern u32 gSolarGpioShadow;,include/runtime.h,,GPIO output/control shadow used by solar timer phases
+030035C0,gSolarEnabled,4,object,extern u32 gSolarEnabled;,include/runtime.h,,"Software sensor-enable flag, set by Solar_Enable and cleared by Solar_Disable"
+030035C6,gRtcProtected,1,object,extern u8 gRtcProtected;,include/runtime.h,,RTC GPIO protection flag set by Rtc_Protect and cleared by Rtc_Initialize
 030035C8,gUnk_030035C8,,object,,,,
 030035E0,gUnk_030035E0,,object,,,,
 030035F0,SoundMainRAM_Buffer,402,object,,,,

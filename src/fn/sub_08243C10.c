@@ -1,6 +1,7 @@
 #include "global.h"
 #include "gba/io_reg.h"
-extern u32 gUnk_030035BC, gUnk_030035B0, gUnk_030035B4, gUnk_03006A38, gUnk_03006A4C;
+#include "runtime.h"
+extern u32 gUnk_03006A38, gUnk_03006A4C;
 extern u32 gUnk_03006A40, gUnk_03006A30, gUnk_03006A44, gUnk_03006A34;
 extern s32 gUnk_03006A48;
 extern void (*gSerialInterruptState[])(void);
@@ -12,9 +13,9 @@ static inline u16 maskIE(u32 ie, u32 mask)
 void Solar_InitTimer(void)
 {
     u16 ie;
-    gUnk_030035BC = (gUnk_030035BC & -3) | 1;
-    gUnk_030035B0 = 0;
-    gUnk_030035B4 = 0;
+    gSolarGpioShadow = (gSolarGpioShadow & -3) | 1;
+    gSolarMeasurementPhase = 0;
+    gSolarInterruptCounter = 0;
     gUnk_03006A38 = 0;
     gUnk_03006A4C = 0x3128;
     gUnk_03006A40 = 1;
