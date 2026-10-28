@@ -13,7 +13,7 @@ struct Task {
 };
 extern u32 gUnk_0300426C, gUnk_03003A08, gUnk_03004264;
 extern u16 gUnk_0300427C;
-extern struct Task gUnk_03001118, gUnk_03001130;
+extern struct Task gUnk_03001130;
 void Mosaic_Initialize(void);
 void sub_082156D8(u32);
 void Video_SetWindowBounds(u32, u32, u32, u32, u32);
@@ -37,7 +37,8 @@ void InterruptsAndVideo_InitRuntime(void)
     u8 byteZero, byteOne;
     struct Dma *dma;
     u32 mask;
-    struct Task *a, *b;
+    struct RuntimeTask *a;
+    struct Task *b;
     fill = zero;
     dma = (struct Dma *)0x040000D4;
     dma->src = (u32)&fill;
@@ -90,13 +91,13 @@ void InterruptsAndVideo_InitRuntime(void)
                              sub_08219624);
     gSceneEffectPalettePhase = zero;
     gUnk_03004264 = zero;
-    a = &gUnk_03001118;
+    a = &gVideoUploadTask;
     Task_SetCallbacks(a, InterruptsAndVideo_OnVideoUploadTask, 0);
     b = &gUnk_03001130;
     Task_SetCallbacks(b, InterruptsAndVideo_OnGraphicsUpdateTask, 0);
-    a->b14 = byteZero;
-    a->b16 = byteOne;
-    a->h10 = zero;
+    a->priority = byteZero;
+    a->unk16 = byteOne;
+    a->id = zero;
     b->b14 = 13;
     b->b16 = byteOne;
     b->h10 = zero;

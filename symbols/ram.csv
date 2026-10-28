@@ -245,7 +245,7 @@ addr,name,size,kind,decl,header,confidence,notes
 0203C400,gUnk_0203C400,,object,,,,
 03000000,gIwramCode,FC,object,extern u8 gIwramCode[];,include/runtime.h,,IWRAM instruction buffer populated from Palette_CacheObjectBankArm through AgbMain__addr at startup; extent is not inferred from the partial RFU read
 03001110,gVideoIrqPhase,4,object,extern u32 gVideoIrqPhase;,include/runtime.h,,Two-phase video/sound IRQ handler latch; toggled by sub_08214144 (tentative name)
-03001118,gUnk_03001118,18,object,,,,
+03001118,gVideoUploadTask,18,object,extern struct RuntimeTask gVideoUploadTask;,include/runtime.h,high callback identity; unresolved task bytes,Static task calling InterruptsAndVideo_OnVideoUploadTask at priority 0; +16 initialized to 1 with unresolved meaning
 03001130,gUnk_03001130,18,object,,,,
 03001148,gUnk_03001148,8,object,,,,
 03001548,gUnk_03001548,2,object,,,,

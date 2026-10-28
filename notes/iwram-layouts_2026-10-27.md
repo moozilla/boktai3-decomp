@@ -47,3 +47,5 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03000000 `gIwramCode` (unified):** Startup instruction buffer, unsized because its copied extent comes from ROM symbol subtraction; ramlayout proves unchanged startup code. New-header probe requires a precreated header skeleton.
 
 - **03001110 `gVideoIrqPhase` (unified):** Tentative two-phase video/sound IRQ latch toggled in 08214144; both consumers retain identical compiler output.
+
+- **03001118 `gVideoUploadTask` (struct):** Static scheduler task identified by its video-upload callback and priority 0. RuntimeTask preserves the scheduler header; +16 remains semantically unresolved. InitRuntime matches with identical compiler output in both modes.
