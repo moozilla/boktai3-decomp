@@ -11,6 +11,9 @@ import csv
 import io
 import struct
 
+# how the source holds the bytes (tools/progress.py ROM data measure, docs/DATA_TRACKING.md)
+SOURCE = "decoded"
+
 
 def decode(rom, start, end, names):
     out = io.StringIO()

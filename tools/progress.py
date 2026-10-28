@@ -387,6 +387,49 @@ def data_measures():
             "complete_data_percent": pct(m["complete_data"])}
 
 
+ROM_DATA_START = 0x0824DAFC  # first byte of gen/data.s (after the code's alignment)
+ROM_DATA_END = 0x08E88144    # end of used ROM; the zero padding after it is free space
+MANIFEST = Path(ROOT) / "data/manifest.csv"
+ROM_DATA_SYMBOLS = Path(ROOT) / "symbols/data.csv"
+
+
+def rom_data_measures(manifest=MANIFEST, symbols=ROM_DATA_SYMBOLS):
+    """ROM data (tables, graphics, text, scripts, sound; docs/DATA_TRACKING.md),
+    kept apart from the RAM data measure. No ROM needed: total = the data
+    region; decoded = data/manifest.csv ranges whose format emits them from an
+    editable source (datafmt SOURCE "decoded"); split = ranges whose structure
+    is regenerated but whose pieces are opaque extracted files ("split"); the
+    rest is .incbin of the base ROM. named = symbols/data.csv rows in the
+    region (bytes only for rows with a size)."""
+    sys.path.insert(0, str(Path(ROOT) / "tools"))
+    import importlib
+    total = ROM_DATA_END - ROM_DATA_START
+    out = {"total": total, "decoded": 0, "split": 0, "named": 0, "named_bytes": 0, "ranges": []}
+    with open(manifest, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            a, b = int(r["start"], 16), int(r["end"], 16)
+            kind = getattr(importlib.import_module("datafmt." + r["format"]), "SOURCE", "split")
+            out[kind] += b - a
+            out["ranges"].append((r["name"], a, b, kind))
+    with open(symbols, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            if ROM_DATA_START <= int(r["addr"], 16) < ROM_DATA_END:
+                out["named"] += 1
+                out["named_bytes"] += int(r["size"], 16) if r["size"] else 0
+    out["raw"] = total - out["decoded"] - out["split"]
+    return out
+
+
+def rom_data_lines(d):
+    pct = lambda v: 100 * v / d["total"]
+    return [f"ROM data (tables, graphics, text, scripts, sound; not in the data measure above, see "
+            f"[docs/DATA_TRACKING.md](docs/DATA_TRACKING.md)): {d['total']:,} bytes. "
+            f"Emitted from decoded source: **{pct(d['decoded']):.1f}%** ({d['decoded']:,} bytes); "
+            f"from extracted resource files: {pct(d['split']):.1f}%; "
+            f"`.incbin` of the base ROM (pointer words as symbols): {pct(d['raw']):.1f}%. "
+            f"Named data symbols: {d['named']}.", ""]
+
+
 def ram_lines(m):
     if not int(m.get("total_data", 0)):
         return []
@@ -550,6 +593,10 @@ def main():
         m = report["measures"]
         print(f"RAM data: {m['matched_data']}/{m['total_data']} bytes in a shared header "
               f"({m['matched_data_percent']:.2f}%), {m['complete_data']} complete")
+        d = rom_data_measures()
+        print(f"ROM data: {d['total']} bytes; decoded source {d['decoded']} ({100 * d['decoded'] / d['total']:.2f}%), "
+              f"extracted files {d['split']} ({100 * d['split'] / d['total']:.2f}%), raw {d['raw']}, "
+              f"{d['named']} named symbols")
     if args.markdown:
         write_markdown(args.markdown, counted, sizes, done, total_b, done_b, pinned_b, fuzzy, report, categories,
                        asm_b=sum(sizes[n] for n in asm))
@@ -721,6 +768,7 @@ def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=N
              f"{100 * draft_b / total_b:.3f}% of code, mean fuzzy match {mean:.1f}%.", "",
              f"Intentional assembly (GBA header, crt0, SDK assembly; not counted above): {asm_b:,} bytes.", "",
              *ram_lines(report["measures"]),
+             *rom_data_lines(rom_data_measures()),
              "```", f"{bar(done_b / total_b, 50)} {100 * done_b / total_b:.2f}%", "```", "",
              "| Region | Functions | Matched | Bytes matched | |", "|---|---:|---:|---:|---|"]
     for lo, hi in regions:

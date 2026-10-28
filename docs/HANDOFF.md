@@ -52,7 +52,7 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 | Phase 1 | complete: every function has C |
 | Phase 2 | the remaining guarded drafts (PROGRESS.md "Nonmatching drafts"), by subsystem in PROGRESS.md; most left are Monsters and Scene actors |
 | Phase 3 | the Register-pinned share in PROGRESS.md; `scope.py FILE.c pins` and `tools/depin.py` remove them |
-| Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data |
+| Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data. ROM data emitted from decoded source is in PROGRESS.md; the plan to report it is [DATA_TRACKING.md](DATA_TRACKING.md) |
 | Report | every function in one of ~490 subsystem units under 11 categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
 
 Recent:

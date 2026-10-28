@@ -12,6 +12,8 @@ Intentional assembly (GBA header, crt0, SDK assembly; not counted above): 4,916 
 
 RAM objects with one shared declaration (`symbols/ram.csv`, reported as data): **29.2%** (4,695 / 16,077 bytes); no other declaration left: 5.9%.
 
+ROM data (tables, graphics, text, scripts, sound; not in the data measure above, see [docs/DATA_TRACKING.md](docs/DATA_TRACKING.md)): 12,822,088 bytes. Emitted from decoded source: **3.5%** (446,538 bytes); from extracted resource files: 59.5%; `.incbin` of the base ROM (pointer words as symbols): 37.0%. Named data symbols: 10.
+
 ```
 ███████████████████████████████████████░░░░░░░░░░░ 78.60%
 ```

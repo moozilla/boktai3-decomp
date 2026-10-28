@@ -21,6 +21,9 @@ import os
 import struct
 
 RESIZABLE = True
+# the container is regenerated, but each entry is an opaque extracted .bin
+# (tools/progress.py ROM data measure, docs/DATA_TRACKING.md)
+SOURCE = "split"
 ANCHORS = ()  # referenced only at its start (the directory record)
 ROM_BASE = 0x08000000
 

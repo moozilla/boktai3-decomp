@@ -89,7 +89,10 @@ def speaker_portraits():
         o = a - 0x08000000
         return rom[o:rom.index(b"\0", o)].decode()
     lines = open(os.path.join(ROOT, "gen", "code.s")).read().split("\n")
-    i0 = next(i for i, l in enumerate(lines) if "thumb_func_start sub_0803232C" in l)
+    # gen/code.s labels the function by its current name (symbols/functions.csv)
+    fname = next((r["name"] for r in csv.DictReader(open(os.path.join(ROOT, "symbols", "functions.csv"), encoding="utf-8"))
+                  if r["addr"].upper() == "0803232C"), "sub_0803232C")
+    i0 = next(i for i, l in enumerate(lines) if l.strip() == f"thumb_func_start {fname}")
     ids, cur = {"R_DJANGO": 0, "B_DJANGO": 1, "W_DJANGO": 2}, None
     for l in lines[i0:i0 + 1200]:
         m = re.search(r"ldr r1, \S+ @ =0x(0824D[0-9A-F]{3})", l)

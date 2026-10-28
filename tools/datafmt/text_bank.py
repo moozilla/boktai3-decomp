@@ -27,6 +27,8 @@ import re
 import struct
 
 RESIZABLE = True
+# how the source holds the bytes (tools/progress.py ROM data measure, docs/DATA_TRACKING.md)
+SOURCE = "decoded"
 TABLE = 0x08D6B1F8  # entry table, after the four section words
 ANCHORS = (TABLE, 0x08D74DDC)  # loaded by Text_LookupString
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
