@@ -1,6 +1,5 @@
 #include "global.h"
-
-extern u16 gUnk_03005418[];
+#include "render.h"
 
 s32 __divsi3(s32, s32);
 void MotionTrack_Update(u8 *);
@@ -82,9 +81,9 @@ void ContactImpactEffect_UpdateContact(struct ContactImpactEffect *effect)
         y = scale(p[1]);
         q[1] = z - y;
         z += y;
-        q[0] = q[0] - gUnk_03005418[0] + 0x78;
-        q[1] = q[1] - gUnk_03005418[1] + 0x50;
-        z -= gUnk_03005418[2];
+        q[0] = q[0] - gCameraOrigin[0] + 0x78;
+        q[1] = q[1] - gCameraOrigin[1] + 0x50;
+        z -= gCameraOrigin[2];
         q[2] = z;
     }
 

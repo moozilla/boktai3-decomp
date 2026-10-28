@@ -161,7 +161,6 @@ struct BackgroundMapEntry {
 /* Shared globals (task pointer tables are indexed by layer). */
 extern struct Background *gBackgrounds[];
 extern struct ScrollingBackground *gScrollingBackgrounds[];
-extern s16 gUnk_03005418[2];
 
 /* Engine functions used by this unit. */
 s32 Script_ReadValue(u8 *);

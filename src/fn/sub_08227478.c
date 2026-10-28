@@ -31,8 +31,6 @@ struct Camera {
     u32 f98;
 };
 
-extern struct Vec gUnk_03005418;
-
 int SceneMessages_RegisterReceiver(u8 *p, int id, int kind);
 
 static inline int project(int input)
@@ -43,7 +41,7 @@ static inline int project(int input)
 
 static inline void updateScroll(void)
 {
-    struct Vec *out = &gUnk_03005418;
+    struct Vec *out = &gCameraOrigin;
     struct CameraPosition *in = &gCamera.position;
     int xy, height, x = in->x, z = in->z;
     out->x = project(x - z);

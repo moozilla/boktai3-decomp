@@ -8,7 +8,6 @@ struct V {
 struct P {
     u32 x : 16, y : 16, z : 16, w : 16;
 };
-extern struct V gUnk_03005418;
 static inline s32 sh(s32 v)
 {
     s32 r;
@@ -26,9 +25,9 @@ static inline void project(struct V *out, struct V *in)
     b = sh(3 * in->y);
     c = a - b;
     d = a + b;
-    out->x = out->x - gUnk_03005418.x + 120;
-    out->y = c - gUnk_03005418.y + 80;
-    out->z = d - gUnk_03005418.z;
+    out->x = out->x - (*(struct V *)gCameraOrigin).x + 120;
+    out->y = c - (*(struct V *)gCameraOrigin).y + 80;
+    out->z = d - (*(struct V *)gCameraOrigin).z;
 }
 s32 SceneEffectQueue_QueueTypeTwoEffect(void)
 {

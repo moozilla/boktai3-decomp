@@ -29,7 +29,7 @@ struct EffectManager {
     struct Effect effects[8];
 };
 extern u8 *gUnknown_02000580[];
-extern struct Vec gUnk_03005418;
+extern struct Vec gCameraOrigin;
 struct EffectManager *FloatingEffectManager_GetOrCreate(void);
 void FloatingEffect_Init(struct Effect *);
 u32 Selection_GetDisplayFrame(u32);
@@ -134,9 +134,9 @@ s32 FloatingItemEffect_Spawn(int kind, int item, int mode, int index, struct Vec
     height = FloatingEffect_Scale3(position->y);
     s->y = depth - height;
     s->z = depth + height;
-    s->x = s->x - gUnk_03005418.x + 120;
-    s->y = s->y - gUnk_03005418.y + 80;
-    s->z = s->z - gUnk_03005418.z;
+    s->x = s->x - gCameraOrigin.x + 120;
+    s->y = s->y - gCameraOrigin.y + 80;
+    s->z = s->z - gCameraOrigin.z;
     s->x -= 8;
     e->sprite.position.y -= 8;
     if (slot >= 0)

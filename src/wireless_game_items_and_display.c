@@ -1,4 +1,5 @@
 #include "wireless_game_items_and_display.h"
+#include "render.h"
 
 void WirelessGame_AddItem(void *p, int index)
 {
@@ -940,7 +941,6 @@ void WirelessGameItems_UpdateTemporaryItem(struct WirelessGameItems *p, struct W
 }
 
 extern const u8 gUnk_0824DE94[];
-extern const struct WirelessGameVector gUnk_03005418;
 
 void Widget_InitLinked(void *, void *, int, int, int, int, int, const void *);
 
@@ -1182,9 +1182,9 @@ int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int in
             height = v;
             start->y = y - height;
             start->z = y + height;
-            start->x = start->x - gUnk_03005418.x + 120;
-            start->y = (y - height) - gUnk_03005418.y + 80;
-            start->z = (y + height) - gUnk_03005418.z;
+            start->x = start->x - (*(const struct WirelessGameVector *)gCameraOrigin).x + 120;
+            start->y = (y - height) - (*(const struct WirelessGameVector *)gCameraOrigin).y + 80;
+            start->z = (y + height) - (*(const struct WirelessGameVector *)gCameraOrigin).z;
         }
     }
     return 0;

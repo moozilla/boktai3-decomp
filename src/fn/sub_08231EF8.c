@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 
 // confidence=low: projects the owner's position to the screen, then runs each of four parts'
 // state handlers from a table and places the active parts relative to that screen point.
@@ -27,7 +28,6 @@ struct EffectGroup {
     struct Vec50 *position;
     struct EffectPart parts[4];
 };
-extern u16 gUnk_03005418[];
 extern EffectPartHandler const gUnk_08E879A8[];
 static inline s32 scale50(s32 v)
 {
@@ -57,9 +57,9 @@ void sub_08231EF8(void *context, struct EffectGroup *group)
     vertical = scale50(coords[1] * 3);
     y = sum - vertical;
     depth = sum + vertical;
-    dest[0] = dest[0] - gUnk_03005418[0] + 120;
-    dest[1] = y - gUnk_03005418[1] + 80;
-    dest[2] = depth - gUnk_03005418[2];
+    dest[0] = dest[0] - gCameraOrigin[0] + 120;
+    dest[1] = y - gCameraOrigin[1] + 80;
+    dest[2] = depth - gCameraOrigin[2];
     table = gUnk_08E879A8;
     point = &screen;
     part = group->parts;

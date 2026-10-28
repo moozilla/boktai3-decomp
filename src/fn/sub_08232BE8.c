@@ -17,7 +17,7 @@ struct OrbitOwner {
     u8 unknown0[0x18];
     struct OrbitVec center;
 };
-extern struct OrbitVec gUnk_03005418;
+extern struct OrbitVec gCameraOrigin;
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 static inline s32 Scale32(s32 n)
@@ -62,9 +62,9 @@ static inline void Project(struct OrbitVec *out, struct OrbitVec *world)
     height = Scale32(world->y * 3);
     low = sum - height;
     sum += height;
-    out->x = out->x - gUnk_03005418.x + 120;
-    out->y = low - gUnk_03005418.y + 80;
-    sum -= (u16)gUnk_03005418.z;
+    out->x = out->x - gCameraOrigin.x + 120;
+    out->y = low - gCameraOrigin.y + 80;
+    sum -= (u16)gCameraOrigin.z;
     out->z = sum;
 }
 

@@ -451,7 +451,7 @@ addr,name,size,kind,decl,header,confidence,notes
 0300540C,gSceneUnpausedFrames,4,object,extern u32 gSceneUnpausedFrames;,include/runtime.h,,Counter incremented while the scene is not paused; provisional semantic name
 03005410,gSceneControlWord2,4,object,extern u32 gSceneControlWord2;,include/runtime.h,,Cleared by Engine_ClearControlFlags; finer meaning unresolved
 03005414,gSceneControlWord3,4,object,extern u32 gSceneControlWord3;,include/runtime.h,,Cleared during transitions and by Engine_ClearControlFlags; finer meaning unresolved
-03005418,gUnk_03005418,8,object,,,,
+03005418,gCameraOrigin,8,object,extern u16 gCameraOrigin[];,include/render.h,low,"camera origin in world coordinates (x, y, z halfwords then padding): sprites and actors subtract it, then add the 120x80 screen center"
 03005420,gActiveCamera,4,object,extern u8 *gActiveCamera;,include/ram.h,low,
 03005428,gSilentGlyph,2,object,extern u16 gSilentGlyph;,include/ram.h,low,"glyph code that plays no text sound; set by Text_SetSilentCharacterFromScript, compared in TextState_PlayGlyphSound"
 03005430,gSunClock,24,object,extern struct SunClock gSunClock;,include/sun_clock.h,low,"sun clock state (base time, times A and B, spans, light phase); the object is 0x24 bytes"

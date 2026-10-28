@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "render.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -18,7 +19,6 @@ struct Emitter {
 };
 extern const u16 gUnk_0203B400[];
 extern const s16 gUnk_086149C4[];
-extern s16 gUnk_03005418[];
 struct Particle *ParticlePool_FindFreeEntry(struct Emitter *);
 static inline s32 random(void)
 {
@@ -51,8 +51,8 @@ static inline void circle(s32 angle, struct Vec *p, s32 radius)
 }
 static inline void unproject(struct Vec *p, struct Vec *screen)
 {
-    s32 x = screen->x + gUnk_03005418[0] - 120;
-    s32 y = screen->y + gUnk_03005418[1] - 80;
+    s32 x = screen->x + ((s16 *)gCameraOrigin)[0] - 120;
+    s32 y = screen->y + ((s16 *)gCameraOrigin)[1] - 80;
     p->x = half(((x + y) << 5) / 3 + 1024);
     p->y = 1024;
     p->z = half(((y - x) << 5) / 3 + 1024);

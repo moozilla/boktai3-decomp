@@ -1,5 +1,6 @@
 #include "global.h"
 #include "projected_display.h"
+#include "render.h"
 struct Vec {
     s16 x, y, z;
 };
@@ -16,7 +17,6 @@ struct Marker {
     u8 *actor;
 };
 struct Vec *TetherActor_GetPosition(void);
-extern u16 gUnk_03005418[];
 s32 DirectionMarker_Update(void *);
 s32 sub_081C0048(void *);
 static inline s32 actorBlocked(u8 *actor)
@@ -36,9 +36,9 @@ static inline void projectPosition(struct Vec *projected, struct Vec *world)
     vertical = projectScale(3 * world->y);
     y = sum - vertical;
     depth = sum + vertical;
-    projected->x = (u16)projected->x - gUnk_03005418[0] + 120;
-    projected->y = y - gUnk_03005418[1] + 80;
-    projected->z = depth - gUnk_03005418[2];
+    projected->x = (u16)projected->x - gCameraOrigin[0] + 120;
+    projected->y = y - gCameraOrigin[1] + 80;
+    projected->z = depth - gCameraOrigin[2];
 }
 void TetherActor_PositionRequestIndicator(struct Marker *p)
 {

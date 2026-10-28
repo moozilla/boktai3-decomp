@@ -305,5 +305,7 @@ extern s16 gScanlineDmaMode; /* HBlank DMA0 mode: 0 off, 1 halfword transfer, el
 extern u16 gBgPaletteBank13[]; /* Interior background palette bank 13, at gBgPaletteBuffer + 0x1A0 */
 /* 0x03004CC0 */
 extern struct BackgroundLayer gBgRecord3; /* Interior view of gBgRecords[3] (no consumer declares it separately) */
+/* 0x03005418 */
+extern u16 gCameraOrigin[]; /* camera origin in world coordinates (x, y, z halfwords then padding): sprites and actors subtract it, then add the 120x80 screen center */
 
 #endif

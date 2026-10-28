@@ -1,4 +1,5 @@
 #include "resource_station.h"
+extern struct ResourceStationPosition gCameraOrigin;
 // MATCHING_CONCESSION: register-pinning
 s32 Div(s32, s32);
 void Anim_LoadKeyframe(void *, void *, u16, u32);
@@ -54,9 +55,9 @@ void ResourceStation_UpdateDigits(struct ResourceStation *station)
             {
                 s32 screenY = depth - height;
                 depth += height;
-                screenPoint->x = (u16)screenPoint->x - (u16)gUnk_03005418.x + 120;
-                screenPoint->y = screenY - (u16)gUnk_03005418.y + 80;
-                depth -= (u16)gUnk_03005418.z;
+                screenPoint->x = (u16)screenPoint->x - (u16)gCameraOrigin.x + 120;
+                screenPoint->y = screenY - (u16)gCameraOrigin.y + 80;
+                depth -= (u16)gCameraOrigin.z;
                 screenPoint->z = depth;
             }
         }

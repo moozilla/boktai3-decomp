@@ -1,4 +1,5 @@
 #include "global.h"
+#include "render.h"
 // MATCHING_CONCESSION: register-pinning
 
 struct SparklePosition {
@@ -22,8 +23,6 @@ struct SparkleEmitter {
     u8 unk_718[0x60];
     u32 count;
 };
-
-extern u16 gUnk_03005418[];
 
 static inline s32 Sparkle_ProjectScale(s32 input)
 {
@@ -63,7 +62,7 @@ void SparkleEmitter_UpdateParticles(u8 *arg0)
 {
     struct SparkleEmitter *emitter = (struct SparkleEmitter *)arg0;
     struct SparkleParticle *particle = emitter->particles;
-    const u16 *camera = gUnk_03005418;
+    const u16 *camera = gCameraOrigin;
     register s32 i asm("r8") = 31;
     do {
         if (!(particle->flags & 1)) {

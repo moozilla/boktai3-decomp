@@ -22,7 +22,7 @@ struct Effect {
     struct Sprite sprite;
 };
 extern u8 *gUnknown_02000580[];
-extern struct Vec gUnk_03005418;
+extern struct Vec gCameraOrigin;
 void FloatingEffect_Init(struct Effect *);
 void Sound_PlaySongChecked(u32);
 s32 Inventory_IsKeyItemId(u32);
@@ -44,9 +44,9 @@ static inline void FloatingEffect_ProjectVec(struct Vec *out, struct Vec *v)
     height = FloatingEffect_Scale3(v->y);
     out->y = depth - height;
     out->z = depth + height;
-    out->x = out->x - gUnk_03005418.x + 120;
-    out->y = out->y - gUnk_03005418.y + 80;
-    out->z = out->z - gUnk_03005418.z;
+    out->x = out->x - gCameraOrigin.x + 120;
+    out->y = out->y - gCameraOrigin.y + 80;
+    out->z = out->z - gCameraOrigin.z;
 }
 // scope shape 6 (differences once low registers are set aside)
 // scope shape 54 (differences once low registers are set aside)

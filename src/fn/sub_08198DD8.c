@@ -1,6 +1,6 @@
 #include "global.h"
+#include "render.h"
 
-extern u16 gUnk_03005418[];
 u32 SceneEffect_LoadRingAnimation(void);
 void Anim_RestartSequence(void *, u32, u32, u32, u32);
 void Callback_InvokeActor(void *, void *);
@@ -36,9 +36,9 @@ void SceneEffectRing_Update(u8 *param)
     a = c - y;
     zero = 0;
     c = c + y;
-    out[0] = out[0] - gUnk_03005418[0] + 120;
-    out[1] = a - gUnk_03005418[1] + 80;
-    c = c - gUnk_03005418[2];
+    out[0] = out[0] - gCameraOrigin[0] + 120;
+    out[1] = a - gCameraOrigin[1] + 80;
+    c = c - gCameraOrigin[2];
     out[2] = c;
     if ((u16)(buf[0] + 0x20) > 0x130) {
         *(u32 *)p = zero;

@@ -10,7 +10,6 @@ struct Vec {
     s16 x, y, z;
 };
 extern struct Camera *gActiveCamera;
-extern struct Vec gUnk_03005418;
 static inline s32 scale(s32 input)
 {
     s32 value = input * 3;
@@ -47,7 +46,7 @@ void sub_082260D8(void)
     if (gActiveCamera) {
         gCamera.position.x -= gActiveCamera->offsetX;
         gCamera.position.z -= gActiveCamera->offsetZ;
-        project(&gUnk_03005418, &gCamera.position);
+        project(&gCameraOrigin, &gCamera.position);
         gActiveCamera->shake = 0;
         gActiveCamera->offsetX = 0;
         gActiveCamera->offsetZ = 0;

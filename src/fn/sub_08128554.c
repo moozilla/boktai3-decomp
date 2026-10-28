@@ -1,5 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "render.h"
 #ifdef NONMATCHING
 // fuzzy: 95.9%
 // fix.py best (sweep after the inlined-insn fix)
@@ -32,7 +33,6 @@ struct FragmentBurst {
     u16 timer;
     u8 enter;
 };
-extern struct Vec gUnk_03005418;
 void Sound_PlaySong(u32);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
@@ -319,7 +319,7 @@ void FragmentBurst_UpdateImpactAnimation(void *unused, struct FragmentBurst *p)
     }
     i = 0;
     endMask = 8;
-    camera = &gUnk_03005418;
+    camera = &gCameraOrigin;
     do {
         struct FragmentSprite *sprite = &p->sprites[i];
         sprite->flags &= ~1;

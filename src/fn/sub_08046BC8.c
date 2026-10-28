@@ -22,9 +22,9 @@ inline static void DamageNumber_ProjectPosition_(struct ContactPosition *screen,
     vertical = DamageNumber_ProjectScale(3 * world->y);
     y = sum - vertical;
     depth = sum + vertical;
-    screen->x = (((u16)screen->x) - (*((typeof(gUnk_03005418) *)0x03005418))[0]) + 120;
-    screen->y = (y - (*((typeof(gUnk_03005418) *)0x03005418))[1]) + 80;
-    screen->z = depth - (*((typeof(gUnk_03005418) *)0x03005418))[2];
+    screen->x = (((u16)screen->x) - (*((typeof(gCameraOrigin) *)0x03005418))[0]) + 120;
+    screen->y = (y - (*((typeof(gCameraOrigin) *)0x03005418))[1]) + 80;
+    screen->z = depth - (*((typeof(gCameraOrigin) *)0x03005418))[2];
 }
 
 u32 DamageNumberDisplay_RenderDigits(struct DamageNumberDisplay *display,

@@ -4,7 +4,6 @@
 struct Vec50 {
     s32 x : 16, y : 16, z : 16;
 };
-extern u16 gUnk_03005418[];
 void sub_082359CC(u8 *);
 void HealthBurstEffect_InitParticlePool(u8 *);
 void sub_08235B34(u8 *);
@@ -45,9 +44,9 @@ s32 sub_08235C30(u8 *p, u8 *owner, u16 mode)
     vertical = scale50(coords[1] * 3);
     y = sum - vertical;
     depth = sum + vertical;
-    dest[0] = dest[0] - gUnk_03005418[0] + 120;
-    dest[1] = y - gUnk_03005418[1] + 80;
-    dest[2] = depth - gUnk_03005418[2];
+    dest[0] = dest[0] - gCameraOrigin[0] + 120;
+    dest[1] = y - gCameraOrigin[1] + 80;
+    dest[2] = depth - gCameraOrigin[2];
     sub_082359CC(p);
     HealthBurstEffect_InitParticlePool(p);
     sub_08235B34(p);

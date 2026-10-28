@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
+#include "render.h"
 /* EffectGroup_Spawn: sets a 4-part effect group kind (installing its update callback), spawns one part at the source position projected to screen space plus an offset, and toggles flag 0x200 on all parts for kind 2 (provisional name) */
 
 struct Unk082315A8Vec {
@@ -33,7 +34,6 @@ struct Unk082315A8Graphics {
     u8 unknown0[0x1C];
     void *animation;
 };
-extern s16 gUnk_03005418[];
 extern const u16 gUnk_08E879A0[];
 void sub_08231444(void);
 void EffectGroup_Reset(void *);
@@ -97,9 +97,9 @@ s32 EffectGroup_Spawn(struct Unk082315A8Group *group, u32 kind, u32 parameter,
         y = Scale(s->y);
         {
             s32 a = sum - y, b = sum + y;
-            d->x = d->x - gUnk_03005418[0] + 0x78;
-            d->y = a - gUnk_03005418[1] + 0x50;
-            d->z = b - gUnk_03005418[2];
+            d->x = d->x - gCameraOrigin[0] + 0x78;
+            d->y = a - gCameraOrigin[1] + 0x50;
+            d->z = b - gCameraOrigin[2];
         }
     }
     for (i = 0; i <= 3; i++) {

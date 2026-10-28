@@ -21,7 +21,7 @@ struct Effect {
     u8 pad20[4];
     struct Sprite sprite;
 };
-extern struct Vec gUnk_03005418;
+extern struct Vec gCameraOrigin;
 static inline int project(int input)
 {
     int v = input * 3;
@@ -43,9 +43,9 @@ void FloatingEffect_Project(struct Effect *p)
     height = project(in->y);
     {
         int y = xy - height, z = xy + height;
-        out->x = out->x - gUnk_03005418.x + 120;
-        out->y = y - gUnk_03005418.y + 80;
-        out->z = z - gUnk_03005418.z;
+        out->x = out->x - gCameraOrigin.x + 120;
+        out->y = y - gCameraOrigin.y + 80;
+        out->z = z - gCameraOrigin.z;
     }
     s->position.x -= 8;
     s->position.y -= 8;

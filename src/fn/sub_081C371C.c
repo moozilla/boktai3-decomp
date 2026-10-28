@@ -1,5 +1,5 @@
 #include "global.h"
-extern u16 gUnk_03005418[];
+#include "render.h"
 s32 __divsi3(s32, s32);
 void OrbitMotion_BeginDistanceWave(void *, void *, void *, u32, u32);
 void ContactImpactEffect_UpdateContact(void);
@@ -38,8 +38,8 @@ static inline s32 Scale(s32 value)
 }
 static inline void FromScreen(struct Vec *out, const struct Vec *screen, s32 offset)
 {
-    s32 x = screen->x + (s16)gUnk_03005418[0] - 120;
-    s32 y = screen->y + (s16)gUnk_03005418[1] - 80;
+    s32 x = screen->x + (s16)gCameraOrigin[0] - 120;
+    s32 y = screen->y + (s16)gCameraOrigin[1] - 80;
     out->x = Half(__divsi3((x + y) << 5, 3) + offset);
     out->y = offset;
     out->z = Half(__divsi3((y - x) << 5, 3) + offset);
@@ -56,9 +56,9 @@ static inline void Project(u16 *screen, struct Vec *world)
     y = Scale(world->y);
     sy = sum - y;
     depth = sum + y;
-    screen[0] = screen[0] - gUnk_03005418[0] + 120;
-    screen[1] = sy - gUnk_03005418[1] + 80;
-    screen[2] = depth - gUnk_03005418[2];
+    screen[0] = screen[0] - gCameraOrigin[0] + 120;
+    screen[1] = sy - gCameraOrigin[1] + 80;
+    screen[2] = depth - gCameraOrigin[2];
 }
 void ContactImpactEffect_UpdateInterpolatedPosition(void);
 static inline void SetCallback(void (*callback)(void), void (**slot)(void))
@@ -81,9 +81,9 @@ static inline void Project_081C371C(u16 *screen, struct Vec *world)
     y = Scale(world->y);
     sy = sum - y;
     depth = sum + y;
-    screen[0] = screen[0] - gUnk_03005418[0] + 120;
-    screen[1] = sy - gUnk_03005418[1] + 80;
-    screen[2] = depth - gUnk_03005418[2];
+    screen[0] = screen[0] - gCameraOrigin[0] + 120;
+    screen[1] = sy - gCameraOrigin[1] + 80;
+    screen[2] = depth - gCameraOrigin[2];
 }
 
 void ContactImpactEffect_BeginInterpolatedPosition(struct ContactImpactEffect *input,

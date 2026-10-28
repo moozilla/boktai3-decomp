@@ -1,6 +1,6 @@
 // MATCHING_CONCESSION: register-pinning
 #include "projected_display.h"
-extern u16 gUnk_03005418[];
+#include "render.h"
 struct ProjectedDisplay *ProjectedDisplay_PositionEntry(struct ProjectedDisplay *display, s32 index)
 {
     register struct ProjectedDisplay *result asm("r0") = display;
@@ -30,9 +30,9 @@ struct ProjectedDisplay *ProjectedDisplay_PositionEntry(struct ProjectedDisplay 
         }
         y = sum - vertical;
         depth = sum + vertical;
-        destination->x = (u16)destination->x - gUnk_03005418[0] + 120;
-        destination->y = y - gUnk_03005418[1] + 80;
-        destination->z = depth - gUnk_03005418[2];
+        destination->x = (u16)destination->x - gCameraOrigin[0] + 120;
+        destination->y = y - gCameraOrigin[1] + 80;
+        destination->z = depth - gCameraOrigin[2];
     } else {
         struct ContactPosition copy = display->screen;
         struct ProjectedDisplayEntry *view = entry;

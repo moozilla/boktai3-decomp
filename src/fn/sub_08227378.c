@@ -10,7 +10,6 @@ struct Camera {
     u16 f5A;
     u16 f5C;
 };
-extern s16 gUnk_03005418[];
 void Camera_DispatchCommands(struct Camera *);
 void sub_08226CF8(struct Camera *);
 void Camera_UpdatePositionMode(struct Camera *);
@@ -47,7 +46,7 @@ u32 Camera_Update(struct Camera *c)
         Camera_UpdateShake(c);
         Camera_ApplyPositionBounds(c, (s16 *)&gCamera.position);
     }
-    out = gUnk_03005418;
+    out = gCameraOrigin;
     p = (s16 *)&gCamera.position;
     a = p[0];
     b = p[2];

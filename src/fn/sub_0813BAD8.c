@@ -8,7 +8,7 @@ struct PackedVec {
     u32 pad : 16;
 };
 extern u8 *gGameState;
-extern struct Vec gUnk_03005418;
+extern struct Vec gCameraOrigin;
 void Player_SetDirectionalEffectFrame(void *, void *, s32);
 
 static inline s32 Scale(s32 value)
@@ -40,9 +40,9 @@ inline static void Project(struct Vec *screen, struct PackedVec *world)
     height = Scale(world->y);
     y = depth - height;
     zscreen = depth + height;
-    screen->x = (((u16)screen->x) - ((u16)gUnk_03005418.x)) + 120;
-    screen->y = ((y) - ((u16)gUnk_03005418.y)) + 80;
-    screen->z = (zscreen) - ((u16)gUnk_03005418.z);
+    screen->x = (((u16)screen->x) - ((u16)gCameraOrigin.x)) + 120;
+    screen->y = ((y) - ((u16)gCameraOrigin.y)) + 80;
+    screen->z = (zscreen) - ((u16)gCameraOrigin.z);
 }
 
 inline static struct Vec *SetVec(struct Vec *v, s32 x, s32 y, s32 z)

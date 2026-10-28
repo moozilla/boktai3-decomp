@@ -8,7 +8,7 @@ struct V {
 struct P {
     u32 x : 16, y : 16, z : 16, w : 16;
 };
-extern struct V gUnk_03005418;
+extern struct V gCameraOrigin;
 void ShadowActor_UpdateTransition(void *);
 s32 __divsi3(s32, s32);
 static inline s32 sh(s32 v, s32 n)
@@ -28,9 +28,9 @@ static inline void project(struct V *out, struct V *in)
     b = sh(3 * in->y, 5);
     c = a - b;
     d = a + b;
-    out->x = out->x - gUnk_03005418.x + 120;
-    out->y = c - gUnk_03005418.y + 80;
-    out->z = d - gUnk_03005418.z;
+    out->x = out->x - gCameraOrigin.x + 120;
+    out->y = c - gCameraOrigin.y + 80;
+    out->z = d - gCameraOrigin.z;
 }
 struct Q {
     u8 pad[0x48];
@@ -63,8 +63,8 @@ void sub_081982A0(u8 *p)
             struct V *q = &out;
             q->x;
         }) +
-        gUnk_03005418.x - 0x78;
-    b = out.y + gUnk_03005418.y - 0x50;
+        gCameraOrigin.x - 0x78;
+    b = out.y + gCameraOrigin.y - 0x50;
     c = __divsi3((a + b) << 5, 3) + y;
     world->x = sh(c, 1);
     new_var = y;

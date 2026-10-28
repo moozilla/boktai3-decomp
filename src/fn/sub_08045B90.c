@@ -1,5 +1,5 @@
 #include "projected_display.h"
-extern u16 gUnk_03005418[];
+#include "render.h"
 void ProjectedDisplay_UpdateScreenPosition(struct ProjectedDisplay *display)
 {
     struct ContactPosition *screen;
@@ -18,7 +18,7 @@ void ProjectedDisplay_UpdateScreenPosition(struct ProjectedDisplay *display)
     vertical = projectScale(3 * raised->y);
     y = sum - vertical;
     depth = sum + vertical;
-    screen->x = (u16)screen->x - gUnk_03005418[0] + 120;
-    screen->y = y - gUnk_03005418[1] + 80;
-    screen->z = depth - gUnk_03005418[2];
+    screen->x = (u16)screen->x - gCameraOrigin[0] + 120;
+    screen->y = y - gCameraOrigin[1] + 80;
+    screen->z = depth - gCameraOrigin[2];
 }

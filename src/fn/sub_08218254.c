@@ -20,7 +20,6 @@ struct Drawable {
     u8 pad1e[4];
     struct Drawable *next;
 };
-extern u16 gUnk_03005418[];
 static inline s32 UnsignedScale(u8 v)
 {
     return v;
