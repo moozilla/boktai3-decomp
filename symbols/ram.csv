@@ -410,7 +410,7 @@ addr,name,size,kind,decl,header,confidence,notes
 0300523C,gEnginePauseFlags,4,object,extern u32 gEnginePauseFlags;,include/render.h,high physical shape; provisional semantic name,engine pause/suspend flags (bits 1-2: sound off; task list masks)
 03005240,gNextTaskId,2,object,extern u16 gNextTaskId;,include/engine.h,,"next Task id (unique, never 0)"
 03005250,gLinkMenuActive,4,object,extern u32 gLinkMenuActive;,include/ram.h,low,
-03005260,gUnk_03005260,10,object,,,,
+03005260,gPadState,10,object,extern u16 gPadState[];,include/input.h,low,"input state: two slots of {held, pressed, released, pad}; updated by sub_08219B24"
 03005270,gHardwareKeys,2,object,extern u16 gHardwareKeys;,include/runtime.h,,Raw active-low KEYINPUT sampled before per-player input records are updated
 03005274,gSceneSelectionDisplaySlots,A,object,extern u16 gSceneSelectionDisplaySlots[];,include/ram.h,low,
 03005278,gLcgState,4,object,extern u32 gLcgState;,include/runtime.h,,"Independent LCG state, separate from gRandomIndex at 03005274; initialized to 123456 and advanced by Random_Next15"

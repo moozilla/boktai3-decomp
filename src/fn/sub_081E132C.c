@@ -4,7 +4,7 @@
 #include "menu_parameters.h"
 #include "runtime.h"
 #include "ram.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 void SelectionPalette_UpdatePulse(void *);
 void Sound_PlaySong(s32);
 void Menu_StartFadeOut(s32);
@@ -22,7 +22,7 @@ void GameStart_Update(u8 *p)
     switch (state = W(0x4DC)) {
         case 0:
             SelectionPalette_UpdatePulse(p);
-            if (gUnk_03005260[1] & 2) {
+            if (gPadState[1] & 2) {
                 Sound_PlaySong(0xDE);
                 W(0x4D8) = 3;
                 Menu_StartFadeOut(3);
@@ -31,7 +31,7 @@ void GameStart_Update(u8 *p)
                 W(0x4E0) = state;
                 break;
             }
-            if (gUnk_03005260[1] & 1) {
+            if (gPadState[1] & 1) {
                 if (W(0x4CC) == 0) {
                     Sound_PlaySong(0xE0);
                     W(0x4D8) = 3;
@@ -50,10 +50,10 @@ void GameStart_Update(u8 *p)
             }
             if (H(0x86E) == 0)
                 break;
-            if (gUnk_03005260[1] & 0x40) {
+            if (gPadState[1] & 0x40) {
                 if (--W(0x4CC) < 0)
                     W(0x4CC) = 1;
-            } else if (gUnk_03005260[1] & 0x80) {
+            } else if (gPadState[1] & 0x80) {
                 if (++W(0x4CC) > 1)
                     W(0x4CC) = state;
             } else

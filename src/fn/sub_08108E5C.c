@@ -1,6 +1,6 @@
 #include "global.h"
+#include "input.h"
 // MATCHING_CONCESSION: register-pinning
-#define gTaskInput gUnk_03005260
 struct CallbackTask {
     u8 pad0[0x1C];
     u32 cancellable;
@@ -17,7 +17,6 @@ struct CallbackTask {
     void (*update)(struct CallbackTask *);
     void *context;
 };
-extern u16 gUnk_03005260[];
 u8 CallbackTask_Finish(struct CallbackTask *);
 s32 CallbackTask_Update(struct CallbackTask *task)
 {
@@ -33,7 +32,7 @@ s32 CallbackTask_Update(struct CallbackTask *task)
         if (r)
             return 0;
     }
-    if (gUnk_03005260[1] & 2) {
+    if (gPadState[1] & 2) {
         task->completed = 1;
         task->arg2 = 1;
     }

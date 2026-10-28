@@ -1,5 +1,6 @@
 #include "global.h"
 #include "game_state.h"
+#include "input.h"
 struct LinkScorePanel {
     u8 pad0[0xfe4];
     void (*update)(struct LinkScorePanel *);
@@ -15,7 +16,6 @@ struct LinkScorePanel {
     u16 remaining;
     u16 step;
 };
-extern u16 gUnk_03005260[];
 void CharacterModel_UpdatePairedAnimations(void *, s32);
 void PaletteFade_CycleMenuColors(void *);
 s32 Mod(s32, s32);
@@ -70,7 +70,7 @@ void sub_0811048C(struct LinkScorePanel *p)
                 SCORE = 9999;
             if (Mod(p->timer, 2) == 0)
                 Sound_PlaySong(0x2a5);
-        } else if (gUnk_03005260[1] & 0x30f) {
+        } else if (gPadState[1] & 0x30f) {
             Sound_PlaySong(0xdd);
             SetUpdate(p, LinkScorePanel_OnWaitSessionReady, 3);
             return;
@@ -80,7 +80,7 @@ void sub_0811048C(struct LinkScorePanel *p)
             u32 *flagWord = &p->flags;
             u32 bits = *flagWord & value;
             value = (u32)flagWord;
-            if (!FlagIsSet(bits) && (gUnk_03005260[1] & 0x30f)) {
+            if (!FlagIsSet(bits) && (gPadState[1] & 0x30f)) {
                 p->step <<= 3;
                 SetFlag((u32 *)value, 1);
             }

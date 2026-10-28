@@ -22,7 +22,7 @@ struct ResultPromptArgs {
 };
 
 extern s32 gSceneDialogActive;
-extern u16 gUnk_03005260[]; // [1] = newly pressed keys
+extern u16 gPadState[]; // [1] = newly pressed keys
 
 u8 Save_WriteAlternateSlotAndSelect(void);
 void Hud_SetMode(s32);

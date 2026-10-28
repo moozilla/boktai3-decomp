@@ -13,7 +13,7 @@ struct Obj {
 extern u8 *gGameState;
 extern u8 *gUnk_02000580;
 extern u32 gEngineFlags;
-extern u16 gUnk_03005260;
+extern u16 gPadState;
 void Solar_SaveExposureTimestamp(void);
 s32 SolarFruit_GetInventorySlot(s32);
 s32 Div(s32, s32);
@@ -46,7 +46,7 @@ void sub_0822C598(struct Obj *obj)
             Solar_SaveExposureTimestamp();
         }
     } else {
-        if (gUnk_03005260)
+        if (gPadState)
             obj->idle = 0;
         else if (obj->idle <= 0x383)
             obj->idle++;

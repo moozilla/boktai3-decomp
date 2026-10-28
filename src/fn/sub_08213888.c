@@ -8,7 +8,7 @@ struct ScriptArg {
     u16 type;
     void *value;
 };
-extern struct Keys gUnk_03005260;
+extern struct Keys gPadState;
 
 void Sound_PlaySong(u32);
 u32 ForgingBook_IsGridPositionValid(s32, s32, s32);
@@ -45,12 +45,12 @@ s32 CollectionBook_UpdateMenu(u8 *m)
     struct ScriptArg arg;
 
     if (EXITING == 0 && BUSY == 0) {
-        if (gUnk_03005260.pressed & 2) {
+        if (gPadState.pressed & 2) {
             ScreenTransition_SendCommand(1, FADE, 4, 4, 4, 0xffff, moved);
             EXITING = 1;
             CLOSING = 1;
             Sound_PlaySong(0x119);
-        } else if (gUnk_03005260.pressed & 1) {
+        } else if (gPadState.pressed & 1) {
             s16 *ip = &INDEX;
             s32 o = *ip * 2;
             u8 *ids = m + 0x6e0;
@@ -65,22 +65,22 @@ s32 CollectionBook_UpdateMenu(u8 *m)
             } else {
                 Sound_PlaySong(0x192);
             }
-        } else if ((gUnk_03005260.pressed & 0x40) &&
+        } else if ((gPadState.pressed & 0x40) &&
                    ForgingBook_IsGridPositionValid(COL, ROW - 1, PAGE)) {
             ROW--;
             moved = 1;
             Sound_PlaySong(0xdc);
-        } else if ((gUnk_03005260.pressed & 0x80) &&
+        } else if ((gPadState.pressed & 0x80) &&
                    ForgingBook_IsGridPositionValid(COL, ROW + 1, PAGE)) {
             ROW++;
             moved = 1;
             Sound_PlaySong(0xdc);
-        } else if ((gUnk_03005260.pressed & 0x20) &&
+        } else if ((gPadState.pressed & 0x20) &&
                    ForgingBook_IsGridPositionValid(COL - 1, ROW, PAGE)) {
             COL--;
             moved = 1;
             Sound_PlaySong(0xdc);
-        } else if ((gUnk_03005260.pressed & 0x10) &&
+        } else if ((gPadState.pressed & 0x10) &&
                    ForgingBook_IsGridPositionValid(COL + 1, ROW, PAGE)) {
             COL++;
             moved = 1;

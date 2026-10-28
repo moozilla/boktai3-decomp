@@ -1,4 +1,3 @@
-#define gStorageInputKeys gUnk_03005260
 #include "global.h"
 #include "scene_input_navigation.h"
 struct MenuPanel {
@@ -31,14 +30,14 @@ static inline u8 distinctInventorySlots(s32 source, s32 destination)
 }
 void Storage_UpdateSwapSelection(struct MenuPanel *p)
 {
-    if (gUnk_03005260[0] & 4) {
+    if (gPadState[0] & 4) {
         Anim_LoadKeyframe(p->cursor, p->cursorResource, 0x4D, 1);
-        if (gUnk_03005260[1] & 1) {
+        if (gPadState[1] & 1) {
             Sound_PlaySong(0xDC);
             if (++p->clockMode > 2)
                 p->clockMode = 0;
         }
-    } else if (gUnk_03005260[1] & 1) {
+    } else if (gPadState[1] & 1) {
         if (p->mode == 1) {
             s32 source, destination, empty;
             if (p->grid.selection == p->grid.savedSelection &&
@@ -65,7 +64,7 @@ void Storage_UpdateSwapSelection(struct MenuPanel *p)
             }
         }
         Sound_PlaySong(0x192);
-    } else if (gUnk_03005260[1] & 2) {
+    } else if (gPadState[1] & 2) {
         Sound_PlaySong(0xDE);
         SceneInventory_BeginCategoryBrowse(p);
     } else {

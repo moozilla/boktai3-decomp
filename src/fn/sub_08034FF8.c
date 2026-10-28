@@ -35,6 +35,7 @@ void Memory_Clear(void *, int);
 #define rfu_clearSlot rfu_clearSlot_sdk
 #include "rfu_compat.h"
 #include "ram.h"
+#include "input.h"
 #undef rfu_clearSlot
 u16 rfu_clearSlot(int connTypeFlag, int slotStatusIndex);
 static inline void setOperation(struct Engine *p, int op, int zero)
@@ -47,7 +48,6 @@ static inline void setOperation(struct Engine *p, int op, int zero)
 int Wireless_BeginChildTransfer(struct Engine *);
 void Wireless_SetStatus(int);
 void RfuManager_RequestMscCycleCompletion(void);
-extern u16 gUnk_03005260[];
 static inline void requestUpdate(struct Engine *p)
 {
     int flags = p->mask;
@@ -106,7 +106,7 @@ int Wireless_UpdateChildHandshake(struct Engine *p)
             rfu_clearSlot(8, *slot);
         }
     }
-    if (gUnk_03005260[1] & 2)
+    if (gPadState[1] & 2)
         requestUpdate(p);
     flags = p->mask;
     if (!(flags & 64))

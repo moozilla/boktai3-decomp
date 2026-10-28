@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 struct S {
     u8 f[0xFE4];
     void *fp;
@@ -14,7 +15,6 @@ struct S {
     u8 pad2;
     u16 t;
 };
-extern u16 gUnk_03005260[];
 void Serial_StopCommunication(void);
 void TextWindow_SetScript(u32, u32);
 void TextWindow_Refresh(u32, u32);
@@ -32,7 +32,7 @@ void SaveMenu_UpdateSaveFailure(struct S *s)
     }
     if (s->t <= 0x3b) {
         s->t++;
-    } else if (gUnk_03005260[1] & 0x30F) {
+    } else if (gPadState[1] & 0x30F) {
         System_ShutdownAndSoftReset();
     }
 }

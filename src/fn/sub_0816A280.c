@@ -22,7 +22,7 @@ void PauseMenu_UpdateQuantityInput(struct SceneHudState *p)
     u8 *timer;
     s32 bank, frame, i;
 
-    if ((gUnk_03005260[0] & 0x20) &&
+    if ((gPadState[0] & 0x20) &&
         gGameState->menuRewardBalance + (p->valueRate + 1) * p->selectedQuantity <= 9999 &&
         p->actionOwner->currentStatB + p->valueRate < p->actionOwner->maximumStatB) {
         p->valueRate++;
@@ -36,7 +36,7 @@ void PauseMenu_UpdateQuantityInput(struct SceneHudState *p)
         frame = p->quantityArrowFrame + bank;
         if (++*timer >= 16)
             *timer = 0;
-    } else if ((gUnk_03005260[0] & 0x10) && p->valueRate) {
+    } else if ((gPadState[0] & 0x10) && p->valueRate) {
         p->valueRate--;
         Sound_PlaySong(0x37D);
         StatusPanel_UpdateGaugePosition(p);
@@ -59,7 +59,7 @@ void PauseMenu_UpdateQuantityInput(struct SceneHudState *p)
         bank = 0;
         frame = 0x12;
     }
-    if ((gUnk_03005260[0] & 0x20) &&
+    if ((gPadState[0] & 0x20) &&
         gGameState->menuRewardBalance + (p->valueRate + 1) * p->selectedQuantity > 9999)
         p->balanceLimitTimer = 60;
     if (p->balanceLimitTimer) {

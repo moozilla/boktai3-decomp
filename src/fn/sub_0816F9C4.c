@@ -1,4 +1,3 @@
-#define gSceneInputKeys gUnk_03005260
 #include "global.h"
 s32 MessageWindow_Clear(void);
 s32 MessageWindow_SetBounds(s32, s32, s32, s32);
@@ -6,7 +5,7 @@ s32 MessageWindow_SetMessageTable(const void *);
 s32 MessageWindow_SetDisplayMode(s32);
 s32 MessageWindow_ShowMessage(s32);
 #include "scene_hud_display.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 s32 TextWindow_SetScript(s32, const u8 *);
 void TextWindow_SetBounds(s32, s32, s32, s32, s32);
 void TextWindow_StartPlayback(s32);
@@ -46,7 +45,7 @@ void SceneHud_UpdateTimedMessage(struct SceneHudState *p)
     }
     p->actionTransferDelay++;
     z = 0;
-    if (p->actionTransferDelay > 89 || (p->actionTransferDelay > 15 && (gUnk_03005260[1] & 1))) {
+    if (p->actionTransferDelay > 89 || (p->actionTransferDelay > 15 && (gPadState[1] & 1))) {
         TextWindow_Clear(p->timedMessageWindow);
         MessageWindow_SetBounds(0, 16, 30, 2);
         SceneHud_RefreshActionIcons(p);

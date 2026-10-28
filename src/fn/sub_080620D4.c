@@ -8,10 +8,10 @@ s32 SceneInventory_TickActionSelection(struct SceneInventoryTail *p)
         SceneInventory_UpdateModePrompt(p, 1);
         return 0;
     }
-    if (gUnk_03005260[1] & 2) {
+    if (gPadState[1] & 2) {
         Sound_PlaySong(0xDE);
         SceneInventory_BeginBrowse(p);
-    } else if (1 & gUnk_03005260[1]) {
+    } else if (1 & gPadState[1]) {
         switch (p->category) {
             case 0:
                 SceneInventory_ConfirmEquipmentAction(p);

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 // MATCHING_CONCESSION: register-pinning
 
 #define SCRIPT_PROMPT_INPUT_BASE ((u16 *)0x03005260)
@@ -22,7 +23,6 @@ struct ScriptPromptTask {
     u8 pulseState[4];
 };
 
-extern u16 gUnk_03005260[];
 extern u32 gScriptPromptSettings[];
 void Sound_PlaySong(u32);
 void Sound_PauseChannel10(u32);

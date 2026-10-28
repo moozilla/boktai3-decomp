@@ -1,5 +1,6 @@
 #include "global.h"
 #include "player.h"
+#include "input.h"
 struct ScriptCallArgs {
     u32 count : 16;
     u32 unused : 16;
@@ -26,7 +27,6 @@ struct TransitionPanel {
     u8 unknown34E[2];
     s32 procedure;
 };
-extern u16 gUnk_03005260[];
 void Sound_PlaySong(u32);
 void MessageWindow_Clear(void);
 void Hud_SetMode(s32);
@@ -38,13 +38,13 @@ void Palette_UpdateHighlightPulse(void *, void *);
 void TransitionPanel_UpdateCostSelection(struct TransitionPanel *p)
 {
     s32 decision = -1;
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         u32 choice = p->choice;
         decision = 1;
         if (choice != 0)
             decision = 0;
         Sound_PlaySong(221);
-    } else if (gUnk_03005260[1] & 2) {
+    } else if (gPadState[1] & 2) {
         decision = 0;
         Sound_PlaySong(222);
     }
@@ -85,9 +85,9 @@ void TransitionPanel_UpdateCostSelection(struct TransitionPanel *p)
         Task_Kill(p);
     } else {
         u32 changed = 0;
-        if (gUnk_03005260[1] & 32)
+        if (gPadState[1] & 32)
             changed = p->choice != 0;
-        else if ((gUnk_03005260[1] & 16) && !p->choice)
+        else if ((gPadState[1] & 16) && !p->choice)
             changed = 1;
         if (changed) {
             Sound_PlaySong(220);

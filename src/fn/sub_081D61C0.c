@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "monster_book.h"
+#include "input.h"
 
 s32 Bestiary_GetCategoryFirstEntry(u32);
 s32 Bestiary_GetCategoryEntryCount(u32);
@@ -185,7 +186,6 @@ void BestiaryDisplay_SetEntry(void *, u32);
 void BestiaryDisplay_DrawEntryDetails(void *);
 void BestiaryFlags_Update(void *);
 
-extern u16 gUnk_03005260[];
 void Sound_PlaySong(u32);
 void MonsterBook_SetPage(void *, u32);
 void Script_Call(void *, u32);
@@ -207,14 +207,14 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
     asm("");
     switch (p->mode) {
         case 0:
-            if (gUnk_03005260[1] & 0x200) {
+            if (gPadState[1] & 0x200) {
                 if (p->category)
                     p->category--;
                 else
                     p->category = 13;
                 Sound_PlaySong(0x10A);
                 goto categoryChanged;
-            } else if (gUnk_03005260[1] & 0x100) {
+            } else if (gPadState[1] & 0x100) {
                 if (p->category <= 12)
                     p->category++;
                 else
@@ -233,7 +233,7 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
                 DrawGroupCounts(p);
                 BestiaryFlags_Update(p);
             }
-            if ((gUnk_03005260[1] & 0x40) && p->entry) {
+            if ((gPadState[1] & 0x40) && p->entry) {
                 u8 *selection = (u8 *)p + 0x48;
                 if (*selection) {
                     p->entry--;
@@ -244,7 +244,7 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
                 }
                 Sound_PlaySong(0xDC);
                 goto selectionChanged;
-            } else if ((gUnk_03005260[1] & 0x80) && p->entry <= 0x51) {
+            } else if ((gPadState[1] & 0x80) && p->entry <= 0x51) {
                 u8 *selection = (u8 *)p + 0x48;
                 s32 current = *selection;
                 if (current < Bestiary_GetCategoryEntryCount(p->category) - 1) {
@@ -261,12 +261,12 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
             selectionChanged:
                 p->s6C.y = BOOK_FIELD(p, 0x48, u8) << 4;
             }
-            if (gUnk_03005260[1] & 1) {
+            if (gPadState[1] & 1) {
                 MonsterBook_SetPage(p, 1);
                 BestiaryFlags_Update(p);
                 Sound_PlaySong(0xDD);
             }
-            if (gUnk_03005260[1] & 2) {
+            if (gPadState[1] & 2) {
                 void *script = BOOK_FIELD(p, 0xF18, void *);
                 if (script)
                     Script_Call(script, 0);
@@ -275,14 +275,14 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
             }
             break;
         case 1:
-            if (gUnk_03005260[1] & 0x40) {
+            if (gPadState[1] & 0x40) {
                 if (p->unk27)
                     p->unk27--;
                 else
                     p->unk27 = 3;
                 Sound_PlaySong(0xDC);
                 goto tabChanged;
-            } else if (gUnk_03005260[1] & 0x80) {
+            } else if (gPadState[1] & 0x80) {
                 if (p->unk27 <= 2)
                     p->unk27++;
                 else
@@ -295,14 +295,14 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
                 p->sCC.y = p->unk27 << 4;
                 BestiaryDisplay_DrawEntryDetails(p);
             }
-            if (gUnk_03005260[1] & 0x100) {
+            if (gPadState[1] & 0x100) {
                 if (p->entry <= 0x51)
                     p->entry++;
                 else
                     p->entry = 0;
                 Sound_PlaySong(0x10A);
                 goto entryChanged;
-            } else if (gUnk_03005260[1] & 0x200) {
+            } else if (gPadState[1] & 0x200) {
                 if (p->entry)
                     p->entry--;
                 else
@@ -325,7 +325,7 @@ u32 MonsterBook_UpdateNavigation(struct MonsterBook *p)
                 u8 *pending = (u8 *)p + 0xDA7;
                 switch (*pending) {
                     case 0:
-                        if (gUnk_03005260[1] & 2) {
+                        if (gPadState[1] & 2) {
                             BOOK_FIELD(p, 0xD4E, u16) |= 1;
                             ThresholdTrack_SelectInterval(p);
                             p->s6C.y = BOOK_FIELD(p, 0x48, u8) << 4;

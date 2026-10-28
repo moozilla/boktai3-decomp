@@ -1,4 +1,3 @@
-#define gStorageInputKeys gUnk_03005260
 #include "global.h"
 #include "scene_input_navigation.h"
 struct SceneInventoryCategoryMenu {
@@ -29,7 +28,7 @@ void Storage_UpdateCursorPosition(struct SceneInputGridView *, void *);
 void Storage_UpdateModeSelection(struct SceneInventoryCategoryMenu *p)
 {
     Storage_SetInteractionMode(p, 1);
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         Sound_PlaySong(0xDD);
         SceneInventory_SetCategoryPalette(p, p->colors);
         switch (p->grid.selection) {

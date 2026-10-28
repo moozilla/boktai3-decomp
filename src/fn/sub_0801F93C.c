@@ -1,8 +1,8 @@
 #include "global.h"
 
 #include "engine.h"
+#include "input.h"
 
-extern u16 gUnk_03005260[];
 s32 MessageQueue_GetMessagesById(u16, void *);
 void SceneObjects_BeginActivation(u8 *, u16);
 void SceneObjects_BeginDeactivation(u8 *, u16);
@@ -184,7 +184,7 @@ s32 sub_0801F93C(struct Obj1FController *self)
                 if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
                     Obj1F_Abs(delta.y) <= 0xFE && !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
                     if (!o->active) {
-                        if ((gUnk_03005260[1] & 1) &&
+                        if ((gPadState[1] & 1) &&
                             !SceneObject_CheckActorCompatibility((u8 *)self, (u8 *)o) &&
                             o->script) {
                             args.kind = 4;
@@ -338,7 +338,7 @@ s32 sub_0801F93C(struct Obj1FController *self)
                 if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
                     Obj1F_Abs(delta.y) <= 0xFE && !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
                     if (!o->active) {
-                        if ((gUnk_03005260[1] & 1) &&
+                        if ((gPadState[1] & 1) &&
                             !SceneObject_CheckActorCompatibility((u8 *)self, (u8 *)o) &&
                             o->script) {
                             args.kind = 4;

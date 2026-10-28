@@ -1,6 +1,7 @@
 #include "global.h"
 #include "menu_parameters.h"
 #include "runtime.h"
+#include "input.h"
 
 struct EntryMenu {
     u8 sprites[0x34C];
@@ -11,7 +12,6 @@ struct EntryMenu {
     s16 state, result;
     s32 timer, fadeShift;
 };
-extern u16 gUnk_03005260[];
 extern u8 *gGameState;
 void Password_MoveCursorUp(void *);
 void Password_MoveCursorDown(void *);
@@ -44,9 +44,9 @@ void Password_UpdateEntryMenu(struct EntryMenu *p)
         case 0:
             p->verticalHistory <<= 1;
             p->horizontalHistory <<= 1;
-            if (gUnk_03005260[0] & 0xC0)
+            if (gPadState[0] & 0xC0)
                 p->verticalHistory |= 1;
-            if (gUnk_03005260[0] & 0x30)
+            if (gPadState[0] & 0x30)
                 p->horizontalHistory |= 1;
             if (p->verticalHistory == 0xFFFF)
                 p->verticalRepeat++;
@@ -56,19 +56,17 @@ void Password_UpdateEntryMenu(struct EntryMenu *p)
                 p->horizontalRepeat++;
             else
                 p->horizontalRepeat = 1;
-            if ((gUnk_03005260[1] & 0x40) ||
-                (Mod(p->verticalRepeat, 5) == 0 && (gUnk_03005260[0] & 0x40)))
+            if ((gPadState[1] & 0x40) || (Mod(p->verticalRepeat, 5) == 0 && (gPadState[0] & 0x40)))
                 Password_MoveCursorUp(p);
-            if ((gUnk_03005260[1] & 0x80) ||
-                (Mod(p->verticalRepeat, 5) == 0 && (gUnk_03005260[0] & 0x80)))
+            if ((gPadState[1] & 0x80) || (Mod(p->verticalRepeat, 5) == 0 && (gPadState[0] & 0x80)))
                 Password_MoveCursorDown(p);
-            if ((gUnk_03005260[1] & 0x10) ||
-                (Mod(p->horizontalRepeat, 5) == 0 && (gUnk_03005260[0] & 0x10)))
+            if ((gPadState[1] & 0x10) ||
+                (Mod(p->horizontalRepeat, 5) == 0 && (gPadState[0] & 0x10)))
                 Password_MoveCursorRight(p);
-            if ((gUnk_03005260[1] & 0x20) ||
-                (Mod(p->horizontalRepeat, 5) == 0 && (gUnk_03005260[0] & 0x20)))
+            if ((gPadState[1] & 0x20) ||
+                (Mod(p->horizontalRepeat, 5) == 0 && (gPadState[0] & 0x20)))
                 Password_MoveCursorLeft(p);
-            if (gUnk_03005260[1] & 1) {
+            if (gPadState[1] & 1) {
                 if (p->selection != 0x41) {
                     Sound_PlaySong(0xDD);
                     if (AnimPanel_AppendSelection(p)) {
@@ -78,7 +76,7 @@ void Password_UpdateEntryMenu(struct EntryMenu *p)
                 } else
                     p->state = 1;
             }
-            if (gUnk_03005260[1] & 2) {
+            if (gPadState[1] & 2) {
                 Sound_PlaySong(0xDE);
                 if (AnimPanel_EraseSelection(p)) {
                     Menu_StartFadeOut(p->fadeShift);
@@ -86,7 +84,7 @@ void Password_UpdateEntryMenu(struct EntryMenu *p)
                     p->state = 2;
                 }
             }
-            if (gUnk_03005260[1] & 8) {
+            if (gPadState[1] & 8) {
                 if (p->selection != 0x41) {
                     Sound_PlaySong(0xDC);
                     p->selection = 0x41;
@@ -94,11 +92,11 @@ void Password_UpdateEntryMenu(struct EntryMenu *p)
                 } else
                     p->state = 1;
             }
-            if (gUnk_03005260[1] & 0x200) {
+            if (gPadState[1] & 0x200) {
                 if (p->position > 0)
                     p->position--;
                 Sound_PlaySong(0xDC);
-            } else if (gUnk_03005260[1] & 0x100) {
+            } else if (gPadState[1] & 0x100) {
                 if (p->position <= 22)
                     p->position++;
                 Sound_PlaySong(0xDC);

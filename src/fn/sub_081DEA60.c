@@ -11,7 +11,7 @@ struct AnimPanelKeys {
     u16 held;
     u16 pressed;
 };
-extern struct AnimPanelKeys gUnk_03005260;
+extern struct AnimPanelKeys gPadState;
 
 /* Tentative clock-setting layout of the AnimPanel task. */
 struct AnimPanelClock {
@@ -34,13 +34,13 @@ void AnimPanel_HandleClockInput(struct AnimPanelClock *p)
     s32 dir = CLOCK_DIR_NONE;
     s32 days;
 
-    if (gUnk_03005260.pressed & 0x40) {
+    if (gPadState.pressed & 0x40) {
         dir = CLOCK_DIR_UP;
-    } else if (gUnk_03005260.pressed & 0x80) {
+    } else if (gPadState.pressed & 0x80) {
         dir = CLOCK_DIR_DOWN;
-    } else if (gUnk_03005260.held & 0xC0) {
+    } else if (gPadState.held & 0xC0) {
         if (++p->repeatTimer > 14 && Mod(p->repeatTimer, 5) == 0) {
-            if (gUnk_03005260.held & 0x40)
+            if (gPadState.held & 0x40)
                 dir = CLOCK_DIR_UP;
             else
                 dir = CLOCK_DIR_DOWN;

@@ -7,7 +7,7 @@ struct Task {
     s32 state, counter;
 };
 extern u32 gEngineFlags;
-extern u16 gUnk_03005260;
+extern u16 gPadState;
 extern u8 *gGameState;
 void System_ShutdownAndSoftReset(void);
 void SceneLifecycle_InitSceneState(void);
@@ -25,11 +25,11 @@ void SunClock_Refresh(void);
 s32 SceneLifecycle_UpdateTask(struct Task *task)
 {
     if (!gSceneDialogActive) {
-        if (!(gUnk_03005260 & 2))
+        if (!(gPadState & 2))
             goto update;
-        if (!(gUnk_03005260 & 1))
+        if (!(gPadState & 1))
             goto update;
-        if ((12 & gUnk_03005260) != 12)
+        if ((12 & gPadState) != 12)
             goto update;
         System_ShutdownAndSoftReset();
         return 0;

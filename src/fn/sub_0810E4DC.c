@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "input.h"
 
 struct ConfirmPanel {
     u8 f0[0x18];
@@ -21,7 +22,6 @@ struct ConfirmPanel {
     u8 fD2D;
     u16 fD2E;
 };
-extern u16 gUnk_03005260[];
 void Bg_SetLayerMap(u32, void *, u16);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void RecordPanel_DrawTime(struct ConfirmPanel *);
@@ -80,7 +80,7 @@ void sub_0810E4DC(struct ConfirmPanel *p)
     sub_0810DE88(p);
     SelectionPanel_UpdateDescription(p);
     p->fD06 = p->fD00;
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         if (TestSel(p)) {
             Sound_PlaySong(0xdd);
             if (LinkActive()) {
@@ -99,7 +99,7 @@ void sub_0810E4DC(struct ConfirmPanel *p)
         } else {
             Sound_PlaySong(0x192);
         }
-    } else if (gUnk_03005260[1] & 2) {
+    } else if (gPadState[1] & 2) {
         if (!LinkActive()) {
             cb = (u32)SelectionPanel_UpdateCancelTransition;
             p->callback = cb;

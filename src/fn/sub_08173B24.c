@@ -1,5 +1,5 @@
 #include "global.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 void sub_0816618C(void *, s32, s32);
 void Sound_PlaySong(s32);
 void Hud_SaveSecondaryGridSelection(void *);
@@ -17,7 +17,7 @@ void Hud_UpdateInventoryMenuInput(u8 *p)
 {
     sub_0816618C(p, 8, 32);
     p[0xa58] = 0;
-    if (1 & gUnk_03005260[1]) {
+    if (1 & gPadState[1]) {
         u8 *q;
         Sound_PlaySong(0xdd);
         Hud_SaveSecondaryGridSelection(p + 0x4384);

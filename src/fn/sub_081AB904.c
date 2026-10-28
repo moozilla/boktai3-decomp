@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 
 // confidence=low: cycles five auxiliary-animation debug modes on a key press.
 #define Vanargand_UpdatePartDebugControls sub_081AB904
@@ -22,7 +23,6 @@ struct DebugPartActor {
     u8 padB2[0x3FC - 0xB2];
     struct DebugPart part;
 };
-extern u16 gUnk_03005260[];
 void Debug_NudgeWorldPositionWithA(void *);
 void Debug_NudgeWorldPositionWithB(void *);
 void Anim_SetSequence(void *, void *, s32, s32, s32);
@@ -36,7 +36,7 @@ void Vanargand_UpdatePartDebugControls(struct DebugPartActor *p)
     }
     Debug_NudgeWorldPositionWithA((u8 *)p + 0x418);
     Debug_NudgeWorldPositionWithB((u8 *)p + 0x478);
-    if (gUnk_03005260[1] & 0x100) {
+    if (gPadState[1] & 0x100) {
         p->phase = (p->phase + 1) % 5;
         p->timer = 0;
     }

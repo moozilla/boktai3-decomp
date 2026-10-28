@@ -1,9 +1,9 @@
 #include "global.h"
 #include "game_state.h"
+#include "input.h"
 
 extern u32 gRandomIndex;
 extern const u16 gUnk_0203B400[];
-extern const u16 gUnk_03005260[];
 extern const u8 gUnk_0824F960[];
 extern const u8 gUnk_0824F968[];
 extern const u8 gUnk_0824F970[];
@@ -137,7 +137,7 @@ void sub_081C0CE4(struct Sub081C0CE4Task *task)
             text[8] = 0;
             Menu_EraseRect(0x14, 4, 8, 2);
             Menu_DrawText(0x14, 4, text);
-            if (task->timer > 0xd2 || (gUnk_03005260[1] & 1)) {
+            if (task->timer > 0xd2 || (gPadState[1] & 1)) {
                 if (!task->soundCued) {
                     Sound_PlaySong(0x167);
                     task->soundCued = 1;
@@ -185,7 +185,7 @@ void sub_081C0CE4(struct Sub081C0CE4Task *task)
                 }
                 sub081C0CE4_Enter(task, 3);
             }
-            if (gUnk_03005260[1] & 1) {
+            if (gPadState[1] & 1) {
                 if (!task->soundCued) {
                     Sound_PlaySong(0x167);
                     task->soundCued = 1;
@@ -201,7 +201,7 @@ void sub_081C0CE4(struct Sub081C0CE4Task *task)
                 Menu_EraseRect(0x12, 7, 0xa, 2);
                 Menu_DrawText(0x12, 7, task->label85);
             }
-            if (task->timer > 0x3c || (gUnk_03005260[1] & 1)) {
+            if (task->timer > 0x3c || (gPadState[1] & 1)) {
                 Menu_EraseRect(0x17, 0xa, 8, 2);
                 v = *(s16 *)((u8 *)gGameState + 0x660);
                 if (v == 1 || v == 0)
@@ -214,7 +214,7 @@ void sub_081C0CE4(struct Sub081C0CE4Task *task)
             break;
         case 4:
             task->flags &= ~2;
-            if (task->timer > 0x3c || (gUnk_03005260[1] & 1)) {
+            if (task->timer > 0x3c || (gPadState[1] & 1)) {
                 Menu_EraseRect(0x13, 0xd, 0xc, 2);
                 v = *(s16 *)((u8 *)gGameState + 0x662);
                 if (v == 4 || v == 0)
@@ -234,7 +234,7 @@ void sub_081C0CE4(struct Sub081C0CE4Task *task)
             break;
         case 6:
             task->flags &= ~2;
-            if (gUnk_03005260[1] & 8) {
+            if (gPadState[1] & 8) {
                 Sound_PlaySong(0xdd);
                 sub081C0CE4_Enter(task, 7);
             }

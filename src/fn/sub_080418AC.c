@@ -1,11 +1,11 @@
 #include "modifier_list.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 extern const u8 gUnk_086058E8[];
 void TextWindow_StopPlayback(s32);
 void Sound_PlaySong(u32);
 void ModifierMenu_HandleChangedInput(struct ModifierMenu *menu)
 {
-    if (menu->stateFrame > 39 && (gUnk_03005260[1] & 3)) {
+    if (menu->stateFrame > 39 && (gPadState[1] & 3)) {
         TextWindow_StopPlayback(menu->detailWindow);
         menu->state = 0;
         menu->stateFrame = 0;

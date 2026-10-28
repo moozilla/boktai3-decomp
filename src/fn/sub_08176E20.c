@@ -6,7 +6,7 @@
 u32 SceneHud_CanOpenFromStart(struct SceneHudState *p)
 {
     struct Player *player;
-    if (gUnk_03005260[1] & 8) {
+    if (gPadState[1] & 8) {
         player = p->actionOwner;
         if (player && player->kind == 1 && player->actionMode != 6 && !(player->statusFlags & 1) &&
             p->controlMode <= 2) {

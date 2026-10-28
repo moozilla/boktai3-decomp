@@ -22,7 +22,7 @@ void SavedPositionMarker_TickIdle(struct SavedPositionMarker *marker)
         {
             u32 button = 1;
             if (gUnk_02000560 & button) {
-                u32 pressed = gUnk_03005260[1];
+                u32 pressed = gPadState[1];
                 u32 edge = button;
                 do {
                     edge &= pressed;

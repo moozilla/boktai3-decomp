@@ -1,5 +1,6 @@
 #include "global.h"
 #include "menu_parameters.h"
+#include "input.h"
 
 struct DateMenu {
     u8 graphics[0x6D8];
@@ -7,7 +8,6 @@ struct DateMenu {
     s32 year, month, day, hour, minute;
     s32 oldYear, oldMonth, oldDay, oldHour, oldMinute;
 };
-extern u16 gUnk_03005260[];
 extern u8 gSunClock[];
 void Sound_PlaySong(s32);
 void AnimPanel_HandleClockInput(void *);
@@ -30,13 +30,13 @@ void Time_UpdateDateMenu(struct DateMenu *p)
             p->oldDay = p->day;
             p->oldHour = p->hour;
             p->oldMinute = p->minute;
-            if (gUnk_03005260[1] & 0x20) {
+            if (gPadState[1] & 0x20) {
                 if (p->selection <= 0)
                     p->selection = 4;
                 else
                     p->selection--;
                 Sound_PlaySong(0xDC);
-            } else if (gUnk_03005260[1] & 0x10) {
+            } else if (gPadState[1] & 0x10) {
                 if (p->selection > 3)
                     p->selection = 0;
                 else
@@ -44,7 +44,7 @@ void Time_UpdateDateMenu(struct DateMenu *p)
                 Sound_PlaySong(0xDC);
             }
             AnimPanel_HandleClockInput(p);
-            if (gUnk_03005260[1] & 8) {
+            if (gPadState[1] & 8) {
                 Sound_PlaySong(0xDD);
                 SunClock_SetDateTime(p->year, p->month, p->day, p->hour, p->minute, 0, 1);
                 Time_CalculateSunriseSunset(0x23A666, 0x8BC000, 0);

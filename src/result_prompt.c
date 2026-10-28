@@ -16,7 +16,7 @@ int ResultPrompt_Update(struct ResultPrompt *p)
             }
         }
     }
-    if ((p->result >= 0 && p->timer > 119 && (gUnk_03005260[1] & 1)) || p->timer > 299) {
+    if ((p->result >= 0 && p->timer > 119 && (gPadState[1] & 1)) || p->timer > 299) {
         Hud_SetMode(7);
         if (p->script) {
             int value = p->result;

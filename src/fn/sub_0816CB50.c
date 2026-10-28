@@ -1,5 +1,5 @@
 #include "global.h"
-extern u16 gUnk_03005260;
+extern u16 gPadState;
 void MapMenu_ClampScrollAndUpdateArrows(u8 *);
 void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
 void MapMenu_DrawLocationIcons(u8 *, s32, s32);
@@ -11,17 +11,17 @@ void sub_0816CB50(u8 *p)
     s16 *y;
     s32 moved;
     moved = 0;
-    if (gUnk_03005260 & 0x20) {
+    if (gPadState & 0x20) {
         F16(p, 0x490C) -= 2;
         moved = 1;
-    } else if (gUnk_03005260 & 0x10) {
+    } else if (gPadState & 0x10) {
         F16(p, 0x490C) += 2;
         moved = 1;
     }
-    if (gUnk_03005260 & 0x40) {
+    if (gPadState & 0x40) {
         F16(p, 0x490E) -= 2;
         moved = 1;
-    } else if (gUnk_03005260 & 0x80) {
+    } else if (gPadState & 0x80) {
         F16(p, 0x490E) += 2;
         moved = 1;
     }

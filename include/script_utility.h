@@ -7,7 +7,7 @@ struct ScriptUtilityArguments {
     u32 unused : 16;
     s32 *values;
 };
-extern u16 gUnk_03005260[];
+extern u16 gPadState[];
 s32 Script_ReadValue(const void *);
 u32 Script_RunBlock(u32, struct ScriptUtilityArguments *);
 void ScriptUtility_SetControlFlag(s32);

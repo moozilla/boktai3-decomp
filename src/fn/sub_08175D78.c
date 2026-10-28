@@ -1,12 +1,11 @@
 #define PauseMenu_SetCallback Hud_SetInteractionCallback
-#define gPauseMenuKeys        gUnk_03005260
 #include "global.h"
+#include "input.h"
 struct PauseMenuConfig {
     u8 unknown0[0x64];
     u8 animationData[0x159C];
     u8 animation[4];
 };
-extern u16 gUnk_03005260[];
 void Sound_PlaySong(u32);
 s32 Anim_Step(void *, void *);
 void SceneCatalog_SaveOptions(struct PauseMenuConfig *);
@@ -21,13 +20,13 @@ void SelectionPanel_WaitConfirmDelay(void);
 void SelectionPanel_ConfirmSettings(void);
 void PauseMenu_UpdateConfigChoice(struct PauseMenuConfig *s)
 {
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         Sound_PlaySong(0xDD);
         SceneCatalog_SaveOptions(s);
         sub_0817597C(s, 0);
         SceneCatalog_SelectDescription(7);
         Hud_SetInteractionCallback(s, SelectionPanel_WaitConfirmDelay, 1);
-    } else if (gUnk_03005260[1] & 2) {
+    } else if (gPadState[1] & 2) {
         Sound_PlaySong(0xDE);
         SelectionPanel_CaptureSettings(s);
         sub_0817597C(s, 0);

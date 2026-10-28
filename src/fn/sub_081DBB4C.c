@@ -1,5 +1,6 @@
 #include "global.h"
 #include "menu_parameters.h"
+#include "input.h"
 /* ScreenParams2E8_UpdateScreen: per-frame state machine (blinking prompt, solar baseline capture and save header write, result message, fade out, return to script) */
 
 struct SaveScreenAnim {
@@ -29,7 +30,6 @@ struct SaveScreenScriptArgs {
     u32 *values;
 };
 
-extern u16 gUnk_03005260[];
 s32 Mod(s32, s32);
 void Menu_SetBackgroundMap(u32, u32);
 void Sound_PlaySong(u32);
@@ -80,13 +80,13 @@ void ScreenParams2E8_UpdateScreen(struct SaveScreen *s)
             }
             s->pageTimer++;
             s->blinkTimer++;
-            if ((gUnk_03005260[1] & 1) && s->timer > 30) {
+            if ((gPadState[1] & 1) && s->timer > 30) {
                 s32 off = s->page * 0x88;
                 u8 *base = (u8 *)&s->anims[1].flags;
                 *(u32 *)(base + off) &= ~1;
                 s->timer = 0;
                 s->state = 1;
-            } else if (gUnk_03005260[1] & 2) {
+            } else if (gPadState[1] & 2) {
                 if (gMessageMenuParameters.f == 0 && gMessageMenuParameters.c != 0) {
                     Sound_PlaySong(0xDE);
                     s->state = 5;

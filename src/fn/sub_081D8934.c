@@ -8,7 +8,7 @@ void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Sound_PlaySong(u32);
 void Task4E01_UpdateTrailSprites(void *, void *);
 void Task4E01_UpdateTimedSprite(void);
-extern u16 gUnk_03005260;
+extern u16 gPadState;
 
 struct ImpactSprite {
     u32 flags;
@@ -75,7 +75,7 @@ s32 Task4E01_UpdateTrailImpact(u8 *p)
         u32 f = *(u32 *)(p + 4);
         *(u32 *)(p + 4) = f & clr;
     }
-    mask = gUnk_03005260 & 2;
+    mask = gPadState & 2;
     if (mask == 0) {
         s16 *timer = (s16 *)(p + 0x1a4);
         u8 *collider;

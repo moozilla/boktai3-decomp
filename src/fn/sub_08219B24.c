@@ -9,14 +9,14 @@ struct PadState {
     u16 released;
     u16 pad;
 };
-extern struct PadState gUnk_03005260[2];
+extern struct PadState gPadState[2];
 
 #define PAD_UPDATE(i, k)                                                                           \
     {                                                                                              \
-        old = gUnk_03005260[i].held;                                                               \
-        gUnk_03005260[i].held = k;                                                                 \
-        gUnk_03005260[i].pressed = k & ~old;                                                       \
-        gUnk_03005260[i].released = old & ~k;                                                      \
+        old = gPadState[i].held;                                                                   \
+        gPadState[i].held = k;                                                                     \
+        gPadState[i].pressed = k & ~old;                                                           \
+        gPadState[i].released = old & ~k;                                                          \
     }
 
 void sub_08219B24(void)

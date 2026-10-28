@@ -1,7 +1,6 @@
 #include "global.h"
 #include "menu_parameters.h"
-
-extern u16 gUnk_03005260[];
+#include "input.h"
 
 struct ScriptArgs {
     u32 count : 16;
@@ -27,20 +26,20 @@ void OptionMenu_Update(struct OptionMenu *p)
     struct ScriptArgs *ap;
     args.count = 1;
     args.vals = &zero;
-    if (gUnk_03005260[1] & 0x40) {
+    if (gPadState[1] & 0x40) {
         Sound_PlaySong(0xDC);
         p->sel--;
         if (p->sel < 0)
             p->sel = 7;
     }
     ap = &args;
-    if (gUnk_03005260[1] & 0x80) {
+    if (gPadState[1] & 0x80) {
         Sound_PlaySong(0xDC);
         p->sel++;
         if (p->sel > 7)
             p->sel = 0;
     }
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         if (p->sel == 1)
             Script_Call(gOptionMenuParameters.callbacks.entries[1], ap);
         else

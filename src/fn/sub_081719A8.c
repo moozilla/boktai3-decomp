@@ -21,7 +21,7 @@ void PauseInventory_UpdateConsumableOptionSelection(struct SceneHudState *p)
         MenuDisplay_UpdateActionPrompt(p, 3);
     }
     SceneHud_SetPairedIcons(p, 1, 4);
-    keys = gUnk_03005260[1];
+    keys = gPadState[1];
     if (keys & 2) {
         Sound_PlaySong(0xDE);
         PauseInventory_ReturnToConsumableActions(p);

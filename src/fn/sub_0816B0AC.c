@@ -1,7 +1,7 @@
 #define SelectionMenu_SetPhase          Hud_SetUpdateCallback
 #define SelectionMenu_SetWidgetPosition PauseMenu_SetSpritePosition
-#define gMenuKeys                       gUnk_03005260
 #include "global.h"
+#include "input.h"
 struct SelectionMenuOwner {
     u8 unknown0[0x418];
     u8 mode;
@@ -19,7 +19,6 @@ struct SelectionMenu {
     u8 unknown48E7[0xD];
     u32 pending;
 };
-extern u16 gUnk_03005260[];
 s32 Anim_Step(void *, void *);
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 void Sound_PlaySong(u32);
@@ -36,7 +35,7 @@ void SelectionMenu_UpdateConfirmInput(struct SelectionMenu *p)
 {
     Anim_Step(p->primaryAnimation, p->animationData);
     Anim_Step(p->selectionAnimation, p->animationData);
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         Sound_PlaySong(0xDD);
         Anim_LoadKeyframe(p->selectionAnimation, p->animationData, 0x1D, 1);
         if (!p->selection) {
@@ -48,10 +47,10 @@ void SelectionMenu_UpdateConfirmInput(struct SelectionMenu *p)
         } else if (p->pending) {
             Hud_SetUpdateCallback(p, SceneSequence_UpdateRampDown64);
         }
-    } else if (gUnk_03005260[1] & 2) {
+    } else if (gPadState[1] & 2) {
         Sound_PlaySong(0xDE);
         SceneSequence_BeginAnimation6(p);
-    } else if (p->owner->mode != 6 && (gUnk_03005260[1] & 0xC0)) {
+    } else if (p->owner->mode != 6 && (gPadState[1] & 0xC0)) {
         Sound_PlaySong(0xDC);
         p->selection = 1 - p->selection;
         MenuPrompt_UpdateSelectionSprites(p);

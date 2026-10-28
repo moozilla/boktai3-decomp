@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "input.h"
 struct ScreenParams3F8Params {
     u8 *mBlock;
     u8 *eBlock;
@@ -73,7 +74,6 @@ void Menu_StartFadeIn(s32);
 struct Pos {
     s16 x, y, z;
 };
-extern u16 gUnk_03005260[];
 void ScrollingDialogue_RequestHide(void);
 void Sound_PlaySong(s32);
 void Menu_StartFadeOut(s32);
@@ -102,7 +102,7 @@ void sub_081EB8E0(struct SpDisplay *p)
 
     switch (p->x108) {
         case 0:
-            if (gUnk_03005260[1] & 1) {
+            if (gPadState[1] & 1) {
                 ScrollingDialogue_RequestHide();
                 if (p->x1C == 0) {
                     Confirm(p);
@@ -135,7 +135,7 @@ void sub_081EB8E0(struct SpDisplay *p)
                     break;
                 }
             }
-            if (gUnk_03005260[1] & 2) {
+            if (gPadState[1] & 2) {
                 Sound_PlaySong(0xDE);
                 ScrollingDialogue_RequestHide();
                 p->x114 = 3;
@@ -144,7 +144,7 @@ void sub_081EB8E0(struct SpDisplay *p)
                 p->x10C = 0;
                 break;
             }
-            if (gUnk_03005260[1] & 0x40) {
+            if (gPadState[1] & 0x40) {
                 Sound_PlaySong(0xDC);
                 p->x1C--;
                 if (p->x1C < 0)
@@ -152,7 +152,7 @@ void sub_081EB8E0(struct SpDisplay *p)
                 ScrollingDialogue_ClearScript();
                 ScreenText_ShowIndexedString(p);
             }
-            if (gUnk_03005260[1] & 0x80) {
+            if (gPadState[1] & 0x80) {
                 Sound_PlaySong(0xDC);
                 p->x1C++;
                 if (p->x1C >= p->x24)
@@ -160,8 +160,8 @@ void sub_081EB8E0(struct SpDisplay *p)
                 ScrollingDialogue_ClearScript();
                 ScreenText_ShowIndexedString(p);
             }
-            if (gUnk_03005260[1] != 0) {
-                p->x18C[p->x144] = gUnk_03005260[1];
+            if (gPadState[1] != 0) {
+                p->x18C[p->x144] = gPadState[1];
                 p->x1CC[p->x144] = p->x140;
                 p->x144++;
                 if (p->x144 > 15)
@@ -227,7 +227,7 @@ void sub_081EB8E0(struct SpDisplay *p)
         case 3:
             if (p->x140 == 0)
                 Sound_PlaySong(0x192);
-            if ((gUnk_03005260[1] & 1) || (gUnk_03005260[1] & 2)) {
+            if ((gPadState[1] & 1) || (gPadState[1] & 2)) {
                 Sound_PlaySong(0xDE);
                 p->x114 = 3;
                 Menu_StartFadeOut(3);

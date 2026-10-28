@@ -64,7 +64,7 @@ struct DirectionalScriptArgs {
 
 extern struct DirectionalManager *gDirectionalManager;
 extern u32 gUnk_02000560;
-extern u16 gUnk_03005260[];
+extern u16 gPadState[];
 extern void *gUnk_086049F4[];
 
 /* Engine helpers. */

@@ -31,6 +31,7 @@ struct Engine {
 void Memory_Clear(void *, int);
 #include "rfu_compat.h"
 #include "ram.h"
+#include "input.h"
 static inline void setOperation(struct Engine *p, int op, int zero)
 {
     p->flag = zero;
@@ -40,7 +41,6 @@ static inline void setOperation(struct Engine *p, int op, int zero)
 }
 void WirelessController_RebuildAvailablePeerList(struct Engine *);
 int RfuManager_StartChildConnect(int, int);
-extern u16 gUnk_03005260[];
 int Wireless_SelectParentFromInput(struct Engine *p)
 {
     u8 *count;
@@ -57,7 +57,7 @@ int Wireless_SelectParentFromInput(struct Engine *p)
         if (available) {
             s8 *scroll = &p->scroll;
             int old = *scroll;
-            register u16 *buttons asm("r2") = gUnk_03005260;
+            register u16 *buttons asm("r2") = gPadState;
             register int pressed asm("r5");
             int current;
             int index;

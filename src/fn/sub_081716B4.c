@@ -4,11 +4,11 @@
 
 #include "scene_hud_display.h"
 #include "game_state.h"
+#include "input.h"
 struct StatTransferProfile {
     u8 data[16];
 };
 extern const struct StatTransferProfile gUnk_08E60F80[];
-extern u16 gUnk_03005260[];
 void MenuDisplay_UpdateActionPrompt(void *, int);
 int SceneInput_NavigateGridKeys(void *, int);
 void SceneHud_GetActionIconPosition(void *, int);
@@ -56,7 +56,7 @@ void SceneHud_UpdateStatComparison(struct SceneHudState *p)
         }
         SceneHud_DrawComparisonBars(p, 10, 6, differences);
         InventoryPanel_DrawStatComparison(p, 0, 0, 1, 0, differences[2]);
-    } else if (gUnk_03005260[1] & 1) {
+    } else if (gPadState[1] & 1) {
         slot = p->actionCursor;
         if (Inventory_GetConsumableId(slot) == none) {
             Sound_PlaySong(0x192);
@@ -81,7 +81,7 @@ void SceneHud_UpdateStatComparison(struct SceneHudState *p)
             SceneHud_PrepareActionTransfer(p, 0, p->actionSelection);
             Hud_SetInteractionCallback(p, SceneHud_TickStatTransfer, 1);
         }
-    } else if (gUnk_03005260[1] & 2) {
+    } else if (gPadState[1] & 2) {
         sub_08171258(p);
         Sound_PlaySong(0xDE);
         PauseInventory_ReturnToConsumableActions(p);

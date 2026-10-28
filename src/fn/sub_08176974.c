@@ -1,6 +1,5 @@
 #include "global.h"
 #include "scene_hud_display.h"
-#define gSceneInputKeys gUnk_03005260
 void Hud_InitSelectionBounds(u32, u32);
 void SceneHud_DrawSelectedClock(void *);
 void PauseMenu_UpdateHighlightPalette(void *);
@@ -28,7 +27,7 @@ void SceneHud_UpdatePageInput(struct SceneHudState *p)
     }
     PauseMenu_LoadSpriteKeyframe(p, 1, 0x41);
     PauseMenu_LoadSpriteKeyframe(p, 2, 0x42);
-    if (gUnk_03005260[1] & 2) {
+    if (gPadState[1] & 2) {
         Sound_PlaySong(0x119);
     close:
         Hud_SetUpdateCallback(p, SceneHud_FadeOutPage);
@@ -36,18 +35,18 @@ void SceneHud_UpdatePageInput(struct SceneHudState *p)
     }
     if (!p->pageInputCooldown) {
         direction = 0;
-        if (gUnk_03005260[1] & 0x100) {
+        if (gPadState[1] & 0x100) {
             p->pageRepeatTimer = 0;
             direction = 1;
-        } else if (gUnk_03005260[1] & 0x200) {
+        } else if (gPadState[1] & 0x200) {
             p->pageRepeatTimer = 0;
             direction = 2;
-        } else if (gUnk_03005260[0] & 0x100) {
+        } else if (gPadState[0] & 0x100) {
             if (++p->pageRepeatTimer > 9) {
                 p->pageRepeatTimer = 0;
                 direction = 1;
             }
-        } else if (gUnk_03005260[0] & 0x200) {
+        } else if (gPadState[0] & 0x200) {
             if (++p->pageRepeatTimer > 9) {
                 p->pageRepeatTimer = 0;
                 direction = 2;

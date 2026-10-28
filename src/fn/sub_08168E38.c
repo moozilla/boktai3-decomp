@@ -12,7 +12,7 @@ s32 SceneHud_CanOpenSecondarySelection(struct SceneHudState *p)
     struct Player *owner = p->actionOwner;
     if (owner->actionMode == 6)
         return 0;
-    if (!(gUnk_03005260[0] & 4))
+    if (!(gPadState[0] & 4))
         return 0;
     if (!owner)
         return 0;

@@ -34,7 +34,7 @@ void EncodedRecord_FormatRows(void *, void *, void *, int);
 void *Script_GetTextSourcePc(void);
 extern u16 gBgPaletteBuffer[];
 extern u16 gBgPaletteBank15[];
-extern u16 gUnk_03005260[];
+extern u16 gPadState[];
 
 void MessageMenu_LoadBackground(struct MessageMenu *m, int id);
 int MessageMenu_CreateTextWindows(struct MessageMenu *m);

@@ -38,7 +38,7 @@ struct ScanlinePresentation {
     struct ScanlineLayer layers[6];
 };
 
-extern u16 gUnk_03005260[];
+extern u16 gPadState[];
 
 void ScanlinePresentation_UpdateNoise(struct ScanlinePresentation *p);
 void ScanlinePresentation_UpdateFadeIn(struct ScanlinePresentation *p);

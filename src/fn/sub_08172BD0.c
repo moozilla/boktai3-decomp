@@ -40,7 +40,7 @@ void SceneHud_UpdateActionGridInput(struct SceneHudState *p)
             InventoryPanel_DrawStatComparison(p, 1, 0, 0, 0, 0);
         else
             InventoryPanel_UpdateSelectedUnlock(p, 3, 14, 0, 0);
-    } else if (gUnk_03005260[1] & 1) {
+    } else if (gPadState[1] & 1) {
         if (!unlockGroup)
             SolarFruit_ToggleEquipSlot(grid);
         else if (GameState_ToggleUnlockEquipSlot(grid)) {
@@ -56,7 +56,7 @@ void SceneHud_UpdateActionGridInput(struct SceneHudState *p)
             MenuDisplay_UpdateActionPrompt(p, group);
         }
         SceneHud_RefreshEquippedActionIcons(p);
-    } else if (gUnk_03005260[1] & 2) {
+    } else if (gPadState[1] & 2) {
         Sound_PlaySong(0xDE);
         PauseInventory_ReturnToEquipmentSelection(p);
     }

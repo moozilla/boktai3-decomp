@@ -27,7 +27,7 @@ struct InteractionMarkerPlayer {
 };
 extern struct InteractionMarkerPlayer *gUnk_02000580[4];
 extern u32 gUnk_02000560;
-extern u16 gUnk_03005260[];
+extern u16 gPadState[];
 u32 InteractionMarker_IsPlayerNearby(struct InteractionMarker *);
 void InteractionMarker_SetState(struct InteractionMarker *, void (*)(struct InteractionMarker *));
 void InteractionMarker_TickIdle(struct InteractionMarker *);

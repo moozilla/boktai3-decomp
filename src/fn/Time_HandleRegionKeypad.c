@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "menu_parameters.h"
+#include "input.h"
 struct RegionEntry {
     s16 group;
     u16 name;
@@ -42,7 +43,6 @@ struct ScriptCallArgs {
     u32 unused : 16;
     s32 *values;
 };
-extern u16 gUnk_03005260[];
 void Sound_PlaySong(u32);
 void Time_OnRegionListSelect(struct RegionMenu *);
 void Time_ShowRegionMenu(struct RegionMenu *);
@@ -62,7 +62,7 @@ void Time_HandleRegionKeypad(struct RegionMenu *menu)
     value = 1;
     switch (menu->state) {
         case 0:
-            if (gUnk_03005260[1] & 1) {
+            if (gPadState[1] & 1) {
                 Sound_PlaySong(0xdd);
                 if (gRegionMenuParameters.flag == 1)
                     menu->fadeSpeed = 3;
@@ -72,14 +72,14 @@ void Time_HandleRegionKeypad(struct RegionMenu *menu)
                 Menu_StartFadeOut(menu->fadeSpeed);
                 menu->state = 1;
                 menu->confirmed = 1;
-            } else if (gUnk_03005260[1] & 2) {
+            } else if (gPadState[1] & 2) {
                 Sound_PlaySong(0xde);
                 Menu_StartFadeOut(menu->fadeSpeed);
                 menu->state = 1;
                 menu->confirmed = 0;
             } else {
                 u8 old;
-                if (gUnk_03005260[1] & 0x100) {
+                if (gPadState[1] & 0x100) {
                     if (++menu->page > 13)
                         menu->page = 1;
                     Sound_PlaySong(0xdc);
@@ -88,7 +88,7 @@ void Time_HandleRegionKeypad(struct RegionMenu *menu)
                                       0);
                     Time_ShowRegionMenu(menu);
                 }
-                if (gUnk_03005260[1] & 0x200) {
+                if (gPadState[1] & 0x200) {
                     if (--menu->page <= 0)
                         menu->page = 13;
                     Sound_PlaySong(0xdc);
@@ -97,7 +97,7 @@ void Time_HandleRegionKeypad(struct RegionMenu *menu)
                                       0);
                     Time_ShowRegionMenu(menu);
                 }
-                if (gUnk_03005260[1] & 0x40) {
+                if (gPadState[1] & 0x40) {
                     old = menu->selected;
                     menu->selected = old - 1;
                     if (menu->entries[menu->selected].group != menu->page)
@@ -105,7 +105,7 @@ void Time_HandleRegionKeypad(struct RegionMenu *menu)
                     else
                         Sound_PlaySong(0xdc);
                 }
-                if (gUnk_03005260[1] & 0x80) {
+                if (gPadState[1] & 0x80) {
                     old = menu->selected;
                     menu->selected = old + 1;
                     if (menu->entries[menu->selected].group != menu->page)

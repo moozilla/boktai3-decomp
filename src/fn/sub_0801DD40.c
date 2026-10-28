@@ -1,11 +1,11 @@
 #include "global.h"
+#include "input.h"
 typedef struct {
     s16 prompt;
     u8 wait, hide;
     int (*run)(void *);
 } Step;
 extern Step gUnk_0824DBC0[];
-extern u16 gUnk_03005260[];
 int ResultTutorial_ShowPrompt(void *);
 int ResultTutorial_HidePrompt(void *);
 int sub_08249240(void *, void *, void *);
@@ -29,7 +29,7 @@ void ResultTutorial_UpdateSequence(u8 *p)
             p[0xaf] = 0;
         case 1:
             if (gUnk_0824DBC0[index].wait) {
-                if (gUnk_03005260[1] & 1) {
+                if (gPadState[1] & 1) {
                     ++p[0xb4];
                     Sound_PlaySong(0x107);
                 }

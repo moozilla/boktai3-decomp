@@ -35,7 +35,7 @@ struct SceneInputPair {
     u16 frame, duration;
 };
 
-extern u16 gUnk_03005260[];
+extern u16 gPadState[];
 s32 Anim_SelectWidgetGlyph(void *, void *, u32);
 void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 void Palette_UpdateHighlightPulse(u16 *, u8 *);

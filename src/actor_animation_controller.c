@@ -1,6 +1,7 @@
 #include "global.h"
 #include "actor_animation_controller.h"
 #include "render.h"
+#include "input.h"
 
 // Provisional name: ActorPalette_BeginFade
 
@@ -228,8 +229,6 @@ void Actor_ProjectAndClampToScreen(struct ActorAnimController *p)
 
 extern u8 *gGameState;
 
-extern u16 gUnk_03005260[];
-
 u8 Math_Atan2(s32, s32);
 
 void Actor_SetInteractionControlFlag(u8 *);
@@ -297,7 +296,7 @@ void Actor_TryInteraction(struct ActorAnimController *p, struct InteractionPartn
         height = -height;
     if (height > 119)
         return;
-    if (!(gUnk_03005260[1] & 1))
+    if (!(gPadState[1] & 1))
         return;
     if (gEnginePauseFlags & 4)
         return;
@@ -541,7 +540,7 @@ void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *);
 // MATCHING_CONCESSION: register-pinning
 void Actor_UpdateIdleWait(struct ActorAnimController *p)
 {
-    if (*(s32 *)gUnk_03005260) {
+    if (*(s32 *)gPadState) {
         p->timer = 0;
         if (gSunClock[14] == 5 || gSunClock[14] == 0 || gSunClock[14] == 4)
             p->delay = 1800;
@@ -624,7 +623,7 @@ void ActorShadow_Enable(void *);
 // MATCHING_CONCESSION: register-pinning
 void Actor_UpdateIdlePhaseRestoration(struct ActorAnimController *p)
 {
-    if (*(s32 *)gUnk_03005260) {
+    if (*(s32 *)gPadState) {
         p->interrupted = 1;
         p->count = 0;
     }

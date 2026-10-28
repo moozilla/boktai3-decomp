@@ -1,11 +1,11 @@
 #include "global.h"
+#include "input.h"
 // Provisional name: TimedPresentation_Update
 struct TimedSequence {
     u8 pad[0x18];
     s32 state, timer, exitTimer, minShift, fadeShift, duration, unused;
     void *handle;
 };
-extern u16 gUnk_03005260[];
 void Menu_StartFadeOut(s32);
 s32 Heap_IsEndGuardValid(void);
 void Script_Call(void *, void *);
@@ -19,7 +19,7 @@ void TimedPresentation_Update(struct TimedSequence *p)
                 p->state = 1;
                 Menu_StartFadeOut(p->fadeShift);
             } else if (p->timer > (1 << p->minShift) && Heap_IsEndGuardValid() &&
-                       (gUnk_03005260[1] & 1)) {
+                       (gPadState[1] & 1)) {
                 p->state = 1;
                 Menu_StartFadeOut(p->fadeShift);
             }

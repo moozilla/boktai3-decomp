@@ -1,10 +1,10 @@
 #include "global.h"
+#include "input.h"
 
 
 struct DebugVector {
     s16 x, y, z;
 };
-extern u16 gUnk_03005260[];
 
 static inline s32 SignedHalf(s32 value)
 {
@@ -26,7 +26,7 @@ void Debug_TestIsometricProjection(void)
 {
     s16 in[3];
     struct DebugVector out;
-    if (gUnk_03005260[1] & 0x100) {
+    if (gPadState[1] & 0x100) {
         s32 height = 0;
         s16 *v = in;
         s32 screenY = 1;

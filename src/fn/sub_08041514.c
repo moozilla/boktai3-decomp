@@ -1,5 +1,5 @@
 #include "modifier_list.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 extern const u8 gUnk_086058E8[];
 void ModifierMenu_BeginClose(struct ModifierMenu *);
 void Sound_PlaySong(u32);
@@ -35,12 +35,12 @@ void ModifierMenu_HandleOverviewInput(struct ModifierMenu *menu)
     }
     close = 0;
     if (menu->specialHeader) {
-        if (gUnk_03005260[1] & 8) {
+        if (gPadState[1] & 8) {
             close = 1;
             Sound_PlaySong(0xdd);
         }
     } else {
-        if (gUnk_03005260[1] & 2) {
+        if (gPadState[1] & 2) {
             close = 1;
             Sound_PlaySong(0x119);
         }
@@ -49,7 +49,7 @@ void ModifierMenu_HandleOverviewInput(struct ModifierMenu *menu)
         ModifierMenu_BeginClose(menu);
         return;
     }
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         s32 mode = menu->mode;
         menu->choice.word = menu->savedChoices[mode];
         menu->state = 1;

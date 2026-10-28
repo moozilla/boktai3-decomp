@@ -92,6 +92,6 @@ void Bg_SetPriority(u32, s32);
 void Bg_SetupLayer(u32, u32, void *, s32, s32, s32, s32, void *);
 void *Video_GetBackgroundMap(u32);
 extern struct StatusScreen *gStatusScreen; // the live status screen, or NULL
-extern u16 gUnk_03005260[];                // input: [1] = newly pressed keys
+extern u16 gPadState[];                    // input: [1] = newly pressed keys
 
 #endif

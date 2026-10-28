@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 struct PeerMenu {
     u8 pad0[0x19];
     u8 state, entered, pad1b[5];
@@ -9,7 +10,6 @@ struct PeerMenu {
 void TextWindow_Refresh(int, int);
 void Sound_PlaySong(int);
 void Wireless_RequestAdvanceConnection(void);
-extern u16 gUnk_03005260[];
 void WirelessPeerMenu_UpdateDismissibleNotice(struct PeerMenu *p)
 {
     if (p->entered) {
@@ -18,7 +18,7 @@ void WirelessPeerMenu_UpdateDismissibleNotice(struct PeerMenu *p)
         Sound_PlaySong(402);
     }
     if (p->timer > 35) {
-        if (gUnk_03005260[1] & 3) {
+        if (gPadState[1] & 3) {
             Wireless_RequestAdvanceConnection();
             {
                 u32 state = 7;

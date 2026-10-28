@@ -1,7 +1,7 @@
 #include "stacked_actor.h"
+#include "input.h"
 extern u32 gEngineFlags, gUnk_02000560;
 extern u8 *gUnk_02000580;
-extern u16 gUnk_03005260[];
 s32 StackedActor_IsPlayerNearby(struct StackedActor *);
 void Sound_PlaySong(u32);
 void AnimData_SelectPaletteBank(void *, u32);
@@ -16,7 +16,7 @@ void StackedActor_TickIdle(struct StackedActor *actor)
             if (!actor->interactionEnabled) {
                 u32 mask = 1;
                 if ((gUnk_02000560 & mask) && gUnk_02000580[0x457] != 0x1D &&
-                    gUnk_02000580[0x457] != 0x1E && (gUnk_03005260[1] & 1))
+                    gUnk_02000580[0x457] != 0x1E && (gPadState[1] & 1))
                     Sound_PlaySong(0x124);
             } else {
                 u16 *state = &actor->proximityState;
@@ -32,7 +32,7 @@ void StackedActor_TickIdle(struct StackedActor *actor)
                     actor->lift = 24;
                 {
                     u32 mask = 1;
-                    if ((gUnk_02000560 & mask) && (gUnk_03005260[1] & 1)) {
+                    if ((gUnk_02000560 & mask) && (gPadState[1] & 1)) {
                         u8 *player = gUnk_02000580;
                         u32 playerMask = 0x100000;
                         if (!(*(u32 *)(player + 0x20) & playerMask) &&

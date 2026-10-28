@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "input.h"
 
 // MATCHING_CONCESSION: register-pinning
 // confidence=low: applies camera, collision, palette and shake presentation effects.
@@ -71,7 +72,6 @@ struct VanargandPresentation {
     u16 cameraShake, cameraMode;
     s32 debugValue;
 };
-extern u16 gUnk_03005260[];
 extern u32 gRandomIndex;
 extern const s16 gUnk_086149C4[];
 void SceneActors_UpdateEffects(void *);
@@ -152,11 +152,11 @@ void Vanargand_UpdatePresentation(struct VanargandPresentation *p)
     struct PresentationCollider *health;
 
     SceneActors_UpdateEffects(p);
-    if (gUnk_03005260[0] & 2) {
-        if (gUnk_03005260[1] & 0x40) {
+    if (gPadState[0] & 2) {
+        if (gPadState[1] & 0x40) {
             if (p->debugValue > 1)
                 p->debugValue--;
-        } else if (gUnk_03005260[1] & 0x80) {
+        } else if (gPadState[1] & 0x80) {
             p->debugValue++;
         }
     }

@@ -43,7 +43,6 @@ struct AreaEffectManager {
 extern struct AreaEffectManager *gAreaEffectManager;
 extern const u16 gUnk_08605A78[], gUnk_08605A80[];
 extern u32 gEngineFlags, gUnk_02000560;
-extern u16 gUnk_03005260;
 void AreaEffect_SetBounds(struct AreaEffectEntry *, s32, struct AreaEffectPosition *, s32);
 void AreaEffect_AccumulatePlayerResource(struct AreaEffectManager *, s32);
 #endif

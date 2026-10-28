@@ -1,4 +1,5 @@
 #include "global.h"
+#include "input.h"
 
 // Tentative result-panel layout: six displayed values settle in three stages.
 struct P {
@@ -7,7 +8,6 @@ struct P {
     u8 state, entered, a, b, c, d, e, f;
 };
 
-extern u16 gUnk_03005260[];
 extern u16 gUnk_0203B400[];
 extern u32 gRandomIndex;
 int Mod(int, int);
@@ -26,7 +26,7 @@ void WirelessResultPanel_UpdateRollingNumbers(struct P *p)
     u8 *base;
     if (p->entered)
         p->entered = 0;
-    if (gUnk_03005260[1] & 0x30F)
+    if (gPadState[1] & 0x30F)
         p->timer = 100;
     if (p->timer <= 29) {
         u16 *table = gUnk_0203B400;

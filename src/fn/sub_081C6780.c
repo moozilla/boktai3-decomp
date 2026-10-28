@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "input.h"
 #ifdef NONMATCHING
 // fuzzy: 55.0%
 // fix.py best (sweep after the inlined-insn fix)
@@ -35,7 +36,6 @@ struct StateActor {
     void (*update)(void *);
 };
 extern u8 *gUnk_0200047C;
-extern u16 gUnk_03005260[];
 extern const u16 gUnk_0203B400[];
 s32 Math_Atan2(s32, s32);
 void SceneMessages_SetPendingTrigger(void *, void *);
@@ -83,7 +83,7 @@ void StateActor_ProcessDirectionMessages(struct StateActor *actor)
         SceneMessages_SetPendingTrigger(receiver, command);
     }
 
-    if (gUnk_03005260[1] & 2) {
+    if (gPadState[1] & 2) {
         s32 x = RandomPart();
         s32 z = RandomPart();
         struct Position *target = &actor->target;

@@ -2,8 +2,8 @@
 #include "global.h"
 
 #include "record_menu.h"
+#include "input.h"
 
-extern u16 gUnk_03005260[];
 void Bg_ClearTilemap(s32);
 void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
@@ -85,7 +85,7 @@ void RecordMenu_UpdateSelection(struct RecordMenu *menu)
     }
 
     Palette_UpdateHighlightPulse(&RM_FIELD(palettePulse), &RM_FIELD(pulsePhase));
-    keys = gUnk_03005260[1];
+    keys = gPadState[1];
     {
         u32 left = 0x20;
         left &= keys;

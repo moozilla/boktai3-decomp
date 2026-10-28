@@ -10,7 +10,7 @@ void sub_08164480(void *, s32, s32, s32, s32, s32, s32);
 void SceneHud_SetPairedIcons(void *, s32, s32);
 void InventoryGrid_UpdateModifierPreview(struct SceneHudState *p)
 {
-    u16 key = gUnk_03005260[0] & 4;
+    u16 key = gPadState[0] & 4;
     if (key) {
         p->comparisonModifier = 1;
         ResultPanel_DrawCappedCounters(p, 1, 7, 8);

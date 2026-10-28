@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "input.h"
 struct Blob {
     u32 words[8];
 };
@@ -17,7 +18,6 @@ struct LinkMenu {
     u32 flags;
     u8 pad5c[0x54];
 };
-extern u16 gUnk_03005260[];
 void TextWindowManager_DestroyAllWindows(void);
 void PaletteLevels_Reset(void);
 void SpriteOam_ResetQueue(int);

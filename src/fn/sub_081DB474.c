@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "menu_parameters.h"
+#include "input.h"
 struct Rect {
     u32 xy;
     u16 width, height;
@@ -10,7 +11,6 @@ struct Message {
     u32 unused : 16;
     void *values;
 };
-extern u16 gUnk_03005260[];
 void Sound_PlaySong(s32);
 void Menu_StartFadeOut(s32);
 void Menu_EraseRect(s32, s32, s32, s32);
@@ -30,7 +30,7 @@ void Options_UpdateScreen(u8 *p)
     message.values = &value;
     switch (state = W(0x2CC)) {
         case 0:
-            if (gUnk_03005260[1] & 1) {
+            if (gPadState[1] & 1) {
                 if (W(0x1C) == 0) {
                     Sound_PlaySong(0xDD);
                     W(0x2D8) = state;
@@ -54,7 +54,7 @@ void Options_UpdateScreen(u8 *p)
                     break;
                 }
             }
-            if (gUnk_03005260[1] & 2) {
+            if (gPadState[1] & 2) {
                 Sound_PlaySong(0xDE);
                 W(0x2D8) = 3;
                 Menu_StartFadeOut(3);
@@ -62,25 +62,25 @@ void Options_UpdateScreen(u8 *p)
                 W(0x2D0) = 0;
                 break;
             }
-            if (gUnk_03005260[1] & 0x40) {
+            if (gPadState[1] & 0x40) {
                 Sound_PlaySong(0xDC);
                 if (--W(0x1C) < 0)
                     W(0x1C) = 2;
             }
-            if (gUnk_03005260[1] & 0x80) {
+            if (gPadState[1] & 0x80) {
                 Sound_PlaySong(0xDC);
                 if (++W(0x1C) > 2)
                     W(0x1C) = 0;
             }
             if (W(0x1C) == 2) {
-                if (gUnk_03005260[1] & 0x20) {
+                if (gPadState[1] & 0x20) {
                     Sound_PlaySong(0xDC);
                     if (--W(0x20) < 0)
                         W(0x20) = 8;
                     Menu_EraseRect(9, 12, 18, 2);
                     Menu_DrawStringRef(9, 12, gChoiceMenuParameters.eBlock, W(0x20));
                 }
-                if (gUnk_03005260[1] & 0x10) {
+                if (gPadState[1] & 0x10) {
                     Sound_PlaySong(0xDC);
                     if (++W(0x20) > 8)
                         W(0x20) = 0;

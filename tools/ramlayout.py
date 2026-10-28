@@ -576,6 +576,8 @@ def cmd_unify(a):
             print(f"  {n} differs in: {' '.join(sorted(ps))}")
         return
 
+    if created:
+        write(new, [a.header])      # the probe includes it from disk
     probe = compile_asm(next(p for p in sorted(new) if p.startswith("src/fn/")), f'#include "{hdr_inc}"\n', False)
     if "ERROR" in probe[:9]:
         sys.exit(f"{a.header} does not compile on its own:\n" + probe)

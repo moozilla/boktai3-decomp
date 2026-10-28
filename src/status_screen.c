@@ -194,7 +194,7 @@ void StatusScreen_RefreshDirtyDisplays(struct StatusScreen *s)
 
 int StatusScreen_CheckConfirm(struct StatusScreen *p)
 {
-    if ((gUnk_03005260[1] & 8) || (gUnk_03005260[1] & 1)) {
+    if ((gPadState[1] & 8) || (gPadState[1] & 1)) {
         ScreenTransition_SendCommand(3, 4, 4, 4, 4, 65535, 0);
         {
             register void (*state)(struct StatusScreen *) = StatusScreen_FadeAndExit;

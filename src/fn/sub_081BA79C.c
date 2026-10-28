@@ -1,5 +1,5 @@
-#define gInputKeys gUnk_03005260
 #include "global.h"
+#include "input.h"
 
 struct Registry3F74Resource {
     u8 unknown[0x1A4];
@@ -12,7 +12,6 @@ struct Registry3F74Object {
     u32 selectionScripts[11];
     u32 alternateScript;
 };
-extern u16 gUnk_03005260[];
 void MenuCursor_SetSelectionFlag(void *);
 void Registry3F74_StartClosingFade(void *);
 void Script_Call(u32, void *);
@@ -22,7 +21,7 @@ static inline u32 TestFlags(struct Registry3F74Resource *p, u32 mask)
 }
 void Registry3F74_ConfirmSelection(struct Registry3F74Object *p)
 {
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         if (TestFlags(p->resource, 2) && p->selection >= 0) {
             if (p->selection == 1 && p->alternateScript) {
                 Script_Call(p->alternateScript, 0);

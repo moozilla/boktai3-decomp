@@ -26,7 +26,7 @@ void SceneHud_UpdateActionSwapSelection(struct SceneHudState *p)
         PauseInventory_RefreshConsumableDescription(p);
         MenuDisplay_UpdateActionPrompt(p, 3);
     }
-    keys = gUnk_03005260[1];
+    keys = gPadState[1];
     one = 1;
     confirm = one;
     asm("" : "+r"(confirm));

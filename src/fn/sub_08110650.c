@@ -1,5 +1,6 @@
 #include "global.h"
 #include "game_state.h"
+#include "input.h"
 
 struct LinkScorePanel {
     u8 pad0[0x18];
@@ -18,7 +19,6 @@ struct LinkScorePanel {
     u8 pad1028[6];
     u16 skip;
 };
-extern u16 gUnk_03005260[];
 void Bg_SetLayerMap(u32, void *, u32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 s32 TextWindow_SetScript(s32 id, const u8 *script);
@@ -76,7 +76,7 @@ void sub_08110650(struct LinkScorePanel *p)
         if (!p->skip) {
             SetUpdate(p, sub_0811048C, 1);
         } else {
-            if (gUnk_03005260[1] & 0x30b)
+            if (gPadState[1] & 0x30b)
                 p->skip = 1;
             LinkScorePanel_UpdateRollingNumber(p);
             LinkScorePanel_UpdateNumberReveal(p);

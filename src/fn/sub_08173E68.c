@@ -29,7 +29,7 @@ void SceneHud_TickEquipmentSwap(struct SceneHudState *p)
         SceneHud_ShowEquipmentDetails(p);
         MenuDisplay_UpdateActionPrompt(p, 2);
     }
-    keys = gUnk_03005260[1];
+    keys = gPadState[1];
     one = 1;
     c = one;
     asm("" : "+r"(c));

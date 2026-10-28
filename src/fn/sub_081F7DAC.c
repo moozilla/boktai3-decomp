@@ -1,7 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
-#define gPreviewKeys gUnk_03005260
+#include "input.h"
 #define gRandomTable gUnk_0203B400
 struct RatatoskPosition {
     u32 packedXY, packedZ;
@@ -35,7 +35,6 @@ struct Ratatosk {
     u8 padE98[0xef8 - 0xe98];
     u16 spawnClone;
 };
-extern u16 gUnk_03005260[];
 extern const u16 gUnk_0203B400[];
 s32 Mod(s32, s32);
 u32 HomingProjectile_GetActiveCount(void);

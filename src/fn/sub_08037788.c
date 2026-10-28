@@ -18,7 +18,7 @@ struct PeerMenu {
     u8 draw[8];
 };
 #include "rfu_compat.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 int Wireless_GetConnectedSlotMask(void);
 int Wireless_GetPeerHandshakeData(void);
 void TextWindow_Refresh(int, int);
@@ -103,12 +103,12 @@ void WirelessPeerMenu_UpdatePeerConfirmation(struct PeerMenu *p)
         }
         p->previous = connected;
     }
-    if ((gUnk_03005260[1] & 1) && connected) {
+    if ((gPadState[1] & 1) && connected) {
         Wireless_RequestAdvanceConnection();
     }
     if (!r) {
     }
-    if (gUnk_03005260[1] & 2) {
+    if (gPadState[1] & 2) {
         if (connected) {
             Wireless_RequestDisconnectPeer();
         } else {

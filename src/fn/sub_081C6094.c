@@ -1,5 +1,5 @@
 #include "global.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 extern u16 gUnk_0203B400[];
 extern u32 gRandomIndex;
 void Sound_PlaySong(u32);
@@ -12,7 +12,7 @@ s32 sub_08249350(s32, s32);
 void sub_081C6094(u8 *p)
 {
     s32 *counter = (s32 *)(p + 0x370);
-    if (++*counter > 0x3c || (gUnk_03005260[1] & 1) != 0) {
+    if (++*counter > 0x3c || (gPadState[1] & 1) != 0) {
         Sound_PlaySong(0x167);
         sub_081C62B4(p);
         ChallengeResult_SetState(p, TimeResult_UpdateResultHold);

@@ -1,5 +1,5 @@
 #include "modifier_list.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 extern const u8 gUnk_086058E8[];
 void Sound_PlaySong(u32);
 u32 StateFlags_GetCategoryBit(s32, s32);
@@ -58,7 +58,7 @@ void ModifierMenu_HandleSelectionInput(struct ModifierMenu *menuArg)
         Sound_PlaySong(0xdc);
         ModifierMenu_SelectPendingSource(menu);
     }
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         if (ModifierMenu_ApplyPendingSource(menu) >= 0)
             Sound_PlaySong(0xdd);
         else {
@@ -72,7 +72,7 @@ void ModifierMenu_HandleSelectionInput(struct ModifierMenu *menuArg)
         }
         ModifierMenu_MarkDirty(menu, 0x38);
     }
-    if (gUnk_03005260[1] & 2) {
+    if (gPadState[1] & 2) {
         menu->savedChoices[menu->mode] = menu->choice.word;
         if (menu->changed != 0) {
             menu->state = 2;

@@ -31,7 +31,7 @@ void SceneHud_TickEquipmentToggle(struct SceneHudState *input)
         Hud_SaveGridSelection(q);
         MenuDisplay_UpdateActionPrompt(p, 2);
         InventoryPanel_DrawStatComparison(p, 0, 1, 0, 0, 0);
-    } else if (gUnk_03005260[1] & 1) {
+    } else if (gPadState[1] & 1) {
         slot = p->actionCursor;
         if (Inventory_GetEquipmentId(slot) == 0xff) {
             Sound_PlaySong(0x192);
@@ -56,7 +56,7 @@ void SceneHud_TickEquipmentToggle(struct SceneHudState *input)
             MenuDisplay_UpdateActionPrompt(p, 2);
             SceneHud_RefreshEquipmentIcons(p, 0);
         }
-    } else if (gUnk_03005260[1] & 2) {
+    } else if (gPadState[1] & 2) {
         SceneHud_BeginEquipmentSelection(p);
         Sound_PlaySong(0xde);
     }

@@ -40,14 +40,14 @@ void Storage_UpdateCursorPosition(void *, void *);
 void Storage_RefreshSelectedItemDetails(void *);
 void SceneInventory_UpdateCategoryBrowse(struct StorageBrowse *p)
 {
-    if (gUnk_03005260[0] & 4) {
+    if (gPadState[0] & 4) {
         Anim_LoadKeyframe(&p->cursor, p->resource, 0x4D, 1);
-        if (gUnk_03005260[1] & 1) {
+        if (gPadState[1] & 1) {
             Sound_PlaySong(0xDC);
             if (++p->categoryKinds[6] > 2)
                 p->categoryKinds[6] = 0;
         }
-    } else if (gUnk_03005260[1] & 1) {
+    } else if (gPadState[1] & 1) {
         SceneInput_SaveSelection(&p->grid);
         if (p->mode == 1) {
             struct SceneInputWidget *saved = &p->savedCursor;
@@ -96,7 +96,7 @@ void SceneInventory_UpdateCategoryBrowse(struct StorageBrowse *p)
                 SceneInventory_BeginCategoryBrowse(p);
             }
         }
-    } else if (gUnk_03005260[1] & 2) {
+    } else if (gPadState[1] & 2) {
         Sound_PlaySong(0xDE);
         Storage_BeginModeSelection(p, p->mode);
     } else if (SceneInput_NavigateGrid(&p->grid)) {

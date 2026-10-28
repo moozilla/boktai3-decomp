@@ -1,10 +1,10 @@
 #include "script_selector.h"
-extern u16 gUnk_03005260[];
+#include "input.h"
 void ScriptSelector_MoveSelection(struct ScriptSelector *, s32);
 u32 Heap_IsEndGuardValid(void);
 s32 ScriptSelector_UpdateTask(struct ScriptSelector *selector)
 {
-    u16 *keys = gUnk_03005260;
+    u16 *keys = gPadState;
     u32 held = keys[0];
     u32 vertical = held & 0xC0;
     if (vertical) {

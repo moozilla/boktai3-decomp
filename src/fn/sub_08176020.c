@@ -1,13 +1,12 @@
 #define PauseMenu_SetCallback Hud_SetInteractionCallback
-#define gPauseMenuKeys        gUnk_03005260
 #include "global.h"
+#include "input.h"
 struct PauseMenuSleep {
     u8 unknown0[0x5C];
     const u8 *script;
     u8 unknown60[0x4868];
     s32 promptWindow;
 };
-extern u16 gUnk_03005260[];
 void Sound_PlaySong(u32);
 void PauseMenu_SetConfirmationIndicator(struct PauseMenuSleep *, s32);
 void SceneCatalog_SelectDescription(u32);
@@ -22,7 +21,7 @@ void TextWindow_StartPlayback(s32);
 void PauseMenu_BeginSleepPrompt(struct PauseMenuSleep *s)
 {
     s32 *window;
-    if (gUnk_03005260[1] & 1) {
+    if (gPadState[1] & 1) {
         Sound_PlaySong(0xDD);
         PauseMenu_SetConfirmationIndicator(s, 0);
         SceneCatalog_SelectDescription(0x12);

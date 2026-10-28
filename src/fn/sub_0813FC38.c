@@ -51,7 +51,7 @@ struct PlayerFC38 {
 
 extern struct GameStateFC38 *gGameState;
 extern u32 gEngineFlags;
-extern struct InputKeysFC38 gUnk_03005260[];
+extern struct InputKeysFC38 gPadState[];
 extern void *const gUnk_08610964[];
 
 s32 Script_SeekToKeyword(s32);
@@ -94,7 +94,7 @@ s32 Player_InitActionMode(struct PlayerFC38 *p)
     p->unk45C = 1;
     ActorSequence_Begin(p, 0, 0);
     p->unkCA8 = 0;
-    p->inputKeys = gUnk_03005260[p->slot].keys;
+    p->inputKeys = gPadState[p->slot].keys;
     Player_ClearDirectionHistory(p);
     if (p->slot == 0) {
         p->unk534 = gPlayerInteractionMode;
