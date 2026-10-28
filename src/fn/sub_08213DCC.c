@@ -5,15 +5,8 @@
 struct Dma {
     vu32 src, dest, control;
 };
-struct Task {
-    u8 p0[0x10];
-    u16 h10;
-    u8 p12[2];
-    u8 b14, b15, b16;
-};
 extern u32 gUnk_0300426C, gUnk_03003A08, gUnk_03004264;
 extern u16 gUnk_0300427C;
-extern struct Task gUnk_03001130;
 void Mosaic_Initialize(void);
 void sub_082156D8(u32);
 void Video_SetWindowBounds(u32, u32, u32, u32, u32);
@@ -38,7 +31,7 @@ void InterruptsAndVideo_InitRuntime(void)
     struct Dma *dma;
     u32 mask;
     struct RuntimeTask *a;
-    struct Task *b;
+    struct RuntimeTask *b;
     fill = zero;
     dma = (struct Dma *)0x040000D4;
     dma->src = (u32)&fill;
@@ -93,14 +86,14 @@ void InterruptsAndVideo_InitRuntime(void)
     gUnk_03004264 = zero;
     a = &gVideoUploadTask;
     Task_SetCallbacks(a, InterruptsAndVideo_OnVideoUploadTask, 0);
-    b = &gUnk_03001130;
+    b = &gGraphicsUpdateTask;
     Task_SetCallbacks(b, InterruptsAndVideo_OnGraphicsUpdateTask, 0);
     a->priority = byteZero;
     a->unk16 = byteOne;
     a->id = zero;
-    b->b14 = 13;
-    b->b16 = byteOne;
-    b->h10 = zero;
+    b->priority = 13;
+    b->unk16 = byteOne;
+    b->id = zero;
     Task_LinkToPriorityList(a);
     Task_LinkToPriorityList(b);
 }

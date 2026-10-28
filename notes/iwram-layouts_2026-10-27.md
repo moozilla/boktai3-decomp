@@ -49,3 +49,5 @@ and field-remapping support in ramlayout would make this migration faster.
 - **03001110 `gVideoIrqPhase` (unified):** Tentative two-phase video/sound IRQ latch toggled in 08214144; both consumers retain identical compiler output.
 
 - **03001118 `gVideoUploadTask` (struct):** Static scheduler task identified by its video-upload callback and priority 0. RuntimeTask preserves the scheduler header; +16 remains semantically unresolved. InitRuntime matches with identical compiler output in both modes.
+
+- **03001130 `gGraphicsUpdateTask` (struct):** Static scheduler task identified by its graphics-update callback and priority 13, sharing RuntimeTask with the video-upload task. InitRuntime still matches in both modes.
