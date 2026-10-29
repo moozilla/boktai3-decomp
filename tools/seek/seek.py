@@ -51,7 +51,8 @@ from perm_pycparser import c_ast as ca  # noqa: E402
 from src import ast_util  # noqa: E402
 
 CURRENT = os.path.join(E.LOCAL, "current")
-SEM_FAMILIES = {"width", "cast", "explicit_narrow", "cse_temp", "inline_var", "reuse_stored", "related_const"}
+SEM_FAMILIES = {"width", "cast", "explicit_narrow", "cse_temp", "inline_var", "reuse_stored", "related_const",
+                "swap_stmts"}
 AGBCC_SRC = os.path.join(ROOT, "build", "scope", "agbcc", "gcc")
 
 
@@ -142,6 +143,12 @@ class Work:
             func = open(alias).read().strip()
         self.sess = E.Session(func)
         self.sess.fold_updates()
+        for node in sorted(self.sess.nodes.values(), key=lambda n: n["id"]):
+            parent = self.sess.nodes.get(node.get("parent"), {})
+            needs_check = node.get("family") in SEM_FAMILIES or node.get("move", "").startswith("[sem]")
+            node["_unverified"] = bool(node.get("kind") == "move" and not node.get("match") and
+                                       (parent.get("_unverified") or
+                                        (needs_check and not node.get("sem", "").startswith("EQUIV"))))
         meta = os.path.join(self.sess.dir, "meta.txt")
         if self.target is None:
             if not os.path.exists(meta):
@@ -174,7 +181,7 @@ class Work:
         return self.sess.nodes[n]
 
     def best(self, k=1):
-        nodes = [n for n in self.sess.nodes.values() if n.get("ok")]
+        nodes = [n for n in self.sess.nodes.values() if n.get("ok") and not n.get("_unverified")]
         nodes.sort(key=lambda n: (rank(n), n["id"]))
         if not nodes:
             sys.exit("no evaluated node")
@@ -360,6 +367,10 @@ class Work:
             if sem and (desc.startswith("[sem]") or fam in SEM_FAMILIES) and rank(dict(ev, ok=True)) <= rank(node):
                 code, _ = self.target.compile_pre(vpre)
                 rec["sem"] = self.target.semantic(code, vpre)
+            rec["_unverified"] = bool(not rec.get("match") and
+                                      (node.get("_unverified") or
+                                       ((desc.startswith("[sem]") or fam in SEM_FAMILIES) and
+                                        not rec.get("sem", "").startswith("EQUIV"))))
             rec = self.sess.add(rec)
             if rank(rec) < rank(node):
                 fs[2] += 1
@@ -400,7 +411,7 @@ class Work:
             if nid in done:
                 # already expanded: its children are on the tree; queue them instead
                 for c in self.sess.nodes.values():
-                    if c.get("parent") == nid and c.get("ok") and c["id"] not in done:
+                    if c.get("parent") == nid and c.get("ok") and not c.get("_unverified") and c["id"] not in done:
                         heapq.heappush(heap, (rank(c), c.get("awrong", 0), c.get("depth", 0), tick, c["id"]))
                         tick += 1
                 continue
@@ -415,7 +426,7 @@ class Work:
                 continue
             rounds += 1
             for c in kids:
-                if c.get("sem", "").startswith("DIFFERENT"):
+                if c.get("_unverified") or c.get("sem", "").startswith("DIFFERENT"):
                     continue
                 ck, bk = rank(c), rank(best)
                 # better, a lateral step on the plateau, or a bounded step back (moves that pay off only
@@ -495,6 +506,8 @@ def rank(n):
     cost = k[1] + k[2]
     if n.get("match"):
         return (0, 0, 0, 0)
+    if n.get("_unverified"):
+        return (9998, cost, k[1], k[2])
     mode = OBJECTIVE["mode"]
     if mode == "rotation" and n.get("rot"):
         r = n["rot"]  # [diff after the best single shift, K, D]
@@ -527,6 +540,8 @@ def fmt_node(n, parent=None):
     sem = n.get("sem")
     semtxt = "" if not sem or sem == "unchecked" else ("  [sem ok]" if sem.startswith("EQUIV") else
                                                        "  [sem: " + sem.split(":")[0] + "]")
+    if n.get("_unverified"):
+        semtxt += "  [unchecked move: review before expanding]"
     al = ""
     if OBJECTIVE["mode"] == "block" and n.get("blk") is not None:
         al += f"  [block {n['blk']}]"
