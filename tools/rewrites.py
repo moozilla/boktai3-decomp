@@ -114,6 +114,25 @@ def following(fn, stmt):
     return out
 
 
+def straight_line_reads(fn, stmt, want):
+    """Reads before a write, call or control-flow boundary can invalidate a snapshot.
+
+    In particular a for condition is not a read of the value entering the loop:
+    the backedge can change it even when the condition precedes the step in AST order.
+    """
+    out = []
+    for st in following(fn, stmt):
+        if any(isinstance(n, (ca.For, ca.While, ca.DoWhile, ca.If, ca.Switch,
+                              ca.Compound, ca.Label, ca.Goto, ca.FuncCall)) for n, _, _ in walk(st)):
+            break
+        if any(isinstance(n, ca.Assignment) and text(n.lvalue) == want
+               or isinstance(n, ca.UnaryOp) and n.op in ("++", "--", "p++", "p--", "&")
+               and text(n.expr) == want for n, _, _ in walk(st)):
+            break
+        out.extend(reads_of(st, want))
+    return out
+
+
 # --- rewrites ------------------------------------------------------------------------
 
 def rw_reuse_stored(fn):
@@ -122,7 +141,7 @@ def rw_reuse_stored(fn):
     for k in range(n_sites):
         node, _, _ = nth(fn, is_stmt_assign, k)
         lv = text(node.lvalue)
-        later = [r for st in following(fn, node) for r in reads_of(st, lv)]
+        later = straight_line_reads(fn, node, lv)
         if not later:
             continue
         for take in ("first", "all"):
@@ -131,7 +150,7 @@ def rw_reuse_stored(fn):
             t = new_name(f2)
             add_local(f2, typeof_decl(t, a.lvalue))
             a.rvalue = ca.Assignment("=", ca.ID(t), a.rvalue)
-            reads = [r for st in following(f2, a) for r in reads_of(st, lv)]
+            reads = straight_line_reads(f2, a, lv)
             for r in reads[:1] if take == "first" else reads:
                 set_child(r[1], r[2], ca.ID(t))
             yield f"reuse {lv} via {t} ({take})", f2

@@ -615,7 +615,7 @@ def cmd_open(a):
 
 def show_layers(w, node):
     if node.get("skeleton"):
-        print("  determined facts not met (fix these first; no reordering will):")
+        print("  structural observations (calls gate search; other differences can be code generation):")
         for ln in node["skeleton"][:10]:
             print("    " + ln)
     if node.get("regions"):
