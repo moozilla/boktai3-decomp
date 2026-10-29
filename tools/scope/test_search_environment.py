@@ -45,6 +45,26 @@ class SearchIntegrationTests(unittest.TestCase):
     def command(self, command, **kwargs):
         return search.dispatch({"command": command, "session": self.db, **kwargs})
 
+    def test_try_retains_siblings_without_moving_head(self):
+        head = self.command("status")["node"]
+        files = []
+        for index, expression in enumerate(("1+x", "x+2")):
+            path = self.path / ("variant%d.c" % index)
+            path.write_text("int F(int x){return %s;}" % expression)
+            files.append(str(path))
+        results = self.command("try", sources=files, parent=head, reason="compare source hypotheses")
+        self.assertEqual(len(results), 2)
+        self.assertEqual(self.command("status")["node"], head)
+        self.assertTrue(all(r["parents"] == [head] for r in results))
+        self.assertEqual(self.command("status")["nodes"], 3)
+
+    def test_new_extern_abi_labels_are_not_instruction_bodies(self):
+        self.source.write_text('extern int Table[] asm("RomTable");\nint F(int x){return x+1;}')
+        self.command("import", source=str(self.source))
+        self.source.write_text('int F(int x){asm("// nop");return x;}')
+        with self.assertRaisesRegex(ValueError, "instruction bodies"):
+            self.command("import", source=str(self.source))
+
     def test_import_uses_current_context_and_head_is_evaluated(self):
         self.env.version = 2
         self.source.write_text("int F(int x) { return 1+x; }\n")

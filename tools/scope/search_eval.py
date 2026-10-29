@@ -308,6 +308,7 @@ class Evaluator:
             if expected_context is not None and expected_context != actual_context:
                 raise StaleContextError("Compiler inputs changed before compilation; refresh the session context.")
             path = self.materialize(source, origin)
+            compile_started = time.perf_counter()
             with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
                 compiled = s.fast_compile(str(path), function, knobs)
                 if compiled is None:
@@ -316,7 +317,7 @@ class Evaluator:
                     data = info.get("data", ())
                 else:
                     code, address, data = compiled
-            compile_ms = (time.perf_counter() - start) * 1000
+            compile_ms = (time.perf_counter() - compile_started) * 1000
             name = s.rom_name(str(path), function)
             size = s.inventory()[2][name]
             target = s.rom_bytes()[s.off(address):s.off(address) + size]

@@ -224,6 +224,12 @@ def dispatch(request):
                 Path(request["out"]).write_text(source)
                 return {"out": request["out"]}
             return source
+        if command == "twins":
+            from search_twins import query
+            node, record, _ = evaluate(session, ref, {})
+            evaluator = environment(path)
+            return query(evaluator.scope, record["result"], session.context(node["id"])["rom_name"],
+                         request.get("region"), request.get("limit") or 4)
         if command == "land":
             from search_land import land
             node, record, _ = evaluate(session, ref, dict(request, force=True, knobs={}, trials=0))
@@ -307,7 +313,7 @@ def dispatch(request):
             return {**compact(node, record), "cache_hit": cached,
                     "experiment_exact": result.get("experiment_exact", False),
                     "experiment_build": result.get("experiment_build") if request.get("knobs") else None}
-        if command in ("trace", "demand"):
+        if command in ("trace", "demand", "priority"):
             from search_trace import collect, delta
             meta = session.metadata()
             evaluator = environment(path)
@@ -323,6 +329,25 @@ def dispatch(request):
                     result = collect(evaluator.scope, str(source_path), meta["function"])
                 session.evaluate(node["id"], result, evaluator="trace")
                 return node["id"], result
+            if command == "priority":
+                from search_priority import analyze as priority_analysis, IMPLEMENTATION_ID
+                argument = request.get("argument", "all")
+                if argument == "all":
+                    raise ValueError("select a local quantity head with --argument NAME (or pseudo ID); use trace to find names")
+                node, _, _ = evaluate(session, ref, {})
+                options = {"implementation": IMPLEMENTATION_ID, "argument": argument, "competitor": request.get("competitor")}
+                cached = None if request.get("force") else session.evaluation(node["id"], evaluator="priority", options=options)
+                if cached:
+                    return cached["result"]
+                source_path = evaluator.materialize(session.source(node["id"]), meta["origin"])
+                captured = io.StringIO()
+                with contextlib.redirect_stdout(captured), contextlib.redirect_stderr(captured):
+                    trace = collect(evaluator.scope, str(source_path), meta["function"])
+                    result = priority_analysis(evaluator.scope, evaluator.scope.workdir(meta["function"]),
+                                              meta["function"], argument, request.get("competitor"))
+                session.evaluate(node["id"], trace, evaluator="trace")
+                session.evaluate(node["id"], result, evaluator="priority", options=options)
+                return result
             if command == "demand":
                 from search_reload import analyze as reload_demand, compact as compact_demand, IMPLEMENTATION_ID
                 node, _, _ = evaluate(session, ref, {})
@@ -413,14 +438,22 @@ def dispatch(request):
             parent = session.node(request.get("parent", ref))["id"]
             pattern = re.compile(r'\b(?:__asm__|__asm|asm)\s*(?:(?:volatile|__volatile__)\s*)?\(\s*((?:"(?:\\.|[^"\\])*"\s*)+)')
             def asm_literals(text):
-                clean = re.sub(r"/\*.*?\*/|//[^\n]*", "", text, flags=re.S)
-                return ["".join(re.findall(r'"((?:\\.|[^"\\])*)"', match[1])).strip()
-                        for match in pattern.finditer(clean)]
-            existing = Counter(asm_literals(session.source(parent)))
-            for literal in asm_literals(source):
+                # Comments inside string literals are instruction text, not C
+                # comments. Keep their bytes while discarding real comments.
+                tokens = r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|/\*.*?\*/|//[^\n]*'
+                clean = re.sub(tokens, lambda m: " " if m[0].startswith(("/*", "//")) else m[0], text, flags=re.S)
+                out = []
+                for match in pattern.finditer(clean):
+                    literal = "".join(re.findall(r'"((?:\\.|[^"\\])*)"', match[1])).strip()
+                    prefix = re.split(r"[;{}]", clean[:match.start()])[-1]
+                    label = bool(re.fullmatch(r"[A-Za-z_.$][\w.$]*", literal) and re.search(r"\bextern\b", prefix))
+                    out.append((literal, label))
+                return out
+            existing = Counter(literal for literal, _ in asm_literals(session.source(parent)))
+            for literal, abi_label in asm_literals(source):
                 if existing[literal]:
                     existing[literal] -= 1  # preserve existing ABI asmlabels and SDK declarations
-                elif literal and not re.fullmatch(r"r(?:1[0-5]|[0-9])|sl|fp|ip|sb|lr", literal):
+                elif literal and not abi_label and not re.fullmatch(r"r(?:1[0-5]|[0-9])|sl|fp|ip|sb|lr", literal):
                     raise ValueError("handwritten instruction bodies are not matching C moves")
             meta = session.metadata()
             context = environment(path).context(source, meta["function"], meta["origin"])
@@ -558,10 +591,14 @@ def parser():
     p.add_argument("--session", default="default")
     p.add_argument("--json", action="store_true", help="return machine-readable response envelope")
     sub = p.add_subparsers(dest="command", required=True)
-    for command in ("status", "inspect", "regions", "why", "history", "notes", "evaluate", "moves", "frontier", "export", "source", "checkout", "experiment", "compiler", "mark", "focus", "compare", "listing", "trace", "demand", "values", "land"):
+    for command in ("status", "inspect", "regions", "why", "history", "notes", "evaluate", "moves", "frontier", "export", "source", "checkout", "experiment", "compiler", "mark", "focus", "compare", "listing", "trace", "demand", "values", "land", "twins", "priority"):
         q = sub.add_parser(command)
         q.add_argument("node", nargs="?", default="HEAD")
         q.add_argument("--out")
+        if command == "priority":
+            q.add_argument("--competitor", help="name or pseudo ID of a particular local quantity head")
+        if command == "twins":
+            q.add_argument("--region", help="ROM basic block Bn; default is the first differing block")
         if command == "land":
             q.add_argument("--unit", help="destination src/UNIT.c when session began from a scratch file")
         q.add_argument("--details", action="store_true")
@@ -654,6 +691,31 @@ def render_result(command, value, details=False):
                 out.append("  %s branch %s: %s [%s; %s]" % (branch["at"], branch["instruction"], args,
                     branch["domain"], branch["status"]))
         out.append(str(value.get("interpretation", "")))
+        return "\n".join(out)
+    if command == "priority" and isinstance(value, dict):
+        out = ["Local quantity priority: " + value["compiler"]["reference"]]
+        for match in value["matches"]:
+            selected = match["selected"]
+            out.append("  %s p%d qty%d block%d: priority%d refs%d birth%d death%d (%d half-insns); words%s" % (
+                selected.get("name"), selected["pseudo"], selected["quantity"], selected["block"], selected["priority"],
+                selected["refs"], selected["birth"], selected["death"], selected["lifetime_half_insns"], selected["register_words"]))
+            for rival in match["competitors"]:
+                other, threshold = rival["quantity"], rival["threshold"]
+                out.append("    vs %s p%d qty%d priority%d: need%+d; shorten own interval%s / add refs%s / lengthen rival%s half-insns%s" % (
+                    other.get("name"), other["pseudo"], other["quantity"], other["priority"], threshold["priority_delta"],
+                    threshold["selected_shorten_half_insns"], threshold["selected_add_refs"], threshold["competitor_lengthen_half_insns"],
+                    "; suggestion phase may precede priority" if rival["suggestion_phase_may_precede_priority"] else ""))
+        if not value["matches"]:
+            out.append("  No local quantity head with this name; it may label a tied member or a globally allocated value.")
+        out.extend(value["limits"])
+        return "\n".join(out)
+    if command == "twins" and isinstance(value, dict):
+        out = ["Prior art for %s (+0x%X, %d instructions)" % (value["region"], value["target_start"], value["target_instructions"])]
+        for match in value["matches"]:
+            line = (match.get("definition") or {}).get("line", "?")
+            out.append("  %d consecutive instructions: %s  %s:%s  (matched index %d)" % (
+                match["consecutive_instructions"], match["function"], match["source"], line, match["matched_instruction"]))
+        out.append(value["interpretation"])
         return "\n".join(out)
     if command == "try" and isinstance(value, list):
         return "\n".join("%s %-12s %s  %sms  %s" % (n["node"], n.get("status"), n.get("counts"),

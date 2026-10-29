@@ -11,6 +11,7 @@ with the ROM is the only exact verdict. Start with an actual NONMATCHING draft.
 search() { build/venv/bin/python tools/scope/search.py "$@"; }
 search --session actor init src/UNIT.c FUNCTION
 search --session actor values               # symbolic addresses, loads/stores and call arguments
+search --session actor twins --region B4    # matched C prior art for a ROM block
 search --session actor regions              # dependency shape, bindings, concrete differences
 search --session actor listing              # concise ROM/current machine differences
 search --session actor why                  # actual compiler diagnosis, saved in session notes
@@ -20,13 +21,15 @@ search --session actor frontier             # no greedy acceptance or automatic 
 search --session actor checkout NODE --out build/actor.c
 # Edit build/actor.c; include helpers/types and retain the unit's guards.
 search --session actor import build/actor.c --parent NODE --reason 'explain the hypothesis'
+search --session actor try build/a.c build/b.c --parent NODE --reason 'compare one hypothesis'
 search --session actor trace --a NODE       # actual allocation/reload/pass changes against NODE
 search --session actor diff NODE HEAD
 search --session actor land EXACT_NODE      # campaign merge + production unit MATCH
 ```
 
 `expand` keeps HEAD where it was; select a child with `checkout`. `import` selects
-its new child. Use explicit node IDs when sharing a session with another worker.
+its new child. `try FILE... --parent NODE` compiles siblings without moving HEAD.
+Use explicit node IDs when sharing a session with another worker.
 Node hash prefixes work. `moves --kinds commute introduce-temporary` filters
 families; `expand --kinds commute --limit 4` evaluates that chosen neighborhood
 in one warm batch. Moves preserve defined C behavior under their listed conditions;
@@ -47,7 +50,9 @@ them. `focus --lines 40:70` restricts move sites; `focus --lines clear` removes 
 Use `trace --a PARENT` on selected nodes: it pays for diagnostic RTL once and
 reports actual named-value allocation changes, reload changes and the earliest
 changed pass with an agbcc source file:line. `--details` exposes all records and
-ambiguous correspondences. Earliest divergence is not causal proof. `demand` links reload pressure and stack evictions to source instructions and machine
+ambiguous correspondences. `priority --argument table --competitor '=24'` shows
+actual local-quantity intervals and rank thresholds; these differ from flow's
+individual pseudo lifetimes. Suggested-register phases can precede priority. Earliest divergence is not causal proof. `demand` links reload pressure and stack evictions to source instructions and machine
 constraints; `--details` retains uncertainty about exact victim events. `compiler
 --view life --argument 'value'` and views `frame`, `hoist`, `giv`, `pre`, `probe`,
 `spill`, or `why --argument UID` reuse scope. `experiment --knob AGBCC_PRI=value:+100`
