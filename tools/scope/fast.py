@@ -20,6 +20,9 @@ import struct
 import subprocess
 import tempfile
 
+with open(__file__, "rb") as _implementation_source:
+    IMPLEMENTATION_ID = hashlib.sha256(_implementation_source.read()).hexdigest()
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 MARK = "\x01"  # right after the prefix's last newline: no extra line
 

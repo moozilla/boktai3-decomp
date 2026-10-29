@@ -14,12 +14,10 @@ SCOPE_SEARCH_SERVER=0 executes locally. Runtime artifacts stay under build/.
 import argparse
 import contextlib
 import dataclasses
-import difflib
 import io
 import json
 import os
 from pathlib import Path
-import socket
 import subprocess
 import sys
 import time
@@ -30,7 +28,6 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 BASE = ROOT / "build/search-sol"
-SOCKET = BASE / "serve.sock"
 EVALUATORS = {}
 
 
@@ -75,6 +72,16 @@ def compact(node, evaluation=None):
                 delta=result.get("delta"), diagnostics=result.get("diagnostics") or None)
 
 
+def protection(result, metadata):
+    result = dict(result)
+    verdicts = {r["target"]: r for r in result.get("structure", {}).get("regions", []) if r.get("target")}
+    result["protected_regions"] = {name: {
+        "preserved": verdicts.get(name, {}).get("local_shape") == "same" and
+            (mode == "shape" or verdicts.get(name, {}).get("global_binding") == "same"),
+        "mode": mode} for name, mode in metadata.get("protected_regions", {}).items()}
+    return result
+
+
 def evaluate(session, ref, request):
     from search_eval import decision_delta
     from search_structure import analyze
@@ -90,6 +97,7 @@ def evaluate(session, ref, request):
     options = {"knobs": request.get("knobs", {}), "semantic_trials": request.get("trials", 0)}
     cached = None if request.get("force") else session.evaluation(node["id"], options=options)
     if cached:
+        cached["result"] = protection(cached["result"], meta)
         return node, cached, True
     lease_options = dict(options, force_attempt=os.getpid()) if request.get("force") else options
     if not session.claim(node["id"], options=lease_options):
@@ -103,16 +111,28 @@ def evaluate(session, ref, request):
             result["structure"] = analyze(source, meta["function"], result["target_rows"], result["rows"],
                 compiler_root=ROOT / "build/scope/agbcc/gcc", target_data=result.get("target_data", ()),
                 current_data=result.get("current_data", ()))
-            protected = meta.get("protected_regions", {})
-            verdicts = {r["target"]: r for r in result["structure"]["regions"] if r.get("target")}
-            result["protected_regions"] = {name: {
-                "preserved": verdicts.get(name, {}).get("local_shape") == "same" and
-                    (mode == "shape" or verdicts.get(name, {}).get("global_binding") == "same"),
-                "mode": mode} for name, mode in protected.items()}
-        if node["parents"]:
-            parent = session.evaluation(node["parents"][0], options=options)
-            if parent:
+            result = protection(result, meta)
+        if options["knobs"] and not request.get("_no_delta"):
+            _, baseline, _ = evaluate(session, node["id"], {"_no_delta": True})
+            result["delta"] = decision_delta(baseline["result"], result)
+            result["delta"]["comparison"] = "counterfactual versus unmodified build of this same source"
+        elif node["parents"] and not request.get("_no_delta"):
+            parent_id = node["parents"][0]
+            parent = session.evaluation(parent_id, options=options)
+            parent_context = session.context(parent_id)
+            actual_context = session.context(node["id"])
+            versions = ("evaluator", "scope", "fast", "structure", "trace", "semantic", "compiler", "headers", "symbols", "elf")
+            environment_changed = any(parent_context.get(k) != actual_context.get(k) for k in versions)
+            same_source = session.node(parent_id)["source_hash"] == node["source_hash"]
+            if same_source and environment_changed:
+                result["delta"] = {"source_unchanged": True, "environment_changed": True}
+            else:
+                if not parent or environment_changed:
+                    baseline, parent, _ = evaluate(session, parent_id, dict(request, _no_delta=True, force=False))
+                    parent_id = baseline["id"]
                 result["delta"] = decision_delta(parent["result"], result)
+                if parent_id != node["parents"][0]:
+                    result["delta"]["baseline_refreshed"] = parent_id[:12]
         record = session.evaluate(node["id"], result, options=options)
     finally:
         session.release(node["id"], options=lease_options)
@@ -123,20 +143,6 @@ def evaluate(session, ref, request):
         session.note("Differential execution found a counterexample.", node["id"], kind="counterexample",
                      data=result["semantic"])
     return node, record, False
-
-
-def focus_moves(moves, source, focus):
-    if not focus:
-        return moves
-    lo, hi = focus
-    selected = []
-    for move in moves:
-        data = serial(move)
-        edits = data.get("edits", [])
-        if edits and all(lo <= source.count("\n", 0, e["start"]) + 1 <= hi
-                         and lo <= source.count("\n", 0, max(e["start"], e["end"]-1)) + 1 <= hi for e in edits):
-            selected.append(move)
-    return selected
 
 
 def dispatch(request):
@@ -158,7 +164,8 @@ def dispatch(request):
             node, record, cached = evaluate(session, node["id"], request)
             return {**compact(node, record), "session": os.path.relpath(path, ROOT), "cache_hit": cached}
         if command == "export":
-            return session.export(request.get("out"))
+            exported = session.export(request.get("out"))
+            return {"out": request["out"], "nodes": len(exported["nodes"])} if request.get("out") else exported
         ref = request.get("node", "HEAD")
         if command == "status":
             return {**compact(session.node(ref)), "metadata": session.metadata(),
@@ -208,13 +215,61 @@ def dispatch(request):
                 Path(request["out"]).write_text(source)
                 return {"out": request["out"]}
             return source
+        if command == "values":
+            import search_lift
+            from search_eval import digest
+            node, record, _ = evaluate(session, ref, request)
+            implementation = getattr(search_lift, "IMPLEMENTATION_ID", digest(Path(search_lift.__file__).read_bytes()))
+            options = {"implementation": implementation}
+            cached = None if request.get("force") else session.evaluation(node["id"], evaluator="values", options=options)
+            if cached:
+                result = cached["result"]
+            else:
+                compiled = record["result"]
+                if not compiled.get("rows"):
+                    raise ValueError(compiled.get("diagnostics", "compile first"))
+                target = search_lift.lift(compiled["target_rows"], compiled.get("target_data", ()))
+                current = search_lift.lift(compiled["rows"], compiled.get("current_data", ()))
+                result = {"target": target, "current": current, "comparison": search_lift.compare(target, current)}
+                session.evaluate(node["id"], result, evaluator="values", options=options)
+            if request.get("details"):
+                return result
+            comparison = result["comparison"]
+            limit = request.get("limit") or 16
+            names = {a: n for n, a in environment(path).scope.inventory()[1].items()}
+            def expression(value):
+                return {"text": value.get("text"), "certainty": value.get("certainty")}
+            def memory(items):
+                return [{"at": f"+0x{m['offset']:X}", "instruction": m.get("instruction"),
+                         "kind": m["kind"], "width": m["width"], "signed": m["signed"],
+                         "address": expression(m["address"]), "value": expression(m["value"])} for m in items[:limit]]
+            def calls(items):
+                out = []
+                for c in items[:limit]:
+                    target = c["target"]["text"]
+                    try:
+                        target = names.get(int(target, 0), target)
+                    except ValueError:
+                        pass
+                    out.append({"at": f"+0x{c['offset']:X}", "target": target,
+                        "register_arguments": [expression(v) for v in c["arguments"]],
+                        "stack_argument_candidates": [{"word": v["word"], "value": expression(v["value"])}
+                            for v in c.get("stack_arguments", [])], "arity": "unknown"})
+                return out
+            return {"target_summary": result["target"]["summary"], "current_summary": result["current"]["summary"],
+                    "target_only": memory(comparison["target_only"]), "current_only": memory(comparison["current_only"]),
+                    "paired_addresses": len(comparison["paired"]),
+                    "ambiguous_target_addresses": len(comparison["unresolved"]["target"]),
+                    "ambiguous_current_addresses": len(comparison["unresolved"]["current"]),
+                    "target_calls": calls(result["target"]["calls"]), "current_calls": calls(result["current"]["calls"]),
+                    "interpretation": comparison["interpretation"]}
         if command in ("evaluate", "inspect", "regions", "compare", "experiment", "listing"):
             if command == "experiment" and not request.get("knobs"):
                 raise ValueError("an experiment needs at least one compiler knob")
             node, record, cached = evaluate(session, ref, request)
             result = record["result"]
             if command == "listing":
-                return "\n".join(f"{d['tag']} " + (f"{d['target'][0]:04X} {d['target'][2]}" if d['target'] else "").ljust(48) + " | " + (f"{d['current'][0]:04X} {d['current'][2]}" if d['current'] else "") for d in result.get("differences", []))
+                return "\n".join(f"{d['tag']} " + (f"{d['target'][0]:04X} {d['target'][2]}" if d['target'] else "").ljust(48) + " | " + (f"{d['current'][0]:04X} {d['current'][2]}" if d['current'] else "") for d in result.get("differences", [])[:request.get("limit")])
             if command == "inspect":
                 return {"node": node["id"], **result}
             if command == "regions":
@@ -222,17 +277,17 @@ def dispatch(request):
                 if request.get("details"):
                     return structure
                 return {"summary": structure.get("summary"),
-                        "regions": [r for r in structure.get("regions", []) if r.get("local_shape") != "same" or r.get("global_binding") != "same"],
+                        "regions": [r for r in structure.get("regions", []) if r.get("local_shape") != "same" or r.get("global_binding") != "same"][:request.get("limit")],
                         "actions": structure.get("actions"), "degrees_of_freedom": structure.get("degrees_of_freedom")}
             if command == "compare":
                 from search_eval import decision_delta
-                a = session.evaluation(request.get("a", "ROOT"), options={"knobs": {}, "semantic_trials": 0})
-                if not a:
-                    raise ValueError("comparison node needs a default evaluation")
-                return decision_delta(a["result"], result)
+                baseline, a, _ = evaluate(session, request.get("a", "ROOT"), {"_no_delta": True})
+                return {"baseline": baseline["id"][:12], "node": node["id"][:12],
+                        "delta": decision_delta(a["result"], result)}
             return {**compact(node, record), "cache_hit": cached,
-                    "experiment_exact": result.get("experiment_exact", False)}
-        if command == "trace":
+                    "experiment_exact": result.get("experiment_exact", False),
+                    "experiment_build": result.get("experiment_build") if request.get("knobs") else None}
+        if command in ("trace", "demand"):
             from search_trace import collect, delta
             meta = session.metadata()
             evaluator = environment(path)
@@ -241,25 +296,43 @@ def dispatch(request):
                 node, _, _ = evaluate(session, node_ref, {})
                 stored = session.evaluation(node["id"], evaluator="trace")
                 if stored and not request.get("force"):
-                    return stored["result"]
+                    return node["id"], stored["result"]
                 source_path = evaluator.materialize(session.source(node["id"]), meta["origin"])
                 captured = io.StringIO()
                 with contextlib.redirect_stdout(captured), contextlib.redirect_stderr(captured):
                     result = collect(evaluator.scope, str(source_path), meta["function"])
                 session.evaluate(node["id"], result, evaluator="trace")
-                return result
-            parent = snapshot(request.get("a", "ROOT"))
-            current = snapshot(ref)
+                return node["id"], result
+            if command == "demand":
+                from search_reload import analyze as reload_demand, compact as compact_demand, IMPLEMENTATION_ID
+                node, _, _ = evaluate(session, ref, {})
+                options = {"implementation": IMPLEMENTATION_ID}
+                cached = None if request.get("force") else session.evaluation(node["id"], evaluator="demand", options=options)
+                if cached:
+                    result = cached["result"]
+                    return result if request.get("details") else compact_demand(result, request.get("limit") or 6)
+                source_path = evaluator.materialize(session.source(node["id"]), meta["origin"])
+                captured = io.StringIO()
+                with contextlib.redirect_stdout(captured), contextlib.redirect_stderr(captured):
+                    trace = collect(evaluator.scope, str(source_path), meta["function"])
+                    result = reload_demand(evaluator.scope, evaluator.scope.workdir(meta["function"]), meta["function"])
+                session.evaluate(node["id"], trace, evaluator="trace")
+                session.evaluate(node["id"], result, evaluator="demand", options=options)
+                return result if request.get("details") else compact_demand(result, request.get("limit") or 6)
+            parent_id, parent = snapshot(request.get("a", "ROOT"))
+            current_id, current = snapshot(ref)
             changes = delta(parent, current)
             if request.get("details"):
-                return {"node": session.node(ref)["id"][:12], "delta": changes, "trace": current}
+                return {"node": current_id[:12], "baseline": parent_id[:12], "delta": changes, "trace": current}
             named = [{**a, "changes": {k: v for k, v in a["changes"].items()
-                        if k in ("allocator", "priority", "refs", "live_length", "rank", "hard_register")}}
+                        if k in ("allocator", "priority", "refs", "live_length", "rank", "hard_register", "preferred_class")}}
                      for a in changes["allocations"] if not a["ambiguous"] and not a["key"].startswith("=")]
-            return {"node": session.node(ref)["id"][:12],
+            return {"node": current_id[:12], "baseline": parent_id[:12],
                     "earliest_changed_pass": changes["earliest_changed_pass"],
                     "changed_passes": [p["pass"] for p in changes["changed_passes"]],
                     "allocations": [a for a in named if a["changes"]],
+                    **({"values": [a for a in current["allocations"] if a.get("name") == request["argument"]]}
+                        if request.get("argument", "all") != "all" else {}),
                     "ambiguous_allocation_changes": sum(a["ambiguous"] for a in changes["allocations"]),
                     "reload_changes": len(changes["reloads"]),
                     "trace_matches_build": changes["trace_matches_build"],
@@ -267,9 +340,10 @@ def dispatch(request):
         if command in ("why", "compiler"):
             meta = session.metadata()
             evaluator = environment(path)
-            text = evaluator.diagnose(session.source(ref), meta["function"], meta["origin"],
+            node, _, _ = evaluate(session, ref, {})
+            text = evaluator.diagnose(session.source(node["id"]), meta["function"], meta["origin"],
                                       request.get("view", "why"), str(request.get("argument", "all")))
-            session.note(text, ref, kind="compiler_evidence", data={"view": request.get("view", "why")})
+            session.note(text, node["id"], kind="compiler_evidence", data={"view": request.get("view", "why")})
             return text
         if command in ("moves", "expand"):
             from search_moves import enumerate_moves, apply_move
@@ -333,6 +407,14 @@ def safe_dispatch(request):
     except (Exception, SystemExit) as error:
         return {"ok": False, "error": str(error), "log": output.getvalue(),
                 "traceback": traceback.format_exc() if os.environ.get("SEARCH_DEBUG") else None}
+    finally:
+        # Scope's standalone commands keep dump locks for process lifetime. Our
+        # resident/batch process outlives a request, so release them at its edge.
+        scope_module = sys.modules.get("scope")
+        if scope_module is not None:
+            for directory, fd in list(scope_module._LOCKS.items()):
+                os.close(fd)
+                del scope_module._LOCKS[directory]
 
 
 def serve():
@@ -360,8 +442,10 @@ def serve():
                     request = json.loads(path.read_text())
                     if request.get("command") == "stop":
                         reply, stopping = {"ok": True, "result": "stopped"}, True
-                    elif request.pop("runtime_version", None) != loaded_version:
+                    elif loaded_version != runtime_version():
                         reply, stopping = {"ok": False, "restart": True}, True
+                    elif request.pop("runtime_version", None) != loaded_version:
+                        reply = {"ok": False, "restart": True}
                     else:
                         reply = safe_dispatch(request)
                 except Exception as e:
@@ -383,47 +467,54 @@ def runtime_version():
     import hashlib
     # Process loads these modules lazily; restart whenever any implementation changes.
     paths = sorted(HERE.glob("search*.py")) + [HERE / "scope.py", HERE / "fast.py",
-                                               ROOT / "tools/semcheck.py"]
+                                               ROOT / "tools/semcheck.py", ROOT / "tools/build.py", ROOT / "tools/check.py",
+                                               ROOT / "tools/romlib.py"]
     return hashlib.sha256(b"".join(p.read_bytes() for p in paths)).hexdigest()
 
 
 def request_server(request):
+    import fcntl
     BASE.mkdir(parents=True, exist_ok=True)
     inbox = BASE / "requests"
     inbox.mkdir(exist_ok=True)
-    for attempt in range(2):
-        ready = BASE / "resident.json"
-        alive = False
-        if ready.exists():
+
+    def active():
+        with open(BASE / "serve.lock", "a") as lock:
             try:
-                os.kill(json.loads(ready.read_text())["pid"], 0)
-                alive = True
-            except (ProcessLookupError, ValueError, OSError):
-                pass
-        if not alive:
-            with open(BASE / "serve.log", "a") as log:
-                subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "serve"], cwd=ROOT,
-                    stdin=subprocess.DEVNULL, stdout=log, stderr=log, start_new_session=True)
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                return False
+            except BlockingIOError:
+                return True
+
+    def start():
+        with open(BASE / "serve.log", "a") as log:
+            subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "serve"], cwd=ROOT,
+                stdin=subprocess.DEVNULL, stdout=log, stderr=log, start_new_session=True)
+
+    for attempt in range(8):
+        if not active():
+            start()
         key = uuid.uuid4().hex
         path = inbox / (key + ".request")
         reply_path = path.with_suffix(".reply")
         tmp = path.with_suffix(".writing")
         tmp.write_text(json.dumps(dict(request, runtime_version=runtime_version())))
         tmp.replace(path)
-        started = time.monotonic()
+        started, checked = time.monotonic(), time.monotonic()
         while not reply_path.exists():
-            if time.monotonic() - started > 600:
-                raise RuntimeError("resident did not respond; inspect build/search-sol/serve.log")
+            now = time.monotonic()
+            if now - started > 120:
+                raise RuntimeError("resident did not respond within 120 seconds; inspect build/search-sol/serve.log")
+            if now - checked > .25:
+                checked = now
+                if not active():
+                    start()  # recover a crashed resident or a startup/shutdown race
             time.sleep(.01)
         reply = json.loads(reply_path.read_text())
         reply_path.unlink()
         if not reply.get("restart"):
             return reply
-        # Give the prior process time to release its lock before starting the next.
-        for _ in range(100):
-            if not ready.exists():
-                break
-            time.sleep(.01)
+        time.sleep(.05)
     raise RuntimeError("search implementation changed repeatedly during a request")
 
 
@@ -432,7 +523,7 @@ def parser():
     p.add_argument("--session", default="default")
     p.add_argument("--json", action="store_true", help="return machine-readable response envelope")
     sub = p.add_subparsers(dest="command", required=True)
-    for command in ("status", "inspect", "regions", "why", "history", "notes", "evaluate", "moves", "frontier", "export", "source", "checkout", "experiment", "compiler", "mark", "focus", "compare", "listing", "trace"):
+    for command in ("status", "inspect", "regions", "why", "history", "notes", "evaluate", "moves", "frontier", "export", "source", "checkout", "experiment", "compiler", "mark", "focus", "compare", "listing", "trace", "demand", "values"):
         q = sub.add_parser(command)
         q.add_argument("node", nargs="?", default="HEAD")
         q.add_argument("--out")

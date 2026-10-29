@@ -11,7 +11,10 @@ import collections
 import hashlib
 import json
 from pathlib import Path
+import os
 import re
+
+IMPLEMENTATION_ID = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 import time
 
 try:
@@ -127,7 +130,7 @@ def _normalize_pass(scope, wd, pass_name, identities):
             "normalization": "C-name/occurrence pseudos; first-use anonymous pseudos; fixed hard regs; lexical label definitions"}
 
 
-def collect(scope, src, function, env=None):
+def _collect(scope, src, function, env=None):
     """Compile SRC once with full dumps and collect actual compiler decisions.
 
     scope is an imported tools/scope/scope.py module. Runtime paths are omitted
@@ -198,6 +201,33 @@ def collect(scope, src, function, env=None):
                        "Cross-node name/occurrence correspondence can be ambiguous after inlining, shadowing or edits.",
                        "Earliest changed pass output locates divergence; it does not prove why a pass made that choice.",
                        "Anonymous temporary alpha-renaming removes numbering noise and can hide pure temporary renamings."]}
+
+
+
+def collect(scope, src, function, env=None):
+    """Capture default-build decisions without inherited experimental knobs.
+
+    Explicit compiler knobs are permitted for counterfactual API clients, but such
+    snapshots never claim default-build exactness or trace_matches_build.
+    """
+    env = dict(env or {})
+    bad = [key for key in env if not key.startswith(("AGBCC_", "CSE_"))]
+    if bad:
+        raise ValueError("unsupported trace experiment keys: " + ", ".join(bad))
+    saved = {key: os.environ.pop(key) for key in list(os.environ)
+             if key.startswith(("AGBCC_", "CSE_", "SCOPE_TRANSFORM"))}
+    try:
+        result = _collect(scope, src, function, env)
+        result["knobs"] = env
+        result["experiment"] = bool(env)
+        if env:
+            result["experiment_exact"] = result.get("exact", False)
+            result["exact"] = False
+            result["diagnostic_matches_no_g"] = result.get("trace_matches_build", False)
+            result["trace_matches_build"] = False
+        return result
+    finally:
+        os.environ.update(saved)
 
 
 def _changes(parent, child, fields):

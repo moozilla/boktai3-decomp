@@ -22,17 +22,48 @@ def digest(data):
     return hashlib.sha256(data.encode() if isinstance(data, str) else data).hexdigest()
 
 
+def module_identity(module):
+    """Hash loaded function bodies, not a newer source file underneath a batch.
+
+    Normalize filenames/line positions so equivalent worktrees share identities.
+    Build configuration values are fingerprinted separately in the context.
+    """
+    import marshal
+    import types
+
+    def portable(code):
+        return code.replace(co_filename=Path(code.co_filename).name, co_firstlineno=0,
+            co_consts=tuple(portable(c) if isinstance(c, types.CodeType) else c for c in code.co_consts))
+    bodies = []
+    for name, value in sorted(vars(module).items()):
+        value = getattr(value, "__wrapped__", value)
+        code = getattr(value, "__code__", None)
+        if code and getattr(value, "__module__", None) == module.__name__:
+            bodies.append(name.encode() + marshal.dumps(portable(code)))
+    return digest(b"".join(bodies))
+
+
 class Evaluator:
     def __init__(self, directory):
         # Import scope as a library: no scope client, no external resident's state.
         import scope
+        import fast
+        import search_structure
+        import search_trace
         self.scope = scope
         self.directory = Path(directory).resolve()
         self.directory.mkdir(parents=True, exist_ok=True)
         self.oracles = {}
         self._hashes = {}
-        self.loaded_scope = digest(Path(scope.__file__).read_bytes())
-        self.loaded_fast = digest((ROOT / "tools/scope/fast.py").read_bytes())
+        self.loaded_scope = scope.IMPLEMENTATION_ID
+        self.loaded_fast = fast.IMPLEMENTATION_ID
+        self.loaded_structure = getattr(search_structure, "IMPLEMENTATION_ID", digest(Path(search_structure.__file__).read_bytes()))
+        self.loaded_trace = getattr(search_trace, "IMPLEMENTATION_ID", digest(Path(search_trace.__file__).read_bytes()))
+        import sys
+        semantic_module = sys.modules.get("semcheck")
+        self.loaded_semantic = getattr(semantic_module, "IMPLEMENTATION_ID", digest((ROOT / "tools/semcheck.py").read_bytes()))
+        import romlib
+        self.support = {module.__name__: module_identity(module) for module in (scope.build, scope.check, romlib)}
 
     def file_hash(self, path):
         path = Path(path)
@@ -80,8 +111,10 @@ class Evaluator:
         headers = [(os.path.relpath(p, ROOT), self.file_hash(p)) for p in deps]
         symbols = [(str(p.relative_to(ROOT)), self.file_hash(p))
                    for p in sorted((ROOT / "symbols").glob("*")) if p.is_file()]
+        import romlib
+        rom_path = romlib.baserom_path()
         environment = digest(json.dumps([headers, symbols, self.file_hash(s.INSTR),
-            self.file_hash(ROOT / "baserom.gba"), self.file_hash(ROOT / "build/boktai3.elf")]))
+            self.file_hash(rom_path), self.file_hash(ROOT / "build/boktai3.elf")]))
         if getattr(self, "_environment", environment) != environment:
             # Scope's preprocessing cache keys source mtimes, not header contents;
             # its live fork servers also retain the old symbol resolver.
@@ -92,18 +125,39 @@ class Evaluator:
             s._ROMBYTES.clear()
             s._MEMO.clear()
             self.oracles.clear()
+            rom_name = s.rom_name(str(path), function)
+            _, addresses, sizes = s.inventory()
         self._environment = environment
         address, size = addresses[rom_name], sizes[rom_name]
         target = s.rom_bytes()[s.off(address):s.off(address) + size]
+        import importlib.util
+        import sys
+        packages = str(ROOT / "build/search-sol/python")
+        if packages not in sys.path:
+            sys.path.insert(0, packages)
+        spec = importlib.util.find_spec("unicorn")
+        backend = []
+        if spec and spec.origin:
+            package = Path(spec.origin).parent
+            backend = [(str(p.relative_to(package)), self.file_hash(p)) for p in sorted(package.rglob("*"))
+                       if p.is_file() and (p.name == "__init__.py" or p.suffix in (".so", ".dylib", ".dll"))]
+        semantic_runtime = dict(python=sys.version, emulator=digest(json.dumps(backend)),
+                                worker=self.file_hash(ROOT / "tools/scope/search_semantic.py"))
+        if getattr(self, "semantic_runtime", None) != semantic_runtime:
+            self.semantic_failure = None
+        self.semantic_runtime = semantic_runtime
         return dict(version=VERSION, function=function, rom_name=rom_name,
                     address=address, size=size, target_hash=digest(target),
-                    rom_hash=self.file_hash(ROOT / "baserom.gba"),
+                    rom_hash=self.file_hash(rom_path),
                     compiler=self.file_hash(s.INSTR), flags=flags,
-                    assembler=self.file_hash(shutil.which(s.build.AS[0])),
-                    cpp=s.build.CPP, defines=s.build.DEFINES,
+                    assembler=self.file_hash(shutil.which(s.build.AS[0])), assembler_flags=s.build.AS[1:],
+                    cpp=s.build.CPP, cpp_binary=self.file_hash(shutil.which(s.build.CPP[0])), defines=s.build.DEFINES,
                     headers=digest(json.dumps(headers)), symbols=digest(json.dumps(symbols)),
                     elf=self.file_hash(ROOT / "build/boktai3.elf"),
                     evaluator=IMPLEMENTATION, scope=self.loaded_scope, fast=self.loaded_fast,
+                    structure=self.loaded_structure, trace=self.loaded_trace, semantic=self.loaded_semantic,
+                    semantic_runtime=semantic_runtime,
+                    support=self.support,
                     origin=os.path.relpath(ROOT / origin, ROOT))
 
     def materialize(self, source, origin):
@@ -150,6 +204,7 @@ class Evaluator:
             exact = not knobs and code == target
             result = dict(status="exact" if exact else "different", exact=exact,
                           experiment=bool(knobs), experiment_exact=bool(knobs) and code == target,
+                          experiment_build="diagnostic -g UID stream" if s.needs_g(knobs) else "normal no-g build",
                           knobs=knobs, compile_ms=round(compile_ms, 3),
                           elapsed_ms=0, counts="MATCH" if exact else counts,
                           code_hash=digest(code), code_hex=code.hex(), target_hash=digest(target),
@@ -161,6 +216,9 @@ class Evaluator:
                                             current=rows[y] if y is not None else None, tag=t)
                                        for x, y, t in pairs if t != "="],
                           semantic=dict(verdict="EXACT" if exact else "NOT_RUN", trials=0))
+            if s.needs_g(knobs):
+                with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
+                    result["diagnostic_baseline_differs"] = s.g_sensitive(str(path), function)
             if semantic_trials and not knobs and not exact:
                 try:
                     result["semantic"] = self.semantic(source, function, target, code, address,
@@ -179,41 +237,51 @@ class Evaluator:
             os.environ.update(saved)
 
     def semantic(self, source, function, target, code, address, path, trials):
+        import subprocess
         import sys
-        local_packages = str(ROOT / "build/search-sol/python")
-        if local_packages not in sys.path:
-            sys.path.insert(0, local_packages)
-        import semcheck
+        if not 1 <= trials <= 10000:
+            raise ValueError("semantic trials must be between 1 and 10000")
+        if getattr(self, "semantic_failure", None):
+            return dict(verdict="UNAVAILABLE", trials=0, detail=self.semantic_failure, proof=False)
         s = self.scope
-        pre = s.preprocess(str(path), func=function)
-        arity = semcheck.arities(pre)
-        kinds = semcheck.param_kinds(pre, function)
-        check_return = semcheck.returns_value(source, function)
-        name = s.rom_name(str(path), function)
-        key = (name, digest(target), trials, check_return, tuple(kinds or []), digest(pre[:pre.find(function)]))
-        oracle = self.oracles.get(key)
-        if oracle is None:
-            oracle = self.oracles[key] = semcheck.Oracle(name, trials, check_return,
-                rom=s.rom_bytes(), arity=arity, kinds=kinds)
-        verdict, detail = oracle.check(code, address)
-        return dict(verdict=verdict, detail=detail, trials=trials,
-                    target_coverage=round(oracle.coverage, 2), proof=False)
+        payload = dict(source=source, pre=s.preprocess(str(path), func=function), function=function,
+                       rom_name=s.rom_name(str(path), function), code_hex=code.hex(), address=address, trials=trials)
+        try:
+            child = subprocess.run([sys.executable, str(ROOT / "tools/scope/search_semantic.py")],
+                input=json.dumps(payload), capture_output=True, text=True, cwd=ROOT, timeout=10)
+        except subprocess.TimeoutExpired:
+            return dict(verdict="TIMEOUT", trials=0, detail="Differential execution exceeded 10 seconds.", proof=False)
+        if child.returncode:
+            detail = (f"Native semantic worker exited with signal {-child.returncode}." if child.returncode < 0
+                      else f"Semantic worker exited with status {child.returncode}.")
+            self.semantic_failure = detail + " " + child.stderr[-1000:]
+            return dict(verdict="UNAVAILABLE", trials=0, detail=self.semantic_failure, proof=False)
+        try:
+            result = json.loads(child.stdout)
+        except ValueError:
+            return dict(verdict="UNAVAILABLE", trials=0, detail="Invalid semantic worker response: " + child.stderr[-1000:], proof=False)
+        return result
 
     def diagnose(self, source, function, origin, command="why", argument="all"):
         s = self.scope
         s.WORK = str(self.directory / "traces")
         path = self.materialize(source, origin)
         output = io.StringIO()
-        with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
-            if command == "why":
-                s.cmd_why_all(str(path), function, {}) if argument == "all" else s.cmd_why(str(path), function, int(argument), {})
-            elif command == "life":
-                s.compile_draft(str(path), function, {})
-                s.cmd_life(argument.split(), function)
-            elif command in ("frame", "hoist", "giv", "pre", "probe", "spill"):
-                getattr(s, "cmd_" + command)(str(path), function, {})
-            else:
-                raise ValueError("unknown compiler view: " + command)
+        saved = {k: os.environ.pop(k) for k in list(os.environ)
+                 if k.startswith(("AGBCC_", "CSE_", "SCOPE_TRANSFORM"))}
+        try:
+            with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
+                if command == "why":
+                    s.cmd_why_all(str(path), function, {}) if argument == "all" else s.cmd_why(str(path), function, int(argument), {})
+                elif command == "life":
+                    s.compile_draft(str(path), function, {})
+                    s.cmd_life(argument.split(), function)
+                elif command in ("frame", "hoist", "giv", "pre", "probe", "spill"):
+                    getattr(s, "cmd_" + command)(str(path), function, {})
+                else:
+                    raise ValueError("unknown compiler view: " + command)
+        finally:
+            os.environ.update(saved)
         return output.getvalue()
 
     def close(self):

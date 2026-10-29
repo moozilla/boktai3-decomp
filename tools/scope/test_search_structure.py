@@ -91,6 +91,25 @@ class StructureTests(unittest.TestCase):
         self.assertFalse(result["exact"])
         self.assertEqual(result["summary"]["local_shape_same"], 1)
 
+    def test_movs_preserves_carry_and_branch_reads_carry_only(self):
+        result = ss.fingerprint(rows("cmp r0, #3", "movs r1, #0", "bcs func+0x8", "bx lr", "bx lr"))
+        use = next(u for u in result["webs"]["uses"] if u["offset"] == 4 and u["register"] == "flag:C")
+        self.assertEqual(use["definitions"], ["0:flag:C"])
+        self.assertFalse(any(u["offset"] == 4 and u["register"] in {"flag:N", "flag:Z", "flag:V"} for u in result["webs"]["uses"]))
+
+    def test_fixed_shift_does_not_read_old_carry(self):
+        read, written, known = ss._effects(ss._row("lsls r0, r1, #3", 0))
+        self.assertNotIn("flag:C", read)
+        self.assertIn("flag:C", written)
+        self.assertNotIn("flag:V", written)
+
+    def test_adc_reads_carry_and_signed_branch_reads_n_v(self):
+        read, written, known = ss._effects(ss._row("adcs r0, r1", 0))
+        self.assertIn("flag:C", read)
+        self.assertTrue(set(ss.FLAGS) <= set(written))
+        read, _, _ = ss._effects(ss._row("bge func+0x10", 0))
+        self.assertEqual(read, ["flag:N", "flag:V"])
+
     def test_unknown_opcode_is_explicit(self):
         result = ss.fingerprint(rows("opaque r0, r1"))
         self.assertEqual(len(result["unknown_instructions"]), 1)

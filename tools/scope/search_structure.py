@@ -16,11 +16,22 @@ import json
 from pathlib import Path
 import re
 
+IMPLEMENTATION_ID = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+
 ROOT = Path(__file__).resolve().parents[2]
 REG = re.compile(r"\b(?:r(?:1[0-5]|[0-9])|sp|lr|pc|ip|sl|fp|sb)\b", re.I)
 ALIASES = {"r13": "sp", "r14": "lr", "r15": "pc", "ip": "r12", "sl": "r10", "fp": "r11", "sb": "r9"}
 CONDITIONS = {"beq", "bne", "bcs", "bcc", "bhs", "blo", "bmi", "bpl", "bvs", "bvc", "bhi", "bls", "bge", "blt", "bgt", "ble"}
 CALLS = {"bl", "blx"}
+FLAGS = ["flag:N", "flag:Z", "flag:C", "flag:V"]
+CONDITION_FLAGS = {
+    "beq": ["flag:Z"], "bne": ["flag:Z"],
+    "bcs": ["flag:C"], "bhs": ["flag:C"], "bcc": ["flag:C"], "blo": ["flag:C"],
+    "bmi": ["flag:N"], "bpl": ["flag:N"], "bvs": ["flag:V"], "bvc": ["flag:V"],
+    "bhi": ["flag:C", "flag:Z"], "bls": ["flag:C", "flag:Z"],
+    "bge": ["flag:N", "flag:V"], "blt": ["flag:N", "flag:V"],
+    "bgt": ["flag:N", "flag:V", "flag:Z"], "ble": ["flag:N", "flag:V", "flag:Z"],
+}
 STORES = {"str": 4, "strh": 2, "strb": 1}
 LOADS = {"ldr": (4, False), "ldrh": (2, False), "ldrb": (1, False), "ldrsh": (2, True), "ldrsb": (1, True)}
 PASS_SOURCES = {
@@ -103,13 +114,13 @@ def _effects(row):
         return [], [], True
     if op in CALLS or op in {"swi", "svc"}:
         reads = flat + ["r0", "r1", "r2", "r3", "sp"]
-        writes = ["r0", "r1", "r2", "r3", "r12", "lr", "flags"]
+        writes = ["r0", "r1", "r2", "r3", "r12", "lr"] + FLAGS
     elif op in CONDITIONS:
-        reads = ["flags"]
+        reads = CONDITION_FLAGS[op]
     elif op in {"b", "bx"}:
         reads = flat
     elif op in {"cmp", "cmn", "tst", "teq"}:
-        reads, writes = flat, ["flags"]
+        reads, writes = flat, FLAGS if op in {"cmp", "cmn"} else FLAGS[:2]
     elif op == "push":
         reads, writes = flat + ["sp"], ["sp"]
     elif op == "pop":
@@ -132,16 +143,30 @@ def _effects(row):
         writes = regs[0] if regs else []
         reads = [r for operand in regs[1:] for r in operand]
         if op.endswith("s"):
-            writes += ["flags"]
+            writes += FLAGS if op in {"negs"} else FLAGS[:2]
     elif op.rstrip("s") in {"add", "sub", "mul", "and", "orr", "eor", "bic", "lsl", "lsr", "asr", "ror", "adc", "sbc", "rsb"}:
         writes = regs[0] if regs else []
         reads = [r for operand in regs[1:] for r in operand]
         if len(args) == 2:
             reads = regs[0] + reads
-        if op.rstrip("s") in {"adc", "sbc", "ror"}:
-            reads += ["flags"]
+        base = op.rstrip("s")
+        if base in {"adc", "sbc"}:
+            reads += ["flag:C"]
         if op.endswith("s"):
-            writes += ["flags"]
+            if base in {"add", "sub", "adc", "sbc", "rsb"}:
+                writes += FLAGS
+            elif base in {"lsl", "lsr", "asr", "ror"}:
+                writes += FLAGS[:2]
+                amount = _number(args[-1]) if args else None
+                if amount is None:
+                    # A zero register shift preserves C; otherwise the source
+                    # operand supplies it. Keep the old-C dependency conservatively.
+                    reads += ["flag:C"]
+                    writes += ["flag:C"]
+                elif amount != 0:
+                    writes += ["flag:C"]
+            else:
+                writes += FLAGS[:2]
     elif op in {"nop"}:
         pass
     else:
@@ -244,7 +269,7 @@ def _reaching(blocks):
         for edge in b["successors"]:
             pred[edge["block"]].append(b["id"])
     entry = {f"r{i}": {f"entry:r{i}"} for i in range(13)}
-    entry.update({r: {f"entry:{r}"} for r in ("sp", "lr", "pc", "flags")})
+    entry.update({r: {f"entry:{r}"} for r in ("sp", "lr", "pc", *FLAGS)})
     outgoing = {b["id"]: {} for b in blocks}
     incoming = {}
     changed = True
@@ -508,4 +533,5 @@ def analyze(source, function, target_rows=(), current_rows=(), *, target_bytes=N
                        "Local alpha equivalence preserves modeled dependencies; it is not semantic equivalence or byte identity.",
                        "Hard-register reuse, spills and coalescing make source-pseudo reconstruction non-unique.",
                        "Call arguments conservatively read r0-r3; call signatures and indirect targets are unresolved.",
+                       "Flag webs distinguish N/Z/C/V; variable shift carry dependencies are conservative and architecture-undefined multiply flags are not inferred.",
                        "Memory observations are syntactic; aliasing, volatile ordering and path conditions require semantic checking."]}

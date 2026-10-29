@@ -56,6 +56,7 @@ Everything is kept in build/scope/FUNC/ for follow-up queries:
 """
 import collections
 import difflib
+import hashlib
 import json
 import os
 import pickle
@@ -65,6 +66,9 @@ import socket
 import subprocess
 import sys
 import time
+
+with open(__file__, "rb") as _implementation_source:
+    IMPLEMENTATION_ID = hashlib.sha256(_implementation_source.read()).hexdigest()
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TOOLS = os.path.dirname(HERE)

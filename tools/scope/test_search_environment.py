@@ -5,6 +5,8 @@ import sys
 import tempfile
 import unittest
 from unittest import mock
+import subprocess
+import types
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import search
@@ -80,6 +82,55 @@ class SearchIntegrationTests(unittest.TestCase):
         self.source.write_text('int F(int x) { asm("mov r0, r1"); return x; }')
         with self.assertRaisesRegex(ValueError, "instruction bodies"):
             self.command("import", source=str(self.source))
+
+    def test_explicit_trace_reference_reports_refreshed_node(self):
+        self.env.scope = types.SimpleNamespace(WORK="")
+        self.env.materialize = lambda source, origin: self.source
+        old = self.command("status")["node"]
+        self.env.version = 2
+        with mock.patch("search_trace.collect", return_value={"allocations": [], "reloads": [],
+                                                              "trace_matches_build": True}):
+            result = self.command("trace", node=old)
+        self.assertNotEqual(result["node"], old)
+        self.assertEqual(result["node"], self.command("status")["node"])
+
+
+class NativeIsolationTests(unittest.TestCase):
+    def environment(self):
+        from search_eval import Evaluator
+        evaluator = object.__new__(Evaluator)
+        evaluator.scope = types.SimpleNamespace(preprocess=lambda *a, **k: "", rom_name=lambda *a: "F")
+        return evaluator
+
+    def test_native_crash_cannot_escape_and_is_not_repeated(self):
+        evaluator = self.environment()
+        child = subprocess.CompletedProcess([], -4, "", "native fault")
+        with mock.patch("subprocess.run", return_value=child) as run:
+            for _ in range(2):
+                result = evaluator.semantic("void F(void){}", "F", b"", b"", 0, "draft.c", 4)
+                self.assertEqual(result["verdict"], "UNAVAILABLE")
+                self.assertIn("signal 4", result["detail"])
+            self.assertEqual(run.call_count, 1)
+
+    def test_wall_clock_timeout_is_not_equivalence(self):
+        evaluator = self.environment()
+        with mock.patch("subprocess.run", side_effect=subprocess.TimeoutExpired("worker", 10)):
+            result = evaluator.semantic("void F(void){}", "F", b"", b"", 0, "draft.c", 4)
+        self.assertEqual(result["verdict"], "TIMEOUT")
+        self.assertFalse(result["proof"])
+
+    def test_request_releases_scope_dump_locks(self):
+        import scope
+        with tempfile.TemporaryFile() as stream:
+            fd = os.dup(stream.fileno())
+            def operation(request):
+                scope._LOCKS["synthetic"] = fd
+                return "ok"
+            with mock.patch.object(search, "dispatch", side_effect=operation):
+                self.assertTrue(search.safe_dispatch({"command": "probe"})["ok"])
+            self.assertNotIn("synthetic", scope._LOCKS)
+            with self.assertRaises(OSError):
+                os.fstat(fd)
 
 
 @unittest.skipUnless(os.environ.get("SEARCH_ROM_TESTS") == "1", "opt-in real unmatched compiler trial")

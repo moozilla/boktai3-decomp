@@ -55,6 +55,9 @@ try:
 except ImportError:  # pragma: no cover
     sys.exit("semcheck needs unicorn: build/venv/bin/pip install unicorn")
 
+with open(__file__, "rb") as _implementation_source:
+    IMPLEMENTATION_ID = hashlib.sha256(_implementation_source.read()).hexdigest()
+
 ROM_BASE = 0x08000000
 PAGE = 0x1000
 SENTINEL = 0x0E000000          # return address of the outermost call

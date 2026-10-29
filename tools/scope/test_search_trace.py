@@ -1,6 +1,8 @@
 """Compiler snapshot and cross-node correspondence guarantees."""
 from pathlib import Path
 import re
+import os
+from unittest import mock
 import sys
 import tempfile
 import unittest
@@ -82,6 +84,27 @@ class TraceTests(unittest.TestCase):
         b = {"allocations": [{"key": "p#1", "preferred_class": "STACK_REG"}]}
         changes = trace.delta(a, b)["allocations"][0]["changes"]
         self.assertEqual(changes["preferred_class"], {"parent": "LO_REGS", "child": "STACK_REG"})
+
+    def test_trace_strips_ambient_knobs_and_restores_on_failure(self):
+        def fail(scope, source, function, env):
+            self.assertNotIn("AGBCC_FORCE", os.environ)
+            self.assertNotIn("CSE_NOCANON", os.environ)
+            self.assertEqual(env, {})
+            raise RuntimeError("sentinel")
+        with mock.patch.dict(os.environ, {"AGBCC_FORCE": "p:7", "CSE_NOCANON": "55"}):
+            with mock.patch.object(trace, "_collect", fail):
+                with self.assertRaisesRegex(RuntimeError, "sentinel"):
+                    trace.collect(None, "source.c", "f")
+            self.assertEqual(os.environ["AGBCC_FORCE"], "p:7")
+            self.assertEqual(os.environ["CSE_NOCANON"], "55")
+
+    def test_explicit_trace_knob_cannot_claim_default_exact(self):
+        with mock.patch.object(trace, "_collect", return_value={"exact": True, "trace_matches_build": True}):
+            result = trace.collect(None, "source.c", "f", {"AGBCC_FORCE": "p:7"})
+        self.assertFalse(result["exact"])
+        self.assertFalse(result["trace_matches_build"])
+        self.assertTrue(result["experiment_exact"])
+        self.assertTrue(result["experiment"])
 
     def test_diagnostic_build_mismatch_cannot_be_hidden(self):
         self.assertFalse(trace.delta({'trace_matches_build': True}, {'trace_matches_build': False})['trace_matches_build'])

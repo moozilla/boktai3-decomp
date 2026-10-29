@@ -8,7 +8,9 @@ retains all branches, including equal, worse and failed candidates. Byte equalit
 with the ROM is the only exact verdict. Start with an actual NONMATCHING draft.
 
 ```sh
+search() { build/venv/bin/python tools/scope/search.py "$@"; }
 search --session actor init src/UNIT.c FUNCTION
+search --session actor values               # symbolic addresses, loads/stores and call arguments
 search --session actor regions              # dependency shape, bindings, concrete differences
 search --session actor listing              # concise ROM/current machine differences
 search --session actor why                  # actual compiler diagnosis, saved in session notes
@@ -44,14 +46,16 @@ them. `focus --lines 40:70` restricts move sites; `focus --lines clear` removes 
 Use `trace --a PARENT` on selected nodes: it pays for diagnostic RTL once and
 reports actual named-value allocation changes, reload changes and the earliest
 changed pass with an agbcc source file:line. `--details` exposes all records and
-ambiguous correspondences. Earliest divergence is not causal proof. `compiler
+ambiguous correspondences. Earliest divergence is not causal proof. `demand` links reload pressure and stack evictions to source instructions and machine
+constraints; `--details` retains uncertainty about exact victim events. `compiler
 --view life --argument 'value'` and views `frame`, `hoist`, `giv`, `pre`, `probe`,
 `spill`, or `why --argument UID` reuse scope. `experiment --knob AGBCC_PRI=value:+100`
 is a separate counterfactual evaluation; even an experiment match is never exact.
 
 `evaluate --trials 16` uses the existing differential Thumb oracle without another
 compile. It reports coverage and counterexamples; EQUIVALENT is sampled evidence,
-INCOMPLETE is not a pass, and missing Unicorn reports UNAVAILABLE. Knob experiments
+INCOMPLETE is not a pass, and missing or faulting Unicorn reports UNAVAILABLE. Trials run in a separate process
+with a ten-second bound; they cannot crash the resident. Knob experiments
 are never semantically certified. Do not optimize the instruction count alone:
 combine hypotheses, inspect shape and decision deltas, and return to earlier nodes.
 Record intent with `note '...' --kind hypothesis`; `mark NODE --state parked
