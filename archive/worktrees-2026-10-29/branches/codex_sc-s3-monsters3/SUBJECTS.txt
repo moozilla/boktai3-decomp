@@ -1,0 +1,2 @@
+Accept the implemented giv and calls commands in scope CLI validation
+Respect the remaining compile budget in seek search expansions

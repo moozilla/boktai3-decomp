@@ -1,0 +1,701 @@
+diff --git a/docs/HANDOFF.md b/docs/HANDOFF.md
+index 8799ed2fa..e7345b948 100644
+--- a/docs/HANDOFF.md
++++ b/docs/HANDOFF.md
+@@ -9,7 +9,7 @@ then `docs/WORKER.md` before matching. Everything else is looked up, not read:
+ Dated progress reports live in [docs/history/](history/README.md); they are
+ records, not instructions. Keep this file short: it describes the present.
+ 
+-## Current state (2026-10-16)
++## Current state (2026-10-25)
+ 
+ Numbers live in one place: [PROGRESS.md](../PROGRESS.md) (regenerated at batch
+ integration with `python3 tools/progress.py --markdown PROGRESS.md`) and the
+@@ -23,6 +23,26 @@ README badges (live from decomp.dev). Don't copy totals into other files.
+ 
+ Recent work, newest first (details in [history](history/README.md)):
+ 
++* **Clean ARM rewrite traced through compiler passes** (2026-10-25):
++  08000430's BRIEF4 investigation reached the target cursor/count priorities,
++  sl/r8 allocation and preheader order with natural C; GCSE still merges the
++  reservation-test address and reload places it too early in ip. No exact
++  natural match; incoming pinned source restored and whole-unit MATCH checked.
++  Full local evidence is in the ARM kit's `REPORT4.md`; [notes](../notes/arm-clean-slate_2026-10-25.md).
++* **Natural ARM cursor RTL forms investigated** (2026-10-25): 08000430's
++  BRIEF3 pass logged 92 trials. Address offsets and SUBREG destinations can
++  bypass GCSE PRE but retain extra instructions or spills. No exact natural
++  match; restored the incoming pinned unit and verified acmp zero plus
++  whole-unit MATCH. Details in the local ARM kit's `REPORT3.md` and
++  [notes](../notes/arm-rtl-round3_2026-10-25.md).
++* **Natural ARM sprite-builder rewrite explored** (2026-10-25): 08000430
++  retains a nonmatching natural candidate in the local ARM kit. Object-aware
++  tile-source access and a fixed EWRAM buffer improve the clean rewrite;
++  separate request-base construction and scheduling remain unresolved after
++  60 further natural variants. Early live buffer handles preserve base-first
++  indexing but keep the base live outside the loop. No source integration or
++  exact coverage gain
++  ([notes](../notes/arm-natural_2026-10-25.md)).
+ * **Every scene's procedures have working names** (2026-10-19):
+   `tools/assets/gclroles.py` names scene entries by area (`white_forest_3880`)
+   and 93% of their private procedures by role (`_stage`, `_doors`, `_enemies`,
+diff --git a/docs/INDEX.md b/docs/INDEX.md
+index 658c8ef0a..e29549d1e 100644
+--- a/docs/INDEX.md
++++ b/docs/INDEX.md
+@@ -112,7 +112,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
+ | [docs/FINDINGS.md](../docs/FINDINGS.md) | Engine findings |  | 5 |
+ | [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
+ | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 34 |
+-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 13 |
++| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 14 |
+ | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
+ | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
+ | [docs/LEVEL_ADVANCE_DISPLAY.md](../docs/LEVEL_ADVANCE_DISPLAY.md) | Level advancement display (tentative presentation identity) |  | 4 |
+@@ -211,6 +211,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
+ | [docs/history/2026-10-19.md](../docs/history/2026-10-19.md) | 2026-10-19.md | #history #scripts #tooling | 1 |
+ | [docs/history/2026-10-23-cx-sol08.md](../docs/history/2026-10-23-cx-sol08.md) | 2026-10-23 — cx-sol08 actor campaign batch | #actors #matching | 1 |
+ | [docs/history/2026-10-23.md](../docs/history/2026-10-23.md) | Campaign sol05 session 2 wrap-up | #actors #campaign #effect-pool #hresvelgr #inventory #matching #monsters #mummy #nonmatching #particles #player #ratatosk #register-pinning #scene-actors #tentacle #vanargand | 7 |
++| [docs/history/2026-10-25.md](../docs/history/2026-10-25.md) | 2026-10-25 | #08000430 #arm #matching #natural-c | 3 |
+ | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
+ | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 16 |
+ | [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 17 |
+@@ -222,6 +223,9 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
+ | [notes/animation-contact-burst_2026-10-14.md](../notes/animation-contact-burst_2026-10-14.md) | Temporary animations and contact-burst effect, October 14 | *#particles #animation* | 7 |
+ | [notes/area-effect-link_2026-10-14.md](../notes/area-effect-link_2026-10-14.md) | Link variant of area effects (Sol, 2026-10-14) |  | 2 |
+ | [notes/area-effect_2026-10-14.md](../notes/area-effect_2026-10-14.md) | Rectangular area effect manager (Sol, 2026-10-14) | *#tooling* | 4 |
++| [notes/arm-clean-slate_2026-10-25.md](../notes/arm-clean-slate_2026-10-25.md) | Natural ARM source and compiler passes for 08000430 (brief 4) | #08000430 #arm #matching #natural-c | 2 |
++| [notes/arm-natural_2026-10-25.md](../notes/arm-natural_2026-10-25.md) | Natural ARM rewrite of 08000430 | #08000430 #arm #matching #natural-c | 4 |
++| [notes/arm-rtl-round3_2026-10-25.md](../notes/arm-rtl-round3_2026-10-25.md) | Natural ARM cursor RTL investigation | #08000430 #arm #matching #natural-c | 2 |
+ | [notes/bk.md](../notes/bk.md) | bk notes (backlog retry, 45 matches) |  | 5 |
+ | [notes/breakable-prop_2026-10-14.md](../notes/breakable-prop_2026-10-14.md) | Breakable prop, 080515C0–08051A3C | *#particles* | 2 |
+ | [notes/cell-gates_2026-10-14.md](../notes/cell-gates_2026-10-14.md) | Cell-based traversal gates and the preceding script entry | *#scripts* | 4 |
+diff --git a/src/iwram_code.c b/src/iwram_code.c
+index dba49690a..ee4db98dc 100644
+--- a/src/iwram_code.c
++++ b/src/iwram_code.c
+@@ -44,10 +44,14 @@ struct IwVec {
+     s16 x, y, z;
+ };
+ 
++struct IwSpr;
++
+ struct IwObj {
+     u8 pad0[8];
+     u32 flags;
+-    u8 padC[0x14];
++    u8 padC[0xE];
++    u8 priority;
++    u8 pad1B[5];
+     struct IwVec pos;
+     u16 dx;
+     u16 dy;
+@@ -55,7 +59,17 @@ struct IwObj {
+     s16 bottom;
+     s16 left;
+     s16 top;
+-    u8 pad34[0x28];
++    u8 scaleX;
++    u8 scaleY;
++    u16 angle;
++    u16 count;
++    u16 palBase;
++    u32 attr;
++    u8 pad40[8];
++    u8 *palSrc;
++    struct IwSpr *spr;
++    u8 *tiles;
++    u8 pad54[8];
+     struct IwObj *next;
+ };
+ 
+@@ -86,7 +100,381 @@ static inline void IwProject(struct IwVec *screen, struct IwVec *world)
+     screen->z = sum + vertical - gUnk_03005418[2];
+ }
+ 
+-INCLUDE_ASM("asm/nonmatching", sub_08000430);
++// MATCHING_CONCESSION: register-pinning
++struct IwSpr {
++    u8 flags;
++    u8 size;
++    s16 dx;
++    s16 dy;
++    u16 tile;
++};
++
++struct IwAffineParam {
++    u8 angle;
++    s8 a;
++    s8 b;
++    u8 pad;
++};
++
++struct IwTileReq {
++    u8 *src;
++    u32 desc;
++};
++
++struct IwOamOut {
++    u32 attr01;
++    u16 attr2;
++    u16 attr3;
++};
++
++extern u8 gUnk_03005230;
++extern u32 gUnk_0300522C;
++extern s32 gUnk_03004BA0;
++extern struct IwAffineParam gUnk_03004310[];
++extern s16 gUnk_086149C4[];
++extern u8 gUnk_03004D20[];
++extern u8 gUnk_03004D90[];
++extern u32 gUnk_03004D50[];
++extern u8 gUnk_03004D30[];
++extern u8 gUnk_03004D40[];
++extern u8 gUnk_03004D10[];
++extern s16 gUnk_030042E8;
++extern u16 gUnk_030042DC;
++extern u32 gUnk_03004304;
++extern struct IwTileReq gUnk_02039000[];
++extern s32 gUnk_03004798;
++extern struct IwOamOut gUnk_03004390[];
++extern u32 gUnk_03003A04;
++extern s32 gUnk_0300479C;
++extern struct IwOamOut gUnk_030047A0[];
++extern u16 gUnk_03004790[];
++u32 Palette_CacheObjectBankArm(u32 key, u32 *src);
++
++static inline s32 IwScale6(s32 v)
++{
++    return v >= 0 ? v >> 6 : -((-v) >> 6);
++}
++
++static inline s32 IwScale12(s32 v)
++{
++    if (v >= 0)
++        return v >> 12;
++    return -((-v) >> 12);
++}
++
++static inline s32 IwAddAffine(u8 angle, s32 a, s32 b)
++{
++    s32 n = gUnk_03004BA0;
++    if (n > 0x1f)
++        return 0;
++    gUnk_03004BA0 = n + 1;
++    gUnk_03004310[n].angle = angle;
++    gUnk_03004310[n].a = a;
++    gUnk_03004310[n].b = b;
++    return n;
++}
++
++#define IW_QUEUE_TILES(r, obj, tile, step, tw, th, b)                                              \
++    if (gUnk_030042E8 + (step) >= 0x400)                                                           \
++        r = -1;                                                                                    \
++    else {                                                                                         \
++        u32 slot;                                                                                  \
++        u32 off;                                                                                   \
++        u8 *src;                                                                                   \
++        u8 *q;                                                                                     \
++        slot = gUnk_03004304;                                                                      \
++        r = 0;                                                                                     \
++        b = reqs;                                                                                  \
++        off = slot << 3;                                                                           \
++        src = (obj)->tiles + ((tile) << 5);                                                        \
++        *(u8 **)(b + off) = src;                                                                   \
++        q = b + off;                                                                               \
++        *(u32 *)(q + 4) = ((tw) << 5) | ((th) << 16);                                              \
++        gUnk_03004304 = slot + 1;                                                                  \
++    }
++
++static inline void IwPushOam(u32 attr01, u32 attr2)
++{
++    s32 c = gUnk_03004798;
++    if (c <= 0x7f) {
++        gUnk_03004798 = c + 1;
++        gUnk_03004390[c].attr01 = attr01;
++        gUnk_03004390[c].attr2 = attr2;
++        gUnk_03003A04 |= 1;
++    }
++}
++
++static inline void IwPushOamZ(u32 attr01, u32 attr2, s32 z, u32 prio)
++{
++    s32 c = gUnk_0300479C;
++    if (c <= 0x7f) {
++        struct IwOamOut *o = &gUnk_030047A0[c];
++        gUnk_0300479C = c + 1;
++        o->attr01 = attr01;
++        o->attr2 = attr2;
++        o->attr3 = (z + 0x80) << 8;
++        gUnk_03004790[prio]++;
++    }
++}
++
++// confidence=low: batches an IwObj's sprites into OAM (affine setup, bounds check, palette cache, tile requests)
++void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
++{
++    u32 oam[64];
++    u8 attr3[64];
++    u16 tile[64];
++    u8 keyIdx[64];
++    u32 keys[16];
++    u8 affTbl[4];
++    u32 bankIdx[16];
++    s32 i;
++    s32 n = 0;
++    s32 nKeys = 0;
++    s32 sinv, cosv;
++    u32 fl2;
++    u32 f4, f8;
++    struct IwSpr *p;
++    s32 j;
++    u8 *ewram;
++    u8 *ew2;
++    s32 step;
++    u8 *b = 0;
++    u8 *b2 = 0;
++    s16 *c;
++    s16 *cnt;
++    s16 *cnt2;
++
++    f4 = obj->flags & 4;
++    f8 = obj->flags & 8;
++    z = z >= 0 ? z >> 1 : -((-z) >> 1);
++    if (z < -0x80)
++        z = -0x80;
++    else if (z > 0x7f)
++        z = 0x7f;
++
++    fl2 = 0;
++    if (((gUnk_03005230 & 1) && obj->priority != 0 && !(obj->flags & 0x10000)) ||
++        (obj->flags & 0x800))
++        fl2 |= 0x1000;
++    if (gUnk_0300522C != 0) {
++        if (obj->flags & 0x4000)
++            fl2 |= 0x400;
++    }
++    if (obj->flags & 0x100)
++        fl2 |= 0x800;
++
++    if (!(obj->flags & 2)) {
++        sinv = cosv = 0;
++    } else {
++        s32 a = obj->scaleX;
++        s32 b = obj->scaleY;
++        s32 ra, rb, idx;
++
++        if (f4)
++            a = -a;
++        if (f8)
++            b = -b;
++        if (obj->flags & 0x20000) {
++            fl2 |= 0x100;
++        } else {
++            if ((a < 0 ? -a : a) > 0x3c || (b < 0 ? -b : b) > 0x3c || obj->angle != 0)
++                fl2 |= 0x300;
++            else
++                fl2 |= 0x100;
++        }
++        affTbl[0] = IwAddAffine(obj->angle, (s8)a, (s8)b);
++        if (obj->flags & 0x8000) {
++            affTbl[1] = IwAddAffine(obj->angle, (s8)-a, (s8)b);
++            affTbl[2] = IwAddAffine(obj->angle, (s8)a, (s8)-b);
++            affTbl[3] = IwAddAffine(obj->angle, (s8)-a, (s8)-b);
++        } else {
++            affTbl[1] = affTbl[0];
++            affTbl[2] = affTbl[0];
++            affTbl[3] = affTbl[0];
++        }
++        idx = (u16)obj->angle;
++        sinv = gUnk_086149C4[(-idx) & 0xff];
++        cosv = gUnk_086149C4[(-idx + 0x40) & 0xff];
++    }
++
++    p = obj->spr;
++    for (i = 0; i < obj->count; i++, p++) {
++        u32 sz = p->size;
++        s32 wd = gUnk_03004D90[sz];
++        s32 ht = gUnk_03004D20[sz];
++        u32 fl = fl2;
++        s32 px, py;
++
++        if (!(obj->flags & 2)) {
++            s32 x1, y1;
++            px = p->dx;
++            py = p->dy;
++            x1 = px + wd;
++            y1 = py + ht;
++            if (f4) {
++                s32 t = px;
++                px = -x1;
++                x1 = -t;
++            }
++            if (f8) {
++                s32 t = py;
++                py = -y1;
++                y1 = -t;
++            }
++            px += x;
++            py += y;
++            if (f4 != (p->flags & 4))
++                fl |= 0x10000000;
++            if (f8 != (p->flags & 8))
++                fl |= 0x20000000;
++            if (!(obj->flags & 0x40)) {
++                x1 += x;
++                y1 += y;
++                if (x1 < 0)
++                    continue;
++                if (px > 0xF0)
++                    continue;
++                if (y1 < 0)
++                    continue;
++                if (py > 0xA0)
++                    continue;
++            }
++        } else {
++            s32 hx = wd >> 1;
++            s32 hy = ht >> 1;
++            s32 sx = IwScale6((p->dx + hx) * obj->scaleX);
++            s32 sy = IwScale6((p->dy + hy) * obj->scaleY);
++            s32 ey, rx, ry;
++            u32 idx;
++
++            if (f4)
++                sx = -sx;
++            ey = sy;
++            if (f8)
++                ey = -sy;
++            if (p->flags & 4)
++                idx = 1;
++            else
++                idx = 0;
++            if (p->flags & 8)
++                idx |= 2;
++            fl |= (u32)affTbl[idx] << 25;
++            rx = IwScale12(sx * cosv - ey * sinv);
++            px = rx - hx;
++            ry = IwScale12(sx * sinv + ey * cosv);
++            py = ry - hy;
++            if ((fl & 0x300) == 0x300) {
++                s32 h2 = ht * 2;
++                px = px - hx;
++                py = py - hy;
++                px += x;
++                py += y;
++                if (px + wd * 2 < 0)
++                    continue;
++                if (px > 0xF0)
++                    continue;
++                if (py + h2 < 0)
++                    continue;
++                if (py > 0xA0)
++                    continue;
++            } else {
++                px += x;
++                py += y;
++                if (px + wd < 0)
++                    continue;
++                if (px > 0xF0)
++                    continue;
++                if (py + ht < 0)
++                    continue;
++                if (py > 0xA0)
++                    continue;
++            }
++        }
++
++        {
++            u32 key;
++            tile[n] = p->tile & 0xfff;
++            key = p->tile >> 12;
++            for (j = 0; j < nKeys && keys[j] != key; j++)
++                ;
++            keyIdx[n] = j;
++            if (j == nKeys) {
++                nKeys = j + 1;
++                keys[j] = key;
++            }
++            attr3[n] = sz;
++            oam[n] = ((gUnk_03004D50[sz] | obj->attr) | ((py & 0xff) | ((px & 0x1ff) << 16)));
++            oam[n] |= fl;
++            n++;
++        }
++    }
++
++    if (n <= 0)
++        return;
++
++    {
++        u8 *pal = obj->palSrc;
++        for (j = 0; j < nKeys; j++)
++            bankIdx[j] =
++                Palette_CacheObjectBankArm(obj->palBase + keys[j], (u32 *)(pal + (keys[j] << 5)));
++    }
++
++    if (obj->flags & 0x20) {
++        ewram = (u8 *)0x2000000;
++        /* The pinned temporary tells cse2 (after loop) that cnt is &gUnk_030042E8 while gcse
++           never sees the address, so the hoisted c = cnt keeps its own pool load into sl. */
++        {
++            register s16 *h asm("r3") = &gUnk_030042E8;
++            cnt = h;
++            h = 0;
++        }
++        for (j = 0; j < n; j++) {
++            u32 s = attr3[j];
++            u32 t = tile[j];
++            s32 tw = gUnk_03004D40[s];
++            s32 th = gUnk_03004D10[s];
++            s32 r;
++            u8 *reqs;
++            step = gUnk_03004D30[s];
++            reqs = ewram + 0x39000;
++            c = cnt;
++            IW_QUEUE_TILES(r, obj, t, step, tw, th, b);
++            if (r < 0)
++                return;
++            IwPushOam(oam[j],
++                      (u32)*c | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12));
++            gUnk_030042DC += step;
++            *c += step;
++        }
++    } else {
++        ew2 = (u8 *)0x2000000;
++        {
++            register s16 *h asm("r3") = &gUnk_030042E8;
++            cnt2 = h;
++            h = 0;
++        }
++        for (j = 0; j < n; j++) {
++            u32 s = attr3[j];
++            u32 t = tile[j];
++            s32 tw = gUnk_03004D40[s];
++            s32 th = gUnk_03004D10[s];
++            s32 r;
++            u8 *reqs;
++            step = gUnk_03004D30[s];
++            reqs = ew2 + 0x39000;
++            c = cnt2;
++            IW_QUEUE_TILES(r, obj, t, step, tw, th, b2);
++            if (r < 0)
++                return;
++            IwPushOamZ(oam[j],
++                       (u32)*c | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12), z,
++                       obj->priority);
++            gUnk_030042DC += step;
++            *c += step;
++        }
++    }
++}
++
+ void sub_08000E90(void)
+ {
+     struct IwObj *o;
+diff --git a/docs/history/2026-10-25.md b/docs/history/2026-10-25.md
+new file mode 100644
+index 000000000..6814c2766
+--- /dev/null
++++ b/docs/history/2026-10-25.md
+@@ -0,0 +1,54 @@
++# 2026-10-25
++
++## ARM brief 4: natural C reaches the target preheader
++
++Tags: #08000430 #arm #matching #natural-c
++
++Traced twenty-seven natural sources of 08000430 against the pinned reference
++through expansion, CSE1, GCSE, loop motion, CSE2, scheduling and allocation.
++Output parameters delay constant knowledge past CSE1; a separate count-pointer
++initializer blocks adjacent-copy reversal. One retained source has the target
++cursor/count priorities, sl/r8 assignment and preheader order, but the test
++address is still merged and rematerialized too early into ip. No exact natural
++match or coverage gain (0.00 percentage points). Restored the incoming unit;
++acmp zero and all six functions MATCH. Full local log: ARM kit `REPORT4.md`;
++[notes](../../notes/arm-clean-slate_2026-10-25.md).
++
++## Natural ARM cursor RTL investigation
++
++Tags: #08000430 #arm #matching #natural-c
++
++BRIEF3's 08000430 investigation logged 92 trials without an exact natural
++match (0 percentage-point exact-code gain). Distinct address expressions and
++multiword SUBREG destinations bypass GCSE PRE, but retain arithmetic or spill
++the carrier. The existing four-difference direct-global draft still fails
++the production checker with its guard removed. Restored the genuine pinned
++incoming source and verified acmp zero plus whole-unit MATCH. No full build,
++commit or push. See [notes](../../notes/arm-rtl-round3_2026-10-25.md) and the
++local `build/arm_kit/REPORT3.md`.
++
++## Natural ARM rewrite follow-up
++
++Tags: #08000430 #arm #matching #natural-c
++
++Sixty more natural variants of 08000430 leave the best unchanged at 89.1%
++normalized sequence similarity (+0.0 percentage points in this follow-up).
++Natural early queue handles reproduce base-first indexing, but preserve the
++base in a register or spill slot instead of reconstructing it inside the loop.
++Compiler dumps identify the initializer's two sched1 sets and lack of constant
++REG_EQUIV as the failure in the function-scope example. Palette abstractions
++and cursor helpers do not improve the result. Incoming source restored; no
++exact coverage gained. See [notes](../../notes/arm-natural_2026-10-25.md).
++
++## Natural ARM sprite-builder exploration
++
++Tags: #08000430 #arm #matching #natural-c
++
++A whole-function rewrite of 08000430 explored 58 natural C variants using the
++Boktai 2 references. Best normalized sequence similarity: 89.1% (+16.5
++percentage points from the supplied clean baseline), with 89 instruction
++differences. No exact coverage gained or source integration performed.
++Production compiler comparison and 20,000 randomized host state comparisons
++passed their respective checks. The remaining source question is chiefly
++Boktai 3's separate tile-request base/index calculation and its resulting
++allocation and scheduling. See [notes](../../notes/arm-natural_2026-10-25.md).
+diff --git a/notes/arm-clean-slate_2026-10-25.md b/notes/arm-clean-slate_2026-10-25.md
+new file mode 100644
+index 000000000..975957ff0
+--- /dev/null
++++ b/notes/arm-clean-slate_2026-10-25.md
+@@ -0,0 +1,28 @@
++# Natural ARM source and compiler passes for 08000430 (brief 4)
++
++Tags: #08000430 #arm #matching #natural-c
++
++Started from the ARM kit's `package/c/best_natural_89.c`, with the pinned unit
++used only as an RTL reference. Full log and retained drafts/dumps:
++`build/arm_kit/REPORT4.md`, `build/arm_kit/drafts4/` (local, gitignored).
++Twenty-seven natural sources and separate diagnostics were archived.
++No exact natural match; exact coverage gain **0.00 percentage points**.
++
++An inline buffer output parameter preserves a base-first indexed store:
++its ADDRESSOF memory reference survives CSE1, then purge_addressof removes
++it before GCSE. An ordinary cursor output copy can similarly defer its
++constant REG_EQUAL until CSE2. Adjacent hoisted address/copy assignments
++are reversed by cse.c's cheapest-register rule; an independent request-count
++pointer initializer blocks that reversal.
++
++Retained natural22 gets the target cursor/count priorities (739/757), sl/r8
++assignments and K/E/T/A/F preheader order. The reservation-test address is
++still merged by GCSE and reload rematerializes it too early into ip.
++Natural25 has more target-like table allocation but the same obstruction,
++plus slot/base allocation differences. This is not a proof that all natural
++C is impossible: the proven limitation concerns keeping an ordinary
++pre-loop scalar SYMBOL_REF assignment invisible to GCSE.
++
++Restored the incoming pinned source byte-for-byte. Final acmp has zero
++normalized instruction differences; whole-unit check.py reports all six
++functions MATCH, 4364 bytes. No full build or source integration.
+diff --git a/notes/arm-natural_2026-10-25.md b/notes/arm-natural_2026-10-25.md
+new file mode 100644
+index 000000000..fdc70a3ca
+--- /dev/null
++++ b/notes/arm-natural_2026-10-25.md
+@@ -0,0 +1,67 @@
++# Natural ARM rewrite of 08000430
++
++Tags: #08000430 #arm #matching #natural-c
++
++Exploratory solo work on `codex/arm-cx1`, following `build/arm_kit/BRIEF.md`.
++Started from `build/arm_kit/drafts/clean_c1.c` and compared the Boktai 2 assembly
++and video C references. No register bindings, dummy initializers, compiler
++behavior overrides, artificial statement splits, full builds, or commits.
++
++The best whole-function candidate is
++`build/arm_kit/drafts/best_natural.c`: 89 differing normalized instructions,
++89.1% sequence similarity (+16.5 percentage points over the supplied baseline),
++96.6% register-blind shape similarity (+6.7 points). This is a nonmatching
++experiment, with no exact coverage gained. It is not installed in `src/`.
++The incoming modified source was restored byte-for-byte.
++
++Useful changes: delay tile-source access until reservation succeeds by passing
++an object/source field to the queue helper; represent the fixed EWRAM request
++buffer as a memory-map pointer; compose the OAM word in one assignment.
++The extern-array alternative is retained in `best_symbolic.c` (106 diffs).
++The cursor hoist plus independent reservation-test address reload arises
++naturally, but its preheader schedule still differs. The remaining large
++structural issue is Boktai 3's separately materialized request base versus the
++indexed constant address produced by the natural draft and seen in Boktai 2.
++
++The architecture is strongly supported: parallel collection arrays, four
++affine indices, signed branch/shift rounding, palette deduplication, and two
++emit loops. A negative-error tile helper and a fixed-buffer accessor are
++plausible original-source forms; their precise interfaces remain tentative.
++Ordinary signed division, boolean flip state, broader emit helpers, and
++halfword descriptor stores all regressed.
++
++Validation: default comparison and uninstrumented production compiler agree;
++20,000 host-side randomized state comparisons against the starting draft pass.
++This does not establish equivalence against the ROM or verify the GBA ABI.
++All 58 numbered trials and limitations are in `build/arm_kit/REPORT.md`;
++per-trial drafts and compiler output remain local under the ignored kit.
++
++## Follow-up 1: natural request-base and cursor lifetimes
++
++Tags: #08000430 #arm #matching #natural-c
++
++Explored 60 additional natural variants from `best_natural.c`, in the requested
++order: B3 request-base construction, palette/affine allocation, cursor-preheader
++scheduling. No candidate improved the best: still 89.1% sequence similarity
++(+0.0 percentage points this follow-up), 89 normalized instruction differences.
++Production compiler reconfirmed this result. The incoming source was restored.
++
++Natural early buffer handles can produce base-first request indexing, but the
++base remains a long-lived register or stack value. The clearest structural
++candidate is `build/arm_kit/drafts/base_first_111.c` (111 diffs). In the
++function-scope example, sched1 splits the queue initializer into two sets
++before local allocation; its constant REG_EQUAL note does not become a
++constant REG_EQUIV, and the pointer spills. EWRAM layout structs, typed
++accessors, mutating pointer parameters, live palette-pointer reuse and
++whole-record appends do not recover the ROM's in-loop rematerialization.
++
++Fixed-point macros, sprite bitfields and palette-search abstractions do not
++improve the affine/palette region. Explicit cursor handles worsen allocation;
++direct cursor accessors and parameterized helpers fold back to the existing
++best and leave its preheader schedule unresolved. There is no support for
++promoting the dead initializer into a supposedly natural early live initializer.
++The missing short-lived base copy remains a source-recovery question.
++
++Detailed trial table and diagnostics are appended to `build/arm_kit/REPORT.md`;
++all variants remain in `build/arm_kit/drafts/f1_*.c`. No exact match, integration,
++commit, push or full build was performed.
+diff --git a/notes/arm-rtl-round3_2026-10-25.md b/notes/arm-rtl-round3_2026-10-25.md
+new file mode 100644
+index 000000000..89be29bf8
+--- /dev/null
++++ b/notes/arm-rtl-round3_2026-10-25.md
+@@ -0,0 +1,35 @@
++# Natural ARM cursor RTL investigation
++
++Tags: #08000430 #arm #matching #natural-c
++
++Followed `build/arm_kit/BRIEF3.md` after reading its predecessors. No natural
++match; exact-code gain is 0 percentage points. The 92 logged trials include
++78 compiled comparisons and 14 compilation failures. Full experiment table,
++compiler findings, validity exclusions and production-check logs are recorded
++in `build/arm_kit/REPORT3.md`; sources and RTL remain in the ignored kit.
++
++Reproduced p6u's 28 differences and the diagnostic zero obtained by disabling
++four GCSE PRE deletions. The closest new representation uses an array end
++pointer and backs up one element: five masked instruction differences, one
++extra instruction, and a production MISMATCH. Distinct address expressions
++avoid PRE, but local allocation cannot fold the symbolic cancellation away.
++
++Two-word cursor contexts produce genuine SUBREG destinations that GCSE skips.
++CSE2 annotates the hoisted cursor extraction correctly, giving priority 739
++and sl. The multiword carrier lacks a whole-register equivalence and spills,
++leaving extra instructions/frame storage. Ordinary register declarations,
++field ordering, inline member staging and useful cursor/EWRAM contexts do not
++remove it. Scalar wrappers, output setters, alternate return modes, libcall
++expansion probes and lazy initialization provide no accepted alternative.
++
++The existing direct-global draft remains four instructions off, solely the
++two cursor-preheader load positions. Its NONMATCHING guard was removed for
++the production comparison: MISMATCH, 22 differing bytes, four realigned
++instructions. An initial check with that guard still present exercised the
++assembly fallback and is explicitly excluded from candidate acceptance.
++
++Restored `src/iwram_code.c` byte-for-byte from the genuine incoming pinned
++snapshot, as BRIEF3 requires: acmp zero and whole-unit `tools/check.py` MATCH
++(4364 bytes). No net source change, full build, commit or push. Resuming needs
++a new scalar assignment form hidden from GCSE but recoverable as a noted
++copy after loop motion, or a way to eliminate the multiword carrier.

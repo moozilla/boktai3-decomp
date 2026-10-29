@@ -1,0 +1,2 @@
+Allow skipping automatic seek add spill probes
+Guard statement swaps against scalar dependencies

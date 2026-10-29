@@ -1,0 +1,1370 @@
+From cb2b22ba43e9d2b9b9e93ff8333364a22aa72edf Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Tue, 27 Oct 2026 23:30:03 -0700
+Subject: [PATCH] Move gRandomTable to ram.h; unify its stragglers
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+---
+ include/ram.h                         | 1 +
+ src/actor_graphics_and_basic_states.c | 2 --
+ src/fn/sub_080154EC.c                 | 1 -
+ src/fn/sub_08015CF0.c                 | 2 +-
+ src/fn/sub_08015F60.c                 | 1 -
+ src/fn/sub_0801746C.c                 | 4 ++--
+ src/fn/sub_08017C8C.c                 | 1 -
+ src/fn/sub_08017E7C.c                 | 1 -
+ src/fn/sub_08025DEC.c                 | 2 +-
+ src/fn/sub_08026488.c                 | 2 +-
+ src/fn/sub_080280CC.c                 | 2 +-
+ src/fn/sub_0802D218.c                 | 2 +-
+ src/fn/sub_08034A80.c                 | 1 -
+ src/fn/sub_08036910.c                 | 1 -
+ src/fn/sub_08038170.c                 | 1 -
+ src/fn/sub_08038448.c                 | 1 -
+ src/fn/sub_08038AD4.c                 | 2 +-
+ src/fn/sub_080390C4.c                 | 1 -
+ src/fn/sub_0803ADB8.c                 | 2 +-
+ src/fn/sub_0803B01C.c                 | 2 +-
+ src/fn/sub_08078EE8.c                 | 1 -
+ src/fn/sub_08090118.c                 | 4 ++--
+ src/fn/sub_080B9158.c                 | 2 +-
+ src/fn/sub_080E0750.c                 | 2 +-
+ src/fn/sub_080F2F7C.c                 | 2 +-
+ src/fn/sub_080F4B54.c                 | 4 ++--
+ src/fn/sub_080F52C0.c                 | 2 +-
+ src/fn/sub_080F5F24.c                 | 2 +-
+ src/fn/sub_080FA7D0.c                 | 4 ++--
+ src/fn/sub_081055C0.c                 | 2 +-
+ src/fn/sub_0812642C.c                 | 1 -
+ src/fn/sub_08126AD4.c                 | 1 -
+ src/fn/sub_08127590.c                 | 1 -
+ src/fn/sub_0812A7B8.c                 | 2 +-
+ src/fn/sub_0812AA0C.c                 | 2 +-
+ src/fn/sub_0812ACB0.c                 | 2 +-
+ src/fn/sub_0813C42C.c                 | 2 +-
+ src/fn/sub_0814B1F8.c                 | 2 +-
+ src/fn/sub_0815767C.c                 | 2 +-
+ src/fn/sub_0815C5A4.c                 | 2 +-
+ src/fn/sub_0816E6F0.c                 | 2 +-
+ src/fn/sub_0817BDB0.c                 | 2 +-
+ src/fn/sub_0817C3F4.c                 | 2 +-
+ src/fn/sub_0817E378.c                 | 2 +-
+ src/fn/sub_0818C6F8.c                 | 2 +-
+ src/fn/sub_0818CAF0.c                 | 4 ++--
+ src/fn/sub_0818CC48.c                 | 2 +-
+ src/fn/sub_0818D21C.c                 | 2 +-
+ src/fn/sub_081A1EFC.c                 | 2 +-
+ src/fn/sub_081A388C.c                 | 1 -
+ src/fn/sub_081A39E0.c                 | 2 +-
+ src/fn/sub_081A96E0.c                 | 2 +-
+ src/fn/sub_081A9910.c                 | 2 +-
+ src/fn/sub_081A9DDC.c                 | 2 +-
+ src/fn/sub_081A9F88.c                 | 2 +-
+ src/fn/sub_081AA178.c                 | 2 +-
+ src/fn/sub_081AA788.c                 | 2 +-
+ src/fn/sub_081C0CE4.c                 | 2 +-
+ src/fn/sub_081CA490.c                 | 2 +-
+ src/fn/sub_081D1404.c                 | 2 +-
+ src/fn/sub_081D2D78.c                 | 2 +-
+ src/fn/sub_081D2EA4.c                 | 2 +-
+ src/fn/sub_081D3094.c                 | 2 +-
+ src/fn/sub_081E2910.c                 | 2 +-
+ src/fn/sub_081F1274.c                 | 2 +-
+ src/fn/sub_081F3C68.c                 | 1 -
+ src/fn/sub_081F92C8.c                 | 2 +-
+ src/fn/sub_081FF454.c                 | 2 +-
+ src/fn/sub_08203D6C.c                 | 4 ++--
+ src/fn/sub_08204EB8.c                 | 4 ++--
+ src/fn/sub_082086B8.c                 | 4 ++--
+ src/fn/sub_0820B2AC.c                 | 2 +-
+ src/fn/sub_08234138.c                 | 2 +-
+ src/fn/sub_08234540.c                 | 2 +-
+ symbols/ram.csv                       | 2 +-
+ 75 files changed, 67 insertions(+), 83 deletions(-)
+
+diff --git a/include/ram.h b/include/ram.h
+index ccfc9979d..bdb84b32f 100644
+--- a/include/ram.h
++++ b/include/ram.h
+@@ -213,5 +213,6 @@ extern u16 gPlayerScriptStatus[2]; /* script status words saved with the player
+ extern void *gPendingPlayerNotification; /* pending player notification record */
+ extern u16 gForceMagnitude;              /* directional force magnitude */
+ extern u8 *gActorAnimationController;    /* actor animation controller singleton */
++extern const u16 gRandomTable[]; /* random value table indexed by gRandomIndex (1024 entries) */
+ 
+ #endif
+diff --git a/src/actor_graphics_and_basic_states.c b/src/actor_graphics_and_basic_states.c
+index 883733557..da59ac64e 100644
+--- a/src/actor_graphics_and_basic_states.c
++++ b/src/actor_graphics_and_basic_states.c
+@@ -490,7 +490,6 @@ typedef struct ParticleOffset {
+     s16 x, y, z, pad;
+ } ParticleOffset;
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ s32 SceneParticle_CreateParticles(const void *anchor, const ParticleOffset *offset,
+                                   const void *range, const void *jitter, s32 count, u32 priority);
+ 
+@@ -589,7 +588,6 @@ typedef struct BurstVec {
+ } BurstVec;
+ extern const BurstVec gUnk_08604D84[];
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ u16 Sqrt(u32);
+ s32 Div(s32, s32);
+ void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
+diff --git a/src/fn/sub_080154EC.c b/src/fn/sub_080154EC.c
+index 09224c0ee..e5abb19bf 100644
+--- a/src/fn/sub_080154EC.c
++++ b/src/fn/sub_080154EC.c
+@@ -40,7 +40,6 @@ int AnimData_Load(void *, int);
+ void Sprite_InitUnlinked(void *, void *, int);
+ void Anim_SetSequence(void *, void *, int, int, int);
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ extern s16 gUnk_086149C4[];
+ struct Config {
+     u16 type, flags, pad, speed;
+diff --git a/src/fn/sub_08015CF0.c b/src/fn/sub_08015CF0.c
+index a72ee7676..2068cba64 100644
+--- a/src/fn/sub_08015CF0.c
++++ b/src/fn/sub_08015CF0.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ struct Config {
+     u16 v[20];
+ };
+@@ -6,7 +7,6 @@ struct Vec {
+     s16 x, y, z, pad;
+ };
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ extern s16 gUnk_086149C4[];
+ void AnimatedParticles_Create(int, void *, struct Config *);
+ static inline int scale(int a, int b)
+diff --git a/src/fn/sub_08015F60.c b/src/fn/sub_08015F60.c
+index 268dd7d3d..c9990ff7d 100644
+--- a/src/fn/sub_08015F60.c
++++ b/src/fn/sub_08015F60.c
+@@ -39,7 +39,6 @@ struct Manager {
+     struct Group groups[6];
+ };
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ extern const s16 gUnk_086149C4[];
+ void *FadingParticleManager_Create(u32, u32);
+ s32 Mod(s32, s32);
+diff --git a/src/fn/sub_0801746C.c b/src/fn/sub_0801746C.c
+index f75b9d41e..78e213ded 100644
+--- a/src/fn/sub_0801746C.c
++++ b/src/fn/sub_0801746C.c
+@@ -1,6 +1,6 @@
+ #include "global.h"
++#include "ram.h"
+ extern u32 gRandomIndex;
+-extern u8 gRandomTable[];
+ s32 Mod(s32, s32);
+ struct S {
+     u8 f[0x1e];
+@@ -14,7 +14,7 @@ void Weather_SetRandomDuration(struct S *s)
+     s->a = s->b;
+     if (s->c != 0) {
+         gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+-        s->a += Mod(*(u16 *)(gRandomTable + gRandomIndex * 2), s->c);
++        s->a += Mod(*(u16 *)(((u8 *)gRandomTable) + gRandomIndex * 2), s->c);
+     }
+     if (s->a <= 9)
+         s->a = 10;
+diff --git a/src/fn/sub_08017C8C.c b/src/fn/sub_08017C8C.c
+index 789e77e84..af532cb0b 100644
+--- a/src/fn/sub_08017C8C.c
++++ b/src/fn/sub_08017C8C.c
+@@ -16,7 +16,6 @@ struct Weather {
+ extern u8 *gGameState;
+ extern u32 gEngineFlags;
+ extern u8 gUnk_03005430[];
+-extern u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ void Palette_SetBrightnessMode(int);
+ int Weather_TestFlags(int, int);
+diff --git a/src/fn/sub_08017E7C.c b/src/fn/sub_08017E7C.c
+index 8cb259036..5779d0b28 100644
+--- a/src/fn/sub_08017E7C.c
++++ b/src/fn/sub_08017E7C.c
+@@ -9,7 +9,6 @@ struct Weather {
+     void *script0, *script;
+ };
+ extern u8 *gGameState;
+-extern u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ void Palette_SetBrightnessMode(int);
+ void Script_Call(void *, int);
+diff --git a/src/fn/sub_08025DEC.c b/src/fn/sub_08025DEC.c
+index 672a77169..af86f755c 100644
+--- a/src/fn/sub_08025DEC.c
++++ b/src/fn/sub_08025DEC.c
+@@ -1,5 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
++#include "ram.h"
+ typedef struct ActorAnimation {
+     u8 pad0[0x51];
+     u8 angle;
+@@ -58,7 +59,6 @@ static inline int trunc12(int x)
+     return x >= 0 ? x >> 12 : -(-x >> 12);
+ }
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ void ContactSwarm_SpawnCharge(void *, void *, int, int, int, int, int);
+ static inline void vector(s16 *dst, int direction, int length)
+ {
+diff --git a/src/fn/sub_08026488.c b/src/fn/sub_08026488.c
+index 461a993c5..7de790564 100644
+--- a/src/fn/sub_08026488.c
++++ b/src/fn/sub_08026488.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ typedef struct ActorAnimation {
+     u8 pad0[0x51];
+     u8 angle;
+@@ -79,7 +80,6 @@ static inline void effect2(u8 *p, int mode, int id, int duration)
+         p[0x38c] = 0;
+ }
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ void SceneActors_StopBackgroundFlash(void *);
+ void BackgroundFlash_BeginAppearance(void *);
+ #define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
+diff --git a/src/fn/sub_080280CC.c b/src/fn/sub_080280CC.c
+index f5e9d138b..04449b55c 100644
+--- a/src/fn/sub_080280CC.c
++++ b/src/fn/sub_080280CC.c
+@@ -1,5 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
++#include "ram.h"
+ typedef struct ActorAnimation {
+     u8 pad0[0x51];
+     u8 angle;
+@@ -58,7 +59,6 @@ static inline int trunc12(int x)
+     return x >= 0 ? x >> 12 : -(-x >> 12);
+ }
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ void ContactSwarm_SpawnCharge(void *, void *, int, int, int, int, int);
+ static inline void vector(s16 *dst, int direction, int length)
+ {
+diff --git a/src/fn/sub_0802D218.c b/src/fn/sub_0802D218.c
+index 03041dca9..544f40ab1 100644
+--- a/src/fn/sub_0802D218.c
++++ b/src/fn/sub_0802D218.c
+@@ -1,6 +1,6 @@
+ #include "global.h"
++#include "ram.h"
+ extern u32 gRandomIndex;
+-extern u8 gRandomTable[];
+ extern u8 *gPlayers;
+ u32 Callback_InvokeActor(u8 *, void *);
+ void Actor_StepFacingAngle(u8 *);
+diff --git a/src/fn/sub_08034A80.c b/src/fn/sub_08034A80.c
+index 3a9534ce0..2058d5c8d 100644
+--- a/src/fn/sub_08034A80.c
++++ b/src/fn/sub_08034A80.c
+@@ -53,7 +53,6 @@ int SunClock_GetPhase(void);
+ int SunClock_GetBaseHour(void);
+ void WirelessText_EncodeString(const void *, void *, int);
+ void Wireless_InitSessionConfig(void *, int, int, int, int, const void *, const void *);
+-extern u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ struct Game {
+     u8 pad[0x780];
+diff --git a/src/fn/sub_08036910.c b/src/fn/sub_08036910.c
+index 7cda4fee4..b5745d0a1 100644
+--- a/src/fn/sub_08036910.c
++++ b/src/fn/sub_08036910.c
+@@ -49,7 +49,6 @@ void Task_SetCallbacks(void *, int, int);
+ void Task_LinkToPriorityList(void *);
+ void Heap_Free(void *);
+ extern u32 gRandomIndex, gUnk_0300546C;
+-extern const u16 gRandomTable[];
+ struct Engine *Wireless_CreateController(void)
+ {
+     struct Engine **singleton = &gWirelessController;
+diff --git a/src/fn/sub_08038170.c b/src/fn/sub_08038170.c
+index 44cd77f7e..8130fe18d 100644
+--- a/src/fn/sub_08038170.c
++++ b/src/fn/sub_08038170.c
+@@ -18,7 +18,6 @@ struct ItemInfo {
+ };
+ extern struct Save *gGameState;
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ int Mod(int, int);
+ void Inventory_GetEquippedDescriptor(int, struct ItemInfo *);
+ int GameState_GetUnlockEntry(int);
+diff --git a/src/fn/sub_08038448.c b/src/fn/sub_08038448.c
+index b18882178..f6632aad3 100644
+--- a/src/fn/sub_08038448.c
++++ b/src/fn/sub_08038448.c
+@@ -18,7 +18,6 @@ struct Save {
+ };
+ extern struct Save *gGameState;
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ void GameState_AddEquipment(int);
+ int Mod(int, int);
+ 
+diff --git a/src/fn/sub_08038AD4.c b/src/fn/sub_08038AD4.c
+index 283f60268..5bb1cd555 100644
+--- a/src/fn/sub_08038AD4.c
++++ b/src/fn/sub_08038AD4.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "render.h"
++#include "ram.h"
+ struct Entry {
+     u8 bytes[4], a, b, flag, kind;
+     u32 timer;
+@@ -27,7 +28,6 @@ struct Target {
+ };
+ extern struct Actor *gPlayers;
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ void Hud_RegisterTimer(u16 *);
+ void WirelessGameMenu_SetStatusPanelState(struct P *, int);
+ void Sound_PlayTrackedSong(int);
+diff --git a/src/fn/sub_080390C4.c b/src/fn/sub_080390C4.c
+index 42118f608..f6bd5ae91 100644
+--- a/src/fn/sub_080390C4.c
++++ b/src/fn/sub_080390C4.c
+@@ -30,7 +30,6 @@ struct Save {
+     u8 pad[0x58];
+     s16 values[4];
+ };
+-extern u8 gRandomTable[];
+ extern u32 gRandomIndex;
+ void *Script_GetKeywordValue(int, int);
+ int Script_SeekToKeyword(int);
+diff --git a/src/fn/sub_0803ADB8.c b/src/fn/sub_0803ADB8.c
+index 43d894e97..6cb7a3176 100644
+--- a/src/fn/sub_0803ADB8.c
++++ b/src/fn/sub_0803ADB8.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ // Tentative result-panel layout: six displayed values settle in three stages.
+ struct P {
+@@ -8,7 +9,6 @@ struct P {
+ };
+ 
+ extern u16 gUnk_03005260[];
+-extern u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ int Mod(int, int);
+ void Sound_PlaySong(int);
+diff --git a/src/fn/sub_0803B01C.c b/src/fn/sub_0803B01C.c
+index 58931b838..4d361100f 100644
+--- a/src/fn/sub_0803B01C.c
++++ b/src/fn/sub_0803B01C.c
+@@ -1,5 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
++#include "ram.h"
+ 
+ // Tentative result panel and drawable offsets.
+ struct Drawing {
+@@ -18,7 +19,6 @@ struct P {
+     struct Drawing drawing;
+ };
+ extern u8 *gUnk_030053F8;
+-extern u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ void Sound_PlayTrackedSong(int);
+ void Anim_LoadKeyframe(void *, void *, int, int);
+diff --git a/src/fn/sub_08078EE8.c b/src/fn/sub_08078EE8.c
+index 9aab98d9a..7209b3488 100644
+--- a/src/fn/sub_08078EE8.c
++++ b/src/fn/sub_08078EE8.c
+@@ -7,7 +7,6 @@ extern u8 *gGameState;
+ extern u32 gLinkSession;
+ extern u8 *gUnknown_02000580[];
+ extern u16 gUnk_030039F0;
+-extern u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ extern u32 gTerrainWidth;
+ extern u32 gTerrainHeight;
+diff --git a/src/fn/sub_08090118.c b/src/fn/sub_08090118.c
+index 6663b3432..91fceae8b 100644
+--- a/src/fn/sub_08090118.c
++++ b/src/fn/sub_08090118.c
+@@ -1,7 +1,7 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ extern u32 gRandomIndex;
+-extern u8 gRandomTable[];
+ 
+ u32 Slime_GetRandomVariantFlags(u8 *p)
+ {
+@@ -10,7 +10,7 @@ u32 Slime_GetRandomVariantFlags(u8 *p)
+     if (*(u16 *)(p + 0x1e6) != 3)
+         return 0;
+     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+-    v = *(u8 *)(gRandomTable + gRandomIndex * 2);
++    v = *(u8 *)(((u8 *)gRandomTable) + gRandomIndex * 2);
+     r = 0x200004;
+     if (v <= 0xb3)
+         r = 0x400008;
+diff --git a/src/fn/sub_080B9158.c b/src/fn/sub_080B9158.c
+index 198fb7595..512c606a1 100644
+--- a/src/fn/sub_080B9158.c
++++ b/src/fn/sub_080B9158.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ /* map cell index under a packed (x, y) position, or 0 when outside the map */
+ 
+@@ -10,7 +11,6 @@
+ #define B9158_AT(T, off) (*(T *)((u8 *)a + (off)))
+ 
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ extern u32 gEngineFlags;
+ extern u8 *gTerrainMap;
+ extern u32 gTerrainWidth, gTerrainHeight;
+diff --git a/src/fn/sub_080E0750.c b/src/fn/sub_080E0750.c
+index aafbb2b62..6ce57f5dd 100644
+--- a/src/fn/sub_080E0750.c
++++ b/src/fn/sub_080E0750.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ /* grid cell id of tile (x, y), 0 when outside the map */
+ 
+@@ -30,7 +31,6 @@ extern u32 gTerrainWidth;
+ extern u32 gTerrainHeight;
+ extern u32 gEngineFlags;
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ extern u8 *gUnknown_02000580[];
+ 
+ /* grid cell id of tile (x, y), 0 when outside the map */
+diff --git a/src/fn/sub_080F2F7C.c b/src/fn/sub_080F2F7C.c
+index 613b827de..6b2d8668b 100644
+--- a/src/fn/sub_080F2F7C.c
++++ b/src/fn/sub_080F2F7C.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ // confidence=low: steps the four entry weights and, on a timer, re-aims the pulse at the target.
+ 
+@@ -48,7 +49,6 @@ struct ColorPulse {
+     u32 flagsD80;
+ };
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ extern s16 gUnk_086149C4[];
+ s32 Div(s32, s32);
+ void PhaseObject_BeginEntryMotion(struct ColorPulse *);
+diff --git a/src/fn/sub_080F4B54.c b/src/fn/sub_080F4B54.c
+index 5bb7add73..6f009768d 100644
+--- a/src/fn/sub_080F4B54.c
++++ b/src/fn/sub_080F4B54.c
+@@ -1,7 +1,7 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ extern u32 gRandomIndex;
+-extern u8 gRandomTable[];
+ struct P {
+     u8 f[0x170];
+     void (*cb)(void);
+@@ -14,7 +14,7 @@ void Ivy_BeginChildRandomDelay(struct P *p)
+ {
+     u32 v;
+     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+-    v = *(u16 *)(gRandomTable + gRandomIndex * 2);
++    v = *(u16 *)(((u8 *)gRandomTable) + gRandomIndex * 2);
+     p->a = (v & 0x40) + 0x1e;
+     p->cb = ActorPhase_OrbitParent;
+ }
+diff --git a/src/fn/sub_080F52C0.c b/src/fn/sub_080F52C0.c
+index bb7799f20..ea9bfd773 100644
+--- a/src/fn/sub_080F52C0.c
++++ b/src/fn/sub_080F52C0.c
+@@ -1,5 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
++#include "ram.h"
+ // confidence=low: computes a target-relative endpoint before accelerating the turn.
+ 
+ struct Orbit {
+@@ -11,7 +12,6 @@ struct Orbit {
+     u16 dx, dy, dz;
+ };
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ extern s16 gUnk_086149C4[];
+ s32 Math_Atan2(s32, s32);
+ s32 Div(s32, s32);
+diff --git a/src/fn/sub_080F5F24.c b/src/fn/sub_080F5F24.c
+index f9a6391aa..f85469c7e 100644
+--- a/src/fn/sub_080F5F24.c
++++ b/src/fn/sub_080F5F24.c
+@@ -1,7 +1,7 @@
+ #include "global.h"
++#include "ram.h"
+ // MATCHING_CONCESSION: register-pinning
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ extern const s16 gUnk_086149C4[];
+ s32 Div(s32, s32);
+ struct StretchBody {
+diff --git a/src/fn/sub_080FA7D0.c b/src/fn/sub_080FA7D0.c
+index 4994dc70a..8b49c24c7 100644
+--- a/src/fn/sub_080FA7D0.c
++++ b/src/fn/sub_080FA7D0.c
+@@ -1,7 +1,7 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ extern s32 gRandomIndex;
+-extern u8 gRandomTable[];
+ s32 Mod(s32, s32);
+ u8 *Path_GetPointData(u8 *);
+ 
+@@ -23,7 +23,7 @@ void Axe_SelectRandomRoutePoint(struct S080FA7D0 *s)
+     u8 v;
+ 
+     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+-    v = Mod(*(u16 *)(gRandomTable + (gRandomIndex << 1)), *e->p);
++    v = Mod(*(u16 *)(((u8 *)gRandomTable) + (gRandomIndex << 1)), *e->p);
+     if (v == e->a)
+         v = Mod(v + 1, *e->p);
+     e->a = v;
+diff --git a/src/fn/sub_081055C0.c b/src/fn/sub_081055C0.c
+index c4c341799..06383c610 100644
+--- a/src/fn/sub_081055C0.c
++++ b/src/fn/sub_081055C0.c
+@@ -1,11 +1,11 @@
+ #include "global.h"
+ #include "directional_interaction.h"
+ #include "callback_pool.h"
++#include "ram.h"
+ 
+ // MATCHING_CONCESSION: register-pinning
+ #define CallbackPool_RunSpawnScript ProximityActor_SetState
+ #define gShakeRandomIndex           gRandomIndex
+-extern u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ static inline u32 NextRandom(u16 *table)
+ {
+diff --git a/src/fn/sub_0812642C.c b/src/fn/sub_0812642C.c
+index 91a05870e..3f7f59f4c 100644
+--- a/src/fn/sub_0812642C.c
++++ b/src/fn/sub_0812642C.c
+@@ -1,7 +1,6 @@
+ #include "global.h"
+ #include "ram.h"
+ // fix.py best version (reprinted C)
+-extern u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ u8 *ScriptedParticle_EnsurePool(void);
+ u8 *ScriptedParticle_AllocateSlot(u8 *);
+diff --git a/src/fn/sub_08126AD4.c b/src/fn/sub_08126AD4.c
+index 6d2d28615..58cadd1ef 100644
+--- a/src/fn/sub_08126AD4.c
++++ b/src/fn/sub_08126AD4.c
+@@ -23,7 +23,6 @@ struct BurstSparkPool {
+     u8 animation[0x1C];
+ };
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ extern const s16 gUnk_086149C4[];
+ struct BurstSparkPool *BurstSpark_EnsurePool(void);
+ struct BurstSpark *BurstSpark_AllocateSlot(struct BurstSparkPool *);
+diff --git a/src/fn/sub_08127590.c b/src/fn/sub_08127590.c
+index dff0b400a..fd4e95609 100644
+--- a/src/fn/sub_08127590.c
++++ b/src/fn/sub_08127590.c
+@@ -165,7 +165,6 @@ void *SpriteProjectile_EnsurePool(void);
+ struct Projectile *SpritePool10_AllocateSlot(void *);
+ extern u32 gEngineFlags, gUnk_02000560;
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ void AnimData_Load(void *, u32);
+ void *ScriptProc_Start(u32, u16);
+ void Sprite_Init(void *, void *, s32);
+diff --git a/src/fn/sub_0812A7B8.c b/src/fn/sub_0812A7B8.c
+index 2cb6d19c8..e4718551d 100644
+--- a/src/fn/sub_0812A7B8.c
++++ b/src/fn/sub_0812A7B8.c
+@@ -1,5 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
++#include "ram.h"
+ struct Vec {
+     s16 x, y, z, pad;
+ };
+@@ -156,7 +157,6 @@ struct Pool {
+     u32 allocated;
+ };
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ extern const s16 gUnk_086149C4[];
+ void Anim_SetSequence(struct Anim *, void *, u32, u32, u32);
+ s32 Math_Atan2(s32, s32);
+diff --git a/src/fn/sub_0812AA0C.c b/src/fn/sub_0812AA0C.c
+index a81e38d8c..945418182 100644
+--- a/src/fn/sub_0812AA0C.c
++++ b/src/fn/sub_0812AA0C.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ // MATCHING_CONCESSION: register-pinning
+ struct Vec {
+     s16 x, y, z, pad;
+@@ -156,7 +157,6 @@ struct Pool {
+     u32 allocated;
+ };
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ extern const s16 gUnk_086149C4[];
+ void Anim_SetSequence(struct Anim *, void *, u32, u32, u32);
+ s32 Math_Atan2(s32, s32);
+diff --git a/src/fn/sub_0812ACB0.c b/src/fn/sub_0812ACB0.c
+index a9abd6584..256bd652a 100644
+--- a/src/fn/sub_0812ACB0.c
++++ b/src/fn/sub_0812ACB0.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ #ifdef NONMATCHING
+ // fuzzy: 80.8%
+ // fix.py best (sweep after the inlined-insn fix)
+@@ -162,7 +163,6 @@ struct Pool {
+     u32 allocated;
+ };
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ extern const s16 gUnk_086149C4[];
+ void Anim_SetSequence(struct Anim *, void *, u32, u32, u32);
+ s32 Math_Atan2(s32, s32);
+diff --git a/src/fn/sub_0813C42C.c b/src/fn/sub_0813C42C.c
+index bf87bd9ac..b2d5ca480 100644
+--- a/src/fn/sub_0813C42C.c
++++ b/src/fn/sub_0813C42C.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ // MATCHING_CONCESSION: register-pinning
+ // Cleanup: angle and RNG temporaries use local register hints.
+ /* Tentative role: periodically spawn an inward-moving effect in a four-slot ring. */
+@@ -23,7 +24,6 @@ typedef struct State {
+     Effect effects[4];
+ } State;
+ extern const s16 gUnk_086149C4[];
+-extern u8 gRandomTable[];
+ extern u32 gRandomIndex;
+ extern u8 *gGameState;
+ void SpriteDrawable_SelectTileFrame(Effect *, void *, s32);
+diff --git a/src/fn/sub_0814B1F8.c b/src/fn/sub_0814B1F8.c
+index 8d4406379..7715e8c74 100644
+--- a/src/fn/sub_0814B1F8.c
++++ b/src/fn/sub_0814B1F8.c
+@@ -1,11 +1,11 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ extern u8 *gUnk_02000538;
+ extern u32 gUnk_0200051C;
+ extern u32 gUnk_02000524;
+ extern u32 gEngineFlags;
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ extern const s16 gUnk_086149C4[];
+ 
+ #define PL_AT(T, off) (*(T *)((u8 *)p + (off)))
+diff --git a/src/fn/sub_0815767C.c b/src/fn/sub_0815767C.c
+index 7dcc92c91..1725ea2c5 100644
+--- a/src/fn/sub_0815767C.c
++++ b/src/fn/sub_0815767C.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ // MATCHING_CONCESSION: register-pinning
+ 
+@@ -19,7 +20,6 @@ void ActorDebris_Show(void *);
+ void ActorDebris_Hide(void *);
+ void PlayerEffect_SetPaletteSource(void *, u32, u32);
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ 
+ static inline u8 *offsetR1(u8 *p, u32 off)
+ {
+diff --git a/src/fn/sub_0815C5A4.c b/src/fn/sub_0815C5A4.c
+index 04752d3a5..1fcb58fd6 100644
+--- a/src/fn/sub_0815C5A4.c
++++ b/src/fn/sub_0815C5A4.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ struct Vec {
+     s16 x, y, z, w;
+@@ -15,7 +16,6 @@ struct P {
+ };
+ 
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ 
+ s32 EffectGroup_Spawn(void *, s32, s32, struct Vec *);
+ void Sound_PlaySong(s32);
+diff --git a/src/fn/sub_0816E6F0.c b/src/fn/sub_0816E6F0.c
+index b1bfaaabc..cb25dd3af 100644
+--- a/src/fn/sub_0816E6F0.c
++++ b/src/fn/sub_0816E6F0.c
+@@ -1,10 +1,10 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ #ifdef NONMATCHING
+ // fuzzy: 94.6%
+ // fix.py best (sweep after the inlined-insn fix)
+ // fix.py best version (reprinted C)
+-extern u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ extern const s16 gUnk_086149C4[];
+ s32 Mod(s32, s32);
+diff --git a/src/fn/sub_0817BDB0.c b/src/fn/sub_0817BDB0.c
+index 98566b513..d9739557d 100644
+--- a/src/fn/sub_0817BDB0.c
++++ b/src/fn/sub_0817BDB0.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ struct VolumeActor {
+     u8 pad0[0x51];
+@@ -82,7 +83,6 @@ static inline s32 Scale(int x)
+     return -(-x >> 12);
+ }
+ 
+-extern u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ s32 Mod(s32, s32);
+ void Path_GetPointPositionById(void *, int, int);
+diff --git a/src/fn/sub_0817C3F4.c b/src/fn/sub_0817C3F4.c
+index a31f8100a..f280169a9 100644
+--- a/src/fn/sub_0817C3F4.c
++++ b/src/fn/sub_0817C3F4.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ // confidence=low: phase-dependent combat selection inferred from state and distance tests
+ #ifdef NONMATCHING
+ // fuzzy: 83.3%
+@@ -30,7 +31,6 @@ void SceneSteeringActor_RequestRemovalAll(void);
+ u8 Callback_InvokeActor(void *, void *);
+ extern void *gUnk_08611C6C[];
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ static inline s32 RandomValue(void)
+ {
+     u32 offset;
+diff --git a/src/fn/sub_0817E378.c b/src/fn/sub_0817E378.c
+index 6d481b66d..595df7fd7 100644
+--- a/src/fn/sub_0817E378.c
++++ b/src/fn/sub_0817E378.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ #ifdef NONMATCHING
+ // fuzzy: 44.3%
+ // fix.py best (sweep after the inlined-insn fix)
+@@ -17,7 +18,6 @@ struct A {
+     u8 count;
+ };
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
+ void Callback_InvokeActor(void *, u32);
+ static inline s32 Rand16(void)
+diff --git a/src/fn/sub_0818C6F8.c b/src/fn/sub_0818C6F8.c
+index f53635e77..c538abf27 100644
+--- a/src/fn/sub_0818C6F8.c
++++ b/src/fn/sub_0818C6F8.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ #ifdef NONMATCHING
+ // fuzzy: 83.4%
+@@ -21,7 +22,6 @@ void Armor_CapturePartMotionEndpoint(void *);
+ void Sound_PlaySongChecked(u32);
+ s32 Math_Atan2(s32, s32);
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ extern const s16 gUnk_086149C4[];
+ 
+ struct PartVector {
+diff --git a/src/fn/sub_0818CAF0.c b/src/fn/sub_0818CAF0.c
+index 89a65e111..0f7fb6f52 100644
+--- a/src/fn/sub_0818CAF0.c
++++ b/src/fn/sub_0818CAF0.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ struct A {
+     u8 f0[6];
+     u8 b6;
+@@ -27,13 +28,12 @@ struct A {
+     u8 b1df;
+ };
+ extern u32 gRandomIndex;
+-extern u8 gRandomTable[];
+ void Armor_UpdatePartOrbit(void);
+ void Armor_InitPartOrbitTimer(struct A *p)
+ {
+     u32 v;
+     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+-    v = *(u16 *)(gRandomTable + gRandomIndex * 2);
++    v = *(u16 *)(((u8 *)gRandomTable) + gRandomIndex * 2);
+     v &= 0x40;
+     p->w1d6 = v + 0x1e;
+     p->fn = Armor_UpdatePartOrbit;
+diff --git a/src/fn/sub_0818CC48.c b/src/fn/sub_0818CC48.c
+index 420b91122..d26e120ca 100644
+--- a/src/fn/sub_0818CC48.c
++++ b/src/fn/sub_0818CC48.c
+@@ -1,10 +1,10 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ // MATCHING_CONCESSION: register-pinning
+ #define gPlayerObject     gGameState
+ #define gRandomTableIndex gRandomIndex
+ extern u32 gRandomTableIndex;
+-extern const u16 gRandomTable[];
+ struct ArmorTravelTarget {
+     u8 pad0[0x30];
+     u16 x, y, z;
+diff --git a/src/fn/sub_0818D21C.c b/src/fn/sub_0818D21C.c
+index d5b761881..af6f4e826 100644
+--- a/src/fn/sub_0818D21C.c
++++ b/src/fn/sub_0818D21C.c
+@@ -1,8 +1,8 @@
+ #include "motion_0818.h"
+ #include "game_state.h"
++#include "ram.h"
+ // MATCHING_CONCESSION: register-pinning
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ extern const s16 gUnk_086149C4[];
+ u32 Math_Atan2(s32, s32);
+ s32 Div(s32, s32);
+diff --git a/src/fn/sub_081A1EFC.c b/src/fn/sub_081A1EFC.c
+index 8a01af64b..14a1d77a1 100644
+--- a/src/fn/sub_081A1EFC.c
++++ b/src/fn/sub_081A1EFC.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ struct PackedVector {
+     s32 x : 16, y : 16, z : 16, pad : 16;
+@@ -63,7 +64,6 @@ struct EnvironmentState {
+     s16 level;
+ };
+ extern struct EnvironmentState *gGameState;
+-extern u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ s32 Hresvelgr_GetEnvironmentalLevel(void *);
+ void Hresvelgr_EmitRandomMotionBurst(void *);
+diff --git a/src/fn/sub_081A388C.c b/src/fn/sub_081A388C.c
+index aafafe145..5bbc21d69 100644
+--- a/src/fn/sub_081A388C.c
++++ b/src/fn/sub_081A388C.c
+@@ -34,7 +34,6 @@ struct Entry {
+     void *trails[4];
+ };
+ extern const s16 gUnk_086149C4[];
+-extern const u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ extern const u32 gUnk_0824F760[4];
+ s32 sub_08249350(s32, s32);
+diff --git a/src/fn/sub_081A39E0.c b/src/fn/sub_081A39E0.c
+index dbbe5b44b..8c1fac339 100644
+--- a/src/fn/sub_081A39E0.c
++++ b/src/fn/sub_081A39E0.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ // confidence=low: updates homing effect entries, animation, trails and lifetime.
+ 
+@@ -38,7 +39,6 @@ struct Entry {
+     void *trails[4];
+ };
+ extern const s16 gUnk_086149C4[];
+-extern const u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ extern const u32 gUnk_0824F760[4];
+ s32 sub_08249350(s32, s32);
+diff --git a/src/fn/sub_081A96E0.c b/src/fn/sub_081A96E0.c
+index 07812d6b0..cfea1e4eb 100644
+--- a/src/fn/sub_081A96E0.c
++++ b/src/fn/sub_081A96E0.c
+@@ -1,5 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
++#include "ram.h"
+ struct Pair {
+     u8 pad0[0x205];
+     u8 first;
+@@ -39,7 +40,6 @@ void Vanargand_SetPairedMotionParameter(void *, u16);
+ void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
+ s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ static inline s32 RandomValue(void)
+ {
+     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+diff --git a/src/fn/sub_081A9910.c b/src/fn/sub_081A9910.c
+index 003ab9a78..177be8bec 100644
+--- a/src/fn/sub_081A9910.c
++++ b/src/fn/sub_081A9910.c
+@@ -1,5 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
++#include "ram.h"
+ // confidence=low: paired commands 3/4/5 repeat a synchronized attack before selected halves recover.
+ struct Pair {
+     u8 pad0[0x205];
+@@ -40,7 +41,6 @@ void Vanargand_SetPairedMotionParameter(void *, u16);
+ void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
+ s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ static inline s32 RandomValue(void)
+ {
+     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+diff --git a/src/fn/sub_081A9DDC.c b/src/fn/sub_081A9DDC.c
+index 4d8e8a472..eb8bef8c0 100644
+--- a/src/fn/sub_081A9DDC.c
++++ b/src/fn/sub_081A9DDC.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ // confidence=low: paired commands 7 and 8 appear to prepare and alternate attacks.
+ struct Vanargand {
+     u8 pad0[0x9C];
+@@ -26,7 +27,6 @@ void Vanargand_SetPairedMotionParameter(void *, u16);
+ void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
+ s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ static inline s32 RandomValue(void)
+ {
+     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+diff --git a/src/fn/sub_081A9F88.c b/src/fn/sub_081A9F88.c
+index aa53a778e..92610cb8a 100644
+--- a/src/fn/sub_081A9F88.c
++++ b/src/fn/sub_081A9F88.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ // confidence=low: paired commands and positive-counter checks appear to gate a charged attack.
+ // MATCHING_CONCESSION: register-pinning
+ struct Pair {
+@@ -39,7 +40,6 @@ void Vanargand_SetPairedMotionParameter(void *, u16);
+ void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
+ s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ static inline s32 RandomValue(void)
+ {
+     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+diff --git a/src/fn/sub_081AA178.c b/src/fn/sub_081AA178.c
+index 96d0cd6fe..cb7d4af9a 100644
+--- a/src/fn/sub_081AA178.c
++++ b/src/fn/sub_081AA178.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ // confidence=low: command 9 alternates the selected pair halves for six timed attacks.
+ // MATCHING_CONCESSION: register-pinning
+ // Scope: byte-for-byte match with one retained register pin.
+@@ -32,7 +33,6 @@ void Vanargand_SetPairedMotionParameter(void *, u16);
+ void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
+ s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ static inline s32 RandomValue(void)
+ {
+     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+diff --git a/src/fn/sub_081AA788.c b/src/fn/sub_081AA788.c
+index 855c19ce0..776d5e9bc 100644
+--- a/src/fn/sub_081AA788.c
++++ b/src/fn/sub_081AA788.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ // confidence=low: runs a seven-phase attack sequence for the paired actors: cues, animates the pair, and spawns projectiles.
+ 
+@@ -61,7 +62,6 @@ void sub_081B71D4(void *, void *, void *, void *, s32, s32, s32);
+ void VanargandProjectile_Create(void *, void *, void *, s32, s32, s32);
+ s32 sub_08249350(s32, s32);
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ extern const u32 gUnk_0824F788[2];
+ 
+ static inline u16 RandomValue(void)
+diff --git a/src/fn/sub_081C0CE4.c b/src/fn/sub_081C0CE4.c
+index d33bf7205..1dd620f7e 100644
+--- a/src/fn/sub_081C0CE4.c
++++ b/src/fn/sub_081C0CE4.c
+@@ -1,8 +1,8 @@
+ #include "global.h"
+ #include "game_state.h"
++#include "ram.h"
+ 
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ extern const u16 gUnk_03005260[];
+ extern const u8 gUnk_0824F960[];
+ extern const u8 gUnk_0824F968[];
+diff --git a/src/fn/sub_081CA490.c b/src/fn/sub_081CA490.c
+index 097101750..a23f99c2f 100644
+--- a/src/fn/sub_081CA490.c
++++ b/src/fn/sub_081CA490.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "player.h"
++#include "ram.h"
+ // MATCHING_CONCESSION: register-pinning
+ #ifdef NONMATCHING
+ // fuzzy: 86.4%
+@@ -20,7 +21,6 @@ void Actor_PlayAnimationEntry(void *, u32, u32, u32, u32);
+ s32 DisplayAnimation_TestFinished(void *);
+ 
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ void Sound_PlaySong(u32);
+ u8 Callback_InvokeActor(void *, u32);
+ void sub_080148CC(s32, s32, void *, s32, s32, s32, s32, s32, s32, s32, s32);
+diff --git a/src/fn/sub_081D1404.c b/src/fn/sub_081D1404.c
+index a101826de..20bc3f84c 100644
+--- a/src/fn/sub_081D1404.c
++++ b/src/fn/sub_081D1404.c
+@@ -1,10 +1,10 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
++#include "ram.h"
+ 
+ struct Pair {
+     u32 a, b;
+ };
+-extern const u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ s32 Mod(s32, s32);
+ void Task_Kill(void *);
+diff --git a/src/fn/sub_081D2D78.c b/src/fn/sub_081D2D78.c
+index 4fb0c5e95..acd19647c 100644
+--- a/src/fn/sub_081D2D78.c
++++ b/src/fn/sub_081D2D78.c
+@@ -1,5 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
++#include "ram.h"
+ #define FrostEmitter_SpawnParticle sub_081D2D78
+ struct FrostVec {
+     u16 x, y, z, pad;
+@@ -31,7 +32,6 @@ struct FrostEmitter {
+     u32 enabled, age;
+ };
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ extern const s16 gUnk_086149C4[];
+ void Anim_SetSequence(void *, void *, u16, u8, u8);
+ static inline s32 ShiftRandom(u16 value, s32 shift)
+diff --git a/src/fn/sub_081D2EA4.c b/src/fn/sub_081D2EA4.c
+index a1b72f1e3..1492bdcdb 100644
+--- a/src/fn/sub_081D2EA4.c
++++ b/src/fn/sub_081D2EA4.c
+@@ -1,5 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
++#include "ram.h"
+ // confidence=low: moves one frost particle, steps playback and hides it on expiry.
+ #define FrostEmitter_UpdateParticle sub_081D2EA4
+ struct FrostVec {
+@@ -32,7 +33,6 @@ struct FrostEmitter {
+     u32 enabled, age;
+ };
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ extern const s16 gUnk_086149C4[];
+ void Anim_SetSequence(void *, void *, u16, u8, u8);
+ void FrostEmitter_UpdateParticle(struct FrostParticle *input)
+diff --git a/src/fn/sub_081D3094.c b/src/fn/sub_081D3094.c
+index 20ebbc235..8a5f296d7 100644
+--- a/src/fn/sub_081D3094.c
++++ b/src/fn/sub_081D3094.c
+@@ -1,5 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
++#include "ram.h"
+ #define FrostEmitter_Initialize sub_081D3094
+ struct FrostVec {
+     u16 x, y, z, pad;
+@@ -31,7 +32,6 @@ struct FrostEmitter {
+     u32 enabled, age;
+ };
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ extern const s16 gUnk_086149C4[];
+ void Anim_SetSequence(void *, void *, u16, u8, u8);
+ void AnimData_Load(void *, u32);
+diff --git a/src/fn/sub_081E2910.c b/src/fn/sub_081E2910.c
+index 6c9b16597..1f3048cfe 100644
+--- a/src/fn/sub_081E2910.c
++++ b/src/fn/sub_081E2910.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ // Provisional name: Presentation_UpdateDropShakeBlink
+ // MATCHING_CONCESSION: register-pinning
+ struct Sequence {
+@@ -33,7 +34,6 @@ void Anim_LoadKeyframe(void *, void *, s32, s32);
+ void Anim_SetKeyframes(void *, void *, s32, s32, s32);
+ void Presentation_UpdateLayerAnimations(void *);
+ void Presentation_ClearTilemap(void);
+-extern u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ s32 Mod(s32, s32);
+ s32 Div(s32, s32);
+diff --git a/src/fn/sub_081F1274.c b/src/fn/sub_081F1274.c
+index a1f8a1d62..4cda85380 100644
+--- a/src/fn/sub_081F1274.c
++++ b/src/fn/sub_081F1274.c
+@@ -1,6 +1,7 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
+ #include "render.h"
++#include "ram.h"
+ #define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
+ struct Slot7PackedPosition {
+     s32 x : 16, y : 16, z : 16, pad : 16;
+@@ -9,7 +10,6 @@ extern void *gSceneCamera;
+ extern u8 *gParticipantActors;
+ extern u8 gUnk_03005040[];
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ void Collider_SetFixedPositionWithYOffset(void *, void *, s32);
+ void SpatialIndex_InsertEntry(void *);
+ void CpuSet(const void *, void *, u32);
+diff --git a/src/fn/sub_081F3C68.c b/src/fn/sub_081F3C68.c
+index 3e9235aed..69666219e 100644
+--- a/src/fn/sub_081F3C68.c
++++ b/src/fn/sub_081F3C68.c
+@@ -110,7 +110,6 @@ static inline void sum(struct Vec *d, struct Vec *a, struct Vec *b)
+ }
+ 
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ struct Vec *Player_GetEffectivePosition(s32);
+ s32 Div(s32, s32);
+ void HomingProjectile_InitParams(void *);
+diff --git a/src/fn/sub_081F92C8.c b/src/fn/sub_081F92C8.c
+index a3ed1b2a5..d647b3d4d 100644
+--- a/src/fn/sub_081F92C8.c
++++ b/src/fn/sub_081F92C8.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ struct Vec {
+     s16 x, y, z, pad;
+@@ -47,7 +48,6 @@ struct ChoiceTable {
+ extern const struct ChoiceTable gUnk_0824FDF8, gUnk_0824FE08, gUnk_0824FE18;
+ extern void *const gUnk_08613F04[];
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ u8 Callback_InvokeActor(void *, void *);
+ struct Vec *Player_GetEffectivePosition(s32);
+ void Ratatosk_BeginInterruptState(void *);
+diff --git a/src/fn/sub_081FF454.c b/src/fn/sub_081FF454.c
+index 0f5616fa7..3b9555a49 100644
+--- a/src/fn/sub_081FF454.c
++++ b/src/fn/sub_081FF454.c
+@@ -1,5 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
++#include "ram.h"
+ // fix.py best after the inlined-insn fix
+ struct HomingVec {
+     s16 x, y, z, pad;
+@@ -58,7 +59,6 @@ struct HomingSlot {
+     s16 blinkTimer;
+ };
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ void SpriteParticle_CreateDefaultVariant4384(void *, u32, u32, u32, u32, u32, u32, u32, u32, u32,
+                                              u32, u32);
+ struct HomingVec *Player_GetEffectivePosition(s32);
+diff --git a/src/fn/sub_08203D6C.c b/src/fn/sub_08203D6C.c
+index fa1d98363..f1453bbe3 100644
+--- a/src/fn/sub_08203D6C.c
++++ b/src/fn/sub_08203D6C.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ struct V {
+     u16 x;
+     u16 y;
+@@ -9,7 +10,6 @@ struct R {
+     u8 a;
+     u8 b;
+ } __attribute__((packed));
+-extern struct R gRandomTable[];
+ void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+                                              s32, s32);
+ void EnemyF426_RecordDefeat(void *);
+@@ -23,7 +23,7 @@ s32 EnemyF426_UpdateDeath(u8 *p)
+             *q = *((struct V *)(p + 0x40));
+             q->y += 200;
+             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+-            r = (*(&gRandomTable[gRandomIndex])).a;
++            r = (*(&((struct R *)gRandomTable)[gRandomIndex])).a;
+             SpriteParticle_CreateDefaultVariant4384(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
+         }
+         if ((*((s32 *)(p + 0x18))) == 12) {
+diff --git a/src/fn/sub_08204EB8.c b/src/fn/sub_08204EB8.c
+index 8226375ce..b5ef793f9 100644
+--- a/src/fn/sub_08204EB8.c
++++ b/src/fn/sub_08204EB8.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ struct V {
+     u16 x;
+     u16 y;
+@@ -9,7 +10,6 @@ struct R {
+     u8 a;
+     u8 b;
+ } __attribute__((packed));
+-extern struct R gRandomTable[];
+ void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+                                              s32, s32);
+ void EnemyD459_RecordDefeat(void *);
+@@ -23,7 +23,7 @@ s32 EnemyD459_UpdateDeath(u8 *p)
+             *q = *((struct V *)(p + 0x40));
+             q->y += 200;
+             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+-            r = (*(&gRandomTable[gRandomIndex])).a;
++            r = (*(&((struct R *)gRandomTable)[gRandomIndex])).a;
+             SpriteParticle_CreateDefaultVariant4384(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, 1, 512);
+         }
+         if ((*((s32 *)(p + 0x18))) == 12) {
+diff --git a/src/fn/sub_082086B8.c b/src/fn/sub_082086B8.c
+index 85281870b..a01916aea 100644
+--- a/src/fn/sub_082086B8.c
++++ b/src/fn/sub_082086B8.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ struct V {
+     u16 x;
+     u16 y;
+@@ -9,7 +10,6 @@ struct R {
+     u8 a;
+     u8 b;
+ } __attribute__((packed));
+-extern struct R gRandomTable[];
+ void SpriteParticle_CreateDefaultVariant4384(void *, s32, s32, s32, s32, s32, s32, s32, s32, s32,
+                                              s32, s32);
+ void CannonTurret_HandleDefeat(void *);
+@@ -24,7 +24,7 @@ s32 sub_082086B8(u8 *p)
+             *q = *((struct V *)(p + 0x40));
+             q->y += 128;
+             gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+-            r = (*(&gRandomTable[gRandomIndex])).a;
++            r = (*(&((struct R *)gRandomTable)[gRandomIndex])).a;
+             SpriteParticle_CreateDefaultVariant4384(&v, 128, 32, 12, 12, 24, r, 32, 32, 1, h, 512);
+         }
+         if ((*((s32 *)(p + 0x18))) == 12) {
+diff --git a/src/fn/sub_0820B2AC.c b/src/fn/sub_0820B2AC.c
+index 83730246d..ccb038eb9 100644
+--- a/src/fn/sub_0820B2AC.c
++++ b/src/fn/sub_0820B2AC.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ struct DragonPuppyPosition {
+     s16 x, y, z, unk_06;
+@@ -29,7 +30,6 @@ struct DragonPuppy {
+     s16 attackIndex;
+ };
+ 
+-extern const u16 gRandomTable[];
+ extern u32 gRandomIndex;
+ void DragonPuppy_HandleDefeat(struct DragonPuppy *);
+ void DragonPuppy_UpdateAttackTiming(void);
+diff --git a/src/fn/sub_08234138.c b/src/fn/sub_08234138.c
+index a2a36d8bf..6a9b05a9c 100644
+--- a/src/fn/sub_08234138.c
++++ b/src/fn/sub_08234138.c
+@@ -1,5 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
++#include "ram.h"
+ 
+ struct E {
+     u32 flags;
+@@ -25,7 +26,6 @@ struct S {
+ };
+ extern const s16 gUnk_086149C4[];
+ extern u32 gRandomIndex;
+-extern u16 gRandomTable[];
+ u32 AnimData_FindEntry(u32);
+ void ParticleSprite_Initialize(void *, u32, u32);
+ void Effect_SetOrigin(void *, s32, s32);
+diff --git a/src/fn/sub_08234540.c b/src/fn/sub_08234540.c
+index 5bf6ad1c3..85f18861d 100644
+--- a/src/fn/sub_08234540.c
++++ b/src/fn/sub_08234540.c
+@@ -1,7 +1,7 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ extern const s16 gUnk_086149C4[];
+ u32 AnimData_FindEntry(u32);
+ void ParticleSprite_Initialize(void *, u32, s32);
+diff --git a/symbols/ram.csv b/symbols/ram.csv
+index 529b34e20..f478f722f 100644
+--- a/symbols/ram.csv
++++ b/symbols/ram.csv
+@@ -241,7 +241,7 @@ addr,name,size,kind,decl,header,confidence,notes
+ 02037000,gBackgroundMapBuffers,2000,object,extern u8 gBackgroundMapBuffers[0x2000];,include/ram.h,low,four 0x800-byte background maps (Video_GetBackgroundMap)
+ 02039000,gTileUploadQueue,2000,object,extern u32 gTileUploadQueue[];,include/ram.h,low,object tile upload queue (ObjGfx_LoadTiles)
+ 0203B000,gResourceRegistry,400,object,extern u8 gResourceRegistry[0x400];,include/ram.h,low,resource registry entries (ResourceRegistry_*)
+-0203B400,gRandomTable,802,object,extern const u16 gRandomTable[];,include/engine.h,low,random value table indexed by gRandomIndex (1024 entries)
++0203B400,gRandomTable,802,object,extern const u16 gRandomTable[];,include/ram.h,low,random value table indexed by gRandomIndex (1024 entries)
+ 0203C400,gGameStateStorage,3C00,object,extern u8 gGameStateStorage[0x3C00];,include/ram.h,low,"storage for the game state regions, offset by timer jitter"
+ 03000000,gUnk_03000000,FC,object,,,,
+ 03001110,gUnk_03001110,4,object,,,,
+-- 
+2.39.3 (Apple Git-145)
+

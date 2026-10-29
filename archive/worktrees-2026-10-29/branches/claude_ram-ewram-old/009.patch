@@ -1,0 +1,463 @@
+From 19b94b11c9530f736a747fbd96fc7e4b13766fe7 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Tue, 27 Oct 2026 23:21:22 -0700
+Subject: [PATCH] Name the script VM section, command table and state objects
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+---
+ include/script_virtual_machine.h |  14 ++---
+ src/fn/sub_08225590.c            |   4 +-
+ src/script_virtual_machine.c     | 100 +++++++++++++++----------------
+ symbols/ram.csv                  |   6 +-
+ 4 files changed, 62 insertions(+), 62 deletions(-)
+
+diff --git a/include/script_virtual_machine.h b/include/script_virtual_machine.h
+index 107b89fd0..58b41b8a3 100644
+--- a/include/script_virtual_machine.h
++++ b/include/script_virtual_machine.h
+@@ -13,10 +13,10 @@
+ #include "script_reference.h"
+ #include "script_utility.h"
+ 
+-/* Resolved section base pointers from the loaded script header (gUnk_02000448):
++/* Resolved section base pointers from the loaded script header (gScriptSections):
+  * 0 unknown/adjacent to the proc table, 1 string offset table (4-byte records,
+  * see Text_LookupString), 2 string data base, 3 a fourth resource (guess). */
+-extern u8 *gUnk_02000448[4];
++extern u8 *gScriptSections[4];
+ 
+ /* The currently loaded script's procedure table (gScriptProcedureTable). `entries` holds
+  * one packed word per procedure: low 24 bits an offset from `body`, high byte
+@@ -30,7 +30,7 @@ struct ScriptProcedureTable {
+ };
+ extern struct ScriptProcedureTable gScriptProcedureTable;
+ 
+-/* A registered table of native script commands (gUnk_02000458 is the head of
++/* A registered table of native script commands (gScriptNativeCommandTables is the head of
+  * the list). Script_ExecuteNativeCommand looks a command id up by key and
+  * invokes its callback. */
+ struct ScriptCommandEntry {
+@@ -42,9 +42,9 @@ struct ScriptCommandTable {
+     s32 count;
+     struct ScriptCommandEntry *entries;
+ };
+-extern struct ScriptCommandTable *gUnk_02000458;
++extern struct ScriptCommandTable *gScriptNativeCommandTables;
+ 
+-/* Interpreter state (gUnk_02000610). `stack` backs both the keyword/control
++/* Interpreter state (gScriptVm). `stack` backs both the keyword/control
+  * stack (growing up from its base, via keywordSp) and the call argument stack
+  * (growing up from stack + 25, via argSp) -- the two are never deep at once. */
+ struct ScriptVm {
+@@ -54,7 +54,7 @@ struct ScriptVm {
+     u32 stack[24];
+     u32 *argSp;
+ };
+-extern struct ScriptVm gUnk_02000610;
++extern struct ScriptVm gScriptVm;
+ 
+ /* ---- Resource lookup (archive keyed by extension/name hash pair) -------- */
+ 
+@@ -89,7 +89,7 @@ void Script_PopCtrlNextKeyword(void);
+ 
+ void Script_ResetStacks(void);
+ 
+-/* ---- Script cursor (gUnk_02000610.pc) ----------------------------------- */
++/* ---- Script cursor (gScriptVm.pc) ----------------------------------- */
+ 
+ void Script_SetPc(u8 *p);
+ /* Script_SeekToKeyword, Script_GetPc, Script_ParseStringRef, Script_GetKeywordValue: engine.h */
+diff --git a/src/fn/sub_08225590.c b/src/fn/sub_08225590.c
+index 7d2abebe7..79879906a 100644
+--- a/src/fn/sub_08225590.c
++++ b/src/fn/sub_08225590.c
+@@ -6,7 +6,7 @@ struct VM {
+     u32 stk[24];
+     u32 *sp;
+ };
+-extern struct VM gUnk_02000610;
++extern struct VM gScriptVm;
+ u32 Script_GetValue(void);
+ u32 Script_GetActorFactory(u16);
+ u32 sub_08249238(void);
+@@ -14,6 +14,6 @@ s32 Script_InvokeRegistryCommand(void)
+ {
+     if (Script_GetActorFactory(Script_GetValue()) == 0)
+         return -1;
+-    gUnk_02000610.f4 = sub_08249238();
++    gScriptVm.f4 = sub_08249238();
+     return 0;
+ }
+diff --git a/src/script_virtual_machine.c b/src/script_virtual_machine.c
+index 85df73447..fa9a65bba 100644
+--- a/src/script_virtual_machine.c
++++ b/src/script_virtual_machine.c
+@@ -253,7 +253,7 @@ u8 *Script_DecodeOperand(u8 *p, s32 *type, s32 *value)
+ 
+ void Script_ResetArgumentStack(void)
+ {
+-    gUnk_02000610.argSp = gUnk_02000610.stack + 25;
++    gScriptVm.argSp = gScriptVm.stack + 25;
+ }
+ 
+ u32 *Script_PushArgumentFrame(u32 a, u32 b)
+@@ -261,10 +261,10 @@ u32 *Script_PushArgumentFrame(u32 a, u32 b)
+     if (a == 0)
+         return 0;
+     else {
+-        u32 *p = gUnk_02000610.argSp;
++        u32 *p = gScriptVm.argSp;
+         u32 *q = p + b;
+         *q++ = a;
+-        gUnk_02000610.argSp = q;
++        gScriptVm.argSp = q;
+         return p;
+     }
+ }
+@@ -272,47 +272,47 @@ u32 *Script_PushArgumentFrame(u32 a, u32 b)
+ void Script_RestoreArgumentStack(u32 *p)
+ {
+     if (p)
+-        gUnk_02000610.argSp = p;
++        gScriptVm.argSp = p;
+ }
+ 
+ u32 Script_GetCallArgument(s32 n)
+ {
+     if (!n)
+-        return gUnk_02000610.result;
++        return gScriptVm.result;
+     else {
+-        u32 *e = (u32 *)gUnk_02000610.argSp[-1];
++        u32 *e = (u32 *)gScriptVm.argSp[-1];
+         return ((u32 *)e[1])[n - 1];
+     }
+ }
+ 
+ u32 Script_GetStackArgument(s32 n)
+ {
+-    return *(u32 *)((u8 *)gUnk_02000610.argSp - (n * 4 + 4));
++    return *(u32 *)((u8 *)gScriptVm.argSp - (n * 4 + 4));
+ }
+ 
+ void Script_SetStackArgument(s32 n, u32 v)
+ {
+-    *(u32 *)((u8 *)gUnk_02000610.argSp - (n * 4 + 4)) = v;
++    *(u32 *)((u8 *)gScriptVm.argSp - (n * 4 + 4)) = v;
+ }
+ 
+ void Script_ResetKeywordStack(void)
+ {
+-    gUnk_02000610.keywordSp = gUnk_02000610.stack;
++    gScriptVm.keywordSp = gScriptVm.stack;
+ }
+ 
+ void Script_PushCtrlNextKeyword(u32 v)
+ {
+-    *gUnk_02000610.keywordSp++ = v;
++    *gScriptVm.keywordSp++ = v;
+ }
+ 
+ void Script_PopCtrlNextKeyword(void)
+ {
+-    gUnk_02000610.keywordSp--;
++    gScriptVm.keywordSp--;
+ }
+ 
+ void Script_SetPc(u8 *p)
+ {
+-    gUnk_02000610.pc = p;
++    gScriptVm.pc = p;
+ }
+ 
+ /* engine.h declares this s32(s32); the real parameter is a byte (the prologue
+@@ -322,13 +322,13 @@ s32 Script_SeekToKeyword(s32 keyword)
+ {
+     u8 k = keyword;
+     s32 a, b;
+-    u8 *p = (u8 *)gUnk_02000610.keywordSp[-1];
++    u8 *p = (u8 *)gScriptVm.keywordSp[-1];
+     for (;;) {
+         p = Script_DecodeOperand(p, &a, &b);
+         if (a == 0)
+             return 0;
+         if ((a & 0xF0) == 0x50 && (a >> 16) == k) {
+-            gUnk_02000610.pc = (u8 *)b;
++            gScriptVm.pc = (u8 *)b;
+             return b;
+         }
+     }
+@@ -337,7 +337,7 @@ s32 Script_SeekToKeyword(s32 keyword)
+ s32 Script_ReadNextKeyword(void)
+ {
+     s32 a, b;
+-    u8 *p = gUnk_02000610.pc;
++    u8 *p = gScriptVm.pc;
+     if (p == 0)
+         return 0;
+     if (*p == 0)
+@@ -348,7 +348,7 @@ s32 Script_ReadNextKeyword(void)
+             return 0;
+         if ((a & 0xF0) != 0x50)
+             continue;
+-        gUnk_02000610.pc = (u8 *)b;
++        gScriptVm.pc = (u8 *)b;
+         return a >> 16;
+     }
+ }
+@@ -356,7 +356,7 @@ s32 Script_ReadNextKeyword(void)
+ s32 Script_ReadValue(const void *p)
+ {
+     s32 a, b;
+-    gUnk_02000610.pc = Script_DecodeOperand((u8 *)p, &a, &b);
++    gScriptVm.pc = Script_DecodeOperand((u8 *)p, &a, &b);
+     return b;
+ }
+ 
+@@ -370,7 +370,7 @@ s32 Script_ReadVector32(u8 *p, s32 *destination)
+         p = Script_DecodeOperand(p, &type, &value);
+         vector[count] = value;
+     }
+-    gUnk_02000610.pc = p;
++    gScriptVm.pc = p;
+     return 0;
+ }
+ 
+@@ -384,7 +384,7 @@ s32 Script_ReadVector16(u8 *p, s16 *destination)
+         p = Script_DecodeOperand(p, &type, &value);
+         vector[count] = value;
+     }
+-    gUnk_02000610.pc = p;
++    gScriptVm.pc = p;
+     return 0;
+ }
+ 
+@@ -392,8 +392,8 @@ u32 Script_ReadValueSafe(u8 *p)
+ {
+     s32 a, b;
+     if (p) {
+-        gUnk_02000610.pc = Script_DecodeOperand(p, &a, &b);
+-        if (gUnk_02000610.pc)
++        gScriptVm.pc = Script_DecodeOperand(p, &a, &b);
++        if (gScriptVm.pc)
+             return b;
+     }
+     return 0;
+@@ -408,13 +408,13 @@ s32 Script_ParseStringRef(const void *pc)
+ {
+     const u8 *p = pc;
+     s32 v = (s16)((p[2] << 8) | p[1]);
+-    gUnk_02000610.pc = (u8 *)p + 3;
++    gScriptVm.pc = (u8 *)p + 3;
+     return v;
+ }
+ 
+ void Script_ReadReference(struct ScriptUtilityReference *ref)
+ {
+-    gUnk_02000610.pc = Script_DecodeVariableReference(Script_GetPc(), ref);
++    gScriptVm.pc = Script_DecodeVariableReference(Script_GetPc(), ref);
+ }
+ 
+ /* Gap: scans operands from a hidden cursor argument until the terminating zero
+@@ -426,7 +426,7 @@ u8 *sub_0821AAF4(u8 *p)
+     u8 **pc;
+     do {
+         p = Script_DecodeOperand(p, &type, &value);
+-        pc = &gUnk_02000610.pc;
++        pc = &gScriptVm.pc;
+     } while (type != 0);
+     *pc = (u8 *)type;
+     return p;
+@@ -434,7 +434,7 @@ u8 *sub_0821AAF4(u8 *p)
+ 
+ u8 *Script_GetPc(void)
+ {
+-    u8 *p = gUnk_02000610.pc;
++    u8 *p = gScriptVm.pc;
+     if (p == 0 || *p == 0 || (*p & 0xF0) == 0x50)
+         return 0;
+     return p;
+@@ -500,13 +500,13 @@ void Script_ResetStacks(void)
+ 
+ void Script_ClearCommandTables(void)
+ {
+-    gUnk_02000458 = 0;
++    gScriptNativeCommandTables = 0;
+ }
+ 
+ u32 Script_RegisterCommandTable(struct ScriptCommandTable *n)
+ {
+-    n->next = gUnk_02000458;
+-    gUnk_02000458 = n;
++    n->next = gScriptNativeCommandTables;
++    gScriptNativeCommandTables = n;
+     return 0;
+ }
+ 
+@@ -517,9 +517,9 @@ s32 sub_0821ABF8(struct ScriptCommandTable *n)
+ {
+     struct ScriptCommandTable *cur;
+     struct ScriptCommandTable *prev;
+-    if (gUnk_02000458 == n)
+-        gUnk_02000458 = n->next;
+-    cur = gUnk_02000458;
++    if (gScriptNativeCommandTables == n)
++        gScriptNativeCommandTables = n->next;
++    cur = gScriptNativeCommandTables;
+     prev = cur;
+     while (cur != 0) {
+         if (cur == n) {
+@@ -534,7 +534,7 @@ s32 sub_0821ABF8(struct ScriptCommandTable *n)
+ 
+ struct ScriptCommandEntry *Script_FindCommand(u32 key)
+ {
+-    struct ScriptCommandTable *b = gUnk_02000458;
++    struct ScriptCommandTable *b = gScriptNativeCommandTables;
+     while (b) {
+         struct ScriptCommandEntry *e = b->entries;
+         s32 n = b->count;
+@@ -635,7 +635,7 @@ void *sub_0821AD98(void *table, u32 key, s32 count)
+ 
+ u8 *Text_LookupString(s32 id)
+ {
+-    u8 **sections = gUnk_02000448;
++    u8 **sections = gScriptSections;
+     u8 *e = (u8 *)((id << 2) + (u32)sections[1]);
+     u32 v = (e[3] << 24) | (e[2] << 16) | (e[1] << 8) | e[0];
+     return sections[2] + (v & 0x7FFFFFFF);
+@@ -656,10 +656,10 @@ s32 Script_LoadScript(u8 *p)
+     base = (u8 *)Script_ReadProcTable((u32 *)p, &count);
+     ctx->entries = (u32 *)p;
+     ctx->count = count;
+-    gUnk_02000448[0] = base;
+-    gUnk_02000448[1] = base + read_word(base + 4);
+-    gUnk_02000448[2] = base + read_word(base + 8);
+-    gUnk_02000448[3] = base + read_word(base + 12);
++    gScriptSections[0] = base;
++    gScriptSections[1] = base + read_word(base + 4);
++    gScriptSections[2] = base + read_word(base + 8);
++    gScriptSections[3] = base + read_word(base + 12);
+     base += read_word(base);
+     ctx->body = base + 4;
+     {
+@@ -677,7 +677,7 @@ s32 Script_LoadScript(u8 *p)
+ 
+ u8 *sub_0821AED0(void)
+ {
+-    return gUnk_02000448[3] + 4;
++    return gScriptSections[3] + 4;
+ }
+ 
+ /* Script_SaveContext: Copies the loaded script context and section pointers into caller storage */
+@@ -691,7 +691,7 @@ struct Block0821AEDC {
+ void sub_0821AEDC(struct Block0821AEDC *dst)
+ {
+     dst[0] = *(struct Block0821AEDC *)&gScriptProcedureTable;
+-    dst[1] = *(struct Block0821AEDC *)&gUnk_02000448;
++    dst[1] = *(struct Block0821AEDC *)&gScriptSections;
+ }
+ 
+ /* Script_RestoreContext: Restores the loaded script context and section pointers from caller storage */
+@@ -705,7 +705,7 @@ struct Block0821AF04 {
+ void sub_0821AF04(struct Block0821AF04 *src)
+ {
+     gScriptProcedureTable = *(struct ScriptProcedureTable *)&src[0];
+-    *(struct Block0821AF04 *)gUnk_02000448 = src[1];
++    *(struct Block0821AF04 *)gScriptSections = src[1];
+ }
+ 
+ u32 Script_ExecuteBlock(u8 *p, u32 a, u32 b)
+@@ -725,12 +725,12 @@ u32 Script_ExecuteBlock(u8 *p, u32 a, u32 b)
+                 break;
+             case 0x70:
+                 p = Script_DecodePacket(p, &length);
+-                gUnk_02000610.result = Script_CallInlineProcedure(p);
++                gScriptVm.result = Script_CallInlineProcedure(p);
+                 p += length;
+                 break;
+             case 0x30:
+                 p = Script_DecodePacket(p, &length);
+-                gUnk_02000610.result = Script_EvalExpression(p);
++                gScriptVm.result = Script_EvalExpression(p);
+                 p += length;
+                 break;
+             case 0:
+@@ -747,8 +747,8 @@ done:
+ u32 Script_RunBlock(u32 a, struct ScriptUtilityArguments *b)
+ {
+     if (Script_ExecuteBlock((u8 *)a, (u32)b, 0) == 1)
+-        return gUnk_02000610.result;
+-    return gUnk_02000610.result = 0;
++        return gScriptVm.result;
++    return gScriptVm.result = 0;
+ }
+ 
+ extern const u8 gUnk_08614184[];
+@@ -758,8 +758,8 @@ u32 Script_RunProcedureBlock(u32 a, const u8 *b, u32 c)
+     if (b == 0)
+         b = gUnk_08614184;
+     if (Script_ExecuteBlock((u8 *)a, (u32)b, c) == 1)
+-        return gUnk_02000610.result;
+-    return gUnk_02000610.result = 0;
++        return gScriptVm.result;
++    return gScriptVm.result = 0;
+ }
+ 
+ void Script_RunMainBlock(void)
+@@ -1184,7 +1184,7 @@ s32 Script_SetResultFromOperand(u8 *p)
+ {
+     s32 a, b;
+     Script_DecodeOperand(p, &a, &b);
+-    gUnk_02000610.result = b;
++    gScriptVm.result = b;
+     return 0;
+ }
+ 
+@@ -1192,9 +1192,9 @@ s32 Script_ExecuteReturn(void)
+ {
+     u8 *p = Script_GetPc();
+     if (p)
+-        gUnk_02000610.result = Script_GetValue();
++        gScriptVm.result = Script_GetValue();
+     else
+-        gUnk_02000610.result = (u32)p;
++        gScriptVm.result = (u32)p;
+     return 1;
+ }
+ 
+@@ -1348,7 +1348,7 @@ u32 Script_EvalExpression(u8 *p)
+             p = Script_DecodeOperand(p, &frame.type, &frame.value);
+             if (frame.type == 0x80) {
+                 Script_ExecuteBlock((u8 *)frame.value, 0, 0);
+-                ((struct Slot *)((u32)slot + 8))->value = gUnk_02000610.result;
++                ((struct Slot *)((u32)slot + 8))->value = gScriptVm.result;
+             } else
+                 ((struct Slot *)((u32)slot + 8))->value = frame.value;
+             slot = (struct Slot *)((u32)slot + 8);
+diff --git a/symbols/ram.csv b/symbols/ram.csv
+index 50e0ed247..8bc339d45 100644
+--- a/symbols/ram.csv
++++ b/symbols/ram.csv
+@@ -156,8 +156,8 @@ addr,name,size,kind,decl,header,confidence,notes
+ 02000420,gScreenDelayParameters,8,object,extern struct ScreenDelayParameters gScreenDelayParameters;,include/ram.h,low,
+ 02000428,gScriptCommandTable,C,object,extern struct ScriptCommandTable gScriptCommandTable;,include/ram.h,low,
+ 02000438,gScriptProcedureTable,10,object,extern struct ScriptProcedureTable gScriptProcedureTable;,include/script_virtual_machine.h,low,
+-02000448,gUnk_02000448,10,object,,,,
+-02000458,gUnk_02000458,4,object,,,,
++02000448,gScriptSections,10,object,extern u8 *gScriptSections[4];,include/script_virtual_machine.h,low,section base pointers resolved from the loaded script header
++02000458,gScriptNativeCommandTables,4,object,extern struct ScriptCommandTable *gScriptNativeCommandTables;,include/script_virtual_machine.h,low,head of the registered native script command tables
+ 02000468,gPaletteController,4,object,extern struct PaletteController *gPaletteController;,include/palette_controller.h,low,
+ 0200046C,gFallingObjectManager,4,object,extern struct FallingObjectManager *gFallingObjectManager;,include/falling_objects.h,low,
+ 02000470,gShadowRegistry,4,object,extern u32 gShadowRegistry;,include/ram.h,low,shadow registry task (ShadowRegistry_*)
+@@ -230,7 +230,7 @@ addr,name,size,kind,decl,header,confidence,notes
+ 02000604,gEnemyParticlePool,4,object,extern u32 gEnemyParticlePool;,include/ram.h,low,enemy particle pool (EnemyParticle_*)
+ 02000608,gForgingBook,4,object,extern u32 gForgingBook;,include/ram.h,low,forging book task (ForgingBook_*)
+ 0200060C,gSaveSignature,4,object,extern u32 gSaveSignature;,include/ram.h,low,signature word of the main save state
+-02000610,gUnk_02000610,70,object,,,,
++02000610,gScriptVm,70,object,extern struct ScriptVm gScriptVm;,include/script_virtual_machine.h,low,script virtual machine state
+ 02000700,gUnk_02000700,4,object,,,,
+ 02000704,gUnk_02000704,4,object,,,,
+ 02000708,gUnk_02000708,4,object,,,,
+-- 
+2.39.3 (Apple Git-145)
+

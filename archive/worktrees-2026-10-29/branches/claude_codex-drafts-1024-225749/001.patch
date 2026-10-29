@@ -1,0 +1,166 @@
+From 8cf282e993844b12a87b42a1b62d84701c27c518 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Sat, 24 Oct 2026 23:02:34 -0700
+Subject: [PATCH] Draft StatusScreen_DrawSunSpans (sub_0800E5B8) (NONMATCHING,
+ 70 ROM / 64 draft)
+
+Phase-1 scope campaign worker.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ include/numeric_overlay.h |  2 +-
+ include/status_screen.h   |  2 +-
+ src/status_screen.c       | 91 ++++++++++++++++++++++++++++++++++++++-
+ symbols/functions.csv     |  1 +
+ 4 files changed, 92 insertions(+), 4 deletions(-)
+
+diff --git a/include/numeric_overlay.h b/include/numeric_overlay.h
+index 5974726a5..26d186aa9 100644
+--- a/include/numeric_overlay.h
++++ b/include/numeric_overlay.h
+@@ -5,7 +5,7 @@
+ #include "status_screen.h"
+ 
+ // Tentative: a lightweight sibling of the status screen: it loads the same background map and
+-// palette, draws the same counter display (sub_0800F4EC mirrors sub_0800E5B8) but has no fades
++// palette, draws the same counter display (sub_0800F4EC mirrors StatusScreen_DrawSunSpans) but has no fades
+ // or scanline transition. Its task object is 0x2C bytes.
+ struct NumericOverlay {
+     u8 task[24];
+diff --git a/include/status_screen.h b/include/status_screen.h
+index bbe91875e..b97e30ee9 100644
+--- a/include/status_screen.h
++++ b/include/status_screen.h
+@@ -66,7 +66,7 @@ struct BgMapInfo {
+ u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y); // address of a tile in the background's tilemap
+ void NumericDisplay_DrawPair(void *unused, int left, int right);
+ void NumericDisplay_DrawStatusValues(struct StatusScreen *);
+-void sub_0800E5B8(struct StatusScreen *);
++void StatusScreen_DrawSunSpans(struct StatusScreen *);
+ void StatusScreen_RefreshDirtyDisplays(struct StatusScreen *);
+ int StatusScreen_CheckConfirm(struct StatusScreen *);
+ void StatusScreen_Close(struct StatusScreen *);
+diff --git a/src/status_screen.c b/src/status_screen.c
+index ae3f4b22a..2f0425c5c 100644
+--- a/src/status_screen.c
++++ b/src/status_screen.c
+@@ -99,7 +99,94 @@ void NumericDisplay_DrawStatusValues(struct StatusScreen *unused)
+     }
+ }
+ 
+-INCLUDE_ASM("asm/nonmatching", sub_0800E5B8);
++#ifdef NONMATCHING
++// fuzzy: 65.9%
++// scope shape 58 (differences once low registers are set aside)
++void StatusScreen_DrawSunSpans(struct StatusScreen *unused)
++{
++    int digits[2];
++    s16 *dst;
++    int row, col, n, base;
++    int *values;
++    u32 hours, minutes;
++    struct StatusGameState *c = &gUnk_03005430;
++    if (!c)
++        return;
++    if (c->mode == 0 || c->mode == 4 || c->mode == 5) {
++        dst = (s16 *)StatusScreen_GetTilePtr(0, 4, 15);
++        hours = gUnk_03005430.altCounters[0];
++        minutes = gUnk_03005430.altCounters[1];
++    } else {
++        dst = (s16 *)StatusScreen_GetTilePtr(0, 4, 15);
++        hours = gUnk_03005430.counters[0];
++        minutes = gUnk_03005430.counters[1];
++    }
++    for (row = 0; row < 2; row++) {
++        int shift = row << 4;
++        int tile = shift + 0x6a;
++        s16 *out = dst;
++        for (col = 0; col < 4; col++)
++            *out++ = (tile + col) | -12288;
++        dst += gUnk_03004C30[0].width * 2;
++    }
++
++    dst = (s16 *)StatusScreen_GetTilePtr(0, 8, 15);
++    if (gUnk_03005430.mode == 0 || gUnk_03005430.mode == 4 || gUnk_03005430.mode == 5) {
++        n = 2;
++        base = 0x6e;
++    } else {
++        n = 2;
++        base = 0x4e;
++    }
++    for (row = 0; row < 2; row++) {
++        int shift = row << 4;
++        s16 *out = dst;
++        for (col = 0; col < n; col++)
++            *out++ = (shift + base + col) | -12288;
++        dst += gUnk_03004C30[0].width * 2;
++    }
++
++    digits[0] = Div(hours, 10);
++    digits[1] = hours - digits[0] * 10;
++    dst = (s16 *)StatusScreen_GetTilePtr(0, 16, 15);
++    do {
++        row = 0;
++        values = digits;
++    } while (0);
++    for (; row < 2; row++) {
++        int shift = row << 4;
++        int *digit = values;
++        s16 *out = dst;
++        for (col = 0; col < 2; col++) {
++            int tile = *digit++ + 0x60;
++            *out++ = shift + tile | -12288;
++        }
++        dst += gUnk_03004C30[0].width * 2;
++    }
++
++    digits[0] = Div(minutes, 10);
++    digits[1] = minutes - digits[0] * 10;
++    dst = (s16 *)StatusScreen_GetTilePtr(0, 22, 15);
++    row = 0;
++    values = digits;
++    for (; row < 2;) {
++        int next = row + 1;
++        row <<= 4;
++        {
++            int *digit = values;
++            s16 *out = dst;
++            for (col = 0; col < 2; col++) {
++                int tile = *digit++ + 0x60;
++                *out++ = row + tile | -12288;
++            }
++            dst += gUnk_03004C30[0].width * 2;
++        }
++        row = next;
++    }
++}
++#else
++INCLUDE_ASM("asm/nonmatching", StatusScreen_DrawSunSpans);
++#endif
+ 
+ void StatusScreen_RefreshDirtyDisplays(struct StatusScreen *s)
+ {
+@@ -110,7 +197,7 @@ void StatusScreen_RefreshDirtyDisplays(struct StatusScreen *s)
+     if (s->dirty & 2)
+         NumericDisplay_DrawStatusValues(s);
+     if (s->dirty & 4)
+-        sub_0800E5B8(s);
++        StatusScreen_DrawSunSpans(s);
+     s->dirty = 0;
+ }
+ 
+diff --git a/symbols/functions.csv b/symbols/functions.csv
+index eb42a1820..cd5eb6515 100644
+--- a/symbols/functions.csv
++++ b/symbols/functions.csv
+@@ -301,6 +301,7 @@ addr,name,mode,confidence,source,notes
+ 0800E3E0,StatusScreen_GetTilePtr,thumb,low,src-alias,"computes the tilemap pointer for tile (x,y) on background bg (gUnk_03004C30); used by the digit-drawing helpers to locate tiles to write"
+ 0800E408,NumericDisplay_DrawPair,thumb,low,src-alias,
+ 0800E4DC,NumericDisplay_DrawStatusValues,thumb,low,src-alias,
++0800E5B8,StatusScreen_DrawSunSpans,thumb,low,src-alias,Draws the sun-span labels (two layouts by light mode 0/4/5) and the span hours and minutes as two-digit numbers
+ 0800E77C,StatusScreen_RefreshDirtyDisplays,thumb,low,src-alias,called from StatusScreen_Update; redraws whichever numeric/overlay pieces s->dirty flags mark before clearing them
+ 0800E7D8,StatusScreen_CheckConfirm,thumb,low,src-alias,
+ 0800E838,StatusScreen_Close,thumb,low,src-alias,
+-- 
+2.39.3 (Apple Git-145)
+

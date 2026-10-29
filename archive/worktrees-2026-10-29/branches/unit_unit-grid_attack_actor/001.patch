@@ -1,0 +1,5110 @@
+From 8a80a317475aa7d7d7f45a6d6103ce946f572a0b Mon Sep 17 00:00:00 2001
+From: Moozilla <moozilla@protonmail.com>
+Date: Sun, 18 Oct 2026 13:32:20 -0700
+Subject: [PATCH] Unit grid_attack_actor: merge 63 files into
+ src/grid_attack_actor.c
+
+Grid attack actor (tentative) (080297E8-0802C678); tools/unitize.py, build OK, matched bytes 907294 -> 907294.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ include/grid_attack_actor.h |  296 ++++++++
+ notes/grid_attack_actor.md  |   92 +++
+ src/fn/sub_080297E8.c       |   11 -
+ src/fn/sub_080297FC.c       |   22 -
+ src/fn/sub_08029904.c       |    5 -
+ src/fn/sub_08029908.c       |   28 -
+ src/fn/sub_080299B4.c       |   28 -
+ src/fn/sub_08029A4C.c       |   12 -
+ src/fn/sub_08029A78.c       |   12 -
+ src/fn/sub_08029AA8.c       |   36 -
+ src/fn/sub_08029CC0.c       |   83 --
+ src/fn/sub_08029E1C.c       |   10 -
+ src/fn/sub_08029E2C.c       |   30 -
+ src/fn/sub_08029EB4.c       |   38 -
+ src/fn/sub_08029F64.c       |   25 -
+ src/fn/sub_08029FB0.c       |   24 -
+ src/fn/sub_08029FF8.c       |   65 --
+ src/fn/sub_0802A0B8.c       |   74 --
+ src/fn/sub_0802A188.c       |  144 ----
+ src/fn/sub_0802A400.c       |   83 --
+ src/fn/sub_0802A4F4.c       |   63 --
+ src/fn/sub_0802A53C.c       |   64 --
+ src/fn/sub_0802A5A0.c       |  102 ---
+ src/fn/sub_0802A63C.c       |   87 ---
+ src/fn/sub_0802A714.c       |   61 --
+ src/fn/sub_0802A758.c       |   23 -
+ src/fn/sub_0802A7A8.c       |   72 --
+ src/fn/sub_0802A82C.c       |   23 -
+ src/fn/sub_0802A87C.c       |   23 -
+ src/fn/sub_0802A8CC.c       |   68 --
+ src/fn/sub_0802A958.c       |   64 --
+ src/fn/sub_0802A9C0.c       |   64 --
+ src/fn/sub_0802AA28.c       |   80 --
+ src/fn/sub_0802AAD4.c       |   10 -
+ src/fn/sub_0802AAF4.c       |   32 -
+ src/fn/sub_0802AB4C.c       |  138 ----
+ src/fn/sub_0802AD0C.c       |   61 --
+ src/fn/sub_0802AFE8.c       |   33 -
+ src/fn/sub_0802B02C.c       |   30 -
+ src/fn/sub_0802B070.c       |   42 --
+ src/fn/sub_0802B0E0.c       |   33 -
+ src/fn/sub_0802B130.c       |   33 -
+ src/fn/sub_0802B180.c       |   42 --
+ src/fn/sub_0802B1F0.c       |   33 -
+ src/fn/sub_0802B240.c       |   42 --
+ src/fn/sub_0802B2B0.c       |   43 --
+ src/fn/sub_0802B31C.c       |    7 -
+ src/fn/sub_0802B338.c       |   69 --
+ src/fn/sub_0802B3E4.c       |   62 --
+ src/fn/sub_0802B440.c       |   69 --
+ src/fn/sub_0802B4B8.c       |   69 --
+ src/fn/sub_0802B530.c       |   75 --
+ src/fn/sub_0802B5C0.c       |   30 -
+ src/fn/sub_0802B5F8.c       |   68 --
+ src/fn/sub_0802B660.c       |   72 --
+ src/fn/sub_0802B6D4.c       |   17 -
+ src/fn/sub_0802B6F8.c       |   12 -
+ src/fn/sub_0802B714.c       |    7 -
+ src/fn/sub_0802B730.c       |   14 -
+ src/fn/sub_0802B76C.c       |    7 -
+ src/fn/sub_0802B788.c       |    7 -
+ src/fn/sub_0802B7A4.c       |   16 -
+ src/fn/sub_0802BF30.c       |   26 -
+ src/fn/sub_0802BF88.c       |   16 -
+ src/fn/sub_0802C620.c       |   26 -
+ src/grid_attack_actor.c     | 1414 +++++++++++++++++++++++++++++++++++
+ 66 files changed, 1802 insertions(+), 2765 deletions(-)
+ create mode 100644 include/grid_attack_actor.h
+ create mode 100644 notes/grid_attack_actor.md
+ delete mode 100644 src/fn/sub_080297E8.c
+ delete mode 100644 src/fn/sub_080297FC.c
+ delete mode 100644 src/fn/sub_08029904.c
+ delete mode 100644 src/fn/sub_08029908.c
+ delete mode 100644 src/fn/sub_080299B4.c
+ delete mode 100644 src/fn/sub_08029A4C.c
+ delete mode 100644 src/fn/sub_08029A78.c
+ delete mode 100644 src/fn/sub_08029AA8.c
+ delete mode 100644 src/fn/sub_08029CC0.c
+ delete mode 100644 src/fn/sub_08029E1C.c
+ delete mode 100644 src/fn/sub_08029E2C.c
+ delete mode 100644 src/fn/sub_08029EB4.c
+ delete mode 100644 src/fn/sub_08029F64.c
+ delete mode 100644 src/fn/sub_08029FB0.c
+ delete mode 100644 src/fn/sub_08029FF8.c
+ delete mode 100644 src/fn/sub_0802A0B8.c
+ delete mode 100644 src/fn/sub_0802A188.c
+ delete mode 100644 src/fn/sub_0802A400.c
+ delete mode 100644 src/fn/sub_0802A4F4.c
+ delete mode 100644 src/fn/sub_0802A53C.c
+ delete mode 100644 src/fn/sub_0802A5A0.c
+ delete mode 100644 src/fn/sub_0802A63C.c
+ delete mode 100644 src/fn/sub_0802A714.c
+ delete mode 100644 src/fn/sub_0802A758.c
+ delete mode 100644 src/fn/sub_0802A7A8.c
+ delete mode 100644 src/fn/sub_0802A82C.c
+ delete mode 100644 src/fn/sub_0802A87C.c
+ delete mode 100644 src/fn/sub_0802A8CC.c
+ delete mode 100644 src/fn/sub_0802A958.c
+ delete mode 100644 src/fn/sub_0802A9C0.c
+ delete mode 100644 src/fn/sub_0802AA28.c
+ delete mode 100644 src/fn/sub_0802AAD4.c
+ delete mode 100644 src/fn/sub_0802AAF4.c
+ delete mode 100644 src/fn/sub_0802AB4C.c
+ delete mode 100644 src/fn/sub_0802AD0C.c
+ delete mode 100644 src/fn/sub_0802AFE8.c
+ delete mode 100644 src/fn/sub_0802B02C.c
+ delete mode 100644 src/fn/sub_0802B070.c
+ delete mode 100644 src/fn/sub_0802B0E0.c
+ delete mode 100644 src/fn/sub_0802B130.c
+ delete mode 100644 src/fn/sub_0802B180.c
+ delete mode 100644 src/fn/sub_0802B1F0.c
+ delete mode 100644 src/fn/sub_0802B240.c
+ delete mode 100644 src/fn/sub_0802B2B0.c
+ delete mode 100644 src/fn/sub_0802B31C.c
+ delete mode 100644 src/fn/sub_0802B338.c
+ delete mode 100644 src/fn/sub_0802B3E4.c
+ delete mode 100644 src/fn/sub_0802B440.c
+ delete mode 100644 src/fn/sub_0802B4B8.c
+ delete mode 100644 src/fn/sub_0802B530.c
+ delete mode 100644 src/fn/sub_0802B5C0.c
+ delete mode 100644 src/fn/sub_0802B5F8.c
+ delete mode 100644 src/fn/sub_0802B660.c
+ delete mode 100644 src/fn/sub_0802B6D4.c
+ delete mode 100644 src/fn/sub_0802B6F8.c
+ delete mode 100644 src/fn/sub_0802B714.c
+ delete mode 100644 src/fn/sub_0802B730.c
+ delete mode 100644 src/fn/sub_0802B76C.c
+ delete mode 100644 src/fn/sub_0802B788.c
+ delete mode 100644 src/fn/sub_0802B7A4.c
+ delete mode 100644 src/fn/sub_0802BF30.c
+ delete mode 100644 src/fn/sub_0802BF88.c
+ delete mode 100644 src/fn/sub_0802C620.c
+ create mode 100644 src/grid_attack_actor.c
+
+diff --git a/include/grid_attack_actor.h b/include/grid_attack_actor.h
+new file mode 100644
+index 000000000..d56981d37
+--- /dev/null
++++ b/include/grid_attack_actor.h
+@@ -0,0 +1,296 @@
++#ifndef GUARD_GRID_ATTACK_ACTOR_H
++
++#define GUARD_GRID_ATTACK_ACTOR_H
++
++#include "engine.h"
++
++#include "scene_vec.h"
++#include "contact_actor.h"
++#include "scene_event_dispatch.h"
++
++/* Grid attack actor (tentative), allocation size 0x924. Unknown spans are
++ * retained; behavioral field names are provisional. */
++
++struct GridAttackPacked {
++    s32 x : 16, y : 16, z : 16, pad : 16;
++};
++
++/* Word-aligned position copy used by the original compiler. */
++
++struct GridAttackPoint {
++    u32 a, b;
++};
++
++struct GridAttackPacket {
++    u16 id;
++    u8 kind, zero;
++    u16 reserved;
++    u8 command, count;
++    u16 args[1];
++};
++
++struct GridAttackTransform {
++    u8 unknown0[9];
++    u8 angle;
++    u8 unknownA[2];
++    struct GridAttackPoint coordinates;
++};
++
++struct GridAttackAnimData {
++    u8 unknown0[0xC];
++    void *palette;
++    u8 unknown10[0xC];
++};
++
++struct GridAttackDrawable {
++    u8 sprite[0x1C];
++    u8 position[0x10];
++};
++
++struct GridAttackActor {
++    u8 unknown0[0x48];
++    struct GridAttackTransform transform; /* 0x48 */
++
++    u8 unknown5C[0x34];
++    u32 timer;     /* 0x90 */
++    s16 health;    /* 0x94 */
++    s16 maxHealth; /* 0x96 */
++    u8 unknown98[0x2];
++    u8 healthCheck; /* 0x9A */
++    u8 unknown9B[0x1];
++    u32 flags; /* 0x9C */
++    u8 unknownA0[0x1];
++    u8 controllerReset; /* 0xA1 */
++    u8 stateReset;      /* 0xA2 */
++    u8 unknownA3[0x1];
++    u32 pending;       /* 0xA4 */
++    u8 facing;         /* 0xA8 */
++    u8 facing8;        /* 0xA9 */
++    u8 requested;      /* 0xAA */
++    u8 state;          /* 0xAB */
++    u8 active;         /* 0xAC */
++    u8 actionReset;    /* 0xAD */
++    u8 action;         /* 0xAE */
++    u8 finished;       /* 0xAF */
++    u8 entered;        /* 0xB0 */
++    u8 changed;        /* 0xB1 */
++    u8 animationEnded; /* 0xB2 */
++    u8 locked;         /* 0xB3 */
++    u8 unknownB4[0x2];
++    u8 animationMode;  /* 0xB6 */
++    u8 animationSpeed; /* 0xB7 */
++    u8 unknownB8[4];
++    s32 contactSource;  /* 0xBC */
++    u32 contactFlags;   /* 0xC0 */
++    u32 actionTimer;    /* 0xC4 */
++    u32 targetDistance; /* 0xC8 */
++    u8 requestedAngle;  /* 0xCC */
++    u8 unknownCD[0x3];
++    struct GridAttackPoint savedPosition; /* 0xD0 */
++    u8 unknownD8[0x9];
++    u8 attackRange;            /* 0xE1 */
++    u8 contactRewardParameter; /* 0xE2 */
++    u8 unknownE3;
++    u32 effectTimer; /* 0xE4 */
++    u8 unknownE8[8];
++    u32 scriptArgs[4];        /* 0xF0 */
++    void (*callback)(void *); /* 0x100 */
++    u8 (*tryUpdate)(void *);  /* 0x104 */
++    u8 (*reset)(void *);      /* 0x108 */
++    u8 *damageSource;         /* 0x10C */
++    s16 *targetPosition;      /* 0x110 */
++    s8 savedAngle;            /* 0x114 */
++    u8 unknown115[0x3];
++    struct SceneEventReceiver receiver; /* 0x118 */
++    u8 unknown140[0x34];
++    u32 targetCount; /* 0x174 */
++    s32 damage;      /* 0x178 */
++    u8 special;      /* 0x17C */
++    u8 unknown17D[0x1];
++    u8 damageAngle; /* 0x17E */
++    u8 stage;       /* 0x17F */
++    u32 counter;    /* 0x180 */
++    s16 height;     /* 0x184 */
++    u8 unknown186[6];
++    s16 flash;          /* 0x18C */
++    s16 stun;           /* 0x18E */
++    u16 actionDuration; /* 0x190 */
++    u16 bodyMode;       /* 0x192 */
++    u8 shakeAngle;      /* 0x194 */
++    u8 shake;           /* 0x195 */
++    u8 unknown196[0x1];
++    u8 reactionCooldown;       /* 0x197 */
++    s32 accumulated;           /* 0x198 */
++    s32 threshold;             /* 0x19C */
++    s16 attackCount;           /* 0x1A0 */
++    u8 forceAction;            /* 0x1A2 */
++    u8 attackAnimationHistory; /* 0x1A3 */
++    s16 attackLimit;           /* 0x1A4 */
++    u8 contactCountLimit;      /* 0x1A6 */
++    u8 messageParameter;       /* 0x1A7 */
++    u8 linkedActorPhase;       /* 0x1A8 */
++    u8 unknown1A9[0x1];
++    u16 phaseTimer;            /* 0x1AA */
++    s16 attackPower;           /* 0x1AC */
++    s16 attackKind;            /* 0x1AE */
++    s16 attackParameter;       /* 0x1B0 */
++    s16 projectileDamage;      /* 0x1B2 */
++    u16 targetAttackParameter; /* 0x1B4 */
++    u8 nearAttackDelay;        /* 0x1B6 */
++    u8 farAttackDelay;         /* 0x1B7 */
++    s16 contactReward;         /* 0x1B8 */
++    s8 effectVariant;          /* 0x1BA */
++    u8 effectDirection;
++    u8 effectMode;     /* 0x1BC */
++    u8 effectDuration; /* 0x1BD */
++    u8 unknown1BE[0x2];
++    u32 effectId;      /* 0x1C0 */
++    u8 palette[0x200]; /* 0x1C4 */
++
++    u8 normalDamageGraphics[0x200];      /* 0x3C4 */
++    u8 specialDamageGraphics[0x200];     /* 0x5C4 */
++    struct ContactCollider bodyCollider; /* 0x7C4 */
++    struct ContactCollider damageCollider;
++    struct GridAttackAnimData animData; /* 0x86C */
++
++    struct GridAttackDrawable drawable;    /* 0x888 */
++    struct DisplaySequenceState animation; /* 0x8B4 */
++    void *resource;                        /* 0x8C4 */
++    struct GridAttackPoint shadowPosition; /* 0x8C8 */
++    u8 shadow[0x30];
++    void *projectedDisplay;         /* 0x900 */
++    void *contactPool;              /* 0x904 */
++    void *orbitContact;             /* 0x908 */
++    void *contactBurst;             /* 0x90C */
++    s32 linkedActorId;              /* 0x910 */
++    struct GridAttackPacket packet; /* 0x914 */
++    u8 unknown920[0x4];
++};
++
++void GridAttackActor_RemoveSprite(struct GridAttackActor *p);
++
++void GridAttackActor_SetAnimation(struct GridAttackActor *p, int sequence, int start, int speed);
++
++void GridAttackActor_OnBodyCollision(void);
++
++void GridAttackActor_InitBodyCollider(struct GridAttackActor *p);
++
++void GridAttackActor_InitDamageCollider(struct GridAttackActor *p, int mode);
++
++void GridAttackActor_GetGridPosition(s16 *p, int x, int z);
++
++void GridAttackActor_SpawnGridContact(struct GridAttackActor *p, int x, int z);
++
++void GridAttackActor_SpawnGridPattern(struct GridAttackActor *p);
++
++int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage);
++
++void GridAttackActor_ResetAttackAnimationHistory(struct GridAttackActor *p);
++
++int GridAttackActor_SelectAttackAnimation(struct GridAttackActor *p);
++
++void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p);
++
++void GridAttackActor_RequestLinkedActorState(struct GridAttackActor *p);
++
++void GridAttackActor_NotifyLinkedActorLatePhase(struct GridAttackActor *p);
++
++void GridAttackActor_UpdateIdle(struct GridAttackActor *p);
++
++void GridAttackActor_UpdateGridAttack(struct GridAttackActor *p, int tick);
++
++void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p);
++
++void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick);
++
++void GridAttackActor_UpdateDamageHold(struct GridAttackActor *p);
++
++void GridAttackActor_UpdateDamageRecovery(struct GridAttackActor *p, int tick);
++
++void GridAttack_UpdateStaggerState(struct GridAttackActor *p);
++
++void GridAttack_UpdateDeathState(struct GridAttackActor *p);
++
++void GridAttack_UpdateHiddenState(struct GridAttackActor *p);
++
++void GridAttack_UpdateIdleState(struct GridAttackActor *s);
++
++void GridAttack_UpdateAnimationNineState(struct GridAttackActor *p);
++
++void GridAttack_UpdateAnimationElevenState(struct GridAttackActor *s);
++
++void GridAttack_UpdateAlternateIdleState(struct GridAttackActor *s);
++
++void GridAttack_UpdateRandomAnimationState(struct GridAttackActor *p, int tick);
++
++void GridAttack_UpdateAnimationThreeState(struct GridAttackActor *p);
++
++void GridAttack_UpdateFastAnimationThreeState(struct GridAttackActor *p);
++
++void GridAttack_UpdateTimedHideState(struct GridAttackActor *p, int tick);
++
++void GridAttack_RunStateIfUnpaused(u32 a);
++
++u32 GridAttack_ApplyRequestedState(struct GridAttackActor *p);
++
++int GridAttack_ApplyPendingDamage(struct GridAttackActor *p);
++
++int GridAttack_SelectNextAction(struct GridAttackActor *p);
++
++void GridAttack_UpdateStateNineAction(struct GridAttackActor *p);
++
++void GridAttack_UpdateIdleAction(struct GridAttackActor *p);
++
++void GridAttack_UpdateStateElevenAction(struct GridAttackActor *p);
++
++void GridAttack_UpdateStateTwelveAction(struct GridAttackActor *p);
++
++void GridAttack_UpdateStateThirteenAction(struct GridAttackActor *p);
++
++void GridAttack_UpdateAnimationFourteen(struct GridAttackActor *p);
++
++void GridAttack_UpdateAnimationFifteen(struct GridAttackActor *p);
++
++void GridAttack_UpdateAnimationSixteen(struct GridAttackActor *p);
++
++void GridAttack_UpdateAnimationSeventeen(struct GridAttackActor *p);
++
++void GridAttack_DispatchSpecialAnimation(struct GridAttackActor *p);
++
++int GridAttack_TryStartDamageReaction(struct GridAttackActor *p);
++
++void sub_0802B3E4(struct GridAttackActor *p);
++
++void GridAttack_UpdateActionTwo(struct GridAttackActor *p);
++
++void GridAttack_UpdateDeathAction(struct GridAttackActor *p);
++
++void GridAttack_UpdateAttackAction(struct GridAttackActor *p);
++
++void GridAttack_UpdateAnimationFive(struct GridAttackActor *p);
++
++void GridAttack_UpdateRecoveryAction(struct GridAttackActor *p);
++
++void GridAttack_UpdateDamageAction(struct GridAttackActor *p);
++
++void GridAttack_UpdatePassiveAction(struct GridAttackActor *p);
++
++void GridAttack_DispatchNormalAction(struct GridAttackActor *p);
++
++void GridAttack_DispatchReactionAction(struct GridAttackActor *p);
++
++void GridAttack_UpdateNormalActions(struct GridAttackActor *p);
++
++void GridAttack_UpdateReactionActions(struct GridAttackActor *p);
++
++void GridAttack_UpdateSpecialActions(struct GridAttackActor *p);
++
++void GridAttack_UpdateActionController(struct GridAttackActor *p);
++
++int GridAttack_Update(struct GridAttackActor *p);
++
++u32 GridAttackActor_Destroy(struct GridAttackActor *p);
++
++struct GridAttackActor *GridAttackActor_Create(u32 a);
++
++#endif
+diff --git a/notes/grid_attack_actor.md b/notes/grid_attack_actor.md
+new file mode 100644
+index 000000000..a00b0051c
+--- /dev/null
++++ b/notes/grid_attack_actor.md
+@@ -0,0 +1,92 @@
++# Grid attack actor unit consolidation
++
++Tags: #grid-attack-actor #unit #matching #080297E8 #0802C678
++
++Range: `080297E8–0802C678` (end exclusive). Subsystem interpretation is tentative.
++
++Consolidated all 63 existing matching files into `src/grid_attack_actor.c`, in
++ROM order, with the six existing unmatched functions in their original positions.
++No new function gaps or inventory entries. No commits or shared-doc edits.
++`merge_unit.py --write` performed the merge; its `git rm` removal step was replaced
++at invocation time with filesystem unlinking because this worker must not write
++Git metadata. The tool itself was not changed.
++
++## Layout
++
++`include/grid_attack_actor.h` defines the shared 0x924-byte actor, its transform,
++word-copy position, packed vector, outgoing message packet, animation resource
++header, and drawable. It reuses `ContactCollider`, `SceneEventReceiver`,
++`DisplaySequenceState`, and `SceneVec` from existing headers; engine declarations
++come from `engine.h`, without local redeclarations. The actor's common state,
++action, callback, damage, attack, palette, collider, linked-object and message
++fields are unified rather than kept as per-function partial views.
++
++The old broad animation views included purported scale fields at +0x343 onward.
++They were unused by this unit; initialization actually fills +0x1C4..+0x3C4 with
++sixteen palette banks. The header therefore describes that storage as a palette,
++not as the unrelated animation-view template. +0x3C4 and +0x5C4 hold the two
++additional palette buffers. The header at +0x86C contains its palette pointer at
+++0xC (+0x878 in the actor).
++
++Names and semantic field interpretations remain provisional. New file-local
++aliases describe damage collision, targeted projectile spawning, message
++processing, animation/target updates, collider/palette updates, initialization,
++and the previously unnamed wait action at `0802B3E4`.
++
++## Matching adaptations
++
++Four consumers retain a typed pointer to the transform at +0x48. Direct actor
++field access removes a live base register and changes the original instruction
++sequence. Particle emission likewise retains a typed drawable-base pointer;
++accessing its position through that pointer preserves the original lifetime.
++Packed bitfield vectors preserve the original stack writes; position copies use
++two word fields. State and action helpers retain their distinct original forms
++where differing constant order or byte-return flag materialization matters.
++Task update/destroy callbacks use explicit API casts because their original
++implementations return values ignored by the task engine. No engine prototype
++correction was needed.
++
++Existing register pins/barriers were retained, with the original concession
++markers on the affected functions. `depin.py --write` found all six remaining
++hints necessary; no new pins or barriers were added.
++
++## Unmatched attempts
++
++All six functions received typed C attempts. Only the close collision draft is
++retained in production source, guarded by `NONMATCHING` and scored with
++`tools/check.py --nonmatching --record`:
++
++| Function | Result | Remaining issue |
++|---|---|---|
++| `08029870` | 97.1% guarded draft | Two bytes differ: signed-x load offset uses r1 instead of r3. |
++| `08029BF4` | 29.7%, assembly retained | Stack word copies and random-index register allocation. |
++| `0802ADBC` | 67.7%, assembly retained | Event receiver loop, switch setup, action constant/register order. |
++| `0802B7C8` | 64.9%, assembly retained | Inlined packed animation stepper, fixed-point shaking, target loop. |
++| `0802BAFC` | 56.2%, assembly retained | Collider flag flow and palette blend register allocation. |
++| `0802BFAC` | 69.2%, assembly retained | Large script initializer: stack slots, constants and callback setup. |
++
++Discarded low-score attempts are available locally in ignored
++`build/grid_all_drafts.c` and `build/grid_all_drafts.h`; they are experimental,
++not complete matching C. In particular, their target loops need an array-layout
++review before reuse. The best retained collision attempt used about five focused
++checks; the other attempts were screened once after compilation fixes. Roughly
++25 manual checks and 14 automated depin checks covered consolidation and drafts.
++
++## Validation
++
++The merged default unit checked byte-identical across all 11,920 bytes. An ARM
++layout compilation checked the actor size and 17 key offsets. Formatting and the
++complete build are recorded below after completion.
++
++Exact code coverage in this range stays **62.617% (+0.000 percentage points)**:
++63 matching C functions, 7,464 bytes. No newly matched functions. The collision
++draft is excluded from exact progress. Repository-wide matched bytes must remain
++unchanged; totals remain in `PROGRESS.md`.
++
++Final validation: `make format` completed; `depin.py --write` retained six of six
++existing hints; `tools/build.py` printed **`build/boktai3.gba: OK`**. Local progress
++confirmed no matched-byte decrease. The first complete build encountered missing
++worker-local resource extracts under `build/res/`; 1,136 required files were
++extracted from the ROM and the existing generated assembly's filenames were
++recreated locally. The resumed build passed, without changing shared `gen/`,
++source tools, or symbol inventories. Generated files remain ignored.
+diff --git a/src/fn/sub_080297E8.c b/src/fn/sub_080297E8.c
+deleted file mode 100644
+index 09f592cb2..000000000
+--- a/src/fn/sub_080297E8.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-
+-struct S {
+-    u8 f[0x888];
+-    u8 a;
+-};
+-void Sprite_Remove(void *);
+-void GridAttackActor_RemoveSprite(struct S *p)
+-{
+-    Sprite_Remove(&p->a);
+-}
+diff --git a/src/fn/sub_080297FC.c b/src/fn/sub_080297FC.c
+deleted file mode 100644
+index 52405ea24..000000000
+--- a/src/fn/sub_080297FC.c
++++ /dev/null
+@@ -1,22 +0,0 @@
+-#include "global.h"
+-struct Actor {
+-    u8 pad0[0xb2];
+-    u8 active;
+-    u8 padb3[3];
+-    u8 mode, speed;
+-    u8 padb8[0x7fc];
+-    u8 animation[16];
+-    void *resource;
+-};
+-void Anim_RestartSequence(void *, void *, int, int, int);
+-void Anim_SetSequence(void *, void *, int, int, int);
+-void GridAttackActor_SetAnimation(struct Actor *p, int sequence, int start, int speed)
+-{
+-    p->mode = 0;
+-    p->speed = speed;
+-    if (start) {
+-        Anim_RestartSequence(p->animation, p->resource, (u16)sequence, p->mode, p->speed);
+-        p->active = 0;
+-    } else
+-        Anim_SetSequence(p->animation, p->resource, (u16)sequence, p->mode, p->speed);
+-}
+diff --git a/src/fn/sub_08029904.c b/src/fn/sub_08029904.c
+deleted file mode 100644
+index 27d48b647..000000000
+--- a/src/fn/sub_08029904.c
++++ /dev/null
+@@ -1,5 +0,0 @@
+-#include "global.h"
+-
+-void GridAttackActor_OnBodyCollision(void)
+-{
+-}
+diff --git a/src/fn/sub_08029908.c b/src/fn/sub_08029908.c
+deleted file mode 100644
+index fd7d1938c..000000000
+--- a/src/fn/sub_08029908.c
++++ /dev/null
+@@ -1,28 +0,0 @@
+-#include "global.h"
+-struct Packed {
+-    s32 x : 16, y : 16, z : 16, pad : 16;
+-};
+-void Collider_Init(void *, int, int, int, int, void *, void *);
+-void Collider_SetPosition(void *, void *, int);
+-void Collider_SetCallback(void *, void *, void *);
+-void Collider_SetAttackProperties(void *, int, int, int, int, int);
+-void Collider_SetBodyProperties(void *, int, int, int);
+-s32 Collider_Refresh(void *);
+-void GridAttackActor_OnBodyCollision(void);
+-void sub_08029870(void *, void *, void *);
+-void GridAttackActor_InitBodyCollider(u8 *p)
+-{
+-    u8 *collider = p + 0x7c4;
+-    struct Packed size, offset;
+-    size.x = 64;
+-    size.y = 128;
+-    size.z = 64;
+-    offset.x = 0;
+-    offset.y = 128;
+-    offset.z = 0;
+-    Collider_Init(collider, 0, 0x2401, 0, 16, &size, &offset);
+-    Collider_SetPosition(collider, p + 0x8a4, 0);
+-    Collider_SetCallback(collider, GridAttackActor_OnBodyCollision, p);
+-    Collider_SetAttackProperties(collider, *(s16 *)(p + 0x1ac), *(s16 *)(p + 0x1ae), 0, 0,
+-                                 *(s16 *)(p + 0x1b0));
+-}
+diff --git a/src/fn/sub_080299B4.c b/src/fn/sub_080299B4.c
+deleted file mode 100644
+index edc55049e..000000000
+--- a/src/fn/sub_080299B4.c
++++ /dev/null
+@@ -1,28 +0,0 @@
+-#include "global.h"
+-struct Packed {
+-    s32 x : 16, y : 16, z : 16, pad : 16;
+-};
+-void Collider_Init(void *, int, int, int, int, void *, void *);
+-void Collider_SetPosition(void *, void *, int);
+-void Collider_SetCallback(void *, void *, void *);
+-void Collider_SetAttackProperties(void *, int, int, int, int, int);
+-void Collider_SetBodyProperties(void *, int, int, int);
+-s32 Collider_Refresh(void *);
+-void GridAttackActor_OnBodyCollision(void);
+-void sub_08029870(void *, void *, void *);
+-void GridAttackActor_InitDamageCollider(u8 *p, int mode)
+-{
+-    u8 *collider = p + 0x818;
+-    struct Packed size, offset;
+-    size.x = 96;
+-    size.y = 128;
+-    size.z = 96;
+-    offset.x = 0;
+-    offset.y = 128;
+-    offset.z = 0;
+-    Collider_Init(collider, 0, 0x5101, 0, 16, &size, &offset);
+-    Collider_SetPosition(collider, p + 0x8a4, 0);
+-    Collider_SetCallback(collider, sub_08029870, p);
+-    Collider_SetBodyProperties(collider, mode, 0x808, 4);
+-    Collider_Refresh(collider);
+-}
+diff --git a/src/fn/sub_08029A4C.c b/src/fn/sub_08029A4C.c
+deleted file mode 100644
+index aa2bbfdab..000000000
+--- a/src/fn/sub_08029A4C.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "global.h"
+-void GridAttackActor_GetGridPosition(s16 *p, int x, int z)
+-{
+-    if (x != 1 || z) {
+-        p[0] = (x << 8) + 0xa80;
+-        {
+-            int height = 256;
+-            p[1] = height;
+-        }
+-        p[2] = (z << 8) + 0xa80;
+-    }
+-}
+diff --git a/src/fn/sub_08029A78.c b/src/fn/sub_08029A78.c
+deleted file mode 100644
+index 9f4246283..000000000
+--- a/src/fn/sub_08029A78.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "global.h"
+-struct Vec {
+-    s16 x, y, z, pad;
+-};
+-void GridAttackActor_GetGridPosition(void *, int, int);
+-void ContactSequencePool_SpawnActor(void *, void *, int);
+-void GridAttackActor_SpawnGridContact(u8 *p, int x, int z)
+-{
+-    struct Vec pos;
+-    GridAttackActor_GetGridPosition(&pos, x, z);
+-    ContactSequencePool_SpawnActor(*(void **)(p + 0x904), &pos, x + z * 3);
+-}
+diff --git a/src/fn/sub_08029AA8.c b/src/fn/sub_08029AA8.c
+deleted file mode 100644
+index d37195b82..000000000
+--- a/src/fn/sub_08029AA8.c
++++ /dev/null
+@@ -1,36 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_03005308;
+-extern u16 gUnk_0203B400[];
+-void GridAttackActor_SpawnGridContact(void *, int, int);
+-int sub_08249350(int, int);
+-static inline int randomColumn(u16 *table)
+-{
+-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+-    return sub_08249350(table[gUnk_03005308], 3);
+-}
+-void GridAttackActor_SpawnGridPattern(u8 *p)
+-{
+-    if ((*(s16 **)(p + 0x110))[2] < 0xc00) {
+-        GridAttackActor_SpawnGridContact(p, 0, 0);
+-        GridAttackActor_SpawnGridContact(p, 2, 0);
+-        GridAttackActor_SpawnGridContact(p, 0, 1);
+-        GridAttackActor_SpawnGridContact(p, 1, 1);
+-        GridAttackActor_SpawnGridContact(p, 2, 1);
+-        {
+-            u16 *table = gUnk_0203B400;
+-            GridAttackActor_SpawnGridContact(p, randomColumn(table), 2);
+-            GridAttackActor_SpawnGridContact(p, randomColumn(table), 3);
+-            GridAttackActor_SpawnGridContact(p, randomColumn(table), 4);
+-        }
+-    } else {
+-        GridAttackActor_SpawnGridContact(p, 0, 1);
+-        GridAttackActor_SpawnGridContact(p, 1, 1);
+-        GridAttackActor_SpawnGridContact(p, 2, 1);
+-        {
+-            u16 *table = gUnk_0203B400;
+-            GridAttackActor_SpawnGridContact(p, randomColumn(table), 2);
+-            GridAttackActor_SpawnGridContact(p, randomColumn(table), 3);
+-            GridAttackActor_SpawnGridContact(p, randomColumn(table), 4);
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_08029CC0.c b/src/fn/sub_08029CC0.c
+deleted file mode 100644
+index 3cec9598f..000000000
+--- a/src/fn/sub_08029CC0.c
++++ /dev/null
+@@ -1,83 +0,0 @@
+-#include "global.h"
+-struct Common {
+-    u8 pad0[0x90];
+-    u32 timer;
+-    s16 health, maxHealth;
+-    u8 pad98[4];
+-    u32 flags;
+-    u8 padA0[2];
+-    u8 reset;
+-    u8 padA3;
+-    u32 pending;
+-    u8 facing, facing8, requested, state;
+-    u8 active, actionReset, action, finished, entered, changed;
+-    u8 padB2[0x12];
+-    u32 actionTimer;
+-    u8 padC8[0x38];
+-    void (*callback)(void *);
+-};
+-static inline void state(struct Common *p, void (*fn)(void *), int id)
+-{
+-    int zero;
+-    p->state = id;
+-    zero = 0;
+-    p->callback = fn;
+-    p->timer = zero;
+-    p->changed = 1;
+-    p->reset = zero;
+-    p->pending = zero;
+-}
+-struct Packed {
+-    s32 x : 16, y : 16, z : 16, pad : 16;
+-};
+-void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
+-void GridAttackActor_UpdateDamageHold(void *);
+-void GridAttackActor_UpdateDamageRecovery(void *);
+-void GridAttack_UpdateDeathState(void *);
+-static inline void action(struct Common *p, int id, int zero)
+-{
+-    int one = 1;
+-    p->active = one;
+-    p->actionReset = zero;
+-    p->action = id;
+-    p->actionTimer = zero;
+-    p->entered = one;
+-}
+-int GridAttackActor_OnDamage(struct Common *p, int kind, int damage)
+-{
+-    u8 *position = (u8 *)p + 0x48;
+-    struct Packed size;
+-    switch (kind) {
+-        case 0:
+-            if (damage > 0) {
+-                size.x = 32;
+-                size.y = 0;
+-                size.z = 32;
+-                DamageNumberDisplay_Show((u8 *)p + 0x818, damage, 0, (u8 *)p + 0x54, &size, 1);
+-            }
+-            action(p, 0, 0);
+-            state(p, GridAttackActor_UpdateDamageHold, 5);
+-            break;
+-        case 2:
+-            action(p, 1, 0);
+-            state(p, GridAttackActor_UpdateDamageRecovery, 6);
+-            {
+-                int angle = position[9];
+-                *((u8 *)p + 0x17e) = angle;
+-            }
+-            break;
+-        case 1: {
+-            int angle = (*(u8 **)((u8 *)p + 0x10c))[0x2d];
+-            u8 *dst = (u8 *)p + 0x17e;
+-            int zero = 0;
+-            *dst = angle;
+-            {
+-                u32 mask = 2;
+-                p->flags |= mask;
+-            }
+-            action(p, 3, zero);
+-            state(p, GridAttack_UpdateDeathState, 8);
+-        } break;
+-    }
+-    return 1;
+-}
+diff --git a/src/fn/sub_08029E1C.c b/src/fn/sub_08029E1C.c
+deleted file mode 100644
+index a8dfdd4e7..000000000
+--- a/src/fn/sub_08029E1C.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "global.h"
+-
+-struct S {
+-    u8 f[0x1a3];
+-    u8 a;
+-};
+-void GridAttackActor_ResetAttackAnimationHistory(struct S *p)
+-{
+-    p->a = 0;
+-}
+diff --git a/src/fn/sub_08029E2C.c b/src/fn/sub_08029E2C.c
+deleted file mode 100644
+index 4ba87849b..000000000
+--- a/src/fn/sub_08029E2C.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_03005308;
+-extern u16 gUnk_0203B400[];
+-int GridAttackActor_SelectAttackAnimation(u8 *p)
+-{
+-    int start, i, index;
+-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+-    {
+-        u32 offset = gUnk_03005308 * 2;
+-        {
+-            int value = *(u16 *)((u8 *)gUnk_0203B400 + offset);
+-            value &= 3;
+-            start = value;
+-        }
+-    }
+-    for (i = start; i < start + 4; i++) {
+-        index = i & 3;
+-        if (!((p[0x1a3] >> index) & 1)) {
+-            p[0x1a3] |= 1 << index;
+-            goto done;
+-        }
+-    }
+-    index = start;
+-    {
+-        int mask = 1 << index;
+-        p[0x1a3] = mask;
+-    }
+-done:
+-    return index + 4;
+-}
+diff --git a/src/fn/sub_08029EB4.c b/src/fn/sub_08029EB4.c
+deleted file mode 100644
+index 2e94bd7bd..000000000
+--- a/src/fn/sub_08029EB4.c
++++ /dev/null
+@@ -1,38 +0,0 @@
+-// MATCHING_CONCESSION: register-pinning
+-#include "global.h"
+-struct Packed {
+-    s32 x : 16, y : 16, z : 16, pad : 16;
+-};
+-extern u32 gUnk_03005308;
+-extern u16 gUnk_0203B400[];
+-void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
+-void GridAttackActor_EmitSpriteParticles(u8 *p)
+-{
+-    u8 *graphics = p + 0x888;
+-    struct Packed size;
+-    int i;
+-    for (i = 0; i < 2; i++) {
+-        int angle, speed;
+-        int count;
+-        register u32 index asm("r1");
+-        u32 *indexPtr;
+-        u32 mask;
+-        int smallMask;
+-        register u16 *table asm("r4");
+-        size.x = 164;
+-        size.y = 16;
+-        size.z = 164;
+-        indexPtr = &gUnk_03005308;
+-        mask = 1023;
+-        smallMask = 3;
+-        table = gUnk_0203B400;
+-        index = (*indexPtr + 1) & mask;
+-        angle = (u8)table[index];
+-        index = (index + 1) & mask;
+-        count = (table[index] & smallMask) + 2;
+-        index = (index + 1) & mask;
+-        *indexPtr = index;
+-        speed = (table[index] & smallMask) + 20;
+-        SparkParticle_Spawn(graphics + 0x1c, 3, &size, angle, count, speed, 2, 2);
+-    }
+-}
+diff --git a/src/fn/sub_08029F64.c b/src/fn/sub_08029F64.c
+deleted file mode 100644
+index d9c1386c1..000000000
+--- a/src/fn/sub_08029F64.c
++++ /dev/null
+@@ -1,25 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    u16 id;
+-    u8 kind, zero;
+-    u16 reserved;
+-    u8 command, count;
+-    u16 args[1];
+-} Packet;
+-void SceneMessages_Send(void *);
+-void GridAttackActor_RequestLinkedActorState(u8 *p)
+-{
+-    Packet *packet = (void *)(p + 0x914);
+-    if (*(int *)(p + 0x910) && p[0x1a8] != 0) {
+-        int zero = 0;
+-        p[0x1a8] = zero;
+-        packet->id = *(int *)(p + 0x910);
+-        packet->kind = 5;
+-        packet->zero = 0;
+-        packet->reserved = zero;
+-        packet->command = 1;
+-        packet->count = 1;
+-        packet->args[0] = 3;
+-        SceneMessages_Send(packet);
+-    }
+-}
+diff --git a/src/fn/sub_08029FB0.c b/src/fn/sub_08029FB0.c
+deleted file mode 100644
+index 5d8bb9df4..000000000
+--- a/src/fn/sub_08029FB0.c
++++ /dev/null
+@@ -1,24 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    u16 id;
+-    u8 kind, zero;
+-    u16 reserved;
+-    u8 command, count;
+-    u16 args[1];
+-} Packet;
+-void SceneMessages_Send(void *);
+-void GridAttackActor_NotifyLinkedActorLatePhase(u8 *p)
+-{
+-    Packet *packet = (void *)(p + 0x914);
+-    if (*(int *)(p + 0x910) && p[0x1a8] != 1) {
+-        int zero = 0;
+-        p[0x1a8] = 1;
+-        packet->id = *(int *)(p + 0x910);
+-        packet->kind = 5;
+-        packet->zero = 0;
+-        packet->reserved = zero;
+-        packet->command = 92;
+-        packet->count = 0;
+-        SceneMessages_Send(packet);
+-    }
+-}
+diff --git a/src/fn/sub_08029FF8.c b/src/fn/sub_08029FF8.c
+deleted file mode 100644
+index e5bec8fc9..000000000
+--- a/src/fn/sub_08029FF8.c
++++ /dev/null
+@@ -1,65 +0,0 @@
+-// MATCHING_CONCESSION: register-pinning
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[5];
+-    u8 finished, enter;
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    u8 (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x22e];
+-    u8 variant;
+-    s16 scale, minScale, maxScale, scaleStep;
+-    u8 pad34C[0x60];
+-    u32 mode;
+-} ActorAnimation;
+-
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    register int shifted asm("r0");
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    asm("" : "+r"(shifted));
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    asm("" : "+r"(shifted));
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void GridAttackActor_SetAnimation(void *, int, int, int);
+-void GridAttackActor_ResetAttackAnimationHistory(void *);
+-int GridAttackActor_SelectAttackAnimation(void *);
+-void GridAttackActor_SpawnGridPattern(void *);
+-void Sound_PlaySongChecked(int);
+-void GridAttackActor_UpdateIdle(ActorAnimation *p)
+-{
+-    if (!p->locked)
+-        setFacing(p, p->requestedAngle);
+-    if (p->changed) {
+-        p->changed = 0;
+-        if (p->locked)
+-            setFacing(p, p->savedAngle);
+-        GridAttackActor_SetAnimation(p, 2, 1, 0);
+-    }
+-    if (!p->tryUpdate(p)) {
+-        u32 mask = 64;
+-        p->flags |= mask;
+-        p->reset(p);
+-    }
+-}
+diff --git a/src/fn/sub_0802A0B8.c b/src/fn/sub_0802A0B8.c
+deleted file mode 100644
+index d9f92b624..000000000
+--- a/src/fn/sub_0802A0B8.c
++++ /dev/null
+@@ -1,74 +0,0 @@
+-// MATCHING_CONCESSION: register-pinning
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[5];
+-    u8 finished, enter;
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    u8 (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x22e];
+-    u8 variant;
+-    s16 scale, minScale, maxScale, scaleStep;
+-    u8 pad34C[0x60];
+-    u32 mode;
+-} ActorAnimation;
+-
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    register int shifted asm("r0");
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    asm("" : "+r"(shifted));
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    asm("" : "+r"(shifted));
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void GridAttackActor_SetAnimation(void *, int, int, int);
+-void GridAttackActor_ResetAttackAnimationHistory(void *);
+-int GridAttackActor_SelectAttackAnimation(void *);
+-void GridAttackActor_SpawnGridPattern(void *);
+-void Sound_PlaySongChecked(int);
+-void GridAttackActor_UpdateGridAttack(ActorAnimation *p, int tick)
+-{
+-    if (p->changed) {
+-        p->changed = 0;
+-        setFacing(p, p->requestedAngle);
+-        GridAttackActor_ResetAttackAnimationHistory(p);
+-        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
+-        Sound_PlaySongChecked(1355);
+-    }
+-    if (p->tryUpdate(p))
+-        return;
+-    {
+-        u32 mask = 64;
+-        p->flags |= mask;
+-    }
+-    if (p->reset(p))
+-        return;
+-    if (tick == 8)
+-        GridAttackActor_SpawnGridPattern(p);
+-    if (p->padB2) {
+-        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
+-        if (tick > 31)
+-            p->finished = 1;
+-    }
+-}
+diff --git a/src/fn/sub_0802A188.c b/src/fn/sub_0802A188.c
+deleted file mode 100644
+index fec1a722c..000000000
+--- a/src/fn/sub_0802A188.c
++++ /dev/null
+@@ -1,144 +0,0 @@
+-// MATCHING_CONCESSION: register-pinning
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[5];
+-    u8 finished, enter;
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    u8 (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x6a];
+-    u8 stage;
+-    u32 counter;
+-    u8 pad184[0x1bf];
+-    u8 variant;
+-    s16 scale, minScale, maxScale, scaleStep;
+-    u8 pad34C[0x60];
+-    u32 mode;
+-} ActorAnimation;
+-
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    register int shifted asm("r0");
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    asm("" : "+r"(shifted));
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    asm("" : "+r"(shifted));
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void GridAttackActor_SetAnimation(void *, int, int, int);
+-void GridAttackActor_ResetAttackAnimationHistory(void *);
+-int GridAttackActor_SelectAttackAnimation(void *);
+-void GridAttackActor_SpawnGridPattern(void *);
+-void Sound_PlaySongChecked(int);
+-void ProjectedDisplay_SetHeight(void *, int);
+-void OrbitContactActor_BeginExpansion(void *);
+-void GridAttackActor_UpdateElevatedGridAttack(ActorAnimation *p)
+-{
+-    ActorAnimation *base = p;
+-    if (p->changed) {
+-        int zero = 0;
+-        p->changed = zero;
+-        setFacing(p, p->requestedAngle);
+-        GridAttackActor_SetAnimation(p, 3, 1, 8);
+-        p->stage = zero;
+-        p->counter = zero;
+-        GridAttackActor_ResetAttackAnimationHistory(p);
+-        Sound_PlaySongChecked(955);
+-    }
+-    {
+-        u16 *dst = (u16 *)((u8 *)p + 0x1aa);
+-        register int zero asm("r2") = 0;
+-        int wordZero = 0;
+-        *dst = 240;
+-        *(u32 *)((u8 *)p + 0x178) = wordZero;
+-        *((u8 *)p + 0x17c) = zero;
+-    }
+-    {
+-        u32 mask = 12;
+-        p->flags |= mask;
+-    }
+-    if (p->reset(p))
+-        return;
+-    switch (p->stage) {
+-        case 0:
+-            p->counter++;
+-            ProjectedDisplay_SetHeight(*(void **)((u8 *)p + 0x900), p->counter * 4);
+-            if (p->counter > 31) {
+-                p->stage++;
+-                p->counter = 0;
+-                OrbitContactActor_BeginExpansion(*(void **)((u8 *)p + 0x908));
+-            }
+-            break;
+-        case 1:
+-            p->counter++;
+-            if (p->counter > 3) {
+-                p->stage++;
+-                p->counter = 0;
+-            }
+-            break;
+-        case 2:
+-            if (p->counter == 10)
+-                Sound_PlaySongChecked(1358);
+-            if (p->counter > 129) {
+-                p->stage++;
+-                p->counter = 0;
+-                GridAttackActor_SetAnimation(p, 3, 1, 12);
+-            }
+-            break;
+-        case 3:
+-            if (p->counter == 6)
+-                GridAttackActor_SpawnGridPattern(p);
+-        case 4:
+-        case 5:
+-        case 6:
+-            if (p->counter > 5) {
+-                p->stage++;
+-                p->counter = 0;
+-                GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
+-            }
+-            break;
+-        case 7:
+-            if (p->counter > 9) {
+-                p->stage++;
+-                p->counter = 0;
+-                Sound_PlaySongChecked(955);
+-            }
+-            break;
+-        case 8:
+-            p->counter++;
+-            ProjectedDisplay_SetHeight(*(void **)((u8 *)p + 0x900), (32 - p->counter) * 4);
+-            if (p->counter > 31) {
+-                p->stage++;
+-                p->counter = 0;
+-            }
+-            break;
+-        case 9:
+-            if (p->counter > 9) {
+-                p->stage++;
+-                p->counter = 0;
+-                base->finished = 1;
+-            }
+-            break;
+-    }
+-    p->counter++;
+-}
+diff --git a/src/fn/sub_0802A400.c b/src/fn/sub_0802A400.c
+deleted file mode 100644
+index 417f6316a..000000000
+--- a/src/fn/sub_0802A400.c
++++ /dev/null
+@@ -1,83 +0,0 @@
+-// MATCHING_CONCESSION: register-pinning
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[5];
+-    u8 finished, enter;
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    u8 (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x6a];
+-    u8 stage;
+-    u32 counter;
+-    u8 pad184[0x1bf];
+-    u8 variant;
+-    s16 scale, minScale, maxScale, scaleStep;
+-    u8 pad34C[0x60];
+-    u32 mode;
+-} ActorAnimation;
+-
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    register int shifted asm("r0");
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    asm("" : "+r"(shifted));
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    asm("" : "+r"(shifted));
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void GridAttackActor_SetAnimation(void *, int, int, int);
+-void GridAttackActor_ResetAttackAnimationHistory(void *);
+-int GridAttackActor_SelectAttackAnimation(void *);
+-void GridAttackActor_SpawnGridPattern(void *);
+-void Sound_PlaySongChecked(int);
+-extern u32 gUnk_03005304;
+-extern u16 gUnk_086141BC[];
+-void sub_08029BF4(void *, void *, int);
+-void GridAttackActor_UpdateTargetedAttack(ActorAnimation *p, int tick)
+-{
+-    ActorAnimation *base = p;
+-    if (p->changed) {
+-        p->changed = 0;
+-        setFacing(p, p->requestedAngle);
+-        GridAttackActor_ResetAttackAnimationHistory(p);
+-        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
+-        gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
+-        {
+-            int random = gUnk_086141BC[gUnk_03005304];
+-            if (random <= 32767)
+-                Sound_PlaySongChecked(1356);
+-        }
+-    }
+-    if (p->tryUpdate(p))
+-        return;
+-    {
+-        u32 mask = 64;
+-        p->flags |= mask;
+-    }
+-    if (p->reset(p))
+-        return;
+-    if (tick == 8)
+-        sub_08029BF4(base, *(void **)((u8 *)p + 0x110), *(u16 *)((u8 *)base + 0x1b4));
+-    if (p->padB2)
+-        p->finished = 1;
+-}
+diff --git a/src/fn/sub_0802A4F4.c b/src/fn/sub_0802A4F4.c
+deleted file mode 100644
+index cdf5339f5..000000000
+--- a/src/fn/sub_0802A4F4.c
++++ /dev/null
+@@ -1,63 +0,0 @@
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[5];
+-    u8 finished, enter;
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    u8 (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x6a];
+-    u8 stage;
+-    u32 counter;
+-    u8 pad184[0x1bf];
+-    u8 variant;
+-    s16 scale, minScale, maxScale, scaleStep;
+-    u8 pad34C[0x60];
+-    u32 mode;
+-} ActorAnimation;
+-
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    int shifted;
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void GridAttackActor_SetAnimation(void *, int, int, int);
+-void GridAttackActor_ResetAttackAnimationHistory(void *);
+-int GridAttackActor_SelectAttackAnimation(void *);
+-void GridAttackActor_SpawnGridPattern(void *);
+-void Sound_PlaySongChecked(int);
+-void GridAttackActor_UpdateDamageHold(ActorAnimation *p)
+-{
+-    if (p->changed) {
+-        p->changed = 0;
+-        GridAttackActor_SetAnimation(p, 8, 1, 8);
+-    }
+-    *(u32 *)((u8 *)p + 0x178) = 0;
+-    *((u8 *)p + 0x17c) = 0;
+-    {
+-        u32 mask = 12;
+-        u32 flags = p->flags | mask;
+-        p->flags = flags | 64;
+-    }
+-}
+diff --git a/src/fn/sub_0802A53C.c b/src/fn/sub_0802A53C.c
+deleted file mode 100644
+index 93e7845cd..000000000
+--- a/src/fn/sub_0802A53C.c
++++ /dev/null
+@@ -1,64 +0,0 @@
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[5];
+-    u8 finished, enter;
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    u8 (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x6a];
+-    u8 stage;
+-    u32 counter;
+-    u8 pad184[0x1bf];
+-    u8 variant;
+-    s16 scale, minScale, maxScale, scaleStep;
+-    u8 pad34C[0x60];
+-    u32 mode;
+-} ActorAnimation;
+-
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    int shifted;
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void GridAttackActor_SetAnimation(void *, int, int, int);
+-void GridAttackActor_ResetAttackAnimationHistory(void *);
+-int GridAttackActor_SelectAttackAnimation(void *);
+-void GridAttackActor_SpawnGridPattern(void *);
+-void Sound_PlaySongChecked(int);
+-void GridAttackActor_UpdateDamageRecovery(ActorAnimation *p, int tick)
+-{
+-    if (p->changed) {
+-        p->changed = 0;
+-        GridAttackActor_SetAnimation(p, 8, 1, 8);
+-    }
+-    *(u32 *)((u8 *)p + 0x178) = 0;
+-    *((u8 *)p + 0x17c) = 0;
+-    {
+-        u32 mask = 12;
+-        p->flags |= mask;
+-    }
+-    if (!p->reset(p) && tick > 19)
+-        p->finished = 1;
+-}
+diff --git a/src/fn/sub_0802A5A0.c b/src/fn/sub_0802A5A0.c
+deleted file mode 100644
+index 8f10a2d37..000000000
+--- a/src/fn/sub_0802A5A0.c
++++ /dev/null
+@@ -1,102 +0,0 @@
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[5];
+-    u8 finished, enter;
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    u8 (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x6a];
+-    u8 stage;
+-    u32 counter;
+-    u8 pad184[0x1bf];
+-    u8 variant;
+-    s16 scale, minScale, maxScale, scaleStep;
+-    u8 pad34C[0x60];
+-    u32 mode;
+-} ActorAnimation;
+-
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    int shifted;
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void GridAttackActor_SetAnimation(void *, int, int, int);
+-void GridAttackActor_ResetAttackAnimationHistory(void *);
+-int GridAttackActor_SelectAttackAnimation(void *);
+-void GridAttackActor_SpawnGridPattern(void *);
+-void Sound_PlaySongChecked(int);
+-struct Common {
+-    u8 pad0[0x90];
+-    u32 timer;
+-    s16 health, maxHealth;
+-    u8 pad98[4];
+-    u32 flags;
+-    u8 padA0[2];
+-    u8 reset;
+-    u8 padA3;
+-    u32 pending;
+-    u8 facing, facing8, requested, state;
+-    u8 padAC[5];
+-    u8 changed;
+-    u8 padB2[0x4e];
+-    void (*callback)(void *);
+-};
+-static inline void state(struct Common *p, void (*fn)(void *), int id)
+-{
+-    int zero;
+-    p->state = id;
+-    zero = 0;
+-    p->callback = fn;
+-    p->timer = zero;
+-    p->changed = 1;
+-    p->reset = zero;
+-    p->pending = zero;
+-}
+-void ContactSequencePool_BeginAllDeaths(void *);
+-void GridAttackActor_UpdateIdle(void *);
+-void GridAttack_UpdateStaggerState(ActorAnimation *p)
+-{
+-    if (p->changed) {
+-        p->changed = 0;
+-        GridAttackActor_SetAnimation(p, 8, 1, 8);
+-        ContactSequencePool_BeginAllDeaths(*(void **)((u8 *)p + 0x904));
+-        Sound_PlaySongChecked(1359);
+-    }
+-    {
+-        u8 *dst = (u8 *)p + 0x197;
+-        int zero = 0;
+-        *dst = 6;
+-        *(u32 *)((u8 *)p + 0x178) = zero;
+-        *((u8 *)p + 0x17c) = zero;
+-    }
+-    {
+-        u32 mask = 12;
+-        p->flags |= mask;
+-    }
+-    if (p->padB2)
+-        state((void *)p, GridAttackActor_UpdateIdle, 1);
+-    else
+-        p->flags |= 1;
+-}
+diff --git a/src/fn/sub_0802A63C.c b/src/fn/sub_0802A63C.c
+deleted file mode 100644
+index 89e875e18..000000000
+--- a/src/fn/sub_0802A63C.c
++++ /dev/null
+@@ -1,87 +0,0 @@
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[5];
+-    u8 finished, enter;
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    u8 (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x6a];
+-    u8 stage;
+-    u32 counter;
+-    u8 pad184[0x1bf];
+-    u8 variant;
+-    s16 scale, minScale, maxScale, scaleStep;
+-    u8 pad34C[0x60];
+-    u32 mode;
+-} ActorAnimation;
+-
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    int shifted;
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void GridAttackActor_SetAnimation(void *, int, int, int);
+-void GridAttackActor_ResetAttackAnimationHistory(void *);
+-int GridAttackActor_SelectAttackAnimation(void *);
+-void GridAttackActor_SpawnGridPattern(void *);
+-void Sound_PlaySongChecked(int);
+-void SceneActors_RunFirstEventScript(void *, void *);
+-void ContactSequencePool_BeginAllDeaths(void *);
+-void GameState_SetEventFlag(int);
+-void SceneActors_RunSecondEventScript(void *, void *);
+-static inline void effect(ActorAnimation *p, int mode, int id, int duration)
+-{
+-    *(u32 *)((u8 *)p + 0x1c0) = id;
+-    *((u8 *)p + 0x1bc) = mode;
+-    *((u8 *)p + 0x1bd) = duration;
+-    if (*((u8 *)p + 0x1bc) == 2) {
+-        u32 value = duration == 5 ? 1 : 2;
+-        *((u8 *)p + 0x1ba) = value;
+-    } else if (*((u8 *)p + 0x1bc) == 1)
+-        *((u8 *)p + 0x1ba) = 0;
+-}
+-void GridAttack_UpdateDeathState(ActorAnimation *p)
+-{
+-    ActorAnimation *base = p;
+-    if (p->changed) {
+-        p->changed = 0;
+-        GridAttackActor_SetAnimation(p, 10, 1, 8);
+-        SceneActors_RunFirstEventScript(p, (u8 *)p + 0x8a4);
+-        ContactSequencePool_BeginAllDeaths(*(void **)((u8 *)p + 0x904));
+-        effect(p, 2, 349, 1);
+-        base->stage = 0;
+-        base->counter = 0;
+-        Sound_PlaySongChecked(958);
+-    }
+-    if (p->padB2 && !base->stage) {
+-        GameState_SetEventFlag(80);
+-        SceneActors_RunSecondEventScript(p, (u8 *)base + 0x8a4);
+-        base->stage++;
+-    }
+-    {
+-        u32 mask = 13;
+-        p->flags |= mask;
+-    }
+-}
+diff --git a/src/fn/sub_0802A714.c b/src/fn/sub_0802A714.c
+deleted file mode 100644
+index 736f5b0a6..000000000
+--- a/src/fn/sub_0802A714.c
++++ /dev/null
+@@ -1,61 +0,0 @@
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[5];
+-    u8 finished, enter;
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    u8 (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x6a];
+-    u8 stage;
+-    u32 counter;
+-    u8 pad184[0x1bf];
+-    u8 variant;
+-    s16 scale, minScale, maxScale, scaleStep;
+-    u8 pad34C[0x60];
+-    u32 mode;
+-} ActorAnimation;
+-
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    int shifted;
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void GridAttackActor_SetAnimation(void *, int, int, int);
+-void GridAttackActor_ResetAttackAnimationHistory(void *);
+-int GridAttackActor_SelectAttackAnimation(void *);
+-void GridAttackActor_SpawnGridPattern(void *);
+-void Sound_PlaySongChecked(int);
+-void GridAttack_UpdateHiddenState(ActorAnimation *p)
+-{
+-    if (p->changed)
+-        p->changed = 0;
+-    *(u32 *)((u8 *)p + 0x178) = 0;
+-    *((u8 *)p + 0x17c) = 0;
+-    {
+-        u32 mask = 28;
+-        p->flags |= mask;
+-    }
+-    p->reset(p);
+-}
+diff --git a/src/fn/sub_0802A758.c b/src/fn/sub_0802A758.c
+deleted file mode 100644
+index 76f8df572..000000000
+--- a/src/fn/sub_0802A758.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "global.h"
+-void GridAttackActor_SetAnimation(u8 *, u32, u32, u32);
+-void Callback_InvokeActor(u8 *, void (*)(u8 *));
+-void GridAttack_UpdateIdleState(u8 *s)
+-{
+-    if (s[0xB1]) {
+-        s[0xB1] = 0;
+-        GridAttackActor_SetAnimation(s, 2, 1, 0);
+-    }
+-    {
+-        u32 zero;
+-        u32 *p = (u32 *)(s + 0x178);
+-        zero = 0;
+-        *p = zero;
+-        s[0x17C] = zero;
+-    }
+-    {
+-        u32 mask = 12;
+-        u32 *flags = (u32 *)(s + 0x9C);
+-        *flags |= mask;
+-    }
+-    Callback_InvokeActor(s, *(void (**)(u8 *))(s + 0x108));
+-}
+diff --git a/src/fn/sub_0802A7A8.c b/src/fn/sub_0802A7A8.c
+deleted file mode 100644
+index d02aec476..000000000
+--- a/src/fn/sub_0802A7A8.c
++++ /dev/null
+@@ -1,72 +0,0 @@
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[5];
+-    u8 finished, enter;
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    u8 (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x6a];
+-    u8 stage;
+-    u32 counter;
+-    u8 pad184[0x1bf];
+-    u8 variant;
+-    s16 scale, minScale, maxScale, scaleStep;
+-    u8 pad34C[0x60];
+-    u32 mode;
+-} ActorAnimation;
+-
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    int shifted;
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void GridAttackActor_SetAnimation(void *, int, int, int);
+-void GridAttackActor_ResetAttackAnimationHistory(void *);
+-int GridAttackActor_SelectAttackAnimation(void *);
+-void GridAttackActor_SpawnGridPattern(void *);
+-void Sound_PlaySongChecked(int);
+-typedef struct {
+-    u32 a, b;
+-} Point;
+-void GridAttack_UpdateAnimationNineState(ActorAnimation *p)
+-{
+-    u8 *position = (u8 *)p + 0x48;
+-    if (p->changed) {
+-        p->changed = 0;
+-        GridAttackActor_SetAnimation(p, 9, 1, 8);
+-        *(Point *)((u8 *)p + 0xd0) = *(Point *)(position + 12);
+-    }
+-    *(u32 *)((u8 *)p + 0x178) = 0;
+-    *((u8 *)p + 0x17c) = 0;
+-    {
+-        u32 mask = 12;
+-        p->flags |= mask;
+-    }
+-    if (!p->reset(p)) {
+-        *((u8 *)p + 0x197) = 6;
+-        if (p->padB2)
+-            p->finished = 1;
+-    }
+-}
+diff --git a/src/fn/sub_0802A82C.c b/src/fn/sub_0802A82C.c
+deleted file mode 100644
+index 5b27a2887..000000000
+--- a/src/fn/sub_0802A82C.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "global.h"
+-void GridAttackActor_SetAnimation(u8 *, u32, u32, u32);
+-void Callback_InvokeActor(u8 *, void (*)(u8 *));
+-void GridAttack_UpdateAnimationElevenState(u8 *s)
+-{
+-    if (s[0xB1]) {
+-        s[0xB1] = 0;
+-        GridAttackActor_SetAnimation(s, 11, 1, 8);
+-    }
+-    {
+-        u32 zero;
+-        u32 *p = (u32 *)(s + 0x178);
+-        zero = 0;
+-        *p = zero;
+-        s[0x17C] = zero;
+-    }
+-    {
+-        u32 mask = 12;
+-        u32 *flags = (u32 *)(s + 0x9C);
+-        *flags |= mask;
+-    }
+-    Callback_InvokeActor(s, *(void (**)(u8 *))(s + 0x108));
+-}
+diff --git a/src/fn/sub_0802A87C.c b/src/fn/sub_0802A87C.c
+deleted file mode 100644
+index 5d1a31ec8..000000000
+--- a/src/fn/sub_0802A87C.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "global.h"
+-void GridAttackActor_SetAnimation(u8 *, u32, u32, u32);
+-void Callback_InvokeActor(u8 *, void (*)(u8 *));
+-void GridAttack_UpdateAlternateIdleState(u8 *s)
+-{
+-    if (s[0xB1]) {
+-        s[0xB1] = 0;
+-        GridAttackActor_SetAnimation(s, 2, 1, 0);
+-    }
+-    {
+-        u32 zero;
+-        u32 *p = (u32 *)(s + 0x178);
+-        zero = 0;
+-        *p = zero;
+-        s[0x17C] = zero;
+-    }
+-    {
+-        u32 mask = 12;
+-        u32 *flags = (u32 *)(s + 0x9C);
+-        *flags |= mask;
+-    }
+-    Callback_InvokeActor(s, *(void (**)(u8 *))(s + 0x108));
+-}
+diff --git a/src/fn/sub_0802A8CC.c b/src/fn/sub_0802A8CC.c
+deleted file mode 100644
+index d9fe8da10..000000000
+--- a/src/fn/sub_0802A8CC.c
++++ /dev/null
+@@ -1,68 +0,0 @@
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[5];
+-    u8 finished, enter;
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    u8 (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x6a];
+-    u8 stage;
+-    u32 counter;
+-    u8 pad184[0x1bf];
+-    u8 variant;
+-    s16 scale, minScale, maxScale, scaleStep;
+-    u8 pad34C[0x60];
+-    u32 mode;
+-} ActorAnimation;
+-
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    int shifted;
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void GridAttackActor_SetAnimation(void *, int, int, int);
+-void GridAttackActor_ResetAttackAnimationHistory(void *);
+-int GridAttackActor_SelectAttackAnimation(void *);
+-void GridAttackActor_SpawnGridPattern(void *);
+-void Sound_PlaySongChecked(int);
+-void GridAttack_UpdateRandomAnimationState(ActorAnimation *p, int tick)
+-{
+-    if (p->changed) {
+-        p->changed = 0;
+-        GridAttackActor_ResetAttackAnimationHistory(p);
+-        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
+-    }
+-    *(u32 *)((u8 *)p + 0x178) = 0;
+-    *((u8 *)p + 0x17c) = 0;
+-    {
+-        u32 mask = 12;
+-        p->flags |= mask;
+-    }
+-    if (!p->reset(p) && p->padB2) {
+-        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
+-        if (tick > 31)
+-            p->finished = 1;
+-    }
+-}
+diff --git a/src/fn/sub_0802A958.c b/src/fn/sub_0802A958.c
+deleted file mode 100644
+index 0914a756e..000000000
+--- a/src/fn/sub_0802A958.c
++++ /dev/null
+@@ -1,64 +0,0 @@
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[5];
+-    u8 finished, enter;
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    u8 (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x6a];
+-    u8 stage;
+-    u32 counter;
+-    u8 pad184[0x1bf];
+-    u8 variant;
+-    s16 scale, minScale, maxScale, scaleStep;
+-    u8 pad34C[0x60];
+-    u32 mode;
+-} ActorAnimation;
+-
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    int shifted;
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void GridAttackActor_SetAnimation(void *, int, int, int);
+-void GridAttackActor_ResetAttackAnimationHistory(void *);
+-int GridAttackActor_SelectAttackAnimation(void *);
+-void GridAttackActor_SpawnGridPattern(void *);
+-void Sound_PlaySongChecked(int);
+-void GridAttack_UpdateAnimationThreeState(ActorAnimation *p)
+-{
+-    if (p->changed) {
+-        p->changed = 0;
+-        GridAttackActor_SetAnimation(p, 3, 1, 8);
+-    }
+-    *(u32 *)((u8 *)p + 0x178) = 0;
+-    *((u8 *)p + 0x17c) = 0;
+-    {
+-        u32 mask = 12;
+-        p->flags |= mask;
+-    }
+-    if (!p->reset(p) && p->padB2)
+-        p->finished = 1;
+-}
+diff --git a/src/fn/sub_0802A9C0.c b/src/fn/sub_0802A9C0.c
+deleted file mode 100644
+index a097d25e8..000000000
+--- a/src/fn/sub_0802A9C0.c
++++ /dev/null
+@@ -1,64 +0,0 @@
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[5];
+-    u8 finished, enter;
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    u8 (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x6a];
+-    u8 stage;
+-    u32 counter;
+-    u8 pad184[0x1bf];
+-    u8 variant;
+-    s16 scale, minScale, maxScale, scaleStep;
+-    u8 pad34C[0x60];
+-    u32 mode;
+-} ActorAnimation;
+-
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    int shifted;
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void GridAttackActor_SetAnimation(void *, int, int, int);
+-void GridAttackActor_ResetAttackAnimationHistory(void *);
+-int GridAttackActor_SelectAttackAnimation(void *);
+-void GridAttackActor_SpawnGridPattern(void *);
+-void Sound_PlaySongChecked(int);
+-void GridAttack_UpdateFastAnimationThreeState(ActorAnimation *p)
+-{
+-    if (p->changed) {
+-        p->changed = 0;
+-        GridAttackActor_SetAnimation(p, 3, 1, 12);
+-    }
+-    *(u32 *)((u8 *)p + 0x178) = 0;
+-    *((u8 *)p + 0x17c) = 0;
+-    {
+-        u32 mask = 12;
+-        p->flags |= mask;
+-    }
+-    if (!p->reset(p) && p->padB2)
+-        p->finished = 1;
+-}
+diff --git a/src/fn/sub_0802AA28.c b/src/fn/sub_0802AA28.c
+deleted file mode 100644
+index ce78fe267..000000000
+--- a/src/fn/sub_0802AA28.c
++++ /dev/null
+@@ -1,80 +0,0 @@
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[5];
+-    u8 finished, enter;
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    u8 (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x6a];
+-    u8 stage;
+-    u32 counter;
+-    u8 pad184[0x1bf];
+-    u8 variant;
+-    s16 scale, minScale, maxScale, scaleStep;
+-    u8 pad34C[0x60];
+-    u32 mode;
+-} ActorAnimation;
+-
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    int shifted;
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void GridAttackActor_SetAnimation(void *, int, int, int);
+-void GridAttackActor_ResetAttackAnimationHistory(void *);
+-int GridAttackActor_SelectAttackAnimation(void *);
+-void GridAttackActor_SpawnGridPattern(void *);
+-void Sound_PlaySongChecked(int);
+-typedef struct {
+-    u32 a, b;
+-} Point;
+-u8 Sprite_BlinkUntilExpired(int *, int, int, int);
+-void GridAttack_UpdateTimedHideState(ActorAnimation *p, int tick)
+-{
+-    ActorAnimation *base = p;
+-    u8 *position = (u8 *)p + 0x48;
+-    int done;
+-    if (p->changed) {
+-        p->changed = 0;
+-        GridAttackActor_SetAnimation(p, 11, 1, 8);
+-        *(Point *)((u8 *)p + 0xd0) = *(Point *)(position + 12);
+-    }
+-    done = 0;
+-    if (Sprite_BlinkUntilExpired(&done, tick, 10, 30)) {
+-        u32 mask = 16;
+-        p->flags |= mask;
+-    } else if (done) {
+-        u32 mask = 16;
+-        p->flags |= mask;
+-    }
+-    *(u32 *)((u8 *)base + 0x178) = 0;
+-    *((u8 *)base + 0x17c) = 0;
+-    {
+-        u32 mask = 12;
+-        p->flags |= mask;
+-    }
+-    if (!p->reset(p) && tick > 59)
+-        p->finished = 1;
+-}
+diff --git a/src/fn/sub_0802AAD4.c b/src/fn/sub_0802AAD4.c
+deleted file mode 100644
+index 1c97dd52e..000000000
+--- a/src/fn/sub_0802AAD4.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "global.h"
+-
+-extern u32 gUnk_02000560;
+-void SceneActors_RunStateCallback(u32);
+-void GridAttack_RunStateIfUnpaused(u32 a)
+-{
+-    u32 m = 4;
+-    if ((gUnk_02000560 & m) == 0)
+-        SceneActors_RunStateCallback(a);
+-}
+diff --git a/src/fn/sub_0802AAF4.c b/src/fn/sub_0802AAF4.c
+deleted file mode 100644
+index 70a90429a..000000000
+--- a/src/fn/sub_0802AAF4.c
++++ /dev/null
+@@ -1,32 +0,0 @@
+-#include "global.h"
+-extern const u32 gUnk_08604FA8[];
+-struct T {
+-    u8 p0[0x90];
+-    u32 w90;
+-    u8 p1[0xa2 - 0x94];
+-    u8 ba2;
+-    u8 p2;
+-    u32 wa4;
+-    u8 p3[0xaa - 0xa8];
+-    u8 baa;
+-    u8 bab;
+-    u8 p4[0xb1 - 0xac];
+-    u8 bb1;
+-    u8 p5[0x100 - 0xb2];
+-    u32 w100;
+-};
+-u32 GridAttack_ApplyRequestedState(struct T *p)
+-{
+-    if ((u8)(p->baa - 1) > 0x11)
+-        return 0;
+-    {
+-        u32 v = gUnk_08604FA8[p->baa];
+-        p->bab = p->baa;
+-        p->w100 = v;
+-        p->w90 = 0;
+-        p->bb1 = 1;
+-        p->ba2 = 0;
+-        p->wa4 = 0;
+-        return 1;
+-    }
+-}
+diff --git a/src/fn/sub_0802AB4C.c b/src/fn/sub_0802AB4C.c
+deleted file mode 100644
+index e3db009a6..000000000
+--- a/src/fn/sub_0802AB4C.c
++++ /dev/null
+@@ -1,138 +0,0 @@
+-#include "global.h"
+-struct Common {
+-    u8 pad0[0x90];
+-    u32 timer;
+-    s16 health, maxHealth;
+-    u8 pad98[4];
+-    u32 flags;
+-    u8 padA0[2];
+-    u8 reset;
+-    u8 padA3;
+-    u32 pending;
+-    u8 facing, facing8, requested, state;
+-    u8 active, actionReset, action, finished, entered, changed;
+-    u8 padB2[0x12];
+-    u32 actionTimer;
+-    u8 padC8[0x38];
+-    void (*callback)(void *);
+-};
+-static inline void state(struct Common *p, void (*fn)(void *), int id)
+-{
+-    int zero;
+-    p->state = id;
+-    zero = 0;
+-    p->callback = fn;
+-    p->timer = zero;
+-    p->changed = 1;
+-    p->reset = zero;
+-    p->pending = zero;
+-}
+-struct Packed {
+-    s32 x : 16, y : 16, z : 16, pad : 16;
+-};
+-void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
+-void GridAttackActor_UpdateDamageHold(void *);
+-void GridAttackActor_UpdateDamageRecovery(void *);
+-void GridAttack_UpdateDeathState(void *);
+-struct Actor {
+-    struct Common common;
+-    u8 pad104[0x74];
+-    int damage;
+-    u8 special;
+-    u8 pad17d[15];
+-    s16 flash, stun;
+-    u8 pad190[4];
+-    u8 angle, shake, pad196[2];
+-    int accumulated, threshold;
+-};
+-extern u32 gUnk_03005308;
+-extern u16 gUnk_0203B400[];
+-void GridAttack_UpdateStaggerState(void *);
+-void Sound_PlaySongChecked(int);
+-int GridAttack_ApplyPendingDamage(struct Actor *p)
+-{
+-    struct Common *base = (void *)p;
+-    u8 *position = (u8 *)p + 0x48;
+-    u8 *collider = (u8 *)p + 0x818;
+-    int damage, special;
+-    struct Packed size;
+-    {
+-        int offset = 0x178;
+-        int *damagePtr = (int *)((u8 *)p + offset);
+-        damage = *damagePtr;
+-        {
+-            int off = 0x17c;
+-            u8 *specialPtr = (u8 *)p + off;
+-            int value;
+-            value = *specialPtr;
+-            special = value;
+-            *damagePtr = 0;
+-            *specialPtr = 0;
+-        }
+-    }
+-    if (damage > 0) {
+-        int react = 0;
+-        p->common.health -= damage;
+-        {
+-            int offset = 0x198;
+-            int *accum = (int *)((u8 *)p + offset);
+-            {
+-                int value = *accum + damage;
+-                *accum = value;
+-                {
+-                    int off = 0x19c;
+-                    int *threshold = (int *)((u8 *)p + off);
+-                    if (value >= *threshold) {
+-                        value = react;
+-                        *accum = value;
+-                        {
+-                            int one = 1;
+-                            react = one;
+-                        }
+-                    }
+-                }
+-            }
+-        }
+-        p->stun = 15;
+-        p->flash = 10;
+-        if (special)
+-            *(void **)((u8 *)p + 0x878) = (u8 *)p + 0x5c4;
+-        else
+-            *(void **)((u8 *)p + 0x878) = (u8 *)p + 0x3c4;
+-        size.x = 16;
+-        size.y = 0;
+-        size.z = 16;
+-        DamageNumberDisplay_Show(collider, damage, 0, position + 12, &size, 1);
+-        if (base->health <= 0) {
+-            base->health = 0;
+-            {
+-                u32 mask = 2;
+-                base->flags |= mask;
+-            }
+-            state(base, GridAttack_UpdateDeathState, 8);
+-            return 1;
+-        }
+-        if (special) {
+-            u32 mask = 0x80000;
+-            base->flags |= mask;
+-        }
+-        if (react) {
+-            {
+-                u32 mask = 1;
+-                base->flags |= mask;
+-            }
+-            state(base, GridAttack_UpdateStaggerState, 7);
+-            return 1;
+-        }
+-        p->shake = 3;
+-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+-        {
+-            u32 index = gUnk_03005308 * 2;
+-            u32 value;
+-            value = *(u16 *)((u8 *)((u16 *)RANDOM_TABLE_ADDR) + index);
+-            p->angle = value;
+-        }
+-        Sound_PlaySongChecked(318);
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0802AD0C.c b/src/fn/sub_0802AD0C.c
+deleted file mode 100644
+index b22eb27b0..000000000
+--- a/src/fn/sub_0802AD0C.c
++++ /dev/null
+@@ -1,61 +0,0 @@
+-#include "global.h"
+-struct Common {
+-    u8 pad0[0x90];
+-    u32 timer;
+-    s16 health, maxHealth;
+-    u8 pad98[4];
+-    u32 flags;
+-    u8 padA0[2];
+-    u8 reset;
+-    u8 padA3;
+-    u32 pending;
+-    u8 facing, facing8, requested, state;
+-    u8 active, actionReset, action, finished, entered, changed;
+-    u8 padB2[0x12];
+-    u32 actionTimer;
+-    u8 padC8[0x38];
+-    void (*callback)(void *);
+-};
+-static inline void state(struct Common *p, void (*fn)(void *), int id)
+-{
+-    int zero;
+-    p->state = id;
+-    zero = 0;
+-    p->callback = fn;
+-    p->timer = zero;
+-    p->changed = 1;
+-    p->reset = zero;
+-    p->pending = zero;
+-}
+-int ContactBurst_GetEnabled(void *);
+-int ContactSequencePool_GetActiveCount(void *);
+-void ContactSequencePool_BeginAllDeaths(void *);
+-static inline void setAction(struct Common *p, int id, int zero)
+-{
+-    p->action = id;
+-    p->actionTimer = zero;
+-    p->entered = 1;
+-}
+-int GridAttack_SelectNextAction(struct Common *p)
+-{
+-    struct Common *base = p;
+-    int trigger = *((u8 *)p + 0x1a2);
+-    if (trigger) {
+-        int zero = 0;
+-        *((u8 *)p + 0x1a2) = zero;
+-        setAction(p, 2, zero);
+-        return 1;
+-    } else {
+-        int active = ContactBurst_GetEnabled(*(void **)((u8 *)p + 0x90c));
+-        if (active) {
+-            setAction(p, 3, 0);
+-        } else if (*(s16 *)((u8 *)p + 0x1a0) >= *(s16 *)((u8 *)p + 0x1a4)) {
+-            if (ContactSequencePool_GetActiveCount(*(void **)((u8 *)p + 0x904)) > 0)
+-                ContactSequencePool_BeginAllDeaths(*(void **)((u8 *)p + 0x904));
+-            setAction(p, 1, 0);
+-        } else {
+-            setAction(base, 3, 0);
+-        }
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0802AFE8.c b/src/fn/sub_0802AFE8.c
+deleted file mode 100644
+index fa96f75c0..000000000
+--- a/src/fn/sub_0802AFE8.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-
+-void Trigger_ConsumePending(void *, u32);
+-
+-struct S {
+-    u8 pad[0xAA];
+-    u8 st;
+-    u8 pad2[4];
+-    u8 f1;
+-    u8 f2;
+-    u8 pad3[0xC4 - 0xB1];
+-    u32 cnt;
+-};
+-
+-static inline u8 TakeFlag(struct S *p)
+-{
+-    if (p->f2) {
+-        p->f2 = 0;
+-        p->f1 = 0;
+-        return TRUE;
+-    }
+-    return FALSE;
+-}
+-
+-void GridAttack_UpdateStateNineAction(struct S *p)
+-{
+-    if (TakeFlag(p)) {
+-        u32 v = 9;
+-        p->st = v;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    }
+-    p->cnt++;
+-}
+diff --git a/src/fn/sub_0802B02C.c b/src/fn/sub_0802B02C.c
+deleted file mode 100644
+index 517371895..000000000
+--- a/src/fn/sub_0802B02C.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[5];
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-static inline u8 chk(struct S *p)
+-{
+-    u8 *q = &p->b0;
+-    if (*q) {
+-        *q = 0;
+-        q--;
+-        *q = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-void GridAttack_UpdateIdleAction(struct S *p)
+-{
+-    u8 r = chk(p);
+-    if (r == 1) {
+-        p->aa = r;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    }
+-    p->c4++;
+-}
+diff --git a/src/fn/sub_0802B070.c b/src/fn/sub_0802B070.c
+deleted file mode 100644
+index 482a3ee3a..000000000
+--- a/src/fn/sub_0802B070.c
++++ /dev/null
+@@ -1,42 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 ab, ac, ad, ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-static inline void action(struct S *p, int mode, int zero, int id)
+-{
+-    p->ac = mode;
+-    p->ad = zero;
+-    p->ae = id;
+-    p->c4 = zero;
+-    p->b0 = 1;
+-}
+-void GridAttack_UpdateStateElevenAction(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 11;
+-        p->aa = k;
+-    }
+-    if (p->af) {
+-        action(p, 2, 0, 4);
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    } else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_0802B0E0.c b/src/fn/sub_0802B0E0.c
+deleted file mode 100644
+index 6ef7714f9..000000000
+--- a/src/fn/sub_0802B0E0.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void GridAttack_UpdateStateTwelveAction(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0xC;
+-        p->aa = k;
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_0802B130.c b/src/fn/sub_0802B130.c
+deleted file mode 100644
+index 163fbf43f..000000000
+--- a/src/fn/sub_0802B130.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void GridAttack_UpdateStateThirteenAction(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0xD;
+-        p->aa = k;
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_0802B180.c b/src/fn/sub_0802B180.c
+deleted file mode 100644
+index 796b94bd0..000000000
+--- a/src/fn/sub_0802B180.c
++++ /dev/null
+@@ -1,42 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 ab, ac, ad, ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-static inline void action(struct S *p, int mode, int zero, int id)
+-{
+-    p->ac = mode;
+-    p->ad = zero;
+-    p->ae = id;
+-    p->c4 = zero;
+-    p->b0 = 1;
+-}
+-void GridAttack_UpdateAnimationFourteen(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 14;
+-        p->aa = k;
+-    }
+-    if (p->af) {
+-        action(p, 2, 0, 4);
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    } else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_0802B1F0.c b/src/fn/sub_0802B1F0.c
+deleted file mode 100644
+index d8a0a431f..000000000
+--- a/src/fn/sub_0802B1F0.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void GridAttack_UpdateAnimationFifteen(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0xF;
+-        p->aa = k;
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_0802B240.c b/src/fn/sub_0802B240.c
+deleted file mode 100644
+index 094128ef0..000000000
+--- a/src/fn/sub_0802B240.c
++++ /dev/null
+@@ -1,42 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 ab, ac, ad, ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-static inline void action(struct S *p, int mode, int zero, int id)
+-{
+-    p->ac = mode;
+-    p->ad = zero;
+-    p->ae = id;
+-    p->c4 = zero;
+-    p->b0 = 1;
+-}
+-void GridAttack_UpdateAnimationSixteen(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 16;
+-        p->aa = k;
+-    }
+-    if (p->af) {
+-        action(p, 2, 0, 4);
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    } else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_0802B2B0.c b/src/fn/sub_0802B2B0.c
+deleted file mode 100644
+index 90eef8cbe..000000000
+--- a/src/fn/sub_0802B2B0.c
++++ /dev/null
+@@ -1,43 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void GridAttack_UpdateAnimationSeventeen(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x11;
+-        p->aa = k;
+-    }
+-    if (p->af) {
+-        u32 two = 2;
+-        u32 z = 0;
+-        p->ac = two;
+-        p->ad = z;
+-        p->ae = z;
+-        p->c4 = z;
+-        p->b0 = 1;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    } else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_0802B31C.c b/src/fn/sub_0802B31C.c
+deleted file mode 100644
+index 598309419..000000000
+--- a/src/fn/sub_0802B31C.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-extern const u32 gUnk_08604FF0[];
+-void Callback_InvokeActor(void *, u32);
+-void GridAttack_DispatchSpecialAnimation(u8 *p)
+-{
+-    Callback_InvokeActor(p, gUnk_08604FF0[p[0xae]]);
+-}
+diff --git a/src/fn/sub_0802B338.c b/src/fn/sub_0802B338.c
+deleted file mode 100644
+index 5118c3087..000000000
+--- a/src/fn/sub_0802B338.c
++++ /dev/null
+@@ -1,69 +0,0 @@
+-#include "global.h"
+-struct Common {
+-    u8 pad0[0x90];
+-    u32 timer;
+-    s16 health, maxHealth;
+-    u8 pad98[2];
+-    u8 healthCheck, pad9b;
+-    u32 flags;
+-    u8 padA0[2];
+-    u8 reset;
+-    u8 padA3;
+-    u32 pending;
+-    u8 facing, facing8, requested, state;
+-    u8 active, actionReset, action, finished, entered, changed;
+-    u8 padB2[0x12];
+-    u32 actionTimer;
+-    u8 padC8[0x38];
+-    void (*callback)(void *);
+-};
+-static inline void state(struct Common *p, void (*fn)(void *), int id)
+-{
+-    int zero;
+-    p->state = id;
+-    zero = 0;
+-    p->callback = fn;
+-    p->timer = zero;
+-    p->changed = 1;
+-    p->reset = zero;
+-    p->pending = zero;
+-}
+-int GridAttack_SelectNextAction(void *);
+-void GridAttack_UpdateDeathState(void *);
+-static inline u8 chk(struct Common *p)
+-{
+-    if (p->entered) {
+-        p->entered = 0;
+-        p->finished = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-static inline void action(struct Common *p, int one, int id, int zero)
+-{
+-    p->active = one;
+-    p->actionReset = zero;
+-    p->action = id;
+-    p->actionTimer = zero;
+-    p->entered = one;
+-}
+-int GridAttack_TryStartDamageReaction(struct Common *p)
+-{
+-    if (p->health <= 0 && p->healthCheck) {
+-        u32 mask = 2;
+-        p->flags |= mask;
+-        state(p, GridAttack_UpdateDeathState, 8);
+-    }
+-    p->healthCheck = 0;
+-    {
+-        u32 mask = 2;
+-        if (p->flags & mask) {
+-            action(p, 1, 3, 0);
+-            return 1;
+-        } else if (p->flags & 1) {
+-            action(p, 1, 2, 0);
+-            return 1;
+-        }
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0802B3E4.c b/src/fn/sub_0802B3E4.c
+deleted file mode 100644
+index f39990380..000000000
+--- a/src/fn/sub_0802B3E4.c
++++ /dev/null
+@@ -1,62 +0,0 @@
+-#include "global.h"
+-struct Common {
+-    u8 pad0[0x90];
+-    u32 timer;
+-    s16 health, maxHealth;
+-    u8 pad98[2];
+-    u8 healthCheck, pad9b;
+-    u32 flags;
+-    u8 padA0[2];
+-    u8 reset;
+-    u8 padA3;
+-    u32 pending;
+-    u8 facing, facing8, requested, state;
+-    u8 active, actionReset, action, finished, entered, changed;
+-    u8 padB2[0x12];
+-    u32 actionTimer;
+-    u8 padC8[0x38];
+-    void (*callback)(void *);
+-};
+-static inline void state(struct Common *p, void (*fn)(void *), int id)
+-{
+-    int zero;
+-    p->state = id;
+-    zero = 0;
+-    p->callback = fn;
+-    p->timer = zero;
+-    p->changed = 1;
+-    p->reset = zero;
+-    p->pending = zero;
+-}
+-int GridAttack_SelectNextAction(void *);
+-void GridAttack_UpdateDeathState(void *);
+-static inline u8 chk(struct Common *p)
+-{
+-    if (p->entered) {
+-        p->entered = 0;
+-        p->finished = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-static inline void action(struct Common *p, int id, int zero)
+-{
+-    int one = 1;
+-    p->active = one;
+-    p->actionReset = zero;
+-    p->action = id;
+-    p->actionTimer = zero;
+-    p->entered = one;
+-}
+-void sub_0802B3E4(struct Common *p)
+-{
+-    struct Common *base = p;
+-    p->healthCheck = 1;
+-    if (chk(p) == 1)
+-        base->requested = 1;
+-    if (base->actionTimer > *(u16 *)((u8 *)p + 0x190)) {
+-        if (GridAttack_SelectNextAction(p))
+-            return;
+-    }
+-    base->actionTimer++;
+-}
+diff --git a/src/fn/sub_0802B440.c b/src/fn/sub_0802B440.c
+deleted file mode 100644
+index c9ce2a640..000000000
+--- a/src/fn/sub_0802B440.c
++++ /dev/null
+@@ -1,69 +0,0 @@
+-#include "global.h"
+-struct Common {
+-    u8 pad0[0x90];
+-    u32 timer;
+-    s16 health, maxHealth;
+-    u8 pad98[2];
+-    u8 healthCheck, pad9b;
+-    u32 flags;
+-    u8 padA0[2];
+-    u8 reset;
+-    u8 padA3;
+-    u32 pending;
+-    u8 facing, facing8, requested, state;
+-    u8 active, actionReset, action, finished, entered, changed;
+-    u8 padB2[0x12];
+-    u32 actionTimer;
+-    u8 padC8[0x38];
+-    void (*callback)(void *);
+-};
+-static inline void state(struct Common *p, void (*fn)(void *), int id)
+-{
+-    int zero;
+-    p->state = id;
+-    zero = 0;
+-    p->callback = fn;
+-    p->timer = zero;
+-    p->changed = 1;
+-    p->reset = zero;
+-    p->pending = zero;
+-}
+-int GridAttack_SelectNextAction(void *);
+-void GridAttack_UpdateDeathState(void *);
+-static inline u8 chk(struct Common *p)
+-{
+-    if (p->entered) {
+-        p->entered = 0;
+-        p->finished = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-static inline void action(struct Common *p, int id, int zero)
+-{
+-    int one = 1;
+-    p->active = one;
+-    p->actionReset = zero;
+-    p->action = id;
+-    p->actionTimer = zero;
+-    p->entered = one;
+-}
+-void GridAttack_UpdateActionTwo(struct Common *p)
+-{
+-    struct Common *base = p;
+-    p->healthCheck = 1;
+-    if (chk(p)) {
+-        u32 id = 2;
+-        p->requested = id;
+-    }
+-    if (p->finished) {
+-        int duration = 60, zero = 0;
+-        base->active = zero;
+-        base->actionReset = zero;
+-        base->action = zero;
+-        base->actionTimer = zero;
+-        base->entered = 1;
+-        *(u16 *)((u8 *)base + 0x190) = duration;
+-    } else
+-        p->actionTimer++;
+-}
+diff --git a/src/fn/sub_0802B4B8.c b/src/fn/sub_0802B4B8.c
+deleted file mode 100644
+index 396ea57d4..000000000
+--- a/src/fn/sub_0802B4B8.c
++++ /dev/null
+@@ -1,69 +0,0 @@
+-#include "global.h"
+-struct Common {
+-    u8 pad0[0x90];
+-    u32 timer;
+-    s16 health, maxHealth;
+-    u8 pad98[2];
+-    u8 healthCheck, pad9b;
+-    u32 flags;
+-    u8 padA0[2];
+-    u8 reset;
+-    u8 padA3;
+-    u32 pending;
+-    u8 facing, facing8, requested, state;
+-    u8 active, actionReset, action, finished, entered, changed;
+-    u8 padB2[0x12];
+-    u32 actionTimer;
+-    u8 padC8[0x38];
+-    void (*callback)(void *);
+-};
+-static inline void state(struct Common *p, void (*fn)(void *), int id)
+-{
+-    int zero;
+-    p->state = id;
+-    zero = 0;
+-    p->callback = fn;
+-    p->timer = zero;
+-    p->changed = 1;
+-    p->reset = zero;
+-    p->pending = zero;
+-}
+-int GridAttack_SelectNextAction(void *);
+-void GridAttack_UpdateDeathState(void *);
+-static inline u8 chk(struct Common *p)
+-{
+-    if (p->entered) {
+-        p->entered = 0;
+-        p->finished = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-static inline void action(struct Common *p, int id, int zero)
+-{
+-    int one = 1;
+-    p->active = one;
+-    p->actionReset = zero;
+-    p->action = id;
+-    p->actionTimer = zero;
+-    p->entered = one;
+-}
+-void GridAttack_UpdateDeathAction(struct Common *p)
+-{
+-    struct Common *base = p;
+-    p->healthCheck = 1;
+-    if (chk(p)) {
+-        u32 id = 3;
+-        p->requested = id;
+-    }
+-    if (p->finished) {
+-        int duration = 60, zero = 0;
+-        base->active = zero;
+-        base->actionReset = zero;
+-        base->action = zero;
+-        base->actionTimer = zero;
+-        base->entered = 1;
+-        *(u16 *)((u8 *)base + 0x190) = duration;
+-    } else
+-        p->actionTimer++;
+-}
+diff --git a/src/fn/sub_0802B530.c b/src/fn/sub_0802B530.c
+deleted file mode 100644
+index 499c10e48..000000000
+--- a/src/fn/sub_0802B530.c
++++ /dev/null
+@@ -1,75 +0,0 @@
+-#include "global.h"
+-struct Common {
+-    u8 pad0[0x90];
+-    u32 timer;
+-    s16 health, maxHealth;
+-    u8 pad98[2];
+-    u8 healthCheck, pad9b;
+-    u32 flags;
+-    u8 padA0[2];
+-    u8 reset;
+-    u8 padA3;
+-    u32 pending;
+-    u8 facing, facing8, requested, state;
+-    u8 active, actionReset, action, finished, entered, changed;
+-    u8 padB2[0x12];
+-    u32 actionTimer;
+-    u8 padC8[0x38];
+-    void (*callback)(void *);
+-};
+-static inline void state(struct Common *p, void (*fn)(void *), int id)
+-{
+-    int zero;
+-    p->state = id;
+-    zero = 0;
+-    p->callback = fn;
+-    p->timer = zero;
+-    p->changed = 1;
+-    p->reset = zero;
+-    p->pending = zero;
+-}
+-int GridAttack_SelectNextAction(void *);
+-void GridAttack_UpdateDeathState(void *);
+-static inline u8 chk(struct Common *p)
+-{
+-    if (p->entered) {
+-        p->entered = 0;
+-        p->finished = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-static inline void action(struct Common *p, int id, int zero)
+-{
+-    int one = 1;
+-    p->active = one;
+-    p->actionReset = zero;
+-    p->action = id;
+-    p->actionTimer = zero;
+-    p->entered = one;
+-}
+-void GridAttack_UpdateAttackAction(struct Common *p)
+-{
+-    struct Common *base = p;
+-    p->healthCheck = 1;
+-    if (chk(p)) {
+-        u32 id = 4;
+-        p->requested = id;
+-    }
+-    if (p->finished) {
+-        int duration, zero;
+-        int value = *((u8 *)p + 0xe1);
+-        if (value < 64)
+-            duration = *((u8 *)base + 0x1b7);
+-        else
+-            duration = *((u8 *)base + 0x1b6);
+-        zero = 0;
+-        base->active = zero;
+-        base->actionReset = zero;
+-        base->action = zero;
+-        base->actionTimer = zero;
+-        base->entered = 1;
+-        *(u16 *)((u8 *)base + 0x190) = duration;
+-    } else
+-        p->actionTimer++;
+-}
+diff --git a/src/fn/sub_0802B5C0.c b/src/fn/sub_0802B5C0.c
+deleted file mode 100644
+index 0592fec79..000000000
+--- a/src/fn/sub_0802B5C0.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#include "global.h"
+-
+-struct S {
+-    u8 pad[0xAA];
+-    u8 st;
+-    u8 pad2[4];
+-    u8 f1;
+-    u8 f2;
+-    u8 pad3[0xC4 - 0xB1];
+-    u32 cnt;
+-};
+-
+-static inline u8 TakeFlag(struct S *p)
+-{
+-    if (p->f2) {
+-        p->f2 = 0;
+-        p->f1 = 0;
+-        return TRUE;
+-    }
+-    return FALSE;
+-}
+-
+-void GridAttack_UpdateAnimationFive(struct S *p)
+-{
+-    if (TakeFlag(p)) {
+-        u32 v = 5;
+-        p->st = v;
+-    }
+-    p->cnt++;
+-}
+diff --git a/src/fn/sub_0802B5F8.c b/src/fn/sub_0802B5F8.c
+deleted file mode 100644
+index d383d25f0..000000000
+--- a/src/fn/sub_0802B5F8.c
++++ /dev/null
+@@ -1,68 +0,0 @@
+-#include "global.h"
+-struct Common {
+-    u8 pad0[0x90];
+-    u32 timer;
+-    s16 health, maxHealth;
+-    u8 pad98[2];
+-    u8 healthCheck, pad9b;
+-    u32 flags;
+-    u8 padA0[2];
+-    u8 reset;
+-    u8 padA3;
+-    u32 pending;
+-    u8 facing, facing8, requested, state;
+-    u8 active, actionReset, action, finished, entered, changed;
+-    u8 padB2[0x12];
+-    u32 actionTimer;
+-    u8 padC8[0x38];
+-    void (*callback)(void *);
+-};
+-static inline void state(struct Common *p, void (*fn)(void *), int id)
+-{
+-    int zero;
+-    p->state = id;
+-    zero = 0;
+-    p->callback = fn;
+-    p->timer = zero;
+-    p->changed = 1;
+-    p->reset = zero;
+-    p->pending = zero;
+-}
+-int GridAttack_SelectNextAction(void *);
+-void GridAttack_UpdateDeathState(void *);
+-static inline u8 chk(struct Common *p)
+-{
+-    if (p->entered) {
+-        p->entered = 0;
+-        p->finished = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-static inline void action(struct Common *p, int id, int zero)
+-{
+-    int one = 1;
+-    p->active = one;
+-    p->actionReset = zero;
+-    p->action = id;
+-    p->actionTimer = zero;
+-    p->entered = one;
+-}
+-void GridAttack_UpdateRecoveryAction(struct Common *p)
+-{
+-    struct Common *base = p;
+-    if (chk(p)) {
+-        u32 id = 6;
+-        p->requested = id;
+-    }
+-    if (p->finished) {
+-        int duration = 30, zero = 0;
+-        base->active = zero;
+-        base->actionReset = zero;
+-        base->action = zero;
+-        base->actionTimer = zero;
+-        base->entered = 1;
+-        *(u16 *)((u8 *)base + 0x190) = duration;
+-    }
+-    p->actionTimer++;
+-}
+diff --git a/src/fn/sub_0802B660.c b/src/fn/sub_0802B660.c
+deleted file mode 100644
+index e29514a58..000000000
+--- a/src/fn/sub_0802B660.c
++++ /dev/null
+@@ -1,72 +0,0 @@
+-#include "global.h"
+-struct Common {
+-    u8 pad0[0x90];
+-    u32 timer;
+-    s16 health, maxHealth;
+-    u8 pad98[2];
+-    u8 healthCheck, pad9b;
+-    u32 flags;
+-    u8 padA0[2];
+-    u8 reset;
+-    u8 padA3;
+-    u32 pending;
+-    u8 facing, facing8, requested, state;
+-    u8 active, actionReset, action, finished, entered, changed;
+-    u8 padB2[0x12];
+-    u32 actionTimer;
+-    u8 padC8[0x38];
+-    void (*callback)(void *);
+-};
+-static inline void state(struct Common *p, void (*fn)(void *), int id)
+-{
+-    int zero;
+-    p->state = id;
+-    zero = 0;
+-    p->callback = fn;
+-    p->timer = zero;
+-    p->changed = 1;
+-    p->reset = zero;
+-    p->pending = zero;
+-}
+-int GridAttack_SelectNextAction(void *);
+-void GridAttack_UpdateDeathState(void *);
+-static inline u8 chk(struct Common *p)
+-{
+-    if (p->entered) {
+-        p->entered = 0;
+-        p->finished = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-static inline void action(struct Common *p, int id, int zero)
+-{
+-    int one = 1;
+-    p->active = one;
+-    p->actionReset = zero;
+-    p->action = id;
+-    p->actionTimer = zero;
+-    p->entered = one;
+-}
+-void GridAttack_UpdateDamageAction(struct Common *p)
+-{
+-    struct Common *base = p;
+-    if (chk(p) == 1) {
+-        u32 id = 7;
+-        p->requested = id;
+-        *((u8 *)base + 0x1a2) = 1;
+-    }
+-    {
+-        u32 mask = 1;
+-        if (!(p->flags & mask)) {
+-            int duration = 30, zero = 0;
+-            base->active = zero;
+-            base->actionReset = zero;
+-            base->action = zero;
+-            base->actionTimer = zero;
+-            base->entered = 1;
+-            *(u16 *)((u8 *)base + 0x190) = duration;
+-        } else
+-            p->actionTimer++;
+-    }
+-}
+diff --git a/src/fn/sub_0802B6D4.c b/src/fn/sub_0802B6D4.c
+deleted file mode 100644
+index 3012c2898..000000000
+--- a/src/fn/sub_0802B6D4.c
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#include "global.h"
+-struct S {
+-    u8 f0[0xb0];
+-    u8 b0;
+-    u8 f1[0x13];
+-    u32 c4;
+-};
+-void GridAttack_UpdatePassiveAction(struct S *p)
+-{
+-    u8 *q = &p->b0;
+-    if (*q) {
+-        *q = 0;
+-        q--;
+-        *q = 0;
+-    }
+-    p->c4++;
+-}
+diff --git a/src/fn/sub_0802B6F8.c b/src/fn/sub_0802B6F8.c
+deleted file mode 100644
+index 58a375967..000000000
+--- a/src/fn/sub_0802B6F8.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "global.h"
+-
+-struct S {
+-    u8 f[0xae];
+-    u8 a;
+-};
+-extern const u32 gUnk_08605014[];
+-void Callback_InvokeActor(struct S *, u32);
+-void GridAttack_DispatchNormalAction(struct S *p)
+-{
+-    Callback_InvokeActor(p, gUnk_08605014[p->a]);
+-}
+diff --git a/src/fn/sub_0802B714.c b/src/fn/sub_0802B714.c
+deleted file mode 100644
+index cafa9ddbf..000000000
+--- a/src/fn/sub_0802B714.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-extern const u32 gUnk_08605024[];
+-void Callback_InvokeActor(void *, u32);
+-void GridAttack_DispatchReactionAction(u8 *p)
+-{
+-    Callback_InvokeActor(p, gUnk_08605024[p[0xae]]);
+-}
+diff --git a/src/fn/sub_0802B730.c b/src/fn/sub_0802B730.c
+deleted file mode 100644
+index 89a864cd2..000000000
+--- a/src/fn/sub_0802B730.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_02000560;
+-extern const u32 gUnk_08605034[];
+-s32 GridAttack_TryStartDamageReaction(void *);
+-void Callback_InvokeActor(void *, u32);
+-void GridAttack_UpdateNormalActions(u8 *p)
+-{
+-    u32 m = 4;
+-    if (!(gUnk_02000560 & m)) {
+-        if (GridAttack_TryStartDamageReaction(p) == 0) {
+-            Callback_InvokeActor(p, gUnk_08605034[p[0xad]]);
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0802B76C.c b/src/fn/sub_0802B76C.c
+deleted file mode 100644
+index 1d3b29a0d..000000000
+--- a/src/fn/sub_0802B76C.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-extern const u32 gUnk_08605038[];
+-void Callback_InvokeActor(void *, u32);
+-void GridAttack_UpdateReactionActions(u8 *p)
+-{
+-    Callback_InvokeActor(p, gUnk_08605038[p[0xAD]]);
+-}
+diff --git a/src/fn/sub_0802B788.c b/src/fn/sub_0802B788.c
+deleted file mode 100644
+index 93ee55d14..000000000
+--- a/src/fn/sub_0802B788.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-extern const u32 gUnk_0860503C[];
+-void Callback_InvokeActor(void *, u32);
+-void GridAttack_UpdateSpecialActions(u8 *p)
+-{
+-    Callback_InvokeActor(p, gUnk_0860503C[p[0xAD]]);
+-}
+diff --git a/src/fn/sub_0802B7A4.c b/src/fn/sub_0802B7A4.c
+deleted file mode 100644
+index 27f29dfb9..000000000
+--- a/src/fn/sub_0802B7A4.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "global.h"
+-
+-extern u32 gUnk_08605040[];
+-struct A {
+-    u8 f[0xa1];
+-    u8 a;
+-    u8 g[0xa];
+-    u8 i;
+-};
+-void Callback_InvokeActor(void *, u32);
+-
+-void GridAttack_UpdateActionController(struct A *p)
+-{
+-    p->a = 0;
+-    Callback_InvokeActor(p, gUnk_08605040[p->i]);
+-}
+diff --git a/src/fn/sub_0802BF30.c b/src/fn/sub_0802BF30.c
+deleted file mode 100644
+index 91bbc4974..000000000
+--- a/src/fn/sub_0802BF30.c
++++ /dev/null
+@@ -1,26 +0,0 @@
+-#include "global.h"
+-
+-void sub_0802B7C8(u8 *p);
+-void GridAttack_UpdateActionController(u8 *p);
+-void GridAttack_RunStateIfUnpaused(u8 *p);
+-void sub_0802BAFC(u8 *p);
+-void GridAttackActor_RequestLinkedActorState(u8 *p);
+-void GridAttackActor_NotifyLinkedActorLatePhase(u8 *p);
+-
+-int GridAttack_Update(u8 *p)
+-{
+-    u16 *t;
+-    sub_0802B7C8(p);
+-    GridAttack_UpdateActionController(p);
+-    GridAttack_RunStateIfUnpaused(p);
+-    sub_0802BAFC(p);
+-    if (*(u16 *)(p + 0x1aa) <= 0xef)
+-        GridAttackActor_RequestLinkedActorState(p);
+-    else
+-        GridAttackActor_NotifyLinkedActorLatePhase(p);
+-    t = (u16 *)(p + 0x1aa);
+-    (*t)++;
+-    if (*t > 0x12b)
+-        *t = 0;
+-    return 0;
+-}
+diff --git a/src/fn/sub_0802BF88.c b/src/fn/sub_0802BF88.c
+deleted file mode 100644
+index 8985feb46..000000000
+--- a/src/fn/sub_0802BF88.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "global.h"
+-
+-struct S {
+-    u8 f[0x818];
+-    u8 a;
+-};
+-void Collider_Remove(u8 *);
+-void GridAttackActor_RemoveSprite(struct S *);
+-void SceneActors_Destroy(struct S *);
+-u32 GridAttackActor_Destroy(struct S *p)
+-{
+-    Collider_Remove(&p->a);
+-    GridAttackActor_RemoveSprite(p);
+-    SceneActors_Destroy(p);
+-    return 0;
+-}
+diff --git a/src/fn/sub_0802C620.c b/src/fn/sub_0802C620.c
+deleted file mode 100644
+index 706fc7864..000000000
+--- a/src/fn/sub_0802C620.c
++++ /dev/null
+@@ -1,26 +0,0 @@
+-#include "global.h"
+-u8 *Task_Create(u32, u32);
+-void Script_GetKeywordValue(u32, u32);
+-u8 *SceneActors_GetBySlot(void);
+-void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
+-s32 sub_0802BFAC(u8 *, u32);
+-void Task_Kill(u8 *);
+-void GridAttack_Update(void);
+-void GridAttackActor_Destroy(void);
+-u8 *GridAttackActor_Create(u32 a)
+-{
+-    u8 *p;
+-    Script_GetKeywordValue(0x74, 3);
+-    p = SceneActors_GetBySlot();
+-    if (p != 0)
+-        return p;
+-    p = Task_Create(8, 0x924);
+-    if (p != 0) {
+-        Task_SetCallbacks(p, GridAttack_Update, GridAttackActor_Destroy);
+-        if (sub_0802BFAC(p, a) < 0) {
+-            Task_Kill(p);
+-            return 0;
+-        }
+-    }
+-    return p;
+-}
+diff --git a/src/grid_attack_actor.c b/src/grid_attack_actor.c
+new file mode 100644
+index 000000000..9d257e15c
+--- /dev/null
++++ b/src/grid_attack_actor.c
+@@ -0,0 +1,1414 @@
++#include "grid_attack_actor.h"
++
++void GridAttackActor_RemoveSprite(struct GridAttackActor *p)
++{
++    Sprite_Remove(p->drawable.sprite);
++}
++
++void Anim_RestartSequence(void *, void *, int, int, int);
++
++void Collider_SetAttackProperties(void *, int, int, int, int, int);
++
++void Collider_SetBodyProperties(void *, int, int, int);
++
++void sub_08029870(struct ContactCollider *, struct ContactCollider *, struct GridAttackActor *);
++
++void ContactSequencePool_SpawnActor(void *, void *, int);
++
++int sub_08249350(int, int);
++
++void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
++
++void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
++
++void SceneMessages_Send(void *);
++
++void ProjectedDisplay_SetHeight(void *, int);
++
++void OrbitContactActor_BeginExpansion(void *);
++
++void sub_08029BF4(struct GridAttackActor *, struct GridAttackPoint *, int);
++
++void ContactSequencePool_BeginAllDeaths(void *);
++
++void SceneActors_RunFirstEventScript(void *, void *);
++
++void GameState_SetEventFlag(int);
++
++void SceneActors_RunSecondEventScript(void *, void *);
++
++u8 Sprite_BlinkUntilExpired(int *, int, int, int);
++
++void SceneActors_RunStateCallback(u32);
++
++int ContactBurst_GetEnabled(void *);
++
++int ContactSequencePool_GetActiveCount(void *);
++
++void sub_0802ADBC(struct GridAttackActor *p);
++void sub_0802B7C8(struct GridAttackActor *p);
++
++void sub_0802BAFC(struct GridAttackActor *p);
++
++void SceneActors_Destroy(struct GridAttackActor *);
++
++struct GridAttackActor *SceneActors_GetBySlot(void);
++
++s32 sub_0802BFAC(struct GridAttackActor *, u32);
++
++void GridAttackActor_SetAnimation(struct GridAttackActor *p, int sequence, int start, int speed)
++{
++    p->animationMode = 0;
++    p->animationSpeed = speed;
++    if (start) {
++        Anim_RestartSequence(&p->animation, p->resource, (u16)sequence, p->animationMode,
++                             p->animationSpeed);
++        p->animationEnded = 0;
++    } else
++        Anim_SetSequence(&p->animation, p->resource, (u16)sequence, p->animationMode,
++                         p->animationSpeed);
++}
++
++#define GridAttackActor_OnDamageCollision sub_08029870
++void sub_0821FF8C(void *, void *);
++void PlayerStats_AddContactHundredths(struct ContactCollider *, struct ContactCollider *, s32);
++
++#ifdef NONMATCHING
++// fuzzy: 97.1%
++// The signed-x offset temporary uses r1 instead of r3 (two bytes differ).
++void GridAttackActor_OnDamageCollision(struct ContactCollider *source,
++                                       struct ContactCollider *other, struct GridAttackActor *p)
++{
++    struct GridAttackActor *base = p;
++    int angle;
++    sub_0821FF8C(source, other);
++    PlayerStats_AddContactHundredths(source, other, p->contactReward);
++    p->damage = other->cost;
++    {
++        u32 mask = 0x100;
++        if (source->flags & mask)
++            angle = source->direction;
++        else {
++            int x = other->x - source->x;
++            int z = other->z - source->z;
++            angle = Math_Atan2(x, z);
++        }
++    }
++    p->damageAngle = angle;
++    {
++        u32 value = source->statRewardFlags;
++        base->contactSource = value;
++        value = source->reactionFlags;
++        base->contactFlags = value;
++    }
++    PlayerStats_AddContactHundredths(source, other, base->contactRewardParameter);
++    {
++        u32 mask = 4;
++        if (source->reactionFlags & mask)
++            p->special = 1;
++    }
++}
++#else
++INCLUDE_ASM("asm/nonmatching", sub_08029870);
++#endif
++
++void GridAttackActor_OnBodyCollision(void)
++{
++}
++
++void GridAttackActor_InitBodyCollider(struct GridAttackActor *p)
++{
++    void *collider = &p->bodyCollider;
++    struct GridAttackPacked size, offset;
++    size.x = 64;
++    size.y = 128;
++    size.z = 64;
++    offset.x = 0;
++    offset.y = 128;
++    offset.z = 0;
++    Collider_Init(collider, 0, 0x2401, 0, 16, &size, &offset);
++    Collider_SetPosition(collider, p->drawable.position, 0);
++    Collider_SetCallback(collider, GridAttackActor_OnBodyCollision, p);
++    Collider_SetAttackProperties(collider, p->attackPower, p->attackKind, 0, 0, p->attackParameter);
++}
++
++void GridAttackActor_InitDamageCollider(struct GridAttackActor *p, int mode)
++{
++    void *collider = &p->damageCollider;
++    struct GridAttackPacked size, offset;
++    size.x = 96;
++    size.y = 128;
++    size.z = 96;
++    offset.x = 0;
++    offset.y = 128;
++    offset.z = 0;
++    Collider_Init(collider, 0, 0x5101, 0, 16, &size, &offset);
++    Collider_SetPosition(collider, p->drawable.position, 0);
++    Collider_SetCallback(collider, sub_08029870, p);
++    Collider_SetBodyProperties(collider, mode, 0x808, 4);
++    Collider_Refresh(collider);
++}
++
++void GridAttackActor_GetGridPosition(s16 *p, int x, int z)
++{
++    if (x != 1 || z) {
++        p[0] = (x << 8) + 0xa80;
++        {
++            int height = 256;
++            p[1] = height;
++        }
++        p[2] = (z << 8) + 0xa80;
++    }
++}
++
++void GridAttackActor_SpawnGridContact(struct GridAttackActor *p, int x, int z)
++{
++    struct SceneVec pos;
++    GridAttackActor_GetGridPosition((s16 *)&pos, x, z);
++    ContactSequencePool_SpawnActor(p->contactPool, &pos, x + z * 3);
++}
++
++static inline int GridAttack_RandomColumn(u16 *table)
++{
++    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
++    return sub_08249350(table[gUnk_03005308], 3);
++}
++
++void GridAttackActor_SpawnGridPattern(struct GridAttackActor *p)
++{
++    if ((p->targetPosition)[2] < 0xc00) {
++        GridAttackActor_SpawnGridContact(p, 0, 0);
++        GridAttackActor_SpawnGridContact(p, 2, 0);
++        GridAttackActor_SpawnGridContact(p, 0, 1);
++        GridAttackActor_SpawnGridContact(p, 1, 1);
++        GridAttackActor_SpawnGridContact(p, 2, 1);
++        {
++            u16 *table = gUnk_0203B400;
++            GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 2);
++            GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 3);
++            GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 4);
++        }
++    } else {
++        GridAttackActor_SpawnGridContact(p, 0, 1);
++        GridAttackActor_SpawnGridContact(p, 1, 1);
++        GridAttackActor_SpawnGridContact(p, 2, 1);
++        {
++            u16 *table = gUnk_0203B400;
++            GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 2);
++            GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 3);
++            GridAttackActor_SpawnGridContact(p, GridAttack_RandomColumn(table), 4);
++        }
++    }
++}
++
++static inline void GridAttack_SetState(struct GridAttackActor *p, void (*fn)(void *), int id)
++{
++    int zero;
++    p->state = id;
++    zero = 0;
++    p->callback = fn;
++    p->timer = zero;
++    p->changed = 1;
++    p->stateReset = zero;
++    p->pending = zero;
++}
++
++static inline void GridAttack_StartAction(struct GridAttackActor *p, int id, int zero)
++{
++    int one = 1;
++    p->active = one;
++    p->actionReset = zero;
++    p->action = id;
++    p->actionTimer = zero;
++    p->entered = one;
++}
++
++#define GridAttackActor_SpawnTargetedProjectile sub_08029BF4
++INCLUDE_ASM("asm/nonmatching", sub_08029BF4);
++
++int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage)
++{
++    /* Keep the transform base live: direct actor fields change register allocation. */
++    struct GridAttackTransform *position = &p->transform;
++    struct GridAttackPacked size;
++    switch (kind) {
++        case 0:
++            if (damage > 0) {
++                size.x = 32;
++                size.y = 0;
++                size.z = 32;
++                DamageNumberDisplay_Show(&p->damageCollider, damage, 0, &position->coordinates,
++                                         &size, 1);
++            }
++            GridAttack_StartAction(p, 0, 0);
++            GridAttack_SetState(p, GridAttackActor_UpdateDamageHold, 5);
++            break;
++        case 2:
++            GridAttack_StartAction(p, 1, 0);
++            GridAttack_SetState(p, GridAttackActor_UpdateDamageRecovery, 6);
++            {
++                int angle = position->angle;
++                p->damageAngle = angle;
++            }
++            break;
++        case 1: {
++            int angle = (p->damageSource)[0x2d];
++            u8 *dst = &p->damageAngle;
++            int zero = 0;
++            *dst = angle;
++            {
++                u32 mask = 2;
++                p->flags |= mask;
++            }
++            GridAttack_StartAction(p, 3, zero);
++            GridAttack_SetState(p, GridAttack_UpdateDeathState, 8);
++        } break;
++    }
++    return 1;
++}
++
++void GridAttackActor_ResetAttackAnimationHistory(struct GridAttackActor *p)
++{
++    p->attackAnimationHistory = 0;
++}
++
++int GridAttackActor_SelectAttackAnimation(struct GridAttackActor *p)
++{
++    int start, i, index;
++    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
++    {
++        u32 offset = gUnk_03005308 * 2;
++        {
++            int value = *(u16 *)((u8 *)gUnk_0203B400 + offset);
++            value &= 3;
++            start = value;
++        }
++    }
++    for (i = start; i < start + 4; i++) {
++        index = i & 3;
++        if (!((p->attackAnimationHistory >> index) & 1)) {
++            p->attackAnimationHistory |= 1 << index;
++            goto done;
++        }
++    }
++    index = start;
++    {
++        int mask = 1 << index;
++        p->attackAnimationHistory = mask;
++    }
++done:
++    return index + 4;
++}
++
++// MATCHING_CONCESSION: register-pinning
++
++void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p)
++{
++    struct GridAttackDrawable *graphics = &p->drawable;
++    struct GridAttackPacked size;
++    int i;
++    for (i = 0; i < 2; i++) {
++        int angle, speed;
++        int count;
++        register u32 index asm("r1");
++        u32 *indexPtr;
++        u32 mask;
++        int smallMask;
++        register u16 *table asm("r4");
++        size.x = 164;
++        size.y = 16;
++        size.z = 164;
++        indexPtr = &gUnk_03005308;
++        mask = 1023;
++        smallMask = 3;
++        table = gUnk_0203B400;
++        index = (*indexPtr + 1) & mask;
++        angle = (u8)table[index];
++        index = (index + 1) & mask;
++        count = (table[index] & smallMask) + 2;
++        index = (index + 1) & mask;
++        *indexPtr = index;
++        speed = (table[index] & smallMask) + 20;
++        SparkParticle_Spawn(graphics->position, 3, &size, angle, count, speed, 2, 2);
++    }
++}
++
++void GridAttackActor_RequestLinkedActorState(struct GridAttackActor *p)
++{
++    struct GridAttackPacket *packet = (void *)&p->packet;
++    if (p->linkedActorId && p->linkedActorPhase != 0) {
++        int zero = 0;
++        p->linkedActorPhase = zero;
++        packet->id = p->linkedActorId;
++        packet->kind = 5;
++        packet->zero = 0;
++        packet->reserved = zero;
++        packet->command = 1;
++        packet->count = 1;
++        packet->args[0] = 3;
++        SceneMessages_Send(packet);
++    }
++}
++
++void GridAttackActor_NotifyLinkedActorLatePhase(struct GridAttackActor *p)
++{
++    struct GridAttackPacket *packet = (void *)&p->packet;
++    if (p->linkedActorId && p->linkedActorPhase != 1) {
++        int zero = 0;
++        p->linkedActorPhase = 1;
++        packet->id = p->linkedActorId;
++        packet->kind = 5;
++        packet->zero = 0;
++        packet->reserved = zero;
++        packet->command = 92;
++        packet->count = 0;
++        SceneMessages_Send(packet);
++    }
++}
++
++static inline void GridAttack_SetFacingPinned(struct GridAttackActor *p, int angle)
++{
++    u32 value;
++    register int shifted asm("r0");
++    p->transform.angle = angle;
++    shifted = p->transform.angle + 0x60;
++    asm("" : "+r"(shifted));
++    shifted >>= 6;
++    value = 3 & shifted;
++    p->facing = value;
++    shifted = p->transform.angle + 0x70;
++    asm("" : "+r"(shifted));
++    shifted >>= 5;
++    value = 7 & shifted;
++    p->facing8 = value;
++}
++
++// MATCHING_CONCESSION: register-pinning
++
++void GridAttackActor_UpdateIdle(struct GridAttackActor *p)
++{
++    if (!p->locked)
++        GridAttack_SetFacingPinned(p, p->requestedAngle);
++    if (p->changed) {
++        p->changed = 0;
++        if (p->locked)
++            GridAttack_SetFacingPinned(p, p->savedAngle);
++        GridAttackActor_SetAnimation(p, 2, 1, 0);
++    }
++    if (!p->tryUpdate(p)) {
++        u32 mask = 64;
++        p->flags |= mask;
++        p->reset(p);
++    }
++}
++
++// MATCHING_CONCESSION: register-pinning
++
++void GridAttackActor_UpdateGridAttack(struct GridAttackActor *p, int tick)
++{
++    if (p->changed) {
++        p->changed = 0;
++        GridAttack_SetFacingPinned(p, p->requestedAngle);
++        GridAttackActor_ResetAttackAnimationHistory(p);
++        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
++        Sound_PlaySongChecked(1355);
++    }
++    if (p->tryUpdate(p))
++        return;
++    {
++        u32 mask = 64;
++        p->flags |= mask;
++    }
++    if (p->reset(p))
++        return;
++    if (tick == 8)
++        GridAttackActor_SpawnGridPattern(p);
++    if (p->animationEnded) {
++        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
++        if (tick > 31)
++            p->finished = 1;
++    }
++}
++
++// MATCHING_CONCESSION: register-pinning
++
++void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
++{
++    struct GridAttackActor *base = p;
++    if (p->changed) {
++        int zero = 0;
++        p->changed = zero;
++        GridAttack_SetFacingPinned(p, p->requestedAngle);
++        GridAttackActor_SetAnimation(p, 3, 1, 8);
++        p->stage = zero;
++        p->counter = zero;
++        GridAttackActor_ResetAttackAnimationHistory(p);
++        Sound_PlaySongChecked(955);
++    }
++    {
++        u16 *dst = (u16 *)&p->phaseTimer;
++        register int zero asm("r2") = 0;
++        int wordZero = 0;
++        *dst = 240;
++        p->damage = wordZero;
++        p->special = zero;
++    }
++    {
++        u32 mask = 12;
++        p->flags |= mask;
++    }
++    if (p->reset(p))
++        return;
++    switch (p->stage) {
++        case 0:
++            p->counter++;
++            ProjectedDisplay_SetHeight(p->projectedDisplay, p->counter * 4);
++            if (p->counter > 31) {
++                p->stage++;
++                p->counter = 0;
++                OrbitContactActor_BeginExpansion(p->orbitContact);
++            }
++            break;
++        case 1:
++            p->counter++;
++            if (p->counter > 3) {
++                p->stage++;
++                p->counter = 0;
++            }
++            break;
++        case 2:
++            if (p->counter == 10)
++                Sound_PlaySongChecked(1358);
++            if (p->counter > 129) {
++                p->stage++;
++                p->counter = 0;
++                GridAttackActor_SetAnimation(p, 3, 1, 12);
++            }
++            break;
++        case 3:
++            if (p->counter == 6)
++                GridAttackActor_SpawnGridPattern(p);
++        case 4:
++        case 5:
++        case 6:
++            if (p->counter > 5) {
++                p->stage++;
++                p->counter = 0;
++                GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
++            }
++            break;
++        case 7:
++            if (p->counter > 9) {
++                p->stage++;
++                p->counter = 0;
++                Sound_PlaySongChecked(955);
++            }
++            break;
++        case 8:
++            p->counter++;
++            ProjectedDisplay_SetHeight(p->projectedDisplay, (32 - p->counter) * 4);
++            if (p->counter > 31) {
++                p->stage++;
++                p->counter = 0;
++            }
++            break;
++        case 9:
++            if (p->counter > 9) {
++                p->stage++;
++                p->counter = 0;
++                base->finished = 1;
++            }
++            break;
++    }
++    p->counter++;
++}
++
++extern u32 gUnk_03005304;
++
++extern u16 gUnk_086141BC[];
++
++// MATCHING_CONCESSION: register-pinning
++
++void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
++{
++    struct GridAttackActor *base = p;
++    if (p->changed) {
++        p->changed = 0;
++        GridAttack_SetFacingPinned(p, p->requestedAngle);
++        GridAttackActor_ResetAttackAnimationHistory(p);
++        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
++        gUnk_03005304 = (gUnk_03005304 + 1) & 1023;
++        {
++            int random = gUnk_086141BC[gUnk_03005304];
++            if (random <= 32767)
++                Sound_PlaySongChecked(1356);
++        }
++    }
++    if (p->tryUpdate(p))
++        return;
++    {
++        u32 mask = 64;
++        p->flags |= mask;
++    }
++    if (p->reset(p))
++        return;
++    if (tick == 8)
++        sub_08029BF4(base, (struct GridAttackPoint *)p->targetPosition,
++                     base->targetAttackParameter);
++    if (p->animationEnded)
++        p->finished = 1;
++}
++
++void GridAttackActor_UpdateDamageHold(struct GridAttackActor *p)
++{
++    if (p->changed) {
++        p->changed = 0;
++        GridAttackActor_SetAnimation(p, 8, 1, 8);
++    }
++    p->damage = 0;
++    p->special = 0;
++    {
++        u32 mask = 12;
++        u32 flags = p->flags | mask;
++        p->flags = flags | 64;
++    }
++}
++
++void GridAttackActor_UpdateDamageRecovery(struct GridAttackActor *p, int tick)
++{
++    if (p->changed) {
++        p->changed = 0;
++        GridAttackActor_SetAnimation(p, 8, 1, 8);
++    }
++    p->damage = 0;
++    p->special = 0;
++    {
++        u32 mask = 12;
++        p->flags |= mask;
++    }
++    if (!p->reset(p) && tick > 19)
++        p->finished = 1;
++}
++
++void GridAttack_UpdateStaggerState(struct GridAttackActor *p)
++{
++    if (p->changed) {
++        p->changed = 0;
++        GridAttackActor_SetAnimation(p, 8, 1, 8);
++        ContactSequencePool_BeginAllDeaths(p->contactPool);
++        Sound_PlaySongChecked(1359);
++    }
++    {
++        u8 *dst = &p->reactionCooldown;
++        int zero = 0;
++        *dst = 6;
++        p->damage = zero;
++        p->special = zero;
++    }
++    {
++        u32 mask = 12;
++        p->flags |= mask;
++    }
++    if (p->animationEnded)
++        GridAttack_SetState((void *)p, GridAttackActor_UpdateIdle, 1);
++    else
++        p->flags |= 1;
++}
++
++static inline void GridAttack_SetDeathEffect(struct GridAttackActor *p, int mode, int id,
++                                             int duration)
++{
++    p->effectId = id;
++    p->effectMode = mode;
++    p->effectDuration = duration;
++    if (p->effectMode == 2) {
++        u32 value = duration == 5 ? 1 : 2;
++        p->effectVariant = value;
++    } else if (p->effectMode == 1)
++        p->effectVariant = 0;
++}
++
++void GridAttack_UpdateDeathState(struct GridAttackActor *p)
++{
++    struct GridAttackActor *base = p;
++    if (p->changed) {
++        p->changed = 0;
++        GridAttackActor_SetAnimation(p, 10, 1, 8);
++        SceneActors_RunFirstEventScript(p, p->drawable.position);
++        ContactSequencePool_BeginAllDeaths(p->contactPool);
++        GridAttack_SetDeathEffect(p, 2, 349, 1);
++        base->stage = 0;
++        base->counter = 0;
++        Sound_PlaySongChecked(958);
++    }
++    if (p->animationEnded && !base->stage) {
++        GameState_SetEventFlag(80);
++        SceneActors_RunSecondEventScript(p, base->drawable.position);
++        base->stage++;
++    }
++    {
++        u32 mask = 13;
++        p->flags |= mask;
++    }
++}
++
++void GridAttack_UpdateHiddenState(struct GridAttackActor *p)
++{
++    if (p->changed)
++        p->changed = 0;
++    p->damage = 0;
++    p->special = 0;
++    {
++        u32 mask = 28;
++        p->flags |= mask;
++    }
++    p->reset(p);
++}
++
++void GridAttack_UpdateIdleState(struct GridAttackActor *s)
++{
++    if (s->changed) {
++        s->changed = 0;
++        GridAttackActor_SetAnimation(s, 2, 1, 0);
++    }
++    {
++        u32 zero;
++        u32 *p = (u32 *)&s->damage;
++        zero = 0;
++        *p = zero;
++        s->special = zero;
++    }
++    {
++        u32 mask = 12;
++        u32 *flags = (u32 *)&s->flags;
++        *flags |= mask;
++    }
++    Callback_InvokeActor(s, (void *)s->reset);
++}
++
++void GridAttack_UpdateAnimationNineState(struct GridAttackActor *p)
++{
++    /* Keep the transform base live: direct actor fields change register allocation. */
++    struct GridAttackTransform *position = &p->transform;
++    if (p->changed) {
++        p->changed = 0;
++        GridAttackActor_SetAnimation(p, 9, 1, 8);
++        p->savedPosition = position->coordinates;
++    }
++    p->damage = 0;
++    p->special = 0;
++    {
++        u32 mask = 12;
++        p->flags |= mask;
++    }
++    if (!p->reset(p)) {
++        p->reactionCooldown = 6;
++        if (p->animationEnded)
++            p->finished = 1;
++    }
++}
++
++void GridAttack_UpdateAnimationElevenState(struct GridAttackActor *s)
++{
++    if (s->changed) {
++        s->changed = 0;
++        GridAttackActor_SetAnimation(s, 11, 1, 8);
++    }
++    {
++        u32 zero;
++        u32 *p = (u32 *)&s->damage;
++        zero = 0;
++        *p = zero;
++        s->special = zero;
++    }
++    {
++        u32 mask = 12;
++        u32 *flags = (u32 *)&s->flags;
++        *flags |= mask;
++    }
++    Callback_InvokeActor(s, (void *)s->reset);
++}
++
++void GridAttack_UpdateAlternateIdleState(struct GridAttackActor *s)
++{
++    if (s->changed) {
++        s->changed = 0;
++        GridAttackActor_SetAnimation(s, 2, 1, 0);
++    }
++    {
++        u32 zero;
++        u32 *p = (u32 *)&s->damage;
++        zero = 0;
++        *p = zero;
++        s->special = zero;
++    }
++    {
++        u32 mask = 12;
++        u32 *flags = (u32 *)&s->flags;
++        *flags |= mask;
++    }
++    Callback_InvokeActor(s, (void *)s->reset);
++}
++
++void GridAttack_UpdateRandomAnimationState(struct GridAttackActor *p, int tick)
++{
++    if (p->changed) {
++        p->changed = 0;
++        GridAttackActor_ResetAttackAnimationHistory(p);
++        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
++    }
++    p->damage = 0;
++    p->special = 0;
++    {
++        u32 mask = 12;
++        p->flags |= mask;
++    }
++    if (!p->reset(p) && p->animationEnded) {
++        GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
++        if (tick > 31)
++            p->finished = 1;
++    }
++}
++
++void GridAttack_UpdateAnimationThreeState(struct GridAttackActor *p)
++{
++    if (p->changed) {
++        p->changed = 0;
++        GridAttackActor_SetAnimation(p, 3, 1, 8);
++    }
++    p->damage = 0;
++    p->special = 0;
++    {
++        u32 mask = 12;
++        p->flags |= mask;
++    }
++    if (!p->reset(p) && p->animationEnded)
++        p->finished = 1;
++}
++
++void GridAttack_UpdateFastAnimationThreeState(struct GridAttackActor *p)
++{
++    if (p->changed) {
++        p->changed = 0;
++        GridAttackActor_SetAnimation(p, 3, 1, 12);
++    }
++    p->damage = 0;
++    p->special = 0;
++    {
++        u32 mask = 12;
++        p->flags |= mask;
++    }
++    if (!p->reset(p) && p->animationEnded)
++        p->finished = 1;
++}
++
++void GridAttack_UpdateTimedHideState(struct GridAttackActor *p, int tick)
++{
++    struct GridAttackActor *base = p;
++    /* Keep the transform base live: direct actor fields change register allocation. */
++    struct GridAttackTransform *position = &p->transform;
++    int done;
++    if (p->changed) {
++        p->changed = 0;
++        GridAttackActor_SetAnimation(p, 11, 1, 8);
++        p->savedPosition = position->coordinates;
++    }
++    done = 0;
++    if (Sprite_BlinkUntilExpired(&done, tick, 10, 30)) {
++        u32 mask = 16;
++        p->flags |= mask;
++    } else if (done) {
++        u32 mask = 16;
++        p->flags |= mask;
++    }
++    base->damage = 0;
++    base->special = 0;
++    {
++        u32 mask = 12;
++        p->flags |= mask;
++    }
++    if (!p->reset(p) && tick > 59)
++        p->finished = 1;
++}
++
++extern u32 gUnk_02000560;
++
++void GridAttack_RunStateIfUnpaused(u32 a)
++{
++    u32 m = 4;
++    if ((gUnk_02000560 & m) == 0)
++        SceneActors_RunStateCallback(a);
++}
++
++extern const u32 gUnk_08604FA8[];
++
++u32 GridAttack_ApplyRequestedState(struct GridAttackActor *p)
++{
++    if ((u8)(p->requested - 1) > 0x11)
++        return 0;
++    {
++        u32 v = gUnk_08604FA8[p->requested];
++        p->state = p->requested;
++        p->callback = (void (*)(void *))v;
++        p->timer = 0;
++        p->changed = 1;
++        p->stateReset = 0;
++        p->pending = 0;
++        return 1;
++    }
++}
++
++int GridAttack_ApplyPendingDamage(struct GridAttackActor *p)
++{
++    struct GridAttackActor *base = (void *)p;
++    /* Keep the transform base live: direct actor fields change register allocation. */
++    struct GridAttackTransform *position = &p->transform;
++    void *collider = &p->damageCollider;
++    int damage, special;
++    struct GridAttackPacked size;
++    {
++        int *damagePtr = &p->damage;
++        damage = *damagePtr;
++        {
++            u8 *specialPtr = &p->special;
++            int value;
++            value = *specialPtr;
++            special = value;
++            *damagePtr = 0;
++            *specialPtr = 0;
++        }
++    }
++    if (damage > 0) {
++        int react = 0;
++        p->health -= damage;
++        {
++            int *accum = &p->accumulated;
++            {
++                int value = *accum + damage;
++                *accum = value;
++                {
++                    int *threshold = &p->threshold;
++                    if (value >= *threshold) {
++                        value = react;
++                        *accum = value;
++                        {
++                            int one = 1;
++                            react = one;
++                        }
++                    }
++                }
++            }
++        }
++        p->stun = 15;
++        p->flash = 10;
++        if (special)
++            p->animData.palette = p->specialDamageGraphics;
++        else
++            p->animData.palette = p->normalDamageGraphics;
++        size.x = 16;
++        size.y = 0;
++        size.z = 16;
++        DamageNumberDisplay_Show(collider, damage, 0, &position->coordinates, &size, 1);
++        if (base->health <= 0) {
++            base->health = 0;
++            {
++                u32 mask = 2;
++                base->flags |= mask;
++            }
++            GridAttack_SetState(base, GridAttack_UpdateDeathState, 8);
++            return 1;
++        }
++        if (special) {
++            u32 mask = 0x80000;
++            base->flags |= mask;
++        }
++        if (react) {
++            {
++                u32 mask = 1;
++                base->flags |= mask;
++            }
++            GridAttack_SetState(base, GridAttack_UpdateStaggerState, 7);
++            return 1;
++        }
++        p->shake = 3;
++        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
++        {
++            u32 index = gUnk_03005308 * 2;
++            u32 value;
++            value = *(u16 *)((u8 *)((u16 *)RANDOM_TABLE_ADDR) + index);
++            p->shakeAngle = value;
++        }
++        Sound_PlaySongChecked(318);
++    }
++    return 0;
++}
++
++static inline void GridAttack_SelectAction(struct GridAttackActor *p, int id, int zero)
++{
++    p->action = id;
++    p->actionTimer = zero;
++    p->entered = 1;
++}
++
++int GridAttack_SelectNextAction(struct GridAttackActor *p)
++{
++    struct GridAttackActor *base = p;
++    int trigger = p->forceAction;
++    if (trigger) {
++        int zero = 0;
++        p->forceAction = zero;
++        GridAttack_SelectAction(p, 2, zero);
++        return 1;
++    } else {
++        int active = ContactBurst_GetEnabled(p->contactBurst);
++        if (active) {
++            GridAttack_SelectAction(p, 3, 0);
++        } else if (p->attackCount >= p->attackLimit) {
++            if (ContactSequencePool_GetActiveCount(p->contactPool) > 0)
++                ContactSequencePool_BeginAllDeaths(p->contactPool);
++            GridAttack_SelectAction(p, 1, 0);
++        } else {
++            GridAttack_SelectAction(base, 3, 0);
++        }
++    }
++    return 0;
++}
++
++static inline u8 GridAttack_TakeActionEntry(struct GridAttackActor *p)
++{
++    if (p->entered) {
++        p->entered = 0;
++        p->finished = 0;
++        return TRUE;
++    }
++    return FALSE;
++}
++
++static inline void GridAttack_StartActionMode(struct GridAttackActor *p, int mode, int zero, int id)
++{
++    p->active = mode;
++    p->actionReset = zero;
++    p->action = id;
++    p->actionTimer = zero;
++    p->entered = 1;
++}
++
++#define GridAttack_ProcessMessages sub_0802ADBC
++INCLUDE_ASM("asm/nonmatching", sub_0802ADBC);
++
++void GridAttack_UpdateStateNineAction(struct GridAttackActor *p)
++{
++    if (GridAttack_TakeActionEntry(p)) {
++        u32 v = 9;
++        p->requested = v;
++        Trigger_ConsumePending(&p->receiver, 1);
++    }
++    p->actionTimer++;
++}
++
++static inline u8 GridAttack_TakeActionEntryViaPointer(struct GridAttackActor *p)
++{
++    u8 *q = &p->entered;
++    if (*q) {
++        *q = 0;
++        q--;
++        *q = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void GridAttack_UpdateIdleAction(struct GridAttackActor *p)
++{
++    u8 r = GridAttack_TakeActionEntryViaPointer(p);
++    if (r == 1) {
++        p->requested = r;
++        Trigger_ConsumePending(&p->receiver, 1);
++    }
++    p->actionTimer++;
++}
++
++static inline u8 GridAttack_TakeActionEntryBool(struct GridAttackActor *p)
++{
++    if (p->entered) {
++        p->entered = 0;
++        p->finished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void GridAttack_UpdateStateElevenAction(struct GridAttackActor *p)
++{
++    if (GridAttack_TakeActionEntryBool(p)) {
++        u32 k = 11;
++        p->requested = k;
++    }
++    if (p->finished) {
++        GridAttack_StartActionMode(p, 2, 0, 4);
++        Trigger_ConsumePending(&p->receiver, 1);
++    } else
++        p->actionTimer++;
++}
++
++void GridAttack_UpdateStateTwelveAction(struct GridAttackActor *p)
++{
++    if (GridAttack_TakeActionEntryBool(p)) {
++        u32 k = 0xC;
++        p->requested = k;
++    }
++    if (p->finished)
++        Trigger_ConsumePending(&p->receiver, 1);
++    else
++        p->actionTimer++;
++}
++
++void GridAttack_UpdateStateThirteenAction(struct GridAttackActor *p)
++{
++    if (GridAttack_TakeActionEntryBool(p)) {
++        u32 k = 0xD;
++        p->requested = k;
++    }
++    if (p->finished)
++        Trigger_ConsumePending(&p->receiver, 1);
++    else
++        p->actionTimer++;
++}
++
++void GridAttack_UpdateAnimationFourteen(struct GridAttackActor *p)
++{
++    if (GridAttack_TakeActionEntryBool(p)) {
++        u32 k = 14;
++        p->requested = k;
++    }
++    if (p->finished) {
++        GridAttack_StartActionMode(p, 2, 0, 4);
++        Trigger_ConsumePending(&p->receiver, 1);
++    } else
++        p->actionTimer++;
++}
++
++void GridAttack_UpdateAnimationFifteen(struct GridAttackActor *p)
++{
++    if (GridAttack_TakeActionEntryBool(p)) {
++        u32 k = 0xF;
++        p->requested = k;
++    }
++    if (p->finished)
++        Trigger_ConsumePending(&p->receiver, 1);
++    else
++        p->actionTimer++;
++}
++
++void GridAttack_UpdateAnimationSixteen(struct GridAttackActor *p)
++{
++    if (GridAttack_TakeActionEntryBool(p)) {
++        u32 k = 16;
++        p->requested = k;
++    }
++    if (p->finished) {
++        GridAttack_StartActionMode(p, 2, 0, 4);
++        Trigger_ConsumePending(&p->receiver, 1);
++    } else
++        p->actionTimer++;
++}
++
++void GridAttack_UpdateAnimationSeventeen(struct GridAttackActor *p)
++{
++    if (GridAttack_TakeActionEntryBool(p)) {
++        u32 k = 0x11;
++        p->requested = k;
++    }
++    if (p->finished) {
++        u32 two = 2;
++        u32 z = 0;
++        p->active = two;
++        p->actionReset = z;
++        p->action = z;
++        p->actionTimer = z;
++        p->entered = 1;
++        Trigger_ConsumePending(&p->receiver, 1);
++    } else
++        p->actionTimer++;
++}
++
++extern const u32 gUnk_08604FF0[];
++
++void GridAttack_DispatchSpecialAnimation(struct GridAttackActor *p)
++{
++    Callback_InvokeActor(p, (void *)gUnk_08604FF0[p->action]);
++}
++
++static inline void GridAttack_StartReaction(struct GridAttackActor *p, int one, int id, int zero)
++{
++    p->active = one;
++    p->actionReset = zero;
++    p->action = id;
++    p->actionTimer = zero;
++    p->entered = one;
++}
++
++int GridAttack_TryStartDamageReaction(struct GridAttackActor *p)
++{
++    if (p->health <= 0 && p->healthCheck) {
++        u32 mask = 2;
++        p->flags |= mask;
++        GridAttack_SetState(p, GridAttack_UpdateDeathState, 8);
++    }
++    p->healthCheck = 0;
++    {
++        u32 mask = 2;
++        if (p->flags & mask) {
++            GridAttack_StartReaction(p, 1, 3, 0);
++            return 1;
++        } else if (p->flags & 1) {
++            GridAttack_StartReaction(p, 1, 2, 0);
++            return 1;
++        }
++    }
++    return 0;
++}
++
++#define GridAttack_UpdateWaitAction sub_0802B3E4
++void GridAttack_UpdateWaitAction(struct GridAttackActor *p)
++{
++    struct GridAttackActor *base = p;
++    p->healthCheck = 1;
++    if (GridAttack_TakeActionEntryBool(p) == 1)
++        base->requested = 1;
++    if (base->actionTimer > p->actionDuration) {
++        if (GridAttack_SelectNextAction(p))
++            return;
++    }
++    base->actionTimer++;
++}
++
++void GridAttack_UpdateActionTwo(struct GridAttackActor *p)
++{
++    struct GridAttackActor *base = p;
++    p->healthCheck = 1;
++    if (GridAttack_TakeActionEntryBool(p)) {
++        u32 id = 2;
++        p->requested = id;
++    }
++    if (p->finished) {
++        int duration = 60, zero = 0;
++        base->active = zero;
++        base->actionReset = zero;
++        base->action = zero;
++        base->actionTimer = zero;
++        base->entered = 1;
++        base->actionDuration = duration;
++    } else
++        p->actionTimer++;
++}
++
++void GridAttack_UpdateDeathAction(struct GridAttackActor *p)
++{
++    struct GridAttackActor *base = p;
++    p->healthCheck = 1;
++    if (GridAttack_TakeActionEntryBool(p)) {
++        u32 id = 3;
++        p->requested = id;
++    }
++    if (p->finished) {
++        int duration = 60, zero = 0;
++        base->active = zero;
++        base->actionReset = zero;
++        base->action = zero;
++        base->actionTimer = zero;
++        base->entered = 1;
++        base->actionDuration = duration;
++    } else
++        p->actionTimer++;
++}
++
++void GridAttack_UpdateAttackAction(struct GridAttackActor *p)
++{
++    struct GridAttackActor *base = p;
++    p->healthCheck = 1;
++    if (GridAttack_TakeActionEntryBool(p)) {
++        u32 id = 4;
++        p->requested = id;
++    }
++    if (p->finished) {
++        int duration, zero;
++        int value = p->attackRange;
++        if (value < 64)
++            duration = base->farAttackDelay;
++        else
++            duration = base->nearAttackDelay;
++        zero = 0;
++        base->active = zero;
++        base->actionReset = zero;
++        base->action = zero;
++        base->actionTimer = zero;
++        base->entered = 1;
++        base->actionDuration = duration;
++    } else
++        p->actionTimer++;
++}
++
++void GridAttack_UpdateAnimationFive(struct GridAttackActor *p)
++{
++    if (GridAttack_TakeActionEntry(p)) {
++        u32 v = 5;
++        p->requested = v;
++    }
++    p->actionTimer++;
++}
++
++void GridAttack_UpdateRecoveryAction(struct GridAttackActor *p)
++{
++    struct GridAttackActor *base = p;
++    if (GridAttack_TakeActionEntryBool(p)) {
++        u32 id = 6;
++        p->requested = id;
++    }
++    if (p->finished) {
++        int duration = 30, zero = 0;
++        base->active = zero;
++        base->actionReset = zero;
++        base->action = zero;
++        base->actionTimer = zero;
++        base->entered = 1;
++        base->actionDuration = duration;
++    }
++    p->actionTimer++;
++}
++
++void GridAttack_UpdateDamageAction(struct GridAttackActor *p)
++{
++    struct GridAttackActor *base = p;
++    if (GridAttack_TakeActionEntryBool(p) == 1) {
++        u32 id = 7;
++        p->requested = id;
++        base->forceAction = 1;
++    }
++    {
++        u32 mask = 1;
++        if (!(p->flags & mask)) {
++            int duration = 30, zero = 0;
++            base->active = zero;
++            base->actionReset = zero;
++            base->action = zero;
++            base->actionTimer = zero;
++            base->entered = 1;
++            base->actionDuration = duration;
++        } else
++            p->actionTimer++;
++    }
++}
++
++void GridAttack_UpdatePassiveAction(struct GridAttackActor *p)
++{
++    u8 *q = &p->entered;
++    if (*q) {
++        *q = 0;
++        q--;
++        *q = 0;
++    }
++    p->actionTimer++;
++}
++
++extern const u32 gUnk_08605014[];
++
++void GridAttack_DispatchNormalAction(struct GridAttackActor *p)
++{
++    Callback_InvokeActor(p, (void *)gUnk_08605014[p->action]);
++}
++
++extern const u32 gUnk_08605024[];
++
++void GridAttack_DispatchReactionAction(struct GridAttackActor *p)
++{
++    Callback_InvokeActor(p, (void *)gUnk_08605024[p->action]);
++}
++
++extern const u32 gUnk_08605034[];
++
++void GridAttack_UpdateNormalActions(struct GridAttackActor *p)
++{
++    u32 m = 4;
++    if (!(gUnk_02000560 & m)) {
++        if (GridAttack_TryStartDamageReaction(p) == 0) {
++            Callback_InvokeActor(p, (void *)gUnk_08605034[p->actionReset]);
++        }
++    }
++}
++
++extern const u32 gUnk_08605038[];
++
++void GridAttack_UpdateReactionActions(struct GridAttackActor *p)
++{
++    Callback_InvokeActor(p, (void *)gUnk_08605038[p->actionReset]);
++}
++
++extern const u32 gUnk_0860503C[];
++
++void GridAttack_UpdateSpecialActions(struct GridAttackActor *p)
++{
++    Callback_InvokeActor(p, (void *)gUnk_0860503C[p->actionReset]);
++}
++
++extern u32 gUnk_08605040[];
++
++void GridAttack_UpdateActionController(struct GridAttackActor *p)
++{
++    p->controllerReset = 0;
++    Callback_InvokeActor(p, (void *)gUnk_08605040[p->active]);
++}
++
++#define GridAttack_UpdateAnimationAndTargets sub_0802B7C8
++INCLUDE_ASM("asm/nonmatching", sub_0802B7C8);
++
++#define GridAttack_UpdateCollidersAndPalette sub_0802BAFC
++INCLUDE_ASM("asm/nonmatching", sub_0802BAFC);
++
++int GridAttack_Update(struct GridAttackActor *p)
++{
++    u16 *t;
++    sub_0802B7C8(p);
++    GridAttack_UpdateActionController(p);
++    GridAttack_RunStateIfUnpaused((u32)p);
++    sub_0802BAFC(p);
++    if (p->phaseTimer <= 0xef)
++        GridAttackActor_RequestLinkedActorState(p);
++    else
++        GridAttackActor_NotifyLinkedActorLatePhase(p);
++    t = (u16 *)&p->phaseTimer;
++    (*t)++;
++    if (*t > 0x12b)
++        *t = 0;
++    return 0;
++}
++
++u32 GridAttackActor_Destroy(struct GridAttackActor *p)
++{
++    Collider_Remove(&p->damageCollider);
++    GridAttackActor_RemoveSprite(p);
++    SceneActors_Destroy(p);
++    return 0;
++}
++
++#define GridAttackActor_Initialize sub_0802BFAC
++INCLUDE_ASM("asm/nonmatching", sub_0802BFAC);
++
++struct GridAttackActor *GridAttackActor_Create(u32 a)
++{
++    struct GridAttackActor *p;
++    Script_GetKeywordValue(0x74, 3);
++    p = SceneActors_GetBySlot();
++    if (p != 0)
++        return p;
++    p = Task_Create(8, 0x924);
++    if (p != 0) {
++        Task_SetCallbacks(p, (void (*)(void *))GridAttack_Update,
++                          (void (*)(void *))GridAttackActor_Destroy);
++        if (sub_0802BFAC(p, a) < 0) {
++            Task_Kill(p);
++            return 0;
++        }
++    }
++    return p;
++}
+-- 
+2.39.3 (Apple Git-145)
+

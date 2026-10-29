@@ -1,0 +1,113 @@
+From 05b722316a0aa409086987e0927ed1c13ae362e5 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 04:56:02 -0700
+Subject: [PATCH] Initialize shared constants before every control-flow use
+
+Replace conditional first-use initialization with a common-scope initializer.
+Fall back to function entry for label/case entry and initialize before existing
+local declarations. Preserve shared literals' original types with typeof.
+Validated if arms, loops, declaration initializers, goto/switch entry, source AST
+immutability, and expansion on the current unmatched initializer.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/rewrites.py | 56 ++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 41 insertions(+), 15 deletions(-)
+
+diff --git a/tools/rewrites.py b/tools/rewrites.py
+index cdfbe652d..7855ad0fd 100644
+--- a/tools/rewrites.py
++++ b/tools/rewrites.py
+@@ -157,8 +157,37 @@ def _cval(c):
+         return None
+ 
+ 
++def _constant_scope(fn, nodes):
++    """An initialization point dominating all uses, including both if arms.
++
++    Block-entry initialization is safe unless a label/case can enter the
++    block after it. In that case use function entry, which cannot be bypassed.
++    """
++    parents = {id(n): p for n, p, _ in walk(fn)}
++    paths = []
++    for node in nodes:
++        path = []
++        while node is not None:
++            if isinstance(node, ca.Compound):
++                path.append(node)
++            node = parents.get(id(node))
++        paths.append(path)
++    common = next(b for b in paths[0] if all(any(b is a for a in path) for path in paths[1:]))
++    if common is not fn.body and any(isinstance(n, (ca.Label, ca.Case, ca.Default))
++                                     for n, _, _ in walk(common)):
++        return fn.body
++    return common
++
++
++def _block_local(block, decl):
++    items = block.block_items or []
++    # Existing declaration initializers may themselves contain the constant.
++    items.insert(0, decl)
++    block.block_items = items
++
++
+ def rw_related_const(fn):
+-    """... = K1 ...; f(K2)  ->  ... = (t = K1) ...; f(t + (K2 - K1))."""
++    """Initialize K1 in a common scope; derive K2 without conditional initialization."""
+     cs = _consts(fn)
+     vals = [_cval(c) for c, _, _ in cs]
+     # only values that are stored or passed (an assignment's value or a call argument)
+@@ -172,10 +201,11 @@ def rw_related_const(fn):
+         f2 = copy.deepcopy(fn)
+         c2 = _consts(f2)
+         t = new_name(f2)
+-        add_local(f2, int_decl(t, "u32"))
+         ci, pi, si = c2[i]
+         cj, pj, sj = c2[j]
+-        set_child(pi, si, ca.Assignment("=", ca.ID(t), ci))
++        block = _constant_scope(f2, [ci, cj])
++        _block_local(block, int_decl(t, "u32", copy.deepcopy(ci)))
++        set_child(pi, si, ca.ID(t))
+         if d == 0:
+             set_child(pj, sj, ca.ID(t))
+         else:
+@@ -492,7 +522,7 @@ def _enclosing_stmt(fn, node):
+ 
+ 
+ def rw_share_const(fn):
+-    """Every occurrence of K (two or more) through one variable."""
++    """Every occurrence of K through a variable initialized before all uses."""
+     cs = _consts(fn)
+     by = {}
+     for i, (c, _, _) in enumerate(cs):
+@@ -502,20 +532,16 @@ def rw_share_const(fn):
+     for v, idxs in by.items():
+         if len(idxs) < 2:
+             continue
+-        for where in ("top", "first"):
++        for where in ("top", "scope"):
+             f2 = copy.deepcopy(fn)
+             c2 = _consts(f2)
+             t = new_name(f2, "k")
+-            if where == "top":
+-                add_local(f2, int_decl(t, "u32", ca.Constant("int", c2[idxs[0]][0].value)))
+-                for i in idxs:
+-                    set_child(c2[i][1], c2[i][2], ca.ID(t))
+-            else:
+-                add_local(f2, int_decl(t, "u32"))
+-                c0, p0, s0 = c2[idxs[0]]
+-                for i in idxs[1:]:
+-                    set_child(c2[i][1], c2[i][2], ca.ID(t))
+-                set_child(p0, s0, ca.Assignment("=", ca.ID(t), c0))
++            uses = [c2[i][0] for i in idxs]
++            block = f2.body if where == "top" else _constant_scope(f2, uses)
++            # Preserve the literal's integer type (notably signed comparisons).
++            _block_local(block, typeof_decl(t, uses[0], copy.deepcopy(uses[0])))
++            for i in idxs:
++                set_child(c2[i][1], c2[i][2], ca.ID(t))
+             yield f"share constant {v} via {t} ({where})", f2
+ 
+ 
+-- 
+2.39.3 (Apple Git-145)
+

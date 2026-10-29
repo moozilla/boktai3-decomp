@@ -1,0 +1,61 @@
+From bc159bfcee736770b2232e8799b93db4708c9f62 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 02:58:17 -0700
+Subject: [PATCH] Preserve trusted seek paths when outputs were reached by
+ unchecked moves
+
+Do not let an unchecked semantic mutation hide a deliberate model hypothesis or a safe automatic path to the same binary. Show unchecked semantic status in node summaries.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/seek/seek.py | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/tools/seek/seek.py b/tools/seek/seek.py
+index 21b2d3b09..645b3d47b 100644
+--- a/tools/seek/seek.py
++++ b/tools/seek/seek.py
+@@ -142,6 +142,12 @@ class Work:
+             func = open(alias).read().strip()
+         self.sess = E.Session(func)
+         self.sess.fold_updates()
++        # An old unchecked node must not hide a trusted path to the same bytes.
++        for node in self.sess.nodes.values():
++            out = node.get("out")
++            prior = self.sess.nodes.get(self.sess.by_out.get(out))
++            if out and self.searchable(node) and prior and not self.searchable(prior):
++                self.sess.by_out[out] = node["id"]
+         meta = os.path.join(self.sess.dir, "meta.txt")
+         if self.target is None:
+             if not os.path.exists(meta):
+@@ -361,7 +367,8 @@ class Work:
+                 stats["neutral"] += 1
+                 continue
+             fs[1] += 1
+-            if out in self.sess.by_out:
++            prior = self.sess.nodes.get(self.sess.by_out.get(out))
++            if prior and self.searchable(prior):
+                 stats["known"] += 1
+                 continue
+             vpre = E.splice(base_pre, [dname], txt)
+@@ -376,6 +383,8 @@ class Work:
+                 code, _ = self.target.compile_pre(vpre)
+                 rec["sem"] = self.target.semantic(code, vpre)
+             rec = self.sess.add(rec)
++            if self.searchable(rec):
++                self.sess.by_out[out] = rec["id"]
+             if rank(rec) < rank(node):
+                 fs[2] += 1
+             kid_defs = dict(defs)
+@@ -538,7 +547,7 @@ def fmt_node(n, parent=None):
+     if n.get("line"):
+         what += f" @{n['line']}"
+     sem = n.get("sem")
+-    semtxt = "" if not sem or sem == "unchecked" else ("  [sem ok]" if sem.startswith("EQUIV") else
++    semtxt = "" if not sem else ("  [sem ok]" if sem.startswith("EQUIV") else
+                                                        "  [sem: " + sem.split(":")[0] + "]")
+     al = ""
+     if OBJECTIVE["mode"] == "block" and n.get("blk") is not None:
+-- 
+2.39.3 (Apple Git-145)
+

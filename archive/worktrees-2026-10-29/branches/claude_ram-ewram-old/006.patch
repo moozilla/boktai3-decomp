@@ -1,0 +1,309 @@
+From a90b83f8923b399452bad974867eb78d656b8dad Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Tue, 27 Oct 2026 23:16:37 -0700
+Subject: [PATCH] ramlayout dedupe: drop headers' repeats of a shared RAM
+ declaration
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+---
+ include/background_controller.h |  2 +-
+ include/cell_gate.h             |  2 +-
+ include/collision_controller.h  |  3 +-
+ include/directional_force.h     |  2 +-
+ include/orbit_background.h      |  2 +-
+ include/resource_station.h      |  2 +-
+ include/roaming_object.h        |  2 +-
+ src/fn/sub_081782E0.c           |  4 +-
+ src/fn/sub_08178AA0.c           |  4 +-
+ src/fn/sub_08178BCC.c           |  4 +-
+ tools/ramlayout.py              | 73 ++++++++++++++++++++++++++++++++-
+ 11 files changed, 85 insertions(+), 15 deletions(-)
+
+diff --git a/include/background_controller.h b/include/background_controller.h
+index d2efba502..fbfe12dc5 100644
+--- a/include/background_controller.h
++++ b/include/background_controller.h
+@@ -3,6 +3,7 @@
+ 
+ #include "engine.h"
+ #include "render.h"
++#include "ram.h"
+ 
+ /*
+  * Background controllers (ROM 080015AC-08002AA8). Two task families share
+@@ -179,7 +180,6 @@ extern struct ScrollingBackground *gScrollingBackgrounds[];
+ extern struct BackgroundLayer gUnk_03004C30[];
+ extern struct Camera gUnk_030042A0;
+ extern s16 gUnk_03005418[2];
+-extern u16 gForceMagnitude, gForceAngle;
+ 
+ /* Engine functions used by this unit. */
+ s32 Script_ReadValue(u8 *);
+diff --git a/include/cell_gate.h b/include/cell_gate.h
+index cf521562e..fd9482cbd 100644
+--- a/include/cell_gate.h
++++ b/include/cell_gate.h
+@@ -2,6 +2,7 @@
+ #define GUARD_CELL_GATE_H
+ #include "contact_swarm.h"
+ #include "game_state.h"
++#include "ram.h"
+ /* Tentative cell-local traversal gate; flags select behavior and constrained axis. */
+ struct CellGate {
+     u8 unknown0[0x18];
+@@ -28,7 +29,6 @@ struct CellGatePlayer {
+ };
+ typedef void (*CellGateUpdate)(struct CellGate *);
+ extern struct CellGatePlayer *gUnk_02000580;
+-extern u16 gPlayerTraversalActive, gPlayerTraversalMode;
+ s32 CellGate_TestPlayerHeight(struct CellGate *);
+ s32 CellGate_TestPlayerCell(struct CellGate *);
+ s32 CellGate_TestPlayerEdge(struct CellGate *, s32);
+diff --git a/include/collision_controller.h b/include/collision_controller.h
+index 6ad929b20..e46e6f578 100644
+--- a/include/collision_controller.h
++++ b/include/collision_controller.h
+@@ -3,6 +3,7 @@
+ #include "global.h"
+ #include "scene_object.h"
+ #include "player.h"
++#include "ram.h"
+ 
+ // Tentative: a pool of 16 small hit-detecting props (idle sprite, hit animation, then spawns an
+ // effect burst) owned by a task, created from script. Each slot embeds a collider
+@@ -75,8 +76,6 @@ struct CollisionScene {
+ 
+ extern struct CollisionManager *gCollisionManager;
+ extern struct CollisionScene gUnk_03005430;
+-extern s32 gActionFreezeTimer;
+-extern u16 gPlayerTraversalActive, gPlayerTraversalMode;
+ extern void *gUnk_08604A00[2][3];
+ 
+ void sub_08009E30(void);
+diff --git a/include/directional_force.h b/include/directional_force.h
+index 9a9619007..e5b038448 100644
+--- a/include/directional_force.h
++++ b/include/directional_force.h
+@@ -1,6 +1,7 @@
+ #ifndef GUARD_DIRECTIONAL_FORCE_H
+ #define GUARD_DIRECTIONAL_FORCE_H
+ #include "engine.h"
++#include "ram.h"
+ struct DirectionalForce {
+     u8 unknown0[0x18];
+     u16 id, mode;
+@@ -8,7 +9,6 @@ struct DirectionalForce {
+     u16 magnitude, targetMagnitude, angle, targetAngle, delay, unknown2E;
+ };
+ extern struct DirectionalForce *gDirectionalForce;
+-extern u16 gForceThreshold, gForceMagnitude, gForceAngle;
+ extern u32 gRandomIndex;
+ s32 Mod(s32, s32);
+ #endif
+diff --git a/include/orbit_background.h b/include/orbit_background.h
+index 9c6b6508f..0bf1cabd6 100644
+--- a/include/orbit_background.h
++++ b/include/orbit_background.h
+@@ -3,6 +3,7 @@
+ #include "contact_swarm.h"
+ #include "game_state.h"
+ #include "render.h"
++#include "ram.h"
+ /* Tentative identity: BG1 image positioned from an orbit around the selected player. */
+ struct OrbitBackground {
+     u8 unknown0[0x18];
+@@ -38,7 +39,6 @@ extern struct OrbitBackgroundSelection *gUnk_020004B4;
+ extern struct OrbitBackgroundPlayer *gUnk_02000580[4];
+ extern struct ContactPosition gUnk_030042A0;
+ extern s16 gUnk_03005418[];
+-extern u16 gPlayerCueActive;
+ extern const s16 gUnk_086149C4[];
+ void OrbitBackground_ResetOrbit(struct OrbitBackground *);
+ void OrbitBackground_UpdateVisibility(struct OrbitBackground *);
+diff --git a/include/resource_station.h b/include/resource_station.h
+index dfc8a9c3c..26282596a 100644
+--- a/include/resource_station.h
++++ b/include/resource_station.h
+@@ -1,6 +1,7 @@
+ #ifndef GUARD_RESOURCE_STATION_H
+ #define GUARD_RESOURCE_STATION_H
+ #include "game_state.h"
++#include "ram.h"
+ /* Tentative identity: a station that transfers stored resource into player+428. */
+ struct ResourceStationPosition {
+     s16 x, y, z, pad;
+@@ -47,7 +48,6 @@ struct ResourceStation {
+     u8 state, animationFrame, nearby, digitsVisible;
+     u16 interactionVariant;
+ };
+-extern u16 gPlayerTraversalActive, gPlayerTraversalMode;
+ extern struct ResourceStationPosition gUnk_03005418;
+ void AnimData_SelectPaletteBank(void *, s32);
+ #endif
+diff --git a/include/roaming_object.h b/include/roaming_object.h
+index 4e2c599d9..ae412d158 100644
+--- a/include/roaming_object.h
++++ b/include/roaming_object.h
+@@ -1,6 +1,7 @@
+ #ifndef GUARD_ROAMING_OBJECT_H
+ #define GUARD_ROAMING_OBJECT_H
+ #include "contact_swarm.h"
++#include "engine.h"
+ /* Two neighboring 0x144-byte actors share this observed layout. Identity is tentative. */
+ struct RoamingObject {
+     u8 task[0x18];
+@@ -26,7 +27,6 @@ struct RoamingObject {
+ };
+ extern const s16 gUnk_086149C4[];
+ extern u32 gRandomIndex;
+-extern const u16 gRandomTable[];
+ void RoamingObject_SetState(struct RoamingObject *, u16);
+ void RoamingObjectB_SetState(struct RoamingObject *, u16);
+ #endif
+diff --git a/src/fn/sub_081782E0.c b/src/fn/sub_081782E0.c
+index 31d2e87cc..f65510630 100644
+--- a/src/fn/sub_081782E0.c
++++ b/src/fn/sub_081782E0.c
+@@ -1,8 +1,8 @@
+ #include "global.h"
+ #include "scene_hud_display.h"
+ #include "engine.h"
+-#define gSceneHud gFieldHud
+-extern struct SceneHudState *gSceneHud;
++#include "ram.h"
++#define gSceneHud (*(struct SceneHudState **)&gFieldHud)
+ extern struct Player *gUnk_02000580[];
+ void SceneHud_RebuildPrimaryOptions(struct SceneHudState *);
+ void PauseMenu_RefreshEquipmentSlotIcons(struct SceneHudState *);
+diff --git a/src/fn/sub_08178AA0.c b/src/fn/sub_08178AA0.c
+index 744e71aa4..1a971676b 100644
+--- a/src/fn/sub_08178AA0.c
++++ b/src/fn/sub_08178AA0.c
+@@ -1,7 +1,6 @@
+ #include "global.h"
+ #include "scene_hud_display.h"
+ 
+-#define gSceneHud            gFieldHud
+ #define gSceneHudOwnerSource gUnk_020004B4
+ #define gPartyActors         gUnk_02000580
+ struct SceneHudOwnerSource {
+@@ -10,7 +9,8 @@ struct SceneHudOwnerSource {
+ };
+ extern struct SceneHudOwnerSource *gSceneHudOwnerSource;
+ extern struct Player *gPartyActors[];
+-extern struct SceneHudState *gSceneHud;
++#include "ram.h"
++#define gSceneHud (*(struct SceneHudState **)&gFieldHud)
+ 
+ void Hud_LoadLayoutResources(struct SceneHudState *);
+ void SceneHud_InitGameplayResources(struct SceneHudState *);
+diff --git a/src/fn/sub_08178BCC.c b/src/fn/sub_08178BCC.c
+index ab3ff8966..91c2055e2 100644
+--- a/src/fn/sub_08178BCC.c
++++ b/src/fn/sub_08178BCC.c
+@@ -1,8 +1,8 @@
+-#define gSceneHud gFieldHud
+ #include "global.h"
+ #include "scene_hud_display.h"
+ #include "game_state.h"
+-extern struct SceneHudState *gSceneHud;
++#include "ram.h"
++#define gSceneHud (*(struct SceneHudState **)&gFieldHud)
+ extern u16 gSceneHudMode;
+ void SceneHud_RemoveAnimations(struct SceneHudState *);
+ void PauseMenu_RemoveHeaderAnimation(struct SceneHudState *);
+diff --git a/tools/ramlayout.py b/tools/ramlayout.py
+index ef9bd1df3..f11a28b19 100644
+--- a/tools/ramlayout.py
++++ b/tools/ramlayout.py
+@@ -529,6 +529,73 @@ def cmd_unify(a):
+           f"or keep their own ({len(kept.get('own', []))})")
+ 
+ 
++def cmd_dedupe(a):
++    """Drop other headers' declarations that repeat a row's shared one, including the row's header instead."""
++    rows = [r for r in load() if r["decl"] and r["header"] and r["addr"].upper().startswith(tuple(a.prefix))]
++    texts = {p: read(p) for p in sources()}
++    new = dict(texts)
++    for r in rows:
++        c, name = parse_decl(r["decl"])
++        hdr = r["header"]
++        for p in sorted(new):
++            if not p.endswith(".h") or p == hdr or not re.search(rf"\b{name}\b", new[p]):
++                continue
++            # a header the row's header includes (directly or not) would form a cycle
++            seen, todo = set(), [hdr]
++            while todo:
++                for inc in includes(new[todo.pop()]):
++                    q = next((x for x in new if x.endswith("/" + inc)), None)
++                    if q and q not in seen:
++                        seen.add(q)
++                        todo.append(q)
++            if p in seen:
++                continue
++            t = new[p]
++            hit = False
++            for m, spec, decls, idx in reversed(declarations(t, name)):
++                if norm(spec, decls[idx], name, name) == c:
++                    t = drop_decl(t, m, decls, idx)
++                    hit = True
++            if hit:
++                new[p] = add_include(t, hdr)
++    changed = [p for p in new if new[p] != texts[p]]
++    print(f"{len(changed)} headers change: " + " ".join(changed))
++    if a.dry_run:
++        return
++
++    def asm(args):
++        p, t = args
++        return {nm: compile_asm(p, t, nm) for nm in ((False, True) if "NONMATCHING" in t else (False,))}
++
++    def includers(cur, hdr):
++        closure, grew = {os.path.basename(hdr)}, True
++        while grew:
++            grew = False
++            for p, t in cur.items():
++                if p.endswith(".h") and os.path.basename(p) not in closure and includes(t) & closure:
++                    closure.add(os.path.basename(p))
++                    grew = True
++        return sorted(p for p, t in cur.items() if p.endswith(".c") and includes(t) & closure)
++    cur, kept = dict(texts), []
++    for h in changed:
++        trial = dict(cur)
++        trial[h] = new[h]
++        verify = includers(trial, h)
++        with concurrent.futures.ThreadPoolExecutor(a.jobs) as ex:
++            before = list(ex.map(asm, [(p, cur[p]) for p in verify]))
++            write(trial, [h])       # compile_asm reads headers from the tree
++            after = list(ex.map(asm, [(p, trial[p]) for p in verify]))
++        bad = [p for p, b, f in zip(verify, before, after) if any(f[k] != v for k, v in b.items() if "ERROR" not in v[:9])]
++        if bad:
++            write(cur, [h])
++            print(f"  {h}: skipped, assembly differs in {len(bad)} files, e.g. {bad[0]}")
++            continue
++        cur = trial
++        kept.append(h)
++        print(f"  {h}: ok ({len(verify)} files)")
++    formatted(texts, cur, kept)
++
++
+ def drop_defs(t, defs):
+     """Remove file-scope struct definitions identical to one in `defs`."""
+     for key, _ in defs:
+@@ -710,8 +777,12 @@ def main():
+     s.add_argument("--cast", action="store_true",
+                    help="a file whose declaration differs gets a cast at each use before keeping its own")
+     s.add_argument("--jobs", type=int, default=os.cpu_count())
++    s = sub.add_parser("dedupe", help="drop headers' repeats of a row's shared declaration")
++    s.add_argument("--prefix", action="append", default=["02"], help="address prefix of the rows to process")
++    s.add_argument("--dry-run", action="store_true")
++    s.add_argument("--jobs", type=int, default=os.cpu_count())
+     a = ap.parse_args()
+-    {"check": cmd_check, "show": cmd_show, "seed": cmd_seed, "unify": cmd_unify}[a.cmd](a)
++    {"check": cmd_check, "show": cmd_show, "seed": cmd_seed, "unify": cmd_unify, "dedupe": cmd_dedupe}[a.cmd](a)
+ 
+ 
+ if __name__ == "__main__":
+-- 
+2.39.3 (Apple Git-145)
+

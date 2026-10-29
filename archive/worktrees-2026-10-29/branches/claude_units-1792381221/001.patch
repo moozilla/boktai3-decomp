@@ -1,0 +1,3780 @@
+From f3d652b18b45fc0416bb3193dfb34eb3ae3c3afd Mon Sep 17 00:00:00 2001
+From: Moozilla <moozilla@protonmail.com>
+Date: Sun, 18 Oct 2026 20:40:28 -0700
+Subject: [PATCH] Unit player_cue_3: merge into src/player_cue_3.c with shared
+ types (tools/unitize.py, codex:gpt-6.1-sol)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ notes/player_cue_3.md |   73 +++
+ src/fn/sub_0815AE94.c |    7 -
+ src/fn/sub_0815AEAC.c |    7 -
+ src/fn/sub_0815AEC4.c |    6 -
+ src/fn/sub_0815AED4.c |   18 -
+ src/fn/sub_0815AEE0.c |   20 -
+ src/fn/sub_0815AF14.c |   23 -
+ src/fn/sub_0815AF50.c |   23 -
+ src/fn/sub_0815AF8C.c |   23 -
+ src/fn/sub_0815AFC8.c |   26 -
+ src/fn/sub_0815B010.c |   50 --
+ src/fn/sub_0815B0A8.c |   48 --
+ src/fn/sub_0815B15C.c |   24 -
+ src/fn/sub_0815B1D0.c |   41 --
+ src/fn/sub_0815B238.c |   40 --
+ src/fn/sub_0815B28C.c |   38 --
+ src/fn/sub_0815B2E0.c |   40 --
+ src/fn/sub_0815B330.c |   40 --
+ src/fn/sub_0815B378.c |   42 --
+ src/fn/sub_0815B3BC.c |   42 --
+ src/fn/sub_0815B404.c |   26 -
+ src/fn/sub_0815B49C.c |   25 -
+ src/fn/sub_0815B52C.c |   46 --
+ src/fn/sub_0815B5F8.c |   39 --
+ src/fn/sub_0815B69C.c |   40 --
+ src/fn/sub_0815B6DC.c |   37 --
+ src/fn/sub_0815B774.c |   30 --
+ src/fn/sub_0815B858.c |   62 ---
+ src/fn/sub_0815B968.c |   45 --
+ src/fn/sub_0815B9CC.c |   54 ---
+ src/fn/sub_0815BAC4.c |   43 --
+ src/fn/sub_0815BB0C.c |   43 --
+ src/fn/sub_0815BB54.c |   43 --
+ src/fn/sub_0815BB9C.c |   43 --
+ src/fn/sub_0815BBE4.c |   43 --
+ src/fn/sub_0815BC2C.c |   43 --
+ src/fn/sub_0815BC74.c |   43 --
+ src/fn/sub_0815BCBC.c |   56 ---
+ src/fn/sub_0815BDD4.c |   50 --
+ src/fn/sub_0815BE28.c |   46 --
+ src/fn/sub_0815BE5C.c |   32 --
+ src/fn/sub_0815BF18.c |   48 --
+ src/fn/sub_0815BF60.c |   49 --
+ src/fn/sub_0815BFB8.c |   48 --
+ src/fn/sub_0815BFFC.c |   48 --
+ src/fn/sub_0815C040.c |   23 -
+ src/fn/sub_0815C0BC.c |   23 -
+ src/fn/sub_0815C138.c |   23 -
+ src/fn/sub_0815C1B4.c |   23 -
+ src/fn/sub_0815C230.c |   36 --
+ src/fn/sub_0815C2BC.c |   36 --
+ src/fn/sub_0815C348.c |   24 -
+ src/fn/sub_0815C3B8.c |   47 --
+ src/fn/sub_0815C3F0.c |   47 --
+ src/fn/sub_0815C428.c |   59 ---
+ src/fn/sub_0815C498.c |   34 --
+ src/fn/sub_0815C4FC.c |   44 --
+ src/fn/sub_0815C5A4.c |   60 ---
+ src/fn/sub_0815C730.c |    8 -
+ src/fn/sub_0815C99C.c |   29 --
+ src/player_cue_3.c    | 1050 +++++++++++++++++++++++++++++++++++++++++
+ 61 files changed, 1123 insertions(+), 2156 deletions(-)
+ create mode 100644 notes/player_cue_3.md
+ delete mode 100644 src/fn/sub_0815AE94.c
+ delete mode 100644 src/fn/sub_0815AEAC.c
+ delete mode 100644 src/fn/sub_0815AEC4.c
+ delete mode 100644 src/fn/sub_0815AED4.c
+ delete mode 100644 src/fn/sub_0815AEE0.c
+ delete mode 100644 src/fn/sub_0815AF14.c
+ delete mode 100644 src/fn/sub_0815AF50.c
+ delete mode 100644 src/fn/sub_0815AF8C.c
+ delete mode 100644 src/fn/sub_0815AFC8.c
+ delete mode 100644 src/fn/sub_0815B010.c
+ delete mode 100644 src/fn/sub_0815B0A8.c
+ delete mode 100644 src/fn/sub_0815B15C.c
+ delete mode 100644 src/fn/sub_0815B1D0.c
+ delete mode 100644 src/fn/sub_0815B238.c
+ delete mode 100644 src/fn/sub_0815B28C.c
+ delete mode 100644 src/fn/sub_0815B2E0.c
+ delete mode 100644 src/fn/sub_0815B330.c
+ delete mode 100644 src/fn/sub_0815B378.c
+ delete mode 100644 src/fn/sub_0815B3BC.c
+ delete mode 100644 src/fn/sub_0815B404.c
+ delete mode 100644 src/fn/sub_0815B49C.c
+ delete mode 100644 src/fn/sub_0815B52C.c
+ delete mode 100644 src/fn/sub_0815B5F8.c
+ delete mode 100644 src/fn/sub_0815B69C.c
+ delete mode 100644 src/fn/sub_0815B6DC.c
+ delete mode 100644 src/fn/sub_0815B774.c
+ delete mode 100644 src/fn/sub_0815B858.c
+ delete mode 100644 src/fn/sub_0815B968.c
+ delete mode 100644 src/fn/sub_0815B9CC.c
+ delete mode 100644 src/fn/sub_0815BAC4.c
+ delete mode 100644 src/fn/sub_0815BB0C.c
+ delete mode 100644 src/fn/sub_0815BB54.c
+ delete mode 100644 src/fn/sub_0815BB9C.c
+ delete mode 100644 src/fn/sub_0815BBE4.c
+ delete mode 100644 src/fn/sub_0815BC2C.c
+ delete mode 100644 src/fn/sub_0815BC74.c
+ delete mode 100644 src/fn/sub_0815BCBC.c
+ delete mode 100644 src/fn/sub_0815BDD4.c
+ delete mode 100644 src/fn/sub_0815BE28.c
+ delete mode 100644 src/fn/sub_0815BE5C.c
+ delete mode 100644 src/fn/sub_0815BF18.c
+ delete mode 100644 src/fn/sub_0815BF60.c
+ delete mode 100644 src/fn/sub_0815BFB8.c
+ delete mode 100644 src/fn/sub_0815BFFC.c
+ delete mode 100644 src/fn/sub_0815C040.c
+ delete mode 100644 src/fn/sub_0815C0BC.c
+ delete mode 100644 src/fn/sub_0815C138.c
+ delete mode 100644 src/fn/sub_0815C1B4.c
+ delete mode 100644 src/fn/sub_0815C230.c
+ delete mode 100644 src/fn/sub_0815C2BC.c
+ delete mode 100644 src/fn/sub_0815C348.c
+ delete mode 100644 src/fn/sub_0815C3B8.c
+ delete mode 100644 src/fn/sub_0815C3F0.c
+ delete mode 100644 src/fn/sub_0815C428.c
+ delete mode 100644 src/fn/sub_0815C498.c
+ delete mode 100644 src/fn/sub_0815C4FC.c
+ delete mode 100644 src/fn/sub_0815C5A4.c
+ delete mode 100644 src/fn/sub_0815C730.c
+ delete mode 100644 src/fn/sub_0815C99C.c
+ create mode 100644 src/player_cue_3.c
+
+diff --git a/notes/player_cue_3.md b/notes/player_cue_3.md
+new file mode 100644
+index 000000000..c3dee4ce4
+--- /dev/null
++++ b/notes/player_cue_3.md
+@@ -0,0 +1,73 @@
++# Player cue 3 unit consolidation
++
++Tags: #player #cutscenes #matching #unit
++
++Range: `0815AE94–0815C9EC` (end exclusive). The subsystem uses the existing
++`struct Player`; its shared layout stays in `include/player.h`, and vectors use
++`struct SceneVec` from `include/scene_vec.h`. No separate player-cue object or
++header was needed.
++
++The 59 previous single-function files are replaced by `src/player_cue_3.c`, in
++ROM order, with the formerly unmatched `0815C73C` between `PlayerCue_Refresh`
++and `PlayerCue_ReleaseControl`. All 60 functions match the complete 7,000-byte
++range. No assembly placeholders, NONMATCHING drafts, gaps, register pins or
++barriers remain in this unit.
++
++## Shared layout
++
++- `Player.cueTarget` at `0x590`: eight-byte destination copied by WalkTo, MoveTo
++  and RunTo; Motion38To writes its first three halfwords.
++- `Player.cueEffect` at `0x5B8`: address passed to `sub_082315A8`; the precise
++  effect-state interpretation is tentative. The following existing
++  `movementModifierKind` byte selects the sound after a successful effect.
++- `Player.cueOverlayMode` at `0xAE4`: zero disables the overlay; the other two
++  entry points write one or two and update `actionEighteenParameter` at `0xAD6`.
++- All partial `P`, `Q`, `Pos` and `Vec` layouts were removed in favor of the
++  existing shared structs. No offset casts or local layout adaptations were
++  needed in the final source.
++
++## New match and naming
++
++`0815C73C` (608 bytes) is named through the file-local alias
++`#define PlayerCue_UpdateAttachment sub_0815C73C`. The name is provisional:
++its nine-way switch selects the player's descriptor-driven attachment and
++animation. Cases zero through three also play sounds; cases four/five provide
++an embedded counter pointer and a signed-halfword parameter; case eight keeps
++the descriptor and selects animation `0x7F`. The visual meanings of individual
++selections remain tentative. It matched on the first candidate check.
++
++Two old declarations concealed missing arguments. Assembly establishes that
++`PlayerCue_Motion7Variant7` forwards its incoming `w` in r2 to
++`PlayerCue_Motion7Turn`, and `PlayerCue_Motion17` calls `ActorSequence_Begin`
++with r2 zero after clearing heading/side. Explicit three-argument calls match
++both sites, so no function-pointer casts or unprototyped calls are retained.
++Callbacks are consistently declared as taking `struct Player *`. Existing
++`engine.h` declarations are reused; no engine prototype changes were needed.
++
++## Verification and scope
++
++- Per-input exact checks, followed by exact checking of the merged unit:
++  zero differing bytes over all 7,000 bytes; checked again after `make format`.
++- Range coverage: 100%, a gain of 8.686 percentage points; whole-project
++  code coverage increases by 0.025 percentage points (608 newly matched bytes).
++  Existing matched coverage is preserved.
++- Approximately 70 checker invocations, including individual converted inputs,
++  small conversion corrections and merged-unit checks; one new-function
++  candidate iteration. No skipped functions or fuzzy drafts.
++- `tools/merge_unit.py`'s `merge()` implementation produced the consolidated
++  source with no declaration conflicts. Its command-line `--write` wrapper
++  invokes `git rm`, so the caller wrote the returned source and removed the
++  old inputs directly to respect this worker's read-only git metadata.
++- No commits, shared documentation edits, symbol-table edits or generated-file
++  edits. Build products and scratch source are confined to this checkout's
++  ignored `build/` directory.
++
++Full-ROM validation: `build/venv/bin/python tools/build.py` printed
++`build/boktai3.gba: OK`.
++
++Checkout setup surprise: the initial build lacked `build/res/`. Extracted the
++manifest's local resources, then recreated 578 suffixed filenames referenced
++by the shared data assembly directly from their indexed ROM slices (checking
++each hash/index pair). These filenames reflect the shared extraction's prior
++state. No shared `gen/` content or tooling was modified. The completed rebuild
++is byte-identical.
+diff --git a/src/fn/sub_0815AE94.c b/src/fn/sub_0815AE94.c
+deleted file mode 100644
+index 7d60432ee..000000000
+--- a/src/fn/sub_0815AE94.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-
+-void PlayerCue_OverlaySet(u8 *p, s32 v)
+-{
+-    *(u16 *)(p + 0xAE4) = 1;
+-    *(u16 *)(p + 0xAD6) = v;
+-}
+diff --git a/src/fn/sub_0815AEAC.c b/src/fn/sub_0815AEAC.c
+deleted file mode 100644
+index b75b815ed..000000000
+--- a/src/fn/sub_0815AEAC.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-
+-void PlayerCue_OverlayOn(u8 *p, s32 v)
+-{
+-    *(u16 *)(p + 0xAE4) = 2;
+-    *(u16 *)(p + 0xAD6) = v;
+-}
+diff --git a/src/fn/sub_0815AEC4.c b/src/fn/sub_0815AEC4.c
+deleted file mode 100644
+index 6c506f842..000000000
+--- a/src/fn/sub_0815AEC4.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-
+-void PlayerCue_OverlayOff(u8 *p)
+-{
+-    *(u16 *)(p + 0xAE4) = 0;
+-}
+diff --git a/src/fn/sub_0815AED4.c b/src/fn/sub_0815AED4.c
+deleted file mode 100644
+index 747c33173..000000000
+--- a/src/fn/sub_0815AED4.c
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x30];
+-    u32 a;
+-    u32 b;
+-};
+-struct Q {
+-    u32 a;
+-    u32 b;
+-};
+-
+-void PlayerCue_SetPosition(struct P *p, struct Q *q)
+-{
+-    u32 t = q->b;
+-    p->a = q->a;
+-    p->b = t;
+-}
+diff --git a/src/fn/sub_0815AEE0.c b/src/fn/sub_0815AEE0.c
+deleted file mode 100644
+index 9a280c772..000000000
+--- a/src/fn/sub_0815AEE0.c
++++ /dev/null
+@@ -1,20 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x94];
+-    u32 f;
+-    u8 filler2[0x58C - 0x98];
+-    void *fn;
+-};
+-
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_UpdateHidden(void);
+-
+-void PlayerCue_Hide(struct P *p)
+-{
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0, 0);
+-    p->f |= 1;
+-    p->fn = PlayerCue_UpdateHidden;
+-}
+diff --git a/src/fn/sub_0815AF14.c b/src/fn/sub_0815AF14.c
+deleted file mode 100644
+index dae424b00..000000000
+--- a/src/fn/sub_0815AF14.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x3A4];
+-    s8 b;
+-    u8 filler2[0x58C - 0x3A5];
+-    void *fn;
+-};
+-
+-void Player_UpdateFacingSide(struct P *);
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void Player_UpdateTriggerAnimation(void);
+-
+-void PlayerCue_Stand(struct P *p, s32 v)
+-{
+-    if (v >= 0)
+-        p->b = v;
+-    Player_UpdateFacingSide(p);
+-    p->fn = Player_UpdateTriggerAnimation;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0, 0);
+-}
+diff --git a/src/fn/sub_0815AF50.c b/src/fn/sub_0815AF50.c
+deleted file mode 100644
+index bb53533b4..000000000
+--- a/src/fn/sub_0815AF50.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x58C];
+-    void *fn;
+-    u8 filler2[0x59D - 0x590];
+-    u8 b;
+-    u8 filler3[0x5A4 - 0x59E];
+-    u32 c;
+-};
+-
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void sub_0814FA10(void);
+-
+-void PlayerCue_Face(struct P *p, u8 b, u32 c)
+-{
+-    p->b = b;
+-    p->c = c;
+-    p->fn = sub_0814FA10;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0, 0);
+-}
+diff --git a/src/fn/sub_0815AF8C.c b/src/fn/sub_0815AF8C.c
+deleted file mode 100644
+index b0bc13bd3..000000000
+--- a/src/fn/sub_0815AF8C.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x3A4];
+-    s8 b;
+-    u8 filler2[0x58C - 0x3A5];
+-    void *fn;
+-};
+-
+-void Player_UpdateFacingSide(struct P *);
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void Player_UpdateTriggerAnimation(void);
+-
+-void PlayerCue_Idle(struct P *p, s32 v)
+-{
+-    if (v >= 0)
+-        p->b = v;
+-    Player_UpdateFacingSide(p);
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0, 1);
+-    p->fn = Player_UpdateTriggerAnimation;
+-}
+diff --git a/src/fn/sub_0815AFC8.c b/src/fn/sub_0815AFC8.c
+deleted file mode 100644
+index f169e2b3f..000000000
+--- a/src/fn/sub_0815AFC8.c
++++ /dev/null
+@@ -1,26 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x3A4];
+-    s8 b;
+-    u8 filler2[0x58C - 0x3A5];
+-    void *fn;
+-    u8 filler3[0x5A4 - 0x590];
+-    u32 c;
+-};
+-
+-void Player_UpdateFacingSide(struct P *);
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void Player_UpdateTriggerAnimation(void);
+-
+-void PlayerCue_StandVariant2(struct P *p, s32 v, u32 c)
+-{
+-    if (v >= 0)
+-        p->b = v;
+-    Player_UpdateFacingSide(p);
+-    p->c = c;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0, 2);
+-    p->fn = Player_UpdateTriggerAnimation;
+-}
+diff --git a/src/fn/sub_0815B010.c b/src/fn/sub_0815B010.c
+deleted file mode 100644
+index faea9062b..000000000
+--- a/src/fn/sub_0815B010.c
++++ /dev/null
+@@ -1,50 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x3A2];
+-    u8 b3A2;
+-    u8 b3A3;
+-    u8 filler2[0x418 - 0x3A4];
+-    u8 state;
+-    u8 filler3[0x58C - 0x419];
+-    void *fn;
+-    u8 filler4[0x5A4 - 0x590];
+-    u32 c;
+-};
+-
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void Player_UpdateTriggerAnimation(void);
+-
+-static inline u8 inRange(u32 q)
+-{
+-    if ((u8)(q - 1) <= 1)
+-        return TRUE;
+-    return FALSE;
+-}
+-
+-static inline u8 above(u32 q)
+-{
+-    if (q > 1)
+-        return TRUE;
+-    return FALSE;
+-}
+-
+-void PlayerCue_StandVariant3(struct P *p, s32 dir, u32 c)
+-{
+-    if (p->state == 6) {
+-        if (p->b3A2 > 1)
+-            p->b3A2--;
+-    } else {
+-        u8 a = (dir << 5) + 0xA0;
+-        u32 q = ((a + 0x60) >> 6) & 3;
+-        u8 *a2 = &p->b3A2;
+-        u8 *a3 = &p->b3A3;
+-        *a2 = inRange(q);
+-        *a3 = above(q);
+-    }
+-    p->c = c;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0, 3);
+-    p->fn = Player_UpdateTriggerAnimation;
+-}
+diff --git a/src/fn/sub_0815B0A8.c b/src/fn/sub_0815B0A8.c
+deleted file mode 100644
+index a02511698..000000000
+--- a/src/fn/sub_0815B0A8.c
++++ /dev/null
+@@ -1,48 +0,0 @@
+-#include "global.h"
+-
+-struct Pos {
+-    u32 x, y;
+-};
+-
+-struct P {
+-    u8 filler[0x418];
+-    u8 state;
+-    u8 filler2[0x464 - 0x419];
+-    u8 b464;
+-    u8 b465;
+-    u8 filler3[0x58C - 0x466];
+-    void *fn;
+-    struct Pos target;
+-    u8 filler4[0x59D - 0x598];
+-    u8 b59D;
+-    u8 filler5[0x5A4 - 0x59E];
+-    u32 c;
+-};
+-
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void sub_08151EB8(void);
+-void sub_08153A00(void);
+-void sub_0814FC80(void);
+-
+-void PlayerCue_WalkTo(struct P *p, struct Pos *pos, u32 c, s32 a)
+-{
+-    p->target = *pos;
+-    p->c = c;
+-    p->b59D = a;
+-    if (p->state == 3) {
+-        if ((s8)a >= 0)
+-            p->b59D = ((s8)a >> 1) * 2 + 1;
+-        p->fn = sub_08151EB8;
+-    } else if (p->state == 4) {
+-        p->fn = sub_08153A00;
+-    } else if (p->state == 5) {
+-        p->b464 = 1;
+-        p->b465 = 1;
+-        p->fn = sub_0814FC80;
+-    } else {
+-        p->fn = sub_0814FC80;
+-    }
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 1, 0);
+-}
+diff --git a/src/fn/sub_0815B15C.c b/src/fn/sub_0815B15C.c
+deleted file mode 100644
+index 220d7103a..000000000
+--- a/src/fn/sub_0815B15C.c
++++ /dev/null
+@@ -1,24 +0,0 @@
+-#include "global.h"
+-struct Pos {
+-    u32 a, b;
+-};
+-void Player_EnterKindTwo(u8 *);
+-void ActorSequence_Begin(u8 *, s32, s32);
+-void sub_0814FFA4(void);
+-/* Scripted actor: target position *pos (or its own, +0x30) into +0x590, with
+-   c, b, a and 0x96 in +0x5A4/+0x59A/+0x59D/+0x59B; enters state 6 with update
+-   sub_0814FFA4. */
+-void PlayerCue_MoveTo(u8 *e, struct Pos *pos, s32 a, s32 b, u32 c)
+-{
+-    if (pos == 0)
+-        *(struct Pos *)(e + 0x590) = *(struct Pos *)(e + 0x30);
+-    else
+-        *(struct Pos *)(e + 0x590) = *pos;
+-    *(u32 *)(e + 0x5A4) = c;
+-    e[0x59A] = b;
+-    e[0x59D] = a;
+-    e[0x59B] = 0x96;
+-    Player_EnterKindTwo(e);
+-    ActorSequence_Begin(e, 6, 0);
+-    *(void **)(e + 0x58C) = sub_0814FFA4;
+-}
+diff --git a/src/fn/sub_0815B1D0.c b/src/fn/sub_0815B1D0.c
+deleted file mode 100644
+index d64a90a1d..000000000
+--- a/src/fn/sub_0815B1D0.c
++++ /dev/null
+@@ -1,41 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x457 - 0x3A5];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-
+-void PlayerCue_Motion7Front(struct P *p, u32 b, u32 w)
+-{
+-    PlayerCue_Stand(p, 4);
+-    p->b9a = b;
+-    p->w5a4 = w;
+-    p->a4 = 4;
+-    p->a2 = 1;
+-    p->a3 = 0;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 7, 0);
+-    p->fn = Player_UpdateSongCueAnimation;
+-}
+diff --git a/src/fn/sub_0815B238.c b/src/fn/sub_0815B238.c
+deleted file mode 100644
+index 4c8893f06..000000000
+--- a/src/fn/sub_0815B238.c
++++ /dev/null
+@@ -1,40 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x457 - 0x3A5];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-
+-void PlayerCue_Motion7(struct P *p, u32 b, u32 w)
+-{
+-    p->b9a = b;
+-    p->w5a4 = w;
+-    p->a4 = 0;
+-    p->a2 = 0;
+-    p->a3 = 0;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 7, 0);
+-    p->fn = Player_UpdateSongCueAnimation;
+-}
+diff --git a/src/fn/sub_0815B28C.c b/src/fn/sub_0815B28C.c
+deleted file mode 100644
+index 534f46566..000000000
+--- a/src/fn/sub_0815B28C.c
++++ /dev/null
+@@ -1,38 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x457 - 0x3A5];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-
+-void PlayerCue_Motion7End(struct P *p, u32 w)
+-{
+-    if (p->st == 2 && p->c57 == 7 && p->c58 != 0) {
+-        p->w5a4 = w;
+-        Player_EnterKindTwo(p);
+-        ActorSequence_Begin(p, 7, 3);
+-        p->fn = Player_UpdateSongCueAnimation;
+-    }
+-}
+diff --git a/src/fn/sub_0815B2E0.c b/src/fn/sub_0815B2E0.c
+deleted file mode 100644
+index 70e92021f..000000000
+--- a/src/fn/sub_0815B2E0.c
++++ /dev/null
+@@ -1,40 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x457 - 0x3A5];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-
+-void PlayerCue_Kneel(struct P *p, s32 v, u32 w)
+-{
+-    Player_EnterKindTwo(p);
+-    if (v >= 0)
+-        p->a4 = v;
+-    Player_UpdateFacingSide(p);
+-    p->w5a4 = w;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0x15, 0);
+-    p->fn = sub_081507F4;
+-}
+diff --git a/src/fn/sub_0815B330.c b/src/fn/sub_0815B330.c
+deleted file mode 100644
+index ca81ee453..000000000
+--- a/src/fn/sub_0815B330.c
++++ /dev/null
+@@ -1,40 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x457 - 0x3A5];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-
+-void PlayerCue_KneelGasp(struct P *p, s32 v)
+-{
+-    Player_EnterKindTwo(p);
+-    if (v >= 0)
+-        p->a4 = v;
+-    Player_UpdateFacingSide(p);
+-    Sound_PlaySong(0xC6);
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0x15, 2);
+-    p->fn = sub_081507F4;
+-}
+diff --git a/src/fn/sub_0815B378.c b/src/fn/sub_0815B378.c
+deleted file mode 100644
+index 45625bedb..000000000
+--- a/src/fn/sub_0815B378.c
++++ /dev/null
+@@ -1,42 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-
+-void PlayerCue_KneelDown(struct P *p, s32 v)
+-{
+-    Player_EnterKindTwo(p);
+-    if (v >= 0)
+-        p->a4 = v;
+-    Player_UpdateFacingSide(p);
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0x15, 1);
+-    p->fn = sub_081507F4;
+-}
+diff --git a/src/fn/sub_0815B3BC.c b/src/fn/sub_0815B3BC.c
+deleted file mode 100644
+index dfaca51a8..000000000
+--- a/src/fn/sub_0815B3BC.c
++++ /dev/null
+@@ -1,42 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-
+-void PlayerCue_GetUp(struct P *p, s32 v, u32 w)
+-{
+-    if (v >= 0)
+-        p->a4 = v;
+-    Player_UpdateFacingSide(p);
+-    p->w5a4 = w;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0x15, 3);
+-    p->fn = sub_081507F4;
+-}
+diff --git a/src/fn/sub_0815B404.c b/src/fn/sub_0815B404.c
+deleted file mode 100644
+index e993dd018..000000000
+--- a/src/fn/sub_0815B404.c
++++ /dev/null
+@@ -1,26 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-void Player_EnterKindTwo(struct Player *);
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-void sub_08153E1C(struct Player *);
+-void sub_0815093C(struct Player *);
+-void PlayerCue_BeginMode27(struct Player *p, s32 facing, s32 variant, u32 parameter)
+-{
+-    if (facing >= 0)
+-        p->facing = facing;
+-    p->facing |= 1;
+-    p->cueParameter = parameter;
+-    p->animationBranchRequested = variant;
+-    p->cueVariant = variant;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0x1B, 0);
+-    if (p->actionMode == 4) {
+-        p->triggerAnimationCallback = sub_08153E1C;
+-    } else {
+-        if (p->actionMode == 5) {
+-            p->actionLatch464 = 1;
+-            p->actionLatch465 = 1;
+-        }
+-        p->triggerAnimationCallback = sub_0815093C;
+-    }
+-}
+diff --git a/src/fn/sub_0815B49C.c b/src/fn/sub_0815B49C.c
+deleted file mode 100644
+index 2f090dcdd..000000000
+--- a/src/fn/sub_0815B49C.c
++++ /dev/null
+@@ -1,25 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-void Player_EnterKindTwo(struct Player *);
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-void sub_081540D4(struct Player *);
+-void sub_08150B34(struct Player *);
+-void PlayerCue_BeginMode28(struct Player *p, s32 facing, s32 variant, u32 parameter)
+-{
+-    if (facing >= 0)
+-        p->facing = facing;
+-    p->facing |= 1;
+-    p->cueParameter = parameter;
+-    Player_EnterKindTwo(p);
+-    p->terrainRecoveryCounter = variant;
+-    ActorSequence_Begin(p, 0x1C, 0);
+-    if (p->actionMode == 4) {
+-        p->triggerAnimationCallback = sub_081540D4;
+-    } else {
+-        if (p->actionMode == 5) {
+-            p->actionLatch464 = 1;
+-            p->actionLatch465 = 1;
+-        }
+-        p->triggerAnimationCallback = sub_08150B34;
+-    }
+-}
+diff --git a/src/fn/sub_0815B52C.c b/src/fn/sub_0815B52C.c
+deleted file mode 100644
+index 9c78bd5f2..000000000
+--- a/src/fn/sub_0815B52C.c
++++ /dev/null
+@@ -1,46 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x3A2];
+-    u8 b3A2;
+-    u8 b3A3;
+-    u8 dir;
+-    u8 filler2[0x418 - 0x3A5];
+-    u8 state;
+-    u8 filler3[0x58C - 0x419];
+-    void *fn;
+-    u8 filler4[0x598 - 0x590];
+-    u16 h598;
+-    u8 filler5[0x5A4 - 0x59A];
+-    u32 c;
+-};
+-
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void sub_08152A5C(void);
+-void sub_08154AF0(void);
+-void sub_08150C5C(void);
+-
+-void PlayerCue_Motion29(struct P *p, s32 dir, u32 h, u32 c)
+-{
+-    if (dir >= 0)
+-        p->dir = dir;
+-    p->dir |= 1;
+-    if (p->dir > 4) {
+-        p->b3A2 = (8 - p->dir) >> 1;
+-        p->b3A3 = 1;
+-    } else {
+-        p->b3A2 = p->dir >> 1;
+-        p->b3A3 = 0;
+-    }
+-    p->h598 = h;
+-    p->c = c;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0x1D, 0);
+-    if (p->state == 3)
+-        p->fn = sub_08152A5C;
+-    else if (p->state == 4)
+-        p->fn = sub_08154AF0;
+-    else
+-        p->fn = sub_08150C5C;
+-}
+diff --git a/src/fn/sub_0815B5F8.c b/src/fn/sub_0815B5F8.c
+deleted file mode 100644
+index c2568b8f4..000000000
+--- a/src/fn/sub_0815B5F8.c
++++ /dev/null
+@@ -1,39 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x3A2];
+-    u8 b3A2;
+-    u8 b3A3;
+-    u8 dir;
+-    u8 filler2[0x58C - 0x3A5];
+-    void *fn;
+-    u8 filler4[0x598 - 0x590];
+-    u16 h598;
+-    u8 b59A;
+-    u8 filler5[0x5A4 - 0x59B];
+-    u32 c;
+-};
+-
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void sub_08150DB0(void);
+-
+-void PlayerCue_Motion30(struct P *p, s32 dir, u32 h, u32 b, u32 c)
+-{
+-    if (dir >= 0)
+-        p->dir = dir;
+-    p->dir |= 1;
+-    if (p->dir > 4) {
+-        p->b3A2 = (8 - p->dir) >> 1;
+-        p->b3A3 = 1;
+-    } else {
+-        p->b3A2 = p->dir >> 1;
+-        p->b3A3 = 0;
+-    }
+-    p->h598 = h;
+-    p->b59A = b;
+-    p->c = c;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0x1E, 0);
+-    p->fn = sub_08150DB0;
+-}
+diff --git a/src/fn/sub_0815B69C.c b/src/fn/sub_0815B69C.c
+deleted file mode 100644
+index 562b7ab2a..000000000
+--- a/src/fn/sub_0815B69C.c
++++ /dev/null
+@@ -1,40 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-
+-void PlayerCue_Motion30End(struct P *p, u32 w)
+-{
+-    if (p->st == 2 && p->c57 == 0x1e && p->c58 == 5) {
+-        p->w5a4 = w;
+-        p->c58 = 4;
+-        Player_EnterKindTwo(p);
+-    }
+-}
+diff --git a/src/fn/sub_0815B6DC.c b/src/fn/sub_0815B6DC.c
+deleted file mode 100644
+index 2aa65870e..000000000
+--- a/src/fn/sub_0815B6DC.c
++++ /dev/null
+@@ -1,37 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x3A2];
+-    u8 b3A2;
+-    u8 b3A3;
+-    u8 dir;
+-    u8 filler2[0x58C - 0x3A5];
+-    void *fn;
+-    u8 filler4[0x598 - 0x590];
+-    u16 h598;
+-    u8 filler5[0x5A4 - 0x59A];
+-    u32 c;
+-};
+-
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void sub_08151078(void);
+-
+-void PlayerCue_Motion29B(struct P *p, s32 dir, u32 h, u32 c)
+-{
+-    if (dir >= 0)
+-        p->dir = dir;
+-    p->dir |= 1;
+-    if (p->dir > 4) {
+-        p->b3A2 = (8 - p->dir) >> 1;
+-        p->b3A3 = 1;
+-    } else {
+-        p->b3A2 = p->dir >> 1;
+-        p->b3A3 = 0;
+-    }
+-    p->h598 = h;
+-    p->c = c;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0x1D, 0);
+-    p->fn = sub_08151078;
+-}
+diff --git a/src/fn/sub_0815B774.c b/src/fn/sub_0815B774.c
+deleted file mode 100644
+index 72e453e37..000000000
+--- a/src/fn/sub_0815B774.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-#include "engine.h"
+-void Player_EnterKindTwo(struct Player *);
+-s32 ActorVariant_GetTableValue(u32, s32);
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-void sub_08151078(struct Player *);
+-void PlayerCue_BeginOddDirection(struct Player *p, s32 direction)
+-{
+-    if (direction >= 0)
+-        p->facing = direction;
+-    p->facing |= 1;
+-    if (p->facing > 4) {
+-        p->heading = (8 - p->facing) >> 1;
+-        p->side = 1;
+-    } else {
+-        p->heading = p->facing >> 1;
+-        p->side = 0;
+-    }
+-    Player_EnterKindTwo(p);
+-    Anim_SetKeyframes(&p->animation, p->animationData,
+-                      (u16)(p->heading + ActorVariant_GetTableValue(p->actionMode, 0x2e)), 1, 2);
+-    Anim_Step(&p->animation, p->animationData);
+-    if (p->side)
+-        p->animation.flags |= 4;
+-    else
+-        p->animation.flags &= ~4;
+-    ActorSequence_Begin(p, 0x1d, 2);
+-    p->triggerAnimationCallback = sub_08151078;
+-}
+diff --git a/src/fn/sub_0815B858.c b/src/fn/sub_0815B858.c
+deleted file mode 100644
+index e9f334d4a..000000000
+--- a/src/fn/sub_0815B858.c
++++ /dev/null
+@@ -1,62 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x3A2];
+-    u8 b3A2;
+-    u8 b3A3;
+-    u8 dir;
+-    u8 filler2[0x418 - 0x3A5];
+-    u8 state;
+-    u8 filler3[0x58C - 0x419];
+-    void *fn;
+-    u8 filler4[0x5A4 - 0x590];
+-    u32 c;
+-};
+-
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void Player_UpdateFacingSide(struct P *);
+-void sub_08152174(void);
+-void sub_081543F0(void);
+-void sub_08155008(void);
+-void sub_081503EC(void);
+-
+-static inline u8 sideDir(u8 d)
+-{
+-    if ((u8)(d - 2) <= 4)
+-        return 4;
+-    return 0;
+-}
+-
+-void PlayerCue_Motion7Turn(struct P *p, s32 dir, u32 c)
+-{
+-    if (dir >= 0)
+-        p->dir = dir;
+-    p->c = c;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 7, 0);
+-    if (p->state == 3) {
+-        p->dir |= 1;
+-        if (p->dir > 4) {
+-            p->b3A2 = (8 - p->dir) >> 1;
+-            p->b3A3 = 1;
+-        } else {
+-            p->b3A2 = p->dir >> 1;
+-            p->b3A3 = 0;
+-        }
+-        p->fn = sub_08152174;
+-    } else {
+-        u8 *d = &p->dir;
+-        *d = sideDir(*d);
+-        Player_UpdateFacingSide(p);
+-        if (p->state == 4) {
+-            p->fn = sub_081543F0;
+-        } else if (p->state == 5) {
+-            p->fn = sub_08155008;
+-        } else {
+-            p->b3A2 >>= 2;
+-            p->b3A3 = 0;
+-            p->fn = sub_081503EC;
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0815B968.c b/src/fn/sub_0815B968.c
+deleted file mode 100644
+index ebc57b336..000000000
+--- a/src/fn/sub_0815B968.c
++++ /dev/null
+@@ -1,45 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void sub_081503EC(void);
+-
+-void PlayerCue_Motion7Variant7(struct P *p, s32 v, u32 w)
+-{
+-    if ((u8)(p->d18 - 3) <= 2)
+-        PlayerCue_Motion7Turn(p, v);
+-    if (v >= 0)
+-        p->a4 = v;
+-    Player_UpdateFacingSide(p);
+-    p->w5a4 = w;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 7, 7);
+-    p->fn = sub_081503EC;
+-}
+diff --git a/src/fn/sub_0815B9CC.c b/src/fn/sub_0815B9CC.c
+deleted file mode 100644
+index aa32a87fd..000000000
+--- a/src/fn/sub_0815B9CC.c
++++ /dev/null
+@@ -1,54 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x3A2];
+-    u8 b3A2;
+-    u8 b3A3;
+-    u8 dir;
+-    u8 filler2[0x418 - 0x3A5];
+-    u8 state;
+-    u8 filler3[0x58C - 0x419];
+-    void *fn;
+-    u8 filler4[0x5A4 - 0x590];
+-    u32 c;
+-};
+-
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void Player_UpdateFacingSide(struct P *);
+-void sub_08152174(void);
+-void sub_081543F0(void);
+-void sub_08155008(void);
+-void sub_081503EC(void);
+-
+-void PlayerCue_Motion7Variant3(struct P *p, s32 dir, u32 c)
+-{
+-    if (dir >= 0)
+-        p->dir = dir;
+-    p->c = c;
+-    Player_EnterKindTwo(p);
+-    if (p->state == 3) {
+-        p->dir |= 1;
+-        if (p->dir > 4) {
+-            p->b3A2 = (8 - p->dir) >> 1;
+-            p->b3A3 = 1;
+-        } else {
+-            p->b3A2 = p->dir >> 1;
+-            p->b3A3 = 0;
+-        }
+-        ActorSequence_Begin(p, 7, 3);
+-        p->fn = sub_08152174;
+-    } else {
+-        Player_UpdateFacingSide(p);
+-        if (p->state == 4) {
+-            ActorSequence_Begin(p, 7, 3);
+-            p->fn = sub_081543F0;
+-        } else if (p->state == 5) {
+-            ActorSequence_Begin(p, 7, 3);
+-            p->fn = sub_08155008;
+-        } else {
+-            ActorSequence_Begin(p, 7, 4);
+-            p->fn = sub_081503EC;
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0815BAC4.c b/src/fn/sub_0815BAC4.c
+deleted file mode 100644
+index e01753684..000000000
+--- a/src/fn/sub_0815BAC4.c
++++ /dev/null
+@@ -1,43 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void Player_UpdateFourPhaseAction(void);
+-
+-void PlayerCue_AimDraw(struct P *p, s32 v, u32 w)
+-{
+-    if (v >= 0)
+-        p->a4 = v;
+-    Player_UpdateFacingSide(p);
+-    p->w5a4 = w;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 3, 0);
+-    p->fn = Player_UpdateFourPhaseAction;
+-}
+diff --git a/src/fn/sub_0815BB0C.c b/src/fn/sub_0815BB0C.c
+deleted file mode 100644
+index c28447557..000000000
+--- a/src/fn/sub_0815BB0C.c
++++ /dev/null
+@@ -1,43 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void Player_UpdateFourPhaseAction(void);
+-
+-void PlayerCue_AimDrawVariant2(struct P *p, s32 v, u32 w)
+-{
+-    if (v >= 0)
+-        p->a4 = v;
+-    Player_UpdateFacingSide(p);
+-    p->w5a4 = w;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 3, 2);
+-    p->fn = Player_UpdateFourPhaseAction;
+-}
+diff --git a/src/fn/sub_0815BB54.c b/src/fn/sub_0815BB54.c
+deleted file mode 100644
+index 7baa5c57c..000000000
+--- a/src/fn/sub_0815BB54.c
++++ /dev/null
+@@ -1,43 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void PlayerCue_UpdateAimHoldA(void);
+-
+-void PlayerCue_AimSteady(struct P *p, s32 v, u32 w)
+-{
+-    if (v >= 0)
+-        p->a4 = v;
+-    Player_UpdateFacingSide(p);
+-    p->w5a4 = w;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 3, 0);
+-    p->fn = PlayerCue_UpdateAimHoldA;
+-}
+diff --git a/src/fn/sub_0815BB9C.c b/src/fn/sub_0815BB9C.c
+deleted file mode 100644
+index d838fde0c..000000000
+--- a/src/fn/sub_0815BB9C.c
++++ /dev/null
+@@ -1,43 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void PlayerCue_UpdateAimHoldA(void);
+-
+-void PlayerCue_AimSteadyVariant2(struct P *p, s32 v, u32 w)
+-{
+-    if (v >= 0)
+-        p->a4 = v;
+-    Player_UpdateFacingSide(p);
+-    p->w5a4 = w;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 3, 2);
+-    p->fn = PlayerCue_UpdateAimHoldA;
+-}
+diff --git a/src/fn/sub_0815BBE4.c b/src/fn/sub_0815BBE4.c
+deleted file mode 100644
+index bcdfaedea..000000000
+--- a/src/fn/sub_0815BBE4.c
++++ /dev/null
+@@ -1,43 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void PlayerCue_UpdateAimHoldB(void);
+-
+-void PlayerCue_SetAimPose(struct P *p, s32 v, u32 w)
+-{
+-    if (v >= 0)
+-        p->a4 = v;
+-    Player_UpdateFacingSide(p);
+-    p->w5a4 = w;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 3, 0);
+-    p->fn = PlayerCue_UpdateAimHoldB;
+-}
+diff --git a/src/fn/sub_0815BC2C.c b/src/fn/sub_0815BC2C.c
+deleted file mode 100644
+index b0e07fce1..000000000
+--- a/src/fn/sub_0815BC2C.c
++++ /dev/null
+@@ -1,43 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void PlayerCue_UpdateAimHoldB(void);
+-
+-void PlayerCue_SetFiringPose(struct P *p, s32 v, u32 w)
+-{
+-    if (v >= 0)
+-        p->a4 = v;
+-    Player_UpdateFacingSide(p);
+-    p->w5a4 = w;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 3, 2);
+-    p->fn = PlayerCue_UpdateAimHoldB;
+-}
+diff --git a/src/fn/sub_0815BC74.c b/src/fn/sub_0815BC74.c
+deleted file mode 100644
+index 3edaabd0a..000000000
+--- a/src/fn/sub_0815BC74.c
++++ /dev/null
+@@ -1,43 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    u8 f590[0x59A - 0x590];
+-    u8 b9a;
+-    u8 f59b[0x59D - 0x59B];
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void Player_UpdateSixPhaseAction(void);
+-
+-void PlayerCue_Aim(struct P *p, s32 v, u32 w)
+-{
+-    if (v >= 0)
+-        p->a4 = v;
+-    Player_UpdateFacingSide(p);
+-    p->w5a4 = w;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 3, 0);
+-    p->fn = Player_UpdateSixPhaseAction;
+-}
+diff --git a/src/fn/sub_0815BCBC.c b/src/fn/sub_0815BCBC.c
+deleted file mode 100644
+index e6b749d12..000000000
+--- a/src/fn/sub_0815BCBC.c
++++ /dev/null
+@@ -1,56 +0,0 @@
+-#include "global.h"
+-
+-struct Vec {
+-    s16 x, y, z, w;
+-};
+-
+-struct P {
+-    u8 filler[0x30];
+-    struct Vec pos;
+-    u8 filler1[0x3A4 - 0x38];
+-    u8 dir;
+-    u8 filler2[0x418 - 0x3A5];
+-    u8 state;
+-    u8 filler3[0x58C - 0x419];
+-    void *fn;
+-    u8 filler4[0x5A4 - 0x590];
+-    u32 c;
+-};
+-
+-extern const s16 gUnk_086149C4[];
+-
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void Sound_PlaySong(s32);
+-void MovingSprite_Create_082375FC(struct Vec *, s32, s32, s32, s32, s32, s32);
+-void Player_UpdateSixPhaseAction(void);
+-
+-static inline int trunc12(int x)
+-{
+-    return x >= 0 ? x >> 12 : -(-x >> 12);
+-}
+-
+-void PlayerCue_Shoot(struct P *p, s32 a, u32 c)
+-{
+-    struct Vec v;
+-    u32 angle;
+-    s32 id;
+-
+-    v = p->pos;
+-    angle = ((p->dir + 5) & 7) << 5;
+-    v.x += trunc12(gUnk_086149C4[(angle + 0x40) & 0xFF] * 150);
+-    v.y += 0xE6;
+-    v.z += trunc12(gUnk_086149C4[angle] * 150);
+-    if (p->state == 6) {
+-        Sound_PlaySong(0x203);
+-        id = 0x51;
+-    } else {
+-        Sound_PlaySong(0xCD);
+-        id = 0x4B;
+-    }
+-    MovingSprite_Create_082375FC(&v, id, 0, p->dir, 0x20, 0, a);
+-    p->c = c;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 3, 2);
+-    p->fn = Player_UpdateSixPhaseAction;
+-}
+diff --git a/src/fn/sub_0815BDD4.c b/src/fn/sub_0815BDD4.c
+deleted file mode 100644
+index 3150a11b8..000000000
+--- a/src/fn/sub_0815BDD4.c
++++ /dev/null
+@@ -1,50 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    struct Q {
+-        u32 a, b;
+-    } v590;
+-    u8 f598[2];
+-    u8 b9a;
+-    u8 b9b;
+-    u8 f59c;
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_SetAnimation(struct P *, s32, s32, s32);
+-s32 ActorVariant_GetTableValue(s32, s32);
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void sub_08151484(void);
+-
+-void PlayerCue_AimHold(struct P *p, s32 v, u32 b, u32 w)
+-{
+-    if (v >= 0)
+-        p->a4 = v;
+-    Player_UpdateFacingSide(p);
+-    p->w5a4 = w;
+-    p->b9b = b;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 3, 0);
+-    p->fn = sub_08151484;
+-}
+diff --git a/src/fn/sub_0815BE28.c b/src/fn/sub_0815BE28.c
+deleted file mode 100644
+index 94b1d6ea9..000000000
+--- a/src/fn/sub_0815BE28.c
++++ /dev/null
+@@ -1,46 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    struct Q {
+-        u32 a, b;
+-    } v590;
+-    u8 f598[2];
+-    u8 b9a;
+-    u8 b9b;
+-    u8 f59c;
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_SetAnimation(struct P *, s32, s32, s32);
+-s32 ActorVariant_GetTableValue(s32, s32);
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void sub_08151484(void);
+-
+-void PlayerCue_AimEnd(struct P *p, u32 w)
+-{
+-    p->w5a4 = w;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 3, 5);
+-    p->fn = sub_08151484;
+-}
+diff --git a/src/fn/sub_0815BE5C.c b/src/fn/sub_0815BE5C.c
+deleted file mode 100644
+index 1b30e55d7..000000000
+--- a/src/fn/sub_0815BE5C.c
++++ /dev/null
+@@ -1,32 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-void Player_UpdateFacingSide(struct Player *);
+-void Player_EnterKindTwo(struct Player *);
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-void sub_08151A14(struct Player *);
+-void PlayerCue_BeginModeSeven(struct Player *p, s32 mode)
+-{
+-    if (mode == 0) {
+-        p->targetFacing = 1;
+-        Player_UpdateFacingSide(p);
+-        p->heading--;
+-        p->tetherPhase = 0;
+-    } else if (mode == 1) {
+-        p->targetFacing = 5;
+-        Player_UpdateFacingSide(p);
+-        p->heading--;
+-        p->tetherPhase = 0;
+-    } else if (mode == 2) {
+-        p->cuePhase = 0;
+-        p->tetherPhase = 5;
+-    } else if (mode == 3) {
+-        p->targetFacing = mode;
+-        Player_UpdateFacingSide(p);
+-        p->heading--;
+-        p->tetherPhase = 0;
+-    } else
+-        return;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 7, p->tetherPhase);
+-    p->triggerAnimationCallback = sub_08151A14;
+-}
+diff --git a/src/fn/sub_0815BF18.c b/src/fn/sub_0815BF18.c
+deleted file mode 100644
+index 89f648204..000000000
+--- a/src/fn/sub_0815BF18.c
++++ /dev/null
+@@ -1,48 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    struct Q {
+-        u32 a, b;
+-    } v590;
+-    u8 f598[2];
+-    u8 b9a;
+-    u8 b9b;
+-    u8 f59c;
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_SetAnimation(struct P *, s32, s32, s32);
+-s32 ActorVariant_GetTableValue(s32, s32);
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void sub_081516C0(void);
+-
+-void PlayerCue_RunTo(struct P *p, struct Q *q, u32 b, u32 w)
+-{
+-    p->v590 = *q;
+-    p->w5a4 = w;
+-    p->b9d = b;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 2, 0);
+-    p->fn = sub_081516C0;
+-}
+diff --git a/src/fn/sub_0815BF60.c b/src/fn/sub_0815BF60.c
+deleted file mode 100644
+index c3db20043..000000000
+--- a/src/fn/sub_0815BF60.c
++++ /dev/null
+@@ -1,49 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    struct Q {
+-        u32 a, b;
+-    } v590;
+-    u8 f598[2];
+-    u8 b9a;
+-    u8 b9b;
+-    u8 f59c;
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_SetAnimation(struct P *, s32, s32, s32);
+-s32 ActorVariant_GetTableValue(s32, s32);
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void PlayerCue_UpdateRunOverlay(void);
+-
+-void PlayerCue_Run(struct P *p, s32 v)
+-{
+-    if (v >= 0)
+-        p->a4 = v;
+-    Player_UpdateFacingSide(p);
+-    Player_SetAnimation(p, ActorVariant_GetTableValue(p->d18, 1), 0x20, 1);
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 2, 0);
+-    p->fn = PlayerCue_UpdateRunOverlay;
+-}
+diff --git a/src/fn/sub_0815BFB8.c b/src/fn/sub_0815BFB8.c
+deleted file mode 100644
+index d95151baf..000000000
+--- a/src/fn/sub_0815BFB8.c
++++ /dev/null
+@@ -1,48 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    struct Q {
+-        u32 a, b;
+-    } v590;
+-    u8 f598[2];
+-    u8 b9a;
+-    u8 b9b;
+-    u8 f59c;
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_SetAnimation(struct P *, s32, s32, s32);
+-s32 ActorVariant_GetTableValue(s32, s32);
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void Player_UpdateThreePhaseBaseAnimationAction(void);
+-void ActorSequence_Begin();
+-
+-void PlayerCue_Motion17(struct P *p)
+-{
+-    Player_EnterKindTwo(p);
+-    p->a4 = 1;
+-    p->a2 = 0;
+-    p->a3 = 0;
+-    ActorSequence_Begin(p, 0x11);
+-    p->fn = Player_UpdateThreePhaseBaseAnimationAction;
+-}
+diff --git a/src/fn/sub_0815BFFC.c b/src/fn/sub_0815BFFC.c
+deleted file mode 100644
+index 358e0036d..000000000
+--- a/src/fn/sub_0815BFFC.c
++++ /dev/null
+@@ -1,48 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    struct Q {
+-        u32 a, b;
+-    } v590;
+-    u8 f598[2];
+-    u8 b9a;
+-    u8 b9b;
+-    u8 f59c;
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_SetAnimation(struct P *, s32, s32, s32);
+-s32 ActorVariant_GetTableValue(s32, s32);
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void Player_UpdateThreePhaseBaseAnimationAction(void);
+-
+-void PlayerCue_Motion17Variant2(struct P *p)
+-{
+-    Player_EnterKindTwo(p);
+-    p->a4 = 1;
+-    p->a2 = 0;
+-    p->a3 = 0;
+-    ActorSequence_Begin(p, 0x11, 2);
+-    p->fn = Player_UpdateThreePhaseBaseAnimationAction;
+-}
+diff --git a/src/fn/sub_0815C040.c b/src/fn/sub_0815C040.c
+deleted file mode 100644
+index 5d823e931..000000000
+--- a/src/fn/sub_0815C040.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "global.h"
+-void Player_EnterKindTwo(u8 *);
+-void ActorSequence_Begin(u8 *, u32, u32);
+-void sub_0814FAE8(void);
+-void PlayerCue_Windblown(u8 *p, s32 a, u32 b)
+-{
+-    if (a != 0) {
+-        u8 *q = p + 0x3a4;
+-        u8 z;
+-        z = 0;
+-        *q = 5;
+-        p[0x3a2] = z;
+-        p[0x3a3] = 1;
+-    } else {
+-        p[0x3a4] = 3;
+-        p[0x3a2] = a;
+-        p[0x3a3] = a;
+-    }
+-    *(u32 *)(p + 0x5a4) = b;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0, 0);
+-    *(u32 *)(p + 0x58c) = (u32)sub_0814FAE8;
+-}
+diff --git a/src/fn/sub_0815C0BC.c b/src/fn/sub_0815C0BC.c
+deleted file mode 100644
+index 93518caa1..000000000
+--- a/src/fn/sub_0815C0BC.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "global.h"
+-void Player_EnterKindTwo(u8 *);
+-void ActorSequence_Begin(u8 *, u32, u32);
+-void sub_0814FAE8(void);
+-void PlayerCue_WindblownVariant3(u8 *p, s32 a, u32 b)
+-{
+-    if (a != 0) {
+-        u8 *q = p + 0x3a4;
+-        u8 z;
+-        z = 0;
+-        *q = 5;
+-        p[0x3a2] = z;
+-        p[0x3a3] = 1;
+-    } else {
+-        p[0x3a4] = 3;
+-        p[0x3a2] = a;
+-        p[0x3a3] = a;
+-    }
+-    *(u32 *)(p + 0x5a4) = b;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0, 3);
+-    *(u32 *)(p + 0x58c) = (u32)sub_0814FAE8;
+-}
+diff --git a/src/fn/sub_0815C138.c b/src/fn/sub_0815C138.c
+deleted file mode 100644
+index c663a8021..000000000
+--- a/src/fn/sub_0815C138.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "global.h"
+-void Player_EnterKindTwo(u8 *);
+-void ActorSequence_Begin(u8 *, u32, u32);
+-void sub_0814FAE8(void);
+-void PlayerCue_WindblownVariant4(u8 *p, s32 a, u32 b)
+-{
+-    if (a != 0) {
+-        u8 *q = p + 0x3a4;
+-        u8 z;
+-        z = 0;
+-        *q = 5;
+-        p[0x3a2] = z;
+-        p[0x3a3] = 1;
+-    } else {
+-        p[0x3a4] = 3;
+-        p[0x3a2] = a;
+-        p[0x3a3] = a;
+-    }
+-    *(u32 *)(p + 0x5a4) = b;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0, 4);
+-    *(u32 *)(p + 0x58c) = (u32)sub_0814FAE8;
+-}
+diff --git a/src/fn/sub_0815C1B4.c b/src/fn/sub_0815C1B4.c
+deleted file mode 100644
+index 0562e11ce..000000000
+--- a/src/fn/sub_0815C1B4.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "global.h"
+-void Player_EnterKindTwo(u8 *);
+-void ActorSequence_Begin(u8 *, u32, u32);
+-void sub_0814FAE8(void);
+-void PlayerCue_WindblownVariant2(u8 *p, s32 a, u32 b)
+-{
+-    if (a != 0) {
+-        u8 *q = p + 0x3a4;
+-        u8 z;
+-        z = 0;
+-        *q = 5;
+-        p[0x3a2] = z;
+-        p[0x3a3] = 1;
+-    } else {
+-        p[0x3a4] = 3;
+-        p[0x3a2] = a;
+-        p[0x3a3] = a;
+-    }
+-    *(u32 *)(p + 0x5a4) = b;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0, 2);
+-    *(u32 *)(p + 0x58c) = (u32)sub_0814FAE8;
+-}
+diff --git a/src/fn/sub_0815C230.c b/src/fn/sub_0815C230.c
+deleted file mode 100644
+index 3e595cf4a..000000000
+--- a/src/fn/sub_0815C230.c
++++ /dev/null
+@@ -1,36 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x3A2];
+-    u8 b3A2;
+-    u8 b3A3;
+-    u8 dir;
+-    u8 filler2[0x58C - 0x3A5];
+-    void *fn;
+-    u8 filler4[0x598 - 0x590];
+-    u16 h598;
+-    u8 filler5[0x5A4 - 0x59A];
+-    u32 c;
+-};
+-
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_UpdateStandDiagonal(void);
+-
+-void PlayerCue_StandDiagonal(struct P *p, s32 dir, u32 c)
+-{
+-    if (dir >= 0)
+-        p->dir = dir;
+-    p->dir |= 1;
+-    if (p->dir > 4) {
+-        p->b3A2 = (8 - p->dir) >> 1;
+-        p->b3A3 = 1;
+-    } else {
+-        p->b3A2 = p->dir >> 1;
+-        p->b3A3 = 0;
+-    }
+-    p->c = c;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0, 0);
+-    p->fn = PlayerCue_UpdateStandDiagonal;
+-}
+diff --git a/src/fn/sub_0815C2BC.c b/src/fn/sub_0815C2BC.c
+deleted file mode 100644
+index 05f333aa8..000000000
+--- a/src/fn/sub_0815C2BC.c
++++ /dev/null
+@@ -1,36 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x3A2];
+-    u8 b3A2;
+-    u8 b3A3;
+-    u8 dir;
+-    u8 filler2[0x58C - 0x3A5];
+-    void *fn;
+-    u8 filler4[0x598 - 0x590];
+-    u16 h598;
+-    u8 filler5[0x5A4 - 0x59A];
+-    u32 c;
+-};
+-
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_UpdateStandDiagonalB(void);
+-
+-void PlayerCue_StandDiagonalB(struct P *p, s32 dir, u32 c)
+-{
+-    if (dir >= 0)
+-        p->dir = dir;
+-    p->dir |= 1;
+-    if (p->dir > 4) {
+-        p->b3A2 = (8 - p->dir) >> 1;
+-        p->b3A3 = 1;
+-    } else {
+-        p->b3A2 = p->dir >> 1;
+-        p->b3A3 = 0;
+-    }
+-    p->c = c;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0, 0);
+-    p->fn = PlayerCue_UpdateStandDiagonalB;
+-}
+diff --git a/src/fn/sub_0815C348.c b/src/fn/sub_0815C348.c
+deleted file mode 100644
+index be1c4ef85..000000000
+--- a/src/fn/sub_0815C348.c
++++ /dev/null
+@@ -1,24 +0,0 @@
+-#include "global.h"
+-void Player_EnterKindTwo(u8 *);
+-void ActorSequence_Begin(u8 *, s32, s32);
+-void PlayerCue_UpdateFaceSide(void);
+-/* Sets the actor's +0x3A4 mode to 5 (on) or 3 and +0x3A2/+0x3A3, then
+-   update PlayerCue_UpdateFaceSide. */
+-void PlayerCue_FaceSide(u8 *a, u32 on)
+-{
+-    if (on) {
+-        u32 zero;
+-        u8 *mode = &a[0x3A4];
+-        zero = 0;
+-        *mode = 5;
+-        a[0x3A2] = zero;
+-        a[0x3A3] = 1;
+-    } else {
+-        a[0x3A4] = 3;
+-        a[0x3A2] = on;
+-        a[0x3A3] = on;
+-    }
+-    Player_EnterKindTwo(a);
+-    ActorSequence_Begin(a, 0, 0);
+-    *(void **)(a + 0x58C) = PlayerCue_UpdateFaceSide;
+-}
+diff --git a/src/fn/sub_0815C3B8.c b/src/fn/sub_0815C3B8.c
+deleted file mode 100644
+index 774e38790..000000000
+--- a/src/fn/sub_0815C3B8.c
++++ /dev/null
+@@ -1,47 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    struct Q {
+-        u32 a, b;
+-    } v590;
+-    u8 f598[2];
+-    u8 b9a;
+-    u8 b9b;
+-    u8 f59c;
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_SetAnimation(struct P *, s32, s32, s32);
+-s32 ActorVariant_GetTableValue(s32, s32);
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void sub_08146EAC(void);
+-
+-s32 PlayerCue_Motion11(struct P *p, u32 w)
+-{
+-    p->w5a4 = w;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0xb, 0);
+-    p->fn = sub_08146EAC;
+-    return 1;
+-}
+diff --git a/src/fn/sub_0815C3F0.c b/src/fn/sub_0815C3F0.c
+deleted file mode 100644
+index 9ad968b98..000000000
+--- a/src/fn/sub_0815C3F0.c
++++ /dev/null
+@@ -1,47 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    struct Q {
+-        u32 a, b;
+-    } v590;
+-    u8 f598[2];
+-    u8 b9a;
+-    u8 b9b;
+-    u8 f59c;
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_SetAnimation(struct P *, s32, s32, s32);
+-s32 ActorVariant_GetTableValue(s32, s32);
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void sub_08147768(void);
+-
+-s32 PlayerCue_Motion10(struct P *p, u32 w)
+-{
+-    p->w5a4 = w;
+-    Player_EnterKindTwo(p);
+-    ActorSequence_Begin(p, 0xa, 0);
+-    p->fn = sub_08147768;
+-    return 1;
+-}
+diff --git a/src/fn/sub_0815C428.c b/src/fn/sub_0815C428.c
+deleted file mode 100644
+index 8f00272c9..000000000
+--- a/src/fn/sub_0815C428.c
++++ /dev/null
+@@ -1,59 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x3A2 - 0x20];
+-    u8 a2;
+-    u8 a3;
+-    s8 a4;
+-    u8 f3a5[0x418 - 0x3A5];
+-    u8 d18;
+-    u8 f419[0x457 - 0x419];
+-    u8 c57;
+-    u8 c58;
+-    u8 f459[0x58C - 0x459];
+-    void *fn;
+-    struct Q {
+-        u32 a, b;
+-    } v590;
+-    u8 f598[2];
+-    u8 b9a;
+-    u8 b9b;
+-    u8 f59c;
+-    u8 b9d;
+-    u8 f59e[0x5A4 - 0x59E];
+-    u32 w5a4;
+-};
+-void Player_SetAnimation(struct P *, s32, s32, s32);
+-s32 ActorVariant_GetTableValue(s32, s32);
+-void Player_EnterKindTwo(struct P *);
+-void Player_UpdateFacingSide(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void PlayerCue_Motion7Turn(struct P *, s32);
+-void PlayerCue_Stand(struct P *, s32);
+-void Player_UpdateSongCueAnimation(void);
+-void sub_081507F4(void);
+-void Sound_PlaySong(s32);
+-void sub_08153224(void);
+-void sub_08146EAC(void);
+-
+-s32 PlayerCue_FormMotion(struct P *p, u32 w)
+-{
+-    s32 r;
+-    p->w5a4 = w;
+-    if (p->d18 == 0) {
+-        r = 0;
+-    } else {
+-        Player_EnterKindTwo(p);
+-        if (p->d18 == 1) {
+-            ActorSequence_Begin(p, 0xa, 0);
+-            p->fn = sub_08153224;
+-        } else if (p->d18 == 2) {
+-            ActorSequence_Begin(p, 0xb, 0);
+-            p->fn = sub_08146EAC;
+-        }
+-        r = 1;
+-    }
+-    return r;
+-}
+diff --git a/src/fn/sub_0815C498.c b/src/fn/sub_0815C498.c
+deleted file mode 100644
+index 47a381548..000000000
+--- a/src/fn/sub_0815C498.c
++++ /dev/null
+@@ -1,34 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x418];
+-    u8 state;
+-    u8 filler3[0x58C - 0x419];
+-    void *fn;
+-    u16 target[3];
+-    u8 filler4[0x5A4 - 0x596];
+-    u32 c;
+-};
+-
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void sub_081561EC(void);
+-
+-u32 PlayerCue_Motion38To(struct P *p, u16 *pos, u32 c)
+-{
+-    u32 r;
+-
+-    p->c = c;
+-    if (p->state == 2) {
+-        Player_EnterKindTwo(p);
+-        ActorSequence_Begin(p, 0x26, 0);
+-        p->fn = sub_081561EC;
+-        p->target[0] = pos[0];
+-        p->target[1] = pos[1];
+-        p->target[2] = pos[2];
+-        r = 1;
+-    } else {
+-        r = 0;
+-    }
+-    return r;
+-}
+diff --git a/src/fn/sub_0815C4FC.c b/src/fn/sub_0815C4FC.c
+deleted file mode 100644
+index ef0ad85bc..000000000
+--- a/src/fn/sub_0815C4FC.c
++++ /dev/null
+@@ -1,44 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 filler[0x3A4];
+-    u8 dir;
+-    u8 filler2[0x418 - 0x3A5];
+-    u8 state;
+-    u8 filler3[0x58C - 0x419];
+-    void *fn;
+-    u8 filler4[0x5A4 - 0x590];
+-    u32 c;
+-};
+-
+-void Player_EnterKindTwo(struct P *);
+-void ActorSequence_Begin(struct P *, s32, s32);
+-void Player_UpdateFacingSide(struct P *);
+-void sub_08153610(void);
+-void sub_08154CD4(void);
+-void sub_081556E0(void);
+-
+-u32 PlayerCue_StateMotion(struct P *p, u32 c)
+-{
+-    p->c = c;
+-    if (p->state <= 1 || p->state == 6)
+-        return 0;
+-    if (p->state == 3) {
+-        Player_EnterKindTwo(p);
+-        ActorSequence_Begin(p, 0xD, 0);
+-        p->fn = sub_08153610;
+-    } else if (p->state == 4) {
+-        Player_EnterKindTwo(p);
+-        ActorSequence_Begin(p, 0xE, 0);
+-        p->fn = sub_08154CD4;
+-    } else if (p->state == 5) {
+-        p->dir = 4;
+-        Player_UpdateFacingSide(p);
+-        Player_EnterKindTwo(p);
+-        ActorSequence_Begin(p, 0xF, 0);
+-        p->fn = sub_081556E0;
+-    } else {
+-        return 0;
+-    }
+-    return 1;
+-}
+diff --git a/src/fn/sub_0815C5A4.c b/src/fn/sub_0815C5A4.c
+deleted file mode 100644
+index 3484228ba..000000000
+--- a/src/fn/sub_0815C5A4.c
++++ /dev/null
+@@ -1,60 +0,0 @@
+-#include "global.h"
+-
+-struct Vec {
+-    s16 x, y, z, w;
+-};
+-
+-struct P {
+-    u8 filler[0x418];
+-    u8 state;
+-    u8 filler2[0x530 - 0x419];
+-    u16 h530;
+-    u8 filler3[0x5B8 - 0x532];
+-    u8 b5B8;
+-    u8 b5B9;
+-};
+-
+-extern u32 gUnk_03005308;
+-extern const u16 gUnk_0203B400[];
+-
+-s32 sub_082315A8(void *, s32, s32, struct Vec *);
+-void Sound_PlaySong(s32);
+-
+-static inline int randomWith(const u16 *table)
+-{
+-    u32 offset;
+-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+-    offset = gUnk_03005308 * 2;
+-    return *(const u16 *)(offset + (u32)table);
+-}
+-
+-void PlayerCue_ShakeEffect(struct P *p, s32 a)
+-{
+-    struct Vec v;
+-
+-    if (p->state == 3) {
+-        const u16 *t = gUnk_0203B400;
+-        v.x = (randomWith(t) & 7) - 3;
+-        v.y = (randomWith(t) & 7) - 5;
+-        v.z = 0;
+-    } else if (p->state == 4) {
+-        const u16 *t = gUnk_0203B400;
+-        v.x = (randomWith(t) & 7) - 3;
+-        v.y = (randomWith(t) & 7) - 3;
+-        v.z = 0;
+-    } else {
+-        const u16 *t = gUnk_0203B400;
+-        v.x = (randomWith(t) & 15) - 7;
+-        v.y = -(randomWith(t) & 31);
+-        v.z = 0;
+-    }
+-    if (sub_082315A8(&p->b5B8, a, 0xE10, &v) >= 0) {
+-        if (p->b5B9 == 1)
+-            Sound_PlaySong(0x191);
+-        else if (p->b5B9 == 2)
+-            Sound_PlaySong(0x133);
+-        else if (p->b5B9 == 3)
+-            Sound_PlaySong(0x133);
+-    }
+-    p->h530 = 0;
+-}
+diff --git a/src/fn/sub_0815C730.c b/src/fn/sub_0815C730.c
+deleted file mode 100644
+index e09fe2676..000000000
+--- a/src/fn/sub_0815C730.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "global.h"
+-
+-void Player_EmitQueuedEffects(u8 *);
+-
+-void PlayerCue_Refresh(u8 *p)
+-{
+-    Player_EmitQueuedEffects(p);
+-}
+diff --git a/src/fn/sub_0815C99C.c b/src/fn/sub_0815C99C.c
+deleted file mode 100644
+index f8d73dd1a..000000000
+--- a/src/fn/sub_0815C99C.c
++++ /dev/null
+@@ -1,29 +0,0 @@
+-#include "global.h"
+-
+-struct P {
+-    u8 f00[0x1c];
+-    s32 st;
+-    u8 f20[0x457 - 0x20];
+-    u8 c57;
+-    u8 c58;
+-    u8 c59;
+-    u16 h5a;
+-    u8 f5c[0x479 - 0x45C];
+-    u8 c79;
+-    u8 f7a[0x59C - 0x47A];
+-    u8 b9c;
+-};
+-
+-void PlayerCue_ReleaseControl(struct P *p)
+-{
+-    u32 z;
+-    if (p->c57 != 6)
+-        p->c57 = 0;
+-    p->c58 = 0;
+-    p->h5a = 0;
+-    z = 0;
+-    if (p->b9c != 0)
+-        p->b9c = z;
+-    p->st = 1;
+-    p->c79 = z;
+-}
+diff --git a/src/player_cue_3.c b/src/player_cue_3.c
+new file mode 100644
+index 000000000..f8523924b
+--- /dev/null
++++ b/src/player_cue_3.c
+@@ -0,0 +1,1050 @@
++#include "player.h"
++#include "engine.h"
++void Player_EnterKindTwo(struct Player *);
++void ActorSequence_Begin(struct Player *, s32, s32);
++void PlayerCue_UpdateHidden(struct Player *);
++void Player_UpdateFacingSide(struct Player *);
++void Player_UpdateTriggerAnimation(struct Player *);
++void sub_0814FA10(struct Player *);
++void sub_08151EB8(struct Player *);
++void sub_08153A00(struct Player *);
++void sub_0814FC80(struct Player *);
++void sub_0814FFA4(struct Player *);
++void PlayerCue_Stand(struct Player *, s32);
++void Player_UpdateSongCueAnimation(struct Player *);
++void sub_081507F4(struct Player *);
++void PlayerCue_Motion7Turn(struct Player *, s32, u32);
++void sub_08153E1C(struct Player *);
++void sub_0815093C(struct Player *);
++void sub_081540D4(struct Player *);
++void sub_08150B34(struct Player *);
++void sub_08152A5C(struct Player *);
++void sub_08154AF0(struct Player *);
++void sub_08150C5C(struct Player *);
++void sub_08150DB0(struct Player *);
++void sub_08151078(struct Player *);
++s32 ActorVariant_GetTableValue(u32, s32);
++void sub_08152174(struct Player *);
++void sub_081543F0(struct Player *);
++void sub_08155008(struct Player *);
++void sub_081503EC(struct Player *);
++void Player_UpdateFourPhaseAction(struct Player *);
++void PlayerCue_UpdateAimHoldA(struct Player *);
++void PlayerCue_UpdateAimHoldB(struct Player *);
++void Player_UpdateSixPhaseAction(struct Player *);
++void MovingSprite_Create_082375FC(struct SceneVec *, s32, s32, s32, s32, s32, s32);
++void Player_SetAnimation(struct Player *, s32, s32, s32);
++void sub_08151484(struct Player *);
++void sub_08151A14(struct Player *);
++void sub_081516C0(struct Player *);
++void PlayerCue_UpdateRunOverlay(struct Player *);
++void Player_UpdateThreePhaseBaseAnimationAction(struct Player *);
++void sub_0814FAE8(struct Player *);
++void PlayerCue_UpdateStandDiagonal(struct Player *);
++void PlayerCue_UpdateStandDiagonalB(struct Player *);
++void PlayerCue_UpdateFaceSide(struct Player *);
++void sub_08146EAC(struct Player *);
++void sub_08147768(struct Player *);
++void sub_08153224(struct Player *);
++void sub_081561EC(struct Player *);
++void sub_08153610(struct Player *);
++void sub_08154CD4(struct Player *);
++void sub_081556E0(struct Player *);
++s32 sub_082315A8(void *, s32, s32, struct SceneVec *);
++void Player_EmitQueuedEffects(struct Player *);
++#define PlayerCue_UpdateAttachment sub_0815C73C
++void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, void *, int, int, int);
++
++void PlayerCue_OverlaySet(struct Player *p, s32 v)
++{
++    p->cueOverlayMode = 1;
++    p->actionEighteenParameter = v;
++}
++
++void PlayerCue_OverlayOn(struct Player *p, s32 v)
++{
++    p->cueOverlayMode = 2;
++    p->actionEighteenParameter = v;
++}
++
++void PlayerCue_OverlayOff(struct Player *p)
++{
++    p->cueOverlayMode = 0;
++}
++
++void PlayerCue_SetPosition(struct Player *p, struct SceneVec *q)
++{
++    p->position = *q;
++}
++
++void PlayerCue_Hide(struct Player *p)
++{
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0, 0);
++    p->animation.flags |= 1;
++    p->triggerAnimationCallback = PlayerCue_UpdateHidden;
++}
++
++void PlayerCue_Stand(struct Player *p, s32 v)
++{
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    p->triggerAnimationCallback = Player_UpdateTriggerAnimation;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0, 0);
++}
++
++void PlayerCue_Face(struct Player *p, u8 b, u32 c)
++{
++    p->targetFacing = b;
++    p->cueParameter = c;
++    p->triggerAnimationCallback = sub_0814FA10;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0, 0);
++}
++
++void PlayerCue_Idle(struct Player *p, s32 v)
++{
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0, 1);
++    p->triggerAnimationCallback = Player_UpdateTriggerAnimation;
++}
++
++void PlayerCue_StandVariant2(struct Player *p, s32 v, u32 c)
++{
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    p->cueParameter = c;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0, 2);
++    p->triggerAnimationCallback = Player_UpdateTriggerAnimation;
++}
++
++static inline u8 inRange(u32 q)
++{
++    if ((u8)(q - 1) <= 1)
++        return TRUE;
++    return FALSE;
++}
++
++static inline u8 above(u32 q)
++{
++    if (q > 1)
++        return TRUE;
++    return FALSE;
++}
++
++void PlayerCue_StandVariant3(struct Player *p, s32 dir, u32 c)
++{
++    if (p->actionMode == 6) {
++        if (p->heading > 1)
++            p->heading--;
++    } else {
++        u8 a = (dir << 5) + 0xA0;
++        u32 q = ((a + 0x60) >> 6) & 3;
++        u8 *a2 = &p->heading;
++        u8 *a3 = &p->side;
++        *a2 = inRange(q);
++        *a3 = above(q);
++    }
++    p->cueParameter = c;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0, 3);
++    p->triggerAnimationCallback = Player_UpdateTriggerAnimation;
++}
++
++void PlayerCue_WalkTo(struct Player *p, struct SceneVec *pos, u32 c, s32 a)
++{
++    p->cueTarget = *pos;
++    p->cueParameter = c;
++    p->targetFacing = a;
++    if (p->actionMode == 3) {
++        if ((s8)a >= 0)
++            p->targetFacing = ((s8)a >> 1) * 2 + 1;
++        p->triggerAnimationCallback = sub_08151EB8;
++    } else if (p->actionMode == 4) {
++        p->triggerAnimationCallback = sub_08153A00;
++    } else if (p->actionMode == 5) {
++        p->actionLatch464 = 1;
++        p->actionLatch465 = 1;
++        p->triggerAnimationCallback = sub_0814FC80;
++    } else {
++        p->triggerAnimationCallback = sub_0814FC80;
++    }
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 1, 0);
++}
++
++/* Scripted actor: target position *pos (or its own, +0x30) into +0x590, with
++   c, b, a and 0x96 in +0x5A4/+0x59A/+0x59D/+0x59B; enters state 6 with update
++   sub_0814FFA4. */
++
++void PlayerCue_MoveTo(struct Player *e, struct SceneVec *pos, s32 a, s32 b, u32 c)
++{
++    if (pos == 0)
++        e->cueTarget = e->position;
++    else
++        e->cueTarget = *pos;
++    e->cueParameter = c;
++    e->animationBranchRequested = b;
++    e->targetFacing = a;
++    e->cuePhase = 0x96;
++    Player_EnterKindTwo(e);
++    ActorSequence_Begin(e, 6, 0);
++    e->triggerAnimationCallback = sub_0814FFA4;
++}
++
++void PlayerCue_Motion7Front(struct Player *p, u32 b, u32 w)
++{
++    PlayerCue_Stand(p, 4);
++    p->animationBranchRequested = b;
++    p->cueParameter = w;
++    p->facing = 4;
++    p->heading = 1;
++    p->side = 0;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 7, 0);
++    p->triggerAnimationCallback = Player_UpdateSongCueAnimation;
++}
++
++void PlayerCue_Motion7(struct Player *p, u32 b, u32 w)
++{
++    p->animationBranchRequested = b;
++    p->cueParameter = w;
++    p->facing = 0;
++    p->heading = 0;
++    p->side = 0;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 7, 0);
++    p->triggerAnimationCallback = Player_UpdateSongCueAnimation;
++}
++
++void PlayerCue_Motion7End(struct Player *p, u32 w)
++{
++    if (p->kind == 2 && p->tetherMode == 7 && p->tetherPhase != 0) {
++        p->cueParameter = w;
++        Player_EnterKindTwo(p);
++        ActorSequence_Begin(p, 7, 3);
++        p->triggerAnimationCallback = Player_UpdateSongCueAnimation;
++    }
++}
++
++void PlayerCue_Kneel(struct Player *p, s32 v, u32 w)
++{
++    Player_EnterKindTwo(p);
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    p->cueParameter = w;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0x15, 0);
++    p->triggerAnimationCallback = sub_081507F4;
++}
++
++void PlayerCue_KneelGasp(struct Player *p, s32 v)
++{
++    Player_EnterKindTwo(p);
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    Sound_PlaySong(0xC6);
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0x15, 2);
++    p->triggerAnimationCallback = sub_081507F4;
++}
++
++void PlayerCue_KneelDown(struct Player *p, s32 v)
++{
++    Player_EnterKindTwo(p);
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0x15, 1);
++    p->triggerAnimationCallback = sub_081507F4;
++}
++
++void PlayerCue_GetUp(struct Player *p, s32 v, u32 w)
++{
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    p->cueParameter = w;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0x15, 3);
++    p->triggerAnimationCallback = sub_081507F4;
++}
++
++void PlayerCue_BeginMode27(struct Player *p, s32 facing, s32 variant, u32 parameter)
++{
++    if (facing >= 0)
++        p->facing = facing;
++    p->facing |= 1;
++    p->cueParameter = parameter;
++    p->animationBranchRequested = variant;
++    p->cueVariant = variant;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0x1B, 0);
++    if (p->actionMode == 4) {
++        p->triggerAnimationCallback = sub_08153E1C;
++    } else {
++        if (p->actionMode == 5) {
++            p->actionLatch464 = 1;
++            p->actionLatch465 = 1;
++        }
++        p->triggerAnimationCallback = sub_0815093C;
++    }
++}
++
++void PlayerCue_BeginMode28(struct Player *p, s32 facing, s32 variant, u32 parameter)
++{
++    if (facing >= 0)
++        p->facing = facing;
++    p->facing |= 1;
++    p->cueParameter = parameter;
++    Player_EnterKindTwo(p);
++    p->terrainRecoveryCounter = variant;
++    ActorSequence_Begin(p, 0x1C, 0);
++    if (p->actionMode == 4) {
++        p->triggerAnimationCallback = sub_081540D4;
++    } else {
++        if (p->actionMode == 5) {
++            p->actionLatch464 = 1;
++            p->actionLatch465 = 1;
++        }
++        p->triggerAnimationCallback = sub_08150B34;
++    }
++}
++
++void PlayerCue_Motion29(struct Player *p, s32 dir, u32 h, u32 c)
++{
++    if (dir >= 0)
++        p->facing = dir;
++    p->facing |= 1;
++    if (p->facing > 4) {
++        p->heading = (8 - p->facing) >> 1;
++        p->side = 1;
++    } else {
++        p->heading = p->facing >> 1;
++        p->side = 0;
++    }
++    p->recoilSpeed = h;
++    p->cueParameter = c;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0x1D, 0);
++    if (p->actionMode == 3)
++        p->triggerAnimationCallback = sub_08152A5C;
++    else if (p->actionMode == 4)
++        p->triggerAnimationCallback = sub_08154AF0;
++    else
++        p->triggerAnimationCallback = sub_08150C5C;
++}
++
++void PlayerCue_Motion30(struct Player *p, s32 dir, u32 h, u32 b, u32 c)
++{
++    if (dir >= 0)
++        p->facing = dir;
++    p->facing |= 1;
++    if (p->facing > 4) {
++        p->heading = (8 - p->facing) >> 1;
++        p->side = 1;
++    } else {
++        p->heading = p->facing >> 1;
++        p->side = 0;
++    }
++    p->recoilSpeed = h;
++    p->animationBranchRequested = b;
++    p->cueParameter = c;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0x1E, 0);
++    p->triggerAnimationCallback = sub_08150DB0;
++}
++
++void PlayerCue_Motion30End(struct Player *p, u32 w)
++{
++    if (p->kind == 2 && p->tetherMode == 0x1e && p->tetherPhase == 5) {
++        p->cueParameter = w;
++        p->tetherPhase = 4;
++        Player_EnterKindTwo(p);
++    }
++}
++
++void PlayerCue_Motion29B(struct Player *p, s32 dir, u32 h, u32 c)
++{
++    if (dir >= 0)
++        p->facing = dir;
++    p->facing |= 1;
++    if (p->facing > 4) {
++        p->heading = (8 - p->facing) >> 1;
++        p->side = 1;
++    } else {
++        p->heading = p->facing >> 1;
++        p->side = 0;
++    }
++    p->recoilSpeed = h;
++    p->cueParameter = c;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0x1D, 0);
++    p->triggerAnimationCallback = sub_08151078;
++}
++
++void PlayerCue_BeginOddDirection(struct Player *p, s32 direction)
++{
++    if (direction >= 0)
++        p->facing = direction;
++    p->facing |= 1;
++    if (p->facing > 4) {
++        p->heading = (8 - p->facing) >> 1;
++        p->side = 1;
++    } else {
++        p->heading = p->facing >> 1;
++        p->side = 0;
++    }
++    Player_EnterKindTwo(p);
++    Anim_SetKeyframes(&p->animation, p->animationData,
++                      (u16)(p->heading + ActorVariant_GetTableValue(p->actionMode, 0x2e)), 1, 2);
++    Anim_Step(&p->animation, p->animationData);
++    if (p->side)
++        p->animation.flags |= 4;
++    else
++        p->animation.flags &= ~4;
++    ActorSequence_Begin(p, 0x1d, 2);
++    p->triggerAnimationCallback = sub_08151078;
++}
++
++static inline u8 sideDir(u8 d)
++{
++    if ((u8)(d - 2) <= 4)
++        return 4;
++    return 0;
++}
++
++void PlayerCue_Motion7Turn(struct Player *p, s32 dir, u32 c)
++{
++    if (dir >= 0)
++        p->facing = dir;
++    p->cueParameter = c;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 7, 0);
++    if (p->actionMode == 3) {
++        p->facing |= 1;
++        if (p->facing > 4) {
++            p->heading = (8 - p->facing) >> 1;
++            p->side = 1;
++        } else {
++            p->heading = p->facing >> 1;
++            p->side = 0;
++        }
++        p->triggerAnimationCallback = sub_08152174;
++    } else {
++        u8 *d = &p->facing;
++        *d = sideDir(*d);
++        Player_UpdateFacingSide(p);
++        if (p->actionMode == 4) {
++            p->triggerAnimationCallback = sub_081543F0;
++        } else if (p->actionMode == 5) {
++            p->triggerAnimationCallback = sub_08155008;
++        } else {
++            p->heading >>= 2;
++            p->side = 0;
++            p->triggerAnimationCallback = sub_081503EC;
++        }
++    }
++}
++
++void PlayerCue_Motion7Variant7(struct Player *p, s32 v, u32 w)
++{
++    if ((u8)(p->actionMode - 3) <= 2)
++        PlayerCue_Motion7Turn(p, v, w);
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    p->cueParameter = w;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 7, 7);
++    p->triggerAnimationCallback = sub_081503EC;
++}
++
++void PlayerCue_Motion7Variant3(struct Player *p, s32 dir, u32 c)
++{
++    if (dir >= 0)
++        p->facing = dir;
++    p->cueParameter = c;
++    Player_EnterKindTwo(p);
++    if (p->actionMode == 3) {
++        p->facing |= 1;
++        if (p->facing > 4) {
++            p->heading = (8 - p->facing) >> 1;
++            p->side = 1;
++        } else {
++            p->heading = p->facing >> 1;
++            p->side = 0;
++        }
++        ActorSequence_Begin(p, 7, 3);
++        p->triggerAnimationCallback = sub_08152174;
++    } else {
++        Player_UpdateFacingSide(p);
++        if (p->actionMode == 4) {
++            ActorSequence_Begin(p, 7, 3);
++            p->triggerAnimationCallback = sub_081543F0;
++        } else if (p->actionMode == 5) {
++            ActorSequence_Begin(p, 7, 3);
++            p->triggerAnimationCallback = sub_08155008;
++        } else {
++            ActorSequence_Begin(p, 7, 4);
++            p->triggerAnimationCallback = sub_081503EC;
++        }
++    }
++}
++
++void PlayerCue_AimDraw(struct Player *p, s32 v, u32 w)
++{
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    p->cueParameter = w;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 3, 0);
++    p->triggerAnimationCallback = Player_UpdateFourPhaseAction;
++}
++
++void PlayerCue_AimDrawVariant2(struct Player *p, s32 v, u32 w)
++{
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    p->cueParameter = w;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 3, 2);
++    p->triggerAnimationCallback = Player_UpdateFourPhaseAction;
++}
++
++void PlayerCue_AimSteady(struct Player *p, s32 v, u32 w)
++{
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    p->cueParameter = w;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 3, 0);
++    p->triggerAnimationCallback = PlayerCue_UpdateAimHoldA;
++}
++
++void PlayerCue_AimSteadyVariant2(struct Player *p, s32 v, u32 w)
++{
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    p->cueParameter = w;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 3, 2);
++    p->triggerAnimationCallback = PlayerCue_UpdateAimHoldA;
++}
++
++void PlayerCue_SetAimPose(struct Player *p, s32 v, u32 w)
++{
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    p->cueParameter = w;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 3, 0);
++    p->triggerAnimationCallback = PlayerCue_UpdateAimHoldB;
++}
++
++void PlayerCue_SetFiringPose(struct Player *p, s32 v, u32 w)
++{
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    p->cueParameter = w;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 3, 2);
++    p->triggerAnimationCallback = PlayerCue_UpdateAimHoldB;
++}
++
++void PlayerCue_Aim(struct Player *p, s32 v, u32 w)
++{
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    p->cueParameter = w;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 3, 0);
++    p->triggerAnimationCallback = Player_UpdateSixPhaseAction;
++}
++
++static inline int trunc12(int x)
++{
++    return x >= 0 ? x >> 12 : -(-x >> 12);
++}
++
++void PlayerCue_Shoot(struct Player *p, s32 a, u32 c)
++{
++    struct SceneVec v;
++    u32 angle;
++    s32 id;
++
++    v = p->position;
++    angle = ((p->facing + 5) & 7) << 5;
++    v.x += trunc12(gUnk_086149C4[(angle + 0x40) & 0xFF] * 150);
++    v.y += 0xE6;
++    v.z += trunc12(gUnk_086149C4[angle] * 150);
++    if (p->actionMode == 6) {
++        Sound_PlaySong(0x203);
++        id = 0x51;
++    } else {
++        Sound_PlaySong(0xCD);
++        id = 0x4B;
++    }
++    MovingSprite_Create_082375FC(&v, id, 0, p->facing, 0x20, 0, a);
++    p->cueParameter = c;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 3, 2);
++    p->triggerAnimationCallback = Player_UpdateSixPhaseAction;
++}
++
++void PlayerCue_AimHold(struct Player *p, s32 v, u32 b, u32 w)
++{
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    p->cueParameter = w;
++    p->cuePhase = b;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 3, 0);
++    p->triggerAnimationCallback = sub_08151484;
++}
++
++void PlayerCue_AimEnd(struct Player *p, u32 w)
++{
++    p->cueParameter = w;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 3, 5);
++    p->triggerAnimationCallback = sub_08151484;
++}
++
++void PlayerCue_BeginModeSeven(struct Player *p, s32 mode)
++{
++    if (mode == 0) {
++        p->targetFacing = 1;
++        Player_UpdateFacingSide(p);
++        p->heading--;
++        p->tetherPhase = 0;
++    } else if (mode == 1) {
++        p->targetFacing = 5;
++        Player_UpdateFacingSide(p);
++        p->heading--;
++        p->tetherPhase = 0;
++    } else if (mode == 2) {
++        p->cuePhase = 0;
++        p->tetherPhase = 5;
++    } else if (mode == 3) {
++        p->targetFacing = mode;
++        Player_UpdateFacingSide(p);
++        p->heading--;
++        p->tetherPhase = 0;
++    } else
++        return;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 7, p->tetherPhase);
++    p->triggerAnimationCallback = sub_08151A14;
++}
++
++void PlayerCue_RunTo(struct Player *p, struct SceneVec *q, u32 b, u32 w)
++{
++    p->cueTarget = *q;
++    p->cueParameter = w;
++    p->targetFacing = b;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 2, 0);
++    p->triggerAnimationCallback = sub_081516C0;
++}
++
++void PlayerCue_Run(struct Player *p, s32 v)
++{
++    if (v >= 0)
++        p->facing = v;
++    Player_UpdateFacingSide(p);
++    Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 1), 0x20, 1);
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 2, 0);
++    p->triggerAnimationCallback = PlayerCue_UpdateRunOverlay;
++}
++
++void PlayerCue_Motion17(struct Player *p)
++{
++    Player_EnterKindTwo(p);
++    p->facing = 1;
++    p->heading = 0;
++    p->side = 0;
++    ActorSequence_Begin(p, 0x11, 0);
++    p->triggerAnimationCallback = Player_UpdateThreePhaseBaseAnimationAction;
++}
++
++void PlayerCue_Motion17Variant2(struct Player *p)
++{
++    Player_EnterKindTwo(p);
++    p->facing = 1;
++    p->heading = 0;
++    p->side = 0;
++    ActorSequence_Begin(p, 0x11, 2);
++    p->triggerAnimationCallback = Player_UpdateThreePhaseBaseAnimationAction;
++}
++
++void PlayerCue_Windblown(struct Player *p, s32 a, u32 b)
++{
++    if (a != 0) {
++        u8 *q = &p->facing;
++        u8 z;
++        z = 0;
++        *q = 5;
++        p->heading = z;
++        p->side = 1;
++    } else {
++        p->facing = 3;
++        p->heading = a;
++        p->side = a;
++    }
++    p->cueParameter = b;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0, 0);
++    p->triggerAnimationCallback = sub_0814FAE8;
++}
++
++void PlayerCue_WindblownVariant3(struct Player *p, s32 a, u32 b)
++{
++    if (a != 0) {
++        u8 *q = &p->facing;
++        u8 z;
++        z = 0;
++        *q = 5;
++        p->heading = z;
++        p->side = 1;
++    } else {
++        p->facing = 3;
++        p->heading = a;
++        p->side = a;
++    }
++    p->cueParameter = b;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0, 3);
++    p->triggerAnimationCallback = sub_0814FAE8;
++}
++
++void PlayerCue_WindblownVariant4(struct Player *p, s32 a, u32 b)
++{
++    if (a != 0) {
++        u8 *q = &p->facing;
++        u8 z;
++        z = 0;
++        *q = 5;
++        p->heading = z;
++        p->side = 1;
++    } else {
++        p->facing = 3;
++        p->heading = a;
++        p->side = a;
++    }
++    p->cueParameter = b;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0, 4);
++    p->triggerAnimationCallback = sub_0814FAE8;
++}
++
++void PlayerCue_WindblownVariant2(struct Player *p, s32 a, u32 b)
++{
++    if (a != 0) {
++        u8 *q = &p->facing;
++        u8 z;
++        z = 0;
++        *q = 5;
++        p->heading = z;
++        p->side = 1;
++    } else {
++        p->facing = 3;
++        p->heading = a;
++        p->side = a;
++    }
++    p->cueParameter = b;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0, 2);
++    p->triggerAnimationCallback = sub_0814FAE8;
++}
++
++void PlayerCue_StandDiagonal(struct Player *p, s32 dir, u32 c)
++{
++    if (dir >= 0)
++        p->facing = dir;
++    p->facing |= 1;
++    if (p->facing > 4) {
++        p->heading = (8 - p->facing) >> 1;
++        p->side = 1;
++    } else {
++        p->heading = p->facing >> 1;
++        p->side = 0;
++    }
++    p->cueParameter = c;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0, 0);
++    p->triggerAnimationCallback = PlayerCue_UpdateStandDiagonal;
++}
++
++void PlayerCue_StandDiagonalB(struct Player *p, s32 dir, u32 c)
++{
++    if (dir >= 0)
++        p->facing = dir;
++    p->facing |= 1;
++    if (p->facing > 4) {
++        p->heading = (8 - p->facing) >> 1;
++        p->side = 1;
++    } else {
++        p->heading = p->facing >> 1;
++        p->side = 0;
++    }
++    p->cueParameter = c;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0, 0);
++    p->triggerAnimationCallback = PlayerCue_UpdateStandDiagonalB;
++}
++
++/* Sets the actor's +0x3A4 mode to 5 (on) or 3 and +0x3A2/+0x3A3, then
++   update PlayerCue_UpdateFaceSide. */
++
++void PlayerCue_FaceSide(struct Player *a, u32 on)
++{
++    if (on) {
++        u32 zero;
++        u8 *mode = &a->facing;
++        zero = 0;
++        *mode = 5;
++        a->heading = zero;
++        a->side = 1;
++    } else {
++        a->facing = 3;
++        a->heading = on;
++        a->side = on;
++    }
++    Player_EnterKindTwo(a);
++    ActorSequence_Begin(a, 0, 0);
++    a->triggerAnimationCallback = PlayerCue_UpdateFaceSide;
++}
++
++s32 PlayerCue_Motion11(struct Player *p, u32 w)
++{
++    p->cueParameter = w;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0xb, 0);
++    p->triggerAnimationCallback = sub_08146EAC;
++    return 1;
++}
++
++s32 PlayerCue_Motion10(struct Player *p, u32 w)
++{
++    p->cueParameter = w;
++    Player_EnterKindTwo(p);
++    ActorSequence_Begin(p, 0xa, 0);
++    p->triggerAnimationCallback = sub_08147768;
++    return 1;
++}
++
++s32 PlayerCue_FormMotion(struct Player *p, u32 w)
++{
++    s32 r;
++    p->cueParameter = w;
++    if (p->actionMode == 0) {
++        r = 0;
++    } else {
++        Player_EnterKindTwo(p);
++        if (p->actionMode == 1) {
++            ActorSequence_Begin(p, 0xa, 0);
++            p->triggerAnimationCallback = sub_08153224;
++        } else if (p->actionMode == 2) {
++            ActorSequence_Begin(p, 0xb, 0);
++            p->triggerAnimationCallback = sub_08146EAC;
++        }
++        r = 1;
++    }
++    return r;
++}
++
++u32 PlayerCue_Motion38To(struct Player *p, u16 *pos, u32 c)
++{
++    u32 r;
++
++    p->cueParameter = c;
++    if (p->actionMode == 2) {
++        Player_EnterKindTwo(p);
++        ActorSequence_Begin(p, 0x26, 0);
++        p->triggerAnimationCallback = sub_081561EC;
++        p->cueTarget.x = pos[0];
++        p->cueTarget.y = pos[1];
++        p->cueTarget.z = pos[2];
++        r = 1;
++    } else {
++        r = 0;
++    }
++    return r;
++}
++
++u32 PlayerCue_StateMotion(struct Player *p, u32 c)
++{
++    p->cueParameter = c;
++    if (p->actionMode <= 1 || p->actionMode == 6)
++        return 0;
++    if (p->actionMode == 3) {
++        Player_EnterKindTwo(p);
++        ActorSequence_Begin(p, 0xD, 0);
++        p->triggerAnimationCallback = sub_08153610;
++    } else if (p->actionMode == 4) {
++        Player_EnterKindTwo(p);
++        ActorSequence_Begin(p, 0xE, 0);
++        p->triggerAnimationCallback = sub_08154CD4;
++    } else if (p->actionMode == 5) {
++        p->facing = 4;
++        Player_UpdateFacingSide(p);
++        Player_EnterKindTwo(p);
++        ActorSequence_Begin(p, 0xF, 0);
++        p->triggerAnimationCallback = sub_081556E0;
++    } else {
++        return 0;
++    }
++    return 1;
++}
++
++static inline int randomWith(const u16 *table)
++{
++    u32 offset;
++    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
++    offset = gUnk_03005308 * 2;
++    return *(const u16 *)(offset + (u32)table);
++}
++
++void PlayerCue_ShakeEffect(struct Player *p, s32 a)
++{
++    struct SceneVec v;
++
++    if (p->actionMode == 3) {
++        const u16 *t = gUnk_0203B400;
++        v.x = (randomWith(t) & 7) - 3;
++        v.y = (randomWith(t) & 7) - 5;
++        v.z = 0;
++    } else if (p->actionMode == 4) {
++        const u16 *t = gUnk_0203B400;
++        v.x = (randomWith(t) & 7) - 3;
++        v.y = (randomWith(t) & 7) - 3;
++        v.z = 0;
++    } else {
++        const u16 *t = gUnk_0203B400;
++        v.x = (randomWith(t) & 15) - 7;
++        v.y = -(randomWith(t) & 31);
++        v.z = 0;
++    }
++    if (sub_082315A8(&p->cueEffect, a, 0xE10, &v) >= 0) {
++        if (p->movementModifierKind == 1)
++            Sound_PlaySong(0x191);
++        else if (p->movementModifierKind == 2)
++            Sound_PlaySong(0x133);
++        else if (p->movementModifierKind == 3)
++            Sound_PlaySong(0x133);
++    }
++    p->scriptStatus[0] = 0;
++}
++
++void PlayerCue_Refresh(struct Player *p)
++{
++    Player_EmitQueuedEffects(p);
++}
++
++/* Descriptor and animation selections observed here; their visual meaning is tentative. */
++
++void PlayerCue_UpdateAttachment(struct Player *p, u32 cue, s32 duration, s32 parameter)
++{
++    switch (cue) {
++        case 0:
++            p->kindTwoAttachmentDescriptor = 0;
++            p->kindTwoAttachmentCounter = 0;
++            p->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
++                p->kindTwoAttachment, &p->positionalEffectGroup, p->kindTwoAttachmentDescriptor, 1,
++                0, 0, 0, 80);
++            Sound_PlaySong(0x1B1);
++            break;
++        case 1:
++            p->kindTwoAttachmentDescriptor = 0;
++            p->kindTwoAttachmentCounter = 0;
++            p->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
++                p->kindTwoAttachment, &p->positionalEffectGroup, p->kindTwoAttachmentDescriptor, 3,
++                0, 0, 0, 80);
++            Sound_PlaySong(0x1EC);
++            break;
++        case 2:
++            p->kindTwoAttachmentDescriptor = 0;
++            p->kindTwoAttachmentCounter = 0;
++            p->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
++                p->kindTwoAttachment, &p->positionalEffectGroup, p->kindTwoAttachmentDescriptor, 0,
++                0, 0, 0, 80);
++            Sound_PlaySong(0x1EC);
++            break;
++        case 3:
++            p->kindTwoAttachmentDescriptor = 0;
++            p->kindTwoAttachmentCounter = 0;
++            p->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
++                p->kindTwoAttachment, &p->positionalEffectGroup, p->kindTwoAttachmentDescriptor, 2,
++                0, 0, 0, 80);
++            Sound_PlaySong(0x1ED);
++            break;
++        case 4:
++            p->kindTwoAttachmentDescriptor = 1;
++            p->kindTwoAttachmentCounter = duration;
++            p->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
++                p->kindTwoAttachment, &p->positionalEffectGroup, p->kindTwoAttachmentDescriptor, 0,
++                &p->kindTwoAttachmentCounter, (s16)parameter, 150, 230);
++            break;
++        case 5:
++            p->kindTwoAttachmentDescriptor = 3;
++            p->kindTwoAttachmentCounter = duration;
++            p->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
++                p->kindTwoAttachment, &p->positionalEffectGroup, p->kindTwoAttachmentDescriptor, 0,
++                &p->kindTwoAttachmentCounter, (s16)parameter, 150, 230);
++            break;
++        case 6:
++            p->kindTwoAttachmentDescriptor = 5;
++            p->kindTwoAttachmentCounter = 0;
++            p->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
++                p->kindTwoAttachment, &p->positionalEffectGroup, p->kindTwoAttachmentDescriptor, 0,
++                0, 0, 150, 230);
++            break;
++        case 7:
++            p->kindTwoAttachmentDescriptor = 4;
++            p->kindTwoAttachmentCounter = 0;
++            p->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
++                p->kindTwoAttachment, &p->positionalEffectGroup, p->kindTwoAttachmentDescriptor, 0,
++                0, 0, 150, 230);
++            break;
++        case 8:
++            p->kindTwoAttachmentCounter = 0;
++            p->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
++                p->kindTwoAttachment, &p->positionalEffectGroup, p->kindTwoAttachmentDescriptor,
++                127, 0, 0, 0, 80);
++            break;
++    }
++}
++
++void PlayerCue_ReleaseControl(struct Player *p)
++{
++    u32 z;
++    if (p->tetherMode != 6)
++        p->tetherMode = 0;
++    p->tetherPhase = 0;
++    p->tetherFrame = 0;
++    z = 0;
++    if (p->kindTwoEntered != 0)
++        p->kindTwoEntered = z;
++    p->kind = 1;
++    p->terrainClampBlocked = z;
++}
+-- 
+2.39.3 (Apple Git-145)
+

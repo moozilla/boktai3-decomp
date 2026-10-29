@@ -1,0 +1,2 @@
+Allow seek add to skip automatic reload-rotation probes
+Resolve seek ROM aliases to the intended draft function

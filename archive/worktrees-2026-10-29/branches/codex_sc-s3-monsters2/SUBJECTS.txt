@@ -1,0 +1,1 @@
+seek: allow code ranking after checking skeleton facts

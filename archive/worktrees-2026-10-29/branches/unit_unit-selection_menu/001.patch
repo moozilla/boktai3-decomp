@@ -1,0 +1,2823 @@
+From 42709c9aa8421b17d84960ad759437313b1dbece Mon Sep 17 00:00:00 2001
+From: Moozilla <moozilla@protonmail.com>
+Date: Sun, 18 Oct 2026 13:59:29 -0700
+Subject: [PATCH] Unit selection_menu: merge 45 files into src/selection_menu.c
+
+Selection menu (tentative) (08019E58-0801B49C); tools/unitize.py, build OK, matched bytes 907294 -> 907470.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ include/selection_menu.h |   47 ++
+ notes/selection_menu.md  |   92 ++++
+ src/fn/sub_08019E58.c    |    6 -
+ src/fn/sub_08019E70.c    |    7 -
+ src/fn/sub_08019E98.c    |   13 -
+ src/fn/sub_08019ECC.c    |   30 --
+ src/fn/sub_08019F18.c    |   13 -
+ src/fn/sub_08019F2C.c    |   12 -
+ src/fn/sub_08019F44.c    |   37 --
+ src/fn/sub_08019FD8.c    |   16 -
+ src/fn/sub_0801A01C.c    |   27 -
+ src/fn/sub_0801A094.c    |   20 -
+ src/fn/sub_0801A0D0.c    |   19 -
+ src/fn/sub_0801A10C.c    |   24 -
+ src/fn/sub_0801A1A4.c    |   17 -
+ src/fn/sub_0801A470.c    |   14 -
+ src/fn/sub_0801A4B4.c    |   27 -
+ src/fn/sub_0801A53C.c    |   26 -
+ src/fn/sub_0801A5A8.c    |   26 -
+ src/fn/sub_0801A614.c    |   21 -
+ src/fn/sub_0801A634.c    |   12 -
+ src/fn/sub_0801A658.c    |    9 -
+ src/fn/sub_0801A67C.c    |   12 -
+ src/fn/sub_0801A69C.c    |   12 -
+ src/fn/sub_0801A6BC.c    |    6 -
+ src/fn/sub_0801A75C.c    |   42 --
+ src/fn/sub_0801A814.c    |   42 --
+ src/fn/sub_0801A8CC.c    |   13 -
+ src/fn/sub_0801A8FC.c    |   11 -
+ src/fn/sub_0801A920.c    |   35 --
+ src/fn/sub_0801A9B4.c    |   26 -
+ src/fn/sub_0801AA18.c    |   41 --
+ src/fn/sub_0801AB1C.c    |   32 --
+ src/fn/sub_0801ABA0.c    |   37 --
+ src/fn/sub_0801ABEC.c    |   26 -
+ src/fn/sub_0801AC50.c    |   15 -
+ src/fn/sub_0801AC84.c    |   15 -
+ src/fn/sub_0801ADC0.c    |  114 ----
+ src/fn/sub_0801AF54.c    |   43 --
+ src/fn/sub_0801B004.c    |   87 ---
+ src/fn/sub_0801B188.c    |   21 -
+ src/fn/sub_0801B1E8.c    |   49 --
+ src/fn/sub_0801B274.c    |   20 -
+ src/fn/sub_0801B2D4.c    |    9 -
+ src/fn/sub_0801B2F8.c    |   18 -
+ src/fn/sub_0801B324.c    |   67 ---
+ src/fn/sub_0801B454.c    |   20 -
+ src/selection_menu.c     | 1097 ++++++++++++++++++++++++++++++++++++++
+ 48 files changed, 1236 insertions(+), 1189 deletions(-)
+ create mode 100644 include/selection_menu.h
+ create mode 100644 notes/selection_menu.md
+ delete mode 100644 src/fn/sub_08019E58.c
+ delete mode 100644 src/fn/sub_08019E70.c
+ delete mode 100644 src/fn/sub_08019E98.c
+ delete mode 100644 src/fn/sub_08019ECC.c
+ delete mode 100644 src/fn/sub_08019F18.c
+ delete mode 100644 src/fn/sub_08019F2C.c
+ delete mode 100644 src/fn/sub_08019F44.c
+ delete mode 100644 src/fn/sub_08019FD8.c
+ delete mode 100644 src/fn/sub_0801A01C.c
+ delete mode 100644 src/fn/sub_0801A094.c
+ delete mode 100644 src/fn/sub_0801A0D0.c
+ delete mode 100644 src/fn/sub_0801A10C.c
+ delete mode 100644 src/fn/sub_0801A1A4.c
+ delete mode 100644 src/fn/sub_0801A470.c
+ delete mode 100644 src/fn/sub_0801A4B4.c
+ delete mode 100644 src/fn/sub_0801A53C.c
+ delete mode 100644 src/fn/sub_0801A5A8.c
+ delete mode 100644 src/fn/sub_0801A614.c
+ delete mode 100644 src/fn/sub_0801A634.c
+ delete mode 100644 src/fn/sub_0801A658.c
+ delete mode 100644 src/fn/sub_0801A67C.c
+ delete mode 100644 src/fn/sub_0801A69C.c
+ delete mode 100644 src/fn/sub_0801A6BC.c
+ delete mode 100644 src/fn/sub_0801A75C.c
+ delete mode 100644 src/fn/sub_0801A814.c
+ delete mode 100644 src/fn/sub_0801A8CC.c
+ delete mode 100644 src/fn/sub_0801A8FC.c
+ delete mode 100644 src/fn/sub_0801A920.c
+ delete mode 100644 src/fn/sub_0801A9B4.c
+ delete mode 100644 src/fn/sub_0801AA18.c
+ delete mode 100644 src/fn/sub_0801AB1C.c
+ delete mode 100644 src/fn/sub_0801ABA0.c
+ delete mode 100644 src/fn/sub_0801ABEC.c
+ delete mode 100644 src/fn/sub_0801AC50.c
+ delete mode 100644 src/fn/sub_0801AC84.c
+ delete mode 100644 src/fn/sub_0801ADC0.c
+ delete mode 100644 src/fn/sub_0801AF54.c
+ delete mode 100644 src/fn/sub_0801B004.c
+ delete mode 100644 src/fn/sub_0801B188.c
+ delete mode 100644 src/fn/sub_0801B1E8.c
+ delete mode 100644 src/fn/sub_0801B274.c
+ delete mode 100644 src/fn/sub_0801B2D4.c
+ delete mode 100644 src/fn/sub_0801B2F8.c
+ delete mode 100644 src/fn/sub_0801B324.c
+ delete mode 100644 src/fn/sub_0801B454.c
+ create mode 100644 src/selection_menu.c
+
+diff --git a/include/selection_menu.h b/include/selection_menu.h
+new file mode 100644
+index 000000000..82539f5ac
+--- /dev/null
++++ b/include/selection_menu.h
+@@ -0,0 +1,47 @@
++#ifndef GUARD_SELECTION_MENU_H
++#define GUARD_SELECTION_MENU_H
++#include "scene_input_panel.h"
++
++/* Tentative actor/item combination menu, allocated as 0xDB4 bytes. */
++struct SelectionMenu {
++    struct Task task;
++    u8 unknown18[4];
++    u8 callbackPending, selectedSlot, choiceCount, repeatTicks;
++    u8 horizontalChoice, choices[2], unknown23, statisticsPage;
++    u8 unknown25[3];
++    u32 frame;
++    u8 unknown2C[8];
++    u32 availableSlots;
++    struct ContactPosition choiceTarget;
++    u16 cancelScript, confirmScript;
++    u8 graphicData[8];
++    struct SceneInputResource panelResource, iconResource;
++    struct SceneInputPanelDrawable panel;
++    struct SceneInputWidget panels[2], cursors[3], markers[8];
++    struct SceneInputWidget highlight, heading, icons[19];
++    u8 result[16];
++    void (*callback)(struct SelectionMenu *);
++    u32 actorMessages, itemMessages, promptMessages;
++};
++/* Packed copy preserves the original paired-word position copy; the z/pad
++ * components are not initialized by the grid population routines. */
++struct SelectionMenuPackedPosition {
++    signed x : 16, y : 16, z : 16, pad : 16;
++};
++struct SelectionMenuScriptValues {
++    u32 actor, item;
++};
++struct SelectionMenuScriptCall {
++    u32 flags : 16, unused : 16;
++    struct SelectionMenuScriptValues *args;
++};
++struct SelectionMenuItem {
++    u8 graphic, unknown1[9], available, unknownB[5];
++};
++struct SelectionMenuActor {
++    u8 unknown0[2], level, unknown3[21];
++    u32 restrictions[2];
++};
++extern struct SelectionMenuItem gUnk_08E60F80[];
++extern struct SelectionMenuActor gUnk_08E6092C[];
++#endif
+diff --git a/notes/selection_menu.md b/notes/selection_menu.md
+new file mode 100644
+index 000000000..3f74013d9
+--- /dev/null
++++ b/notes/selection_menu.md
+@@ -0,0 +1,92 @@
++# Selection menu unit (tentative)
++
++Tags: #selection-menu #translation-unit #matching
++
++Range: 08019E58–0801B49C (end exclusive). Consolidated the 45 input files
++into `src/selection_menu.c`, with every function and remaining assembly body in
++ROM order. `include/selection_menu.h` holds the shared owner, script-call
++arguments, packed-copy position, and the observed actor/item table layouts.
++The owner reuses `Task`, `SceneInputResource`, `SceneInputWidget`,
++`SceneInputPanelDrawable`, and `ContactPosition` from existing headers.
++The `0xDB4` allocation includes two resource headers, the panel drawable and
++its graphics, two panel widgets, three cursors, eight markers, a highlight,
++a heading, nineteen icon/choice widgets, a sixteen-byte result record, the
++state callback, and three message sources. Semantic names remain tentative.
++
++## Matching results
++
++The original 45 C functions remain exact. Newly matched, without pins:
++
++- 0801A3C0: `SelectionMenu_InitCursors` initializes three cursor widgets.
++- 0801A418: `SelectionMenu_InitMarkers` initializes eight marker widgets.
++
++These add 176 exact bytes, a 0.0073 percentage-point code gain.
++Names use file-local aliases; no function-symbol CSV was edited.
++
++0801ACB8 (`SelectionMenu_NavigateGrid`, tentative) is a guarded NONMATCHING
++draft, recorded at 94.7% fuzzy by `tools/check.py --nonmatching --record`.
++It selects a direction from newly pressed keys, delays held-key repeat, wraps
++the four-by-four grid, and resets the repeat counter after movement. The
++remaining differences involve the held-input pointer lifetime and the
++compiler sharing branches/masks between the down and right wrap cases.
++The default build retains the original assembly.
++
++0801A218 remains assembly: panel widget/sprite setup, resource 922E/4BBF,
++glyph 593A, palette 1F7, and a stack-local sequence step. A typed draft was
++about 65–67% fuzzy; the sequence step's masks, instruction ordering and
++register allocation still differ. 0801A6D0 remains assembly: initializes
++nineteen icons in reverse order, then the heading at (32, 0). Attempts
++reached about 70% fuzzy; scratch-position lifetime, final heading argument
++ordering and register allocation differ. These lower-scoring attempts were
++left in ignored build scratch, not production source.
++No extra/gap functions were needed: the exact unit spans all 5700 bytes.
++
++## Matching adaptations and API observations
++
++- The two marker-position loops byte-index the `GameState` owner before
++  accessing the shared `inventory[0]`/`party[0]` field. Direct array indexing
++  reverses the two address additions. No alternate partial struct is used.
++- Marker hiding traverses pointers to the shared widget's flag word with
++  the observed 0x60 stride; traversing widget pointers changes load offsets.
++- Grid population retains the original packed bitfield position copy through
++  a small shared packed-copy type. The original z/padding components remain
++  unspecified, as in the preexisting matches; no new such behavior was added.
++- `SelectionMenu_Choose` keeps its existing pinned byte-offset coordinate
++  stores: using direct position fields coalesces the address calculations.
++  The adaptations have source comments. No new pins or barriers were added.
++- `SelectionMenu_Initialize` keeps its two unused creation arguments: dropping
++  them changes the creator's saved registers and call setup. Task callback
++  casts retain the engine's public void-returning callback declaration while
++  the menu update/destructor retain their observed zero return values.
++- The page-refresh routines explicitly pass `Script_ParseStringRef`'s return
++  to `Text_LookupString`, replacing their old missing-argument declaration;
++  this matches exactly with the existing engine prototype.
++- `tools/depin.py src/selection_menu.c --write` kept all 19 existing hints.
++  Existing concession markers stay beside the affected functions.
++
++## Validation
++
++Used `merge_unit.py`'s item/conflict/merge implementation (no conflicts after
++type unification). Its CLI removal step runs `git rm`; source removal and
++output writing were done directly to respect the driver's no-git-metadata
++constraint. No commits, shared documentation edits, generated-source edits,
++or tool edits were made.
++
++Approximately four to nine focused checks per unmatched function, several
++whole-unit checks, individual checks of all existing functions during type
++unification, and the 19-hint depinning pass. Formatting was restricted to
++the unit and its header. The final fast unit check reports zero differing
++bytes across 08019E58–0801B49C. Progress reports two additional matching
++functions and no lost matching bytes. Full-build result is recorded below.
++
++The first full build exposed a fresh-checkout setup issue: private `build/res`
++assets had not been extracted, so data assembly could not open its incbins.
++Generated the missing resource archives and text bank from the ROM using
++`datafmt` in this checkout only. Retained both normal and indexed extraction
++filenames required by the shared generated assembly. No shared `gen/` files
++were regenerated; the resumed build used these private build inputs.
++
++Final validation: `build/venv/bin/python tools/build.py` printed
++`build/boktai3.gba: OK` (byte-identical ROM). Build log:
++`build/selection_build_final.log`. The merged source/header also pass the
++scoped clang-format check and `git diff --check`. No commit was made.
+diff --git a/src/fn/sub_08019E58.c b/src/fn/sub_08019E58.c
+deleted file mode 100644
+index bd9e45fcc..000000000
+--- a/src/fn/sub_08019E58.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_030042E4;
+-u8 *SelectionMenu_GetIconPalette(s32 i)
+-{
+-    return gUnk_030042E4 + (i + 0x373) * 0x20;
+-}
+diff --git a/src/fn/sub_08019E70.c b/src/fn/sub_08019E70.c
+deleted file mode 100644
+index 520fa43dd..000000000
+--- a/src/fn/sub_08019E70.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
+-void Presentation_SetActorIconFrame(u8 *p, u8 *q, u8 *r)
+-{
+-    Anim_LoadKeyframe(q, p + 0x6c, *r + 0xf0, 0);
+-    *(u32 *)(q + 8) &= ~1;
+-}
+diff --git a/src/fn/sub_08019E98.c b/src/fn/sub_08019E98.c
+deleted file mode 100644
+index fc81e3854..000000000
+--- a/src/fn/sub_08019E98.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-u8 *Inventory_GetEquipmentEntry(u32);
+-void Presentation_SetActorIconFrame(u8 *, u8 *, u8 *);
+-void SelectionMenu_SetActorIcon(u8 *p, u8 *q, u32 c)
+-{
+-    u8 *r = Inventory_GetEquipmentEntry(c);
+-    if (*r != 0xff) {
+-        Presentation_SetActorIconFrame(p, q, r);
+-        *(u32 *)(q + 8) &= ~1;
+-    } else {
+-        *(u32 *)(q + 8) |= 1;
+-    }
+-}
+diff --git a/src/fn/sub_08019ECC.c b/src/fn/sub_08019ECC.c
+deleted file mode 100644
+index 8080d9c6c..000000000
+--- a/src/fn/sub_08019ECC.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#include "global.h"
+-// MATCHING_CONCESSION: register-pinning
+-extern u8 gUnk_08E60F80[][16];
+-int Inventory_GetConsumableId(u32);
+-void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
+-void Presentation_SetItemGraphic(u8 *p, u8 *q, u32 item)
+-{
+-    int index = Inventory_GetConsumableId(item);
+-    if (index >= 0) {
+-        int offset = index * 16;
+-        u8 *entry;
+-        entry = (u8 *)((u32)gUnk_08E60F80 + offset);
+-        {
+-            u8 *context = p + 0x6c;
+-            register int base asm("r0");
+-            int resource;
+-            base = 0x121;
+-            asm("" : "+r"(base));
+-            resource = base;
+-            asm("" : "+r"(resource));
+-            {
+-                register int tile asm("r3") = entry[0];
+-                resource += tile;
+-            }
+-            Anim_LoadKeyframe(q, context, resource, 0);
+-        }
+-        *(u32 *)(q + 8) &= ~1;
+-    } else
+-        *(u32 *)(q + 8) |= 1;
+-}
+diff --git a/src/fn/sub_08019F18.c b/src/fn/sub_08019F18.c
+deleted file mode 100644
+index 60f40a35d..000000000
+--- a/src/fn/sub_08019F18.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-struct S {
+-    u8 f[0x1c];
+-    u8 a;
+-    u8 g[0xb];
+-    u32 b;
+-};
+-void SelectionMenu_SetCallback(u8 *p, u32 v)
+-{
+-    *(u32 *)(p + 0x28) = 0;
+-    p[0x1c] = 1;
+-    *(u32 *)(p + 0xda4) = v;
+-}
+diff --git a/src/fn/sub_08019F2C.c b/src/fn/sub_08019F2C.c
+deleted file mode 100644
+index 46e9d7530..000000000
+--- a/src/fn/sub_08019F2C.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "global.h"
+-u32 SelectionMenu_ConsumeCallbackFlag(u8 *p)
+-{
+-    u32 r;
+-    if (p[0x1c] == 0) {
+-        r = 0;
+-    } else {
+-        p[0x1c] = 0;
+-        r = 1;
+-    }
+-    return r;
+-}
+diff --git a/src/fn/sub_08019F44.c b/src/fn/sub_08019F44.c
+deleted file mode 100644
+index 3adaad966..000000000
+--- a/src/fn/sub_08019F44.c
++++ /dev/null
+@@ -1,37 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    u32 pad[2], flags;
+-} Graphic;
+-u8 *Inventory_GetEquipmentEntry(u32);
+-void ActionRecord_CopyFromEntry(u8 *, void *);
+-void MessageWindow_SetMessageTable(u32);
+-void Presentation_ApplyGraphicData(void *, void *);
+-void Presentation_ApplyGraphicSettings(u8 *, u32);
+-u32 Presentation_SelectGraphicResource(u8 *);
+-void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
+-void MessageWindow_Clear(void);
+-void ScrollingDialogue_ClearScript(void);
+-void ScrollingDialogue_SetScript(u32);
+-void Presentation_UpdateActorGraphic(u8 *p, u32 fallback)
+-{
+-    u8 *actor = Inventory_GetEquipmentEntry(p[0x1d]);
+-    u8 data[32];
+-    if (*actor != 255) {
+-        ActionRecord_CopyFromEntry(actor, data);
+-        MessageWindow_SetMessageTable(*(u32 *)(p + 0xda8));
+-        Presentation_ApplyGraphicData(data, p + 0x44);
+-        Presentation_ApplyGraphicSettings(actor, *(u32 *)(p + 0xda8));
+-        {
+-            u32 resource = Presentation_SelectGraphicResource(actor);
+-            ((Graphic *)(p + 0x5b4))->flags &= ~1;
+-            Anim_LoadKeyframe(p + 0x5b4, p + 0x6c, (u16)resource, 0);
+-        }
+-    } else {
+-        MessageWindow_Clear();
+-        if (!fallback)
+-            ScrollingDialogue_ClearScript();
+-        else
+-            ScrollingDialogue_SetScript(fallback);
+-        ((Graphic *)(p + 0x5b4))->flags |= 1;
+-    }
+-}
+diff --git a/src/fn/sub_08019FD8.c b/src/fn/sub_08019FD8.c
+deleted file mode 100644
+index 84e519fdf..000000000
+--- a/src/fn/sub_08019FD8.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "global.h"
+-u32 Script_ParseStringRef(u32);
+-u32 Text_LookupString(u32);
+-void MessageWindow_SetMessageTable(u32);
+-void MessageWindow_ShowMessage(u32);
+-void ScrollingDialogue_SetNumberArgument(u32, u32);
+-void ScrollingDialogue_SetScript(u32);
+-void Presentation_ShowItemDescription(u8 *p, u32 q)
+-{
+-    u32 s = Script_ParseStringRef(q) + 0x30;
+-    MessageWindow_SetMessageTable(q);
+-    MessageWindow_ShowMessage(*p);
+-    ScrollingDialogue_SetNumberArgument(0, 0);
+-    ScrollingDialogue_SetNumberArgument(1, 999);
+-    ScrollingDialogue_SetScript(Text_LookupString(s + *p));
+-}
+diff --git a/src/fn/sub_0801A01C.c b/src/fn/sub_0801A01C.c
+deleted file mode 100644
+index 378f5ae75..000000000
+--- a/src/fn/sub_0801A01C.c
++++ /dev/null
+@@ -1,27 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    u32 pad[2], flags;
+-} Graphic;
+-extern u8 gUnk_08E60F80[][16];
+-int Inventory_GetConsumableId(u32);
+-void Presentation_ShowItemDescription(void *, u32);
+-void Anim_LoadKeyframe(u8 *, u8 *, u32, u32);
+-void MessageWindow_Clear(void);
+-void ScrollingDialogue_ClearScript(void);
+-void ScrollingDialogue_SetScript(u32);
+-void Presentation_UpdateItemGraphic(u8 *p, u32 fallback)
+-{
+-    int index = Inventory_GetConsumableId(p[0x1d]);
+-    if (index >= 0) {
+-        Presentation_ShowItemDescription(gUnk_08E60F80[index], *(u32 *)(p + 0xdac));
+-        ((Graphic *)(p + 0x5b4))->flags &= ~1;
+-        Anim_LoadKeyframe(p + 0x5b4, p + 0x6c, 0x18a, 0);
+-    } else {
+-        MessageWindow_Clear();
+-        if (!fallback)
+-            ScrollingDialogue_ClearScript();
+-        else
+-            ScrollingDialogue_SetScript(fallback);
+-        ((Graphic *)(p + 0x5b4))->flags |= 1;
+-    }
+-}
+diff --git a/src/fn/sub_0801A094.c b/src/fn/sub_0801A094.c
+deleted file mode 100644
+index 2ee740d14..000000000
+--- a/src/fn/sub_0801A094.c
++++ /dev/null
+@@ -1,20 +0,0 @@
+-#include "global.h"
+-struct A {
+-    u32 a, b;
+-};
+-struct B {
+-    u32 flags : 16;
+-    u32 pad : 16;
+-    struct A *args;
+-};
+-void Script_Call(u32, struct B *);
+-void SelectionMenu_CallConfirmScript(u8 *p)
+-{
+-    struct A a;
+-    struct B b;
+-    b.flags = 2;
+-    b.args = &a;
+-    a.a = p[0x21];
+-    a.b = p[0x22];
+-    Script_Call(*(u16 *)(p + 0x42), &b);
+-}
+diff --git a/src/fn/sub_0801A0D0.c b/src/fn/sub_0801A0D0.c
+deleted file mode 100644
+index 9b8779500..000000000
+--- a/src/fn/sub_0801A0D0.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include "global.h"
+-/* Presentation_PlaySelectionSound: Independent switch-based sound picker living in the byte tail after SelectionMenu_ConfigureLayers; matches the existing low-confidence proposal in sym */
+-#define Presentation_PlaySelectionSound sub_0801A0D0
+-#define Presentation_PlaySelectionSound sub_0801A0D0
+-void Sound_PlaySong(int);
+-void Presentation_PlaySelectionSound(void *p, int selection)
+-{
+-    switch (selection) {
+-        case 0:
+-            Sound_PlaySong(0x394);
+-            break;
+-        case 1:
+-            Sound_PlaySong(0x395);
+-            break;
+-        case 2:
+-            Sound_PlaySong(0x396);
+-            break;
+-    }
+-}
+diff --git a/src/fn/sub_0801A10C.c b/src/fn/sub_0801A10C.c
+deleted file mode 100644
+index 50aa60f96..000000000
+--- a/src/fn/sub_0801A10C.c
++++ /dev/null
+@@ -1,24 +0,0 @@
+-#include "global.h"
+-u8 *ScriptProc_Start(int, int);
+-void Bg_SetupLayers(int, int, void *, int, int, int, void *);
+-void BgGfx_LoadTilemapSimple(int, int, int, int, int);
+-extern u8 gUnk_03005160[];
+-int SelectionMenu_ConfigureLayers(int value, int mode)
+-{
+-    u8 *resource = ScriptProc_Start(0xc091, 0xa597);
+-    int result;
+-    if (mode) {
+-        Bg_SetupLayers(3, 0, resource, 0, 0, 1, &value);
+-        BgGfx_LoadTilemapSimple(1, 0, 0, 0, 0);
+-        result = 1;
+-    } else {
+-        Bg_SetupLayers(0, 0, resource, 0, 0, 1, &value);
+-        BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
+-        result = 0;
+-    }
+-    {
+-        u8 *palette = ScriptProc_Start(0x92b3, 0x81b);
+-        CpuSet(palette + 0x1b4, gUnk_03005160, 0x30);
+-    }
+-    return result;
+-}
+diff --git a/src/fn/sub_0801A1A4.c b/src/fn/sub_0801A1A4.c
+deleted file mode 100644
+index 95992e23b..000000000
+--- a/src/fn/sub_0801A1A4.c
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#include "global.h"
+-extern u16 gUnk_03005260[];
+-void Anim_LoadKeyframe(u8 *, u8 *, int, int);
+-void Sound_PlaySong(int);
+-void SelectionMenu_HandleHorizontalInput(u8 *p)
+-{
+-    if ((gUnk_03005260[1] & 0x20) && p[0x20] == 1) {
+-        p[0x20] = 0;
+-        Anim_LoadKeyframe(p + 0x254, p + 0x4c, 0x4b, 0);
+-        Sound_PlaySong(0xdc);
+-    }
+-    if ((gUnk_03005260[1] & 0x10) && p[0x20] == 0) {
+-        p[0x20] = 1;
+-        Anim_LoadKeyframe(p + 0x254, p + 0x4c, 0x4c, 0);
+-        Sound_PlaySong(0xdc);
+-    }
+-}
+diff --git a/src/fn/sub_0801A470.c b/src/fn/sub_0801A470.c
+deleted file mode 100644
+index 931f12452..000000000
+--- a/src/fn/sub_0801A470.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-struct Z {
+-    u32 x;
+-    u32 y;
+-};
+-void sub_0821983C(u8 *, u8 *, u32, u32, u32, u32, u32, struct Z *);
+-void SelectionMenu_InitHighlight(u8 *p)
+-{
+-    struct Z z;
+-    u32 m = 0xFFFF0000;
+-    z.x = 0x800000;
+-    z.y &= m;
+-    sub_0821983C(p + 0x5b4, p + 0x6c, 0x189, 0x11, 0, 0, 0x3c, &z);
+-}
+diff --git a/src/fn/sub_0801A4B4.c b/src/fn/sub_0801A4B4.c
+deleted file mode 100644
+index f18b2cd44..000000000
+--- a/src/fn/sub_0801A4B4.c
++++ /dev/null
+@@ -1,27 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    u32 pad[2], flags;
+-    u8 gap[20];
+-    s16 x, y;
+-    u8 tail[60];
+-} Graphic;
+-
+-void Anim_LoadKeyframe(void *, void *, int, int);
+-void SelectionMenu_PositionCursors(u8 *p)
+-{
+-    Graphic *g = (Graphic *)(p + 0x194);
+-    g->x = (p[0x1d] & 3) * 24 + 144;
+-    g->y = (p[0x1d] >> 2) * 24 + 32;
+-    g->flags &= ~1;
+-    Anim_LoadKeyframe(g, p + 0x4c, 0x4d, 0);
+-    g = (Graphic *)(p + 0x1f4);
+-    g->x = 16;
+-    g->y = 40;
+-    g->flags &= ~1;
+-    Anim_LoadKeyframe(g, p + 0x4c, 0x4e, 0);
+-    g = (Graphic *)(p + 0x254);
+-    g->x = 0;
+-    g->y = 0;
+-    g->flags |= 1;
+-    Anim_LoadKeyframe(g, p + 0x4c, 0x4b, 0);
+-}
+diff --git a/src/fn/sub_0801A53C.c b/src/fn/sub_0801A53C.c
+deleted file mode 100644
+index 2138cefbe..000000000
+--- a/src/fn/sub_0801A53C.c
++++ /dev/null
+@@ -1,26 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    u32 pad[2], flags;
+-    u8 gap[20];
+-    s16 x, y;
+-    u8 tail[60];
+-} Graphic;
+-
+-extern u8 *gUnk_02000710;
+-void SelectionMenu_PositionInventoryMarkers(u8 *p)
+-{
+-    int i, index;
+-    for (i = 0; i < 8; i++) {
+-        Graphic *g = (Graphic *)(p + 0x2b4 + i * 0x60);
+-        if (i <= 7)
+-            index = *(s16 *)(gUnk_02000710 + 0x68 + i * 2);
+-        else
+-            index = -1;
+-        if (index >= 0) {
+-            g->x = (index & 3) * 24 + 144;
+-            g->y = (index >> 2) * 24 + 32;
+-            g->flags &= ~1;
+-        } else
+-            g->flags |= 1;
+-    }
+-}
+diff --git a/src/fn/sub_0801A5A8.c b/src/fn/sub_0801A5A8.c
+deleted file mode 100644
+index 0c0c25efb..000000000
+--- a/src/fn/sub_0801A5A8.c
++++ /dev/null
+@@ -1,26 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    u32 pad[2], flags;
+-    u8 gap[20];
+-    s16 x, y;
+-    u8 tail[60];
+-} Graphic;
+-
+-extern u8 *gUnk_02000710;
+-void SelectionMenu_PositionEquipmentMarkers(u8 *p)
+-{
+-    int i, index;
+-    for (i = 0; i < 8; i++) {
+-        Graphic *g = (Graphic *)(p + 0x2b4 + i * 0x60);
+-        if (i <= 3)
+-            index = *(s16 *)(gUnk_02000710 + 0x58 + i * 2);
+-        else
+-            index = -1;
+-        if (index >= 0) {
+-            g->x = (index & 3) * 24 + 144;
+-            g->y = (index >> 2) * 24 + 32;
+-            g->flags &= ~1;
+-        } else
+-            g->flags |= 1;
+-    }
+-}
+diff --git a/src/fn/sub_0801A614.c b/src/fn/sub_0801A614.c
+deleted file mode 100644
+index 1e8b2cde2..000000000
+--- a/src/fn/sub_0801A614.c
++++ /dev/null
+@@ -1,21 +0,0 @@
+-#include "global.h"
+-/* SelectionMenu_HideMarkers: Independent eight-marker hide loop in the byte tail, matching the eight inventory/equipment markers positioned by SelectionMenu_PositionInventoryMarke */
+-#define SelectionMenu_HideMarkers sub_0801A614
+-#define SelectionMenu_HideMarkers sub_0801A614
+-typedef struct {
+-    u32 flags;
+-    u8 pad[92];
+-} Graphic;
+-void SelectionMenu_HideMarkers(u8 *p)
+-{
+-    int mask = 1;
+-    Graphic *g;
+-    int i;
+-    g = (Graphic *)(p + 0x2bc);
+-    i = 7;
+-    do {
+-        g->flags |= mask;
+-        g++;
+-        i--;
+-    } while (i >= 0);
+-}
+diff --git a/src/fn/sub_0801A634.c b/src/fn/sub_0801A634.c
+deleted file mode 100644
+index 8fc8204c5..000000000
+--- a/src/fn/sub_0801A634.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "global.h"
+-void Anim_Step(u8 *, u8 *);
+-void SelectionMenu_StepCursors(u8 *p)
+-{
+-    u8 *e = p + 0x194;
+-    s32 i = 2;
+-    do {
+-        Anim_Step(e, p + 0x4c);
+-        e += 0x60;
+-        i--;
+-    } while (i >= 0);
+-}
+diff --git a/src/fn/sub_0801A658.c b/src/fn/sub_0801A658.c
+deleted file mode 100644
+index 2dfec2739..000000000
+--- a/src/fn/sub_0801A658.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-void Anim_Remove(u8 *);
+-void Sprite_Remove(u8 *);
+-void SelectionMenu_RemovePanel(u8 *p)
+-{
+-    Anim_Remove(p + 0xd4);
+-    Anim_Remove(p + 0x134);
+-    Sprite_Remove(p + 0x8c);
+-}
+diff --git a/src/fn/sub_0801A67C.c b/src/fn/sub_0801A67C.c
+deleted file mode 100644
+index 569df423e..000000000
+--- a/src/fn/sub_0801A67C.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "global.h"
+-void Anim_Remove(u8 *);
+-void SelectionMenu_RemoveCursors(u8 *p)
+-{
+-    u8 *e = p + 0x194;
+-    s32 i = 2;
+-    do {
+-        Anim_Remove(e);
+-        e += 0x60;
+-        i--;
+-    } while (i >= 0);
+-}
+diff --git a/src/fn/sub_0801A69C.c b/src/fn/sub_0801A69C.c
+deleted file mode 100644
+index 7aca82d1a..000000000
+--- a/src/fn/sub_0801A69C.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "global.h"
+-void Anim_Remove(u8 *);
+-void SelectionMenu_RemoveMarkerAnim(u8 *p)
+-{
+-    u8 *e = p + 0x2b4;
+-    s32 i = 7;
+-    do {
+-        Anim_Remove(e);
+-        e += 0x60;
+-        i--;
+-    } while (i >= 0);
+-}
+diff --git a/src/fn/sub_0801A6BC.c b/src/fn/sub_0801A6BC.c
+deleted file mode 100644
+index 13f6446ba..000000000
+--- a/src/fn/sub_0801A6BC.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-void Anim_Remove(u8 *);
+-void SelectionMenu_RemoveHighlight(u8 *p)
+-{
+-    Anim_Remove(p + 0x5b4);
+-}
+diff --git a/src/fn/sub_0801A75C.c b/src/fn/sub_0801A75C.c
+deleted file mode 100644
+index a0631f22f..000000000
+--- a/src/fn/sub_0801A75C.c
++++ /dev/null
+@@ -1,42 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    signed x : 16;
+-    signed y : 16;
+-    signed z : 16;
+-    signed pad : 16;
+-} Vec;
+-typedef struct {
+-    u32 pad[2], flags;
+-    u8 gap[20];
+-    Vec position;
+-    u8 gap28[18];
+-    u16 palette;
+-    u8 gap3c[12];
+-    void *colors;
+-    u8 tail[20];
+-} Graphic;
+-void SelectionMenu_SetActorIcon(u8 *, Graphic *, int);
+-void *SelectionMenu_GetIconPalette(int);
+-void Anim_LoadKeyframe(void *, void *, int, int);
+-void SelectionMenu_PopulateActors(u8 *p)
+-{
+-    Graphic *g = (Graphic *)(p + 0x674);
+-    int i;
+-    Vec v;
+-    for (i = 0; i < 16; i++, g++) {
+-        v.x = (i & 3) * 24 + 144;
+-        v.y = (i >> 2) * 24 + 32;
+-        SelectionMenu_SetActorIcon(p, g, i);
+-        g->position = v;
+-        if ((1 << i) & *(u32 *)(p + 0x34)) {
+-            g->palette = 0x373;
+-            g->colors = SelectionMenu_GetIconPalette(0);
+-        } else {
+-            g->palette = 0x374;
+-            g->colors = SelectionMenu_GetIconPalette(1);
+-        }
+-    }
+-    g = (Graphic *)(p + 0x614);
+-    Anim_LoadKeyframe(g, p + 0x4c, 0x65, 0);
+-    g->flags &= ~1;
+-}
+diff --git a/src/fn/sub_0801A814.c b/src/fn/sub_0801A814.c
+deleted file mode 100644
+index 3ca9037e8..000000000
+--- a/src/fn/sub_0801A814.c
++++ /dev/null
+@@ -1,42 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    signed x : 16;
+-    signed y : 16;
+-    signed z : 16;
+-    signed pad : 16;
+-} Vec;
+-typedef struct {
+-    u32 pad[2], flags;
+-    u8 gap[20];
+-    Vec position;
+-    u8 gap28[18];
+-    u16 palette;
+-    u8 gap3c[12];
+-    void *colors;
+-    u8 tail[20];
+-} Graphic;
+-void Presentation_SetItemGraphic(u8 *, Graphic *, int);
+-void *SelectionMenu_GetIconPalette(int);
+-void Anim_LoadKeyframe(void *, void *, int, int);
+-void SelectionMenu_PopulateItems(u8 *p)
+-{
+-    Graphic *g = (Graphic *)(p + 0x674);
+-    int i;
+-    Vec v;
+-    for (i = 0; i < 16; i++, g++) {
+-        v.x = (i & 3) * 24 + 144;
+-        v.y = (i >> 2) * 24 + 32;
+-        Presentation_SetItemGraphic(p, g, i);
+-        g->position = v;
+-        if ((1 << i) & *(u32 *)(p + 0x34)) {
+-            g->palette = 0x373;
+-            g->colors = SelectionMenu_GetIconPalette(0);
+-        } else {
+-            g->palette = 0x374;
+-            g->colors = SelectionMenu_GetIconPalette(1);
+-        }
+-    }
+-    g = (Graphic *)(p + 0x614);
+-    Anim_LoadKeyframe(g, p + 0x4c, 0x66, 0);
+-    g->flags &= ~1;
+-}
+diff --git a/src/fn/sub_0801A8CC.c b/src/fn/sub_0801A8CC.c
+deleted file mode 100644
+index 5629efc39..000000000
+--- a/src/fn/sub_0801A8CC.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-void Anim_Remove(u8 *);
+-void SelectionMenu_RemoveIconGrid(u8 *p)
+-{
+-    u8 *e = p + 0x674;
+-    s32 i = 0x12;
+-    do {
+-        Anim_Remove(e);
+-        e += 0x60;
+-        i--;
+-    } while (i >= 0);
+-    Anim_Remove(p + 0x614);
+-}
+diff --git a/src/fn/sub_0801A8FC.c b/src/fn/sub_0801A8FC.c
+deleted file mode 100644
+index 14e2a6557..000000000
+--- a/src/fn/sub_0801A8FC.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-void Sound_PlaySong(u32);
+-void SelectionMenu_SetCallback(u8 *, void (*)(void));
+-void SelectionMenu_AnimateChoice(void);
+-void SelectionMenu_StartAnimateChoice(u8 *p)
+-{
+-    if (p[0x1e] <= 1) {
+-        Sound_PlaySong(0xdd);
+-        SelectionMenu_SetCallback(p, SelectionMenu_AnimateChoice);
+-    }
+-}
+diff --git a/src/fn/sub_0801A920.c b/src/fn/sub_0801A920.c
+deleted file mode 100644
+index 90043ea30..000000000
+--- a/src/fn/sub_0801A920.c
++++ /dev/null
+@@ -1,35 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    u32 pad[2], flags;
+-    u8 gap[20];
+-    s16 x, y;
+-    u8 tail[60];
+-} Graphic;
+-void SelectionMenu_SetCallback(void *, void (*)(void));
+-void SelectionMenu_Choose(void);
+-void SelectionMenu_Close(void);
+-void Sound_PlaySong(int);
+-void Anim_LoadKeyframe(void *, void *, int, int);
+-void MessageWindow_SetBounds(int, int, int, int);
+-void Presentation_UpdateActorGraphic(void *, int);
+-void SelectionMenu_Back(u8 *p)
+-{
+-    Graphic *g = (Graphic *)(p + 0x1f4);
+-    if (p[0x1e]) {
+-        Sound_PlaySong(0xde);
+-        Anim_LoadKeyframe(g, p + 0x4c, 0x4d, 0);
+-        p[0x1e]--;
+-        ((Graphic *)(p + 0xc74 + p[0x1e] * 0x60))->flags |= 1;
+-        if (!p[0x1e])
+-            g->x = 16;
+-        else
+-            g->x = 64;
+-        g->y = 40;
+-        MessageWindow_SetBounds(2, 16, 30, 2);
+-        Presentation_UpdateActorGraphic(p, 0);
+-        SelectionMenu_SetCallback(p, SelectionMenu_Choose);
+-    } else {
+-        Sound_PlaySong(0xde);
+-        SelectionMenu_SetCallback(p, SelectionMenu_Close);
+-    }
+-}
+diff --git a/src/fn/sub_0801A9B4.c b/src/fn/sub_0801A9B4.c
+deleted file mode 100644
+index 8ff53df39..000000000
+--- a/src/fn/sub_0801A9B4.c
++++ /dev/null
+@@ -1,26 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    u32 pad[2], flags;
+-    u8 gap[20];
+-    s16 x, y;
+-    u8 tail[60];
+-} Graphic;
+-void SelectionMenu_SetCallback(void *, void (*)(void));
+-void SelectionMenu_Choose(void);
+-void SelectionMenu_ReviewChoice(void);
+-void sub_0801B600(int, int, void *);
+-void SelectionMenu_AdvanceChoice(u8 *p)
+-{
+-    Graphic *g = (Graphic *)(p + 0x1f4);
+-    if (!p[0x1e])
+-        g->x = 64;
+-    else
+-        g->x = 104;
+-    g->y = 40;
+-    if (++p[0x1e] <= 1)
+-        SelectionMenu_SetCallback(p, SelectionMenu_Choose);
+-    else {
+-        sub_0801B600(p[0x21], p[0x22], p + 0xd94);
+-        SelectionMenu_SetCallback(p, SelectionMenu_ReviewChoice);
+-    }
+-}
+diff --git a/src/fn/sub_0801AA18.c b/src/fn/sub_0801AA18.c
+deleted file mode 100644
+index 0b02eeae1..000000000
+--- a/src/fn/sub_0801AA18.c
++++ /dev/null
+@@ -1,41 +0,0 @@
+-#include "global.h"
+-// MATCHING_CONCESSION: register-pinning
+-extern u8 *gUnk_02000710;
+-void SceneHud_DrawClock(int);
+-void SceneHud_DrawNumericStatus(int);
+-void Text_DrawNumber(int, int, int, int, int, int, int);
+-void SceneInputPanel_GetEquippedValues(int *, int *, int, int);
+-void SceneHud_FillTile020(int, int, int);
+-int Player_GetCurrentAttribute(int);
+-void SelectionMenu_StepCursors(void *);
+-void SelectionMenu_DrawStatistics(u8 *p)
+-{
+-    int value, a, b;
+-    SceneHud_DrawClock(p[0x24]);
+-    SceneHud_DrawNumericStatus(p[0x24]);
+-    value = *(s16 *)(gUnk_02000710 + 0x40);
+-    if (value > 99)
+-        value = 99;
+-    else if (value < 0)
+-        value = 0;
+-    {
+-        int x = 10;
+-        asm("" : "+r"(x));
+-        Text_DrawNumber(0, x, 9, value, 33, 2, 15);
+-    }
+-    a = 0;
+-    b = 0;
+-    SceneInputPanel_GetEquippedValues(&a, &b, 0, 0);
+-    if (b > 0)
+-        Text_DrawNumber(0, 9, 10, b, 33, 3, 15);
+-    else
+-        SceneHud_FillTile020(9, 10, 3);
+-    if (a > 0)
+-        Text_DrawNumber(0, 9, 11, a, 33, 3, 15);
+-    else
+-        SceneHud_FillTile020(9, 11, 3);
+-    Text_DrawNumber(0, 11, 12, Player_GetCurrentAttribute(0), 33, 3, 15);
+-    Text_DrawNumber(0, 11, 13, Player_GetCurrentAttribute(1), 33, 3, 15);
+-    Text_DrawNumber(0, 11, 14, Player_GetCurrentAttribute(2), 33, 3, 15);
+-    SelectionMenu_StepCursors(p);
+-}
+diff --git a/src/fn/sub_0801AB1C.c b/src/fn/sub_0801AB1C.c
+deleted file mode 100644
+index b0c510352..000000000
+--- a/src/fn/sub_0801AB1C.c
++++ /dev/null
+@@ -1,32 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000710;
+-extern u8 gUnk_08E6092C[][32];
+-u8 *Inventory_GetEquipmentEntry(int);
+-void SelectionMenu_ActorAvailability(u8 *p)
+-{
+-    int i, mask;
+-    s16 *slot;
+-    *(u32 *)(p + 0x34) = 0xffff;
+-    {
+-        u8 *base = gUnk_02000710;
+-        mask = 1;
+-        slot = (s16 *)(base + 0x68);
+-    }
+-    i = 7;
+-    do {
+-        if (*slot >= 0)
+-            *(u32 *)(p + 0x34) &= ~(mask << *slot);
+-        slot++;
+-        i--;
+-    } while (i >= 0);
+-    for (i = 0; i < 16; i++) {
+-        u8 *actor = Inventory_GetEquipmentEntry(i);
+-        if (*actor != 255) {
+-            int id = *actor;
+-            u8 *data = gUnk_08E6092C[id];
+-            if (id != 46 && *(u32 *)(data + 24) == 0xffffffff &&
+-                (*(u32 *)(data + 28) & 0xffffff) == 0xffffff)
+-                *(u32 *)(p + 0x34) &= ~(1 << i);
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0801ABA0.c b/src/fn/sub_0801ABA0.c
+deleted file mode 100644
+index a98cafd03..000000000
+--- a/src/fn/sub_0801ABA0.c
++++ /dev/null
+@@ -1,37 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    u8 pad[10], available, tail[5];
+-} Item;
+-extern Item gUnk_08E60F80[];
+-int Inventory_GetConsumableId(int);
+-int GameState_IsConsumableSlotEquipped(int);
+-void SelectionMenu_ItemAvailability(u8 *arg)
+-{
+-    u8 *p = arg;
+-    int i;
+-    int index;
+-    u8 alias;
+-    int mask;
+-    *((u32 *)(p + 0x34)) = 0xffff;
+-    i = 0;
+-    mask = 1;
+-    /* do-while(0) only keeps agbcc's block layout */
+-    do {
+-        index = Inventory_GetConsumableId(i);
+-        if (index >= 0) {
+-            Item *table = gUnk_08E60F80;
+-            alias = table[index].available;
+-            if (alias && (!GameState_IsConsumableSlotEquipped(i))) {
+-                goto next;
+-            }
+-        }
+-        if (p) {
+-            *((u32 *)(p + 0x34)) &= ~(mask << i);
+-        } else {
+-            *((u32 *)(p + 0x34)) &= ~(mask << i);
+-        }
+-    next:
+-        i++;
+-
+-    } while (i < 16);
+-}
+diff --git a/src/fn/sub_0801ABEC.c b/src/fn/sub_0801ABEC.c
+deleted file mode 100644
+index c5ffdafe1..000000000
+--- a/src/fn/sub_0801ABEC.c
++++ /dev/null
+@@ -1,26 +0,0 @@
+-#include "global.h"
+-void SelectionMenu_ActorAvailability(void *);
+-void Bg_ClearTilemap(int);
+-void SelectionMenu_ConfigureLayers(int, int);
+-void SelectionMenu_PositionCursors(void *);
+-void SelectionMenu_PositionInventoryMarkers(void *);
+-void SelectionMenu_PopulateActors(void *);
+-void MessageWindow_SetMessageTable(u32);
+-void MessageWindow_SetBounds(int, int, int, int);
+-void MessageWindow_SetDisplayMode(int);
+-void MessageWindow_SetPalette(int);
+-void SelectionMenu_OpenActorPage(u8 *p)
+-{
+-    SelectionMenu_ActorAvailability(p);
+-    p[0x1e] = 0;
+-    p[0x24] = 0;
+-    Bg_ClearTilemap(0);
+-    SelectionMenu_ConfigureLayers(13, 0);
+-    SelectionMenu_PositionCursors(p);
+-    SelectionMenu_PositionInventoryMarkers(p);
+-    SelectionMenu_PopulateActors(p);
+-    MessageWindow_SetMessageTable(*(u32 *)(p + 0xda8));
+-    MessageWindow_SetBounds(2, 16, 30, 2);
+-    MessageWindow_SetDisplayMode(1);
+-    MessageWindow_SetPalette(0x81b);
+-}
+diff --git a/src/fn/sub_0801AC50.c b/src/fn/sub_0801AC50.c
+deleted file mode 100644
+index be39ea81e..000000000
+--- a/src/fn/sub_0801AC50.c
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#include "global.h"
+-void SelectionMenu_ActorAvailability(u8 *);
+-void SelectionMenu_PositionInventoryMarkers(u8 *);
+-void SelectionMenu_PopulateActors(u8 *);
+-s32 Script_ParseStringRef(s32);
+-s32 Text_LookupString(void);
+-void Presentation_UpdateActorGraphic(u8 *, s32);
+-void SelectionMenu_RefreshActorPage(u8 *p)
+-{
+-    SelectionMenu_ActorAvailability(p);
+-    SelectionMenu_PositionInventoryMarkers(p);
+-    SelectionMenu_PopulateActors(p);
+-    Script_ParseStringRef(*(s32 *)(p + 0xDB0));
+-    Presentation_UpdateActorGraphic(p, Text_LookupString());
+-}
+diff --git a/src/fn/sub_0801AC84.c b/src/fn/sub_0801AC84.c
+deleted file mode 100644
+index ff7742f0d..000000000
+--- a/src/fn/sub_0801AC84.c
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#include "global.h"
+-void SelectionMenu_ItemAvailability(u8 *);
+-void SelectionMenu_PositionEquipmentMarkers(u8 *);
+-void SelectionMenu_PopulateItems(u8 *);
+-s32 Script_ParseStringRef(s32);
+-s32 Text_LookupString(void);
+-void Presentation_UpdateItemGraphic(u8 *, s32);
+-void SelectionMenu_RefreshItemPage(u8 *p)
+-{
+-    SelectionMenu_ItemAvailability(p);
+-    SelectionMenu_PositionEquipmentMarkers(p);
+-    SelectionMenu_PopulateItems(p);
+-    Script_ParseStringRef(*(s32 *)(p + 0xDB0));
+-    Presentation_UpdateItemGraphic(p, Text_LookupString());
+-}
+diff --git a/src/fn/sub_0801ADC0.c b/src/fn/sub_0801ADC0.c
+deleted file mode 100644
+index c21c2ca87..000000000
+--- a/src/fn/sub_0801ADC0.c
++++ /dev/null
+@@ -1,114 +0,0 @@
+-#include "global.h"
+-// MATCHING_CONCESSION: register-pinning
+-extern u16 gUnk_03005260[];
+-int SelectionMenu_ConsumeCallbackFlag(void *);
+-void SelectionMenu_RefreshActorPage(void *);
+-void SelectionMenu_RefreshItemPage(void *);
+-int sub_0801ACB8(void *);
+-void Sound_PlaySong(int);
+-void Presentation_UpdateActorGraphic(void *, int);
+-void Presentation_UpdateItemGraphic(void *, int);
+-u8 *Inventory_GetEquipmentEntry(int);
+-int Inventory_GetConsumableId(int);
+-void SelectionMenu_StartAnimateChoice(void *);
+-void SelectionMenu_Back(void *);
+-void SelectionMenu_Choose(u8 *p)
+-{
+-    int index;
+-    switch (p[0x1e]) {
+-
+-        case 0:
+-            if (SelectionMenu_ConsumeCallbackFlag(p))
+-                SelectionMenu_RefreshActorPage(p);
+-            if (gUnk_03005260[0] & 4) {
+-                if (gUnk_03005260[1] & 1) {
+-                    if (++p[0x24] > 2)
+-                        p[0x24] = 0;
+-                    Sound_PlaySong(0xdc);
+-                }
+-            } else {
+-                index = sub_0801ACB8(p);
+-                if (index != p[0x1d]) {
+-                    {
+-                        register int x asm("r0") = (index & 3) * 24 + 144;
+-                        register int offset asm("r3");
+-                        offset = 0x1b4;
+-                        asm("" : "+r"(offset));
+-                        *(u16 *)(p + offset) = x;
+-                        x = (index >> 2) * 24 + 32;
+-                        offset += 2;
+-                        {
+-                            register u16 *out asm("r1") = (u16 *)(p + offset);
+-                            *out = x;
+-                        }
+-                    }
+-                    p[0x1d] = index;
+-                    Sound_PlaySong(0xdc);
+-                    Presentation_UpdateActorGraphic(p, 0);
+-                }
+-                if (gUnk_03005260[1] & 1) {
+-                    if (*Inventory_GetEquipmentEntry(p[0x1d]) != 255 &&
+-                        ((1 << p[0x1d]) & *(u32 *)(p + 0x34)))
+-                        SelectionMenu_StartAnimateChoice(p);
+-                    else
+-                        Sound_PlaySong(0x192);
+-                    return;
+-                } else if (gUnk_03005260[1] & 2) {
+-                    SelectionMenu_Back(p);
+-                    return;
+-                }
+-            }
+-            break;
+-
+-        case 1:
+-            if (SelectionMenu_ConsumeCallbackFlag(p))
+-                SelectionMenu_RefreshItemPage(p);
+-            if (gUnk_03005260[0] & 4) {
+-                if (gUnk_03005260[1] & 1) {
+-                    if (++p[0x24] > 2)
+-                        p[0x24] = 0;
+-                    Sound_PlaySong(0xdc);
+-                }
+-            } else {
+-                index = sub_0801ACB8(p);
+-                {
+-                    register int old asm("r3") = p[0x1d];
+-                    asm("" : "+r"(old));
+-                    if (index != old) {
+-                        {
+-                            register int x asm("r0") = (index & 3) * 24 + 144;
+-                            register int offset asm("r3");
+-                            offset = 0x1b4;
+-                            asm("" : "+r"(offset));
+-                            *(u16 *)(p + offset) = x;
+-                            x = (index >> 2) * 24 + 32;
+-                            offset += 2;
+-                            {
+-                                register u16 *out asm("r1") = (u16 *)(p + offset);
+-                                *out = x;
+-                            }
+-                        }
+-                        p[0x1d] = index;
+-                        Sound_PlaySong(0xdc);
+-                        Presentation_UpdateItemGraphic(p, 0);
+-                    }
+-                }
+-                if (gUnk_03005260[1] & 1) {
+-                    if (Inventory_GetConsumableId(p[0x1d]) >= 0) {
+-                        int selected = p[0x1d];
+-                        if ((1 << selected) & *(u32 *)(p + 0x34))
+-                            SelectionMenu_StartAnimateChoice(p);
+-                        else
+-                            Sound_PlaySong(0x192);
+-                    } else
+-                        Sound_PlaySong(0x192);
+-                    return;
+-                } else if (gUnk_03005260[1] & 2) {
+-                    SelectionMenu_Back(p);
+-                    return;
+-                }
+-            }
+-            break;
+-    }
+-    (*(u32 *)(p + 0x28))++;
+-}
+diff --git a/src/fn/sub_0801AF54.c b/src/fn/sub_0801AF54.c
+deleted file mode 100644
+index 006880a7a..000000000
+--- a/src/fn/sub_0801AF54.c
++++ /dev/null
+@@ -1,43 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    u32 pad[2], flags;
+-    u8 gap[20];
+-    u32 position[2];
+-    u8 gap28[18];
+-    u16 palette;
+-    u8 gap3c[12];
+-    void *colors;
+-    u8 tail[20];
+-} Graphic;
+-int SelectionMenu_ConsumeCallbackFlag(void *);
+-void sub_082199C8(void *, void *, int);
+-void *SelectionMenu_GetIconPalette(int);
+-void sub_082216F8(void *, void *, void *, u32, int);
+-void SelectionMenu_AdvanceChoice(void *);
+-void SelectionMenu_AnimateChoice(u8 *p)
+-{
+-    Graphic *source = (Graphic *)(p + 0x674 + p[0x1d] * 0x60);
+-    Graphic *dest = (Graphic *)(p + 0xc74 + p[0x1e] * 0x60);
+-    if (SelectionMenu_ConsumeCallbackFlag(p)) {
+-        sub_082199C8(dest, source, 13);
+-        dest->flags &= ~1;
+-        source->palette = 0x374;
+-        source->colors = SelectionMenu_GetIconPalette(1);
+-        ((struct {
+-            u8 pad[0x21];
+-            u8 choices[2];
+-        } *)p)
+-            ->choices[p[0x1e]] = p[0x1d];
+-        *(u32 *)(p + 0x34) &= ~(1 << p[0x1d]);
+-        if (!p[0x1e])
+-            *(u16 *)(p + 0x38) = 16;
+-        else
+-            *(u16 *)(p + 0x38) = 64;
+-        *(u16 *)(p + 0x3a) = 40;
+-    }
+-    sub_082216F8(dest->position, source->position, p + 0x38, *(u32 *)(p + 0x28), 3);
+-    if (*(u32 *)(p + 0x28) > 7)
+-        SelectionMenu_AdvanceChoice(p);
+-    else
+-        (*(u32 *)(p + 0x28))++;
+-}
+diff --git a/src/fn/sub_0801B004.c b/src/fn/sub_0801B004.c
+deleted file mode 100644
+index a340d58ec..000000000
+--- a/src/fn/sub_0801B004.c
++++ /dev/null
+@@ -1,87 +0,0 @@
+-#include "global.h"
+-// MATCHING_CONCESSION: register-pinning
+-typedef struct {
+-    u8 pad[2], level, tail[29];
+-} Actor;
+-typedef struct {
+-    u32 pad[2], flags;
+-    u8 gap[20];
+-    s16 x, y;
+-    u8 tail[60];
+-} Graphic;
+-extern u16 gUnk_03005260[];
+-extern u8 *gUnk_02000710;
+-extern Actor gUnk_08E6092C[];
+-int SelectionMenu_ConsumeCallbackFlag(void *);
+-void Anim_LoadKeyframe(void *, void *, int, int);
+-void ScrollingDialogue_ClearScript(void);
+-void Presentation_SetActorIconFrame(void *, void *, void *);
+-void MessageWindow_SetBounds(int, int, int, int);
+-void MessageWindow_SetMessageTable(u32);
+-int Inventory_HasItem(int);
+-void MessageWindow_ShowMessage(int);
+-void Sound_PlaySong(int);
+-void SelectionMenu_HandleHorizontalInput(void *);
+-void SelectionMenu_Back(void *);
+-void SelectionMenu_SetCallback(void *, void (*)(void));
+-void SelectionMenu_Confirm(void);
+-void SelectionMenu_ReviewChoice(u8 *p)
+-{
+-    Graphic *g;
+-    if (SelectionMenu_ConsumeCallbackFlag(p)) {
+-        g = (Graphic *)(p + 0xd34);
+-        Anim_LoadKeyframe(p + 0x194, p + 0x4c, 0x4d, 0);
+-        ScrollingDialogue_ClearScript();
+-        {
+-            u8 *result = p + 0xd94;
+-            Presentation_SetActorIconFrame(p, g, result);
+-        }
+-        g->flags &= ~1;
+-        g->x = 104;
+-        g->y = 40;
+-        p[0x20] = 0;
+-        Anim_LoadKeyframe(p + 0x254, p + 0x4c, 0x4b, 0);
+-        *(u32 *)(p + 0x25c) &= ~1;
+-        MessageWindow_SetBounds(0, 16, 30, 2);
+-        MessageWindow_SetMessageTable(*(u32 *)(p + 0xdb0));
+-        {
+-            Actor *actor = &gUnk_08E6092C[p[0xd94]];
+-            if (*(s16 *)(gUnk_02000710 + 0x40) >= actor->level || Inventory_HasItem(0x29))
+-                MessageWindow_ShowMessage(1);
+-            else
+-                MessageWindow_ShowMessage(2);
+-        }
+-        ((Graphic *)(p + 0x5b4))->flags |= 1;
+-        ScrollingDialogue_ClearScript();
+-    }
+-    if (gUnk_03005260[0] & 4) {
+-        if (gUnk_03005260[1] & 1) {
+-            if (++p[0x24] > 2)
+-                p[0x24] = 0;
+-            Sound_PlaySong(0xdc);
+-        }
+-    } else {
+-        SelectionMenu_HandleHorizontalInput(p);
+-        {
+-            int keys = gUnk_03005260[1], mask;
+-            mask = 1;
+-            asm("" : "+r"(mask));
+-            if (mask & keys) {
+-                if (!p[0x20]) {
+-                    Sound_PlaySong(0xdd);
+-                    SelectionMenu_SetCallback(p, SelectionMenu_Confirm);
+-                    return;
+-                }
+-                goto back;
+-            } else if (2 & keys) {
+-            back:
+-                ((Graphic *)(p + 0xd34))->flags |= mask;
+-                *(u32 *)(p + 0x25c) |= mask;
+-                SelectionMenu_Back(p);
+-                return;
+-            }
+-            asm("" ::"r"(keys));
+-        }
+-    }
+-    (*(u32 *)(p + 0x28))++;
+-}
+diff --git a/src/fn/sub_0801B188.c b/src/fn/sub_0801B188.c
+deleted file mode 100644
+index 99539a4b9..000000000
+--- a/src/fn/sub_0801B188.c
++++ /dev/null
+@@ -1,21 +0,0 @@
+-#include "global.h"
+-int SelectionMenu_ConsumeCallbackFlag(void *);
+-void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
+-void Script_Call(int, void *);
+-extern u32 gUnk_0300523C;
+-void SelectionMenu_Close(u8 *p)
+-{
+-    if (SelectionMenu_ConsumeCallbackFlag(p))
+-        ScreenTransition_SendCommand(3, 4, 4, 4, 4, 0xffff, 0);
+-    if (*(u32 *)(p + 0x28) == 20) {
+-        {
+-            u32 *state = &gUnk_0300523C;
+-            int mask;
+-            mask = ~4;
+-            *state &= mask;
+-        }
+-        if (*(u16 *)(p + 0x40))
+-            Script_Call(*(u16 *)(p + 0x40), 0);
+-    } else
+-        (*(u32 *)(p + 0x28))++;
+-}
+diff --git a/src/fn/sub_0801B1E8.c b/src/fn/sub_0801B1E8.c
+deleted file mode 100644
+index dff927558..000000000
+--- a/src/fn/sub_0801B1E8.c
++++ /dev/null
+@@ -1,49 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    u32 pad[2], flags;
+-    u8 tail[84];
+-} Graphic;
+-extern u32 gUnk_0300523C;
+-void SelectionMenu_Hide(u8 *arg)
+-{
+-    u8 *p = arg;
+-    int i, mask;
+-    u32 *flags;
+-    u32 *state;
+-    Graphic *g;
+-    g = (Graphic *)(p + 0xd4);
+-    g->flags |= 1;
+-    g = (Graphic *)(p + 0x134);
+-    g->flags |= 1;
+-    state = &gUnk_0300523C;
+-    mask = 1;
+-    flags = (u32 *)(p + 0x67c);
+-    i = 18;
+-    do {
+-        *flags |= mask;
+-        flags += 24;
+-        i--;
+-    } while (i >= 0);
+-    mask = 1;
+-    flags = (u32 *)(p + 0x19c);
+-    i = 2;
+-    do {
+-        *flags |= mask;
+-        flags += 24;
+-        i--;
+-    } while (i >= 0);
+-    mask = 1;
+-    flags = (u32 *)(p + 0x2bc);
+-    i = 7;
+-    do {
+-        *flags |= mask;
+-        flags += 24;
+-        i--;
+-    } while (i >= 0);
+-    g = (Graphic *)(p + 0x5b4);
+-    g->flags |= 1;
+-    {
+-        int clear = ~4;
+-        *state &= clear;
+-    }
+-}
+diff --git a/src/fn/sub_0801B274.c b/src/fn/sub_0801B274.c
+deleted file mode 100644
+index f79ba1a4e..000000000
+--- a/src/fn/sub_0801B274.c
++++ /dev/null
+@@ -1,20 +0,0 @@
+-#include "global.h"
+-int SelectionMenu_ConsumeCallbackFlag(void *);
+-void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
+-void SelectionMenu_Hide(void *);
+-void ScrollingDialogue_RequestHide(void);
+-void SelectionMenu_CallConfirmScript(void *);
+-void Task_Kill(void *);
+-void SelectionMenu_Confirm(u8 *p)
+-{
+-    if (SelectionMenu_ConsumeCallbackFlag(p))
+-        ScreenTransition_SendCommand(1, 5, 4, 4, 4, 0xffff, 0);
+-    if (*(u32 *)(p + 0x28) > 31) {
+-        SelectionMenu_Hide(p);
+-        ScrollingDialogue_RequestHide();
+-        if (*(u16 *)(p + 0x42))
+-            SelectionMenu_CallConfirmScript(p);
+-        Task_Kill(p);
+-    } else
+-        (*(u32 *)(p + 0x28))++;
+-}
+diff --git a/src/fn/sub_0801B2D4.c b/src/fn/sub_0801B2D4.c
+deleted file mode 100644
+index 7af98df7e..000000000
+--- a/src/fn/sub_0801B2D4.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-void Callback_InvokeActor(u8 *, u32);
+-void SelectionMenu_DrawStatistics(u8 *);
+-u32 SelectionMenu_Update(u8 *p)
+-{
+-    Callback_InvokeActor(p, *(u32 *)(p + 0xDA4));
+-    SelectionMenu_DrawStatistics(p);
+-    return 0;
+-}
+diff --git a/src/fn/sub_0801B2F8.c b/src/fn/sub_0801B2F8.c
+deleted file mode 100644
+index 123911177..000000000
+--- a/src/fn/sub_0801B2F8.c
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#include "global.h"
+-
+-void SelectionMenu_RemoveIconGrid(u32);
+-void SelectionMenu_RemoveCursors(u32);
+-void SelectionMenu_RemoveMarkerAnim(u32);
+-void SelectionMenu_RemoveHighlight(u32);
+-void SelectionMenu_RemovePanel(u32);
+-void ScrollingDialogue_RequestHide(void);
+-u32 SelectionMenu_Destroy(u32 p)
+-{
+-    SelectionMenu_RemoveIconGrid(p);
+-    SelectionMenu_RemoveCursors(p);
+-    SelectionMenu_RemoveMarkerAnim(p);
+-    SelectionMenu_RemoveHighlight(p);
+-    SelectionMenu_RemovePanel(p);
+-    ScrollingDialogue_RequestHide();
+-    return 0;
+-}
+diff --git a/src/fn/sub_0801B324.c b/src/fn/sub_0801B324.c
+deleted file mode 100644
+index d36bf2244..000000000
+--- a/src/fn/sub_0801B324.c
++++ /dev/null
+@@ -1,67 +0,0 @@
+-#include "global.h"
+-// MATCHING_CONCESSION: register-pinning
+-typedef struct {
+-    u32 words[8];
+-} Resource;
+-Resource *ScriptProc_Start(int, int);
+-void ResourceHeader_Relocate(void *, void *);
+-int Script_GetKeywordValue(int, int);
+-int Script_SeekToKeyword(int);
+-u32 Script_GetTextSourcePc(void);
+-void sub_0801A218(void *);
+-void sub_0801A418(void *);
+-void sub_0801A6D0(void *);
+-void sub_0801A3C0(void *);
+-void SelectionMenu_InitHighlight(void *);
+-void MessageWindow_SetBounds(int, int, int, int);
+-void SelectionMenu_OpenActorPage(void *);
+-void SelectionMenu_SetCallback(void *, void (*)(void));
+-void SelectionMenu_Choose(void);
+-void ScrollingDialogue_RequestShow(void);
+-extern u32 gUnk_0300523C;
+-int SelectionMenu_Initialize(u8 *p)
+-{
+-    Resource *resource = ScriptProc_Start(0xcb05, 0x530d);
+-    if (!resource)
+-        goto fail;
+-    asm("" ::: "r0");
+-    *(Resource *)(p + 0x4c) = *resource;
+-    ResourceHeader_Relocate(p + 0x4c, resource);
+-    resource = ScriptProc_Start(0xcb05, 0x5d04);
+-    if (!resource)
+-        goto fail;
+-    asm("" ::: "r0");
+-    *(Resource *)(p + 0x6c) = *resource;
+-    ResourceHeader_Relocate(p + 0x6c, resource);
+-    *(u16 *)(p + 0x40) = Script_GetKeywordValue('c', 0);
+-    *(u16 *)(p + 0x42) = Script_GetKeywordValue('e', 0);
+-    if (!Script_SeekToKeyword('w'))
+-        goto fail;
+-    if (!(*(u32 *)(p + 0xda8) = Script_GetTextSourcePc()))
+-        goto fail;
+-    if (!Script_SeekToKeyword('a'))
+-        goto fail;
+-    if ((*(u32 *)(p + 0xdac) = Script_GetTextSourcePc()))
+-        goto configure;
+-fail:
+-    return -1;
+-configure:
+-    if (!Script_SeekToKeyword('k'))
+-        goto fail;
+-    if (!(*(u32 *)(p + 0xdb0) = Script_GetTextSourcePc()))
+-        goto fail;
+-    sub_0801A218(p);
+-    sub_0801A418(p);
+-    sub_0801A6D0(p);
+-    sub_0801A3C0(p);
+-    SelectionMenu_InitHighlight(p);
+-    MessageWindow_SetBounds(0, 16, 30, 2);
+-    SelectionMenu_OpenActorPage(p);
+-    SelectionMenu_SetCallback(p, SelectionMenu_Choose);
+-    ScrollingDialogue_RequestShow();
+-    {
+-        int mask = 4;
+-        gUnk_0300523C |= mask;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0801B454.c b/src/fn/sub_0801B454.c
+deleted file mode 100644
+index 37c8cdaed..000000000
+--- a/src/fn/sub_0801B454.c
++++ /dev/null
+@@ -1,20 +0,0 @@
+-#include "global.h"
+-void *Task_Create(s32, s32);
+-void Task_SetCallbacks(void *, void *, void *);
+-s32 SelectionMenu_Initialize(void *, void *, void *);
+-void Task_Kill(void *);
+-void SelectionMenu_Update(void);
+-void SelectionMenu_Destroy(void);
+-void *SelectionMenu_Create(void *a, void *b)
+-{
+-    void *obj;
+-    obj = Task_Create(11, 0xDB4);
+-    if (obj != 0) {
+-        Task_SetCallbacks(obj, SelectionMenu_Update, SelectionMenu_Destroy);
+-        if (SelectionMenu_Initialize(obj, a, b) < 0) {
+-            Task_Kill(obj);
+-            return 0;
+-        }
+-    }
+-    return obj;
+-}
+diff --git a/src/selection_menu.c b/src/selection_menu.c
+new file mode 100644
+index 000000000..83d6cc297
+--- /dev/null
++++ b/src/selection_menu.c
+@@ -0,0 +1,1097 @@
++#include "selection_menu.h"
++#define Presentation_PlaySelectionSound sub_0801A0D0
++#define SelectionMenu_HideMarkers       sub_0801A614
++
++#define SelectionMenu_InitCursors  sub_0801A3C0
++#define SelectionMenu_InitMarkers  sub_0801A418
++#define SelectionMenu_NavigateGrid sub_0801ACB8
++void ActionRecord_CopyFromEntry(u8 *, void *);
++void Presentation_ApplyGraphicData(void *, void *);
++void Presentation_ApplyGraphicSettings(u8 *, u32);
++u32 Presentation_SelectGraphicResource(u8 *);
++void MessageWindow_Clear(void);
++void ScrollingDialogue_ClearScript(void);
++void ScrollingDialogue_SetNumberArgument(u32, u32);
++void Bg_SetupLayers(int, int, void *, int, int, int, void *);
++void MessageWindow_SetBounds(int, int, int, int);
++void sub_0801B600(int, int, void *);
++void SceneHud_DrawClock(int);
++void SceneHud_DrawNumericStatus(int);
++void Text_DrawNumber(int, int, int, int, int, int, int);
++void SceneInputPanel_GetEquippedValues(int *, int *, int, int);
++void SceneHud_FillTile020(int, int, int);
++int Player_GetCurrentAttribute(int);
++int GameState_IsConsumableSlotEquipped(int);
++void MessageWindow_SetDisplayMode(int);
++void MessageWindow_SetPalette(int);
++void sub_082199C8(void *, void *, int);
++void sub_082216F8(void *, void *, void *, u32, int);
++int Inventory_HasItem(int);
++void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
++void ScrollingDialogue_RequestHide(void);
++void ScrollingDialogue_RequestShow(void);
++
++u8 *Inventory_GetEquipmentEntry(u32);
++int Inventory_GetConsumableId(u32);
++void ScrollingDialogue_SetScript(u32);
++void MessageWindow_SetMessageTable(u32);
++void MessageWindow_ShowMessage(u32);
++void sub_0801A218(struct SelectionMenu *);
++void SelectionMenu_InitCursors(struct SelectionMenu *);
++void SelectionMenu_InitMarkers(struct SelectionMenu *);
++void sub_0801A6D0(struct SelectionMenu *);
++int SelectionMenu_NavigateGrid(struct SelectionMenu *);
++extern u8 gUnk_03005160[];
++u32 Script_GetTextSourcePc(void);
++
++u8 *SelectionMenu_GetIconPalette(s32 i);
++void Presentation_SetActorIconFrame(struct SelectionMenu *p, struct SceneInputWidget *q, u8 *r);
++void SelectionMenu_SetActorIcon(struct SelectionMenu *p, struct SceneInputWidget *q, u32 c);
++void Presentation_SetItemGraphic(struct SelectionMenu *p, struct SceneInputWidget *q, u32 item);
++void SelectionMenu_SetCallback(struct SelectionMenu *p, void (*v)(struct SelectionMenu *));
++u32 SelectionMenu_ConsumeCallbackFlag(struct SelectionMenu *p);
++void Presentation_UpdateActorGraphic(struct SelectionMenu *p, u32 fallback);
++void Presentation_ShowItemDescription(u8 *p, u32 q);
++void Presentation_UpdateItemGraphic(struct SelectionMenu *p, u32 fallback);
++void SelectionMenu_CallConfirmScript(struct SelectionMenu *p);
++void Presentation_PlaySelectionSound(void *p, int selection);
++int SelectionMenu_ConfigureLayers(int value, int mode);
++void SelectionMenu_HandleHorizontalInput(struct SelectionMenu *p);
++void SelectionMenu_InitHighlight(struct SelectionMenu *p);
++void SelectionMenu_PositionCursors(struct SelectionMenu *p);
++void SelectionMenu_PositionInventoryMarkers(struct SelectionMenu *p);
++void SelectionMenu_PositionEquipmentMarkers(struct SelectionMenu *p);
++void SelectionMenu_HideMarkers(struct SelectionMenu *p);
++void SelectionMenu_StepCursors(struct SelectionMenu *p);
++void SelectionMenu_RemovePanel(struct SelectionMenu *p);
++void SelectionMenu_RemoveCursors(struct SelectionMenu *p);
++void SelectionMenu_RemoveMarkerAnim(struct SelectionMenu *p);
++void SelectionMenu_RemoveHighlight(struct SelectionMenu *p);
++void SelectionMenu_PopulateActors(struct SelectionMenu *p);
++void SelectionMenu_PopulateItems(struct SelectionMenu *p);
++void SelectionMenu_RemoveIconGrid(struct SelectionMenu *p);
++void SelectionMenu_StartAnimateChoice(struct SelectionMenu *p);
++void SelectionMenu_Back(struct SelectionMenu *p);
++void SelectionMenu_AdvanceChoice(struct SelectionMenu *p);
++void SelectionMenu_DrawStatistics(struct SelectionMenu *p);
++void SelectionMenu_ActorAvailability(struct SelectionMenu *p);
++void SelectionMenu_ItemAvailability(struct SelectionMenu *arg);
++void SelectionMenu_OpenActorPage(struct SelectionMenu *p);
++void SelectionMenu_RefreshActorPage(struct SelectionMenu *p);
++void SelectionMenu_RefreshItemPage(struct SelectionMenu *p);
++void SelectionMenu_Choose(struct SelectionMenu *p);
++void SelectionMenu_AnimateChoice(struct SelectionMenu *p);
++void SelectionMenu_ReviewChoice(struct SelectionMenu *p);
++void SelectionMenu_Close(struct SelectionMenu *p);
++void SelectionMenu_Hide(struct SelectionMenu *arg);
++void SelectionMenu_Confirm(struct SelectionMenu *p);
++u32 SelectionMenu_Update(struct SelectionMenu *p);
++u32 SelectionMenu_Destroy(struct SelectionMenu *p);
++int SelectionMenu_Initialize(struct SelectionMenu *p, void *a, void *b);
++void *SelectionMenu_Create(void *a, void *b);
++
++static inline void SelectionMenu_ClearPosition(void *source, void *destination)
++{
++    CpuSet(source, destination, 0x05000002);
++}
++
++u8 *SelectionMenu_GetIconPalette(s32 i)
++{
++    return gUnk_030042E4 + (i + 0x373) * 0x20;
++}
++
++void Presentation_SetActorIconFrame(struct SelectionMenu *p, struct SceneInputWidget *q, u8 *r)
++{
++    Anim_LoadKeyframe(q, &p->iconResource, *r + 0xf0, 0);
++    q->flags &= ~1;
++}
++
++void SelectionMenu_SetActorIcon(struct SelectionMenu *p, struct SceneInputWidget *q, u32 c)
++{
++    u8 *r = Inventory_GetEquipmentEntry(c);
++    if (*r != 0xff) {
++        Presentation_SetActorIconFrame(p, q, r);
++        q->flags &= ~1;
++    } else {
++        q->flags |= 1;
++    }
++}
++
++// MATCHING_CONCESSION: register-pinning
++void Presentation_SetItemGraphic(struct SelectionMenu *p, struct SceneInputWidget *q, u32 item)
++{
++    int index = Inventory_GetConsumableId(item);
++    if (index >= 0) {
++        int offset = index * 16;
++        u8 *entry;
++        entry = (u8 *)((u32)gUnk_08E60F80 + offset);
++        {
++            void *context = &p->iconResource;
++            register int base asm("r0");
++            int resource;
++            base = 0x121;
++            asm("" : "+r"(base));
++            resource = base;
++            asm("" : "+r"(resource));
++            {
++                register int tile asm("r3") = entry[0];
++                resource += tile;
++            }
++            Anim_LoadKeyframe(q, context, resource, 0);
++        }
++        q->flags &= ~1;
++    } else
++        q->flags |= 1;
++}
++
++void SelectionMenu_SetCallback(struct SelectionMenu *p, void (*v)(struct SelectionMenu *))
++{
++    p->frame = 0;
++    p->callbackPending = 1;
++    p->callback = v;
++}
++
++u32 SelectionMenu_ConsumeCallbackFlag(struct SelectionMenu *p)
++{
++    u32 r;
++    if (p->callbackPending == 0) {
++        r = 0;
++    } else {
++        p->callbackPending = 0;
++        r = 1;
++    }
++    return r;
++}
++
++void Presentation_UpdateActorGraphic(struct SelectionMenu *p, u32 fallback)
++{
++    u8 *actor = Inventory_GetEquipmentEntry(p->selectedSlot);
++    u8 data[32];
++    if (*actor != 255) {
++        ActionRecord_CopyFromEntry(actor, data);
++        MessageWindow_SetMessageTable(p->actorMessages);
++        Presentation_ApplyGraphicData(data, p->graphicData);
++        Presentation_ApplyGraphicSettings(actor, p->actorMessages);
++        {
++            u32 resource = Presentation_SelectGraphicResource(actor);
++            (&p->highlight)->flags &= ~1;
++            Anim_LoadKeyframe(&p->highlight, &p->iconResource, (u16)resource, 0);
++        }
++    } else {
++        MessageWindow_Clear();
++        if (!fallback)
++            ScrollingDialogue_ClearScript();
++        else
++            ScrollingDialogue_SetScript(fallback);
++        (&p->highlight)->flags |= 1;
++    }
++}
++
++void Presentation_ShowItemDescription(u8 *p, u32 q)
++{
++    u32 s = Script_ParseStringRef((void *)q) + 0x30;
++    MessageWindow_SetMessageTable(q);
++    MessageWindow_ShowMessage(*p);
++    ScrollingDialogue_SetNumberArgument(0, 0);
++    ScrollingDialogue_SetNumberArgument(1, 999);
++    ScrollingDialogue_SetScript((u32)Text_LookupString(s + *p));
++}
++
++void Presentation_UpdateItemGraphic(struct SelectionMenu *p, u32 fallback)
++{
++    int index = Inventory_GetConsumableId(p->selectedSlot);
++    if (index >= 0) {
++        Presentation_ShowItemDescription(&gUnk_08E60F80[index], p->itemMessages);
++        (&p->highlight)->flags &= ~1;
++        Anim_LoadKeyframe(&p->highlight, &p->iconResource, 0x18a, 0);
++    } else {
++        MessageWindow_Clear();
++        if (!fallback)
++            ScrollingDialogue_ClearScript();
++        else
++            ScrollingDialogue_SetScript(fallback);
++        (&p->highlight)->flags |= 1;
++    }
++}
++
++void SelectionMenu_CallConfirmScript(struct SelectionMenu *p)
++{
++    struct SelectionMenuScriptValues a;
++    struct SelectionMenuScriptCall b;
++    b.flags = 2;
++    b.args = &a;
++    a.actor = p->choices[0];
++    a.item = p->choices[1];
++    Script_Call(p->confirmScript, &b);
++}
++
++/* Tentative: choose one of three selection sounds. */
++
++void Presentation_PlaySelectionSound(void *p, int selection)
++{
++    switch (selection) {
++        case 0:
++            Sound_PlaySong(0x394);
++            break;
++        case 1:
++            Sound_PlaySong(0x395);
++            break;
++        case 2:
++            Sound_PlaySong(0x396);
++            break;
++    }
++}
++
++int SelectionMenu_ConfigureLayers(int value, int mode)
++{
++    u8 *resource = ScriptProc_Start(0xc091, 0xa597);
++    int result;
++    if (mode) {
++        Bg_SetupLayers(3, 0, resource, 0, 0, 1, &value);
++        BgGfx_LoadTilemapSimple(1, 0, 0, 0, 0);
++        result = 1;
++    } else {
++        Bg_SetupLayers(0, 0, resource, 0, 0, 1, &value);
++        BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
++        result = 0;
++    }
++    {
++        u8 *palette = ScriptProc_Start(0x92b3, 0x81b);
++        CpuSet(palette + 0x1b4, gUnk_03005160, 0x30);
++    }
++    return result;
++}
++
++void SelectionMenu_HandleHorizontalInput(struct SelectionMenu *p)
++{
++    if ((gUnk_03005260[1] & 0x20) && p->horizontalChoice == 1) {
++        p->horizontalChoice = 0;
++        Anim_LoadKeyframe(&p->cursors[2], &p->panelResource, 0x4b, 0);
++        Sound_PlaySong(0xdc);
++    }
++    if ((gUnk_03005260[1] & 0x10) && p->horizontalChoice == 0) {
++        p->horizontalChoice = 1;
++        Anim_LoadKeyframe(&p->cursors[2], &p->panelResource, 0x4c, 0);
++        Sound_PlaySong(0xdc);
++    }
++}
++
++INCLUDE_ASM("asm/nonmatching", sub_0801A218);
++
++void SelectionMenu_InitCursors(struct SelectionMenu *p)
++{
++    struct {
++        u32 zero;
++        struct ContactPosition position;
++    } scratch;
++    struct SceneInputWidget *g;
++    int i;
++    struct ContactPosition *pos = &scratch.position;
++    struct ContactPosition *saved;
++    int clear;
++    scratch.zero = 0;
++    SelectionMenu_ClearPosition(&scratch.zero, pos);
++    saved = pos;
++    clear = 0;
++    g = p->cursors;
++    i = 2;
++    do {
++        sub_0821983C(g, &p->panelResource, 0x4e, 0x10, clear, clear, 0x3c, saved);
++        g++;
++        i--;
++    } while (i >= 0);
++}
++
++void SelectionMenu_InitMarkers(struct SelectionMenu *p)
++{
++    struct {
++        u32 zero;
++        struct ContactPosition position;
++    } scratch;
++    struct SceneInputWidget *g;
++    int i;
++    struct ContactPosition *pos = &scratch.position;
++    struct ContactPosition *saved;
++    int clear;
++    scratch.zero = 0;
++    SelectionMenu_ClearPosition(&scratch.zero, pos);
++    saved = pos;
++    clear = 0;
++    g = p->markers;
++    i = 7;
++    do {
++        sub_0821983C(g, &p->panelResource, 0x50, 0x31, clear, clear, 0x3c, saved);
++        g++;
++        i--;
++    } while (i >= 0);
++}
++
++void SelectionMenu_InitHighlight(struct SelectionMenu *p)
++{
++    struct ContactPosition z;
++    u32 m = 0xFFFF0000;
++    *(u32 *)&z = 0x800000;
++    *((u32 *)&z + 1) &= m;
++    sub_0821983C(&p->highlight, &p->iconResource, 0x189, 0x11, 0, 0, 0x3c, &z);
++}
++
++void SelectionMenu_PositionCursors(struct SelectionMenu *p)
++{
++    struct SceneInputWidget *g = &p->cursors[0];
++    g->position.x = (p->selectedSlot & 3) * 24 + 144;
++    g->position.y = (p->selectedSlot >> 2) * 24 + 32;
++    g->flags &= ~1;
++    Anim_LoadKeyframe(g, &p->panelResource, 0x4d, 0);
++    g = &p->cursors[1];
++    g->position.x = 16;
++    g->position.y = 40;
++    g->flags &= ~1;
++    Anim_LoadKeyframe(g, &p->panelResource, 0x4e, 0);
++    g = &p->cursors[2];
++    g->position.x = 0;
++    g->position.y = 0;
++    g->flags |= 1;
++    Anim_LoadKeyframe(g, &p->panelResource, 0x4b, 0);
++}
++
++void SelectionMenu_PositionInventoryMarkers(struct SelectionMenu *p)
++{
++    int i, index;
++    for (i = 0; i < 8; i++) {
++        struct SceneInputWidget *g = &p->markers[i];
++        /* Byte-index the owner first to preserve the original address-add order. */
++        if (i <= 7)
++            index = ((struct GameState *)((u8 *)gUnk_02000710 + i * 2))->inventory[0];
++        else
++            index = -1;
++        if (index >= 0) {
++            g->position.x = (index & 3) * 24 + 144;
++            g->position.y = (index >> 2) * 24 + 32;
++            g->flags &= ~1;
++        } else
++            g->flags |= 1;
++    }
++}
++
++void SelectionMenu_PositionEquipmentMarkers(struct SelectionMenu *p)
++{
++    int i, index;
++    for (i = 0; i < 8; i++) {
++        struct SceneInputWidget *g = &p->markers[i];
++        /* Same address-order adaptation as the inventory marker loop. */
++        if (i <= 3)
++            index = ((struct GameState *)((u8 *)gUnk_02000710 + i * 2))->party[0];
++        else
++            index = -1;
++        if (index >= 0) {
++            g->position.x = (index & 3) * 24 + 144;
++            g->position.y = (index >> 2) * 24 + 32;
++            g->flags &= ~1;
++        } else
++            g->flags |= 1;
++    }
++}
++
++/* Hide the eight inventory/equipment markers. */
++
++void SelectionMenu_HideMarkers(struct SelectionMenu *p)
++{
++    int mask = 1;
++    u32 *flags;
++    int i;
++    flags = &p->markers[0].flags;
++    i = 7;
++    do {
++        *flags |= mask;
++        flags += sizeof(struct SceneInputWidget) / sizeof(u32);
++        i--;
++    } while (i >= 0);
++}
++
++void SelectionMenu_StepCursors(struct SelectionMenu *p)
++{
++    struct SceneInputWidget *e = &p->cursors[0];
++    s32 i = 2;
++    do {
++        Anim_Step(e, &p->panelResource);
++        e++;
++        i--;
++    } while (i >= 0);
++}
++
++void SelectionMenu_RemovePanel(struct SelectionMenu *p)
++{
++    Anim_Remove(&p->panels[0]);
++    Anim_Remove(&p->panels[1]);
++    Sprite_Remove(&p->panel);
++}
++
++void SelectionMenu_RemoveCursors(struct SelectionMenu *p)
++{
++    struct SceneInputWidget *e = &p->cursors[0];
++    s32 i = 2;
++    do {
++        Anim_Remove(e);
++        e++;
++        i--;
++    } while (i >= 0);
++}
++
++void SelectionMenu_RemoveMarkerAnim(struct SelectionMenu *p)
++{
++    struct SceneInputWidget *e = p->markers;
++    s32 i = 7;
++    do {
++        Anim_Remove(e);
++        e++;
++        i--;
++    } while (i >= 0);
++}
++
++void SelectionMenu_RemoveHighlight(struct SelectionMenu *p)
++{
++    Anim_Remove(&p->highlight);
++}
++
++INCLUDE_ASM("asm/nonmatching", sub_0801A6D0);
++
++void SelectionMenu_PopulateActors(struct SelectionMenu *p)
++{
++    struct SceneInputWidget *g = p->icons;
++    int i;
++    struct SelectionMenuPackedPosition v;
++    for (i = 0; i < 16; i++, g++) {
++        v.x = (i & 3) * 24 + 144;
++        v.y = (i >> 2) * 24 + 32;
++        SelectionMenu_SetActorIcon(p, g, i);
++        *(struct SelectionMenuPackedPosition *)&g->position = v;
++        if ((1 << i) & p->availableSlots) {
++            g->paletteBank = 0x373;
++            g->palette = SelectionMenu_GetIconPalette(0);
++        } else {
++            g->paletteBank = 0x374;
++            g->palette = SelectionMenu_GetIconPalette(1);
++        }
++    }
++    g = &p->heading;
++    Anim_LoadKeyframe(g, &p->panelResource, 0x65, 0);
++    g->flags &= ~1;
++}
++
++void SelectionMenu_PopulateItems(struct SelectionMenu *p)
++{
++    struct SceneInputWidget *g = p->icons;
++    int i;
++    struct SelectionMenuPackedPosition v;
++    for (i = 0; i < 16; i++, g++) {
++        v.x = (i & 3) * 24 + 144;
++        v.y = (i >> 2) * 24 + 32;
++        Presentation_SetItemGraphic(p, g, i);
++        *(struct SelectionMenuPackedPosition *)&g->position = v;
++        if ((1 << i) & p->availableSlots) {
++            g->paletteBank = 0x373;
++            g->palette = SelectionMenu_GetIconPalette(0);
++        } else {
++            g->paletteBank = 0x374;
++            g->palette = SelectionMenu_GetIconPalette(1);
++        }
++    }
++    g = &p->heading;
++    Anim_LoadKeyframe(g, &p->panelResource, 0x66, 0);
++    g->flags &= ~1;
++}
++
++void SelectionMenu_RemoveIconGrid(struct SelectionMenu *p)
++{
++    struct SceneInputWidget *e = p->icons;
++    s32 i = 0x12;
++    do {
++        Anim_Remove(e);
++        e++;
++        i--;
++    } while (i >= 0);
++    Anim_Remove(&p->heading);
++}
++
++void SelectionMenu_StartAnimateChoice(struct SelectionMenu *p)
++{
++    if (p->choiceCount <= 1) {
++        Sound_PlaySong(0xdd);
++        SelectionMenu_SetCallback(p, SelectionMenu_AnimateChoice);
++    }
++}
++
++void SelectionMenu_Back(struct SelectionMenu *p)
++{
++    struct SceneInputWidget *g = &p->cursors[1];
++    if (p->choiceCount) {
++        Sound_PlaySong(0xde);
++        Anim_LoadKeyframe(g, &p->panelResource, 0x4d, 0);
++        p->choiceCount--;
++        (&p->icons[16 + p->choiceCount])->flags |= 1;
++        if (!p->choiceCount)
++            g->position.x = 16;
++        else
++            g->position.x = 64;
++        g->position.y = 40;
++        MessageWindow_SetBounds(2, 16, 30, 2);
++        Presentation_UpdateActorGraphic(p, 0);
++        SelectionMenu_SetCallback(p, SelectionMenu_Choose);
++    } else {
++        Sound_PlaySong(0xde);
++        SelectionMenu_SetCallback(p, SelectionMenu_Close);
++    }
++}
++
++void SelectionMenu_AdvanceChoice(struct SelectionMenu *p)
++{
++    struct SceneInputWidget *g = &p->cursors[1];
++    if (!p->choiceCount)
++        g->position.x = 64;
++    else
++        g->position.x = 104;
++    g->position.y = 40;
++    if (++p->choiceCount <= 1)
++        SelectionMenu_SetCallback(p, SelectionMenu_Choose);
++    else {
++        sub_0801B600(p->choices[0], p->choices[1], p->result);
++        SelectionMenu_SetCallback(p, SelectionMenu_ReviewChoice);
++    }
++}
++
++// MATCHING_CONCESSION: register-pinning
++void SelectionMenu_DrawStatistics(struct SelectionMenu *p)
++{
++    int value, a, b;
++    SceneHud_DrawClock(p->statisticsPage);
++    SceneHud_DrawNumericStatus(p->statisticsPage);
++    value = gUnk_02000710->level;
++    if (value > 99)
++        value = 99;
++    else if (value < 0)
++        value = 0;
++    {
++        int x = 10;
++        asm("" : "+r"(x));
++        Text_DrawNumber(0, x, 9, value, 33, 2, 15);
++    }
++    a = 0;
++    b = 0;
++    SceneInputPanel_GetEquippedValues(&a, &b, 0, 0);
++    if (b > 0)
++        Text_DrawNumber(0, 9, 10, b, 33, 3, 15);
++    else
++        SceneHud_FillTile020(9, 10, 3);
++    if (a > 0)
++        Text_DrawNumber(0, 9, 11, a, 33, 3, 15);
++    else
++        SceneHud_FillTile020(9, 11, 3);
++    Text_DrawNumber(0, 11, 12, Player_GetCurrentAttribute(0), 33, 3, 15);
++    Text_DrawNumber(0, 11, 13, Player_GetCurrentAttribute(1), 33, 3, 15);
++    Text_DrawNumber(0, 11, 14, Player_GetCurrentAttribute(2), 33, 3, 15);
++    SelectionMenu_StepCursors(p);
++}
++
++void SelectionMenu_ActorAvailability(struct SelectionMenu *p)
++{
++    int i, mask;
++    s16 *slot;
++    p->availableSlots = 0xffff;
++    {
++        struct GameState *base = gUnk_02000710;
++        mask = 1;
++        slot = base->inventory;
++    }
++    i = 7;
++    do {
++        if (*slot >= 0)
++            p->availableSlots &= ~(mask << *slot);
++        slot++;
++        i--;
++    } while (i >= 0);
++    for (i = 0; i < 16; i++) {
++        u8 *actor = Inventory_GetEquipmentEntry(i);
++        if (*actor != 255) {
++            int id = *actor;
++            struct SelectionMenuActor *data = &gUnk_08E6092C[id];
++            if (id != 46 && data->restrictions[0] == 0xffffffff &&
++                (data->restrictions[1] & 0xffffff) == 0xffffff)
++                p->availableSlots &= ~(1 << i);
++        }
++    }
++}
++
++void SelectionMenu_ItemAvailability(struct SelectionMenu *arg)
++{
++    struct SelectionMenu *p = arg;
++    int i;
++    int index;
++    u8 alias;
++    int mask;
++    p->availableSlots = 0xffff;
++    i = 0;
++    mask = 1;
++    /* do-while(0) only keeps agbcc's block layout */
++    do {
++        index = Inventory_GetConsumableId(i);
++        if (index >= 0) {
++            struct SelectionMenuItem *table = gUnk_08E60F80;
++            alias = table[index].available;
++            if (alias && (!GameState_IsConsumableSlotEquipped(i))) {
++                goto next;
++            }
++        }
++        if (p) {
++            p->availableSlots &= ~(mask << i);
++        } else {
++            p->availableSlots &= ~(mask << i);
++        }
++    next:
++        i++;
++
++    } while (i < 16);
++}
++
++void SelectionMenu_OpenActorPage(struct SelectionMenu *p)
++{
++    SelectionMenu_ActorAvailability(p);
++    p->choiceCount = 0;
++    p->statisticsPage = 0;
++    Bg_ClearTilemap(0);
++    SelectionMenu_ConfigureLayers(13, 0);
++    SelectionMenu_PositionCursors(p);
++    SelectionMenu_PositionInventoryMarkers(p);
++    SelectionMenu_PopulateActors(p);
++    MessageWindow_SetMessageTable(p->actorMessages);
++    MessageWindow_SetBounds(2, 16, 30, 2);
++    MessageWindow_SetDisplayMode(1);
++    MessageWindow_SetPalette(0x81b);
++}
++
++void SelectionMenu_RefreshActorPage(struct SelectionMenu *p)
++{
++    SelectionMenu_ActorAvailability(p);
++    SelectionMenu_PositionInventoryMarkers(p);
++    SelectionMenu_PopulateActors(p);
++    Presentation_UpdateActorGraphic(
++        p, (u32)Text_LookupString(Script_ParseStringRef((void *)p->promptMessages)));
++}
++
++void SelectionMenu_RefreshItemPage(struct SelectionMenu *p)
++{
++    SelectionMenu_ItemAvailability(p);
++    SelectionMenu_PositionEquipmentMarkers(p);
++    SelectionMenu_PopulateItems(p);
++    Presentation_UpdateItemGraphic(
++        p, (u32)Text_LookupString(Script_ParseStringRef((void *)p->promptMessages)));
++}
++
++#ifdef NONMATCHING
++// fuzzy: 94.7%
++// Input pointer lifetime and branch sharing still differ.
++int SelectionMenu_NavigateGrid(struct SelectionMenu *p)
++{
++    int index = p->selectedSlot;
++    int direction = 0;
++    if (gUnk_03005260[1] & 0x40)
++        direction = 1;
++    else if (gUnk_03005260[1] & 0x80)
++        direction = 2;
++    else if (gUnk_03005260[1] & 0x20)
++        direction = 4;
++    else if (gUnk_03005260[1] & 0x10)
++        direction = 8;
++    if (!direction) {
++        if (p->repeatTicks > 7) {
++            u16 *held = gUnk_03005260;
++            if (*held & 0x40)
++                direction = 1;
++            else if (*held & 0x80)
++                direction = 2;
++            if (gUnk_03005260[0] & 0x20)
++                direction |= 4;
++            else if (gUnk_03005260[0] & 0x10)
++                direction |= 8;
++        } else if (gUnk_03005260[0] & 0xf0)
++            p->repeatTicks++;
++    }
++    if (direction & 1) {
++        if (!(index >> 2))
++            index = (index & 3) + 12;
++        else
++            index -= 4;
++    } else if (direction & 2) {
++        int row = index >> 2;
++        if (row == 3) {
++            index &= row;
++            goto moved;
++        }
++        index += 4;
++    } else if (direction & 4) {
++        if (!(index & 3))
++            index = (index & 0xfc) + 3;
++        else
++            index--;
++    } else if (direction & 8) {
++        if ((index & 3) == 3) {
++            index &= 0xfc;
++            goto moved;
++        }
++        index++;
++    } else
++        return index;
++moved:
++    p->repeatTicks = 0;
++    return index;
++}
++#else
++INCLUDE_ASM("asm/nonmatching", sub_0801ACB8);
++#endif
++
++// MATCHING_CONCESSION: register-pinning
++void SelectionMenu_Choose(struct SelectionMenu *p)
++{
++    int index;
++    switch (p->choiceCount) {
++
++        case 0:
++            if (SelectionMenu_ConsumeCallbackFlag(p))
++                SelectionMenu_RefreshActorPage(p);
++            if (gUnk_03005260[0] & 4) {
++                if (gUnk_03005260[1] & 1) {
++                    if (++p->statisticsPage > 2)
++                        p->statisticsPage = 0;
++                    Sound_PlaySong(0xdc);
++                }
++            } else {
++                index = SelectionMenu_NavigateGrid(p);
++                if (index != p->selectedSlot) {
++                    {
++                        register int x asm("r0") = (index & 3) * 24 + 144;
++                        /* Retain the existing pinned byte-offset calculation: typed
++                         * coordinate stores coalesce the two address additions. */
++                        register int offset asm("r3");
++                        offset = 0x1b4;
++                        asm("" : "+r"(offset));
++                        *(u16 *)((u8 *)p + offset) = x;
++                        x = (index >> 2) * 24 + 32;
++                        offset += 2;
++                        {
++                            register u16 *out asm("r1") = (u16 *)((u8 *)p + offset);
++                            *out = x;
++                        }
++                    }
++                    p->selectedSlot = index;
++                    Sound_PlaySong(0xdc);
++                    Presentation_UpdateActorGraphic(p, 0);
++                }
++                if (gUnk_03005260[1] & 1) {
++                    if (*Inventory_GetEquipmentEntry(p->selectedSlot) != 255 &&
++                        ((1 << p->selectedSlot) & p->availableSlots))
++                        SelectionMenu_StartAnimateChoice(p);
++                    else
++                        Sound_PlaySong(0x192);
++                    return;
++                } else if (gUnk_03005260[1] & 2) {
++                    SelectionMenu_Back(p);
++                    return;
++                }
++            }
++            break;
++
++        case 1:
++            if (SelectionMenu_ConsumeCallbackFlag(p))
++                SelectionMenu_RefreshItemPage(p);
++            if (gUnk_03005260[0] & 4) {
++                if (gUnk_03005260[1] & 1) {
++                    if (++p->statisticsPage > 2)
++                        p->statisticsPage = 0;
++                    Sound_PlaySong(0xdc);
++                }
++            } else {
++                index = SelectionMenu_NavigateGrid(p);
++                {
++                    register int old asm("r3") = p->selectedSlot;
++                    asm("" : "+r"(old));
++                    if (index != old) {
++                        {
++                            register int x asm("r0") = (index & 3) * 24 + 144;
++                            /* Retain the existing pinned byte-offset calculation: typed
++                         * coordinate stores coalesce the two address additions. */
++                            register int offset asm("r3");
++                            offset = 0x1b4;
++                            asm("" : "+r"(offset));
++                            *(u16 *)((u8 *)p + offset) = x;
++                            x = (index >> 2) * 24 + 32;
++                            offset += 2;
++                            {
++                                register u16 *out asm("r1") = (u16 *)((u8 *)p + offset);
++                                *out = x;
++                            }
++                        }
++                        p->selectedSlot = index;
++                        Sound_PlaySong(0xdc);
++                        Presentation_UpdateItemGraphic(p, 0);
++                    }
++                }
++                if (gUnk_03005260[1] & 1) {
++                    if (Inventory_GetConsumableId(p->selectedSlot) >= 0) {
++                        int selected = p->selectedSlot;
++                        if ((1 << selected) & p->availableSlots)
++                            SelectionMenu_StartAnimateChoice(p);
++                        else
++                            Sound_PlaySong(0x192);
++                    } else
++                        Sound_PlaySong(0x192);
++                    return;
++                } else if (gUnk_03005260[1] & 2) {
++                    SelectionMenu_Back(p);
++                    return;
++                }
++            }
++            break;
++    }
++    (p->frame)++;
++}
++
++void SelectionMenu_AnimateChoice(struct SelectionMenu *p)
++{
++    struct SceneInputWidget *source = &p->icons[p->selectedSlot];
++    struct SceneInputWidget *dest = &p->icons[16 + p->choiceCount];
++    if (SelectionMenu_ConsumeCallbackFlag(p)) {
++        sub_082199C8(dest, source, 13);
++        dest->flags &= ~1;
++        source->paletteBank = 0x374;
++        source->palette = SelectionMenu_GetIconPalette(1);
++        p->choices[p->choiceCount] = p->selectedSlot;
++        p->availableSlots &= ~(1 << p->selectedSlot);
++        if (!p->choiceCount)
++            p->choiceTarget.x = 16;
++        else
++            p->choiceTarget.x = 64;
++        p->choiceTarget.y = 40;
++    }
++    sub_082216F8(&dest->position, &source->position, &p->choiceTarget, p->frame, 3);
++    if (p->frame > 7)
++        SelectionMenu_AdvanceChoice(p);
++    else
++        (p->frame)++;
++}
++
++// MATCHING_CONCESSION: register-pinning
++void SelectionMenu_ReviewChoice(struct SelectionMenu *p)
++{
++    struct SceneInputWidget *g;
++    if (SelectionMenu_ConsumeCallbackFlag(p)) {
++        g = &p->icons[18];
++        Anim_LoadKeyframe(&p->cursors[0], &p->panelResource, 0x4d, 0);
++        ScrollingDialogue_ClearScript();
++        {
++            u8 *result = p->result;
++            Presentation_SetActorIconFrame(p, g, result);
++        }
++        g->flags &= ~1;
++        g->position.x = 104;
++        g->position.y = 40;
++        p->horizontalChoice = 0;
++        Anim_LoadKeyframe(&p->cursors[2], &p->panelResource, 0x4b, 0);
++        p->cursors[2].flags &= ~1;
++        MessageWindow_SetBounds(0, 16, 30, 2);
++        MessageWindow_SetMessageTable(p->promptMessages);
++        {
++            struct SelectionMenuActor *actor = &gUnk_08E6092C[p->result[0]];
++            if (gUnk_02000710->level >= actor->level || Inventory_HasItem(0x29))
++                MessageWindow_ShowMessage(1);
++            else
++                MessageWindow_ShowMessage(2);
++        }
++        (&p->highlight)->flags |= 1;
++        ScrollingDialogue_ClearScript();
++    }
++    if (gUnk_03005260[0] & 4) {
++        if (gUnk_03005260[1] & 1) {
++            if (++p->statisticsPage > 2)
++                p->statisticsPage = 0;
++            Sound_PlaySong(0xdc);
++        }
++    } else {
++        SelectionMenu_HandleHorizontalInput(p);
++        {
++            int keys = gUnk_03005260[1], mask;
++            mask = 1;
++            asm("" : "+r"(mask));
++            if (mask & keys) {
++                if (!p->horizontalChoice) {
++                    Sound_PlaySong(0xdd);
++                    SelectionMenu_SetCallback(p, SelectionMenu_Confirm);
++                    return;
++                }
++                goto back;
++            } else if (2 & keys) {
++            back:
++                (&p->icons[18])->flags |= mask;
++                p->cursors[2].flags |= mask;
++                SelectionMenu_Back(p);
++                return;
++            }
++            asm("" ::"r"(keys));
++        }
++    }
++    (p->frame)++;
++}
++
++void SelectionMenu_Close(struct SelectionMenu *p)
++{
++    if (SelectionMenu_ConsumeCallbackFlag(p))
++        ScreenTransition_SendCommand(3, 4, 4, 4, 4, 0xffff, 0);
++    if (p->frame == 20) {
++        {
++            u32 *state = &gUnk_0300523C;
++            int mask;
++            mask = ~4;
++            *state &= mask;
++        }
++        if (p->cancelScript)
++            Script_Call(p->cancelScript, 0);
++    } else
++        (p->frame)++;
++}
++
++void SelectionMenu_Hide(struct SelectionMenu *arg)
++{
++    struct SelectionMenu *p = arg;
++    int i, mask;
++    u32 *flags;
++    u32 *state;
++    struct SceneInputWidget *g;
++    g = &p->panels[0];
++    g->flags |= 1;
++    g = &p->panels[1];
++    g->flags |= 1;
++    state = &gUnk_0300523C;
++    mask = 1;
++    flags = &p->icons[0].flags;
++    i = 18;
++    do {
++        *flags |= mask;
++        flags += 24;
++        i--;
++    } while (i >= 0);
++    mask = 1;
++    flags = &p->cursors[0].flags;
++    i = 2;
++    do {
++        *flags |= mask;
++        flags += 24;
++        i--;
++    } while (i >= 0);
++    mask = 1;
++    flags = &p->markers[0].flags;
++    i = 7;
++    do {
++        *flags |= mask;
++        flags += 24;
++        i--;
++    } while (i >= 0);
++    g = &p->highlight;
++    g->flags |= 1;
++    {
++        int clear = ~4;
++        *state &= clear;
++    }
++}
++
++void SelectionMenu_Confirm(struct SelectionMenu *p)
++{
++    if (SelectionMenu_ConsumeCallbackFlag(p))
++        ScreenTransition_SendCommand(1, 5, 4, 4, 4, 0xffff, 0);
++    if (p->frame > 31) {
++        SelectionMenu_Hide(p);
++        ScrollingDialogue_RequestHide();
++        if (p->confirmScript)
++            SelectionMenu_CallConfirmScript(p);
++        Task_Kill(p);
++    } else
++        (p->frame)++;
++}
++
++u32 SelectionMenu_Update(struct SelectionMenu *p)
++{
++    Callback_InvokeActor(p, (void *)p->callback);
++    SelectionMenu_DrawStatistics(p);
++    return 0;
++}
++
++u32 SelectionMenu_Destroy(struct SelectionMenu *p)
++{
++    SelectionMenu_RemoveIconGrid(p);
++    SelectionMenu_RemoveCursors(p);
++    SelectionMenu_RemoveMarkerAnim(p);
++    SelectionMenu_RemoveHighlight(p);
++    SelectionMenu_RemovePanel(p);
++    ScrollingDialogue_RequestHide();
++    return 0;
++}
++
++// MATCHING_CONCESSION: register-pinning
++int SelectionMenu_Initialize(struct SelectionMenu *p, void *a, void *b)
++{
++    struct SceneInputResource *resource = ScriptProc_Start(0xcb05, 0x530d);
++    if (!resource)
++        goto fail;
++    asm("" ::: "r0");
++    p->panelResource = *resource;
++    ResourceHeader_Relocate(&p->panelResource, resource);
++    resource = ScriptProc_Start(0xcb05, 0x5d04);
++    if (!resource)
++        goto fail;
++    asm("" ::: "r0");
++    p->iconResource = *resource;
++    ResourceHeader_Relocate(&p->iconResource, resource);
++    p->cancelScript = Script_GetKeywordValue('c', 0);
++    p->confirmScript = Script_GetKeywordValue('e', 0);
++    if (!Script_SeekToKeyword('w'))
++        goto fail;
++    if (!(p->actorMessages = Script_GetTextSourcePc()))
++        goto fail;
++    if (!Script_SeekToKeyword('a'))
++        goto fail;
++    if ((p->itemMessages = Script_GetTextSourcePc()))
++        goto configure;
++fail:
++    return -1;
++configure:
++    if (!Script_SeekToKeyword('k'))
++        goto fail;
++    if (!(p->promptMessages = Script_GetTextSourcePc()))
++        goto fail;
++    sub_0801A218(p);
++    SelectionMenu_InitMarkers(p);
++    sub_0801A6D0(p);
++    SelectionMenu_InitCursors(p);
++    SelectionMenu_InitHighlight(p);
++    MessageWindow_SetBounds(0, 16, 30, 2);
++    SelectionMenu_OpenActorPage(p);
++    SelectionMenu_SetCallback(p, SelectionMenu_Choose);
++    ScrollingDialogue_RequestShow();
++    {
++        int mask = 4;
++        gUnk_0300523C |= mask;
++    }
++    return 0;
++}
++
++void *SelectionMenu_Create(void *a, void *b)
++{
++    void *obj;
++    obj = Task_Create(11, 0xDB4);
++    if (obj != 0) {
++        Task_SetCallbacks(obj, (void (*)(void *))SelectionMenu_Update,
++                          (void (*)(void *))SelectionMenu_Destroy);
++        if (SelectionMenu_Initialize(obj, a, b) < 0) {
++            Task_Kill(obj);
++            return 0;
++        }
++    }
++    return obj;
++}
+-- 
+2.39.3 (Apple Git-145)
+

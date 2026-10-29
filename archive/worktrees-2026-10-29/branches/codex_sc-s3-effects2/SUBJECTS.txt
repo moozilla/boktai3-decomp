@@ -1,0 +1,4 @@
+Accept explicit function arguments for scope giv and calls
+Distinguish loop counter eligibility from actual elimination
+Keep recovered interior routines in reviewed scope and seek extents
+Search every recovered routine in a bundled seek entry

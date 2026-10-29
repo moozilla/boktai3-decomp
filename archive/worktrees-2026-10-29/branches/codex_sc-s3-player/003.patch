@@ -1,0 +1,96 @@
+From cddbe913a9295f8294afb5b538987dad7717bc5f Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 02:53:00 -0700
+Subject: [PATCH] Resume seek search through known binaries and expanded
+ descendants
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/seek/seek.py | 34 +++++++++++++++++++++++++---------
+ 1 file changed, 25 insertions(+), 9 deletions(-)
+
+diff --git a/tools/seek/seek.py b/tools/seek/seek.py
+index ae9fea74d..fa4e25771 100644
+--- a/tools/seek/seek.py
++++ b/tools/seek/seek.py
+@@ -348,6 +348,7 @@ class Work:
+             fs[1] += 1
+             if out in self.sess.by_out:
+                 stats["known"] += 1
++                children.append(self.sess.nodes[self.sess.by_out[out]])
+                 continue
+             vpre = E.splice(base_pre, [dname], txt)
+             nd = dict(node.get("defs") or {})
+@@ -370,7 +371,8 @@ class Work:
+             stats["new"] += 1
+         stats["seconds"] = round(time.time() - t0, 2)
+         self.sess.event(kind="expand", node=node["id"], families=sorted(families) if families else None,
+-                        lines=lines, **{k: v for k, v in stats.items() if k != "fam"})
++                        lines=lines, children=sorted({c["id"] for c in children}),
++                        **{k: v for k, v in stats.items() if k != "fam"})
+         if not quiet:
+             print_expand(self, node, children, stats)
+         return children, stats
+@@ -384,12 +386,20 @@ class Work:
+         t0 = time.time()
+         start_compiles = self.target.compiles
+         heap, tick = [], 0
++        queued = set()
++
++        def enqueue(n):
++            nonlocal tick
++            if n["id"] in queued or not n.get("ok") or n.get("sem", "").startswith("DIFFERENT"):
++                return
++            queued.add(n["id"])
++            heapq.heappush(heap, (rank(n), n.get("awrong", 0), n.get("depth", 0), tick, n["id"]))
++            tick += 1
+         sig = (tuple(sorted(families)) if families else None, tuple(lines) if lines else None)
+         done = {e["node"] for e in self.sess.events if e.get("kind") == "expand"
+                 and (tuple(e["families"]) if e.get("families") else None, tuple(e["lines"]) if e.get("lines") else None) == sig}
+         for n in starts:
+-            heapq.heappush(heap, (rank(n), n.get("awrong", 0), n.get("depth", 0), tick, n["id"]))
+-            tick += 1
++            enqueue(n)
+         best = min(starts, key=rank)
+         if slack is None:
+             slack = max(4, key_of(best)[2] // 8)
+@@ -397,15 +407,22 @@ class Work:
+         rounds = 0
+         while heap and self.target.compiles - start_compiles < budget and time.time() - t0 < seconds:
+             nid = heapq.heappop(heap)[-1]
++            node = self.sess.nodes[nid]
++            if rank(node) < rank(best):
++                best = node
++            if best.get("match"):
++                break
+             if nid in done:
+                 # already expanded: its children are on the tree; queue them instead
++                for e in self.sess.events:
++                    if e.get("kind") == "expand" and e.get("node") == nid:
++                        for cid in e.get("children", ()):
++                            enqueue(self.sess.nodes[cid])
+                 for c in self.sess.nodes.values():
+-                    if c.get("parent") == nid and c.get("ok") and c["id"] not in done:
+-                        heapq.heappush(heap, (rank(c), c.get("awrong", 0), c.get("depth", 0), tick, c["id"]))
+-                        tick += 1
++                    if c.get("parent") == nid:
++                        enqueue(c)
+                 continue
+             done.add(nid)
+-            node = self.sess.nodes[nid]
+             try:
+                 kids, st = self.expand(node, families, lines, quiet=True,
+                                        budget=None)
+@@ -421,8 +438,7 @@ class Work:
+                 # together: the first can cost a few insns); the heap still expands the best first
+                 if ck <= rank(node) or (ck[0] <= bk[0] and cost(c) <= cost(best) + slack
+                                         and c.get("depth", 0) <= max_depth):
+-                    heapq.heappush(heap, (rank(c), c.get("awrong", 0), c.get("depth", 0), tick, c["id"]))
+-                    tick += 1
++                    enqueue(c)
+                 if rank(c) < rank(best):
+                     best = c
+                     if not quiet:
+-- 
+2.39.3 (Apple Git-145)
+

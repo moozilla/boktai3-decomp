@@ -1,0 +1,6283 @@
+From c0387b91b481a1f00f29a22522245e3fb3f2b45b Mon Sep 17 00:00:00 2001
+From: Moozilla <moozilla@protonmail.com>
+Date: Mon, 19 Oct 2026 02:16:22 -0700
+Subject: [PATCH] Unit actor_graphics_and_basic_states: merge 71 files into
+ src/actor_graphics_and_basic_states.c
+
+Actor graphics and basic states (tentative) (08021EA8-08024F2C); tools/unitize.py, build OK, matched bytes 995718 -> 995718.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ include/actor_graphics_and_basic_states.h |   58 +
+ include/state_actor.h                     |   51 +-
+ notes/actor_graphics_and_basic_states.md  |  140 ++
+ src/actor_graphics_and_basic_states.c     | 2532 +++++++++++++++++++++
+ src/fn/sub_08021EA8.c                     |   12 -
+ src/fn/sub_08021EB8.c                     |    6 -
+ src/fn/sub_08021EC0.c                     |   30 -
+ src/fn/sub_080221D8.c                     |    5 -
+ src/fn/sub_080221DC.c                     |   35 -
+ src/fn/sub_0802229C.c                     |   26 -
+ src/fn/sub_08022330.c                     |   29 -
+ src/fn/sub_08022404.c                     |   20 -
+ src/fn/sub_08022468.c                     |   16 -
+ src/fn/sub_080224A4.c                     |   14 -
+ src/fn/sub_080224C4.c                     |   14 -
+ src/fn/sub_080224E4.c                     |   67 -
+ src/fn/sub_08022590.c                     |   15 -
+ src/fn/sub_080225B4.c                     |   26 -
+ src/fn/sub_08022600.c                     |   11 -
+ src/fn/sub_08022A48.c                     |   38 -
+ src/fn/sub_08022AF4.c                     |   14 -
+ src/fn/sub_08022D24.c                     |   20 -
+ src/fn/sub_08022D68.c                     |   29 -
+ src/fn/sub_08022F88.c                     |  275 ---
+ src/fn/sub_080235F4.c                     |   33 -
+ src/fn/sub_08023638.c                     |   30 -
+ src/fn/sub_0802367C.c                     |   33 -
+ src/fn/sub_080236C0.c                     |   34 -
+ src/fn/sub_08023720.c                     |   33 -
+ src/fn/sub_08023770.c                     |   33 -
+ src/fn/sub_080237C0.c                     |   45 -
+ src/fn/sub_0802383C.c                     |   43 -
+ src/fn/sub_080238A8.c                     |   33 -
+ src/fn/sub_080238F8.c                     |   33 -
+ src/fn/sub_08023948.c                     |   41 -
+ src/fn/sub_080239A8.c                     |   33 -
+ src/fn/sub_080239F8.c                     |   33 -
+ src/fn/sub_08023A48.c                     |   32 -
+ src/fn/sub_08023A98.c                     |   33 -
+ src/fn/sub_08023AE8.c                     |   33 -
+ src/fn/sub_08023B38.c                     |   42 -
+ src/fn/sub_08023BA0.c                     |   33 -
+ src/fn/sub_08023BE4.c                     |   44 -
+ src/fn/sub_08023C50.c                     |   33 -
+ src/fn/sub_08023CA0.c                     |   43 -
+ src/fn/sub_08023D0C.c                     |   33 -
+ src/fn/sub_08023D5C.c                     |    7 -
+ src/fn/sub_08023D78.c                     |   69 -
+ src/fn/sub_08023E24.c                     |   60 -
+ src/fn/sub_08023EC0.c                     |   53 -
+ src/fn/sub_08023F34.c                     |   50 -
+ src/fn/sub_08023F98.c                     |   70 -
+ src/fn/sub_0802429C.c                     |   54 -
+ src/fn/sub_08024334.c                     |   54 -
+ src/fn/sub_08024440.c                     |   54 -
+ src/fn/sub_080244D8.c                     |   54 -
+ src/fn/sub_08024570.c                     |   61 -
+ src/fn/sub_0802461C.c                     |   61 -
+ src/fn/sub_080246C8.c                     |   71 -
+ src/fn/sub_08024774.c                     |   30 -
+ src/fn/sub_080247AC.c                     |   50 -
+ src/fn/sub_08024944.c                     |   61 -
+ src/fn/sub_080249F0.c                     |   61 -
+ src/fn/sub_08024A9C.c                     |   30 -
+ src/fn/sub_08024AD4.c                     |   50 -
+ src/fn/sub_08024B60.c                     |   57 -
+ src/fn/sub_08024BEC.c                     |   17 -
+ src/fn/sub_08024C10.c                     |    7 -
+ src/fn/sub_08024C2C.c                     |    7 -
+ src/fn/sub_08024C48.c                     |   14 -
+ src/fn/sub_08024C84.c                     |    7 -
+ src/fn/sub_08024CA0.c                     |    7 -
+ src/fn/sub_08024CBC.c                     |   16 -
+ src/fn/sub_08024CE0.c                     |   81 -
+ src/fn/sub_08024E18.c                     |   77 -
+ src/fn/sub_0806E130.c                     |    6 +-
+ src/fn/sub_080764C8.c                     |    6 +-
+ src/fn/sub_08080984.c                     |    6 +-
+ src/fn/sub_0813C5B4.c                     |    2 +-
+ src/fn/sub_0817A57C.c                     |    2 +-
+ src/tether_actor.c                        |    2 +-
+ 81 files changed, 2789 insertions(+), 2791 deletions(-)
+ create mode 100644 include/actor_graphics_and_basic_states.h
+ create mode 100644 notes/actor_graphics_and_basic_states.md
+ create mode 100644 src/actor_graphics_and_basic_states.c
+ delete mode 100644 src/fn/sub_08021EA8.c
+ delete mode 100644 src/fn/sub_08021EB8.c
+ delete mode 100644 src/fn/sub_08021EC0.c
+ delete mode 100644 src/fn/sub_080221D8.c
+ delete mode 100644 src/fn/sub_080221DC.c
+ delete mode 100644 src/fn/sub_0802229C.c
+ delete mode 100644 src/fn/sub_08022330.c
+ delete mode 100644 src/fn/sub_08022404.c
+ delete mode 100644 src/fn/sub_08022468.c
+ delete mode 100644 src/fn/sub_080224A4.c
+ delete mode 100644 src/fn/sub_080224C4.c
+ delete mode 100644 src/fn/sub_080224E4.c
+ delete mode 100644 src/fn/sub_08022590.c
+ delete mode 100644 src/fn/sub_080225B4.c
+ delete mode 100644 src/fn/sub_08022600.c
+ delete mode 100644 src/fn/sub_08022A48.c
+ delete mode 100644 src/fn/sub_08022AF4.c
+ delete mode 100644 src/fn/sub_08022D24.c
+ delete mode 100644 src/fn/sub_08022D68.c
+ delete mode 100644 src/fn/sub_08022F88.c
+ delete mode 100644 src/fn/sub_080235F4.c
+ delete mode 100644 src/fn/sub_08023638.c
+ delete mode 100644 src/fn/sub_0802367C.c
+ delete mode 100644 src/fn/sub_080236C0.c
+ delete mode 100644 src/fn/sub_08023720.c
+ delete mode 100644 src/fn/sub_08023770.c
+ delete mode 100644 src/fn/sub_080237C0.c
+ delete mode 100644 src/fn/sub_0802383C.c
+ delete mode 100644 src/fn/sub_080238A8.c
+ delete mode 100644 src/fn/sub_080238F8.c
+ delete mode 100644 src/fn/sub_08023948.c
+ delete mode 100644 src/fn/sub_080239A8.c
+ delete mode 100644 src/fn/sub_080239F8.c
+ delete mode 100644 src/fn/sub_08023A48.c
+ delete mode 100644 src/fn/sub_08023A98.c
+ delete mode 100644 src/fn/sub_08023AE8.c
+ delete mode 100644 src/fn/sub_08023B38.c
+ delete mode 100644 src/fn/sub_08023BA0.c
+ delete mode 100644 src/fn/sub_08023BE4.c
+ delete mode 100644 src/fn/sub_08023C50.c
+ delete mode 100644 src/fn/sub_08023CA0.c
+ delete mode 100644 src/fn/sub_08023D0C.c
+ delete mode 100644 src/fn/sub_08023D5C.c
+ delete mode 100644 src/fn/sub_08023D78.c
+ delete mode 100644 src/fn/sub_08023E24.c
+ delete mode 100644 src/fn/sub_08023EC0.c
+ delete mode 100644 src/fn/sub_08023F34.c
+ delete mode 100644 src/fn/sub_08023F98.c
+ delete mode 100644 src/fn/sub_0802429C.c
+ delete mode 100644 src/fn/sub_08024334.c
+ delete mode 100644 src/fn/sub_08024440.c
+ delete mode 100644 src/fn/sub_080244D8.c
+ delete mode 100644 src/fn/sub_08024570.c
+ delete mode 100644 src/fn/sub_0802461C.c
+ delete mode 100644 src/fn/sub_080246C8.c
+ delete mode 100644 src/fn/sub_08024774.c
+ delete mode 100644 src/fn/sub_080247AC.c
+ delete mode 100644 src/fn/sub_08024944.c
+ delete mode 100644 src/fn/sub_080249F0.c
+ delete mode 100644 src/fn/sub_08024A9C.c
+ delete mode 100644 src/fn/sub_08024AD4.c
+ delete mode 100644 src/fn/sub_08024B60.c
+ delete mode 100644 src/fn/sub_08024BEC.c
+ delete mode 100644 src/fn/sub_08024C10.c
+ delete mode 100644 src/fn/sub_08024C2C.c
+ delete mode 100644 src/fn/sub_08024C48.c
+ delete mode 100644 src/fn/sub_08024C84.c
+ delete mode 100644 src/fn/sub_08024CA0.c
+ delete mode 100644 src/fn/sub_08024CBC.c
+ delete mode 100644 src/fn/sub_08024CE0.c
+ delete mode 100644 src/fn/sub_08024E18.c
+
+diff --git a/include/actor_graphics_and_basic_states.h b/include/actor_graphics_and_basic_states.h
+new file mode 100644
+index 000000000..0dc248121
+--- /dev/null
++++ b/include/actor_graphics_and_basic_states.h
+@@ -0,0 +1,58 @@
++#ifndef GUARD_ACTOR_GRAPHICS_AND_BASIC_STATES_H
++#define GUARD_ACTOR_GRAPHICS_AND_BASIC_STATES_H
++#include "engine.h"
++#include "state_actor.h"
++#include "contact_actor.h"
++#include "background_flash.h"
++
++/* 08021EA8-08024F2C: drawable setup, targeting, resource/health costs and the
++ * recovery/action dispatch pipeline for struct StateActor (see state_actor.h
++ * for the 0x90-0x2CC fields this range pinned down). This header names
++ * `groundEffect`'s contents as far as this unit's evidence goes; its full
++ * extent is still unknown past 0x9E0. Field names are provisional
++ * (confidence=low). */
++struct SceneActorGraphics {
++    s16 scale, scaleMin, scaleMax, scaleStep; /* 0x344: SceneActorGraphics_OscillateScale. */
++    u8 unk34C[0xA];
++    u16 recoveryTimer; /* 0x356: frames of recovery set by the *ThenRecover handlers. */
++    s32 stepTableKind; /* 0x358: selects one of the gUnk_08604DC4 family tables. */
++    s16 attackWidth0, attackHeight0, attackDepth0; /* 0x35C: variant-0 attack properties. */
++    s16 attackWidth1, attackHeight1, attackDepth1; /* 0x362: variant-1 attack properties. */
++    u8 unk368[0x38C - 0x368];
++    u8 effectScale; /* 0x38C: SceneActorGraphics_SelectResource / SceneActors_DispatchCommands. */
++    u8 unk38D;
++    u8 effectMode;     /* 0x38E */
++    u8 effectDuration; /* 0x38F */
++    u32 resourceId;    /* 0x390 */
++    u8 particleFlag;   /* 0x394: cleared by SceneActorState_AdvanceToState06. */
++    u8 unk395[0x39C - 0x395];
++    s32 resourceCostAccumulator; /* 0x39C: SceneActors_AddResourceCost. */
++    s32 healthCostAccumulator;   /* 0x3A0: SceneActors_AddHealthCost. */
++    s32 healthCostBaseline;      /* 0x3A4: snapshot of health at contact-pool start. */
++    u8 unk3A8[0x3B0 - 0x3A8];
++    u8 stepTableRow;                     /* 0x3B0 */
++    u8 stepTableCol;                     /* 0x3B1 */
++    u16 stepTableValue;                  /* 0x3B2 */
++    u16 stepTableValuePrev;              /* 0x3B4 */
++    u8 variantToggle, variantTogglePrev; /* 0x3B6: SceneActorGraphics_UpdateVariant. */
++    u8 unk3B8[0x3C0 - 0x3B8];
++    u32 backgroundFlashFlag; /* 0x3C0: SceneActors_StopBackgroundFlash. */
++    u8 paletteBank0[0x200];  /* 0x3C4 */
++    u8 paletteBank1[0x200];  /* 0x5C4 */
++    u8 paletteBank2[0x200];  /* 0x7C4 */
++    u8 unk9C4[0x9D8 - 0x9C4];
++    struct ContactActorPool *contactPool; /* 0x9D8: SceneActors_RequestContactPoolClear. */
++    struct BackgroundFlashController *backgroundFlash; /* 0x9DC: SceneActors_StopBackgroundFlash. */
++};
++
++void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
++void SceneActors_StartEightDirectionAnimation(void *, void *, void *, s32, s32, s32, s32);
++struct StateActor *SceneActors_GetBySlot(s32);
++void SceneActors_ConfigureEffect(struct StateActor *, s32, s32, s32);
++void SceneMessages_SetPendingTrigger(void *entry, void *message);
++void BackgroundFlash_BeginAppearance(struct BackgroundFlashController *);
++void BackgroundFlash_BeginAlternating(struct BackgroundFlashController *);
++void BackgroundFlash_BeginDisappearance(struct BackgroundFlashController *);
++s32 AreaEffect_IsPositionCovered(void *position);
++
++#endif
+diff --git a/include/state_actor.h b/include/state_actor.h
+index 9557a1a16..abdf602e0 100644
+--- a/include/state_actor.h
++++ b/include/state_actor.h
+@@ -54,18 +54,59 @@ struct StateActor {
+     u8 angle;                    /* 0x65, initialized from targetAngle by 081D1A44. */
+     u8 unk66[2];
+     struct StateActorPos position; /* 0x68 */
+-    u8 unk70[0x168 - 0x70];
+-    u8 receiver[0x2CC - 0x168];  /* 0x168: scene message receiver */
++    u8 unk70[0x20];                /* 0x70-0x8F: still unknown. */
++    /* 0x90-0x167: a second, nested command/recovery pipeline (actor graphics
++     * and basic states, 08021EA8-08024F2C), parallel to the primary state
++     * machine above but with its own offsets. Field names are provisional
++     * (confidence=low); several bytes are only pinned by neighbouring
++     * confirmed fields and are not independently read anywhere yet. */
++    u8 unk90[4];
++    s16 health, maxHealth; /* 0x94: SceneActors_AddHealthCost, _TryStartDeathOrFlaggedAction. */
++    u8 unk98[2];
++    u8 vulnerable; /* 0x9A: set 1 by recovery states; the death/flag check clears it. */
++    u8 unk9B;
++    u32 actionFlags; /* 0x9C: per-frame bits; meaning differs by caller (busy/pending/variant). */
++    u8 unkA0[0xA];
++    u8 actionAnimation; /* 0xAA: requested sub-animation id for the recovery pipeline. */
++    u8 actionState;     /* 0xAB: checked for value 3 by the variant-recovery handlers. */
++    u8 actionMode;      /* 0xAC: index into SceneActorState_UpdateActionController's table. */
++    u8 actionIndex;     /* 0xAD: index into the Active/Secondary/Passive action tables. */
++    u8 actionPhase;     /* 0xAE: index into the phase/primary/secondary action tables. */
++    u8 actionFinished;  /* 0xAF */
++    u8 actionEnter;     /* 0xB0 */
++    u8 actionChanged;   /* 0xB1: unconfirmed, position only. */
++    u8 unkB2;
++    u8 locked; /* 0xB3: SceneActorAnimation_Update{Directional,EightDirection}Callback. */
++    u8 unkB4[0x10];
++    u32 actionTimer; /* 0xC4: reset to 0 on transition, incremented each call otherwise. */
++    u8 unkC8[4];
++    u8 requestedAngle; /* 0xCC */
++    u8 unkCD[0x37];
++    u8 (*actionTryUpdate)(void *); /* 0x104 */
++    void (*actionReset)(void *);   /* 0x108 */
++    u8 unk10C[0xC];
++    u8 receiver2[0x10]; /* 0x118: a second scene message receiver (size tentative). */
++    u8 unk128[0x40];
++    u8 receiver[0x10];                 /* 0x168: scene message receiver (size tentative). */
++    u8 bodyDrawable[0x1CC - 0x178];    /* 0x178: SceneActorGraphics_InitializeBody. */
++    u8 overlayDrawable[0x260 - 0x1CC]; /* 0x1CC: SceneActorGraphics_InitializeOverlay. */
++    struct StateActorPos
++        worldPosition; /* 0x260: render/collider position (distinct from `position`). */
++    u8 unk268[0x20];
++    void *palette; /* 0x288: active palette bank, picked by SceneActorGraphics_SelectResource. */
++    u8 unk28C[0x2CC - 0x28C];
+     void (*stateCallback)(void); /* 0x2CC */
+     u8 unk2D0[0x2E4 - 0x2D0];
+     s32 (*animationCallback)(struct StateActor *); /* 0x2E4 */
+     u8 unk2E8[0x300 - 0x2E8];
+     s32 counter300; /* Advanced by 081CFCA4; meaning tentative. */
+-    u8 unk304[0x344 - 0x304];
+-    u8 groundEffect[1]; /* 0x344: embedded projection object, full extent unknown. */
++    u8 unk304[0x343 - 0x304];
++    u8 variant;         /* 0x343: SceneActorAnimation_Update{Directional,EightDirection}Callback. */
++    u8 groundEffect[1]; /* 0x344: embedded projection object, full extent unknown; see
++                          * include/actor_graphics_and_basic_states.h for what this unit learned. */
+ };
+ 
+-void Trigger_ConsumePending(void *receiver, s32 count);
++u32 Trigger_ConsumePending(void *receiver, u32 count);
+ 
+ /* On entry select the next state, then consume a message once done. */
+ #define STATE_COMMAND_WAIT(name, next)                                                             \
+diff --git a/notes/actor_graphics_and_basic_states.md b/notes/actor_graphics_and_basic_states.md
+new file mode 100644
+index 000000000..2bac7f5b0
+--- /dev/null
++++ b/notes/actor_graphics_and_basic_states.md
+@@ -0,0 +1,140 @@
++Tags: #actors #animation
++
++# Actor graphics and basic states (08021EA8-08024F2C)
++
++Merged into `src/actor_graphics_and_basic_states.c` (82 functions: 70 matched,
++12 `INCLUDE_ASM`). Reuses `struct StateActor` (`include/state_actor.h`), the
++same object as `081D...`'s state-table actors (confirmed: `SceneNpc_*` and
++`SceneCharacter_*`/`MessageActor_*` in `src/message_actor_08612344.c` still
++match unchanged after the header edit). This range fills in bytes that header
++previously left as opaque padding.
++
++## Header changes
++
++* `include/state_actor.h`: `unk70[0x168-0x70]` and `receiver[0x2CC-0x168]`
++  split into named fields:
++  - `0x90-0x167`: a second, nested command/recovery pipeline, structurally
++    identical to the primary state machine (`enterCommand`/`done`/`nextState`
++    at 0x08/0x07/0x05) but at different offsets: `actionAnimation` (0xAA),
++    `actionState` (0xAB), `actionMode`/`actionIndex`/`actionPhase`
++    (0xAC-0xAE, three separate dispatch-table indices feeding
++    `SceneActorState_UpdateActionController` / `_UpdateActiveActions` /
++    `_DispatchPrimaryAction` and siblings), `actionFinished`/`actionEnter`
++    (0xAF/0xB0), `actionTimer` (0xC4), `actionTryUpdate`/`actionReset`
++    function pointers (0x104/0x108), and a second message receiver
++    `receiver2` (0x118, used by all the `AdvanceToState*`/`*Recover`
++    handlers via `Trigger_ConsumePending`).
++  - `0x168-0x2CC` (previously all `receiver`): `receiver` shrunk to a
++    16-byte placeholder (still just a guess at its real size - nothing in
++    this unit characterizes it further), followed by `bodyDrawable` (0x178,
++    `SceneActorGraphics_InitializeBody`'s collider), `overlayDrawable`
++    (0x1CC, `_InitializeOverlay`'s collider), `worldPosition` (0x260, the
++    collider/render position - distinct from the walk-target `position` at
++    0x68), and `palette` (0x288, the active 16-color bank pointer).
++  - `variant` (0x343, the byte right before `groundEffect`): a 0/1 selector
++    read by `SceneActorGraphics_UpdateVariant` and the two
++    `SceneActorAnimation_Update*Callback` concessions, and compared against
++    in `SceneActorState_SetValueClampedWhen{Inactive,Active}`.
++* `include/actor_graphics_and_basic_states.h` (new): `struct SceneActorGraphics`
++  names `groundEffect`'s contents as far as this unit's evidence goes (0x344
++  through the three 0x200-byte palette banks at 0x3C4-0x9C4, to the contact
++  pool / background-flash pointers at 0x9D8/0x9DC). Declares the
++  engine-adjacent helpers this unit calls that weren't already in
++  `engine.h`/`contact_actor.h`/`background_flash.h`/`spark_particle.h`
++  (`SceneActors_Start{Directional,EightDirection}Animation`,
++  `SceneActors_GetBySlot`, `SceneActors_ConfigureEffect`,
++  `SceneMessages_SetPendingTrigger`, `BackgroundFlash_Begin*`,
++  `AreaEffect_IsPositionCovered`).
++
++## Local adaptations (and why)
++
++Struct-field access through `SceneActorGraphics` (a nested nested cast off
++`groundEffect`) reliably **breaks the match** whenever more than one field
++from the same cast is read together (e.g. the three attack-property shorts
++passed to `Collider_SetAttackProperties`, or the `actionMode`/`actionIndex`/
++`actionPhase`/`actionTimer` quads the `*Recover`/`Resume`-style handlers
++write). agbcc ends up CSE-ing the shared base pointer and addressing fields
++as small register offsets, instead of recomputing each field's full absolute
++offset the way the original does. Single, isolated field reads (one access,
++no sibling field from the same base nearby) matched fine through the named
++struct. Net effect:
++
++* Top-level `StateActor` fields used in isolation (`health`, `vulnerable`,
++  `locked`, `variant`, `target`, `worldPosition`, `bodyDrawable`,
++  `overlayDrawable`, `palette`, `actionAnimation`, `actionPhase`,
++  `actionIndex`, `actionMode` alone, `receiver2`) -> converted to the shared
++  struct, all still match.
++* Anywhere two or more `groundEffect`/action-cluster fields are read or
++  written together -> kept as the original per-function local struct or raw
++  `(u8 *)p + 0xNN` casts, with a one-line comment pointing at the header
++  field names. `sub_080221DC`, `sub_08022330`, `sub_080225B4`,
++  `sub_08022AF4`, `sub_080237C0` and the whole `*Recover`/`Resume`/`Advance`
++  cluster family (`sub_08023948` through `sub_0802483C`'s callers) are this
++  shape; each has a comment citing the lesson.
++* `sub_08021EC0` (`SceneActorGraphics_SelectResource`,
++  `MATCHING_CONCESSION: register-pinning`) and `sub_080224E4`
++  (`SceneActors_StartDisappearEffect`), `sub_08024CE0`/`sub_08024E18`
++  (the two `SceneActorAnimation_Update*Callback` concessions) were left
++  completely untouched (still their original ad hoc local structs): these
++  are register-pinned, and even the single-field changes above were enough
++  to perturb them.
++* `src/fn/sub_08022F88.c` (`SceneActors_DispatchCommands`, already
++  `#ifdef NONMATCHING`, 81.1% fuzzy) was left as is; its local `struct
++  S`/`struct T`/`Entry` are a third, independent, lower-confidence view of
++  the same object and weren't reconciled with the new header.
++
++Several files had the same local struct/helper names (`struct S`, `chk`,
++`TakeFlag`, `State`, `Actor`, `enter`, `ActorAnimation`, `setFacing`) with
++different bodies; `merge_unit.py` requires identical names to have identical
++bodies, so each was suffixed with its address (`chk_08023638`, `S_080237C0`,
++...) before merging.
++
++## Gap functions (no C before this unit; 12 total)
++
++Matched: none closely enough to keep as a draft. All 12 are
++`INCLUDE_ASM("asm/nonmatching", ...)`:
++
++* `sub_08022624` (55 insn): searches an array of position pointers at
++  `base+0x110` for one inside a min/max box (x and z only). Best attempt hit
++  66.7% fuzzy - very close logically, but the original advances a running
++  pointer by 4 each iteration instead of recomputing `base+0x110+i*4` from
++  the index, and swaps two registers for `min`/`max`; couldn't reproduce
++  with plain C after ~6 tries.
++* `sub_080243CC` (56 insn): the same actionPhase/actionTimer/actionEnter
++  recovery pattern as the matched `*Recover` family, gated on a byte at
++  `groundEffect+0x3F` (`0x383` absolute) that's also cleared by
++  `SceneActorState_EnterPhase6AndResetAnimation`. Best attempt 64.3% fuzzy;
++  register allocation diverges as soon as the `if`/`else` halves are given
++  as separate statements rather than whatever shape the original used.
++* `sub_08022694`, `sub_08022790`, `sub_08022878`, `sub_08022B18`,
++  `sub_08022DBC`, `sub_08022EA4`, `sub_08021F4C`, `sub_08023FE8`,
++  `sub_0802483C`: not attempted beyond reading the asm. `sub_08022694` is a
++  packed 16.16-style particle-spawn helper with an unusual calling
++  convention (takes extra arguments in `r4`/`r5`, i.e. register-pinned by
++  its caller); `sub_08021F4C`/`sub_08023FE8` are large (250-300 insn)
++  jump-tabled dispatchers. None of these were registered as
++  `progress_extra_functions.csv` gaps - they already have normal
++  `thumb_func_start` labels in `gen/code_sym.s`, just no name or C yet.
++
++## Surprises
++
++* The "second state machine" at 0x90-0x167 mirrors the primary one's
++  enter/done/nextState/timer/receiver shape almost exactly, just at
++  different offsets and (per this range) one level further from the
++  object's start - strong evidence `StateActor` really is one shared actor
++  object across many 0802xxxx/081Dxxxx ranges, just incompletely merged so
++  far.
++* `include/scene_actor_collision.h` (from the immediately preceding
++  subsystem, 080213EC-08021EA8) already reads bytes 0x9E/0xA2/0xA4 - which
++  fall inside this unit's new `actionFlags`/`unkA0` span - through a
++  *different* named type, `struct SceneActorRegistryActor`. That struct and
++  `StateActor` look like the same object described twice by different
++  eras of decomp work; not reconciled here (out of this unit's scope), but
++  worth flagging for whoever tackles that range next.
++
++## Check iterations
++
++Rough total: ~140 `tools/check.py` runs across the session (most functions
++1-2 iterations once the "isolated field = safe, clustered field = raw
++offset" rule was established by trial on the first dozen; the two gap
++attempts cost ~6 iterations each before giving up).
+diff --git a/src/actor_graphics_and_basic_states.c b/src/actor_graphics_and_basic_states.c
+new file mode 100644
+index 000000000..381c89272
+--- /dev/null
++++ b/src/actor_graphics_and_basic_states.c
+@@ -0,0 +1,2532 @@
++#include "global.h"
++#include "actor_graphics_and_basic_states.h"
++#include "contact_actor.h"
++
++int SceneActorGraphics_GetResourceId(struct StateActor *p)
++{
++    switch (p->locked) {
++        case 0:
++            return 0x335;
++        case 1:
++            return 0x335;
++        default:
++            return 0x335;
++    }
++}
++
++u8 *SceneActorGraphics_GetDefaultResourceId(void)
++{
++    return (u8 *)0x00000335;
++}
++
++int SceneActorGraphics_GetResourceId(struct StateActor *);
++
++// MATCHING_CONCESSION: register-pinning
++void SceneActorGraphics_SelectResource(u8 *p)
++{
++    /* Raw offsets, not struct SceneActorGraphics fields (0x38c effectScale,
++     * 0x38e effectMode, 0x390 resourceId, 0x288 palette, 0x3c4/0x5c4/0x7c4
++     * palette banks): going through the struct perturbs this pinned match. */
++    if (p[0x38e]) {
++        int resource;
++        p[0x38c] = 0;
++        p[0x38e] = 0;
++        *(int *)(p + 0x390) = SceneActorGraphics_GetResourceId((struct StateActor *)p);
++        resource = SceneActorGraphics_GetResourceId((struct StateActor *)p);
++        {
++            int test = resource;
++            asm("" : "+r"(test));
++            if (test == 0)
++                *(void **)(p + 0x288) = p + 0x5c4;
++            else if (test == 1)
++                *(void **)(p + 0x288) = p + 0x7c4;
++            else {
++                {
++                    void *src = gUnk_030042E4 + resource * 32;
++                    register void *dst asm("r1") = p + 0x3c4;
++                    CpuSet(src, dst, 0x4000008);
++                }
++                *(void **)(p + 0x288) = p + 0x3c4;
++            }
++        }
++    }
++}
++
++INCLUDE_ASM("asm/nonmatching", sub_08021F4C);
++
++void SceneActorGraphics_InitBodyNoOp(void)
++{
++}
++
++typedef struct {
++    s16 x, y, z;
++} Vec;
++
++void SceneActorGraphics_InitBodyNoOp(void);
++
++extern u32 gUnk_030053F4;
++
++void SceneActorGraphics_InitializeBody(struct StateActor *p)
++{
++    Vec scale, rotation;
++    void *drawable = p->bodyDrawable;
++    scale.x = 0x40;
++    scale.y = 0x80;
++    scale.z = 0x40;
++    rotation.x = 0;
++    rotation.y = 0x80;
++    rotation.z = 0;
++    Collider_Init(drawable, 0, 0x2001, 0, 16, &scale, &rotation);
++    Collider_SetPosition(drawable, &p->worldPosition, 0);
++    Collider_SetCallback(drawable, SceneActorGraphics_InitBodyNoOp, p);
++    {
++        int test = gUnk_030053F4 & 0x1000;
++        int flags;
++        flags = 0;
++        if (test)
++            flags = 0x40800;
++        /* Not through struct SceneActorGraphics: that CSEs the groundEffect base and
++         * reads the three fields as small offsets off it, unlike the original. */
++        Collider_SetAttackProperties(drawable, *(s16 *)((u8 *)p + 0x35c), *(s16 *)((u8 *)p + 0x35e),
++                                     0, flags, *(s16 *)((u8 *)p + 0x360));
++    }
++}
++
++void sub_08021F4C(void);
++
++void SceneActorGraphics_InitializeOverlay(struct StateActor *p, int resource)
++{
++    Vec scale, rotation;
++    void *drawable = p->overlayDrawable;
++    scale.x = 0x60;
++    scale.y = 0x80;
++    scale.z = 0x60;
++    rotation.x = 0;
++    rotation.y = 0x80;
++    rotation.z = 0;
++    Collider_Init(drawable, 0, 0x5101, 0, 16, &scale, &rotation);
++    Collider_SetPosition(drawable, &p->worldPosition, 0);
++    Collider_SetCallback(drawable, sub_08021F4C, p);
++    Collider_SetBodyProperties(drawable, resource, 0x802, 1);
++    Collider_Refresh(drawable);
++}
++
++/* Raw offsets throughout: routing any of this through struct StateActor /
++ * SceneActorGraphics changes register allocation enough to break the match
++ * (tried: `p->actionFlags`, `p->bodyDrawable`, struct-field attack properties). */
++
++void SceneActorGraphics_UpdateVariant(struct StateActor *p)
++{
++    u8 *drawable = (u8 *)p + 0x178;
++    {
++        u32 mask = 0x40000;
++        if (*(u32 *)((u8 *)p + 0x9c) & mask)
++            ((u8 *)p)[0x3b6] = 1;
++        else
++            ((u8 *)p)[0x3b6] = 0;
++    }
++    if (((u8 *)p)[0x3b6] != ((u8 *)p)[0x3b7]) {
++        switch (((u8 *)p)[0x3b6]) {
++            case 0:
++                Collider_SetAttackProperties(drawable, *(s16 *)((u8 *)p + 0x35c),
++                                             *(s16 *)((u8 *)p + 0x35e), 0, 0,
++                                             *(s16 *)((u8 *)p + 0x360));
++                break;
++            case 1:
++                Collider_SetAttackProperties(drawable, *(s16 *)((u8 *)p + 0x362),
++                                             *(s16 *)((u8 *)p + 0x364), 0, 0x60000,
++                                             *(s16 *)((u8 *)p + 0x366));
++                break;
++        }
++        {
++            int value = ((u8 *)p)[0x3b6];
++            ((u8 *)p)[0x3b7] = value;
++        }
++    }
++}
++
++/* A flat `pad[0x344]` prefix (matching groundEffect's offset) rather than
++ * struct StateActor + a nested SceneActorGraphics cast: the two-step access
++ * changes register allocation enough to break the match. Fields are
++ * SceneActorGraphics's scale/scaleMin/scaleMax/scaleStep (0x344-0x34B). */
++
++typedef struct {
++    u8 pad[0x344];
++    s16 scale, min, max, step;
++} Actor;
++
++void SceneActorGraphics_OscillateScale(Actor *p)
++{
++    p->scale += p->step;
++    if (p->step > 0) {
++        if (p->scale >= p->max) {
++            p->scale = p->max;
++            p->step = -32;
++        }
++    } else {
++        if (p->scale <= p->min) {
++            p->scale = p->min;
++            p->step = 32;
++        }
++    }
++}
++
++extern u16 gUnk_02000590;
++
++s32 SceneActorGraphics_GetEffectState(struct StateActor *p)
++{
++    s32 r;
++    if (gUnk_02000590 != 0) {
++        r = 4;
++    } else if (AreaEffect_IsPositionCovered(&p->target) == 0) {
++        r = 0;
++    } else {
++        r = *(s16 *)((u8 *)gUnk_02000710 + 0x876);
++    }
++    return r;
++}
++
++void SceneActorState_SetValueClampedWhenInactive(struct StateActor *p, u32 v)
++{
++    if (p->variant == 0)
++        v = 3;
++    p->actionAnimation = v;
++}
++
++void SceneActorState_SetValueClampedWhenActive(struct StateActor *p, u32 v)
++{
++    if (p->variant == 1)
++        v = 3;
++    p->actionAnimation = v;
++}
++
++typedef struct ActorAnimation {
++    u8 pad0[0x51];
++    u8 angle;
++    u8 pad52[2];
++    struct {
++        u32 x, y;
++    } pos;
++    u8 pad5c[0x4c];
++    u8 facing, facing8, padAA[2], mode, state, phase, finished, enter;
++    u8 padB1[0x13];
++    u32 elapsed;
++    u8 padC8[4];
++    u8 requestedAngle;
++    u8 padCD[0x2df];
++    u32 graphicsMode;
++} ActorAnimation;
++
++static inline void setFacing(ActorAnimation *p, int angle)
++{
++    u32 value;
++    register int shifted asm("r0");
++    p->angle = angle;
++    shifted = p->angle + 0x60;
++    asm("" : "+r"(shifted));
++    shifted >>= 6;
++    value = 3 & shifted;
++    p->facing = value;
++    shifted = p->angle + 0x70;
++    asm("" : "+r"(shifted));
++    shifted >>= 5;
++    value = 7 & shifted;
++    p->facing8 = value;
++}
++
++void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
++
++// MATCHING_CONCESSION: register-pinning
++void SceneActors_StartDisappearEffect(u32 *position)
++{
++    ActorAnimation *p = SceneActors_GetBySlot(0);
++    if (p) {
++        int sequence;
++        u32 one;
++        u32 zero = 0, phase = 13;
++        p->mode = zero;
++        p->state = zero;
++        p->phase = phase;
++        p->elapsed = zero;
++        {
++            u8 *dst = &p->enter;
++            one = 1;
++            *dst = one;
++        }
++        p->pos = *(typeof(p->pos) *)position;
++        setFacing(p, p->requestedAngle);
++        {
++            int test = p->graphicsMode & one;
++            sequence = 62;
++            if (test)
++                sequence = 24;
++        }
++        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, one,
++                                              one, 6);
++        Sound_PlaySongChecked(839);
++        Sound_PlaySongChecked(1335);
++    }
++}
++
++void ContactActorPool_RequestClear(struct ContactActorPool *);
++
++void SceneActors_RequestContactPoolClear(void)
++{
++    struct StateActor *p = SceneActors_GetBySlot(0);
++    if (p && ((struct SceneActorGraphics *)p->groundEffect)->contactPool != 0)
++        ContactActorPool_RequestClear(((struct SceneActorGraphics *)p->groundEffect)->contactPool);
++}
++
++void SceneActors_RequestContactPoolClear(void);
++
++void SceneActors_AddHealthCost(int amount)
++{
++    struct StateActor *p;
++    if (amount > 0) {
++        p = SceneActors_GetBySlot(0);
++        if (p) {
++            int remaining, diff;
++            /* Raw offsets into groundEffect (healthCostAccumulator 0x3A0,
++             * healthCostBaseline 0x3A4): a shared SceneActorGraphics pointer
++             * changes register allocation enough to break the match. */
++            *(s32 *)((u8 *)p + 0x3a0) += amount;
++            remaining = p->health - *(s32 *)((u8 *)p + 0x3a0);
++            if (remaining <= 1)
++                goto stop;
++            {
++                diff = remaining - *(s32 *)((u8 *)p + 0x3a4);
++                if (diff < 0)
++                    diff = -diff;
++                if (diff > 49) {
++                stop:
++                    SceneActors_RequestContactPoolClear();
++                }
++            }
++        }
++    }
++}
++
++void SceneActors_AddResourceCost(int amount)
++{
++    struct StateActor *p;
++    if (amount > 0) {
++        p = SceneActors_GetBySlot(0);
++        if (p)
++            *(int *)((u8 *)p + 0x39c) += amount; /* resourceCostAccumulator */
++    }
++}
++
++INCLUDE_ASM("asm/nonmatching", sub_08022624);
++
++INCLUDE_ASM("asm/nonmatching", sub_08022694);
++
++INCLUDE_ASM("asm/nonmatching", sub_08022790);
++
++INCLUDE_ASM("asm/nonmatching", sub_08022878);
++
++struct Packed {
++    s32 x : 16, y : 16, z : 16, pad : 16;
++};
++
++extern u32 gUnk_03005308;
++
++// MATCHING_CONCESSION: register-pinning
++void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
++{
++    u8 *graphics = (u8 *)p + 0x240;
++    struct Packed size;
++    int i;
++    for (i = 0; i < 2; i++) {
++        int angle, speed;
++        int count;
++        register u32 index asm("r1");
++        u32 *indexPtr;
++        u32 mask;
++        int smallMask;
++        register const u16 *table asm("r4");
++        size.x = 164;
++        size.y = 16;
++        size.z = 164;
++        indexPtr = &gUnk_03005308;
++        mask = 1023;
++        smallMask = 3;
++        table = gUnk_0203B400;
++        index = (*indexPtr + 1) & mask;
++        angle = (u8)table[index];
++        index = (index + 1) & mask;
++        count = (table[index] & smallMask) + 2;
++        index = (index + 1) & mask;
++        *indexPtr = index;
++        speed = (table[index] & smallMask) + 20;
++        SparkParticle_Spawn((struct ContactPosition *)(graphics + 0x20), 3, &size, angle, count,
++                            speed, 2, 2);
++    }
++}
++
++void SceneActors_StopBackgroundFlash(struct StateActor *p)
++{
++    /* Raw offsets (backgroundFlash 0x9DC, backgroundFlashFlag 0x3C0): a
++     * shared SceneActorGraphics pointer breaks the match. */
++    BackgroundFlash_BeginDisappearance(*(struct BackgroundFlashController **)((u8 *)p + 0x9dc));
++    *(u32 *)((u8 *)p + 0x3c0) = 0;
++}
++
++INCLUDE_ASM("asm/nonmatching", sub_08022B18);
++
++void SceneActorState_StepTableByte(struct StateActor *p, const u8 *tbl)
++{
++    /* Raw offsets into groundEffect's step-table fields (row 0x3B0, col 0x3B1,
++     * value 0x3B2, previous value 0x3B4). */
++    u16 *cur = (u16 *)((u8 *)p + 0x3b2);
++    u16 old = *cur;
++    u8 *col;
++    u32 row;
++    *(u16 *)((u8 *)p + 0x3b4) = old;
++    row = ((u8 *)p)[0x3b0];
++    col = (u8 *)p + 0x3b1;
++    {
++        u32 idx = row * 8 + (u32)tbl;
++        idx += *col;
++        *cur = *(u8 *)idx;
++    }
++    (*col)++;
++    if (*col > 7)
++        *col = 0;
++}
++
++extern const u8 gUnk_08604DC4[], gUnk_08604DE4[], gUnk_08604E04[], gUnk_08604E24[];
++
++void SceneActorState_StepTableByte(struct StateActor *p, const u8 *tbl);
++
++int SceneActorState_StepTableByKind(struct StateActor *p)
++{
++    const u8 *tbl;
++    switch (*(s32 *)((u8 *)p + 0x358)) { /* stepTableKind */
++        case 0:
++            tbl = gUnk_08604DC4;
++            break;
++        case 1:
++            tbl = gUnk_08604DE4;
++            break;
++        case 2:
++            tbl = gUnk_08604E04;
++            break;
++        case 3:
++            tbl = gUnk_08604E24;
++            break;
++        default:
++            goto fail;
++    }
++    SceneActorState_StepTableByte(p, tbl);
++    return 1;
++fail:
++    return 0;
++}
++
++INCLUDE_ASM("asm/nonmatching", sub_08022DBC);
++
++INCLUDE_ASM("asm/nonmatching", sub_08022EA4);
++
++#ifdef NONMATCHING
++
++// fuzzy: 81.1%
++
++// Scene-actor cutscene dispatcher (Vanargand, Ratatosk). Commands mostly set
++
++// state 2 with a sub-state (setState); 2 places the actor, 9 configures an
++
++// effect, 15/16 pick the body graphics variant, 25 flashes the background.
++
++// Still differs: sb/r8 swapped for entry/i; in cases 15/16 the graphics
++
++// variant branches use other registers, so their tails are not cross-jumped
++
++// as in the original.
++
++typedef struct {
++    u16 id;
++    u8 unk[4];
++    u8 count[2];
++    s16 *messages[2][4];
++    u8 pad[8];
++    void *next;
++} Entry;
++
++struct S {
++    u8 pad0[0x54];
++    u16 h54, h56, h58;
++    u8 pad5a[0xAC - 0x5A];
++    u8 state;
++    u8 entered;
++    u8 sub;
++    u8 padAF;
++    u8 changed;
++    u8 padB1[0xC4 - 0xB1];
++    u32 timer;
++    u8 padC8[0xD0 - 0xC8];
++    u16 hD0, hD2, hD4;
++    u8 padD6[0x114 - 0xD6];
++    u8 angle;
++    u8 pad115[0x118 - 0x115];
++    Entry entry;
++};
++
++struct T {
++    u8 pad0[0x260];
++    u16 h260, h262, h264;
++    u8 pad266[0x288 - 0x266];
++    u8 *palette;
++    u8 pad28c[0x344 - 0x28C];
++    u16 h344;
++    u8 pad346[0x38C - 0x346];
++    u8 b38C;
++    u8 pad38d;
++    u8 b38E;
++    u8 b38F;
++    u32 w390;
++    u8 pad394[0x3B8 - 0x394];
++    u8 b3B8;
++    u8 pad3b9;
++    u8 b3BA;
++    u8 pad3bb[0x3C4 - 0x3BB];
++    u8 pal3C4[0x5C4 - 0x3C4];
++    u8 pal5C4[0x7C4 - 0x5C4];
++    u8 pal7C4[0x9C4 - 0x7C4];
++    u16 h9C4, h9C6, h9C8;
++    u8 pad9ca[0x9DC - 0x9CA];
++    void *flash;
++};
++
++extern u8 *gUnk_0200047C;
++
++extern u8 *gUnk_030042E4;
++
++void SceneMessages_SetPendingTrigger(void *, void *);
++
++void Trigger_ConsumePending(void *, s32);
++
++void SceneActors_StopBackgroundFlash(void *);
++
++void BackgroundFlash_BeginAlternating(void *);
++
++void BackgroundFlash_BeginAppearance(void *);
++
++s32 SceneActorGraphics_GetResourceId(void *);
++
++void CpuSet(const void *, void *, u32);
++
++void SceneActors_ConfigureEffect(void *, s32, s32, s32);
++
++static inline void setStateFull(struct S *s, u32 state, u32 entered, u32 sub)
++{
++    s->state = state;
++    s->entered = entered;
++    s->sub = sub;
++    s->timer = entered;
++}
++
++#define setState(s, sub) setStateFull(s, 2, 0, sub)
++
++static inline void effect2(u8 *p, int mode, int id, int duration)
++{
++    *(u32 *)(p + 0x390) = id;
++    p[0x38e] = mode;
++    p[0x38f] = duration;
++    if (p[0x38e] == 2) {
++        u32 value = duration == 5 ? 32 : 64;
++        p[0x38c] = value;
++    } else if (p[0x38e] == 1)
++        p[0x38c] = 0;
++}
++
++#define effect(p, id, mode, d) effect2(p, mode, id, d)
++
++void SceneActors_DispatchCommands(struct S *s)
++{
++    struct T *t = (struct T *)s;
++    Entry *entry = &s->entry;
++    s32 i;
++
++    i = 0;
++    if (i < entry->count[gUnk_0200047C[0x24]])
++        do {
++            s16 *m;
++            u8 *controller = gUnk_0200047C;
++            m = entry->messages[controller[0x24]][i];
++            SceneMessages_SetPendingTrigger(entry, m);
++            switch (((u8 *)m)[6]) {
++                case 0:
++                    setState(s, 0);
++                    s->changed = 1;
++                    break;
++                case 1:
++                    s->angle = (m[4] + 5) << 5;
++                    setState(s, 1);
++                    s->changed = 1;
++                    break;
++                case 3:
++                    s->angle = (m[4] + 5) << 5;
++                    setState(s, 2);
++                    s->changed = 1;
++                    break;
++                case 4:
++                    s->angle = (m[4] + 5) << 5;
++                    setState(s, 3);
++                    s->changed = 1;
++                    break;
++                case 5:
++                    s->angle = (m[4] + 5) << 5;
++                    setState(s, 4);
++                    s->changed = 1;
++                    break;
++                case 6:
++                    s->angle = (m[4] + 5) << 5;
++                    setState(s, 5);
++                    s->changed = 1;
++                    break;
++                case 7:
++                    setState(s, 6);
++                    s->changed = 1;
++                    break;
++                case 8:
++                    setState(s, 7);
++                    s->changed = 1;
++                    break;
++                case 10:
++                    setState(s, 8);
++                    s->changed = 1;
++                    break;
++                case 11:
++                    setState(s, 9);
++                    s->changed = 1;
++                    break;
++                case 12:
++                    t->h9C4 = m[4];
++                    t->h9C6 = m[5];
++                    t->h9C8 = m[6];
++                    setState(s, 10);
++                    s->changed = 1;
++                    break;
++                case 19:
++                    setState(s, 11);
++                    s->changed = 1;
++                    break;
++                case 20:
++                    setState(s, 12);
++                    s->changed = 1;
++                    break;
++                case 21:
++                    setState(s, 13);
++                    s->changed = 1;
++                    break;
++                case 23:
++                    setState(s, 14);
++                    s->changed = 1;
++                    break;
++                case 24:
++                    setState(s, 15);
++                    s->changed = 1;
++                    break;
++                case 25:
++                    if (m[4])
++                        SceneActors_StopBackgroundFlash(t);
++                    else if (m[5])
++                        BackgroundFlash_BeginAlternating(t->flash);
++                    else
++                        BackgroundFlash_BeginAppearance(t->flash);
++                    break;
++                case 13:
++                    setState(s, 16);
++                    s->changed = 1;
++                    break;
++                case 14:
++                    setState(s, 18);
++                    s->changed = 1;
++                    break;
++                case 22:
++                    s->hD0 = m[4];
++                    s->hD2 = m[5];
++                    s->hD4 = m[6];
++                    setState(s, 19);
++                    s->changed = 1;
++                    break;
++                case 18:
++                    setState(s, 20);
++                    s->changed = 1;
++                    break;
++                case 15:
++                    if (m[4] == 0) {
++                        s32 r;
++                        t->b38C = 0;
++                        t->b38E = 0;
++                        t->w390 = SceneActorGraphics_GetResourceId(t);
++                        r = SceneActorGraphics_GetResourceId(t);
++                        switch (r) {
++                            case 0:
++                                t->palette = t->pal5C4;
++                                break;
++                            case 1:
++                                t->palette = t->pal7C4;
++                                break;
++                            default:
++                                CpuSet(gUnk_030042E4 + r * 32, t->pal3C4, 0x04000008);
++                                t->palette = t->pal3C4;
++                                break;
++                        }
++                    } else if (m[5] == 0) {
++                        effect((u8 *)t, 0x338, 3, 5);
++                    } else {
++                        effect((u8 *)t, 0x33A, 3, 5);
++                    }
++                    Trigger_ConsumePending(entry, 1);
++                    break;
++                case 16:
++                    if (m[4] == 0)
++                        effect((u8 *)t, 0x335, 1, 5);
++                    else if (m[5] == 0)
++                        effect((u8 *)t, 0x338, 2, 5);
++                    else
++                        effect((u8 *)t, 0x33A, 2, 5);
++                    Trigger_ConsumePending(entry, 1);
++                    break;
++                case 9:
++                    SceneActors_ConfigureEffect(s, m[4], 0xB4, 0xB4);
++                    Trigger_ConsumePending(entry, 1);
++                    break;
++                case 17:
++                    t->b3B8 = m[4];
++                    Trigger_ConsumePending(entry, 1);
++                    break;
++                case 2:
++                    s->h54 = m[4];
++                    s->h56 = m[5];
++                    s->h58 = m[6];
++                    t->h260 = s->h54;
++                    t->h262 = t->h344 + s->h56;
++                    t->h264 = s->h58;
++                    Trigger_ConsumePending(entry, 1);
++                    break;
++                case 66:
++                    t->b3BA = m[4];
++                    setState(s, 21);
++                    s->changed = 1;
++                    break;
++            }
++            i++;
++        } while (i < entry->count[gUnk_0200047C[0x24]]);
++}
++
++#else
++
++INCLUDE_ASM("asm/nonmatching", SceneActors_DispatchCommands);
++
++#endif
++
++static inline u8 TakeFlag(struct StateActor *p)
++{
++    if (p->actionEnter) {
++        p->actionEnter = 0;
++        p->actionFinished = 0;
++        return TRUE;
++    }
++    return FALSE;
++}
++
++void SceneActorState_AdvanceToState1A(struct StateActor *p)
++{
++    if (TakeFlag(p)) {
++        u32 v = 0x1a;
++        p->actionAnimation = v;
++        Trigger_ConsumePending(p->receiver2, 1);
++    }
++    p->actionTimer++;
++}
++
++static inline u8 chk_08023638(struct StateActor *p)
++{
++    u8 *q = &p->actionEnter;
++    if (*q) {
++        *q = 0;
++        q--;
++        *q = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_AdvanceToState01(struct StateActor *p)
++{
++    u8 r = chk_08023638(p);
++    if (r == 1) {
++        p->actionAnimation = r;
++        Trigger_ConsumePending(p->receiver2, 1);
++    }
++    p->actionTimer++;
++}
++
++void SceneActorState_AdvanceToState02(struct StateActor *p)
++{
++    if (TakeFlag(p)) {
++        u32 v = 2;
++        p->actionAnimation = v;
++        Trigger_ConsumePending(p->receiver2, 1);
++    }
++    p->actionTimer++;
++}
++
++static inline u8 chk_080236C0(struct StateActor *p)
++{
++    if (p->actionEnter) {
++        p->actionEnter = 0;
++        p->actionFinished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_Acknowledge(struct StateActor *p)
++{
++    if (chk_080236C0(p)) {
++        u32 k = 3;
++        p->actionAnimation = k;
++        Trigger_ConsumePending(p->receiver2, 1);
++    }
++    if (p->actionFinished)
++        Trigger_ConsumePending(p->receiver2, 1);
++    else
++        p->actionTimer++;
++}
++
++static inline u8 chk_08023720(struct StateActor *p)
++{
++    if (p->actionEnter) {
++        p->actionEnter = 0;
++        p->actionFinished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_AdvanceToState1B(struct StateActor *p)
++{
++    if (chk_08023720(p)) {
++        u32 k = 0x1b;
++        p->actionAnimation = k;
++    }
++    if (p->actionFinished)
++        Trigger_ConsumePending(p->receiver2, 1);
++    else
++        p->actionTimer++;
++}
++
++static inline u8 chk_08023770(struct StateActor *p)
++{
++    if (p->actionEnter) {
++        p->actionEnter = 0;
++        p->actionFinished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_AdvanceToState1C(struct StateActor *p)
++{
++    if (chk_08023770(p)) {
++        u32 k = 0x1C;
++        p->actionAnimation = k;
++    }
++    if (p->actionFinished)
++        Trigger_ConsumePending(p->receiver2, 1);
++    else
++        p->actionTimer++;
++}
++
++/* Raw offsets throughout the recovery block below (actionMode 0xAC,
++ * actionIndex 0xAD, actionPhase 0xAE, actionTimer 0xC4, actionFinished 0xAF):
++ * struct-field writes for that cluster pick a different (still correct, but
++ * non-matching) register for the last store. */
++
++struct S_080237C0 {
++    u8 f0[0xaa];
++    u8 aa;
++    u8 f1;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++};
++
++static inline u8 chk_080237C0(struct S_080237C0 *p)
++{
++    if (p->b0) {
++        p->b0 = 0;
++        p->af = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_Resume(struct S_080237C0 *p)
++{
++    if (chk_080237C0(p)) {
++        u32 k = 0x1d;
++        p->aa = k;
++        Trigger_ConsumePending((u8 *)p + 0x118, 1);
++    }
++    if (p->af) {
++        u32 two = 2;
++        u32 z = 0;
++        u32 one = 1;
++        p->ac = two;
++        p->ad = z;
++        p->ae = one;
++        p->c4 = z;
++        p->b0 = one;
++        Trigger_ConsumePending((u8 *)p + 0x118, 1);
++    } else
++        p->c4++;
++}
++
++/* Raw offsets in the recovery block: see sub_080237C0 for why. */
++
++struct S_0802383C {
++    u8 f0[0xaa];
++    u8 aa;
++    u8 f1;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++};
++
++static inline u8 chk_0802383C(struct S_0802383C *p)
++{
++    if (p->b0) {
++        p->b0 = 0;
++        p->af = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_AdvanceToState1E(struct S_0802383C *p)
++{
++    if (chk_0802383C(p)) {
++        u32 k = 0x1e;
++        p->aa = k;
++    }
++    if (p->af) {
++        u32 two = 2;
++        u32 z = 0;
++        p->ac = two;
++        p->ad = z;
++        p->ae = z;
++        p->c4 = z;
++        p->b0 = 1;
++        Trigger_ConsumePending((u8 *)p + 0x118, 1);
++    } else
++        p->c4++;
++}
++
++static inline u8 chk_080238A8(struct StateActor *p)
++{
++    if (p->actionEnter) {
++        p->actionEnter = 0;
++        p->actionFinished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_AdvanceToState23(struct StateActor *p)
++{
++    if (chk_080238A8(p)) {
++        u32 k = 0x23;
++        p->actionAnimation = k;
++    }
++    if (p->actionFinished)
++        Trigger_ConsumePending(p->receiver2, 1);
++    else
++        p->actionTimer++;
++}
++
++static inline u8 chk_080238F8(struct StateActor *p)
++{
++    if (p->actionEnter) {
++        p->actionEnter = 0;
++        p->actionFinished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_AdvanceToState24(struct StateActor *p)
++{
++    if (chk_080238F8(p)) {
++        u32 k = 0x24;
++        p->actionAnimation = k;
++    }
++    if (p->actionFinished)
++        Trigger_ConsumePending(p->receiver2, 1);
++    else
++        p->actionTimer++;
++}
++
++/* Raw offsets: see sub_080237C0 for why the triplet write needs this shape. */
++
++struct S_08023948 {
++    u8 f0[0xaa];
++    u8 aa;
++    u8 f1[4];
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++    u8 padC8[0x2cc];
++    u8 particle;
++};
++
++static inline u8 chk_08023948(struct S_08023948 *p)
++{
++    if (p->b0) {
++        p->b0 = 0;
++        p->af = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_AdvanceToState06(struct S_08023948 *arg)
++{
++    struct S_08023948 *p = arg;
++    struct S_08023948 *base = p;
++    if (chk_08023948(p)) {
++        u32 k = 6;
++        u8 *state = &p->aa;
++        u32 zero;
++        zero = 0;
++        *state = k;
++        base->particle = zero;
++    }
++    if (p->af)
++        Trigger_ConsumePending((u8 *)p + 0x118, 1);
++    else
++        p->c4++;
++}
++
++static inline u8 chk_080239A8(struct StateActor *p)
++{
++    if (p->actionEnter) {
++        p->actionEnter = 0;
++        p->actionFinished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_AdvanceToState20(struct StateActor *p)
++{
++    if (chk_080239A8(p)) {
++        u32 k = 0x20;
++        p->actionAnimation = k;
++    }
++    if (p->actionFinished)
++        Trigger_ConsumePending(p->receiver2, 1);
++    else
++        p->actionTimer++;
++}
++
++static inline u8 chk_080239F8(struct StateActor *p)
++{
++    if (p->actionEnter) {
++        p->actionEnter = 0;
++        p->actionFinished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_AdvanceToState21(struct StateActor *p)
++{
++    if (chk_080239F8(p)) {
++        u32 k = 0x21;
++        p->actionAnimation = k;
++    }
++    if (p->actionFinished)
++        Trigger_ConsumePending(p->receiver2, 1);
++    else
++        p->actionTimer++;
++}
++
++static inline u8 chk(struct StateActor *p)
++{
++    if (p->actionEnter) {
++        p->actionEnter = 0;
++        p->actionFinished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_Hold(struct StateActor *p)
++{
++    if (chk(p)) {
++        u32 k = 0x22;
++        p->actionAnimation = k;
++        Trigger_ConsumePending(p->receiver2, 1);
++    }
++    if (!p->actionFinished)
++        p->actionTimer++;
++}
++
++void SceneActorState_PlayAnimation17AndConsumeTrigger(struct StateActor *p)
++{
++    if (chk(p)) {
++        u32 k = 0x11;
++        p->actionAnimation = k;
++    }
++    if (p->actionFinished)
++        Trigger_ConsumePending(p->receiver2, 1);
++    else
++        p->actionTimer++;
++}
++
++void SceneActorState_PlayAnimation19AndConsumeTrigger(struct StateActor *p)
++{
++    if (chk(p)) {
++        u32 k = 0x13;
++        p->actionAnimation = k;
++    }
++    if (p->actionFinished)
++        Trigger_ConsumePending(p->receiver2, 1);
++    else
++        p->actionTimer++;
++}
++
++/* Raw offsets: see sub_080237C0. */
++
++struct S_08023B38 {
++    u8 f0[0xaa];
++    u8 aa;
++    u8 f1;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++};
++
++static inline u8 chk_08023B38(struct S_08023B38 *p)
++{
++    if (p->b0) {
++        p->b0 = 0;
++        p->af = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_PlayAnimation14ThenAdvance(struct S_08023B38 *p)
++{
++    if (chk_08023B38(p)) {
++        u32 k = 0xe;
++        p->aa = k;
++    }
++    if (p->af) {
++        u32 next = 0x11;
++        u32 z;
++        p->ae = next;
++        z = 0;
++        p->c4 = z;
++        p->b0 = 1;
++        Trigger_ConsumePending((u8 *)p + 0x118, 1);
++    } else
++        p->c4++;
++}
++
++void SceneActorState_PlayAnimation15AndConsumeTrigger(struct StateActor *p)
++{
++    if (TakeFlag(p)) {
++        u32 v = 0xf;
++        p->actionAnimation = v;
++        Trigger_ConsumePending(p->receiver2, 1);
++    }
++    p->actionTimer++;
++}
++
++/* Raw offsets: see sub_080237C0. */
++
++struct S_08023BE4 {
++    u8 f0[0xaa];
++    u8 aa;
++    u8 f1;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++};
++
++static inline u8 chk_08023BE4(struct S_08023BE4 *p)
++{
++    if (p->b0) {
++        p->b0 = 0;
++        p->af = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_ResumeAfterAction(struct S_08023BE4 *p)
++{
++    if (chk_08023BE4(p)) {
++        u32 k = 0x10;
++        p->aa = k;
++    }
++    if (p->af) {
++        u32 two = 2;
++        u32 z = 0;
++        u32 one = 1;
++        p->ac = two;
++        p->ad = z;
++        p->ae = one;
++        p->c4 = z;
++        p->b0 = one;
++        Trigger_ConsumePending((u8 *)p + 0x118, 1);
++    } else
++        p->c4++;
++}
++
++void SceneActorState_PlayAnimation31AndConsumeTrigger(struct StateActor *p)
++{
++    if (chk(p)) {
++        u32 k = 0x1F;
++        p->actionAnimation = k;
++    }
++    if (p->actionFinished)
++        Trigger_ConsumePending(p->receiver2, 1);
++    else
++        p->actionTimer++;
++}
++
++/* Raw offsets: see sub_080237C0. */
++
++struct S_08023CA0 {
++    u8 f0[0xaa];
++    u8 aa;
++    u8 f1;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++};
++
++static inline u8 chk_08023CA0(struct S_08023CA0 *p)
++{
++    if (p->b0) {
++        p->b0 = 0;
++        p->af = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_PlayAnimation37ThenResume(struct S_08023CA0 *p)
++{
++    if (chk_08023CA0(p)) {
++        u32 k = 0x25;
++        p->aa = k;
++    }
++    if (p->af) {
++        u32 two = 2;
++        u32 z = 0;
++        p->ac = two;
++        p->ad = z;
++        p->ae = z;
++        p->c4 = z;
++        p->b0 = 1;
++        Trigger_ConsumePending((u8 *)p + 0x118, 1);
++    } else
++        p->c4++;
++}
++
++void SceneActorState_PlayAnimation39AndConsumeTrigger(struct StateActor *p)
++{
++    if (chk(p)) {
++        u32 k = 0x27;
++        p->actionAnimation = k;
++    }
++    if (p->actionFinished)
++        Trigger_ConsumePending(p->receiver2, 1);
++    else
++        p->actionTimer++;
++}
++
++extern const u32 gUnk_08604E44[];
++
++void SceneActorState_DispatchPhaseHandler(struct StateActor *p)
++{
++    Callback_InvokeActor(p, gUnk_08604E44[p->actionPhase]);
++}
++
++/* Raw offsets throughout: the state()/action() helpers each write several
++ * adjacent fields together (callback+state+timer+changed+reset+pending, or
++ * active+actionReset+action+actionTimer+entered); going through
++ * struct StateActor's named fields for those clusters breaks the match
++ * (see sub_080237C0). */
++
++struct Common {
++    u8 pad0[0x90];
++    u32 timer;
++    s16 health, maxHealth;
++    u8 pad98[2];
++    u8 healthCheck, pad9b;
++    u32 flags;
++    u8 padA0[2];
++    u8 reset;
++    u8 padA3;
++    u32 pending;
++    u8 facing, facing8, requested, state;
++    u8 active, actionReset, action, finished, entered, changed;
++    u8 padB2[0x12];
++    u32 actionTimer;
++    u8 padC8[0x38];
++    void (*callback)(void *);
++};
++
++static inline void state(struct Common *p, void (*fn)(void *), int id)
++{
++    int zero;
++    p->state = id;
++    zero = 0;
++    p->callback = fn;
++    p->timer = zero;
++    p->changed = 1;
++    p->reset = zero;
++    p->pending = zero;
++}
++
++int GridAttack_SelectNextAction(void *);
++
++void sub_08027214(void *);
++
++static inline u8 chk_08023D78(struct Common *p)
++{
++    if (p->entered) {
++        p->entered = 0;
++        p->finished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++static inline void action(struct Common *p, int one, int id, int zero)
++{
++    p->active = one;
++    p->actionReset = zero;
++    p->action = id;
++    p->actionTimer = zero;
++    p->entered = one;
++}
++
++int SceneActorState_TryStartDeathOrFlaggedAction(struct Common *p)
++{
++    if (p->health <= 0 && p->healthCheck) {
++        u32 mask = 2;
++        p->flags |= mask;
++        state(p, sub_08027214, 25);
++    }
++    p->healthCheck = 0;
++    {
++        u32 mask = 2;
++        if (p->flags & mask) {
++            action(p, 1, 3, 0);
++            return 1;
++        } else if (p->flags & 1) {
++            action(p, 1, 2, 0);
++            return 1;
++        }
++    }
++    return 0;
++}
++
++/* Raw offsets: the ending phase/elapsed/enter_08023E24 triplet write breaks the match
++ * when routed through struct StateActor's named fields (see sub_080237C0). */
++
++typedef struct State_08023E24 {
++    u8 pad0[0x90];
++    u32 tick;
++    s16 hp, maxHp;
++    u16 extra;
++    u8 vulnerable, kind;
++    u32 flags;
++    u8 unknownA0[2];
++    u8 unknownA2, unknownA3;
++    u32 unknownA4;
++    u8 facing, facing8, animation, state, mode, submode, phase, finished, enter_08023E24, changed;
++    u8 padB2[0x12];
++    u32 elapsed;
++    u8 padC8[0x38];
++    void (*callback)(void *, int);
++} State_08023E24;
++
++typedef struct Actor_08023E24 {
++    State_08023E24 base;
++    u8 pad104[0x23f];
++    u8 variant;
++    u8 pad344[0x12];
++    u16 delay;
++} Actor_08023E24;
++
++static inline u8 enter_08023E24(State_08023E24 *p)
++{
++    if (p->enter_08023E24) {
++        p->enter_08023E24 = 0;
++        p->finished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void sub_08022EA4(void *, void *);
++
++void SceneActorState_WaitForDelayedAction(Actor_08023E24 *p)
++{
++    State_08023E24 *s = &p->base;
++    s->vulnerable = 1;
++    if (enter_08023E24(s) == 1) {
++        if (p->variant == 0)
++            s->animation = 1;
++        else {
++            u32 k = 2;
++            s->animation = k;
++        }
++    }
++    if (s->elapsed > p->delay && SceneActorState_StepTableByKind(p)) {
++        sub_08022EA4(p, (u8 *)p + 0x9c4);
++        {
++            u32 one = 1;
++            u32 zero;
++            s->phase = one;
++            zero = 0;
++            s->elapsed = zero;
++            s->enter_08023E24 = one;
++        }
++    } else
++        s->elapsed++;
++}
++
++typedef struct State_08023EC0 {
++    u8 pad0[0x90];
++    u32 tick;
++    s16 hp, maxHp;
++    u16 extra;
++    u8 vulnerable, kind;
++    u32 flags;
++    u8 unknownA0[2];
++    u8 unknownA2, unknownA3;
++    u32 unknownA4;
++    u8 facing, facing8, animation, state, mode, submode, phase, finished, enter_08023EC0, changed;
++    u8 padB2[0x12];
++    u32 elapsed;
++    u8 padC8[0x38];
++    void (*callback)(void *, int);
++} State_08023EC0;
++
++typedef struct Actor_08023EC0 {
++    State_08023EC0 base;
++    u8 pad104[0x23f];
++    u8 variant;
++    u8 pad344[0x12];
++    u16 delay;
++} Actor_08023EC0;
++
++static inline u8 enter_08023EC0(State_08023EC0 *p)
++{
++    if (p->enter_08023EC0) {
++        p->enter_08023EC0 = 0;
++        p->finished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void sub_08022DBC(void *);
++
++void SceneActorState_UpdateVariantActionPlayback(Actor_08023EC0 *p)
++{
++    State_08023EC0 *s = &p->base;
++    s->vulnerable = 1;
++    if (enter_08023EC0(s))
++        SceneActorState_SetValueClampedWhenInactive(p, 4);
++    if (s->finished) {
++        if (p->base.state != 3) {
++            sub_08022DBC(p);
++            p->delay = 60;
++            return;
++        } else {
++            u32 k = 4;
++            p->base.animation = k;
++        }
++    }
++    s->elapsed++;
++}
++
++typedef struct State_08023F34 {
++    u8 pad0[0x90];
++    u32 tick;
++    s16 hp, maxHp;
++    u16 extra;
++    u8 vulnerable, kind;
++    u32 flags;
++    u8 unknownA0[2];
++    u8 unknownA2, unknownA3;
++    u32 unknownA4;
++    u8 facing, facing8, animation, state, mode, submode, phase, finished, enter_08023F34, changed;
++    u8 padB2[0x12];
++    u32 elapsed;
++    u8 padC8[0x38];
++    void (*callback)(void *, int);
++} State_08023F34;
++
++static inline u8 enter_08023F34(State_08023F34 *p)
++{
++    if (p->enter_08023F34) {
++        p->enter_08023F34 = 0;
++        p->finished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_PlayAnimation5ThenAdvance(State_08023F34 *p)
++{
++    p->vulnerable = 1;
++    if (enter_08023F34(p)) {
++        u32 k = 5;
++        p->animation = k;
++    }
++    if (p->finished) {
++        u32 next = 3;
++        u32 zero;
++        p->phase = next;
++        zero = 0;
++        p->elapsed = zero;
++        p->enter_08023F34 = 1;
++    } else
++        p->elapsed++;
++}
++
++typedef struct State_08023F98 {
++    u8 pad0[0x90];
++    u32 tick;
++    s16 hp;
++    s16 maxHp;
++    u16 extra;
++    u8 vulnerable;
++    u8 kind;
++    u32 flags;
++    u8 unknownA0[2];
++    u8 unknownA2;
++    u8 unknownA3;
++    u32 unknownA4;
++    u8 facing;
++    u8 facing8;
++    u8 animation;
++    u8 state;
++    u8 mode;
++    u8 submode;
++    u8 phase;
++    u8 finished;
++    u8 enter_08023F98;
++    u8 changed;
++    u8 padB2[0x12];
++    u32 elapsed;
++    u8 padC8[0x38];
++    void (*callback)(void *, int);
++} State_08023F98;
++
++typedef struct Actor_08023F98 {
++    State_08023F98 base;
++    u8 pad104[0x23f];
++    u8 variant;
++    u8 pad344[0x12];
++    u16 delay;
++} Actor_08023F98;
++
++static inline u8 enter_08023F98(State_08023F98 *p)
++{
++    if (p->enter_08023F98) {
++        p->enter_08023F98 = 0;
++        p->finished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_EnterPhase6AndResetAnimation(State_08023F98 *p)
++{
++    int bit;
++    {
++        u32 next = 6;
++        u32 zero;
++        p->phase = next;
++        zero = 0;
++        p->elapsed = zero;
++        p->enter_08023F98 = 1;
++    }
++    {
++        u32 k = 9;
++        p->animation = k;
++    }
++    (*((void (**)(void *))(((u8 *)p) + 0x108)))(p);
++    p->animation = 0;
++    {
++        u32 *flags = &p->flags;
++        u32 mask = ~0x40u;
++        bit = 0x40;
++        p->flags &= ~bit;
++    }
++    ((u8 *)p)[0x383] = 0;
++}
++
++INCLUDE_ASM("asm/nonmatching", sub_08023FE8);
++
++struct S_0802429C {
++    u8 f0[0x9a];
++    u8 a9a;
++    u8 f9[0xf];
++    u8 aa;
++    u8 f1;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++    u8 f3[0x28e];
++    u16 h356;
++};
++
++static inline u8 chk_0802429C(struct S_0802429C *p, u32 z)
++{
++    if (p->b0) {
++        p->b0 = z;
++        p->af = z;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_PlayAnimation7ThenRecover(struct S_0802429C *p)
++{
++    struct S_0802429C *p2 = p;
++    u32 z;
++    u8 *a = &p->a9a;
++    z = 0;
++    *a = 1;
++    if (chk_0802429C(p, z)) {
++        u32 k = 7;
++        p->aa = k;
++    }
++    if (p->af) {
++        u32 z2 = 0;
++        p2->ac = z2;
++        p2->ad = z2;
++        p2->ae = z2;
++        p2->c4 = z2;
++        p2->b0 = 1;
++        if (gUnk_030053F4 & 0x1000)
++            p2->h356 = z2;
++        else
++            p2->h356 = 0x5a;
++    } else
++        p->c4++;
++}
++
++struct S_08024334 {
++    u8 f0[0x9a];
++    u8 a9a;
++    u8 f9[0xf];
++    u8 aa;
++    u8 f1;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++    u8 f3[0x28e];
++    u16 h356;
++};
++
++static inline u8 chk_08024334(struct S_08024334 *p, u32 z)
++{
++    if (p->b0) {
++        p->b0 = z;
++        p->af = z;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_PlayAnimation8ThenRecover(struct S_08024334 *p)
++{
++    struct S_08024334 *p2 = p;
++    u32 z;
++    u8 *a = &p->a9a;
++    z = 0;
++    *a = 1;
++    if (chk_08024334(p, z)) {
++        u32 k = 8;
++        p->aa = k;
++    }
++    if (p->af) {
++        u32 z2 = 0;
++        p2->ac = z2;
++        p2->ad = z2;
++        p2->ae = z2;
++        p2->c4 = z2;
++        p2->b0 = 1;
++        if (gUnk_030053F4 & 0x1000)
++            p2->h356 = z2;
++        else
++            p2->h356 = 0x1E;
++    } else
++        p->c4++;
++}
++
++INCLUDE_ASM("asm/nonmatching", sub_080243CC);
++
++struct S_08024440 {
++    u8 f0[0x9a];
++    u8 a9a;
++    u8 f9[0xf];
++    u8 aa;
++    u8 f1;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++    u8 f3[0x28e];
++    u16 h356;
++};
++
++static inline u8 chk_08024440(struct S_08024440 *p, u32 z)
++{
++    if (p->b0) {
++        p->b0 = z;
++        p->af = z;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_PlayAnimation10ThenRecover(struct S_08024440 *p)
++{
++    struct S_08024440 *p2 = p;
++    u32 z;
++    u8 *a = &p->a9a;
++    z = 0;
++    *a = 1;
++    if (chk_08024440(p, z)) {
++        u32 k = 10;
++        p->aa = k;
++    }
++    if (p->af) {
++        u32 z2 = 0;
++        p2->ac = z2;
++        p2->ad = z2;
++        p2->ae = z2;
++        p2->c4 = z2;
++        p2->b0 = 1;
++        if (gUnk_030053F4 & 0x1000)
++            p2->h356 = z2;
++        else
++            p2->h356 = 0x1E;
++    } else
++        p->c4++;
++}
++
++struct S_080244D8 {
++    u8 f0[0x9a];
++    u8 a9a;
++    u8 f9[0xf];
++    u8 aa;
++    u8 f1;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++    u8 f3[0x28e];
++    u16 h356;
++};
++
++static inline u8 chk_080244D8(struct S_080244D8 *p, u32 z)
++{
++    if (p->b0) {
++        p->b0 = z;
++        p->af = z;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_PlayAnimation11ThenRecover(struct S_080244D8 *p)
++{
++    struct S_080244D8 *p2 = p;
++    u32 z;
++    u8 *a = &p->a9a;
++    z = 0;
++    *a = 1;
++    if (chk_080244D8(p, z)) {
++        u32 k = 11;
++        p->aa = k;
++    }
++    if (p->af) {
++        u32 z2 = 0;
++        p2->ac = z2;
++        p2->ad = z2;
++        p2->ae = z2;
++        p2->c4 = z2;
++        p2->b0 = 1;
++        if (gUnk_030053F4 & 0x1000)
++            p2->h356 = z2;
++        else
++            p2->h356 = 0x1E;
++    } else
++        p->c4++;
++}
++
++struct S_08024570 {
++    u8 f0[0x9a];
++    u8 a9a;
++    u8 f9[0xf];
++    u8 aa;
++    u8 ab;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++    u8 f3[0x28e];
++    u16 h356;
++};
++
++static inline u8 chk_08024570(struct S_08024570 *p, u32 z)
++{
++    if (p->b0) {
++        p->b0 = z;
++        p->af = z;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_PlayVariantAnimation12ThenRecover(struct S_08024570 *p)
++{
++    struct S_08024570 *p2 = p;
++    u32 z;
++    u8 *a = &p->a9a;
++    z = 0;
++    *a = 1;
++    if (chk_08024570(p, z))
++        SceneActorState_SetValueClampedWhenActive(p2, 0xc);
++    if (p->af) {
++        if (p2->ab == 3) {
++            u32 k = 0xc;
++            p2->aa = k;
++            goto inc;
++        } else {
++            u32 z2 = 0;
++            p2->ac = z2;
++            p2->ad = z2;
++            p2->ae = z2;
++            p2->c4 = z2;
++            p2->b0 = 1;
++            if (gUnk_030053F4 & 0x1000)
++                p2->h356 = z2;
++            else
++                p2->h356 = 0x5a;
++        }
++    } else {
++    inc:
++        p->c4++;
++    }
++}
++
++struct S_0802461C {
++    u8 f0[0x9a];
++    u8 a9a;
++    u8 f9[0xf];
++    u8 aa;
++    u8 ab;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++    u8 f3[0x28e];
++    u16 h356;
++};
++
++static inline u8 chk_0802461C(struct S_0802461C *p, u32 z)
++{
++    if (p->b0) {
++        p->b0 = z;
++        p->af = z;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_PlayVariantAnimation13ThenRecover(struct S_0802461C *p)
++{
++    struct S_0802461C *p2 = p;
++    u32 z;
++    u8 *a = &p->a9a;
++    z = 0;
++    *a = 1;
++    if (chk_0802461C(p, z))
++        SceneActorState_SetValueClampedWhenActive(p2, 0xD);
++    if (p->af) {
++        if (p2->ab == 3) {
++            u32 k = 0xD;
++            p2->aa = k;
++            goto inc;
++        } else {
++            u32 z2 = 0;
++            p2->ac = z2;
++            p2->ad = z2;
++            p2->ae = z2;
++            p2->c4 = z2;
++            p2->b0 = 1;
++            if (gUnk_030053F4 & 0x1000)
++                p2->h356 = z2;
++            else
++                p2->h356 = 0x96;
++        }
++    } else {
++    inc:
++        p->c4++;
++    }
++}
++
++typedef struct State_080246C8 {
++    u8 pad0[0x90];
++    u32 tick;
++    s16 hp, maxHp;
++    u16 extra;
++    u8 vulnerable, kind;
++    u32 flags;
++    u8 unknownA0[2];
++    u8 unknownA2, unknownA3;
++    u32 unknownA4;
++    u8 facing, facing8, animation, state, mode, submode, phase, finished, enter_080246C8, changed;
++    u8 padB2[0x12];
++    u32 elapsed;
++    u8 padC8[0x38];
++    void (*callback)(void *, int);
++} State_080246C8;
++
++typedef struct Actor_080246C8 {
++    State_080246C8 base;
++    u8 pad104[0x2A0];
++    s32 f3a4;
++    u8 pad3a8[0x630];
++    void *pool;
++} Actor_080246C8;
++
++void ContactActorPool_Start();
++
++static inline u8 enter_080246C8(State_080246C8 *p)
++{
++    if (p->enter_080246C8) {
++        p->enter_080246C8 = 0;
++        p->finished = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_StartContactPool(Actor_080246C8 *a)
++{
++    State_080246C8 *p = &a->base;
++    struct ContactPosition pos;
++    struct ContactPosition pos2;
++    u8 *src = (u8 *)p + 0x48;
++
++    if (enter_080246C8(p)) {
++        u32 k = 0xE;
++        p->animation = k;
++    }
++    if (p->finished) {
++        struct ContactPosition *pp = &pos;
++        struct ContactPosition *pp2;
++        pos = *(struct ContactPosition *)(src + 0xC);
++        pp->y += 200;
++        pp2 = &pos2;
++        pos2 = *pp;
++        {
++            s32 v = p->hp;
++            a->f3a4 = v;
++        }
++        if (a->pool)
++            ContactActorPool_Start(a->pool, pp, pp2, 10, 10);
++        {
++            u32 next = 0xC;
++            p->phase = next;
++        }
++        p->elapsed = 0;
++        p->enter_080246C8 = 1;
++    } else
++        p->elapsed++;
++}
++
++void SceneActorState_HoldAnimation15(struct StateActor *p)
++{
++    if (TakeFlag(p)) {
++        u32 v = 0xF;
++        p->actionAnimation = v;
++    }
++    p->actionTimer++;
++}
++
++struct S_080247AC {
++    u8 f0[0x9a];
++    u8 a9a;
++    u8 f9[0xf];
++    u8 aa;
++    u8 f1;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++    u8 f3[0x28e];
++    u16 h356;
++};
++
++static inline u8 chk_080247AC(struct S_080247AC *p)
++{
++    if (p->b0) {
++        p->b0 = 0;
++        p->af = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_UpdateLongRecovery(struct S_080247AC *p)
++{
++    struct S_080247AC *p2 = p;
++    if (chk_080247AC(p)) {
++        u32 k = 0x10;
++        p->aa = k;
++    }
++    if (p->af) {
++        u32 z2 = 0;
++        p2->ac = z2;
++        p2->ad = z2;
++        p2->ae = z2;
++        p2->c4 = z2;
++        p2->b0 = 1;
++        if (gUnk_030053F4 & 0x1000)
++            p2->h356 = z2;
++        else
++            p2->h356 = 0x5a;
++    } else
++        p->c4++;
++}
++
++INCLUDE_ASM("asm/nonmatching", sub_0802483C);
++
++struct S_08024944 {
++    u8 f0[0x9a];
++    u8 a9a;
++    u8 f9[0xf];
++    u8 aa;
++    u8 ab;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++    u8 f3[0x28e];
++    u16 h356;
++};
++
++static inline u8 chk_08024944(struct S_08024944 *p, u32 z)
++{
++    if (p->b0) {
++        p->b0 = z;
++        p->af = z;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_UpdateAction20Recovery(struct S_08024944 *p)
++{
++    struct S_08024944 *p2 = p;
++    u32 z;
++    u8 *a = &p->a9a;
++    z = 0;
++    *a = 1;
++    if (chk_08024944(p, z))
++        SceneActorState_SetValueClampedWhenActive(p2, 0x14);
++    if (p->af) {
++        if (p2->ab == 3) {
++            u32 k = 0x14;
++            p2->aa = k;
++            goto inc;
++        } else {
++            u32 z2 = 0;
++            p2->ac = z2;
++            p2->ad = z2;
++            p2->ae = z2;
++            p2->c4 = z2;
++            p2->b0 = 1;
++            if (gUnk_030053F4 & 0x1000)
++                p2->h356 = z2;
++            else
++                p2->h356 = 0x5a;
++        }
++    } else {
++    inc:
++        p->c4++;
++    }
++}
++
++struct S_080249F0 {
++    u8 f0[0x9a];
++    u8 a9a;
++    u8 f9[0xf];
++    u8 aa;
++    u8 ab;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++    u8 f3[0x28e];
++    u16 h356;
++};
++
++static inline u8 chk_080249F0(struct S_080249F0 *p, u32 z)
++{
++    if (p->b0) {
++        p->b0 = z;
++        p->af = z;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_UpdateAction21Recovery(struct S_080249F0 *p)
++{
++    struct S_080249F0 *p2 = p;
++    u32 z;
++    u8 *a = &p->a9a;
++    z = 0;
++    *a = 1;
++    if (chk_080249F0(p, z))
++        SceneActorState_SetValueClampedWhenActive(p2, 0x15);
++    if (p->af) {
++        if (p2->ab == 3) {
++            u32 k = 0x15;
++            p2->aa = k;
++            goto inc;
++        } else {
++            u32 z2 = 0;
++            p2->ac = z2;
++            p2->ad = z2;
++            p2->ae = z2;
++            p2->c4 = z2;
++            p2->b0 = 1;
++            if (gUnk_030053F4 & 0x1000)
++                p2->h356 = z2;
++            else
++                p2->h356 = 0x5a;
++        }
++    } else {
++    inc:
++        p->c4++;
++    }
++}
++
++void SceneActorState_UpdateAction22(struct StateActor *p)
++{
++    if (TakeFlag(p)) {
++        u32 v = 0x16;
++        p->actionAnimation = v;
++    }
++    p->actionTimer++;
++}
++
++struct S_08024AD4 {
++    u8 f0[0x9a];
++    u8 a9a;
++    u8 f9[0xf];
++    u8 aa;
++    u8 f1;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++    u8 f3[0x28e];
++    u16 h356;
++};
++
++static inline u8 chk_08024AD4(struct S_08024AD4 *p)
++{
++    if (p->b0) {
++        p->b0 = 0;
++        p->af = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_UpdateShortRecovery(struct S_08024AD4 *p)
++{
++    struct S_08024AD4 *p2 = p;
++    if (chk_08024AD4(p)) {
++        u32 k = 0x17;
++        p->aa = k;
++    }
++    if (p->af) {
++        u32 z2 = 0;
++        p2->ac = z2;
++        p2->ad = z2;
++        p2->ae = z2;
++        p2->c4 = z2;
++        p2->b0 = 1;
++        if (gUnk_030053F4 & 0x1000)
++            p2->h356 = z2;
++        else
++            p2->h356 = 0x1e;
++    }
++    p->c4++;
++}
++
++struct S_08024B60 {
++    u8 f0[0x9a];
++    u8 a9a;
++    u8 f9[0xf];
++    u8 aa;
++    u8 f1;
++    u8 ac;
++    u8 ad;
++    u8 ae;
++    u8 af;
++    u8 b0;
++    u8 f2[0x13];
++    u32 c4;
++    u8 f3[0x28e];
++    u16 h356;
++};
++
++static inline u8 chk_08024B60(struct S_08024B60 *p)
++{
++    if (p->b0) {
++        p->b0 = 0;
++        p->af = 0;
++        return 1;
++    }
++    return 0;
++}
++
++void SceneActorState_WaitForFlagRelease(struct S_08024B60 *p)
++{
++    struct S_08024B60 *p2 = p;
++    int one;
++    if (chk_08024B60(p)) {
++        u32 k = 0x18;
++        p->aa = k;
++    }
++    one = 1;
++    {
++        u32 mask = one;
++    }
++    if (!((*((u32 *)(((u8 *)p) + 0x9c))) & 1)) {
++        u32 z2 = 0;
++        p2->ac = z2;
++        p2->ad = z2;
++        p2->ae = z2;
++        p2->c4 = z2;
++        p2->b0 = 1;
++        if (gUnk_030053F4 & 0x1000) {
++            p2->h356 = z2;
++        } else {
++            p2->h356 = 0x1e;
++        }
++    } else {
++        p->c4++;
++    }
++}
++
++struct S_08024BEC {
++    u8 f0[0xb0];
++    u8 b0;
++    u8 f1[0x13];
++    u32 c4;
++};
++
++void SceneActorState_UpdatePassiveAction(struct S_08024BEC *p)
++{
++    u8 *q = &p->b0;
++    if (*q) {
++        *q = 0;
++        q--;
++        *q = 0;
++    }
++    p->c4++;
++}
++
++extern const u32 gUnk_08604E9C[];
++
++void SceneActorState_DispatchPrimaryAction(struct StateActor *p)
++{
++    Callback_InvokeActor(p, gUnk_08604E9C[p->actionPhase]);
++}
++
++extern const u32 gUnk_08604EE0[];
++
++void SceneActorState_DispatchSecondaryAction(struct StateActor *p)
++{
++    Callback_InvokeActor(p, gUnk_08604EE0[p->actionPhase]);
++}
++
++extern u32 gUnk_02000560;
++
++extern const u32 gUnk_08604EF0[];
++
++void SceneActorState_UpdateActiveActions(struct StateActor *p)
++{
++    u32 m = 4;
++    if (!(gUnk_02000560 & m)) {
++        if (SceneActorState_TryStartDeathOrFlaggedAction(p) == 0) {
++            Callback_InvokeActor(p, gUnk_08604EF0[p->actionIndex]);
++        }
++    }
++}
++
++extern const u32 gUnk_08604EF4[];
++
++void SceneActorState_UpdateSecondaryActions(struct StateActor *p)
++{
++    Callback_InvokeActor(p, gUnk_08604EF4[p->actionIndex]);
++}
++
++extern const u32 gUnk_08604EF8[];
++
++void SceneActorState_UpdatePassiveActions(struct StateActor *p)
++{
++    Callback_InvokeActor(p, gUnk_08604EF8[p->actionIndex]);
++}
++
++extern u32 gUnk_08604EFC[];
++
++void SceneActorState_UpdateActionController(struct StateActor *p)
++{
++    /* Raw offset: 0xA1 is still unknown in state_actor.h (within unkA0). */
++    ((u8 *)p)[0xa1] = 0;
++    Callback_InvokeActor(p, gUnk_08604EFC[p->actionMode]);
++}
++
++typedef struct ActorAnimation_08024CE0 {
++    u8 pad0[0x51];
++    u8 angle;
++    u8 pad52[0x4a];
++    u32 flags;
++    u8 padA0[8];
++    u8 facing, facing8;
++    u8 padAA[7];
++    u8 changed;
++    u8 padB2;
++    u8 locked;
++    u8 padB4[0x18];
++    u8 requestedAngle;
++    u8 padCD[0x37];
++    u8 (*tryUpdate)(void *);
++    void (*reset)(void *);
++    u8 pad10C[8];
++    s8 savedAngle;
++    u8 pad115[0x22e];
++    u8 variant;
++    u16 scale, minScale, maxScale;
++    u8 pad34A[0x62];
++    u32 mode;
++} ActorAnimation_08024CE0;
++
++static inline void setFacing_08024CE0(ActorAnimation_08024CE0 *p, int angle)
++{
++    u32 value;
++    register int shifted asm("r0");
++    p->angle = angle;
++    shifted = p->angle + 0x60;
++    asm("" : "+r"(shifted));
++    shifted >>= 6;
++    value = 3 & shifted;
++    p->facing = value;
++    shifted = p->angle + 0x70;
++    asm("" : "+r"(shifted));
++    shifted >>= 5;
++    value = 7 & shifted;
++    p->facing8 = value;
++}
++
++// MATCHING_CONCESSION: register-pinning
++void SceneActorAnimation_UpdateDirectionalCallback(ActorAnimation_08024CE0 *p)
++{
++    ActorAnimation_08024CE0 *p2 = p;
++    if (!p->locked)
++        setFacing_08024CE0(p, p->requestedAngle);
++    if (p->changed) {
++        int sequence;
++        p->changed = 0;
++        if (p->locked)
++            setFacing_08024CE0(p, p->savedAngle);
++        {
++            int test = p->mode & 1;
++            sequence = 43;
++            if (test)
++                sequence = 5;
++        }
++        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1,
++                                              4);
++    } else {
++        int sequence;
++        {
++            int test = p->mode & 1;
++            sequence = 43;
++            if (test)
++                sequence = 5;
++        }
++        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1,
++                                              1);
++    }
++    p2->minScale = 0;
++    p2->maxScale = 0;
++    p2->variant = 0;
++    if (!p->tryUpdate(p)) {
++        u32 mask = 0x40;
++        p->flags |= mask;
++        p->reset(p);
++    }
++}
++
++typedef struct ActorAnimation_08024E18 {
++    u8 pad0[0x51];
++    u8 angle;
++    u8 pad52[0x4a];
++    u32 flags;
++    u8 padA0[8];
++    u8 facing, facing8;
++    u8 padAA[7];
++    u8 changed;
++    u8 padB2;
++    u8 locked;
++    u8 padB4[0x18];
++    u8 requestedAngle;
++    u8 padCD[0x37];
++    u8 (*tryUpdate)(void *);
++    void (*reset)(void *);
++    u8 pad10C[8];
++    s8 savedAngle;
++    u8 pad115[0x22e];
++    u8 variant;
++    u16 scale, minScale, maxScale;
++    u8 pad34A[0x62];
++    u32 mode;
++} ActorAnimation_08024E18;
++
++static inline void setFacing_08024E18(ActorAnimation_08024E18 *p, int angle)
++{
++    u32 value;
++    register int shifted asm("r0");
++    p->angle = angle;
++    shifted = p->angle + 0x60;
++    asm("" : "+r"(shifted));
++    shifted >>= 6;
++    value = 3 & shifted;
++    p->facing = value;
++    shifted = p->angle + 0x70;
++    asm("" : "+r"(shifted));
++    shifted >>= 5;
++    value = 7 & shifted;
++    p->facing8 = value;
++}
++
++void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
++
++// MATCHING_CONCESSION: register-pinning
++void SceneActorAnimation_UpdateEightDirectionCallback(ActorAnimation_08024E18 *p)
++{
++    if (!p->locked)
++        setFacing_08024E18(p, p->requestedAngle);
++    if (p->changed) {
++        int sequence;
++        p->changed = 0;
++        if (p->locked)
++            setFacing_08024E18(p, p->savedAngle);
++        {
++            int test = p->mode & 1;
++            sequence = 38;
++            if (test)
++                sequence = 0;
++        }
++        SceneActors_StartEightDirectionAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1,
++                                                 1, 4);
++    } else {
++        int sequence;
++        {
++            int test = p->mode & 1;
++            sequence = 38;
++            if (test)
++                sequence = 0;
++        }
++        SceneActors_StartEightDirectionAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1,
++                                                 1, 1);
++    }
++    if (!p->tryUpdate(p)) {
++        u32 mask = 0x40;
++        p->flags |= mask;
++        p->reset(p);
++    }
++}
+diff --git a/src/fn/sub_08021EA8.c b/src/fn/sub_08021EA8.c
+deleted file mode 100644
+index c9b131e6f..000000000
+--- a/src/fn/sub_08021EA8.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "global.h"
+-int SceneActorGraphics_GetResourceId(u8 *p)
+-{
+-    switch (p[0xb3]) {
+-        case 0:
+-            return 0x335;
+-        case 1:
+-            return 0x335;
+-        default:
+-            return 0x335;
+-    }
+-}
+diff --git a/src/fn/sub_08021EB8.c b/src/fn/sub_08021EB8.c
+deleted file mode 100644
+index 9ca2f3a92..000000000
+--- a/src/fn/sub_08021EB8.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-
+-u8 *SceneActorGraphics_GetDefaultResourceId(void)
+-{
+-    return (u8 *)0x00000335;
+-}
+diff --git a/src/fn/sub_08021EC0.c b/src/fn/sub_08021EC0.c
+deleted file mode 100644
+index beb599a90..000000000
+--- a/src/fn/sub_08021EC0.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-// MATCHING_CONCESSION: register-pinning
+-#include "global.h"
+-extern u8 *gUnk_030042E4;
+-int SceneActorGraphics_GetResourceId(void *);
+-void SceneActorGraphics_SelectResource(u8 *p)
+-{
+-    if (p[0x38e]) {
+-        int resource;
+-        p[0x38c] = 0;
+-        p[0x38e] = 0;
+-        *(int *)(p + 0x390) = SceneActorGraphics_GetResourceId(p);
+-        resource = SceneActorGraphics_GetResourceId(p);
+-        {
+-            int test = resource;
+-            asm("" : "+r"(test));
+-            if (test == 0)
+-                *(void **)(p + 0x288) = p + 0x5c4;
+-            else if (test == 1)
+-                *(void **)(p + 0x288) = p + 0x7c4;
+-            else {
+-                {
+-                    void *src = gUnk_030042E4 + resource * 32;
+-                    register void *dst asm("r1") = p + 0x3c4;
+-                    CpuSet(src, dst, 0x4000008);
+-                }
+-                *(void **)(p + 0x288) = p + 0x3c4;
+-            }
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_080221D8.c b/src/fn/sub_080221D8.c
+deleted file mode 100644
+index 0cc95febf..000000000
+--- a/src/fn/sub_080221D8.c
++++ /dev/null
+@@ -1,5 +0,0 @@
+-#include "global.h"
+-
+-void SceneActorGraphics_InitBodyNoOp(void)
+-{
+-}
+diff --git a/src/fn/sub_080221DC.c b/src/fn/sub_080221DC.c
+deleted file mode 100644
+index 02baa1d43..000000000
+--- a/src/fn/sub_080221DC.c
++++ /dev/null
+@@ -1,35 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    s16 x, y, z;
+-} Vec;
+-void Collider_Init(void *, int, int, int, int, void *, void *);
+-void Collider_SetPosition(void *, void *, int);
+-void Collider_SetCallback(void *, void *, void *);
+-void Collider_SetBodyProperties(void *, int, int, int);
+-s32 Collider_Refresh(void *);
+-void SceneActorGraphics_InitBodyNoOp(void);
+-extern u32 gUnk_030053F4;
+-void Collider_SetAttackProperties(void *, int, int, int, int, int);
+-void SceneActorGraphics_InitializeBody(u8 *p)
+-{
+-    Vec scale, rotation;
+-    u8 *drawable = p + 0x178;
+-    scale.x = 0x40;
+-    scale.y = 0x80;
+-    scale.z = 0x40;
+-    rotation.x = 0;
+-    rotation.y = 0x80;
+-    rotation.z = 0;
+-    Collider_Init(drawable, 0, 0x2001, 0, 16, &scale, &rotation);
+-    Collider_SetPosition(drawable, p + 0x260, 0);
+-    Collider_SetCallback(drawable, SceneActorGraphics_InitBodyNoOp, p);
+-    {
+-        int test = gUnk_030053F4 & 0x1000;
+-        int flags;
+-        flags = 0;
+-        if (test)
+-            flags = 0x40800;
+-        Collider_SetAttackProperties(drawable, *(s16 *)(p + 0x35c), *(s16 *)(p + 0x35e), 0, flags,
+-                                     *(s16 *)(p + 0x360));
+-    }
+-}
+diff --git a/src/fn/sub_0802229C.c b/src/fn/sub_0802229C.c
+deleted file mode 100644
+index 6ba24497b..000000000
+--- a/src/fn/sub_0802229C.c
++++ /dev/null
+@@ -1,26 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    s16 x, y, z;
+-} Vec;
+-void Collider_Init(void *, int, int, int, int, void *, void *);
+-void Collider_SetPosition(void *, void *, int);
+-void Collider_SetCallback(void *, void *, void *);
+-void Collider_SetBodyProperties(void *, int, int, int);
+-s32 Collider_Refresh(void *);
+-void sub_08021F4C(void);
+-void SceneActorGraphics_InitializeOverlay(u8 *p, int resource)
+-{
+-    Vec scale, rotation;
+-    u8 *drawable = p + 0x1cc;
+-    scale.x = 0x60;
+-    scale.y = 0x80;
+-    scale.z = 0x60;
+-    rotation.x = 0;
+-    rotation.y = 0x80;
+-    rotation.z = 0;
+-    Collider_Init(drawable, 0, 0x5101, 0, 16, &scale, &rotation);
+-    Collider_SetPosition(drawable, p + 0x260, 0);
+-    Collider_SetCallback(drawable, sub_08021F4C, p);
+-    Collider_SetBodyProperties(drawable, resource, 0x802, 1);
+-    Collider_Refresh(drawable);
+-}
+diff --git a/src/fn/sub_08022330.c b/src/fn/sub_08022330.c
+deleted file mode 100644
+index daabdfab6..000000000
+--- a/src/fn/sub_08022330.c
++++ /dev/null
+@@ -1,29 +0,0 @@
+-#include "global.h"
+-void Collider_SetAttackProperties(void *, int, int, int, int, int);
+-void SceneActorGraphics_UpdateVariant(u8 *p)
+-{
+-    u8 *drawable = p + 0x178;
+-    {
+-        u32 mask = 0x40000;
+-        if (*(u32 *)(p + 0x9c) & mask)
+-            p[0x3b6] = 1;
+-        else
+-            p[0x3b6] = 0;
+-    }
+-    if (p[0x3b6] != p[0x3b7]) {
+-        switch (p[0x3b6]) {
+-            case 0:
+-                Collider_SetAttackProperties(drawable, *(s16 *)(p + 0x35c), *(s16 *)(p + 0x35e), 0,
+-                                             0, *(s16 *)(p + 0x360));
+-                break;
+-            case 1:
+-                Collider_SetAttackProperties(drawable, *(s16 *)(p + 0x362), *(s16 *)(p + 0x364), 0,
+-                                             0x60000, *(s16 *)(p + 0x366));
+-                break;
+-        }
+-        {
+-            int value = p[0x3b6];
+-            p[0x3b7] = value;
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_08022404.c b/src/fn/sub_08022404.c
+deleted file mode 100644
+index b8854e235..000000000
+--- a/src/fn/sub_08022404.c
++++ /dev/null
+@@ -1,20 +0,0 @@
+-#include "global.h"
+-typedef struct {
+-    u8 pad[0x344];
+-    s16 scale, min, max, step;
+-} Actor;
+-void SceneActorGraphics_OscillateScale(Actor *p)
+-{
+-    p->scale += p->step;
+-    if (p->step > 0) {
+-        if (p->scale >= p->max) {
+-            p->scale = p->max;
+-            p->step = -32;
+-        }
+-    } else {
+-        if (p->scale <= p->min) {
+-            p->scale = p->min;
+-            p->step = 32;
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_08022468.c b/src/fn/sub_08022468.c
+deleted file mode 100644
+index b6c9f9ea2..000000000
+--- a/src/fn/sub_08022468.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "global.h"
+-extern u16 gUnk_02000590;
+-extern u8 *gUnk_02000710;
+-s32 AreaEffect_IsPositionCovered(void *);
+-s32 SceneActorGraphics_GetEffectState(u8 *p)
+-{
+-    s32 r;
+-    if (gUnk_02000590 != 0) {
+-        r = 4;
+-    } else if (AreaEffect_IsPositionCovered(p + 0x54) == 0) {
+-        r = 0;
+-    } else {
+-        r = *(s16 *)(gUnk_02000710 + 0x876);
+-    }
+-    return r;
+-}
+diff --git a/src/fn/sub_080224A4.c b/src/fn/sub_080224A4.c
+deleted file mode 100644
+index 3bc53450b..000000000
+--- a/src/fn/sub_080224A4.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-
+-struct S {
+-    u8 f[0xaa];
+-    u8 a;
+-    u8 g[0x298];
+-    u8 b;
+-};
+-void SceneActorState_SetValueClampedWhenInactive(struct S *p, u32 v)
+-{
+-    if (p->b == 0)
+-        v = 3;
+-    p->a = v;
+-}
+diff --git a/src/fn/sub_080224C4.c b/src/fn/sub_080224C4.c
+deleted file mode 100644
+index 9c00f3f99..000000000
+--- a/src/fn/sub_080224C4.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-
+-struct S {
+-    u8 f[0xaa];
+-    u8 a;
+-    u8 g[0x298];
+-    u8 b;
+-};
+-void SceneActorState_SetValueClampedWhenActive(struct S *p, u32 v)
+-{
+-    if (p->b == 1)
+-        v = 3;
+-    p->a = v;
+-}
+diff --git a/src/fn/sub_080224E4.c b/src/fn/sub_080224E4.c
+deleted file mode 100644
+index 0c5f09f0d..000000000
+--- a/src/fn/sub_080224E4.c
++++ /dev/null
+@@ -1,67 +0,0 @@
+-// MATCHING_CONCESSION: register-pinning
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[2];
+-    struct {
+-        u32 x, y;
+-    } pos;
+-    u8 pad5c[0x4c];
+-    u8 facing, facing8, padAA[2], mode, state, phase, finished, enter;
+-    u8 padB1[0x13];
+-    u32 elapsed;
+-    u8 padC8[4];
+-    u8 requestedAngle;
+-    u8 padCD[0x2df];
+-    u32 graphicsMode;
+-} ActorAnimation;
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    register int shifted asm("r0");
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    asm("" : "+r"(shifted));
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    asm("" : "+r"(shifted));
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
+-void Sound_PlaySongChecked(int);
+-ActorAnimation *SceneActors_GetBySlot(int);
+-void SceneActors_StartDisappearEffect(u32 *position)
+-{
+-    ActorAnimation *p = SceneActors_GetBySlot(0);
+-    if (p) {
+-        int sequence;
+-        u32 one;
+-        u32 zero = 0, phase = 13;
+-        p->mode = zero;
+-        p->state = zero;
+-        p->phase = phase;
+-        p->elapsed = zero;
+-        {
+-            u8 *dst = &p->enter;
+-            one = 1;
+-            *dst = one;
+-        }
+-        p->pos = *(typeof(p->pos) *)position;
+-        setFacing(p, p->requestedAngle);
+-        {
+-            int test = p->graphicsMode & one;
+-            sequence = 62;
+-            if (test)
+-                sequence = 24;
+-        }
+-        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, one,
+-                                              one, 6);
+-        Sound_PlaySongChecked(839);
+-        Sound_PlaySongChecked(1335);
+-    }
+-}
+diff --git a/src/fn/sub_08022590.c b/src/fn/sub_08022590.c
+deleted file mode 100644
+index a1947c9b8..000000000
+--- a/src/fn/sub_08022590.c
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#include "global.h"
+-struct ContactActorPool;
+-
+-struct S {
+-    u8 f[0x9d8];
+-    struct ContactActorPool *contactPool;
+-};
+-struct S *SceneActors_GetBySlot(u32);
+-void ContactActorPool_RequestClear(struct ContactActorPool *);
+-void SceneActors_RequestContactPoolClear(void)
+-{
+-    struct S *p = SceneActors_GetBySlot(0);
+-    if (p && p->contactPool != 0)
+-        ContactActorPool_RequestClear(p->contactPool);
+-}
+diff --git a/src/fn/sub_080225B4.c b/src/fn/sub_080225B4.c
+deleted file mode 100644
+index a81e7c8a1..000000000
+--- a/src/fn/sub_080225B4.c
++++ /dev/null
+@@ -1,26 +0,0 @@
+-#include "global.h"
+-u8 *SceneActors_GetBySlot(int);
+-void SceneActors_RequestContactPoolClear(void);
+-void SceneActors_AddHealthCost(int amount)
+-{
+-    u8 *p;
+-    if (amount > 0) {
+-        p = SceneActors_GetBySlot(0);
+-        if (p) {
+-            int remaining, diff;
+-            *(int *)(p + 0x3a0) += amount;
+-            remaining = *(s16 *)(p + 0x94) - *(int *)(p + 0x3a0);
+-            if (remaining <= 1)
+-                goto stop;
+-            {
+-                diff = remaining - *(int *)(p + 0x3a4);
+-                if (diff < 0)
+-                    diff = -diff;
+-                if (diff > 49) {
+-                stop:
+-                    SceneActors_RequestContactPoolClear();
+-                }
+-            }
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_08022600.c b/src/fn/sub_08022600.c
+deleted file mode 100644
+index d0148610a..000000000
+--- a/src/fn/sub_08022600.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-u8 *SceneActors_GetBySlot(int);
+-void SceneActors_AddResourceCost(int amount)
+-{
+-    u8 *p;
+-    if (amount > 0) {
+-        p = SceneActors_GetBySlot(0);
+-        if (p)
+-            *(int *)(p + 0x39c) += amount;
+-    }
+-}
+diff --git a/src/fn/sub_08022A48.c b/src/fn/sub_08022A48.c
+deleted file mode 100644
+index a9716793e..000000000
+--- a/src/fn/sub_08022A48.c
++++ /dev/null
+@@ -1,38 +0,0 @@
+-// MATCHING_CONCESSION: register-pinning
+-#include "global.h"
+-struct Packed {
+-    s32 x : 16, y : 16, z : 16, pad : 16;
+-};
+-extern u32 gUnk_03005308;
+-extern u16 gUnk_0203B400[];
+-void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
+-void SceneActors_SpawnAmbientParticlePair(u8 *p)
+-{
+-    u8 *graphics = p + 0x240;
+-    struct Packed size;
+-    int i;
+-    for (i = 0; i < 2; i++) {
+-        int angle, speed;
+-        int count;
+-        register u32 index asm("r1");
+-        u32 *indexPtr;
+-        u32 mask;
+-        int smallMask;
+-        register u16 *table asm("r4");
+-        size.x = 164;
+-        size.y = 16;
+-        size.z = 164;
+-        indexPtr = &gUnk_03005308;
+-        mask = 1023;
+-        smallMask = 3;
+-        table = gUnk_0203B400;
+-        index = (*indexPtr + 1) & mask;
+-        angle = (u8)table[index];
+-        index = (index + 1) & mask;
+-        count = (table[index] & smallMask) + 2;
+-        index = (index + 1) & mask;
+-        *indexPtr = index;
+-        speed = (table[index] & smallMask) + 20;
+-        SparkParticle_Spawn(graphics + 0x20, 3, &size, angle, count, speed, 2, 2);
+-    }
+-}
+diff --git a/src/fn/sub_08022AF4.c b/src/fn/sub_08022AF4.c
+deleted file mode 100644
+index c670300d5..000000000
+--- a/src/fn/sub_08022AF4.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-
+-struct S {
+-    u8 f[0x3c0];
+-    u32 b;
+-    u8 g[0x9dc - 0x3c4];
+-    u32 a;
+-};
+-void BackgroundFlash_BeginDisappearance(u32);
+-void SceneActors_StopBackgroundFlash(struct S *p)
+-{
+-    BackgroundFlash_BeginDisappearance(p->a);
+-    p->b = 0;
+-}
+diff --git a/src/fn/sub_08022D24.c b/src/fn/sub_08022D24.c
+deleted file mode 100644
+index 7e4bc4410..000000000
+--- a/src/fn/sub_08022D24.c
++++ /dev/null
+@@ -1,20 +0,0 @@
+-#include "global.h"
+-
+-void SceneActorState_StepTableByte(u8 *p, u8 *tbl)
+-{
+-    u16 *cur = (u16 *)(p + 0x3b2);
+-    u16 old = *cur;
+-    u8 *col;
+-    u32 row;
+-    *(u16 *)(p + 0x3b4) = old;
+-    row = p[0x3b0];
+-    col = p + 0x3b1;
+-    {
+-        u32 idx = row * 8 + (u32)tbl;
+-        idx += *col;
+-        *cur = *(u8 *)idx;
+-    }
+-    (*col)++;
+-    if (*col > 7)
+-        *col = 0;
+-}
+diff --git a/src/fn/sub_08022D68.c b/src/fn/sub_08022D68.c
+deleted file mode 100644
+index 3fe2c3d05..000000000
+--- a/src/fn/sub_08022D68.c
++++ /dev/null
+@@ -1,29 +0,0 @@
+-#include "global.h"
+-
+-extern const u8 gUnk_08604DC4[], gUnk_08604DE4[], gUnk_08604E04[], gUnk_08604E24[];
+-void SceneActorState_StepTableByte(u8 *p, const u8 *tbl);
+-
+-int SceneActorState_StepTableByKind(u8 *p)
+-{
+-    const u8 *tbl;
+-    switch (*(s32 *)(p + 0x358)) {
+-        case 0:
+-            tbl = gUnk_08604DC4;
+-            break;
+-        case 1:
+-            tbl = gUnk_08604DE4;
+-            break;
+-        case 2:
+-            tbl = gUnk_08604E04;
+-            break;
+-        case 3:
+-            tbl = gUnk_08604E24;
+-            break;
+-        default:
+-            goto fail;
+-    }
+-    SceneActorState_StepTableByte(p, tbl);
+-    return 1;
+-fail:
+-    return 0;
+-}
+diff --git a/src/fn/sub_08022F88.c b/src/fn/sub_08022F88.c
+deleted file mode 100644
+index 5d68ce771..000000000
+--- a/src/fn/sub_08022F88.c
++++ /dev/null
+@@ -1,275 +0,0 @@
+-#include "global.h"
+-#ifdef NONMATCHING
+-// fuzzy: 81.1%
+-// Scene-actor cutscene dispatcher (Vanargand, Ratatosk). Commands mostly set
+-// state 2 with a sub-state (setState); 2 places the actor, 9 configures an
+-// effect, 15/16 pick the body graphics variant, 25 flashes the background.
+-// Still differs: sb/r8 swapped for entry/i; in cases 15/16 the graphics
+-// variant branches use other registers, so their tails are not cross-jumped
+-// as in the original.
+-
+-typedef struct {
+-    u16 id;
+-    u8 unk[4];
+-    u8 count[2];
+-    s16 *messages[2][4];
+-    u8 pad[8];
+-    void *next;
+-} Entry;
+-
+-struct S {
+-    u8 pad0[0x54];
+-    u16 h54, h56, h58;
+-    u8 pad5a[0xAC - 0x5A];
+-    u8 state;
+-    u8 entered;
+-    u8 sub;
+-    u8 padAF;
+-    u8 changed;
+-    u8 padB1[0xC4 - 0xB1];
+-    u32 timer;
+-    u8 padC8[0xD0 - 0xC8];
+-    u16 hD0, hD2, hD4;
+-    u8 padD6[0x114 - 0xD6];
+-    u8 angle;
+-    u8 pad115[0x118 - 0x115];
+-    Entry entry;
+-};
+-
+-struct T {
+-    u8 pad0[0x260];
+-    u16 h260, h262, h264;
+-    u8 pad266[0x288 - 0x266];
+-    u8 *palette;
+-    u8 pad28c[0x344 - 0x28C];
+-    u16 h344;
+-    u8 pad346[0x38C - 0x346];
+-    u8 b38C;
+-    u8 pad38d;
+-    u8 b38E;
+-    u8 b38F;
+-    u32 w390;
+-    u8 pad394[0x3B8 - 0x394];
+-    u8 b3B8;
+-    u8 pad3b9;
+-    u8 b3BA;
+-    u8 pad3bb[0x3C4 - 0x3BB];
+-    u8 pal3C4[0x5C4 - 0x3C4];
+-    u8 pal5C4[0x7C4 - 0x5C4];
+-    u8 pal7C4[0x9C4 - 0x7C4];
+-    u16 h9C4, h9C6, h9C8;
+-    u8 pad9ca[0x9DC - 0x9CA];
+-    void *flash;
+-};
+-
+-extern u8 *gUnk_0200047C;
+-extern u8 *gUnk_030042E4;
+-
+-void SceneMessages_SetPendingTrigger(void *, void *);
+-void Trigger_ConsumePending(void *, s32);
+-void SceneActors_StopBackgroundFlash(void *);
+-void BackgroundFlash_BeginAlternating(void *);
+-void BackgroundFlash_BeginAppearance(void *);
+-s32 SceneActorGraphics_GetResourceId(void *);
+-void CpuSet(const void *, void *, u32);
+-void SceneActors_ConfigureEffect(void *, s32, s32, s32);
+-
+-static inline void setStateFull(struct S *s, u32 state, u32 entered, u32 sub)
+-{
+-    s->state = state;
+-    s->entered = entered;
+-    s->sub = sub;
+-    s->timer = entered;
+-}
+-#define setState(s, sub) setStateFull(s, 2, 0, sub)
+-
+-static inline void effect2(u8 *p, int mode, int id, int duration)
+-{
+-    *(u32 *)(p + 0x390) = id;
+-    p[0x38e] = mode;
+-    p[0x38f] = duration;
+-    if (p[0x38e] == 2) {
+-        u32 value = duration == 5 ? 32 : 64;
+-        p[0x38c] = value;
+-    } else if (p[0x38e] == 1)
+-        p[0x38c] = 0;
+-}
+-#define effect(p, id, mode, d) effect2(p, mode, id, d)
+-
+-void SceneActors_DispatchCommands(struct S *s)
+-{
+-    struct T *t = (struct T *)s;
+-    Entry *entry = &s->entry;
+-    s32 i;
+-
+-    i = 0;
+-    if (i < entry->count[gUnk_0200047C[0x24]])
+-        do {
+-            s16 *m;
+-            u8 *controller = gUnk_0200047C;
+-            m = entry->messages[controller[0x24]][i];
+-            SceneMessages_SetPendingTrigger(entry, m);
+-            switch (((u8 *)m)[6]) {
+-                case 0:
+-                    setState(s, 0);
+-                    s->changed = 1;
+-                    break;
+-                case 1:
+-                    s->angle = (m[4] + 5) << 5;
+-                    setState(s, 1);
+-                    s->changed = 1;
+-                    break;
+-                case 3:
+-                    s->angle = (m[4] + 5) << 5;
+-                    setState(s, 2);
+-                    s->changed = 1;
+-                    break;
+-                case 4:
+-                    s->angle = (m[4] + 5) << 5;
+-                    setState(s, 3);
+-                    s->changed = 1;
+-                    break;
+-                case 5:
+-                    s->angle = (m[4] + 5) << 5;
+-                    setState(s, 4);
+-                    s->changed = 1;
+-                    break;
+-                case 6:
+-                    s->angle = (m[4] + 5) << 5;
+-                    setState(s, 5);
+-                    s->changed = 1;
+-                    break;
+-                case 7:
+-                    setState(s, 6);
+-                    s->changed = 1;
+-                    break;
+-                case 8:
+-                    setState(s, 7);
+-                    s->changed = 1;
+-                    break;
+-                case 10:
+-                    setState(s, 8);
+-                    s->changed = 1;
+-                    break;
+-                case 11:
+-                    setState(s, 9);
+-                    s->changed = 1;
+-                    break;
+-                case 12:
+-                    t->h9C4 = m[4];
+-                    t->h9C6 = m[5];
+-                    t->h9C8 = m[6];
+-                    setState(s, 10);
+-                    s->changed = 1;
+-                    break;
+-                case 19:
+-                    setState(s, 11);
+-                    s->changed = 1;
+-                    break;
+-                case 20:
+-                    setState(s, 12);
+-                    s->changed = 1;
+-                    break;
+-                case 21:
+-                    setState(s, 13);
+-                    s->changed = 1;
+-                    break;
+-                case 23:
+-                    setState(s, 14);
+-                    s->changed = 1;
+-                    break;
+-                case 24:
+-                    setState(s, 15);
+-                    s->changed = 1;
+-                    break;
+-                case 25:
+-                    if (m[4])
+-                        SceneActors_StopBackgroundFlash(t);
+-                    else if (m[5])
+-                        BackgroundFlash_BeginAlternating(t->flash);
+-                    else
+-                        BackgroundFlash_BeginAppearance(t->flash);
+-                    break;
+-                case 13:
+-                    setState(s, 16);
+-                    s->changed = 1;
+-                    break;
+-                case 14:
+-                    setState(s, 18);
+-                    s->changed = 1;
+-                    break;
+-                case 22:
+-                    s->hD0 = m[4];
+-                    s->hD2 = m[5];
+-                    s->hD4 = m[6];
+-                    setState(s, 19);
+-                    s->changed = 1;
+-                    break;
+-                case 18:
+-                    setState(s, 20);
+-                    s->changed = 1;
+-                    break;
+-                case 15:
+-                    if (m[4] == 0) {
+-                        s32 r;
+-                        t->b38C = 0;
+-                        t->b38E = 0;
+-                        t->w390 = SceneActorGraphics_GetResourceId(t);
+-                        r = SceneActorGraphics_GetResourceId(t);
+-                        switch (r) {
+-                            case 0:
+-                                t->palette = t->pal5C4;
+-                                break;
+-                            case 1:
+-                                t->palette = t->pal7C4;
+-                                break;
+-                            default:
+-                                CpuSet(gUnk_030042E4 + r * 32, t->pal3C4, 0x04000008);
+-                                t->palette = t->pal3C4;
+-                                break;
+-                        }
+-                    } else if (m[5] == 0) {
+-                        effect((u8 *)t, 0x338, 3, 5);
+-                    } else {
+-                        effect((u8 *)t, 0x33A, 3, 5);
+-                    }
+-                    Trigger_ConsumePending(entry, 1);
+-                    break;
+-                case 16:
+-                    if (m[4] == 0)
+-                        effect((u8 *)t, 0x335, 1, 5);
+-                    else if (m[5] == 0)
+-                        effect((u8 *)t, 0x338, 2, 5);
+-                    else
+-                        effect((u8 *)t, 0x33A, 2, 5);
+-                    Trigger_ConsumePending(entry, 1);
+-                    break;
+-                case 9:
+-                    SceneActors_ConfigureEffect(s, m[4], 0xB4, 0xB4);
+-                    Trigger_ConsumePending(entry, 1);
+-                    break;
+-                case 17:
+-                    t->b3B8 = m[4];
+-                    Trigger_ConsumePending(entry, 1);
+-                    break;
+-                case 2:
+-                    s->h54 = m[4];
+-                    s->h56 = m[5];
+-                    s->h58 = m[6];
+-                    t->h260 = s->h54;
+-                    t->h262 = t->h344 + s->h56;
+-                    t->h264 = s->h58;
+-                    Trigger_ConsumePending(entry, 1);
+-                    break;
+-                case 66:
+-                    t->b3BA = m[4];
+-                    setState(s, 21);
+-                    s->changed = 1;
+-                    break;
+-            }
+-            i++;
+-        } while (i < entry->count[gUnk_0200047C[0x24]]);
+-}
+-#else
+-INCLUDE_ASM("asm/nonmatching", SceneActors_DispatchCommands);
+-#endif
+diff --git a/src/fn/sub_080235F4.c b/src/fn/sub_080235F4.c
+deleted file mode 100644
+index c099aad0a..000000000
+--- a/src/fn/sub_080235F4.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-
+-void Trigger_ConsumePending(void *, u32);
+-
+-struct S {
+-    u8 pad[0xAA];
+-    u8 st;
+-    u8 pad2[4];
+-    u8 f1;
+-    u8 f2;
+-    u8 pad3[0xC4 - 0xB1];
+-    u32 cnt;
+-};
+-
+-static inline u8 TakeFlag(struct S *p)
+-{
+-    if (p->f2) {
+-        p->f2 = 0;
+-        p->f1 = 0;
+-        return TRUE;
+-    }
+-    return FALSE;
+-}
+-
+-void SceneActorState_AdvanceToState1A(struct S *p)
+-{
+-    if (TakeFlag(p)) {
+-        u32 v = 0x1a;
+-        p->st = v;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    }
+-    p->cnt++;
+-}
+diff --git a/src/fn/sub_08023638.c b/src/fn/sub_08023638.c
+deleted file mode 100644
+index b82dd5d92..000000000
+--- a/src/fn/sub_08023638.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[5];
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-static inline u8 chk(struct S *p)
+-{
+-    u8 *q = &p->b0;
+-    if (*q) {
+-        *q = 0;
+-        q--;
+-        *q = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-void SceneActorState_AdvanceToState01(struct S *p)
+-{
+-    u8 r = chk(p);
+-    if (r == 1) {
+-        p->aa = r;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    }
+-    p->c4++;
+-}
+diff --git a/src/fn/sub_0802367C.c b/src/fn/sub_0802367C.c
+deleted file mode 100644
+index bad1c2c26..000000000
+--- a/src/fn/sub_0802367C.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-
+-void Trigger_ConsumePending(void *, u32);
+-
+-struct S {
+-    u8 pad[0xAA];
+-    u8 st;
+-    u8 pad2[4];
+-    u8 f1;
+-    u8 f2;
+-    u8 pad3[0xC4 - 0xB1];
+-    u32 cnt;
+-};
+-
+-static inline u8 TakeFlag(struct S *p)
+-{
+-    if (p->f2) {
+-        p->f2 = 0;
+-        p->f1 = 0;
+-        return TRUE;
+-    }
+-    return FALSE;
+-}
+-
+-void SceneActorState_AdvanceToState02(struct S *p)
+-{
+-    if (TakeFlag(p)) {
+-        u32 v = 2;
+-        p->st = v;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    }
+-    p->cnt++;
+-}
+diff --git a/src/fn/sub_080236C0.c b/src/fn/sub_080236C0.c
+deleted file mode 100644
+index ce514b01e..000000000
+--- a/src/fn/sub_080236C0.c
++++ /dev/null
+@@ -1,34 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_Acknowledge(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 3;
+-        p->aa = k;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08023720.c b/src/fn/sub_08023720.c
+deleted file mode 100644
+index f7b90def2..000000000
+--- a/src/fn/sub_08023720.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_AdvanceToState1B(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x1b;
+-        p->aa = k;
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08023770.c b/src/fn/sub_08023770.c
+deleted file mode 100644
+index 512fe9ac3..000000000
+--- a/src/fn/sub_08023770.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_AdvanceToState1C(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x1C;
+-        p->aa = k;
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_080237C0.c b/src/fn/sub_080237C0.c
+deleted file mode 100644
+index 44ee7fdf9..000000000
+--- a/src/fn/sub_080237C0.c
++++ /dev/null
+@@ -1,45 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_Resume(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x1d;
+-        p->aa = k;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    }
+-    if (p->af) {
+-        u32 two = 2;
+-        u32 z = 0;
+-        u32 one = 1;
+-        p->ac = two;
+-        p->ad = z;
+-        p->ae = one;
+-        p->c4 = z;
+-        p->b0 = one;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    } else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_0802383C.c b/src/fn/sub_0802383C.c
+deleted file mode 100644
+index 1da3527c8..000000000
+--- a/src/fn/sub_0802383C.c
++++ /dev/null
+@@ -1,43 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_AdvanceToState1E(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x1e;
+-        p->aa = k;
+-    }
+-    if (p->af) {
+-        u32 two = 2;
+-        u32 z = 0;
+-        p->ac = two;
+-        p->ad = z;
+-        p->ae = z;
+-        p->c4 = z;
+-        p->b0 = 1;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    } else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_080238A8.c b/src/fn/sub_080238A8.c
+deleted file mode 100644
+index 4fac2bfb1..000000000
+--- a/src/fn/sub_080238A8.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_AdvanceToState23(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x23;
+-        p->aa = k;
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_080238F8.c b/src/fn/sub_080238F8.c
+deleted file mode 100644
+index bfe82bb40..000000000
+--- a/src/fn/sub_080238F8.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_AdvanceToState24(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x24;
+-        p->aa = k;
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08023948.c b/src/fn/sub_08023948.c
+deleted file mode 100644
+index ac638f7c0..000000000
+--- a/src/fn/sub_08023948.c
++++ /dev/null
+@@ -1,41 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-    u8 padC8[0x2cc];
+-    u8 particle;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_AdvanceToState06(struct S *arg)
+-{
+-    struct S *p = arg;
+-    struct S *base = p;
+-    if (chk(p)) {
+-        u32 k = 6;
+-        u8 *state = &p->aa;
+-        u32 zero;
+-        zero = 0;
+-        *state = k;
+-        base->particle = zero;
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_080239A8.c b/src/fn/sub_080239A8.c
+deleted file mode 100644
+index f1ac12ee1..000000000
+--- a/src/fn/sub_080239A8.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_AdvanceToState20(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x20;
+-        p->aa = k;
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_080239F8.c b/src/fn/sub_080239F8.c
+deleted file mode 100644
+index 5f424e9e2..000000000
+--- a/src/fn/sub_080239F8.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_AdvanceToState21(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x21;
+-        p->aa = k;
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08023A48.c b/src/fn/sub_08023A48.c
+deleted file mode 100644
+index b51ecd64b..000000000
+--- a/src/fn/sub_08023A48.c
++++ /dev/null
+@@ -1,32 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_Hold(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x22;
+-        p->aa = k;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    }
+-    if (!p->af)
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08023A98.c b/src/fn/sub_08023A98.c
+deleted file mode 100644
+index 240d7fd19..000000000
+--- a/src/fn/sub_08023A98.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_PlayAnimation17AndConsumeTrigger(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x11;
+-        p->aa = k;
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08023AE8.c b/src/fn/sub_08023AE8.c
+deleted file mode 100644
+index bc6a1c81d..000000000
+--- a/src/fn/sub_08023AE8.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_PlayAnimation19AndConsumeTrigger(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x13;
+-        p->aa = k;
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08023B38.c b/src/fn/sub_08023B38.c
+deleted file mode 100644
+index b4e242801..000000000
+--- a/src/fn/sub_08023B38.c
++++ /dev/null
+@@ -1,42 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_PlayAnimation14ThenAdvance(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0xe;
+-        p->aa = k;
+-    }
+-    if (p->af) {
+-        u32 next = 0x11;
+-        u32 z;
+-        p->ae = next;
+-        z = 0;
+-        p->c4 = z;
+-        p->b0 = 1;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    } else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08023BA0.c b/src/fn/sub_08023BA0.c
+deleted file mode 100644
+index b0714af94..000000000
+--- a/src/fn/sub_08023BA0.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-
+-void Trigger_ConsumePending(void *, u32);
+-
+-struct S {
+-    u8 pad[0xAA];
+-    u8 st;
+-    u8 pad2[4];
+-    u8 f1;
+-    u8 f2;
+-    u8 pad3[0xC4 - 0xB1];
+-    u32 cnt;
+-};
+-
+-static inline u8 TakeFlag(struct S *p)
+-{
+-    if (p->f2) {
+-        p->f2 = 0;
+-        p->f1 = 0;
+-        return TRUE;
+-    }
+-    return FALSE;
+-}
+-
+-void SceneActorState_PlayAnimation15AndConsumeTrigger(struct S *p)
+-{
+-    if (TakeFlag(p)) {
+-        u32 v = 0xf;
+-        p->st = v;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    }
+-    p->cnt++;
+-}
+diff --git a/src/fn/sub_08023BE4.c b/src/fn/sub_08023BE4.c
+deleted file mode 100644
+index f3bfafaf9..000000000
+--- a/src/fn/sub_08023BE4.c
++++ /dev/null
+@@ -1,44 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_ResumeAfterAction(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x10;
+-        p->aa = k;
+-    }
+-    if (p->af) {
+-        u32 two = 2;
+-        u32 z = 0;
+-        u32 one = 1;
+-        p->ac = two;
+-        p->ad = z;
+-        p->ae = one;
+-        p->c4 = z;
+-        p->b0 = one;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    } else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08023C50.c b/src/fn/sub_08023C50.c
+deleted file mode 100644
+index ee26b6faf..000000000
+--- a/src/fn/sub_08023C50.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_PlayAnimation31AndConsumeTrigger(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x1F;
+-        p->aa = k;
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08023CA0.c b/src/fn/sub_08023CA0.c
+deleted file mode 100644
+index dd95d7bbd..000000000
+--- a/src/fn/sub_08023CA0.c
++++ /dev/null
+@@ -1,43 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_PlayAnimation37ThenResume(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x25;
+-        p->aa = k;
+-    }
+-    if (p->af) {
+-        u32 two = 2;
+-        u32 z = 0;
+-        p->ac = two;
+-        p->ad = z;
+-        p->ae = z;
+-        p->c4 = z;
+-        p->b0 = 1;
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    } else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08023D0C.c b/src/fn/sub_08023D0C.c
+deleted file mode 100644
+index d002183cd..000000000
+--- a/src/fn/sub_08023D0C.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-void Trigger_ConsumePending(void *, u32);
+-struct S {
+-    u8 f0[0xaa];
+-    u8 aa;
+-    u8 f1[4];
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_PlayAnimation39AndConsumeTrigger(struct S *p)
+-{
+-    if (chk(p)) {
+-        u32 k = 0x27;
+-        p->aa = k;
+-    }
+-    if (p->af)
+-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+-    else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08023D5C.c b/src/fn/sub_08023D5C.c
+deleted file mode 100644
+index 227f35a5d..000000000
+--- a/src/fn/sub_08023D5C.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-extern const u32 gUnk_08604E44[];
+-void Callback_InvokeActor(void *, u32);
+-void SceneActorState_DispatchPhaseHandler(u8 *p)
+-{
+-    Callback_InvokeActor(p, gUnk_08604E44[p[0xae]]);
+-}
+diff --git a/src/fn/sub_08023D78.c b/src/fn/sub_08023D78.c
+deleted file mode 100644
+index dda6959c6..000000000
+--- a/src/fn/sub_08023D78.c
++++ /dev/null
+@@ -1,69 +0,0 @@
+-#include "global.h"
+-struct Common {
+-    u8 pad0[0x90];
+-    u32 timer;
+-    s16 health, maxHealth;
+-    u8 pad98[2];
+-    u8 healthCheck, pad9b;
+-    u32 flags;
+-    u8 padA0[2];
+-    u8 reset;
+-    u8 padA3;
+-    u32 pending;
+-    u8 facing, facing8, requested, state;
+-    u8 active, actionReset, action, finished, entered, changed;
+-    u8 padB2[0x12];
+-    u32 actionTimer;
+-    u8 padC8[0x38];
+-    void (*callback)(void *);
+-};
+-static inline void state(struct Common *p, void (*fn)(void *), int id)
+-{
+-    int zero;
+-    p->state = id;
+-    zero = 0;
+-    p->callback = fn;
+-    p->timer = zero;
+-    p->changed = 1;
+-    p->reset = zero;
+-    p->pending = zero;
+-}
+-int GridAttack_SelectNextAction(void *);
+-void sub_08027214(void *);
+-static inline u8 chk(struct Common *p)
+-{
+-    if (p->entered) {
+-        p->entered = 0;
+-        p->finished = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-static inline void action(struct Common *p, int one, int id, int zero)
+-{
+-    p->active = one;
+-    p->actionReset = zero;
+-    p->action = id;
+-    p->actionTimer = zero;
+-    p->entered = one;
+-}
+-int SceneActorState_TryStartDeathOrFlaggedAction(struct Common *p)
+-{
+-    if (p->health <= 0 && p->healthCheck) {
+-        u32 mask = 2;
+-        p->flags |= mask;
+-        state(p, sub_08027214, 25);
+-    }
+-    p->healthCheck = 0;
+-    {
+-        u32 mask = 2;
+-        if (p->flags & mask) {
+-            action(p, 1, 3, 0);
+-            return 1;
+-        } else if (p->flags & 1) {
+-            action(p, 1, 2, 0);
+-            return 1;
+-        }
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_08023E24.c b/src/fn/sub_08023E24.c
+deleted file mode 100644
+index e2a6fcf4a..000000000
+--- a/src/fn/sub_08023E24.c
++++ /dev/null
+@@ -1,60 +0,0 @@
+-#include "global.h"
+-typedef struct State {
+-    u8 pad0[0x90];
+-    u32 tick;
+-    s16 hp, maxHp;
+-    u16 extra;
+-    u8 vulnerable, kind;
+-    u32 flags;
+-    u8 unknownA0[2];
+-    u8 unknownA2, unknownA3;
+-    u32 unknownA4;
+-    u8 facing, facing8, animation, state, mode, submode, phase, finished, enter, changed;
+-    u8 padB2[0x12];
+-    u32 elapsed;
+-    u8 padC8[0x38];
+-    void (*callback)(void *, int);
+-} State;
+-typedef struct Actor {
+-    State base;
+-    u8 pad104[0x23f];
+-    u8 variant;
+-    u8 pad344[0x12];
+-    u16 delay;
+-} Actor;
+-static inline u8 enter(State *p)
+-{
+-    if (p->enter) {
+-        p->enter = 0;
+-        p->finished = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-void sub_08022EA4(void *, void *);
+-int SceneActorState_StepTableByKind(void *);
+-void SceneActorState_WaitForDelayedAction(Actor *p)
+-{
+-    State *s = &p->base;
+-    s->vulnerable = 1;
+-    if (enter(s) == 1) {
+-        if (p->variant == 0)
+-            s->animation = 1;
+-        else {
+-            u32 k = 2;
+-            s->animation = k;
+-        }
+-    }
+-    if (s->elapsed > p->delay && SceneActorState_StepTableByKind(p)) {
+-        sub_08022EA4(p, (u8 *)p + 0x9c4);
+-        {
+-            u32 one = 1;
+-            u32 zero;
+-            s->phase = one;
+-            zero = 0;
+-            s->elapsed = zero;
+-            s->enter = one;
+-        }
+-    } else
+-        s->elapsed++;
+-}
+diff --git a/src/fn/sub_08023EC0.c b/src/fn/sub_08023EC0.c
+deleted file mode 100644
+index b2fd4a79d..000000000
+--- a/src/fn/sub_08023EC0.c
++++ /dev/null
+@@ -1,53 +0,0 @@
+-#include "global.h"
+-typedef struct State {
+-    u8 pad0[0x90];
+-    u32 tick;
+-    s16 hp, maxHp;
+-    u16 extra;
+-    u8 vulnerable, kind;
+-    u32 flags;
+-    u8 unknownA0[2];
+-    u8 unknownA2, unknownA3;
+-    u32 unknownA4;
+-    u8 facing, facing8, animation, state, mode, submode, phase, finished, enter, changed;
+-    u8 padB2[0x12];
+-    u32 elapsed;
+-    u8 padC8[0x38];
+-    void (*callback)(void *, int);
+-} State;
+-typedef struct Actor {
+-    State base;
+-    u8 pad104[0x23f];
+-    u8 variant;
+-    u8 pad344[0x12];
+-    u16 delay;
+-} Actor;
+-static inline u8 enter(State *p)
+-{
+-    if (p->enter) {
+-        p->enter = 0;
+-        p->finished = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-void SceneActorState_SetValueClampedWhenInactive(void *, int);
+-void sub_08022DBC(void *);
+-void SceneActorState_UpdateVariantActionPlayback(Actor *p)
+-{
+-    State *s = &p->base;
+-    s->vulnerable = 1;
+-    if (enter(s))
+-        SceneActorState_SetValueClampedWhenInactive(p, 4);
+-    if (s->finished) {
+-        if (p->base.state != 3) {
+-            sub_08022DBC(p);
+-            p->delay = 60;
+-            return;
+-        } else {
+-            u32 k = 4;
+-            p->base.animation = k;
+-        }
+-    }
+-    s->elapsed++;
+-}
+diff --git a/src/fn/sub_08023F34.c b/src/fn/sub_08023F34.c
+deleted file mode 100644
+index 5552a220b..000000000
+--- a/src/fn/sub_08023F34.c
++++ /dev/null
+@@ -1,50 +0,0 @@
+-#include "global.h"
+-typedef struct State {
+-    u8 pad0[0x90];
+-    u32 tick;
+-    s16 hp, maxHp;
+-    u16 extra;
+-    u8 vulnerable, kind;
+-    u32 flags;
+-    u8 unknownA0[2];
+-    u8 unknownA2, unknownA3;
+-    u32 unknownA4;
+-    u8 facing, facing8, animation, state, mode, submode, phase, finished, enter, changed;
+-    u8 padB2[0x12];
+-    u32 elapsed;
+-    u8 padC8[0x38];
+-    void (*callback)(void *, int);
+-} State;
+-typedef struct Actor {
+-    State base;
+-    u8 pad104[0x23f];
+-    u8 variant;
+-    u8 pad344[0x12];
+-    u16 delay;
+-} Actor;
+-static inline u8 enter(State *p)
+-{
+-    if (p->enter) {
+-        p->enter = 0;
+-        p->finished = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-void SceneActorState_PlayAnimation5ThenAdvance(State *p)
+-{
+-    p->vulnerable = 1;
+-    if (enter(p)) {
+-        u32 k = 5;
+-        p->animation = k;
+-    }
+-    if (p->finished) {
+-        u32 next = 3;
+-        u32 zero;
+-        p->phase = next;
+-        zero = 0;
+-        p->elapsed = zero;
+-        p->enter = 1;
+-    } else
+-        p->elapsed++;
+-}
+diff --git a/src/fn/sub_08023F98.c b/src/fn/sub_08023F98.c
+deleted file mode 100644
+index 485c5e6f0..000000000
+--- a/src/fn/sub_08023F98.c
++++ /dev/null
+@@ -1,70 +0,0 @@
+-#include "global.h"
+-typedef struct State {
+-    u8 pad0[0x90];
+-    u32 tick;
+-    s16 hp;
+-    s16 maxHp;
+-    u16 extra;
+-    u8 vulnerable;
+-    u8 kind;
+-    u32 flags;
+-    u8 unknownA0[2];
+-    u8 unknownA2;
+-    u8 unknownA3;
+-    u32 unknownA4;
+-    u8 facing;
+-    u8 facing8;
+-    u8 animation;
+-    u8 state;
+-    u8 mode;
+-    u8 submode;
+-    u8 phase;
+-    u8 finished;
+-    u8 enter;
+-    u8 changed;
+-    u8 padB2[0x12];
+-    u32 elapsed;
+-    u8 padC8[0x38];
+-    void (*callback)(void *, int);
+-} State;
+-typedef struct Actor {
+-    State base;
+-    u8 pad104[0x23f];
+-    u8 variant;
+-    u8 pad344[0x12];
+-    u16 delay;
+-} Actor;
+-static inline u8 enter(State *p)
+-{
+-    if (p->enter) {
+-        p->enter = 0;
+-        p->finished = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-void SceneActorState_EnterPhase6AndResetAnimation(State *p)
+-{
+-    int bit;
+-    {
+-        u32 next = 6;
+-        u32 zero;
+-        p->phase = next;
+-        zero = 0;
+-        p->elapsed = zero;
+-        p->enter = 1;
+-    }
+-    {
+-        u32 k = 9;
+-        p->animation = k;
+-    }
+-    (*((void (**)(void *))(((u8 *)p) + 0x108)))(p);
+-    p->animation = 0;
+-    {
+-        u32 *flags = &p->flags;
+-        u32 mask = ~0x40u;
+-        bit = 0x40;
+-        p->flags &= ~bit;
+-    }
+-    ((u8 *)p)[0x383] = 0;
+-}
+diff --git a/src/fn/sub_0802429C.c b/src/fn/sub_0802429C.c
+deleted file mode 100644
+index c9ca4637f..000000000
+--- a/src/fn/sub_0802429C.c
++++ /dev/null
+@@ -1,54 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_030053F4;
+-struct S {
+-    u8 f0[0x9a];
+-    u8 a9a;
+-    u8 f9[0xf];
+-    u8 aa;
+-    u8 f1;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-    u8 f3[0x28e];
+-    u16 h356;
+-};
+-
+-static inline u8 chk(struct S *p, u32 z)
+-{
+-    if (p->b0) {
+-        p->b0 = z;
+-        p->af = z;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_PlayAnimation7ThenRecover(struct S *p)
+-{
+-    struct S *p2 = p;
+-    u32 z;
+-    u8 *a = &p->a9a;
+-    z = 0;
+-    *a = 1;
+-    if (chk(p, z)) {
+-        u32 k = 7;
+-        p->aa = k;
+-    }
+-    if (p->af) {
+-        u32 z2 = 0;
+-        p2->ac = z2;
+-        p2->ad = z2;
+-        p2->ae = z2;
+-        p2->c4 = z2;
+-        p2->b0 = 1;
+-        if (gUnk_030053F4 & 0x1000)
+-            p2->h356 = z2;
+-        else
+-            p2->h356 = 0x5a;
+-    } else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08024334.c b/src/fn/sub_08024334.c
+deleted file mode 100644
+index 8e58dac03..000000000
+--- a/src/fn/sub_08024334.c
++++ /dev/null
+@@ -1,54 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_030053F4;
+-struct S {
+-    u8 f0[0x9a];
+-    u8 a9a;
+-    u8 f9[0xf];
+-    u8 aa;
+-    u8 f1;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-    u8 f3[0x28e];
+-    u16 h356;
+-};
+-
+-static inline u8 chk(struct S *p, u32 z)
+-{
+-    if (p->b0) {
+-        p->b0 = z;
+-        p->af = z;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_PlayAnimation8ThenRecover(struct S *p)
+-{
+-    struct S *p2 = p;
+-    u32 z;
+-    u8 *a = &p->a9a;
+-    z = 0;
+-    *a = 1;
+-    if (chk(p, z)) {
+-        u32 k = 8;
+-        p->aa = k;
+-    }
+-    if (p->af) {
+-        u32 z2 = 0;
+-        p2->ac = z2;
+-        p2->ad = z2;
+-        p2->ae = z2;
+-        p2->c4 = z2;
+-        p2->b0 = 1;
+-        if (gUnk_030053F4 & 0x1000)
+-            p2->h356 = z2;
+-        else
+-            p2->h356 = 0x1E;
+-    } else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08024440.c b/src/fn/sub_08024440.c
+deleted file mode 100644
+index 86e62b4de..000000000
+--- a/src/fn/sub_08024440.c
++++ /dev/null
+@@ -1,54 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_030053F4;
+-struct S {
+-    u8 f0[0x9a];
+-    u8 a9a;
+-    u8 f9[0xf];
+-    u8 aa;
+-    u8 f1;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-    u8 f3[0x28e];
+-    u16 h356;
+-};
+-
+-static inline u8 chk(struct S *p, u32 z)
+-{
+-    if (p->b0) {
+-        p->b0 = z;
+-        p->af = z;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_PlayAnimation10ThenRecover(struct S *p)
+-{
+-    struct S *p2 = p;
+-    u32 z;
+-    u8 *a = &p->a9a;
+-    z = 0;
+-    *a = 1;
+-    if (chk(p, z)) {
+-        u32 k = 10;
+-        p->aa = k;
+-    }
+-    if (p->af) {
+-        u32 z2 = 0;
+-        p2->ac = z2;
+-        p2->ad = z2;
+-        p2->ae = z2;
+-        p2->c4 = z2;
+-        p2->b0 = 1;
+-        if (gUnk_030053F4 & 0x1000)
+-            p2->h356 = z2;
+-        else
+-            p2->h356 = 0x1E;
+-    } else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_080244D8.c b/src/fn/sub_080244D8.c
+deleted file mode 100644
+index 955179288..000000000
+--- a/src/fn/sub_080244D8.c
++++ /dev/null
+@@ -1,54 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_030053F4;
+-struct S {
+-    u8 f0[0x9a];
+-    u8 a9a;
+-    u8 f9[0xf];
+-    u8 aa;
+-    u8 f1;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-    u8 f3[0x28e];
+-    u16 h356;
+-};
+-
+-static inline u8 chk(struct S *p, u32 z)
+-{
+-    if (p->b0) {
+-        p->b0 = z;
+-        p->af = z;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_PlayAnimation11ThenRecover(struct S *p)
+-{
+-    struct S *p2 = p;
+-    u32 z;
+-    u8 *a = &p->a9a;
+-    z = 0;
+-    *a = 1;
+-    if (chk(p, z)) {
+-        u32 k = 11;
+-        p->aa = k;
+-    }
+-    if (p->af) {
+-        u32 z2 = 0;
+-        p2->ac = z2;
+-        p2->ad = z2;
+-        p2->ae = z2;
+-        p2->c4 = z2;
+-        p2->b0 = 1;
+-        if (gUnk_030053F4 & 0x1000)
+-            p2->h356 = z2;
+-        else
+-            p2->h356 = 0x1E;
+-    } else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08024570.c b/src/fn/sub_08024570.c
+deleted file mode 100644
+index bdf9a1103..000000000
+--- a/src/fn/sub_08024570.c
++++ /dev/null
+@@ -1,61 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_030053F4;
+-void SceneActorState_SetValueClampedWhenActive(void *, u32);
+-struct S {
+-    u8 f0[0x9a];
+-    u8 a9a;
+-    u8 f9[0xf];
+-    u8 aa;
+-    u8 ab;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-    u8 f3[0x28e];
+-    u16 h356;
+-};
+-
+-static inline u8 chk(struct S *p, u32 z)
+-{
+-    if (p->b0) {
+-        p->b0 = z;
+-        p->af = z;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_PlayVariantAnimation12ThenRecover(struct S *p)
+-{
+-    struct S *p2 = p;
+-    u32 z;
+-    u8 *a = &p->a9a;
+-    z = 0;
+-    *a = 1;
+-    if (chk(p, z))
+-        SceneActorState_SetValueClampedWhenActive(p2, 0xc);
+-    if (p->af) {
+-        if (p2->ab == 3) {
+-            u32 k = 0xc;
+-            p2->aa = k;
+-            goto inc;
+-        } else {
+-            u32 z2 = 0;
+-            p2->ac = z2;
+-            p2->ad = z2;
+-            p2->ae = z2;
+-            p2->c4 = z2;
+-            p2->b0 = 1;
+-            if (gUnk_030053F4 & 0x1000)
+-                p2->h356 = z2;
+-            else
+-                p2->h356 = 0x5a;
+-        }
+-    } else {
+-    inc:
+-        p->c4++;
+-    }
+-}
+diff --git a/src/fn/sub_0802461C.c b/src/fn/sub_0802461C.c
+deleted file mode 100644
+index 85d13d61d..000000000
+--- a/src/fn/sub_0802461C.c
++++ /dev/null
+@@ -1,61 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_030053F4;
+-void SceneActorState_SetValueClampedWhenActive(void *, u32);
+-struct S {
+-    u8 f0[0x9a];
+-    u8 a9a;
+-    u8 f9[0xf];
+-    u8 aa;
+-    u8 ab;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-    u8 f3[0x28e];
+-    u16 h356;
+-};
+-
+-static inline u8 chk(struct S *p, u32 z)
+-{
+-    if (p->b0) {
+-        p->b0 = z;
+-        p->af = z;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_PlayVariantAnimation13ThenRecover(struct S *p)
+-{
+-    struct S *p2 = p;
+-    u32 z;
+-    u8 *a = &p->a9a;
+-    z = 0;
+-    *a = 1;
+-    if (chk(p, z))
+-        SceneActorState_SetValueClampedWhenActive(p2, 0xD);
+-    if (p->af) {
+-        if (p2->ab == 3) {
+-            u32 k = 0xD;
+-            p2->aa = k;
+-            goto inc;
+-        } else {
+-            u32 z2 = 0;
+-            p2->ac = z2;
+-            p2->ad = z2;
+-            p2->ae = z2;
+-            p2->c4 = z2;
+-            p2->b0 = 1;
+-            if (gUnk_030053F4 & 0x1000)
+-                p2->h356 = z2;
+-            else
+-                p2->h356 = 0x96;
+-        }
+-    } else {
+-    inc:
+-        p->c4++;
+-    }
+-}
+diff --git a/src/fn/sub_080246C8.c b/src/fn/sub_080246C8.c
+deleted file mode 100644
+index bf73830e6..000000000
+--- a/src/fn/sub_080246C8.c
++++ /dev/null
+@@ -1,71 +0,0 @@
+-#include "global.h"
+-#include "contact_actor.h"
+-typedef struct State {
+-    u8 pad0[0x90];
+-    u32 tick;
+-    s16 hp, maxHp;
+-    u16 extra;
+-    u8 vulnerable, kind;
+-    u32 flags;
+-    u8 unknownA0[2];
+-    u8 unknownA2, unknownA3;
+-    u32 unknownA4;
+-    u8 facing, facing8, animation, state, mode, submode, phase, finished, enter, changed;
+-    u8 padB2[0x12];
+-    u32 elapsed;
+-    u8 padC8[0x38];
+-    void (*callback)(void *, int);
+-} State;
+-typedef struct Actor {
+-    State base;
+-    u8 pad104[0x2A0];
+-    s32 f3a4;
+-    u8 pad3a8[0x630];
+-    void *pool;
+-} Actor;
+-
+-void ContactActorPool_Start();
+-
+-static inline u8 enter(State *p)
+-{
+-    if (p->enter) {
+-        p->enter = 0;
+-        p->finished = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_StartContactPool(Actor *a)
+-{
+-    State *p = &a->base;
+-    struct ContactPosition pos;
+-    struct ContactPosition pos2;
+-    u8 *src = (u8 *)p + 0x48;
+-
+-    if (enter(p)) {
+-        u32 k = 0xE;
+-        p->animation = k;
+-    }
+-    if (p->finished) {
+-        struct ContactPosition *pp = &pos;
+-        struct ContactPosition *pp2;
+-        pos = *(struct ContactPosition *)(src + 0xC);
+-        pp->y += 200;
+-        pp2 = &pos2;
+-        pos2 = *pp;
+-        {
+-            s32 v = p->hp;
+-            a->f3a4 = v;
+-        }
+-        if (a->pool)
+-            ContactActorPool_Start(a->pool, pp, pp2, 10, 10);
+-        {
+-            u32 next = 0xC;
+-            p->phase = next;
+-        }
+-        p->elapsed = 0;
+-        p->enter = 1;
+-    } else
+-        p->elapsed++;
+-}
+diff --git a/src/fn/sub_08024774.c b/src/fn/sub_08024774.c
+deleted file mode 100644
+index 1381eec54..000000000
+--- a/src/fn/sub_08024774.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#include "global.h"
+-
+-struct S {
+-    u8 pad[0xAA];
+-    u8 st;
+-    u8 pad2[4];
+-    u8 f1;
+-    u8 f2;
+-    u8 pad3[0xC4 - 0xB1];
+-    u32 cnt;
+-};
+-
+-static inline u8 TakeFlag(struct S *p)
+-{
+-    if (p->f2) {
+-        p->f2 = 0;
+-        p->f1 = 0;
+-        return TRUE;
+-    }
+-    return FALSE;
+-}
+-
+-void SceneActorState_HoldAnimation15(struct S *p)
+-{
+-    if (TakeFlag(p)) {
+-        u32 v = 0xF;
+-        p->st = v;
+-    }
+-    p->cnt++;
+-}
+diff --git a/src/fn/sub_080247AC.c b/src/fn/sub_080247AC.c
+deleted file mode 100644
+index 54dced16c..000000000
+--- a/src/fn/sub_080247AC.c
++++ /dev/null
+@@ -1,50 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_030053F4;
+-struct S {
+-    u8 f0[0x9a];
+-    u8 a9a;
+-    u8 f9[0xf];
+-    u8 aa;
+-    u8 f1;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-    u8 f3[0x28e];
+-    u16 h356;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_UpdateLongRecovery(struct S *p)
+-{
+-    struct S *p2 = p;
+-    if (chk(p)) {
+-        u32 k = 0x10;
+-        p->aa = k;
+-    }
+-    if (p->af) {
+-        u32 z2 = 0;
+-        p2->ac = z2;
+-        p2->ad = z2;
+-        p2->ae = z2;
+-        p2->c4 = z2;
+-        p2->b0 = 1;
+-        if (gUnk_030053F4 & 0x1000)
+-            p2->h356 = z2;
+-        else
+-            p2->h356 = 0x5a;
+-    } else
+-        p->c4++;
+-}
+diff --git a/src/fn/sub_08024944.c b/src/fn/sub_08024944.c
+deleted file mode 100644
+index 5a8e7e7c8..000000000
+--- a/src/fn/sub_08024944.c
++++ /dev/null
+@@ -1,61 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_030053F4;
+-void SceneActorState_SetValueClampedWhenActive(void *, u32);
+-struct S {
+-    u8 f0[0x9a];
+-    u8 a9a;
+-    u8 f9[0xf];
+-    u8 aa;
+-    u8 ab;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-    u8 f3[0x28e];
+-    u16 h356;
+-};
+-
+-static inline u8 chk(struct S *p, u32 z)
+-{
+-    if (p->b0) {
+-        p->b0 = z;
+-        p->af = z;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_UpdateAction20Recovery(struct S *p)
+-{
+-    struct S *p2 = p;
+-    u32 z;
+-    u8 *a = &p->a9a;
+-    z = 0;
+-    *a = 1;
+-    if (chk(p, z))
+-        SceneActorState_SetValueClampedWhenActive(p2, 0x14);
+-    if (p->af) {
+-        if (p2->ab == 3) {
+-            u32 k = 0x14;
+-            p2->aa = k;
+-            goto inc;
+-        } else {
+-            u32 z2 = 0;
+-            p2->ac = z2;
+-            p2->ad = z2;
+-            p2->ae = z2;
+-            p2->c4 = z2;
+-            p2->b0 = 1;
+-            if (gUnk_030053F4 & 0x1000)
+-                p2->h356 = z2;
+-            else
+-                p2->h356 = 0x5a;
+-        }
+-    } else {
+-    inc:
+-        p->c4++;
+-    }
+-}
+diff --git a/src/fn/sub_080249F0.c b/src/fn/sub_080249F0.c
+deleted file mode 100644
+index 346f12a0f..000000000
+--- a/src/fn/sub_080249F0.c
++++ /dev/null
+@@ -1,61 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_030053F4;
+-void SceneActorState_SetValueClampedWhenActive(void *, u32);
+-struct S {
+-    u8 f0[0x9a];
+-    u8 a9a;
+-    u8 f9[0xf];
+-    u8 aa;
+-    u8 ab;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-    u8 f3[0x28e];
+-    u16 h356;
+-};
+-
+-static inline u8 chk(struct S *p, u32 z)
+-{
+-    if (p->b0) {
+-        p->b0 = z;
+-        p->af = z;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_UpdateAction21Recovery(struct S *p)
+-{
+-    struct S *p2 = p;
+-    u32 z;
+-    u8 *a = &p->a9a;
+-    z = 0;
+-    *a = 1;
+-    if (chk(p, z))
+-        SceneActorState_SetValueClampedWhenActive(p2, 0x15);
+-    if (p->af) {
+-        if (p2->ab == 3) {
+-            u32 k = 0x15;
+-            p2->aa = k;
+-            goto inc;
+-        } else {
+-            u32 z2 = 0;
+-            p2->ac = z2;
+-            p2->ad = z2;
+-            p2->ae = z2;
+-            p2->c4 = z2;
+-            p2->b0 = 1;
+-            if (gUnk_030053F4 & 0x1000)
+-                p2->h356 = z2;
+-            else
+-                p2->h356 = 0x5a;
+-        }
+-    } else {
+-    inc:
+-        p->c4++;
+-    }
+-}
+diff --git a/src/fn/sub_08024A9C.c b/src/fn/sub_08024A9C.c
+deleted file mode 100644
+index 342dbde4f..000000000
+--- a/src/fn/sub_08024A9C.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#include "global.h"
+-
+-struct S {
+-    u8 pad[0xAA];
+-    u8 st;
+-    u8 pad2[4];
+-    u8 f1;
+-    u8 f2;
+-    u8 pad3[0xC4 - 0xB1];
+-    u32 cnt;
+-};
+-
+-static inline u8 TakeFlag(struct S *p)
+-{
+-    if (p->f2) {
+-        p->f2 = 0;
+-        p->f1 = 0;
+-        return TRUE;
+-    }
+-    return FALSE;
+-}
+-
+-void SceneActorState_UpdateAction22(struct S *p)
+-{
+-    if (TakeFlag(p)) {
+-        u32 v = 0x16;
+-        p->st = v;
+-    }
+-    p->cnt++;
+-}
+diff --git a/src/fn/sub_08024AD4.c b/src/fn/sub_08024AD4.c
+deleted file mode 100644
+index ff0099ae7..000000000
+--- a/src/fn/sub_08024AD4.c
++++ /dev/null
+@@ -1,50 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_030053F4;
+-struct S {
+-    u8 f0[0x9a];
+-    u8 a9a;
+-    u8 f9[0xf];
+-    u8 aa;
+-    u8 f1;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-    u8 f3[0x28e];
+-    u16 h356;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_UpdateShortRecovery(struct S *p)
+-{
+-    struct S *p2 = p;
+-    if (chk(p)) {
+-        u32 k = 0x17;
+-        p->aa = k;
+-    }
+-    if (p->af) {
+-        u32 z2 = 0;
+-        p2->ac = z2;
+-        p2->ad = z2;
+-        p2->ae = z2;
+-        p2->c4 = z2;
+-        p2->b0 = 1;
+-        if (gUnk_030053F4 & 0x1000)
+-            p2->h356 = z2;
+-        else
+-            p2->h356 = 0x1e;
+-    }
+-    p->c4++;
+-}
+diff --git a/src/fn/sub_08024B60.c b/src/fn/sub_08024B60.c
+deleted file mode 100644
+index dc9b4884d..000000000
+--- a/src/fn/sub_08024B60.c
++++ /dev/null
+@@ -1,57 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_030053F4;
+-struct S {
+-    u8 f0[0x9a];
+-    u8 a9a;
+-    u8 f9[0xf];
+-    u8 aa;
+-    u8 f1;
+-    u8 ac;
+-    u8 ad;
+-    u8 ae;
+-    u8 af;
+-    u8 b0;
+-    u8 f2[0x13];
+-    u32 c4;
+-    u8 f3[0x28e];
+-    u16 h356;
+-};
+-
+-static inline u8 chk(struct S *p)
+-{
+-    if (p->b0) {
+-        p->b0 = 0;
+-        p->af = 0;
+-        return 1;
+-    }
+-    return 0;
+-}
+-
+-void SceneActorState_WaitForFlagRelease(struct S *p)
+-{
+-    struct S *p2 = p;
+-    int one;
+-    if (chk(p)) {
+-        u32 k = 0x18;
+-        p->aa = k;
+-    }
+-    one = 1;
+-    {
+-        u32 mask = one;
+-    }
+-    if (!((*((u32 *)(((u8 *)p) + 0x9c))) & 1)) {
+-        u32 z2 = 0;
+-        p2->ac = z2;
+-        p2->ad = z2;
+-        p2->ae = z2;
+-        p2->c4 = z2;
+-        p2->b0 = 1;
+-        if (gUnk_030053F4 & 0x1000) {
+-            p2->h356 = z2;
+-        } else {
+-            p2->h356 = 0x1e;
+-        }
+-    } else {
+-        p->c4++;
+-    }
+-}
+diff --git a/src/fn/sub_08024BEC.c b/src/fn/sub_08024BEC.c
+deleted file mode 100644
+index e8462b642..000000000
+--- a/src/fn/sub_08024BEC.c
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#include "global.h"
+-struct S {
+-    u8 f0[0xb0];
+-    u8 b0;
+-    u8 f1[0x13];
+-    u32 c4;
+-};
+-void SceneActorState_UpdatePassiveAction(struct S *p)
+-{
+-    u8 *q = &p->b0;
+-    if (*q) {
+-        *q = 0;
+-        q--;
+-        *q = 0;
+-    }
+-    p->c4++;
+-}
+diff --git a/src/fn/sub_08024C10.c b/src/fn/sub_08024C10.c
+deleted file mode 100644
+index 9efb4ac49..000000000
+--- a/src/fn/sub_08024C10.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-extern const u32 gUnk_08604E9C[];
+-void Callback_InvokeActor(void *, u32);
+-void SceneActorState_DispatchPrimaryAction(u8 *p)
+-{
+-    Callback_InvokeActor(p, gUnk_08604E9C[p[0xae]]);
+-}
+diff --git a/src/fn/sub_08024C2C.c b/src/fn/sub_08024C2C.c
+deleted file mode 100644
+index 753e6711d..000000000
+--- a/src/fn/sub_08024C2C.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-extern const u32 gUnk_08604EE0[];
+-void Callback_InvokeActor(void *, u32);
+-void SceneActorState_DispatchSecondaryAction(u8 *p)
+-{
+-    Callback_InvokeActor(p, gUnk_08604EE0[p[0xae]]);
+-}
+diff --git a/src/fn/sub_08024C48.c b/src/fn/sub_08024C48.c
+deleted file mode 100644
+index 15d70672c..000000000
+--- a/src/fn/sub_08024C48.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_02000560;
+-extern const u32 gUnk_08604EF0[];
+-s32 SceneActorState_TryStartDeathOrFlaggedAction(void *);
+-void Callback_InvokeActor(void *, u32);
+-void SceneActorState_UpdateActiveActions(u8 *p)
+-{
+-    u32 m = 4;
+-    if (!(gUnk_02000560 & m)) {
+-        if (SceneActorState_TryStartDeathOrFlaggedAction(p) == 0) {
+-            Callback_InvokeActor(p, gUnk_08604EF0[p[0xad]]);
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_08024C84.c b/src/fn/sub_08024C84.c
+deleted file mode 100644
+index 722b43701..000000000
+--- a/src/fn/sub_08024C84.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-extern const u32 gUnk_08604EF4[];
+-void Callback_InvokeActor(void *, u32);
+-void SceneActorState_UpdateSecondaryActions(u8 *p)
+-{
+-    Callback_InvokeActor(p, gUnk_08604EF4[p[0xAD]]);
+-}
+diff --git a/src/fn/sub_08024CA0.c b/src/fn/sub_08024CA0.c
+deleted file mode 100644
+index c91863c9a..000000000
+--- a/src/fn/sub_08024CA0.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-extern const u32 gUnk_08604EF8[];
+-void Callback_InvokeActor(void *, u32);
+-void SceneActorState_UpdatePassiveActions(u8 *p)
+-{
+-    Callback_InvokeActor(p, gUnk_08604EF8[p[0xAD]]);
+-}
+diff --git a/src/fn/sub_08024CBC.c b/src/fn/sub_08024CBC.c
+deleted file mode 100644
+index 5670f229f..000000000
+--- a/src/fn/sub_08024CBC.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "global.h"
+-
+-extern u32 gUnk_08604EFC[];
+-struct A {
+-    u8 f[0xa1];
+-    u8 a;
+-    u8 g[0xa];
+-    u8 i;
+-};
+-void Callback_InvokeActor(void *, u32);
+-
+-void SceneActorState_UpdateActionController(struct A *p)
+-{
+-    p->a = 0;
+-    Callback_InvokeActor(p, gUnk_08604EFC[p->i]);
+-}
+diff --git a/src/fn/sub_08024CE0.c b/src/fn/sub_08024CE0.c
+deleted file mode 100644
+index 688e1c2bb..000000000
+--- a/src/fn/sub_08024CE0.c
++++ /dev/null
+@@ -1,81 +0,0 @@
+-// MATCHING_CONCESSION: register-pinning
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[7];
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    void (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x22e];
+-    u8 variant;
+-    u16 scale, minScale, maxScale;
+-    u8 pad34A[0x62];
+-    u32 mode;
+-} ActorAnimation;
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    register int shifted asm("r0");
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    asm("" : "+r"(shifted));
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    asm("" : "+r"(shifted));
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
+-void SceneActorAnimation_UpdateDirectionalCallback(ActorAnimation *p)
+-{
+-    ActorAnimation *p2 = p;
+-    if (!p->locked)
+-        setFacing(p, p->requestedAngle);
+-    if (p->changed) {
+-        int sequence;
+-        p->changed = 0;
+-        if (p->locked)
+-            setFacing(p, p->savedAngle);
+-        {
+-            int test = p->mode & 1;
+-            sequence = 43;
+-            if (test)
+-                sequence = 5;
+-        }
+-        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1,
+-                                              4);
+-    } else {
+-        int sequence;
+-        {
+-            int test = p->mode & 1;
+-            sequence = 43;
+-            if (test)
+-                sequence = 5;
+-        }
+-        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1,
+-                                              1);
+-    }
+-    p2->minScale = 0;
+-    p2->maxScale = 0;
+-    p2->variant = 0;
+-    if (!p->tryUpdate(p)) {
+-        u32 mask = 0x40;
+-        p->flags |= mask;
+-        p->reset(p);
+-    }
+-}
+diff --git a/src/fn/sub_08024E18.c b/src/fn/sub_08024E18.c
+deleted file mode 100644
+index ac029a63d..000000000
+--- a/src/fn/sub_08024E18.c
++++ /dev/null
+@@ -1,77 +0,0 @@
+-// MATCHING_CONCESSION: register-pinning
+-#include "global.h"
+-typedef struct ActorAnimation {
+-    u8 pad0[0x51];
+-    u8 angle;
+-    u8 pad52[0x4a];
+-    u32 flags;
+-    u8 padA0[8];
+-    u8 facing, facing8;
+-    u8 padAA[7];
+-    u8 changed;
+-    u8 padB2;
+-    u8 locked;
+-    u8 padB4[0x18];
+-    u8 requestedAngle;
+-    u8 padCD[0x37];
+-    u8 (*tryUpdate)(void *);
+-    void (*reset)(void *);
+-    u8 pad10C[8];
+-    s8 savedAngle;
+-    u8 pad115[0x22e];
+-    u8 variant;
+-    u16 scale, minScale, maxScale;
+-    u8 pad34A[0x62];
+-    u32 mode;
+-} ActorAnimation;
+-static inline void setFacing(ActorAnimation *p, int angle)
+-{
+-    u32 value;
+-    register int shifted asm("r0");
+-    p->angle = angle;
+-    shifted = p->angle + 0x60;
+-    asm("" : "+r"(shifted));
+-    shifted >>= 6;
+-    value = 3 & shifted;
+-    p->facing = value;
+-    shifted = p->angle + 0x70;
+-    asm("" : "+r"(shifted));
+-    shifted >>= 5;
+-    value = 7 & shifted;
+-    p->facing8 = value;
+-}
+-void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
+-void SceneActorAnimation_UpdateEightDirectionCallback(ActorAnimation *p)
+-{
+-    if (!p->locked)
+-        setFacing(p, p->requestedAngle);
+-    if (p->changed) {
+-        int sequence;
+-        p->changed = 0;
+-        if (p->locked)
+-            setFacing(p, p->savedAngle);
+-        {
+-            int test = p->mode & 1;
+-            sequence = 38;
+-            if (test)
+-                sequence = 0;
+-        }
+-        SceneActors_StartEightDirectionAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1,
+-                                                 1, 4);
+-    } else {
+-        int sequence;
+-        {
+-            int test = p->mode & 1;
+-            sequence = 38;
+-            if (test)
+-                sequence = 0;
+-        }
+-        SceneActors_StartEightDirectionAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1,
+-                                                 1, 1);
+-    }
+-    if (!p->tryUpdate(p)) {
+-        u32 mask = 0x40;
+-        p->flags |= mask;
+-        p->reset(p);
+-    }
+-}
+diff --git a/src/fn/sub_0806E130.c b/src/fn/sub_0806E130.c
+index 044163da9..1fd8af153 100644
+--- a/src/fn/sub_0806E130.c
++++ b/src/fn/sub_0806E130.c
+@@ -30,9 +30,9 @@ s32 RouteSpritePool_Tick(struct RouteSpritePool *pool)
+             if (!Locked()) {
+                 i = 0;
+                 do {
+-                table = gUnk_08605BB0;
+-                state = (u32)&pool->slots[0].state;
+-                slot = start;
++                    table = gUnk_08605BB0;
++                    state = (u32)&pool->slots[0].state;
++                    slot = start;
+                 } while (0);
+                 for (; i < 4;) {
+                     if (Occupied(&pool->occupiedMask, i))
+diff --git a/src/fn/sub_080764C8.c b/src/fn/sub_080764C8.c
+index 9290b6e42..199a7a393 100644
+--- a/src/fn/sub_080764C8.c
++++ b/src/fn/sub_080764C8.c
+@@ -27,9 +27,9 @@ void SceneActorAnimation_SelectDirectionFlagsVariant(struct SceneActorAnimationV
+         }
+     }
+     do {
+-    variantReload = &directionVariant;
+-    mirrorValue = *mirrorPointer;
+-    entryFlags = entry->flags;
++        variantReload = &directionVariant;
++        mirrorValue = *mirrorPointer;
++        entryFlags = entry->flags;
+     } while (0);
+     selection = entry->value;
+     flags = mirrorValue | entryFlags;
+diff --git a/src/fn/sub_08080984.c b/src/fn/sub_08080984.c
+index 83f47ba2d..87c2e13ec 100644
+--- a/src/fn/sub_08080984.c
++++ b/src/fn/sub_08080984.c
+@@ -34,13 +34,15 @@ void SceneActorReaction_BeginReactionSound(struct SceneActorRegistryResetView *a
+                     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
+                     Sound_PlaySong(459);
+                     break;
+-        }
++            }
+             {
+                 u16 *timer = (u16 *)(((u8 *)actor) + 0x178);
+                 timerZero = 0;
+                 *timer = timerZero;
+             }
+-        } while (0);
++        }
++        while (0)
++            ;
+         if (actor->drawableKind == 0) {
+             u32 *sequence = actor->drawable;
+             u32 mask = timerZero - 2;
+diff --git a/src/fn/sub_0813C5B4.c b/src/fn/sub_0813C5B4.c
+index 01da607c1..c644232f6 100644
+--- a/src/fn/sub_0813C5B4.c
++++ b/src/fn/sub_0813C5B4.c
+@@ -55,7 +55,7 @@ void ConvergingEffects_EmitFarParticle(State *s, Point *pos)
+         angle = random_first() & 255;
+         radius = (random_first() & 127) + 256;
+         do {
+-        e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
++            e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
+         } while (0);
+         e->dy = scale(radius * gUnk_086149C4[angle]);
+         draw->pos = *pos;
+diff --git a/src/fn/sub_0817A57C.c b/src/fn/sub_0817A57C.c
+index 017026a41..7c0ff2be0 100644
+--- a/src/fn/sub_0817A57C.c
++++ b/src/fn/sub_0817A57C.c
+@@ -55,7 +55,7 @@ void SceneActors_SpawnConvergingParticle(State *s, Point *pos)
+         angle = random_first() & 255;
+         radius = (random_first() & 127) + 256;
+         do {
+-        e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
++            e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
+         } while (0);
+         e->dy = scale(radius * gUnk_086149C4[angle]);
+         draw->pos = *pos;
+diff --git a/src/tether_actor.c b/src/tether_actor.c
+index d9f595440..e1bf1548e 100644
+--- a/src/tether_actor.c
++++ b/src/tether_actor.c
+@@ -3387,7 +3387,7 @@ void TetherActor_UpdateWanderingState(struct TetherActor *actor)
+             angle = value << 5;
+         }
+         do {
+-        table = gUnk_086149C4;
++            table = gUnk_086149C4;
+         } while (0);
+         delta.x = scale(table[(angle + 64) & 255] * 3);
+         delta.y = 0;
+-- 
+2.39.3 (Apple Git-145)
+

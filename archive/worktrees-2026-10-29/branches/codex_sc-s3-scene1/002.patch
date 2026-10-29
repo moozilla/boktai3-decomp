@@ -1,0 +1,56 @@
+From b729d8a74578256a8f92439cbc4cb0b8369443e6 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 04:57:33 -0700
+Subject: [PATCH] Guard statement swaps against scalar dependencies
+
+Reject read/write and write/write scalar dependencies, including compound assignments, and request semantic checks for remaining statement swaps. This prevents a swap from moving a mask use before its initialization.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/rewrites.py  | 16 ++++++++++++++++
+ tools/seek/seek.py |  2 +-
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/tools/rewrites.py b/tools/rewrites.py
+index eb0734c86..28287ce43 100644
+--- a/tools/rewrites.py
++++ b/tools/rewrites.py
+@@ -334,6 +334,22 @@ def rw_swap_stmts(fn):
+             x, y = b.block_items[i], b.block_items[i + 1]
+             if isinstance(x, (ca.Decl, ca.Label, ca.Return)) or isinstance(y, (ca.Decl, ca.Label)):
+                 continue
++            # Do not reverse a direct scalar dependency, including compound assignments.
++            # Memory aliases still need the semantic check performed by seek.
++            def scalar_writes(stmt):
++                out = set()
++                for node, _, _ in walk(stmt):
++                    if isinstance(node, ca.Assignment) and isinstance(node.lvalue, ca.ID):
++                        out.add(node.lvalue.name)
++                    elif isinstance(node, ca.UnaryOp) and node.op in ("++", "--", "p++", "p--") and isinstance(node.expr, ca.ID):
++                        out.add(node.expr.name)
++                    elif isinstance(node, ca.Decl) and node.init is not None:
++                        out.add(node.name)
++                return out
++            ids_x = {node.name for node, _, _ in walk(x) if isinstance(node, ca.ID)}
++            ids_y = {node.name for node, _, _ in walk(y) if isinstance(node, ca.ID)}
++            if scalar_writes(x) & ids_y or scalar_writes(y) & ids_x:
++                continue
+             f2 = copy.deepcopy(fn)
+             b2 = blocks(f2)[bi]
+             b2.block_items[i], b2.block_items[i + 1] = b2.block_items[i + 1], b2.block_items[i]
+diff --git a/tools/seek/seek.py b/tools/seek/seek.py
+index 700592cea..3d97b5641 100644
+--- a/tools/seek/seek.py
++++ b/tools/seek/seek.py
+@@ -52,7 +52,7 @@ from perm_pycparser import c_ast as ca  # noqa: E402
+ from src import ast_util  # noqa: E402
+ 
+ CURRENT = os.path.join(E.LOCAL, "current")
+-SEM_FAMILIES = {"width", "cast", "explicit_narrow", "cse_temp", "inline_var", "reuse_stored", "related_const"}
++SEM_FAMILIES = {"width", "cast", "explicit_narrow", "cse_temp", "inline_var", "reuse_stored", "related_const", "swap_stmts"}
+ AGBCC_SRC = os.path.join(ROOT, "build", "scope", "agbcc", "gcc")
+ 
+ 
+-- 
+2.39.3 (Apple Git-145)
+

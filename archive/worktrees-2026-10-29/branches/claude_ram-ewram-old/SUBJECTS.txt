@@ -1,0 +1,17 @@
+Cast views of array-typed RAM objects as pointers; drop engine.h's repeat of gRandomTable
+Document ramlayout --cast and dedupe
+Fix gTrackedPlayerId as a four-entry array; unify drops repeated declarations of earlier rows
+Move gRandomTable to ram.h; unify its stragglers
+Name 45 EWRAM singletons, params blocks and buffers
+Name EWRAM object from batch c1 (named_object.h)
+Name gActorAttachmentManager
+Name gLinkSession (area_effect_link.h)
+Name gParticipantActors (scene_pool.h)
+Name gRandomTable and gHeap
+Name ten more EWRAM player-state and force words
+Name the script VM section, command table and state objects
+Name the script variable and game state backup pointers
+Name the weather state words at 02000080-0200008C
+Share gRandomTable's const declaration from headers
+ramlayout dedupe: drop headers' repeats of a shared RAM declaration
+ramlayout unify --cast: prefer a cast at each use over a file's own declaration; unify stragglers of ram.h objects

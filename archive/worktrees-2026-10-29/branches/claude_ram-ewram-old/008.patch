@@ -1,0 +1,339 @@
+From 602d5c2a19f27219163a48f6d09d271758db1ec9 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Tue, 27 Oct 2026 23:21:18 -0700
+Subject: [PATCH] Name gActorAttachmentManager
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+---
+ include/actor_attachment_state.h | 2 +-
+ src/fn/sub_08064D40.c            | 2 +-
+ src/fn/sub_08064DF8.c            | 2 +-
+ src/fn/sub_08065260.c            | 4 ++--
+ src/fn/sub_080654AC.c            | 4 ++--
+ src/fn/sub_080656D4.c            | 4 ++--
+ src/fn/sub_080659C4.c            | 2 +-
+ src/fn/sub_08065A70.c            | 2 +-
+ src/fn/sub_08065C50.c            | 2 +-
+ src/fn/sub_08065D1C.c            | 2 +-
+ src/fn/sub_08065DBC.c            | 2 +-
+ src/fn/sub_08065FD0.c            | 2 +-
+ src/fn/sub_08066278.c            | 2 +-
+ src/fn/sub_08066474.c            | 2 +-
+ src/fn/sub_080666D8.c            | 2 +-
+ src/fn/sub_080668B0.c            | 2 +-
+ src/fn/sub_08066B28.c            | 2 +-
+ src/fn/sub_08066C0C.c            | 2 +-
+ src/fn/sub_08066C34.c            | 4 ++--
+ src/fn/sub_08066C80.c            | 2 +-
+ src/fn/sub_08066C8C.c            | 2 +-
+ src/fn/sub_08066CB8.c            | 2 +-
+ symbols/ram.csv                  | 2 +-
+ 23 files changed, 27 insertions(+), 27 deletions(-)
+
+diff --git a/include/actor_attachment_state.h b/include/actor_attachment_state.h
+index 0a5b44bad..abad0d2dc 100644
+--- a/include/actor_attachment_state.h
++++ b/include/actor_attachment_state.h
+@@ -43,7 +43,7 @@ struct ActorAttachmentManagerView {
+     struct ActorAttachmentSlotView slots[8];
+     u32 occupiedMask;
+ };
+-extern struct ActorAttachmentManagerView *gUnk_02000124;
++extern struct ActorAttachmentManagerView *gActorAttachmentManager;
+ static inline u32 ActorAttachment_ReadByteFlags(const u8 *flags, u32 mask)
+ {
+     return *flags & mask;
+diff --git a/src/fn/sub_08064D40.c b/src/fn/sub_08064D40.c
+index a553ca82a..255061ccc 100644
+--- a/src/fn/sub_08064D40.c
++++ b/src/fn/sub_08064D40.c
+@@ -3,7 +3,7 @@
+ void ActorAttachment_BeginPartJitter(struct ActorAttachmentSlotView *slot, s32 indexInput)
+ {
+     s32 index = indexInput;
+-    if (gUnk_02000124 != NULL) {
++    if (gActorAttachmentManager != NULL) {
+         if (*slot->value <= slot->thresholds[index]) {
+             u8 *status;
+             s32 indexLow;
+diff --git a/src/fn/sub_08064DF8.c b/src/fn/sub_08064DF8.c
+index 67cf16b88..e637890f7 100644
+--- a/src/fn/sub_08064DF8.c
++++ b/src/fn/sub_08064DF8.c
+@@ -2,7 +2,7 @@
+ #include "actor_attachment_orbit_playback.h"
+ void ActorAttachment_TickDetachedParts(struct ActorAttachmentSlotView *slot)
+ {
+-    register struct ActorAttachmentManagerView *loaded asm("r0") = gUnk_02000124;
++    register struct ActorAttachmentManagerView *loaded asm("r0") = gActorAttachmentManager;
+     if (loaded) {
+         struct ActorAttachmentManagerView *manager = loaded;
+         struct ActorAttachmentPartSprite *parts = slot->parts;
+diff --git a/src/fn/sub_08065260.c b/src/fn/sub_08065260.c
+index 9ed9a980b..01bbd2d2d 100644
+--- a/src/fn/sub_08065260.c
++++ b/src/fn/sub_08065260.c
+@@ -3,8 +3,8 @@
+ void ActorAttachment_TickRisingPart(struct ActorAttachmentSlotView *slot)
+ {
+     s8 *finalSlotId;
+-    if (gUnk_02000124) {
+-        struct ActorAttachmentManagerView *manager = gUnk_02000124;
++    if (gActorAttachmentManager) {
++        struct ActorAttachmentManagerView *manager = gActorAttachmentManager;
+         struct ActorAttachmentPartSprite *sprite = slot->parts;
+         struct DisplaySequenceState *sequence = slot->sequences;
+         const struct ActorAttachmentPartResource *resource;
+diff --git a/src/fn/sub_080654AC.c b/src/fn/sub_080654AC.c
+index ba0ba1fe8..1483d1244 100644
+--- a/src/fn/sub_080654AC.c
++++ b/src/fn/sub_080654AC.c
+@@ -3,8 +3,8 @@
+ void ActorAttachment_TickWideShake(void *, struct ActorAttachmentSlotView *);
+ void ActorAttachment_TickDescendingSprite(struct ActorAttachmentSlotView *slot)
+ {
+-    if (gUnk_02000124) {
+-        struct ActorAttachmentManagerView *manager = gUnk_02000124;
++    if (gActorAttachmentManager) {
++        struct ActorAttachmentManagerView *manager = gActorAttachmentManager;
+         struct ContactSwarmSprite *sprite = &slot->sprite;
+         struct DisplaySequenceState *sequence = slot->sequences;
+         register u32 ended asm("r8") = ActorAttachment_StepSprite(sprite, sequence);
+diff --git a/src/fn/sub_080656D4.c b/src/fn/sub_080656D4.c
+index 451f68f2f..5a0d36fc7 100644
+--- a/src/fn/sub_080656D4.c
++++ b/src/fn/sub_080656D4.c
+@@ -3,8 +3,8 @@
+ void ActorAttachment_TickNarrowShake(void *, struct ActorAttachmentSlotView *);
+ void ActorAttachment_TickAscendingSprite(struct ActorAttachmentSlotView *slot)
+ {
+-    if (gUnk_02000124) {
+-        struct ActorAttachmentManagerView *manager = gUnk_02000124;
++    if (gActorAttachmentManager) {
++        struct ActorAttachmentManagerView *manager = gActorAttachmentManager;
+         struct ContactSwarmSprite *sprite = &slot->sprite;
+         struct DisplaySequenceState *sequence = slot->sequences;
+         u32 ended = ActorAttachment_StepSprite(sprite, sequence);
+diff --git a/src/fn/sub_080659C4.c b/src/fn/sub_080659C4.c
+index 6c36578e2..adf0090ac 100644
+--- a/src/fn/sub_080659C4.c
++++ b/src/fn/sub_080659C4.c
+@@ -3,7 +3,7 @@ void ActorAttachment_UpdateValueFrame(struct ActorAttachmentSlotView *);
+ u8 ActorAttachment_TickRemoval(void *, void *);
+ void ActorAttachment_TickValueFrame(struct ActorAttachmentSlotView *slot)
+ {
+-    struct ActorAttachmentManagerView *manager = gUnk_02000124;
++    struct ActorAttachmentManagerView *manager = gActorAttachmentManager;
+     if (manager != NULL) {
+         struct ActorAttachmentManagerView *owner = manager;
+         struct ContactSwarmSprite *sprite = &slot->sprite;
+diff --git a/src/fn/sub_08065A70.c b/src/fn/sub_08065A70.c
+index 28bd6d08f..c53a98820 100644
+--- a/src/fn/sub_08065A70.c
++++ b/src/fn/sub_08065A70.c
+@@ -3,7 +3,7 @@
+ void ActorAttachment_TickWideShake(void *, struct ActorAttachmentSlotView *);
+ void ActorAttachment_TickLandingBounce(struct ActorAttachmentSlotView *slot)
+ {
+-    struct ActorAttachmentManagerView *manager = gUnk_02000124;
++    struct ActorAttachmentManagerView *manager = gActorAttachmentManager;
+     if (manager) {
+         struct ContactSwarmSprite *sprite = &slot->sprite;
+         sprite->flags &= ~1;
+diff --git a/src/fn/sub_08065C50.c b/src/fn/sub_08065C50.c
+index cf7be02cf..89450cf94 100644
+--- a/src/fn/sub_08065C50.c
++++ b/src/fn/sub_08065C50.c
+@@ -19,7 +19,7 @@ ActorAttachment_ReleaseResource(struct ActorAttachmentSlotView *incoming, u32 re
+     asm("" : "+r"(slot));
+     if (!slot)
+         goto cleared;
+-    manager = gUnk_02000124;
++    manager = gActorAttachmentManager;
+     if (!manager)
+         goto cleared;
+     {
+diff --git a/src/fn/sub_08065D1C.c b/src/fn/sub_08065D1C.c
+index d59a0c923..b4fe932a1 100644
+--- a/src/fn/sub_08065D1C.c
++++ b/src/fn/sub_08065D1C.c
+@@ -16,7 +16,7 @@ ActorAttachment_ReleasePartsResource(struct ActorAttachmentSlotView *incoming, u
+     asm("" : "+r"(matchUpdate));
+     if (!slot)
+         goto cleared;
+-    manager = gUnk_02000124;
++    manager = gActorAttachmentManager;
+     if (!manager)
+         goto cleared;
+     parts = slot->parts;
+diff --git a/src/fn/sub_08065DBC.c b/src/fn/sub_08065DBC.c
+index 4e315f7dd..8424f1874 100644
+--- a/src/fn/sub_08065DBC.c
++++ b/src/fn/sub_08065DBC.c
+@@ -42,7 +42,7 @@ ActorAttachment_CreateSpriteSlot(u32 frame, struct ContactPosition *anchor, void
+     savedY = y;
+     savedFollow = follow;
+     startFrame = (u8)frame;
+-    existing = gUnk_02000124;
++    existing = gActorAttachmentManager;
+     if (!existing) {
+         manager = ActorAttachment_CreateManager();
+         if (manager)
+diff --git a/src/fn/sub_08065FD0.c b/src/fn/sub_08065FD0.c
+index 2edaf16f4..f23075b00 100644
+--- a/src/fn/sub_08065FD0.c
++++ b/src/fn/sub_08065FD0.c
+@@ -44,7 +44,7 @@ ActorAttachment_CreateValueSpriteSlot(u32 incomingFrame, struct ContactPosition
+     frame = (u8)incomingFrame;
+     countLow = (u16)countLow;
+     thresholdCount = countLow;
+-    existing = gUnk_02000124;
++    existing = gActorAttachmentManager;
+     if (!existing) {
+         manager = ActorAttachment_CreateManager();
+         if (manager)
+diff --git a/src/fn/sub_08066278.c b/src/fn/sub_08066278.c
+index 70755948f..c87e9de63 100644
+--- a/src/fn/sub_08066278.c
++++ b/src/fn/sub_08066278.c
+@@ -37,7 +37,7 @@ ActorAttachment_CreateSinglePartSlot(u32 incomingFrame, struct ContactPosition *
+     s32 i;
+     savedZ = z;
+     frame = (u8)incomingFrame;
+-    existing = gUnk_02000124;
++    existing = gActorAttachmentManager;
+     if (!existing) {
+         manager = ActorAttachment_CreateManager();
+         if (manager)
+diff --git a/src/fn/sub_08066474.c b/src/fn/sub_08066474.c
+index 60c321145..86cbfbbd6 100644
+--- a/src/fn/sub_08066474.c
++++ b/src/fn/sub_08066474.c
+@@ -27,7 +27,7 @@ struct ActorAttachmentSlotView *ActorAttachment_CreateMeterPartsSlot(
+     s32 xOffset, zOffset;
+     savedZ = z;
+     frame = (u8)incomingFrame;
+-    existing = gUnk_02000124;
++    existing = gActorAttachmentManager;
+     if (!existing) {
+         manager = ActorAttachment_CreateManager();
+         if (manager)
+diff --git a/src/fn/sub_080666D8.c b/src/fn/sub_080666D8.c
+index 17588f711..10d6f8eb7 100644
+--- a/src/fn/sub_080666D8.c
++++ b/src/fn/sub_080666D8.c
+@@ -38,7 +38,7 @@ ActorAttachment_CreateFixedSpriteSlot(struct ContactPosition *anchor, void *upda
+     struct ContactSwarmSprite *sprite;
+     void *graphics, *sequence;
+     s32 xOffset, zOffset;
+-    existing = gUnk_02000124;
++    existing = gActorAttachmentManager;
+     if (!existing) {
+         manager = ActorAttachment_CreateManager();
+         if (manager)
+diff --git a/src/fn/sub_080668B0.c b/src/fn/sub_080668B0.c
+index 14a03684a..6727674bd 100644
+--- a/src/fn/sub_080668B0.c
++++ b/src/fn/sub_080668B0.c
+@@ -38,7 +38,7 @@ ActorAttachment_CreateAlternateSpriteSlot(struct ContactPosition *anchor, void *
+     struct ContactSwarmSprite *sprite;
+     void *graphics, *sequence;
+     s32 xOffset, zOffset;
+-    existing = gUnk_02000124;
++    existing = gActorAttachmentManager;
+     if (!existing) {
+         manager = ActorAttachment_CreateManager();
+         if (manager)
+diff --git a/src/fn/sub_08066B28.c b/src/fn/sub_08066B28.c
+index 23854d325..db4108e3b 100644
+--- a/src/fn/sub_08066B28.c
++++ b/src/fn/sub_08066B28.c
+@@ -34,7 +34,7 @@ s32 ActorAttachment_DestroyManager(struct ActorAttachmentManagerView *manager)
+     }
+     {
+         struct ActorAttachmentManagerView *empty = 0;
+-        gUnk_02000124 = empty;
++        gActorAttachmentManager = empty;
+     }
+     return 0;
+ }
+diff --git a/src/fn/sub_08066C0C.c b/src/fn/sub_08066C0C.c
+index 425e559c3..2ac69af5f 100644
+--- a/src/fn/sub_08066C0C.c
++++ b/src/fn/sub_08066C0C.c
+@@ -4,6 +4,6 @@ s32 ActorAttachment_InitManager(struct ActorAttachmentManagerView *manager)
+ {
+     manager->occupiedMask = 0;
+     ActorAttachment_LoadManagerResources((struct ActorAttachmentManagerResources *)manager);
+-    gUnk_02000124 = manager;
++    gActorAttachmentManager = manager;
+     return 0;
+ }
+diff --git a/src/fn/sub_08066C34.c b/src/fn/sub_08066C34.c
+index a168242fb..e05ea488d 100644
+--- a/src/fn/sub_08066C34.c
++++ b/src/fn/sub_08066C34.c
+@@ -5,8 +5,8 @@ s32 ActorAttachment_DestroyManager(struct ActorAttachmentManagerView *);
+ struct ActorAttachmentManagerView *ActorAttachment_CreateManager(void)
+ {
+     struct ActorAttachmentManagerView *manager;
+-    if (gUnk_02000124)
+-        return gUnk_02000124;
++    if (gActorAttachmentManager)
++        return gActorAttachmentManager;
+     manager = Task_Create(9, 0xA20);
+     if (manager) {
+         Task_SetCallbacks(manager, (void (*)(void *))ActorAttachment_TickManager,
+diff --git a/src/fn/sub_08066C80.c b/src/fn/sub_08066C80.c
+index fc24abe16..6174e857a 100644
+--- a/src/fn/sub_08066C80.c
++++ b/src/fn/sub_08066C80.c
+@@ -1,5 +1,5 @@
+ #include "actor_attachment_manager.h"
+ void ActorAttachment_ClearManagerPointer(void)
+ {
+-    gUnk_02000124 = 0;
++    gActorAttachmentManager = 0;
+ }
+diff --git a/src/fn/sub_08066C8C.c b/src/fn/sub_08066C8C.c
+index a9e9e72bf..986e91a17 100644
+--- a/src/fn/sub_08066C8C.c
++++ b/src/fn/sub_08066C8C.c
+@@ -1,7 +1,7 @@
+ #include "actor_attachment_manager.h"
+ s32 ActorAttachment_IsUnavailable(struct ActorAttachmentSlotView *slot)
+ {
+-    if (gUnk_02000124 && slot && slot->flags31)
++    if (gActorAttachmentManager && slot && slot->flags31)
+         return 0;
+     return 1;
+ }
+diff --git a/src/fn/sub_08066CB8.c b/src/fn/sub_08066CB8.c
+index 22207b46e..d6765a61a 100644
+--- a/src/fn/sub_08066CB8.c
++++ b/src/fn/sub_08066CB8.c
+@@ -15,7 +15,7 @@ static inline u8 IsOccupied(u32 *mask, u32 bit)
+ void ActorAttachment_ReleaseAll(void)
+ {
+     struct ActorAttachmentManagerView *manager;
+-    struct ActorAttachmentManagerView *incoming = gUnk_02000124;
++    struct ActorAttachmentManagerView *incoming = gActorAttachmentManager;
+     register s32 i asm("r3");
+     register u32 *occupied asm("r10");
+     s32 next;
+diff --git a/symbols/ram.csv b/symbols/ram.csv
+index 3809d3c9d..50e0ed247 100644
+--- a/symbols/ram.csv
++++ b/symbols/ram.csv
+@@ -58,7 +58,7 @@ addr,name,size,kind,decl,header,confidence,notes
+ 02000118,gStackedActor,4,object,extern struct StackedActor *gStackedActor;,include/stacked_actor.h,low,
+ 0200011C,gStageIconDisplay,4,object,extern struct StageIconDisplay *gStageIconDisplay;,include/stage_icon_display.h,low,
+ 02000120,gLevelAdvanceManager,4,object,extern struct LevelAdvanceManager *gLevelAdvanceManager;,include/level_advance_display.h,low,
+-02000124,gUnk_02000124,4,object,,,,
++02000124,gActorAttachmentManager,4,object,extern struct ActorAttachmentManagerView *gActorAttachmentManager;,include/actor_attachment_state.h,low,actor attachment manager singleton
+ 02000128,gSceneActorControlManager,4,object,extern struct SceneActorControlManager *gSceneActorControlManager;,include/ram.h,low,
+ 0200012C,gColliderEffectPool,4,object,extern struct ColliderEffectPool *gColliderEffectPool;,include/ram.h,low,
+ 02000130,gSceneParticleBurstPool,4,object,extern struct SceneParticleBurstPool *gSceneParticleBurstPool;,include/ram.h,low,
+-- 
+2.39.3 (Apple Git-145)
+

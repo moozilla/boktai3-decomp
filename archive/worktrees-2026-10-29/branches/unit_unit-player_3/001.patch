@@ -1,0 +1,3018 @@
+From 30673799468b394c32d26e9849c5947962e057c9 Mon Sep 17 00:00:00 2001
+From: Moozilla <moozilla@protonmail.com>
+Date: Sun, 18 Oct 2026 13:50:15 -0700
+Subject: [PATCH] Unit player_3: merge 53 files into src/player_3.c
+
+Player 3 (auto, tentative) (0813C8F0-0813FC38); tools/unitize.py, build OK, matched bytes 907294 -> 907654.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ include/game_state.h                 |    9 +-
+ include/player.h                     |   61 +-
+ include/player_3.h                   |   15 +
+ notes/player_3.md                    |  130 +++
+ src/fn/sub_0813C8F0.c                |   30 -
+ src/fn/sub_0813C94C.c                |   30 -
+ src/fn/sub_0813D150.c                |   10 -
+ src/fn/sub_0813D34C.c                |   37 -
+ src/fn/sub_0813D4E0.c                |   14 -
+ src/fn/sub_0813D508.c                |   22 -
+ src/fn/sub_0813D734.c                |    9 -
+ src/fn/sub_0813D754.c                |   50 --
+ src/fn/sub_0813D8F4.c                |   14 -
+ src/fn/sub_0813DD84.c                |   10 -
+ src/fn/sub_0813DDAC.c                |   73 --
+ src/fn/sub_0813DF08.c                |   19 -
+ src/fn/sub_0813E0F0.c                |   11 -
+ src/fn/sub_0813E1D8.c                |   12 -
+ src/fn/sub_0813E208.c                |   13 -
+ src/fn/sub_0813E244.c                |   14 -
+ src/fn/sub_0813E324.c                |   19 -
+ src/fn/sub_0813E35C.c                |   10 -
+ src/fn/sub_0813E374.c                |   11 -
+ src/fn/sub_0813E38C.c                |   11 -
+ src/fn/sub_0813E3A4.c                |   11 -
+ src/fn/sub_0813E3BC.c                |   11 -
+ src/fn/sub_0813E3D4.c                |    7 -
+ src/fn/sub_0813E3E4.c                |    7 -
+ src/fn/sub_0813E3F4.c                |    7 -
+ src/fn/sub_0813E404.c                |    7 -
+ src/fn/sub_0813E414.c                |    7 -
+ src/fn/sub_0813E424.c                |   19 -
+ src/fn/sub_0813E45C.c                |   19 -
+ src/fn/sub_0813E494.c                |   19 -
+ src/fn/sub_0813E4CC.c                |   19 -
+ src/fn/sub_0813E504.c                |   19 -
+ src/fn/sub_0813E53C.c                |   54 --
+ src/fn/sub_0813EAB0.c                |    6 -
+ src/fn/sub_0813EABC.c                |   46 --
+ src/fn/sub_0813EBE0.c                |   50 --
+ src/fn/sub_0813ED14.c                |    6 -
+ src/fn/sub_0813ED20.c                |   59 --
+ src/fn/sub_0813F748.c                |    8 -
+ src/fn/sub_0813F758.c                |   11 -
+ src/fn/sub_0813F780.c                |    5 -
+ src/fn/sub_0813F784.c                |   10 -
+ src/fn/sub_0813F7B4.c                |   29 -
+ src/fn/sub_0813F808.c                |   15 -
+ src/fn/sub_0813F84C.c                |    6 -
+ src/fn/sub_0813F850.c                |   18 -
+ src/fn/sub_0813F89C.c                |    9 -
+ src/fn/sub_0813F8B4.c                |   18 -
+ src/fn/sub_0813F9EC.c                |   57 --
+ src/fn/sub_0813FADC.c                |   24 -
+ src/fn/sub_0813FBC8.c                |   15 -
+ src/fn/sub_0813FBE4.c                |   13 -
+ src/fn/sub_0813FC08.c                |   16 -
+ src/fn/sub_0814433C.c                |    4 +-
+ src/fn/sub_081580EC.c                |    2 +-
+ src/fn/sub_08158588.c                |    2 +-
+ src/player_3.c                       | 1088 ++++++++++++++++++++++++++
+ symbols/build_extra_functions.csv    |    9 +-
+ symbols/progress_extra_functions.csv |    7 +
+ symbols/progress_functions.csv       |    7 +
+ 64 files changed, 1311 insertions(+), 1069 deletions(-)
+ create mode 100644 include/player_3.h
+ create mode 100644 notes/player_3.md
+ delete mode 100644 src/fn/sub_0813C8F0.c
+ delete mode 100644 src/fn/sub_0813C94C.c
+ delete mode 100644 src/fn/sub_0813D150.c
+ delete mode 100644 src/fn/sub_0813D34C.c
+ delete mode 100644 src/fn/sub_0813D4E0.c
+ delete mode 100644 src/fn/sub_0813D508.c
+ delete mode 100644 src/fn/sub_0813D734.c
+ delete mode 100644 src/fn/sub_0813D754.c
+ delete mode 100644 src/fn/sub_0813D8F4.c
+ delete mode 100644 src/fn/sub_0813DD84.c
+ delete mode 100644 src/fn/sub_0813DDAC.c
+ delete mode 100644 src/fn/sub_0813DF08.c
+ delete mode 100644 src/fn/sub_0813E0F0.c
+ delete mode 100644 src/fn/sub_0813E1D8.c
+ delete mode 100644 src/fn/sub_0813E208.c
+ delete mode 100644 src/fn/sub_0813E244.c
+ delete mode 100644 src/fn/sub_0813E324.c
+ delete mode 100644 src/fn/sub_0813E35C.c
+ delete mode 100644 src/fn/sub_0813E374.c
+ delete mode 100644 src/fn/sub_0813E38C.c
+ delete mode 100644 src/fn/sub_0813E3A4.c
+ delete mode 100644 src/fn/sub_0813E3BC.c
+ delete mode 100644 src/fn/sub_0813E3D4.c
+ delete mode 100644 src/fn/sub_0813E3E4.c
+ delete mode 100644 src/fn/sub_0813E3F4.c
+ delete mode 100644 src/fn/sub_0813E404.c
+ delete mode 100644 src/fn/sub_0813E414.c
+ delete mode 100644 src/fn/sub_0813E424.c
+ delete mode 100644 src/fn/sub_0813E45C.c
+ delete mode 100644 src/fn/sub_0813E494.c
+ delete mode 100644 src/fn/sub_0813E4CC.c
+ delete mode 100644 src/fn/sub_0813E504.c
+ delete mode 100644 src/fn/sub_0813E53C.c
+ delete mode 100644 src/fn/sub_0813EAB0.c
+ delete mode 100644 src/fn/sub_0813EABC.c
+ delete mode 100644 src/fn/sub_0813EBE0.c
+ delete mode 100644 src/fn/sub_0813ED14.c
+ delete mode 100644 src/fn/sub_0813ED20.c
+ delete mode 100644 src/fn/sub_0813F748.c
+ delete mode 100644 src/fn/sub_0813F758.c
+ delete mode 100644 src/fn/sub_0813F780.c
+ delete mode 100644 src/fn/sub_0813F784.c
+ delete mode 100644 src/fn/sub_0813F7B4.c
+ delete mode 100644 src/fn/sub_0813F808.c
+ delete mode 100644 src/fn/sub_0813F84C.c
+ delete mode 100644 src/fn/sub_0813F850.c
+ delete mode 100644 src/fn/sub_0813F89C.c
+ delete mode 100644 src/fn/sub_0813F8B4.c
+ delete mode 100644 src/fn/sub_0813F9EC.c
+ delete mode 100644 src/fn/sub_0813FADC.c
+ delete mode 100644 src/fn/sub_0813FBC8.c
+ delete mode 100644 src/fn/sub_0813FBE4.c
+ delete mode 100644 src/fn/sub_0813FC08.c
+ create mode 100644 src/player_3.c
+
+diff --git a/include/game_state.h b/include/game_state.h
+index 091b94ea1..f0e8190e8 100644
+--- a/include/game_state.h
++++ b/include/game_state.h
+@@ -37,8 +37,9 @@ struct GameState {
+     s16 selected;            /* (guess) index into the slot tables */
+     s16 actionAuxiliarySlot; /* 0x54: selects the auxiliary action descriptor (tentative) */
+     u8 unk56[2];
+-    s16 party[4]; /* (guess) ids, searched by GameState_HasEquippedConsumable */
+-    u8 unk60[0x8];
++    s16 party[4];       /* (guess) ids, searched by GameState_HasEquippedConsumable */
++    s16 abilityVariant; /* 0x60: selects alternate-mode ability four or five (tentative) */
++    u8 unk62[6];
+     s16 inventory[16]; /* (guess) -1 is empty */
+     s16 slots88[12];   /* (guess) indexed by `selected` */
+     s16 table0A0[48];  /* (guess) */
+@@ -74,7 +75,9 @@ struct GameState {
+     u16 counter576; /* (guess) capped at 9999 */
+     u8 unk578[0x4];
+     u16 counter57C; /* (guess) capped at 9999 */
+-    u8 unk57E[0x18];
++    u8 unk57E[0xC];
++    s16 targetFlagBonuses[5]; /* 0x58A: flag 7..11 modifier bonuses, units of 1/64 (tentative) */
++    u8 unk594[2];
+     s16 flags596; /* (guess) bit mask, bits 0-9 */
+     u8 unk598[0x8];
+     s32 region; /* current region/scene id (guess); compared by interactable controllers */
+diff --git a/include/player.h b/include/player.h
+index 8b7227807..d5c538eb7 100644
+--- a/include/player.h
++++ b/include/player.h
+@@ -94,6 +94,13 @@ struct PlayerAnimation {
+     u32 flags;
+ };
+ 
++struct PlayerVisualObject {
++    u8 unknown0[6];
++    u16 resource;
++    u8 unknown8[4];
++    u32 parameters;
++};
++
+ struct Player {
+     u8 unk0[0x18];
+     s32 slot;                  /* 0x18: compared with local link player index */
+@@ -119,15 +126,21 @@ struct Player {
+     u8 unkB4[0xC];
+     u8 movementSpeedScale;  /* 0xC0: mode-five speed scale, units of 1/64 */
+     u8 secondarySpeedScale; /* 0xC1: paired with movementSpeedScale by 08145400 (tentative) */
+-    u8 unkC2[0x12];
++    u8 unkC2[4];
++    u16 spriteResource; /* 0xC6 */
++    u8 unkC8[0xC];
+     u32 actionVariantResource; /* 0xD4: forwarded to variant display */
+     u8 unkD8[0x14];
+     struct PlayerAnimation secondaryAnimation; /* 0xEC: alternate keyframe channel */
+-    u8 unkF8[0x54];
++    u8 unkF8[0x14];
++    u16 alternatePosition[3]; /* 0x10C */
++    u8 unk112[0x3A];
+     u32 secondaryDrawFlags; /* 0x14C: bit zero follows reset flag one */
+     u8 unk150[0x18];
+     struct SceneVec colliderPosition; /* 0x168 */
+-    u8 unk170[0x60];
++    u8 unk170[8];
++    struct PlayerVisualObject *visualObject; /* 0x178 */
++    u8 unk17C[0x54];
+     u8 auxiliarySprite[0x40]; /* 0x1D0: removed by player destructor */
+     u8 unk210[0x20];
+     struct PlayerCollider collider; /* 0x230: embedded collider, extent bounded by directionFrame */
+@@ -155,12 +168,17 @@ struct Player {
+     u8 thresholdMode; /* 0x33C: values 6 through 11 qualify for the scene threshold */
+     u8 actionEnabled; /* 0x33D: zero bypasses action mode filtering */
+     u8 actionSelectionStamp,
+-        actionModeValue; /* 0x33E: cached selection and mode value (tentative) */
+-    u8 unk340[4];
++        actionModeValue;     /* 0x33E: cached selection and mode value (tentative) */
++    u8 actionRequestBlocked; /* 0x340 */
++    u8 unk341[3];
+     const struct PlayerActionConfig *actionConfig; /* 0x344 */
+     const u16 *inputKeys;     /* 0x348: directional key bits consumed by Player_GetInputDirection */
+-    s16 directionHistory[10]; /* 0x34C: recent direction samples, -1 means absent */
+-    u8 unk360[0x40];
++    u16 directionHistory[10]; /* 0x34C: signed samples; 0xFFFF means absent (read through s16) */
++    u8 visualParameters[0xA]; /* 0x360: animation parameter block */
++    u16 visualParameterA, visualParameterB; /* 0x36A */
++    u8 unk36E[0xC];
++    u16 visualParameterC; /* 0x37A */
++    u8 unk37C[0x24];
+     u16 animationIndex; /* 0x3A0: selected base keyframe index */
+     u8 heading, side;   /* 0x3A2: folded direction and side */
+     u8 facing;          /* (guess) direction index */
+@@ -240,8 +258,8 @@ struct Player {
+     u8 movementRequestAnimated; /* 0x4F2: inverse of immediate movement flag */
+     u8 movementAnimationState;  /* 0x4F3: negative byte resets animation (tentative) */
+     u8 facingChangeEffects;     /* 0x4F4: bits zero/one enable/select facing cue */
+-    u8 unk4F5;
+-    u8 movementSpeedReduction; /* 0x4F6 */
++    u8 savedEffectTick;         /* 0x4F5 */
++    u8 movementSpeedReduction;  /* 0x4F6 */
+     u8 unk4F7[0x2B];
+     u16 displaySegmentCount; /* 0x522: tentative, clamped to seven by segment display */
+     u8 unk524[0xA];
+@@ -268,14 +286,22 @@ struct Player {
+     u8 unk59F[4];
+     u8 pendingAnimationTrigger; /* 0x5A3: consumed by 0814F90C */
+     u32 cueParameter;           /* 0x5A4: forwarded cue parameter, tentative */
+-    u8 unk5A8[0x11];
++    u8 unk5A8[0x10];
++    u8 effectGroup; /* 0x5B8: scene effect group context */
+     u8 movementModifierKind, unknown5BA, movementModifierActive; /* 0x5B9: tentative */
+-    u8 unk5BC[0x13C];
++    u8 unk5BC[0x134];
++    u16 effectPosition[3]; /* 0x6F0 */
++    u8 unk6F6[2];
+     u16 resetValue6F8, resetValue6FA, resetValue6FC;
+     u8 unk6FE[2];
+     u8 shadow[0x40];  /* 0x700: actor shadow state */
+     u8 resetState740; /* 0x740: set to one by 0813B080 */
+-    u8 unk741[0xA80 - 0x741];
++    u8 unk741[7];
++    u8 visualEffects748[0x30], visualEffects778[0x28];
++    u8 visualEffects7A0[0x30], visualEffects7D0[0x2C];
++    u8 directionalEffect[0x68];      /* 0x7FC */
++    void *directionalEffectCallback; /* 0x864 */
++    u8 unk868[0x218];
+     struct SceneVec actionOrigin; /* 0xA80: offset copy of position (tentative) */
+     u8 unkA88[4];
+     struct SceneVec movementStart, movementDestination; /* 0xA8C, 0xA94 */
+@@ -283,10 +309,14 @@ struct Player {
+     u8 unkA9E[0x10];
+     u16 actionResetCounter;  /* 0xAAE: reset when starting a variant action (tentative) */
+     u16 menuStatusValues[7]; /* 0xAB0: panel selects indices 0, 2 or 6 (tentative) */
+-    u8 unkABE[0xA];
++    u8 unkABE[4];
++    u16 baseSpriteResource, savedSpriteResource; /* 0xAC2 */
++    u8 unkAC6[2];
+     u8 baseActionVariant; /* 0xAC8: copied to actionVariant */
+     u8 actionVariant;     /* 0xAC9: zero or saved action index plus one (tentative) */
+-    u8 unkACA[8];
++    u16 savedVisualMode;  /* 0xACA */
++    s16 visualFlashTimer; /* 0xACC */
++    u8 unkACE[4];
+     u16 movementRequestParameter, movementRequestScale;  /* 0xAD2: tentative */
+     u16 actionEighteenParameter, actionEighteenDuration; /* 0xAD6: tentative */
+     u16 actionRequestHold, actionRequestTimer;           /* 0xADA */
+@@ -299,7 +329,8 @@ struct Player {
+     u8 kindTwoAttachmentDescriptor; /* 0xB08 */
+     u8 unkB09;
+     u16 kindTwoAttachmentCounter; /* 0xB0A */
+-    u8 unkB0C[0x34];
++    u8 unkB0C[0x30];
++    s32 eventProcedure;                                   /* 0xB3C */
+     void *actionRequestEffect;                            /* 0xB40 */
+     struct PlayerStatModifierContext statModifierContext; /* 0xB44: callback context */
+     void *actionDisplay;           /* 0xC84: receives descriptor display selection */
+diff --git a/include/player_3.h b/include/player_3.h
+new file mode 100644
+index 000000000..4088ec920
+--- /dev/null
++++ b/include/player_3.h
+@@ -0,0 +1,15 @@
++#ifndef GUARD_PLAYER_3_H
++#define GUARD_PLAYER_3_H
++#include "engine.h"
++#include "player.h"
++#include "scene_input_compare.h"
++/* Modifier callback input, distinct from the owning player (0xB0 selects equipment). */
++struct PlayerModifierInput {
++    u8 unknown0[0xB0];
++    u8 equipment;
++};
++struct PlayerModifierTarget {
++    u8 unknown0[0x38];
++    u32 flags;
++};
++#endif
+diff --git a/notes/player_3.md b/notes/player_3.md
+new file mode 100644
+index 000000000..a3dee24ce
+--- /dev/null
++++ b/notes/player_3.md
+@@ -0,0 +1,130 @@
++# Player 3 unit consolidation
++
++Tags: #player #matching #types
++
++Range: `0813C8F0–0813FC38` (end exclusive). The 53 original files were
++merged into `src/player_3.c` in ROM order using `tools/merge_unit.py`.
++Its `--write` removal step was adapted locally to unlink the inputs instead
++of invoking `git rm`, because the driver owns git metadata and commits.
++No shared documentation, tool source, generated assembly, or function-name
++registry was edited. The changes are uncommitted.
++
++## Shared types
++
++`include/player_3.h` includes `engine.h`, reuses `player.h`, and provides
++`PlayerModifierInput` (equipment selector at +0xB0) and
++`PlayerModifierTarget` (target flags at +0x38). These are callback inputs,
++not additional partial views of the owning Player; their exact broader
++ownership remains tentative.
++
++Extended the existing `Player` with the observed visual object pointer and
++its `PlayerVisualObject` resource/parameter fields; visual parameter block,
++resource selectors and flash state; alternate/effect positions; embedded
++effect contexts; and event procedure. `GameState` now exposes the signed
++ability selector at +0x60 and five signed target bonuses at +0x58A.
++Names and effect interpretations are provisional. Existing movement-oriented
++names for bytes +0x4F4..+0x4F6 and +0x5B9..+0x5BB also serve visual-effect
++code here; these are shared storage, not separate layouts.
++
++## Exact additions
++
++All have file-local aliases, awaiting integration promotion:
++
++| Address | Tentative name |
++|---|---|
++| 0813E108 | Player_GetStateModifierBonus |
++| 0813E160 | Player_GetBlockedActionBonus |
++| 0813E174 | Player_GetStatAModifierBonus |
++| 0813E184 | Player_GetStatBModifierBonus |
++| 0813E194 | Player_GetEnergyRatioModifier |
++| 0813E1B8 | Player_GetLifeRatioModifier |
++| 0813E284 | Player_GetScaledTargetFlagBonus |
++| 0813F828 | Player_SpendEnchantmentEnergy |
++| 0813FB30 | Player_InitActionRequest |
++
++Seven missing boundaries were registered in `build_extra_functions.csv` and
++`progress_extra_functions.csv`: E160, E174, E184, E194, E1B8, E284 and F828.
++The progress inventory was refreshed. E108 was already registered, but its
++retained blob concealed five additional independent callbacks. E284 and F828
++were previously charged to adjacent matched functions; separating them does
++not itself earn new bytes. The scaled target bonus uses the first qualifying
++bit among target flags 7..11, arithmetic-shifts the signed saved value by six,
++and caps only the upper bound at ten.
++
++## Matching adaptations
++
++- Direction history uses unsigned halfword storage so clearing retains the
++  original load/OR/store loop. Its three existing consumers (0814433C,
++  081580EC, 08158588) explicitly read signed samples; all three pass exact
++  checks after the change.
++- The action request is a typed five-byte view of Player +0x33C, overlapping
++  the established individually named fields. It introduces no padded actor
++  view. Signed kind reads remain explicit where required.
++- Two GameState indexed accesses retain byte-address formation with the
++  index added before the field offset; direct array indexing changes agbcc's
++  register/address order. Random-table reads similarly retain byte-scaled
++  indexing of the shared engine declaration.
++- Reconciled local caller contracts for descriptor entry arguments, unsigned
++  mode-value returns and the availability hook's unused arguments. The blocked
++  action bonus forwards its incoming Player pointer to Player_IsActionBlocked.
++  No engine.h prototype needed changing.
++- The former isolated E0F0 old_agbcc leaf matches with the merged unit's normal
++  agbcc compiler. No compiler exception, new register pins, or asm barriers
++  are needed.
++
++## Retained assembly and attempts
++
++Near-match drafts are guarded by NONMATCHING and recorded with check.py:
++0813DB60 (Player_SelectFlashingVisualMode), 82.1%, has the actor/input-mode
++registers swapped; 0813F8F8 (Player_SelectRequestedActionMode), 85.0%, has
++owner/request registers swapped and one mode-exit reload difference.
++
++The other retained entries and blockers:
++
++- 0813C9B4: palette component adjustment loop; closest port 14.7%.
++- 0813CB8C / 0813CE20: large visual/resource mode selection; unrelated port
++  skeletons score 2.0% / 10.6%, not useful drafts.
++- 0813D178: resource/palette initialization with many branches; port 0%.
++- 0813D3B0: random effect emitter constructs packed vector bitfields, including
++  the compiler's read/modify/write of partially initialized stack words; its
++  closest relative does not provide a complete function to port. Retained
++  assembly rather than introducing uninitialized C or a false match.
++- 0813D548: vector/effect creation; closest PlayerCue_ShakeEffect port 74%,
++  with different effect setup and arguments; below retained-draft threshold.
++- 0813D834: drafted state-timer setter; shared-field conversion still changes
++  switch-derived index lifetime, saved registers, and signed byte loading.
++  Several structural variants did not match; discarded from production.
++- 0813D924: state-to-visual-mode policy; closest port 33.3%.
++- 0813DB98: multi-state visual flag and speed transitions; closest port 10.8%.
++- 0813DF5C: broad embedded-effect initialization; closest port 5.5%.
++- 0813E608: action-modifier dispatch builder; closest relative explains only
++  7% and is now part of the merged unit, not a complete portable source.
++- 0813E90C: action/collider configuration; closest port 23.4%.
++- 0813EDDC: large equipment flag reconstruction; closest relative explains
++  only 2%, no complete portable candidate.
++- 0813F702: internal entry into the preceding 0813EDDC routine's epilogue, with
++  r5 and stacked high registers already live. It is not an independent C
++  function; retain its INCLUDE_ASM entry in order. An unrelated relative port
++  scored 4.2% and was rejected.
++
++The Ghidra export is absent in this checkout. Relative candidates and failed
++variants were kept only in ignored `build/player_3/`. Approximately 45 exact
++check invocations covered the merge, type changes, candidates, and signed
++history consumers. The default merged unit is an exact 13,128-byte range,
++including the retained assembly. Two guarded drafts are not exact progress.
++
++## Validation
++
++- `make format` and focused clang-format validation passed.
++- Final `tools/check.py src/player_3.c`: zero differing bytes across 13,128 bytes.
++- All three signed-history consumers passed their individual exact checks.
++- `tools/check.py src/player_3.c --nonmatching --record` recorded the two drafts.
++- `tools/build.py`: **build/boktai3.gba: OK**.
++- `tools/progress.py`: no loss of matched code; net batch gain is +0.015
++  percentage points (360 bytes), with nine newly defined exact callbacks.
++
++The first full-build attempts lacked this checkout's extracted `build/res`
++files. They were extracted locally from the ROM through datafmt. Shared
++`gen/data.s` references indexed archive filenames; matching aliases were
++populated by archive table index in the local build directory. No shared
++generated files were changed. The final complete build passed.
+diff --git a/src/fn/sub_0813C8F0.c b/src/fn/sub_0813C8F0.c
+deleted file mode 100644
+index 90253c799..000000000
+--- a/src/fn/sub_0813C8F0.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#include "global.h"
+-/* Tentative role: select an effect flag from actor and global state. */
+-typedef struct State {
+-    u8 pad0[0x20];
+-    u32 flags;
+-    u8 pad24[0x418 - 0x24];
+-    u8 mode;
+-} State;
+-extern u8 *gUnk_02000710;
+-static inline u8 global_mode(void)
+-{
+-    u32 mask = 2;
+-    if (*(u32 *)(gUnk_02000710 + 0x868) & mask)
+-        return 1;
+-    return 0;
+-}
+-s32 Player_GetVisualEffectFlags(State *s)
+-{
+-    s32 result = 0;
+-    if (s->mode == 2)
+-        return 0;
+-    if (!global_mode()) {
+-        if (s->flags & 16)
+-            result = 8;
+-    } else {
+-        if (s->flags & 16)
+-            result = 4;
+-    }
+-    return result;
+-}
+diff --git a/src/fn/sub_0813C94C.c b/src/fn/sub_0813C94C.c
+deleted file mode 100644
+index 36d196c84..000000000
+--- a/src/fn/sub_0813C94C.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#include "global.h"
+-
+-struct P0813C94C {
+-    u8 f0[0x36A];
+-    u16 a;
+-    u16 b;
+-    u8 f36E[0xC];
+-    u16 c;
+-    u8 f37C[0xAC8 - 0x37C];
+-    u8 idx;
+-};
+-extern u8 *gUnk_030042E4;
+-
+-void Player_LoadVisualParameters(struct P0813C94C *p)
+-{
+-    u16 *t;
+-    s32 i;
+-    if (p->idx <= 9) {
+-        t = (u16 *)(gUnk_030042E4 + 0x6A0);
+-        i = p->idx;
+-    } else {
+-        t = (u16 *)(gUnk_030042E4 + 0x2F60);
+-        i = p->idx;
+-        i -= 10;
+-    }
+-    t += i * 3;
+-    p->a = *t++;
+-    p->b = *t;
+-    p->c = t[1];
+-}
+diff --git a/src/fn/sub_0813D150.c b/src/fn/sub_0813D150.c
+deleted file mode 100644
+index d76dbd38e..000000000
+--- a/src/fn/sub_0813D150.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "global.h"
+-
+-void Player_SelectSpriteResource(u8 *p)
+-{
+-    if (*(s32 *)(p + 0x18) == 0) {
+-        *(u16 *)(p + 0xAC2) = 0x2A;
+-    } else {
+-        *(u16 *)(p + 0xAC2) = 0x35;
+-    }
+-}
+diff --git a/src/fn/sub_0813D34C.c b/src/fn/sub_0813D34C.c
+deleted file mode 100644
+index 42a66cf94..000000000
+--- a/src/fn/sub_0813D34C.c
++++ /dev/null
+@@ -1,37 +0,0 @@
+-#include "global.h"
+-
+-struct O0813D34C {
+-    u8 f0[6];
+-    u16 f6;
+-    u8 f8[4];
+-    u32 fC;
+-};
+-struct P0813D34C {
+-    u8 f0[0xC6];
+-    u16 fC6;
+-    u8 fC8[0xC];
+-    u32 fD4;
+-    u8 fD8[0x178 - 0xD8];
+-    struct O0813D34C *f178;
+-    u8 f17C[0xAC2 - 0x17C];
+-    u16 fAC2;
+-    u16 fAC4;
+-    u8 fAC6[2];
+-    u8 fAC8;
+-};
+-void Player_SelectSpriteResource(void);
+-void sub_0813D178(void *);
+-void sub_0813CB8C(void *, u32);
+-
+-void Player_InitVisualState(struct P0813D34C *p)
+-{
+-    Player_SelectSpriteResource();
+-    sub_0813D178(p);
+-    p->fAC4 = 0xFFFF;
+-    p->fAC8 = 0xFF;
+-    p->fC6 = p->fAC2;
+-    p->fD4 = (u32)p + 0x360;
+-    p->f178->f6 = p->fAC2;
+-    p->f178->fC = (u32)p + 0x360;
+-    sub_0813CB8C(p, 0);
+-}
+diff --git a/src/fn/sub_0813D4E0.c b/src/fn/sub_0813D4E0.c
+deleted file mode 100644
+index 5446e53c4..000000000
+--- a/src/fn/sub_0813D4E0.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-void SceneActor_StartRandomizedEffect(u8 *);
+-void Player_EmitQueuedEffects(u8 *p)
+-{
+-    u8 t = p[0x5BB];
+-    s32 n;
+-    if (t != 0) {
+-        n = t;
+-        do {
+-            SceneActor_StartRandomizedEffect(p);
+-            n--;
+-        } while (n != 0);
+-    }
+-}
+diff --git a/src/fn/sub_0813D508.c b/src/fn/sub_0813D508.c
+deleted file mode 100644
+index 1e3fa12fd..000000000
+--- a/src/fn/sub_0813D508.c
++++ /dev/null
+@@ -1,22 +0,0 @@
+-#include "global.h"
+-
+-void sub_08231568(u8 *);
+-void SceneActor_StartRandomizedEffect(u8 *);
+-
+-void Player_FlushQueuedEffects(u8 *p)
+-{
+-    if (p[0x5B9] == 1) {
+-        sub_08231568(p + 0x5B8);
+-    } else {
+-        u8 t = p[0x5BB];
+-        s32 n;
+-
+-        if (t != 0) {
+-            n = t;
+-            do {
+-                SceneActor_StartRandomizedEffect(p);
+-                n--;
+-            } while (n != 0);
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0813D734.c b/src/fn/sub_0813D734.c
+deleted file mode 100644
+index 7c35d5ee4..000000000
+--- a/src/fn/sub_0813D734.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_GetEffectTickDelta(u8 *p)
+-{
+-    s32 r = p[0x4F4];
+-    r -= p[0x4F5];
+-    r += 0x100;
+-    return r & 0xFF;
+-}
+diff --git a/src/fn/sub_0813D754.c b/src/fn/sub_0813D754.c
+deleted file mode 100644
+index 3458965a3..000000000
+--- a/src/fn/sub_0813D754.c
++++ /dev/null
+@@ -1,50 +0,0 @@
+-#define SceneActor_GetEffectElapsedTicks Player_GetEffectTickDelta
+-#define gSceneActorEffectThresholds      gUnk_08610918
+-#include "global.h"
+-struct SceneActorEffectDisplay {
+-    u8 unknown0[0x1C];
+-    u32 flags;
+-    u8 unknown20[0x4F4 - 0x20];
+-    u8 tick, savedTick, overrideMode;
+-    u8 unknown4F7[0x5B9 - 0x4F7];
+-    u8 effectMode, unknown5BA, effectActive;
+-    u8 unknown5BC[0xACA - 0x5BC];
+-    u16 savedMode;
+-    s16 flashTimer;
+-};
+-extern const u8 gUnk_08610918[];
+-void SceneActor_StartRandomizedEffect(void *);
+-s32 Player_GetEffectTickDelta(void *);
+-s32 SceneActor_SelectEffectDisplayMode(struct SceneActorEffectDisplay *p, s32 mode)
+-{
+-    s32 original = mode;
+-    if (p->effectActive) {
+-        if (p->flags & 1) {
+-            if (Player_GetEffectTickDelta(p) >= gUnk_08610918[p->effectMode - 1]) {
+-                SceneActor_StartRandomizedEffect(p);
+-                p->savedTick = p->tick;
+-            }
+-        }
+-        if (p->effectActive) {
+-            if (p->effectMode == 1)
+-                mode = 3;
+-            else if (p->effectMode == 2)
+-                mode = 4;
+-            else if (p->effectMode == 3)
+-                mode = 5;
+-        }
+-    }
+-    if (p->overrideMode)
+-        mode = 7;
+-    if (mode == original) {
+-        if (p->flashTimer) {
+-            if (((u16)p->flashTimer >> 2) & 1)
+-                mode = p->savedMode;
+-            p->flashTimer--;
+-        }
+-    } else {
+-        p->savedMode = mode;
+-        p->flashTimer = 64;
+-    }
+-    return mode;
+-}
+diff --git a/src/fn/sub_0813D8F4.c b/src/fn/sub_0813D8F4.c
+deleted file mode 100644
+index 69b8977c3..000000000
+--- a/src/fn/sub_0813D8F4.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-
+-extern u8 *gUnk_02000710;
+-
+-void Player_ClearStateTimer(u8 *p, s32 idx)
+-{
+-    s32 off = idx << 1;
+-    u8 *base = p + 0x530;
+-    *(u16 *)(base + off) = 0;
+-    if (idx == 1) {
+-        u16 v = *(u16 *)(gUnk_02000710 + 0x10);
+-        *(u8 *)(p + 0x54A) = v;
+-    }
+-}
+diff --git a/src/fn/sub_0813DD84.c b/src/fn/sub_0813DD84.c
+deleted file mode 100644
+index c42a48fa8..000000000
+--- a/src/fn/sub_0813DD84.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "global.h"
+-
+-void Player_AdvanceEffectTick(u8 *p)
+-{
+-    u8 *q = *(u8 **)(p + 0x348);
+-
+-    if (*(u16 *)(q + 2) & 0xF3) {
+-        p[0x4F4]++;
+-    }
+-}
+diff --git a/src/fn/sub_0813DDAC.c b/src/fn/sub_0813DDAC.c
+deleted file mode 100644
+index 717bd4b73..000000000
+--- a/src/fn/sub_0813DDAC.c
++++ /dev/null
+@@ -1,73 +0,0 @@
+-#define SceneActor_AdvanceEffectTick Player_AdvanceEffectTick
+-#include "global.h"
+-#include "engine.h"
+-struct SceneActorVisualEffects {
+-    u8 unknown0[0x1C];
+-    u32 mode;
+-    u8 unknown20[0x10];
+-    u16 position[3];
+-    u8 unknown36[0x10C - 0x36];
+-    u16 alternatePosition[3];
+-    u8 unknown112[0x457 - 0x112];
+-    u8 state;
+-    u8 unknown458[0x6F0 - 0x458];
+-    u16 effectPosition[3];
+-    u8 unknown6F6[2];
+-    u16 effectOffset[3];
+-    u8 unknown6FE[0x7FC - 0x6FE];
+-    u8 callbackContext[0x864 - 0x7FC];
+-    void *callback;
+-    u8 unknown868[0xB04 - 0x868];
+-    void *attachment;
+-    u8 attachmentKind;
+-    u8 unknownB09;
+-    u16 attachmentDelay;
+-};
+-void sub_0813DB98(void *);
+-void Player_AdvanceEffectTick(void *);
+-s32 sub_0813D924(void *, s32);
+-s32 SceneActor_SelectEffectDisplayMode(void *, s32);
+-s32 sub_0813DB60(void *, s32);
+-void sub_0813CE20(void *, s32);
+-void sub_0813CB8C(void *, u32);
+-void sub_0813B950(void *);
+-void Player_UpdateOrbitingEffect(void *);
+-void sub_0813BAD8(void *);
+-void ConvergingEffects_UpdateParticles(void *);
+-void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, void *, int, int, int);
+-void SceneActor_UpdateVisualEffects(struct SceneActorVisualEffects *p)
+-{
+-    s32 mode;
+-    sub_0813DB98(p);
+-    Player_AdvanceEffectTick(p);
+-    mode = sub_0813D924(p, 0);
+-    mode = SceneActor_SelectEffectDisplayMode(p, mode);
+-    mode = sub_0813DB60(p, mode);
+-    if (p->mode == 2 && p->state != 10 && p->state != 11)
+-        sub_0813CE20(p, mode);
+-    else
+-        sub_0813CB8C(p, mode);
+-    sub_0813B950(p);
+-    Player_UpdateOrbitingEffect(p);
+-    sub_0813BAD8(p);
+-    ConvergingEffects_UpdateParticles(p);
+-    {
+-        void **callback = &p->callback;
+-        void *context = p->callbackContext;
+-        Callback_InvokeActor(context, *callback);
+-    }
+-    if (p->attachmentDelay) {
+-        if (--p->attachmentDelay == 0)
+-            p->attachment = ActorAttachment_UpdateFromDescriptor(
+-                p->attachment, (u8 *)p + 0x24, p->attachmentKind, 127, 0, 0, 0, 80);
+-    }
+-    if (p->state == 38 || p->state == 12) {
+-        p->effectPosition[0] = p->alternatePosition[0] + p->effectOffset[0];
+-        p->effectPosition[1] = p->alternatePosition[1] + p->effectOffset[1];
+-        p->effectPosition[2] = p->alternatePosition[2] + p->effectOffset[2];
+-    } else {
+-        p->effectPosition[0] = p->position[0] + p->effectOffset[0];
+-        p->effectPosition[1] = p->position[1] + p->effectOffset[1];
+-        p->effectPosition[2] = p->position[2] + p->effectOffset[2];
+-    }
+-}
+diff --git a/src/fn/sub_0813DF08.c b/src/fn/sub_0813DF08.c
+deleted file mode 100644
+index 4541efb82..000000000
+--- a/src/fn/sub_0813DF08.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include "global.h"
+-
+-void SceneActorEffects_DestroyGroup(void *);
+-void Shadow_Destroy(void *);
+-void Effect_Remove(void *);
+-void ConvergingEffects_RemoveSprites(void *);
+-void DirectionalSpriteEffect_RemoveSprite(void *);
+-
+-void Player_DestroyEffects(u8 *p)
+-{
+-    SceneActorEffects_DestroyGroup(p + 0x5B8);
+-    Shadow_Destroy(p + 0x700);
+-    Effect_Remove(p + 0x748);
+-    Effect_Remove(p + 0x778);
+-    Effect_Remove(p + 0x7A0);
+-    Effect_Remove(p + 0x7D0);
+-    ConvergingEffects_RemoveSprites(p);
+-    DirectionalSpriteEffect_RemoveSprite(p);
+-}
+diff --git a/src/fn/sub_0813E0F0.c b/src/fn/sub_0813E0F0.c
+deleted file mode 100644
+index 386f1cec8..000000000
+--- a/src/fn/sub_0813E0F0.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-// COMPILER: old_agbcc
+-#include "global.h"
+-/* Player_GetEffectIntensity: Returns the global signed value also used to pace inward particle emission; intensity interpretation tentative */
+-#define Player_GetEffectIntensity sub_0813E0F0
+-
+-extern u8 *gUnk_02000710;
+-
+-s16 sub_0813E0F0(void)
+-{
+-    return *(s16 *)(gUnk_02000710 + 0x876);
+-}
+diff --git a/src/fn/sub_0813E1D8.c b/src/fn/sub_0813E1D8.c
+deleted file mode 100644
+index f2958ad4b..000000000
+--- a/src/fn/sub_0813E1D8.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "global.h"
+-
+-extern u8 *gUnk_02000710;
+-s32 Div(s32, s32);
+-
+-s32 Player_ModifyValueByMissingLife(void *unused, s32 n)
+-{
+-    s32 a = Div(n, 4);
+-    s16 v1 = *(s16 *)(gUnk_02000710 + 0x2A);
+-    s32 b = Div(v1 - *(s16 *)(gUnk_02000710 + 0x28), v1);
+-    return a + n * b;
+-}
+diff --git a/src/fn/sub_0813E208.c b/src/fn/sub_0813E208.c
+deleted file mode 100644
+index 5e31a15b9..000000000
+--- a/src/fn/sub_0813E208.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-
+-extern u8 *gUnk_02000710;
+-s32 Div(s32, s32);
+-
+-s32 Player_ModifyValueByRemainingLife(void *unused, s32 n)
+-{
+-    s32 a = Div(n, 10);
+-    s32 b = Div(n, 2);
+-    s16 v1 = *(s16 *)(gUnk_02000710 + 0x2A);
+-    s32 c = Div(v1 - *(s16 *)(gUnk_02000710 + 0x28), v1);
+-    return n + a - b * c;
+-}
+diff --git a/src/fn/sub_0813E244.c b/src/fn/sub_0813E244.c
+deleted file mode 100644
+index cfd4a8e4c..000000000
+--- a/src/fn/sub_0813E244.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-
+-extern u8 *gUnk_02000710;
+-u8 *Equipment_GetDefinition(u8);
+-s32 Div(s32, s32);
+-
+-s32 Player_ModifyValueByEquipmentLevel(u8 *p, s32 n)
+-{
+-    u8 *t = Equipment_GetDefinition(p[0xB0]);
+-    s32 a = Div(Div(n, 2), 100 - t[2]);
+-    s32 b = *(s16 *)(gUnk_02000710 + 0x40) - t[2];
+-
+-    return n - b * a;
+-}
+diff --git a/src/fn/sub_0813E324.c b/src/fn/sub_0813E324.c
+deleted file mode 100644
+index 0285b431e..000000000
+--- a/src/fn/sub_0813E324.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include "global.h"
+-
+-extern s32 gUnk_03005308;
+-extern u8 gUnk_0203B400[];
+-s32 Mod(s32, s32);
+-
+-s32 Player_RollModifierBonus(void)
+-{
+-    s32 r;
+-
+-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+-    r = Mod(*(u16 *)(gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
+-    if (r > 10) {
+-        r = 0;
+-    } else {
+-        r = 10;
+-    }
+-    return r;
+-}
+diff --git a/src/fn/sub_0813E35C.c b/src/fn/sub_0813E35C.c
+deleted file mode 100644
+index eb1ab9eb1..000000000
+--- a/src/fn/sub_0813E35C.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_GetTargetFlag7Bonus(s32 unused0, s32 unused1, u8 *p)
+-{
+-    u32 m = 0x80;
+-    if (*(u32 *)(p + 0x38) & m) {
+-        return 10;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0813E374.c b/src/fn/sub_0813E374.c
+deleted file mode 100644
+index 526f5eea6..000000000
+--- a/src/fn/sub_0813E374.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_GetTargetFlag8Bonus(s32 unused0, s32 unused1, u8 *p)
+-{
+-    u32 m = 0x80;
+-    m <<= 1;
+-    if (*(u32 *)(p + 0x38) & m) {
+-        return 10;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0813E38C.c b/src/fn/sub_0813E38C.c
+deleted file mode 100644
+index f73c1f1b9..000000000
+--- a/src/fn/sub_0813E38C.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_GetTargetFlag9Bonus(s32 unused0, s32 unused1, u8 *p)
+-{
+-    u32 m = 0x80;
+-    m <<= 2;
+-    if (*(u32 *)(p + 0x38) & m) {
+-        return 10;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0813E3A4.c b/src/fn/sub_0813E3A4.c
+deleted file mode 100644
+index 154cbc7ca..000000000
+--- a/src/fn/sub_0813E3A4.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_GetTargetFlag10Bonus(s32 unused0, s32 unused1, u8 *p)
+-{
+-    u32 m = 0x80;
+-    m <<= 3;
+-    if (*(u32 *)(p + 0x38) & m) {
+-        return 10;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0813E3BC.c b/src/fn/sub_0813E3BC.c
+deleted file mode 100644
+index 4beb13c55..000000000
+--- a/src/fn/sub_0813E3BC.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_GetTargetFlag11Bonus(s32 unused0, s32 unused1, u8 *p)
+-{
+-    u32 m = 0x80;
+-    m <<= 4;
+-    if (*(u32 *)(p + 0x38) & m) {
+-        return 10;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0813E3D4.c b/src/fn/sub_0813E3D4.c
+deleted file mode 100644
+index 5ffc0af98..000000000
+--- a/src/fn/sub_0813E3D4.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_OnWeaponHitApplySol(u8 *p)
+-{
+-    p[0xAC9] = 1;
+-    return 1;
+-}
+diff --git a/src/fn/sub_0813E3E4.c b/src/fn/sub_0813E3E4.c
+deleted file mode 100644
+index 106e9506c..000000000
+--- a/src/fn/sub_0813E3E4.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_OnWeaponHitApplyFlame(u8 *p)
+-{
+-    p[0xAC9] = 3;
+-    return 4;
+-}
+diff --git a/src/fn/sub_0813E3F4.c b/src/fn/sub_0813E3F4.c
+deleted file mode 100644
+index 9c3e4de72..000000000
+--- a/src/fn/sub_0813E3F4.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_OnWeaponHitApplyFrost(u8 *p)
+-{
+-    p[0xAC9] = 4;
+-    return 8;
+-}
+diff --git a/src/fn/sub_0813E404.c b/src/fn/sub_0813E404.c
+deleted file mode 100644
+index 425390291..000000000
+--- a/src/fn/sub_0813E404.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_OnWeaponHitApplyCloud(u8 *p)
+-{
+-    p[0xAC9] = 5;
+-    return 16;
+-}
+diff --git a/src/fn/sub_0813E414.c b/src/fn/sub_0813E414.c
+deleted file mode 100644
+index 882940b5d..000000000
+--- a/src/fn/sub_0813E414.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_OnWeaponHitApplyEarth(u8 *p)
+-{
+-    p[0xAC9] = 6;
+-    return 32;
+-}
+diff --git a/src/fn/sub_0813E424.c b/src/fn/sub_0813E424.c
+deleted file mode 100644
+index eee001615..000000000
+--- a/src/fn/sub_0813E424.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include "global.h"
+-
+-extern s32 gUnk_03005308;
+-extern u8 gUnk_0203B400[];
+-s32 Mod(s32, s32);
+-
+-s32 Player_OnWeaponHitRollEffect1000(void)
+-{
+-    s32 r;
+-
+-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+-    r = Mod(*(u16 *)(gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
+-    if (r > 10) {
+-        r = 0;
+-    } else {
+-        r = 0x1000;
+-    }
+-    return r;
+-}
+diff --git a/src/fn/sub_0813E45C.c b/src/fn/sub_0813E45C.c
+deleted file mode 100644
+index b97b9bdfa..000000000
+--- a/src/fn/sub_0813E45C.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include "global.h"
+-
+-extern s32 gUnk_03005308;
+-extern u8 gUnk_0203B400[];
+-s32 Mod(s32, s32);
+-
+-s32 Player_OnWeaponHitRollEffect40000Low(void)
+-{
+-    s32 r;
+-
+-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+-    r = Mod(*(u16 *)(gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
+-    if (r > 10) {
+-        r = 0;
+-    } else {
+-        r = 0x40000;
+-    }
+-    return r;
+-}
+diff --git a/src/fn/sub_0813E494.c b/src/fn/sub_0813E494.c
+deleted file mode 100644
+index bf0c2ce3f..000000000
+--- a/src/fn/sub_0813E494.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include "global.h"
+-
+-extern s32 gUnk_03005308;
+-extern u8 gUnk_0203B400[];
+-s32 Mod(s32, s32);
+-
+-s32 Player_OnWeaponHitRollEffect40000High(void)
+-{
+-    s32 r;
+-
+-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+-    r = Mod(*(u16 *)(gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
+-    if (r > 20) {
+-        r = 0;
+-    } else {
+-        r = 0x40000;
+-    }
+-    return r;
+-}
+diff --git a/src/fn/sub_0813E4CC.c b/src/fn/sub_0813E4CC.c
+deleted file mode 100644
+index 3e95eced6..000000000
+--- a/src/fn/sub_0813E4CC.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include "global.h"
+-
+-extern s32 gUnk_03005308;
+-extern u8 gUnk_0203B400[];
+-s32 Mod(s32, s32);
+-
+-s32 Player_OnWeaponHitRollEffect80000Low(void)
+-{
+-    s32 r;
+-
+-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+-    r = Mod(*(u16 *)(gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
+-    if (r > 10) {
+-        r = 0;
+-    } else {
+-        r = 0x80000;
+-    }
+-    return r;
+-}
+diff --git a/src/fn/sub_0813E504.c b/src/fn/sub_0813E504.c
+deleted file mode 100644
+index b85cc0db7..000000000
+--- a/src/fn/sub_0813E504.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include "global.h"
+-
+-extern s32 gUnk_03005308;
+-extern u8 gUnk_0203B400[];
+-s32 Mod(s32, s32);
+-
+-s32 Player_OnWeaponHitRollEffect80000High(void)
+-{
+-    s32 r;
+-
+-    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
+-    r = Mod(*(u16 *)(gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
+-    if (r > 20) {
+-        r = 0;
+-    } else {
+-        r = 0x80000;
+-    }
+-    return r;
+-}
+diff --git a/src/fn/sub_0813E53C.c b/src/fn/sub_0813E53C.c
+deleted file mode 100644
+index 95e4a09d6..000000000
+--- a/src/fn/sub_0813E53C.c
++++ /dev/null
+@@ -1,54 +0,0 @@
+-#define Player_AddStatA      Player_IncreaseLifeTowardLimit
+-#define Player_SubtractStatA Player_SubtractLifeNonlethal
+-#define Player_AddStatB      Player_AddEnergy
+-#define Player_SubtractStatB Player_SubtractEnergy
+-#include "global.h"
+-#include "player.h"
+-s32 Div(s32, s32);
+-void Player_IncreaseLifeTowardLimit(struct Player *, s32);
+-void Player_SubtractLifeNonlethal(struct Player *, s32);
+-void Player_AddEnergy(struct Player *, s32);
+-void Player_SubtractEnergy(struct Player *, s32);
+-static inline u32 TestFlags(u32 *flags, u32 mask)
+-{
+-    u32 m = mask;
+-    return *flags & m;
+-}
+-static inline s32 HasFlag(struct Player *p, u32 mask)
+-{
+-    if (!p)
+-        return FALSE;
+-    if (TestFlags(&p->statBonusFlags, mask))
+-        return TRUE;
+-    return FALSE;
+-}
+-void Player_ApplyPeriodicStatChanges(struct Player *p)
+-{
+-    s32 amount;
+-    if (p->kind == 1) {
+-        if (HasFlag(p, 4)) {
+-            amount = Div(p->maximumStatA, 100);
+-            if (amount <= 0)
+-                amount = 1;
+-            Player_IncreaseLifeTowardLimit(p, amount);
+-        }
+-        if (HasFlag(p, 8)) {
+-            amount = Div(p->maximumStatA, 100);
+-            if (amount <= 0)
+-                amount = 1;
+-            Player_SubtractLifeNonlethal(p, amount);
+-        }
+-        if (HasFlag(p, 16)) {
+-            amount = Div(p->maximumStatB, 100);
+-            if (amount <= 0)
+-                amount = 1;
+-            Player_AddEnergy(p, amount);
+-        }
+-        if (HasFlag(p, 32)) {
+-            amount = Div(p->maximumStatB, 100);
+-            if (amount <= 0)
+-                amount = 1;
+-            Player_SubtractEnergy(p, amount);
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0813EAB0.c b/src/fn/sub_0813EAB0.c
+deleted file mode 100644
+index 350729dad..000000000
+--- a/src/fn/sub_0813EAB0.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-
+-void Player_SetWeaponInstance(u8 *p, u32 v)
+-{
+-    *(u32 *)(p + 0xBF0) = v;
+-}
+diff --git a/src/fn/sub_0813EABC.c b/src/fn/sub_0813EABC.c
+deleted file mode 100644
+index f4eb7253b..000000000
+--- a/src/fn/sub_0813EABC.c
++++ /dev/null
+@@ -1,46 +0,0 @@
+-#define Player_SetActionEntry    Player_SetWeaponInstance
+-#define gPlayerActionDescriptors gUnk_08E6092C
+-#include "global.h"
+-#include "player.h"
+-#include "scene_input_compare.h"
+-extern const struct PlayerActionDescriptor gUnk_08E6092C[];
+-void Player_SetWeaponInstance(struct Player *, u32);
+-void sub_0822D7C0(void *);
+-void ActionRecord_CopyFromEntry(void *, void *);
+-void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierContext *, const void *);
+-void sub_0813E90C(struct Player *);
+-void sub_0814F328(void);
+-void sub_0814D9C4(void);
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-void VariantSprite_SelectAnimation(void *, u32);
+-void Player_BeginDescriptorAction(struct Player *p, u32 entry)
+-{
+-    struct PlayerActionDescriptor descriptor;
+-    if (p->actionMode != 6) {
+-        Player_SetWeaponInstance(p, entry);
+-        if (p->statModifierContext.actionEntry == NULL)
+-            sub_0822D7C0(&descriptor);
+-        else
+-            ActionRecord_CopyFromEntry(p->statModifierContext.actionEntry, &descriptor);
+-    } else {
+-        p->statModifierContext.actionEntry = NULL;
+-        descriptor = gUnk_08E6092C[47];
+-    }
+-    p->statModifierContext.actionKind = descriptor.kind;
+-    p->statModifierContext.statBOverrideEnabled = 0;
+-    p->statModifierContext.actionDuration = descriptor.duration;
+-    p->statModifierContext.actionPhase =
+-        Player_GetEquipmentValue((const struct SceneInputItemDescriptor *)&descriptor);
+-    Player_BuildActionModifiers(p, &p->statModifierContext, &descriptor);
+-    if (p->statModifierContext.actionKind == 0x30)
+-        p->actionCallback = sub_0814F328;
+-    else
+-        p->actionCallback = sub_0814D9C4;
+-    p->actionResetCounter = 0;
+-    sub_0813E90C(p);
+-    if (p->tetherMode == 3)
+-        ActorSequence_Begin(p, 0, 0);
+-    if (p->statModifierContext.actionKind != 0x30)
+-        VariantSprite_SelectAnimation(
+-            p->actionDisplay, gUnk_08E6092C[p->statModifierContext.actionKind].displaySelection);
+-}
+diff --git a/src/fn/sub_0813EBE0.c b/src/fn/sub_0813EBE0.c
+deleted file mode 100644
+index 86dcc8fe4..000000000
+--- a/src/fn/sub_0813EBE0.c
++++ /dev/null
+@@ -1,50 +0,0 @@
+-#define gPlayerIndexedActions gUnk_08E60F4C
+-#include "global.h"
+-#include "player.h"
+-extern const struct PlayerIndexedAction gUnk_08E60F4C[];
+-void sub_0814A9D4(void);
+-void sub_0814EEE0(void);
+-void sub_0814E990(void);
+-void sub_0814E3D8(void);
+-void sub_0813E90C(struct Player *);
+-void ActorSequence_Begin(struct Player *, s32, s32);
+-static inline void ClearFlag(struct Player *p, u32 index)
+-{
+-    if (!p)
+-        return;
+-    if (index > 63)
+-        p->actionStateFlags &= ~(1 << (index - 64));
+-    else if (index > 31)
+-        p->actionFlags &= ~(1 << (index - 32));
+-    else
+-        p->statBonusFlags &= ~(1 << index);
+-}
+-void Player_BeginIndexedAction(struct Player *p, s32 action)
+-{
+-    s32 index = action - 1;
+-    const struct PlayerIndexedAction *table = gUnk_08E60F4C;
+-    const struct PlayerIndexedAction *descriptor;
+-    s32 i;
+-    if (p) {
+-        for (i = 0; i <= 6; i++)
+-            ClearFlag(p, i);
+-    }
+-    if (p->actionMode != 6)
+-        descriptor = &table[index];
+-    else
+-        descriptor = &table[index];
+-    p->statModifierContext.actionKind = action;
+-    p->statModifierContext.actionDuration = descriptor->duration;
+-    p->statModifierContext.statBOverrideEnabled = 4;
+-    if (p->actionMode == 6)
+-        p->actionCallback = sub_0814A9D4;
+-    else if (p->statModifierContext.actionKind == 11)
+-        p->actionCallback = sub_0814EEE0;
+-    else if (p->statModifierContext.actionKind == 8)
+-        p->actionCallback = sub_0814E990;
+-    else
+-        p->actionCallback = sub_0814E3D8;
+-    sub_0813E90C(p);
+-    if (p->tetherMode == 3)
+-        ActorSequence_Begin(p, 0, 0);
+-}
+diff --git a/src/fn/sub_0813ED14.c b/src/fn/sub_0813ED14.c
+deleted file mode 100644
+index 12074e578..000000000
+--- a/src/fn/sub_0813ED14.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-
+-void Player_SetWeaponMode(u8 *p, u8 v)
+-{
+-    p[0xC18] = v;
+-}
+diff --git a/src/fn/sub_0813ED20.c b/src/fn/sub_0813ED20.c
+deleted file mode 100644
+index 0ec8b15c4..000000000
+--- a/src/fn/sub_0813ED20.c
++++ /dev/null
+@@ -1,59 +0,0 @@
+-#include "global.h"
+-#include "player.h"
+-void Hud_BeginModeSixCue(void);
+-void Player_BeginDescriptorAction(struct Player *, struct PlayerActionEntry *);
+-static inline u32 TestFlags(u32 *flags, u32 mask)
+-{
+-    u32 m = mask;
+-    return *flags & m;
+-}
+-static inline s32 HasFlag(struct Player *p, u32 mask)
+-{
+-    if (!p)
+-        return FALSE;
+-    if (TestFlags(&p->statBonusFlags, mask))
+-        return TRUE;
+-    return FALSE;
+-}
+-void Player_ConsumeActionCharge(struct Player *p)
+-{
+-    s32 cost;
+-    struct PlayerActionEntry *entry;
+-
+-    if (p->actionMode != 6) {
+-        {
+-            struct PlayerActionDrainContext *drain = &p->statModifierContext.drain;
+-            cost = drain->pendingCost;
+-        }
+-        if (cost > 0) {
+-            if (!p->statModifierContext.statBOverrideEnabled) {
+-                s32 kind = p->statModifierContext.actionEntry->kind;
+-                if (kind == 0x30)
+-                    goto clear;
+-                if (kind == 0x2F)
+-                    goto clear;
+-                {
+-                    if (HasFlag(p, 0x400))
+-                        cost <<= 1;
+-                    if (HasFlag(p, 1) || HasFlag(p, 0x200))
+-                        cost >>= 1;
+-                    if (cost <= 0)
+-                        cost = 1;
+-                    entry = p->statModifierContext.actionEntry;
+-                    if (entry->remainingCharge != 0) {
+-                        if (entry->remainingCharge <= cost) {
+-                            entry->remainingCharge = 0;
+-                            Hud_BeginModeSixCue();
+-                            Player_BeginDescriptorAction(p, p->statModifierContext.actionEntry);
+-                        } else
+-                            entry->remainingCharge -= cost;
+-                    }
+-                }
+-            }
+-        clear: {
+-            struct PlayerActionDrainContext *drain = &p->statModifierContext.drain;
+-            drain->pendingCost = 0;
+-        }
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0813F748.c b/src/fn/sub_0813F748.c
+deleted file mode 100644
+index b8d47d076..000000000
+--- a/src/fn/sub_0813F748.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "global.h"
+-
+-void Player_RefreshEquipmentWithOptions(u8 *p, s32 unused, s32 flag);
+-
+-void Player_RefreshEquipment(u8 *p, s32 q)
+-{
+-    Player_RefreshEquipmentWithOptions(p, q, -1);
+-}
+diff --git a/src/fn/sub_0813F758.c b/src/fn/sub_0813F758.c
+deleted file mode 100644
+index 603a75ed0..000000000
+--- a/src/fn/sub_0813F758.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-
+-void PlayerAction_RefreshFlagState(u8 *, u8 *);
+-void Player_RefreshStatsAndVitals(u8 *);
+-
+-void Player_RefreshEquipmentWithOptions(u8 *p, s32 unused, s32 flag)
+-{
+-    PlayerAction_RefreshFlagState(p, p + 0x32C);
+-    Player_RefreshStatsAndVitals(p);
+-    p[0x45E] = 0;
+-}
+diff --git a/src/fn/sub_0813F780.c b/src/fn/sub_0813F780.c
+deleted file mode 100644
+index 046313ab4..000000000
+--- a/src/fn/sub_0813F780.c
++++ /dev/null
+@@ -1,5 +0,0 @@
+-#include "global.h"
+-
+-void Player_InitEquipmentHook(void)
+-{
+-}
+diff --git a/src/fn/sub_0813F784.c b/src/fn/sub_0813F784.c
+deleted file mode 100644
+index f9aa56ffa..000000000
+--- a/src/fn/sub_0813F784.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_030053F4;
+-extern const u16 gUnk_0861091C[], gUnk_08610940[];
+-u32 ActorParameter_GetModeValue(s32 index)
+-{
+-    if (gUnk_030053F4 & 0x1000)
+-        return gUnk_08610940[index];
+-    else
+-        return gUnk_0861091C[index];
+-}
+diff --git a/src/fn/sub_0813F7B4.c b/src/fn/sub_0813F7B4.c
+deleted file mode 100644
+index f4b85d9a8..000000000
+--- a/src/fn/sub_0813F7B4.c
++++ /dev/null
+@@ -1,29 +0,0 @@
+-#include "global.h"
+-
+-struct P0813F7B4 {
+-    u8 f0[0x33c];
+-    s8 f33C;
+-    u8 f33D[0x448 - 0x33D];
+-    u32 f448;
+-};
+-static inline u32 tst(u32 *a, u32 m)
+-{
+-    return *a & m;
+-}
+-s32 Div(s32, s32);
+-s32 ActorParameter_GetModeValue(s32);
+-
+-s32 Player_GetEnchantmentEnergyCost(struct P0813F7B4 *p)
+-{
+-    s32 v;
+-    s32 pct;
+-    if (p->f33C < 0)
+-        return 0;
+-    v = ActorParameter_GetModeValue(p->f33C);
+-    pct = 100;
+-    if (p != 0 && tst(&p->f448, 0x1000))
+-        pct = 50;
+-    if (pct <= 99)
+-        v = Div(v * pct, 100);
+-    return v;
+-}
+diff --git a/src/fn/sub_0813F808.c b/src/fn/sub_0813F808.c
+deleted file mode 100644
+index 952320497..000000000
+--- a/src/fn/sub_0813F808.c
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_GetEnchantmentEnergyCost(u8 *p);
+-
+-s32 Player_CanAffordEnchantment(u8 *p)
+-{
+-    u8 *q = p;
+-    s32 r = Player_GetEnchantmentEnergyCost(p);
+-
+-    q += 0x428;
+-    if (*(u16 *)q >= r) {
+-        return 1;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0813F84C.c b/src/fn/sub_0813F84C.c
+deleted file mode 100644
+index f708c4abd..000000000
+--- a/src/fn/sub_0813F84C.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_IsEnchantmentAvailable(void)
+-{
+-    return 1;
+-}
+diff --git a/src/fn/sub_0813F850.c b/src/fn/sub_0813F850.c
+deleted file mode 100644
+index a4f856a35..000000000
+--- a/src/fn/sub_0813F850.c
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#include "global.h"
+-
+-struct P0813F850 {
+-    u8 f0[0x33C];
+-    s8 f33C;
+-    u8 f33D;
+-    u8 f33E;
+-    u8 f33F[0xBF5 - 0x33F];
+-    u8 fBF5;
+-};
+-s32 Player_CanAffordEnchantment(void *);
+-
+-s32 Player_GetUsableEnchantment(struct P0813F850 *p)
+-{
+-    if (p->f33E != 0 && Player_CanAffordEnchantment(p) != 0 && (u8)(p->fBF5 - 3) > 1)
+-        return p->f33C;
+-    return -1;
+-}
+diff --git a/src/fn/sub_0813F89C.c b/src/fn/sub_0813F89C.c
+deleted file mode 100644
+index 69088ca23..000000000
+--- a/src/fn/sub_0813F89C.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-
+-s32 Player_HasRequiredEnergy(u8 *p, s32 v)
+-{
+-    if ((s32) * (u16 *)(p + 0x428) < v) {
+-        return 0;
+-    }
+-    return 1;
+-}
+diff --git a/src/fn/sub_0813F8B4.c b/src/fn/sub_0813F8B4.c
+deleted file mode 100644
+index 314fd70d9..000000000
+--- a/src/fn/sub_0813F8B4.c
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#include "global.h"
+-
+-struct P0813F8B4 {
+-    u8 f0[0x472];
+-    u8 idx;
+-};
+-struct G0813F8B4 {
+-    u8 f0[0x876];
+-    s16 f876;
+-};
+-extern struct G0813F8B4 *gUnk_02000710;
+-
+-s32 Player_CanSpendSharedResource(struct P0813F8B4 *p, s32 v)
+-{
+-    if (*(s32 *)((u8 *)gUnk_02000710 + p->idx * 4 + 0x628) <= 0 && gUnk_02000710->f876 >= v)
+-        return 1;
+-    return 0;
+-}
+diff --git a/src/fn/sub_0813F9EC.c b/src/fn/sub_0813F9EC.c
+deleted file mode 100644
+index c755f9d10..000000000
+--- a/src/fn/sub_0813F9EC.c
++++ /dev/null
+@@ -1,57 +0,0 @@
+-#define Player_IsActionRequestEnabled Player_IsEnchantmentAvailable
+-#include "global.h"
+-#include "player.h"
+-s32 ActorParameter_GetModeValue(s32);
+-s32 Player_IsEnchantmentAvailable(struct Player *, s32);
+-void PlayerBarrier_Hide(void *);
+-s32 PlayerBarrier_IsActive(void *);
+-static inline void ClearModeFlag(struct Player *p)
+-{
+-    if (p) {
+-        u32 *flags = &p->actionStateFlags;
+-        u32 mask = ~16;
+-        *flags &= mask;
+-    }
+-}
+-static inline void SetModeFlag(struct Player *p)
+-{
+-    if (p) {
+-        u32 *flags = &p->actionStateFlags;
+-        u32 mask = 16;
+-        *flags |= mask;
+-    }
+-}
+-void Player_SetActionRequest(struct Player *p, s32 kind)
+-{
+-    struct PlayerActionRequest *request = (struct PlayerActionRequest *)&p->thresholdMode;
+-    if (request->kind != kind) {
+-        if (request->latched) {
+-            request->latched = 0;
+-            p->actionVariant = 0;
+-        }
+-        request->kind = kind;
+-        ClearModeFlag(p);
+-        if (kind == 3)
+-            SetModeFlag(p);
+-        else if (PlayerBarrier_IsActive(p->actionRequestEffect))
+-            PlayerBarrier_Hide(p->actionRequestEffect);
+-        if ((u8)request->kind > 5) {
+-            request->latched = 0;
+-            request->enabled = 0;
+-            request->duration = 0;
+-            p->actionRequestState = 0;
+-            if (p->actionRequestHold == 0)
+-                p->actionRequestTimer = 0;
+-        } else {
+-            request->enabled = Player_IsEnchantmentAvailable(p, request->kind);
+-            request->duration = ActorParameter_GetModeValue(request->kind);
+-            if (!request->enabled)
+-                return;
+-            request->latched = 0;
+-            p->actionRequestState = 0;
+-            if (p->actionRequestHold == 0)
+-                p->actionRequestTimer = 0;
+-        }
+-        p->actionVariant = p->baseActionVariant;
+-    }
+-}
+diff --git a/src/fn/sub_0813FADC.c b/src/fn/sub_0813FADC.c
+deleted file mode 100644
+index 61c2b9f96..000000000
+--- a/src/fn/sub_0813FADC.c
++++ /dev/null
+@@ -1,24 +0,0 @@
+-#include "global.h"
+-
+-struct P0813FADC {
+-    u8 f0[0x418];
+-    u8 f418;
+-};
+-struct G0813FADC {
+-    u8 f0[0x52];
+-    s16 idx;
+-    u8 f54[0xC];
+-    s16 f60;
+-};
+-extern struct G0813FADC *gUnk_02000710;
+-extern s16 gUnk_02000554;
+-
+-s32 Player_GetSelectedAbility(struct P0813FADC *p)
+-{
+-    if (p->f418 != 6)
+-        return *(s16 *)((u8 *)gUnk_02000710 + gUnk_02000710->idx * 2 + 0x88);
+-    gUnk_02000554 = 0;
+-    if (gUnk_02000710->f60 == 0)
+-        return 4;
+-    return 5;
+-}
+diff --git a/src/fn/sub_0813FBC8.c b/src/fn/sub_0813FBC8.c
+deleted file mode 100644
+index cc5133966..000000000
+--- a/src/fn/sub_0813FBC8.c
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#include "global.h"
+-
+-s32 Script_SeekToKeyword(s32);
+-s32 Script_GetValue(void);
+-
+-void Player_InitSlotFromScript(u8 *p)
+-{
+-    s32 v;
+-
+-    v = Script_SeekToKeyword(0x69);
+-    if (v != 0) {
+-        v = Script_GetValue();
+-    }
+-    *(s32 *)(p + 0x18) = v;
+-}
+diff --git a/src/fn/sub_0813FBE4.c b/src/fn/sub_0813FBE4.c
+deleted file mode 100644
+index 89e84456f..000000000
+--- a/src/fn/sub_0813FBE4.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-
+-struct P0813FBE4 {
+-    u8 f0[0x34C];
+-    u16 a[10];
+-};
+-
+-void Player_ClearDirectionHistory(struct P0813FBE4 *p)
+-{
+-    s32 i;
+-    for (i = 0; i < 10; i++)
+-        p->a[i] |= 0xFFFF;
+-}
+diff --git a/src/fn/sub_0813FC08.c b/src/fn/sub_0813FC08.c
+deleted file mode 100644
+index 29f8b5440..000000000
+--- a/src/fn/sub_0813FC08.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "global.h"
+-
+-s32 Script_SeekToKeyword(s32);
+-s32 Script_GetValue(void);
+-
+-void Player_InitEventProcedureFromScript(u8 *p)
+-{
+-    s32 v;
+-
+-    v = Script_SeekToKeyword(0x52);
+-    if (v != 0) {
+-        *(s32 *)(p + 0xB3C) = Script_GetValue();
+-    } else {
+-        *(s32 *)(p + 0xB3C) = v;
+-    }
+-}
+diff --git a/src/fn/sub_0814433C.c b/src/fn/sub_0814433C.c
+index 9149da8eb..59a79615f 100644
+--- a/src/fn/sub_0814433C.c
++++ b/src/fn/sub_0814433C.c
+@@ -7,14 +7,14 @@ s32 Player_SetAnimation(struct Player *, s32, s32, s32);
+ void ActorSequence_Begin(struct Player *, s32, s32);
+ void Player_UpdateMovementFacing(struct Player *p)
+ {
+-    if (p->directionHistory[0] >= 0 && p->facing != p->directionHistory[0]) {
++    if ((s16)p->directionHistory[0] >= 0 && p->facing != (s16)p->directionHistory[0]) {
+         if (p->facingChangeEffects & 1) {
+             if ((p->facingChangeEffects >> 1) & 1)
+                 Player_PlayPositionEffect(p, &p->position, 1, 1, 0, 0, 0x116);
+             else
+                 Player_PlayPositionEffect(p, &p->position, 1, 1, 0, 0, 0x117);
+         }
+-        p->facing = p->directionHistory[0];
++        p->facing = (s16)p->directionHistory[0];
+         Player_UpdateFacingSide(p);
+     }
+     Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0), 64, 1);
+diff --git a/src/fn/sub_081580EC.c b/src/fn/sub_081580EC.c
+index feb5d2ff2..cbf2c2432 100644
+--- a/src/fn/sub_081580EC.c
++++ b/src/fn/sub_081580EC.c
+@@ -19,7 +19,7 @@ s32 Player_SelectInteractionMode(struct Player *p)
+         if ((p->inputKeys[1] & 1) &&
+             (u8)Trigger_TryOpenNearby((struct TriggerOpener *)((u8 *)p + 0x24)))
+             mode = 0;
+-        else if (p->directionHistory[0] == -1 || (p->inputKeys[0] & 0x100))
++        else if ((s16)p->directionHistory[0] == -1 || (p->inputKeys[0] & 0x100))
+             mode = 0;
+         else
+             mode = 1;
+diff --git a/src/fn/sub_08158588.c b/src/fn/sub_08158588.c
+index da466d9c6..3a283b95c 100644
+--- a/src/fn/sub_08158588.c
++++ b/src/fn/sub_08158588.c
+@@ -22,7 +22,7 @@ s32 Player_SelectAlternateInteractionMode(struct Player *p)
+                 mode = 0;
+             else
+                 mode = 4;
+-        } else if (p->directionHistory[0] == -1 || (p->inputKeys[0] & 0x100))
++        } else if ((s16)p->directionHistory[0] == -1 || (p->inputKeys[0] & 0x100))
+             mode = 0;
+         else
+             mode = 1;
+diff --git a/src/player_3.c b/src/player_3.c
+new file mode 100644
+index 000000000..a9d51d445
+--- /dev/null
++++ b/src/player_3.c
+@@ -0,0 +1,1088 @@
++#include "player_3.h"
++
++/* Tentative role: select an effect flag from actor and global state. */
++
++static inline u8 global_mode(void)
++{
++    u32 mask = 2;
++    if (gUnk_02000710->flags868 & mask)
++        return 1;
++    return 0;
++}
++
++s32 Player_GetVisualEffectFlags(struct Player *s)
++{
++    s32 result = 0;
++    if (s->actionMode == 2)
++        return 0;
++    if (!global_mode()) {
++        if (s->statusFlags & 16)
++            result = 8;
++    } else {
++        if (s->statusFlags & 16)
++            result = 4;
++    }
++    return result;
++}
++
++void Player_LoadVisualParameters(struct Player *p)
++{
++    u16 *t;
++    s32 i;
++    if (p->baseActionVariant <= 9) {
++        t = (u16 *)(gUnk_030042E4 + 0x6A0);
++        i = p->baseActionVariant;
++    } else {
++        t = (u16 *)(gUnk_030042E4 + 0x2F60);
++        i = p->baseActionVariant;
++        i -= 10;
++    }
++    t += i * 3;
++    p->visualParameterA = *t++;
++    p->visualParameterB = *t;
++    p->visualParameterC = t[1];
++}
++
++INCLUDE_ASM("asm/nonmatching", sub_0813C9B4);
++
++INCLUDE_ASM("asm/nonmatching", sub_0813CB8C);
++
++INCLUDE_ASM("asm/nonmatching", sub_0813CE20);
++
++void Player_SelectSpriteResource(struct Player *p)
++{
++    if (p->slot == 0) {
++        p->baseSpriteResource = 0x2A;
++    } else {
++        p->baseSpriteResource = 0x35;
++    }
++}
++
++void sub_0813D178(void *);
++
++void sub_0813CB8C(void *, u32);
++
++INCLUDE_ASM("asm/nonmatching", sub_0813D178);
++
++void Player_InitVisualState(struct Player *p)
++{
++    Player_SelectSpriteResource(p);
++    sub_0813D178(p);
++    p->savedSpriteResource = 0xFFFF;
++    p->baseActionVariant = 0xFF;
++    p->spriteResource = p->baseSpriteResource;
++    p->actionVariantResource = (u32)p->visualParameters;
++    p->visualObject->resource = p->baseSpriteResource;
++    p->visualObject->parameters = (u32)p->visualParameters;
++    sub_0813CB8C(p, 0);
++}
++
++void SceneActor_StartRandomizedEffect(struct Player *);
++
++INCLUDE_ASM("asm/nonmatching", SceneActor_StartRandomizedEffect);
++
++void Player_EmitQueuedEffects(struct Player *p)
++{
++    u8 t = p->movementModifierActive;
++    s32 n;
++    if (t != 0) {
++        n = t;
++        do {
++            SceneActor_StartRandomizedEffect(p);
++            n--;
++        } while (n != 0);
++    }
++}
++
++void sub_08231568(u8 *);
++
++void Player_FlushQueuedEffects(struct Player *p)
++{
++    if (p->movementModifierKind == 1) {
++        sub_08231568(&p->effectGroup);
++    } else {
++        u8 t = p->movementModifierActive;
++        s32 n;
++
++        if (t != 0) {
++            n = t;
++            do {
++                SceneActor_StartRandomizedEffect(p);
++                n--;
++            } while (n != 0);
++        }
++    }
++}
++
++INCLUDE_ASM("asm/nonmatching", sub_0813D548);
++
++s32 Player_GetEffectTickDelta(struct Player *p)
++{
++    s32 r = p->facingChangeEffects;
++    r -= p->savedEffectTick;
++    r += 0x100;
++    return r & 0xFF;
++}
++
++#define SceneActor_GetEffectElapsedTicks Player_GetEffectTickDelta
++
++#define gSceneActorEffectThresholds gUnk_08610918
++
++extern const u8 gUnk_08610918[];
++
++void SceneActor_StartRandomizedEffect(struct Player *);
++
++s32 Player_GetEffectTickDelta(struct Player *);
++
++s32 SceneActor_SelectEffectDisplayMode(struct Player *p, s32 mode)
++{
++    s32 original = mode;
++    if (p->movementModifierActive) {
++        if (p->kind & 1) {
++            if (Player_GetEffectTickDelta(p) >= gUnk_08610918[p->movementModifierKind - 1]) {
++                SceneActor_StartRandomizedEffect(p);
++                p->savedEffectTick = p->facingChangeEffects;
++            }
++        }
++        if (p->movementModifierActive) {
++            if (p->movementModifierKind == 1)
++                mode = 3;
++            else if (p->movementModifierKind == 2)
++                mode = 4;
++            else if (p->movementModifierKind == 3)
++                mode = 5;
++        }
++    }
++    if (p->movementSpeedReduction)
++        mode = 7;
++    if (mode == original) {
++        if (p->visualFlashTimer) {
++            if (((u16)p->visualFlashTimer >> 2) & 1)
++                mode = p->savedVisualMode;
++            p->visualFlashTimer--;
++        }
++    } else {
++        p->savedVisualMode = mode;
++        p->visualFlashTimer = 64;
++    }
++    return mode;
++}
++
++INCLUDE_ASM("asm/nonmatching", sub_0813D834);
++
++void Player_ClearStateTimer(struct Player *p, s32 idx)
++{
++    p->scriptStatus[idx] = 0;
++    if (idx == 1) {
++        u16 v = gUnk_02000710->values08[4];
++        p->catalogSavedOption = v;
++    }
++}
++
++INCLUDE_ASM("asm/nonmatching", sub_0813D924);
++
++#define Player_SelectFlashingVisualMode sub_0813DB60
++#ifdef NONMATCHING
++// fuzzy: 82.1%
++// Register allocation swaps the preserved actor and input mode.
++s32 Player_SelectFlashingVisualMode(struct Player *p, s32 mode)
++{
++    s32 result = mode;
++    if (p->movementRequestScale) {
++        if ((--p->movementRequestScale >> 2) & 1)
++            goto flash;
++    }
++    return result;
++flash:
++    return p->movementRequestParameter;
++}
++#else
++INCLUDE_ASM("asm/nonmatching", sub_0813DB60);
++#endif
++
++INCLUDE_ASM("asm/nonmatching", sub_0813DB98);
++
++void Player_AdvanceEffectTick(struct Player *p)
++{
++    const u16 *q = p->inputKeys;
++
++    if (q[1] & 0xF3) {
++        p->facingChangeEffects++;
++    }
++}
++
++#define SceneActor_AdvanceEffectTick Player_AdvanceEffectTick
++
++void sub_0813DB98(void *);
++
++void Player_AdvanceEffectTick(struct Player *);
++
++s32 sub_0813D924(void *, s32);
++
++s32 SceneActor_SelectEffectDisplayMode(struct Player *, s32);
++
++s32 sub_0813DB60(struct Player *, s32);
++
++void sub_0813CE20(void *, s32);
++
++void sub_0813B950(void *);
++
++void Player_UpdateOrbitingEffect(void *);
++
++void sub_0813BAD8(void *);
++
++void ConvergingEffects_UpdateParticles(void *);
++
++void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, void *, int, int, int);
++
++void SceneActor_UpdateVisualEffects(struct Player *p)
++{
++    s32 mode;
++    sub_0813DB98(p);
++    Player_AdvanceEffectTick(p);
++    mode = sub_0813D924(p, 0);
++    mode = SceneActor_SelectEffectDisplayMode(p, mode);
++    mode = sub_0813DB60(p, mode);
++    if (p->kind == 2 && p->tetherMode != 10 && p->tetherMode != 11)
++        sub_0813CE20(p, mode);
++    else
++        sub_0813CB8C(p, mode);
++    sub_0813B950(p);
++    Player_UpdateOrbitingEffect(p);
++    sub_0813BAD8(p);
++    ConvergingEffects_UpdateParticles(p);
++    {
++        void **callback = &p->directionalEffectCallback;
++        void *context = p->directionalEffect;
++        Callback_InvokeActor(context, *callback);
++    }
++    if (p->kindTwoAttachmentCounter) {
++        if (--p->kindTwoAttachmentCounter == 0)
++            p->kindTwoAttachment = ActorAttachment_UpdateFromDescriptor(
++                p->kindTwoAttachment, &p->positionalEffectGroup, p->kindTwoAttachmentDescriptor,
++                127, 0, 0, 0, 80);
++    }
++    if (p->tetherMode == 38 || p->tetherMode == 12) {
++        p->effectPosition[0] = p->alternatePosition[0] + p->resetValue6F8;
++        p->effectPosition[1] = p->alternatePosition[1] + p->resetValue6FA;
++        p->effectPosition[2] = p->alternatePosition[2] + p->resetValue6FC;
++    } else {
++        p->effectPosition[0] = p->position.x + p->resetValue6F8;
++        p->effectPosition[1] = p->position.y + p->resetValue6FA;
++        p->effectPosition[2] = p->position.z + p->resetValue6FC;
++    }
++}
++
++void SceneActorEffects_DestroyGroup(void *);
++
++void Shadow_Destroy(void *);
++
++void ConvergingEffects_RemoveSprites(void *);
++
++void DirectionalSpriteEffect_RemoveSprite(void *);
++
++void Player_DestroyEffects(struct Player *p)
++{
++    SceneActorEffects_DestroyGroup(&p->effectGroup);
++    Shadow_Destroy(p->shadow);
++    Effect_Remove(p->visualEffects748);
++    Effect_Remove(p->visualEffects778);
++    Effect_Remove(p->visualEffects7A0);
++    Effect_Remove(p->visualEffects7D0);
++    ConvergingEffects_RemoveSprites(p);
++    DirectionalSpriteEffect_RemoveSprite(p);
++}
++
++/* Player_GetEffectIntensity: Returns the global signed value also used to pace inward particle emission; intensity interpretation tentative */
++
++#define Player_GetEffectIntensity sub_0813E0F0
++
++INCLUDE_ASM("asm/nonmatching", sub_0813DF5C);
++
++s16 sub_0813E0F0(void)
++{
++    return gUnk_02000710->unk876;
++}
++
++s32 Div(s32, s32);
++
++#define Player_GetStateModifierBonus sub_0813E108
++s32 Player_GetStateModifierBonus(struct Player *p)
++{
++    s32 i;
++    for (i = 0; i <= 1; i++) {
++        if (p->scriptStatus[i])
++            return 10;
++    }
++    if (*(s32 *)((u8 *)gUnk_02000710 + p->timedEventSlot * 4 + 0x628))
++        return 10;
++    if (p->movementModifierActive)
++        return 10;
++    return 0;
++}
++#define Player_GetBlockedActionBonus sub_0813E160
++s32 Player_IsActionBlocked(struct Player *);
++s32 Player_GetBlockedActionBonus(struct Player *p)
++{
++    if (Player_IsActionBlocked(p) == 0)
++        goto zero;
++    return 10;
++zero:
++    return 0;
++}
++#define Player_GetStatAModifierBonus sub_0813E174
++s32 Player_GetStatAModifierBonus(struct Player *p)
++{
++    return p->derivedStats[0] >> 3;
++}
++#define Player_GetStatBModifierBonus sub_0813E184
++s32 Player_GetStatBModifierBonus(struct Player *p)
++{
++    return p->derivedStats[1] >> 3;
++}
++#define Player_GetEnergyRatioModifier sub_0813E194
++s32 Player_GetEnergyRatioModifier(struct Player *p)
++{
++    return Div(p->currentStatB * 10, p->maximumStatB);
++}
++#define Player_GetLifeRatioModifier sub_0813E1B8
++s32 Player_GetLifeRatioModifier(void)
++{
++    return Div(gUnk_02000710->life * 10, gUnk_02000710->lifeMax);
++}
++
++s32 Player_ModifyValueByMissingLife(void *unused, s32 n)
++{
++    s32 a = Div(n, 4);
++    s16 v1 = gUnk_02000710->lifeMax;
++    s32 b = Div(v1 - gUnk_02000710->life, v1);
++    return a + n * b;
++}
++
++s32 Player_ModifyValueByRemainingLife(void *unused, s32 n)
++{
++    s32 a = Div(n, 10);
++    s32 b = Div(n, 2);
++    s16 v1 = gUnk_02000710->lifeMax;
++    s32 c = Div(v1 - gUnk_02000710->life, v1);
++    return n + a - b * c;
++}
++
++u8 *Equipment_GetDefinition(u8);
++
++s32 Player_ModifyValueByEquipmentLevel(struct PlayerModifierInput *p, s32 n)
++{
++    u8 *t = Equipment_GetDefinition(p->equipment);
++    s32 a = Div(Div(n, 2), 100 - t[2]);
++    s32 b = gUnk_02000710->level - t[2];
++
++    return n - b * a;
++}
++
++#define Player_GetScaledTargetFlagBonus sub_0813E284
++static inline s32 LimitTargetBonus(s32 value)
++{
++    if (value > 10)
++        value = 10;
++    return value;
++}
++s32 Player_GetScaledTargetFlagBonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *target)
++{
++    u32 mask = 0x80;
++    if (target->flags & mask)
++        return LimitTargetBonus(gUnk_02000710->targetFlagBonuses[0] >> 6);
++    else if (target->flags & 0x100)
++        return LimitTargetBonus(gUnk_02000710->targetFlagBonuses[1] >> 6);
++    else if (target->flags & 0x200)
++        return LimitTargetBonus(gUnk_02000710->targetFlagBonuses[2] >> 6);
++    else if (target->flags & 0x400)
++        return LimitTargetBonus(gUnk_02000710->targetFlagBonuses[3] >> 6);
++    else if (target->flags & 0x800)
++        return LimitTargetBonus(gUnk_02000710->targetFlagBonuses[4] >> 6);
++    return 0;
++}
++
++s32 Mod(s32, s32);
++
++s32 Player_RollModifierBonus(void)
++{
++    s32 r;
++
++    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
++    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
++    if (r > 10) {
++        r = 0;
++    } else {
++        r = 10;
++    }
++    return r;
++}
++
++s32 Player_GetTargetFlag7Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
++{
++    u32 m = 0x80;
++    if (p->flags & m) {
++        return 10;
++    }
++    return 0;
++}
++
++s32 Player_GetTargetFlag8Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
++{
++    u32 m = 0x80;
++    m <<= 1;
++    if (p->flags & m) {
++        return 10;
++    }
++    return 0;
++}
++
++s32 Player_GetTargetFlag9Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
++{
++    u32 m = 0x80;
++    m <<= 2;
++    if (p->flags & m) {
++        return 10;
++    }
++    return 0;
++}
++
++s32 Player_GetTargetFlag10Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
++{
++    u32 m = 0x80;
++    m <<= 3;
++    if (p->flags & m) {
++        return 10;
++    }
++    return 0;
++}
++
++s32 Player_GetTargetFlag11Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
++{
++    u32 m = 0x80;
++    m <<= 4;
++    if (p->flags & m) {
++        return 10;
++    }
++    return 0;
++}
++
++s32 Player_OnWeaponHitApplySol(struct Player *p)
++{
++    p->actionVariant = 1;
++    return 1;
++}
++
++s32 Player_OnWeaponHitApplyFlame(struct Player *p)
++{
++    p->actionVariant = 3;
++    return 4;
++}
++
++s32 Player_OnWeaponHitApplyFrost(struct Player *p)
++{
++    p->actionVariant = 4;
++    return 8;
++}
++
++s32 Player_OnWeaponHitApplyCloud(struct Player *p)
++{
++    p->actionVariant = 5;
++    return 16;
++}
++
++s32 Player_OnWeaponHitApplyEarth(struct Player *p)
++{
++    p->actionVariant = 6;
++    return 32;
++}
++
++s32 Player_OnWeaponHitRollEffect1000(void)
++{
++    s32 r;
++
++    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
++    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
++    if (r > 10) {
++        r = 0;
++    } else {
++        r = 0x1000;
++    }
++    return r;
++}
++
++s32 Player_OnWeaponHitRollEffect40000Low(void)
++{
++    s32 r;
++
++    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
++    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
++    if (r > 10) {
++        r = 0;
++    } else {
++        r = 0x40000;
++    }
++    return r;
++}
++
++s32 Player_OnWeaponHitRollEffect40000High(void)
++{
++    s32 r;
++
++    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
++    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
++    if (r > 20) {
++        r = 0;
++    } else {
++        r = 0x40000;
++    }
++    return r;
++}
++
++s32 Player_OnWeaponHitRollEffect80000Low(void)
++{
++    s32 r;
++
++    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
++    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
++    if (r > 10) {
++        r = 0;
++    } else {
++        r = 0x80000;
++    }
++    return r;
++}
++
++s32 Player_OnWeaponHitRollEffect80000High(void)
++{
++    s32 r;
++
++    gUnk_03005308 = (gUnk_03005308 + 1) & 0x3FF;
++    r = Mod(*(const u16 *)((const u8 *)gUnk_0203B400 + (gUnk_03005308 << 1)), 100);
++    if (r > 20) {
++        r = 0;
++    } else {
++        r = 0x80000;
++    }
++    return r;
++}
++
++#define Player_AddStatA Player_IncreaseLifeTowardLimit
++
++#define Player_SubtractStatA Player_SubtractLifeNonlethal
++
++#define Player_AddStatB Player_AddEnergy
++
++#define Player_SubtractStatB Player_SubtractEnergy
++
++void Player_IncreaseLifeTowardLimit(struct Player *, s32);
++
++void Player_SubtractLifeNonlethal(struct Player *, s32);
++
++void Player_AddEnergy(struct Player *, s32);
++
++void Player_SubtractEnergy(struct Player *, s32);
++
++static inline u32 TestFlags(u32 *flags, u32 mask)
++{
++    u32 m = mask;
++    return *flags & m;
++}
++
++static inline s32 HasFlag(struct Player *p, u32 mask)
++{
++    if (!p)
++        return FALSE;
++    if (TestFlags(&p->statBonusFlags, mask))
++        return TRUE;
++    return FALSE;
++}
++
++void Player_ApplyPeriodicStatChanges(struct Player *p)
++{
++    s32 amount;
++    if (p->kind == 1) {
++        if (HasFlag(p, 4)) {
++            amount = Div(p->maximumStatA, 100);
++            if (amount <= 0)
++                amount = 1;
++            Player_IncreaseLifeTowardLimit(p, amount);
++        }
++        if (HasFlag(p, 8)) {
++            amount = Div(p->maximumStatA, 100);
++            if (amount <= 0)
++                amount = 1;
++            Player_SubtractLifeNonlethal(p, amount);
++        }
++        if (HasFlag(p, 16)) {
++            amount = Div(p->maximumStatB, 100);
++            if (amount <= 0)
++                amount = 1;
++            Player_AddEnergy(p, amount);
++        }
++        if (HasFlag(p, 32)) {
++            amount = Div(p->maximumStatB, 100);
++            if (amount <= 0)
++                amount = 1;
++            Player_SubtractEnergy(p, amount);
++        }
++    }
++}
++
++INCLUDE_ASM("asm/nonmatching", Player_BuildActionModifiers);
++
++INCLUDE_ASM("asm/nonmatching", sub_0813E90C);
++
++void Player_SetWeaponInstance(struct Player *p, u32 v)
++{
++    p->statModifierContext.actionEntry = (struct PlayerActionEntry *)v;
++}
++
++#define Player_SetActionEntry Player_SetWeaponInstance
++
++#define gPlayerActionDescriptors gUnk_08E6092C
++
++extern const struct PlayerActionDescriptor gUnk_08E6092C[];
++
++void Player_SetWeaponInstance(struct Player *, u32);
++
++void sub_0822D7C0(void *);
++
++void ActionRecord_CopyFromEntry(void *, void *);
++
++void Player_BuildActionModifiers(struct Player *, struct PlayerStatModifierContext *, const void *);
++
++void sub_0813E90C(struct Player *);
++
++void sub_0814F328(void);
++
++void sub_0814D9C4(void);
++
++void ActorSequence_Begin(struct Player *, s32, s32);
++
++void VariantSprite_SelectAnimation(void *, u32);
++
++void Player_BeginDescriptorAction(struct Player *p, u32 entry)
++{
++    struct PlayerActionDescriptor descriptor;
++    if (p->actionMode != 6) {
++        Player_SetWeaponInstance(p, entry);
++        if (p->statModifierContext.actionEntry == NULL)
++            sub_0822D7C0(&descriptor);
++        else
++            ActionRecord_CopyFromEntry(p->statModifierContext.actionEntry, &descriptor);
++    } else {
++        p->statModifierContext.actionEntry = NULL;
++        descriptor = gUnk_08E6092C[47];
++    }
++    p->statModifierContext.actionKind = descriptor.kind;
++    p->statModifierContext.statBOverrideEnabled = 0;
++    p->statModifierContext.actionDuration = descriptor.duration;
++    p->statModifierContext.actionPhase =
++        Player_GetEquipmentValue((const struct SceneInputItemDescriptor *)&descriptor);
++    Player_BuildActionModifiers(p, &p->statModifierContext, &descriptor);
++    if (p->statModifierContext.actionKind == 0x30)
++        p->actionCallback = sub_0814F328;
++    else
++        p->actionCallback = sub_0814D9C4;
++    p->actionResetCounter = 0;
++    sub_0813E90C(p);
++    if (p->tetherMode == 3)
++        ActorSequence_Begin(p, 0, 0);
++    if (p->statModifierContext.actionKind != 0x30)
++        VariantSprite_SelectAnimation(
++            p->actionDisplay, gUnk_08E6092C[p->statModifierContext.actionKind].displaySelection);
++}
++
++#define gPlayerIndexedActions gUnk_08E60F4C
++
++extern const struct PlayerIndexedAction gUnk_08E60F4C[];
++
++void sub_0814A9D4(void);
++
++void sub_0814EEE0(void);
++
++void sub_0814E990(void);
++
++void sub_0814E3D8(void);
++
++static inline void ClearFlag(struct Player *p, u32 index)
++{
++    if (!p)
++        return;
++    if (index > 63)
++        p->actionStateFlags &= ~(1 << (index - 64));
++    else if (index > 31)
++        p->actionFlags &= ~(1 << (index - 32));
++    else
++        p->statBonusFlags &= ~(1 << index);
++}
++
++void Player_BeginIndexedAction(struct Player *p, s32 action)
++{
++    s32 index = action - 1;
++    const struct PlayerIndexedAction *table = gUnk_08E60F4C;
++    const struct PlayerIndexedAction *descriptor;
++    s32 i;
++    if (p) {
++        for (i = 0; i <= 6; i++)
++            ClearFlag(p, i);
++    }
++    if (p->actionMode != 6)
++        descriptor = &table[index];
++    else
++        descriptor = &table[index];
++    p->statModifierContext.actionKind = action;
++    p->statModifierContext.actionDuration = descriptor->duration;
++    p->statModifierContext.statBOverrideEnabled = 4;
++    if (p->actionMode == 6)
++        p->actionCallback = sub_0814A9D4;
++    else if (p->statModifierContext.actionKind == 11)
++        p->actionCallback = sub_0814EEE0;
++    else if (p->statModifierContext.actionKind == 8)
++        p->actionCallback = sub_0814E990;
++    else
++        p->actionCallback = sub_0814E3D8;
++    sub_0813E90C(p);
++    if (p->tetherMode == 3)
++        ActorSequence_Begin(p, 0, 0);
++}
++
++void Player_SetWeaponMode(struct Player *p, u8 v)
++{
++    p->statModifierContext.statBOverrideMode = v;
++}
++
++void Hud_BeginModeSixCue(void);
++
++void Player_BeginDescriptorAction(struct Player *, u32);
++
++void Player_ConsumeActionCharge(struct Player *p)
++{
++    s32 cost;
++    struct PlayerActionEntry *entry;
++
++    if (p->actionMode != 6) {
++        {
++            struct PlayerActionDrainContext *drain = &p->statModifierContext.drain;
++            cost = drain->pendingCost;
++        }
++        if (cost > 0) {
++            if (!p->statModifierContext.statBOverrideEnabled) {
++                s32 kind = p->statModifierContext.actionEntry->kind;
++                if (kind == 0x30)
++                    goto clear;
++                if (kind == 0x2F)
++                    goto clear;
++                {
++                    if (HasFlag(p, 0x400))
++                        cost <<= 1;
++                    if (HasFlag(p, 1) || HasFlag(p, 0x200))
++                        cost >>= 1;
++                    if (cost <= 0)
++                        cost = 1;
++                    entry = p->statModifierContext.actionEntry;
++                    if (entry->remainingCharge != 0) {
++                        if (entry->remainingCharge <= cost) {
++                            entry->remainingCharge = 0;
++                            Hud_BeginModeSixCue();
++                            Player_BeginDescriptorAction(p,
++                                                         (u32)p->statModifierContext.actionEntry);
++                        } else
++                            entry->remainingCharge -= cost;
++                    }
++                }
++            }
++        clear: {
++            struct PlayerActionDrainContext *drain = &p->statModifierContext.drain;
++            drain->pendingCost = 0;
++        }
++        }
++    }
++}
++
++void Player_RefreshEquipmentWithOptions(struct Player *p, s32 unused, s32 flag);
++
++INCLUDE_ASM("asm/nonmatching", PlayerAction_RefreshFlagState);
++
++INCLUDE_ASM("asm/nonmatching", sub_0813F702);
++
++void Player_RefreshEquipment(struct Player *p, s32 q)
++{
++    Player_RefreshEquipmentWithOptions(p, q, -1);
++}
++
++void PlayerAction_RefreshFlagState(struct Player *, u8 *);
++
++void Player_RefreshStatsAndVitals(struct Player *);
++
++void Player_RefreshEquipmentWithOptions(struct Player *p, s32 unused, s32 flag)
++{
++    PlayerAction_RefreshFlagState(p, p->actionFlagState);
++    Player_RefreshStatsAndVitals(p);
++    p->movementStatTimer = 0;
++}
++
++void Player_InitEquipmentHook(void)
++{
++}
++
++extern const u16 gUnk_0861091C[], gUnk_08610940[];
++
++u32 ActorParameter_GetModeValue(s32 index)
++{
++    if (gUnk_030053F4 & 0x1000)
++        return gUnk_08610940[index];
++    else
++        return gUnk_0861091C[index];
++}
++
++static inline u32 tst(u32 *a, u32 m)
++{
++    return *a & m;
++}
++
++u32 ActorParameter_GetModeValue(s32);
++
++s32 Player_GetEnchantmentEnergyCost(struct Player *p)
++{
++    s32 v;
++    s32 pct;
++    if ((s8)p->thresholdMode < 0)
++        return 0;
++    v = ActorParameter_GetModeValue((s8)p->thresholdMode);
++    pct = 100;
++    if (p != 0 && tst(&p->actionFlags, 0x1000))
++        pct = 50;
++    if (pct <= 99)
++        v = Div(v * pct, 100);
++    return v;
++}
++
++s32 Player_GetEnchantmentEnergyCost(struct Player *p);
++
++s32 Player_CanAffordEnchantment(struct Player *p)
++{
++    const u16 *q;
++    s32 r = Player_GetEnchantmentEnergyCost(p);
++
++    q = &p->currentStatB;
++    if (*(u16 *)q >= r) {
++        return 1;
++    }
++    return 0;
++}
++
++#define Player_SpendEnchantmentEnergy sub_0813F828
++void Player_SpendEnchantmentEnergy(struct Player *p)
++{
++    s32 cost = Player_GetEnchantmentEnergyCost(p);
++    u16 *energy = &p->currentStatB;
++    if (*energy < cost)
++        *energy = 0;
++    else
++        *energy -= cost;
++}
++
++s32 Player_IsEnchantmentAvailable(struct Player *unused, s32 kind)
++{
++    return 1;
++}
++
++s32 Player_CanAffordEnchantment(struct Player *);
++
++s32 Player_GetUsableEnchantment(struct Player *p)
++{
++    if (p->actionSelectionStamp != 0 && Player_CanAffordEnchantment(p) != 0 &&
++        (u8)(p->statModifierContext.statBOverrideEnabled - 3) > 1)
++        return (s8)p->thresholdMode;
++    return -1;
++}
++
++s32 Player_HasRequiredEnergy(struct Player *p, s32 v)
++{
++    if ((s32)p->currentStatB < v) {
++        return 0;
++    }
++    return 1;
++}
++
++s32 Player_CanSpendSharedResource(struct Player *p, s32 v)
++{
++    if (*(s32 *)((u8 *)gUnk_02000710 + p->timedEventSlot * 4 + 0x628) <= 0 &&
++        gUnk_02000710->unk876 >= v)
++        return 1;
++    return 0;
++}
++
++#define Player_IsActionRequestEnabled Player_IsEnchantmentAvailable
++
++void PlayerBarrier_Hide(void *);
++
++s32 PlayerBarrier_IsActive(void *);
++
++static inline void ClearModeFlag(struct Player *p)
++{
++    if (p) {
++        u32 *flags = &p->actionStateFlags;
++        u32 mask = ~16;
++        *flags &= mask;
++    }
++}
++
++static inline void SetModeFlag(struct Player *p)
++{
++    if (p) {
++        u32 *flags = &p->actionStateFlags;
++        u32 mask = 16;
++        *flags |= mask;
++    }
++}
++
++#define Player_SelectRequestedActionMode sub_0813F8F8
++#ifdef NONMATCHING
++// fuzzy: 85.0%
++// Preserved owner/request registers differ; one exit reloads the mode.
++s32 Player_SelectRequestedActionMode(struct Player *p)
++{
++    struct PlayerActionRequest *request = (struct PlayerActionRequest *)&p->thresholdMode;
++    if (request->kind >= 0 && request->enabled && !request->blocked) {
++        if (p->tetherMode > 1)
++            return p->tetherMode;
++        {
++            switch (request->kind) {
++                case 3:
++                    if (gUnk_030053F4 & 0x1000)
++                        return p->tetherMode;
++                    return 19;
++                case 2:
++                    if (p->actionRequestRestricted == 1) {
++                        Sound_PlaySong(0x192);
++                        return p->tetherMode;
++                    }
++                    if (gUnk_030053F4 & 0x1000)
++                        return p->tetherMode;
++                    return 10;
++                case 1:
++                    if (p->actionRequestRestricted == 1) {
++                        Sound_PlaySong(0x192);
++                        return p->tetherMode;
++                    }
++                    if (gUnk_030053F4 & 0x1000)
++                        return p->tetherMode;
++                    return 11;
++                case 0:
++                    if (p->actionMode == 0 || p->actionMode == 6)
++                        return 2;
++                    return p->tetherMode;
++            }
++        }
++    }
++    return p->tetherMode;
++}
++
++#else
++INCLUDE_ASM("asm/nonmatching", sub_0813F8F8);
++#endif
++
++void Player_SetActionRequest(struct Player *p, s32 kind)
++{
++    struct PlayerActionRequest *request = (struct PlayerActionRequest *)&p->thresholdMode;
++    if (request->kind != kind) {
++        if (request->latched) {
++            request->latched = 0;
++            p->actionVariant = 0;
++        }
++        request->kind = kind;
++        ClearModeFlag(p);
++        if (kind == 3)
++            SetModeFlag(p);
++        else if (PlayerBarrier_IsActive(p->actionRequestEffect))
++            PlayerBarrier_Hide(p->actionRequestEffect);
++        if ((u8)request->kind > 5) {
++            request->latched = 0;
++            request->enabled = 0;
++            request->duration = 0;
++            p->actionRequestState = 0;
++            if (p->actionRequestHold == 0)
++                p->actionRequestTimer = 0;
++        } else {
++            request->enabled = Player_IsEnchantmentAvailable(p, request->kind);
++            request->duration = ActorParameter_GetModeValue(request->kind);
++            if (!request->enabled)
++                return;
++            request->latched = 0;
++            p->actionRequestState = 0;
++            if (p->actionRequestHold == 0)
++                p->actionRequestTimer = 0;
++        }
++        p->actionVariant = p->baseActionVariant;
++    }
++}
++
++extern s16 gUnk_02000554;
++
++s32 Player_GetSelectedAbility(struct Player *p)
++{
++    if (p->actionMode != 6)
++        /* Add the slot index before the field offset to retain the original address lifetime. */
++        return *(s16 *)((u8 *)gUnk_02000710 + gUnk_02000710->selected * 2 + 0x88);
++    gUnk_02000554 = 0;
++    if (gUnk_02000710->abilityVariant == 0)
++        return 4;
++    return 5;
++}
++
++#define Player_InitActionRequest sub_0813FB30
++void Player_InitActionRequest(struct Player *p)
++{
++    struct PlayerActionRequest *request = (struct PlayerActionRequest *)&p->thresholdMode;
++    if (gUnk_030053F4 & 0x1000)
++        request->kind = 0xFF;
++    else
++        request->kind = Player_GetSelectedAbility(p);
++    ClearModeFlag(p);
++    if (request->kind == 3)
++        SetModeFlag(p);
++    if (request->kind < 0) {
++        request->duration = 0;
++        request->enabled = 0;
++        request->latched = 0;
++    } else {
++        request->duration = ActorParameter_GetModeValue(request->kind);
++        request->enabled = Player_IsEnchantmentAvailable(p, request->kind);
++        request->latched = gUnk_02000554;
++        if (!request->enabled)
++            request->latched = 0;
++    }
++}
++
++void Player_InitSlotFromScript(struct Player *p)
++{
++    s32 v;
++
++    v = Script_SeekToKeyword(0x69);
++    if (v != 0) {
++        v = Script_GetValue();
++    }
++    p->slot = v;
++}
++
++void Player_ClearDirectionHistory(struct Player *p)
++{
++    s32 i;
++    for (i = 0; i < 10; i++)
++        p->directionHistory[i] |= 0xFFFF;
++}
++
++void Player_InitEventProcedureFromScript(struct Player *p)
++{
++    s32 v;
++
++    v = Script_SeekToKeyword(0x52);
++    if (v != 0) {
++        p->eventProcedure = Script_GetValue();
++    } else {
++        p->eventProcedure = v;
++    }
++}
+diff --git a/symbols/build_extra_functions.csv b/symbols/build_extra_functions.csv
+index 8f946e176..27750881b 100644
+--- a/symbols/build_extra_functions.csv
++++ b/symbols/build_extra_functions.csv
+@@ -236,7 +236,14 @@ address,isa,evidence,replacement_end
+ 0813ADC4,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,0813ADD0
+ 0813B3AC,thumb,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C,0813B3BC
+ 0813E0F0,thumb,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C,0813E108
+-0813E108,thumb,Code following a reviewed gap function (own boundary so the function can be replaced); retained assembly,0813E1D8
++0813E108,thumb,Independent player state modifier callback; exact C; notes/player_3.md,0813E160
++0813E160,thumb,Independent player modifier callback with own return; notes/player_3.md,0813E174
++0813E174,thumb,Independent player modifier callback with own return; notes/player_3.md,0813E184
++0813E184,thumb,Independent player modifier callback with own return; notes/player_3.md,0813E194
++0813E194,thumb,Independent player modifier callback with own return; notes/player_3.md,0813E1B8
++0813E1B8,thumb,Independent player modifier callback with own return; notes/player_3.md,0813E1D8
++0813E284,thumb,Independent modifier callback in equipment-level tail; own push and pop-bx; notes/player_3.md,0813E324
++0813F828,thumb,Independent energy-spend body after affordability test; push and pop-bx; notes/player_3.md,0813F84C
+ 08159228,thumb,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C,0815924C
+ 081593F8,thumb,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C,08159404
+ 0815AAB8,thumb,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C,0815AAD4
+diff --git a/symbols/progress_extra_functions.csv b/symbols/progress_extra_functions.csv
+index 01e15ea16..3aeff1de3 100644
+--- a/symbols/progress_extra_functions.csv
++++ b/symbols/progress_extra_functions.csv
+@@ -248,6 +248,13 @@ address,evidence
+ 0813B3AC,Independent 16-byte leaf left as incbin by gbadisasm; exact standalone C
+ 0813E0F0,Independent 24-byte leaf left as incbin by gbadisasm; exact standalone C
+ 0813E108,Code following a reviewed gap function; retained assembly
++0813E160,Independent player modifier callback with own return; notes/player_3.md
++0813E174,Independent player modifier callback with own return; notes/player_3.md
++0813E184,Independent player modifier callback with own return; notes/player_3.md
++0813E194,Independent player modifier callback with own return; notes/player_3.md
++0813E1B8,Independent player modifier callback with own return; notes/player_3.md
++0813E284,Independent modifier callback following equipment-level function; notes/player_3.md
++0813F828,Independent energy-spend body after affordability test; notes/player_3.md
+ 08159228,Independent 36-byte leaf left as incbin by gbadisasm; exact standalone C
+ 081593F8,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+ 0815AAB8,Independent 28-byte leaf left as incbin by gbadisasm; exact standalone C
+diff --git a/symbols/progress_functions.csv b/symbols/progress_functions.csv
+index d9c417b03..297c22d7e 100644
+--- a/symbols/progress_functions.csv
++++ b/symbols/progress_functions.csv
+@@ -5732,9 +5732,15 @@ address
+ 0813DF5C
+ 0813E0F0
+ 0813E108
++0813E160
++0813E174
++0813E184
++0813E194
++0813E1B8
+ 0813E1D8
+ 0813E208
+ 0813E244
++0813E284
+ 0813E324
+ 0813E35C
+ 0813E374
+@@ -5767,6 +5773,7 @@ address
+ 0813F784
+ 0813F7B4
+ 0813F808
++0813F828
+ 0813F84C
+ 0813F850
+ 0813F89C
+-- 
+2.39.3 (Apple Git-145)
+

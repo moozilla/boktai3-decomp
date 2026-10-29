@@ -1,0 +1,4 @@
+Allow documented giv and calls scope commands through CLI validation
+Guard statement swaps against value and memory dependencies
+Resume seek search through known binaries and expanded descendants
+Retain bounded same-binary source alternatives in seek

@@ -1,0 +1,318 @@
+From e2554140fcdcdfc0026d9b2a4972218131b6b5ea Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Tue, 27 Oct 2026 22:53:43 -0700
+Subject: [PATCH] Name the weather state words at 02000080-0200008C
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+---
+ include/ram.h         |  5 +++++
+ src/fn/sub_08017A6C.c | 11 +++++------
+ src/fn/sub_08017C8C.c | 16 ++++++++--------
+ src/fn/sub_08017E7C.c |  8 ++++----
+ src/fn/sub_08017F74.c |  7 ++++---
+ src/fn/sub_08018028.c | 18 ++++++++----------
+ src/fn/sub_080183A8.c | 10 +++++-----
+ src/fn/sub_08018420.c |  5 ++---
+ symbols/ram.csv       | 12 ++++++------
+ 9 files changed, 47 insertions(+), 45 deletions(-)
+
+diff --git a/include/ram.h b/include/ram.h
+index 5cdbe3df7..d3b4d2b74 100644
+--- a/include/ram.h
++++ b/include/ram.h
+@@ -148,5 +148,10 @@ extern u32 gForgingBook;                  /* forging book task (ForgingBook_*) *
+ extern u32 gShadowRegistry;               /* shadow registry task (ShadowRegistry_*) */
+ extern u8 *gSolarController;              /* solar sensor controller (Solar_*) */
+ extern u32 gScenePauseFlags; /* scene pause/mute flags (bit tests across effects and actors) */
++extern s32
++    gWeatherCooldownBase; /* weather cooldown timer reset value (Weather_ConfigureCooldown) */
++extern s32 gWeatherCooldownSpread; /* random spread added to the weather timer */
++extern s32 gWeatherStormActive; /* storm flag, set by Weather_Update, returned by Weather_GetType */
++extern s32 gWeatherStormDelay;  /* storm delay countdown (Weather_ActiveStorm) */
+ 
+ #endif
+diff --git a/src/fn/sub_08017A6C.c b/src/fn/sub_08017A6C.c
+index 0226cd4d8..56861e7a4 100644
+--- a/src/fn/sub_08017A6C.c
++++ b/src/fn/sub_08017A6C.c
+@@ -13,7 +13,6 @@ struct Weather {
+ };
+ extern u8 *gGameState;
+ extern u32 gEngineFlags, gRandomIndex;
+-extern s32 gUnk_02000080, gUnk_02000084;
+ #define RANDOM_TABLE ((u16 *)0x0203B400)
+ void Palette_SetBrightnessMode(s32);
+ u32 Weather_TestFlags(u32, u32);
+@@ -74,8 +73,8 @@ s32 Weather_UpdateStormTrigger(struct Weather *p)
+                     u8 *base = gGameState;
+                     timer = StormTimer(base);
+                 }
+-                if (*timer >= gUnk_02000080)
+-                    *timer = gUnk_02000080;
++                if (*timer >= gWeatherCooldownBase)
++                    *timer = gWeatherCooldownBase;
+             } else {
+                 s32 *timer = StormTimer(gGameState);
+                 if (!*timer) {
+@@ -87,9 +86,9 @@ s32 Weather_UpdateStormTrigger(struct Weather *p)
+                         if (sample < volume)
+                             goto beginStorm;
+                     }
+-                    *timer = gUnk_02000080;
+-                    if (gUnk_02000084 > 0) {
+-                        s32 random = Mod(RandomAt(table), gUnk_02000084);
++                    *timer = gWeatherCooldownBase;
++                    if (gWeatherCooldownSpread > 0) {
++                        s32 random = Mod(RandomAt(table), gWeatherCooldownSpread);
+                         s32 *last = StormTimer(gGameState);
+                         *last += random;
+                     }
+diff --git a/src/fn/sub_08017C8C.c b/src/fn/sub_08017C8C.c
+index 699ec6553..41aa4e781 100644
+--- a/src/fn/sub_08017C8C.c
++++ b/src/fn/sub_08017C8C.c
+@@ -15,7 +15,7 @@ struct Weather {
+ };
+ extern u8 *gGameState;
+ extern u32 gEngineFlags;
+-extern int gUnk_0200008C, gUnk_02000478;
++extern int gUnk_02000478;
+ extern u8 gUnk_03005430[];
+ extern u16 gUnk_0203B400[];
+ extern u32 gRandomIndex;
+@@ -58,10 +58,10 @@ int Weather_ActiveStorm(struct Weather *p)
+ {
+     if (p->entered) {
+         p->entered = 0;
+-        if (!gUnk_0200008C) {
+-            gUnk_0200008C = p->duration;
++        if (!gWeatherStormDelay) {
++            gWeatherStormDelay = p->duration;
+             if (p->randomDuration)
+-                gUnk_0200008C += Mod(randomValue(), p->randomDuration);
++                gWeatherStormDelay += Mod(randomValue(), p->randomDuration);
+         }
+         p->light = 0;
+         flags();
+@@ -87,18 +87,18 @@ int Weather_ActiveStorm(struct Weather *p)
+     if (!Weather_TestFlags(p->flags, 1) && p->timer > 29) {
+         p->light = light(p);
+         if (p->light > 59 || interrupted()) {
+-            gUnk_0200008C = 0;
++            gWeatherStormDelay = 0;
+             Weather_EnterPhase(p, 4);
+             return 1;
+         }
+     }
+     if (!Weather_TestFlags(p->flags, 2)) {
+-        if (gUnk_0200008C <= 0) {
++        if (gWeatherStormDelay <= 0) {
+             Weather_EnterPhase(p, 4);
+-            gUnk_0200008C = 0;
++            gWeatherStormDelay = 0;
+             return 1;
+         } else
+-            gUnk_0200008C--;
++            gWeatherStormDelay--;
+     }
+     sub_080177AC(p, (randomValue() & 3) + 4, 1, 0);
+     p->bank = 1 - p->bank;
+diff --git a/src/fn/sub_08017E7C.c b/src/fn/sub_08017E7C.c
+index 7bd555ac2..8f680531c 100644
+--- a/src/fn/sub_08017E7C.c
++++ b/src/fn/sub_08017E7C.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "render.h"
++#include "ram.h"
+ struct Weather {
+     u8 pad[24];
+     u32 timer;
+@@ -8,7 +9,6 @@ struct Weather {
+     void *script0, *script;
+ };
+ extern u8 *gGameState;
+-extern int gUnk_02000080, gUnk_02000084;
+ extern u16 gUnk_0203B400[];
+ extern u32 gRandomIndex;
+ void Palette_SetBrightnessMode(int);
+@@ -46,15 +46,15 @@ int Weather_StormEnd(struct Weather *p)
+             m = ~512;
+             *reg = m & *reg;
+         }
+-        *(int *)(gGameState + 0x630) = gUnk_02000080;
+-        if (gUnk_02000084 > 0) {
++        *(int *)(gGameState + 0x630) = gWeatherCooldownBase;
++        if (gWeatherCooldownSpread > 0) {
+             int r;
+             gRandomIndex = (gRandomIndex + 1) & 1023;
+             {
+                 u32 offset = gRandomIndex * 2;
+                 r = *(u16 *)((u8 *)gUnk_0203B400 + offset);
+             }
+-            *(int *)(gGameState + 0x630) += Mod(r, gUnk_02000084);
++            *(int *)(gGameState + 0x630) += Mod(r, gWeatherCooldownSpread);
+         }
+         return 1;
+     } else {
+diff --git a/src/fn/sub_08017F74.c b/src/fn/sub_08017F74.c
+index 09e114e0b..12aa9cbdf 100644
+--- a/src/fn/sub_08017F74.c
++++ b/src/fn/sub_08017F74.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ struct Weather {
+     u8 pad[29];
+     u8 state;
+@@ -7,7 +8,7 @@ struct Weather {
+ };
+ extern int (*const gUnk_08604C80[])(struct Weather *);
+ extern u8 *gGameState;
+-extern int gUnk_02000088, gUnk_02000478;
++extern int gUnk_02000478;
+ void sub_08017510(void *);
+ void WeatherParticles_Update(void *);
+ int Weather_Update(struct Weather *p)
+@@ -19,11 +20,11 @@ int Weather_Update(struct Weather *p)
+         sub_08017510(p);
+     if (p->state == 3) {
+         *(s16 *)(gGameState + 0x87a) = 32767;
+-        gUnk_02000088 = 1;
++        gWeatherStormActive = 1;
+     } else {
+         if (*(s16 *)(gGameState + 0x87a) > 0)
+             (*(s16 *)(gGameState + 0x87a))--;
+-        gUnk_02000088 = 0;
++        gWeatherStormActive = 0;
+     }
+     if (gUnk_02000478 > 0)
+         gUnk_02000478--;
+diff --git a/src/fn/sub_08018028.c b/src/fn/sub_08018028.c
+index a5bb51c39..7eec601dd 100644
+--- a/src/fn/sub_08018028.c
++++ b/src/fn/sub_08018028.c
+@@ -19,8 +19,6 @@ struct WeatherState {
+     u8 pad5C[4];
+     u8 *resource;
+ };
+-extern s32 gUnk_0200008C;
+-extern s32 gUnk_02000080;
+ 
+ int Script_GetKeywordValue(int, int);
+ int Script_SeekToKeyword(int);
+@@ -73,10 +71,10 @@ s32 Weather_Initialize(struct WeatherState *p)
+         p->delay = 7200;
+         p->delayRange = 3600;
+     }
+-    if (gUnk_0200008C > p->delay) {
+-        gUnk_0200008C = p->delay;
++    if (gWeatherStormDelay > p->delay) {
++        gWeatherStormDelay = p->delay;
+         if (p->delayRange)
+-            gUnk_0200008C += Mod(RAND(), p->delayRange);
++            gWeatherStormDelay += Mod(RAND(), p->delayRange);
+     }
+     if (Script_SeekToKeyword(0x63))
+         *(s32 *)((u8 *)gGameState + 0x630) = Script_GetValue();
+@@ -98,13 +96,13 @@ s32 Weather_Initialize(struct WeatherState *p)
+         storm = *sensor;
+         *(s32 *)((u8 *)gGameState + 0x630) += storm >> 2;
+     }
+-    if (*(s32 *)((u8 *)gGameState + 0x630) >= gUnk_02000080)
+-        *(s32 *)((u8 *)gGameState + 0x630) = gUnk_02000080;
++    if (*(s32 *)((u8 *)gGameState + 0x630) >= gWeatherCooldownBase)
++        *(s32 *)((u8 *)gGameState + 0x630) = gWeatherCooldownBase;
+     phase = 0;
+     if (gGameState->unk876 == 0) {
+-        if (gUnk_0200008C > 0) {
+-            if (gUnk_0200008C <= 99)
+-                gUnk_0200008C = 100;
++        if (gWeatherStormDelay > 0) {
++            if (gWeatherStormDelay <= 99)
++                gWeatherStormDelay = 100;
+             phase = 3;
+         } else if (*(s32 *)((u8 *)gGameState + 0x630) == 0) {
+             s32 volume = Weather_GetStormVolume(p);
+diff --git a/src/fn/sub_080183A8.c b/src/fn/sub_080183A8.c
+index cb9125279..91e2b094b 100644
+--- a/src/fn/sub_080183A8.c
++++ b/src/fn/sub_080183A8.c
+@@ -1,5 +1,5 @@
+ #include "global.h"
+-extern int gUnk_02000080, gUnk_02000084;
++#include "ram.h"
+ extern u32 gRandomIndex;
+ extern u16 gUnk_0203B400[];
+ int Script_SeekToKeyword(int);
+@@ -17,13 +17,13 @@ int Weather_ConfigureCooldown(void)
+     result = Script_SeekToKeyword('i');
+     if (result)
+         result = Script_GetValue();
+-    else if (gUnk_02000084 > 0) {
++    else if (gWeatherCooldownSpread > 0) {
+         gRandomIndex = (gRandomIndex + 1) & 1023;
+         {
+             u32 offset = gRandomIndex * 2;
+-            result = Mod(*(u16 *)((u8 *)gUnk_0203B400 + offset), gUnk_02000084);
++            result = Mod(*(u16 *)((u8 *)gUnk_0203B400 + offset), gWeatherCooldownSpread);
+         }
+     }
+-    gUnk_02000080 = base;
+-    gUnk_02000084 = spread;
++    gWeatherCooldownBase = base;
++    gWeatherCooldownSpread = spread;
+ }
+diff --git a/src/fn/sub_08018420.c b/src/fn/sub_08018420.c
+index b29d858eb..05e010df8 100644
+--- a/src/fn/sub_08018420.c
++++ b/src/fn/sub_08018420.c
+@@ -1,8 +1,7 @@
+ #include "global.h"
+-
+-extern u32 gUnk_02000088;
++#include "ram.h"
+ 
+ u32 Weather_GetType(void)
+ {
+-    return gUnk_02000088;
++    return gWeatherStormActive;
+ }
+diff --git a/symbols/ram.csv b/symbols/ram.csv
+index dedddc5e7..8b919664c 100644
+--- a/symbols/ram.csv
++++ b/symbols/ram.csv
+@@ -25,10 +25,10 @@ addr,name,size,kind,decl,header,confidence,notes
+ 02000074,gDamageNumberDisplay,4,object,extern struct DamageNumberDisplay *gDamageNumberDisplay;,include/damage_number_display.h,low,
+ 02000078,gLinkedWidgetSet,4,object,extern struct LinkedWidgetSet *gLinkedWidgetSet;,include/ram.h,low,
+ 0200007C,gScanlineWave,4,object,extern u32 gScanlineWave;,include/ram.h,low,scanline wave effect task (ScanlineWave_*)
+-02000080,gUnk_02000080,4,object,,,,
+-02000084,gUnk_02000084,4,object,,,,
+-02000088,gUnk_02000088,4,object,,,,
+-0200008C,gUnk_0200008C,4,object,,,,
++02000080,gWeatherCooldownBase,4,object,extern s32 gWeatherCooldownBase;,include/ram.h,low,weather cooldown timer reset value (Weather_ConfigureCooldown)
++02000084,gWeatherCooldownSpread,4,object,extern s32 gWeatherCooldownSpread;,include/ram.h,low,random spread added to the weather timer
++02000088,gWeatherStormActive,4,object,extern s32 gWeatherStormActive;,include/ram.h,low,"storm flag, set by Weather_Update, returned by Weather_GetType"
++0200008C,gWeatherStormDelay,4,object,extern s32 gWeatherStormDelay;,include/ram.h,low,storm delay countdown (Weather_ActiveStorm)
+ 02000090,gWeatherState,4,object,extern struct WeatherState *gWeatherState;,include/ram.h,low,
+ 02000094,gPaletteCycle,4,object,extern u32 gPaletteCycle;,include/ram.h,low,palette cycle task (PaletteCycle_*)
+ 02000098,gEffectQuad,4,object,extern u32 gEffectQuad;,include/ram.h,low,
+@@ -408,13 +408,13 @@ addr,name,size,kind,decl,header,confidence,notes
+ 03005234,gMosaicParam,2,object,extern u16 gMosaicParam;,include/render.h,high physical shape; provisional semantic name,packed mosaic parameter (byte and halfword accesses)
+ 03005238,gDefaultAnimFlags,2,object,extern u16 gDefaultAnimFlags;,include/render.h,high physical shape; provisional semantic name,default animation/widget flags
+ 0300523C,gEnginePauseFlags,4,object,extern u32 gEnginePauseFlags;,include/render.h,high physical shape; provisional semantic name,engine pause/suspend flags (bits 1-2: sound off; task list masks)
+-03005240,gNextTaskId,2,object,extern u16 gNextTaskId;,include/engine.h,,"next Task id (unique, never 0)"
++03005240,gNextTaskId,2,object,extern u16 gNextTaskId;,include/engine.h,low,"next Task id (unique, never 0)"
+ 03005250,gLinkMenuActive,4,object,extern u32 gLinkMenuActive;,include/ram.h,low,
+ 03005260,gUnk_03005260,10,object,,,,
+ 03005270,gUnk_03005270,2,object,,,,
+ 03005274,gSceneSelectionDisplaySlots,A,object,extern u16 gSceneSelectionDisplaySlots[];,include/ram.h,low,
+ 03005278,gUnk_03005278,,interior,,,,gUnk_03005274 +0x4
+-03005280,gTaskLists,70,object,extern struct TaskList gTaskLists[14];,include/engine.h,,task lists by priority
++03005280,gTaskLists,70,object,extern struct TaskList gTaskLists[14];,include/engine.h,low,task lists by priority
+ 030052F0,gUnk_030052F0,4,object,,,,
+ 030052F4,gTerrainMap,4,object,extern struct EngineMap *gTerrainMap;,include/engine.h,low,
+ 030052F8,gTerrainWidth,4,object,extern u32 gTerrainWidth;,include/engine.h,low,
+-- 
+2.39.3 (Apple Git-145)
+

@@ -1,0 +1,187 @@
+From 5b7819784af530d023aec2417014f33ecea1a36f Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 04:14:32 -0700
+Subject: [PATCH] Add scope what-ifs for combine and unallocated values
+
+Add AGBCC_NOCOMBINE=UID and AGBCC_FORCE=PSEUDO:-2 to isolate folding and reload rematerialization. Support an isolated compiler with SCOPE_AGBCC. Ordinary compiles preserve both landed scene matches; the new knobs reproduce every fragment-launcher instruction while exposing its stack-slot ordering.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/scope/WORKER.md      |   7 ++-
+ tools/scope/agbcc.patch    | 106 +++++++++++++++++++++++++++++++++++++
+ tools/scope/build_agbcc.sh |   2 +-
+ tools/scope/scope.py       |   4 +-
+ 4 files changed, 115 insertions(+), 4 deletions(-)
+
+diff --git a/tools/scope/WORKER.md b/tools/scope/WORKER.md
+index c15dd559e..66fee07bd 100644
+--- a/tools/scope/WORKER.md
++++ b/tools/scope/WORKER.md
+@@ -118,9 +118,14 @@ Knobs (what-ifs; they never go into the final C): `AGBCC_PRI=PSEUDO:+N`
+ `AGBCC_SPILL=K:D` (shift reload's K-th choice D places along its rotation; D is
+ mod the number of spill registers, and `why` prints the D that gives the ROM's register),
+ `CSE_KEEP=PSEUDO` (keep a register canonical in cse).
++`AGBCC_FORCE=PSEUDO:-2` leaves that value unallocated in local/global alloc and
++reload retries; `AGBCC_NOCOMBINE=UID,...` preserves selected source insns in combine.
++These isolate rematerialization and expression folding when register rotation is only
++a downstream symptom. Set `SCOPE_AGBCC` to an isolated instrumented compiler path
++when the default compiler is shared read-only.
+ 
+ Knobs compile as the build does (no `-g`), except those that name insn uids
+-(`AGBCC_NOMOVE`, `AGBCC_NOGIV`, `AGBCC_GIV`, `AGBCC_NOTIE`, `CSE_NOFOLLOW_JUMP`):
++(`AGBCC_NOMOVE`, `AGBCC_NOGIV`, `AGBCC_GIV`, `AGBCC_NOTIE`, `AGBCC_NOCOMBINE`, `CSE_NOFOLLOW_JUMP`):
+ uids exist only in the `-g` compile. When `-g` changes a function's code
+ (scope prints a note), their results are marked `[-g compile]` and a MATCH
+ there is not the build's.
+diff --git a/tools/scope/agbcc.patch b/tools/scope/agbcc.patch
+index 84b64bb91..82cd5215a 100644
+--- a/tools/scope/agbcc.patch
++++ b/tools/scope/agbcc.patch
+@@ -1566,3 +1566,109 @@
+  	    {
+  	      if (loop_dump_stream)
+  		fprintf (loop_dump_stream,
++--- a/local-alloc.c
+++++ b/local-alloc.c
++@@ -79,6 +79,13 @@
++ #define AGBCC_MAXREG 40000
++ int agbcc_pri_delta[AGBCC_MAXREG];
++ int agbcc_force[AGBCC_MAXREG];
+++
+++/* Explicitly leave this value to reload, including retries.  */
+++int
+++agbcc_noreg_p (int regno)
+++{
+++  return regno >= 0 && regno < AGBCC_MAXREG && agbcc_force[regno] == -2;
+++}
++ FILE *agbcc_dump;
++ 
++ /* Variable names of pseudos, keyed by the REG rtx (which inlining copies).  */
++@@ -1683,7 +1690,12 @@
++     {
++       int r = qty_first_reg[i];
++       qty_forced[i] = 0;
++-      if (r >= 0 && r < AGBCC_MAXREG && agbcc_force[r] >= 0)
+++      if (agbcc_noreg_p (r))
+++        {
+++          qty_forced[i] = 1;
+++          qty_phys_reg[i] = -1;
+++        }
+++      else if (r >= 0 && r < AGBCC_MAXREG && agbcc_force[r] >= 0)
++ 	{
++ 	  qty_forced[i] = 1;
++ 	  qty_phys_reg[i] = agbcc_force[r];
++@@ -1949,6 +1961,8 @@
++   if (GET_CODE (setreg) != REG)
++     return 0;
++   sreg = REGNO (setreg);
+++  if (agbcc_noreg_p (ureg) || agbcc_noreg_p (sreg))
+++    return 0;
++   ssize = REG_SIZE (setreg);
++ 
++   /* If UREG is a pseudo-register that hasn't already been assigned a
++--- a/global.c
+++++ b/global.c
++@@ -265,6 +265,7 @@
++ 
++ extern int agbcc_pri_delta[];
++ extern int agbcc_force[];
+++extern int agbcc_noreg_p (int);
++ extern FILE *agbcc_dump;
++ extern void agbcc_instr_init ();
++ extern char *agbcc_name_get ();
++@@ -579,7 +580,8 @@
++   
++     for (i = 0; i < (size_t) max_allocno; i++)
++     {
++-        if (reg_renumber[allocno_reg[allocno_order[i]]] < 0
+++        if (!agbcc_noreg_p (allocno_reg[allocno_order[i]])
+++         && reg_renumber[allocno_reg[allocno_order[i]]] < 0
++          && REG_LIVE_LENGTH (allocno_reg[allocno_order[i]]) >= 0)
++         {
++             int order = allocno_order[i];
++@@ -1320,7 +1322,7 @@
++      HARD_REG_SET forbidden_regs;
++ {
++   int allocno = reg_allocno[regno];
++-  if (allocno >= 0)
+++  if (allocno >= 0 && !agbcc_noreg_p (regno))
++     {
++       /* If we have more than one register class,
++ 	 first try allocating in the class that is cheapest
++--- a/combine.c
+++++ b/combine.c
++@@ -815,6 +815,25 @@
++    destination of INSN and *PSRC to the single source, and this function
++    will return 1.  */
++ 
+++/* AGBCC_NOCOMBINE=uid,...: preserve selected source insns for a what-if. */
+++static int
+++agbcc_nocombine_p (rtx insn)
+++{
+++  char *e = getenv ("AGBCC_NOCOMBINE");
+++  if (!insn)
+++    return 0;
+++  while (e && *e)
+++    {
+++      if (atoi (e) == INSN_UID (insn))
+++        return 1;
+++      while (*e && *e != ',')
+++        e++;
+++      if (*e == ',')
+++        e++;
+++    }
+++  return 0;
+++}
+++
++ static int
++ can_combine_p (insn, i3, pred, succ, pdest, psrc)
++      rtx insn;
++@@ -832,6 +851,9 @@
++   int all_adjacent = (succ ? (next_active_insn (insn) == succ
++ 			      && next_active_insn (succ) == i3)
++ 		      : next_active_insn (insn) == i3);
+++
+++  if (agbcc_nocombine_p (insn))
+++    return 0;
++ 
++   /* Can combine only if previous insn is a SET of a REG, a SUBREG or CC0.
++      or a PARALLEL consisting of such a SET and CLOBBERs. 
+diff --git a/tools/scope/build_agbcc.sh b/tools/scope/build_agbcc.sh
+index 7dd0cfd36..f276b6399 100644
+--- a/tools/scope/build_agbcc.sh
++++ b/tools/scope/build_agbcc.sh
+@@ -3,7 +3,7 @@
+ # Separate from tools/agbcc-instr.sh, which other tools extend, so neither breaks the other.
+ # It applies the patch to the agbcc source that tools/setup.sh fetched and
+ # compiles with -O2 (about 1.8 times faster than agbcc's own -g build).
+-# Without its environment variables (AGBCC_PRI, AGBCC_FORCE, AGBCC_SPILL, AGBCC_GCSE_T, AGBCC_NOTIE, CSE_KEEP, CSE_NOCANON, CSE_DEBUG, CSE_PATH, CSE_NOFOLLOW, AGBCC_NOPRE, AGBCC_PRE_TRACE, AGBCC_NOGIV, AGBCC_GIV, AGBCC_LOOP_TRACE, AGBCC_NOMOVE, AGBCC_NOSTRICT,
++# Without its environment variables (AGBCC_PRI, AGBCC_FORCE (including pseudo:-2), AGBCC_NOCOMBINE, AGBCC_SPILL, AGBCC_GCSE_T, AGBCC_NOTIE, CSE_KEEP, CSE_NOCANON, CSE_DEBUG, CSE_PATH, CSE_NOFOLLOW, AGBCC_NOPRE, AGBCC_PRE_TRACE, AGBCC_NOGIV, AGBCC_GIV, AGBCC_LOOP_TRACE, AGBCC_NOMOVE, AGBCC_NOSTRICT,
+ # AGBCC_DUMPPRI, AGBCC_SERVER) it emits the same code as agbcc: checked on
+ # every C file in src/ and the guarded drafts. The ROM build never uses it.
+ set -e
+diff --git a/tools/scope/scope.py b/tools/scope/scope.py
+index 520bc176a..f05763404 100644
+--- a/tools/scope/scope.py
++++ b/tools/scope/scope.py
+@@ -143,7 +143,7 @@ import build  # noqa: E402
+ import check  # noqa: E402
+ from romlib import ROOT, load_rom, off  # noqa: E402
+ 
+-INSTR = os.path.join(ROOT, "build", "scope", "agbcc", "gcc", "agbcc")  # tools/scope/build_agbcc.sh
++INSTR = os.environ.get("SCOPE_AGBCC", os.path.join(ROOT, "build", "scope", "agbcc", "gcc", "agbcc"))  # tools/scope/build_agbcc.sh
+ PASSES = ["rtl", "jump", "cse", "addressof", "gcse", "loop", "cse2", "flow", "combine", "regmove",
+           "lreg", "greg", "jump2", "mach"]
+ PASS_NOTE = {"greg": "greg/reload", "mach": "mach (late split/reorg)"}
+@@ -2353,7 +2353,7 @@ def has_knobs(env):
+ # means another insn (or none) in the build's own compile (no -g): only these force a -g compile.
+ # The others name pseudos (AGBCC_PRI, AGBCC_FORCE, CSE_NOCANON, CSE_KEEP) or count events
+ # (AGBCC_SPILL, AGBCC_NOPRE, CSE_NOFOLLOW) and are compiled as the build compiles.
+-UID_KNOBS = ("AGBCC_NOGIV", "AGBCC_GIV", "AGBCC_NOMOVE", "AGBCC_NOTIE", "CSE_WHY", "CSE_NOFOLLOW_JUMP")
++UID_KNOBS = ("AGBCC_NOCOMBINE", "AGBCC_NOGIV", "AGBCC_GIV", "AGBCC_NOMOVE", "AGBCC_NOTIE", "CSE_WHY", "CSE_NOFOLLOW_JUMP")
+ 
+ 
+ def needs_g(env):
+-- 
+2.39.3 (Apple Git-145)
+

@@ -1,0 +1,88 @@
+From 810dc141e74042119896f2d4f5d261d1d1a5691c Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 05:04:20 -0700
+Subject: [PATCH] Search every recovered routine in a bundled seek entry
+
+Move parsing now includes all reviewed entry routines and their transitive inline helpers. Keep alias-aware source materialization. Verified a recovered suffix and its helpers are included while an ordinary aliased entry still parses.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/seek/seek.py | 33 +++++++++++++++++----------------
+ 1 file changed, 17 insertions(+), 16 deletions(-)
+
+diff --git a/tools/seek/seek.py b/tools/seek/seek.py
+index a41ff51ba..50fae725a 100644
+--- a/tools/seek/seek.py
++++ b/tools/seek/seek.py
+@@ -58,27 +58,26 @@ AGBCC_SRC = os.path.join(ROOT, "build", "scope", "agbcc", "gcc")
+ # ------------------------------------------------------------------ parse
+ 
+ def parse_function(pre, names, src_text=None):
+-    """{name: FuncDef} of FUNC (first) and the unit's inline helpers it calls, transitively, from the
++    """{name: FuncDef} of the reviewed entry routines and their inline helpers, transitively, from the
+     preprocessed unit PRE. Moves apply to all of them: much of a function's code is often in a helper."""
+-    span = None
+-    for n in names:
+-        span = E.find_def(pre, n)
+-        if span:
+-            break
+-    if not span:
++    spans = [(n, E.find_def(pre, n)) for n in names]
++    spans = [(n, span) for n, span in spans if span]
++    if not spans:
+         raise SystemExit("cannot find the function in the preprocessed unit")
+-    head = pre[:span[0]]
++    start = min(span[0] for _, span in spans)
++    end = max(span[1] for _, span in spans)
++    head = pre[:start]
+     head = re.sub(r'^[ \t]*asm\s*\(\s*"\.include (?:\\.|[^"\\\n])*"\s*\)\s*;[ \t]*$', "", head, flags=re.M)
+-    body = pre[span[0]:span[1]]
++    body = pre[start:end]
+     try:
+         ast = ast_util.parse_c(head + body)
+     except Exception:  # noqa: BLE001  other functions' bodies with syntax pycparser lacks: stub them
+         ast = ast_util.parse_c(stub_bodies(head) + body)
+-    fn = next(e for e in reversed(ast.ext) if isinstance(e, ca.FuncDef) and e.decl.name in names)
+-    defs = {e.decl.name: e for e in ast.ext if isinstance(e, ca.FuncDef) and e is not fn
++    roots = [e for e in ast.ext if isinstance(e, ca.FuncDef) and e.decl.name in names]
++    defs = {e.decl.name: e for e in ast.ext if isinstance(e, ca.FuncDef)
+             and "inline" in (e.decl.funcspec or [])}
+-    out = {fn.decl.name: fn}
+-    todo = [fn]
++    out = {fn.decl.name: fn for fn in roots}
++    todo = list(roots)
+     while todo:
+         f = todo.pop()
+         for n, _, _ in R.walk(f):
+@@ -87,7 +86,7 @@ def parse_function(pre, names, src_text=None):
+                 out[n.name.name] = defs[n.name.name]
+                 todo.append(defs[n.name.name])
+     if src_text is not None:  # helpers from headers stay as they are: a node rewrites only its own file
+-        out = {k: v for k, v in out.items() if k == fn.decl.name or E.find_def(src_text, k)}
++        out = {k: v for k, v in out.items() if k in names or E.find_def(src_text, k)}
+     return out
+ 
+ 
+@@ -186,7 +185,8 @@ class Work:
+             return self.ast[node["id"]]
+         path = self.sess.materialize(node)
+         pre = self.target.preprocess_file(path)
+-        defs = parse_function(pre, self.target.names, open(os.path.join(ROOT, path)).read())
++        names = E.fast.bundle_names(pre, self.target.names, self.target.addr, self.target.size)
++        defs = parse_function(pre, names, open(os.path.join(ROOT, path)).read())
+         self.ast[node["id"]] = (pre, defs)
+         return pre, defs
+ 
+@@ -283,7 +283,8 @@ class Work:
+         if same and same != rec["id"]:
+             self.sess.update(rec["id"], same_as=same)
+         try:
+-            self.ast[rec["id"]] = (pre, parse_function(pre, self.target.names, text))
++            names = E.fast.bundle_names(pre, self.target.names, self.target.addr, self.target.size)
++            self.ast[rec["id"]] = (pre, parse_function(pre, names, text))
+         except Exception as e:  # noqa: BLE001
+             print(f"(n{rec['id']} cannot be parsed for moves: {str(e).splitlines()[0][:200]})")
+         return rec
+-- 
+2.39.3 (Apple Git-145)
+

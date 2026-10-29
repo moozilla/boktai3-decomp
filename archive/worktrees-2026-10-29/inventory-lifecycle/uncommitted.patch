@@ -1,0 +1,531 @@
+diff --git a/include/actor_attachment.h b/include/actor_attachment.h
+new file mode 100644
+index 000000000..f436aef13
+--- /dev/null
++++ b/include/actor_attachment.h
+@@ -0,0 +1,14 @@
++#ifndef GUARD_ACTOR_ATTACHMENT_H
++#define GUARD_ACTOR_ATTACHMENT_H
++#include "global.h"
++/* Tentative screen-space attachment offsets, selected by kind/action/facing. */
++void sub_080648B0(s32, s32 *, s32 *, s32);
++void sub_08064918(s32, s32 *, s32 *, s32);
++void sub_08064954(s32, s32 *, s32 *, s32);
++void sub_08064990(s32, s32 *, s32 *, s32);
++void sub_08064A58(s32, s32 *, s32 *, s32);
++void sub_08064B20(s32, s32 *, s32 *, s32);
++void sub_08064B70(u32, s32 *, s32 *, s32);
++void sub_08064BF8(u32, s32 *, s32 *, s32);
++void sub_08064C48(s32, u32, u32, s32 *, s32 *, void *);
++#endif
+diff --git a/include/actor_attachment_state.h b/include/actor_attachment_state.h
+new file mode 100644
+index 000000000..fffde3075
+--- /dev/null
++++ b/include/actor_attachment_state.h
+@@ -0,0 +1,56 @@
++#ifndef GUARD_ACTOR_ATTACHMENT_STATE_H
++#define GUARD_ACTOR_ATTACHMENT_STATE_H
++#include "actor_attachment.h"
++#include "contact_swarm.h"
++struct ActorAttachmentPartSprite {
++    u32 flags;
++    u8 unknown4[4];
++    u16 tile;
++    u8 width, height;
++    u8 unknownC[0xC];
++    struct ContactPosition position;
++    u8 unknown20[8];
++};
++struct ActorAttachmentSlotView {
++    struct ContactPosition *anchor;
++    struct ContactPosition jitter[3];
++    struct ContactPosition offset;
++    void *update;
++    struct ContactPosition position;
++    u8 frame, active, flags, action;
++    u16 unknown34;
++    u8 status[3], phase[3];
++    u8 partMask;
++    s8 slotId;
++    u8 kind, resourceKind;
++    s16 timer, thresholds[3];
++    u8 unknown48[4];
++    s16 *value;
++    s32 counters[3];
++    void *source;
++    struct ContactSwarmSprite sprite;
++    struct ActorAttachmentPartSprite parts[3];
++    struct DisplaySequenceState sequences[3];
++    void *followActor;
++};
++struct ActorAttachmentManagerView {
++    u8 unknown0[0x58];
++    const void *partResource;
++    struct ActorAttachmentSlotView slots[8];
++    u32 occupiedMask;
++};
++extern struct ActorAttachmentManagerView *gUnk_02000124;
++static inline u32 ActorAttachment_ReadByteFlags(const u8 *flags, u32 mask)
++{
++    return *flags & mask;
++}
++static inline u8 ActorAttachment_TestByteFlags(const u8 *flags, u32 mask)
++{
++    if (ActorAttachment_ReadByteFlags(flags, mask))
++        return TRUE;
++    return FALSE;
++}
++void sub_08064D40(struct ActorAttachmentSlotView *, s32);
++void sub_080645D4(struct ActorAttachmentSlotView *);
++void sub_08217EAC(struct ActorAttachmentPartSprite *);
++#endif
+diff --git a/include/scene_actor_animation.h b/include/scene_actor_animation.h
+new file mode 100644
+index 000000000..80b5dbd91
+--- /dev/null
++++ b/include/scene_actor_animation.h
+@@ -0,0 +1,40 @@
++#ifndef GUARD_SCENE_ACTOR_ANIMATION_H
++#define GUARD_SCENE_ACTOR_ANIMATION_H
++#include "scene_actor_profile.h"
++/* Animation-phase actor and drawable views; selection names are provisional. */
++struct SceneActorAnimationView {
++    void *object;
++    void *drawable;
++    u8 drawableKind, unknown9[0x50];
++    u8 direction;
++    u8 unknown5A[0x259];
++    u8 restart;
++    u8 unknown2B4[3];
++    u8 selection;
++    u8 unknown2B8[0xC];
++    u32 profileMode;
++    u8 unknown2C8[0x40];
++    u32 profileId;
++};
++struct SceneActorAnimationSequenceDrawable {
++    u8 unknown0[0x48];
++    u8 sequence[0x10];
++    const void *resource;
++};
++struct SceneActorAnimationTile {
++    u8 unknown0[8];
++    u32 flags;
++};
++struct SceneActorAnimationTileDrawable {
++    u8 unknown0[0x20];
++    struct SceneActorAnimationTile tile;
++};
++void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *, s32);
++void SceneActorAnimation_SelectDirectionalEntryFlags(struct SceneActorAnimationView *, s32, u32);
++void sub_080762A8(struct SceneActorAnimationView *, s32, u32);
++void SceneActorAnimation_SelectEntryFlags(struct SceneActorAnimationView *, s32, u32);
++void SceneActorAnimation_SelectDirectionFlagsVariant(struct SceneActorAnimationView *, s32, u32);
++void SceneActorAnimation_SelectExplicitVariant(struct SceneActorAnimationView *, s32, u32, u32);
++void SceneActorAnimation_SelectDirectionalFlags(struct SceneActorAnimationView *, s32);
++void SceneActorAnimation_SelectProfileEntry(struct SceneActorAnimationView *, s32);
++#endif
+diff --git a/include/scene_actor_contacts.h b/include/scene_actor_contacts.h
+new file mode 100644
+index 000000000..db9761556
+--- /dev/null
++++ b/include/scene_actor_contacts.h
+@@ -0,0 +1,30 @@
++#ifndef GUARD_SCENE_ACTOR_CONTACTS_H
++#define GUARD_SCENE_ACTOR_CONTACTS_H
++#include "scene_actor_registry.h"
++/* Tentative contact-candidate list shared with the preceding 08072264 cohort. */
++struct SceneActorContactNode {
++    void *object;
++    u8 flags, kind;
++    u16 cooldown;
++    struct SceneActorRegistryActor *owner;
++    struct SceneActorContactNode *next;
++};
++struct SceneActorContactManager {
++    u8 task[0x18];
++    u32 field18, count, frame;
++    u16 resourceId, unknown26;
++    struct SceneActorContactNode *head;
++};
++extern struct SceneActorContactManager *gUnk_020001A0;
++void sub_08072B50(void *);
++void sub_08072BA8(void);
++u8 sub_08072BC4(struct SceneActorContactNode *);
++void sub_08072D34(void);
++u8 sub_08072F4C(struct SceneActorContactNode *, struct SceneActorRegistryActor *, s32 *);
++struct SceneActorContactNode *sub_08073A3C(struct SceneActorRegistryActor *, u32);
++void sub_08073B38(void);
++u32 sub_08073B60(struct SceneActorContactManager *);
++struct SceneActorContactManager *sub_08073B78(struct SceneActorContactManager *);
++void sub_08073B84(struct SceneActorContactManager *, u32);
++void sub_08073BF0(void);
++#endif
+diff --git a/include/scene_actor_control.h b/include/scene_actor_control.h
+new file mode 100644
+index 000000000..a3cd6df18
+--- /dev/null
++++ b/include/scene_actor_control.h
+@@ -0,0 +1,40 @@
++#ifndef GUARD_SCENE_ACTOR_CONTROL_H
++#define GUARD_SCENE_ACTOR_CONTROL_H
++#include "engine.h"
++#include "contact_actor.h"
++/* Tentative owner: an eight-slot scene controller that applies player/tether
++ * parameters. These names describe observed consumers, not screen identity. */
++struct SceneActorControlSprite {
++    u32 flags;
++    u8 active;
++};
++struct SceneActorControlSlot {
++    u32 spriteFlags;
++    u8 active, unknown5[2], priority;
++    u8 unknown8[8];
++    u16 tile;
++    u8 unknown12[0xA];
++    struct ContactPosition position;
++    u8 unknown24[8];
++    struct DisplaySequenceState sequence;
++    s16 stateFrame, kind;
++    u16 flags;
++    s16 index, timer;
++    u8 unknown46[2];
++    s32 scene;
++    u16 parameter, previousParameter;
++    struct ContactCollider collider;
++    struct ContactPosition savedPosition;
++};
++struct SceneActorControlManager {
++    u8 unknown0[0x38];
++    u32 used;
++    struct SceneActorControlSlot slots[8];
++};
++static inline u8 SceneActorControl_IsUsed(struct SceneActorControlManager *p, u32 index)
++{
++    if (p->used & (1U << index))
++        return 1;
++    return 0;
++}
++#endif
+diff --git a/include/scene_actor_control_phase.h b/include/scene_actor_control_phase.h
+new file mode 100644
+index 000000000..2b78d9a81
+--- /dev/null
++++ b/include/scene_actor_control_phase.h
+@@ -0,0 +1,33 @@
++#ifndef GUARD_SCENE_ACTOR_CONTROL_PHASE_H
++#define GUARD_SCENE_ACTOR_CONTROL_PHASE_H
++#include "scene_actor_reset.h"
++#include "scene_actor_animation.h"
++#include "scene_actor_behavior.h"
++/* Tentative view of actor3D0's control context, shared by the 082A6C family. */
++struct SceneActorControlState {
++    u8 unknown0[0x3D4];
++    u32 flags3D4;
++    u8 unknown3D8[2];
++    u8 pulseInterval, unknown3DB;
++    u8 maxElapsed, savedDirection;
++    u8 unknown3DE[8];
++    u8 elapsed, startTick;
++};
++struct SceneActorControlPhaseView {
++    u8 unknown0[0x3D0];
++    struct SceneActorControlState *control;
++};
++static inline struct SceneActorControlState *
++SceneActorControl_GetState(struct SceneActorRegistryResetView *actor)
++{
++    return ((struct SceneActorControlPhaseView *)actor)->control;
++}
++static inline u8 SceneActorControl_TakeFlag(u8 *flag)
++{
++    if (*flag) {
++        *flag = 0;
++        return 1;
++    }
++    return 0;
++}
++#endif
+diff --git a/include/scene_actor_profile.h b/include/scene_actor_profile.h
+new file mode 100644
+index 000000000..2032c18e4
+--- /dev/null
++++ b/include/scene_actor_profile.h
+@@ -0,0 +1,22 @@
++#ifndef GUARD_SCENE_ACTOR_PROFILE_H
++#define GUARD_SCENE_ACTOR_PROFILE_H
++#include "scene_actor_registry.h"
++/* Tentative profile records; entry meanings await their consumers. */
++struct SceneActorProfileEntry {
++    u8 value, flags, state, unknown3;
++};
++struct SceneActorProfile {
++    struct SceneActorProfile *next;
++    u8 id, mode, category, entryCount;
++    struct SceneActorProfileEntry entries[30];
++};
++struct SceneActorProfileList {
++    struct SceneActorProfile *head;
++    s32 count;
++};
++s32 SceneActorProfiles_FindDefaultIndex(u32);
++struct SceneActorProfile *SceneActorProfiles_Find(u32, u32);
++u32 SceneActorProfiles_GetEntryAddress(u32, u32, s32);
++s32 SceneActorProfiles_Add(u32, u32);
++s32 SceneActorProfiles_FindOrAdd(u32, u32);
++#endif
+diff --git a/include/scene_actor_registry.h b/include/scene_actor_registry.h
+new file mode 100644
+index 000000000..53bc08a43
+--- /dev/null
++++ b/include/scene_actor_registry.h
+@@ -0,0 +1,122 @@
++#ifndef GUARD_SCENE_ACTOR_REGISTRY_H
++#define GUARD_SCENE_ACTOR_REGISTRY_H
++#include "engine.h"
++#include "contact_actor.h"
++/* Tentative actor-registry manager. Narrow views cover only reviewed fields. */
++struct SceneActorRegistryActor {
++    void *object;
++    void *drawable;
++    u8 drawableKind, unknown9[0x47];
++    u32 id;
++    u8 unknown54[8];
++    struct ContactPosition position;
++    struct ContactPosition velocity;
++    u8 unknown6C[0x2C];
++    u8 category, unknown99[3];
++    s16 health;
++    u8 unknown9E[0xA];
++    s16 fieldA8;
++    u16 fieldAA;
++    u8 unknownAC[0x58];
++    u32 field104;
++    u8 unknown108[0xC];
++    u32 flags114;
++    u8 unknown118[0x60];
++    u16 field178;
++    u8 unknown17A[0x64];
++    u16 paletteBank, basePaletteBank;
++    u8 unknown1E2[4];
++    u16 paletteOffset;
++    u8 unknown1E8[0x34];
++    const void *control;
++    u8 unknown220[0xC];
++    const void *defaultControl;
++    u8 unknown230[0x28];
++    s32 (*update)(void *);
++    s32 (*destroy)(void *);
++    u8 unknown260[0x48];
++    u8 state2A8, phase2A9, behavior2AA, unknown2AB;
++    u32 counter2AC;
++    u8 field2B0, field2B1, field2B2, field2B3;
++    u8 enabled, unknown2B5[3];
++    u16 field2B8;
++    u8 unknown2BA[6];
++    u16 flags2C0;
++    u16 field2C2;
++    u8 unknown2C4[4];
++    u16 field2C8;
++    u8 unknown2CA[2];
++    u32 flags2CC, flags2D0;
++    u16 flags2D4, flags2D6;
++    u8 unknown2D8[0x22];
++    u16 regionId;
++    u8 unknown2FC[0xD4];
++    void *context;
++    u8 unknown3D4[0x40];
++    u16 flags414, field416, field418;
++    u8 unknown41A[0x36];
++    const struct ContactPosition *field450;
++    u8 unknown454[0x28];
++    u32 effectConfig[2];
++    const struct ContactPosition *effectOrigin;
++    u8 unknown488[0xE8];
++    void *field570, *field574;
++    u8 unknown578[0x64];
++    void *field5DC;
++    u8 unknown5E0[0x14];
++    const void *control5F4;
++};
++struct SceneActorRegistrySequenceDrawable {
++    u32 flags;
++    u8 unknown4[0x18];
++    struct ContactPosition position;
++    u8 unknown24[8], animation[6];
++    u16 paletteBank;
++};
++struct SceneActorRegistryTileDrawable {
++    u8 unknown0[0x28];
++    u32 flags;
++    u8 unknown2C[0x14];
++    struct ContactPosition position;
++    u8 unknown48[0x12];
++    u16 paletteBank;
++    u8 unknown5C[0xC];
++    u8 *palette;
++};
++union SceneActorRegistryPackedPosition {
++    struct ContactPosition position;
++    struct {
++        u32 x : 16, y : 16, z : 16, padding : 16;
++    } packed;
++};
++struct SceneActorRegistryNode {
++    struct SceneActorRegistryNode *next;
++    struct SceneActorRegistryActor *actor;
++};
++struct SceneActorRegistryManager {
++    u8 task[0x24];
++    u32 resourceId;
++    u16 unknown28, frame;
++    u32 flags;
++    u8 mode, unknown31;
++    u16 field32;
++    u8 unknown34[0x2E];
++    u16 field62;
++    u8 unknown64[0x21C];
++    u32 subsystem[2];
++};
++extern struct SceneActorRegistryManager *gUnk_020004A8;
++extern struct SceneActorRegistryNode *gUnk_020004AC;
++void sub_08070FA8(struct SceneActorRegistryManager *);
++void SceneActorRegistry_DestroyActors(void);
++void SceneActorRegistry_AdvanceInactiveActors(struct SceneActorRegistryManager *);
++void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *);
++void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *);
++void sub_080718D8(struct SceneActorRegistryActor *);
++void SceneActorRegistry_UpdateBackgroundFlag(struct SceneActorRegistryManager *);
++s32 SceneActorRegistry_TickManager(struct SceneActorRegistryManager *);
++s32 SceneActorRegistry_DestroyManager(struct SceneActorRegistryManager *);
++s32 SceneActorRegistry_InitializeManager(struct SceneActorRegistryManager *, u32, u32);
++struct SceneActorRegistryManager *SceneActorRegistry_CreateManager(u32, u32);
++void SceneActorRegistry_ResetManager(void);
++#endif
+diff --git a/include/scene_actor_reset.h b/include/scene_actor_reset.h
+new file mode 100644
+index 000000000..9a0632d92
+--- /dev/null
++++ b/include/scene_actor_reset.h
+@@ -0,0 +1,120 @@
++#ifndef GUARD_SCENE_ACTOR_RESET_H
++#define GUARD_SCENE_ACTOR_RESET_H
++#include "scene_actor_registry.h"
++/* Extended reset-phase view; fields are offset names unless consumers establish a role. */
++struct SceneActorRegistryControl {
++    u8 unknown0[8];
++    u16 timer;
++    u8 mode, unknownB[0xD];
++    u32 counter;
++};
++struct SceneActorRegistryControlGroup {
++    u8 unknown0[0x40];
++    u16 flags414, field416, field418;
++    u8 unknown46[6];
++    struct SceneActorRegistryControl control;
++    u8 unknown68[0xC];
++};
++struct SceneActorRegistryRoute {
++    u8 unknown0[0xC];
++    u8 fieldC, unknownD[3];
++    u8 parameterA, parameterB, parameterC, unknown13;
++};
++struct SceneActorRegistryResetView {
++    void *object;
++    void *drawable;
++    u8 drawableKind;
++    u8 unknown9[0x47];
++    u32 id;
++    u8 unknown54[5];
++    u8 direction;
++    u8 unknown5A[0x2];
++    struct ContactPosition position;
++    struct ContactPosition motion;
++    u8 unknown6C[0xC];
++    void *currentRoute;
++    u8 unknown7C[0x1C];
++    u8 category;
++    u8 unknown99[0x3];
++    s16 health;
++    u8 unknown9E[0xA];
++    s16 fieldA8;
++    u16 fieldAA;
++    u8 unknownAC[4];
++    s16 defaultHealth;
++    u8 unknownB2[0x2A];
++    u32 fieldDC;
++    u8 unknownE0[0x24];
++    u32 word104;
++    u8 unknown108[0xC];
++    u32 flags114;
++    u32 defaultFlags2CC, defaultFlags2D0;
++    u8 direction120;
++    u8 defaultState, defaultPhase, defaultBehavior;
++    const void *defaultControl;
++    u8 defaultField2B5, unknown129[3];
++    u16 defaultField2EA, defaultFlags2C0;
++    u8 unknown130[4];
++    struct ContactCollider colliderA;
++    struct ContactCollider colliderB;
++    u8 unknown1DC[0x2];
++    u16 paletteBank;
++    u16 basePaletteBank;
++    u8 unknown1E2[0x4];
++    u16 paletteOffset;
++    u16 field1E8;
++    u16 field1EA;
++    u8 unknown1EC[0x30];
++    void *target;
++    u8 unknown220[0xC];
++    void *savedTarget;
++    u8 unknown230[0x18];
++    void *callback248;
++    u8 unknown24C[0x5C];
++    u8 state2A8, phase2A9, behavior2AA, unknown2AB;
++    u32 counter2AC;
++    u8 field2B0, field2B1, field2B2, field2B3;
++    u8 enabled, field2B5, field2B6, unknown2B7;
++    u16 field2B8;
++    u8 unknown2BA[6];
++    u16 flags2C0, field2C2;
++    u8 unknown2C4[4];
++    u16 field2C8;
++    u8 unknown2CA[2];
++    u32 flags2CC;
++    u32 flags2D0;
++    u16 flags2D4;
++    u16 flags2D6;
++    u32 field2D8, field2DC, field2E0;
++    u8 unknown2E4[2];
++    u16 field2E6;
++    u8 unknown2E8[2];
++    u16 field2EA;
++    struct ContactPosition secondaryMotion;
++    u16 terrainCell;
++    u8 unknown2F6[0xE];
++    u32 field304;
++    u8 unknown308[0xC4];
++    u8 field3CC, unknown3CD[7];
++    struct SceneActorRegistryControlGroup group;
++    struct SceneActorRegistryRoute route;
++    u8 unknown45C[4];
++    u32 word460;
++    u8 field464, field465, field466, field467;
++    u32 field468;
++    u8 unknown46C[8];
++    void *attachment;
++    u8 unknown478[0x140];
++    struct ContactPosition motion5B8;
++    u16 field5C0, field5C2, field5C4, field5C6;
++    u8 unknown5C8[2];
++    u8 field5CA, unknown5CB[5];
++    void *routeObject;
++    u8 unknown5D4[4];
++    u8 field5D8, field5D9, field5DA, unknown5DB;
++};
++u8 *sub_0821D64C(s32, s32);
++void sub_0821E5C4(struct SceneActorRegistryRoute *, u32, u32, u32);
++s32 sub_0821E7EC(u16 *, u32, u32);
++void sub_0821FD3C(void *, struct ContactPosition *);
++#endif

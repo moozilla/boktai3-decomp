@@ -1,0 +1,191 @@
+From 5b9dab6694c322b1a8a950670ae3ae90e6e3745a Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Tue, 27 Oct 2026 23:20:16 -0700
+Subject: [PATCH] Fix gTrackedPlayerId as a four-entry array; unify drops
+ repeated declarations of earlier rows
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+---
+ include/ram.h         |  2 +-
+ src/fn/sub_080D6608.c |  2 +-
+ src/fn/sub_080D7568.c |  4 ++--
+ src/fn/sub_080DA3AC.c |  2 +-
+ src/fn/sub_0813FFE4.c |  2 +-
+ src/fn/sub_08158C14.c | 12 +-----------
+ src/fn/sub_08178BCC.c |  1 -
+ src/fn/sub_0823B0D4.c |  2 +-
+ symbols/ram.csv       |  2 +-
+ tools/ramlayout.py    | 12 ++++++++++++
+ 10 files changed, 21 insertions(+), 20 deletions(-)
+
+diff --git a/include/ram.h b/include/ram.h
+index 65b9a6b35..ccfc9979d 100644
+--- a/include/ram.h
++++ b/include/ram.h
+@@ -80,7 +80,7 @@ extern u32 gRisingSpritePool;
+ extern u32 gSpriteNoticeManager;
+ extern u8 *gColliderManager;
+ extern void *gSceneComposite;
+-extern u16 gTrackedPlayerId;
++extern u16 gTrackedPlayerId[4];
+ extern u32 gActorParticlePool;
+ extern u32 gGrowthHazardManager;
+ extern struct FragmentBurstPool *gSpriteGroupPool;
+diff --git a/src/fn/sub_080D6608.c b/src/fn/sub_080D6608.c
+index a7061e794..919aad325 100644
+--- a/src/fn/sub_080D6608.c
++++ b/src/fn/sub_080D6608.c
+@@ -205,7 +205,7 @@ u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
+     u8 *body = actor->context;
+     u8 *group = (u8 *)(&actor->group);
+     s32 goal = *((u16 *)((*((u8 **)(actor->fieldDC + 0x1c))) + 6));
+-    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId)
++    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId[0])
+         return 0;
+     if (goal == actor->terrainCell)
+         return 1;
+diff --git a/src/fn/sub_080D7568.c b/src/fn/sub_080D7568.c
+index 9a3f99c92..6928cffa6 100644
+--- a/src/fn/sub_080D7568.c
++++ b/src/fn/sub_080D7568.c
+@@ -160,7 +160,7 @@ u8 Mummy_ProcessContactPursuit(struct SceneActorRegistryResetView *actor)
+         return 0;
+     if (!Chase_Bits32(&actor->flags2D0, 0x1000000))
+         return 0;
+-    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId)
++    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId[0])
+         return 0;
+     target = (void *)(&actor->fieldDC);
+     ((struct MummyContactState *)target)->flags |= 2;
+@@ -210,7 +210,7 @@ u8 Mummy_ProcessContactPursuit(struct SceneActorRegistryResetView *actor)
+         goto restore;
+     if (actor->field2C2 != 64)
+         return 0;
+-    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId)
++    if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId[0])
+         return 0;
+     actor->flags2D6 |= 0x100;
+ restore:
+diff --git a/src/fn/sub_080DA3AC.c b/src/fn/sub_080DA3AC.c
+index 267be74db..fa04d91b6 100644
+--- a/src/fn/sub_080DA3AC.c
++++ b/src/fn/sub_080DA3AC.c
+@@ -36,7 +36,7 @@ s32 SceneActor_TryTrackNearbyPlayer(struct SceneActorRegistryResetView *actor,
+     struct ContactPosition *position;
+     u32 distance;
+     struct SceneActorReactionMotion *motion;
+-    if (playerId != gTrackedPlayerId)
++    if (playerId != gTrackedPlayerId[0])
+         goto fail;
+     {
+         struct Player *player = gPlayerSlots[0];
+diff --git a/src/fn/sub_0813FFE4.c b/src/fn/sub_0813FFE4.c
+index c1c327bdd..d4cd59d08 100644
+--- a/src/fn/sub_0813FFE4.c
++++ b/src/fn/sub_0813FFE4.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ #include "engine.h"
+ #include "contact_actor.h"
+ void sub_0813FE30(void *);
+@@ -7,7 +8,6 @@ void SceneBody_SetKeyframeDisplay(void *, void *);
+ void SceneBody_SetMovementProbe(void *, void *, s32, s32);
+ void SceneBody_SetPositionOffset(void *, void *);
+ u32 SceneActorContacts_RegisterNode(void *, void *, u32);
+-extern u16 gTrackedPlayerId[];
+ u8 *TerrainModifiers_FindCellOverride(s32, s32);
+ void SceneBody_Init(void *, u32, struct ContactPackedVector *, u32, u32, void *);
+ u32 Player_InitBodyFromScript(u8 *owner, s32 entry)
+diff --git a/src/fn/sub_08158C14.c b/src/fn/sub_08158C14.c
+index 746f556a0..a8c205078 100644
+--- a/src/fn/sub_08158C14.c
++++ b/src/fn/sub_08158C14.c
+@@ -1,17 +1,7 @@
+ #include "global.h"
+-extern u16 gPlayerCount;
+-extern u16 gPlayerTraversalMode;
+-extern u16 gPlayerSavedValue536;
+-extern u16 gPlayerTraversalActive;
+-extern u16 gParticleEffectPendingCount;
+-extern u16 gPlayerEnergyBurstLatch;
+-extern u16 gPlayerCueActive;
+-extern u16 gPlayerCueTimer;
++#include "ram.h"
+ extern u32 gUnk_02000560[4];
+ extern u32 gUnk_02000580[4];
+-extern u16 gTrackedPlayerId[4];
+-extern u16 gPlayerScriptStatus[2];
+-extern u16 gForceThreshold, gForceMagnitude, gForceAngle, gPlayerActionSelectionStamp;
+ // MATCHING_CONCESSION: register-pinning
+ // confidence=low: clears the link-mode shared arrays and counters in the movement-state tail.
+ #define Player_ResetLinkState sub_08158C14
+diff --git a/src/fn/sub_08178BCC.c b/src/fn/sub_08178BCC.c
+index 91c2055e2..716745712 100644
+--- a/src/fn/sub_08178BCC.c
++++ b/src/fn/sub_08178BCC.c
+@@ -3,7 +3,6 @@
+ #include "game_state.h"
+ #include "ram.h"
+ #define gSceneHud (*(struct SceneHudState **)&gFieldHud)
+-extern u16 gSceneHudMode;
+ void SceneHud_RemoveAnimations(struct SceneHudState *);
+ void PauseMenu_RemoveHeaderAnimation(struct SceneHudState *);
+ void PlayerPanel_RemoveEffects(struct SceneHudState *);
+diff --git a/src/fn/sub_0823B0D4.c b/src/fn/sub_0823B0D4.c
+index 4e78c99d4..49eb894aa 100644
+--- a/src/fn/sub_0823B0D4.c
++++ b/src/fn/sub_0823B0D4.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ /* tentative: reads the script position and sets up the body, probe and contact node */
+ 
+@@ -17,7 +18,6 @@ void CellObject_Init(void *, void *);
+ void SceneBody_SetMovementProbe(void *, void *, s32, s32);
+ u32 SceneBody_SetPositionOffset(void *, struct Vec16 *);
+ u32 SceneActorContacts_RegisterNode(void *, void *, u32);
+-extern u16 gTrackedPlayerId[];
+ 
+ u32 KeyframeActor_InitBodyFromScript(u8 *p, u32 entry)
+ {
+diff --git a/symbols/ram.csv b/symbols/ram.csv
+index 42f2a4fe1..3809d3c9d 100644
+--- a/symbols/ram.csv
++++ b/symbols/ram.csv
+@@ -190,7 +190,7 @@ addr,name,size,kind,decl,header,confidence,notes
+ 020004F0,gUnk_020004F0,C,object,,,,
+ 02000500,gPlayerTraversalMode,2,object,extern u16 gPlayerTraversalMode;,include/ram.h,low,"traversal mode (0, 2, 4) tested by collision and cell gates"
+ 02000504,gPlayerCatalogSavedOption,2,object,extern u16 gPlayerCatalogSavedOption;,include/ram.h,low,catalog option saved with the player state
+-02000508,gTrackedPlayerId,2,object,extern u16 gTrackedPlayerId;,include/ram.h,low,
++02000508,gTrackedPlayerId,8,object,extern u16 gTrackedPlayerId[4];,include/ram.h,low,
+ 02000514,gPlayerLevelOverride,2,object,extern u16 gPlayerLevelOverride;,include/ram.h,low,level used by sub_0815910C in state 6
+ 02000518,gPlayerCueTimer,2,object,extern u16 gPlayerCueTimer;,include/ram.h,low,
+ 02000520,gPlayerSavedValue536,2,object,extern u16 gPlayerSavedValue536;,include/ram.h,low,saved copy of player field 0x536
+diff --git a/tools/ramlayout.py b/tools/ramlayout.py
+index f11a28b19..417a6baf0 100644
+--- a/tools/ramlayout.py
++++ b/tools/ramlayout.py
+@@ -397,6 +397,18 @@ def cmd_unify(a):
+     # header reaches every file that includes it, which cannot fall back
+     blocked |= {p for p in new if p.endswith(".h") and p != a.header}
+     # a file that declares one of them differently cannot include the header
++    # (earlier rows of the header lose their repeated declarations too)
++    for name in sorted(set(canon) - {parse_decl(d)[1] for _, d, _ in jobs}):
++        for p in sorted(new):
++            if p == a.header or p in blocked or not re.search(rf"\b{name}\b", new[p]):
++                continue
++            t = new[p]
++            for m, spec, decls, idx in reversed(declarations(t, name)):
++                if norm(spec, decls[idx], name, name) == canon[name]:
++                    t = drop_decl(t, m, decls, idx)
++                    if p.endswith(".h") or hdr_inc not in includes(t):
++                        t = add_include(t, a.header)
++            new[p] = t
+     for r, decl, note in jobs:
+         c, name = parse_decl(decl)
+         for p in sorted(new):
+-- 
+2.39.3 (Apple Git-145)
+

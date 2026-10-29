@@ -1,0 +1,520 @@
+diff --git a/docs/HANDOFF.md b/docs/HANDOFF.md
+index 8799ed2fa..45cd8d9c4 100644
+--- a/docs/HANDOFF.md
++++ b/docs/HANDOFF.md
+@@ -23,6 +23,12 @@ README badges (live from decomp.dev). Don't copy totals into other files.
+ 
+ Recent work, newest first (details in [history](history/README.md)):
+ 
++* **ARM cursor de-pinning research** (2026-10-25): 08000430's prior unpinned
++  four-instruction near-match remains best. Pass dumps isolate the emit-loop
++  preheader scheduling, cse2 notes and GCSE PRE conflict; the supplied pinned
++  baseline is restored and exact-checked. See
++  [notes](../notes/arm-counter-pointer_2026-10-25.md) and the local experiment
++  record in `build/arm_kit/REPORT.md`.
+ * **Every scene's procedures have working names** (2026-10-19):
+   `tools/assets/gclroles.py` names scene entries by area (`white_forest_3880`)
+   and 93% of their private procedures by role (`_stage`, `_doors`, `_enemies`,
+diff --git a/docs/INDEX.md b/docs/INDEX.md
+index 658c8ef0a..062ee9a41 100644
+--- a/docs/INDEX.md
++++ b/docs/INDEX.md
+@@ -211,6 +211,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
+ | [docs/history/2026-10-19.md](../docs/history/2026-10-19.md) | 2026-10-19.md | #history #scripts #tooling | 1 |
+ | [docs/history/2026-10-23-cx-sol08.md](../docs/history/2026-10-23-cx-sol08.md) | 2026-10-23 — cx-sol08 actor campaign batch | #actors #matching | 1 |
+ | [docs/history/2026-10-23.md](../docs/history/2026-10-23.md) | Campaign sol05 session 2 wrap-up | #actors #campaign #effect-pool #hresvelgr #inventory #matching #monsters #mummy #nonmatching #particles #player #ratatosk #register-pinning #scene-actors #tentacle #vanargand | 7 |
++| [docs/history/2026-10-25.md](../docs/history/2026-10-25.md) | 2026-10-25 | #compiler #iwram #matching | 1 |
+ | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
+ | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 16 |
+ | [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 17 |
+@@ -222,6 +223,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
+ | [notes/animation-contact-burst_2026-10-14.md](../notes/animation-contact-burst_2026-10-14.md) | Temporary animations and contact-burst effect, October 14 | *#particles #animation* | 7 |
+ | [notes/area-effect-link_2026-10-14.md](../notes/area-effect-link_2026-10-14.md) | Link variant of area effects (Sol, 2026-10-14) |  | 2 |
+ | [notes/area-effect_2026-10-14.md](../notes/area-effect_2026-10-14.md) | Rectangular area effect manager (Sol, 2026-10-14) | *#tooling* | 4 |
++| [notes/arm-counter-pointer_2026-10-25.md](../notes/arm-counter-pointer_2026-10-25.md) | ARM emit-loop counter-pointer investigation (2026-10-25) | #matching #compiler #iwram | 2 |
+ | [notes/bk.md](../notes/bk.md) | bk notes (backlog retry, 45 matches) |  | 5 |
+ | [notes/breakable-prop_2026-10-14.md](../notes/breakable-prop_2026-10-14.md) | Breakable prop, 080515C0–08051A3C | *#particles* | 2 |
+ | [notes/cell-gates_2026-10-14.md](../notes/cell-gates_2026-10-14.md) | Cell-based traversal gates and the preceding script entry | *#scripts* | 4 |
+diff --git a/src/iwram_code.c b/src/iwram_code.c
+index dba49690a..ee4db98dc 100644
+--- a/src/iwram_code.c
++++ b/src/iwram_code.c
+@@ -44,10 +44,14 @@ struct IwVec {
+     s16 x, y, z;
+ };
+ 
++struct IwSpr;
++
+ struct IwObj {
+     u8 pad0[8];
+     u32 flags;
+-    u8 padC[0x14];
++    u8 padC[0xE];
++    u8 priority;
++    u8 pad1B[5];
+     struct IwVec pos;
+     u16 dx;
+     u16 dy;
+@@ -55,7 +59,17 @@ struct IwObj {
+     s16 bottom;
+     s16 left;
+     s16 top;
+-    u8 pad34[0x28];
++    u8 scaleX;
++    u8 scaleY;
++    u16 angle;
++    u16 count;
++    u16 palBase;
++    u32 attr;
++    u8 pad40[8];
++    u8 *palSrc;
++    struct IwSpr *spr;
++    u8 *tiles;
++    u8 pad54[8];
+     struct IwObj *next;
+ };
+ 
+@@ -86,7 +100,381 @@ static inline void IwProject(struct IwVec *screen, struct IwVec *world)
+     screen->z = sum + vertical - gUnk_03005418[2];
+ }
+ 
+-INCLUDE_ASM("asm/nonmatching", sub_08000430);
++// MATCHING_CONCESSION: register-pinning
++struct IwSpr {
++    u8 flags;
++    u8 size;
++    s16 dx;
++    s16 dy;
++    u16 tile;
++};
++
++struct IwAffineParam {
++    u8 angle;
++    s8 a;
++    s8 b;
++    u8 pad;
++};
++
++struct IwTileReq {
++    u8 *src;
++    u32 desc;
++};
++
++struct IwOamOut {
++    u32 attr01;
++    u16 attr2;
++    u16 attr3;
++};
++
++extern u8 gUnk_03005230;
++extern u32 gUnk_0300522C;
++extern s32 gUnk_03004BA0;
++extern struct IwAffineParam gUnk_03004310[];
++extern s16 gUnk_086149C4[];
++extern u8 gUnk_03004D20[];
++extern u8 gUnk_03004D90[];
++extern u32 gUnk_03004D50[];
++extern u8 gUnk_03004D30[];
++extern u8 gUnk_03004D40[];
++extern u8 gUnk_03004D10[];
++extern s16 gUnk_030042E8;
++extern u16 gUnk_030042DC;
++extern u32 gUnk_03004304;
++extern struct IwTileReq gUnk_02039000[];
++extern s32 gUnk_03004798;
++extern struct IwOamOut gUnk_03004390[];
++extern u32 gUnk_03003A04;
++extern s32 gUnk_0300479C;
++extern struct IwOamOut gUnk_030047A0[];
++extern u16 gUnk_03004790[];
++u32 Palette_CacheObjectBankArm(u32 key, u32 *src);
++
++static inline s32 IwScale6(s32 v)
++{
++    return v >= 0 ? v >> 6 : -((-v) >> 6);
++}
++
++static inline s32 IwScale12(s32 v)
++{
++    if (v >= 0)
++        return v >> 12;
++    return -((-v) >> 12);
++}
++
++static inline s32 IwAddAffine(u8 angle, s32 a, s32 b)
++{
++    s32 n = gUnk_03004BA0;
++    if (n > 0x1f)
++        return 0;
++    gUnk_03004BA0 = n + 1;
++    gUnk_03004310[n].angle = angle;
++    gUnk_03004310[n].a = a;
++    gUnk_03004310[n].b = b;
++    return n;
++}
++
++#define IW_QUEUE_TILES(r, obj, tile, step, tw, th, b)                                              \
++    if (gUnk_030042E8 + (step) >= 0x400)                                                           \
++        r = -1;                                                                                    \
++    else {                                                                                         \
++        u32 slot;                                                                                  \
++        u32 off;                                                                                   \
++        u8 *src;                                                                                   \
++        u8 *q;                                                                                     \
++        slot = gUnk_03004304;                                                                      \
++        r = 0;                                                                                     \
++        b = reqs;                                                                                  \
++        off = slot << 3;                                                                           \
++        src = (obj)->tiles + ((tile) << 5);                                                        \
++        *(u8 **)(b + off) = src;                                                                   \
++        q = b + off;                                                                               \
++        *(u32 *)(q + 4) = ((tw) << 5) | ((th) << 16);                                              \
++        gUnk_03004304 = slot + 1;                                                                  \
++    }
++
++static inline void IwPushOam(u32 attr01, u32 attr2)
++{
++    s32 c = gUnk_03004798;
++    if (c <= 0x7f) {
++        gUnk_03004798 = c + 1;
++        gUnk_03004390[c].attr01 = attr01;
++        gUnk_03004390[c].attr2 = attr2;
++        gUnk_03003A04 |= 1;
++    }
++}
++
++static inline void IwPushOamZ(u32 attr01, u32 attr2, s32 z, u32 prio)
++{
++    s32 c = gUnk_0300479C;
++    if (c <= 0x7f) {
++        struct IwOamOut *o = &gUnk_030047A0[c];
++        gUnk_0300479C = c + 1;
++        o->attr01 = attr01;
++        o->attr2 = attr2;
++        o->attr3 = (z + 0x80) << 8;
++        gUnk_03004790[prio]++;
++    }
++}
++
++// confidence=low: batches an IwObj's sprites into OAM (affine setup, bounds check, palette cache, tile requests)
++void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
++{
++    u32 oam[64];
++    u8 attr3[64];
++    u16 tile[64];
++    u8 keyIdx[64];
++    u32 keys[16];
++    u8 affTbl[4];
++    u32 bankIdx[16];
++    s32 i;
++    s32 n = 0;
++    s32 nKeys = 0;
++    s32 sinv, cosv;
++    u32 fl2;
++    u32 f4, f8;
++    struct IwSpr *p;
++    s32 j;
++    u8 *ewram;
++    u8 *ew2;
++    s32 step;
++    u8 *b = 0;
++    u8 *b2 = 0;
++    s16 *c;
++    s16 *cnt;
++    s16 *cnt2;
++
++    f4 = obj->flags & 4;
++    f8 = obj->flags & 8;
++    z = z >= 0 ? z >> 1 : -((-z) >> 1);
++    if (z < -0x80)
++        z = -0x80;
++    else if (z > 0x7f)
++        z = 0x7f;
++
++    fl2 = 0;
++    if (((gUnk_03005230 & 1) && obj->priority != 0 && !(obj->flags & 0x10000)) ||
++        (obj->flags & 0x800))
++        fl2 |= 0x1000;
++    if (gUnk_0300522C != 0) {
++        if (obj->flags & 0x4000)
++            fl2 |= 0x400;
++    }
++    if (obj->flags & 0x100)
++        fl2 |= 0x800;
++
++    if (!(obj->flags & 2)) {
++        sinv = cosv = 0;
++    } else {
++        s32 a = obj->scaleX;
++        s32 b = obj->scaleY;
++        s32 ra, rb, idx;
++
++        if (f4)
++            a = -a;
++        if (f8)
++            b = -b;
++        if (obj->flags & 0x20000) {
++            fl2 |= 0x100;
++        } else {
++            if ((a < 0 ? -a : a) > 0x3c || (b < 0 ? -b : b) > 0x3c || obj->angle != 0)
++                fl2 |= 0x300;
++            else
++                fl2 |= 0x100;
++        }
++        affTbl[0] = IwAddAffine(obj->angle, (s8)a, (s8)b);
++        if (obj->flags & 0x8000) {
++            affTbl[1] = IwAddAffine(obj->angle, (s8)-a, (s8)b);
++            affTbl[2] = IwAddAffine(obj->angle, (s8)a, (s8)-b);
++            affTbl[3] = IwAddAffine(obj->angle, (s8)-a, (s8)-b);
++        } else {
++            affTbl[1] = affTbl[0];
++            affTbl[2] = affTbl[0];
++            affTbl[3] = affTbl[0];
++        }
++        idx = (u16)obj->angle;
++        sinv = gUnk_086149C4[(-idx) & 0xff];
++        cosv = gUnk_086149C4[(-idx + 0x40) & 0xff];
++    }
++
++    p = obj->spr;
++    for (i = 0; i < obj->count; i++, p++) {
++        u32 sz = p->size;
++        s32 wd = gUnk_03004D90[sz];
++        s32 ht = gUnk_03004D20[sz];
++        u32 fl = fl2;
++        s32 px, py;
++
++        if (!(obj->flags & 2)) {
++            s32 x1, y1;
++            px = p->dx;
++            py = p->dy;
++            x1 = px + wd;
++            y1 = py + ht;
++            if (f4) {
++                s32 t = px;
++                px = -x1;
++                x1 = -t;
++            }
++            if (f8) {
++                s32 t = py;
++                py = -y1;
++                y1 = -t;
++            }
++            px += x;
++            py += y;
++            if (f4 != (p->flags & 4))
++                fl |= 0x10000000;
++            if (f8 != (p->flags & 8))
++                fl |= 0x20000000;
++            if (!(obj->flags & 0x40)) {
++                x1 += x;
++                y1 += y;
++                if (x1 < 0)
++                    continue;
++                if (px > 0xF0)
++                    continue;
++                if (y1 < 0)
++                    continue;
++                if (py > 0xA0)
++                    continue;
++            }
++        } else {
++            s32 hx = wd >> 1;
++            s32 hy = ht >> 1;
++            s32 sx = IwScale6((p->dx + hx) * obj->scaleX);
++            s32 sy = IwScale6((p->dy + hy) * obj->scaleY);
++            s32 ey, rx, ry;
++            u32 idx;
++
++            if (f4)
++                sx = -sx;
++            ey = sy;
++            if (f8)
++                ey = -sy;
++            if (p->flags & 4)
++                idx = 1;
++            else
++                idx = 0;
++            if (p->flags & 8)
++                idx |= 2;
++            fl |= (u32)affTbl[idx] << 25;
++            rx = IwScale12(sx * cosv - ey * sinv);
++            px = rx - hx;
++            ry = IwScale12(sx * sinv + ey * cosv);
++            py = ry - hy;
++            if ((fl & 0x300) == 0x300) {
++                s32 h2 = ht * 2;
++                px = px - hx;
++                py = py - hy;
++                px += x;
++                py += y;
++                if (px + wd * 2 < 0)
++                    continue;
++                if (px > 0xF0)
++                    continue;
++                if (py + h2 < 0)
++                    continue;
++                if (py > 0xA0)
++                    continue;
++            } else {
++                px += x;
++                py += y;
++                if (px + wd < 0)
++                    continue;
++                if (px > 0xF0)
++                    continue;
++                if (py + ht < 0)
++                    continue;
++                if (py > 0xA0)
++                    continue;
++            }
++        }
++
++        {
++            u32 key;
++            tile[n] = p->tile & 0xfff;
++            key = p->tile >> 12;
++            for (j = 0; j < nKeys && keys[j] != key; j++)
++                ;
++            keyIdx[n] = j;
++            if (j == nKeys) {
++                nKeys = j + 1;
++                keys[j] = key;
++            }
++            attr3[n] = sz;
++            oam[n] = ((gUnk_03004D50[sz] | obj->attr) | ((py & 0xff) | ((px & 0x1ff) << 16)));
++            oam[n] |= fl;
++            n++;
++        }
++    }
++
++    if (n <= 0)
++        return;
++
++    {
++        u8 *pal = obj->palSrc;
++        for (j = 0; j < nKeys; j++)
++            bankIdx[j] =
++                Palette_CacheObjectBankArm(obj->palBase + keys[j], (u32 *)(pal + (keys[j] << 5)));
++    }
++
++    if (obj->flags & 0x20) {
++        ewram = (u8 *)0x2000000;
++        /* The pinned temporary tells cse2 (after loop) that cnt is &gUnk_030042E8 while gcse
++           never sees the address, so the hoisted c = cnt keeps its own pool load into sl. */
++        {
++            register s16 *h asm("r3") = &gUnk_030042E8;
++            cnt = h;
++            h = 0;
++        }
++        for (j = 0; j < n; j++) {
++            u32 s = attr3[j];
++            u32 t = tile[j];
++            s32 tw = gUnk_03004D40[s];
++            s32 th = gUnk_03004D10[s];
++            s32 r;
++            u8 *reqs;
++            step = gUnk_03004D30[s];
++            reqs = ewram + 0x39000;
++            c = cnt;
++            IW_QUEUE_TILES(r, obj, t, step, tw, th, b);
++            if (r < 0)
++                return;
++            IwPushOam(oam[j],
++                      (u32)*c | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12));
++            gUnk_030042DC += step;
++            *c += step;
++        }
++    } else {
++        ew2 = (u8 *)0x2000000;
++        {
++            register s16 *h asm("r3") = &gUnk_030042E8;
++            cnt2 = h;
++            h = 0;
++        }
++        for (j = 0; j < n; j++) {
++            u32 s = attr3[j];
++            u32 t = tile[j];
++            s32 tw = gUnk_03004D40[s];
++            s32 th = gUnk_03004D10[s];
++            s32 r;
++            u8 *reqs;
++            step = gUnk_03004D30[s];
++            reqs = ew2 + 0x39000;
++            c = cnt2;
++            IW_QUEUE_TILES(r, obj, t, step, tw, th, b2);
++            if (r < 0)
++                return;
++            IwPushOamZ(oam[j],
++                       (u32)*c | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12), z,
++                       obj->priority);
++            gUnk_030042DC += step;
++            *c += step;
++        }
++    }
++}
++
+ void sub_08000E90(void)
+ {
+     struct IwObj *o;
+diff --git a/docs/history/2026-10-25.md b/docs/history/2026-10-25.md
+new file mode 100644
+index 000000000..4fde2402e
+--- /dev/null
++++ b/docs/history/2026-10-25.md
+@@ -0,0 +1,15 @@
++# 2026-10-25
++
++## ARM emit-loop counter-pointer investigation
++
++Tags: #matching #compiler #iwram
++
++Investigated natural C for the 08000430 cursor hoist/reload conflict in 83
++local compiler experiments. No new exact match or coverage gain; the prior
++four-instruction unpinned near-match remains best. Scheduler classification,
++cse2 equivalence notes, GCSE PRE and allocation priorities were isolated with
++pass dumps and diagnostic knobs. Boktai 2 confirms the shared cursor shape
++while differing in its request writer. The supplied pinned source was restored
++and the whole unit passes exact checking. See
++[research notes](../../notes/arm-counter-pointer_2026-10-25.md); detailed local
++experiments are retained in `build/arm_kit/REPORT.md`.
+diff --git a/notes/arm-counter-pointer_2026-10-25.md b/notes/arm-counter-pointer_2026-10-25.md
+new file mode 100644
+index 000000000..4d833849e
+--- /dev/null
++++ b/notes/arm-counter-pointer_2026-10-25.md
+@@ -0,0 +1,34 @@
++# ARM emit-loop counter-pointer investigation (2026-10-25)
++
++Tags: #matching #compiler #iwram
++
++Investigated 08000430 in `src/iwram_code.c` from the supplied exact pinned
++baseline, working solo. No new exact match or coverage gain. The best unpinned
++source remains the prior four-instruction near-match; its residue is the cursor
++address load appearing late in each emit-loop preheader.
++
++The local research record is `build/arm_kit/REPORT.md`: 83 default/diagnostic
++runs, candidate sources, pass dumps and compiler priority logs. Retained local
++sources include direct counter globals (8 instruction differences), the
++palette-loop pointer-copy route (18), and a natural request helper without the
++b/b2 dead initializers (71). Knob-only zero-diff outputs are diagnostics, not
++accepted matches.
++
++Direct globals plus diagnostic sched1 load reclassification on the two cursor
++preheader sets removes the emit residue. A separate collect-loop priority tie
++accounts for the remaining four differences; changing both decisions yields
++zero instruction diffs. The palette-copy route instead preserves the test
++reload and preheader copy but loses cse2 constant notes at the palette exit,
++raising the pointer's allocation priority. Simple early aliases let GCSE PRE
++remove the test reloads. Detailed UIDs and pseudo numbers are in the report
++and apply only to its captured source.
++
++Boktai 2 has the same sl cursor hoist, fresh r2 address load for the reservation
++test, signed attr2 read, and halfword increment. Its request writer differs in
++address construction and count reloads. Its Video_AllocObjTiles C favors direct
++global cursor expressions. Reconstructing the original inline API and its
++argument lifetimes from neighboring routines is the strongest next direction.
++
++Restored the supplied pinned baseline to `src/iwram_code.c` at closeout.
++`tools/check.py src/iwram_code.c`: all six functions MATCH, zero differing
++bytes across the 4364-byte unit including pools. No full build, commit or push.

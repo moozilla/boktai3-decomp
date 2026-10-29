@@ -1,0 +1,1860 @@
+diff --git a/README.md b/README.md
+index 9c9cb4f18..69100a06f 100644
+--- a/README.md
++++ b/README.md
+@@ -87,21 +87,12 @@ python3 tools/studio/serve.py    # http://localhost:8642
+ 
+ **Browse** (`/atlas`) is the way in: everything in the game as one tree
+ (characters, the monster list in the game's order, objects, places in story
+-order, items, scripts, script commands, sprites, songs and code by subsystem), each
++order, items, scripts, script commands, sprites and code by subsystem), each
+ with one page of everything known about it: a monster family's species and
+ every palette its sprites are drawn in, where it appears, the scripts that
+ create it and how much of its code is decompiled. ⌘K searches everything;
+ links to the views below open in a side panel with its own history. The index
+-is built by `tools/studio/atlas.py`. Groups come from the game and the code, not
+-from hand-made categories: the Cast is the game's character list plus every
+-speaker of dialogue in the scripts (with their lines and scenes), the Bestiary
+-the game's monster list, Objects and Script routines the registry entries by
+-the code subsystem their callback is in. An object's page lists its own
+-sprites and palettes, the sprite packages, maps, tilesets and animations its
+-code looks up (`sub_0821A520(type, hash)`), and the scenes whose own scripts
+-place it; a scene opened from there marks it on the map. **ROM** (`/rom`) is
+-the ROM as a treemap in address order, colored by kind or by how well each
+-byte is understood.
++is built by `tools/studio/atlas.py` and grouped by `data/atlas/categories.csv`.
+ 
+ | | |
+ |---|---|
+@@ -112,10 +103,7 @@ byte is understood.
+ | ![Actors](docs/img/studio-actors.png) | **Actors**: every object a script can create, with its GCL name, code, sprites and scenes. |
+ | ![Screen inspector](docs/img/studio-captures.png) | **Screen inspector** (Live and Captures): every sprite, text box, layer and palette on screen, matched to its resource. Live mode connects to mGBA through [Centaur](docs/CENTAUR.md). |
+ 
+-Also: palette, font and tile viewers, and **Sound** (`/sound`): every song in
+-the song table with its tracks, voices and the scripts, scenes and code that
+-start it, played in the browser by a small MP2K player (`tools/studio/mp2k.js`)
+-from the ROM's own sequence and sample data.
++Also: palette, font and tile viewers.
+ 
+ ## Layout
+ 
+diff --git a/tools/m4a.py b/tools/m4a.py
+index 1c904a06c..bba46d6d7 100644
+--- a/tools/m4a.py
++++ b/tools/m4a.py
+@@ -33,7 +33,6 @@ class Walker:
+         self.voicegroups = set()
+         self.songs = []
+         self.samples = {}       # wave header address -> end (exclusive)
+-        self.voices = set()     # VOICE (program) numbers the walked tracks select
+ 
+     def u32(self, a):
+         return u32(self.rom, a - ROM_BASE)
+@@ -87,8 +86,6 @@ class Walker:
+                 elif c == 0xCD:       # XCMD type param
+                     pos += 3
+                 elif c in ARGS1:
+-                    if c == 0xBD:     # VOICE program
+-                        self.voices.add(self.b(pos + 1))
+                     pos += 2
+                 elif c >= 0xCE:       # EOT / TIE / notes: up to 3 args < 0x80
+                     pos += 1
+diff --git a/tools/studio/atlas.html b/tools/studio/atlas.html
+index 37faf1851..f76a066df 100644
+--- a/tools/studio/atlas.html
++++ b/tools/studio/atlas.html
+@@ -94,10 +94,6 @@ table.t th { color: var(--muted); font-weight: 500; font-size: 12px; }
+ #sres .r .p { color: var(--muted); font-size: 12px; margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45%; }
+ .mapframe { width: 100%; height: 460px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+ pre.script { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow: auto; max-height: 70vh; font: 12.5px/1.5 ui-monospace, Menlo, monospace; white-space: pre; }
+-.dlg { margin: 0 0 16px; }
+-.dlg .dh { font-weight: 550; margin-bottom: 4px; }
+-.dlg .ln { display: grid; grid-template-columns: 58px 1fr; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+-.dlg .en { white-space: normal; }
+ .kbd { font-size: 11px; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; color: var(--muted); }
+ @media (max-width: 860px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } .page { padding: 14px 16px 40px; } }
+ </style>
+@@ -120,8 +116,8 @@ pre.script { background: var(--panel); border: 1px solid var(--line); border-rad
+ studioHeader(`<button id="sbtn" title="Search everything">Search <span class="kbd">⌘K</span></button>`);
+ let T = [], E = {}, F = null, open = new Set(), SEL = null;
+ const nodes = {};                  // folder path -> node
+-const ICON = { package: '▤', actor: '◆', monster: '☠', char: '☺', item: '◇', area: '▣', scene: '▫', file: '≡', sprite: '▤', unit: '{}', tileset: '▦', bgtiles: '▦', song: '♪' };
+-const KIND = { package: 'sprite', actor: 'object', monster: 'monster', char: 'character', item: 'item', area: 'area', scene: 'scene', file: 'script', sprite: 'sprite', unit: 'code', tileset: 'tileset', bgtiles: 'map tiles', song: 'song' };
++const ICON = { package: '▤', actor: '◆', monster: '☠', char: '☺', item: '◇', area: '▣', scene: '▫', file: '≡', sprite: '▤', unit: '{}', tileset: '▦', bgtiles: '▦' };
++const KIND = { package: 'sprite', actor: 'object', monster: 'monster', char: 'character', item: 'item', area: 'area', scene: 'scene', file: 'script', sprite: 'sprite', unit: 'code', tileset: 'tileset', bgtiles: 'map tiles' };
+ const href = id => '#' + id;
+ const link = (id, text) => E[id] ? `<a href="${href(id)}">${esc(text ?? E[id].title)}</a>` : esc(text ?? id);
+ const chip = (id, text, extra = '') => E[id] ? `<a class="chip" href="${href(id)}">${esc(text ?? E[id].title)}${extra}</a>` : '';
+@@ -218,7 +214,6 @@ function picOf(e, size = 64) {
+   if (e.kind === 'sprite') return thumb('big', e.key, size);
+   if (e.kind === 'package') return thumb('spr', e.key, size);
+   if (e.kind === 'monster') { if (e.palette) return thumb('big', e.palette.sprite, size, { pool: e.palette.pool }); const a = E[e.actors[0]]; return a ? picOf(a, size) : ''; }
+-  if (e.kind === 'char' && e.portrait) return thumb('big', e.portrait.sprite, size, { pool: e.portrait.pool, frame: e.portrait.frame });
+   if (e.kind === 'char') { const sp = e.sprites?.[0]; if (sp) return sp.startsWith('spr:') ? thumb('spr', sp.slice(4), size) : thumb('big', sp.slice(7), size); return e.actors?.length ? picOf(E[e.actors[0]], size) : ''; }
+   if (e.kind === 'actor' && e.pic) return e.pic.startsWith('spr:') ? thumb('spr', e.pic.slice(4), size) : thumb('big', e.pic.slice(7), size);
+   if (e.kind === 'actor') { if (e.sprites[0]) return thumb('big', e.sprites[0], size); if (e.small[0]) return thumb('spr', e.small[0], size); return ''; }
+@@ -246,9 +241,8 @@ function cardFor(id) {
+   if (e.kind === 'scene') small = E[e.area]?.title || '';
+   if (e.kind === 'file') small = `${e.nprocs} procedures`;
+   if (e.kind === 'unit') small = `${e.funcs.length} functions · ${e.size ? Math.round(100 * e.matched / e.size) : 0}% matched`;
+-  if (e.kind === 'char') small = e.jp + (e.lines ? ` · ${e.lines} lines` : '');
++  if (e.kind === 'char') small = e.jp;
+   if (e.kind === 'tileset') small = `${e.tiles} tiles · ${e.maps.length ? 'map ' + e.maps.map(m => m.map).join(', ') : 'no stage'}`;
+-  if (e.kind === 'song') small = `song ${e.key} · ${e.ntracks} track${e.ntracks > 1 ? 's' : ''}${e.scenes.length ? ` · ${e.scenes.length} scene${e.scenes.length > 1 ? 's' : ''}` : ''}`;
+   if (e.kind === 'bgtiles') small = `map ${e.key} · ${e.tiles} tiles`;
+   return `<a class="card" href="${href(id)}">${pic ? `<span class="picw">${pic}</span>` : ''}<span class="ct">${esc(label(e))}</span><small>${esc(small)}</small></a>`;
+ }
+@@ -274,11 +268,6 @@ function palettes(hash) {
+   return `<div class="spritebox"><div class="sh"><a href="#sprite:${hash}">${esc(s.title)}</a> <span class="mono">${hash}</span> · ${peekLink(gfxHref('big', hash), 'frames ↗')}</div>
+     <div class="pals">${one(s.default, s.default_label, true)}${s.variants.map(v => one(v.pool, v.label, false, v.source)).join('')}</div></div>`;
+ }
+-// the songs a scene's or area's scripts start
+-function songsOf(e) {
+-  const ss = (e.songs || []).filter(id => E[id]);
+-  return ss.length ? `<h3>Music and sound <span class="n">${ss.length}</span></h3><div class="chips">${ss.map(id => chip(id, null, ` <small>${E[id].key}</small>`)).join('')}</div>` : '';
+-}
+ function placesOf(areas, from) {
+   const rows = Object.entries(areas || {}).sort((a, b) => (E['area:' + a[0]]?.order ?? 999) - (E['area:' + b[0]]?.order ?? 999));
+   if (!rows.length) return '<div class="empty">Not placed in any scene found so far.</div>';
+@@ -297,16 +286,6 @@ function codeTable(names, el) {
+   });
+ }
+ 
+-// Resources an object's code looks up by hash: maps and tilesets (bosses
+-// drawn as background layers), palettes, animation scripts.
+-function resources(e) {
+-  const r = e.resources || {};
+-  const row = (k, label, href) => r[k]?.length ? `<div style="margin:4px 0"><span class="muted">${label}</span> <span class="chips" style="display:inline-flex">${r[k].map(h => `<a class="chip" href="${href(h)}" data-peek>${h}</a>`).join('')}</span></div>` : '';
+-  const html = row('maps', 'maps', h => gfxHref('map', h)) + row('tilesets', 'tilesets', h => '/gfx#tiles/' + h) + row('palettes', 'palettes', h => gfxHref('pal', h)) + row('animations', 'animation scripts', h => '/gfx#data/' + h);
+-  // a boss drawn as a background layer: show the map it loads
+-  const preview = r.maps?.length ? `<iframe class="mapframe" style="height:300px;margin-top:6px" src="/gfx?embed=1&bare=1#maps/${r.maps[0]}" loading="lazy"></iframe>` : '';
+-  return html ? `<h3>Other resources its code loads</h3>${html}${preview}` : '';
+-}
+ // Where an object is: scenes whose own script creates it; otherwise the
+ // shared scripts that do (run by many scenes, or by the system).
+ function placement(e) {
+@@ -318,18 +297,15 @@ function placement(e) {
+ const PAGES = {
+   actor(e) {
+     const species = e.names.filter(n => E['monster:' + n.id]);
+-    const spoken = Object.values(E).filter(c => c.kind === 'char' && c.monster && species.some(n => 'monster:' + n.id === c.monster));
+     const chars = (e.chars || []).filter(id => E[id]);
+-    const sub = [e.title_from ? `<span class="muted">named from ${esc(e.title_from)}</span>` : '', e.names.length ? `<span class="jp">${e.names.map(n => esc(n.jp)).join(' · ')}</span>` : '', e.gcl[0] ? `GCL <b>${esc(e.gcl[0].name)}</b>` : '', `key <span class="mono">${e.key}</span>`].filter(Boolean).join(' · ');
++    const sub = [e.names.length ? `<span class="jp">${e.names.map(n => esc(n.jp)).join(' · ')}</span>` : '', e.gcl[0] ? `GCL <b>${esc(e.gcl[0].name)}</b>` : '', `key <span class="mono">${e.key}</span>`].filter(Boolean).join(' · ');
+     const b = [`<a class="badge" href="#unit:${esc(e.subsystem)}">code: ${esc(e.subsystem)}</a>`, badge(e.creates ? 'object' : 'script routine'), e.nscenes ? badge(`placed in ${e.nscenes} scenes`) : '', e.procs.length ? badge(`${e.spawns} script calls`) : badge('not created by scripts')];
+     return `<div class="page">${head(e, sub, b)}
+       ${chars.length ? `<h3>Character</h3><div class="chips">${chars.map(id => chip(id)).join('')}</div>` : ''}
+       ${species.length ? `<h3>Species <span class="n">${species.length}</span></h3><div class="chips">${species.map(n => chip('monster:' + n.id, n.en || n.jp, ` <small>${esc(n.jp)}</small>`)).join('')}</div>` : ''}
+       <h3>Sprites and palettes <span class="n">${e.sprites.length}</span></h3>${e.sprites.length ? e.sprites.map(palettes).join('') : `<div class="empty">Its own code (${esc(e.fname)}${e.loader_name ? ', ' + esc(e.loader_name) : ''}) loads no large sprite we can trace${e.small.length ? '' : '; it may draw with a sprite package or a background layer'}.</div>`}
+       ${e.effects?.length ? `<details style="margin-top:6px"><summary class="muted">Other sprites its code loads <span class="n">${e.effects.length}</span>: effects, projectiles and things it spawns</summary><div class="cards" style="margin-top:8px">${e.effects.map(h => cardFor('sprite:' + h)).join('')}</div></details>` : ''}
+-      ${e.small.length ? `<h3>Sprite packages <span class="n">${e.small.length}</span></h3><div class="cards">${e.small.map(h => E['spr:' + h] ? cardFor('spr:' + h) : `<a class="card" href="${gfxHref('spr', h)}" data-peek>${thumb('spr', h, 64)}<span class="ct">Package ${h}</span></a>`).join('')}</div>` : ''}
+-      ${e.effect_pkgs?.length ? `<details style="margin-top:6px"><summary class="muted">Other sprite packages its code loads <span class="n">${e.effect_pkgs.length}</span></summary><div class="cards" style="margin-top:8px">${e.effect_pkgs.map(h => `<a class="card" href="${gfxHref('spr', h)}" data-peek>${thumb('spr', h, 64)}<span class="ct">${esc(E['spr:' + h]?.title || 'Package ' + h)}</span></a>`).join('')}</div></details>` : ''}
+-      ${resources(e)}
++      ${e.small.length ? `<div class="cards" style="margin-top:8px">${e.small.map(h => cardFor('spr:' + h)).join('')}</div>` : ''}
+       <div class="grid2"><div><h3>Placed in <span class="n">${e.nscenes} scenes</span></h3>${placement(e)}</div>
+       <div><h3>Created by <span class="n">${e.procs.length} procedures</span></h3>${e.procs.length ? `<div class="chips">${e.procs.map(p => `<a class="chip" href="/scripts#${p.id}" data-peek>${esc(p.name || 'proc ' + p.id)}</a>`).join('')}</div>` : '<div class="empty">No script creates it.</div>'}</div></div>
+       <h3>Code</h3><div class="muted" style="margin-bottom:8px">Entry ${codeLink(e.callback, e.fname)}${e.loader ? ` → ${codeLink(e.loader, e.loader_name)}` : ''}, and everything it calls or installs.</div><div id="code"></div>
+@@ -344,26 +320,15 @@ const PAGES = {
+       <div class="badges">${prev ? `<a class="badge" href="#${prev.id}">‹ ${esc(prev.title)}</a>` : ''}${next ? `<a class="badge" href="#${next.id}">${esc(next.title)} ›</a>` : ''}</div>
+       ${fam.length ? fam.map(a => `<h3>Family</h3><div>${link(a.id)} <span class="muted">· ${esc(a.path)}</span></div>
+         ${others.length ? `<h3>Related species</h3><div class="chips">${others.map(n => chip('monster:' + n.id, n.en || n.jp)).join('')}</div>` : ''}
+-        ${a.sprites.length ? `<h3>Sprites and palettes</h3>${a.sprites.map(palettes).join('')}` : a.small.length || a.resources ? '<h3>Sprites</h3>' : '<h3>Sprites</h3><div class="empty">Its own code loads no sprite we can trace.</div>'}
+-        ${a.small.length ? `<div class="cards" style="margin-top:8px">${a.small.map(h => `<a class="card" href="${gfxHref('spr', h)}" data-peek>${thumb('spr', h, 64)}<span class="ct">${esc(E['spr:' + h]?.title || 'Package ' + h)}</span><small>sprite package</small></a>`).join('')}</div>` : ''}
+-        ${resources(a)}
++        <h3>Sprites and palettes</h3>${a.sprites.map(palettes).join('') || '<div class="empty">Its own code loads no large sprite we can trace; it may draw with a sprite package or a background layer.</div>'}
+         <h3>Placed in <span class="n">${a.nscenes} scenes</span></h3>${placement(a)}`).join('') : '<h3>Family</h3><div class="empty">Not linked to an object in the code yet.</div>'}</div>`;
+   },
+   char(e) {
+     const big = (e.sprites || []).filter(x => x.startsWith('sprite:')).map(x => x.slice(7));
+     const pk = (e.sprites || []).filter(x => x.startsWith('spr:'));
+-    const pt = e.portrait;
+-    const hero = pt ? `<div style="display:flex;gap:16px;align-items:center;margin:12px 0 4px"><a href="${gfxHref('big', pt.sprite, pt.frame)}" data-peek style="image-rendering:pixelated">${thumb('big', pt.sprite, 96, { pool: pt.pool, frame: pt.frame })}</a><div class="muted">Dialogue portrait: speaker <span class="mono">${esc(e.label)}</span> (id ${pt.id}), frame ${pt.frame} of ${link('sprite:' + pt.sprite)}, palette ${pt.pool}</div></div>` : '';
+-    // every line, grouped by the script that shows it, in script order
+-    const groups = [];
+-    for (const l of e.dialogue || []) { const g = groups[groups.length - 1]; g && g.file === l.file ? g.lines.push(l) : groups.push({ file: l.file, lines: [l] }); }
+-    return `<div class="page">${head(e, `<span class="jp">${esc(e.jp)}</span>${/^\d+$/.test(e.key) ? ' · ' + stringLink(e.key, 'string ' + e.key) : ''}`)}${hero}
++    return `<div class="page">${head(e, `<span class="jp">${esc(e.jp)}</span> · ${stringLink(e.key, 'string ' + e.key)}`)}
+       ${pk.length || big.length ? `<h3>Sprites</h3>${pk.length ? `<div class="cards">${pk.map(cardFor).join('')}</div>` : ''}${big.map(palettes).join('')}` : ''}
+-      ${e.monster ? `<h3>In the bestiary</h3><div class="chips">${chip(e.monster)}</div>` : ''}
+-      ${e.lines ? `<h3>Where they speak <span class="n">${e.nscenes} scenes</span></h3>${e.nscenes ? placesOf(e.areas) : '<div class="empty">Only in shared scripts.</div>'}
+-        <h3>Dialogue <span class="n">${e.lines} lines in ${groups.length} scripts</span></h3>
+-        ${groups.map(g => `<div class="dlg"><div class="dh">${link(g.file, E[g.file]?.title)} · ${peekLink('/scripts#file=' + (E[g.file]?.key || ''), 'read ↗')}</div>${g.lines.map(l => `<div class="ln"><span class="mono muted">${stringLink(l.id, '#' + l.id)}</span><div><div class="en">${esc(l.en || '').replace(/\n/g, '<br>')}</div><div class="muted">${esc(l.jp).replace(/\n/g, '<br>')}</div></div></div>`).join('')}</div>`).join('')}` : ''}
+-      <h3>Objects</h3>${e.actors.length ? `<div class="cards">${e.actors.map(cardFor).join('')}</div>` : '<div class="empty">Not linked to an object yet: nothing in the code or data names it.</div>'}</div>`;
++      <h3>Objects</h3>${e.actors.length ? `<div class="cards">${e.actors.map(cardFor).join('')}</div>` : '<div class="empty">Not linked to an object yet.</div>'}</div>`;
+   },
+   package(e) {
+     return `<div class="page"><div style="display:flex;gap:18px;align-items:center"><div style="image-rendering:pixelated">${thumb('spr', e.key, 128)}</div><div>${head(e, `sprite package <span class="mono">${e.key}</span> · ${peekLink(gfxHref('spr', e.key), 'frames ↗')}`)}</div></div>
+@@ -379,7 +344,6 @@ const PAGES = {
+       <h3>Scenes <span class="n">${e.scenes.length}</span></h3><table class="t"><tr><th>Scene</th><th>Floor</th><th>Objects</th><th>Items</th></tr>${e.scenes.map(s => `<tr><td>${link(s)}</td><td class="muted">${esc(E[s]?.floor || '')}</td><td>${(sceneActors[s] || []).length || ''}</td><td>${(E[s]?.items || []).length || ''}</td></tr>`).join('')}</table>
+       ${Object.entries(byTop).map(([t, ids]) => `<h3>${esc(t)} <span class="n">${ids.length}</span></h3><div class="cards">${ids.map(cardFor).join('')}</div>`).join('')}
+       ${(e.tilesets || []).length ? `<h3>Tilesets <span class="n">${e.tilesets.length}</span></h3><div class="cards">${e.tilesets.map(cardFor).join('')}</div>` : ''}
+-      ${songsOf(e)}
+       ${items.length ? `<h3>Items <span class="n">${items.length}</span></h3><div class="chips">${items.map(([s, x]) => `<span class="chip">${esc(x.name || 'item')}${x.chest ? ' <small>chest</small>' : ''} <small>· ${s.split(':')[1]}</small></span>`).join('')}</div>` : ''}</div>`;
+   },
+   scene(e, from) {
+@@ -392,8 +356,6 @@ const PAGES = {
+     return `<div class="page">${head(e, `${link(e.area)}${e.floor && e.floor !== 'N/A' ? ' · ' + esc(e.floor) : ''} · scene ${e.key} · ${peekLink(`/world#area=${ar?.key}/scene=${e.key}`, 'world ↗')}`)}
+       ${stageKey ? `<h3>Map${fa ? ` <span class="n">showing where ${link(fa.id)} is placed</span>` : ''}</h3><iframe class="mapframe" src="/gfx?embed=1&bare=1#maps/${stageKey}/${e.key}${hl}" loading="lazy"></iframe>${(e.tilesets || []).length ? `<div class="sub" style="margin-top:6px">Tiles: ${e.tilesets.map(id => link(id)).join(', ')} · map ${e.stage.map}</div>` : ''}` : ''}
+       ${Object.entries(groups).map(([t, ids]) => `<h3>${esc(t)} <span class="n">${ids.length}</span></h3><div class="cards">${ids.map(cardFor).join('')}</div>`).join('') || '<h3>Objects</h3><div class="empty">No object placed by this scene\'s script.</div>'}
+-      ${songsOf(e)}
+-      ${e.speakers?.length ? `<h3>Who speaks here <span class="n">${e.speakers.length}</span></h3><div class="chips">${e.speakers.map(id => chip(id)).join('')}</div>` : ''}
+       <h3>Doors to <span class="n">${doors.length}</span></h3>${doors.length ? `<div class="chips">${doors.map(d => chip('scene:' + d.scene, E['scene:' + d.scene]?.title, d.cond?.length ? ' <small>conditional</small>' : '')).join('')}</div>` : '<div class="empty">No doors found in the stage data.</div>'}
+       ${e.items.length ? `<h3>Items <span class="n">${e.items.length}</span></h3><div class="chips">${e.items.map(x => { const it = Object.values(E).find(i => i.kind === 'item' && i.jp === x.name); return it ? chip(it.id, null, x.chest ? ' <small>chest</small>' : '') : `<span class="chip">${esc(x.name || '?')}</span>`; }).join('')}</div>` : ''}
+       ${e.file ? `<h3>Script <label class="muted" style="text-transform:none;letter-spacing:0;font-weight:400"><input type="checkbox" id="sen" checked> English text</label> <span class="n">${peekLink('/scripts#file=' + E[e.file].key, 'open in Scripts ↗')}</span></h3><pre class="script" id="script" data-file="${esc(E[e.file].key)}">Loading…</pre>` : ''}</div>`;
+@@ -428,17 +390,6 @@ const PAGES = {
+       <iframe class="mapframe" style="height:360px" src="/gfx?embed=1&bare=1#tiles/bg:${e.key}" loading="lazy"></iframe>
+       ${tilesUsers(e)}</div>`;
+   },
+-  song(e) {
+-    const where = {};
+-    for (const s of e.scenes) { const a = E[s]?.area; if (a) (where[a.split(':')[1]] ||= []).push(s.split(':')[1]); }
+-    const test = e.test ? badge(`Sound test ${e.test.list} No. ${e.test.no}`) : '';
+-    return `<div class="page">${head(e, `song ${e.key} · header <span class="mono">${e.addr}</span> · ${e.player === 10 ? 'music player 10' : 'player ' + e.player} · ${e.ntracks} track${e.ntracks > 1 ? 's' : ''} · ${(e.size / 1024).toFixed(1)} KB · ${peekLink('/sound#vg=' + e.voicegroup, 'voicegroup ' + e.voicegroup)} · ${peekLink('/sound#' + e.key, 'Sound ↗')}`, [test].filter(Boolean))}
+-      <iframe class="mapframe" style="height:620px" src="/sound?embed=1&bare=1&compact=1#${e.key}" loading="lazy"></iframe>
+-      <div class="grid2"><div><h3>Played in <span class="n">${e.scenes.length} scenes</span></h3>${e.scenes.length ? placesOf(where) : `<div class="empty">${e.shared.length ? 'Started by shared scripts:' : 'Not traced to a scene: started by code, or chosen at run time.'}</div>`}${e.shared.length ? `<div class="chips" style="margin-top:6px">${e.shared.map(f => chip('file:' + f, E['file:' + f]?.title || f)).join('')}</div>` : ''}</div>
+-      <div><h3>Started by scripts <span class="n">${e.scripts.length}</span></h3>${e.scripts.length ? `<div class="chips">${e.scripts.map(u => `<a class="chip" href="/scripts#${u.proc}" data-peek>${esc(u.name || 'proc ' + u.proc)} <small>${esc(u.via)}</small></a>`).join('')}</div>` : '<div class="empty">No script call with this song number found.</div>'}</div></div>
+-      <h3>Started by code <span class="n">${e.code.length}</span></h3><div id="code"></div>
+-      <h3>Notes</h3><div id="ned"></div></div>`;
+-  },
+   unit(e) {
+     return `<div class="page">${head(e, `${e.funcs.length} functions · ${e.size.toLocaleString()} bytes${e.tentative ? ' · tentative grouping' : ''}`)}
+       ${e.objects?.length ? `<h3>Registry entries <span class="n">${e.objects.length}</span></h3><div class="cards">${e.objects.map(cardFor).join('')}</div>` : ''}<h3>Functions</h3><div id="code"></div></div>`;
+@@ -457,8 +408,8 @@ function route() {
+   const v = $('view'); v.innerHTML = html; v.scrollTop = 0;
+   hydrate(v);
+   const e = E[id];
+-  if (e && (e.kind === 'actor' || e.kind === 'unit' || e.kind === 'song') && $('code')) codeTable(e.kind === 'unit' ? e.funcs : [...new Set(e.code)], $('code'));
+-  if ((e?.kind === 'actor' || e?.kind === 'song') && $('ned')) $('ned').replaceWith(noteEditor(e.kind, e.key));
++  if (e && (e.kind === 'actor' || e.kind === 'unit') && $('code')) codeTable(e.kind === 'actor' ? e.code : e.funcs, $('code'));
++  if (e?.kind === 'actor' && $('ned')) $('ned').replaceWith(noteEditor('actor', e.key));
+   if ($('script')) {
+     const load = () => fetch(`/api/file/${$('script').dataset.file}/inline${$('sen').checked ? '/en' : ''}`).then(r => r.json())
+       .then(d => { $('script').textContent = (d.lines || []).map(x => x[1]).join('\n'); });
+@@ -486,7 +437,7 @@ function doSearch() {
+     if ([e.jp, e.fname, e.key, ...(e.names || []).map(n => n.jp + ' ' + n.en)].some(x => (x || '').toLowerCase().includes(q))) return 40;
+     return 0;
+   };
+-  const rank = { monster: 9, actor: 8, char: 8, item: 7, area: 6, scene: 5, sprite: 4, tileset: 3, bgtiles: 3, song: 3, file: 3, unit: 2 };
++  const rank = { monster: 9, actor: 8, char: 8, item: 7, area: 6, scene: 5, sprite: 4, tileset: 3, bgtiles: 3, file: 3, unit: 2 };
+   SR = q ? Object.values(E).map(e => [score(e), e]).filter(x => x[0] > 0).sort((a, b) => b[0] - a[0] || rank[b[1].kind] - rank[a[1].kind] || a[1].title.localeCompare(b[1].title)).slice(0, 60).map(x => x[1]) : [];
+   SI = 0; drawSearch();
+ }
+diff --git a/tools/studio/atlas.py b/tools/studio/atlas.py
+index 478cdafb6..54ecd869f 100644
+--- a/tools/studio/atlas.py
++++ b/tools/studio/atlas.py
+@@ -9,8 +9,7 @@ Entities have an id "kind:key": char (the game's character list), monster
+ (the game's monster list, bosses included), actor (a registry entry: an
+ object scripts create with `chara KEY`, or a script command), item, area,
+ scene, file (a reconstructed GCL source file), sprite (98F5 large sprite),
+-tileset (a CEEF tileset), bgtiles (a map's own tiles), song (an MP2K song)
+-and func (a code function). The tree groups them:
++tileset (a CEEF tileset), bgtiles (a map's own tiles) and func (a code function). The tree groups them:
+ 
+ * Cast and Bestiary: the game's own name lists, in its order;
+ * Objects (registry entries whose callback or loader loads a sprite, or that
+@@ -23,8 +22,6 @@ and func (a code function). The tree groups them:
+ * Sprites: large sprites and sprite packages in archive (ROM) order;
+ * Tiles: the CEEF tileset library's tilesets by the area that uses them,
+   and the maps that carry their own tiles (tools/assets/tilesets.py);
+-* Sound: the MP2K songs by the music player the song table assigns them
+-  (player 10 is the BGM player), from tools/studio/sound.py;
+ * Code: subsystems in ROM order, with their functions and decomp status.
+ 
+ rom_tree() is the ROM as nested blocks for tools/studio/rom.html.
+@@ -51,7 +48,7 @@ INPUTS = ["data/actor_registry.csv", "data/items.csv", "data/notes.csv",
+           "data/sprite_palettes.csv", "data/labels/areas.csv", "data/labels/scenes.csv",
+           "data/labels/sprites.csv", "data/labels/palettes.csv", "gcl/names/proc.csv", "gcl/names/chara.csv",
+           "gcl/names/files.csv", "symbols/functions.csv", "tools/studio/atlas.py", "tools/assets/actors.py",
+-          "tools/assets/tilesets.py", "data/stage_palettes.csv", "tools/studio/sound.py", "tools/m4a.py"]
++          "tools/assets/tilesets.py", "data/stage_palettes.csv"]
+ # the monster list's bosses: 黒騎士 and ニーズホッグ (9902-9903), then 伯爵 on (9915-)
+ BOSSES = {9902, 9903} | set(range(9915, 9922))
+ 
+@@ -72,50 +69,6 @@ def nice(s):
+     return re.sub(r"(?<=[a-z])'S\b", "'s", t)
+ 
+ 
+-def speaker_portraits():
+-    """{speaker label: {"sprite", "frame", "pool"}}: the tokenizer's ids
+-    (sub_0803232C: strncmp against the table, then an id), the portrait
+-    animation 922E 4BBF (sequence = id, frame = key >> 6, over 593A's 16
+-    frames then 593B's) and the palette sub_0803092C selects per id."""
+-    import archive
+-    import struct as st_
+-    from romlib import load_rom
+-    rom = load_rom()
+-
+-    def cstr(a):
+-        o = a - 0x08000000
+-        return rom[o:rom.index(b"\0", o)].decode()
+-    lines = open(os.path.join(ROOT, "gen", "code.s")).read().split("\n")
+-    i0 = next(i for i, l in enumerate(lines) if "thumb_func_start sub_0803232C" in l)
+-    ids, cur = {"R_DJANGO": 0, "B_DJANGO": 1, "W_DJANGO": 2}, None
+-    for l in lines[i0:i0 + 1200]:
+-        m = re.search(r"ldr r1, \S+ @ =0x(0824D[0-9A-F]{3})", l)
+-        if m:
+-            cur = cstr(int(m.group(1), 16))
+-            continue
+-        m = re.match(r"\s*movs r0, #(0x[0-9a-f]+|\d+)$", l)
+-        if m and cur:
+-            ids.setdefault(cur, int(m.group(1), 0))
+-            cur = None
+-    d = None
+-    for label, _, _, ents in archive.archives(rom):
+-        if label == "anm":
+-            for h, a, sz in ents:
+-                if h == 0x4BBF:
+-                    d = rom[a - 0x08000000:a - 0x08000000 + sz]
+-    if d is None:
+-        return {}
+-    n = st_.unpack_from("<H", d, 0)[0]
+-    pools = {4: 505, 5: 505, 13: 505, 19: 507, 20: 504, 25: 504, 30: 506}
+-    out = {}
+-    for label, sid in ids.items():
+-        if 0 <= sid < n:
+-            _, _, off = st_.unpack_from("<BBH", d, 4 + 4 * sid)
+-            f = st_.unpack_from("<H", d, off)[0] >> 6
+-            out[label] = {"sprite": "593A" if f < 16 else "593B", "frame": f if f < 16 else f - 16, "pool": pools.get(sid, 503), "id": sid}
+-    return out
+-
+-
+ def clean(t):
+     """A name without the text bank's control sequences ($X=..., {00})."""
+     return re.split(r"\$[A-Z]=|\{[0-9A-F]{2}\}", t)[0].strip() or t
+@@ -227,8 +180,7 @@ def build():
+     squash = lambda t: re.sub(r"[^a-z]", "", t.lower())
+     for a in A:
+         f = a["callback_name"]
+-        creator = a["loader"] or re.search(r"_(Create|CreateFromScript|StartFromScript|ScriptCreate)$", f)
+-        if f.startswith("sub_") or not creator or any(n["id"] in monster_ids for n in a["names"]):
++        if f.startswith("sub_") or not a["loader"] or any(n["id"] in monster_ids for n in a["names"]):
+             continue
+         base = squash(re.sub(r"_(Create|CreateFromScript|StartFromScript|ScriptCreate|Command|Start|Init)$", "", f))
+         if len(base) < 4:
+@@ -366,108 +318,6 @@ def build():
+         add(f"file:{f['id']}", path, kind="file", key=f["id"], title=title, description=f.get("description", ""),
+             nprocs=len(f["procs"]), procs=f["procs"][:400], scenes=f.get("scenes"), fkind=f["kind"], entry=f.get("entry"))
+ 
+-    # ---- who speaks where: dialogue strings start with the speaker's name
+-    # (おてんこさま 「...), and each scene's script names the strings it shows ----
+-    img = gclview._image()
+-    texts_in = collections.defaultdict(set)  # text id -> scenes whose own script shows it
+-
+-    def walk_text(x, out):
+-        if isinstance(x, tuple):
+-            if len(x) == 2 and x[0] == "text" and isinstance(x[1], int):
+-                out.append(x[1])
+-            for y in x:
+-                walk_text(y, out)
+-        elif isinstance(x, list):
+-            for y in x:
+-                walk_text(y, out)
+-    text_files = collections.defaultdict(set)  # text id -> every script file that shows it
+-    text_order = []                            # text ids in file and script order
+-    for f in gclfiles.files():
+-        ids = []
+-        for c in f["procs"]:
+-            walk_text(gclview.procedure(img, c) or [], ids)
+-        for i in ids:
+-            if not text_files[i]:
+-                text_order.append(i)
+-            text_files[i].add(f["id"])
+-            if f["kind"] == "scene" and f.get("entry") is not None:
+-                texts_in[i].add(f["entry"])
+-    # the speaker of a line is its <LABEL=ID> tag (the game's own speaker
+-    # table at 0824DCD4, tokenized by sub_0803232C); the message window shows
+-    # that speaker's portrait: Anim_SetSequence(portrait, 922E 4BBF, speaker)
+-    # over the frames of 593A then 593B, in the pool entry sub_0803092C picks
+-    raw = {}
+-    for ln in open(os.path.join(ROOT, "build", "text", "bank.tsv"), encoding="utf-8"):
+-        p_ = ln.rstrip("\n").split("\t", 2)
+-        if len(p_) == 3 and p_[1] == "T" and p_[0].isdigit():
+-            raw[int(p_[0])] = p_[2]
+-    portrait = speaker_portraits()
+-    cast_jp = {e["jp"]: e for e in E.values() if e["kind"] == "char"}
+-    monster_jp = {e["jp"]: e["id"] for e in E.values() if e["kind"] == "monster"}
+-    by_label = collections.defaultdict(list)
+-    shown = collections.defaultdict(collections.Counter)
+-    for i in text_order:
+-        m = re.match(r"<LABEL=(\w+)>(.*?)</LABEL>", raw.get(i, ""))
+-        if m and m.group(1) not in ("NONE", "PLAYER"):
+-            by_label[m.group(1)].append(i)
+-            shown[m.group(1)][m.group(2)] += 1
+-    # cast without lines in the scripts: the speaker label that contains their name (R_DJANGO)
+-    for c in cast_jp.values():
+-        lab = next((l for l in portrait if re.search(r"(^|_)" + re.escape(c["title"].upper()) + r"$", l)), None)
+-        if lab:
+-            c["portrait"] = portrait[lab]
+-            c["label"] = None
+-    rank = 0
+-    for label, ids in sorted(by_label.items(), key=lambda kv: -len(kv[1])):
+-        names = [n for n, _ in shown[label].most_common() if not n.startswith("?")]
+-        who = re.sub(r"\(.*?\)$", "", names[0]).strip() if names else label
+-        e = next((c for j, c in cast_jp.items() if who.startswith(j) or any(n.startswith(j) for n in names)), None)
+-        same = None
+-        if e is not None and e.get("label") and e["label"] != label:
+-            same, e = e, None  # a second speaker label with the same name (SABATA_B): its own entry
+-        if e is None:
+-            rank += 1
+-            ens = collections.Counter(en.get(i, "").split(":", 1)[0].strip() for i in ids if ":" in en.get(i, "")[:30] and not en.get(i, "").startswith("?"))
+-            title = f"{same['title']} ({label})" if same else clean(ens.most_common(1)[0][0]) if ens else who
+-            e = add(f"char:{label}", "Cast", kind="char", key=label, jp=who, order=100 + rank, actors=[], sprites=[], title=title)
+-        e["label"] = label
+-        e["portrait"] = portrait.get(label)
+-        scenes = sorted({s_ for i in ids for s_ in texts_in[i]})
+-        by_area = collections.defaultdict(list)
+-        for sc in scenes:
+-            by_area[str(scene_area.get(sc, -1))].append(sc)
+-        e["lines"] = len(ids)
+-        e["areas"] = dict(by_area)
+-        e["nscenes"] = len(scenes)
+-        e["files"] = list(dict.fromkeys(f"file:{x}" for i in ids for x in sorted(text_files[i])))
+-        # every line, in script order, under the script that shows it
+-        # a message is the labeled first page the script names plus the pages
+-        # after it, up to the string with <END> (each string is one page)
+-        def pages(i):
+-            out = [i]
+-            for k in range(i + 1, i + 60):
+-                t_ = raw.get(k)
+-                if t_ is None or t_.startswith("<LABEL="):
+-                    break
+-                if re.sub(r"<PROC=\d+>|<END>|\\n|\s", "", t_):
+-                    out.append(k)
+-                if "<END>" in t_:
+-                    break
+-            return out
+-
+-        def joined(d, ks):
+-            # a page's wrapped lines run together; pages stay separate
+-            return "\n".join(re.sub(r"\s*\n\s*", " ", x).strip() for x in (d.get(k, "") for k in ks) if x)
+-        e["dialogue"] = []
+-        for i in ids:
+-            ks = pages(i)
+-            e["dialogue"].append({"id": i, "pages": len(ks), "file": f"file:{sorted(text_files[i])[0]}", "en": joined(en, ks), "jp": joined(jp, ks)})
+-        if who in monster_jp:
+-            e["monster"] = monster_jp[who]
+-        for sc in scenes:
+-            if f"scene:{sc}" in E and e["id"] not in E[f"scene:{sc}"].setdefault("speakers", []):
+-                E[f"scene:{sc}"]["speakers"].append(e["id"])
+-
+     # ---- sprites ----
+     lab = {r["hash"]: r for r in csv.DictReader(open(os.path.join(ROOT, "data", "labels", "sprites.csv"), encoding="utf-8"))}
+     plab = collections.defaultdict(dict)
+@@ -505,39 +355,6 @@ def build():
+                     e["effects"].append(hx)
+                     effect_of[hx].append(key)
+     big_order = {h: i for i, h in enumerate(bigpalettes.defaults())}  # archive (ROM) order
+-    # every resource lookup (sub_0821A520(type, hash)) the family's code makes:
+-    # sprite packages, maps, tilesets, palettes, animations (bosses drawn as
+-    # background layers load maps and tilesets)
+-    RES = {0xCB05: "packages", 0xC091: "maps", 0xCEEF: "tilesets", 0x92B3: "palettes", 0x922E: "animations"}
+-    for f, rec in paltrace.program().items():
+-        fams_f = sorted(paltrace.family_of().get(f, ()))
+-        for t, st in rec["calls"]:
+-            if t != "sub_0821A520" or not st.get("r0") or st["r0"][0] != "c" or st["r0"][1] not in RES:
+-                continue
+-            kind = RES[st["r0"][1]]
+-            for fam in fams_f:
+-                k2, key = ents.get(fam, (None, None))
+-                e = E.get(f"actor:{key}") if k2 == "registry" else None
+-                if e is None:
+-                    continue
+-                try:
+-                    hs = {v[0] & 0xFFFF for v, _ in paltrace.Tracer(fam).joint([st.get("r1")], f)}
+-                except paltrace.Why:
+-                    continue
+-                if len(hs) > 12:
+-                    continue
+-                own = f in (e["fname"], e["loader_name"])
+-                for h in hs:
+-                    hx = f"{h:04X}"
+-                    if kind == "packages":
+-                        if own and hx not in e["small"]:
+-                            e["small"].append(hx)
+-                        elif not own and hx not in e["small"]:
+-                            e.setdefault("effect_pkgs", []).append(hx) if hx not in e.get("effect_pkgs", []) else None
+-                    else:
+-                        lst = e.setdefault("resources", {}).setdefault(kind, [])
+-                        if hx not in lst:
+-                            lst.append(hx)
+     for h, d in sorted(bigpalettes.defaults().items()):
+         hx = f"{h:04X}"
+         owners = sprite_owner.get(hx, [])
+@@ -565,8 +382,7 @@ def build():
+     # (or allocates one and hands it to a loader); else a script routine
+     for e in E.values():
+         if e["kind"] == "actor":
+-            r = e.get("resources", {})
+-            e["creates"] = bool(e["allocates"] or e["sprites"] or e["small"] or e.get("effect_pkgs") or r.get("maps") or r.get("tilesets"))
++            e["creates"] = bool(e["allocates"] or e["sprites"] or e["small"])
+             e["path"] = ("Objects/" if e["creates"] else "Script routines/") + e["subsystem"]
+             node_rank[e["path"]] = subsys_start.get(e["subsystem"], 0x09000000)
+             tree_items[e["path"]].append(e["id"])
+@@ -610,30 +426,6 @@ def build():
+             addr=f"{b['addr']:08X}", compressed=b["compressed"], maps=b["maps"], stages=b["stages"],
+             scenes=[f"scene:{x['scene']}" for x in b["scenes"]])
+ 
+-    # ---- sound: songs by music player, linked to the scenes that start them ----
+-    import sound
+-    S = sound.load()
+-    test_word = {"music": "Music", "effects": "Effect", "voices": "Voice"}
+-    for sg in S["songs"]:
+-        if sg.get("empty"):
+-            continue
+-        n, p = sg["n"], sg["player"]
+-        group = "Sound/" + ("Music (player 10)" if p == 10 else f"Player {p}")
+-        node_rank[group] = -1 if p == 10 else p
+-        t = sg["test"]
+-        title = N.get(("song", str(n)), {}).get("label") or (f"{test_word[t['list']]} {t['no']}" if t else f"Song {n}")
+-        add(f"song:{n}", group, kind="song", key=str(n), order=n, title=title, player=p, addr=sg["addr"],
+-            ntracks=len(sg["tracks"]), size=sg["size"], voicegroup=sg["voicegroup"], test=t,
+-            scenes=[f"scene:{x['scene']}" for x in sg["scenes"]], scripts=sg["scripts"], shared=sg["shared_files"],
+-            code=[c["func"] for c in sg["code"]])
+-        for x in sg["scenes"]:
+-            sc = E.get(f"scene:{x['scene']}")
+-            if sc is not None and f"song:{n}" not in sc.setdefault("songs", []):
+-                sc["songs"].append(f"song:{n}")
+-                ar = E.get(sc["area"])
+-                if ar is not None and f"song:{n}" not in ar.setdefault("songs", []):
+-                    ar["songs"].append(f"song:{n}")
+-
+     # ---- explicit links (data/atlas/links.csv) ----
+     for r in csv.DictReader(l for l in open(os.path.join(ROOT, "data", "atlas", "links.csv"), encoding="utf-8") if not l.startswith("#")):
+         a, b = r["from"], r["to"]
+@@ -684,27 +476,6 @@ def build():
+             top = e["path"].split("/")[0]
+             e["placed"] = e["creates"] and 0 < e["nscenes"] <= 120
+ 
+-    # placeholder titles from the data: the procedures that create it
+-    # (spawn_lun_1, spawn_lun_2 -> Lun), else its own sprite's label
+-    for e in E.values():
+-        if e["kind"] != "actor" or not re.match(r"(Object|Routine) [0-9A-F]{4}$", e["title"]):
+-            continue
+-        stems = collections.Counter()
+-        for p in e["procs"]:
+-            if {sp_["key"] for sp_ in actors.procs()[p["id"]]["spawns"]} != {e["key"]}:
+-                continue  # a procedure that creates other things too names them, not this
+-            n = re.sub(r"^(spawn|place|create|make|add|start|set|show|init)_", "", p["name"] or "")
+-            n = re.sub(r"(_\d+|_by_\w+)$", "", n)
+-            if n and not n.startswith("proc_"):
+-                stems[n] += 1
+-        sp = E.get(f"sprite:{e['sprites'][0]}") if e["sprites"] else None
+-        if stems:
+-            e["title"] = stems.most_common(1)[0][0].replace("_", " ").capitalize()
+-            e["title_from"] = "the names of the procedures that create it"
+-        elif sp and not sp["title"].startswith("Sprite ") and sp["title"].lower() != "unknown":
+-            e["title"] = sp["title"]
+-            e["title_from"] = f"its sprite {sp['key']}"
+-
+     # titles shared within a group get the function's name to tell them apart
+     seen = collections.defaultdict(list)
+     for e in E.values():
+@@ -718,7 +489,7 @@ def build():
+     # ---- tree ----
+     node_rank.update({"Sprites/Large sprites": 0, "Sprites/Sprite packages": 1, "Tiles/Tilesets": 0, "Tiles/Map tiles": 1,
+                       "Tiles/Tilesets/Not loaded by a scene": 1000, "Tiles/Tilesets/Not loaded by a script": 1001})
+-    order = ["Cast", "Bestiary", "Items", "Places", "Objects", "Script routines", "Scripts", "Sprites", "Tiles", "Sound", "Code"]
++    order = ["Cast", "Bestiary", "Items", "Places", "Objects", "Script routines", "Scripts", "Sprites", "Tiles", "Code"]
+     root = {}
+     for path, ids in tree_items.items():
+         node = root
+@@ -940,56 +711,6 @@ def rom_tree():
+     for label, ls in archives.items():
+         ls.sort(key=lambda x: x["s"])
+         tops.append({"s": ls[0]["s"], "n": sum(x["n"] for x in ls), "k": ls[0]["k"], "t": titles.get(label, label), "c": ls})
+-    # sound (tools/studio/sound.py): the song table, voicegroups, samples and songs
+-    import sound
+-    S = sound.load()
+-    kids = [leaf(int(S["table"]["addr"], 16), S["table"]["size"], "sound", "song table", "node:Sound", "decoded")]
+-    vgs = sorted(int(v["addr"], 16) for v in S["voicegroups"])
+-    users = {v["addr"]: v["songs"] for v in S["voicegroups"]}
+-    vg_leaves = []
+-    for i, a in enumerate(vgs):
+-        end = min(vgs[i + 1] if i + 1 < len(vgs) else a + 128 * 12, a + 128 * 12)
+-        u = users.get(f"{a:08X}", [])
+-        vg_leaves.append(leaf(a, end - a, "sound", f"voicegroup {a:08X}" + (f" ({len(u)} songs)" if u else " (inside another)"),
+-                              f"/sound#vg={a:08X}", "decoded"))
+-    sm_leaves = [leaf(int(x["addr"], 16), x["size"], "sound", f"sample {x['addr']}" + (f" · {x['rate']} Hz" if x.get("rate") else " · GB wave"),
+-                      f"/sound#sample={x['addr']}", "decoded") for x in S["samples"]]
+-    song_leaves, last = [], 0
+-    titles_ = sound.titles()
+-    for sg in sorted((x for x in S["songs"] if not x.get("empty")), key=lambda x: x["start"]):
+-        a, b = max(sg["start"], last), int(sg["addr"], 16) + 8 + 4 * len(sg["tracks"])
+-        if b <= a:
+-            continue
+-        last = b
+-        name = titles_.get(sg["n"])
+-        song_leaves.append(leaf(a, b - a, "sound", f"song {sg['n']}" + (f" {name}" if name else ""), f"song:{sg['n']}", "named" if name else "decoded"))
+-    # what the walk doesn't reach inside the documented sound regions
+-    # (keysplit tables, the player table, padding) stays in the Sound block;
+-    # alignment bytes after a block join it
+-    ordered = sorted(vg_leaves + sm_leaves + song_leaves + kids, key=lambda x: x["s"])
+-    other = []
+-    for a, b, kind, label in seg["regions"]:
+-        if kind != "sound" or "SoundMainRAM" in label:
+-            continue
+-        p, prev = a, None
+-        for x in ordered + [None]:
+-            x0 = b if x is None else x["s"]
+-            if x is not None and (x0 + x["n"] <= p or x0 >= b):
+-                continue
+-            x0 = min(x0, b)
+-            if x0 - p >= 16:
+-                name = "music player table (gMPlayTable)" if p == sound.PLAYER_TABLE else f"{label.split(' (')[0]}: not walked"
+-                other.append(leaf(p, x0 - p, "sound", name, "node:Sound", "decoded" if p == sound.PLAYER_TABLE else "located"))
+-            elif x0 > p and prev is not None and prev["s"] + prev["n"] == p:
+-                prev["n"] += x0 - p
+-            if x is None:
+-                break
+-            p, prev = max(p, x["s"] + x["n"]), x
+-    for title, ls in (("Voicegroups", vg_leaves), ("Samples", sm_leaves), ("Songs", song_leaves), ("Other sound data", other)):
+-        if ls:
+-            kids.append({"s": ls[0]["s"], "n": sum(x["n"] for x in ls), "k": "sound", "t": title, "c": ls})
+-    kids.sort(key=lambda x: x["s"])
+-    tops.append({"s": kids[0]["s"], "n": sum(x["n"] for x in kids), "k": "sound", "t": "Sound (MP2K)", "c": kids})
+     # the documented regions that items don't cover (sound, text, scripts, graphics, tables)
+     covered = sorted((c["s"], c["s"] + c["n"]) for t in tops for c in (t.get("c") or [t]) for c in (c.get("c") or [c]))
+     merged = []
+diff --git a/tools/studio/common.js b/tools/studio/common.js
+index 89981cc65..9bb97da19 100644
+--- a/tools/studio/common.js
++++ b/tools/studio/common.js
+@@ -11,7 +11,7 @@ function localStore(k, v) { try { if (v === undefined) return localStorage.getIt
+ // ---------- header ----------
+ const NAV = [
+   ['Browse', '/atlas'], ['ROM', '/rom'], ['Text', '/'], ['Sprites', '/gfx#sprites'], ['Large sprites', '/gfx#big'], ['Maps', '/gfx#maps'], ['Palettes', '/gfx#palettes'],
+-  ['Sprite palettes', '/gfx#pool'], ['Font', '/gfx#font'], ['Tiles', '/gfx#tiles'], ['Data', '/gfx#data'], ['Actors', '/actors'], ['Scripts', '/scripts'], ['Sound', '/sound'], ['World', '/world'], ['Dungeons', '/gfx#dungeon'], ['Live', '/live'], ['Captures', '/captures'],
++  ['Sprite palettes', '/gfx#pool'], ['Font', '/gfx#font'], ['Tiles', '/gfx#tiles'], ['Data', '/gfx#data'], ['Actors', '/actors'], ['Scripts', '/scripts'], ['World', '/world'], ['Dungeons', '/gfx#dungeon'], ['Live', '/live'], ['Captures', '/captures'],
+ ];
+ // Fills <header id="top">; `tools` is HTML for the right-hand side.
+ function studioHeader(tools = '') {
+@@ -38,7 +38,7 @@ const embedHref = href => { const u = new URL(href, location.href); u.searchPara
+ function keepEmbed() {
+   document.addEventListener('click', e => {
+     const a = e.target.closest && e.target.closest('a[href]');
+-    if (!a || a.target === '_blank' || a.target === '_top' || e.defaultPrevented) return;
++    if (!a || a.target === '_blank' || e.defaultPrevented) return;
+     const u = new URL(a.href, location.href);
+     if (u.origin !== location.origin || u.searchParams.has('embed')) return;
+     if (u.pathname === location.pathname && u.search === location.search) return;  // same page: a hash change
+@@ -305,7 +305,7 @@ async function spriteThumb(kind, hash, max = 64, opt = {}) {
+   const L = await learnedSprites();
+   let parts, colors;
+   if (kind === 'big') {
+-    const big = await bigSprites(), i = big.recs.findIndex(r => r.hash === hash), f = i >= 0 && big.frames(i)[opt.frame ?? 0];
++    const big = await bigSprites(), i = big.recs.findIndex(r => r.hash === hash), f = i >= 0 && big.frames(i)[0];
+     if (!f) return null;
+     colors = await packageColors(null, opt.pool ?? big.recs[i].pal);
+     parts = big.parts(f);
+diff --git a/tools/studio/mp2k.js b/tools/studio/mp2k.js
+deleted file mode 100644
+index 2c408b8bf..000000000
+--- a/tools/studio/mp2k.js
++++ /dev/null
+@@ -1,372 +0,0 @@
+-// A small MP2K ("Sappy"/m4a) player for the Studio: plays a song from the ROM
+-// bytes /api/sound/song/N serves (tools/studio/sound.py), following the driver
+-// in src/lib/m4a.c (pokeemerald's m4a.c): the sequencer runs per frame
+-// (tempo accumulator, 150 per tick), notes go to DirectSound channels with
+-// the m4a ADSR envelope, or to CGB square/wave/noise channels.
+-//
+-// Approximations: no reverb, CGB envelopes and noise pitch are simplified,
+-// no channel priority beyond a 12-voice DirectSound limit (m4aSoundInit's
+-// MAXCHN 12), and linear interpolation instead of the GBA's 21024 Hz mixer.
+-'use strict';
+-
+-const MP2K = (() => {
+-  const FRAME_HZ = 59.7275, MIXER_HZ = 21024, MAX_DS = 12;
+-  const CLOCK = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+-    28, 30, 32, 36, 40, 42, 44, 48, 52, 54, 56, 60, 64, 66, 68, 72, 76, 78, 80, 84, 88, 90, 92, 96];
+-  const DUTY = [0.125, 0.25, 0.5, 0.75];
+-
+-  // the ROM ranges a song reads, as one sparse memory
+-  class Mem {
+-    constructor(chunks) {
+-      this.c = chunks.map(([a, b64]) => { const s = atob(b64), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return [parseInt(a, 16), u]; }).sort((x, y) => x[0] - y[0]);
+-      this.last = this.c[0];
+-    }
+-    find(a) {
+-      const l = this.last; if (l && a >= l[0] && a < l[0] + l[1].length) return l;
+-      let lo = 0, hi = this.c.length - 1;
+-      while (lo <= hi) { const m = (lo + hi) >> 1, [s, u] = this.c[m]; if (a < s) hi = m - 1; else if (a >= s + u.length) lo = m + 1; else return this.last = this.c[m]; }
+-      return null;
+-    }
+-    u8(a) { const c = this.find(a); return c ? c[1][a - c[0]] : 0; }
+-    s8(a) { const v = this.u8(a); return v > 127 ? v - 256 : v; }
+-    u32(a) { return (this.u8(a) | this.u8(a + 1) << 8 | this.u8(a + 2) << 16 | this.u8(a + 3) << 24) >>> 0; }
+-    has(a) { return !!this.find(a); }
+-  }
+-
+-  function tone(mem, a) {
+-    return { addr: a, type: mem.u8(a), key: mem.u8(a + 1), length: mem.u8(a + 2), panSweep: mem.u8(a + 3), wav: mem.u32(a + 4), extra: mem.u32(a + 8),
+-      attack: mem.u8(a + 8), decay: mem.u8(a + 9), sustain: mem.u8(a + 10), release: mem.u8(a + 11) };
+-  }
+-  const isRom = v => v >= 0x08000000 && v < 0x0A000000;
+-
+-  // a DirectSound sample: {rate, loop, loopStart, size, data(Float32Array)}
+-  const waveCache = new WeakMap();
+-  function wave(mem, a) {
+-    let m = waveCache.get(mem); if (!m) waveCache.set(mem, m = new Map());
+-    if (m.has(a)) return m.get(a);
+-    let w = null;
+-    if (mem.has(a) && mem.has(a + 16)) {
+-      const size = mem.u32(a + 12), loop = !!(mem.u8(a + 3) & 0x40);
+-      if (size < 0x400000) {
+-        const d = new Float32Array(size + 1);
+-        for (let i = 0; i < size; i++) d[i] = mem.s8(a + 16 + i) / 128;
+-        d[size] = loop ? d[Math.min(mem.u32(a + 8), size - 1)] : 0;
+-        w = { rate: mem.u32(a + 4) / 1024, loop, loopStart: mem.u32(a + 8), size, data: d };
+-      }
+-    }
+-    m.set(a, w);
+-    return w;
+-  }
+-  function cgbWave(mem, a) {
+-    const d = new Float32Array(32);
+-    for (let i = 0; i < 16; i++) { const b = mem.u8(a + i); d[2 * i] = ((b >> 4) - 7.5) / 7.5; d[2 * i + 1] = ((b & 15) - 7.5) / 7.5; }
+-    return d;
+-  }
+-
+-  class Player {
+-    // data: {song: "08xxxxxx", chunks}; rate: output sample rate
+-    constructor(data, rate = 48000) {
+-      this.mem = new Mem(data.chunks);
+-      this.rate = rate;
+-      this.head = parseInt(data.song, 16);
+-      const m = this.mem;
+-      this.ntracks = m.u8(this.head);
+-      this.priority = m.u8(this.head + 2);
+-      this.reverb = m.u8(this.head + 3);
+-      this.vg = m.u32(this.head + 4);
+-      this.volume = 1;
+-      this.loop = true;
+-      this.reset();
+-    }
+-    reset() {
+-      const m = this.mem;
+-      this.tracks = [];
+-      for (let i = 0; i < this.ntracks; i++) this.tracks.push(this.newTrack(m.u32(this.head + 8 + 4 * i), i));
+-      this.chans = [];
+-      this.tempoD = 150; this.tempoI = 150; this.tempoC = 0;
+-      this.frames = 0; this.ticks = 0; this.frac = 0;
+-      this.looped = 0; this.fade = 0; this.done = false;
+-      this.onNote = null;
+-    }
+-    newTrack(ptr, i) {
+-      const keep = this.tracks?.[i];
+-      return { i, ptr, start: ptr, wait: 0, running: 0, stack: [], repN: 0, key: 60, vel: 127, gate: 0, tone: null,
+-        keyShift: 0, vol: 100, pan: 0, bend: 0, bendRange: 2, tune: 0, lfoSpeed: 22, lfoDelay: 0, lfoDelayC: 0, lfoSpeedC: 0,
+-        mod: 0, modT: 0, modM: 0, prio: 0, on: true, loops: 0, mute: keep?.mute || false, solo: keep?.solo || false, last: -1 };
+-    }
+-    get anySolo() { return this.tracks.some(t => t.solo); }
+-
+-    // ---- sequencer ----
+-    tick() {
+-      for (const c of this.chans) if (c.gate > 0 && --c.gate === 0) c.stop = true;
+-      for (const t of this.tracks) {
+-        if (!t.on) continue;
+-        let guard = 0;
+-        while (t.wait === 0 && t.on && guard++ < 10000) this.step(t);
+-        if (t.wait > 0) t.wait--;
+-        if (t.lfoSpeed && t.mod) {
+-          if (t.lfoDelayC) t.lfoDelayC--;
+-          else {
+-            t.lfoSpeedC = (t.lfoSpeedC + t.lfoSpeed) & 255;
+-            const s = t.lfoSpeedC - 64 < 0 ? (t.lfoSpeedC << 24 >> 24) : 128 - t.lfoSpeedC;
+-            t.modM = (t.mod * s) >> 6;
+-          }
+-        }
+-      }
+-      this.ticks++;
+-    }
+-    step(t) {
+-      const m = this.mem;
+-      let cmd = m.u8(t.ptr);
+-      if (cmd < 0x80) cmd = t.running; else { t.ptr++; if (cmd >= 0xBD) t.running = cmd; }
+-      if (cmd >= 0xCF) return this.note(t, cmd);
+-      if (cmd <= 0xB0) { if (cmd >= 0x80) t.wait = CLOCK[cmd - 0x80]; return; }
+-      const a = m.u8(t.ptr);
+-      switch (cmd) {
+-        case 0xB1: t.on = false; this.release(t); break;                                  // FINE
+-        case 0xB2: { const p = m.u32(t.ptr); if (p <= t.ptr) { t.loops++; this.onLoop(t); } t.ptr = p; break; } // GOTO
+-        case 0xB3: if (t.stack.length < 3) { t.stack.push(t.ptr + 4); t.ptr = m.u32(t.ptr); } else t.ptr += 4; break; // PATT
+-        case 0xB4: if (t.stack.length) t.ptr = t.stack.pop(); break;                        // PEND
+-        case 0xB5: {                                                                        // REPT
+-          if (a === 0) { t.ptr = m.u32(t.ptr + 1); t.loops++; this.onLoop(t); }
+-          else if (++t.repN < a) t.ptr = m.u32(t.ptr + 1);
+-          else { t.repN = 0; t.ptr += 5; }
+-          break;
+-        }
+-        case 0xB9: t.ptr += 3; break;                                                       // MEMACC
+-        case 0xBA: t.prio = a; t.ptr++; break;
+-        case 0xBB: this.tempoD = a * 2; this.tempoI = this.tempoD; t.ptr++; break;         // TEMPO (bpm/2)
+-        case 0xBC: t.keyShift = a << 24 >> 24; t.ptr++; break;
+-        case 0xBD: t.tone = tone(m, this.vg + 12 * a); t.program = a; t.ptr++; break;      // VOICE
+-        case 0xBE: t.vol = a; t.ptr++; break;
+-        case 0xBF: t.pan = a - 64; t.ptr++; break;
+-        case 0xC0: t.bend = a - 64; t.ptr++; break;
+-        case 0xC1: t.bendRange = a; t.ptr++; break;
+-        case 0xC2: t.lfoSpeed = a; t.ptr++; break;
+-        case 0xC3: t.lfoDelay = a; t.ptr++; break;
+-        case 0xC4: t.mod = a; if (!a) t.modM = 0; t.ptr++; break;
+-        case 0xC5: t.modT = a; t.ptr++; break;
+-        case 0xC8: t.tune = a - 64; t.ptr++; break;
+-        case 0xCD: t.ptr += 2; break;                                                       // XCMD
+-        case 0xCE: {                                                                        // EOT
+-          let k = t.key;
+-          if (m.u8(t.ptr) < 0x80) { k = t.key = m.u8(t.ptr); t.ptr++; }
+-          for (const c of this.chans) if (c.track === t && c.key === k && !c.stop) c.stop = true;
+-          break;
+-        }
+-        default: break;                                                                     // C6, C7, C9-CC
+-      }
+-    }
+-    onLoop(t) {
+-      if (t.loops > this.looped) { this.looped = t.loops; if (!this.loop && !this.fade) this.fade = 1; }
+-    }
+-    release(t) { for (const c of this.chans) if (c.track === t) c.stop = true; }
+-    note(t, cmd) {
+-      const m = this.mem;
+-      let gate = CLOCK[cmd - 0xCF];
+-      if (m.u8(t.ptr) < 0x80) { t.key = m.u8(t.ptr++); if (m.u8(t.ptr) < 0x80) { t.vel = m.u8(t.ptr++); if (m.u8(t.ptr) < 0x80) gate += m.u8(t.ptr++); } }
+-      if (cmd === 0xCF) gate = 0;
+-      this.play(t, t.tone, t.key, t.vel, gate);
+-    }
+-    // start a note on track t with voice tn
+-    play(t, tn, key, vel, gate) {
+-      if (!tn) return;
+-      const m = this.mem;
+-      let pan = 0, k2 = key;
+-      if (tn.type & 0x40) {                          // keysplit
+-        const idx = m.u8(tn.extra + key);
+-        tn = tone(m, tn.wav + 12 * idx);
+-      } else if (tn.type & 0x80) {                   // rhythm: one voice per key
+-        tn = tone(m, tn.wav + 12 * key);
+-        if (tn.panSweep & 0x80) pan = (tn.panSweep - 0xC0) * 2;
+-        k2 = tn.key;
+-      }
+-      if (tn.type & 0xC0) return;
+-      const kind = tn.type & 7, fixed = !!(tn.type & 8);
+-      const c = { track: t, key, midi: k2, vel, gate, tone: tn, kind, fixed, pan, env: 0, state: 0, stop: false, pos: 0, phase: 0, age: this.ticks, lfsr: 0x7FFF };
+-      if (kind === 0) {
+-        c.wave = wave(m, tn.wav); if (!c.wave) return;
+-        const ds = this.chans.filter(x => x.kind === 0);
+-        if (ds.length >= MAX_DS) {                   // steal: released first, then the oldest
+-          const v = ds.sort((a, b) => (b.stop - a.stop) || a.age - b.age)[0];
+-          this.chans.splice(this.chans.indexOf(v), 1);
+-        }
+-      } else {
+-        // one CGB channel of each kind
+-        const old = this.chans.findIndex(x => x.kind === kind);
+-        if (old >= 0) this.chans.splice(old, 1);
+-        if (kind === 3) c.wavetable = cgbWave(m, tn.wav);
+-        if (kind === 1 || kind === 2) c.duty = DUTY[tn.wav & 3];
+-        if (kind === 4) c.short = !!(tn.wav & 1);
+-        c.env = 0; c.cnt = tn.attack;
+-      }
+-      this.chans.push(c);
+-      t.last = key;
+-      if (this.onNote) { const n = this.onNote(t.i, key, vel); if (n) n.ch = c; }
+-    }
+-
+-    // ---- per frame (vblank): tempo, ticks, envelopes ----
+-    frame() {
+-      this.tempoC += this.tempoI;
+-      while (this.tempoC >= 150) { this.tick(); this.tempoC -= 150; }
+-      this.frames++;
+-      const out = [];
+-      for (const c of this.chans) if (this.envelope(c)) out.push(c);
+-      this.chans = out;
+-      if (this.fade) { this.fade++; if (this.fade > FRAME_HZ * 4) this.done = true; }
+-      if (this.tracks.every(t => !t.on) && !this.chans.length) this.done = true;
+-    }
+-    envelope(c) {
+-      const tn = c.tone;
+-      if (c.kind === 0) {
+-        if (c.stop && c.state < 3) c.state = 3;
+-        if (c.state === 0) { c.env += tn.attack; if (c.env >= 255) { c.env = 255; c.state = 1; } }
+-        else if (c.state === 1) { c.env = (c.env * tn.decay) >> 8; if (c.env <= tn.sustain) { c.env = tn.sustain; c.state = 2; if (!c.env) return false; } }
+-        else if (c.state === 3) { c.env = (c.env * tn.release) >> 8; if (c.env <= 0) return false; }
+-        return true;
+-      }
+-      // CGB: 0-15 steps, one step every n frames (attack/decay/release 0-7, sustain 0-15)
+-      const sus = tn.sustain & 15;
+-      if (c.stop && c.state < 3) { c.state = 3; c.cnt = tn.release & 7; if (!c.cnt) return false; }
+-      if (c.state === 0) { if (!(tn.attack & 7)) { c.env = 15; c.state = 1; c.cnt = tn.decay & 7; } else if (--c.cnt <= 0) { c.cnt = tn.attack & 7; if (++c.env >= 15) { c.env = 15; c.state = 1; c.cnt = tn.decay & 7; } } }
+-      else if (c.state === 1) { if (!(tn.decay & 7)) { c.env = sus; c.state = 2; } else if (--c.cnt <= 0) { c.cnt = tn.decay & 7; if (--c.env <= sus) { c.env = sus; c.state = 2; } } if (!c.env && c.state === 2) return false; }
+-      else if (c.state === 3) { if (--c.cnt <= 0) { c.cnt = tn.release & 7; if (--c.env <= 0) return false; } }
+-      return true;
+-    }
+-    // per-channel volume (left, right 0..1) and frequency, from its track (m4a TrkVolPitSet, ChnVolSetAsm)
+-    params(c) {
+-      const t = c.track;
+-      let x = t.vol * 2;
+-      if (t.modT === 1) x = (x * (t.modM + 128)) >> 7;
+-      let y = 2 * t.pan; if (t.modT === 2) y += t.modM;
+-      y = Math.max(-128, Math.min(127, y));
+-      const mr = Math.min(255, ((y + 128) * x) >> 8), ml = Math.min(255, ((127 - y) * x) >> 8);
+-      const r = Math.min(255, (mr * c.vel * (128 + c.pan)) >> 14), l = Math.min(255, (ml * c.vel * (127 - c.pan)) >> 14);
+-      let pit = (t.tune + t.bend * t.bendRange) * 4 + (t.keyShift << 8);
+-      if (t.modT === 0) pit += 16 * t.modM;
+-      const key = c.midi + pit / 256;
+-      let freq;
+-      if (c.kind === 0) freq = c.fixed ? MIXER_HZ : c.wave.rate * Math.pow(2, (key - 60) / 12);
+-      else if (c.kind === 4) freq = Math.min(262144, 4096 * Math.pow(2, (key - 60) / 12) * 4);
+-      else freq = 440 * Math.pow(2, (key - 69) / 12);
+-      return [l / 255, r / 255, freq];
+-    }
+-
+-    // ---- audio ----
+-    // fills two Float32Arrays; advances frames as time passes
+-    render(L, R, n = L.length) {
+-      L.fill(0, 0, n); R.fill(0, 0, n);
+-      const spf = this.rate / FRAME_HZ;
+-      let i = 0;
+-      while (i < n) {
+-        if (this.frac <= 0) { if (!this.done) this.frame(); this.frac += spf; }
+-        const len = Math.min(n - i, Math.ceil(this.frac));
+-        this.mix(L, R, i, len);
+-        i += len; this.frac -= len;
+-      }
+-      const g = this.volume * (this.fade ? Math.max(0, 1 - this.fade / (FRAME_HZ * 4)) : 1);
+-      for (let j = 0; j < n; j++) { L[j] = Math.max(-1, Math.min(1, L[j] * g)); R[j] = Math.max(-1, Math.min(1, R[j] * g)); }
+-    }
+-    mix(L, R, off, len) {
+-      const solo = this.anySolo;
+-      for (const c of this.chans) {
+-        const t = c.track;
+-        if (t.mute || (solo && !t.solo)) { this.advance(c, len); continue; }
+-        const [l, r, freq] = this.params(c);
+-        if (c.kind === 0) {
+-          const amp = (c.env / 255) * 0.6, gl = l * amp, gr = r * amp, w = c.wave, d = w.data, step = freq / this.rate;
+-          let p = c.pos;
+-          for (let j = off, e = off + len; j < e; j++) {
+-            if (p >= w.size) { if (w.loop && w.size > w.loopStart) p = w.loopStart + (p - w.size) % (w.size - w.loopStart); else { c.env = 0; c.state = 4; c.stop = true; break; } }
+-            const k = p | 0, f = p - k, s = d[k] + (d[k + 1] - d[k]) * f;
+-            L[j] += s * gl; R[j] += s * gr; p += step;
+-          }
+-          c.pos = p;
+-          if (c.state === 4) c.dead = true;
+-        } else {
+-          const amp = (c.env / 15) * 0.3, gl = l * amp, gr = r * amp, step = freq / this.rate;
+-          let ph = c.phase;
+-          for (let j = off, e = off + len; j < e; j++) {
+-            let s;
+-            if (c.kind === 3) s = c.wavetable[(ph * 32 | 0) & 31];
+-            else if (c.kind === 4) {
+-              ph += step; while (ph >= 1) { ph -= 1; const b = (c.lfsr ^ (c.lfsr >> 1)) & 1; c.lfsr = (c.lfsr >> 1) | (b << 14); if (c.short) c.lfsr = (c.lfsr & ~0x40) | (b << 6); }
+-              s = c.lfsr & 1 ? -1 : 1; L[j] += s * gl; R[j] += s * gr; continue;
+-            } else s = (ph % 1) < c.duty ? 1 : -1;
+-            L[j] += s * gl; R[j] += s * gr; ph = (ph + step) % 1;
+-          }
+-          c.phase = ph;
+-        }
+-      }
+-      if (this.chans.some(c => c.dead)) this.chans = this.chans.filter(c => !c.dead);
+-    }
+-    advance(c, len) {
+-      if (c.kind !== 0) return;
+-      const [, , freq] = this.params(c), w = c.wave;
+-      c.pos += freq / this.rate * len;
+-      if (c.pos >= w.size) { if (w.loop && w.size > w.loopStart) c.pos = w.loopStart + (c.pos - w.size) % (w.size - w.loopStart); else c.dead = true; }
+-    }
+-
+-    // jump to frame f: replay the sequencer silently from the start
+-    seek(f) {
+-      const mute = this.tracks.map(t => [t.mute, t.solo]);
+-      this.reset();
+-      this.tracks.forEach((t, i) => { [t.mute, t.solo] = mute[i]; });
+-      while (this.frames < f && !this.done) this.frame();
+-      this.chans = [];
+-      this.frac = 0;
+-    }
+-    // sound one voice (a 12-byte voicegroup entry at addr) at key for ticks
+-    static preview(data, addr, key = 60, ticks = 40, rate = 48000) {
+-      const p = new Player({ song: data.song || data.chunks[0][0], chunks: data.chunks }, rate);
+-      p.ntracks = 0; p.tracks = [];
+-      const t = p.newTrack(0, 0); t.vol = 127;
+-      p.play(t, tone(p.mem, addr), key, 127, ticks);
+-      p.tracks = [t]; t.on = false;
+-      return p;
+-    }
+-
+-    // ---- analysis: run the sequencer alone, recording notes ----
+-    // {frames: to the end or the first loop, notes [{t, d, key, vel, track}] in frames, loopFrame}
+-    survey(maxFrames = FRAME_HZ * 60 * 12) {
+-      this.reset();
+-      const notes = [];
+-      let open = [], loopFrame = null;
+-      this.onNote = (ti, key, vel) => { const n = { t: this.frames, d: 0, key, vel, track: ti }; notes.push(n); open.push(n); return n; };
+-      while (this.frames < maxFrames && !this.done) {
+-        const before = this.looped;
+-        this.frame();
+-        open = open.filter(n => { if (n.ch && !n.ch.stop && this.chans.includes(n.ch)) return true; n.d = Math.max(1, this.frames - n.t); return false; });
+-        if (this.looped > before) { loopFrame = this.frames; break; }
+-      }
+-      for (const n of open) n.d = Math.max(1, this.frames - n.t);
+-      const out = { frames: this.frames, notes, loopFrame };
+-      this.reset();
+-      return out;
+-    }
+-  }
+-
+-  // ---- WebAudio: one shared context and processor ----
+-  let ctx = null, node = null, current = null;
+-  function start(player) {
+-    ctx ||= new (window.AudioContext || window.webkitAudioContext)();
+-    if (ctx.state === 'suspended') ctx.resume();
+-    if (!node) {
+-      node = ctx.createScriptProcessor(2048, 0, 2);
+-      node.onaudioprocess = e => {
+-        const L = e.outputBuffer.getChannelData(0), R = e.outputBuffer.getChannelData(1);
+-        if (!current) { L.fill(0); R.fill(0); return; }
+-        current.render(L, R);
+-        if (current.done && !current.chans.length) { const p = current; current = null; p.onEnd?.(); }
+-      };
+-      node.connect(ctx.destination);
+-    }
+-    player.rate = ctx.sampleRate;
+-    current = player;
+-  }
+-  function stop() { const p = current; current = null; p?.onEnd?.(); }
+-  const rate = () => (ctx ||= new (window.AudioContext || window.webkitAudioContext)()).sampleRate;
+-  const playing = () => current;
+-
+-  return { Player, Mem, tone, wave, start, stop, playing, rate, FRAME_HZ, MIXER_HZ };
+-})();
+diff --git a/tools/studio/serve.py b/tools/studio/serve.py
+index aef5aa001..a70749e53 100644
+--- a/tools/studio/serve.py
++++ b/tools/studio/serve.py
+@@ -4,9 +4,8 @@ the game font, then build a modified ROM; browse sprites, palettes, the font and
+ raw tiles from the resource archives (/gfx); and a live view of the game
+ running in mGBA with tools/mgba/centaur.lua (/live, link on port 8643); the
+ script actor registry (/actors), script procedures (/scripts), how the rooms
+-connect (/world, tools/assets/areas.py), any function's disassembly and C
+-(/code), from tools/assets/actors.py, and every MP2K song, playable in the
+-browser (/sound, tools/studio/sound.py and mp2k.js).
++connect (/world, tools/assets/areas.py) and any function's disassembly and C
++(/code), from tools/assets/actors.py.
+ 
+   python3 tools/studio/serve.py [--port 8642] [--link-port 8643]    then open http://localhost:8642
+ 
+@@ -336,21 +335,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
+                 self.send(404, {"error": "not found"})
+         elif self.path == "/api/display":
+             self.send(200, {"jp": self.server.display_jp, "en": self.server.display_en})
+-        elif self.path in ("/sound", "/sound.html"):
+-            self.send(200, open(os.path.join(HERE, "sound.html"), "rb").read(), "text/html; charset=utf-8")
+-        elif self.path == "/api/sound":
+-            import sound
+-            self.send(200, sound.load())
+-        elif self.path.startswith(("/api/sound/song/", "/api/sound/vg/", "/api/sound/sample/")):
+-            import sound  # /api/sound/song/N, /api/sound/vg/ADDR, /api/sound/sample/ADDR
+-            what, arg = self.path.split("/")[3:5]
+-            try:
+-                d = {"song": lambda: sound.song_data(int(arg)), "vg": lambda: sound.voicegroup_data(int(arg, 16)),
+-                     "sample": lambda: sound.sample_data(int(arg, 16))}[what]()
+-            except ValueError:
+-                d = None
+-            self.send(200 if d else 404, d or {"error": "no such " + what})
+-        elif self.path in ("/static/common.js", "/static/common.css", "/static/inspector.js", "/static/mp2k.js"):
++        elif self.path in ("/static/common.js", "/static/common.css", "/static/inspector.js"):
+             ctype = "text/javascript" if self.path.endswith(".js") else "text/css"
+             self.send(200, open(os.path.join(HERE, os.path.basename(self.path)), "rb").read(), ctype + "; charset=utf-8")
+         elif self.path == "/api/notes":
+diff --git a/tools/studio/sound.html b/tools/studio/sound.html
+deleted file mode 100644
+index ccd17acfc..000000000
+--- a/tools/studio/sound.html
++++ /dev/null
+@@ -1,339 +0,0 @@
+-<!doctype html>
+-<html lang="en">
+-<head>
+-<meta charset="utf-8">
+-<meta name="viewport" content="width=device-width, initial-scale=1">
+-<title>Boktai 3 Sound</title>
+-<link rel="stylesheet" href="/static/common.css">
+-<style>
+-:root {
+-  --bg: #f6f3ec; --panel: #fffdf8; --ink: #2b2620; --muted: #7d7468; --line: #e3dccf;
+-  --accent: #b5462f; --accent-ink: #fff; --sel: #f3e3d6; --ok: #2f7d4f; --soft: #efe9de; --roll: #fbf8f2; --grid: #ece5d8;
+-}
+-@media (prefers-color-scheme: dark) {
+-  :root:not([data-theme="light"]) {
+-    --bg: #1b1916; --panel: #24211d; --ink: #ece6dc; --muted: #9a9083; --line: #3a352e;
+-    --accent: #e0745a; --accent-ink: #1b1916; --sel: #3a2c25; --ok: #6cc596; --soft: #2b2723; --roll: #1f1d1a; --grid: #2e2a25;
+-  }
+-}
+-* { box-sizing: border-box; }
+-body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Hiragino Sans", sans-serif; }
+-a { color: var(--accent); text-decoration: none; }
+-a:hover { text-decoration: underline; }
+-button, input, select { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+-button { cursor: pointer; }
+-button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+-main { display: grid; grid-template-columns: 320px 1fr; height: calc(100vh - 53px); }
+-body.embed main, body.bare main { height: 100vh; }
+-body.bare main { grid-template-columns: 1fr; }
+-body.bare #side { display: none; }
+-#side { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; background: var(--panel); }
+-#side .tools { padding: 10px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+-#side .tools input[type=search], #side .tools select { width: 100%; }
+-#side .tools label { font-size: 12px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+-#count { font-size: 12px; color: var(--muted); }
+-#list { overflow-y: auto; flex: 1; }
+-.grp { padding: 8px 10px 3px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 650; position: sticky; top: 0; background: var(--panel); border-bottom: 1px solid var(--line); }
+-.row { padding: 4px 10px; display: flex; gap: 8px; cursor: pointer; align-items: baseline; border-bottom: 1px solid var(--line); }
+-.row:hover { background: var(--sel); }
+-.row.on { background: var(--sel); box-shadow: inset 3px 0 var(--accent); }
+-.row .id { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 2.8em; font-size: 12px; }
+-.row .t { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+-.row .m { color: var(--muted); font-size: 11px; white-space: nowrap; }
+-.row .u { color: var(--ok); font-size: 10px; }
+-#view { overflow: auto; min-width: 0; }
+-.page { padding: 18px 28px 60px; max-width: 1200px; }
+-h1.t { font-size: 24px; margin: 0; font-weight: 650; letter-spacing: -.01em; }
+-.sub { color: var(--muted); margin-top: 2px; }
+-.badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+-.badge { font-size: 11.5px; padding: 1px 8px; border-radius: 10px; border: 1px solid var(--line); color: var(--muted); background: var(--panel); }
+-h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 26px 0 10px; font-weight: 650; display: flex; align-items: baseline; gap: 8px; }
+-h3 .n { font-weight: 500; letter-spacing: 0; text-transform: none; }
+-.mono { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; }
+-.muted { color: var(--muted); }
+-.empty { color: var(--muted); }
+-.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+-.chip { font-size: 12.5px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel); white-space: nowrap; color: var(--ink); }
+-a.chip:hover { border-color: var(--accent); text-decoration: none; }
+-.chip small { color: var(--muted); }
+-.transport { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 16px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+-.transport .time { font-variant-numeric: tabular-nums; min-width: 9em; }
+-.transport label { display: flex; gap: 6px; align-items: center; color: var(--muted); font-size: 13px; }
+-#roll { width: 100%; height: 240px; display: block; border: 1px solid var(--line); border-radius: 8px; background: var(--roll); margin-top: 10px; cursor: pointer; }
+-table.t { border-collapse: collapse; font-size: 13px; width: 100%; }
+-table.t td, table.t th { padding: 4px 12px 4px 0; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+-table.t th { color: var(--muted); font-weight: 500; font-size: 12px; }
+-.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: middle; }
+-.meter { display: inline-block; width: 70px; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; vertical-align: middle; }
+-.meter > i { display: block; height: 100%; width: 0; }
+-.ms { display: inline-flex; gap: 2px; }
+-.ms button { padding: 0 6px; font-size: 11px; line-height: 18px; }
+-.ms button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+-button.pv { padding: 0 7px; font-size: 11px; line-height: 18px; }
+-.places .pl { margin-bottom: 8px; }
+-.wave { width: 100%; height: 120px; display: block; border: 1px solid var(--line); border-radius: 8px; background: var(--roll); }
+-.note { font-size: 12.5px; color: var(--muted); max-width: 760px; }
+-body.compact .full { display: none; }
+-body.compact .page { padding: 4px 10px 20px; }
+-@media (max-width: 860px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } .page { padding: 14px 16px 40px; } }
+-</style>
+-</head>
+-<body>
+-<header id="top"></header>
+-<main>
+-  <section id="side">
+-    <div class="tools">
+-      <input id="q" type="search" placeholder="Filter: number, name, address…" autocomplete="off">
+-      <select id="grp"></select>
+-      <label><input type="checkbox" id="used"> Only songs a script or the code starts</label>
+-      <label><input type="checkbox" id="empties"> Show the empty slots</label>
+-      <div id="count"></div>
+-    </div>
+-    <div id="list"></div>
+-  </section>
+-  <section id="view"><div class="page empty">Loading the song table…</div></section>
+-</main>
+-<script src="/static/common.js"></script>
+-<script src="/static/mp2k.js"></script>
+-<script>
+-// Sound: every MP2K song in the song table (tools/studio/sound.py), playable
+-// with the in-browser player (tools/studio/mp2k.js). #N opens song N,
+-// #vg=ADDR a voicegroup, #sample=ADDR a sample; ?bare=1 hides the list.
+-studioHeader();
+-// ?bare (and the side panel) hides the list; ?compact shows only the player (Browse's song pages)
+-const QS = new URLSearchParams(location.search);
+-if (QS.has('bare') || EMBED) document.body.classList.add('bare');
+-if (QS.has('compact')) document.body.classList.add('compact');
+-let C = null, SONGS = [], CUR = null, PL = null, SURVEY = null, RAF = 0;
+-const TEST = { music: 'Sound test music', effects: 'Sound test effects', voices: 'Sound test voices' };
+-const COLORS = ['#c0533a', '#3a7dc0', '#4f9d4a', '#b58a1a', '#8a4fb5', '#1a9a9a', '#c03a7d', '#6b7a2a', '#d07a2a', '#3a4fc0', '#9a5a3a', '#2a8a6b', '#7a3ac0', '#a0a03a', '#c06a9a', '#5a8ac0'];
+-const hex8 = a => (typeof a === 'number' ? a.toString(16) : a).toUpperCase().padStart(8, '0');
+-const kb = n => n >= 1024 ? (n / 1024).toFixed(1) + ' KB' : n + ' B';
+-const mmss = f => { const s = f / MP2K.FRAME_HZ; return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`; };
+-const KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+-const keyName = k => KEYS[k % 12] + (Math.floor(k / 12) - 1);  // MIDI 60 = C4
+-const TESTWORD = { music: 'Music', effects: 'Effect', voices: 'Voice' };
+-// a name from data/notes.csv, else its place in the sound test, else its number
+-const titleOf = s => noteOf('song', s.n)?.label || (s.test ? `${TESTWORD[s.test.list]} ${s.test.no}` : '') || (s.empty ? 'Empty slot' : `Song ${s.n}`);
+-const playerName = p => p === 10 ? 'Player 10 · music' : p === 0 ? 'Player 0 · empty slots' : `Player ${p}`;
+-const used = s => s.scripts?.length || s.code?.length;
+-
+-// ---------- the list ----------
+-function renderList() {
+-  const q = $('q').value.trim().toLowerCase(), g = $('grp').value, onlyUsed = $('used').checked, empties = $('empties').checked;
+-  const rows = SONGS.filter(s => (empties || !s.empty) && (!onlyUsed || used(s)) && (g === '' || String(s.player) === g || (g.startsWith('test:') && s.test?.list === g.slice(5)))
+-    && (!q || String(s.n) === q || titleOf(s).toLowerCase().includes(q) || s.addr.toLowerCase().includes(q) || (s.voicegroup || '').toLowerCase().includes(q)));
+-  let html = '', last = null;
+-  const groupKey = s => g.startsWith('test:') ? TEST[g.slice(5)] : playerName(s.player);
+-  const sorted = g.startsWith('test:') ? rows.slice().sort((a, b) => a.test.no - b.test.no) : rows.slice().sort((a, b) => (a.player === 10 ? -1 : a.player) - (b.player === 10 ? -1 : b.player) || a.n - b.n);
+-  for (const s of sorted) {
+-    const k = groupKey(s);
+-    if (k !== last) { html += `<div class="grp">${esc(k)}</div>`; last = k; }
+-    html += `<div class="row${CUR?.n === s.n ? ' on' : ''}" data-n="${s.n}"><span class="id">${s.n}</span><span class="t">${esc(titleOf(s))}</span>${used(s) ? '<span class="u" title="started by a script or the code">●</span>' : ''}<span class="m">${s.empty ? '' : `${s.tracks.length}t · ${kb(s.size)}`}</span></div>`;
+-  }
+-  $('list').innerHTML = html || '<div class="page empty">No songs match.</div>';
+-  $('count').textContent = `${rows.length} of ${SONGS.length} song table entries`;
+-}
+-$('list').onclick = e => { const r = e.target.closest('.row'); if (r) location.hash = r.dataset.n; };
+-['q', 'grp', 'used', 'empties'].forEach(id => $(id).addEventListener('input', renderList));
+-
+-// ---------- a song ----------
+-function placesOf(scenes) {
+-  const by = {};
+-  for (const s of scenes) (by[s.area] ||= []).push(s);
+-  return `<div class="places">${Object.entries(by).map(([a, ss]) => `<div class="pl"><a href="/atlas#area:${a}" target="_top">${esc(ss[0].area_title || (a < 0 ? 'No area' : 'Area ' + a))}</a> <span class="chips" style="display:inline-flex">${ss.map(s => `<a class="chip" href="/atlas#scene:${s.scene}" target="_top">${esc(s.title || 'Scene ' + s.scene)} <small>${s.scene}</small></a>`).join('')}</span></div>`).join('')}</div>`;
+-}
+-function describeVoice(mem, addr) {
+-  const t = MP2K.tone(mem, addr), k = t.type & 7;
+-  if (t.type & 0x80) return { kind: 'Rhythm (drum kit)', detail: `kit at <span class="mono">${hex8(t.wav)}</span>` };
+-  if (t.type & 0x40) return { kind: 'Keysplit', detail: `voices at <span class="mono">${hex8(t.wav)}</span>, table <span class="mono">${hex8(t.extra)}</span>` };
+-  const kinds = { 0: 'DirectSound', 1: 'Square 1', 2: 'Square 2', 3: 'Wave', 4: 'Noise' };
+-  let detail = '';
+-  if (k === 0) { const w = MP2K.wave(mem, t.wav); detail = `sample <a class="mono" href="#sample=${hex8(t.wav)}">${hex8(t.wav)}</a>` + (w ? ` · ${Math.round(w.rate)} Hz · ${kb(w.size)}${w.loop ? ' · loops' : ''}` : ''); }
+-  else if (k === 1 || k === 2) detail = `duty ${[12.5, 25, 50, 75][t.wav & 3]}%`;
+-  else if (k === 3) detail = `wave <span class="mono">${hex8(t.wav)}</span>`;
+-  else if (k === 4) detail = t.wav & 1 ? '7-bit noise' : '15-bit noise';
+-  return { kind: kinds[k] + (t.type & 8 ? ' (fixed pitch)' : ''), detail, adsr: `${t.attack} ${t.decay} ${t.sustain} ${t.release}`, key: t.key };
+-}
+-async function showSong(s) {
+-  stop();
+-  CUR = s; renderList(); document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
+-  document.title = 'Boktai 3 Sound · ' + titleOf(s);
+-  if (s.empty) {
+-    $('view').innerHTML = `<div class="page"><h1 class="t">Empty slot ${s.n}</h1><div class="sub">Song table entry ${s.n} points at the shared 0-track header <span class="mono">${s.addr}</span> (${s.shared} entries do).</div></div>`;
+-    return;
+-  }
+-  const test = s.test ? `<span class="badge">${TEST[s.test.list]} No. ${s.test.no}</span>` : '';
+-  $('view').innerHTML = `<div class="page"><div class="full">
+-    <h1 class="t" id="title">${esc(titleOf(s))}</h1>
+-    <div class="sub">Song ${s.n} · header <span class="mono">${s.addr}</span> · ${playerName(s.player)} (${s.player_tracks} tracks) · ${s.tracks.length} track${s.tracks.length > 1 ? 's' : ''} · ${kb(s.size)} · voicegroup <a class="mono" href="#vg=${s.voicegroup}">${s.voicegroup}</a></div>
+-    <div class="badges">${test}<span class="badge">priority ${s.priority}</span>${s.reverb & 0x7f ? `<span class="badge">reverb ${s.reverb & 0x7f}</span>` : ''}<a class="badge" href="/atlas#song:${s.n}" target="_top">Browse ↗</a></div>
+-    <div id="ned" style="margin-top:10px"></div></div>
+-    <div class="transport"><button class="primary" id="play">▶ Play</button><button id="stop">■ Stop</button>
+-      <span class="time" id="time">0:00</span><label><input type="checkbox" id="loop" checked> Loop</label>
+-      <label>Volume <input type="range" id="vol" min="0" max="1.5" step="0.05" value="${localStore('sound.vol') || 1}"></label><span class="muted" id="len"></span></div>
+-    <canvas id="roll"></canvas>
+-    <h3>Tracks <span class="n">${s.tracks.length}</span></h3><table class="t" id="tracks"><tr><th></th><th>Track</th><th>Address</th><th>Bytes</th><th>Voices</th><th>Now</th><th></th></tr>
+-      ${s.tracks.map((t, i) => `<tr><td><span class="sw" style="background:${COLORS[i % 16]}"></span></td><td>${i + 1}</td><td class="mono">${t.addr}</td><td>${t.size}</td><td>${t.voices.join(', ') || '<span class="muted">0</span>'}</td><td><span class="meter"><i id="m${i}" style="background:${COLORS[i % 16]}"></i></span> <span class="mono muted" id="k${i}"></span></td><td><span class="ms"><button data-m="${i}" title="Mute">M</button><button data-s="${i}" title="Solo">S</button></span></td></tr>`).join('')}</table>
+-    <h3>Voices <span class="n">${s.voices.length} of voicegroup <a class="mono" href="#vg=${s.voicegroup}">${s.voicegroup}</a></span></h3><div id="voices" class="muted">Loading…</div>
+-    <div class="full" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:0 32px">
+-      <div><h3>Started by scripts <span class="n">${s.scripts.length}</span></h3>${s.scripts.length ? `<div class="chips">${s.scripts.map(u => `<a class="chip" href="/scripts#${u.proc}" data-peek>${esc(u.name || 'proc ' + u.proc)} <small>${esc(u.via)}</small></a>`).join('')}</div>` : '<div class="empty">No script call with this song number found.</div>'}
+-        <h3>Scenes <span class="n">${s.scenes.length}</span></h3>${s.scenes.length ? placesOf(s.scenes) : `<div class="empty">${s.shared_files.length ? 'Started by shared scripts:' : 'Not traced to a scene.'}</div>`}${s.shared_files.length ? `<div class="chips" style="margin-top:6px">${s.shared_files.map(f => `<a class="chip" href="/atlas#file:${esc(f)}" target="_top">${esc(f)}</a>`).join('')}</div>` : ''}</div>
+-      <div><h3>Started by code <span class="n">${s.code.length}</span></h3>${s.code.length ? `<div class="chips">${s.code.map(c => `<a class="chip" href="${codeHref(c.addr)}" data-peek>${esc(c.func)} <small>${esc(c.via)}</small></a>`).join('')}</div>` : '<div class="empty">No function passes this song number as a constant.</div>'}</div>
+-    </div>
+-    <p class="note full">Played by the Studio's own MP2K player from the song's ROM bytes: timing, notes, voices and envelopes follow the m4a driver; reverb is left out and the GB channels are approximate.</p></div>`;
+-  $('ned').replaceWith(noteEditor('song', s.n, n => { $('title').textContent = titleOf(s); renderList(); }));
+-  const data = await fetch('/api/sound/song/' + s.n).then(r => r.json());
+-  if (CUR !== s) return;
+-  PL = new MP2K.Player(data, MP2K.rate());
+-  SURVEY = PL.survey();
+-  $('len').textContent = `${mmss(SURVEY.frames)}${SURVEY.loopFrame ? ' to the loop' : ''} · ${SURVEY.notes.length} notes`;
+-  drawRoll();
+-  $('voices').innerHTML = `<table class="t"><tr><th>Voice</th><th>Kind</th><th>Base key</th><th>Data</th><th>ADSR</th><th></th></tr>${(s.voices.length ? s.voices : [0]).map(v => {
+-    const a = parseInt(s.voicegroup, 16) + 12 * v, d = describeVoice(PL.mem, a);
+-    return `<tr><td>${v}</td><td>${esc(d.kind)}</td><td>${d.key != null ? keyName(d.key) : ''}</td><td>${d.detail}</td><td class="mono">${d.adsr || ''}</td><td><button class="pv" data-a="${a}" title="Play C4">▶</button></td></tr>`;
+-  }).join('')}</table>`;
+-  $('play').onclick = play; $('stop').onclick = stop;
+-  $('loop').onchange = () => { if (PL) PL.loop = $('loop').checked; };
+-  $('vol').oninput = () => { localStore('sound.vol', $('vol').value); if (PL) PL.volume = +$('vol').value; };
+-  $('tracks').onclick = e => {
+-    const b = e.target.closest('button'); if (!b || !PL) return;
+-    const i = +(b.dataset.m ?? b.dataset.s), t = PL.tracks[i];
+-    if (b.dataset.m != null) t.mute = !t.mute; else t.solo = !t.solo;
+-    b.classList.toggle('on', b.dataset.m != null ? t.mute : t.solo);
+-  };
+-  $('voices').onclick = e => { const b = e.target.closest('button.pv'); if (b) preview(data, +b.dataset.a); };
+-  $('roll').onclick = e => {
+-    if (!PL || !SURVEY) return;
+-    const r = $('roll').getBoundingClientRect(), f = Math.round((e.clientX - r.left) / r.width * SURVEY.frames);
+-    PL.seek(f); if (!MP2K.playing()) play(false);
+-  };
+-}
+-function preview(data, addr, ticks = 48) {
+-  stop();
+-  const p = MP2K.Player.preview(data, addr, 60, ticks, MP2K.rate());
+-  p.volume = +($('vol')?.value || 1);
+-  MP2K.start(p);
+-}
+-function play(fromStart = true) {
+-  if (!PL) return;
+-  if (fromStart !== false && (PL.done || !PL.frames)) PL.reset();
+-  PL.loop = $('loop').checked; PL.volume = +$('vol').value;
+-  PL.onEnd = () => { $('play').textContent = '▶ Play'; };
+-  MP2K.start(PL);
+-  $('play').textContent = '▶ Playing';
+-  cancelAnimationFrame(RAF); RAF = requestAnimationFrame(animate);
+-}
+-function stop() { if (MP2K.playing()) MP2K.stop(); if (PL) PL.reset(); cancelAnimationFrame(RAF); if ($('play')) $('play').textContent = '▶ Play'; if (SURVEY) drawRoll(); if ($('time')) $('time').textContent = '0:00'; }
+-// ---------- piano roll ----------
+-let ROLLBG = null;
+-function drawRoll(at = null) {
+-  const cv = $('roll'); if (!cv || !SURVEY) return;
+-  const dpr = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+-  if (!ROLLBG || ROLLBG.w !== W || ROLLBG.song !== CUR) {
+-    cv.width = W * dpr; cv.height = H * dpr;
+-    const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+-    const ns = SURVEY.notes; let lo = 127, hi = 0;
+-    for (const n of ns) { lo = Math.min(lo, n.key); hi = Math.max(hi, n.key); }
+-    if (lo > hi) { lo = 48; hi = 72; }
+-    lo -= 2; hi += 2;
+-    const cs = getComputedStyle(document.body);
+-    g.fillStyle = cs.getPropertyValue('--roll'); g.fillRect(0, 0, W, H);
+-    const kh = H / (hi - lo + 1), fx = W / Math.max(1, SURVEY.frames);
+-    g.fillStyle = cs.getPropertyValue('--grid');
+-    for (let k = lo; k <= hi; k++) if ([1, 3, 6, 8, 10].includes(k % 12)) g.fillRect(0, H - (k - lo + 1) * kh, W, kh);
+-    for (const n of ns) {
+-      g.fillStyle = COLORS[n.track % 16]; g.globalAlpha = 0.35 + 0.65 * n.vel / 127;
+-      g.fillRect(n.t * fx, H - (n.key - lo + 1) * kh, Math.max(1.5, n.d * fx), Math.max(1.5, kh - 0.5));
+-    }
+-    g.globalAlpha = 1;
+-    ROLLBG = { w: W, song: CUR, img: g.getImageData(0, 0, W * dpr, H * dpr) };
+-  }
+-  const g = cv.getContext('2d');
+-  g.putImageData(ROLLBG.img, 0, 0);
+-  if (at != null) { g.setTransform(dpr, 0, 0, dpr, 0, 0); const x = (at % Math.max(1, SURVEY.frames)) / SURVEY.frames * W; g.fillStyle = getComputedStyle(document.body).getPropertyValue('--accent'); g.fillRect(x, 0, 2, H); }
+-}
+-function animate() {
+-  if (!PL || MP2K.playing() !== PL) return;
+-  drawRoll(PL.frames);
+-  $('time').textContent = mmss(PL.frames) + (PL.looped ? ` · loop ${PL.looped}` : '');
+-  const by = {};
+-  for (const c of PL.chans) { const e = c.kind === 0 ? c.env / 255 : c.env / 15; if (!by[c.track.i] || by[c.track.i][0] < e) by[c.track.i] = [e, c.midi]; }
+-  PL.tracks.forEach((t, i) => { const m = $('m' + i); if (m) { m.style.width = ((by[i]?.[0] || 0) * 100).toFixed(0) + '%'; $('k' + i).textContent = by[i] ? keyName(by[i][1]) : ''; } });
+-  RAF = requestAnimationFrame(animate);
+-}
+-addEventListener('resize', () => { ROLLBG = null; drawRoll(); });
+-
+-// ---------- a voicegroup ----------
+-async function showVoicegroup(addr) {
+-  stop(); CUR = null; renderList();
+-  const vg = C.voicegroups.find(v => v.addr === addr);
+-  document.title = 'Boktai 3 Sound · voicegroup ' + addr;
+-  $('view').innerHTML = `<div class="page"><h1 class="t">Voicegroup <span class="mono">${addr}</span></h1>
+-    <div class="sub">128 voices · used by ${vg ? vg.songs.length : 0} songs</div>
+-    <h3>Songs</h3><div class="chips">${(vg?.songs || []).map(n => `<a class="chip" href="#${n}">${esc(titleOf(SONGS[n]))} <small>${n}</small></a>`).join('') || '<span class="empty">None.</span>'}</div>
+-    <h3>Voices</h3><div id="voices" class="muted">Loading…</div></div>`;
+-  const data = await fetch('/api/sound/vg/' + addr).then(r => r.json());
+-  const mem = new MP2K.Mem(data.chunks), base = parseInt(addr, 16);
+-  const rows = [];
+-  for (let v = 0; v < 128; v++) {
+-    const a = base + 12 * v, t = MP2K.tone(mem, a);
+-    if (t.type === 0 && t.wav === 0) continue;
+-    const d = describeVoice(mem, a);
+-    rows.push(`<tr><td>${v}</td><td>${esc(d.kind)}</td><td>${d.key != null ? keyName(d.key) : ''}</td><td>${d.detail}</td><td class="mono">${d.adsr || ''}</td><td><button class="pv" data-a="${a}">▶</button></td></tr>`);
+-  }
+-  $('voices').innerHTML = `<table class="t"><tr><th>Voice</th><th>Kind</th><th>Base key</th><th>Data</th><th>ADSR</th><th></th></tr>${rows.join('')}</table>`;
+-  $('voices').onclick = e => { const b = e.target.closest('button.pv'); if (b) preview(data, +b.dataset.a); };
+-}
+-// ---------- a sample ----------
+-async function showSample(addr) {
+-  stop(); CUR = null; renderList();
+-  document.title = 'Boktai 3 Sound · sample ' + addr;
+-  const sm = C.samples.find(x => x.addr === addr);
+-  const data = await fetch('/api/sound/sample/' + addr).then(r => r.json());
+-  const mem = new MP2K.Mem(data.chunks), w = MP2K.wave(mem, parseInt(addr, 16));
+-  $('view').innerHTML = `<div class="page"><h1 class="t">Sample <span class="mono">${addr}</span></h1>
+-    <div class="sub">${w ? `${Math.round(w.rate)} Hz · ${w.size.toLocaleString()} samples (${(w.size / w.rate).toFixed(2)} s)${w.loop ? ` · loops from ${w.loopStart}` : ''}` : sm?.wave ? 'GB wave channel pattern (32 4-bit steps)' : ''}</div>
+-    <div class="transport"><button class="primary" id="splay">▶ Play at its own rate</button></div>
+-    <canvas class="wave" id="wave"></canvas></div>`;
+-  if (!w) return;
+-  const cv = $('wave'), dpr = devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+-  cv.width = W * dpr; cv.height = H * dpr;
+-  const g = cv.getContext('2d'); g.scale(dpr, dpr); g.fillStyle = getComputedStyle(document.body).getPropertyValue('--accent');
+-  for (let x = 0; x < W; x++) {
+-    const a = Math.floor(x / W * w.size), b = Math.max(a + 1, Math.floor((x + 1) / W * w.size));
+-    let lo = 1, hi = -1; for (let i = a; i < b; i++) { lo = Math.min(lo, w.data[i]); hi = Math.max(hi, w.data[i]); }
+-    g.fillRect(x, H / 2 - hi * H / 2, 1, Math.max(1, (hi - lo) * H / 2));
+-  }
+-  if (w.loop) { g.fillStyle = getComputedStyle(document.body).getPropertyValue('--ok'); g.fillRect(w.loopStart / w.size * W, 0, 1.5, H); }
+-  $('splay').onclick = () => {
+-    // a one-voice "voicegroup" in memory: a DirectSound entry pointing at the sample
+-    const entry = new Uint8Array(12); entry[1] = 60; entry[8] = 255; entry[9] = 0; entry[10] = 255; entry[11] = 200;
+-    new DataView(entry.buffer).setUint32(4, parseInt(addr, 16), true);
+-    const fake = 0x09F00000, b64 = btoa(String.fromCharCode(...entry));
+-    preview({ song: hex8(fake), chunks: [...data.chunks, [hex8(fake), b64]] }, fake, Math.min(900, Math.ceil(w.size / w.rate * MP2K.FRAME_HZ) + 2));
+-  };
+-}
+-
+-function route() {
+-  const h = decodeURIComponent(location.hash.slice(1));
+-  if (h.startsWith('vg=')) return showVoicegroup(h.slice(3).toUpperCase());
+-  if (h.startsWith('sample=')) return showSample(h.slice(7).toUpperCase());
+-  const n = parseInt(h, 10);
+-  const s = SONGS[Number.isFinite(n) ? n : SONGS.find(x => !x.empty)?.n];
+-  if (s) showSong(s);
+-}
+-(async () => {
+-  const [cat] = await Promise.all([fetch('/api/sound').then(r => r.json()), loadNotes()]);
+-  C = cat; SONGS = cat.songs;
+-  const counts = {};
+-  for (const s of SONGS) if (!s.empty) counts[s.player] = (counts[s.player] || 0) + 1;
+-  $('grp').innerHTML = `<option value="">All players</option>${Object.keys(counts).sort((a, b) => (a == 10 ? -1 : +a) - (b == 10 ? -1 : +b)).map(p => `<option value="${p}">${playerName(+p)} (${counts[p]})</option>`).join('')}`
+-    + Object.entries(TEST).map(([k, v]) => `<option value="test:${k}">${v} (${SONGS.filter(s => s.test?.list === k).length})</option>`).join('');
+-  renderList();
+-  window.onhashchange = route;
+-  route();
+-})();
+-</script>
+-</body>
+-</html>
+diff --git a/tools/studio/sound.py b/tools/studio/sound.py
+deleted file mode 100644
+index ea10ee883..000000000
+--- a/tools/studio/sound.py
++++ /dev/null
+@@ -1,443 +0,0 @@
+-#!/usr/bin/env python3
+-"""The game's sound for the Studio (tools/studio/sound.html): every MP2K song
+-in the song table with its tracks, voicegroup and size, where it is used, and
+-the bytes a song needs to play in the browser (tools/studio/mp2k.js).
+-
+-  python3 tools/studio/sound.py            summary
+-  python3 tools/studio/sound.py N          one song as JSON
+-
+-Where a song is used:
+-
+-* scripts: calls to play_bgm / play_bgm_with_fade / play_bgm_fade (procs
+-  1048-1051) with a constant id, and the song-start script commands 53BF and
+-  E7CA (sub_0822AE7C: start, remember for resuming) and 1870 (m4aSongNumStart);
+-* scenes: the scene scripts that make those calls, directly or through library
+-  procedures (as Browse places objects);
+-* code: functions that pass a constant song number to Sound_PlaySong,
+-  Sound_PlaySongChecked, the m4aSongNumStart family or the wrappers above;
+-* the sound test's three lists (gUnk_086136F0, 086137AE, 08613BC4).
+-
+-Song groups are the game's music players (the song table's ms field): player
+-10 is the 12-track BGM player; the others are effect players with 1-8 tracks.
+-
+-Built from tools/m4a.py, the GCL scripts and gen/code_sym.s; cached in
+-build/cache/sound.json until an input changes. Nothing rendered is stored:
+-the browser synthesizes the audio from ROM bytes served by song_data().
+-"""
+-import base64
+-import collections
+-import csv
+-import functools
+-import json
+-import os
+-import re
+-import struct
+-import sys
+-
+-HERE = os.path.dirname(os.path.abspath(__file__))
+-ROOT = os.path.dirname(os.path.dirname(HERE))
+-for p in (os.path.join(ROOT, "tools", "assets"), os.path.join(ROOT, "tools"), HERE):
+-    if p not in sys.path:
+-        sys.path.insert(0, p)
+-
+-import m4a  # noqa: E402
+-
+-CACHE = os.path.join(ROOT, "build", "cache", "sound.json")
+-INPUTS = ["tools/studio/sound.py", "tools/m4a.py", "gen/code_sym.s", "gcl/names/proc.csv",
+-          "data/labels/scenes.csv", "data/labels/areas.csv"]
+-ROM_BASE = 0x08000000
+-PLAYER_TABLE = 0x082643EC  # gMPlayTable: {MusicPlayerInfo*, MusicPlayerTrack*, u16 ntracks, u16 unk}
+-SOUND_TEST = [("music", 0x086136F0), ("effects", 0x086137AE), ("voices", 0x08613BC4)]
+-BGM_PROCS = {1048: ("play_bgm", 0), 1049: ("play_bgm_with_fade", 1), 1050: ("play_bgm_urgent", 0), 1051: ("play_bgm_fade", 1)}
+-START_CMDS = {0x53BF: "start song (53BF)", 0xE7CA: "start song (E7CA)", 0x1870: "start song, raw (1870)"}
+-CODE_PLAY = {"Sound_PlaySong", "Sound_PlaySongChecked", "m4aSongNumStart", "m4aSongNumStartOrChange",
+-             "m4aSongNumStartOrContinue", "sub_0822AE7C", "sub_0822B330"}
+-KINDS = {0: "DirectSound", 1: "Square 1", 2: "Square 2", 3: "Wave", 4: "Noise", 8: "DirectSound (fixed)",
+-         9: "Square 1", 10: "Square 2", 11: "Wave", 12: "Noise"}
+-
+-
+-@functools.lru_cache(None)
+-def rom():
+-    from romlib import load_rom
+-    return load_rom()
+-
+-
+-def u32(a):
+-    return struct.unpack_from("<I", rom(), a - ROM_BASE)[0]
+-
+-
+-def players():
+-    out = {}
+-    for p in range(32):
+-        info, _, n = struct.unpack_from("<III", rom(), PLAYER_TABLE + 12 * p - ROM_BASE)
+-        if info:
+-            out[p] = n & 0xFFFF
+-    return out
+-
+-
+-def sound_test():
+-    """{song: (list, position from 1)}."""
+-    out = {}
+-    for name, a in SOUND_TEST:
+-        o, i = a - ROM_BASE, 0
+-        while True:
+-            v = struct.unpack_from("<h", rom(), o + 2 * i)[0]
+-            if v == -1:
+-                break
+-            out.setdefault(v, (name, i + 1))
+-            i += 1
+-    return out
+-
+-
+-def walk_song(song, ntracks, vg):
+-    """(tracks [{addr, end, size, patterns, voices}], voicegroups, samples) of one song."""
+-    tracks = []
+-    w = m4a.Walker(rom())
+-    allvoices = set()
+-    for t in range(ntracks):
+-        tp = u32(song + 8 + 4 * t)
+-        one = m4a.Walker(rom())
+-        one.walk_track(tp)
+-        allvoices |= one.voices
+-        w.tracks |= one.tracks
+-        for k, v in one.track_extent.items():
+-            w.track_extent[k] = max(w.track_extent.get(k, 0), v)
+-        tracks.append({"addr": f"{tp:08X}", "end": f"{one.track_extent[tp]:08X}", "size": one.track_extent[tp] - tp,
+-                       "patterns": sorted(f"{a:08X}" for a in one.tracks if a != tp), "voices": sorted(one.voices)})
+-    if vg:
+-        w.walk_voicegroup(vg)
+-    return tracks, w, allvoices
+-
+-
+-def _sizes(w):
+-    """Bytes of track data a walk covers, overlaps counted once."""
+-    spans = sorted((a, e) for a, e in w.track_extent.items())
+-    total, end = 0, 0
+-    for a, e in spans:
+-        if e > end:
+-            total += e - max(a, end)
+-            end = e
+-    return total
+-
+-
+-# ---------- usage ----------
+-def script_uses():
+-    """{song: [{proc, via}]} from the GCL scripts: constant song ids passed to
+-    the play_bgm procedures, to procedures that hand a parameter on to them
+-    (found to a fixpoint), stored in a variable that is later passed to them,
+-    or given to the song-start commands."""
+-    import actors
+-    import gclview
+-    img = gclview._image()
+-    names = {int(p): r["name"] for p, r in gclview.Names().procs.items()}
+-    bodies = {cid: gclview.procedure(img, cid) or [] for cid in actors.procs()}
+-    params = {p: {i} for p, (_, i) in BGM_PROCS.items()}  # proc -> argument positions that are a song
+-    svars = set()                                          # variables passed as a song
+-
+-    def stmts_of(stmts):
+-        for s in stmts:
+-            yield s
+-            for x in s[1:]:
+-                yield from blocks(x)
+-
+-    def blocks(x):
+-        if isinstance(x, tuple):
+-            if x and x[0] == "block":
+-                yield from stmts_of(x[1])
+-            else:
+-                for y in x:
+-                    yield from blocks(y)
+-        elif isinstance(x, list):
+-            for y in x:
+-                yield from blocks(y)
+-
+-    def var(v):
+-        return (v[1], v[2]) if v[0] == "var" and v[5] is None else None
+-
+-    def scan(record):
+-        changed = False
+-        for pid, body in bodies.items():
+-            for s in stmts_of(body):
+-                if s[0] == "call" and s[1] in params:
+-                    for i in params[s[1]]:
+-                        if len(s[2]) <= i:
+-                            continue
+-                        v = s[2][i]
+-                        if v[0] == "int" and v[1] > 0 and record is not None:
+-                            record[v[1]].append({"proc": pid, "via": BGM_PROCS.get(s[1], (names.get(s[1]) or f"proc {s[1]}",))[0]})
+-                        elif v[0] == "arg" and v[1] - 1 not in params.setdefault(pid, set()):
+-                            params[pid].add(v[1] - 1)
+-                            changed = True
+-                        elif var(v) and var(v) not in svars and var(v) != ("r708", 0x74):  # 0x74: the previous track
+-                            svars.add(var(v))
+-                            changed = True
+-                elif s[0] == "eval" and s[1][0] == "bin" and s[1][1] == 22 and var(s[1][2]) in svars:
+-                    v = s[1][3]
+-                    if v[0] == "int" and v[1] > 0 and record is not None:
+-                        record[v[1]].append({"proc": pid, "via": "sets {}[0x{:x}]".format(*var(s[1][2]))})
+-                    elif v[0] == "arg" and v[1] - 1 not in params.setdefault(pid, set()):
+-                        params[pid].add(v[1] - 1)
+-                        changed = True
+-                elif s[0] == "cmd" and s[2] in START_CMDS and record is not None:
+-                    for letter, vals in s[4]:
+-                        if letter == "i" and vals and vals[0][0] == "int":
+-                            record[vals[0][1]].append({"proc": pid, "via": START_CMDS[s[2]]})
+-        return changed
+-    while scan(None):
+-        pass
+-    out = collections.defaultdict(list)
+-    scan(out)
+-    return out
+-
+-
+-def code_uses():
+-    """{song: [{func, addr, at}]}: constant song numbers passed to the play
+-    functions, from gen/code_sym.s (r0 set after the last label)."""
+-    out = collections.defaultdict(list)
+-    path = os.path.join(ROOT, "gen", "code_sym.s")
+-    func = faddr = None
+-    r0 = None
+-    for ln in open(path):
+-        s = ln.strip()
+-        m = re.match(r"thumb_func_start (\S+)|arm_func_start (\S+)", s)
+-        if m:
+-            func, r0 = m.group(1) or m.group(2), None
+-            continue
+-        m = re.match(r"(\S+): @ 0x([0-9A-F]{8})", s)
+-        if m:
+-            if m.group(1) == func:
+-                faddr = m.group(2)
+-            r0 = None
+-            continue
+-        if s.endswith(":") or s.startswith("_") and ":" in s.split()[0]:
+-            r0 = None
+-            continue
+-        m = re.match(r"movs r0, #(0x[0-9a-f]+|\d+)$", s)
+-        if m:
+-            r0 = int(m.group(1), 0)
+-            continue
+-        m = re.match(r"ldr r0, \S+ @ =(0x[0-9A-Fa-f]+)$", s)
+-        if m:
+-            r0 = int(m.group(1), 16)
+-            continue
+-        m = re.match(r"lsls r0, r0, #(0x[0-9a-f]+|\d+)$", s)
+-        if m and r0 is not None:
+-            r0 = (r0 << int(m.group(1), 0)) & 0xFFFFFFFF
+-            continue
+-        m = re.match(r"adds r0, (?:r0, )?#(0x[0-9a-f]+|\d+)$", s)
+-        if m and r0 is not None:
+-            r0 += int(m.group(1), 0)
+-            continue
+-        m = re.match(r"bl (\S+)$", s)
+-        if m:
+-            if m.group(1) in CODE_PLAY and r0 is not None and 0 < r0 < 0x10000:
+-                out[r0].append({"func": func, "addr": faddr, "via": m.group(1)})
+-            r0 = None
+-            continue
+-        if re.match(r"\w+ r0\b", s) and not re.match(r"(cmp|str\w*|tst|cmn) ", s):
+-            r0 = None
+-    return out
+-
+-
+-@functools.lru_cache(None)
+-def _files():
+-    import gclfiles
+-    callers = collections.defaultdict(set)
+-    for c, (calls, _) in gclfiles.refs().items():
+-        for t in calls:
+-            callers[t].add(c)
+-    return gclfiles.file_of(), {f["id"]: f for f in gclfiles.files()}, callers
+-
+-
+-def scenes_of(procs):
+-    """The scene entries whose own scripts run these procedures, directly or
+-    through library procedures (up to three calls up), and shared files."""
+-    fof, fkind, callers = _files()
+-    scenes, via = set(), set()
+-    todo, seen = [(p, 0) for p in procs], set()
+-    while todo:
+-        p, d = todo.pop()
+-        if p in seen:
+-            continue
+-        seen.add(p)
+-        f = fkind.get(fof.get(p))
+-        if not f:
+-            continue
+-        if f["kind"] == "scene" and f.get("entry") is not None:
+-            scenes.add(f["entry"])
+-        elif f["kind"] == "library" and d < 3:
+-            todo += [(c, d + 1) for c in callers.get(p, ())]
+-        else:
+-            via.add(f["id"])
+-    return sorted(scenes), sorted(via)
+-
+-
+-# ---------- the catalog ----------
+-def build():
+-    import gclfiles
+-    import gclview
+-    w = m4a.walk(rom())
+-    pl = players()
+-    test = sound_test()
+-    su, cu = script_uses(), code_uses()
+-    procnames = {int(p): r["name"] for p, r in gclview.Names().procs.items()}
+-    fof = gclfiles.file_of()
+-    import areas
+-    scene_area = {int(k): v for k, v in areas.build()["scene_area"].items()}
+-    slab = {int(r["scene"]): r.get("label") or "" for r in csv.DictReader(open(os.path.join(ROOT, "data", "labels", "scenes.csv"), encoding="utf-8"))}
+-    alab = {int(r["area"]): r.get("place") or "" for r in csv.DictReader(open(os.path.join(ROOT, "data", "labels", "areas.csv"), encoding="utf-8"))}
+-
+-    hdr_count = collections.Counter(s for _, s, _, _ in w.songs)
+-    vg_users = collections.defaultdict(list)
+-    songs = []
+-    for n, song, nt, vg in w.songs:
+-        ms, me = struct.unpack_from("<HH", rom(), m4a.SONG_TABLE + 8 * n + 4 - ROM_BASE)
+-        nblocks, prio, reverb = rom()[song + 1 - ROM_BASE], rom()[song + 2 - ROM_BASE], rom()[song + 3 - ROM_BASE]
+-        if nt == 0:
+-            songs.append({"n": n, "addr": f"{song:08X}", "tracks": [], "empty": True, "shared": hdr_count[song], "player": ms})
+-            continue
+-        tracks, sw, voices = walk_song(song, nt, vg)
+-        vg_users[vg].append(n)
+-        uses = su.get(n, [])
+-        procs = sorted({u["proc"] for u in uses})
+-        sc, shared = scenes_of(procs)
+-        t = test.get(n)
+-        songs.append({
+-            "n": n, "addr": f"{song:08X}",
+-            "player": ms, "player_tracks": pl.get(ms, 0), "priority": prio, "reverb": reverb, "blocks": nblocks,
+-            "voicegroup": f"{vg:08X}", "voices": sorted(voices),
+-            "tracks": tracks, "size": 8 + 4 * nt + _sizes(sw), "start": min(int(x["addr"], 16) for x in tracks),
+-            "test": {"list": t[0], "no": t[1]} if t else None,
+-            "scripts": [dict(u, name=procnames.get(u["proc"], ""), file=fof.get(u["proc"])) for u in uses],
+-            "scenes": [{"scene": s, "title": slab.get(s, ""), "area": scene_area.get(s, -1),
+-                        "area_title": alab.get(scene_area.get(s, -1), "")} for s in sc],
+-            "shared_files": shared,
+-            "code": cu.get(n, []),
+-        })
+-    # voicegroups and samples, in ROM order
+-    vgs = []
+-    for vg in sorted(w.voicegroups):
+-        vgs.append({"addr": f"{vg:08X}", "songs": vg_users.get(vg, [])})
+-    samples = []
+-    for a, e in sorted(w.samples.items()):
+-        if e - a > 16 + 1:
+-            freq = u32(a + 4)
+-            samples.append({"addr": f"{a:08X}", "size": e - a, "rate": round(freq / 1024), "loop": bool(rom()[a + 3 - ROM_BASE] & 0x40)})
+-        else:
+-            samples.append({"addr": f"{a:08X}", "size": e - a, "wave": True})
+-    return {"songs": songs, "players": {str(k): v for k, v in pl.items()}, "voicegroups": vgs, "samples": samples,
+-            "table": {"addr": f"{m4a.SONG_TABLE:08X}", "size": 8 * len(w.songs)}}
+-
+-
+-def titles():
+-    """{song number: name} from data/notes.csv (kind "song"), which the Sound
+-    page edits; read on every request so a new name shows at once."""
+-    p = os.path.join(ROOT, "data", "notes.csv")
+-    if not os.path.exists(p):
+-        return {}
+-    return {int(r["key"]): r["label"] for r in csv.DictReader(open(p, encoding="utf-8"))
+-            if r["kind"] == "song" and r["key"].isdigit() and r.get("label")}
+-
+-
+-def load():
+-    newest = max(os.path.getmtime(os.path.join(ROOT, p)) for p in INPUTS if os.path.exists(os.path.join(ROOT, p)))
+-    if os.path.exists(CACHE) and os.path.getmtime(CACHE) >= newest:
+-        return json.load(open(CACHE))
+-    out = build()
+-    os.makedirs(os.path.dirname(CACHE), exist_ok=True)
+-    json.dump(out, open(CACHE + ".tmp", "w"), ensure_ascii=False)
+-    os.replace(CACHE + ".tmp", CACHE)
+-    return out
+-
+-
+-# ---------- bytes for the browser player ----------
+-def _voice_spans(vg, progs, samples, spans, depth=0):
+-    """Add the ROM ranges voices progs of voicegroup vg read: the entries,
+-    keysplit tables, sub-voicegroups and wave data."""
+-    r = rom()
+-    for i in progs:
+-        e = vg + 12 * i
+-        spans.append((e, e + 12))
+-        kind = r[e - ROM_BASE]
+-        p1 = u32(e + 4)
+-        if not m4a.is_rom(p1, len(r)):
+-            continue
+-        if kind & 0x40 and depth < 2:          # keysplit: table of 128 keys, sub-voicegroup
+-            tbl = u32(e + 8)
+-            spans.append((tbl, tbl + 128))
+-            _voice_spans(p1, sorted(set(r[tbl - ROM_BASE: tbl - ROM_BASE + 128])), samples, spans, depth + 1)
+-        elif kind & 0x80 and depth < 2:        # rhythm: one voice per key
+-            _voice_spans(p1, range(128), samples, spans, depth + 1)
+-        elif kind & 0x07 == 0 and p1 in samples:
+-            spans.append((p1, samples[p1]))
+-        elif kind & 0x07 == 3:
+-            spans.append((p1, p1 + 16))
+-
+-
+-def _chunks(spans):
+-    r = rom()
+-    merged = []
+-    for a, b in sorted(spans):
+-        if merged and a <= merged[-1][1] + 16:
+-            merged[-1][1] = max(merged[-1][1], b)
+-        else:
+-            merged.append([a, b])
+-    return [[f"{a:08X}", base64.b64encode(r[a - ROM_BASE:b - ROM_BASE]).decode()] for a, b in merged]
+-
+-
+-@functools.lru_cache(None)
+-def _walk_all():
+-    return m4a.walk(rom())
+-
+-
+-def song_data(n):
+-    """{"song", "n", "chunks": [[addr, base64]]}: every ROM range song n reads
+-    when it plays (header, track streams with their patterns, the voicegroup
+-    entries it selects with keysplit tables and sub-voicegroups, wave data)."""
+-    r = rom()
+-    if not 0 <= n < 0x10000:
+-        return None
+-    song = u32(m4a.SONG_TABLE + 8 * n)
+-    if not m4a.is_rom(song, len(r)):
+-        return None
+-    nt, vg = r[song - ROM_BASE], u32(song + 4)
+-    spans = [(song, song + 8 + 4 * nt)]
+-    _, w, voices = walk_song(song, nt, 0)
+-    spans += list(w.track_extent.items())
+-    if m4a.is_rom(vg, len(r)):
+-        _voice_spans(vg, sorted(voices | {0}), _walk_all().samples, spans)
+-    return {"song": f"{song:08X}", "n": n, "chunks": _chunks(spans)}
+-
+-
+-def voicegroup_data(vg):
+-    """All 128 voices of a voicegroup, with what they read."""
+-    if vg not in _walk_all().voicegroups:
+-        return None
+-    spans = []
+-    _voice_spans(vg, range(128), _walk_all().samples, spans)
+-    return {"voicegroup": f"{vg:08X}", "chunks": _chunks(spans)}
+-
+-
+-def sample_data(a):
+-    w = _walk_all()
+-    if a not in w.samples:
+-        return None
+-    return {"sample": f"{a:08X}", "chunks": _chunks([(a, w.samples[a])])}
+-
+-
+-def main():
+-    cat = load()
+-    if len(sys.argv) > 1:
+-        n = int(sys.argv[1], 0)
+-        print(json.dumps(next((s for s in cat["songs"] if s["n"] == n), None), ensure_ascii=False, indent=1))
+-        return
+-    real = [s for s in cat["songs"] if not s.get("empty")]
+-    print(f"{len(cat['songs'])} song table entries, {len(real)} songs, {len(cat['voicegroups'])} voicegroups, {len(cat['samples'])} samples")
+-    print(f"scripts start {sum(1 for s in real if s['scripts'])} songs, code {sum(1 for s in real if s['code'])}, "
+-          f"in scenes {sum(1 for s in real if s['scenes'])}, sound test {sum(1 for s in real if s['test'])}")
+-    by = collections.Counter(s["player"] for s in real)
+-    print("players:", dict(sorted(by.items())))
+-
+-
+-if __name__ == "__main__":
+-    main()

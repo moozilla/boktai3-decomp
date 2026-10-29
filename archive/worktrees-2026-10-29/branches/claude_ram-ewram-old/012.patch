@@ -1,0 +1,3323 @@
+From 51eb68db8dbc597178524dda71f4c51eba8be8f7 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Tue, 27 Oct 2026 23:26:36 -0700
+Subject: [PATCH] Name gLinkSession (area_effect_link.h)
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+---
+ include/area_effect_link.h |  2 +-
+ include/orbit_background.h |  2 +-
+ src/fn/sub_0804194C.c      |  4 ++--
+ src/fn/sub_08041F3C.c      |  4 ++--
+ src/fn/sub_0804EBD8.c      |  4 ++--
+ src/fn/sub_0804EC00.c      |  4 ++--
+ src/fn/sub_0804EC60.c      |  4 ++--
+ src/fn/sub_0804ECD0.c      |  2 +-
+ src/fn/sub_0804EDD0.c      |  8 ++++----
+ src/fn/sub_08050910.c      |  8 ++++----
+ src/fn/sub_08051054.c      |  4 ++--
+ src/fn/sub_0806EF04.c      |  4 ++--
+ src/fn/sub_08075588.c      |  6 +++---
+ src/fn/sub_08078EE8.c      |  6 +++---
+ src/fn/sub_0807D2E0.c      |  4 ++--
+ src/fn/sub_08082648.c      |  4 ++--
+ src/fn/sub_080D812C.c      |  4 ++--
+ src/fn/sub_080EA064.c      |  6 +++---
+ src/fn/sub_080EAA48.c      |  2 +-
+ src/fn/sub_080ED914.c      |  6 +++---
+ src/fn/sub_08109040.c      |  9 ++++-----
+ src/fn/sub_08109090.c      |  5 ++---
+ src/fn/sub_081090E0.c      |  4 ++--
+ src/fn/sub_08109134.c      |  3 +--
+ src/fn/sub_081091AC.c      |  6 +++---
+ src/fn/sub_081091E4.c      |  3 +--
+ src/fn/sub_08109224.c      |  3 +--
+ src/fn/sub_081092F0.c      |  6 +++---
+ src/fn/sub_08109324.c      |  6 +++---
+ src/fn/sub_08109340.c      |  7 +++----
+ src/fn/sub_08109358.c      |  7 +++----
+ src/fn/sub_08109374.c      |  7 +++----
+ src/fn/sub_08109390.c      |  7 +++----
+ src/fn/sub_081093AC.c      |  7 +++----
+ src/fn/sub_081093C4.c      |  5 ++---
+ src/fn/sub_081093DC.c      |  4 ++--
+ src/fn/sub_081093FC.c      |  2 +-
+ src/fn/sub_08109464.c      |  7 +++----
+ src/fn/sub_08109C24.c      |  4 ++--
+ src/fn/sub_08109F1C.c      | 22 +++++++++++-----------
+ src/fn/sub_0810A3E0.c      |  3 +--
+ src/fn/sub_0810A448.c      |  5 ++---
+ src/fn/sub_0810A5C0.c      |  5 ++---
+ src/fn/sub_0810A698.c      |  1 -
+ src/fn/sub_0810A7E8.c      |  1 -
+ src/fn/sub_0810A8D8.c      |  1 -
+ src/fn/sub_0810AC7C.c      |  4 ++--
+ src/fn/sub_0810AD50.c      |  4 ++--
+ src/fn/sub_0810B324.c      |  7 +++----
+ src/fn/sub_0810B3BC.c      |  8 +++++---
+ src/fn/sub_0810B724.c      |  5 +++--
+ src/fn/sub_0810B8A8.c      |  3 +--
+ src/fn/sub_0810B914.c      |  8 ++++----
+ src/fn/sub_0810BB0C.c      |  6 +++---
+ src/fn/sub_0810BDB4.c      |  4 ++--
+ src/fn/sub_0810BE58.c      |  4 ++--
+ src/fn/sub_0810C184.c      |  4 ++--
+ src/fn/sub_0810C238.c      |  4 ++--
+ src/fn/sub_0810C398.c      |  9 ++++-----
+ src/fn/sub_0810C420.c      |  8 ++++----
+ src/fn/sub_0810C7F4.c      | 10 +++++-----
+ src/fn/sub_0810CCC8.c      |  8 ++++----
+ src/fn/sub_0810CDD8.c      |  6 +++---
+ src/fn/sub_0810CFF0.c      |  2 +-
+ src/fn/sub_0810D3A0.c      |  4 ++--
+ src/fn/sub_0810D9B0.c      |  4 ++--
+ src/fn/sub_0810DD24.c      |  4 ++--
+ src/fn/sub_0810E218.c      |  4 ++--
+ src/fn/sub_0810E9D4.c      | 10 +++++-----
+ src/fn/sub_0810ECEC.c      |  4 ++--
+ src/fn/sub_0810EDC0.c      |  6 +++---
+ src/fn/sub_0810F0A0.c      |  2 +-
+ src/fn/sub_0810F678.c      |  2 +-
+ src/fn/sub_0810F990.c      |  4 ++--
+ src/fn/sub_0810FC90.c      |  7 +++----
+ src/fn/sub_081100A0.c      |  4 ++--
+ src/fn/sub_08110188.c      |  4 ++--
+ src/fn/sub_081102EC.c      |  4 ++--
+ src/fn/sub_08110894.c      |  2 +-
+ src/fn/sub_081169A8.c      |  2 +-
+ src/fn/sub_08116C74.c      |  3 +--
+ src/fn/sub_08116E44.c      |  8 ++++----
+ src/fn/sub_081172C4.c      |  2 +-
+ src/fn/sub_081175F8.c      |  2 +-
+ src/fn/sub_08117948.c      |  2 +-
+ src/fn/sub_08117F6C.c      |  2 +-
+ src/fn/sub_081182E4.c      |  4 ++--
+ src/fn/sub_081188F4.c      |  2 +-
+ src/fn/sub_08118B8C.c      |  2 +-
+ src/fn/sub_08118E30.c      |  2 +-
+ src/fn/sub_081190D4.c      |  2 +-
+ src/fn/sub_08119378.c      |  2 +-
+ src/fn/sub_08119638.c      |  2 +-
+ src/fn/sub_081198F8.c      |  2 +-
+ src/fn/sub_0811A158.c      |  6 +++---
+ src/fn/sub_0811A6C4.c      |  8 ++++----
+ src/fn/sub_0811C67C.c      |  3 +--
+ src/fn/sub_081266B4.c      |  2 +-
+ src/fn/sub_08131D5C.c      |  4 ++--
+ src/fn/sub_0813214C.c      |  4 ++--
+ src/fn/sub_08132490.c      |  4 ++--
+ src/fn/sub_08132904.c      |  4 ++--
+ src/fn/sub_0813599C.c      |  4 ++--
+ src/fn/sub_08135F70.c      |  4 ++--
+ src/fn/sub_081363F4.c      |  4 ++--
+ src/fn/sub_08137AFC.c      |  1 -
+ src/fn/sub_08137CA8.c      |  1 -
+ src/fn/sub_081381CC.c      |  1 -
+ src/fn/sub_08164864.c      | 10 +++++-----
+ src/fn/sub_081786A0.c      |  4 ++--
+ src/fn/sub_0817871C.c      |  6 +++---
+ src/fn/sub_08178AA0.c      |  7 +++----
+ src/fn/sub_08179A74.c      |  7 +++----
+ src/fn/sub_08224FA4.c      |  4 ++--
+ src/fn/sub_08226CF8.c      |  4 ++--
+ src/fn/sub_0822C8D8.c      |  6 +++---
+ src/fn/sub_08232F68.c      |  4 ++--
+ src/fn/sub_08232FD0.c      |  6 +++---
+ src/fn/sub_08233CAC.c      |  6 +++---
+ src/fn/sub_08238470.c      |  6 +++---
+ src/fn/sub_0823849C.c      |  6 +++---
+ src/fn/sub_082384C8.c      |  7 +++----
+ src/fn/sub_082386A4.c      |  5 ++---
+ src/fn/sub_082392E8.c      |  2 +-
+ src/fn/sub_0823A060.c      |  4 ++--
+ src/fn/sub_0823A3CC.c      |  4 ++--
+ src/fn/sub_0823A518.c      |  6 +++---
+ src/fn/sub_0823AAF8.c      | 10 +++++-----
+ src/fn/sub_0823ABC0.c      |  6 +++---
+ src/fn/sub_0823AC94.c      |  4 ++--
+ src/fn/sub_0823B6A4.c      |  6 +++---
+ src/fn/sub_0823B7A4.c      |  6 +++---
+ src/fn/sub_0823C760.c      |  5 ++---
+ src/fn/sub_0824261C.c      |  6 +++---
+ src/fn/sub_082429AC.c      |  6 +++---
+ src/fn/sub_08242EA4.c      |  6 +++---
+ src/fn/sub_08243428.c      |  6 +++---
+ src/fn/sub_0824372C.c      |  4 ++--
+ src/fn/sub_082438F4.c      |  6 +++---
+ src/fn/sub_08243A50.c      |  6 +++---
+ symbols/ram.csv            |  2 +-
+ 141 files changed, 320 insertions(+), 349 deletions(-)
+
+diff --git a/include/area_effect_link.h b/include/area_effect_link.h
+index 3e504bd07..0991ed5dd 100644
+--- a/include/area_effect_link.h
++++ b/include/area_effect_link.h
+@@ -74,6 +74,6 @@ struct AreaEffectLinkState {
+     u8 unknown260[0x80];
+     u32 positionScript; /* 0x2E0 */
+ };
+-extern struct AreaEffectLinkState *gUnk_020004B4;
++extern struct AreaEffectLinkState *gLinkSession;
+ extern struct AreaEffectPlayer *gPlayers[4];
+ #endif
+diff --git a/include/orbit_background.h b/include/orbit_background.h
+index 05b2e4de2..adfd284b3 100644
+--- a/include/orbit_background.h
++++ b/include/orbit_background.h
+@@ -35,7 +35,7 @@ struct OrbitBackgroundSelection {
+     u8 status[1];
+ };
+ extern struct OrbitBackground *gOrbitBackground;
+-extern struct OrbitBackgroundSelection *gUnk_020004B4;
++extern struct OrbitBackgroundSelection *gLinkSession;
+ extern struct OrbitBackgroundPlayer *gPlayers[4];
+ extern struct ContactPosition gUnk_030042A0;
+ extern s16 gUnk_03005418[];
+diff --git a/src/fn/sub_0804194C.c b/src/fn/sub_0804194C.c
+index 8b65973e7..3acec0503 100644
+--- a/src/fn/sub_0804194C.c
++++ b/src/fn/sub_0804194C.c
+@@ -1,6 +1,6 @@
+ #include "modifier_list.h"
+ #include "ram.h"
+-extern struct ModifierMenuActor *gUnk_020004B4;
++#include "area_effect_link.h"
+ void ActorSprite_InitPartDrawings(u8 *, u8 *, u32);
+ void ModifierMenu_RefreshPreviewModel(struct ModifierMenu *);
+ void CharacterPreview_PositionParts(u8 *, u8 *, struct ModifierPreviewOrigin *, u32);
+@@ -21,7 +21,7 @@ void ModifierMenu_InitializePreview(struct ModifierMenu *menu)
+     flags = (gEngineFlags | gScenePauseFlags) & mask;
+     if (flags) {
+         s32 id;
+-        struct ModifierMenuActor *actor = gUnk_020004B4;
++        struct ModifierMenuActor *actor = gLinkSession;
+         if (!actor) {
+             id = -1;
+         } else {
+diff --git a/src/fn/sub_08041F3C.c b/src/fn/sub_08041F3C.c
+index e0e066992..f630e8825 100644
+--- a/src/fn/sub_08041F3C.c
++++ b/src/fn/sub_08041F3C.c
+@@ -1,6 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "modifier_list.h"
+-extern struct ModifierMenuActor *gUnk_020004B4;
++#include "area_effect_link.h"
+ extern void (*const gUnk_086058EC[])(struct ModifierMenu *);
+ void ModifierMenu_CloseScript(struct ModifierMenu *);
+ void ModifierMenu_ClearDisplay(struct ModifierMenu *);
+@@ -17,7 +17,7 @@ void ModifierMenu_UpdateCapacityFlash(struct ModifierMenu *);
+ void ModifierMenu_DrawClockAndValue(void);
+ static inline u32 actorInactive(void)
+ {
+-    struct ModifierMenuActor *actor = gUnk_020004B4;
++    struct ModifierMenuActor *actor = gLinkSession;
+     register u32 value asm("r0");
+     if (!actor || actor->active)
+         goto available;
+diff --git a/src/fn/sub_0804EBD8.c b/src/fn/sub_0804EBD8.c
+index e6526bcbc..a0fef9216 100644
+--- a/src/fn/sub_0804EBD8.c
++++ b/src/fn/sub_0804EBD8.c
+@@ -5,10 +5,10 @@ s32 AreaEffect_ScaleLinkResourceGain(s32 gain)
+ {
+     u32 value;
+     register u32 product asm("r2");
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         value = 0;
+     else
+-        value = gUnk_020004B4->value;
++        value = gLinkSession->value;
+     product = value;
+     product *= gain;
+     return Div(product, 140);
+diff --git a/src/fn/sub_0804EC00.c b/src/fn/sub_0804EC00.c
+index 5f98491ca..1ec28e0e2 100644
+--- a/src/fn/sub_0804EC00.c
++++ b/src/fn/sub_0804EC00.c
+@@ -1,10 +1,10 @@
+ #include "global.h"
+ #include "game_state.h"
++#include "area_effect_link.h"
+ struct S {
+     u8 f[0x868];
+     u32 fl;
+ };
+-extern u8 *gUnk_020004B4;
+ s32 AreaEffect_FindContainingEntry(u8 *);
+ s32 AreaEffect_ScaleLinkResourceGain(s32);
+ static inline u32 mk(u32 *a, u32 m)
+@@ -25,7 +25,7 @@ static inline u16 g62(u8 *p)
+ }
+ s32 AreaEffect_ScaleLinkGainAtPosition(u8 *a, s32 gain)
+ {
+-    if (g62(gUnk_020004B4) == 0)
++    if (g62(gLinkSession) == 0)
+         goto no;
+     {
+         u32 m = 2;
+diff --git a/src/fn/sub_0804EC60.c b/src/fn/sub_0804EC60.c
+index 6d3e153eb..81b6e5c93 100644
+--- a/src/fn/sub_0804EC60.c
++++ b/src/fn/sub_0804EC60.c
+@@ -1,11 +1,11 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "area_effect.h"
++#include "area_effect_link.h"
+ struct S {
+     u8 f[0x868];
+     u32 fl;
+ };
+-extern u8 *gUnk_020004B4;
+ s32 AreaEffect_FindContainingEntry(u8 *);
+ static inline u32 mk(u32 *a, u32 m)
+ {
+@@ -29,7 +29,7 @@ static inline u8 gb(u8 *p, s32 i)
+ s32 AreaEffect_IsLinkPlayerCovered(u8 *a)
+ {
+     s32 i = *(s32 *)(a + 0x18);
+-    if (gb(gUnk_020004B4, i) == 0)
++    if (gb(gLinkSession, i) == 0)
+         goto no;
+     {
+         u32 m = 2;
+diff --git a/src/fn/sub_0804ECD0.c b/src/fn/sub_0804ECD0.c
+index 1d0fd2765..c9f8dd0f9 100644
+--- a/src/fn/sub_0804ECD0.c
++++ b/src/fn/sub_0804ECD0.c
+@@ -17,7 +17,7 @@ static inline u32 playerMode(struct AreaEffectPlayer *player)
+ static inline u32 linkValue(s32 index)
+ {
+     register s32 selected asm("r3") = index;
+-    struct AreaEffectLinkState *link = gUnk_020004B4;
++    struct AreaEffectLinkState *link = gLinkSession;
+     if (!link || selected < 0)
+         return 0;
+     return link->playerValues[selected];
+diff --git a/src/fn/sub_0804EDD0.c b/src/fn/sub_0804EDD0.c
+index 0c5e2a7e8..3e7c584d0 100644
+--- a/src/fn/sub_0804EDD0.c
++++ b/src/fn/sub_0804EDD0.c
+@@ -2,15 +2,15 @@
+ // MATCHING_CONCESSION: register-pinning
+ static inline s32 localPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ static inline u32 linkValue(s32 index)
+ {
+-    if (!gUnk_020004B4 || index < 0)
++    if (!gLinkSession || index < 0)
+         return 0;
+-    return gUnk_020004B4->playerValues[index];
++    return gLinkSession->playerValues[index];
+ }
+ void AreaEffect_UpdateLinkVisibility(struct AreaEffectManager *manager)
+ {
+diff --git a/src/fn/sub_08050910.c b/src/fn/sub_08050910.c
+index f4b45aef0..62c86609d 100644
+--- a/src/fn/sub_08050910.c
++++ b/src/fn/sub_08050910.c
+@@ -14,14 +14,14 @@ void OrbitBackground_UpdateVisibility(struct OrbitBackground *input)
+     if (gEngineFlags & 0x800) {
+         register s32 selected asm("r1");
+         u32 status;
+-        if (!gUnk_020004B4)
++        if (!gLinkSession)
+             selected = -1;
+         else
+-            selected = gUnk_020004B4->selected;
+-        if (!gUnk_020004B4 || selected < 0)
++            selected = gLinkSession->selected;
++        if (!gLinkSession || selected < 0)
+             status = 0;
+         else
+-            status = gUnk_020004B4->status[selected];
++            status = gLinkSession->status[selected];
+         asm("" : "+r"(status));
+         if (status)
+             background->enabled = 0;
+diff --git a/src/fn/sub_08051054.c b/src/fn/sub_08051054.c
+index f5835388f..c2844eb84 100644
+--- a/src/fn/sub_08051054.c
++++ b/src/fn/sub_08051054.c
+@@ -6,11 +6,11 @@ struct OrbitBackground *OrbitBackground_CreateFromScript(u32 id)
+     s32 player;
+     u32 enabled;
+     if (gEngineFlags & 0x800) {
+-        if (!gUnk_020004B4) {
++        if (!gLinkSession) {
+             k2 = 1;
+             player = -k2;
+         } else {
+-            player = gUnk_020004B4->selected;
++            player = gLinkSession->selected;
+         }
+     } else if (Script_SeekToKeyword('i')) {
+         player = Script_GetValue();
+diff --git a/src/fn/sub_0806EF04.c b/src/fn/sub_0806EF04.c
+index 2e99422b4..a8d435136 100644
+--- a/src/fn/sub_0806EF04.c
++++ b/src/fn/sub_0806EF04.c
+@@ -1,5 +1,5 @@
+ #include "global.h"
+-extern u32 gUnk_020004B4;
++#include "area_effect_link.h"
+ void SceneEffectSchedule_Reset(void);
+ void SceneScheduledEffect_ResetSingleton(void);
+ void Pool1B8_ResetInstance(void);
+@@ -81,7 +81,7 @@ void SceneLifecycle_ResetSubsystems(void)
+     FragmentSpritePool_ResetSingleton();
+     ParticleEffectPool_ResetSingleton();
+     LinkHandshake_ResetInstance();
+-    gUnk_020004B4 = 0;
++    gLinkSession = 0;
+     ActorMarkerPool_ResetSingleton();
+     RegistryE7BC_ResetManager();
+     AnimatedTile_ResetManager();
+diff --git a/src/fn/sub_08075588.c b/src/fn/sub_08075588.c
+index fc28054bc..f7c800ba6 100644
+--- a/src/fn/sub_08075588.c
++++ b/src/fn/sub_08075588.c
+@@ -16,7 +16,7 @@ void SparkParticle_Spawn(void *, s32, s32, s32, s32, s32);
+ void SceneActorRecord_RecordPair(u16, u32);
+ void SceneActorBehavior_UpdateColliders(void *);
+ void SceneActorReaction_SinkAndRemove(void);
+-extern u32 gUnk_020004B4;
++extern u32 gLinkSession;
+ extern u32 gPlayers[];
+ extern u16 gUnk_030039F0;
+ s32 Math_Atan2(s32, s32);
+@@ -150,10 +150,10 @@ s32 sub_08075588(struct SceneActorRegistryActor *actor)
+ 
+ after_timers:
+     if (gEngineFlags & 0x4800) {
+-        if (gUnk_020004B4 == 0) {
++        if (gLinkSession == 0) {
+             goto finish;
+         }
+-        r2 = *(s16 *)(gUnk_020004B4 + 0x18);
++        r2 = *(s16 *)(gLinkSession + 0x18);
+         if (r2 < 0) {
+             goto finish;
+         }
+diff --git a/src/fn/sub_08078EE8.c b/src/fn/sub_08078EE8.c
+index 0082604cb..9aab98d9a 100644
+--- a/src/fn/sub_08078EE8.c
++++ b/src/fn/sub_08078EE8.c
+@@ -4,7 +4,7 @@
+ 
+ extern u32 gEngineFlags;
+ extern u8 *gGameState;
+-extern u32 gUnk_020004B4;
++extern u32 gLinkSession;
+ extern u8 *gUnknown_02000580[];
+ extern u16 gUnk_030039F0;
+ extern u16 gRandomTable[];
+@@ -308,9 +308,9 @@ s32 sub_08078EE8(struct SceneActorRegistryActor *arg0_)
+ 
+     /* scene transition when a special mode is active */
+     if (gEngineFlags & 0x4800) {
+-        if (gUnk_020004B4 == 0)
++        if (gLinkSession == 0)
+             goto pal_done;
+-        res = *(s16 *)(gUnk_020004B4 + 0x18);
++        res = *(s16 *)(gLinkSession + 0x18);
+         if ((s32)res < 0)
+             goto pal_done;
+     } else {
+diff --git a/src/fn/sub_0807D2E0.c b/src/fn/sub_0807D2E0.c
+index 4838cf572..fd5ab8ade 100644
+--- a/src/fn/sub_0807D2E0.c
++++ b/src/fn/sub_0807D2E0.c
+@@ -28,9 +28,9 @@ static inline u8 F0807D2E0_Test(u32 value, u32 mask)
+ 
+ static inline s32 F0807D2E0_LocalPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ 
+ static inline u8 F0807D2E0_ShouldShow(struct SceneActorRegistryResetView *actor)
+diff --git a/src/fn/sub_08082648.c b/src/fn/sub_08082648.c
+index 0805e69fe..56c71a44c 100644
+--- a/src/fn/sub_08082648.c
++++ b/src/fn/sub_08082648.c
+@@ -62,9 +62,9 @@ static inline void Phase(struct SceneActorRegistryResetView *a, u32 state, u32 p
+ }
+ static inline s32 LocalPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
+ {
+diff --git a/src/fn/sub_080D812C.c b/src/fn/sub_080D812C.c
+index dbeec312c..539fc87ef 100644
+--- a/src/fn/sub_080D812C.c
++++ b/src/fn/sub_080D812C.c
+@@ -130,9 +130,9 @@ zero:
+ 
+ static inline s32 LocalPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
+ {
+diff --git a/src/fn/sub_080EA064.c b/src/fn/sub_080EA064.c
+index 307492de6..995ab8e82 100644
+--- a/src/fn/sub_080EA064.c
++++ b/src/fn/sub_080EA064.c
+@@ -18,7 +18,7 @@ void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
+ u32 Octopus_GetAnimationStatus(struct SceneActorRegistryResetView *);
+ void Octopus_UpdateActiveState(void);
+ extern u8 *gPlayers;
+-extern s16 *gUnk_020004B4;
++extern s16 *gLinkSession;
+ 
+ struct OctopusContext {
+     u8 unknown0[0x628];
+@@ -141,9 +141,9 @@ static inline u8 IsIdle(struct Player *player)
+ 
+ static inline s32 HudMode(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4[0xC];
++    return gLinkSession[0xC];
+ }
+ 
+ static inline u8 MayCount(struct SceneActorRegistryResetView *victim)
+diff --git a/src/fn/sub_080EAA48.c b/src/fn/sub_080EAA48.c
+index 0d8ac9895..f3e47628f 100644
+--- a/src/fn/sub_080EAA48.c
++++ b/src/fn/sub_080EAA48.c
+@@ -20,7 +20,7 @@ void SceneHud_SetTimedState(u32, s32, u32, u32, u32, u32);
+ void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
+ u32 Octopus_GetAnimationStatus(struct SceneActorRegistryResetView *);
+ void Octopus_UpdateActiveState(void);
+-extern s16 *gUnk_020004B4;
++extern s16 *gLinkSession;
+ 
+ struct OctopusContext {
+     u8 unknown0[0x628];
+diff --git a/src/fn/sub_080ED914.c b/src/fn/sub_080ED914.c
+index c76c01912..9cac29ebb 100644
+--- a/src/fn/sub_080ED914.c
++++ b/src/fn/sub_080ED914.c
+@@ -18,7 +18,7 @@ void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
+ u32 Ivy_GetAnimationStatus(struct SceneActorRegistryResetView *);
+ void Ivy_UpdateActiveState(void);
+ extern u8 *gPlayers;
+-extern s16 *gUnk_020004B4;
++extern s16 *gLinkSession;
+ 
+ struct IvyContext {
+     u8 unknown0[0x62C];
+@@ -141,9 +141,9 @@ static inline u8 IsIdle(struct Player *player)
+ 
+ static inline s32 HudMode(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4[0xC];
++    return gLinkSession[0xC];
+ }
+ 
+ static inline u8 MayCount(struct SceneActorRegistryResetView *victim)
+diff --git a/src/fn/sub_08109040.c b/src/fn/sub_08109040.c
+index 9a8ea77ce..d8b5ce466 100644
+--- a/src/fn/sub_08109040.c
++++ b/src/fn/sub_08109040.c
+@@ -1,5 +1,5 @@
+ #include "global.h"
+-#define gSelectionSlots gUnk_020004B4
++#include "area_effect_link.h"
+ struct SelectionSlots {
+     u8 pad0[0x53];
+     u8 busy;
+@@ -7,12 +7,11 @@ struct SelectionSlots {
+     u8 slotView[0x84];
+     s8 values[5];
+ };
+-extern struct SelectionSlots *gUnk_020004B4;
+ static inline void *SelectionSlots_GetView(void)
+ {
+-    if (!gUnk_020004B4 || gUnk_020004B4->busy)
++    if (!((struct SelectionSlots *)gLinkSession) || ((struct SelectionSlots *)gLinkSession)->busy)
+         return 0;
+-    return gUnk_020004B4->slotView;
++    return ((struct SelectionSlots *)gLinkSession)->slotView;
+ }
+ s32 SelectionSlots_ClearValue(void *unused, s32 value)
+ {
+@@ -24,7 +23,7 @@ s32 SelectionSlots_ClearValue(void *unused, s32 value)
+     do {
+         m = 0xFF;
+     } while (0);
+-    slot = gUnk_020004B4->values;
++    slot = ((struct SelectionSlots *)gLinkSession)->values;
+     i = 4;
+     do {
+         if (*slot == value) {
+diff --git a/src/fn/sub_08109090.c b/src/fn/sub_08109090.c
+index 2442cb9fd..dac9ba801 100644
+--- a/src/fn/sub_08109090.c
++++ b/src/fn/sub_08109090.c
+@@ -1,16 +1,15 @@
+ #include "global.h"
+ /* Provisional names and field interpretations; confidence low. */
+ #include "area_effect_link.h"
+-#define gLinkSession gUnk_020004B4
+ struct LinkSessionData {
+     u8 unknown0[0x84];
+     s8 playerKinds[5];
+ };
+ static inline struct LinkSessionData *LinkSession_GetData(void)
+ {
+-    if (!gUnk_020004B4 || gUnk_020004B4->unavailable)
++    if (!gLinkSession || gLinkSession->unavailable)
+         return 0;
+-    return (struct LinkSessionData *)gUnk_020004B4->sessionData;
++    return (struct LinkSessionData *)gLinkSession->sessionData;
+ }
+ s32 LinkSession_ClearFirstPlayerKind(void *unused, s32 value)
+ {
+diff --git a/src/fn/sub_081090E0.c b/src/fn/sub_081090E0.c
+index 2254e75dd..4d3017de8 100644
+--- a/src/fn/sub_081090E0.c
++++ b/src/fn/sub_081090E0.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ struct Sub {
+     u8 pad[0x84];
+     s8 slots[5];
+@@ -9,7 +10,6 @@ struct S {
+     u8 pad54[0xe0 - 0x54];
+     struct Sub sub;
+ };
+-extern struct S *gUnk_020004B4;
+ 
+ static inline s32 AddSlot(struct Sub *q, s32 v)
+ {
+@@ -26,7 +26,7 @@ static inline s32 AddSlot(struct Sub *q, s32 v)
+ }
+ s32 sub_081090E0(s32 v)
+ {
+-    struct S *s = gUnk_020004B4;
++    struct S *s = gLinkSession;
+     if (!s || s->busy)
+         return -1;
+     return AddSlot(&s->sub, v);
+diff --git a/src/fn/sub_08109134.c b/src/fn/sub_08109134.c
+index a6513fe76..f152c10d4 100644
+--- a/src/fn/sub_08109134.c
++++ b/src/fn/sub_08109134.c
+@@ -1,9 +1,8 @@
+-#define gLinkSessionState gUnk_020004B4
+ #include "global.h"
+ #include "area_effect_link.h"
+ s32 LinkSession_CountPlayerKind(s32 kind)
+ {
+-    struct AreaEffectLinkState *p = gUnk_020004B4;
++    struct AreaEffectLinkState *p = gLinkSession;
+     s32 count, i;
+     if (!p || p->unavailable || !p->sessionData)
+         return -1;
+diff --git a/src/fn/sub_081091AC.c b/src/fn/sub_081091AC.c
+index c4d48abcd..6be69ebd7 100644
+--- a/src/fn/sub_081091AC.c
++++ b/src/fn/sub_081091AC.c
+@@ -1,17 +1,17 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ struct S {
+     u8 pad[0x18];
+     s16 x18;
+ };
+-extern struct S *gUnk_020004B4;
+ void Script_ReadReference(void *);
+ void Script_WriteReferenceValue(void *, u32, s32);
+ 
+ static inline s32 GetValue(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!((struct S *)gLinkSession))
+         return -1;
+-    return gUnk_020004B4->x18;
++    return ((struct S *)gLinkSession)->x18;
+ }
+ s32 sub_081091AC(void)
+ {
+diff --git a/src/fn/sub_081091E4.c b/src/fn/sub_081091E4.c
+index 95ecce29c..291f0f3e5 100644
+--- a/src/fn/sub_081091E4.c
++++ b/src/fn/sub_081091E4.c
+@@ -1,9 +1,8 @@
+-#define gLinkSessionState gUnk_020004B4
+ #include "global.h"
+ #include "area_effect_link.h"
+ s32 LinkSession_IncrementCounter(s32 index)
+ {
+-    struct AreaEffectLinkState *p = gUnk_020004B4;
++    struct AreaEffectLinkState *p = gLinkSession;
+     if (!p || p->unavailable || !p->sessionData)
+         return -1;
+     p->counters[index]++;
+diff --git a/src/fn/sub_08109224.c b/src/fn/sub_08109224.c
+index 1a75a8970..7cf78cff7 100644
+--- a/src/fn/sub_08109224.c
++++ b/src/fn/sub_08109224.c
+@@ -1,9 +1,8 @@
+-#define gLinkSessionState gUnk_020004B4
+ #include "global.h"
+ #include "area_effect_link.h"
+ s32 LinkSession_IncrementAlternateCounter(s32 index)
+ {
+-    struct AreaEffectLinkState *p = gUnk_020004B4;
++    struct AreaEffectLinkState *p = gLinkSession;
+     if (!p || p->unavailable || !p->sessionData)
+         return -1;
+     p->alternateCounters[index]++;
+diff --git a/src/fn/sub_081092F0.c b/src/fn/sub_081092F0.c
+index 6c8bb3e5c..5f4ae8029 100644
+--- a/src/fn/sub_081092F0.c
++++ b/src/fn/sub_081092F0.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ 
+ struct P {
+     u8 f[0x1c];
+@@ -6,7 +7,6 @@ struct P {
+     u8 g[7];
+     u8 b;
+ };
+-extern struct P *gUnk_020004B4;
+ void Sound_FadeOutChannel10(s32);
+ 
+ static inline u8 chk(struct P *p)
+@@ -18,8 +18,8 @@ static inline u8 chk(struct P *p)
+ 
+ void Registry1745_SetSelectionResponse(u32 v)
+ {
+-    if (gUnk_020004B4 != 0) {
+-        struct P *p = gUnk_020004B4;
++    if (gLinkSession != 0) {
++        struct P *p = gLinkSession;
+         if (!chk(p)) {
+             p->b = v;
+             Sound_FadeOutChannel10(1);
+diff --git a/src/fn/sub_08109324.c b/src/fn/sub_08109324.c
+index e07f60bad..49a2676d8 100644
+--- a/src/fn/sub_08109324.c
++++ b/src/fn/sub_08109324.c
+@@ -1,8 +1,8 @@
+ #include "global.h"
+-extern u8 *gUnk_020004B4;
++#include "area_effect_link.h"
+ 
+ void sub_08109324(void)
+ {
+-    if (gUnk_020004B4 != 0)
+-        gUnk_020004B4[0x25] = 1;
++    if (((u8 *)gLinkSession) != 0)
++        ((u8 *)gLinkSession)[0x25] = 1;
+ }
+diff --git a/src/fn/sub_08109340.c b/src/fn/sub_08109340.c
+index 05602fa78..ea3921d24 100644
+--- a/src/fn/sub_08109340.c
++++ b/src/fn/sub_08109340.c
+@@ -1,10 +1,9 @@
+ #include "global.h"
+-
+-extern u32 gUnk_020004B4;
++#include "area_effect_link.h"
+ 
+ void Registry1745_SetCancelRequest(u32 v)
+ {
+-    if (gUnk_020004B4 != 0) {
+-        *(u8 *)(gUnk_020004B4 + 0x21) = v;
++    if ((*(u32 *)&gLinkSession) != 0) {
++        *(u8 *)((*(u32 *)&gLinkSession) + 0x21) = v;
+     }
+ }
+diff --git a/src/fn/sub_08109358.c b/src/fn/sub_08109358.c
+index 6ce9437b6..bca84c1fb 100644
+--- a/src/fn/sub_08109358.c
++++ b/src/fn/sub_08109358.c
+@@ -1,10 +1,9 @@
+ #include "global.h"
+-
+-extern u8 *gUnk_020004B4;
++#include "area_effect_link.h"
+ 
+ void Registry1745_RequestHandshakeStart(void)
+ {
+-    if (gUnk_020004B4) {
+-        gUnk_020004B4[0x29] = 1;
++    if (((u8 *)gLinkSession)) {
++        ((u8 *)gLinkSession)[0x29] = 1;
+     }
+ }
+diff --git a/src/fn/sub_08109374.c b/src/fn/sub_08109374.c
+index 00c77e4eb..656eb5e1f 100644
+--- a/src/fn/sub_08109374.c
++++ b/src/fn/sub_08109374.c
+@@ -1,10 +1,9 @@
+ #include "global.h"
+-
+-extern u8 *gUnk_020004B4;
++#include "area_effect_link.h"
+ 
+ void Registry1745_RequestHandshakeContinue(void)
+ {
+-    if (gUnk_020004B4) {
+-        gUnk_020004B4[0x2A] = 1;
++    if (((u8 *)gLinkSession)) {
++        ((u8 *)gLinkSession)[0x2A] = 1;
+     }
+ }
+diff --git a/src/fn/sub_08109390.c b/src/fn/sub_08109390.c
+index f5f7af08a..90744c212 100644
+--- a/src/fn/sub_08109390.c
++++ b/src/fn/sub_08109390.c
+@@ -1,10 +1,9 @@
+ #include "global.h"
+-
+-extern u8 *gUnk_020004B4;
++#include "area_effect_link.h"
+ 
+ void Registry1745_RequestHandshakeFinish(void)
+ {
+-    if (gUnk_020004B4) {
+-        gUnk_020004B4[0x2B] = 1;
++    if (((u8 *)gLinkSession)) {
++        ((u8 *)gLinkSession)[0x2B] = 1;
+     }
+ }
+diff --git a/src/fn/sub_081093AC.c b/src/fn/sub_081093AC.c
+index 70bbc5857..3ed18ea53 100644
+--- a/src/fn/sub_081093AC.c
++++ b/src/fn/sub_081093AC.c
+@@ -1,10 +1,9 @@
+ #include "global.h"
+-
+-extern u32 gUnk_020004B4;
++#include "area_effect_link.h"
+ 
+ void Registry1745_SetMenuRequest(u32 v)
+ {
+-    if (gUnk_020004B4 != 0) {
+-        *(u8 *)(gUnk_020004B4 + 0x23) = v;
++    if ((*(u32 *)&gLinkSession) != 0) {
++        *(u8 *)((*(u32 *)&gLinkSession) + 0x23) = v;
+     }
+ }
+diff --git a/src/fn/sub_081093C4.c b/src/fn/sub_081093C4.c
+index 225f76a9d..ffc1d5815 100644
+--- a/src/fn/sub_081093C4.c
++++ b/src/fn/sub_081093C4.c
+@@ -1,10 +1,9 @@
+ #include "global.h"
+-
+-extern u8 *gUnk_020004B4;
++#include "area_effect_link.h"
+ 
+ void Registry1745_NotifyMenuClosed(void)
+ {
+-    u8 *p = gUnk_020004B4;
++    u8 *p = gLinkSession;
+     if (p != 0)
+         p[0x1e] = 1;
+ }
+diff --git a/src/fn/sub_081093DC.c b/src/fn/sub_081093DC.c
+index 56b0cda14..26597431d 100644
+--- a/src/fn/sub_081093DC.c
++++ b/src/fn/sub_081093DC.c
+@@ -1,9 +1,9 @@
+ #include "global.h"
+-extern u8 *gUnk_020004B4;
++#include "area_effect_link.h"
+ 
+ bool32 sub_081093DC(void)
+ {
+-    if (gUnk_020004B4 == 0 || gUnk_020004B4[0x1e] == 0)
++    if (((u8 *)gLinkSession) == 0 || ((u8 *)gLinkSession)[0x1e] == 0)
+         return FALSE;
+     return TRUE;
+ }
+diff --git a/src/fn/sub_081093FC.c b/src/fn/sub_081093FC.c
+index d2d6f7610..db4aeb6bf 100644
+--- a/src/fn/sub_081093FC.c
++++ b/src/fn/sub_081093FC.c
+@@ -20,7 +20,7 @@ void LinkSession_CallPositionScript(struct AreaEffectPosition *position, s32 val
+ {
+     s32 values[6];
+     struct LinkScriptArgs args;
+-    struct AreaEffectLinkState *p = gUnk_020004B4;
++    struct AreaEffectLinkState *p = gLinkSession;
+     if (LinkSession_GetData(p)) {
+         values[0] = position->x;
+         values[1] = position->y;
+diff --git a/src/fn/sub_08109464.c b/src/fn/sub_08109464.c
+index e29fe83a8..5c6969008 100644
+--- a/src/fn/sub_08109464.c
++++ b/src/fn/sub_08109464.c
+@@ -1,11 +1,10 @@
+ #include "global.h"
+-
+-extern u8 *gUnk_020004B4;
++#include "area_effect_link.h"
+ 
+ s32 Registry1745_GetSessionState(void)
+ {
+-    if (gUnk_020004B4 != NULL) {
+-        return gUnk_020004B4[0x1C];
++    if (((u8 *)gLinkSession) != NULL) {
++        return ((u8 *)gLinkSession)[0x1C];
+     }
+     return 0;
+ }
+diff --git a/src/fn/sub_08109C24.c b/src/fn/sub_08109C24.c
+index d7a2dbe02..0b1579f89 100644
+--- a/src/fn/sub_08109C24.c
++++ b/src/fn/sub_08109C24.c
+@@ -1,6 +1,7 @@
+ #define gSunClock gUnk_03005430
+ #include "global.h"
+ #include "sun_clock.h"
++#include "area_effect_link.h"
+ struct ClockPanelSnapshot {
+     u8 unk0[0x20];
+     u16 time;
+@@ -20,12 +21,11 @@ struct ClockState {
+     u8 unk0[0x18];
+     s16 mode;
+ };
+-extern struct ClockState *gUnk_020004B4;
+ u8 SunClock_GetPhase(void);
+ void ClockPanel_CaptureTime(struct ClockPanel *p)
+ {
+     struct ClockPanelSnapshot *snapshot = &p->snapshot;
+-    struct ClockState **state = &gUnk_020004B4;
++    struct ClockState **state = &gLinkSession;
+     s32 i;
+     for (i = 0; i < 2; i++) {
+         p->values[i] = 0;
+diff --git a/src/fn/sub_08109F1C.c b/src/fn/sub_08109F1C.c
+index 786c75433..575c215ce 100644
+--- a/src/fn/sub_08109F1C.c
++++ b/src/fn/sub_08109F1C.c
+@@ -30,7 +30,7 @@ struct LinkReadyState {
+     u8 pad72[2];
+     u8 missed[2];
+ };
+-extern u8 *gUnk_020004B4;
++extern u8 *gLinkSession;
+ extern u16 gUnk_03005260[];
+ s32 Serial_ReadLatestPacket(u16 *);
+ u8 Registry1745_ConsumeStateEntry(void *);
+@@ -84,8 +84,8 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
+         p->timer = 0;
+         p->requested = 0;
+         p->countdown = 40;
+-        if (gUnk_020004B4)
+-            gUnk_020004B4[0x2c] = 0;
++        if (gLinkSession)
++            gLinkSession[0x2c] = 0;
+         base = p->ready;
+         q = &p->ready[1];
+         do {
+@@ -94,8 +94,8 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
+     }
+     if (!Registry1745_HasParticipantCount(p, 2)) {
+         p->requested = 0;
+-        if (gUnk_020004B4)
+-            gUnk_020004B4[0x2c] = 0;
++        if (gLinkSession)
++            gLinkSession[0x2c] = 0;
+         for (i = 0; i <= 1; i++) {
+             p->presence[i] = 0;
+             p->ready[i] = 0;
+@@ -188,8 +188,8 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
+                 }
+                 allReady = 0;
+                 p->ready[i] = 0;
+-                if (gUnk_020004B4)
+-                    gUnk_020004B4[0x2c] = 0;
++                if (gLinkSession)
++                    gLinkSession[0x2c] = 0;
+             }
+         }
+ 
+@@ -201,8 +201,8 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
+             }
+ 
+         if (Mode_1(*p->selection, mask)) {
+-            if (gUnk_020004B4)
+-                gUnk_020004B4[0x2c] = 1;
++            if (gLinkSession)
++                gLinkSession[0x2c] = 1;
+             if (p->countdown) {
+                 p->countdown--;
+                 if (((p->count != 2) || (p->count != readyCount)) || other)
+@@ -225,8 +225,8 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
+                         p->mode = k1;
+                     }
+                     p->requested = 0;
+-                    if (gUnk_020004B4)
+-                        gUnk_020004B4[0x2c] = 1;
++                    if (gLinkSession)
++                        gLinkSession[0x2c] = 1;
+                 }
+                 p->presence[0] = 3;
+             } else {
+diff --git a/src/fn/sub_0810A3E0.c b/src/fn/sub_0810A3E0.c
+index d0f075acb..2865f03b1 100644
+--- a/src/fn/sub_0810A3E0.c
++++ b/src/fn/sub_0810A3E0.c
+@@ -1,7 +1,6 @@
+ #include "global.h"
+ #define SessionMenu_SetState          Registry1745_SetState
+ #define SessionMenu_ResetWithCallback Registry1745_BeginShutdown
+-#define gSessionMenu                  gUnk_020004B4
+ #include "area_effect_link.h"
+ s32 Registry1745_CheckSessionReady(void *);
+ void Registry1745_BeginShutdown(void *, void (*)(void));
+@@ -17,7 +16,7 @@ s32 SessionMenu_WaitForSelection(struct AreaEffectLinkState *p)
+         return -1;
+     }
+     if (p->menuElapsed > 120) {
+-        if (gUnk_020004B4 && gUnk_020004B4->localPlayer == 0) {
++        if (gLinkSession && gLinkSession->localPlayer == 0) {
+             Registry1745_SetState(p, 7, LinkMenu_UpdateSelection);
+             RegistryF246_Close();
+         } else {
+diff --git a/src/fn/sub_0810A448.c b/src/fn/sub_0810A448.c
+index d6c2de9f5..268aa6206 100644
+--- a/src/fn/sub_0810A448.c
++++ b/src/fn/sub_0810A448.c
+@@ -2,7 +2,6 @@
+ #define LinkMenu_SetState          Registry1745_SetState
+ #define LinkMenu_CheckSession      Registry1745_CheckSessionReady
+ #define LinkMenu_ResetSelection    Registry1745_BeginShutdown
+-#define gLinkMenuState             gUnk_020004B4
+ #include "global.h"
+ #include "area_effect_link.h"
+ u8 Registry1745_ConsumeStateEntry(void *);
+@@ -42,9 +41,9 @@ s32 LinkMenu_UpdateSelection(struct AreaEffectLinkState *p)
+         Registry1745_SetState(p, 9, LinkMenu_ExchangeChoices);
+     else if (IsMode4(p->selection)) {
+         Registry1745_SetState(p, 4, LinkMenu_WaitForReadyPeers);
+-        if (gUnk_020004B4 && gUnk_020004B4->localPlayer == 0)
++        if (gLinkSession && gLinkSession->localPlayer == 0)
+             Sound_FadeOutChannel10(1);
+-    } else if (gUnk_020004B4 && gUnk_020004B4->localPlayer == 0) {
++    } else if (gLinkSession && gLinkSession->localPlayer == 0) {
+         u32 value = p->menuEvent;
+         u8 *event = &p->menuEvent;
+         if (value) {
+diff --git a/src/fn/sub_0810A5C0.c b/src/fn/sub_0810A5C0.c
+index 3564f3412..00f82961e 100644
+--- a/src/fn/sub_0810A5C0.c
++++ b/src/fn/sub_0810A5C0.c
+@@ -3,7 +3,6 @@
+ #define LinkMenu_CheckSession          Registry1745_CheckSessionReady
+ #define LinkMenu_ResetSelection        Registry1745_BeginShutdown
+ #define LinkMenu_ClearExchangeCounters Registry1745_ClearParticipantCounters
+-#define gLinkMenuState                 gUnk_020004B4
+ #include "global.h"
+ #include "area_effect_link.h"
+ #include "engine.h"
+@@ -24,14 +23,14 @@ s32 LinkMenu_ExchangeChoices(struct AreaEffectLinkState *p)
+     u8 *incoming;
+     if (Registry1745_ConsumeStateEntry(p)) {
+         Registry1745_ClearParticipantCounters(p);
+-        if (gUnk_020004B4 && gUnk_020004B4->localPlayer == 0)
++        if (gLinkSession && gLinkSession->localPlayer == 0)
+             p->exchangeText = Crc_ComputeCcitt16(&p->exchangeValue, 0, 2);
+     }
+     if (Registry1745_CheckSessionReady(p) < 0) {
+         Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+         return -1;
+     }
+-    if (gUnk_020004B4 && gUnk_020004B4->localPlayer == 0)
++    if (gLinkSession && gLinkSession->localPlayer == 0)
+         ByteSequence_AdvanceEncodedValue(p, session + 0x12c, 4);
+     incoming = session + 0x130;
+     if (LinkSession_ReceiveSelectionByte(p, incoming, 0, 4) == 1) {
+diff --git a/src/fn/sub_0810A698.c b/src/fn/sub_0810A698.c
+index 9fca31a8d..77a612fbb 100644
+--- a/src/fn/sub_0810A698.c
++++ b/src/fn/sub_0810A698.c
+@@ -2,7 +2,6 @@
+ #define LinkMenu_SetState          Registry1745_SetState
+ #define LinkMenu_CheckSession      Registry1745_CheckSessionReady
+ #define LinkMenu_ResetSelection    Registry1745_BeginShutdown
+-#define gLinkMenuState             gUnk_020004B4
+ #include "global.h"
+ #include "area_effect_link.h"
+ u8 Registry1745_ConsumeStateEntry(void *);
+diff --git a/src/fn/sub_0810A7E8.c b/src/fn/sub_0810A7E8.c
+index a240b3ef0..75f860759 100644
+--- a/src/fn/sub_0810A7E8.c
++++ b/src/fn/sub_0810A7E8.c
+@@ -2,7 +2,6 @@
+ #define LinkMenu_SetState          Registry1745_SetState
+ #define LinkMenu_CheckSession      Registry1745_CheckSessionReady
+ #define LinkMenu_ResetSelection    Registry1745_BeginShutdown
+-#define gLinkMenuState             gUnk_020004B4
+ #include "global.h"
+ #include "area_effect_link.h"
+ #include "render.h"
+diff --git a/src/fn/sub_0810A8D8.c b/src/fn/sub_0810A8D8.c
+index 6d78d03ed..4c11f92c4 100644
+--- a/src/fn/sub_0810A8D8.c
++++ b/src/fn/sub_0810A8D8.c
+@@ -3,7 +3,6 @@
+ #define LinkMenu_CheckSession          Registry1745_CheckSessionReady
+ #define LinkMenu_ResetSelection        Registry1745_BeginShutdown
+ #define LinkMenu_ClearExchangeCounters Registry1745_ClearParticipantCounters
+-#define gLinkMenuState                 gUnk_020004B4
+ #include "global.h"
+ #include "area_effect_link.h"
+ u8 Registry1745_ConsumeStateEntry(void *);
+diff --git a/src/fn/sub_0810AC7C.c b/src/fn/sub_0810AC7C.c
+index c8281e121..b1c1b1fb6 100644
+--- a/src/fn/sub_0810AC7C.c
++++ b/src/fn/sub_0810AC7C.c
+@@ -6,7 +6,7 @@ void Registry1745_ToggleConnectionRole(struct AreaEffectLinkState *);
+ void LinkSession_UpdatePlayerValueAverage(struct AreaEffectLinkState *);
+ static inline u8 ReceiveBit(void)
+ {
+-    struct AreaEffectLinkState *p = gUnk_020004B4;
++    struct AreaEffectLinkState *p = gLinkSession;
+     if (!p)
+         return 0;
+     return (p->receiveBits >> p->receiveBit) & 1;
+@@ -29,7 +29,7 @@ void LinkSelection_AdvanceBitExchange(struct AreaEffectLinkState *p, u32 flags,
+             } while (i < p->participantCount);
+         }
+     }
+-    if (gUnk_020004B4 && gUnk_020004B4->localPlayer == 0 && p->receiveBit == 5)
++    if (gLinkSession && gLinkSession->localPlayer == 0 && p->receiveBit == 5)
+         *value |= 8;
+     *value |= ReceiveBit() << 2;
+     p->receiveBit++;
+diff --git a/src/fn/sub_0810AD50.c b/src/fn/sub_0810AD50.c
+index 489218033..68b29b8b4 100644
+--- a/src/fn/sub_0810AD50.c
++++ b/src/fn/sub_0810AD50.c
+@@ -57,9 +57,9 @@ static inline u16 PackKeys(u32 value, u32 mode)
+ }
+ static inline s32 SessionState(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->unknown1C;
++    return gLinkSession->unknown1C;
+ }
+ s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
+ {
+diff --git a/src/fn/sub_0810B324.c b/src/fn/sub_0810B324.c
+index 7cd1d3618..a2d37bef4 100644
+--- a/src/fn/sub_0810B324.c
++++ b/src/fn/sub_0810B324.c
+@@ -1,6 +1,6 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ #define SceneMenu_SetState Registry1745_SetState
+-#define gSceneMenuPeer     gUnk_020004B4
+ struct SceneMenu {
+     u8 pad0[0x30];
+     u32 timer;
+@@ -11,7 +11,6 @@ struct SceneMenu {
+     u32 field260;
+     u32 field264;
+ };
+-extern u8 *gUnk_020004B4;
+ u8 Registry1745_ConsumeStateEntry(struct SceneMenu *);
+ s32 Registry1745_CheckSessionReady(struct SceneMenu *);
+ void Registry1745_BeginShutdown(struct SceneMenu *, void (*)(void));
+@@ -27,8 +26,8 @@ s32 SceneMenu_BeginTimedMessage(struct SceneMenu *p)
+     if (Registry1745_ConsumeStateEntry(p)) {
+         p->field260 = 0;
+         p->field264 = 0;
+-        if (gUnk_020004B4)
+-            gUnk_020004B4[0x52] = 1;
++        if (((u8 *)gLinkSession))
++            ((u8 *)gLinkSession)[0x52] = 1;
+         p->window = TextWindow_Create(1, 6, 28, 6);
+         TextWindow_SetScript(p->window, p->script);
+         TextWindow_Refresh(p->window, 8);
+diff --git a/src/fn/sub_0810B3BC.c b/src/fn/sub_0810B3BC.c
+index 59ca2241e..9ea3af880 100644
+--- a/src/fn/sub_0810B3BC.c
++++ b/src/fn/sub_0810B3BC.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ struct SceneMenuRecord {
+     u8 data[0x3E];
+     u16 checksum;
+@@ -16,7 +17,6 @@ struct SceneMenuPeer {
+     u8 pad0[0x18];
+     s16 state;
+ };
+-extern struct SceneMenuPeer *gUnk_020004B4;
+ u8 Registry1745_ConsumeStateEntry(struct SceneMenu *);
+ void Registry1745_ClearParticipantCounters(struct SceneMenu *);
+ void ClockPanel_CaptureTime(struct SceneMenu *);
+@@ -55,7 +55,8 @@ s32 SceneMenu_UpdateRecords(struct SceneMenu *object)
+         return -1;
+     }
+     if (HasRecordInput(p)) {
+-        if (gUnk_020004B4 && (gUnk_020004B4->state == 0)) {
++        if ((*(struct SceneMenuPeer **)&gLinkSession) &&
++            ((*(struct SceneMenuPeer **)&gLinkSession)->state == 0)) {
+             Registry1745_SetState(p, 7, LinkMenu_UpdateSelection);
+         } else {
+             Registry1745_SetState(p, 8, LinkMenu_WaitSelectionMode);
+@@ -76,7 +77,8 @@ s32 SceneMenu_UpdateRecords(struct SceneMenu *object)
+             i++;
+         } while (i < p->count);
+     }
+-    if (((completed == p->count) && gUnk_020004B4) && (gUnk_020004B4->state == 0)) {
++    if (((completed == p->count) && (*(struct SceneMenuPeer **)&gLinkSession)) &&
++        ((*(struct SceneMenuPeer **)&gLinkSession)->state == 0)) {
+         p->flags = 0x1800;
+     }
+ }
+diff --git a/src/fn/sub_0810B724.c b/src/fn/sub_0810B724.c
+index 1d039c2a9..1970adb55 100644
+--- a/src/fn/sub_0810B724.c
++++ b/src/fn/sub_0810B724.c
+@@ -2,6 +2,7 @@
+ #include "engine.h"
+ #include "render.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ 
+ struct Reg1745Run {
+     u8 pad0[0x1c];
+@@ -23,7 +24,6 @@ struct Reg1745Hdr {
+ };
+ 
+ extern u32 gUnk_03005408, gUnk_030053FC;
+-extern struct Reg1745Hdr *gUnk_020004B4;
+ s32 Serial_ReceivePacket(u32);
+ s32 SerialLink_QueueSendWord(u32);
+ void SerialLink_StartTransferIfIdle(void);
+@@ -55,7 +55,8 @@ u32 Registry1745_RunSession(struct Reg1745Run *p)
+         gRegistry1745Mode = 3;
+         st = p->state;
+         if (st > 4) {
+-            if (gUnk_020004B4 && gUnk_020004B4->field18 == 0 && st != 0x19 && st != 0x1b)
++            if ((*(struct Reg1745Hdr **)&gLinkSession) &&
++                (*(struct Reg1745Hdr **)&gLinkSession)->field18 == 0 && st != 0x19 && st != 0x1b)
+                 SerialLink_StartTransferIfIdle();
+         } else if (p->field1D == 0 && st != 0x19 && st != 0x1b)
+             SerialLink_StartTransferIfIdle();
+diff --git a/src/fn/sub_0810B8A8.c b/src/fn/sub_0810B8A8.c
+index 9744508b1..c97984692 100644
+--- a/src/fn/sub_0810B8A8.c
++++ b/src/fn/sub_0810B8A8.c
+@@ -1,5 +1,4 @@
+ #include "global.h"
+-#define gSessionMenu gUnk_020004B4
+ #include "area_effect_link.h"
+ #include "engine.h"
+ #include "ram.h"
+@@ -20,6 +19,6 @@ s32 SessionMenu_Destroy(struct AreaEffectLinkState *p)
+     if (p->menuTextWindow >= 0 && TextWindow_Clear(p->menuTextWindow) == 0)
+         p->menuTextWindow = -1;
+     gUnk_0300546C = 0;
+-    gUnk_020004B4 = 0;
++    gLinkSession = 0;
+     return 0;
+ }
+diff --git a/src/fn/sub_0810B914.c b/src/fn/sub_0810B914.c
+index 34d4612c7..f1828075b 100644
+--- a/src/fn/sub_0810B914.c
++++ b/src/fn/sub_0810B914.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
++#include "area_effect_link.h"
+ struct Registry1745Settings {
+     u8 pad0[0x15C];
+     u32 field15C;
+@@ -45,7 +46,6 @@ struct Registry1745 {
+     u8 padDC[4];
+     struct Registry1745Settings settings;
+ };
+-extern struct Registry1745 *gUnk_020004B4;
+ extern u32 gUnk_0300546C;
+ void Task_LinkToPriorityList(void *);
+ void sub_08223180(void);
+@@ -57,12 +57,12 @@ void Hud_SetMode(s32);
+ void SessionMenu_Destroy(void *);
+ void ScriptPanel_ConfirmSelection(void);
+ void Registry1745_RunSession(void);
+-/* Registry routine 1745: creates the singleton at gUnk_020004B4 (0x268
++/* Registry routine 1745: creates the singleton at gLinkSession (0x268
+    bytes) from the script options; returns the existing one if there is one,
+    or 0 when a required option is missing. */
+ struct Registry1745 *Registry1745_Create(void)
+ {
+-    struct Registry1745 *existing = gUnk_020004B4;
++    struct Registry1745 *existing = gLinkSession;
+     void *m;
+     struct Registry1745 *p;
+     struct Registry1745Settings *settings;
+@@ -79,7 +79,7 @@ struct Registry1745 *Registry1745_Create(void)
+     Memory_Clear(m, 0x268);
+     p = m;
+     settings = &p->settings;
+-    gUnk_020004B4 = p;
++    gLinkSession = p;
+     Task_SetCallbacks(p, 0, SessionMenu_Destroy);
+     {
+         s32 one = 1;
+diff --git a/src/fn/sub_0810BB0C.c b/src/fn/sub_0810BB0C.c
+index 7fed522a0..cf87212c2 100644
+--- a/src/fn/sub_0810BB0C.c
++++ b/src/fn/sub_0810BB0C.c
+@@ -3,16 +3,16 @@
+ s32 Callback_InvokeActor(void *, void (*)(void));
+ void SessionMenu_InvokeCallback(void)
+ {
+-    struct AreaEffectLinkState *p = gUnk_020004B4;
++    struct AreaEffectLinkState *p = gLinkSession;
+     DEBUG_NOP();
+     if (p) {
+-        struct AreaEffectLinkState *q = gUnk_020004B4;
++        struct AreaEffectLinkState *q = gLinkSession;
+         switch (q->unavailable) {
+             case 0:
+                 Callback_InvokeActor(q, q->menuCallback);
+                 break;
+             case 1:
+-                Callback_InvokeActor(gUnk_020004B4, gUnk_020004B4->menuCallback);
++                Callback_InvokeActor(gLinkSession, gLinkSession->menuCallback);
+                 break;
+         }
+     }
+diff --git a/src/fn/sub_0810BDB4.c b/src/fn/sub_0810BDB4.c
+index ebbe68af5..ebbe71985 100644
+--- a/src/fn/sub_0810BDB4.c
++++ b/src/fn/sub_0810BDB4.c
+@@ -1,12 +1,12 @@
+ #include "global.h"
+ #include "engine.h"
++#include "area_effect_link.h"
+ struct TimerObject {
+     u8 pad0[0x53];
+     u8 state;
+     u8 pad54[0x1F8];
+     s32 times[3];
+ };
+-extern struct TimerObject *gUnk_020004B4;
+ /* Script: for the object at 0x020004B4 in state 1 (+0x53), stores -t (clamped
+    to 60000) in slot -p (0-2) of the words at +0x24C (tentative). */
+ void RegistryC5BD_SetTimeFromScript(void)
+@@ -22,7 +22,7 @@ void RegistryC5BD_SetTimeFromScript(void)
+         return;
+     if (t > 60000)
+         t = 60000;
+-    p = gUnk_020004B4;
++    p = gLinkSession;
+     if (p && p->state == 1)
+         p->times[slot] = t;
+ }
+diff --git a/src/fn/sub_0810BE58.c b/src/fn/sub_0810BE58.c
+index 2a0b1d191..9736629e1 100644
+--- a/src/fn/sub_0810BE58.c
++++ b/src/fn/sub_0810BE58.c
+@@ -1,10 +1,10 @@
+ #include "global.h"
+-extern u8 *gUnk_020004B4;
++#include "area_effect_link.h"
+ void Script_ReadReference(void *);
+ void Script_WriteReferenceValue(void *, s32, s32);
+ static inline u8 *getBlock(void)
+ {
+-    u8 *p = gUnk_020004B4;
++    u8 *p = gLinkSession;
+     if (p) {
+         u8 state = p[0x53];
+         p += 0xE0;
+diff --git a/src/fn/sub_0810C184.c b/src/fn/sub_0810C184.c
+index fe150cf9d..e64e363de 100644
+--- a/src/fn/sub_0810C184.c
++++ b/src/fn/sub_0810C184.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ 
+ struct LPElem {
+     u32 flags;
+@@ -14,11 +15,10 @@ struct LPPeer {
+     u8 pad0[0x1c];
+     u8 mode;
+ };
+-extern struct LPPeer *gUnk_020004B4;
+ 
+ void LinkPanel_SelectActiveAnimation(struct LPanel *p, s32 i)
+ {
+-    struct LPPeer *peer = gUnk_020004B4;
++    struct LPPeer *peer = gLinkSession;
+     s32 mode = -1;
+     if (peer)
+         mode = peer->mode;
+diff --git a/src/fn/sub_0810C238.c b/src/fn/sub_0810C238.c
+index 103837ac6..4f42b5f4a 100644
+--- a/src/fn/sub_0810C238.c
++++ b/src/fn/sub_0810C238.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ struct LinkPanelPeer {
+     u8 pad0[0x53];
+     u8 active;
+@@ -19,7 +20,6 @@ struct LinkPanel {
+     u8 pad31C[0x624];
+     struct LinkPanelEntry entries[2];
+ };
+-extern struct LinkPanelPeer *gUnk_020004B4;
+ void LinkPanel_SelectActiveAnimation(struct LinkPanel *, s32);
+ void RegistryF246_ShowSlotReadyFrame(struct LinkPanel *, s32);
+ void RegistryF246_ShowSlotDefaultFrame(struct LinkPanel *, s32);
+@@ -39,7 +39,7 @@ void LinkPanel_UpdateAnimations(struct LinkPanel *p)
+     s32 i;
+     struct LinkPanelPeer *peer;
+     for (i = 0; i <= 1; i++) {
+-        peer = gUnk_020004B4;
++        peer = gLinkSession;
+         if (peer && peer->active == 1 && valid(i) && (u8 *)peer + (0x120 + i * 0x40)) {
+             if (p->entries[i].timer > 30) {
+                 if (p->entries[i].state > 1)
+diff --git a/src/fn/sub_0810C398.c b/src/fn/sub_0810C398.c
+index 961784f33..fbe3fd664 100644
+--- a/src/fn/sub_0810C398.c
++++ b/src/fn/sub_0810C398.c
+@@ -1,24 +1,23 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ #define Link_GetState Registry1745_GetSessionState
+-#define gLinkSession  gUnk_020004B4
+ struct LinkPanel {
+     u8 pad0[0xF50];
+     s32 peerIndex;
+ };
+-extern u8 *gUnk_020004B4;
+ s32 Registry1745_GetSessionState(void);
+ static inline u8 connected(void)
+ {
+-    if (gUnk_020004B4 && gUnk_020004B4[0x1D])
++    if ((*(u8 **)&gLinkSession) && (*(u8 **)&gLinkSession)[0x1D])
+         return 1;
+     return 0;
+ }
+ static inline s32 peerStatus(s32 i)
+ {
+-    if (!gUnk_020004B4)
++    if (!(*(u8 **)&gLinkSession))
+         return 0;
+     {
+-        u8 *statuses = gUnk_020004B4 + 0x64;
++        u8 *statuses = (*(u8 **)&gLinkSession) + 0x64;
+         return *(statuses + i);
+     }
+ }
+diff --git a/src/fn/sub_0810C420.c b/src/fn/sub_0810C420.c
+index 0d6079fc0..f25ca8475 100644
+--- a/src/fn/sub_0810C420.c
++++ b/src/fn/sub_0810C420.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ struct LinkPanel {
+     u8 pad0[0xf44];
+     u32 script;
+@@ -11,7 +12,6 @@ struct LinkPanel {
+     u8 delay;
+     u8 connection;
+ };
+-extern u8 *gUnk_020004B4;
+ s32 LinkPanel_GetConnectionStatus(struct LinkPanel *);
+ s32 Registry1745_GetSessionState(void);
+ void ScrollingDialogue_ClearScript(void);
+@@ -21,16 +21,16 @@ void ScrollingDialogue_SetScript(const u8 *);
+ void ScrollingDialogue_SetNumberArgument(s32, s32);
+ static inline u8 connected(void)
+ {
+-    if (gUnk_020004B4 && gUnk_020004B4[0x1d])
++    if ((*(u8 **)&gLinkSession) && (*(u8 **)&gLinkSession)[0x1d])
+         return 1;
+     return 0;
+ }
+ static inline s32 peerStatus(s32 i)
+ {
+-    if (!gUnk_020004B4)
++    if (!(*(u8 **)&gLinkSession))
+         return 0;
+     {
+-        u8 *statuses = gUnk_020004B4 + 0x64;
++        u8 *statuses = (*(u8 **)&gLinkSession) + 0x64;
+         return statuses[i];
+     }
+ }
+diff --git a/src/fn/sub_0810C7F4.c b/src/fn/sub_0810C7F4.c
+index d465d8a10..f10eafd0a 100644
+--- a/src/fn/sub_0810C7F4.c
++++ b/src/fn/sub_0810C7F4.c
+@@ -26,7 +26,7 @@ struct LinkPanel {
+     u8 padF6D;
+     u16 timer;
+ };
+-extern u8 *gUnk_020004B4;
++extern u8 *gLinkSession;
+ extern u16 gUnk_03005260[];
+ void Bg_SetLayerMap(u32, void *, u32);
+ void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
+@@ -45,23 +45,23 @@ void Sound_PlaySong(u32);
+ 
+ static inline s32 peerStatus(s32 i)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return 0;
+     {
+-        u8 *statuses = gUnk_020004B4 + 0x64;
++        u8 *statuses = gLinkSession + 0x64;
+         return statuses[i];
+     }
+ }
+ static inline u8 unavailable(void)
+ {
+-    if (gUnk_020004B4 && gUnk_020004B4[0x2c] == 1)
++    if (gLinkSession && gLinkSession[0x2c] == 1)
+         return 1;
+     return 0;
+ }
+ 
+ static inline s32 GetPeer(void)
+ {
+-    u8 *st = gUnk_020004B4;
++    u8 *st = gLinkSession;
+     s32 r = -1;
+     if (st)
+         r = *(u16 *)(st + 0x1a);
+diff --git a/src/fn/sub_0810CCC8.c b/src/fn/sub_0810CCC8.c
+index 5cdde89a8..68a20db8c 100644
+--- a/src/fn/sub_0810CCC8.c
++++ b/src/fn/sub_0810CCC8.c
+@@ -1,5 +1,5 @@
+ #include "global.h"
+-#define gLinkSession gUnk_020004B4
++#include "area_effect_link.h"
+ struct LinkPanel {
+     u8 pad0[0x13FD];
+     u8 selection;
+@@ -15,13 +15,13 @@ struct LinkSession {
+     u8 pad54[0xCC];
+     struct LinkTimeRecord peers[2];
+ };
+-extern struct LinkSession *gUnk_020004B4;
+ void LinkPanel_DrawTime(struct LinkTimeRecord *, u8 *, u32, s32);
+ static inline struct LinkTimeRecord *getPeer(s32 i)
+ {
+-    if (!gUnk_020004B4 || gUnk_020004B4->active != 1)
++    if (!(*(struct LinkSession **)&gLinkSession) ||
++        (*(struct LinkSession **)&gLinkSession)->active != 1)
+         return NULL;
+-    return &gUnk_020004B4->peers[i];
++    return &(*(struct LinkSession **)&gLinkSession)->peers[i];
+ }
+ static inline s32 clampIndex(s32 index, s32 low, s32 high)
+ {
+diff --git a/src/fn/sub_0810CDD8.c b/src/fn/sub_0810CDD8.c
+index 02cfae567..7718061a0 100644
+--- a/src/fn/sub_0810CDD8.c
++++ b/src/fn/sub_0810CDD8.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ struct PanelSelection {
+     u8 pad0[0x53];
+     volatile u8 type;
+@@ -17,21 +18,20 @@ struct LinkPanel {
+     s32 window0;
+     s32 window1;
+ };
+-extern struct PanelSelection *gUnk_020004B4;
+ s32 TextWindow_SetScript(s32, const u8 *);
+ s32 TextWindow_Refresh(s32, s32);
+ void TextWindow_SetString(s32, s32, void *);
+ void TextWindow_StartPlayback(s32);
+ void LinkPanel_StartDescriptions(struct LinkPanel *p)
+ {
+-    struct PanelSelection *sel = gUnk_020004B4;
++    struct PanelSelection *sel = gLinkSession;
+     if (sel != 0 && sel->type == 1 && (void *)((u8 *)sel + 0x120) != 0) {
+         s32 *w = &p->window0;
+         TextWindow_SetScript(*w, p->script);
+         TextWindow_Refresh(*w, 0);
+         TextWindow_SetString(*w, 1, (u8 *)sel + 0x130);
+         TextWindow_StartPlayback(*w);
+-        sel = gUnk_020004B4;
++        sel = gLinkSession;
+         if (sel != 0 && sel->type == 1 && (void *)((u8 *)sel + 0x160) != 0) {
+             w = &p->window1;
+             TextWindow_SetScript(*w, p->script);
+diff --git a/src/fn/sub_0810CFF0.c b/src/fn/sub_0810CFF0.c
+index c95674655..1b191fdc6 100644
+--- a/src/fn/sub_0810CFF0.c
++++ b/src/fn/sub_0810CFF0.c
+@@ -43,7 +43,7 @@ void sub_0810CFF0(struct LinkPreviewPanel *panel)
+     s32 i;
+     struct LinkMenuPosition pos;
+     for (i = 0; i <= 1; i++) {
+-        struct AreaEffectLinkState *link = gUnk_020004B4;
++        struct AreaEffectLinkState *link = gLinkSession;
+         u8 *payload;
+         struct LinkPreview *preview;
+         u8 *model;
+diff --git a/src/fn/sub_0810D3A0.c b/src/fn/sub_0810D3A0.c
+index 56aa8daf2..e86fa162a 100644
+--- a/src/fn/sub_0810D3A0.c
++++ b/src/fn/sub_0810D3A0.c
+@@ -1,6 +1,7 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ #define SpriteGroup_Initialize PanelSequence_InitializeSprites
+ struct PanelSequence {
+     u8 pad0[0x1C];
+@@ -23,7 +24,6 @@ struct PanelSelection {
+     u8 pad54[0x1BC];
+     u8 count;
+ };
+-extern struct PanelSelection *gUnk_020004B4;
+ s32 Script_SeekToKeyword(u32);
+ u32 Script_GetTextSourcePc(void);
+ s32 Script_GetPc(void);
+@@ -41,7 +41,7 @@ void PanelSequence_UpdateDelay(struct PanelSequence *);
+ void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
+ static inline u8 *GetSelectionCount(void)
+ {
+-    struct PanelSelection *p = gUnk_020004B4;
++    struct PanelSelection *p = gLinkSession;
+     if (p && (p->type == 1))
+         goto ret1;
+     return 0;
+diff --git a/src/fn/sub_0810D9B0.c b/src/fn/sub_0810D9B0.c
+index c8649555d..09a73120a 100644
+--- a/src/fn/sub_0810D9B0.c
++++ b/src/fn/sub_0810D9B0.c
+@@ -2,6 +2,7 @@
+ #include "game_state.h"
+ #include "engine.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ #define TextWindow_Show TextWindow_StartPlayback
+ struct RecordPanel {
+     u8 pad0[0xCF4];
+@@ -19,14 +20,13 @@ struct PanelSelection {
+     u8 pad54[0xCC];
+     struct PanelNameRecord record;
+ };
+-extern struct PanelSelection *gUnk_020004B4;
+ s32 TextWindow_SetScript(s32, const u8 *);
+ s32 TextWindow_Refresh(s32, s32);
+ void TextWindow_SetString(s32, s32, void *);
+ void TextWindow_StartPlayback(s32);
+ static inline struct PanelNameRecord *GetNameRecord(void)
+ {
+-    struct PanelSelection *p = gUnk_020004B4;
++    struct PanelSelection *p = gLinkSession;
+     if (!p)
+         return 0;
+     if (p->type != 1)
+diff --git a/src/fn/sub_0810DD24.c b/src/fn/sub_0810DD24.c
+index e5a192820..ec31f7433 100644
+--- a/src/fn/sub_0810DD24.c
++++ b/src/fn/sub_0810DD24.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "engine.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ // MATCHING_CONCESSION: register-pinning
+ struct PreviewPosition {
+     u32 x : 16, y : 16, z : 16, pad : 16;
+@@ -11,7 +12,6 @@ struct PreviewSource {
+     u8 unk54[0x14c];
+     u8 values[5];
+ };
+-extern struct PreviewSource *gUnk_020004B4;
+ void CharacterModel_InitPalettes(u8 *, s32);
+ void ActorSprite_InitPartDrawings(void *, void *, u32);
+ void CharacterPreview_PositionParts(void *, void *, void *, s32);
+@@ -27,7 +27,7 @@ void SelectionPanel_InitPreview(u8 *p)
+     u32 flags = (gEngineFlags | gScenePauseFlags) & mask;
+     if (flags) {
+         register u32 offset asm("r4");
+-        struct PreviewSource *source = gUnk_020004B4;
++        struct PreviewSource *source = gLinkSession;
+         u8 *values;
+         u8 value;
+         u8 zero;
+diff --git a/src/fn/sub_0810E218.c b/src/fn/sub_0810E218.c
+index 2692ff719..6aeee6275 100644
+--- a/src/fn/sub_0810E218.c
++++ b/src/fn/sub_0810E218.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
++#include "area_effect_link.h"
+ 
+ // foundry draft (worker best 96.2%); what differs is mostly register allocation and instruction order
+ struct SelectionPanel {
+@@ -12,13 +13,12 @@ struct SelectionContext {
+     u8 unknown54[0x1B8];
+     u8 selection;
+ };
+-extern struct SelectionContext *gUnk_020004B4;
+ s32 Mod(s32, s32);
+ s32 SelectionPanel_GetSelection(struct SelectionPanel *);
+ void SelectionPanel_CommitSelection(struct SelectionPanel *p)
+ {
+     unsigned int two;
+-    struct SelectionContext *context = gUnk_020004B4;
++    struct SelectionContext *context = gLinkSession;
+     if (context && context->mode == 1) {
+         if (&context->selection) {
+             u32 off = 0xD24;
+diff --git a/src/fn/sub_0810E9D4.c b/src/fn/sub_0810E9D4.c
+index 1b8f4a34f..2594f8a7f 100644
+--- a/src/fn/sub_0810E9D4.c
++++ b/src/fn/sub_0810E9D4.c
+@@ -64,7 +64,7 @@ struct RecScore {
+     s16 losses;
+     s16 draws;
+ };
+-extern struct RecActor *gUnk_020004B4;
++extern struct RecActor *gLinkSession;
+ extern struct RecScore *gGameState;
+ void Anim_SelectWidgetGlyph(void *, void *, u16);
+ void Sound_PlayTrackedSong(u32);
+@@ -80,7 +80,7 @@ static inline s32 Clamp999(s32 x)
+ #define CLAMP_SCORE(field, off) *(s16 *)((u8 *)gGameState + off) = Clamp999(gGameState->field);
+ static inline s32 ActorSide(void)
+ {
+-    struct RecActor *a = gUnk_020004B4;
++    struct RecActor *a = gLinkSession;
+     if (a == 0)
+         return -1;
+     return a->side;
+@@ -91,7 +91,7 @@ void RecordMenu_DrawRecords(struct RecordMenu *menu)
+     u16 *cell;
+     s32 i;
+     {
+-        struct RecActor *a = gUnk_020004B4;
++        struct RecActor *a = gLinkSession;
+         u8 f;
+         if (a != 0) {
+             f = a->flag;
+@@ -118,13 +118,13 @@ void RecordMenu_DrawRecords(struct RecordMenu *menu)
+         menu->sprites[4].x = 0;
+         menu->sprites[5].x = 0x90;
+     } else if (rec->ticksA < rec->ticksB) {
+-        if (gUnk_020004B4 != 0 && gUnk_020004B4->side == 0)
++        if (gLinkSession != 0 && gLinkSession->side == 0)
+             gGameState->wins++;
+         else
+             gGameState->losses++;
+         menu->sprites[4].x = 0;
+         menu->sprites[5].x = 0x90;
+-        if (gUnk_020004B4 != 0 && gUnk_020004B4->side == 0)
++        if (gLinkSession != 0 && gLinkSession->side == 0)
+             Sound_PlayTrackedSong(0xa9);
+     } else {
+         s32 side = ActorSide();
+diff --git a/src/fn/sub_0810ECEC.c b/src/fn/sub_0810ECEC.c
+index 84158214b..46d963f2d 100644
+--- a/src/fn/sub_0810ECEC.c
++++ b/src/fn/sub_0810ECEC.c
+@@ -1,14 +1,14 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ struct S {
+     u8 filler[0x84];
+     s16 a;
+     s16 b;
+ };
+-extern struct S *gUnk_020004B4;
+ void PanelText_DrawDigits(s32, s32, s32, s32, s32);
+ void Registry33FF_DrawActorValues(void)
+ {
+-    struct S *s = gUnk_020004B4;
++    struct S *s = gLinkSession;
+     if (s == 0) {
+         PanelText_DrawDigits(0, 0x64, 0, 0x12, (s32)s);
+         PanelText_DrawDigits(0, 0x64, 0x12, 0x12, (s32)s);
+diff --git a/src/fn/sub_0810EDC0.c b/src/fn/sub_0810EDC0.c
+index f41f4f9ff..e8e66b158 100644
+--- a/src/fn/sub_0810EDC0.c
++++ b/src/fn/sub_0810EDC0.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ struct H {
+     u8 filler[0x14E4];
+     u32 a;
+@@ -15,20 +16,19 @@ struct G2 {
+     u8 e[0x10];
+     u8 g[1];
+ };
+-extern struct G2 *gUnk_020004B4;
+ void TextWindow_SetScript(u32, u32);
+ void TextWindow_Refresh(u32, u32);
+ void TextWindow_SetString(u32, u32, void *);
+ void TextWindow_StartPlayback(u32);
+ void LinkLobbyPanel_RefreshPlayerNames(struct H *h)
+ {
+-    struct G2 *g = gUnk_020004B4;
++    struct G2 *g = gLinkSession;
+     if (g != 0 && g->b == 1 && g->a != 0) {
+         TextWindow_SetScript(h->c, h->a);
+         TextWindow_Refresh(h->c, 0);
+         TextWindow_SetString(h->c, 1, g->c);
+         TextWindow_StartPlayback(h->c);
+-        g = gUnk_020004B4;
++        g = gLinkSession;
+         if (g != 0 && g->b == 1 && g->e != 0) {
+             TextWindow_SetScript(h->d, h->a);
+             TextWindow_Refresh(h->d, 1);
+diff --git a/src/fn/sub_0810F0A0.c b/src/fn/sub_0810F0A0.c
+index eb895dd1b..941522d0f 100644
+--- a/src/fn/sub_0810F0A0.c
++++ b/src/fn/sub_0810F0A0.c
+@@ -36,7 +36,7 @@ void RecordMenu_LoadPlayerSprites(struct RecMenu *menu)
+ {
+     s32 i, next;
+     for (i = 0; i <= 1; i = next) {
+-        struct AreaEffectLinkState *link = gUnk_020004B4;
++        struct AreaEffectLinkState *link = gLinkSession;
+         u8 *payload;
+         struct RecSlot *slot;
+         struct RecSlotOrigin origin;
+diff --git a/src/fn/sub_0810F678.c b/src/fn/sub_0810F678.c
+index ab83501cc..9986c938d 100644
+--- a/src/fn/sub_0810F678.c
++++ b/src/fn/sub_0810F678.c
+@@ -20,7 +20,7 @@ void RecordMenu_UpdateRecords(struct RecordMenu *);
+ void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
+ static inline u8 *GetChoices(void)
+ {
+-    struct AreaEffectLinkState *state = gUnk_020004B4;
++    struct AreaEffectLinkState *state = gLinkSession;
+     u32 result;
+     if (!state)
+         return 0;
+diff --git a/src/fn/sub_0810F990.c b/src/fn/sub_0810F990.c
+index fc77b5ee6..921db0bf1 100644
+--- a/src/fn/sub_0810F990.c
++++ b/src/fn/sub_0810F990.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ struct G {
+     u8 f[0x53];
+     u8 b;
+@@ -11,7 +12,6 @@ struct S {
+     u32 pad;
+     u32 h;
+ };
+-extern struct G *gUnk_020004B4;
+ void TextWindow_SetScript(u32, u32);
+ void TextWindow_Refresh(u32, u32);
+ void TextWindow_SetString(u32, u32, void *);
+@@ -30,7 +30,7 @@ o:
+ void LinkScorePanel_RefreshPlayerName(struct S *s)
+ {
+     s32 i = s->i;
+-    struct G *g = gUnk_020004B4;
++    struct G *g = gLinkSession;
+     if (g != 0 && g->b == 1 && ok(i)) {
+         u8 *q = (u8 *)g + ((i << 6) + 0x120);
+         if (q != 0) {
+diff --git a/src/fn/sub_0810FC90.c b/src/fn/sub_0810FC90.c
+index f3d49a5f5..2aec064e8 100644
+--- a/src/fn/sub_0810FC90.c
++++ b/src/fn/sub_0810FC90.c
+@@ -1,4 +1,3 @@
+-#define gLinkSession               gUnk_020004B4
+ #define MenuSprite_LoadPalettePair CharacterModel_InitPalettes
+ #include "global.h"
+ #include "area_effect_link.h"
+@@ -19,9 +18,9 @@ void CharacterModel_SetComponentRenderMode(void *, s32);
+ void CharacterModel_InitPalettes(void *, s32);
+ static inline s32 localPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ static inline u8 validSelection(s32 i)
+ {
+@@ -37,7 +36,7 @@ yes:
+ void LinkMenu_LoadSelectionSprite(struct LinkMenu *menu)
+ {
+     s32 i = menu->selected;
+-    struct AreaEffectLinkState *link = gUnk_020004B4;
++    struct AreaEffectLinkState *link = gLinkSession;
+     if (link && link->unavailable == 1 && validSelection(i)) {
+         u8 *payload = link->incomingPayload + i * 0x24;
+         if (payload) {
+diff --git a/src/fn/sub_081100A0.c b/src/fn/sub_081100A0.c
+index caf0800be..fc7e29054 100644
+--- a/src/fn/sub_081100A0.c
++++ b/src/fn/sub_081100A0.c
+@@ -31,14 +31,14 @@ static inline s32 ClampScore(struct LinkScorePanel *panel)
+ }
+ void LinkScorePanel_UpdateDisplayedScore(struct LinkScorePanel *panel)
+ {
+-    struct AreaEffectLinkState *link = gUnk_020004B4;
++    struct AreaEffectLinkState *link = gLinkSession;
+     struct AreaEffectLinkState *link2;
+     s32 i, v;
+     u8 ok;
+ 
+     if (link == NULL || link->unavailable != 1)
+         goto zero;
+-    link2 = gUnk_020004B4;
++    link2 = gLinkSession;
+     i = link2->localPlayer;
+     if (i >= 0)
+         goto hi;
+diff --git a/src/fn/sub_08110188.c b/src/fn/sub_08110188.c
+index 9770541ec..ca80241e9 100644
+--- a/src/fn/sub_08110188.c
++++ b/src/fn/sub_08110188.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ struct S {
+     u32 f0[7];
+     u32 g;
+@@ -20,7 +21,6 @@ struct G {
+     u8 f[0x1c];
+     u8 b;
+ };
+-extern struct G *gUnk_020004B4;
+ void LinkScorePanel_HideSprites(struct S *);
+ void Bg_ClearTilemap(s32);
+ void Bg_SetLayerMap(s32, u32, s32);
+@@ -57,7 +57,7 @@ void LinkScorePanel_OnWaitSessionReady(struct S *s)
+         Registry1745_RequestHandshakeStart();
+         s->c24 = 0;
+     }
+-    g = gUnk_020004B4;
++    g = gLinkSession;
+     v = -1;
+     if (g != 0)
+         v = g->b;
+diff --git a/src/fn/sub_081102EC.c b/src/fn/sub_081102EC.c
+index fc7a625d3..c77a5a1ba 100644
+--- a/src/fn/sub_081102EC.c
++++ b/src/fn/sub_081102EC.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ struct G {
+     u8 f[0x1c];
+     u8 b;
+@@ -11,7 +12,6 @@ struct S {
+     u8 q[0x23];
+     u8 c;
+ };
+-extern struct G *gUnk_020004B4;
+ void SaveMenu_UpdateSlotCommit(void);
+ static inline void set(struct S *s, void *fp, u8 st)
+ {
+@@ -21,7 +21,7 @@ static inline void set(struct S *s, void *fp, u8 st)
+ }
+ void SaveMenu_WaitForSaveTransition(struct S *s)
+ {
+-    struct G *g = gUnk_020004B4;
++    struct G *g = gLinkSession;
+     s32 v = -1;
+     if (g != 0)
+         v = g->b;
+diff --git a/src/fn/sub_08110894.c b/src/fn/sub_08110894.c
+index 776d15b18..3ee48d974 100644
+--- a/src/fn/sub_08110894.c
++++ b/src/fn/sub_08110894.c
+@@ -22,7 +22,7 @@ void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
+ 
+ static inline s32 GetLocalPlayer(void)
+ {
+-    struct AreaEffectLinkState *state = gUnk_020004B4;
++    struct AreaEffectLinkState *state = gLinkSession;
+     if (!state)
+         return -1;
+     return state->localPlayer;
+diff --git a/src/fn/sub_081169A8.c b/src/fn/sub_081169A8.c
+index e169ce3d2..67b8e52df 100644
+--- a/src/fn/sub_081169A8.c
++++ b/src/fn/sub_081169A8.c
+@@ -66,7 +66,7 @@ void Glove_InitializeStyleModifiers(struct Glove *p)
+     u32 mask = 0x800;
+     if ((gEngineFlags | gScenePauseFlags) & mask) {
+         s32 player = p->participant;
+-        register struct AreaEffectLinkState *link asm("r1") = gUnk_020004B4;
++        register struct AreaEffectLinkState *link asm("r1") = gLinkSession;
+         struct LinkStylePayload *payload;
+         s32 i;
+         if (!link || link->unavailable != 1 || !ValidParticipant(player))
+diff --git a/src/fn/sub_08116C74.c b/src/fn/sub_08116C74.c
+index a576a21cd..216bcd75e 100644
+--- a/src/fn/sub_08116C74.c
++++ b/src/fn/sub_08116C74.c
+@@ -2,14 +2,13 @@
+ #include "area_effect_link.h"
+ #include "engine.h"
+ #include "ram.h"
+-#define gLinkSelection gUnk_020004B4
+ struct LinkParticipant {
+     u8 unknown0[0x8F8];
+     s8 playerIndex;
+ };
+ static inline s32 LinkSelection_GetLocalPlayer(void)
+ {
+-    struct AreaEffectLinkState *selection = gUnk_020004B4;
++    struct AreaEffectLinkState *selection = gLinkSession;
+     if (!selection)
+         return -1;
+     return selection->localPlayer;
+diff --git a/src/fn/sub_08116E44.c b/src/fn/sub_08116E44.c
+index b708657d7..9baf82bcd 100644
+--- a/src/fn/sub_08116E44.c
++++ b/src/fn/sub_08116E44.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ 
+ struct Position {
+     s32 x, y, z;
+@@ -73,7 +74,6 @@ struct ScriptArgs {
+     u32 : 16;
+     s32 *values;
+ };
+-extern struct LinkMenu *gUnk_020004B4;
+ extern u32 gEngineFlags;
+ void Registry1745_SetMenuRequest(u32);
+ s32 GameState_GetResultIndex(void);
+@@ -103,7 +103,7 @@ static inline void StoreValue(s32 *out, s32 value)
+ }
+ static inline u32 *LinkResult(void)
+ {
+-    struct LinkMenu *p = gUnk_020004B4;
++    struct LinkMenu *p = ((struct LinkMenu *)gLinkSession);
+     u32 *result;
+     if (p) {
+         u32 type = p->type;
+@@ -116,9 +116,9 @@ static inline u32 *LinkResult(void)
+ }
+ static inline s32 LinkParticipant(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!((struct LinkMenu *)gLinkSession))
+         return -1;
+-    return gUnk_020004B4->participant;
++    return ((struct LinkMenu *)gLinkSession)->participant;
+ }
+ static inline void AddFlags(u32 mask, u16 *flags)
+ {
+diff --git a/src/fn/sub_081172C4.c b/src/fn/sub_081172C4.c
+index 6e8103c18..0181e2c3c 100644
+--- a/src/fn/sub_081172C4.c
++++ b/src/fn/sub_081172C4.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ 
+ #ifdef NONMATCHING
+ // fuzzy: 77.8%
+@@ -82,7 +83,6 @@ void Actor_ClampMovementSpeed(struct Obj *);
+ void Glove_SetAnimationKeyframes(struct Glove *, s32);
+ void ActorRecoil_UpdateMotion(struct Glove *);
+ extern u32 gEngineFlags;
+-extern u8 *gUnk_020004B4;
+ 
+ void StageIconDisplay_Create(s32, s32, void *, void *);
+ void Glove_BeginStopping(void);
+diff --git a/src/fn/sub_081175F8.c b/src/fn/sub_081175F8.c
+index 9024ba3df..3ec55ec61 100644
+--- a/src/fn/sub_081175F8.c
++++ b/src/fn/sub_081175F8.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ 
+ #ifdef NONMATCHING
+ // fuzzy: 67.0%
+@@ -83,7 +84,6 @@ void Actor_ClampMovementSpeed(struct Obj *);
+ void Glove_SetAnimationKeyframes(struct Glove *, s32);
+ void ActorRecoil_UpdateMotion(struct Glove *);
+ extern u32 gEngineFlags;
+-extern u8 *gUnk_020004B4;
+ 
+ void StageIconDisplay_Create(s32, s32, void *, void *);
+ void Glove_BeginStopping(void);
+diff --git a/src/fn/sub_08117948.c b/src/fn/sub_08117948.c
+index 83a624e36..8a078f64e 100644
+--- a/src/fn/sub_08117948.c
++++ b/src/fn/sub_08117948.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ // MATCHING_CONCESSION: register-pinning
+ 
+ #ifdef NONMATCHING
+@@ -104,7 +105,6 @@ s32 CharacterModel_GetPrimaryPaletteIndex(void *);
+ s32 sub_08249240(void *, s32, u32);
+ void ChargeMarker_TickHold(void *, void *, u32);
+ extern u32 gEngineFlags;
+-extern u8 *gUnk_020004B4;
+ void Glove_UpdateStopping(struct Glove *);
+ 
+ // Action-pointer lifetimes, constant reuse and register allocation still differ.
+diff --git a/src/fn/sub_08117F6C.c b/src/fn/sub_08117F6C.c
+index 06b61d781..d21e422af 100644
+--- a/src/fn/sub_08117F6C.c
++++ b/src/fn/sub_08117F6C.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ // MATCHING_CONCESSION: register-pinning
+ 
+ struct Obj {
+@@ -101,7 +102,6 @@ s32 CharacterModel_GetPrimaryPaletteIndex(void *);
+ s32 sub_08249240(void *, s32, u32);
+ void ChargeMarker_TickHold(void *, void *, u32);
+ extern u32 gEngineFlags;
+-extern u8 *gUnk_020004B4;
+ void Glove_UpdateStopping(struct Glove *);
+ 
+ void GameState_AddActionCount894(s32);
+diff --git a/src/fn/sub_081182E4.c b/src/fn/sub_081182E4.c
+index 47b2824c2..e9edecb02 100644
+--- a/src/fn/sub_081182E4.c
++++ b/src/fn/sub_081182E4.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ 
+ // confidence=low: clears actions and markers, emits defeat bursts, then selects recovery.
+ 
+@@ -85,7 +86,6 @@ void Actor_ClampMovementSpeed(struct Obj *);
+ void Glove_SetAnimationKeyframes(struct Glove *, s32);
+ void ActorRecoil_UpdateMotion(struct Glove *);
+ extern u32 gEngineFlags;
+-extern u8 *gUnk_020004B4;
+ 
+ void ActorParticles_UpdateEmitter(void *, void *, u32);
+ void GameState_AddActionCount894(s32);
+@@ -209,7 +209,7 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
+         {
+             u32 mask = 0x800;
+             if ((gEngineFlags | gScenePauseFlags) & mask) {
+-                u8 *peer = gUnk_020004B4;
++                u8 *peer = gLinkSession;
+                 if (peer) {
+                     if (U8(peer, 0x53) != 1)
+                         peer = 0;
+diff --git a/src/fn/sub_081188F4.c b/src/fn/sub_081188F4.c
+index 93e250232..60ac5fdff 100644
+--- a/src/fn/sub_081188F4.c
++++ b/src/fn/sub_081188F4.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ 
+ struct Obj {
+     u8 pad0[4];
+@@ -78,7 +79,6 @@ void Actor_ClampMovementSpeed(struct Obj *);
+ void Glove_SetAnimationKeyframes(struct Glove *, s32);
+ void ActorRecoil_UpdateMotion(struct Glove *);
+ extern u32 gEngineFlags;
+-extern u8 *gUnk_020004B4;
+ 
+ void ActorParticles_UpdateEmitter(void *, void *, u32);
+ void Glove_UpdateRecoil(struct Glove *p)
+diff --git a/src/fn/sub_08118B8C.c b/src/fn/sub_08118B8C.c
+index d5a1c4490..4ced91bb0 100644
+--- a/src/fn/sub_08118B8C.c
++++ b/src/fn/sub_08118B8C.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ 
+ struct Obj {
+     u8 pad0[4];
+@@ -78,7 +79,6 @@ void Actor_ClampMovementSpeed(struct Obj *);
+ void Glove_SetAnimationKeyframes(struct Glove *, s32);
+ void ActorRecoil_UpdateMotion(struct Glove *);
+ extern u32 gEngineFlags;
+-extern u8 *gUnk_020004B4;
+ 
+ void ActorParticles_UpdateEmitter(void *, void *, u32);
+ void Trigger_ConsumePending(void *, s32);
+diff --git a/src/fn/sub_08118E30.c b/src/fn/sub_08118E30.c
+index 4dd798505..e153bf515 100644
+--- a/src/fn/sub_08118E30.c
++++ b/src/fn/sub_08118E30.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ 
+ struct Obj {
+     u8 pad0[4];
+@@ -78,7 +79,6 @@ void Actor_ClampMovementSpeed(struct Obj *);
+ void Glove_SetAnimationKeyframes(struct Glove *, s32);
+ void ActorRecoil_UpdateMotion(struct Glove *);
+ extern u32 gEngineFlags;
+-extern u8 *gUnk_020004B4;
+ 
+ void ActorParticles_UpdateEmitter(void *, void *, u32);
+ void Trigger_ConsumePending(void *, s32);
+diff --git a/src/fn/sub_081190D4.c b/src/fn/sub_081190D4.c
+index 045731199..80d593687 100644
+--- a/src/fn/sub_081190D4.c
++++ b/src/fn/sub_081190D4.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ 
+ struct Obj {
+     u8 pad0[4];
+@@ -78,7 +79,6 @@ void Actor_ClampMovementSpeed(struct Obj *);
+ void Glove_SetAnimationKeyframes(struct Glove *, s32);
+ void ActorRecoil_UpdateMotion(struct Glove *);
+ extern u32 gEngineFlags;
+-extern u8 *gUnk_020004B4;
+ 
+ void ActorParticles_UpdateEmitter(void *, void *, u32);
+ void Trigger_ConsumePending(void *, s32);
+diff --git a/src/fn/sub_08119378.c b/src/fn/sub_08119378.c
+index 65103d4d9..d358036c3 100644
+--- a/src/fn/sub_08119378.c
++++ b/src/fn/sub_08119378.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ 
+ // confidence=low: recoil completion returns to the callback at 081198F8.
+ 
+@@ -82,7 +83,6 @@ s32 ActorRecoil_UpdateMotion(struct Glove *);
+ void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
+ void Glove_UpdateRestingMotion(void *);
+ extern u32 gEngineFlags;
+-extern u8 *gUnk_020004B4;
+ 
+ void ActorParticles_UpdateEmitter(void *, void *, u32);
+ void Trigger_ConsumePending(void *, s32);
+diff --git a/src/fn/sub_08119638.c b/src/fn/sub_08119638.c
+index 4e300650c..f68086740 100644
+--- a/src/fn/sub_08119638.c
++++ b/src/fn/sub_08119638.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ 
+ // confidence=low: animation 0x21 completes into Glove_UpdateStaggerRecoil.
+ 
+@@ -82,7 +83,6 @@ s32 ActorRecoil_UpdateMotion(struct Glove *);
+ void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
+ void Glove_UpdateStaggerRecoil(void *);
+ extern u32 gEngineFlags;
+-extern u8 *gUnk_020004B4;
+ 
+ void ActorParticles_UpdateEmitter(void *, void *, u32);
+ void Trigger_ConsumePending(void *, s32);
+diff --git a/src/fn/sub_081198F8.c b/src/fn/sub_081198F8.c
+index 79d40157f..8fd935622 100644
+--- a/src/fn/sub_081198F8.c
++++ b/src/fn/sub_081198F8.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ 
+ // confidence=low: recoil completion returns to the callback at 081198F8.
+ 
+@@ -81,7 +82,6 @@ void Glove_SetAnimationKeyframes(struct Glove *, s32);
+ s32 ActorRecoil_UpdateMotion(struct Glove *);
+ void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
+ extern u32 gEngineFlags;
+-extern u8 *gUnk_020004B4;
+ 
+ void ActorParticles_UpdateEmitter(void *, void *, u32);
+ void Trigger_ConsumePending(void *, s32);
+diff --git a/src/fn/sub_0811A158.c b/src/fn/sub_0811A158.c
+index 6f86e77ad..e9c3ef486 100644
+--- a/src/fn/sub_0811A158.c
++++ b/src/fn/sub_0811A158.c
+@@ -2,6 +2,7 @@
+ #include "game_state.h"
+ #include "engine.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ // MATCHING_CONCESSION: register-pinning
+ 
+ #ifdef NONMATCHING
+@@ -16,7 +17,6 @@ struct Vec16 {
+ #define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
+ #define U32(p, o) (*(u32 *)((u8 *)(p) + (o)))
+ #define S32(p, o) (*(s32 *)((u8 *)(p) + (o)))
+-extern u8 *gUnk_020004B4;
+ extern s32 gUnk_020004E0[];
+ extern const s16 gUnk_086149C4[];
+ void Character_GetHeightAdjustedPosition(void *, struct Vec16 *);
+@@ -54,14 +54,14 @@ static inline u8 Inactive(u8 *p)
+ }
+ static inline s32 LocalParticipant(void)
+ {
+-    u8 *p = gUnk_020004B4;
++    u8 *p = gLinkSession;
+     if (!p)
+         return -1;
+     return S16(p, 0x18);
+ }
+ static inline s32 ParticipantStat(s32 slot)
+ {
+-    u8 *p = gUnk_020004B4;
++    u8 *p = gLinkSession;
+     if (!p || slot < 0)
+         return 0;
+     return p[0x5C + slot];
+diff --git a/src/fn/sub_0811A6C4.c b/src/fn/sub_0811A6C4.c
+index 4a358293e..afb5e42cc 100644
+--- a/src/fn/sub_0811A6C4.c
++++ b/src/fn/sub_0811A6C4.c
+@@ -86,7 +86,7 @@ void Glove_SetAnimationKeyframes(struct Glove *, s32);
+ s32 ActorRecoil_UpdateMotion(struct Glove *);
+ void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
+ extern u32 gEngineFlags;
+-extern u8 *gUnk_020004B4;
++extern u8 *gLinkSession;
+ 
+ void ActorParticles_UpdateEmitter(void *, void *, u32);
+ void Trigger_ConsumePending(void *, s32);
+@@ -114,9 +114,9 @@ static inline u32 Mode(u32 mask)
+ }
+ static inline s32 Slot(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return S16(gUnk_020004B4, 0x18);
++    return S16(gLinkSession, 0x18);
+ }
+ static inline void SetCallback(struct Glove *p, void (*fn)(void *), s32 zero)
+ {
+@@ -218,7 +218,7 @@ s32 Glove_InitFromScript(struct Glove *p)
+     }
+     if (Mode_1()) {
+         if (p->participant == Slot()) {
+-            void *ref = gUnk_020004B4;
++            void *ref = gLinkSession;
+             void *optional;
+             if (ref && ((*((u8 *)(((u8 *)ref) + 0x53))) == 1))
+                 optional = ((u8 *)ref) + 0x260;
+diff --git a/src/fn/sub_0811C67C.c b/src/fn/sub_0811C67C.c
+index 65a330485..dfe8c5784 100644
+--- a/src/fn/sub_0811C67C.c
++++ b/src/fn/sub_0811C67C.c
+@@ -1,5 +1,4 @@
+ #define Equipment_HasCategory GameState_HasEquippedConsumable
+-#define gAreaEffectLinkState  gUnk_020004B4
+ #include "global.h"
+ #include "area_effect_link.h"
+ #include "engine.h"
+@@ -22,7 +21,7 @@ s32 ActorResource_SelectElementResource(s32 index)
+     s32 count, selected;
+     u32 mask = 0x800;
+     if ((gEngineFlags | gScenePauseFlags) & mask) {
+-        struct AreaEffectLinkState *link = gUnk_020004B4;
++        struct AreaEffectLinkState *link = gLinkSession;
+         struct AreaEffectLinkResourceSlot *slot;
+         if (!link || link->unavailable != 1 || !ValidIndex(index))
+             return 0x378;
+diff --git a/src/fn/sub_081266B4.c b/src/fn/sub_081266B4.c
+index e7f360273..ee5ce39c4 100644
+--- a/src/fn/sub_081266B4.c
++++ b/src/fn/sub_081266B4.c
+@@ -42,7 +42,7 @@ void SceneStatusIndicator_UpdateBlink(void *owner, struct StatusSlot *input)
+         p->reset = active;
+     if (gEngineFlags & 0x800) {
+         s32 local;
+-        if (gUnk_020004B4 && (local = gUnk_020004B4->localPlayer) >= 0) {
++        if (gLinkSession && (local = gLinkSession->localPlayer) >= 0) {
+             if (!PlayerInMode(gPlayers[local]))
+                 goto checkActive;
+             goto show;
+diff --git a/src/fn/sub_08131D5C.c b/src/fn/sub_08131D5C.c
+index 396c362c2..9bd0450da 100644
+--- a/src/fn/sub_08131D5C.c
++++ b/src/fn/sub_08131D5C.c
+@@ -56,9 +56,9 @@ void SceneActorMovement_ProjectProbe(void *, u32, u32);
+ void SceneActorReaction_PlayStaggerBurst(void);
+ static inline s32 LocalPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
+ {
+diff --git a/src/fn/sub_0813214C.c b/src/fn/sub_0813214C.c
+index e96d6bab2..384933e42 100644
+--- a/src/fn/sub_0813214C.c
++++ b/src/fn/sub_0813214C.c
+@@ -53,9 +53,9 @@ void SceneActorMovement_ProjectProbe(void *, u32, u32);
+ void SceneActorReaction_PlayStaggerBurst(void);
+ static inline s32 LocalPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
+ {
+diff --git a/src/fn/sub_08132490.c b/src/fn/sub_08132490.c
+index 488a7164b..e2c70d6f8 100644
+--- a/src/fn/sub_08132490.c
++++ b/src/fn/sub_08132490.c
+@@ -53,9 +53,9 @@ void SceneActorMovement_ProjectProbe(void *, u32, u32);
+ void Sound_PlaySong(u32);
+ static inline s32 LocalPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
+ {
+diff --git a/src/fn/sub_08132904.c b/src/fn/sub_08132904.c
+index 93a19a67e..0f0d1544a 100644
+--- a/src/fn/sub_08132904.c
++++ b/src/fn/sub_08132904.c
+@@ -57,9 +57,9 @@ void SceneActorMovement_ProjectProbe(void *, u32, u32);
+ void SceneActorReaction_PlayStaggerBurst(void);
+ static inline s32 LocalPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
+ {
+diff --git a/src/fn/sub_0813599C.c b/src/fn/sub_0813599C.c
+index 4b8ff50c4..298727b2f 100644
+--- a/src/fn/sub_0813599C.c
++++ b/src/fn/sub_0813599C.c
+@@ -21,9 +21,9 @@ static inline u8 Test(u32 value, u32 mask)
+ }
+ static inline s32 LocalPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
+ {
+diff --git a/src/fn/sub_08135F70.c b/src/fn/sub_08135F70.c
+index 18393d841..053915ab2 100644
+--- a/src/fn/sub_08135F70.c
++++ b/src/fn/sub_08135F70.c
+@@ -37,9 +37,9 @@ static inline u8 HasPendingHit(struct SceneActorRegistryResetView *actor)
+ }
+ static inline s32 LocalPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
+ {
+diff --git a/src/fn/sub_081363F4.c b/src/fn/sub_081363F4.c
+index b5c820249..97b5c7d78 100644
+--- a/src/fn/sub_081363F4.c
++++ b/src/fn/sub_081363F4.c
+@@ -23,9 +23,9 @@ static inline u8 Test(u32 value, u32 mask)
+ }
+ static inline s32 LocalPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
+ {
+diff --git a/src/fn/sub_08137AFC.c b/src/fn/sub_08137AFC.c
+index 4e7c0ae28..d0482756f 100644
+--- a/src/fn/sub_08137AFC.c
++++ b/src/fn/sub_08137AFC.c
+@@ -1,4 +1,3 @@
+-#define gLinkSession     gUnk_020004B4
+ #define gPlayerSlotFlags gUnk_02000560
+ #include "global.h"
+ #include "area_effect_link.h"
+diff --git a/src/fn/sub_08137CA8.c b/src/fn/sub_08137CA8.c
+index 91184ea1d..35520db5b 100644
+--- a/src/fn/sub_08137CA8.c
++++ b/src/fn/sub_08137CA8.c
+@@ -1,4 +1,3 @@
+-#define gLinkSession     gUnk_020004B4
+ #define gPlayerSlotFlags gUnk_02000560
+ #include "global.h"
+ #include "area_effect_link.h"
+diff --git a/src/fn/sub_081381CC.c b/src/fn/sub_081381CC.c
+index 05e5a7c63..e335a933a 100644
+--- a/src/fn/sub_081381CC.c
++++ b/src/fn/sub_081381CC.c
+@@ -4,7 +4,6 @@
+ 
+ // foundry draft (worker best 96.7%); what differs is mostly register allocation and instruction order
+ #define PlayerValue_GetBand Solar_GetLevelForIntensity
+-#define gLinkSession        gUnk_020004B4
+ s32 PlayerValue_GetBand(s32);
+ s32 Div(s32, s32);
+ static inline u32 GetSelection(s32 player)
+diff --git a/src/fn/sub_08164864.c b/src/fn/sub_08164864.c
+index 11eb851a6..fd081c1f7 100644
+--- a/src/fn/sub_08164864.c
++++ b/src/fn/sub_08164864.c
+@@ -7,7 +7,7 @@ struct HudSlotSource {
+     u8 unknown1A[0x5C - 0x1A];
+     u8 counts[4];
+ };
+-extern struct HudSlotSource *gUnk_020004B4;
++extern struct HudSlotSource *gLinkSession;
+ extern u8 *gGameState;
+ extern u16 gUnk_03005174;
+ extern u32 gEngineFlags;
+@@ -22,16 +22,16 @@ void Sound_PlaySong(u32);
+ 
+ static inline s32 OwnerIndex(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->index;
++    return gLinkSession->index;
+ }
+ 
+ static inline u8 SlotCount(s32 slot)
+ {
+-    if (!gUnk_020004B4 || slot < 0)
++    if (!gLinkSession || slot < 0)
+         return 0;
+-    return gUnk_020004B4->counts[slot];
++    return gLinkSession->counts[slot];
+ }
+ 
+ static inline u32 testFlags(const u32 *flags, u32 mask)
+diff --git a/src/fn/sub_081786A0.c b/src/fn/sub_081786A0.c
+index 0d2180524..6e4ce8d09 100644
+--- a/src/fn/sub_081786A0.c
++++ b/src/fn/sub_081786A0.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ u16 *Hud_GetTilemapCell(int, int, int);
+ struct SlotOwner {
+     u8 unknown0[0x53];
+@@ -6,13 +7,12 @@ struct SlotOwner {
+     u8 unknown54[0x164 - 0x54];
+     u8 slots[5];
+ };
+-extern struct SlotOwner *gUnk_020004B4;
+ void SceneHud_DrawSlotMarkers(void)
+ {
+     u8 *src;
+     u16 *dst;
+     int i;
+-    struct SlotOwner *owner = gUnk_020004B4;
++    struct SlotOwner *owner = gLinkSession;
+     if (owner) {
+         u8 f = owner->flag;
+         src = owner->slots;
+diff --git a/src/fn/sub_0817871C.c b/src/fn/sub_0817871C.c
+index af6df4075..5cd91b98b 100644
+--- a/src/fn/sub_0817871C.c
++++ b/src/fn/sub_0817871C.c
+@@ -7,7 +7,7 @@ struct SceneHudSlotCounts {
+     u8 unknown0[0x5C];
+     u8 counts[4];
+ };
+-extern struct SceneHudSlotCounts *gUnk_020004B4;
++extern struct SceneHudSlotCounts *gLinkSession;
+ extern u16 gSceneHudMeterPulse;
+ u16 *SceneHud_GetTilemapCell(s32, u32, u32);
+ static inline u32 testFlags(const u32 *flags, u32 mask)
+@@ -16,9 +16,9 @@ static inline u32 testFlags(const u32 *flags, u32 mask)
+ }
+ static inline u8 slotCount(s32 slot)
+ {
+-    if (!gUnk_020004B4 || slot < 0)
++    if (!gLinkSession || slot < 0)
+         return 0;
+-    return gUnk_020004B4->counts[slot];
++    return gLinkSession->counts[slot];
+ }
+ void SceneHud_DrawSlotMeter(struct SceneHudState *hud, s32 mode, u32 x, u32 y)
+ {
+diff --git a/src/fn/sub_08178AA0.c b/src/fn/sub_08178AA0.c
+index e948f14c8..f2fe2afe3 100644
+--- a/src/fn/sub_08178AA0.c
++++ b/src/fn/sub_08178AA0.c
+@@ -1,12 +1,11 @@
+ #include "global.h"
+ #include "scene_hud_display.h"
+ 
+-#define gSceneHudOwnerSource gUnk_020004B4
+ struct SceneHudOwnerSource {
+     u8 unknown0[0x18];
+     s16 index;
+ };
+-extern struct SceneHudOwnerSource *gSceneHudOwnerSource;
++extern struct SceneHudOwnerSource *gLinkSession;
+ #include "ram.h"
+ #include "player.h"
+ #define gSceneHud (*(struct SceneHudState **)&gFieldHud)
+@@ -16,9 +15,9 @@ void SceneHud_InitGameplayResources(struct SceneHudState *);
+ void SceneHud_RefreshGameplayDisplay(struct SceneHudState *);
+ static inline s32 OwnerIndex(void)
+ {
+-    if (!gSceneHudOwnerSource)
++    if (!gLinkSession)
+         return -1;
+-    return gSceneHudOwnerSource->index;
++    return gLinkSession->index;
+ }
+ s32 SceneHud_InitializeOwner(struct SceneHudState *s)
+ {
+diff --git a/src/fn/sub_08179A74.c b/src/fn/sub_08179A74.c
+index c32ab7d33..ea09e218c 100644
+--- a/src/fn/sub_08179A74.c
++++ b/src/fn/sub_08179A74.c
+@@ -1,7 +1,7 @@
+-#define gMeterOwnerSource gUnk_020004B4
+ #include "global.h"
+ #include "engine.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ struct MeterDisplayWidget {
+     u8 unknown0[8];
+     u32 flags;
+@@ -24,13 +24,12 @@ struct MeterOwnerSource {
+     u8 unknown0[0x18];
+     s16 index;
+ };
+-extern struct MeterOwnerSource *gMeterOwnerSource;
+ s32 ViewportGauge_ComputeFill(struct MeterDisplay *, s32);
+ static inline s32 OwnerIndex(void)
+ {
+-    if (!gMeterOwnerSource)
++    if (!((struct MeterOwnerSource *)gLinkSession))
+         return -1;
+-    return gMeterOwnerSource->index;
++    return ((struct MeterOwnerSource *)gLinkSession)->index;
+ }
+ void MeterDisplay_UpdateOwnerMeters(struct MeterDisplay *s)
+ {
+diff --git a/src/fn/sub_08224FA4.c b/src/fn/sub_08224FA4.c
+index ae456119e..23961c705 100644
+--- a/src/fn/sub_08224FA4.c
++++ b/src/fn/sub_08224FA4.c
+@@ -1,8 +1,8 @@
+ #include "global.h"
+ #include "ram.h"
++#include "area_effect_link.h"
+ extern u32 gUnk_03004278, gUnk_03003A00;
+ extern u16 gUnk_03004270, gUnk_03004274, gUnk_0300427C;
+-extern u32 gUnk_020004B4;
+ void m4aMPlayAllStop(void);
+ void m4aSoundVSyncOff(void);
+ void InterruptsAndVideo_WaitForVBlank(void);
+@@ -25,7 +25,7 @@ u32 System_ShutdownAndSoftReset(void)
+     InterruptsAndVideo_WaitForVBlank();
+     Solar_StopMeasurement();
+     Rtc_Protect();
+-    if (gUnk_020004B4 || gSlotMonitor)
++    if (gLinkSession || gSlotMonitor)
+         Serial_StopCommunication();
+     rfu_setREQCallback(0);
+     rfu_REQ_stopMode();
+diff --git a/src/fn/sub_08226CF8.c b/src/fn/sub_08226CF8.c
+index b49c84eca..d065c5119 100644
+--- a/src/fn/sub_08226CF8.c
++++ b/src/fn/sub_08226CF8.c
+@@ -29,7 +29,7 @@ struct CameraState {
+     u8 unknown8[10];
+     s16 facing;
+ };
+-extern struct LinkState *gUnk_020004B4;
++extern struct LinkState *gLinkSession;
+ extern struct Player *gPlayers[4];
+ extern struct CameraState gUnk_030042A0;
+ s32 Div(s32, s32);
+@@ -46,7 +46,7 @@ void sub_08226CF8(struct Camera2 *camera)
+     switch (camera->mode) {
+         case 0:
+             if (gEngineFlags & 0x800) {
+-                struct LinkState *link = gUnk_020004B4;
++                struct LinkState *link = gLinkSession;
+                 {
+                     s16 index;
+                     if (link && (index = link->player) >= 0) {
+diff --git a/src/fn/sub_0822C8D8.c b/src/fn/sub_0822C8D8.c
+index a7db33506..1fcb55e4b 100644
+--- a/src/fn/sub_0822C8D8.c
++++ b/src/fn/sub_0822C8D8.c
+@@ -1,6 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
+-extern u8 *gUnk_020004B4;
++extern u8 *gLinkSession;
+ extern u16 gUnk_03005260[];
+ extern u16 gUnk_030054B8;
+ 
+@@ -9,11 +9,11 @@ u16 sub_0822C8D8(u8 *p)
+     u16 *keys;
+     if (gEngineFlags & 0x800) {
+         s32 i, k;
+-        if (gUnk_020004B4 == NULL) {
++        if (gLinkSession == NULL) {
+             k = 1;
+             i = -k;
+         } else
+-            i = *(s16 *)(gUnk_020004B4 + 0x18);
++            i = *(s16 *)(gLinkSession + 0x18);
+         keys = &gUnk_03005260[i * 4];
+     } else
+         keys = gUnk_03005260;
+diff --git a/src/fn/sub_08232F68.c b/src/fn/sub_08232F68.c
+index 3a1de2643..3c3a2a084 100644
+--- a/src/fn/sub_08232F68.c
++++ b/src/fn/sub_08232F68.c
+@@ -18,9 +18,9 @@ extern struct EffectQuad *gEffectQuad;
+ void SpriteDrawable_SelectTileFrame(void *, void *, u32);
+ static inline s32 LocalPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ void EffectQuad_StartRemoteEntry(s32 player, const struct EffectQuadPosition *position)
+ {
+diff --git a/src/fn/sub_08232FD0.c b/src/fn/sub_08232FD0.c
+index 881457021..c895b489e 100644
+--- a/src/fn/sub_08232FD0.c
++++ b/src/fn/sub_08232FD0.c
+@@ -1,6 +1,6 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ extern struct Manager *gEffectQuad;
+-extern u8 *gUnk_020004B4;
+ void SpriteDrawable_SelectTileFrame(void *, u32, s32);
+ 
+ struct Pair {
+@@ -24,9 +24,9 @@ struct Manager {
+ 
+ static inline s32 GetCurrent(void)
+ {
+-    if (gUnk_020004B4 == NULL)
++    if (((u8 *)gLinkSession) == NULL)
+         return -1;
+-    return *(s16 *)(gUnk_020004B4 + 0x18);
++    return *(s16 *)(((u8 *)gLinkSession) + 0x18);
+ }
+ 
+ void sub_08232FD0(s32 index, struct Pair *pos)
+diff --git a/src/fn/sub_08233CAC.c b/src/fn/sub_08233CAC.c
+index 12b2ce2cc..1700f4c7c 100644
+--- a/src/fn/sub_08233CAC.c
++++ b/src/fn/sub_08233CAC.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "engine.h"
+ #include "scene_vec.h"
++#include "area_effect_link.h"
+ struct SolarBombOwner {
+     u8 pad0[0x18];
+     s32 player;
+@@ -33,7 +34,6 @@ struct LinkLevels {
+ struct PackedVec {
+     s32 x : 16, y : 16, z : 16, pad : 16;
+ };
+-extern struct LinkLevels *gUnk_020004B4;
+ u8 *TerrainModifiers_FindCellOverride(s32, s32);
+ void SolarBomb_SetState(struct SolarBomb *, void (*)(struct SolarBomb *));
+ void MovingEffect_AdvanceLifetime(struct SolarBomb *);
+@@ -60,9 +60,9 @@ static inline struct Cell *getCell(s32 index)
+ }
+ static inline u8 LinkLevel(s32 player)
+ {
+-    if (!gUnk_020004B4 || player < 0)
++    if (!((struct LinkLevels *)gLinkSession) || player < 0)
+         return 0;
+-    return gUnk_020004B4->levels[player];
++    return ((struct LinkLevels *)gLinkSession)->levels[player];
+ }
+ void sub_08233CAC(struct SolarBomb *p)
+ {
+diff --git a/src/fn/sub_08238470.c b/src/fn/sub_08238470.c
+index 016e50694..02aa7409e 100644
+--- a/src/fn/sub_08238470.c
++++ b/src/fn/sub_08238470.c
+@@ -1,15 +1,15 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ struct S {
+     u8 p[0x18];
+     s16 id;
+ };
+-extern struct S *gUnk_020004B4;
+ void Sound_PlaySong(u32);
+ static inline s32 gid(void)
+ {
+-    if (gUnk_020004B4 == 0)
++    if (((struct S *)gLinkSession) == 0)
+         return -1;
+-    return gUnk_020004B4->id;
++    return ((struct S *)gLinkSession)->id;
+ }
+ void Player_PlayLocalSong(s32 a, u32 b)
+ {
+diff --git a/src/fn/sub_0823849C.c b/src/fn/sub_0823849C.c
+index 898b5551a..0f02dc84d 100644
+--- a/src/fn/sub_0823849C.c
++++ b/src/fn/sub_0823849C.c
+@@ -1,15 +1,15 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ struct S {
+     u8 p[0x18];
+     s16 id;
+ };
+-extern struct S *gUnk_020004B4;
+ void Sound_StopSong(u32);
+ static inline s32 gid(void)
+ {
+-    if (gUnk_020004B4 == 0)
++    if (((struct S *)gLinkSession) == 0)
+         return -1;
+-    return gUnk_020004B4->id;
++    return ((struct S *)gLinkSession)->id;
+ }
+ void Player_StopLocalSong(s32 a, u32 b)
+ {
+diff --git a/src/fn/sub_082384C8.c b/src/fn/sub_082384C8.c
+index 3234dd923..a56303c55 100644
+--- a/src/fn/sub_082384C8.c
++++ b/src/fn/sub_082384C8.c
+@@ -1,17 +1,16 @@
+-#define gPlayerLinkSelection gUnk_020004B4
+ #include "global.h"
+ #include "player.h"
+ struct PlayerLinkSelection {
+     u8 unknown0[0x18];
+     s16 localPlayer;
+ };
+-extern struct PlayerLinkSelection *gUnk_020004B4;
++extern struct PlayerLinkSelection *gLinkSession;
+ void Sound_StopSong(u32);
+ static inline s32 LocalPlayerSlot(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ void Player_StopLocalActionSounds(struct Player *p)
+ {
+diff --git a/src/fn/sub_082386A4.c b/src/fn/sub_082386A4.c
+index f1f42c892..5613779eb 100644
+--- a/src/fn/sub_082386A4.c
++++ b/src/fn/sub_082386A4.c
+@@ -1,11 +1,10 @@
+-#define gPlayerLinkSelection gUnk_020004B4
+ #include "global.h"
+ #include "area_effect_link.h"
+ static inline u32 PlayerLink_GetActionMode(void)
+ {
+-    if (gUnk_020004B4 == 0 || gUnk_020004B4->unavailable)
++    if (gLinkSession == 0 || gLinkSession->unavailable)
+         return 0;
+-    return gUnk_020004B4->incomingPayload[0x3c];
++    return gLinkSession->incomingPayload[0x3c];
+ }
+ s32 PlayerLink_IsActionModeAllowed(void)
+ {
+diff --git a/src/fn/sub_082392E8.c b/src/fn/sub_082392E8.c
+index 3d05eefda..a60bc7329 100644
+--- a/src/fn/sub_082392E8.c
++++ b/src/fn/sub_082392E8.c
+@@ -44,7 +44,7 @@ static inline s32 scale(s32 v)
+ }
+ static inline u16 linkValue(s32 index)
+ {
+-    struct AreaEffectLinkState *link = gUnk_020004B4;
++    struct AreaEffectLinkState *link = gLinkSession;
+     if (!link || index < 0)
+         return 0;
+     return link->playerValues[index];
+diff --git a/src/fn/sub_0823A060.c b/src/fn/sub_0823A060.c
+index d579194a9..eb6819655 100644
+--- a/src/fn/sub_0823A060.c
++++ b/src/fn/sub_0823A060.c
+@@ -24,11 +24,11 @@ struct LinkAura {
+     u8 pad53A[0xaf2 - 0x53a];
+     u16 fade;
+ };
+-extern struct LinkSide *gUnk_020004B4;
++extern struct LinkSide *gLinkSession;
+ void Player_PlayLocalSong(s32, s32);
+ static inline s32 LinkAura_LocalSide(void)
+ {
+-    struct LinkSide *a = gUnk_020004B4;
++    struct LinkSide *a = gLinkSession;
+     if (a == 0)
+         return -1;
+     return a->side;
+diff --git a/src/fn/sub_0823A3CC.c b/src/fn/sub_0823A3CC.c
+index 18b408567..42d264ff7 100644
+--- a/src/fn/sub_0823A3CC.c
++++ b/src/fn/sub_0823A3CC.c
+@@ -17,9 +17,9 @@ void DirectionalEffect_Init(u8 *);
+ 
+ static inline s32 LocalPlayer(void)
+ {
+-    if (gUnk_020004B4 == NULL)
++    if (gLinkSession == NULL)
+         return -1;
+-    return gUnk_020004B4->localPlayer;
++    return gLinkSession->localPlayer;
+ }
+ 
+ // confidence=low: initializes a link player actor: shadow, effects and state bytes.
+diff --git a/src/fn/sub_0823A518.c b/src/fn/sub_0823A518.c
+index dc6fa3f3b..14fbbae14 100644
+--- a/src/fn/sub_0823A518.c
++++ b/src/fn/sub_0823A518.c
+@@ -1,5 +1,5 @@
+ #include "global.h"
+-extern u8 *gUnk_020004B4;
++#include "area_effect_link.h"
+ struct L {
+     u8 pad[0x5c];
+     u8 arr[1];
+@@ -7,7 +7,7 @@ struct L {
+ u8 sub_0823A518(u8 *p)
+ {
+     s32 index = *(s32 *)(p + 0x18);
+-    if (gUnk_020004B4 == NULL || index < 0)
++    if (gLinkSession == NULL || index < 0)
+         return 0;
+-    return ((struct L *)gUnk_020004B4)->arr[index];
++    return ((struct L *)gLinkSession)->arr[index];
+ }
+\ No newline at end of file
+diff --git a/src/fn/sub_0823AAF8.c b/src/fn/sub_0823AAF8.c
+index b0f96db19..28c6ac9bc 100644
+--- a/src/fn/sub_0823AAF8.c
++++ b/src/fn/sub_0823AAF8.c
+@@ -5,18 +5,18 @@ struct ResourceUsage {
+     u8 pad0[0x94];
+     u32 consumed;
+ };
+-extern struct ResourceUsage *gUnk_020004B4;
++extern struct ResourceUsage *gLinkSession;
+ s32 LinkPlayer_GetSelectedAbilityCost(struct Player *);
+ void Player_ConsumeActionResource(struct Player *s)
+ {
+     s32 cost = LinkPlayer_GetSelectedAbilityCost(s);
+     if (s->currentStatB < cost) {
+-        if (gUnk_020004B4)
+-            gUnk_020004B4->consumed += s->currentStatB;
++        if (gLinkSession)
++            gLinkSession->consumed += s->currentStatB;
+         s->currentStatB = 0;
+     } else {
+-        if (gUnk_020004B4)
+-            gUnk_020004B4->consumed += cost;
++        if (gLinkSession)
++            gLinkSession->consumed += cost;
+         s->currentStatB -= cost;
+     }
+ }
+diff --git a/src/fn/sub_0823ABC0.c b/src/fn/sub_0823ABC0.c
+index 9994368d2..15601fe38 100644
+--- a/src/fn/sub_0823ABC0.c
++++ b/src/fn/sub_0823ABC0.c
+@@ -1,13 +1,13 @@
+ #include "global.h"
+-extern u8 *gUnk_020004B4;
++#include "area_effect_link.h"
+ u32 LinkPlayer_HasSlotValueAtLeast(u8 *s, s32 m)
+ {
+     s32 i = *(s32 *)(s + 0x18);
+     s32 r;
+-    if (gUnk_020004B4 == 0 || i < 0)
++    if (((u8 *)gLinkSession) == 0 || i < 0)
+         r = 0;
+     else {
+-        u8 *q = gUnk_020004B4 + 0x5c;
++        u8 *q = ((u8 *)gLinkSession) + 0x5c;
+         r = q[i];
+     }
+     if (r < m)
+diff --git a/src/fn/sub_0823AC94.c b/src/fn/sub_0823AC94.c
+index 2165fa2c8..6ad3e4a13 100644
+--- a/src/fn/sub_0823AC94.c
++++ b/src/fn/sub_0823AC94.c
+@@ -1,9 +1,9 @@
+ #include "global.h"
+-extern u8 *gUnk_020004B4;
++#include "area_effect_link.h"
+ u8 *LinkPlayer_GetSessionPlayerData(u8 *s)
+ {
+     s32 i = *(s32 *)(s + 0x18);
+-    u8 *g = gUnk_020004B4;
++    u8 *g = gLinkSession;
+     u8 *r;
+     if (g == 0 || g[0x53] != 0 || i < 0)
+         r = 0;
+diff --git a/src/fn/sub_0823B6A4.c b/src/fn/sub_0823B6A4.c
+index 9a97e5c4c..931bca2f0 100644
+--- a/src/fn/sub_0823B6A4.c
++++ b/src/fn/sub_0823B6A4.c
+@@ -1,15 +1,15 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ struct S {
+     u8 p[0x18];
+     s16 id;
+ };
+-extern struct S *gUnk_020004B4;
+ void Camera_FollowPlayerWithoutCompletion(u32);
+ static inline s32 gid(void)
+ {
+-    if (gUnk_020004B4 == 0)
++    if (((struct S *)gLinkSession) == 0)
+         return -1;
+-    return gUnk_020004B4->id;
++    return ((struct S *)gLinkSession)->id;
+ }
+ void Player_ClearMovementLock(u8 *s)
+ {
+diff --git a/src/fn/sub_0823B7A4.c b/src/fn/sub_0823B7A4.c
+index e6b003944..7c3e9a63a 100644
+--- a/src/fn/sub_0823B7A4.c
++++ b/src/fn/sub_0823B7A4.c
+@@ -1,5 +1,5 @@
+ #include "global.h"
+-extern u8 *gUnk_020004B4;
++#include "area_effect_link.h"
+ 
+ s32 Div(s32, s32);
+ void Camera_SnapToWithoutCompletion(void *);
+@@ -17,9 +17,9 @@ struct Q {
+ 
+ static inline s32 ControllerId(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!((u8 *)gLinkSession))
+         return -1;
+-    return *(s16 *)(gUnk_020004B4 + 0x18);
++    return *(s16 *)(((u8 *)gLinkSession) + 0x18);
+ }
+ // confidence=low: smooths the camera anchor toward actor position and motion offset.
+ #define Player_SmoothCameraAnchor sub_0823B7A4
+diff --git a/src/fn/sub_0823C760.c b/src/fn/sub_0823C760.c
+index e74a8edd6..89f7bee14 100644
+--- a/src/fn/sub_0823C760.c
++++ b/src/fn/sub_0823C760.c
+@@ -1,6 +1,5 @@
+ #include "global.h"
+-
+-extern u8 *gUnk_020004B4;
++#include "area_effect_link.h"
+ 
+ s32 sub_0823C4B4(u8 *);
+ s32 LinkPlayer_HasSlotValueAtLeast(u8 *, s32);
+@@ -23,7 +22,7 @@ void sub_0823C760(u8 *p)
+             s32 v;
+             Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x392);
+             slot = *(s32 *)(p + 0x18);
+-            base = gUnk_020004B4;
++            base = gLinkSession;
+             if (base == 0 || slot < 0)
+                 v = 0;
+             else {
+diff --git a/src/fn/sub_0824261C.c b/src/fn/sub_0824261C.c
+index 43bac63af..d89de70fa 100644
+--- a/src/fn/sub_0824261C.c
++++ b/src/fn/sub_0824261C.c
+@@ -7,7 +7,7 @@ struct LinkRefs {
+     u8 unk0[0x5c];
+     u8 charge[8];
+ };
+-extern struct LinkRefs *gUnk_020004B4;
++extern struct LinkRefs *gLinkSession;
+ extern u32 gUnk_08E87A10[];
+ extern const s16 gUnk_086149C4[];
+ void Player_AccumulateActionCharge(struct Player *, u32);
+@@ -40,9 +40,9 @@ static inline void FlagOr(u32 m, u32 *f)
+ }
+ static inline u8 Charge(s32 slot)
+ {
+-    if (!gUnk_020004B4 || slot < 0)
++    if (!gLinkSession || slot < 0)
+         return 0;
+-    return gUnk_020004B4->charge[slot];
++    return gLinkSession->charge[slot];
+ }
+ static inline s32 IsScene5(struct Player *p)
+ {
+diff --git a/src/fn/sub_082429AC.c b/src/fn/sub_082429AC.c
+index 949cc7ac4..66f099dd0 100644
+--- a/src/fn/sub_082429AC.c
++++ b/src/fn/sub_082429AC.c
+@@ -7,7 +7,7 @@ struct LinkRefs {
+     u8 unk0[0x5c];
+     u8 charge[8];
+ };
+-extern struct LinkRefs *gUnk_020004B4;
++extern struct LinkRefs *gLinkSession;
+ extern u32 gUnk_08E87A90[];
+ extern const s16 gUnk_086149C4[];
+ void Player_AccumulateActionCharge(struct Player *, s32);
+@@ -57,9 +57,9 @@ static inline void FlagOr(u32 m, u32 *f)
+ }
+ static inline u8 Charge(s32 slot)
+ {
+-    if (!gUnk_020004B4 || slot < 0)
++    if (!gLinkSession || slot < 0)
+         return 0;
+-    return gUnk_020004B4->charge[slot];
++    return gLinkSession->charge[slot];
+ }
+ static inline s32 IsScene5(struct Player *p)
+ {
+diff --git a/src/fn/sub_08242EA4.c b/src/fn/sub_08242EA4.c
+index 3ed4b8b54..cb989136f 100644
+--- a/src/fn/sub_08242EA4.c
++++ b/src/fn/sub_08242EA4.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "area_effect_link.h"
+ 
+ struct P2 {
+     u32 a, b;
+@@ -7,7 +8,6 @@ struct Link {
+     u8 pad[0x5c];
+     u8 arr[1];
+ };
+-extern struct Link *gUnk_020004B4;
+ extern void *gUnk_08E87B0C[];
+ void Player_AccumulateActionCharge(u8 *, s32);
+ void sub_082420D4(u8 *);
+@@ -23,10 +23,10 @@ void Player_SetSecondaryActionFlags(u8 *, s32);
+ static inline long long LinkGet(s32 i)
+ {
+     u8 v;
+-    if (gUnk_020004B4 == 0 || i < 0)
++    if (((struct Link *)gLinkSession) == 0 || i < 0)
+         v = 0;
+     else
+-        v = gUnk_020004B4->arr[i];
++        v = ((struct Link *)gLinkSession)->arr[i];
+     return v;
+ }
+ 
+diff --git a/src/fn/sub_08243428.c b/src/fn/sub_08243428.c
+index 43d736e06..e45f04bbd 100644
+--- a/src/fn/sub_08243428.c
++++ b/src/fn/sub_08243428.c
+@@ -8,13 +8,13 @@ struct LinkRef {
+     u8 unk0[0x18];
+     s16 bit;
+ };
+-extern struct LinkRef *gUnk_020004B4;
++extern struct LinkRef *gLinkSession;
+ 
+ static inline s32 LocalPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->bit;
++    return gLinkSession->bit;
+ }
+ 
+ static inline u32 Busy(struct Player *p)
+diff --git a/src/fn/sub_0824372C.c b/src/fn/sub_0824372C.c
+index fedb5bef8..6f2cf6cf7 100644
+--- a/src/fn/sub_0824372C.c
++++ b/src/fn/sub_0824372C.c
+@@ -1,6 +1,6 @@
+ #include "global.h"
+ #include "player.h"
+-extern u8 *gUnk_020004B4;
++extern u8 *gLinkSession;
+ s32 Script_GetOptionalIValue(void);
+ bool32 Script_SeekToKeyword(s32);
+ s32 Script_GetValue(void);
+@@ -20,7 +20,7 @@ void sub_0824372C(void)
+             LinkSession_CallPositionScript(player + 0x30, *slot);
+         *slot = v;
+         x = *slot;
+-        g = gUnk_020004B4;
++        g = gLinkSession;
+         if (g == NULL || g[0x53] != 0 || x < 0)
+             g = NULL;
+         else
+diff --git a/src/fn/sub_082438F4.c b/src/fn/sub_082438F4.c
+index fd78ca5dc..817e45085 100644
+--- a/src/fn/sub_082438F4.c
++++ b/src/fn/sub_082438F4.c
+@@ -6,7 +6,7 @@ struct LinkRef {
+     u8 unk0[0x18];
+     s16 bit;
+ };
+-extern struct LinkRef *gUnk_020004B4;
++extern struct LinkRef *gLinkSession;
+ extern u32 gUnk_02000560[];
+ void Player_ResetActionState(struct Player *);
+ s32 Player_ApplyTerrainDamage(struct Player *);
+@@ -19,9 +19,9 @@ void sub_0823A2E4(struct Player *);
+ void sub_0821DE30(void *);
+ static inline s32 LocalPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->bit;
++    return gLinkSession->bit;
+ }
+ #define F(T, off) (*(T *)((u8 *)p + (off)))
+ s32 Player_UpdateLinkCore(struct Player *p)
+diff --git a/src/fn/sub_08243A50.c b/src/fn/sub_08243A50.c
+index e7f7d290b..7cb042be3 100644
+--- a/src/fn/sub_08243A50.c
++++ b/src/fn/sub_08243A50.c
+@@ -7,7 +7,7 @@ struct LinkRef {
+     u8 unk0[0x18];
+     s16 bit;
+ };
+-extern struct LinkRef *gUnk_020004B4;
++extern struct LinkRef *gLinkSession;
+ extern u32 gUnk_02000560[];
+ void LinkPlayer_ReadSlotFromScript(void);
+ void sub_0823ADB4(struct Player *);
+@@ -19,9 +19,9 @@ void Player_InitOptionalComponents(struct Player *);
+ void sub_0823A3CC(struct Player *);
+ static inline s32 LocalPlayer(void)
+ {
+-    if (!gUnk_020004B4)
++    if (!gLinkSession)
+         return -1;
+-    return gUnk_020004B4->bit;
++    return gLinkSession->bit;
+ }
+ s32 Player_OnCreate(struct Player *p, void *script)
+ {
+diff --git a/symbols/ram.csv b/symbols/ram.csv
+index a7dd483fd..083081b77 100644
+--- a/symbols/ram.csv
++++ b/symbols/ram.csv
+@@ -177,7 +177,7 @@ addr,name,size,kind,decl,header,confidence,notes
+ 020004A8,gSceneActorRegistryManager,4,object,extern struct SceneActorRegistryManager *gSceneActorRegistryManager;,include/scene_actor_registry.h,low,
+ 020004AC,gSceneActorRegistryNode,4,object,extern struct SceneActorRegistryNode *gSceneActorRegistryNode;,include/scene_actor_registry.h,low,
+ 020004B0,gSlotMonitor,4,object,extern u32 gSlotMonitor;,include/ram.h,low,
+-020004B4,gUnk_020004B4,4,object,,,,
++020004B4,gLinkSession,4,object,extern struct AreaEffectLinkState *gLinkSession;,include/area_effect_link.h,low,link session / menu peer object
+ 020004B8,gSceneCamera,4,object,extern struct Camera *gSceneCamera;,include/background_controller.h,low,scene camera object
+ 020004BC,gPanelSpritePool,4,object,extern u8 *gPanelSpritePool;,include/ram.h,low,
+ 020004C0,gSpriteSlots,4,object,extern u32 gSpriteSlots;,include/ram.h,low,
+-- 
+2.39.3 (Apple Git-145)
+

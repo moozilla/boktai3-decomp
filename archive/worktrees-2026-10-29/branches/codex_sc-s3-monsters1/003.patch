@@ -1,0 +1,104 @@
+From 393b6f78c24726c8828a44f032929e5d81bb3444 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 03:16:23 -0700
+Subject: [PATCH] Reject dependent and effectful statement swaps in seek
+ rewrites
+
+Only reorder independent scalar operations on unescaped locals. Preserve calls,
+memory accesses and control flow when alias/type information is unavailable.
+Validated dependency, pointer-loop, script-call, volatile and cursor-update cases.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/rewrites.py | 71 +++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 69 insertions(+), 2 deletions(-)
+
+diff --git a/tools/rewrites.py b/tools/rewrites.py
+index eb0734c86..cdfbe652d 100644
+--- a/tools/rewrites.py
++++ b/tools/rewrites.py
+@@ -327,12 +327,79 @@ def rw_commute(fn):
+ 
+ 
+ def rw_swap_stmts(fn):
+-    """Swap two adjacent statements (scheduling / evaluation order)."""
++    """Swap independent scalar operations, preserving calls and memory order.
++
++    A whole loop is not a scheduling unit: moving its pointer initialization
++    after it introduces an uninitialized read. Likewise two script reads cannot
++    exchange places. Be conservative when types/aliasing are unavailable here.
++    """
++    locals_ = set()
++    for n, _, _ in walk(fn):
++        if not isinstance(n, ca.Decl) or not n.name:
++            continue
++        if n.storage or isinstance(n.type, (ca.ArrayDecl, ca.FuncDecl)):
++            continue
++        if any("volatile" in getattr(t, "quals", ()) for t, _, _ in walk(n.type)):
++            continue
++        locals_.add(n.name)
++    escaped = {n.expr.name for n, _, _ in walk(fn)
++               if isinstance(n, ca.UnaryOp) and n.op == "&" and isinstance(n.expr, ca.ID)}
++    locals_ -= escaped
++
++    def reads(n, address=False):
++        if isinstance(n, ca.Constant):
++            return set()
++        if isinstance(n, ca.ID):
++            return {n.name} if n.name in locals_ else None
++        if isinstance(n, ca.UnaryOp):
++            if n.op == "sizeof":
++                return set()
++            if n.op == "&":
++                return reads(n.expr, True)
++            if n.op in ("+", "-", "~", "!") or (address and n.op == "*"):
++                return reads(n.expr)
++            return None
++        if isinstance(n, ca.StructRef):
++            return reads(n.name) if address else None
++        if isinstance(n, ca.ArrayRef):
++            if not address:
++                return None
++            children = (n.name, n.subscript)
++        elif isinstance(n, ca.Cast):
++            return reads(n.expr, address)
++        elif isinstance(n, (ca.BinaryOp, ca.TernaryOp)):
++            children = [c for _, c in n.children()]
++        else:
++            return None
++        result = set()
++        for child in children:
++            r = reads(child)
++            if r is None:
++                return None
++            result |= r
++        return result
++
++    def effects(n):
++        if isinstance(n, ca.Assignment) and isinstance(n.lvalue, ca.ID):
++            name = n.lvalue.name
++            r = reads(n.rvalue)
++            if name in locals_ and r is not None:
++                return r | ({name} if n.op != "=" else set()), {name}
++        if isinstance(n, ca.UnaryOp) and n.op in ("p++", "p--", "++", "--"):
++            if isinstance(n.expr, ca.ID) and n.expr.name in locals_:
++                return {n.expr.name}, {n.expr.name}
++        return None
++
+     bl = blocks(fn)
+     for bi, b in enumerate(bl):
+         for i in range(len(b.block_items) - 1):
+             x, y = b.block_items[i], b.block_items[i + 1]
+-            if isinstance(x, (ca.Decl, ca.Label, ca.Return)) or isinstance(y, (ca.Decl, ca.Label)):
++            ex, ey = effects(x), effects(y)
++            if ex is None or ey is None:
++                continue
++            rx, wx = ex
++            ry, wy = ey
++            if wx & (ry | wy) or wy & rx:
+                 continue
+             f2 = copy.deepcopy(fn)
+             b2 = blocks(f2)[bi]
+-- 
+2.39.3 (Apple Git-145)
+

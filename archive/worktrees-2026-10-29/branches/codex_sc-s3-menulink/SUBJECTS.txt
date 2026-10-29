@@ -1,0 +1,3 @@
+Accept an explicit function with the scope giv command
+Keep statement swaps from crossing scalar dependencies
+Let seek combine bounded same-output source variants

@@ -1,0 +1,435 @@
+diff --git a/include/scene_effect_schedule.h b/include/scene_effect_schedule.h
+index 5c0b7b19a..c3b4683ac 100644
+--- a/include/scene_effect_schedule.h
++++ b/include/scene_effect_schedule.h
+@@ -26,6 +26,6 @@ s32 SceneEffectSchedule_Tick(struct SceneEffectSchedule *);
+ void SceneEffectSchedule_Destroy(void *);
+ s32 SceneEffectSchedule_Initialize(struct SceneEffectSchedule *, u32);
+ struct SceneEffectSchedule *SceneEffectSchedule_Create(u32);
+-struct SceneScheduledEffect *SceneScheduledEffect_Create(const struct ContactPosition *, u32, s32, u32, u32, s32,
+-                                          s32, s32, s32, s32, u32);
++struct SceneScheduledEffect *SceneScheduledEffect_Create(const struct ContactPosition *, u32, s32,
++                                                         u32, u32, s32, s32, s32, s32, s32, u32);
+ #endif
+diff --git a/src/falling_objects.c b/src/falling_objects.c
+index ad5c7238b..3f82334ed 100644
+--- a/src/falling_objects.c
++++ b/src/falling_objects.c
+@@ -342,8 +342,8 @@ void FallingObject_UpdateLanding(struct FallingObject *object)
+         object->entered = 0;
+         Anim_SetSequence(&object->anim, gUnk_0200046C->animation, 2, 0, 0);
+         FallingObject_ClearEffect(object);
+-        FadingParticleGroup_Spawn((FallingObject_Random() & 3) + 6, &object->position, 9, 20, 8, 8, 0, 256, 24,
+-                     16);
++        FadingParticleGroup_Spawn((FallingObject_Random() & 3) + 6, &object->position, 9, 20, 8, 8,
++                                  0, 256, 24, 16);
+     }
+     if (object->type > 1) {
+         object->frameTimer++;
+diff --git a/src/fn/sub_08015F60.c b/src/fn/sub_08015F60.c
+index 71246abb6..4f77fe127 100644
+--- a/src/fn/sub_08015F60.c
++++ b/src/fn/sub_08015F60.c
+@@ -55,7 +55,7 @@ static inline u16 FadingParticles_NextRandom(u32 *r)
+ // scope shape 38 (differences once low registers are set aside)
+ // scope shape 79 (differences once low registers are set aside)
+ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lifeRange, s32 speed,
+-                 s32 speedRange, s32 angle, s32 angleRange, s32 rise, s32 riseRange)
++                              s32 speedRange, s32 angle, s32 angleRange, s32 rise, s32 riseRange)
+ {
+     s32 i, j;
+     u32 *rng;
+diff --git a/src/fn/sub_08017044.c b/src/fn/sub_08017044.c
+index 564320fcf..793021f95 100644
+--- a/src/fn/sub_08017044.c
++++ b/src/fn/sub_08017044.c
+@@ -43,8 +43,8 @@ static inline int FloatingEffect_Scale3(int v)
+ // fuzzy: 59.1%
+ // scope shape 14 (differences once low registers are set aside)
+ // scope shape 64 (differences once low registers are set aside)
+-s32 FloatingItemEffect_Spawn(int kind, int item, int mode, int index, struct Vec *position, struct Vec *target,
+-                 int duration, u32 id)
++s32 FloatingItemEffect_Spawn(int kind, int item, int mode, int index, struct Vec *position,
++                             struct Vec *target, int duration, u32 id)
+ {
+     struct EffectManager *m = FloatingEffectManager_GetOrCreate();
+     u32 key = (id & 0xFFFFFF) | (kind << 28);
+diff --git a/src/fn/sub_0806DCE4.c b/src/fn/sub_0806DCE4.c
+index 73c7462d1..2e4f28598 100644
+--- a/src/fn/sub_0806DCE4.c
++++ b/src/fn/sub_0806DCE4.c
+@@ -85,8 +85,8 @@ void RouteSpriteActor_TickEmitting(struct RouteSpritePool *pool, struct RouteSpr
+                 position.position = low->sprite.position;
+             }
+             position.packed.y -= 60;
+-            FragmentBurst_Create(&position.position, (u16)actor->amount, actor->kind, actor->parameter,
+-                         actor->option, 20, actor->context);
++            FragmentBurst_Create(&position.position, (u16)actor->amount, actor->kind,
++                                 actor->parameter, actor->option, 20, actor->context);
+             RouteSpriteActor_RunEventScript(actor);
+         }
+     }
+diff --git a/src/fn/sub_0806F448.c b/src/fn/sub_0806F448.c
+index 6df74c39e..6a61046ae 100644
+--- a/src/fn/sub_0806F448.c
++++ b/src/fn/sub_0806F448.c
+@@ -31,9 +31,9 @@ s32 SceneEffectSchedule_Tick(struct SceneEffectSchedule *manager)
+         if (entry->effect && entry->effect->state < 0) {
+             s32 scale = Scale(entry->scaleValue);
+             s32 random = Scale(entry->randomValue);
+-            entry->effect = SceneScheduledEffect_Create(&entry->position, entry->id, scale, entry->kind,
+-                                         entry->style, -1, entry->offset.x, entry->offset.y,
+-                                         entry->offset.z, random, entry->flags);
++            entry->effect = SceneScheduledEffect_Create(
++                &entry->position, entry->id, scale, entry->kind, entry->style, -1, entry->offset.x,
++                entry->offset.y, entry->offset.z, random, entry->flags);
+         }
+     }
+     return 0;
+diff --git a/src/fn/sub_0806F5C0.c b/src/fn/sub_0806F5C0.c
+index d88bf99cc..8085cc478 100644
+--- a/src/fn/sub_0806F5C0.c
++++ b/src/fn/sub_0806F5C0.c
+@@ -15,8 +15,8 @@ struct SceneEffectEntry {
+ extern void *gUnk_0200019C;
+ extern u32 gUnk_030053F0;
+ struct SceneEffectEntry *SceneEffectSchedule_Allocate(void *);
+-void *SceneScheduledEffect_Create(struct SceneEffectEntry *, u16 name, s32 time, u8 d, u8 f, s32, s32 ax, s32 ay,
+-                   s32 az, s32 delay, u16 flagged);
++void *SceneScheduledEffect_Create(struct SceneEffectEntry *, u16 name, s32 time, u8 d, u8 f, s32,
++                                  s32 ax, s32 ay, s32 az, s32 delay, u16 flagged);
+ s32 Div(s32, s32);
+ s32 Mod(s32, s32);
+ static inline u32 Random(void)
+@@ -82,6 +82,6 @@ void SceneEffectSchedule_AddFromScript(void)
+         e->flagged = 1;
+     time = scaleUnlessFlagged(e->time);
+     delay = scaleUnlessFlagged(e->delay);
+-    e->effect =
+-        SceneScheduledEffect_Create(e, e->name, time, e->d, e->f, -1, e->ax, e->ay, e->az, delay, e->flagged);
++    e->effect = SceneScheduledEffect_Create(e, e->name, time, e->d, e->f, -1, e->ax, e->ay, e->az,
++                                            delay, e->flagged);
+ }
+diff --git a/src/fn/sub_080D6608.c b/src/fn/sub_080D6608.c
+index 272403f76..38f0eb367 100644
+--- a/src/fn/sub_080D6608.c
++++ b/src/fn/sub_080D6608.c
+@@ -167,23 +167,25 @@ static inline u8 CanReach(s32 cell, s32 goal, s32 y, u32 kind, s32 total)
+     s32 i, col;
+     if (cell < goal) {
+         i = cell + 1;
+-        for (col = Mod(i, GridWidth()); col < GridWidth() && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
+-             i++, col++) {
++        for (col = Mod(i, GridWidth());
++             col < GridWidth() && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i++, col++) {
+             if (i == goal)
+                 return 1;
+         }
+-        for (i = cell + GridWidth(); total > i && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
+-             i += GridWidth()) {
++        for (i = cell + GridWidth();
++             total > i && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i += GridWidth()) {
+             if (i == goal)
+                 return 1;
+         }
+     } else {
+         i = cell - 1;
+-        for (col = Mod(i, GridWidth()); col >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i--, col--) {
++        for (col = Mod(i, GridWidth());
++             col >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i--, col--) {
+             if (i == goal)
+                 return 1;
+         }
+-        for (i = cell - GridWidth(); i >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i -= GridWidth()) {
++        for (i = cell - GridWidth(); i >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
++             i -= GridWidth()) {
+             if (i == goal)
+                 return 1;
+         }
+diff --git a/src/fn/sub_080D6DF8.c b/src/fn/sub_080D6DF8.c
+index 423b98d5f..1598d31cd 100644
+--- a/src/fn/sub_080D6DF8.c
++++ b/src/fn/sub_080D6DF8.c
+@@ -42,23 +42,25 @@ static inline u8 CanReach(s32 cell, s32 goal, s32 y, u32 kind, s32 total)
+     s32 i, col;
+     if (cell < goal) {
+         i = cell + 1;
+-        for (col = Mod(i, GridWidth()); col < GridWidth() && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
+-             i++, col++) {
++        for (col = Mod(i, GridWidth());
++             col < GridWidth() && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i++, col++) {
+             if (i == goal)
+                 return 1;
+         }
+-        for (i = cell + GridWidth(); total > i && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
+-             i += GridWidth()) {
++        for (i = cell + GridWidth();
++             total > i && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i += GridWidth()) {
+             if (i == goal)
+                 return 1;
+         }
+     } else {
+         i = cell - 1;
+-        for (col = Mod(i, GridWidth()); col >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i--, col--) {
++        for (col = Mod(i, GridWidth());
++             col >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i--, col--) {
+             if (i == goal)
+                 return 1;
+         }
+-        for (i = cell - GridWidth(); i >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i -= GridWidth()) {
++        for (i = cell - GridWidth(); i >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
++             i -= GridWidth()) {
+             if (i == goal)
+                 return 1;
+         }
+diff --git a/src/fn/sub_080DF6EC.c b/src/fn/sub_080DF6EC.c
+index 71e43cbe1..fe6a3d363 100644
+--- a/src/fn/sub_080DF6EC.c
++++ b/src/fn/sub_080DF6EC.c
+@@ -53,7 +53,8 @@ void sub_080DF6EC(s32 unused, u8 *b, struct SceneActorRegistryResetView *a)
+     pos.y += 200;
+     if (!InventorySlot_PickRandom(context + 0x6A0, context + 0x6A2, context + 0x6A4))
+         return;
+-    if (FloatingItemEffect_Spawn(0, *(s16 *)(context + 0x6A2), 3, 0, &pos, &a->position, 0x18, a) < 0) {
++    if (FloatingItemEffect_Spawn(0, *(s16 *)(context + 0x6A2), 3, 0, &pos, &a->position, 0x18, a) <
++        0) {
+         *(u16 *)(context + 0x6A0) |= mask;
+         return;
+     }
+diff --git a/src/fn/sub_081218C0.c b/src/fn/sub_081218C0.c
+index 646d8ace5..df4a578a1 100644
+--- a/src/fn/sub_081218C0.c
++++ b/src/fn/sub_081218C0.c
+@@ -62,7 +62,8 @@ static inline s32 TruncateShift(s32 value, u32 shift)
+     return -(-value >> shift);
+ }
+ 
+-void SceneColliderEffect_SpawnAimedSprite(struct EffectTransform *from, struct EffectTarget *target, u32 a, u32 b, u32 c)
++void SceneColliderEffect_SpawnAimedSprite(struct EffectTransform *from, struct EffectTarget *target,
++                                          u32 a, u32 b, u32 c)
+ {
+     struct ColliderEffectPool *loaded = gUnk_0200012C;
+     struct ColliderEffectPool *pool;
+diff --git a/src/fn/sub_08122B8C.c b/src/fn/sub_08122B8C.c
+index 1b731c3d4..51c154e55 100644
+--- a/src/fn/sub_08122B8C.c
++++ b/src/fn/sub_08122B8C.c
+@@ -34,9 +34,10 @@ void TerrainOverlay_QueueAddActor(struct ScheduledEffectBody *);
+ void StateSprite_InitCollider(struct SceneScheduledEffect *, s32, s32, s32, s32, s32);
+ void StateSprite_InitAnimation(struct SceneScheduledEffect *, s32, s32, s32);
+ 
+-struct SceneScheduledEffect *SceneScheduledEffect_Create(const struct ContactPosition *position, u32 id,
+-                                          s32 lifetime, u32 side, u32 type, s32 variant, s32 x,
+-                                          s32 y, s32 z, s32 delay, u32 flags)
++struct SceneScheduledEffect *SceneScheduledEffect_Create(const struct ContactPosition *position,
++                                                         u32 id, s32 lifetime, u32 side, u32 type,
++                                                         s32 variant, s32 x, s32 y, s32 z,
++                                                         s32 delay, u32 flags)
+ {
+     struct SceneScheduledEffect *effect;
+     struct ScheduledEffectBody *body;
+diff --git a/src/fn/sub_08125928.c b/src/fn/sub_08125928.c
+index 6cc86d8a2..de73e8e4d 100644
+--- a/src/fn/sub_08125928.c
++++ b/src/fn/sub_08125928.c
+@@ -53,7 +53,7 @@ static inline void SpreadShot_SetAttackProperties(void *collider, u32 a, u32 b,
+     Collider_SetAttackProperties(collider, a, b, flags, properties, c);
+ }
+ s32 SpreadShot_Create(struct ContactPosition *position, struct ContactPosition *velocity, u32 hits,
+-                 u32 kind, u32 attackA, u32 attackB, u32 attackC)
++                      u32 kind, u32 attackA, u32 attackB, u32 attackC)
+ {
+     struct SpreadShot *shot;
+     struct PairSlotPool *pool;
+diff --git a/src/fn/sub_081287D4.c b/src/fn/sub_081287D4.c
+index f64601f99..bad151489 100644
+--- a/src/fn/sub_081287D4.c
++++ b/src/fn/sub_081287D4.c
+@@ -84,8 +84,8 @@ static inline u16 GroundHeight(struct ContactPosition *point)
+     return height;
+ }
+ 
+-void FragmentBurst_Create(struct ContactPosition *position, u32 amount, u32 kind, u32 parameter, u32 flags,
+-                  u32 unused, void *completionScript)
++void FragmentBurst_Create(struct ContactPosition *position, u32 amount, u32 kind, u32 parameter,
++                          u32 flags, u32 unused, void *completionScript)
+ {
+     struct ContactPosition screen;
+     struct ContactPosition *out;
+diff --git a/src/fn/sub_081394B4.c b/src/fn/sub_081394B4.c
+index 9a6423555..fe07faecd 100644
+--- a/src/fn/sub_081394B4.c
++++ b/src/fn/sub_081394B4.c
+@@ -55,7 +55,8 @@ s32 SceneProcSprites_CreateEntry(struct SpriteVector *position, s32 a, s32 b, u3
+             p->entries[i].kind = kind;
+             SceneProcSprites_SubmitBounds(&p->entries[i], BallisticSpriteEffect_OnAnimationComplete,
+                                           params[3], kind + 1);
+-            ((struct SceneProcSprites *)((u8 *)p + i * 0xe0))->entries[0].callback = BallisticSpriteEffect_UpdateLaunch;
++            ((struct SceneProcSprites *)((u8 *)p + i * 0xe0))->entries[0].callback =
++                BallisticSpriteEffect_UpdateLaunch;
+             p->entries[i].flags = 1;
+             return i;
+         }
+diff --git a/src/fn/sub_0813A4C8.c b/src/fn/sub_0813A4C8.c
+index 56c5f9ab7..6e20f27ac 100644
+--- a/src/fn/sub_0813A4C8.c
++++ b/src/fn/sub_0813A4C8.c
+@@ -76,7 +76,8 @@ s32 SpritePairPool_StartEntry(void *position, u32 *height, u32 unused,
+             SpritePairEntry_CreateEffect(&pool->entries[i],
+                                          FollowingSpriteEffect_OnAnimationComplete, params->value,
+                                          id + 1);
+-            FollowingSpriteEffect_SetStateCallback(&pool->entries[i], FollowingSpriteEffect_UpdateFollowing);
++            FollowingSpriteEffect_SetStateCallback(&pool->entries[i],
++                                                   FollowingSpriteEffect_UpdateFollowing);
+             Sound_PlaySong(0x3e4);
+             return i;
+         }
+diff --git a/src/fn/sub_0815F5F8.c b/src/fn/sub_0815F5F8.c
+index ebc8097f3..5d6f08d16 100644
+--- a/src/fn/sub_0815F5F8.c
++++ b/src/fn/sub_0815F5F8.c
+@@ -26,8 +26,8 @@ static inline s32 AngleDifference(const s32 angle, const s32 direction)
+     return (angle - base) & 0xFF;
+ }
+ 
+-struct TargetEntry *TargetRegistry_FindNearestInCone(struct TargetPosition *position, s32 direction, s32 range,
+-                                 s32 halfAngle)
++struct TargetEntry *TargetRegistry_FindNearestInCone(struct TargetPosition *position, s32 direction,
++                                                     s32 range, s32 halfAngle)
+ {
+     struct TargetEntry *entry;
+     struct TargetEntry *best;
+diff --git a/src/fn/sub_08199094.c b/src/fn/sub_08199094.c
+index f4b17bbb6..259c86e44 100644
+--- a/src/fn/sub_08199094.c
++++ b/src/fn/sub_08199094.c
+@@ -126,7 +126,6 @@ static inline u32 StepRing(struct EffectRing *e)
+     return done;
+ }
+ 
+-
+ s32 SceneEffectQueue_UpdateEffects(struct SceneEffectQueue *p)
+ {
+     struct EffectMessage *message;
+diff --git a/src/fn/sub_0819F5B4.c b/src/fn/sub_0819F5B4.c
+index bab1ab382..1f4dd94c3 100644
+--- a/src/fn/sub_0819F5B4.c
++++ b/src/fn/sub_0819F5B4.c
+@@ -1,8 +1,8 @@
+ #include "global.h"
+ #include "scene_panel_schedule.h"
+ 
+-void DirectionBurst_EmitStaggeredLine(const struct ContactPosition *origin, s32 direction, s32 spacing, u32 kind,
+-                  u32 parameter)
++void DirectionBurst_EmitStaggeredLine(const struct ContactPosition *origin, s32 direction,
++                                      s32 spacing, u32 kind, u32 parameter)
+ {
+     struct ContactPosition position = *origin;
+     s16 *coordinate = &position.z;
+diff --git a/src/fn/sub_081A645C.c b/src/fn/sub_081A645C.c
+index dfdd87c1f..3f0c9b231 100644
+--- a/src/fn/sub_081A645C.c
++++ b/src/fn/sub_081A645C.c
+@@ -1,6 +1,5 @@
+ #include "global.h"
+ 
+-
+ struct DebugVector {
+     s16 x, y, z;
+ };
+diff --git a/src/fn/sub_081B7614.c b/src/fn/sub_081B7614.c
+index 2aa77ffaf..74c69f98b 100644
+--- a/src/fn/sub_081B7614.c
++++ b/src/fn/sub_081B7614.c
+@@ -19,7 +19,7 @@ struct GrowthHazardManager {
+ };
+ 
+ s32 GrowthHazard_FindNearestEntryDistance(void *object, struct GrowthHazardPosition *position,
+-                 struct GrowthHazardPosition *out)
++                                          struct GrowthHazardPosition *out)
+ {
+     struct GrowthHazardManager *collection = object;
+     struct GrowthHazardEntry *entry = collection->entries;
+diff --git a/src/fn/sub_081C2D68.c b/src/fn/sub_081C2D68.c
+index 3f615c230..f8ff6be0a 100644
+--- a/src/fn/sub_081C2D68.c
++++ b/src/fn/sub_081C2D68.c
+@@ -1,6 +1,5 @@
+ #include "global.h"
+ 
+-
+ struct SparkleSprite {
+     u32 flags;
+     u8 unk_04[0x34];
+diff --git a/src/fn/sub_081D75E8.c b/src/fn/sub_081D75E8.c
+index b8081d8f4..a529394e7 100644
+--- a/src/fn/sub_081D75E8.c
++++ b/src/fn/sub_081D75E8.c
+@@ -1,6 +1,5 @@
+ #include "global.h"
+ 
+-
+ extern const s16 gUnk_086149C4[];
+ 
+ struct TrailPosition {
+diff --git a/src/fn/sub_082318E0.c b/src/fn/sub_082318E0.c
+index db0021599..80796a099 100644
+--- a/src/fn/sub_082318E0.c
++++ b/src/fn/sub_082318E0.c
+@@ -22,7 +22,7 @@ struct Unk08231A0CPart {
+ };
+ 
+ void EffectPart_UpdateFinish(struct Unk08231A0CManager *manager, struct Unk08231A0CGroup *group,
+-                  struct Unk08231A0CPart *p)
++                             struct Unk08231A0CPart *p)
+ {
+     struct EffectSprite *sprite = &p->sprite, *o;
+     struct EffectAnim *a;
+diff --git a/src/item_container.c b/src/item_container.c
+index 851a8434f..b8ac9c032 100644
+--- a/src/item_container.c
++++ b/src/item_container.c
+@@ -10,7 +10,8 @@ void ScaledShadow_Destroy(void *);
+ s32 sub_0822D490(s32, s32);
+ u8 *TerrainModifiers_FindCellOverride(s32, s32);
+ void ScaledShadow_Disable(void *);
+-void FloatingItemEffect_Spawn(s32, s32, s32, s32, struct SceneVec *, struct SceneVec *, s32, struct Trigger *);
++void FloatingItemEffect_Spawn(s32, s32, s32, s32, struct SceneVec *, struct SceneVec *, s32,
++                              struct Trigger *);
+ u8 Sprite_BlinkUntilExpired(void *, u32, s32, s32);
+ void ParticleSprite_Initialize(struct TriggerSprite *, struct TriggerGraphics *, u32);
+ void Effect_SetOrigin(struct TriggerSprite *, s32, s32);
+@@ -276,7 +277,8 @@ void Trigger_UpdateShake(struct Trigger *p)
+     }
+ }
+ 
+-static inline s32 inBox(struct SceneVec *v, struct SceneVec *proj, s16 *o, struct Player *actor, s32 dy)
++static inline s32 inBox(struct SceneVec *v, struct SceneVec *proj, s16 *o, struct Player *actor,
++                        s32 dy)
+ {
+     if (absolute(v->y - actor->position.y) <= 127 && absolute(o[0] - proj->x) <= 14 && dy >= -24) {
+         if (dy <= 4)
+diff --git a/src/iwram_code.c b/src/iwram_code.c
+index ee4db98dc..48b7aaec3 100644
+--- a/src/iwram_code.c
++++ b/src/iwram_code.c
+@@ -441,8 +441,7 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
+             IW_QUEUE_TILES(r, obj, t, step, tw, th, b);
+             if (r < 0)
+                 return;
+-            IwPushOam(oam[j],
+-                      (u32)*c | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12));
++            IwPushOam(oam[j], (u32)*c | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12));
+             gUnk_030042DC += step;
+             *c += step;
+         }
+@@ -466,8 +465,7 @@ void sub_08000430(struct IwObj *obj, s32 x, s32 y, s32 z)
+             IW_QUEUE_TILES(r, obj, t, step, tw, th, b2);
+             if (r < 0)
+                 return;
+-            IwPushOamZ(oam[j],
+-                       (u32)*c | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12), z,
++            IwPushOamZ(oam[j], (u32)*c | (obj->priority << 10) | (bankIdx[keyIdx[j]] << 12), z,
+                        obj->priority);
+             gUnk_030042DC += step;
+             *c += step;

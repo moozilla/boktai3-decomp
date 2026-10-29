@@ -1,0 +1,3118 @@
+From e9a57514a8c147e90f551cf24739b18a61c1dbb9 Mon Sep 17 00:00:00 2001
+From: Moozilla <moozilla@protonmail.com>
+Date: Sun, 18 Oct 2026 12:26:44 -0700
+Subject: [PATCH] Unit orbiting_particles: merge 9 files into
+ src/orbiting_particles.c
+
+Orbiting particles (080187BC-08018D94); tools/unitize.py, build OK, matched bytes 768774 -> 768774.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ docs/GAME_LAYOUT.md                      |   2 +-
+ docs/HANDOFF.md                          |   7 +-
+ docs/INDEX.md                            |   4 +-
+ docs/history/2026-10-18.md               |  11 +
+ include/actor_attachment_manager.h       |   3 +-
+ include/choice_menu.h                    |   4 +-
+ include/collision_controller.h           |   3 +-
+ include/directional_interaction.h        |   8 +-
+ include/falling_objects.h                |   6 +-
+ include/game_state.h                     |   2 +-
+ include/orbiting_particles.h             |  42 ++++
+ include/scene_actor_control_helpers.h    |   3 +-
+ include/status_screen.h                  |   3 +-
+ notes/orbiting_particles_2026-10-18.md   |  49 ++++
+ src/animated_hazard.c                    |   3 +-
+ src/background_controller.c              |   1 -
+ src/breakable_barrier.c                  |   3 +-
+ src/collision_controller.c               |   2 +-
+ src/directional_interaction.c            |  11 +-
+ src/falling_objects.c                    |   3 +-
+ src/fn/Time_CalculateSunriseSunsetCore.c |  15 +-
+ src/fn/sub_08017270.c                    |   5 +-
+ src/fn/sub_080187BC.c                    |  21 --
+ src/fn/sub_080187E4.c                    |  30 ---
+ src/fn/sub_08018840.c                    |  25 --
+ src/fn/sub_08018898.c                    |  89 -------
+ src/fn/sub_080189A8.c                    |  12 -
+ src/fn/sub_080189C8.c                    | 169 -------------
+ src/fn/sub_08018C48.c                    |  19 --
+ src/fn/sub_08018CA8.c                    |  42 ----
+ src/fn/sub_08018D84.c                    |   8 -
+ src/fn/sub_0801ADC0.c                    |   3 +-
+ src/fn/sub_08020B8C.c                    |   4 +-
+ src/fn/sub_080221DC.c                    |   2 +-
+ src/fn/sub_08022330.c                    |   8 +-
+ src/fn/sub_08029908.c                    |   3 +-
+ src/fn/sub_0802C9A0.c                    |   2 +-
+ src/fn/sub_0802E468.c                    |   3 +-
+ src/fn/sub_0802E698.c                    |   3 +-
+ src/fn/sub_08033BD4.c                    |   3 +-
+ src/fn/sub_08034A2C.c                    |   3 +-
+ src/fn/sub_08036B2C.c                    |   3 +-
+ src/fn/sub_080374A8.c                    |   4 +-
+ src/fn/sub_08038E48.c                    |   3 +-
+ src/fn/sub_08039834.c                    |   4 +-
+ src/fn/sub_0803C7EC.c                    |  33 +--
+ src/fn/sub_080454C8.c                    |   2 +-
+ src/fn/sub_08045778.c                    |   2 +-
+ src/fn/sub_08045F48.c                    |   2 +-
+ src/fn/sub_0804EFB4.c                    |   6 +-
+ src/fn/sub_0804FDB4.c                    |   3 +-
+ src/fn/sub_08050404.c                    |   3 +-
+ src/fn/sub_080505BC.c                    |   3 +-
+ src/fn/sub_08051858.c                    |   3 +-
+ src/fn/sub_08054DC4.c                    |   2 +-
+ src/fn/sub_0805CD60.c                    |   2 +-
+ src/fn/sub_0805F3A4.c                    |   3 +-
+ src/fn/sub_0806122C.c                    |   3 +-
+ src/fn/sub_08062414.c                    |   3 +-
+ src/fn/sub_08063F00.c                    |   3 +-
+ src/fn/sub_0806458C.c                    |   3 +-
+ src/fn/sub_08067014.c                    |   2 +-
+ src/fn/sub_08067C0C.c                    |   2 +-
+ src/fn/sub_08069214.c                    |   6 +-
+ src/fn/sub_08069C94.c                    |   2 +-
+ src/fn/sub_0806A784.c                    |   2 +-
+ src/fn/sub_0806CF18.c                    |   2 +-
+ src/fn/sub_08070444.c                    |   2 +-
+ src/fn/sub_08070E44.c                    |   2 +-
+ src/fn/sub_08074BF4.c                    |   4 +-
+ src/fn/sub_08074C64.c                    |   4 +-
+ src/fn/sub_08074CD4.c                    |   4 +-
+ src/fn/sub_08074D34.c                    |   6 +-
+ src/fn/sub_08074DC0.c                    |   6 +-
+ src/fn/sub_08074E38.c                    |   6 +-
+ src/fn/sub_080772C0.c                    |   3 +-
+ src/fn/sub_0807836C.c                    |   2 +-
+ src/fn/sub_08078B48.c                    |   2 +-
+ src/fn/sub_08091E58.c                    |   4 +-
+ src/fn/sub_08111A48.c                    |   3 +-
+ src/fn/sub_08121338.c                    |   3 +-
+ src/fn/sub_081393DC.c                    |   3 +-
+ src/fn/sub_08179650.c                    |   3 +-
+ src/fn/sub_0818399C.c                    |   3 +-
+ src/fn/sub_081936F8.c                    |  10 +-
+ src/fn/sub_0819792C.c                    |   2 +-
+ src/fn/sub_081B9598.c                    |   3 +-
+ src/fn/sub_081B9818.c                    |   3 +-
+ src/fn/sub_081BB294.c                    |   3 +-
+ src/fn/sub_081C0434.c                    |   3 +-
+ src/fn/sub_081C1788.c                    |   3 +-
+ src/fn/sub_081DB168.c                    |   2 +-
+ src/fn/sub_081DB1D8.c                    |   4 +-
+ src/fn/sub_081DB324.c                    |   3 +-
+ src/fn/sub_081DB404.c                    |   7 +-
+ src/fn/sub_081E1E50.c                    |   3 +-
+ src/fn/sub_081E270C.c                    |   3 +-
+ src/fn/sub_08200A10.c                    |   4 +-
+ src/fn/sub_08201784.c                    |   3 +-
+ src/fn/sub_08210B50.c                    |   3 +-
+ src/fn/sub_082130D4.c                    |   3 +-
+ src/fn/sub_082132E8.c                    |   3 +-
+ src/fn/sub_0821BA5C.c                    |   3 +-
+ src/fn/sub_08221908.c                    |   2 +-
+ src/fn/sub_0822194C.c                    |   2 +-
+ src/fn/sub_082219A0.c                    |   2 +-
+ src/fn/sub_082219F4.c                    |   2 +-
+ src/fn/sub_08221A48.c                    |   2 +-
+ src/fn/sub_08221B5C.c                    |   2 +-
+ src/fn/sub_08221B9C.c                    |   2 +-
+ src/fn/sub_08221BE8.c                    |   2 +-
+ src/fn/sub_08221C34.c                    |   2 +-
+ src/fn/sub_08221D9C.c                    |   2 +-
+ src/fn/sub_08221E00.c                    |   2 +-
+ src/fn/sub_08221E70.c                    |   2 +-
+ src/fn/sub_08221EE0.c                    |   2 +-
+ src/fn/sub_0822204C.c                    |   2 +-
+ src/fn/sub_08222094.c                    |   2 +-
+ src/fn/sub_082220DC.c                    |   2 +-
+ src/fn/sub_08222124.c                    |   2 +-
+ src/fn/sub_08228368.c                    |   3 +-
+ src/fn/sub_082285C4.c                    |   3 +-
+ src/fn/sub_08229FFC.c                    |   3 +-
+ src/fn/sub_0822A230.c                    |   3 +-
+ src/fn/sub_0822BCE4.c                    |   3 +-
+ src/fn/sub_0822BD20.c                    |   3 +-
+ src/fn/sub_0822C824.c                    |   3 +-
+ src/fn/sub_0822E2A4.c                    |   3 +-
+ src/fn/sub_0822ED7C.c                    |   4 +-
+ src/fn/sub_0822EDF8.c                    |   4 +-
+ src/fn/sub_082332B0.c                    |   3 +-
+ src/fn/sub_0823333C.c                    |   4 +-
+ src/fn/sub_08233488.c                    |   3 +-
+ src/fn/sub_08235D68.c                    |   3 +-
+ src/fn/sub_082381C8.c                    |   4 +-
+ src/fn/sub_0823E704.c                    |   3 +-
+ src/fn/sub_0823EDDC.c                    |   3 +-
+ src/numeric_overlay.c                    |   6 +-
+ src/orbiting_particles.c                 | 296 +++++++++++++++++++++++
+ src/pooled_interactable.c                |   3 +-
+ src/result_prompt.c                      |   3 +-
+ src/scene_object.c                       |  23 +-
+ src/terrain_modifier.c                   |   3 +-
+ src/terrain_overlay.c                    |   1 -
+ 144 files changed, 684 insertions(+), 613 deletions(-)
+ create mode 100644 docs/history/2026-10-18.md
+ create mode 100644 include/orbiting_particles.h
+ create mode 100644 notes/orbiting_particles_2026-10-18.md
+ delete mode 100644 src/fn/sub_080187BC.c
+ delete mode 100644 src/fn/sub_080187E4.c
+ delete mode 100644 src/fn/sub_08018840.c
+ delete mode 100644 src/fn/sub_08018898.c
+ delete mode 100644 src/fn/sub_080189A8.c
+ delete mode 100644 src/fn/sub_080189C8.c
+ delete mode 100644 src/fn/sub_08018C48.c
+ delete mode 100644 src/fn/sub_08018CA8.c
+ delete mode 100644 src/fn/sub_08018D84.c
+ create mode 100644 src/orbiting_particles.c
+
+diff --git a/docs/GAME_LAYOUT.md b/docs/GAME_LAYOUT.md
+index 2b0e2cceb..ffedbab52 100644
+--- a/docs/GAME_LAYOUT.md
++++ b/docs/GAME_LAYOUT.md
+@@ -267,7 +267,7 @@ sprite and tile animation, and the timed presentations that run them.
+ | `08017270`–`08017428` | Scanline wave distortion | `src/fn/` (4 files) | Scanline wave distortion: update, initialization, creation and cleanup. |
+ | `08017428`–`08018438` | Weather and storm controller (tentative) | `src/fn/` (19 files) | Weather: storm wait, onset, active and end states, weather particles, script commands. |
+ | `08018438`–`080187BC` | Palette cycling | `src/fn/` (5 files) | Palette cycling: interpolated palette cycles with script initialization. |
+-| `080187BC`–`08018D94` | Orbiting particles | `src/fn/` (9 files) | Orbiting particles: orbit movement, terrain placement and script creation. |
++| `080187BC`–`08018D94` | Orbiting particles | `src/orbiting_particles.c` | Orbiting particles: orbit movement, terrain placement and script creation. |
+ | `08018D94`–`08018F38` | Hardware blend transitions | `src/fn/` (3 files) | Hardware blend transitions: animated blend coefficients. |
+ | `08018F38`–`080192D0` | Circular scanline window | `src/fn/` (6 files) | Circular scanline window: scanline generation, expansion, contraction and lifecycle. |
+ | `080192D0`–`08019518` | Clock events | `src/fn/` (5 files) | Clock events: script events on real-time clock edges. |
+diff --git a/docs/HANDOFF.md b/docs/HANDOFF.md
+index de80ba4b4..a3767241c 100644
+--- a/docs/HANDOFF.md
++++ b/docs/HANDOFF.md
+@@ -9,7 +9,7 @@ then `docs/WORKER.md` before matching. Everything else is looked up, not read:
+ Dated progress reports live in [docs/history/](history/README.md); they are
+ records, not instructions. Keep this file short: it describes the present.
+ 
+-## Current state (2026-10-16)
++## Current state (2026-10-18)
+ 
+ Numbers live in one place: [PROGRESS.md](../PROGRESS.md) (regenerated at batch
+ integration with `python3 tools/progress.py --markdown PROGRESS.md`) and the
+@@ -23,6 +23,11 @@ README badges (live from decomp.dev). Don't copy totals into other files.
+ 
+ Recent work, newest first (details in [history](history/README.md)):
+ 
++* **Orbiting particles shared unit** (2026-10-18): 080187BC–08018D94 now
++  lives in `src/orbiting_particles.c`, with shared manager/orb/sprite types in
++  `include/orbiting_particles.h`; all nine existing functions remain exact
++  ([notes](../notes/orbiting_particles_2026-10-18.md)).
++
+ * **A showcase scene in the game** (2026-10-17): `tools/showcase/` writes new
+   script procedures (a GCL assembler), dialogue, a cutscene table and stage
+   paths into a ROM copy, and `video.sh` records the result with sound. It
+diff --git a/docs/INDEX.md b/docs/INDEX.md
+index 6d9f7ae33..99dca11c2 100644
+--- a/docs/INDEX.md
++++ b/docs/INDEX.md
+@@ -117,7 +117,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
+ | [docs/LIBM.md](../docs/LIBM.md) | Math-library source matches | *#library #text* | 5 |
+ | [docs/MENU_CONTEXT.md](../docs/MENU_CONTEXT.md) | Pause-menu config, sleep, and save context | *#menu* | 3 |
+ | [docs/MGS_GCL_MATCHING.md](../docs/MGS_GCL_MATCHING.md) | Boktai 3 / MGS GCL matching evidence | *#scripts #matching* | 66 |
+-| [docs/MODEL_BENCHMARK.md](../docs/MODEL_BENCHMARK.md) | Small-model matching benchmark: explain.py vs check.py | #matching #tooling | 7 |
++| [docs/MODEL_BENCHMARK.md](../docs/MODEL_BENCHMARK.md) | Small-model matching benchmark: explain.py vs check.py | #matching #tooling | 9 |
+ | [docs/MOTION_0818.md](../docs/MOTION_0818.md) | Motion callback family at 0818D754 | *#tooling* | 7 |
+ | [docs/PERMUTER.md](../docs/PERMUTER.md) | Solving register allocation in the compiler, then in C | #matching #tooling | 19 |
+ | [docs/PERMUTER_HANDOFF_2026-10-15.md](../docs/PERMUTER_HANDOFF_2026-10-15.md) | October 15 matching residue and frozen searches | *#matching* | 5 |
+@@ -203,6 +203,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
+ | [docs/history/2026-10-15.md](../docs/history/2026-10-15.md) | Handoff history: 2026-10-15 | #actors #animation #assets #inventory #particles #scene #scripts #sound #text #tooling | 41 |
+ | [docs/history/2026-10-16.md](../docs/history/2026-10-16.md) | Handoff history: 2026-10-16 | #actors #scripts #text #tooling | 5 |
+ | [docs/history/2026-10-17.md](../docs/history/2026-10-17.md) | Handoff history: 2026-10-17 | #actors #scripts | 0 |
++| [docs/history/2026-10-18.md](../docs/history/2026-10-18.md) | 2026-10-18 | #matching #particles #types | 0 |
+ | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
+ | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 16 |
+ | [gcl/README.md](../gcl/README.md) | GCL: the game's scripts | *#scripts #scene #assets #tooling* | 15 |
+@@ -240,6 +241,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
+ | [notes/modifier-preview_2026-10-14.md](../notes/modifier-preview_2026-10-14.md) | Modifier menu preview and lifecycle (tentative) | *#actors #menu #process* | 6 |
+ | [notes/orbit-background_2026-10-14.md](../notes/orbit-background_2026-10-14.md) | Orbit-positioned background controller |  | 4 |
+ | [notes/orbit-number-display_2026-10-14.md](../notes/orbit-number-display_2026-10-14.md) | Rotating contact actor and floating numbers, October 14 | *#actors* | 7 |
++| [notes/orbiting_particles_2026-10-18.md](../notes/orbiting_particles_2026-10-18.md) | Orbiting particles unit consolidation (2026-10-18) | #particles #types #matching | 3 |
+ | [notes/parameterized-motion-pool_2026-10-14.md](../notes/parameterized-motion-pool_2026-10-14.md) | Parameterized motion pool, 080454C0–08045A20 |  | 5 |
+ | [notes/pilot-haiku.md](../notes/pilot-haiku.md) | pilot-haiku notes |  | 1 |
+ | [notes/pilot-sonnet.md](../notes/pilot-sonnet.md) | pilot-sonnet.md |  | 0 |
+diff --git a/docs/history/2026-10-18.md b/docs/history/2026-10-18.md
+new file mode 100644
+index 000000000..6f89da6dc
+--- /dev/null
++++ b/docs/history/2026-10-18.md
+@@ -0,0 +1,11 @@
++# 2026-10-18
++
++## Orbiting particles shared unit
++
++Tags: #particles #types #matching
++
++Consolidated 080187BC–08018D94 into `src/orbiting_particles.c` and
++`include/orbiting_particles.h`: nine existing exact functions, shared task/orb/
++sprite types and reused engine/vector declarations. No new matches, drafts,
++gaps or register hints. Full build: `build/boktai3.gba: OK`; matching coverage
++unchanged. Details: [worker notes](../../notes/orbiting_particles_2026-10-18.md).
+diff --git a/include/actor_attachment_manager.h b/include/actor_attachment_manager.h
+index 3e2cad37d..50c7b8ce6 100644
+--- a/include/actor_attachment_manager.h
++++ b/include/actor_attachment_manager.h
+@@ -18,7 +18,8 @@ struct ActorAttachmentFollowView {
+     u8 unknown14[0x34 - 0x14];
+     struct ContactPosition offset;
+ };
+-struct ActorAttachmentSlotView *ActorAttachment_AllocateSlotHeader(struct ActorAttachmentManagerView *);
++struct ActorAttachmentSlotView *
++ActorAttachment_AllocateSlotHeader(struct ActorAttachmentManagerView *);
+ struct ActorAttachmentManagerView *ActorAttachment_CreateManager(void);
+ struct ActorAttachmentSlotView *ActorAttachment_ReleaseResource(struct ActorAttachmentSlotView *,
+                                                                 u32, void *);
+diff --git a/include/choice_menu.h b/include/choice_menu.h
+index 40b0947dc..1e379a528 100644
+--- a/include/choice_menu.h
++++ b/include/choice_menu.h
+@@ -93,7 +93,7 @@ void ChoiceMenu_ReloadFromScript(void);
+                 f;                                                                                 \
+             }) &&                                                                                  \
+             length)                                                                                \
+-            value = Text_ParseDecimal(p->scratch, length);                                              \
++            value = Text_ParseDecimal(p->scratch, length);                                         \
+         else                                                                                       \
+             value = 0;                                                                             \
+         value;                                                                                     \
+@@ -124,7 +124,7 @@ void ChoiceMenu_ReloadFromScript(void);
+                 f;                                                                                 \
+             }) &&                                                                                  \
+             length) {                                                                              \
+-            s32 value = Text_ParseDecimal(p->scratch, length);                                          \
++            s32 value = Text_ParseDecimal(p->scratch, length);                                     \
+             register u8 *out asm("r2") = &p->explicitWidth;                                        \
+             asm("" : : "r"(out));                                                                  \
+             *out = value;                                                                          \
+diff --git a/include/collision_controller.h b/include/collision_controller.h
+index 5ed4bcc2d..935e18c55 100644
+--- a/include/collision_controller.h
++++ b/include/collision_controller.h
+@@ -83,7 +83,8 @@ void sub_08009E30(void);
+ struct CollisionSlot *CollisionController_FindFreeSlot(struct CollisionManager *);
+ s32 CollisionController_InitSlot(struct CollisionManager *, struct CollisionSlot *);
+ u32 CollisionController_RemoveSlot(struct CollisionManager *, struct CollisionSlot *);
+-void CollisionController_ReceiveHit(struct SceneCollider *, struct CollisionOther *, struct CollisionSlot *);
++void CollisionController_ReceiveHit(struct SceneCollider *, struct CollisionOther *,
++                                    struct CollisionSlot *);
+ void CollisionController_UpdateIdleAnimationPaused(u32, struct CollisionSlot *);
+ void CollisionController_UpdateIdleAnimation(struct CollisionManager *, struct CollisionSlot *);
+ void CollisionController_UpdateHitDelayAnimation(u32, struct CollisionSlot *);
+diff --git a/include/directional_interaction.h b/include/directional_interaction.h
+index f82df6674..ff980aad6 100644
+--- a/include/directional_interaction.h
++++ b/include/directional_interaction.h
+@@ -89,11 +89,13 @@ void sub_08249244(struct DirectionalManager *, struct DirectionalController *, s
+ 
+ u32 DirectionalController_SetState(struct DirectionalController *, u32);
+ u32 DirectionalController_ConsumeEntered(struct DirectionalController *);
+-s32 DirectionalController_InitSlot(struct DirectionalManager *, struct DirectionalController *, s32);
+-struct DirectionalController *DirectionalController_FindByScriptId(struct DirectionalManager *, s32, s32 *);
++s32 DirectionalController_InitSlot(struct DirectionalManager *, struct DirectionalController *,
++                                   s32);
++struct DirectionalController *DirectionalController_FindByScriptId(struct DirectionalManager *, s32,
++                                                                   s32 *);
+ u32 DirectionalController_SetMarkerFadeLevel(struct DirectionalController *, u32);
+ u32 DirectionalController_SetPosition(struct DirectionalManager *, struct DirectionalController *,
+-                 struct DirectionalPackedVec *);
++                                      struct DirectionalPackedVec *);
+ void LevelController_Update(struct DirectionalManager *, struct DirectionalController *);
+ s32 Actor_CanInteractWithController(struct DirectionalManager *, struct DirectionalController *);
+ void LevelController_RunScript(struct DirectionalManager *, struct DirectionalController *, u32);
+diff --git a/include/falling_objects.h b/include/falling_objects.h
+index ae6ddaf1b..fe427dbd1 100644
+--- a/include/falling_objects.h
++++ b/include/falling_objects.h
+@@ -103,8 +103,10 @@ s32 FallingObject_CreateFromScript(void);
+ s32 FallingObject_SpawnFinishParticles(struct FallingObject *object);
+ void FallingObject_ReceiveHit(struct FallingHit *hit, u32 unused, struct FallingObject *object);
+ void FallingObject_ReceiveAttackHit(void);
+-u32 FallingObjectManager_AddObject(struct FallingObjectManager *manager, struct FallingObject *object);
+-u32 FallingObjectManager_RemoveObject(struct FallingObjectManager *manager, struct FallingObject *object);
++u32 FallingObjectManager_AddObject(struct FallingObjectManager *manager,
++                                   struct FallingObject *object);
++u32 FallingObjectManager_RemoveObject(struct FallingObjectManager *manager,
++                                      struct FallingObject *object);
+ u32 FallingObjectManager_Destroy(struct FallingObjectManager *manager);
+ s32 FallingObjectManager_Initialize(struct FallingObjectManager *manager, void *unused);
+ void *FallingObjectManager_Create(void *a, u32 unused);
+diff --git a/include/game_state.h b/include/game_state.h
+index 1fc6b97a5..6c8843498 100644
+--- a/include/game_state.h
++++ b/include/game_state.h
+@@ -16,7 +16,7 @@ struct GameState {
+     u16 unk12;
+     s16 unk14;
+     u8 unk16[0x12];
+-    s16 life;    /* (guess) current; (lifeMax - life) / lifeMax is a ratio in Player_ModifyValueByRemainingLife */
++    s16 life; /* (guess) current; (lifeMax - life) / lifeMax is a ratio in Player_ModifyValueByRemainingLife */
+     s16 lifeMax; /* (guess) */
+     u16 unk2c;
+     u8 unk2E[0x2];
+diff --git a/include/orbiting_particles.h b/include/orbiting_particles.h
+new file mode 100644
+index 000000000..8c5d71d98
+--- /dev/null
++++ b/include/orbiting_particles.h
+@@ -0,0 +1,42 @@
++#ifndef GUARD_ORBITING_PARTICLES_H
++#define GUARD_ORBITING_PARTICLES_H
++#include "engine.h"
++#include "scene_vec.h"
++
++/* Eight rising orbs around a terrain-clamped origin; layout from 080187BC–08018D94. */
++struct OrbitingParticleSprite {
++    u32 flags;                 /* bit 0 hides the effect */
++    u8 unknown4[11], priority; /* priority interpretation tentative */
++    u8 unknown10[8];
++    struct SceneVec position;
++    u8 unknown20[8];
++};
++struct OrbitingParticle {
++    u8 state, angle;
++    u16 rise, radius, timer; /* timer: respawn delay when idle, animation ticks when active */
++    struct OrbitingParticleSprite sprite;
++};
++struct OrbitingParticles {
++    struct Task task;
++    s32 time, duration;
++    u16 speed, limit, count, frame;
++    void *resource;
++    struct SceneVec position;
++    struct OrbitingParticle orbs[8];
++};
++u32 OrbitingParticles_HasActiveOrb(struct OrbitingParticles *);
++void OrbitingParticles_SpawnOrb(struct OrbitingParticles *, struct OrbitingParticle *);
++void OrbitingParticles_Advance(struct OrbitingParticles *, struct OrbitingParticle *);
++s32 OrbitingParticles_Update(struct OrbitingParticles *);
++u32 OrbitingParticles_Destroy(struct OrbitingParticles *);
++s32 OrbitingParticles_Initialize(struct OrbitingParticles *, struct SceneVec *, s32, s32, s32, s32);
++struct OrbitingParticles *OrbitingParticles_Create(struct SceneVec *, s32, s32, s32, s32);
++struct OrbitingParticles *OrbitingParticles_CreateFromScript(void);
++void OrbitingParticles_Stop(struct OrbitingParticles *);
++
++u8 *TerrainModifiers_FindCellOverride(s32, s32);
++void sub_08217DE0(void *, void *, s32);
++void sub_08217EEC(void *, void *, s32);
++void Effect_SetOrigin(void *, s32, s32);
++void Effect_SetPalette(void *, u32);
++#endif
+diff --git a/include/scene_actor_control_helpers.h b/include/scene_actor_control_helpers.h
+index 80e556f24..a0f4a8a32 100644
+--- a/include/scene_actor_control_helpers.h
++++ b/include/scene_actor_control_helpers.h
+@@ -6,7 +6,8 @@ struct SceneActorControlPositionView {
+     u8 unknown0[0x3FC];
+     struct ContactPosition position;
+ };
+-void SceneActorControl_InitPositionCurveEndpoints(struct SceneActorRegistryResetView *, const struct ContactPosition *);
++void SceneActorControl_InitPositionCurveEndpoints(struct SceneActorRegistryResetView *,
++                                                  const struct ContactPosition *);
+ s32 sub_08083C38(struct SceneActorRegistryResetView *);
+ void SceneActorControl_StartPositionCurve(struct SceneActorRegistryResetView *,
+                                           const struct ContactPosition *);
+diff --git a/include/status_screen.h b/include/status_screen.h
+index b5244944b..f7c16b9d2 100644
+--- a/include/status_screen.h
++++ b/include/status_screen.h
+@@ -87,7 +87,8 @@ s32 SunClock_GetBaseHour(void); // counter values
+ s32 SunClock_GetBaseMinute(void);
+ u32 SunClock_GetPackedDate(void);
+ void Clock_UnpackDate(s32 *, s32 *, s32 *, u32);
+-void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32); // (guess) start a screen transition
++void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32,
++                                  s32); // (guess) start a screen transition
+ 
+ int StatusScreen_Update(struct StatusScreen *);
+ int StatusScreen_Destroy(struct StatusScreen *);
+diff --git a/notes/orbiting_particles_2026-10-18.md b/notes/orbiting_particles_2026-10-18.md
+new file mode 100644
+index 000000000..276853568
+--- /dev/null
++++ b/notes/orbiting_particles_2026-10-18.md
+@@ -0,0 +1,49 @@
++# Orbiting particles unit consolidation (2026-10-18)
++
++Tags: #particles #types #matching
++
++Range: 080187BC–08018D94 (end exclusive). All nine functions were already
++matched; consolidated them into `src/orbiting_particles.c` in ROM order with
++`include/orbiting_particles.h`. No newly matched functions, drafts or gaps.
++Subsystem coverage remains 100% (+0 percentage points), 1496 exact bytes.
++
++Shared layout: `OrbitingParticles` is the 0x1B4-byte task, with time/duration
++at +0x18/+0x1C, speed/rise limit/count/base frame at +0x20..+0x26, resource at
+++0x28, origin at +0x2C, and eight `OrbitingParticle` records at +0x34.
++Each 0x30-byte orb holds state, angle, rise, radius and a shared wait/animation
++timer, then a 0x28-byte `OrbitingParticleSprite` at +8. Sprite position is
+++0x18; byte +0xF is provisionally named priority. Reused `SceneVec`, `Task`
++and `EngineMap` from existing headers, removing partial views and engine
++redeclarations. Existing descriptive function names were already promoted;
++no new aliases or symbol-table edits were needed.
++
++Matching adaptations:
++
++* Spawn keeps byte-addressed random-table indexing: typed array indexing
++  reverses a literal load and shift. The RAM literal in the initialization
++  helper remains the existing checked `RANDOM_TABLE_ADDR` constant.
++* Update and destroy retain byte strides between embedded fields, expressed
++  using `sizeof(struct OrbitingParticle)`. Update's inactive-slot loop keeps
++  its offset temporary with a type-derived member offset: direct indexing
++  changes register allocation.
++* `depin.py --write` tested the update's existing r2 pin and empty barrier;
++  both remain necessary (2 -> 2). No new hints were added.
++* `engine.h` declares void-returning task callbacks; these callbacks return
++  zero and must retain their result-producing epilogues to match. Explicit
++  callback casts preserve the existing engine API without redeclarations.
++
++Validation: individual checks, then the merged checker reports all nine
++functions MATCH (1496 bytes). Roughly 20 checker invocations including depin's
++three checks. `make format` was run; unrelated formatting edits were removed.
++`tools/build.py` printed `build/boktai3.gba: OK`; the progress inventory
++retains the baseline matched function and byte counts. No commits or Git-index writes were performed. `merge_unit.py --write`
++was run through a local build-directory wrapper replacing only its `git rm`
++with filesystem unlinking, as this driver's worker cannot write Git metadata.
++
++Build setup surprise: this checkout lacked `build/res/` and another extracted
++manifest source. Extracted the eleven missing build-local sources through
++`datafmt.Entry.extract()`. Shared `gen/data.s` also references 578 archive
++filenames with entry-index suffixes; fresh extraction used unsuffixed names.
++Created the required local aliases from the corresponding extracted entries,
++then confirmed every `.incbin` target exists. No shared generated files or
++tracked tools were changed.
+diff --git a/src/animated_hazard.c b/src/animated_hazard.c
+index aa8f46075..bb07793ac 100644
+--- a/src/animated_hazard.c
++++ b/src/animated_hazard.c
+@@ -391,7 +391,8 @@ void *AnimatedHazardManager_Create(void)
+         return gUnk_02000050;
+     p = Task_Create(8, 0x538);
+     if (p != 0) {
+-        Task_SetCallbacks(p, (void (*)(void *))AnimatedHazardManager_Update, (void (*)(void *))AnimatedHazardManager_Destroy);
++        Task_SetCallbacks(p, (void (*)(void *))AnimatedHazardManager_Update,
++                          (void (*)(void *))AnimatedHazardManager_Destroy);
+         if (AnimatedHazardManager_Initialize(p) < 0) {
+             Task_Kill(p);
+             return 0;
+diff --git a/src/background_controller.c b/src/background_controller.c
+index 5ecda4778..cfc95a1a7 100644
+--- a/src/background_controller.c
++++ b/src/background_controller.c
+@@ -768,7 +768,6 @@ s32 ScrollingBackground_Update(struct ScrollingBackground *p)
+     }
+ }
+ 
+-
+ u32 ScrollingBackground_Destroy(struct ScrollingBackground *p)
+ {
+     /* The slot table is pointer-sized; a u32 view keeps the original access shape. */
+diff --git a/src/breakable_barrier.c b/src/breakable_barrier.c
+index 5004d3879..4bbaf67d3 100644
+--- a/src/breakable_barrier.c
++++ b/src/breakable_barrier.c
+@@ -370,7 +370,8 @@ void *BatCurtain_Create(void)
+     void *obj;
+     obj = Task_Create(8, 0x2FC);
+     if (obj != 0) {
+-        Task_SetCallbacks(obj, (void (*)(void *))BreakableBarriers_Update, (void (*)(void *))BreakableBarriers_Destroy);
++        Task_SetCallbacks(obj, (void (*)(void *))BreakableBarriers_Update,
++                          (void (*)(void *))BreakableBarriers_Destroy);
+         if (BreakableBarriers_Initialize(obj) < 0) {
+             Task_Kill(obj);
+             return 0;
+diff --git a/src/collision_controller.c b/src/collision_controller.c
+index 145bb4b08..c9c43529d 100644
+--- a/src/collision_controller.c
++++ b/src/collision_controller.c
+@@ -24,7 +24,7 @@ struct CollisionSlot *CollisionController_FindFreeSlot(struct CollisionManager *
+ }
+ 
+ void CollisionController_ReceiveHit(struct SceneCollider *collider, struct CollisionOther *other,
+-                  struct CollisionSlot *slot)
++                                    struct CollisionSlot *slot)
+ {
+     u32 m = 0x4000;
+     if ((collider->contactFlags2 & m) == 0) {
+diff --git a/src/directional_interaction.c b/src/directional_interaction.c
+index 8c2b66500..5a2c20955 100644
+--- a/src/directional_interaction.c
++++ b/src/directional_interaction.c
+@@ -21,7 +21,8 @@ u32 DirectionalController_ConsumeEntered(struct DirectionalController *p)
+     return r;
+ }
+ 
+-s32 DirectionalController_InitSlot(struct DirectionalManager *manager, struct DirectionalController *p, s32 index)
++s32 DirectionalController_InitSlot(struct DirectionalManager *manager,
++                                   struct DirectionalController *p, s32 index)
+ {
+     void *animation = p->animation;
+     s32 r;
+@@ -37,7 +38,8 @@ s32 DirectionalController_InitSlot(struct DirectionalManager *manager, struct Di
+ }
+ 
+ /* Finds the enabled controller with the given script id; optionally returns its slot index. */
+-struct DirectionalController *DirectionalController_FindByScriptId(struct DirectionalManager *manager, s32 id, s32 *index)
++struct DirectionalController *
++DirectionalController_FindByScriptId(struct DirectionalManager *manager, s32 id, s32 *index)
+ {
+     struct DirectionalController *e;
+     s32 i;
+@@ -63,8 +65,9 @@ u32 DirectionalController_SetMarkerFadeLevel(struct DirectionalController *p, u3
+ }
+ 
+ /* Places the controller and its marker around the given point. */
+-u32 DirectionalController_SetPosition(struct DirectionalManager *manager, struct DirectionalController *p,
+-                 struct DirectionalPackedVec *in)
++u32 DirectionalController_SetPosition(struct DirectionalManager *manager,
++                                      struct DirectionalController *p,
++                                      struct DirectionalPackedVec *in)
+ {
+     struct DirectionalDrawable *q = &p->drawable;
+     p->position.x = in->x;
+diff --git a/src/falling_objects.c b/src/falling_objects.c
+index 47c596737..89f503213 100644
+--- a/src/falling_objects.c
++++ b/src/falling_objects.c
+@@ -632,7 +632,8 @@ void *FallingObjectManager_Create(void *a, u32 unused)
+         return gUnk_0200046C;
+     p = Task_Create(8, 0x20);
+     if (p != 0) {
+-        Task_SetCallbacks(p, (void *)FallingObjectManager_Update, (void *)FallingObjectManager_Destroy);
++        Task_SetCallbacks(p, (void *)FallingObjectManager_Update,
++                          (void *)FallingObjectManager_Destroy);
+         if (FallingObjectManager_Initialize(p, a) < 0) {
+             Task_Kill(p);
+             return 0;
+diff --git a/src/fn/Time_CalculateSunriseSunsetCore.c b/src/fn/Time_CalculateSunriseSunsetCore.c
+index 5ceee7932..c3ef5e2d5 100644
+--- a/src/fn/Time_CalculateSunriseSunsetCore.c
++++ b/src/fn/Time_CalculateSunriseSunsetCore.c
+@@ -38,14 +38,17 @@ u32 Time_CalculateSunriseSunsetCore(u32 year, s32 month, s32 day, double latitud
+         c.n[3] = 0;
+         Time_CalculateSolarRiseTransitSet(&c, 1, midpoint, (s32)c.d[11], longitude, latitude);
+         transit = c.d[1];
+-        Time_CalculateSolarRiseTransitSet(&c, 0, transit, (s32)transform(transit, offset), longitude, latitude);
++        Time_CalculateSolarRiseTransitSet(&c, 0, transit, (s32)transform(transit, offset),
++                                          longitude, latitude);
+     }
+     {
+         double old = c.d[0], current;
+         middle = c.d[2];
+-        Time_CalculateSolarRiseTransitSet(&c, 1, old, (s32)transform(old, offset), longitude, latitude);
++        Time_CalculateSolarRiseTransitSet(&c, 1, old, (s32)transform(old, offset), longitude,
++                                          latitude);
+         current = c.d[0];
+-        Time_CalculateSolarRiseTransitSet(&c, 1, current, (s32)transform(current, offset), longitude, latitude);
++        Time_CalculateSolarRiseTransitSet(&c, 1, current, (s32)transform(current, offset),
++                                          longitude, latitude);
+         {
+             double result = c.d[0], difference;
+             if (current > result)
+@@ -64,9 +67,11 @@ u32 Time_CalculateSunriseSunsetCore(u32 year, s32 month, s32 day, double latitud
+         double old;
+         double intermediate = (middle - 40000.0) * 1.002737909 + 0.671262;
+         double offset2 = longitude / 360.0;
+-        Time_CalculateSolarRiseTransitSet(&c, 3, middle, (s32)(intermediate + offset2), longitude, latitude);
++        Time_CalculateSolarRiseTransitSet(&c, 3, middle, (s32)(intermediate + offset2), longitude,
++                                          latitude);
+         old = c.d[2];
+-        Time_CalculateSolarRiseTransitSet(&c, 3, old, (s32)transform(old, offset2), longitude, latitude);
++        Time_CalculateSolarRiseTransitSet(&c, 3, old, (s32)transform(old, offset2), longitude,
++                                          latitude);
+         {
+             double result = c.d[2], difference;
+             if (old > result)
+diff --git a/src/fn/sub_08017270.c b/src/fn/sub_08017270.c
+index 18af7accc..da3cd40d3 100644
+--- a/src/fn/sub_08017270.c
++++ b/src/fn/sub_08017270.c
+@@ -19,8 +19,9 @@ void ScanlineEffect_SetSource(int, int, void *);
+ int ScanlineWave_Update(struct Wave *p)
+ {
+     if (p->enabled) {
+-        ScanlineEffect_SetSource(p->target, p->mode,
+-                     &p->samples[p->bank][(gUnk_03004C30[gUnk_03005220].y + p->phase) & 127]);
++        ScanlineEffect_SetSource(
++            p->target, p->mode,
++            &p->samples[p->bank][(gUnk_03004C30[gUnk_03005220].y + p->phase) & 127]);
+         if (++p->timer >= p->period) {
+             p->timer = 0;
+             p->phase += p->step;
+diff --git a/src/fn/sub_080187BC.c b/src/fn/sub_080187BC.c
+deleted file mode 100644
+index 8b1a8f929..000000000
+--- a/src/fn/sub_080187BC.c
++++ /dev/null
+@@ -1,21 +0,0 @@
+-#include "global.h"
+-struct S {
+-    u8 f[0x24];
+-    u16 n;
+-};
+-u32 OrbitingParticles_HasActiveOrb(struct S *s)
+-{
+-    s32 i = 0;
+-    u8 *e;
+-    if (i < s->n) {
+-        s32 n = s->n;
+-        e = (u8 *)s + 0x34;
+-        do {
+-            if (*e == 1)
+-                return 1;
+-            e += 0x30;
+-            i++;
+-        } while (i < n);
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_080187E4.c b/src/fn/sub_080187E4.c
+deleted file mode 100644
+index f3c666bb5..000000000
+--- a/src/fn/sub_080187E4.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_03005308;
+-extern u8 gUnk_0203B400[];
+-struct B {
+-    u8 a;
+-    u8 r;
+-    u16 c;
+-    u16 d;
+-    u16 t;
+-    u32 fl;
+-};
+-struct O {
+-    u8 f[0x18];
+-    s32 lo;
+-    s32 hi;
+-};
+-void OrbitingParticles_SpawnOrb(struct O *o, struct B *b)
+-{
+-    if (b->t == 0) {
+-        if (o->hi < 0 || o->lo < o->hi) {
+-            b->a = 1;
+-            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
+-            b->r = *(u16 *)(gUnk_0203B400 + gUnk_03005308 * 2);
+-            b->c = 0;
+-            b->fl &= ~1;
+-        }
+-    } else {
+-        b->t--;
+-    }
+-}
+diff --git a/src/fn/sub_08018840.c b/src/fn/sub_08018840.c
+deleted file mode 100644
+index d2fa52215..000000000
+--- a/src/fn/sub_08018840.c
++++ /dev/null
+@@ -1,25 +0,0 @@
+-#include "global.h"
+-struct Orb {
+-    u8 state, angle;
+-    u16 rise, radius, timer;
+-    u32 flags;
+-    u8 tail[36];
+-};
+-struct Manager {
+-    u8 pad[32];
+-    u16 speed, limit, count, frame;
+-    void *resource;
+-};
+-void sub_08217EEC(void *, void *, int);
+-void OrbitingParticles_Advance(struct Manager *m, struct Orb *p)
+-{
+-    p->rise += m->speed;
+-    if (!(p->timer & 3))
+-        sub_08217EEC(&p->flags, m->resource, m->frame + ((p->timer >> 2) & 1));
+-    p->timer++;
+-    if (p->rise >= m->limit) {
+-        p->state = 0;
+-        p->flags |= 1;
+-        p->timer = ((8 - m->count) << 2) + 4;
+-    }
+-}
+diff --git a/src/fn/sub_08018898.c b/src/fn/sub_08018898.c
+deleted file mode 100644
+index 6ff1fb47f..000000000
+--- a/src/fn/sub_08018898.c
++++ /dev/null
+@@ -1,89 +0,0 @@
+-#include "global.h"
+-// MATCHING_CONCESSION: register-pinning
+-struct Vec {
+-    s16 x, y, z, pad;
+-};
+-struct Sprite {
+-    u32 flags;
+-    u8 pad[20];
+-    struct Vec position;
+-    u8 tail[8];
+-};
+-struct Orb {
+-    u8 state, angle;
+-    u16 rise, radius, timer;
+-    struct Sprite sprite;
+-};
+-struct Manager {
+-    u8 pad[24];
+-    int time, duration;
+-    u16 speed, limit, count, frame;
+-    void *resource;
+-    struct Vec position;
+-    struct Orb orbs[8];
+-};
+-extern const s16 gUnk_086149C4[];
+-void OrbitingParticles_SpawnOrb(void *, void *);
+-void OrbitingParticles_Advance(void *, void *);
+-int OrbitingParticles_HasActiveOrb(void *);
+-void Task_Kill(void *);
+-static inline int scale(int v)
+-{
+-    if (v >= 0)
+-        return v >> 12;
+-    return -((-v) >> 12);
+-}
+-int OrbitingParticles_Update(struct Manager *m)
+-{
+-    int i;
+-    i = 0;
+-    if (i < m->count) {
+-        struct Vec *position = &m->orbs[0].sprite.position;
+-        struct Orb *cursor = m->orbs;
+-        struct Orb *p = cursor;
+-        do {
+-            int angle, radius;
+-            struct Vec *out;
+-            register const s16 *table asm("r2");
+-            struct Orb *arg = cursor;
+-            asm("" : "+r"(arg));
+-            if (!p->state)
+-                OrbitingParticles_SpawnOrb(m, arg);
+-            else
+-                OrbitingParticles_Advance(m, arg);
+-            out = position;
+-            angle = p->angle;
+-            radius = p->radius;
+-            table = gUnk_086149C4;
+-            out->x = scale(table[(angle + 64) & 255] * radius);
+-            out->y = 0;
+-            out->z = scale(table[angle] * radius);
+-            p->sprite.position.y += p->rise;
+-            p->sprite.position.x += m->position.x;
+-            p->sprite.position.y += m->position.y;
+-            p->sprite.position.z += m->position.z;
+-            position = (void *)((u8 *)position + 48);
+-            p++;
+-            cursor++;
+-            i++;
+-        } while (i < m->count);
+-    }
+-    {
+-        u32 *flags;
+-        i = m->count;
+-        if (i <= 7) {
+-            int mask = 1, offset;
+-            offset = i * 48 + 60;
+-            flags = (void *)(offset + (u32)m);
+-            do {
+-                *flags |= mask;
+-                flags = (void *)((u8 *)flags + 48);
+-                i++;
+-            } while (i <= 7);
+-        }
+-    }
+-    m->time++;
+-    if (m->duration > 0 && m->time >= m->duration && !OrbitingParticles_HasActiveOrb(m))
+-        Task_Kill(m);
+-    return 0;
+-}
+diff --git a/src/fn/sub_080189A8.c b/src/fn/sub_080189A8.c
+deleted file mode 100644
+index 264b9d2ec..000000000
+--- a/src/fn/sub_080189A8.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "global.h"
+-void Effect_Remove(u8 *);
+-u32 OrbitingParticles_Destroy(u8 *p)
+-{
+-    s32 i;
+-    u8 *q = p + 0x3c;
+-    for (i = 7; i >= 0; i--) {
+-        Effect_Remove(q);
+-        q += 0x30;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_080189C8.c b/src/fn/sub_080189C8.c
+deleted file mode 100644
+index f3ef22f08..000000000
+--- a/src/fn/sub_080189C8.c
++++ /dev/null
+@@ -1,169 +0,0 @@
+-#include "global.h"
+-struct Vec {
+-    s16 x, y, z, pad;
+-};
+-struct Sprite {
+-    u32 flags;
+-    u8 pad[20];
+-    struct Vec position;
+-    u8 tail[8];
+-};
+-struct Orb {
+-    u8 state, angle;
+-    u16 rise, radius, timer;
+-    struct Sprite sprite;
+-};
+-struct Manager {
+-    u8 pad[24];
+-    int time, duration;
+-    u16 speed, limit, count, frame;
+-    void *resource;
+-    struct Vec position;
+-    struct Orb orbs[8];
+-};
+-extern const s16 gUnk_086149C4[];
+-void OrbitingParticles_SpawnOrb(void *, void *);
+-void OrbitingParticles_Advance(void *, void *);
+-int OrbitingParticles_HasActiveOrb(void *);
+-void Task_Kill(void *);
+-static inline int scale(int v)
+-{
+-    if (v >= 0)
+-        return v >> 12;
+-    return -((-v) >> 12);
+-}
+-struct Map {
+-    u32 pad;
+-    u8 *cells;
+-    u8 pad8[28];
+-    u16 rows[1];
+-};
+-extern struct Map *gUnk_030052F4;
+-extern u32 gUnk_030052F8, gUnk_030052FC;
+-u8 *TerrainModifiers_FindCellOverride(int, int);
+-void *AnimData_FindEntry(int);
+-extern u32 gUnk_03005308;
+-extern u16 gUnk_0203B400[];
+-void sub_08217DE0(void *, void *, int);
+-void Effect_SetOrigin(void *, int, int);
+-void sub_08217EEC(void *, void *, int);
+-void Effect_SetPalette(void *, int);
+-static inline u8 *cell(int i)
+-{
+-    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
+-    if (p)
+-        return p + 4;
+-    return gUnk_030052F4->cells + 12 + i * 4;
+-}
+-static inline int randomAngle(void)
+-{
+-    u32 offset, value;
+-    u16 *table;
+-    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+-    offset = gUnk_03005308 * 2;
+-    table = ((u16 *)RANDOM_TABLE_ADDR);
+-    value = *(u16 *)(offset + (u32)table);
+-    return (value & 127) - 32;
+-}
+-int OrbitingParticles_Initialize(struct Manager *m, struct Vec *source, int radius, int duration,
+-                                 int count, int type)
+-{
+-    int i, index, height, slope;
+-    struct Vec *pos;
+-    u8 *c;
+-    struct Orb *p;
+-    switch (type) {
+-        case 1:
+-            m->resource = AnimData_FindEntry(0x1c1e);
+-            m->frame = 0;
+-            break;
+-        case 3:
+-            m->resource = AnimData_FindEntry(0x1c1e);
+-            m->frame = 4;
+-            break;
+-        case 4:
+-            m->resource = AnimData_FindEntry(0x1c1e);
+-            m->frame = 6;
+-            break;
+-        case 5:
+-            m->resource = AnimData_FindEntry(0x1c1e);
+-            m->frame = 8;
+-            break;
+-        case 6:
+-            m->resource = AnimData_FindEntry(0x1c1e);
+-            m->frame = 10;
+-            break;
+-        case 7:
+-            m->resource = AnimData_FindEntry(0x1c1e);
+-            m->frame = 12;
+-            break;
+-        case 8:
+-            m->resource = AnimData_FindEntry(0x1c1e);
+-            m->frame = 14;
+-            break;
+-        case 0:
+-        case 2:
+-        default:
+-            m->resource = AnimData_FindEntry(0x1c1e);
+-            m->frame = 2;
+-            break;
+-    }
+-    m->position = *source;
+-    pos = &m->position;
+-    {
+-        int x = pos->x >> 8, z = pos->z >> 8;
+-        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
+-            index = 0;
+-        else
+-            index = gUnk_030052F4->rows[z] + x;
+-    }
+-    c = cell(index);
+-    slope = *c >> 4;
+-    height = (*c & 15) << 8;
+-    switch (slope) {
+-        case 1:
+-            height -= (u8)pos->z;
+-            break;
+-        case 2:
+-            height -= (u8)pos->x;
+-            break;
+-    }
+-    if (m->position.y < height)
+-        m->position.y = height;
+-    m->time = 0;
+-    m->duration = duration;
+-    m->speed = 20;
+-    m->limit = 400;
+-    if (count > 7)
+-        count = 8;
+-    m->count = count;
+-    p = m->orbs;
+-    for (i = 0; i <= 7; p++) {
+-        struct Sprite *s = &p->sprite;
+-        int angle, r;
+-        p->state = 0;
+-        p->angle = randomAngle();
+-        p->rise = 0;
+-        p->radius = radius;
+-        p->timer = i * 4;
+-        sub_08217DE0(s, m->resource, 1);
+-        Effect_SetOrigin(s, -4, -4);
+-        sub_08217EEC(s, m->resource, m->frame);
+-        Effect_SetPalette(s, 1);
+-        angle = p->angle;
+-        r = p->radius;
+-        p->sprite.position.x = scale(gUnk_086149C4[(angle + 64) & 255] * r);
+-        p->sprite.position.y = 0;
+-        p->sprite.position.z = scale(gUnk_086149C4[angle] * r);
+-        p->sprite.position.y += p->rise;
+-        p->sprite.position.x += m->position.x;
+-        p->sprite.position.y += m->position.y;
+-        p->sprite.position.z += m->position.z;
+-        {
+-            int one = 1;
+-            ((u8 *)s)[15] = one;
+-            i += one;
+-        }
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_08018C48.c b/src/fn/sub_08018C48.c
+deleted file mode 100644
+index 65cca8c5e..000000000
+--- a/src/fn/sub_08018C48.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include "global.h"
+-void *Task_Create(int, int);
+-void Task_SetCallbacks(void *, void *, void *);
+-int OrbitingParticles_Update(void *);
+-int OrbitingParticles_Destroy(void *);
+-int OrbitingParticles_Initialize(void *, void *, int, int, int, int);
+-void Task_Kill(void *);
+-void *OrbitingParticles_Create(void *pos, int radius, int duration, int count, int type)
+-{
+-    void *p = Task_Create(11, 436);
+-    if (p) {
+-        Task_SetCallbacks(p, OrbitingParticles_Update, OrbitingParticles_Destroy);
+-        if (OrbitingParticles_Initialize(p, pos, radius, duration, count, type) < 0) {
+-            Task_Kill(p);
+-            return 0;
+-        }
+-    }
+-    return p;
+-}
+diff --git a/src/fn/sub_08018CA8.c b/src/fn/sub_08018CA8.c
+deleted file mode 100644
+index 5ada87444..000000000
+--- a/src/fn/sub_08018CA8.c
++++ /dev/null
+@@ -1,42 +0,0 @@
+-#include "global.h"
+-void *Task_Create(int, int);
+-void Task_SetCallbacks(void *, void *, void *);
+-int OrbitingParticles_Update(void *);
+-int OrbitingParticles_Destroy(void *);
+-int OrbitingParticles_Initialize(void *, void *, int, int, int, int);
+-void Task_Kill(void *);
+-int Script_SeekToKeyword(int);
+-int Script_GetValue(void);
+-int Script_GetKeywordValue(int, int);
+-struct Vec {
+-    signed x : 16;
+-    signed y : 16;
+-    signed z : 16;
+-};
+-void *OrbitingParticles_CreateFromScript(void)
+-{
+-    void *p = Task_Create(11, 436);
+-    struct Vec pos;
+-    int radius, duration, count, type;
+-    if (p) {
+-        if (Script_SeekToKeyword('p')) {
+-            pos.x = Script_GetValue();
+-            pos.y = Script_GetValue();
+-            pos.z = Script_GetValue();
+-        } else {
+-            pos.x = 0;
+-            pos.y = 0;
+-            pos.z = 0;
+-        }
+-        radius = Script_GetKeywordValue('d', 256);
+-        duration = Script_GetKeywordValue('t', 256);
+-        count = Script_GetKeywordValue('n', 8);
+-        type = Script_GetKeywordValue('T', 0);
+-        Task_SetCallbacks(p, OrbitingParticles_Update, OrbitingParticles_Destroy);
+-        if (OrbitingParticles_Initialize(p, &pos, radius, duration, count, type) < 0) {
+-            Task_Kill(p);
+-            return 0;
+-        }
+-    }
+-    return p;
+-}
+diff --git a/src/fn/sub_08018D84.c b/src/fn/sub_08018D84.c
+deleted file mode 100644
+index edc9c0fe6..000000000
+--- a/src/fn/sub_08018D84.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "global.h"
+-
+-void OrbitingParticles_Stop(u8 *p)
+-{
+-    if (p) {
+-        *(u32 *)(p + 0x1C) = *(u32 *)(p + 0x18);
+-    }
+-}
+diff --git a/src/fn/sub_0801ADC0.c b/src/fn/sub_0801ADC0.c
+index 66fc7e30f..c21c2ca87 100644
+--- a/src/fn/sub_0801ADC0.c
++++ b/src/fn/sub_0801ADC0.c
+@@ -47,7 +47,8 @@ void SelectionMenu_Choose(u8 *p)
+                     Presentation_UpdateActorGraphic(p, 0);
+                 }
+                 if (gUnk_03005260[1] & 1) {
+-                    if (*Inventory_GetEquipmentEntry(p[0x1d]) != 255 && ((1 << p[0x1d]) & *(u32 *)(p + 0x34)))
++                    if (*Inventory_GetEquipmentEntry(p[0x1d]) != 255 &&
++                        ((1 << p[0x1d]) & *(u32 *)(p + 0x34)))
+                         SelectionMenu_StartAnimateChoice(p);
+                     else
+                         Sound_PlaySong(0x192);
+diff --git a/src/fn/sub_08020B8C.c b/src/fn/sub_08020B8C.c
+index da2da63f3..794c007c4 100644
+--- a/src/fn/sub_08020B8C.c
++++ b/src/fn/sub_08020B8C.c
+@@ -26,8 +26,8 @@ int SceneMessages_Update(u8 *p)
+         if (p[0x1f]) {
+             void *message;
+             *((u16 *)(p + 0x1c)) = 0;
+-            while (message = SceneMessages_GetEventMessage(*((s16 *)(p + 0x18)), *((s16 *)(p + 0x1a)),
+-                                          *((u16 *)(p + 0x1c)))) {
++            while (message = SceneMessages_GetEventMessage(
++                       *((s16 *)(p + 0x18)), *((s16 *)(p + 0x1a)), *((u16 *)(p + 0x1c)))) {
+                 SceneMessages_Enqueue(p, message);
+                 (*((u16 *)(p + 0x1c)))++;
+             }
+diff --git a/src/fn/sub_080221DC.c b/src/fn/sub_080221DC.c
+index 21496ddbe..02baa1d43 100644
+--- a/src/fn/sub_080221DC.c
++++ b/src/fn/sub_080221DC.c
+@@ -30,6 +30,6 @@ void SceneActorGraphics_InitializeBody(u8 *p)
+         if (test)
+             flags = 0x40800;
+         Collider_SetAttackProperties(drawable, *(s16 *)(p + 0x35c), *(s16 *)(p + 0x35e), 0, flags,
+-                     *(s16 *)(p + 0x360));
++                                     *(s16 *)(p + 0x360));
+     }
+ }
+diff --git a/src/fn/sub_08022330.c b/src/fn/sub_08022330.c
+index ee6ad002c..daabdfab6 100644
+--- a/src/fn/sub_08022330.c
++++ b/src/fn/sub_08022330.c
+@@ -13,12 +13,12 @@ void SceneActorGraphics_UpdateVariant(u8 *p)
+     if (p[0x3b6] != p[0x3b7]) {
+         switch (p[0x3b6]) {
+             case 0:
+-                Collider_SetAttackProperties(drawable, *(s16 *)(p + 0x35c), *(s16 *)(p + 0x35e), 0, 0,
+-                             *(s16 *)(p + 0x360));
++                Collider_SetAttackProperties(drawable, *(s16 *)(p + 0x35c), *(s16 *)(p + 0x35e), 0,
++                                             0, *(s16 *)(p + 0x360));
+                 break;
+             case 1:
+-                Collider_SetAttackProperties(drawable, *(s16 *)(p + 0x362), *(s16 *)(p + 0x364), 0, 0x60000,
+-                             *(s16 *)(p + 0x366));
++                Collider_SetAttackProperties(drawable, *(s16 *)(p + 0x362), *(s16 *)(p + 0x364), 0,
++                                             0x60000, *(s16 *)(p + 0x366));
+                 break;
+         }
+         {
+diff --git a/src/fn/sub_08029908.c b/src/fn/sub_08029908.c
+index 99cfe9812..fd7d1938c 100644
+--- a/src/fn/sub_08029908.c
++++ b/src/fn/sub_08029908.c
+@@ -23,5 +23,6 @@ void GridAttackActor_InitBodyCollider(u8 *p)
+     Collider_Init(collider, 0, 0x2401, 0, 16, &size, &offset);
+     Collider_SetPosition(collider, p + 0x8a4, 0);
+     Collider_SetCallback(collider, GridAttackActor_OnBodyCollision, p);
+-    Collider_SetAttackProperties(collider, *(s16 *)(p + 0x1ac), *(s16 *)(p + 0x1ae), 0, 0, *(s16 *)(p + 0x1b0));
++    Collider_SetAttackProperties(collider, *(s16 *)(p + 0x1ac), *(s16 *)(p + 0x1ae), 0, 0,
++                                 *(s16 *)(p + 0x1b0));
+ }
+diff --git a/src/fn/sub_0802C9A0.c b/src/fn/sub_0802C9A0.c
+index 5066d8391..fc2235c2d 100644
+--- a/src/fn/sub_0802C9A0.c
++++ b/src/fn/sub_0802C9A0.c
+@@ -11,7 +11,7 @@ void Actor_InitHitSensor(u8 *p, void *a, void *b, void *fn)
+     Collider_SetPosition(q, p + 0xc, 0);
+     Collider_SetCallback(q, fn, p);
+     Collider_SetAttackProperties(q, *(u32 *)(p + 0x150), *(u32 *)(p + 0x154), *(u32 *)(p + 0x15c),
+-                 *(u32 *)(p + 0x160), *(u32 *)(p + 0x158));
++                                 *(u32 *)(p + 0x160), *(u32 *)(p + 0x158));
+     {
+         u32 mask = 4;
+         *(u32 *)(p + 0x50) |= mask;
+diff --git a/src/fn/sub_0802E468.c b/src/fn/sub_0802E468.c
+index 9d79ea07c..9fa5af507 100644
+--- a/src/fn/sub_0802E468.c
++++ b/src/fn/sub_0802E468.c
+@@ -107,7 +107,8 @@ int Actor_BeginScriptControl(void)
+         p->pathId = Script_GetValue();
+         p->pathParamA = Script_GetValue();
+         p->pathParamB = Script_GetValue();
+-        SceneBody_StartRoute(&p->body, p->path, (u8)p->pathId, (u8)p->pathParamA, (u8)p->pathParamB);
++        SceneBody_StartRoute(&p->body, p->path, (u8)p->pathId, (u8)p->pathParamA,
++                             (u8)p->pathParamB);
+         Path_GetPointPosition(&p->pos, p->map, p->pathParamB);
+     }
+     if (Script_SeekToKeyword(0x62)) {
+diff --git a/src/fn/sub_0802E698.c b/src/fn/sub_0802E698.c
+index de751dff2..4d0d393d2 100644
+--- a/src/fn/sub_0802E698.c
++++ b/src/fn/sub_0802E698.c
+@@ -91,7 +91,8 @@ int Actor_InitBehaviorFromScript(void *unused, struct Actor *p)
+         p->pathId = Script_GetValue();
+         p->pathParamA = Script_GetValue();
+         p->pathParamB = Script_GetValue();
+-        SceneBody_StartRoute(&p->body, p->path, (u8)p->pathId, (u8)p->pathParamA, (u8)p->pathParamB);
++        SceneBody_StartRoute(&p->body, p->path, (u8)p->pathId, (u8)p->pathParamA,
++                             (u8)p->pathParamB);
+         Path_GetPointPosition(&p->pos, p->map, p->pathParamB);
+     } else
+         p->pathId = -1;
+diff --git a/src/fn/sub_08033BD4.c b/src/fn/sub_08033BD4.c
+index cb641e116..2ee2efe25 100644
+--- a/src/fn/sub_08033BD4.c
++++ b/src/fn/sub_08033BD4.c
+@@ -10,7 +10,8 @@ void *TextWindowManager_Create(void)
+     if (!p) {
+         p = Task_Create(12, 0x20);
+         if (p) {
+-            Task_SetCallbacks(p, (void (*)(void *))TextWindowManager_OnUpdate, (void (*)(void *))TextWindowManager_OnDestroy);
++            Task_SetCallbacks(p, (void (*)(void *))TextWindowManager_OnUpdate,
++                              (void (*)(void *))TextWindowManager_OnDestroy);
+             if (TextWindowManager_Init(p) < 0) {
+                 Task_Kill(p);
+                 return 0;
+diff --git a/src/fn/sub_08034A2C.c b/src/fn/sub_08034A2C.c
+index 0f95e3544..1cf2df485 100644
+--- a/src/fn/sub_08034A2C.c
++++ b/src/fn/sub_08034A2C.c
+@@ -48,7 +48,8 @@ int WirelessController_InitLinkCallbacks(struct Engine *p)
+     if (p->pending)
+         p->pending = 0;
+     {
+-        int status = (u8)RfuManager_Init(WirelessController_OnLinkEvent, WirelessController_OnReceiveRequest);
++        int status = (u8)RfuManager_Init(WirelessController_OnLinkEvent,
++                                         WirelessController_OnReceiveRequest);
+         if (status)
+             setOperation(p, 27, 0);
+         else {
+diff --git a/src/fn/sub_08036B2C.c b/src/fn/sub_08036B2C.c
+index b5b37dc16..07c283ad7 100644
+--- a/src/fn/sub_08036B2C.c
++++ b/src/fn/sub_08036B2C.c
+@@ -40,7 +40,8 @@ static inline void setOperation(struct Engine *p, int op, int zero)
+     p->ticks = zero;
+     p->pending = 1;
+ }
+-void Wireless_SetTransferCallbacks(void *sent, void *received, void *sendFailure, void *receiveFailure)
++void Wireless_SetTransferCallbacks(void *sent, void *received, void *sendFailure,
++                                   void *receiveFailure)
+ {
+     struct Engine *p = gUnk_02000484;
+     if (p) {
+diff --git a/src/fn/sub_080374A8.c b/src/fn/sub_080374A8.c
+index 7cd2148c7..c7a38a67d 100644
+--- a/src/fn/sub_080374A8.c
++++ b/src/fn/sub_080374A8.c
+@@ -14,8 +14,8 @@ void Memory_Copy(void *destination, const void *source, int size);
+ void WirelessText_DecodeString(const u8 *source, u8 *destination, int count);
+ void TextWindow_Refresh(int window, int style);
+ 
+-int WirelessPeerPanel_SetNameFromPacket(void *ownerArg, struct PeerPanel *panel, int peerArg, int playerArg,
+-                 const u8 *packetArg)
++int WirelessPeerPanel_SetNameFromPacket(void *ownerArg, struct PeerPanel *panel, int peerArg,
++                                        int playerArg, const u8 *packetArg)
+ {
+     u8 *owner = ownerArg;
+     struct PeerPanel *p = panel;
+diff --git a/src/fn/sub_08038E48.c b/src/fn/sub_08038E48.c
+index fb90667ae..279d4f559 100644
+--- a/src/fn/sub_08038E48.c
++++ b/src/fn/sub_08038E48.c
+@@ -47,7 +47,8 @@ void WirelessTradeMenu_UpdateResultsPanel(struct P *p)
+         right = (u8 *)(offset + (u32)p->right);
+         side = Wireless_IsSessionActive();
+         money = gUnk_030053F8->money;
+-        sub_0803B700(side, p->mode, left, right, p->reward, money, WirelessGameMenu_OnResultPanelClosed);
++        sub_0803B700(side, p->mode, left, right, p->reward, money,
++                     WirelessGameMenu_OnResultPanelClosed);
+     }
+     if (p->done) {
+         int *window = &p->window;
+diff --git a/src/fn/sub_08039834.c b/src/fn/sub_08039834.c
+index 7165c7b1e..2e5f59393 100644
+--- a/src/fn/sub_08039834.c
++++ b/src/fn/sub_08039834.c
+@@ -15,6 +15,8 @@ void WirelessGame_InitDisplayAndLinkCallbacks(struct Panel *p)
+ {
+     WirelessGameItems_Create(0, 0);
+     p->task = WirelessGameDisplay_Create();
+-    Wireless_SetTransferCallbacks(WirelessExchange_OnPacketSent, WirelessExchange_OnPacketReceived, WirelessExchange_OnSendFailure, WirelessExchange_OnReceiveFailure);
++    Wireless_SetTransferCallbacks(WirelessExchange_OnPacketSent, WirelessExchange_OnPacketReceived,
++                                  WirelessExchange_OnSendFailure,
++                                  WirelessExchange_OnReceiveFailure);
+     WirelessLinkIndicator_SetPosition(4, 24);
+ }
+diff --git a/src/fn/sub_0803C7EC.c b/src/fn/sub_0803C7EC.c
+index 74731c6ad..494eeeefa 100644
+--- a/src/fn/sub_0803C7EC.c
++++ b/src/fn/sub_0803C7EC.c
+@@ -14,27 +14,30 @@ struct Item {
+     u8 pad3[12];
+     u32 threshold;
+ };
+-int ScenePool_IsEntryOutsidePlayerBounds(struct P *p,void *unused,struct Item *item)
++int ScenePool_IsEntryOutsidePlayerBounds(struct P *p, void *unused, struct Item *item)
+ {
+-    int bits=0;
+-    int i=0;
+-    if(bits<p->count) {
+-        int count=p->count;
+-        u32 *edge=p->edges;
++    int bits = 0;
++    int i = 0;
++    if (bits < p->count) {
++        int count = p->count;
++        u32 *edge = p->edges;
+         do {
+-            u32 value=*edge;
+-            if(value>0x18ffff) {
+-                u32 one=1;
+-                u32 flag=item->flags&one;
+-                u32 position=item->position;
+-                if(flag&&position<item->threshold)goto next;
+-                if(position<=value-0x190000 || position>=edge[2]+0x190000)bits|=one<<i;
++            u32 value = *edge;
++            if (value > 0x18ffff) {
++                u32 one = 1;
++                u32 flag = item->flags & one;
++                u32 position = item->position;
++                if (flag && position < item->threshold)
++                    goto next;
++                if (position <= value - 0x190000 || position >= edge[2] + 0x190000)
++                    bits |= one << i;
+             }
+         next:
+             edge++;
+             i++;
+-        } while(i<count);
++        } while (i < count);
+     }
+-    if(bits==p->expected)return 1;
++    if (bits == p->expected)
++        return 1;
+     return 0;
+ }
+diff --git a/src/fn/sub_080454C8.c b/src/fn/sub_080454C8.c
+index 2314b2098..8ff79fde1 100644
+--- a/src/fn/sub_080454C8.c
++++ b/src/fn/sub_080454C8.c
+@@ -27,5 +27,5 @@ void MotionPool_InitializeSlot(struct MotionPool *pool, struct MotionPoolSlot *s
+     Collider_Init(collider, 0, 0x2001, 0, 0x10, &params->bounds, &params->offset);
+     Collider_SetCallback(collider, MotionPool_FinishOnResourceContact, slot);
+     Collider_SetAttackProperties(collider, params->resourceId, params->cost, params->contactMode,
+-                 params->contactFlags, params->option);
++                                 params->contactFlags, params->option);
+ }
+diff --git a/src/fn/sub_08045778.c b/src/fn/sub_08045778.c
+index 2ae45f8df..0fd9244ce 100644
+--- a/src/fn/sub_08045778.c
++++ b/src/fn/sub_08045778.c
+@@ -39,7 +39,7 @@ s32 MotionPool_Spawn(const struct MotionPoolParams *params, const struct Contact
+     velocity->z = scaleMotion(gUnk_086149C4[direction & 255] * speed);
+     collider = &slot->collider;
+     Collider_SetAttackProperties(collider, params->resourceId, params->cost, params->contactMode,
+-                 params->contactFlags, params->option);
++                                 params->contactFlags, params->option);
+     collider->bounds = params->bounds;
+     collider->offset = params->offset;
+     Collider_SetPosition(collider, position, 0);
+diff --git a/src/fn/sub_08045F48.c b/src/fn/sub_08045F48.c
+index 24c6666ce..cb78b82fc 100644
+--- a/src/fn/sub_08045F48.c
++++ b/src/fn/sub_08045F48.c
+@@ -18,7 +18,7 @@ void ContactSequenceActor_UpdateAppearing(struct ContactSequenceOwner *parent,
+     if (ContactSequenceActor_TakeEntryFlag(owner)) {
+         owner->sprite.flags &= ~1;
+         Anim_RestartSequence(&owner->sequence, parent->sequenceResource,
+-                     gUnk_08605974[owner->variant & 1].frame, 0, 8);
++                             gUnk_08605974[owner->variant & 1].frame, 0, 8);
+     }
+     if (owner->sequence.index == 3 && owner->sequence.elapsed == 0)
+         Sound_PlaySongChecked(0x3B8);
+diff --git a/src/fn/sub_0804EFB4.c b/src/fn/sub_0804EFB4.c
+index df73f87c9..ef03a5188 100644
+--- a/src/fn/sub_0804EFB4.c
++++ b/src/fn/sub_0804EFB4.c
+@@ -1,6 +1,7 @@
+ #include "resource_station.h"
+ // MATCHING_CONCESSION: register-pinning
+-void Player_BeginResourceStationInteraction(struct ResourceStationPlayer *, struct ResourceStationPosition *, u32);
++void Player_BeginResourceStationInteraction(struct ResourceStationPlayer *,
++                                            struct ResourceStationPosition *, u32);
+ void ResourceStation_CheckInteraction(struct ResourceStation *station)
+ {
+     struct ResourceStationPlayer *player = station->player;
+@@ -73,7 +74,8 @@ void ResourceStation_CheckInteraction(struct ResourceStation *station)
+                         register u32 triggerOffset asm("r5") = 0x254;
+                         struct ResourceStationPosition *trigger =
+                             (void *)((u8 *)station + triggerOffset);
+-                        Player_BeginResourceStationInteraction(player, trigger, station->interactionVariant);
++                        Player_BeginResourceStationInteraction(player, trigger,
++                                                               station->interactionVariant);
+                         triggerOffset += 0xE;
+                         destination = (u8 *)station + triggerOffset;
+                         value = 1;
+diff --git a/src/fn/sub_0804FDB4.c b/src/fn/sub_0804FDB4.c
+index 564a7cea3..bdcf376ef 100644
+--- a/src/fn/sub_0804FDB4.c
++++ b/src/fn/sub_0804FDB4.c
+@@ -2,7 +2,8 @@
+ void AnimData_Load(void *, u32);
+ void Sprite_Init(void *, void *, s32);
+ void AnimData_SelectPaletteBank(void *, u32);
+-void SceneBody_Init(void *, u16, struct RepeatedEffectPosition *, u32, u32, struct RepeatedEffect *);
++void SceneBody_Init(void *, u16, struct RepeatedEffectPosition *, u32, u32,
++                    struct RepeatedEffect *);
+ void TerrainOverlay_QueueAddActor(void *);
+ void RepeatedEffect_InitSprite(struct RepeatedEffect *effect,
+                                struct RepeatedEffectPosition *position, u32 bodyEnabled)
+diff --git a/src/fn/sub_08050404.c b/src/fn/sub_08050404.c
+index 2ea2d5dbc..e5444d534 100644
+--- a/src/fn/sub_08050404.c
++++ b/src/fn/sub_08050404.c
+@@ -47,7 +47,8 @@ void CellGate_UpdateForcedDirection(struct CellGate *gate)
+             }
+             if (!CellGate_TestForcedPassage(gate)) {
+                 if (!gate->registered) {
+-                    TerrainModifiers_RegisterCell(gate->registration, gate->cell, 0, gate->height, 255, 0x80B);
++                    TerrainModifiers_RegisterCell(gate->registration, gate->cell, 0, gate->height,
++                                                  255, 0x80B);
+                     gate->registered = 1;
+                 }
+             } else
+diff --git a/src/fn/sub_080505BC.c b/src/fn/sub_080505BC.c
+index f357d34c8..69804fdab 100644
+--- a/src/fn/sub_080505BC.c
++++ b/src/fn/sub_080505BC.c
+@@ -24,7 +24,8 @@ void CellGate_UpdateConditionalBarrier(struct CellGate *gate)
+         } else {
+             if (CellGate_TestTraversalMode(gate) && CellGate_TestPlayerEdge(gate, 64)) {
+                 if (!gate->registered) {
+-                    TerrainModifiers_RegisterCell(gate->registration, gate->cell, 0, gate->height, 255, 0x82A);
++                    TerrainModifiers_RegisterCell(gate->registration, gate->cell, 0, gate->height,
++                                                  255, 0x82A);
+                     gate->registered = 1;
+                 }
+             } else if (gate->registered) {
+diff --git a/src/fn/sub_08051858.c b/src/fn/sub_08051858.c
+index 992ebe6dc..86e25ad4c 100644
+--- a/src/fn/sub_08051858.c
++++ b/src/fn/sub_08051858.c
+@@ -71,7 +71,8 @@ s32 BreakableProp_InitializeFromScript(struct BreakableProp *input, u32 id, u32
+         struct ContactPosition *point = (void *)&packet;
+         prop->height = (point->y >> 8) + 1;
+     }
+-    TerrainModifiers_RegisterCell(prop->terrainRegistration, prop->cell, 0, prop->height, 255, 0x103);
++    TerrainModifiers_RegisterCell(prop->terrainRegistration, prop->cell, 0, prop->height, 255,
++                                  0x103);
+     BreakableProp_InitializeSprite(prop, &packet);
+     BreakableProp_InitializeCollider(prop, id, &packet);
+     script = Script_SeekToKeyword('R');
+diff --git a/src/fn/sub_08054DC4.c b/src/fn/sub_08054DC4.c
+index cba459e80..38e29d78b 100644
+--- a/src/fn/sub_08054DC4.c
++++ b/src/fn/sub_08054DC4.c
+@@ -20,7 +20,7 @@ void DisplayTrack_SetSequenceFromScript(void)
+                 if (variant) {
+                     state = &track->sequenceState;
+                     Anim_RestartSequence(state, track->sequenceResource, track->sequenceId,
+-                                 track->sequenceRow, track->mirror);
++                                         track->sequenceRow, track->mirror);
+                 } else {
+                     state = &track->sequenceState;
+                     Anim_SetSequence(state, (void *)track->sequenceResource, track->sequenceId,
+diff --git a/src/fn/sub_0805CD60.c b/src/fn/sub_0805CD60.c
+index ae62272bf..5255ad1d8 100644
+--- a/src/fn/sub_0805CD60.c
++++ b/src/fn/sub_0805CD60.c
+@@ -1,7 +1,7 @@
+ #include "scene_panel_subject.h"
+ /* ScenePanelSubject_TickInactive: No-op callback for subject state 0; parallels the other Tick state handlers and distinguishes it from TickIdle */
+ #define ScenePanelSubject_TickInactive sub_0805CD60
+-#define ScenePanelSubject_Idle sub_0805CD60
++#define ScenePanelSubject_Idle         sub_0805CD60
+ void ScenePanelSubject_Idle(struct ScenePanelSubjectView *subject)
+ {
+ }
+diff --git a/src/fn/sub_0805F3A4.c b/src/fn/sub_0805F3A4.c
+index cd8fc84f4..556aa4f95 100644
+--- a/src/fn/sub_0805F3A4.c
++++ b/src/fn/sub_0805F3A4.c
+@@ -22,7 +22,8 @@ void SceneInputPanel_GetEquippedValues(s32 *primaryValue, s32 *secondaryValue,
+         index = equipment->selected - 8;
+         entry = (void *)(index * 2 + (u32)equipment);
+         if (entry->secondary[0] >= 0) {
+-            second = Player_GetEquipmentLevelBonus(GameState_GetUnlockDescriptor(entry->secondary[0]));
++            second =
++                Player_GetEquipmentLevelBonus(GameState_GetUnlockDescriptor(entry->secondary[0]));
+             secondIndex = index;
+         }
+     }
+diff --git a/src/fn/sub_0806122C.c b/src/fn/sub_0806122C.c
+index 15e31462b..850222a7f 100644
+--- a/src/fn/sub_0806122C.c
++++ b/src/fn/sub_0806122C.c
+@@ -46,7 +46,8 @@ s32 SceneInventory_ClassifyConsumableAction(struct SceneInventoryControlView *pa
+         if (item < 0)
+             goto invalid;
+         {
+-            struct SceneInventoryControlConsumable *definition = GameState_GetConsumableDescriptor(item);
++            struct SceneInventoryControlConsumable *definition =
++                GameState_GetConsumableDescriptor(item);
+             s32 value = definition->baseValue;
+             result = -1;
+             if (!value)
+diff --git a/src/fn/sub_08062414.c b/src/fn/sub_08062414.c
+index bb72f970a..c4d8e28be 100644
+--- a/src/fn/sub_08062414.c
++++ b/src/fn/sub_08062414.c
+@@ -19,7 +19,8 @@ struct SceneInventoryFunds {
+     s16 funds;
+ };
+ s32 SceneInput_TickPairTransition(struct SceneInputPair *);
+-void SceneInventory_PrepareEquipmentDescriptor(struct SceneInventoryTail *, struct SceneInventoryPurchaseDescriptor *);
++void SceneInventory_PrepareEquipmentDescriptor(struct SceneInventoryTail *,
++                                               struct SceneInventoryPurchaseDescriptor *);
+ void Inventory_SetEquipmentEntry(u32, struct SceneInventoryPurchaseDescriptor *);
+ void Inventory_SetItemId(u32, s32);
+ void Inventory_SetConsumableEntry(u32, s32);
+diff --git a/src/fn/sub_08063F00.c b/src/fn/sub_08063F00.c
+index fb71e08aa..b1af17eea 100644
+--- a/src/fn/sub_08063F00.c
++++ b/src/fn/sub_08063F00.c
+@@ -9,7 +9,8 @@ u8 *RoamingObject_Create(u32 a, u32 b)
+ {
+     u8 *r = Task_Create(8, 0x144);
+     if (r) {
+-        Task_SetCallbacks(r, (void (*)(void))RoamingObject_Tick, (void (*)(void))RoamingObject_Destroy);
++        Task_SetCallbacks(r, (void (*)(void))RoamingObject_Tick,
++                          (void (*)(void))RoamingObject_Destroy);
+         if (RoamingObject_Initialize(r, a, b) < 0) {
+             Task_Kill(r);
+             return 0;
+diff --git a/src/fn/sub_0806458C.c b/src/fn/sub_0806458C.c
+index 2695a5f7a..a51c06e39 100644
+--- a/src/fn/sub_0806458C.c
++++ b/src/fn/sub_0806458C.c
+@@ -9,7 +9,8 @@ u8 *RoamingObjectB_Create(u32 a, u32 b)
+ {
+     u8 *r = Task_Create(8, 0x144);
+     if (r) {
+-        Task_SetCallbacks(r, (void (*)(void))RoamingObjectB_Tick, (void (*)(void))RoamingObjectB_Destroy);
++        Task_SetCallbacks(r, (void (*)(void))RoamingObjectB_Tick,
++                          (void (*)(void))RoamingObjectB_Destroy);
+         if (RoamingObjectB_Initialize(r, a, b) < 0) {
+             Task_Kill(r);
+             return 0;
+diff --git a/src/fn/sub_08067014.c b/src/fn/sub_08067014.c
+index 52d2e0974..0f9385e8b 100644
+--- a/src/fn/sub_08067014.c
++++ b/src/fn/sub_08067014.c
+@@ -1,7 +1,7 @@
+ #include "scene_actor_control.h"
+ /* SceneActorControl_DoNothing: Empty function preceding TickJitter; no callers or callback role established */
+ #define SceneActorControl_DoNothing sub_08067014
+-#define SceneActorControl_NoOp sub_08067014
++#define SceneActorControl_NoOp      sub_08067014
+ void SceneActorControl_NoOp(void)
+ {
+ }
+diff --git a/src/fn/sub_08067C0C.c b/src/fn/sub_08067C0C.c
+index f2a281201..09291ff7b 100644
+--- a/src/fn/sub_08067C0C.c
++++ b/src/fn/sub_08067C0C.c
+@@ -1,7 +1,7 @@
+ #include "global.h"
+ /* SceneActorControl_ReturnImmediately: Empty function following the departure request loop; no callers or callback role established */
+ #define SceneActorControl_ReturnImmediately sub_08067C0C
+-#define SceneActorControl_NoOp sub_08067C0C
++#define SceneActorControl_NoOp              sub_08067C0C
+ void SceneActorControl_NoOp(void)
+ {
+ }
+diff --git a/src/fn/sub_08069214.c b/src/fn/sub_08069214.c
+index 9713d31fb..2823b6a02 100644
+--- a/src/fn/sub_08069214.c
++++ b/src/fn/sub_08069214.c
+@@ -5,10 +5,10 @@ void BouncingObject_TickRemoval(struct BouncingPool *unused, struct BouncingObje
+ {
+     s8 *index;
+     if (object->enter) {
+-        ExplosionEffect_Create(&object->sprite.position, 32, object->spawnParameterA, object->spawnParameterB,
+-                     0);
++        ExplosionEffect_Create(&object->sprite.position, 32, object->spawnParameterA,
++                               object->spawnParameterB, 0);
+         SceneStimulus_AddTagged(object->sprite.position.x, object->sprite.position.z, 1024, 0, 1,
+-                     (u16)object->colliderConfig);
++                                (u16)object->colliderConfig);
+         object->enter = 0;
+     }
+     {
+diff --git a/src/fn/sub_08069C94.c b/src/fn/sub_08069C94.c
+index 01e9c6359..a0238f627 100644
+--- a/src/fn/sub_08069C94.c
++++ b/src/fn/sub_08069C94.c
+@@ -1,6 +1,6 @@
+ #include "burst_emitter.h"
+ /* BurstEmitter_TickIdle: No-op callback for the emitter idle state; parallels BurstEmitter_TickActive. */
+-#define BurstEmitter_TickIdle sub_08069C94
++#define BurstEmitter_TickIdle  sub_08069C94
+ #define BurstEmitter_StateIdle sub_08069C94
+ void BurstEmitter_StateIdle(struct BurstEmitterPool *unusedPool, struct BurstEmitter *unusedEmitter)
+ {
+diff --git a/src/fn/sub_0806A784.c b/src/fn/sub_0806A784.c
+index 345b430a7..2b90033e0 100644
+--- a/src/fn/sub_0806A784.c
++++ b/src/fn/sub_0806A784.c
+@@ -1,6 +1,6 @@
+ #include "sprite_effect_controller.h"
+ /* SpriteEffectController_OnIdle: Empty controller callback taking pool and controller pointers; provisionally represents an idle state */
+-#define SpriteEffectController_OnIdle sub_0806A784
++#define SpriteEffectController_OnIdle    sub_0806A784
+ #define SpriteEffectController_StateIdle sub_0806A784
+ void SpriteEffectController_StateIdle(struct SpriteEffectControllerPool *unusedPool,
+                                       struct SpriteEffectController *unusedController)
+diff --git a/src/fn/sub_0806CF18.c b/src/fn/sub_0806CF18.c
+index 7c8b9ce28..8315ad3fc 100644
+--- a/src/fn/sub_0806CF18.c
++++ b/src/fn/sub_0806CF18.c
+@@ -1,7 +1,7 @@
+ #include "scene_steering_actor.h"
+ /* SceneSteeringActor_RequestTravelDepartureAll: Changes all state-four travel actors to departure state five without modifying entry latches */
+ #define SceneSteeringActor_RequestTravelDepartureAll sub_0806CF18
+-#define SceneSteeringActor_FinishSettledAll sub_0806CF18
++#define SceneSteeringActor_FinishSettledAll          sub_0806CF18
+ 
+ /* Advance state-four actors without touching their entry latch. */
+ void SceneSteeringActor_FinishSettledAll(void)
+diff --git a/src/fn/sub_08070444.c b/src/fn/sub_08070444.c
+index f3b088c86..b2b2caea2 100644
+--- a/src/fn/sub_08070444.c
++++ b/src/fn/sub_08070444.c
+@@ -2,7 +2,7 @@
+ #include "scene_actor_registry.h"
+ /* SceneActorRegistry_CountLivingByCategoryAndField1E6: Counts living actors matching category and halfword 1E6 while excluding status flag 0x20000; field meaning remains tentative */
+ #define SceneActorRegistry_CountLivingByCategoryAndField1E6 sub_08070444
+-#define SceneActorRegistry_CountLivingByCategoryAndField sub_08070444
++#define SceneActorRegistry_CountLivingByCategoryAndField    sub_08070444
+ struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
+ /* Byte98 and halfword1E6 are caller-supplied classification filters; the
+  * field1E6 interpretation remains tentative. The registry has a NULL-actor
+diff --git a/src/fn/sub_08070E44.c b/src/fn/sub_08070E44.c
+index c2af8827f..3e950f9fa 100644
+--- a/src/fn/sub_08070E44.c
++++ b/src/fn/sub_08070E44.c
+@@ -1,7 +1,7 @@
+ #include "scene_actor_registry.h"
+ /* SceneActorRegistry_FindAvailableCategoryActorAfterId: Finds the next actor after an ID with flag 2CC bit 0 clear and category in a fixed whitelist; zero starts at the head */
+ #define SceneActorRegistry_FindAvailableCategoryActorAfterId sub_08070E44
+-#define SceneActorRegistry_FindAvailableFilteredAfterId sub_08070E44
++#define SceneActorRegistry_FindAvailableFilteredAfterId      sub_08070E44
+ /* The observed category whitelist is preserved without guessing game roles. */
+ struct SceneActorRegistryActor *SceneActorRegistry_FindAvailableFilteredAfterId(u32 inputId)
+ {
+diff --git a/src/fn/sub_08074BF4.c b/src/fn/sub_08074BF4.c
+index 026b085a8..cbe034ab5 100644
+--- a/src/fn/sub_08074BF4.c
++++ b/src/fn/sub_08074BF4.c
+@@ -12,8 +12,8 @@ void SceneActorCollision_InitBody(struct SceneActorRegistryActor *actor, void *i
+     }
+     Collider_Init(collider, (u16)actor->id, 0x5109, 0, 16, size, offset);
+     Collider_SetBodyProperties(collider, SceneActorCollision_ReadBodyField3C(actor),
+-                 SceneActorCollision_ReadBodyReactionFlags(actor),
+-                 SceneActorCollision_ReadBodyField34(actor));
++                               SceneActorCollision_ReadBodyReactionFlags(actor),
++                               SceneActorCollision_ReadBodyField34(actor));
+     Collider_SetPosition(collider, &actor->position, 0);
+     Collider_SetCallback(collider, callback, owner);
+     Collider_Refresh(collider);
+diff --git a/src/fn/sub_08074C64.c b/src/fn/sub_08074C64.c
+index 1e25614e6..85cfa08ca 100644
+--- a/src/fn/sub_08074C64.c
++++ b/src/fn/sub_08074C64.c
+@@ -13,8 +13,8 @@ void SceneActorCollision_InitBodyWithFlags(struct SceneActorRegistryActor *actor
+     }
+     Collider_Init(collider, (u16)actor->id, (u16)flags, 0, 16, size, offset);
+     Collider_SetBodyProperties(collider, SceneActorCollision_ReadBodyField3C(actor),
+-                 SceneActorCollision_ReadBodyReactionFlags(actor),
+-                 SceneActorCollision_ReadBodyField34(actor));
++                               SceneActorCollision_ReadBodyReactionFlags(actor),
++                               SceneActorCollision_ReadBodyField34(actor));
+     Collider_SetPosition(collider, &actor->position, 0);
+     Collider_SetCallback(collider, callback, owner);
+     Collider_Refresh(collider);
+diff --git a/src/fn/sub_08074CD4.c b/src/fn/sub_08074CD4.c
+index d468642fc..c8251b109 100644
+--- a/src/fn/sub_08074CD4.c
++++ b/src/fn/sub_08074CD4.c
+@@ -5,8 +5,8 @@ void SceneActorCollision_InitExternalBody(struct SceneActorRegistryActor *actor,
+ {
+     Collider_Init(collider, (u16)actor->id, (u16)flags, 0, 16, size, offset);
+     Collider_SetBodyProperties(collider, SceneActorCollision_ReadBodyField3C(actor),
+-                 SceneActorCollision_ReadBodyReactionFlags(actor),
+-                 SceneActorCollision_ReadBodyField34(actor));
++                               SceneActorCollision_ReadBodyReactionFlags(actor),
++                               SceneActorCollision_ReadBodyField34(actor));
+     Collider_SetPosition(collider, &actor->position, 0);
+     Collider_SetCallback(collider, callback, owner);
+     Collider_Refresh(collider);
+diff --git a/src/fn/sub_08074D34.c b/src/fn/sub_08074D34.c
+index 5e7da5370..e25991e57 100644
+--- a/src/fn/sub_08074D34.c
++++ b/src/fn/sub_08074D34.c
+@@ -17,9 +17,9 @@ void SceneActorCollision_InitAttack(struct SceneActorRegistryActor *actor, void
+         Collider_Init(collider, (u16)actor->id, flags, 0, 16, size, offset);
+     }
+     Collider_SetAttackProperties(collider, SceneActorCollision_ReadAttackField3C(actor, index),
+-                 SceneActorCollision_ReadAttackField40(actor, index), 0,
+-                 SceneActorCollision_ReadAttackReactionFlags(actor, index),
+-                 SceneActorCollision_ReadAttackField44(actor, index));
++                                 SceneActorCollision_ReadAttackField40(actor, index), 0,
++                                 SceneActorCollision_ReadAttackReactionFlags(actor, index),
++                                 SceneActorCollision_ReadAttackField44(actor, index));
+     Collider_SetPosition(collider, &actor->position, 0);
+     Collider_SetCallback(collider, callback, owner);
+ }
+diff --git a/src/fn/sub_08074DC0.c b/src/fn/sub_08074DC0.c
+index 0b0f4f720..4d08da75b 100644
+--- a/src/fn/sub_08074DC0.c
++++ b/src/fn/sub_08074DC0.c
+@@ -8,9 +8,9 @@ void SceneActorCollision_InitExternalAttack(struct SceneActorRegistryActor *acto
+         Collider_Init(collider, (u16)actor->id, flags, 0, 16, size, offset);
+     }
+     Collider_SetAttackProperties(collider, SceneActorCollision_ReadAttackField3C(actor, index),
+-                 SceneActorCollision_ReadAttackField40(actor, index), 0,
+-                 SceneActorCollision_ReadAttackReactionFlags(actor, index),
+-                 SceneActorCollision_ReadAttackField44(actor, index));
++                                 SceneActorCollision_ReadAttackField40(actor, index), 0,
++                                 SceneActorCollision_ReadAttackReactionFlags(actor, index),
++                                 SceneActorCollision_ReadAttackField44(actor, index));
+     Collider_SetPosition(collider, &actor->position, 0);
+     Collider_SetCallback(collider, callback, owner);
+ }
+diff --git a/src/fn/sub_08074E38.c b/src/fn/sub_08074E38.c
+index 725c2168c..620ac6219 100644
+--- a/src/fn/sub_08074E38.c
++++ b/src/fn/sub_08074E38.c
+@@ -9,9 +9,9 @@ void SceneActorCollision_InitExternalAttackWithField34(struct SceneActorRegistry
+         Collider_Init(collider, (u16)actor->id, flags, 0, 16, size, offset);
+     }
+     Collider_SetAttackProperties(collider, SceneActorCollision_ReadAttackField3C(actor, index),
+-                 SceneActorCollision_ReadAttackField40(actor, index), field34,
+-                 SceneActorCollision_ReadAttackReactionFlags(actor, index),
+-                 SceneActorCollision_ReadAttackField44(actor, index));
++                                 SceneActorCollision_ReadAttackField40(actor, index), field34,
++                                 SceneActorCollision_ReadAttackReactionFlags(actor, index),
++                                 SceneActorCollision_ReadAttackField44(actor, index));
+     Collider_SetPosition(collider, &actor->position, 0);
+     Collider_SetCallback(collider, callback, owner);
+ }
+diff --git a/src/fn/sub_080772C0.c b/src/fn/sub_080772C0.c
+index 6bdc92174..cd3a425f4 100644
+--- a/src/fn/sub_080772C0.c
++++ b/src/fn/sub_080772C0.c
+@@ -35,7 +35,8 @@ done:
+     asm("" : "+r"(result));
+     return result;
+ }
+-void SceneActorPlacement_ResetActorState(struct SceneActorRegistryResetView *actor, const u16 *inputArgument)
++void SceneActorPlacement_ResetActorState(struct SceneActorRegistryResetView *actor,
++                                         const u16 *inputArgument)
+ {
+     const u16 *argument = inputArgument;
+     u32 prior, currentFlags;
+diff --git a/src/fn/sub_0807836C.c b/src/fn/sub_0807836C.c
+index 893413cfd..62d17a1b9 100644
+--- a/src/fn/sub_0807836C.c
++++ b/src/fn/sub_0807836C.c
+@@ -1,7 +1,7 @@
+ #include "scene_actor_registry.h"
+ /* SceneActorBehavior_UpdateDrawableBlink: Toggles drawable visibility at age-dependent intervals and restores visibility after age 60 */
+ #define SceneActorBehavior_UpdateDrawableBlink sub_0807836C
+-#define SceneActorBehavior_TickDrawableBlink sub_0807836C
++#define SceneActorBehavior_TickDrawableBlink   sub_0807836C
+ extern const s16 gUnk_08605C20[3];
+ static inline u8 TestNonzero(u32 value)
+ {
+diff --git a/src/fn/sub_08078B48.c b/src/fn/sub_08078B48.c
+index 494e8143e..976649ccc 100644
+--- a/src/fn/sub_08078B48.c
++++ b/src/fn/sub_08078B48.c
+@@ -1,7 +1,7 @@
+ #include "scene_actor_behavior.h"
+ /* SceneActorBehavior_UpdateDefeatState: Records defeat when counter304 is positive and updates actor and gate flags accordingly */
+ #define SceneActorBehavior_UpdateDefeatState sub_08078B48
+-#define SceneActorBehavior_TestDefeated sub_08078B48
++#define SceneActorBehavior_TestDefeated      sub_08078B48
+ 
+ void SceneActorBehavior_RecordDefeat(struct SceneActorBehaviorView *);
+ 
+diff --git a/src/fn/sub_08091E58.c b/src/fn/sub_08091E58.c
+index 1e8428be4..51b008584 100644
+--- a/src/fn/sub_08091E58.c
++++ b/src/fn/sub_08091E58.c
+@@ -26,8 +26,8 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *actor)
+     return 0;
+ }
+ void sub_08091E58(struct SceneActorBehaviorContactView *source,
+-                                              struct SceneActorBehaviorContactView *destination,
+-                                              struct SceneActorRegistryResetView *actor)
++                  struct SceneActorBehaviorContactView *destination,
++                  struct SceneActorRegistryResetView *actor)
+ {
+     register u32 index asm("r0");
+     s32 power;
+diff --git a/src/fn/sub_08111A48.c b/src/fn/sub_08111A48.c
+index 6248490f3..c0380a778 100644
+--- a/src/fn/sub_08111A48.c
++++ b/src/fn/sub_08111A48.c
+@@ -18,7 +18,8 @@ struct PaletteFade {
+ };
+ extern struct PaletteFade *gUnk_020001D8;
+ extern u16 gUnk_03004FC0[];
+-void PaletteFade_SetTransitionParameters(struct PaletteFade *, s32 slot, s32 target, s32 rate, s32 frames);
++void PaletteFade_SetTransitionParameters(struct PaletteFade *, s32 slot, s32 target, s32 rate,
++                                         s32 frames);
+ void sub_08111410(struct PaletteFade *);
+ void sub_08111578(struct PaletteFade *);
+ /* Registry routine 734C: fades palette slot -t (default 3) of the palette
+diff --git a/src/fn/sub_08121338.c b/src/fn/sub_08121338.c
+index 4066f1ae3..a063e7fb3 100644
+--- a/src/fn/sub_08121338.c
++++ b/src/fn/sub_08121338.c
+@@ -13,7 +13,8 @@ void RegistryA8CB_ResetFromScript(void)
+ {
+     void *manager = gUnk_0200020C;
+     u8 *e;
+-    if (manager && (e = RegistryA8CB_FindEntryByName(manager, Script_GetKeywordValue('n', 0))) != 0) {
++    if (manager &&
++        (e = RegistryA8CB_FindEntryByName(manager, Script_GetKeywordValue('n', 0))) != 0) {
+         u8 *p = e;
+         u8 *s = e + 0x5F8;
+         s32 i;
+diff --git a/src/fn/sub_081393DC.c b/src/fn/sub_081393DC.c
+index 6603b062d..10bae95d2 100644
+--- a/src/fn/sub_081393DC.c
++++ b/src/fn/sub_081393DC.c
+@@ -15,7 +15,8 @@ u8 *BallisticSpriteEffect_EnsureManager(void)
+         return gUnk_020004CC;
+     p = Task_Create(0xa, 0x39c);
+     if (p != 0) {
+-        Task_SetCallbacks(p, BallisticSpriteEffect_UpdateManager, BallisticSpriteEffect_DestroyManager);
++        Task_SetCallbacks(p, BallisticSpriteEffect_UpdateManager,
++                          BallisticSpriteEffect_DestroyManager);
+         if (sub_0813930C(p) < 0) {
+             Task_Kill(p);
+             return 0;
+diff --git a/src/fn/sub_08179650.c b/src/fn/sub_08179650.c
+index 85c10a77f..6039b18d2 100644
+--- a/src/fn/sub_08179650.c
++++ b/src/fn/sub_08179650.c
+@@ -7,7 +7,8 @@ struct Obj {
+     u32 x, y, z;
+ };
+ s32 Div(s32, s32);
+-void Palette_InitColorTransition(struct Obj *p, u32 x, u32 y, u32 z, u32 endX, u32 endY, u32 endZ, u32 duration)
++void Palette_InitColorTransition(struct Obj *p, u32 x, u32 y, u32 z, u32 endX, u32 endY, u32 endZ,
++                                 u32 duration)
+ {
+     p->from = x | (y << 5) | (z << 10);
+     p->to = endX | (endY << 5) | (endZ << 10);
+diff --git a/src/fn/sub_0818399C.c b/src/fn/sub_0818399C.c
+index 999609d66..de2fb7c68 100644
+--- a/src/fn/sub_0818399C.c
++++ b/src/fn/sub_0818399C.c
+@@ -37,7 +37,8 @@ void ActorController_UpdateSoundedAnimationTransition(u8 *p)
+         }
+         case 1:
+             if (p[0xB43] != 0) {
+-                Armor_SetAnimationFromStart((u32)p, (u32)&gUnk_0824ED88[((p[0xB39] + 0x60) >> 6) & 3]);
++                Armor_SetAnimationFromStart((u32)p,
++                                            (u32)&gUnk_0824ED88[((p[0xB39] + 0x60) >> 6) & 3]);
+                 *s = 0xFF;
+                 p[0xB41] = st;
+             }
+diff --git a/src/fn/sub_081936F8.c b/src/fn/sub_081936F8.c
+index 75e8f1843..95b032ac3 100644
+--- a/src/fn/sub_081936F8.c
++++ b/src/fn/sub_081936F8.c
+@@ -17,10 +17,12 @@ static inline u32 CellIndex(s32 x, s32 z)
+ void Nidhoggr_RegisterTerrainCells(u8 *t)
+ {
+     if (!t[0x71bd]) {
+-        TerrainModifiers_RegisterCell(t + 0x7100, CellIndex(gUnk_0824F478[0].x >> 8, gUnk_0824F478[0].z >> 8), 0,
+-                     gUnk_0824F478[0].y >> 8, 0xff, 0x1000);
+-        TerrainModifiers_RegisterCell(t + 0x7110, CellIndex(gUnk_0824F478[1].x >> 8, gUnk_0824F478[1].z >> 8), 0,
+-                     gUnk_0824F478[1].y >> 8, 0xff, 0x1000);
++        TerrainModifiers_RegisterCell(t + 0x7100,
++                                      CellIndex(gUnk_0824F478[0].x >> 8, gUnk_0824F478[0].z >> 8),
++                                      0, gUnk_0824F478[0].y >> 8, 0xff, 0x1000);
++        TerrainModifiers_RegisterCell(t + 0x7110,
++                                      CellIndex(gUnk_0824F478[1].x >> 8, gUnk_0824F478[1].z >> 8),
++                                      0, gUnk_0824F478[1].y >> 8, 0xff, 0x1000);
+         t[0x71bd] = 1;
+     }
+ }
+diff --git a/src/fn/sub_0819792C.c b/src/fn/sub_0819792C.c
+index f5b86d3e6..763197d62 100644
+--- a/src/fn/sub_0819792C.c
++++ b/src/fn/sub_0819792C.c
+@@ -27,7 +27,7 @@ struct Task0819792C {
+ };
+ 
+ struct Task0819792C *PaletteEffect_Create(struct Anim0819792C *anim, struct Sprite0819792C *sprite,
+-                                  u32 hold, s32 count, s32 start)
++                                          u32 hold, s32 count, s32 start)
+ {
+     struct Task0819792C *t = Task_Create(10, count * 32 + 0x28);
+     if (!t)
+diff --git a/src/fn/sub_081B9598.c b/src/fn/sub_081B9598.c
+index 037574b3b..c0d0abcba 100644
+--- a/src/fn/sub_081B9598.c
++++ b/src/fn/sub_081B9598.c
+@@ -20,7 +20,8 @@ struct O {
+     u32 w34;
+ };
+ 
+-void PositionMotion_InitParameterizedApproach(struct O *o, u32 d, struct P *a, u32 h1, u32 h2, u32 h3, u32 b1, u32 b2)
++void PositionMotion_InitParameterizedApproach(struct O *o, u32 d, struct P *a, u32 h1, u32 h2,
++                                              u32 h3, u32 b1, u32 b2)
+ {
+     if (o != 0 && d != 0 && a != 0) {
+         o->w0 = d;
+diff --git a/src/fn/sub_081B9818.c b/src/fn/sub_081B9818.c
+index eea5945cc..d21f2563d 100644
+--- a/src/fn/sub_081B9818.c
++++ b/src/fn/sub_081B9818.c
+@@ -19,7 +19,8 @@ struct O {
+     u32 w34;
+ };
+ 
+-void PositionMotion_InitTimedInterpolation(struct O *o, struct P *d, struct P *a, struct P *b, u16 h)
++void PositionMotion_InitTimedInterpolation(struct O *o, struct P *d, struct P *a, struct P *b,
++                                           u16 h)
+ {
+     o->w0 = (u32)d;
+     o->p4 = *a;
+diff --git a/src/fn/sub_081BB294.c b/src/fn/sub_081BB294.c
+index f1d66e8cb..1bf2554e4 100644
+--- a/src/fn/sub_081BB294.c
++++ b/src/fn/sub_081BB294.c
+@@ -40,5 +40,6 @@ void SolarBank_ApplyInterestFromScript(void)
+             rate = 13;
+         STATE_S16(0x598) = rate + 0x41;
+     } else
+-        STATE_S16(0x598) = Mod(*(u32 *)((u8 *)gUnk_02000710 + 0x614) ^ SunClock_GetSecond(), 13) + 0x41;
++        STATE_S16(0x598) =
++            Mod(*(u32 *)((u8 *)gUnk_02000710 + 0x614) ^ SunClock_GetSecond(), 13) + 0x41;
+ }
+diff --git a/src/fn/sub_081C0434.c b/src/fn/sub_081C0434.c
+index b89015aff..16a504034 100644
+--- a/src/fn/sub_081C0434.c
++++ b/src/fn/sub_081C0434.c
+@@ -9,7 +9,8 @@ void *TetherActor_CreateRequestIndicator(void)
+ {
+     void *p = Task_Create(9, 0xac);
+     if (p != 0) {
+-        Task_SetCallbacks(p, TetherActor_UpdateRequestIndicator, TetherActor_DestroyRequestIndicator);
++        Task_SetCallbacks(p, TetherActor_UpdateRequestIndicator,
++                          TetherActor_DestroyRequestIndicator);
+         if (sub_081C0390(p) < 0) {
+             Task_Kill(p);
+             return 0;
+diff --git a/src/fn/sub_081C1788.c b/src/fn/sub_081C1788.c
+index 392988053..d00927c04 100644
+--- a/src/fn/sub_081C1788.c
++++ b/src/fn/sub_081C1788.c
+@@ -9,7 +9,8 @@ void *RecordDisplay_Create(void)
+ {
+     void *p = Task_Create(0xb, 0x464);
+     if (p != 0) {
+-        Task_SetCallbacks(p, (void (*)(void *))PlayStats_Update, (void (*)(void *))RecordDisplay_OnTaskDestroy);
++        Task_SetCallbacks(p, (void (*)(void *))PlayStats_Update,
++                          (void (*)(void *))RecordDisplay_OnTaskDestroy);
+         if (sub_081C1578(p) < 0) {
+             Task_Kill(p);
+             return 0;
+diff --git a/src/fn/sub_081DB168.c b/src/fn/sub_081DB168.c
+index 80adf394d..da3ac3bf9 100644
+--- a/src/fn/sub_081DB168.c
++++ b/src/fn/sub_081DB168.c
+@@ -8,7 +8,7 @@ static inline void init(u16 *dest, u32 zero, u32 value)
+     *dest = zero;
+ }
+ s32 Explosion_Init(u8 *p, u8 *pos, u32 flag, s32 duration, s32 arg4, s32 arg5, s32 arg6, s32 frame,
+-                 u32 arg8)
++                   u32 arg8)
+ {
+     u8 *emitter;
+     Explosion_InitSprite(p + 0x18, p + 0x44, pos, frame);
+diff --git a/src/fn/sub_081DB1D8.c b/src/fn/sub_081DB1D8.c
+index 397cb003c..793224af8 100644
+--- a/src/fn/sub_081DB1D8.c
++++ b/src/fn/sub_081DB1D8.c
+@@ -7,8 +7,8 @@ static inline void init(u16 *dest, u32 zero, u32 value)
+     *dest++ = value;
+     *dest = zero;
+ }
+-s32 Explosion_InitWithCollisionFlags(u8 *p, u8 *pos, u32 flag, s32 duration, s32 arg4, s32 arg5, s32 arg6, s32 arg7,
+-                 s32 frame, u32 arg9)
++s32 Explosion_InitWithCollisionFlags(u8 *p, u8 *pos, u32 flag, s32 duration, s32 arg4, s32 arg5,
++                                     s32 arg6, s32 arg7, s32 frame, u32 arg9)
+ {
+     u8 *emitter;
+     Explosion_InitSprite(p + 0x18, p + 0x44, pos, frame);
+diff --git a/src/fn/sub_081DB324.c b/src/fn/sub_081DB324.c
+index 482c69573..817168517 100644
+--- a/src/fn/sub_081DB324.c
++++ b/src/fn/sub_081DB324.c
+@@ -5,7 +5,8 @@ void Explosion_Update(u8 *);
+ void Explosion_Destroy(u8 *);
+ void Task_Kill(u8 *);
+ s32 Explosion_Init(u8 *, u8 *, u32, s32, s32, s32, s32, s32, u32);
+-u8 *Explosion_Create(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4, s32 arg5, s32 arg6, u32 arg7)
++u8 *Explosion_Create(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4, s32 arg5, s32 arg6,
++                     u32 arg7)
+ {
+     u8 *obj = Task_Create(10, 188);
+     if (obj) {
+diff --git a/src/fn/sub_081DB404.c b/src/fn/sub_081DB404.c
+index 09dc30b00..f4112263e 100644
+--- a/src/fn/sub_081DB404.c
++++ b/src/fn/sub_081DB404.c
+@@ -5,13 +5,14 @@ void Explosion_Update(u8 *);
+ void Explosion_Destroy(u8 *);
+ void Task_Kill(u8 *);
+ s32 Explosion_InitWithCollisionFlags(u8 *, u8 *, u32, s32, s32, s32, s32, s32, s32, u32);
+-u8 *Explosion_CreateWithCollisionFlags(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7,
+-                 u32 arg8)
++u8 *Explosion_CreateWithCollisionFlags(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4,
++                                       s32 arg5, s32 arg6, s32 arg7, u32 arg8)
+ {
+     u8 *obj = Task_Create(10, 188);
+     if (obj) {
+         Task_SetCallbacks(obj, Explosion_Update, Explosion_Destroy);
+-        if (Explosion_InitWithCollisionFlags(obj, pos, flag, duration, arg3, arg4, arg5, arg6, arg7, arg8) < 0) {
++        if (Explosion_InitWithCollisionFlags(obj, pos, flag, duration, arg3, arg4, arg5, arg6, arg7,
++                                             arg8) < 0) {
+             Task_Kill(obj);
+             return 0;
+         }
+diff --git a/src/fn/sub_081E1E50.c b/src/fn/sub_081E1E50.c
+index 5fc33eade..5d6e7a913 100644
+--- a/src/fn/sub_081E1E50.c
++++ b/src/fn/sub_081E1E50.c
+@@ -41,7 +41,8 @@ void Anim_SetKeyframes(void *, void *, u16, s32, s32);
+ // Stop the selected preview, or signal that all categories are already silent.
+ s32 SoundTest_StopSelection(struct Viewer *p)
+ {
+-    if (!Sound_IsSongPlaying(gUnk_086136F0[p->previousA]) && !Sound_IsSongPlaying(gUnk_086137AE[p->previousB]) &&
++    if (!Sound_IsSongPlaying(gUnk_086136F0[p->previousA]) &&
++        !Sound_IsSongPlaying(gUnk_086137AE[p->previousB]) &&
+         !Sound_IsSongPlaying(gUnk_08613BC4[p->previousC])) {
+         p->labels[0].flags |= 1;
+         p->labels[1].flags |= 1;
+diff --git a/src/fn/sub_081E270C.c b/src/fn/sub_081E270C.c
+index 228a981b7..313191d6a 100644
+--- a/src/fn/sub_081E270C.c
++++ b/src/fn/sub_081E270C.c
+@@ -18,7 +18,8 @@ void TimedPresentation_Update(struct TimedSequence *p)
+             if (p->timer > p->duration - (1 << p->fadeShift)) {
+                 p->state = 1;
+                 Menu_StartFadeOut(p->fadeShift);
+-            } else if (p->timer > (1 << p->minShift) && Heap_IsEndGuardValid() && (gUnk_03005260[1] & 1)) {
++            } else if (p->timer > (1 << p->minShift) && Heap_IsEndGuardValid() &&
++                       (gUnk_03005260[1] & 1)) {
+                 p->state = 1;
+                 Menu_StartFadeOut(p->fadeShift);
+             }
+diff --git a/src/fn/sub_08200A10.c b/src/fn/sub_08200A10.c
+index 6b6accff0..4accf7bf9 100644
+--- a/src/fn/sub_08200A10.c
++++ b/src/fn/sub_08200A10.c
+@@ -93,7 +93,7 @@ void PlayerClone_InitSlot(u32 unused, u8 *s, u32 arg)
+     Collider_Init(p, zero, 0x2001, zero, 16, &v, &w);
+     Collider_SetCallback(p, PlayerClone_OnPassiveColliderContact, s);
+     Collider_SetAttackProperties(p, *(s16 *)(context + 0x10), *(s16 *)(context + 0x12), 0, zero,
+-                 *(s16 *)(context + 0x14));
++                                 *(s16 *)(context + 0x14));
+     p += 0xa8;
+     v.x = 200;
+     v.y = 128;
+@@ -104,7 +104,7 @@ void PlayerClone_InitSlot(u32 unused, u8 *s, u32 arg)
+     Collider_Init(p, zero, 0x2001, zero, 16, &v, &w);
+     Collider_SetCallback(p, PlayerClone_OnPassiveColliderContact, s);
+     Collider_SetAttackProperties(p, *(s16 *)(context + 0x18), *(s16 *)(context + 0x1a), 0, zero,
+-                 *(s16 *)(context + 0x1c));
++                                 *(s16 *)(context + 0x1c));
+     p = s + 0x128;
+     v.x = 32;
+     v.y = 32;
+diff --git a/src/fn/sub_08201784.c b/src/fn/sub_08201784.c
+index 517ebb071..27fd165de 100644
+--- a/src/fn/sub_08201784.c
++++ b/src/fn/sub_08201784.c
+@@ -33,7 +33,8 @@ void sub_08201784(u8 *p)
+     b.b.lo = 0;
+     Collider_Init(q, 0, 0x2001, 0, 0x10, &a, &b);
+     Collider_SetCallback(q, ScriptCombatActor_OnPassiveColliderContact, p);
+-    Collider_SetAttackProperties(q, *(s16 *)(p + 0x174), *(s16 *)(p + 0x176), 0, 0, *(s16 *)(p + 0x178));
++    Collider_SetAttackProperties(q, *(s16 *)(p + 0x174), *(s16 *)(p + 0x176), 0, 0,
++                                 *(s16 *)(p + 0x178));
+     q += 0x54;
+     v = (u16 *)&a;
+     r = (u16 *)&b;
+diff --git a/src/fn/sub_08210B50.c b/src/fn/sub_08210B50.c
+index fc16324a2..a48848744 100644
+--- a/src/fn/sub_08210B50.c
++++ b/src/fn/sub_08210B50.c
+@@ -5,7 +5,8 @@ s32 Mod(s32, s32);
+ void Anim_LoadKeyframe(void *, void *, u16, u32);
+ s32 Collection_UpdateCountDigits(u8 *p)
+ {
+-    s32 v = Collection_CountUnlockedEntries(p), a = Div(v, 10), b = Mod(v, 10), c = Div(27, 10), d = Mod(27, 10);
++    s32 v = Collection_CountUnlockedEntries(p), a = Div(v, 10), b = Mod(v, 10), c = Div(27, 10),
++        d = Mod(27, 10);
+     Anim_LoadKeyframe(p + 0x1c4, p + 0x24, a, 0);
+     Anim_LoadKeyframe(p + 0x224, p + 0x24, b, 0);
+     Anim_LoadKeyframe(p + 0x284, p + 0x24, c, 0);
+diff --git a/src/fn/sub_082130D4.c b/src/fn/sub_082130D4.c
+index 98d237d62..7fc4fcd8e 100644
+--- a/src/fn/sub_082130D4.c
++++ b/src/fn/sub_082130D4.c
+@@ -5,7 +5,8 @@ s32 Mod(s32, s32);
+ void Anim_LoadKeyframe(void *, void *, u16, u32);
+ s32 CollectionBook_RefreshCompletionDigits(u8 *p)
+ {
+-    s32 v = CollectionBook_CountCollectedEntries(p), a = Div(v, 10), b = Mod(v, 10), c = Div(10, 10), d = Mod(10, 10);
++    s32 v = CollectionBook_CountCollectedEntries(p), a = Div(v, 10), b = Mod(v, 10),
++        c = Div(10, 10), d = Mod(10, 10);
+     Anim_LoadKeyframe(p + 0x1e4, p + 0x24, a, 0);
+     Anim_LoadKeyframe(p + 0x244, p + 0x24, b, 0);
+     Anim_LoadKeyframe(p + 0x2a4, p + 0x24, c, 0);
+diff --git a/src/fn/sub_082132E8.c b/src/fn/sub_082132E8.c
+index 748900e7c..a2d32ca50 100644
+--- a/src/fn/sub_082132E8.c
++++ b/src/fn/sub_082132E8.c
+@@ -17,7 +17,8 @@ u32 ForgingBook_RefreshEntryDescription(u8 *s)
+         TextWindow_StartPlayback(*handle);
+         ScrollingDialogue_ClearScript();
+         ref = Script_ParseStringRef(*(u32 *)(s + 0x710));
+-        ScrollingDialogue_SetScript(Text_LookupString(ref + *(s16 *)((u8 *)entries + (*index << 1))));
++        ScrollingDialogue_SetScript(
++            Text_LookupString(ref + *(s16 *)((u8 *)entries + (*index << 1))));
+     } else {
+         handle = (u32 *)(s + 0x708);
+         TextWindow_SetScript(*handle, *(u32 *)(s + 0x70C));
+diff --git a/src/fn/sub_0821BA5C.c b/src/fn/sub_0821BA5C.c
+index 49c940d7f..4a9765b36 100644
+--- a/src/fn/sub_0821BA5C.c
++++ b/src/fn/sub_0821BA5C.c
+@@ -33,7 +33,8 @@ u32 Script_EvalExpression(u8 *p)
+                 if (category == 0x90)
+                     Script_SetStackArgument(type & 15, ((struct Slot *)((u32)slot + 8))->value);
+                 else
+-                    Script_AssignVariableOperand(reference, ((struct Slot *)((u32)slot + 8))->value);
++                    Script_AssignVariableOperand(reference,
++                                                 ((struct Slot *)((u32)slot + 8))->value);
+                 saved->value = ((struct Slot *)((u32)slot + 8))->value;
+             } else {
+                 slot->value =
+diff --git a/src/fn/sub_08221908.c b/src/fn/sub_08221908.c
+index 3fc0c6b2a..55887b5c2 100644
+--- a/src/fn/sub_08221908.c
++++ b/src/fn/sub_08221908.c
+@@ -1,7 +1,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepAngleHalf: Approaches the target along the wrapped angle difference by half and snaps within one unit */
+ #define ScalarApproach_StepAngleHalf sub_08221908
+-#define ScalarApproach_HalfAngle sub_08221908
++#define ScalarApproach_HalfAngle     sub_08221908
+ s32 ScalarApproach_HalfAngle(s32 current, s32 target)
+ {
+     s16 angle = ((u32)current - (u32)target) & 255;
+diff --git a/src/fn/sub_0822194C.c b/src/fn/sub_0822194C.c
+index d45574a51..64a2b8bf8 100644
+--- a/src/fn/sub_0822194C.c
++++ b/src/fn/sub_0822194C.c
+@@ -1,7 +1,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepAngleQuarter: Approaches the target along the wrapped angle difference by one quarter with a minimum unit step */
+ #define ScalarApproach_StepAngleQuarter sub_0822194C
+-#define ScalarApproach_QuarterAngle sub_0822194C
++#define ScalarApproach_QuarterAngle     sub_0822194C
+ s32 ScalarApproach_QuarterAngle(s32 current, s32 target)
+ {
+     s16 angle = ((u32)current - (u32)target) & 255;
+diff --git a/src/fn/sub_082219A0.c b/src/fn/sub_082219A0.c
+index 8630ef578..18f11e7cd 100644
+--- a/src/fn/sub_082219A0.c
++++ b/src/fn/sub_082219A0.c
+@@ -1,7 +1,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepAngleEighth: Approaches the target along the wrapped angle difference by one eighth with a minimum unit step */
+ #define ScalarApproach_StepAngleEighth sub_082219A0
+-#define ScalarApproach_EighthAngle sub_082219A0
++#define ScalarApproach_EighthAngle     sub_082219A0
+ s32 ScalarApproach_EighthAngle(s32 current, s32 target)
+ {
+     s16 angle = ((u32)current - (u32)target) & 255;
+diff --git a/src/fn/sub_082219F4.c b/src/fn/sub_082219F4.c
+index 2fa5850ff..7ef383658 100644
+--- a/src/fn/sub_082219F4.c
++++ b/src/fn/sub_082219F4.c
+@@ -1,7 +1,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepAngleSixteenth: Approaches the target along the wrapped angle difference by one sixteenth with a minimum unit step */
+ #define ScalarApproach_StepAngleSixteenth sub_082219F4
+-#define ScalarApproach_SixteenthAngle sub_082219F4
++#define ScalarApproach_SixteenthAngle     sub_082219F4
+ s32 ScalarApproach_SixteenthAngle(s32 current, s32 target)
+ {
+     s16 angle = ((u32)current - (u32)target) & 255;
+diff --git a/src/fn/sub_08221A48.c b/src/fn/sub_08221A48.c
+index 37414c0b0..3c3ca59c3 100644
+--- a/src/fn/sub_08221A48.c
++++ b/src/fn/sub_08221A48.c
+@@ -1,7 +1,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepAngleByDivisor: Computes a divisor-controlled wrapped angle step with minimum-step and snap thresholds */
+ #define ScalarApproach_StepAngleByDivisor sub_08221A48
+-#define ScalarApproach_DivideAngleStep sub_08221A48
++#define ScalarApproach_DivideAngleStep    sub_08221A48
+ s32 ScalarApproach_DivideAngleStep(s32 current, s32 target, s32 divisor)
+ {
+     s32 step, magnitude, near, integerStep;
+diff --git a/src/fn/sub_08221B5C.c b/src/fn/sub_08221B5C.c
+index aa7e3848f..55379fa62 100644
+--- a/src/fn/sub_08221B5C.c
++++ b/src/fn/sub_08221B5C.c
+@@ -1,7 +1,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepHalfArray: Updates signed halfword values toward corresponding targets using half steps */
+ #define ScalarApproach_StepHalfArray sub_08221B5C
+-#define ScalarApproach_HalfArray sub_08221B5C
++#define ScalarApproach_HalfArray     sub_08221B5C
+ void ScalarApproach_HalfArray(s16 *values, const s16 *targets, s32 count)
+ {
+     s32 remaining = count;
+diff --git a/src/fn/sub_08221B9C.c b/src/fn/sub_08221B9C.c
+index a77379c6c..138f69e2f 100644
+--- a/src/fn/sub_08221B9C.c
++++ b/src/fn/sub_08221B9C.c
+@@ -2,7 +2,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepQuarterArray: Updates signed halfword values toward corresponding targets using quarter steps */
+ #define ScalarApproach_StepQuarterArray sub_08221B9C
+-#define ScalarApproach_QuarterArray sub_08221B9C
++#define ScalarApproach_QuarterArray     sub_08221B9C
+ void ScalarApproach_QuarterArray(s16 *values, const s16 *targets, s32 count)
+ {
+     while ((count = (s32)((u32)count - 1u)) >= 0) {
+diff --git a/src/fn/sub_08221BE8.c b/src/fn/sub_08221BE8.c
+index e36a37a52..c7d3c2540 100644
+--- a/src/fn/sub_08221BE8.c
++++ b/src/fn/sub_08221BE8.c
+@@ -2,7 +2,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepEighthArray: Updates signed halfword values toward corresponding targets using eighth steps */
+ #define ScalarApproach_StepEighthArray sub_08221BE8
+-#define ScalarApproach_EighthArray sub_08221BE8
++#define ScalarApproach_EighthArray     sub_08221BE8
+ void ScalarApproach_EighthArray(s16 *values, const s16 *targets, s32 count)
+ {
+     while ((count = (s32)((u32)count - 1u)) >= 0) {
+diff --git a/src/fn/sub_08221C34.c b/src/fn/sub_08221C34.c
+index 262707576..84d435f50 100644
+--- a/src/fn/sub_08221C34.c
++++ b/src/fn/sub_08221C34.c
+@@ -2,7 +2,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepSixteenthArray: Updates signed halfword values toward corresponding targets using sixteenth steps */
+ #define ScalarApproach_StepSixteenthArray sub_08221C34
+-#define ScalarApproach_SixteenthArray sub_08221C34
++#define ScalarApproach_SixteenthArray     sub_08221C34
+ void ScalarApproach_SixteenthArray(s16 *values, const s16 *targets, s32 count)
+ {
+     while ((count = (s32)((u32)count - 1u)) >= 0) {
+diff --git a/src/fn/sub_08221D9C.c b/src/fn/sub_08221D9C.c
+index 8b3db18b9..7ee7b7910 100644
+--- a/src/fn/sub_08221D9C.c
++++ b/src/fn/sub_08221D9C.c
+@@ -1,7 +1,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepAngleHalfArray: Updates signed halfword angles toward corresponding targets using wrapped half steps */
+ #define ScalarApproach_StepAngleHalfArray sub_08221D9C
+-#define ScalarApproach_HalfAngleArray sub_08221D9C
++#define ScalarApproach_HalfAngleArray     sub_08221D9C
+ void ScalarApproach_HalfAngleArray(s16 *values, const s16 *targets, s32 count)
+ {
+     s32 remaining = count;
+diff --git a/src/fn/sub_08221E00.c b/src/fn/sub_08221E00.c
+index fd5f5f5b7..535030a44 100644
+--- a/src/fn/sub_08221E00.c
++++ b/src/fn/sub_08221E00.c
+@@ -1,7 +1,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepAngleQuarterArray: Updates signed halfword angles toward corresponding targets using wrapped quarter steps */
+ #define ScalarApproach_StepAngleQuarterArray sub_08221E00
+-#define ScalarApproach_QuarterAngleArray sub_08221E00
++#define ScalarApproach_QuarterAngleArray     sub_08221E00
+ void ScalarApproach_QuarterAngleArray(s16 *values, const s16 *targets, s32 count)
+ {
+     s32 remaining = count;
+diff --git a/src/fn/sub_08221E70.c b/src/fn/sub_08221E70.c
+index e7bc9f2eb..36936932f 100644
+--- a/src/fn/sub_08221E70.c
++++ b/src/fn/sub_08221E70.c
+@@ -1,7 +1,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepAngleEighthArray: Updates signed halfword angles toward corresponding targets using wrapped eighth steps */
+ #define ScalarApproach_StepAngleEighthArray sub_08221E70
+-#define ScalarApproach_EighthAngleArray sub_08221E70
++#define ScalarApproach_EighthAngleArray     sub_08221E70
+ void ScalarApproach_EighthAngleArray(s16 *values, const s16 *targets, s32 count)
+ {
+     s32 remaining = count;
+diff --git a/src/fn/sub_08221EE0.c b/src/fn/sub_08221EE0.c
+index 5ffe916c2..973ea86d6 100644
+--- a/src/fn/sub_08221EE0.c
++++ b/src/fn/sub_08221EE0.c
+@@ -1,7 +1,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepAngleSixteenthArray: Updates signed halfword angles toward corresponding targets using wrapped sixteenth steps */
+ #define ScalarApproach_StepAngleSixteenthArray sub_08221EE0
+-#define ScalarApproach_SixteenthAngleArray sub_08221EE0
++#define ScalarApproach_SixteenthAngleArray     sub_08221EE0
+ void ScalarApproach_SixteenthAngleArray(s16 *values, const s16 *targets, s32 count)
+ {
+     s32 remaining = count;
+diff --git a/src/fn/sub_0822204C.c b/src/fn/sub_0822204C.c
+index 5c2b95e22..9c972e1a6 100644
+--- a/src/fn/sub_0822204C.c
++++ b/src/fn/sub_0822204C.c
+@@ -1,7 +1,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepHalfArrayWithSnap: Steps signed halfword elements halfway toward targets and snaps when the step magnitude is below the threshold */
+ #define ScalarApproach_StepHalfArrayWithSnap sub_0822204C
+-#define ScalarApproach_Snap2Array sub_0822204C
++#define ScalarApproach_Snap2Array            sub_0822204C
+ void ScalarApproach_Snap2Array(s16 *values, const s16 *targets, s32 threshold, s32 count)
+ {
+     s32 initialLimit = threshold;
+diff --git a/src/fn/sub_08222094.c b/src/fn/sub_08222094.c
+index 37df83dfe..c40ca947d 100644
+--- a/src/fn/sub_08222094.c
++++ b/src/fn/sub_08222094.c
+@@ -1,7 +1,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepQuarterArrayWithSnap: Steps signed halfword elements one quarter toward targets and snaps when the step magnitude is below the threshold */
+ #define ScalarApproach_StepQuarterArrayWithSnap sub_08222094
+-#define ScalarApproach_Snap4Array sub_08222094
++#define ScalarApproach_Snap4Array               sub_08222094
+ void ScalarApproach_Snap4Array(s16 *values, const s16 *targets, s32 threshold, s32 count)
+ {
+     s32 initialLimit = threshold;
+diff --git a/src/fn/sub_082220DC.c b/src/fn/sub_082220DC.c
+index a918ab603..c35378ae6 100644
+--- a/src/fn/sub_082220DC.c
++++ b/src/fn/sub_082220DC.c
+@@ -1,7 +1,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepEighthArrayWithSnap: Steps signed halfword elements one eighth toward targets and snaps when the step magnitude is below the threshold */
+ #define ScalarApproach_StepEighthArrayWithSnap sub_082220DC
+-#define ScalarApproach_Snap8Array sub_082220DC
++#define ScalarApproach_Snap8Array              sub_082220DC
+ void ScalarApproach_Snap8Array(s16 *values, const s16 *targets, s32 threshold, s32 count)
+ {
+     s32 initialLimit = threshold;
+diff --git a/src/fn/sub_08222124.c b/src/fn/sub_08222124.c
+index 59146186b..593c2c5c5 100644
+--- a/src/fn/sub_08222124.c
++++ b/src/fn/sub_08222124.c
+@@ -1,7 +1,7 @@
+ #include "scalar_approach.h"
+ /* ScalarApproach_StepSixteenthArrayWithSnap: Steps signed halfword elements one sixteenth toward targets and snaps when the step magnitude is below the threshold */
+ #define ScalarApproach_StepSixteenthArrayWithSnap sub_08222124
+-#define ScalarApproach_Snap16Array sub_08222124
++#define ScalarApproach_Snap16Array                sub_08222124
+ void ScalarApproach_Snap16Array(s16 *values, const s16 *targets, s32 threshold, s32 count)
+ {
+     s32 initialLimit = threshold;
+diff --git a/src/fn/sub_08228368.c b/src/fn/sub_08228368.c
+index d0bf52604..156a4336e 100644
+--- a/src/fn/sub_08228368.c
++++ b/src/fn/sub_08228368.c
+@@ -3,7 +3,8 @@ struct Args08228368 {
+     u16 count;
+     u32 *values;
+ };
+-void *Task_CreateFromHeapEnd(u32 list, u32 size); /* Task_Create variant (allocator Heap_AllocFromEnd) */
++void *Task_CreateFromHeapEnd(u32 list,
++                             u32 size); /* Task_Create variant (allocator Heap_AllocFromEnd) */
+ void Task_SetCallbacks(void *, void *, void *);
+ void sub_082282DC(u8 *);
+ void DelayedScript_OnDestroy(u8 *);
+diff --git a/src/fn/sub_082285C4.c b/src/fn/sub_082285C4.c
+index 1c629fda0..0edace0f5 100644
+--- a/src/fn/sub_082285C4.c
++++ b/src/fn/sub_082285C4.c
+@@ -14,7 +14,8 @@ static inline s32 yearDays(s32 year)
+     c = Div(year, k);
+     return 365 * year + a - b + c;
+ }
+-s32 Clock_CalculateDateDifference(s32 year, s32 month, s32 day, s32 otherYear, s32 otherMonth, s32 otherDay)
++s32 Clock_CalculateDateDifference(s32 year, s32 month, s32 day, s32 otherYear, s32 otherMonth,
++                                  s32 otherDay)
+ {
+     s32 total = yearDays(year);
+     s32 otherTotal;
+diff --git a/src/fn/sub_08229FFC.c b/src/fn/sub_08229FFC.c
+index 96a13497b..44c2a157e 100644
+--- a/src/fn/sub_08229FFC.c
++++ b/src/fn/sub_08229FFC.c
+@@ -29,7 +29,8 @@ double Time_CalculateMoonAge(s32 a, u32 year, s32 month, s32 day)
+         } else
+             current += period;
+         for (i = 1; i <= 4; i++) {
+-            difference = Time_CalculateLunarLongitude(current) - Time_CalculateSolarLongitude(current);
++            difference =
++                Time_CalculateLunarLongitude(current) - Time_CalculateSolarLongitude(current);
+             if (difference >= 0.0 && difference <= 0.1)
+                 break;
+             if (difference < 0.0 && difference >= -0.1)
+diff --git a/src/fn/sub_0822A230.c b/src/fn/sub_0822A230.c
+index 8a19f5558..b8d7b7af5 100644
+--- a/src/fn/sub_0822A230.c
++++ b/src/fn/sub_0822A230.c
+@@ -12,7 +12,8 @@ struct SA230 {
+     double d[12];
+     s32 n[4];
+ };
+-void Time_CalculateSolarRiseTransitSet(struct SA230 *s, s32 mode, double arg, s32 day, double longitude, double latitude)
++void Time_CalculateSolarRiseTransitSet(struct SA230 *s, s32 mode, double arg, s32 day,
++                                       double longitude, double latitude)
+ {
+     double l, b, e, decl, alpha, hour;
+ 
+diff --git a/src/fn/sub_0822BCE4.c b/src/fn/sub_0822BCE4.c
+index 59a25e5ff..207999089 100644
+--- a/src/fn/sub_0822BCE4.c
++++ b/src/fn/sub_0822BCE4.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+-u32 Save_GetContinuationSize(void), Save_AlignSizeToEightBytes(u32), Save_GetContinuationRegionBlock(u32);
++u32 Save_GetContinuationSize(void), Save_AlignSizeToEightBytes(u32),
++    Save_GetContinuationRegionBlock(u32);
+ void *Save_GetContinuationSnapshot(void);
+ s32 sub_0822F0A4(u32, void *, u32);
+ u32 Save_WriteContinuation(u32 arg)
+diff --git a/src/fn/sub_0822BD20.c b/src/fn/sub_0822BD20.c
+index c3227b2ba..a6239b003 100644
+--- a/src/fn/sub_0822BD20.c
++++ b/src/fn/sub_0822BD20.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+-u32 Save_GetContinuationSize(void), Save_AlignSizeToEightBytes(u32), Save_GetContinuationRegionBlock(u32);
++u32 Save_GetContinuationSize(void), Save_AlignSizeToEightBytes(u32),
++    Save_GetContinuationRegionBlock(u32);
+ void *Save_GetContinuationData(void);
+ s32 sub_0822F10C(u32, void *, u32);
+ u32 Save_ReadContinuation(u32 arg)
+diff --git a/src/fn/sub_0822C824.c b/src/fn/sub_0822C824.c
+index b29ab95b9..57c0c076d 100644
+--- a/src/fn/sub_0822C824.c
++++ b/src/fn/sub_0822C824.c
+@@ -34,7 +34,8 @@ void Solar_UpdateMeasurement(struct Obj *obj)
+             obj->a = Solar_GetIntensity();
+             obj->b = Solar_GetLevelForIntensity(obj->a);
+             (*(s16 *)(gUnk_02000710 + 0x874)) = Solar_ApplyIntensityModifiers(obj->a);
+-            (*(s16 *)(gUnk_02000710 + 0x876)) = Solar_GetLevelForIntensity((*(s16 *)(gUnk_02000710 + 0x874)));
++            (*(s16 *)(gUnk_02000710 + 0x876)) =
++                Solar_GetLevelForIntensity((*(s16 *)(gUnk_02000710 + 0x874)));
+             sub_0822C598(obj);
+             gUnk_030054C0 = (*(s16 *)(gUnk_02000710 + 0x874));
+             gUnk_030054C4 = (*(s16 *)(gUnk_02000710 + 0x876));
+diff --git a/src/fn/sub_0822E2A4.c b/src/fn/sub_0822E2A4.c
+index 656d9ccdc..52848d807 100644
+--- a/src/fn/sub_0822E2A4.c
++++ b/src/fn/sub_0822E2A4.c
+@@ -3,6 +3,7 @@ extern u8 *gUnk_02000710;
+ u8 *GameState_GetConsumableDescriptor(s32);
+ void GameState_EquipConsumableSlot(u32 a)
+ {
+-    *(u16 *)(gUnk_02000710 + GameState_GetConsumableDescriptor(*(s16 *)(gUnk_02000710 + a * 2 + 0x160))[0xc] * 2 +
++    *(u16 *)(gUnk_02000710 +
++             GameState_GetConsumableDescriptor(*(s16 *)(gUnk_02000710 + a * 2 + 0x160))[0xc] * 2 +
+              0x58) = a;
+ }
+diff --git a/src/fn/sub_0822ED7C.c b/src/fn/sub_0822ED7C.c
+index e2f895490..7708cdf4e 100644
+--- a/src/fn/sub_0822ED7C.c
++++ b/src/fn/sub_0822ED7C.c
+@@ -6,8 +6,8 @@ struct Snapshot {
+ extern struct Snapshot gUnk_030054D0;
+ extern u32 gUnk_03004278, gUnk_03003A00, gUnk_03002608, gUnk_0300546C;
+ extern u16 gUnk_03004270, gUnk_03004274, gUnk_0300427C;
+-void sub_0822B410(void), InterruptsAndVideo_WaitForVBlank(void), m4aSoundVSyncOff(void), m4aSoundVSyncOn(void),
+-    Solar_PauseMeasurement(void), Solar_ResumeMeasurement(void);
++void sub_0822B410(void), InterruptsAndVideo_WaitForVBlank(void), m4aSoundVSyncOff(void),
++    m4aSoundVSyncOn(void), Solar_PauseMeasurement(void), Solar_ResumeMeasurement(void);
+ u32 Save_SuspendRuntimeForTransfer(void)
+ {
+     gUnk_030054D0.a = gUnk_03004278;
+diff --git a/src/fn/sub_0822EDF8.c b/src/fn/sub_0822EDF8.c
+index 805a1ad30..31ba0a047 100644
+--- a/src/fn/sub_0822EDF8.c
++++ b/src/fn/sub_0822EDF8.c
+@@ -6,8 +6,8 @@ struct Snapshot {
+ extern struct Snapshot gUnk_030054D0;
+ extern u32 gUnk_03004278, gUnk_03003A00, gUnk_03002608, gUnk_0300546C;
+ extern u16 gUnk_03004270, gUnk_03004274, gUnk_0300427C;
+-void sub_0822B410(void), InterruptsAndVideo_WaitForVBlank(void), m4aSoundVSyncOff(void), m4aSoundVSyncOn(void),
+-    Solar_PauseMeasurement(void);
++void sub_0822B410(void), InterruptsAndVideo_WaitForVBlank(void), m4aSoundVSyncOff(void),
++    m4aSoundVSyncOn(void), Solar_PauseMeasurement(void);
+ u32 Solar_ResumeMeasurement(void);
+ u32 Save_ResumeRuntimeAfterTransfer(void)
+ {
+diff --git a/src/fn/sub_082332B0.c b/src/fn/sub_082332B0.c
+index 6f1590933..56a3c57e9 100644
+--- a/src/fn/sub_082332B0.c
++++ b/src/fn/sub_082332B0.c
+@@ -5,7 +5,8 @@ struct Vec {
+ void Collider_Init(u8 *, u32, u32, u32, u32, struct Vec *, struct Vec *);
+ void Collider_SetAttackProperties(u8 *, s32, s32, s32, s32, s32);
+ void Collider_SetCallback(u8 *, u32, u8 *);
+-void ExplosionEffect_InitCollider(u8 *owner, u8 *emitter, u32 flag, s32 duration, s32 arg4, s32 arg5, s32 arg6)
++void ExplosionEffect_InitCollider(u8 *owner, u8 *emitter, u32 flag, s32 duration, s32 arg4,
++                                  s32 arg5, s32 arg6)
+ {
+     struct Vec scale, offset;
+     u32 type;
+diff --git a/src/fn/sub_0823333C.c b/src/fn/sub_0823333C.c
+index 2807e6bb1..aea984a34 100644
+--- a/src/fn/sub_0823333C.c
++++ b/src/fn/sub_0823333C.c
+@@ -7,8 +7,8 @@ static inline void init(u16 *dest, u32 zero, u32 value)
+     *dest++ = value;
+     *dest = zero;
+ }
+-s32 ExplosionEffect_Init(u8 *p, u8 *pos, u32 flag, s32 duration, s32 arg4, s32 arg5, s32 arg6, s32 frame,
+-                 u32 arg8)
++s32 ExplosionEffect_Init(u8 *p, u8 *pos, u32 flag, s32 duration, s32 arg4, s32 arg5, s32 arg6,
++                         s32 frame, u32 arg8)
+ {
+     u8 *emitter;
+     ExplosionEffect_InitSprite(p + 0x18, p + 0x44, pos, frame);
+diff --git a/src/fn/sub_08233488.c b/src/fn/sub_08233488.c
+index 040835d05..b51893692 100644
+--- a/src/fn/sub_08233488.c
++++ b/src/fn/sub_08233488.c
+@@ -5,7 +5,8 @@ void ExplosionEffect_Update(u8 *);
+ void ExplosionEffect_Destroy(u8 *);
+ void Task_Kill(u8 *);
+ s32 ExplosionEffect_Init(u8 *, u8 *, u32, s32, s32, s32, s32, s32, u32);
+-u8 *ExplosionEffect_CreateConfigured(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4, s32 arg5, s32 arg6, u32 arg7)
++u8 *ExplosionEffect_CreateConfigured(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4, s32 arg5,
++                                     s32 arg6, u32 arg7)
+ {
+     u8 *obj = Task_Create(10, 184);
+     if (obj) {
+diff --git a/src/fn/sub_08235D68.c b/src/fn/sub_08235D68.c
+index 0689938e8..a847b3cc5 100644
+--- a/src/fn/sub_08235D68.c
++++ b/src/fn/sub_08235D68.c
+@@ -9,7 +9,8 @@ u8 *HealthBurstEffect_Create(u32 a, u32 b)
+ {
+     u8 *r = Task_Create(11, 0x354);
+     if (r) {
+-        Task_SetCallbacks(r, (void (*)(void))HealthBurstEffect_OnUpdate, (void (*)(void))sub_08235984);
++        Task_SetCallbacks(r, (void (*)(void))HealthBurstEffect_OnUpdate,
++                          (void (*)(void))sub_08235984);
+         if (sub_08235C30(r, a, b) < 0) {
+             Task_Kill(r);
+             return 0;
+diff --git a/src/fn/sub_082381C8.c b/src/fn/sub_082381C8.c
+index 3cea8c4b4..c7ffce254 100644
+--- a/src/fn/sub_082381C8.c
++++ b/src/fn/sub_082381C8.c
+@@ -5,8 +5,8 @@ void sub_08237ED8(u8 *);
+ void TimedSpriteEffect_Destroy(u8 *);
+ void Task_Kill(u8 *);
+ s32 sub_08238110(u8 *, u8 *, u32, s32, s32, s32, s32, s32, s32, u32);
+-u8 *TimedSpriteEffect_Create(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7,
+-                 u32 arg8)
++u8 *TimedSpriteEffect_Create(u8 *pos, u32 flag, s32 duration, s32 arg3, s32 arg4, s32 arg5,
++                             s32 arg6, s32 arg7, u32 arg8)
+ {
+     u8 *obj = Task_Create(8, 196);
+     if (obj) {
+diff --git a/src/fn/sub_0823E704.c b/src/fn/sub_0823E704.c
+index f90073f36..8a688e35a 100644
+--- a/src/fn/sub_0823E704.c
++++ b/src/fn/sub_0823E704.c
+@@ -40,7 +40,8 @@ void sub_0823E704(u8 *p)
+             sub_0823AAF8(p);
+         }
+     }
+-    Collider_SetAttackProperties(q + 0x48, resource, *(u16 *)(q + 0xb8), 4, flags, *(u16 *)(q + 0xba));
++    Collider_SetAttackProperties(q + 0x48, resource, *(u16 *)(q + 0xb8), 4, flags,
++                                 *(u16 *)(q + 0xba));
+     q[0x8a] = q[0xc8];
+     *(u16 *)(q + 0xc6) = 0;
+ }
+diff --git a/src/fn/sub_0823EDDC.c b/src/fn/sub_0823EDDC.c
+index 689bb7a84..a7bfea733 100644
+--- a/src/fn/sub_0823EDDC.c
++++ b/src/fn/sub_0823EDDC.c
+@@ -25,7 +25,8 @@ void sub_0823EDDC(u8 *p)
+     }
+     resource = Player_GetConfiguredActionPower(p);
+     AnimData_SelectPaletteBank(p + 0xb70, 76);
+-    Collider_SetAttackProperties(p + 0xb8c, resource, *(u16 *)(p + 0xbfc), 0x2000, zero, *(u16 *)(p + 0xbfe));
++    Collider_SetAttackProperties(p + 0xb8c, resource, *(u16 *)(p + 0xbfc), 0x2000, zero,
++                                 *(u16 *)(p + 0xbfe));
+     p[0xbce] = *angle;
+     *(u16 *)(p + 0xc0a) = zero;
+ }
+diff --git a/src/numeric_overlay.c b/src/numeric_overlay.c
+index 32bfe3811..6f0c650da 100644
+--- a/src/numeric_overlay.c
++++ b/src/numeric_overlay.c
+@@ -22,7 +22,8 @@ void NumericOverlay_RefreshDisplay(struct NumericOverlay *s)
+ }
+ 
+ // Returns the (unchanged) r0 of NumericOverlay_RefreshDisplay.
+-extern u32 NumericOverlay_RefreshResult(struct NumericOverlay *) asm("NumericOverlay_RefreshDisplay");
++extern u32
++NumericOverlay_RefreshResult(struct NumericOverlay *) asm("NumericOverlay_RefreshDisplay");
+ u32 NumericOverlay_Update(struct NumericOverlay *p)
+ {
+     return NumericOverlay_RefreshResult(p);
+@@ -40,7 +41,8 @@ void *NumericOverlay_Create(u32 arg)
+     void *obj;
+     obj = Task_Create(9, 0x2C);
+     if (obj != 0) {
+-        Task_SetCallbacks(obj, (void (*)(void *))NumericOverlay_Update, (void (*)(void *))NumericOverlay_Destroy);
++        Task_SetCallbacks(obj, (void (*)(void *))NumericOverlay_Update,
++                          (void (*)(void *))NumericOverlay_Destroy);
+         if (sub_0800F6F8(obj, arg) < 0) {
+             Task_Kill(obj);
+             return 0;
+diff --git a/src/orbiting_particles.c b/src/orbiting_particles.c
+new file mode 100644
+index 000000000..f7eb76374
+--- /dev/null
++++ b/src/orbiting_particles.c
+@@ -0,0 +1,296 @@
++#include "orbiting_particles.h"
++
++u32 OrbitingParticles_HasActiveOrb(struct OrbitingParticles *s)
++{
++    s32 i = 0;
++    struct OrbitingParticle *e;
++    if (i < s->count) {
++        s32 n = s->count;
++        e = s->orbs;
++        do {
++            if (e->state == 1)
++                return 1;
++            e++;
++            i++;
++        } while (i < n);
++    }
++    return 0;
++}
++
++void OrbitingParticles_SpawnOrb(struct OrbitingParticles *o, struct OrbitingParticle *b)
++{
++    if (b->timer == 0) {
++        if (o->duration < 0 || o->time < o->duration) {
++            b->state = 1;
++            gUnk_03005308 = (gUnk_03005308 + 1) & 0x3ff;
++            b->angle = *(const u16 *)((const u8 *)gUnk_0203B400 + gUnk_03005308 * 2);
++            b->rise = 0;
++            b->sprite.flags &= ~1;
++        }
++    } else {
++        b->timer--;
++    }
++}
++
++void OrbitingParticles_Advance(struct OrbitingParticles *m, struct OrbitingParticle *p)
++{
++    p->rise += m->speed;
++    if (!(p->timer & 3))
++        sub_08217EEC(&p->sprite, m->resource, m->frame + ((p->timer >> 2) & 1));
++    p->timer++;
++    if (p->rise >= m->limit) {
++        p->state = 0;
++        p->sprite.flags |= 1;
++        p->timer = ((8 - m->count) << 2) + 4;
++    }
++}
++
++static inline int scale(int v)
++{
++    if (v >= 0)
++        return v >> 12;
++    return -((-v) >> 12);
++}
++
++// MATCHING_CONCESSION: register-pinning
++int OrbitingParticles_Update(struct OrbitingParticles *m)
++{
++    int i;
++    i = 0;
++    if (i < m->count) {
++        struct SceneVec *position = &m->orbs[0].sprite.position;
++        struct OrbitingParticle *cursor = m->orbs;
++        struct OrbitingParticle *p = cursor;
++        do {
++            int angle, radius;
++            struct SceneVec *out;
++            register const s16 *table asm("r2");
++            struct OrbitingParticle *arg = cursor;
++            asm("" : "+r"(arg));
++            if (!p->state)
++                OrbitingParticles_SpawnOrb(m, arg);
++            else
++                OrbitingParticles_Advance(m, arg);
++            out = position;
++            angle = p->angle;
++            radius = p->radius;
++            table = gUnk_086149C4;
++            out->x = scale(table[(angle + 64) & 255] * radius);
++            out->y = 0;
++            out->z = scale(table[angle] * radius);
++            p->sprite.position.y += p->rise;
++            p->sprite.position.x += m->position.x;
++            p->sprite.position.y += m->position.y;
++            p->sprite.position.z += m->position.z;
++            position = (void *)((u8 *)position + sizeof(struct OrbitingParticle));
++            p++;
++            cursor++;
++            i++;
++        } while (i < m->count);
++    }
++    {
++        u32 *flags;
++        i = m->count;
++        if (i <= 7) {
++            /* Keep the byte-offset temporary: direct indexing changes register allocation. */
++            int mask = 1, offset;
++            offset = i * sizeof(struct OrbitingParticle) + (u32) &
++                     ((struct OrbitingParticles *)0)->orbs[0].sprite.flags;
++            flags = (void *)(offset + (u32)m);
++            do {
++                *flags |= mask;
++                flags = (void *)((u8 *)flags + sizeof(struct OrbitingParticle));
++                i++;
++            } while (i <= 7);
++        }
++    }
++    m->time++;
++    if (m->duration > 0 && m->time >= m->duration && !OrbitingParticles_HasActiveOrb(m))
++        Task_Kill(m);
++    return 0;
++}
++
++u32 OrbitingParticles_Destroy(struct OrbitingParticles *p)
++{
++    s32 i;
++    struct OrbitingParticleSprite *q = &p->orbs[0].sprite;
++    for (i = 7; i >= 0; i--) {
++        Effect_Remove(q);
++        /* Embedded sprites are spaced by a whole orb, not a sprite. */
++        q = (void *)((u8 *)q + sizeof(struct OrbitingParticle));
++    }
++    return 0;
++}
++
++static inline u8 *cell(int i)
++{
++    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
++    if (p)
++        return p + 4;
++    return gUnk_030052F4->cells + 12 + i * 4;
++}
++
++static inline int randomAngle(void)
++{
++    u32 offset, value;
++    u16 *table;
++    gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
++    offset = gUnk_03005308 * 2;
++    table = ((u16 *)RANDOM_TABLE_ADDR);
++    value = *(u16 *)(offset + (u32)table);
++    return (value & 127) - 32;
++}
++
++int OrbitingParticles_Initialize(struct OrbitingParticles *m, struct SceneVec *source, int radius,
++                                 int duration, int count, int type)
++{
++    int i, index, height, slope;
++    struct SceneVec *pos;
++    u8 *c;
++    struct OrbitingParticle *p;
++    switch (type) {
++        case 1:
++            m->resource = AnimData_FindEntry(0x1c1e);
++            m->frame = 0;
++            break;
++        case 3:
++            m->resource = AnimData_FindEntry(0x1c1e);
++            m->frame = 4;
++            break;
++        case 4:
++            m->resource = AnimData_FindEntry(0x1c1e);
++            m->frame = 6;
++            break;
++        case 5:
++            m->resource = AnimData_FindEntry(0x1c1e);
++            m->frame = 8;
++            break;
++        case 6:
++            m->resource = AnimData_FindEntry(0x1c1e);
++            m->frame = 10;
++            break;
++        case 7:
++            m->resource = AnimData_FindEntry(0x1c1e);
++            m->frame = 12;
++            break;
++        case 8:
++            m->resource = AnimData_FindEntry(0x1c1e);
++            m->frame = 14;
++            break;
++        case 0:
++        case 2:
++        default:
++            m->resource = AnimData_FindEntry(0x1c1e);
++            m->frame = 2;
++            break;
++    }
++    m->position = *source;
++    pos = &m->position;
++    {
++        int x = pos->x >> 8, z = pos->z >> 8;
++        if (x < 0 || z < 0 || (u32)x >= gUnk_030052F8 || (u32)z >= gUnk_030052FC)
++            index = 0;
++        else
++            index = gUnk_030052F4->rows[z] + x;
++    }
++    c = cell(index);
++    slope = *c >> 4;
++    height = (*c & 15) << 8;
++    switch (slope) {
++        case 1:
++            height -= (u8)pos->z;
++            break;
++        case 2:
++            height -= (u8)pos->x;
++            break;
++    }
++    if (m->position.y < height)
++        m->position.y = height;
++    m->time = 0;
++    m->duration = duration;
++    m->speed = 20;
++    m->limit = 400;
++    if (count > 7)
++        count = 8;
++    m->count = count;
++    p = m->orbs;
++    for (i = 0; i <= 7; p++) {
++        struct OrbitingParticleSprite *s = &p->sprite;
++        int angle, r;
++        p->state = 0;
++        p->angle = randomAngle();
++        p->rise = 0;
++        p->radius = radius;
++        p->timer = i * 4;
++        sub_08217DE0(s, m->resource, 1);
++        Effect_SetOrigin(s, -4, -4);
++        sub_08217EEC(s, m->resource, m->frame);
++        Effect_SetPalette(s, 1);
++        angle = p->angle;
++        r = p->radius;
++        p->sprite.position.x = scale(gUnk_086149C4[(angle + 64) & 255] * r);
++        p->sprite.position.y = 0;
++        p->sprite.position.z = scale(gUnk_086149C4[angle] * r);
++        p->sprite.position.y += p->rise;
++        p->sprite.position.x += m->position.x;
++        p->sprite.position.y += m->position.y;
++        p->sprite.position.z += m->position.z;
++        {
++            int one = 1;
++            s->priority = one;
++            i += one;
++        }
++    }
++    return 0;
++}
++
++struct OrbitingParticles *OrbitingParticles_Create(struct SceneVec *pos, int radius, int duration,
++                                                   int count, int type)
++{
++    struct OrbitingParticles *p = Task_Create(11, 436);
++    if (p) {
++        Task_SetCallbacks(p, (void (*)(void *))OrbitingParticles_Update,
++                          (void (*)(void *))OrbitingParticles_Destroy);
++        if (OrbitingParticles_Initialize(p, pos, radius, duration, count, type) < 0) {
++            Task_Kill(p);
++            return 0;
++        }
++    }
++    return p;
++}
++
++struct OrbitingParticles *OrbitingParticles_CreateFromScript(void)
++{
++    struct OrbitingParticles *p = Task_Create(11, 436);
++    struct SceneVec pos;
++    int radius, duration, count, type;
++    if (p) {
++        if (Script_SeekToKeyword('p')) {
++            pos.x = Script_GetValue();
++            pos.y = Script_GetValue();
++            pos.z = Script_GetValue();
++        } else {
++            pos.x = 0;
++            pos.y = 0;
++            pos.z = 0;
++        }
++        radius = Script_GetKeywordValue('d', 256);
++        duration = Script_GetKeywordValue('t', 256);
++        count = Script_GetKeywordValue('n', 8);
++        type = Script_GetKeywordValue('T', 0);
++        Task_SetCallbacks(p, (void (*)(void *))OrbitingParticles_Update,
++                          (void (*)(void *))OrbitingParticles_Destroy);
++        if (OrbitingParticles_Initialize(p, &pos, radius, duration, count, type) < 0) {
++            Task_Kill(p);
++            return 0;
++        }
++    }
++    return p;
++}
++
++void OrbitingParticles_Stop(struct OrbitingParticles *p)
++{
++    if (p) {
++        p->duration = p->time;
++    }
++}
+diff --git a/src/pooled_interactable.c b/src/pooled_interactable.c
+index 1c19d4b68..1da1b9df1 100644
+--- a/src/pooled_interactable.c
++++ b/src/pooled_interactable.c
+@@ -112,7 +112,8 @@ void sub_08008C18(void)
+ {
+ }
+ 
+-void Breakable_UpdateAnimation(struct PooledInteractableManager *manager, struct PooledInteractable *slot)
++void Breakable_UpdateAnimation(struct PooledInteractableManager *manager,
++                               struct PooledInteractable *slot)
+ {
+     if (Breakable_ConsumeEnteredFlag(slot)) {
+         void *q = &slot->drawable;
+diff --git a/src/result_prompt.c b/src/result_prompt.c
+index b3990b321..89d188bf7 100644
+--- a/src/result_prompt.c
++++ b/src/result_prompt.c
+@@ -66,7 +66,8 @@ u8 *ResultPrompt_Create(void)
+     u8 *p;
+     p = Task_Create(11, 0x2c);
+     if (p != 0) {
+-        Task_SetCallbacks(p, (void (*)(void *))ResultPrompt_Update, (void (*)(void *))ResultPrompt_Destroy);
++        Task_SetCallbacks(p, (void (*)(void *))ResultPrompt_Update,
++                          (void (*)(void *))ResultPrompt_Destroy);
+         if (ResultPrompt_Init((struct ResultPrompt *)p) < 0) {
+             Task_Kill(p);
+             return 0;
+diff --git a/src/scene_object.c b/src/scene_object.c
+index 2696dcb37..6b797b6ba 100644
+--- a/src/scene_object.c
++++ b/src/scene_object.c
+@@ -66,7 +66,6 @@ void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
+     }
+ }
+ 
+-
+ u8 *TerrainModifiers_FindCellOverride(s32, s32);
+ 
+ u8 Scene_CanEnterNeighborCell(struct SceneObject *object, s32 index, s32 direction)
+@@ -120,7 +119,6 @@ void Scene_PlayNeighborStepSound(u32 type)
+     }
+ }
+ 
+-
+ u8 Scene_CheckNeighborHeight(struct SceneObject *object, s32 index, s32 direction)
+ {
+     u8 *reference = &object->cellRef.cell.height;
+@@ -249,7 +247,6 @@ void SceneObjects_PlayPushSound(s32 type)
+     }
+ }
+ 
+-
+ void AnimatedParticles_EmitBurst(struct SceneVec *, s32, s32, s32, s32, s32, s32, s32);
+ 
+ // MATCHING_CONCESSION: register-pinning
+@@ -992,7 +989,8 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
+             } else if (!Scene_TryStepDown(p, p->cellRef.index, p->direction)) {
+                 Scene_PlayNeighborMovementEffect(p);
+                 {
+-                    register void (*callback)(struct SceneObject *) asm("r1") = Scene_UpdateObjectIdle;
++                    register void (*callback)(struct SceneObject *) asm("r1") =
++                        Scene_UpdateObjectIdle;
+                     p->update = callback;
+                 }
+                 p->timer = 0;
+@@ -1016,7 +1014,8 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
+             } else {
+                 Scene_PlayNeighborMovementEffect(p);
+                 {
+-                    register void (*callback)(struct SceneObject *) asm("r1") = Scene_UpdateObjectIdle;
++                    register void (*callback)(struct SceneObject *) asm("r1") =
++                        Scene_UpdateObjectIdle;
+                     p->update = callback;
+                 }
+                 p->timer = 0;
+@@ -1305,7 +1304,8 @@ struct SceneObjectManager *SceneObjects_CreateTask(void *a)
+         return gUnk_02000024;
+     p = Task_Create(8, 0x74);
+     if (p != 0) {
+-        Task_SetCallbacks(p, (void (*)(void))SceneObjects_Update, (void (*)(void))SceneObjects_DestroyTask);
++        Task_SetCallbacks(p, (void (*)(void))SceneObjects_Update,
++                          (void (*)(void))SceneObjects_DestroyTask);
+         p->count = Script_GetKeywordValue(0x6d, 8);
+         if (SceneObjects_InitPool(p, a) < 0) {
+             Task_Kill(p);
+@@ -1356,9 +1356,9 @@ s32 TerrainOverlay_QueueAddActor(struct SceneBody *);
+ static inline void initializeCell(void *cell, s32 index, s32 height)
+ {
+     TerrainModifiers_RegisterCell(cell, index, 0, height, 255, ({
+-                     register s32 zero asm("r2") = 0;
+-                     zero;
+-                 }));
++                                      register s32 zero asm("r2") = 0;
++                                      zero;
++                                  }));
+ }
+ 
+ static inline void setStepFlags(struct SceneCollider *c)
+@@ -1596,15 +1596,14 @@ s32 SceneObjects_CreateFromScript(void)
+     return 0;
+ }
+ 
+-
+ s32 SceneObjects_SwitchPaletteFromScript(void)
+ {
+     struct SceneObjectManager *manager = gUnk_02000024;
+     struct SceneObject *p;
+     struct SceneDraw *draw;
+     s32 id, mode, sound;
+-    if (!manager || !(id = Script_GetKeywordValue('n', 0)) || !(p = SceneObjects_FindByScriptId(manager, id)) ||
+-        p->type != 6)
++    if (!manager || !(id = Script_GetKeywordValue('n', 0)) ||
++        !(p = SceneObjects_FindByScriptId(manager, id)) || p->type != 6)
+         return -1;
+     draw = &p->draw;
+     mode = Script_GetKeywordValue('s', 0);
+diff --git a/src/terrain_modifier.c b/src/terrain_modifier.c
+index de295d85e..b95c518a4 100644
+--- a/src/terrain_modifier.c
++++ b/src/terrain_modifier.c
+@@ -145,7 +145,8 @@ s32 TerrainModifiers_Activate(u32 id)
+         n = e->next;
+         if (e->id == k && e->active == 0) {
+             e->active = 1;
+-            TerrainModifiers_RegisterCell(e->registration, e->cell, e->tile, e->height, 0xff, e->flags);
++            TerrainModifiers_RegisterCell(e->registration, e->cell, e->tile, e->height, 0xff,
++                                          e->flags);
+         }
+         e = n;
+     }
+diff --git a/src/terrain_overlay.c b/src/terrain_overlay.c
+index cde808ba7..f1d86250b 100644
+--- a/src/terrain_overlay.c
++++ b/src/terrain_overlay.c
+@@ -65,7 +65,6 @@ u32 TerrainOverlay_QueueRemoveActor(u32 *p)
+     return TerrainOverlay_QueueCommand(1, *p);
+ }
+ 
+-
+ u8 *TerrainModifiers_FindCellOverride(s32, s32);
+ 
+ void Sprite_LinkToList(struct TerrainOverlayDrawable *, s32);
+-- 
+2.39.3 (Apple Git-145)
+

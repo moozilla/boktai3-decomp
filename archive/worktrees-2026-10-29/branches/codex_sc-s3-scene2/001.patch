@@ -1,0 +1,35 @@
+From 7195fdfda5bda3b55a6568c87b934c2f44720a5e Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 01:52:25 -0700
+Subject: [PATCH] Resolve seek ROM aliases to the intended draft function
+
+Prefer explicit function aliases and otherwise use nonstatic definitions in source order. The block name set also includes inline helpers, so its iteration order could select a helper and report a false compile failure.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/seek/engine.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/tools/seek/engine.py b/tools/seek/engine.py
+index a47db2872..1f022dda8 100644
+--- a/tools/seek/engine.py
++++ b/tools/seek/engine.py
+@@ -317,7 +317,14 @@ class Target:
+             for b in scope.nonmatching_blocks(text):
+                 if func in b["names"]:
+                     body = text[b["body"]:b["else"][0]]
+-                    defs = [n for n in b["names"] if n != func and find_def(body, n)]
++                    # names is a set and also contains inline helpers. Prefer the
++                    # explicit alias; otherwise preserve source order and exclude
++                    # helper definitions, just as scope's draft discovery does.
++                    aliases = re.findall(r"^#define[ \t]+(\w+)[ \t]+" + re.escape(func) + r"[ \t]*$",
++                                         body, re.M)
++                    defs = aliases or [m.group(2) for m in re.finditer(
++                        r"^([A-Za-z_][\w \t*]*?)\b(\w+)\s*\([^;{}]*\)\s*\{", body, re.M)
++                        if not re.search(r"\b(?:static|inline)\b", m.group(1))]
+                     func = defs[-1] if defs else func
+         self.func = func or scope.nonmatching_func(self.src)
+         if not self.func:
+-- 
+2.39.3 (Apple Git-145)
+

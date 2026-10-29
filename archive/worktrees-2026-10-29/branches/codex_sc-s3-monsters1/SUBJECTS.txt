@@ -1,0 +1,4 @@
+Fix seek type-edit locations and block search ranking
+Honor seek search limits within large expansions
+Initialize shared constants before every control-flow use
+Reject dependent and effectful statement swaps in seek rewrites

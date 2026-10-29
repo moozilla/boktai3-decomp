@@ -1,0 +1,27 @@
+From 06b5b803f6e0633d57cdf3559b6ed2c3d4278edc Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 01:54:41 -0700
+Subject: [PATCH] Respect the remaining compile budget in seek search
+ expansions
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/seek/seek.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/seek/seek.py b/tools/seek/seek.py
+index ae9fea74d..d59130733 100644
+--- a/tools/seek/seek.py
++++ b/tools/seek/seek.py
+@@ -408,7 +408,7 @@ class Work:
+             node = self.sess.nodes[nid]
+             try:
+                 kids, st = self.expand(node, families, lines, quiet=True,
+-                                       budget=None)
++                                       budget=budget - (self.target.compiles - start_compiles))
+             except SystemExit as e:
+                 print(f"  n{nid}: {e}")
+                 continue
+-- 
+2.39.3 (Apple Git-145)
+

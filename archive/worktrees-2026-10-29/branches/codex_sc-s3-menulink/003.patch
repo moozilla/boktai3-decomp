@@ -1,0 +1,136 @@
+From d3a167979047021e19a22dcde0ec08b101982a9b Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 04:52:15 -0700
+Subject: [PATCH] Let seek combine bounded same-output source variants
+
+Add run --neutral N to retain up to N neutral C variants per move family and expansion. Binary identity does not imply identical compiler state: individually neutral edits can change expression discovery and intermediate instruction counts only when combined. Deduplicate source states, include this option in expansion signatures, and bound neutral depth. The default remains unchanged.
+
+Validated with an actual function search: four expansions instead of a single dead-end expansion, and retained children have distinct source states, identical parent bytes, and at most one child per family with --neutral 1. Python syntax check passes.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/seek/seek.py | 42 +++++++++++++++++++++++++++++++-----------
+ 1 file changed, 31 insertions(+), 11 deletions(-)
+
+diff --git a/tools/seek/seek.py b/tools/seek/seek.py
+index 55e0dd588..b52dfa5a0 100644
+--- a/tools/seek/seek.py
++++ b/tools/seek/seek.py
+@@ -289,7 +289,7 @@ class Work:
+         return rec
+ 
+     # -- expanding
+-    def expand(self, node, families=None, lines=None, quiet=False, budget=None, sem=True):
++    def expand(self, node, families=None, lines=None, quiet=False, budget=None, sem=True, neutral=0):
+         """Every move at NODE: compile, evaluate, add the distinct outputs as children. Returns
+         (children, stats)."""
+         pre, defs = self.pre_of(node)
+@@ -310,6 +310,9 @@ class Work:
+         stats = {"variants": 0, "neutral": 0, "known": 0, "failed": 0, "new": 0, "fam": {}}
+         children = []
+         file_hash = node["file"]
++        known_sources = {(n.get("file"), tuple(sorted((n.get("defs") or {}).items())))
++                         for n in self.sess.nodes.values()}
++        neutral_kept = collections.Counter()
+         depth = node.get("depth", 0) + 1
+         main = next(iter(defs))
+         tasks = []
+@@ -342,19 +345,29 @@ class Work:
+                 stats["failed"] += 1
+                 continue
+             out, alloc, ev = res
+-            if out == own_out:
++            same_output = out == own_out
++            if same_output:
+                 stats["neutral"] += 1
+-                continue
+-            fs[1] += 1
+-            if out in self.sess.by_out:
++                if neutral_kept[fam] >= neutral:
++                    continue
++            else:
++                fs[1] += 1
++            if not same_output and out in self.sess.by_out:
+                 stats["known"] += 1
+                 continue
+             vpre = E.splice(base_pre, [dname], txt)
+             nd = dict(node.get("defs") or {})
+             nd[dname] = self.sess.put_blob(txt)
++            source_key = (file_hash, tuple(sorted(nd.items())))
++            if source_key in known_sources:
++                continue
++            known_sources.add(source_key)
+             rec = dict(parent=node["id"], kind="move", who="auto", file=file_hash, defs=nd, out=out,
+                        family=fam, move=desc if dname == main else f"{desc} (in {dname})", line=line,
+                        depth=depth, alloc=alloc, moved=E.alloc_changes(base_alloc, alloc)[:8], **ev)
++            if same_output:
++                neutral_kept[fam] += 1
++                rec.update(neutral=True, same_as=self.sess.by_out.get(out, node["id"]))
+             if want and not ev.get("match"):
+                 rec["awrong"] = len(E.alloc_wrong(alloc, want))
+             if sem and (desc.startswith("[sem]") or fam in SEM_FAMILIES) and rank(dict(ev, ok=True)) <= rank(node):
+@@ -370,13 +383,14 @@ class Work:
+             stats["new"] += 1
+         stats["seconds"] = round(time.time() - t0, 2)
+         self.sess.event(kind="expand", node=node["id"], families=sorted(families) if families else None,
+-                        lines=lines, **{k: v for k, v in stats.items() if k != "fam"})
++                        lines=lines, neutral_limit=neutral,
++                        **{k: v for k, v in stats.items() if k != "fam"})
+         if not quiet:
+             print_expand(self, node, children, stats)
+         return children, stats
+ 
+     def search(self, starts, budget=2000, seconds=120, families=None, lines=None, quiet=False, slack=None,
+-               max_depth=6):
++               max_depth=6, neutral=0):
+         """Best-first over (key, depth): expand the best node not yet expanded with these moves.
+         New outputs that tie their parent stay on the frontier (a plateau is walked, not abandoned);
+         a node is never expanded twice with the same move set."""
+@@ -384,9 +398,10 @@ class Work:
+         t0 = time.time()
+         start_compiles = self.target.compiles
+         heap, tick = [], 0
+-        sig = (tuple(sorted(families)) if families else None, tuple(lines) if lines else None)
++        sig = (tuple(sorted(families)) if families else None, tuple(lines) if lines else None, neutral)
+         done = {e["node"] for e in self.sess.events if e.get("kind") == "expand"
+-                and (tuple(e["families"]) if e.get("families") else None, tuple(e["lines"]) if e.get("lines") else None) == sig}
++                and (tuple(e["families"]) if e.get("families") else None,
++                     tuple(e["lines"]) if e.get("lines") else None, e.get("neutral_limit", 0)) == sig}
+         for n in starts:
+             heapq.heappush(heap, (rank(n), n.get("awrong", 0), n.get("depth", 0), tick, n["id"]))
+             tick += 1
+@@ -406,9 +421,11 @@ class Work:
+                 continue
+             done.add(nid)
+             node = self.sess.nodes[nid]
++            if node.get("neutral") and node.get("depth", 0) >= max_depth:
++                continue
+             try:
+                 kids, st = self.expand(node, families, lines, quiet=True,
+-                                       budget=None)
++                                       budget=None, neutral=neutral)
+             except SystemExit as e:
+                 print(f"  n{nid}: {e}")
+                 continue
+@@ -699,7 +716,7 @@ def cmd_run(a):
+     if a.objective == "rotation":
+         w.rot_max = a.rot_max if a.rot_max is not None else max(8, min(key_of(n)[2] for n in starts) + 6)
+     best = w.search(starts, a.budget, a.seconds, parse_fams(a.fam), parse_lines(a.lines), slack=a.slack,
+-                    max_depth=a.depth)
++                    max_depth=a.depth, neutral=a.neutral)
+     if best.get("match"):
+         print(f"MATCH: seek.py show n{best['id']}; land with seek.py land n{best['id']}")
+     else:
+@@ -1026,6 +1043,9 @@ def main():
+     p.add_argument("--slack", type=int, help="explore children up to this much worse (shape+diff) than the "
+                    "best (default max(4, diff/8))")
+     p.add_argument("--depth", type=int, default=6, help="moves stacked on a node at most")
++    p.add_argument("--neutral", type=int, default=0, metavar="N",
++                   help="keep up to N same-output C variants per move family and expansion; "
++                   "use a small value to combine individually neutral edits (default: discard)")
+     p.add_argument("--objective", choices=["rotation", "block", "code"], help="rotation: rank by the reload spill "
+                    "shift still needed (AGBCC_SPILL=K:D); block: by one ROM block's cost (--block); "
+                    "code: shape and differing insns before optimization-dependent skeleton hints")
+-- 
+2.39.3 (Apple Git-145)
+

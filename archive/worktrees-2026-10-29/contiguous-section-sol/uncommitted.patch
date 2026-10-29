@@ -1,0 +1,265 @@
+diff --git a/include/actor_attachment_playback.h b/include/actor_attachment_playback.h
+new file mode 100644
+index 000000000..1b58c9a83
+--- /dev/null
++++ b/include/actor_attachment_playback.h
+@@ -0,0 +1,95 @@
++#ifndef GUARD_ACTOR_ATTACHMENT_PLAYBACK_H
++#define GUARD_ACTOR_ATTACHMENT_PLAYBACK_H
++#include "actor_attachment_state.h"
++static inline void ActorAttachment_StepPart(struct ActorAttachmentPartSprite *sprite,
++    struct DisplaySequenceState *state, const struct ActorAttachmentPartResource *resource)
++{
++    const volatile u16 *command = state->commands + state->index;
++    u32 duration, flags;
++    {
++        u32 frame = *command >> 6;
++        register u32 width asm("r1") = sprite->width >> 3;
++        u32 height = sprite->height >> 3;
++        height *= width;
++        height *= frame;
++        height += resource->tileBase;
++        sprite->tile = height;
++    }
++    {
++        u32 input = state->flags;
++        u32 bit = 1;
++        register u32 first asm("r1");
++        asm("" : "+r"(bit));
++        first = bit;
++        first &= input;
++        if (first != (((*command & 0x30) >> 4) & bit))
++            sprite->flags |= 4;
++        else
++            sprite->flags &= ~4;
++    }
++    {
++        u32 input = state->flags;
++        u32 bit = 2;
++        register u32 first asm("r1");
++        asm("" : "+r"(bit));
++        first = bit;
++        first &= input;
++        asm("" : "+r"(first));
++        first = (u8)first;
++        if (first != (((*command & 0x30) >> 4) & bit))
++            sprite->flags |= 8;
++        else
++            sprite->flags &= ~8;
++    }
++    {
++        u32 elapsed = state->elapsed + 1;
++        u32 mask;
++        register u32 temp asm("r1");
++        register u32 cache asm("r3");
++        state->elapsed = elapsed;
++        temp = 0xFFFF;
++        asm("" : "+r"(temp));
++        mask = temp;
++        asm("" : "+&r"(mask) : "r"(temp));
++        duration = state->duration;
++        elapsed = (u16)elapsed;
++        cache = duration;
++        asm("" : : "r"(cache));
++        if ((u16)elapsed >= duration) {
++            state->elapsed = 0;
++            flags = state->flags;
++            if (flags & 4) {
++                u32 index = state->index;
++                if (!index) {
++                    u32 hold = 8;
++                    hold &= flags;
++                    asm("" : "+r"(hold));
++                    if (hold)
++                        state->elapsed = cache;
++                    else
++                        state->index = state->frameCount - 1;
++                } else
++                    state->index = index - 1;
++            } else {
++                u32 index = state->index + 1;
++                state->index = index;
++                cache = state->frameCount;
++                asm("" : : "r"(cache));
++                if ((index & mask) >= cache) {
++                    u32 endFlag = flags & 8;
++                    asm("" : "+r"(endFlag));
++                    endFlag = (u8)endFlag;
++                    if (endFlag) {
++                        state->elapsed = duration;
++                        state->index = cache - 1;
++                    } else
++                        state->index = 0;
++                }
++            }
++            asm("" : : "r"(cache));
++            command = state->commands + state->index;
++            state->duration = ((*command & 15) * (s32)state->speed) >> 6;
++        }
++    }
++}
++#endif
+diff --git a/include/bouncing_object.h b/include/bouncing_object.h
+new file mode 100644
+index 000000000..8c25073a7
+--- /dev/null
++++ b/include/bouncing_object.h
+@@ -0,0 +1,46 @@
++#ifndef GUARD_BOUNCING_OBJECT_H
++#define GUARD_BOUNCING_OBJECT_H
++#include "contact_swarm.h"
++/* Separate twelve-slot family; not the preceding anchored-particle pool. */
++struct BouncingObject {
++    struct ContactSwarmSprite sprite;
++    struct DisplaySequenceState sequence;
++    struct ContactCollider bodyCollider, removalCollider;
++    u8 registration[0x40];
++    struct ContactPosition velocity, origin;
++    u16 flags;
++    u8 state;
++    s8 index;
++    u8 enter, collisionDelay;
++    u16 timer, mapCell, spawnParameterA, spawnParameterB;
++    u8 animationDelay, animation;
++    u32 colliderConfig;
++    u16 initialTimer, stateFrame;
++};
++struct BouncingPool {
++    u8 task[0x18];
++    u8 graphics[0x1C];
++    void *sequenceResource;
++    struct BouncingObject slots[12];
++    u32 used, stopping;
++};
++struct BouncingContact {
++    u8 unknown0[0xC];
++    struct ContactPosition position;
++    u8 unknown14[0x38 - 0x14];
++    u32 flags;
++};
++extern void *gUnk_08605B6C[];
++extern u32 gUnk_02000560;
++extern u32 gUnk_030053F0;
++struct BouncingPool *sub_08069668(void);
++void Shadow_Initialize(void *, struct ContactPosition *, s32);
++void sub_08068A78(struct BouncingObject *, s16, s16);
++void sub_08013684(void *);
++extern struct BouncingPool *gUnk_0200014C;
++struct BouncingObject *sub_08068B8C(struct BouncingPool *);
++void sub_080688D0(struct BouncingContact *, struct BouncingContact *, struct BouncingObject *);
++void sub_08068A3C(struct BouncingContact *, void *, struct BouncingObject *);
++void sub_0821FF58(void *, s32, s32, s32, s32, s32);
++s32 Math_Atan2(s32, s32);
++#endif
+diff --git a/include/scene_actor_motion.h b/include/scene_actor_motion.h
+new file mode 100644
+index 000000000..5d8d585a3
+--- /dev/null
++++ b/include/scene_actor_motion.h
+@@ -0,0 +1,106 @@
++#ifndef GUARD_SCENE_ACTOR_MOTION_H
++#define GUARD_SCENE_ACTOR_MOTION_H
++#include "scene_actor_placement.h"
++/* Tentative motion/tick phase of the same registered actor. */
++struct SceneActorMotionTerrainGroup {
++    u8 unknown0[0x1FC];
++    void *contact;
++};
++struct SceneActorMotionSubject {
++    struct ContactPosition origin;
++    u8 playerIndex, unknown9[3];
++    struct ContactPosition position;
++};
++struct SceneActorMotionRoutePoint {
++    s16 x, z;
++    u8 unknown4[2], attributes, unknown7;
++};
++struct SceneActorMotionRouteCursor {
++    u8 unknown0[8];
++    const struct SceneActorMotionRoutePoint *point;
++    u8 fieldC, unknownD[3];
++    u8 parameterA, parameterB, parameterC, unknown13;
++};
++struct SceneActorMotionSavedControl {
++    const void *control;
++    u8 state, phase, behavior, kind;
++};
++struct SceneActorMotionView {
++    void *object, *drawable;
++    u8 drawableKind, unknown9[0x47];
++    u32 id;
++    u8 unknown54[5], heading, unknown5A[2];
++    struct ContactPosition position, velocity;
++    void *motionMap;
++    u8 unknown70[0x28];
++    u8 category, unknown99[3];
++    s16 health;
++    u8 unknown9E[0x3E];
++    struct SceneActorMotionSubject *subject;
++    u8 unknownE0[0x24];
++    u32 field104;
++    u8 unknown108[0xC];
++    u32 flags114;
++    u8 unknown118[0x1C];
++    struct ContactCollider primaryCollider, secondaryCollider;
++    u16 alternatePalette, paletteBank, basePaletteBank;
++    u8 unknown1E2[2];
++    u16 alternateOffset, paletteOffset;
++    u8 unknown1E8[0x34];
++    const void *control;
++    u8 unknown220[8];
++    const void *alternateControl;
++    u8 unknown22C[0xC];
++    const void *terrainControl;
++    u8 unknown23C[0x6C];
++    u8 state, phase, behavior, unknown2AB;
++    u32 counter;
++    u8 substate, resetRequested, prepared, animationEnded;
++    u8 enabled, kind, effectDirection, unknown2B7[7];
++    u16 groundHeight, flags2C0;
++    u16 reactionCountdown;
++    u8 unknown2C4[4];
++    u16 field2C8, movementTicks;
++    u32 flags2CC, flags2D0;
++    u16 flags2D4, flags2D6;
++    s32 parameter2D8;
++    u32 field2DC, payload2E0;
++    u16 result2E4, mode2E6;
++    u8 unknown2E8[2];
++    s16 verticalOffset;
++    struct ContactPosition secondaryMotion;
++    u16 terrainCell, previousTerrainCell;
++    u8 unknown2F8[4];
++    struct ContactPosition previousPosition;
++    u8 unknown304[0xD0];
++    struct SceneActorRegistryControlGroup group;
++    struct SceneActorMotionRouteCursor route;
++    u8 unknown45C[4];
++    struct SceneActorMotionSavedControl savedControl;
++    u8 unknown468[0x168];
++    void *terrainContact;
++    struct ContactPosition *destination;
++    u8 randomHeading, savedHeading, turnCountdown, unknown5DB[0x15];
++    const void *turnControl;
++    u8 unknown5F4[4];
++    const void *failureCallback;
++};
++struct SceneActorMotionSequence {
++    u32 flags;
++    u8 unknown4[0xC];
++    u16 frame;
++    u8 unknown12[0xA];
++    struct ContactPosition position;
++    u8 unknown24[0x24];
++    struct DisplaySequenceState sequence;
++};
++struct SceneActorMotionTile {
++    u8 unknown0[0x20];
++    u8 state[8];
++    u32 flags;
++    u16 elapsed;
++    u8 unknown2E[0xF];
++    u8 ended, unknown3E[2];
++    struct ContactPosition position;
++};
++#endif

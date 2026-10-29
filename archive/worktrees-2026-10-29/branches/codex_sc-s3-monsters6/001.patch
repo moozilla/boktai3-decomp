@@ -1,0 +1,112 @@
+From a0e415855b1e0b9292841693b401cff12522cced Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 02:31:09 -0700
+Subject: [PATCH] Keep unchecked semantic mutations out of seek automatic
+ search
+
+Reject swaps across jumps, mark remaining swaps as assumption-based, and require equivalence evidence before expanding such automatic nodes. Skip those move families when Unicorn cannot run. Deliberate model files remain usable; SEEK_UNCHECKED=1 restores explicit unchecked exploration.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/rewrites.py  |  7 +++++--
+ tools/seek/seek.py | 26 ++++++++++++++++++++++----
+ 2 files changed, 27 insertions(+), 6 deletions(-)
+
+diff --git a/tools/rewrites.py b/tools/rewrites.py
+index eb0734c86..86934f7f8 100644
+--- a/tools/rewrites.py
++++ b/tools/rewrites.py
+@@ -332,12 +332,15 @@ def rw_swap_stmts(fn):
+     for bi, b in enumerate(bl):
+         for i in range(len(b.block_items) - 1):
+             x, y = b.block_items[i], b.block_items[i + 1]
+-            if isinstance(x, (ca.Decl, ca.Label, ca.Return)) or isinstance(y, (ca.Decl, ca.Label)):
++            # Moving a statement across a jump can delete its effects or
++            # change which path executes them, including jumps nested in an if.
++            control = (ca.Decl, ca.Label, ca.Return, ca.Break, ca.Continue, ca.Goto)
++            if any(isinstance(n, control) for stmt in (x, y) for n, _, _ in walk(stmt)):
+                 continue
+             f2 = copy.deepcopy(fn)
+             b2 = blocks(f2)[bi]
+             b2.block_items[i], b2.block_items[i + 1] = b2.block_items[i + 1], b2.block_items[i]
+-            yield f"swap statements {i}/{i + 1}", f2
++            yield f"[sem] swap statements {i}/{i + 1}", f2
+ 
+ 
+ def rw_if_swap(fn):
+diff --git a/tools/seek/seek.py b/tools/seek/seek.py
+index ae9fea74d..21b2d3b09 100644
+--- a/tools/seek/seek.py
++++ b/tools/seek/seek.py
+@@ -51,7 +51,7 @@ from perm_pycparser import c_ast as ca  # noqa: E402
+ from src import ast_util  # noqa: E402
+ 
+ CURRENT = os.path.join(E.LOCAL, "current")
+-SEM_FAMILIES = {"width", "cast", "explicit_narrow", "cse_temp", "inline_var", "reuse_stored", "related_const"}
++SEM_FAMILIES = {"width", "cast", "explicit_narrow", "cse_temp", "inline_var", "reuse_stored", "related_const", "swap_stmts"}
+ AGBCC_SRC = os.path.join(ROOT, "build", "scope", "agbcc", "gcc")
+ 
+ 
+@@ -173,8 +173,20 @@ class Work:
+             sys.exit(f"no node n{n}")
+         return self.sess.nodes[n]
+ 
++    def searchable(self, node):
++        """Model files are deliberate hypotheses; automatic assumption-based
++        moves need an actual equivalence verdict, including their ancestry."""
++        if node.get("match") or os.environ.get("SEEK_UNCHECKED") == "1":
++            return True
++        while node and node.get("kind") != "file":
++            needs_sem = node.get("family") in SEM_FAMILIES or node.get("move", "").startswith("[sem]")
++            if needs_sem and not node.get("sem", "").startswith("EQUIV"):
++                return False
++            node = self.sess.nodes.get(node.get("parent"))
++        return True
++
+     def best(self, k=1):
+-        nodes = [n for n in self.sess.nodes.values() if n.get("ok")]
++        nodes = [n for n in self.sess.nodes.values() if n.get("ok") and self.searchable(n)]
+         nodes.sort(key=lambda n: (rank(n), n["id"]))
+         if not nodes:
+             sys.exit("no evaluated node")
+@@ -320,6 +332,9 @@ class Work:
+             seen_src.add(sha(R.text(fn)))
+         for dname, fn in defs.items():
+             for fam, desc, f2 in M.all_moves(fn, families):
++                needs_sem = fam in SEM_FAMILIES or desc.startswith("[sem]")
++                if needs_sem and os.environ.get("SEEK_UNCHECKED") != "1" and not self.target.oracle(base_pre):
++                    continue
+                 if budget is not None and len(tasks) >= budget:
+                     break
+                 line = changed_line(fn, f2)
+@@ -387,6 +402,9 @@ class Work:
+         sig = (tuple(sorted(families)) if families else None, tuple(lines) if lines else None)
+         done = {e["node"] for e in self.sess.events if e.get("kind") == "expand"
+                 and (tuple(e["families"]) if e.get("families") else None, tuple(e["lines"]) if e.get("lines") else None) == sig}
++        starts = [n for n in starts if self.searchable(n)]
++        if not starts:
++            sys.exit("no trusted starting node; inspect the C and add it as a deliberate hypothesis")
+         for n in starts:
+             heapq.heappush(heap, (rank(n), n.get("awrong", 0), n.get("depth", 0), tick, n["id"]))
+             tick += 1
+@@ -400,7 +418,7 @@ class Work:
+             if nid in done:
+                 # already expanded: its children are on the tree; queue them instead
+                 for c in self.sess.nodes.values():
+-                    if c.get("parent") == nid and c.get("ok") and c["id"] not in done:
++                    if c.get("parent") == nid and c.get("ok") and self.searchable(c) and c["id"] not in done:
+                         heapq.heappush(heap, (rank(c), c.get("awrong", 0), c.get("depth", 0), tick, c["id"]))
+                         tick += 1
+                 continue
+@@ -414,7 +432,7 @@ class Work:
+                 continue
+             rounds += 1
+             for c in kids:
+-                if c.get("sem", "").startswith("DIFFERENT"):
++                if c.get("sem", "").startswith("DIFFERENT") or not self.searchable(c):
+                     continue
+                 ck, bk = rank(c), rank(best)
+                 # better, a lateral step on the plateau, or a bounded step back (moves that pay off only
+-- 
+2.39.3 (Apple Git-145)
+

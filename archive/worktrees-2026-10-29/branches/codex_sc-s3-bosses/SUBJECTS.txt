@@ -1,0 +1,3 @@
+Allow scope and seek to compare a reviewed span containing following routines
+Allow seek add to skip reload rotation probing
+Preserve values when removing tied empty asm barriers

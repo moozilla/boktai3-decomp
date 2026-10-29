@@ -1,0 +1,28 @@
+From c40d082aa0544c22705bef134920498d78e5f7d4 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 02:06:56 -0700
+Subject: [PATCH] Mark seek materialized files with their target function
+
+Ensure scope diagnostics select the seek session target in multi-function units.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/seek/engine.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tools/seek/engine.py b/tools/seek/engine.py
+index a47db2872..e26b30248 100644
+--- a/tools/seek/engine.py
++++ b/tools/seek/engine.py
+@@ -571,6 +571,8 @@ class Session:
+         os.makedirs(d, exist_ok=True)
+         p = os.path.join(d, f"n{node['id']}.c")
+         t = self.text(node)
++        t = re.sub(r"(?m)^// scope: write \w+ here[^\n]*\n", "", t)
++        t = f"// scope: write {self.func} here\n" + t
+         if not os.path.exists(p) or open(p).read() != t:
+             open(p, "w").write(t)
+         return os.path.relpath(p, ROOT)
+-- 
+2.39.3 (Apple Git-145)
+

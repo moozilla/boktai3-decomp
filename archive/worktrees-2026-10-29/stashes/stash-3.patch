@@ -1,0 +1,64 @@
+diff --git a/data/stage_palettes.csv b/data/stage_palettes.csv
+index 6678cd8ff..72e8b0f5e 100644
+--- a/data/stage_palettes.csv
++++ b/data/stage_palettes.csv
+@@ -26,7 +26,7 @@ map,palette,evidence
+ 296B,DAA7,BG palette RAM matched in a centaur capture
+ 2A27,00C7,BG palette RAM matched in a centaur capture
+ 2A2F,EB34,BG palette RAM matched in a centaur capture
+-2C6E,17EE,BG palette RAM matched in a centaur capture
++2C6E,37EE,BG palette RAM matched in a centaur capture
+ 2DFB,A5B3,BG palette RAM matched in a centaur capture
+ 316C,A4B3,BG palette RAM matched in a centaur capture
+ 3334,2F53,BG palette RAM matched in a centaur capture
+@@ -64,12 +64,12 @@ map,palette,evidence
+ 5E57,17EE,BG palette RAM matched in a centaur capture
+ 5E97,243E,BG palette RAM matched in a centaur capture
+ 610B,BB25,BG palette RAM matched in a centaur capture
+-6216,2F53,BG palette RAM matched in a centaur capture
++6216,A5B3,BG palette RAM matched in a centaur capture
+ 640A,A7B3,BG palette RAM matched in a centaur capture
+ 6603,00C7,BG palette RAM matched in a centaur capture
+ 6A1A,72C4,BG palette RAM matched in a centaur capture
+ 6A7A,00C7,BG palette RAM matched in a centaur capture
+-6B84,EA34,BG palette RAM matched in a centaur capture
++6B84,E934,BG palette RAM matched in a centaur capture
+ 6D6F,17EE,BG palette RAM matched in a centaur capture
+ 6F7E,72C4,BG palette RAM matched in a centaur capture
+ 75F2,A7B3,BG palette RAM matched in a centaur capture
+@@ -80,7 +80,7 @@ map,palette,evidence
+ 7C19,EB34,BG palette RAM matched in a centaur capture
+ 7E65,04C7,BG palette RAM matched in a centaur capture
+ 7EF2,17EE,BG palette RAM matched in a centaur capture
+-7EFB,17EE,BG palette RAM matched in a centaur capture
++7EFB,57EE,BG palette RAM matched in a centaur capture
+ 802C,00C7,BG palette RAM matched in a centaur capture
+ 818B,EB34,BG palette RAM matched in a centaur capture
+ 8306,BB25,BG palette RAM matched in a centaur capture
+@@ -102,7 +102,7 @@ A1F7,EA34,BG palette RAM matched in a centaur capture
+ A25C,243E,BG palette RAM matched in a centaur capture
+ A3B3,EA34,BG palette RAM matched in a centaur capture
+ A68E,2F53,BG palette RAM matched in a centaur capture
+-A6B5,17EE,BG palette RAM matched in a centaur capture
++A6B5,37EE,BG palette RAM matched in a centaur capture
+ A96A,454B,BG palette RAM matched in a centaur capture
+ AB7B,3815,BG palette RAM matched in a centaur capture
+ ABAB,0DB9,BG palette RAM matched in a centaur capture
+@@ -121,7 +121,7 @@ BBD7,DBA7,BG palette RAM matched in a centaur capture
+ C04F,00C7,BG palette RAM matched in a centaur capture
+ C05C,A5B3,BG palette RAM matched in a centaur capture
+ C479,DBA7,BG palette RAM matched in a centaur capture
+-C480,243E,BG palette RAM matched in a centaur capture
++C480,F353,BG palette RAM matched in a centaur capture
+ C5A7,091D,BG palette RAM matched in a centaur capture
+ C5ED,00C7,BG palette RAM matched in a centaur capture
+ C9E7,DBA7,BG palette RAM matched in a centaur capture
+@@ -140,7 +140,7 @@ DE57,BB25,BG palette RAM matched in a centaur capture
+ DEB5,00C7,BG palette RAM matched in a centaur capture
+ DF3C,E243,BG palette RAM matched in a centaur capture
+ DFCA,243E,BG palette RAM matched in a centaur capture
+-E38B,3815,BG palette RAM matched in a centaur capture
++E38B,DAA7,BG palette RAM matched in a centaur capture
+ E41D,17EE,BG palette RAM matched in a centaur capture
+ E44F,00C7,BG palette RAM matched in a centaur capture
+ E568,3815,BG palette RAM matched in a centaur capture

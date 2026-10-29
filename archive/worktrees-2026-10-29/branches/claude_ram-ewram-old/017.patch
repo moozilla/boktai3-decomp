@@ -1,0 +1,37 @@
+From b34637dde76c6ed0e45c6ec5be5b81b38663b572 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Tue, 27 Oct 2026 23:36:59 -0700
+Subject: [PATCH] Document ramlayout --cast and dedupe
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+---
+ docs/RAM.md | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/docs/RAM.md b/docs/RAM.md
+index 76438dec9..05d65e5c7 100644
+--- a/docs/RAM.md
++++ b/docs/RAM.md
+@@ -69,6 +69,19 @@ A batch file has one `ADDR | DECL | NOTE` line per object. The tool:
+ 
+ The header must compile on its own; the tool checks that first.
+ 
++`--cast` tries a cast at each use before keeping a file's own declaration, so a
++file whose view of the object differs (`struct Manager *` for a `u32`) still stops
++declaring it. Rows with a header also drop repeated declarations in other `.c` files
++on every run. To drop identical declarations in other headers (`#include` the row's
++header instead), run:
++
++```bash
++python3 tools/ramlayout.py dedupe
++```
++
++It tries one header at a time and keeps the change only if every includer still compiles
++to the same assembly.
++
+ ### Where declarations live
+ 
+ - `include/render.h`: the renderer block `03004280`-`0300523F` (OAM, BG affine
+-- 
+2.39.3 (Apple Git-145)
+

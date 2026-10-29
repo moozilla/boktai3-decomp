@@ -1,0 +1,3569 @@
+From ae2afff10cba9af1580640a8a9fced9c9d0df428 Mon Sep 17 00:00:00 2001
+From: Moozilla <moozilla@protonmail.com>
+Date: Sun, 18 Oct 2026 13:59:42 -0700
+Subject: [PATCH] Unit scene_panel_control_and_lifecycle: merge 48 files into
+ src/scene_panel_control_and_lifecycle.c
+
+Scene panel control and lifecycle (0805B28C-0805CB88); tools/unitize.py, build OK, matched bytes 907294 -> 907294.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ include/scene_panel.h                      |  164 ++-
+ include/scene_panel_commands.h             |   29 +-
+ include/scene_panel_config.h               |   64 +-
+ include/scene_panel_interaction.h          |   43 -
+ include/scene_panel_lifecycle.h            |   27 +-
+ include/scene_panel_orchestration.h        |    2 +-
+ include/scene_panel_rig.h                  |   48 +-
+ include/scene_panel_subject.h              |   37 +-
+ include/scene_panel_subject_playback.h     |    2 +-
+ include/scene_panel_subject_tail.h         |   14 +-
+ notes/scene_panel_control_and_lifecycle.md |   94 ++
+ src/fn/sub_08058700.c                      |    6 +-
+ src/fn/sub_08058BD8.c                      |    8 +-
+ src/fn/sub_0805B28C.c                      |   11 -
+ src/fn/sub_0805B2CC.c                      |   14 -
+ src/fn/sub_0805B318.c                      |   18 -
+ src/fn/sub_0805B34C.c                      |   17 -
+ src/fn/sub_0805B3A0.c                      |    8 -
+ src/fn/sub_0805B3CC.c                      |   11 -
+ src/fn/sub_0805B40C.c                      |  101 --
+ src/fn/sub_0805B658.c                      |    9 -
+ src/fn/sub_0805B688.c                      |   19 -
+ src/fn/sub_0805B70C.c                      |   34 -
+ src/fn/sub_0805B7C8.c                      |   23 -
+ src/fn/sub_0805B8B4.c                      |   31 -
+ src/fn/sub_0805B974.c                      |   17 -
+ src/fn/sub_0805B9C8.c                      |   13 -
+ src/fn/sub_0805BA18.c                      |    9 -
+ src/fn/sub_0805BA50.c                      |   27 -
+ src/fn/sub_0805BAE4.c                      |   11 -
+ src/fn/sub_0805BB20.c                      |   29 -
+ src/fn/sub_0805BC10.c                      |   32 -
+ src/fn/sub_0805BCE8.c                      |    7 -
+ src/fn/sub_0805BCEC.c                      |   46 -
+ src/fn/sub_0805BD78.c                      |   16 -
+ src/fn/sub_0805BDD0.c                      |   75 --
+ src/fn/sub_0805BFC8.c                      |   15 -
+ src/fn/sub_0805C054.c                      |   10 -
+ src/fn/sub_0805C084.c                      |   63 --
+ src/fn/sub_0805C2DC.c                      |   17 -
+ src/fn/sub_0805C310.c                      |   65 --
+ src/fn/sub_0805C454.c                      |    9 -
+ src/fn/sub_0805C470.c                      |   12 -
+ src/fn/sub_0805C4A0.c                      |   31 -
+ src/fn/sub_0805C564.c                      |   29 -
+ src/fn/sub_0805C614.c                      |   11 -
+ src/fn/sub_0805C640.c                      |    7 -
+ src/fn/sub_0805C660.c                      |    7 -
+ src/fn/sub_0805C680.c                      |   25 -
+ src/fn/sub_0805C728.c                      |    5 -
+ src/fn/sub_0805C73C.c                      |    5 -
+ src/fn/sub_0805C754.c                      |    9 -
+ src/fn/sub_0805C760.c                      |    8 -
+ src/fn/sub_0805C774.c                      |   11 -
+ src/fn/sub_0805C7B4.c                      |   16 -
+ src/fn/sub_0805C7E4.c                      |   18 -
+ src/fn/sub_0805C86C.c                      |   10 -
+ src/fn/sub_0805C8D8.c                      |   43 -
+ src/fn/sub_0805CA20.c                      |   16 -
+ src/fn/sub_0805CA7C.c                      |   32 -
+ src/fn/sub_0805CB38.c                      |   18 -
+ src/fn/sub_0805CB88.c                      |    4 +-
+ src/fn/sub_0805CBD4.c                      |    2 +-
+ src/fn/sub_0805CC44.c                      |    2 +-
+ src/fn/sub_0805CCF0.c                      |    2 +-
+ src/fn/sub_0805CD60.c                      |    2 +-
+ src/fn/sub_0805CD64.c                      |    2 +-
+ src/fn/sub_0805CECC.c                      |    2 +-
+ src/fn/sub_0805CFE8.c                      |    2 +-
+ src/fn/sub_0805D17C.c                      |    2 +-
+ src/fn/sub_0805D2B0.c                      |    2 +-
+ src/fn/sub_0805D584.c                      |    2 +-
+ src/fn/sub_0805D6C4.c                      |    2 +-
+ src/fn/sub_0805D770.c                      |    2 +-
+ src/fn/sub_0805D800.c                      |    4 +-
+ src/fn/sub_0805D884.c                      |    2 +-
+ src/fn/sub_0805D8A8.c                      |    2 +-
+ src/fn/sub_0805D92C.c                      |    2 +-
+ src/fn/sub_0805DCAC.c                      |   10 +-
+ src/scene_panel_control_and_lifecycle.c    | 1072 ++++++++++++++++++++
+ 80 files changed, 1379 insertions(+), 1349 deletions(-)
+ create mode 100644 notes/scene_panel_control_and_lifecycle.md
+ delete mode 100644 src/fn/sub_0805B28C.c
+ delete mode 100644 src/fn/sub_0805B2CC.c
+ delete mode 100644 src/fn/sub_0805B318.c
+ delete mode 100644 src/fn/sub_0805B34C.c
+ delete mode 100644 src/fn/sub_0805B3A0.c
+ delete mode 100644 src/fn/sub_0805B3CC.c
+ delete mode 100644 src/fn/sub_0805B40C.c
+ delete mode 100644 src/fn/sub_0805B658.c
+ delete mode 100644 src/fn/sub_0805B688.c
+ delete mode 100644 src/fn/sub_0805B70C.c
+ delete mode 100644 src/fn/sub_0805B7C8.c
+ delete mode 100644 src/fn/sub_0805B8B4.c
+ delete mode 100644 src/fn/sub_0805B974.c
+ delete mode 100644 src/fn/sub_0805B9C8.c
+ delete mode 100644 src/fn/sub_0805BA18.c
+ delete mode 100644 src/fn/sub_0805BA50.c
+ delete mode 100644 src/fn/sub_0805BAE4.c
+ delete mode 100644 src/fn/sub_0805BB20.c
+ delete mode 100644 src/fn/sub_0805BC10.c
+ delete mode 100644 src/fn/sub_0805BCE8.c
+ delete mode 100644 src/fn/sub_0805BCEC.c
+ delete mode 100644 src/fn/sub_0805BD78.c
+ delete mode 100644 src/fn/sub_0805BDD0.c
+ delete mode 100644 src/fn/sub_0805BFC8.c
+ delete mode 100644 src/fn/sub_0805C054.c
+ delete mode 100644 src/fn/sub_0805C084.c
+ delete mode 100644 src/fn/sub_0805C2DC.c
+ delete mode 100644 src/fn/sub_0805C310.c
+ delete mode 100644 src/fn/sub_0805C454.c
+ delete mode 100644 src/fn/sub_0805C470.c
+ delete mode 100644 src/fn/sub_0805C4A0.c
+ delete mode 100644 src/fn/sub_0805C564.c
+ delete mode 100644 src/fn/sub_0805C614.c
+ delete mode 100644 src/fn/sub_0805C640.c
+ delete mode 100644 src/fn/sub_0805C660.c
+ delete mode 100644 src/fn/sub_0805C680.c
+ delete mode 100644 src/fn/sub_0805C728.c
+ delete mode 100644 src/fn/sub_0805C73C.c
+ delete mode 100644 src/fn/sub_0805C754.c
+ delete mode 100644 src/fn/sub_0805C760.c
+ delete mode 100644 src/fn/sub_0805C774.c
+ delete mode 100644 src/fn/sub_0805C7B4.c
+ delete mode 100644 src/fn/sub_0805C7E4.c
+ delete mode 100644 src/fn/sub_0805C86C.c
+ delete mode 100644 src/fn/sub_0805C8D8.c
+ delete mode 100644 src/fn/sub_0805CA20.c
+ delete mode 100644 src/fn/sub_0805CA7C.c
+ delete mode 100644 src/fn/sub_0805CB38.c
+ create mode 100644 src/scene_panel_control_and_lifecycle.c
+
+diff --git a/include/scene_panel.h b/include/scene_panel.h
+index c5d37ea87..b66786054 100644
+--- a/include/scene_panel.h
++++ b/include/scene_panel.h
+@@ -4,45 +4,173 @@
+ #include "background_controller.h"
+ #include "contact_actor.h"
+ #include "scene_object.h"
++#include "contact_swarm.h"
++struct ScenePanel;
++struct ScenePanelInteractionPlayer;
++struct TetherActor;
++
++/* Subject identity remains tentative; fields follow observed consumers. */
+ struct ScenePanelSubject {
+-    u8 unknown0[0xD3];
+-    u8 displayState;
++    u8 unknown0[0x18];
++    struct ContactSwarmSprite drawable;
++    u8 graphics[0x1C];
++    struct ContactPosition home;
++    struct ContactCollider collider;
++    struct DisplaySequenceState sequence;
++    void *sequenceResource;
++    u8 sequenceRow, sequenceVariant, kind, state;
++    u16 stateFrame, contactProgress, contactLimit;
++    u8 unknownDA[2];
++    u16 progressStep;
++    u16 timer, appearDelay, unknownE2, contactCooldown, requested;
++    u16 requestLevel, unknownEA, hold;
++    u8 unknownEE, contactKind, changed, positionReset;
++    u16 paletteBank, basePaletteBank, countdown, nextThreshold;
++    u8 unknownFA[3], byteTimer;
++    u8 unknownFE[6];
++    u32 effects[0x138 / 4];
++    void (*update)(struct ScenePanelSubject *);
+ };
+-/* Tentative presentation/state view; fields belong to observed consumers. */
++/* Fifteen-sprite rig embedded at parent offset 0xC6C. */
++struct SceneRigSprite {
++    u32 flags;
++    u8 unknown4[3];
++    u8 renderMode;
++    u8 unknown8[8];
++    u16 frame;
++    u8 unknown12[0xA];
++    struct ContactPosition position;
++    u8 unknown24[8];
++    u8 graphics[0x1C];
++    struct DisplaySequenceState sequence;
++    void *animationResource;
++    u8 unknown5C[8];
++    u16 randomPhase, phase;
++};
++struct ScenePanelRig {
++    struct SceneRigSprite main, primary[8], secondary[6];
++    struct ContactPosition position;
++    struct ContactCollider collider;
++    struct ContactPosition origin;
++    u16 state, stateFrame, angle;
++    s16 turnStep;
++    s16 turnRate;
++    u16 turnDuration;
++    u16 distance, speed;
++    u16 verticalStep, colliderHold;
++    u8 motionFlag;
++    u8 contactDirection;
++    u16 contactForce, contactEffect;
++    s8 selectedSubject;
++    u8 unknown697[3];
++    u16 resourceAccumulator, selectionTimer;
++    u8 unknown69E[2];
++    u8 payloadA[8], payloadB[8];
++    struct ScenePanel *parent;
++};
++struct ScenePanelAuxSprite {
++    u32 flags;
++    u8 unknown4[3];
++    u8 renderMode, parameter8, parameter9;
++    u8 unknownA[6];
++    u16 frame;
++    u8 unknown12[0xA];
++    struct ContactPosition position;
++    u8 unknown24[8];
++    u8 graphics[0x1C];
++};
++struct ScenePanelPaletteGraphics {
++    u8 unknown0[0xC];
++    u16 *palette;
++    u8 unknown10[0xC];
++};
++struct ScenePanelPaletteSprite {
++    u32 flags;
++    u8 unknown4[3];
++    u8 renderMode;
++    u8 unknown8[8];
++    u16 frame;
++    u8 unknown12[0xA];
++    struct ContactPosition position;
++    u8 unknown24[8];
++    struct ScenePanelPaletteGraphics graphics;
++    u16 paletteCopy[16];
++    u16 active, transform[3];
++};
++struct ScenePanelCommand {
++    u8 unknown0[6];
++    u8 opcode, unknown7;
++    u16 mode;
++};
++struct ScenePanelReceiver {
++    u16 actorId;
++    u8 category, pendingTrigger;
++    u8 unknown4[2], count[2];
++    struct ScenePanelCommand *commands[2][4];
++};
++/* Shared parent layout from presentation, interaction, configuration and lifecycle consumers.
++ * Presentation mode and effect state retain the original public field names. */
+ struct ScenePanel {
+-    u8 unknown0[0x1E];
+-    u8 overlayCount;
+-    u8 unknown1F[0x20F];
++    struct Task task;
++    u16 actorId, initialMode;
++    u8 unknown1C[2];
++    u8 subjectCount;
++    u8 activeCount;
++    u8 unknown20[0x20E];
+     u16 stateFrame, channels[8];
+     u8 unknown240[0x10];
+     void (*state)(struct ScenePanel *);
+-    u8 unknown254[0x280];
++    struct ScenePanelPaletteSprite paletteSprite;
++    u8 unknown2C4[0x210];
+     void *backgroundMap, *palette;
+     void *overlayMap, *overlayPalette;
+     u8 targetLevels[4], currentLevels[4];
+     u16 overlayFrame;
+-    u8 unknown4EE[0xE];
++    u8 unknown4EE[6];
++    struct ScenePanelInteractionPlayer *savedPlayer;
++    struct TetherActor *savedTether;
+     u16 effectState, effectFrame;
+-    struct ContactPosition overlayOrigin;
+-    u8 unknown508[8];
+-    struct ContactPackedVector center;
+-    u8 unknown518[0x6D0];
++    struct ContactPosition origin;
++    struct ContactPosition approachPosition;
++    /* Signed vector and packed presentation arithmetic share these eight bytes. */
++    struct ContactPosition center;
++    struct ScenePanelAuxSprite auxiliary;
++    u8 unknown560[0x688];
+     struct ScenePanelSubject *subjects[4];
+-    u8 unknownBF8[0x18];
+-    u8 paletteMode;
+-    u8 unknownC11[0x717];
++    u16 resourceScale;
++    u8 unknownBFA[0x15];
++    u8 skipMainSprite;
++    u8 paletteMode, savedMode, gateC12;
++    u8 unknownC13[3];
++    u16 variant;
++    u8 unknownC18[0x54];
++    struct ScenePanelRig rig;
++    u8 unknown1320[8];
+     u16 mode;
+     s16 shakeOffset;
+     u8 unknown132C[2];
+     u8 overlayChanged;
+-    u8 unknown132F[0xB];
++    u8 unknown132F[7];
++    u8 allSubjectsNotified, arrivalRampEnabled;
++    u16 arrivalRampFrame;
+     u8 resourceIndex;
+-    u8 unknown133B[0x3D];
++    u8 unknown133B[7];
++    u8 activated, warningStage;
++    u16 warningSounds[4];
++    u8 unknown134C[6];
++    u16 resourceId;
++    u8 unknown1354[0x24];
+     u16 effectPhase;
+-    u8 unknown137A[0xAE];
++    u8 unknown137A[0x4A];
++    u16 parameter;
++    u8 unknown13C6[0x62];
+     u32 transitionComplete;
+     u8 unknown142C[4];
+     u16 channelsDirty;
++    u8 unknown1432[0x37A];
++    s32 property;
++    struct ScenePanelReceiver receiver;
++    u8 unknown17D8[0xC];
+ };
+ extern const u16 gUnk_08605A88[];
+ extern u16 gUnk_03004BD8;
+diff --git a/include/scene_panel_commands.h b/include/scene_panel_commands.h
+index 415f17814..04cb711a0 100644
+--- a/include/scene_panel_commands.h
++++ b/include/scene_panel_commands.h
+@@ -2,23 +2,6 @@
+ #define GUARD_SCENE_PANEL_COMMANDS_H
+ #include "scene_panel_orchestration.h"
+ 
+-struct ScenePanelCommand {
+-    u8 unknown0[6];
+-    u8 opcode, unknown7;
+-    u16 mode;
+-};
+-struct ScenePanelReceiver {
+-    u16 actorId;
+-    u8 category, pendingTrigger;
+-    u8 unknown4[2], count[2];
+-    struct ScenePanelCommand *commands[2][4];
+-};
+-struct ScenePanelCommandView {
+-    u8 unknown0[0x18];
+-    u16 actorId;
+-    u8 unknown1A[0x17B0 - 0x1A];
+-    struct ScenePanelReceiver receiver;
+-};
+ struct ScenePanelCommandGlobals {
+     u8 unknown0[0x24];
+     u8 bank;
+@@ -30,12 +13,12 @@ s32 SceneMessages_RegisterReceiver(void *, u32, u32);
+ void sub_08225F88(const void *);
+ 
+ void ScenePanel_DispatchCommands(struct ScenePanel *);
+-void ScenePanel_UnregisterReceiver(struct ScenePanelCommandView *);
+-void ScenePanel_RegisterReceiver(struct ScenePanelCommandView *);
++void ScenePanel_UnregisterReceiver(struct ScenePanel *);
++void ScenePanel_RegisterReceiver(struct ScenePanel *);
+ void sub_0805C754(void);
+ u32 ScenePanel_IsPresent(void);
+-void ScenePanel_SelectMode(struct ScenePanelInteractionView *);
+-s32 ScenePanel_CountActiveSubjects(struct ScenePanelInteractionView *);
+-void ScenePanel_UpdateApproachSprite(struct ScenePanelInteractionView *);
+-void ScenePanel_SubmitPlayerMidpoint(struct ScenePanelInteractionView *);
++void ScenePanel_SelectMode(struct ScenePanel *);
++s32 ScenePanel_CountActiveSubjects(struct ScenePanel *);
++void ScenePanel_UpdateApproachSprite(struct ScenePanel *);
++void ScenePanel_SubmitPlayerMidpoint(struct ScenePanel *);
+ #endif
+diff --git a/include/scene_panel_config.h b/include/scene_panel_config.h
+index 7fa792ecf..031f37f1a 100644
+--- a/include/scene_panel_config.h
++++ b/include/scene_panel_config.h
+@@ -1,70 +1,16 @@
+ #ifndef GUARD_SCENE_PANEL_CONFIG_H
+ #define GUARD_SCENE_PANEL_CONFIG_H
+ #include "scene_panel_rig.h"
+-struct ScenePanelAuxSprite {
+-    u32 flags;
+-    u8 unknown4[3];
+-    u8 renderMode, parameter8, parameter9;
+-    u8 unknownA[6];
+-    u16 frame;
+-    u8 unknown12[0xA];
+-    struct ContactPosition position;
+-    u8 unknown24[8];
+-    u8 graphics[0x1C];
+-};
+-struct ScenePanelPaletteGraphics {
+-    u8 unknown0[0xC];
+-    u16 *palette;
+-    u8 unknown10[0xC];
+-};
+-struct ScenePanelPaletteSprite {
+-    u32 flags;
+-    u8 unknown4[3];
+-    u8 renderMode;
+-    u8 unknown8[8];
+-    u16 frame;
+-    u8 unknown12[0xA];
+-    struct ContactPosition position;
+-    u8 unknown24[8];
+-    struct ScenePanelPaletteGraphics graphics;
+-    u16 paletteCopy[16];
+-    u16 active, transform[3];
+-};
+-struct ScenePanelConfigView {
+-    u8 unknown0[0x1A];
+-    u16 category;
+-    u8 unknown1C[2];
+-    u8 subjectCount;
+-    u8 unknown1F[0x235];
+-    struct ScenePanelPaletteSprite paletteSprite;
+-    u8 unknown2C4[0x23C];
+-    struct ContactPosition origin, approachPosition, center;
+-    struct ScenePanelAuxSprite auxiliary;
+-    u8 unknown560[0x688];
+-    struct SceneRigSubject *subjects[4];
+-    u8 unknownBF8[0x17];
+-    u8 suppressAuxiliary;
+-    u8 unknownC10[0x72A];
+-    u8 resourceIndex;
+-    u8 unknown133B[8];
+-    u8 warningStage;
+-    u16 warningSounds[4];
+-    u8 unknown134C[6];
+-    u16 resourceId;
+-    u8 unknown1354[0x70];
+-    u16 parameter;
+-    u8 unknown13C6[0x3E6];
+-    s32 property;
+-};
++
+ struct ScenePanelSpawnPosition {
+     u32 x : 16, y : 16, z : 16;
+ };
+-struct ScenePanelSubjectView;
+-struct ScenePanelSubjectView *ScenePanelSubject_Create(const struct ContactPosition *, u32, u32,
+-                                                       u32, u32, u32, u32, u32);
++struct ScenePanelSubject;
++struct ScenePanelSubject *ScenePanelSubject_Create(const struct ContactPosition *, u32, u32, u32,
++                                                   u32, u32, u32, u32);
+ void ScenePanel_InitScheduledAction(struct ScenePanel *);
+ void ScenePanel_InitPaletteSprite(struct ScenePanel *);
+ void ScenePanel_InitAuxiliarySprite(struct ScenePanel *);
+-void ScenePanel_InitResourceConfiguration(struct ScenePanelConfigView *);
++void ScenePanel_InitResourceConfiguration(struct ScenePanel *);
+ s32 ScenePanel_AreSubjectsIdle(struct ScenePanel *);
+ #endif
+diff --git a/include/scene_panel_interaction.h b/include/scene_panel_interaction.h
+index 3664859a6..703cbb72e 100644
+--- a/include/scene_panel_interaction.h
++++ b/include/scene_panel_interaction.h
+@@ -20,49 +20,6 @@ struct ScenePanelInteractionPackedPosition {
+     u32 y : 16;
+     u32 z : 16;
+ };
+-struct ScenePanelInteractionSubject {
+-    u8 unknown0[0xD3];
+-    u8 state;
+-    u8 unknownD4[0x1C];
+-    u8 changed;
+-};
+-struct ScenePanelApproachSprite {
+-    u32 flags;
+-    u8 unknown4[4];
+-    u8 scaleX, scaleY;
+-    u8 unknownA[6];
+-    u16 frame;
+-    u8 unknown12[0x56];
+-};
+-struct ScenePanelInteractionView {
+-    u8 unknown0[0x1A];
+-    u16 initialMode;
+-    u8 unknown1C[2];
+-    u8 subjectCount;
+-    u8 activeCount;
+-    u8 unknown20[0x230];
+-    void (*presentationState)(struct ScenePanel *);
+-    u32 mainSpriteFlags;
+-    u8 unknown258[0x2A4];
+-    u16 state, frame;
+-    struct ContactPosition origin, approachPosition, center;
+-    struct ScenePanelApproachSprite approachSprite;
+-    u8 unknown580[0x668];
+-    struct ScenePanelInteractionSubject *subjects[4];
+-    u16 resourceScale;
+-    u8 unknownBFA[0x15];
+-    u8 skipMainSprite;
+-    u8 mode, savedMode, gateC12;
+-    u8 unknownC13[3];
+-    u16 variant;
+-    u8 unknownC18[0x54];
+-    struct ScenePanelRig rig;
+-    u8 unknown1320[0x16];
+-    u8 allSubjectsNotified, arrivalRampEnabled;
+-    u16 arrivalRampFrame;
+-    u8 unknown133A[0x10];
+-    u16 transitionSound;
+-};
+ 
+ extern struct TetherActor *gUnk_02000488;
+ #define SCENE_PANEL_PLAYER ((struct ScenePanelInteractionPlayer *)gUnk_02000580[0])
+diff --git a/include/scene_panel_lifecycle.h b/include/scene_panel_lifecycle.h
+index 1200eb658..c3e67bb02 100644
+--- a/include/scene_panel_lifecycle.h
++++ b/include/scene_panel_lifecycle.h
+@@ -1,32 +1,11 @@
+ #ifndef GUARD_SCENE_PANEL_LIFECYCLE_H
+ #define GUARD_SCENE_PANEL_LIFECYCLE_H
+ #include "scene_panel_commands.h"
+-struct ScenePanelLifecycleView {
+-    u8 unknown0[0x1A];
+-    u16 initialMode;
+-    u8 unknown1C[2];
+-    u8 subjectCount, activeCount;
+-    u8 unknown20[0x234];
+-    struct ScenePanelPaletteSprite paletteSprite;
+-    u8 unknown2C4[0x230];
+-    struct ScenePanelInteractionPlayer *savedPlayer;
+-    struct TetherActor *savedTether;
+-    u16 state, frame;
+-    struct ContactPosition origin, approachPosition, center;
+-    struct ScenePanelAuxSprite auxiliary;
+-    u8 unknown560[0x6AF];
+-    u8 skipMainSprite;
+-    u8 mode;
+-    u8 unknownC11[0x5B];
+-    struct ScenePanelRig rig;
+-    u8 unknown1320[0x22];
+-    u8 activated, warningStage;
+-    u16 warningSounds[4];
+-};
++
+ extern void (*const gUnk_08605ABC[])(struct ScenePanel *);
+ void ScenePanel_ReadInitialMode(struct ScenePanel *);
+-void ScenePanel_InitAnchorPositions(struct ScenePanelConfigView *);
+-void ScenePanel_CreateSubjects(struct ScenePanelConfigView *);
++void ScenePanel_InitAnchorPositions(struct ScenePanel *);
++void ScenePanel_CreateSubjects(struct ScenePanel *);
+ void ScenePanel_InitScriptProperty(struct ScenePanel *);
+ void ScenePanel_UpdateParticles(struct ScenePanel *);
+ void ScenePanel_DestroyParticles(struct ScenePanel *);
+diff --git a/include/scene_panel_orchestration.h b/include/scene_panel_orchestration.h
+index 648739f5f..3c1889765 100644
+--- a/include/scene_panel_orchestration.h
++++ b/include/scene_panel_orchestration.h
+@@ -4,7 +4,7 @@
+ #include "script_reference.h"
+ #include "scene_panel_config.h"
+ 
+-#define SCENE_PANEL_GLOBAL ((struct ScenePanelInteractionView *)gUnk_020004A4)
++#define SCENE_PANEL_GLOBAL ((struct ScenePanel *)gUnk_020004A4)
+ void ScenePanel_InitRig(struct ScenePanel *);
+ void ScenePanel_InitBackground(struct ScenePanel *);
+ void ScenePanel_InitOverlay(struct ScenePanel *);
+diff --git a/include/scene_panel_rig.h b/include/scene_panel_rig.h
+index 21604b0a3..fee52e71d 100644
+--- a/include/scene_panel_rig.h
++++ b/include/scene_panel_rig.h
+@@ -2,32 +2,12 @@
+ #define GUARD_SCENE_PANEL_RIG_H
+ #include "scene_panel.h"
+ #include "contact_actor.h"
+-struct SceneRigSprite {
+-    u32 flags;
+-    u8 unknown4[3];
+-    u8 renderMode;
+-    u8 unknown8[8];
+-    u16 frame;
+-    u8 unknown12[0xA];
+-    struct ContactPosition position;
+-    u8 unknown24[8];
+-    u8 graphics[0x1C];
+-    struct DisplaySequenceState sequence;
+-    void *animationResource;
+-    u8 unknown5C[8];
+-    u16 randomPhase, phase;
+-};
+-struct SceneRigSubject {
+-    u8 unknown0[0xD3];
+-    u8 state;
+-    u8 unknownD4[0x12];
+-    u16 requested;
+-};
++
+ struct SceneRigParentView {
+     u8 unknown0[0x1E];
+     u8 subjectCount, activeCount;
+     u8 unknown20[0xBC8];
+-    struct SceneRigSubject *subjects[4];
++    struct ScenePanelSubject *subjects[4];
+     u16 resourceScale;
+     u8 unknownBFA[0x16];
+     u8 mode;
+@@ -35,27 +15,7 @@ struct SceneRigParentView {
+     u8 activated, warningStage;
+     u16 warningSounds[4];
+ };
+-struct ScenePanelRig {
+-    struct SceneRigSprite main, primary[8], secondary[6];
+-    struct ContactPosition position;
+-    struct ContactCollider collider;
+-    struct ContactPosition origin;
+-    u16 state, stateFrame, angle;
+-    s16 turnStep;
+-    s16 turnRate;
+-    u16 turnDuration;
+-    u16 distance, speed;
+-    u16 verticalStep, colliderHold;
+-    u8 motionFlag;
+-    u8 contactDirection;
+-    u16 contactForce, contactEffect;
+-    s8 selectedSubject;
+-    u8 unknown697[3];
+-    u16 resourceAccumulator, selectionTimer;
+-    u8 unknown69E[2];
+-    u8 payloadA[8], payloadB[8];
+-    struct ScenePanel *parent;
+-};
++
+ struct SceneRigContact {
+     u8 unknown0[0x34];
+     u32 typeFlags, reactionFlags;
+@@ -73,7 +33,7 @@ void ScenePanelRig_HideSprites(struct ScenePanelRig *);
+ void ScenePanelRig_ShowSprites(struct ScenePanelRig *);
+ void ScenePanelRig_InitMovement(struct ScenePanelRig *);
+ u32 ScenePanelRig_GetActiveCount(struct ScenePanelRig *);
+-void ScenePanelSubject_SetState(struct SceneRigSubject *, u32);
++void ScenePanelSubject_SetState(struct ScenePanelSubject *, u32);
+ extern const s16 gUnk_086149C4[];
+ void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
+ #endif
+diff --git a/include/scene_panel_subject.h b/include/scene_panel_subject.h
+index 01a8b21a8..06aea47d6 100644
+--- a/include/scene_panel_subject.h
++++ b/include/scene_panel_subject.h
+@@ -4,37 +4,16 @@
+ #include "contact_swarm.h"
+ 
+ /* Tentative subject view; state-specific field meanings remain under review. */
+-struct ScenePanelSubjectView {
+-    u8 unknown0[0x18];
+-    struct ContactSwarmSprite drawable;
+-    u8 graphics[0x1C];
+-    struct ContactPosition home;
+-    struct ContactCollider collider;
+-    struct DisplaySequenceState sequence;
+-    void *sequenceResource;
+-    u8 sequenceRow, sequenceVariant, kind, state;
+-    u16 stateFrame, contactProgress, contactLimit;
+-    u8 unknownDA[2];
+-    u16 progressStep;
+-    u16 timer, appearDelay, unknownE2, contactCooldown, requested;
+-    u16 requestLevel, unknownEA, hold;
+-    u8 unknownEE, contactKind, changed, positionReset;
+-    u16 paletteBank, basePaletteBank, countdown, nextThreshold;
+-    u8 unknownFA[3], byteTimer;
+-    u8 unknownFE[6];
+-    u32 effects[0x138 / 4];
+-    void (*update)(struct ScenePanelSubjectView *);
+-};
+-extern void (*gUnk_08605AF8[])(struct ScenePanelSubjectView *);
+-struct ScenePanelLifecycleView;
+-s32 ScenePanel_TickLifecycle(struct ScenePanelLifecycleView *);
+-s32 ScenePanel_DestroyLifecycle(struct ScenePanelLifecycleView *);
+-s32 ScenePanel_InitializeLifecycle(struct ScenePanelLifecycleView *);
++
++extern void (*gUnk_08605AF8[])(struct ScenePanelSubject *);
++s32 ScenePanel_TickLifecycle(struct ScenePanel *);
++s32 ScenePanel_DestroyLifecycle(struct ScenePanel *);
++s32 ScenePanel_InitializeLifecycle(struct ScenePanel *);
+ s32 Math_Atan2(s32, s32);
+ void Sound_PlaySong(u32);
+ struct ScenePanel *ScenePanel_Create(u32);
+-void ScenePanelSubject_ResetPosition(struct ScenePanelSubjectView *);
+-void ScenePanelSubject_KeepPlayerOutside(struct ScenePanelSubjectView *);
++void ScenePanelSubject_ResetPosition(struct ScenePanelSubject *);
++void ScenePanelSubject_KeepPlayerOutside(struct ScenePanelSubject *);
+ void ScenePanelSubject_ApplyContact(struct ContactCollider *, struct ContactCollider *, void *);
+-void sub_0805CD60(struct ScenePanelSubjectView *);
++void sub_0805CD60(struct ScenePanelSubject *);
+ #endif
+diff --git a/include/scene_panel_subject_playback.h b/include/scene_panel_subject_playback.h
+index 5ab4da771..1ae7702dd 100644
+--- a/include/scene_panel_subject_playback.h
++++ b/include/scene_panel_subject_playback.h
+@@ -3,7 +3,7 @@
+ #include "scene_panel_subject.h"
+ /* Defined empty-asm operands preserve agbcc copy lifetimes; all callers carry
+  * MATCHING_CONCESSION and the shared hints were minimized across their extents. */
+-static inline u32 ScenePanelSubject_StepPlayback(struct ScenePanelSubjectView *owner)
++static inline u32 ScenePanelSubject_StepPlayback(struct ScenePanelSubject *owner)
+ {
+     struct ContactSwarmSprite *sprite = &owner->drawable;
+     struct DisplaySequenceState *state = &owner->sequence;
+diff --git a/include/scene_panel_subject_tail.h b/include/scene_panel_subject_tail.h
+index eb8249699..4c5b4489b 100644
+--- a/include/scene_panel_subject_tail.h
++++ b/include/scene_panel_subject_tail.h
+@@ -6,11 +6,11 @@ void sub_08231568(void *);
+ void sub_082314C4(void *);
+ u32 SceneActorEffects_DestroyGroup(void *);
+ void Collider_SetBodyProperties(void *, u32, u32, u32);
+-void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubjectView *);
+-void ScenePanelSubject_UpdatePaletteBank(struct ScenePanelSubjectView *);
+-s32 ScenePanelSubject_Update(struct ScenePanelSubjectView *);
+-s32 ScenePanelSubject_Destroy(struct ScenePanelSubjectView *);
+-void ScenePanelSubject_InitCollider(struct ScenePanelSubjectView *, u32);
+-s32 ScenePanelSubject_Initialize(struct ScenePanelSubjectView *, const struct ContactPosition *,
+-                                 u32, u32, u32, u32, u32, u32, u32);
++void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubject *);
++void ScenePanelSubject_UpdatePaletteBank(struct ScenePanelSubject *);
++s32 ScenePanelSubject_Update(struct ScenePanelSubject *);
++s32 ScenePanelSubject_Destroy(struct ScenePanelSubject *);
++void ScenePanelSubject_InitCollider(struct ScenePanelSubject *, u32);
++s32 ScenePanelSubject_Initialize(struct ScenePanelSubject *, const struct ContactPosition *, u32,
++                                 u32, u32, u32, u32, u32, u32);
+ #endif
+diff --git a/notes/scene_panel_control_and_lifecycle.md b/notes/scene_panel_control_and_lifecycle.md
+new file mode 100644
+index 000000000..c2bf60861
+--- /dev/null
++++ b/notes/scene_panel_control_and_lifecycle.md
+@@ -0,0 +1,94 @@
++# Scene panel control and lifecycle unit
++
++Tags: #scene #panel #matching #types
++
++Range: `0805B28C–0805CB88` (end exclusive).
++
++Consolidated the 48 existing implementations in ROM order into
++`src/scene_panel_control_and_lifecycle.c`. All 48 were already matched; this
++is type recovery and consolidation, with no newly matched functions, drafts,
++or gap functions. The range remains 100% matching, a gain of 0 percentage
++points (6,396 retained exact bytes).
++
++## Shared types
++
++Reused `include/scene_panel.h`, because these are the same parent, rig and
++subjects already described by that header. It now contains the combined
++`ScenePanel` layout, the existing complete subject layout as
++`ScenePanelSubject`, the embedded `ScenePanelRig` and its sprite type, palette
++and auxiliary sprites, and command/receiver records. Removed the overlapping
++interaction, configuration, command and lifecycle parent structs, and the
++partial interaction/rig subject structs. Neighboring subject consumers use the
++same subject tag; their code is otherwise unchanged.
++
++The parent observations include actor ID/initial mode at 0x18/0x1A, subject
++and active counts at 0x1E/0x1F, presentation callback at 0x250, palette sprite
++at 0x254, saved player/tether pointers at 0x4F4/0x4F8, effect state/frame at
++0x4FC/0x4FE, positions at 0x500/0x508/0x510, auxiliary sprite at 0x518, subject
++slots at 0xBE8, palette mode at 0xC10, acquisition variant at 0xC16, rig at
++0xC6C, notification/ramp fields at 0x1336–0x1338, warning sounds at 0x1344,
++script property at 0x17AC, and receiver at 0x17B0. Parent allocation remains
++0x17E4 bytes. The previous transitionSound is warningSounds[3], the same
++halfword at 0x134A. Unknown regions and tentative semantics remain explicit.
++
++## Matching adaptations and observations
++
++- `ScenePanel_UpdateActiveSubjects` retains its indexed slot calculation using
++  a byte offset from the typed subject-pointer array. Direct array indexing
++  changes agbcc's induction loop and register allocation. The slot reload
++  after callbacks is retained.
++- `ScenePanel_CreateSubjects` retains the packed unsigned bitfield position
++  temporary: its component additions truncate to 16 bits. Other packed
++  position temporaries also retain their observed widths and signedness.
++- Existing presentation consumer `08058700` needs signed packed-vector copies
++  of the shared center position. Two explicit packed reinterpretations retain
++  its original operations; other position users use `ContactPosition` fields.
++- The palette initializer now uses direct typed member addresses; its previous
++  manually computed member offsets were unnecessary.
++- `tools/depin.py --write` retained all five existing hints across B34C, B40C
++  and B8B4 (one, three and one respectively). No new pins/barriers were added.
++- C754's old_agbcc override was unnecessary: ordinary agbcc produces the exact
++  function, allowing one compiler for the merged unit. Retained the local
++  `ScenePanel_ClearGlobal` alias and the empty-state
++  `ScenePanel_HoldInteraction` alias; removed duplicate alias definitions.
++- agbcc does not support anonymous union members here. Shared fields use one
++  canonical name instead: effectState/effectFrame for interaction state,
++  paletteMode for the mode byte, and state for the presentation callback.
++- No engine prototype mismatch was encountered.
++
++## Validation
++
++Per-function checks passed for all 48 after initial type unification. The
++merged-unit check reports zero differing bytes and a 6,396-byte exact match.
++`make format` was run. `tools/progress.py` retained exactly the baseline
++matched function and byte counts, including the register-pinned category.
++
++The merge used `tools.merge_unit.merge` directly, then wrote the result and
++removed the original inputs with filesystem operations: the CLI's `--write`
++uses `git rm`, while this worker must leave git metadata untouched.
++
++Rough iteration count: three layout passes, two direct-access experiments,
++one merged-unit check, and the requested depinning checks. No unmatched
++functions needed drafting. Full-ROM build result is recorded below.
++
++The clean build needed local resource extraction: this worktree initially had
++no `build/res/` archives. Existing `datafmt` extractors recovered them from the
++ROM. The shared `gen/data.s` also referenced 578 indexed filenames absent from
++a fresh extraction; these were materialized from the corresponding extracted
++entry after checking each filename's hash and archive index. Only ignored
++local build outputs were written; shared `gen/` and tools were untouched.
++The adjacent overlay renderer was updated to the canonical origin/count/state
++names; its exact check and the packed-center presentation consumer's check
++both passed (1,056 and 1,012 bytes respectively).
++
++The first completed ROM comparison exposed one remaining old-view name in the
++neighboring subject update: `SCENE_PANEL_GLOBAL->mode` meant the byte at 0xC10,
++not the existing core's halfword at 0x1328. Changed that access to
++`paletteMode`. The candidate returned to the original size; the fast check
++against the failed build's ELF differed only in the address of the relocated
++indirect-call helper. Final validation uses the corrected complete build.
++
++Final validation: `build/venv/bin/python tools/build.py` printed
++`build/boktai3.gba: OK`. The corrected subject updater also passes its exact
++check against the final ELF. The before/after progress reports are identical.
++All changes are left uncommitted; no shared docs or git metadata were written.
+diff --git a/src/fn/sub_08058700.c b/src/fn/sub_08058700.c
+index 47c8a434a..5c01e02cc 100644
+--- a/src/fn/sub_08058700.c
++++ b/src/fn/sub_08058700.c
+@@ -71,7 +71,9 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32
+             {
+                 s32 zero = panel->mode & 3;
+                 if (zero == 0) {
+-                    struct ContactPackedVector position = panel->center, velocity;
++                    struct ContactPackedVector position =
++                                                   (*(struct ContactPackedVector *)&panel->center),
++                                               velocity;
+                     position.x += 64;
+                     position.z += 64;
+                     velocity.x = 300;
+@@ -96,7 +98,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32
+                 u32 highMask;
+                 register union ScenePanelPackedVector *positionWords asm("r9");
+                 u32 next;
+-                position.packed = panel->center;
++                position.packed = (*(struct ContactPackedVector *)&panel->center);
+                 {
+                     register const u16 *load asm("r2") = (const u16 *)RANDOM_TABLE_ADDR;
+                     asm("" : "+r"(load));
+diff --git a/src/fn/sub_08058BD8.c b/src/fn/sub_08058BD8.c
+index 960ccf0bd..e13de6e8a 100644
+--- a/src/fn/sub_08058BD8.c
++++ b/src/fn/sub_08058BD8.c
+@@ -56,7 +56,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32
+         const struct ContactPosition *origin;
+         projectedPointer = &projected;
+         asm("" : "+r"(projectedPointer));
+-        origin = &panel->overlayOrigin;
++        origin = &panel->origin;
+         asm("" : "+r"(origin));
+         x = origin->x;
+         z = origin->z;
+@@ -92,7 +92,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32
+     }
+     panel->overlayChanged = 0;
+     slot = 0;
+-    if (slot < panel->overlayCount) {
++    if (slot < panel->subjectCount) {
+         entryPointer = &entry;
+         do {
+             s32 old;
+@@ -105,7 +105,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32
+             if (panel->paletteMode == 0 || (panel->effectState != 10 && panel->effectState != 14))
+                 target = 5;
+             else {
+-                u32 state = panel->subjects[slot]->displayState;
++                u32 state = panel->subjects[slot]->state;
+                 target = 5;
+                 if (state == 4)
+                     target = 0;
+@@ -353,7 +353,7 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32
+             }
+         nextSlot:
+             slot = next;
+-        } while (slot < panel->overlayCount);
++        } while (slot < panel->subjectCount);
+     }
+     if (playSound)
+         Sound_PlaySong(245);
+diff --git a/src/fn/sub_0805B28C.c b/src/fn/sub_0805B28C.c
+deleted file mode 100644
+index 077baa76b..000000000
+--- a/src/fn/sub_0805B28C.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "scene_panel_interaction.h"
+-s32 ScenePanel_IsWithinHorizontalRadius(const struct ContactPosition *first,
+-                                        const struct ContactPosition *second, s32 radius)
+-{
+-    s32 x = first->x - second->x;
+-    s32 z = first->z - second->z;
+-    if (x > radius || z > radius || (s32)((u32)x * x + (u32)z * z) > (s32)((u32)radius * radius))
+-        return 0;
+-    else
+-        return 1;
+-}
+\ No newline at end of file
+diff --git a/src/fn/sub_0805B2CC.c b/src/fn/sub_0805B2CC.c
+deleted file mode 100644
+index 1d5194f90..000000000
+--- a/src/fn/sub_0805B2CC.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "scene_panel_interaction.h"
+-s32 ScenePanel_CanAcquireTether(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    struct TetherActor *tether = gUnk_02000488;
+-    if (tether) {
+-        struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
+-        if (player->kindValue == 1 && player->tetherMode == 6) {
+-            if (ScenePanel_IsWithinHorizontalRadius(&tether->position, &panel->center, 70))
+-                return 1;
+-        }
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0805B318.c b/src/fn/sub_0805B318.c
+deleted file mode 100644
+index efb9acf20..000000000
+--- a/src/fn/sub_0805B318.c
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#include "scene_panel_interaction.h"
+-s32 ScenePanel_AreSubjectsSettled(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    s32 i = 0;
+-    s32 count = panel->subjectCount;
+-    if (i < count) {
+-        s32 limit = count;
+-        struct ScenePanelInteractionSubject **subject = panel->subjects;
+-        do {
+-            if ((*subject)->state != 2)
+-                return 0;
+-            subject++;
+-            i++;
+-        } while (i < limit);
+-    }
+-    return 1;
+-}
+diff --git a/src/fn/sub_0805B34C.c b/src/fn/sub_0805B34C.c
+deleted file mode 100644
+index 5101897c6..000000000
+--- a/src/fn/sub_0805B34C.c
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#include "scene_panel_interaction.h"
+-// MATCHING_CONCESSION: register-pinning
+-
+-s32 ScenePanel_CanAcceptPlayer(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
+-    if (player->kindValue == 1 && (u8)(player->actionMode - 3) > 2) {
+-        asm("" : : : "r3");
+-        if (player->tetherMode == 7) {
+-            if (ScenePanel_IsWithinHorizontalRadius(&player->position, &panel->approachPosition,
+-                                                    100))
+-                return 1;
+-        }
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0805B3A0.c b/src/fn/sub_0805B3A0.c
+deleted file mode 100644
+index 135cfd54f..000000000
+--- a/src/fn/sub_0805B3A0.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel_interaction.h"
+-s32 ScenePanel_IsTetherDistant(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    if (ScenePanel_IsWithinHorizontalRadius(&gUnk_02000488->position, &panel->center, 800) != 0)
+-        return 0;
+-    return 1;
+-}
+diff --git a/src/fn/sub_0805B3CC.c b/src/fn/sub_0805B3CC.c
+deleted file mode 100644
+index e07a9a27e..000000000
+--- a/src/fn/sub_0805B3CC.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "scene_panel_interaction.h"
+-void ScenePanel_WaitInitialTether(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    if (ScenePanel_CanAcquireTether(input) != 0) {
+-        u32 zero;
+-        PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, zero = 0);
+-        panel->variant = zero;
+-        ScenePanel_SetEffectState(input, 1);
+-    }
+-}
+diff --git a/src/fn/sub_0805B40C.c b/src/fn/sub_0805B40C.c
+deleted file mode 100644
+index c32f29d58..000000000
+--- a/src/fn/sub_0805B40C.c
++++ /dev/null
+@@ -1,101 +0,0 @@
+-#include "scene_panel_interaction.h"
+-// MATCHING_CONCESSION: register-pinning
+-
+-void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    u16 *framePointer = &panel->frame;
+-    u32 frame;
+-    asm("" : "+r"(panel));
+-    {
+-        u32 value = *framePointer;
+-        value++;
+-        *framePointer = value;
+-        frame = (u16)value;
+-    }
+-    if (frame <= 5) {
+-        struct ScenePanelInteractionPackedPosition position;
+-        s32 divisor;
+-        s32 previousWeight;
+-        s32 sourceX;
+-        u32 direction;
+-        {
+-            u16 *sourceFrame = framePointer;
+-            divisor = 6 - *sourceFrame;
+-        }
+-        sourceX = gUnk_02000488->position.x;
+-        previousWeight = divisor - 1;
+-        position.x = Div(sourceX * previousWeight + panel->center.x, divisor);
+-        position.z = Div(gUnk_02000488->position.z * previousWeight + panel->center.z, divisor);
+-        direction = gUnk_02000488->heading;
+-        if (*framePointer & 1) {
+-            u32 facing = direction;
+-            asm("" : "+r"(facing));
+-            if (facing) {
+-                if (facing > 4)
+-                    direction++;
+-                else
+-                    direction--;
+-                direction &= 7;
+-            }
+-        }
+-        TetherActor_SetInteractionTarget(&position, direction);
+-    } else if (frame == 6) {
+-        gUnk_02000488->state = 12;
+-        gUnk_02000488->position = panel->center;
+-        {
+-            u8 *heading = &gUnk_02000488->heading;
+-            register u32 zero asm("r0");
+-            zero = 0;
+-            *heading = zero;
+-        }
+-        panel->mainSpriteFlags |= 1;
+-        Sound_PlaySong(249);
+-    } else if (frame <= 69) {
+-        if (panel->variant != 2 && frame == 20) {
+-            ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
+-            Sound_PlaySong(294);
+-        }
+-        Camera_RequestShake((70 - panel->frame) >> 1);
+-    } else if (panel->variant == 0) {
+-        s32 i = 0;
+-        if (i < panel->subjectCount) {
+-            struct ScenePanelInteractionSubject **subject = panel->subjects;
+-            do {
+-                ScenePanelSubject_SetState((void *)*subject++, 1);
+-                i++;
+-            } while (i < panel->subjectCount);
+-        }
+-        PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
+-        Sound_PlaySong(250);
+-        ScenePanel_SetEffectState((void *)panel, 2);
+-    } else if (panel->variant == 1) {
+-        s32 anyActive;
+-        u32 count;
+-        PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
+-        PlayerCue_ReleaseControl(SCENE_PANEL_PLAYER);
+-        anyActive = 0;
+-        count = panel->subjectCount;
+-        if (anyActive < (s32)count) {
+-            struct ScenePanelInteractionSubject **subject = panel->subjects;
+-            s32 remaining = count;
+-            do {
+-                if ((*subject)->state == 4)
+-                    anyActive = 1;
+-                subject++;
+-                remaining--;
+-            } while (remaining != 0);
+-        }
+-        if (anyActive)
+-            ScenePanel_SetEffectState((void *)panel, 4);
+-        else
+-            ScenePanel_SetEffectState((void *)panel, 3);
+-    } else {
+-        PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
+-        PlayerCue_ReleaseControl(SCENE_PANEL_PLAYER);
+-        Sound_PlaySong(490);
+-        gUnk_02000488->state = 14;
+-        ScenePanelRig_SetState(&panel->rig, 1);
+-        ScenePanel_SetEffectState((void *)panel, 10);
+-    }
+-}
+diff --git a/src/fn/sub_0805B658.c b/src/fn/sub_0805B658.c
+deleted file mode 100644
+index 3b6284e47..000000000
+--- a/src/fn/sub_0805B658.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "scene_panel_interaction.h"
+-void ScenePanel_WaitSettledSubjects(struct ScenePanel *input)
+-{
+-    if (ScenePanel_AreSubjectsSettled(input) != 0) {
+-        PlayerCue_ReleaseControl(SCENE_PANEL_PLAYER);
+-        ScenePanel_SetEffectState(input, 3);
+-        ScenePanel_CallPendingScript(input, 0);
+-    }
+-}
+diff --git a/src/fn/sub_0805B688.c b/src/fn/sub_0805B688.c
+deleted file mode 100644
+index 9b122299f..000000000
+--- a/src/fn/sub_0805B688.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include "scene_panel_interaction.h"
+-void ScenePanel_WaitTetherOrActiveSubject(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    s32 i, count;
+-    if (gUnk_02000488->state != 12 && ScenePanel_CanAcquireTether((void *)panel)) {
+-        PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, 0);
+-        panel->variant = 1;
+-        ScenePanel_SetEffectState((void *)panel, 1);
+-    }
+-    i = 0;
+-    count = panel->subjectCount;
+-    for (; i < count; i++) {
+-        if (panel->subjects[i]->state == 4) {
+-            ScenePanel_SetEffectState((void *)panel, 4);
+-            break;
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0805B70C.c b/src/fn/sub_0805B70C.c
+deleted file mode 100644
+index f822487ef..000000000
+--- a/src/fn/sub_0805B70C.c
++++ /dev/null
+@@ -1,34 +0,0 @@
+-#include "scene_panel_interaction.h"
+-
+-void ScenePanel_UpdateActiveSubjects(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    s32 active = 0;
+-    s32 i = 0;
+-    for (; i < panel->subjectCount; i++) {
+-        struct ScenePanelInteractionSubject **subject;
+-        u32 offset;
+-        struct ScenePanelInteractionSubject **base;
+-        offset = i * 4;
+-        base = panel->subjects;
+-        subject = (void *)((u8 *)base + offset);
+-        if ((*subject)->state == 4) {
+-            active++;
+-            if ((*subject)->changed) {
+-                Sound_PlaySong(294);
+-                ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
+-                (*subject)->changed = 0;
+-            }
+-        }
+-    }
+-    if (!panel->allSubjectsNotified && active >= panel->subjectCount) {
+-        panel->allSubjectsNotified = 1;
+-        ScenePanel_CallPendingScript((void *)panel, 1);
+-    }
+-    if (!panel->presentationState)
+-        ScenePanel_SetState((void *)panel, ScenePanel_BeginPulseSequence);
+-    if (ScenePanel_CanAcceptPlayer((void *)panel)) {
+-        PlayerCue_WalkTo(SCENE_PANEL_PLAYER, &panel->approachPosition, 0, 4);
+-        ScenePanel_SetEffectState((void *)panel, 5);
+-    }
+-}
+diff --git a/src/fn/sub_0805B7C8.c b/src/fn/sub_0805B7C8.c
+deleted file mode 100644
+index 845d640d3..000000000
+--- a/src/fn/sub_0805B7C8.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "scene_panel_interaction.h"
+-void ScenePanel_AdvancePlayerArrival(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
+-    if (player->tetherMode == 0) {
+-        struct ScenePanelInteractionPackedPosition position;
+-        position.x = (u32)(panel->origin.x * 3 + player->position.x) >> 2;
+-        position.y = (u32)(panel->origin.y * 3 + player->position.y) >> 2;
+-        position.z = (u32)(panel->origin.z * 3 + player->position.z) >> 2;
+-        sub_08226380(16, &position);
+-        if (panel->mode) {
+-            PlayerCue_Motion7Front(SCENE_PANEL_PLAYER, 1, 0);
+-            Sound_PlaySong(5);
+-            ScenePanel_SetState(input, ScenePanel_BeginForwardSequence);
+-            ScenePanel_SetEffectState(input, 7);
+-        } else {
+-            PlayerCue_Motion7Front(SCENE_PANEL_PLAYER, 0, 0);
+-            Sound_PlaySong(407);
+-            ScenePanel_SetEffectState(input, 6);
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0805B8B4.c b/src/fn/sub_0805B8B4.c
+deleted file mode 100644
+index 94192918d..000000000
+--- a/src/fn/sub_0805B8B4.c
++++ /dev/null
+@@ -1,31 +0,0 @@
+-#include "scene_panel_interaction.h"
+-// MATCHING_CONCESSION: register-pinning
+-
+-void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    u32 frame;
+-    asm("" : "+r"(panel));
+-    frame = (u16)(++panel->frame);
+-    if (frame == 30) {
+-        s32 i = 0;
+-        for (; i < panel->subjectCount; i++) {
+-            struct ScenePanelInteractionSubject *subject = panel->subjects[i];
+-            if (subject->state == 4)
+-                ScenePanelSubject_SetState((void *)subject, 5);
+-        }
+-        ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
+-        Sound_FadeOutChannel10(4);
+-    } else if (frame == 90) {
+-        Camera_FollowPlayerWithoutCompletion(16);
+-        PlayerCue_Motion7End(SCENE_PANEL_PLAYER, 0);
+-    } else if (frame > 105) {
+-        struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
+-        if (!player->tetherMode) {
+-            PlayerCue_ReleaseControl(player);
+-            ScenePanel_SetEffectState((void *)panel, 3);
+-            panel->allSubjectsNotified = 0;
+-            ScenePanel_CallPendingScript((void *)panel, 2);
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0805B974.c b/src/fn/sub_0805B974.c
+deleted file mode 100644
+index 2e7a784a0..000000000
+--- a/src/fn/sub_0805B974.c
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#include "scene_panel_interaction.h"
+-void ScenePanel_AdvanceArrivalRamp(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    u16 *frame = &panel->frame;
+-    if (*frame <= 69) {
+-        *frame += 1;
+-        if (*frame == 70)
+-            ScenePanel_CallPendingScript(input, 3);
+-    }
+-    if (panel->arrivalRampEnabled) {
+-        u16 *fade = &panel->arrivalRampFrame;
+-        if (*fade <= 59)
+-            *fade += 1;
+-        Camera_RequestShake(*fade >> 1);
+-    }
+-}
+diff --git a/src/fn/sub_0805B9C8.c b/src/fn/sub_0805B9C8.c
+deleted file mode 100644
+index 84d09568a..000000000
+--- a/src/fn/sub_0805B9C8.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "scene_panel_interaction.h"
+-void ScenePanel_WaitTransitionGate(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    u16 *frame = &panel->frame;
+-    if (*frame <= 29)
+-        *frame += 1;
+-    else if (!panel->gateC12) {
+-        Sound_PlaySong(490);
+-        gUnk_02000488->state = 14;
+-        ScenePanel_SetEffectState(input, 9);
+-    }
+-}
+diff --git a/src/fn/sub_0805BA18.c b/src/fn/sub_0805BA18.c
+deleted file mode 100644
+index 627958fd8..000000000
+--- a/src/fn/sub_0805BA18.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "scene_panel_interaction.h"
+-void ScenePanel_WaitTetherDirectedState(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    if (gUnk_02000488->state == 13) {
+-        ScenePanelRig_SetState(&panel->rig, 1);
+-        ScenePanel_SetEffectState(input, 10);
+-    }
+-}
+diff --git a/src/fn/sub_0805BA50.c b/src/fn/sub_0805BA50.c
+deleted file mode 100644
+index a1cc95606..000000000
+--- a/src/fn/sub_0805BA50.c
++++ /dev/null
+@@ -1,27 +0,0 @@
+-#include "scene_panel_interaction.h"
+-void ScenePanel_WaitRigRelease(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    s32 anyActive = 0;
+-    if (panel->mode) {
+-        u32 count = panel->subjectCount;
+-        if (anyActive < (s32)count) {
+-            struct ScenePanelInteractionSubject **subject = panel->subjects;
+-            s32 remaining = count;
+-            do {
+-                if ((*subject)->state == 4)
+-                    anyActive = 1;
+-                subject++;
+-                remaining--;
+-            } while (remaining != 0);
+-        }
+-    }
+-    if (gUnk_02000710->unk618 > 0)
+-        ScenePanel_RunScheduledAction((void *)panel);
+-    if (anyActive)
+-        panel->frame = 0;
+-    else if (++panel->frame > 119) {
+-        ScenePanelRig_SetState(&panel->rig, 6);
+-        ScenePanel_SetEffectState((void *)panel, 11);
+-    }
+-}
+diff --git a/src/fn/sub_0805BAE4.c b/src/fn/sub_0805BAE4.c
+deleted file mode 100644
+index 637afee50..000000000
+--- a/src/fn/sub_0805BAE4.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "scene_panel_interaction.h"
+-void ScenePanel_WaitRigIdle(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    if (panel->rig.state == 0) {
+-        Sound_PlaySong(491);
+-        TetherActor_BeginDirectedState(&panel->center);
+-        ScenePanel_SetEffectState(input, 12);
+-        ScenePanel_CallPendingScript(input, 5);
+-    }
+-}
+diff --git a/src/fn/sub_0805BB20.c b/src/fn/sub_0805BB20.c
+deleted file mode 100644
+index feaf1d417..000000000
+--- a/src/fn/sub_0805BB20.c
++++ /dev/null
+@@ -1,29 +0,0 @@
+-#include "scene_panel_interaction.h"
+-void ScenePanel_WaitTetherReturn(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    if (ScenePanel_CanAcquireTether(input)) {
+-        PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, 0);
+-        panel->variant = 2;
+-        ScenePanel_SetEffectState(input, 1);
+-    } else if (ScenePanel_IsTetherDistant(input)) {
+-        struct TetherActor *tether = gUnk_02000488;
+-        s32 sourceX = tether->position.x;
+-        struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
+-        s32 x = sourceX - player->position.x;
+-        s32 z = tether->position.z - player->position.z;
+-        s32 direction;
+-        if (player->actionMode <= 1 || player->actionMode == 6) {
+-            direction = (((u16)Math_Atan2(x, z) + 112) >> 5) & 7;
+-            PlayerCue_Face(player, direction, 0);
+-        } else {
+-            direction = (((u16)Math_Atan2(x, z) + 112) >> 5) & 7;
+-            PlayerCue_Stand(player, direction);
+-            PlayerCue_StateMotion(SCENE_PANEL_PLAYER, 0);
+-        }
+-        TetherActor_BeginAuxiliaryState(gUnk_02000488);
+-        sub_08226380(16, &gUnk_02000488->position);
+-        ScenePanel_SetEffectState(input, 13);
+-        ScenePanel_CallPendingScript(input, 6);
+-    }
+-}
+diff --git a/src/fn/sub_0805BC10.c b/src/fn/sub_0805BC10.c
+deleted file mode 100644
+index e3faedfba..000000000
+--- a/src/fn/sub_0805BC10.c
++++ /dev/null
+@@ -1,32 +0,0 @@
+-#include "scene_panel_interaction.h"
+-void ScenePanel_AdvanceTetherReturn(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    panel->frame++;
+-    switch (panel->frame) {
+-        case 33: {
+-            struct TetherActor *tether = gUnk_02000488;
+-            s32 sourceX = tether->position.x;
+-            struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
+-            s32 x = sourceX - player->position.x;
+-            s32 z = tether->position.z - player->position.z;
+-            s32 direction = (((u16)Math_Atan2(x, z) + 112) >> 5) & 7;
+-            PlayerCue_Stand(player, direction);
+-            break;
+-        }
+-        case 64:
+-            Sound_PlaySong(453);
+-            break;
+-        case 300:
+-            sub_08226380(16, &SCENE_PANEL_PLAYER->position);
+-            break;
+-        case 316:
+-            if (panel->transitionSound)
+-                Sound_PlaySong(panel->transitionSound);
+-            PlayerCue_Kneel(SCENE_PANEL_PLAYER, -1, 0);
+-            break;
+-        case 360:
+-            ScenePanel_CallPendingScript(input, 7);
+-            break;
+-    }
+-}
+diff --git a/src/fn/sub_0805BCE8.c b/src/fn/sub_0805BCE8.c
+deleted file mode 100644
+index 35253f1b5..000000000
+--- a/src/fn/sub_0805BCE8.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "scene_panel_interaction.h"
+-/* ScenePanel_HoldInteraction: Empty callback for interaction state 14 that leaves the panel state unchanged */
+-#define ScenePanel_HoldInteraction sub_0805BCE8
+-#define ScenePanel_HoldInteraction sub_0805BCE8
+-void ScenePanel_HoldInteraction(struct ScenePanel *input)
+-{
+-}
+diff --git a/src/fn/sub_0805BCEC.c b/src/fn/sub_0805BCEC.c
+deleted file mode 100644
+index 8e223f436..000000000
+--- a/src/fn/sub_0805BCEC.c
++++ /dev/null
+@@ -1,46 +0,0 @@
+-#include "scene_panel_config.h"
+-void ScenePanel_InitPaletteSprite(struct ScenePanel *input)
+-{
+-    struct ScenePanelConfigView *parent = (void *)input;
+-    if (!parent->suppressAuxiliary) {
+-        u32 spriteOffset = (u32) & ((struct ScenePanelConfigView *)0)->paletteSprite;
+-        struct ScenePanelPaletteSprite *sprite;
+-        struct ScenePanelPaletteSprite *positionSprite;
+-        struct ScenePanelPaletteGraphics *graphics;
+-        u16 *paletteCopy;
+-        u16 *destination;
+-        u16 *source;
+-        s32 i;
+-        sprite = (void *)((u8 *)parent + spriteOffset);
+-        positionSprite = sprite;
+-        {
+-            u32 offset = (u32) & ((struct ScenePanelConfigView *)0)->paletteSprite.graphics;
+-            graphics = (void *)((u8 *)parent + offset);
+-        }
+-        AnimData_Load(graphics, 0xC039);
+-        Sprite_Init(sprite, graphics, 0);
+-        sprite->renderMode = 3;
+-        {
+-            u32 offset = (u32) & ((struct ScenePanelConfigView *)0)->paletteSprite.paletteCopy;
+-            paletteCopy = (void *)((u8 *)parent + offset);
+-        }
+-        source = graphics->palette;
+-        destination = paletteCopy;
+-        for (i = 15; i >= 0; i--)
+-            *destination++ = *source++;
+-        graphics->palette = paletteCopy;
+-        sprite->transform[0] = 0;
+-        sprite->transform[1] = 0;
+-        sprite->transform[2] = 0;
+-        {
+-            u32 offset = (u32) & ((struct ScenePanelConfigView *)0)->origin;
+-            struct ContactPosition position;
+-            {
+-                const struct ContactPosition *origin = (void *)((u8 *)parent + offset);
+-                position = *origin;
+-            }
+-            positionSprite->position = position;
+-        }
+-        sprite->active = 1;
+-    }
+-}
+diff --git a/src/fn/sub_0805BD78.c b/src/fn/sub_0805BD78.c
+deleted file mode 100644
+index 5ecc22ef2..000000000
+--- a/src/fn/sub_0805BD78.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "scene_panel_config.h"
+-void ScenePanel_InitAuxiliarySprite(struct ScenePanel *input)
+-{
+-    struct ScenePanelConfigView *parent = (void *)input;
+-    struct ScenePanelAuxSprite *sprite = &parent->auxiliary;
+-    void *graphics = sprite->graphics;
+-    AnimData_Load(graphics, 0x3641);
+-    Sprite_Init(sprite, graphics, 512);
+-    sprite->frame = 0;
+-    sprite->flags |= 2;
+-    sprite->parameter9 = 96;
+-    sprite->parameter8 = 96;
+-    sprite->renderMode = 1;
+-    sprite->position = parent->center;
+-    sprite->position.y += 72;
+-}
+diff --git a/src/fn/sub_0805BDD0.c b/src/fn/sub_0805BDD0.c
+deleted file mode 100644
+index d9d6cb5e6..000000000
+--- a/src/fn/sub_0805BDD0.c
++++ /dev/null
+@@ -1,75 +0,0 @@
+-#include "scene_panel_config.h"
+-void ScenePanel_CreateSubjects(struct ScenePanelConfigView *parent)
+-{
+-    u32 initialStates[4];
+-    struct ScenePanelSpawnPosition position;
+-    s32 contactLimit, colliderSetting;
+-    u32 category = parent->category;
+-    u32 kind = 0;
+-    s32 i;
+-    if (category == 1)
+-        kind = 1;
+-    if (!Script_SeekToKeyword('g')) {
+-        contactLimit = 100;
+-        colliderSetting = 0;
+-    } else {
+-        contactLimit = Script_GetValue();
+-        colliderSetting = Script_GetValue();
+-    }
+-    if (!Script_SeekToKeyword('a')) {
+-        for (i = 0; i < parent->subjectCount; i++) {
+-            parent->subjects[i] = 0;
+-            initialStates[i] = 0;
+-        }
+-    } else {
+-        for (i = 0; i < parent->subjectCount; i++) {
+-            parent->subjects[i] = 0;
+-            initialStates[i] = Script_GetValue();
+-        }
+-    }
+-    parent->parameter = Script_GetKeywordValue('S', 0);
+-    {
+-        for (i = 0; i < parent->subjectCount; i++) {
+-            u32 row, variant, appearDelay;
+-            s32 negative = -514;
+-            position = *(struct ScenePanelSpawnPosition *)&parent->origin;
+-            switch (i) {
+-                case 0:
+-                    position.x += negative;
+-                    position.z += 76;
+-                    row = 1;
+-                    variant = 0;
+-                    appearDelay = 6;
+-                    break;
+-                case 2:
+-                    position.x += 76;
+-                    position.z += negative;
+-                    row = 1;
+-                    variant = 1;
+-                    appearDelay = 3;
+-                    break;
+-                case 3:
+-                    position.x -= 76;
+-                    position.z += 514;
+-                    row = 0;
+-                    variant = 0;
+-                    appearDelay = 0;
+-                    break;
+-                case 1:
+-                    position.x += 514;
+-                    position.z -= 76;
+-                    row = 0;
+-                    variant = 1;
+-                    appearDelay = 9;
+-                    break;
+-                default:
+-                    row = 0;
+-                    variant = 0;
+-                    appearDelay = 0;
+-            }
+-            parent->subjects[i] = (struct SceneRigSubject *)ScenePanelSubject_Create(
+-                (const void *)&position, row, variant, initialStates[i], kind, contactLimit,
+-                colliderSetting, appearDelay);
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0805BFC8.c b/src/fn/sub_0805BFC8.c
+deleted file mode 100644
+index d814a91f4..000000000
+--- a/src/fn/sub_0805BFC8.c
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#include "scene_panel_config.h"
+-void ScenePanel_InitAnchorPositions(struct ScenePanelConfigView *parent)
+-{
+-    if (Script_SeekToKeyword('c')) {
+-        parent->origin.x = Script_GetValue();
+-        parent->origin.y = Script_GetValue();
+-        parent->origin.z = Script_GetValue();
+-    }
+-    parent->approachPosition = parent->origin;
+-    parent->approachPosition.x += 324;
+-    parent->approachPosition.z += 324;
+-    parent->center = parent->origin;
+-    parent->center.x -= 20;
+-    parent->center.z -= 20;
+-}
+diff --git a/src/fn/sub_0805C054.c b/src/fn/sub_0805C054.c
+deleted file mode 100644
+index 140a4179c..000000000
+--- a/src/fn/sub_0805C054.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "scene_panel_config.h"
+-void ScenePanel_InitScriptProperty(struct ScenePanel *input)
+-{
+-    struct ScenePanelConfigView *parent = (void *)input;
+-    s32 value = Script_SeekToKeyword('p');
+-    if (value)
+-        parent->property = Script_GetValue();
+-    else
+-        parent->property = value;
+-}
+diff --git a/src/fn/sub_0805C084.c b/src/fn/sub_0805C084.c
+deleted file mode 100644
+index 4ad50b133..000000000
+--- a/src/fn/sub_0805C084.c
++++ /dev/null
+@@ -1,63 +0,0 @@
+-#include "scene_panel_config.h"
+-void ScenePanel_InitResourceConfiguration(struct ScenePanelConfigView *parent)
+-{
+-    s32 found = Script_SeekToKeyword('b');
+-    if (found) {
+-        parent->resourceIndex = Script_GetValue();
+-        gUnk_02000710->unk618 = Script_GetValue();
+-        gUnk_02000710->unk61C = Script_GetValue();
+-    } else {
+-        parent->resourceIndex = found;
+-        {
+-            struct GameState *volatile *slot = &gUnk_02000710;
+-            (*slot)->unk618 = 6000;
+-            (*slot)->unk61C = 6000;
+-        }
+-    }
+-    if (gUnk_02000710->unk618 > (gUnk_02000710->unk61C >> 2))
+-        parent->warningStage = 0;
+-    else
+-        parent->warningStage = 1;
+-    switch (parent->resourceIndex) {
+-        case 0:
+-            parent->warningSounds[0] = 0x534;
+-            parent->warningSounds[1] = 0x533;
+-            parent->warningSounds[2] = 0x359;
+-            parent->warningSounds[3] = 0x535;
+-            break;
+-        case 1:
+-            parent->warningSounds[0] = 0x4D5;
+-            parent->warningSounds[1] = 0x4D1;
+-            parent->warningSounds[2] = 0x4CF;
+-            parent->warningSounds[3] = 0x4D7;
+-            break;
+-        case 2:
+-            parent->warningSounds[0] = 0x53E;
+-            parent->warningSounds[1] = 0x53D;
+-            parent->warningSounds[2] = 0x2EB;
+-            parent->warningSounds[3] = 0x53F;
+-            break;
+-        case 3:
+-            parent->warningSounds[0] = 0x548;
+-            parent->warningSounds[1] = 0x549;
+-            parent->warningSounds[2] = 0x547;
+-            parent->warningSounds[3] = 0x54A;
+-            break;
+-        case 4:
+-            parent->warningSounds[0] = 0x551;
+-            parent->warningSounds[1] = 0x553;
+-            parent->warningSounds[2] = 0x552;
+-            parent->warningSounds[3] = 0x554;
+-            break;
+-        default:
+-            parent->warningSounds[0] = 0;
+-            parent->warningSounds[1] = 0;
+-            parent->warningSounds[2] = 0;
+-            parent->warningSounds[3] = 0;
+-    }
+-    if (Script_SeekToKeyword('T'))
+-        parent->resourceId = Script_GetValue();
+-    else
+-        parent->resourceId = 10;
+-    ScenePanel_InitScheduledAction((void *)parent);
+-}
+diff --git a/src/fn/sub_0805C2DC.c b/src/fn/sub_0805C2DC.c
+deleted file mode 100644
+index e16a8691d..000000000
+--- a/src/fn/sub_0805C2DC.c
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#include "scene_panel_config.h"
+-s32 ScenePanel_AreSubjectsIdle(struct ScenePanel *input)
+-{
+-    struct ScenePanelConfigView *parent = (void *)input;
+-    s32 i = 0, count = parent->subjectCount;
+-    if (i < count) {
+-        s32 limit = count;
+-        struct SceneRigSubject **subject = parent->subjects;
+-        do {
+-            if ((*subject)->state != 0)
+-                return 0;
+-            subject++;
+-            i++;
+-        } while (i < limit);
+-    }
+-    return 1;
+-}
+diff --git a/src/fn/sub_0805C310.c b/src/fn/sub_0805C310.c
+deleted file mode 100644
+index 3bcd8517e..000000000
+--- a/src/fn/sub_0805C310.c
++++ /dev/null
+@@ -1,65 +0,0 @@
+-#include "scene_panel_orchestration.h"
+-void ScenePanel_InitializeInteraction(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    u32 mode = panel->initialMode;
+-    switch (mode) {
+-        case 0: {
+-            s32 option;
+-            if (ScenePanel_AreSubjectsIdle((void *)panel)) {
+-                ScenePanel_InitPaletteSprite((void *)panel);
+-                ScenePanel_SetEffectState((void *)panel, 0);
+-                return;
+-            }
+-            if (Script_SeekToKeyword('O'))
+-                option = Script_GetValue();
+-            else
+-                option = 0;
+-            if (option && gUnk_02000488) {
+-                s32 active;
+-                u32 count;
+-                u8 *tetherState = &gUnk_02000488->state;
+-                active = 0;
+-                *tetherState = 12;
+-                gUnk_02000488->position = panel->center;
+-                gUnk_02000488->heading = 0;
+-                count = panel->subjectCount;
+-                if (active < (s32)count) {
+-                    struct ScenePanelInteractionSubject **subject = panel->subjects;
+-                    s32 remaining = count;
+-                    do {
+-                        if ((*subject)->state == 4)
+-                            active = 1;
+-                        subject++;
+-                        remaining--;
+-                    } while (remaining != 0);
+-                }
+-                if (active) {
+-                    ScenePanel_SetEffectState((void *)panel, 4);
+-                    return;
+-                }
+-            } else
+-                ScenePanel_InitPaletteSprite((void *)panel);
+-            ScenePanel_SetEffectState((void *)panel, 3);
+-            break;
+-        }
+-        case 1: {
+-            ScenePanel_InitRig((void *)panel);
+-            ScenePanel_InitResourceConfiguration((void *)panel);
+-            gUnk_02000488->state = 12;
+-            gUnk_02000488->position = panel->center;
+-            gUnk_02000488->heading = 0;
+-            gUnk_02000488->unknown1B = mode;
+-            if (gUnk_02000488->kind == 6)
+-                panel->resourceScale = 80;
+-            else if (gUnk_02000488->kind == 7)
+-                panel->resourceScale = 120;
+-            else
+-                panel->resourceScale = 100;
+-            ScenePanel_InitBackground((void *)panel);
+-            ScenePanel_InitOverlay((void *)panel);
+-            ScenePanel_InitAuxiliarySprite((void *)panel);
+-            ScenePanel_SetEffectState((void *)panel, 8);
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0805C454.c b/src/fn/sub_0805C454.c
+deleted file mode 100644
+index 9efa52ed1..000000000
+--- a/src/fn/sub_0805C454.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "scene_panel_orchestration.h"
+-void ScenePanel_ReadInitialMode(struct ScenePanel *input)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)input;
+-    s32 mode = Script_SeekToKeyword('m');
+-    if (mode)
+-        mode = Script_GetValue();
+-    panel->initialMode = mode;
+-}
+diff --git a/src/fn/sub_0805C470.c b/src/fn/sub_0805C470.c
+deleted file mode 100644
+index cf35c12d8..000000000
+--- a/src/fn/sub_0805C470.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "scene_panel_orchestration.h"
+-void ScenePanel_SuppressMainPresentation(void)
+-{
+-    if (gUnk_020004A4) {
+-        struct ScenePanelInteractionView *panel;
+-        u8 mode;
+-        SCENE_PANEL_GLOBAL->skipMainSprite = 1;
+-        panel = SCENE_PANEL_GLOBAL;
+-        mode = panel->mode;
+-        panel->savedMode = mode;
+-    }
+-}
+diff --git a/src/fn/sub_0805C4A0.c b/src/fn/sub_0805C4A0.c
+deleted file mode 100644
+index 6c92dbf9b..000000000
+--- a/src/fn/sub_0805C4A0.c
++++ /dev/null
+@@ -1,31 +0,0 @@
+-#include "scene_panel_orchestration.h"
+-void ScenePanel_WriteFullScriptStatus(void)
+-{
+-    if (gUnk_020004A4) {
+-        struct ScriptUtilityReference reference;
+-        s32 i;
+-        Script_ReadReference(&reference);
+-        Script_WriteReferenceValue(&reference, 0, SCENE_PANEL_GLOBAL->initialMode);
+-        Script_ReadReference(&reference);
+-        if (gUnk_02000488) {
+-            if (gUnk_02000488->state == 12)
+-                Script_WriteReferenceValue(&reference, 0, 1);
+-            else
+-                Script_WriteReferenceValue(&reference, 0, 0);
+-        } else
+-            Script_WriteReferenceValue(&reference, 0, 0);
+-        i = 0;
+-        do {
+-            struct ScenePanelInteractionSubject *subject;
+-            Script_ReadReference(&reference);
+-            subject = SCENE_PANEL_GLOBAL->subjects[i];
+-            if (!subject || subject->state <= 1)
+-                Script_WriteReferenceValue(&reference, 0, 0);
+-            else if (subject->state == 4)
+-                Script_WriteReferenceValue(&reference, 0, 4);
+-            else
+-                Script_WriteReferenceValue(&reference, 0, 2);
+-            i++;
+-        } while (i <= 3);
+-    }
+-}
+diff --git a/src/fn/sub_0805C564.c b/src/fn/sub_0805C564.c
+deleted file mode 100644
+index 4a17896dd..000000000
+--- a/src/fn/sub_0805C564.c
++++ /dev/null
+@@ -1,29 +0,0 @@
+-#include "scene_panel_orchestration.h"
+-void ScenePanel_WriteScriptStatus(void)
+-{
+-    if (gUnk_020004A4) {
+-        struct ScriptUtilityReference reference;
+-        s32 i;
+-        Script_ReadReference(&reference);
+-        if (gUnk_02000488) {
+-            if (gUnk_02000488->state == 12)
+-                Script_WriteReferenceValue(&reference, 0, 1);
+-            else
+-                Script_WriteReferenceValue(&reference, 0, 0);
+-        } else
+-            Script_WriteReferenceValue(&reference, 0, 0);
+-        i = 0;
+-        do {
+-            struct ScenePanelInteractionSubject *subject;
+-            Script_ReadReference(&reference);
+-            subject = SCENE_PANEL_GLOBAL->subjects[i];
+-            if (!subject || subject->state <= 1)
+-                Script_WriteReferenceValue(&reference, 0, 0);
+-            else if (subject->state == 4)
+-                Script_WriteReferenceValue(&reference, 0, 4);
+-            else
+-                Script_WriteReferenceValue(&reference, 0, 2);
+-            i++;
+-        } while (i <= 3);
+-    }
+-}
+diff --git a/src/fn/sub_0805C614.c b/src/fn/sub_0805C614.c
+deleted file mode 100644
+index 3d395722c..000000000
+--- a/src/fn/sub_0805C614.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "scene_panel_orchestration.h"
+-void ScenePanel_BeginArrivalRamp(void)
+-{
+-    struct ScenePanelInteractionView *panel = SCENE_PANEL_GLOBAL;
+-    if (panel) {
+-        u8 *enabled = &panel->arrivalRampEnabled;
+-        u32 zero = 0;
+-        *enabled = 1;
+-        SCENE_PANEL_GLOBAL->arrivalRampFrame = zero;
+-    }
+-}
+diff --git a/src/fn/sub_0805C640.c b/src/fn/sub_0805C640.c
+deleted file mode 100644
+index 1313068cd..000000000
+--- a/src/fn/sub_0805C640.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "scene_panel_orchestration.h"
+-void ScenePanel_SetTransitionGate(void)
+-{
+-    struct ScenePanelInteractionView *panel = SCENE_PANEL_GLOBAL;
+-    if (panel)
+-        panel->gateC12 = 1;
+-}
+diff --git a/src/fn/sub_0805C660.c b/src/fn/sub_0805C660.c
+deleted file mode 100644
+index a2ff0763f..000000000
+--- a/src/fn/sub_0805C660.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "scene_panel_orchestration.h"
+-void ScenePanel_ClearTransitionGate(void)
+-{
+-    struct ScenePanelInteractionView *panel = SCENE_PANEL_GLOBAL;
+-    if (panel)
+-        panel->gateC12 = 0;
+-}
+diff --git a/src/fn/sub_0805C680.c b/src/fn/sub_0805C680.c
+deleted file mode 100644
+index f8e9225d7..000000000
+--- a/src/fn/sub_0805C680.c
++++ /dev/null
+@@ -1,25 +0,0 @@
+-#include "scene_panel_commands.h"
+-void ScenePanel_DispatchCommands(struct ScenePanel *owner)
+-{
+-    struct ScenePanelInteractionView *panel = (void *)owner;
+-    struct ScenePanelReceiver *receiver = &((struct ScenePanelCommandView *)owner)->receiver;
+-    s32 i = 0;
+-    if (i < receiver->count[gUnk_0200047C->bank]) {
+-        do {
+-            struct ScenePanelCommandGlobals *globals = gUnk_0200047C;
+-            struct ScenePanelCommand *command = receiver->commands[globals->bank][i];
+-            SceneMessages_SetPendingTrigger(receiver, command);
+-            switch (command->opcode) {
+-                case 0:
+-                    panel->savedMode = command->mode;
+-                    Trigger_ConsumePending(receiver, 1);
+-                    break;
+-                case 1:
+-                    ScenePanel_SetState((void *)panel, ScenePanel_BeginForwardSequence);
+-                    Trigger_ConsumePending(receiver, 1);
+-                    break;
+-            }
+-            i++;
+-        } while (i < receiver->count[gUnk_0200047C->bank]);
+-    }
+-}
+diff --git a/src/fn/sub_0805C728.c b/src/fn/sub_0805C728.c
+deleted file mode 100644
+index 8fa80e266..000000000
+--- a/src/fn/sub_0805C728.c
++++ /dev/null
+@@ -1,5 +0,0 @@
+-#include "scene_panel_commands.h"
+-void ScenePanel_UnregisterReceiver(struct ScenePanelCommandView *panel)
+-{
+-    SceneMessages_UnregisterReceiver(&panel->receiver);
+-}
+diff --git a/src/fn/sub_0805C73C.c b/src/fn/sub_0805C73C.c
+deleted file mode 100644
+index e5bf54fbc..000000000
+--- a/src/fn/sub_0805C73C.c
++++ /dev/null
+@@ -1,5 +0,0 @@
+-#include "scene_panel_commands.h"
+-void ScenePanel_RegisterReceiver(struct ScenePanelCommandView *panel)
+-{
+-    SceneMessages_RegisterReceiver(&panel->receiver, panel->actorId, 9);
+-}
+diff --git a/src/fn/sub_0805C754.c b/src/fn/sub_0805C754.c
+deleted file mode 100644
+index 7c37385aa..000000000
+--- a/src/fn/sub_0805C754.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-// COMPILER: old_agbcc
+-#include "scene_panel_commands.h"
+-/* ScenePanel_ClearGlobal: Clears the global panel pointer used by ScenePanel_IsPresent */
+-#define ScenePanel_ClearGlobal sub_0805C754
+-#define ScenePanel_ClearGlobal sub_0805C754
+-void sub_0805C754(void)
+-{
+-    gUnk_020004A4 = NULL;
+-}
+diff --git a/src/fn/sub_0805C760.c b/src/fn/sub_0805C760.c
+deleted file mode 100644
+index 72464a185..000000000
+--- a/src/fn/sub_0805C760.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel_commands.h"
+-u32 ScenePanel_IsPresent(void)
+-{
+-    u32 present = (u32)gUnk_020004A4;
+-    if (present != 0)
+-        present = 1;
+-    return present;
+-}
+diff --git a/src/fn/sub_0805C774.c b/src/fn/sub_0805C774.c
+deleted file mode 100644
+index bea693cf3..000000000
+--- a/src/fn/sub_0805C774.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "scene_panel_commands.h"
+-#include "game_state.h"
+-void ScenePanel_SelectMode(struct ScenePanelInteractionView *panel)
+-{
+-    s32 mode;
+-    if (panel->skipMainSprite == 0)
+-        mode = gUnk_02000710->unk876;
+-    else
+-        mode = panel->savedMode;
+-    panel->mode = mode;
+-}
+diff --git a/src/fn/sub_0805C7B4.c b/src/fn/sub_0805C7B4.c
+deleted file mode 100644
+index 40d1856a5..000000000
+--- a/src/fn/sub_0805C7B4.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "scene_panel_commands.h"
+-s32 ScenePanel_CountActiveSubjects(struct ScenePanelInteractionView *panel)
+-{
+-    s32 active = 0;
+-    s32 remaining = panel->subjectCount;
+-    if (active < remaining) {
+-        struct ScenePanelInteractionSubject **subject = panel->subjects;
+-        do {
+-            if ((*subject)->state == 4)
+-                active++;
+-            subject++;
+-            remaining--;
+-        } while (remaining != 0);
+-    }
+-    return active;
+-}
+diff --git a/src/fn/sub_0805C7E4.c b/src/fn/sub_0805C7E4.c
+deleted file mode 100644
+index 4d6fa0c4f..000000000
+--- a/src/fn/sub_0805C7E4.c
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#include "scene_panel_commands.h"
+-void ScenePanel_UpdateApproachSprite(struct ScenePanelInteractionView *panel)
+-{
+-    if (panel->mode && panel->activeCount && (panel->state == 10 || panel->state == 14)) {
+-        u32 scale, offset;
+-        struct ScenePanelApproachSprite *sprite = &panel->approachSprite;
+-        sprite->flags &= ~1;
+-        sprite->frame = 1;
+-        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+-        offset = gUnk_03005308 * 2;
+-        scale = *(const u16 *)(offset + (u32)gUnk_0203B400);
+-        scale &= 15;
+-        scale += 72;
+-        panel->approachSprite.scaleY = scale;
+-        panel->approachSprite.scaleX = scale;
+-    } else
+-        panel->approachSprite.flags |= 1;
+-}
+diff --git a/src/fn/sub_0805C86C.c b/src/fn/sub_0805C86C.c
+deleted file mode 100644
+index 46c81aaac..000000000
+--- a/src/fn/sub_0805C86C.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "scene_panel_commands.h"
+-void ScenePanel_SubmitPlayerMidpoint(struct ScenePanelInteractionView *panel)
+-{
+-    struct ScenePanelInteractionPackedPosition position;
+-    struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
+-    position.x = ((u32)(player->position.x + panel->origin.x) << 15) >> 16;
+-    position.y = (u16)player->position.y + 150;
+-    position.z = ((u32)(player->position.z + panel->origin.z) << 15) >> 16;
+-    sub_08225F88(&position);
+-}
+diff --git a/src/fn/sub_0805C8D8.c b/src/fn/sub_0805C8D8.c
+deleted file mode 100644
+index 00d0bf64a..000000000
+--- a/src/fn/sub_0805C8D8.c
++++ /dev/null
+@@ -1,43 +0,0 @@
+-#include "scene_panel_lifecycle.h"
+-s32 ScenePanel_TickLifecycle(struct ScenePanelLifecycleView *parent)
+-{
+-    u32 playerKind;
+-    ScenePanel_DispatchCommands((void *)parent);
+-    ScenePanel_SelectMode((void *)parent);
+-    parent->activeCount = ScenePanel_CountActiveSubjects((void *)parent);
+-    playerKind = SCENE_PANEL_PLAYER->kindValue;
+-    if (playerKind == 4)
+-        return 0;
+-    if (parent->initialMode == 1 && parent->state != 14 && playerKind == 1 &&
+-        !gUnk_02000710->unk618) {
+-        ScenePanel_SetEffectState((void *)parent, 14);
+-        ScenePanelRig_SetState(&parent->rig, 9);
+-        ScenePanel_NoOpAction((void *)parent);
+-        ScenePanel_CallPendingScript((void *)parent, 8);
+-    }
+-    gUnk_08605ABC[parent->state]((void *)parent);
+-    if (parent->initialMode == 0)
+-        ScenePanel_UpdatePaletteState((void *)parent);
+-    else {
+-        ScenePanel_TickRig((void *)parent);
+-        ScenePanel_SubmitPlayerMidpoint((void *)parent);
+-        ScenePanel_DrawBackgroundLayers((void *)parent);
+-        ScenePanel_LoadModePalette((void *)parent);
+-        ScenePanel_UpdateApproachSprite((void *)parent);
+-        if (parent->activated) {
+-            if (!parent->skipMainSprite) {
+-                if (gUnk_02000710->unk618 == 0) {
+-                    if (parent->warningSounds[2])
+-                        Sound_PlaySong(parent->warningSounds[2]);
+-                } else {
+-                    if (parent->warningSounds[parent->warningStage])
+-                        Sound_PlaySong(parent->warningSounds[parent->warningStage]);
+-                }
+-                Sound_PlaySong(0x29B);
+-            }
+-            parent->activated = 0;
+-        }
+-    }
+-    /* The non-void callback preserves the original fall-through return ABI. */
+-    ScenePanel_UpdateParticles((void *)parent);
+-}
+diff --git a/src/fn/sub_0805CA20.c b/src/fn/sub_0805CA20.c
+deleted file mode 100644
+index 49cdf0875..000000000
+--- a/src/fn/sub_0805CA20.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "scene_panel_lifecycle.h"
+-s32 ScenePanel_DestroyLifecycle(struct ScenePanelLifecycleView *parent)
+-{
+-    if (parent->initialMode == 0) {
+-        if (parent->paletteSprite.active)
+-            Sprite_Remove(&parent->paletteSprite);
+-    } else {
+-        ScenePanelRig_RemoveSprites(&parent->rig);
+-        Sprite_Remove(&parent->auxiliary);
+-        Bg_SetPriority(1, 1);
+-    }
+-    ScenePanel_DestroyParticles((void *)parent);
+-    ScenePanel_UnregisterReceiver((void *)parent);
+-    gUnk_020004A4 = 0;
+-    return 0;
+-}
+diff --git a/src/fn/sub_0805CA7C.c b/src/fn/sub_0805CA7C.c
+deleted file mode 100644
+index b0314c258..000000000
+--- a/src/fn/sub_0805CA7C.c
++++ /dev/null
+@@ -1,32 +0,0 @@
+-#include "scene_panel_lifecycle.h"
+-s32 ScenePanel_InitializeLifecycle(struct ScenePanelLifecycleView *parent)
+-{
+-    s32 found = Script_SeekToKeyword('d');
+-    if (found)
+-        parent->skipMainSprite = Script_GetValue();
+-    else
+-        parent->skipMainSprite = found;
+-    {
+-        struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
+-        parent->savedPlayer = player;
+-    }
+-    parent->savedTether = gUnk_02000488;
+-    ScenePanel_InitAnchorPositions((void *)parent);
+-    ScenePanel_ReadInitialMode((void *)parent);
+-    if (Script_SeekToKeyword('n'))
+-        parent->subjectCount = Script_GetValue();
+-    else
+-        parent->subjectCount = 4;
+-    ScenePanel_CreateSubjects((void *)parent);
+-    ScenePanel_InitializeInteraction((void *)parent);
+-    ScenePanel_InitParticles((void *)parent);
+-    ScenePanel_InitTimePalette((void *)parent);
+-    ScenePanel_InitScriptProperty((void *)parent);
+-    ScenePanel_RegisterReceiver((void *)parent);
+-    {
+-        s32 mode = gUnk_02000710->unk876;
+-        parent->mode = mode;
+-    }
+-    gUnk_020004A4 = (void *)parent;
+-    return 0;
+-}
+diff --git a/src/fn/sub_0805CB38.c b/src/fn/sub_0805CB38.c
+deleted file mode 100644
+index d8a319328..000000000
+--- a/src/fn/sub_0805CB38.c
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#include "scene_panel_subject.h"
+-struct ScenePanel *ScenePanel_Create(u32 actorId)
+-{
+-    struct ScenePanel *panel;
+-    if (gUnk_020004A4)
+-        return gUnk_020004A4;
+-    panel = Task_Create(9, 0x17E4);
+-    if (panel) {
+-        Task_SetCallbacks(panel, (void (*)(void *))ScenePanel_TickLifecycle,
+-                          (void (*)(void *))ScenePanel_DestroyLifecycle);
+-        ((struct ScenePanelCommandView *)panel)->actorId = actorId;
+-        if (ScenePanel_InitializeLifecycle((void *)panel) < 0) {
+-            Task_Kill(panel);
+-            return NULL;
+-        }
+-    }
+-    return panel;
+-}
+diff --git a/src/fn/sub_0805CB88.c b/src/fn/sub_0805CB88.c
+index 2b73ecb5c..d82488eb6 100644
+--- a/src/fn/sub_0805CB88.c
++++ b/src/fn/sub_0805CB88.c
+@@ -1,7 +1,7 @@
+ #include "scene_panel_subject.h"
+-void ScenePanelSubject_SetState(struct SceneRigSubject *owner, u32 state)
++void ScenePanelSubject_SetState(struct ScenePanelSubject *owner, u32 state)
+ {
+-    struct ScenePanelSubjectView *subject = (void *)owner;
++    struct ScenePanelSubject *subject = (void *)owner;
+     subject->state = state;
+     subject->stateFrame = 0;
+     subject->update = gUnk_08605AF8[subject->state];
+diff --git a/src/fn/sub_0805CBD4.c b/src/fn/sub_0805CBD4.c
+index d0f9d9eaf..e5c4fdfae 100644
+--- a/src/fn/sub_0805CBD4.c
++++ b/src/fn/sub_0805CBD4.c
+@@ -1,6 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "scene_panel_subject.h"
+-void ScenePanelSubject_ResetPosition(struct ScenePanelSubjectView *subject)
++void ScenePanelSubject_ResetPosition(struct ScenePanelSubject *subject)
+ {
+     s32 offset;
+     s32 random;
+diff --git a/src/fn/sub_0805CC44.c b/src/fn/sub_0805CC44.c
+index 50d50d62c..27480bf81 100644
+--- a/src/fn/sub_0805CC44.c
++++ b/src/fn/sub_0805CC44.c
+@@ -1,5 +1,5 @@
+ #include "scene_panel_subject.h"
+-void ScenePanelSubject_KeepPlayerOutside(struct ScenePanelSubjectView *subject)
++void ScenePanelSubject_KeepPlayerOutside(struct ScenePanelSubject *subject)
+ {
+     s32 x = SCENE_PANEL_PLAYER->position.x - subject->home.x;
+     s32 z = SCENE_PANEL_PLAYER->position.z - subject->home.z;
+diff --git a/src/fn/sub_0805CCF0.c b/src/fn/sub_0805CCF0.c
+index c17095ac2..12a8c108d 100644
+--- a/src/fn/sub_0805CCF0.c
++++ b/src/fn/sub_0805CCF0.c
+@@ -4,7 +4,7 @@ void ScenePanelSubject_ApplyContact(struct ContactCollider *contact, struct Cont
+ {
+     u32 mask = 127;
+     if (contact->reactionFlags & mask) {
+-        struct ScenePanelSubjectView *subject = owner;
++        struct ScenePanelSubject *subject = owner;
+         if (subject->contactCooldown == 0 && subject->state == 2) {
+             s32 amount = contact->unknown3C - other->unknown3C;
+             if (amount < 0)
+diff --git a/src/fn/sub_0805CD60.c b/src/fn/sub_0805CD60.c
+index 5255ad1d8..38cb77887 100644
+--- a/src/fn/sub_0805CD60.c
++++ b/src/fn/sub_0805CD60.c
+@@ -2,6 +2,6 @@
+ /* ScenePanelSubject_TickInactive: No-op callback for subject state 0; parallels the other Tick state handlers and distinguishes it from TickIdle */
+ #define ScenePanelSubject_TickInactive sub_0805CD60
+ #define ScenePanelSubject_Idle         sub_0805CD60
+-void ScenePanelSubject_Idle(struct ScenePanelSubjectView *subject)
++void ScenePanelSubject_Idle(struct ScenePanelSubject *subject)
+ {
+ }
+diff --git a/src/fn/sub_0805CD64.c b/src/fn/sub_0805CD64.c
+index f6a072c28..d7f8c3e5f 100644
+--- a/src/fn/sub_0805CD64.c
++++ b/src/fn/sub_0805CD64.c
+@@ -1,6 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "scene_panel_subject_playback.h"
+-void ScenePanelSubject_TickAppearing(struct ScenePanelSubjectView *owner)
++void ScenePanelSubject_TickAppearing(struct ScenePanelSubject *owner)
+ {
+     if (owner->appearDelay)
+         owner->appearDelay--;
+diff --git a/src/fn/sub_0805CECC.c b/src/fn/sub_0805CECC.c
+index c39de6193..6af9d4d70 100644
+--- a/src/fn/sub_0805CECC.c
++++ b/src/fn/sub_0805CECC.c
+@@ -1,6 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "scene_panel_subject_playback.h"
+-void ScenePanelSubject_TickIdle(struct ScenePanelSubjectView *owner)
++void ScenePanelSubject_TickIdle(struct ScenePanelSubject *owner)
+ {
+     Anim_SetSequence(&owner->sequence, owner->sequenceResource, 1, owner->sequenceRow,
+                      owner->sequenceVariant);
+diff --git a/src/fn/sub_0805CFE8.c b/src/fn/sub_0805CFE8.c
+index 3101a5526..8e8e2d9c0 100644
+--- a/src/fn/sub_0805CFE8.c
++++ b/src/fn/sub_0805CFE8.c
+@@ -1,6 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "scene_panel_subject_playback.h"
+-void ScenePanelSubject_TickActivating(struct ScenePanelSubjectView *owner)
++void ScenePanelSubject_TickActivating(struct ScenePanelSubject *owner)
+ {
+     if (owner->kind) {
+         const volatile u16 *source = &owner->sequence.index;
+diff --git a/src/fn/sub_0805D17C.c b/src/fn/sub_0805D17C.c
+index 24d55df73..30cf98b4b 100644
+--- a/src/fn/sub_0805D17C.c
++++ b/src/fn/sub_0805D17C.c
+@@ -1,6 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "scene_panel_subject_playback.h"
+-void ScenePanelSubject_TickActive(struct ScenePanelSubjectView *owner)
++void ScenePanelSubject_TickActive(struct ScenePanelSubject *owner)
+ {
+     Anim_SetSequence(&owner->sequence, owner->sequenceResource, 3, owner->sequenceRow,
+                      owner->sequenceVariant);
+diff --git a/src/fn/sub_0805D2B0.c b/src/fn/sub_0805D2B0.c
+index 57c0eb5b2..15ca7538f 100644
+--- a/src/fn/sub_0805D2B0.c
++++ b/src/fn/sub_0805D2B0.c
+@@ -1,5 +1,5 @@
+ #include "scene_panel_subject_playback.h"
+-void ScenePanelSubject_TickDeparting(struct ScenePanelSubjectView *owner)
++void ScenePanelSubject_TickDeparting(struct ScenePanelSubject *owner)
+ {
+     if (owner->kind) {
+         const volatile u16 *source = &owner->sequence.index;
+diff --git a/src/fn/sub_0805D584.c b/src/fn/sub_0805D584.c
+index 8c3576f21..3f6d62f6e 100644
+--- a/src/fn/sub_0805D584.c
++++ b/src/fn/sub_0805D584.c
+@@ -1,6 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "scene_panel_subject_playback.h"
+-void ScenePanelSubject_TickResetDelay(struct ScenePanelSubjectView *owner)
++void ScenePanelSubject_TickResetDelay(struct ScenePanelSubject *owner)
+ {
+     Anim_SetSequence(&owner->sequence, owner->sequenceResource, 1, owner->sequenceRow,
+                      owner->sequenceVariant);
+diff --git a/src/fn/sub_0805D6C4.c b/src/fn/sub_0805D6C4.c
+index 33a535388..a5a8da914 100644
+--- a/src/fn/sub_0805D6C4.c
++++ b/src/fn/sub_0805D6C4.c
+@@ -1,5 +1,5 @@
+ #include "scene_panel_subject_tail.h"
+-void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubjectView *subject)
++void ScenePanelSubject_UpdateTimedEffect(struct ScenePanelSubject *subject)
+ {
+     if (subject->byteTimer)
+         subject->byteTimer--;
+diff --git a/src/fn/sub_0805D770.c b/src/fn/sub_0805D770.c
+index 0fb8816ed..ef852a98b 100644
+--- a/src/fn/sub_0805D770.c
++++ b/src/fn/sub_0805D770.c
+@@ -1,5 +1,5 @@
+ #include "scene_panel_subject_tail.h"
+-void ScenePanelSubject_UpdatePaletteBank(struct ScenePanelSubjectView *subject)
++void ScenePanelSubject_UpdatePaletteBank(struct ScenePanelSubject *subject)
+ {
+     if (subject->requested) {
+         if (subject->requestLevel <= 11)
+diff --git a/src/fn/sub_0805D800.c b/src/fn/sub_0805D800.c
+index cda41a1a7..9e747aa51 100644
+--- a/src/fn/sub_0805D800.c
++++ b/src/fn/sub_0805D800.c
+@@ -1,5 +1,5 @@
+ #include "scene_panel_subject_tail.h"
+-s32 ScenePanelSubject_Update(struct ScenePanelSubjectView *subject)
++s32 ScenePanelSubject_Update(struct ScenePanelSubject *subject)
+ {
+     if (subject->state)
+         ScenePanelSubject_KeepPlayerOutside((void *)subject);
+@@ -12,7 +12,7 @@ s32 ScenePanelSubject_Update(struct ScenePanelSubjectView *subject)
+     {
+         u16 *hold = &subject->hold;
+         if (*hold) {
+-            u32 mode = SCENE_PANEL_GLOBAL->mode;
++            u32 mode = SCENE_PANEL_GLOBAL->paletteMode;
+             if (mode) {
+                 if (subject->state != 4)
+                     *hold = 0;
+diff --git a/src/fn/sub_0805D884.c b/src/fn/sub_0805D884.c
+index 2211ddbdc..381815b3f 100644
+--- a/src/fn/sub_0805D884.c
++++ b/src/fn/sub_0805D884.c
+@@ -1,5 +1,5 @@
+ #include "scene_panel_subject_tail.h"
+-s32 ScenePanelSubject_Destroy(struct ScenePanelSubjectView *subject)
++s32 ScenePanelSubject_Destroy(struct ScenePanelSubject *subject)
+ {
+     Sprite_Remove(&subject->drawable);
+     Collider_Remove(&subject->collider);
+diff --git a/src/fn/sub_0805D8A8.c b/src/fn/sub_0805D8A8.c
+index 1be0beef0..676275b46 100644
+--- a/src/fn/sub_0805D8A8.c
++++ b/src/fn/sub_0805D8A8.c
+@@ -1,5 +1,5 @@
+ #include "scene_panel_subject_tail.h"
+-void ScenePanelSubject_InitCollider(struct ScenePanelSubjectView *subject, u32 value)
++void ScenePanelSubject_InitCollider(struct ScenePanelSubject *subject, u32 value)
+ {
+     struct ScenePanelInteractionPackedPosition size, offset;
+     struct ContactCollider *collider = &subject->collider;
+diff --git a/src/fn/sub_0805D92C.c b/src/fn/sub_0805D92C.c
+index ed67461dc..6538e7263 100644
+--- a/src/fn/sub_0805D92C.c
++++ b/src/fn/sub_0805D92C.c
+@@ -1,7 +1,7 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "scene_panel_subject_tail.h"
+ #include "scene_panel_subject_playback.h"
+-s32 ScenePanelSubject_Initialize(struct ScenePanelSubjectView *subject,
++s32 ScenePanelSubject_Initialize(struct ScenePanelSubject *subject,
+                                  const struct ContactPosition *home, u32 row, u32 variant,
+                                  u32 initialState, u32 kind, u32 contactLimit, u32 colliderSetting,
+                                  u32 appearDelay)
+diff --git a/src/fn/sub_0805DCAC.c b/src/fn/sub_0805DCAC.c
+index 79d2167d4..22419c106 100644
+--- a/src/fn/sub_0805DCAC.c
++++ b/src/fn/sub_0805DCAC.c
+@@ -1,10 +1,10 @@
+ #include "scene_panel_subject_tail.h"
+-struct ScenePanelSubjectView *ScenePanelSubject_Create(const struct ContactPosition *home, u32 row,
+-                                                       u32 variant, u32 state, u32 kind,
+-                                                       u32 contactLimit, u32 colliderSetting,
+-                                                       u32 appearDelay)
++struct ScenePanelSubject *ScenePanelSubject_Create(const struct ContactPosition *home, u32 row,
++                                                   u32 variant, u32 state, u32 kind,
++                                                   u32 contactLimit, u32 colliderSetting,
++                                                   u32 appearDelay)
+ {
+-    struct ScenePanelSubjectView *subject = Task_Create(8, 0x240);
++    struct ScenePanelSubject *subject = Task_Create(8, 0x240);
+     if (subject) {
+         Task_SetCallbacks(subject, (void (*)(void *))ScenePanelSubject_Update,
+                           (void (*)(void *))ScenePanelSubject_Destroy);
+diff --git a/src/scene_panel_control_and_lifecycle.c b/src/scene_panel_control_and_lifecycle.c
+new file mode 100644
+index 000000000..f6e17670f
+--- /dev/null
++++ b/src/scene_panel_control_and_lifecycle.c
+@@ -0,0 +1,1072 @@
++#include "scene_panel_interaction.h"
++#include "scene_panel_config.h"
++#include "scene_panel_orchestration.h"
++#include "scene_panel_commands.h"
++#include "game_state.h"
++#include "scene_panel_lifecycle.h"
++#include "scene_panel_subject.h"
++
++s32 ScenePanel_IsWithinHorizontalRadius(const struct ContactPosition *first,
++                                        const struct ContactPosition *second, s32 radius)
++{
++    s32 x = first->x - second->x;
++    s32 z = first->z - second->z;
++    if (x > radius || z > radius || (s32)((u32)x * x + (u32)z * z) > (s32)((u32)radius * radius))
++        return 0;
++    else
++        return 1;
++}
++
++s32 ScenePanel_CanAcquireTether(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    struct TetherActor *tether = gUnk_02000488;
++    if (tether) {
++        struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
++        if (player->kindValue == 1 && player->tetherMode == 6) {
++            if (ScenePanel_IsWithinHorizontalRadius(&tether->position, &panel->center, 70))
++                return 1;
++        }
++    }
++    return 0;
++}
++
++s32 ScenePanel_AreSubjectsSettled(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    s32 i = 0;
++    s32 count = panel->subjectCount;
++    if (i < count) {
++        s32 limit = count;
++        struct ScenePanelSubject **subject = panel->subjects;
++        do {
++            if ((*subject)->state != 2)
++                return 0;
++            subject++;
++            i++;
++        } while (i < limit);
++    }
++    return 1;
++}
++
++// MATCHING_CONCESSION: register-pinning
++s32 ScenePanel_CanAcceptPlayer(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
++    if (player->kindValue == 1 && (u8)(player->actionMode - 3) > 2) {
++        asm("" : : : "r3");
++        if (player->tetherMode == 7) {
++            if (ScenePanel_IsWithinHorizontalRadius(&player->position, &panel->approachPosition,
++                                                    100))
++                return 1;
++        }
++    }
++    return 0;
++}
++
++s32 ScenePanel_IsTetherDistant(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    if (ScenePanel_IsWithinHorizontalRadius(&gUnk_02000488->position, &panel->center, 800) != 0)
++        return 0;
++    return 1;
++}
++
++void ScenePanel_WaitInitialTether(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    if (ScenePanel_CanAcquireTether(input) != 0) {
++        u32 zero;
++        PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, zero = 0);
++        panel->variant = zero;
++        ScenePanel_SetEffectState(input, 1);
++    }
++}
++
++// MATCHING_CONCESSION: register-pinning
++void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    u16 *framePointer = &panel->effectFrame;
++    u32 frame;
++    asm("" : "+r"(panel));
++    {
++        u32 value = *framePointer;
++        value++;
++        *framePointer = value;
++        frame = (u16)value;
++    }
++    if (frame <= 5) {
++        struct ScenePanelInteractionPackedPosition position;
++        s32 divisor;
++        s32 previousWeight;
++        s32 sourceX;
++        u32 direction;
++        {
++            u16 *sourceFrame = framePointer;
++            divisor = 6 - *sourceFrame;
++        }
++        sourceX = gUnk_02000488->position.x;
++        previousWeight = divisor - 1;
++        position.x = Div(sourceX * previousWeight + panel->center.x, divisor);
++        position.z = Div(gUnk_02000488->position.z * previousWeight + panel->center.z, divisor);
++        direction = gUnk_02000488->heading;
++        if (*framePointer & 1) {
++            u32 facing = direction;
++            asm("" : "+r"(facing));
++            if (facing) {
++                if (facing > 4)
++                    direction++;
++                else
++                    direction--;
++                direction &= 7;
++            }
++        }
++        TetherActor_SetInteractionTarget(&position, direction);
++    } else if (frame == 6) {
++        gUnk_02000488->state = 12;
++        gUnk_02000488->position = panel->center;
++        {
++            u8 *heading = &gUnk_02000488->heading;
++            register u32 zero asm("r0");
++            zero = 0;
++            *heading = zero;
++        }
++        panel->paletteSprite.flags |= 1;
++        Sound_PlaySong(249);
++    } else if (frame <= 69) {
++        if (panel->variant != 2 && frame == 20) {
++            ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
++            Sound_PlaySong(294);
++        }
++        Camera_RequestShake((70 - panel->effectFrame) >> 1);
++    } else if (panel->variant == 0) {
++        s32 i = 0;
++        if (i < panel->subjectCount) {
++            struct ScenePanelSubject **subject = panel->subjects;
++            do {
++                ScenePanelSubject_SetState((void *)*subject++, 1);
++                i++;
++            } while (i < panel->subjectCount);
++        }
++        PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
++        Sound_PlaySong(250);
++        ScenePanel_SetEffectState((void *)panel, 2);
++    } else if (panel->variant == 1) {
++        s32 anyActive;
++        u32 count;
++        PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
++        PlayerCue_ReleaseControl(SCENE_PANEL_PLAYER);
++        anyActive = 0;
++        count = panel->subjectCount;
++        if (anyActive < (s32)count) {
++            struct ScenePanelSubject **subject = panel->subjects;
++            s32 remaining = count;
++            do {
++                if ((*subject)->state == 4)
++                    anyActive = 1;
++                subject++;
++                remaining--;
++            } while (remaining != 0);
++        }
++        if (anyActive)
++            ScenePanel_SetEffectState((void *)panel, 4);
++        else
++            ScenePanel_SetEffectState((void *)panel, 3);
++    } else {
++        PlayerCue_Stand(SCENE_PANEL_PLAYER, -1);
++        PlayerCue_ReleaseControl(SCENE_PANEL_PLAYER);
++        Sound_PlaySong(490);
++        gUnk_02000488->state = 14;
++        ScenePanelRig_SetState(&panel->rig, 1);
++        ScenePanel_SetEffectState((void *)panel, 10);
++    }
++}
++
++void ScenePanel_WaitSettledSubjects(struct ScenePanel *input)
++{
++    if (ScenePanel_AreSubjectsSettled(input) != 0) {
++        PlayerCue_ReleaseControl(SCENE_PANEL_PLAYER);
++        ScenePanel_SetEffectState(input, 3);
++        ScenePanel_CallPendingScript(input, 0);
++    }
++}
++
++void ScenePanel_WaitTetherOrActiveSubject(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    s32 i, count;
++    if (gUnk_02000488->state != 12 && ScenePanel_CanAcquireTether((void *)panel)) {
++        PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, 0);
++        panel->variant = 1;
++        ScenePanel_SetEffectState((void *)panel, 1);
++    }
++    i = 0;
++    count = panel->subjectCount;
++    for (; i < count; i++) {
++        if (panel->subjects[i]->state == 4) {
++            ScenePanel_SetEffectState((void *)panel, 4);
++            break;
++        }
++    }
++}
++
++void ScenePanel_UpdateActiveSubjects(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    s32 active = 0;
++    s32 i = 0;
++    for (; i < panel->subjectCount; i++) {
++        struct ScenePanelSubject **subject;
++        u32 offset;
++        struct ScenePanelSubject **base;
++        /* Keep the indexed slot calculation: direct indexing becomes a different
++         * induction loop in agbcc. The slot is reloaded after callbacks. */
++        offset = i * 4;
++        base = panel->subjects;
++        subject = (void *)((u8 *)base + offset);
++        if ((*subject)->state == 4) {
++            active++;
++            if ((*subject)->changed) {
++                Sound_PlaySong(294);
++                ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
++                (*subject)->changed = 0;
++            }
++        }
++    }
++    if (!panel->allSubjectsNotified && active >= panel->subjectCount) {
++        panel->allSubjectsNotified = 1;
++        ScenePanel_CallPendingScript((void *)panel, 1);
++    }
++    if (!panel->state)
++        ScenePanel_SetState((void *)panel, ScenePanel_BeginPulseSequence);
++    if (ScenePanel_CanAcceptPlayer((void *)panel)) {
++        PlayerCue_WalkTo(SCENE_PANEL_PLAYER, &panel->approachPosition, 0, 4);
++        ScenePanel_SetEffectState((void *)panel, 5);
++    }
++}
++
++void ScenePanel_AdvancePlayerArrival(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
++    if (player->tetherMode == 0) {
++        struct ScenePanelInteractionPackedPosition position;
++        position.x = (u32)(panel->origin.x * 3 + player->position.x) >> 2;
++        position.y = (u32)(panel->origin.y * 3 + player->position.y) >> 2;
++        position.z = (u32)(panel->origin.z * 3 + player->position.z) >> 2;
++        sub_08226380(16, &position);
++        if (panel->paletteMode) {
++            PlayerCue_Motion7Front(SCENE_PANEL_PLAYER, 1, 0);
++            Sound_PlaySong(5);
++            ScenePanel_SetState(input, ScenePanel_BeginForwardSequence);
++            ScenePanel_SetEffectState(input, 7);
++        } else {
++            PlayerCue_Motion7Front(SCENE_PANEL_PLAYER, 0, 0);
++            Sound_PlaySong(407);
++            ScenePanel_SetEffectState(input, 6);
++        }
++    }
++}
++
++// MATCHING_CONCESSION: register-pinning
++void ScenePanel_AdvanceSubjectDeparture(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    u32 frame;
++    asm("" : "+r"(panel));
++    frame = (u16)(++panel->effectFrame);
++    if (frame == 30) {
++        s32 i = 0;
++        for (; i < panel->subjectCount; i++) {
++            struct ScenePanelSubject *subject = panel->subjects[i];
++            if (subject->state == 4)
++                ScenePanelSubject_SetState((void *)subject, 5);
++        }
++        ScenePanel_SetState((void *)panel, ScenePanel_BeginLongSequence);
++        Sound_FadeOutChannel10(4);
++    } else if (frame == 90) {
++        Camera_FollowPlayerWithoutCompletion(16);
++        PlayerCue_Motion7End(SCENE_PANEL_PLAYER, 0);
++    } else if (frame > 105) {
++        struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
++        if (!player->tetherMode) {
++            PlayerCue_ReleaseControl(player);
++            ScenePanel_SetEffectState((void *)panel, 3);
++            panel->allSubjectsNotified = 0;
++            ScenePanel_CallPendingScript((void *)panel, 2);
++        }
++    }
++}
++
++void ScenePanel_AdvanceArrivalRamp(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    u16 *frame = &panel->effectFrame;
++    if (*frame <= 69) {
++        *frame += 1;
++        if (*frame == 70)
++            ScenePanel_CallPendingScript(input, 3);
++    }
++    if (panel->arrivalRampEnabled) {
++        u16 *fade = &panel->arrivalRampFrame;
++        if (*fade <= 59)
++            *fade += 1;
++        Camera_RequestShake(*fade >> 1);
++    }
++}
++
++void ScenePanel_WaitTransitionGate(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    u16 *frame = &panel->effectFrame;
++    if (*frame <= 29)
++        *frame += 1;
++    else if (!panel->gateC12) {
++        Sound_PlaySong(490);
++        gUnk_02000488->state = 14;
++        ScenePanel_SetEffectState(input, 9);
++    }
++}
++
++void ScenePanel_WaitTetherDirectedState(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    if (gUnk_02000488->state == 13) {
++        ScenePanelRig_SetState(&panel->rig, 1);
++        ScenePanel_SetEffectState(input, 10);
++    }
++}
++
++void ScenePanel_WaitRigRelease(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    s32 anyActive = 0;
++    if (panel->paletteMode) {
++        u32 count = panel->subjectCount;
++        if (anyActive < (s32)count) {
++            struct ScenePanelSubject **subject = panel->subjects;
++            s32 remaining = count;
++            do {
++                if ((*subject)->state == 4)
++                    anyActive = 1;
++                subject++;
++                remaining--;
++            } while (remaining != 0);
++        }
++    }
++    if (gUnk_02000710->unk618 > 0)
++        ScenePanel_RunScheduledAction((void *)panel);
++    if (anyActive)
++        panel->effectFrame = 0;
++    else if (++panel->effectFrame > 119) {
++        ScenePanelRig_SetState(&panel->rig, 6);
++        ScenePanel_SetEffectState((void *)panel, 11);
++    }
++}
++
++void ScenePanel_WaitRigIdle(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    if (panel->rig.state == 0) {
++        Sound_PlaySong(491);
++        TetherActor_BeginDirectedState(&panel->center);
++        ScenePanel_SetEffectState(input, 12);
++        ScenePanel_CallPendingScript(input, 5);
++    }
++}
++
++void ScenePanel_WaitTetherReturn(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    if (ScenePanel_CanAcquireTether(input)) {
++        PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, 0);
++        panel->variant = 2;
++        ScenePanel_SetEffectState(input, 1);
++    } else if (ScenePanel_IsTetherDistant(input)) {
++        struct TetherActor *tether = gUnk_02000488;
++        s32 sourceX = tether->position.x;
++        struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
++        s32 x = sourceX - player->position.x;
++        s32 z = tether->position.z - player->position.z;
++        s32 direction;
++        if (player->actionMode <= 1 || player->actionMode == 6) {
++            direction = (((u16)Math_Atan2(x, z) + 112) >> 5) & 7;
++            PlayerCue_Face(player, direction, 0);
++        } else {
++            direction = (((u16)Math_Atan2(x, z) + 112) >> 5) & 7;
++            PlayerCue_Stand(player, direction);
++            PlayerCue_StateMotion(SCENE_PANEL_PLAYER, 0);
++        }
++        TetherActor_BeginAuxiliaryState(gUnk_02000488);
++        sub_08226380(16, &gUnk_02000488->position);
++        ScenePanel_SetEffectState(input, 13);
++        ScenePanel_CallPendingScript(input, 6);
++    }
++}
++
++void ScenePanel_AdvanceTetherReturn(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    panel->effectFrame++;
++    switch (panel->effectFrame) {
++        case 33: {
++            struct TetherActor *tether = gUnk_02000488;
++            s32 sourceX = tether->position.x;
++            struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
++            s32 x = sourceX - player->position.x;
++            s32 z = tether->position.z - player->position.z;
++            s32 direction = (((u16)Math_Atan2(x, z) + 112) >> 5) & 7;
++            PlayerCue_Stand(player, direction);
++            break;
++        }
++        case 64:
++            Sound_PlaySong(453);
++            break;
++        case 300:
++            sub_08226380(16, &SCENE_PANEL_PLAYER->position);
++            break;
++        case 316:
++            if (panel->warningSounds[3])
++                Sound_PlaySong(panel->warningSounds[3]);
++            PlayerCue_Kneel(SCENE_PANEL_PLAYER, -1, 0);
++            break;
++        case 360:
++            ScenePanel_CallPendingScript(input, 7);
++            break;
++    }
++}
++
++/* ScenePanel_HoldInteraction: Empty callback for interaction state 14 that leaves the panel state unchanged */
++
++#define ScenePanel_HoldInteraction sub_0805BCE8
++
++void ScenePanel_HoldInteraction(struct ScenePanel *input)
++{
++}
++
++void ScenePanel_InitPaletteSprite(struct ScenePanel *input)
++{
++    struct ScenePanel *parent = (void *)input;
++    if (!parent->skipMainSprite) {
++        struct ScenePanelPaletteSprite *sprite;
++        struct ScenePanelPaletteSprite *positionSprite;
++        struct ScenePanelPaletteGraphics *graphics;
++        u16 *paletteCopy;
++        u16 *destination;
++        u16 *source;
++        s32 i;
++        sprite = &parent->paletteSprite;
++        positionSprite = sprite;
++        {
++            graphics = &parent->paletteSprite.graphics;
++        }
++        AnimData_Load(graphics, 0xC039);
++        Sprite_Init(sprite, graphics, 0);
++        sprite->renderMode = 3;
++        {
++            paletteCopy = parent->paletteSprite.paletteCopy;
++        }
++        source = graphics->palette;
++        destination = paletteCopy;
++        for (i = 15; i >= 0; i--)
++            *destination++ = *source++;
++        graphics->palette = paletteCopy;
++        sprite->transform[0] = 0;
++        sprite->transform[1] = 0;
++        sprite->transform[2] = 0;
++        {
++            struct ContactPosition position;
++            {
++                const struct ContactPosition *origin = &parent->origin;
++                position = *origin;
++            }
++            positionSprite->position = position;
++        }
++        sprite->active = 1;
++    }
++}
++
++void ScenePanel_InitAuxiliarySprite(struct ScenePanel *input)
++{
++    struct ScenePanel *parent = (void *)input;
++    struct ScenePanelAuxSprite *sprite = &parent->auxiliary;
++    void *graphics = sprite->graphics;
++    AnimData_Load(graphics, 0x3641);
++    Sprite_Init(sprite, graphics, 512);
++    sprite->frame = 0;
++    sprite->flags |= 2;
++    sprite->parameter9 = 96;
++    sprite->parameter8 = 96;
++    sprite->renderMode = 1;
++    sprite->position = parent->center;
++    sprite->position.y += 72;
++}
++
++void ScenePanel_CreateSubjects(struct ScenePanel *parent)
++{
++    u32 initialStates[4];
++    struct ScenePanelSpawnPosition position;
++    s32 contactLimit, colliderSetting;
++    u32 category = parent->initialMode;
++    u32 kind = 0;
++    s32 i;
++    if (category == 1)
++        kind = 1;
++    if (!Script_SeekToKeyword('g')) {
++        contactLimit = 100;
++        colliderSetting = 0;
++    } else {
++        contactLimit = Script_GetValue();
++        colliderSetting = Script_GetValue();
++    }
++    if (!Script_SeekToKeyword('a')) {
++        for (i = 0; i < parent->subjectCount; i++) {
++            parent->subjects[i] = 0;
++            initialStates[i] = 0;
++        }
++    } else {
++        for (i = 0; i < parent->subjectCount; i++) {
++            parent->subjects[i] = 0;
++            initialStates[i] = Script_GetValue();
++        }
++    }
++    parent->parameter = Script_GetKeywordValue('S', 0);
++    {
++        for (i = 0; i < parent->subjectCount; i++) {
++            u32 row, variant, appearDelay;
++            s32 negative = -514;
++            position = *(struct ScenePanelSpawnPosition *)&parent->origin;
++            switch (i) {
++                case 0:
++                    position.x += negative;
++                    position.z += 76;
++                    row = 1;
++                    variant = 0;
++                    appearDelay = 6;
++                    break;
++                case 2:
++                    position.x += 76;
++                    position.z += negative;
++                    row = 1;
++                    variant = 1;
++                    appearDelay = 3;
++                    break;
++                case 3:
++                    position.x -= 76;
++                    position.z += 514;
++                    row = 0;
++                    variant = 0;
++                    appearDelay = 0;
++                    break;
++                case 1:
++                    position.x += 514;
++                    position.z -= 76;
++                    row = 0;
++                    variant = 1;
++                    appearDelay = 9;
++                    break;
++                default:
++                    row = 0;
++                    variant = 0;
++                    appearDelay = 0;
++            }
++            parent->subjects[i] = (struct ScenePanelSubject *)ScenePanelSubject_Create(
++                (const void *)&position, row, variant, initialStates[i], kind, contactLimit,
++                colliderSetting, appearDelay);
++        }
++    }
++}
++
++void ScenePanel_InitAnchorPositions(struct ScenePanel *parent)
++{
++    if (Script_SeekToKeyword('c')) {
++        parent->origin.x = Script_GetValue();
++        parent->origin.y = Script_GetValue();
++        parent->origin.z = Script_GetValue();
++    }
++    parent->approachPosition = parent->origin;
++    parent->approachPosition.x += 324;
++    parent->approachPosition.z += 324;
++    parent->center = parent->origin;
++    parent->center.x -= 20;
++    parent->center.z -= 20;
++}
++
++void ScenePanel_InitScriptProperty(struct ScenePanel *input)
++{
++    struct ScenePanel *parent = (void *)input;
++    s32 value = Script_SeekToKeyword('p');
++    if (value)
++        parent->property = Script_GetValue();
++    else
++        parent->property = value;
++}
++
++void ScenePanel_InitResourceConfiguration(struct ScenePanel *parent)
++{
++    s32 found = Script_SeekToKeyword('b');
++    if (found) {
++        parent->resourceIndex = Script_GetValue();
++        gUnk_02000710->unk618 = Script_GetValue();
++        gUnk_02000710->unk61C = Script_GetValue();
++    } else {
++        parent->resourceIndex = found;
++        {
++            struct GameState *volatile *slot = &gUnk_02000710;
++            (*slot)->unk618 = 6000;
++            (*slot)->unk61C = 6000;
++        }
++    }
++    if (gUnk_02000710->unk618 > (gUnk_02000710->unk61C >> 2))
++        parent->warningStage = 0;
++    else
++        parent->warningStage = 1;
++    switch (parent->resourceIndex) {
++        case 0:
++            parent->warningSounds[0] = 0x534;
++            parent->warningSounds[1] = 0x533;
++            parent->warningSounds[2] = 0x359;
++            parent->warningSounds[3] = 0x535;
++            break;
++        case 1:
++            parent->warningSounds[0] = 0x4D5;
++            parent->warningSounds[1] = 0x4D1;
++            parent->warningSounds[2] = 0x4CF;
++            parent->warningSounds[3] = 0x4D7;
++            break;
++        case 2:
++            parent->warningSounds[0] = 0x53E;
++            parent->warningSounds[1] = 0x53D;
++            parent->warningSounds[2] = 0x2EB;
++            parent->warningSounds[3] = 0x53F;
++            break;
++        case 3:
++            parent->warningSounds[0] = 0x548;
++            parent->warningSounds[1] = 0x549;
++            parent->warningSounds[2] = 0x547;
++            parent->warningSounds[3] = 0x54A;
++            break;
++        case 4:
++            parent->warningSounds[0] = 0x551;
++            parent->warningSounds[1] = 0x553;
++            parent->warningSounds[2] = 0x552;
++            parent->warningSounds[3] = 0x554;
++            break;
++        default:
++            parent->warningSounds[0] = 0;
++            parent->warningSounds[1] = 0;
++            parent->warningSounds[2] = 0;
++            parent->warningSounds[3] = 0;
++    }
++    if (Script_SeekToKeyword('T'))
++        parent->resourceId = Script_GetValue();
++    else
++        parent->resourceId = 10;
++    ScenePanel_InitScheduledAction((void *)parent);
++}
++
++s32 ScenePanel_AreSubjectsIdle(struct ScenePanel *input)
++{
++    struct ScenePanel *parent = (void *)input;
++    s32 i = 0, count = parent->subjectCount;
++    if (i < count) {
++        s32 limit = count;
++        struct ScenePanelSubject **subject = parent->subjects;
++        do {
++            if ((*subject)->state != 0)
++                return 0;
++            subject++;
++            i++;
++        } while (i < limit);
++    }
++    return 1;
++}
++
++void ScenePanel_InitializeInteraction(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    u32 mode = panel->initialMode;
++    switch (mode) {
++        case 0: {
++            s32 option;
++            if (ScenePanel_AreSubjectsIdle((void *)panel)) {
++                ScenePanel_InitPaletteSprite((void *)panel);
++                ScenePanel_SetEffectState((void *)panel, 0);
++                return;
++            }
++            if (Script_SeekToKeyword('O'))
++                option = Script_GetValue();
++            else
++                option = 0;
++            if (option && gUnk_02000488) {
++                s32 active;
++                u32 count;
++                u8 *tetherState = &gUnk_02000488->state;
++                active = 0;
++                *tetherState = 12;
++                gUnk_02000488->position = panel->center;
++                gUnk_02000488->heading = 0;
++                count = panel->subjectCount;
++                if (active < (s32)count) {
++                    struct ScenePanelSubject **subject = panel->subjects;
++                    s32 remaining = count;
++                    do {
++                        if ((*subject)->state == 4)
++                            active = 1;
++                        subject++;
++                        remaining--;
++                    } while (remaining != 0);
++                }
++                if (active) {
++                    ScenePanel_SetEffectState((void *)panel, 4);
++                    return;
++                }
++            } else
++                ScenePanel_InitPaletteSprite((void *)panel);
++            ScenePanel_SetEffectState((void *)panel, 3);
++            break;
++        }
++        case 1: {
++            ScenePanel_InitRig((void *)panel);
++            ScenePanel_InitResourceConfiguration((void *)panel);
++            gUnk_02000488->state = 12;
++            gUnk_02000488->position = panel->center;
++            gUnk_02000488->heading = 0;
++            gUnk_02000488->unknown1B = mode;
++            if (gUnk_02000488->kind == 6)
++                panel->resourceScale = 80;
++            else if (gUnk_02000488->kind == 7)
++                panel->resourceScale = 120;
++            else
++                panel->resourceScale = 100;
++            ScenePanel_InitBackground((void *)panel);
++            ScenePanel_InitOverlay((void *)panel);
++            ScenePanel_InitAuxiliarySprite((void *)panel);
++            ScenePanel_SetEffectState((void *)panel, 8);
++        }
++    }
++}
++
++void ScenePanel_ReadInitialMode(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = (void *)input;
++    s32 mode = Script_SeekToKeyword('m');
++    if (mode)
++        mode = Script_GetValue();
++    panel->initialMode = mode;
++}
++
++void ScenePanel_SuppressMainPresentation(void)
++{
++    if (gUnk_020004A4) {
++        struct ScenePanel *panel;
++        u8 mode;
++        SCENE_PANEL_GLOBAL->skipMainSprite = 1;
++        panel = SCENE_PANEL_GLOBAL;
++        mode = panel->paletteMode;
++        panel->savedMode = mode;
++    }
++}
++
++void ScenePanel_WriteFullScriptStatus(void)
++{
++    if (gUnk_020004A4) {
++        struct ScriptUtilityReference reference;
++        s32 i;
++        Script_ReadReference(&reference);
++        Script_WriteReferenceValue(&reference, 0, SCENE_PANEL_GLOBAL->initialMode);
++        Script_ReadReference(&reference);
++        if (gUnk_02000488) {
++            if (gUnk_02000488->state == 12)
++                Script_WriteReferenceValue(&reference, 0, 1);
++            else
++                Script_WriteReferenceValue(&reference, 0, 0);
++        } else
++            Script_WriteReferenceValue(&reference, 0, 0);
++        i = 0;
++        do {
++            struct ScenePanelSubject *subject;
++            Script_ReadReference(&reference);
++            subject = SCENE_PANEL_GLOBAL->subjects[i];
++            if (!subject || subject->state <= 1)
++                Script_WriteReferenceValue(&reference, 0, 0);
++            else if (subject->state == 4)
++                Script_WriteReferenceValue(&reference, 0, 4);
++            else
++                Script_WriteReferenceValue(&reference, 0, 2);
++            i++;
++        } while (i <= 3);
++    }
++}
++
++void ScenePanel_WriteScriptStatus(void)
++{
++    if (gUnk_020004A4) {
++        struct ScriptUtilityReference reference;
++        s32 i;
++        Script_ReadReference(&reference);
++        if (gUnk_02000488) {
++            if (gUnk_02000488->state == 12)
++                Script_WriteReferenceValue(&reference, 0, 1);
++            else
++                Script_WriteReferenceValue(&reference, 0, 0);
++        } else
++            Script_WriteReferenceValue(&reference, 0, 0);
++        i = 0;
++        do {
++            struct ScenePanelSubject *subject;
++            Script_ReadReference(&reference);
++            subject = SCENE_PANEL_GLOBAL->subjects[i];
++            if (!subject || subject->state <= 1)
++                Script_WriteReferenceValue(&reference, 0, 0);
++            else if (subject->state == 4)
++                Script_WriteReferenceValue(&reference, 0, 4);
++            else
++                Script_WriteReferenceValue(&reference, 0, 2);
++            i++;
++        } while (i <= 3);
++    }
++}
++
++void ScenePanel_BeginArrivalRamp(void)
++{
++    struct ScenePanel *panel = SCENE_PANEL_GLOBAL;
++    if (panel) {
++        u8 *enabled = &panel->arrivalRampEnabled;
++        u32 zero = 0;
++        *enabled = 1;
++        SCENE_PANEL_GLOBAL->arrivalRampFrame = zero;
++    }
++}
++
++void ScenePanel_SetTransitionGate(void)
++{
++    struct ScenePanel *panel = SCENE_PANEL_GLOBAL;
++    if (panel)
++        panel->gateC12 = 1;
++}
++
++void ScenePanel_ClearTransitionGate(void)
++{
++    struct ScenePanel *panel = SCENE_PANEL_GLOBAL;
++    if (panel)
++        panel->gateC12 = 0;
++}
++
++void ScenePanel_DispatchCommands(struct ScenePanel *owner)
++{
++    struct ScenePanel *panel = (void *)owner;
++    struct ScenePanelReceiver *receiver = &((struct ScenePanel *)owner)->receiver;
++    s32 i = 0;
++    if (i < receiver->count[gUnk_0200047C->bank]) {
++        do {
++            struct ScenePanelCommandGlobals *globals = gUnk_0200047C;
++            struct ScenePanelCommand *command = receiver->commands[globals->bank][i];
++            SceneMessages_SetPendingTrigger(receiver, command);
++            switch (command->opcode) {
++                case 0:
++                    panel->savedMode = command->mode;
++                    Trigger_ConsumePending(receiver, 1);
++                    break;
++                case 1:
++                    ScenePanel_SetState((void *)panel, ScenePanel_BeginForwardSequence);
++                    Trigger_ConsumePending(receiver, 1);
++                    break;
++            }
++            i++;
++        } while (i < receiver->count[gUnk_0200047C->bank]);
++    }
++}
++
++void ScenePanel_UnregisterReceiver(struct ScenePanel *panel)
++{
++    SceneMessages_UnregisterReceiver(&panel->receiver);
++}
++
++void ScenePanel_RegisterReceiver(struct ScenePanel *panel)
++{
++    SceneMessages_RegisterReceiver(&panel->receiver, panel->actorId, 9);
++}
++
++/* ScenePanel_ClearGlobal: Clears the global panel pointer used by ScenePanel_IsPresent */
++
++#define ScenePanel_ClearGlobal sub_0805C754
++
++void ScenePanel_ClearGlobal(void)
++{
++    gUnk_020004A4 = NULL;
++}
++
++u32 ScenePanel_IsPresent(void)
++{
++    u32 present = (u32)gUnk_020004A4;
++    if (present != 0)
++        present = 1;
++    return present;
++}
++
++void ScenePanel_SelectMode(struct ScenePanel *panel)
++{
++    s32 mode;
++    if (panel->skipMainSprite == 0)
++        mode = gUnk_02000710->unk876;
++    else
++        mode = panel->savedMode;
++    panel->paletteMode = mode;
++}
++
++s32 ScenePanel_CountActiveSubjects(struct ScenePanel *panel)
++{
++    s32 active = 0;
++    s32 remaining = panel->subjectCount;
++    if (active < remaining) {
++        struct ScenePanelSubject **subject = panel->subjects;
++        do {
++            if ((*subject)->state == 4)
++                active++;
++            subject++;
++            remaining--;
++        } while (remaining != 0);
++    }
++    return active;
++}
++
++void ScenePanel_UpdateApproachSprite(struct ScenePanel *panel)
++{
++    if (panel->paletteMode && panel->activeCount &&
++        (panel->effectState == 10 || panel->effectState == 14)) {
++        u32 scale, offset;
++        struct ScenePanelAuxSprite *sprite = &panel->auxiliary;
++        sprite->flags &= ~1;
++        sprite->frame = 1;
++        gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
++        offset = gUnk_03005308 * 2;
++        scale = *(const u16 *)(offset + (u32)gUnk_0203B400);
++        scale &= 15;
++        scale += 72;
++        panel->auxiliary.parameter9 = scale;
++        panel->auxiliary.parameter8 = scale;
++    } else
++        panel->auxiliary.flags |= 1;
++}
++
++void ScenePanel_SubmitPlayerMidpoint(struct ScenePanel *panel)
++{
++    struct ScenePanelInteractionPackedPosition position;
++    struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
++    position.x = ((u32)(player->position.x + panel->origin.x) << 15) >> 16;
++    position.y = (u16)player->position.y + 150;
++    position.z = ((u32)(player->position.z + panel->origin.z) << 15) >> 16;
++    sub_08225F88(&position);
++}
++
++s32 ScenePanel_TickLifecycle(struct ScenePanel *parent)
++{
++    u32 playerKind;
++    ScenePanel_DispatchCommands((void *)parent);
++    ScenePanel_SelectMode((void *)parent);
++    parent->activeCount = ScenePanel_CountActiveSubjects((void *)parent);
++    playerKind = SCENE_PANEL_PLAYER->kindValue;
++    if (playerKind == 4)
++        return 0;
++    if (parent->initialMode == 1 && parent->effectState != 14 && playerKind == 1 &&
++        !gUnk_02000710->unk618) {
++        ScenePanel_SetEffectState((void *)parent, 14);
++        ScenePanelRig_SetState(&parent->rig, 9);
++        ScenePanel_NoOpAction((void *)parent);
++        ScenePanel_CallPendingScript((void *)parent, 8);
++    }
++    gUnk_08605ABC[parent->effectState]((void *)parent);
++    if (parent->initialMode == 0)
++        ScenePanel_UpdatePaletteState((void *)parent);
++    else {
++        ScenePanel_TickRig((void *)parent);
++        ScenePanel_SubmitPlayerMidpoint((void *)parent);
++        ScenePanel_DrawBackgroundLayers((void *)parent);
++        ScenePanel_LoadModePalette((void *)parent);
++        ScenePanel_UpdateApproachSprite((void *)parent);
++        if (parent->activated) {
++            if (!parent->skipMainSprite) {
++                if (gUnk_02000710->unk618 == 0) {
++                    if (parent->warningSounds[2])
++                        Sound_PlaySong(parent->warningSounds[2]);
++                } else {
++                    if (parent->warningSounds[parent->warningStage])
++                        Sound_PlaySong(parent->warningSounds[parent->warningStage]);
++                }
++                Sound_PlaySong(0x29B);
++            }
++            parent->activated = 0;
++        }
++    }
++    /* The non-void callback preserves the original fall-through return ABI. */
++    ScenePanel_UpdateParticles((void *)parent);
++}
++
++s32 ScenePanel_DestroyLifecycle(struct ScenePanel *parent)
++{
++    if (parent->initialMode == 0) {
++        if (parent->paletteSprite.active)
++            Sprite_Remove(&parent->paletteSprite);
++    } else {
++        ScenePanelRig_RemoveSprites(&parent->rig);
++        Sprite_Remove(&parent->auxiliary);
++        Bg_SetPriority(1, 1);
++    }
++    ScenePanel_DestroyParticles((void *)parent);
++    ScenePanel_UnregisterReceiver((void *)parent);
++    gUnk_020004A4 = 0;
++    return 0;
++}
++
++s32 ScenePanel_InitializeLifecycle(struct ScenePanel *parent)
++{
++    s32 found = Script_SeekToKeyword('d');
++    if (found)
++        parent->skipMainSprite = Script_GetValue();
++    else
++        parent->skipMainSprite = found;
++    {
++        struct ScenePanelInteractionPlayer *player = SCENE_PANEL_PLAYER;
++        parent->savedPlayer = player;
++    }
++    parent->savedTether = gUnk_02000488;
++    ScenePanel_InitAnchorPositions((void *)parent);
++    ScenePanel_ReadInitialMode((void *)parent);
++    if (Script_SeekToKeyword('n'))
++        parent->subjectCount = Script_GetValue();
++    else
++        parent->subjectCount = 4;
++    ScenePanel_CreateSubjects((void *)parent);
++    ScenePanel_InitializeInteraction((void *)parent);
++    ScenePanel_InitParticles((void *)parent);
++    ScenePanel_InitTimePalette((void *)parent);
++    ScenePanel_InitScriptProperty((void *)parent);
++    ScenePanel_RegisterReceiver((void *)parent);
++    {
++        s32 mode = gUnk_02000710->unk876;
++        parent->paletteMode = mode;
++    }
++    gUnk_020004A4 = (void *)parent;
++    return 0;
++}
++
++struct ScenePanel *ScenePanel_Create(u32 actorId)
++{
++    struct ScenePanel *panel;
++    if (gUnk_020004A4)
++        return gUnk_020004A4;
++    panel = Task_Create(9, 0x17E4);
++    if (panel) {
++        Task_SetCallbacks(panel, (void (*)(void *))ScenePanel_TickLifecycle,
++                          (void (*)(void *))ScenePanel_DestroyLifecycle);
++        panel->actorId = actorId;
++        if (ScenePanel_InitializeLifecycle((void *)panel) < 0) {
++            Task_Kill(panel);
++            return NULL;
++        }
++    }
++    return panel;
++}
+-- 
+2.39.3 (Apple Git-145)
+

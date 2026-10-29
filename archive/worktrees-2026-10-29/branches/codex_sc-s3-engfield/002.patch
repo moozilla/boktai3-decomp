@@ -1,0 +1,49 @@
+From e29aa3c087e4bd1c53be82b853c77a7ae5df0b1d Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 02:59:03 -0700
+Subject: [PATCH] Add a seek objective for allocation-dependent skeleton
+ differences
+
+Allow shape-guided searches to ignore duplicate literal and frame differences once source semantics are understood. The default determined-facts gate remains unchanged.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/seek/seek.py | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/tools/seek/seek.py b/tools/seek/seek.py
+index ae9fea74d..87cefab9e 100644
+--- a/tools/seek/seek.py
++++ b/tools/seek/seek.py
+@@ -493,6 +493,8 @@ def rank(n):
+     if n.get("match"):
+         return (0, 0, 0, 0)
+     mode = OBJECTIVE["mode"]
++    if mode == "shape":
++        return (0, cost, k[1], k[0])
+     if mode == "rotation" and n.get("rot"):
+         r = n["rot"]  # [diff after the best single shift, K, D]
+         return (k[0], r[0], r[2] if r[0] == 0 else 99, cost)
+@@ -1012,7 +1014,7 @@ def main():
+     p.add_argument("--fam")
+     p.add_argument("--lines")
+     p.add_argument("--top", type=int, default=10)
+-    p.add_argument("--objective", choices=["rotation"])
++    p.add_argument("--objective", choices=["rotation", "shape"])
+     p.set_defaults(go=cmd_expand)
+     p = sub.add_parser("run")
+     p.add_argument("nodes", nargs="*")
+@@ -1022,8 +1024,8 @@ def main():
+     p.add_argument("--slack", type=int, help="explore children up to this much worse (shape+diff) than the "
+                    "best (default max(4, diff/8))")
+     p.add_argument("--depth", type=int, default=6, help="moves stacked on a node at most")
+-    p.add_argument("--objective", choices=["rotation", "block"], help="rotation: rank by the reload spill "
+-                   "shift still needed (AGBCC_SPILL=K:D); block: by one ROM block's cost (--block)")
++    p.add_argument("--objective", choices=["rotation", "block", "shape"], help="rotation: rank by the reload spill "
++                   "shift still needed (AGBCC_SPILL=K:D); shape: ignore allocation-dependent skeleton facts; block: by one ROM block's cost (--block)")
+     p.add_argument("--rot-max", type=int, help="rotation: test shifts on children with at most this diff")
+     p.add_argument("--block", type=int, help="work on one ROM block (its number in the block map): moves only on "
+                    "the C lines that produce it, ranked by its own cost first")
+-- 
+2.39.3 (Apple Git-145)
+

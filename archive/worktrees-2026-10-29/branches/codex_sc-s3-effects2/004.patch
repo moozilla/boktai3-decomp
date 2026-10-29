@@ -1,0 +1,49 @@
+From 4c84ce8d479291e2b31331c5460fef79c9759135 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 05:30:46 -0700
+Subject: [PATCH] Distinguish loop counter eligibility from actual elimination
+
+Do not report loop.c's preliminary can-be-eliminated message as a completed transformation. Parse the actual was-eliminated message and show unreduced derived values blocking an eligible counter. Verified the reverse zero-fill case identifies its zero-benefit scale expression as the blocker.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/scope/scope.py | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/tools/scope/scope.py b/tools/scope/scope.py
+index ba9e12ce2..f9d13adba 100644
+--- a/tools/scope/scope.py
++++ b/tools/scope/scope.py
+@@ -4400,12 +4400,12 @@ def cmd_giv(src, func, env):
+         if m:
+             cur["bivs"][m.group(1)] = dict(init=m.group(3).strip(), fate="")
+             continue
+-        m = re.match(r"(?:Cannot eliminate biv (\d+)(.*)|biv (\d+) can be eliminated)", ln)
++        m = re.match(r"(?:Cannot eliminate biv (\d+)(.*)|biv (\d+) (can be|was) eliminated)", ln)
+         if m:
+             r = m.group(1) or m.group(3)
+             b = cur["bivs"].setdefault(r, dict(init="?", fate=""))
+             if m.group(3):
+-                b["fate"] = "eliminated (counting only: the loop can run backwards)"
++                b["fate"] = "eligible for elimination" if m.group(4) == "can be" else "eliminated"
+             else:
+                 u = re.search(r"insn (\d+)", m.group(2) or "")
+                 b["fate"] = "kept" + (f": used at line {ln_of(u.group(1))} (insn {u.group(1)})" if u else "")
+@@ -4436,7 +4436,13 @@ def cmd_giv(src, func, env):
+         ls = sorted({ln_of(u) for u in list(L["givs"]) if ln_of(u) != "?"})
+         print(f"  loop insns {L['span'][0]}-{L['span'][1]} ({L['insns']} insns), givs on line(s) {', '.join(map(str, ls)) or '-'}:")
+         for r, b in L["bivs"].items():
+-            print(f"    biv  pseudo {r} from {b['init'][:40]}: {b['fate'] or 'kept'}")
++            fate = b['fate'] or 'kept'
++            if fate == "eligible for elimination":
++                blockers = [u for u, g in L["givs"].items()
++                            if g["biv"] == r and g["fate"].startswith("kept")]
++                if blockers:
++                    fate += "; blocked by unreduced giv(s) " + ", ".join(blockers)
++            print(f"    biv  pseudo {r} from {b['init'][:40]}: {fate}")
+         for uid, g in L["givs"].items():
+             if g["kind"] == "address" and g["benefit"] <= 0:
+                 continue  # an address used once: never worth it, never interesting
+-- 
+2.39.3 (Apple Git-145)
+

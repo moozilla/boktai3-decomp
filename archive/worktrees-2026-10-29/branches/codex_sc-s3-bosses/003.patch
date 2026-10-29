@@ -1,0 +1,84 @@
+From 18f4c88dad40982e45749f560abea05ab0428db7 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 05:02:05 -0700
+Subject: [PATCH] Allow scope and seek to compare a reviewed span containing
+ following routines
+
+SCOPE_TAIL=1 keeps following definitions in fork-server requests and includes their text in the candidate span. The ROM extent and byte comparison remain unchanged. This permits recovering an unlisted routine within an existing unit without editing shared symbol metadata.
+
+Validated normal and tail modes on a matched unit; both object placement and linker paths compare the recovered 632-byte two-routine candidate identically.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/scope/fast.py  | 10 +++++++---
+ tools/scope/scope.py |  5 ++++-
+ 2 files changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/tools/scope/fast.py b/tools/scope/fast.py
+index bd66b84c4..1fa8c0654 100644
+--- a/tools/scope/fast.py
++++ b/tools/scope/fast.py
+@@ -29,7 +29,8 @@ HELPER_CHARS = 12000  # longest unit-local stretch before FUNC sent with every r
+ 
+ def split_source(text, func_names):
+     """(prefix, suffix): the suffix starts at the definition of one of FUNC_NAMES.
+-    None when the text has no such definition or contains the marker byte."""
++    None when the text has no such definition or contains the marker byte.
++    SCOPE_TAIL=1 keeps following definitions for a reviewed ROM span with unlisted routines."""
+     if MARK in text:
+         return None
+     m = None
+@@ -53,7 +54,7 @@ def split_source(text, func_names):
+         start = back.end()
+     # and end the suffix with FUNC's body: agbcc compiles a function at a time, so what follows cannot
+     # change FUNC's code, and a big unit's later functions would otherwise compile with every variant
+-    end = body_end(text, m.end() - 1)
++    end = len(text) if os.environ.get("SCOPE_TAIL") == "1" else body_end(text, m.end() - 1)
+     return text[:start], text[start:end]
+ 
+ 
+@@ -180,6 +181,8 @@ def place(obj, own, rom_syms, address):
+     """Bytes of the function named in OWN (its names) from object OBJ, placed at ADDRESS.
+     Calls to other functions of the unit go to their ROM addresses (where the ROM has them),
+     so drafts of other sizes before or after FUNC do not move FUNC's call targets.
++    SCOPE_TAIL=1 includes following routines through the end of .text. It does not change the ROM
++    target extent or byte acceptance; use it only for a reviewed span containing those routines.
+     Returns (code, start offset in .text, the unit's function starts, unresolved names)."""
+     secs = elf_sections(obj)
+     text_i = next(i for i, s in enumerate(secs) if s["name"] == ".text")
+@@ -190,7 +193,8 @@ def place(obj, own, rom_syms, address):
+     start = next((v for v, n in funcs if n in own), None)
+     if start is None:
+         return None, None, funcs, ["no " + "/".join(own)]
+-    end = next((v for v, n in funcs if v > start), len(text))
++    end = (len(text) if os.environ.get("SCOPE_TAIL") == "1"
++           else next((v for v, n in funcs if v > start), len(text)))
+     base = address - start  # address of .text offset 0
+     local = {n: base + (v & ~1) + (v & 1) for n, v, sh, t in syms if sh == text_i and n}
+     local_funcs = {n for _, n in funcs} - set(own)
+diff --git a/tools/scope/scope.py b/tools/scope/scope.py
+index e5e777873..03f05bab3 100644
+--- a/tools/scope/scope.py
++++ b/tools/scope/scope.py
+@@ -381,6 +381,8 @@ def diagnostic_source(pre, own):
+     function, so FUNC's dumps are the same (checked with SCOPE_TRIM=0 against the whole unit); the
+     whole unit cost 2.3 s per compile in Nidhoggr_ApplyPartDamage's 4,000 lines. Data, declarations and
+     inline helpers stay. None when FUNC's definition is not found (compile the unit as it is)."""
++    if os.environ.get("SCOPE_TAIL") == "1":
++        return None  # a reviewed ROM span may include an unlisted following routine
+     import fast
+     parts = fast.split_source(pre, own)
+     if parts is None:
+@@ -518,7 +520,8 @@ def compile_draft_g(src, func, env=None):
+     if obj_name is None:
+         sys.exit(f"{func} is not in the object (functions: {', '.join(names)})")
+     start = next(v for v, n in syms if n == obj_name) & ~1
+-    end = next((v & ~1 for v, n in syms if (v & ~1) > start), len(whole))
++    end = (len(whole) if os.environ.get("SCOPE_TAIL") == "1"
++           else next((v & ~1 for v, n in syms if (v & ~1) > start), len(whole)))
+     base = syms[0][0] & ~1
+     _, addr, _ = inventory()
+     a = addr[rom_name(src, func)]
+-- 
+2.39.3 (Apple Git-145)
+

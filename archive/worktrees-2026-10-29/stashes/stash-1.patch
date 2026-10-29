@@ -1,0 +1,139 @@
+diff --git a/tools/scope/campaign.py b/tools/scope/campaign.py
+index 5677f7ce0..957583c9d 100644
+--- a/tools/scope/campaign.py
++++ b/tools/scope/campaign.py
+@@ -556,6 +556,15 @@ def cmd_submit(args):
+     is the workspace's, so landing merges it like a worker's result."""
+     import shutil
+     func, src = args[0], os.path.abspath(os.path.expanduser(args[1]))
++    # the build rejects a raw ROM-data address (it would not move with the data), so say so now,
++    # with the gen/data.s label to use, rather than at integrate
++    code = re.sub(r"/\*.*?\*/|//[^\n]*", "", open(src).read(), flags=re.S)
++    raw = sorted({m.group(1).upper() for m in re.finditer(r"\b0[xX]0?([89][0-9A-Fa-f]{6})\b", code)
++                  if int(m.group(1), 16) >= 0x0824DAFC})
++    if raw:
++        sys.exit(f"{func}: not submitted: raw ROM data address(es) {', '.join('0x0' + a for a in raw)}. Use the "
++                 f"gen/data.s label instead, e.g. `extern const u8 gUnk_0{raw[0]}[];` and `gUnk_0{raw[0]}` "
++                 f"(cast it to the type you need).")
+     wd = os.path.join(CAMP, func)
+     os.makedirs(wd, exist_ok=True)
+     env = {k: v for k, v in os.environ.items() if k != "SCOPE_RUN"}
+@@ -608,6 +617,14 @@ def mismatch_files(tree, out, touched):
+             c = row.split(",")
+             if len(c) > 1 and re.fullmatch(r"[0-9A-Fa-f]{8}", c[0]):
+                 starts.append((int(c[0], 16), c[1]))
++    # a size change moves everything after it, so the first difference is often a far-off pointer;
++    # the layout check names the first moved function, and the culprit is the one just before it
++    moved = re.search(r"layout shifted: (\w+) is not at its original address", out)
++    if moved:
++        at = re.fullmatch(r"sub_([0-9A-Fa-f]{8})", moved.group(1))
++        at = int(at.group(1), 16) if at else next((a for a, n in starts if n == moved.group(1)), None)
++        if at:
++            addr = at - 1
+     before = [s for s in starts if s[0] <= addr]
+     if not before:
+         return set()
+diff --git a/tools/scope/land.py b/tools/scope/land.py
+index 78b846b2f..cee7c71d9 100644
+--- a/tools/scope/land.py
++++ b/tools/scope/land.py
+@@ -274,9 +274,29 @@ def wrap_nonmatching(text, func, asm_name, fuzzy, shape=None):
+     sp = definition_span(text, func)
+     if not sp:
+         return None
+-    body = text[sp[0]:sp[1]].rstrip("\n") + "\n"
++    # A non-inline static helper only FUNC uses would still be emitted by the default build and
++    # shift every later address, so it moves into the block with FUNC.
++    spans = {func: sp}
++    for name in re.findall(r"^static\s+(?![^\n(]*\binline\b)[^\n;=(]*?\b(\w+)\s*\([^;{]*\)\s*\{", text, re.M):
++        if name != func and definition_span(text, name):
++            spans[name] = definition_span(text, name)
++    private = set(spans) - {func}
++    while True:
++        inside = [spans[n] for n in private | {func}]
++        leaked = {n for n in private
++                  if any(not any(a <= m.start() < b for a, b in inside)
++                         for m in re.finditer(r"\b%s\b" % re.escape(n), text))}
++        if not leaked:
++            break
++        private -= leaked
++    moved = sorted([spans[n] for n in private], key=lambda s: s[0])
++    body = "".join(text[a:b].rstrip("\n") + "\n\n" for a, b in moved) + text[sp[0]:sp[1]].rstrip("\n") + "\n"
+     note = f"// fuzzy: {fuzzy:.1f}%\n" + (f"// scope shape {shape} (differences once low registers are set aside)\n"
+                                            if shape else "")
+     block = (f"#ifdef NONMATCHING\n{note}{body}#else\n"
+              f'INCLUDE_ASM("asm/nonmatching", {asm_name});\n#endif\n')
+-    return text[:sp[0]] + block + text[sp[1]:]
++    out, at = "", 0
++    for a, b in sorted(moved + [sp]):
++        out += text[at:a] + (block if (a, b) == sp else "")
++        at = b
++    return out + text[at:]
+diff --git a/tools/scope/scope.py b/tools/scope/scope.py
+index d387ed1d4..149c5c70a 100644
+--- a/tools/scope/scope.py
++++ b/tools/scope/scope.py
+@@ -1966,10 +1966,26 @@ def score(src, func, env, full=False):
+ def shape_distance(rom, mine):
+     """Insns to delete or insert to turn the draft into the ROM with low registers blanked: what is left
+     once register choice is set aside (order and instruction shape). A moved block costs twice its length."""
+-    a = [norm_insn(r[3]) for r in rom]
+-    b = [norm_insn(r[3]) for r in mine]
+-    same = sum(n for _, _, n in difflib.SequenceMatcher(None, a, b, autojunk=False).get_matching_blocks())
+-    return len(a) + len(b) - 2 * same
++    # a branch's offset moves with every size difference before it (the diff shows those as moved
++    # targets, not differences), so only its kind counts here
++    a = [re.sub(r"func\+0x[0-9A-Fa-f]+", "func+X", norm_insn(r[3])) for r in rom]
++    b = [re.sub(r"func\+0x[0-9A-Fa-f]+", "func+X", norm_insn(r[3])) for r in mine]
++    return len(a) + len(b) - 2 * lcs_length(a, b)
++
++
++def lcs_length(a, b):
++    """Longest common subsequence of A and B (bit-parallel, Hyyro 2004). SequenceMatcher's greedy
++    longest-block pairing misses most of the alignment in a long, repetitive listing, which made a
++    fuller draft of a big function score worse than a skeleton."""
++    masks = {}
++    for i, x in enumerate(a):
++        masks[x] = masks.get(x, 0) | (1 << i)
++    full = (1 << len(a)) - 1
++    v = full
++    for y in b:
++        u = v & masks.get(y, 0)
++        v = ((v + u) | (v - u)) & full
++    return len(a) - bin(v).count("1")
+ 
+ 
+ def count_text(rows):
+@@ -3353,8 +3369,17 @@ def put_definition(src, snippet, func):
+     if not sp:
+         sys.exit(f"{func}: no definition in {src} to replace (`new` writes one)")
+     start = pat.search(text, sp[0]).start()
+-    have = set(re.findall(r"^#include .*$", text, re.M))
+-    new = "".join(ln for ln in new.splitlines(True) if ln.rstrip("\n") not in have)
++    # #include and other directives the unit has already are dropped (a #define replaces the old one below)
++    have = set(re.findall(r"^#(?!define\b).*$", text, re.M))
++    new = "".join(ln for ln in new.splitlines(True) if not (ln.startswith("#") and ln.rstrip("\n") in have))
++    # a prototype of FUNC in the unit takes the definition's signature, so a changed type compiles
++    header = re.sub(r"\s+", " ", new[pat.search(new).start():new.index("{", pat.search(new).start())]).strip()
++    proto = re.compile(r"^(?!static\b)[A-Za-z_][^\n;=(){}]*\b%s\s*\([^;{}]*\)\s*;" % re.escape(func), re.M)
++    text = proto.sub(lambda m: re.sub(r"^static\s+", "", header) + ";", text[:start]) + text[start:]
++    sp = land.definition_span(text, func)
++    start = pat.search(text, sp[0]).start()
++    # a macro the snippet #defines replaces an earlier put's #define of it
++    macros = set(re.findall(r"^#define\s+(\w+)", new, re.M))
+     # a helper or type the snippet defines replaces the same-named one an earlier put left between the
+     # previous definition and FUNC (re-putting an edited snippet would otherwise redefine it)
+     # the gap starts after the previous function definition that is not a static helper
+@@ -3374,7 +3399,11 @@ def put_definition(src, snippet, func):
+             dropped.append(n)
+             pos = b
+     kept.append(gap[pos:])
+-    gap = re.sub(r"\n{3,}", "\n\n", "".join(kept))
++    gap = "".join(kept)
++    for name in macros:
++        gap, n = re.subn(r"^#define\s+%s\b(?:[^\n]*\\\n)*[^\n]*\n?" % re.escape(name), "", gap, flags=re.M)
++        dropped += [name] * bool(n)
++    gap = re.sub(r"\n{3,}", "\n\n", gap)
+     open(path, "w").write(text[:prev_end] + gap + new.strip("\n") + "\n" + text[sp[1]:])
+     print(f"{func}: {src}: definition replaced with {snippet}"
+           + (f" (replacing the earlier {', '.join(sorted(set(dropped)))})" if dropped else ""))

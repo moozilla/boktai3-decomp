@@ -1,0 +1,4169 @@
+From 7e4e71c6743f4247d5170d1d86086dfe0cfbe5f7 Mon Sep 17 00:00:00 2001
+From: Moozilla <moozilla@protonmail.com>
+Date: Mon, 19 Oct 2026 02:16:22 -0700
+Subject: [PATCH] Unit script_virtual_machine: merge 86 files into
+ src/script_virtual_machine.c
+
+Script virtual machine (0821A454-0821BAFC); tools/unitize.py, build OK, matched bytes 995718 -> 995718.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ include/game_state.h                 |    8 +
+ include/script_virtual_machine.h     |  174 ++++
+ notes/script_virtual_machine.md      |  135 +++
+ src/fn/Script_DecodeOperand.c        |  105 --
+ src/fn/sub_0806E130.c                |    6 +-
+ src/fn/sub_080764C8.c                |    6 +-
+ src/fn/sub_08080984.c                |    6 +-
+ src/fn/sub_0813C5B4.c                |    2 +-
+ src/fn/sub_0817A57C.c                |    2 +-
+ src/fn/sub_0821A454.c                |   15 -
+ src/fn/sub_0821A490.c                |   17 -
+ src/fn/sub_0821A4E8.c                |   21 -
+ src/fn/sub_0821A520.c                |   73 --
+ src/fn/sub_0821A66C.c                |   23 -
+ src/fn/sub_0821A6C0.c                |   10 -
+ src/fn/sub_0821A894.c                |   13 -
+ src/fn/sub_0821A8A4.c                |   21 -
+ src/fn/sub_0821A8C8.c                |   14 -
+ src/fn/sub_0821A8DC.c                |   18 -
+ src/fn/sub_0821A908.c                |   13 -
+ src/fn/sub_0821A91C.c                |   13 -
+ src/fn/sub_0821A930.c                |   13 -
+ src/fn/sub_0821A940.c                |   10 -
+ src/fn/sub_0821A950.c                |   10 -
+ src/fn/sub_0821A960.c                |    6 -
+ src/fn/sub_0821A96C.c                |   22 -
+ src/fn/sub_0821A9B8.c                |   21 -
+ src/fn/sub_0821AA00.c                |    9 -
+ src/fn/sub_0821AA1C.c                |   16 -
+ src/fn/sub_0821AA50.c                |   16 -
+ src/fn/sub_0821AA88.c                |   13 -
+ src/fn/sub_0821AAB0.c                |    6 -
+ src/fn/sub_0821AABC.c                |    8 -
+ src/fn/sub_0821AAD8.c                |    8 -
+ src/fn/sub_0821AB18.c                |    9 -
+ src/fn/sub_0821AB40.c                |    7 -
+ src/fn/sub_0821AB50.c                |   11 -
+ src/fn/sub_0821AB64.c                |   11 -
+ src/fn/sub_0821AB78.c                |    7 -
+ src/fn/sub_0821AB88.c                |    7 -
+ src/fn/sub_0821AB98.c                |    9 -
+ src/fn/sub_0821ABA8.c                |   10 -
+ src/fn/sub_0821ABCC.c                |    8 -
+ src/fn/sub_0821ABDC.c                |    6 -
+ src/fn/sub_0821ABE8.c                |    8 -
+ src/fn/sub_0821AC30.c                |   24 -
+ src/fn/sub_0821AC6C.c                |   21 -
+ src/fn/sub_0821ACB4.c                |   15 -
+ src/fn/sub_0821ACDC.c                |   15 -
+ src/fn/sub_0821AD08.c                |    9 -
+ src/fn/sub_0821AD2C.c                |   27 -
+ src/fn/sub_0821ADD4.c                |   14 -
+ src/fn/sub_0821AE04.c                |   39 -
+ src/fn/sub_0821AED0.c                |   11 -
+ src/fn/sub_0821AEDC.c                |   14 -
+ src/fn/sub_0821AF04.c                |   14 -
+ src/fn/sub_0821AF2C.c                |   42 -
+ src/fn/sub_0821AFB4.c                |   13 -
+ src/fn/sub_0821AFD8.c                |   16 -
+ src/fn/sub_0821B004.c                |   14 -
+ src/fn/sub_0821B028.c                |    9 -
+ src/fn/sub_0821B03C.c                |    6 -
+ src/fn/sub_0821B048.c                |   18 -
+ src/fn/sub_0821B078.c                |    6 -
+ src/fn/sub_0821B084.c                |   17 -
+ src/fn/sub_0821B0DC.c                |    9 -
+ src/fn/sub_0821B104.c                |   13 -
+ src/fn/sub_0821B148.c                |    9 -
+ src/fn/sub_0821B180.c                |    9 -
+ src/fn/sub_0821B1B8.c                |    9 -
+ src/fn/sub_0821B1DC.c                |    9 -
+ src/fn/sub_0821B1F4.c                |    8 -
+ src/fn/sub_0821B20C.c                |   36 -
+ src/fn/sub_0821B2B0.c                |   29 -
+ src/fn/sub_0821B34C.c                |   41 -
+ src/fn/sub_0821B3E4.c                |   28 -
+ src/fn/sub_0821B478.c                |   25 -
+ src/fn/sub_0821B4C8.c                |   23 -
+ src/fn/sub_0821B540.c                |   25 -
+ src/fn/sub_0821B5BC.c                |   30 -
+ src/fn/sub_0821B63C.c                |   28 -
+ src/fn/sub_0821B6B0.c                |    6 -
+ src/fn/sub_0821B6BC.c                |    6 -
+ src/fn/sub_0821B6C8.c                |   33 -
+ src/fn/sub_0821B738.c                |   24 -
+ src/fn/sub_0821B794.c                |   10 -
+ src/fn/sub_0821B7B0.c                |   28 -
+ src/fn/sub_0821B80C.c                |   17 -
+ src/fn/sub_0821B82C.c                |   20 -
+ src/fn/sub_0821B858.c                |   21 -
+ src/fn/sub_0821B8AC.c                |   27 -
+ src/fn/sub_0821B90C.c                |   17 -
+ src/fn/sub_0821B938.c                |   59 --
+ src/fn/sub_0821BA5C.c                |   56 --
+ src/script_virtual_machine.c         | 1362 ++++++++++++++++++++++++++
+ src/tether_actor.c                   |    2 +-
+ symbols/progress_extra_functions.csv |    3 +
+ symbols/progress_functions.csv       |    3 +
+ 98 files changed, 1698 insertions(+), 1617 deletions(-)
+ create mode 100644 include/script_virtual_machine.h
+ create mode 100644 notes/script_virtual_machine.md
+ delete mode 100644 src/fn/Script_DecodeOperand.c
+ delete mode 100644 src/fn/sub_0821A454.c
+ delete mode 100644 src/fn/sub_0821A490.c
+ delete mode 100644 src/fn/sub_0821A4E8.c
+ delete mode 100644 src/fn/sub_0821A520.c
+ delete mode 100644 src/fn/sub_0821A66C.c
+ delete mode 100644 src/fn/sub_0821A6C0.c
+ delete mode 100644 src/fn/sub_0821A894.c
+ delete mode 100644 src/fn/sub_0821A8A4.c
+ delete mode 100644 src/fn/sub_0821A8C8.c
+ delete mode 100644 src/fn/sub_0821A8DC.c
+ delete mode 100644 src/fn/sub_0821A908.c
+ delete mode 100644 src/fn/sub_0821A91C.c
+ delete mode 100644 src/fn/sub_0821A930.c
+ delete mode 100644 src/fn/sub_0821A940.c
+ delete mode 100644 src/fn/sub_0821A950.c
+ delete mode 100644 src/fn/sub_0821A960.c
+ delete mode 100644 src/fn/sub_0821A96C.c
+ delete mode 100644 src/fn/sub_0821A9B8.c
+ delete mode 100644 src/fn/sub_0821AA00.c
+ delete mode 100644 src/fn/sub_0821AA1C.c
+ delete mode 100644 src/fn/sub_0821AA50.c
+ delete mode 100644 src/fn/sub_0821AA88.c
+ delete mode 100644 src/fn/sub_0821AAB0.c
+ delete mode 100644 src/fn/sub_0821AABC.c
+ delete mode 100644 src/fn/sub_0821AAD8.c
+ delete mode 100644 src/fn/sub_0821AB18.c
+ delete mode 100644 src/fn/sub_0821AB40.c
+ delete mode 100644 src/fn/sub_0821AB50.c
+ delete mode 100644 src/fn/sub_0821AB64.c
+ delete mode 100644 src/fn/sub_0821AB78.c
+ delete mode 100644 src/fn/sub_0821AB88.c
+ delete mode 100644 src/fn/sub_0821AB98.c
+ delete mode 100644 src/fn/sub_0821ABA8.c
+ delete mode 100644 src/fn/sub_0821ABCC.c
+ delete mode 100644 src/fn/sub_0821ABDC.c
+ delete mode 100644 src/fn/sub_0821ABE8.c
+ delete mode 100644 src/fn/sub_0821AC30.c
+ delete mode 100644 src/fn/sub_0821AC6C.c
+ delete mode 100644 src/fn/sub_0821ACB4.c
+ delete mode 100644 src/fn/sub_0821ACDC.c
+ delete mode 100644 src/fn/sub_0821AD08.c
+ delete mode 100644 src/fn/sub_0821AD2C.c
+ delete mode 100644 src/fn/sub_0821ADD4.c
+ delete mode 100644 src/fn/sub_0821AE04.c
+ delete mode 100644 src/fn/sub_0821AED0.c
+ delete mode 100644 src/fn/sub_0821AEDC.c
+ delete mode 100644 src/fn/sub_0821AF04.c
+ delete mode 100644 src/fn/sub_0821AF2C.c
+ delete mode 100644 src/fn/sub_0821AFB4.c
+ delete mode 100644 src/fn/sub_0821AFD8.c
+ delete mode 100644 src/fn/sub_0821B004.c
+ delete mode 100644 src/fn/sub_0821B028.c
+ delete mode 100644 src/fn/sub_0821B03C.c
+ delete mode 100644 src/fn/sub_0821B048.c
+ delete mode 100644 src/fn/sub_0821B078.c
+ delete mode 100644 src/fn/sub_0821B084.c
+ delete mode 100644 src/fn/sub_0821B0DC.c
+ delete mode 100644 src/fn/sub_0821B104.c
+ delete mode 100644 src/fn/sub_0821B148.c
+ delete mode 100644 src/fn/sub_0821B180.c
+ delete mode 100644 src/fn/sub_0821B1B8.c
+ delete mode 100644 src/fn/sub_0821B1DC.c
+ delete mode 100644 src/fn/sub_0821B1F4.c
+ delete mode 100644 src/fn/sub_0821B20C.c
+ delete mode 100644 src/fn/sub_0821B2B0.c
+ delete mode 100644 src/fn/sub_0821B34C.c
+ delete mode 100644 src/fn/sub_0821B3E4.c
+ delete mode 100644 src/fn/sub_0821B478.c
+ delete mode 100644 src/fn/sub_0821B4C8.c
+ delete mode 100644 src/fn/sub_0821B540.c
+ delete mode 100644 src/fn/sub_0821B5BC.c
+ delete mode 100644 src/fn/sub_0821B63C.c
+ delete mode 100644 src/fn/sub_0821B6B0.c
+ delete mode 100644 src/fn/sub_0821B6BC.c
+ delete mode 100644 src/fn/sub_0821B6C8.c
+ delete mode 100644 src/fn/sub_0821B738.c
+ delete mode 100644 src/fn/sub_0821B794.c
+ delete mode 100644 src/fn/sub_0821B7B0.c
+ delete mode 100644 src/fn/sub_0821B80C.c
+ delete mode 100644 src/fn/sub_0821B82C.c
+ delete mode 100644 src/fn/sub_0821B858.c
+ delete mode 100644 src/fn/sub_0821B8AC.c
+ delete mode 100644 src/fn/sub_0821B90C.c
+ delete mode 100644 src/fn/sub_0821B938.c
+ delete mode 100644 src/fn/sub_0821BA5C.c
+ create mode 100644 src/script_virtual_machine.c
+
+diff --git a/include/game_state.h b/include/game_state.h
+index f0e8190e8a..92d0777589 100644
+--- a/include/game_state.h
++++ b/include/game_state.h
+@@ -162,4 +162,12 @@ struct GameState {
+ 
+ extern struct GameState *gUnk_02000710;
+ 
++/* Backup of gUnk_02000710, and the active/backup pair of the shared
++ * script-variable region (0x400 bytes each); gUnk_02000700 is the separate,
++ * unbacked local-variable region. Selected together by GameState_SelectRamBase. */
++extern u8 *gUnk_0200070C;
++extern u8 *gUnk_02000708;
++extern u8 *gUnk_02000704;
++extern u8 *gUnk_02000700;
++
+ #endif
+diff --git a/include/script_virtual_machine.h b/include/script_virtual_machine.h
+new file mode 100644
+index 0000000000..757899dc95
+--- /dev/null
++++ b/include/script_virtual_machine.h
+@@ -0,0 +1,174 @@
++#ifndef GUARD_SCRIPT_VIRTUAL_MACHINE_H
++#define GUARD_SCRIPT_VIRTUAL_MACHINE_H
++
++/*
++ * The GCL bytecode interpreter: operand decoding, the argument/keyword stacks,
++ * native command dispatch, procedure lookup and the postfix expression
++ * evaluator. Built from field offsets seen across src/fn/*.c; names are
++ * provisional. See docs/ASSETS.md for the bytecode format.
++ */
++
++#include "global.h"
++#include "engine.h"
++#include "script_reference.h"
++#include "script_utility.h"
++
++/* Resolved section base pointers from the loaded script header (gUnk_02000448):
++ * 0 unknown/adjacent to the proc table, 1 string offset table (4-byte records,
++ * see Text_LookupString), 2 string data base, 3 a fourth resource (guess). */
++extern u8 *gUnk_02000448[4];
++
++/* The currently loaded script's procedure table (gUnk_02000438). `entries` holds
++ * one packed word per procedure: low 24 bits an offset from `body`, high byte
++ * metadata (returned by Script_GetProcedure). `mainBlock` is the bytecode run
++ * when no entry procedure is selected (Script_RunMainBlock). */
++struct ScriptProcedureTable {
++    u32 *entries;
++    u32 count;
++    u8 *body;
++    u8 *mainBlock;
++};
++extern struct ScriptProcedureTable gUnk_02000438;
++
++/* A registered table of native script commands (gUnk_02000458 is the head of
++ * the list). Script_ExecuteNativeCommand looks a command id up by key and
++ * invokes its callback. */
++struct ScriptCommandEntry {
++    u32 key;
++    void *callback;
++};
++struct ScriptCommandTable {
++    struct ScriptCommandTable *next;
++    s32 count;
++    struct ScriptCommandEntry *entries;
++};
++extern struct ScriptCommandTable *gUnk_02000458;
++
++/* Interpreter state (gUnk_02000610). `stack` backs both the keyword/control
++ * stack (growing up from its base, via keywordSp) and the call argument stack
++ * (growing up from stack + 25, via argSp) -- the two are never deep at once. */
++struct ScriptVm {
++    u8 *pc;
++    u32 result;
++    u32 *keywordSp;
++    u32 stack[24];
++    u32 *argSp;
++};
++extern struct ScriptVm gUnk_02000610;
++
++/* ---- Resource lookup (archive keyed by extension/name hash pair) -------- */
++
++s32 Script_FindResourceKey(u32 key, u16 *keys, s32 context, s32 lo, s32 hi);
++u8 *Script_LookupResource(u8 *base, u32 unused, u16 key, u16 context);
++
++struct ScriptArchiveEntry {
++    u32 key, value;
++};
++u32 Script_LookupArchive(u32 key, struct ScriptArchiveEntry *table, s32 lo, s32 hi);
++
++/* ---- Operand and packet decoding ---------------------------------------- */
++
++u8 *Script_DecodeOperand(u8 *p, s32 *type, s32 *value);
++u8 *Script_DecodePacket(u8 *p, u32 *length);
++u8 *Script_DecodeCommandOffset(u8 *p, u32 *offset);
++
++/* ---- Argument stack (call arguments for the current procedure) --------- */
++
++void Script_ResetArgumentStack(void);
++u32 *Script_PushArgumentFrame(u32 args, u32 count);
++void Script_RestoreArgumentStack(u32 *saved);
++u32 Script_GetCallArgument(s32 index);
++u32 Script_GetStackArgument(s32 index);
++void Script_SetStackArgument(s32 index, u32 value);
++
++/* ---- Keyword/control stack (nested command and if/switch scopes) ------- */
++
++void Script_ResetKeywordStack(void);
++void Script_PushCtrlNextKeyword(u32 pc);
++void Script_PopCtrlNextKeyword(void);
++
++void Script_ResetStacks(void);
++
++/* ---- Script cursor (gUnk_02000610.pc) ----------------------------------- */
++
++void Script_SetPc(u8 *p);
++/* Script_SeekToKeyword, Script_GetPc, Script_ParseStringRef, Script_GetKeywordValue: engine.h */
++s32 Script_ReadNextKeyword(void);
++
++/* ---- Value and reference reading at the cursor -------------------------- */
++
++/* Script_ReadValue: script_utility.h */
++s32 Script_ReadVector32(u8 *p, s32 *destination);
++s32 Script_ReadVector16(u8 *p, s16 *destination);
++u32 Script_ReadValueSafe(u8 *p);
++u32 Script_ReadString(u8 *p);
++void Script_ReadReference(struct ScriptUtilityReference *ref);
++
++u32 Script_GetValueSafe(void);
++
++/* ---- Native command tables ----------------------------------------------- */
++
++void Script_ClearCommandTables(void);
++u32 Script_RegisterCommandTable(struct ScriptCommandTable *table);
++struct ScriptCommandEntry *Script_FindCommand(u32 key);
++u8 *Script_ExecuteNativeCommand(u8 *p);
++void Script_RegisterBuiltinCommands(void);
++
++/* ---- Procedures ----------------------------------------------------------- */
++
++u32 *Script_ReadProcTable(u32 *p, u32 *count);
++u8 *Script_GetProcedure(u32 id, u32 *metadata);
++s32 Script_LoadScript(u8 *p);
++
++/* ---- Block execution -------------------------------------------------------- */
++
++u32 Script_ExecuteBlock(u8 *p, u32 args, u32 count);
++/* Script_RunBlock: script_utility.h */
++u32 Script_RunProcedureBlock(u32 a, const u8 *b, u32 c);
++void Script_RunMainBlock(void);
++s32 Script_DiscardValueIfZero(void);
++void Script_SetEntryProcedure(u16 id);
++void Script_InitRuntime(void);
++void Script_ResetLocalVariables(void);
++
++/* ---- Game-state and script-variable regions ------------------------------ */
++
++void GameState_SelectRamBase(void);
++void GameState_ClearActiveRegions(void);
++void GameState_ResetActiveRegions(void);
++void GameState_BackupActiveRegions(void);
++void GameState_RestoreActiveRegions(void);
++void GameState_BackupRegionRange(u8 *p, u32 n);
++u8 *GameState_GetBackupRegionPointer(u8 *p);
++u8 *GameState_GetBackupStateBase(void);
++u8 *GameState_GetBackupVariableBase(void);
++
++void Script_ClearLocalVariables(void);
++
++/* ---- Script variables ------------------------------------------------------ */
++
++void Script_ReadTypedVariable(u8 *base, s32 descriptor, s32 index, s32 *value);
++void Script_WriteTypedVariable(u8 *base, s32 descriptor, s32 index, s32 value);
++u8 *Script_DecodeVariableValue(u8 *p, s32 *type, s32 *value);
++u8 *Script_AssignVariableOperand(u8 *p, s32 value);
++u8 *Script_DecodeVariableReference(u8 *p, struct ScriptUtilityReference *ref);
++void Script_WriteReferenceValue(struct ScriptUtilityReference *ref, s32 index, s32 value);
++s32 Script_ReadReferenceValue(struct ScriptUtilityReference *ref, s32 index);
++u8 *Script_BackupVariableOperand(u8 *p);
++s32 Script_ReadBackupVariableOperand(u8 *p);
++
++/* ---- Control flow commands -------------------------------------------------- */
++
++void Script_ConvertTextToShiftJis(u8 *output, u8 *input);
++u8 *Script_SelectConditionalBlock(u8 *p);
++u32 Script_ExecuteIf(u8 *p);
++s32 Script_ExecuteSwitch(u8 *p);
++s32 Script_SetResultFromOperand(u8 *p);
++s32 Script_ExecuteReturn(void);
++s32 Script_ExecutePrint(u8 *p);
++s32 Script_CallFromOperands(void);
++
++s32 Script_ApplyOperator(u32 operation, s32 left, s32 right);
++u32 Script_EvalExpression(u8 *p);
++
++#endif
+diff --git a/notes/script_virtual_machine.md b/notes/script_virtual_machine.md
+new file mode 100644
+index 0000000000..9944777285
+--- /dev/null
++++ b/notes/script_virtual_machine.md
+@@ -0,0 +1,135 @@
++# Script virtual machine, merged unit
++
++Range **0821A454–0821BAFC**: the GCL bytecode interpreter proper (operand
++decoding, argument/keyword stacks, native-command dispatch, procedure lookup,
++the postfix expression evaluator, and the game-state/script-variable regions
++it reads and writes). All 89 functions in the range are exact; `src/fn/*.c`
++for this range is gone, replaced by `src/script_virtual_machine.c` with shared
++types in `include/script_virtual_machine.h`.
++
++## Header
++
++`include/script_virtual_machine.h` adds:
++
++* `struct ScriptVm` for `gUnk_02000610`: `pc`, `result` (last eval/call result,
++  read by callers of blocks), `keywordSp`/`stack[24]`/`argSp` — the keyword
++  (control) stack and the call-argument stack share the same backing array,
++  growing up from opposite ends (`argSp` resets to `stack + 25`).
++* `struct ScriptProcedureTable` for `gUnk_02000438` (the loaded script's
++  procedure table: entries, count, body base, main block) and
++  `u8 *gUnk_02000448[4]` for the loaded script's four resolved section
++  pointers (string table, string base, and two more).
++* `struct ScriptCommandTable` / `struct ScriptCommandEntry` for the native
++  command table linked list at `gUnk_02000458`.
++* Reused `struct ScriptUtilityReference` (`script_reference.h`) and
++  `struct ScriptUtilityArguments` (`script_utility.h`) — both already existed
++  for this exact object, declared by other units that call into this one.
++  `script_utility.h` also owns the external prototypes for `Script_ReadValue`
++  and `Script_RunBlock`, so this header does not redeclare them.
++* `include/engine.h` (included transitively) already declared
++  `Script_GetValue`, `Script_SeekToKeyword`, `Script_GetPc`,
++  `Script_ParseStringRef`, `Text_LookupString`, `Script_GetKeywordValue`,
++  `ScriptProc_Start` and `Script_Call` — reused as-is, not redeclared.
++* `include/game_state.h` gained four externs: `gUnk_0200070C`/`08`/`04`/`00`,
++  the backup game-state base, the active/backup shared script-variable region
++  and the (unbacked) local-variable region, alongside the existing
++  `gUnk_02000710`. They're set together by `GameState_SelectRamBase` and used
++  by one other, not-yet-merged function (`sub_0822BC6C`) outside this range.
++
++## Local adaptations
++
++* `gUnk_02000710` is `struct GameState *` (from `game_state.h`); this unit's
++  functions treat it as a raw byte region (`Memory_Clear`/`Memory_Copy`,
++  pointer subtraction, `+0x30`/`+0x744` offsets), so those call sites carry an
++  explicit `(u8 *)` cast. Confirmed by a temp test with agbcc that the cast
++  adds no instructions — it only changes what the C type checker is told.
++* `engine.h`'s declared types are occasionally wrong for *this* implementation
++  (established by diffing the merged build against this project's own agbcc,
++  not guessed): `Script_SeekToKeyword`'s real parameter is a byte (the
++  prologue zero-extends it) despite the `s32` prototype, and likewise
++  `Script_GetKeywordValue`'s first parameter. Narrowing the shared prototype
++  to `u8` would add truncation instructions at the ~300 other call sites across
++  the codebase that pass it a non-constant `int` (verified with a throwaway
++  agbcc test), so `engine.h` keeps `s32`; each function instead truncates its
++  own parameter into a local `u8` first (`u8 k = keyword;`), which reproduces
++  the real prologue without touching the shared prototype. Flagging this
++  rather than fixing it silently, per the worker brief.
++* Several "builtin command" handlers (`Script_ExecuteIf` and, it turns out,
++  two of the newly-named gap functions) are invoked indirectly through
++  `Callback_InvokeActor`/a stored function pointer with an argument the
++  original C never declared, relying on the register still holding the
++  caller's value. Since nothing in this unit calls them by name with a literal
++  argument count, they got a real declared parameter instead of the implicit
++  passthrough — cleaner and still byte-exact.
++* `Script_InitRuntime` is a genuine same-file register-passthrough: it calls
++  `ScriptProc_Start(0xA8D9, 0x49BC)` then falls into `Script_LoadScript` with
++  no argument, relying on r0 carrying the previous call's return value (visible
++  in the ROM: `bl ScriptProc_Start` is immediately followed by
++  `bl Script_LoadScript`, no register setup between). Giving `Script_LoadScript`
++  a real prototype (needed since its own definition appears earlier in the
++  merged file) makes a 0-argument call to it a hard compile error once both
++  are in one translation unit (confirmed: GCC/agbcc checks argument count
++  against any visible full prototype, even mid-file). The call is instead
++  written as `((s32 (*)())Script_LoadScript)();` — a cast to an
++  unprototyped function-pointer type, which agbcc compiles to the identical
++  bare `bl Script_LoadScript` (confirmed byte-identical) without tripping the
++  argument-count check. No register pin, no handwritten instructions.
++* `sub_0821AB78` is a byte-for-byte duplicate of `Script_GetValueSafe`
++  (0821AB88) kept as a separate ROM function; noted rather than merged away.
++
++## Gap functions found and added
++
++`tools/unit_files.py` found no gaps up front because these three were never
++flagged as functions at all — gbadisasm left them as `.byte` blobs with no
++inbound `bl` anywhere in `gen/code.s`/`code_sym.s` and no pointer evidence in
++`symbols/pointers.txt`. They surfaced only because merging shifted every
++later address and the whole-unit check stopped matching; each was found by
++bisecting the first wrong `bl` target back to a byte-identical gbadisasm
++dump, decoding it by hand (`arm-none-eabi-objdump -b binary -Mforce-thumb`),
++and writing C for it. All three are unreferenced by anything found so far
++(added to `symbols/progress_extra_functions.csv`, sorted; inventory refreshed
++with `tools/progress.py --refresh-inventory`):
++
++* **0821AAF4** (36 bytes): scans operands from a hidden cursor argument until
++  the terminating zero type, then clears the VM's PC. `Script_ReadNextKeyword`
++  with no keyword match, essentially.
++* **0821ABF8** (56 bytes): unlinks a node from the command-table list at
++  `gUnk_02000458` by pointer identity — the removal counterpart to
++  `Script_RegisterCommandTable`. Returns 0 if found in the middle, -1 if it
++  was the head or not found at all (a real quirk of the ROM code, not a
++  simplification: removing the head still falls through into the walk, which
++  can no longer find the now-detached node).
++* **0821AD98** (60 bytes): binary search by key over a `ScriptArchiveEntry`
++  table (same shape as `Script_LookupArchive`), but returns the entry pointer
++  itself rather than its value field.
++
++None of the three have a confirmed caller yet; whatever calls them (directly
++or through a pointer table) hasn't been identified. Left `sub_<ADDR>` names.
++
++## Surprises
++
++* The VM's keyword/control stack and its call-argument stack are the *same*
++  backing array (`gUnk_02000610.stack[24]`), growing from opposite ends — not
++  two separate stacks. `Script_ResetArgumentStack` sets `argSp = stack + 25`,
++  one word past the declared 24-element bound; harmless since it's pure
++  pointer arithmetic, not an indexed access, but worth flagging as a hint that
++  the real buffer may extend further than any one function's view shows.
++* Three agbcc behaviors were confirmed empirically with a scratch `.c` file
++  compiled directly against this worktree's pinned `agbcc` rather than assumed:
++  a full prototype in scope makes a too-few-arguments call a **hard error**
++  (not a warning) even when agbcc still happens to emit the desired bytes
++  (and `tools/build.py` treats that as a failed compile regardless); a
++  **type-only** mismatch at a call site (same argument count) is just a
++  warning; and a **definition** whose type disagrees with an already-visible
++  prototype is always a hard "conflicting types" error, for return type,
++  signedness or pointer type alike.
++
++## Process
++
++Roughly 90 `tools/check.py` iterations total: most functions needed one pass
++(the individually-matching `src/fn/*.c` files already existed; the work was
++retyping their ad hoc structs to the shared header and fixing the handful of
++prototype collisions above), the three gap functions took 2–4 iterations
++each, and the whole-unit check after merging took about 6 bisection rounds
++to find the two gaps that weren't visible function-by-function. One real
++build pending at batch integration; not run here per the worker brief.
+diff --git a/src/fn/Script_DecodeOperand.c b/src/fn/Script_DecodeOperand.c
+deleted file mode 100644
+index c02944b92c..0000000000
+--- a/src/fn/Script_DecodeOperand.c
++++ /dev/null
+@@ -1,105 +0,0 @@
+-#include "global.h"
+-u8 *Script_DecodeVariableValue(u8 *, s32 *, s32 *);
+-s32 Script_GetCallArgument(s32);
+-s32 Script_GetStackArgument(s32);
+-u8 *Script_DecodePacket(u8 *, u32 *);
+-s32 Script_EvalExpression(u8 *);
+-u8 *Text_LookupString(u16);
+-u8 *Script_DecodeOperand(u8 *p, s32 *type, s32 *value)
+-{
+-    u32 length;
+-    u8 *cursor = p;
+-    s32 opcode = *cursor;
+-    s32 family = opcode & 0xF0;
+-    if ((family & 0xC0) == 0xC0) {
+-        *type = 9;
+-        *value = (*cursor & ~0xC0) - 1;
+-        cursor++;
+-    } else if (!family) {
+-        *type = opcode;
+-        cursor++;
+-        switch (opcode) {
+-            case 0:
+-                cursor = 0;
+-                break;
+-            case 8: {
+-                s32 high = cursor[1] << 8;
+-                *value = cursor[0] | high;
+-                cursor += 2;
+-                break;
+-            }
+-            case 1: {
+-                s32 high = cursor[1] << 8;
+-                *value = (s16)(cursor[0] | high);
+-                cursor += 2;
+-                break;
+-            }
+-            case 9:
+-            case 10:
+-            case 13:
+-                *value = (cursor[3] << 24) | (cursor[2] << 16) | (cursor[1] << 8) | cursor[0];
+-                cursor += 4;
+-                break;
+-            case 6: {
+-                s32 high = cursor[1] << 8;
+-                *value = high | cursor[0];
+-                cursor += 2;
+-                break;
+-            }
+-            case 2:
+-            case 3:
+-            case 4:
+-                *value = *cursor++;
+-                break;
+-            case 7:
+-                *value = (s32)(cursor + 1);
+-                cursor += *cursor + 1;
+-                break;
+-            case 14: {
+-                s32 high = cursor[1] << 8;
+-                *value = (s32)Text_LookupString(cursor[0] | high);
+-                *type = 7;
+-                cursor += 2;
+-                break;
+-            }
+-        }
+-    } else {
+-        *type = family;
+-        switch (family) {
+-            case 0x10:
+-            case 0x20:
+-                return Script_DecodeVariableValue(p, type, value);
+-            case 0x40:
+-                if ((*cursor & 15) == 15) {
+-                    *value = Script_GetCallArgument(cursor[1] + 15);
+-                    cursor++;
+-                } else
+-                    *value = Script_GetCallArgument(*cursor & 15);
+-                *type = 9;
+-                cursor++;
+-                break;
+-            case 0x90:
+-                *value = Script_GetStackArgument(*cursor & 15);
+-                *type = 9;
+-                cursor++;
+-                break;
+-            case 0x80:
+-                cursor = Script_DecodePacket(cursor, &length);
+-                *value = (s32)cursor;
+-                cursor += length;
+-                break;
+-            case 0x30:
+-                cursor = Script_DecodePacket(cursor, &length);
+-                *value = Script_EvalExpression(cursor);
+-                cursor += length;
+-                break;
+-            case 0x50:
+-                cursor = Script_DecodePacket(cursor, &length);
+-                *type |= *cursor << 16;
+-                *value = (s32)(cursor + 1);
+-                cursor += length;
+-                break;
+-        }
+-    }
+-    return cursor;
+-}
+diff --git a/src/fn/sub_0806E130.c b/src/fn/sub_0806E130.c
+index 044163da97..1fd8af1538 100644
+--- a/src/fn/sub_0806E130.c
++++ b/src/fn/sub_0806E130.c
+@@ -30,9 +30,9 @@ s32 RouteSpritePool_Tick(struct RouteSpritePool *pool)
+             if (!Locked()) {
+                 i = 0;
+                 do {
+-                table = gUnk_08605BB0;
+-                state = (u32)&pool->slots[0].state;
+-                slot = start;
++                    table = gUnk_08605BB0;
++                    state = (u32)&pool->slots[0].state;
++                    slot = start;
+                 } while (0);
+                 for (; i < 4;) {
+                     if (Occupied(&pool->occupiedMask, i))
+diff --git a/src/fn/sub_080764C8.c b/src/fn/sub_080764C8.c
+index 9290b6e42f..199a7a3936 100644
+--- a/src/fn/sub_080764C8.c
++++ b/src/fn/sub_080764C8.c
+@@ -27,9 +27,9 @@ void SceneActorAnimation_SelectDirectionFlagsVariant(struct SceneActorAnimationV
+         }
+     }
+     do {
+-    variantReload = &directionVariant;
+-    mirrorValue = *mirrorPointer;
+-    entryFlags = entry->flags;
++        variantReload = &directionVariant;
++        mirrorValue = *mirrorPointer;
++        entryFlags = entry->flags;
+     } while (0);
+     selection = entry->value;
+     flags = mirrorValue | entryFlags;
+diff --git a/src/fn/sub_08080984.c b/src/fn/sub_08080984.c
+index 83f47ba2d4..87c2e13ec6 100644
+--- a/src/fn/sub_08080984.c
++++ b/src/fn/sub_08080984.c
+@@ -34,13 +34,15 @@ void SceneActorReaction_BeginReactionSound(struct SceneActorRegistryResetView *a
+                     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
+                     Sound_PlaySong(459);
+                     break;
+-        }
++            }
+             {
+                 u16 *timer = (u16 *)(((u8 *)actor) + 0x178);
+                 timerZero = 0;
+                 *timer = timerZero;
+             }
+-        } while (0);
++        }
++        while (0)
++            ;
+         if (actor->drawableKind == 0) {
+             u32 *sequence = actor->drawable;
+             u32 mask = timerZero - 2;
+diff --git a/src/fn/sub_0813C5B4.c b/src/fn/sub_0813C5B4.c
+index 01da607c15..c644232f64 100644
+--- a/src/fn/sub_0813C5B4.c
++++ b/src/fn/sub_0813C5B4.c
+@@ -55,7 +55,7 @@ void ConvergingEffects_EmitFarParticle(State *s, Point *pos)
+         angle = random_first() & 255;
+         radius = (random_first() & 127) + 256;
+         do {
+-        e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
++            e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
+         } while (0);
+         e->dy = scale(radius * gUnk_086149C4[angle]);
+         draw->pos = *pos;
+diff --git a/src/fn/sub_0817A57C.c b/src/fn/sub_0817A57C.c
+index 017026a411..7c0ff2be07 100644
+--- a/src/fn/sub_0817A57C.c
++++ b/src/fn/sub_0817A57C.c
+@@ -55,7 +55,7 @@ void SceneActors_SpawnConvergingParticle(State *s, Point *pos)
+         angle = random_first() & 255;
+         radius = (random_first() & 127) + 256;
+         do {
+-        e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
++            e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
+         } while (0);
+         e->dy = scale(radius * gUnk_086149C4[angle]);
+         draw->pos = *pos;
+diff --git a/src/fn/sub_0821A454.c b/src/fn/sub_0821A454.c
+deleted file mode 100644
+index 99d1e71ec0..0000000000
+--- a/src/fn/sub_0821A454.c
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#include "global.h"
+-s32 Script_FindResourceKey(u32 key, u16 *tbl, s32 x, s32 lo, s32 hi)
+-{
+-    s32 mid;
+-    while (lo < hi) {
+-        mid = (lo + hi) >> 1;
+-        if (tbl[mid] < key)
+-            lo = mid + 1;
+-        else
+-            hi = mid;
+-    }
+-    if (tbl[lo] == key)
+-        return lo;
+-    return -1;
+-}
+diff --git a/src/fn/sub_0821A490.c b/src/fn/sub_0821A490.c
+deleted file mode 100644
+index c296c2a731..0000000000
+--- a/src/fn/sub_0821A490.c
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#include "global.h"
+-struct Header {
+-    u32 count;
+-    u32 keys, records, reserved;
+-};
+-s32 Script_FindResourceKey(u32, u16 *, s32, s32, s32);
+-u8 *Script_LookupResource(u8 *base, u32 unused, u16 key, u16 context)
+-{
+-    struct Header header = *(struct Header *)base;
+-    s32 index;
+-    header.keys += (u32)base;
+-    header.records += (u32)base;
+-    index = Script_FindResourceKey(key, (u16 *)header.keys, context, 0, header.count - 1);
+-    if (index < 0 || (u32)index >= header.count)
+-        return 0;
+-    return (u8 *)(((u32 *)header.records)[index] + (u32)base);
+-}
+diff --git a/src/fn/sub_0821A4E8.c b/src/fn/sub_0821A4E8.c
+deleted file mode 100644
+index c6f94d9399..0000000000
+--- a/src/fn/sub_0821A4E8.c
++++ /dev/null
+@@ -1,21 +0,0 @@
+-#include "global.h"
+-struct E {
+-    u32 k;
+-    u32 v;
+-};
+-u32 Script_LookupArchive(u32 key, struct E *tbl, s32 lo, s32 hi)
+-{
+-    s32 mid;
+-    struct E *e;
+-    while (lo < hi) {
+-        mid = (lo + hi) >> 1;
+-        if (tbl[mid].k < key)
+-            lo = mid + 1;
+-        else
+-            hi = mid;
+-    }
+-    e = (struct E *)((lo << 3) + (u32)tbl);
+-    if (e->k == key)
+-        return e->v;
+-    return 0;
+-}
+diff --git a/src/fn/sub_0821A520.c b/src/fn/sub_0821A520.c
+deleted file mode 100644
+index dd711104ef..0000000000
+--- a/src/fn/sub_0821A520.c
++++ /dev/null
+@@ -1,73 +0,0 @@
+-#include "global.h"
+-struct E {
+-    u32 k, v;
+-};
+-extern struct E gUnk_08614D6C[];
+-u8 *Script_LookupResource(u8 *, u32, u16, u16);
+-u32 Script_LookupArchive(u32, struct E *, s32, s32);
+-u8 *ScriptProc_Start(u16 key, u16 context)
+-{
+-    u32 special = 0;
+-    u16 saved_context = context;
+-    u32 combined;
+-    u8 *result;
+-    switch (key) {
+-        case 0x922E:
+-            key = 0x9225;
+-            context = 0x5130;
+-            special = 1;
+-            break;
+-        case 0x92B3:
+-            key = 0x9305;
+-            context = 0xD710;
+-            special = 1;
+-            break;
+-        case 0x9B1B:
+-            key = 0x9A65;
+-            context = 0x4679;
+-            special = 1;
+-            break;
+-        case 0x98F5:
+-            key = 0x9B05;
+-            context = 0x2117;
+-            special = 1;
+-            break;
+-        case 0xA635:
+-            key = 0xA705;
+-            context = 0x6D24;
+-            special = 1;
+-            break;
+-        case 0xAE6C:
+-            key = 0xAF05;
+-            context = 0xAC2C;
+-            special = 1;
+-            break;
+-        case 0xC091:
+-            key = 0xC305;
+-            context = 0xE53E;
+-            special = 1;
+-            break;
+-        case 0xCB05:
+-            key = 0xC8E5;
+-            context = 0x5F29;
+-            special = 1;
+-            break;
+-        case 0xCEEF:
+-            key = 0xCEE5;
+-            context = 0x4F2D;
+-            special = 1;
+-            break;
+-        case 0xCEAA:
+-            key = 0xCF05;
+-            context = 0xA4D;
+-            special = 1;
+-            break;
+-    }
+-    combined = (key << 16) | context;
+-    result = (u8 *)Script_LookupArchive(combined, gUnk_08614D6C, 0, 10);
+-    if (special == 1) {
+-        u32 third = saved_context;
+-        result = Script_LookupResource(result, key, third, combined);
+-    }
+-    return result;
+-}
+diff --git a/src/fn/sub_0821A66C.c b/src/fn/sub_0821A66C.c
+deleted file mode 100644
+index 1070e7d6e7..0000000000
+--- a/src/fn/sub_0821A66C.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "global.h"
+-u8 *Script_DecodePacket(u8 *p, u32 *length)
+-{
+-    s32 size = *p & 15;
+-    switch (size) {
+-        case 13:
+-            *length = p[1];
+-            return p + 2;
+-        case 14: {
+-            u32 high = p[2] << 8;
+-            *length = p[1] | high;
+-            return p + 3;
+-        }
+-        case 15: {
+-            u8 *q = p + 1;
+-            *length = (q[2] << 16) | (q[1] << 8) | p[1];
+-            return p + 4;
+-        }
+-        default:
+-            *length = size;
+-            return p + 1;
+-    }
+-}
+diff --git a/src/fn/sub_0821A6C0.c b/src/fn/sub_0821A6C0.c
+deleted file mode 100644
+index 3ab2626759..0000000000
+--- a/src/fn/sub_0821A6C0.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "global.h"
+-u8 *Script_DecodeCommandOffset(u8 *p, u32 *out)
+-{
+-    if (p[0] & 0x80) {
+-        *out = ((p[0] << 8) | p[1]) & 0x7FFF;
+-        return p + 2;
+-    }
+-    *out = p[0];
+-    return p + 1;
+-}
+diff --git a/src/fn/sub_0821A894.c b/src/fn/sub_0821A894.c
+deleted file mode 100644
+index bed8cde08c..0000000000
+--- a/src/fn/sub_0821A894.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-struct VM {
+-    u8 p0[4];
+-    u32 f4;
+-    u32 *f8;
+-    u32 stk[24];
+-    u32 *sp;
+-};
+-extern struct VM gUnk_02000610;
+-void Script_ResetArgumentStack(void)
+-{
+-    gUnk_02000610.sp = gUnk_02000610.stk + 25;
+-}
+diff --git a/src/fn/sub_0821A8A4.c b/src/fn/sub_0821A8A4.c
+deleted file mode 100644
+index 66a22f74ff..0000000000
+--- a/src/fn/sub_0821A8A4.c
++++ /dev/null
+@@ -1,21 +0,0 @@
+-#include "global.h"
+-struct VM {
+-    u8 p0[4];
+-    u32 f4;
+-    u32 *f8;
+-    u32 stk[24];
+-    u32 *sp;
+-};
+-extern struct VM gUnk_02000610;
+-u32 *Script_PushArgumentFrame(u32 a, u32 b)
+-{
+-    if (a == 0)
+-        return 0;
+-    else {
+-        u32 *p = gUnk_02000610.sp;
+-        u32 *q = p + b;
+-        *q++ = a;
+-        gUnk_02000610.sp = q;
+-        return p;
+-    }
+-}
+diff --git a/src/fn/sub_0821A8C8.c b/src/fn/sub_0821A8C8.c
+deleted file mode 100644
+index 06f9cea140..0000000000
+--- a/src/fn/sub_0821A8C8.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-struct VM {
+-    u8 p0[4];
+-    u32 f4;
+-    u32 *f8;
+-    u32 stk[24];
+-    u32 *sp;
+-};
+-extern struct VM gUnk_02000610;
+-void Script_RestoreArgumentStack(u32 *p)
+-{
+-    if (p)
+-        gUnk_02000610.sp = p;
+-}
+diff --git a/src/fn/sub_0821A8DC.c b/src/fn/sub_0821A8DC.c
+deleted file mode 100644
+index ae43ebf025..0000000000
+--- a/src/fn/sub_0821A8DC.c
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#include "global.h"
+-struct VM {
+-    u8 p0[4];
+-    u32 f4;
+-    u32 *f8;
+-    u32 stk[24];
+-    u32 *sp;
+-};
+-extern struct VM gUnk_02000610;
+-u32 Script_GetCallArgument(s32 n)
+-{
+-    if (!n)
+-        return gUnk_02000610.f4;
+-    else {
+-        u32 *e = (u32 *)gUnk_02000610.sp[-1];
+-        return ((u32 *)e[1])[n - 1];
+-    }
+-}
+diff --git a/src/fn/sub_0821A908.c b/src/fn/sub_0821A908.c
+deleted file mode 100644
+index b06d08ddbd..0000000000
+--- a/src/fn/sub_0821A908.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-struct VM {
+-    u8 p0[4];
+-    u32 f4;
+-    u32 *f8;
+-    u32 stk[24];
+-    u32 *sp;
+-};
+-extern struct VM gUnk_02000610;
+-u32 Script_GetStackArgument(s32 n)
+-{
+-    return *(u32 *)((u8 *)gUnk_02000610.sp - (n * 4 + 4));
+-}
+diff --git a/src/fn/sub_0821A91C.c b/src/fn/sub_0821A91C.c
+deleted file mode 100644
+index 62bc7c5d3c..0000000000
+--- a/src/fn/sub_0821A91C.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-struct VM {
+-    u8 p0[4];
+-    u32 f4;
+-    u32 *f8;
+-    u32 stk[24];
+-    u32 *sp;
+-};
+-extern struct VM gUnk_02000610;
+-void Script_SetStackArgument(s32 n, u32 v)
+-{
+-    *(u32 *)((u8 *)gUnk_02000610.sp - (n * 4 + 4)) = v;
+-}
+diff --git a/src/fn/sub_0821A930.c b/src/fn/sub_0821A930.c
+deleted file mode 100644
+index 8559174857..0000000000
+--- a/src/fn/sub_0821A930.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-struct VM {
+-    u8 p0[4];
+-    u32 f4;
+-    u32 *f8;
+-    u32 stk[24];
+-    u32 *sp;
+-};
+-extern struct VM gUnk_02000610;
+-void Script_ResetKeywordStack(void)
+-{
+-    gUnk_02000610.f8 = gUnk_02000610.stk;
+-}
+diff --git a/src/fn/sub_0821A940.c b/src/fn/sub_0821A940.c
+deleted file mode 100644
+index ed59473121..0000000000
+--- a/src/fn/sub_0821A940.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "global.h"
+-struct VM {
+-    u8 p0[8];
+-    u32 *f8;
+-};
+-extern struct VM gUnk_02000610;
+-void Script_PushCtrlNextKeyword(u32 v)
+-{
+-    *gUnk_02000610.f8++ = v;
+-}
+diff --git a/src/fn/sub_0821A950.c b/src/fn/sub_0821A950.c
+deleted file mode 100644
+index 36d802a571..0000000000
+--- a/src/fn/sub_0821A950.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "global.h"
+-struct VM {
+-    u8 p0[8];
+-    u32 *f8;
+-};
+-extern struct VM gUnk_02000610;
+-void Script_PopCtrlNextKeyword(void)
+-{
+-    gUnk_02000610.f8--;
+-}
+diff --git a/src/fn/sub_0821A960.c b/src/fn/sub_0821A960.c
+deleted file mode 100644
+index 21ded9a670..0000000000
+--- a/src/fn/sub_0821A960.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000610;
+-void Script_SetPc(u8 *p)
+-{
+-    gUnk_02000610 = p;
+-}
+diff --git a/src/fn/sub_0821A96C.c b/src/fn/sub_0821A96C.c
+deleted file mode 100644
+index 0d06dff7e7..0000000000
+--- a/src/fn/sub_0821A96C.c
++++ /dev/null
+@@ -1,22 +0,0 @@
+-#include "global.h"
+-struct VM {
+-    u8 *pc;
+-    u32 f4;
+-    u32 **f8;
+-};
+-extern struct VM gUnk_02000610;
+-u8 *Script_DecodeOperand(u8 *, u32 *, u32 *);
+-u32 Script_SeekToKeyword(u8 k)
+-{
+-    u32 a, b;
+-    u8 *p = (u8 *)gUnk_02000610.f8[-1];
+-    for (;;) {
+-        p = Script_DecodeOperand(p, &a, &b);
+-        if (a == 0)
+-            return 0;
+-        if ((a & 0xF0) == 0x50 && ((s32)a >> 16) == k) {
+-            gUnk_02000610.pc = (u8 *)b;
+-            return b;
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0821A9B8.c b/src/fn/sub_0821A9B8.c
+deleted file mode 100644
+index 176e7e8ca7..0000000000
+--- a/src/fn/sub_0821A9B8.c
++++ /dev/null
+@@ -1,21 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000610;
+-u8 *Script_DecodeOperand(u8 *, u32 *, u32 *);
+-s32 Script_ReadNextKeyword(void)
+-{
+-    u32 a, b;
+-    u8 *p = gUnk_02000610;
+-    if (p == 0)
+-        return 0;
+-    if (*p == 0)
+-        return 0;
+-    for (;;) {
+-        p = Script_DecodeOperand(p, &a, &b);
+-        if (a == 0)
+-            return 0;
+-        if ((a & 0xF0) != 0x50)
+-            continue;
+-        gUnk_02000610 = (u8 *)b;
+-        return (s32)a >> 16;
+-    }
+-}
+diff --git a/src/fn/sub_0821AA00.c b/src/fn/sub_0821AA00.c
+deleted file mode 100644
+index e2e0a5b065..0000000000
+--- a/src/fn/sub_0821AA00.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000610;
+-u8 *Script_DecodeOperand(u8 *, u32 *, u32 *);
+-u32 Script_ReadValue(u8 *p)
+-{
+-    u32 a, b;
+-    gUnk_02000610 = Script_DecodeOperand(p, &a, &b);
+-    return b;
+-}
+diff --git a/src/fn/sub_0821AA1C.c b/src/fn/sub_0821AA1C.c
+deleted file mode 100644
+index 0392da1779..0000000000
+--- a/src/fn/sub_0821AA1C.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000610;
+-u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
+-s32 Script_ReadVector32(u8 *p, s32 *destination)
+-{
+-    s32 type, value;
+-    s32 *vector;
+-    s32 count;
+-    vector = destination;
+-    for (count = 0; count < 3; count++) {
+-        p = Script_DecodeOperand(p, &type, &value);
+-        vector[count] = value;
+-    }
+-    gUnk_02000610 = p;
+-    return 0;
+-}
+diff --git a/src/fn/sub_0821AA50.c b/src/fn/sub_0821AA50.c
+deleted file mode 100644
+index 9608eee6b5..0000000000
+--- a/src/fn/sub_0821AA50.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000610;
+-u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
+-s32 Script_ReadVector16(u8 *p, s16 *destination)
+-{
+-    s32 type, value;
+-    s16 *vector;
+-    s32 count;
+-    vector = destination;
+-    for (count = 0; count < 3; count++) {
+-        p = Script_DecodeOperand(p, &type, &value);
+-        vector[count] = value;
+-    }
+-    gUnk_02000610 = p;
+-    return 0;
+-}
+diff --git a/src/fn/sub_0821AA88.c b/src/fn/sub_0821AA88.c
+deleted file mode 100644
+index f79a702f08..0000000000
+--- a/src/fn/sub_0821AA88.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000610;
+-u8 *Script_DecodeOperand(u8 *, u32 *, u32 *);
+-u32 Script_ReadValueSafe(u8 *p)
+-{
+-    u32 a, b;
+-    if (p) {
+-        gUnk_02000610 = Script_DecodeOperand(p, &a, &b);
+-        if (gUnk_02000610)
+-            return b;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0821AAB0.c b/src/fn/sub_0821AAB0.c
+deleted file mode 100644
+index 7938c3227f..0000000000
+--- a/src/fn/sub_0821AAB0.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-u32 Script_ReadValueSafe(u8 *);
+-u32 Script_ReadString(u8 *p)
+-{
+-    return Script_ReadValueSafe(p);
+-}
+diff --git a/src/fn/sub_0821AABC.c b/src/fn/sub_0821AABC.c
+deleted file mode 100644
+index 2490adc9b3..0000000000
+--- a/src/fn/sub_0821AABC.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000610;
+-s32 Script_ParseStringRef(u8 *p)
+-{
+-    s32 v = (s16)((p[2] << 8) | p[1]);
+-    gUnk_02000610 = p + 3;
+-    return v;
+-}
+diff --git a/src/fn/sub_0821AAD8.c b/src/fn/sub_0821AAD8.c
+deleted file mode 100644
+index 0c46556658..0000000000
+--- a/src/fn/sub_0821AAD8.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000610;
+-u8 *Script_GetPc(void);
+-u8 *Script_DecodeVariableReference(u8 *, u32);
+-void Script_ReadReference(u32 a)
+-{
+-    gUnk_02000610 = Script_DecodeVariableReference(Script_GetPc(), a);
+-}
+diff --git a/src/fn/sub_0821AB18.c b/src/fn/sub_0821AB18.c
+deleted file mode 100644
+index b85840f4a0..0000000000
+--- a/src/fn/sub_0821AB18.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000610;
+-u8 *Script_GetPc(void)
+-{
+-    u8 *p = gUnk_02000610;
+-    if (p == 0 || *p == 0 || (*p & 0xF0) == 0x50)
+-        return 0;
+-    return p;
+-}
+diff --git a/src/fn/sub_0821AB40.c b/src/fn/sub_0821AB40.c
+deleted file mode 100644
+index 8db3e4a1d9..0000000000
+--- a/src/fn/sub_0821AB40.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-u8 *Script_GetPc(void);
+-u32 Script_ReadValue(u8 *);
+-u32 Script_GetValue(void)
+-{
+-    return Script_ReadValue(Script_GetPc());
+-}
+diff --git a/src/fn/sub_0821AB50.c b/src/fn/sub_0821AB50.c
+deleted file mode 100644
+index 586ba52eea..0000000000
+--- a/src/fn/sub_0821AB50.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-#include "engine.h"
+-/* Script_GetVector32: Reads a three component thirty two bit vector from the current script PC */
+-#define Script_GetVector32 sub_0821AB50
+-
+-s32 Script_ReadVector32(void *, void *);
+-
+-s32 sub_0821AB50(void *p)
+-{
+-    return Script_ReadVector32(Script_GetPc(), p);
+-}
+diff --git a/src/fn/sub_0821AB64.c b/src/fn/sub_0821AB64.c
+deleted file mode 100644
+index f18c30335d..0000000000
+--- a/src/fn/sub_0821AB64.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "global.h"
+-#include "engine.h"
+-/* Script_GetVector: Decodes three operands at the current script cursor into a signed 16-bit vector */
+-#define Script_GetVector sub_0821AB64
+-
+-s32 Script_ReadVector16(void *, void *);
+-
+-s32 sub_0821AB64(void *p)
+-{
+-    return Script_ReadVector16(Script_GetPc(), p);
+-}
+diff --git a/src/fn/sub_0821AB78.c b/src/fn/sub_0821AB78.c
+deleted file mode 100644
+index 0e72340e7c..0000000000
+--- a/src/fn/sub_0821AB78.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-u8 *Script_GetPc(void);
+-u32 Script_ReadValueSafe(u8 *);
+-u32 sub_0821AB78(void)
+-{
+-    return Script_ReadValueSafe(Script_GetPc());
+-}
+diff --git a/src/fn/sub_0821AB88.c b/src/fn/sub_0821AB88.c
+deleted file mode 100644
+index db6d097c33..0000000000
+--- a/src/fn/sub_0821AB88.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "global.h"
+-u8 *Script_GetPc(void);
+-u32 Script_ReadValueSafe(u8 *);
+-u32 Script_GetValueSafe(void)
+-{
+-    return Script_ReadValueSafe(Script_GetPc());
+-}
+diff --git a/src/fn/sub_0821AB98.c b/src/fn/sub_0821AB98.c
+deleted file mode 100644
+index ebac430788..0000000000
+--- a/src/fn/sub_0821AB98.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-#include "engine.h"
+-/* Script_GetStringRef: Parses a string reference at the current script cursor and advances it */
+-#define Script_GetStringRef sub_0821AB98
+-
+-s32 sub_0821AB98(void)
+-{
+-    return Script_ParseStringRef(Script_GetPc());
+-}
+diff --git a/src/fn/sub_0821ABA8.c b/src/fn/sub_0821ABA8.c
+deleted file mode 100644
+index a303e778ab..0000000000
+--- a/src/fn/sub_0821ABA8.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "global.h"
+-u8 *Script_GetPc(void);
+-u32 Script_SeekToKeyword(u8);
+-u32 Script_ReadValue(u8 *);
+-u32 Script_GetKeywordValue(u8 k, u32 d)
+-{
+-    if (Script_SeekToKeyword(k) != 0)
+-        return Script_ReadValue(Script_GetPc());
+-    return d;
+-}
+diff --git a/src/fn/sub_0821ABCC.c b/src/fn/sub_0821ABCC.c
+deleted file mode 100644
+index ca92825282..0000000000
+--- a/src/fn/sub_0821ABCC.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "global.h"
+-void Script_ResetArgumentStack(void);
+-void Script_ResetKeywordStack(void);
+-void Script_ResetStacks(void)
+-{
+-    Script_ResetArgumentStack();
+-    Script_ResetKeywordStack();
+-}
+diff --git a/src/fn/sub_0821ABDC.c b/src/fn/sub_0821ABDC.c
+deleted file mode 100644
+index ae5f2de611..0000000000
+--- a/src/fn/sub_0821ABDC.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_02000458;
+-void Script_ClearCommandTables(void)
+-{
+-    gUnk_02000458 = 0;
+-}
+diff --git a/src/fn/sub_0821ABE8.c b/src/fn/sub_0821ABE8.c
+deleted file mode 100644
+index ade80d3e37..0000000000
+--- a/src/fn/sub_0821ABE8.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "global.h"
+-extern u32 *gUnk_02000458;
+-u32 Script_RegisterCommandTable(u32 *n)
+-{
+-    *n = (u32)gUnk_02000458;
+-    gUnk_02000458 = n;
+-    return 0;
+-}
+diff --git a/src/fn/sub_0821AC30.c b/src/fn/sub_0821AC30.c
+deleted file mode 100644
+index af0eaba362..0000000000
+--- a/src/fn/sub_0821AC30.c
++++ /dev/null
+@@ -1,24 +0,0 @@
+-#include "global.h"
+-struct Ent {
+-    u32 key;
+-    u32 v;
+-};
+-struct Blk {
+-    struct Blk *next;
+-    s32 n;
+-    struct Ent *ents;
+-};
+-extern struct Blk *gUnk_02000458;
+-struct Ent *Script_FindCommand(u32 key)
+-{
+-    struct Blk *b = gUnk_02000458;
+-    while (b) {
+-        struct Ent *e = b->ents;
+-        s32 n = b->n;
+-        for (; n > 0; e++, n--)
+-            if (e->key == key)
+-                return e;
+-        b = b->next;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0821AC6C.c b/src/fn/sub_0821AC6C.c
+deleted file mode 100644
+index 3e067a91db..0000000000
+--- a/src/fn/sub_0821AC6C.c
++++ /dev/null
+@@ -1,21 +0,0 @@
+-#include "global.h"
+-u32 Script_FindCommand(u32);
+-u8 *Script_DecodeCommandOffset(u8 *, u32 *);
+-void Script_PushCtrlNextKeyword(u8 *);
+-void Script_PopCtrlNextKeyword(void);
+-void Script_SetPc(u8 *);
+-u8 *Callback_InvokeActor(u8 *, u32);
+-u8 *Script_ExecuteNativeCommand(u8 *p)
+-{
+-    u32 len;
+-    u32 id = (p[1] << 8) | p[0];
+-    u32 *e;
+-    p += 2;
+-    e = (u32 *)Script_FindCommand(id);
+-    p = Script_DecodeCommandOffset(p, &len);
+-    Script_PushCtrlNextKeyword(p + len);
+-    Script_SetPc(p);
+-    p = Callback_InvokeActor(p, e[1]);
+-    Script_PopCtrlNextKeyword();
+-    return p;
+-}
+diff --git a/src/fn/sub_0821ACB4.c b/src/fn/sub_0821ACB4.c
+deleted file mode 100644
+index af0bd36d32..0000000000
+--- a/src/fn/sub_0821ACB4.c
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#include "global.h"
+-s32 *Script_ReadProcTable(s32 *p, s32 *n)
+-{
+-    s32 c;
+-    s32 *q;
+-    s32 *o = n;
+-    c = 0;
+-    q = p;
+-    while (*q != -1) {
+-        q++;
+-        c++;
+-    }
+-    *o = c;
+-    return q + 1;
+-}
+diff --git a/src/fn/sub_0821ACDC.c b/src/fn/sub_0821ACDC.c
+deleted file mode 100644
+index 496fa9e566..0000000000
+--- a/src/fn/sub_0821ACDC.c
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#include "global.h"
+-struct T {
+-    u32 *tbl;
+-    u32 f4;
+-    u8 *base;
+-};
+-extern struct T gUnk_02000438;
+-u8 *Script_GetProcedure(u32 id, u32 *out)
+-{
+-    u32 idx = (id & 0x7FFFFFFF) - 1;
+-    struct T *t = &gUnk_02000438;
+-    u32 *e = t->tbl + idx;
+-    *out = ((u8 *)e)[3];
+-    return t->base + (e[0] & 0xFFFFFF);
+-}
+diff --git a/src/fn/sub_0821AD08.c b/src/fn/sub_0821AD08.c
+deleted file mode 100644
+index 8430dd828a..0000000000
+--- a/src/fn/sub_0821AD08.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-u8 *Script_GetProcedure(u32, u32 *);
+-u32 Script_DecodePacket(u8 *, u32 *);
+-u32 Script_RunProcedureBlock(u32, u32, u32);
+-u32 Script_Call(u32 id, u32 b)
+-{
+-    u32 x, y;
+-    return Script_RunProcedureBlock(Script_DecodePacket(Script_GetProcedure(id, &x), &y), b, x);
+-}
+diff --git a/src/fn/sub_0821AD2C.c b/src/fn/sub_0821AD2C.c
+deleted file mode 100644
+index 4253b1cd1c..0000000000
+--- a/src/fn/sub_0821AD2C.c
++++ /dev/null
+@@ -1,27 +0,0 @@
+-#include "global.h"
+-struct Args {
+-    u32 count : 16;
+-    u32 reserved : 16;
+-    s32 *values;
+-};
+-u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
+-s32 Script_Call(s32, struct Args *);
+-s32 Script_CallInlineProcedure(u8 *p)
+-{
+-    s32 values[16], type, value;
+-    struct Args args;
+-    s32 high = p[1] << 8;
+-    s32 id = (s16)(p[0] | high);
+-    s32 count;
+-    p += 2;
+-    count = 0;
+-    for (;;) {
+-        p = Script_DecodeOperand(p, &type, &value);
+-        if (!type)
+-            break;
+-        values[count++] = value;
+-    }
+-    args.count = count;
+-    args.values = values;
+-    return Script_Call(id, &args);
+-}
+diff --git a/src/fn/sub_0821ADD4.c b/src/fn/sub_0821ADD4.c
+deleted file mode 100644
+index a9f505811c..0000000000
+--- a/src/fn/sub_0821ADD4.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-struct T {
+-    u8 p[4];
+-    u8 (*tbl)[4];
+-    u8 *base;
+-};
+-extern struct T gUnk_02000448;
+-u8 *Text_LookupString(u32 i)
+-{
+-    struct T *t = &gUnk_02000448;
+-    u8 *e = (u8 *)((i << 2) + (u32)t->tbl);
+-    u32 v = (e[3] << 24) | (e[2] << 16) | (e[1] << 8) | e[0];
+-    return t->base + (v & 0x7FFFFFFF);
+-}
+diff --git a/src/fn/sub_0821AE04.c b/src/fn/sub_0821AE04.c
+deleted file mode 100644
+index abd3fbb7bd..0000000000
+--- a/src/fn/sub_0821AE04.c
++++ /dev/null
+@@ -1,39 +0,0 @@
+-#include "global.h"
+-struct ScriptContext {
+-    u8 *table;
+-    u32 count;
+-    u8 *body;
+-    u8 *tail;
+-};
+-extern struct ScriptContext gUnk_02000438;
+-extern u8 *gUnk_02000448[4];
+-extern u32 gUnk_0200060C;
+-u8 *Script_ReadProcTable(u8 *, u32 *);
+-static inline u32 read_word(u8 *p)
+-{
+-    return (p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0];
+-}
+-s32 Script_LoadScript(u8 *p)
+-{
+-    u32 count;
+-    struct ScriptContext *ctx = &gUnk_02000438;
+-    u8 *base;
+-    gUnk_0200060C = read_word(p);
+-    p += 4;
+-    base = Script_ReadProcTable(p, &count);
+-    ctx->table = p;
+-    ctx->count = count;
+-    gUnk_02000448[0] = base;
+-    gUnk_02000448[1] = base + read_word(base + 4);
+-    gUnk_02000448[2] = base + read_word(base + 8);
+-    gUnk_02000448[3] = base + read_word(base + 12);
+-    base += read_word(base);
+-    ctx->body = base + 4;
+-    {
+-        u32 size = read_word(base);
+-        size += (u32)base;
+-        size += 8;
+-        ctx->tail = (u8 *)size;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0821AED0.c b/src/fn/sub_0821AED0.c
+deleted file mode 100644
+index 58db09f94a..0000000000
+--- a/src/fn/sub_0821AED0.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-// COMPILER: old_agbcc
+-#include "global.h"
+-/* Script_GetSectionThreeData: Returns data after the fourth resolved section pointer's header with section purpose tentative */
+-#define Script_GetSectionThreeData sub_0821AED0
+-
+-extern u8 *gUnk_02000448[];
+-
+-u8 *sub_0821AED0(void)
+-{
+-    return gUnk_02000448[3] + 4;
+-}
+diff --git a/src/fn/sub_0821AEDC.c b/src/fn/sub_0821AEDC.c
+deleted file mode 100644
+index 17c10629c4..0000000000
+--- a/src/fn/sub_0821AEDC.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-/* Script_SaveContext: Copies the loaded script context and section pointers into caller storage */
+-#define Script_SaveContext sub_0821AEDC
+-
+-struct Block0821AEDC {
+-    u32 w[4];
+-};
+-extern struct Block0821AEDC gUnk_02000438, gUnk_02000448;
+-
+-void sub_0821AEDC(struct Block0821AEDC *dst)
+-{
+-    dst[0] = gUnk_02000438;
+-    dst[1] = gUnk_02000448;
+-}
+diff --git a/src/fn/sub_0821AF04.c b/src/fn/sub_0821AF04.c
+deleted file mode 100644
+index a7c6722cfa..0000000000
+--- a/src/fn/sub_0821AF04.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-/* Script_RestoreContext: Restores the loaded script context and section pointers from caller storage */
+-#define Script_RestoreContext sub_0821AF04
+-
+-struct Block0821AF04 {
+-    u32 w[4];
+-};
+-extern struct Block0821AF04 gUnk_02000438, gUnk_02000448;
+-
+-void sub_0821AF04(struct Block0821AF04 *src)
+-{
+-    gUnk_02000438 = src[0];
+-    gUnk_02000448 = src[1];
+-}
+diff --git a/src/fn/sub_0821AF2C.c b/src/fn/sub_0821AF2C.c
+deleted file mode 100644
+index 1b9719f4fd..0000000000
+--- a/src/fn/sub_0821AF2C.c
++++ /dev/null
+@@ -1,42 +0,0 @@
+-#include "global.h"
+-extern u32 gUnk_02000610[];
+-u32 Script_PushArgumentFrame(u32, u32);
+-void Script_RestoreArgumentStack(u32);
+-u8 *Script_DecodePacket(u8 *, u32 *);
+-u32 Script_ExecuteNativeCommand(u8 *);
+-u32 Script_CallInlineProcedure(u8 *);
+-u32 Script_EvalExpression(u8 *);
+-u32 Script_ExecuteBlock(u8 *p, u32 a, u32 b)
+-{
+-    u32 length, saved;
+-    saved = Script_PushArgumentFrame(a, b);
+-    while (p) {
+-        switch (*p & 0xF0) {
+-            case 0x60:
+-                p = Script_DecodePacket(p, &length);
+-                if (Script_ExecuteNativeCommand(p) == 1) {
+-                    p = (u8 *)1;
+-                    goto done;
+-                }
+-                p += length;
+-                break;
+-            case 0x70:
+-                p = Script_DecodePacket(p, &length);
+-                gUnk_02000610[1] = Script_CallInlineProcedure(p);
+-                p += length;
+-                break;
+-            case 0x30:
+-                p = Script_DecodePacket(p, &length);
+-                gUnk_02000610[1] = Script_EvalExpression(p);
+-                p += length;
+-                break;
+-            case 0:
+-                goto stop;
+-        }
+-    }
+-stop:
+-    p = 0;
+-done:
+-    Script_RestoreArgumentStack(saved);
+-    return (u32)p;
+-}
+diff --git a/src/fn/sub_0821AFB4.c b/src/fn/sub_0821AFB4.c
+deleted file mode 100644
+index 8e2f702e98..0000000000
+--- a/src/fn/sub_0821AFB4.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-struct VM {
+-    u8 p0[4];
+-    u32 f4;
+-};
+-extern struct VM gUnk_02000610;
+-s32 Script_ExecuteBlock(u32, u32, u32);
+-u32 Script_RunBlock(u32 a, u32 b)
+-{
+-    if (Script_ExecuteBlock(a, b, 0) == 1)
+-        return gUnk_02000610.f4;
+-    return gUnk_02000610.f4 = 0;
+-}
+diff --git a/src/fn/sub_0821AFD8.c b/src/fn/sub_0821AFD8.c
+deleted file mode 100644
+index ee189174f1..0000000000
+--- a/src/fn/sub_0821AFD8.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "global.h"
+-struct VM {
+-    u8 p0[4];
+-    u32 f4;
+-};
+-extern struct VM gUnk_02000610;
+-extern const u8 gUnk_08614184[];
+-s32 Script_ExecuteBlock(u32, const u8 *, u32);
+-u32 Script_RunProcedureBlock(u32 a, const u8 *b, u32 c)
+-{
+-    if (b == 0)
+-        b = gUnk_08614184;
+-    if (Script_ExecuteBlock(a, b, c) == 1)
+-        return gUnk_02000610.f4;
+-    return gUnk_02000610.f4 = 0;
+-}
+diff --git a/src/fn/sub_0821B004.c b/src/fn/sub_0821B004.c
+deleted file mode 100644
+index 37e84c0a4e..0000000000
+--- a/src/fn/sub_0821B004.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "global.h"
+-struct T {
+-    u8 p[0xc];
+-    u8 *f0c;
+-};
+-extern struct T gUnk_02000438;
+-extern const u8 gUnk_08614184[];
+-u8 *Script_DecodePacket(u8 *, u32 *);
+-void Script_RunBlock(u8 *, const u8 *);
+-void Script_RunMainBlock(void)
+-{
+-    u32 x;
+-    Script_RunBlock(Script_DecodePacket(gUnk_02000438.f0c, &x), gUnk_08614184);
+-}
+diff --git a/src/fn/sub_0821B028.c b/src/fn/sub_0821B028.c
+deleted file mode 100644
+index f77175c660..0000000000
+--- a/src/fn/sub_0821B028.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-s32 Script_GetValue(void);
+-void sub_0821AB78(void);
+-s32 Script_DiscardValueIfZero(void)
+-{
+-    if (Script_GetValue() == 0)
+-        sub_0821AB78();
+-    return 0;
+-}
+diff --git a/src/fn/sub_0821B03C.c b/src/fn/sub_0821B03C.c
+deleted file mode 100644
+index 8af18f9c52..0000000000
+--- a/src/fn/sub_0821B03C.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-extern u16 gUnk_030039F0;
+-void Script_SetEntryProcedure(u16 v)
+-{
+-    gUnk_030039F0 = v;
+-}
+diff --git a/src/fn/sub_0821B048.c b/src/fn/sub_0821B048.c
+deleted file mode 100644
+index 34d458bf27..0000000000
+--- a/src/fn/sub_0821B048.c
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#include "global.h"
+-void Script_ResetStacks(void);
+-void GameState_ClearActiveRegions(void);
+-void Script_ClearCommandTables(void);
+-void Script_RegisterBuiltinCommands(void);
+-void ScriptProc_Start(u32, u32);
+-void Script_LoadScript(void);
+-void Script_SetEntryProcedure(u32);
+-void Script_InitRuntime(void)
+-{
+-    Script_ResetStacks();
+-    GameState_ClearActiveRegions();
+-    Script_ClearCommandTables();
+-    Script_RegisterBuiltinCommands();
+-    ScriptProc_Start(0xA8D9, 0x49BC);
+-    Script_LoadScript();
+-    Script_SetEntryProcedure(0);
+-}
+diff --git a/src/fn/sub_0821B078.c b/src/fn/sub_0821B078.c
+deleted file mode 100644
+index 29145e171f..0000000000
+--- a/src/fn/sub_0821B078.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-void Script_ClearLocalVariables(void);
+-void Script_ResetLocalVariables(void)
+-{
+-    Script_ClearLocalVariables();
+-}
+diff --git a/src/fn/sub_0821B084.c b/src/fn/sub_0821B084.c
+deleted file mode 100644
+index f43b4f36be..0000000000
+--- a/src/fn/sub_0821B084.c
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#include "global.h"
+-// Provisional name: GameState_SelectRamBase
+-// MATCHING_CONCESSION: register-pinning
+-/* Select timer-jittered storage for the game-state regions. */
+-extern u8 gUnk_0203C400[];
+-extern u8 *gUnk_02000710, *gUnk_0200070C, *gUnk_02000708, *gUnk_02000704, *gUnk_02000700;
+-void GameState_SelectRamBase(void)
+-{
+-    u32 timer = *(vu16 *)0x0400010C;
+-    register u8 *base asm("r1") = gUnk_0203C400;
+-    base += (timer & 127) * 8;
+-    gUnk_02000710 = base;
+-    gUnk_0200070C = base + 0xb00;
+-    gUnk_02000708 = base + 0x1600;
+-    gUnk_02000704 = base + 0x1a00;
+-    gUnk_02000700 = base + 0x1e00;
+-}
+diff --git a/src/fn/sub_0821B0DC.c b/src/fn/sub_0821B0DC.c
+deleted file mode 100644
+index 49d7d27c1a..0000000000
+--- a/src/fn/sub_0821B0DC.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000710, *gUnk_0200070C, *gUnk_02000708, *gUnk_02000704, *gUnk_02000700;
+-void Memory_Clear(u8 *, u32);
+-void Memory_Copy(u8 *, u8 *, u32);
+-void GameState_ClearActiveRegions(void)
+-{
+-    Memory_Clear(gUnk_02000708, 0x400);
+-    Memory_Clear(gUnk_02000710, 0x89C);
+-}
+diff --git a/src/fn/sub_0821B104.c b/src/fn/sub_0821B104.c
+deleted file mode 100644
+index b1b7f96c2a..0000000000
+--- a/src/fn/sub_0821B104.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000710, *gUnk_0200070C, *gUnk_02000708, *gUnk_02000704, *gUnk_02000700;
+-void Memory_Clear(u8 *, u32);
+-void Memory_Copy(u8 *, u8 *, u32);
+-void GameState_BackupActiveRegions(void);
+-void GameState_ResetActiveRegions(void)
+-{
+-    u16 v = *(u16 *)(gUnk_02000710 + 0x744);
+-    Memory_Clear(gUnk_02000708, 0x400);
+-    Memory_Clear(gUnk_02000710 + 0x30, 0x74A);
+-    *(u16 *)(gUnk_02000710 + 0x744) = v;
+-    GameState_BackupActiveRegions();
+-}
+diff --git a/src/fn/sub_0821B148.c b/src/fn/sub_0821B148.c
+deleted file mode 100644
+index 6c8f7f14c3..0000000000
+--- a/src/fn/sub_0821B148.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000710, *gUnk_0200070C, *gUnk_02000708, *gUnk_02000704, *gUnk_02000700;
+-void Memory_Clear(u8 *, u32);
+-void Memory_Copy(u8 *, u8 *, u32);
+-void GameState_BackupActiveRegions(void)
+-{
+-    Memory_Copy(gUnk_0200070C, gUnk_02000710, 0x89C);
+-    Memory_Copy(gUnk_02000704, gUnk_02000708, 0x400);
+-}
+diff --git a/src/fn/sub_0821B180.c b/src/fn/sub_0821B180.c
+deleted file mode 100644
+index a0de5ecb47..0000000000
+--- a/src/fn/sub_0821B180.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000710, *gUnk_0200070C, *gUnk_02000708, *gUnk_02000704, *gUnk_02000700;
+-void Memory_Clear(u8 *, u32);
+-void Memory_Copy(u8 *, u8 *, u32);
+-void GameState_RestoreActiveRegions(void)
+-{
+-    Memory_Copy(gUnk_02000710, gUnk_0200070C, 0x89C);
+-    Memory_Copy(gUnk_02000708, gUnk_02000704, 0x400);
+-}
+diff --git a/src/fn/sub_0821B1B8.c b/src/fn/sub_0821B1B8.c
+deleted file mode 100644
+index 22074d3ae4..0000000000
+--- a/src/fn/sub_0821B1B8.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000710, *gUnk_0200070C, *gUnk_02000708, *gUnk_02000704, *gUnk_02000700;
+-void Memory_Clear(u8 *, u32);
+-void Memory_Copy(u8 *, u8 *, u32);
+-void GameState_BackupRegionRange(u8 *p, u32 n)
+-{
+-    s32 d = p - gUnk_02000710;
+-    Memory_Copy(gUnk_0200070C + d, p, n);
+-}
+diff --git a/src/fn/sub_0821B1DC.c b/src/fn/sub_0821B1DC.c
+deleted file mode 100644
+index f365a72f3e..0000000000
+--- a/src/fn/sub_0821B1DC.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000710, *gUnk_0200070C, *gUnk_02000708, *gUnk_02000704, *gUnk_02000700;
+-void Memory_Clear(u8 *, u32);
+-void Memory_Copy(u8 *, u8 *, u32);
+-u8 *GameState_GetBackupRegionPointer(u8 *p)
+-{
+-    s32 d = p - gUnk_02000710;
+-    return gUnk_0200070C + d;
+-}
+diff --git a/src/fn/sub_0821B1F4.c b/src/fn/sub_0821B1F4.c
+deleted file mode 100644
+index 27593ac333..0000000000
+--- a/src/fn/sub_0821B1F4.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000710, *gUnk_0200070C, *gUnk_02000708, *gUnk_02000704, *gUnk_02000700;
+-void Memory_Clear(u8 *, u32);
+-void Memory_Copy(u8 *, u8 *, u32);
+-void Script_ClearLocalVariables(void)
+-{
+-    Memory_Clear(gUnk_02000700, 0x400);
+-}
+diff --git a/src/fn/sub_0821B20C.c b/src/fn/sub_0821B20C.c
+deleted file mode 100644
+index 0fcc83aecf..0000000000
+--- a/src/fn/sub_0821B20C.c
++++ /dev/null
+@@ -1,36 +0,0 @@
+-#include "global.h"
+-struct Shorts {
+-    s16 elements[1];
+-};
+-void Script_ReadTypedVariable(u8 *p, s32 descriptor, s32 index, s32 *value)
+-{
+-    switch ((descriptor >> 24) & 15) {
+-        case 9:
+-            p += index * 4;
+-            *value = (p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0];
+-            break;
+-        case 8:
+-            p += index * 4;
+-            *value = (p[1] << 8) | p[0];
+-            break;
+-        case 1:
+-        case 6:
+-            *value = ((struct Shorts *)p)->elements[index];
+-            break;
+-        case 2:
+-        case 3:
+-            p += index;
+-            *value = *p;
+-            break;
+-        case 4: {
+-            u8 *byte;
+-            u32 mask, bits;
+-            index += (descriptor >> 16) & 15;
+-            byte = p + (index >> 3);
+-            mask = 1u << (index & 7);
+-            bits = *byte & mask;
+-            *value = bits != 0;
+-            break;
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0821B2B0.c b/src/fn/sub_0821B2B0.c
+deleted file mode 100644
+index a0099db8b6..0000000000
+--- a/src/fn/sub_0821B2B0.c
++++ /dev/null
+@@ -1,29 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000710;
+-extern u8 *gUnk_02000700;
+-extern u8 *gUnk_02000708;
+-u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
+-void Script_ReadTypedVariable(u8 *, u32, s32, s32 *);
+-u8 *Script_DecodeVariableValue(u8 *p, s32 *type, s32 *value)
+-{
+-    s32 ignored, first, index;
+-    u32 descriptor = (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
+-    u8 *base, *end;
+-    *type = (descriptor >> 24) & 15;
+-    if ((descriptor & 0xF00000) == 0x800000)
+-        base = gUnk_02000710;
+-    else if ((descriptor & 0xF00000) == 0x100000)
+-        base = gUnk_02000700;
+-    else
+-        base = gUnk_02000708;
+-    base += descriptor & 0xFFFF;
+-    if (((descriptor >> 24) & 0xF0) == 0x20) {
+-        end = Script_DecodeOperand(p + 4, &ignored, &first);
+-        end = Script_DecodeOperand(end, &ignored, &index);
+-    } else {
+-        index = 0;
+-        end = p + 4;
+-    }
+-    Script_ReadTypedVariable(base, descriptor, index, value);
+-    return end;
+-}
+diff --git a/src/fn/sub_0821B34C.c b/src/fn/sub_0821B34C.c
+deleted file mode 100644
+index b63dba6178..0000000000
+--- a/src/fn/sub_0821B34C.c
++++ /dev/null
+@@ -1,41 +0,0 @@
+-#include "global.h"
+-struct Words {
+-    s32 elements[1];
+-};
+-struct Shorts {
+-    s16 elements[1];
+-};
+-void Script_WriteTypedVariable(u8 *p, s32 descriptor, s32 index, s32 value)
+-{
+-    switch ((descriptor >> 24) & 15) {
+-        case 9:
+-            ((struct Words *)p)->elements[index] = value;
+-            break;
+-        case 8: {
+-            u8 *q = p + index * 4;
+-            q[2] = value >> 16;
+-            q[1] = value >> 8;
+-            q[0] = value;
+-            break;
+-        }
+-        case 1:
+-        case 6:
+-            ((struct Shorts *)p)->elements[index] = value;
+-            break;
+-        case 2:
+-        case 3:
+-            p[index] = value;
+-            break;
+-        case 4: {
+-            s32 mask;
+-            index += (descriptor >> 16) & 15;
+-            p += index >> 3;
+-            mask = 1 << (index & 7);
+-            if (value)
+-                *p |= mask;
+-            else
+-                *p &= ~mask;
+-            break;
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_0821B3E4.c b/src/fn/sub_0821B3E4.c
+deleted file mode 100644
+index e12ca18fb6..0000000000
+--- a/src/fn/sub_0821B3E4.c
++++ /dev/null
+@@ -1,28 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000710;
+-extern u8 *gUnk_02000700;
+-extern u8 *gUnk_02000708;
+-u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
+-void Script_WriteTypedVariable(u8 *, u32, s32, s32);
+-u8 *Script_AssignVariableOperand(u8 *p, s32 value)
+-{
+-    s32 ignored, first, index;
+-    u32 descriptor = (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
+-    u8 *base, *end;
+-    if ((descriptor & 0xF00000) == 0x800000)
+-        base = gUnk_02000710;
+-    else if ((descriptor & 0xF00000) == 0x100000)
+-        base = gUnk_02000700;
+-    else
+-        base = gUnk_02000708;
+-    base += descriptor & 0xFFFF;
+-    if (((descriptor >> 24) & 0xF0) == 0x20) {
+-        end = Script_DecodeOperand(p + 4, &ignored, &first);
+-        end = Script_DecodeOperand(end, &ignored, &index);
+-    } else {
+-        index = 0;
+-        end = p + 4;
+-    }
+-    Script_WriteTypedVariable(base, descriptor, index, value);
+-    return end;
+-}
+diff --git a/src/fn/sub_0821B478.c b/src/fn/sub_0821B478.c
+deleted file mode 100644
+index 628ec96e79..0000000000
+--- a/src/fn/sub_0821B478.c
++++ /dev/null
+@@ -1,25 +0,0 @@
+-#include "global.h"
+-u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
+-void Memory_Copy(u8 *, u8 *, s32);
+-struct Reference {
+-    u32 descriptor;
+-    u16 count;
+-    u16 index;
+-};
+-u8 *Script_DecodeVariableReference(u8 *p, struct Reference *ref)
+-{
+-    s32 type, count, index;
+-    u8 *end;
+-    Memory_Copy((u8 *)ref, p, 4);
+-    if ((*(u8 *)ref & 0xF0) == 0x20) {
+-        end = Script_DecodeOperand(p + 4, &type, &count);
+-        end = Script_DecodeOperand(end, &type, &index);
+-        ref->count = count;
+-        ref->index = index;
+-    } else {
+-        end = p + 4;
+-        ref->count = 1;
+-        ref->index = 0;
+-    }
+-    return end;
+-}
+diff --git a/src/fn/sub_0821B4C8.c b/src/fn/sub_0821B4C8.c
+deleted file mode 100644
+index f227bc20d3..0000000000
+--- a/src/fn/sub_0821B4C8.c
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#include "global.h"
+-struct Reference {
+-    u8 bytes[4];
+-    u16 first, index;
+-};
+-extern u8 *gUnk_02000710, *gUnk_02000700, *gUnk_02000708;
+-void Script_WriteTypedVariable(u8 *, u32, s32, s32);
+-void Script_WriteReferenceValue(struct Reference *ref, s32 index, s32 value)
+-{
+-    u32 descriptor =
+-        (ref->bytes[0] << 24) | (ref->bytes[1] << 16) | (ref->bytes[2] << 8) | ref->bytes[3];
+-    u8 *base;
+-    if ((descriptor & 0xF00000) == 0x800000)
+-        base = gUnk_02000710;
+-    else if ((descriptor & 0xF00000) == 0x100000)
+-        base = gUnk_02000700;
+-    else
+-        base = gUnk_02000708;
+-    base += descriptor & 0xFFFF;
+-    if (((descriptor >> 24) & 0xF0) == 0x20)
+-        index += ref->index;
+-    Script_WriteTypedVariable(base, descriptor, index, value);
+-}
+diff --git a/src/fn/sub_0821B540.c b/src/fn/sub_0821B540.c
+deleted file mode 100644
+index fc86f86e26..0000000000
+--- a/src/fn/sub_0821B540.c
++++ /dev/null
+@@ -1,25 +0,0 @@
+-#include "global.h"
+-struct Reference {
+-    u8 bytes[4];
+-    u16 first, index;
+-};
+-extern u8 *gUnk_02000710, *gUnk_02000700, *gUnk_02000708;
+-void Script_ReadTypedVariable(u8 *, u32, s32, s32 *);
+-s32 Script_ReadReferenceValue(struct Reference *ref, s32 index)
+-{
+-    s32 value;
+-    u32 descriptor =
+-        (ref->bytes[0] << 24) | (ref->bytes[1] << 16) | (ref->bytes[2] << 8) | ref->bytes[3];
+-    u8 *base;
+-    if ((descriptor & 0xF00000) == 0x800000)
+-        base = gUnk_02000710;
+-    else if ((descriptor & 0xF00000) == 0x100000)
+-        base = gUnk_02000700;
+-    else
+-        base = gUnk_02000708;
+-    base += descriptor & 0xFFFF;
+-    if (((descriptor >> 24) & 0xF0) == 0x20)
+-        index += ref->index;
+-    Script_ReadTypedVariable(base, descriptor, index, &value);
+-    return value;
+-}
+diff --git a/src/fn/sub_0821B5BC.c b/src/fn/sub_0821B5BC.c
+deleted file mode 100644
+index a1f532af18..0000000000
+--- a/src/fn/sub_0821B5BC.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#include "global.h"
+-struct Reference {
+-    u8 bytes[4];
+-    u16 first, index;
+-};
+-extern u8 *gUnk_0200070C, *gUnk_02000704;
+-u8 *Script_DecodeVariableReference(u8 *, struct Reference *);
+-s32 Script_ReadReferenceValue(struct Reference *, s32);
+-void Script_WriteTypedVariable(u8 *, u32, s32, s32);
+-u8 *Script_BackupVariableOperand(u8 *p)
+-{
+-    struct Reference ref;
+-    u8 *r = (u8 *)&ref;
+-    u8 *end, *base;
+-    s32 index = 0;
+-    s32 value;
+-    u32 descriptor;
+-    end = Script_DecodeVariableReference(p, &ref);
+-    value = Script_ReadReferenceValue(&ref, 0);
+-    descriptor = (r[0] << 24) | (r[1] << 16) | (r[2] << 8) | r[3];
+-    if ((descriptor & 0xF00000) == 0x800000)
+-        base = gUnk_0200070C;
+-    else
+-        base = gUnk_02000704;
+-    base += descriptor & 0xFFFF;
+-    if (((descriptor >> 24) & 0xF0) == 0x20)
+-        index += *(u16 *)(r + 6);
+-    Script_WriteTypedVariable(base, descriptor, index, value);
+-    return end;
+-}
+diff --git a/src/fn/sub_0821B63C.c b/src/fn/sub_0821B63C.c
+deleted file mode 100644
+index 673c7a426d..0000000000
+--- a/src/fn/sub_0821B63C.c
++++ /dev/null
+@@ -1,28 +0,0 @@
+-#include "global.h"
+-struct Reference {
+-    u8 bytes[4];
+-    u16 first, index;
+-};
+-extern u8 *gUnk_0200070C, *gUnk_02000704;
+-u8 *Script_DecodeVariableReference(u8 *, struct Reference *);
+-void Script_ReadTypedVariable(u8 *, u32, s32, s32 *);
+-s32 Script_ReadBackupVariableOperand(u8 *p)
+-{
+-    struct Reference ref;
+-    u8 *r = (u8 *)&ref;
+-    s32 value;
+-    u8 *base;
+-    s32 index = 0;
+-    u32 descriptor;
+-    Script_DecodeVariableReference(p, &ref);
+-    descriptor = (r[0] << 24) | (r[1] << 16) | (r[2] << 8) | r[3];
+-    if ((descriptor & 0xF00000) == 0x800000)
+-        base = gUnk_0200070C;
+-    else
+-        base = gUnk_02000704;
+-    base += descriptor & 0xFFFF;
+-    if (((descriptor >> 24) & 0xF0) == 0x20)
+-        index += *(u16 *)(r + 6);
+-    Script_ReadTypedVariable(base, descriptor, index, &value);
+-    return value;
+-}
+diff --git a/src/fn/sub_0821B6B0.c b/src/fn/sub_0821B6B0.c
+deleted file mode 100644
+index c3c7cec75a..0000000000
+--- a/src/fn/sub_0821B6B0.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_0200070C;
+-u8 *GameState_GetBackupStateBase(void)
+-{
+-    return gUnk_0200070C;
+-}
+diff --git a/src/fn/sub_0821B6BC.c b/src/fn/sub_0821B6BC.c
+deleted file mode 100644
+index 84883a568e..0000000000
+--- a/src/fn/sub_0821B6BC.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "global.h"
+-extern u8 *gUnk_02000704;
+-u8 *GameState_GetBackupVariableBase(void)
+-{
+-    return gUnk_02000704;
+-}
+diff --git a/src/fn/sub_0821B6C8.c b/src/fn/sub_0821B6C8.c
+deleted file mode 100644
+index fd2e646f05..0000000000
+--- a/src/fn/sub_0821B6C8.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-#include "global.h"
+-s32 Div(s32, s32);
+-void Script_ConvertTextToShiftJis(u8 *output, u8 *input)
+-{
+-    u8 *src = input;
+-    u8 *dest = output;
+-    while (*src) {
+-        if (*src & 0x80) {
+-            s32 row = *src - 0x80;
+-            s32 column = src[1];
+-            s32 adjusted;
+-            src++;
+-            if (row & 1) {
+-                adjusted = column - 0x61;
+-                if (adjusted > 0x7E)
+-                    adjusted++;
+-            } else
+-                adjusted = column - 2;
+-            row = Div(row - 0x21, 2) + 0x81;
+-            if (row > 0x9F)
+-                row += 0x40;
+-            dest[0] = row;
+-            dest[1] = adjusted;
+-            dest++;
+-        } else
+-            *dest = *src;
+-        if (src[0] == 13 && src[1] == 10)
+-            src++;
+-        src++;
+-        dest++;
+-    }
+-    *dest = 0;
+-}
+diff --git a/src/fn/sub_0821B738.c b/src/fn/sub_0821B738.c
+deleted file mode 100644
+index ad84b6c978..0000000000
+--- a/src/fn/sub_0821B738.c
++++ /dev/null
+@@ -1,24 +0,0 @@
+-#include "global.h"
+-u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
+-u8 *Script_SelectConditionalBlock(u8 *p)
+-{
+-    s32 type, condition, block;
+-condition_next:
+-    p = Script_DecodeOperand(p, &type, &condition);
+-block_next:
+-    p = Script_DecodeOperand(p, &type, &block);
+-    if (condition)
+-        return (u8 *)block;
+-    p = Script_DecodeOperand(p, &type, &condition);
+-    if (p) {
+-        type >>= 16;
+-        p = (u8 *)condition;
+-        if (type == 'e') {
+-            condition = 1;
+-            goto block_next;
+-        }
+-        if (type == 'i')
+-            goto condition_next;
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0821B794.c b/src/fn/sub_0821B794.c
+deleted file mode 100644
+index 1da281204e..0000000000
+--- a/src/fn/sub_0821B794.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "global.h"
+-u32 Script_SelectConditionalBlock(void);
+-u32 Script_ExecuteBlock(u32, u32, u32);
+-u32 Script_ExecuteIf(void)
+-{
+-    u32 r = Script_SelectConditionalBlock();
+-    if (r != 0)
+-        return Script_ExecuteBlock(r, 0, 0);
+-    return 0;
+-}
+diff --git a/src/fn/sub_0821B7B0.c b/src/fn/sub_0821B7B0.c
+deleted file mode 100644
+index cd3f794dd2..0000000000
+--- a/src/fn/sub_0821B7B0.c
++++ /dev/null
+@@ -1,28 +0,0 @@
+-#include "global.h"
+-u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
+-void Script_SetPc(u8 *);
+-s32 Script_ReadNextKeyword(void);
+-s32 Script_GetValue(void);
+-u8 *Script_GetPc(void);
+-s32 Script_ExecuteBlock(u8 *, u32, u32);
+-s32 Script_ExecuteSwitch(u8 *p)
+-{
+-    s32 type, value, block = 0;
+-    Script_SetPc(Script_DecodeOperand(p, &type, &value));
+-    for (;;) {
+-        s32 option = Script_ReadNextKeyword();
+-        if (!option)
+-            return 0;
+-        if (option == 'c') {
+-            if (Script_GetValue() != value)
+-                continue;
+-            Script_DecodeOperand(Script_GetPc(), &type, &block);
+-            break;
+-        }
+-        if (option == 'd') {
+-            Script_DecodeOperand(Script_GetPc(), &type, &block);
+-            break;
+-        }
+-    }
+-    return Script_ExecuteBlock((u8 *)block, 0, 0);
+-}
+diff --git a/src/fn/sub_0821B80C.c b/src/fn/sub_0821B80C.c
+deleted file mode 100644
+index fe72f74f4e..0000000000
+--- a/src/fn/sub_0821B80C.c
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#include "global.h"
+-struct VM {
+-    u8 p0[4];
+-    u32 f4;
+-    u32 *f8;
+-    u32 stk[24];
+-    u32 *sp;
+-};
+-extern struct VM gUnk_02000610;
+-u8 *Script_DecodeOperand(u8 *, u32 *, u32 *);
+-s32 Script_SetResultFromOperand(u8 *p)
+-{
+-    u32 a, b;
+-    Script_DecodeOperand(p, &a, &b);
+-    gUnk_02000610.f4 = b;
+-    return 0;
+-}
+diff --git a/src/fn/sub_0821B82C.c b/src/fn/sub_0821B82C.c
+deleted file mode 100644
+index f87bb20d52..0000000000
+--- a/src/fn/sub_0821B82C.c
++++ /dev/null
+@@ -1,20 +0,0 @@
+-#include "global.h"
+-struct VM {
+-    u8 p0[4];
+-    u32 f4;
+-    u32 *f8;
+-    u32 stk[24];
+-    u32 *sp;
+-};
+-extern struct VM gUnk_02000610;
+-u8 *Script_GetPc(void);
+-u32 Script_GetValue(void);
+-s32 Script_ExecuteReturn(void)
+-{
+-    u8 *p = Script_GetPc();
+-    if (p)
+-        gUnk_02000610.f4 = Script_GetValue();
+-    else
+-        gUnk_02000610.f4 = (u32)p;
+-    return 1;
+-}
+diff --git a/src/fn/sub_0821B858.c b/src/fn/sub_0821B858.c
+deleted file mode 100644
+index 4e05c356ec..0000000000
+--- a/src/fn/sub_0821B858.c
++++ /dev/null
+@@ -1,21 +0,0 @@
+-#include "global.h"
+-u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
+-void Script_ConvertTextToShiftJis(u8 *, u8 *);
+-s32 Script_ExecutePrint(u8 *p)
+-{
+-    u8 buffer[512];
+-    s32 type, value;
+-    while (p) {
+-        p = Script_DecodeOperand(p, &type, &value);
+-        if (!type)
+-            break;
+-        if (type == 7)
+-            Script_ConvertTextToShiftJis(buffer, (u8 *)value);
+-        else if (type == 14) {
+-            u8 *q = (u8 *)value;
+-            while (*q)
+-                q++;
+-        }
+-    }
+-    return 0;
+-}
+diff --git a/src/fn/sub_0821B8AC.c b/src/fn/sub_0821B8AC.c
+deleted file mode 100644
+index e3aa9c20e7..0000000000
+--- a/src/fn/sub_0821B8AC.c
++++ /dev/null
+@@ -1,27 +0,0 @@
+-#include "global.h"
+-struct Args {
+-    u32 count : 16;
+-    u32 reserved : 16;
+-    s32 *values;
+-};
+-s32 Script_GetValue(void);
+-u8 *Script_GetPc(void);
+-u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
+-s32 Script_Call(s32, struct Args *);
+-s32 Script_CallFromOperands(void)
+-{
+-    s32 values[16], type, value;
+-    struct Args args;
+-    s32 id = Script_GetValue();
+-    u8 *p = Script_GetPc();
+-    s32 count = 0;
+-    while (p) {
+-        p = Script_DecodeOperand(p, &type, &value);
+-        if (!type)
+-            break;
+-        values[count++] = value;
+-    }
+-    args.count = count;
+-    args.values = values;
+-    return Script_Call(id, &args);
+-}
+diff --git a/src/fn/sub_0821B90C.c b/src/fn/sub_0821B90C.c
+deleted file mode 100644
+index 62fad0d0e1..0000000000
+--- a/src/fn/sub_0821B90C.c
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#include "global.h"
+-struct S {
+-    u32 f0;
+-    u32 f4;
+-    const u8 *f8;
+-};
+-extern struct S gUnk_02000428;
+-extern const u8 gUnk_0861418C[];
+-s32 Div(s32, s32);
+-u32 Script_RegisterCommandTable(struct S *);
+-void Script_RegisterBuiltinCommands(void)
+-{
+-    gUnk_02000428.f0 = 0;
+-    gUnk_02000428.f4 = Div(0x30, 8);
+-    gUnk_02000428.f8 = gUnk_0861418C;
+-    Script_RegisterCommandTable(&gUnk_02000428);
+-}
+diff --git a/src/fn/sub_0821B938.c b/src/fn/sub_0821B938.c
+deleted file mode 100644
+index bee57b2d3b..0000000000
+--- a/src/fn/sub_0821B938.c
++++ /dev/null
+@@ -1,59 +0,0 @@
+-#include "global.h"
+-s32 Div(s32, s32);
+-s32 Mod(s32, s32);
+-s32 Script_ApplyOperator(u32 operation, s32 left, s32 right)
+-{
+-    switch (operation) {
+-        case 1:
+-            return -right;
+-        case 2:
+-            return !right;
+-        case 3:
+-            return ~right;
+-        case 4:
+-            return left + right;
+-        case 5:
+-            return left - right;
+-        case 6:
+-            return left * right;
+-        case 7:
+-            return Div(left, right);
+-        case 8:
+-            return Mod(left, right);
+-        case 9:
+-            left <<= right;
+-            return left;
+-        case 10:
+-            left = (u32)left >> right;
+-            return left;
+-        case 11:
+-            return left == right;
+-        case 12:
+-            return left != right;
+-        case 13:
+-            return left < right;
+-        case 14:
+-            return left <= right;
+-        case 15:
+-            return left > right;
+-        case 16:
+-            return left >= right;
+-        case 17:
+-            left |= right;
+-            return left;
+-        case 18:
+-            left &= right;
+-            return left;
+-        case 19:
+-            left ^= right;
+-            return left;
+-        case 20:
+-            return left || right;
+-        case 21:
+-            return left && right;
+-        case 23:
+-            return right;
+-        default:
+-            return 0;
+-    }
+-}
+diff --git a/src/fn/sub_0821BA5C.c b/src/fn/sub_0821BA5C.c
+deleted file mode 100644
+index 4a9765b36c..0000000000
+--- a/src/fn/sub_0821BA5C.c
++++ /dev/null
+@@ -1,56 +0,0 @@
+-#include "global.h"
+-struct Slot {
+-    s32 value;
+-    u8 *reference;
+-};
+-struct Frame {
+-    struct Slot stack[8];
+-    s32 type, value;
+-};
+-extern u32 gUnk_02000610[];
+-u8 *Script_DecodeOperand(u8 *, s32 *, s32 *);
+-void Script_SetStackArgument(s32, u32);
+-u8 *Script_AssignVariableOperand(u8 *, s32);
+-s32 Script_ApplyOperator(s32, s32, s32);
+-u32 Script_ExecuteBlock(u8 *, u32, u32);
+-u32 Script_EvalExpression(u8 *p)
+-{
+-    struct Frame frame;
+-    struct Slot *slot = (struct Slot *)((u32)frame.stack - 8);
+-    for (;;) {
+-        frame.type = *p;
+-        if ((frame.type & 0xE0) == 0xA0) {
+-            s32 op = frame.type & ~0xE0;
+-            slot = (struct Slot *)((u32)slot - 8);
+-            if (!op)
+-                return ((struct Slot *)((u32)slot + 8))->value;
+-            if (op == 0x16) {
+-                struct Slot *saved;
+-                u8 *reference = slot->reference;
+-                u32 type = *reference;
+-                u32 category = type & 0xF0;
+-                saved = slot;
+-                if (category == 0x90)
+-                    Script_SetStackArgument(type & 15, ((struct Slot *)((u32)slot + 8))->value);
+-                else
+-                    Script_AssignVariableOperand(reference,
+-                                                 ((struct Slot *)((u32)slot + 8))->value);
+-                saved->value = ((struct Slot *)((u32)slot + 8))->value;
+-            } else {
+-                slot->value =
+-                    Script_ApplyOperator(op, slot->value, ((struct Slot *)((u32)slot + 8))->value);
+-                slot->reference = 0;
+-            }
+-            p++;
+-        } else {
+-            ((struct Slot *)((u32)slot + 8))->reference = p;
+-            p = Script_DecodeOperand(p, &frame.type, &frame.value);
+-            if (frame.type == 0x80) {
+-                Script_ExecuteBlock((u8 *)frame.value, 0, 0);
+-                ((struct Slot *)((u32)slot + 8))->value = gUnk_02000610[1];
+-            } else
+-                ((struct Slot *)((u32)slot + 8))->value = frame.value;
+-            slot = (struct Slot *)((u32)slot + 8);
+-        }
+-    }
+-}
+diff --git a/src/script_virtual_machine.c b/src/script_virtual_machine.c
+new file mode 100644
+index 0000000000..a1c5cacbf1
+--- /dev/null
++++ b/src/script_virtual_machine.c
+@@ -0,0 +1,1362 @@
++#include "script_virtual_machine.h"
++
++s32 Script_FindResourceKey(u32 key, u16 *tbl, s32 x, s32 lo, s32 hi)
++{
++    s32 mid;
++    while (lo < hi) {
++        mid = (lo + hi) >> 1;
++        if (tbl[mid] < key)
++            lo = mid + 1;
++        else
++            hi = mid;
++    }
++    if (tbl[lo] == key)
++        return lo;
++    return -1;
++}
++
++struct ScriptResourceHeader {
++    u32 count;
++    u32 keys, records, reserved;
++};
++
++u8 *Script_LookupResource(u8 *base, u32 unused, u16 key, u16 context)
++{
++    struct ScriptResourceHeader header = *(struct ScriptResourceHeader *)base;
++    s32 index;
++    header.keys += (u32)base;
++    header.records += (u32)base;
++    index = Script_FindResourceKey(key, (u16 *)header.keys, context, 0, header.count - 1);
++    if (index < 0 || (u32)index >= header.count)
++        return 0;
++    return (u8 *)(((u32 *)header.records)[index] + (u32)base);
++}
++
++u32 Script_LookupArchive(u32 key, struct ScriptArchiveEntry *tbl, s32 lo, s32 hi)
++{
++    s32 mid;
++    struct ScriptArchiveEntry *e;
++    while (lo < hi) {
++        mid = (lo + hi) >> 1;
++        if (tbl[mid].key < key)
++            lo = mid + 1;
++        else
++            hi = mid;
++    }
++    e = (struct ScriptArchiveEntry *)((lo << 3) + (u32)tbl);
++    if (e->key == key)
++        return e->value;
++    return 0;
++}
++
++extern struct ScriptArchiveEntry gUnk_08614D6C[];
++
++void *ScriptProc_Start(u16 key, u16 context)
++{
++    u32 special = 0;
++    u16 saved_context = context;
++    u32 combined;
++    u8 *result;
++    switch (key) {
++        case 0x922E:
++            key = 0x9225;
++            context = 0x5130;
++            special = 1;
++            break;
++        case 0x92B3:
++            key = 0x9305;
++            context = 0xD710;
++            special = 1;
++            break;
++        case 0x9B1B:
++            key = 0x9A65;
++            context = 0x4679;
++            special = 1;
++            break;
++        case 0x98F5:
++            key = 0x9B05;
++            context = 0x2117;
++            special = 1;
++            break;
++        case 0xA635:
++            key = 0xA705;
++            context = 0x6D24;
++            special = 1;
++            break;
++        case 0xAE6C:
++            key = 0xAF05;
++            context = 0xAC2C;
++            special = 1;
++            break;
++        case 0xC091:
++            key = 0xC305;
++            context = 0xE53E;
++            special = 1;
++            break;
++        case 0xCB05:
++            key = 0xC8E5;
++            context = 0x5F29;
++            special = 1;
++            break;
++        case 0xCEEF:
++            key = 0xCEE5;
++            context = 0x4F2D;
++            special = 1;
++            break;
++        case 0xCEAA:
++            key = 0xCF05;
++            context = 0xA4D;
++            special = 1;
++            break;
++    }
++    combined = (key << 16) | context;
++    result = (u8 *)Script_LookupArchive(combined, gUnk_08614D6C, 0, 10);
++    if (special == 1) {
++        u32 third = saved_context;
++        result = Script_LookupResource(result, key, third, combined);
++    }
++    return result;
++}
++
++u8 *Script_DecodePacket(u8 *p, u32 *length)
++{
++    s32 size = *p & 15;
++    switch (size) {
++        case 13:
++            *length = p[1];
++            return p + 2;
++        case 14: {
++            u32 high = p[2] << 8;
++            *length = p[1] | high;
++            return p + 3;
++        }
++        case 15: {
++            u8 *q = p + 1;
++            *length = (q[2] << 16) | (q[1] << 8) | p[1];
++            return p + 4;
++        }
++        default:
++            *length = size;
++            return p + 1;
++    }
++}
++
++u8 *Script_DecodeCommandOffset(u8 *p, u32 *out)
++{
++    if (p[0] & 0x80) {
++        *out = ((p[0] << 8) | p[1]) & 0x7FFF;
++        return p + 2;
++    }
++    *out = p[0];
++    return p + 1;
++}
++
++u8 *Script_DecodeOperand(u8 *p, s32 *type, s32 *value)
++{
++    u32 length;
++    u8 *cursor = p;
++    s32 opcode = *cursor;
++    s32 family = opcode & 0xF0;
++    if ((family & 0xC0) == 0xC0) {
++        *type = 9;
++        *value = (*cursor & ~0xC0) - 1;
++        cursor++;
++    } else if (!family) {
++        *type = opcode;
++        cursor++;
++        switch (opcode) {
++            case 0:
++                cursor = 0;
++                break;
++            case 8: {
++                s32 high = cursor[1] << 8;
++                *value = cursor[0] | high;
++                cursor += 2;
++                break;
++            }
++            case 1: {
++                s32 high = cursor[1] << 8;
++                *value = (s16)(cursor[0] | high);
++                cursor += 2;
++                break;
++            }
++            case 9:
++            case 10:
++            case 13:
++                *value = (cursor[3] << 24) | (cursor[2] << 16) | (cursor[1] << 8) | cursor[0];
++                cursor += 4;
++                break;
++            case 6: {
++                s32 high = cursor[1] << 8;
++                *value = high | cursor[0];
++                cursor += 2;
++                break;
++            }
++            case 2:
++            case 3:
++            case 4:
++                *value = *cursor++;
++                break;
++            case 7:
++                *value = (s32)(cursor + 1);
++                cursor += *cursor + 1;
++                break;
++            case 14: {
++                s32 high = cursor[1] << 8;
++                *value = (s32)Text_LookupString(cursor[0] | high);
++                *type = 7;
++                cursor += 2;
++                break;
++            }
++        }
++    } else {
++        *type = family;
++        switch (family) {
++            case 0x10:
++            case 0x20:
++                return Script_DecodeVariableValue(p, type, value);
++            case 0x40:
++                if ((*cursor & 15) == 15) {
++                    *value = Script_GetCallArgument(cursor[1] + 15);
++                    cursor++;
++                } else
++                    *value = Script_GetCallArgument(*cursor & 15);
++                *type = 9;
++                cursor++;
++                break;
++            case 0x90:
++                *value = Script_GetStackArgument(*cursor & 15);
++                *type = 9;
++                cursor++;
++                break;
++            case 0x80:
++                cursor = Script_DecodePacket(cursor, &length);
++                *value = (s32)cursor;
++                cursor += length;
++                break;
++            case 0x30:
++                cursor = Script_DecodePacket(cursor, &length);
++                *value = Script_EvalExpression(cursor);
++                cursor += length;
++                break;
++            case 0x50:
++                cursor = Script_DecodePacket(cursor, &length);
++                *type |= *cursor << 16;
++                *value = (s32)(cursor + 1);
++                cursor += length;
++                break;
++        }
++    }
++    return cursor;
++}
++
++void Script_ResetArgumentStack(void)
++{
++    gUnk_02000610.argSp = gUnk_02000610.stack + 25;
++}
++
++u32 *Script_PushArgumentFrame(u32 a, u32 b)
++{
++    if (a == 0)
++        return 0;
++    else {
++        u32 *p = gUnk_02000610.argSp;
++        u32 *q = p + b;
++        *q++ = a;
++        gUnk_02000610.argSp = q;
++        return p;
++    }
++}
++
++void Script_RestoreArgumentStack(u32 *p)
++{
++    if (p)
++        gUnk_02000610.argSp = p;
++}
++
++u32 Script_GetCallArgument(s32 n)
++{
++    if (!n)
++        return gUnk_02000610.result;
++    else {
++        u32 *e = (u32 *)gUnk_02000610.argSp[-1];
++        return ((u32 *)e[1])[n - 1];
++    }
++}
++
++u32 Script_GetStackArgument(s32 n)
++{
++    return *(u32 *)((u8 *)gUnk_02000610.argSp - (n * 4 + 4));
++}
++
++void Script_SetStackArgument(s32 n, u32 v)
++{
++    *(u32 *)((u8 *)gUnk_02000610.argSp - (n * 4 + 4)) = v;
++}
++
++void Script_ResetKeywordStack(void)
++{
++    gUnk_02000610.keywordSp = gUnk_02000610.stack;
++}
++
++void Script_PushCtrlNextKeyword(u32 v)
++{
++    *gUnk_02000610.keywordSp++ = v;
++}
++
++void Script_PopCtrlNextKeyword(void)
++{
++    gUnk_02000610.keywordSp--;
++}
++
++void Script_SetPc(u8 *p)
++{
++    gUnk_02000610.pc = p;
++}
++
++/* engine.h declares this s32(s32); the real parameter is a byte (the prologue
++ * zero-extends it) -- narrow it explicitly so the body still matches. */
++
++s32 Script_SeekToKeyword(s32 keyword)
++{
++    u8 k = keyword;
++    s32 a, b;
++    u8 *p = (u8 *)gUnk_02000610.keywordSp[-1];
++    for (;;) {
++        p = Script_DecodeOperand(p, &a, &b);
++        if (a == 0)
++            return 0;
++        if ((a & 0xF0) == 0x50 && (a >> 16) == k) {
++            gUnk_02000610.pc = (u8 *)b;
++            return b;
++        }
++    }
++}
++
++s32 Script_ReadNextKeyword(void)
++{
++    s32 a, b;
++    u8 *p = gUnk_02000610.pc;
++    if (p == 0)
++        return 0;
++    if (*p == 0)
++        return 0;
++    for (;;) {
++        p = Script_DecodeOperand(p, &a, &b);
++        if (a == 0)
++            return 0;
++        if ((a & 0xF0) != 0x50)
++            continue;
++        gUnk_02000610.pc = (u8 *)b;
++        return a >> 16;
++    }
++}
++
++s32 Script_ReadValue(const void *p)
++{
++    s32 a, b;
++    gUnk_02000610.pc = Script_DecodeOperand((u8 *)p, &a, &b);
++    return b;
++}
++
++s32 Script_ReadVector32(u8 *p, s32 *destination)
++{
++    s32 type, value;
++    s32 *vector;
++    s32 count;
++    vector = destination;
++    for (count = 0; count < 3; count++) {
++        p = Script_DecodeOperand(p, &type, &value);
++        vector[count] = value;
++    }
++    gUnk_02000610.pc = p;
++    return 0;
++}
++
++s32 Script_ReadVector16(u8 *p, s16 *destination)
++{
++    s32 type, value;
++    s16 *vector;
++    s32 count;
++    vector = destination;
++    for (count = 0; count < 3; count++) {
++        p = Script_DecodeOperand(p, &type, &value);
++        vector[count] = value;
++    }
++    gUnk_02000610.pc = p;
++    return 0;
++}
++
++u32 Script_ReadValueSafe(u8 *p)
++{
++    s32 a, b;
++    if (p) {
++        gUnk_02000610.pc = Script_DecodeOperand(p, &a, &b);
++        if (gUnk_02000610.pc)
++            return b;
++    }
++    return 0;
++}
++
++u32 Script_ReadString(u8 *p)
++{
++    return Script_ReadValueSafe(p);
++}
++
++s32 Script_ParseStringRef(const void *pc)
++{
++    const u8 *p = pc;
++    s32 v = (s16)((p[2] << 8) | p[1]);
++    gUnk_02000610.pc = (u8 *)p + 3;
++    return v;
++}
++
++void Script_ReadReference(struct ScriptUtilityReference *ref)
++{
++    gUnk_02000610.pc = Script_DecodeVariableReference(Script_GetPc(), ref);
++}
++
++/* Gap: scans operands from a hidden cursor argument until the terminating zero
++ * type and clears the PC. gbadisasm left it as data; no caller (bl or pointer)
++ * has been found yet. See symbols/progress_extra_functions.csv. */
++u8 *sub_0821AAF4(u8 *p)
++{
++    s32 type, value;
++    u8 **pc;
++    do {
++        p = Script_DecodeOperand(p, &type, &value);
++        pc = &gUnk_02000610.pc;
++    } while (type != 0);
++    *pc = (u8 *)type;
++    return p;
++}
++
++u8 *Script_GetPc(void)
++{
++    u8 *p = gUnk_02000610.pc;
++    if (p == 0 || *p == 0 || (*p & 0xF0) == 0x50)
++        return 0;
++    return p;
++}
++
++s32 Script_GetValue(void)
++{
++    return Script_ReadValue(Script_GetPc());
++}
++
++/* Script_GetVector32: Reads a three component thirty two bit vector from the current script PC */
++
++#define Script_GetVector32 sub_0821AB50
++
++s32 sub_0821AB50(void *p)
++{
++    return Script_ReadVector32(Script_GetPc(), p);
++}
++
++/* Script_GetVector: Decodes three operands at the current script cursor into a signed 16-bit vector */
++
++#define Script_GetVector sub_0821AB64
++
++s32 sub_0821AB64(void *p)
++{
++    return Script_ReadVector16(Script_GetPc(), p);
++}
++
++/* Same body as Script_GetValueSafe (0821AB88); kept as a separate ROM function. */
++
++u32 sub_0821AB78(void)
++{
++    return Script_ReadValueSafe(Script_GetPc());
++}
++
++u32 Script_GetValueSafe(void)
++{
++    return Script_ReadValueSafe(Script_GetPc());
++}
++
++/* Script_GetStringRef: Parses a string reference at the current script cursor and advances it */
++
++#define Script_GetStringRef sub_0821AB98
++
++s32 sub_0821AB98(void)
++{
++    return Script_ParseStringRef(Script_GetPc());
++}
++
++s32 Script_GetKeywordValue(s32 keyword, s32 defaultValue)
++{
++    u8 k = keyword;
++    if (Script_SeekToKeyword(k) != 0)
++        return Script_ReadValue(Script_GetPc());
++    return defaultValue;
++}
++
++void Script_ResetStacks(void)
++{
++    Script_ResetArgumentStack();
++    Script_ResetKeywordStack();
++}
++
++void Script_ClearCommandTables(void)
++{
++    gUnk_02000458 = 0;
++}
++
++u32 Script_RegisterCommandTable(struct ScriptCommandTable *n)
++{
++    n->next = gUnk_02000458;
++    gUnk_02000458 = n;
++    return 0;
++}
++
++/* Gap: unlinks a command table from the registered list, returning 0 if found in
++ * the middle, -1 if it was the head or not found. gbadisasm left it as data; no
++ * caller (bl or pointer) has been found yet. See symbols/progress_extra_functions.csv. */
++s32 sub_0821ABF8(struct ScriptCommandTable *n)
++{
++    struct ScriptCommandTable *cur;
++    struct ScriptCommandTable *prev;
++    if (gUnk_02000458 == n)
++        gUnk_02000458 = n->next;
++    cur = gUnk_02000458;
++    prev = cur;
++    while (cur != 0) {
++        if (cur == n) {
++            prev->next = cur->next;
++            return 0;
++        }
++        prev = cur;
++        cur = cur->next;
++    }
++    return -1;
++}
++
++struct ScriptCommandEntry *Script_FindCommand(u32 key)
++{
++    struct ScriptCommandTable *b = gUnk_02000458;
++    while (b) {
++        struct ScriptCommandEntry *e = b->entries;
++        s32 n = b->count;
++        for (; n > 0; e++, n--)
++            if (e->key == key)
++                return e;
++        b = b->next;
++    }
++    return 0;
++}
++
++u8 *Script_ExecuteNativeCommand(u8 *p)
++{
++    u32 len;
++    u32 id = (p[1] << 8) | p[0];
++    struct ScriptCommandEntry *e;
++    p += 2;
++    e = Script_FindCommand(id);
++    p = Script_DecodeCommandOffset(p, &len);
++    Script_PushCtrlNextKeyword((u32)(p + len));
++    Script_SetPc(p);
++    p = Callback_InvokeActor(p, e->callback);
++    Script_PopCtrlNextKeyword();
++    return p;
++}
++
++u32 *Script_ReadProcTable(u32 *p, u32 *n)
++{
++    s32 c;
++    u32 *q;
++    u32 *o = n;
++    c = 0;
++    q = p;
++    while (*q != (u32)-1) {
++        q++;
++        c++;
++    }
++    *o = c;
++    return q + 1;
++}
++
++u8 *Script_GetProcedure(u32 id, u32 *out)
++{
++    u32 idx = (id & 0x7FFFFFFF) - 1;
++    struct ScriptProcedureTable *t = &gUnk_02000438;
++    u32 *e = t->entries + idx;
++    *out = ((u8 *)e)[3];
++    return t->body + (e[0] & 0xFFFFFF);
++}
++
++s32 Script_Call(u32 id, void *b)
++{
++    u32 x, y;
++    return Script_RunProcedureBlock(Script_DecodePacket(Script_GetProcedure(id, &x), &y), b, x);
++}
++
++s32 Script_CallInlineProcedure(u8 *p)
++{
++    s32 values[16], type, value;
++    struct ScriptUtilityArguments args;
++    s32 high = p[1] << 8;
++    s32 id = (s16)(p[0] | high);
++    s32 count;
++    p += 2;
++    count = 0;
++    for (;;) {
++        p = Script_DecodeOperand(p, &type, &value);
++        if (!type)
++            break;
++        values[count++] = value;
++    }
++    args.count = count;
++    args.values = values;
++    return Script_Call(id, &args);
++}
++
++/* Gap: a binary search by key over a ScriptArchiveEntry table, returning the entry
++ * pointer (not its value, unlike Script_LookupArchive). gbadisasm left it as data;
++ * no caller (bl or pointer) has been found yet. See symbols/progress_extra_functions.csv. */
++void *sub_0821AD98(void *table, u32 key, s32 count)
++{
++    struct ScriptArchiveEntry *tbl = table;
++    s32 lo = 0, hi = count - 1;
++    s32 mid;
++    struct ScriptArchiveEntry *e;
++    while (lo < hi) {
++        mid = (lo + hi) >> 1;
++        if (tbl[mid].key < key)
++            lo = mid + 1;
++        else
++            hi = mid;
++    }
++    e = (struct ScriptArchiveEntry *)((lo << 3) + (u32)tbl);
++    if (e->key == key)
++        return e;
++    return 0;
++}
++
++u8 *Text_LookupString(s32 id)
++{
++    u8 **sections = gUnk_02000448;
++    u8 *e = (u8 *)((id << 2) + (u32)sections[1]);
++    u32 v = (e[3] << 24) | (e[2] << 16) | (e[1] << 8) | e[0];
++    return sections[2] + (v & 0x7FFFFFFF);
++}
++
++extern u32 gUnk_0200060C;
++
++static inline u32 read_word(u8 *p)
++{
++    return (p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0];
++}
++
++s32 Script_LoadScript(u8 *p)
++{
++    u32 count;
++    struct ScriptProcedureTable *ctx = &gUnk_02000438;
++    u8 *base;
++    gUnk_0200060C = read_word(p);
++    p += 4;
++    base = (u8 *)Script_ReadProcTable((u32 *)p, &count);
++    ctx->entries = (u32 *)p;
++    ctx->count = count;
++    gUnk_02000448[0] = base;
++    gUnk_02000448[1] = base + read_word(base + 4);
++    gUnk_02000448[2] = base + read_word(base + 8);
++    gUnk_02000448[3] = base + read_word(base + 12);
++    base += read_word(base);
++    ctx->body = base + 4;
++    {
++        u32 size = read_word(base);
++        size += (u32)base;
++        size += 8;
++        ctx->mainBlock = (u8 *)size;
++    }
++    return 0;
++}
++
++/* Script_GetSectionThreeData: Returns data after the fourth resolved section pointer's header with section purpose tentative */
++
++#define Script_GetSectionThreeData sub_0821AED0
++
++u8 *sub_0821AED0(void)
++{
++    return gUnk_02000448[3] + 4;
++}
++
++/* Script_SaveContext: Copies the loaded script context and section pointers into caller storage */
++
++#define Script_SaveContext sub_0821AEDC
++
++struct Block0821AEDC {
++    u32 w[4];
++};
++
++void sub_0821AEDC(struct Block0821AEDC *dst)
++{
++    dst[0] = *(struct Block0821AEDC *)&gUnk_02000438;
++    dst[1] = *(struct Block0821AEDC *)&gUnk_02000448;
++}
++
++/* Script_RestoreContext: Restores the loaded script context and section pointers from caller storage */
++
++#define Script_RestoreContext sub_0821AF04
++
++struct Block0821AF04 {
++    u32 w[4];
++};
++
++void sub_0821AF04(struct Block0821AF04 *src)
++{
++    gUnk_02000438 = *(struct ScriptProcedureTable *)&src[0];
++    *(struct Block0821AF04 *)gUnk_02000448 = src[1];
++}
++
++u32 Script_ExecuteBlock(u8 *p, u32 a, u32 b)
++{
++    u32 length;
++    u32 *saved;
++    saved = Script_PushArgumentFrame(a, b);
++    while (p) {
++        switch (*p & 0xF0) {
++            case 0x60:
++                p = Script_DecodePacket(p, &length);
++                if (Script_ExecuteNativeCommand(p) == 1) {
++                    p = (u8 *)1;
++                    goto done;
++                }
++                p += length;
++                break;
++            case 0x70:
++                p = Script_DecodePacket(p, &length);
++                gUnk_02000610.result = Script_CallInlineProcedure(p);
++                p += length;
++                break;
++            case 0x30:
++                p = Script_DecodePacket(p, &length);
++                gUnk_02000610.result = Script_EvalExpression(p);
++                p += length;
++                break;
++            case 0:
++                goto stop;
++        }
++    }
++stop:
++    p = 0;
++done:
++    Script_RestoreArgumentStack(saved);
++    return (u32)p;
++}
++
++u32 Script_RunBlock(u32 a, struct ScriptUtilityArguments *b)
++{
++    if (Script_ExecuteBlock((u8 *)a, (u32)b, 0) == 1)
++        return gUnk_02000610.result;
++    return gUnk_02000610.result = 0;
++}
++
++extern const u8 gUnk_08614184[];
++
++u32 Script_RunProcedureBlock(u32 a, const u8 *b, u32 c)
++{
++    if (b == 0)
++        b = gUnk_08614184;
++    if (Script_ExecuteBlock((u8 *)a, (u32)b, c) == 1)
++        return gUnk_02000610.result;
++    return gUnk_02000610.result = 0;
++}
++
++void Script_RunMainBlock(void)
++{
++    u32 x;
++    Script_RunBlock((u32)Script_DecodePacket(gUnk_02000438.mainBlock, &x),
++                    (struct ScriptUtilityArguments *)gUnk_08614184);
++}
++
++s32 Script_DiscardValueIfZero(void)
++{
++    if (Script_GetValue() == 0)
++        sub_0821AB78();
++    return 0;
++}
++
++extern u16 gUnk_030039F0;
++
++void Script_SetEntryProcedure(u16 v)
++{
++    gUnk_030039F0 = v;
++}
++
++void Script_InitRuntime(void)
++{
++    Script_ResetStacks();
++    GameState_ClearActiveRegions();
++    Script_ClearCommandTables();
++    Script_RegisterBuiltinCommands();
++    ScriptProc_Start(0xA8D9, 0x49BC);
++    /* Falls through: r0 (ScriptProc_Start's resource pointer) becomes Script_LoadScript's
++     * argument. The cast avoids a hard arg-count mismatch against its real prototype now
++     * that both are in the same translation unit. */
++    ((s32(*)())Script_LoadScript)();
++    Script_SetEntryProcedure(0);
++}
++
++void Script_ResetLocalVariables(void)
++{
++    Script_ClearLocalVariables();
++}
++
++// Provisional name: GameState_SelectRamBase
++
++/* Select timer-jittered storage for the game-state regions. */
++
++extern u8 gUnk_0203C400[];
++
++// MATCHING_CONCESSION: register-pinning
++void GameState_SelectRamBase(void)
++{
++    u32 timer = *(vu16 *)0x0400010C;
++    register u8 *base asm("r1") = gUnk_0203C400;
++    base += (timer & 127) * 8;
++    gUnk_02000710 = (struct GameState *)base;
++    gUnk_0200070C = base + 0xb00;
++    gUnk_02000708 = base + 0x1600;
++    gUnk_02000704 = base + 0x1a00;
++    gUnk_02000700 = base + 0x1e00;
++}
++
++void GameState_ClearActiveRegions(void)
++{
++    Memory_Clear(gUnk_02000708, 0x400);
++    Memory_Clear(gUnk_02000710, 0x89C);
++}
++
++void GameState_ResetActiveRegions(void)
++{
++    u16 v = *(u16 *)((u8 *)gUnk_02000710 + 0x744);
++    Memory_Clear(gUnk_02000708, 0x400);
++    Memory_Clear((u8 *)gUnk_02000710 + 0x30, 0x74A);
++    *(u16 *)((u8 *)gUnk_02000710 + 0x744) = v;
++    GameState_BackupActiveRegions();
++}
++
++void GameState_BackupActiveRegions(void)
++{
++    Memory_Copy(gUnk_0200070C, gUnk_02000710, 0x89C);
++    Memory_Copy(gUnk_02000704, gUnk_02000708, 0x400);
++}
++
++void GameState_RestoreActiveRegions(void)
++{
++    Memory_Copy(gUnk_02000710, gUnk_0200070C, 0x89C);
++    Memory_Copy(gUnk_02000708, gUnk_02000704, 0x400);
++}
++
++void GameState_BackupRegionRange(u8 *p, u32 n)
++{
++    s32 d = p - (u8 *)gUnk_02000710;
++    Memory_Copy(gUnk_0200070C + d, p, n);
++}
++
++u8 *GameState_GetBackupRegionPointer(u8 *p)
++{
++    s32 d = p - (u8 *)gUnk_02000710;
++    return gUnk_0200070C + d;
++}
++
++void Script_ClearLocalVariables(void)
++{
++    Memory_Clear(gUnk_02000700, 0x400);
++}
++
++struct ScriptShortArrayView {
++    s16 elements[1];
++};
++
++void Script_ReadTypedVariable(u8 *p, s32 descriptor, s32 index, s32 *value)
++{
++    switch ((descriptor >> 24) & 15) {
++        case 9:
++            p += index * 4;
++            *value = (p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0];
++            break;
++        case 8:
++            p += index * 4;
++            *value = (p[1] << 8) | p[0];
++            break;
++        case 1:
++        case 6:
++            *value = ((struct ScriptShortArrayView *)p)->elements[index];
++            break;
++        case 2:
++        case 3:
++            p += index;
++            *value = *p;
++            break;
++        case 4: {
++            u8 *byte;
++            u32 mask, bits;
++            index += (descriptor >> 16) & 15;
++            byte = p + (index >> 3);
++            mask = 1u << (index & 7);
++            bits = *byte & mask;
++            *value = bits != 0;
++            break;
++        }
++    }
++}
++
++u8 *Script_DecodeVariableValue(u8 *p, s32 *type, s32 *value)
++{
++    s32 ignored, first, index;
++    u32 descriptor = (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
++    u8 *base, *end;
++    *type = (descriptor >> 24) & 15;
++    if ((descriptor & 0xF00000) == 0x800000)
++        base = (u8 *)gUnk_02000710;
++    else if ((descriptor & 0xF00000) == 0x100000)
++        base = gUnk_02000700;
++    else
++        base = gUnk_02000708;
++    base += descriptor & 0xFFFF;
++    if (((descriptor >> 24) & 0xF0) == 0x20) {
++        end = Script_DecodeOperand(p + 4, &ignored, &first);
++        end = Script_DecodeOperand(end, &ignored, &index);
++    } else {
++        index = 0;
++        end = p + 4;
++    }
++    Script_ReadTypedVariable(base, descriptor, index, value);
++    return end;
++}
++
++struct ScriptWordArrayView {
++    s32 elements[1];
++};
++
++void Script_WriteTypedVariable(u8 *p, s32 descriptor, s32 index, s32 value)
++{
++    switch ((descriptor >> 24) & 15) {
++        case 9:
++            ((struct ScriptWordArrayView *)p)->elements[index] = value;
++            break;
++        case 8: {
++            u8 *q = p + index * 4;
++            q[2] = value >> 16;
++            q[1] = value >> 8;
++            q[0] = value;
++            break;
++        }
++        case 1:
++        case 6:
++            ((struct ScriptShortArrayView *)p)->elements[index] = value;
++            break;
++        case 2:
++        case 3:
++            p[index] = value;
++            break;
++        case 4: {
++            s32 mask;
++            index += (descriptor >> 16) & 15;
++            p += index >> 3;
++            mask = 1 << (index & 7);
++            if (value)
++                *p |= mask;
++            else
++                *p &= ~mask;
++            break;
++        }
++    }
++}
++
++u8 *Script_AssignVariableOperand(u8 *p, s32 value)
++{
++    s32 ignored, first, index;
++    u32 descriptor = (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
++    u8 *base, *end;
++    if ((descriptor & 0xF00000) == 0x800000)
++        base = (u8 *)gUnk_02000710;
++    else if ((descriptor & 0xF00000) == 0x100000)
++        base = gUnk_02000700;
++    else
++        base = gUnk_02000708;
++    base += descriptor & 0xFFFF;
++    if (((descriptor >> 24) & 0xF0) == 0x20) {
++        end = Script_DecodeOperand(p + 4, &ignored, &first);
++        end = Script_DecodeOperand(end, &ignored, &index);
++    } else {
++        index = 0;
++        end = p + 4;
++    }
++    Script_WriteTypedVariable(base, descriptor, index, value);
++    return end;
++}
++
++u8 *Script_DecodeVariableReference(u8 *p, struct ScriptUtilityReference *ref)
++{
++    s32 type, count, index;
++    u8 *end;
++    Memory_Copy(ref->descriptor, p, 4);
++    if ((ref->descriptor[0] & 0xF0) == 0x20) {
++        end = Script_DecodeOperand(p + 4, &type, &count);
++        end = Script_DecodeOperand(end, &type, &index);
++        ref->count = count;
++        ref->index = index;
++    } else {
++        end = p + 4;
++        ref->count = 1;
++        ref->index = 0;
++    }
++    return end;
++}
++
++void Script_WriteReferenceValue(struct ScriptUtilityReference *ref, s32 index, s32 value)
++{
++    u32 descriptor = (ref->descriptor[0] << 24) | (ref->descriptor[1] << 16) |
++                     (ref->descriptor[2] << 8) | ref->descriptor[3];
++    u8 *base;
++    if ((descriptor & 0xF00000) == 0x800000)
++        base = (u8 *)gUnk_02000710;
++    else if ((descriptor & 0xF00000) == 0x100000)
++        base = gUnk_02000700;
++    else
++        base = gUnk_02000708;
++    base += descriptor & 0xFFFF;
++    if (((descriptor >> 24) & 0xF0) == 0x20)
++        index += ref->index;
++    Script_WriteTypedVariable(base, descriptor, index, value);
++}
++
++s32 Script_ReadReferenceValue(struct ScriptUtilityReference *ref, s32 index)
++{
++    s32 value;
++    u32 descriptor = (ref->descriptor[0] << 24) | (ref->descriptor[1] << 16) |
++                     (ref->descriptor[2] << 8) | ref->descriptor[3];
++    u8 *base;
++    if ((descriptor & 0xF00000) == 0x800000)
++        base = (u8 *)gUnk_02000710;
++    else if ((descriptor & 0xF00000) == 0x100000)
++        base = gUnk_02000700;
++    else
++        base = gUnk_02000708;
++    base += descriptor & 0xFFFF;
++    if (((descriptor >> 24) & 0xF0) == 0x20)
++        index += ref->index;
++    Script_ReadTypedVariable(base, descriptor, index, &value);
++    return value;
++}
++
++u8 *Script_BackupVariableOperand(u8 *p)
++{
++    struct ScriptUtilityReference ref;
++    u8 *r = (u8 *)&ref;
++    u8 *end, *base;
++    s32 index = 0;
++    s32 value;
++    u32 descriptor;
++    end = Script_DecodeVariableReference(p, &ref);
++    value = Script_ReadReferenceValue(&ref, 0);
++    descriptor = (r[0] << 24) | (r[1] << 16) | (r[2] << 8) | r[3];
++    if ((descriptor & 0xF00000) == 0x800000)
++        base = gUnk_0200070C;
++    else
++        base = gUnk_02000704;
++    base += descriptor & 0xFFFF;
++    if (((descriptor >> 24) & 0xF0) == 0x20)
++        index += *(u16 *)(r + 6);
++    Script_WriteTypedVariable(base, descriptor, index, value);
++    return end;
++}
++
++s32 Script_ReadBackupVariableOperand(u8 *p)
++{
++    struct ScriptUtilityReference ref;
++    u8 *r = (u8 *)&ref;
++    s32 value;
++    u8 *base;
++    s32 index = 0;
++    u32 descriptor;
++    Script_DecodeVariableReference(p, &ref);
++    descriptor = (r[0] << 24) | (r[1] << 16) | (r[2] << 8) | r[3];
++    if ((descriptor & 0xF00000) == 0x800000)
++        base = gUnk_0200070C;
++    else
++        base = gUnk_02000704;
++    base += descriptor & 0xFFFF;
++    if (((descriptor >> 24) & 0xF0) == 0x20)
++        index += *(u16 *)(r + 6);
++    Script_ReadTypedVariable(base, descriptor, index, &value);
++    return value;
++}
++
++u8 *GameState_GetBackupStateBase(void)
++{
++    return gUnk_0200070C;
++}
++
++u8 *GameState_GetBackupVariableBase(void)
++{
++    return gUnk_02000704;
++}
++
++s32 Div(s32, s32);
++
++void Script_ConvertTextToShiftJis(u8 *output, u8 *input)
++{
++    u8 *src = input;
++    u8 *dest = output;
++    while (*src) {
++        if (*src & 0x80) {
++            s32 row = *src - 0x80;
++            s32 column = src[1];
++            s32 adjusted;
++            src++;
++            if (row & 1) {
++                adjusted = column - 0x61;
++                if (adjusted > 0x7E)
++                    adjusted++;
++            } else
++                adjusted = column - 2;
++            row = Div(row - 0x21, 2) + 0x81;
++            if (row > 0x9F)
++                row += 0x40;
++            dest[0] = row;
++            dest[1] = adjusted;
++            dest++;
++        } else
++            *dest = *src;
++        if (src[0] == 13 && src[1] == 10)
++            src++;
++        src++;
++        dest++;
++    }
++    *dest = 0;
++}
++
++u8 *Script_SelectConditionalBlock(u8 *p)
++{
++    s32 type, condition, block;
++condition_next:
++    p = Script_DecodeOperand(p, &type, &condition);
++block_next:
++    p = Script_DecodeOperand(p, &type, &block);
++    if (condition)
++        return (u8 *)block;
++    p = Script_DecodeOperand(p, &type, &condition);
++    if (p) {
++        type >>= 16;
++        p = (u8 *)condition;
++        if (type == 'e') {
++            condition = 1;
++            goto block_next;
++        }
++        if (type == 'i')
++            goto condition_next;
++    }
++    return 0;
++}
++
++u32 Script_ExecuteIf(u8 *p)
++{
++    u8 *r = Script_SelectConditionalBlock(p);
++    if (r != 0)
++        return Script_ExecuteBlock(r, 0, 0);
++    return 0;
++}
++
++s32 Script_ExecuteSwitch(u8 *p)
++{
++    s32 type, value, block = 0;
++    Script_SetPc(Script_DecodeOperand(p, &type, &value));
++    for (;;) {
++        s32 option = Script_ReadNextKeyword();
++        if (!option)
++            return 0;
++        if (option == 'c') {
++            if (Script_GetValue() != value)
++                continue;
++            Script_DecodeOperand(Script_GetPc(), &type, &block);
++            break;
++        }
++        if (option == 'd') {
++            Script_DecodeOperand(Script_GetPc(), &type, &block);
++            break;
++        }
++    }
++    return Script_ExecuteBlock((u8 *)block, 0, 0);
++}
++
++s32 Script_SetResultFromOperand(u8 *p)
++{
++    s32 a, b;
++    Script_DecodeOperand(p, &a, &b);
++    gUnk_02000610.result = b;
++    return 0;
++}
++
++s32 Script_ExecuteReturn(void)
++{
++    u8 *p = Script_GetPc();
++    if (p)
++        gUnk_02000610.result = Script_GetValue();
++    else
++        gUnk_02000610.result = (u32)p;
++    return 1;
++}
++
++s32 Script_ExecutePrint(u8 *p)
++{
++    u8 buffer[512];
++    s32 type, value;
++    while (p) {
++        p = Script_DecodeOperand(p, &type, &value);
++        if (!type)
++            break;
++        if (type == 7)
++            Script_ConvertTextToShiftJis(buffer, (u8 *)value);
++        else if (type == 14) {
++            u8 *q = (u8 *)value;
++            while (*q)
++                q++;
++        }
++    }
++    return 0;
++}
++
++s32 Script_CallFromOperands(void)
++{
++    s32 values[16], type, value;
++    struct ScriptUtilityArguments args;
++    s32 id = Script_GetValue();
++    u8 *p = Script_GetPc();
++    s32 count = 0;
++    while (p) {
++        p = Script_DecodeOperand(p, &type, &value);
++        if (!type)
++            break;
++        values[count++] = value;
++    }
++    args.count = count;
++    args.values = values;
++    return Script_Call(id, &args);
++}
++
++extern struct ScriptCommandTable gUnk_02000428;
++
++extern const u8 gUnk_0861418C[];
++
++void Script_RegisterBuiltinCommands(void)
++{
++    gUnk_02000428.next = 0;
++    gUnk_02000428.count = Div(0x30, 8);
++    gUnk_02000428.entries = (struct ScriptCommandEntry *)gUnk_0861418C;
++    Script_RegisterCommandTable(&gUnk_02000428);
++}
++
++s32 Mod(s32, s32);
++
++s32 Script_ApplyOperator(u32 operation, s32 left, s32 right)
++{
++    switch (operation) {
++        case 1:
++            return -right;
++        case 2:
++            return !right;
++        case 3:
++            return ~right;
++        case 4:
++            return left + right;
++        case 5:
++            return left - right;
++        case 6:
++            return left * right;
++        case 7:
++            return Div(left, right);
++        case 8:
++            return Mod(left, right);
++        case 9:
++            left <<= right;
++            return left;
++        case 10:
++            left = (u32)left >> right;
++            return left;
++        case 11:
++            return left == right;
++        case 12:
++            return left != right;
++        case 13:
++            return left < right;
++        case 14:
++            return left <= right;
++        case 15:
++            return left > right;
++        case 16:
++            return left >= right;
++        case 17:
++            left |= right;
++            return left;
++        case 18:
++            left &= right;
++            return left;
++        case 19:
++            left ^= right;
++            return left;
++        case 20:
++            return left || right;
++        case 21:
++            return left && right;
++        case 23:
++            return right;
++        default:
++            return 0;
++    }
++}
++
++struct Slot {
++    s32 value;
++    u8 *reference;
++};
++
++struct Frame {
++    struct Slot stack[8];
++    s32 type, value;
++};
++
++u32 Script_EvalExpression(u8 *p)
++{
++    struct Frame frame;
++    struct Slot *slot = (struct Slot *)((u32)frame.stack - 8);
++    for (;;) {
++        frame.type = *p;
++        if ((frame.type & 0xE0) == 0xA0) {
++            s32 op = frame.type & ~0xE0;
++            slot = (struct Slot *)((u32)slot - 8);
++            if (!op)
++                return ((struct Slot *)((u32)slot + 8))->value;
++            if (op == 0x16) {
++                struct Slot *saved;
++                u8 *reference = slot->reference;
++                u32 type = *reference;
++                u32 category = type & 0xF0;
++                saved = slot;
++                if (category == 0x90)
++                    Script_SetStackArgument(type & 15, ((struct Slot *)((u32)slot + 8))->value);
++                else
++                    Script_AssignVariableOperand(reference,
++                                                 ((struct Slot *)((u32)slot + 8))->value);
++                saved->value = ((struct Slot *)((u32)slot + 8))->value;
++            } else {
++                slot->value =
++                    Script_ApplyOperator(op, slot->value, ((struct Slot *)((u32)slot + 8))->value);
++                slot->reference = 0;
++            }
++            p++;
++        } else {
++            ((struct Slot *)((u32)slot + 8))->reference = p;
++            p = Script_DecodeOperand(p, &frame.type, &frame.value);
++            if (frame.type == 0x80) {
++                Script_ExecuteBlock((u8 *)frame.value, 0, 0);
++                ((struct Slot *)((u32)slot + 8))->value = gUnk_02000610.result;
++            } else
++                ((struct Slot *)((u32)slot + 8))->value = frame.value;
++            slot = (struct Slot *)((u32)slot + 8);
++        }
++    }
++}
+diff --git a/src/tether_actor.c b/src/tether_actor.c
+index d9f595440f..e1bf1548e8 100644
+--- a/src/tether_actor.c
++++ b/src/tether_actor.c
+@@ -3387,7 +3387,7 @@ void TetherActor_UpdateWanderingState(struct TetherActor *actor)
+             angle = value << 5;
+         }
+         do {
+-        table = gUnk_086149C4;
++            table = gUnk_086149C4;
+         } while (0);
+         delta.x = scale(table[(angle + 64) & 255] * 3);
+         delta.y = 0;
+diff --git a/symbols/progress_extra_functions.csv b/symbols/progress_extra_functions.csv
+index 3aeff1de33..163bcd32b3 100644
+--- a/symbols/progress_extra_functions.csv
++++ b/symbols/progress_extra_functions.csv
+@@ -369,9 +369,12 @@ address,evidence
+ 082195F8,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+ 08219DB4,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+ 0821A168,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
++0821AAF4,Independent 36-byte operand-skip-to-terminator function (own push/pop-bx), unreferenced by any found bl/pointer; exact standalone C
+ 0821AB50,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+ 0821AB64,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
+ 0821AB98,Independent function (own push/pop-bx) left as incbin by gbadisasm; exact standalone C
++0821ABF8,Independent 56-byte command-table unlink function (own push/pop-bx), unreferenced by any found bl/pointer; exact standalone C
++0821AD98,Independent 60-byte binary-search-by-key function (own push/pop-bx), unreferenced by any found bl/pointer; exact standalone C
+ 0821AED0,Independent 12-byte leaf left as incbin by gbadisasm; exact standalone C
+ 0821AEDC,Independent state save/restore function following a reviewed gap leaf; exact standalone C
+ 0821AF04,Independent state save/restore function following a reviewed gap leaf; exact standalone C
+diff --git a/symbols/progress_functions.csv b/symbols/progress_functions.csv
+index 297c22d7e6..1d2b5384ce 100644
+--- a/symbols/progress_functions.csv
++++ b/symbols/progress_functions.csv
+@@ -10036,6 +10036,7 @@ address
+ 0821AAB0
+ 0821AABC
+ 0821AAD8
++0821AAF4
+ 0821AB18
+ 0821AB40
+ 0821AB50
+@@ -10047,12 +10048,14 @@ address
+ 0821ABCC
+ 0821ABDC
+ 0821ABE8
++0821ABF8
+ 0821AC30
+ 0821AC6C
+ 0821ACB4
+ 0821ACDC
+ 0821AD08
+ 0821AD2C
++0821AD98
+ 0821ADD4
+ 0821AE04
+ 0821AED0
+-- 
+2.39.3 (Apple Git-145)
+

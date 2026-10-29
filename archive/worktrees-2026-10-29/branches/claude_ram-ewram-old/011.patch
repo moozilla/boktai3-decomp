@@ -1,0 +1,807 @@
+From 519d13de15fc2e27be58a6a162aa8ea7d5b8b54e Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Tue, 27 Oct 2026 23:22:04 -0700
+Subject: [PATCH] Name EWRAM object from batch c1 (named_object.h)
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+---
+ include/named_object.h | 4 ++--
+ src/fn/sub_08100AD4.c  | 5 ++---
+ src/fn/sub_0810103C.c  | 4 ++--
+ src/fn/sub_081015EC.c  | 4 ++--
+ src/fn/sub_081018DC.c  | 4 ++--
+ src/fn/sub_08101A3C.c  | 5 ++---
+ src/fn/sub_08101A74.c  | 5 ++---
+ src/fn/sub_08101B1C.c  | 4 ++--
+ src/fn/sub_08101E20.c  | 4 ++--
+ src/fn/sub_081028F8.c  | 5 ++---
+ src/fn/sub_081029F8.c  | 4 ++--
+ src/fn/sub_08102C0C.c  | 5 ++---
+ src/fn/sub_08102EE8.c  | 5 ++---
+ src/fn/sub_08102FB0.c  | 5 ++---
+ src/fn/sub_08103110.c  | 6 +++---
+ src/fn/sub_0810399C.c  | 5 ++---
+ src/fn/sub_08103A54.c  | 4 ++--
+ src/fn/sub_08103A84.c  | 6 +++---
+ src/fn/sub_08103AD0.c  | 5 ++---
+ src/fn/sub_08103ADC.c  | 4 ++--
+ src/fn/sub_08103B14.c  | 7 +++----
+ src/fn/sub_08103B94.c  | 4 ++--
+ src/fn/sub_08103C1C.c  | 4 ++--
+ src/fn/sub_08103C54.c  | 7 +++----
+ src/fn/sub_08103CF8.c  | 4 ++--
+ src/fn/sub_08103D84.c  | 4 ++--
+ src/fn/sub_08103DCC.c  | 4 ++--
+ src/fn/sub_08103E08.c  | 4 ++--
+ src/fn/sub_08103E60.c  | 4 ++--
+ src/fn/sub_08103EBC.c  | 4 ++--
+ src/fn/sub_08103EF4.c  | 5 ++---
+ src/fn/sub_08103F24.c  | 4 ++--
+ src/fn/sub_08103F44.c  | 4 ++--
+ symbols/ram.csv        | 2 +-
+ 34 files changed, 71 insertions(+), 83 deletions(-)
+
+diff --git a/include/named_object.h b/include/named_object.h
+index e2f5e108c..8b20b6851 100644
+--- a/include/named_object.h
++++ b/include/named_object.h
+@@ -4,7 +4,7 @@
+ #include "engine.h"
+ 
+ /* Tentative: a scripted scene object (kinds 0-3) from the 12-slot pool owned by
+- * gUnk_020001AC. Slots are 0x19C bytes. */
++ * gNamedObjectManager. Slots are 0x19C bytes. */
+ struct NamedObjectArgs {
+     u16 count, pad;
+     u32 *values;
+@@ -36,7 +36,7 @@ struct NamedObjectManager {
+     u32 followName;
+     u32 tetherName;
+ };
+-extern struct NamedObjectManager *gUnk_020001AC;
++extern struct NamedObjectManager *gNamedObjectManager;
+ u8 sub_08101094(struct NamedObject *);
+ void Route_AdvancePoint(void *);
+ s32 Route_GetCurrentPointNodeId(void *);
+diff --git a/src/fn/sub_08100AD4.c b/src/fn/sub_08100AD4.c
+index ecff25faf..7ea7f6e6f 100644
+--- a/src/fn/sub_08100AD4.c
++++ b/src/fn/sub_08100AD4.c
+@@ -1,4 +1,3 @@
+-#define gNamedObjectManager       gUnk_020001AC
+ #define gNamedObjectContactBounds gUnk_086064B4
+ #include "global.h"
+ #include "contact_actor.h"
+@@ -12,7 +11,7 @@ struct NamedObjectContactPool {
+     struct NamedObjectContactSlot slots[12];
+     u32 activeMask;
+ };
+-extern struct NamedObjectContactPool *gUnk_020001AC;
++extern struct NamedObjectContactPool *gNamedObjectManager;
+ extern const struct ContactPosition gUnk_086064B4;
+ static inline u8 IsActive(u32 *mask, s32 i)
+ {
+@@ -29,7 +28,7 @@ static inline void Difference(struct ContactPosition *d, const struct ContactPos
+ }
+ struct NamedObjectContactSlot *NamedObject_FindNearPosition(const struct ContactPosition *position)
+ {
+-    struct NamedObjectContactPool *pool = gUnk_020001AC;
++    struct NamedObjectContactPool *pool = gNamedObjectManager;
+     struct ContactPosition delta;
+     s32 i;
+     if (!pool)
+diff --git a/src/fn/sub_0810103C.c b/src/fn/sub_0810103C.c
+index 2a5c08487..9e99bef69 100644
+--- a/src/fn/sub_0810103C.c
++++ b/src/fn/sub_0810103C.c
+@@ -16,11 +16,11 @@ struct Follower {
+     u8 pad44[0x284 - 0x44];
+     u8 slot[4];
+ };
+-extern struct NamedObjectManager *gUnk_020001AC;
++extern struct NamedObjectManager *gNamedObjectManager;
+ extern struct Follower *gUnk_02000580[];
+ void sub_0810103C(struct NamedObject *object)
+ {
+-    struct NamedObjectManager *manager = gUnk_020001AC;
++    struct NamedObjectManager *manager = gNamedObjectManager;
+     s32 i;
+     for (i = 0; i < 1; i++) {
+         struct Follower *f = gUnk_02000580[i];
+diff --git a/src/fn/sub_081015EC.c b/src/fn/sub_081015EC.c
+index e287f4e20..7671ed669 100644
+--- a/src/fn/sub_081015EC.c
++++ b/src/fn/sub_081015EC.c
+@@ -27,7 +27,7 @@ void NamedObject_UpdateContactTrigger(struct NamedObject *o)
+     struct NamedObjectManager *m;
+     u32 *np, name;
+     if (o->stage) {
+-        manager = gUnk_020001AC;
++        manager = gNamedObjectManager;
+         if (HasFlag(0x2000, &o->flags) || o->name == manager->followName) {
+             if (o->script) {
+                 if (o->kind == 2) {
+@@ -57,7 +57,7 @@ void NamedObject_UpdateContactTrigger(struct NamedObject *o)
+                     SetFlag2(2, (u16 *)&o->flags);
+                 o->timer = 0;
+                 o->stage = 1;
+-                m = gUnk_020001AC;
++                m = gNamedObjectManager;
+                 np = &o->name;
+                 if (*np == m->followName && o->exitScript) {
+                     struct NamedObjectArgs args2;
+diff --git a/src/fn/sub_081018DC.c b/src/fn/sub_081018DC.c
+index 75257d09b..8aad79a79 100644
+--- a/src/fn/sub_081018DC.c
++++ b/src/fn/sub_081018DC.c
+@@ -17,7 +17,7 @@ void NamedObject_UpdateRouteFollower(struct NamedObject *o)
+     u32 *np;
+     struct NamedObjectManager *m;
+     if (o->stage) {
+-        struct NamedObjectManager *manager = gUnk_020001AC;
++        struct NamedObjectManager *manager = gNamedObjectManager;
+         if (HasFlag(0x2000, &o->flags) || o->name == manager->followName) {
+             if (o->script) {
+                 struct NamedObjectArgs args;
+@@ -39,7 +39,7 @@ void NamedObject_UpdateRouteFollower(struct NamedObject *o)
+         o->timer = 0;
+         o->stage = 0;
+     }
+-    managerPtr = &gUnk_020001AC;
++    managerPtr = &gNamedObjectManager;
+     if (!sub_08101094(o)) {
+         route = o->route;
+         step = route[3]++;
+diff --git a/src/fn/sub_08101A3C.c b/src/fn/sub_08101A3C.c
+index 399a60dec..85feec8c5 100644
+--- a/src/fn/sub_08101A3C.c
++++ b/src/fn/sub_08101A3C.c
+@@ -1,10 +1,9 @@
+ #include "global.h"
+-
+-extern u8 *gUnk_020001AC;
++#include "named_object.h"
+ 
+ u8 *NamedObject_FindByName(u32 key)
+ {
+-    u8 *base = gUnk_020001AC;
++    u8 *base = gNamedObjectManager;
+     s32 i = 0;
+     u8 *a = base + 0x1c;
+     u8 *b = base + 0xf8;
+diff --git a/src/fn/sub_08101A74.c b/src/fn/sub_08101A74.c
+index 5077f92a1..ee9d0f19d 100644
+--- a/src/fn/sub_08101A74.c
++++ b/src/fn/sub_08101A74.c
+@@ -1,10 +1,9 @@
+ #include "global.h"
+-
+-extern u8 *gUnk_020001AC;
++#include "named_object.h"
+ 
+ u8 *NamedObject_GetFollowTarget(void)
+ {
+-    u8 *g = gUnk_020001AC;
++    u8 *g = gNamedObjectManager;
+     s32 i = 0;
+     u32 v = *(u32 *)(g + 0x1370);
+     u8 *a = g + 0x1c;
+diff --git a/src/fn/sub_08101B1C.c b/src/fn/sub_08101B1C.c
+index 10c1e08ec..794e1fcc4 100644
+--- a/src/fn/sub_08101B1C.c
++++ b/src/fn/sub_08101B1C.c
+@@ -20,7 +20,7 @@ struct NamedObjectManager {
+     u8 pad0[0x1370];
+     u32 followName;
+ };
+-extern struct NamedObjectManager *gUnk_020001AC;
++extern struct NamedObjectManager *gNamedObjectManager;
+ void ActorGroup_ReleaseMember(struct NamedObject *);
+ void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
+ s32 Div(s32, s32);
+@@ -50,7 +50,7 @@ static inline u8 HasBits(u16 *p)
+ void NamedObject_RegisterFollowCells(struct NamedObject *objectArg)
+ {
+     register struct NamedObject *object asm("r8") = objectArg;
+-    struct NamedObjectManager *manager = gUnk_020001AC;
++    struct NamedObjectManager *manager = gNamedObjectManager;
+     s32 base, cell, col, row;
+     s32 i;
+     struct Pos16 where;
+diff --git a/src/fn/sub_08101E20.c b/src/fn/sub_08101E20.c
+index 831aa9095..dd305933e 100644
+--- a/src/fn/sub_08101E20.c
++++ b/src/fn/sub_08101E20.c
+@@ -1,5 +1,5 @@
+ #include "global.h"
+-extern u8 *gUnk_020001AC;
++#include "named_object.h"
+ 
+ static inline u8 Tst(u16 *m, s32 one)
+ {
+@@ -10,7 +10,7 @@ static inline u8 Tst(u16 *m, s32 one)
+ 
+ u32 NamedObject_IsMapCellOccupied(u32 x)
+ {
+-    u8 *b = (u8 *)gUnk_020001AC;
++    u8 *b = (u8 *)gNamedObjectManager;
+     s32 i = 0;
+     s32 one = 1;
+     for (; i < 12; i++) {
+diff --git a/src/fn/sub_081028F8.c b/src/fn/sub_081028F8.c
+index 7f47bc8dc..4e24b22e2 100644
+--- a/src/fn/sub_081028F8.c
++++ b/src/fn/sub_081028F8.c
+@@ -1,4 +1,3 @@
+-#define gNamedObjectManager gUnk_020001AC
+ #include "global.h"
+ struct NamedObject {
+     u8 pad0[0xB8];
+@@ -12,7 +11,7 @@ struct NamedObjectManager {
+     struct NamedObject objects[12];
+     u32 activeMask;
+ };
+-extern struct NamedObjectManager *gUnk_020001AC;
++extern struct NamedObjectManager *gNamedObjectManager;
+ static inline u8 isActive(u32 *mask, s32 index)
+ {
+     u32 bit = 1 << index;
+@@ -22,7 +21,7 @@ static inline u8 isActive(u32 *mask, s32 index)
+ }
+ void NamedObject_ClearAttachmentFlag(u32 name, s32 tether)
+ {
+-    struct NamedObjectManager *manager = gUnk_020001AC;
++    struct NamedObjectManager *manager = gNamedObjectManager;
+     s32 i;
+     if (manager->activeMask) {
+         for (i = 0; i < 12; i++) {
+diff --git a/src/fn/sub_081029F8.c b/src/fn/sub_081029F8.c
+index 96d9134c8..abf548d29 100644
+--- a/src/fn/sub_081029F8.c
++++ b/src/fn/sub_081029F8.c
+@@ -17,7 +17,7 @@ struct NamedObjectManager {
+     u8 pad0[0x1370];
+     u32 playerName;
+ };
+-extern struct NamedObjectManager *gUnk_020001AC;
++extern struct NamedObjectManager *gNamedObjectManager;
+ extern const struct NamedObjectVector gUnk_086064B4;
+ extern const struct NamedObjectVector gUnk_086064BC;
+ void NamedObject_ClearAttachmentFlag(u32, s32);
+@@ -52,7 +52,7 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
+     target.y = player->position.y + object->offset.y;
+     target.z = player->position.z + object->offset.z;
+     subtractVector(&delta, &target, &object->position);
+-    manager = gUnk_020001AC;
++    manager = gNamedObjectManager;
+     if (delta.x <= gUnk_086064B4.x && delta.x >= -gUnk_086064B4.x && delta.y <= gUnk_086064B4.y &&
+         delta.y >= -gUnk_086064B4.y && delta.z <= gUnk_086064B4.z && delta.z >= -gUnk_086064B4.z) {
+         NamedObject_ClearAttachmentFlag(manager->playerName, 0);
+diff --git a/src/fn/sub_08102C0C.c b/src/fn/sub_08102C0C.c
+index f71987888..43244cb05 100644
+--- a/src/fn/sub_08102C0C.c
++++ b/src/fn/sub_08102C0C.c
+@@ -1,5 +1,4 @@
+ #define NamedObject_SyncTetherStatus NamedObject_UpdateTetherFollowFlags
+-#define gNamedObjectManager          gUnk_020001AC
+ #define gNamedObjectTetherBounds     gUnk_086064B4
+ #include "global.h"
+ struct NamedObjectVector {
+@@ -19,7 +18,7 @@ struct NamedObjectManager {
+     u8 pad0[0x1374];
+     u32 tetherName;
+ };
+-extern struct NamedObjectManager *gUnk_020001AC;
++extern struct NamedObjectManager *gNamedObjectManager;
+ extern const struct NamedObjectVector gUnk_086064B4;
+ u32 TetherActor_CopyPosition(struct NamedObjectVector *);
+ void TetherActor_RemoveStatusFlags(u32);
+@@ -56,7 +55,7 @@ void NamedObject_UpdateTetherAttachment(struct NamedObject *object)
+     target.y += object->offset.y;
+     target.z = target.z + object->offset.z;
+     subtractVector(&delta, &target, &object->position);
+-    manager = gUnk_020001AC;
++    manager = gNamedObjectManager;
+     if (delta.x <= gUnk_086064B4.x && delta.x >= -gUnk_086064B4.x && delta.y <= gUnk_086064B4.y &&
+         delta.y >= -gUnk_086064B4.y && delta.z <= gUnk_086064B4.z && delta.z >= -gUnk_086064B4.z) {
+         NamedObject_ClearAttachmentFlag(manager->tetherName, 1);
+diff --git a/src/fn/sub_08102EE8.c b/src/fn/sub_08102EE8.c
+index 9e9c4d01c..12e2a4e9c 100644
+--- a/src/fn/sub_08102EE8.c
++++ b/src/fn/sub_08102EE8.c
+@@ -1,5 +1,4 @@
+ #define Player_SetAttachmentPosition Player_SetPositionAndSave
+-#define gNamedObjectManager          gUnk_020001AC
+ #include "global.h"
+ #include "player.h"
+ struct NamedObject {
+@@ -14,7 +13,7 @@ struct NamedObjectManager {
+     u8 pad0[0x1370];
+     u32 playerName;
+ };
+-extern struct NamedObjectManager *gUnk_020001AC;
++extern struct NamedObjectManager *gNamedObjectManager;
+ void NamedObject_ResolveAttachmentPosition(struct SceneVec *, struct SceneVec *,
+                                            struct NamedObject *);
+ void Player_SetPositionAndSave(struct Player *, struct SceneVec *);
+@@ -27,7 +26,7 @@ static inline u8 testFlag(u32 mask, u16 *flags)
+ void NamedObject_MoveAttachedPlayer(struct NamedObject *object)
+ {
+     struct SceneVec target;
+-    struct NamedObjectManager *manager = gUnk_020001AC;
++    struct NamedObjectManager *manager = gNamedObjectManager;
+     if (gUnk_02000580[0] && object->name == manager->playerName) {
+         if (!testFlag(0x100, &object->flags)) {
+             target.x = gUnk_02000580[0]->position.x + object->offset.x;
+diff --git a/src/fn/sub_08102FB0.c b/src/fn/sub_08102FB0.c
+index 3793387de..c8f521889 100644
+--- a/src/fn/sub_08102FB0.c
++++ b/src/fn/sub_08102FB0.c
+@@ -1,4 +1,3 @@
+-#define gNamedObjectManager gUnk_020001AC
+ #include "global.h"
+ struct NamedObjectVector {
+     s16 x, y, z, pad;
+@@ -17,7 +16,7 @@ struct NamedObjectManager {
+     u8 pad0[0x1374];
+     u32 tetherName;
+ };
+-extern struct NamedObjectManager *gUnk_020001AC;
++extern struct NamedObjectManager *gNamedObjectManager;
+ u32 TetherActor_CopyPosition(struct NamedObjectVector *);
+ void TetherActor_SetPosition(struct NamedObjectVector *);
+ static inline void subtractVector(struct NamedObjectVector *d, struct NamedObjectVector *a,
+@@ -36,7 +35,7 @@ static inline u8 testFlag(u32 mask, u16 *flags)
+ void NamedObject_MoveAttachedTether(struct NamedObject *object)
+ {
+     struct NamedObjectVector target, delta;
+-    struct NamedObjectManager *manager = gUnk_020001AC;
++    struct NamedObjectManager *manager = gNamedObjectManager;
+     if (manager->tetherName == object->name) {
+         TetherActor_CopyPosition(&target);
+         subtractVector(&delta, &target, &object->position);
+diff --git a/src/fn/sub_08103110.c b/src/fn/sub_08103110.c
+index 57f33acde..34111ac1e 100644
+--- a/src/fn/sub_08103110.c
++++ b/src/fn/sub_08103110.c
+@@ -54,7 +54,7 @@ struct NamedObjectManager {
+     u32 field1370;
+     u32 field1374;
+ };
+-extern struct NamedObjectManager *gUnk_020001AC;
++extern struct NamedObjectManager *gNamedObjectManager;
+ extern u8 *gUnk_02000580;
+ struct NamedObject *NamedObject_AllocateSlot(struct NamedObjectManager *);
+ void Path_GetPointPositionById(void *, u32, u32);
+@@ -90,11 +90,11 @@ static inline void readOptional(u32 *dst)
+         *dst = 0;
+ }
+ /* Registry routine A4FC: creates a named scene object (-n) of kind -k (0-3)
+-   in the gUnk_020001AC object pool, with heights -Y, sprite rows -T and
++   in the gNamedObjectManager object pool, with heights -Y, sprite rows -T and
+    optional terrain registration (-f). */
+ void NamedObject_CreateFromScript(void)
+ {
+-    struct NamedObjectManager *manager = gUnk_020001AC;
++    struct NamedObjectManager *manager = gNamedObjectManager;
+     struct NamedObject *e;
+     struct NamedObjectSprite *sprite;
+     u32 sequence;
+diff --git a/src/fn/sub_0810399C.c b/src/fn/sub_0810399C.c
+index 19c462161..f18790f3b 100644
+--- a/src/fn/sub_0810399C.c
++++ b/src/fn/sub_0810399C.c
+@@ -1,6 +1,6 @@
+-#define gActorGroup gUnk_020001AC
+ /* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
+ #include "global.h"
++#include "named_object.h"
+ struct ActorGroupMember {
+     u8 unk0[0xB8];
+     u16 flags;
+@@ -13,7 +13,6 @@ struct ActorGroup {
+     struct ActorGroupMember members[12];
+     u32 active;
+ };
+-extern void *gUnk_020001AC;
+ void Sound_StopSong(u32);
+ void TerrainModifiers_UnregisterCell(void *);
+ void SceneBody_Unregister(void *);
+@@ -46,5 +45,5 @@ u32 ActorGroup_Destroy(struct ActorGroup *group)
+             Sprite_Remove(member);
+         }
+     }
+-    return (u32)(gUnk_020001AC = 0);
++    return (u32)(gNamedObjectManager = 0);
+ }
+diff --git a/src/fn/sub_08103A54.c b/src/fn/sub_08103A54.c
+index 84e09ca93..744fe315c 100644
+--- a/src/fn/sub_08103A54.c
++++ b/src/fn/sub_08103A54.c
+@@ -1,12 +1,12 @@
+ #include "global.h"
+ 
+-extern void *gUnk_020001AC;
++extern void *gNamedObjectManager;
+ 
+ u32 ScriptProc_Start(u32, u32);
+ 
+ s32 NamedObject_InitManager(void *p)
+ {
+     *(u32 *)((u8 *)p + 0x18) = ScriptProc_Start(0x922E, 0x13F9);
+-    gUnk_020001AC = p;
++    gNamedObjectManager = p;
+     return *(u32 *)((u8 *)p + 0x136C) = 0;
+ }
+diff --git a/src/fn/sub_08103A84.c b/src/fn/sub_08103A84.c
+index c4289a6c1..665cfa621 100644
+--- a/src/fn/sub_08103A84.c
++++ b/src/fn/sub_08103A84.c
+@@ -1,6 +1,6 @@
+ #include "global.h"
+ 
+-extern u8 *gUnk_020001AC;
++extern u8 *gNamedObjectManager;
+ u8 *Task_Create(u32, u32);
+ void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));
+ s32 NamedObject_InitManager(u8 *);
+@@ -11,8 +11,8 @@ void ActorGroup_Destroy(void);
+ u8 *NamedObject_CreateManager(void)
+ {
+     u8 *p;
+-    if (gUnk_020001AC != 0)
+-        return gUnk_020001AC;
++    if (gNamedObjectManager != 0)
++        return gNamedObjectManager;
+     p = Task_Create(5, 0x137c);
+     if (p != 0) {
+         Task_SetCallbacks(p, NamedObject_UpdatePool, ActorGroup_Destroy);
+diff --git a/src/fn/sub_08103AD0.c b/src/fn/sub_08103AD0.c
+index 52518a5e0..78bfaab9c 100644
+--- a/src/fn/sub_08103AD0.c
++++ b/src/fn/sub_08103AD0.c
+@@ -1,11 +1,10 @@
+ // COMPILER: old_agbcc
+ #include "global.h"
++#include "named_object.h"
+ /* NamedObject_ResetManager: Clears the singleton named object manager pointer */
+ #define NamedObject_ResetManager sub_08103AD0
+ 
+-extern u32 gUnk_020001AC;
+-
+ void sub_08103AD0(void)
+ {
+-    gUnk_020001AC = 0;
++    gNamedObjectManager = 0;
+ }
+diff --git a/src/fn/sub_08103ADC.c b/src/fn/sub_08103ADC.c
+index b805ba8ae..63d99068d 100644
+--- a/src/fn/sub_08103ADC.c
++++ b/src/fn/sub_08103ADC.c
+@@ -1,6 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
+-extern void *gUnk_020001AC;
++#include "named_object.h"
+ u8 *NamedObject_FindByName(s32 name);
+ static inline void orFlags(u16 mask, u16 *flags)
+ {
+@@ -10,7 +10,7 @@ void NamedActor_SetFlag20FromScript(void)
+ {
+     s32 name = Script_GetKeywordValue('n', 0);
+     u8 *actor;
+-    if (gUnk_020001AC && name) {
++    if (gNamedObjectManager && name) {
+         actor = NamedObject_FindByName(name);
+         if (actor)
+             orFlags(0x20, (u16 *)(actor + 0xB8));
+diff --git a/src/fn/sub_08103B14.c b/src/fn/sub_08103B14.c
+index 0546540d0..de2fc4638 100644
+--- a/src/fn/sub_08103B14.c
++++ b/src/fn/sub_08103B14.c
+@@ -1,6 +1,6 @@
+-#define gActorGroup gUnk_020001AC
+ /* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
+ #include "global.h"
++#include "named_object.h"
+ struct ActorGroupMember {
+     u8 unk0[0xB8];
+     u16 flags;
+@@ -13,7 +13,6 @@ struct ActorGroup {
+     struct ActorGroupMember members[12];
+     u32 active;
+ };
+-extern struct ActorGroup *gUnk_020001AC;
+ u32 TetherActor_TestStatusFlags(u32);
+ static inline u8 HasBit(u32 value, u32 mask)
+ {
+@@ -26,9 +25,9 @@ s32 ActorGroup_GetSelectedMemberId(void)
+     struct ActorGroup *group;
+     struct ActorGroupMember *member;
+     s32 i;
+-    if (!gUnk_020001AC)
++    if (!gNamedObjectManager)
+         goto fail;
+-    group = gUnk_020001AC;
++    group = gNamedObjectManager;
+     if (!group->active)
+         goto fail;
+     if (TetherActor_TestStatusFlags(1))
+diff --git a/src/fn/sub_08103B94.c b/src/fn/sub_08103B94.c
+index a05a8c16d..884a4dbfd 100644
+--- a/src/fn/sub_08103B94.c
++++ b/src/fn/sub_08103B94.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
++#include "named_object.h"
+ #ifdef NONMATCHING
+ // fuzzy: 85.9%
+ // fix.py best version (reprinted C)
+@@ -12,7 +13,6 @@ struct NamedActor {
+     u8 padBA[0x26];
+     u32 flagsE0;
+ };
+-extern void *gUnk_020001AC;
+ struct NamedActor *NamedObject_FindByName(s32 name);
+ void NamedActor_PlayMovementSound(struct NamedActor *);
+ /* Script: for actor -n with flag 2 at +0xE0: +0xB6 = 2, then by -m (default
+@@ -24,7 +24,7 @@ void NamedActor_SetMoveModeFromScript(void)
+     s32 name = Script_GetKeywordValue('n', 0);
+     struct NamedActor *actor;
+     u32 k1 = 4;
+-    if (gUnk_020001AC && name) {
++    if (gNamedObjectManager && name) {
+         actor = NamedObject_FindByName(name);
+         if (actor && (actor->flagsE0 & 2)) {
+             s32 two = 2;
+diff --git a/src/fn/sub_08103C1C.c b/src/fn/sub_08103C1C.c
+index 994570be2..6884fa395 100644
+--- a/src/fn/sub_08103C1C.c
++++ b/src/fn/sub_08103C1C.c
+@@ -1,13 +1,13 @@
+ #include "global.h"
++#include "named_object.h"
+ 
+-extern u32 gUnk_020001AC;
+ s32 Script_GetKeywordValue(s32, s32);
+ u8 *NamedObject_FindByName(s32);
+ 
+ void NamedActor_SetModeFromScript(void)
+ {
+     s32 r = Script_GetKeywordValue(0x6e, 0);
+-    if (gUnk_020001AC != 0 && r != 0) {
++    if (gNamedObjectManager != 0 && r != 0) {
+         u8 *p = NamedObject_FindByName(r);
+         *(s32 *)(p + 0xe0) = Script_GetKeywordValue(0x6d, -1);
+     }
+diff --git a/src/fn/sub_08103C54.c b/src/fn/sub_08103C54.c
+index 5b83754b6..dad728d5e 100644
+--- a/src/fn/sub_08103C54.c
++++ b/src/fn/sub_08103C54.c
+@@ -1,5 +1,4 @@
+ #define ActorGroup_FindMemberByName NamedObject_FindByName
+-#define gActorGroup                 gUnk_020001AC
+ /* Provisional ActorGroup names: static behavior established; semantic ownership tentative. */
+ #include "global.h"
+ struct ActorGroupMember {
+@@ -18,7 +17,7 @@ struct ActorGroup {
+     struct ActorGroupMember members[12];
+     u32 active;
+ };
+-extern struct ActorGroup *gUnk_020001AC;
++extern struct ActorGroup *gNamedObjectManager;
+ s32 Script_GetKeywordValue(u32, s32);
+ struct ActorGroupMember *NamedObject_FindByName(s32);
+ void TerrainModifiers_UnregisterCell(void *);
+@@ -46,9 +45,9 @@ void ActorGroup_RemoveFromScript(void)
+     s32 name = Script_GetKeywordValue('n', 0);
+     struct ActorGroupMember *member;
+     struct ActorGroup *group;
+-    if (gUnk_020001AC && name) {
++    if (gNamedObjectManager && name) {
+         member = NamedObject_FindByName(name);
+-        group = gUnk_020001AC;
++        group = gNamedObjectManager;
+         if (MemberHasBit(member, 1)) {
+             TerrainModifiers_UnregisterCell(member->effect);
+             ClearFlags(member, 1);
+diff --git a/src/fn/sub_08103CF8.c b/src/fn/sub_08103CF8.c
+index e4540dbe3..3562d40a3 100644
+--- a/src/fn/sub_08103CF8.c
++++ b/src/fn/sub_08103CF8.c
+@@ -1,6 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
+-extern void *gUnk_020001AC;
++#include "named_object.h"
+ u8 *NamedObject_FindByName(s32 name);
+ void Route_Start(void *route, u32 id, u32 point, u32 mode);
+ static inline u8 optionalByte(void)
+@@ -19,7 +19,7 @@ void NamedActor_SetRouteFromScript(void)
+     s32 name = Script_GetKeywordValue('n', 0);
+     u8 *actor;
+     u32 id, point, mode;
+-    if (gUnk_020001AC && name) {
++    if (gNamedObjectManager && name) {
+         actor = NamedObject_FindByName(name);
+         id = 0;
+         point = 0;
+diff --git a/src/fn/sub_08103D84.c b/src/fn/sub_08103D84.c
+index 8eb71b3f4..fc003a0b3 100644
+--- a/src/fn/sub_08103D84.c
++++ b/src/fn/sub_08103D84.c
+@@ -1,17 +1,17 @@
+ #include "global.h"
+ 
+ #include "engine.h"
++#include "named_object.h"
+ struct Obj {
+     u8 pad[0x2C];
+     u8 anim[0x1C];
+ };
+-extern void *gUnk_020001AC;
+ struct Obj *NamedObject_FindByName(s32);
+ void NamedObject_SetPaletteFromScript(void)
+ {
+     s32 name = Script_GetKeywordValue('n', 0);
+     struct Obj *e;
+-    if (gUnk_020001AC && name && (e = NamedObject_FindByName(name))) {
++    if (gNamedObjectManager && name && (e = NamedObject_FindByName(name))) {
+         s32 c = Script_GetKeywordValue('c', 0);
+         AnimData_SelectPaletteBank(e->anim, c + 0x23F);
+     }
+diff --git a/src/fn/sub_08103DCC.c b/src/fn/sub_08103DCC.c
+index cdc194275..d78a07558 100644
+--- a/src/fn/sub_08103DCC.c
++++ b/src/fn/sub_08103DCC.c
+@@ -1,12 +1,12 @@
+ #include "global.h"
+ #include "engine.h"
+-extern void *gUnk_020001AC;
++#include "named_object.h"
+ u8 *NamedObject_FindByName(s32 name);
+ void NamedActor_SetSpeedFromScript(void)
+ {
+     s32 name = Script_GetKeywordValue('n', 0);
+     u8 *actor;
+-    if (gUnk_020001AC && name) {
++    if (gNamedObjectManager && name) {
+         actor = NamedObject_FindByName(name);
+         if (actor) {
+             s32 speed = Script_GetKeywordValue('s', 6);
+diff --git a/src/fn/sub_08103E08.c b/src/fn/sub_08103E08.c
+index ce152780f..a92aed55b 100644
+--- a/src/fn/sub_08103E08.c
++++ b/src/fn/sub_08103E08.c
+@@ -1,6 +1,6 @@
+ #include "global.h"
++#include "named_object.h"
+ 
+-extern u8 *gUnk_020001AC;
+ extern u8 *gUnk_02000580[];
+ u8 *NamedObject_GetFollowTarget(void);
+ void Player_ClearAttachmentFlags(u8 *, s32);
+@@ -13,7 +13,7 @@ static inline void clearBits(s16 *p, s32 mask)
+    clears the follow flags (tentative). */
+ void NamedObject_ReleaseFromScript(void)
+ {
+-    u8 *manager = gUnk_020001AC;
++    u8 *manager = gNamedObjectManager;
+     u8 *e = NamedObject_GetFollowTarget();
+     *(u32 *)(manager + 0x1370) = 0;
+     {
+diff --git a/src/fn/sub_08103E60.c b/src/fn/sub_08103E60.c
+index 325fc906a..566f0911f 100644
+--- a/src/fn/sub_08103E60.c
++++ b/src/fn/sub_08103E60.c
+@@ -1,6 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
+-extern void *gUnk_020001AC;
++#include "named_object.h"
+ u8 *NamedObject_FindByName(s32 name);
+ /* Script: for actor -n, a positive -h goes to +0xD8 and a positive -l to
+    +0xD4 (tentative: high and low limits). */
+@@ -8,7 +8,7 @@ void NamedActor_SetRangeFromScript(void)
+ {
+     s32 name = Script_GetKeywordValue('n', 0);
+     u8 *actor;
+-    if (gUnk_020001AC && name) {
++    if (gNamedObjectManager && name) {
+         actor = NamedObject_FindByName(name);
+         if (actor) {
+             s32 none = -1;
+diff --git a/src/fn/sub_08103EBC.c b/src/fn/sub_08103EBC.c
+index 554bb2b4f..2cf77bb5a 100644
+--- a/src/fn/sub_08103EBC.c
++++ b/src/fn/sub_08103EBC.c
+@@ -1,12 +1,12 @@
+ #include "global.h"
++#include "named_object.h"
+ 
+-extern u32 gUnk_020001AC;
+ s32 Script_GetKeywordValue(s32, s32);
+ u8 *NamedObject_FindByName(s32);
+ void NamedActor_ClearFlag1000FromScript(void)
+ {
+     s32 r = Script_GetKeywordValue(0x6e, 0);
+-    if (gUnk_020001AC != 0 && r != 0) {
++    if (gNamedObjectManager != 0 && r != 0) {
+         u8 *p = NamedObject_FindByName(r);
+         if (p != 0) {
+             u16 *q = (u16 *)(p + 0xb8);
+diff --git a/src/fn/sub_08103EF4.c b/src/fn/sub_08103EF4.c
+index 75873b6de..d00693ec1 100644
+--- a/src/fn/sub_08103EF4.c
++++ b/src/fn/sub_08103EF4.c
+@@ -1,6 +1,5 @@
+ #include "global.h"
+-
+-extern void *gUnk_020001AC;
++#include "named_object.h"
+ 
+ u8 *NamedObject_FindByName(u32 key);
+ 
+@@ -8,7 +7,7 @@ u8 *NamedObject_GetPositionByName(u32 key)
+ {
+     u8 *r;
+ 
+-    if (gUnk_020001AC && key) {
++    if (gNamedObjectManager && key) {
+         r = NamedObject_FindByName(key);
+         if (r) {
+             return r + 0x10C;
+diff --git a/src/fn/sub_08103F24.c b/src/fn/sub_08103F24.c
+index d4abf65cf..abffb42b5 100644
+--- a/src/fn/sub_08103F24.c
++++ b/src/fn/sub_08103F24.c
+@@ -1,9 +1,9 @@
+ #include "global.h"
+-extern void *gUnk_020001AC;
++#include "named_object.h"
+ 
+ u8 *sub_08103F24(u8 *p)
+ {
+-    if (gUnk_020001AC == 0)
++    if (gNamedObjectManager == 0)
+         return 0;
+     return p + 0x10c;
+ }
+diff --git a/src/fn/sub_08103F44.c b/src/fn/sub_08103F44.c
+index a46d40df1..3f713d0f6 100644
+--- a/src/fn/sub_08103F44.c
++++ b/src/fn/sub_08103F44.c
+@@ -1,6 +1,6 @@
+ #include "global.h"
+ #include "scene_actor_terrain.h"
+-extern u8 *gUnk_020001AC;
++#include "named_object.h"
+ extern void *gUnk_02000580;
+ u32 Player_TestAttachmentFlags(void *, u32);
+ static inline u32 Attributes(s32 cell)
+@@ -23,7 +23,7 @@ static inline u8 PlayExit(s32 cell, s32 height)
+ }
+ void NamedObject_PlayAdjacentExitSound(u8 *o)
+ {
+-    u8 *manager = gUnk_020001AC;
++    u8 *manager = gNamedObjectManager;
+     s32 x, z, cell, height;
+     if (!manager)
+         return;
+diff --git a/symbols/ram.csv b/symbols/ram.csv
+index e5c4ac8a8..790ff50a6 100644
+--- a/symbols/ram.csv
++++ b/symbols/ram.csv
+@@ -92,7 +92,7 @@ addr,name,size,kind,decl,header,confidence,notes
+ 020001A0,gSceneActorContactManager,4,object,extern struct SceneActorContactManager *gSceneActorContactManager;,include/scene_actor_contacts.h,low,
+ 020001A4,gWoodenCrateManager,4,object,extern u8 *gWoodenCrateManager;,include/ram.h,low,
+ 020001A8,gFloorSwitchManager,4,object,extern u32 gFloorSwitchManager;,include/ram.h,low,floor switch manager (FloorSwitch_*)
+-020001AC,gUnk_020001AC,4,object,,,,
++020001AC,gNamedObjectManager,4,object,extern struct NamedObjectManager *gNamedObjectManager;,include/named_object.h,low,named object manager singleton
+ 020001B0,gCallbackPool,4,object,extern void *gCallbackPool;,include/ram.h,low,callback pool / member manager singleton (Pool184_*)
+ 020001B4,gRegionActorPool,4,object,extern struct RegionSpriteManager *gRegionActorPool;,include/ram.h,low,
+ 020001B8,gTileTriggerManager,4,object,extern struct TileTriggerManager *gTileTriggerManager;,include/ram.h,low,
+-- 
+2.39.3 (Apple Git-145)
+

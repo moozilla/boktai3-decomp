@@ -1,0 +1,2 @@
+Draft GridAttackActor_Initialize (NONMATCHING, 291 ROM / 302 draft)
+Draft sub_08193874 (NONMATCHING, 273 ROM / 244 draft)

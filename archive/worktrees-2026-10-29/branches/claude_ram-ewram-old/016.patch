@@ -1,0 +1,123 @@
+From a8c2a0b25ac5e211b7363dd501599b9ac7163537 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Tue, 27 Oct 2026 23:36:38 -0700
+Subject: [PATCH] Cast views of array-typed RAM objects as pointers; drop
+ engine.h's repeat of gRandomTable
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+---
+ include/engine.h      | 2 +-
+ src/fn/sub_08138924.c | 4 ++--
+ src/fn/sub_081DCF84.c | 6 +++---
+ src/fn/sub_081E1C10.c | 4 ++--
+ tools/ramlayout.py    | 2 +-
+ 5 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/include/engine.h b/include/engine.h
+index 64f42e3df..9ad5dc825 100644
+--- a/include/engine.h
++++ b/include/engine.h
+@@ -12,6 +12,7 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "render.h"
++#include "ram.h"
+ 
+ /* ---- Globals ---------------------------------------------------------- */
+ 
+@@ -71,7 +72,6 @@ extern struct HeapBlock gHeap;            /* head of the general heap (Heap_Allo
+ extern struct EngineMap *gTerrainMap;     /* current terrain map */
+ extern u32 gTerrainWidth, gTerrainHeight; /* terrain map width, height (cells) */
+ extern u32 gRandomIndex;                  /* index (0..1023) into the random table */
+-extern const u16 gRandomTable[];          /* 1024 entry random table (guess) */
+ extern const s16 gUnk_086149C4[];         /* sine table (guess) */
+ extern u32 gEngineFlags; /* more engine flags (bit 10 mutes Sound_PlaySongChecked; guess) */
+ 
+diff --git a/src/fn/sub_08138924.c b/src/fn/sub_08138924.c
+index e770dc04c..18b7bafc5 100644
+--- a/src/fn/sub_08138924.c
++++ b/src/fn/sub_08138924.c
+@@ -1,7 +1,6 @@
+ #include "global.h"
+ #include "display_animation.h"
+ 
+-#define gPlayerSlotDisplay gSpriteSlots
+ struct PlayerSlotDisplaySprite {
+     u32 flags;
+     u8 unknown4[3], priority;
+@@ -20,7 +19,8 @@ struct PlayerSlotDisplay {
+     struct PlayerSlotDisplaySlot slots[4];
+     void *sequenceResource;
+ };
+-extern struct PlayerSlotDisplay *gPlayerSlotDisplay;
++#include "ram.h"
++#define gPlayerSlotDisplay (*(struct PlayerSlotDisplay **)&gSpriteSlots)
+ s32 PlayerSlotDisplay_Initialize(struct PlayerSlotDisplay *input)
+ {
+     struct PlayerSlotDisplay *manager = input;
+diff --git a/src/fn/sub_081DCF84.c b/src/fn/sub_081DCF84.c
+index e40ebe878..bad09b644 100644
+--- a/src/fn/sub_081DCF84.c
++++ b/src/fn/sub_081DCF84.c
+@@ -1,6 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
+-extern const void *gNamePlaceholderScript;
++#include "ram.h"
+ void Menu_DrawText(u32, u32, const u8 *);
+ void Menu_EraseRect(u32, u32, u32, u32);
+ void TextEntry_DrawName(const void *src)
+@@ -13,8 +13,8 @@ void TextEntry_DrawName(const void *src)
+     i = 4;
+     do {
+         if (!p[0] && !p[1]) {
+-            u8 *placeholder =
+-                Text_LookupString(Script_ParseStringRef(gNamePlaceholderScript) + 0x54);
++            u8 *placeholder = Text_LookupString(
++                Script_ParseStringRef((*(const void **)gNamePlaceholderScript)) + 0x54);
+             p[0] = placeholder[0];
+             p[1] = placeholder[1];
+         }
+diff --git a/src/fn/sub_081E1C10.c b/src/fn/sub_081E1C10.c
+index 2f21d126e..aed3fc09f 100644
+--- a/src/fn/sub_081E1C10.c
++++ b/src/fn/sub_081E1C10.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ // Provisional name: SoundTest_DrawTrackName
+ struct Sprite {
+     u8 head[8];
+@@ -32,7 +33,6 @@ struct Viewer {
+ void Anim_LoadKeyframe(void *, void *, u16, s32);
+ s32 Mod(s32, s32);
+ s32 Div(s32, s32);
+-extern u8 *gSoundTestParams;
+ void Bg_ClearTilemap(s32);
+ void BgGfx_LoadTilemapSimple(s32, s32, s32, s32, s32);
+ s32 Script_ParseStringRef(void *);
+@@ -45,7 +45,7 @@ void SoundTest_DrawTrackName(struct Viewer *p)
+     const char *text;
+     Bg_ClearTilemap(0);
+     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
+-    text = Text_LookupString(Script_ParseStringRef(gSoundTestParams) + p->textIndex);
++    text = Text_LookupString(Script_ParseStringRef((*(u8 **)gSoundTestParams)) + p->textIndex);
+     Menu_EraseRect(10, 4, 16, 2);
+     Menu_DrawText(10, 4, text);
+ }
+diff --git a/tools/ramlayout.py b/tools/ramlayout.py
+index 417a6baf0..820cc7ad5 100644
+--- a/tools/ramlayout.py
++++ b/tools/ramlayout.py
+@@ -672,7 +672,7 @@ def view(spec, declarator, name, canon, lvalue=True):
+     if not dims:
+         if canon_array:
+             # a scalar view of an array: its first element
+-            return None if stars else f"(*({spec} *){name})"
++            return f"(*({spec} {'*' * stars}*){name})"
+         if stars and not lvalue:
+             return f"(({spec} {'*' * stars}){name})"
+         return f"(*({spec} {'*' * stars}*)&{name})"
+-- 
+2.39.3 (Apple Git-145)
+

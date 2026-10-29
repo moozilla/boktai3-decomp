@@ -1,0 +1,60 @@
+From 0c940a2ea75d3dec9ae82f9a295dd7e6ff0654bb Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 03:57:10 -0700
+Subject: [PATCH] Allow seek add to skip reload rotation probing
+
+Manual near-match hypotheses can use --no-rotation to avoid an expensive automatic spill search. Default probing stays enabled.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/seek/seek.py | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/tools/seek/seek.py b/tools/seek/seek.py
+index a2e0c546e..35ece6502 100644
+--- a/tools/seek/seek.py
++++ b/tools/seek/seek.py
+@@ -245,7 +245,7 @@ class Work:
+         return {}
+ 
+     # -- adding nodes
+-    def add_file(self, path, parent=None, note=None, who="model"):
++    def add_file(self, path, parent=None, note=None, who="model", rotation=True):
+         text = open(path).read()
+         if not E.find_def(text, self.func) and not E.find_def(text, self.target.rom_name):
+             sys.exit(f"{path}: no definition of {self.func}")
+@@ -263,7 +263,7 @@ class Work:
+         code, err, alloc = self.target.compile_pre(pre, trace=True)
+         nrel = alloc.pop("__reloads__", 0)
+         ev = self.target.evaluate(code)
+-        if code and not ev.get("match") and ev["key"][2] <= 12:
++        if rotation and code and not ev.get("match") and ev["key"][2] <= 12:
+             ev["rot"] = self.target.rotation(pre, nrel) or [ev["key"][2], -1, 99]
+         out = sha(code) if code else None
+         rec = dict(parent=parent["id"] if parent else None, kind="file", who=who, file=fh, defs={},
+@@ -630,11 +630,11 @@ def cmd_add(a):
+     w = Work(a.f)
+     parent = w.node(a.parent) if a.parent else w.best()
+     if len(a.file) > 1:  # several spellings of one hypothesis: score them all, best first, no expansion
+-        recs = [w.add_file(f, parent, a.m) for f in a.file]
++        recs = [w.add_file(f, parent, a.m, rotation=not a.no_rotation) for f in a.file]
+         for r in sorted(recs, key=lambda r: (rank(r), r["id"])):
+             print(fmt_node(r, parent) + (f"  (same code as n{r['same_as']})" if r.get("same_as") else ""))
+         return
+-    node = w.add_file(a.file[0], parent, a.m)
++    node = w.add_file(a.file[0], parent, a.m, rotation=not a.no_rotation)
+     print(fmt_node(node, parent))
+     show_layers(w, node)
+     if node.get("same_as"):
+@@ -1007,6 +1007,8 @@ def main():
+     p.add_argument("-p", "--parent")
+     p.add_argument("-m", help="the hypothesis this edit tests")
+     p.add_argument("--no-expand", action="store_true")
++    p.add_argument("--no-rotation", action="store_true",
++                   help="skip the automatic reload-rotation probe when adding a near match")
+     p.set_defaults(go=cmd_add)
+     p = sub.add_parser("expand")
+     p.add_argument("node", nargs="?")
+-- 
+2.39.3 (Apple Git-145)
+

@@ -1,0 +1,47 @@
+From e8aadd2ff330f3ded1f3a656cb819e6ff2dbcc2a Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 02:16:03 -0700
+Subject: [PATCH] Keep statement swaps from crossing scalar dependencies
+
+Reject swaps that move scalar definitions, pointer assignments or loop-index updates across uses of the same variable. This prevents search candidates with uninitialized pointer reads when the emulator oracle is unavailable.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/rewrites.py | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/tools/rewrites.py b/tools/rewrites.py
+index eb0734c86..6ed597643 100644
+--- a/tools/rewrites.py
++++ b/tools/rewrites.py
+@@ -328,12 +328,27 @@ def rw_commute(fn):
+ 
+ def rw_swap_stmts(fn):
+     """Swap two adjacent statements (scheduling / evaluation order)."""
++    def effects(stmt):
++        ids, writes = set(), set()
++        for n, p, slot in walk(stmt):
++            if isinstance(n, ca.ID) and not (isinstance(p, ca.StructRef) and slot == "field"):
++                ids.add(n.name)
++            if isinstance(n, ca.Assignment) and isinstance(n.lvalue, ca.ID):
++                writes.add(n.lvalue.name)
++            if isinstance(n, ca.UnaryOp) and n.op in ("p++", "p--", "++", "--") and isinstance(n.expr, ca.ID):
++                writes.add(n.expr.name)
++        return ids, writes
++
+     bl = blocks(fn)
+     for bi, b in enumerate(bl):
+         for i in range(len(b.block_items) - 1):
+             x, y = b.block_items[i], b.block_items[i + 1]
+             if isinstance(x, (ca.Decl, ca.Label, ca.Return)) or isinstance(y, (ca.Decl, ca.Label)):
+                 continue
++            xi, xw = effects(x)
++            yi, yw = effects(y)
++            if xw & yi or yw & xi:
++                continue  # preserve definitions before uses, including address and loop-index uses
+             f2 = copy.deepcopy(fn)
+             b2 = blocks(f2)[bi]
+             b2.block_items[i], b2.block_items[i + 1] = b2.block_items[i + 1], b2.block_items[i]
+-- 
+2.39.3 (Apple Git-145)
+

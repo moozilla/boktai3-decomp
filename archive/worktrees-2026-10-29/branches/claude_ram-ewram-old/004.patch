@@ -1,0 +1,2049 @@
+From 1ca6738790b21665707d275554976ddf529ffc67 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Tue, 27 Oct 2026 23:11:36 -0700
+Subject: [PATCH] Name ten more EWRAM player-state and force words
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+---
+ include/background_controller.h  |  2 +-
+ include/cell_gate.h              |  2 +-
+ include/collision_controller.h   |  2 +-
+ include/directional_force.h      |  2 +-
+ include/orbit_background.h       |  2 +-
+ include/ram.h                    | 11 +++++-
+ include/resource_station.h       |  2 +-
+ src/actor_animation_controller.c | 67 ++++++++++++++++----------------
+ src/background_controller.c      |  4 +-
+ src/collision_controller.c       |  4 +-
+ src/fn/sub_0804E10C.c            |  4 +-
+ src/fn/sub_0804EA54.c            |  3 +-
+ src/fn/sub_0804EFB4.c            |  4 +-
+ src/fn/sub_080501E8.c            |  4 +-
+ src/fn/sub_08050310.c            |  4 +-
+ src/fn/sub_08050404.c            |  4 +-
+ src/fn/sub_08050574.c            |  4 +-
+ src/fn/sub_080508B4.c            |  2 +-
+ src/fn/sub_08050910.c            |  2 +-
+ src/fn/sub_08050E9C.c            |  4 +-
+ src/fn/sub_080511EC.c            |  5 +--
+ src/fn/sub_080511F8.c            |  2 +-
+ src/fn/sub_08051224.c            |  4 +-
+ src/fn/sub_08051390.c            | 10 ++---
+ src/fn/sub_080513B8.c            |  4 +-
+ src/fn/sub_08070FA8.c            |  4 +-
+ src/fn/sub_08075588.c            |  6 +--
+ src/fn/sub_08078EE8.c            |  4 +-
+ src/fn/sub_080974F4.c            |  6 +--
+ src/fn/sub_08098788.c            |  3 +-
+ src/fn/sub_0809AE0C.c            |  4 +-
+ src/fn/sub_0810480C.c            |  4 +-
+ src/fn/sub_081266B4.c            |  5 +--
+ src/fn/sub_0813FC38.c            | 10 ++---
+ src/fn/sub_08140F40.c            |  4 +-
+ src/fn/sub_081411B8.c            |  5 +--
+ src/fn/sub_08146EAC.c            |  3 +-
+ src/fn/sub_0814C3A4.c            | 40 +++++++++----------
+ src/fn/sub_08151A14.c            |  7 ++--
+ src/fn/sub_08156FE0.c            | 23 +++++++----
+ src/fn/sub_08158C14.c            | 24 ++++++------
+ src/fn/sub_08158F70.c            |  4 +-
+ src/fn/sub_081598F8.c            |  3 +-
+ src/fn/sub_08159E28.c            |  3 +-
+ src/fn/sub_0815A048.c            |  3 +-
+ src/fn/sub_0815A97C.c            |  6 +--
+ src/fn/sub_0815AAB8.c            |  6 +--
+ src/fn/sub_0815AD78.c            | 21 ++++++----
+ src/fn/sub_0815E790.c            |  3 +-
+ src/fn/sub_0815EC14.c            |  8 ++--
+ src/fn/sub_0815F0D0.c            |  8 ++--
+ src/fn/sub_0815F224.c            |  7 +---
+ src/fn/sub_081A2858.c            |  8 ++--
+ src/fn/sub_081A2BD4.c            |  5 +--
+ src/fn/sub_081E34C4.c            |  5 +--
+ src/fn/sub_08209AC4.c            | 14 +++----
+ src/fn/sub_0820A2C8.c            |  6 +--
+ src/fn/sub_0822C2B0.c            |  4 +-
+ src/fn/sub_08235DB0.c            |  5 +--
+ src/fn/sub_0823A3CC.c            |  9 ++---
+ src/item_container.c             |  5 +--
+ src/player_3.c                   |  7 ++--
+ src/scene_object.c               |  5 +--
+ src/tether_actor.c               | 15 ++++---
+ symbols/ram.csv                  | 20 +++++-----
+ 65 files changed, 236 insertions(+), 254 deletions(-)
+
+diff --git a/include/background_controller.h b/include/background_controller.h
+index a3abe5e99..d2efba502 100644
+--- a/include/background_controller.h
++++ b/include/background_controller.h
+@@ -179,7 +179,7 @@ extern struct ScrollingBackground *gScrollingBackgrounds[];
+ extern struct BackgroundLayer gUnk_03004C30[];
+ extern struct Camera gUnk_030042A0;
+ extern s16 gUnk_03005418[2];
+-extern u16 gUnk_02000550, gUnk_0200053C;
++extern u16 gForceMagnitude, gForceAngle;
+ 
+ /* Engine functions used by this unit. */
+ s32 Script_ReadValue(u8 *);
+diff --git a/include/cell_gate.h b/include/cell_gate.h
+index 3311c11a6..cf521562e 100644
+--- a/include/cell_gate.h
++++ b/include/cell_gate.h
+@@ -28,7 +28,7 @@ struct CellGatePlayer {
+ };
+ typedef void (*CellGateUpdate)(struct CellGate *);
+ extern struct CellGatePlayer *gUnk_02000580;
+-extern u16 gUnk_02000534, gUnk_02000500;
++extern u16 gPlayerTraversalActive, gPlayerTraversalMode;
+ s32 CellGate_TestPlayerHeight(struct CellGate *);
+ s32 CellGate_TestPlayerCell(struct CellGate *);
+ s32 CellGate_TestPlayerEdge(struct CellGate *, s32);
+diff --git a/include/collision_controller.h b/include/collision_controller.h
+index 927bf7853..6ad929b20 100644
+--- a/include/collision_controller.h
++++ b/include/collision_controller.h
+@@ -76,7 +76,7 @@ struct CollisionScene {
+ extern struct CollisionManager *gCollisionManager;
+ extern struct CollisionScene gUnk_03005430;
+ extern s32 gActionFreezeTimer;
+-extern u16 gUnk_02000534, gUnk_02000500;
++extern u16 gPlayerTraversalActive, gPlayerTraversalMode;
+ extern void *gUnk_08604A00[2][3];
+ 
+ void sub_08009E30(void);
+diff --git a/include/directional_force.h b/include/directional_force.h
+index c93187720..9a9619007 100644
+--- a/include/directional_force.h
++++ b/include/directional_force.h
+@@ -8,7 +8,7 @@ struct DirectionalForce {
+     u16 magnitude, targetMagnitude, angle, targetAngle, delay, unknown2E;
+ };
+ extern struct DirectionalForce *gDirectionalForce;
+-extern u16 gUnk_0200052C, gUnk_02000550, gUnk_0200053C;
++extern u16 gForceThreshold, gForceMagnitude, gForceAngle;
+ extern u32 gRandomIndex;
+ s32 Mod(s32, s32);
+ #endif
+diff --git a/include/orbit_background.h b/include/orbit_background.h
+index 51897a690..9c6b6508f 100644
+--- a/include/orbit_background.h
++++ b/include/orbit_background.h
+@@ -38,7 +38,7 @@ extern struct OrbitBackgroundSelection *gUnk_020004B4;
+ extern struct OrbitBackgroundPlayer *gUnk_02000580[4];
+ extern struct ContactPosition gUnk_030042A0;
+ extern s16 gUnk_03005418[];
+-extern u16 gUnk_02000528;
++extern u16 gPlayerCueActive;
+ extern const s16 gUnk_086149C4[];
+ void OrbitBackground_ResetOrbit(struct OrbitBackground *);
+ void OrbitBackground_UpdateVisibility(struct OrbitBackground *);
+diff --git a/include/ram.h b/include/ram.h
+index 7cb64ede8..65b9a6b35 100644
+--- a/include/ram.h
++++ b/include/ram.h
+@@ -203,6 +203,15 @@ extern u8
+ extern u32 gTileUploadQueue[];      /* object tile upload queue (ObjGfx_LoadTiles) */
+ extern u8 gResourceRegistry[0x400]; /* resource registry entries (ResourceRegistry_*) */
+ extern u8
+-    gGameStateStorage[0x3C00]; /* storage for the game state regions, offset by timer jitter */
++    gGameStateStorage[0x3C00];     /* storage for the game state regions, offset by timer jitter */
++extern u16 gPlayerTraversalMode;   /* traversal mode (0, 2, 4) tested by collision and cell gates */
++extern u16 gPlayerCueActive;       /* player cue / orbit background active flag */
++extern u16 gForceThreshold;        /* directional force strength threshold */
++extern u16 gPlayerTraversalActive; /* traversal active flag tested by collision and cell gates */
++extern u16 gForceAngle;            /* directional force angle (0-255) */
++extern u16 gPlayerScriptStatus[2]; /* script status words saved with the player state */
++extern void *gPendingPlayerNotification; /* pending player notification record */
++extern u16 gForceMagnitude;              /* directional force magnitude */
++extern u8 *gActorAnimationController;    /* actor animation controller singleton */
+ 
+ #endif
+diff --git a/include/resource_station.h b/include/resource_station.h
+index 90db5bc37..dfc8a9c3c 100644
+--- a/include/resource_station.h
++++ b/include/resource_station.h
+@@ -47,7 +47,7 @@ struct ResourceStation {
+     u8 state, animationFrame, nearby, digitsVisible;
+     u16 interactionVariant;
+ };
+-extern u16 gUnk_02000534, gUnk_02000500;
++extern u16 gPlayerTraversalActive, gPlayerTraversalMode;
+ extern struct ResourceStationPosition gUnk_03005418;
+ void AnimData_SelectPaletteBank(void *, s32);
+ #endif
+diff --git a/src/actor_animation_controller.c b/src/actor_animation_controller.c
+index aebaf8878..e1ed2f579 100644
+--- a/src/actor_animation_controller.c
++++ b/src/actor_animation_controller.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "actor_animation_controller.h"
+ #include "render.h"
++#include "ram.h"
+ 
+ // Provisional name: ActorPalette_BeginFade
+ 
+@@ -693,13 +694,11 @@ void Actor_UpdateInteractionSoundDelay(struct ActorAnimController *p)
+     }
+ }
+ 
+-extern u8 *gUnk_020003C8;
+-
+ u8 *Actor_EnsureController(u32, u32);
+ 
+ void Actor_BeginAnimationPhaseOne(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 3;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -721,7 +720,7 @@ void Actor_BeginAnimationPhaseOne(void)
+ 
+ void Actor_BeginAnimationPhaseTwo(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 3;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -743,7 +742,7 @@ void Actor_BeginAnimationPhaseTwo(void)
+ 
+ void Actor_BeginAnimationPhaseThree(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 3;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -765,7 +764,7 @@ void Actor_BeginAnimationPhaseThree(void)
+ 
+ void Actor_BeginAnimationPhaseFour(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 3;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -787,7 +786,7 @@ void Actor_BeginAnimationPhaseFour(void)
+ 
+ void Actor_BeginAnimationPhaseFive(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 3;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -809,7 +808,7 @@ void Actor_BeginAnimationPhaseFive(void)
+ 
+ void Actor_BeginAnimationPhaseSix(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 3;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -831,7 +830,7 @@ void Actor_BeginAnimationPhaseSix(void)
+ 
+ void Actor_BeginAnimationPhaseSeven(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 3;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -853,7 +852,7 @@ void Actor_BeginAnimationPhaseSeven(void)
+ 
+ void Actor_BeginAnimationPhaseEight(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 3;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -898,7 +897,7 @@ static inline u32 mode_bits_v2(u8 *p, u32 mask)
+ // MATCHING_CONCESSION: register-pinning
+ void Actor_BeginScriptedAnimationPhaseNine(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 2;
+     if (g == 0)
+         return;
+@@ -953,7 +952,7 @@ void ScriptUtility_ClearControlFlag(void);
+ 
+ void sub_081E4B0C(u32 phase)
+ {
+-    struct G *g = (struct G *)gUnk_020003C8;
++    struct G *g = (struct G *)gActorAnimationController;
+     u32 three = 3;
+     if (g == 0) {
+         g = (struct G *)Actor_EnsureController(0xBB34, 0);
+@@ -995,7 +994,7 @@ void sub_081E4B0C(u32 phase)
+ 
+ void sub_081E4BD4(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 3;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -1021,7 +1020,7 @@ void sub_081E4BD4(void)
+ 
+ void sub_081E4C74(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 3;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -1047,7 +1046,7 @@ void sub_081E4C74(void)
+ 
+ void sub_081E4D14(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 3;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -1074,7 +1073,7 @@ void sub_081E4D14(void)
+ // MATCHING_CONCESSION: register-pinning
+ void Actor_BeginCurveToPosition(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 2;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -1132,7 +1131,7 @@ void Actor_BeginCurveToPosition(void)
+ 
+ void Actor_BeginCurveToRest(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 2;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -1161,7 +1160,7 @@ void Actor_BeginCurveToRest(void)
+ // MATCHING_CONCESSION: register-pinning
+ void Actor_BeginScriptedCurve(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 2;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -1204,7 +1203,7 @@ void Actor_BeginScriptedCurve(void)
+ // MATCHING_CONCESSION: register-pinning
+ void Actor_SetFacingAndIdle(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 2;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -1251,7 +1250,7 @@ void Actor_SetFacingAndIdle(void)
+ 
+ void Actor_BeginFadeAnimation(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 2;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -1275,7 +1274,7 @@ void Actor_BeginFadeAnimation(void)
+ 
+ void Actor_BeginReverseFadeAnimation(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 2;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -1299,7 +1298,7 @@ void Actor_BeginReverseFadeAnimation(void)
+ 
+ void Actor_BeginHide(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 2;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -1324,7 +1323,7 @@ void Actor_BeginHide(void)
+ // MATCHING_CONCESSION: register-pinning
+ void Actor_BeginPositionedEffect(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 2;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -1374,7 +1373,7 @@ void Actor_BeginPositionedEffect(void)
+ 
+ void Actor_BeginRadialBurst(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     u32 three = 2;
+     if (g == 0) {
+         g = (struct ActorAnimController *)Actor_EnsureController(0xBB34, 0);
+@@ -1398,7 +1397,7 @@ u8 *Actor_EnsureController(u32, u32);
+ 
+ u8 Actor_GetFacingDirection(void)
+ {
+-    u8 *p = gUnk_020003C8;
++    u8 *p = gActorAnimationController;
+     if (p == 0) {
+         p = Actor_EnsureController(0xBB34, 0);
+         if (p == 0)
+@@ -1409,7 +1408,7 @@ u8 Actor_GetFacingDirection(void)
+ 
+ void Actor_SetSpritePriorityFromScript(void)
+ {
+-    u8 *p = gUnk_020003C8;
++    u8 *p = gActorAnimationController;
+     if (p == 0) {
+         p = Actor_EnsureController(0xBB34, 0);
+         if (p == 0)
+@@ -1420,7 +1419,7 @@ void Actor_SetSpritePriorityFromScript(void)
+ 
+ void Actor_SetPreviousAnimationStateFromScript(void)
+ {
+-    u8 *p = gUnk_020003C8;
++    u8 *p = gActorAnimationController;
+     if (p == 0) {
+         p = Actor_EnsureController(0xBB34, 0);
+         if (p == 0)
+@@ -4481,7 +4480,7 @@ s32 Actor_DestroyController(struct ActorAnimController *p)
+     }
+     if (SceneBody_GetById(*(u16 *)((u8 *)p + 0xf8a)))
+         SceneBody_Unregister((u8 *)p + 0xe80);
+-    gUnk_020003C8 = 0;
++    gActorAnimationController = 0;
+ }
+ 
+ struct ScriptInteractionChild {
+@@ -4534,7 +4533,7 @@ static inline void interaction_state(struct ActorAnimController *g, u32 mode, u3
+ void Actor_ConfigureInteractionChildFromScript(void)
+ {
+     struct Vec position;
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     struct ScriptInteractionChild *child;
+     s32 i, j;
+     u32 one = 1;
+@@ -4661,7 +4660,7 @@ static inline void state(struct ActorAnimController *g, u32 mode, u32 phase)
+ 
+ void Actor_ConfigureFromScript(void)
+ {
+-    struct ActorAnimController *g = (struct ActorAnimController *)gUnk_020003C8;
++    struct ActorAnimController *g = (struct ActorAnimController *)gActorAnimationController;
+     struct ActorSprite *obj;
+     if (!g)
+         g = (struct ActorAnimController *)Actor_EnsureController(0xbb34, 0);
+@@ -4811,7 +4810,7 @@ s32 Actor_InitializeController(void *arg0)
+     u16 *dst;
+     s32 i;
+     u32 mask;
+-    gUnk_020003C8 = arg0;
++    gActorAnimationController = arg0;
+     p->owner = gUnknown_02000580;
+     obj = &p->obj;
+     ActorInit_InitMainSprite(p, obj);
+@@ -4886,7 +4885,7 @@ INCLUDE_ASM("asm/nonmatching", Actor_InitializeController);
+ 
+ void Actor_RequestControllerRemoval(void)
+ {
+-    Task_Kill(gUnk_020003C8);
++    Task_Kill(gActorAnimationController);
+ }
+ 
+ /* Create the singleton animated controller and install its task callbacks. */
+@@ -4900,8 +4899,8 @@ s32 Actor_InitializeController(void *);
+ u8 *Actor_EnsureController(u32 resource, u32 unused)
+ {
+     struct ActorAnimController *p;
+-    if (gUnk_020003C8)
+-        return gUnk_020003C8;
++    if (gActorAnimationController)
++        return gActorAnimationController;
+     p = Task_Create(11, 0xfa4);
+     if (p) {
+         p->resource = resource;
+diff --git a/src/background_controller.c b/src/background_controller.c
+index 1e16399ac..1a718f11d 100644
+--- a/src/background_controller.c
++++ b/src/background_controller.c
+@@ -713,8 +713,8 @@ s32 ScrollingBackground_Update(struct ScrollingBackground *p)
+     width = p->width << 4;
+     height = p->height << 4;
+     if (p->flags & 8) {
+-        s32 speed = gUnk_02000550 * (s16)p->speedScale;
+-        s32 angle = (gUnk_0200053C + 160) & 255;
++        s32 speed = gForceMagnitude * (s16)p->speedScale;
++        s32 angle = (gForceAngle + 160) & 255;
+         s32 x, y;
+         const s16 *sine = gUnk_086149C4;
+         p->accumulatedX += sine[(angle + 64) & 255] * speed;
+diff --git a/src/collision_controller.c b/src/collision_controller.c
+index 5eccb263d..8de767517 100644
+--- a/src/collision_controller.c
++++ b/src/collision_controller.c
+@@ -91,9 +91,9 @@ static inline s32 stateMode(void)
+ 
+ static inline s32 globalMode(void)
+ {
+-    u32 active = gUnk_02000534;
++    u32 active = gPlayerTraversalActive;
+     s32 yes = 0;
+-    if (active && gUnk_02000500 == 4)
++    if (active && gPlayerTraversalMode == 4)
+         yes = 1;
+     return yes;
+ }
+diff --git a/src/fn/sub_0804E10C.c b/src/fn/sub_0804E10C.c
+index 493bf2cbd..a84c79d22 100644
+--- a/src/fn/sub_0804E10C.c
++++ b/src/fn/sub_0804E10C.c
+@@ -1,13 +1,13 @@
+ #include "global.h"
+ #include "game_state.h"
+ #include "area_effect.h"
++#include "ram.h"
+ struct S {
+     u8 f[0x868];
+     u32 fl;
+     u8 g[0xa];
+     s16 v;
+ };
+-extern u16 gUnk_02000528;
+ s32 AreaEffect_FindContainingEntry(u8 *);
+ static inline u32 mk(u32 *a, u32 m)
+ {
+@@ -40,7 +40,7 @@ s32 AreaEffect_TestPlayerCoverage(u8 *a)
+     if (AreaEffect_FindContainingEntry(a + 0x30) >= 0)
+         goto yes;
+     {
+-        u32 v = gUnk_02000528;
++        u32 v = gPlayerCueActive;
+         u32 r = 0;
+         if (v == 1)
+             r = 1;
+diff --git a/src/fn/sub_0804EA54.c b/src/fn/sub_0804EA54.c
+index 5810098e1..88778d9d2 100644
+--- a/src/fn/sub_0804EA54.c
++++ b/src/fn/sub_0804EA54.c
+@@ -14,7 +14,6 @@ struct O {
+     u8 b29;
+ };
+ extern u32 gUnk_02000580;
+-extern u16 gUnk_02000528;
+ s32 AreaEffect_TestParticleMode(struct O *);
+ void AreaEffect_UpdateActionParticles(struct O *);
+ void AreaEffect_HideSprites(struct O *);
+@@ -49,7 +48,7 @@ s32 AreaEffect_Tick(struct O *o)
+                 AreaEffect_ShowEnabledSprites(o);
+         }
+         {
+-            u32 v = gUnk_02000528;
++            u32 v = gPlayerCueActive;
+             u32 r = 0;
+             if (v == 1)
+                 r = 1;
+diff --git a/src/fn/sub_0804EFB4.c b/src/fn/sub_0804EFB4.c
+index ef03a5188..a420681d9 100644
+--- a/src/fn/sub_0804EFB4.c
++++ b/src/fn/sub_0804EFB4.c
+@@ -34,9 +34,9 @@ void ResourceStation_CheckInteraction(struct ResourceStation *station)
+                 register u8 *nearby asm("r0") = (u8 *)station + nearbyOffset;
+                 *nearby = playerKind;
+             }
+-            sample = gUnk_02000534;
++            sample = gPlayerTraversalActive;
+             blocked = 0;
+-            if (sample && gUnk_02000500 == 5)
++            if (sample && gPlayerTraversalMode == 5)
+                 blocked = 1;
+             if (blocked == 0) {
+                 u32 kind;
+diff --git a/src/fn/sub_080501E8.c b/src/fn/sub_080501E8.c
+index a57a77790..71df06bb6 100644
+--- a/src/fn/sub_080501E8.c
++++ b/src/fn/sub_080501E8.c
+@@ -18,10 +18,10 @@ s32 CellGate_TestPassage(struct CellGate *p)
+         u32 f, v;
+         if (a->actionMode == 3)
+             goto yes;
+-        v = gUnk_02000534;
++        v = gPlayerTraversalActive;
+         f = 0;
+         if (v != 0) {
+-            if (gUnk_02000500 == 5)
++            if (gPlayerTraversalMode == 5)
+                 f = 1;
+         }
+         if (f == 0) {
+diff --git a/src/fn/sub_08050310.c b/src/fn/sub_08050310.c
+index 33fcdad4f..dcd6f041c 100644
+--- a/src/fn/sub_08050310.c
++++ b/src/fn/sub_08050310.c
+@@ -15,10 +15,10 @@ s32 CellGate_TestForcedPassage(struct CellGate *p)
+         goto no;
+     } else {
+         u32 x;
+-        u32 w = gUnk_02000534;
++        u32 w = gPlayerTraversalActive;
+         x = 0;
+         if (w != 0) {
+-            if (gUnk_02000500 == 5)
++            if (gPlayerTraversalMode == 5)
+                 x = 1;
+         }
+         if (x == 0) {
+diff --git a/src/fn/sub_08050404.c b/src/fn/sub_08050404.c
+index 6a4405cf3..522229e95 100644
+--- a/src/fn/sub_08050404.c
++++ b/src/fn/sub_08050404.c
+@@ -1,9 +1,9 @@
+ #include "cell_gate.h"
+ static inline u8 specialMode(void)
+ {
+-    u32 mode = gUnk_02000534;
++    u32 mode = gPlayerTraversalActive;
+     u32 result = 0;
+-    if (mode && gUnk_02000500 == 5)
++    if (mode && gPlayerTraversalMode == 5)
+         result = 1;
+     return result;
+ }
+diff --git a/src/fn/sub_08050574.c b/src/fn/sub_08050574.c
+index 1a1aa0c53..3ab0cfcbf 100644
+--- a/src/fn/sub_08050574.c
++++ b/src/fn/sub_08050574.c
+@@ -2,10 +2,10 @@
+ s32 CellGate_TestTraversalMode(struct CellGate *gate)
+ {
+     u32 x;
+-    u32 w = gUnk_02000534;
++    u32 w = gPlayerTraversalActive;
+     x = 0;
+     if (w != 0) {
+-        if (gUnk_02000500 == 5)
++        if (gPlayerTraversalMode == 5)
+             x = 1;
+     }
+     if (x == 0) {
+diff --git a/src/fn/sub_080508B4.c b/src/fn/sub_080508B4.c
+index 7118c782a..d8ec3a524 100644
+--- a/src/fn/sub_080508B4.c
++++ b/src/fn/sub_080508B4.c
+@@ -1,7 +1,7 @@
+ #include "orbit_background.h"
+ u32 OrbitBackground_IsEnabled(void)
+ {
+-    u32 value = gUnk_02000528;
++    u32 value = gPlayerCueActive;
+     u32 special = 0;
+     if (value == 1)
+         special = 1;
+diff --git a/src/fn/sub_08050910.c b/src/fn/sub_08050910.c
+index 9d7ef3d03..f4b45aef0 100644
+--- a/src/fn/sub_08050910.c
++++ b/src/fn/sub_08050910.c
+@@ -2,7 +2,7 @@
+ // MATCHING_CONCESSION: register-pinning
+ static inline u32 isSpecial(void)
+ {
+-    u32 value = gUnk_02000528;
++    u32 value = gPlayerCueActive;
+     u32 result = 0;
+     if (value == 1)
+         result = 1;
+diff --git a/src/fn/sub_08050E9C.c b/src/fn/sub_08050E9C.c
+index 7e6ab6180..8a9d1ea1b 100644
+--- a/src/fn/sub_08050E9C.c
++++ b/src/fn/sub_08050E9C.c
+@@ -1,6 +1,6 @@
+ #include "orbit_background.h"
+ #include "render.h"
+-extern u16 gUnk_02000528;
++#include "ram.h"
+ void *ScriptProc_Start(u16, u16);
+ void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, void *);
+ void Bg_SetPriority(u32, u32);
+@@ -12,7 +12,7 @@ void OrbitBackground_LoadResource(struct OrbitBackground *p)
+     z[0] = 0;
+     Bg_SetupLayers(3, 2, p->resource, 0, 0, 1, z);
+     Bg_SetPriority(1, 1);
+-    v = gUnk_02000528;
++    v = gPlayerCueActive;
+     f = 0;
+     if (v == 1)
+         f = 1;
+diff --git a/src/fn/sub_080511EC.c b/src/fn/sub_080511EC.c
+index d6c9feacb..0c31cbfea 100644
+--- a/src/fn/sub_080511EC.c
++++ b/src/fn/sub_080511EC.c
+@@ -1,12 +1,11 @@
+ // COMPILER: old_agbcc
+ #include "directional_force.h"
++#include "ram.h"
+ /* DirectionalForce_SetThreshold: Stores the supplied threshold in the directional force global used by the corresponding script setter. */
+ #define DirectionalForce_SetThreshold sub_080511EC
+ #define DirectionalForce_SetThreshold sub_080511EC
+ 
+-extern u16 gUnk_0200052C;
+-
+ void DirectionalForce_SetThreshold(u16 v)
+ {
+-    gUnk_0200052C = v;
++    gForceThreshold = v;
+ }
+diff --git a/src/fn/sub_080511F8.c b/src/fn/sub_080511F8.c
+index 1cbf10b8f..2943707c9 100644
+--- a/src/fn/sub_080511F8.c
++++ b/src/fn/sub_080511F8.c
+@@ -2,5 +2,5 @@
+ void DirectionalForce_SetThresholdFromScript(void)
+ {
+     if (gDirectionalForce && Script_SeekToKeyword('H'))
+-        gUnk_0200052C = Script_GetValue();
++        gForceThreshold = Script_GetValue();
+ }
+diff --git a/src/fn/sub_08051224.c b/src/fn/sub_08051224.c
+index eb4d6cca3..f7ec0f20b 100644
+--- a/src/fn/sub_08051224.c
++++ b/src/fn/sub_08051224.c
+@@ -26,8 +26,8 @@ s32 DirectionalForce_Tick(struct DirectionalForce *force)
+         force->angle = next;
+     }
+     asm("" ::: "memory");
+-    gUnk_02000550 = force->magnitude >> 4;
+-    gUnk_0200053C = force->angle >> 4;
++    gForceMagnitude = force->magnitude >> 4;
++    gForceAngle = force->angle >> 4;
+     switch ((s32)force->mode) {
+         case 0:
+         default:
+diff --git a/src/fn/sub_08051390.c b/src/fn/sub_08051390.c
+index ba6639bfd..9550e2e04 100644
+--- a/src/fn/sub_08051390.c
++++ b/src/fn/sub_08051390.c
+@@ -1,12 +1,10 @@
+ #include "directional_force.h"
++#include "ram.h"
+ 
+-extern u16 gUnk_0200052C;
+-extern u16 gUnk_02000550;
+-extern u16 gUnk_0200053C;
+ void DirectionalForce_Destroy(void)
+ {
+-    gUnk_0200052C = 0;
+-    gUnk_02000550 = 0;
+-    gUnk_0200053C = 0;
++    gForceThreshold = 0;
++    gForceMagnitude = 0;
++    gForceAngle = 0;
+     gDirectionalForce = 0;
+ }
+diff --git a/src/fn/sub_080513B8.c b/src/fn/sub_080513B8.c
+index 7a445f673..3895f690a 100644
+--- a/src/fn/sub_080513B8.c
++++ b/src/fn/sub_080513B8.c
+@@ -46,7 +46,7 @@ s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id
+         status = Script_SeekToKeyword('H');
+         found = status;
+         if (found) {
+-            u16 *destination = &gUnk_0200052C;
++            u16 *destination = &gForceThreshold;
+             status = Script_GetValue();
+             {
+                 u32 value = status;
+@@ -54,7 +54,7 @@ s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id
+                 *destination = value;
+             }
+         } else {
+-            u16 *destination = &gUnk_0200052C;
++            u16 *destination = &gForceThreshold;
+             *destination = found;
+         }
+     }
+diff --git a/src/fn/sub_08070FA8.c b/src/fn/sub_08070FA8.c
+index 48dfd5209..a416a5b01 100644
+--- a/src/fn/sub_08070FA8.c
++++ b/src/fn/sub_08070FA8.c
+@@ -1,8 +1,8 @@
+ #include "scene_actor_palette.h"
+ #include "engine.h"
++#include "ram.h"
+ #ifdef NONMATCHING
+ // fuzzy: 57.7%
+-extern u16 gUnk_02000528;
+ void Heap_Free(void *);
+ void EffectGroup_SpawnPart(void *, s32, void *, void *, void *, s32, s32);
+ union RegistryParticleVector {
+@@ -62,7 +62,7 @@ static inline u8 TransitionComplete(struct SceneActorRegistryManager *p)
+ static inline u8 Stopped(void)
+ {
+     u32 value = 0;
+-    if (gUnk_02000528 == 1)
++    if (gPlayerCueActive == 1)
+         value = 1;
+     return value;
+ }
+diff --git a/src/fn/sub_08075588.c b/src/fn/sub_08075588.c
+index b0b52c78c..066c1eccb 100644
+--- a/src/fn/sub_08075588.c
++++ b/src/fn/sub_08075588.c
+@@ -18,8 +18,8 @@ void SceneActorReaction_SinkAndRemove(void);
+ extern u32 gUnk_020004B4;
+ extern u32 gUnk_02000580[];
+ extern u32 gActionFreezeTimer;
+-extern u32 gUnk_02000534;
+-extern u32 gUnk_02000500;
++extern u32 gPlayerTraversalActive;
++extern u32 gPlayerTraversalMode;
+ extern u16 gUnk_030039F0;
+ s32 Math_Atan2(s32, s32);
+ s32 Mod(s32, s32);
+@@ -174,7 +174,7 @@ after_timers:
+     } else if (gUnk_02000580[r2] != 0 && (*(u32 *)(gUnk_02000580[r2] + 0x448) & 0x10) != 0) {
+         cond = 1;
+     } else {
+-        cond = (gUnk_02000534 != 0 && gUnk_02000500 == 4);
++        cond = (gPlayerTraversalActive != 0 && gPlayerTraversalMode == 4);
+     }
+     if (cond) {
+         if ((*flags & 0x20000) == 0) {
+diff --git a/src/fn/sub_08078EE8.c b/src/fn/sub_08078EE8.c
+index b73eaee48..0082604cb 100644
+--- a/src/fn/sub_08078EE8.c
++++ b/src/fn/sub_08078EE8.c
+@@ -5,8 +5,6 @@
+ extern u32 gEngineFlags;
+ extern u8 *gGameState;
+ extern u32 gUnk_020004B4;
+-extern u16 gUnk_02000534;
+-extern u16 gUnk_02000500;
+ extern u8 *gUnknown_02000580[];
+ extern u16 gUnk_030039F0;
+ extern u16 gRandomTable[];
+@@ -338,7 +336,7 @@ s32 sub_08078EE8(struct SceneActorRegistryActor *arg0_)
+                 res = 1;
+             } else {
+                 res = 0;
+-                if (gUnk_02000534 != 0 && gUnk_02000500 == 4)
++                if (gPlayerTraversalActive != 0 && gPlayerTraversalMode == 4)
+                     res = 1;
+             }
+         }
+diff --git a/src/fn/sub_080974F4.c b/src/fn/sub_080974F4.c
+index 8b1db61cf..78cb2a472 100644
+--- a/src/fn/sub_080974F4.c
++++ b/src/fn/sub_080974F4.c
+@@ -1,9 +1,9 @@
+ #include "global.h"
+ #include "scene_actor_reset.h"
+ #include "player.h"
++#include "ram.h"
+ 
+ #define gSceneActorSineTable gUnk_086149C4
+-extern u16 gUnk_02000534, gUnk_02000500;
+ extern const s16 gUnk_086149C4[];
+ s32 Div(s32, s32);
+ struct ActorHeightOscillation {
+@@ -24,10 +24,10 @@ static inline s32 ScaleWave(s32 wave)
+ void SceneActor_EasePlayerHeight(struct SceneActorRegistryResetView *actor)
+ {
+     struct ActorHeightOscillation *state = actor->context;
+-    u32 active = gUnk_02000534;
++    u32 active = gPlayerTraversalActive;
+     s32 special = 0;
+     s32 offset;
+-    if (active && gUnk_02000500 == 5)
++    if (active && gPlayerTraversalMode == 5)
+         special = 1;
+     if (special || gUnk_02000580[0]->actionMode == 4)
+         offset = 100;
+diff --git a/src/fn/sub_08098788.c b/src/fn/sub_08098788.c
+index 2789a3625..daba391c3 100644
+--- a/src/fn/sub_08098788.c
++++ b/src/fn/sub_08098788.c
+@@ -10,7 +10,6 @@
+ #include "engine.h"
+ #include "ram.h"
+ extern u8 *gUnk_02000580;
+-extern u16 gUnk_02000534, gUnk_02000500;
+ void ActorShadow_Disable(void *);
+ void Ghost_TickVisibilityTransition(void *);
+ void ActorTick_DecrementCounterAA(void *);
+@@ -86,7 +85,7 @@ static inline u8 PlayerMode(void)
+ static inline u8 GlobalMode(void)
+ {
+     u32 result = 0;
+-    if (gUnk_02000534 && gUnk_02000500 == 4)
++    if (gPlayerTraversalActive && gPlayerTraversalMode == 4)
+         result = 1;
+     return result;
+ }
+diff --git a/src/fn/sub_0809AE0C.c b/src/fn/sub_0809AE0C.c
+index bee19cc20..76a68f236 100644
+--- a/src/fn/sub_0809AE0C.c
++++ b/src/fn/sub_0809AE0C.c
+@@ -1,11 +1,11 @@
+ #include "scene_actor_reset.h"
+ #include "player.h"
++#include "ram.h"
+ 
+ void SceneActorControl_OnIdle(void);
+ void Player_IncrementActionSpeedBonus(struct Player *player, u32 value);
+ void Player_QueueStatusEffect(struct Player *player, s32 effect);
+ void Sound_PlaySong(u32 song);
+-extern u16 gUnk_02000534, gUnk_02000500;
+ extern struct Player *gUnknown_02000580;
+ 
+ struct sub0809AE0C_Context {
+@@ -65,7 +65,7 @@ void sub_0809AE0C(void *unused, struct ContactCollider *other,
+     }
+     distance = actor->position.y - gUnknown_02000580->position.y;
+     {
+-        s32 fast = gUnk_02000534 != 0 && gUnk_02000500 == 5;
++        s32 fast = gPlayerTraversalActive != 0 && gPlayerTraversalMode == 5;
+         if (fast || gUnknown_02000580->actionMode == 4) {
+             limit = 0x3C;
+         } else {
+diff --git a/src/fn/sub_0810480C.c b/src/fn/sub_0810480C.c
+index 1c6b12927..5df3caec0 100644
+--- a/src/fn/sub_0810480C.c
++++ b/src/fn/sub_0810480C.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ // Register allocation and a few load/order choices still differ.
+ // MATCHING_CONCESSION: register-pinning
+ struct ActorGroupMember {
+@@ -52,7 +53,6 @@ static inline s32 WrapAngle(s32 x)
+     return x;
+ }
+ extern u8 *gUnk_02000580[];
+-extern u16 gUnk_02000534, gUnk_02000500;
+ u8 ProximityActor_IsPlayerInsideOriginRange(void *);
+ void ActorGroup_UpdateMemberSway(struct ActorGroupMember *);
+ void Sound_PlaySong(u32);
+@@ -92,7 +92,7 @@ void ActorGroup_UpdateMemberProximity(void *unused, struct ActorGroupMember *p)
+             fl = *(u32 *)(b8 + 0x20);
+             if (!(fl & m8)) {
+                 s32 active;
+-                if (gUnk_02000534 && !gUnk_02000500)
++                if (gPlayerTraversalActive && !gPlayerTraversalMode)
+                     active = 1;
+                 else
+                     active = 0;
+diff --git a/src/fn/sub_081266B4.c b/src/fn/sub_081266B4.c
+index 30faf8967..a6cec32f1 100644
+--- a/src/fn/sub_081266B4.c
++++ b/src/fn/sub_081266B4.c
+@@ -8,7 +8,6 @@ struct StatusSlot {
+     u8 pad2A[2];
+     u16 reset, timer;
+ };
+-extern u16 gUnk_02000534, gUnk_02000500;
+ static inline u8 PlayerInMode(struct AreaEffectPlayer *p)
+ {
+     if (p) {
+@@ -22,9 +21,9 @@ static inline u8 PlayerInMode(struct AreaEffectPlayer *p)
+ }
+ static inline u8 GlobalMode(void)
+ {
+-    u32 value = gUnk_02000534;
++    u32 value = gPlayerTraversalActive;
+     u32 active = 0;
+-    if (value && gUnk_02000500 == 4)
++    if (value && gPlayerTraversalMode == 4)
+         active = 1;
+     return active;
+ }
+diff --git a/src/fn/sub_0813FC38.c b/src/fn/sub_0813FC38.c
+index f4f575afa..69017785f 100644
+--- a/src/fn/sub_0813FC38.c
++++ b/src/fn/sub_0813FC38.c
+@@ -52,8 +52,6 @@ struct PlayerFC38 {
+ extern struct GameStateFC38 *gGameState;
+ extern u32 gEngineFlags;
+ extern struct InputKeysFC38 gUnk_03005260[];
+-extern u16 gUnk_02000548[2];
+-extern u16 gUnk_02000500, gUnk_02000534;
+ extern void *const gUnk_08610964[];
+ 
+ s32 Script_SeekToKeyword(s32);
+@@ -83,7 +81,7 @@ s32 Player_InitActionMode(struct PlayerFC38 *p)
+     Player_RecalculateDerivedStats(p);
+     if (gEngineFlags & 0x1000) {
+         void *cb = Player_UpdateLinkModeMovement;
+-        u16 *q, *base = gUnk_02000548;
++        u16 *q, *base = gPlayerScriptStatus;
+         u16 zero = 0;
+         q = base + 1;
+         do {
+@@ -99,11 +97,11 @@ s32 Player_InitActionMode(struct PlayerFC38 *p)
+     p->inputKeys = gUnk_03005260[p->slot].keys;
+     Player_ClearDirectionHistory(p);
+     if (p->slot == 0) {
+-        p->unk534 = gUnk_02000500;
++        p->unk534 = gPlayerTraversalMode;
+         p->unk536 = gPlayerSavedValue536;
+-        p->unk538 = gUnk_02000534;
++        p->unk538 = gPlayerTraversalActive;
+         for (i = 0; i < 2; i++)
+-            p->scriptStatus[i] = gUnk_02000548[i];
++            p->scriptStatus[i] = gPlayerScriptStatus[i];
+     } else {
+         s32 j;
+         p->unk534 = 0;
+diff --git a/src/fn/sub_08140F40.c b/src/fn/sub_08140F40.c
+index 1dc58ba8c..ea3d79cd2 100644
+--- a/src/fn/sub_08140F40.c
++++ b/src/fn/sub_08140F40.c
+@@ -1,12 +1,12 @@
+ #include "global.h"
+ #include "player.h"
+ #include "engine.h"
++#include "ram.h"
+ 
+ struct Terrain {
+     u8 pad[4];
+     u8 *cells;
+ };
+-extern u16 gUnk_0200053C;
+ u8 *TerrainModifiers_FindCellOverride(s32, s32);
+ static inline u8 *Cell(s32 i)
+ {
+@@ -21,7 +21,7 @@ static inline s32 Width(void)
+ }
+ s32 Player_GetForceDirection(struct Player *p)
+ {
+-    s32 angle = ((gUnk_0200053C + 0x70) & 255);
++    s32 angle = ((gForceAngle + 0x70) & 255);
+     s32 d;
+     s32 offset;
+     u32 h;
+diff --git a/src/fn/sub_081411B8.c b/src/fn/sub_081411B8.c
+index 2a7b7e2f5..9113262ce 100644
+--- a/src/fn/sub_081411B8.c
++++ b/src/fn/sub_081411B8.c
+@@ -4,10 +4,7 @@
+ #include "ram.h"
+ 
+ // MATCHING_CONCESSION: register-pinning
+-#define gForceMagnitude gUnk_02000550
+-#define gForceThreshold gUnk_0200052C
+-#define gForceAngle     gUnk_0200053C
+-#define gSineTable      gUnk_086149C4
++#define gSineTable gUnk_086149C4
+ s32 Player_GetForceDirection(struct Player *);
+ static inline u8 Player_IsActiveInSceneFive(struct Player *p)
+ {
+diff --git a/src/fn/sub_08146EAC.c b/src/fn/sub_08146EAC.c
+index cebb5c6d7..6a41a250a 100644
+--- a/src/fn/sub_08146EAC.c
++++ b/src/fn/sub_08146EAC.c
+@@ -122,7 +122,6 @@ static inline u32 Step(struct ContactSwarmSprite *sp, struct DisplaySequenceStat
+ }
+ 
+ // confidence=low: motion eleven toggles actionMode two with a secondary sprite animation.
+-extern u16 gUnk_02000528;
+ u32 Player_ConsumeStateEntry(struct Player *);
+ void Player_SetPendingCallback(struct Player *, void (*)(struct Player *));
+ void Player_OnMotion11Exit(struct Player *);
+@@ -277,7 +276,7 @@ void Player_UpdateAlternateFormCue(struct Player *p)
+                     {
+                         u32 one = 1;
+                         u32 duration = 1800;
+-                        gUnk_02000528 = one;
++                        gPlayerCueActive = one;
+                         gPlayerCueTimer = duration;
+                     }
+                     ScreenTransition_SendCommand(0, 4, 31, 31, 20, 0x1FFF, 0);
+diff --git a/src/fn/sub_0814C3A4.c b/src/fn/sub_0814C3A4.c
+index 142d163fd..988b27a6d 100644
+--- a/src/fn/sub_0814C3A4.c
++++ b/src/fn/sub_0814C3A4.c
+@@ -13,7 +13,6 @@ struct C3A4Target {
+     u32 flags, unknown8;
+     struct C3A4Target *next;
+ };
+-extern struct C3A4Target *gUnk_0200054C;
+ extern u16 gUnk_02000510;
+ extern u16 gUnk_02000530;
+ extern u32 gEngineFlags;
+@@ -92,7 +91,7 @@ void sub_0814C3A4(u8 *p)
+         gUnk_02000530 = 0;
+         gPlayerNotificationPending = 0;
+         C3A4_U16(p, 0x274) = 0;
+-        gUnk_0200054C = 0;
++        (*(struct C3A4Target **)&gPendingPlayerNotification) = 0;
+         C3A4_U16(p, 0xAD6) = 0x16F;
+         C3A4_U16(p, 0xAD8) = 0x20;
+         Sound_PlaySong(0x39E);
+@@ -122,8 +121,8 @@ void sub_0814C3A4(u8 *p)
+             else
+                 PlayerAnimation_SelectSecondaryKeyframes(p, 0xE9, 0x40);
+             C3A4_CopyPosition(p);
+-            gUnk_0200054C = sub_0814C248(p);
+-            if (gUnk_0200054C == 0) {
++            (*(struct C3A4Target **)&gPendingPlayerNotification) = sub_0814C248(p);
++            if ((*(struct C3A4Target **)&gPendingPlayerNotification) == 0) {
+                 C3A4_U32(p, 0x20) |= 0x4000;
+             } else {
+                 Player_SetActionPhase(p, 1);
+@@ -132,21 +131,21 @@ void sub_0814C3A4(u8 *p)
+             C3A4_U16(p, 0x45A)++;
+             if (C3A4_U16(p, 0x45A) <= 0x1D)
+                 return;
+-            gUnk_0200054C = sub_0814C248(p);
+-            if (gUnk_0200054C)
++            (*(struct C3A4Target **)&gPendingPlayerNotification) = sub_0814C248(p);
++            if ((*(struct C3A4Target **)&gPendingPlayerNotification))
+                 return;
+             Player_SetActionPhase(p, 5);
+             return;
+         }
+         case 1: {
+-            struct C3A4Target *t = gUnk_0200054C;
++            struct C3A4Target *t = (*(struct C3A4Target **)&gPendingPlayerNotification);
+             s32 dx = t->body->pos.x - C3A4_S16(p, 0x10C);
+             s32 dy;
+             s32 dz;
+             s32 angle;
+-            t = gUnk_0200054C;
++            t = (*(struct C3A4Target **)&gPendingPlayerNotification);
+             dy = t->body->pos.y - C3A4_S16(p, 0x10E);
+-            t = gUnk_0200054C;
++            t = (*(struct C3A4Target **)&gPendingPlayerNotification);
+             dz = t->body->pos.z - C3A4_S16(p, 0x110);
+             angle = Math_Atan2(dx, dz);
+             if (dx * dx + dz * dz + dy * dy > 0x8FF) {
+@@ -165,23 +164,24 @@ void sub_0814C3A4(u8 *p)
+                 if (C3A4_U16(p, 0x45A) > 0x59)
+                     Player_SetActionPhase(p, 6);
+             } else {
+-                t = gUnk_0200054C;
++                t = (*(struct C3A4Target **)&gPendingPlayerNotification);
+                 if (t->flags & 1) {
+-                    gUnk_0200054C = 0;
++                    (*(struct C3A4Target **)&gPendingPlayerNotification) = 0;
+                     Player_SetActionPhase(p, 5);
+                 } else {
+                     s32 r = sub_08249244(t->body, 0, 0, t->unknown8);
+                     C3A4_U32(gGameState, 0xC00) += 8;
+                     gPlayerNotificationPending = 1;
+                     if (r == 0) {
+-                        gUnk_0200054C = 0;
++                        (*(struct C3A4Target **)&gPendingPlayerNotification) = 0;
+                         Player_SetActionPhase(p, 5);
+                     } else {
+                         s32 base;
+                         s32 quarter;
+                         p[0x3A4] = ((((angle + 0x20) & 0xFF) >> 6) * 2 + 3) & 7;
+-                        if (!(gUnk_0200054C->flags & 0x10))
+-                            ((u8 *)gUnk_0200054C->body)[9] = ((p[0x3A4] + 5) & 7) << 5;
++                        if (!((*(struct C3A4Target **)&gPendingPlayerNotification)->flags & 0x10))
++                            ((u8 *)(*(struct C3A4Target **)&gPendingPlayerNotification)->body)[9] =
++                                ((p[0x3A4] + 5) & 7) << 5;
+                         base = ((angle + 0x60) & 0xFF) >> 6;
+                         quarter = base;
+                         C3A4_SetFacing(p, quarter);
+@@ -195,7 +195,7 @@ void sub_0814C3A4(u8 *p)
+             return;
+         }
+         case 2: {
+-            struct C3A4Target *t = gUnk_0200054C;
++            struct C3A4Target *t = (*(struct C3A4Target **)&gPendingPlayerNotification);
+             s32 r;
+             s32 damage;
+             if (t->flags & 1) {
+@@ -203,7 +203,7 @@ void sub_0814C3A4(u8 *p)
+                     C3A4_Hit(t, 1, 0x3C);
+                 else
+                     C3A4_Hit(t, 1, 0x3C);
+-                gUnk_0200054C = 0;
++                (*(struct C3A4Target **)&gPendingPlayerNotification) = 0;
+                 Player_UpdateFacingSide(p);
+                 PlayerAnimation_SelectSecondaryKeyframes(p, 0xE9, 0x40);
+                 Player_SetActionPhase(p, 6);
+@@ -223,13 +223,13 @@ void sub_0814C3A4(u8 *p)
+                     amount = 30;
+                 else
+                     amount = Player_ScaleLevelValue(2, 0x60);
+-                t = gUnk_0200054C;
++                t = (*(struct C3A4Target **)&gPendingPlayerNotification);
+                 if (t->flags & 0x10)
+                     r = sub_08249244(t->body, 0, amount, t->unknown8);
+                 else
+                     r = sub_08249244(t->body, 0, amount, t->unknown8);
+                 if (r != 1) {
+-                    gUnk_0200054C = 0;
++                    (*(struct C3A4Target **)&gPendingPlayerNotification) = 0;
+                     Player_UpdateFacingSide(p);
+                     Player_SetActionPhase(p, 6);
+                     return;
+@@ -259,12 +259,12 @@ void sub_0814C3A4(u8 *p)
+                 Player_SetActionPhase(p, 2);
+             } else {
+                 Player_AddControlFlags(p, 8);
+-                t = gUnk_0200054C;
++                t = (*(struct C3A4Target **)&gPendingPlayerNotification);
+                 if (t->flags & 0x10)
+                     C3A4_Hit(t, 1, 0x3C);
+                 else
+                     C3A4_Hit(t, 1, 0x3C);
+-                gUnk_0200054C = 0;
++                (*(struct C3A4Target **)&gPendingPlayerNotification) = 0;
+                 Player_SetActionPhase(p, 6);
+             }
+             gUnk_02000530 = 0;
+diff --git a/src/fn/sub_08151A14.c b/src/fn/sub_08151A14.c
+index 5cf9a3d1b..af39e6e97 100644
+--- a/src/fn/sub_08151A14.c
++++ b/src/fn/sub_08151A14.c
+@@ -17,7 +17,6 @@ extern const s16 gUnk_086149C4[];
+ 
+ // confidence=low: motion seven rotates toward a target and pulses three palette colors.
+ extern u8 *gGameState;
+-extern u16 gUnk_02000528;
+ static inline u32 Arg1(u32 k_, s32 green)
+ {
+     return (green << 5) | k_;
+@@ -129,12 +128,12 @@ void PlayerCue_UpdateTurningPalette(struct Player *p)
+         p->unk59F[1] = 0;
+     if ((*((s16 *)(gGameState + 0x5A8))) != 2) {
+         gPlayerCueTimer = 0;
+-        gUnk_02000528 = 0;
++        gPlayerCueActive = 0;
+     }
+-    if (gUnk_02000528) {
++    if (gPlayerCueActive) {
+         if (gPlayerCueTimer)
+             gPlayerCueTimer--;
+         else
+-            gUnk_02000528 = 0;
++            gPlayerCueActive = 0;
+     }
+ }
+diff --git a/src/fn/sub_08156FE0.c b/src/fn/sub_08156FE0.c
+index b5be0c284..9db98c27c 100644
+--- a/src/fn/sub_08156FE0.c
++++ b/src/fn/sub_08156FE0.c
+@@ -9,7 +9,6 @@ struct PlayerPendingNotification {
+     u32 flags;
+     void *payload;
+ };
+-extern struct PlayerPendingNotification *gUnk_0200054C;
+ void ActorSequence_Begin(struct Player *, s32, s32);
+ void Player_BeginDirectionSequence(struct Player *, u32);
+ void Player_StopMovementEffects(struct Player *);
+@@ -136,14 +135,24 @@ s32 Player_SelectActionSequence(struct Player *p)
+                 ActorSequence_Begin(p, 0x1E, 0);
+         } else
+             ActorSequence_Begin(p, 0x1D, 0);
+-        if (gUnk_0200054C && gPlayerNotificationPending) {
+-            if (!(gUnk_0200054C->flags & 1)) {
+-                if (gUnk_0200054C->flags & 0x10)
+-                    sub_08249244(gUnk_0200054C->receiver, 1, 60, gUnk_0200054C->payload);
++        if ((*(struct PlayerPendingNotification **)&gPendingPlayerNotification) &&
++            gPlayerNotificationPending) {
++            if (!((*(struct PlayerPendingNotification **)&gPendingPlayerNotification)->flags & 1)) {
++                if ((*(struct PlayerPendingNotification **)&gPendingPlayerNotification)->flags &
++                    0x10)
++                    sub_08249244((*(struct PlayerPendingNotification **)&gPendingPlayerNotification)
++                                     ->receiver,
++                                 1, 60,
++                                 (*(struct PlayerPendingNotification **)&gPendingPlayerNotification)
++                                     ->payload);
+                 else
+-                    sub_08249244(gUnk_0200054C->receiver, 1, 60, gUnk_0200054C->payload);
++                    sub_08249244((*(struct PlayerPendingNotification **)&gPendingPlayerNotification)
++                                     ->receiver,
++                                 1, 60,
++                                 (*(struct PlayerPendingNotification **)&gPendingPlayerNotification)
++                                     ->payload);
+             }
+-            gUnk_0200054C = 0;
++            (*(struct PlayerPendingNotification **)&gPendingPlayerNotification) = 0;
+             gPlayerNotificationPending = 0;
+         }
+         Player_StopMovementEffects(p);
+diff --git a/src/fn/sub_08158C14.c b/src/fn/sub_08158C14.c
+index 14ad5eb3a..746f556a0 100644
+--- a/src/fn/sub_08158C14.c
++++ b/src/fn/sub_08158C14.c
+@@ -1,17 +1,17 @@
+ #include "global.h"
+ extern u16 gPlayerCount;
+-extern u16 gUnk_02000500;
++extern u16 gPlayerTraversalMode;
+ extern u16 gPlayerSavedValue536;
+-extern u16 gUnk_02000534;
++extern u16 gPlayerTraversalActive;
+ extern u16 gParticleEffectPendingCount;
+ extern u16 gPlayerEnergyBurstLatch;
+-extern u16 gUnk_02000528;
++extern u16 gPlayerCueActive;
+ extern u16 gPlayerCueTimer;
+ extern u32 gUnk_02000560[4];
+ extern u32 gUnk_02000580[4];
+ extern u16 gTrackedPlayerId[4];
+-extern u16 gUnk_02000548[2];
+-extern u16 gUnk_0200052C, gUnk_02000550, gUnk_0200053C, gPlayerActionSelectionStamp;
++extern u16 gPlayerScriptStatus[2];
++extern u16 gForceThreshold, gForceMagnitude, gForceAngle, gPlayerActionSelectionStamp;
+ // MATCHING_CONCESSION: register-pinning
+ // confidence=low: clears the link-mode shared arrays and counters in the movement-state tail.
+ #define Player_ResetLinkState sub_08158C14
+@@ -29,12 +29,12 @@ void Player_ResetLinkState(void)
+         gUnk_02000560[i] = 0;
+     }
+ 
+-    gUnk_02000500 = 0;
++    gPlayerTraversalMode = 0;
+     gPlayerSavedValue536 = 0;
+-    gUnk_02000534 = 0;
++    gPlayerTraversalActive = 0;
+     firstCounter = &gParticleEffectPendingCount;
+     secondCounter = &gPlayerEnergyBurstLatch;
+-    thirdCounter = &gUnk_02000528;
++    thirdCounter = &gPlayerCueActive;
+     fourthCounter = &gPlayerCueTimer;
+     // Keep these addresses live together until the counter resets.
+     asm("" : : "g"(firstCounter), "g"(secondCounter), "g"(thirdCounter), "g"(fourthCounter));
+@@ -42,7 +42,7 @@ void Player_ResetLinkState(void)
+     *secondCounter = 0;
+     *thirdCounter = 0;
+     *fourthCounter = 0;
+-    pairBase = (s32)gUnk_02000548;
++    pairBase = (s32)gPlayerScriptStatus;
+     pairAddress = pairBase;
+     zero = 0;
+     pairAddress += 2;
+@@ -50,8 +50,8 @@ void Player_ResetLinkState(void)
+         *((u16 *)pairAddress) = zero;
+         pairAddress -= 2;
+     } while (pairAddress >= pairBase);
+-    gUnk_0200052C = 0;
+-    gUnk_02000550 = 0;
+-    gUnk_0200053C = 0;
++    gForceThreshold = 0;
++    gForceMagnitude = 0;
++    gForceAngle = 0;
+     gPlayerActionSelectionStamp = 0;
+ }
+diff --git a/src/fn/sub_08158F70.c b/src/fn/sub_08158F70.c
+index ec90e31af..707e41179 100644
+--- a/src/fn/sub_08158F70.c
++++ b/src/fn/sub_08158F70.c
+@@ -1,16 +1,16 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ struct O08158F70 {
+     u32 f0;
+     u32 f4;
+     u32 f8;
+ };
+-extern struct O08158F70 *gUnk_0200054C;
+ void sub_08249244(u32, u32, u32, u32);
+ 
+ void Player_NotifyActionInterruption(u8 *p)
+ {
+-    struct O08158F70 *o = gUnk_0200054C;
++    struct O08158F70 *o = gPendingPlayerNotification;
+     if (o != 0 && p[0x458] == 2 && p[0x457] == 0xc) {
+         if (o->f4 & 0x10)
+             sub_08249244(o->f0, 1, 0x3c, o->f8);
+diff --git a/src/fn/sub_081598F8.c b/src/fn/sub_081598F8.c
+index a085e55d4..b6c07c05d 100644
+--- a/src/fn/sub_081598F8.c
++++ b/src/fn/sub_081598F8.c
+@@ -2,7 +2,6 @@
+ #include "global.h"
+ #include "player.h"
+ #include "ram.h"
+-extern void *gUnk_0200054C;
+ void Player_EmitQueuedEffects(struct Player *);
+ void ActorSequence_Begin(struct Player *, s32, s32);
+ static inline void SetFlags(u32 *flags, u32 mask)
+@@ -22,7 +21,7 @@ void PlayerAction_BeginMode24(struct Player *p)
+     p->positionResetCounter = 0;
+     p->positionResetState = 0;
+     p->particleEmissionCount = 0;
+-    gUnk_0200054C = 0;
++    gPendingPlayerNotification = 0;
+     gPlayerNotificationPending = 0;
+     ActorSequence_Begin(p, 0x18, 0);
+ }
+diff --git a/src/fn/sub_08159E28.c b/src/fn/sub_08159E28.c
+index ada02070c..d98241ed7 100644
+--- a/src/fn/sub_08159E28.c
++++ b/src/fn/sub_08159E28.c
+@@ -1,7 +1,6 @@
+ #include "global.h"
+ #include "player.h"
+ #include "ram.h"
+-extern u32 gUnk_0200054C;
+ void ActorSequence_Begin(struct Player *, s32, s32);
+ void Player_AddControlFlags(struct Player *, s32);
+ static inline u32 requestBlocked(u32 *flags, u32 mask)
+@@ -23,7 +22,7 @@ s32 Player_ResetPositionState(struct Player *p, struct SceneVec *position)
+     p->positionResetCounter = 0;
+     p->positionResetState = 0;
+     p->particleEmissionCount = 0;
+-    gUnk_0200054C = 0;
++    gPendingPlayerNotification = 0;
+     gPlayerNotificationPending = 0;
+     return 1;
+ }
+diff --git a/src/fn/sub_0815A048.c b/src/fn/sub_0815A048.c
+index c276bee1a..213d8fae9 100644
+--- a/src/fn/sub_0815A048.c
++++ b/src/fn/sub_0815A048.c
+@@ -1,7 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
+ #include "ram.h"
+-extern u32 gUnk_0200054C;
+ void Player_AddControlFlags(void *, u32);
+ void Sound_PlaySong(u32);
+ // confidence=low: forced variant clears movement state before starting or refreshing stun.
+@@ -28,7 +27,7 @@ s32 Player_TryStartStun(u8 *p, s32 duration, s32 force)
+             *(u16 *)(p + 0x4DA) = zeroHalf;
+             *(u8 *)(p + 0x4BE) = zeroByte;
+             *(u16 *)(p + 0x442) = zeroHalf;
+-            gUnk_0200054C = zeroHalf;
++            gPendingPlayerNotification = zeroHalf;
+             gPlayerNotificationPending = zeroHalf;
+         }
+     }
+diff --git a/src/fn/sub_0815A97C.c b/src/fn/sub_0815A97C.c
+index bf33917b3..c62c494bf 100644
+--- a/src/fn/sub_0815A97C.c
++++ b/src/fn/sub_0815A97C.c
+@@ -1,12 +1,12 @@
+ #include "global.h"
+ 
+ #include "engine.h"
++#include "ram.h"
+ extern u8 *gUnk_02000580[];
+-extern u16 gUnk_02000548[];
+ extern const u16 gUnk_08610E24[];
+ void sub_0813D834(u8 *, s32, s32);
+ /* Script: value -t (default gUnk_08610E24[-s]) for slot -s (0 or 1) of the
+-   player (sub_0813D834), or kept in gUnk_02000548 when there is no player
++   player (sub_0813D834), or kept in gPlayerScriptStatus when there is no player
+    yet (tentative). */
+ void Player_SetSlotValueFromScript(void)
+ {
+@@ -19,6 +19,6 @@ void Player_SetSlotValueFromScript(void)
+         if (gUnk_02000580[0])
+             sub_0813D834(gUnk_02000580[0], n, value);
+         else
+-            gUnk_02000548[n] = value;
++            gPlayerScriptStatus[n] = value;
+     }
+ }
+diff --git a/src/fn/sub_0815AAB8.c b/src/fn/sub_0815AAB8.c
+index 9105c5cbf..3294284a5 100644
+--- a/src/fn/sub_0815AAB8.c
++++ b/src/fn/sub_0815AAB8.c
+@@ -1,14 +1,12 @@
+ // COMPILER: old_agbcc
+ #include "global.h"
+ #include "ram.h"
+-/* ScriptActor_ResetCountersFromScript: zeroes three standalone globals (gPlayerEnergyBurstLatch, gUnk_02000528, gPlayerCueTimer) with no actor/script lookup; sits in the ScriptActor command cluster so  */
++/* ScriptActor_ResetCountersFromScript: zeroes three standalone globals (gPlayerEnergyBurstLatch, gPlayerCueActive, gPlayerCueTimer) with no actor/script lookup; sits in the ScriptActor command cluster so  */
+ #define ScriptActor_ResetCountersFromScript sub_0815AAB8
+ 
+-extern u16 gUnk_02000528;
+-
+ void sub_0815AAB8(void)
+ {
+     gPlayerEnergyBurstLatch = 0;
+-    gUnk_02000528 = 0;
++    gPlayerCueActive = 0;
+     gPlayerCueTimer = 0;
+ }
+diff --git a/src/fn/sub_0815AD78.c b/src/fn/sub_0815AD78.c
+index 52e5955f5..dab1f53c0 100644
+--- a/src/fn/sub_0815AD78.c
++++ b/src/fn/sub_0815AD78.c
+@@ -1,4 +1,3 @@
+-#define gPendingPlayerNotification  gUnk_0200054C
+ #define Player_StopActionModeSounds Player_StopActionSounds
+ #include "global.h"
+ #include "player.h"
+@@ -8,7 +7,6 @@ struct PlayerPendingNotification {
+     u32 flags;
+     void *payload;
+ };
+-extern struct PlayerPendingNotification *gUnk_0200054C;
+ void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, void *, int, int, int);
+ void sub_08249244(void *, s32, s32, void *);
+ void Player_StopActionSounds(struct Player *);
+@@ -27,14 +25,21 @@ void Player_EnterKindTwo(struct Player *p)
+     p->kindTwoEntered = 1;
+     p->terrainRecoveryCounter = 0;
+     p->actionCountdown = 0;
+-    if (gUnk_0200054C && gPlayerNotificationPending) {
+-        if (!(gUnk_0200054C->flags & 1)) {
+-            if (gUnk_0200054C->flags & 0x10)
+-                sub_08249244(gUnk_0200054C->receiver, 1, 60, gUnk_0200054C->payload);
++    if ((*(struct PlayerPendingNotification **)&gPendingPlayerNotification) &&
++        gPlayerNotificationPending) {
++        if (!((*(struct PlayerPendingNotification **)&gPendingPlayerNotification)->flags & 1)) {
++            if ((*(struct PlayerPendingNotification **)&gPendingPlayerNotification)->flags & 0x10)
++                sub_08249244(
++                    (*(struct PlayerPendingNotification **)&gPendingPlayerNotification)->receiver,
++                    1, 60,
++                    (*(struct PlayerPendingNotification **)&gPendingPlayerNotification)->payload);
+             else
+-                sub_08249244(gUnk_0200054C->receiver, 1, 60, gUnk_0200054C->payload);
++                sub_08249244(
++                    (*(struct PlayerPendingNotification **)&gPendingPlayerNotification)->receiver,
++                    1, 60,
++                    (*(struct PlayerPendingNotification **)&gPendingPlayerNotification)->payload);
+         }
+-        gUnk_0200054C = 0;
++        (*(struct PlayerPendingNotification **)&gPendingPlayerNotification) = 0;
+         gPlayerNotificationPending = 0;
+     }
+     Player_StopActionSounds(p);
+diff --git a/src/fn/sub_0815E790.c b/src/fn/sub_0815E790.c
+index 192532492..5de9f9fa3 100644
+--- a/src/fn/sub_0815E790.c
++++ b/src/fn/sub_0815E790.c
+@@ -1,7 +1,6 @@
+ #include "global.h"
+ #include "player.h"
+ #include "ram.h"
+-extern u16 gUnk_02000528;
+ void Player_EmitQueuedEffects(struct Player *);
+ void Player_StopActionSounds(struct Player *);
+ void Player_RestoreCameraFollow(struct Player *);
+@@ -27,7 +26,7 @@ void Player_EnterKindFour(struct Player *p)
+     p->positionResetValue = 0;
+     p->actionSelectionStamp = 0;
+     gPlayerEnergyBurstLatch = 0;
+-    gUnk_02000528 = 0;
++    gPlayerCueActive = 0;
+     gPlayerCueTimer = 0;
+     Player_EmitQueuedEffects(p);
+     p->sceneMode = 0;
+diff --git a/src/fn/sub_0815EC14.c b/src/fn/sub_0815EC14.c
+index 52c9249e2..83f5a5314 100644
+--- a/src/fn/sub_0815EC14.c
++++ b/src/fn/sub_0815EC14.c
+@@ -3,8 +3,6 @@
+ #include "ram.h"
+ /* Byte view preserves the original global-pointer reloads between stores. */
+ extern u8 *gGameState;
+-extern u16 gUnk_02000500, gUnk_02000534;
+-extern u16 gUnk_02000548[];
+ extern u32 gUnk_02000560[];
+ void Player_SaveStateSnapshot(struct Player *p)
+ {
+@@ -32,11 +30,11 @@ void Player_SaveStateSnapshot(struct Player *p)
+     *(u16 *)(gGameState + 0x2e) = p->maximumStatB;
+     *(u32 *)(gGameState + 0x608) = p->statHundredths;
+     *(u32 *)(gGameState + 0x60c) = 0;
+-    gUnk_02000500 = p->sceneMode;
++    gPlayerTraversalMode = p->sceneMode;
+     gPlayerSavedValue536 = p->unk536;
+-    gUnk_02000534 = p->active;
++    gPlayerTraversalActive = p->active;
+     for (i = 0; i < 2; i++)
+-        gUnk_02000548[i] = p->scriptStatus[i];
++        gPlayerScriptStatus[i] = p->scriptStatus[i];
+     gUnk_02000560[p->movementRequestBlocked] = p->kind;
+     gPlayerActionSelectionStamp = p->actionSelectionStamp;
+ }
+diff --git a/src/fn/sub_0815F0D0.c b/src/fn/sub_0815F0D0.c
+index ac829699d..d58b0cbd0 100644
+--- a/src/fn/sub_0815F0D0.c
++++ b/src/fn/sub_0815F0D0.c
+@@ -1,10 +1,8 @@
+ #define Player_RefreshCueCollider Player_UpdateColliderRefreshCountdown
+-#define gPlayerCueActive          gUnk_02000528
+ #include "global.h"
+ #include "player.h"
+ #include "game_state.h"
+ #include "ram.h"
+-extern u16 gUnk_02000528;
+ void PlayerCue_Dispatch(void *);
+ void Player_ResetStatus(void *);
+ void Player_RecordInputTicks(void *);
+@@ -32,13 +30,13 @@ s32 Player_Update(struct Player *p)
+         Player_UpdateColliderRefreshCountdown(p);
+         if (gGameState->form != 2) {
+             gPlayerCueTimer = 0;
+-            gUnk_02000528 = 0;
++            gPlayerCueActive = 0;
+         }
+-        if (gUnk_02000528) {
++        if (gPlayerCueActive) {
+             if (gPlayerCueTimer)
+                 gPlayerCueTimer--;
+             else
+-                gUnk_02000528 = 0;
++                gPlayerCueActive = 0;
+         }
+         if (PlayerContact_ApplyTerrainDamage(p))
+             Player_EnterKindFour(p);
+diff --git a/src/fn/sub_0815F224.c b/src/fn/sub_0815F224.c
+index c26182044..9179abb29 100644
+--- a/src/fn/sub_0815F224.c
++++ b/src/fn/sub_0815F224.c
+@@ -1,5 +1,4 @@
+ #define Player_RemoveEffects Player_DestroyEffects
+-#define gPlayerCueActive     gUnk_02000528
+ #include "global.h"
+ #include "player.h"
+ #include "ram.h"
+@@ -11,8 +10,6 @@ void SceneBody_Unregister(void *);
+ void Player_DestroyEffects(void *);
+ void Player_UnregisterSceneMessageReceiver(void *);
+ void Player_StopActionSounds(void *);
+-extern u32 gUnk_0200054C;
+-extern u16 gUnk_02000528;
+ s32 Player_Destroy(struct Player *p)
+ {
+     SceneActorContacts_RemoveNode(&p->contactListNode);
+@@ -24,13 +21,13 @@ s32 Player_Destroy(struct Player *p)
+     Player_DestroyEffects(p);
+     Player_UnregisterSceneMessageReceiver(p);
+     Player_StopActionSounds(p);
+-    gUnk_0200054C = 0;
++    gPendingPlayerNotification = 0;
+     gPlayerNotificationPending = 0;
+     gUnk_02000580[p->movementRequestBlocked] = 0;
+     gPlayerCount--;
+     gParticleEffectPendingCount = 0;
+     gPlayerEnergyBurstLatch = 0;
+-    gUnk_02000528 = 0;
++    gPlayerCueActive = 0;
+     gPlayerCueTimer = 0;
+     return 0;
+ }
+diff --git a/src/fn/sub_081A2858.c b/src/fn/sub_081A2858.c
+index 2734b5819..7e458bccc 100644
+--- a/src/fn/sub_081A2858.c
++++ b/src/fn/sub_081A2858.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ // confidence=low: synchronizes collision, shadow and camera presentation.
+ 
+@@ -64,7 +65,6 @@ struct Actor {
+     u8 pad383[0x38C - 0x383];
+     struct V attackBox;
+ };
+-extern u16 gUnk_02000550, gUnk_0200053C;
+ extern u32 gUnk_02000560;
+ extern const s16 gUnk_086149C4[];
+ void SceneActors_UpdateEffects(void *);
+@@ -175,10 +175,10 @@ void Hresvelgr_UpdateCollisionPresentation(struct Actor *p)
+     else
+         ScaledShadow_Enable((u8 *)p + 0x3B4);
+     if (test(&*flags, 0x2000000)) {
+-        gUnk_02000550 = p->sound;
+-        gUnk_0200053C = p2->facing <= 1 ? 0 : 64;
++        gForceMagnitude = p->sound;
++        gForceAngle = p2->facing <= 1 ? 0 : 64;
+     } else {
+-        gUnk_02000550 = 0;
++        gForceMagnitude = 0;
+         Sound_PauseChannel12(15);
+     }
+     if (p->timer312 > 0) {
+diff --git a/src/fn/sub_081A2BD4.c b/src/fn/sub_081A2BD4.c
+index 8d381adb0..201effb60 100644
+--- a/src/fn/sub_081A2BD4.c
++++ b/src/fn/sub_081A2BD4.c
+@@ -1,9 +1,9 @@
+ #include "global.h"
+ #include "render.h"
++#include "ram.h"
+ #define ActorReaction_CommitRequestedState  Hresvelgr_ApplyRequestedAction
+ #define ActorReaction_ResetFlagsAndDispatch Hresvelgr_UpdateBehaviorMode
+ #define gActorUpdatePaused                  gEnginePauseFlags
+-#define gActorUpdateLatch                   gUnk_02000550
+ struct ActorReaction {
+     u8 unknown0[0xAB];
+     u8 state;
+@@ -12,7 +12,6 @@ struct ActorReaction {
+     u8 unknownB0[0x34];
+     u32 ticks;
+ };
+-extern u16 gUnk_02000550;
+ void Hresvelgr_UpdateAnimationAndTargets(struct ActorReaction *);
+ void Hresvelgr_UpdateBehaviorMode(struct ActorReaction *);
+ u32 Hresvelgr_ApplyRequestedAction(struct ActorReaction *);
+@@ -22,7 +21,7 @@ void Hresvelgr_CopyUpdateTable(struct ActorReaction *);
+ u32 ActorReaction_Tick(struct ActorReaction *actor)
+ {
+     if (gActorUpdatePaused) {
+-        gActorUpdateLatch = 0;
++        gForceMagnitude = 0;
+         if (actor->state == 13)
+             actor->callbackBlocked = 1;
+     } else {
+diff --git a/src/fn/sub_081E34C4.c b/src/fn/sub_081E34C4.c
+index 87f1528d8..7d7d06f98 100644
+--- a/src/fn/sub_081E34C4.c
++++ b/src/fn/sub_081E34C4.c
+@@ -1,11 +1,10 @@
+ // COMPILER: old_agbcc
+ #include "global.h"
++#include "ram.h"
+ /* Actor_ClearSingletonInstance: Clears the global instance pointer used by the singleton scripted actor controller; ownership is provisional */
+ #define Actor_ClearSingletonInstance sub_081E34C4
+ 
+-extern u32 gUnk_020003C8;
+-
+ void sub_081E34C4(void)
+ {
+-    gUnk_020003C8 = 0;
++    gActorAnimationController = 0;
+ }
+diff --git a/src/fn/sub_08209AC4.c b/src/fn/sub_08209AC4.c
+index 74b4d16d4..304de436d 100644
+--- a/src/fn/sub_08209AC4.c
++++ b/src/fn/sub_08209AC4.c
+@@ -1,5 +1,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
++#include "ram.h"
+ struct FanVec {
+     s16 x, y, z, pad;
+ };
+@@ -60,7 +61,6 @@ struct FanTerrain {
+ };
+ extern struct FanTerrain *gTerrainMap;
+ extern u32 gTerrainWidth, gTerrainHeight, gRandomIndex;
+-extern u16 gUnk_02000550, gUnk_0200053C;
+ s32 Mod(s32, s32);
+ s32 Div(s32, s32);
+ void FanCannon_Activate(struct FanCannon *);
+@@ -313,21 +313,21 @@ invoke:
+             if (p->position.z - 0x80 < pl->z && p->position.z + 0x80 > pl->z &&
+                 p->position.x < pl->x && Fan_Distance(p) < p->range * p->range &&
+                 FanCannon_IsPathToPlayerClear(p)) {
+-                gUnk_02000550 = p->wind;
++                gForceMagnitude = p->wind;
+                 if (!p->reverse)
+-                    gUnk_0200053C = 0x80;
++                    gForceAngle = 0x80;
+                 else
+-                    gUnk_0200053C = direction;
++                    gForceAngle = direction;
+             }
+         } else {
+             if (p->position.x - 0x80 < pl->x && p->position.x + 0x80 > pl->x &&
+                 p->position.z < pl->z && Fan_Distance(p) < p->range * p->range &&
+                 FanCannon_IsPathToPlayerClear(p)) {
+-                gUnk_02000550 = p->wind;
++                gForceMagnitude = p->wind;
+                 if (!p->reverse)
+-                    gUnk_0200053C = 0xc0;
++                    gForceAngle = 0xc0;
+                 else
+-                    gUnk_0200053C = 0x40;
++                    gForceAngle = 0x40;
+             }
+         }
+     }
+diff --git a/src/fn/sub_0820A2C8.c b/src/fn/sub_0820A2C8.c
+index b4a011fbc..3de516e5c 100644
+--- a/src/fn/sub_0820A2C8.c
++++ b/src/fn/sub_0820A2C8.c
+@@ -13,8 +13,6 @@ struct FanCannonManager {
+     struct FanCannon slots[8];
+ };
+ extern u32 gUnk_02000560;
+-extern u16 gUnk_02000550;
+-extern u16 gUnk_0200053C;
+ void FanCannon_Update(struct FanCannonManager *, struct FanCannon *, s32);
+ void FanCannon_UpdateActive(void);
+ void Sound_StopSong(u32);
+@@ -31,8 +29,8 @@ u32 FanCannonManager_Update(struct FanCannonManager *p)
+         if (gUnk_02000560 & pauseMask)
+             return 0;
+     }
+-    gUnk_02000550 = 0;
+-    gUnk_0200053C = 0;
++    gForceMagnitude = 0;
++    gForceAngle = 0;
+     slot = p->slots;
+     i = 0;
+     do {
+diff --git a/src/fn/sub_0822C2B0.c b/src/fn/sub_0822C2B0.c
+index 38387af61..92a06cf7c 100644
+--- a/src/fn/sub_0822C2B0.c
++++ b/src/fn/sub_0822C2B0.c
+@@ -1,14 +1,14 @@
+ #include "global.h"
++#include "ram.h"
+ extern u32 gEngineFlags;
+ extern u8 *gUnk_02000580;
+ extern u8 *gGameState;
+-extern u16 gUnk_02000528;
+ s32 Solar_GetLevelForIntensity(s32);
+ s32 Solar_GetLevelUpperBound(s32);
+ s32 Solar_GetLevelLowerBound(s32);
+ static inline s32 modeIs(s32 m)
+ {
+-    u16 mode = gUnk_02000528;
++    u16 mode = gPlayerCueActive;
+     s32 r = 0;
+     if (mode == m)
+         r = 1;
+diff --git a/src/fn/sub_08235DB0.c b/src/fn/sub_08235DB0.c
+index 590e658b1..afc7e1ac5 100644
+--- a/src/fn/sub_08235DB0.c
++++ b/src/fn/sub_08235DB0.c
+@@ -2,7 +2,6 @@
+ #include "ram.h"
+ 
+ extern u8 *gGameState;
+-extern u16 gUnk_02000528;
+ 
+ struct CueTarget {
+     u8 pad0[0x428];
+@@ -24,7 +23,7 @@ void sub_08235DB0(struct CueTask *p)
+         {
+             u16 one = 1;
+             u16 time = 0x708;
+-            gUnk_02000528 = one;
++            gPlayerCueActive = one;
+             gPlayerCueTimer = time;
+         }
+         gParticleEffectPendingCount++;
+@@ -34,7 +33,7 @@ void sub_08235DB0(struct CueTask *p)
+         {
+             u16 two = 2;
+             u16 time = 0x708;
+-            gUnk_02000528 = two;
++            gPlayerCueActive = two;
+             gPlayerCueTimer = time;
+         }
+     }
+diff --git a/src/fn/sub_0823A3CC.c b/src/fn/sub_0823A3CC.c
+index 1a3cc8e76..18b408567 100644
+--- a/src/fn/sub_0823A3CC.c
++++ b/src/fn/sub_0823A3CC.c
+@@ -5,9 +5,6 @@
+ typedef struct Pos8 {
+     u32 a, b;
+ } Pos8;
+-extern u16 gUnk_02000550;
+-extern u16 gUnk_0200053C;
+-extern u16 gUnk_0200052C;
+ void sub_08232264(void *, void *, s32, s32, s32);
+ void Shadow_Initialize(void *, void *, s32);
+ void *SceneParticlePool_EnsureSingleton(void);
+@@ -71,9 +68,9 @@ void LinkPlayer_InitializeActor(u8 *p)
+     *(u16 *)(p + 0xae8) = 0;
+     *(u16 *)(p + 0xaea) = 0;
+     *(u16 *)(p + 0xaec) = 0;
+-    gUnk_02000550 = 0;
+-    gUnk_0200053C = 0;
+-    gUnk_0200052C = 1;
++    gForceMagnitude = 0;
++    gForceAngle = 0;
++    gForceThreshold = 1;
+     gParticleEffectPendingCount = 0;
+     p[0x4f3] = 0xff;
+ }
+diff --git a/src/item_container.c b/src/item_container.c
+index e1eb6a23a..ee8d59488 100644
+--- a/src/item_container.c
++++ b/src/item_container.c
+@@ -4,7 +4,6 @@
+ // MATCHING_CONCESSION: register-pinning
+ 
+ extern u32 gUnk_02000560[];
+-extern u16 gUnk_02000534, gUnk_02000500;
+ 
+ void ScaledShadow_Destroy(void *);
+ s32 sub_0822D490(s32, s32);
+@@ -84,9 +83,9 @@ static inline s32 stateMode(void)
+ }
+ static inline s32 globalMode(void)
+ {
+-    u32 active = gUnk_02000534;
++    u32 active = gPlayerTraversalActive;
+     s32 yes = 0;
+-    if (active && gUnk_02000500 == 4)
++    if (active && gPlayerTraversalMode == 4)
+         yes = 1;
+     return yes;
+ }
+diff --git a/src/player_3.c b/src/player_3.c
+index 7c4c43ee6..8fef0e0fa 100644
+--- a/src/player_3.c
++++ b/src/player_3.c
+@@ -1005,7 +1005,6 @@ void Player_InitDirectionalEffectPair(void *);
+ void Player_InitOrbitingEffect(void *);
+ void ConvergingEffects_InitSprites(void *);
+ void DirectionalSpriteEffect_InitSprite(void *);
+-extern u16 gUnk_02000550, gUnk_0200053C, gUnk_0200052C;
+ 
+ static inline u8 PlayerEffects_IsSceneModeFive(struct Player *p)
+ {
+@@ -1056,9 +1055,9 @@ void Player_InitEffects(struct Player *p)
+     p->movementRequestTarget.x = 0;
+     p->movementRequestTarget.y = 0;
+     p->movementRequestTarget.z = 0;
+-    gUnk_02000550 = 0;
+-    gUnk_0200053C = 0;
+-    gUnk_0200052C = 1;
++    gForceMagnitude = 0;
++    gForceAngle = 0;
++    gForceThreshold = 1;
+     gForceDirectionMode = 1;
+     gParticleEffectPendingCount = 0;
+     p->movementAnimationState = 255;
+diff --git a/src/scene_object.c b/src/scene_object.c
+index 75a99f522..7b680d94b 100644
+--- a/src/scene_object.c
++++ b/src/scene_object.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "scene_object.h"
++#include "ram.h"
+ 
+ static inline void scatter(u16 *coordinate, const u8 *random)
+ {
+@@ -695,8 +696,6 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
+     } while (i >= 0);
+ }
+ 
+-extern u16 gUnk_02000534, gUnk_02000500;
+-
+ // MATCHING_CONCESSION: register-pinning
+ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
+ {
+@@ -710,7 +709,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
+     u8 *dynamic;
+     if (({
+             u8 active = 0;
+-            if (gUnk_02000534 && gUnk_02000500 == 2)
++            if (gPlayerTraversalActive && gPlayerTraversalMode == 2)
+                 active = 1;
+             active;
+         }) ||
+diff --git a/src/tether_actor.c b/src/tether_actor.c
+index d4a001c70..84bb0f6ba 100644
+--- a/src/tether_actor.c
++++ b/src/tether_actor.c
+@@ -1,5 +1,6 @@
+ #include "tether_actor.h"
+ #include "engine.h"
++#include "ram.h"
+ 
+ #define TetherActor_GetStatusTag sub_08049F54
+ 
+@@ -1210,15 +1211,13 @@ void TetherActor_BeginAuxiliaryState(struct TetherActor *input)
+ 
+ // fix.py best (sweep after the inlined-insn fix)
+ 
+-extern u16 gUnk_02000550, gUnk_0200052C, gUnk_0200053C;
+-
+ static inline void slopePush(struct TetherActor *actor, s32 octant)
+ {
+     s32 angle = (octant + 1) << 5;
+     s32 cosine = gUnk_086149C4[(angle + 64) & 255];
+     s32 sine = gUnk_086149C4[angle & 255];
+-    actor->movementDelta.x -= scaleOffset(gUnk_02000550 * cosine);
+-    actor->movementDelta.z -= scaleOffset(gUnk_02000550 * sine);
++    actor->movementDelta.x -= scaleOffset(gForceMagnitude * cosine);
++    actor->movementDelta.z -= scaleOffset(gForceMagnitude * sine);
+ }
+ 
+ static inline u32 NeighborHeight(s32 cell)
+@@ -1237,23 +1236,23 @@ inline static void slopePush_AdjustSlopeMovement(struct TetherActor *actor, s32
+     cosine = table[(angle + 64) & 255];
+     sine = table[angle & 255];
+     do {
+-        actor->movementDelta.x -= scaleOffset(gUnk_02000550 * cosine);
++        actor->movementDelta.x -= scaleOffset(gForceMagnitude * cosine);
+     } while (0);
+-    actor->movementDelta.z -= scaleOffset(gUnk_02000550 * sine);
++    actor->movementDelta.z -= scaleOffset(gForceMagnitude * sine);
+ }
+ 
+ void TetherActor_AdjustSlopeMovement(struct TetherActor *actor)
+ {
+     s32 neighbor;
+     s32 octant;
+-    if (((actor->kind != 9) || (actor->state == 11)) || (gUnk_02000550 < gUnk_0200052C))
++    if (((actor->kind != 9) || (actor->state == 11)) || (gForceMagnitude < gForceThreshold))
+         return;
+     if (!actor->movementProbe) {
+         void *probe = &actor->movementProbeStorage;
+         CellObject_Init(probe, &actor->position);
+         actor->movementProbe = probe;
+     }
+-    octant = ((gUnk_0200053C + 112) & 255) >> 5;
++    octant = ((gForceAngle + 112) & 255) >> 5;
+     neighbor = 0;
+     if (octant & 1) {
+         if (octant == 1)
+diff --git a/symbols/ram.csv b/symbols/ram.csv
+index 4cadeffc7..42f2a4fe1 100644
+--- a/symbols/ram.csv
++++ b/symbols/ram.csv
+@@ -150,7 +150,7 @@ addr,name,size,kind,decl,header,confidence,notes
+ 02000388,gScriptPromptSettings,14,object,extern struct ScriptPromptSettings gScriptPromptSettings;,include/ram.h,low,
+ 020003A0,gGameStartParams,1C,object,extern u32 gGameStartParams[7];,include/ram.h,low,game start menu parameters
+ 020003C0,gSoundTestParams,8,object,extern u32 gSoundTestParams[2];,include/ram.h,low,sound test script and track text
+-020003C8,gUnk_020003C8,4,object,,,,
++020003C8,gActorAnimationController,4,object,extern u8 *gActorAnimationController;,include/ram.h,low,actor animation controller singleton
+ 020003D0,gScreenParams3D0,28,object,extern u32 gScreenParams3D0[10];,include/ram.h,low,screen parameters 3D0 (idle and music timers)
+ 020003F8,gScreenTextParameters,28,object,extern struct ScreenTextParameters gScreenTextParameters;,include/ram.h,low,
+ 02000420,gScreenDelayParameters,8,object,extern struct ScreenDelayParameters gScreenDelayParameters;,include/ram.h,low,
+@@ -188,23 +188,23 @@ addr,name,size,kind,decl,header,confidence,notes
+ 020004D4,gSpritePairPool,4,object,extern u32 gSpritePairPool;,include/ram.h,low,
+ 020004D8,gCompactSpritePool,4,object,extern u8 *gCompactSpritePool;,include/ram.h,low,
+ 020004F0,gUnk_020004F0,C,object,,,,
+-02000500,gUnk_02000500,2,object,,,,
++02000500,gPlayerTraversalMode,2,object,extern u16 gPlayerTraversalMode;,include/ram.h,low,"traversal mode (0, 2, 4) tested by collision and cell gates"
+ 02000504,gPlayerCatalogSavedOption,2,object,extern u16 gPlayerCatalogSavedOption;,include/ram.h,low,catalog option saved with the player state
+ 02000508,gTrackedPlayerId,2,object,extern u16 gTrackedPlayerId;,include/ram.h,low,
+ 02000514,gPlayerLevelOverride,2,object,extern u16 gPlayerLevelOverride;,include/ram.h,low,level used by sub_0815910C in state 6
+ 02000518,gPlayerCueTimer,2,object,extern u16 gPlayerCueTimer;,include/ram.h,low,
+ 02000520,gPlayerSavedValue536,2,object,extern u16 gPlayerSavedValue536;,include/ram.h,low,saved copy of player field 0x536
+-02000528,gUnk_02000528,2,object,,,,
+-0200052C,gUnk_0200052C,6,object,,,,
+-02000534,gUnk_02000534,2,object,,,,
+-0200053C,gUnk_0200053C,2,object,,,,
++02000528,gPlayerCueActive,2,object,extern u16 gPlayerCueActive;,include/ram.h,low,player cue / orbit background active flag
++0200052C,gForceThreshold,2,object,extern u16 gForceThreshold;,include/ram.h,low,directional force strength threshold
++02000534,gPlayerTraversalActive,2,object,extern u16 gPlayerTraversalActive;,include/ram.h,low,traversal active flag tested by collision and cell gates
++0200053C,gForceAngle,2,object,extern u16 gForceAngle;,include/ram.h,low,directional force angle (0-255)
+ 02000544,gPlayerCount,2,object,extern u16 gPlayerCount;,include/ram.h,low,
+-02000548,gUnk_02000548,4,object,,,,
+-0200054C,gUnk_0200054C,4,object,,,,
+-02000550,gUnk_02000550,2,object,,,,
++02000548,gPlayerScriptStatus,4,object,extern u16 gPlayerScriptStatus[2];,include/ram.h,low,script status words saved with the player state
++0200054C,gPendingPlayerNotification,4,object,extern void *gPendingPlayerNotification;,include/ram.h,low,pending player notification record
++02000550,gForceMagnitude,2,object,extern u16 gForceMagnitude;,include/ram.h,low,directional force magnitude
+ 02000554,gPlayerActionSelectionStamp,2,object,extern u16 gPlayerActionSelectionStamp;,include/ram.h,low,action selection stamp (Player_SaveStateSnapshot)
+ 02000558,gForceDirectionMode,2,object,extern u16 gForceDirectionMode;,include/ram.h,low,
+-02000560,gUnk_02000560,4,object,,,,
++02000560,gUnk_02000560,10,object,,,,
+ 02000570,gPlayerEnergyBurstLatch,2,object,extern u16 gPlayerEnergyBurstLatch;,include/ram.h,low,latch set by Player_UpdateEnergyBurst
+ 02000580,gUnk_02000580,10,object,,,,
+ 02000590,gParticleEffectPendingCount,2,object,extern u16 gParticleEffectPendingCount;,include/ram.h,low,pending particle effects
+-- 
+2.39.3 (Apple Git-145)
+

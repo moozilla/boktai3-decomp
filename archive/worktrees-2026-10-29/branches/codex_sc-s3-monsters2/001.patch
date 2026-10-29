@@ -1,0 +1,52 @@
+From 7b9d874cec12089d17f7b49ed83af0cad8d6f7f0 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 01:45:29 -0700
+Subject: [PATCH] seek: allow code ranking after checking skeleton facts
+
+Keep facts visible but permit shape/diff ranking when address folding creates false semantic gaps.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/seek/seek.py | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/tools/seek/seek.py b/tools/seek/seek.py
+index ae9fea74d..096596956 100644
+--- a/tools/seek/seek.py
++++ b/tools/seek/seek.py
+@@ -493,6 +493,11 @@ def rank(n):
+     if n.get("match"):
+         return (0, 0, 0, 0)
+     mode = OBJECTIVE["mode"]
++    if mode == "code":
++        # Immediate offsets and literal pools can reflect address folding rather
++        # than a semantic difference. Keep the facts visible but let the worker
++        # rank by generated code after checking them against the ROM.
++        return (0, cost, k[1], k[2])
+     if mode == "rotation" and n.get("rot"):
+         r = n["rot"]  # [diff after the best single shift, K, D]
+         return (k[0], r[0], r[2] if r[0] == 0 else 99, cost)
+@@ -1012,7 +1017,7 @@ def main():
+     p.add_argument("--fam")
+     p.add_argument("--lines")
+     p.add_argument("--top", type=int, default=10)
+-    p.add_argument("--objective", choices=["rotation"])
++    p.add_argument("--objective", choices=["rotation", "code"])
+     p.set_defaults(go=cmd_expand)
+     p = sub.add_parser("run")
+     p.add_argument("nodes", nargs="*")
+@@ -1022,8 +1027,9 @@ def main():
+     p.add_argument("--slack", type=int, help="explore children up to this much worse (shape+diff) than the "
+                    "best (default max(4, diff/8))")
+     p.add_argument("--depth", type=int, default=6, help="moves stacked on a node at most")
+-    p.add_argument("--objective", choices=["rotation", "block"], help="rotation: rank by the reload spill "
+-                   "shift still needed (AGBCC_SPILL=K:D); block: by one ROM block's cost (--block)")
++    p.add_argument("--objective", choices=["rotation", "block", "code"], help="rotation: rank by the reload spill "
++                   "shift still needed (AGBCC_SPILL=K:D); block: by one ROM block's cost (--block); "
++                   "code: by shape+diff after the worker checks the skeleton facts")
+     p.add_argument("--rot-max", type=int, help="rotation: test shifts on children with at most this diff")
+     p.add_argument("--block", type=int, help="work on one ROM block (its number in the block map): moves only on "
+                    "the C lines that produce it, ranked by its own cost first")
+-- 
+2.39.3 (Apple Git-145)
+

@@ -1,0 +1,27 @@
+From 9e8d40a199a7e6f0150012d3a86ad480469c01e4 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 02:48:28 -0700
+Subject: [PATCH] Allow documented giv and calls scope commands through CLI
+ validation
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/scope/scope.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/scope/scope.py b/tools/scope/scope.py
+index 055648127..28d06776a 100644
+--- a/tools/scope/scope.py
++++ b/tools/scope/scope.py
+@@ -5318,7 +5318,7 @@ def validate_cli(args):
+     elif rest and rest[0] == "pins":
+         if len([a for a in rest if a != "--all"]) > 2:
+             cli_error("FILE.c pins [FUNC] [--all]")
+-    elif any(a in rest for a in ("probe", "shape", "frame", "hoist", "spill", "pre")):
++    elif any(a in rest for a in ("probe", "shape", "frame", "hoist", "spill", "pre", "giv", "calls")):
+         if len(rest) > 2:
+             cli_error("FILE.c COMMAND [FUNC]")
+     elif len(rest) > 1:
+-- 
+2.39.3 (Apple Git-145)
+

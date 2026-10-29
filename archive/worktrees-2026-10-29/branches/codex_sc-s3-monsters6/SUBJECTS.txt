@@ -1,0 +1,2 @@
+Keep unchecked semantic mutations out of seek automatic search
+Preserve trusted seek paths when outputs were reached by unchecked moves

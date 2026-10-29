@@ -1,0 +1,2081 @@
+From 3e460b93276b5f68c8d5ef3cd0b9c70191c4d339 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Tue, 27 Oct 2026 23:14:37 -0700
+Subject: [PATCH] ramlayout unify --cast: prefer a cast at each use over a
+ file's own declaration; unify stragglers of ram.h objects
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+---
+ src/fn/Time_HandleRegionKeypad.c |  8 ++---
+ src/fn/Time_LoadRegionList.c     |  6 ++--
+ src/fn/Time_ShowRegionMenu.c     |  4 +--
+ src/fn/sub_080135E8.c            | 10 +++---
+ src/fn/sub_080154EC.c            | 18 ++++++----
+ src/fn/sub_08015F60.c            |  8 ++---
+ src/fn/sub_08016118.c            |  4 +--
+ src/fn/sub_08017444.c            |  7 ++--
+ src/fn/sub_0802E04C.c            |  6 ++--
+ src/fn/sub_08031DBC.c            |  6 ++--
+ src/fn/sub_08031DDC.c            |  6 ++--
+ src/fn/sub_08033568.c            |  7 ++--
+ src/fn/sub_080369F0.c            |  7 ++--
+ src/fn/sub_08036AA8.c            |  5 ++-
+ src/fn/sub_08036AC4.c            |  6 ++--
+ src/fn/sub_08036AE0.c            |  6 ++--
+ src/fn/sub_08036C38.c            |  7 ++--
+ src/fn/sub_080390C4.c            | 10 +++---
+ src/fn/sub_08075588.c            |  8 ++---
+ src/fn/sub_08111A24.c            |  6 ++--
+ src/fn/sub_0811ADF0.c            |  5 ++-
+ src/fn/sub_0811DEC8.c            |  6 ++--
+ src/fn/sub_0811E3DC.c            |  6 ++--
+ src/fn/sub_0815F5F8.c            |  6 ++--
+ src/fn/sub_081A37E0.c            |  6 ++--
+ src/fn/sub_081A4A78.c            |  4 +--
+ src/fn/sub_081B7744.c            |  6 ++--
+ src/fn/sub_081D7510.c            | 18 +++++-----
+ src/fn/sub_081DE520.c            | 16 ++++-----
+ src/fn/sub_081DF06C.c            |  8 ++---
+ src/fn/sub_081DFA50.c            |  4 +--
+ src/fn/sub_081DFB18.c            |  4 +--
+ src/fn/sub_081E078C.c            | 10 +++---
+ src/fn/sub_081E092C.c            |  5 +--
+ src/fn/sub_081E0CB4.c            | 14 ++++----
+ src/fn/sub_081E1A2C.c            | 16 ++++-----
+ src/fn/sub_081E269C.c            |  6 ++--
+ src/fn/sub_081EAB64.c            | 24 +++++++-------
+ src/fn/sub_081EB5A8.c            |  8 ++---
+ src/fn/sub_081EB8E0.c            | 35 ++++++++++++--------
+ src/fn/sub_081EBD0C.c            | 57 +++++++++++++++++++-------------
+ src/fn/sub_081EC0A8.c            | 22 ++++++------
+ src/fn/sub_081EC310.c            |  6 ++--
+ src/fn/sub_081FC800.c            |  4 +--
+ src/fn/sub_081FF388.c            |  4 +--
+ src/fn/sub_0821FDC8.c            | 12 +++----
+ src/fn/sub_0821FE04.c            | 10 +++---
+ src/fn/sub_0821FE6C.c            | 12 +++----
+ src/fn/sub_082260D8.c            | 14 ++++----
+ src/fn/sub_08226268.c            |  8 ++---
+ src/fn/sub_082263A0.c            | 10 +++---
+ src/fn/sub_082263FC.c            | 10 +++---
+ src/fn/sub_08226558.c            | 19 +++++------
+ src/fn/sub_0822C1C8.c            |  6 ++--
+ src/fn/sub_0822C1F0.c            |  6 ++--
+ src/fn/sub_08232264.c            | 10 +++---
+ src/fn/sub_08232420.c            |  8 ++---
+ src/fn/sub_08232764.c            |  5 +--
+ tools/ramlayout.py               |  9 +++--
+ 59 files changed, 304 insertions(+), 280 deletions(-)
+
+diff --git a/src/fn/Time_HandleRegionKeypad.c b/src/fn/Time_HandleRegionKeypad.c
+index 02d2a112b..e3f474945 100644
+--- a/src/fn/Time_HandleRegionKeypad.c
++++ b/src/fn/Time_HandleRegionKeypad.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "render.h"
++#include "ram.h"
+ struct RegionEntry {
+     s16 group;
+     u16 name;
+@@ -44,7 +45,6 @@ struct ScriptCallArgs {
+ struct Params310 {
+     u32 unk0, unk4, confirmProc, cancelProc, flag;
+ };
+-extern struct Params310 gTimeRegionMenuParams;
+ extern u16 gUnk_03005260[];
+ void Sound_PlaySong(u32);
+ void Time_OnRegionListSelect(struct RegionMenu *);
+@@ -67,7 +67,7 @@ void Time_HandleRegionKeypad(struct RegionMenu *menu)
+         case 0:
+             if (gUnk_03005260[1] & 1) {
+                 Sound_PlaySong(0xdd);
+-                if (gTimeRegionMenuParams.flag == 1)
++                if ((*(struct Params310 *)gTimeRegionMenuParams).flag == 1)
+                     menu->fadeSpeed = 3;
+                 else
+                     menu->fadeSpeed = 0;
+@@ -136,9 +136,9 @@ void Time_HandleRegionKeypad(struct RegionMenu *menu)
+                 menu->anims[1].flags |= 1;
+                 menu->anims[0].flags |= 1;
+                 if (menu->confirmed == 0)
+-                    Script_Call(gTimeRegionMenuParams.cancelProc, &args);
++                    Script_Call((*(struct Params310 *)gTimeRegionMenuParams).cancelProc, &args);
+                 else
+-                    Script_Call(gTimeRegionMenuParams.confirmProc, &args);
++                    Script_Call((*(struct Params310 *)gTimeRegionMenuParams).confirmProc, &args);
+                 Task_Kill(menu);
+             }
+             menu->timer++;
+diff --git a/src/fn/Time_LoadRegionList.c b/src/fn/Time_LoadRegionList.c
+index 4eec07d05..52c5132e6 100644
+--- a/src/fn/Time_LoadRegionList.c
++++ b/src/fn/Time_LoadRegionList.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "render.h"
++#include "ram.h"
+ struct RegionEntry {
+     s16 group;
+     u16 name;
+@@ -45,7 +46,6 @@ struct TimeState {
+     u8 pad0[0x18];
+     u32 region;
+ };
+-extern struct Params310 gTimeRegionMenuParams;
+ extern struct TimeState *gUnk_030053F8;
+ void Bg_ClearTilemap(u32);
+ void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
+@@ -68,7 +68,7 @@ u32 Time_LoadRegionList(struct RegionMenu *menu)
+     void *tiles;
+     u32 value;
+     struct Rect16 rect;
+-    if (gTimeRegionMenuParams.flag == 1)
++    if ((*(struct Params310 *)gTimeRegionMenuParams).flag == 1)
+         menu->selected = 6;
+     else
+         menu->selected = gUnk_030053F8->region;
+@@ -85,7 +85,7 @@ u32 Time_LoadRegionList(struct RegionMenu *menu)
+     Bg_SetupLayers(2, 0, tiles, 0, zero, 1, &value);
+     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
+     CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14, gBgPaletteBuffer, 0x100);
+-    Script_SetPc((u8 *)gTimeRegionMenuParams.table);
++    Script_SetPc((u8 *)(*(struct Params310 *)gTimeRegionMenuParams).table);
+     n = 0;
+     while (n <= 64 && Script_GetPc()) {
+         group = Script_GetValue();
+diff --git a/src/fn/Time_ShowRegionMenu.c b/src/fn/Time_ShowRegionMenu.c
+index 6779840ae..af9dbc85e 100644
+--- a/src/fn/Time_ShowRegionMenu.c
++++ b/src/fn/Time_ShowRegionMenu.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ struct RegionEntry {
+     s16 page;
+     u8 pad[10];
+@@ -12,7 +13,6 @@ struct RegionMenu {
+     u8 pad5b0[4];
+     s32 skipped;
+ };
+-extern u32 gTimeRegionMenuParams;
+ void Menu_EraseRect(s32, s32, s32, s32);
+ void Menu_DrawStringRef(s32, s32, u32, s32);
+ void Time_ShowRegionMenu(struct RegionMenu *menu)
+@@ -26,7 +26,7 @@ void Time_ShowRegionMenu(struct RegionMenu *menu)
+         if (menu->entries[i].page == menu->page) {
+             if (first == 1)
+                 first = 0;
+-            Menu_DrawStringRef(4, row + 7, gTimeRegionMenuParams, i);
++            Menu_DrawStringRef(4, row + 7, (*(u32 *)gTimeRegionMenuParams), i);
+             row += 2;
+         }
+         menu->skipped += first;
+diff --git a/src/fn/sub_080135E8.c b/src/fn/sub_080135E8.c
+index c2fbc1a31..75216309c 100644
+--- a/src/fn/sub_080135E8.c
++++ b/src/fn/sub_080135E8.c
+@@ -1,9 +1,9 @@
+ #include "global.h"
++#include "ram.h"
+ struct Manager {
+     u8 pad[24];
+     u8 *resource;
+ };
+-extern struct Manager *gShadowManager;
+ void *ShadowTask_Create(int, int);
+ void Shadow_UpdateTerrain(void *);
+ void ActorShadow_UpdateNone(void *);
+@@ -14,7 +14,7 @@ int Shadow_Initialize(u8 *p, void *source, int mode)
+ {
+     u8 *sprite;
+     int zero;
+-    if (!gShadowManager && !ShadowTask_Create(0, 0))
++    if (!((struct Manager *)gShadowManager) && !ShadowTask_Create(0, 0))
+         return -1;
+     zero = 0;
+     p[0] = zero;
+@@ -27,15 +27,15 @@ int Shadow_Initialize(u8 *p, void *source, int mode)
+     else
+         *(void (**)(void *))(p + 0x34) = ActorShadow_UpdateNone;
+     sprite = p + 12;
+-    ParticleSprite_Initialize(sprite, gShadowManager->resource, 512);
++    ParticleSprite_Initialize(sprite, ((struct Manager *)gShadowManager)->resource, 512);
+     Effect_SetOrigin(sprite, -8, -8);
+     {
+-        u8 *resource = gShadowManager->resource;
++        u8 *resource = ((struct Manager *)gShadowManager)->resource;
+         int width = p[0x16] >> 3, height = p[0x17] >> 3;
+         *(u16 *)(p + 0x14) = width * height * 34 + *(u16 *)(resource + 4);
+     }
+     p[0x1c] = 252;
+     p[0x1b] = 2;
+-    ShadowList_Insert(gShadowManager, p);
++    ShadowList_Insert(((struct Manager *)gShadowManager), p);
+     return 0;
+ }
+diff --git a/src/fn/sub_080154EC.c b/src/fn/sub_080154EC.c
+index 2e14077d9..09224c0ee 100644
+--- a/src/fn/sub_080154EC.c
++++ b/src/fn/sub_080154EC.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ // MATCHING_CONCESSION: register-pinning
+ struct Vec {
+     s16 x, y, z, pad;
+@@ -33,7 +34,6 @@ struct Manager {
+     struct Piece pieces[32];
+ };
+ void Sprite_Remove(void *);
+-extern struct Manager *gAnimatedParticleManager;
+ extern u16 gUnk_08604C54[];
+ void *ScriptProc_Start(int, int);
+ int AnimData_Load(void *, int);
+@@ -82,7 +82,7 @@ int AnimatedParticles_Create(int count, struct Vec *pos, struct Config *c)
+     int i, emitted;
+     u16 *table;
+     u32 *index;
+-    if (gAnimatedParticleManager)
++    if ((*(struct Manager **)&gAnimatedParticleManager))
+         goto start;
+     if (AnimatedParticleManager_Create(0, 0))
+         goto start;
+@@ -95,7 +95,7 @@ start:
+     table = gRandomTable;
+     index = &gRandomIndex;
+     for (; i <= 31; i++) {
+-        struct Piece *p = &gAnimatedParticleManager->pieces[i];
++        struct Piece *p = &(*(struct Manager **)&gAnimatedParticleManager)->pieces[i];
+         struct Obj *o = &p->sprite;
+         if (!p->active) {
+             int pitch, yaw;
+@@ -156,26 +156,30 @@ start:
+                 AnimData_SelectPaletteBank(p->resource, 0x29f);
+                 setFrame(&p->sprite, 32);
+                 a = &p->anim;
+-                Anim_SetSequence(a, gAnimatedParticleManager->resources[1], 6, 0, 0);
++                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
++                                 6, 0, 0);
+             } else if (p->pad1 == 6) {
+                 AnimData_Load(p->resource, 0x61f9);
+                 AnimData_SelectPaletteBank(p->resource, 0x2a7);
+                 setFrame(&p->sprite, 32);
+                 a = &p->anim;
+-                Anim_SetSequence(a, gAnimatedParticleManager->resources[1], 6, 0, 0);
++                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
++                                 6, 0, 0);
+                 asm("" : : "r"(a), "i"(6));
+             } else if (p->pad1 == 7) {
+                 AnimData_Load(p->resource, 0x61f9);
+                 AnimData_SelectPaletteBank(p->resource, 0x2a6);
+                 setFrame(&p->sprite, 45);
+                 a = &p->anim;
+-                Anim_SetSequence(a, gAnimatedParticleManager->resources[1], 8, 0, 0);
++                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
++                                 8, 0, 0);
+                 asm("" : : "r"(a), "i"(7));
+             } else {
+                 AnimData_Load(p->resource, 0x4384);
+                 AnimData_SelectPaletteBank(p->resource, p->pad1 + 182);
+                 a = &p->anim;
+-                Anim_SetSequence(a, gAnimatedParticleManager->resources[0], 0, 0, 0);
++                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[0],
++                                 0, 0, 0);
+             }
+             saved = a;
+             asm("" : "+r"(saved));
+diff --git a/src/fn/sub_08015F60.c b/src/fn/sub_08015F60.c
+index 8e6a1e83c..268dd7d3d 100644
+--- a/src/fn/sub_08015F60.c
++++ b/src/fn/sub_08015F60.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ struct Vec {
+     s16 x, y, z, pad;
+@@ -37,7 +38,6 @@ struct Manager {
+     void *animations;
+     struct Group groups[6];
+ };
+-extern struct Manager *gFadingParticleManager;
+ extern u32 gRandomIndex;
+ extern const u16 gRandomTable[];
+ extern const s16 gUnk_086149C4[];
+@@ -59,10 +59,10 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
+ {
+     s32 i, j;
+     u32 *rng;
+-    if (gFadingParticleManager == NULL && FadingParticleManager_Create(0, 0) == NULL)
++    if ((*(struct Manager **)&gFadingParticleManager) == NULL && FadingParticleManager_Create(0, 0) == NULL)
+         return -1;
+     for (i = 0; i < 6; i++) {
+-        struct Group *g = &gFadingParticleManager->groups[i];
++        struct Group *g = &(*(struct Manager **)&gFadingParticleManager)->groups[i];
+         rng = &gRandomIndex;
+         if (g->active == 0) {
+             g->active = 1;
+@@ -94,7 +94,7 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
+                 p->motion.sprite.position = *position;
+                 sub_08217E40(&p->motion.sprite, 0);
+                 p->motion.sprite.flags &= ~1;
+-                Anim_SetSequence(&p->motion.anim, gFadingParticleManager->animations, 3, 0, 0);
++                Anim_SetSequence(&p->motion.anim, (*(struct Manager **)&gFadingParticleManager)->animations, 3, 0, 0);
+             }
+             return 0;
+         }
+diff --git a/src/fn/sub_08016118.c b/src/fn/sub_08016118.c
+index 8dc9ecdd6..750a0be26 100644
+--- a/src/fn/sub_08016118.c
++++ b/src/fn/sub_08016118.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ // MATCHING_CONCESSION: register-pinning
+ struct Vec {
+     s16 x, y, z, pad;
+@@ -36,7 +37,6 @@ struct Manager {
+     u8 *resource;
+     void *animations;
+ };
+-extern struct Manager *gFadingParticleManager;
+ void Anim_SetDurationScale(void *, int);
+ void Effect_Remove(void *);
+ static inline int scale(int a, int b)
+@@ -74,7 +74,7 @@ int FadingParticleGroup_Update(struct Group *g)
+                 asm("" : : : "memory");
+                 p->velocity.y -= 2;
+                 Anim_SetDurationScale(anim, 16);
+-                resource = gFadingParticleManager->resource;
++                resource = ((struct Manager *)gFadingParticleManager)->resource;
+                 a = anim;
+                 entry = p->anim.data + p->anim.frame;
+                 frame = *entry >> 6;
+diff --git a/src/fn/sub_08017444.c b/src/fn/sub_08017444.c
+index e78ac5c17..a89f54493 100644
+--- a/src/fn/sub_08017444.c
++++ b/src/fn/sub_08017444.c
+@@ -1,11 +1,10 @@
+ #include "global.h"
+-
+-extern u8 *gWeatherState;
++#include "ram.h"
+ 
+ u32 Weather_IsActive(void)
+ {
+-    if (gWeatherState != 0) {
+-        if (gWeatherState[0x26] == 0) {
++    if (((u8 *)gWeatherState) != 0) {
++        if (((u8 *)gWeatherState)[0x26] == 0) {
+             return 1;
+         }
+     }
+diff --git a/src/fn/sub_0802E04C.c b/src/fn/sub_0802E04C.c
+index 99b2e7d6c..3cd8aaf09 100644
+--- a/src/fn/sub_0802E04C.c
++++ b/src/fn/sub_0802E04C.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
++#include "ram.h"
+ // MATCHING_CONCESSION: register-pinning
+ struct Position {
+     s16 x, y, z, pad;
+@@ -24,7 +25,6 @@ struct Emitter {
+     void *resource;
+     u16 first, second;
+ };
+-extern struct ActorList *gSceneActorManager;
+ extern const s16 gUnk_086149C4[];
+ s32 Math_Atan2(s32, s32);
+ void sub_0821C8F8(void *, struct Position *, struct Position *, u32, u32, u32);
+@@ -64,9 +64,9 @@ void SceneActorAnimation_EmitTowardNearbyActors(struct Emitter *emitter)
+     struct Actor *actor;
+     struct Position offset;
+     const s16 *table;
+-    if ((!gSceneActorManager) || (gEngineFlags & 0x200))
++    if ((!((struct ActorList *)gSceneActorManager)) || (gEngineFlags & 0x200))
+         return;
+-    actor = gSceneActorManager->head;
++    actor = ((struct ActorList *)gSceneActorManager)->head;
+     if (!actor)
+         return;
+     table = gUnk_086149C4;
+diff --git a/src/fn/sub_08031DBC.c b/src/fn/sub_08031DBC.c
+index f57bd2e72..acd9d3ce7 100644
+--- a/src/fn/sub_08031DBC.c
++++ b/src/fn/sub_08031DBC.c
+@@ -1,11 +1,11 @@
+ #include "global.h"
+-extern u8 *gMessageWindow;
++#include "ram.h"
+ s32 TextState_GetNumberWidth(u8 *, s32);
+ s32 MessageWindow_GetNumberWidth(s32 a)
+ {
+     s32 r;
+-    if (gMessageWindow)
+-        r = TextState_GetNumberWidth(gMessageWindow + 0x18, a);
++    if (((u8 *)gMessageWindow))
++        r = TextState_GetNumberWidth(((u8 *)gMessageWindow) + 0x18, a);
+     else
+         r = 0;
+     return r;
+diff --git a/src/fn/sub_08031DDC.c b/src/fn/sub_08031DDC.c
+index cc9eaf702..ea313b59a 100644
+--- a/src/fn/sub_08031DDC.c
++++ b/src/fn/sub_08031DDC.c
+@@ -1,11 +1,11 @@
+ #include "global.h"
+-extern u8 *gMessageWindow;
++#include "ram.h"
+ s32 TextState_MeasureStringLine(u8 *, s32);
+ s32 MessageWindow_GetStringWidth(s32 a)
+ {
+     s32 r;
+-    if (gMessageWindow)
+-        r = TextState_MeasureStringLine(gMessageWindow + 0x18, a);
++    if (((u8 *)gMessageWindow))
++        r = TextState_MeasureStringLine(((u8 *)gMessageWindow) + 0x18, a);
+     else
+         r = 0;
+     return r;
+diff --git a/src/fn/sub_08033568.c b/src/fn/sub_08033568.c
+index 63260b5d4..d6abdbbc0 100644
+--- a/src/fn/sub_08033568.c
++++ b/src/fn/sub_08033568.c
+@@ -1,13 +1,12 @@
+ #include "global.h"
+-
+-extern u8 *gScrollingDialogue;
++#include "ram.h"
+ 
+ s32 ScrollingDialogue_RequestShow(void)
+ {
+     s32 ret;
+ 
+-    if (gScrollingDialogue) {
+-        gScrollingDialogue[0x17D] = 1;
++    if (((u8 *)gScrollingDialogue)) {
++        ((u8 *)gScrollingDialogue)[0x17D] = 1;
+         ret = 0;
+     } else {
+         ret = -1;
+diff --git a/src/fn/sub_080369F0.c b/src/fn/sub_080369F0.c
+index 7b738ea5e..6ad5b15e8 100644
+--- a/src/fn/sub_080369F0.c
++++ b/src/fn/sub_080369F0.c
+@@ -1,12 +1,11 @@
+ #include "global.h"
++#include "ram.h"
+ /* Wireless_GetLocalParticipantIndex: Returns the participant index assigned by matching the local RFU ID */
+ #define Wireless_GetLocalParticipantIndex sub_080369F0
+ 
+-extern u8 *gWirelessController;
+-
+ s32 sub_080369F0(void)
+ {
+-    if (gWirelessController == NULL)
++    if (((u8 *)gWirelessController) == NULL)
+         return -1;
+-    return (s8)gWirelessController[0x1f];
++    return (s8)((u8 *)gWirelessController)[0x1f];
+ }
+diff --git a/src/fn/sub_08036AA8.c b/src/fn/sub_08036AA8.c
+index 2f92c1b6e..d244cfec8 100644
+--- a/src/fn/sub_08036AA8.c
++++ b/src/fn/sub_08036AA8.c
+@@ -1,8 +1,7 @@
+ #include "global.h"
+-
+-extern u8 *gWirelessController;
++#include "ram.h"
+ 
+ u32 Wireless_IsSessionActive(void)
+ {
+-    return gWirelessController ? gWirelessController[0x30] : 0x0;
++    return ((u8 *)gWirelessController) ? ((u8 *)gWirelessController)[0x30] : 0x0;
+ }
+diff --git a/src/fn/sub_08036AC4.c b/src/fn/sub_08036AC4.c
+index b3b2e0197..c63c75db0 100644
+--- a/src/fn/sub_08036AC4.c
++++ b/src/fn/sub_08036AC4.c
+@@ -1,14 +1,14 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ struct S {
+     u8 f[0x19];
+     u8 v;
+ };
+-extern struct S *gWirelessController;
+ 
+ u8 Wireless_GetConnectedSlotMask(void)
+ {
+-    if (gWirelessController == 0)
++    if (((struct S *)gWirelessController) == 0)
+         return 0;
+-    return gWirelessController->v;
++    return ((struct S *)gWirelessController)->v;
+ }
+diff --git a/src/fn/sub_08036AE0.c b/src/fn/sub_08036AE0.c
+index d75b3ba18..946897152 100644
+--- a/src/fn/sub_08036AE0.c
++++ b/src/fn/sub_08036AE0.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ struct S {
+     u8 pad0[56];
+@@ -6,11 +7,10 @@ struct S {
+     u32 f4;
+     u32 f8;
+ };
+-extern struct S *gWirelessController;
+ 
+ u16 Wireless_GetOperation(void)
+ {
+-    if (gWirelessController == 0)
++    if (((struct S *)gWirelessController) == 0)
+         return 0;
+-    return gWirelessController->f2;
++    return ((struct S *)gWirelessController)->f2;
+ }
+diff --git a/src/fn/sub_08036C38.c b/src/fn/sub_08036C38.c
+index 524ef1ba3..630a25d2f 100644
+--- a/src/fn/sub_08036C38.c
++++ b/src/fn/sub_08036C38.c
+@@ -1,10 +1,9 @@
+ #include "global.h"
+-
+-extern u8 *gWirelessController;
++#include "ram.h"
+ 
+ void Wireless_RequestResetConnection(void)
+ {
+-    if (gWirelessController) {
+-        gWirelessController[0x3D] = 1;
++    if (((u8 *)gWirelessController)) {
++        ((u8 *)gWirelessController)[0x3D] = 1;
+     }
+ }
+diff --git a/src/fn/sub_080390C4.c b/src/fn/sub_080390C4.c
+index e17601abb..42118f608 100644
+--- a/src/fn/sub_080390C4.c
++++ b/src/fn/sub_080390C4.c
+@@ -1,6 +1,7 @@
+ // MATCHING_CONCESSION: register-pinning
+ #include "global.h"
+ #include "game_state.h"
++#include "ram.h"
+ // Tentative wireless selection/menu layout from observed offsets.
+ struct Slot {
+     u8 counts[4];
+@@ -29,8 +30,7 @@ struct Save {
+     u8 pad[0x58];
+     s16 values[4];
+ };
+-extern struct Menu *gWirelessTradeMenu;
+-extern u8 gSceneEffectPalettePhase, gRandomTable[];
++extern u8 gRandomTable[];
+ extern u32 gRandomIndex;
+ void *Script_GetKeywordValue(int, int);
+ int Script_SeekToKeyword(int);
+@@ -56,7 +56,7 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
+     int i;
+     u8 *item;
+     u16 *cursor;
+-    gWirelessTradeMenu = p;
++    (*(struct Menu **)&gWirelessTradeMenu) = p;
+     p->listener = Script_GetKeywordValue(101, 0);
+     p->secondListener = Script_GetKeywordValue(114, 0);
+     p->count = 0;
+@@ -148,7 +148,7 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
+         if (count) {
+             int r;
+             register int j asm("r5");
+-            r = gSceneEffectPalettePhase;
++            r = (*(u8 *)&gSceneEffectPalettePhase);
+             j = 0;
+             if ((u32)j < count)
+                 do {
+@@ -240,7 +240,7 @@ int WirelessTradeMenu_InitFromScript(struct Menu *arg)
+             register int j asm("r5");
+             u16 *q;
+             u32 *random;
+-            r = gSceneEffectPalettePhase;
++            r = (*(u8 *)&gSceneEffectPalettePhase);
+             j = 0;
+             if ((u32)j < count) {
+                 q = rightBase;
+diff --git a/src/fn/sub_08075588.c b/src/fn/sub_08075588.c
+index 066c1eccb..faca337da 100644
+--- a/src/fn/sub_08075588.c
++++ b/src/fn/sub_08075588.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "render.h"
+ #include "engine.h"
++#include "ram.h"
+ 
+ // confidence=low: per-frame update for one scene actor's timers, palette transition and shadow state, and its spark and hit-record bookkeeping
+ 
+@@ -17,9 +18,6 @@ void SceneActorBehavior_UpdateColliders(void *);
+ void SceneActorReaction_SinkAndRemove(void);
+ extern u32 gUnk_020004B4;
+ extern u32 gUnk_02000580[];
+-extern u32 gActionFreezeTimer;
+-extern u32 gPlayerTraversalActive;
+-extern u32 gPlayerTraversalMode;
+ extern u16 gUnk_030039F0;
+ s32 Math_Atan2(s32, s32);
+ s32 Mod(s32, s32);
+@@ -169,12 +167,12 @@ after_timers:
+         } else {
+             cond = 0;
+         }
+-    } else if (gActionFreezeTimer > 0) {
++    } else if ((*(u32 *)&gActionFreezeTimer) > 0) {
+         cond = 1;
+     } else if (gUnk_02000580[r2] != 0 && (*(u32 *)(gUnk_02000580[r2] + 0x448) & 0x10) != 0) {
+         cond = 1;
+     } else {
+-        cond = (gPlayerTraversalActive != 0 && gPlayerTraversalMode == 4);
++        cond = ((*(u32 *)&gPlayerTraversalActive) != 0 && (*(u32 *)&gPlayerTraversalMode) == 4);
+     }
+     if (cond) {
+         if ((*flags & 0x20000) == 0) {
+diff --git a/src/fn/sub_08111A24.c b/src/fn/sub_08111A24.c
+index 619fadc2d..9d039abe4 100644
+--- a/src/fn/sub_08111A24.c
++++ b/src/fn/sub_08111A24.c
+@@ -1,12 +1,12 @@
+ #include "global.h"
++#include "ram.h"
+ struct S {
+     u8 pad[0x1ad8];
+     u16 values[1];
+ };
+-extern struct S *gPaletteFade;
+ 
+ void sub_08111A24(s32 index, u32 value)
+ {
+-    if (gPaletteFade)
+-        gPaletteFade->values[index] = value;
++    if (((struct S *)gPaletteFade))
++        ((struct S *)gPaletteFade)->values[index] = value;
+ }
+diff --git a/src/fn/sub_0811ADF0.c b/src/fn/sub_0811ADF0.c
+index 92edc8e9a..e53f72b0c 100644
+--- a/src/fn/sub_0811ADF0.c
++++ b/src/fn/sub_0811ADF0.c
+@@ -1,13 +1,12 @@
+ /* Provisional family and semantic names; inferred from static accesses and callers. */
+ #include "global.h"
+ #include "scene_pool.h"
++#include "ram.h"
+ struct TerrainCoordinate {
+     s32 x : 16;
+     s32 y : 16;
+     s32 z : 16;
+ };
+-extern u8 *gTerrainColumnIndices;
+-extern u8 *gTerrainColumns;
+ s32 Terrain_GetHeightAtPosition(struct ScenePoolVec32 *position)
+ {
+     struct TerrainCoordinate point;
+@@ -18,7 +17,7 @@ s32 Terrain_GetHeightAtPosition(struct ScenePoolVec32 *position)
+     column = point.x < 0 ? 0 : point.x;
+     row = point.z < 0 ? 0 : point.z;
+     index = column >> 5;
+-    data = gTerrainColumns + gTerrainColumnIndices[index] * 160;
++    data = ((u8 *)gTerrainColumns) + gTerrainColumnIndices[index] * 160;
+     cell = (column & 31) >> 3;
+     offset = row >> 3;
+     if (offset > 7)
+diff --git a/src/fn/sub_0811DEC8.c b/src/fn/sub_0811DEC8.c
+index 580075694..7e23e7bcf 100644
+--- a/src/fn/sub_0811DEC8.c
++++ b/src/fn/sub_0811DEC8.c
+@@ -1,11 +1,11 @@
+ #include "global.h"
++#include "ram.h"
+ struct S {
+     u32 a;
+ };
+-extern struct S *gScriptRecordTable;
+ struct S *Modifier_GetTableTask(void)
+ {
+-    if (!gScriptRecordTable)
++    if (!(*(struct S **)&gScriptRecordTable))
+         return 0;
+-    return &gScriptRecordTable->a;
++    return &(*(struct S **)&gScriptRecordTable)->a;
+ }
+diff --git a/src/fn/sub_0811E3DC.c b/src/fn/sub_0811E3DC.c
+index f8d7787ca..d81bd465f 100644
+--- a/src/fn/sub_0811E3DC.c
++++ b/src/fn/sub_0811E3DC.c
+@@ -1,13 +1,13 @@
+ #include "global.h"
++#include "ram.h"
+ struct T {
+     u8 pad[0x1c];
+     s32 count;
+ };
+-extern struct T *gScriptRecordTable;
+ 
+ s32 sub_0811E3DC(void)
+ {
+-    if (!gScriptRecordTable)
++    if (!((struct T *)gScriptRecordTable))
+         return 0;
+-    return gScriptRecordTable->count;
++    return ((struct T *)gScriptRecordTable)->count;
+ }
+diff --git a/src/fn/sub_0815F5F8.c b/src/fn/sub_0815F5F8.c
+index a3fbfa602..81ffb9cbd 100644
+--- a/src/fn/sub_0815F5F8.c
++++ b/src/fn/sub_0815F5F8.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ struct TargetPosition {
+     s16 x, y, z;
+@@ -17,7 +18,6 @@ struct TargetRegistry {
+     u8 unk_00[0x18];
+     struct TargetEntry *first;
+ };
+-extern struct TargetRegistry *gSceneLinkList;
+ s32 Math_Atan2(s32, s32);
+ 
+ static inline s32 AngleDifference(const s32 angle, const s32 direction)
+@@ -33,9 +33,9 @@ struct TargetEntry *TargetRegistry_FindNearestInCone(struct TargetPosition *posi
+     struct TargetEntry *best;
+     s32 distance;
+     s32 otherAngle;
+-    if (!gSceneLinkList)
++    if (!((struct TargetRegistry *)gSceneLinkList))
+         return 0;
+-    entry = gSceneLinkList->first;
++    entry = ((struct TargetRegistry *)gSceneLinkList)->first;
+     best = 0;
+     distance = range * range;
+     if (entry) {
+diff --git a/src/fn/sub_081A37E0.c b/src/fn/sub_081A37E0.c
+index 5974435a8..f5842b39f 100644
+--- a/src/fn/sub_081A37E0.c
++++ b/src/fn/sub_081A37E0.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ /* Effect pool family names and field interpretations are tentative. */
+ struct EffectPoolEntry {
+     u32 flags;
+@@ -12,12 +13,11 @@ struct EffectPool {
+     u8 unknown40[8];
+     struct EffectPoolEntry entries[3];
+ };
+-extern struct EffectPool *gEffectPoolManager;
+ struct EffectPoolEntry *EffectPool_FindIdleActiveEntry(void)
+ {
+-    struct EffectPoolEntry *entry = gEffectPoolManager->entries;
++    struct EffectPoolEntry *entry = ((struct EffectPool *)gEffectPoolManager)->entries;
+     s32 i;
+-    if (gEffectPoolManager->count <= 2)
++    if (((struct EffectPool *)gEffectPoolManager)->count <= 2)
+         goto scan;
+     goto fail;
+ found:
+diff --git a/src/fn/sub_081A4A78.c b/src/fn/sub_081A4A78.c
+index b7aaee208..f7628f7b4 100644
+--- a/src/fn/sub_081A4A78.c
++++ b/src/fn/sub_081A4A78.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ struct G {
+     u8 f[0x62];
+@@ -11,13 +12,12 @@ struct A {
+     u8 f70[0x74];
+     u16 he4;
+ };
+-extern struct G *gHresvelgrProjectilePool;
+ void ScaledShadow_Destroy(void *);
+ void Hresvelgr_SetFallingAttackState(void *, s32);
+ 
+ void Hresvelgr_ReleaseProjectile(struct A *p)
+ {
+-    gHresvelgrProjectilePool->cnt--;
++    ((struct G *)gHresvelgrProjectilePool)->cnt--;
+     p->he4 = 0;
+     p->flags |= 1;
+     ScaledShadow_Destroy(p->f70);
+diff --git a/src/fn/sub_081B7744.c b/src/fn/sub_081B7744.c
+index 593446af9..f1e8d62d2 100644
+--- a/src/fn/sub_081B7744.c
++++ b/src/fn/sub_081B7744.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ struct GrowthHazardAnimationEvent {
+     u8 unk0[4];
+@@ -25,7 +26,6 @@ struct GrowthHazardManager {
+     u8 unk0[0x19];
+     u8 flags;
+ };
+-extern struct GrowthHazardManager *gGrowthHazardManager;
+ u32 Hresvelgr_GetAnimationIdentifier(void);
+ 
+ static inline u32 TestWord(u32 *value, u32 mask)
+@@ -48,7 +48,7 @@ void GrowthHazard_ApplyAnimationEvent(struct GrowthHazardAnimationEvent *event,
+                     entry->eventCount++;
+                     entry->cooldown = event->cooldown;
+                     entry->mode = 0;
+-                    gGrowthHazardManager->flags |= 1;
++                    ((struct GrowthHazardManager *)gGrowthHazardManager)->flags |= 1;
+                 }
+                 break;
+             case 2:
+@@ -57,7 +57,7 @@ void GrowthHazard_ApplyAnimationEvent(struct GrowthHazardAnimationEvent *event,
+                     if (--entry->remaining > 0) {
+                         entry->cooldown = 0x20;
+                         entry->mode = 1;
+-                        gGrowthHazardManager->flags |= 2;
++                        ((struct GrowthHazardManager *)gGrowthHazardManager)->flags |= 2;
+                     }
+                 }
+                 break;
+diff --git a/src/fn/sub_081D7510.c b/src/fn/sub_081D7510.c
+index b384b0d07..f8c9fcd17 100644
+--- a/src/fn/sub_081D7510.c
++++ b/src/fn/sub_081D7510.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
++#include "ram.h"
+ /* Parameters at 0x020002A0 (meaning unknown). */
+ struct ScreenParams2A0Params {
+     s32 g;
+@@ -11,23 +12,22 @@ struct ScreenParams2A0Params {
+     s32 d;
+     s32 f;
+ };
+-extern struct ScreenParams2A0Params gOptionMenuParams;
+ void ScreenParams2A0_SetFromScript(void)
+ {
+     if (Script_SeekToKeyword('g'))
+-        gOptionMenuParams.g = Script_GetValue();
++        (*(struct ScreenParams2A0Params *)gOptionMenuParams).g = Script_GetValue();
+     if (Script_SeekToKeyword('o'))
+-        gOptionMenuParams.o = Script_GetValue();
++        (*(struct ScreenParams2A0Params *)gOptionMenuParams).o = Script_GetValue();
+     if (Script_SeekToKeyword('s'))
+-        gOptionMenuParams.s = Script_GetValue();
++        (*(struct ScreenParams2A0Params *)gOptionMenuParams).s = Script_GetValue();
+     if (Script_SeekToKeyword('c'))
+-        gOptionMenuParams.c = Script_GetValue();
++        (*(struct ScreenParams2A0Params *)gOptionMenuParams).c = Script_GetValue();
+     if (Script_SeekToKeyword('r'))
+-        gOptionMenuParams.r = Script_GetValue();
++        (*(struct ScreenParams2A0Params *)gOptionMenuParams).r = Script_GetValue();
+     if (Script_SeekToKeyword('l'))
+-        gOptionMenuParams.l = Script_GetValue();
++        (*(struct ScreenParams2A0Params *)gOptionMenuParams).l = Script_GetValue();
+     if (Script_SeekToKeyword('d'))
+-        gOptionMenuParams.d = Script_GetValue();
++        (*(struct ScreenParams2A0Params *)gOptionMenuParams).d = Script_GetValue();
+     if (Script_SeekToKeyword('f'))
+-        gOptionMenuParams.f = Script_GetValue();
++        (*(struct ScreenParams2A0Params *)gOptionMenuParams).f = Script_GetValue();
+ }
+diff --git a/src/fn/sub_081DE520.c b/src/fn/sub_081DE520.c
+index 9b8844f0d..a841690b8 100644
+--- a/src/fn/sub_081DE520.c
++++ b/src/fn/sub_081DE520.c
+@@ -1,25 +1,25 @@
+ #include "global.h"
+ #include "engine.h"
++#include "ram.h"
+ /* Parameters at 0x02000328 (meaning unknown). */
+ struct ScreenParams328 {
+     u8 *kBlock, *hBlock;
+     s32 o, c, p, f;
+ };
+-extern struct ScreenParams328 gNamePlaceholderScript;
+ void ScreenParams328_SetFromScript(void)
+ {
+     if (Script_SeekToKeyword('h'))
+-        gNamePlaceholderScript.hBlock = Script_GetPc();
++        (*(struct ScreenParams328 *)gNamePlaceholderScript).hBlock = Script_GetPc();
+     if (Script_SeekToKeyword('k'))
+-        gNamePlaceholderScript.kBlock = Script_GetPc();
++        (*(struct ScreenParams328 *)gNamePlaceholderScript).kBlock = Script_GetPc();
+     if (Script_SeekToKeyword('o'))
+-        gNamePlaceholderScript.o = Script_GetValue();
++        (*(struct ScreenParams328 *)gNamePlaceholderScript).o = Script_GetValue();
+     if (Script_SeekToKeyword('c'))
+-        gNamePlaceholderScript.c = Script_GetValue();
++        (*(struct ScreenParams328 *)gNamePlaceholderScript).c = Script_GetValue();
+     if (Script_SeekToKeyword('p'))
+-        gNamePlaceholderScript.p = Script_GetValue();
++        (*(struct ScreenParams328 *)gNamePlaceholderScript).p = Script_GetValue();
+     if (Script_SeekToKeyword('f'))
+-        gNamePlaceholderScript.f = Script_GetValue();
++        (*(struct ScreenParams328 *)gNamePlaceholderScript).f = Script_GetValue();
+     else
+-        gNamePlaceholderScript.f = 5;
++        (*(struct ScreenParams328 *)gNamePlaceholderScript).f = 5;
+ }
+diff --git a/src/fn/sub_081DF06C.c b/src/fn/sub_081DF06C.c
+index 8112b6280..f6cb94396 100644
+--- a/src/fn/sub_081DF06C.c
++++ b/src/fn/sub_081DF06C.c
+@@ -1,16 +1,16 @@
+ #include "global.h"
++#include "ram.h"
+ struct G {
+     u32 a, b, c, d, e;
+ };
+-extern struct G gTimeDateMenuParams;
+ s32 Script_SeekToKeyword(s32);
+ s32 Script_GetValue(void);
+ void Time_SetDateMenuFromScript(void)
+ {
+     if (Script_SeekToKeyword(0x6f))
+-        gTimeDateMenuParams.c = Script_GetValue();
++        (*(struct G *)gTimeDateMenuParams).c = Script_GetValue();
+     if (Script_SeekToKeyword(0x63))
+-        gTimeDateMenuParams.d = Script_GetValue();
++        (*(struct G *)gTimeDateMenuParams).d = Script_GetValue();
+     if (Script_SeekToKeyword(0x66))
+-        gTimeDateMenuParams.e = Script_GetValue();
++        (*(struct G *)gTimeDateMenuParams).e = Script_GetValue();
+ }
+diff --git a/src/fn/sub_081DFA50.c b/src/fn/sub_081DFA50.c
+index 7960a6c80..853e0ac4b 100644
+--- a/src/fn/sub_081DFA50.c
++++ b/src/fn/sub_081DFA50.c
+@@ -1,5 +1,5 @@
+ #include "global.h"
+-extern u32 gPasswordEntryParams;
++#include "ram.h"
+ s32 Script_ParseStringRef(u32);
+ const u8 *Text_LookupString(s32);
+ void Menu_EraseRect(s32, s32, s32, s32);
+@@ -30,7 +30,7 @@ void Password_BuildLabels(struct PwLabels *p)
+                 dst = p->b3;
+                 break;
+         }
+-        src = Text_LookupString(Script_ParseStringRef(gPasswordEntryParams) + off);
++        src = Text_LookupString(Script_ParseStringRef((*(u32 *)gPasswordEntryParams)) + off);
+         while (*src) {
+             *dst = *src;
+             dst++;
+diff --git a/src/fn/sub_081DFB18.c b/src/fn/sub_081DFB18.c
+index 9e41f5ecc..84527d871 100644
+--- a/src/fn/sub_081DFB18.c
++++ b/src/fn/sub_081DFB18.c
+@@ -1,5 +1,5 @@
+ #include "global.h"
+-extern u32 gPasswordEntryParams;
++#include "ram.h"
+ extern u8 gUnk_0824FD3C[];
+ void memcpy(void *, const void *, u32);
+ s32 Div(s32, s32);
+@@ -17,7 +17,7 @@ void sub_081DFB18(u8 *p, s32 n)
+     x = (n - d * 6) * 2 + tbl[d][0];
+     y = tbl[d][1];
+     {
+-        u32 base = Script_ParseStringRef(gPasswordEntryParams);
++        u32 base = Script_ParseStringRef((*(u32 *)gPasswordEntryParams));
+         s32 off = n * 4;
+         u8 *a = p + 0x770;
+         text = Text_LookupString(base + *(u32 *)(a + off));
+diff --git a/src/fn/sub_081E078C.c b/src/fn/sub_081E078C.c
+index 78050b949..8f0919a53 100644
+--- a/src/fn/sub_081E078C.c
++++ b/src/fn/sub_081E078C.c
+@@ -1,23 +1,23 @@
+ #include "global.h"
+ 
+ #include "engine.h"
++#include "ram.h"
+ struct Msg {
+     void *text;
+     u8 *pc;
+     s32 value;
+ };
+-extern struct Msg gScriptMessageParams;
+ 
+-/* Script: text from string -c (Text_LookupString) into gScriptMessageParams, with
++/* Script: text from string -c (Text_LookupString) into (*(struct Msg *)gScriptMessageParams), with
+    -d (script position) and -e (value) (tentative). */
+ void ScriptMessage_SetFromScript(void)
+ {
+     u8 *pc = 0;
+     if (Script_SeekToKeyword('c'))
+         pc = Script_GetPc();
+-    gScriptMessageParams.text = Text_LookupString(Script_ParseStringRef(pc));
++    (*(struct Msg *)gScriptMessageParams).text = Text_LookupString(Script_ParseStringRef(pc));
+     if (Script_SeekToKeyword('d'))
+-        gScriptMessageParams.pc = Script_GetPc();
++        (*(struct Msg *)gScriptMessageParams).pc = Script_GetPc();
+     if (Script_SeekToKeyword('e'))
+-        gScriptMessageParams.value = Script_GetValue();
++        (*(struct Msg *)gScriptMessageParams).value = Script_GetValue();
+ }
+diff --git a/src/fn/sub_081E092C.c b/src/fn/sub_081E092C.c
+index 8d31fe21f..fcd25317d 100644
+--- a/src/fn/sub_081E092C.c
++++ b/src/fn/sub_081E092C.c
+@@ -1,5 +1,5 @@
+ #include "global.h"
+-extern u32 gScriptPromptSettings;
++#include "ram.h"
+ void Menu_EraseRect(s32, s32, s32, s32);
+ u32 Script_ParseStringRef(u32);
+ u32 Text_LookupString(u32);
+@@ -7,5 +7,6 @@ void Menu_DrawText(s32, s32, u32);
+ void ScriptPrompt_DrawFooterText(void)
+ {
+     Menu_EraseRect(4, 0xd, 0x16, 2);
+-    Menu_DrawText(4, 0xd, Text_LookupString(Script_ParseStringRef(gScriptPromptSettings) + 0xa));
++    Menu_DrawText(4, 0xd,
++                  Text_LookupString(Script_ParseStringRef((*(u32 *)&gScriptPromptSettings)) + 0xa));
+ }
+diff --git a/src/fn/sub_081E0CB4.c b/src/fn/sub_081E0CB4.c
+index b898663ef..20131455e 100644
+--- a/src/fn/sub_081E0CB4.c
++++ b/src/fn/sub_081E0CB4.c
+@@ -1,24 +1,24 @@
+ #include "global.h"
+ 
+ #include "engine.h"
++#include "ram.h"
+ struct Settings {
+     u8 *m;
+     u8 *t;
+     s32 o, c, p;
+ };
+-extern struct Settings gScriptPromptSettings;
+ /* Script: -m and -t (script positions) and -o, -c, -p (values) into the
+-   block at gScriptPromptSettings, next to ScriptMessage_SetFromScript's (tentative). */
++   block at (*(struct Settings *)&gScriptPromptSettings), next to ScriptMessage_SetFromScript's (tentative). */
+ void ScriptPrompt_SetFromScript(void)
+ {
+     if (Script_SeekToKeyword('m'))
+-        gScriptPromptSettings.m = Script_GetPc();
++        (*(struct Settings *)&gScriptPromptSettings).m = Script_GetPc();
+     if (Script_SeekToKeyword('t'))
+-        gScriptPromptSettings.t = Script_GetPc();
++        (*(struct Settings *)&gScriptPromptSettings).t = Script_GetPc();
+     if (Script_SeekToKeyword('o'))
+-        gScriptPromptSettings.o = Script_GetValue();
++        (*(struct Settings *)&gScriptPromptSettings).o = Script_GetValue();
+     if (Script_SeekToKeyword('c'))
+-        gScriptPromptSettings.c = Script_GetValue();
++        (*(struct Settings *)&gScriptPromptSettings).c = Script_GetValue();
+     if (Script_SeekToKeyword('p'))
+-        gScriptPromptSettings.p = Script_GetValue();
++        (*(struct Settings *)&gScriptPromptSettings).p = Script_GetValue();
+ }
+diff --git a/src/fn/sub_081E1A2C.c b/src/fn/sub_081E1A2C.c
+index 8d469d51e..210bf4477 100644
+--- a/src/fn/sub_081E1A2C.c
++++ b/src/fn/sub_081E1A2C.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
++#include "ram.h"
+ /* Parameters at 0x020003A0 (meaning unknown). */
+ struct ScreenParams3A0Params {
+     u8 *mBlock;
+@@ -10,21 +11,20 @@ struct ScreenParams3A0Params {
+     s32 c;
+     s32 b;
+ };
+-extern struct ScreenParams3A0Params gGameStartParams;
+ void ScreenParams3A0_SetFromScript(void)
+ {
+     if (Script_SeekToKeyword('m'))
+-        gGameStartParams.mBlock = Script_GetPc();
++        (*(struct ScreenParams3A0Params *)gGameStartParams).mBlock = Script_GetPc();
+     if (Script_SeekToKeyword('a'))
+-        gGameStartParams.aBlock = Script_GetPc();
++        (*(struct ScreenParams3A0Params *)gGameStartParams).aBlock = Script_GetPc();
+     if (Script_SeekToKeyword('l'))
+-        gGameStartParams.l = Script_GetValue();
++        (*(struct ScreenParams3A0Params *)gGameStartParams).l = Script_GetValue();
+     if (Script_SeekToKeyword('f'))
+-        gGameStartParams.f = Script_GetValue();
++        (*(struct ScreenParams3A0Params *)gGameStartParams).f = Script_GetValue();
+     if (Script_SeekToKeyword('F'))
+-        gGameStartParams.F = Script_GetValue();
++        (*(struct ScreenParams3A0Params *)gGameStartParams).F = Script_GetValue();
+     if (Script_SeekToKeyword('c'))
+-        gGameStartParams.c = Script_GetValue();
++        (*(struct ScreenParams3A0Params *)gGameStartParams).c = Script_GetValue();
+     if (Script_SeekToKeyword('b'))
+-        gGameStartParams.b = Script_GetValue();
++        (*(struct ScreenParams3A0Params *)gGameStartParams).b = Script_GetValue();
+ }
+diff --git a/src/fn/sub_081E269C.c b/src/fn/sub_081E269C.c
+index 5053537f3..a7d912dc0 100644
+--- a/src/fn/sub_081E269C.c
++++ b/src/fn/sub_081E269C.c
+@@ -1,16 +1,16 @@
+ #include "global.h"
++#include "ram.h"
+ struct P {
+     u32 a;
+     u32 b;
+ };
+-extern struct P gSoundTestParams;
+ s32 Script_SeekToKeyword(s32);
+ s32 Script_GetValue(void);
+ u32 Script_GetPc(void);
+ void SoundTest_ConfigureFromScript(void)
+ {
+     if (Script_SeekToKeyword(0x72))
+-        gSoundTestParams.a = Script_GetPc();
++        (*(struct P *)gSoundTestParams).a = Script_GetPc();
+     if (Script_SeekToKeyword(0x63))
+-        gSoundTestParams.b = Script_GetValue();
++        (*(struct P *)gSoundTestParams).b = Script_GetValue();
+ }
+diff --git a/src/fn/sub_081EAB64.c b/src/fn/sub_081EAB64.c
+index 28bed60f6..ce81b1bcd 100644
+--- a/src/fn/sub_081EAB64.c
++++ b/src/fn/sub_081EAB64.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "render.h"
++#include "ram.h"
+ // confidence=low: menu ownership follows Params3D0_CreateDisplay.
+ 
+ // confidence=low: menu ownership follows Params3D0_CreateDisplay; option meanings remain tentative.
+@@ -21,7 +22,6 @@ struct Message {
+     u32 unused : 16;
+     void *values;
+ };
+-extern struct Parameters gScreenParams3D0;
+ extern u16 gUnk_03005260[];
+ extern u8 *gGameState;
+ extern const s32 gUnk_08613D80[];
+@@ -52,7 +52,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
+     struct Message message;
+     message.count = 1;
+     message.values = &value;
+-    if (p->timer == p->musicTimer + 170 && gScreenParams3D0.silent == 0) {
++    if (p->timer == p->musicTimer + 170 && (*(struct Parameters *)gScreenParams3D0).silent == 0) {
+         switch (TimeDisplay_GetCurrentMonth() - 1) {
+             case 2:
+             case 3:
+@@ -88,10 +88,10 @@ void Params3D0_UpdateDisplay(struct Display *p)
+             } break;
+         }
+     }
+-    if (p->idleTimer > gScreenParams3D0.timeout) {
++    if (p->idleTimer > (*(struct Parameters *)gScreenParams3D0).timeout) {
+         p->state = 13;
+         p->result = 5;
+-        p->fadeShift = gScreenParams3D0.fadeOut;
++        p->fadeShift = (*(struct Parameters *)gScreenParams3D0).fadeOut;
+         Menu_StartFadeOut(p->fadeShift);
+         if (Sound_IsSongPlaying(0xA4)) {
+             Sound_FadeOutChannel10(p->fadeShift);
+@@ -234,13 +234,13 @@ void Params3D0_UpdateDisplay(struct Display *p)
+                     *(u16 *)(gGameState + 0x870) = p->selection;
+                     if (p->selection == 0) {
+                         Sound_PlaySong(0xE0);
+-                        p->fadeShift = gScreenParams3D0.confirmFade;
++                        p->fadeShift = (*(struct Parameters *)gScreenParams3D0).confirmFade;
+                         if (p->fadeShift <= 5) {
+                             p->fadeShift = 6;
+                         }
+                     } else {
+                         Sound_PlaySong(0xDD);
+-                        p->fadeShift = gScreenParams3D0.confirmFade;
++                        p->fadeShift = (*(struct Parameters *)gScreenParams3D0).confirmFade;
+                     }
+                     p->state = 13;
+                     p->result = p->selection + 1;
+@@ -347,18 +347,18 @@ void Params3D0_UpdateDisplay(struct Display *p)
+             if (p->counter > (1 << p->fadeShift) || p->fadeShift == 0) {
+                 TimeDisplay_HideAnimatedObjects(p);
+                 if (p->result == 0) {
+-                    Script_Call(gScreenParams3D0.c, 0);
++                    Script_Call((*(struct Parameters *)gScreenParams3D0).c, 0);
+                 } else if (p->result == 1) {
+-                    Script_Call(gScreenParams3D0.g, 0);
++                    Script_Call((*(struct Parameters *)gScreenParams3D0).g, 0);
+                 } else if (p->result == 2) {
+                     value = 0;
+-                    Script_Call(gScreenParams3D0.o, &message);
++                    Script_Call((*(struct Parameters *)gScreenParams3D0).o, &message);
+                 } else if (p->result == 3) {
+-                    Script_Call(gScreenParams3D0.l, 0);
++                    Script_Call((*(struct Parameters *)gScreenParams3D0).l, 0);
+                 } else if (p->result == 5) {
+-                    Script_Call(gScreenParams3D0.d, 0);
++                    Script_Call((*(struct Parameters *)gScreenParams3D0).d, 0);
+                 } else if (p->result == 4) {
+-                    Script_Call(gScreenParams3D0.s, 0);
++                    Script_Call((*(struct Parameters *)gScreenParams3D0).s, 0);
+                 }
+                 Task_Kill(p);
+             }
+diff --git a/src/fn/sub_081EB5A8.c b/src/fn/sub_081EB5A8.c
+index a12cdb5a7..4eb98b01d 100644
+--- a/src/fn/sub_081EB5A8.c
++++ b/src/fn/sub_081EB5A8.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
++#include "ram.h"
+ 
+ struct Params3D0 {
+     s32 g, o, l, s, d, c;
+@@ -10,7 +11,6 @@ struct Params3D0 {
+ struct Params3D0Gfx {
+     u8 pad[0x6220];
+ };
+-extern struct Params3D0 gScreenParams3D0;
+ extern u8 *gUnk_030053F8;
+ 
+ void TimeDisplay_InitBackgrounds(void *);
+@@ -29,7 +29,7 @@ s32 Params3D0_InitDisplay(u8 *p)
+     *(s32 *)(p + 0x760) = 8;
+     TimeDisplay_InitBackgrounds(p);
+     TimeDisplay_InitAnimatedObjects(p);
+-    if ((s16)gScreenParams3D0.b == 1) {
++    if ((s16)(*(struct Params3D0 *)gScreenParams3D0).b == 1) {
+         *(s32 *)(p + 0x724) = *(s16 *)((u8 *)gGameState + 0x870);
+         *(u32 *)(p + 0x20) &= ~1;
+         *(u32 *)(p + 0x350) &= ~1;
+@@ -45,14 +45,14 @@ s32 Params3D0_InitDisplay(u8 *p)
+         *(s32 *)(p + 0x724) = 0;
+         *(s32 *)(p + 0x72c) = *(s32 *)(p + 0x74c) = 0;
+     }
+-    if (gScreenParams3D0.M == 1)
++    if ((*(struct Params3D0 *)gScreenParams3D0).M == 1)
+         *(s32 *)(p + 0x728) = 1;
+     else
+         *(s32 *)(p + 0x728) = gUnk_030053F8[9] ? 4 : 3;
+     *(s32 *)(p + 0x740) = 0;
+     *(s32 *)(p + 0x744) = 0;
+     Sound_PlaySong(0xa4);
+-    *(s32 *)(p + 0x738) = gScreenParams3D0.f[0];
++    *(s32 *)(p + 0x738) = (*(struct Params3D0 *)gScreenParams3D0).f[0];
+     Menu_StartFadeIn();
+     CpuSet(gPaletteBankData + 0x6220, p + 0x500, 0x100);
+     v = 0x7fff;
+diff --git a/src/fn/sub_081EB8E0.c b/src/fn/sub_081EB8E0.c
+index 9a3bd8636..c91025d49 100644
+--- a/src/fn/sub_081EB8E0.c
++++ b/src/fn/sub_081EB8E0.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "render.h"
++#include "ram.h"
+ struct ScreenParams3F8Params {
+     u8 *mBlock;
+     u8 *eBlock;
+@@ -52,8 +53,6 @@ struct Obj53F8 {
+     u8 pad0[0x10];
+     s32 x10;
+ };
+-extern struct ScreenParams3F8Params gScreenTextParameters;
+-extern s32 gScreenTextSavedX1C;
+ extern struct Obj53F8 *gUnk_030053F8;
+ s32 ScreenParams3F8_SelectValidDataBank(struct SpDisplay *);
+ void Bg_ClearTilemap(s32);
+@@ -114,7 +113,7 @@ void sub_081EB8E0(struct SpDisplay *p)
+                 if (p->x1C == 1) {
+                     Confirm(p);
+                     p->x108 = 1;
+-                    if (gScreenTextParameters.M == 2)
++                    if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).M == 2)
+                         p->x10C = 3;
+                     else
+                         p->x10C = 2;
+@@ -123,13 +122,14 @@ void sub_081EB8E0(struct SpDisplay *p)
+                 if (p->x1C == 2) {
+                     Confirm(p);
+                     p->x108 = 1;
+-                    if (gScreenTextParameters.M == 2)
++                    if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).M == 2)
+                         p->x10C = 4;
+                     else
+                         p->x10C = 3;
+                     break;
+                 }
+-                if (gScreenTextParameters.M != 0 && p->x1C == 3) {
++                if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).M != 0 &&
++                    p->x1C == 3) {
+                     Confirm(p);
+                     p->x108 = 1;
+                     p->x10C = 4;
+@@ -185,7 +185,10 @@ void sub_081EB8E0(struct SpDisplay *p)
+                             p->x20C = 1;
+                             p->x24 = 3;
+                             gUnk_030053F8->x10 = magic;
+-                            Menu_DrawStringRef(5, 10, gScreenTextParameters.mBlock, 2);
++                            Menu_DrawStringRef(
++                                5, 10,
++                                (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock,
++                                2);
+                         }
+                     } while (0);
+                     idx++;
+@@ -207,18 +210,24 @@ void sub_081EB8E0(struct SpDisplay *p)
+                 p->wA8.flags |= 1;
+                 p->w48.flags |= 1;
+                 if (p->x10C == 0)
+-                    Script_Call((u8 *)gScreenTextParameters.c, 0);
++                    Script_Call((u8 *)(*(struct ScreenParams3F8Params *)&gScreenTextParameters).c,
++                                0);
+                 else if (p->x10C == 1)
+-                    Script_Call((u8 *)gScreenTextParameters.b, 0);
++                    Script_Call((u8 *)(*(struct ScreenParams3F8Params *)&gScreenTextParameters).b,
++                                0);
+                 else if (p->x10C == 2)
+-                    Script_Call((u8 *)gScreenTextParameters.d, 0);
+-                else if (gScreenTextParameters.M != 0) {
++                    Script_Call((u8 *)(*(struct ScreenParams3F8Params *)&gScreenTextParameters).d,
++                                0);
++                else if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).M != 0) {
+                     if (p->x10C == 4)
+-                        Script_Call((u8 *)gScreenTextParameters.t, 0);
++                        Script_Call(
++                            (u8 *)(*(struct ScreenParams3F8Params *)&gScreenTextParameters).t, 0);
+                     else
+-                        Script_Call((u8 *)gScreenTextParameters.R, 0);
++                        Script_Call(
++                            (u8 *)(*(struct ScreenParams3F8Params *)&gScreenTextParameters).R, 0);
+                 } else
+-                    Script_Call((u8 *)gScreenTextParameters.R, 0);
++                    Script_Call((u8 *)(*(struct ScreenParams3F8Params *)&gScreenTextParameters).R,
++                                0);
+                 Task_Kill(p);
+             }
+             p->x110++;
+diff --git a/src/fn/sub_081EBD0C.c b/src/fn/sub_081EBD0C.c
+index d2da8bb85..e25a2210c 100644
+--- a/src/fn/sub_081EBD0C.c
++++ b/src/fn/sub_081EBD0C.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "render.h"
++#include "ram.h"
+ struct ScreenParams3F8Params {
+     u8 *mBlock;
+     u8 *eBlock;
+@@ -50,8 +51,6 @@ struct Obj53F8 {
+     u8 pad0[0x10];
+     s32 x10;
+ };
+-extern struct ScreenParams3F8Params gScreenTextParameters;
+-extern s32 gScreenTextSavedX1C;
+ extern struct Obj53F8 *gUnk_030053F8;
+ s32 ScreenParams3F8_SelectValidDataBank(struct SpDisplay *);
+ void Bg_ClearTilemap(s32);
+@@ -81,10 +80,10 @@ s32 sub_081EBD0C(struct SpDisplay *p)
+     s32 opt;
+     void *gfx;
+ 
+-    if (gScreenTextParameters.B == 1)
++    if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).B == 1)
+         p->x1C = gScreenTextSavedX1C;
+-    if (gScreenTextParameters.M != 0) {
+-        if (gScreenTextParameters.M == 1)
++    if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).M != 0) {
++        if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).M == 1)
+             p->x24 = 4;
+         else
+             p->x24 = 3;
+@@ -121,11 +120,12 @@ s32 sub_081EBD0C(struct SpDisplay *p)
+         p->x1CC[i] = 0;
+     }
+     p->x144 = 0;
+-    if (gScreenTextParameters.f == 0)
++    if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).f == 0)
+         p->x210 = 600;
+     else
+-        p->x210 = gScreenTextParameters.f;
+-    if (gScreenTextParameters.M == 0 && gScreenTextParameters.B == 0) {
++        p->x210 = (*(struct ScreenParams3F8Params *)&gScreenTextParameters).f;
++    if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).M == 0 &&
++        (*(struct ScreenParams3F8Params *)&gScreenTextParameters).B == 0) {
+         p->x148 = ScreenParams3F8_SelectValidDataBank(p);
+         if (p->x148 == -1)
+             p->x108 = 3;
+@@ -144,7 +144,7 @@ s32 sub_081EBD0C(struct SpDisplay *p)
+     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
+     CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x81B) + 0x14, gBgPaletteBuffer, 0x100);
+     ResourceHeader_Relocate(res, ScriptProc_Start(0xCB05, 0x530D));
+-    if (gScreenTextParameters.M)
++    if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).M)
+         Widget_InitLinked(w1, res, 0xD9, 0x10, 0, 0, 0, 0);
+     else
+         Widget_InitLinked(w1, res, 0xD1, 0x10, 0, 0, 0, 0);
+@@ -158,34 +158,45 @@ s32 sub_081EBD0C(struct SpDisplay *p)
+     }
+     if (p->x148 >= 0) {
+         Menu_EraseRect(1, 4, 0x1C, 9);
+-        if (gScreenTextParameters.M != 0) {
+-            if (gScreenTextParameters.M == 1) {
+-                Menu_DrawStringRef(1, 4, gScreenTextParameters.mBlock, 0);
+-                Menu_DrawStringRef(1, 7, gScreenTextParameters.mBlock, 1);
+-                Menu_DrawStringRef(1, 10, gScreenTextParameters.mBlock, 2);
+-                Menu_DrawStringRef(1, 13, gScreenTextParameters.mBlock, 3);
++        if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).M != 0) {
++            if ((*(struct ScreenParams3F8Params *)&gScreenTextParameters).M == 1) {
++                Menu_DrawStringRef(
++                    1, 4, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 0);
++                Menu_DrawStringRef(
++                    1, 7, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 1);
++                Menu_DrawStringRef(
++                    1, 10, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 2);
++                Menu_DrawStringRef(
++                    1, 13, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 3);
+             } else {
+-                Menu_DrawStringRef(1, 4, gScreenTextParameters.mBlock, 0);
+-                Menu_DrawStringRef(1, 7, gScreenTextParameters.mBlock, 2);
+-                Menu_DrawStringRef(1, 10, gScreenTextParameters.mBlock, 3);
++                Menu_DrawStringRef(
++                    1, 4, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 0);
++                Menu_DrawStringRef(
++                    1, 7, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 2);
++                Menu_DrawStringRef(
++                    1, 10, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 3);
+             }
+         } else {
+-            Menu_DrawStringRef(9, 4, gScreenTextParameters.mBlock, 0);
+-            Menu_DrawStringRef(10, 7, gScreenTextParameters.mBlock, 1);
++            Menu_DrawStringRef(9, 4,
++                               (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 0);
++            Menu_DrawStringRef(10, 7,
++                               (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 1);
+             if (p->x24 == 3)
+-                Menu_DrawStringRef(5, 10, gScreenTextParameters.mBlock, 2);
++                Menu_DrawStringRef(
++                    5, 10, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock, 2);
+         }
+         ScrollingDialogue_ClearScript();
+         ScrollingDialogue_RequestShow();
+         ScrollingDialogue_ClearScript();
+         {
+-            u8 *e = gScreenTextParameters.eBlock;
++            u8 *e = (*(struct ScreenParams3F8Params *)&gScreenTextParameters).eBlock;
+             s32 base = p->x1C;
+             ScrollingDialogue_SetScript(Text_LookupString(Script_ParseStringRef(e) + base));
+         }
+     } else {
+         Menu_EraseRect(1, 6, 0x1C, 6);
+-        Menu_DrawStringRef(1, 6, gScreenTextParameters.mBlock, 3);
++        Menu_DrawStringRef(1, 6, (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock,
++                           3);
+         *(u32 *)((u8 *)p + 0x50) |= 1;
+     }
+     p->x114 = 3;
+diff --git a/src/fn/sub_081EC0A8.c b/src/fn/sub_081EC0A8.c
+index d52ca67ae..be8b75af5 100644
+--- a/src/fn/sub_081EC0A8.c
++++ b/src/fn/sub_081EC0A8.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
++#include "ram.h"
+ /* Parameters at 0x020003F8 (meaning unknown). */
+ struct ScreenParams3F8Params {
+     u8 *mBlock;
+@@ -13,27 +14,26 @@ struct ScreenParams3F8Params {
+     s32 f;
+     s32 M;
+ };
+-extern struct ScreenParams3F8Params gScreenTextParameters;
+ void ScreenParams3F8_SetFromScript(void)
+ {
+     if (Script_SeekToKeyword('m'))
+-        gScreenTextParameters.mBlock = Script_GetPc();
++        (*(struct ScreenParams3F8Params *)&gScreenTextParameters).mBlock = Script_GetPc();
+     if (Script_SeekToKeyword('e'))
+-        gScreenTextParameters.eBlock = Script_GetPc();
++        (*(struct ScreenParams3F8Params *)&gScreenTextParameters).eBlock = Script_GetPc();
+     if (Script_SeekToKeyword('b'))
+-        gScreenTextParameters.b = Script_GetValue();
++        (*(struct ScreenParams3F8Params *)&gScreenTextParameters).b = Script_GetValue();
+     if (Script_SeekToKeyword('d'))
+-        gScreenTextParameters.d = Script_GetValue();
++        (*(struct ScreenParams3F8Params *)&gScreenTextParameters).d = Script_GetValue();
+     if (Script_SeekToKeyword('R'))
+-        gScreenTextParameters.R = Script_GetValue();
++        (*(struct ScreenParams3F8Params *)&gScreenTextParameters).R = Script_GetValue();
+     if (Script_SeekToKeyword('c'))
+-        gScreenTextParameters.c = Script_GetValue();
++        (*(struct ScreenParams3F8Params *)&gScreenTextParameters).c = Script_GetValue();
+     if (Script_SeekToKeyword('t'))
+-        gScreenTextParameters.t = Script_GetValue();
++        (*(struct ScreenParams3F8Params *)&gScreenTextParameters).t = Script_GetValue();
+     if (Script_SeekToKeyword('B'))
+-        gScreenTextParameters.B = Script_GetValue();
++        (*(struct ScreenParams3F8Params *)&gScreenTextParameters).B = Script_GetValue();
+     if (Script_SeekToKeyword('f'))
+-        gScreenTextParameters.f = Script_GetValue();
++        (*(struct ScreenParams3F8Params *)&gScreenTextParameters).f = Script_GetValue();
+     if (Script_SeekToKeyword('M'))
+-        gScreenTextParameters.M = Script_GetValue();
++        (*(struct ScreenParams3F8Params *)&gScreenTextParameters).M = Script_GetValue();
+ }
+diff --git a/src/fn/sub_081EC310.c b/src/fn/sub_081EC310.c
+index 2e5021e94..0bbcab936 100644
+--- a/src/fn/sub_081EC310.c
++++ b/src/fn/sub_081EC310.c
+@@ -1,16 +1,16 @@
+ #include "global.h"
++#include "ram.h"
+ struct P {
+     u32 a;
+     u32 b;
+ };
+-extern struct P gScreenDelayParameters;
+ s32 Script_SeekToKeyword(s32);
+ s32 Script_GetValue(void);
+ u32 Script_GetPc(void);
+ void Results_SetFromScript(void)
+ {
+     if (Script_SeekToKeyword(0x72))
+-        gScreenDelayParameters.a = Script_GetPc();
++        (*(struct P *)&gScreenDelayParameters).a = Script_GetPc();
+     if (Script_SeekToKeyword(0x65))
+-        gScreenDelayParameters.b = Script_GetValue();
++        (*(struct P *)&gScreenDelayParameters).b = Script_GetValue();
+ }
+diff --git a/src/fn/sub_081FC800.c b/src/fn/sub_081FC800.c
+index b74007049..b272835dc 100644
+--- a/src/fn/sub_081FC800.c
++++ b/src/fn/sub_081FC800.c
+@@ -1,5 +1,6 @@
+ #define gPlayer gUnk_02000580
+ #include "global.h"
++#include "ram.h"
+ struct SceneProjectileState {
+     u16 unknown;
+     u16 lifetime;
+@@ -22,7 +23,6 @@ struct ProjectilePoolState {
+     u8 pad00[0x1C];
+     u32 contactFlag;
+ };
+-extern struct ProjectilePoolState *gSceneProjectilePool;
+ extern u8 *gPlayer;
+ s32 Player_StartForcedStun(u8 *, s32);
+ void Sound_PlaySong(u32);
+@@ -31,7 +31,7 @@ void SceneProjectile_RespondToContact(void *unused, struct ProjectileContact *co
+ {
+     struct SceneProjectileState *state = (void *)((u8 *)p + 0x28);
+     if (p->state.mode == 1 && contact->kind == 1)
+-        gSceneProjectilePool->contactFlag = 1;
++        ((struct ProjectilePoolState *)gSceneProjectilePool)->contactFlag = 1;
+     if (p->state.mode == 0) {
+         if (gPlayer[0x457] != 26 && *(u16 *)(gPlayer + 0x4D8) == 0) {
+             if (Player_StartForcedStun(gPlayer, 90) == 1)
+diff --git a/src/fn/sub_081FF388.c b/src/fn/sub_081FF388.c
+index e79c68817..97d99288f 100644
+--- a/src/fn/sub_081FF388.c
++++ b/src/fn/sub_081FF388.c
+@@ -1,6 +1,6 @@
+ #include "global.h"
+-extern u8 *gHomingManager;
++#include "ram.h"
+ u32 HomingProjectile_GetActiveCount(void)
+ {
+-    return *(u32 *)(gHomingManager + 0x43c);
++    return *(u32 *)(((u8 *)gHomingManager) + 0x43c);
+ }
+diff --git a/src/fn/sub_0821FDC8.c b/src/fn/sub_0821FDC8.c
+index 90d6a3ed0..c4e5df687 100644
+--- a/src/fn/sub_0821FDC8.c
++++ b/src/fn/sub_0821FDC8.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ struct Nd {
+     struct Nd *next;
+     u16 pad;
+@@ -14,18 +15,17 @@ struct M {
+     u16 c1;
+     u16 c2;
+ };
+-extern struct M *gColliderManager;
+ void Collider_Register(struct Nd *n)
+ {
+     struct Nd *p;
+-    if (gColliderManager == 0)
++    if (((struct M *)gColliderManager) == 0)
+         return;
+-    p = gColliderManager->f18;
++    p = ((struct M *)gColliderManager)->f18;
+     while ((p = p->next) != 0)
+         if (p == n)
+             return;
+-    gColliderManager->f20->next = n;
++    ((struct M *)gColliderManager)->f20->next = n;
+     n->next = 0;
+-    gColliderManager->f20 = n;
+-    gColliderManager->c0++;
++    ((struct M *)gColliderManager)->f20 = n;
++    ((struct M *)gColliderManager)->c0++;
+ }
+diff --git a/src/fn/sub_0821FE04.c b/src/fn/sub_0821FE04.c
+index a8e4aabf6..465fe05b9 100644
+--- a/src/fn/sub_0821FE04.c
++++ b/src/fn/sub_0821FE04.c
+@@ -1,18 +1,18 @@
+ #include "global.h"
+ #include "contact_actor.h"
++#include "ram.h"
+ struct ColliderManager {
+     u8 unknown0[0x1C];
+     struct ContactCollider *prioritySentinel;
+     u8 unknown20[0xB2];
+     u16 priorityCount;
+ };
+-extern struct ColliderManager *gColliderManager;
+ void Collider_InsertPriorityList(struct ContactCollider *node)
+ {
+     struct ContactCollider *entry;
+-    if (!gColliderManager)
++    if (!((struct ColliderManager *)gColliderManager))
+         return;
+-    entry = gColliderManager->prioritySentinel->next;
++    entry = ((struct ColliderManager *)gColliderManager)->prioritySentinel->next;
+     if (entry) {
+         do {
+             if (entry == node)
+@@ -20,8 +20,8 @@ void Collider_InsertPriorityList(struct ContactCollider *node)
+             entry = entry->next;
+         } while (entry);
+     }
+-    entry = gColliderManager->prioritySentinel;
++    entry = ((struct ColliderManager *)gColliderManager)->prioritySentinel;
+     node->next = entry->next;
+     entry->next = node;
+-    gColliderManager->priorityCount++;
++    ((struct ColliderManager *)gColliderManager)->priorityCount++;
+ }
+diff --git a/src/fn/sub_0821FE6C.c b/src/fn/sub_0821FE6C.c
+index b04839d76..a7e058d48 100644
+--- a/src/fn/sub_0821FE6C.c
++++ b/src/fn/sub_0821FE6C.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ struct Nd {
+     struct Nd *next;
+     u16 pad;
+@@ -14,20 +15,19 @@ struct M {
+     u16 c1;
+     u16 c2;
+ };
+-extern struct M *gColliderManager;
+ void Collider_Remove(struct Nd *n)
+ {
+     struct Nd *prev, *cur;
+-    if (gColliderManager == 0)
++    if (((struct M *)gColliderManager) == 0)
+         return;
+-    prev = gColliderManager->f18;
++    prev = ((struct M *)gColliderManager)->f18;
+     cur = prev->next;
+     while (cur) {
+         if (cur == n) {
+-            if (cur == gColliderManager->f20)
+-                gColliderManager->f20 = prev;
++            if (cur == ((struct M *)gColliderManager)->f20)
++                ((struct M *)gColliderManager)->f20 = prev;
+             prev->next = cur->next;
+-            gColliderManager->c0--;
++            ((struct M *)gColliderManager)->c0--;
+             break;
+         }
+         prev = cur;
+diff --git a/src/fn/sub_082260D8.c b/src/fn/sub_082260D8.c
+index ced22e77a..c098349e4 100644
+--- a/src/fn/sub_082260D8.c
++++ b/src/fn/sub_082260D8.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ struct Camera {
+     u8 pad[0x7e];
+     u16 shake;
+@@ -8,7 +9,6 @@ struct Camera {
+ struct Vec {
+     s16 x, y, z;
+ };
+-extern struct Camera *gActiveCamera;
+ extern struct Vec gUnk_030042A0;
+ extern struct Vec gUnk_03005418;
+ static inline s32 scale(s32 input)
+@@ -44,12 +44,12 @@ static inline void project(struct Vec *out, struct Vec *in)
+ }
+ void sub_082260D8(void)
+ {
+-    if (gActiveCamera) {
+-        gUnk_030042A0.x -= gActiveCamera->offsetX;
+-        gUnk_030042A0.z -= gActiveCamera->offsetZ;
++    if (((struct Camera *)gActiveCamera)) {
++        gUnk_030042A0.x -= ((struct Camera *)gActiveCamera)->offsetX;
++        gUnk_030042A0.z -= ((struct Camera *)gActiveCamera)->offsetZ;
+         project(&gUnk_03005418, &gUnk_030042A0);
+-        gActiveCamera->shake = 0;
+-        gActiveCamera->offsetX = 0;
+-        gActiveCamera->offsetZ = 0;
++        ((struct Camera *)gActiveCamera)->shake = 0;
++        ((struct Camera *)gActiveCamera)->offsetX = 0;
++        ((struct Camera *)gActiveCamera)->offsetZ = 0;
+     }
+ }
+diff --git a/src/fn/sub_08226268.c b/src/fn/sub_08226268.c
+index 2a136dd14..11b364324 100644
+--- a/src/fn/sub_08226268.c
++++ b/src/fn/sub_08226268.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ 
+ struct Vec {
+     s16 x, y, z;
+@@ -14,7 +15,6 @@ struct Camera {
+     struct Vec pos;
+ };
+ 
+-extern struct Camera *gActiveCamera;
+ extern struct Vec gUnk_030042A0;
+ extern struct Vec gUnk_03005418;
+ 
+@@ -28,7 +28,7 @@ static inline int project(int input)
+    the scroll origin (gUnk_03005418) from its isometric projection. */
+ void Camera_SnapTo(struct Vec *pos)
+ {
+-    struct Camera *c = gActiveCamera;
++    struct Camera *c = ((struct Camera *)gActiveCamera);
+     if (c) {
+         c->pos.x = pos->x;
+         c->pos.y = pos->y;
+@@ -46,7 +46,7 @@ void Camera_SnapTo(struct Vec *pos)
+             out->y = xy - height;
+             out->z = xy + height;
+         }
+-        gActiveCamera->f1c = 1;
+-        gActiveCamera->f68 = 1;
++        ((struct Camera *)gActiveCamera)->f1c = 1;
++        ((struct Camera *)gActiveCamera)->f68 = 1;
+     }
+ }
+diff --git a/src/fn/sub_082263A0.c b/src/fn/sub_082263A0.c
+index e5deefbaf..9d4f11a4b 100644
+--- a/src/fn/sub_082263A0.c
++++ b/src/fn/sub_082263A0.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ struct P {
+     u32 a, b;
+ };
+@@ -12,14 +13,13 @@ struct S {
+     struct P f74;
+     u16 f7c;
+ };
+-extern struct S *gActiveCamera;
+ s32 SceneBody_GetById(u32);
+ void Camera_TrackActor(u32 a, struct P *b)
+ {
+-    if (gActiveCamera) {
+-        gActiveCamera->f7c = a;
+-        if (SceneBody_GetById(gActiveCamera->f7c)) {
+-            struct S *p = gActiveCamera;
++    if (((struct S *)gActiveCamera)) {
++        ((struct S *)gActiveCamera)->f7c = a;
++        if (SceneBody_GetById(((struct S *)gActiveCamera)->f7c)) {
++            struct S *p = ((struct S *)gActiveCamera);
+             p->f1c = 1;
+             p->f74 = *b;
+             p->f68 = 3;
+diff --git a/src/fn/sub_082263FC.c b/src/fn/sub_082263FC.c
+index 684f81623..f8d79e1e5 100644
+--- a/src/fn/sub_082263FC.c
++++ b/src/fn/sub_082263FC.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ struct P {
+     u32 a, b;
+ };
+@@ -12,15 +13,14 @@ struct S {
+     struct P f74;
+     u16 f7c;
+ };
+-extern struct S *gActiveCamera;
+ s32 SceneBody_GetById(u32);
+ void Camera_NotifyMoveComplete(struct S *);
+ void Camera_PanToActor(u32 a, s32 n, struct P *b)
+ {
+-    if (gActiveCamera) {
+-        gActiveCamera->f7c = a;
+-        if (SceneBody_GetById(gActiveCamera->f7c)) {
+-            struct S *p = gActiveCamera;
++    if (((struct S *)gActiveCamera)) {
++        ((struct S *)gActiveCamera)->f7c = a;
++        if (SceneBody_GetById(((struct S *)gActiveCamera)->f7c)) {
++            struct S *p = ((struct S *)gActiveCamera);
+             p->f1c = 1;
+             p->f74 = *b;
+             if (n <= 1) {
+diff --git a/src/fn/sub_08226558.c b/src/fn/sub_08226558.c
+index 2242804a5..64728cfb5 100644
+--- a/src/fn/sub_08226558.c
++++ b/src/fn/sub_08226558.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
++#include "ram.h"
+ 
+ struct Camera {
+     u8 pad[0x84];
+@@ -10,25 +11,23 @@ struct Camera {
+     u16 h8A;
+ };
+ 
+-extern struct Camera *gActiveCamera;
+-
+ void Camera_SetSway(s32 a, s32 b, s32 mode)
+ {
+-    if (gActiveCamera && !(gEngineFlags & 0x800)) {
++    if (((struct Camera *)gActiveCamera) && !(gEngineFlags & 0x800)) {
+         if (b == 0 && mode == 1) {
+-            gActiveCamera->b84 = b;
+-            gActiveCamera->b85 = b;
+-            gActiveCamera->h86 = b;
+-            gActiveCamera->h88 = b;
++            ((struct Camera *)gActiveCamera)->b84 = b;
++            ((struct Camera *)gActiveCamera)->b85 = b;
++            ((struct Camera *)gActiveCamera)->h86 = b;
++            ((struct Camera *)gActiveCamera)->h88 = b;
+         } else {
+             struct Camera *c;
+-            gActiveCamera->b84 = 1;
+-            c = gActiveCamera;
++            ((struct Camera *)gActiveCamera)->b84 = 1;
++            c = ((struct Camera *)gActiveCamera);
+             c->h88 = a;
+             c->h8A = b;
+             if ((u16)b == 0)
+                 c->h86 = c->h88;
+-            gActiveCamera->b85 = mode;
++            ((struct Camera *)gActiveCamera)->b85 = mode;
+         }
+     }
+ }
+diff --git a/src/fn/sub_0822C1C8.c b/src/fn/sub_0822C1C8.c
+index 6feb3ef08..f59d6dcf7 100644
+--- a/src/fn/sub_0822C1C8.c
++++ b/src/fn/sub_0822C1C8.c
+@@ -1,15 +1,15 @@
+ #include "global.h"
++#include "ram.h"
+ struct S {
+     u8 p[0x19];
+     u8 b;
+ };
+-extern struct S *gSolarController;
+ extern u16 gUnk_030054BC;
+ void Solar_StopMeasurement(void);
+ void Solar_PauseMeasurement(void)
+ {
+-    if (gSolarController) {
+-        if (gSolarController->b)
++    if (((struct S *)gSolarController)) {
++        if (((struct S *)gSolarController)->b)
+             Solar_StopMeasurement();
+         gUnk_030054BC = 1;
+     }
+diff --git a/src/fn/sub_0822C1F0.c b/src/fn/sub_0822C1F0.c
+index d06317815..0d150a25b 100644
+--- a/src/fn/sub_0822C1F0.c
++++ b/src/fn/sub_0822C1F0.c
+@@ -1,20 +1,20 @@
+ #include "global.h"
++#include "ram.h"
+ struct S {
+     u8 p[0x19];
+     u8 b;
+     u8 q[6];
+     u16 h;
+ };
+-extern struct S *gSolarController;
+ extern u16 gUnk_030054BC;
+ void Solar_StartMeasurement(void);
+ void Solar_ResumeMeasurement(void)
+ {
+-    struct S *s = gSolarController;
++    struct S *s = ((struct S *)gSolarController);
+     if (s) {
+         if (s->b != 0) {
+             s->b = 1;
+-            gSolarController->h = 0;
++            ((struct S *)gSolarController)->h = 0;
+             Solar_StartMeasurement();
+         }
+         gUnk_030054BC = 0;
+diff --git a/src/fn/sub_08232264.c b/src/fn/sub_08232264.c
+index ce4dfbf24..36e283bdd 100644
+--- a/src/fn/sub_08232264.c
++++ b/src/fn/sub_08232264.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "ram.h"
+ struct EffectManager {
+     u8 task[0x18];
+     void *animData;
+@@ -22,7 +23,6 @@ struct EffectGroup {
+     struct EffectGroupEntry entries[4];
+     void (*update)(struct EffectGroup *);
+ };
+-extern struct EffectManager *gSceneActorEffectsManager;
+ struct EffectManager *SceneActorEffects_CreateManager(void *, void *);
+ void ParticleSprite_Initialize(void *, void *, u32);
+ void Effect_SetOrigin(void *, s32, s32);
+@@ -33,7 +33,7 @@ void sub_08231444(struct EffectGroup *);
+ // scene actor effect manager, creating the manager if needed.
+ s32 sub_08232264(struct EffectGroup *group, void *owner, s32 mode, s32 kind, s32 variant)
+ {
+-    struct EffectManager *manager = gSceneActorEffectsManager;
++    struct EffectManager *manager = ((struct EffectManager *)gSceneActorEffectsManager);
+     struct EffectGroupEntry *entry;
+     s32 i;
+     if (manager == NULL) {
+@@ -56,10 +56,12 @@ s32 sub_08232264(struct EffectGroup *group, void *owner, s32 mode, s32 kind, s32
+         entry->x = 0;
+         entry->y = 0;
+         entry->z = 0;
+-        ParticleSprite_Initialize(entry->sprite, gSceneActorEffectsManager->animData, 0x11);
++        ParticleSprite_Initialize(
++            entry->sprite, ((struct EffectManager *)gSceneActorEffectsManager)->animData, 0x11);
+         Effect_SetOrigin(entry->sprite, -8, -8);
+         entry->sprite[0xF] = 2;
+-        Anim_SetSequence(entry->anim, gSceneActorEffectsManager->sequence, 0, 0, 0);
++        Anim_SetSequence(entry->anim, ((struct EffectManager *)gSceneActorEffectsManager)->sequence,
++                         0, 0, 0);
+     }
+     ActiveList_PrependNode(manager, group);
+     return 0;
+diff --git a/src/fn/sub_08232420.c b/src/fn/sub_08232420.c
+index 03dddb079..3f653ba33 100644
+--- a/src/fn/sub_08232420.c
++++ b/src/fn/sub_08232420.c
+@@ -1,4 +1,5 @@
+ #include "engine.h"
++#include "ram.h"
+ struct HazardVec {
+     s16 x, y, z, pad;
+ };
+@@ -28,7 +29,6 @@ struct TimedHazardPool {
+     u8 task[0x18];
+     void *animation;
+ };
+-extern struct TimedHazardPool *gColliderSpritePool;
+ void *ColliderSpritePool_Create(u32, u32);
+ void TimedHazard_OnDamageContact();
+ void TimedHazard_OnAttackContact();
+@@ -52,7 +52,7 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *pos
+     struct TimedHazard *p;
+     struct HazardVec *pos;
+     void *resource;
+-    if (!gColliderSpritePool && !ColliderSpritePool_Create(0xC0DB, 0))
++    if (!((struct TimedHazardPool *)gColliderSpritePool) && !ColliderSpritePool_Create(0xC0DB, 0))
+         return -1;
+     p = Heap_Alloc(sizeof(*p));
+     if (!p)
+@@ -129,7 +129,7 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *pos
+         return -1;
+     Sprite_Init(&p->sprite, resource, 1);
+     p->sprite.priority = 2;
+-    Anim_SetSequence(p->anim, gColliderSpritePool->animation, 1, 0, 0);
++    Anim_SetSequence(p->anim, ((struct TimedHazardPool *)gColliderSpritePool)->animation, 1, 0, 0);
+     AnimData_SelectPaletteBank(resource, p->id + 0x153);
+     if (p->delay == 0) {
+         p->state = 1;
+@@ -143,7 +143,7 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *pos
+     p->unknown5 = 0;
+     p->previous = 0;
+     p->next = 0;
+-    return TimedHazard_LinkInstance(gColliderSpritePool, p);
++    return TimedHazard_LinkInstance(((struct TimedHazardPool *)gColliderSpritePool), p);
+ }
+ int Script_GetKeywordValue(int, int);
+ int Script_SeekToKeyword(int);
+diff --git a/src/fn/sub_08232764.c b/src/fn/sub_08232764.c
+index 9ff9b5190..e7f46f633 100644
+--- a/src/fn/sub_08232764.c
++++ b/src/fn/sub_08232764.c
+@@ -1,5 +1,6 @@
+ #include "global.h"
+ #include "engine.h"
++#include "ram.h"
+ /* Tentative: per-frame update of a collider-carrying object (restart animation once, move colliders, advance timer). */
+ struct ColliderObjectCtx {
+     u8 pad[0x18];
+@@ -16,14 +17,14 @@ struct ColliderObject {
+     u8 pad40[0x28];
+     u8 anim[1];
+ };
+-extern struct ColliderObjectCtx *gColliderSpritePool;
+ 
+ void ColliderObject_Update(struct ColliderObject *p)
+ {
+     if (p->restart) {
+         p->restart = 0;
+         p->flags &= ~1;
+-        Anim_SetSequence(p->anim, gColliderSpritePool->animation, 1, 0, 0);
++        Anim_SetSequence(p->anim, ((struct ColliderObjectCtx *)gColliderSpritePool)->animation, 1,
++                         0, 0);
+     }
+     if (p->health <= 0 || p->hold) {
+         p->done = 1;
+diff --git a/tools/ramlayout.py b/tools/ramlayout.py
+index 832e608e3..ef9bd1df3 100644
+--- a/tools/ramlayout.py
++++ b/tools/ramlayout.py
+@@ -471,8 +471,11 @@ def cmd_unify(a):
+             # unchanged, else its own (if the header stays out of sight),
+             # else its own view as a cast at each use
+             err = None
+-            for how, t in (("shared", adopt(new[p], canon, a.header, cast=False)), ("own", renamed[p]),
+-                           ("cast", adopt(new[p], canon, a.header, cast=True))):
++            tries = [("shared", adopt(new[p], canon, a.header, cast=False)), ("own", renamed[p]),
++                     ("cast", adopt(new[p], canon, a.header, cast=True))]
++            if a.cast:      # prefer one declaration: a cast at each use over a file's own
++                tries[1], tries[2] = tries[2], tries[1]
++            for how, t in tries:
+                 if t is None:
+                     continue
+                 err = same(p, t)
+@@ -704,6 +707,8 @@ def main():
+     s.add_argument("--header", required=True)
+     s.add_argument("--note", default="")
+     s.add_argument("--dry-run", action="store_true")
++    s.add_argument("--cast", action="store_true",
++                   help="a file whose declaration differs gets a cast at each use before keeping its own")
+     s.add_argument("--jobs", type=int, default=os.cpu_count())
+     a = ap.parse_args()
+     {"check": cmd_check, "show": cmd_show, "seed": cmd_seed, "unify": cmd_unify}[a.cmd](a)
+-- 
+2.39.3 (Apple Git-145)
+

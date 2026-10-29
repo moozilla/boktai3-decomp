@@ -1,0 +1,62 @@
+From 08c0804118ca4489afd3a5ac29226592df8154a0 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 04:51:30 -0700
+Subject: [PATCH] Preserve values when removing tied empty asm barriers
+
+Scope pins now replaces a single tied input/output barrier with an ordinary assignment. This lets it measure the concession without leaving an uninitialized variable or incorrectly reporting that all barriers were removed.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/scope/scope.py | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/tools/scope/scope.py b/tools/scope/scope.py
+index 055648127..e5e777873 100644
+--- a/tools/scope/scope.py
++++ b/tools/scope/scope.py
+@@ -2530,11 +2530,21 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
+ 
+ PIN_RE = re.compile(r'\s+(?:asm|__asm__)\s*\(\s*"(?:r\d+|sb|sl|fp|ip|lr)"\s*\)')
+ BARRIER_RE = re.compile(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""[^;]*\)\s*;\s*(?://.*)?$')
++TIED_BARRIER_RE = re.compile(
++    r'^(\s*)(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""\s*:'
++    r'\s*"=[^"]*"\s*\(\s*(\w+)\s*\)\s*:\s*"0"\s*\(\s*(\w+)\s*\)'
++    r'\s*\)\s*;\s*(?://.*)?$')
++
++
++def tied_barrier_assignment(line):
++    """An empty asm with one tied input/output is an ordinary copy without its constraint."""
++    m = TIED_BARRIER_RE.match(line)
++    return f"{m[1]}{m[2]} = {m[3]};" if m else None
+ 
+ 
+ def concession_sites(text):
+     """[(line index, kind, removal)] for each register pin (`register T x asm("rN")`) and each empty asm
+-    barrier statement (`asm("" : "+r"(x));`) in TEXT; removal(lines) returns the lines without it."""
++    barrier statement (`asm("" : "+r"(x));`) in TEXT; removal(lines) preserves a tied output's value."""
+     lines = text.split("\n")
+     out = []
+     for i, ln in enumerate(lines):
+@@ -2543,7 +2553,9 @@ def concession_sites(text):
+         if PIN_RE.search(ln) and "register" in ln:
+             out.append((i, "pin", lambda ls, i=i: ls[:i] + [PIN_RE.sub("", ls[i], count=1)] + ls[i + 1:]))
+         elif BARRIER_RE.match(ln):
+-            out.append((i, "barrier", lambda ls, i=i: ls[:i] + ls[i + 1:]))
++            copy = tied_barrier_assignment(ln)
++            out.append((i, "barrier", lambda ls, i=i, copy=copy:
++                        ls[:i] + ([copy] if copy is not None else []) + ls[i + 1:]))
+     return out
+ 
+ 
+@@ -2555,6 +2567,8 @@ def sole_definitions(lines, i):
+     else in the enclosing function sets. Removing such a barrier leaves x read with no value: same bytes
+     perhaps, but not C anyone wrote (a pinned register variable gets no uninitialized warning)."""
+     ln = lines[i]
++    if tied_barrier_assignment(ln) is not None:
++        return []  # concession_sites replaces this barrier with its ordinary assignment
+     outs = re.findall(r'"=[^"]*"\s*\(\s*(\w+)\s*\)', ln.split(":")[1] if ln.count(":") >= 1 else "")
+     if not outs:
+         return []
+-- 
+2.39.3 (Apple Git-145)
+

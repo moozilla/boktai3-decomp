@@ -1,0 +1,41 @@
+From 0e0e619f4805221726f8a9f5ceb6d52fb52512d2 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 02:25:08 -0700
+Subject: [PATCH] Resolve local draft aliases before selecting seek targets
+
+Opening sub_080D7568 selected static helper Test8 because fallback depended on block name order. Resolve explicit object-like aliases first, and use definition position for the fallback. Validated by opening the real campaign draft and compiling its intended ROM function.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/seek/engine.py | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/tools/seek/engine.py b/tools/seek/engine.py
+index a47db2872..a033f8d81 100644
+--- a/tools/seek/engine.py
++++ b/tools/seek/engine.py
+@@ -313,12 +313,20 @@ class Target:
+     def __init__(self, src, func=None):
+         self.src = os.path.relpath(os.path.abspath(src), ROOT)
+         text = open(os.path.join(ROOT, self.src)).read()
++        # Local descriptive aliases precede their definitions in older drafts. Resolve the
++        # requested ROM symbol before considering helpers in its NONMATCHING block.
++        if func and not find_def(text, func):
++            aliases = re.findall(r"^\s*#\s*define\s+(\w+)\s+(\w+)\s*$", text, re.M)
++            for name, target in aliases:
++                if target == func and find_def(text, name):
++                    func = name
++                    break
+         if func and not find_def(text, func):  # a ROM name whose draft has a C name: its block's definition
+             for b in scope.nonmatching_blocks(text):
+                 if func in b["names"]:
+                     body = text[b["body"]:b["else"][0]]
+                     defs = [n for n in b["names"] if n != func and find_def(body, n)]
+-                    func = defs[-1] if defs else func
++                    func = max(defs, key=lambda n: find_def(body, n)[0]) if defs else func
+         self.func = func or scope.nonmatching_func(self.src)
+         if not self.func:
+             raise SystemExit(f"{src}: no NONMATCHING function found; name it")
+-- 
+2.39.3 (Apple Git-145)
+

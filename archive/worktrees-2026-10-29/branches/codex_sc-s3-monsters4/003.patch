@@ -1,0 +1,33 @@
+From 942c487c225b57ee72f24fa38e3df89aeea4dfd7 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 03:54:07 -0700
+Subject: [PATCH] Keep seek statement swaps from crossing control-flow exits
+
+Reject both direct and nested exits on either side so a return cannot be moved before a required store.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/rewrites.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/tools/rewrites.py b/tools/rewrites.py
+index eb0734c86..8861f72fb 100644
+--- a/tools/rewrites.py
++++ b/tools/rewrites.py
+@@ -332,7 +332,12 @@ def rw_swap_stmts(fn):
+     for bi, b in enumerate(bl):
+         for i in range(len(b.block_items) - 1):
+             x, y = b.block_items[i], b.block_items[i + 1]
+-            if isinstance(x, (ca.Decl, ca.Label, ca.Return)) or isinstance(y, (ca.Decl, ca.Label)):
++            if isinstance(x, (ca.Decl, ca.Label)) or isinstance(y, (ca.Decl, ca.Label)):
++                continue
++            # Moving a statement across any exit can make its side effects unreachable,
++            # or execute them on a path that previously returned/jumped first.
++            jumps = (ca.Return, ca.Goto, ca.Break, ca.Continue)
++            if any(isinstance(n, jumps) for st in (x, y) for n, _, _ in walk(st)):
+                 continue
+             f2 = copy.deepcopy(fn)
+             b2 = blocks(f2)[bi]
+-- 
+2.39.3 (Apple Git-145)
+

@@ -1,0 +1,3614 @@
+From b7f5bfff15e07f2d13f032f7fd1acef76325384f Mon Sep 17 00:00:00 2001
+From: Moozilla <moozilla@protonmail.com>
+Date: Sun, 18 Oct 2026 20:48:28 -0700
+Subject: [PATCH] Unit scene_panel_presentation: merge into
+ src/scene_panel_presentation.c with shared types (tools/unitize.py,
+ codex:gpt-6.1-sol)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ notes/scene_panel_presentation.md |   76 ++
+ src/fn/sub_08057960.c             |    7 -
+ src/fn/sub_08057978.c             |   18 -
+ src/fn/sub_080579B0.c             |   28 -
+ src/fn/sub_08057A44.c             |   20 -
+ src/fn/sub_08057ADC.c             |   11 -
+ src/fn/sub_08057AFC.c             |   19 -
+ src/fn/sub_08057B5C.c             |   37 -
+ src/fn/sub_08057C58.c             |    7 -
+ src/fn/sub_08057C78.c             |   21 -
+ src/fn/sub_08057CB8.c             |   85 --
+ src/fn/sub_08057E04.c             |  259 -----
+ src/fn/sub_080580C8.c             |   14 -
+ src/fn/sub_08058130.c             |    6 -
+ src/fn/sub_08058150.c             |    6 -
+ src/fn/sub_08058168.c             |    9 -
+ src/fn/sub_08058184.c             |    9 -
+ src/fn/sub_080581A0.c             |    6 -
+ src/fn/sub_080581C0.c             |    8 -
+ src/fn/sub_080581F8.c             |    8 -
+ src/fn/sub_0805822C.c             |    9 -
+ src/fn/sub_0805824C.c             |    8 -
+ src/fn/sub_08058284.c             |    8 -
+ src/fn/sub_080582B8.c             |    8 -
+ src/fn/sub_080582EC.c             |    8 -
+ src/fn/sub_08058324.c             |    8 -
+ src/fn/sub_0805835C.c             |    8 -
+ src/fn/sub_08058394.c             |    8 -
+ src/fn/sub_080583CC.c             |    8 -
+ src/fn/sub_08058404.c             |    9 -
+ src/fn/sub_08058444.c             |    6 -
+ src/fn/sub_08058464.c             |    8 -
+ src/fn/sub_0805849C.c             |    8 -
+ src/fn/sub_080584D4.c             |    8 -
+ src/fn/sub_0805850C.c             |    8 -
+ src/fn/sub_08058544.c             |   32 -
+ src/fn/sub_080585AC.c             |    7 -
+ src/fn/sub_080585E8.c             |   21 -
+ src/fn/sub_080586B0.c             |    5 -
+ src/fn/sub_080586C0.c             |   10 -
+ src/fn/sub_08058700.c             |  209 ----
+ src/fn/sub_08058AF4.c             |   30 -
+ src/fn/sub_08058B88.c             |   27 -
+ src/fn/sub_08058BD8.c             |  360 -------
+ src/fn/sub_08058FF8.c             |   13 -
+ src/fn/sub_0805907C.c             |    7 -
+ src/fn/sub_08059098.c             |    4 -
+ src/fn/sub_0805909C.c             |   14 -
+ src/fn/sub_0805911C.c             |   24 -
+ src/fn/sub_080591E8.c             |   12 -
+ src/fn/sub_08059264.c             |   10 -
+ src/fn/sub_080592AC.c             |   10 -
+ src/fn/sub_080592F4.c             |   59 --
+ src/scene_panel_presentation.c    | 1540 +++++++++++++++++++++++++++++
+ 54 files changed, 1616 insertions(+), 1552 deletions(-)
+ create mode 100644 notes/scene_panel_presentation.md
+ delete mode 100644 src/fn/sub_08057960.c
+ delete mode 100644 src/fn/sub_08057978.c
+ delete mode 100644 src/fn/sub_080579B0.c
+ delete mode 100644 src/fn/sub_08057A44.c
+ delete mode 100644 src/fn/sub_08057ADC.c
+ delete mode 100644 src/fn/sub_08057AFC.c
+ delete mode 100644 src/fn/sub_08057B5C.c
+ delete mode 100644 src/fn/sub_08057C58.c
+ delete mode 100644 src/fn/sub_08057C78.c
+ delete mode 100644 src/fn/sub_08057CB8.c
+ delete mode 100644 src/fn/sub_08057E04.c
+ delete mode 100644 src/fn/sub_080580C8.c
+ delete mode 100644 src/fn/sub_08058130.c
+ delete mode 100644 src/fn/sub_08058150.c
+ delete mode 100644 src/fn/sub_08058168.c
+ delete mode 100644 src/fn/sub_08058184.c
+ delete mode 100644 src/fn/sub_080581A0.c
+ delete mode 100644 src/fn/sub_080581C0.c
+ delete mode 100644 src/fn/sub_080581F8.c
+ delete mode 100644 src/fn/sub_0805822C.c
+ delete mode 100644 src/fn/sub_0805824C.c
+ delete mode 100644 src/fn/sub_08058284.c
+ delete mode 100644 src/fn/sub_080582B8.c
+ delete mode 100644 src/fn/sub_080582EC.c
+ delete mode 100644 src/fn/sub_08058324.c
+ delete mode 100644 src/fn/sub_0805835C.c
+ delete mode 100644 src/fn/sub_08058394.c
+ delete mode 100644 src/fn/sub_080583CC.c
+ delete mode 100644 src/fn/sub_08058404.c
+ delete mode 100644 src/fn/sub_08058444.c
+ delete mode 100644 src/fn/sub_08058464.c
+ delete mode 100644 src/fn/sub_0805849C.c
+ delete mode 100644 src/fn/sub_080584D4.c
+ delete mode 100644 src/fn/sub_0805850C.c
+ delete mode 100644 src/fn/sub_08058544.c
+ delete mode 100644 src/fn/sub_080585AC.c
+ delete mode 100644 src/fn/sub_080585E8.c
+ delete mode 100644 src/fn/sub_080586B0.c
+ delete mode 100644 src/fn/sub_080586C0.c
+ delete mode 100644 src/fn/sub_08058700.c
+ delete mode 100644 src/fn/sub_08058AF4.c
+ delete mode 100644 src/fn/sub_08058B88.c
+ delete mode 100644 src/fn/sub_08058BD8.c
+ delete mode 100644 src/fn/sub_08058FF8.c
+ delete mode 100644 src/fn/sub_0805907C.c
+ delete mode 100644 src/fn/sub_08059098.c
+ delete mode 100644 src/fn/sub_0805909C.c
+ delete mode 100644 src/fn/sub_0805911C.c
+ delete mode 100644 src/fn/sub_080591E8.c
+ delete mode 100644 src/fn/sub_08059264.c
+ delete mode 100644 src/fn/sub_080592AC.c
+ delete mode 100644 src/fn/sub_080592F4.c
+ create mode 100644 src/scene_panel_presentation.c
+
+diff --git a/notes/scene_panel_presentation.md b/notes/scene_panel_presentation.md
+new file mode 100644
+index 000000000..c2b243b63
+--- /dev/null
++++ b/notes/scene_panel_presentation.md
+@@ -0,0 +1,76 @@
++# Scene panel presentation unit (tentative)
++
++Tags: #scene #panel #particles #palette #unit
++
++Range: 08057960–08059428, end exclusive. All 52 existing functions were
++consolidated in ROM order into `src/scene_panel_presentation.c`. No gaps,
++unmatched functions, new matches, or NONMATCHING drafts were present.
++The range remains 100% matching, a 0.000 percentage-point gain (6,856 bytes
++preserved). Repository matched-code percentage and register-pinned percentage
++are unchanged by the consolidation.
++
++## Shared layout
++
++Reused `include/scene_panel.h` because these consumers use the existing
++`ScenePanel` object. Removed the separate `ScenePanelEffectsView` and
++`ScenePanelScheduleView`; their headers now carry API declarations and include
++the common layout. No other subsystem's object view was reinterpreted.
++
++The shared header now describes the time-palette banks at 0x20, three palette
++sources at 0x220, selectors at 0x22C/0x22D, main sprite at 0x254, particle pool
++at 0x560, time phase at 0xC0B, scheduled-action fields at 0x134C–0x1368,
++action parameter at 0x13C4, palette blend counters at 0x142C/0x142E, and pending
++script ID at 0x17AC. Existing presentation channels, maps, overlay levels,
++origin, center, subject pointers, state and effect counters remain at their
++original offsets. Unknown storage is explicitly retained.
++
++`ScenePanelParticles` contains 32 0x34-byte particle records plus the resource
++pointer and active/cursor bytes. Its natural two-byte tail alignment occupies
++0xBE6–0xBE8, exactly before the existing subject array. Main sprite, graphics,
++script arguments, palette-loop scratch, and packed word-vector helper types
++also live in the shared header. Overlay initialization now uses the same
++`SceneOverlayResource` declaration as the overlay drawer. Interpretations are
++static and tentative; this work adds no runtime coverage claims.
++
++## Matching adaptations and naming
++
++Direct field access replaced the palette-source, palette-buffer, overlay-map,
++and shake-offset casts. Dynamic array byte offsets remain where they index
++palette data. The scheduled-action initializer at 080592F4 retains two small
++runtime-offset adaptations: the interval store derives 0x134E from 0x1364,
++and the null callback store keeps 0x1360 in the original register. Replacing
++both with direct field addresses changed 25 bytes; restoring only the interval
++left three differing bytes. Both adaptations have comments in the unit.
++
++The background effect retains a packed bitfield/word union because its original
++code performs whole-word updates while preserving adjacent halfwords. Sprite
++helper prototypes were unchanged; no engine.h API incompatibility was found.
++
++Existing local aliases are preserved once each: ScenePanel_SetChannelTwo
++(08058168), ScenePanel_SetChannelFive (08058184), and
++ScenePanel_BeginReverseSequence (0805822C). The other functions already have
++published descriptive names. No symbol registry changes were made.
++
++## Verification and process
++
++All 52 individual functions passed after shared-type unification. The merged,
++formatted unit passed tools/check.py with zero differing bytes across the
++entire 6,856-byte range. make format and git diff --check passed.
++tools/progress.py reports unchanged matched bytes and register-pinned bytes.
++
++Ran tools/depin.py --write on the six previously hinted inputs: hint counts
++remained 2, 27, 12, 4, 35, and 2 respectively. No new pins or barriers were
++added. There were roughly 65 deliberate check compilations (individual and
++merged), plus about 88 automated hint-removal trials.
++
++Used tools/merge_unit.py's merge and --write workflow, replacing only its git rm
++operation in memory with ordinary file deletion to honor the driver's explicit
++no-git-metadata instruction. No tools were edited, no commits were made, and
++no shared docs or symbol inventories were edited.
++
++Full combined validation: `build/venv/bin/python tools/build.py` printed
++`build/boktai3.gba: OK`. The first attempt compiled all C but discovered this
++fresh worktree lacked `build/res/` extraction inputs required by shared gen/data.s.
++Copied the existing baseline resource inputs into the worktree's own build/res/
++(no sharing or modification of another build tree), then reran with cached C
++objects. The complete build and ROM comparison passed. Final matched-byte count equaled the baseline (no regression).
+diff --git a/src/fn/sub_08057960.c b/src/fn/sub_08057960.c
+deleted file mode 100644
+index ce8967f24..000000000
+--- a/src/fn/sub_08057960.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "scene_panel_effects.h"
+-void ScenePanel_SetEffectState(struct ScenePanel *input, u16 state)
+-{
+-    struct ScenePanelEffectsView *panel = (void *)input;
+-    panel->effectState = state;
+-    panel->effectFrame = 0;
+-}
+diff --git a/src/fn/sub_08057978.c b/src/fn/sub_08057978.c
+deleted file mode 100644
+index 810b92bef..000000000
+--- a/src/fn/sub_08057978.c
++++ /dev/null
+@@ -1,18 +0,0 @@
+-#include "scene_panel_effects.h"
+-struct ScenePanelScriptArguments {
+-    u32 count;
+-    s32 *values;
+-};
+-void ScenePanel_CallPendingScript(struct ScenePanel *input, u32 value)
+-{
+-    struct ScenePanelEffectsView *panel = (void *)input;
+-    u32 scriptId = panel->pendingScriptId;
+-    if (scriptId) {
+-        s32 argument;
+-        struct ScenePanelScriptArguments arguments;
+-        arguments.count = (arguments.count & 0xFFFF0000) | 1;
+-        argument = value;
+-        arguments.values = &argument;
+-        Script_Call(scriptId, &arguments);
+-    }
+-}
+diff --git a/src/fn/sub_080579B0.c b/src/fn/sub_080579B0.c
+deleted file mode 100644
+index d8f5a0d40..000000000
+--- a/src/fn/sub_080579B0.c
++++ /dev/null
+@@ -1,28 +0,0 @@
+-#include "scene_panel_effects.h"
+-void ScenePanel_UpdateParticles(struct ScenePanel *input)
+-{
+-    struct ScenePanelEffectsView *panel = (void *)input;
+-    struct ScenePanelParticles *particles = (void *)&panel->particleResource;
+-    if (particles->active) {
+-        u32 anyActive = 0;
+-        s32 i;
+-        for (i = 0; i < 32; i++) {
+-            struct ScenePanelParticle *particle = &particles->entries[i];
+-            if (particle->active) {
+-                if (particle->age >= particle->lifetime) {
+-                    particle->flags |= 1;
+-                    particle->active = 0;
+-                } else {
+-                    anyActive = 1;
+-                    particle->position.world.x += particle->velocity.world.x;
+-                    particle->position.world.y += particle->velocity.world.y;
+-                    particle->position.world.z += particle->velocity.world.z;
+-                    if (particle->age == 6)
+-                        SpriteDrawable_SelectTileFrame(particle, particles->resource, 3);
+-                    particle->age++;
+-                }
+-            }
+-        }
+-        particles->active = anyActive;
+-    }
+-}
+diff --git a/src/fn/sub_08057A44.c b/src/fn/sub_08057A44.c
+deleted file mode 100644
+index 665f3f7b4..000000000
+--- a/src/fn/sub_08057A44.c
++++ /dev/null
+@@ -1,20 +0,0 @@
+-#include "scene_panel_effects.h"
+-void ScenePanel_AddParticle(struct ScenePanel *input, union ScenePanelPosition *position,
+-                            union ScenePanelPosition *velocity, u32 lifetime, u32 renderMode)
+-{
+-    struct ScenePanelEffectsView *panel = (void *)input;
+-    struct ScenePanelParticles *particles = (void *)&panel->particleResource;
+-    struct ScenePanelParticle *particle = &particles->entries[particles->cursor];
+-    particle->flags &= ~1;
+-    particle->position = *position;
+-    particle->renderMode = renderMode;
+-    SpriteDrawable_SelectTileFrame(particle, particles->resource, 2);
+-    particle->velocity = *velocity;
+-    particle->age = 0;
+-    particle->lifetime = lifetime;
+-    particle->active = 1;
+-    particles->active = 1;
+-    particles->cursor++;
+-    if (particles->cursor > 31)
+-        particles->cursor = 0;
+-}
+diff --git a/src/fn/sub_08057ADC.c b/src/fn/sub_08057ADC.c
+deleted file mode 100644
+index b4fa5b5f3..000000000
+--- a/src/fn/sub_08057ADC.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "scene_panel_effects.h"
+-void ScenePanel_DestroyParticles(struct ScenePanel *input)
+-{
+-    struct ScenePanelEffectsView *panel = (void *)input;
+-    struct ScenePanelParticle *particle = panel->particleEntries;
+-    s32 i;
+-    for (i = 31; i >= 0; i--) {
+-        Effect_Remove(particle);
+-        particle++;
+-    }
+-}
+diff --git a/src/fn/sub_08057AFC.c b/src/fn/sub_08057AFC.c
+deleted file mode 100644
+index 4144d1175..000000000
+--- a/src/fn/sub_08057AFC.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-#include "scene_panel_effects.h"
+-void ScenePanel_InitParticles(struct ScenePanel *input)
+-{
+-    struct ScenePanelEffectsView *panel = (void *)input;
+-    struct ScenePanelParticles *particles = (void *)&panel->particleResource;
+-    s32 i;
+-    s32 scale;
+-    particles->resource = AnimData_FindEntry(0x1C1E);
+-    particles->active = 0;
+-    i = 0;
+-    scale = -4;
+-    for (; i < 32; i++) {
+-        struct ScenePanelParticle *particle = &particles->entries[i];
+-        sub_08217DE0(particle, particles->resource, 1);
+-        Effect_SetOrigin(particle, scale, scale);
+-        Effect_SetPalette(particle, 1);
+-        particle->active = 0;
+-    }
+-}
+diff --git a/src/fn/sub_08057B5C.c b/src/fn/sub_08057B5C.c
+deleted file mode 100644
+index 027f23a5a..000000000
+--- a/src/fn/sub_08057B5C.c
++++ /dev/null
+@@ -1,37 +0,0 @@
+-#include "scene_panel_effects.h"
+-void ScenePanel_SelectTimePalette(struct ScenePanel *input, s32 phase)
+-{
+-    struct ScenePanelEffectsView *panel = (void *)input;
+-    switch (panel->timePhase) {
+-        case 0:
+-            panel->previousPalette = 2;
+-            panel->targetPalette = 2;
+-            break;
+-        case 1:
+-            panel->previousPalette = 2;
+-            panel->targetPalette = 0;
+-            panel->paletteBlendActive = 1;
+-            panel->paletteBlendFrame = 0;
+-            break;
+-        case 2:
+-            panel->previousPalette = 0;
+-            panel->targetPalette = 0;
+-            break;
+-        case 3:
+-            panel->previousPalette = 0;
+-            panel->targetPalette = 1;
+-            panel->paletteBlendActive = 1;
+-            panel->paletteBlendFrame = 0;
+-            break;
+-        case 4:
+-            panel->previousPalette = 1;
+-            panel->targetPalette = 2;
+-            panel->paletteBlendActive = 1;
+-            panel->paletteBlendFrame = 0;
+-            break;
+-        case 5:
+-            panel->previousPalette = 2;
+-            panel->targetPalette = 2;
+-            break;
+-    }
+-}
+diff --git a/src/fn/sub_08057C58.c b/src/fn/sub_08057C58.c
+deleted file mode 100644
+index 018cb2f3a..000000000
+--- a/src/fn/sub_08057C58.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "scene_panel_effects.h"
+-s32 ScenePanel_IsSpriteVisible(struct ScenePanelMainSprite *sprite)
+-{
+-    if (sprite->active && !(sprite->flags & 1))
+-        return 1;
+-    return 0;
+-}
+diff --git a/src/fn/sub_08057C78.c b/src/fn/sub_08057C78.c
+deleted file mode 100644
+index 48133bbb5..000000000
+--- a/src/fn/sub_08057C78.c
++++ /dev/null
+@@ -1,21 +0,0 @@
+-#include "scene_panel_effects.h"
+-s32 ScenePanel_AdvancePaletteFrame(struct ScenePanelMainSprite *sprite)
+-{
+-    u16 *counter = &sprite->phaseCounter;
+-    u32 frame;
+-    (*counter)++;
+-    if (*counter > 129)
+-        *counter = 0;
+-    frame = *counter;
+-    if (frame <= 29)
+-        return 0;
+-    if (frame <= 39)
+-        return 1;
+-    if (frame <= 49)
+-        return 2;
+-    if (frame <= 109)
+-        return 3;
+-    if (frame <= 119)
+-        return 2;
+-    return 1;
+-}
+diff --git a/src/fn/sub_08057CB8.c b/src/fn/sub_08057CB8.c
+deleted file mode 100644
+index 860951981..000000000
+--- a/src/fn/sub_08057CB8.c
++++ /dev/null
+@@ -1,85 +0,0 @@
+-#include "scene_panel_effects.h"
+-void ScenePanel_InitTimePalette(struct ScenePanel *input)
+-{
+-    struct ScenePanelEffectsView *panel = (void *)input;
+-    u32 resourceIds[3];
+-    s32 i;
+-    const u16 *colors;
+-    const u16 *source;
+-    u16 *destination;
+-    if (Script_SeekToKeyword('A')) {
+-        u32 *write = resourceIds;
+-        i = 2;
+-        do {
+-            *write++ = Script_GetValue();
+-        } while (--i >= 0);
+-    } else {
+-        resourceIds[0] = 0x2365;
+-        resourceIds[1] = 0xF80C;
+-        resourceIds[2] = 0xA344;
+-    }
+-    {
+-        u32 *read;
+-        i = 0;
+-        read = resourceIds;
+-        do {
+-            u32 offset = i << 2;
+-            u8 *resource;
+-            resource = ScriptProc_Start(0x92B3, (u16)*read++);
+-            {
+-                u8 *base = ((u8 *)(*(&panel))) + 0x220;
+-                base += offset;
+-                *(const u16 **)base = (u16 *)(resource + 0x14);
+-            }
+-            i++;
+-        } while (i < 3);
+-    }
+-    panel->timePhase = SunClock_GetPhase();
+-    ScenePanel_SelectTimePalette((struct ScenePanel *)panel, panel->timePhase);
+-    panel->paletteBlendActive = 0;
+-    panel->paletteBlendFrame = 0;
+-    colors = panel->paletteSources[panel->targetPalette];
+-    {
+-        u8 *base = (u8 *)panel;
+-        destination = (u16 *)(base + 0x20);
+-    }
+-    source = colors;
+-    i = 15;
+-    do {
+-        CpuSet(source, destination, 0x04000008);
+-        destination += 16;
+-        source += 16;
+-    } while (--i >= 0);
+-    destination = gUnk_03004FC0;
+-    source = colors;
+-    i = 2;
+-    do {
+-        CpuSet(source, destination, 0x04000008);
+-        destination += 16;
+-        source += 16;
+-    } while (--i >= 0);
+-    i = 2;
+-    {
+-        u16 *channel = &panel->channels[2];
+-        do {
+-            *channel-- = i;
+-        } while (--i >= 0);
+-    }
+-    {
+-        struct ScenePanelMainSprite *sprite = &panel->mainSprite;
+-        if (ScenePanel_IsSpriteVisible(sprite)) {
+-            sprite->paletteFrame = ScenePanel_AdvancePaletteFrame(sprite);
+-            {
+-                struct ScenePanelGraphics *graphics = &sprite->graphics;
+-                u32 bank;
+-                u32 paletteFrame;
+-                bank = panel->targetPalette * 4;
+-                paletteFrame = sprite->paletteFrame;
+-                paletteFrame += 0x203;
+-                bank += paletteFrame;
+-                AnimData_SelectPaletteBank(graphics, bank);
+-            }
+-        }
+-    }
+-    panel->state = 0;
+-}
+diff --git a/src/fn/sub_08057E04.c b/src/fn/sub_08057E04.c
+deleted file mode 100644
+index 3a651a450..000000000
+--- a/src/fn/sub_08057E04.c
++++ /dev/null
+@@ -1,259 +0,0 @@
+-// MATCHING_CONCESSION: register-pinning
+-#include "scene_panel_effects.h"
+-/* Persistent loop state; empty barriers preserve the reviewed stack layout. */
+-struct ScenePanelPaletteScratch {
+-    s32 column;
+-    const u16 *previous;
+-    s32 remaining, nextRow;
+-    u32 rowOffset;
+-    u16 *paletteBase;
+-};
+-void ScenePanel_UpdateTimePalette(struct ScenePanel *input)
+-{
+-    register struct ScenePanelEffectsView *panel asm("r8") = (void *)input;
+-    struct ScenePanelPaletteScratch cache;
+-    u32 phase;
+-    u8 *phaseField;
+-    phase = SunClock_GetPhase();
+-    phaseField = &panel->timePhase;
+-    if (*phaseField != phase) {
+-        *phaseField = phase;
+-        ScenePanel_SelectTimePalette((struct ScenePanel *)panel, *phaseField);
+-    }
+-    if (panel->paletteBlendActive) {
+-        u16 *blendFrame;
+-        u32 nextFrame;
+-        panel->channelsDirty = 1;
+-        blendFrame = &panel->paletteBlendFrame;
+-        nextFrame = *blendFrame + 1;
+-        *blendFrame = nextFrame;
+-        if ((u16)nextFrame > 63) {
+-            const u16 *source;
+-            u32 paletteOffset = panel->targetPalette * 4;
+-            const u16 **sources = panel->paletteSources;
+-            u16 *destination;
+-            s32 i;
+-            sources = (void *)((u8 *)sources + paletteOffset);
+-            destination = &panel->paletteColors[0][0];
+-            source = *sources;
+-            for (i = 15; i >= 0; i--) {
+-                CpuSet(source, destination, 0x04000008);
+-                destination += 16;
+-                source += 16;
+-            }
+-            panel->paletteBlendActive = 0;
+-            {
+-                struct ScenePanelMainSprite *sprite = &panel->mainSprite;
+-                if (ScenePanel_IsSpriteVisible(sprite)) {
+-                    s32 frame = ScenePanel_AdvancePaletteFrame(sprite);
+-                    u16 *framePointer = &panel->mainSprite.paletteFrame;
+-                    *framePointer = frame;
+-                    {
+-                        struct ScenePanelGraphics *graphics = &panel->mainSprite.graphics;
+-                        u32 bank;
+-                        u32 frameValue;
+-                        bank = panel->targetPalette * 4;
+-                        frameValue = *framePointer;
+-                        frameValue += 0x203;
+-                        bank += frameValue;
+-                        AnimData_SelectPaletteBank(graphics, bank);
+-                    }
+-                }
+-            }
+-        } else {
+-            s32 newWeight;
+-            s32 oldWeight;
+-            register const u16 *previous asm("r12");
+-            const u16 *target;
+-            u32 paletteOffset;
+-            const u16 **sources;
+-            register s32 row asm("r0");
+-            {
+-                s32 sample = *blendFrame;
+-                s32 inverse = 64 - sample;
+-                oldWeight = inverse;
+-                newWeight = sample;
+-            }
+-            paletteOffset = panel->previousPalette * 4;
+-            sources = panel->paletteSources;
+-            previous = *(const u16 **)((u8 *)sources + paletteOffset);
+-            paletteOffset = panel->targetPalette * 4;
+-            sources = (void *)((u8 *)sources + paletteOffset);
+-            target = *sources;
+-            row = 0;
+-            {
+-                register u16 *base asm("r5") = &panel->paletteColors[0][0];
+-                cache.paletteBase = base;
+-            }
+-            do {
+-                cache.column = 0;
+-                {
+-                    register u32 rowOffset asm("r2") = row * 32;
+-                    cache.rowOffset = rowOffset;
+-                }
+-                cache.nextRow = row + 1;
+-                do {
+-                    register const u16 *previousView asm("r5") = previous;
+-                    u32 startColor = *previousView;
+-                    s32 redStart = 31;
+-                    s32 greenStart;
+-                    s32 redEnd;
+-                    u32 endColor;
+-                    s32 greenEnd;
+-                    register s32 channelMask asm("r5");
+-                    register s32 red asm("r5"), green asm("r2"), blue asm("r0");
+-                    redStart &= startColor;
+-                    startColor <<= 16;
+-                    greenStart = startColor >> 21;
+-                    redEnd = 31;
+-                    greenStart &= redEnd;
+-                    startColor >>= 26;
+-                    startColor &= redEnd;
+-                    endColor = *target;
+-                    redEnd &= endColor;
+-                    endColor <<= 16;
+-                    greenEnd = endColor >> 21;
+-                    channelMask = 31;
+-                    greenEnd &= channelMask;
+-                    endColor >>= 26;
+-                    endColor &= channelMask;
+-                    red = (oldWeight * redStart + newWeight * redEnd) >> 6;
+-                    green = (oldWeight * greenStart + newWeight * greenEnd) >> 6;
+-                    blue = (oldWeight * (s32)startColor + newWeight * (s32)endColor) >> 6;
+-
+-                    asm("" : "+m"(cache.column), "+m"(cache.rowOffset), "+m"(cache.paletteBase));
+-                    {
+-                        s32 column = cache.column;
+-                        register u32 offset asm("r1") = column * 2;
+-                        register u16 *destination asm("r1");
+-                        asm("" : : "r"(column));
+-                        offset += cache.rowOffset;
+-                        destination = (u16 *)((u8 *)cache.paletteBase + offset);
+-                        blue <<= 10;
+-                        green <<= 5;
+-                        blue |= green;
+-                        blue |= red;
+-                        *destination = blue;
+-                    }
+-                    {
+-                        register u32 step asm("r5") = 2;
+-                        asm("" : "+r"(step));
+-                        previous = (u16 *)((u8 *)previous + step);
+-                    }
+-                    target++;
+-                    asm("" : "+m"(cache.column));
+-                    cache.column++;
+-                } while (cache.column <= 15);
+-                row = cache.nextRow;
+-            } while (row <= 15);
+-            {
+-                struct ScenePanelMainSprite *sprite = &panel->mainSprite;
+-                if (ScenePanel_IsSpriteVisible(sprite)) {
+-                    s32 frame = ScenePanel_AdvancePaletteFrame(sprite);
+-                    u8 **ram = &gUnk_030042E4;
+-                    u32 offset;
+-                    u8 *ramBase;
+-                    register const u16 *target asm("r12");
+-                    u16 *destination;
+-                    offset = panel->previousPalette * 4;
+-                    frame += 0x203;
+-                    offset += frame;
+-                    offset <<= 5;
+-                    ramBase = *ram;
+-                    cache.previous = (u16 *)(ramBase + offset);
+-                    offset = panel->targetPalette * 4 + frame;
+-                    offset <<= 5;
+-                    target = (u16 *)(ramBase + offset);
+-                    destination = panel->mainSprite.paletteColors;
+-                    {
+-                        register s32 remaining asm("r5") = 15;
+-                        cache.remaining = remaining;
+-                    }
+-                    do {
+-                        register const u16 *previousView asm("r0") = cache.previous;
+-                        u32 startColor = *previousView;
+-                        s32 redStart = 31;
+-                        s32 greenStart;
+-                        register s32 startMask asm("r1");
+-                        s32 redEnd;
+-                        u32 endColor;
+-                        s32 greenEnd;
+-                        register s32 channelMask asm("r5");
+-                        s32 red, green, blue;
+-                        redStart &= startColor;
+-                        startColor <<= 16;
+-                        greenStart = startColor >> 21;
+-                        startMask = 31;
+-                        greenStart &= startMask;
+-                        startColor >>= 26;
+-                        startColor &= startMask;
+-                        {
+-                            register const u16 *targetView asm("r5") = target;
+-                            endColor = *targetView;
+-                        }
+-                        redEnd = 31;
+-                        redEnd &= endColor;
+-                        endColor <<= 16;
+-                        greenEnd = endColor >> 21;
+-                        channelMask = 31;
+-                        greenEnd &= channelMask;
+-                        endColor >>= 26;
+-                        endColor &= channelMask;
+-                        red = (oldWeight * redStart + newWeight * redEnd) >> 6;
+-                        green = (oldWeight * greenStart + newWeight * greenEnd) >> 6;
+-                        blue = (oldWeight * (s32)startColor + newWeight * (s32)endColor) >> 6;
+-
+-                        blue <<= 10;
+-                        green <<= 5;
+-                        blue |= green;
+-                        blue |= red;
+-                        *destination = blue;
+-                        {
+-                            register const u16 *next asm("r5") = cache.previous + 1;
+-                            cache.previous = next;
+-                        }
+-                        {
+-                            u32 step = 2;
+-                            target = (u16 *)((u8 *)target + step);
+-                        }
+-                        destination++;
+-                        {
+-                            register s32 remaining asm("r1") = cache.remaining - 1;
+-                            cache.remaining = remaining;
+-                            if (remaining < 0)
+-                                break;
+-                        }
+-                    } while (1);
+-                    panel->mainSprite.graphics.paletteOverride = panel->mainSprite.paletteColors;
+-                }
+-            }
+-        }
+-    } else {
+-        struct ScenePanelMainSprite *sprite = &panel->mainSprite;
+-        if (ScenePanel_IsSpriteVisible(sprite)) {
+-            s32 frame = ScenePanel_AdvancePaletteFrame(sprite);
+-            u16 *framePointer = &panel->mainSprite.paletteFrame;
+-            {
+-                register u32 oldFrame asm("r3") = *framePointer;
+-                asm("" : : "r"(oldFrame));
+-                if (frame != oldFrame) {
+-                    *framePointer = frame;
+-                    {
+-                        struct ScenePanelGraphics *graphics = &panel->mainSprite.graphics;
+-                        u32 bank;
+-                        u32 frameValue;
+-                        bank = panel->targetPalette * 4;
+-                        frameValue = *framePointer;
+-                        {
+-                            register u32 paletteBase asm("r5") = 0x203;
+-                            asm("" : "+r"(paletteBase));
+-                            frameValue += paletteBase;
+-                        }
+-                        bank += frameValue;
+-                        AnimData_SelectPaletteBank(graphics, bank);
+-                    }
+-                }
+-            }
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_080580C8.c b/src/fn/sub_080580C8.c
+deleted file mode 100644
+index 5c424e599..000000000
+--- a/src/fn/sub_080580C8.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "scene_panel_effects.h"
+-void ScenePanel_UpdatePaletteState(struct ScenePanel *input)
+-{
+-    struct ScenePanelEffectsView *panel = (void *)input;
+-    if (panel->state)
+-        panel->state(input);
+-    ScenePanel_UpdateTimePalette(input);
+-    if (panel->channelsDirty) {
+-        s32 i;
+-        for (i = 0; i < 3; i++)
+-            CpuSet(panel->paletteColors[panel->channels[i]], gUnk_03004FC0 + i * 16, 0x04000008);
+-        panel->channelsDirty = 0;
+-    }
+-}
+diff --git a/src/fn/sub_08058130.c b/src/fn/sub_08058130.c
+deleted file mode 100644
+index 182ac66b2..000000000
+--- a/src/fn/sub_08058130.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_SetChannelValue(struct ScenePanel *panel, s32 channel, u16 value)
+-{
+-    panel->channels[channel] = value;
+-    panel->channelsDirty = 1;
+-}
+diff --git a/src/fn/sub_08058150.c b/src/fn/sub_08058150.c
+deleted file mode 100644
+index 07819f48b..000000000
+--- a/src/fn/sub_08058150.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_SetState(struct ScenePanel *panel, void (*state)(struct ScenePanel *))
+-{
+-    panel->state = state;
+-    panel->stateFrame = 0;
+-}
+diff --git a/src/fn/sub_08058168.c b/src/fn/sub_08058168.c
+deleted file mode 100644
+index 8fa1769ee..000000000
+--- a/src/fn/sub_08058168.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "scene_panel.h"
+-/* ScenePanel_SetChannelTwo: Sets presentation channel 2 to value 2 and clears the state callback */
+-#define ScenePanel_SetChannelTwo sub_08058168
+-#define ScenePanel_SetChannelTwo sub_08058168
+-void ScenePanel_SetChannelTwo(struct ScenePanel *panel)
+-{
+-    ScenePanel_SetChannelValue(panel, 2, 2);
+-    ScenePanel_SetState(panel, 0);
+-}
+diff --git a/src/fn/sub_08058184.c b/src/fn/sub_08058184.c
+deleted file mode 100644
+index 8cad67803..000000000
+--- a/src/fn/sub_08058184.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "scene_panel.h"
+-/* ScenePanel_SetChannelFive: Sets presentation channel 2 to value 5 and clears the state callback */
+-#define ScenePanel_SetChannelFive sub_08058184
+-#define ScenePanel_SetChannelFive sub_08058184
+-void ScenePanel_SetChannelFive(struct ScenePanel *panel)
+-{
+-    ScenePanel_SetChannelValue(panel, 2, 5);
+-    ScenePanel_SetState(panel, 0);
+-}
+diff --git a/src/fn/sub_080581A0.c b/src/fn/sub_080581A0.c
+deleted file mode 100644
+index 75cbfcc24..000000000
+--- a/src/fn/sub_080581A0.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_BeginForwardSequence(struct ScenePanel *panel)
+-{
+-    ScenePanel_SetChannelValue(panel, 2, 3);
+-    ScenePanel_SetState(panel, ScenePanel_TickForwardThree);
+-}
+diff --git a/src/fn/sub_080581C0.c b/src/fn/sub_080581C0.c
+deleted file mode 100644
+index 14834b827..000000000
+--- a/src/fn/sub_080581C0.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_TickForwardThree(struct ScenePanel *panel)
+-{
+-    if (++panel->stateFrame > 7) {
+-        ScenePanel_SetChannelValue(panel, 2, 4);
+-        ScenePanel_SetState(panel, ScenePanel_TickForwardFour);
+-    }
+-}
+diff --git a/src/fn/sub_080581F8.c b/src/fn/sub_080581F8.c
+deleted file mode 100644
+index f5c15d304..000000000
+--- a/src/fn/sub_080581F8.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_TickForwardFour(struct ScenePanel *panel)
+-{
+-    if (++panel->stateFrame > 7) {
+-        ScenePanel_SetChannelValue(panel, 2, 5);
+-        ScenePanel_SetState(panel, 0);
+-    }
+-}
+diff --git a/src/fn/sub_0805822C.c b/src/fn/sub_0805822C.c
+deleted file mode 100644
+index b7ea3712e..000000000
+--- a/src/fn/sub_0805822C.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "scene_panel.h"
+-/* ScenePanel_BeginReverseSequence: Sets presentation channel 2 to value 4 and installs the reverse sequence callback */
+-#define ScenePanel_BeginReverseSequence sub_0805822C
+-#define ScenePanel_BeginReverseSequence sub_0805822C
+-void ScenePanel_BeginReverseSequence(struct ScenePanel *panel)
+-{
+-    ScenePanel_SetChannelValue(panel, 2, 4);
+-    ScenePanel_SetState(panel, ScenePanel_TickReverseFour);
+-}
+diff --git a/src/fn/sub_0805824C.c b/src/fn/sub_0805824C.c
+deleted file mode 100644
+index 8e92716f3..000000000
+--- a/src/fn/sub_0805824C.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_TickReverseFour(struct ScenePanel *panel)
+-{
+-    if (++panel->stateFrame > 7) {
+-        ScenePanel_SetChannelValue(panel, 2, 3);
+-        ScenePanel_SetState(panel, ScenePanel_TickReverseThree);
+-    }
+-}
+diff --git a/src/fn/sub_08058284.c b/src/fn/sub_08058284.c
+deleted file mode 100644
+index 763f3994d..000000000
+--- a/src/fn/sub_08058284.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_TickReverseThree(struct ScenePanel *panel)
+-{
+-    if (++panel->stateFrame > 7) {
+-        ScenePanel_SetChannelValue(panel, 2, 2);
+-        ScenePanel_SetState(panel, 0);
+-    }
+-}
+diff --git a/src/fn/sub_080582B8.c b/src/fn/sub_080582B8.c
+deleted file mode 100644
+index bdd39e5ad..000000000
+--- a/src/fn/sub_080582B8.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_BeginLongSequence(struct ScenePanel *panel)
+-{
+-    ScenePanel_SetChannelValue(panel, 2, 6);
+-    ScenePanel_SetState(panel, ScenePanel_TickLongSix);
+-    panel->transitionComplete = 0;
+-    panel->stateFrame = 0;
+-}
+diff --git a/src/fn/sub_080582EC.c b/src/fn/sub_080582EC.c
+deleted file mode 100644
+index 646efefc7..000000000
+--- a/src/fn/sub_080582EC.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_TickLongSix(struct ScenePanel *panel)
+-{
+-    if (++panel->stateFrame > 5) {
+-        ScenePanel_SetChannelValue(panel, 2, 7);
+-        ScenePanel_SetState(panel, ScenePanel_TickLongSeven);
+-    }
+-}
+diff --git a/src/fn/sub_08058324.c b/src/fn/sub_08058324.c
+deleted file mode 100644
+index 8bcd501a2..000000000
+--- a/src/fn/sub_08058324.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_TickLongSeven(struct ScenePanel *panel)
+-{
+-    if (++panel->stateFrame > 5) {
+-        ScenePanel_SetChannelValue(panel, 2, 8);
+-        ScenePanel_SetState(panel, ScenePanel_TickLongEight);
+-    }
+-}
+diff --git a/src/fn/sub_0805835C.c b/src/fn/sub_0805835C.c
+deleted file mode 100644
+index 1641d2078..000000000
+--- a/src/fn/sub_0805835C.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_TickLongEight(struct ScenePanel *panel)
+-{
+-    if (++panel->stateFrame > 5) {
+-        ScenePanel_SetChannelValue(panel, 2, 9);
+-        ScenePanel_SetState(panel, ScenePanel_TickLongNine);
+-    }
+-}
+diff --git a/src/fn/sub_08058394.c b/src/fn/sub_08058394.c
+deleted file mode 100644
+index 9e9be11a9..000000000
+--- a/src/fn/sub_08058394.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_TickLongNine(struct ScenePanel *panel)
+-{
+-    if (++panel->stateFrame > 5) {
+-        ScenePanel_SetChannelValue(panel, 2, 10);
+-        ScenePanel_SetState(panel, ScenePanel_TickLongTen);
+-    }
+-}
+diff --git a/src/fn/sub_080583CC.c b/src/fn/sub_080583CC.c
+deleted file mode 100644
+index f110869df..000000000
+--- a/src/fn/sub_080583CC.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_TickLongTen(struct ScenePanel *panel)
+-{
+-    if (++panel->stateFrame > 5) {
+-        ScenePanel_SetChannelValue(panel, 2, 11);
+-        ScenePanel_SetState(panel, ScenePanel_TickLongEleven);
+-    }
+-}
+diff --git a/src/fn/sub_08058404.c b/src/fn/sub_08058404.c
+deleted file mode 100644
+index c675c2a71..000000000
+--- a/src/fn/sub_08058404.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_TickLongEleven(struct ScenePanel *panel)
+-{
+-    if (++panel->stateFrame > 5) {
+-        ScenePanel_SetChannelValue(panel, 2, 2);
+-        ScenePanel_SetState(panel, 0);
+-        panel->transitionComplete = 1;
+-    }
+-}
+diff --git a/src/fn/sub_08058444.c b/src/fn/sub_08058444.c
+deleted file mode 100644
+index 0e10f802b..000000000
+--- a/src/fn/sub_08058444.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_BeginPulseSequence(struct ScenePanel *panel)
+-{
+-    ScenePanel_SetChannelValue(panel, 2, 12);
+-    ScenePanel_SetState(panel, ScenePanel_TickPulseTwelve);
+-}
+diff --git a/src/fn/sub_08058464.c b/src/fn/sub_08058464.c
+deleted file mode 100644
+index 11517e36e..000000000
+--- a/src/fn/sub_08058464.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_TickPulseRest(struct ScenePanel *panel)
+-{
+-    if (++panel->stateFrame > 37) {
+-        ScenePanel_SetChannelValue(panel, 2, 12);
+-        ScenePanel_SetState(panel, ScenePanel_TickPulseTwelve);
+-    }
+-}
+diff --git a/src/fn/sub_0805849C.c b/src/fn/sub_0805849C.c
+deleted file mode 100644
+index 95ca7af47..000000000
+--- a/src/fn/sub_0805849C.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_TickPulseTwelve(struct ScenePanel *panel)
+-{
+-    if (++panel->stateFrame > 7) {
+-        ScenePanel_SetChannelValue(panel, 2, 13);
+-        ScenePanel_SetState(panel, ScenePanel_TickPulseThirteen);
+-    }
+-}
+diff --git a/src/fn/sub_080584D4.c b/src/fn/sub_080584D4.c
+deleted file mode 100644
+index 3e578d8cf..000000000
+--- a/src/fn/sub_080584D4.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_TickPulseThirteen(struct ScenePanel *panel)
+-{
+-    if (++panel->stateFrame > 37) {
+-        ScenePanel_SetChannelValue(panel, 2, 12);
+-        ScenePanel_SetState(panel, ScenePanel_TickPulseTwo);
+-    }
+-}
+diff --git a/src/fn/sub_0805850C.c b/src/fn/sub_0805850C.c
+deleted file mode 100644
+index c48926421..000000000
+--- a/src/fn/sub_0805850C.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_TickPulseTwo(struct ScenePanel *panel)
+-{
+-    if (++panel->stateFrame > 7) {
+-        ScenePanel_SetChannelValue(panel, 2, 2);
+-        ScenePanel_SetState(panel, ScenePanel_TickPulseRest);
+-    }
+-}
+diff --git a/src/fn/sub_08058544.c b/src/fn/sub_08058544.c
+deleted file mode 100644
+index 7c1938639..000000000
+--- a/src/fn/sub_08058544.c
++++ /dev/null
+@@ -1,32 +0,0 @@
+-#include "scene_panel.h"
+-s32 ScenePanel_GetPaletteOffset(struct ScenePanel *panel)
+-{
+-    s32 result;
+-    switch (panel->paletteMode) {
+-        case 0:
+-            result = 8;
+-            break;
+-        case 1:
+-        case 2:
+-            result = 6;
+-            break;
+-        case 3:
+-            result = 4;
+-            break;
+-        case 4:
+-            result = 2;
+-            break;
+-        case 7:
+-        case 8:
+-            result = 10;
+-            break;
+-        case 9:
+-        case 10:
+-            result = 12;
+-            break;
+-        default:
+-            result = 0;
+-            break;
+-    }
+-    return result;
+-}
+diff --git a/src/fn/sub_080585AC.c b/src/fn/sub_080585AC.c
+deleted file mode 100644
+index 96dba53ec..000000000
+--- a/src/fn/sub_080585AC.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_LoadModePalette(struct ScenePanel *panel)
+-{
+-    u8 *palette = (u8 *)ScriptProc_Start(0x92B3, 0x313A) + 0x14;
+-    palette += ScenePanel_GetPaletteOffset(panel) << 5;
+-    CpuSet(palette, (void *)0x03004FC0, 0x04000010);
+-}
+diff --git a/src/fn/sub_080585E8.c b/src/fn/sub_080585E8.c
+deleted file mode 100644
+index 92861c9d3..000000000
+--- a/src/fn/sub_080585E8.c
++++ /dev/null
+@@ -1,21 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_InitBackground(struct ScenePanel *panel)
+-{
+-    void *map = ScriptProc_Start(0xC091, gUnk_08605A88[panel->resourceIndex]);
+-    s32 id;
+-    panel->backgroundMap = map;
+-    id = 0;
+-    Bg_SetupLayers(3, 0, map, 0, 0, 1, &id);
+-    Bg_SetLayerMap(1, panel->backgroundMap, 0);
+-    {
+-        u16 *control = &gUnk_03004BD8;
+-        s32 mask = ~0x200;
+-        *control = mask & *control;
+-    }
+-    Bg_SetPriority(1, 0);
+-    *(vu16 *)0x04000050 = 0x3C42;
+-    *(vu16 *)0x04000052 = 0x810;
+-    *(vu16 *)0x04000054 = 0;
+-    panel->palette = (u8 *)ScriptProc_Start(0x92B3, 0xF308) + 0x194;
+-    CpuSet(panel->palette, (void *)0x03005140, 0x04000008);
+-}
+diff --git a/src/fn/sub_080586B0.c b/src/fn/sub_080586B0.c
+deleted file mode 100644
+index c4d9d67d4..000000000
+--- a/src/fn/sub_080586B0.c
++++ /dev/null
+@@ -1,5 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_SetPresentationMode(struct ScenePanel *panel)
+-{
+-    panel->mode = 0x30;
+-}
+diff --git a/src/fn/sub_080586C0.c b/src/fn/sub_080586C0.c
+deleted file mode 100644
+index 69fddbc8b..000000000
+--- a/src/fn/sub_080586C0.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_BeginBackgroundBurst(void)
+-{
+-    if (gUnk_020004A4) {
+-        gUnk_020004A4->mode = 64;
+-        gUnk_020004A4->shakeOffset = 0;
+-        gUnk_020004A4->effectPhase = 1;
+-        Sound_PlaySong(297);
+-    }
+-}
+diff --git a/src/fn/sub_08058700.c b/src/fn/sub_08058700.c
+deleted file mode 100644
+index 47c8a434a..000000000
+--- a/src/fn/sub_08058700.c
++++ /dev/null
+@@ -1,209 +0,0 @@
+-#include "scene_panel.h"
+-
+-// MATCHING_CONCESSION: register-pinning
+-
+-void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
+-                                       s32 screenY)
+-{
+-    if (gUnk_02000710->unk618 > 0) {
+-        register u16 frame asm("r5") = panel->mode;
+-        u32 shifted = (u32)frame << 16;
+-        u32 value;
+-        s32 alpha;
+-        value = shifted >> 16;
+-        if (value == 0)
+-            goto hide;
+-        {
+-            u32 mask = 0x200;
+-            u16 *shadow = &gUnk_03004BD8;
+-            *shadow = mask | *shadow;
+-        }
+-        if (value > 31) {
+-            alpha = 16;
+-            if (value > 35) {
+-                gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+-                {
+-                    u32 offset = gUnk_03005308 * 2;
+-                    s32 sample = *(u16 *)(offset + RANDOM_TABLE_ADDR);
+-                    panel->shakeOffset = (sample >> 3) & 7;
+-                }
+-            } else
+-                panel->shakeOffset = 5;
+-        } else {
+-            alpha = shifted >> 17;
+-            if (!(frame & 3) && panel->shakeOffset > 0)
+-                panel->shakeOffset--;
+-        }
+-        {
+-            u32 blend = ((16 - alpha) >> 1) + 8;
+-            *(vu16 *)0x04000052 = (blend << 8) | alpha;
+-        }
+-        BgGfx_LoadTilemapSimple(1, tileX, tileY, screenX, screenY + panel->shakeOffset);
+-        panel->mode--;
+-    } else {
+-        CpuSet((u8 *)panel->palette + 32, (void *)0x03005140, 0x04000008);
+-        if (panel->effectPhase == 0) {
+-            s32 count;
+-            s32 alpha;
+-            {
+-                u32 mask = 0x200;
+-                u16 *shadow = &gUnk_03004BD8;
+-                *shadow = mask | *shadow;
+-            }
+-            if (++panel->mode > 63)
+-                panel->mode = 0;
+-            if (panel->mode > 32)
+-                count = (64 - panel->mode) >> 3;
+-            else
+-                count = panel->mode >> 3;
+-            alpha = count + 12;
+-            {
+-                u32 blend = ((16 - alpha) >> 1) + 8;
+-                *(vu16 *)0x04000052 = (blend << 8) | alpha;
+-            }
+-            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
+-            {
+-                u32 offset = gUnk_03005308 * 2;
+-                s32 sample = *(u16 *)(offset + RANDOM_TABLE_ADDR);
+-                panel->shakeOffset = (sample >> 3) & 7;
+-            }
+-            BgGfx_LoadTilemapSimple(1, tileX, tileY, screenX, screenY + panel->shakeOffset);
+-            {
+-                s32 zero = panel->mode & 3;
+-                if (zero == 0) {
+-                    struct ContactPackedVector position = panel->center, velocity;
+-                    position.x += 64;
+-                    position.z += 64;
+-                    velocity.x = 300;
+-                    velocity.y = 300;
+-                    velocity.z = 300;
+-                    SparkParticle_Spawn(&position, 1, &velocity, 0, zero, 48, 2, 1);
+-                }
+-            }
+-        } else {
+-            u16 *frame = &panel->mode;
+-            if (*frame == 0)
+-                goto hide;
+-            {
+-                union ScenePanelPackedVector {
+-                    struct ContactPackedVector packed;
+-                    struct {
+-                        u32 xy, zpad;
+-                    } words;
+-                } position, velocity;
+-                const u16 *table;
+-                register u32 indexMask asm("r8");
+-                u32 highMask;
+-                register union ScenePanelPackedVector *positionWords asm("r9");
+-                u32 next;
+-                position.packed = panel->center;
+-                {
+-                    register const u16 *load asm("r2") = (const u16 *)RANDOM_TABLE_ADDR;
+-                    asm("" : "+r"(load));
+-                    table = load;
+-                }
+-                {
+-                    u32 nextIndex = gUnk_03005308 + 1;
+-                    register u32 lowMask asm("r3") = 1023;
+-                    indexMask = lowMask;
+-                    gUnk_03005308 = nextIndex & lowMask;
+-                }
+-                {
+-                    s32 offset = Mod(table[gUnk_03005308], 500);
+-                    register s32 coordinate asm("r1");
+-                    {
+-                        union ScenePanelPackedVector *lowPosition = &position;
+-                        asm("" : "+r"(lowPosition));
+-                        positionWords = lowPosition;
+-                        coordinate = (u16)lowPosition->words.xy - 250;
+-                    }
+-                    coordinate += offset;
+-                    coordinate = (u16)coordinate;
+-                    highMask = 0xFFFF0000;
+-                    position.words.xy = (position.words.xy & highMask) | coordinate;
+-                }
+-                gUnk_03005308 = (gUnk_03005308 + 1) & indexMask;
+-                {
+-                    s32 offset = Mod(table[gUnk_03005308], 500);
+-                    s32 coordinate = ((s32)position.words.xy >> 16) - 250;
+-                    coordinate += offset;
+-                    coordinate = (u32)coordinate << 16;
+-                    {
+-                        u32 previous = position.words.xy;
+-                        u32 lowMask = 0xFFFF;
+-                        lowMask &= previous;
+-                        position.words.xy = lowMask | coordinate;
+-                    }
+-                }
+-                gUnk_03005308 = (gUnk_03005308 + 1) & indexMask;
+-                {
+-                    s32 offset = Mod(table[gUnk_03005308], 500);
+-                    register union ScenePanelPackedVector *lowPosition asm("r2") = positionWords;
+-                    register s32 coordinate asm("r1");
+-                    coordinate = (u16)lowPosition->words.zpad - 250;
+-                    coordinate += offset;
+-                    coordinate = (u16)coordinate;
+-                    lowPosition->words.zpad = (lowPosition->words.zpad & highMask) | coordinate;
+-                }
+-                velocity.words.xy &= highMask;
+-                {
+-                    u32 mask;
+-                    next = gUnk_03005308 + 1;
+-                    mask = indexMask;
+-                    next &= mask;
+-                    {
+-                        u32 sample = table[next];
+-                        sample &= 31;
+-                        sample += 16;
+-                        velocity.words.xy = sample << 16;
+-                    }
+-                    velocity.words.zpad &= highMask;
+-                    gUnk_03005308 = (next + 1) & mask;
+-                }
+-                {
+-                    u32 life = table[gUnk_03005308];
+-                    life &= 7;
+-                    life += 8;
+-                    ScenePanel_AddParticle(panel, (union ScenePanelPosition *)positionWords,
+-                                           (union ScenePanelPosition *)&velocity, life, 1);
+-                }
+-            }
+-            {
+-                u32 mask = 0x200;
+-                u16 *shadow = &gUnk_03004BD8;
+-                *shadow = mask | *shadow;
+-            }
+-            {
+-                u16 *lowFrame = frame;
+-                register u32 frameValue asm("r0");
+-                register s32 alpha asm("r2");
+-                frameValue = *lowFrame;
+-                alpha = frameValue >> 2;
+-                {
+-                    u32 blend = ((16 - alpha) >> 1) + 8;
+-                    *(vu16 *)0x04000052 = (blend << 8) | alpha;
+-                }
+-            }
+-            {
+-                u16 *conditionFrame = frame;
+-                if (!(*conditionFrame & 7)) {
+-                    u32 shakeOffset = 0x132A;
+-                    s16 *shake;
+-                    shake = (void *)((u8 *)panel + shakeOffset);
+-                    if (*shake <= 6)
+-                        (*shake)++;
+-                }
+-            }
+-            BgGfx_LoadTilemapSimple(1, tileX, tileY, screenX, screenY + panel->shakeOffset);
+-            if (--panel->mode == 0)
+-                ScenePanel_CallPendingScript(gUnk_020004A4, 9);
+-        }
+-    }
+-    return;
+-hide: {
+-    u16 *shadow = &gUnk_03004BD8;
+-    u32 mask = ~0x200;
+-    mask &= *shadow;
+-    *shadow = mask;
+-}
+-}
+diff --git a/src/fn/sub_08058AF4.c b/src/fn/sub_08058AF4.c
+deleted file mode 100644
+index 9aaf62fe7..000000000
+--- a/src/fn/sub_08058AF4.c
++++ /dev/null
+@@ -1,30 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_InitOverlay(struct ScenePanel *panel)
+-{
+-    struct OverlayResource {
+-        u32 words[3];
+-        u8 *pointers[3];
+-    } resource, *original = ScriptProc_Start(0xC091, 0xAD57);
+-    panel->overlayMap = original;
+-    resource = *original;
+-    resource.pointers[0] += (u32)original;
+-    resource.pointers[1] += (u32)original;
+-    resource.pointers[2] += (u32)original;
+-    {
+-        u32 mask = 0x800;
+-        u16 *shadow = &gUnk_03004BD8;
+-        *shadow = mask | *shadow;
+-    }
+-    Bg_SetPriority(3, 1);
+-    panel->overlayPalette = (u8 *)ScriptProc_Start(0x92B3, 0xE2BA) + 0x114;
+-    {
+-        u32 level = 5;
+-        u8 *levels = panel->targetLevels;
+-        s32 i = 3;
+-        do {
+-            levels[4] = level;
+-            levels[0] = level;
+-            levels++;
+-        } while (--i >= 0);
+-    }
+-}
+diff --git a/src/fn/sub_08058B88.c b/src/fn/sub_08058B88.c
+deleted file mode 100644
+index 60143a876..000000000
+--- a/src/fn/sub_08058B88.c
++++ /dev/null
+@@ -1,27 +0,0 @@
+-// MATCHING_CONCESSION: register-pinning
+-#include "scene_panel.h"
+-void ScenePanel_CycleOverlayPalette(struct ScenePanel *panel)
+-{
+-    u32 frame;
+-    {
+-        u16 *counter = &panel->overlayFrame;
+-        u32 old = *counter;
+-        frame = old + 1;
+-        *counter = frame;
+-    }
+-    {
+-        register u32 mask asm("r0") = 0xFFFF;
+-        u32 savedMask;
+-        register u32 masked asm("r0");
+-        asm("" : "+r"(mask));
+-        savedMask = mask;
+-        masked = frame;
+-        asm("" : "+r"(savedMask), "+r"(masked));
+-        masked &= savedMask;
+-        masked &= 1;
+-        if (masked) {
+-            u32 bank = ((u16)frame >> 1) & 3;
+-            CpuSet((u8 *)panel->overlayPalette + bank * 32, (void *)0x03005120, 0x04000008);
+-        }
+-    }
+-}
+diff --git a/src/fn/sub_08058BD8.c b/src/fn/sub_08058BD8.c
+deleted file mode 100644
+index 960ccf0bd..000000000
+--- a/src/fn/sub_08058BD8.c
++++ /dev/null
+@@ -1,360 +0,0 @@
+-#include "scene_panel_overlay.h"
+-
+-// MATCHING_CONCESSION: register-pinning
+-
+-static inline s32 scaleSceneOverlay(s32 value)
+-{
+-    if (value >= 0)
+-        return value >> 5;
+-    return -((-value) >> 5);
+-}
+-#define truncate5(value) ((value) >= 0 ? (value) >> 5 : -((-(value)) >> 5))
+-#define truncate1(value) ((value) >= 0 ? (value) >> 1 : -((-(value)) >> 1))
+-void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
+-                            s32 screenY)
+-{
+-    struct SceneOverlayResource resource;
+-    struct SceneOverlayMapEntry entry;
+-    struct ContactPosition projected;
+-    struct ContactPosition *projectedPointer;
+-    struct ContactPosition *projectedRead;
+-    struct SceneOverlayMapEntry *entries;
+-    s32 width, height;
+-    u16 *blocks;
+-    s32 blockStride, centerX, centerY, playSound = 0;
+-    struct SceneOverlayMapEntry *entryPointer;
+-    s32 next;
+-    register u16 *output asm("r9");
+-    s32 slot;
+-    ScenePanel_CycleOverlayPalette(panel);
+-    {
+-        struct SceneOverlayLayer *layer;
+-        register u16 tx asm("r2");
+-        u16 ty;
+-        u16 *buffer;
+-        register u32 reloadScratch asm("r3");
+-        tx = tileX;
+-        layer = &gUnk_03004CC0;
+-        layer->tileX = tx;
+-        ty = tileY;
+-        layer->tileY = ty;
+-        layer->screenX = screenX;
+-        layer->screenY = screenY;
+-        buffer = layer->output;
+-        asm("" : : "r"(buffer));
+-        output = buffer;
+-        asm("" : : "r"(output));
+-        /* Defined opaque scratch keeps the signed-load reloads in their original registers. */
+-        asm("" : "=r"(reloadScratch));
+-        width = layer->width * 2;
+-        asm("" : : "r"(width), "r"(tx), "r"(reloadScratch), "r"(buffer));
+-        height = layer->height * 2;
+-    }
+-    {
+-        s32 x, z asm("r4"), sum asm("r4");
+-        s32 y;
+-        const struct ContactPosition *origin;
+-        projectedPointer = &projected;
+-        asm("" : "+r"(projectedPointer));
+-        origin = &panel->overlayOrigin;
+-        asm("" : "+r"(origin));
+-        x = origin->x;
+-        z = origin->z;
+-        {
+-            s32 value = 3 * (x - z);
+-            projectedRead = projectedPointer;
+-            projectedPointer->x = scaleSceneOverlay(value);
+-        }
+-        {
+-            s32 subtotal = x + z;
+-            s32 value;
+-            value = scaleSceneOverlay(3 * subtotal);
+-            sum = value;
+-        }
+-        y = scaleSceneOverlay(3 * origin->y);
+-        projectedPointer->y = sum - y;
+-        {
+-            s32 projectedZ = sum + y;
+-            projectedPointer->z = projectedZ;
+-        }
+-    }
+-    centerX = projectedRead->x + gUnk_030042A0.offsetX;
+-    centerY = projected.y + gUnk_030042A0.offsetY;
+-    centerX = truncate3(centerX);
+-    centerY = truncate3(centerY) & ~1;
+-    centerX -= tileX;
+-    centerY -= tileY;
+-    {
+-        struct SceneOverlayResource *mapBase = panel->overlayMap;
+-        resource = *mapBase;
+-        resource.maps = (void *)((u32)resource.maps + (u32)mapBase);
+-        entries = resource.maps;
+-    }
+-    panel->overlayChanged = 0;
+-    slot = 0;
+-    if (slot < panel->overlayCount) {
+-        entryPointer = &entry;
+-        do {
+-            s32 old;
+-            s32 target;
+-            register u8 *current asm("r2");
+-            register u8 *base asm("r0");
+-            register s32 maxX asm("r12"), maxY asm("r8");
+-            s32 minX;
+-            register s32 minY asm("r2");
+-            if (panel->paletteMode == 0 || (panel->effectState != 10 && panel->effectState != 14))
+-                target = 5;
+-            else {
+-                u32 state = panel->subjects[slot]->displayState;
+-                target = 5;
+-                if (state == 4)
+-                    target = 0;
+-            }
+-            panel->targetLevels[slot] = target;
+-            base = panel->currentLevels;
+-            current = base + slot;
+-            old = *current;
+-            next = slot + 1;
+-            if (old == target)
+-                goto nextSlot;
+-            if (target == 0)
+-                playSound = 1;
+-            *current = target;
+-            switch (slot) {
+-                case 0:
+-                    maxX = centerX;
+-                    maxY = centerY;
+-                    minX = maxX - 7;
+-                    if (minX < 0)
+-                        minX = 0;
+-                    minY = maxY - 6;
+-                    if (minY < 0)
+-                        minY = 0;
+-                    break;
+-                case 2:
+-                    maxX = centerX + 7;
+-                    maxY = centerY;
+-                    minX = centerX;
+-                    if (minX < 0)
+-                        minX = 0;
+-                    minY = maxY - 6;
+-                    if (minY < 0)
+-                        minY = 0;
+-                    break;
+-                case 3:
+-                    maxX = centerX;
+-                    maxY = centerY + 4;
+-                    minX = maxX - 7;
+-                    if (minX < 0)
+-                        minX = 0;
+-                    minY = centerY;
+-                    if (minY < 0)
+-                        minY = 0;
+-                    break;
+-                case 1:
+-                    maxX = centerX + 7;
+-                    maxY = centerY + 4;
+-                    minX = centerX;
+-                    if (minX < 0)
+-                        minX = 0;
+-                    minY = centerY;
+-                    if (minY < 0)
+-                        minY = 0;
+-                    break;
+-                default:
+-                    minX = -1;
+-                    minY = minX;
+-                    maxY = minX;
+-                    maxX = maxY;
+-                    break;
+-            }
+-            asm("" : "+r"(maxX), "+r"(maxY), "+r"(minY), "+r"(slot) : "r"(target));
+-            slot++;
+-            next = slot;
+-            if (maxX < 0 || maxY < 0 || minX > 31 || minY > 31)
+-                goto nextSlot;
+-            {
+-                struct SceneOverlayLayer *strideLayer = &gUnk_03004CC0;
+-                blockStride = strideLayer->width >> 4;
+-            }
+-            if (target == 5) {
+-                register s32 y asm("r6");
+-                for (y = minY; y < maxY; y += 2) {
+-                    register s32 x asm("r5");
+-                    for (x = minX; x < maxX; x++) {
+-                        register s32 dx asm("r2") = tileX + x, dy asm("r1") = tileY + y;
+-                        dx &= 31;
+-                        dy &= 31;
+-                        {
+-                            register s32 index asm("r0") = dy * 32;
+-                            asm("" : "+r"(index));
+-                            index = dx + index;
+-                            output[index] = 0;
+-                        }
+-                        dy++;
+-                        dy *= 32;
+-                        asm("" : "+r"(dy));
+-                        dx += dy;
+-                        asm("" : "+r"(dx));
+-                        output[dx] = 0;
+-                    }
+-                }
+-            } else {
+-                register s32 y asm("r6");
+-                u32 ringMask;
+-                target++;
+-                {
+-                    u32 offset = target * sizeof(entry);
+-                    struct SceneOverlayMapEntry *destination, *mapEntries asm("r3");
+-                    destination = entryPointer;
+-                    mapEntries = entries;
+-                    offset += (u32)mapEntries;
+-                    *destination = *(struct SceneOverlayMapEntry *)offset;
+-                }
+-                {
+-                    void **mapSlot;
+-                    struct ScenePanel *mapPanel = panel;
+-                    u32 mapOffset = 0x4DC;
+-                    struct SceneOverlayMapEntry *copied;
+-                    u32 relative;
+-                    mapSlot = (void *)((u8 *)mapPanel + mapOffset);
+-                    copied = entryPointer;
+-                    relative = (u32)copied->blocks;
+-                    {
+-                        u32 mapBase = (u32)*mapSlot;
+-                        relative += mapBase;
+-                        copied->blocks = (void *)relative;
+-                        gUnk_03004CC0.map = (void *)relative;
+-                        blocks = (void *)relative;
+-                    }
+-                }
+-                for (y = minY; y < maxY; y += 2) {
+-                    s32 x;
+-                    for (x = minX; x < maxX; x++) {
+-                        s32 dx, dy;
+-                        u16 *secondOutput;
+-                        u32 secondValue;
+-                        ringMask = 31;
+-                        dx = tileX + x;
+-                        dy = tileY + y;
+-                        if (dx < 0 || dy < 0 || dx >= width || dy >= height) {
+-                            {
+-                                u32 mask = ringMask;
+-                                dx &= mask;
+-                                dy &= mask;
+-                            }
+-                            {
+-                                register s32 index asm("r0") = dy * 32;
+-                                asm("" : "+r"(index));
+-                                index = dx + index;
+-                                index = (u32)(output + index);
+-                                secondValue = 0;
+-                                *(u16 *)index = secondValue;
+-                            }
+-                            {
+-                                register s32 index asm("r0") = dy + 1;
+-                                index *= 32;
+-                                asm("" : "+r"(index));
+-                                index = dx + index;
+-                                secondOutput = output + index;
+-                            }
+-                        } else {
+-                            register s32 blockX asm("r1"), block asm("r2"), halfX asm("r1"),
+-                                halfY asm("r0");
+-                            u32 tile;
+-                            {
+-                                s32 scaled = truncate5(dx);
+-                                asm("" : "+r"(scaled));
+-                                blockX = scaled;
+-                            }
+-                            {
+-                                register s32 scaled asm("r0") = truncate5(dy);
+-                                scaled *= blockStride;
+-                                scaled = blockX + scaled;
+-                                block = scaled << 8;
+-                            }
+-                            dx &= ringMask;
+-                            dy &= ringMask;
+-                            {
+-                                s32 scaled = truncate1(dx);
+-                                asm("" : "+r"(scaled));
+-                                halfX = scaled;
+-                            }
+-                            halfY = truncate1(dy);
+-                            halfY <<= 4;
+-                            {
+-                                s32 index = block + halfX + halfY;
+-                                tile = blocks[index];
+-                            }
+-                            {
+-                                u32 parity = dx & 1;
+-                                if (parity == 0) {
+-                                    u16 *firstOutput;
+-                                    u16 *tileBuffer, *pair;
+-                                    {
+-                                        register s32 index asm("r1") = dy * 32;
+-                                        index = dx + index;
+-                                        firstOutput = output + index;
+-                                    }
+-                                    /* Preserve the original destination spill while loading the tile table. */
+-                                    asm(""
+-                                        :
+-                                        : "m"(((struct SceneOverlayLayer *)SCENE_OVERLAY_LAYER_ADDR)
+-                                                  ->tiles),
+-                                          "r"(parity));
+-                                    tileBuffer =
+-                                        ((struct SceneOverlayLayer *)SCENE_OVERLAY_LAYER_ADDR)
+-                                            ->tiles;
+-                                    tile <<= 3;
+-                                    tile += (u32)tileBuffer;
+-                                    pair = (void *)tile;
+-                                    {
+-                                        u32 value = *pair;
+-                                        *firstOutput = value;
+-                                    }
+-                                    {
+-                                        register s32 index asm("r0") = dy + 1;
+-                                        index *= 32;
+-                                        index = dx + index;
+-                                        secondOutput = output + index;
+-                                    }
+-                                    secondValue = pair[2];
+-                                } else {
+-                                    u16 *firstOutput;
+-                                    u16 *tileBuffer, *pair;
+-                                    {
+-                                        register s32 index asm("r1") = dy * 32;
+-                                        index = dx + index;
+-                                        firstOutput = output + index;
+-                                    }
+-                                    tileBuffer =
+-                                        ((struct SceneOverlayLayer *)SCENE_OVERLAY_LAYER_ADDR)
+-                                            ->tiles;
+-                                    tile <<= 3;
+-                                    tile += (u32)tileBuffer;
+-                                    pair = (void *)tile;
+-                                    {
+-                                        u32 value = pair[1];
+-                                        *firstOutput = value;
+-                                    }
+-                                    {
+-                                        register s32 index asm("r0") = dy + 1;
+-                                        index *= 32;
+-                                        index = dx + index;
+-                                        secondOutput = output + index;
+-                                    }
+-                                    secondValue = pair[3];
+-                                }
+-                            }
+-                        }
+-                        *secondOutput = secondValue;
+-                    }
+-                }
+-            }
+-        nextSlot:
+-            slot = next;
+-        } while (slot < panel->overlayCount);
+-    }
+-    if (playSound)
+-        Sound_PlaySong(245);
+-}
+diff --git a/src/fn/sub_08058FF8.c b/src/fn/sub_08058FF8.c
+deleted file mode 100644
+index 3f98195d5..000000000
+--- a/src/fn/sub_08058FF8.c
++++ /dev/null
+@@ -1,13 +0,0 @@
+-#include "scene_panel.h"
+-void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *, s32, s32, s32, s32);
+-void ScenePanel_DrawOverlay(struct ScenePanel *, s32, s32, s32, s32);
+-void ScenePanel_DrawBackgroundLayers(struct ScenePanel *panel)
+-{
+-    s32 x = gUnk_03005418[0] + gUnk_030042A0.offsetX;
+-    s32 y = gUnk_03005418[1] + gUnk_030042A0.offsetY;
+-    s32 tileX = truncate3(x - 128), tileY = truncate3(y - 128) & ~1;
+-    x -= 120;
+-    y -= 80;
+-    ScenePanel_UpdateBackgroundEffect(panel, tileX, tileY, x, y);
+-    ScenePanel_DrawOverlay(panel, tileX, tileY, x, y);
+-}
+diff --git a/src/fn/sub_0805907C.c b/src/fn/sub_0805907C.c
+deleted file mode 100644
+index c1d560e6b..000000000
+--- a/src/fn/sub_0805907C.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "scene_panel_schedule.h"
+-void ScenePanel_RunScheduledAction(struct ScenePanel *input)
+-{
+-    struct ScenePanelScheduleView *panel = (void *)input;
+-    if (panel->action)
+-        Callback_InvokeActor(panel, panel->action);
+-}
+diff --git a/src/fn/sub_08059098.c b/src/fn/sub_08059098.c
+deleted file mode 100644
+index f6b610adc..000000000
+--- a/src/fn/sub_08059098.c
++++ /dev/null
+@@ -1,4 +0,0 @@
+-#include "scene_panel_schedule.h"
+-void ScenePanel_NoOpAction(struct ScenePanel *panel)
+-{
+-}
+diff --git a/src/fn/sub_0805909C.c b/src/fn/sub_0805909C.c
+deleted file mode 100644
+index fe127fed3..000000000
+--- a/src/fn/sub_0805909C.c
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#include "scene_panel_schedule.h"
+-void ScenePanel_TickHazardSpawner(struct ScenePanel *input)
+-{
+-    struct ScenePanelScheduleView *panel = (void *)input;
+-    if (++panel->frame >= panel->interval) {
+-        struct ContactPackedVector position;
+-        position.x = gUnk_02000710->positionX;
+-        position.y = gUnk_02000710->positionY;
+-        position.z = gUnk_02000710->positionZ;
+-        AnimatedHazard_Create(&position, panel->resourceId, 30);
+-        panel->step = 0;
+-        panel->frame = 0;
+-    }
+-}
+diff --git a/src/fn/sub_0805911C.c b/src/fn/sub_0805911C.c
+deleted file mode 100644
+index 02aee67db..000000000
+--- a/src/fn/sub_0805911C.c
++++ /dev/null
+@@ -1,24 +0,0 @@
+-#include "scene_panel_schedule.h"
+-void ScenePanel_TickAngleBurst(struct ScenePanel *input)
+-{
+-    struct ScenePanelScheduleView *panel = (void *)input;
+-    if (panel->frame < panel->interval) {
+-        if (++panel->frame >= panel->interval) {
+-            u32 angle = Math_Atan2(gUnk_02000710->positionX - panel->origin.x,
+-                                   gUnk_02000710->positionZ - panel->origin.z) -
+-                        32;
+-            u16 *destination = &panel->angle;
+-            *destination = angle & 255;
+-            panel->step = 0;
+-        }
+-    } else {
+-        if (panel->step == 0)
+-            Sound_PlaySong(994);
+-        if (panel->step <= 4) {
+-            DirectionBurst_Emit(&panel->origin, panel->angle, 12, 100);
+-            panel->angle = (panel->angle + 16) & 255;
+-            panel->step++;
+-        } else
+-            panel->frame = 0;
+-    }
+-}
+diff --git a/src/fn/sub_080591E8.c b/src/fn/sub_080591E8.c
+deleted file mode 100644
+index e36611fa8..000000000
+--- a/src/fn/sub_080591E8.c
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#include "scene_panel_schedule.h"
+-void ScenePanel_TickHandlePosition(struct ScenePanel *input)
+-{
+-    struct ScenePanelScheduleView *panel = (void *)input;
+-    if (++panel->frame >= panel->interval) {
+-        Math_Atan2(gUnk_02000710->positionX - panel->origin.x,
+-                   gUnk_02000710->positionZ - panel->origin.z);
+-        sub_08190B10(panel->handle, &panel->origin, gUnk_0824DEA4);
+-        panel->step = 0;
+-        panel->frame = 0;
+-    }
+-}
+diff --git a/src/fn/sub_08059264.c b/src/fn/sub_08059264.c
+deleted file mode 100644
+index 1df5cb026..000000000
+--- a/src/fn/sub_08059264.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "scene_panel_schedule.h"
+-void ScenePanel_TickHandleActionA(struct ScenePanel *input)
+-{
+-    struct ScenePanelScheduleView *panel = (void *)input;
+-    if (++panel->frame >= panel->interval) {
+-        SceneBurstEmitter_RequestCleanup(panel->handle);
+-        panel->step = 0;
+-        panel->frame = 0;
+-    }
+-}
+diff --git a/src/fn/sub_080592AC.c b/src/fn/sub_080592AC.c
+deleted file mode 100644
+index 9d9657832..000000000
+--- a/src/fn/sub_080592AC.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "scene_panel_schedule.h"
+-void ScenePanel_TickHandleActionB(struct ScenePanel *input)
+-{
+-    struct ScenePanelScheduleView *panel = (void *)input;
+-    if (++panel->frame >= panel->interval) {
+-        SceneOrbitHazard_Activate(panel->handle);
+-        panel->step = 0;
+-        panel->frame = 0;
+-    }
+-}
+diff --git a/src/fn/sub_080592F4.c b/src/fn/sub_080592F4.c
+deleted file mode 100644
+index fb245c573..000000000
+--- a/src/fn/sub_080592F4.c
++++ /dev/null
+@@ -1,59 +0,0 @@
+-// MATCHING_CONCESSION: register-pinning
+-#include "scene_panel_schedule.h"
+-void ScenePanel_InitScheduledAction(struct ScenePanel *input)
+-{
+-    struct ScenePanelScheduleView *panel = (void *)input;
+-    register void (**destination)(struct ScenePanel *) asm("r1");
+-    register void (*action)(struct ScenePanel *) asm("r0");
+-    u32 handleOffset;
+-    /* Cache the handle offset for the neighboring interval field. */
+-    switch (panel->resourceIndex) {
+-        case 0:
+-            panel->handle = 0;
+-            handleOffset = 0x1364;
+-            destination = &panel->action;
+-            action = ScenePanel_TickHazardSpawner;
+-            goto shared;
+-        case 1:
+-            panel->handle = Hresvelgr_CreateShotPool(panel->resourceId, 10, 30);
+-            handleOffset = 0x1364;
+-            destination = &panel->action;
+-            action = ScenePanel_TickAngleBurst;
+-            goto shared;
+-        case 2:
+-            panel->handle = SceneEffect_CreateMovingTask(panel->resourceId, &panel->origin);
+-            handleOffset = 0x1364;
+-            destination = &panel->action;
+-            action = ScenePanel_TickHandleActionB;
+-            goto shared;
+-        case 3:
+-            panel->handle = ScenePanelEffect_Create(panel->resourceId, panel->parameter);
+-            panel->action = ScenePanel_TickHandlePosition;
+-            panel->interval = 360;
+-            break;
+-        case 4:
+-            panel->handle = SceneEffect_CreateEntryTask(panel->resourceId, &panel->origin);
+-            handleOffset = 0x1364;
+-            destination = &panel->action;
+-            action = ScenePanel_TickHandleActionA;
+-        shared:
+-            *destination = action;
+-            {
+-                u16 *interval;
+-                u32 duration;
+-                handleOffset -= 0x16;
+-                interval = (void *)((u8 *)panel + handleOffset);
+-                duration = 600;
+-                *interval = duration;
+-            }
+-            break;
+-        default: {
+-            register u32 offset asm("r0") = 0x1360;
+-            asm("" : "+r"(offset));
+-            destination = (void *)((u8 *)panel + offset);
+-            action = 0;
+-            *destination = action;
+-            break;
+-        }
+-    }
+-}
+diff --git a/src/scene_panel_presentation.c b/src/scene_panel_presentation.c
+new file mode 100644
+index 000000000..b36fc2d14
+--- /dev/null
++++ b/src/scene_panel_presentation.c
+@@ -0,0 +1,1540 @@
++#include "scene_panel_effects.h"
++#include "scene_panel.h"
++#include "scene_panel_overlay.h"
++#include "scene_panel_schedule.h"
++
++void ScenePanel_SetEffectState(struct ScenePanel *input, u16 state)
++{
++    struct ScenePanel *panel = input;
++    panel->effectState = state;
++    panel->effectFrame = 0;
++}
++
++void ScenePanel_CallPendingScript(struct ScenePanel *input, u32 value)
++{
++    struct ScenePanel *panel = input;
++    u32 scriptId = panel->pendingScriptId;
++    if (scriptId) {
++        s32 argument;
++        struct ScenePanelScriptArguments arguments;
++        arguments.count = (arguments.count & 0xFFFF0000) | 1;
++        argument = value;
++        arguments.values = &argument;
++        Script_Call(scriptId, &arguments);
++    }
++}
++
++void ScenePanel_UpdateParticles(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = input;
++    struct ScenePanelParticles *particles = &panel->particles;
++    if (particles->active) {
++        u32 anyActive = 0;
++        s32 i;
++        for (i = 0; i < 32; i++) {
++            struct ScenePanelParticle *particle = &particles->entries[i];
++            if (particle->active) {
++                if (particle->age >= particle->lifetime) {
++                    particle->flags |= 1;
++                    particle->active = 0;
++                } else {
++                    anyActive = 1;
++                    particle->position.world.x += particle->velocity.world.x;
++                    particle->position.world.y += particle->velocity.world.y;
++                    particle->position.world.z += particle->velocity.world.z;
++                    if (particle->age == 6)
++                        SpriteDrawable_SelectTileFrame(particle, particles->resource, 3);
++                    particle->age++;
++                }
++            }
++        }
++        particles->active = anyActive;
++    }
++}
++
++void ScenePanel_AddParticle(struct ScenePanel *input, union ScenePanelPosition *position,
++                            union ScenePanelPosition *velocity, u32 lifetime, u32 renderMode)
++{
++    struct ScenePanel *panel = input;
++    struct ScenePanelParticles *particles = &panel->particles;
++    struct ScenePanelParticle *particle = &particles->entries[particles->cursor];
++    particle->flags &= ~1;
++    particle->position = *position;
++    particle->renderMode = renderMode;
++    SpriteDrawable_SelectTileFrame(particle, particles->resource, 2);
++    particle->velocity = *velocity;
++    particle->age = 0;
++    particle->lifetime = lifetime;
++    particle->active = 1;
++    particles->active = 1;
++    particles->cursor++;
++    if (particles->cursor > 31)
++        particles->cursor = 0;
++}
++
++void ScenePanel_DestroyParticles(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = input;
++    struct ScenePanelParticle *particle = panel->particles.entries;
++    s32 i;
++    for (i = 31; i >= 0; i--) {
++        Effect_Remove(particle);
++        particle++;
++    }
++}
++
++void ScenePanel_InitParticles(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = input;
++    struct ScenePanelParticles *particles = &panel->particles;
++    s32 i;
++    s32 scale;
++    particles->resource = AnimData_FindEntry(0x1C1E);
++    particles->active = 0;
++    i = 0;
++    scale = -4;
++    for (; i < 32; i++) {
++        struct ScenePanelParticle *particle = &particles->entries[i];
++        sub_08217DE0(particle, particles->resource, 1);
++        Effect_SetOrigin(particle, scale, scale);
++        Effect_SetPalette(particle, 1);
++        particle->active = 0;
++    }
++}
++
++void ScenePanel_SelectTimePalette(struct ScenePanel *input, s32 phase)
++{
++    struct ScenePanel *panel = input;
++    switch (panel->timePhase) {
++        case 0:
++            panel->previousPalette = 2;
++            panel->targetPalette = 2;
++            break;
++        case 1:
++            panel->previousPalette = 2;
++            panel->targetPalette = 0;
++            panel->paletteBlendActive = 1;
++            panel->paletteBlendFrame = 0;
++            break;
++        case 2:
++            panel->previousPalette = 0;
++            panel->targetPalette = 0;
++            break;
++        case 3:
++            panel->previousPalette = 0;
++            panel->targetPalette = 1;
++            panel->paletteBlendActive = 1;
++            panel->paletteBlendFrame = 0;
++            break;
++        case 4:
++            panel->previousPalette = 1;
++            panel->targetPalette = 2;
++            panel->paletteBlendActive = 1;
++            panel->paletteBlendFrame = 0;
++            break;
++        case 5:
++            panel->previousPalette = 2;
++            panel->targetPalette = 2;
++            break;
++    }
++}
++
++s32 ScenePanel_IsSpriteVisible(struct ScenePanelMainSprite *sprite)
++{
++    if (sprite->active && !(sprite->flags & 1))
++        return 1;
++    return 0;
++}
++
++s32 ScenePanel_AdvancePaletteFrame(struct ScenePanelMainSprite *sprite)
++{
++    u16 *counter = &sprite->phaseCounter;
++    u32 frame;
++    (*counter)++;
++    if (*counter > 129)
++        *counter = 0;
++    frame = *counter;
++    if (frame <= 29)
++        return 0;
++    if (frame <= 39)
++        return 1;
++    if (frame <= 49)
++        return 2;
++    if (frame <= 109)
++        return 3;
++    if (frame <= 119)
++        return 2;
++    return 1;
++}
++
++// MATCHING_CONCESSION: register-pinning
++void ScenePanel_InitTimePalette(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = input;
++    u32 resourceIds[3];
++    s32 i;
++    const u16 *colors;
++    const u16 *source;
++    u16 *destination;
++    if (Script_SeekToKeyword('A')) {
++        u32 *write = resourceIds;
++        i = 2;
++        do {
++            *write++ = Script_GetValue();
++        } while (--i >= 0);
++    } else {
++        resourceIds[0] = 0x2365;
++        resourceIds[1] = 0xF80C;
++        resourceIds[2] = 0xA344;
++    }
++    {
++        u32 *read;
++        i = 0;
++        read = resourceIds;
++        do {
++            u32 offset = i << 2;
++            u8 *resource;
++            resource = ScriptProc_Start(0x92B3, (u16)*read++);
++            {
++                const u16 **base = panel->paletteSources;
++                base = (void *)((u8 *)base + offset);
++                *base = (u16 *)(resource + 0x14);
++            }
++            i++;
++        } while (i < 3);
++    }
++    panel->timePhase = SunClock_GetPhase();
++    ScenePanel_SelectTimePalette(panel, panel->timePhase);
++    panel->paletteBlendActive = 0;
++    panel->paletteBlendFrame = 0;
++    colors = panel->paletteSources[panel->targetPalette];
++    {
++        register struct ScenePanel *base asm("r6") = panel;
++        asm("" : "+r"(base));
++        destination = base->paletteColors[0];
++    }
++    source = colors;
++    i = 15;
++    do {
++        CpuSet(source, destination, 0x04000008);
++        destination += 16;
++        source += 16;
++    } while (--i >= 0);
++    destination = gUnk_03004FC0;
++    source = colors;
++    i = 2;
++    do {
++        CpuSet(source, destination, 0x04000008);
++        destination += 16;
++        source += 16;
++    } while (--i >= 0);
++    i = 2;
++    {
++        u16 *channel = &panel->channels[2];
++        do {
++            *channel-- = i;
++        } while (--i >= 0);
++    }
++    {
++        struct ScenePanelMainSprite *sprite = &panel->mainSprite;
++        if (ScenePanel_IsSpriteVisible(sprite)) {
++            sprite->paletteFrame = ScenePanel_AdvancePaletteFrame(sprite);
++            {
++                struct ScenePanelGraphics *graphics = &sprite->graphics;
++                u32 bank;
++                u32 paletteFrame;
++                bank = panel->targetPalette * 4;
++                paletteFrame = sprite->paletteFrame;
++                paletteFrame += 0x203;
++                bank += paletteFrame;
++                AnimData_SelectPaletteBank(graphics, bank);
++            }
++        }
++    }
++    panel->state = 0;
++}
++
++/* Persistent loop state; empty barriers preserve the reviewed stack layout. */
++
++// MATCHING_CONCESSION: register-pinning
++void ScenePanel_UpdateTimePalette(struct ScenePanel *input)
++{
++    register struct ScenePanel *panel asm("r8") = input;
++    struct ScenePanelPaletteScratch cache;
++    u32 phase;
++    u8 *phaseField;
++    phase = SunClock_GetPhase();
++    phaseField = &panel->timePhase;
++    if (*phaseField != phase) {
++        *phaseField = phase;
++        ScenePanel_SelectTimePalette(panel, *phaseField);
++    }
++    if (panel->paletteBlendActive) {
++        u16 *blendFrame;
++        u32 nextFrame;
++        panel->channelsDirty = 1;
++        blendFrame = &panel->paletteBlendFrame;
++        nextFrame = *blendFrame + 1;
++        *blendFrame = nextFrame;
++        if ((u16)nextFrame > 63) {
++            const u16 *source;
++            u32 paletteOffset = panel->targetPalette * 4;
++            const u16 **sources = panel->paletteSources;
++            u16 *destination;
++            s32 i;
++            sources = (void *)((u8 *)sources + paletteOffset);
++            destination = &panel->paletteColors[0][0];
++            source = *sources;
++            for (i = 15; i >= 0; i--) {
++                CpuSet(source, destination, 0x04000008);
++                destination += 16;
++                source += 16;
++            }
++            panel->paletteBlendActive = 0;
++            {
++                struct ScenePanelMainSprite *sprite = &panel->mainSprite;
++                if (ScenePanel_IsSpriteVisible(sprite)) {
++                    s32 frame = ScenePanel_AdvancePaletteFrame(sprite);
++                    u16 *framePointer = &panel->mainSprite.paletteFrame;
++                    *framePointer = frame;
++                    {
++                        struct ScenePanelGraphics *graphics = &panel->mainSprite.graphics;
++                        u32 bank;
++                        u32 frameValue;
++                        bank = panel->targetPalette * 4;
++                        frameValue = *framePointer;
++                        frameValue += 0x203;
++                        bank += frameValue;
++                        AnimData_SelectPaletteBank(graphics, bank);
++                    }
++                }
++            }
++        } else {
++            s32 newWeight;
++            s32 oldWeight;
++            register const u16 *previous asm("r12");
++            const u16 *target;
++            u32 paletteOffset;
++            const u16 **sources;
++            register s32 row asm("r0");
++            {
++                s32 sample = *blendFrame;
++                s32 inverse = 64 - sample;
++                oldWeight = inverse;
++                newWeight = sample;
++            }
++            paletteOffset = panel->previousPalette * 4;
++            sources = panel->paletteSources;
++            previous = *(const u16 **)((u8 *)sources + paletteOffset);
++            paletteOffset = panel->targetPalette * 4;
++            sources = (void *)((u8 *)sources + paletteOffset);
++            target = *sources;
++            row = 0;
++            {
++                register u16 *base asm("r5") = &panel->paletteColors[0][0];
++                cache.paletteBase = base;
++            }
++            do {
++                cache.column = 0;
++                {
++                    register u32 rowOffset asm("r2") = row * 32;
++                    cache.rowOffset = rowOffset;
++                }
++                cache.nextRow = row + 1;
++                do {
++                    register const u16 *previousView asm("r5") = previous;
++                    u32 startColor = *previousView;
++                    s32 redStart = 31;
++                    s32 greenStart;
++                    s32 redEnd;
++                    u32 endColor;
++                    s32 greenEnd;
++                    register s32 channelMask asm("r5");
++                    register s32 red asm("r5"), green asm("r2"), blue asm("r0");
++                    redStart &= startColor;
++                    startColor <<= 16;
++                    greenStart = startColor >> 21;
++                    redEnd = 31;
++                    greenStart &= redEnd;
++                    startColor >>= 26;
++                    startColor &= redEnd;
++                    endColor = *target;
++                    redEnd &= endColor;
++                    endColor <<= 16;
++                    greenEnd = endColor >> 21;
++                    channelMask = 31;
++                    greenEnd &= channelMask;
++                    endColor >>= 26;
++                    endColor &= channelMask;
++                    red = (oldWeight * redStart + newWeight * redEnd) >> 6;
++                    green = (oldWeight * greenStart + newWeight * greenEnd) >> 6;
++                    blue = (oldWeight * (s32)startColor + newWeight * (s32)endColor) >> 6;
++
++                    asm("" : "+m"(cache.column), "+m"(cache.rowOffset), "+m"(cache.paletteBase));
++                    {
++                        s32 column = cache.column;
++                        register u32 offset asm("r1") = column * 2;
++                        register u16 *destination asm("r1");
++                        asm("" : : "r"(column));
++                        offset += cache.rowOffset;
++                        destination = (u16 *)((u8 *)cache.paletteBase + offset);
++                        blue <<= 10;
++                        green <<= 5;
++                        blue |= green;
++                        blue |= red;
++                        *destination = blue;
++                    }
++                    {
++                        register u32 step asm("r5") = 2;
++                        asm("" : "+r"(step));
++                        previous = (u16 *)((u8 *)previous + step);
++                    }
++                    target++;
++                    asm("" : "+m"(cache.column));
++                    cache.column++;
++                } while (cache.column <= 15);
++                row = cache.nextRow;
++            } while (row <= 15);
++            {
++                struct ScenePanelMainSprite *sprite = &panel->mainSprite;
++                if (ScenePanel_IsSpriteVisible(sprite)) {
++                    s32 frame = ScenePanel_AdvancePaletteFrame(sprite);
++                    u8 **ram = &gUnk_030042E4;
++                    u32 offset;
++                    u8 *ramBase;
++                    register const u16 *target asm("r12");
++                    u16 *destination;
++                    offset = panel->previousPalette * 4;
++                    frame += 0x203;
++                    offset += frame;
++                    offset <<= 5;
++                    ramBase = *ram;
++                    cache.previous = (u16 *)(ramBase + offset);
++                    offset = panel->targetPalette * 4 + frame;
++                    offset <<= 5;
++                    target = (u16 *)(ramBase + offset);
++                    destination = panel->mainSprite.paletteColors;
++                    {
++                        register s32 remaining asm("r5") = 15;
++                        cache.remaining = remaining;
++                    }
++                    do {
++                        register const u16 *previousView asm("r0") = cache.previous;
++                        u32 startColor = *previousView;
++                        s32 redStart = 31;
++                        s32 greenStart;
++                        register s32 startMask asm("r1");
++                        s32 redEnd;
++                        u32 endColor;
++                        s32 greenEnd;
++                        register s32 channelMask asm("r5");
++                        s32 red, green, blue;
++                        redStart &= startColor;
++                        startColor <<= 16;
++                        greenStart = startColor >> 21;
++                        startMask = 31;
++                        greenStart &= startMask;
++                        startColor >>= 26;
++                        startColor &= startMask;
++                        {
++                            register const u16 *targetView asm("r5") = target;
++                            endColor = *targetView;
++                        }
++                        redEnd = 31;
++                        redEnd &= endColor;
++                        endColor <<= 16;
++                        greenEnd = endColor >> 21;
++                        channelMask = 31;
++                        greenEnd &= channelMask;
++                        endColor >>= 26;
++                        endColor &= channelMask;
++                        red = (oldWeight * redStart + newWeight * redEnd) >> 6;
++                        green = (oldWeight * greenStart + newWeight * greenEnd) >> 6;
++                        blue = (oldWeight * (s32)startColor + newWeight * (s32)endColor) >> 6;
++
++                        blue <<= 10;
++                        green <<= 5;
++                        blue |= green;
++                        blue |= red;
++                        *destination = blue;
++                        {
++                            register const u16 *next asm("r5") = cache.previous + 1;
++                            cache.previous = next;
++                        }
++                        {
++                            u32 step = 2;
++                            target = (u16 *)((u8 *)target + step);
++                        }
++                        destination++;
++                        {
++                            register s32 remaining asm("r1") = cache.remaining - 1;
++                            cache.remaining = remaining;
++                            if (remaining < 0)
++                                break;
++                        }
++                    } while (1);
++                    panel->mainSprite.graphics.paletteOverride = panel->mainSprite.paletteColors;
++                }
++            }
++        }
++    } else {
++        struct ScenePanelMainSprite *sprite = &panel->mainSprite;
++        if (ScenePanel_IsSpriteVisible(sprite)) {
++            s32 frame = ScenePanel_AdvancePaletteFrame(sprite);
++            u16 *framePointer = &panel->mainSprite.paletteFrame;
++            {
++                register u32 oldFrame asm("r3") = *framePointer;
++                asm("" : : "r"(oldFrame));
++                if (frame != oldFrame) {
++                    *framePointer = frame;
++                    {
++                        struct ScenePanelGraphics *graphics = &panel->mainSprite.graphics;
++                        u32 bank;
++                        u32 frameValue;
++                        bank = panel->targetPalette * 4;
++                        frameValue = *framePointer;
++                        {
++                            register u32 paletteBase asm("r5") = 0x203;
++                            asm("" : "+r"(paletteBase));
++                            frameValue += paletteBase;
++                        }
++                        bank += frameValue;
++                        AnimData_SelectPaletteBank(graphics, bank);
++                    }
++                }
++            }
++        }
++    }
++}
++
++void ScenePanel_UpdatePaletteState(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = input;
++    if (panel->state)
++        panel->state(input);
++    ScenePanel_UpdateTimePalette(input);
++    if (panel->channelsDirty) {
++        s32 i;
++        for (i = 0; i < 3; i++)
++            CpuSet(panel->paletteColors[panel->channels[i]], gUnk_03004FC0 + i * 16, 0x04000008);
++        panel->channelsDirty = 0;
++    }
++}
++
++void ScenePanel_SetChannelValue(struct ScenePanel *panel, s32 channel, u16 value)
++{
++    panel->channels[channel] = value;
++    panel->channelsDirty = 1;
++}
++
++void ScenePanel_SetState(struct ScenePanel *panel, void (*state)(struct ScenePanel *))
++{
++    panel->state = state;
++    panel->stateFrame = 0;
++}
++
++/* ScenePanel_SetChannelTwo: Sets presentation channel 2 to value 2 and clears the state callback */
++
++#define ScenePanel_SetChannelTwo sub_08058168
++
++void ScenePanel_SetChannelTwo(struct ScenePanel *panel)
++{
++    ScenePanel_SetChannelValue(panel, 2, 2);
++    ScenePanel_SetState(panel, 0);
++}
++
++/* ScenePanel_SetChannelFive: Sets presentation channel 2 to value 5 and clears the state callback */
++
++#define ScenePanel_SetChannelFive sub_08058184
++
++void ScenePanel_SetChannelFive(struct ScenePanel *panel)
++{
++    ScenePanel_SetChannelValue(panel, 2, 5);
++    ScenePanel_SetState(panel, 0);
++}
++
++void ScenePanel_BeginForwardSequence(struct ScenePanel *panel)
++{
++    ScenePanel_SetChannelValue(panel, 2, 3);
++    ScenePanel_SetState(panel, ScenePanel_TickForwardThree);
++}
++
++void ScenePanel_TickForwardThree(struct ScenePanel *panel)
++{
++    if (++panel->stateFrame > 7) {
++        ScenePanel_SetChannelValue(panel, 2, 4);
++        ScenePanel_SetState(panel, ScenePanel_TickForwardFour);
++    }
++}
++
++void ScenePanel_TickForwardFour(struct ScenePanel *panel)
++{
++    if (++panel->stateFrame > 7) {
++        ScenePanel_SetChannelValue(panel, 2, 5);
++        ScenePanel_SetState(panel, 0);
++    }
++}
++
++/* ScenePanel_BeginReverseSequence: Sets presentation channel 2 to value 4 and installs the reverse sequence callback */
++
++#define ScenePanel_BeginReverseSequence sub_0805822C
++
++void ScenePanel_BeginReverseSequence(struct ScenePanel *panel)
++{
++    ScenePanel_SetChannelValue(panel, 2, 4);
++    ScenePanel_SetState(panel, ScenePanel_TickReverseFour);
++}
++
++void ScenePanel_TickReverseFour(struct ScenePanel *panel)
++{
++    if (++panel->stateFrame > 7) {
++        ScenePanel_SetChannelValue(panel, 2, 3);
++        ScenePanel_SetState(panel, ScenePanel_TickReverseThree);
++    }
++}
++
++void ScenePanel_TickReverseThree(struct ScenePanel *panel)
++{
++    if (++panel->stateFrame > 7) {
++        ScenePanel_SetChannelValue(panel, 2, 2);
++        ScenePanel_SetState(panel, 0);
++    }
++}
++
++void ScenePanel_BeginLongSequence(struct ScenePanel *panel)
++{
++    ScenePanel_SetChannelValue(panel, 2, 6);
++    ScenePanel_SetState(panel, ScenePanel_TickLongSix);
++    panel->transitionComplete = 0;
++    panel->stateFrame = 0;
++}
++
++void ScenePanel_TickLongSix(struct ScenePanel *panel)
++{
++    if (++panel->stateFrame > 5) {
++        ScenePanel_SetChannelValue(panel, 2, 7);
++        ScenePanel_SetState(panel, ScenePanel_TickLongSeven);
++    }
++}
++
++void ScenePanel_TickLongSeven(struct ScenePanel *panel)
++{
++    if (++panel->stateFrame > 5) {
++        ScenePanel_SetChannelValue(panel, 2, 8);
++        ScenePanel_SetState(panel, ScenePanel_TickLongEight);
++    }
++}
++
++void ScenePanel_TickLongEight(struct ScenePanel *panel)
++{
++    if (++panel->stateFrame > 5) {
++        ScenePanel_SetChannelValue(panel, 2, 9);
++        ScenePanel_SetState(panel, ScenePanel_TickLongNine);
++    }
++}
++
++void ScenePanel_TickLongNine(struct ScenePanel *panel)
++{
++    if (++panel->stateFrame > 5) {
++        ScenePanel_SetChannelValue(panel, 2, 10);
++        ScenePanel_SetState(panel, ScenePanel_TickLongTen);
++    }
++}
++
++void ScenePanel_TickLongTen(struct ScenePanel *panel)
++{
++    if (++panel->stateFrame > 5) {
++        ScenePanel_SetChannelValue(panel, 2, 11);
++        ScenePanel_SetState(panel, ScenePanel_TickLongEleven);
++    }
++}
++
++void ScenePanel_TickLongEleven(struct ScenePanel *panel)
++{
++    if (++panel->stateFrame > 5) {
++        ScenePanel_SetChannelValue(panel, 2, 2);
++        ScenePanel_SetState(panel, 0);
++        panel->transitionComplete = 1;
++    }
++}
++
++void ScenePanel_BeginPulseSequence(struct ScenePanel *panel)
++{
++    ScenePanel_SetChannelValue(panel, 2, 12);
++    ScenePanel_SetState(panel, ScenePanel_TickPulseTwelve);
++}
++
++void ScenePanel_TickPulseRest(struct ScenePanel *panel)
++{
++    if (++panel->stateFrame > 37) {
++        ScenePanel_SetChannelValue(panel, 2, 12);
++        ScenePanel_SetState(panel, ScenePanel_TickPulseTwelve);
++    }
++}
++
++void ScenePanel_TickPulseTwelve(struct ScenePanel *panel)
++{
++    if (++panel->stateFrame > 7) {
++        ScenePanel_SetChannelValue(panel, 2, 13);
++        ScenePanel_SetState(panel, ScenePanel_TickPulseThirteen);
++    }
++}
++
++void ScenePanel_TickPulseThirteen(struct ScenePanel *panel)
++{
++    if (++panel->stateFrame > 37) {
++        ScenePanel_SetChannelValue(panel, 2, 12);
++        ScenePanel_SetState(panel, ScenePanel_TickPulseTwo);
++    }
++}
++
++void ScenePanel_TickPulseTwo(struct ScenePanel *panel)
++{
++    if (++panel->stateFrame > 7) {
++        ScenePanel_SetChannelValue(panel, 2, 2);
++        ScenePanel_SetState(panel, ScenePanel_TickPulseRest);
++    }
++}
++
++s32 ScenePanel_GetPaletteOffset(struct ScenePanel *panel)
++{
++    s32 result;
++    switch (panel->paletteMode) {
++        case 0:
++            result = 8;
++            break;
++        case 1:
++        case 2:
++            result = 6;
++            break;
++        case 3:
++            result = 4;
++            break;
++        case 4:
++            result = 2;
++            break;
++        case 7:
++        case 8:
++            result = 10;
++            break;
++        case 9:
++        case 10:
++            result = 12;
++            break;
++        default:
++            result = 0;
++            break;
++    }
++    return result;
++}
++
++void ScenePanel_LoadModePalette(struct ScenePanel *panel)
++{
++    u8 *palette = (u8 *)ScriptProc_Start(0x92B3, 0x313A) + 0x14;
++    palette += ScenePanel_GetPaletteOffset(panel) << 5;
++    CpuSet(palette, (void *)0x03004FC0, 0x04000010);
++}
++
++void ScenePanel_InitBackground(struct ScenePanel *panel)
++{
++    void *map = ScriptProc_Start(0xC091, gUnk_08605A88[panel->resourceIndex]);
++    s32 id;
++    panel->backgroundMap = map;
++    id = 0;
++    Bg_SetupLayers(3, 0, map, 0, 0, 1, &id);
++    Bg_SetLayerMap(1, panel->backgroundMap, 0);
++    {
++        u16 *control = &gUnk_03004BD8;
++        s32 mask = ~0x200;
++        *control = mask & *control;
++    }
++    Bg_SetPriority(1, 0);
++    *(vu16 *)0x04000050 = 0x3C42;
++    *(vu16 *)0x04000052 = 0x810;
++    *(vu16 *)0x04000054 = 0;
++    panel->palette = (u8 *)ScriptProc_Start(0x92B3, 0xF308) + 0x194;
++    CpuSet(panel->palette, (void *)0x03005140, 0x04000008);
++}
++
++void ScenePanel_SetPresentationMode(struct ScenePanel *panel)
++{
++    panel->mode = 0x30;
++}
++
++void ScenePanel_BeginBackgroundBurst(void)
++{
++    if (gUnk_020004A4) {
++        gUnk_020004A4->mode = 64;
++        gUnk_020004A4->shakeOffset = 0;
++        gUnk_020004A4->effectPhase = 1;
++        Sound_PlaySong(297);
++    }
++}
++
++// MATCHING_CONCESSION: register-pinning
++void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
++                                       s32 screenY)
++{
++    if (gUnk_02000710->unk618 > 0) {
++        register u16 frame asm("r5") = panel->mode;
++        u32 shifted = (u32)frame << 16;
++        u32 value;
++        s32 alpha;
++        value = shifted >> 16;
++        if (value == 0)
++            goto hide;
++        {
++            u32 mask = 0x200;
++            u16 *shadow = &gUnk_03004BD8;
++            *shadow = mask | *shadow;
++        }
++        if (value > 31) {
++            alpha = 16;
++            if (value > 35) {
++                gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
++                {
++                    u32 offset = gUnk_03005308 * 2;
++                    s32 sample = *(u16 *)(offset + RANDOM_TABLE_ADDR);
++                    panel->shakeOffset = (sample >> 3) & 7;
++                }
++            } else
++                panel->shakeOffset = 5;
++        } else {
++            alpha = shifted >> 17;
++            if (!(frame & 3) && panel->shakeOffset > 0)
++                panel->shakeOffset--;
++        }
++        {
++            u32 blend = ((16 - alpha) >> 1) + 8;
++            *(vu16 *)0x04000052 = (blend << 8) | alpha;
++        }
++        BgGfx_LoadTilemapSimple(1, tileX, tileY, screenX, screenY + panel->shakeOffset);
++        panel->mode--;
++    } else {
++        CpuSet((u8 *)panel->palette + 32, (void *)0x03005140, 0x04000008);
++        if (panel->effectPhase == 0) {
++            s32 count;
++            s32 alpha;
++            {
++                u32 mask = 0x200;
++                u16 *shadow = &gUnk_03004BD8;
++                *shadow = mask | *shadow;
++            }
++            if (++panel->mode > 63)
++                panel->mode = 0;
++            if (panel->mode > 32)
++                count = (64 - panel->mode) >> 3;
++            else
++                count = panel->mode >> 3;
++            alpha = count + 12;
++            {
++                u32 blend = ((16 - alpha) >> 1) + 8;
++                *(vu16 *)0x04000052 = (blend << 8) | alpha;
++            }
++            gUnk_03005308 = (gUnk_03005308 + 1) & 1023;
++            {
++                u32 offset = gUnk_03005308 * 2;
++                s32 sample = *(u16 *)(offset + RANDOM_TABLE_ADDR);
++                panel->shakeOffset = (sample >> 3) & 7;
++            }
++            BgGfx_LoadTilemapSimple(1, tileX, tileY, screenX, screenY + panel->shakeOffset);
++            {
++                s32 zero = panel->mode & 3;
++                if (zero == 0) {
++                    struct ContactPackedVector position = panel->center, velocity;
++                    position.x += 64;
++                    position.z += 64;
++                    velocity.x = 300;
++                    velocity.y = 300;
++                    velocity.z = 300;
++                    SparkParticle_Spawn(&position, 1, &velocity, 0, zero, 48, 2, 1);
++                }
++            }
++        } else {
++            u16 *frame = &panel->mode;
++            if (*frame == 0)
++                goto hide;
++            {
++                union ScenePanelPackedVector position, velocity;
++                const u16 *table;
++                register u32 indexMask asm("r8");
++                u32 highMask;
++                register union ScenePanelPackedVector *positionWords asm("r9");
++                u32 next;
++                position.packed = panel->center;
++                {
++                    register const u16 *load asm("r2") = (const u16 *)RANDOM_TABLE_ADDR;
++                    asm("" : "+r"(load));
++                    table = load;
++                }
++                {
++                    u32 nextIndex = gUnk_03005308 + 1;
++                    register u32 lowMask asm("r3") = 1023;
++                    indexMask = lowMask;
++                    gUnk_03005308 = nextIndex & lowMask;
++                }
++                {
++                    s32 offset = Mod(table[gUnk_03005308], 500);
++                    register s32 coordinate asm("r1");
++                    {
++                        union ScenePanelPackedVector *lowPosition = &position;
++                        asm("" : "+r"(lowPosition));
++                        positionWords = lowPosition;
++                        coordinate = (u16)lowPosition->words.xy - 250;
++                    }
++                    coordinate += offset;
++                    coordinate = (u16)coordinate;
++                    highMask = 0xFFFF0000;
++                    position.words.xy = (position.words.xy & highMask) | coordinate;
++                }
++                gUnk_03005308 = (gUnk_03005308 + 1) & indexMask;
++                {
++                    s32 offset = Mod(table[gUnk_03005308], 500);
++                    s32 coordinate = ((s32)position.words.xy >> 16) - 250;
++                    coordinate += offset;
++                    coordinate = (u32)coordinate << 16;
++                    {
++                        u32 previous = position.words.xy;
++                        u32 lowMask = 0xFFFF;
++                        lowMask &= previous;
++                        position.words.xy = lowMask | coordinate;
++                    }
++                }
++                gUnk_03005308 = (gUnk_03005308 + 1) & indexMask;
++                {
++                    s32 offset = Mod(table[gUnk_03005308], 500);
++                    register union ScenePanelPackedVector *lowPosition asm("r2") = positionWords;
++                    register s32 coordinate asm("r1");
++                    coordinate = (u16)lowPosition->words.zpad - 250;
++                    coordinate += offset;
++                    coordinate = (u16)coordinate;
++                    lowPosition->words.zpad = (lowPosition->words.zpad & highMask) | coordinate;
++                }
++                velocity.words.xy &= highMask;
++                {
++                    u32 mask;
++                    next = gUnk_03005308 + 1;
++                    mask = indexMask;
++                    next &= mask;
++                    {
++                        u32 sample = table[next];
++                        sample &= 31;
++                        sample += 16;
++                        velocity.words.xy = sample << 16;
++                    }
++                    velocity.words.zpad &= highMask;
++                    gUnk_03005308 = (next + 1) & mask;
++                }
++                {
++                    u32 life = table[gUnk_03005308];
++                    life &= 7;
++                    life += 8;
++                    ScenePanel_AddParticle(panel, (union ScenePanelPosition *)positionWords,
++                                           (union ScenePanelPosition *)&velocity, life, 1);
++                }
++            }
++            {
++                u32 mask = 0x200;
++                u16 *shadow = &gUnk_03004BD8;
++                *shadow = mask | *shadow;
++            }
++            {
++                u16 *lowFrame = frame;
++                register u32 frameValue asm("r0");
++                register s32 alpha asm("r2");
++                frameValue = *lowFrame;
++                alpha = frameValue >> 2;
++                {
++                    u32 blend = ((16 - alpha) >> 1) + 8;
++                    *(vu16 *)0x04000052 = (blend << 8) | alpha;
++                }
++            }
++            {
++                u16 *conditionFrame = frame;
++                if (!(*conditionFrame & 7)) {
++                    s16 *shake = &panel->shakeOffset;
++                    if (*shake <= 6)
++                        (*shake)++;
++                }
++            }
++            BgGfx_LoadTilemapSimple(1, tileX, tileY, screenX, screenY + panel->shakeOffset);
++            if (--panel->mode == 0)
++                ScenePanel_CallPendingScript(gUnk_020004A4, 9);
++        }
++    }
++    return;
++hide: {
++    u16 *shadow = &gUnk_03004BD8;
++    u32 mask = ~0x200;
++    mask &= *shadow;
++    *shadow = mask;
++}
++}
++
++void ScenePanel_InitOverlay(struct ScenePanel *panel)
++{
++    struct SceneOverlayResource resource, *original = ScriptProc_Start(0xC091, 0xAD57);
++    panel->overlayMap = original;
++    resource = *original;
++    resource.maps = (void *)((u32)resource.maps + (u32)original);
++    resource.tiles += (u32)original;
++    resource.extra += (u32)original;
++    {
++        u32 mask = 0x800;
++        u16 *shadow = &gUnk_03004BD8;
++        *shadow = mask | *shadow;
++    }
++    Bg_SetPriority(3, 1);
++    panel->overlayPalette = (u8 *)ScriptProc_Start(0x92B3, 0xE2BA) + 0x114;
++    {
++        u32 level = 5;
++        u8 *levels = panel->targetLevels;
++        s32 i = 3;
++        do {
++            levels[4] = level;
++            levels[0] = level;
++            levels++;
++        } while (--i >= 0);
++    }
++}
++
++// MATCHING_CONCESSION: register-pinning
++void ScenePanel_CycleOverlayPalette(struct ScenePanel *panel)
++{
++    u32 frame;
++    {
++        u16 *counter = &panel->overlayFrame;
++        u32 old = *counter;
++        frame = old + 1;
++        *counter = frame;
++    }
++    {
++        register u32 mask asm("r0") = 0xFFFF;
++        u32 savedMask;
++        register u32 masked asm("r0");
++        asm("" : "+r"(mask));
++        savedMask = mask;
++        masked = frame;
++        asm("" : "+r"(savedMask), "+r"(masked));
++        masked &= savedMask;
++        masked &= 1;
++        if (masked) {
++            u32 bank = ((u16)frame >> 1) & 3;
++            CpuSet((u8 *)panel->overlayPalette + bank * 32, (void *)0x03005120, 0x04000008);
++        }
++    }
++}
++
++static inline s32 scaleSceneOverlay(s32 value)
++{
++    if (value >= 0)
++        return value >> 5;
++    return -((-value) >> 5);
++}
++
++#define truncate5(value) ((value) >= 0 ? (value) >> 5 : -((-(value)) >> 5))
++
++#define truncate1(value) ((value) >= 0 ? (value) >> 1 : -((-(value)) >> 1))
++
++// MATCHING_CONCESSION: register-pinning
++void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
++                            s32 screenY)
++{
++    struct SceneOverlayResource resource;
++    struct SceneOverlayMapEntry entry;
++    struct ContactPosition projected;
++    struct ContactPosition *projectedPointer;
++    struct ContactPosition *projectedRead;
++    struct SceneOverlayMapEntry *entries;
++    s32 width, height;
++    u16 *blocks;
++    s32 blockStride, centerX, centerY, playSound = 0;
++    struct SceneOverlayMapEntry *entryPointer;
++    s32 next;
++    register u16 *output asm("r9");
++    s32 slot;
++    ScenePanel_CycleOverlayPalette(panel);
++    {
++        struct SceneOverlayLayer *layer;
++        register u16 tx asm("r2");
++        u16 ty;
++        u16 *buffer;
++        register u32 reloadScratch asm("r3");
++        tx = tileX;
++        layer = &gUnk_03004CC0;
++        layer->tileX = tx;
++        ty = tileY;
++        layer->tileY = ty;
++        layer->screenX = screenX;
++        layer->screenY = screenY;
++        buffer = layer->output;
++        asm("" : : "r"(buffer));
++        output = buffer;
++        asm("" : : "r"(output));
++        /* Defined opaque scratch keeps the signed-load reloads in their original registers. */
++        asm("" : "=r"(reloadScratch));
++        width = layer->width * 2;
++        asm("" : : "r"(width), "r"(tx), "r"(reloadScratch), "r"(buffer));
++        height = layer->height * 2;
++    }
++    {
++        s32 x, z asm("r4"), sum asm("r4");
++        s32 y;
++        const struct ContactPosition *origin;
++        projectedPointer = &projected;
++        asm("" : "+r"(projectedPointer));
++        origin = &panel->overlayOrigin;
++        asm("" : "+r"(origin));
++        x = origin->x;
++        z = origin->z;
++        {
++            s32 value = 3 * (x - z);
++            projectedRead = projectedPointer;
++            projectedPointer->x = scaleSceneOverlay(value);
++        }
++        {
++            s32 subtotal = x + z;
++            s32 value;
++            value = scaleSceneOverlay(3 * subtotal);
++            sum = value;
++        }
++        y = scaleSceneOverlay(3 * origin->y);
++        projectedPointer->y = sum - y;
++        {
++            s32 projectedZ = sum + y;
++            projectedPointer->z = projectedZ;
++        }
++    }
++    centerX = projectedRead->x + gUnk_030042A0.offsetX;
++    centerY = projected.y + gUnk_030042A0.offsetY;
++    centerX = truncate3(centerX);
++    centerY = truncate3(centerY) & ~1;
++    centerX -= tileX;
++    centerY -= tileY;
++    {
++        struct SceneOverlayResource *mapBase = panel->overlayMap;
++        resource = *mapBase;
++        resource.maps = (void *)((u32)resource.maps + (u32)mapBase);
++        entries = resource.maps;
++    }
++    panel->overlayChanged = 0;
++    slot = 0;
++    if (slot < panel->overlayCount) {
++        entryPointer = &entry;
++        do {
++            s32 old;
++            s32 target;
++            register u8 *current asm("r2");
++            register u8 *base asm("r0");
++            register s32 maxX asm("r12"), maxY asm("r8");
++            s32 minX;
++            register s32 minY asm("r2");
++            if (panel->paletteMode == 0 || (panel->effectState != 10 && panel->effectState != 14))
++                target = 5;
++            else {
++                u32 state = panel->subjects[slot]->displayState;
++                target = 5;
++                if (state == 4)
++                    target = 0;
++            }
++            panel->targetLevels[slot] = target;
++            base = panel->currentLevels;
++            current = base + slot;
++            old = *current;
++            next = slot + 1;
++            if (old == target)
++                goto nextSlot;
++            if (target == 0)
++                playSound = 1;
++            *current = target;
++            switch (slot) {
++                case 0:
++                    maxX = centerX;
++                    maxY = centerY;
++                    minX = maxX - 7;
++                    if (minX < 0)
++                        minX = 0;
++                    minY = maxY - 6;
++                    if (minY < 0)
++                        minY = 0;
++                    break;
++                case 2:
++                    maxX = centerX + 7;
++                    maxY = centerY;
++                    minX = centerX;
++                    if (minX < 0)
++                        minX = 0;
++                    minY = maxY - 6;
++                    if (minY < 0)
++                        minY = 0;
++                    break;
++                case 3:
++                    maxX = centerX;
++                    maxY = centerY + 4;
++                    minX = maxX - 7;
++                    if (minX < 0)
++                        minX = 0;
++                    minY = centerY;
++                    if (minY < 0)
++                        minY = 0;
++                    break;
++                case 1:
++                    maxX = centerX + 7;
++                    maxY = centerY + 4;
++                    minX = centerX;
++                    if (minX < 0)
++                        minX = 0;
++                    minY = centerY;
++                    if (minY < 0)
++                        minY = 0;
++                    break;
++                default:
++                    minX = -1;
++                    minY = minX;
++                    maxY = minX;
++                    maxX = maxY;
++                    break;
++            }
++            asm("" : "+r"(maxX), "+r"(maxY), "+r"(minY), "+r"(slot) : "r"(target));
++            slot++;
++            next = slot;
++            if (maxX < 0 || maxY < 0 || minX > 31 || minY > 31)
++                goto nextSlot;
++            {
++                struct SceneOverlayLayer *strideLayer = &gUnk_03004CC0;
++                blockStride = strideLayer->width >> 4;
++            }
++            if (target == 5) {
++                register s32 y asm("r6");
++                for (y = minY; y < maxY; y += 2) {
++                    register s32 x asm("r5");
++                    for (x = minX; x < maxX; x++) {
++                        register s32 dx asm("r2") = tileX + x, dy asm("r1") = tileY + y;
++                        dx &= 31;
++                        dy &= 31;
++                        {
++                            register s32 index asm("r0") = dy * 32;
++                            asm("" : "+r"(index));
++                            index = dx + index;
++                            output[index] = 0;
++                        }
++                        dy++;
++                        dy *= 32;
++                        asm("" : "+r"(dy));
++                        dx += dy;
++                        asm("" : "+r"(dx));
++                        output[dx] = 0;
++                    }
++                }
++            } else {
++                register s32 y asm("r6");
++                u32 ringMask;
++                target++;
++                {
++                    u32 offset = target * sizeof(entry);
++                    struct SceneOverlayMapEntry *destination, *mapEntries asm("r3");
++                    destination = entryPointer;
++                    mapEntries = entries;
++                    offset += (u32)mapEntries;
++                    *destination = *(struct SceneOverlayMapEntry *)offset;
++                }
++                {
++                    void **mapSlot;
++                    struct ScenePanel *mapPanel = panel;
++                    struct SceneOverlayMapEntry *copied;
++                    u32 relative;
++                    mapSlot = &mapPanel->overlayMap;
++                    copied = entryPointer;
++                    relative = (u32)copied->blocks;
++                    {
++                        u32 mapBase = (u32)*mapSlot;
++                        relative += mapBase;
++                        copied->blocks = (void *)relative;
++                        gUnk_03004CC0.map = (void *)relative;
++                        blocks = (void *)relative;
++                    }
++                }
++                for (y = minY; y < maxY; y += 2) {
++                    s32 x;
++                    for (x = minX; x < maxX; x++) {
++                        s32 dx, dy;
++                        u16 *secondOutput;
++                        u32 secondValue;
++                        ringMask = 31;
++                        dx = tileX + x;
++                        dy = tileY + y;
++                        if (dx < 0 || dy < 0 || dx >= width || dy >= height) {
++                            {
++                                u32 mask = ringMask;
++                                dx &= mask;
++                                dy &= mask;
++                            }
++                            {
++                                register s32 index asm("r0") = dy * 32;
++                                asm("" : "+r"(index));
++                                index = dx + index;
++                                index = (u32)(output + index);
++                                secondValue = 0;
++                                *(u16 *)index = secondValue;
++                            }
++                            {
++                                register s32 index asm("r0") = dy + 1;
++                                index *= 32;
++                                asm("" : "+r"(index));
++                                index = dx + index;
++                                secondOutput = output + index;
++                            }
++                        } else {
++                            register s32 blockX asm("r1"), block asm("r2"), halfX asm("r1"),
++                                halfY asm("r0");
++                            u32 tile;
++                            {
++                                s32 scaled = truncate5(dx);
++                                asm("" : "+r"(scaled));
++                                blockX = scaled;
++                            }
++                            {
++                                register s32 scaled asm("r0") = truncate5(dy);
++                                scaled *= blockStride;
++                                scaled = blockX + scaled;
++                                block = scaled << 8;
++                            }
++                            dx &= ringMask;
++                            dy &= ringMask;
++                            {
++                                s32 scaled = truncate1(dx);
++                                asm("" : "+r"(scaled));
++                                halfX = scaled;
++                            }
++                            halfY = truncate1(dy);
++                            halfY <<= 4;
++                            {
++                                s32 index = block + halfX + halfY;
++                                tile = blocks[index];
++                            }
++                            {
++                                u32 parity = dx & 1;
++                                if (parity == 0) {
++                                    u16 *firstOutput;
++                                    u16 *tileBuffer, *pair;
++                                    {
++                                        register s32 index asm("r1") = dy * 32;
++                                        index = dx + index;
++                                        firstOutput = output + index;
++                                    }
++                                    /* Preserve the original destination spill while loading the tile table. */
++                                    asm(""
++                                        :
++                                        : "m"(((struct SceneOverlayLayer *)SCENE_OVERLAY_LAYER_ADDR)
++                                                  ->tiles),
++                                          "r"(parity));
++                                    tileBuffer =
++                                        ((struct SceneOverlayLayer *)SCENE_OVERLAY_LAYER_ADDR)
++                                            ->tiles;
++                                    tile <<= 3;
++                                    tile += (u32)tileBuffer;
++                                    pair = (void *)tile;
++                                    {
++                                        u32 value = *pair;
++                                        *firstOutput = value;
++                                    }
++                                    {
++                                        register s32 index asm("r0") = dy + 1;
++                                        index *= 32;
++                                        index = dx + index;
++                                        secondOutput = output + index;
++                                    }
++                                    secondValue = pair[2];
++                                } else {
++                                    u16 *firstOutput;
++                                    u16 *tileBuffer, *pair;
++                                    {
++                                        register s32 index asm("r1") = dy * 32;
++                                        index = dx + index;
++                                        firstOutput = output + index;
++                                    }
++                                    tileBuffer =
++                                        ((struct SceneOverlayLayer *)SCENE_OVERLAY_LAYER_ADDR)
++                                            ->tiles;
++                                    tile <<= 3;
++                                    tile += (u32)tileBuffer;
++                                    pair = (void *)tile;
++                                    {
++                                        u32 value = pair[1];
++                                        *firstOutput = value;
++                                    }
++                                    {
++                                        register s32 index asm("r0") = dy + 1;
++                                        index *= 32;
++                                        index = dx + index;
++                                        secondOutput = output + index;
++                                    }
++                                    secondValue = pair[3];
++                                }
++                            }
++                        }
++                        *secondOutput = secondValue;
++                    }
++                }
++            }
++        nextSlot:
++            slot = next;
++        } while (slot < panel->overlayCount);
++    }
++    if (playSound)
++        Sound_PlaySong(245);
++}
++
++void ScenePanel_DrawBackgroundLayers(struct ScenePanel *panel)
++{
++    s32 x = gUnk_03005418[0] + gUnk_030042A0.offsetX;
++    s32 y = gUnk_03005418[1] + gUnk_030042A0.offsetY;
++    s32 tileX = truncate3(x - 128), tileY = truncate3(y - 128) & ~1;
++    x -= 120;
++    y -= 80;
++    ScenePanel_UpdateBackgroundEffect(panel, tileX, tileY, x, y);
++    ScenePanel_DrawOverlay(panel, tileX, tileY, x, y);
++}
++
++void ScenePanel_RunScheduledAction(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = input;
++    if (panel->action)
++        Callback_InvokeActor(panel, panel->action);
++}
++
++void ScenePanel_NoOpAction(struct ScenePanel *panel)
++{
++}
++
++void ScenePanel_TickHazardSpawner(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = input;
++    if (++panel->actionFrame >= panel->actionInterval) {
++        struct ContactPackedVector position;
++        position.x = gUnk_02000710->positionX;
++        position.y = gUnk_02000710->positionY;
++        position.z = gUnk_02000710->positionZ;
++        AnimatedHazard_Create(&position, panel->actionResourceId, 30);
++        panel->actionStep = 0;
++        panel->actionFrame = 0;
++    }
++}
++
++void ScenePanel_TickAngleBurst(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = input;
++    if (panel->actionFrame < panel->actionInterval) {
++        if (++panel->actionFrame >= panel->actionInterval) {
++            u32 angle = Math_Atan2(gUnk_02000710->positionX - panel->overlayOrigin.x,
++                                   gUnk_02000710->positionZ - panel->overlayOrigin.z) -
++                        32;
++            u16 *destination = &panel->actionAngle;
++            *destination = angle & 255;
++            panel->actionStep = 0;
++        }
++    } else {
++        if (panel->actionStep == 0)
++            Sound_PlaySong(994);
++        if (panel->actionStep <= 4) {
++            DirectionBurst_Emit(&panel->overlayOrigin, panel->actionAngle, 12, 100);
++            panel->actionAngle = (panel->actionAngle + 16) & 255;
++            panel->actionStep++;
++        } else
++            panel->actionFrame = 0;
++    }
++}
++
++void ScenePanel_TickHandlePosition(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = input;
++    if (++panel->actionFrame >= panel->actionInterval) {
++        Math_Atan2(gUnk_02000710->positionX - panel->overlayOrigin.x,
++                   gUnk_02000710->positionZ - panel->overlayOrigin.z);
++        sub_08190B10(panel->actionHandle, &panel->overlayOrigin, gUnk_0824DEA4);
++        panel->actionStep = 0;
++        panel->actionFrame = 0;
++    }
++}
++
++void ScenePanel_TickHandleActionA(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = input;
++    if (++panel->actionFrame >= panel->actionInterval) {
++        SceneBurstEmitter_RequestCleanup(panel->actionHandle);
++        panel->actionStep = 0;
++        panel->actionFrame = 0;
++    }
++}
++
++void ScenePanel_TickHandleActionB(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = input;
++    if (++panel->actionFrame >= panel->actionInterval) {
++        SceneOrbitHazard_Activate(panel->actionHandle);
++        panel->actionStep = 0;
++        panel->actionFrame = 0;
++    }
++}
++
++// MATCHING_CONCESSION: register-pinning
++void ScenePanel_InitScheduledAction(struct ScenePanel *input)
++{
++    struct ScenePanel *panel = input;
++    register void (**destination)(struct ScenePanel *) asm("r1");
++    register void (*action)(struct ScenePanel *) asm("r0");
++    u32 handleOffset;
++    /* Cache the handle offset for the neighboring interval field. */
++    switch (panel->resourceIndex) {
++        case 0:
++            panel->actionHandle = 0;
++            handleOffset = 0x1364;
++            destination = &panel->action;
++            action = ScenePanel_TickHazardSpawner;
++            goto shared;
++        case 1:
++            panel->actionHandle = Hresvelgr_CreateShotPool(panel->actionResourceId, 10, 30);
++            handleOffset = 0x1364;
++            destination = &panel->action;
++            action = ScenePanel_TickAngleBurst;
++            goto shared;
++        case 2:
++            panel->actionHandle = SceneEffect_CreateMovingTask(panel->actionResourceId, &panel->overlayOrigin);
++            handleOffset = 0x1364;
++            destination = &panel->action;
++            action = ScenePanel_TickHandleActionB;
++            goto shared;
++        case 3:
++            panel->actionHandle =
++                ScenePanelEffect_Create(panel->actionResourceId, panel->actionParameter);
++            panel->action = ScenePanel_TickHandlePosition;
++            panel->actionInterval = 360;
++            break;
++        case 4:
++            panel->actionHandle = SceneEffect_CreateEntryTask(panel->actionResourceId, &panel->overlayOrigin);
++            handleOffset = 0x1364;
++            destination = &panel->action;
++            action = ScenePanel_TickHandleActionA;
++        shared:
++            *destination = action;
++            {
++                u16 *interval;
++                u32 duration;
++                handleOffset -= 0x16;
++                /* Keep the runtime offset: a direct field address changes agbcc allocation. */
++                interval = (void *)((u8 *)panel + handleOffset);
++                duration = 600;
++                *interval = duration;
++            }
++            break;
++        default: {
++            register u32 offset asm("r0") = 0x1360;
++            asm("" : "+r"(offset));
++            /* Preserve the original register-held offset for the null callback store. */
++            destination = (void *)((u8 *)panel + offset);
++            action = 0;
++            *destination = action;
++            break;
++        }
++    }
++}
+-- 
+2.39.3 (Apple Git-145)
+

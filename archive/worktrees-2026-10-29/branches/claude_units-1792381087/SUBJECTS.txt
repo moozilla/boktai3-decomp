@@ -1,0 +1,2 @@
+Unit player_cue_3: merge into src/player_cue_3.c with shared types (tools/unitize.py, codex:gpt-6.1-sol)
+Unit scene_panel_presentation: merge into src/scene_panel_presentation.c with shared types (tools/unitize.py, codex:gpt-6.1-sol)

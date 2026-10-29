@@ -1,0 +1,229 @@
+From 1fdf4c5fceed03bb9c83c90c09afdf4c0f0851e5 Mon Sep 17 00:00:00 2001
+From: Campaign Worker <>
+Date: Thu, 29 Oct 2026 05:33:02 -0700
+Subject: [PATCH] Retain bounded same-binary source alternatives in seek
+
+Add --neutral N to run and expand. Keep at most N source alternatives per
+node and move family when they compile to an unchanged or known binary.
+Deduplicate inverse rewrites by source hashes, retain the default binary
+search behavior, and include the neutral limit in resumable expansion keys.
+
+Verified with a fake two-step source search: the first edit preserves bytes,
+the second matches; also checked source-cycle deduplication, repeated expansion,
+mode changes on resume, and the depth bound. Real copy_var expansions retain
+an alternative once and reuse it on the next expansion. Python compilation and
+git diff --check pass.
+
+Co-Authored-By: GPT-6.1 Sol (Codex) <noreply@openai.com>
+---
+ tools/seek/seek.py | 81 +++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 65 insertions(+), 16 deletions(-)
+
+diff --git a/tools/seek/seek.py b/tools/seek/seek.py
+index fa4e25771..a1d4cd945 100644
+--- a/tools/seek/seek.py
++++ b/tools/seek/seek.py
+@@ -8,6 +8,7 @@
+   seek.py expand N [--fam F,..] [--lines A-B] [--top K]   every move at node N, compiled and ranked
+   seek.py run [N..] [--budget C] [--seconds S] [--fam F,..] [--lines A-B]   best-first search from N
+                                       (default: the best nodes), until MATCH or the budget
++                                      --neutral N retains N same-binary sources per move family
+   seek.py show N [--diff]             a node: layers, skeleton gaps, block map, C diff from its parent
+                                       (--diff: scope's full listing)
+   seek.py values N                    allocation of every named value: draft register, the ROM's, priority
+@@ -289,7 +290,7 @@ class Work:
+         return rec
+ 
+     # -- expanding
+-    def expand(self, node, families=None, lines=None, quiet=False, budget=None, sem=True):
++    def expand(self, node, families=None, lines=None, quiet=False, budget=None, sem=True, neutral=0):
+         """Every move at NODE: compile, evaluate, add the distinct outputs as children. Returns
+         (children, stats)."""
+         pre, defs = self.pre_of(node)
+@@ -307,9 +308,26 @@ class Work:
+                   f"(moves start from the regenerated form: {self.target.evaluate(base_code)['counts']})")
+             own_out = sha(base_code)
+         seen_src = set()
+-        stats = {"variants": 0, "neutral": 0, "known": 0, "failed": 0, "new": 0, "fam": {}}
++        stats = {"variants": 0, "neutral": 0, "retained": 0, "known": 0, "failed": 0, "new": 0, "fam": {}}
+         children = []
+         file_hash = node["file"]
++        definition_hashes = {name: sha(R.text(fn)) for name, fn in defs.items()}
++
++        def source_key(changed=None, txt=None):
++            hashes = dict(definition_hashes)
++            if changed is not None:
++                hashes[changed] = sha(txt)
++            return sha(repr((file_hash, sorted(hashes.items()))))
++
++        sources = {}
++        retained = collections.Counter(n.get("family") for n in self.sess.nodes.values()
++                                       if n.get("parent") == node["id"] and n.get("same_as"))
++        if neutral:
++            # A binary is not a complete state for source rewriting: two spellings can have
++            # different pre-reload RTL, then react differently to the next edit. Source keys
++            # bound this optional plateau walk and prevent inverse rewrites making new cycles.
++            self.sess.update(node["id"], source_key=source_key())
++            sources = {n["source_key"]: n for n in self.sess.nodes.values() if n.get("source_key")}
+         depth = node.get("depth", 0) + 1
+         main = next(iter(defs))
+         tasks = []
+@@ -342,43 +360,61 @@ class Work:
+                 stats["failed"] += 1
+                 continue
+             out, alloc, ev = res
+-            if out == own_out:
++            same = out == own_out
++            known = self.sess.by_out.get(out)
++            if same:
+                 stats["neutral"] += 1
+-                continue
+-            fs[1] += 1
+-            if out in self.sess.by_out:
++            else:
++                fs[1] += 1
++            if known and not same:
+                 stats["known"] += 1
+-                children.append(self.sess.nodes[self.sess.by_out[out]])
+-                continue
++                children.append(self.sess.nodes[known])
++            sk = source_key(dname, txt) if neutral else None
++            alternative = same or known is not None
++            if alternative:
++                if not neutral:
++                    continue
++                if sk in sources:
++                    children.append(sources[sk])
++                    continue
++                if retained[fam] >= neutral:
++                    continue
++                retained[fam] += 1
+             vpre = E.splice(base_pre, [dname], txt)
+             nd = dict(node.get("defs") or {})
+             nd[dname] = self.sess.put_blob(txt)
+             rec = dict(parent=node["id"], kind="move", who="auto", file=file_hash, defs=nd, out=out,
+                        family=fam, move=desc if dname == main else f"{desc} (in {dname})", line=line,
+                        depth=depth, alloc=alloc, moved=E.alloc_changes(base_alloc, alloc)[:8], **ev)
++            if sk:
++                rec["source_key"] = sk
++            if alternative:
++                rec["same_as"] = known or node["id"]
+             if want and not ev.get("match"):
+                 rec["awrong"] = len(E.alloc_wrong(alloc, want))
+             if sem and (desc.startswith("[sem]") or fam in SEM_FAMILIES) and rank(dict(ev, ok=True)) <= rank(node):
+                 code, _ = self.target.compile_pre(vpre)
+                 rec["sem"] = self.target.semantic(code, vpre)
+             rec = self.sess.add(rec)
++            if sk:
++                sources[sk] = rec
+             if rank(rec) < rank(node):
+                 fs[2] += 1
+             kid_defs = dict(defs)
+             kid_defs[dname] = f2
+             self.ast[rec["id"]] = (vpre, kid_defs)
+             children.append(rec)
+-            stats["new"] += 1
++            stats["retained" if alternative else "new"] += 1
+         stats["seconds"] = round(time.time() - t0, 2)
+         self.sess.event(kind="expand", node=node["id"], families=sorted(families) if families else None,
+-                        lines=lines, children=sorted({c["id"] for c in children}),
++                        lines=lines, neutral_limit=neutral, children=sorted({c["id"] for c in children}),
+                         **{k: v for k, v in stats.items() if k != "fam"})
+         if not quiet:
+             print_expand(self, node, children, stats)
+         return children, stats
+ 
+     def search(self, starts, budget=2000, seconds=120, families=None, lines=None, quiet=False, slack=None,
+-               max_depth=6):
++               max_depth=6, neutral=0):
+         """Best-first over (key, depth): expand the best node not yet expanded with these moves.
+         New outputs that tie their parent stay on the frontier (a plateau is walked, not abandoned);
+         a node is never expanded twice with the same move set."""
+@@ -395,9 +431,10 @@ class Work:
+             queued.add(n["id"])
+             heapq.heappush(heap, (rank(n), n.get("awrong", 0), n.get("depth", 0), tick, n["id"]))
+             tick += 1
+-        sig = (tuple(sorted(families)) if families else None, tuple(lines) if lines else None)
++        sig = (tuple(sorted(families)) if families else None, tuple(lines) if lines else None, neutral)
+         done = {e["node"] for e in self.sess.events if e.get("kind") == "expand"
+-                and (tuple(e["families"]) if e.get("families") else None, tuple(e["lines"]) if e.get("lines") else None) == sig}
++                and (tuple(e["families"]) if e.get("families") else None,
++                     tuple(e["lines"]) if e.get("lines") else None, e.get("neutral_limit", 0)) == sig}
+         for n in starts:
+             enqueue(n)
+         best = min(starts, key=rank)
+@@ -422,10 +459,12 @@ class Work:
+                     if c.get("parent") == nid:
+                         enqueue(c)
+                 continue
++            if neutral and node.get("depth", 0) >= max_depth:
++                continue
+             done.add(nid)
+             try:
+                 kids, st = self.expand(node, families, lines, quiet=True,
+-                                       budget=None)
++                                       budget=None, neutral=neutral)
+             except SystemExit as e:
+                 print(f"  n{nid}: {e}")
+                 continue
+@@ -555,6 +594,8 @@ def print_expand(w, node, children, st):
+     print(f"expand n{node['id']} ({fmt_key(key_of(node))}): {st['variants']} variants in {st['seconds']}s -> "
+           f"{st['new']} new outputs, {st['neutral']} no code change, {st['known']} already in the tree, "
+           f"{st['failed']} compile errors")
++    if st.get("retained"):
++        print(f"  retained {st['retained']} alternative sources for known binaries")
+     moving = [f"{f} {v[1]}/{v[0]}" + (f" ({v[2]} better)" if v[2] else "") for f, v in sorted(st["fam"].items())
+               if v[1]]
+     still = [f for f, v in sorted(st["fam"].items()) if not v[1]]
+@@ -682,16 +723,20 @@ def parse_fams(s):
+ 
+ 
+ def cmd_expand(a):
++    if a.neutral < 0:
++        sys.exit("--neutral must be nonnegative")
+     w = Work(a.f)
+     if a.objective == "rotation":
+         OBJECTIVE["mode"] = "rotation"
+         w.rot_max = 99
+     w.top = a.top
+     node = w.node(a.node)
+-    w.expand(node, parse_fams(a.fam), parse_lines(a.lines))
++    w.expand(node, parse_fams(a.fam), parse_lines(a.lines), neutral=a.neutral)
+ 
+ 
+ def cmd_run(a):
++    if a.neutral < 0:
++        sys.exit("--neutral must be nonnegative")
+     w = Work(a.f)
+     starts = [w.node(n) for n in a.nodes] if a.nodes else w.best(a.width)
+     if isinstance(starts, dict):
+@@ -711,7 +756,7 @@ def cmd_run(a):
+     if a.objective == "rotation":
+         w.rot_max = a.rot_max if a.rot_max is not None else max(8, min(key_of(n)[2] for n in starts) + 6)
+     best = w.search(starts, a.budget, a.seconds, parse_fams(a.fam), parse_lines(a.lines), slack=a.slack,
+-                    max_depth=a.depth)
++                    max_depth=a.depth, neutral=a.neutral)
+     if best.get("match"):
+         print(f"MATCH: seek.py show n{best['id']}; land with seek.py land n{best['id']}")
+     else:
+@@ -1029,6 +1074,8 @@ def main():
+     p.add_argument("--lines")
+     p.add_argument("--top", type=int, default=10)
+     p.add_argument("--objective", choices=["rotation"])
++    p.add_argument("--neutral", type=int, default=0,
++                   help="retain this many alternative sources per node and move family for unchanged/known binaries")
+     p.set_defaults(go=cmd_expand)
+     p = sub.add_parser("run")
+     p.add_argument("nodes", nargs="*")
+@@ -1038,6 +1085,8 @@ def main():
+     p.add_argument("--slack", type=int, help="explore children up to this much worse (shape+diff) than the "
+                    "best (default max(4, diff/8))")
+     p.add_argument("--depth", type=int, default=6, help="moves stacked on a node at most")
++    p.add_argument("--neutral", type=int, default=0,
++                   help="retain this many alternative sources per node and move family for unchanged/known binaries")
+     p.add_argument("--objective", choices=["rotation", "block"], help="rotation: rank by the reload spill "
+                    "shift still needed (AGBCC_SPILL=K:D); block: by one ROM block's cost (--block)")
+     p.add_argument("--rot-max", type=int, help="rotation: test shifts on children with at most this diff")
+-- 
+2.39.3 (Apple Git-145)
+

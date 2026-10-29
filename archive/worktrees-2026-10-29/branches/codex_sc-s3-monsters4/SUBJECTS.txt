@@ -1,0 +1,3 @@
+Add instruction-first objective for seek searches
+Keep seek statement swaps from crossing control-flow exits
+Resolve local draft aliases before selecting seek targets
