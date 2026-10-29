@@ -1,10 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 98.1%
-// fix.py best (sweep after the inlined-insn fix)
-// Parameter-save order and the first signed-load scratch still differ.
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
 #include "player.h"
 
 s32 Math_Atan2(s32, s32);
@@ -40,6 +34,10 @@ struct ActorStatus {
     u8 contactDirection;
     u16 strengthShift;
 };
+static inline u32 testFlags(u16 *flags, u32 mask)
+{
+    return *flags & mask;
+}
 void ActorStatus_InitializeContact(struct ContactActor *input, struct ContactActor *other,
                                    struct ActorStatus *status)
 {
@@ -48,7 +46,6 @@ void ActorStatus_InitializeContact(struct ContactActor *input, struct ContactAct
     s32 shift;
     s32 scaled;
     u32 value;
-    u32 direction;
     Collision_CalculateDamageResponse(input);
     strength = other->strength;
     shift = status->strengthShift;
@@ -58,29 +55,16 @@ void ActorStatus_InitializeContact(struct ContactActor *input, struct ContactAct
         scaled = -((-strength) >> shift);
     status->contactStrength = scaled;
     value = input->value38;
-    do {
-        status->contactValue = value;
-    } while (0);
+    status->contactValue = value;
     status->contactKind = input->value44;
     if (((status->mode == 1) && Player_IsSlotInActionTwelveOrThirtyEight(0)) &&
         (world[0x418] == 2)) {
         if (status->contactStrength < status->duration)
             status->contactStrength = status->duration;
     }
-    {
-        u32 mask = 0x100;
-        if (input->flags & mask)
-            direction = input->direction;
-        else {
-            s32 dx = other->x - input->x;
-            s32 dy = other->y - input->y;
-            direction = Math_Atan2(dx, dy);
-        }
-    }
-    status->contactDirection = direction;
+    if (testFlags(&input->flags, 0x100))
+        status->contactDirection = input->direction;
+    else
+        status->contactDirection = Math_Atan2(other->x - input->x, other->y - input->y);
     PlayerStats_AddContactHundredths(input, other, 5);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", ActorStatus_InitializeContact);
-#endif

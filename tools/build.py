@@ -241,9 +241,12 @@ def main():
     for i in range(0, len(cobjs), 400):                # one nm per 400 objects, not per object
         out = sh(["arm-none-eabi-nm", "-u"] + cobjs[i:i + 400])
         syms |= set(re.findall(r"\b(\w+_(0[23][0-9A-Fa-f]{6}))\b", out))
-    ld = ["SECTIONS {", "  . = 0x08000000;", "  .text : {"]
-    ld += [f"    {o}(.text)" for o in objs]
-    ld += ["  }", "  /DISCARD/ : { *(.comment) *(.ARM.attributes) }", "}"]
+    # Declare inputs once in ROM order. One file selector per object makes GNU
+    # ld repeatedly walk the input list (over ten thousand objects here).
+    # A single section wildcard preserves that same input order without the
+    # repeated file matching; all other sections keep the existing policy.
+    ld = ["INPUT(", *objs, ")", "SECTIONS {", "  . = 0x08000000;",
+          "  .text : { *(.text) }", "  /DISCARD/ : { *(.comment) *(.ARM.attributes) }", "}"]
     ld += [f"{name} = 0x{addr};" for name, addr in sorted(syms)]
     ld += [f"{name} = 0x{addr:08X};" for name, addr in sorted(ram_symbols().items())]
     ld += open(os.path.join(ROOT, "build", "c_labels.ld")).read().splitlines()
