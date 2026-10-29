@@ -125,7 +125,7 @@ def changed_line(fn, f2):
 
 
 def shallow(n):
-    return tuple((k, getattr(n, k)) for k in n.attr_names if not isinstance(getattr(n, k), (list, dict)))
+    return tuple((k, getattr(n, k)) for k in n.attr_names)
 
 
 # ------------------------------------------------------------------ the engine's state in one process
