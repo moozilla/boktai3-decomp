@@ -826,7 +826,7 @@ def cmd_land(args):
             merged = open(a).read()
     # worker notes pointing at their own REPORT.md / build paths do not belong in src
     merged = re.sub(r"^\s*//[^\n]*(REPORT\.md|build/scope)[^\n]*\n", "", merged, flags=re.M)
-    pins = len(re.findall(r'\basm\("r\d+"\)', merged))
+    pins = len(re.findall(r'\basm\s*\(\s*"(?:r\d+|sl|sb|fp|ip|lr|sp|pc)"\s*\)', merged))
     bars = len(re.findall(r'\basm(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', merged))
     marker = "// MATCHING_CONCESSION: register-pinning"
     if (pins or bars) and marker not in merged:
