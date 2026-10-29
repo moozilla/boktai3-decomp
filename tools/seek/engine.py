@@ -35,6 +35,7 @@ import scope  # noqa: E402  (re-execs under build/venv when capstone is missing)
 import fast  # noqa: E402
 import build  # noqa: E402
 from romlib import ROOT, off  # noqa: E402
+import scope as _scope  # noqa: E402,F401
 
 
 def sha(text):

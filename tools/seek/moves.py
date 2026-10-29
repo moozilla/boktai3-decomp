@@ -851,8 +851,74 @@ def mv_early_return(fn):
 
 # --- registry --------------------------------------------------------------------------
 
+def _last_assign(st):
+    """(container list, index) of ST's last statement if it is `ID = E;`, else None."""
+    items = st.block_items if isinstance(st, ca.Compound) else None
+    last = items[-1] if items else st
+    if isinstance(last, ca.Assignment) and last.op == "=":
+        return last
+    return None
+
+
+def mv_sink_store(fn):
+    """if (c) v = A; else v = B; L = v;  ->  if (c) L = A; else L = B;  (the store in each branch, no
+    temporary; v must not be read later). And the reverse: one temporary for a store both branches make."""
+    blocks = [n for n, _, _ in walk(fn) if isinstance(n, ca.Compound)]
+    for bk, b in enumerate(blocks):
+        if not b.block_items:
+            continue
+        items = b.block_items
+        for i in range(len(items) - 1):
+            st, nxt = items[i], items[i + 1]
+            path = []  # the if may end a nested block: `{ u32 mask = ...; if (...) ... }`
+            while isinstance(st, ca.Compound) and st.block_items:
+                path.append(len(st.block_items) - 1)
+                st = st.block_items[-1]
+            if not (isinstance(st, ca.If) and st.iffalse is not None):
+                continue
+
+            def at(it2):
+                x = it2[i]
+                for k in path:
+                    x = x.block_items[k]
+                return x
+            la, lb = _last_assign(st.iftrue), _last_assign(st.iffalse)
+            if la and lb and isinstance(la.lvalue, ca.ID) and isinstance(lb.lvalue, ca.ID) \
+                    and la.lvalue.name == lb.lvalue.name and isinstance(nxt, ca.Assignment) \
+                    and nxt.op == "=" and isinstance(nxt.rvalue, ca.ID) and nxt.rvalue.name == la.lvalue.name:
+                v = la.lvalue.name
+                later = [u for st2 in items[i + 2:] for u in _uses(st2, v)]
+                if later or _uses(nxt.lvalue, v):
+                    continue
+                f2 = copy.deepcopy(fn)
+                b2 = [n for n, _, _ in walk(f2) if isinstance(n, ca.Compound)][bk]
+                it2 = b2.block_items
+                for br in (at(it2).iftrue, at(it2).iffalse):
+                    a = _last_assign(br)
+                    a.lvalue = copy.deepcopy(it2[i + 1].lvalue)
+                del it2[i + 1]
+                yield f"store {text(nxt.lvalue)} in each branch (no {v})", f2
+            elif la and lb and text(la.lvalue) == text(lb.lvalue) and not isinstance(la.lvalue, ca.ID):
+                f2 = copy.deepcopy(fn)
+                b2 = [n for n, _, _ in walk(f2) if isinstance(n, ca.Compound)][bk]
+                it2 = b2.block_items
+                t = new_name(f2)
+                target = copy.deepcopy(la.lvalue)
+                for br in (at(it2).iftrue, at(it2).iffalse):
+                    _last_assign_any(br).lvalue = ca.ID(t)
+                it2.insert(i + 1, ca.Assignment("=", target, ca.ID(t)))
+                R.add_local(f2, R.typeof_decl(t, target))  # last: it shifts the function block's items
+                yield f"one temporary for the store to {text(la.lvalue)}", f2
+
+
+def _last_assign_any(st):
+    items = st.block_items if isinstance(st, ca.Compound) else None
+    return items[-1] if items else st
+
+
 MOVES = [mv_loop_form, mv_cmp_flip, mv_zero_test, mv_mul_shift, mv_compound, mv_ternary, mv_decl_scope,
-         mv_init_merge, mv_index_ptr, mv_merge_if, mv_cast, mv_cse_temp, mv_swap_decls, mv_early_return]
+         mv_init_merge, mv_index_ptr, mv_merge_if, mv_cast, mv_cse_temp, mv_swap_decls, mv_early_return,
+         mv_sink_store]
 
 
 def family(gen):

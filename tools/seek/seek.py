@@ -13,6 +13,8 @@
   seek.py values N                    allocation of every named value: draft register, the ROM's, priority
   seek.py facts [N]                   the determined part: the ROM's calls, accesses, literals, frame,
                                       and which ones node N misses
+  seek.py twins [N] [--blocks 3,5]     matched functions with the same ROM code as N's differing blocks,
+                                      and the C lines that produced it there (block-level prior art)
   seek.py tree [--all]                the session: nodes by key, the frontier, what was expanded
   seek.py diff A B                    C diff between two nodes and their layers
   seek.py file N                      write node N's whole file (build/seek/FUNC/nN.c) and print its path
@@ -31,6 +33,7 @@ Block map characters, one per ROM basic block: = exact, r same code up to renami
 block, s same shape, x different.
 """
 import argparse
+import collections
 import copy
 import difflib
 import os
@@ -743,6 +746,110 @@ def collections_counter(it):
     return sorted(collections.Counter(it).items())
 
 
+def block_tokens(w, lo, hi, ctx=0):
+    import structure
+    names = {}
+    for n, v in E.scope.elf_syms().items():
+        a_ = v[0] if isinstance(v, tuple) else v
+        if isinstance(a_, int):
+            names.setdefault(a_ & ~1, n)
+    rows = [r for r in w.target.rom_rows[max(0, lo - ctx):hi + ctx] if not r[2].startswith(".")]
+    return [structure.norm_insn(r[2], names) for r in rows]
+
+
+def loose(tok):
+    return re.sub(r"#-?(?:0x[0-9a-fA-F]+|\d+)", "#", tok)
+
+
+def matched_c_lines(src, func, lo_off, hi_off):
+    """{C line: text} of matched FUNC in SRC that produced its ROM bytes [lo_off, hi_off)."""
+    import json
+    sc = E.scope
+    try:
+        (mine, addr, info), _ = E.capture(sc.compile_draft, src, func)
+        _, _, sizes = sc.inventory()
+        rom_code = sc.rom_bytes()[E.off(addr):E.off(addr) + sizes[sc.rom_name(src, func)]]
+        E.capture(sc.report, src, func, rom_code, addr, mine, info, 0)
+        rows = json.load(open(os.path.join(info["wd"], "diff.json")))
+    except BaseException:  # noqa: BLE001
+        return {}
+    lines = sorted({int(r["line"]) for r in rows if r.get("line") and r.get("rom_addr")
+                    and lo_off <= int(r["rom_addr"], 16) - addr < hi_off and str(r["line"]).isdigit()})
+    text = open(os.path.join(ROOT, src)).read().split("\n")
+    return {ln: text[ln - 1] for ln in lines if 0 < ln <= len(text)}
+
+
+def cmd_twins(a):
+    """Matched functions whose ROM has the same code as this node's differing blocks, with the C lines
+    that produced it there: prior art at the level of a block, not a whole function."""
+    import difflib
+    sc = E.scope
+    w = Work(a.f)
+    node = w.node(a.node)
+    code = None
+    path = w.sess.materialize(node)
+    pre = w.target.preprocess_file(path)
+    code, _ = w.target.compile_pre(pre)
+    if code is None:
+        sys.exit("node does not compile")
+    _, _, regs = w.target.detail(code)
+    want = [int(x) for x in a.blocks.split(",")] if a.blocks else None
+    index = sc.like_index()
+    status, files = sc.code_status()
+    shing = {}
+    for n, toks in index.items():
+        if status.get(n) != "matched" or n == w.target.rom_name:
+            continue
+        lt = [loose(t) for t in toks]
+        for i in range(len(lt) - 2):
+            shing.setdefault("|".join(lt[i:i + 3]), set()).add(n)
+    shown = 0
+    for bi, (lo, hi, verdict, detail) in enumerate(regs):
+        if (want is not None and bi not in want) or (want is None and verdict == "="):
+            continue
+        toks = block_tokens(w, lo, hi, ctx=a.context)
+        lt = [loose(t) for t in toks]
+        if len(lt) < 3:
+            continue
+        cand = collections.Counter()
+        for i in range(len(lt) - 2):
+            hits = shing.get("|".join(lt[i:i + 3]), ())
+            if len(hits) <= 300:
+                for n in hits:
+                    cand[n] += 1
+        scored = []
+        for n, _ in cand.most_common(60):
+            other = [loose(t) for t in index[n]]
+            m = difflib.SequenceMatcher(None, lt, other, autojunk=False).find_longest_match(0, len(lt), 0, len(other))
+            exact = sum(1 for i in range(m.size) if toks[m.a + i] == index[n][m.b + i])
+            scored.append((m.size, exact, n, m.b))
+        scored.sort(reverse=True)
+        off0 = w.target.rom_rows[lo][0]
+        print(f"block {bi} [{verdict}] ROM +0x{off0:X}, {len(toks)} insns{' with context' if a.context else ''}: "
+              + (" | ".join(toks[:6]) + (" ..." if len(toks) > 6 else "")))
+        if not scored or scored[0][0] < min(4, len(lt)):
+            print("    no matched function shares a run of 4+ of these insns")
+            continue
+        for size, exact, n, b in scored[:a.show]:
+            src = files.get(n, "?")
+            print(f"    {size}/{len(lt)} insns in a row ({exact} exact) in {n} ({src})")
+        size, exact, n, b = scored[0]
+        if files.get(n) and size >= 4:
+            rows = [r for r in sc.decode(sc.rom_bytes()[E.off(sc.inventory()[1][n]):E.off(sc.inventory()[1][n]) +
+                                                       sc.inventory()[2][n]], sc.inventory()[1][n],
+                                         sc.rom_pool_ranges(sc.rom_bytes()[E.off(sc.inventory()[1][n]):E.off(sc.inventory()[1][n]) + sc.inventory()[2][n]], sc.inventory()[1][n]))
+                    if not r[2].startswith(".")]
+            lo_off, hi_off = rows[b][0], rows[min(len(rows) - 1, b + size - 1)][0] + 2
+            cl = matched_c_lines(files[n], n, lo_off, hi_off)
+            if cl:
+                print(f"    its C for those insns ({files[n]}):")
+                for ln, t in list(cl.items())[:14]:
+                    print(f"      {ln:5}  {t}")
+        shown += 1
+    if not shown:
+        print("no differing blocks (or none given with --blocks)")
+
+
 def cmd_tree(a):
     w = Work(a.f)
     nodes = sorted(w.sess.nodes.values(), key=lambda n: (rank(n), n["id"]))
@@ -868,6 +975,12 @@ def main():
         if name == "show":
             p.add_argument("--diff", action="store_true")
         p.set_defaults(go=fn_)
+    p = sub.add_parser("twins")
+    p.add_argument("node", nargs="?")
+    p.add_argument("--blocks", help="block numbers (default: every block not exact)")
+    p.add_argument("--context", type=int, default=2, help="insns of context on each side")
+    p.add_argument("--show", type=int, default=3)
+    p.set_defaults(go=cmd_twins)
     p = sub.add_parser("tree")
     p.add_argument("--all", action="store_true")
     p.set_defaults(go=cmd_tree)
