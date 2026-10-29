@@ -771,6 +771,13 @@ def cmd_facts(a):
     frame = [" ".join(e[1:]) for e in ev if e[0] == "frame"]
     loops = sum(1 for r in t.rom_rows if r[4] is not None and r[4] < r[0] and r[2].startswith("b"))
     print(f"{w.func} (ROM {t.size} B): the determined part")
+    later_entries = [r[0] for i, r in enumerate(t.rom_rows) if i and
+                     r[2].startswith("push ") and "lr" in r[2] and
+                     any(p[2].startswith("bx ") for p in t.rom_rows[max(0, i - 6):i])]
+    if later_entries:
+        print("  check ROM extent: possible additional routine entries after a return: "
+              + ", ".join(f"+0x{x:X} ({t.addr + x:08X})" for x in later_entries))
+        print("    Missing calls/accesses may belong to an undrafted suffix; inspect ROM before searching.")
     print(f"  frame: {'; '.join(frame) or 'leaf, no frame'}")
     print(f"  calls in order ({len(calls)}): " + (", ".join(calls) or "none"))
     names = {}
