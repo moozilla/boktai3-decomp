@@ -1,18 +1,12 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 92.9%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
 // confidence=low: control reacquires a player route once the context delay clears.
 
-// Remaining differences: random-turn hoisting, flag-load order and return/pool placement.
 #include "scene_actor_chase.h"
 static inline void SetHalf(u16 *field, u32 bits)
 {
-    register u32 mask asm("r0") = bits;
-    asm("" : "+r"(mask));
+    s16 mask = bits;
     mask |= *field;
     *field = mask;
 }
@@ -21,6 +15,12 @@ static inline u32 ClearWordValue(u32 *field, u32 bits)
     return *field & ~bits;
 }
 #include "scene_actor_animation.h"
+static inline u16 MotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    u16 *field = &actor->flags2D4;
+    u32 value = *field;
+    return value & mask;
+}
 
 static inline u8 Test16(u16 *p, u32 mask)
 {
@@ -28,33 +28,39 @@ static inline u8 Test16(u16 *p, u32 mask)
         return 1;
     return 0;
 }
-static inline u32 PickTurn(u32 dir, u32 mask)
+static inline u32 PickTurn(u32 dir)
 {
     u32 d;
     s32 i;
     for (i = 0; i < 4; i++) {
         {
-            u32 index = (gRandomIndex + 1) & 1023;
+            const u16 *table = gRandomTable;
+            u32 index;
             u32 v;
+            /* Temporary concession: retain the table address as a loop value. */
+            asm("" : "+r"(table));
+            index = (gRandomIndex + 1) & 1023;
             gRandomIndex = index;
             index *= 2;
-            v = *((const u16 *)(index + ((u32)gRandomTable)));
-            d = (v & mask) << 6;
+            v = *((const u16 *)(index + (u32)table));
+            d = (v & 3) << 6;
         }
         if (d != dir)
-            goto ret1;
+            return d;
     }
-
     return dir;
-ret1:
-    return d;
 }
 
+struct MummyTurnBytes {
+    u8 direction : 8;
+    u8 saved : 8;
+    u8 remaining : 8;
+};
 struct MummySavedControl {
     void *target;
     u8 state, phase, behavior, kind;
 };
-static inline void Turn(u8 saved, void *ctx, void *g)
+static inline void Turn(u8 saved, void *ctx)
 {
     struct SceneActorRegistryResetView *actor = ctx;
     u8 *group = (u8 *)&actor->group;
@@ -65,7 +71,7 @@ static inline void Turn(u8 saved, void *ctx, void *g)
     }
     if (Test16((u16 *)((u8 *)ctx + 0x414), 4))
         return;
-    group[0x204] = PickTurn(actor->direction, 3);
+    ((struct MummyTurnBytes *)(group + 0x204))->direction = PickTurn(actor->direction);
     {
         struct MummySavedControl *save = (struct MummySavedControl *)(group + 0x8C);
         save->target = actor->target;
@@ -78,6 +84,12 @@ static inline void Turn(u8 saved, void *ctx, void *g)
     Chase_SetCtl(actor, *(void **)(group + 0x21C), 0x1B);
     Chase_SetState(actor, 3, 1, 0);
     group[0x206] = 6;
+}
+static inline s32 PlayerSlot(u8 *target)
+{
+    if (target[8] <= 3)
+        return target[8];
+    return -1;
 }
 static inline u8 Arrive(void *obj)
 {
@@ -92,12 +104,7 @@ static inline u8 Arrive(void *obj)
         struct ChaseTarget *t = *slot;
         if (!t)
             goto invoke;
-        {
-            u32 index = t->index;
-            player = -1;
-            if (index <= 3)
-                player = index;
-        }
+        player = PlayerSlot((u8 *)t);
         if (player < 0) {
             goto invoke;
         }
@@ -109,14 +116,14 @@ static inline u8 Arrive(void *obj)
     }
     if (cell != actor->terrainCell && !Chase_Bits32(&gPlayers[player]->flags, 0x20000))
         goto reroute;
-    if (Chase_MotionFlags(actor, 0x400))
-        goto done;
+    if (MotionFlags(actor, 0x400))
+        return 0;
     {
         struct ChaseFlags40 *flags = (void *)(group + 0x40);
         s32 mask = ~4;
         flags->bits = mask & flags->bits;
     }
-    if (Chase_MotionFlags(actor, 0x80)) {
+    if (MotionFlags(actor, 0x80)) {
         Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
         Chase_SetBehavior(actor, 12);
     } else {
@@ -130,11 +137,11 @@ static inline u8 Arrive(void *obj)
     }
     {
         u8 saved = actor->direction;
-        Turn(saved, obj, (u8 *)&actor->group);
+        Turn(saved, obj);
     }
-    sub_0807E334(actor);
+    sub_0807E334(obj);
     actor->field2C2 = 0x20;
-    goto done;
+    return 0;
 reroute: {
     struct ContactPosition *targetPointer = &target;
     s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
@@ -154,7 +161,6 @@ reroute: {
 }
 invoke:
     Callback_InvokeActor(actor, *(void **)(group + 0x224));
-done:
     return 0;
 moved:
     return 1;
@@ -194,7 +200,11 @@ void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
             SetHalf((u16 *)(group + 0x40), mask);
         }
         actor->flags2D0 = ClearWordValue(&actor->flags2D0, 4);
-        *((u16 *)(body + 0x6f2)) &= ~0x1400;
+        {
+            struct ChaseFlags40 *field = (void *)(body + 0x6f2);
+            s32 mask = ~0x1400;
+            field->bits = mask & field->bits;
+        }
         if (Arrive(actor)) {
             Chase_SetCtl(actor, *((void **)(group + 0x48)), 0x25);
             Chase_SetBehavior(actor, 12);
@@ -202,7 +212,3 @@ void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
     } else
         actor->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Mummy_UpdatePlayerRoute);
-#endif
