@@ -1,0 +1,435 @@
+"""seek's engine: a target (one ROM function), layered evaluation, and the session store.
+
+Evaluation is layered, from what the C cannot vary to what it can:
+
+  skeleton  the determined part: calls (in order), memory accesses (width, signedness, offset; base
+            register abstracted), literal-pool values, the frame (pushed registers, stack size).
+            A draft that misses one of these computes something else or computes it another way;
+            no reordering or allocation move fixes it.
+  shape     register-blind instruction distance (scope's shape_distance): order and instruction choice.
+  regs      differing instructions after alignment (scope's count): allocation, the last layer.
+  regions   the ROM's basic blocks, each judged on its own: '=' exact, 'r' exact up to a consistent
+            renaming of low registers inside the block (so a register shift from an earlier block
+            does not hide that this block's code is right), 's' same shape, 'x' different, '-' missing.
+
+The key a search sorts by is (skeleton, shape, regs): structure before allocation, so a change that
+buys registers by breaking shape (a pin, a scaffold temporary) never ranks above the right shape.
+"""
+import collections
+import contextlib
+import hashlib
+import io
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+import zlib
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+TOOLS = os.path.dirname(HERE)
+sys.path.insert(0, os.path.join(TOOLS, "scope"))
+sys.path.insert(0, TOOLS)
+import scope  # noqa: E402  (re-execs under build/venv when capstone is missing)
+import fast  # noqa: E402
+import build  # noqa: E402
+from romlib import ROOT, off  # noqa: E402
+
+
+def sha(text):
+    return hashlib.sha1(text.encode() if isinstance(text, str) else text).hexdigest()[:16]
+
+
+def main_checkout():
+    try:
+        out = subprocess.run(["git", "-C", ROOT, "worktree", "list", "--porcelain"], capture_output=True,
+                             text=True).stdout
+        return out.split("\n", 1)[0].split(" ", 1)[1]
+    except (OSError, IndexError):
+        return ROOT
+
+
+# Sessions live in the main checkout's build/ so workers in other worktrees share them.
+HOME = os.environ.get("SEEK_HOME") or os.path.join(main_checkout(), "build", "seek")
+LOCAL = os.path.join(ROOT, "build", "seek")  # materialized node files (inside this tree, for cpp paths)
+
+
+# ------------------------------------------------------------------ source surgery
+
+def find_def(text, name):
+    """(start, end) of NAME's definition in TEXT (the last one), or None. Start is the line start (the
+    return type may sit on the line before)."""
+    m = None
+    # a definition starts at column 0 with no parenthesis before the name (`if (Name(x)) {` is a call)
+    for m2 in re.finditer(r"^(?![ \t])[^\n;#{}()=]*\b" + re.escape(name) + r"\s*\([^;{]*\)\s*\{", text, re.M):
+        m = m2
+    if not m:
+        return None
+    start = text.rfind("\n", 0, m.start()) + 1
+    if re.match(r"\s*" + re.escape(name) + r"\b", text[start:]):  # `void\nName(...)`
+        prev = text.rfind("\n", 0, start - 1) + 1
+        if re.fullmatch(r"(static\s+|inline\s+)*[A-Za-z_][\w \t\*]*", text[prev:start - 1]):
+            start = prev
+    return start, fast.body_end(text, m.end() - 1)
+
+
+def splice(text, names, new_def):
+    for n in names:
+        span = find_def(text, n)
+        if span:
+            return text[:span[0]] + new_def.rstrip() + "\n" + text[span[1]:]
+    return None
+
+
+# ------------------------------------------------------------------ the determined part
+
+MEM = re.compile(r"^(ldr|ldrh|ldrsh|ldrb|ldrsb|str|strh|strb) (r\d+|sb|sl|fp|ip), \[(\w+)(?:, (#?-?(?:0x[0-9a-f]+|\d+)|\w+))?\]")
+
+
+def skeleton(rows, names):
+    """Ordered determined events of a decoded listing: ('call', name), ('mem', op, offset),
+    ('lit', value), ('frame', ...)."""
+    ev = []
+    for r in rows:
+        t = r[2]
+        m = re.match(r"bl #(0x[0-9a-f]+)$", t)
+        if m:
+            a = int(m.group(1), 16)
+            ev.append(("call", names.get(a & ~1, hex(a))))
+            continue
+        m = MEM.match(t)
+        if m:
+            op, base, idx = m.group(1), m.group(3), m.group(4)
+            if base == "sp":
+                continue  # the frame layout is allocation's business
+            if base == "pc":
+                continue
+            o = idx if idx and idx.startswith("#") else ("#0" if not idx else "reg")
+            ev.append(("mem", op, o))
+            continue
+        m = re.match(r"ldr (r\d+), =(0x[0-9A-Fa-f]+)$", r[3])
+        if m:
+            ev.append(("lit", m.group(2).lower()))
+            continue
+        if t.startswith("push") or (t.startswith("pop") and "pc" in t):
+            ev.append(("frame", t.split()[0], re.sub(r"\s", "", t.split(None, 1)[1])))
+        elif re.match(r"(sub|add) sp, #", t):
+            ev.append(("frame", t))
+    return ev
+
+
+def ev_text(e):
+    if e[0] == "call":
+        return f"call {e[1]}"
+    if e[0] == "mem":
+        return f"{e[1]} [base, {e[2]}]"
+    if e[0] == "lit":
+        return f"literal {e[1]}"
+    return " ".join(e[1:])
+
+
+def skeleton_diff(rom_ev, mine_ev):
+    """(distance, [lines]) between two skeletons: multiset differences, then call order."""
+    out = []
+    a, b = collections.Counter(rom_ev), collections.Counter(mine_ev)
+    miss, extra = a - b, b - a
+    dist = sum(miss.values()) + sum(extra.values())
+    for e, n in sorted(miss.items(), key=str):
+        out.append(f"ROM has, draft lacks: {ev_text(e)}" + (f" x{n}" if n > 1 else ""))
+    for e, n in sorted(extra.items(), key=str):
+        out.append(f"draft has, ROM lacks: {ev_text(e)}" + (f" x{n}" if n > 1 else ""))
+    ca_ = [e[1] for e in rom_ev if e[0] == "call"]
+    cb = [e[1] for e in mine_ev if e[0] == "call"]
+    if not miss and not extra and ca_ != cb:
+        dist += 1
+        out.append("calls in another order: ROM " + ", ".join(ca_[:12]) + " / draft " + ", ".join(cb[:12]))
+    return dist, out
+
+
+# ------------------------------------------------------------------ regions
+
+def blocks_of(rows):
+    """[(lo, hi)] row index ranges of the basic blocks of a decoded listing."""
+    at = {r[0]: i for i, r in enumerate(rows)}
+    leaders = {0}
+    for i, r in enumerate(rows):
+        t = r[2]
+        if r[4] is not None and t.split()[0].startswith("b") and t.split()[0] not in ("bic", "bics", "bl"):
+            if r[4] in at:
+                leaders.add(at[r[4]])
+            leaders.add(i + 1)
+        elif t.startswith(("bx", "pop")) and ("pc" in t or t.startswith("bx")):
+            leaders.add(i + 1)
+        elif t.startswith(".word") or t.startswith("."):
+            leaders.add(i)
+            leaders.add(i + 1)
+    leaders = sorted(x for x in leaders if x < len(rows))
+    return [(a, b) for a, b in zip(leaders, leaders[1:] + [len(rows)])]
+
+
+def regions(rom, mine, pairs):
+    """[(lo, hi, verdict, detail)] per ROM block."""
+    by_rom = {x: (y, t) for x, y, t in pairs if x is not None}
+    extra = collections.Counter()  # draft-only insns, charged to the ROM row before them
+    last = 0
+    for x, y, t in pairs:
+        if x is not None:
+            last = x
+        elif t == "+":
+            extra[last] += 1
+    out = []
+    for lo, hi in blocks_of(rom):
+        if all(rom[i][2].startswith(".") or rom[i][2] == "movs r0, r0" for i in range(lo, hi)):
+            continue  # literal pool
+        tags = [by_rom.get(i, (None, "-")) for i in range(lo, hi)]
+        added = sum(extra[i] for i in range(lo, hi))
+        if all(t == "=" for _, t in tags) and not added:
+            out.append((lo, hi, "=", ""))
+            continue
+        if any(y is None for y, _ in tags) or added:
+            out.append((lo, hi, "x", f"{sum(1 for y, _ in tags if y is None)} missing, {added} extra"))
+            continue
+        same_shape = all(scope.norm_insn(rom[i][3]) == scope.norm_insn(mine[y][3]) or t in "=→"
+                         for i, (y, t) in zip(range(lo, hi), tags))
+        if not same_shape:
+            out.append((lo, hi, "x", f"{sum(1 for _, t in tags if t != '=')} differ"))
+            continue
+        fwd, back, ok = {}, {}, True
+        for i, (y, t) in zip(range(lo, hi), tags):
+            for a, b in zip(scope.reg_nums(rom[i][2]), scope.reg_nums(mine[y][2])):
+                if a > 7 and b > 7:
+                    ok &= a == b
+                    continue
+                if fwd.setdefault(b, a) != a or back.setdefault(a, b) != b:
+                    ok = False
+        if ok:
+            ren = ", ".join(f"r{b}->r{a}" for b, a in sorted(fwd.items()) if a != b)
+            out.append((lo, hi, "r", ren))
+        else:
+            out.append((lo, hi, "s", ""))
+    return out
+
+
+def region_string(regs):
+    return "".join(v for _, _, v, _ in regs)
+
+
+# ------------------------------------------------------------------ target
+
+class Target:
+    """One ROM function and its draft's unit: compiles variants in milliseconds and evaluates them."""
+
+    def __init__(self, src, func=None):
+        self.src = os.path.relpath(os.path.abspath(src), ROOT)
+        text = open(os.path.join(ROOT, self.src)).read()
+        if func and not find_def(text, func):  # a ROM name whose draft has a C name: its block's definition
+            for b in scope.nonmatching_blocks(text):
+                if func in b["names"]:
+                    body = text[b["body"]:b["else"][0]]
+                    defs = [n for n in b["names"] if n != func and find_def(body, n)]
+                    func = defs[-1] if defs else func
+        self.func = func or scope.nonmatching_func(self.src)
+        if not self.func:
+            raise SystemExit(f"{src}: no NONMATCHING function found; name it")
+        self.rom_name = scope.rom_name(self.src, self.func)
+        self.names = (self.func, self.rom_name)
+        _, addr, sizes = scope.inventory()
+        if self.rom_name not in addr:
+            raise SystemExit(f"{self.func}: not in the ROM inventory")
+        self.addr, self.size = addr[self.rom_name], sizes[self.rom_name]
+        self.rom_code = scope.rom_bytes()[off(self.addr):off(self.addr) + self.size]
+        self.rom_rows = scope.decode(self.rom_code, self.addr, scope.rom_data(self.rom_name, self.addr,
+                                                                               self.rom_code))
+        self.symnames = {}
+        for n, v in scope.elf_syms().items():
+            a = v[0] if isinstance(v, tuple) else v
+            if isinstance(a, int):
+                self.symnames.setdefault(a & ~1, n)
+        self.rom_skel = skeleton(self.rom_rows, self.symnames)
+        flags = list(build.cflags_for(self.src))
+        os.makedirs(os.path.join(LOCAL, "cache"), exist_ok=True)
+        self.fast = fast.Fast(scope.INSTR, flags, build.AS, scope.elf_syms(), self.addr,
+                              os.path.join(LOCAL, "cache"), fixup=scope.inline_macros)
+        self.compiles = 0
+        self.compile_time = 0.0
+        self._oracle = None
+
+    # -- compiling
+    def preprocess_file(self, path):
+        rel = os.path.relpath(os.path.abspath(path), ROOT)
+        return scope.fast_preprocess(rel, {}, self.func)
+
+    def compile_pre(self, pre, knobs=None):
+        """(code, error) for a preprocessed unit text."""
+        t0 = time.time()
+        code, err = self.fast.bytes(pre, self.names, knobs or {})
+        self.compiles += 1
+        self.compile_time += time.time() - t0
+        return code, err
+
+    # -- evaluation
+    def evaluate(self, code):
+        if code is None:
+            return {"ok": False, "key": [9999, 9999, 9999], "counts": "COMPILE FAILED"}
+        if code == self.rom_code:
+            return {"ok": True, "match": True, "key": [0, 0, 0], "counts": "MATCH", "regions": "",
+                    "size": len(code)}
+        rows = scope.decode(code, self.addr, self.fast.data)
+        pairs, _ = scope.align(self.rom_rows, rows)
+        diff = sum(1 for _, _, t in pairs if t != "=")
+        shape = scope.shape_distance(self.rom_rows, rows)
+        sk, sk_lines = skeleton_diff(self.rom_skel, skeleton(rows, self.symnames))
+        regs = regions(self.rom_rows, rows, pairs)
+        counts = scope.count_text([{"tag": t} for _, _, t in pairs])
+        return {"ok": True, "match": False, "key": [sk, shape, diff], "counts": counts,
+                "regions": region_string(regs), "skeleton": sk_lines[:12], "size": len(code)}
+
+    def detail(self, code):
+        rows = scope.decode(code, self.addr, self.fast.data)
+        pairs, _ = scope.align(self.rom_rows, rows)
+        return rows, pairs, regions(self.rom_rows, rows, pairs)
+
+    # -- semantics
+    def oracle(self, pre):
+        if self._oracle is None:
+            try:
+                import semcheck
+            except BaseException:  # noqa: BLE001  semcheck exits when unicorn is missing
+                self._oracle = False
+                return False
+            text = open(os.path.join(ROOT, self.src)).read()
+            try:
+                self._oracle = semcheck.Oracle(self.rom_name, 6, semcheck.returns_value(text, self.func),
+                                               arity=semcheck.arities(pre),
+                                               kinds=semcheck.param_kinds(pre, self.func))
+            except Exception as e:  # noqa: BLE001
+                self._oracle = False
+                print(f"(semcheck unavailable: {e})", file=sys.stderr)
+        return self._oracle
+
+    def semantic(self, code, pre):
+        o = self.oracle(pre)
+        if not o or code is None:
+            return "unchecked"
+        try:
+            verdict, detail = o.check(code)
+        except Exception as e:  # noqa: BLE001
+            return f"unchecked ({e})"
+        return verdict if not detail else f"{verdict}: {detail}"
+
+
+# ------------------------------------------------------------------ session store
+
+class Session:
+    """The search tree of one function: nodes.jsonl (append-only, one evaluated node per line) and
+    content-addressed blobs. Shared by every worker on the function (SEEK_HOME)."""
+
+    def __init__(self, func):
+        self.func = func
+        self.dir = os.path.join(HOME, func)
+        os.makedirs(os.path.join(self.dir, "blobs"), exist_ok=True)
+        self.path = os.path.join(self.dir, "nodes.jsonl")
+        self.nodes = {}
+        self.by_out = {}
+        self.events = []
+        if os.path.exists(self.path):
+            for ln in open(self.path):
+                if not ln.strip():
+                    continue
+                r = json.loads(ln)
+                if r.get("type") == "event":
+                    self.events.append(r)
+                    continue
+                self.nodes[r["id"]] = r
+                if r.get("out"):
+                    self.by_out.setdefault(r["out"], r["id"])
+
+    def put_blob(self, text):
+        h = sha(text)
+        p = os.path.join(self.dir, "blobs", h + ".z")
+        if not os.path.exists(p):
+            tmp = f"{p}.{os.getpid()}"
+            open(tmp, "wb").write(zlib.compress(text.encode(), 6))
+            os.replace(tmp, p)
+        return h
+
+    def blob(self, h):
+        return zlib.decompress(open(os.path.join(self.dir, "blobs", h + ".z"), "rb").read()).decode()
+
+    def _append(self, rec):
+        import fcntl
+        with open(self.path, "a") as f:
+            fcntl.flock(f, fcntl.LOCK_EX)
+            f.write(json.dumps(rec) + "\n")
+
+    def add(self, rec):
+        import fcntl
+        with open(self.path, "a+") as f:  # ids are allocated under the lock: other workers append too
+            fcntl.flock(f, fcntl.LOCK_EX)
+            f.seek(0)
+            last = 0
+            for ln in f:
+                try:
+                    r = json.loads(ln)
+                except ValueError:
+                    continue
+                if r.get("type") != "event":
+                    last = max(last, r["id"])
+                    self.nodes.setdefault(r["id"], r)
+            rec["id"] = last + 1
+            rec.setdefault("t", round(time.time()))
+            f.write(json.dumps(rec) + "\n")
+        self.nodes[rec["id"]] = rec
+        if rec.get("out"):
+            self.by_out.setdefault(rec["out"], rec["id"])
+        return rec
+
+    def event(self, **kw):
+        kw.update(type="event", t=round(time.time()))
+        self._append(kw)
+        self.events.append(kw)
+
+    def update(self, nid, **kw):
+        """Annotate a node (notes, semantic verdicts): appended as an event, folded in on load."""
+        self.nodes[nid].update(kw)
+        self.event(kind="update", node=nid, fields=kw)
+
+    def fold_updates(self):
+        for e in self.events:
+            if e.get("kind") == "update" and e.get("node") in self.nodes:
+                self.nodes[e["node"]].update(e["fields"])
+
+    def text(self, node):
+        """The node's whole source file."""
+        text = self.blob(node["file"])
+        for name, h in sorted((node.get("defs") or {}).items()):
+            out = splice(text, [name], self.blob(h))
+            if out is None:
+                raise SystemExit(f"n{node['id']}: cannot find {name}'s definition in its base file")
+            text = out
+        return text
+
+    def materialize(self, node):
+        """build/seek/FUNC/nN.c in this tree (cpp resolves includes relative to the tree)."""
+        d = os.path.join(LOCAL, self.func)
+        os.makedirs(d, exist_ok=True)
+        p = os.path.join(d, f"n{node['id']}.c")
+        t = self.text(node)
+        if not os.path.exists(p) or open(p).read() != t:
+            open(p, "w").write(t)
+        return os.path.relpath(p, ROOT)
+
+    def expanded(self, nid):
+        return [e for e in self.events if e.get("kind") == "expand" and e.get("node") == nid]
+
+
+def key_of(node):
+    return tuple(node.get("key") or (9999, 9999, 9999))
+
+
+def capture(fn, *a, **kw):
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        r = fn(*a, **kw)
+    return r, buf.getvalue()
