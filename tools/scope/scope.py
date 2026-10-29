@@ -673,6 +673,10 @@ def rom_pool_ranges(code, addr, arm=False):
 def rom_data(func, addr, code, arm=False):
     """The ROM function's data ranges: its generated assembly's, or (a function the disassembler
     left as .incbin has no labels at all) the literal pools its pc-relative loads reach."""
+    if os.environ.get("SCOPE_POOL_SCAN") == "1":
+        # Explicit diagnostic override when generated assembly labels reachable code as .word.
+        # Byte acceptance still compares the original ROM span without modification.
+        return rom_pool_ranges(code, addr, arm)
     found = rom_data_ranges(func, addr)
     if not found or not (found[0] or found[1]):
         return rom_pool_ranges(code, addr, arm)
@@ -770,6 +774,18 @@ def draft_annotations(wd, func, rows, obj_offset, lines=None, data=()):
     # RTL uid: including even one would discard annotations for the whole unit.
     code = [r for r in rows if not r[2].startswith(".")
             and not any(lo <= r[0] < hi for lo, hi in data)]
+    if os.environ.get("SCOPE_TAIL") == "1":
+        # The dumps and -dp sequence belong to FUNC, although the compared byte span includes
+        # following routines. Keep its annotations instead of discarding every uid on a length mismatch.
+        import fast
+        obj = open(os.path.join(wd, "u.o"), "rb").read()
+        secs = fast.elf_sections(obj)
+        text_i = next(i for i, sec in enumerate(secs) if sec["name"] == ".text")
+        following = [v & ~1 for _, v, sh, typ in fast.elf_symbols(obj, secs)
+                     if sh == text_i and typ == 2 and (v & ~1) > obj_offset]
+        if following:
+            end = min(following) - obj_offset
+            code = [r for r in code if r[0] < end]
     ann = {}
     if len(seq) == len(code):
         for (mn, uid), r in zip(seq, code):
