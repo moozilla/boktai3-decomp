@@ -486,7 +486,9 @@ def rank(n):
     Objective "rotation": among nodes whose code is right up to reload's spill rotation, the one
     needing the smallest shift first (a C change that adds or removes one reload choice before the
     differing one moves the shift by one: a gradient where the insn count shows none).
-    Objective "block": the cost inside one ROM block first, the rest of the function second."""
+    Objective "block": the cost inside one ROM block first, the rest of the function second.
+    Objective "code": shape and differing insns first, for cases where the skeleton's frame or
+    literal-load counts reflect optimization choices rather than a semantic error."""
     if not n.get("ok"):
         return (9999, 9999, 9999, 9999)
     k = key_of(n)
@@ -498,7 +500,9 @@ def rank(n):
         r = n["rot"]  # [diff after the best single shift, K, D]
         return (k[0], r[0], r[2] if r[0] == 0 else 99, cost)
     if mode == "block" and n.get("blk") is not None:
-        return (k[0], n["blk"], cost, k[1])
+        return (n["blk"], cost, k[1], k[0])
+    if mode == "code":
+        return (cost, k[1], k[2], k[0])
     return (k[0], cost, k[1], k[2])
 
 
@@ -1030,8 +1034,9 @@ def main():
     p.add_argument("--slack", type=int, help="explore children up to this much worse (shape+diff) than the "
                    "best (default max(4, diff/8))")
     p.add_argument("--depth", type=int, default=6, help="moves stacked on a node at most")
-    p.add_argument("--objective", choices=["rotation", "block"], help="rotation: rank by the reload spill "
-                   "shift still needed (AGBCC_SPILL=K:D); block: by one ROM block's cost (--block)")
+    p.add_argument("--objective", choices=["rotation", "block", "code"], help="rotation: rank by the reload spill "
+                   "shift still needed (AGBCC_SPILL=K:D); block: by one ROM block's cost (--block); "
+                   "code: shape and differing insns before optimization-dependent skeleton hints")
     p.add_argument("--rot-max", type=int, help="rotation: test shifts on children with at most this diff")
     p.add_argument("--block", type=int, help="work on one ROM block (its number in the block map): moves only on "
                    "the C lines that produce it, ranked by its own cost first")
