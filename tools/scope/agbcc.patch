@@ -1566,3 +1566,43 @@
  	    {
  	      if (loop_dump_stream)
  		fprintf (loop_dump_stream,
+--- a/jump.c
++++ b/jump.c
+@@ -2698,6 +2698,22 @@
+ 
+   *f1 = 0;
+   *f2 = 0;
++
++  /* Diagnostic: keep selected late tail merges separate.  The numbers
++     name the source jump's insn uid (as in the RTL dumps).  */
++  {
++    const char *skip = getenv ("AGBCC_NOCROSS");
++    while (skip && *skip)
++      {
++        char *end;
++        long uid = strtol (skip, &end, 10);
++        if (end == skip)
++          break;
++        if (uid == INSN_UID (e1))
++          return;
++        skip = *end == ',' ? end + 1 : end;
++      }
++  }
+ 
+   while (1)
+     {
+@@ -2829,7 +2845,13 @@
+     }
+ 
+   if (minimum <= 0 && last1 != 0 && last1 != e1)
+-    *f1 = last1, *f2 = last2;
++    {
++      if (getenv ("AGBCC_CROSS_TRACE"))
++        fprintf (stderr, "CROSS jump %d target %d: share %d with %d\n",
++                 INSN_UID (e1), INSN_UID (e2),
++                 INSN_UID (last1), INSN_UID (last2));
++      *f1 = last1, *f2 = last2;
++    }
+ }
+ 
+ static void
