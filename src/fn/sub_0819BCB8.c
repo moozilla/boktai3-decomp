@@ -11,7 +11,12 @@ struct BurstVector {
 struct ActorReaction {
     u8 unk_00[0x54];
     struct BurstVector position;
-    u8 unk_5C[0x32B - 0x5C];
+    struct BurstVector velocity;
+    u8 unk64[0xA8 - 0x64];
+    u8 motionFacing;
+    u8 unkA9[0x110 - 0xA9];
+    struct BurstVector *parts[8];
+    u8 unk130[0x32B - 0x130];
     u8 side;
 };
 extern const s16 gUnk_086149C4[];
@@ -50,32 +55,87 @@ static inline s32 RandomMode(void)
     offset = gRandomIndex * 2;
     return *(const u16 *)(offset + 0x0203B400);
 }
-#ifdef NONMATCHING
-// fuzzy: 61.2%
-// scope shape 141 (differences once low registers are set aside)
+
+u16 Sqrt(u32);
+s32 Div(s32, s32);
+static inline void MotionPolar(struct BurstVector *out, s32 angle, s32 radius)
+{
+    out->x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
+    out->y = 0;
+    out->z = Scale(gUnk_086149C4[angle & 255] * radius);
+}
+static inline void Difference(struct BurstVector *out, struct BurstVector *a, struct BurstVector *b)
+{
+    out->x = a->x - b->x;
+    out->y = a->y - b->y;
+    out->z = a->z - b->z;
+}
+static inline void Normalize(struct BurstVector *v, s32 speed)
+{
+    struct BurstVector *out = v;
+    u16 length = Sqrt(v->x * v->x + out->y * out->y + out->z * out->z);
+    if (length) {
+        v->x = Div(v->x * speed, length);
+        out->y = Div(out->y * speed, length);
+        out->z = Div(out->z * speed, length);
+    }
+}
+
 void Hresvelgr_EmitFacingMotion(struct ActorReaction *input)
 {
     register struct ActorReaction *actor asm("r6") = input;
     struct ActorReaction *saved = actor;
     struct BurstVector position;
     struct BurstVector velocity;
-    s32 sideSample = RandomValue() >> 3;
-    s32 side = sideSample - sideSample / 2 * 2;
-    s32 facing = actor->side;
-    s32 sample = RandomValue() >> 3;
+    /* The inlined RNG retains this setup address across its first two samples. */
+    register u32 opaque asm("r12") = 0x0403B714;
+    u32 sideSample;
+    s32 side;
+    s32 facing;
+    s32 radius;
+    register s32 direction;
+    sideSample = RandomValue() >> 3;
+    side = sideSample - sideSample / 2 * 2;
+    facing = actor->side;
+    radius = RandomValue() >> 3;
     {
-        s32 quotient = sample / 1024 * 1024;
-        struct BurstVector *out = &position;
-        s32 angle = (side << 7) + (facing << 6) + 64;
-        s32 radius = sample - quotient;
+        register s32 quotient asm("r1");
+        register u32 scratch asm("r9");
+        struct BurstVector *out;
+        register s32 angle;
+        quotient = radius;
+        asm("" : : "r"(quotient));
+        scratch = opaque;
+        quotient = quotient / 1024 * 1024;
+        out = &position;
+        side <<= 7;
+        direction = facing << 6;
+        angle = side + direction;
+        angle += 64;
+        radius -= quotient;
         out->x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
         out->y = 0;
-        out->z = Scale(gUnk_086149C4[angle & 255] * radius);
+        angle &= 255;
+        direction = angle << 1;
+        out->z = Scale(*(const s16 *)((u32)gUnk_086149C4 + direction) * radius);
+        asm("" : : "r"(scratch));
     }
     Add(&position, &saved->position, &position);
-    Polar(&velocity, actor->side << 6, 128);
+    direction = actor->side;
+    Polar(&velocity, direction << 6, 128);
+    asm("" : : "r"(actor));
     MotionEntry_CreateWithDelta(&position, &velocity, (RandomMode() >> 3) % 4, 32);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Hresvelgr_EmitFacingMotion);
-#endif
+#define Hresvelgr_SetPartApproachMotion sub_0819BE28
+/* Tentative: choose an offset from one part, then set a normalized movement vector. */
+void Hresvelgr_SetPartApproachMotion(struct ActorReaction *actor, s32 radius, s32 speed, u32 part)
+{
+    struct BurstVector offset;
+    MotionPolar(&offset, ((actor->motionFacing >> 1) << 6) + 128, radius);
+    {
+        struct BurstVector *target = actor->parts[part];
+        Add(&offset, target, &offset);
+    }
+    Difference(&actor->velocity, &offset, &actor->position);
+    Normalize(&actor->velocity, speed);
+}

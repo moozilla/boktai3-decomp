@@ -207,8 +207,13 @@ def draft_scores(src, obj, mine, rom, arm):
         if not here or key not in addr:
             continue
         start = here[0] - base
-        end = next((o - base for o, _ in syms if o - base > start), len(mine))
         a = addr[key]
+        # An inventory span can contain formerly unlabeled trailing functions.
+        # Their recovered C belongs to the same reviewed byte range.
+        def inside_span(n):
+            m = re.fullmatch(r"sub_([0-9A-Fa-f]{8})", n)
+            return n not in addr and m is not None and a < int(m[1], 16) < a + sizes[key]
+        end = next((o - base for o, n in syms if o - base > start and not inside_span(n)), len(mine))
         part = comparison(rom[off(a):off(a) + sizes[key]], mine[start:end], a, arm=arm)
         scores[name] = fuzzy_percent(part)
     return scores

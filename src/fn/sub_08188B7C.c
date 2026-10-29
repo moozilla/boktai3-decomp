@@ -1,263 +1,310 @@
 #include "global.h"
+#include "game_state.h"
 
-// confidence=low: armor boss timers and the chase/attack state machine, player-relative
-
-// confidence=low: armor boss timers and the chase/attack state machine, player-relative
-
-// confidence=low: armor boss timers and the chase/attack state machine, player-relative
-
-// confidence=low: armor boss timers and the chase/attack state machine, player-relative
-struct Player08188B7C {
-    u8 unk00[0x30];
-    s16 x30;
-    u8 unk32[2];
-    s16 y34;
+struct ArmorPart {
+    u8 pad[0x38];
+    u32 flags;
 };
 
-struct Armor08188B7C {
-    u8 unk00[0x18];
-    u16 flags18;
-    u8 unk1A[0x48 - 0x1A];
-    s16 x48;
-    u8 unk4A[2];
-    s16 y4C;
-    u8 unk4E[0x1C8 - 0x4E];
-    u32 word1C8;
-    u8 unk1CC[0x21C - 0x1CC];
-    u32 word21C;
-    u8 unk220[0x274 - 0x220];
-    u16 f274;
-    u8 unk276[0xB26 - 0x276];
-    u16 fB26;
-    u16 fB28;
-    u8 unkB2A[0xB32 - 0xB2A];
-    u16 flagsB32;
-    u8 unkB34[0xB38 - 0xB34];
-    u8 fB38;
-    u8 fB39;
-    u8 unkB3A[0xB3C - 0xB3A];
-    u8 fB3C;
-    u8 fB3D;
-    u8 unkB3E[0x1120 - 0xB3E];
-    u8 state1120;
-    u8 flag1121;
-    s16 t1122;
-    s16 t1124;
-    s16 t1126;
-    u16 f1128;
-    s16 t112A;
-    u16 f112C;
-    u16 f112E;
+struct ArmorChargeActor {
+    u8 pad0[0x18];
+    u16 taskFlags;
+    u8 pad1a[0x48 - 0x1a];
+    s16 x, y, z;
+    u8 pad4e[0x190 - 0x4e];
+    struct ArmorPart body;
+    u8 pad1cc[0x1e4 - 0x1cc];
+    struct ArmorPart attack;
+    u8 pad220[0x274 - 0x220];
+    u16 damage274;
+    u8 pad276[0xb26 - 0x276];
+    u16 savedB26;
+    u16 savedB28;
+    u8 padB2A[0xB32 - 0xB2A];
+    u16 flags;
+    u8 padB34[4];
+    u8 type;
+    u8 facing;
+    u8 padB3A[2];
+    u8 behavior, phase;
+    u8 padB3E[0x1120 - 0xB3E];
+    u8 decision, fastMode;
+    s16 attackCooldown;
+    s16 secondaryCooldown;
+    s16 collisionCooldown;
+    s16 modeTimer;
+    s16 timer112a;
+    u16 field112C;
+    u16 field112E;
+};
+
+struct ArmorChargeTarget {
+    u8 pad[0x30];
+    s16 x, y, z;
 };
 
 void ActorController_SetBehavior(void *, s32);
 void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Math_Atan2(s32, s32);
 
-#ifdef NONMATCHING
-// fuzzy: 45.2%
-// scope shape 201 (differences once low registers are set aside)
-// confidence=low: armor boss timers and the chase/attack state machine, player-relative
-void sub_08188B7C(void *arg0)
+static inline void Armor_ClearPart(struct ArmorPart *part, u32 bits)
 {
-    struct Armor08188B7C *a = arg0;
-    struct Player08188B7C *player;
-    s32 dx, dy, dxR, dyR, absX, absY, sum, dir;
+    u32 mask = ~bits;
+    part->flags &= mask;
+}
 
-    if (a->t1122 > 0)
-        a->t1122--;
-    if (a->t1124 > 0)
-        a->t1124--;
-    if (a->t1126 > 0)
-        a->t1126--;
-    if (a->fB3D != 0xFF && a->fB3C != 2 && a->fB3C != 0x1a && a->fB3C != 0x1b && a->fB3C != 0x1c)
-        return;
+/* Prepare a charge and clear the body and attack-part flags. */
+static inline void Armor_BeginCharge(struct ArmorChargeActor *p)
+{
+    u16 damage;
+    p->decision = 5;
+    p->attackCooldown = 0x12C;
+    p->savedB26 = p->field112C;
+    damage = p->field112E;
+    p->savedB28 = damage;
+    p->damage274 = damage;
+    Armor_ClearPart(&p->attack, 0x200004);
+    Armor_ClearPart(&p->body, 0x200004);
+}
 
-    player = *(struct Player08188B7C **)0x02000710;
-    dx = player->x30 - a->x48;
-    dy = player->y34 - a->y4C;
-    dxR = (dx + 0x80) >> 8;
-    dyR = (dy + 0x80) >> 8;
-    absX = dxR < 0 ? -dxR : dxR;
-    absY = dyR < 0 ? -dyR : dyR;
-    sum = absX + absY;
+/* Select a close strike or a more distant aligned attack. */
+static inline void Armor_AimAtPlayer(struct ArmorChargeActor *p, s32 ax, s32 az,
+                                     s32 allowDistantAttack)
+{
+    struct ArmorChargeTarget *tgt;
+    s32 dx, dz, dir;
 
-    if (a->flagsB32 & 1) {
-        if (a->state1120 > 5)
+    tgt = (struct ArmorChargeTarget *)gGameState;
+    dx = tgt->x - p->x;
+    dz = tgt->z - p->z;
+    dir = Math_Atan2(dx, dz);
+    dir = (dir + 0x20) & 0xC0;
+    if (p->facing == dir) {
+        if (ax + az <= 2) {
+            ActorController_SetBehavior(p, 3);
             return;
-        switch (a->state1120) {
+        }
+        if (allowDistantAttack && ax + az > 4) {
+            ActorController_SetBehavior(p, 9);
+            return;
+        }
+    }
+    if (p->secondaryCooldown <= 0)
+        ActorController_SetBehaviorIfFinished(p, 0x1C);
+    else
+        ActorController_SetBehaviorIfFinished(p, 0x1B);
+}
+
+// confidence=low: manages aligned strikes, recovery and charge preparation.
+void sub_08188B7C(struct ArmorChargeActor *p)
+{
+    s32 dx, dz, ax, az;
+    if (p->attackCooldown > 0)
+        p->attackCooldown--;
+    if (p->secondaryCooldown > 0)
+        p->secondaryCooldown--;
+    if (p->collisionCooldown > 0)
+        p->collisionCooldown--;
+    if (p->phase != 0xFF && p->behavior != 2 && p->behavior != 0x1A && p->behavior != 0x1B &&
+        p->behavior != 0x1C)
+        return;
+    {
+        struct ArmorChargeTarget *tgt = (struct ArmorChargeTarget *)gGameState;
+        dx = tgt->x - p->x;
+        dz = tgt->z - p->z;
+    }
+    dx = (dx + 128) >> 8;
+    dz = (dz + 128) >> 8;
+    ax = dx;
+    az = dz;
+    if (dx < 0)
+        ax = -dx;
+    if (dz < 0)
+        az = -dz;
+
+    if (p->flags & 1) {
+        switch (p->decision) {
             case 0:
-                if (a->flagsB32 & 2) {
-                    ActorController_SetBehavior(a, 0xC);
+                if (p->flags & 2) {
+                    ActorController_SetBehavior(p, 0xC);
                     return;
                 }
-                if ((dxR == 0 || dyR == 0) && a->fB3C == 2 && (a->flags18 & 4)) {
-                    ActorController_SetBehavior(a, 0x18);
-                    return;
-                }
-                ActorController_SetBehaviorIfFinished(a, 2);
+                if (dx == 0) {
+                    if (p->behavior != 2)
+                        goto waitAttack;
+                    if (!(p->taskFlags & 4))
+                        goto waitAttack;
+                    goto beginAttack;
+                } else if (dz == 0) {
+                    if (p->behavior == 2) {
+                        if (p->taskFlags & 4)
+                            goto beginAttack;
+                    }
+                    goto waitAttack;
+                } else
+                    ActorController_SetBehaviorIfFinished(p, 2);
                 return;
             case 1:
-                if (a->t1122 <= 0) {
-                    ActorController_SetBehavior(a, 2);
-                    a->state1120 = 0;
-                    a->f1128 = 0;
-                    a->t112A = 0;
+                if (p->attackCooldown <= 0) {
+                    ActorController_SetBehavior(p, 2);
+                    p->decision = 0;
+                    p->modeTimer = 0;
+                    p->timer112a = 0;
                     return;
-                }
-                if (a->fB3C == 3) {
-                    ActorController_SetBehavior(a, 0xA);
-                    a->t1126 = 0x78;
-                    return;
-                }
-                if (a->fB3C == 0xF) {
-                    ActorController_SetBehavior(a, 0xA);
-                    a->t1126 = 0x78;
-                    return;
-                }
-                if ((u8)(a->fB3C - 10) <= 1 || a->fB3C == 0xD) {
-                    if (a->t1126 > 0)
+                } else {
+                    s16 bh = p->behavior;
+                    if (bh == 3) {
+                        ActorController_SetBehavior(p, 10);
+                        p->collisionCooldown = 120;
                         return;
-                }
-                dir = (Math_Atan2(player->x30 - a->x48, player->y34 - a->y4C) + 0x20) & 0xC0;
-                if (a->fB39 == dir && sum <= 2) {
-                    ActorController_SetBehavior(a, 3);
+                    }
+                    if (bh == 15) {
+                        ActorController_SetBehavior(p, 0xA);
+                        p->collisionCooldown = 0x78;
+                        return;
+                    }
+                    if ((u8)(bh - 10) <= 1 || bh == 0xD) {
+                        if (p->collisionCooldown > 0)
+                            return;
+                    }
+                    Armor_AimAtPlayer(p, ax, az, 0);
                     return;
                 }
-                if (a->t1124 > 0)
-                    ActorController_SetBehaviorIfFinished(a, 0x1b);
-                else
-                    ActorController_SetBehaviorIfFinished(a, 0x1c);
-                return;
             case 2:
-                if (a->t1122 > 0) {
-                    ActorController_SetBehaviorIfFinished(a, 5);
-                    return;
-                }
-                ActorController_SetBehavior(a, 6);
-                a->state1120 = 0;
+                if (p->attackCooldown <= 0) {
+                    ActorController_SetBehavior(p, 6);
+                    p->decision = 0;
+                } else
+                    ActorController_SetBehaviorIfFinished(p, 5);
                 return;
             case 3:
-                if (a->t1124 <= 0)
-                    goto state5;
-                if (a->flagsB32 & 2) {
-                    ActorController_SetBehavior(a, 0xC);
-                    return;
+                if (p->secondaryCooldown <= 0)
+                    Armor_BeginCharge(p);
+                else {
+                    if (p->flags & 2) {
+                        ActorController_SetBehavior(p, 0xC);
+                        return;
+                    }
+                    if (dx == 0) {
+                        if (p->behavior != 26)
+                            goto waitWait;
+                        if (!(p->taskFlags & 4))
+                            goto waitWait;
+                        goto beginWait;
+                    } else if (dz == 0) {
+                        if (p->behavior == 26) {
+                            if (p->taskFlags & 4)
+                                goto beginWait;
+                        }
+                        goto waitWait;
+                    } else
+                        ActorController_SetBehaviorIfFinished(p, 0x1A);
                 }
-                if ((dxR == 0 || dyR == 0) && a->fB3C == 0x1a && (a->flags18 & 4)) {
-                    ActorController_SetBehavior(a, 0x19);
-                    return;
-                }
-                ActorController_SetBehaviorIfFinished(a, 0x1a);
                 return;
             case 4:
-                if (a->t1122 > 0) {
-                    ActorController_SetBehaviorIfFinished(a, 5);
-                    return;
-                }
-                ActorController_SetBehavior(a, 6);
-                a->state1120 = 3;
+                if (p->attackCooldown <= 0) {
+                    ActorController_SetBehavior(p, 6);
+                    p->decision = 3;
+                } else
+                    ActorController_SetBehaviorIfFinished(p, 5);
                 return;
             case 5:
-                if (a->t1122 > 0) {
-                    ActorController_SetBehavior(a, 0x1d);
-                    return;
-                }
-                a->state1120 = 0;
+                if (p->attackCooldown <= 0)
+                    p->decision = 0;
+                else
+                    ActorController_SetBehavior(p, 0x1D);
                 return;
         }
-        return;
-    }
-
-    if (a->fB38 == 0xD) {
-        ActorController_SetBehavior(a, 0x29);
-        return;
-    }
-    if (a->state1120 > 5)
-        return;
-    switch (a->state1120) {
-        case 0:
-            if (a->flagsB32 & 2) {
-                ActorController_SetBehavior(a, 0xC);
-                return;
-            }
-            if ((dxR == 0 || dyR == 0) && a->fB3C == 2 && (a->flags18 & 4)) {
-                ActorController_SetBehavior(a, 0x18);
-                return;
-            }
-            ActorController_SetBehaviorIfFinished(a, 2);
+    } else {
+        if (p->type == 0xD) {
+            ActorController_SetBehavior(p, 0x29);
             return;
-        case 1:
-            if (a->t1122 <= 0) {
-                a->state1120 = 0;
-                a->f1128 = 0;
-                a->t112A = 0;
-                return;
-            }
-            if (a->fB3C == 3) {
-                ActorController_SetBehavior(a, 0x1e);
-                return;
-            }
-            dir = (Math_Atan2(player->x30 - a->x48, player->y34 - a->y4C) + 0x20) & 0xC0;
-            if (a->fB39 == dir) {
-                if (sum <= 2) {
-                    ActorController_SetBehavior(a, 3);
+        }
+        switch (p->decision) {
+            case 0:
+                if (p->flags & 2) {
+                    ActorController_SetBehavior(p, 0xC);
                     return;
                 }
-                if (sum > 4) {
-                    ActorController_SetBehavior(a, 9);
+                if (dx == 0) {
+                    if (p->behavior != 2)
+                        goto waitAttack;
+                    if (!(p->taskFlags & 4))
+                        goto waitAttack;
+                    goto beginAttack;
+                } else if (dz == 0) {
+                    if (p->behavior != 2)
+                        goto waitAttack;
+                    if (!(p->taskFlags & 4))
+                        goto waitAttack;
+                beginAttack:
+                    ActorController_SetBehavior(p, 24);
+                    return;
+                waitAttack:
+                    ActorController_SetBehaviorIfFinished(p, 2);
+                    return;
+                } else
+                    ActorController_SetBehaviorIfFinished(p, 2);
+                return;
+            case 1:
+                if (p->attackCooldown <= 0) {
+                    p->decision = 0;
+                    p->modeTimer = 0;
+                    p->timer112a = 0;
+                    return;
+                } else {
+                    if (p->behavior == 3) {
+                        ActorController_SetBehavior(p, 0x1E);
+                        return;
+                    }
+                    Armor_AimAtPlayer(p, ax, az, 1);
                     return;
                 }
-            }
-            if (a->t1124 > 0)
-                ActorController_SetBehaviorIfFinished(a, 0x1b);
-            else
-                ActorController_SetBehaviorIfFinished(a, 0x1c);
-            return;
-        case 2:
-            if (a->t1122 > 0) {
-                ActorController_SetBehaviorIfFinished(a, 5);
+            case 2:
+                if (p->attackCooldown <= 0) {
+                    ActorController_SetBehavior(p, 6);
+                    p->decision = 0;
+                } else
+                    ActorController_SetBehaviorIfFinished(p, 5);
                 return;
-            }
-            ActorController_SetBehavior(a, 6);
-            a->state1120 = 0;
-            return;
-        case 3:
-            if (a->t1124 > 0) {
-                if ((dxR == 0 || dyR == 0) && a->fB3C == 0x1a && (a->flags18 & 4)) {
-                    ActorController_SetBehavior(a, 0x19);
-                    return;
+            case 3:
+                if (p->secondaryCooldown <= 0)
+                    Armor_BeginCharge(p);
+                else {
+                    if (dx == 0) {
+                        if (p->behavior != 26)
+                            goto waitWait;
+                        if (!(p->taskFlags & 4))
+                            goto waitWait;
+                        goto beginWait;
+                    } else if (dz == 0) {
+                        if (p->behavior != 26)
+                            goto waitWait;
+                        if (!(p->taskFlags & 4))
+                            goto waitWait;
+                    beginWait:
+                        ActorController_SetBehavior(p, 25);
+                        return;
+                    waitWait:
+                        ActorController_SetBehaviorIfFinished(p, 26);
+                        return;
+                    } else
+                        ActorController_SetBehaviorIfFinished(p, 0x1A);
                 }
-                ActorController_SetBehaviorIfFinished(a, 0x1a);
                 return;
-            }
-        state5:
-            a->state1120 = 5;
-            a->t1122 = 0x12C;
-            a->fB26 = a->f112C;
-            a->fB28 = a->f112E;
-            a->f274 = a->f112E;
-            a->word21C &= 0xFFDFFFFB;
-            a->word1C8 &= 0xFFDFFFFB;
-            return;
-        case 4:
-            if (a->t1122 > 0) {
-                ActorController_SetBehaviorIfFinished(a, 5);
+            case 4:
+                if (p->attackCooldown <= 0) {
+                    ActorController_SetBehavior(p, 6);
+                    p->decision = 3;
+                } else
+                    ActorController_SetBehaviorIfFinished(p, 5);
                 return;
-            }
-            ActorController_SetBehavior(a, 6);
-            a->state1120 = 3;
-            return;
-        case 5:
-            if (a->t1122 > 0) {
-                ActorController_SetBehavior(a, 0x1d);
+            case 5:
+                if (p->attackCooldown <= 0)
+                    p->decision = 0;
+                else
+                    ActorController_SetBehavior(p, 0x1D);
                 return;
-            }
-            a->state1120 = 0;
-            return;
+        }
     }
-    return;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08188B7C);
-#endif

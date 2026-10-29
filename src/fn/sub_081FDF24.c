@@ -1,11 +1,6 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
-#ifdef NONMATCHING
-// fuzzy: 91.7%
-// fix.py best (sweep after the inlined-insn fix)
-// foundry draft (worker best 92.1%); what differs is mostly register allocation and instruction order
-#define gOrbitEffectRandomIndex gRandomIndex
 struct OrbitEffectPosition {
     s16 x, y, z, pad;
 };
@@ -40,16 +35,9 @@ static inline s32 RandomValue(const u16 *table)
 }
 void OrbitEffect_SpawnHomingTrail(struct OrbitEffect *p, struct OrbitEffectPosition *origin)
 {
-    u32 timer = p->trailTimer + 1;
-    p->trailTimer = timer;
-    {
-        u16 mask = 0xffff;
-        timer &= mask;
-    }
-    if (!(timer & 3)) {
+    if (!(++p->trailTimer & 3)) {
         struct OrbitTrailSprite *trail = &p->trails[p->nextTrail];
         const u16 *table;
-        u32 zero;
         if (!p->hidden)
             trail->flags &= ~1;
         trail->flags &= ~0x200;
@@ -63,22 +51,12 @@ void OrbitEffect_SpawnHomingTrail(struct OrbitEffect *p, struct OrbitEffectPosit
             SpriteDrawable_SelectTileFrame(trail, p->resource, 5);
             Effect_SetPalette(trail, 1);
         }
-        {
-            struct OrbitEffectPosition *position = origin;
-            u32 x = position->x;
-            zero = 0;
-            trail->position.x = x;
-            trail->position.y = position->y;
-            trail->position.z = position->z;
-            trail->active = 1;
-            trail->age = zero;
-            p->nextTrail++;
-            if (p->nextTrail > 11)
-                p->nextTrail = zero;
-        }
+        trail->position.x = origin->x;
+        trail->position.y = origin->y;
+        trail->position.z = origin->z;
+        trail->active = 1;
+        trail->age = 0;
+        if (++p->nextTrail > 11)
+            p->nextTrail = 0;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", OrbitEffect_SpawnHomingTrail);
-#endif

@@ -33,11 +33,12 @@ def split_source(text, func_names):
     if MARK in text:
         return None
     m = None
+    ends = []
     for name in func_names:
         for m2 in re.finditer(r"^[^\n;#]*\b" + re.escape(name) + r"\s*\([^;{]*\)\s*\{", text, re.M):
-            m = m2
-        if m:
-            break
+            if m is None:
+                m = m2
+            ends.append(body_end(text, m2.end() - 1))
     if not m:
         return None
     # start at the line holding the definition, so line numbers stay the same
@@ -53,7 +54,7 @@ def split_source(text, func_names):
         start = back.end()
     # and end the suffix with FUNC's body: agbcc compiles a function at a time, so what follows cannot
     # change FUNC's code, and a big unit's later functions would otherwise compile with every variant
-    end = body_end(text, m.end() - 1)
+    end = max(ends)
     return text[:start], text[start:end]
 
 
@@ -102,15 +103,18 @@ class Server:
         pre_path = os.path.join(self.dir, "prefix.c")
         open(pre_path, "w").write(prefix + MARK)
         self.prefix_s = os.path.join(self.dir, "prefix.s")
+        self.stderr_path = os.path.join(self.dir, "stderr.txt")
+        self.last_error = ""
         req_r, self.req_w = os.pipe()
         self.rep_r, rep_w = os.pipe()
         env = dict(os.environ, AGBCC_SERVER=f"{req_r}:{rep_w}")
         for k in list(env):
             if k.startswith(("AGBCC_", "CSE_")) and k != "AGBCC_SERVER":
                 del env[k]  # knobs go with each request, never with the prefix
-        self.proc = subprocess.Popen([compiler, *flags, "-o", self.prefix_s, pre_path],
-                                     env=env, pass_fds=(req_r, rep_w),
-                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        with open(self.stderr_path, "w") as stderr:
+            self.proc = subprocess.Popen([compiler, *flags, "-o", self.prefix_s, pre_path],
+                                         env=env, pass_fds=(req_r, rep_w),
+                                         stdout=subprocess.DEVNULL, stderr=stderr)
         os.close(req_r)
         os.close(rep_w)
         self.reply = os.fdopen(self.rep_r)
@@ -136,6 +140,8 @@ class Server:
         if not status:
             raise RuntimeError("agbcc server exited")
         if int(status) != 0:
+            with open(self.stderr_path) as stderr:
+                self.last_error = "\n".join(stderr.read().splitlines()[-12:])
             return None
         return self.prefix_asm() + open(out).read()
 
@@ -190,7 +196,7 @@ def place(obj, own, rom_syms, address):
     start = next((v for v, n in funcs if n in own), None)
     if start is None:
         return None, None, funcs, ["no " + "/".join(own)]
-    end = next((v for v, n in funcs if v > start), len(text))
+    end = next((v for v, n in funcs if v > start and n not in own), len(text))
     base = address - start  # address of .text offset 0
     local = {n: base + (v & ~1) + (v & 1) for n, v, sh, t in syms if sh == text_i and n}
     local_funcs = {n for _, n in funcs} - set(own)
@@ -304,9 +310,10 @@ class Fast:
         parts = split_source(pre, own)
         if parts is None:
             return None, "the fork server needs FUNC's definition in the unit"
-        asm = self.server(canonical_prefix(parts[0])).compile(parts[1], env)
+        server = self.server(canonical_prefix(parts[0]))
+        asm = server.compile(parts[1], env)
         if asm is None:
-            return None, "compile failed"
+            return None, server.last_error or "compile failed"
         obj, err = assemble(self.assembler, self.fixup(asm), self.workdir)
         if obj is None:
             return None, "as failed: " + err[:300]

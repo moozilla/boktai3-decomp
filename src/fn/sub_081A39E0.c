@@ -4,11 +4,6 @@
 
 // confidence=low: updates homing effect entries, animation, trails and lifetime.
 
-// MATCHING_CONCESSION: register-pinning
-
-#ifdef NONMATCHING
-// fuzzy: 97.4%
-// Remaining differences: register choices in angle, animation and trail setup.
 struct Types {
     u32 values[4];
 };
@@ -67,56 +62,49 @@ static inline void SetVelocity(struct Vec *out, u8 angle, u8 speed)
         z = -(-z >> 12);
     out->z = z;
 }
-static inline void AddVelocity(struct Vec *out, struct Vec *velocity)
+static inline void AddVelocity(struct Vec *out, struct Vec *position, struct Vec *velocity)
 {
-    u16 value = velocity->x;
-    register u16 position asm("r5") = out->x;
-    out->x = value + position;
-    value = velocity->y;
+    u16 x = position->x;
+    out->x = velocity->x + x;
     {
-        register u16 y asm("r6") = out->y;
-        out->y = value + y;
+        u16 y = position->y;
+        out->y = velocity->y + y;
     }
-    value = velocity->z;
     {
-        u16 z = out->z;
-        out->z = value + z;
+        u16 z = position->z;
+        out->z = velocity->z + z;
     }
+}
+static inline u8 MaskFlags(u8 input, u32 mask)
+{
+    return input & mask;
 }
 static inline void Animate(struct Entry *p)
 {
     struct Animation *a = &p->animation;
-    const u16 *entry = a->data + a->frame;
-    register u16 timer asm("r0");
-    u32 mask;
-    u32 flags;
-    u32 weight;
+    const volatile u16 *entry = a->data + a->frame;
     p->tile = *entry >> 6;
     {
-        register u32 input asm("r0") = a->flags;
-        register u32 mask asm("r4") = 1;
-        register u32 left asm("r1") = mask & input;
+        u8 input = *(const volatile u8 *)&a->flags;
+        u32 mask = 1;
+        u32 left = MaskFlags(input, mask);
         if (left != (((*entry & 0x30) >> 4) & mask))
             p->flags |= 4;
         else
             p->flags &= ~4;
     }
     {
-        register u32 input asm("r0") = a->flags;
-        register u32 mask asm("r3") = 2;
-        register u32 left asm("r1");
-        asm("" : "+r"(input));
-        left = mask;
-        left &= input;
-        asm("" : "+r"(left));
+        u8 input = *(const volatile u8 *)&a->flags;
+        u32 mask = 2;
+        u32 left;
+        left = MaskFlags(input, mask);
         left = (u8)left;
         if (left != (((*entry & 0x30) >> 4) & mask))
             p->flags |= 8;
         else
             p->flags &= ~8;
     }
-    timer = ++a->timer;
-    if (timer >= a->rate) {
+    if (++a->timer >= a->rate) {
         a->timer = 0;
         if (a->flags & 4) {
             if (a->frame == 0) {
@@ -136,12 +124,7 @@ static inline void Animate(struct Entry *p)
             }
         }
         entry = a->data + a->frame;
-        {
-            register u32 loaded asm("r1") = *entry;
-            asm("" : "+r"(loaded));
-            weight = loaded;
-        }
-        a->duration = weight & 15;
+        a->duration = *entry & 15;
         a->rate = (a->duration * a->scale) >> 6;
         if (!a->rate)
             a->rate = 1;
@@ -157,10 +140,9 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
     if (sub_08249350(p->frame, p->homingInterval) == 0) {
         s32 diff = Hresvelgr_GetHomingShotTargetAngle(p, Player_GetEffectivePosition(0));
         s32 heading = p->heading;
-        register u32 angleMask asm("r3");
+        u32 angleMask;
         diff -= heading;
         angleMask = 255;
-        asm("" : "+r"(angleMask), "+r"(diff));
         *(&diff) &= angleMask;
         if (diff > 128) {
             diff = angleMask - diff;
@@ -174,20 +156,16 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
         p->heading = diff & angleMask;
     }
     SetVelocity(&p->velocity, p->heading, p->speed);
-    AddVelocity(&p->position, &p->velocity);
+    AddVelocity(&p->position, &p->position, &p->velocity);
     Animate(p);
     Collider_SetPosition(p->collider, &p->position, 0);
     {
-        register u32 zero asm("r0") = 0;
-        asm("" : "+r"(zero));
+        u32 zero = 0;
         p->collider[0x42] = zero;
     }
     Collider_Refresh(p->collider);
     {
-        register u8 *cursor asm("r3") = &p->trailCount;
-        u8 *trailCount;
-        asm("" : "+r"(cursor));
-        trailCount = cursor;
+        u8 *trailCount = &p->trailCount;
         if (*trailCount <= 3 && !(Frame(p) & 31)) {
             s32 index;
             u32 types[4];
@@ -199,8 +177,8 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
             *(struct Types *)types = *(const struct Types *)gUnk_0824F760;
             gRandomIndex = (gRandomIndex + 1) & 1023;
             {
-                register s32 loaded asm("r2") = table[gRandomIndex];
-                asm("" : "+r"(loaded));
+                s32 loaded = table[gRandomIndex];
+
                 sample = loaded;
             }
             angle = ((sample >> 3) & 127) + 64;
@@ -214,12 +192,7 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
     if (p->lifetime < (p->initialLifetime >> 3))
         p->flags |= 0x200;
     if (!(p->lifetime & 31)) {
-        s32 value = p->homingInterval;
-        register s32 interval asm("r1") = value;
-        asm("" : "+r"(value), "+r"(interval));
-        if (value > 2)
-            interval--;
-        p->homingInterval = interval;
+        p->homingInterval = p->homingInterval > 2 ? p->homingInterval - 1 : p->homingInterval;
         p->speed++;
         if (p->turnShift > 2)
             p->turnShift >>= 1;
@@ -227,7 +200,3 @@ void EffectPool_UpdateEntry(void *pool, struct Entry *p)
     if (!p->lifetime)
         EffectEntry_Release(p);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", EffectPool_UpdateEntry);
-#endif

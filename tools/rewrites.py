@@ -65,13 +65,16 @@ def int_decl(name, tname, init=None):
     return _decl(name, ca.TypeDecl(name, [], None, ca.IdentifierType([tname])), init)
 
 
-def add_local(fn, decl):
-    items = fn.body.block_items or []
+def add_local(fn, decl, coord=None):
+    block = fn.body if isinstance(fn, ca.FuncDef) else fn
+    if coord is not None:
+        decl.coord = coord
+    items = block.block_items or []
     i = 0
     while i < len(items) and isinstance(items[i], ca.Decl):
         i += 1
     items.insert(i, decl)
-    fn.body.block_items = items
+    block.block_items = items
 
 
 def blocks(fn):
@@ -114,6 +117,25 @@ def following(fn, stmt):
     return out
 
 
+def straight_line_reads(fn, stmt, want):
+    """Reads before a write, call or control-flow boundary can invalidate a snapshot.
+
+    In particular a for condition is not a read of the value entering the loop:
+    the backedge can change it even when the condition precedes the step in AST order.
+    """
+    out = []
+    for st in following(fn, stmt):
+        if any(isinstance(n, (ca.For, ca.While, ca.DoWhile, ca.If, ca.Switch,
+                              ca.Compound, ca.Label, ca.Goto, ca.FuncCall)) for n, _, _ in walk(st)):
+            break
+        if any(isinstance(n, ca.Assignment) and text(n.lvalue) == want
+               or isinstance(n, ca.UnaryOp) and n.op in ("++", "--", "p++", "p--", "&")
+               and text(n.expr) == want for n, _, _ in walk(st)):
+            break
+        out.extend(reads_of(st, want))
+    return out
+
+
 # --- rewrites ------------------------------------------------------------------------
 
 def rw_reuse_stored(fn):
@@ -122,16 +144,16 @@ def rw_reuse_stored(fn):
     for k in range(n_sites):
         node, _, _ = nth(fn, is_stmt_assign, k)
         lv = text(node.lvalue)
-        later = [r for st in following(fn, node) for r in reads_of(st, lv)]
+        later = straight_line_reads(fn, node, lv)
         if not later:
             continue
         for take in ("first", "all"):
             f2 = copy.deepcopy(fn)
-            a, _, _ = nth(f2, is_stmt_assign, k)
+            a, par, _ = nth(f2, is_stmt_assign, k)
             t = new_name(f2)
-            add_local(f2, typeof_decl(t, a.lvalue))
+            add_local(par, typeof_decl(t, a.lvalue), a.coord)
             a.rvalue = ca.Assignment("=", ca.ID(t), a.rvalue)
-            reads = [r for st in following(f2, a) for r in reads_of(st, lv)]
+            reads = straight_line_reads(f2, a, lv)
             for r in reads[:1] if take == "first" else reads:
                 set_child(r[1], r[2], ca.ID(t))
             yield f"reuse {lv} via {t} ({take})", f2
@@ -157,13 +179,17 @@ def _cval(c):
         return None
 
 
-def rw_related_const(fn):
+def rw_related_const(fn, lines=None):
     """... = K1 ...; f(K2)  ->  ... = (t = K1) ...; f(t + (K2 - K1))."""
     cs = _consts(fn)
     vals = [_cval(c) for c, _, _ in cs]
     # only values that are stored or passed (an assignment's value or a call argument)
     passed = [isinstance(p, ca.ExprList) or (isinstance(p, ca.Assignment) and s == "rvalue") for _, p, s in cs]
+    allowed = set(lines) if lines is not None else None
     for i, j in itertools.permutations(range(len(cs)), 2):
+        if allowed is not None and any(c.coord is None or c.coord.line not in allowed
+                                       for c, _, _ in (cs[i], cs[j])):
+            continue
         if i > j or vals[i] is None or vals[j] is None or not (passed[i] and passed[j]):
             continue
         d = vals[j] - vals[i]
@@ -172,7 +198,9 @@ def rw_related_const(fn):
         f2 = copy.deepcopy(fn)
         c2 = _consts(f2)
         t = new_name(f2)
-        add_local(f2, int_decl(t, "u32"))
+        decl = int_decl(t, "u32")
+        decl.coord = cs[i][0].coord
+        add_local(f2, decl)
         ci, pi, si = c2[i]
         cj, pj, sj = c2[j]
         set_child(pi, si, ca.Assignment("=", ca.ID(t), ci))
@@ -204,14 +232,33 @@ def rw_copy_var(fn):
     for k in range(sites(fn, pred)):
         node, par0, _ = nth(fn, pred, k)
         v = node.lvalue.name
+        # A copy holds this definition's value, not later definitions of v.
+        # Stop before a statement that can modify it (including inside an if
+        # or loop). Taking its address can also let a call modify it, so do
+        # not copy address-taken locals at all.
+        if any(isinstance(n, ca.UnaryOp) and n.op == "&"
+               and isinstance(n.expr, ca.ID) and n.expr.name == v
+               for n, _, _ in walk(fn)):
+            continue
+        declarations = [n for n, _, _ in walk(fn) if isinstance(n, ca.Decl) and n.name == v]
+        if len(declarations) != 1 or any("volatile" in (getattr(n, "quals", []) or [])
+                                         for n, _, _ in walk(declarations[0])):
+            continue
         fol = following(fn, node)
+        for i, st in enumerate(fol):
+            if any((isinstance(n, ca.Assignment) and isinstance(n.lvalue, ca.ID) and n.lvalue.name == v)
+                   or (isinstance(n, ca.UnaryOp) and n.op in ("++", "--", "p++", "p--")
+                       and isinstance(n.expr, ca.ID) and n.expr.name == v)
+                   for n, _, _ in walk(st)):
+                fol = fol[:i]
+                break
         users = [i for i, st in enumerate(fol) if reads_of(st, v)]
         ranges = [(a, b) for a in range(len(users)) for b in range(a, len(users))][:12]
         for a_, b_ in ranges:
             f2 = copy.deepcopy(fn)
             a, par, slot = nth(f2, pred, k)
             w = new_name(f2, "c")
-            add_local(f2, typeof_decl(w, ca.ID(v)))
+            add_local(par, typeof_decl(w, ca.ID(v)), node.coord)
             fol2 = following(f2, a)
             par.block_items.insert(par.block_items.index(a) + 1, ca.Assignment("=", ca.ID(w), ca.ID(v)))
             for i in users[a_:b_ + 1]:
@@ -227,7 +274,7 @@ def rw_temp_rvalue(fn):
         f2 = copy.deepcopy(fn)
         a, par, _ = nth(f2, pred, k)
         t = new_name(f2)
-        add_local(f2, typeof_decl(t, a.rvalue))
+        add_local(par, typeof_decl(t, a.rvalue), a.coord)
         par.block_items.insert(par.block_items.index(a), ca.Assignment("=", ca.ID(t), a.rvalue))
         a.rvalue = ca.ID(t)
         yield f"temporary for {text(a.lvalue)}", f2
@@ -328,11 +375,43 @@ def rw_commute(fn):
 
 def rw_swap_stmts(fn):
     """Swap two adjacent statements (scheduling / evaluation order)."""
+    def transfers_control(stmt):
+        return any(isinstance(n, (ca.Return, ca.Goto, ca.Break, ca.Continue, ca.Label))
+                   for n, _, _ in walk(stmt))
+
+    def effects(stmt):
+        # Only straight-line assignments with pure operands can commute here.
+        # Calls and control flow may observe/change any memory, and identifiers
+        # used to form an address still depend on earlier scalar assignments.
+        if not isinstance(stmt, ca.Assignment) or stmt.op != "=":
+            return None
+        nodes = list(walk(stmt))
+        if any(isinstance(n, (ca.FuncCall, ca.Assignment)) and n is not stmt
+               or isinstance(n, ca.UnaryOp) and n.op in ("p++", "p--", "++", "--")
+               for n, _, _ in nodes):
+            return None
+        target = stmt.lvalue
+        writes = {target.name} if isinstance(target, ca.ID) else set()
+        reads = {n.name for n, p, s in nodes if isinstance(n, ca.ID)
+                 and not (p is stmt and s == "lvalue")
+                 and not (isinstance(p, ca.StructRef) and s == "field")}
+        memory = any(isinstance(n, (ca.StructRef, ca.ArrayRef))
+                     or isinstance(n, ca.UnaryOp) and n.op == "*" for n, _, _ in nodes)
+        return reads, writes, not isinstance(target, ca.ID), memory
+
     bl = blocks(fn)
     for bi, b in enumerate(bl):
         for i in range(len(b.block_items) - 1):
             x, y = b.block_items[i], b.block_items[i + 1]
-            if isinstance(x, (ca.Decl, ca.Label, ca.Return)) or isinstance(y, (ca.Decl, ca.Label)):
+            if (isinstance(x, ca.Decl) or isinstance(y, ca.Decl)
+                    or transfers_control(x) or transfers_control(y)):
+                continue
+            ex, ey = effects(x), effects(y)
+            if ex is None or ey is None:
+                continue
+            rx, wx, mx, ax = ex
+            ry, wy, my, ay = ey
+            if wx & (ry | wy) or wy & (rx | wx) or mx and ay or my and ax:
                 continue
             f2 = copy.deepcopy(fn)
             b2 = blocks(f2)[bi]
@@ -391,8 +470,10 @@ def rw_temp_arg(fn):
         if stmt is None:
             continue
         blk, st = stmt
+        if isinstance(st, ca.Decl):
+            continue  # a preceding assignment would split the C89 declaration list
         t = new_name(f2)
-        add_local(f2, typeof_decl(t, arg))
+        add_local(blk, typeof_decl(t, arg), arg.coord)
         idx = blk.block_items.index(st)
         blk.block_items.insert(idx, ca.Assignment("=", ca.ID(t), arg))
         set_child(p, s, ca.ID(t))
@@ -406,8 +487,10 @@ def rw_temp_arg(fn):
         if stmt is None:
             continue
         blk, st = stmt
+        if isinstance(st, ca.Decl):
+            continue
         t = new_name(f2)
-        add_local(f2, int_decl(t, "s32"))
+        add_local(blk, int_decl(t, "s32"), arg.coord)
         idx = blk.block_items.index(st)
         blk.block_items.insert(idx, ca.Assignment("=", ca.ID(t), arg))
         set_child(p, s, ca.ID(t))
@@ -610,7 +693,7 @@ def rw_explicit_narrow(fn):
             f2 = copy.deepcopy(fn)
             a, par, _ = nth(f2, pred, k)
             t = new_name(f2)
-            add_local(f2, int_decl(t, ttype))
+            add_local(par, int_decl(t, ttype), a.coord)
             par.block_items.insert(par.block_items.index(a), ca.Assignment(
                 "=", ca.ID(t), ca.BinaryOp("<<", a.rvalue, ca.Constant("int", str(sh)))))
             a.rvalue = ca.BinaryOp(">>", ca.ID(t), ca.Constant("int", str(sh)))
@@ -630,13 +713,15 @@ def rw_hoist_args(fn):
             if not found:
                 continue
             blk, st = found
+            if isinstance(st, ca.Decl):
+                continue
             idx = blk.block_items.index(st)
             hoisted = []
             for i, a in enumerate(call.args.exprs):
                 if isinstance(a, (ca.ID, ca.Constant)):
                     continue
                 t = new_name(f2)
-                add_local(f2, typeof_decl(t, a))
+                add_local(blk, typeof_decl(t, a), a.coord)
                 hoisted.append(ca.Assignment("=", ca.ID(t), a))
                 call.args.exprs[i] = ca.ID(t)
             if order == "reverse":

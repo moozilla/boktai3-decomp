@@ -306,7 +306,24 @@ def resolve_knobs(src, func, env):
     for k in ("AGBCC_PRI", "AGBCC_FORCE"):
         if k not in env and os.environ.get(k):
             env[k] = os.environ[k]
-    keys = [k for k in ("AGBCC_PRI", "AGBCC_FORCE") if re.search(r"(^|,)[A-Za-z_]", env.get(k, ""))]
+    if env.get("AGBCC_FORCE"):
+        # Accept the register spellings printed by allocation explanations.
+        # The compiler parses decimal register numbers, so passing r6 through
+        # silently disables the request.
+        aliases = {"sb": 9, "sl": 10, "fp": 11, "ip": 12,
+                   "sp": 13, "lr": 14, "pc": 15}
+        entries = []
+        for entry in env["AGBCC_FORCE"].split(","):
+            pseudo, reg = entry.split(":", 1)
+            if re.fullmatch(r"r(?:[0-9]|1[0-5])", reg):
+                reg = reg[1:]
+            elif reg in aliases:
+                reg = str(aliases[reg])
+            if not reg.isdigit() or not 0 <= int(reg) <= 15:
+                sys.exit(f"AGBCC_FORCE: unknown register {reg!r}")
+            entries.append(f"{pseudo}:{reg}")
+        env["AGBCC_FORCE"] = ",".join(entries)
+    keys = [k for k in ("AGBCC_PRI", "AGBCC_FORCE") if re.search(r"(^|,)=?[A-Za-z_]", env.get(k, ""))]
     if not keys:
         return env
     saved = {k: os.environ.pop(k) for k in keys if k in os.environ}
@@ -336,8 +353,10 @@ def compile_draft(src, func, env=None):
     ENV adds knob settings (CSE_NOCANON=N, AGBCC_FORCE=..., see tools/scope/build_agbcc.sh).
     The dumps, uids and DWARF lines come from a -g compile. Without knobs the bytes are the real
     build's (no -g): where -g changes the code, those win and info["g_differs"] is set."""
-    mine, a, info = compile_draft_g(src, func, env)
+    # Resolve C names before the diagnostic compile. Resolving afterwards
+    # recompiles the baseline and overwrites the knobbed RTL and traces.
     env = resolve_knobs(src, func, env)
+    mine, a, info = compile_draft_g(src, func, env)
     if needs_g(env):  # a knob naming insn uids: the -g compile is the only one it means anything in
         if g_sensitive(src, func):
             info["g_only"] = True
@@ -363,6 +382,28 @@ def compile_draft(src, func, env=None):
 
 _G_WARNED = set()
 _UNINIT_WARNED = set()
+
+
+def source_group(src, func, text=None):
+    """Include address-named definitions hidden inside FUNC's inventory span.
+
+    Some inventory entries include unlabeled trailing functions as byte data. A
+    draft can recover them as ordinary C definitions without changing symbols.
+    They remain part of the original span's byte-exact acceptance check.
+    """
+    name = rom_name(src, func)
+    own = [func, name]
+    _, addresses, sizes = inventory()
+    if name not in addresses:
+        return tuple(own)
+    lo, hi = addresses[name], addresses[name] + sizes[name]
+    if text is None:
+        text = open(os.path.join(ROOT, src)).read()
+    for m in re.finditer(r"^[^\n;#{}]*\b(sub_([0-9A-Fa-f]{8}))\s*\([^;{]*\)\s*\{", text, re.M):
+        n, addr = m.group(1), int(m.group(2), 16)
+        if lo < addr < hi and n not in addresses and n not in own:
+            own.append(n)
+    return tuple(own)
 
 
 def arm_unit_exit(src, func):
@@ -407,7 +448,7 @@ def compile_draft_g(src, func, env=None):
     wd = workdir(func)
     pre = preprocess(src, env, func)
     if os.environ.get("SCOPE_TRIM") != "0":
-        pre = diagnostic_source(pre, (func, rom_name(src, func))) or pre
+        pre = diagnostic_source(pre, source_group(src, func)) or pre
     open(os.path.join(wd, "u.i"), "w").write(pre)
     for p in PASSES:
         try:
@@ -419,7 +460,10 @@ def compile_draft_g(src, func, env=None):
         os.remove(names)
     # -Wuninitialized changes no code (150 units compared); a draft reading a variable it never set
     # compiles to plausible bytes, so say so
-    r = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "-dp", "-da", "-Wuninitialized", "u.i", "-o", "u.s"],
+    # Use assembler label differences for DWARF lengths. The legacy size
+    # estimator undercounts some large inline line programs (dwarf2out.c:
+    # size_of_line_info); its truncated unit then breaks the line reader.
+    r = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "-ffix-debug-line", "-dp", "-da", "-Wuninitialized", "u.i", "-o", "u.s"],
                        cwd=wd, capture_output=True, text=True,
                        env=dict(os.environ, AGBCC_DUMPPRI=names, **(env or {})))
     open(os.path.join(wd, "stderr.txt"), "w").write(r.stderr)
@@ -431,8 +475,14 @@ def compile_draft_g(src, func, env=None):
     if uninit and func not in _UNINIT_WARNED:
         _UNINIT_WARNED.add(func)
         print("note: agbcc: " + ", ".join(f"`{v}' (line {ln})" for ln, v in uninit) + f" might be used"
-              f" uninitialized in {func}: the bytes read whatever the register held; give it its value",
+              f" uninitialized in {func}; inspect its definition and uses",
               file=sys.stderr)
+        for _, v in uninit:
+            if re.search(r"\b" + re.escape(v) + r'\s+asm\s*\(\s*"r7"\s*\)', pre):
+                print(f"  `{v}' is bound to r7, Thumb's eliminable frame pointer: reload can replace"
+                      " this binding with sp + an offset even when C initialized it. Remove the r7"
+                      " binding before diagnosing this warning (agbcc gcc/thumb.h:581-600).",
+                      file=sys.stderr)
     if r.returncode or "error" in r.stderr:
         errs = [ln.replace(ROOT + os.sep, "") for ln in r.stderr.splitlines() if ln.strip()]
         # the errors first: other functions' warnings would push them past the shown lines
@@ -476,7 +526,7 @@ def compile_draft_g(src, func, env=None):
     # earlier drafts of other sizes move: send such calls to the callee's ROM address instead, so
     # they compare like calls to outside symbols (a phantom bl difference otherwise).
     _, addr_all, _ = inventory()
-    own = (func, rom_name(src, func))
+    own = source_group(src, func)
     local = set(re.findall(r"^\t\.type\t\s*(\w+),function", text, re.M)) - set(own)
     for n in sorted(local):
         a_rom = addr_all.get(n)
@@ -623,6 +673,10 @@ def rom_pool_ranges(code, addr, arm=False):
 def rom_data(func, addr, code, arm=False):
     """The ROM function's data ranges: its generated assembly's, or (a function the disassembler
     left as .incbin has no labels at all) the literal pools its pc-relative loads reach."""
+    if os.environ.get("SCOPE_POOL_SCAN") == "1":
+        # Explicit diagnostic override when generated assembly labels reachable code as .word.
+        # Byte acceptance still compares the original ROM span without modification.
+        return rom_pool_ranges(code, addr, arm)
     found = rom_data_ranges(func, addr)
     if not found or not (found[0] or found[1]):
         return rom_pool_ranges(code, addr, arm)
@@ -720,6 +774,18 @@ def draft_annotations(wd, func, rows, obj_offset, lines=None, data=()):
     # RTL uid: including even one would discard annotations for the whole unit.
     code = [r for r in rows if not r[2].startswith(".")
             and not any(lo <= r[0] < hi for lo, hi in data)]
+    if os.environ.get("SCOPE_TAIL") == "1":
+        # The dumps and -dp sequence belong to FUNC, although the compared byte span includes
+        # following routines. Keep its annotations instead of discarding every uid on a length mismatch.
+        import fast
+        obj = open(os.path.join(wd, "u.o"), "rb").read()
+        secs = fast.elf_sections(obj)
+        text_i = next(i for i, sec in enumerate(secs) if sec["name"] == ".text")
+        following = [v & ~1 for _, v, sh, typ in fast.elf_symbols(obj, secs)
+                     if sh == text_i and typ == 2 and (v & ~1) > obj_offset]
+        if following:
+            end = min(following) - obj_offset
+            code = [r for r in code if r[0] < end]
     ann = {}
     if len(seq) == len(code):
         for (mn, uid), r in zip(seq, code):
@@ -1342,7 +1408,7 @@ def uid_lines(wd):
             continue
         line = 0
         for blk in re.split(r"\n\n", open(path).read()):
-            m = re.search(r'\(note \d+ \d+ \d+ \("[^"]*"\) (\d+)\)', blk)
+            m = re.search(r'\(note(?:/[a-z]+)* \d+ \d+ \d+ \("[^"]*"\) (\d+)\)', blk)
             if m:
                 line = int(m.group(1))
                 continue
@@ -1733,6 +1799,18 @@ def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
         return True
     if want in f["someone"]:
         print(f"      {rname(want)} is held back in pass 0 because a conflicting pseudo allocated later prefers it.")
+        prefs = preferences(wd)
+        pc = conflicts(wd).get(pseudo, (set(), set()))[0]
+        later = sorted((x for x in pc if want in prefs.get(x, []) and
+                        recs.get(x, ("L",))[0] == "G" and recs[x][1] > rec[1]),
+                       key=lambda x: recs[x][1])
+        for x in later[:4]:
+            xr = recs[x]
+            placed = xr[6]
+            result = f"gets {rname(placed)}" if placed >= 0 else "spills"
+            print(f"        {nm(x)} prefers {rname(want)}: allocated {xr[1] + 1}, priority {xr[2]},"
+                  f" {xr[3]} refs, live {xr[4]}; it ultimately {result}."
+                  + mention_lines(wd, x))
         return True
     if want not in f["sofar"]:
         hard = hard_of(wd)
@@ -2325,7 +2403,7 @@ def has_knobs(env):
 # means another insn (or none) in the build's own compile (no -g): only these force a -g compile.
 # The others name pseudos (AGBCC_PRI, AGBCC_FORCE, CSE_NOCANON, CSE_KEEP) or count events
 # (AGBCC_SPILL, AGBCC_NOPRE, CSE_NOFOLLOW) and are compiled as the build compiles.
-UID_KNOBS = ("AGBCC_NOGIV", "AGBCC_GIV", "AGBCC_NOMOVE", "AGBCC_NOTIE", "CSE_WHY", "CSE_NOFOLLOW_JUMP")
+UID_KNOBS = ("AGBCC_CROSS_LIMIT", "AGBCC_NOCROSS", "AGBCC_NOGIV", "AGBCC_GIV", "AGBCC_NOMOVE", "AGBCC_NOTIE", "CSE_WHY", "CSE_NOFOLLOW_JUMP")
 
 
 def needs_g(env):
@@ -2368,7 +2446,7 @@ def fast_compile(src, func, env=None, plain=None):
         atexit.register(f.close)  # stops its agbcc servers and removes their directories
         os.makedirs(os.path.join(WORK, "cache"), exist_ok=True)
     knobs = {k: v for k, v in (env or {}).items() if k.startswith(("AGBCC_", "CSE_"))}
-    code, err = f.bytes(fast_preprocess(src, env, func), (func, rom_name(src, func)), knobs)
+    code, err = f.bytes(fast_preprocess(src, env, func), source_group(src, func), knobs)
     if code is None:
         return None
     return code, addr, f.data
@@ -2537,13 +2615,21 @@ def concession_sites(text):
     barrier statement (`asm("" : "+r"(x));`) in TEXT; removal(lines) returns the lines without it."""
     lines = text.split("\n")
     out = []
+    skip_until = 0
     for i, ln in enumerate(lines):
+        if i < skip_until:
+            continue
         if ln.lstrip().startswith("//"):
             continue
         if PIN_RE.search(ln) and "register" in ln:
             out.append((i, "pin", lambda ls, i=i: ls[:i] + [PIN_RE.sub("", ls[i], count=1)] + ls[i + 1:]))
-        elif BARRIER_RE.match(ln):
-            out.append((i, "barrier", lambda ls, i=i: ls[:i] + ls[i + 1:]))
+        elif re.match(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', ln):
+            end = i + 1
+            while ";" not in "\n".join(lines[i:end]) and end < len(lines):
+                end += 1
+            if BARRIER_RE.match("\n".join(lines[i:end])):
+                out.append((i, "barrier", lambda ls, i=i, end=end: ls[:i] + ls[end:]))
+                skip_until = end
     return out
 
 
@@ -2554,13 +2640,16 @@ def sole_definitions(lines, i):
     """Variables that the barrier on line I defines (an output-only `"=r"(x)` operand) and that nothing
     else in the enclosing function sets. Removing such a barrier leaves x read with no value: same bytes
     perhaps, but not C anyone wrote (a pinned register variable gets no uninitialized warning)."""
-    ln = lines[i]
+    end = i + 1
+    while ";" not in "\n".join(lines[i:end]) and end < len(lines):
+        end += 1
+    ln = "\n".join(lines[i:end])
     outs = re.findall(r'"=[^"]*"\s*\(\s*(\w+)\s*\)', ln.split(":")[1] if ln.count(":") >= 1 else "")
     if not outs:
         return []
     lo = next((j for j in range(i, -1, -1) if re.match(r"\w.*\)\s*\{?\s*$", lines[j]) and not lines[j][0].isspace()), 0)
     hi = next((j for j in range(i, len(lines)) if lines[j].startswith("}")), len(lines) - 1)
-    body = "\n".join(lines[lo:i] + lines[i + 1:hi + 1])
+    body = "\n".join(lines[lo:i] + lines[end:hi + 1])
     sole = []
     for x in outs:
         x_re = re.escape(x)
@@ -4326,6 +4415,19 @@ def cmd_pre(src, func, env):
     srclines = open(os.path.join(ROOT, src)).read().splitlines()
     print(f"{func}: {info.get('counts') or 'MATCH'}; {len(recs)} PRE replacement(s) of"
           f" {len({r['expr'] for r in recs})} expression(s)")
+    gcse_path = os.path.join(wd, "u.i.gcse")
+    if os.path.exists(gcse_path):
+        dump = open(gcse_path).read()
+        sections = re.split(r"(?m)^(?=;; Function \w+)", dump)
+        for section in sections:
+            if not re.match(r";; Function " + re.escape(info["obj_name"]) + r"\b", section):
+                continue
+            tables = re.findall(r"Expression hash table \((\d+) buckets, (\d+) entries\)", section)
+            if tables:
+                print("  expression hash table(s): " + "; ".join(
+                    f"{b} buckets / {e} entries" for b, e in tables))
+                print("    gcse.c alloc_expr_hash_table uses (real insns / 2) | 1; bucket order controls"
+                      " reaching-register creation order (AGBCC_GCSE_T tests this decision).")
     differing = {r["uid"] for r in rows if r.get("uid") and r["tag"] != "="}
     scores = {}
     for r in recs:
@@ -4401,10 +4503,14 @@ def cmd_giv(src, func, env):
             r = m.group(1) or m.group(3)
             b = cur["bivs"].setdefault(r, dict(init="?", fate=""))
             if m.group(3):
-                b["fate"] = "eliminated (counting only: the loop can run backwards)"
+                b["fate"] = "candidate for elimination"
             else:
                 u = re.search(r"insn (\d+)", m.group(2) or "")
                 b["fate"] = "kept" + (f": used at line {ln_of(u.group(1))} (insn {u.group(1)})" if u else "")
+            continue
+        m = re.match(r"Final biv value for (\d+), reversed biv\.", ln)
+        if m:
+            cur["bivs"].setdefault(m.group(1), dict(init="?", fate=""))["reversed"] = True
             continue
         m = re.match(r"Insn (\d+): (giv reg \d+|dest address|dest reg \d+) src reg (\d+) benefit (-?\d+) lifetime (\d+)"
                      r"(.*?)mult (\S+) add (.*)", ln)
@@ -4432,7 +4538,8 @@ def cmd_giv(src, func, env):
         ls = sorted({ln_of(u) for u in list(L["givs"]) if ln_of(u) != "?"})
         print(f"  loop insns {L['span'][0]}-{L['span'][1]} ({L['insns']} insns), givs on line(s) {', '.join(map(str, ls)) or '-'}:")
         for r, b in L["bivs"].items():
-            print(f"    biv  pseudo {r} from {b['init'][:40]}: {b['fate'] or 'kept'}")
+            print(f"    biv  pseudo {r} from {b['init'][:40]}: {b['fate'] or 'kept'}"
+                  + ("; reversed counter" if b.get("reversed") else ""))
         for uid, g in L["givs"].items():
             if g["kind"] == "address" and g["benefit"] <= 0:
                 continue  # an address used once: never worth it, never interesting
@@ -5320,7 +5427,7 @@ def validate_cli(args):
     elif rest and rest[0] == "pins":
         if len([a for a in rest if a != "--all"]) > 2:
             cli_error("FILE.c pins [FUNC] [--all]")
-    elif any(a in rest for a in ("probe", "shape", "frame", "hoist", "spill", "pre")):
+    elif any(a in rest for a in ("probe", "shape", "frame", "hoist", "giv", "spill", "pre", "calls")):
         if len(rest) > 2:
             cli_error("FILE.c COMMAND [FUNC]")
     elif len(rest) > 1:

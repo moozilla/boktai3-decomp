@@ -587,50 +587,45 @@ s32 Div(s32, s32);
 void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
 void TransientSpriteEffects_Spawn(int, int, void *, void *, int, int);
 
-#ifdef NONMATCHING
-// fuzzy: 30.8%
-// scope shape 95 (differences once low registers are set aside)
-// confidence=low: bursts eight particles around fixed offsets from p, each flying outward
-// from a point 0xc8 above p at speed 5.
+/* Emit particles away from a point above the center of the burst. */
+static inline void BurstNormalize(struct ContactPosition *v, s32 speed)
+{
+    struct ContactPosition *out = v;
+    u16 len = Sqrt(v->x * v->x + out->y * out->y + out->z * out->z);
+    if (len) {
+        v->x = Div(v->x * speed, len);
+        out->y = Div(out->y * speed, len);
+        out->z = Div(out->z * speed, len);
+    }
+}
+
+static inline s32 BurstRandom(const u16 *table)
+{
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
+    return table[index];
+}
+
 void sub_08022878(BurstVec *p)
 {
     BurstVec center = *p;
     s32 i;
-    BurstVec pos[1], vel[1];
+    BurstVec pos, vel;
     center.y += 0xc8;
     for (i = 0; i < 8; i++) {
-        const u16 *table = gRandomTable;
-        u32 index;
-        u16 len;
-        u16 r;
-        index = (gRandomIndex + 1) & 0x3FF;
-        gRandomIndex = index;
-        r = table[index] & 0x1f;
-        pos->x = gUnk_08604D84[i].x + p->x - 0x10 + r;
-        index = (index + 1) & 0x3FF;
-        gRandomIndex = index;
-        r = table[index] & 0x1f;
-        pos->y = gUnk_08604D84[i].y + p->y - 0x10 + r;
-        index = (index + 1) & 0x3FF;
-        gRandomIndex = index;
-        r = table[index] & 0x1f;
-        pos->z = gUnk_08604D84[i].z + p->z - 0x10 + r;
-        AnimatedParticles_EmitBurst(pos, 1, 0, 0x40, 0xc, 0xc, 4, 4);
-        vel->x = pos->x - center.x;
-        vel->y = pos->y - center.y;
-        vel->z = pos->z - center.z;
-        len = Sqrt(vel->x * vel->x + vel->y * vel->y + vel->z * vel->z);
-        if (len) {
-            vel->x = Div(vel->x * 5, len);
-            vel->y = Div(vel->y * 5, len);
-            vel->z = Div(vel->z * 5, len);
-        }
-        TransientSpriteEffects_Spawn(2, 0, pos, vel, 0x20, 0x100);
+        void *data = (void *)gRandomTable;
+        pos.x = (s16)(p->x + gUnk_08604D84[i].x - 16) + (BurstRandom(data) & 0x1f);
+        pos.y = (s16)(p->y + gUnk_08604D84[i].y - 16) + (BurstRandom(data) & 0x1f);
+        pos.z = (s16)(p->z + gUnk_08604D84[i].z - 16) + (BurstRandom(data) & 0x1f);
+        data = &pos;
+        AnimatedParticles_EmitBurst(data, 1, 0, 0x40, 0xc, 0xc, 4, 4);
+        vel.x = pos.x - center.x;
+        vel.y = pos.y - center.y;
+        vel.z = pos.z - center.z;
+        BurstNormalize((struct ContactPosition *)&vel, 5);
+        TransientSpriteEffects_Spawn(2, 0, &pos, &vel, 0x20, 0x100);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08022878);
-#endif
 
 // MATCHING_CONCESSION: register-pinning
 void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
@@ -951,23 +946,7 @@ void SceneActorState_SnapReactionPosition(u8 *p, struct SnapVector *position)
     *(u16 *)(p + 0x354) = 64;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 71.3%
-
-// fuzzy: 81.1%
-
-// Scene-actor cutscene dispatcher (Vanargand, Ratatosk). Commands mostly set
-
-// state 2 with a sub-state (setState); 2 places the actor, 9 configures an
-
-// effect, 15/16 pick the body graphics variant, 25 flashes the background.
-
-// Still differs: sb/r8 swapped for entry/i; in cases 15/16 the graphics
-
-// variant branches use other registers, so their tails are not cross-jumped
-
-// as in the original.
-
+/* Scene commands set actor states, positions, graphics variants and background flashes. */
 typedef struct {
     u16 id;
     u8 unk[4];
@@ -1038,19 +1017,31 @@ static inline void setStateFull(struct S *s, u32 state, u32 entered, u32 sub)
 
 #define setState(s, sub) setStateFull(s, 2, 0, sub)
 
-static inline void effect2(u8 *p, int mode, int id, int duration)
+static inline void effect2(struct T *p, int mode, int id, int duration)
 {
-    *(u32 *)(p + 0x390) = id;
-    p[0x38e] = mode;
-    p[0x38f] = duration;
-    if (p[0x38e] == 2) {
+    p->w390 = id;
+    p->b38E = mode;
+    p->b38F = duration;
+    if (p->b38E == 2) {
         u32 value = duration == 5 ? 32 : 64;
-        p[0x38c] = value;
-    } else if (p[0x38e] == 1)
-        p[0x38c] = 0;
+        p->b38C = value;
+    } else if (p->b38E == 1)
+        p->b38C = 0;
 }
 
 #define effect(p, id, mode, d) effect2(p, mode, id, d)
+
+static inline void DispatchSelectPalette(struct T *t, s32 r)
+{
+    if (r == 0)
+        t->palette = t->pal5C4;
+    else if (r == 1)
+        t->palette = t->pal7C4;
+    else {
+        CpuSet(gPaletteBankData + r * 32, t->pal3C4, 0x04000008);
+        t->palette = t->pal3C4;
+    }
+}
 
 void SceneActors_DispatchCommands(struct S *s)
 {
@@ -1167,55 +1158,42 @@ void SceneActors_DispatchCommands(struct S *s)
                     break;
                 case 15:
                     if (m[4] == 0) {
-                        s32 r;
                         t->b38C = 0;
                         t->b38E = 0;
                         t->w390 = SceneActorGraphics_GetResourceId(t);
-                        r = SceneActorGraphics_GetResourceId(t);
-                        switch (r) {
-                            case 0:
-                                t->palette = t->pal5C4;
-                                break;
-                            case 1:
-                                t->palette = t->pal7C4;
-                                break;
-                            default:
-                                CpuSet(gPaletteBankData + r * 32, t->pal3C4, 0x04000008);
-                                t->palette = t->pal3C4;
-                                break;
-                        }
+                        DispatchSelectPalette(t, SceneActorGraphics_GetResourceId(t));
                     } else if (m[5] == 0) {
-                        effect((u8 *)t, 0x338, 3, 5);
+                        effect(t, 0x338, 3, 5);
                     } else {
-                        effect((u8 *)t, 0x33A, 3, 5);
+                        effect(t, 0x33A, 3, 5);
                     }
-                    Trigger_ConsumePending(entry, 1);
+                    Trigger_ConsumePending(&s->entry, 1);
                     break;
                 case 16:
                     if (m[4] == 0)
-                        effect((u8 *)t, 0x335, 1, 5);
+                        effect(t, 0x335, 1, 5);
                     else if (m[5] == 0)
-                        effect((u8 *)t, 0x338, 2, 5);
+                        effect(t, 0x338, 2, 5);
                     else
-                        effect((u8 *)t, 0x33A, 2, 5);
-                    Trigger_ConsumePending(entry, 1);
+                        effect(t, 0x33A, 2, 5);
+                    Trigger_ConsumePending(&s->entry, 1);
                     break;
                 case 9:
                     SceneActors_ConfigureEffect(s, m[4], 0xB4, 0xB4);
-                    Trigger_ConsumePending(entry, 1);
+                    Trigger_ConsumePending(&s->entry, 1);
                     break;
                 case 17:
                     t->b3B8 = m[4];
-                    Trigger_ConsumePending(entry, 1);
+                    Trigger_ConsumePending(&s->entry, 1);
                     break;
                 case 2:
                     s->h54 = m[4];
                     s->h56 = m[5];
                     s->h58 = m[6];
                     t->h260 = s->h54;
-                    t->h262 = t->h344 + s->h56;
+                    t->h262 = s->h56 + t->h344;
                     t->h264 = s->h58;
-                    Trigger_ConsumePending(entry, 1);
+                    Trigger_ConsumePending(&s->entry, 1);
                     break;
                 case 66:
                     t->b3BA = m[4];
@@ -1226,12 +1204,6 @@ void SceneActors_DispatchCommands(struct S *s)
             i++;
         } while (i < entry->count[gSceneEventDispatchState[0x24]]);
 }
-
-#else
-
-INCLUDE_ASM("asm/nonmatching", SceneActors_DispatchCommands);
-
-#endif
 
 static inline u8 TakeFlag(struct StateActor *p)
 {
@@ -2170,9 +2142,6 @@ static inline u8 *ProbeCellProps(s32 cell)
     return gTerrainMap->cells + (cell * 4 + 12);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 89.6%
-// scope shape 5 (differences once low registers are set aside)
 // confidence=low: state 6 of the actor's recovery pipeline: grab a tracked target in reach in
 // front (variant 1), otherwise advance to phase 5 once the animation ends or the ground 0x190
 // ahead is more than two tiles above or below.
@@ -2199,7 +2168,8 @@ void sub_08023FE8(State_08023F98 *p)
         r = sub_08022624(actor, actor[0x174], (struct BoxSearchPosition *)&min,
                          (struct BoxSearchPosition *)&max);
         if (r >= 0) {
-            u8 *q = (&(*(u8 **)gPlayers))[r];
+            u8 **players = (u8 **)gPlayers;
+            u8 *q = players[r];
             u32 mask = 0x40000;
             if (!(*(u32 *)(q + 0x20) & mask)) {
                 actor[0x395] = r;
@@ -2213,26 +2183,29 @@ void sub_08023FE8(State_08023F98 *p)
         s32 distance = 0x190;
         u8 *s = actor + 0x48;
         u8 *props;
+        struct ProbePos *at;
         u32 type;
         s32 h;
         u32 bad;
         ProbeProject(&pos, s[9], distance);
         ProbeAdd(&pos, (struct ProbePos *)(s + 0xc));
-        props = ProbeCellProps(ProbeCellAt(&pos));
+        at = &pos;
+        props = ProbeCellProps(ProbeCellAt(at));
         type = *props >> 4;
         h = (*props & 0xf) << 8;
         switch (type) {
             case 1:
-                h -= (u8)pos.z;
+                h -= (u8)at->z;
                 break;
             case 2:
-                h -= (u8)pos.x;
+                h -= (u8)at->x;
                 break;
         }
         {
             u32 d = h - *(s16 *)(actor + 0x352) + 0x1ff;
+            u32 bound = 0x2fe;
             bad = 0;
-            if (d > 0x3fe)
+            if (d > bound)
                 bad = 1;
         }
         if (bad || p->finished) {
@@ -2246,9 +2219,6 @@ void sub_08023FE8(State_08023F98 *p)
             p->elapsed++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08023FE8);
-#endif
 
 struct S_0802429C {
     u8 f0[0x9a];
@@ -2396,36 +2366,44 @@ struct S_080243CC {
     u8 b383;
 };
 
-#ifdef NONMATCHING
-// fuzzy: 40.4%
-// scope shape 18 (differences once low registers are set aside)
-void sub_080243CC(struct S_080243CC *p)
+static inline u8 SceneRecovery_TakeEntry(State_08023F98 *p, u32 zero)
 {
-    struct S_080243CC *p2 = p;
-    u32 z;
-    u8 t;
-    p->a9a = 1;
-    if (p->b0) {
-        p->b0 = 0;
-        p->af = 0;
+    if (p->enter_08023F98) {
+        p->enter_08023F98 = zero;
+        p->finished = zero;
+        return 1;
     }
-    if (p->af) {
-        t = p->b383;
-        if (t) {
-            p2->ae = 8;
-            p2->c4 = 0;
+    return 0;
+}
+
+void sub_080243CC(State_08023F98 *p)
+{
+    u8 *actor = (u8 *)p;
+    u8 *vulnerable = &p->vulnerable;
+    u32 zero = 0;
+    *vulnerable = 1;
+    if (SceneRecovery_TakeEntry(p, zero)) {
+        /* This recovery state needs no additional initialization. */
+    }
+    if (p->finished) {
+        u32 variant = actor[0x383];
+        if (variant) {
+            u32 phase = 8;
+            u32 elapsed;
+            p->phase = phase;
+            elapsed = 0;
+            p->elapsed = elapsed;
+            p->enter_08023F98 = 1;
         } else {
-            p2->ae = 7;
-            p2->c4 = t;
+            u32 phase = 7;
+            p->phase = phase;
+            p->elapsed = variant;
+            p->enter_08023F98 = 1;
         }
-        p2->b0 = 1;
     } else {
-        p->c4++;
+        p->elapsed++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080243CC);
-#endif
 
 struct S_08024440 {
     u8 f0[0x9a];

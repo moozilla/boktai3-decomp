@@ -1,12 +1,5 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 81.8%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// confidence=low: follows the existing Lun movement callback interpretation.
-
-// Remaining differences: instruction ordering, address lifetimes, and registers.
 #include "scene_actor_reset.h"
 #include "engine.h"
 #include "player.h"
@@ -17,7 +10,7 @@ void Lun_ResumeAfterLiftPenalty(void);
 void Lun_UpdateWaitingAnimation(void);
 void Lun_BeginMoveToPosition(void *, void *);
 void SceneActorControl_ResetCollisionFlags(void *);
-struct Flags {
+struct LunFlagWord {
     s16 bits : 16;
 };
 static inline u8 TakeFlag(u8 *p)
@@ -28,9 +21,13 @@ static inline u8 TakeFlag(u8 *p)
     }
     return 0;
 }
-static inline u16 SetFlag(u16 *p, u32 mask)
+static inline s32 SetFlag(u16 mask, struct LunFlagWord *p)
 {
-    return *p = mask | *p;
+    return p->bits = mask | p->bits;
+}
+static inline s32 ClearFlag(struct LunFlagWord *p, u32 mask)
+{
+    return p->bits = mask & p->bits;
 }
 static inline void SetControl(struct SceneActorRegistryResetView *a, void *callback, u32 kind)
 {
@@ -57,14 +54,27 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u32 state, u3
 }
 static inline u32 Rand(void)
 {
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gRandomTable[gRandomIndex];
+    u32 index = (gRandomIndex + 1) & 1023;
+    u32 offset;
+    const u16 *entry;
+    gRandomIndex = index;
+    offset = index * 2;
+    entry = (const u16 *)(offset + (u32)RANDOM_TABLE_ADDR);
+    return *entry;
 }
 static inline s32 Quarter(s32 v)
 {
     if (v >= 0)
-        return v >> 2;
-    return -((-v) >> 2);
+        v >>= 2;
+    else
+        v = -((-v) >> 2);
+    return v;
+}
+static inline void SetMotionFlags(struct SceneActorRegistryResetView *a, u32 input)
+{
+    u32 mask = input;
+    u32 *p = &a->flags2D0;
+    *p |= mask;
 }
 static inline u8 Move(struct SceneActorRegistryResetView *a)
 {
@@ -87,14 +97,14 @@ static inline u8 Move(struct SceneActorRegistryResetView *a)
     return 0;
 }
 // confidence=low: eases Lun to its movement target, then selects the next waiting or pursuit state.
-static inline u32 Arg1(u32 k_, struct SceneActorRegistryResetView *a)
+static inline u32 TestMotionFlags(u32 mask, struct SceneActorRegistryResetView *a)
 {
-    return a->flags2D4 & k_;
+    return a->flags2D4 & mask;
 }
 
-inline static u16 SetFlag_1(struct SceneActorRegistryResetView *a_, u32 mask)
+inline static u16 SetAnimationFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    u16 *p = &a_->flags2C0;
+    u16 *p = &actor->flags2C0;
     return *p = mask | (*p);
 }
 
@@ -102,7 +112,7 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
 {
     u8 *ctx = a->context;
     if (TakeFlag(&a->field2B2)) {
-        SetFlag(&a->flags2D4, 32);
+        SetFlag(32, (struct LunFlagWord *)&a->flags2D4);
         if (a->flags2D4 & 8)
             Sound_PlaySong(0x12A);
         {
@@ -111,14 +121,11 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
         }
         {
             struct ContactCollider *c = &a->colliderA;
-            {
-                typeof(c->flags) *q1 = &c->flags;
-                *q1 |= 4;
-            }
+            c->flags |= 4;
         }
-        SetFlag_1(a, 0x800);
+        SetAnimationFlags(a, 0x800);
     }
-    if ((Mod(frame, 12) == 0) && Arg1(8, a)) {
+    if ((Mod(frame, 12) == 0) && TestMotionFlags(8, a)) {
         struct ContactPackedVector range;
         range.x = 20;
         range.y = 20;
@@ -126,32 +133,26 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
         SparkParticle_Spawn(&a->position, (Rand() & 3) + 1, &range, a->direction + 128, 10, 6, 2,
                             2);
     }
-    {
-        u32 mask = 0x100000;
-        a->flags2D0 |= mask;
-    }
+    SetMotionFlags(a, 0x100000);
     if (Move(a)) {
         a->field2B0 = 1;
-        ((struct Flags *)(&a->flags2D4))->bits &= ~0x120;
+        ClearFlag((struct LunFlagWord *)&a->flags2D4, ~0x120);
         {
             u32 *p = &a->flags2CC;
             u32 mask = ~0x80;
             *p &= mask;
         }
-        {
-            u32 mask = 0x100000;
-            a->flags2D0 |= mask;
-        }
+        SetMotionFlags(a, 0x100000);
         ctx[0x3E2] = 0;
         {
-            u16 k1 = 8;
-            if (a->flags2D4 & k1) {
+            u16 liftFlag = 8;
+            if (a->flags2D4 & liftFlag) {
                 SetState(a, 3, 0, 0);
                 SetControl(a, Lun_ResumeAfterLiftPenalty, 20);
-                ((struct Flags *)(&a->flags2D4))->bits &= ~8;
+                ClearFlag((struct LunFlagWord *)&a->flags2D4, ~8);
                 a->field2C2 = 64;
             } else if (*((u16 *)(ctx + 0x444))) {
-                SetFlag(&a->flags2D4, 0x100);
+                SetFlag(0x100, (struct LunFlagWord *)&a->flags2D4);
                 *((u16 *)(ctx + 0x444)) = *((u16 *)(ctx + 0x442));
                 Lun_BeginMoveToPosition(a, ((u8 **)gPlayers)[0] + 0x30);
                 SetState(a, 0, 2, 1);
@@ -167,7 +168,3 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Lun_ApproachMovementTarget);
-#endif

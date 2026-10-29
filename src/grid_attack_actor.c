@@ -74,28 +74,21 @@ void GridAttackActor_SetAnimation(struct GridAttackActor *p, int sequence, int s
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(struct ContactCollider *, struct ContactCollider *, s32);
 
-#ifdef NONMATCHING
-// fuzzy: 97.3%
-// The signed-x offset temporary uses r1 instead of r3 (two bytes differ).
+static inline u32 testFlags(u16 *flags, u32 mask)
+{
+    return *flags & mask;
+}
 void GridAttackActor_OnDamageCollision(struct ContactCollider *source,
                                        struct ContactCollider *other, struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
-    int angle;
     Collision_CalculateDamageResponse(source, other);
     PlayerStats_AddContactHundredths(source, other, p->contactReward);
     p->damage = other->cost;
-    {
-        u32 mask = 0x100;
-        if (source->flags & mask)
-            angle = source->direction;
-        else {
-            int x = other->x - source->x;
-            int z = other->z - source->z;
-            angle = Math_Atan2(x, z);
-        }
-    }
-    p->damageAngle = angle;
+    if (testFlags(&source->flags, 0x100))
+        p->damageAngle = source->direction;
+    else
+        p->damageAngle = Math_Atan2(other->x - source->x, other->z - source->z);
     {
         u32 value = source->statRewardFlags;
         base->contactSource = value;
@@ -109,9 +102,6 @@ void GridAttackActor_OnDamageCollision(struct ContactCollider *source,
             p->special = 1;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", GridAttackActor_OnDamageCollision);
-#endif
 
 void GridAttackActor_OnBodyCollision(void)
 {
