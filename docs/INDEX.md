@@ -196,6 +196,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/SCENE_RANGE_WATCH.md](../docs/SCENE_RANGE_WATCH.md) | Scene range watcher (tentative) | *#scripts #scene* | 2 |
 | [docs/SCENE_STATE_QUERIES.md](../docs/SCENE_STATE_QUERIES.md) | Scene state, spatial queries and pair records (tentative) | *#actors #scene* | 4 |
 | [docs/SCRIPT_TRACING.md](../docs/SCRIPT_TRACING.md) | Script calls in a running game | *#scripts #actors #tooling* | 7 |
+| [docs/SEARCH_SPEC.md](../docs/SEARCH_SPEC.md) | A matching search engine: spec and brief (2026-10-28) | #tooling #matching #compiler #process | 24 |
 | [docs/SHIFTABILITY.md](../docs/SHIFTABILITY.md) | Shiftable data: how it was proven | #tooling #assets | 1 |
 | [docs/SOLAR_SENSOR.md](../docs/SOLAR_SENSOR.md) | Cartridge solar sensor: code and runtime evidence | *#hardware* | 5 |
 | [docs/SPARK_PARTICLE.md](../docs/SPARK_PARTICLE.md) | Moving tile particles (tentative identity) | *#particles #assets* | 3 |
