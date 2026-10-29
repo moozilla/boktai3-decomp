@@ -2993,6 +2993,7 @@ addr,name,mode,confidence,source,notes
 0808B264,Ghoul_BeginAlternateRoute,thumb,low,src-alias,Sets owner context flag bits and starts the route group alternate route in behavior 15
 0808B320,Vorn_ParseField624_0808B320,thumb,low,src-alias,
 0808B3A0,Bat_TickDelayedScript,thumb,low,src-alias,
+0808B3EC,Ghoul_ReactToContact,thumb,low,src-alias,
 0808CC48,Ghoul_ResumePendingRoute,thumb,low,src-alias,
 0808CE44,Ghoul_UpdateCooldown,thumb,low,src-alias,Per-update helper ticks the ghoul countdown and returns success
 0808CE50,Ghoul_UpdateSpecialActionControl,thumb,low,src-alias,Starts the ghoul animation-five action and restores the saved controller after completion

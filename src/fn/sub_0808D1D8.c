@@ -57,7 +57,7 @@ void SceneActorReaction_TryResumeRoute(void);
 void SceneActorReaction_BeginReactionSound(void);
 void Ghoul_ResetRouteState(void);
 void SceneActorControl_RefreshMotionRoute_0808A90C(void);
-void sub_0808B3EC(void);
+void Ghoul_ReactToContact(void);
 void Ghoul_OnLifecycleEvent(void);
 void Ghoul_ResumeContactRoute(void);
 void Ghoul_OnMessage(void);
@@ -407,7 +407,7 @@ s32 sub_0808D1D8(u8 *arg0)
     SceneActorMovement_ResolveRoutePosition(arg0);
     GH_AT(void *, 0x248) = Ghoul_ResetRouteState;
     GH_AT(void *, 0x23C) = SceneActorControl_RefreshMotionRoute_0808A90C;
-    GH_AT(void *, 0x268) = sub_0808B3EC;
+    GH_AT(void *, 0x268) = Ghoul_ReactToContact;
     GH_AT(void *, 0x61C) = Ghoul_OnLifecycleEvent;
     GH_AT(void *, 0x5EC) = Ghoul_ResumeContactRoute;
     GH_AT(u8, 0xEB) |= 1;
