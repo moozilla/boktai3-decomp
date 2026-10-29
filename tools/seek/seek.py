@@ -289,7 +289,7 @@ class Work:
         return rec
 
     # -- expanding
-    def expand(self, node, families=None, lines=None, quiet=False, budget=None, sem=True):
+    def expand(self, node, families=None, lines=None, quiet=False, budget=None, sem=True, deadline=None):
         """Every move at NODE: compile, evaluate, add the distinct outputs as children. Returns
         (children, stats)."""
         pre, defs = self.pre_of(node)
@@ -320,7 +320,7 @@ class Work:
             seen_src.add(sha(R.text(fn)))
         for dname, fn in defs.items():
             for fam, desc, f2 in M.all_moves(fn, families):
-                if budget is not None and len(tasks) >= budget:
+                if (budget is not None and len(tasks) >= budget) or (deadline is not None and time.time() >= deadline):
                     break
                 line = changed_line(fn, f2)
                 if lines and line not in lineset:
@@ -408,7 +408,8 @@ class Work:
             node = self.sess.nodes[nid]
             try:
                 kids, st = self.expand(node, families, lines, quiet=True,
-                                       budget=None)
+                                       budget=budget - (self.target.compiles - start_compiles),
+                                       deadline=t0 + seconds)
             except SystemExit as e:
                 print(f"  n{nid}: {e}")
                 continue
