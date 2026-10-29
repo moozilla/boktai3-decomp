@@ -1783,6 +1783,18 @@ def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
         return True
     if want in f["someone"]:
         print(f"      {rname(want)} is held back in pass 0 because a conflicting pseudo allocated later prefers it.")
+        prefs = preferences(wd)
+        pc = conflicts(wd).get(pseudo, (set(), set()))[0]
+        later = sorted((x for x in pc if want in prefs.get(x, []) and
+                        recs.get(x, ("L",))[0] == "G" and recs[x][1] > rec[1]),
+                       key=lambda x: recs[x][1])
+        for x in later[:4]:
+            xr = recs[x]
+            placed = xr[6]
+            result = f"gets {rname(placed)}" if placed >= 0 else "spills"
+            print(f"        {nm(x)} prefers {rname(want)}: allocated {xr[1] + 1}, priority {xr[2]},"
+                  f" {xr[3]} refs, live {xr[4]}; it ultimately {result}."
+                  + mention_lines(wd, x))
         return True
     if want not in f["sofar"]:
         hard = hard_of(wd)
