@@ -149,9 +149,9 @@ def rw_reuse_stored(fn):
             continue
         for take in ("first", "all"):
             f2 = copy.deepcopy(fn)
-            a, _, _ = nth(f2, is_stmt_assign, k)
+            a, par, _ = nth(f2, is_stmt_assign, k)
             t = new_name(f2)
-            add_local(f2, typeof_decl(t, a.lvalue))
+            add_local(par, typeof_decl(t, a.lvalue), a.coord)
             a.rvalue = ca.Assignment("=", ca.ID(t), a.rvalue)
             reads = straight_line_reads(f2, a, lv)
             for r in reads[:1] if take == "first" else reads:
@@ -470,8 +470,10 @@ def rw_temp_arg(fn):
         if stmt is None:
             continue
         blk, st = stmt
+        if isinstance(st, ca.Decl):
+            continue  # a preceding assignment would split the C89 declaration list
         t = new_name(f2)
-        add_local(f2, typeof_decl(t, arg))
+        add_local(blk, typeof_decl(t, arg), arg.coord)
         idx = blk.block_items.index(st)
         blk.block_items.insert(idx, ca.Assignment("=", ca.ID(t), arg))
         set_child(p, s, ca.ID(t))
@@ -485,8 +487,10 @@ def rw_temp_arg(fn):
         if stmt is None:
             continue
         blk, st = stmt
+        if isinstance(st, ca.Decl):
+            continue
         t = new_name(f2)
-        add_local(f2, int_decl(t, "s32"))
+        add_local(blk, int_decl(t, "s32"), arg.coord)
         idx = blk.block_items.index(st)
         blk.block_items.insert(idx, ca.Assignment("=", ca.ID(t), arg))
         set_child(p, s, ca.ID(t))
@@ -689,7 +693,7 @@ def rw_explicit_narrow(fn):
             f2 = copy.deepcopy(fn)
             a, par, _ = nth(f2, pred, k)
             t = new_name(f2)
-            add_local(f2, int_decl(t, ttype))
+            add_local(par, int_decl(t, ttype), a.coord)
             par.block_items.insert(par.block_items.index(a), ca.Assignment(
                 "=", ca.ID(t), ca.BinaryOp("<<", a.rvalue, ca.Constant("int", str(sh)))))
             a.rvalue = ca.BinaryOp(">>", ca.ID(t), ca.Constant("int", str(sh)))
@@ -709,13 +713,15 @@ def rw_hoist_args(fn):
             if not found:
                 continue
             blk, st = found
+            if isinstance(st, ca.Decl):
+                continue
             idx = blk.block_items.index(st)
             hoisted = []
             for i, a in enumerate(call.args.exprs):
                 if isinstance(a, (ca.ID, ca.Constant)):
                     continue
                 t = new_name(f2)
-                add_local(f2, typeof_decl(t, a))
+                add_local(blk, typeof_decl(t, a), a.coord)
                 hoisted.append(ca.Assignment("=", ca.ID(t), a))
                 call.args.exprs[i] = ca.ID(t)
             if order == "reverse":

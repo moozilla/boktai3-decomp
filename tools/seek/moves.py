@@ -489,7 +489,6 @@ def mv_decl_scope(fn):
         yield f"declare {d.name} in its inner block", f2
 
     # hoist a nested declaration to the top
-    top_names = _top_names(fn)
     for bi, b in enumerate(R.blocks(fn)):
         if b is fn.body:
             continue
@@ -793,10 +792,7 @@ def mv_cse_temp(fn):
                 for r in found:
                     set_child(r[1], r[2], ca.ID(t))
                 it.insert(j, ca.Assignment("=", ca.ID(t), copy.deepcopy(n)))
-                if _ids(n) <= top_names or b2 is f2.body:
-                    R.add_local(f2, decl)
-                else:
-                    it.insert(nd, decl)
+                R.add_local(b2, decl, n.coord)
                 yield f"[sem] {key[:40]} in {t} (x{count})", f2
 
 
@@ -899,6 +895,8 @@ def mv_sink_store(fn):
                 del it2[i + 1]
                 yield f"store {text(nxt.lvalue)} in each branch (no {v})", f2
             elif la and lb and text(la.lvalue) == text(lb.lvalue) and not isinstance(la.lvalue, ca.ID):
+                if _ids(la.lvalue) & set(_declared_names(st)):
+                    continue  # branch-local objects cannot be named after the branch
                 f2 = copy.deepcopy(fn)
                 b2 = [n for n, _, _ in walk(f2) if isinstance(n, ca.Compound)][bk]
                 it2 = b2.block_items
@@ -907,7 +905,7 @@ def mv_sink_store(fn):
                 for br in (at(it2).iftrue, at(it2).iffalse):
                     _last_assign_any(br).lvalue = ca.ID(t)
                 it2.insert(i + 1, ca.Assignment("=", target, ca.ID(t)))
-                R.add_local(f2, R.typeof_decl(t, target))  # last: it shifts the function block's items
+                R.add_local(b2, R.typeof_decl(t, target), target.coord)
                 yield f"one temporary for the store to {text(la.lvalue)}", f2
 
 
