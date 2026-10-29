@@ -1,17 +1,6 @@
 #include "global.h"
 
-// confidence=low: directional state update; refreshes facing and sway velocity, decays the scale fields, and either restores the directional callback or sets the flags bit 0.
-
-// confidence=low: directional state update; refreshes facing and sway velocity, decays the scale fields, and either restores the directional callback or sets the flags bit 0.
-
-// confidence=low: directional state update; refreshes facing and sway velocity, decays the scale fields, and either restores the directional callback or sets the flags bit 0.
-
-// confidence=low: directional state update; refreshes facing and sway velocity, decays the scale fields, and either restores the directional callback or sets the flags bit 0.
-
-// confidence=low: directional state update; refreshes facing and sway velocity, decays the scale fields, and either restores the directional callback or sets the flags bit 0.
-
-// confidence=low: directional state update; refreshes facing and sway velocity, decays the scale fields, and either restores the directional callback or sets the flags bit 0.
-extern s16 gUnk_086149C4[];
+extern const s16 gUnk_086149C4[];
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
 void Sound_PlaySongChecked(u32);
 void sub_08022790(void *, s32);
@@ -59,17 +48,19 @@ struct Actor08026FF0 {
 
 static inline void f08026FF0_setFacing(struct Actor08026FF0 *p, int angle)
 {
-    u32 value;
-    int shifted;
     p->angle = angle;
-    shifted = p->angle + 0x60;
-    shifted >>= 6;
-    value = 3 & shifted;
-    p->facing = value;
-    shifted = p->angle + 0x70;
-    shifted >>= 5;
-    value = 7 & shifted;
-    p->facing8 = value;
+    {
+        s32 shifted = (p->angle + 0x60) >> 6;
+        u32 mask = 3;
+        mask &= shifted;
+        p->facing = mask;
+    }
+    {
+        s32 shifted = (p->angle + 0x70) >> 5;
+        u32 mask = 7;
+        mask &= shifted;
+        p->facing8 = mask;
+    }
 }
 
 static inline int f08026FF0_choose(u32 mode, int normal, int alternate)
@@ -87,22 +78,14 @@ static inline int f08026FF0_trunc12(int x)
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
 
-static inline void f08026FF0_decay(s16 *p)
-{
-    u32 old = (u16)*p;
-    *p = *p > 23 ? old - 24 : 0;
-}
-
-#ifdef NONMATCHING
-// fuzzy: 68.0%
-// scope shape 33 (differences once low registers are set aside)
-// confidence=low: directional state update; refreshes facing and sway velocity, decays the scale fields, and either restores the directional callback or sets the flags bit 0.
+/* Update the reaction sway and restore the directional state when it completes. */
 void sub_08026FF0(struct Actor08026FF0 *base, int time)
 {
-    int tick = time;
     struct Actor08026FF0 *p = base;
     u8 *position = (u8 *)p + 0x48;
     s16 *velocity;
+    s16 *minimum;
+    s16 *maximum;
     u32 zero;
 
     if (p->changed) {
@@ -116,12 +99,14 @@ void sub_08026FF0(struct Actor08026FF0 *base, int time)
             Sound_PlaySongChecked(0x34E);
         Sound_PlaySongChecked(0x34F);
     }
-    if (tick <= 15) {
+    if (time <= 15) {
         u32 angle;
         int speed;
-        angle = p->angleSource;
+        u8 *angleField = &p->angleSource;
+        s32 initialSpeed = 16;
         velocity = (s16 *)(position + 20);
-        speed = 16 - tick;
+        angle = *angleField;
+        speed = initialSpeed - time;
         {
             int x = f08026FF0_trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
             int z = 0;
@@ -130,8 +115,26 @@ void sub_08026FF0(struct Actor08026FF0 *base, int time)
         }
         velocity[2] = f08026FF0_trunc12(gUnk_086149C4[angle] * speed);
     }
-    f08026FF0_decay(&p->minScale);
-    f08026FF0_decay(&p->maxScale);
+    {
+        s16 *value = &p->minScale;
+        u32 old = (u16)*value;
+        s32 current = *value;
+        minimum = value;
+        if (current > 23)
+            *minimum = old - 24;
+        else
+            *minimum = 0;
+    }
+    {
+        s16 *value = &p->maxScale;
+        u32 old = (u16)*value;
+        s32 current = *value;
+        maximum = value;
+        if (current > 23)
+            *maximum = old - 24;
+        else
+            *maximum = 0;
+    }
     p->unk39B = 8;
     zero = 0;
     p->unk33C = zero;
@@ -143,28 +146,33 @@ void sub_08026FF0(struct Actor08026FF0 *base, int time)
     if (p->unk341 && (time & 3) == 0)
         sub_08022790(p, 0);
     if (p->unk25D & 2) {
-        p->unkAB = 1;
-        p->callback = SceneActorAnimation_UpdateDirectionalCallback;
-        p->unk90 = zero;
-        p->changed = 1;
-        p->unkA2 = 0;
-        p->unkA4 = zero;
+        void (*callback)(void *) = SceneActorAnimation_UpdateDirectionalCallback;
+        u32 one = 1;
+        u32 stateZero;
+        u8 *active = &base->unkAB;
+        stateZero = 0;
+        *active = one;
+        base->callback = callback;
+        base->unk90 = stateZero;
+        base->changed = one;
+        base->unkA2 = stateZero;
+        base->unkA4 = stateZero;
         if (p->unk341) {
             p->mode &= ~1;
             p->unk341 = 0;
             if (p->script) {
                 Script_Call(p->script, 0);
-                p->script = zero;
+                p->script = stateZero;
             }
         }
-        p->minScale = 0;
-        p->maxScale = 0;
-        p->variant = 0;
+        {
+            u8 variant = stateZero;
+            *minimum = 0;
+            *maximum = 0;
+            p->variant = variant;
+        }
     } else {
         u32 bit = 1;
         base->flags |= bit;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08026FF0);
-#endif
