@@ -34,9 +34,13 @@ For each function FUNC (unit file SRC) in queue order, skipping any with build/s
    minute; never run git commands that write).
    Register pins are allowed as a last resort; a pin-free match is worth far more. Mark a pinned unit
    `// MATCHING_CONCESSION: register-pinning`. Never hand-written instructions in `asm()`.
-3. Whether or not it matched, finish the function: `touch build/scope/campaign/FUNC/done`, and append one
-   line to build/scope/campaign/LOG.md: `FUNC  MATCH|N ROM / M draft  pins P  note`. When you stop on a
-   function, `seek note` your best node with what is left, and keep build/scope/campaign/FUNC/best.c.
+3. A function is finished only when it matches. Stay on it: do not move to the next function while it is
+   unmatched. When you are stuck, that is the moment to change approach rather than leave: rewrite a
+   component from the ROM, look for the struct, macro or helper the original used, read the agbcc source
+   behind the decision, or improve seek or scope so the next step is visible (tool fixes are welcome).
+   On MATCH: `touch build/scope/campaign/FUNC/done` and append one line to build/scope/campaign/LOG.md:
+   `FUNC  MATCH  pins P  note`. Keep your current best in build/scope/campaign/FUNC/best.c and `seek note`
+   your findings as you go, so a stop or a crash loses nothing.
 4. Paper cuts: whenever a tool confused you, was slow, wrong, or missing something, add one line to
    build/PAPERCUTS.md (tool, what happened, what would have helped). This is how the tools get better tonight.
 
@@ -46,6 +50,6 @@ build/commits/NNN.files (the paths, one per line; NNN counts from 001).
 
 Rules: matching means byte-identical. Never run make, tools/build.py or a full build (tools/check.py per unit
 and seek/scope compiles are the checks). Never `rm -rf` (move to ~/.Trash). Don't edit files outside your
-subsystem's units except tools/. No personal paths in committed files (write ~). Keep going function after
-function until the queue is done or you are stopped; then do a second pass over the unmatched ones with
-what you learned. Your last message: matched, unmatched with what is left, and the top paper cuts.
+subsystem's units except tools/. No personal paths in committed files (write ~). Keep going until the
+queue is done or you are stopped. Your last message: what matched, the function you are on and what is left,
+and the top paper cuts.
