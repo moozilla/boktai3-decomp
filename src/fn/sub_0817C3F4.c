@@ -2,8 +2,21 @@
 #include "engine_globals.h"
 #include "ram.h"
 // confidence=low: phase-dependent combat selection inferred from state and distance tests
-#ifdef NONMATCHING
-// fuzzy: 83.3%
+struct DecisionBytes {
+    u8 transition, previousChoice, mode, index;
+};
+union DecisionControl {
+    u32 word;
+    struct DecisionBytes bytes;
+};
+struct DecisionThresholds {
+    u32 unknown;
+    u16 values[2];
+};
+struct DecisionSummons {
+    u32 unknown;
+    u32 actors[2];
+};
 struct DecisionActor {
     u8 pad0[0x51];
     u8 direction;
@@ -15,13 +28,13 @@ struct DecisionActor {
     u8 padB4[0x10];
     u32 timer, distance;
     u8 requestedDirection;
-    u8 padCD[0x1A7];
-    u16 firstThreshold, secondThreshold;
+    u8 padCD[0x270 - 0xCD];
+    struct DecisionThresholds thresholds;
     u8 pad278[0x1B0];
     u8 latch[0xC0];
-    u8 transition, previousChoice, mode, index;
-    u8 pad4EC[0x774];
-    u32 firstSummon, secondSummon;
+    union DecisionControl control;
+    u8 pad4EC[0xC5C - 0x4EC];
+    struct DecisionSummons summons;
 };
 s32 SceneActors_ConsumePendingSignal(void *);
 void SceneVolume_BeginPhase(void *, int);
@@ -36,7 +49,7 @@ static inline s32 RandomValue(void)
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    return *(u16 *)(offset + (u32)gRandomTable);
+    return *(u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 static inline void SelectAction(struct DecisionActor *p, u32 zero, u32 choice)
 {
@@ -62,34 +75,56 @@ static inline void FaceTarget(struct DecisionActor *p)
         p->direction8 = mask;
     }
 }
+static inline u8 *IndexAddress(struct DecisionActor *p)
+{
+    struct DecisionBytes *bytes = &p->control.bytes;
+    return &bytes->index;
+}
+static inline void SetSpecial(struct DecisionActor *p, u32 value)
+{
+    p->special = value;
+}
+static inline void RequestSummon(struct DecisionActor *p, u32 action)
+{
+    p->action = action;
+    p->subaction = 0;
+    p->choice = 0;
+    p->timer = 0;
+    p->queued = 1;
+    p->state = 1;
+}
+static inline u16 *ThresholdAddress(struct DecisionActor *p, u32 phase)
+{
+    struct DecisionThresholds *limits = &p->thresholds;
+    return &limits->values[phase];
+}
+static inline u32 *SummonAddress(struct DecisionActor *p, u32 phase)
+{
+    struct DecisionSummons *summons = &p->summons;
+    return &summons->actors[phase];
+}
 // confidence=low: selects phase-dependent attacks from the preceding choice and event index
 void BossSlot2_SelectCombatAction(struct DecisionActor *p)
 {
     struct DecisionActor *q = p;
-    u8 *event = &p->index;
     if (SceneActors_ConsumePendingSignal(p))
         SceneVolume_BeginPhase(p, 4);
-    if (!(*(u32 *)&p->transition & 0xFF0000FF))
+    if (!(p->control.word & 0xFF0000FF))
         goto callback;
-    switch (p->mode) {
+    switch (p->control.bytes.mode) {
         case 0:
-            if (p->vitality < p->firstThreshold) {
-                if (p->firstSummon) {
-                    p->special = 1;
-                    p->action = 2;
-                    p->subaction = 0;
-                    p->choice = 0;
-                    p->timer = 0;
-                    p->queued = 1;
-                    p->state = 1;
+            if (p->vitality < *ThresholdAddress(p, 0)) {
+                if (*SummonAddress(p, 0)) {
+                    SetSpecial(p, 1);
+                    RequestSummon(p, 2);
                 } else {
-                    p->mode = 1;
+                    p->control.bytes.mode = 1;
                     SelectAction(p, 0, 8);
                 }
             } else {
-                switch (p->previousChoice) {
+                switch (p->control.bytes.previousChoice) {
                     case 0: {
-                        u32 index = *(event = &q->index);
+                        u32 index = *IndexAddress(q);
                         if (index == 4) {
                             SelectAction(p, 0, 11);
                         } else if (index == 1) {
@@ -108,7 +143,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         }
                     } break;
                     case 1: {
-                        u32 index = *(event = &q->index);
+                        u32 index = *IndexAddress(q);
                         if (index == 4) {
                             SelectAction(p, 0, 11);
                         } else if (index != 0) {
@@ -122,7 +157,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         if (result) {
                             SelectAction(p, 0, 12);
                         } else {
-                            u32 index = *(event = &q->index);
+                            u32 index = *IndexAddress(q);
                             if (index == 0) {
                                 SelectAction(p, result, 4);
                             } else if (index == 2) {
@@ -131,7 +166,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         }
                     } break;
                     case 3: {
-                        u32 index = *(event = &q->index);
+                        u32 index = *IndexAddress(q);
                         if (index == 4) {
                             SelectAction(p, 0, 11);
                         } else if (index == 1) {
@@ -146,7 +181,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         }
                     } break;
                     case 4: {
-                        u32 index = *(event = &q->index);
+                        s16 index = *IndexAddress(q);
                         if (index == 4) {
                             SelectAction(p, 0, 11);
                         } else if ((u8)(index - 1) <= 1) {
@@ -162,7 +197,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         }
                     } break;
                     case 5: {
-                        u32 index = *(event = &q->index);
+                        u32 index = *IndexAddress(q);
                         if (index == 4) {
                             SelectAction(p, 0, 11);
                         } else if (index == 1) {
@@ -174,7 +209,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         }
                     } break;
                     case 6: {
-                        u32 index = *(event = &q->index);
+                        u32 index = *IndexAddress(q);
                         if (index == 4) {
                             SelectAction(p, 0, 11);
                         } else {
@@ -186,7 +221,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         }
                     } break;
                     case 7: {
-                        u32 index = *(event = &q->index);
+                        u32 index = *IndexAddress(q);
                         if (index == 4) {
                             SelectAction(p, 0, 11);
                         } else if (index == 1) {
@@ -211,13 +246,13 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         SelectAction(p, 0, 13);
                     } break;
                     case 13: {
-                        u32 index = *(event = &q->index);
+                        u32 index = *IndexAddress(q);
                         if (index == 0) {
                             SelectAction(p, index, 14);
                         }
                     } break;
                     case 14: {
-                        u32 index = *(event = &q->index);
+                        u32 index = *IndexAddress(q);
                         if (index == 2) {
                             if (p->distance <= 0x23FFF) {
                                 SelectAction(p, 0, 2);
@@ -232,23 +267,18 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
             }
             break;
         case 1:
-            if (p->vitality < p->secondThreshold) {
+            if (p->vitality < *ThresholdAddress(p, 1)) {
                 ProximityVolume_ClearLatch(p->latch);
                 AnimatedHazardManager_RetractAll();
-                if (p->secondSummon) {
-                    p->special = 1;
-                    p->action = 2;
-                    p->subaction = 0;
-                    p->choice = 0;
-                    p->timer = 0;
-                    p->queued = 1;
-                    p->state = 1;
+                if (*SummonAddress(p, 1)) {
+                    SetSpecial(p, 1);
+                    RequestSummon(p, 2);
                 } else {
-                    p->mode = 2;
+                    p->control.bytes.mode = 2;
                     SelectAction(p, 0, 10);
                 }
             } else {
-                switch (p->previousChoice) {
+                switch (p->control.bytes.previousChoice) {
                     case 0:
                     case 1:
                     case 3:
@@ -256,12 +286,18 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                     case 7:
                         SelectAction(p, 0, 8);
                         break;
+                    case 13: {
+                        u32 index = *IndexAddress(q);
+                        if (index == 0) {
+                            SelectAction(p, index, 8);
+                        }
+                    } break;
                     case 2: {
                         s32 result = SceneVolume_CanActivate(q);
                         if (result) {
                             SelectAction(p, 0, 12);
                         } else {
-                            u32 index = *(event = &q->index);
+                            u32 index = *IndexAddress(q);
                             if (index == 0) {
                                 SelectAction(p, result, 8);
                             } else if (index == 2) {
@@ -270,7 +306,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         }
                     } break;
                     case 8: {
-                        u32 index = *(event = &q->index);
+                        u32 index = *IndexAddress(q);
                         if (index == 2) {
                             if (p->distance <= 0x23FFF) {
                                 SelectAction(p, 0, 2);
@@ -284,7 +320,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         }
                     } break;
                     case 9: {
-                        u32 index = *(event = &q->index);
+                        u32 index = *IndexAddress(q);
                         if (index == 2) {
                             SelectAction(p, 0, 13);
                         } else {
@@ -303,14 +339,8 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                     case 12: {
                         SelectAction(p, 0, 13);
                     } break;
-                    case 13: {
-                        u32 index = *(event = &q->index);
-                        if (index == 0) {
-                            SelectAction(p, index, 8);
-                        }
-                    } break;
                     case 14: {
-                        u32 index = *(event = &q->index);
+                        u32 index = *IndexAddress(q);
                         if (index == 2) {
                             if (p->distance <= 0x23FFF) {
                                 SelectAction(p, 0, 2);
@@ -325,9 +355,9 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
             }
             break;
         case 2:
-            switch (p->previousChoice) {
+            switch (p->control.bytes.previousChoice) {
                 case 0: {
-                    u32 index = *(event = &q->index);
+                    u32 index = *IndexAddress(q);
                     if (index == 1) {
                         if (p->distance <= 0x23FFF) {
                             SelectAction(p, 0, 2);
@@ -344,7 +374,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                     }
                 } break;
                 case 1: {
-                    u32 index = *(event = &q->index);
+                    u32 index = *IndexAddress(q);
                     if (index == 4) {
                         SelectAction(p, 0, 11);
                     } else if (index != 0) {
@@ -358,7 +388,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                     if (result) {
                         SelectAction(p, 0, 12);
                     } else {
-                        u32 index = *(event = &q->index);
+                        u32 index = *IndexAddress(q);
                         if (index == 0) {
                             SelectAction(p, result, 4);
                         } else if (index == 2) {
@@ -367,7 +397,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                     }
                 } break;
                 case 3: {
-                    u32 index = *(event = &q->index);
+                    u32 index = *IndexAddress(q);
                     if (index == 4) {
                         SelectAction(p, 0, 11);
                     } else if (index == 1) {
@@ -387,7 +417,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                     }
                 } break;
                 case 4: {
-                    u32 index = *(event = &q->index);
+                    s16 index = *IndexAddress(q);
                     if (index == 4) {
                         SelectAction(p, 0, 11);
                     } else if ((u8)(index - 1) <= 1) {
@@ -399,16 +429,11 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                     } else if (index == 3) {
                         SelectAction(p, 0, 5);
                     } else {
-                        u32 random = (RandomValue() >> 8) & 1;
-                        if (random == 0) {
-                            SelectAction(p, random, 10);
-                        } else {
-                            SelectAction(p, 0, 3);
-                        }
+                        goto random_fallback;
                     }
                 } break;
                 case 5: {
-                    u32 index = *(event = &q->index);
+                    u32 index = *IndexAddress(q);
                     if (index == 4) {
                         SelectAction(p, 0, 11);
                     } else if (index == 1) {
@@ -420,7 +445,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                     }
                 } break;
                 case 6: {
-                    u32 index = *(event = &q->index);
+                    u32 index = *IndexAddress(q);
                     if (index == 4) {
                         SelectAction(p, 0, 11);
                     } else {
@@ -432,7 +457,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                     }
                 } break;
                 case 7: {
-                    u32 index = *(event = &q->index);
+                    u32 index = *IndexAddress(q);
                     if (index == 4) {
                         SelectAction(p, 0, 11);
                     } else if (index == 1) {
@@ -446,17 +471,6 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         SelectAction(p, 0, 4);
                     }
                 } break;
-                case 10: {
-                    if (SceneVolume_CanActivate(q)) {
-                        SceneSteeringActor_RequestRemovalAll();
-                        SelectAction(p, 0, 12);
-                    } else {
-                        u32 index = *(event = &q->index);
-                        if (index == 0) {
-                            SelectAction(p, index, 3);
-                        }
-                    }
-                } break;
                 case 11: {
                     if (p->distance <= 0x23FFF) {
                         SelectAction(p, 0, 2);
@@ -464,17 +478,28 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                         SelectAction(p, 0, 1);
                     }
                 } break;
+                case 10: {
+                    if (SceneVolume_CanActivate(q)) {
+                        SceneSteeringActor_RequestRemovalAll();
+                        SelectAction(p, 0, 12);
+                    } else {
+                        u32 index = *IndexAddress(q);
+                        if (index == 0) {
+                            SelectAction(p, index, 3);
+                        }
+                    }
+                } break;
                 case 12: {
                     SelectAction(p, 0, 13);
                 } break;
                 case 13: {
-                    u32 index = *(event = &q->index);
+                    u32 index = *IndexAddress(q);
                     if (index == 0) {
                         SelectAction(p, index, 0);
                     }
                 } break;
                 case 14: {
-                    u32 index = *(event = &q->index);
+                    u32 index = *IndexAddress(q);
                     if (index == 2) {
                         if (p->distance <= 0x23FFF) {
                             SelectAction(p, 0, 2);
@@ -482,6 +507,7 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                             SelectAction(p, 0, 1);
                         }
                     } else {
+                    random_fallback: {
                         u32 random = (RandomValue() >> 8) & 1;
                         if (random == 0) {
                             SelectAction(p, random, 10);
@@ -489,18 +515,18 @@ void BossSlot2_SelectCombatAction(struct DecisionActor *p)
                             SelectAction(p, 0, 3);
                         }
                     }
+                    }
                 } break;
             }
             break;
     }
-    *event = 0;
-    q->transition = 0;
+    {
+        u32 zero = 0;
+        *IndexAddress(q) = zero;
+        q->control.bytes.transition = zero;
+    }
     if (*(u16 *)&p->action == 0) {
     callback:
         Callback_InvokeActor(p, gUnk_08611C6C[p->choice]);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", BossSlot2_SelectCombatAction);
-#endif
