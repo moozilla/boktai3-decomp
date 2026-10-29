@@ -65,13 +65,16 @@ def int_decl(name, tname, init=None):
     return _decl(name, ca.TypeDecl(name, [], None, ca.IdentifierType([tname])), init)
 
 
-def add_local(fn, decl):
-    items = fn.body.block_items or []
+def add_local(fn, decl, coord=None):
+    block = fn.body if isinstance(fn, ca.FuncDef) else fn
+    if coord is not None:
+        decl.coord = coord
+    items = block.block_items or []
     i = 0
     while i < len(items) and isinstance(items[i], ca.Decl):
         i += 1
     items.insert(i, decl)
-    fn.body.block_items = items
+    block.block_items = items
 
 
 def blocks(fn):
@@ -255,7 +258,7 @@ def rw_copy_var(fn):
             f2 = copy.deepcopy(fn)
             a, par, slot = nth(f2, pred, k)
             w = new_name(f2, "c")
-            add_local(f2, typeof_decl(w, ca.ID(v)))
+            add_local(par, typeof_decl(w, ca.ID(v)), node.coord)
             fol2 = following(f2, a)
             par.block_items.insert(par.block_items.index(a) + 1, ca.Assignment("=", ca.ID(w), ca.ID(v)))
             for i in users[a_:b_ + 1]:
@@ -271,7 +274,7 @@ def rw_temp_rvalue(fn):
         f2 = copy.deepcopy(fn)
         a, par, _ = nth(f2, pred, k)
         t = new_name(f2)
-        add_local(f2, typeof_decl(t, a.rvalue))
+        add_local(par, typeof_decl(t, a.rvalue), a.coord)
         par.block_items.insert(par.block_items.index(a), ca.Assignment("=", ca.ID(t), a.rvalue))
         a.rvalue = ca.ID(t)
         yield f"temporary for {text(a.lvalue)}", f2
