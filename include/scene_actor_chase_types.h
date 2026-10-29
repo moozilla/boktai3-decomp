@@ -5,6 +5,11 @@
 
 /* Shared player, route and control records used by monster pursuit reactions.
  * Actor and monster-specific body state retain their existing declarations. */
+/* A halfword flag member viewed independently of its owning actor or group. */
+struct SceneActorChaseFlags16 {
+    u16 value;
+};
+
 struct SceneActorChaseTarget {
     u8 unknown0[8];
     u8 playerIndex;

@@ -3593,6 +3593,7 @@ addr,name,mode,confidence,source,notes
 080D203C,Mummy_UpdateDying,thumb,low,src-alias,
 080D211C,Golem_UpdateDeath_080D211C,thumb,low,src-alias,
 080D2194,Mummy_ResumeRouteAfterRecovery,thumb,low,src-alias,
+080D2584,Mummy_UpdateDisplacementRecovery,thumb,low,src-alias,Mummy recoil displacement decay and route/pursuit recovery
 080D3878,Mummy_UpdateDefeat,thumb,low,src-alias,
 080D3D60,Mummy_UpdatePlayerRoute,thumb,low,src-alias,
 080D48C0,Mummy_UpdateBehavior,thumb,low,src-alias,Runs five mummy behavior helpers before the current state callback is dispatched
