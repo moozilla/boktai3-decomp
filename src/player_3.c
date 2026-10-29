@@ -45,20 +45,17 @@ void Player_LoadVisualParameters(struct Player *p)
     p->visualParameterC = t[1];
 }
 
-#ifdef NONMATCHING
-// fuzzy: 66.5%
-// fix.py best (sweep after the inlined-insn fix)
-// Palette blend layout recovered; channel allocation remains tentative.
-void sub_0813C9B4(struct Player *actor, const u16 *input, s32 weightA, s32 weightB, s32 shift)
+void sub_0813C9B4(struct Player *actor, const u16 *input, s32 inputWeightA, s32 weightB, s32 shift)
 {
-    register struct Player *p asm("sl") = actor;
-    register s32 baseWeight asm("sb") = weightB;
+    register struct Player *p = actor;
+    s32 weightA = inputWeightA;
+    register s32 baseWeight = weightB;
     register const u16 *source asm("r8");
-    register u16 *base asm("r6");
+    register u16 *base;
     s32 i;
     u8 *brightnessPtr;
-    u32 *palette;
-    if (!weightA) {
+    u8 *alternateBrightness;
+    if (!inputWeightA) {
         if (!p->unk419)
             p->actionVariantResource = (u32)p->visualParameters;
         else
@@ -67,6 +64,7 @@ void sub_0813C9B4(struct Player *actor, const u16 *input, s32 weightA, s32 weigh
     }
     source = input;
     if (!p->unk419) {
+        u32 *palette;
         i = 0;
         palette = &p->actionVariantResource;
         base = (u16 *)p->visualParameters;
@@ -75,33 +73,52 @@ void sub_0813C9B4(struct Player *actor, const u16 *input, s32 weightA, s32 weigh
             if ((((u32)(i - 5)) <= 1) || (i == 13))
                 base[16] = base[0];
             else {
-                u32 color = *source;
-                s32 brightness;
-                register s32 r asm("r4");
-                register s32 g asm("r2");
-                register s32 b asm("r5");
-                s32 br;
-                s32 bg;
-                s32 bb;
-                r = color & 31;
-                brightness = *brightnessPtr;
-                r += brightness;
-                if (r > 31)
-                    r = 31;
-                g = ((((u16)color) >> 5) & 31) + brightness;
-                if (g > 31)
-                    g = 31;
-                b = ((((u16)color) >> 10) & 31) + brightness;
-                if (b > 31)
-                    b = 31;
-                color = *base;
-                br = color & 31;
-                bg = (((u16)color) >> 5) & 31;
-                bb = (((u16)color) >> 10) & 31;
-                r = ((weightA * r) + (baseWeight * br)) >> shift;
-                g = ((weightA * g) + (baseWeight * bg)) >> shift;
-                b = ((weightA * b) + (baseWeight * bb)) >> shift;
-                base[16] = ((b << 10) | (g << 5)) | r;
+                register u32 color;
+                register s32 brightness;
+                register s32 channel asm("r0");
+                register u32 packed;
+                register s32 red;
+                register s32 green asm("r2");
+                s32 blue;
+                u32 channelMask;
+                {
+                    register const u16 *view asm("r4") = source;
+                    color = *view;
+                }
+                channelMask = 31;
+                channel = channelMask;
+                channel &= color;
+                {
+                    register const u8 *brightnessView asm("r3") = brightnessPtr;
+                    asm("" : : "r"(brightnessView));
+                    brightness = *brightnessView;
+                }
+                red = channel + brightness;
+                if (red > 31)
+                    red = 31;
+                packed = color << 16;
+                channel = (packed >> 21) & channelMask;
+                green = channel + brightness;
+                if (green > 31)
+                    green = 31;
+                channel = (packed >> 26) & channelMask;
+                blue = channel + brightness;
+                if (blue > 31)
+                    blue = 31;
+                {
+                    register u32 baseColor = *base;
+                    register s32 baseRed asm("r0");
+                    register s32 baseGreen asm("r3");
+                    baseRed = channelMask;
+                    baseRed &= baseColor;
+                    baseColor <<= 16;
+                    baseGreen = (baseColor >> 21) & channelMask;
+                    baseColor = (baseColor >> 26) & channelMask;
+                    red = ((weightA * red) + (baseWeight * baseRed)) >> shift;
+                    green = ((weightA * green) + (baseWeight * baseGreen)) >> shift;
+                    blue = ((weightA * blue) + (baseWeight * ((s32)baseColor))) >> shift;
+                    base[16] = ((blue << 10) | (green << 5)) | red;
+                }
             }
             source++;
             base++;
@@ -109,50 +126,63 @@ void sub_0813C9B4(struct Player *actor, const u16 *input, s32 weightA, s32 weigh
 
         *palette = (u32)(((u8 *)p) + 0x380);
     } else {
+        const u16 *cursor;
         i = 0;
-        brightnessPtr = p->unkAC6;
+        alternateBrightness = p->unkAC6;
         base = (u16 *)p->visualParameters;
-        for (; i < 16; i++) {
+        cursor = source;
+        while (1) {
             {
-                u32 color = *source;
-                s32 brightness;
-                register s32 r asm("r4");
-                register s32 g asm("r2");
-                register s32 b asm("r5");
-                s32 br;
-                s32 bg;
-                s32 bb;
-                r = (u16)(color & 31);
-                brightness = *brightnessPtr;
-                r += brightness;
-                if (r > 31)
-                    r = 31;
-                g = ((((u16)color) >> 5) & 31) + brightness;
-                if (g > 31)
-                    g = 31;
-                b = ((((u16)color) >> 10) & 31) + brightness;
-                if (b > 31)
-                    b = 31;
-                color = *base;
-                br = color & 31;
-                bg = (((u16)color) >> 5) & 31;
-                bb = (((u16)color) >> 10) & 31;
-                r = ((weightA * r) + (baseWeight * br)) >> shift;
-                g = ((weightA * g) + (baseWeight * bg)) >> shift;
-                b = ((weightA * b) + (baseWeight * bb)) >> shift;
-                base[16] = ((b << 10) | (g << 5)) | r;
+                register u32 color;
+                register s32 brightness;
+                register s32 channel asm("r0");
+                register u32 packed;
+                register s32 red;
+                register s32 green asm("r2");
+                s32 blue;
+                u32 channelMask;
+                asm("" : "+h"(cursor));
+                color = *cursor;
+                channelMask = 31;
+                channel = channelMask;
+                channel &= color;
+                brightness = *alternateBrightness;
+                red = channel + brightness;
+                if (red > 31)
+                    red = 31;
+                packed = color << 16;
+                channel = (packed >> 21) & channelMask;
+                green = channel + brightness;
+                if (green > 31)
+                    green = 31;
+                channel = (packed >> 26) & channelMask;
+                blue = channel + brightness;
+                if (blue > 31)
+                    blue = 31;
+                {
+                    register u32 baseColor = *base;
+                    register s32 baseRed asm("r0");
+                    register s32 baseGreen asm("r3");
+                    baseRed = channelMask;
+                    baseRed &= baseColor;
+                    baseColor <<= 16;
+                    baseGreen = (baseColor >> 21) & channelMask;
+                    baseColor = (baseColor >> 26) & channelMask;
+                    red = ((weightA * red) + (baseWeight * baseRed)) >> shift;
+                    green = ((weightA * green) + (baseWeight * baseGreen)) >> shift;
+                    blue = ((weightA * blue) + (baseWeight * ((s32)baseColor))) >> shift;
+                    base[16] = ((blue << 10) | (green << 5)) | red;
+                }
             }
-            source++;
+            cursor++;
             base++;
+            if ((++i) > 15)
+                break;
         }
 
         p->visualObject->parameters = (u32)(((u8 *)p) + 0x380);
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0813C9B4);
-#endif
 
 void PaletteFade_ApplyBrightenedPalette(struct Player *);
 void sub_0813C9B4(struct Player *, const u16 *, s32, s32, s32);
