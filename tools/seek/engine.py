@@ -105,6 +105,15 @@ def splice(text, names, new_def):
         span = find_def(text, n)
         if span:
             return text[:span[0]] + new_def.rstrip() + "\n" + text[span[1]:]
+        # cpp expands a file-local friendly-name alias in the AST. Preserve
+        # the source spelling when putting that AST back into the source unit.
+        aliases = re.findall(r"^#define[ \t]+(\w+)[ \t]+" + re.escape(n)
+                             + r"[ \t]*(?://[^\n]*)?$", text, re.M)
+        for alias in aliases:
+            span = find_def(text, alias)
+            if span:
+                renamed = re.sub(r"\b" + re.escape(n) + r"(?=\s*\()", alias, new_def, count=1)
+                return text[:span[0]] + renamed.rstrip() + "\n" + text[span[1]:]
     return None
 
 
