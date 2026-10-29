@@ -67,7 +67,7 @@ void Mummy_GetAnimationStepOffset(void);
 void Mummy_TurnTowardRoute(void);
 void Mummy_UpdateWalking(void);
 void Mummy_UpdateIdle(void);
-void sub_080D2584(void);
+void Mummy_UpdateDisplacementRecovery(void);
 void Mummy_UpdateDefeat(void);
 void SceneActorReaction_OnEnemyDefault(void);
 void sub_080D7568(void);
@@ -394,7 +394,7 @@ s32 Mummy_Init(void *arg0)
     GL_AT(void *, 0x224) = Mummy_TurnTowardRoute;
     GL_AT(void *, 0x228) = Mummy_UpdateWalking;
     GL_AT(void *, 0x22C) = Mummy_UpdateIdle;
-    GL_AT(void *, 0x230) = sub_080D2584;
+    GL_AT(void *, 0x230) = Mummy_UpdateDisplacementRecovery;
     GL_AT(void *, 0x234) = Mummy_UpdateDefeat;
     GL_AT(void *, 0x220) = Mummy_UpdateHiddenRecovery;
     GL_AT(void *, 0x278) = SceneActorReaction_OnEnemyDefault;

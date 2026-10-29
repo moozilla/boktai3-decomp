@@ -72,7 +72,7 @@ void *Region_FindContaining(void *);
 // fuzzy: 30.4%
 // scope shape 1272 (differences once low registers are set aside)
 // confidence=low: tentacle enemy loader: script-driven parameters, animation, callback tables
-s32 sub_080ABDCC(void *arg0)
+s32 TentacleActor_Init(void *arg0)
 {
     u8 *flagp;
     u8 *heap;
@@ -447,5 +447,5 @@ s32 sub_080ABDCC(void *arg0)
     return SceneActorRegistry_LinkActor(arg0) ? 0 : -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_080ABDCC);
+INCLUDE_ASM("asm/nonmatching", TentacleActor_Init);
 #endif

@@ -58,18 +58,23 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
-* **Second-largest match completed** (2026-10-29): `Skeleton_ReactToContact`
-  (`080C12FC`, formerly `Golem_ReactToContact`) matches all 6,372 bytes in ordinary
-  C, with no pins, barriers, or compiler overrides. Measured PRE constraints
-  resolve 45 generated address slots. Independent stock/full-unit checks,
-  117 directed cases, and 183 layout assertions pass. Both this function and
-  the earlier 8,764-byte `Golem_UpdateHitReaction` (`080C9C04`) use the shared
-  actor layout; remaining compiler-sensitive helper choices are documented.
-  Vorn `080AEB74` remains exact. This checkout predates the user's parallel
-  upstream integrations; refresh aggregate reports on the integration branch
-  ([contact result](../notes/matching-search-contact_2026-10-29.md),
-  [PRE ordering guide](../tools/scope/PRE_STACK_ORDER.md),
-  [earlier Golem result](../notes/matching-search-completion_2026-10-29.md)).
+* **Round 4 shared monster batch completed** (2026-10-29): all five reserved
+  targets match in ordinary C: Mummy movement (`080DA97C`), Ghoul contact
+  (`0808B3EC`), `SceneActor_UpdateStatus` (`08078EE8`), `Vanargand_Init`
+  (`081AE0C0`), and Mummy displacement recovery (`080D2584`). Golem, Skeleton,
+  Ghoul, and both Mummy reactions now share the chase records and operations;
+  the status updater reuses the same component/control/terrain layer. Stock and
+  complete-unit gates, old-consumer preservation, and the combined ROM/RAM-literal
+  build pass. Remaining matching interfaces and the symlink-root landing fix
+  are documented in [the batch note](../notes/shared-monster-round4_2026-10-29.md)
+  and [shared-operation guide](SHARED_MONSTER_REACTIONS.md). This batch starts
+  from the supplied PR 887 bundle; refresh aggregate reports after combining
+  additional worker commits.
+* **Earlier largest matches**: `Skeleton_ReactToContact` (`080C12FC`) and
+  `Golem_UpdateHitReaction` (`080C9C04`) remain exact after shared-header cleanup.
+  The [PRE ordering guide](../tools/scope/PRE_STACK_ORDER.md) explains the compiler
+  rule and rejects applying it before physical instructions and stack identities
+  are verified. Vorn `080AEB74` remains exact.
 * **Second subsystem run with RAM layout workers** (2026-10-27): 29 more matches (to 79.7%) and RAM
   objects with one shared declaration 29% -> 75%; gpt-6.1-terra tried and dropped for Sol
   ([notes/subsystem-run_2026-10-27.md](../notes/subsystem-run_2026-10-27.md)).

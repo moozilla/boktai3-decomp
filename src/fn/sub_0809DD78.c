@@ -75,7 +75,7 @@ void Lun_Destroy(void);
 // fuzzy: 18.8%
 // scope shape 1352 (differences once low registers are set aside)
 // confidence=low: lun enemy setup: script parameters, animation tables, callback tables
-s32 sub_0809DD78(void *arg0)
+s32 Lun_Init(void *arg0)
 {
     u8 *flagp;
     u8 *heap;
@@ -482,5 +482,5 @@ s32 sub_0809DD78(void *arg0)
     return SceneActorRegistry_LinkActor(arg0) ? 0 : -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0809DD78);
+INCLUDE_ASM("asm/nonmatching", Lun_Init);
 #endif

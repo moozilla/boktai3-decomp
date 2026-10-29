@@ -57,7 +57,7 @@ void SceneActorReaction_TryResumeRoute(void);
 void SceneActorReaction_BeginReactionSound(void);
 void Ghoul_ResetRouteState(void);
 void SceneActorControl_RefreshMotionRoute_0808A90C(void);
-void sub_0808B3EC(void);
+void Ghoul_ReactToContact(void);
 void Ghoul_OnLifecycleEvent(void);
 void Ghoul_ResumeContactRoute(void);
 void Ghoul_OnMessage(void);
@@ -129,7 +129,7 @@ static inline s32 Ghoul_CellHeight(u16 *pos, u16 *cellOut)
 // fuzzy: 30.2%
 // scope shape 1443 (differences once low registers are set aside)
 // confidence=low: Ghoul enemy loader (Crow/Ivy-shaped): script params, optional patrol route, callback tables
-s32 sub_0808D1D8(u8 *arg0)
+s32 Ghoul_Init(u8 *arg0)
 {
     u8 *heap;
     u32 zero;
@@ -407,7 +407,7 @@ s32 sub_0808D1D8(u8 *arg0)
     SceneActorMovement_ResolveRoutePosition(arg0);
     GH_AT(void *, 0x248) = Ghoul_ResetRouteState;
     GH_AT(void *, 0x23C) = SceneActorControl_RefreshMotionRoute_0808A90C;
-    GH_AT(void *, 0x268) = sub_0808B3EC;
+    GH_AT(void *, 0x268) = Ghoul_ReactToContact;
     GH_AT(void *, 0x61C) = Ghoul_OnLifecycleEvent;
     GH_AT(void *, 0x5EC) = Ghoul_ResumeContactRoute;
     GH_AT(u8, 0xEB) |= 1;
@@ -522,5 +522,5 @@ s32 sub_0808D1D8(u8 *arg0)
     return SceneActorRegistry_LinkActor(arg0) ? 0 : -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0808D1D8);
+INCLUDE_ASM("asm/nonmatching", Ghoul_Init);
 #endif

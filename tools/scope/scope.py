@@ -444,7 +444,13 @@ def diagnostic_source(pre, own):
         end = fast.body_end(prefix, m.end() - 1)
         if end > len(prefix):
             break
-        if "inline" in m.group(1) or m.group(1)[:1].isspace():  # a helper FUNC may inline: kept whole
+        # A formatter can put the return type (and inline qualifier) on the
+        # preceding line. The function-name match then starts too late to see
+        # it. Inspect the whole declaration since the previous C boundary.
+        declaration_start = max(prefix.rfind(token, i, m.start()) for token in ";{}") + 1
+        declaration = prefix[max(i, declaration_start):m.end(1)]
+        is_inline = re.search(r"\b(?:inline|__inline|__inline__)\b", declaration)
+        if is_inline or m.group(1)[:1].isspace():  # a helper FUNC may inline: kept whole
             out.append(prefix[i:end])
         else:
             out.append(prefix[i:m.start()] + m.group(1) + ";" + "\n" * prefix.count("\n", m.end(1), end))
