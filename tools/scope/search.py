@@ -67,7 +67,8 @@ def compact(node, evaluation=None):
                 state=node.get("frontier", {}).get("state"),
                 status=result.get("status", "unevaluated"), counts=result.get("counts"),
                 compile_ms=result.get("compile_ms"), semantic=result.get("semantic"),
-                concessions=result.get("concessions"),
+                concessions={k: result["concessions"].get(k) for k in ("verdict", "pins", "barriers")}
+                    if result.get("concessions") else None,
                 byte_differences=result.get("byte_differences"),
                 protected_regions=result.get("protected_regions"),
                 delta=result.get("delta"), diagnostics=result.get("diagnostics") or None)
@@ -84,8 +85,9 @@ def protection(result, metadata):
 
 
 def evaluate(session, ref, request):
-    from search_eval import decision_delta, StaleContextError
+    from search_eval import decision_delta, StaleContextError, validate_knobs
     from search_structure import analyze
+    validate_knobs(request.get("knobs", {}))
     meta = session.metadata()
     node = session.node(ref)
     source = session.source(node["id"])
@@ -124,8 +126,9 @@ def evaluate(session, ref, request):
             parent = session.evaluation(parent_id, options=options)
             parent_context = session.context(parent_id)
             actual_context = session.context(node["id"])
-            versions = ("evaluator", "scope", "fast", "structure", "trace", "semantic", "semantic_runtime", "support", "compiler", "headers", "symbols", "elf", "target_classification")
-            environment_changed = any(parent_context.get(k) != actual_context.get(k) for k in versions)
+            # Every context field can affect compilation or classification;
+            # a newly added dependency must not be omitted from delta freshness.
+            environment_changed = parent_context != actual_context
             same_source = session.node(parent_id)["source_hash"] == node["source_hash"]
             if same_source and environment_changed:
                 result["delta"] = {"source_unchanged": True, "environment_changed": True}
@@ -157,6 +160,10 @@ def evaluate(session, ref, request):
 def dispatch(request):
     from search_session import Session
     command = request["command"]
+    if request.get("limit") is not None and (not isinstance(request["limit"], int) or request["limit"] < 1):
+        raise ValueError("--limit must be a positive integer")
+    if not isinstance(request.get("trials", 0), int) or not 0 <= request.get("trials", 0) <= 10000:
+        raise ValueError("--trials must be an integer between 0 and 10000")
     if command == "ping":
         return {"ready": True, "pid": os.getpid()}
     path = location(request.get("session", "default"))
@@ -312,7 +319,8 @@ def dispatch(request):
                         "delta": decision_delta(a["result"], result)}
             return {**compact(node, record), "cache_hit": cached,
                     "experiment_exact": result.get("experiment_exact", False),
-                    "experiment_build": result.get("experiment_build") if request.get("knobs") else None}
+                    "experiment_build": result.get("experiment_build") if request.get("knobs") else None,
+                    **({"effective_knobs": result.get("effective_knobs")} if request.get("knobs") else {})}
         if command in ("trace", "demand", "priority"):
             from search_trace import collect, delta
             meta = session.metadata()

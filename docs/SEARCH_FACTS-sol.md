@@ -28,3 +28,16 @@ current file:line references.
   look alike after blanking registers. Search regions use local value IDs and
   reaching definitions instead. Equal local shape still leaves global input
   bindings, aliasing, branch correspondence and semantics to establish.
+
+* **Local allocation ranks quantities, not flow's pseudo lifetimes.** In the
+  08203DF4 trial, flow reported 58 ticks while the table's local quantity covered
+  birth 28 through death 126: 98 half-instructions. Its 4 refs gave priority 816;
+  constant 24 had 3 refs over 36 ticks, priority 833. `priority` uses the actual
+  `L` records and `local-alloc.c:QTY_CMP_PRI_BASE`, including quantity-number tie
+  rules. Two fewer interval ticks crossed the boundary; that does not promise
+  that one C edit preserves quantity grouping or hard-register constraints.
+* **A named selector must be resolved before agbcc sees it.** `CSE_NOCANON`
+  uses `atoi`, so passing an unresolved C name selects pseudo zero instead.
+  Scope now resolves unique names for `CSE_NOCANON`/`CSE_KEEP`, as for PRI/FORCE;
+  search rejects unsupported UID/event formats. `AGBCC_NOPRE` accepts one event,
+  not a comma list. `AGBCC_SPILL_LABEL` requires a `label#occurrence:shift`.

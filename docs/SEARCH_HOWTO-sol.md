@@ -2,86 +2,80 @@
 
 Tags: #tooling #matching #compiler
 
-Run from the repository root with `build/venv/bin/python tools/scope/search.py`.
-Below, `search` means that command. The model chooses the search policy: the tool
-retains all branches, including equal, worse and failed candidates. Byte equality
-with the ROM is the only exact verdict. Start with an actual NONMATCHING draft.
+Run from the repository root. The model chooses the policy; the tool retains
+competing source branches, including equal, worse and failed candidates.
 
 ```sh
 search() { build/venv/bin/python tools/scope/search.py "$@"; }
 search --session actor init src/UNIT.c FUNCTION
-search --session actor values               # symbolic addresses, loads/stores and call arguments
-search --session actor twins --region B4    # matched C prior art for a ROM block
-search --session actor regions              # dependency shape, bindings, concrete differences
-search --session actor listing              # concise ROM/current machine differences
-search --session actor why                  # actual compiler diagnosis, saved in session notes
-search --session actor moves --limit 20     # stable IDs, sites, legality conditions
-search --session actor expand MOVE_ID --parent ROOT --reason 'test this compiler hypothesis'
-search --session actor frontier             # no greedy acceptance or automatic score pruning
+search --session actor values --limit 6       # addresses, types, calls, comparisons
+search --session actor regions                # local dependencies versus global bindings
+search --session actor listing --limit 20
+search --session actor why                    # actual compiler diagnosis
+search --session actor twins --region B4      # matched C prior art
+search --session actor moves --limit 20       # IDs, source sites, legality conditions
+search --session actor expand MOVE_ID --parent ROOT --reason 'test this hypothesis'
+search --session actor frontier
 search --session actor checkout NODE --out build/actor.c
-# Edit build/actor.c; include helpers/types and retain the unit's guards.
-search --session actor import build/actor.c --parent NODE --reason 'explain the hypothesis'
-search --session actor try build/a.c build/b.c --parent NODE --reason 'compare one hypothesis'
-search --session actor trace --a NODE       # actual allocation/reload/pass changes against NODE
-search --session actor diff NODE HEAD
-search --session actor land EXACT_NODE      # campaign merge + production unit MATCH
+# Edit the whole unit, preserving helpers, includes and NONMATCHING guards.
+search --session actor try build/a.c build/b.c --parent NODE --reason 'compare one idea'
+search --session actor import build/actor.c --parent NODE --reason 'explain the change'
+search --session actor trace --a NODE         # selected-node compiler decision changes
+search --session actor priority --argument table --competitor '=24'
+search --session actor demand                 # reload pressure and final evictions
+search --session actor land EXACT_NODE        # merge and production unit verification
 ```
 
-`expand` keeps HEAD where it was; select a child with `checkout`. `import` selects
-its new child. `try FILE... --parent NODE` compiles siblings without moving HEAD.
-Use explicit node IDs when sharing a session with another worker.
-Node hash prefixes work. `moves --kinds commute introduce-temporary` filters
-families; `expand --kinds commute --limit 4` evaluates that chosen neighborhood
-in one warm batch. Moves preserve defined C behavior under their listed conditions;
-unknown types, calls, memory and volatile accesses are not assumed pure. The first
-AST move normalizes the selected function's formatting and removes its comments.
-Free edits remain explicitly unproved; inspect them and use semantic trials.
+`expand` and `try` retain siblings without selecting a winner. `import` selects
+its child; `checkout` selects any retained node. Use explicit node IDs when sharing
+a session; hash prefixes work. `moves --kinds commute introduce-temporary` filters
+families; `expand --kinds commute --limit 4` compiles a chosen neighborhood warm.
+Moves preserve defined behavior under their stated conditions. Unknown types,
+volatile accesses, calls and memory are not assumed pure. The first AST move
+normalizes the function's formatting and removes its comments. Free edits remain
+unproved hypotheses.
 
-Solve the machine constraints first: call targets/control paths, memory widths,
-signed loads, offsets and values. These are observations, not unique source types
-or variables. `regions` compares basic blocks with dependency-sensitive value IDs,
-so changing earlier registers does not erase local shape progress. `regions
---details` includes CFGs, reaching definitions and ambiguity. A local shape match
-is neither behavioral proof nor exact bytes. `protect B0 B2` records solved local
-shape obligations; `--mode binding` also protects hard-register bindings. Future
-evaluations report violations while retaining the branch. `protect --clear` clears
-them. `focus --lines 40:70` restricts move sites; `focus --lines clear` removes it.
+Solve call targets/control paths, memory widths, signed loads, addresses and values
+first. `values` exposes uncertainty; call arity remains unknown. `regions` compares
+actual dependencies rather than blanking registers. Equal local shape leaves
+global bindings and semantics to establish. `protect B0 B2` records solved local
+shape obligations; `--mode binding` also protects registers. Violations are reported,
+with branches retained. `protect --clear` removes obligations. `focus --lines 40:70`
+restricts move sites; `focus --lines clear` clears it. Twin similarity retrieves
+prior art; it proves neither semantics nor a unique original abstraction.
 
-Use `trace --a PARENT` on selected nodes: it pays for diagnostic RTL once and
-reports actual named-value allocation changes, reload changes and the earliest
-changed pass with an agbcc source file:line. `--details` exposes all records and
-ambiguous correspondences. `priority --argument table --competitor '=24'` shows
-actual local-quantity intervals and rank thresholds; these differ from flow's
-individual pseudo lifetimes. Suggested-register phases can precede priority. Earliest divergence is not causal proof. `demand` links reload pressure and stack evictions to source instructions and machine
-constraints; `--details` retains uncertainty about exact victim events. `compiler
---view life --argument 'value'` and views `frame`, `hoist`, `giv`, `pre`, `probe`,
-`spill`, or `why --argument UID` reuse scope. `experiment --knob AGBCC_PRI=value:+100`
-is a separate counterfactual evaluation; even an experiment match is never exact.
+`trace` pays for diagnostic RTL on selected nodes and points at agbcc source.
+`priority` uses actual local quantities, whose birth/death intervals differ from
+flow's pseudo lifetimes. Rank thresholds hold other metrics fixed; suggested
+registers, classes and conflicts still matter. `demand` distinguishes actual
+reservations/evictions from inferred pressure causes. `--details` retains full
+records and ambiguity; `--json` provides response envelopes. `compiler --view life
+--argument value`, and views `frame`, `hoist`, `giv`, `pre`, `probe`, `spill`, reuse
+scope. Earliest changed pass is not causal proof.
 
-`evaluate --trials 16` uses the existing differential Thumb oracle without another
-compile. It reports coverage and counterexamples; EQUIVALENT is sampled evidence,
-INCOMPLETE is not a pass, and missing or faulting Unicorn reports UNAVAILABLE. Trials run in a separate process
-with a ten-second bound; they cannot crash the resident. Knob experiments
-are never semantically certified. Do not optimize the instruction count alone:
-combine hypotheses, inspect shape and decision deltas, and return to earlier nodes.
-Record intent with `note '...' --kind hypothesis`; `mark NODE --state parked
---reason '...'` manages the frontier. `history`, `notes --all`, and `export --out
-build/search.json` preserve the search. Runtime state contains ROM-derived data:
-keep it under `build/`, never commit it.
+`experiment --knob AGBCC_PRI=value:+100` stores a separate counterfactual. Only
+ordinary compiler bytes equal to the ROM mean exact. PRI/FORCE and CSE pseudo
+selectors accept unique names; UID/event selectors require numbers. Unsupported
+formats are rejected. `evaluate --trials 16` runs differential Thumb execution in
+a bounded subprocess without recompiling. EQUIVALENT is sampled evidence;
+INCOMPLETE, TIMEOUT and UNAVAILABLE cannot certify equivalence. The current shared
+Unicorn backend faults during mapping; the resident survives.
 
-Sessions live in `build/search-sol/NAME/session.sqlite3`; pass a database path to
-share one explicitly. The resident starts automatically, uses a sandbox-compatible
-filesystem mailbox, and restarts when implementation files change. `stop` stops
-it. `SCOPE_SEARCH_SERVER=0` runs locally; `batch` reads JSON commands one per line
-and keeps compilers warm without a daemon. `--json` returns response envelopes.
-Typical warm compilation is tens of milliseconds; tracing and first-use setup cost
-more. Compiler/environment changes create new contexts instead of stale cache hits.
-`land NODE` forces an ordinary evaluation, prepares campaign metadata from the
-immutable session root, merges and formats the source, and requires the production
-unit checker to print MATCH. Failure restores the original unit. For a session
-initialized from scratch, specify `--unit src/UNIT.c`. Inspect and clean the exact
-candidate before landing. Landing does not commit or run a full ROM build.
-Concession counts inspect the preprocessed target and referenced inline helpers,
-so macro spellings cannot hide register pins; unsupported extraction is UNKNOWN.
-Generated assembly presence/content and resolved target literal ranges belong to
-the context; changed classification creates a new node rather than a stale score.
+Keep intent with `note '...' --kind hypothesis`; `mark NODE --state parked --reason
+'...'` manages the frontier. `diff`, `history`, `notes --all` and `export --out
+build/search.json` preserve evidence. Sessions live in `build/search-sol/NAME/`;
+a database path can be shared explicitly. Never commit runtime ROM-derived data.
+The mailbox resident starts automatically and restarts after implementation
+changes. `stop` stops it; `batch` reads JSON commands line by line;
+`SCOPE_SEARCH_SERVER=0` runs locally. Warm compiler work takes milliseconds;
+context validation, tracing and startup add overhead.
+
+`land` forces an ordinary evaluation, prepares campaign inputs from the immutable
+root, formats/merges the source, and requires production unit MATCH. Failure
+restores the source. Scratch-origin sessions need `--unit src/UNIT.c`. Clean and
+inspect the exact candidate first. Concessions are counted after production
+preprocessing, including macro-hidden pins in referenced helpers. Landing does
+not commit or run a full ROM build. Changed compiler inputs or target assembly
+classification create new contexts, never stale cache hits.
+
+[Design, evidence and remaining gaps](../notes/search-sol_2026-10-29.md).

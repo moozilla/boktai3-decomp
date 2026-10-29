@@ -45,6 +45,12 @@ class SearchIntegrationTests(unittest.TestCase):
     def command(self, command, **kwargs):
         return search.dispatch({"command": command, "session": self.db, **kwargs})
 
+    def test_invalid_work_limits_do_not_start_compilation(self):
+        for request in ({"limit": -1}, {"limit": 0}, {"trials": -1}, {"trials": 10001}):
+            with self.assertRaisesRegex(ValueError, "integer"):
+                self.command("evaluate", force=True, **request)
+        self.assertEqual(self.env.calls, 1)
+
     def test_try_retains_siblings_without_moving_head(self):
         head = self.command("status")["node"]
         files = []
@@ -72,9 +78,14 @@ class SearchIntegrationTests(unittest.TestCase):
         status = self.command("status")
         self.assertEqual(result["node"], status["node"])
         self.assertEqual(status["status"], "different")
-        self.assertEqual(status["nodes"], 2)  # no unevaluated intermediate node
+        # The parent baseline is also refreshed before source-only comparison;
+        # all three nodes have evidence, rather than an unevaluated intermediate.
+        self.assertEqual(status["nodes"], 3)
+        self.assertTrue(result["delta"]["baseline_refreshed"])
         with Session(self.db) as session:
             self.assertEqual(session.context()["version"], 2)
+            for row in session.db.execute("SELECT id FROM nodes"):
+                self.assertIsNotNone(session.evaluation(row[0], options={"knobs": {}, "semantic_trials": 0}))
 
     def test_environment_refresh_selects_refreshed_head(self):
         old = self.command("status")["node"]
@@ -271,7 +282,7 @@ class ClassificationContextTests(unittest.TestCase):
             evaluator.directory.mkdir()
             evaluator._hashes, evaluator.oracles = {}, {}
             evaluator.support = {}
-            for name in ("loaded_scope", "loaded_fast", "loaded_structure", "loaded_trace", "loaded_semantic"):
+            for name in ("loaded_scope", "loaded_fast", "loaded_structure", "loaded_trace", "loaded_semantic", "loaded_orchestrator"):
                 setattr(evaluator, name, "fixture")
             # This Thumb LDR reaches the literal pool at offset four. The
             # generated assembly additionally identifies offset two as data.
@@ -280,7 +291,7 @@ class ClassificationContextTests(unittest.TestCase):
                 rom_name=lambda *a: "F", inventory=lambda: ({}, {"F": 0x08000000}, {"F": len(code)}),
                 INSTR=root / "compiler", arm_starts=lambda: [], rom_bytes=lambda: code,
                 off=lambda a: 0, rom_data=scope.rom_data, _FAST={}, _PRE={"stale": True},
-                _HEADS={"stale": True}, _ROMBYTES={"stale": True}, _MEMO={"stale": True},
+                _HEADS={"stale": True}, _CPP1={"stale": True}, _ROMBYTES={"stale": True}, _MEMO={"stale": True},
                 build=types.SimpleNamespace(compiler_for=lambda p: "agbcc", cflags_for=lambda p: [],
                     AS=["/usr/bin/true"], CPP=["/usr/bin/true"], DEFINES=[]))
             evaluator.scope = fake
@@ -315,6 +326,50 @@ class ClassificationContextTests(unittest.TestCase):
                 with Session(db) as session:
                     self.assertNotEqual(labeled_node, session.node()["id"])
                     self.assertEqual(labeled["target_classification"]["data"], session.context()["target_classification"]["data"])
+
+                # Exercise real CPP and its cached concrete command. Merely
+                # creating a new node context must never reuse old definitions.
+                fake._PRE, fake._CPP1, fake._HEADS = scope._PRE, scope._CPP1, scope._HEADS
+                fake.build.CPP = list(scope.build.CPP)
+                fake.build.DEFINES = ["-DSEARCH_CONTEXT_FLAG=0"]
+                probe = "int F(void) { return SEARCH_CONTEXT_FLAG; }"
+                path = evaluator.materialize(probe, "src/draft.c")
+                with mock.patch.object(scope.build, "ROOT", str(root)), \
+                     mock.patch.object(scope.build, "DEFINES", fake.build.DEFINES):
+                    before = evaluator.context(probe, "F", "src/draft.c")
+                    pre = scope.preprocess(str(path), func="F")
+                    self.assertRegex(pre, r'return\s+0\s*;')
+                    self.assertTrue(scope._CPP1)  # the optimized command is warm
+                    fake.build.DEFINES[:] = ["-DSEARCH_CONTEXT_FLAG=1"]
+                    after = evaluator.context(probe, "F", "src/draft.c")
+                    self.assertNotEqual(before["defines"], after["defines"])
+                    self.assertEqual(before["defines"], ["-DSEARCH_CONTEXT_FLAG=0"])
+                    self.assertFalse(scope._CPP1)
+                    self.assertRegex(scope.preprocess(str(path), func="F"), r'return\s+1\s*;')
+
+                    # A newly constructed evaluator has no previous per-session
+                    # environment, but still inherits module-global CPP caches.
+                    fresh = object.__new__(search_eval.Evaluator)
+                    fresh.__dict__.update(evaluator.__dict__)
+                    del fresh._environment
+                    fake.build.DEFINES[:] = ["-DSEARCH_CONTEXT_FLAG=2"]
+                    fresh.context(probe, "F", "src/draft.c")
+                    self.assertFalse(scope._CPP1)
+                    self.assertRegex(scope.preprocess(str(path), func="F"), r'return\s+2\s*;')
+
+                closed = []
+                fake._FAST["old assembler"] = types.SimpleNamespace(close=lambda: closed.append(True))
+                fake.build.AS.append("--new-assembler-option")
+                changed_assembler = evaluator.context(source, "F", "src/draft.c")
+                self.assertEqual(closed, [True])
+                self.assertFalse(fake._FAST)
+                self.assertIn("--new-assembler-option", changed_assembler["assembler_command"])
+                (root / "asm").mkdir()
+                (root / "asm/macros.inc").write_text(".macro first\n.endm\n")
+                first_macro = evaluator.context(source, "F", "src/draft.c")
+                (root / "asm/macros.inc").write_text(".macro second\n.endm\n")
+                second_macro = evaluator.context(source, "F", "src/draft.c")
+                self.assertNotEqual(first_macro["asm_macros"], second_macro["asm_macros"])
 
 
 @unittest.skipUnless(os.environ.get("SEARCH_ROM_TESTS") == "1", "opt-in real unmatched compiler trial")

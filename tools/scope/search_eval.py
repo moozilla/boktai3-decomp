@@ -136,6 +136,26 @@ def preprocessed_concessions(pre, function=None, aliases=()):
                 by_function=by_function, scope="preprocessed target and referenced inline helpers; source sites")
 
 
+def validate_knobs(knobs):
+    """Reject misspellings and atoi-style silent no-ops before recording evidence."""
+    name = r"(?:[A-Za-z_]\w*(?:#\d+)?|\d+)"
+    integer = r"[+-]?\d+"
+    formats = {
+        **{k: name + ":" + integer + "(?:," + name + ":" + integer + ")*" for k in ("AGBCC_PRI", "AGBCC_FORCE")},
+        **{k: r"[^,:\n]+:" + integer + r"(?:,[^,:\n]+:" + integer + ")*" for k in ("AGBCC_PRI_LABEL", "AGBCC_FORCE_LABEL")},
+        "AGBCC_SPILL_LABEL": r"[^,:\n]+#\d+:" + integer + r"(?:,[^,:\n]+#\d+:" + integer + ")*",
+        "AGBCC_SPILL": r"\d+:" + integer + r"(?:,\d+:" + integer + ")*",
+        **{k: r"\d+(?:,\d+)*" for k in ("AGBCC_NOGIV", "AGBCC_GIV", "AGBCC_NOMOVE", "AGBCC_NOTIE")},
+        "CSE_KEEP": name + "(?:," + name + ")*", "CSE_NOCANON": name,
+        "CSE_NOFOLLOW_JUMP": r"\d+(?::[12])?(?:,\d+(?::[12])?)*",
+        **{k: r"\d+" for k in ("AGBCC_NOPRE", "CSE_NOFOLLOW", "CSE_WHY", "CSE_DEBUG", "CSE_PATH", "CSE_PATHS", "AGBCC_GCSE_T", "AGBCC_NOSTRICT", "AGBCC_PRE_TRACE", "AGBCC_LOOP_TRACE")}}
+    for key, value in knobs.items():
+        if key not in formats:
+            raise ValueError("unknown search experiment knob: " + key)
+        if not re.fullmatch(formats[key], str(value)):
+            raise ValueError(f"invalid {key} value {value!r}; numeric UIDs/events are required except named PRI/FORCE and CSE pseudo selectors")
+
+
 class Evaluator:
     def __init__(self, directory):
         # Import scope as a library: no scope client, no external resident's state.
@@ -153,6 +173,8 @@ class Evaluator:
         self.loaded_structure = getattr(search_structure, "IMPLEMENTATION_ID", digest(Path(search_structure.__file__).read_bytes()))
         self.loaded_trace = getattr(search_trace, "IMPLEMENTATION_ID", digest(Path(search_trace.__file__).read_bytes()))
         import sys
+        orchestrator = sys.modules.get("search") or sys.modules.get("__main__")
+        self.loaded_orchestrator = module_identity(orchestrator) if orchestrator else None
         semantic_module = sys.modules.get("semcheck")
         self.loaded_semantic = getattr(semantic_module, "IMPLEMENTATION_ID", digest((ROOT / "tools/semcheck.py").read_bytes()))
         import romlib
@@ -213,18 +235,31 @@ class Evaluator:
                    for p in sorted((ROOT / "symbols").glob("*")) if p.is_file()]
         import romlib
         rom_path = romlib.baserom_path()
+        macros = ROOT / "asm/macros.inc"
+        asm_macros = dict(present=macros.is_file(),
+                          sha256=self.file_hash(macros) if macros.is_file() else None)
+        # Freeze configuration values, not references to mutable build lists.
+        # Scope's CPP and fork-server caches otherwise keep old definitions or
+        # assembler commands while a new context claims to have used new ones.
+        toolchain = dict(flags=list(flags), cpp=list(s.build.CPP),
+            cpp_binary=self.file_hash(shutil.which(s.build.CPP[0])),
+            defines=list(s.build.DEFINES), assembler_command=list(s.build.AS),
+            assembler=self.file_hash(shutil.which(s.build.AS[0])), asm_macros=asm_macros)
         assembly = ROOT / "build/asm/nonmatching" / (rom_name + ".s")
         assembly_identity = dict(path=str(assembly.relative_to(ROOT)),
                                  present=assembly.is_file(),
                                  sha256=self.file_hash(assembly) if assembly.is_file() else None)
-        environment = digest(json.dumps([headers, symbols, self.file_hash(s.INSTR),
-            self.file_hash(rom_path), self.file_hash(ROOT / "build/boktai3.elf"), assembly_identity]))
-        if getattr(self, "_environment", environment) != environment:
+        common_environment = digest(json.dumps([headers, symbols, self.file_hash(s.INSTR),
+            self.file_hash(rom_path), self.file_hash(ROOT / "build/boktai3.elf"), toolchain]))
+        environment = digest(json.dumps([common_environment, assembly_identity]))
+        if (getattr(s, "_SEARCH_ENVIRONMENT", None) != common_environment or
+                getattr(self, "_environment", environment) != environment):
             # Scope's preprocessing cache keys source mtimes, not header contents;
             # its live fork servers also retain the old symbol resolver.
             self.close()
             s._FAST.clear()
             s._PRE.clear()
+            s._CPP1.clear()
             s._HEADS.clear()
             s._ROMBYTES.clear()
             s._MEMO.clear()
@@ -232,6 +267,9 @@ class Evaluator:
             rom_name = s.rom_name(str(path), function)
             _, addresses, sizes = s.inventory()
         self._environment = environment
+        # These caches belong to the imported scope module, not this Evaluator.
+        # A fresh session/evaluator must validate caches populated by another one.
+        s._SEARCH_ENVIRONMENT = common_environment
         address, size = addresses[rom_name], sizes[rom_name]
         # The source's compiler directive was checked above; the target mode is
         # in functions.csv. is_arm() additionally scans every source unit to
@@ -261,12 +299,14 @@ class Evaluator:
                     address=address, size=size, target_hash=digest(target),
                     target_classification=classification,
                     rom_hash=self.file_hash(rom_path),
-                    compiler=self.file_hash(s.INSTR), flags=flags,
-                    assembler=self.file_hash(shutil.which(s.build.AS[0])), assembler_flags=s.build.AS[1:],
-                    cpp=s.build.CPP, cpp_binary=self.file_hash(shutil.which(s.build.CPP[0])), defines=s.build.DEFINES,
+                    compiler=self.file_hash(s.INSTR), flags=toolchain["flags"],
+                    assembler=toolchain["assembler"], assembler_flags=toolchain["assembler_command"][1:],
+                    assembler_command=toolchain["assembler_command"], asm_macros=asm_macros,
+                    cpp=toolchain["cpp"], cpp_binary=toolchain["cpp_binary"], defines=toolchain["defines"],
                     headers=digest(json.dumps(headers)), symbols=digest(json.dumps(symbols)),
                     elf=self.file_hash(ROOT / "build/boktai3.elf"),
-                    evaluator=IMPLEMENTATION, scope=self.loaded_scope, fast=self.loaded_fast,
+                    evaluator=IMPLEMENTATION, orchestrator=self.loaded_orchestrator,
+                    scope=self.loaded_scope, fast=self.loaded_fast,
                     structure=self.loaded_structure, trace=self.loaded_trace, semantic=self.loaded_semantic,
                     semantic_runtime=semantic_runtime,
                     support=self.support,
@@ -295,9 +335,7 @@ class Evaluator:
         s = self.scope
         s.WORK = str(self.directory / "traces")
         knobs = dict(knobs or {})
-        bad = [k for k in knobs if not k.startswith(("AGBCC_", "CSE_"))]
-        if bad:
-            raise ValueError("unsupported experiment keys: " + ", ".join(bad))
+        validate_knobs(knobs)
         # Neither the caller's environment nor a prior experiment may influence exact.
         saved = {k: os.environ.pop(k) for k in list(os.environ)
                  if k.startswith(("AGBCC_", "CSE_", "SCOPE_TRANSFORM"))}
@@ -310,10 +348,11 @@ class Evaluator:
             path = self.materialize(source, origin)
             compile_started = time.perf_counter()
             with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
-                compiled = s.fast_compile(str(path), function, knobs)
+                effective_knobs = s.resolve_knobs(str(path), function, knobs)
+                compiled = s.fast_compile(str(path), function, effective_knobs)
                 if compiled is None:
                     # Capture actual diagnostics and keep failures in the graph.
-                    code, address, info = s.compile_draft(str(path), function, knobs)
+                    code, address, info = s.compile_draft(str(path), function, effective_knobs)
                     data = info.get("data", ())
                 else:
                     code, address, data = compiled
@@ -330,7 +369,7 @@ class Evaluator:
             result = dict(status="exact" if exact else "different", exact=exact,
                           experiment=bool(knobs), experiment_exact=bool(knobs) and code == target,
                           experiment_build="diagnostic -g UID stream" if s.needs_g(knobs) else "normal no-g build",
-                          knobs=knobs, compile_ms=round(compile_ms, 3),
+                          knobs=knobs, effective_knobs=effective_knobs, compile_ms=round(compile_ms, 3),
                           elapsed_ms=0, counts="MATCH" if exact else counts,
                           code_hash=digest(code), code_hex=code.hex(), target_hash=digest(target),
                           byte_length=len(code), target_length=len(target),
@@ -363,7 +402,7 @@ class Evaluator:
         except StaleContextError:
             raise
         except (SystemExit, OSError, RuntimeError, ValueError) as e:
-            return dict(status="compile_error", exact=False, experiment=bool(knobs),
+            return dict(status="experiment_error" if knobs else "compile_error", exact=False, experiment=bool(knobs),
                         knobs=knobs, diagnostics=output.getvalue()[-8000:] + "\n" + str(e),
                         elapsed_ms=round((time.perf_counter()-start)*1000, 3),
                         semantic=dict(verdict="NOT_RUN", trials=0))

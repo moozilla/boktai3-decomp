@@ -307,10 +307,11 @@ def resolve_knobs(src, func, env):
     """AGBCC_PRI / AGBCC_FORCE may name pseudos by C variable (`table:+214`): compile once without them to
     learn the numbers, then substitute."""
     env = dict(env or {})
-    for k in ("AGBCC_PRI", "AGBCC_FORCE"):
+    for k in ("AGBCC_PRI", "AGBCC_FORCE", "CSE_NOCANON", "CSE_KEEP"):
         if k not in env and os.environ.get(k):
             env[k] = os.environ[k]
-    keys = [k for k in ("AGBCC_PRI", "AGBCC_FORCE") if re.search(r"(^|,)[A-Za-z_]", env.get(k, ""))]
+    keys = [k for k in ("AGBCC_PRI", "AGBCC_FORCE", "CSE_NOCANON", "CSE_KEEP")
+            if re.search(r"(^|,)[A-Za-z_]", env.get(k, ""))]
     if not keys:
         return env
     saved = {k: os.environ.pop(k) for k in keys if k in os.environ}
@@ -330,7 +331,15 @@ def resolve_knobs(src, func, env):
             sys.exit(f"{name}: " + (f"names pseudos {rev[name]}; use a number" if name in rev else
                                      f"no pseudo by that name (known: {', '.join(sorted(rev))[:300]})"))
         return f"{rev[name][0]}:{rest}"
-    out = dict(env, **{k: ",".join(sub(t) for t in env[k].split(",")) for k in keys})
+    def reg_name(name):
+        if name.isdigit():
+            return name
+        if len(rev.get(name, [])) != 1:
+            sys.exit(f"{name}: " + (f"names pseudos {rev[name]}; use a number" if name in rev else
+                                     f"no pseudo by that name (known: {', '.join(sorted(rev))[:300]})"))
+        return str(rev[name][0])
+    out = dict(env, **{k: ",".join((reg_name(t) if k in ("CSE_NOCANON", "CSE_KEEP") else sub(t))
+                                  for t in env[k].split(",")) for k in keys})
     print("  knobs: " + " ".join(f"{k}={out[k]}" for k in keys), file=sys.stderr)
     return out
 

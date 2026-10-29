@@ -5,10 +5,14 @@ records what the project owner asked for, what we agreed, what the tool does
 today, and what we have learned about agbcc with it. Read it before changing
 the tool; update it when a decision or a finding changes.
 
+The stateful search interface is `search.py`: [worker guide](../../docs/SEARCH_HOWTO-sol.md)
+and [design/evidence](../../notes/search-sol_2026-10-29.md). It retains source branches,
+reuses this workbench's compiler, and lands exact nodes through production checks.
+
 ## Why this exists
 
-The project is about 71% matched (52% without register pinning). Progress has
-hit diminishing returns, and most remaining effort goes into trial and error:
+Current progress lives in [PROGRESS.md](../../PROGRESS.md). Much remaining
+matching effort goes into trial and error:
 edit, compile, compare, repeat. That is what verifiable-reward training makes
 agents good at, and it is expensive. Earlier research tools (beam search over
 "spellings", a mutation-mined hint ranker, many single-purpose scripts) moved
