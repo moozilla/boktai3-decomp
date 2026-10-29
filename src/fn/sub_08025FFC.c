@@ -2,7 +2,12 @@
 #include "engine.h"
 #include "terrain_cell_probe.h"
 
-// confidence=low: advances an actor's impact animation and cue sounds, then spawns hazards at a jittered point of its impact cell.
+/* Play the impact cues and create a hazard at a nearby point on the same terrain level. */
+union ImpactPosition {
+    struct Pos16 vector;
+    u32 words[2];
+};
+
 typedef struct Actor08025FFC {
     u8 pad0[0x9c];
     u32 flags;
@@ -14,7 +19,7 @@ typedef struct Actor08025FFC {
     void *callbackA;
     void *callbackB;
     u8 *q;
-    u32 *copyFrom;
+    union ImpactPosition *copyFrom;
     u8 pad114[0x149];
     u8 field25D;
     u8 pad25E[0x10c];
@@ -23,42 +28,55 @@ typedef struct Actor08025FFC {
     u32 mode;
 } Actor08025FFC;
 
-typedef struct Map08025FFC {
-    u8 pad0[4];
-    u8 *cells;
-    u8 pad8[0x1c];
-    u16 rows[1];
-} Map08025FFC;
-
 static inline s32 s08025FFC_Trunc12(s32 v)
 {
     return v >= 0 ? v >> 12 : -((-v) >> 12);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 61.1%
-// scope shape 78 (differences once low registers are set aside)
-// scope shape 99 (differences once low registers are set aside)
+static inline u32 Impact_GetTerrainHeight(struct Pos16 *pos)
+{
+    u8 *props = cellProps(cellIndexAt(pos));
+    u32 type = *props >> 4;
+    u32 height = (*props & 0xf) << 8;
+    switch (type) {
+        case 1:
+            height -= (u8)pos->z;
+            break;
+        case 2:
+            height -= (u8)pos->x;
+            break;
+    }
+    return height;
+}
+
+static inline u16 Impact_Random(const u16 *table)
+{
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
+    return table[index];
+}
+
+static inline void Impact_AddPosition(struct Pos16 *out, const struct Pos16 *a,
+                                      const struct Pos16 *b)
+{
+    out->x = a->x + b->x;
+    out->y = a->y + b->y;
+    out->z = a->z + b->z;
+}
+
 void sub_08025FFC(Actor08025FFC *p, s32 arg)
 {
-    u32 copy[2];
-    u16 d[4];
-    u16 *s = (u16 *)copy;
-    u8 *cd;
-    s32 cell;
-    s32 t;
-    u32 bits;
-    u32 idx;
+    Actor08025FFC *actor = p;
+    union ImpactPosition copy;
+    struct Pos16 d;
+    struct Pos16 *delta;
     u16 a;
     u16 b;
     s32 base;
     s32 nb;
-    s32 cx;
-    s32 cy;
-    Map08025FFC *map;
-    u32 *src;
+    union ImpactPosition *src;
     s32 f;
-    s32 kind;
+    const u16 *table;
 
     if (p->changed) {
         s32 seq;
@@ -69,7 +87,10 @@ void sub_08025FFC(Actor08025FFC *p, s32 arg)
     }
     if ((u8)Callback_InvokeActor(p, p->callbackA))
         return;
-    p->flags |= 0x40;
+    {
+        u32 mask = 0x40;
+        p->flags |= mask;
+    }
     if ((u8)Callback_InvokeActor(p, p->callbackB))
         return;
     if (arg == 0x10)
@@ -77,34 +98,26 @@ void sub_08025FFC(Actor08025FFC *p, s32 arg)
     f = arg & 0xf;
     if (f == 0xf) {
         src = p->copyFrom;
-        copy[0] = src[0];
-        copy[1] = src[1];
+        copy = *src;
         base = p->q[0x2d];
-        idx = (gRandomIndex + 1) & 0x3ff;
-        a = gRandomTable[idx] & f;
+        table = gRandomTable;
+        a = Impact_Random(table) & f;
+        b = Impact_Random(table) & 0x7f;
+        delta = &d;
         base = base + a;
         base -= 8;
-        idx = (idx + 1) & 0x3ff;
-        gRandomIndex = idx;
-        b = gRandomTable[idx] & 0x7f;
         nb = b + 0x20;
-        d[0] = s08025FFC_Trunc12(gUnk_086149C4[(base + 0x40) & 0xff] * nb);
-        d[1] = 0;
+        delta->x = s08025FFC_Trunc12(gUnk_086149C4[(base + 0x40) & 0xff] * nb);
+        delta->y = 0;
         base &= 0xff;
-        d[2] = s08025FFC_Trunc12(gUnk_086149C4[base] * nb);
-        d[0] += s[0];
-        d[1] += s[1];
-        d[2] += s[2];
-        Pos16_SnapToTerrain((struct Pos16 *)d);
-        if (d[1] == s[1]) {
-            AnimatedHazard_Create(d, p->field36A, 0x3c);
+        delta->z = s08025FFC_Trunc12(gUnk_086149C4[base] * nb);
+        Impact_AddPosition(&d, &d, &copy.vector);
+        if (Impact_GetTerrainHeight(&d) == (s16)copy.vector.y) {
+            AnimatedHazard_Create(&d, actor->field36A, 0x3c);
         } else {
-            AnimatedHazard_Create(s, p->field36A, 0x3c);
+            AnimatedHazard_Create(&copy.vector, actor->field36A, 0x3c);
         }
     }
-    if (p->field25D & 2)
+    if (actor->field25D & 2)
         p->signalAF = 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08025FFC);
-#endif
