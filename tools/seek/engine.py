@@ -416,7 +416,9 @@ class Session:
         self.nodes = {}
         self.by_out = {}
         self.events = []
+        self.offset = 0
         if os.path.exists(self.path):
+            self.offset = os.path.getsize(self.path)
             for ln in open(self.path):
                 if not ln.strip():
                     continue
@@ -450,19 +452,21 @@ class Session:
         import fcntl
         with open(self.path, "a+") as f:  # ids are allocated under the lock: other workers append too
             fcntl.flock(f, fcntl.LOCK_EX)
-            f.seek(0)
-            last = 0
+            f.seek(self.offset)  # only what others appended since we last looked
             for ln in f:
                 try:
                     r = json.loads(ln)
                 except ValueError:
                     continue
                 if r.get("type") != "event":
-                    last = max(last, r["id"])
                     self.nodes.setdefault(r["id"], r)
-            rec["id"] = last + 1
+                    if r.get("out"):
+                        self.by_out.setdefault(r["out"], r["id"])
+            rec["id"] = max(self.nodes, default=0) + 1
             rec.setdefault("t", round(time.time()))
             f.write(json.dumps(rec) + "\n")
+            f.flush()
+            self.offset = f.tell()
         self.nodes[rec["id"]] = rec
         if rec.get("out"):
             self.by_out.setdefault(rec["out"], rec["id"])

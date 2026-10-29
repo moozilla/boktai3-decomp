@@ -53,6 +53,8 @@ the search that used to live only in your head and the current best file.
   that improve or tie (a plateau is walked: equal-score code is new code), and never compiles the same
   output twice (one node per distinct binary). Restrict it: `--fam swap_stmts,decl_order,width`,
   `--lines 40-60` (only moves touching those source lines). `seek.py moves` lists the 35 families.
+* `SEEK_JOBS=4` spreads each expansion over four processes, each with its own agbcc fork server
+  (about 6 ms per variant instead of 16 on a 200-byte function). Be fair to other workers.
 * Moves apply to the function and to the `static inline` helpers it calls.
 * Moves rewrite through pycparser, so a move node's C has macros expanded and is regenerated in
   one style. Take the idea, not the text: port the change into your own file and `add` it.

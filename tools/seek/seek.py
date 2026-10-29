@@ -4,6 +4,7 @@
   seek.py open FILE.c [FUNC]          start (or resume) FUNC's session from a draft; prints the facts
   seek.py add FILE.c [-p N] [-m NOTE] [--no-expand]   your edit as a child of node N (default: best),
                                       evaluated, semantics checked, and its neighborhood expanded
+                                      (several files: spellings of one hypothesis, scored side by side)
   seek.py expand N [--fam F,..] [--lines A-B] [--top K]   every move at node N, compiled and ranked
   seek.py run [N..] [--budget C] [--seconds S] [--fam F,..] [--lines A-B]   best-first search from N
                                       (default: the best nodes), until MATCH or the budget
@@ -18,6 +19,8 @@
   seek.py note N TEXT                 attach a hypothesis or finding to a node (shared with other workers)
   seek.py moves                       the move families
   seek.py land N                      a MATCH node: hand it to `campaign.py land` (unwraps NONMATCHING)
+
+SEEK_JOBS=4 compiles expansions in four processes (each with its own agbcc fork server).
 
 Options: -f FUNC picks the session (default: the last one opened in this tree).
 Sessions are shared across worktrees ($SEEK_HOME, default: the main checkout's build/seek).
@@ -51,7 +54,7 @@ AGBCC_SRC = os.path.join(ROOT, "build", "scope", "agbcc", "gcc")
 
 # ------------------------------------------------------------------ parse
 
-def parse_function(pre, names):
+def parse_function(pre, names, src_text=None):
     """{name: FuncDef} of FUNC (first) and the unit's inline helpers it calls, transitively, from the
     preprocessed unit PRE. Moves apply to all of them: much of a function's code is often in a helper."""
     span = None
@@ -80,6 +83,8 @@ def parse_function(pre, names):
                     and n.name.name not in out:
                 out[n.name.name] = defs[n.name.name]
                 todo.append(defs[n.name.name])
+    if src_text is not None:  # helpers from headers stay as they are: a node rewrites only its own file
+        out = {k: v for k, v in out.items() if k == fn.decl.name or E.find_def(src_text, k)}
     return out
 
 
@@ -140,7 +145,9 @@ class Work:
         else:
             open(meta, "w").write(f"{self.target.src} {self.target.func}\n")
         set_current(self.target.func)
-        self.ast = {}  # node id -> (pre, FuncDef)
+        self.ast = {}  # node id -> (pre, {name: FuncDef})
+        self.jobs = int(os.environ.get("SEEK_JOBS", "1"))
+        self.pool = None
 
     @property
     def func(self):
@@ -167,9 +174,28 @@ class Work:
             return self.ast[node["id"]]
         path = self.sess.materialize(node)
         pre = self.target.preprocess_file(path)
-        defs = parse_function(pre, self.target.names)
+        defs = parse_function(pre, self.target.names, open(os.path.join(ROOT, path)).read())
         self.ast[node["id"]] = (pre, defs)
         return pre, defs
+
+    def compile_all(self, base_pre, tasks):
+        """[(output hash, alloc, evaluation) or None] for each (dname, ..., txt, line) task, spliced into
+        BASE_PRE: in this process, or across SEEK_JOBS worker processes (each its own fork server)."""
+        jobs = self.jobs
+        if jobs <= 1 or len(tasks) < 16:
+            return [compile_one(self.target, base_pre, t[0], t[4]) for t in tasks]
+        if self.pool is None:
+            import multiprocessing as mp
+            self.pool = mp.get_context("spawn").Pool(jobs, _winit, (self.target.src, self.func))
+        h = sha(base_pre)
+        path = os.path.join(E.LOCAL, "cache", f"base-{h}.i")
+        if not os.path.exists(path):
+            open(path, "w").write(base_pre)
+        t0 = time.time()
+        out = self.pool.map(_wcompile, [(h, path, t[0], t[4]) for t in tasks], chunksize=8)
+        self.target.compiles += len(tasks)
+        self.target.compile_time += time.time() - t0
+        return out
 
     def want_of(self, node):
         """The ROM's register per value, from the nearest file node above NODE."""
@@ -186,6 +212,11 @@ class Work:
         if not E.find_def(text, self.func) and not E.find_def(text, self.target.rom_name):
             sys.exit(f"{path}: no definition of {self.func}")
         fh = self.sess.put_blob(text)
+        for n in self.sess.nodes.values():
+            if n.get("file") == fh and not n.get("defs") and n.get("kind") == "file":
+                if note and not n.get("note"):
+                    self.sess.update(n["id"], note=note)
+                return n  # this exact file is already a node
         d = os.path.join(E.LOCAL, self.func)
         os.makedirs(d, exist_ok=True)
         tmp = os.path.join(d, f"add{os.getpid()}.c")
@@ -211,7 +242,7 @@ class Work:
         if same and same != rec["id"]:
             self.sess.update(rec["id"], same_as=same)
         try:
-            self.ast[rec["id"]] = (pre, parse_function(pre, self.target.names))
+            self.ast[rec["id"]] = (pre, parse_function(pre, self.target.names, text))
         except Exception as e:  # noqa: BLE001
             print(f"(n{rec['id']} cannot be parsed for moves: {str(e).splitlines()[0][:200]})")
         return rec
@@ -239,10 +270,12 @@ class Work:
         file_hash = node["file"]
         depth = node.get("depth", 0) + 1
         main = next(iter(defs))
+        tasks = []
         for dname, fn in defs.items():
             seen_src.add(sha(R.text(fn)))
+        for dname, fn in defs.items():
             for fam, desc, f2 in M.all_moves(fn, families):
-                if budget is not None and stats["variants"] >= budget:
+                if budget is not None and len(tasks) >= budget:
                     break
                 line = changed_line(fn, f2)
                 if lines and (line is None or not (lines[0] <= line <= lines[1])):
@@ -255,41 +288,41 @@ class Work:
                 if h in seen_src:
                     continue
                 seen_src.add(h)
-                stats["variants"] += 1
-                fs = stats["fam"].setdefault(fam, [0, 0, 0])  # tried, changed code, better
-                fs[0] += 1
-                vpre = E.splice(base_pre, [dname], txt)
-                code, err, alloc = self.target.compile_pre(vpre, trace=True)
-                if code is None:
-                    stats["failed"] += 1
-                    continue
-                alloc = {k: v[0] for k, v in alloc.items()}
-                out = sha(code)
-                if out == own_out:
-                    stats["neutral"] += 1
-                    continue
-                fs[1] += 1
-                if out in self.sess.by_out:
-                    stats["known"] += 1
-                    continue
-                ev = self.target.evaluate(code)
-                nd = dict(node.get("defs") or {})
-                nd[dname] = self.sess.put_blob(txt)
-                rec = dict(parent=node["id"], kind="move", who="auto", file=file_hash, defs=nd, out=out,
-                           family=fam, move=desc if dname == main else f"{desc} (in {dname})", line=line,
-                           depth=depth, alloc=alloc, moved=E.alloc_changes(base_alloc, alloc)[:8], **ev)
-                if want and not ev.get("match"):
-                    rec["awrong"] = len(E.alloc_wrong(alloc, want))
-                if sem and (desc.startswith("[sem]") or fam in SEM_FAMILIES) and tuple(ev["key"]) <= key_of(node):
-                    rec["sem"] = self.target.semantic(code, vpre)
-                rec = self.sess.add(rec)
-                if tuple(ev["key"]) < key_of(node):
-                    fs[2] += 1
-                kid_defs = dict(defs)
-                kid_defs[dname] = f2
-                self.ast[rec["id"]] = (vpre, kid_defs)
-                children.append(rec)
-                stats["new"] += 1
+                tasks.append((dname, fam, desc, f2, txt, line))
+        stats["variants"] = len(tasks)
+        for (dname, fam, desc, f2, txt, line), res in zip(tasks, self.compile_all(base_pre, tasks)):
+            fs = stats["fam"].setdefault(fam, [0, 0, 0])  # tried, changed code, better
+            fs[0] += 1
+            if res is None:
+                stats["failed"] += 1
+                continue
+            out, alloc, ev = res
+            if out == own_out:
+                stats["neutral"] += 1
+                continue
+            fs[1] += 1
+            if out in self.sess.by_out:
+                stats["known"] += 1
+                continue
+            vpre = E.splice(base_pre, [dname], txt)
+            nd = dict(node.get("defs") or {})
+            nd[dname] = self.sess.put_blob(txt)
+            rec = dict(parent=node["id"], kind="move", who="auto", file=file_hash, defs=nd, out=out,
+                       family=fam, move=desc if dname == main else f"{desc} (in {dname})", line=line,
+                       depth=depth, alloc=alloc, moved=E.alloc_changes(base_alloc, alloc)[:8], **ev)
+            if want and not ev.get("match"):
+                rec["awrong"] = len(E.alloc_wrong(alloc, want))
+            if sem and (desc.startswith("[sem]") or fam in SEM_FAMILIES) and tuple(ev["key"]) <= key_of(node):
+                code, _ = self.target.compile_pre(vpre)
+                rec["sem"] = self.target.semantic(code, vpre)
+            rec = self.sess.add(rec)
+            if tuple(ev["key"]) < key_of(node):
+                fs[2] += 1
+            kid_defs = dict(defs)
+            kid_defs[dname] = f2
+            self.ast[rec["id"]] = (vpre, kid_defs)
+            children.append(rec)
+            stats["new"] += 1
         stats["seconds"] = round(time.time() - t0, 2)
         self.sess.event(kind="expand", node=node["id"], families=sorted(families) if families else None,
                         lines=lines, **{k: v for k, v in stats.items() if k != "fam"})
@@ -355,10 +388,37 @@ class Work:
                 break
         el = time.time() - t0
         n = self.target.compiles - start_compiles
-        print(f"run: {rounds} expansions, {n} compiles in {el:.1f}s ({1000 * el / max(1, n):.0f} ms each); "
+        print(f"run: {rounds} expansions, {n} compiles in {el:.1f}s ({1000 * el / max(1, n):.1f} ms each, "
+              f"{self.jobs} job{'s' if self.jobs > 1 else ''}); "
               f"best {fmt_node(best)}")
         self.sess.event(kind="run", rounds=rounds, compiles=n, seconds=round(el, 1), best=best["id"])
         return best
+
+
+def compile_one(target, base_pre, dname, txt):
+    code, err, alloc = target.compile_pre(E.splice(base_pre, [dname], txt), trace=True)
+    if code is None:
+        return None
+    return sha(code), {k: v[0] for k, v in alloc.items()}, target.evaluate(code)
+
+
+_WT = None
+_WBASE = {}
+
+
+def _winit(src, func):
+    global _WT
+    import signal
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    _WT = E.Target(src, func)
+
+
+def _wcompile(task):
+    h, path, dname, txt = task
+    if h not in _WBASE:
+        _WBASE.clear()
+        _WBASE[h] = open(path).read()
+    return compile_one(_WT, _WBASE[h], dname, txt)
 
 
 # ------------------------------------------------------------------ printing
@@ -483,7 +543,12 @@ def show_layers(w, node):
 def cmd_add(a):
     w = Work(a.f)
     parent = w.node(a.parent) if a.parent else w.best()
-    node = w.add_file(a.file, parent, a.m)
+    if len(a.file) > 1:  # several spellings of one hypothesis: score them all, best first, no expansion
+        recs = [w.add_file(f, parent, a.m) for f in a.file]
+        for r in sorted(recs, key=lambda r: (key_of(r), r["id"])):
+            print(fmt_node(r, parent) + (f"  (same code as n{r['same_as']})" if r.get("same_as") else ""))
+        return
+    node = w.add_file(a.file[0], parent, a.m)
     print(fmt_node(node, parent))
     show_layers(w, node)
     if node.get("same_as"):
@@ -717,7 +782,7 @@ def main():
     p.add_argument("func", nargs="?")
     p.set_defaults(go=cmd_open)
     p = sub.add_parser("add")
-    p.add_argument("file")
+    p.add_argument("file", nargs="+")
     p.add_argument("-p", "--parent")
     p.add_argument("-m", help="the hypothesis this edit tests")
     p.add_argument("--no-expand", action="store_true")
