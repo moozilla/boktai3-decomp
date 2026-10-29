@@ -67,6 +67,7 @@ def compact(node, evaluation=None):
                 state=node.get("frontier", {}).get("state"),
                 status=result.get("status", "unevaluated"), counts=result.get("counts"),
                 compile_ms=result.get("compile_ms"), semantic=result.get("semantic"),
+                concessions=result.get("concessions"),
                 byte_differences=result.get("byte_differences"),
                 protected_regions=result.get("protected_regions"),
                 delta=result.get("delta"), diagnostics=result.get("diagnostics") or None)
@@ -83,7 +84,7 @@ def protection(result, metadata):
 
 
 def evaluate(session, ref, request):
-    from search_eval import decision_delta
+    from search_eval import decision_delta, StaleContextError
     from search_structure import analyze
     meta = session.metadata()
     node = session.node(ref)
@@ -105,8 +106,10 @@ def evaluate(session, ref, request):
         if cached and not request.get("force"):
             return node, cached, True
         raise ValueError("another worker is evaluating this node; reuse its result when the lease completes")
+    stale = False
     try:
-        result = evaluator.evaluate(source, meta["function"], meta["origin"], options["knobs"], options["semantic_trials"])
+        result = evaluator.evaluate(source, meta["function"], meta["origin"], options["knobs"], options["semantic_trials"],
+                                    expected_context=context)
         if result.get("rows"):
             result["structure"] = analyze(source, meta["function"], result["target_rows"], result["rows"],
                 compiler_root=ROOT / "build/scope/agbcc/gcc", target_data=result.get("target_data", ()),
@@ -121,7 +124,7 @@ def evaluate(session, ref, request):
             parent = session.evaluation(parent_id, options=options)
             parent_context = session.context(parent_id)
             actual_context = session.context(node["id"])
-            versions = ("evaluator", "scope", "fast", "structure", "trace", "semantic", "semantic_runtime", "support", "compiler", "headers", "symbols", "elf")
+            versions = ("evaluator", "scope", "fast", "structure", "trace", "semantic", "semantic_runtime", "support", "compiler", "headers", "symbols", "elf", "target_classification")
             environment_changed = any(parent_context.get(k) != actual_context.get(k) for k in versions)
             same_source = session.node(parent_id)["source_hash"] == node["source_hash"]
             if same_source and environment_changed:
@@ -134,8 +137,14 @@ def evaluate(session, ref, request):
                 if parent_id != node["parents"][0]:
                     result["delta"]["baseline_refreshed"] = parent_id[:12]
         record = session.evaluate(node["id"], result, options=options)
+    except StaleContextError:
+        if request.get("_context_retry", 0) >= 2:
+            raise
+        stale = True
     finally:
         session.release(node["id"], options=lease_options)
+    if stale:
+        return evaluate(session, node["id"], dict(request, _context_retry=request.get("_context_retry", 0) + 1))
     if result.get("exact"):
         session.set_frontier(node["id"], "solved", reason="Unmodified build bytes equal ROM bytes.")
     # A failed semantic trial is evidence against the draft; keep it inspectable.
@@ -215,6 +224,10 @@ def dispatch(request):
                 Path(request["out"]).write_text(source)
                 return {"out": request["out"]}
             return source
+        if command == "land":
+            from search_land import land
+            node, record, _ = evaluate(session, ref, dict(request, force=True, knobs={}, trials=0))
+            return land(session, node, record["result"], request.get("unit"))
         if command == "values":
             import search_lift
             from search_eval import digest
@@ -385,6 +398,14 @@ def dispatch(request):
                 node, record, cached = evaluate(session, node["id"], request)
                 results.append({**compact(node, record), "move": serial(move)["id"], "cache_hit": cached})
             return results
+        if command == "try":
+            parent = session.node(request.get("parent", ref))["id"]
+            results = []
+            for source_path in request["sources"]:
+                result = dispatch({**request, "command": "import", "source": source_path,
+                                   "parent": parent, "checkout": False})
+                results.append({"source": source_path, **result})
+            return results
         if command == "import":
             source = Path(request["source"]).read_text()
             import re
@@ -406,7 +427,7 @@ def dispatch(request):
             # Free edits are first-class moves, never labeled proven equivalent.
             node = session.add(source, parent, {"kind": "model_edit", "reason": request.get("reason", ""),
                 "semantic_precondition": "unproven; inspect differential trials and the ROM"},
-                context=context, note=request.get("reason"))
+                context=context, note=request.get("reason"), checkout=request.get("checkout", True))
             node, record, cached = evaluate(session, node["id"], request)
             return {**compact(node, record), "cache_hit": cached}
         raise ValueError("unknown command: " + command)
@@ -537,10 +558,12 @@ def parser():
     p.add_argument("--session", default="default")
     p.add_argument("--json", action="store_true", help="return machine-readable response envelope")
     sub = p.add_subparsers(dest="command", required=True)
-    for command in ("status", "inspect", "regions", "why", "history", "notes", "evaluate", "moves", "frontier", "export", "source", "checkout", "experiment", "compiler", "mark", "focus", "compare", "listing", "trace", "demand", "values"):
+    for command in ("status", "inspect", "regions", "why", "history", "notes", "evaluate", "moves", "frontier", "export", "source", "checkout", "experiment", "compiler", "mark", "focus", "compare", "listing", "trace", "demand", "values", "land"):
         q = sub.add_parser(command)
         q.add_argument("node", nargs="?", default="HEAD")
         q.add_argument("--out")
+        if command == "land":
+            q.add_argument("--unit", help="destination src/UNIT.c when session began from a scratch file")
         q.add_argument("--details", action="store_true")
         q.add_argument("--limit", type=int)
         q.add_argument("--all", action="store_true")
@@ -567,6 +590,11 @@ def parser():
         q.add_argument("--kinds", nargs="+")
         q.add_argument("--limit", type=int)
         q.add_argument("--trials", type=int, default=0)
+    q = sub.add_parser("try")
+    q.add_argument("sources", nargs="+")
+    q.add_argument("--parent", default="HEAD")
+    q.add_argument("--reason", default="")
+    q.add_argument("--trials", type=int, default=0)
     q = sub.add_parser("diff")
     q.add_argument("a", nargs="?", default="ROOT")
     q.add_argument("b", nargs="?", default="HEAD")
@@ -582,6 +610,58 @@ def parser():
     for command in ("serve", "batch", "ping", "stop"):
         sub.add_parser(command)
     return p
+
+
+def render_result(command, value, details=False):
+    """Bounded worker-facing views; --json and --details retain full evidence."""
+    if isinstance(value, str):
+        return value
+    if details:
+        return json.dumps(value, indent=2)
+    if command == "regions" and isinstance(value, dict):
+        out = ["Regions: " + json.dumps(value.get("summary", {}), sort_keys=True)]
+        for region in value.get("regions", []):
+            out.append("%s -> %s  shape=%s binding=%s%s" % (
+                region.get("target"), region.get("current"), region.get("local_shape"),
+                region.get("global_binding"), " ambiguous" if region.get("alignment_ambiguous") else ""))
+            for difference in region.get("differences", [])[:2]:
+                def instruction(side):
+                    insn = difference.get(side) or {}
+                    return f"+0x{insn.get('offset', 0):X} {insn.get('text', '<absent>')}"
+                out.append("  " + difference.get("kind", "difference") + ": " + instruction("target") + " | " + instruction("current"))
+        for action in value.get("actions", []):
+            refs = ", ".join(r.get("reference", "") for r in action.get("compiler", []) if r)
+            out.append("Hypothesis [%s]: %s %s" % (action.get("category"), action.get("reason"), refs))
+        out.append("Degrees of freedom: " + ", ".join(value.get("degrees_of_freedom", [])))
+        return "\n".join(out)
+    if command == "values" and isinstance(value, dict):
+        out = ["Symbolic observations: %s paired memory accesses; unresolved ROM=%s current=%s" % (
+            value.get("paired_addresses"), value.get("ambiguous_target_addresses"), value.get("ambiguous_current_addresses"))]
+        for side in ("target", "current"):
+            label = "ROM" if side == "target" else "C"
+            out.append(label + " summary: " + json.dumps(value.get(side + "_summary", {}), sort_keys=True))
+            for memory in value.get(side + "_only", []):
+                address, stored = memory.get("address", {}), memory.get("value", {})
+                out.append("  %s %s%d%s [%s] = %s  (%s)" % (memory["at"], memory["kind"], memory["width"],
+                    " signed" if memory.get("signed") else "", address.get("text"), stored.get("text"), address.get("certainty")))
+            for call in value.get(side + "_calls", []):
+                args = ", ".join(str(a.get("text")) for a in call["register_arguments"])
+                stack = ", ".join("word%d=%s" % (a["word"], a["value"].get("text")) for a in call.get("stack_argument_candidates", []))
+                out.append("  %s call %s (%s)%s; arity unknown" % (call["at"], call["target"], args,
+                    "; stack candidates " + stack if stack else ""))
+            for branch in value.get(side + "_branches", []):
+                args = (" " + branch["relation"] + " ").join(str(a.get("text")) for a in branch["arguments"])
+                out.append("  %s branch %s: %s [%s; %s]" % (branch["at"], branch["instruction"], args,
+                    branch["domain"], branch["status"]))
+        out.append(str(value.get("interpretation", "")))
+        return "\n".join(out)
+    if command == "try" and isinstance(value, list):
+        return "\n".join("%s %-12s %s  %sms  %s" % (n["node"], n.get("status"), n.get("counts"),
+                          n.get("compile_ms"), n["source"]) for n in value)
+    if command in ("frontier", "history") and isinstance(value, list):
+        return "\n".join("%s %-8s %-12s %s  %sms" % (n["node"], n.get("state"), n.get("status"),
+                         n.get("counts"), n.get("compile_ms")) for n in value)
+    return json.dumps(value, indent=2)
 
 
 def main():
@@ -621,7 +701,7 @@ def main():
         print(json.dumps(reply))
     elif reply["ok"]:
         value = reply["result"]
-        print(value if isinstance(value, str) else json.dumps(value, indent=2))
+        print(render_result(args["command"], value, args.get("details", False)))
         if reply.get("log"):
             print(reply["log"], file=sys.stderr)
     else:

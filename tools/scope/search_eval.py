@@ -18,6 +18,10 @@ VERSION = 1
 IMPLEMENTATION = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 
 
+class StaleContextError(RuntimeError):
+    """An evaluation must be retried on a node in the new compiler context."""
+
+
 def digest(data):
     return hashlib.sha256(data.encode() if isinstance(data, str) else data).hexdigest()
 
@@ -41,6 +45,95 @@ def module_identity(module):
         if code and getattr(value, "__module__", None) == module.__name__:
             bodies.append(name.encode() + marshal.dumps(portable(code)))
     return digest(b"".join(bodies))
+
+
+def preprocessed_concessions(pre, function=None, aliases=()):
+    """Count sites after CPP, scoped to the target and reachable inline bodies.
+
+    This counts source sites, not machine instructions or the number of inline
+    expansions. Address-taken inline helpers are included conservatively. An
+    unsupported definition spelling reports UNKNOWN instead of false pin-free.
+    """
+    token = re.compile(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|/\*.*?\*/|//[^\n]*|[A-Za-z_]\w*|[^\s]', re.S)
+    tokens = [t for t in token.findall(re.sub(r'^\s*#.*$', '', pre, flags=re.M))
+              if not t.startswith(('/*', '//'))]
+    # A top-level brace following a balanced function parameter list starts a
+    # definition; aggregate bodies and initializer braces are not definitions.
+    definitions, depth, start, i = {}, 0, 0, 0
+    while i < len(tokens):
+        t = tokens[i]
+        if t == '{' and depth == 0:
+            prefix = tokens[start:i]
+            name = None
+            if prefix and prefix[-1] == ')':
+                j, parens = len(prefix)-1, 1
+                while j and parens:
+                    j -= 1
+                    parens += (prefix[j] == ')') - (prefix[j] == '(')
+                if j and re.fullmatch(r'[A-Za-z_]\w*', prefix[j-1]):
+                    name = prefix[j-1]
+            end, nested = i+1, 1
+            while end < len(tokens) and nested:
+                nested += (tokens[end] == '{') - (tokens[end] == '}')
+                end += 1
+            if name and nested == 0:
+                definitions[name] = (tokens[i+1:end-1], bool(set(prefix) & {'inline', '__inline', '__inline__'}))
+            i, start = end, end
+            continue
+        if t == ';' and depth == 0:
+            start = i+1
+        i += 1
+    function = next((n for n in (function, *aliases) if n in definitions), function)
+    roots = [function] if function is not None else [name for name, (_, inline) in definitions.items() if not inline]
+    if (function is not None and function not in definitions) or not roots:
+        return dict(verdict="UNKNOWN", pins=None, barriers=None, by_function={},
+                    detail="The selected preprocessed function definition could not be located.")
+    reached, todo, by_function = set(), roots, {}
+    while todo:
+        name = todo.pop()
+        if name in reached:
+            continue
+        reached.add(name)
+        body = definitions[name][0]
+        todo += [t for t in set(body) if t in definitions and definitions[t][1] and t not in reached]
+        pins = barriers = 0
+        for j, t in enumerate(body):
+            if t not in {'asm', '__asm', '__asm__'}:
+                continue
+            k = j+1
+            if k < len(body) and body[k] in {'volatile', '__volatile', '__volatile__'}:
+                k += 1
+            if k+1 >= len(body) or body[k] != '(':
+                continue
+            k += 1
+            strings = []
+            while k < len(body) and body[k].startswith('"'):
+                strings.append(body[k][1:-1])
+                k += 1
+            if not strings:
+                continue
+            def unescape(m):
+                value = m[0][1:]
+                if value.startswith('x'):
+                    return chr(int(value[1:], 16) & 255)
+                if value[0] in '01234567':
+                    return chr(int(value, 8) & 255)
+                return {'n': '\n', 'r': '\r', 't': '\t', 'b': '\b', 'f': '\f', 'v': '\v', 'a': '\a'}.get(value, value)
+            template = ''.join(re.sub(r'\\(?:x[0-9a-fA-F]+|[0-7]{1,3}|.)', unescape, s) for s in strings)
+            if re.fullmatch(r'r(?:1[0-5]|[0-9])|a[1-4]|v[1-8]|sb|sl|fp|ip|sp|lr|pc', template):
+                # A function ABI asm label is at file scope; inside a body this
+                # syntax must belong to a register declaration to count a pin.
+                prior = body[:j]
+                boundary = max((n for n, b in enumerate(prior) if b in {';', '{', '}'}), default=-1)
+                if 'register' in prior[boundary+1:]:
+                    pins += 1
+            elif not template:
+                barriers += 1
+        by_function[name] = dict(pins=pins, barriers=barriers)
+    return dict(verdict="CONCESSIONS" if any(v[k] for v in by_function.values() for k in ('pins', 'barriers')) else "NONE_FOUND",
+                pins=sum(v['pins'] for v in by_function.values()),
+                barriers=sum(v['barriers'] for v in by_function.values()),
+                by_function=by_function, scope="preprocessed target and referenced inline helpers; source sites")
 
 
 class Evaluator:
@@ -88,20 +181,29 @@ class Evaluator:
         if os.path.basename(s.build.compiler_for(str(path))) != "agbcc":
             raise ValueError("this session needs the Thumb agbcc compiler")
         flags = s.build.cflags_for(str(path))
-        deps = sorted({p.resolve() for p in (ROOT / "include").rglob("*.h")})
+        # Paths produced below ROOT already have a canonical parent. Resolving
+        # every header and every repeated include walks thousands of directory
+        # components per request; resolve each distinct quoted path only once.
+        deps = sorted(set((ROOT / "include").rglob("*.h")))
+        resolutions = {}
+        def resolve(path):
+            if path not in resolutions:
+                resolutions[path] = path.resolve()
+            return resolutions[path]
         # Include unit-local headers too. Imported edits are recontextualized.
         local = (ROOT / origin).resolve().parent
-        deps += sorted(p for p in local.glob("*.h") if p not in deps)
         # Unit-local include chains need not live under include/. Discover quoted
         # paths recursively; system includes are disabled by the build flags.
+        # Scanning every neighbor of a file under src/fn/ costs more than a warm
+        # compile and discovers nothing that these actual include paths omit.
         queue = [(source, local)] + [(p.read_text(errors="replace"), p.parent) for p in deps]
         visited = set(deps)
         while queue:
             text, directory = queue.pop()
             for name in re.findall(r'^\s*#\s*include\s*"([^"\n]+)"', text, re.M):
-                child = (directory / name).resolve()
+                child = resolve(directory / name)
                 if not child.is_file():
-                    child = (ROOT / "include" / name).resolve()
+                    child = resolve(ROOT / "include" / name)
                 if child.is_file() and child not in visited:
                     visited.add(child)
                     deps.append(child)
@@ -111,8 +213,12 @@ class Evaluator:
                    for p in sorted((ROOT / "symbols").glob("*")) if p.is_file()]
         import romlib
         rom_path = romlib.baserom_path()
+        assembly = ROOT / "build/asm/nonmatching" / (rom_name + ".s")
+        assembly_identity = dict(path=str(assembly.relative_to(ROOT)),
+                                 present=assembly.is_file(),
+                                 sha256=self.file_hash(assembly) if assembly.is_file() else None)
         environment = digest(json.dumps([headers, symbols, self.file_hash(s.INSTR),
-            self.file_hash(rom_path), self.file_hash(ROOT / "build/boktai3.elf")]))
+            self.file_hash(rom_path), self.file_hash(ROOT / "build/boktai3.elf"), assembly_identity]))
         if getattr(self, "_environment", environment) != environment:
             # Scope's preprocessing cache keys source mtimes, not header contents;
             # its live fork servers also retain the old symbol resolver.
@@ -133,6 +239,8 @@ class Evaluator:
         if any(a == address and mode == "arm" for a, mode in s.arm_starts()):
             raise ValueError("the search environment currently serves Thumb agbcc functions")
         target = s.rom_bytes()[s.off(address):s.off(address) + size]
+        classification = dict(generated_assembly=assembly_identity,
+                              data=[list(r) for r in s.rom_data(rom_name, address, target)])
         import importlib.util
         import sys
         packages = str(ROOT / "build/search-sol/python")
@@ -143,7 +251,7 @@ class Evaluator:
         if spec and spec.origin:
             package = Path(spec.origin).parent
             backend = [(str(p.relative_to(package)), self.file_hash(p)) for p in sorted(package.rglob("*"))
-                       if p.is_file() and (p.name == "__init__.py" or p.suffix in (".so", ".dylib", ".dll"))]
+                       if (p.name == "__init__.py" or p.suffix in (".so", ".dylib", ".dll")) and p.is_file()]
         semantic_runtime = dict(python=sys.version, emulator=digest(json.dumps(backend)),
                                 worker=self.file_hash(ROOT / "tools/scope/search_semantic.py"))
         if getattr(self, "semantic_runtime", None) != semantic_runtime:
@@ -151,6 +259,7 @@ class Evaluator:
         self.semantic_runtime = semantic_runtime
         return dict(version=VERSION, function=function, rom_name=rom_name,
                     address=address, size=size, target_hash=digest(target),
+                    target_classification=classification,
                     rom_hash=self.file_hash(rom_path),
                     compiler=self.file_hash(s.INSTR), flags=flags,
                     assembler=self.file_hash(shutil.which(s.build.AS[0])), assembler_flags=s.build.AS[1:],
@@ -182,7 +291,7 @@ class Evaluator:
             staged.replace(path)
         return path
 
-    def evaluate(self, source, function, origin, knobs=None, semantic_trials=0):
+    def evaluate(self, source, function, origin, knobs=None, semantic_trials=0, expected_context=None):
         s = self.scope
         s.WORK = str(self.directory / "traces")
         knobs = dict(knobs or {})
@@ -195,6 +304,9 @@ class Evaluator:
         output = io.StringIO()
         start = time.perf_counter()
         try:
+            actual_context = self.context(source, function, origin)
+            if expected_context is not None and expected_context != actual_context:
+                raise StaleContextError("Compiler inputs changed before compilation; refresh the session context.")
             path = self.materialize(source, origin)
             with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
                 compiled = s.fast_compile(str(path), function, knobs)
@@ -208,7 +320,8 @@ class Evaluator:
             name = s.rom_name(str(path), function)
             size = s.inventory()[2][name]
             target = s.rom_bytes()[s.off(address):s.off(address) + size]
-            target_rows = s.decode(target, address, s.rom_data(name, address, target))
+            target_data = actual_context["target_classification"]["data"]
+            target_rows = s.decode(target, address, target_data)
             rows = s.decode(code, address, data)
             pairs, shifted = s.align(target_rows, rows)
             counts = s.count_text([{"tag": t} for _, _, t in pairs])
@@ -222,11 +335,13 @@ class Evaluator:
                           byte_length=len(code), target_length=len(target),
                           byte_differences=sum(a != b for a, b in zip(code, target)) + abs(len(code)-len(target)),
                           shifted_branches=shifted, rows=rows, target_rows=target_rows,
-                          current_data=data, target_data=s.rom_data(name, address, target),
+                          current_data=data, target_data=target_data,
                           differences=[dict(target=target_rows[x] if x is not None else None,
                                             current=rows[y] if y is not None else None, tag=t)
                                        for x, y, t in pairs if t != "="],
                           semantic=dict(verdict="EXACT" if exact else "NOT_RUN", trials=0))
+            result["concessions"] = preprocessed_concessions(s.fast_preprocess(str(path), func=function), function,
+                aliases=(name, f"sub_{address:08X}"))
             if s.needs_g(knobs):
                 with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
                     result["diagnostic_baseline_differs"] = s.g_sensitive(str(path), function)
@@ -237,8 +352,15 @@ class Evaluator:
                 except (ImportError, SystemExit) as e:
                     result["semantic"] = dict(verdict="UNAVAILABLE", trials=0, detail=str(e), proof=False)
             result["diagnostics"] = output.getvalue()[-8000:]
+            # The graph's node context describes one resolved classification and
+            # compiler environment. Never attach newly classified or newly built
+            # evidence to that old node if dependencies changed during the work.
+            if actual_context != self.context(source, function, origin):
+                raise StaleContextError("Compiler inputs changed during compilation; refresh the session context.")
             result["elapsed_ms"] = round((time.perf_counter()-start)*1000, 3)
             return result
+        except StaleContextError:
+            raise
         except (SystemExit, OSError, RuntimeError, ValueError) as e:
             return dict(status="compile_error", exact=False, experiment=bool(knobs),
                         knobs=knobs, diagnostics=output.getvalue()[-8000:] + "\n" + str(e),

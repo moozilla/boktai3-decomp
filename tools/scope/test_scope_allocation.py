@@ -9,6 +9,21 @@ import scope
 
 
 class AllocationExplanationTests(unittest.TestCase):
+    def test_extended_reload_records_and_initial_rotation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            Path(directory, "names.txt").write_text(
+                "X F 0 68 start=-1 pass=1 rotate=1 0:L43 1:A 2:A 3:A\n"
+                "X F 1 91 start=1 pass=1 future=2 rotate=0 0:A 1:A 2:A\n"
+                "X F 2 95 start=2 pass=1 0:A 1:A 2:A\n")
+            with mock.patch.object(scope, "dump_func", return_value="F"):
+                states = scope.spill_states(directory, "F")
+            self.assertEqual(states[0]["regs"], [0, 1, 2, 3])
+            self.assertTrue(states[0]["rotate"])
+            self.assertEqual(scope.spill_shifts(states[0], 2), [2])
+            self.assertFalse(states[1]["rotate"])
+            self.assertEqual(scope.spill_shifts(states[1], 2), [])
+            self.assertTrue(states[2]["rotate"])
+
     def test_stack_class_is_not_reported_as_overlapping_low_values(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

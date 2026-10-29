@@ -172,7 +172,7 @@ def _collect(scope, src, function, env=None):
         state = states.get(choice)
         rotation = None
         if state:
-            rotation = {"start": state["start"], "pass": state["pass"], "registers": state["regs"],
+            rotation = {"start": state["start"], "pass": state["pass"], "rotate": state.get("rotate"), "registers": state["regs"],
                         "standing": {str(r): ("live:" + identities.get(int(s[1:]), {"key": "pseudo:" + s[1:]})["key"] if s.startswith("L") else s)
                                      for r, s in state["st"].items()}}
         reloads.append({"key": f"{stem}#{occurrences[stem]}", "choice": choice, "uid": uid, "line": line,

@@ -22,6 +22,7 @@ search --session actor checkout NODE --out build/actor.c
 search --session actor import build/actor.c --parent NODE --reason 'explain the hypothesis'
 search --session actor trace --a NODE       # actual allocation/reload/pass changes against NODE
 search --session actor diff NODE HEAD
+search --session actor land EXACT_NODE      # campaign merge + production unit MATCH
 ```
 
 `expand` keeps HEAD where it was; select a child with `checkout`. `import` selects
@@ -70,6 +71,12 @@ it. `SCOPE_SEARCH_SERVER=0` runs locally; `batch` reads JSON commands one per li
 and keeps compilers warm without a daemon. `--json` returns response envelopes.
 Typical warm compilation is tens of milliseconds; tracing and first-use setup cost
 more. Compiler/environment changes create new contexts instead of stale cache hits.
-On exact output, export `best_match.c` to the function's campaign directory, retain
-`base.c` and queue metadata, then use `campaign.py land FUNCTION .`; it verifies the
-unit with the normal build compiler. No full ROM build is needed in this worktree.
+`land NODE` forces an ordinary evaluation, prepares campaign metadata from the
+immutable session root, merges and formats the source, and requires the production
+unit checker to print MATCH. Failure restores the original unit. For a session
+initialized from scratch, specify `--unit src/UNIT.c`. Inspect and clean the exact
+candidate before landing. Landing does not commit or run a full ROM build.
+Concession counts inspect the preprocessed target and referenced inline helpers,
+so macro spellings cannot hide register pins; unsupported extraction is UNKNOWN.
+Generated assembly presence/content and resolved target literal ranges belong to
+the context; changed classification creates a new node rather than a stale score.

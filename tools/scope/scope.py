@@ -2006,13 +2006,19 @@ def spill_states(wd, func):
     for ln in open(path) if os.path.exists(path) else []:
         p = ln.split()
         if p[0] == "X" and len(p) > 5 and p[1] == func:
-            regs, st = [], {}
-            for f in p[6:]:
-                r, c = f.split(":")
-                regs.append(int(r))
-                st[int(r)] = c
-            out[int(p[2])] = {"uid": int(p[3]), "start": int(p[4][6:]), "pass": int(p[5][5:]), "regs": regs,
-                              "st": st}
+            regs, st, metadata = [], {}, {}
+            for f in p[4:]:
+                if "=" in f:
+                    key, value = f.split("=", 1)
+                    metadata[key] = value
+                elif re.fullmatch(r"[0-9]+:[A-Z][0-9]*", f):
+                    r, c = f.split(":", 1)
+                    regs.append(int(r))
+                    st[int(r)] = c
+            start = int(metadata["start"])
+            out[int(p[2])] = {"uid": int(p[3]), "start": start, "pass": int(metadata["pass"]), "regs": regs,
+                              "rotate": bool(int(metadata["rotate"])) if "rotate" in metadata else start >= 0,
+                              "rotation_known": "rotate" in metadata or start >= 0, "st": st}
     return out
 
 
@@ -2051,7 +2057,7 @@ def spill_pick(x, start):
 def spill_shifts(x, want):
     """[D] (1 <= D < n) such that AGBCC_SPILL=K:D makes X's reload take WANT; [] if no rotation can."""
     n = len(x["regs"])
-    if x["start"] < 0:
+    if not x.get("rotate", x["start"] >= 0):
         return []
     return [d for d in range(1, n) if spill_pick(x, (x["start"] + d) % n) == want]
 
@@ -2079,8 +2085,11 @@ def explain_spill(wd, func, k, want, got, nm, at, indent="    "):
     print(f"{indent}spill registers at this insn, in rotation order: "
           + ", ".join(f"{rn(r)} {spill_word(x['st'][r], nm)}" for r in regs))
     prev = [r for r in rel if r[0] < k][-3:]
-    if x["start"] < 0:
-        print(f"{indent}this is a group reload: it always scans from {rn(regs[0])}, whatever the rotation")
+    if not x.get("rotate", x["start"] >= 0):
+        qualifier = "this is a group reload" if x.get("rotation_known", True) else "this older dump cannot distinguish a group reload from the initial rotation"
+        print(f"{indent}{qualifier}: the recorded scan starts from {rn(regs[0])}")
+    elif x["start"] < 0:
+        print(f"{indent}the initial rotation starts before {rn(regs[0])}; a shift can change its first choice")
     else:
         took = regs[x["start"]]
         print(f"{indent}the scan starts after {rn(took)}, the register the previous choice took"
@@ -2109,6 +2118,10 @@ def explain_spill(wd, func, k, want, got, nm, at, indent="    "):
     if ds:
         d = ds[0]
         need = sorted({regs[(x["start"] + e) % n] for e in ds}, key=regs.index)
+        if x["start"] < 0:
+            print(f"{indent}AGBCC_SPILL={k}:{d} gives {rn(want)} by shifting the initial scan."
+                  " The recorded initial state has no previous choice to identify.")
+            return d, f"; shifting the initial rotation by {d} gives {rn(want)}", out
         print(f"{indent}AGBCC_SPILL={k}:{d} gives {rn(want)}: the ROM's previous choice took"
               f" {' or '.join(map(rn, need))}, not {rn(regs[x['start']])}. Each choice advances the rotation to"
               " the register it took, so the ROM made a different number of reload choices before this"
@@ -4575,22 +4588,18 @@ def hoist_levers(src, func, env, passes, names, lines, base, info):
         for cands in ps.values():
             for uid, c in cands.items():
                 name, ln = names.get(c["reg"], ""), lines.get(uid)
-                if not (c["move"] and c["move"][0] and re.fullmatch(r"[A-Za-z_]\w*", name) and ln) or name in tried:
+                if not (c["move"] and c["move"][0] and re.fullmatch(r"[A-Za-z_]\w*", name) and ln) or (name, ln) in tried:
                     continue
-                tried.add(name)
+                tried.add((name, ln))
+                if not 1 <= ln <= len(rows):
+                    print(f"  lever unavailable for `{name}`: source line {ln} is outside this snapshot")
+                    continue
                 m = re.search(rf"\b{name}\s*=\s*([^;=][^;]*);", rows[ln - 1])
-                head = next((i for i in range(ln - 1, -1, -1)
-                             if re.search(r"\b(for|while)\s*\(|\bdo\b", rows[i])), None)
-                if not m or head is None:
+                if not m:
                     continue
-                depth, close = 0, None
-                for i in range(head, len(rows)):
-                    for ch in rows[i]:
-                        depth += (ch == "{") - (ch == "}")
-                    if depth == 0 and "{" in "".join(rows[head:i + 1]) and i > head:
-                        close = i
-                        break
-                if close is None or close < ln:
+                close, reason = hoist_probe_close(text, ln)
+                if close is None:
+                    print(f"  lever unavailable for `{name}` at line {ln}: {reason}")
                     continue
                 indent = re.match(r"\s*", rows[close]).group(0) + "    "
                 out = rows[:close] + [f"{indent}{name} = {m.group(1).strip()}; /* dead: keeps loop.c from hoisting {name} */"] + rows[close:]
@@ -4599,10 +4608,65 @@ def hoist_levers(src, func, env, passes, names, lines, base, info):
                 os.makedirs(os.path.dirname(os.path.join(ROOT, var)), exist_ok=True)
                 with open(os.path.join(ROOT, var), "w") as f:
                     f.write("\n".join(out))
-                k, inf = score(var, func, env)
+                try:
+                    k, inf = score(var, func, env)
+                except (SystemExit, OSError, RuntimeError, ValueError) as error:
+                    # A speculative source edit is not compiler evidence. Local
+                    # names may be shadowed or visible only in a macro's scope;
+                    # preserve the actual loop trace if this optional probe fails.
+                    detail = " ".join(str(error).split())[-300:]
+                    print(f"  lever unavailable for `{name}`: speculative source did not compile ({detail})")
+                    continue
                 res = "MATCH" if k == 0 else inf.get("counts", f"{k} differ")
                 print(f"  lever: `{name} = {m.group(1).strip()};` again before line {close + 1}: {res}"
                       f" ({'better' if k < base else 'same' if k == base else 'worse'}; {var})")
+
+
+def hoist_probe_close(text, line):
+    """Find a safe line insertion inside the actual enclosing braced loop.
+
+    This deliberately declines nested lexical blocks: variables or an RHS may
+    leave scope before the loop closes. It does not infer identity from a debug
+    name that can represent several shadowed locals.
+    """
+    masked = re.sub(r'/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'',
+                    lambda m: re.sub(r'[^\n]', ' ', m[0]), text, flags=re.S)
+    starts = [0] + [m.end() for m in re.finditer('\n', masked)]
+    if line < 1 or line > len(starts):
+        return None, "source line is outside this snapshot"
+    at = starts[line-1]
+    endline = masked.find('\n', at)
+    endline = len(masked) if endline < 0 else endline
+    # Use the statement's first non-space token, not the preceding line break.
+    at += len(masked[at:endline]) - len(masked[at:endline].lstrip())
+    stack, pairs = [], {}
+    for i, ch in enumerate(masked):
+        if ch == '{':
+            stack.append(i)
+        elif ch == '}' and stack:
+            pairs[stack.pop()] = i
+    enclosing = [lo for lo, hi in pairs.items() if lo < at < hi]
+    loops = []
+    for match in re.finditer(r'\b(?:for|while)\s*\(|\bdo\b', masked):
+        i = match.end()
+        if masked[i-1] == '(':
+            depth = 1
+            while i < len(masked) and depth:
+                depth += (masked[i] == '(') - (masked[i] == ')')
+                i += 1
+        while i < len(masked) and masked[i].isspace():
+            i += 1
+        if i in enclosing:
+            loops.append(i)
+    if not loops:
+        return None, "no enclosing braced loop could be resolved"
+    body = max(loops)
+    if not enclosing or max(enclosing) != body:
+        return None, "assignment is in a nested lexical block; local/RHS scope at the loop close is unproved"
+    close = masked.count('\n', 0, pairs[body])
+    if close < line or masked[starts[close]:pairs[body]].strip():
+        return None, "loop closing brace is not on a separate source line"
+    return close, None
 
 
 def cmd_frame(src, func, env):
