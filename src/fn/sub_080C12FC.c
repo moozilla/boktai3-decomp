@@ -1,60 +1,141 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 84.7%
-// Golem/skeleton reaction dispatcher (returns 1 when it changed control): hit (0x2000) turns
-// round and chases, 0xC0000 hands over to reactionTarget230, otherwise roar-and-chase through
-// three copies of Chase_Arrive; 080C23FC is its far tail.
-// Remaining differences include helper address lifetimes and turn-loop allocation.
-#include "global.h"
-#include "scene_actor_terrain.h"
-#include "scene_actor_reaction.h"
+#include "scene_actor_reset.h"
+#include "scene_actor_animation.h"
 #include "engine.h"
+#include "ram.h"
+extern u8 *gUnknown_02000580[];
 
-void Skeleton_UpdateScriptWaitState(void);
-void sub_0807E334(void *);
+#include "engine_globals.h"
+
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
-void Anim_SetDurationScale(void *, u32);
-void Anim_SetFrameDurationScale(void *, u32);
+void sub_0807E334(struct SceneActorRegistryResetView *);
+s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
+s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
 
-struct ChasePlayer {
-    u8 unknown0[0x20];
-    u32 flags;
-    u8 unknown24[0x1C];
-    u16 *cell;
-};
-extern struct ChasePlayer *gPlayers[];
-
-struct ChaseTarget {
+struct SkeletonReactionTarget {
     u8 unknown0[8];
-    u8 index;
+    u8 playerIndex;
     u8 unknown9[3];
     struct ContactPosition position;
 };
 
-struct ChaseContext {
-    u8 unknown0[0x6DC];
+struct SkeletonReactionPlayerCell {
+    u16 unknown0[3];
+    u16 index;
+};
+struct SkeletonReactionPlayer {
+    u8 unknown0[0x20];
     u32 flags;
-    u8 unknown6E0[0x28];
-    u32 nearDistance;
-    u32 farDistance;
+    struct SkeletonReactionTarget target;
+    u8 unknown38[8];
+    struct SkeletonReactionPlayerCell *cell;
 };
 
-static inline u8 Chase_Test(u32 value, u32 mask)
+struct SkeletonReactionBody {
+    u8 unknown0[0x6F0];
+    s16 pursuitTimer;
+};
+
+struct SkeletonReactionRoutePoint {
+    s16 x, z;
+};
+struct SkeletonReactionRouteLink {
+    u8 unknown0[8];
+    struct SkeletonReactionRoutePoint *point;
+    u8 unknownC[8];
+};
+struct SkeletonReactionSavedControl {
+    void *control;
+    u8 state, phase, behavior, kind;
+};
+struct SkeletonReactionTurnState {
+    u8 direction, savedDirection;
+    s8 turnsRemaining;
+    u8 unknown3;
+};
+struct SkeletonReactionGroup {
+    u8 unknown0[0x40];
+    s16 flags;
+    u16 field42, timer44, unknown46;
+    void *homeControl;
+    struct SceneActorRegistryControl control;
+    u8 unknown68[0xC];
+    struct SkeletonReactionRouteLink homeRoute;
+    u8 unknown88[4];
+    struct SkeletonReactionSavedControl saved;
+    u8 unknown94[0x162];
+    u8 hitReactionLatch;
+    u8 unknown1F7[5];
+    void *route;
+    struct ContactPosition *destination;
+    struct SkeletonReactionTurnState turn;
+    void *contactControl;
+    u8 unknown20C[0x10];
+    void *turnControl, *routePhaseCallback, *fallback;
+};
+
+struct SkeletonReactionTracking {
+    struct SkeletonReactionTarget *target;
+    struct ContactPosition destination;
+    u8 unknownC, heading, unknownE, flags;
+};
+
+static inline void SkeletonReaction_SetActorFlags(void *object, u32 bits)
+{
+    struct SceneActorRegistryResetView *view = object;
+    view->flags2CC |= bits;
+}
+
+static inline struct SkeletonReactionGroup *SkeletonReaction_GroupOf(void *object)
+{
+    struct SceneActorRegistryResetView *actor = object;
+    return (struct SkeletonReactionGroup *)&actor->group;
+}
+
+static inline u8 SkeletonReaction_Test(u32 value, u32 mask)
 {
     if (value & mask)
         return 1;
     return 0;
 }
-static inline void Chase_SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+
+static inline u8 SkeletonReaction_TestField(u16 *field, u32 mask)
 {
-    void *callback = cb;
-    u32 kind = k;
+    if (*field & mask)
+        return 1;
+    return 0;
+}
+
+static inline u16 SkeletonReaction_ReadMotionFlags(void *object)
+{
+    struct SceneActorRegistryResetView *actor = object;
+    return actor->flags2D4;
+}
+static inline u16 SkeletonReaction_MotionFlags(void *object, u32 mask)
+{
+    struct SceneActorRegistryResetView *actor = object;
+    u16 value = SkeletonReaction_ReadMotionFlags(actor);
+    return value & mask;
+}
+
+static inline u32 SkeletonReaction_Bits32(u32 *field, u32 mask)
+{
+    return *field & mask;
+}
+
+static inline void SkeletonReaction_InstallControl(void *object, void *callback, u32 kind)
+{
+    struct SceneActorRegistryResetView *actor = object;
     actor->field2B2 = 1;
     actor->field2B0 = 0;
     actor->field2B5 = kind;
     actor->target = callback;
+}
+
+static inline void SkeletonReaction_ResetMotionControl(void *object)
+{
+    struct SceneActorRegistryResetView *actor = object;
     actor->field2C8 = 0;
     {
         u32 *field = &actor->flags114;
@@ -63,351 +144,496 @@ static inline void Chase_SetCtl(struct SceneActorRegistryResetView *actor, void 
     }
     actor->word104 = 0;
 }
-static inline void Chase_SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+
+static inline void SkeletonReaction_SetControl(void *object, void *callback, u32 kind)
 {
-    u32 behavior = b;
-    actor->state2A8 = s;
-    actor->phase2A9 = p;
+    struct SceneActorRegistryResetView *actor = object;
+    SkeletonReaction_InstallControl(actor, callback, kind);
+    SkeletonReaction_ResetMotionControl(actor);
+}
+
+static inline void SkeletonReaction_SelectState(void *object, u8 state, u8 phase, u8 behavior)
+{
+    struct SceneActorRegistryResetView *actor = object;
+    actor->state2A8 = state;
+    actor->phase2A9 = phase;
     actor->behavior2AA = behavior;
+}
+
+static inline void SkeletonReaction_ResetStateEntry(void *object)
+{
+    struct SceneActorRegistryResetView *actor = object;
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-static inline void Chase_SetBehavior(struct SceneActorRegistryResetView *actor, u32 b)
+
+static inline void SkeletonReaction_SetState(void *object, u32 state, u32 phase, u32 behavior)
 {
-    actor->state2A8 = 0;
-    actor->phase2A9 = 0;
-    actor->behavior2AA = b;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    struct SceneActorRegistryResetView *actor = object;
+    SkeletonReaction_SelectState(actor, state, phase, behavior);
+    SkeletonReaction_ResetStateEntry(actor);
 }
-static inline u16 Chase_MotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+
+static inline void SkeletonReaction_SetPhase(void *object, u32 phase, u32 behavior)
 {
-    return actor->flags2D4 & mask;
+    struct SceneActorRegistryResetView *actor = object;
+    SkeletonReaction_SelectState(actor, 0, phase, behavior);
+    SkeletonReaction_ResetStateEntry(actor);
 }
-static inline u32 Chase_Bits32(u32 *field, u32 mask)
+
+static inline void SkeletonReaction_SetBehavior(void *object, u32 behavior)
 {
-    return *field & mask;
+    struct SceneActorRegistryResetView *actor = object;
+    SkeletonReaction_SetPhase(actor, 0, behavior);
 }
-static inline s32 Chase_CellIndex(s32 x, s32 z)
+
+static inline struct EngineMap *SkeletonReaction_CurrentMap(void)
 {
+    return gTerrainMap;
+}
+struct SkeletonReactionTerrainCell {
+    u8 attributes;
+    u8 tile;
+    u16 flags;
+};
+struct SkeletonReactionTerrainGrid {
+    u32 field0;
+    s16 width, height;
+    s16 originX, originZ;
+    struct SkeletonReactionTerrainCell cells[1];
+};
+struct SkeletonReactionTerrainOverride {
+    u16 flags, index;
+    struct SkeletonReactionTerrainCell properties;
+};
+static inline struct SkeletonReactionTerrainCell *SkeletonReaction_MapCell(struct EngineMap *map,
+                                                                           s32 cell)
+{
+    return &((struct SkeletonReactionTerrainGrid *)map->cells)->cells[cell];
+}
+static inline struct SkeletonReactionTerrainCell *SkeletonReaction_CellProperties(s32 cell)
+{
+    struct SkeletonReactionTerrainOverride *override =
+        (void *)TerrainModifiers_FindCellOverride(cell, 1);
+    if (override)
+        return &override->properties;
+    return SkeletonReaction_MapCell(SkeletonReaction_CurrentMap(), cell);
+}
+
+static inline u32 SkeletonReaction_MapRowStart(const struct EngineMap *map, s32 row)
+{
+    return map->rows[row];
+}
+
+static inline s32 SkeletonReaction_CellAt(struct ContactPosition *position)
+{
+    s32 x = position->x >> 8;
+    s32 z = position->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return gTerrainMap->rows[z] + x;
+    return SkeletonReaction_MapRowStart(SkeletonReaction_CurrentMap(), z) + x;
 }
-static inline s32 Chase_CellAt(struct ContactPosition *position)
+
+static inline u32 SkeletonReaction_HeightAt(s32 cell, struct ContactPosition *position)
 {
-    return Chase_CellIndex(position->x >> 8, position->z >> 8);
-}
-static inline u32 Chase_HeightAt(s32 cell, struct ContactPosition *position)
-{
-    u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
+    struct SkeletonReactionTerrainCell *data = SkeletonReaction_CellProperties(cell);
     u32 kind, height;
-    if (data)
-        data += 4;
-    else
-        data = gTerrainMap->cells + (cell * 4 + 12);
-    kind = *data >> 4;
-    height = (*data & 15) << 8;
-    if (kind == 1)
-        goto slopeZ;
-    if (kind == 2)
-        goto slopeX;
-    goto done;
-slopeZ:
-    height -= *(u8 *)&position->z;
-    goto done;
-slopeX:
-    height -= *(u8 *)&position->x;
-done:
+    kind = data->attributes >> 4;
+    height = (data->attributes & 15) << 8;
+    switch (kind) {
+        case 1:
+            height -= (u8)position->z;
+            break;
+        case 2:
+            height -= (u8)position->x;
+            break;
+    }
     return height;
 }
-static inline u32 Chase_Height(struct ContactPosition *position)
+
+static inline u32 SkeletonReaction_Height(struct ContactPosition *position)
 {
-    return Chase_HeightAt(Chase_CellAt(position), position);
+    return SkeletonReaction_HeightAt(SkeletonReaction_CellAt(position), position);
 }
-static inline void Chase_SnapToRoute(struct ContactPosition *p, u8 *route)
+
+static inline void SkeletonReaction_SnapToRoute(struct ContactPosition *position,
+                                                struct SkeletonReactionRouteLink *route)
 {
-    p->x = (*(u16 **)(route + 8))[0];
-    p->z = (*(u16 **)(route + 8))[1];
-    p->y = Chase_Height(p);
+    position->x = route->point->x;
+    position->z = route->point->z;
+    position->y = SkeletonReaction_Height(position);
 }
-static inline void Chase_ClearBits(u16 *field, u32 bits)
+
+static inline void SkeletonReaction_ClearBits(u16 *field, u32 bits)
 {
     *field &= ~bits;
 }
-static inline u8 Chase_TryRoute(struct SceneActorRegistryResetView *actor, void *route,
-                                struct ContactPosition *position,
-                                struct ContactPosition *destination)
+
+static inline u16 *SkeletonReaction_MotionFlagsOf(struct SceneActorRegistryResetView *actor)
+{
+    return &actor->flags2D4;
+}
+
+static inline struct ContactPosition *
+SkeletonReaction_MotionOf(struct SceneActorRegistryResetView *actor)
+{
+    return &actor->motion;
+}
+
+static inline u8 SkeletonReaction_TryRoute(struct SceneActorRegistryResetView *actor, void *route,
+                                           struct ContactPosition *position,
+                                           struct ContactPosition *target)
 {
     s32 result;
-    if (!Nav_IsPositionInMesh(route, position, destination)) {
-        Chase_ClearBits(&actor->flags2D4, 0x200);
+    if (!Nav_IsPositionInMesh(route, position, target)) {
+        SkeletonReaction_ClearBits(SkeletonReaction_MotionFlagsOf(actor), 0x200);
         return 0;
     } else {
-        result = Terrain_ApplyBlocked(route, position, destination);
+        result = Terrain_ApplyBlocked(route, position, target);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(SkeletonReaction_MotionOf(actor), 8);
             return 1;
         } else {
-            Chase_ClearBits(&actor->flags2D4, 0x200);
+            SkeletonReaction_ClearBits(SkeletonReaction_MotionFlagsOf(actor), 0x200);
             return 0;
         }
     }
 }
-struct ChaseFlags40 {
-    s16 bits : 16;
-};
 
-struct ChasePacket {
-    void *control;
-    u8 state, phase, behavior, kind;
+static inline void *SkeletonReaction_CurrentControl(void *object)
+{
+    struct SceneActorRegistryResetView *actor = object;
+    return actor->target;
+}
+
+static inline u8 SkeletonReaction_ControlKind(struct SceneActorRegistryResetView *actor)
+{
+    return actor->field2B5;
+}
+
+static inline u8 SkeletonReaction_CurrentState(struct SceneActorRegistryResetView *actor)
+{
+    return actor->state2A8;
+}
+
+static inline u8 SkeletonReaction_CurrentPhase(struct SceneActorRegistryResetView *actor)
+{
+    return actor->phase2A9;
+}
+
+static inline u8 SkeletonReaction_CurrentBehavior(struct SceneActorRegistryResetView *actor)
+{
+    return actor->behavior2AA;
+}
+
+static inline void SkeletonReaction_SaveControl(void *p, void *object)
+{
+    struct SceneActorRegistryResetView *actor = object;
+    struct SkeletonReactionSavedControl *packet = p;
+    packet->control = SkeletonReaction_CurrentControl(actor);
+    packet->kind = SkeletonReaction_ControlKind(actor);
+    packet->state = SkeletonReaction_CurrentState(actor);
+    packet->phase = SkeletonReaction_CurrentPhase(actor);
+    packet->behavior = SkeletonReaction_CurrentBehavior(actor);
+}
+
+struct SkeletonRandomTableView {
+    const u16 *samples;
 };
-static inline void Chase_SavePacket(void *p, struct SceneActorRegistryResetView *actor)
+#define SkeletonReaction_NextSample(table_, seed_, wrap_, bits_)                                   \
+    ({                                                                                             \
+        const struct SkeletonRandomTableView *table_view_ = (table_);                              \
+        const u16 *samples_ = table_view_->samples;                                                \
+        u32 *cursor_ = (seed_);                                                                    \
+        u32 wrap_mask_ = (wrap_);                                                                  \
+        u32 result_mask_ = (bits_);                                                                \
+        u32 index_ = (*cursor_ + 1) & wrap_mask_;                                                  \
+        u32 sample_;                                                                               \
+        *cursor_ = index_;                                                                         \
+        sample_ = samples_[index_];                                                                \
+        sample_ &= result_mask_;                                                                   \
+        sample_;                                                                                   \
+    })
+static inline u32 SkeletonReaction_RandomDirectionExcept(u32 current, const u16 *randomSamples)
 {
-    struct ChasePacket *packet = p;
-    packet->control = actor->target;
-    packet->kind = actor->field2B5;
-    packet->state = actor->state2A8;
-    packet->phase = actor->phase2A9;
-    packet->behavior = actor->behavior2AA;
+    s32 tries;
+    struct SkeletonRandomTableView table = {randomSamples};
+    for (tries = 0; tries < 4; tries++) {
+        u32 direction = SkeletonReaction_NextSample(&table, &gRandomIndex, 1023, 3) << 6;
+        if (direction != current)
+            return direction;
+    }
+    return current;
 }
-static inline u8 Chase_Test16(u16 *p, u32 mask)
-{
-    if (*p & mask)
-        return 1;
-    return 0;
-}
-static inline u32 PickTurn(u32 dir)
-{
-    register s32 prior asm("r7") = dir;
-    s32 tries = 0;
-    s32 choice;
-    do {
-        {
-            register u32 bits asm("r1") = 3;
-            u32 index = (gRandomIndex + 1) & 1023;
-            u32 v;
-            gRandomIndex = index;
-            index *= 2;
-            v = *(const u16 *)(index + (u32)gRandomTable);
-            choice = (v & bits) << 6;
-        }
-        if (choice != prior)
-            goto chosen;
-    } while (++tries <= 3);
-    choice = prior;
-chosen:
-    return choice;
-}
-static inline void Chase_BeginTurn(void *obj, u8 saved)
+
+static inline void SkeletonReaction_BeginTurn(void *obj, u32 saved, const u16 *randomSamples)
 {
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
-    u32 mask = 0x400;
-    if (actor->flags2D4 & mask)
-        return;
-    if (Chase_Test16((u16 *)((u8 *)obj + 0x414), 4))
-        return;
-    group[0x204] = PickTurn(actor->direction);
-    Chase_SavePacket(group + 0x8C, actor);
-    group[0x205] = saved;
-    Chase_SetCtl(actor, *(void **)(group + 0x21C), 0x1B);
-    Chase_SetState(actor, 3, 1, 0);
-    group[0x206] = 6;
+    struct SkeletonReactionGroup *group = SkeletonReaction_GroupOf(obj);
+    if (!SkeletonReaction_MotionFlags(actor, 0x400) &&
+        !SkeletonReaction_TestField((u16 *)&group->flags, 4)) {
+        group->turn.direction =
+            SkeletonReaction_RandomDirectionExcept(actor->direction, randomSamples);
+        SkeletonReaction_SaveControl(&group->saved, actor);
+        group->turn.savedDirection = saved;
+        SkeletonReaction_SetControl(actor, group->turnControl, 0x1B);
+        SkeletonReaction_SetState(actor, 3, 1, 0);
+        group->turn.turnsRemaining = 6;
+    }
 }
 
-static inline u8 Chase_Arrive(void *obj)
+static inline s16 SkeletonReaction_MapWidth(struct EngineMap *map)
+{
+    return ((struct SkeletonReactionTerrainGrid *)map->cells)->width;
+}
+static inline s16 SkeletonReaction_TerrainLevelHeight(u32 level)
+{
+    return level << 8;
+}
+#define SkeletonReaction_CellCenterCoordinate(coordinate_)                                         \
+    ({                                                                                             \
+        s32 grid_coordinate_ = (coordinate_);                                                      \
+        (s16)(((u32)grid_coordinate_ << 8) + 0x80);                                                \
+    })
+
+static inline void SkeletonReaction_CellCenter(s32 cell, struct ContactPosition *position)
+{
+    s32 x = Mod(cell, SkeletonReaction_MapWidth(SkeletonReaction_CurrentMap()));
+    s32 z = Div(cell, SkeletonReaction_MapWidth(SkeletonReaction_CurrentMap()));
+    position->x = SkeletonReaction_CellCenterCoordinate(x);
+    {
+        u32 attributes = SkeletonReaction_CellProperties(cell)->attributes;
+        u32 height = 15;
+        height &= attributes;
+        position->y = SkeletonReaction_TerrainLevelHeight(height);
+    }
+    position->z = SkeletonReaction_CellCenterCoordinate(z);
+}
+
+static inline s32 SkeletonReaction_PlayerSlot(struct SkeletonReactionTarget *target)
+{
+    if (target->playerIndex <= 3)
+        return target->playerIndex;
+    return -1;
+}
+/* A successful cell-center reroute returns one. Other paths leave the
+ * caller to try the separate partner-position route. */
+static inline u8 SkeletonReaction_Arrive(void *obj)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
-    struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
-    s32 cell;
-    s32 player;
-    Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
-    if (Chase_Test(gEngineFlags, 0x4800)) {
-        struct ChaseTarget *t = *slot;
+    struct SkeletonReactionGroup *group = SkeletonReaction_GroupOf(obj);
+    struct SkeletonReactionTracking *tracking = (struct SkeletonReactionTracking *)&actor->fieldDC;
+    s32 cell, player;
+    const u16 *randomSamples = gRandomTable;
+    void **callback;
+    SkeletonReaction_SnapToRoute(group->destination, &group->homeRoute);
+    if (SkeletonReaction_Test(gEngineFlags, 0x4800)) {
+        struct SkeletonReactionTarget *t = tracking->target;
         if (!t)
+            goto invalid_target;
+        player = SkeletonReaction_PlayerSlot(t);
+        if (player < 0) {
+        invalid_target:
+            callback = &group->fallback;
             goto invoke;
-        {
-            u32 index = t->index;
-            player = -1;
-            if (index <= 3)
-                player = index;
         }
-        if (player < 0)
-            goto invoke;
-        cell = gPlayers[player]->cell[3];
+        cell = ((struct SkeletonReactionPlayer *)gUnknown_02000580[player])->cell->index;
     } else {
-        struct ChaseTarget *t = *slot;
-        cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
+        struct SkeletonReactionTarget *t = tracking->target;
+        cell = SkeletonReaction_CellAt(&t->position);
         player = 0;
     }
-    if (cell != actor->terrainCell && !Chase_Bits32(&gPlayers[player]->flags, 0x20000))
+    if (cell != actor->terrainCell &&
+        !SkeletonReaction_Bits32(
+            &((struct SkeletonReactionPlayer *)gUnknown_02000580[player])->flags, 0x20000))
         goto reroute;
-    if (Chase_MotionFlags(actor, 0x400))
-        goto done;
-    ((struct ChaseFlags40 *)(group + 0x40))->bits &= ~4;
-    if (Chase_MotionFlags(actor, 0x80)) {
-        Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
-        Chase_SetBehavior(actor, 12);
+    if (SkeletonReaction_MotionFlags(actor, 0x400))
+        return 0;
+    {
+        u32 bits = 4;
+        group->flags &= ~bits;
+    }
+    if (SkeletonReaction_MotionFlags(actor, 0x80)) {
+        SkeletonReaction_SetControl(actor, group->homeControl, 0x1A);
+        SkeletonReaction_SetBehavior(actor, 12);
     } else {
-        Chase_SetCtl(actor, actor->entryTarget228, 1);
-        Chase_SetBehavior(actor, 5);
-        Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), group + 0x74);
-        (*(struct ContactPosition **)(group + 0x200))->y =
-            Chase_HeightAt(Chase_CellAt(*(struct ContactPosition **)(group + 0x200)),
-                           *(struct ContactPosition **)(group + 0x200));
-        (*(struct ContactPosition **)(group + 0x200))->pad = 0;
+        SkeletonReaction_SetControl(actor, actor->entryTarget228, 1);
+        SkeletonReaction_SetBehavior(actor, 5);
+        SkeletonReaction_SnapToRoute(group->destination, &group->homeRoute);
+        (group->destination)->y = SkeletonReaction_HeightAt(
+            SkeletonReaction_CellAt(group->destination), group->destination);
+        (group->destination)->pad = 0;
     }
     {
         u8 saved = actor->direction;
-        Chase_BeginTurn(obj, saved);
+        SkeletonReaction_BeginTurn(obj, saved, randomSamples);
     }
-    sub_0807E334(actor);
+    sub_0807E334(obj);
     actor->field2C2 = 0x20;
-    goto done;
+    return 0;
 reroute: {
-    struct ContactPosition *targetPointer = &target;
-    s32 x = Mod(cell, *(s16 *)(gTerrainMap->cells + 4));
-    s32 z = Div(cell, *(s16 *)(gTerrainMap->cells + 4));
-    u8 *data;
-    targetPointer->x = (x << 8) + 0x80;
-    data = TerrainModifiers_FindCellOverride(cell, 1);
-    if (data)
-        data += 4;
-    else
-        data = gTerrainMap->cells + (cell * 4 + 12);
-    targetPointer->y = (*data & 15) << 8;
-    targetPointer->z = (z << 8) + 0x80;
-    if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, targetPointer))
-        return 1;
-invoke:
-    Callback_InvokeActor(actor, *(void **)(group + 0x224));
+    SkeletonReaction_CellCenter(cell, &target);
+    if (SkeletonReaction_TryRoute(obj, group->route, &actor->position, &target))
+        goto success;
 }
-done:
+    callback = &group->fallback;
+invoke:
+    Callback_InvokeActor(actor, *callback);
+    return 0;
+success:
+    return 1;
+}
+
+static inline u16 SkeletonReaction_QueryMotionFlags(struct SceneActorRegistryResetView *actor,
+                                                    u16 mask)
+{
+    return actor->flags2D4 & mask;
+}
+static inline void SkeletonReaction_ClearMotionFlags(struct SceneActorRegistryResetView *actor,
+                                                     u32 bits)
+{
+    u32 mask = ~bits;
+    actor->flags2D4 &= mask;
+}
+static inline u8 SkeletonReaction_TrackingFlags(struct SkeletonReactionTracking *tracking, u32 mask)
+{
+    if (tracking->flags & mask)
+        return 1;
     return 0;
 }
 
-void Sound_PlaySong(u32);
-void SceneActorScript_TriggerCallOnCount(struct SceneActorRegistryResetView *);
-
-static inline u8 StartRoar(struct SceneActorRegistryResetView *actor)
+static inline void SkeletonReaction_ClearWordFlags(u32 *flags, u32 bits)
 {
-    u8 *roar = (u8 *)actor + 0x5CA;
-    if (*roar == 0 && (*(u16 *)((u8 *)actor + 0x2E6) & 8)) {
+    u32 mask = ~bits;
+    *flags &= mask;
+}
+
+static inline void SkeletonReaction_HalfwordFlagsSet(u16 *field, u32 bits)
+{
+    u32 value = *field;
+    bits |= value;
+    *field = bits;
+}
+static inline void SkeletonReaction_GroupSetFlags(struct SkeletonReactionGroup *owner, u32 bits)
+{
+    SkeletonReaction_HalfwordFlagsSet((u16 *)&owner->flags, bits);
+}
+
+void SceneActorScript_TriggerCallOnCount(struct SceneActorRegistryActor *);
+
+static inline u8 SkeletonReaction_StartRoar(struct SceneActorRegistryResetView *actor)
+{
+    if (!actor->field5CA && (actor->field2E6 & 8)) {
         actor->field2B8 = 0x2D;
-        *roar = 0x41;
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
+        actor->field5CA = 0x41;
+        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
         return 1;
     }
     return 0;
 }
-static inline void ChasePlayer(struct SceneActorRegistryResetView *actor)
+
+static inline void SkeletonReaction_TrackPlayer(struct SceneActorRegistryResetView *actor)
 {
-    actor->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
+    ((struct SkeletonReactionTracking *)&actor->fieldDC)->target =
+        &((struct SkeletonReactionPlayer *)gUnknown_02000580[0])->target;
 }
 
-// confidence=low: contact flags select chase, roar, or a reaction control.
-u8 Golem_ReactToContact(struct SceneActorRegistryResetView *actor)
+/* Resolve contact flags, animation, and pursuit routing. The normal chase
+ * continuation returns zero even after installing its control. */
+u8 Skeleton_ReactToContact(struct SceneActorRegistryResetView *actor)
 {
-    u8 *body = actor->context;
-    u8 *group = (u8 *)&actor->group;
-    u16 flags;
+    struct SkeletonReactionBody *body = actor->context;
+    struct SkeletonReactionGroup *group = (struct SkeletonReactionGroup *)&actor->group;
 
     if (!(actor->field2D8 & 0x20000)) {
-        if (*(u16 *)((u8 *)actor + 0x2E4) == 0)
+        if (actor->reactionSoundVariant == 0)
             Sound_PlaySong(0x211);
         else
             Sound_PlaySong(0x13E);
     }
-    SceneActorScript_TriggerCallOnCount(actor);
+    SceneActorScript_TriggerCallOnCount((struct SceneActorRegistryActor *)actor);
+    if (!SkeletonReaction_QueryMotionFlags(actor, 0x2000))
+        goto otherContact;
     {
-        u32 mask = 0x2000;
-        flags = actor->flags2D4;
-        if (!(flags & mask))
-            goto otherContact;
-    }
-    {
-        actor->direction = *((u8 *)actor + 0x2B6) + 0x80;
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-        actor->flags2D4 &= ~0x2020;
-        actor->flags2CC |= 0x10;
-        (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-        ChasePlayer(actor);
-        if (!Chase_Arrive(actor)) {
-            if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position,
-                                &((struct ChaseTarget *)actor->fieldDC)->position)) {
-                Callback_InvokeActor(actor, *(void **)(group + 0x224));
+        actor->direction = actor->field2B6 + 0x80;
+        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 0);
+        SkeletonReaction_ClearMotionFlags(actor, 0x2020);
+        SkeletonReaction_SetActorFlags(actor, 0x10);
+        group->destination->pad = 0;
+        SkeletonReaction_TrackPlayer(actor);
+        if (!SkeletonReaction_Arrive(actor)) {
+            if (!SkeletonReaction_TryRoute(
+                    actor, group->route, &actor->position,
+                    &((struct SkeletonReactionTracking *)&actor->fieldDC)->target->position)) {
+                Callback_InvokeActor(actor, group->fallback);
                 return 0;
             }
         }
-        Chase_SetCtl(actor, actor->entryTarget228, 1);
-        Chase_SetBehavior(actor, 7);
+        SkeletonReaction_SetControl(actor, actor->entryTarget228, 1);
+        SkeletonReaction_SetBehavior(actor, 7);
         actor->field2C2 = Div(0x40, 3);
         return 1;
     }
 otherContact:
-    if (flags & 0x8002) {
-        actor->flags2D4 = flags & ~0x20;
+    if (SkeletonReaction_QueryMotionFlags(actor, 0x8002)) {
+        SkeletonReaction_ClearMotionFlags(actor, 0x20);
         return 0;
     }
-    if (*(u32 *)((u8 *)actor + 0x2DC) & 0xC0000) {
-        Chase_SetCtl(actor, actor->reactionTarget230, 0x12);
-        Chase_SetState(actor, 3, 0, 0);
-        actor->flags2D0 &= ~0x1000000;
+    if (actor->field2DC & 0xC0000) {
+        SkeletonReaction_SetControl(actor, actor->reactionTarget230, 0x12);
+        SkeletonReaction_SetState(actor, 3, 0, 0);
+        SkeletonReaction_ClearWordFlags(&actor->flags2D0, 0x1000000);
         return 1;
     }
-    flags &= ~0x20;
-    actor->flags2D4 = flags;
-    if (flags & 0x100)
+    SkeletonReaction_ClearMotionFlags(actor, 0x20);
+    if (SkeletonReaction_QueryMotionFlags(actor, 0x100))
         return 0;
     if (actor->field2B8)
         return 0;
-    if (Chase_Test(actor->flagsEB, 0x10))
+    if (SkeletonReaction_TrackingFlags((struct SkeletonReactionTracking *)&actor->fieldDC, 0x10))
         return 0;
-    if (actor->flags2D4 & 0x80) {
-        if (StartRoar(actor))
+    if (SkeletonReaction_QueryMotionFlags(actor, 0x80)) {
+        if (SkeletonReaction_StartRoar(actor))
             Sound_PlaySong(0x3A7);
-        if (!actor->fieldDC)
+        if (!((struct SkeletonReactionTracking *)&actor->fieldDC)->target)
             return 0;
-        actor->flags2CC |= 0x80;
-        *(u16 *)(group + 0x40) |= 4;
-        ChasePlayer(actor);
-        if (!Chase_Arrive(actor)) {
-            *(u16 *)(body + 0x6F0) = 0;
-            if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position,
-                                &((struct ChaseTarget *)actor->fieldDC)->position)) {
-                Callback_InvokeActor(actor, *(void **)(group + 0x224));
+        SkeletonReaction_SetActorFlags(actor, 0x80);
+        SkeletonReaction_GroupSetFlags(group, 4);
+        SkeletonReaction_TrackPlayer(actor);
+        if (!SkeletonReaction_Arrive(actor)) {
+            body->pursuitTimer = 0;
+            if (!SkeletonReaction_TryRoute(
+                    actor, group->route, &actor->position,
+                    &((struct SkeletonReactionTracking *)&actor->fieldDC)->target->position)) {
+                Callback_InvokeActor(actor, group->fallback);
                 return 0;
             }
         }
-        Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
-        Chase_SetBehavior(actor, 12);
+        SkeletonReaction_SetControl(actor, group->homeControl, 0x1A);
+        SkeletonReaction_SetBehavior(actor, 12);
         actor->field2C2 = 0x20;
         return 1;
     }
-    if (StartRoar(actor))
+    if (SkeletonReaction_StartRoar(actor))
         Sound_PlaySong(0x3A7);
-    if (!actor->fieldDC)
+    if (!((struct SkeletonReactionTracking *)&actor->fieldDC)->target)
         return 0;
-    ChasePlayer(actor);
-    actor->flags2CC |= 0x10;
-    (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-    if (!Chase_Arrive(actor)) {
-        *(u16 *)(body + 0x6F0) = 0;
-        if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position,
-                            &((struct ChaseTarget *)actor->fieldDC)->position)) {
-            Callback_InvokeActor(actor, *(void **)(group + 0x224));
+    SkeletonReaction_TrackPlayer(actor);
+    SkeletonReaction_SetActorFlags(actor, 0x10);
+    group->destination->pad = 0;
+    if (!SkeletonReaction_Arrive(actor)) {
+        body->pursuitTimer = 0;
+        if (!SkeletonReaction_TryRoute(
+                actor, group->route, &actor->position,
+                &((struct SkeletonReactionTracking *)&actor->fieldDC)->target->position)) {
+            Callback_InvokeActor(actor, group->fallback);
             return 0;
         }
     }
-    Chase_SetCtl(actor, actor->entryTarget228, 1);
-    Chase_SetBehavior(actor, 7);
+    SkeletonReaction_SetControl(actor, actor->entryTarget228, 1);
+    SkeletonReaction_SetBehavior(actor, 7);
     actor->field2C2 = 0x20;
     return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Golem_ReactToContact);
-#endif

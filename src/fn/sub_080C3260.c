@@ -129,7 +129,8 @@ void SceneActorReaction_BeginTargetRecovery(void);
 void Skeleton_ResetRouteReaction(void);
 void SceneActorReaction_UpdateGate(void);
 void Skeleton_RestorePursuitRoute(void);
-void Golem_ReactToContact(void);
+struct SceneActorRegistryResetView;
+u8 Skeleton_ReactToContact(struct SceneActorRegistryResetView *);
 void SceneActorReaction_SinkThenDefeat(void);
 void Skeleton_BeginKnockedFlight(void);
 void SceneActorReaction_TickHiddenTimeout(void);
@@ -414,7 +415,7 @@ s32 Skeleton_Init(u8 *arg0)
     SK_AT(u32, 0x61C) = 0;
     SK_AT(void *, 0x23C) = SceneActorReaction_UpdateGate;
     SK_AT(void *, 0x5EC) = Skeleton_RestorePursuitRoute;
-    SK_AT(void *, 0x268) = Golem_ReactToContact;
+    SK_AT(void *, 0x268) = Skeleton_ReactToContact;
     SK_AT(const void *, 0x250) = gUnk_086060FC;
     SK_AT(void *, 0x238) = SceneActorReaction_SinkThenDefeat;
     SK_AT(u16, 0x2E8) = 0;
