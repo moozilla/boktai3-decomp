@@ -155,9 +155,29 @@ static inline void addPositionAt(struct GroupVec *d, struct GroupVec *dst, struc
     dst->z += src->z;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 85.5%
-// fix.py best (sweep after the inlined-insn fix)
+#define GROUP_RANDOM_READ(table, offset, result)                                                   \
+    do {                                                                                           \
+        const u16 *sample = (const u16 *)((offset) + (u32)(table));                                \
+        (result) = *sample;                                                                        \
+    } while (0)
+
+#define GROUP_RANDOM_NEXT(result)                                                                  \
+    do {                                                                                           \
+        u32 offset;                                                                                \
+        const u16 *table;                                                                          \
+        gRandomIndex = (gRandomIndex + 1) & 1023;                                                  \
+        table = gRandomTable;                                                                      \
+        offset = gRandomIndex * 2;                                                                 \
+        GROUP_RANDOM_READ(table, offset, result);                                                  \
+    } while (0)
+
+static inline int BoardPieces_RandomValue(void)
+{
+    int result;
+    GROUP_RANDOM_NEXT(result);
+    return result;
+}
+
 int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct GroupVec origin;
@@ -169,7 +189,7 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     int spread;
     struct GroupPiece *p;
     struct GroupPiece *r;
-    u32 k1 = 16;
+
     origin.x = cmd->originX;
     origin.y = cmd->originY;
     origin.z = cmd->originZ;
@@ -187,23 +207,24 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         void *second = gPaletteBankData + 0x5AA0;
         Palette_InterpolateBanks(m->palette, first, second, 63, 6);
     }
-    p = m->pieces;
-    r = p;
-    for (i = 0; i < k1; i++, p++, r++) {
+    r = m->pieces;
+
+    for (i = 0; i < 16; i++, r++) {
+        p = r;
         p->state = 5;
         p->active = 1;
         p->timer = 0;
         p->direction = direction;
         if (spread != 0)
-            p->direction += Mod((s16)randomValue(), spread);
+            p->direction += Mod(BoardPieces_RandomValue(), spread);
         p->duration = radius0;
         polar(&r->position, p->direction, radius1);
         addPositionAt(&p->position, &r->position, &origin);
         polar(&r->target, p->direction, radius2);
         addPositionAt(&p->target, &r->target, &origin);
-        p->angle = randomValue();
-        p->targetY = (i * k1) + p->position.y;
-        p->speed = (randomValue() & 7) + 7;
+        p->angle = BoardPieces_RandomValue();
+        p->targetY = (i << 4) + p->position.y;
+        p->speed = (BoardPieces_RandomValue() & 7) + 7;
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
         BoardPiece_SetFacingAnim(m, r, 0);
@@ -216,9 +237,6 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     return 0;
 }
 
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0800FC28);
-#endif
 #ifdef NONMATCHING
 // fuzzy: 82.0%
 // fix.py best (sweep after the inlined-insn fix)
