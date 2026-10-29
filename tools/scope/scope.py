@@ -1392,7 +1392,7 @@ def uid_lines(wd):
             continue
         line = 0
         for blk in re.split(r"\n\n", open(path).read()):
-            m = re.search(r'\(note \d+ \d+ \d+ \("[^"]*"\) (\d+)\)', blk)
+            m = re.search(r'\(note(?:/[a-z]+)* \d+ \d+ \d+ \("[^"]*"\) (\d+)\)', blk)
             if m:
                 line = int(m.group(1))
                 continue
