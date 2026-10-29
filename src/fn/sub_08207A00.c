@@ -1,9 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.4%
-// fix.py best version (reprinted C)
-// Remaining difference: reload spill-register rotation after the inline animation step
-// (offset temps for inert/terrainEnabled and the terrain cell use r1/r2/r3 one step early).
 // MATCHING_CONCESSION: register-pinning
 #include "vulcan_cannon_worker.h"
 #include "engine.h"
@@ -19,6 +14,11 @@ void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, s32, s32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
+static inline u8 VulcanCannon_MaskedFlags(u8 value, u32 mask)
+{
+    mask &= value;
+    return mask;
+}
 static inline u32 VulcanCannon_StepAnimation_(struct VulcanCannon *owner)
 {
     struct DisplaySequenceSprite *sprite = &owner->display.sprite;
@@ -27,8 +27,7 @@ static inline u32 VulcanCannon_StepAnimation_(struct VulcanCannon *owner)
     u32 ended;
     u32 duration;
     u32 flags;
-    u32 bit;
-    u32 k1 = 0x30;
+    register u32 bit asm("r3");
     {
         u32 offset = state->index << 1;
         const volatile u16 *table;
@@ -37,46 +36,32 @@ static inline u32 VulcanCannon_StepAnimation_(struct VulcanCannon *owner)
     }
     sprite->frame = (*command) >> 6;
     {
-        u32 input = state->flags;
+        u8 input = state->flags;
         register u32 first asm("r1");
-        u32 maskBit = 1;
-        bit = maskBit;
-        asm("" : "+r"(bit));
+        bit = 1;
         first = bit;
         first &= input;
-        if (first != ((((*command) & k1) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & bit))
             sprite->flags |= 4;
         else
             sprite->flags &= ~4;
     }
     {
-        u32 input = state->flags;
-        u32 bit;
+        u8 input = state->flags;
+        register u32 bit asm("r3");
         register u32 first asm("r1");
         bit = 2;
-        asm("" : "+r"(bit));
         first = bit;
         first &= input;
-        asm("" : "+r"(first));
         first = (u8)first;
-        if (first != ((((*command) & k1) >> 4) & bit))
+        if (first != ((((*command) & 0x30) >> 4) & bit))
             sprite->flags |= 8;
         else
             sprite->flags &= ~8;
     }
     {
-        u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r5");
-        register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
+        u8 savedDuration;
+        if (++state->elapsed >= (savedDuration = duration = state->duration)) {
             state->elapsed = 0;
             flags = state->flags;
             if (flags & 4) {
@@ -95,15 +80,10 @@ static inline u32 VulcanCannon_StepAnimation_(struct VulcanCannon *owner)
                     ended = 0;
                 }
             } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
+                u8 frameCount;
                 u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
+                if (++state->index >= (frameCount = state->frameCount)) {
+                    endFlag = VulcanCannon_MaskedFlags(flags, 8);
                     if (endFlag) {
                         state->elapsed = duration;
                         {
@@ -126,12 +106,13 @@ static inline u32 VulcanCannon_StepAnimation_(struct VulcanCannon *owner)
             }
             state->frameWeight = (*command) & 15;
             {
-                register s32 weight asm("r1") = state->frameWeight;
+                s32 weight = state->frameWeight;
                 s32 speed;
+                s32 delay;
                 speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!((u8)speed))
+                delay = (speed * weight) >> 6;
+                state->duration = delay;
+                if (!((u8)delay))
                     state->duration = 1;
             }
         } else {
@@ -271,6 +252,3 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
     if (p->delayScript)
         VulcanCannon_ReadScriptValueList(p, p->delayScript);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", VulcanCannon_InitializeFromScript);
-#endif
