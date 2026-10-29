@@ -306,7 +306,7 @@ def resolve_knobs(src, func, env):
     for k in ("AGBCC_PRI", "AGBCC_FORCE"):
         if k not in env and os.environ.get(k):
             env[k] = os.environ[k]
-    keys = [k for k in ("AGBCC_PRI", "AGBCC_FORCE") if re.search(r"(^|,)[A-Za-z_]", env.get(k, ""))]
+    keys = [k for k in ("AGBCC_PRI", "AGBCC_FORCE") if re.search(r"(^|,)=?[A-Za-z_]", env.get(k, ""))]
     if not keys:
         return env
     saved = {k: os.environ.pop(k) for k in keys if k in os.environ}
@@ -336,8 +336,10 @@ def compile_draft(src, func, env=None):
     ENV adds knob settings (CSE_NOCANON=N, AGBCC_FORCE=..., see tools/scope/build_agbcc.sh).
     The dumps, uids and DWARF lines come from a -g compile. Without knobs the bytes are the real
     build's (no -g): where -g changes the code, those win and info["g_differs"] is set."""
-    mine, a, info = compile_draft_g(src, func, env)
+    # Resolve C names before the diagnostic compile. Resolving afterwards
+    # recompiles the baseline and overwrites the knobbed RTL and traces.
     env = resolve_knobs(src, func, env)
+    mine, a, info = compile_draft_g(src, func, env)
     if needs_g(env):  # a knob naming insn uids: the -g compile is the only one it means anything in
         if g_sensitive(src, func):
             info["g_only"] = True
@@ -419,7 +421,10 @@ def compile_draft_g(src, func, env=None):
         os.remove(names)
     # -Wuninitialized changes no code (150 units compared); a draft reading a variable it never set
     # compiles to plausible bytes, so say so
-    r = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "-dp", "-da", "-Wuninitialized", "u.i", "-o", "u.s"],
+    # Use assembler label differences for DWARF lengths. The legacy size
+    # estimator undercounts some large inline line programs (dwarf2out.c:
+    # size_of_line_info); its truncated unit then breaks the line reader.
+    r = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "-ffix-debug-line", "-dp", "-da", "-Wuninitialized", "u.i", "-o", "u.s"],
                        cwd=wd, capture_output=True, text=True,
                        env=dict(os.environ, AGBCC_DUMPPRI=names, **(env or {})))
     open(os.path.join(wd, "stderr.txt"), "w").write(r.stderr)
@@ -431,8 +436,14 @@ def compile_draft_g(src, func, env=None):
     if uninit and func not in _UNINIT_WARNED:
         _UNINIT_WARNED.add(func)
         print("note: agbcc: " + ", ".join(f"`{v}' (line {ln})" for ln, v in uninit) + f" might be used"
-              f" uninitialized in {func}: the bytes read whatever the register held; give it its value",
+              f" uninitialized in {func}; inspect its definition and uses",
               file=sys.stderr)
+        for _, v in uninit:
+            if re.search(r"\b" + re.escape(v) + r'\s+asm\s*\(\s*"r7"\s*\)', pre):
+                print(f"  `{v}' is bound to r7, Thumb's eliminable frame pointer: reload can replace"
+                      " this binding with sp + an offset even when C initialized it. Remove the r7"
+                      " binding before diagnosing this warning (agbcc gcc/thumb.h:581-600).",
+                      file=sys.stderr)
     if r.returncode or "error" in r.stderr:
         errs = [ln.replace(ROOT + os.sep, "") for ln in r.stderr.splitlines() if ln.strip()]
         # the errors first: other functions' warnings would push them past the shown lines
@@ -2325,7 +2336,7 @@ def has_knobs(env):
 # means another insn (or none) in the build's own compile (no -g): only these force a -g compile.
 # The others name pseudos (AGBCC_PRI, AGBCC_FORCE, CSE_NOCANON, CSE_KEEP) or count events
 # (AGBCC_SPILL, AGBCC_NOPRE, CSE_NOFOLLOW) and are compiled as the build compiles.
-UID_KNOBS = ("AGBCC_NOGIV", "AGBCC_GIV", "AGBCC_NOMOVE", "AGBCC_NOTIE", "CSE_WHY", "CSE_NOFOLLOW_JUMP")
+UID_KNOBS = ("AGBCC_CROSS_LIMIT", "AGBCC_NOCROSS", "AGBCC_NOGIV", "AGBCC_GIV", "AGBCC_NOMOVE", "AGBCC_NOTIE", "CSE_WHY", "CSE_NOFOLLOW_JUMP")
 
 
 def needs_g(env):
@@ -5318,7 +5329,7 @@ def validate_cli(args):
     elif rest and rest[0] == "pins":
         if len([a for a in rest if a != "--all"]) > 2:
             cli_error("FILE.c pins [FUNC] [--all]")
-    elif any(a in rest for a in ("probe", "shape", "frame", "hoist", "spill", "pre")):
+    elif any(a in rest for a in ("probe", "shape", "frame", "hoist", "giv", "spill", "pre", "calls")):
         if len(rest) > 2:
             cli_error("FILE.c COMMAND [FUNC]")
     elif len(rest) > 1:

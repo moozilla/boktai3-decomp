@@ -101,10 +101,22 @@ def find_def(text, name):
 
 
 def splice(text, names, new_def):
-    for n in names:
+    aliases = [alias for alias, target in
+               re.findall(r"^\s*#define\s+(\w+)\s+(\w+)\s*$", text, re.M)
+               if target in names]
+    for n in [*names, *aliases]:
         span = find_def(text, n)
         if span:
             return text[:span[0]] + new_def.rstrip() + "\n" + text[span[1]:]
+        # cpp expands a file-local friendly-name alias in the AST. Preserve
+        # the source spelling when putting that AST back into the source unit.
+        aliases = re.findall(r"^#define[ \t]+(\w+)[ \t]+" + re.escape(n)
+                             + r"[ \t]*(?://[^\n]*)?$", text, re.M)
+        for alias in aliases:
+            span = find_def(text, alias)
+            if span:
+                renamed = re.sub(r"\b" + re.escape(n) + r"(?=\s*\()", alias, new_def, count=1)
+                return text[:span[0]] + renamed.rstrip() + "\n" + text[span[1]:]
     return None
 
 
@@ -160,14 +172,18 @@ def skeleton_diff(rom_ev, mine_ev):
     out = []
     a, b = collections.Counter(rom_ev), collections.Counter(mine_ev)
     miss, extra = a - b, b - a
-    dist = sum(miss.values()) + sum(extra.values())
+    # Instruction inventories are observations, not semantic invariants: spills,
+    # pointer views and tail sharing change their widths, offsets and counts.
+    # Only calls gate search; shape/diff already measure the other differences.
+    dist = sum(n for e, n in miss.items() if e[0] == "call")
+    dist += sum(n for e, n in extra.items() if e[0] == "call")
     for e, n in sorted(miss.items(), key=str):
         out.append(f"ROM has, draft lacks: {ev_text(e)}" + (f" x{n}" if n > 1 else ""))
     for e, n in sorted(extra.items(), key=str):
         out.append(f"draft has, ROM lacks: {ev_text(e)}" + (f" x{n}" if n > 1 else ""))
     ca_ = [e[1] for e in rom_ev if e[0] == "call"]
     cb = [e[1] for e in mine_ev if e[0] == "call"]
-    if not miss and not extra and ca_ != cb:
+    if ca_ != cb and collections.Counter(ca_) == collections.Counter(cb):
         dist += 1
         out.append("calls in another order: ROM " + ", ".join(ca_[:12]) + " / draft " + ", ".join(cb[:12]))
     return dist, out
@@ -313,12 +329,20 @@ class Target:
     def __init__(self, src, func=None):
         self.src = os.path.relpath(os.path.abspath(src), ROOT)
         text = open(os.path.join(ROOT, self.src)).read()
+        if func and not find_def(text, func):
+            aliases = re.findall(r"^#define[ \t]+(\w+)[ \t]+" + re.escape(func)
+                                 + r"[ \t]*(?://[^\n]*)?$", text, re.M)
+            func = next((n for n in aliases if find_def(text, n)), func)
         if func and not find_def(text, func):  # a ROM name whose draft has a C name: its block's definition
             for b in scope.nonmatching_blocks(text):
                 if func in b["names"]:
                     body = text[b["body"]:b["else"][0]]
-                    defs = [n for n in b["names"] if n != func and find_def(body, n)]
-                    func = defs[-1] if defs else func
+                    aliases = re.findall(r"^#define[ \t]+(\w+)[ \t]+" + re.escape(func)
+                                         + r"[ \t]*(?://[^\n]*)?$", body, re.M)
+                    defs = [(find_def(body, n), n) for n in b["names"] if n != func]
+                    defs = sorted((span[0], n) for span, n in defs if span)
+                    func = next((n for n in aliases if find_def(body, n)),
+                                defs[-1][1] if defs else func)
         self.func = func or scope.nonmatching_func(self.src)
         if not self.func:
             raise SystemExit(f"{src}: no NONMATCHING function found; name it")
@@ -559,7 +583,13 @@ class Session:
         """The node's whole source file."""
         text = self.blob(node["file"])
         for name, h in sorted((node.get("defs") or {}).items()):
-            out = splice(text, [name], self.blob(h))
+            aliases = re.findall(r"^#define[ \t]+(\w+)[ \t]+" + re.escape(name)
+                                 + r"[ \t]*(?://[^\n]*)?$", text, re.M)
+            source_name = next((n for n in [name] + aliases if find_def(text, n)), name)
+            definition = self.blob(h)
+            if source_name != name:
+                definition = re.sub(r"\b" + re.escape(name) + r"\b", source_name, definition)
+            out = splice(text, [source_name], definition)
             if out is None:
                 raise SystemExit(f"n{node['id']}: cannot find {name}'s definition in its base file")
             text = out
@@ -571,6 +601,8 @@ class Session:
         os.makedirs(d, exist_ok=True)
         p = os.path.join(d, f"n{node['id']}.c")
         t = self.text(node)
+        t = re.sub(r"^// scope: write \w+ here\n", "", t, flags=re.M)
+        t = f"// scope: write {self.func} here\n" + t
         if not os.path.exists(p) or open(p).read() != t:
             open(p, "w").write(t)
         return os.path.relpath(p, ROOT)

@@ -114,6 +114,25 @@ def following(fn, stmt):
     return out
 
 
+def straight_line_reads(fn, stmt, want):
+    """Reads before a write, call or control-flow boundary can invalidate a snapshot.
+
+    In particular a for condition is not a read of the value entering the loop:
+    the backedge can change it even when the condition precedes the step in AST order.
+    """
+    out = []
+    for st in following(fn, stmt):
+        if any(isinstance(n, (ca.For, ca.While, ca.DoWhile, ca.If, ca.Switch,
+                              ca.Compound, ca.Label, ca.Goto, ca.FuncCall)) for n, _, _ in walk(st)):
+            break
+        if any(isinstance(n, ca.Assignment) and text(n.lvalue) == want
+               or isinstance(n, ca.UnaryOp) and n.op in ("++", "--", "p++", "p--", "&")
+               and text(n.expr) == want for n, _, _ in walk(st)):
+            break
+        out.extend(reads_of(st, want))
+    return out
+
+
 # --- rewrites ------------------------------------------------------------------------
 
 def rw_reuse_stored(fn):
@@ -122,7 +141,7 @@ def rw_reuse_stored(fn):
     for k in range(n_sites):
         node, _, _ = nth(fn, is_stmt_assign, k)
         lv = text(node.lvalue)
-        later = [r for st in following(fn, node) for r in reads_of(st, lv)]
+        later = straight_line_reads(fn, node, lv)
         if not later:
             continue
         for take in ("first", "all"):
@@ -131,7 +150,7 @@ def rw_reuse_stored(fn):
             t = new_name(f2)
             add_local(f2, typeof_decl(t, a.lvalue))
             a.rvalue = ca.Assignment("=", ca.ID(t), a.rvalue)
-            reads = [r for st in following(f2, a) for r in reads_of(st, lv)]
+            reads = straight_line_reads(f2, a, lv)
             for r in reads[:1] if take == "first" else reads:
                 set_child(r[1], r[2], ca.ID(t))
             yield f"reuse {lv} via {t} ({take})", f2
@@ -328,11 +347,38 @@ def rw_commute(fn):
 
 def rw_swap_stmts(fn):
     """Swap two adjacent statements (scheduling / evaluation order)."""
+    def effects(stmt):
+        # Only straight-line assignments with pure operands can commute here.
+        # Calls and control flow may observe/change any memory, and identifiers
+        # used to form an address still depend on earlier scalar assignments.
+        if not isinstance(stmt, ca.Assignment) or stmt.op != "=":
+            return None
+        nodes = list(walk(stmt))
+        if any(isinstance(n, (ca.FuncCall, ca.Assignment)) and n is not stmt
+               or isinstance(n, ca.UnaryOp) and n.op in ("p++", "p--", "++", "--")
+               for n, _, _ in nodes):
+            return None
+        target = stmt.lvalue
+        writes = {target.name} if isinstance(target, ca.ID) else set()
+        reads = {n.name for n, p, s in nodes if isinstance(n, ca.ID)
+                 and not (p is stmt and s == "lvalue")
+                 and not (isinstance(p, ca.StructRef) and s == "field")}
+        memory = any(isinstance(n, (ca.StructRef, ca.ArrayRef))
+                     or isinstance(n, ca.UnaryOp) and n.op == "*" for n, _, _ in nodes)
+        return reads, writes, not isinstance(target, ca.ID), memory
+
     bl = blocks(fn)
     for bi, b in enumerate(bl):
         for i in range(len(b.block_items) - 1):
             x, y = b.block_items[i], b.block_items[i + 1]
             if isinstance(x, (ca.Decl, ca.Label, ca.Return)) or isinstance(y, (ca.Decl, ca.Label)):
+                continue
+            ex, ey = effects(x), effects(y)
+            if ex is None or ey is None:
+                continue
+            rx, wx, mx, ax = ex
+            ry, wy, my, ay = ey
+            if wx & (ry | wy) or wy & (rx | wx) or mx and ay or my and ax:
                 continue
             f2 = copy.deepcopy(fn)
             b2 = blocks(f2)[bi]

@@ -1566,3 +1566,108 @@
  	    {
  	      if (loop_dump_stream)
  		fprintf (loop_dump_stream,
+--- a/jump.c
++++ b/jump.c
+@@ -126,6 +126,7 @@
+    case.  */
+ 
+ static int cross_jump_death_matters = 0;
++static unsigned short agbcc_cross_shared[40000];
+ 
+ static int init_label_info		(rtx);
+ static void delete_barrier_successors	(rtx);
+@@ -186,6 +187,8 @@
+   rtx last_insn;
+ 
+   cross_jump_death_matters = (cross_jump == 2);
++  if (cross_jump)
++    memset (agbcc_cross_shared, 0, sizeof agbcc_cross_shared);
+ /* CYGNUS LOCAL -- branch prediction */
+   /* Do any branch prediction reorganization if desired on the last pass
+      (branch prediction needs combine to be run).  We do it now, so that
+@@ -2692,13 +2695,52 @@
+   register rtx i1 = e1, i2 = e2;
+   register rtx p1, p2;
+   int lose = 0;
++  int cross_limit = -1, cross_matched = 0;
+ 
+   rtx last1 = 0, last2 = 0;
+   rtx afterlast1 = 0, afterlast2 = 0;
+ 
+   *f1 = 0;
+   *f2 = 0;
++  {
++    const char *limit = getenv ("AGBCC_CROSS_LIMIT");
++    while (limit && *limit)
++      {
++        int uid, count, used = 0;
++        if (sscanf (limit, "%d:%d%n", &uid, &count, &used) < 2 || ! used)
++          break;
++        if (uid == INSN_UID (e1))
++          cross_limit = count;
++        limit += used;
++        if (*limit == ',')
++          limit++;
++      }
++  }
+ 
++  if (cross_limit >= 0)
++    {
++      if (INSN_UID (e1) < 40000)
++        cross_limit -= agbcc_cross_shared[INSN_UID (e1)];
++      if (cross_limit <= 0)
++        return;
++    }
++
++  /* Diagnostic: keep selected late tail merges separate.  The numbers
++     name the source jump's insn uid (as in the RTL dumps).  */
++  {
++    const char *skip = getenv ("AGBCC_NOCROSS");
++    while (skip && *skip)
++      {
++        char *end;
++        long uid = strtol (skip, &end, 10);
++        if (end == skip)
++          break;
++        if (uid == INSN_UID (e1))
++          return;
++        skip = *end == ',' ? end + 1 : end;
++      }
++  }
++
+   while (1)
+     {
+       i1 = prev_nonnote_insn (i1);
+@@ -2825,11 +2867,19 @@
+ 	  /* Ok, this insn is potentially includable in a cross-jump here.  */
+ 	  afterlast1 = last1, afterlast2 = last2;
+ 	  last1 = i1, last2 = i2, --minimum;
++          if (cross_limit >= 0 && ++cross_matched >= cross_limit)
++            break;
+ 	}
+     }
+ 
+   if (minimum <= 0 && last1 != 0 && last1 != e1)
+-    *f1 = last1, *f2 = last2;
++    {
++      if (getenv ("AGBCC_CROSS_TRACE"))
++        fprintf (stderr, "CROSS jump %d target %d: share %d with %d\n",
++                 INSN_UID (e1), INSN_UID (e2),
++                 INSN_UID (last1), INSN_UID (last2));
++      *f1 = last1, *f2 = last2;
++    }
+ }
+ 
+ static void
+@@ -2868,6 +2918,11 @@
+   while (newjpos != insn)
+     {
+       rtx lnote;
++      if (INSN_UID (insn) < 40000
++          && (GET_CODE (newjpos) == INSN || GET_CODE (newjpos) == CALL_INSN)
++          && GET_CODE (PATTERN (newjpos)) != USE
++          && GET_CODE (PATTERN (newjpos)) != CLOBBER)
++        agbcc_cross_shared[INSN_UID (insn)]++;
+ 
+       for (lnote = REG_NOTES (newlpos); lnote; lnote = XEXP (lnote, 1))
+ 	if ((REG_NOTE_KIND (lnote) == REG_EQUAL

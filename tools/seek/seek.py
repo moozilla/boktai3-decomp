@@ -23,6 +23,8 @@
   seek.py land N                      a MATCH node: hand it to `campaign.py land` (unwraps NONMATCHING)
 
 SEEK_JOBS=4 compiles expansions in four processes (each with its own agbcc fork server).
+SEEK_FAST_ADD=1 skips spill-rotation probes and ROM register voting when adding files;
+use values or scope on a selected node for detailed allocation diagnostics afterward.
 
 Options: -f FUNC picks the session (default: the last one opened in this tree).
 Sessions are shared across worktrees ($SEEK_HOME, default: the main checkout's build/seek).
@@ -51,7 +53,8 @@ from perm_pycparser import c_ast as ca  # noqa: E402
 from src import ast_util  # noqa: E402
 
 CURRENT = os.path.join(E.LOCAL, "current")
-SEM_FAMILIES = {"width", "cast", "explicit_narrow", "cse_temp", "inline_var", "reuse_stored", "related_const"}
+SEM_FAMILIES = {"width", "cast", "explicit_narrow", "cse_temp", "inline_var", "reuse_stored", "related_const",
+                "swap_stmts"}
 AGBCC_SRC = os.path.join(ROOT, "build", "scope", "agbcc", "gcc")
 
 
@@ -142,6 +145,12 @@ class Work:
             func = open(alias).read().strip()
         self.sess = E.Session(func)
         self.sess.fold_updates()
+        for node in sorted(self.sess.nodes.values(), key=lambda n: n["id"]):
+            parent = self.sess.nodes.get(node.get("parent"), {})
+            needs_check = node.get("family") in SEM_FAMILIES or node.get("move", "").startswith("[sem]")
+            node["_unverified"] = bool(node.get("kind") == "move" and not node.get("match") and
+                                       (parent.get("_unverified") or
+                                        (needs_check and not node.get("sem", "").startswith("EQUIV"))))
         meta = os.path.join(self.sess.dir, "meta.txt")
         if self.target is None:
             if not os.path.exists(meta):
@@ -174,7 +183,7 @@ class Work:
         return self.sess.nodes[n]
 
     def best(self, k=1):
-        nodes = [n for n in self.sess.nodes.values() if n.get("ok")]
+        nodes = [n for n in self.sess.nodes.values() if n.get("ok") and not n.get("_unverified")]
         nodes.sort(key=lambda n: (rank(n), n["id"]))
         if not nodes:
             sys.exit("no evaluated node")
@@ -263,7 +272,8 @@ class Work:
         code, err, alloc = self.target.compile_pre(pre, trace=True)
         nrel = alloc.pop("__reloads__", 0)
         ev = self.target.evaluate(code)
-        if code and not ev.get("match") and ev["key"][2] <= 12:
+        fast_add = os.environ.get("SEEK_FAST_ADD") == "1"
+        if code and not fast_add and not ev.get("match") and ev["key"][2] <= 12:
             ev["rot"] = self.target.rotation(pre, nrel) or [ev["key"][2], -1, 99]
         out = sha(code) if code else None
         rec = dict(parent=parent["id"] if parent else None, kind="file", who=who, file=fh, defs={},
@@ -273,7 +283,7 @@ class Work:
         else:
             rec["sem"] = self.target.semantic(code, pre)
             rec["alloc"] = {k: v[0] for k, v in alloc.items()}
-            if not ev.get("match"):
+            if not fast_add and not ev.get("match"):
                 rec["want"] = self.target.wanted(os.path.relpath(tmp, ROOT))
                 rec["awrong"] = len(E.alloc_wrong(rec["alloc"], rec["want"]))
             if parent and parent.get("alloc"):
@@ -289,7 +299,7 @@ class Work:
         return rec
 
     # -- expanding
-    def expand(self, node, families=None, lines=None, quiet=False, budget=None, sem=True):
+    def expand(self, node, families=None, lines=None, quiet=False, budget=None, sem=True, deadline=None):
         """Every move at NODE: compile, evaluate, add the distinct outputs as children. Returns
         (children, stats)."""
         pre, defs = self.pre_of(node)
@@ -320,7 +330,9 @@ class Work:
             seen_src.add(sha(R.text(fn)))
         for dname, fn in defs.items():
             for fam, desc, f2 in M.all_moves(fn, families):
-                if budget is not None and len(tasks) >= budget:
+                if (budget is not None and len(tasks) >= budget) or (deadline is not None and time.time() >= deadline):
+                    break
+                if deadline is not None and time.time() >= deadline:
                     break
                 line = changed_line(fn, f2)
                 if lines and line not in lineset:
@@ -360,6 +372,10 @@ class Work:
             if sem and (desc.startswith("[sem]") or fam in SEM_FAMILIES) and rank(dict(ev, ok=True)) <= rank(node):
                 code, _ = self.target.compile_pre(vpre)
                 rec["sem"] = self.target.semantic(code, vpre)
+            rec["_unverified"] = bool(not rec.get("match") and
+                                      (node.get("_unverified") or
+                                       ((desc.startswith("[sem]") or fam in SEM_FAMILIES) and
+                                        not rec.get("sem", "").startswith("EQUIV"))))
             rec = self.sess.add(rec)
             if rank(rec) < rank(node):
                 fs[2] += 1
@@ -400,7 +416,7 @@ class Work:
             if nid in done:
                 # already expanded: its children are on the tree; queue them instead
                 for c in self.sess.nodes.values():
-                    if c.get("parent") == nid and c.get("ok") and c["id"] not in done:
+                    if c.get("parent") == nid and c.get("ok") and not c.get("_unverified") and c["id"] not in done:
                         heapq.heappush(heap, (rank(c), c.get("awrong", 0), c.get("depth", 0), tick, c["id"]))
                         tick += 1
                 continue
@@ -408,13 +424,14 @@ class Work:
             node = self.sess.nodes[nid]
             try:
                 kids, st = self.expand(node, families, lines, quiet=True,
-                                       budget=None)
+                                       budget=budget - (self.target.compiles - start_compiles),
+                                       deadline=t0 + seconds)
             except SystemExit as e:
                 print(f"  n{nid}: {e}")
                 continue
             rounds += 1
             for c in kids:
-                if c.get("sem", "").startswith("DIFFERENT"):
+                if c.get("_unverified") or c.get("sem", "").startswith("DIFFERENT"):
                     continue
                 ck, bk = rank(c), rank(best)
                 # better, a lateral step on the plateau, or a bounded step back (moves that pay off only
@@ -485,19 +502,25 @@ def rank(n):
     Objective "rotation": among nodes whose code is right up to reload's spill rotation, the one
     needing the smallest shift first (a C change that adds or removes one reload choice before the
     differing one moves the shift by one: a gradient where the insn count shows none).
-    Objective "block": the cost inside one ROM block first, the rest of the function second."""
+    Objective "block": the cost inside one ROM block first, the rest of the function second.
+    Objective "code": shape and differing insns first, for cases where the skeleton's frame or
+    literal-load counts reflect optimization choices rather than a semantic error."""
     if not n.get("ok"):
         return (9999, 9999, 9999, 9999)
     k = key_of(n)
     cost = k[1] + k[2]
     if n.get("match"):
         return (0, 0, 0, 0)
+    if n.get("_unverified"):
+        return (9998, cost, k[1], k[2])
     mode = OBJECTIVE["mode"]
     if mode == "rotation" and n.get("rot"):
         r = n["rot"]  # [diff after the best single shift, K, D]
         return (k[0], r[0], r[2] if r[0] == 0 else 99, cost)
     if mode == "block" and n.get("blk") is not None:
-        return (k[0], n["blk"], cost, k[1])
+        return (n["blk"], cost, k[1], k[0])
+    if mode == "code":
+        return (cost, k[1], k[2], k[0])
     return (k[0], cost, k[1], k[2])
 
 
@@ -522,6 +545,8 @@ def fmt_node(n, parent=None):
     sem = n.get("sem")
     semtxt = "" if not sem or sem == "unchecked" else ("  [sem ok]" if sem.startswith("EQUIV") else
                                                        "  [sem: " + sem.split(":")[0] + "]")
+    if n.get("_unverified"):
+        semtxt += "  [unchecked move: review before expanding]"
     al = ""
     if OBJECTIVE["mode"] == "block" and n.get("blk") is not None:
         al += f"  [block {n['blk']}]"
@@ -614,7 +639,7 @@ def cmd_open(a):
 
 def show_layers(w, node):
     if node.get("skeleton"):
-        print("  determined facts not met (fix these first; no reordering will):")
+        print("  structural observations (calls gate search; other differences can be code generation):")
         for ln in node["skeleton"][:10]:
             print("    " + ln)
     if node.get("regions"):
@@ -629,7 +654,12 @@ def cmd_add(a):
     w = Work(a.f)
     parent = w.node(a.parent) if a.parent else w.best()
     if len(a.file) > 1:  # several spellings of one hypothesis: score them all, best first, no expansion
-        recs = [w.add_file(f, parent, a.m) for f in a.file]
+        recs = []
+        for f in a.file:
+            rec = w.add_file(f, parent, a.m)
+            recs.append(rec)
+            print(fmt_node(rec, parent), flush=True)
+        print("best first:")
         for r in sorted(recs, key=lambda r: (rank(r), r["id"])):
             print(fmt_node(r, parent) + (f"  (same code as n{r['same_as']})" if r.get("same_as") else ""))
         return
@@ -770,6 +800,13 @@ def cmd_facts(a):
     frame = [" ".join(e[1:]) for e in ev if e[0] == "frame"]
     loops = sum(1 for r in t.rom_rows if r[4] is not None and r[4] < r[0] and r[2].startswith("b"))
     print(f"{w.func} (ROM {t.size} B): the determined part")
+    later_entries = [r[0] for i, r in enumerate(t.rom_rows) if i and
+                     r[2].startswith("push ") and "lr" in r[2] and
+                     any(p[2].startswith("bx ") for p in t.rom_rows[max(0, i - 6):i])]
+    if later_entries:
+        print("  check ROM extent: possible additional routine entries after a return: "
+              + ", ".join(f"+0x{x:X} ({t.addr + x:08X})" for x in later_entries))
+        print("    Missing calls/accesses may belong to an undrafted suffix; inspect ROM before searching.")
     print(f"  frame: {'; '.join(frame) or 'leaf, no frame'}")
     print(f"  calls in order ({len(calls)}): " + (", ".join(calls) or "none"))
     names = {}
@@ -1022,8 +1059,9 @@ def main():
     p.add_argument("--slack", type=int, help="explore children up to this much worse (shape+diff) than the "
                    "best (default max(4, diff/8))")
     p.add_argument("--depth", type=int, default=6, help="moves stacked on a node at most")
-    p.add_argument("--objective", choices=["rotation", "block"], help="rotation: rank by the reload spill "
-                   "shift still needed (AGBCC_SPILL=K:D); block: by one ROM block's cost (--block)")
+    p.add_argument("--objective", choices=["rotation", "block", "code"], help="rotation: rank by the reload spill "
+                   "shift still needed (AGBCC_SPILL=K:D); block: by one ROM block's cost (--block); "
+                   "code: shape and differing insns before optimization-dependent skeleton hints")
     p.add_argument("--rot-max", type=int, help="rotation: test shifts on children with at most this diff")
     p.add_argument("--block", type=int, help="work on one ROM block (its number in the block map): moves only on "
                    "the C lines that produce it, ranked by its own cost first")
