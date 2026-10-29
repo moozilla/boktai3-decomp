@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "terrain_cell_probe.h"
 
 void SceneActors_RunFirstEventScript(void *, void *);
 void SceneActors_RunSecondEventScript(void *, void *);
@@ -14,71 +15,179 @@ void sub_08022878(void *);
 void GameState_SetEventFlag(s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
-static inline s32 sub_08027214_CellIndex(s32 x, s32 y)
-{
-    if (x < 0 || y < 0 || (u32)x >= gTerrainWidth || (u32)y >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[y] + x;
-}
+struct __attribute__((packed)) DeathState {
+    u8 value;
+};
+
+struct DeathVector {
+    s16 x, y, z, pad;
+};
+
+struct DeathActor {
+    u8 pad0[0x51];
+    u8 angle;
+    u8 pad52[0x2];
+    struct Pos16 position;
+    struct DeathVector velocity;
+    u8 pad64[0x38];
+    u32 flags;
+    u8 padA0[0x2];
+    struct DeathState state;
+    u8 frame;
+    u32 elapsed;
+    u8 facing4;
+    u8 facing8;
+    u8 padAA[0x7];
+    u8 entered;
+    u8 padB2[0x16e];
+    u8 overlay[0x20];
+    u8 body[0xc];
+    u16 animationFrame;
+    u8 pad24E[0x6];
+    u16 animationState;
+    u8 pad256[0x7];
+    u8 animationFlags;
+    u8 pad25E[0x2];
+    u8 scriptContext[0xcc];
+    struct DeathVector origin;
+    u8 pad334[0xe];
+    u8 heading;
+    u8 variant;
+    u8 pad344[0x2];
+    u16 minimumScale;
+    u16 maximumScale;
+    u8 pad34A[0x8];
+    s16 floorHeight;
+    u8 pad354[0x4];
+    u32 entryMode;
+    u8 pad35C[0x29];
+    u8 retreatTimer;
+    u8 pad386[0x6];
+    u8 indicatorState;
+    u8 pad38D[0x1];
+    u8 indicatorMode;
+    u8 indicatorStep;
+    u32 resource;
+    u8 pad394[0x7];
+    u8 delay;
+    u8 pad39C[0x10];
+    u32 mode;
+};
 
 static inline s32 sub_08027214_Scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 51.0%
-// scope shape 145 (differences once low registers are set aside)
-// confidence=low: per-frame actor update; runs the state-switch on the byte at 0xA2 (with
-// the arrival flag at 0xB1 and the 0x385 countdown) and bumps the 0xA4 phase counter.
-void sub_08027214(u8 *p, s32 tick)
+static inline u32 Death_GetTerrainHeight(struct Pos16 *position)
 {
-    u8 *pos;
-    u8 *data;
-    s32 x;
-    s32 y;
-    s32 cell;
-    s32 d;
-    s32 kind;
+    u8 *data = cellProps(cellIndexAt(position));
+    u32 kind = *data >> 4;
+    u32 height = (*data & 15) << 8;
+    switch (kind) {
+        case 1:
+            height -= (u8)position->z;
+            break;
+        case 2:
+            height -= (u8)position->x;
+            break;
+    }
+    return height;
+}
 
-    if (p[0xB1]) {
-        p[0xB1] = 0;
-        SceneActors_RunFirstEventScript(p, p + 0x260);
-        if (*(u32 *)(p + 0x358) == 1) {
-            p[0x51] = p[0x342] + 0x80;
-            p[0xA8] = ((p[0x51] + 0x60) >> 6) & 3;
-            p[0xA9] = ((p[0x51] + 0x70) >> 5) & 7;
-            SceneActors_StartDirectionalAnimation(p, p + 0x240, p + 0x220,
-                                                  (*(u32 *)(p + 0x3AC) & 1) ? 0xB : 0x31, 2, 1, 4);
-            p[0xA2] = 7;
-            *(u32 *)(p + 0xA4) = 0;
+static inline s32 Death_CellBlocks(struct Pos16 *position)
+{
+    u8 *data = cellProps(cellIndexAt(position));
+    u16 flags = *(u16 *)(data + 2);
+    flags &= 1;
+    return flags;
+}
+
+static inline void Death_SetVelocity(s16 *vector, s32 angle, s32 speed)
+{
+    {
+        s32 x = sub_08027214_Scale(gUnk_086149C4[(angle + 0x40) & 0xff] * speed);
+        s32 y = 0;
+        vector[0] = x;
+        vector[1] = y;
+    }
+    vector[2] = sub_08027214_Scale(gUnk_086149C4[angle & 0xff] * speed);
+}
+
+static inline u32 Death_GetMode(struct DeathActor *actor)
+{
+    return actor->mode;
+}
+
+static inline void Death_SetState(struct DeathState *out, struct DeathState state)
+{
+    *out = state;
+}
+
+void sub_08027214(struct DeathActor *base, s32 tick)
+{
+    struct DeathActor *p = base;
+    u8 *pos;
+
+    if (base->entered) {
+        u32 zero = 0;
+        base->entered = zero;
+        SceneActors_RunFirstEventScript(base, (u8 *)base + 0x260);
+        if (base->entryMode == 1) {
+            s32 angle = base->heading + 0x80;
+            struct DeathState state;
+            s32 sequence;
+            base->angle = angle;
+            {
+                s32 direction = (base->angle + 0x60) >> 6;
+                u32 mask = 3;
+                mask &= direction;
+                base->facing4 = mask;
+            }
+            {
+                s32 direction = (base->angle + 0x70) >> 5;
+                state.value = 7;
+                direction = (u8)direction & state.value;
+                base->facing8 = direction;
+            }
+            sequence = (base->mode & 1) ? 0xB : 0x31;
+            SceneActors_StartDirectionalAnimation(base, (u8 *)base + 0x240, (u8 *)base + 0x220,
+                                                  sequence, 2, 1, 4);
+            Death_SetState(&base->state, state);
+            base->elapsed = zero;
             Sound_PlaySongChecked(0x359);
         } else {
-            u32 flash = *(u32 *)(p + 0x3AC) & 1;
-            SceneActors_StartUnmirroredAnimation(p, p + 0x240, p + 0x220, flash ? 0x20 : 0x46, 1,
-                                                 0);
-            *(u16 *)(p + 0x346) = 0;
-            *(u16 *)(p + 0x348) = 0;
-            p[0x343] = 0;
-            if (*(u32 *)(p + 0x3AC) & 1) {
-                p[0xA2] = 1;
-                *(u32 *)(p + 0xA4) = 0;
+            u32 flash = Death_GetMode(base) & 1;
+            s32 sequence = flash ? 0x20 : 0x46;
+            SceneActors_StartUnmirroredAnimation(base, (u8 *)base + 0x240, (u8 *)base + 0x220,
+                                                 sequence, 1, zero);
+            base->minimumScale = zero;
+            base->maximumScale = zero;
+            base->variant = 0;
+            if (base->mode & 1) {
+                base->state.value = 1;
+                base->elapsed = zero;
                 Sound_PlaySongChecked(0x1C5);
             } else {
-                p[0xA2] = 0;
-                *(u32 *)(p + 0xA4) = 0;
+                base->state.value = zero;
+                base->elapsed = zero;
                 Sound_PlaySongChecked(0x359);
             }
         }
-        *(u32 *)(p + 0x390) = SceneActorGraphics_GetResourceId(p);
-        p[0x38E] = 2;
-        p[0x38F] = 1;
-        if (p[0x38E] == 2) {
-            p[0x38C] = 2;
-        } else if (p[0x38E] == 1) {
-            p[0x38C] = 0;
+        {
+            u32 resource = SceneActorGraphics_GetResourceId(p);
+            u32 mode = 2;
+            u32 step = 1;
+            p->resource = resource;
+            p->indicatorMode = mode;
+            p->indicatorStep = step;
         }
-        p[0x385] = 0;
+        if (p->indicatorMode == 2) {
+            p->indicatorState = 2;
+        } else if (p->indicatorMode == 1) {
+            p->indicatorState = 0;
+        }
+        p->retreatTimer = 0;
         RouteSpritePool_RequestFinishAll();
         SceneActors_StopBackgroundFlash(p);
         if (gEngineFlags & 0x1000) {
@@ -86,58 +195,31 @@ void sub_08027214(u8 *p, s32 tick)
         }
     }
 
-    pos = p + 0x54;
-    x = (s8)(*(u16 *)pos >> 8);
-    y = (s8)(*(u16 *)(pos + 4) >> 8);
-    cell = sub_08027214_CellIndex(x, y);
-    data = TerrainModifiers_FindCellOverride(cell, 1);
-    if (data) {
-        data += 4;
-    } else {
-        data = gTerrainMap->cells + (cell * 4 + 12);
-    }
-    kind = *data >> 4;
-    d = (*data & 15) << 8;
-    if (kind == 1) {
-        d -= pos[4];
-    } else if (kind == 2) {
-        d -= pos[0];
-    }
-    if ((u32)d < (u32) * (s16 *)(p + 0x352)) {
-        p[0x385] = 8;
-    } else {
-        cell = sub_08027214_CellIndex(x, y);
-        data = TerrainModifiers_FindCellOverride(cell, 1);
-        if (data) {
-            data += 4;
-        } else {
-            data = gTerrainMap->cells + (cell * 4 + 12);
-        }
-        if (*(u16 *)(data + 2) & 1) {
-            p[0x385] = 8;
-        }
+    if (Death_GetTerrainHeight(&base->position) < (u32)p->floorHeight ||
+        Death_CellBlocks(&base->position)) {
+        p->retreatTimer = 8;
     }
 
-    if (p[0x385]) {
-        p[0x385]--;
+    pos = (u8 *)&base->position;
+    if (p->retreatTimer) {
+        p->retreatTimer--;
         {
-            s32 dx = *(s16 *)(p + 0x32C) - *(s16 *)(pos + 0);
-            s32 dy = *(s16 *)(p + 0x330) - *(s16 *)(pos + 4);
+            s16 *origin = (s16 *)((u8 *)p + 0x32c);
+            s32 dx = origin[0] - *(s16 *)(pos + 0);
+            s32 dy = origin[2] - *(s16 *)(pos + 4);
             s32 angle = Math_Atan2(dx, dy);
-            s16 *vec = (s16 *)(p + 0x5C);
-            vec[0] = sub_08027214_Scale(gUnk_086149C4[(angle + 0x40) & 0xFF] * 20);
-            vec[1] = 0;
-            vec[2] = sub_08027214_Scale(gUnk_086149C4[angle & 0xFF] * 20);
+            Death_SetVelocity((s16 *)((u8 *)base + 0x5c), angle, 20);
         }
     }
 
-    switch (p[0xA2]) {
+    switch (base->state.value) {
         case 0:
-            p[0x39B] = 8;
-            if (p[0xA3] > 4) {
-                p[0xA2] = 2;
-                *(u32 *)(p + 0xA4) = 0;
-                SceneActors_StartUnmirroredAnimation(p, p + 0x240, p + 0x220, 0x21, 2, 0);
+            p->delay = 8;
+            if (base->frame > 4) {
+                base->state.value = 2;
+                base->elapsed = 0;
+                SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x21,
+                                                     2, 0);
                 Sound_PlaySongChecked(0x350);
             }
             break;
@@ -145,66 +227,85 @@ void sub_08027214(u8 *p, s32 tick)
             if ((tick & 3) == 0) {
                 sub_08022790(p, 1);
             }
-            p[0x39B] = 8;
-            if (p[0xA3] > 4) {
-                p[0xA2] = 2;
-                *(u32 *)(p + 0xA4) = 0;
-                SceneActors_StartUnmirroredAnimation(p, p + 0x240, p + 0x220, 0x21, 2, 0);
-                *(u32 *)(p + 0x3AC) &= ~1;
+            p->delay = 8;
+            if (base->frame > 4) {
+                base->state.value = 2;
+                base->elapsed = 0;
+                SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x21,
+                                                     2, 0);
+                p->mode &= ~1;
                 Sound_PlaySongChecked(0x359);
             }
             break;
         case 2:
-            if (*(u16 *)(p + 0x254) == 1 && *(u16 *)(p + 0x24C) == 0) {
+            if (p->animationState == 1 && p->animationFrame == 0) {
                 Sound_PlaySongChecked(0x350);
             }
-            if (p[0x25D] & 2) {
-                p[0xA2] = 3;
-                *(u32 *)(p + 0xA4) = 0;
-                SceneActors_StartUnmirroredAnimation(p, p + 0x240, p + 0x220, 0x22, 2, 0);
-                sub_08022878(p + 0x260);
+            if (p->animationFlags & 2) {
+                {
+                    u32 nextState = 3;
+                    base->state.value = nextState;
+                }
+                base->elapsed = 0;
+                SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x22,
+                                                     2, 0);
+                sub_08022878((u8 *)p + 0x260);
             }
             break;
         case 3:
-            if (p[0x25D] & 2) {
-                p[0xA2] = 4;
-                *(u32 *)(p + 0xA4) = 0;
-                SceneActors_StartUnmirroredAnimation(p, p + 0x240, p + 0x220, 0x23, 2, 0);
+            if (p->animationFlags & 2) {
+                {
+                    u32 nextState = 4;
+                    base->state.value = nextState;
+                }
+                base->elapsed = 0;
+                SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x23,
+                                                     2, 0);
             }
             break;
         case 4:
-            if (*(u16 *)(p + 0x254) == 0xA && *(u16 *)(p + 0x24C) == 0) {
+            if (p->animationState == 0xA && p->animationFrame == 0) {
                 Sound_PlaySongChecked(0x354);
             }
-            if (p[0x25D] & 2) {
-                p[0xA2] = 5;
-                *(u32 *)(p + 0xA4) = 0;
-                SceneActors_StartUnmirroredAnimation(p, p + 0x240, p + 0x220, 0x24, 2, 0);
+            if (p->animationFlags & 2) {
+                {
+                    u32 nextState = 5;
+                    base->state.value = nextState;
+                }
+                base->elapsed = 0;
+                SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x24,
+                                                     2, 0);
             }
             break;
         case 5:
-            if (p[0x25D] & 2) {
-                p[0xA2] = 6;
-                *(u32 *)(p + 0xA4) = 0;
+            if (p->animationFlags & 2) {
+                {
+                    u32 nextState = 6;
+                    base->state.value = nextState;
+                }
+                base->elapsed = 0;
                 GameState_SetEventFlag(0x4D);
-                SceneActors_RunSecondEventScript(p, p + 0x260);
+                SceneActors_RunSecondEventScript(base, (u8 *)p + 0x260);
             }
             break;
         case 6:
             break;
         case 7:
-            p[0x39B] = 8;
-            if (*(u32 *)(p + 0xA4) > 0xEF) {
-                p[0xA2] = 5;
-                *(u32 *)(p + 0xA4) = 0;
+            p->delay = 8;
+            if (base->elapsed > 0xEF) {
+                {
+                    u32 nextState = 5;
+                    base->state.value = nextState;
+                }
+                base->elapsed = 0;
             }
             break;
         default:
             break;
     }
-    *(u32 *)(p + 0xA4) += 1;
-    *(u32 *)(p + 0x9C) |= 0xD;
+    base->elapsed += 1;
+    {
+        u32 mask = 0xD;
+        base->flags |= mask;
+    }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08027214);
-#endif

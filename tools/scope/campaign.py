@@ -846,6 +846,14 @@ def cmd_land(args):
         # never leave a mismatching unit in the tree for a later commit to pick up
         open(target, "w").write(cur)
         sys.exit(f"{func}: restored {r['src']}; land by hand")
+    # a match can define a routine recovered from inside this span (sub_XXXXXXXX after FUNC): progress
+    # refuses C functions without an inventory start, so register them with the unit
+    reg = subprocess.run(["python3", "-c", "import sys; sys.path.insert(0, 'tools'); import progress, add_function;"
+                          " from pathlib import Path;"
+                          " new = add_function.add(progress.source_boundaries(progress.INVENTORY, Path('src')));"
+                          " print(' '.join(f'{a:08X}' for a in new))"], cwd=tree, capture_output=True, text=True)
+    if reg.stdout.strip():
+        print(f"{func}: registered recovered function start(s) {reg.stdout.strip()} in symbols/progress_functions.csv")
     open(os.path.join(wd, "landed"), "w").write(tree)
     return 0
 
