@@ -289,14 +289,17 @@ def _reaching(blocks):
             "interpretation": "machine reaching definitions; reload, coalescing and register reuse prevent unique source-pseudo recovery"}
 
 
-def fingerprint(rows):
+def fingerprint(rows, data_ranges=()):
     """Machine observations and dependency-sensitive signatures, JSON serializable."""
     rows = [_row(r, i) for i, r in enumerate(rows)]
+    for row in rows:
+        if any(lo <= row["offset"] < hi for lo, hi in data_ranges):
+            row["data"] = True
     blocks = _blocks(rows)
     for b in blocks:
         b.update(_canonical(b))
     calls = [{"offset": r["offset"], "target": " ".join(r["operands"]), "kind": r["op"]}
-             for r in rows if r["op"] in CALLS]
+             for r in rows if not r["data"] and r["op"] in CALLS]
     memory = [m for r in rows if (m := _memory(r))]
     constants = [{"offset": r["offset"], "value": int(m.group(1), 0)}
                  for r in rows if not r["data"] and r["op"] not in CONDITIONS | {"b", "bl", "blx"}
@@ -398,19 +401,54 @@ def _region_pairs(target, current):
                     "dependency_supported": bool(ta and cb and ta["supported"] and cb["supported"]),
                     "alignment_ambiguous": bool(ta and a.count(ta["fingerprint"]) > 1 or cb and b.count(cb["fingerprint"]) > 1),
                     "target_fingerprint": ta["fingerprint"] if ta else None,
-                    "current_fingerprint": cb["fingerprint"] if cb else None})
+                    "current_fingerprint": cb["fingerprint"] if cb else None,
+                    "differences": _region_differences(ta, cb, exact_shape)})
+    return out
+
+
+def _region_differences(target, current, same_shape):
+    """A small concrete witness, rather than forcing policy to compare hashes."""
+    aa = target["instructions"] if target else []
+    bb = current["instructions"] if current else []
+    signatures_a = target["signature"] if target else []
+    signatures_b = current["signature"] if current else []
+    out = []
+    if same_shape:
+        pairs = [(i, i) for i in range(len(aa))
+                 if re.sub(r"func\+0x[0-9a-f]+", "func+TARGET", aa[i]["text"], flags=re.I) !=
+                    re.sub(r"func\+0x[0-9a-f]+", "func+TARGET", bb[i]["text"], flags=re.I)]
+    else:
+        akeys = [json.dumps(x, separators=(",", ":")) for x in signatures_a]
+        bkeys = [json.dumps(x, separators=(",", ":")) for x in signatures_b]
+        pairs = []
+        for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, akeys, bkeys, autojunk=False).get_opcodes():
+            if tag != "equal":
+                pairs.extend((i1 + k if i1 + k < i2 else None, j1 + k if j1 + k < j2 else None)
+                             for k in range(max(i2 - i1, j2 - j1)))
+            if len(pairs) >= 4:
+                break
+    for i, j in pairs[:4]:
+        a, b = aa[i] if i is not None else None, bb[j] if j is not None else None
+        kind = "binding" if same_shape else "dependency" if a and b and a["op"] == b["op"] else "operation"
+        out.append({"kind": kind,
+                    "target": {"offset": a["offset"], "text": a["text"], "memory": _memory(a)} if a else None,
+                    "current": {"offset": b["offset"], "text": b["text"], "memory": _memory(b)} if b else None,
+                    "target_values": signatures_a[i][2:4] if i is not None else None,
+                    "current_values": signatures_b[j][2:4] if j is not None else None})
     return out
 
 
 def analyze(source, function, target_rows=(), current_rows=(), *, target_bytes=None, current_bytes=None,
-            compiler_root=None, evaluation=None):
+            compiler_root=None, evaluation=None, target_data=(), current_data=()):
     """Compare decoded machine evidence with C move sites. Never compiles.
 
+    target_data/current_data are offset ranges for pools/padding, including zero
+    halfwords which scope.decode presents as movs r0,r0.
     target_rows/current_rows accept scope.decode's five-tuples, instruction strings,
     or dicts with offset/size/text/target. Byte identity is the sole exact verdict.
     evaluation may hold scope diff rows under `diff` to attach source lines and UIDs.
     """
-    target, current = fingerprint(target_rows), fingerprint(current_rows)
+    target, current = fingerprint(target_rows, target_data), fingerprint(current_rows, current_data)
     regions = _region_pairs(target, current)
     facts = _source_facts(source, function)
     same_calls = [x["target"] for x in target["calls"]] == [x["target"] for x in current["calls"]]
@@ -424,34 +462,34 @@ def analyze(source, function, target_rows=(), current_rows=(), *, target_bytes=N
     actions = []
 
     def action(category, reason, moves, command):
-        actions.append({"category": category, "reason": reason, "moves": moves,
+        actions.append({"category": category, "reason": reason, "moves": list(dict.fromkeys(moves)),
                         "compiler": compiler_references(category, compiler_root), "diagnostic": command,
                         "confidence": "hypothesis; verify with trace or scope knob before attributing the compiler decision"})
     if not same_calls:
         action("control_flow", "Static call order/targets differ; recover the intended call/control skeleton first.",
-               ["free_edit", "inline_helper", "extract_helper", "branch_invert"], "calls")
+               ["free-edit", "free-edit", "free-edit", "invert-if"], "calls")
     if not same_memory:
         action("expression", "Memory operation width, signedness, displacement or sequence differs.",
-               ["free_edit", "introduce_temporary", "remove_temporary", "field_view"], "why all")
+               ["free-edit", "introduce-temporary", "free-edit", "free-edit"], "why all")
     if not same_control:
         action("control_flow", "Basic-block edges or branch kinds differ; later branch offsets alone are not a cause.",
-               ["branch_invert", "early_return", "loop_form", "free_edit"], "probe")
+               ["invert-if", "free-edit", "while-to-for", "free-edit"], "probe")
     local_different = sum(r["local_shape"] != "same" for r in regions)
     binding_different = sum(r["local_shape"] == "same" and r["global_binding"] == "different" for r in regions)
     if local_different:
         action("expression", f"{local_different} region(s) have different dependency-sensitive instruction shape.",
-               ["introduce_temporary", "remove_temporary", "commute_operands", "reorder_independent"], "why all")
+               ["introduce-temporary", "free-edit", "commute", "independent-statements"], "why all")
         if any(s["kind"] == "loop" for s in facts["sites"]):
             action("loop", "A source loop exists and local shape differs; check induction/hoist decisions in that region.",
-                   ["loop_form", "introduce_temporary", "scope_local"], "giv")
+                   ["while-to-for", "introduce-temporary", "free-edit"], "giv")
     if binding_different:
         action("allocation", f"{binding_different} region(s) retain local dependencies with different hard-register bindings.",
-               ["declaration_order", "scope_local", "commute_operands", "introduce_temporary", "remove_temporary"], "life")
+               ["declaration-order", "free-edit", "commute", "introduce-temporary", "free-edit"], "life")
         action("reload", "Equal local shape does not determine whether global allocation or reload chose the binding.",
-               ["scope_local", "introduce_temporary", "remove_temporary"], "spill")
+               ["free-edit", "introduce-temporary", "free-edit"], "spill")
     if unknown:
         action("expression", "Some opcodes are conservatively modeled; inspect those instructions before trusting local shape.",
-               ["free_edit"], "why all")
+               ["free-edit"], "why all")
     diff = (evaluation or {}).get("diff", [])
     evidence = [{k: r[k] for k in ("line", "uid", "pass", "rom", "draft", "tag") if k in r}
                 for r in diff if isinstance(r, dict) and r.get("tag") != "="][:32]

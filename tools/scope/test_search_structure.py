@@ -64,6 +64,21 @@ class StructureTests(unittest.TestCase):
         self.assertEqual(len(result["blocks"]), 1)
         self.assertEqual(result["memory"][0]["literal"], "0x8123456")
 
+    def test_explicit_pool_padding_does_not_create_fake_region(self):
+        source = rows("bx lr", "movs r0, r0")
+        result = ss.analyze("void f(void) {}", "f", source, source, target_data=[(2, 4)], current_data=[(2, 4)])
+        self.assertEqual(result["summary"]["regions"], 1)
+        self.assertEqual(result["target"]["instruction_count"], 1)
+
+    def test_region_exposes_concrete_dependency_witness(self):
+        a = rows("movs r0, #3", "adds r1, r0, #1", "muls r1, r0")
+        b = rows("movs r0, #3", "adds r1, r0, #1", "muls r1, r1")
+        result = ss.analyze("void f(void) {}", "f", a, b)
+        witness = result["regions"][0]["differences"][0]
+        self.assertEqual(witness["kind"], "dependency")
+        self.assertEqual(witness["target"]["text"], "muls r1, r0")
+        self.assertEqual(witness["current"]["text"], "muls r1, r1")
+
     def test_calls_are_ordered_and_not_proof(self):
         result = ss.analyze("void f(void) { a(); b(); }", "f", rows("bl #0x8001000", "bl #0x8002000"), rows("bl #0x8002000", "bl #0x8001000"))
         self.assertFalse(result["constraints"]["call_order"]["same"])

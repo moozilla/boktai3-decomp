@@ -132,15 +132,29 @@ def _strip_comments(source):
     return re.sub(r'/\*.*?\*/|//[^\n]*', lambda m: "\n" * m.group().count("\n"), source, flags=re.S)
 
 
+def _macro_definitions(source):
+    source = source.replace("\\\n", " ")
+    return {m.group(1): m.group(2) for m in re.finditer(r"^\s*#\s*define\s+(\w+)(.*)$", source, re.M)}
+
+
 @lru_cache(maxsize=1)
-def _textual_macros():
-    bad = set()
+def _header_macros():
+    definitions = {}
     for path in (ROOT / "include").rglob("*.h"):
-        text = path.read_text(errors="replace").replace("\\\n", " ")
-        for m in re.finditer(r"^\s*#\s*define\s+(\w+)(.*)$", text, re.M):
-            if "#" in m.group(2) or re.search(r"\b(__LINE__|__COUNTER__|__FILE__)\b", m.group(2)):
-                bad.add(m.group(1))
-    return frozenset(bad)
+        definitions.update(_macro_definitions(path.read_text(errors="replace")))
+    return definitions
+
+
+def _textual_macros(source):
+    definitions = {**_header_macros(), **_macro_definitions(source)}
+    bad = {name for name, value in definitions.items()
+           if "#" in value or re.search(r"\b(__LINE__|__COUNTER__|__FILE__)\b", value)}
+    while True:
+        more = {name for name, value in definitions.items()
+                if set(re.findall(r"\b\w+\b", value)) & bad}
+        if more <= bad:
+            return bad
+        bad |= more
 
 
 def _parse(source, func):
@@ -148,7 +162,7 @@ def _parse(source, func):
     body = source[start:end]
     if re.search(r"^\s*#|\b(__LINE__|__COUNTER__|__FILE__|__func__|__FUNCTION__)\b", body, re.M):
         raise MoveError("function contains preprocessing or source-location-sensitive constructs")
-    if set(re.findall(r"\b\w+\b", body)) & _textual_macros():
+    if set(re.findall(r"\b\w+\b", body)) & _textual_macros(source):
         raise MoveError("function uses a textual or source-location-sensitive macro")
     if re.search(r"\b(__attribute__)\b", body):
         raise MoveError("function has attributes requiring a source-preserving edit")
@@ -187,7 +201,7 @@ def _decl_type(decl):
     if len(words) == 1 and words[0] in KNOWN:
         return KNOWN[words[0]]
     if set(words) <= {"unsigned", "signed", "int", "char", "short", "long"}:
-        if words.count("long") > 1:
+        if words.count("long") > 1 or ("char" in words and not {"signed", "unsigned"} & set(words)):
             return None
         width = 8 if "char" in words else 16 if "short" in words else 32
         return ("u" if "unsigned" in words else "s") + str(width)
@@ -197,18 +211,42 @@ def _decl_type(decl):
 class Facts:
     def __init__(self, fn):
         all_nodes = [n for _, n in walk(fn)]
-        decls = [n for n in all_nodes if isinstance(n, ca.Decl) and n.name]
+        # Struct members and prototype parameters are not automatic locals.
+        params = getattr(fn.decl.type, "args", None)
+        parameter_decls = [d for d in (params.params if params else []) if isinstance(d, ca.Decl)]
+        block_decls = [d for _, block in walk(fn.body) if isinstance(block, ca.Compound)
+                       for d in (block.block_items or []) if isinstance(d, ca.Decl)]
+        decls = [d for d in parameter_decls + block_decls if d.name]
         self.counts = {d.name: sum(x.name == d.name for x in decls) for d in decls}
         self.addressed = {n.expr.name for n in all_nodes if isinstance(n, ca.UnaryOp)
                           and n.op == "&" and isinstance(n.expr, ca.ID)}
         self.types = {d.name: _decl_type(d) for d in decls
                       if self.counts[d.name] == 1 and not d.storage and d.name not in self.addressed}
         self.decls = {d.name: d for d in decls}
+        self.bound_ids = set()
+
+        def bind(node, env):
+            if isinstance(node, ca.Compound):
+                env = dict(env)
+                for item in node.block_items or []:
+                    if isinstance(item, ca.Decl):
+                        env[item.name] = self.types.get(item.name)
+                        if item.init:
+                            bind(item.init, env)
+                    else:
+                        bind(item, env)
+            elif isinstance(node, ca.ID):
+                if env.get(node.name):
+                    self.bound_ids.add(id(node))
+            else:
+                for _, child in node.children():
+                    bind(child, env)
+        bind(fn.body, {d.name: self.types.get(d.name) for d in parameter_decls})
         self.names = {n.name for n in all_nodes if isinstance(n, (ca.ID, ca.Decl)) and n.name}
 
     def typ(self, n):
         if isinstance(n, ca.ID):
-            return self.types.get(n.name)
+            return self.types.get(n.name) if id(n) in self.bound_ids else None
         if isinstance(n, ca.Constant) and n.type in ("int", "unsigned int", "long int", "unsigned long int"):
             try:
                 value = int(re.sub(r"[uUlL]+$", "", n.value), 0)
@@ -242,7 +280,7 @@ class Facts:
         return {x.name for _, x in walk(n) if isinstance(x, ca.ID)}
 
     def local(self, n):
-        return isinstance(n, ca.ID) and bool(self.types.get(n.name))
+        return isinstance(n, ca.ID) and id(n) in self.bound_ids and bool(self.types.get(n.name))
 
     def fresh(self):
         for i in range(1, 100000):
@@ -400,6 +438,28 @@ def enumerate_moves(source: str, func: str | None = None, *, kinds=None, line_ra
         if not isinstance(n, ca.Compound):
             continue
         items = n.block_items or []
+        for di, decl in enumerate(items):
+            if not isinstance(decl, ca.Decl) or decl.init is not None or not facts.types.get(decl.name):
+                continue
+            uses = [j for j, item in enumerate(items) if j != di and decl.name in facts.reads(item)]
+            if not uses or min(uses) <= di or isinstance(items[min(uses)], ca.Decl):
+                continue
+            first = min(uses)
+            # Keep scope editing structural: no labels/gotos or declaration
+            # dependencies hidden in a typedef/array bound.
+            if any(isinstance(x, (ca.Label, ca.Goto)) for _, x in walk(n)):
+                continue
+            if any(isinstance(x, ca.Decl) for x in items[first:]):
+                continue
+            def narrow_scope(f, p=path, di=di, first=first):
+                block = _at(f, p)
+                xs = block.block_items
+                nested = ca.Compound([xs[di]] + xs[first:])
+                block.block_items = [x for j, x in enumerate(xs[:first]) if j != di] + [nested]
+            emit("narrow-scope", path + ("block_items[%d]" % di,), "Limit %s to its used suffix block" % decl.name,
+                 narrow_scope, ("uninitialized unaliased scalar local; all uses remain in the same order in the new block",
+                               "no labels, gotos, VLA bounds, or declaration dependencies cross the new scope"),
+                 {"name": decl.name, "first_statement": first})
         for i, item in enumerate(items):
             if i + 1 < len(items):
                 other = items[i + 1]
@@ -419,6 +479,27 @@ def enumerate_moves(source: str, func: str | None = None, *, kinds=None, line_ra
                         xs[i], xs[i + 1] = xs[i + 1], xs[i]
                     emit("independent-statements", path + ("block_items[%d]" % i,), "Exchange independent assignments", stmt_swap,
                          pure + ("write/read sets do not conflict; locals cannot alias",), {"index": i})
+            if (isinstance(item, ca.Assignment) and item.op == "=" and facts.local(item.lvalue)
+                    and facts.pure(item.rvalue) and i + 1 < len(items)):
+                target = item.lvalue.name
+                decl = facts.decls[target]
+                other = items[i + 1]
+                uses = [(p, x) for p, x in walk(other) if isinstance(x, ca.ID) and x.name == target]
+                count = sum(isinstance(x, ca.ID) and x.name == target for _, x in walk(fn))
+                expression = (other.rvalue if isinstance(other, ca.Assignment) and other.op == "=" and facts.local(other.lvalue)
+                              else other.expr if isinstance(other, ca.Return) else None)
+                if (decl in items and decl.init is None and len(uses) == 1 and count == 2
+                        and expression is not None and facts.pure(expression)):
+                    def inline_temp(f, p=path, i=i, target=target, use_path=uses[0][0], typ=facts.types[target]):
+                        block = _at(f, p)
+                        defining, consuming = block.block_items[i:i + 2]
+                        type_ast = c_parser.CParser().parse(PRELUDE + "\nint f(void){return (%s)1;}" % typ).ext[-1].body.block_items[0].expr.to_type
+                        _set(consuming, use_path, ca.Cast(type_ast, defining.rvalue))
+                        block.block_items.pop(i)
+                        block.block_items[:] = [x for x in block.block_items if not (isinstance(x, ca.Decl) and x.name == target)]
+                    emit("inline-temporary", path + ("block_items[%d]" % i,), "Inline single-use local " + target,
+                         inline_temp, pure + ("the sole read immediately follows the sole definition; explicit cast preserves the stored type",),
+                         {"name": target, "index": i})
             if isinstance(item, ca.Assignment) and item.op == "=" and facts.local(item.lvalue) and facts.pure(item.rvalue):
                 # Do not extract declarations into blocks reachable by goto: a
                 # jump could bypass the newly introduced assignment's context.

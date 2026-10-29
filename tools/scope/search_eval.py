@@ -15,6 +15,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[2]
 VERSION = 1
+IMPLEMENTATION = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 
 
 def digest(data):
@@ -30,6 +31,8 @@ class Evaluator:
         self.directory.mkdir(parents=True, exist_ok=True)
         self.oracles = {}
         self._hashes = {}
+        self.loaded_scope = digest(Path(scope.__file__).read_bytes())
+        self.loaded_fast = digest((ROOT / "tools/scope/fast.py").read_bytes())
 
     def file_hash(self, path):
         path = Path(path)
@@ -73,9 +76,7 @@ class Evaluator:
                     cpp=s.build.CPP, defines=s.build.DEFINES,
                     headers=digest(json.dumps(headers)), symbols=digest(json.dumps(symbols)),
                     elf=self.file_hash(ROOT / "build/boktai3.elf"),
-                    evaluator=digest(Path(__file__).read_bytes()),
-                    scope=digest(Path(s.__file__).read_bytes()),
-                    fast=digest((ROOT / "tools/scope/fast.py").read_bytes()),
+                    evaluator=IMPLEMENTATION, scope=self.loaded_scope, fast=self.loaded_fast,
                     origin=os.path.relpath(ROOT / origin, ROOT))
 
     def materialize(self, source, origin):
@@ -91,6 +92,7 @@ class Evaluator:
 
     def evaluate(self, source, function, origin, knobs=None, semantic_trials=0):
         s = self.scope
+        s.WORK = str(self.directory / "traces")
         knobs = dict(knobs or {})
         bad = [k for k in knobs if not k.startswith(("AGBCC_", "CSE_"))]
         if bad:
@@ -127,13 +129,17 @@ class Evaluator:
                           byte_length=len(code), target_length=len(target),
                           byte_differences=sum(a != b for a, b in zip(code, target)) + abs(len(code)-len(target)),
                           shifted_branches=shifted, rows=rows, target_rows=target_rows,
+                          current_data=data, target_data=s.rom_data(name, address, target),
                           differences=[dict(target=target_rows[x] if x is not None else None,
                                             current=rows[y] if y is not None else None, tag=t)
                                        for x, y, t in pairs if t != "="],
                           semantic=dict(verdict="EXACT" if exact else "NOT_RUN", trials=0))
             if semantic_trials and not knobs and not exact:
-                result["semantic"] = self.semantic(source, function, target, code, address,
-                                                   path, semantic_trials)
+                try:
+                    result["semantic"] = self.semantic(source, function, target, code, address,
+                                                       path, semantic_trials)
+                except (ImportError, SystemExit) as e:
+                    result["semantic"] = dict(verdict="UNAVAILABLE", trials=0, detail=str(e), proof=False)
             result["diagnostics"] = output.getvalue()[-8000:]
             result["elapsed_ms"] = round((time.perf_counter()-start)*1000, 3)
             return result
@@ -146,6 +152,10 @@ class Evaluator:
             os.environ.update(saved)
 
     def semantic(self, source, function, target, code, address, path, trials):
+        import sys
+        local_packages = str(ROOT / "build/search-sol/python")
+        if local_packages not in sys.path:
+            sys.path.insert(0, local_packages)
         import semcheck
         s = self.scope
         pre = s.preprocess(str(path), func=function)
@@ -164,6 +174,7 @@ class Evaluator:
 
     def diagnose(self, source, function, origin, command="why", argument="all"):
         s = self.scope
+        s.WORK = str(self.directory / "traces")
         path = self.materialize(source, origin)
         output = io.StringIO()
         with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):

@@ -83,8 +83,9 @@ def evaluate(session, ref, request):
     evaluator = environment(session.path)
     context = evaluator.context(source, meta["function"], meta["origin"])
     if session.context(ref) != context:
+        was_head = session.node("HEAD")["id"] == node["id"]
         node = session.add(source, node["id"], {"kind": "context_refresh"}, context=context,
-                           checkout=False, note="Compiler environment changed; reevaluate in a new context.")
+                           checkout=was_head, note="Compiler environment changed; reevaluate in a new context.")
     options = {"knobs": request.get("knobs", {}), "semantic_trials": request.get("trials", 0)}
     cached = None if request.get("force") else session.evaluation(node["id"], options=options)
     if cached:
@@ -92,7 +93,8 @@ def evaluate(session, ref, request):
     result = evaluator.evaluate(source, meta["function"], meta["origin"], options["knobs"], options["semantic_trials"])
     if result.get("rows"):
         result["structure"] = analyze(source, meta["function"], result["target_rows"], result["rows"],
-            compiler_root=ROOT / "build/scope/agbcc/gcc")
+            compiler_root=ROOT / "build/scope/agbcc/gcc", target_data=result.get("target_data", ()),
+            current_data=result.get("current_data", ()))
     if node["parents"]:
         parent = session.evaluation(node["parents"][0], options=options)
         if parent:
@@ -174,26 +176,50 @@ def dispatch(request):
                 Path(request["out"]).write_text(source)
                 return {"out": request["out"]}
             return source
-        if command in ("evaluate", "inspect", "regions", "compare", "experiment"):
+        if command in ("evaluate", "inspect", "regions", "compare", "experiment", "listing"):
             if command == "experiment" and not request.get("knobs"):
                 raise ValueError("an experiment needs at least one compiler knob")
             node, record, cached = evaluate(session, ref, request)
             result = record["result"]
+            if command == "listing":
+                return "\n".join(f"{d['tag']} " + (f"{d['target'][0]:04X} {d['target'][2]}" if d['target'] else "").ljust(48) + " | " + (f"{d['current'][0]:04X} {d['current'][2]}" if d['current'] else "") for d in result.get("differences", []))
             if command == "inspect":
                 return {"node": node["id"], **result}
             if command == "regions":
                 structure = result.get("structure", {"error": result.get("diagnostics")})
                 if request.get("details"):
                     return structure
-                return {k: structure.get(k) for k in ("summary", "regions", "actions", "degrees_of_freedom")}
+                return {"summary": structure.get("summary"),
+                        "regions": [r for r in structure.get("regions", []) if r.get("local_shape") != "same" or r.get("global_binding") != "same"],
+                        "actions": structure.get("actions"), "degrees_of_freedom": structure.get("degrees_of_freedom")}
             if command == "compare":
                 from search_eval import decision_delta
-                a = session.evaluation(request.get("a", "ROOT"))
+                a = session.evaluation(request.get("a", "ROOT"), options={"knobs": {}, "semantic_trials": 0})
                 if not a:
                     raise ValueError("comparison node needs a default evaluation")
                 return decision_delta(a["result"], result)
             return {**compact(node, record), "cache_hit": cached,
                     "experiment_exact": result.get("experiment_exact", False)}
+        if command == "trace":
+            from search_trace import collect, delta
+            meta = session.metadata()
+            evaluator = environment(path)
+            evaluator.scope.WORK = str(path.parent / "compiler/traces")
+            def snapshot(node_ref):
+                node, _, _ = evaluate(session, node_ref, {})
+                stored = session.evaluation(node["id"], evaluator="trace")
+                if stored and not request.get("force"):
+                    return stored["result"]
+                source_path = evaluator.materialize(session.source(node["id"]), meta["origin"])
+                captured = io.StringIO()
+                with contextlib.redirect_stdout(captured), contextlib.redirect_stderr(captured):
+                    result = collect(evaluator.scope, str(source_path), meta["function"])
+                session.evaluate(node["id"], result, evaluator="trace")
+                return result
+            parent = snapshot(request.get("a", "ROOT"))
+            current = snapshot(ref)
+            return {"node": session.node(ref)["id"][:12], "delta": delta(parent, current),
+                    **({"trace": current} if request.get("details") else {})}
         if command in ("why", "compiler"):
             meta = session.metadata()
             evaluator = environment(path)
@@ -205,7 +231,7 @@ def dispatch(request):
             from search_moves import enumerate_moves, apply_move
             source = session.source(ref)
             function = session.metadata()["function"]
-            moves = focus_moves(enumerate_moves(source, function), source, session.metadata().get("focus"))
+            moves = enumerate_moves(source, function, line_range=session.metadata().get("focus"))
             if request.get("kinds"):
                 moves = [m for m in moves if serial(m)["kind"] in request["kinds"]]
             if command == "moves":
@@ -227,17 +253,22 @@ def dispatch(request):
             results = []
             for move in selected:
                 child = apply_move(source, move, function)
-                node = session.add(child, parent, serial(move), note=request.get("reason"), checkout=False)
+                meta = session.metadata()
+                context = environment(path).context(child, function, meta["origin"])
+                node = session.add(child, parent, serial(move), context=context,
+                                   note=request.get("reason"), checkout=False)
                 node, record, cached = evaluate(session, node["id"], request)
                 results.append({**compact(node, record), "move": serial(move)["id"], "cache_hit": cached})
             return results
         if command == "import":
             source = Path(request["source"]).read_text()
             parent = session.node(request.get("parent", ref))["id"]
+            meta = session.metadata()
+            context = environment(path).context(source, meta["function"], meta["origin"])
             # Free edits are first-class moves, never labeled proven equivalent.
             node = session.add(source, parent, {"kind": "model_edit", "reason": request.get("reason", ""),
                 "semantic_precondition": "unproven; inspect differential trials and the ROM"},
-                note=request.get("reason"))
+                context=context, note=request.get("reason"))
             node, record, cached = evaluate(session, node["id"], request)
             return {**compact(node, record), "cache_hit": cached}
         raise ValueError("unknown command: " + command)
@@ -266,7 +297,8 @@ def serve():
     except BlockingIOError:
         return
     ready = BASE / "resident.json"
-    ready.write_text(json.dumps({"pid": os.getpid(), "version": runtime_version()}))
+    loaded_version = runtime_version()
+    ready.write_text(json.dumps({"pid": os.getpid(), "version": loaded_version}))
     last = time.monotonic()
     try:
         while time.monotonic() - last < 1800:
@@ -278,7 +310,7 @@ def serve():
                     request = json.loads(path.read_text())
                     if request.get("command") == "stop":
                         reply, stopping = {"ok": True, "result": "stopped"}, True
-                    elif request.pop("runtime_version", None) != runtime_version():
+                    elif request.pop("runtime_version", None) != loaded_version:
                         reply, stopping = {"ok": False, "restart": True}, True
                     else:
                         reply = safe_dispatch(request)
@@ -348,7 +380,7 @@ def parser():
     p.add_argument("--session", default="default")
     p.add_argument("--json", action="store_true", help="return machine-readable response envelope")
     sub = p.add_subparsers(dest="command", required=True)
-    for command in ("status", "inspect", "regions", "why", "history", "notes", "evaluate", "moves", "frontier", "export", "source", "checkout", "experiment", "compiler", "mark", "focus", "compare"):
+    for command in ("status", "inspect", "regions", "why", "history", "notes", "evaluate", "moves", "frontier", "export", "source", "checkout", "experiment", "compiler", "mark", "focus", "compare", "listing", "trace"):
         q = sub.add_parser(command)
         q.add_argument("node", nargs="?", default="HEAD")
         q.add_argument("--out")
