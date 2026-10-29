@@ -306,6 +306,23 @@ def resolve_knobs(src, func, env):
     for k in ("AGBCC_PRI", "AGBCC_FORCE"):
         if k not in env and os.environ.get(k):
             env[k] = os.environ[k]
+    if env.get("AGBCC_FORCE"):
+        # Accept the register spellings printed by allocation explanations.
+        # The compiler parses decimal register numbers, so passing r6 through
+        # silently disables the request.
+        aliases = {"sb": 9, "sl": 10, "fp": 11, "ip": 12,
+                   "sp": 13, "lr": 14, "pc": 15}
+        entries = []
+        for entry in env["AGBCC_FORCE"].split(","):
+            pseudo, reg = entry.split(":", 1)
+            if re.fullmatch(r"r(?:[0-9]|1[0-5])", reg):
+                reg = reg[1:]
+            elif reg in aliases:
+                reg = str(aliases[reg])
+            if not reg.isdigit() or not 0 <= int(reg) <= 15:
+                sys.exit(f"AGBCC_FORCE: unknown register {reg!r}")
+            entries.append(f"{pseudo}:{reg}")
+        env["AGBCC_FORCE"] = ",".join(entries)
     keys = [k for k in ("AGBCC_PRI", "AGBCC_FORCE") if re.search(r"(^|,)=?[A-Za-z_]", env.get(k, ""))]
     if not keys:
         return env
