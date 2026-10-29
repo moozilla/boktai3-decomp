@@ -334,8 +334,12 @@ class Target:
             for b in scope.nonmatching_blocks(text):
                 if func in b["names"]:
                     body = text[b["body"]:b["else"][0]]
-                    defs = [n for n in b["names"] if n != func and find_def(body, n)]
-                    func = defs[-1] if defs else func
+                    aliases = re.findall(r"^#define[ \t]+(\w+)[ \t]+" + re.escape(func)
+                                         + r"[ \t]*(?://[^\n]*)?$", body, re.M)
+                    defs = [(find_def(body, n), n) for n in b["names"] if n != func]
+                    defs = sorted((span[0], n) for span, n in defs if span)
+                    func = next((n for n in aliases if find_def(body, n)),
+                                defs[-1][1] if defs else func)
         self.func = func or scope.nonmatching_func(self.src)
         if not self.func:
             raise SystemExit(f"{src}: no NONMATCHING function found; name it")
