@@ -2371,36 +2371,44 @@ struct S_080243CC {
     u8 b383;
 };
 
-#ifdef NONMATCHING
-// fuzzy: 40.4%
-// scope shape 18 (differences once low registers are set aside)
-void sub_080243CC(struct S_080243CC *p)
+static inline u8 SceneRecovery_TakeEntry(State_08023F98 *p, u32 zero)
 {
-    struct S_080243CC *p2 = p;
-    u32 z;
-    u8 t;
-    p->a9a = 1;
-    if (p->b0) {
-        p->b0 = 0;
-        p->af = 0;
+    if (p->enter_08023F98) {
+        p->enter_08023F98 = zero;
+        p->finished = zero;
+        return 1;
     }
-    if (p->af) {
-        t = p->b383;
-        if (t) {
-            p2->ae = 8;
-            p2->c4 = 0;
+    return 0;
+}
+
+void sub_080243CC(State_08023F98 *p)
+{
+    u8 *actor = (u8 *)p;
+    u8 *vulnerable = &p->vulnerable;
+    u32 zero = 0;
+    *vulnerable = 1;
+    if (SceneRecovery_TakeEntry(p, zero)) {
+        /* This recovery state needs no additional initialization. */
+    }
+    if (p->finished) {
+        u32 variant = actor[0x383];
+        if (variant) {
+            u32 phase = 8;
+            u32 elapsed;
+            p->phase = phase;
+            elapsed = 0;
+            p->elapsed = elapsed;
+            p->enter_08023F98 = 1;
         } else {
-            p2->ae = 7;
-            p2->c4 = t;
+            u32 phase = 7;
+            p->phase = phase;
+            p->elapsed = variant;
+            p->enter_08023F98 = 1;
         }
-        p2->b0 = 1;
     } else {
-        p->c4++;
+        p->elapsed++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080243CC);
-#endif
 
 struct S_08024440 {
     u8 f0[0x9a];
