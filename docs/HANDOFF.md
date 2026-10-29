@@ -40,7 +40,7 @@ progress by exact matches and removed concessions, not by fuzzy scores. Blind sp
 sweeps don't count. When an approach stops paying, change the approach or the tool,
 not just the function.
 
-## Where things stand (2026-10-27)
+## Where things stand (2026-10-29)
 
 Numbers live only in [PROGRESS.md](../PROGRESS.md) (regenerated at batch integration) and
 the README badges. Use `python3 tools/progress.py` for the current figures and
@@ -58,6 +58,16 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
+* **Largest-function match completed** (2026-10-29): `Golem_UpdateHitReaction`
+  (`080C9C04`) now matches all 8,764 bytes in ordinary C, with no target pins,
+  barriers, or compiler overrides. Typed records and real helper ownership close
+  the RNG spill, shared tails, and all 61 private address-slot positions. Stock
+  and full-unit checks, 82 directed cases, 135 layout assertions, and the combined
+  ROM/RAM-literal build pass. The C is active in the normal build. Vorn `080AEB74`
+  remains exact. Matching-tool context, semantic-process isolation, worker actions,
+  and rollback checks incorporate the review
+  ([completion evidence](../notes/matching-search-completion_2026-10-29.md),
+  [earlier scale work](../notes/matching-search-scale_2026-10-29.md)).
 * **Second subsystem run with RAM layout workers** (2026-10-27): 29 more matches (to 79.7%) and RAM
   objects with one shared declaration 29% -> 75%; gpt-6.1-terra tried and dropped for Sol
   ([notes/subsystem-run_2026-10-27.md](../notes/subsystem-run_2026-10-27.md)).
@@ -79,6 +89,7 @@ Recent:
 | Tool | What |
 |---|---|
 | `tools/scope/scope.py` | the matching workbench: diff, `why`, knobs, `try`, `probe`, `pins`, `new`/`land`/`rename`. Spec and findings: [tools/scope/README.md](../tools/scope/README.md); loop: [tools/scope/WORKER.md](../tools/scope/WORKER.md) |
+| `tools/matchsearch/` | persistent model-directed hypotheses, guarded moves, value constraints, diverse frontier, and compiler evidence ([README](../tools/matchsearch/README.md)) |
 | `tools/scope/subsystem/` | a Codex worker per subsystem, each in its own worktree; committer, watcher, batch integration ([README](../tools/scope/subsystem/README.md)) |
 | `tools/scope/campaign.py` | the per-function variant: one Codex worker per draft in the main checkout, landed by `campaign.py integrate` |
 | `tools/check.py FILE.c` | exact check of one unit (`--nonmatching --record` scores a draft) |

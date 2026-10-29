@@ -3397,12 +3397,14 @@ def explain_move2add(wd, uid, row, at):
         if re.match(r"\(set \(reg:\w+ %d r%d\) \(const_int (-?\d+)" % (reg, reg), r):
             src = (u, int(re.match(r".*?\(const_int (-?\d+)", r).group(1)))
             break
-    known = f", set to {src[1]:#x} at {at(src[0])}" if src else ""
-    print(f"  reload's move2add (reload_cse_move2add, reload1.c) rewrote a constant load as an add from"
-          f" r{reg}, which still held a known constant{known}. It forgets everything at a CODE_LABEL, so"
-          " the ROM had a label in between: an if/else arm, an inline function's early return, or a loop"
-          " start. lever: restructure that stretch so control flow joins there (e.g. an inline helper"
-          " with if/return instead of a plain if)")
+    known = (f" An earlier greg assignment sets r{reg} to {src[1]:#x} at {at(src[0])};"
+             " check intervening definitions before treating it as the retained value.") if src else ""
+    print(f"  this add/subtract is consistent with reload's move2add (reload_cse_move2add, reload1.c)"
+          f" reusing a known constant in r{reg}.{known} The optimization depends on physical-register"
+          " contents and allocation, and forgets tracked constants at a CODE_LABEL. A ROM constant"
+          " load can reflect different register history or allocation; an intervening label is only"
+          " one possible cause. Compare the pre/post-reload instruction and preceding register"
+          " definitions before changing source control flow.")
 
 
 def norm_insn(text):

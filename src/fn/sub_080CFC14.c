@@ -80,7 +80,7 @@ void SceneActorReaction_TryResumeRoute(void);
 void SceneActorReaction_BeginReactionSound(void);
 void Golem_ResetCombatState(void);
 void SceneActorControl_RefreshMotionRoute(void);
-void sub_080C9C04(void);
+void Golem_UpdateHitReaction(void);
 void Golem_ClearControlFlag(void);
 void Golem_RestoreRoute(void);
 void SceneActorScript_OnCommand(void);
@@ -422,7 +422,7 @@ s32 Golem_Init(void *arg0)
     SceneActorMovement_ResolveRoutePosition(arg0);
     GL_AT(void *, 0x248) = Golem_ResetCombatState;
     GL_AT(void *, 0x23C) = SceneActorControl_RefreshMotionRoute;
-    GL_AT(void *, 0x268) = sub_080C9C04;
+    GL_AT(void *, 0x268) = Golem_UpdateHitReaction;
     GL_AT(void *, 0x61C) = Golem_ClearControlFlag;
     GL_AT(void *, 0x5EC) = Golem_RestoreRoute;
     GL_AT(u16, 0x2E8) = 0;
