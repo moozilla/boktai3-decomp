@@ -2330,7 +2330,7 @@ def has_knobs(env):
 # means another insn (or none) in the build's own compile (no -g): only these force a -g compile.
 # The others name pseudos (AGBCC_PRI, AGBCC_FORCE, CSE_NOCANON, CSE_KEEP) or count events
 # (AGBCC_SPILL, AGBCC_NOPRE, CSE_NOFOLLOW) and are compiled as the build compiles.
-UID_KNOBS = ("AGBCC_NOCROSS", "AGBCC_NOGIV", "AGBCC_GIV", "AGBCC_NOMOVE", "AGBCC_NOTIE", "CSE_WHY", "CSE_NOFOLLOW_JUMP")
+UID_KNOBS = ("AGBCC_CROSS_LIMIT", "AGBCC_NOCROSS", "AGBCC_NOGIV", "AGBCC_GIV", "AGBCC_NOMOVE", "AGBCC_NOTIE", "CSE_WHY", "CSE_NOFOLLOW_JUMP")
 
 
 def needs_g(env):

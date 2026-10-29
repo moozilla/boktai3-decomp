@@ -1568,11 +1568,32 @@
  		fprintf (loop_dump_stream,
 --- a/jump.c
 +++ b/jump.c
-@@ -2698,6 +2698,22 @@
+@@ -2692,13 +2692,44 @@
+   register rtx i1 = e1, i2 = e2;
+   register rtx p1, p2;
+   int lose = 0;
++  int cross_limit = -1, cross_matched = 0;
+ 
+   rtx last1 = 0, last2 = 0;
+   rtx afterlast1 = 0, afterlast2 = 0;
  
    *f1 = 0;
    *f2 = 0;
-+
++  {
++    const char *limit = getenv ("AGBCC_CROSS_LIMIT");
++    while (limit && *limit)
++      {
++        int uid, count, used = 0;
++        if (sscanf (limit, "%d:%d%n", &uid, &count, &used) < 2 || ! used)
++          break;
++        if (uid == INSN_UID (e1))
++          cross_limit = count;
++        limit += used;
++        if (*limit == ',')
++          limit++;
++      }
++  }
+ 
 +  /* Diagnostic: keep selected late tail merges separate.  The numbers
 +     name the source jump's insn uid (as in the RTL dumps).  */
 +  {
@@ -1588,10 +1609,17 @@
 +        skip = *end == ',' ? end + 1 : end;
 +      }
 +  }
- 
++
    while (1)
      {
-@@ -2829,7 +2845,13 @@
+       i1 = prev_nonnote_insn (i1);
+@@ -2825,11 +2856,19 @@
+ 	  /* Ok, this insn is potentially includable in a cross-jump here.  */
+ 	  afterlast1 = last1, afterlast2 = last2;
+ 	  last1 = i1, last2 = i2, --minimum;
++          if (cross_limit >= 0 && ++cross_matched >= cross_limit)
++            break;
+ 	}
      }
  
    if (minimum <= 0 && last1 != 0 && last1 != e1)
