@@ -598,6 +598,8 @@ class Session:
         os.makedirs(d, exist_ok=True)
         p = os.path.join(d, f"n{node['id']}.c")
         t = self.text(node)
+        t = re.sub(r"^// scope: write \w+ here\n", "", t, flags=re.M)
+        t = f"// scope: write {self.func} here\n" + t
         if not os.path.exists(p) or open(p).read() != t:
             open(p, "w").write(t)
         return os.path.relpath(p, ROOT)
