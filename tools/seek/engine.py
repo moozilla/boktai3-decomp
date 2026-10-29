@@ -101,7 +101,10 @@ def find_def(text, name):
 
 
 def splice(text, names, new_def):
-    for n in names:
+    aliases = [alias for alias, target in
+               re.findall(r"^\s*#define\s+(\w+)\s+(\w+)\s*$", text, re.M)
+               if target in names]
+    for n in [*names, *aliases]:
         span = find_def(text, n)
         if span:
             return text[:span[0]] + new_def.rstrip() + "\n" + text[span[1]:]
