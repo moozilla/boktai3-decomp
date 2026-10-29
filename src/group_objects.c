@@ -237,9 +237,6 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     return 0;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 82.0%
-// fix.py best (sweep after the inlined-insn fix)
 int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
     struct GroupVec origin;
@@ -268,12 +265,10 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         void *second = gPaletteBankData + 0x5AA0;
         Palette_InterpolateBanks(m->palette, first, second, 63, 6);
     }
-    p = m->pieces;
-    r = p;
-    for (i = 0; i < 16; i++, p++, r++) {
-        do {
-            p->state = 0;
-        } while (0);
+    r = m->pieces;
+    for (i = 0; i < 16; i++, r++) {
+        p = r;
+        p->state = 0;
         p->active = 1;
         p->timer = 0;
         p->direction = direction;
@@ -284,9 +279,9 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
         addPositionAt(&p->position, &r->position, &origin);
         polar(&r->target, p->direction, radius2);
         addPositionAt(&p->target, &r->target, &origin);
-        p->angle = randomValue();
-        p->targetY = (i * 16) + p->position.y;
-        p->speed = (randomValue() & 7) + 7;
+        p->angle = BoardPieces_RandomValue();
+        p->targetY = (i << 4) + p->position.y;
+        p->speed = (BoardPieces_RandomValue() & 7) + 7;
         p->sprite.position = p->position;
         p->sprite.flags &= ~1;
         BoardPiece_SetFacingAnim(m, r, 0);
@@ -299,9 +294,6 @@ int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     return 0;
 }
 
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0800FE98);
-#endif
 s32 Div(s32, s32);
 struct PackedVec {
     u32 x : 16, y : 16, z : 16;
