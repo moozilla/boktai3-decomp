@@ -3,7 +3,7 @@
 
     tools/pii_check.py --staged          added lines of the staged diff (pre-commit hook)
     tools/pii_check.py --msg FILE        a commit message (commit-msg hook)
-    tools/pii_check.py --range A..B      added lines and commit messages in a range (CI)
+    tools/pii_check.py --range A..B      added lines and commit messages in a range
     tools/pii_check.py --all             every tracked file
 
 Generic rules catch home directories: /Users/<name>, /home/<name> (except the
@@ -11,7 +11,7 @@ sandbox's /home/user), C:\\Users\\<name>. Write ~ or a repo-relative path instea
 
 Names, handles and domains that only one person knows are personal go in a private
 pattern list, never in this file: one case-insensitive regex per line, read from
-$PII_PATTERNS (CI: a repository secret of the same name), $PII_PATTERNS_FILE,
+$PII_PATTERNS, $PII_PATTERNS_FILE,
 ~/.config/boktai3/pii-patterns and .git/pii-patterns. Lines starting with # are comments.
 
 Install the hooks with `git config core.hooksPath .githooks` (tools/cloud_setup.sh and
