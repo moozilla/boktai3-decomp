@@ -497,6 +497,7 @@ class Evaluator:
                 self.repo / "tools" / "scope" / "agbcc.patch",
                 self.repo / "symbols" / "functions.csv",
                 self.repo / "symbols" / "progress_functions.csv",
+                self.repo / "symbols" / "ram.csv",
                 self.rom_path,
                 self.repo / "build" / "boktai3.elf"]
         dep_hash = hashlib.sha256()

@@ -213,7 +213,17 @@ def by_dumps(*files):
 
 def elf_syms():
     elf = os.path.join(ROOT, "build", "boktai3.elf")
-    return cached("elf_symbols", [elf], check.elf_symbols)
+    ram = os.path.join(ROOT, "symbols", "ram.csv")
+
+    def resolve():
+        syms = check.elf_symbols()
+        # Match check.link_object's fallback for RAM names added since the
+        # last combined build. Preserve the ELF's existing bindings.
+        for name, address in build.ram_symbols().items():
+            syms.setdefault(name, (address, "OBJECT"))
+        return syms
+
+    return cached("elf_symbols", [elf, ram, __file__], resolve)
 
 
 def inventory():
