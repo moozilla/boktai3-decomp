@@ -90,6 +90,25 @@ class LocalLanding(unittest.TestCase):
         self.verified.append(source)
         return {'exact': True, 'code_hash': 'test-only-stock-result'}
 
+    def test_symlinked_repository_root_preserves_src_containment(self):
+        alias = self.repo / 'repository-link'
+        alias.symlink_to(self.repo, target_is_directory=True)
+        self.evaluator.repo = alias
+        self.evaluator.source_path = alias / 'src' / 'unit.c'
+        result = worker.land(self.session, self.node, dry_run=True)
+        self.assertFalse(result['landed'])
+        self.assertTrue(result['verification']['exact'])
+        self.assertEqual(self.target.read_text(), BASE)
+
+    def test_source_symlink_outside_src_remains_rejected(self):
+        outside = self.repo / 'outside.c'
+        outside.write_text(BASE)
+        self.target.unlink()
+        self.target.symlink_to(outside)
+        with self.assertRaisesRegex(ValueError, 'existing src/ C unit'):
+            worker.land(self.session, self.node)
+        self.assertEqual(outside.read_text(), BASE)
+
     def test_merge_preserves_macros_comments_and_current_neighbor_changes(self):
         self.target.write_text(BASE.replace('// neighbor belongs to another worker', '// reviewed neighbor note'))
         result = worker.land(self.session, self.node)

@@ -167,7 +167,7 @@ def land(session, node: str, *, dry_run: bool = False, timeout: float = 120) -> 
     workflow remains scope's responsibility. No commit, push or full ROM build occurs.
     """
     evaluator = session.evaluator
-    repo = evaluator.repo
+    repo = evaluator.repo.resolve()
     target = evaluator.source_path.resolve()
     if not target.is_relative_to(repo / 'src') or target.suffix != '.c' or not target.is_file():
         raise ValueError('local land requires a session initialized from an existing src/ C unit')
