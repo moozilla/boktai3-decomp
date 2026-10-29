@@ -102,15 +102,18 @@ class Server:
         pre_path = os.path.join(self.dir, "prefix.c")
         open(pre_path, "w").write(prefix + MARK)
         self.prefix_s = os.path.join(self.dir, "prefix.s")
+        self.stderr_path = os.path.join(self.dir, "stderr.txt")
+        self.last_error = ""
         req_r, self.req_w = os.pipe()
         self.rep_r, rep_w = os.pipe()
         env = dict(os.environ, AGBCC_SERVER=f"{req_r}:{rep_w}")
         for k in list(env):
             if k.startswith(("AGBCC_", "CSE_")) and k != "AGBCC_SERVER":
                 del env[k]  # knobs go with each request, never with the prefix
-        self.proc = subprocess.Popen([compiler, *flags, "-o", self.prefix_s, pre_path],
-                                     env=env, pass_fds=(req_r, rep_w),
-                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        with open(self.stderr_path, "w") as stderr:
+            self.proc = subprocess.Popen([compiler, *flags, "-o", self.prefix_s, pre_path],
+                                         env=env, pass_fds=(req_r, rep_w),
+                                         stdout=subprocess.DEVNULL, stderr=stderr)
         os.close(req_r)
         os.close(rep_w)
         self.reply = os.fdopen(self.rep_r)
@@ -136,6 +139,8 @@ class Server:
         if not status:
             raise RuntimeError("agbcc server exited")
         if int(status) != 0:
+            with open(self.stderr_path) as stderr:
+                self.last_error = "\n".join(stderr.read().splitlines()[-12:])
             return None
         return self.prefix_asm() + open(out).read()
 
@@ -304,9 +309,10 @@ class Fast:
         parts = split_source(pre, own)
         if parts is None:
             return None, "the fork server needs FUNC's definition in the unit"
-        asm = self.server(canonical_prefix(parts[0])).compile(parts[1], env)
+        server = self.server(canonical_prefix(parts[0]))
+        asm = server.compile(parts[1], env)
         if asm is None:
-            return None, "compile failed"
+            return None, server.last_error or "compile failed"
         obj, err = assemble(self.assembler, self.fixup(asm), self.workdir)
         if obj is None:
             return None, "as failed: " + err[:300]
