@@ -827,15 +827,15 @@
 +   after the R line.  scope.py reads it to say which register any rotation could
 +   give here, and the AGBCC_SPILL shift that gives the ROM's.  */
 +static void
-+agbcc_spill_status (chain, r, k, start, pass)
++agbcc_spill_status (chain, r, k, start, pass, rotate)
 +     struct insn_chain *chain;
-+     int r, k, start, pass;
++     int r, k, start, pass, rotate;
 +{
 +  int c;
 +  char *b = agbcc_xbuf;
 +  int class = (int) reload_reg_class[r];
-+  b += sprintf (b, "X %s %d %d start=%d pass=%d", current_function_name, k,
-+	   INSN_UID (chain->insn), start, pass);
++  b += sprintf (b, "X %s %d %d start=%d pass=%d rotate=%d", current_function_name, k,
++	   INSN_UID (chain->insn), start, pass, rotate);
 +  for (c = 0; c < n_spills; c++)
 +    {
 +      int reg = spill_regs[c];
@@ -914,7 +914,7 @@
  	  {
  	    /* The reg is OK.  */
 +	    if (agbcc_dump)
-+	      agbcc_spill_status (chain, r, agbcc_reload_count - 1, agbcc_start, pass);
++	      agbcc_spill_status (chain, r, agbcc_reload_count - 1, agbcc_start, pass, (noerror || ! force_group));
  	    last_spill_reg = i;
  
  	    /* Mark as in use for this insn the reload regs we use
