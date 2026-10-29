@@ -52,16 +52,33 @@ the search that used to live only in your head and the current best file.
 * `run [N...] --seconds S --budget C` best-first: expands the best unexpanded node, keeps children
   that improve or tie (a plateau is walked: equal-score code is new code), and never compiles the same
   output twice (one node per distinct binary). Restrict it: `--fam swap_stmts,decl_order,width`,
-  `--lines 40-60` (only moves touching those source lines). `seek.py moves` lists the 35 families.
+  `--lines 40-60,72` (only moves touching those source lines). `seek.py moves` lists the 36 families.
+  Ranking is (skeleton, shape + diff, shape): a node never ranks above one with both less shape
+  and fewer differing insns.
 * `SEEK_JOBS=4` spreads each expansion over four processes, each with its own agbcc fork server
   (about 6 ms per variant instead of 16 on a 200-byte function). Be fair to other workers.
 * Moves apply to the function and to the `static inline` helpers it calls.
 * Moves rewrite through pycparser, so a move node's C has macros expanded and is regenerated in
   one style. Take the idea, not the text: port the change into your own file and `add` it.
+* `add A.c B.c C.c -p N -m "hypothesis"`: several spellings of one idea, scored side by side;
+  `(same code as nK)` says a spelling changed nothing the compiler sees.
+* `twins N`: for each differing block, matched functions whose ROM has the same run of insns, with
+  the C lines that produced it there. Usually the fastest route: the project has often matched the
+  same idiom elsewhere (GridAttackActor_OnDamageCollision matched from its twins' spelling).
+* `run --block B`: work on block B of the map alone: moves only on the C lines behind it, ranked by
+  that block's cost first, so the rest of the function stays fixed and does not mask progress.
+* `[rotation: AGBCC_SPILL=K:D matches]` on a node: the code is right except reload's round-robin
+  spill choice; the ROM made D more (or fewer) reload choices before choice K. `run --objective
+  rotation` ranks children by the shift they still need. The fix is upstream: a temporary that costs
+  or saves a reload (both matched rotation cases here were a value stored through a temporary
+  instead of in each branch: the `sink_store` move).
 * `note N TEXT` records a finding on a node for the next worker (`tree` shows notes).
 * `[sem]` moves (casts, temporaries for repeated expressions) can change meaning; seek runs
-  semcheck on them when unicorn is installed (`build/venv/bin/pip install unicorn`), else they
-  are marked unchecked. The ROM match is the final check either way.
+  semcheck (unicorn) on them and on every file you add: `[sem ok]`, or `[sem: DIFFERENT]`, which the
+  search never expands. The ROM match is the final check either way.
+* `land N` on a MATCH node: campaign.py land merges it into src/ and checks the unit. Remove the
+  draft's scaffolding first (unused temporaries, `do {} while (0)`, stale comments) and `add` the
+  clean file: if it is still MATCH, land that one.
 
 ## What the search is good at, and what it is not
 
@@ -91,7 +108,7 @@ tree keeps the old best, and the search will expand around your new idea.
 * **Block verdicts up to renaming** answer "is this region's C right?" without being confounded by
   register shifts from elsewhere; they replace solving regions in isolation, which agbcc's global
   allocation makes unreliable.
-* **Not built yet:** semantic pruning needs unicorn in build/venv (`[sem]` moves are unchecked
-  without it); region-local search by ROM block (only `--lines`); reload rotation as an objective
-  (the two nearest misses tried, GridAttackActor_OnDamageCollision and ActorStatus_InitializeContact,
-  are the same `ldrsh` index reload, `AGBCC_SPILL=3:2` matches both).
+* **Reload rotation as an objective:** a node whose bytes match under one `AGBCC_SPILL=K:D` is
+  marked, and `--objective rotation` ranks by D, a gradient where the insn count shows none.
+* **Not built:** a lifted value graph (the per-compile allocation records and block verdicts carried
+  the matches so far); moves that transplant a twin's C automatically (`twins` shows it; you port it).
