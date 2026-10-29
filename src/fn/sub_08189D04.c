@@ -1,11 +1,25 @@
 #include "global.h"
 #include "engine_globals.h"
+/* Horizontal deltas use whole tiles; height stays in position units. */
+#define ARMOR_ALIGNED_GRID(deltaX, deltaY, deltaZ, absX, absY, absZ, target, actor)                \
+    do {                                                                                           \
+        (deltaX) = (target)->x - (actor)->x;                                                       \
+        (deltaY) = (target)->y - (actor)->y;                                                       \
+        (deltaZ) = (target)->z - (actor)->z;                                                       \
+        (deltaX) = ((deltaX) + 128) >> 8;                                                          \
+        (deltaZ) = ((deltaZ) + 128) >> 8;                                                          \
+        (absX) = (deltaX);                                                                         \
+        (absY) = (deltaY);                                                                         \
+        (absZ) = (deltaZ);                                                                         \
+        if ((deltaX) < 0)                                                                          \
+            (absX) = -(deltaX);                                                                    \
+        if ((deltaY) < 0)                                                                          \
+            (absY) = -(deltaY);                                                                    \
+        if ((deltaZ) < 0)                                                                          \
+            (absZ) = -(deltaZ);                                                                    \
+    } while (0)
+
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 74.9%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining: shared strike tails, zero/address scheduling and delta register allocation.
 struct ArmorDecisionActor {
     u8 pad0[0x18];
     u16 taskFlags;
@@ -23,9 +37,10 @@ struct ArmorDecisionActor {
     u8 facing;
     u8 padb3a[2];
     u8 behavior, phase;
-    u8 padb3e[0x1120 - 0xb3e];
+    u8 padb3e[0xb58 - 0xb3e];
+    u8 sequence[0x1120 - 0xb58];
     u8 decision, fastMode;
-    s16 attackCooldown, secondaryCooldown, collisionCooldown, modeTimer, timer112a;
+    s16 attackCooldown, secondaryCooldown, sequenceTimer, modeTimer, timer112a;
     u16 savedB26, savedB28;
     s16 timer1130;
 };
@@ -37,169 +52,156 @@ extern struct ArmorDecisionTarget *gGameState;
 void ActorController_SetBehavior(void *, s32);
 void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);
-s32 Math_Atan2(s32, s32);
-// confidence=low: coordinates approach, aligned strike and recovery decisions.
-void Armor_UpdateAlignedStrikeDecision(struct ArmorDecisionActor *p)
+static inline void Armor_ClearDecision(struct ArmorDecisionActor *actor, u8 *cachedDecision)
 {
-    register s32 dx asm("r5");
-    u32 dy;
-    register s32 dz asm("r1");
-    register s32 ax asm("r7");
-    s32 ay;
-    s32 az;
-    register u32 mode asm("r8");
-    u8 *decision;
-    s16 *cooldown = &p->attackCooldown;
-    typeof(dz) c1;
+    u8 *address = &actor->decision;
+    u32 zero = 0;
+    // Keep the cached address live and the new address ahead of the zero value.
+    asm("" : "+r"(zero) : "r"(address), "r"(cachedDecision));
+    *address = zero;
+}
+// Tentative field meanings: aligned strike and recovery decisions.
+void Armor_UpdateAlignedStrikeDecision(struct ArmorDecisionActor *actor)
+{
+    s32 deltaX;
+    s32 deltaY;
+    s32 deltaZ;
+    s32 absX;
+    s32 absY;
+    s32 absZ;
+    u32 flag;
+    u8 *decisionPtr;
+    s16 *cooldown = &actor->attackCooldown;
     if ((*cooldown) > 0)
         --(*cooldown);
-    if ((((p->phase != 255) && (p->behavior != 20)) && (p->behavior != 2)) && (p->behavior != 19))
+    if ((((actor->phase != 255) && (actor->behavior != 20)) && (actor->behavior != 2)) &&
+        (actor->behavior != 19))
         return;
-    dx = gGameState->x - p->x;
-    dy = gGameState->y - p->y;
-    dz = gGameState->z - p->z;
-    c1 = dz;
-    dx = (dx + 128) >> 8;
-    dz = (c1 + 128) >> 8;
-    ax = dx;
-    ay = dy;
-    az = dz;
-    if (dx < 0)
-        ax = -dx;
-    if (dy < 0)
-        ay = -dy;
-    if (dz < 0)
-        az = -dz;
-    asm("" : "+r"(dx), "+r"(dy), "+r"(dz), "+r"(ax));
-    mode = p->flags & 1;
-    asm("" : "+r"(mode));
-    if (mode) {
-        decision = &p->decision;
-        switch (*decision) {
+    ARMOR_ALIGNED_GRID(deltaX, deltaY, deltaZ, absX, absY, absZ, gGameState, actor);
+    flag = actor->flags & 1;
+    if (flag) {
+        decisionPtr = &actor->decision;
+        switch (*decisionPtr) {
             case 0:
-                if (p->behavior == 3) {
-                    ActorController_SetBehavior(p, 4);
+                if (actor->behavior == 3) {
+                    ActorController_SetBehavior(actor, 4);
                     break;
                 }
-                if (ay <= 127) {
-                    if (dx == 0) {
-                        if (az <= 1)
-                            goto attack;
-                    } else if (dz == 0) {
-                        if (ax <= 1) {
+                if (absY <= 127) {
+                    if (deltaX == 0) {
+                        if (absZ > 1)
+                            goto approach;
+                        goto attack;
+                    } else if (deltaZ == 0) {
+                        if (absX <= 1) {
                         attack:
-                            ActorController_SetBehavior(p, 3);
-
+                            ActorController_SetBehavior(actor, 3);
                             return;
                         }
                     }
                 }
-                if (((++p->collisionCooldown) > 300) &&
-                    Armor_IsSequenceIncomplete(((u8 *)p) + 0xb58)) {
-                    ActorController_SetBehavior(p, 31);
-                    p->collisionCooldown = 0;
+            approach:
+                if (((++actor->sequenceTimer) > 300) &&
+                    Armor_IsSequenceIncomplete(actor->sequence)) {
+                    ActorController_SetBehavior(actor, 31);
+                    actor->sequenceTimer = 0;
                     break;
                 }
-                ActorController_SetBehaviorIfFinished(p, 20);
+                ActorController_SetBehaviorIfFinished(actor, 20);
                 break;
 
             case 1:
-                if (p->attackCooldown <= 0) {
-                    ActorController_SetBehavior(p, 6);
+                if (actor->attackCooldown <= 0) {
+                    ActorController_SetBehavior(actor, 6);
                     {
-                        u8 k1 = 0;
-                        *decision = k1;
+                        u32 zero = 0;
+                        *decisionPtr = zero;
+                        actor->secondaryCooldown = zero;
+                        actor->sequenceTimer = zero;
                     }
-                    p->secondaryCooldown = 0;
-                    p->collisionCooldown = 0;
                 } else
                     goto wait;
                 break;
 
             case 2:
-                ActorController_SetBehaviorIfFinished(p, 23);
-                *decision = 0;
+                ActorController_SetBehaviorIfFinished(actor, 23);
                 {
-                    typeof(p->secondaryCooldown) *q1 = &p->secondaryCooldown;
-                    *q1 = 0;
+                    u32 zero = 0;
+                    *decisionPtr = zero;
+                    actor->secondaryCooldown = zero;
+                    actor->sequenceTimer = zero;
                 }
-                p->collisionCooldown = 0;
                 break;
         }
 
     } else {
-        decision = &p->decision;
-        switch (*decision) {
+        decisionPtr = &actor->decision;
+        switch (*decisionPtr) {
             case 0:
-                if (ay <= 127) {
-                    if (dx == 0) {
-                        if (az <= 1) {
-                            ActorController_SetBehavior(p, 3);
-                            *decision = 1;
+                if (absY <= 127) {
+                    if (deltaX == 0) {
+                        if (absZ <= 1) {
+                            ActorController_SetBehavior(actor, 3);
+                            *decisionPtr = 1;
                             break;
                         }
-                    } else if (dz == 0) {
-                        if (ax <= 1) {
-                            ActorController_SetBehavior(p, 3);
-                            *decision = 1;
+                    } else if (deltaZ == 0) {
+                        if (absX <= 1) {
+                            ActorController_SetBehavior(actor, 3);
+                            *decisionPtr = 1;
                             break;
                         }
                     }
                 }
-                ActorController_SetBehaviorIfFinished(p, 19);
+                ActorController_SetBehaviorIfFinished(actor, 19);
                 break;
 
             case 1:
-                if (ay <= 127) {
-                    if (dx == 0) {
-                        if ((dz < 0) && (p->facing == 192))
+                if (absY <= 127) {
+                    if (deltaX == 0) {
+                        if ((deltaZ < 0) && (actor->facing == 192))
                             goto strike;
-                        if (p->facing == 64) {
-                            ActorController_SetBehavior(p, 22);
-                            p->decision = 0;
+                        if (actor->facing == 64) {
+                            ActorController_SetBehavior(actor, 22);
+                            Armor_ClearDecision(actor, decisionPtr);
                             break;
                         }
-                    } else if (dz == 0) {
-                        if ((dx < 0) && (p->facing == 128)) {
+                    } else if (deltaZ == 0) {
+                        if ((deltaX < 0) && (actor->facing == 128)) {
                         strike:
-                            ActorController_SetBehavior(p, 22);
-
-                            *decision = mode;
+                            ActorController_SetBehavior(actor, 22);
+                            *decisionPtr = flag;
                             break;
                         }
-                        if (p->facing == 0) {
-                            ActorController_SetBehavior(p, 22);
-                            p->decision = 0;
+                        if (actor->facing == 0) {
+                            ActorController_SetBehavior(actor, 22);
+                            actor->decision = 0;
                             break;
                         }
                     }
                 }
-                ActorController_SetBehavior(p, 5);
-                p->decision = 2;
-                p->attackCooldown = 90;
+                ActorController_SetBehavior(actor, 5);
+                actor->decision = 2;
+                actor->attackCooldown = 90;
                 break;
 
             case 2:
-                if (p->attackCooldown <= 0) {
-                    ActorController_SetBehavior(p, 6);
-                    *decision = mode;
+                if (actor->attackCooldown <= 0) {
+                    ActorController_SetBehavior(actor, 6);
+                    *decisionPtr = flag;
                 } else {
                 wait:
-                    ActorController_SetBehaviorIfFinished(p, 5);
+                    ActorController_SetBehaviorIfFinished(actor, 5);
                 }
                 break;
 
             case 3:
-                if (p->behavior == 24)
-                    *decision = mode;
+                if (actor->behavior == 24)
+                    *decisionPtr = flag;
                 else
-                    ActorController_SetBehavior(p, 24);
+                    ActorController_SetBehavior(actor, 24);
                 break;
         }
     }
     return;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Armor_UpdateAlignedStrikeDecision);
-#endif
