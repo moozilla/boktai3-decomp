@@ -3,245 +3,290 @@
 #include "engine.h"
 #include "game_state.h"
 
-/* Non-zero when the actor already faces the player along one axis. */
-
-// confidence=low: per-frame chase state machine that steers the actor toward the player's position.
 void ActorController_SetBehavior(void *actor, u32 behavior);
 void ActorController_SetBehaviorIfFinished(void *actor, u32 behavior);
 s32 Armor_IsSequenceIncomplete(void *armor);
 
-struct Sub081879A8Actor {
+struct ArmorChaseActor {
     u8 unk0[0x48];
-    s16 x48, y4A, z4C;
-    u8 unk4E[0x292 - 0x4E];
-    u16 flags292;
+    s16 x, y, z;
+    u8 unk4E[0x28C - 0x4E];
+    struct ArmorCollision {
+        u8 pad[6];
+        s16 flags;
+    } collision;
     u8 unk294[0xB32 - 0x294];
-    u16 flagsB32;
+    u16 flags;
     u8 unkB34[0xB39 - 0xB34];
-    u8 dirB39;
+    u8 facing;
     u8 unkB3A[2];
-    u8 kindB3C;
-    u8 kindB3D;
+    u8 behavior;
+    u8 phase;
     u8 unkB3E[0xB58 - 0xB3E];
-    u8 armorB58[0x1120 - 0xB58];
-    u8 mode1120;
-    u8 flag1121;
-    u16 timer1122;
+    u8 armorData[0x1120 - 0xB58];
+    u8 decision;
+    u8 fastMode;
+    u16 attackCooldown;
     u8 unk1124[2];
-    u16 timer1126;
-    u16 timer1128;
+    u16 collisionCooldown;
+    u16 modeTimer;
 };
 
-static inline s32 sub081879A8_Abs(s32 v)
+static inline void Armor_ClearCollision(struct ArmorCollision *collision, u32 bits)
 {
-    if (v < 0) {
-        return -v;
+    u32 mask = ~bits;
+    collision->flags &= mask;
+}
+static inline void Armor_SetCollision(struct ArmorCollision *collision)
+{
+    collision->flags |= 4;
+}
+
+static inline u8 Armor_FacingValue(struct ArmorChaseActor *actor)
+{
+    return actor->facing;
+}
+
+// MATCHING_CONCESSION: register-pinning
+// confidence=low: steers toward the player and selects aligned attacks.
+void sub_081879A8(struct ArmorChaseActor *actor)
+{
+    s32 playerX, actorX, playerZ, actorZ, deltaY, distance, absZ, direction;
+    register s32 absZValue asm("r2");
+    register s32 absX asm("r8");
+    register s32 gridX asm("r6");
+    s32 deltaX;
+    register s32 gridZ asm("r5");
+    s32 deltaZ;
+
+    u16 timer;
+    u8 *decision;
+    timer = actor->attackCooldown;
+    if ((s16)timer > 0) {
+        actor->attackCooldown = timer - 1;
+        if (actor->fastMode)
+            actor->attackCooldown = timer - 2;
     }
-    return v;
-}
-
-static inline s32 sub081879A8_Facing(s32 dx, s32 dz)
-{
-    return (Math_Atan2(dx, dz) + 0x20) & 0xC0;
-}
-
-/* Non-zero when the actor already faces the player along one axis. */
-static inline int sub081879A8_Aligned(struct Sub081879A8Actor *actor, s32 dxs, s32 dzs)
-{
-    if (dxs == 0) {
-        if (dzs < 0) {
-            return actor->dirB39 == 0xC0;
+    timer = actor->collisionCooldown;
+    if ((s16)timer > 0) {
+        actor->collisionCooldown = timer - 1;
+        if (actor->fastMode)
+            actor->collisionCooldown = timer - 2;
+        if ((s16)actor->collisionCooldown > 0)
+            goto setCollision;
+    }
+    if (!(actor->flags & 1))
+        Armor_ClearCollision(&actor->collision, 4);
+    else {
+    setCollision:
+        Armor_SetCollision(&actor->collision);
+    }
+    if ((s16)--actor->modeTimer <= 0 && !(actor->flags & 1)) {
+        actor->fastMode = !actor->fastMode;
+        actor->modeTimer = 300;
+    }
+    if (actor->phase != 255 && actor->behavior != 19 && actor->behavior != 33 &&
+        actor->behavior != 32 && actor->behavior != 34)
+        return;
+    playerX = gGameState->positionX;
+    actorX = actor->x;
+    deltaX = playerX - actorX;
+    deltaY = gGameState->positionY - actor->y;
+    playerZ = gGameState->positionZ;
+    actorZ = actor->z;
+    deltaZ = playerZ - actorZ;
+    deltaX = (deltaX + 128) >> 8;
+    deltaZ = (deltaZ + 128) >> 8;
+    absX = deltaX;
+    distance = deltaY;
+    absZValue = deltaZ;
+    if (deltaX < 0)
+        absX = -deltaX;
+    if (deltaY < 0)
+        distance = -deltaY;
+    if (deltaZ < 0)
+        absZValue = -deltaZ;
+    absZ = absZValue;
+    gridX = deltaX;
+    gridZ = deltaZ;
+    if (actor->flags & 1) {
+        decision = &actor->decision;
+        switch (*decision) {
+            case 0:
+                if (absX + absZ <= 3) {
+                    ActorController_SetBehavior(actor, 32);
+                    *decision = 1;
+                    actor->attackCooldown = 180;
+                } else
+                    ActorController_SetBehaviorIfFinished(actor, 19);
+                break;
+            case 1:
+                if (actor->behavior == 3)
+                    goto recover;
+                distance = absX + absZ;
+                if (distance > 4) {
+                    ActorController_SetBehavior(actor, 19);
+                    *decision = 0;
+                    break;
+                }
+                direction = Math_Atan2(playerX - actorX, playerZ - actorZ);
+                direction = (direction + 32) & 192;
+                if (Armor_FacingValue(actor) == direction && distance <= 1)
+                    goto attack;
+                if ((s16)actor->attackCooldown <= 0) {
+                    if (gridX == 0) {
+                        if (gridZ < 0) {
+                            if (actor->facing == 192)
+                                goto alignHighZ;
+                        } else if (actor->facing == 64)
+                            goto alignHighZ;
+                        goto idleHigh;
+                    alignHighZ:
+                        ActorController_SetBehavior(actor, 24);
+                        actor->attackCooldown = 180;
+                        break;
+                    } else if (gridZ == 0) {
+                        if (gridX < 0) {
+                            if (actor->facing == 128)
+                                goto alignHighX;
+                        } else if (actor->facing == 0)
+                            goto alignHighX;
+                        goto idleHigh;
+                    alignHighX:
+                        ActorController_SetBehavior(actor, 24);
+                        actor->attackCooldown = 180;
+                        break;
+                    }
+                }
+            idleHigh:
+                ActorController_SetBehaviorIfFinished(actor, 32);
+                break;
+            case 2:
+                if (actor->behavior == 15)
+                    goto attack;
+                ActorController_SetBehavior(actor, 32);
+                *decision = 1;
+                actor->attackCooldown = 180;
+                break;
+            case 3:
+                if ((u8)(actor->behavior - 10) > 1 && actor->behavior != 13)
+                    ActorController_SetBehavior(actor, 10);
+                if ((s16)actor->attackCooldown > 0)
+                    break;
+                if (gridX == 0) {
+                    if (gridZ < 0) {
+                        if (actor->facing == 192)
+                            goto strikeHighZ;
+                    } else if (actor->facing == 64)
+                        goto strikeHighZ;
+                    goto resetHigh;
+                strikeHighZ:
+                    if (distance <= 127 && absZ <= 4) {
+                        ActorController_SetBehavior(actor, 36);
+                        actor->decision = 0;
+                        break;
+                    }
+                    goto resetHigh;
+                } else if (gridZ == 0) {
+                    if (gridX < 0) {
+                        if (actor->facing == 128)
+                            goto strikeHighX;
+                    } else if (actor->facing == 0)
+                        goto strikeHighX;
+                    goto resetHigh;
+                strikeHighX:
+                    if (distance <= 127 && absX <= 4) {
+                        ActorController_SetBehavior(actor, 36);
+                        actor->decision = 0;
+                        break;
+                    }
+                    goto resetHigh;
+                }
+            resetHigh:
+                ActorController_SetBehavior(actor, 19);
+                actor->decision = 0;
+                break;
         }
-        return actor->dirB39 == 0x40;
-    }
-    if (dzs != 0) {
-        return 0;
-    }
-    if (dxs >= 0) {
-        return actor->dirB39 == 0;
-    }
-    return actor->dirB39 == 0x80;
-}
-
-static inline int sub081879A8_TryAlign(struct Sub081879A8Actor *actor, s32 dxs, s32 dzs)
-{
-    if ((s16)actor->timer1122 > 0) {
-        return 0;
-    }
-    if (!sub081879A8_Aligned(actor, dxs, dzs)) {
-        return 0;
-    }
-    ActorController_SetBehavior(actor, 0x18);
-    actor->timer1122 = 0xB4;
-    return 1;
-}
-
-#ifdef NONMATCHING
-// fuzzy: 35.6%
-// scope shape 369 (differences once low registers are set aside)
-// confidence=low: per-frame chase state machine that steers the actor toward the player's position.
-void sub_081879A8(struct Sub081879A8Actor *actor)
-{
-    struct GameState *player;
-    u16 t;
-    s32 px, py, pz, ax, ay, az;
-    s32 dxRaw, dyRaw, dzRaw, dxs, dzs, adx, ady, adz, sum, dir;
-
-    t = actor->timer1122;
-    if ((s16)t > 0) {
-        actor->timer1122 = t - 1;
-        if (actor->flag1121) {
-            actor->timer1122 = t - 2;
-        }
-    }
-    t = actor->timer1126;
-    if ((s16)t > 0) {
-        actor->timer1126 = t - 1;
-        if (actor->flag1121) {
-            actor->timer1126 = t - 2;
-        }
-    }
-    if ((s16)actor->timer1126 > 0 || (actor->flagsB32 & 1)) {
-        actor->flags292 |= 4;
     } else {
-        actor->flags292 &= ~4;
-    }
-    actor->timer1128 = actor->timer1128 - 1;
-    if (!((s16)actor->timer1128 > 0) && !(actor->flagsB32 & 1)) {
-        actor->flag1121 = (actor->flag1121 == 0);
-        actor->timer1128 = 0x12C;
-    }
-
-    if (actor->kindB3D == 0xFF || actor->kindB3C == 0x13 || actor->kindB3C == 0x21 ||
-        actor->kindB3C == 0x20 || actor->kindB3C == 0x22) {
-        player = gGameState;
-        px = player->positionX;
-        py = player->positionY;
-        pz = player->positionZ;
-        ax = actor->x48;
-        ay = actor->y4A;
-        az = actor->z4C;
-        dxRaw = px - ax;
-        dyRaw = py - ay;
-        dzRaw = pz - az;
-        dxs = (dxRaw + 0x80) >> 8;
-        dzs = (dzRaw + 0x80) >> 8;
-        adx = sub081879A8_Abs(dxs);
-        ady = sub081879A8_Abs(dyRaw);
-        adz = sub081879A8_Abs(dzs);
-
-        if (actor->flagsB32 & 1) {
-            if (actor->mode1120 == 1) {
-                if (actor->kindB3C == 3) {
-                    ActorController_SetBehavior(actor, 0x1E);
-                } else {
-                    sum = adx + adz;
-                    if (sum > 4) {
-                        ActorController_SetBehavior(actor, 0x13);
-                        actor->mode1120 = 0;
-                    } else {
-                        dir = sub081879A8_Facing(dxRaw, dzRaw);
-                        if (dir == actor->dirB39 && sum <= 1) {
-                            ActorController_SetBehavior(actor, 3);
-                        } else if (!sub081879A8_TryAlign(actor, dxs, dzs)) {
-                            ActorController_SetBehaviorIfFinished(actor, 0x20);
-                        }
-                    }
-                }
-            } else if (actor->mode1120 > 1) {
-                if (actor->mode1120 == 2) {
-                    if (actor->kindB3C == 0xF) {
-                        ActorController_SetBehavior(actor, 3);
-                    } else {
-                        ActorController_SetBehavior(actor, 0x20);
-                        actor->mode1120 = 1;
-                        actor->timer1122 = 0xB4;
-                    }
-                } else if (actor->mode1120 == 3) {
-                    if (!(((u8)(actor->kindB3C - 10) <= 1) || actor->kindB3C == 0xD)) {
-                        ActorController_SetBehavior(actor, 0xA);
-                    }
-                    if (!((s16)actor->timer1122 > 0)) {
-                        if (sub081879A8_Aligned(actor, dxs, dzs) && ady <= 0x7F &&
-                            (dxs == 0 ? adz : adx) <= 4) {
-                            ActorController_SetBehavior(actor, 0x24);
-                        } else {
-                            ActorController_SetBehavior(actor, 0x13);
-                        }
-                        actor->mode1120 = 0;
-                    }
-                }
-            } else if (actor->mode1120 == 0) {
-                sum = adx + adz;
-                if (sum <= 3) {
-                    ActorController_SetBehavior(actor, 0x20);
-                    actor->mode1120 = 1;
-                    actor->timer1122 = 0xB4;
-                } else {
-                    ActorController_SetBehaviorIfFinished(actor, 0x13);
-                }
-            }
-        } else {
-            if (actor->mode1120 == 1) {
-                if (actor->kindB3C == 3) {
-                    ActorController_SetBehavior(actor, 0x1E);
-                } else {
-                    sum = adx + adz;
-                    if (sum > 4) {
-                        if (actor->flag1121) {
-                            ActorController_SetBehavior(actor, 0x21);
-                        } else {
-                            ActorController_SetBehavior(actor, 0x13);
-                        }
-                        actor->mode1120 = 0;
-                    } else {
-                        dir = sub081879A8_Facing(dxRaw, dzRaw);
-                        if (dir == actor->dirB39 && sum <= 1) {
-                            ActorController_SetBehavior(actor, 3);
-                        } else if (!sub081879A8_TryAlign(actor, dxs, dzs)) {
-                            if (actor->flag1121) {
-                                ActorController_SetBehavior(actor, 0x22);
-                            } else {
-                                ActorController_SetBehavior(actor, 0x20);
-                            }
-                        }
-                    }
-                }
-            } else if (actor->mode1120 == 2) {
-                if (actor->kindB3C == 0xF) {
-                    ActorController_SetBehavior(actor, 3);
-                } else {
-                    if (actor->flag1121) {
-                        ActorController_SetBehavior(actor, 0x22);
-                    } else {
-                        ActorController_SetBehavior(actor, 0x20);
-                    }
-                    actor->mode1120 = 1;
-                    actor->timer1122 = 0xB4;
-                }
-            } else if (actor->mode1120 == 0) {
-                sum = adx + adz;
-                if (sum <= 3) {
-                    if (actor->flag1121) {
-                        ActorController_SetBehavior(actor, 0x22);
-                    } else {
-                        ActorController_SetBehavior(actor, 0x20);
-                    }
-                    actor->mode1120 = 1;
-                    actor->timer1122 = 0xB4;
-                } else if (Armor_IsSequenceIncomplete(actor->armorB58)) {
+        switch (actor->decision) {
+            case 0:
+                if (absX + absZ <= 3) {
+                    if (actor->fastMode)
+                        ActorController_SetBehavior(actor, 34);
+                    else
+                        ActorController_SetBehavior(actor, 32);
+                    actor->decision = 1;
+                    actor->attackCooldown = 180;
+                } else if (Armor_IsSequenceIncomplete(actor->armorData))
                     ActorController_SetBehavior(actor, 8);
-                } else {
-                    if (actor->flag1121) {
-                        ActorController_SetBehavior(actor, 0x21);
-                    } else {
-                        ActorController_SetBehavior(actor, 0x13);
+                else if (actor->fastMode)
+                    ActorController_SetBehavior(actor, 33);
+                else
+                    ActorController_SetBehavior(actor, 19);
+                break;
+            case 1:
+                if (actor->behavior == 3) {
+                recover:
+                    ActorController_SetBehavior(actor, 30);
+                    break;
+                }
+                distance = absX + absZ;
+                if (distance > 4) {
+                    if (actor->fastMode)
+                        ActorController_SetBehavior(actor, 33);
+                    else
+                        ActorController_SetBehavior(actor, 19);
+                    actor->decision = 0;
+                    break;
+                }
+                direction = Math_Atan2(playerX - actorX, playerZ - actorZ);
+                direction = (direction + 32) & 192;
+                if (Armor_FacingValue(actor) == direction && distance <= 1)
+                    goto attack;
+                if ((s16)actor->attackCooldown <= 0) {
+                    if (gridX == 0) {
+                        if (gridZ < 0) {
+                            if (actor->facing == 192)
+                                goto alignLowZ;
+                        } else if (actor->facing == 64)
+                            goto alignLowZ;
+                        goto idleLow;
+                    alignLowZ:
+                        ActorController_SetBehavior(actor, 24);
+                        actor->attackCooldown = 180;
+                        break;
+                    } else if (gridZ == 0) {
+                        if (gridX < 0) {
+                            if (actor->facing == 128)
+                                goto alignLowX;
+                        } else if (actor->facing == 0)
+                            goto alignLowX;
+                        goto idleLow;
+                    alignLowX:
+                        ActorController_SetBehavior(actor, 24);
+                        actor->attackCooldown = 180;
+                        break;
                     }
                 }
-            }
+            idleLow:
+                if (actor->fastMode)
+                    ActorController_SetBehavior(actor, 34);
+                else
+                    ActorController_SetBehavior(actor, 32);
+                break;
+            case 2:
+                if (actor->behavior == 15) {
+                attack:
+                    ActorController_SetBehavior(actor, 3);
+                    break;
+                }
+                if (actor->fastMode)
+                    ActorController_SetBehavior(actor, 34);
+                else
+                    ActorController_SetBehavior(actor, 32);
+                actor->decision = 1;
+                actor->attackCooldown = 180;
+                break;
         }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081879A8);
-#endif
