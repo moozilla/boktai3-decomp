@@ -189,7 +189,12 @@ def decision_delta(parent, child):
     delta = {k: {"before": parent.get(k), "after": child.get(k)}
              for k in keys if parent.get(k) != child.get(k)}
     a, b = parent.get("structure", {}), child.get("structure", {})
-    for k in ("regions", "constraints", "mismatches", "verdicts"):
+    for k in ("summary", "constraints"):
         if a.get(k) != b.get(k):
-            delta["structure." + k] = {"before": a.get(k), "after": b.get(k)}
+            if k == "constraints":
+                delta["constraints"] = {name: {"before": a.get(k, {}).get(name, {}).get("same"),
+                    "after": b.get(k, {}).get(name, {}).get("same")}
+                    for name in b.get(k, {}) if a.get(k, {}).get(name, {}).get("same") != b[k][name].get("same")}
+            else:
+                delta["structure." + k] = {"before": a.get(k), "after": b.get(k)}
     return delta
