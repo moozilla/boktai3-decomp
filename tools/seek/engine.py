@@ -348,6 +348,7 @@ class Target:
             raise SystemExit(f"{src}: no NONMATCHING function found; name it")
         self.rom_name = scope.rom_name(self.src, self.func)
         self.names = (self.func, self.rom_name)
+        self.group = scope.source_group(self.src, self.func)
         _, addr, sizes = scope.inventory()
         if self.rom_name not in addr:
             raise SystemExit(f"{self.func}: not in the ROM inventory")
@@ -379,12 +380,13 @@ class Target:
         """(code, error) for a preprocessed unit text; with TRACE, (code, error, alloc): the allocation
         agbcc made, per labeled value (AGBCC_DUMPPRI, written by the fork server's child: no -g needed)."""
         t0 = time.time()
+        self.group = scope.source_group(self.src, self.func, pre)
         knobs = dict(knobs or {})
         if trace:
             path = os.path.join(LOCAL, "cache", f"pri{os.getpid()}.txt")
             open(path, "w").close()
             knobs["AGBCC_DUMPPRI"] = path
-        code, err = self.fast.bytes(pre, self.names, knobs)
+        code, err = self.fast.bytes(pre, self.group, knobs)
         self.compiles += 1
         self.compile_time += time.time() - t0
         if not trace:

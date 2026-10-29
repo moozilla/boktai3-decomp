@@ -384,6 +384,28 @@ _G_WARNED = set()
 _UNINIT_WARNED = set()
 
 
+def source_group(src, func, text=None):
+    """Include address-named definitions hidden inside FUNC's inventory span.
+
+    Some inventory entries include unlabeled trailing functions as byte data. A
+    draft can recover them as ordinary C definitions without changing symbols.
+    They remain part of the original span's byte-exact acceptance check.
+    """
+    name = rom_name(src, func)
+    own = [func, name]
+    _, addresses, sizes = inventory()
+    if name not in addresses:
+        return tuple(own)
+    lo, hi = addresses[name], addresses[name] + sizes[name]
+    if text is None:
+        text = open(os.path.join(ROOT, src)).read()
+    for m in re.finditer(r"^[^\n;#{}]*\b(sub_([0-9A-Fa-f]{8}))\s*\([^;{]*\)\s*\{", text, re.M):
+        n, addr = m.group(1), int(m.group(2), 16)
+        if lo < addr < hi and n not in addresses and n not in own:
+            own.append(n)
+    return tuple(own)
+
+
 def arm_unit_exit(src, func):
     """Scope's instrumented compiler is Thumb agbcc: an agbcc_arm unit would compile as Thumb and
     compare against ARM bytes, a listing of nothing but differences. Stop with what to use instead."""
@@ -426,7 +448,7 @@ def compile_draft_g(src, func, env=None):
     wd = workdir(func)
     pre = preprocess(src, env, func)
     if os.environ.get("SCOPE_TRIM") != "0":
-        pre = diagnostic_source(pre, (func, rom_name(src, func))) or pre
+        pre = diagnostic_source(pre, source_group(src, func)) or pre
     open(os.path.join(wd, "u.i"), "w").write(pre)
     for p in PASSES:
         try:
@@ -504,7 +526,7 @@ def compile_draft_g(src, func, env=None):
     # earlier drafts of other sizes move: send such calls to the callee's ROM address instead, so
     # they compare like calls to outside symbols (a phantom bl difference otherwise).
     _, addr_all, _ = inventory()
-    own = (func, rom_name(src, func))
+    own = source_group(src, func)
     local = set(re.findall(r"^\t\.type\t\s*(\w+),function", text, re.M)) - set(own)
     for n in sorted(local):
         a_rom = addr_all.get(n)
@@ -2396,7 +2418,7 @@ def fast_compile(src, func, env=None, plain=None):
         atexit.register(f.close)  # stops its agbcc servers and removes their directories
         os.makedirs(os.path.join(WORK, "cache"), exist_ok=True)
     knobs = {k: v for k, v in (env or {}).items() if k.startswith(("AGBCC_", "CSE_"))}
-    code, err = f.bytes(fast_preprocess(src, env, func), (func, rom_name(src, func)), knobs)
+    code, err = f.bytes(fast_preprocess(src, env, func), source_group(src, func), knobs)
     if code is None:
         return None
     return code, addr, f.data
