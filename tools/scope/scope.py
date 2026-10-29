@@ -1952,9 +1952,9 @@ def reload_records(wd, func):
 
 @by_dumps("names.txt")
 def spill_states(wd, func):
-    """{k: {"uid", "start", "pass", "regs": [spill regs in rotation order], "st": {reg: code}}} from the X
-    line after each R line: the rotation reload choice K scanned (it starts after index START; -1 = a group
-    reload, always from the first) and each spill register's standing at its insn: S shared (pass 0 takes
+    """{k: {"uid", "start", "pass", "rotate", "regs": [spill regs in rotation order], "st": {reg: code}}} from the X
+    line after each R line: the rotation reload choice K scanned (it starts after index START; -1 means
+    the first entry, either an initial rotation or a forced group) and each spill register's standing: S shared (pass 0 takes
     these first), A free, L<n> pseudo N lives there, H a hard register lives there, T another reload of
     the insn has it, C not in the class, M wrong mode."""
     func = dump_func(wd, func)
@@ -1964,12 +1964,14 @@ def spill_states(wd, func):
         p = ln.split()
         if p[0] == "X" and len(p) > 5 and p[1] == func:
             regs, st = [], {}
-            for f in p[6:]:
+            fields = dict(f.split("=", 1) for f in p[4:] if "=" in f)
+            for f in (f for f in p[4:] if ":" in f):
                 r, c = f.split(":")
                 regs.append(int(r))
                 st[int(r)] = c
-            out[int(p[2])] = {"uid": int(p[3]), "start": int(p[4][6:]), "pass": int(p[5][5:]), "regs": regs,
-                              "st": st}
+            out[int(p[2])] = {"uid": int(p[3]), "start": int(fields["start"]), "pass": int(fields["pass"]),
+                              "rotate": bool(int(fields["rotate"])) if "rotate" in fields else None,
+                              "regs": regs, "st": st}
     return out
 
 
@@ -2008,7 +2010,10 @@ def spill_pick(x, start):
 def spill_shifts(x, want):
     """[D] (1 <= D < n) such that AGBCC_SPILL=K:D makes X's reload take WANT; [] if no rotation can."""
     n = len(x["regs"])
-    if x["start"] < 0:
+    # The first normal choice starts at -1 but AGBCC_SPILL can shift it.  A
+    # forced group also records -1 and ignores rotation.  Old traces cannot
+    # distinguish them, so preserve the conservative answer for those traces.
+    if x.get("rotate") is False or (x["start"] < 0 and x.get("rotate") is not True):
         return []
     return [d for d in range(1, n) if spill_pick(x, (x["start"] + d) % n) == want]
 
@@ -2037,7 +2042,12 @@ def explain_spill(wd, func, k, want, got, nm, at, indent="    "):
           + ", ".join(f"{rn(r)} {spill_word(x['st'][r], nm)}" for r in regs))
     prev = [r for r in rel if r[0] < k][-3:]
     if x["start"] < 0:
-        print(f"{indent}this is a group reload: it always scans from {rn(regs[0])}, whatever the rotation")
+        if x.get("rotate") is True:
+            print(f"{indent}the initial round-robin scan starts at {rn(regs[0])}; no previous choice exists")
+        elif x.get("rotate") is False:
+            print(f"{indent}this is a forced group reload: it always scans from {rn(regs[0])}, whatever the rotation")
+        else:
+            print(f"{indent}legacy trace: start=-1 cannot distinguish initial rotation from a forced group; rebuild scope's compiler")
     else:
         took = regs[x["start"]]
         print(f"{indent}the scan starts after {rn(took)}, the register the previous choice took"
@@ -2062,9 +2072,17 @@ def explain_spill(wd, func, k, want, got, nm, at, indent="    "):
               f" the draft keeps elsewhere: `scope.py FILE.c uses {rn(want)}`)")
         return None, f"; {rn(want)} is not a spill register here", out
     code = x["st"][want]
+    if x["start"] < 0 and x.get("rotate") is None:
+        return None, "; rotation status is unknown in this legacy trace", out
+    if x.get("rotate") is False:
+        return None, "; forced group scan ignores AGBCC_SPILL rotation", out
     ds = spill_shifts(x, want)
     if ds:
         d = ds[0]
+        if x["start"] < 0:
+            print(f"{indent}AGBCC_SPILL={k}:{d} gives {rn(want)} by shifting the initial scan {d} places;"
+                  " this does not imply a previous ROM reload choice")
+            return d, f"; shifting the initial reload scan gives {rn(want)}", out
         need = sorted({regs[(x["start"] + e) % n] for e in ds}, key=regs.index)
         print(f"{indent}AGBCC_SPILL={k}:{d} gives {rn(want)}: the ROM's previous choice took"
               f" {' or '.join(map(rn, need))}, not {rn(regs[x['start']])}. Each choice advances the rotation to"
@@ -3290,12 +3308,14 @@ def explain_move2add(wd, uid, row, at):
         if re.match(r"\(set \(reg:\w+ %d r%d\) \(const_int (-?\d+)" % (reg, reg), r):
             src = (u, int(re.match(r".*?\(const_int (-?\d+)", r).group(1)))
             break
-    known = f", set to {src[1]:#x} at {at(src[0])}" if src else ""
-    print(f"  reload's move2add (reload_cse_move2add, reload1.c) rewrote a constant load as an add from"
-          f" r{reg}, which still held a known constant{known}. It forgets everything at a CODE_LABEL, so"
-          " the ROM had a label in between: an if/else arm, an inline function's early return, or a loop"
-          " start. lever: restructure that stretch so control flow joins there (e.g. an inline helper"
-          " with if/return instead of a plain if)")
+    known = (f" An earlier greg assignment sets r{reg} to {src[1]:#x} at {at(src[0])};"
+             " check intervening definitions before treating it as the retained value.") if src else ""
+    print(f"  this add/subtract is consistent with reload's move2add (reload_cse_move2add, reload1.c)"
+          f" reusing a known constant in r{reg}.{known} The optimization depends on physical-register"
+          " contents and allocation, and forgets tracked constants at a CODE_LABEL. A ROM constant"
+          " load can reflect different register history or allocation; an intervening label is only"
+          " one possible cause. Compare the pre/post-reload instruction and preceding register"
+          " definitions before changing source control flow.")
 
 
 def norm_insn(text):

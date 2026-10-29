@@ -3555,6 +3555,7 @@ addr,name,mode,confidence,source,notes
 080C8774,Golem_ResumeBehaviorAfterDisplacement,thumb,low,src-alias,
 080C9844,Golem_OnUnusedState,thumb,low,src-alias,Empty state callback registered by Golem_Init
 080C9848,Golem_UpdateDefeat,thumb,low,src-alias,
+080C9C04,Golem_UpdateHitReaction,thumb,low,src-alias,Hit-reaction dispatcher with charge and route-recovery transitions; interpretation tentative
 080CBE40,Golem_UpdateScriptedAction,thumb,low,src-alias,Initializes an action script and advances its timer until completion
 080CBF24,Golem_ResumeDelayedRoute,thumb,low,src-alias,
 080CC820,Golem_InitActionHandlers,thumb,low,src-alias,Installs the two-entry action callback table at actor offset 0x288

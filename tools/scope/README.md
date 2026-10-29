@@ -406,6 +406,19 @@ in the patch.
 
 ### Gaps (next work on the tool)
 
+* **Largest-function run (2026-10-29), `080C9C04`**: an isolated private compiler
+  experiment suppressing `REG_EQUIV(gRandomTable)` restores the target's `0x150`
+  frame, shared `sp+0x14C` table slot, and RNG register roles together. The normal
+  source still matches neither that decision nor the whole function. Mutable
+  helper inputs, local table forms, shared pointer/union values, and helper
+  input/result reuse retain the equivalence. Recovering the source value boundary
+  is the concrete remaining gap; the diagnostic patch is not in the normal build.
+  A separate audit traces unwanted whole-tail sharing to identical physical
+  sequences and `jump2` cross-jumping. `explain_move2add` now treats an extra
+  label as one possible cause, alongside different register allocation/history.
+  The run also produced `tools/matchsearch` stack transport and explicit
+  call-region obligations, with uncertainty retained
+  ([evidence and continuation](../../notes/matching-search-scale_2026-10-29.md)).
 * **From the first subsystem run (2026-10-25)**: 16 Codex workers' reports, grouped by how many
   hit each (reload/spill causes, PRE source expressions, repeated-block alignment, `why all`'s
   eight-hunk cap, fast-cache races, `-g` knob runs, `land` formatting the whole tree):

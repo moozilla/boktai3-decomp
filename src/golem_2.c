@@ -205,374 +205,827 @@ void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     SceneActorPlacement_PlayCategoryEventSound(actor);
 }
 
-#define GA(T, off) (*(T *)((u8 *)a + (off)))
-#define GB(T, off) (*(T *)((u8 *)base + (off)))
-#define GC(T, off) (*(T *)((u8 *)ctx + (off)))
-
 extern u8 *gUnknown_02000580[];
 void SceneActorRoute_CommitReachableDestination(void *);
 
-/* terrain height of a cell id (shared with the Ivy/Axe loaders) */
-static inline s32 Golem_CellHeight(u32 cell, u8 *pos)
-{
-    u8 *p;
-    s32 b, h;
+#include "engine_globals.h"
 
-    p = TerrainModifiers_FindCellOverride(cell, 1);
-    if (p)
-        p += 4;
-    else
-        p = (u8 *)((u32 *)gTerrainMap)[1] + cell * 4 + 0xC;
-    b = *p;
-    h = (b & 0xF) << 8;
-    if ((b >> 4) == 1)
-        h -= pos[4];
-    else if ((b >> 4) == 2)
-        h -= pos[0];
-    return h;
+u8 *TerrainModifiers_FindCellOverride(s32, s32);
+s32 Mod(s32, s32);
+s32 Div(s32, s32);
+void sub_0807E334(struct SceneActorRegistryResetView *);
+s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
+s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
+
+struct GolemReactionTarget {
+    u8 unknown0[8];
+    u8 playerIndex;
+    u8 unknown9[3];
+    struct ContactPosition position;
+};
+
+struct GolemReactionPlayerCell {
+    u16 unknown0[3];
+    u16 index;
+};
+struct GolemReactionPlayer {
+    u8 unknown0[0x20];
+    u32 flags;
+    struct GolemReactionTarget target;
+    u8 unknown38[8];
+    struct GolemReactionPlayerCell *cell;
+};
+
+struct GolemReactionBody {
+    u8 unknown0[0x624];
+    u8 responseCount;
+    u8 unknown625[3];
+    u32 flags628;
+    u8 unknown62C[0x54];
+    s16 routeDelay;
+    u8 unknown682[0x2A];
+    u16 shakeStrength, shakeTimer;
+};
+
+struct GolemReactionRoutePoint {
+    s16 x, z;
+};
+struct GolemReactionRouteLink {
+    u8 unknown0[8];
+    struct GolemReactionRoutePoint *point;
+    u8 unknownC[8];
+};
+struct GolemReactionSavedControl {
+    void *control;
+    u8 state, phase, behavior, kind;
+};
+struct GolemReactionTurnState {
+    u8 direction, savedDirection;
+    s8 turnsRemaining;
+    u8 unknown3;
+};
+struct GolemReactionGroup {
+    u8 unknown0[0x40];
+    s16 flags;
+    u16 field42, timer44, unknown46;
+    void *homeControl;
+    struct SceneActorRegistryControl control;
+    u8 unknown68[0xC];
+    struct GolemReactionRouteLink homeRoute;
+    u8 unknown88[4];
+    struct GolemReactionSavedControl saved;
+    u8 unknown94[0x162];
+    u8 hitReactionLatch;
+    u8 unknown1F7[5];
+    void *route;
+    struct ContactPosition *destination;
+    struct GolemReactionTurnState turn;
+    void *contactControl;
+    u8 unknown20C[0x10];
+    void *turnControl, *routePhaseCallback, *fallback;
+};
+
+struct GolemReactionTracking {
+    struct GolemReactionTarget *target;
+    struct ContactPosition destination;
+    u8 unknownC, heading, unknownE, flags;
+};
+
+struct GolemReactionActor {
+    void *object;
+    void *drawable;
+    u8 drawableKind;
+    u8 unknown9[0x47];
+    u32 id;
+    u8 unknown54[5];
+    u8 direction;
+    u8 unknown5A[0x2];
+    struct ContactPosition position;
+    struct ContactPosition motion;
+    u8 unknown6C[0xC];
+    void *currentRoute;
+    u8 unknown7C[0x1C];
+    u8 category;
+    u8 unknown99[0x3];
+    s16 health;
+    u8 unknown9E[0xA];
+    s16 heightA8;
+    u16 chargeHeightAA;
+    u8 unknownAC[4];
+    s16 defaultHealth;
+    u8 unknownB2[2];
+    u16 fieldB4;
+    u16 fieldB6;
+    u16 fieldB8;
+    u8 unknownBA[2];
+    u16 fieldBC;
+    u16 fieldBE;
+    u16 fieldC0;
+    u8 unknownC2[2];
+    u16 fieldC4, fieldC6;
+    u16 fieldC8;
+    u8 unknownCA[2];
+    u32 fieldCC;
+    u32 wordD0;
+    u32 wordD4;
+    u8 unknownD8[4];
+    struct GolemReactionTracking tracking;
+    u8 unknownEC[4];
+    u32 distanceF0, rangeF4;
+    u32 distanceLimitF8; /* 080E8200: compared unsigned with distanceF0. */
+    u8 unknownFC[8];
+    u32 word104;
+    u32 word108, word10C, word110;
+    u32 flags114;
+    u32 defaultFlags2CC, defaultFlags2D0;
+    u8 direction120;
+    u8 defaultState, defaultPhase, defaultBehavior;
+    const void *defaultControl;
+    u8 defaultField2B5, unknown129[3];
+    u16 defaultField2EA, defaultFlags2C0;
+    u32 flags130;
+    struct ContactCollider colliderA;
+    struct ContactCollider colliderB;
+    u8 unknown1DC[0x2];
+    u16 paletteBank;
+    u16 basePaletteBank;
+    u8 unknown1E2[0x4];
+    u16 paletteOffset;
+    u16 field1E8;
+    u16 field1EA;
+    u8 unknown1EC[0x30];
+    void *control;
+    u8 unknown220[4];
+    void *entryTarget224;
+    void *idleControl;
+    void *savedTarget;
+    void *chargeControl;
+    u8 unknown234[0x14];
+    void *callback248;
+    u8 unknown24C[0x20];
+    void *update26C;
+    void *update270;
+    u8 unknown274[8];
+    void **callbacks27C, **callbacks280, **callbacks284;
+    void **alternateBehaviorCallbacks; /* +0x288: indexed by behavior2AA. */
+    void **behaviorCallbacks;          /* +0x28C: indexed by behavior2AA. */
+    void **callbacks290, **callbacks294;
+    void **phaseCallbacks; /* +0x298: indexed by phase2A9. */
+    void **callbacks29C, **callbacks2A0;
+    u8 unknown2A4[4];
+    u8 state2A8, phase2A9, behavior2AA, unknown2AB;
+    u32 counter2AC;
+    u8 field2B0, field2B1, field2B2, field2B3;
+    u8 enabled, field2B5, impactDirection, unknown2B7;
+    u16 animationTimer;
+    u8 unknown2BA[4];
+    u16 groundHeight2BE;
+    u16 flags2C0, reactionTimer;
+    u32 profileMode;
+    u16 field2C8;
+    u16 field2CA;
+    u32 actorFlags;
+    u32 collisionFlags;
+    u16 motionFlags;
+    u16 flags2D6;
+    u32 reactionFlags, chargeFlags, field2E0;
+    u16 reactionSoundVariant;
+    u16 impactFlags;
+    u8 unknown2E8[2];
+    u16 field2EA;
+    struct ContactPosition secondaryMotion;
+    u16 terrainCell;
+    u8 unknown2F6[0xE];
+    u32 field304;
+    u32 profileId;
+    u32 unknown30C;
+    struct ContactPosition reactionStart, reactionEnd;
+    u8 unknown320[0xAC];
+    u8 field3CC, unknown3CD[3];
+    struct GolemReactionBody *body;
+    struct GolemReactionGroup group;
+};
+
+static inline void GolemReaction_SetBodyFlags(struct GolemReactionBody *body, u32 flags)
+{
+    body->flags628 |= flags;
+}
+static inline void GolemReaction_SetActorFlags(void *object, u32 bits)
+{
+    struct GolemReactionActor *view = object;
+    view->actorFlags |= bits;
 }
 
-/* (x, z) in 1/256 units -> cell id; 0 when outside the map */
-static inline u32 Golem_CellIndex(s32 x, s32 z)
+static inline struct GolemReactionGroup *GolemReaction_GroupOf(void *object)
 {
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return *(u16 *)((u8 *)gTerrainMap + 0x24 + z * 2) + x;
+    struct GolemReactionActor *actor = object;
+    return &actor->group;
 }
 
-static inline s32 Golem_PosHeight(u16 *pos)
+static inline u8 GolemReaction_Test(u32 value, u32 mask)
 {
-    s32 x = (s16)pos[0] >> 8;
-    s32 z = (s16)pos[2] >> 8;
-
-    return Golem_CellHeight(Golem_CellIndex(x, z), (u8 *)pos);
-}
-
-/* the ROM repeats this store sequence everywhere a control state is entered */
-static inline void Golem_SetControl(u8 *a, u32 kind, void *target)
-{
-    GA(u8, 0x2B2) = 1;
-    GA(u8, 0x2B0) = 0;
-    GA(u8, 0x2B5) = kind;
-    GA(void *, 0x21C) = target;
-    GA(u16, 0x2C8) = 0;
-    GA(u32, 0x114) &= ~1;
-    GA(u32, 0x104) = 0;
-}
-
-static inline void Golem_SetState(u8 *a, u32 state, u32 phase, u32 behavior)
-{
-    GA(u8, 0x2A8) = state;
-    GA(u8, 0x2A9) = phase;
-    GA(u8, 0x2AA) = behavior;
-    GA(u32, 0x2AC) = 0;
-    GA(u8, 0x2B1) = 1;
-}
-
-/* Nav probe + apply; clears the 0x200 flag when the destination is rejected */
-static inline u32 Golem_ApplyBlocked(u8 *a, void *mesh, void *q)
-{
-    s32 r;
-
-    if (Nav_IsPositionInMesh(mesh, a + 0x5C, q) &&
-        (r = Terrain_ApplyBlocked(mesh, a + 0x5C, q)) != 0) {
-        if (r != 2)
-            Memory_Clear(a + 0x64, 8);
+    if (value & mask)
         return 1;
-    }
-    GA(u16, 0x2D4) &= 0xFDFF;
     return 0;
 }
 
-/* same probe, second spelling (the ROM keeps the two inlined copies apart) */
-static inline u32 Golem_ApplyBlocked2(u8 *a, void *mesh, void *q)
+static inline u8 GolemReaction_TestField(u16 *field, u32 mask)
 {
-    s32 r;
-    u32 ok = 0;
-
-    if (Nav_IsPositionInMesh(mesh, a + 0x5C, q)) {
-        r = Terrain_ApplyBlocked(mesh, a + 0x5C, q);
-        if (r != 0) {
-            if (r != 2)
-                Memory_Clear(a + 0x64, 8);
-            ok = 1;
-        }
-    }
-    if (!ok)
-        GA(u16, 0x2D4) &= 0xFDFF;
-    return ok;
+    if (*field & mask)
+        return 1;
+    return 0;
 }
 
-/* Inlined four times: pick where the golem goes after the player-cell check.
-   Returns 0 when it already invoked the fallback callback. */
-static inline u32 Golem_Reposition(u8 *a, u32 variant)
+static inline u16 GolemReaction_ReadMotionFlags(void *object)
 {
-    u8 *base = a + 0x3D4;
-    u8 *ctx = GA(u8 *, 0x3D0);
-    u16 *pos;
-    u16 *src;
-    u8 *obj;
-    u32 cell;
-    u32 res;
-    s32 slot;
-    s32 i;
-    s32 dir;
-    u32 v;
-    u8 *sav;
-    u8 *route;
-    u16 q[4];
-    u32 w;
-    u32 sx, sz;
+    struct GolemReactionActor *actor = object;
+    return actor->motionFlags;
+}
+static inline u16 GolemReaction_MotionFlags(void *object, u32 mask)
+{
+    struct GolemReactionActor *actor = object;
+    u16 value = GolemReaction_ReadMotionFlags(actor);
+    return value & mask;
+}
 
-    pos = GA(u16 *, 0x5D4);
-    src = *(u16 **)(a + 0x450);
-    pos[0] = src[0];
-    pos[2] = src[1];
-    pos[1] = Golem_PosHeight(pos);
+static inline u32 GolemReaction_Bits32(u32 *field, u32 mask)
+{
+    return *field & mask;
+}
 
-    if (gEngineFlags & 0x4800) {
-        obj = GA(u8 *, 0xDC);
-        slot = -1;
-        if (obj) {
-            if (obj[8] <= 3)
-                slot = obj[8];
-        }
-        if (!obj || slot < 0)
-            goto callback;
-        cell = *(u16 *)(*(u8 **)(gUnknown_02000580[slot] + 0x40) + 6);
-    } else {
-        obj = GA(u8 *, 0xDC);
-        cell = Golem_CellIndex((s16) * (u16 *)(obj + 0xC) >> 8, (s16) * (u16 *)(obj + 0x10) >> 8);
+static inline void GolemReaction_InstallControl(void *object, void *callback, u32 kind)
+{
+    struct GolemReactionActor *actor = object;
+    actor->field2B2 = 1;
+    actor->field2B0 = 0;
+    actor->field2B5 = kind;
+    actor->control = callback;
+}
+
+static inline void GolemReaction_ResetMotionControl(void *object)
+{
+    struct GolemReactionActor *actor = object;
+    actor->field2C8 = 0;
+    {
+        u32 *field = &actor->flags114;
+        u32 mask = ~1;
+        *field &= mask;
     }
+    actor->word104 = 0;
+}
 
-    if (cell == GA(u16, 0x2F4) || (*(u32 *)(gUnknown_02000580[0] + 0x20) & 0x20000)) {
-        if (GA(u16, 0x2D4) & 0x400) {
-            res = 0;
-            goto after;
+static inline void GolemReaction_SetControl(void *object, void *callback, u32 kind)
+{
+    struct GolemReactionActor *actor = object;
+    GolemReaction_InstallControl(actor, callback, kind);
+    GolemReaction_ResetMotionControl(actor);
+}
+
+static inline void GolemReaction_SelectState(void *object, u32 state, u32 phase, u32 behavior)
+{
+    struct GolemReactionActor *actor = object;
+    actor->state2A8 = state;
+    actor->phase2A9 = phase;
+    actor->behavior2AA = behavior;
+}
+
+static inline void GolemReaction_ResetStateEntry(void *object)
+{
+    struct GolemReactionActor *actor = object;
+    actor->counter2AC = 0;
+    actor->field2B1 = 1;
+}
+
+static inline void GolemReaction_SetState(void *object, u32 state, u32 phase, u32 behavior)
+{
+    struct GolemReactionActor *actor = object;
+    GolemReaction_SelectState(actor, state, phase, behavior);
+    GolemReaction_ResetStateEntry(actor);
+}
+
+static inline void GolemReaction_SetPhase(void *object, u32 phase, u32 behavior)
+{
+    struct GolemReactionActor *actor = object;
+    GolemReaction_SelectState(actor, 0, phase, behavior);
+    GolemReaction_ResetStateEntry(actor);
+}
+
+static inline void GolemReaction_SetBehavior(void *object, u32 behavior)
+{
+    struct GolemReactionActor *actor = object;
+    GolemReaction_SetPhase(actor, 0, behavior);
+}
+
+static inline struct EngineMap *GolemReaction_CurrentMap(void)
+{
+    return gTerrainMap;
+}
+struct GolemReactionTerrainCell {
+    u8 attributes;
+    u8 tile;
+    u16 flags;
+};
+struct GolemReactionTerrainGrid {
+    u32 field0;
+    s16 width, height;
+    s16 originX, originZ;
+    struct GolemReactionTerrainCell cells[1];
+};
+struct GolemReactionTerrainOverride {
+    u16 flags;
+    u16 index;
+    struct GolemReactionTerrainCell properties;
+};
+static inline struct GolemReactionTerrainCell *GolemReaction_MapCell(struct EngineMap *map,
+                                                                     s32 cell)
+{
+    return &((struct GolemReactionTerrainGrid *)map->cells)->cells[cell];
+}
+static inline struct GolemReactionTerrainCell *GolemReaction_CellProperties(s32 cell)
+{
+    struct GolemReactionTerrainOverride *override =
+        (void *)TerrainModifiers_FindCellOverride(cell, 1);
+    if (override)
+        return &override->properties;
+    return GolemReaction_MapCell(GolemReaction_CurrentMap(), cell);
+}
+static inline u8 GolemReaction_CoordinateFraction(s16 coordinate)
+{
+    return coordinate;
+}
+static inline u32 GolemReaction_MapRowStart(const struct EngineMap *map, s32 row)
+{
+    return map->rows[row];
+}
+static inline s32 GolemReaction_CellIndex(s32 x, s32 z)
+{
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+        return 0;
+    return GolemReaction_MapRowStart(GolemReaction_CurrentMap(), z) + x;
+}
+
+static inline s32 GolemReaction_CellAt(struct ContactPosition *position)
+{
+    return GolemReaction_CellIndex(position->x >> 8, position->z >> 8);
+}
+
+static inline u32 GolemReaction_HeightAt(s32 cell, struct ContactPosition *position)
+{
+    struct GolemReactionTerrainCell *data = GolemReaction_CellProperties(cell);
+    u32 kind, height;
+    kind = data->attributes >> 4;
+    height = (data->attributes & 15) << 8;
+    switch (kind) {
+        case 1:
+            height -= GolemReaction_CoordinateFraction(position->z);
+            break;
+        case 2:
+            height -= GolemReaction_CoordinateFraction(position->x);
+            break;
+    }
+    return height;
+}
+
+static inline u32 GolemReaction_Height(struct ContactPosition *position)
+{
+    return GolemReaction_HeightAt(GolemReaction_CellAt(position), position);
+}
+
+static inline void GolemReaction_SnapToRoute(struct ContactPosition *position,
+                                             struct GolemReactionRouteLink *route)
+{
+    position->x = route->point->x;
+    position->z = route->point->z;
+    position->y = GolemReaction_Height(position);
+}
+
+static inline void GolemReaction_ClearBits(u16 *field, u32 bits)
+{
+    *field &= ~bits;
+}
+
+#define GolemReaction_RouteStatus(route_, position_, target_)                                      \
+    ({                                                                                             \
+        void *route_owner_ = (route_);                                                             \
+        struct ContactPosition *route_position_ = (position_);                                     \
+        struct ContactPosition *route_target_ = (target_);                                         \
+        s32 route_status_ = Nav_IsPositionInMesh(route_owner_, route_position_, route_target_);    \
+        if (route_status_)                                                                         \
+            route_status_ = Terrain_ApplyBlocked(route_owner_, route_position_, route_target_);    \
+        route_status_;                                                                             \
+    })
+
+static inline u16 *GolemReaction_MotionFlagsOf(struct GolemReactionActor *actor)
+{
+    return &actor->motionFlags;
+}
+
+static inline struct ContactPosition *GolemReaction_MotionOf(struct GolemReactionActor *actor)
+{
+    return &actor->motion;
+}
+
+static inline u8 GolemReaction_TryRoute(struct GolemReactionActor *actor, void *route,
+                                        struct ContactPosition *position,
+                                        struct ContactPosition *target)
+{
+    s32 result = GolemReaction_RouteStatus(route, position, target);
+    if (result) {
+        if (result != 2)
+            Memory_Clear(GolemReaction_MotionOf(actor), 8);
+        return 1;
+    }
+    GolemReaction_ClearBits(GolemReaction_MotionFlagsOf(actor), 0x200);
+    return 0;
+}
+
+static inline void *GolemReaction_CurrentControl(void *object)
+{
+    struct GolemReactionActor *actor = object;
+    return actor->control;
+}
+
+static inline u8 GolemReaction_ControlKind(struct GolemReactionActor *actor)
+{
+    return actor->field2B5;
+}
+
+static inline u8 GolemReaction_CurrentState(struct GolemReactionActor *actor)
+{
+    return actor->state2A8;
+}
+
+static inline u8 GolemReaction_CurrentPhase(struct GolemReactionActor *actor)
+{
+    return actor->phase2A9;
+}
+
+static inline u8 GolemReaction_CurrentBehavior(struct GolemReactionActor *actor)
+{
+    return actor->behavior2AA;
+}
+
+static inline void GolemReaction_SaveControl(void *p, void *object)
+{
+    struct GolemReactionActor *actor = object;
+    struct GolemReactionSavedControl *packet = p;
+    packet->control = GolemReaction_CurrentControl(actor);
+    packet->kind = GolemReaction_ControlKind(actor);
+    packet->state = GolemReaction_CurrentState(actor);
+    packet->phase = GolemReaction_CurrentPhase(actor);
+    packet->behavior = GolemReaction_CurrentBehavior(actor);
+}
+
+struct GolemRandomTableView {
+    const u16 *samples;
+};
+#define GolemReaction_NextSample(table_, seed_, wrap_, bits_)                                      \
+    ({                                                                                             \
+        const struct GolemRandomTableView *table_view_ = (table_);                                 \
+        const u16 *samples_ = table_view_->samples;                                                \
+        u32 *cursor_ = (seed_);                                                                    \
+        u32 wrap_mask_ = (wrap_);                                                                  \
+        u32 result_mask_ = (bits_);                                                                \
+        u32 index_ = (*cursor_ + 1) & wrap_mask_;                                                  \
+        u32 sample_;                                                                               \
+        *cursor_ = index_;                                                                         \
+        sample_ = samples_[index_];                                                                \
+        sample_ &= result_mask_;                                                                   \
+        sample_;                                                                                   \
+    })
+static inline u32 GolemReaction_RandomDirectionExcept(u32 current, const u16 *randomSamples)
+{
+    s32 tries;
+    struct GolemRandomTableView table = {randomSamples};
+    for (tries = 0; tries < 4; tries++) {
+        u32 direction = GolemReaction_NextSample(&table, &gRandomIndex, 1023, 3) << 6;
+        if (direction != current)
+            return direction;
+    }
+    return current;
+}
+
+static inline void GolemReaction_BeginTurn(void *obj, u32 saved, const u16 *randomSamples)
+{
+    struct GolemReactionActor *actor = obj;
+    struct GolemReactionGroup *group = GolemReaction_GroupOf(obj);
+    if (!GolemReaction_MotionFlags(actor, 0x400) &&
+        !GolemReaction_TestField((u16 *)&group->flags, 4)) {
+        group->turn.direction =
+            GolemReaction_RandomDirectionExcept(actor->direction, randomSamples);
+        GolemReaction_SaveControl(&group->saved, actor);
+        group->turn.savedDirection = saved;
+        GolemReaction_SetControl(actor, group->turnControl, 0x1B);
+        GolemReaction_SetState(actor, 3, 1, 0);
+        group->turn.turnsRemaining = 6;
+    }
+}
+
+static inline s16 GolemReaction_MapWidth(struct EngineMap *map)
+{
+    return ((struct GolemReactionTerrainGrid *)map->cells)->width;
+}
+static inline s16 GolemReaction_TerrainLevelHeight(u32 level)
+{
+    return level << 8;
+}
+#define GolemReaction_CellCenterCoordinate(coordinate_)                                            \
+    ({                                                                                             \
+        s32 grid_coordinate_ = (coordinate_);                                                      \
+        (s16)(((u32)grid_coordinate_ << 8) + 0x80);                                                \
+    })
+
+static inline void GolemReaction_CellCenter(s32 cell, struct ContactPosition *position)
+{
+    s32 x = Mod(cell, GolemReaction_MapWidth(GolemReaction_CurrentMap()));
+    s32 z = Div(cell, GolemReaction_MapWidth(GolemReaction_CurrentMap()));
+    position->x = GolemReaction_CellCenterCoordinate(x);
+    {
+        u32 attributes = GolemReaction_CellProperties(cell)->attributes;
+        u32 height = 15;
+        height &= attributes;
+        position->y = GolemReaction_TerrainLevelHeight(height);
+    }
+    position->z = GolemReaction_CellCenterCoordinate(z);
+}
+
+static inline s32 GolemReaction_PlayerSlot(struct GolemReactionTarget *target)
+{
+    if (target->playerIndex <= 3)
+        return target->playerIndex;
+    return -1;
+}
+/* A successful cell-center reroute returns one. Other paths leave the
+ * caller to try the separate partner-position route. */
+static inline u8 GolemReaction_Arrive(void *obj)
+{
+    struct ContactPosition target;
+    struct GolemReactionActor *actor = obj;
+    struct GolemReactionGroup *group = GolemReaction_GroupOf(obj);
+    struct GolemReactionTracking *tracking = &actor->tracking;
+    s32 cell, player;
+    const u16 *randomSamples = gRandomTable;
+    void **callback;
+    GolemReaction_SnapToRoute(group->destination, &group->homeRoute);
+    if (GolemReaction_Test(gEngineFlags, 0x4800)) {
+        struct GolemReactionTarget *t = tracking->target;
+        if (!t)
+            goto invalid_target;
+        player = GolemReaction_PlayerSlot(t);
+        if (player < 0) {
+        invalid_target:
+            callback = &group->fallback;
+            goto invoke;
         }
-        GB(u16, 0x40) &= ~4;
-        if (GA(u16, 0x2D4) & 0x80) {
-            Golem_SetControl(a, 0x1A, GB(void *, 0x48));
-            Golem_SetState(a, 0, 0, 0xC);
-        } else {
-            Golem_SetControl(a, 1, GA(void *, 0x228));
-            Golem_SetState(a, 0, 0, 5);
-            pos = GB(u16 *, 0x200);
-            src = *(u16 **)(base + 0x74 + 8);
-            pos[0] = src[0];
-            pos[2] = src[1];
-            pos[1] = Golem_PosHeight(pos);
-            pos = GB(u16 *, 0x200);
-            pos[1] = Golem_PosHeight(pos);
-            pos[3] = 0;
-        }
-        dir = GA(u8, 0x59);
-        if (!((GA(u16, 0x2D4) & 0x400) || (GB(u16, 0x40) & 4))) {
-            v = dir;
-            for (i = 0; i <= 3; i++) {
-                gRandomIndex = (gRandomIndex + 1) & 0x3FF;
-                v = (gRandomTable[gRandomIndex] & 3) << 6;
-                if (v != (u32)dir)
-                    break;
-                v = dir;
+        cell = ((struct GolemReactionPlayer *)gUnknown_02000580[player])->cell->index;
+    } else {
+        struct GolemReactionTarget *t = tracking->target;
+        cell = GolemReaction_CellIndex(t->position.x >> 8, t->position.z >> 8);
+        player = 0;
+    }
+    if (cell != actor->terrainCell &&
+        !GolemReaction_Bits32(&((struct GolemReactionPlayer *)gUnknown_02000580[player])->flags,
+                              0x20000))
+        goto reroute;
+    if (GolemReaction_MotionFlags(actor, 0x400))
+        return 0;
+    {
+        u32 bits = 4;
+        group->flags &= ~bits;
+    }
+    if (GolemReaction_MotionFlags(actor, 0x80)) {
+        GolemReaction_SetControl(actor, group->homeControl, 0x1A);
+        GolemReaction_SetBehavior(actor, 12);
+    } else {
+        GolemReaction_SetControl(actor, actor->idleControl, 1);
+        GolemReaction_SetBehavior(actor, 5);
+        GolemReaction_SnapToRoute(group->destination, &group->homeRoute);
+        (group->destination)->y =
+            GolemReaction_HeightAt(GolemReaction_CellAt(group->destination), group->destination);
+        (group->destination)->pad = 0;
+    }
+    {
+        u8 saved = actor->direction;
+        GolemReaction_BeginTurn(obj, saved, randomSamples);
+    }
+    sub_0807E334(obj);
+    actor->reactionTimer = 0x20;
+    return 0;
+reroute: {
+    GolemReaction_CellCenter(cell, &target);
+    if (GolemReaction_TryRoute(obj, group->route, &actor->position, &target))
+        goto success;
+}
+    callback = &group->fallback;
+invoke:
+    Callback_InvokeActor(actor, *callback);
+    return 0;
+success:
+    return 1;
+}
+
+/* Fields are established by 080C9C04 and the ordinary ReturnHome/ChargeOrReturnHome
+ * relatives. Names for the response count and flags are tentative. */
+static inline u16 GolemReaction_QueryMotionFlags(struct GolemReactionActor *actor, u16 mask)
+{
+    return actor->motionFlags & mask;
+}
+static inline void GolemReaction_ClearMotionFlags(struct GolemReactionActor *actor, u32 bits)
+{
+    u32 mask = ~bits;
+    actor->motionFlags &= mask;
+}
+static inline u8 GolemReaction_TrackingFlags(struct GolemReactionTracking *tracking, u32 mask)
+{
+    if (tracking->flags & mask)
+        return 1;
+    return 0;
+}
+static inline void GolemReaction_SetResponseControl(struct GolemReactionActor *actor, void *control,
+                                                    u32 kind)
+{
+    GolemReaction_InstallControl(actor, control, kind);
+    GolemReaction_ResetMotionControl(actor);
+}
+static inline void GolemReaction_SetResponseState(struct GolemReactionActor *actor, u32 state,
+                                                  u32 phase, u32 behavior)
+{
+    GolemReaction_SelectState(actor, state, phase, behavior);
+    GolemReaction_ResetStateEntry(actor);
+}
+static inline void GolemReaction_LatchHitReact(void *object)
+{
+    struct GolemReactionActor *actor = object;
+    if (!actor->group.hitReactionLatch && (actor->impactFlags & 8)) {
+        actor->animationTimer = 0x2D;
+        actor->group.hitReactionLatch = 0x41;
+        SceneActorAnimation_SelectDirectionalEntry(actor, 3);
+    }
+}
+static inline s16 GolemReaction_CurrentHeight(struct GolemReactionActor *actor)
+{
+    return actor->heightA8;
+}
+
+static inline void GolemReaction_SetChargeHeight(struct GolemReactionActor *actor, s32 height)
+{
+    actor->chargeHeightAA = height;
+}
+static inline void GolemReaction_ClearWordFlags(u32 *flags, u32 bits)
+{
+    u32 mask = ~bits;
+    *flags &= mask;
+}
+static inline void GolemReaction_EnterCharge(struct GolemReactionActor *actor, s16 height)
+{
+    GolemReaction_SetChargeHeight(actor, height);
+    GolemReaction_SetResponseControl(actor, actor->chargeControl, 0x12);
+    GolemReaction_SetResponseState(actor, 3, 0, 0);
+}
+static inline void GolemReaction_HalfwordFlagsSet(u16 *field, u32 bits)
+{
+    u32 value = *field;
+    bits |= value;
+    *field = bits;
+}
+static inline void GolemReaction_GroupSetFlags(struct GolemReactionGroup *owner, u32 bits)
+{
+    GolemReaction_HalfwordFlagsSet((u16 *)&owner->flags, bits);
+}
+static inline void GolemReaction_Settle(struct GolemReactionActor *actor)
+{
+    GolemReaction_SetResponseControl(actor, actor->idleControl, 1);
+    GolemReaction_SetResponseState(actor, 0, 0, 7);
+    actor->reactionTimer = 0x20;
+}
+
+/* Dispatch the hit-reaction state; return one when entering a state. */
+s32 Golem_UpdateHitReaction(struct GolemReactionActor *actor)
+{
+    struct GolemReactionBody *body = actor->body;
+    struct GolemReactionGroup *group = &actor->group;
+    void *object = actor;
+
+    GolemReaction_SetBodyFlags(body, 0x800);
+    actor->collisionFlags &= ~0x1000000;
+    SceneActorPlacement_PlayVariantEventSound(actor, 1);
+
+    if (GolemReaction_QueryMotionFlags(actor, 0x2000)) {
+        actor->direction = actor->impactDirection + 0x80;
+        SceneActorAnimation_SelectDirectionalEntry(actor, 0);
+        GolemReaction_ClearMotionFlags(actor, 0x2020);
+        GolemReaction_SetActorFlags(actor, 0x10);
+        group->destination->pad = 0;
+        actor->tracking.target = &((struct GolemReactionPlayer *)gUnknown_02000580[0])->target;
+        if (!GolemReaction_Arrive(object)) {
+            if (!GolemReaction_TryRoute(object, group->route, &actor->position,
+                                        &actor->tracking.target->position)) {
+                Callback_InvokeActor(actor, group->fallback);
+                return 0;
             }
-            GB(u8, 0x204) = v;
-            sav = base + 0x8C;
-            *(u32 *)sav = GA(u32, 0x21C);
-            sav[7] = GA(u8, 0x2B5);
-            sav[4] = GA(u8, 0x2A8);
-            sav[5] = GA(u8, 0x2A9);
-            sav[6] = GA(u8, 0x2AA);
-            GB(u8, 0x205) = dir;
-            Golem_SetControl(a, 0x1B, GB(void *, 0x21C));
-            Golem_SetState(a, 3, 1, 0);
-            GB(u8, 0x206) = 6;
         }
-        sub_0807E334(a);
-        GA(u16, 0x2C2) = 0x20;
-        res = 0;
-    } else {
-        s32 rem = Mod(cell, *(s16 *)((u8 *)((u32 *)gTerrainMap)[1] + 4));
-        s32 quo = Div(cell, *(s16 *)((u8 *)((u32 *)gTerrainMap)[1] + 4));
-        q[0] = (rem << 8) + 0x80;
-        {
-            u8 *o = TerrainModifiers_FindCellOverride(cell, 1);
-            u8 b;
-            if (o)
-                b = *(o + 4);
-            else
-                b = *((u8 *)((u32 *)gTerrainMap)[1] + cell * 4 + 0xC);
-            q[1] = (b & 0xF) << 8;
-        }
-        q[2] = (quo << 8) + 0x80;
-        if (variant & 1 ? Golem_ApplyBlocked2(a, GB(void *, 0x1FC), q)
-                        : Golem_ApplyBlocked(a, GB(void *, 0x1FC), q)) {
-            res = 1;
-        } else {
-        callback:
-            Callback_InvokeActor(a, GB(void *, 0x224));
-            res = 0;
-        }
-    }
-
-after:
-    if (res == 0) {
-        if (!Golem_ApplyBlocked2(a, GB(void *, 0x1FC), GA(u8 *, 0xDC) + 0xC)) {
-            Callback_InvokeActor(a, GB(void *, 0x224));
-            return 0;
-        }
-    }
-    return 1;
-}
-
-/* the prefix of the 0x80 / animation-B cases: a one-shot hit-react latch */
-static inline void Golem_LatchHitReact(u8 *a)
-{
-    if (GA(u8, 0x5CA) == 0 && (GA(u16, 0x2E6) & 8)) {
-        GA(u16, 0x2B8) = 0x2D;
-        GA(u8, 0x5CA) = 0x41;
-        SceneActorAnimation_SelectDirectionalEntry(a, 3);
-    }
-}
-
-/* shared by the 0x100 and fall-through branches */
-static inline void Golem_EnterCharge(u8 *a)
-{
-    GA(s16, 0xAA) = GA(s16, 0xA8);
-    Golem_SetControl(a, 0x12, GA(void *, 0x230));
-    Golem_SetState(a, 3, 0, 0);
-    GA(u32, 0x2D0) &= 0xFEFFFFFF;
-}
-
-/* the common exit of the 0x2000 case and of the last Reposition copy */
-static inline void Golem_Settle(u8 *a)
-{
-    Golem_SetControl(a, 1, GA(void *, 0x228));
-    Golem_SetState(a, 0, 0, 7);
-    GA(u16, 0x2C2) = 0x20;
-}
-
-#ifdef NONMATCHING
-// fuzzy: 12.6%
-// scope shape 2617 (differences once low registers are set aside)
-// confidence=low: golem hit-reaction state machine; one flag cascade, four inlined Reposition copies, returns 1 if it entered a new state
-s32 sub_080C9C04(u8 *a)
-{
-    u8 *ctx = GA(u8 *, 0x3D0);
-    u8 *base = a + 0x3D4;
-    u16 *flags = &GA(u16, 0x2D4);
-    u32 fl;
-
-    *(u32 *)(ctx + 0x628) |= 0x800;
-    GA(u32, 0x2D0) &= 0xFEFFFFFF;
-    SceneActorPlacement_PlayVariantEventSound(a, 1);
-
-    if (*flags & 0x2000) {
-        GA(u8, 0x59) = GA(u8, 0x2B6) + 0x80;
-        SceneActorAnimation_SelectDirectionalEntry(a, 0);
-        *flags &= 0xDFDF;
-        GA(u32, 0x2CC) |= 0x10;
-        GA(u16 *, 0x5D4)[3] = 0;
-        GA(u8 *, 0xDC) = gUnknown_02000580[0] + 0x24;
-        if (!Golem_Reposition(a, 0))
-            return 0;
-        Golem_Settle(a);
+        GolemReaction_Settle(actor);
         return 1;
     }
-
-    fl = *flags;
-    if (fl & 0x8000) {
-        *flags = fl & ~0x20;
+    if (GolemReaction_QueryMotionFlags(actor, 0x8000)) {
+        GolemReaction_ClearMotionFlags(actor, 0x20);
         return 0;
     }
-    if (fl & 2) {
-        GA(u32, 0x318) = GA(u32, 0x5C);
-        GA(u32, 0x31C) = GA(u32, 0x60);
-        GA(u32, 0x310) = GA(u32, 0x5C);
-        GA(u32, 0x314) = GA(u32, 0x60);
-        Golem_SetControl(a, 7, GA(void *, 0x5DC));
-        Golem_SetState(a, 3, 0, 0);
+    if (GolemReaction_QueryMotionFlags(actor, 2)) {
+        actor->reactionStart = actor->reactionEnd = actor->position;
+        GolemReaction_SetResponseControl(actor, group->contactControl, 7);
+        GolemReaction_SetResponseState(actor, 3, 0, 0);
         return 1;
     }
-    if (fl & 0x100) {
-        if (GA(u32, 0x2D8) & 0x400) {
-            GC(u16, 0x6AC) = 0x1E;
-            GC(u16, 0x6AE) = 0x14;
-            GA(s16, 0xAA) = GA(s16, 0xA8);
-            Golem_SetControl(a, 0x12, GA(void *, 0x230));
-            Golem_SetState(a, 3, 0, 0);
-            GA(u32, 0x2CC) |= 0x80000;
-            GA(u32, 0x2CC) &= ~0x80;
-            GA(u32, 0x2D0) &= 0xFEFFFFFC;
-            GA(u16, 0x2C2) = 0x40;
+    if (GolemReaction_QueryMotionFlags(actor, 0x100)) {
+        if (actor->reactionFlags & 0x400) {
+            body->shakeStrength = 30;
+            body->shakeTimer = 20;
+            GolemReaction_EnterCharge(actor, GolemReaction_CurrentHeight(actor));
+            actor->chargeFlags |= 0x80000;
+            GolemReaction_ClearWordFlags(&actor->actorFlags, 0x80);
+            GolemReaction_ClearWordFlags(&actor->collisionFlags, 0x1000003);
+            actor->reactionTimer = 0x40;
             return 1;
         }
-        if (GA(u32, 0x2DC) & 0xC0000) {
-            Golem_EnterCharge(a);
+        if (actor->chargeFlags & 0xC0000) {
+            GolemReaction_EnterCharge(actor, GolemReaction_CurrentHeight(actor));
+            actor->collisionFlags &= ~0x1000000;
             return 1;
         }
-        if (GA(u32, 0xDC)) {
-            SceneActorRoute_CommitReachableDestination(a);
-            GC(u16, 0x680) = 0x78;
+        if (actor->tracking.target) {
+            SceneActorRoute_CommitReachableDestination(actor);
+            body->routeDelay = 120;
         }
-        *flags &= ~0x20;
+        GolemReaction_ClearMotionFlags(actor, 0x20);
         return 0;
     }
-    if (GA(u32, 0x2DC) & 0xC0000) {
-        Golem_EnterCharge(a);
+    if (actor->chargeFlags & 0xC0000) {
+        GolemReaction_EnterCharge(actor, GolemReaction_CurrentHeight(actor));
+        actor->collisionFlags &= ~0x1000000;
         return 1;
     }
 
-    *flags &= ~0x20;
-    if (GA(u8, 0xDC + 0xF) & 0x10)
+    GolemReaction_ClearMotionFlags(actor, 0x20);
+    if (GolemReaction_TrackingFlags(&actor->tracking, 0x10))
         return 0;
-
-    if (*flags & 0x80) {
-        Golem_LatchHitReact(a);
-        if (!GA(u32, 0xDC))
+    if (GolemReaction_QueryMotionFlags(actor, 0x80)) {
+        GolemReaction_LatchHitReact(object);
+        if (!actor->tracking.target)
             return 0;
-        GA(u8 *, 0xDC) = gUnknown_02000580[0] + 0x24;
-        GA(u32, 0x2CC) |= 0x80;
-        GB(u16, 0x40) |= 4;
-        if (!Golem_Reposition(a, 1))
+        actor->tracking.target = &((struct GolemReactionPlayer *)gUnknown_02000580[0])->target;
+        GolemReaction_SetActorFlags(actor, 0x80);
+        GolemReaction_GroupSetFlags(group, 4);
+        if (!GolemReaction_Arrive(object)) {
+            if (!GolemReaction_TryRoute(object, group->route, &actor->position,
+                                        &actor->tracking.target->position)) {
+                Callback_InvokeActor(actor, group->fallback);
+                return 0;
+            }
+        }
+        GolemReaction_SetResponseControl(actor, group->homeControl, 0x1A);
+        GolemReaction_SetResponseState(actor, 0, 0, 12);
+        return 1;
+    }
+    if (!body->responseCount) {
+        GolemReaction_LatchHitReact(object);
+        if (!actor->tracking.target)
             return 0;
-        Golem_SetControl(a, 0x1A, GB(void *, 0x48));
-        Golem_SetState(a, 0, 0, 0xC);
+        actor->tracking.target = &((struct GolemReactionPlayer *)gUnknown_02000580[0])->target;
+        actor->direction = actor->tracking.heading;
+        group->destination->pad = 1;
+        if (!GolemReaction_Arrive(object)) {
+            if (!GolemReaction_TryRoute(object, group->route, &actor->position,
+                                        &actor->tracking.target->position)) {
+                Callback_InvokeActor(actor, group->fallback);
+                return 0;
+            }
+        }
+        actor->reactionTimer = 0x40;
+        if (body->responseCount <= 2)
+            body->responseCount++;
+        GolemReaction_SetResponseControl(actor, SceneActorReaction_PlayAnimationBUntilComplete, 10);
+        GolemReaction_SetResponseState(actor, 0, 1, 1);
+        GolemReaction_SetActorFlags(actor, 0x10);
         return 1;
     }
 
-    if (GC(u8, 0x624) == 0) {
-        Golem_LatchHitReact(a);
-        if (!GA(u32, 0xDC))
+    GolemReaction_LatchHitReact(object);
+    if (!actor->tracking.target)
+        return 0;
+    actor->tracking.target = &((struct GolemReactionPlayer *)gUnknown_02000580[0])->target;
+    GolemReaction_SetActorFlags(actor, 0x90);
+    group->destination->pad = 0;
+    if (!GolemReaction_Arrive(object)) {
+        if (!GolemReaction_TryRoute(object, group->route, &actor->position,
+                                    &actor->tracking.target->position)) {
+            Callback_InvokeActor(actor, group->fallback);
             return 0;
-        GA(u8 *, 0xDC) = gUnknown_02000580[0] + 0x24;
-        GA(u8, 0x59) = GA(u8, 0xE9);
-        GB(u16 *, 0x200)[3] = 1;
-        if (!Golem_Reposition(a, 2))
-            return 0;
-        GA(u16, 0x2C2) = 0x40;
-        if (GC(u8, 0x624) <= 2)
-            GC(u8, 0x624)++;
-        Golem_SetControl(a, 0xA, SceneActorReaction_PlayAnimationBUntilComplete);
-        Golem_SetState(a, 0, 1, 1);
-        GA(u32, 0x2CC) |= 0x10;
-        return 1;
+        }
     }
-
-    Golem_LatchHitReact(a);
-    if (!GA(u32, 0xDC))
-        return 0;
-    GA(u8 *, 0xDC) = gUnknown_02000580[0] + 0x24;
-    GA(u32, 0x2CC) |= 0x90;
-    GB(u16 *, 0x200)[3] = 0;
-    if (!Golem_Reposition(a, 3))
-        return 0;
-    Golem_Settle(a);
+    GolemReaction_Settle(actor);
     return 1;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080C9C04);
-#endif
 
 void Golem_UpdateScriptedAction(struct SceneActorRegistryResetView *obj)
 {
@@ -636,7 +1089,7 @@ void Golem_UpdateScriptedAction(struct SceneActorRegistryResetView *obj)
 }
 
 #ifdef NONMATCHING
-// fuzzy: 77.7%
+// fuzzy: 80.8%
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
