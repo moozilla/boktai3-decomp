@@ -191,7 +191,9 @@ def rw_related_const(fn):
         f2 = copy.deepcopy(fn)
         c2 = _consts(f2)
         t = new_name(f2)
-        add_local(f2, int_decl(t, "u32"))
+        decl = int_decl(t, "u32")
+        decl.coord = cs[i][0].coord
+        add_local(f2, decl)
         ci, pi, si = c2[i]
         cj, pj, sj = c2[j]
         set_child(pi, si, ca.Assignment("=", ca.ID(t), ci))
