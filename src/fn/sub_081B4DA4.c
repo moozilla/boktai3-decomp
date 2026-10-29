@@ -30,7 +30,7 @@ static inline s32 ScaleSequenceSpeed(s32 weight, s32 speed)
     return (speed * weight) >> 6;
 }
 
-static inline void StepSequence(void *obj, u32 firstMask, int preserveMask)
+static inline void StepSequence(void *obj)
 {
     struct VanargandPart *owner = obj;
     struct DisplaySequenceState *state;
@@ -47,7 +47,7 @@ static inline void StepSequence(void *obj, u32 firstMask, int preserveMask)
     {
         u32 input = state->flags;
         register u32 first asm("r1");
-        bit = firstMask;
+        bit = 1;
         asm("" : "+r"(bit));
         first = bit;
         first &= input;
@@ -73,13 +73,12 @@ static inline void StepSequence(void *obj, u32 firstMask, int preserveMask)
     }
     {
         u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r6");
-        register u16 temp asm("r1");
+        register u32 mask;
+        u32 temp;
         register u32 savedDuration asm("r3");
         state->elapsed = elapsed;
         temp = 0xFFFF;
-        asm("" : "+r"(temp) : "r"(preserveMask ? bit : temp));
-        mask = temp;
+        asm("" : "+r"(temp), "=&r"(mask) : "1"(temp));
         duration = state->duration;
         elapsed = (u16)elapsed;
         savedDuration = duration;
@@ -118,7 +117,6 @@ static inline void StepSequence(void *obj, u32 firstMask, int preserveMask)
                     } else {
                         state->index = 0;
                     }
-                } else {
                 }
             }
             {
@@ -216,9 +214,6 @@ static inline void SetVector(struct SceneVec *v, s32 x, s32 y, s32 z)
     v->z = z;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 96.5%
-// scope shape 2 (differences once low registers are set aside)
 // Tentative action: raise the part along a variant-dependent heading, then land.
 void Vanargand_UpdatePartLeap(struct VanargandBoss *boss, struct VanargandPart *p)
 {
@@ -231,7 +226,7 @@ void Vanargand_UpdatePartLeap(struct VanargandBoss *boss, struct VanargandPart *
             void *resource = boss->partSequenceResource;
             Anim_SetSequence(&p->sequence, resource, 9, (u8)p->variant, 0);
         }
-        StepSequence(p, 1, 0);
+        StepSequence(p);
         SetState(p, 0);
         p->enter = 1;
     }
@@ -282,6 +277,3 @@ void Vanargand_UpdatePartLeap(struct VanargandBoss *boss, struct VanargandPart *
             break;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Vanargand_UpdatePartLeap);
-#endif

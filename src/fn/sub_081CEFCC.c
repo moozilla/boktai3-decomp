@@ -58,12 +58,6 @@ static inline void Polar(struct Vec *out, s32 angle, s32 speed)
     out->y = 0;
     out->z = Scale(speed * gUnk_086149C4[angle]);
 }
-static inline void Add(struct Vec *out, struct Vec *a, struct Vec *b)
-{
-    out->x = a->x + b->x;
-    out->y = a->y + b->y;
-    out->z = a->z + b->z;
-}
 static inline void Face(struct SceneNpc *npc, s32 angle)
 {
     u16 a;
@@ -87,9 +81,6 @@ static inline void Face(struct SceneNpc *npc, s32 angle)
 
 /* Tentative SceneNpc_FollowSceneTarget: follow the manager's selected actor,
  * snapping behind it when separated and permitting conversation when nearby. */
-#ifdef NONMATCHING
-// fuzzy: 73.3%
-// scope shape 42 (differences once low registers are set aside)
 void SceneNpc_FollowSceneTarget(struct Context *ctx, struct SceneNpc *npc)
 {
     struct FollowTarget *target = ctx->target;
@@ -115,11 +106,19 @@ void SceneNpc_FollowSceneTarget(struct Context *ctx, struct SceneNpc *npc)
         s32 dx = targetPosition->x - motion->position.x;
         s32 dz = targetPosition->z - position->z;
         s32 distance = dx * dx + dz * dz;
+        s32 snapDistance = 0x90000;
+        struct Vec *snapPosition = position;
         /* Snap to a point three world units behind a distant target. */
-        if (distance > 0x90000) {
+        if (distance > snapDistance) {
             Face(npc, angle);
             Polar(&offset, motion->angle, -768);
-            Add(&npc->motion.position, &offset, &target->position);
+            {
+                struct Vec *offsetPosition = &offset;
+                struct Vec *targetPosition = &target->position;
+                motion->position.x = targetPosition->x + offsetPosition->x;
+                snapPosition->y = targetPosition->y + offsetPosition->y;
+                snapPosition->z = targetPosition->z + offsetPosition->z;
+            }
         } else if (distance > 0xFFFF) {
             Face(npc, angle);
             Polar(&motion->velocity, motion->angle, 24);
@@ -141,6 +140,3 @@ void SceneNpc_FollowSceneTarget(struct Context *ctx, struct SceneNpc *npc)
     }
     Actor_PlayAnimationEntry(npc, 0, 1, 0, 1);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneNpc_FollowSceneTarget);
-#endif
