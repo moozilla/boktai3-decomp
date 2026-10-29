@@ -1,4 +1,5 @@
 #include "global.h"
+// MATCHING_CONCESSION: register-pinning
 #include "engine.h"
 #include "ram.h"
 // confidence=low: fills the first inactive group with randomized bouncing particles.
@@ -28,10 +29,6 @@ struct Manager {
     u8 *small, *large;
     struct Group groups[6];
 };
-struct Cell {
-    u8 height, tile;
-    u16 flags;
-};
 struct Map {
     u32 pad;
     u8 *cells;
@@ -40,8 +37,6 @@ struct Map {
 };
 #define gRandomTable ((u16 *)0x0203B400)
 extern u32 gUnk_08604B90[];
-u8 *TerrainModifiers_FindCellOverride(int, int);
-void Effect_Remove(void *);
 static inline int CellIndex(struct Vec *p)
 {
     int x = p->x >> 8, z = p->z >> 8;
@@ -52,15 +47,16 @@ static inline int CellIndex(struct Vec *p)
 struct Manager *ParticleManager_Create(void *, u32);
 s32 Mod(s32, s32);
 void sub_08217E40(void *, s32);
-#ifdef NONMATCHING
-// fuzzy: 74.5%
-// fix.py best (sweep after the inlined-insn fix)
-// Register lifetimes and stack offsets still differ in the group and velocity loops.
+struct SpawnArgs {
+    s32 count, options;
+    struct Vec *position;
+};
 static inline s32 Random(u16 *table, u32 mask, u32 *rng)
 {
     u32 r = (*rng + 1) & mask;
     *rng = r;
-    return table[r];
+    r *= 2;
+    return *(u16 *)(r + (u32)table);
 }
 static inline void ClearFlag(volatile u32 *p, u32 mask)
 {
@@ -68,109 +64,144 @@ static inline void ClearFlag(volatile u32 *p, u32 mask)
     v &= ~mask;
     *p = v;
 }
-s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position, struct Vec *velocity,
-                                struct Vec *spread, s32 lifetime, s32 lifetimeMask)
+s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position,
+                                struct Vec *velocityArg, struct Vec *spread, s32 lifetime,
+                                s32 lifetimeMask)
 {
-    struct Manager *m = gParticleGroupManager;
+    struct SpawnArgs args = {count, options, position};
+    register struct Vec *velocityInput asm("r3") = velocityArg;
+    struct Vec *velocity;
+    register struct Manager *m asm("r1");
     u8 *resource;
     struct Group *g;
     struct Group *pool;
     u32 *rng;
     s32 priority;
+    register s32 optionMask asm("r0");
     s32 j;
     register s32 i asm("r5");
-    asm("" : "+m"(count), "+m"(options), "+m"(position));
+
+    velocity = velocityInput;
+    m = gParticleGroupManager;
     if (!m) {
         m = ParticleManager_Create(0, 0);
         if (!m)
             return -1;
     }
-    priority = options >> 8;
-    options &= 255;
-    {
-        register s32 held asm("r4") = priority;
-        asm("" : "+r"(held));
-        priority = held;
+    priority = args.options >> 8;
+    asm("" : "+m"(args.options));
+    optionMask = 255;
+    args.options &= optionMask;
+    if (args.count > 8) {
+        register s32 limit asm("r2") = 8;
+        args.count = limit;
     }
-    if (count > 8)
-        count = 8;
-    asm("" : "+m"(options));
-    if (options <= 20)
-        resource = m->small;
-    else
-        resource = m->large;
+
+    if (args.options <= 20) {
+        register u8 *small asm("r2") = m->small;
+        asm("" : "+r"(small));
+        resource = small;
+    } else {
+        register u8 *large asm("r0") = m->large;
+        asm("" : "+r"(large));
+        resource = large;
+    }
     j = 0;
-    asm("" : "+r"(rng));
+
     rng = &gRandomIndex;
     pool = m->groups;
     g = pool;
-    asm("" : "+r"(g));
+
     for (; j < 6; g++, pool++, j++) {
         if (!g->active) {
             g->active = 1;
-            g->type = *((u8 *)(&options));
-            g->count = *((u8 *)(&count));
+            {
+                register struct SpawnArgs *header asm("r1") = &args;
+                register u32 byte asm("r1") = *((u8 *)&header->options);
+                g->type = byte;
+            }
+            {
+                register struct SpawnArgs *header asm("r2") = &args;
+                register u32 byte asm("r2") = *((u8 *)&header->count);
+                g->count = byte;
+            }
             if (priority > 0)
                 g->priority = priority - 1;
             else
                 g->priority = 2;
             i = 0;
-            if (i < count) {
-                u16 *table = (u16 *)0x0203B400;
-                register u32 mask asm("sb") = 0x3ff;
-                struct Particle *p = pool->particles;
-                u8 *sprite = ((u8 *)pool) + 20;
-                asm("" : "+r"(table), "+r"(mask));
-                i = count;
-                asm("" : "+r"(i));
-                do {
-                    p->active = 1;
-                    p->pad = 1;
-                    p->timer = 0;
-                    p->lifetime = lifetime + (Random(table, mask, rng) & lifetimeMask);
-                    p->cell = CellIndex(position);
-                    p->height = position->y;
-                    if (spread->x) {
-                        s32 r = Random(table, mask, rng);
-                        p->velocity.x = velocity->x + Mod(r, spread->x);
-                    } else
-                        p->velocity.x = velocity->x;
-                    if (spread->y) {
-                        s32 r = Random(table, mask, rng);
-                        p->velocity.y = velocity->y + Mod(r, spread->y);
-                    } else
-                        p->velocity.y = velocity->y;
-                    if (spread->z) {
-                        s32 r = Random(table, mask, rng);
-                        p->velocity.z = velocity->z + Mod(r, spread->z);
-                    } else
-                        p->velocity.z = velocity->z;
-                    if ((Random(table, mask, rng) & 15) <= 7)
-                        p->flags |= 4;
-                    else
-                        p->flags &= ~4;
-                    ClearFlag(&p->flags, 1);
-                    {
-                        struct Vec *source = position;
-                        u32 a = *((u32 *)source);
-                        u32 b = *(((u32 *)source) + 1);
-                        *((u32 *)(&p->position)) = a;
-                        *(((u32 *)(&p->position)) + 1) = b;
-                    }
-                    p->tile = (*((u16 *)(resource + 4))) + gUnk_08604B90[options];
-                    p->priority = g->priority;
-                    sub_08217E40(sprite, 0);
-                    p++;
-                    sprite += 56;
-                    asm("" : "+r"(i));
-                } while (--i);
-                i = count;
+            {
+                register s32 bound asm("r4") = args.count;
+                if (i < bound) {
+                    u16 *table = (u16 *)0x0203B400;
+                    register u16 *tableReg asm("r7") = table;
+                    struct Particle *p = pool->particles;
+                    u8 *sprite = ((u8 *)pool) + 20;
+                    u32 mask = 0x3ff;
+
+                    asm("" : "+r"(tableReg), "+r"(g));
+                    table = tableReg;
+                    i = args.count;
+
+                    do {
+                        p->active = 1;
+                        p->pad = 1;
+                        p->timer = 0;
+                        p->lifetime = lifetime + (Random(table, mask, rng) & lifetimeMask);
+                        p->cell = CellIndex(args.position);
+                        {
+                            register struct Vec *source asm("r2") = args.position;
+                            p->height = source->y;
+                        }
+                        if (spread->x) {
+                            s32 r = Random(table, mask, rng);
+                            p->velocity.x = velocity->x + Mod(r, spread->x);
+                        } else
+                            p->velocity.x = velocity->x;
+                        if (spread->y) {
+                            s32 r = Random(table, mask, rng);
+                            p->velocity.y = velocity->y + Mod(r, spread->y);
+                        } else
+                            p->velocity.y = velocity->y;
+                        if (spread->z) {
+                            s32 r = Random(table, mask, rng);
+                            p->velocity.z = velocity->z + Mod(r, spread->z);
+                        } else
+                            p->velocity.z = velocity->z;
+                        if ((Random(table, mask, rng) & 15) <= 7)
+                            p->flags |= 4;
+                        else
+                            p->flags &= ~4;
+                        ClearFlag(&p->flags, 1);
+                        {
+                            register struct Vec *source asm("r2") = args.position;
+                            p->position = *source;
+                        }
+                        {
+                            register u32 *entries asm("r1") = gUnk_08604B90;
+                            s32 type;
+                            u32 offset;
+                            type = args.options;
+                            offset = type * sizeof(*entries);
+                            asm("" : "+r"(offset) : "r"(type));
+                            p->tile = (*((u16 *)(resource + 4))) + *(u32 *)(offset + (u32)entries);
+                        }
+                        p->priority = g->priority;
+                        sub_08217E40(sprite, 0);
+                        p++;
+                        sprite += 56;
+
+                    } while (--i);
+                    i = args.count;
+                }
             }
             if (i < 8) {
-                struct Particle *p = &pool->particles[i];
+                u32 inactive = 0, hidden = 1;
+                u32 offset = i * sizeof(struct Particle);
+                struct Particle *p = (struct Particle *)(offset + (u32)pool->particles);
                 do {
-                    p->active = 0;
-                    p->flags |= 1;
+                    p->active = inactive;
+                    p->flags |= hidden;
                     p++;
                     i++;
                 } while (i < 8);
@@ -181,7 +212,3 @@ s32 ParticleGroup_SpawnBouncing(s32 count, s32 options, struct Vec *position, st
 
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08014634);
-#endif

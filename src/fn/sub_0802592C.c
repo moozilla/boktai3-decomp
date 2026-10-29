@@ -21,8 +21,11 @@ struct Sub0802592CPlayer {
 };
 
 struct Sub0802592CSize {
-    u32 w;
-    u32 h;
+    s32 x : 16, y : 16, z : 16, pad : 16;
+};
+
+struct Sub0802592CPair {
+    u32 first, second;
 };
 
 struct Sub0802592CActor {
@@ -40,7 +43,13 @@ struct Sub0802592CActor {
     u8 unkB2[0x104 - 0xB2];
     void *unk104;
     void *unk108;
-    struct Sub0802592CPlayer *unk10C[69];
+    union {
+        struct Sub0802592CPlayer *players[69];
+        struct {
+            u32 unknown;
+            struct Sub0802592CPair *positions[68];
+        } references;
+    } targets;
     u8 unk220[0x24C - 0x220];
     u16 unk24C;
     u8 unk24E[0x254 - 0x24E];
@@ -61,17 +70,38 @@ struct Sub0802592CActor {
     u8 unk39B[0x3AC - 0x39B];
     u32 unk3AC;
     u8 unk3B0[0x9CC - 0x3B0];
-    u32 unk9CC;
-    u32 unk9D0;
+    struct Sub0802592CPair saved;
 };
 
-#ifdef NONMATCHING
-// fuzzy: 59.2%
-// scope shape 120 (differences once low registers are set aside)
-// scope shape 120 (differences once low registers are set aside)
-// confidence=low: player-trail update: a per-frame state machine that starts an animation on a flagged frame, copies a position pair, and reports health and damage changes
-void sub_0802592C(struct Sub0802592CActor *actor, s32 param)
+/* Track the selected player and apply contact health changes. */
+static inline u8 SceneTrail_TargetIndex(struct Sub0802592CActor *p)
 {
+    return p->unk395;
+}
+
+static inline void SceneTrail_CopySavedPosition(struct Sub0802592CActor *actor)
+{
+    s32 idx;
+    u32 *pair;
+    idx = (s8)SceneTrail_TargetIndex(actor);
+    pair = (u32 *)actor->targets.references.positions[idx];
+    *(struct Sub0802592CPair *)((u8 *)actor + 0x9cc) = *(struct Sub0802592CPair *)pair;
+}
+
+static inline s32 SceneTrail_WrappedDifference(s32 current, s32 previous)
+{
+    s32 before = previous - 0x100;
+    return (current - before) & 0xff;
+}
+
+static inline u8 SceneTrail_DirectionToAngle(u8 direction)
+{
+    return (((u32)direction << 29) + 0xA0000000) >> 24;
+}
+
+void sub_0802592C(struct Sub0802592CActor *base, s32 param)
+{
+    struct Sub0802592CActor *actor = base;
     struct Sub0802592CPlayer *q;
     struct Sub0802592CSize size;
     s32 idx;
@@ -85,48 +115,60 @@ void sub_0802592C(struct Sub0802592CActor *actor, s32 param)
     s32 hp;
     u32 v;
     u32 w;
-    u32 *pair;
 
-    if (actor->unkB1) {
-        actor->unkB1 = 0;
-        idx = (s8)actor->unk395;
+    if (base->unkB1) {
+        base->unkB1 = 0;
+        idx = (s8)SceneTrail_TargetIndex(base);
         state = gUnknown_02000580[idx]->unk418;
         switch (state) {
-            case 1:
-                animA = 0x14;
-                animB = 0x3A;
+            case 0:
+            default:
+                animA = 0x13;
+                animB = 0x39;
                 break;
             case 2:
                 animA = 0x15;
                 animB = 0x3B;
                 break;
-            default:
-                animA = 0x13;
-                animB = 0x39;
+            case 1:
+                animA = 0x14;
+                animB = 0x3A;
                 break;
         }
         if (actor->unk3AC & 1)
             anim = animA;
         else
             anim = animB;
-        SceneActors_StartAnimation(actor, (u8 *)actor + 0x240, (u8 *)actor + 0x220, anim, 1, 4);
-        if (actor->unkA8 > 1) {
-            actor->unk51 = 0x40;
-            actor->unkA8 = 2;
-        } else {
-            actor->unk51 = 0;
-            actor->unkA8 = 1;
+        SceneActors_StartAnimation(base, (u8 *)actor + 0x240, (u8 *)actor + 0x220, anim, 1, 4);
+        {
+            u8 *facingPtr = &base->unkA8;
+            s32 facing;
+            if (*facingPtr <= 1) {
+                u32 angle = 0;
+                base->unk51 = angle;
+                facing = 1;
+            } else {
+                u32 angle = 0x40;
+                base->unk51 = angle;
+                facing = 2;
+            }
+            *facingPtr = facing;
         }
-        actor->unkA9 = ((actor->unk51 + 0x70) >> 5) & 7;
-        idx = (s8)actor->unk395;
-        pair = (u32 *)actor->unk10C[idx + 1];
-        actor->unk9CC = pair[0];
-        actor->unk9D0 = pair[1];
+        {
+            s32 shift = (base->unk51 + 0x70) >> 5;
+            s32 direction = 7;
+            direction &= shift;
+            {
+                u8 *out = &base->unkA9;
+                *out = direction;
+            }
+        }
+        SceneTrail_CopySavedPosition(actor);
+        idx = (s8)SceneTrail_TargetIndex(actor);
         Player_BeginPositionRequest(gUnknown_02000580[idx], (u8 *)actor + 0x260, 0, 0, 0, 0, 1, 0,
                                     2);
-        idx = (s8)actor->unk395;
-        if (idx >= 0) {
-            v = actor->unk10C[idx]->unk4F4;
+        if ((s8)actor->unk395 >= 0) {
+            v = base->targets.players[(s8)actor->unk395]->unk4F4;
             actor->unk396 = v;
             actor->unk397 = v;
         }
@@ -134,59 +176,73 @@ void sub_0802592C(struct Sub0802592CActor *actor, s32 param)
         actor->unk39A = 0;
     }
 
-    cb = (u8)Callback_InvokeActor(actor, actor->unk104);
+    cb = (u8)Callback_InvokeActor(base, base->unk104);
     if (cb != 0) {
-        idx = (s8)actor->unk395;
-        Player_ApplyPositionRequest(gUnknown_02000580[idx], &actor->unk9CC, 0x32, actor->unk51,
-                                    0x32, 0, 0, 0);
+        idx = (s8)SceneTrail_TargetIndex(actor);
+        Player_ApplyPositionRequest(gUnknown_02000580[idx], &actor->saved, 0x32, actor->unk51, 0x32,
+                                    0, 0, 0);
         return;
     }
 
-    cb2 = (u8)Callback_InvokeActor(actor, actor->unk108);
+    cb2 = (u8)Callback_InvokeActor(base, base->unk108);
     if (cb2 != 0) {
-        idx = (s8)actor->unk395;
-        Player_ApplyPositionRequest(gUnknown_02000580[idx], &actor->unk9CC, 0x32, actor->unk51,
-                                    0x32, 0, 0, 0);
+        idx = (s8)SceneTrail_TargetIndex(actor);
+        Player_ApplyPositionRequest(gUnknown_02000580[idx], &actor->saved, 0x32, actor->unk51, 0x32,
+                                    0, 0, 0);
         return;
     }
 
-    idx = (s8)actor->unk395;
-    q = actor->unk10C[idx];
-    v = q->unk4F4;
-    w = actor->unk397;
-    if (w != v) {
-        actor->unk397 = v;
-        actor->unk39A++;
-    }
-    if (actor->unk39A > 3) {
-        actor->unk398 = ((Player_GetInputDirection(q) << 29) + 0xA0000000) >> 24;
-        actor->unk399 = 0x10;
-        actor->unk39A = cb2;
-    }
-    if (actor->unk254 == 3 && actor->unk24C == 0) {
-        reqRes = Player_BeginPositionRequest(gUnknown_02000580[(s8)actor->unk395],
-                                             (u8 *)actor + 0x260, 0, 0, 0, 0, 1, actor->unk368, 2);
-        hp = actor->unk94;
-        SceneActors_SetHealth(actor, hp + reqRes);
-        if (hp != actor->unk94) {
-            size.w = (size.w & 0xFFFF0000) | 0x18;
-            size.w &= 0xFFFF;
-            size.h = (size.h & 0xFFFF0000) | 0x18;
-            DamageNumberDisplay_Show((u8 *)actor + 0x1CC, reqRes, 1, (u8 *)actor + 0x54, &size, 1);
+    {
+        u8 sample;
+        struct Sub0802592CPlayer **targets;
+        s8 *index = (s8 *)&actor->unk395;
+        idx = *index;
+        {
+            u32 offset = idx * 4;
+            struct Sub0802592CPlayer **references = base->targets.players;
+            q = *(struct Sub0802592CPlayer **)((u8 *)references + offset);
+            sample = q->unk4F4;
+            w = actor->unk397;
+            targets = references;
         }
-        sub_08022694(actor);
-        Sound_PlaySongChecked(0x34C);
-    }
+        if (w != sample) {
+            actor->unk397 = sample;
+            actor->unk39A++;
+        }
+        if (actor->unk39A > 3) {
+            actor->unk398 = SceneTrail_DirectionToAngle(Player_GetInputDirection(q));
+            actor->unk399 = 0x10;
+            actor->unk39A = cb2;
+        }
+        if (actor->unk254 == 3 && actor->unk24C == 0) {
+            idx = *index;
+            reqRes = Player_BeginPositionRequest(gUnknown_02000580[idx], (u8 *)actor + 0x260, 0, 0,
+                                                 0, 0, 1, actor->unk368, 2);
+            hp = actor->unk94;
+            SceneActors_SetHealth(actor, hp + reqRes);
+            if (hp != actor->unk94) {
+                void *contact = (u8 *)actor + 0x1cc;
+                size.x = 0x18;
+                size.y = 0;
+                size.z = 0x18;
+                DamageNumberDisplay_Show(contact, reqRes, 1, (u8 *)actor + 0x54, &size, 1);
+            }
+            sub_08022694(actor);
+            Sound_PlaySongChecked(0x34C);
+        }
 
-    idx = (s8)actor->unk395;
-    q = actor->unk10C[idx];
-    if (((q->unk4F4 - (actor->unk396 - 0x100)) & 0xFF) > 0xF)
-        actor->unk383 = 1;
-    if (actor->unk25D & 2) {
-        if ((gUnk_02000560 & 4) || actor->unk383 || param > 0x78)
-            actor->unkAF = 1;
+        idx = (s8)SceneTrail_TargetIndex(actor);
+        {
+            struct Sub0802592CPlayer *currentPlayer = targets[idx];
+            s32 previous = actor->unk396;
+            s32 current = currentPlayer->unk4F4;
+            if (SceneTrail_WrappedDifference(current, previous) > 0xf)
+                actor->unk383 = 1;
+        }
+        if (actor->unk25D & 2) {
+            u32 mask = 4;
+            if ((gUnk_02000560 & mask) || actor->unk383 || param > 0x78)
+                base->unkAF = 1;
+        }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0802592C);
-#endif

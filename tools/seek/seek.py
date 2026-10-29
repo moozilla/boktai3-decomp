@@ -595,11 +595,14 @@ def c_diff(a, b, la="a", lb="b", n=2):
 
 
 def func_text(w, node):
+    """Comparable source, including helpers; normalize functions to hide AST formatting noise."""
     t = w.sess.text(node)
-    for n in w.target.names:
-        sp = E.find_def(t, n)
-        if sp:
-            return t[sp[0]:sp[1]]
+    try:
+        _, defs = w.pre_of(node)
+        for name, fn in defs.items():
+            t = E.splice(t, [name], R.text(fn)) or t
+    except Exception:  # A file node can still be reviewed if its AST cannot be parsed.
+        pass
     return t
 
 
