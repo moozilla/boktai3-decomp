@@ -50,9 +50,11 @@ _unicorn_ok = None
 
 def unicorn_usable():
     """Whether unicorn runs here. In some sandboxes (no JIT memory) it dies with SIGILL, which no
-    try/except catches, so probe it once in a child process. SEEK_SEM=0 skips semantics entirely."""
+    try/except catches, so probe it once in a child process. SEEK_SEM=0 skips semantics entirely. In
+    Codex's seatbelt sandbox the answer is known, and the probe's crash would raise a macOS crash dialog
+    on every seek command, so it is not run there."""
     global _unicorn_ok
-    if os.environ.get("SEEK_SEM") == "0":
+    if os.environ.get("SEEK_SEM") == "0" or os.environ.get("CODEX_SANDBOX") == "seatbelt":
         return False
     if _unicorn_ok is None:
         try:
