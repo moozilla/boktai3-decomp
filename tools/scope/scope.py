@@ -2565,13 +2565,21 @@ def concession_sites(text):
     barrier statement (`asm("" : "+r"(x));`) in TEXT; removal(lines) returns the lines without it."""
     lines = text.split("\n")
     out = []
+    skip_until = 0
     for i, ln in enumerate(lines):
+        if i < skip_until:
+            continue
         if ln.lstrip().startswith("//"):
             continue
         if PIN_RE.search(ln) and "register" in ln:
             out.append((i, "pin", lambda ls, i=i: ls[:i] + [PIN_RE.sub("", ls[i], count=1)] + ls[i + 1:]))
-        elif BARRIER_RE.match(ln):
-            out.append((i, "barrier", lambda ls, i=i: ls[:i] + ls[i + 1:]))
+        elif re.match(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', ln):
+            end = i + 1
+            while ";" not in "\n".join(lines[i:end]) and end < len(lines):
+                end += 1
+            if BARRIER_RE.match("\n".join(lines[i:end])):
+                out.append((i, "barrier", lambda ls, i=i, end=end: ls[:i] + ls[end:]))
+                skip_until = end
     return out
 
 
@@ -2582,13 +2590,16 @@ def sole_definitions(lines, i):
     """Variables that the barrier on line I defines (an output-only `"=r"(x)` operand) and that nothing
     else in the enclosing function sets. Removing such a barrier leaves x read with no value: same bytes
     perhaps, but not C anyone wrote (a pinned register variable gets no uninitialized warning)."""
-    ln = lines[i]
+    end = i + 1
+    while ";" not in "\n".join(lines[i:end]) and end < len(lines):
+        end += 1
+    ln = "\n".join(lines[i:end])
     outs = re.findall(r'"=[^"]*"\s*\(\s*(\w+)\s*\)', ln.split(":")[1] if ln.count(":") >= 1 else "")
     if not outs:
         return []
     lo = next((j for j in range(i, -1, -1) if re.match(r"\w.*\)\s*\{?\s*$", lines[j]) and not lines[j][0].isspace()), 0)
     hi = next((j for j in range(i, len(lines)) if lines[j].startswith("}")), len(lines) - 1)
-    body = "\n".join(lines[lo:i] + lines[i + 1:hi + 1])
+    body = "\n".join(lines[lo:i] + lines[end:hi + 1])
     sole = []
     for x in outs:
         x_re = re.escape(x)
