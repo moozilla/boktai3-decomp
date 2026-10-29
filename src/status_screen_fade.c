@@ -146,24 +146,28 @@ void StatusScreen_FadeOutPalette(struct StatusScreen *p)
 
 static inline int StatusScreen_Random(void)
 {
-    u32 offset;
+    u16 offset;
+    const u16 *table = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)gRandomTable);
+    return *(const u16 *)((const u8 *)table + offset);
 }
-#ifdef NONMATCHING
-// fuzzy: 75.6%
-// scope shape 34 (differences once low registers are set aside)
-// scope shape 36 (differences once low registers are set aside)
+static inline void StatusScreen_AdvanceNoiseAmplitude(struct StatusScreen *p)
+{
+    s16 *amplitude = &p->amplitude;
+    u16 *delta = &p->delta;
+    *amplitude += *delta;
+    if (*amplitude < 0)
+        *amplitude = 0;
+    else if (*amplitude > 256)
+        *amplitude = 256;
+}
 void StatusScreen_UpdateScanlineNoise(struct StatusScreen *p)
 {
     s32 i;
-    s16 *amplitude, *delta;
     for (i = 0; i < p->top; i++)
         p->rows[p->active][i] = 0;
     i = p->top;
-    amplitude = &p->amplitude;
-    delta = (s16 *)&p->delta;
     for (; i < p->bottom; i++) {
         p->rows[p->active][i] = (StatusScreen_Random() * p->amplitude) >> 18;
     }
@@ -173,15 +177,8 @@ void StatusScreen_UpdateScanlineNoise(struct StatusScreen *p)
     gScanlineDmaTarget = (void *)0x0400004C;
     gScanlineDmaCount = 1;
     gScanlineDmaMode = 1;
-    *amplitude += *delta;
-    if (*amplitude < 0)
-        *amplitude = 0;
-    else if (*amplitude > 256)
-        *amplitude = 256;
+    StatusScreen_AdvanceNoiseAmplitude(p);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", StatusScreen_UpdateScanlineNoise);
-#endif
 
 void StatusScreen_ClearScanlineNoise(struct StatusScreen *p)
 {
