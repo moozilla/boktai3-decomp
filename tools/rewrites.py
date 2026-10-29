@@ -353,6 +353,10 @@ def rw_commute(fn):
 
 def rw_swap_stmts(fn):
     """Swap two adjacent statements (scheduling / evaluation order)."""
+    def transfers_control(stmt):
+        return any(isinstance(n, (ca.Return, ca.Goto, ca.Break, ca.Continue, ca.Label))
+                   for n, _, _ in walk(stmt))
+
     def effects(stmt):
         # Only straight-line assignments with pure operands can commute here.
         # Calls and control flow may observe/change any memory, and identifiers
@@ -377,7 +381,8 @@ def rw_swap_stmts(fn):
     for bi, b in enumerate(bl):
         for i in range(len(b.block_items) - 1):
             x, y = b.block_items[i], b.block_items[i + 1]
-            if isinstance(x, (ca.Decl, ca.Label, ca.Return)) or isinstance(y, (ca.Decl, ca.Label)):
+            if (isinstance(x, ca.Decl) or isinstance(y, ca.Decl)
+                    or transfers_control(x) or transfers_control(y)):
                 continue
             ex, ey = effects(x), effects(y)
             if ex is None or ey is None:
