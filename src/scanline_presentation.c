@@ -3,35 +3,57 @@
 #include "engine.h"
 #include "ram.h"
 
-#ifdef NONMATCHING
-// fuzzy: 66.9%
-// scope shape 38 (differences once low registers are set aside)
+// MATCHING_CONCESSION: register-pinning
+
+static inline int ScanlinePresentation_NextNoiseRandom(void)
+{
+    const u16 *table = gRandomTable;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return table[gRandomIndex];
+}
+
 void ScanlinePresentation_UpdateNoise(struct ScanlinePresentation *p)
 {
     s32 i;
-    s16 *amplitude = &p->amplitude, *delta = &p->delta;
-    for (i = 0; i < p->start; i++)
-        p->rows[p->active][i] = 0;
+    s16 value;
+    register s16 *ramp asm("r1");
+    s16 *amplitude, *delta;
+    u16 *end;
+    register u32 amplitudeAddress;
+    register u32 endOffset asm("r8");
+    i = 0;
+    if (i < p->start) {
+        u16 *active = &p->active;
+        u16(*rows)[160] = p->rows;
+        register u32 zero asm("ip") = 0;
+        do {
+            u32 columnOffset = i * sizeof(u16);
+            u32 bufferOffset = *active * sizeof(p->rows[0]);
+            *(u16 *)((u8 *)rows + (columnOffset + bufferOffset)) = zero;
+            i++;
+        } while (i < p->start);
+    }
     i = p->start;
-    for (; i < p->end; i++) {
-        u32 offset;
+    endOffset = (u8 *)&p->end - (u8 *)p;
+    end = (u16 *)((u8 *)p + endOffset);
+    amplitudeAddress = (u8 *)&p->amplitude - (u8 *)p;
+    amplitudeAddress += (u32)p;
+    amplitude = (s16 *)amplitudeAddress;
+    delta = &p->delta;
+    for (; i < *end; i++, end = (u16 *)((u8 *)p + endOffset)) {
         s32 v;
-        gRandomIndex = (gRandomIndex + 1) & 1023;
-        offset = gRandomIndex * 2;
-        v = (*(u16 *)(offset + (u32)gRandomTable) * p->amplitude) >> 18;
+        v = (ScanlinePresentation_NextNoiseRandom() * p->amplitude) >> 18;
         p->rows[p->active][i] = v | (v << 8);
     }
     for (i = p->end; i < 160; i++)
         p->rows[p->active][i] = 0;
-    *amplitude += *delta;
-    if (*amplitude < 0)
-        *amplitude = 0;
-    else if (*amplitude > 128)
+    ramp = amplitude;
+    value = (*ramp += *delta);
+    if (value < 0)
+        *ramp = 0;
+    else if (value > 128)
         *amplitude = 128;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", ScanlinePresentation_UpdateNoise);
-#endif
 
 s32 Div(s32, s32);
 

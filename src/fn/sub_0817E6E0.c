@@ -86,11 +86,9 @@ static inline void SetDirection(struct VolumeActor *p, int angle)
         p->direction8 = mask;
     }
 }
-static inline s32 Scale(int x)
+static inline s32 ScaleCoordinate(s32 value)
 {
-    if (x >= 0)
-        return x >> 12;
-    return -(-x >> 12);
+    return value >= 0 ? (s16)(value >> 12) : -(s16)((-value) >> 12);
 }
 
 u8 *TerrainModifiers_FindCellOverride(u32, int);
@@ -131,11 +129,11 @@ static inline int TerrainHeight(struct Position *position)
 }
 static inline void SetVelocity(struct Position *velocity, u32 angle, s32 speed)
 {
-    s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
+    s32 x = ScaleCoordinate(gUnk_086149C4[(angle + 64) & 255] * speed);
     s32 zero = 0;
     velocity->x = x;
     velocity->y = zero;
-    velocity->z = Scale(gUnk_086149C4[angle & 255] * speed);
+    velocity->z = ScaleCoordinate(gUnk_086149C4[angle & 255] * speed);
 }
 static inline void SetPalette(struct VolumeActor *p, u32 mode, u32 shift)
 {
@@ -152,8 +150,8 @@ static inline void AddPosition(struct Position *out, struct VolumeTransform *a, 
 }
 static inline void SetHorizontalVelocity(struct VolumeActor *p, u32 angle, s32 speed)
 {
-    p->velocity[0] = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
-    p->velocity[2] = Scale(gUnk_086149C4[angle & 255] * speed);
+    p->velocity[0] = ScaleCoordinate(gUnk_086149C4[(angle + 64) & 255] * speed);
+    p->velocity[2] = ScaleCoordinate(gUnk_086149C4[angle & 255] * speed);
 }
 static inline void FinishLunge(struct VolumeActor *p, void *callback, u32 one)
 {
@@ -169,27 +167,25 @@ static inline int HeightInvalid(u32 difference, u32 limit)
 {
     return difference > limit;
 }
-#ifdef NONMATCHING
-// fuzzy: 99.8%
 // Tentative: approaches a destination during a short lunge animation.
 void BossSlot2_UpdateLungeApproach(struct VolumeActor *p)
 {
     int zero = 0;
-    struct VolumeActor *q = p;
+    struct VolumeActor *actor = p;
     int dx, dz, angle;
     int speed;
     if (p->restart) {
         p->restart = zero;
         ProximityVolume_TranslateBounds(p->bounds, &p->transform.position);
-        q->reached = 0;
-        if (q->attackFlags & 2)
+        actor->reached = 0;
+        if (actor->attackFlags & 2)
             Sound_PlaySong(0x540);
-        q->attackFlags &= ~2;
+        actor->attackFlags &= ~2;
     }
-    if (q->movementMode == 1)
-        SceneVolume_TestPlayerPosition(q);
-    else if (q->movementMode == 3)
-        ActorPosition_TestPath(q, q->pathPosition);
+    if (actor->movementMode == 1)
+        SceneVolume_TestPlayerPosition(actor);
+    else if (actor->movementMode == 3)
+        ActorPosition_TestPath(actor, actor->pathPosition);
     {
         u32 mask = 0x480004;
         p->flags |= mask;
@@ -210,37 +206,35 @@ void BossSlot2_UpdateLungeApproach(struct VolumeActor *p)
         p->flags |= mask;
     }
     if (p->timer > 7)
-        SetPalette(q, 1, 5);
+        SetPalette(actor, 1, 5);
     {
         int radiusSquared = 2500;
         speed = 32;
-        dx = q->destination[0] - p->transform.position.x;
-        dz = q->destination[2] - p->transform.position.z;
+        dx = actor->destination[0] - p->transform.position.x;
+        dz = actor->destination[2] - p->transform.position.z;
         angle = Math_Atan2(dx, dz) & 0xE0;
         if (dx * dx + dz * dz > radiusSquared) {
-            struct VolumeTransform *base = &p->transform;
+            struct VolumeTransform *base = &actor->transform;
             struct Position position;
             int invalid;
             u32 heightDifference;
             SetVelocity(&position, angle, speed);
             AddPosition(&position, base, &position);
-            heightDifference = TerrainHeight(&position) - q->floorHeight + 511;
+            heightDifference = TerrainHeight(&position) - actor->floorHeight + 511;
             invalid = HeightInvalid(heightDifference, 766);
             if (!invalid)
                 goto advance;
         }
         p->velocity[0] = dx;
         p->velocity[2] = dz;
-        q->reached = 1;
-        SceneActors_StartEightDirectionAnimation(p, &q->animation, q->animationState, 0xF4, 1, 1,
-                                                 4);
+        actor->reached = 1;
+        SceneActors_StartEightDirectionAnimation(p, &actor->animation, actor->animationState, 0xF4,
+                                                 1, 1, 4);
         return;
     }
 advance:
     SetHorizontalVelocity(p, angle, speed);
     SetDirection(p, angle);
-    SceneActors_StartEightDirectionAnimation(p, &q->animation, q->animationState, 0xF9, 1, 1, 4);
+    SceneActors_StartEightDirectionAnimation(p, &actor->animation, actor->animationState, 0xF9, 1,
+                                             1, 4);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", BossSlot2_UpdateLungeApproach);
-#endif

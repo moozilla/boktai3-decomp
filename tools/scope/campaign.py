@@ -842,6 +842,7 @@ def cmd_land(args):
     ok = bool(last) and ": MATCH" in last[0]
     print(f"{func}: {'unit MATCH' if ok else 'UNIT MISMATCH'} in {tree} ({pins} pins, {bars} barriers in the file)")
     if not ok:
+        print((chk.stdout + chk.stderr).strip())
         # never leave a mismatching unit in the tree for a later commit to pick up
         open(target, "w").write(cur)
         sys.exit(f"{func}: restored {r['src']}; land by hand")

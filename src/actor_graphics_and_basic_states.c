@@ -587,50 +587,45 @@ s32 Div(s32, s32);
 void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
 void TransientSpriteEffects_Spawn(int, int, void *, void *, int, int);
 
-#ifdef NONMATCHING
-// fuzzy: 30.8%
-// scope shape 95 (differences once low registers are set aside)
-// confidence=low: bursts eight particles around fixed offsets from p, each flying outward
-// from a point 0xc8 above p at speed 5.
+/* Emit particles away from a point above the center of the burst. */
+static inline void BurstNormalize(struct ContactPosition *v, s32 speed)
+{
+    struct ContactPosition *out = v;
+    u16 len = Sqrt(v->x * v->x + out->y * out->y + out->z * out->z);
+    if (len) {
+        v->x = Div(v->x * speed, len);
+        out->y = Div(out->y * speed, len);
+        out->z = Div(out->z * speed, len);
+    }
+}
+
+static inline s32 BurstRandom(const u16 *table)
+{
+    u32 index = (gRandomIndex + 1) & 1023;
+    gRandomIndex = index;
+    return table[index];
+}
+
 void sub_08022878(BurstVec *p)
 {
     BurstVec center = *p;
     s32 i;
-    BurstVec pos[1], vel[1];
+    BurstVec pos, vel;
     center.y += 0xc8;
     for (i = 0; i < 8; i++) {
-        const u16 *table = gRandomTable;
-        u32 index;
-        u16 len;
-        u16 r;
-        index = (gRandomIndex + 1) & 0x3FF;
-        gRandomIndex = index;
-        r = table[index] & 0x1f;
-        pos->x = gUnk_08604D84[i].x + p->x - 0x10 + r;
-        index = (index + 1) & 0x3FF;
-        gRandomIndex = index;
-        r = table[index] & 0x1f;
-        pos->y = gUnk_08604D84[i].y + p->y - 0x10 + r;
-        index = (index + 1) & 0x3FF;
-        gRandomIndex = index;
-        r = table[index] & 0x1f;
-        pos->z = gUnk_08604D84[i].z + p->z - 0x10 + r;
-        AnimatedParticles_EmitBurst(pos, 1, 0, 0x40, 0xc, 0xc, 4, 4);
-        vel->x = pos->x - center.x;
-        vel->y = pos->y - center.y;
-        vel->z = pos->z - center.z;
-        len = Sqrt(vel->x * vel->x + vel->y * vel->y + vel->z * vel->z);
-        if (len) {
-            vel->x = Div(vel->x * 5, len);
-            vel->y = Div(vel->y * 5, len);
-            vel->z = Div(vel->z * 5, len);
-        }
-        TransientSpriteEffects_Spawn(2, 0, pos, vel, 0x20, 0x100);
+        void *data = (void *)gRandomTable;
+        pos.x = (s16)(p->x + gUnk_08604D84[i].x - 16) + (BurstRandom(data) & 0x1f);
+        pos.y = (s16)(p->y + gUnk_08604D84[i].y - 16) + (BurstRandom(data) & 0x1f);
+        pos.z = (s16)(p->z + gUnk_08604D84[i].z - 16) + (BurstRandom(data) & 0x1f);
+        data = &pos;
+        AnimatedParticles_EmitBurst(data, 1, 0, 0x40, 0xc, 0xc, 4, 4);
+        vel.x = pos.x - center.x;
+        vel.y = pos.y - center.y;
+        vel.z = pos.z - center.z;
+        BurstNormalize((struct ContactPosition *)&vel, 5);
+        TransientSpriteEffects_Spawn(2, 0, &pos, &vel, 0x20, 0x100);
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08022878);
-#endif
 
 // MATCHING_CONCESSION: register-pinning
 void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)

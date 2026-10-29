@@ -337,7 +337,10 @@ class Work:
         for dname, fn in defs.items():
             seen_src.add(sha(R.text(fn)))
         for dname, fn in defs.items():
-            for fam, desc, f2 in M.all_moves(fn, families):
+            if lines and not any(getattr(n, "coord", None) is not None and n.coord.line in lineset
+                                 for n, _, _ in R.walk(fn)):
+                continue
+            for fam, desc, f2 in M.all_moves(fn, families, lines=lineset if lines else None):
                 if (budget is not None and len(tasks) >= budget) or (deadline is not None and time.time() >= deadline):
                     stats["complete"] = False
                     break
@@ -798,7 +801,7 @@ def cmd_values(a):
               f"{pri:>8} {r['refs']!s:>5} {r['live']!s:>5} {r['rank'] if r['rank'] is not None else '':>4}")
     print(f"  {wrong} value(s) in another register than the ROM's ('!'). ROM registers are voted from aligned "
           "insns. Raise or lower a value's priority (refs, live length) to reorder;"
-          f" confirm with scope.py {path} AGBCC_PRI=NAME:+N or AGBCC_FORCE=NAME:rN before changing C.")
+          f" confirm with scope.py {path} AGBCC_PRI=NAME:+N or AGBCC_FORCE=NAME:N (numeric hard register, e.g. 4 for r4) before changing C.")
 
 
 def cmd_facts(a):
