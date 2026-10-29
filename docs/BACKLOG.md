@@ -264,3 +264,22 @@ separate category. Backlogged with the RAM accounting landed.
 Researched on October 27: [DATA_TRACKING.md](DATA_TRACKING.md) has the objdiff
 semantics, the current ROM data numbers and the plan; the report (ROM data as
 the headline data measure, categories by kind) landed the same day.
+
+## Worker fleets: disk cost and Codex Cloud (backlogged October 29, 2026)
+
+Disk ran out twice during Codex worker runs (down to 3.8 GB and 4.3 GB free), and on
+October 29 that limited how many workers could start before a quota deadline. Each
+fresh worktree from `tools/worktree.sh` took about 30 s and a few hundred MB, and old
+worktrees piled up to about 48 GB in `../wt`. Two directions:
+
+* **Make a worker cheaper on disk.** Measure what a worker's worktree actually holds
+  (source checkout, APFS clones that diverge, `build/check` and scope/seek/matchsearch
+  run outputs). Options: a sparse checkout of only `src/`, `include/`, `tools/` and
+  `symbols/`; run outputs in a shared, regularly pruned location; workers that clean up
+  their own compile artifacts; `tools/clean.py` running automatically during a run.
+  Reusing existing worktrees (`git worktree move` and `checkout -B`) is instant and
+  costs no disk; make that a supported launch path.
+* **Codex Cloud for burst capacity.** The user likes local runs. Investigate running
+  overflow workers in Codex Cloud when many are needed at once: what the cloud
+  environment needs (the toolchain, the built base, and the ROM, which is never committed), and how
+  matches come back for batch integration.
