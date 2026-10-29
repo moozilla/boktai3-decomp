@@ -436,8 +436,14 @@ def compile_draft_g(src, func, env=None):
     if uninit and func not in _UNINIT_WARNED:
         _UNINIT_WARNED.add(func)
         print("note: agbcc: " + ", ".join(f"`{v}' (line {ln})" for ln, v in uninit) + f" might be used"
-              f" uninitialized in {func}: the bytes read whatever the register held; give it its value",
+              f" uninitialized in {func}; inspect its definition and uses",
               file=sys.stderr)
+        for _, v in uninit:
+            if re.search(r"\b" + re.escape(v) + r'\s+asm\s*\(\s*"r7"\s*\)', pre):
+                print(f"  `{v}' is bound to r7, Thumb's eliminable frame pointer: reload can replace"
+                      " this binding with sp + an offset even when C initialized it. Remove the r7"
+                      " binding before diagnosing this warning (agbcc gcc/thumb.h:581-600).",
+                      file=sys.stderr)
     if r.returncode or "error" in r.stderr:
         errs = [ln.replace(ROOT + os.sep, "") for ln in r.stderr.splitlines() if ln.strip()]
         # the errors first: other functions' warnings would push them past the shown lines
