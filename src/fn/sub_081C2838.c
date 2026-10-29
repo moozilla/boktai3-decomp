@@ -1,6 +1,5 @@
 #include "global.h"
 #include "render.h"
-// MATCHING_CONCESSION: register-pinning
 
 struct SparklePosition {
     s16 x, y, z, unk_06;
@@ -24,9 +23,8 @@ struct SparkleEmitter {
     u32 count;
 };
 
-static inline s32 Sparkle_ProjectScale(s32 input)
+static inline s32 Sparkle_ProjectScale(s32 value)
 {
-    s32 value = input * 3;
     if (value >= 0)
         value >>= 5;
     else
@@ -34,20 +32,19 @@ static inline s32 Sparkle_ProjectScale(s32 input)
     return value;
 }
 
-static inline void Sparkle_ProjectPosition(struct SparklePosition *screen, s16 *position,
-                                           const u16 *camera)
+static inline void Sparkle_ProjectPosition(struct SparklePosition *screen, s16 *position)
 {
     s32 x, z, sum, height, y, depth;
     x = position[0];
     z = position[2];
-    screen->x = Sparkle_ProjectScale(x - z);
-    sum = Sparkle_ProjectScale(x + z);
-    height = Sparkle_ProjectScale(*++position);
+    screen->x = Sparkle_ProjectScale(3 * (x - z));
+    sum = Sparkle_ProjectScale(3 * (x + z));
+    height = Sparkle_ProjectScale(3 * *++position);
     y = sum - height;
     depth = sum + height;
-    screen->x = (u16)screen->x - camera[0] + 120;
-    screen->y = y - camera[1] + 80;
-    screen->z = depth - camera[2];
+    screen->x = (u16)screen->x - gCameraOrigin[0] + 120;
+    screen->y = y - gCameraOrigin[1] + 80;
+    screen->z = depth - gCameraOrigin[2];
 }
 
 static inline void SparkleEmitter_RemoveParticle(struct SparkleEmitter *emitter)
@@ -55,15 +52,12 @@ static inline void SparkleEmitter_RemoveParticle(struct SparkleEmitter *emitter)
     emitter->count--;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 99.3%
-// scope shape 2 (differences once low registers are set aside)
 void SparkleEmitter_UpdateParticles(u8 *arg0)
 {
     struct SparkleEmitter *emitter = (struct SparkleEmitter *)arg0;
     struct SparkleParticle *particle = emitter->particles;
-    const u16 *camera = gCameraOrigin;
-    register s32 i asm("r8") = 31;
+    s32 i;
+    i = 0;
     do {
         if (!(particle->flags & 1)) {
             struct SparklePosition screen;
@@ -73,16 +67,13 @@ void SparkleEmitter_UpdateParticles(u8 *arg0)
             position->z += particle->velocity.z;
             particle->frame = (particle->age >> 3) % 4;
             particle->age++;
-            Sparkle_ProjectPosition(&screen, &position->x, camera);
+            Sparkle_ProjectPosition(&screen, &position->x);
             if ((u16)(screen.x + 128) > 448 || screen.y > 320 || screen.y < -128) {
                 particle->flags |= 1;
                 SparkleEmitter_RemoveParticle(emitter);
             }
         }
         particle++;
-        i--;
-    } while (i >= 0);
+        i++;
+    } while (i < 32);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SparkleEmitter_UpdateParticles);
-#endif
