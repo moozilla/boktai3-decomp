@@ -325,7 +325,28 @@ class Target:
         self.compile_time += time.time() - t0
         if not trace:
             return code, err
-        return code, err, parse_alloc(open(path).read(), self.names) if code else {}
+        text = open(path).read()
+        alloc = parse_alloc(text, self.names) if code else {}
+        alloc["__reloads__"] = sum(1 for ln in text.splitlines() if ln.startswith("R ") and ln.split()[1] in self.names)
+        return code, err, alloc
+
+    def rotation(self, pre, n_reloads, max_d=5, hint=None):
+        """Is this code right up to reload's round-robin spill choice? [0, K, D] for the smallest shift
+        D (AGBCC_SPILL=K:D, reload1.c's last_spill_reg moved D places before choice K) that gives the
+        ROM's bytes, else None. D counts reload choices the ROM made (or skipped) before choice K that
+        this C does not: the C fix adds or removes that many."""
+        if hint:  # near the parent's shift: a move changes the count of earlier choices by one or two
+            k0, d0 = hint
+            ks = [k for k in range(k0 - 3, k0 + 4) if 0 <= k < n_reloads]
+            ds = [d for d in (d0 - 1, d0 - 2, d0, d0 + 1, d0 + 2) if 1 <= d <= max_d]
+        else:
+            ks, ds = range(n_reloads), range(1, max_d + 1)
+        for d in sorted(ds):
+            for k in ks:
+                code, _ = self.compile_pre(pre, {"AGBCC_SPILL": f"{k}:{d}"})
+                if code == self.rom_code:
+                    return [0, k, d]
+        return None
 
     # -- evaluation
     def evaluate(self, code):

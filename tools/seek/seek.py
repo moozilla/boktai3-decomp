@@ -147,6 +147,8 @@ class Work:
         set_current(self.target.func)
         self.ast = {}  # node id -> (pre, {name: FuncDef})
         self.jobs = int(os.environ.get("SEEK_JOBS", "1"))
+        self.hint = None  # the expanded node's rotation [0, K, D]: children try shifts near it first
+        self.rot_max = None  # rotation objective: check spill shifts for children with at most this diff
         self.pool = None
 
     @property
@@ -163,7 +165,7 @@ class Work:
 
     def best(self, k=1):
         nodes = [n for n in self.sess.nodes.values() if n.get("ok")]
-        nodes.sort(key=lambda n: (key_of(n), n["id"]))
+        nodes.sort(key=lambda n: (rank(n), n["id"]))
         if not nodes:
             sys.exit("no evaluated node")
         return nodes[0] if k == 1 else nodes[:k]
@@ -182,8 +184,9 @@ class Work:
         """[(output hash, alloc, evaluation) or None] for each (dname, ..., txt, line) task, spliced into
         BASE_PRE: in this process, or across SEEK_JOBS worker processes (each its own fork server)."""
         jobs = self.jobs
+        rot = self.rot_max
         if jobs <= 1 or len(tasks) < 16:
-            return [compile_one(self.target, base_pre, t[0], t[4]) for t in tasks]
+            return [compile_one(self.target, base_pre, t[0], t[4], rot, self.hint) for t in tasks]
         if self.pool is None:
             import multiprocessing as mp
             self.pool = mp.get_context("spawn").Pool(jobs, _winit, (self.target.src, self.func))
@@ -192,7 +195,7 @@ class Work:
         if not os.path.exists(path):
             open(path, "w").write(base_pre)
         t0 = time.time()
-        out = self.pool.map(_wcompile, [(h, path, t[0], t[4]) for t in tasks], chunksize=8)
+        out = self.pool.map(_wcompile, [(h, path, t[0], t[4], rot, self.hint) for t in tasks], chunksize=4)
         self.target.compiles += len(tasks)
         self.target.compile_time += time.time() - t0
         return out
@@ -223,7 +226,10 @@ class Work:
         open(tmp, "w").write(text)
         pre = self.target.preprocess_file(tmp)
         code, err, alloc = self.target.compile_pre(pre, trace=True)
+        nrel = alloc.pop("__reloads__", 0)
         ev = self.target.evaluate(code)
+        if code and not ev.get("match") and ev["key"][2] <= 12:
+            ev["rot"] = self.target.rotation(pre, nrel) or [ev["key"][2], -1, 99]
         out = sha(code) if code else None
         rec = dict(parent=parent["id"] if parent else None, kind="file", who=who, file=fh, defs={},
                    out=out, move=os.path.relpath(os.path.abspath(path), ROOT), note=note, depth=0, **ev)
@@ -257,6 +263,7 @@ class Work:
         for name, f in defs.items():
             base_pre = E.splice(base_pre, [name], R.text(f))
         base_code, _, base_alloc = self.target.compile_pre(base_pre, trace=True)
+        base_alloc.pop("__reloads__", None)
         base_alloc = {k: v[0] for k, v in base_alloc.items()}
         want = self.want_of(node)
         own_out = node.get("out")
@@ -271,6 +278,8 @@ class Work:
         depth = node.get("depth", 0) + 1
         main = next(iter(defs))
         tasks = []
+        r = node.get("rot")
+        self.hint = r[1:] if r and r[0] == 0 else None
         for dname, fn in defs.items():
             seen_src.add(sha(R.text(fn)))
         for dname, fn in defs.items():
@@ -312,11 +321,11 @@ class Work:
                        depth=depth, alloc=alloc, moved=E.alloc_changes(base_alloc, alloc)[:8], **ev)
             if want and not ev.get("match"):
                 rec["awrong"] = len(E.alloc_wrong(alloc, want))
-            if sem and (desc.startswith("[sem]") or fam in SEM_FAMILIES) and tuple(ev["key"]) <= key_of(node):
+            if sem and (desc.startswith("[sem]") or fam in SEM_FAMILIES) and rank(dict(ev, ok=True)) <= rank(node):
                 code, _ = self.target.compile_pre(vpre)
                 rec["sem"] = self.target.semantic(code, vpre)
             rec = self.sess.add(rec)
-            if tuple(ev["key"]) < key_of(node):
+            if rank(rec) < rank(node):
                 fs[2] += 1
             kid_defs = dict(defs)
             kid_defs[dname] = f2
@@ -343,11 +352,12 @@ class Work:
         done = {e["node"] for e in self.sess.events if e.get("kind") == "expand"
                 and (tuple(e["families"]) if e.get("families") else None, tuple(e["lines"]) if e.get("lines") else None) == sig}
         for n in starts:
-            heapq.heappush(heap, (key_of(n), n.get("awrong", 0), n.get("depth", 0), tick, n["id"]))
+            heapq.heappush(heap, (rank(n), n.get("awrong", 0), n.get("depth", 0), tick, n["id"]))
             tick += 1
-        best = min(starts, key=key_of)
+        best = min(starts, key=rank)
         if slack is None:
             slack = max(4, key_of(best)[2] // 8)
+        cost = lambda n: rank(n)[1]
         rounds = 0
         while heap and self.target.compiles - start_compiles < budget and time.time() - t0 < seconds:
             nid = heapq.heappop(heap)[-1]
@@ -355,7 +365,7 @@ class Work:
                 # already expanded: its children are on the tree; queue them instead
                 for c in self.sess.nodes.values():
                     if c.get("parent") == nid and c.get("ok") and c["id"] not in done:
-                        heapq.heappush(heap, (key_of(c), c.get("awrong", 0), c.get("depth", 0), tick, c["id"]))
+                        heapq.heappush(heap, (rank(c), c.get("awrong", 0), c.get("depth", 0), tick, c["id"]))
                         tick += 1
                 continue
             done.add(nid)
@@ -370,14 +380,14 @@ class Work:
             for c in kids:
                 if c.get("sem", "").startswith("DIFFERENT"):
                     continue
-                ck, bk = key_of(c), key_of(best)
+                ck, bk = rank(c), rank(best)
                 # better, a lateral step on the plateau, or a bounded step back (moves that pay off only
                 # together: the first can cost a few insns); the heap still expands the best first
-                if ck <= key_of(node) or (ck[0] <= bk[0] and ck[1] + ck[2] <= bk[1] + bk[2] + slack
-                                          and c.get("depth", 0) <= max_depth):
-                    heapq.heappush(heap, (key_of(c), c.get("awrong", 0), c.get("depth", 0), tick, c["id"]))
+                if ck <= rank(node) or (ck[0] <= bk[0] and cost(c) <= cost(best) + slack
+                                        and c.get("depth", 0) <= max_depth):
+                    heapq.heappush(heap, (rank(c), c.get("awrong", 0), c.get("depth", 0), tick, c["id"]))
                     tick += 1
-                if key_of(c) < key_of(best):
+                if rank(c) < rank(best):
                     best = c
                     if not quiet:
                         print(f"  {fmt_node(c)}   [{self.target.compiles - start_compiles} compiles, "
@@ -395,11 +405,16 @@ class Work:
         return best
 
 
-def compile_one(target, base_pre, dname, txt):
-    code, err, alloc = target.compile_pre(E.splice(base_pre, [dname], txt), trace=True)
+def compile_one(target, base_pre, dname, txt, rot_max=None, hint=None):
+    vpre = E.splice(base_pre, [dname], txt)
+    code, err, alloc = target.compile_pre(vpre, trace=True)
     if code is None:
         return None
-    return sha(code), {k: v[0] for k, v in alloc.items()}, target.evaluate(code)
+    nrel = alloc.pop("__reloads__", 0)
+    ev = target.evaluate(code)
+    if rot_max is not None and not ev.get("match") and ev["key"][2] <= rot_max:
+        ev["rot"] = target.rotation(vpre, nrel, hint=hint) or [ev["key"][2], -1, 99]
+    return sha(code), {k: v[0] for k, v in alloc.items()}, ev
 
 
 _WT = None
@@ -414,11 +429,39 @@ def _winit(src, func):
 
 
 def _wcompile(task):
-    h, path, dname, txt = task
+    h, path, dname, txt, rot, hint = task
     if h not in _WBASE:
         _WBASE.clear()
         _WBASE[h] = open(path).read()
-    return compile_one(_WT, _WBASE[h], dname, txt)
+    return compile_one(_WT, _WBASE[h], dname, txt, rot, hint)
+
+
+# ------------------------------------------------------------------ ranking
+
+OBJECTIVE = {"mode": None}
+
+
+def rank(n):
+    """The order the search and every listing use. Structure first (determined facts missed), then
+    shape + differing insns together, so a node never ranks above another with both more shape and
+    more register differences (key (skel, shape, diff) is what is stored and printed).
+    Objective "rotation": among nodes whose code is right up to reload's spill rotation, the one
+    needing the smallest shift first (a C change that adds or removes one reload choice before the
+    differing one moves the shift by one: a gradient where the insn count shows none).
+    Objective "block": the cost inside one ROM block first, the rest of the function second."""
+    if not n.get("ok"):
+        return (9999, 9999, 9999, 9999)
+    k = key_of(n)
+    cost = k[1] + k[2]
+    if n.get("match"):
+        return (0, 0, 0, 0)
+    mode = OBJECTIVE["mode"]
+    if mode == "rotation" and n.get("rot"):
+        r = n["rot"]  # [diff after the best single shift, K, D]
+        return (k[0], r[0], r[2] if r[0] == 0 else 99, cost)
+    if mode == "block" and n.get("blk") is not None:
+        return (k[0], n["blk"], cost, k[1])
+    return (k[0], cost, k[1], k[2])
 
 
 # ------------------------------------------------------------------ printing
@@ -443,8 +486,11 @@ def fmt_node(n, parent=None):
     semtxt = "" if not sem or sem == "unchecked" else ("  [sem ok]" if sem.startswith("EQUIV") else
                                                        "  [sem: " + sem.split(":")[0] + "]")
     al = ""
+    if n.get("rot"):
+        r = n["rot"]
+        al += f"  [rotation: AGBCC_SPILL={r[1]}:{r[2]} matches]" if r[0] == 0 else "  [not rotation-only]"
     if n.get("awrong") is not None and not n.get("match"):
-        al = f"  [alloc {n['awrong']} off]"
+        al += f"  [alloc {n['awrong']} off]"
     if n.get("moved") and parent is not None:
         al += "  {" + ", ".join(n["moved"][:4]) + ("..." if len(n["moved"]) > 4 else "") + "}"
     return f"{head}{delta}  {what}{semtxt}{al}"
@@ -461,7 +507,7 @@ def print_expand(w, node, children, st):
         print("  families that change the code (changed/tried): " + ", ".join(moving))
     if still:
         print("  no effect here: " + ", ".join(still))
-    top = sorted(children, key=lambda c: (key_of(c), c["id"]))[:getattr(w, "top", 8)]
+    top = sorted(children, key=lambda c: (rank(c), c["id"]))[:getattr(w, "top", 8)]
     for c in top:
         print("  " + fmt_node(c, node))
 
@@ -545,7 +591,7 @@ def cmd_add(a):
     parent = w.node(a.parent) if a.parent else w.best()
     if len(a.file) > 1:  # several spellings of one hypothesis: score them all, best first, no expansion
         recs = [w.add_file(f, parent, a.m) for f in a.file]
-        for r in sorted(recs, key=lambda r: (key_of(r), r["id"])):
+        for r in sorted(recs, key=lambda r: (rank(r), r["id"])):
             print(fmt_node(r, parent) + (f"  (same code as n{r['same_as']})" if r.get("same_as") else ""))
         return
     node = w.add_file(a.file[0], parent, a.m)
@@ -579,6 +625,9 @@ def parse_fams(s):
 
 def cmd_expand(a):
     w = Work(a.f)
+    if a.objective == "rotation":
+        OBJECTIVE["mode"] = "rotation"
+        w.rot_max = 99
     w.top = a.top
     node = w.node(a.node)
     w.expand(node, parse_fams(a.fam), parse_lines(a.lines))
@@ -589,6 +638,10 @@ def cmd_run(a):
     starts = [w.node(n) for n in a.nodes] if a.nodes else w.best(a.width)
     if isinstance(starts, dict):
         starts = [starts]
+    if a.objective:
+        OBJECTIVE["mode"] = a.objective
+    if a.objective == "rotation":
+        w.rot_max = a.rot_max if a.rot_max is not None else max(8, min(key_of(n)[2] for n in starts) + 6)
     best = w.search(starts, a.budget, a.seconds, parse_fams(a.fam), parse_lines(a.lines), slack=a.slack,
                     max_depth=a.depth)
     if best.get("match"):
@@ -692,7 +745,7 @@ def collections_counter(it):
 
 def cmd_tree(a):
     w = Work(a.f)
-    nodes = sorted(w.sess.nodes.values(), key=lambda n: (key_of(n), n["id"]))
+    nodes = sorted(w.sess.nodes.values(), key=lambda n: (rank(n), n["id"]))
     exp = {}
     for e in w.sess.events:
         if e.get("kind") == "expand":
@@ -758,8 +811,9 @@ def cmd_land(a):
     open(os.path.join(d, "base.c"), "w").write(orig)
     q = os.path.join(camp, "queue.json")
     rows = json.load(open(q)) if os.path.exists(q) else []
+    rows = [r for r in rows if not (r.get("func") == w.target.rom_name and not isinstance(r.get("addr"), str))]
     if not any(r.get("func") == w.target.rom_name for r in rows):
-        rows.append({"func": w.target.rom_name, "src": w.target.src, "addr": w.target.addr,
+        rows.append({"func": w.target.rom_name, "src": w.target.src, "addr": f"{w.target.addr:08X}",
                      "size": w.target.size, "kind": "nonmatching"})
         json.dump(rows, open(q, "w"), indent=1)
     rev = os.path.join(d, ".main_rev")
@@ -792,6 +846,7 @@ def main():
     p.add_argument("--fam")
     p.add_argument("--lines")
     p.add_argument("--top", type=int, default=10)
+    p.add_argument("--objective", choices=["rotation"])
     p.set_defaults(go=cmd_expand)
     p = sub.add_parser("run")
     p.add_argument("nodes", nargs="*")
@@ -801,6 +856,9 @@ def main():
     p.add_argument("--slack", type=int, help="explore children up to this much worse (shape+diff) than the "
                    "best (default max(4, diff/8))")
     p.add_argument("--depth", type=int, default=6, help="moves stacked on a node at most")
+    p.add_argument("--objective", choices=["rotation", "block"], help="rotation: rank by the reload spill "
+                   "shift still needed (AGBCC_SPILL=K:D); block: by one ROM block's cost (--block)")
+    p.add_argument("--rot-max", type=int, help="rotation: test shifts on children with at most this diff")
     p.add_argument("--fam")
     p.add_argument("--lines")
     p.set_defaults(go=cmd_run)
