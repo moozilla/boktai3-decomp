@@ -15,7 +15,7 @@ struct Vanargand {
     struct SceneVec position; /* 0x54 */
     u8 unknown5C[0x34];
     u32 actionTimer; /* 0x90 */
-    s16 health; /* 0x94 */
+    s16 health;      /* 0x94 */
     u8 unknown96[0x6];
     u32 actorFlags; /* 0x9C */
     u8 unknownA0[0x2];
@@ -23,33 +23,33 @@ struct Vanargand {
     u8 unknownA3[0x1];
     u32 timer; /* 0xA4 */
     u8 unknownA8[0x3];
-    u8 state; /* 0xAB */
-    u8 mode; /* 0xAC */
-    u8 step; /* 0xAD */
-    u8 actionPhase; /* 0xAE */
-    u8 finished; /* 0xAF */
-    u8 entered; /* 0xB0 */
+    u8 state;            /* 0xAB */
+    u8 mode;             /* 0xAC */
+    u8 step;             /* 0xAD */
+    u8 actionPhase;      /* 0xAE */
+    u8 finished;         /* 0xAF */
+    u8 entered;          /* 0xB0 */
     u8 pendingAnimation; /* 0xB1 */
-    u8 ready; /* 0xB2 */
+    u8 ready;            /* 0xB2 */
     u8 unknownB3[0x11];
     u32 modeTimer; /* 0xC4 */
     u8 unknownC8[0x19];
     u8 healthRatio; /* 0xE1 */
     u8 unknownE2[0x1E];
-    VanargandStateCallback callback; /* 0x100 */
+    VanargandStateCallback callback;        /* 0x100 */
     VanargandUpdateCallback damageCallback; /* 0x104 */
-    VanargandUpdateCallback modeCallback; /* 0x108 */
-    struct Player *targetPlayer; /* 0x10C */
-    struct SceneVec *targetPosition; /* 0x110 */
+    VanargandUpdateCallback modeCallback;   /* 0x108 */
+    struct Player *targetPlayer;            /* 0x10C */
+    struct SceneVec *targetPosition;        /* 0x110 */
     u8 unknown114[0x60];
-    u8 backdrop[8]; /* 0x174 */
-    u8 partController[8]; /* 0x17C */
-    u8 spriteAnchor[8]; /* 0x184 */
-    u8 animation[0x60]; /* 0x18C */
-    u8 drawable[0x28]; /* 0x1EC */
-    u8 spriteParameter[8]; /* 0x214 */
-    u8 actionSequence[0xb4]; /* 0x21C */
-    u8 spriteGroup[0x12c]; /* 0x2D0 */
+    u8 backdrop[8];            /* 0x174 */
+    u8 partController[8];      /* 0x17C */
+    u8 spriteAnchor[8];        /* 0x184 */
+    u8 animation[0x60];        /* 0x18C */
+    u8 drawable[0x28];         /* 0x1EC */
+    u8 spriteParameter[8];     /* 0x214 */
+    u8 actionSequence[0xb4];   /* 0x21C */
+    u8 spriteGroup[0x12c];     /* 0x2D0 */
     struct VanargandPart part; /* 0x3FC */
     u8 unknown410[0x8];
     struct SceneVec partPosition; /* 0x418 */
@@ -59,27 +59,27 @@ struct Vanargand {
     u16 attackParameter; /* 0x51E */
     u8 unknown520[0x14];
     struct MotionTrack track; /* 0x534 */
-    void *attachment; /* 0x56C */
-    s32 targetCount; /* 0x570 */
-    u32 counter574; /* 0x574 */
-    u32 impactShake; /* 0x578 */
-    void *projectilePool; /* 0x57C */
+    void *attachment;         /* 0x56C */
+    s32 targetCount;          /* 0x570 */
+    u32 counter574;           /* 0x574 */
+    u32 impactShake;          /* 0x578 */
+    void *projectilePool;     /* 0x57C */
     u8 unknown580[0x4];
-    u16 pairedMotion; /* 0x584 */
-    u16 parameter586; /* 0x586 */
-    u16 parameter588; /* 0x588 */
-    u16 parameter58A; /* 0x58A */
+    u16 pairedMotion;    /* 0x584 */
+    u16 parameter586;    /* 0x586 */
+    u16 parameter588;    /* 0x588 */
+    u16 parameter58A;    /* 0x58A */
     u16 projectileCount; /* 0x58C */
-    u16 parameter58E; /* 0x58E */
+    u16 parameter58E;    /* 0x58E */
     u8 unknown590[0x8];
-    u16 scriptS[3]; /* 0x598 */
-    u16 thresholds[3]; /* 0x59E */
-    u32 hitFlags; /* 0x5A4 */
-    s16 damage; /* 0x5A8 */
-    u16 field5AA; /* 0x5AA */
+    u16 scriptS[3];        /* 0x598 */
+    u16 thresholds[3];     /* 0x59E */
+    u32 hitFlags;          /* 0x5A4 */
+    s16 damage;            /* 0x5A8 */
+    u16 field5AA;          /* 0x5AA */
     s16 accumulatedDamage; /* 0x5AC */
-    u16 flashTimer; /* 0x5AE */
-    u16 delay; /* 0x5B0 */
+    u16 flashTimer;        /* 0x5AE */
+    u16 delay;             /* 0x5B0 */
     u8 unknown5B2[0x6];
     u16 field5B8; /* 0x5B8 */
     u16 field5BA; /* 0x5BA */
@@ -87,25 +87,25 @@ struct Vanargand {
     u16 field5BE; /* 0x5BE */
     u8 unknown5C0[0x2];
     s16 presentationMode; /* 0x5C2 */
-    u8 phase5C4; /* 0x5C4 */
-    u8 phase5C5; /* 0x5C5 */
-    u8 phase5C6; /* 0x5C6 */
-    u8 healthBand; /* 0x5C7 */
+    u8 phase5C4;          /* 0x5C4 */
+    u8 phase5C5;          /* 0x5C5 */
+    u8 phase5C6;          /* 0x5C6 */
+    u8 healthBand;        /* 0x5C7 */
     u8 unknown5C8[0x150];
-    u8 palette[0x200]; /* 0x718 */
-    u8 fadeA[0x200]; /* 0x918 */
-    u8 fadeB[0x200]; /* 0xB18 */
-    u8 fadeC[0x200]; /* 0xD18 */
-    s32 paletteFrame; /* 0xF18 */
+    u8 palette[0x200];   /* 0x718 */
+    u8 fadeA[0x200];     /* 0x918 */
+    u8 fadeB[0x200];     /* 0xB18 */
+    u8 fadeC[0x200];     /* 0xD18 */
+    s32 paletteFrame;    /* 0xF18 */
     u32 paletteSelector; /* 0xF1C */
-    u16 paletteMode; /* 0xF20 */
-    u16 paletteShift; /* 0xF22 */
-    u32 variant; /* 0xF24 */
-    u32 scriptE[3]; /* 0xF28 */
-    s32 transition; /* 0xF34 */
-    u32 eventParameter; /* 0xF38 */
+    u16 paletteMode;     /* 0xF20 */
+    u16 paletteShift;    /* 0xF22 */
+    u32 variant;         /* 0xF24 */
+    u32 scriptE[3];      /* 0xF28 */
+    s32 transition;      /* 0xF34 */
+    u32 eventParameter;  /* 0xF38 */
     u8 unknownF3C[0x4];
-    u32 enabledF40; /* 0xF40 */
+    u32 enabledF40;    /* 0xF40 */
     void *afterimages; /* 0xF44 */
 };
 s32 __divsi3(s32, s32);
@@ -177,7 +177,8 @@ static inline void ApplyPaletteBank(struct Vanargand *p, struct Vanargand *self,
     }
     Vanargand_ResetPaletteTransition(self);
 }
-static inline void ApplyPaletteSelection(struct Vanargand *p, struct Vanargand *self, const struct VanargandPaletteSelection *selection)
+static inline void ApplyPaletteSelection(struct Vanargand *p, struct Vanargand *self,
+                                         const struct VanargandPaletteSelection *selection)
 {
     ApplyPaletteBank(p, self, selection->bank);
 }
@@ -383,14 +384,16 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
     CpuSet(ScriptProc_Start(0x92B3, 0xF392) + 0x14, p->fadeC, 0x04000080);
     SceneBackdrop_Initialize(p, (void *)&p->backdrop);
     Vanargand_InitAnimatedAttachment(p, (void *)&p->animation);
-    Vanargand_InitSpriteGroup(p, (void *)&p->spriteGroup, (void *)&p->spriteAnchor, (void *)&p->spriteParameter);
+    Vanargand_InitSpriteGroup(p, (void *)&p->spriteGroup, (void *)&p->spriteAnchor,
+                              (void *)&p->spriteParameter);
     if (p->variant)
         Vanargand_InitPart(p, (void *)&p->part);
     else {
         SetPosition(&p->partPosition, 0x33B, 0x100, 0x33B);
     }
     RestorePalette(p, p);
-    SceneActors_StartUnmirroredAnimation(self, (void *)&p->animation, (void *)&p->drawable, 2, 1, 0);
+    SceneActors_StartUnmirroredAnimation(self, (void *)&p->animation, (void *)&p->drawable, 2, 1,
+                                         0);
     SceneActors_SetHealthLimits(self, health, health, healthParameter);
     PositionedEffect_InitAttackCollider(p);
     PositionedEffect_InitRadialAttackColliders(p);
@@ -399,25 +402,29 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
         case 0:
             SetMode(self, 0, 0, 0);
             ChangeState(self, 1, ActorSoundPhase_StartFlaggedAnimation);
-            p->attachment = Vanargand_CreatePartController((void *)&p->partController, p->palette, 1);
+            p->attachment =
+                Vanargand_CreatePartController((void *)&p->partController, p->palette, 1);
             break;
         case 1:
             SetMode(self, 2, 0, 1);
             ChangeState(self, 26, Vanargand_OnPrimaryStopState);
-            p->attachment = Vanargand_CreatePartController((void *)&p->partController, p->palette, 0);
+            p->attachment =
+                Vanargand_CreatePartController((void *)&p->partController, p->palette, 0);
             SetPosition(&self->position, 0x33B, 0x100, 0x33B);
             p->presentationMode = 1;
             break;
         case 2:
             SetMode(self, 2, 0, 0);
             ChangeState(self, 1, ActorSoundPhase_StartFlaggedAnimation);
-            p->attachment = Vanargand_CreatePartController((void *)&p->partController, p->palette, 1);
+            p->attachment =
+                Vanargand_CreatePartController((void *)&p->partController, p->palette, 1);
             p->presentationMode = 0;
             break;
         case 3:
             SetMode(self, 2, 0, 9);
             ChangeState(self, 29, Vanargand_OnAlternateStopState);
-            p->attachment = Vanargand_CreatePartController((void *)&p->partController, p->palette, 0);
+            p->attachment =
+                Vanargand_CreatePartController((void *)&p->partController, p->palette, 0);
             {
                 struct VanargandPaletteSelection selection;
                 selection.bank = 0x82;
@@ -430,12 +437,12 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
     if (!p->attachment)
         return -1;
     if (p->variant == 1) {
-        PairedSceneActor_InitHalves(p->attachment, 0x60, 0x400, 300, p->pairedMotion, 0x80, 60,
-                                    0, 3);
+        PairedSceneActor_InitHalves(p->attachment, 0x60, 0x400, 300, p->pairedMotion, 0x80, 60, 0,
+                                    3);
         Vanargand_SetPartAnimationParameter(p->attachment, 1);
     } else {
-        PairedSceneActor_InitHalves(p->attachment, 0x60, 0x400, 300, p->pairedMotion, 0x80, 60,
-                                    0, 1);
+        PairedSceneActor_InitHalves(p->attachment, 0x60, 0x400, 300, p->pairedMotion, 0x80, 60, 0,
+                                    1);
         Vanargand_SetPartAnimationParameter(p->attachment, 0);
     }
     PairedSceneActor_SetResetValues(p->attachment, limitA, limitB);

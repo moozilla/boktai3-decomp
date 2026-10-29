@@ -119,7 +119,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/FINDINGS.md](../docs/FINDINGS.md) | Engine findings |  | 5 |
 | [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 34 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 11 |
+| [docs/GHOUL_CONTACT_RESPONSE.md](../docs/GHOUL_CONTACT_RESPONSE.md) | Ghoul contact response: 0808B3EC | #matching #ghoul #scene-actor #regalloc #0808B3EC | 3 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 12 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LAYOUTS.md](../docs/LAYOUTS.md) | RAM object layouts merged across files | #tooling #matching | 12 |
@@ -130,6 +131,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/MGS_GCL_MATCHING.md](../docs/MGS_GCL_MATCHING.md) | Boktai 3 / MGS GCL matching evidence | *#scripts #matching* | 66 |
 | [docs/MODEL_BENCHMARK.md](../docs/MODEL_BENCHMARK.md) | Small-model matching benchmark: explain.py vs check.py | #matching #tooling | 13 |
 | [docs/MOTION_0818.md](../docs/MOTION_0818.md) | Motion callback family at 0818D754 | *#tooling* | 7 |
+| [docs/MUMMY_DISPLACEMENT_RECOVERY.md](../docs/MUMMY_DISPLACEMENT_RECOVERY.md) | Mummy displacement recovery: 080D2584 | #matching #mummy #scene-actor #regalloc #080D2584 | 3 |
+| [docs/MUMMY_MOVEMENT_RESPONSE.md](../docs/MUMMY_MOVEMENT_RESPONSE.md) | Mummy movement response: 080DA97C | #matching #mummy #scene-actor #regalloc #080DA97C | 3 |
 | [docs/PERMUTER.md](../docs/PERMUTER.md) | Solving register allocation in the compiler, then in C | #matching #tooling | 22 |
 | [docs/PERMUTER_HANDOFF_2026-10-15.md](../docs/PERMUTER_HANDOFF_2026-10-15.md) | October 15 matching residue and frozen searches | *#matching* | 5 |
 | [docs/PROCESS_REVIEW.md](../docs/PROCESS_REVIEW.md) | External research review and next experiments | *#scripts #process* | 13 |
@@ -164,6 +167,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/SCENE_ACTOR_REGISTRY.md](../docs/SCENE_ACTOR_REGISTRY.md) | Scene actor registry (tentative) | *#actors #scene #assets* | 7 |
 | [docs/SCENE_ACTOR_REGISTRY_LIFECYCLE.md](../docs/SCENE_ACTOR_REGISTRY_LIFECYCLE.md) | Registry list, message dispatch and update cadence (tentative) | *#actors* | 4 |
 | [docs/SCENE_ACTOR_REGISTRY_QUERIES.md](../docs/SCENE_ACTOR_REGISTRY_QUERIES.md) | Actor-registry queries (08070070–08070FA8) | *#actors* | 12 |
+| [docs/SCENE_ACTOR_STATUS.md](../docs/SCENE_ACTOR_STATUS.md) | SceneActor_UpdateStatus — exact status update reconstruction | #matching #scene-actor #compiler #regalloc #08078EE8 | 4 |
 | [docs/SCENE_ACTOR_TARGET_CONTROL.md](../docs/SCENE_ACTOR_TARGET_CONTROL.md) | Scene actor target and contact control | *#actors #scene #animation* | 2 |
 | [docs/SCENE_ACTOR_TERRAIN.md](../docs/SCENE_ACTOR_TERRAIN.md) | Scene actor terrain transitions | *#scripts #actors #scene* | 2 |
 | [docs/SCENE_ACTOR_UPDATE.md](../docs/SCENE_ACTOR_UPDATE.md) | Actor timer and pending-flag update helpers | *#actors #animation* | 3 |
@@ -196,7 +200,9 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/SCENE_RANGE_WATCH.md](../docs/SCENE_RANGE_WATCH.md) | Scene range watcher (tentative) | *#scripts #scene* | 2 |
 | [docs/SCENE_STATE_QUERIES.md](../docs/SCENE_STATE_QUERIES.md) | Scene state, spatial queries and pair records (tentative) | *#actors #scene* | 4 |
 | [docs/SCRIPT_TRACING.md](../docs/SCRIPT_TRACING.md) | Script calls in a running game | *#scripts #actors #tooling* | 7 |
+| [docs/SEARCH_HOWTO-opus.md](../docs/SEARCH_HOWTO-opus.md) | seek: matching as a search, with you as the policy (worker guide) | *#matching #tooling* | 8 |
 | [docs/SEARCH_SPEC.md](../docs/SEARCH_SPEC.md) | A matching search engine: spec and brief (2026-10-28) | #tooling #matching #compiler #process | 24 |
+| [docs/SHARED_MONSTER_REACTIONS.md](../docs/SHARED_MONSTER_REACTIONS.md) | Shared monster pursuit and contact operations | #matching #scene-actor #golem #skeleton #ghoul #mummy #regalloc #080C9C04 #080C12FC #0808B3EC #080DA97C #080D2584 #08078EE8 | 6 |
 | [docs/SHIFTABILITY.md](../docs/SHIFTABILITY.md) | Shiftable data: how it was proven | #tooling #assets | 1 |
 | [docs/SOLAR_SENSOR.md](../docs/SOLAR_SENSOR.md) | Cartridge solar sensor: code and runtime evidence | *#hardware* | 5 |
 | [docs/SPARK_PARTICLE.md](../docs/SPARK_PARTICLE.md) | Moving tile particles (tentative identity) | *#particles #assets* | 3 |
@@ -220,7 +226,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-23-cx-sol08.md](../docs/history/2026-10-23-cx-sol08.md) | 2026-10-23 — cx-sol08 actor campaign batch | #actors #compiler-debugger #matching #mimic #particles #register-pinning #weather | 2 |
 | [docs/history/2026-10-23.md](../docs/history/2026-10-23.md) | Campaign sol05 session 2 wrap-up | #actors #animation #axe #bosses #camera #campaign #charge #compiler #effect-pool #effects #hresvelgr #inventory #ivy #linked-effect #map-menu #matching #monster-book #monsters #mummy #nidhoggr #nonmatching #palette #particles #player #ratatosk #reactions #register-pinning #registry-f3e4 #scene-actor #scene-actors #scene-npc #screamer #script-combat-actor #singleton-slot7 #slime #spider #sprite-effects #tentacle #terrain #vanargand #wireless | 19 |
 | [docs/history/2026-10-27.md](../docs/history/2026-10-27.md) | Work history: 2026-10-27 | #matching #ram #tooling | 1 |
-| [docs/history/2026-10-29.md](../docs/history/2026-10-29.md) | 2026-10-29: matching search and the largest-function experiment | #compiler #golem #matching #monsters #process #skeleton #tooling | 6 |
+| [docs/history/2026-10-29.md](../docs/history/2026-10-29.md) | 2026-10-29: matching search and the largest-function experiment | #compiler #ghoul #golem #matching #monsters #mummy #process #scene-actor #skeleton #tooling #vanargand | 7 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
@@ -362,6 +368,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round3-sol.md](../notes/round3-sol.md) | Sol production round 3 |  | 5 |
 | [notes/round4-luna-b.md](../notes/round4-luna-b.md) | Round 4 — Luna B |  | 2 |
 | [notes/round4-sol.md](../notes/round4-sol.md) | Sol production round 4 |  | 3 |
+| [notes/round4-vanargand_2026-10-29.md](../notes/round4-vanargand_2026-10-29.md) | Vanargand initialization — exact ordinary C | #matching #vanargand #palette #motion-track #regalloc #081AE0C0 | 4 |
 | [notes/round5-sol.md](../notes/round5-sol.md) | Sol production round 5 |  | 3 |
 | [notes/round6-sol.md](../notes/round6-sol.md) | Production round 6 — Sol |  | 3 |
 | [notes/s0.md](../notes/s0.md) | s0 notes | *#tooling* | 11 |
@@ -388,6 +395,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/script_virtual_machine.md](../notes/script_virtual_machine.md) | Script virtual machine, merged unit | *#scripts* | 8 |
 | [notes/selection_menu.md](../notes/selection_menu.md) | Selection menu unit (tentative) | #selection-menu #translation-unit #matching | 5 |
 | [notes/shake-icon-display_2026-10-14.md](../notes/shake-icon-display_2026-10-14.md) | Short-lived shaking keyframe icon |  | 2 |
+| [notes/shared-monster-round4_2026-10-29.md](../notes/shared-monster-round4_2026-10-29.md) | Round 4: shared monster operations and five exact matches | #matching #scene-actor #monsters #golem #skeleton #ghoul #mummy #vanargand #compiler #tooling #080DA97C #0808B3EC #08078EE8 #081AE0C0 #080D2584 | 6 |
 | [notes/sol-family-push-2.md](../notes/sol-family-push-2.md) | Sol family push 2 |  | 3 |
 | [notes/sol-family-push-3.md](../notes/sol-family-push-3.md) | Sol family push 3 |  | 8 |
 | [notes/sol-family-push-4.md](../notes/sol-family-push-4.md) | Sol family push 4 |  | 2 |
