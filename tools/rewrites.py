@@ -176,13 +176,17 @@ def _cval(c):
         return None
 
 
-def rw_related_const(fn):
+def rw_related_const(fn, lines=None):
     """... = K1 ...; f(K2)  ->  ... = (t = K1) ...; f(t + (K2 - K1))."""
     cs = _consts(fn)
     vals = [_cval(c) for c, _, _ in cs]
     # only values that are stored or passed (an assignment's value or a call argument)
     passed = [isinstance(p, ca.ExprList) or (isinstance(p, ca.Assignment) and s == "rvalue") for _, p, s in cs]
+    allowed = set(lines) if lines is not None else None
     for i, j in itertools.permutations(range(len(cs)), 2):
+        if allowed is not None and any(c.coord is None or c.coord.line not in allowed
+                                       for c, _, _ in (cs[i], cs[j])):
+            continue
         if i > j or vals[i] is None or vals[j] is None or not (passed[i] and passed[j]):
             continue
         d = vals[j] - vals[i]

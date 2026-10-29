@@ -929,7 +929,7 @@ def family(gen):
 FAMILIES = {family(g): g for g in MOVES + list(R.REWRITES)}
 
 
-def all_moves(fn, families=None, include_rewrites=True):
+def all_moves(fn, families=None, include_rewrites=True, lines=None):
     """(family, description, new FuncDef) for every move site; FAMILIES: a set of family names to keep
     (family = the generator's name without the rw_/mv_ prefix). Includes rewrites.REWRITES when
     include_rewrites. Swallow exceptions per generator (a broken generator must not stop the others)."""
@@ -938,7 +938,8 @@ def all_moves(fn, families=None, include_rewrites=True):
         if families is not None and fam not in families:
             continue
         try:
-            for desc, f2 in gen(fn):
+            variants = gen(fn, lines=lines) if gen is R.rw_related_const else gen(fn)
+            for desc, f2 in variants:
                 yield fam, desc, fix_dangling_else(f2)
         except Exception:
             continue
