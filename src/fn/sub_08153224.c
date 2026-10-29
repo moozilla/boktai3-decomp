@@ -1,14 +1,13 @@
 #include "contact_swarm.h"
 #include "render.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.2%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// confidence=low: tentative player cue role; see callback body.
-// Constant lifetimes, phase branches and particle configuration differ; particle words are fully initialized.
-struct P {
-    u8 pad3A2[0x3A2];
+// confidence=low: tentative player cue field interpretations.
+struct PlayerFormCue {
+    u8 unknown0[0x6C];
+    struct DisplaySequenceState sequence;
+    u8 unknown7C[0x10];
+    struct DisplaySequenceSprite sprite;
+    u8 unknownB8[0x2EA];
     u8 facing;
     u8 flip;
     u8 dir;
@@ -42,43 +41,18 @@ struct P {
     u16 fAD6;
     u16 fAD8;
 };
-void ActorSequence_Begin(struct P *, s32, s32);
-void Player_AddControlFlags(struct P *, u32);
-void PlayerCue_UpdateHidden(struct P *);
-void PlayerCue_CompleteAction(struct P *);
-void PlayerCue_EnterStandUpdate(struct P *);
-void Player_RestartAnimationFromSetup(struct P *);
-extern const s16 gUnk_086149C4[];
+void ActorSequence_Begin(struct PlayerFormCue *, s32, s32);
+void Player_AddControlFlags(struct PlayerFormCue *, u32);
+void PlayerCue_EnterStandUpdate(struct PlayerFormCue *);
 void Sound_PlaySong(u32);
-static inline s32 Truncate(s32 v)
-{
-    if (v >= 0)
-        return v >> 12;
-    return -((-v) >> 12);
-}
-#define U8(p, o)  (*(u8 *)((u8 *)(p) + (o)))
-#define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
-#define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
-void Player_RestartAnimationFromResource(struct P *);
-void Player_UpdateFacingSide(struct P *);
-u32 Player_SetAnimation(struct P *, u32, u32, u32);
-void SpiralTrail_CreateWithParticles(struct P *, s32, void *, s32, s32);
-s32 Player_ConsumeStateEntry(struct P *);
+void Player_UpdateFacingSide(struct PlayerFormCue *);
+u32 Player_SetAnimation(struct PlayerFormCue *, u32, u32, u32);
+void SpiralTrail_CreateWithParticles(struct PlayerFormCue *, s32, void *, s32, s32);
+s32 Player_ConsumeStateEntry(struct PlayerFormCue *);
 s32 ActorVariant_GetTableValue(s32, s32);
-void Player_SetActionPhase(struct P *, s32);
-void Player_InitVisualResources(struct P *);
-// confidence=low: toggles actor variant between zero and one through four motion phases.
-static inline u32 Arg1(u32 k_, struct P *p)
-{
-    return p->timer >> k_;
-}
-
-inline static u32 Arg1_1(struct P *p)
-{
-    return p->timer >> 2;
-}
-
-void PlayerCue_UpdateFormChange(struct P *p)
+void Player_SetActionPhase(struct PlayerFormCue *, s32);
+void Player_InitVisualResources(struct PlayerFormCue *);
+void PlayerCue_UpdateFormChange(struct PlayerFormCue *p)
 {
     if (Player_ConsumeStateEntry(p)) {
         p->fAD6 = 0x16F;
@@ -109,13 +83,11 @@ void PlayerCue_UpdateFormChange(struct P *p)
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->variant, 0), 64, 1);
             p->facing >>= 2;
             if (p->f4EE) {
-                struct {
-                    u32 a;
-                    u8 b;
-                } particles;
-                particles.a = 0;
-                particles.b = 15;
-                SpiralTrail_CreateWithParticles(p, 1, &particles, 50, 69);
+                struct ContactPosition offset;
+                offset.x = 0;
+                offset.y = 0;
+                offset.z = 15;
+                SpiralTrail_CreateWithParticles(p, 1, &offset, 50, 69);
                 Sound_PlaySong(0x39B);
             }
             Player_SetActionPhase(p, 1);
@@ -123,8 +95,7 @@ void PlayerCue_UpdateFormChange(struct P *p)
 
         case 1:
             if (p->f4EE) {
-                p->fAD8 += 3;
-                if (p->fAD8 > 32)
+                if ((p->fAD8 += 3) > 32)
                     p->fAD8 = 32;
             }
             p->f6FC = 15;
@@ -136,15 +107,14 @@ void PlayerCue_UpdateFormChange(struct P *p)
             break;
 
         case 2:
-            if ((p->timer & 7) < (7 - ((u16)Arg1_1(p))))
+            if ((p->timer & 7) < (7 - (p->timer >> 2)))
                 Player_SetAnimation(p, ActorVariant_GetTableValue(p->variant, 10), 64, 1);
             else if (p->variant != 1) {
-                Anim_SetKeyframes(((u8 *)p) + 0x8C, ((u8 *)p) + 0x6C, 0xE4, 0, 0);
-                Anim_Step(((u8 *)p) + 0x8C, ((u8 *)p) + 0x6C);
+                Anim_SetKeyframes(&p->sprite, &p->sequence, 0xE4, 0, 0);
+                Anim_Step(&p->sprite, &p->sequence);
             } else
                 Player_SetAnimation(p, ActorVariant_GetTableValue(0, 10), 64, 1);
-            p->fAD8 += 3;
-            if (p->fAD8 > 32)
+            if ((p->fAD8 += 3) > 32)
                 p->fAD8 = 32;
             p->f6FC = 30;
             if ((++p->timer) > 19) {
@@ -175,8 +145,8 @@ void PlayerCue_UpdateFormChange(struct P *p)
                 }
             } else {
                 if (p->timer == 0)
-                    Anim_SetKeyframes(((u8 *)p) + 0x8C, ((u8 *)p) + 0x6C, 0xE4, 1, 0);
-                Anim_Step(((u8 *)p) + 0x8C, ((u8 *)p) + 0x6C);
+                    Anim_SetKeyframes(&p->sprite, &p->sequence, 0xE4, 1, 0);
+                Anim_Step(&p->sprite, &p->sequence);
                 if ((++p->timer) > 29) {
                     Player_UpdateFacingSide(p);
                     ActorSequence_Begin(p, 0, 0);
@@ -191,7 +161,3 @@ void PlayerCue_UpdateFormChange(struct P *p)
             break;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", PlayerCue_UpdateFormChange);
-#endif

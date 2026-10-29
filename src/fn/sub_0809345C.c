@@ -1,77 +1,86 @@
 #include "global.h"
 
-// confidence=low: writes eight cubic-blend samples from the actor's point toward the target point into its buffer, then stores the target.
-static inline s32 sub0809345C_Shift10(s32 n)
+struct BeePoint {
+    s16 x, y, z, pad;
+} __attribute__((aligned(4)));
+struct BeeRoute {
+    u8 unknown0[0x3E0];
+    struct BeePoint points[8];
+    struct BeePoint endpoint;
+    u8 unknown428[0x480 - 0x428];
+    struct BeePoint motion;
+};
+struct BeeActor {
+    u8 unknown0[0x5C];
+    struct BeePoint position;
+    u8 unknown64[0x3D0 - 0x64];
+    struct BeeRoute *route;
+};
+s32 Div(s32, s32);
+
+static inline s32 Bee_Shift10(s32 value)
 {
-    if (n >= 0)
-        return n >> 10;
-    return -((-n) >> 10);
+    return value >= 0 ? value >> 10 : -((-value) >> 10);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 25.6%
-// scope shape 154 (differences once low registers are set aside)
-// confidence=low: writes eight cubic-blend samples from the actor's point toward the target point into its buffer, then stores the target.
-void sub_0809345C(void *arg0, void *arg1)
+static inline void Bee_SubtractPoints(struct BeePoint *out, struct BeePoint *a, struct BeePoint *b)
 {
-    u8 *actor = arg0;
-    u8 *pool;
-    u32 zeroSrc;
-    u32 start[2];
-    u32 end[2];
-    s16 delta[4];
-    s16 zv[4];
-    s32 unit;
-    s32 sc1;
-    s32 sc2;
-    s32 i;
-    u16 *a16;
-    u16 *b16;
+    out->x = a->x - b->x;
+    out->y = a->y - b->y;
+    out->z = a->z - b->z;
+}
 
-    pool = *(u8 **)(actor + 0x3D0);
-    start[0] = *(u32 *)(actor + 0x5C);
-    start[1] = *(u32 *)(actor + 0x60);
-    end[0] = ((u32 *)arg1)[0];
-    end[1] = ((u32 *)arg1)[1];
-    start[0] &= 0xFFFF;
-    end[0] &= 0xFFFF;
-    unit = Div(0x400, 8);
-    sc1 = *(s16 *)(pool + 0x480) << 4;
-    sc2 = *(s16 *)(pool + 0x484) << 4;
-    a16 = (u16 *)end;
-    b16 = (u16 *)start;
+static inline void Bee_InterpolatePoint(struct BeePoint *out, struct BeePoint *start,
+                                        struct BeePoint *end, s32 tx, s32 tz, s32 t)
+{
+    struct BeePoint offset;
+    struct BeePoint acc;
+    s32 q, p, twiceP, thriceQ, tangent, h11;
+    s32 scaled, value;
+    Bee_SubtractPoints(&offset, end, start);
+    ZeroFill8(&acc);
+    q = Bee_Shift10(t * t);
+    p = Bee_Shift10(q * t);
+    twiceP = p * 2;
+    thriceQ = q * 3;
+    tangent = (p - 2 * q + t) * tz;
+    h11 = p - q;
+    scaled = ((twiceP - thriceQ + 1) * acc.x) * tx;
+    value = (thriceQ - twiceP) * offset.x;
+    value = scaled + value + tangent + h11;
+    out->x = start->x + Bee_Shift10(value);
+    scaled = ((twiceP - thriceQ + 1) * acc.y) * tx;
+    value = (-twiceP + thriceQ) * offset.y;
+    value = scaled + value + tangent + h11;
+    out->y = start->y + Bee_Shift10(value);
+    scaled = ((twiceP - thriceQ + 1) * acc.z) * tx;
+    value = (-twiceP + thriceQ) * offset.z;
+    value = scaled + value + tangent + h11;
+    out->z = start->z + Bee_Shift10(value);
+}
 
-    for (i = 0; i < 8; i++) {
-        s32 t = unit * (i + 1);
-        s16 *out = (s16 *)(pool + 0x3E0 + i * 8);
-        s32 s1;
-        s32 s2;
-        s32 h00;
-        s32 h01;
-        s32 h10;
-        s32 h11;
+void sub_0809345C(struct BeeActor *actor, struct BeePoint *target)
+{
+    struct BeeRoute *route = actor->route;
+    struct BeePoint start;
+    struct BeePoint end;
+    s32 step, tx, tz, i;
 
-        delta[0] = a16[0] - b16[0];
-        delta[1] = a16[1] - b16[1];
-        delta[2] = a16[2] - b16[2];
-        zeroSrc = 0;
-        CpuSet(&zeroSrc, zv, 0x05000002);
-        s1 = sub0809345C_Shift10(t * t);
-        s2 = sub0809345C_Shift10(s1 * t);
-        h00 = 2 * s2 - 3 * s1 + 1;
-        h01 = 3 * s1 - 2 * s2;
-        h10 = s2 - 2 * s1 + t;
-        h11 = s2 - s1;
-        out[0] =
-            b16[0] + sub0809345C_Shift10(sc1 * (h00 * zv[0]) + h01 * delta[0] + sc2 * h10 + h11);
-        out[1] =
-            b16[1] + sub0809345C_Shift10(sc1 * (h00 * zv[1]) + h01 * delta[1] + sc2 * h10 + h11);
-        out[2] =
-            b16[2] + sub0809345C_Shift10(sc1 * (h00 * zv[2]) + h01 * delta[2] + sc2 * h10 + h11);
+    start = actor->position;
+    end = *target;
+    {
+        u32 mask = 0xFFFF;
+        *(u32 *)&start = mask & *(u32 *)&start;
     }
-    *(u32 *)(pool + 0x420) = end[0];
-    *(u32 *)(pool + 0x424) = end[1];
+    *(u32 *)&end &= 0xFFFF;
+    step = Div(0x400, 8);
+    tx = route->motion.x << 4;
+    tz = route->motion.z << 4;
+    for (i = 0; i < 8; i++) {
+        s32 next = i + 1;
+        struct BeePoint *out = (struct BeePoint *)(i * 8 + (u32)route);
+        out = (struct BeePoint *)((u8 *)out + (u32) & ((struct BeeRoute *)0)->points);
+        Bee_InterpolatePoint(out, &start, &end, tx, tz, step * next);
+    }
+    route->endpoint = end;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0809345C);
-#endif

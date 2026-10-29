@@ -497,6 +497,7 @@ class Evaluator:
                 self.repo / "tools" / "scope" / "agbcc.patch",
                 self.repo / "symbols" / "functions.csv",
                 self.repo / "symbols" / "progress_functions.csv",
+                self.repo / "symbols" / "ram.csv",
                 self.rom_path,
                 self.repo / "build" / "boktai3.elf"]
         dep_hash = hashlib.sha256()
@@ -745,6 +746,24 @@ class Evaluator:
             raise ValueError("candidate changes translation-unit compiler/flags; propose C within the frozen build context")
 
     @_serialized
+    def source_names(self, source: str) -> tuple[str, ...]:
+        """Include recovered address-named leaves inside the frozen ROM span.
+
+        Scope uses the same grouping for drafts whose inventory extent contains
+        a trailing function. Keep known, independently inventoried neighbors out.
+        """
+        leaves = []
+        for match in re.finditer(r"^[^\n;#{}]*\b(sub_([0-9A-Fa-f]{8}))\s*\([^;{]*\)\s*\{",
+                                 _without_comments(source), re.M):
+            name, address = match[1], int(match[2], 16)
+            if self.address < address < self.address + len(self.target_code):
+                leaves.append(name)
+        if not leaves:
+            return self.own_names
+        _, addresses, _ = self.scope.inventory()
+        return tuple(dict.fromkeys((*self.own_names, *(name for name in leaves if name not in addresses))))
+
+    @_serialized
     def evaluate(self, source: str, *, preprocessed: bool = False,
                  diagnostic_knobs: Mapping[str, str] | None = None,
                  semcheck_trials: int = 0) -> Evaluation:
@@ -768,7 +787,8 @@ class Evaluator:
                 self.validate_environment()
             pre = source if preprocessed else self.preprocess(source)
             self._last_preprocessed = pre
-            result.concessions = _concessions(pre, self.own_names)
+            own = self.source_names(pre)
+            result.concessions = _concessions(pre, own)
             resolved = knobs
             if any(re.search(r"(^|,)[A-Za-z_]", knobs.get(k, "")) for k in ("AGBCC_PRI", "AGBCC_FORCE")):
                 self._input.write_text(source)
@@ -781,7 +801,7 @@ class Evaluator:
             compile_started = time.perf_counter()
             with self._scope_context():
                 server = self._compiler(debug)
-                code, error = server.bytes(pre, self.own_names, resolved)
+                code, error = server.bytes(pre, own, resolved)
             result.compile_ms = (time.perf_counter() - compile_started) * 1000
             self.validate_environment()
             if code is None:
@@ -832,7 +852,7 @@ class Evaluator:
                                        str(self.workdir), tag="verify")
         if obj is None:
             return {"exact": False, "method": "production compiler", "error": error}
-        code, _, _, missing = self.fast.place(obj, self.own_names, self.rom_symbols, self.address)
+        code, _, _, missing = self.fast.place(obj, self.source_names(pre), self.rom_symbols, self.address)
         if code is None or missing:
             return {"exact": False, "method": "production compiler", "error": "unresolved: " + ", ".join(missing)}
         self.validate_environment()
