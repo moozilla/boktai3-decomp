@@ -1,8 +1,4 @@
 // MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 59.0%
-// fix.py best (sweep after the inlined-insn fix)
-// Reviewed full extent; register lifetimes and instruction scheduling still differ.
 #include "contact_actor.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
@@ -32,11 +28,28 @@ static inline u32 nextRandom(const u16 *table)
     gRandomIndex = index;
     return table[index];
 }
-inline static u32 nextRandom_UpdateRetreat(const u16 *table)
+static inline s32 terrainHeight(struct ContactPosition *position, s32 index)
 {
-    u32 index = ((*((typeof(gRandomIndex) *)0x03005308)) + 1) & 1023;
-    *((typeof(gRandomIndex) *)0x03005308) = index;
-    return table[index];
+    u8 *properties = cell(index);
+    u32 type = *properties >> 4;
+    s32 height = (*properties & 15) << 8;
+    switch (type) {
+        case 1:
+            height -= (u8)position->z;
+            break;
+        case 2:
+            height -= (u8)position->x;
+            break;
+    }
+    return height;
+}
+
+static inline void addPosition(struct ContactPosition *out, const struct ContactPosition *delta,
+                               const struct ContactPosition *base)
+{
+    out->x = base->x + delta->x;
+    out->y = base->y + delta->y;
+    out->z = base->z + delta->z;
 }
 
 void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactActor *slot, s32 index)
@@ -46,13 +59,15 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
     struct ContactPosition *destination;
     if (slot->enter) {
         struct ContactPosition *center;
-        u32 type;
-        u32 packed;
-        s32 height;
-        register u32 observed asm("r8");
+        struct ContactPosition *entryDestination;
+        register u32 rngSetup asm("r8");
         const u16 *table;
+        const u16 *earlyTable;
         u32 angle;
+        register u32 angleMask asm("r6");
+        register u32 radiusBits asm("r1");
         u32 radius;
+        s32 jitter;
         struct ContactPosition *write;
         slot->enter = 0;
         {
@@ -60,55 +75,43 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
             collider->flags |= 4;
         }
         center = &pool->retreatCenter;
-        packed = *cell(cellIndex(center));
-        type = packed >> 4;
-        height = (packed & 15) * 256;
-        switch (type) {
-            case 1:
-                height -= (u8)center->z;
-                break;
-
-            case 2:
-                height -= (u8)center->x;
-                break;
-        }
-
-        pool->retreatCenter.y = height;
-        observed = 0x0403B714;
-        asm volatile("" : : "r"(observed));
-        table = (const u16 *)0x0203B400;
-        angle = nextRandom_UpdateRetreat(table) & 255;
-        radius = (nextRandom_UpdateRetreat(table) & 127) + 16;
+        pool->retreatCenter.y = terrainHeight(center, cellIndex(center));
+        rngSetup = 0x0403B714;
+        asm volatile("" : : "r"(rngSetup));
+        earlyTable = (const u16 *)0x0203B400;
+        angle = nextRandom(earlyTable);
+        angleMask = 255;
+        angle &= angleMask;
+        radiusBits = nextRandom(earlyTable) & 127;
         write = &delta;
-        write->x = truncateShift12(gUnk_086149C4[(angle + 64) & 255] * radius);
+        radius = radiusBits + 16;
+        write->x = truncateShift12(gUnk_086149C4[(angle + 64) & angleMask] * radius);
         write->y = 0;
         write->z = truncateShift12(gUnk_086149C4[angle] * radius);
-        destination = &slot->destination;
-        {
-            const struct ContactPosition *read = &delta;
-            const struct ContactPosition *first = &delta;
-            slot->destination.x = first->x + pool->retreatCenter.x;
-            destination->y = read->y + center->y;
-            destination->z = read->z + center->z;
-        }
-        slot->targetHeight = (nextRandom_UpdateRetreat(table) & 511) + slot->desiredHeight;
-        slot->direction =
-            Math_Atan2(slot->destination.x - slot->position.x, destination->z - slot->position.z);
-        slot->direction += (nextRandom_UpdateRetreat(table) & 15) - 8;
-        slot->steeringTimer = (nextRandom_UpdateRetreat(table) & 7) + 8;
+        entryDestination = &slot->destination;
+        addPosition(entryDestination, &delta, &pool->retreatCenter);
+        table = gRandomTable;
+        slot->targetHeight = (nextRandom(table) & 511) + slot->desiredHeight;
+        slot->direction = Math_Atan2(slot->destination.x - slot->position.x,
+                                     entryDestination->z - slot->position.z);
+        jitter = (nextRandom(table) & 15) - 8;
+        slot->direction += jitter;
+        slot->steeringTimer = (nextRandom(table) & 7) + 8;
         slot->speed = 16;
     }
     if (!slot->steeringTimer) {
-        const u16 *table;
+        register const u16 *table asm("r4");
+        s32 jitter;
+        struct ContactPosition *steeringDestination;
         position = &slot->position;
-        destination = &slot->destination;
-        slot->direction =
-            Math_Atan2(slot->destination.x - slot->position.x, destination->z - position->z);
-        do {
-            table = (const u16 *)0x0203B400;
-        } while (0);
-        slot->direction += (nextRandom_UpdateRetreat(table) & 3) - 1;
-        slot->steeringTimer = (nextRandom_UpdateRetreat(table) & 7) + 8;
+        steeringDestination = &slot->destination;
+        slot->direction = Math_Atan2(slot->destination.x - slot->position.x,
+                                     steeringDestination->z - position->z);
+        table = gRandomTable;
+        jitter = (nextRandom(table) & 3) - 1;
+        slot->direction += jitter;
+        slot->steeringTimer = (nextRandom(table) & 7) + 8;
+        destination = steeringDestination;
     } else {
         slot->steeringTimer--;
         destination = &slot->destination;
@@ -141,8 +144,3 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
             slot->stateFrame++;
     }
 }
-
-#else
-#include "global.h"
-INCLUDE_ASM("asm/nonmatching", ContactActor_UpdateRetreat);
-#endif
