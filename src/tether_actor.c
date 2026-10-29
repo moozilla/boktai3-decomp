@@ -588,11 +588,6 @@ void TetherActor_InitializeSegments(struct TetherActor *actor)
     } while (remaining >= 0);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 94.6%
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining: the ROM hoists neither z endpoint out of the segment loop and keeps the
-// priority in sb; this hoists start.z and spills the priority.
 static inline s32 scaleOffsetR(s32 value)
 {
     s32 result;
@@ -605,8 +600,10 @@ static inline s32 scaleOffsetR(s32 value)
 void TetherActor_UpdateSegments(struct TetherActor *actor)
 {
     struct TetherSegment *segment;
-    struct ContactPackedVector start;
-    struct ContactPackedVector end;
+    union {
+        struct ContactPackedVector bits;
+        struct ContactPosition position;
+    } start, end;
     s32 x;
     s32 z;
     s32 offsetX;
@@ -631,34 +628,28 @@ void TetherActor_UpdateSegments(struct TetherActor *actor)
         offsetX = scaleOffsetR(20 * (x + z));
         offsetZ = scaleOffsetR(20 * (z - x));
     }
-    start.x = (*gPlayers)->position.x + offsetX;
-    start.y = (*gPlayers)->position.y + 220;
-    start.z = (*gPlayers)->position.z + offsetZ;
+    start.bits.x = (*gPlayers)->position.x + offsetX;
+    start.bits.y = (*gPlayers)->position.y + 220;
+    start.bits.z = (*gPlayers)->position.z + offsetZ;
     angle = ((actor->heading + 5) & 7) * 32;
-    end.x = actor->position.x + scaleOffsetR(100 * gUnk_086149C4[(angle + 64) & 255]);
-    end.y = actor->position.y - 50;
-    end.z = actor->position.z + scaleOffsetR(100 * gUnk_086149C4[angle & 255]);
+    end.bits.x = actor->position.x + scaleOffsetR(100 * gUnk_086149C4[(angle + 64) & 255]);
+    end.bits.y = actor->position.y - 50;
+    end.bits.z = actor->position.z + scaleOffsetR(100 * gUnk_086149C4[angle & 255]);
     priority = ((*gPlayers)->heading == 4) ? (-20) : (-2);
     segment = actor->segments;
     i = 0;
     do {
         s32 count = i + 1;
         s32 remaining = 7 - i;
-        segment->position.x = ((end.x * count) + (start.x * remaining)) >> 3;
-        segment->position.z = ((start.z * remaining) + (end.z * count)) >> 3;
-        segment->position.y = ((end.y * count) + (start.y * remaining)) >> 3;
+        segment->position.x = ((end.position.x * count) + (start.position.x * remaining)) >> 3;
+        segment->position.y = ((end.position.y * count) + (start.position.y * remaining)) >> 3;
+        segment->position.z = ((end.position.z * count) + (start.position.z * remaining)) >> 3;
         segment->priority = priority;
         segment->flags &= ~1;
         i = count;
         ++segment;
     } while (i <= 6);
 }
-
-#else
-
-INCLUDE_ASM("asm/nonmatching", TetherActor_UpdateSegments);
-
-#endif
 
 void TetherActor_RemoveSegments(struct TetherActor *actor)
 {
