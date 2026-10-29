@@ -1,7 +1,4 @@
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 99.5%
-// Complete reviewed 1736-byte tick body; health/mode reload allocation remains.
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_motion.h"
 #include "game_state.h"
@@ -13,12 +10,18 @@ void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *, s32)
 void Obj_StepPosition(void *);
 void NavMesh_UpdateProbe(u16 *, u32);
 void sub_0821DE30(struct SceneActorRegistryControlGroup *);
-static inline u32 ReadMotionFlags(struct SceneActorMotionView *actor, u32 mask)
+static inline u32 MotionFlags16(struct SceneActorMotionView *actor, u32 input)
 {
-    register u32 offset asm("r6") = (u8 *)&actor->flags2D0 - (u8 *)actor;
-    register u32 *field asm("r0");
-    asm("" : "+r"(offset));
-    field = (void *)((u8 *)actor + offset);
+    u32 mask = input;
+    u32 offset = (u8 *)&actor->flags2D4 - (u8 *)actor;
+    u16 *field = (void *)((u8 *)actor + offset);
+    return *field & mask;
+}
+static inline u32 MotionFlags32(struct SceneActorMotionView *actor, u32 input)
+{
+    u32 mask = input;
+    u32 offset = (u8 *)&actor->flags2D0 - (u8 *)actor;
+    u32 *field = (void *)((u8 *)actor + offset);
     return *field & mask;
 }
 static inline u8 IsUnavailable(struct SceneActorMotionView *argument)
@@ -222,14 +225,9 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
         }
     }
     {
-        register u32 unavailable;
+        u32 unavailable;
         if (actor) {
-            u32 mask = 0x40;
-            register u32 offset asm("r4") = (u8 *)&actor->flags2D4 - (u8 *)actor;
-            register u16 *flags asm("r0");
-            asm("" : "+r"(offset));
-            flags = (void *)((u8 *)actor + offset);
-            if ((*flags & mask) || ReadMotionFlags(actor, 0x20000) || actor->health <= 0)
+            if (MotionFlags16(actor, 0x40) || MotionFlags32(actor, 0x20000) || actor->health <= 0)
                 unavailable = 1;
             else
                 unavailable = 0;
@@ -243,7 +241,6 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
     {
 
         register u32 *flags;
-        register u32 offset;
         register u32 moving;
         motionMask = 0x2000;
         motionFlagOffset = (u8 *)&actor->flags2CC - (u8 *)actor;
@@ -256,11 +253,9 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
                 register u32 blockedMask = 0x20;
                 u8 blocked;
                 {
-                    register u32 offset asm("r4") = (u8 *)&actor->flags2C0 - (u8 *)actor;
-                    register u16 *field asm("r0");
-                    asm("" : "+r"(offset));
+                    register u32 offset = (u8 *)&actor->flags2C0 - (u8 *)actor;
+                    register u16 *field;
                     field = (void *)((u8 *)actor + offset);
-                    asm("" : "+r"(field));
                     blocked = SceneActorPlacement_TestFlags(field, blockedMask);
                 }
                 if (!blocked)
@@ -307,7 +302,6 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
             register u16 *motionFlags asm("r4");
             old = (void *)((u8 *)actor + offset);
             oldX = *old;
-            asm("" : : "r"(motionFlagOffset));
             current = &actor->position;
             currentX = current->x;
             offset += (u8 *)&actor->flags2D6 - (u8 *)&actor->previousPosition;
@@ -445,9 +439,9 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
                                 } else {
                                     kind = 22;
                                     {
-                                        register u32 preparedOffset asm("r0") =
+                                        register u32 preparedOffset =
                                             (u8 *)&actor->prepared - (u8 *)actor;
-                                        register u8 *prepared asm("r1");
+                                        register u8 *prepared;
                                         asm("" : "+r"(preparedOffset));
                                         prepared = (void *)((u8 *)actor + preparedOffset);
                                         *prepared = 1;
@@ -590,7 +584,7 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
                                     attributes = *record;
                                 }
                                 {
-                                    register struct ContactPosition *localCenter asm("r3");
+                                    register struct ContactPosition *localCenter;
                                     register s32 height = (attributes & 15) << 8;
                                     localCenter = center;
                                     localCenter->y = height;
@@ -604,7 +598,7 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
                             {
                                 register struct ContactPosition *difference = &cache.difference;
                                 register const struct ContactPosition *center = &cache.center;
-                                register const struct ContactPosition *current asm("r6");
+                                register const struct ContactPosition *current;
                                 {
                                     register u32 centerX = (u16)cache.center.x;
                                     current = position;
@@ -617,9 +611,6 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
                                     register s32 direction;
                                     register u32 offset;
                                     register u8 *field;
-                                    asm(""
-                                        : "+r"(firstCoordinate)
-                                        : "r"(savedZ), "r"(center), "r"(current));
                                     direction = Math_Atan2(firstCoordinate, difference->z) >> 5;
                                     offset = (u8 *)&actor->effectDirection - (u8 *)actor;
                                     field = (void *)((u8 *)actor + offset);
@@ -662,8 +653,9 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
                                 *field = strength;
                             }
                             {
-                                register u32 offset = (u8 *)&actor->mode2E6 - (u8 *)actor;
-                                register u16 *field;
+                                register u32 offset asm("r2") = (u8 *)&actor->mode2E6 - (u8 *)actor;
+                                register u16 *field asm("r1");
+                                asm("" : "+r"(offset));
                                 field = (void *)((u8 *)actor + offset);
                                 *field = 1;
                             }
@@ -685,14 +677,13 @@ s32 SceneActorMotion_Update(struct SceneActorMotionView *argument)
                     ticks = (void *)((u8 *)actor + offset);
                     if (*ticks & 1) {
                         register u32 mask = 0x100;
-                        register u32 offset asm("r6") = (u8 *)&actor->flags2D4 - (u8 *)actor;
-                        register u16 *flags asm("r0");
-                        asm("" : "+r"(mask), "+r"(offset));
+                        register u32 offset = (u8 *)&actor->flags2D4 - (u8 *)actor;
+                        register u16 *flags;
                         flags = (void *)((u8 *)actor + offset);
                         if (*flags & mask) {
                             register u32 addMask = 0x10000;
                             register u32 offset asm("r0") = (u8 *)&actor->flags2D0 - (u8 *)actor;
-                            register u32 *field asm("r1");
+                            register u32 *field;
                             field = (void *)((u8 *)actor + offset);
                             *field |= addMask;
                         }
@@ -729,7 +720,8 @@ refresh: {
     register u32 mask;
     register u32 *flags asm("r2");
     {
-        register void **field asm("r0") = (void *)((u8 *)group + offset);
+        register void **field asm("r0");
+        field = (void *)((u8 *)group + offset);
         contact = *field;
     }
     mask = 0x400000;
@@ -757,6 +749,7 @@ refresh: {
     {
         register u32 offset asm("r6") = (u8 *)&actor->previousPosition - (u8 *)actor;
         register struct ContactPosition *previous asm("r2");
+        asm("" : "+r"(offset));
         previous = (void *)((u8 *)actor + offset);
         *previous = actor->position;
     }
@@ -769,7 +762,3 @@ refresh: {
     }
     return 1;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorMotion_Update);
-#endif
