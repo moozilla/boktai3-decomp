@@ -78,7 +78,7 @@ struct SceneActorRegistryResetView {
     u32 word104;
     u32 word108, word10C, word110;
     u32 flags114;
-    u32 defaultFlags2CC, defaultFlags2D0;
+    u32 defaultFlags2CC, defaultFlags2D0; /* +0x118/+0x11C: defaults for the named live fields. */
     u8 direction120;
     u8 defaultState, defaultPhase, defaultBehavior;
     const void *defaultControl;
@@ -139,7 +139,10 @@ struct SceneActorRegistryResetView {
     u8 unknown2F6[0xE];
     u32 field304;
     u32 profileId;
-    u8 unknown30C[0xC0];
+    u32 field30C;
+    struct ContactPosition reactionStart,
+        reactionEnd; /* +0x310/+0x318: reaction position snapshots. */
+    u8 unknown320[0xAC];
     u8 field3CC, unknown3CD[3];
     void *context;
     struct SceneActorRegistryControlGroup group;
