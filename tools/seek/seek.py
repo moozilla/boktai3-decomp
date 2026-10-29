@@ -60,7 +60,7 @@ AGBCC_SRC = os.path.join(ROOT, "build", "scope", "agbcc", "gcc")
 
 # ------------------------------------------------------------------ parse
 
-def parse_function(pre, names, src_text=None):
+def parse_function(pre, names, src_text=None, group=()):
     """{name: FuncDef} of FUNC (first) and the unit's inline helpers it calls, transitively, from the
     preprocessed unit PRE. Moves apply to all of them: much of a function's code is often in a helper."""
     span = None
@@ -72,16 +72,18 @@ def parse_function(pre, names, src_text=None):
         raise SystemExit("cannot find the function in the preprocessed unit")
     head = pre[:span[0]]
     head = re.sub(r'^[ \t]*asm\s*\(\s*"\.include (?:\\.|[^"\\\n])*"\s*\)\s*;[ \t]*$', "", head, flags=re.M)
-    body = pre[span[0]:span[1]]
+    end = max([span[1]] + [s[1] for n in group if (s := E.find_def(pre, n))])
+    body = pre[span[0]:end]
     try:
         ast = ast_util.parse_c(head + body)
     except Exception:  # noqa: BLE001  other functions' bodies with syntax pycparser lacks: stub them
         ast = ast_util.parse_c(stub_bodies(head) + body)
-    fn = next(e for e in reversed(ast.ext) if isinstance(e, ca.FuncDef) and e.decl.name in names)
+    fn = next(e for e in ast.ext if isinstance(e, ca.FuncDef) and e.decl.name in names)
     defs = {e.decl.name: e for e in ast.ext if isinstance(e, ca.FuncDef) and e is not fn
             and "inline" in (e.decl.funcspec or [])}
     out = {fn.decl.name: fn}
-    todo = [fn]
+    out.update({e.decl.name: e for e in ast.ext if isinstance(e, ca.FuncDef) and e.decl.name in group})
+    todo = list(out.values())
     while todo:
         f = todo.pop()
         for n, _, _ in R.walk(f):
@@ -195,7 +197,8 @@ class Work:
             return self.ast[node["id"]]
         path = self.sess.materialize(node)
         pre = self.target.preprocess_file(path)
-        defs = parse_function(pre, self.target.names, open(os.path.join(ROOT, path)).read())
+        self.target.group = E.scope.source_group(self.target.src, self.func, pre)
+        defs = parse_function(pre, self.target.names, open(os.path.join(ROOT, path)).read(), self.target.group)
         self.ast[node["id"]] = (pre, defs)
         return pre, defs
 
@@ -293,7 +296,7 @@ class Work:
         if same and same != rec["id"]:
             self.sess.update(rec["id"], same_as=same)
         try:
-            self.ast[rec["id"]] = (pre, parse_function(pre, self.target.names, text))
+            self.ast[rec["id"]] = (pre, parse_function(pre, self.target.names, text, self.target.group))
         except Exception as e:  # noqa: BLE001
             print(f"(n{rec['id']} cannot be parsed for moves: {str(e).splitlines()[0][:200]})")
         return rec

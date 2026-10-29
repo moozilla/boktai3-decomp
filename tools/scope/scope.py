@@ -384,6 +384,28 @@ _G_WARNED = set()
 _UNINIT_WARNED = set()
 
 
+def source_group(src, func, text=None):
+    """Include address-named definitions hidden inside FUNC's inventory span.
+
+    Some inventory entries include unlabeled trailing functions as byte data. A
+    draft can recover them as ordinary C definitions without changing symbols.
+    They remain part of the original span's byte-exact acceptance check.
+    """
+    name = rom_name(src, func)
+    own = [func, name]
+    _, addresses, sizes = inventory()
+    if name not in addresses:
+        return tuple(own)
+    lo, hi = addresses[name], addresses[name] + sizes[name]
+    if text is None:
+        text = open(os.path.join(ROOT, src)).read()
+    for m in re.finditer(r"^[^\n;#{}]*\b(sub_([0-9A-Fa-f]{8}))\s*\([^;{]*\)\s*\{", text, re.M):
+        n, addr = m.group(1), int(m.group(2), 16)
+        if lo < addr < hi and n not in addresses and n not in own:
+            own.append(n)
+    return tuple(own)
+
+
 def arm_unit_exit(src, func):
     """Scope's instrumented compiler is Thumb agbcc: an agbcc_arm unit would compile as Thumb and
     compare against ARM bytes, a listing of nothing but differences. Stop with what to use instead."""
@@ -426,7 +448,7 @@ def compile_draft_g(src, func, env=None):
     wd = workdir(func)
     pre = preprocess(src, env, func)
     if os.environ.get("SCOPE_TRIM") != "0":
-        pre = diagnostic_source(pre, (func, rom_name(src, func))) or pre
+        pre = diagnostic_source(pre, source_group(src, func)) or pre
     open(os.path.join(wd, "u.i"), "w").write(pre)
     for p in PASSES:
         try:
@@ -504,7 +526,7 @@ def compile_draft_g(src, func, env=None):
     # earlier drafts of other sizes move: send such calls to the callee's ROM address instead, so
     # they compare like calls to outside symbols (a phantom bl difference otherwise).
     _, addr_all, _ = inventory()
-    own = (func, rom_name(src, func))
+    own = source_group(src, func)
     local = set(re.findall(r"^\t\.type\t\s*(\w+),function", text, re.M)) - set(own)
     for n in sorted(local):
         a_rom = addr_all.get(n)
@@ -2396,7 +2418,7 @@ def fast_compile(src, func, env=None, plain=None):
         atexit.register(f.close)  # stops its agbcc servers and removes their directories
         os.makedirs(os.path.join(WORK, "cache"), exist_ok=True)
     knobs = {k: v for k, v in (env or {}).items() if k.startswith(("AGBCC_", "CSE_"))}
-    code, err = f.bytes(fast_preprocess(src, env, func), (func, rom_name(src, func)), knobs)
+    code, err = f.bytes(fast_preprocess(src, env, func), source_group(src, func), knobs)
     if code is None:
         return None
     return code, addr, f.data
@@ -2565,13 +2587,21 @@ def concession_sites(text):
     barrier statement (`asm("" : "+r"(x));`) in TEXT; removal(lines) returns the lines without it."""
     lines = text.split("\n")
     out = []
+    skip_until = 0
     for i, ln in enumerate(lines):
+        if i < skip_until:
+            continue
         if ln.lstrip().startswith("//"):
             continue
         if PIN_RE.search(ln) and "register" in ln:
             out.append((i, "pin", lambda ls, i=i: ls[:i] + [PIN_RE.sub("", ls[i], count=1)] + ls[i + 1:]))
-        elif BARRIER_RE.match(ln):
-            out.append((i, "barrier", lambda ls, i=i: ls[:i] + ls[i + 1:]))
+        elif re.match(r'^\s*(?:asm|__asm__)(?:\s+(?:volatile|__volatile__))?\s*\(\s*""', ln):
+            end = i + 1
+            while ";" not in "\n".join(lines[i:end]) and end < len(lines):
+                end += 1
+            if BARRIER_RE.match("\n".join(lines[i:end])):
+                out.append((i, "barrier", lambda ls, i=i, end=end: ls[:i] + ls[end:]))
+                skip_until = end
     return out
 
 
@@ -2582,13 +2612,16 @@ def sole_definitions(lines, i):
     """Variables that the barrier on line I defines (an output-only `"=r"(x)` operand) and that nothing
     else in the enclosing function sets. Removing such a barrier leaves x read with no value: same bytes
     perhaps, but not C anyone wrote (a pinned register variable gets no uninitialized warning)."""
-    ln = lines[i]
+    end = i + 1
+    while ";" not in "\n".join(lines[i:end]) and end < len(lines):
+        end += 1
+    ln = "\n".join(lines[i:end])
     outs = re.findall(r'"=[^"]*"\s*\(\s*(\w+)\s*\)', ln.split(":")[1] if ln.count(":") >= 1 else "")
     if not outs:
         return []
     lo = next((j for j in range(i, -1, -1) if re.match(r"\w.*\)\s*\{?\s*$", lines[j]) and not lines[j][0].isspace()), 0)
     hi = next((j for j in range(i, len(lines)) if lines[j].startswith("}")), len(lines) - 1)
-    body = "\n".join(lines[lo:i] + lines[i + 1:hi + 1])
+    body = "\n".join(lines[lo:i] + lines[end:hi + 1])
     sole = []
     for x in outs:
         x_re = re.escape(x)

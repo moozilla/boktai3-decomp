@@ -33,11 +33,12 @@ def split_source(text, func_names):
     if MARK in text:
         return None
     m = None
+    ends = []
     for name in func_names:
         for m2 in re.finditer(r"^[^\n;#]*\b" + re.escape(name) + r"\s*\([^;{]*\)\s*\{", text, re.M):
-            m = m2
-        if m:
-            break
+            if m is None:
+                m = m2
+            ends.append(body_end(text, m2.end() - 1))
     if not m:
         return None
     # start at the line holding the definition, so line numbers stay the same
@@ -53,7 +54,7 @@ def split_source(text, func_names):
         start = back.end()
     # and end the suffix with FUNC's body: agbcc compiles a function at a time, so what follows cannot
     # change FUNC's code, and a big unit's later functions would otherwise compile with every variant
-    end = body_end(text, m.end() - 1)
+    end = max(ends)
     return text[:start], text[start:end]
 
 
@@ -195,7 +196,7 @@ def place(obj, own, rom_syms, address):
     start = next((v for v, n in funcs if n in own), None)
     if start is None:
         return None, None, funcs, ["no " + "/".join(own)]
-    end = next((v for v, n in funcs if v > start), len(text))
+    end = next((v for v, n in funcs if v > start and n not in own), len(text))
     base = address - start  # address of .text offset 0
     local = {n: base + (v & ~1) + (v & 1) for n, v, sh, t in syms if sh == text_i and n}
     local_funcs = {n for _, n in funcs} - set(own)
