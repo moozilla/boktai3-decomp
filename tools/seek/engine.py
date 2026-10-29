@@ -215,6 +215,57 @@ def region_string(regs):
     return "".join(v for _, _, v, _ in regs)
 
 
+# ------------------------------------------------------------------ allocation decisions
+
+def parse_alloc(text, names):
+    """{label: [reg, priority, refs, live, kind]} from AGBCC_DUMPPRI records of FUNC: global-alloc (G) and
+    local-alloc (L) values with a C name or a constant label (=N); repeats of a label get #2, #3 in
+    pseudo order. reg -1 = no register (stack or reload)."""
+    recs = []
+    for ln in text.splitlines():
+        p = ln.split()
+        if not p or p[0] not in ("G", "L") or len(p) < 3 or p[1] not in names:
+            continue
+        if p[0] == "G" and len(p) >= 9:
+            pseudo, pri, refs, live, reg, lab = int(p[2]), int(p[3]), int(p[4]), int(p[5]), int(p[7]), p[8]
+            recs.append((pseudo, lab, [reg, pri, refs, live, "G"]))
+        elif p[0] == "L" and len(p) >= 12:
+            pseudo, pri, refs, reg, lab = int(p[3]), int(p[5]), int(p[8]), int(p[10]), p[11]
+            recs.append((pseudo, lab, [reg, pri, refs, int(p[7]) - int(p[6]), "L"]))
+    out, seen = {}, collections.Counter()
+    for pseudo, lab, v in sorted(recs):
+        if lab == "-":
+            continue
+        seen[lab] += 1
+        out[lab if seen[lab] == 1 else f"{lab}#{seen[lab]}"] = v
+    return out
+
+
+def alloc_changes(a, b):
+    """[text] of labels whose register differs between allocations A (parent) and B."""
+    out = []
+    for lab in sorted(set(a) | set(b)):
+        reg = lambda v: v[0] if isinstance(v, list) else v
+        ra, rb = reg(a.get(lab)), reg(b.get(lab))
+        if ra != rb:
+            out.append(f"{lab} {rname(ra)}->{rname(rb)}")
+    return out
+
+
+def rname(r):
+    if r is None:
+        return "gone"
+    if r < 0:
+        return "mem"
+    return {13: "sp", 14: "lr", 12: "ip", 11: "fp", 10: "sl", 9: "sb"}.get(r, f"r{r}")
+
+
+def alloc_wrong(alloc, want):
+    """[label] whose register is not the one the ROM uses for it."""
+    reg = lambda v: v[0] if isinstance(v, list) else v
+    return [lab for lab, r in want.items() if lab in alloc and reg(alloc[lab]) != r]
+
+
 # ------------------------------------------------------------------ target
 
 class Target:
@@ -260,13 +311,21 @@ class Target:
         rel = os.path.relpath(os.path.abspath(path), ROOT)
         return scope.fast_preprocess(rel, {}, self.func)
 
-    def compile_pre(self, pre, knobs=None):
-        """(code, error) for a preprocessed unit text."""
+    def compile_pre(self, pre, knobs=None, trace=False):
+        """(code, error) for a preprocessed unit text; with TRACE, (code, error, alloc): the allocation
+        agbcc made, per labeled value (AGBCC_DUMPPRI, written by the fork server's child: no -g needed)."""
         t0 = time.time()
-        code, err = self.fast.bytes(pre, self.names, knobs or {})
+        knobs = dict(knobs or {})
+        if trace:
+            path = os.path.join(LOCAL, "cache", f"pri{os.getpid()}.txt")
+            open(path, "w").close()
+            knobs["AGBCC_DUMPPRI"] = path
+        code, err = self.fast.bytes(pre, self.names, knobs)
         self.compiles += 1
         self.compile_time += time.time() - t0
-        return code, err
+        if not trace:
+            return code, err
+        return code, err, parse_alloc(open(path).read(), self.names) if code else {}
 
     # -- evaluation
     def evaluate(self, code):
@@ -289,6 +348,30 @@ class Target:
         rows = scope.decode(code, self.addr, self.fast.data)
         pairs, _ = scope.align(self.rom_rows, rows)
         return rows, pairs, regions(self.rom_rows, rows, pairs)
+
+    def wanted(self, path):
+        """{label: the ROM's register} for the values of the draft at PATH: scope's full compile, then
+        votes from aligned insns (scope.rom_hard), keyed like parse_alloc's labels."""
+        try:
+            (mine, addr, info), _ = capture(scope.compile_draft, path, self.func)
+            capture(scope.report, path, self.func, self.rom_code, addr, mine, info, 0)
+            wd = info["wd"]
+            rom = scope.rom_hard(wd)
+            pn = scope.pseudo_names(wd, self.func)
+        except BaseException as e:  # noqa: BLE001
+            print(f"(no ROM register targets: {str(e)[:200]})", file=sys.stderr)
+            return {}
+        out, seen = {}, collections.Counter()
+        for x in sorted(pn):
+            lab = pn[x]
+            if not lab or lab == "-":
+                continue
+            lab = re.sub(r"#\d+$", "", lab)
+            seen[lab] += 1
+            key = lab if seen[lab] == 1 else f"{lab}#{seen[lab]}"
+            if x in rom:
+                out[key] = rom[x]
+        return out
 
     # -- semantics
     def oracle(self, pre):
