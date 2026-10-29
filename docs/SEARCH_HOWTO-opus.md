@@ -73,3 +73,24 @@ Not: the shape the C is missing (a struct, a macro, an inline helper, a differen
 job. When `run` stalls with the same `x` blocks, read the ROM for those blocks (`scope.py rom FUNC`),
 write the C a programmer would have written, and `add` it, even when it scores worse at first: the
 tree keeps the old best, and the search will expand around your new idea.
+
+## Design notes (where this departs from docs/SEARCH_SPEC.md, and why)
+
+* **One node per distinct binary, not per program.** The space of C programs is infinite, but the
+  space of outputs a neighborhood reaches is small: on 19 drafts, 60-90% of moves changed no byte.
+  Deduplicating by output (a transposition table) turns the tree into a graph over binaries and
+  tells you, per family, which kinds of edit move this function at all.
+* **The determined part is checked, not lifted.** Instead of a lifted value graph, seek extracts
+  the facts C cannot vary (calls, accesses, literals, frame) from both listings and ranks by them
+  first. That is the "solve the determined part first" gate at the cost of one regex pass per compile.
+* **Value webs come from the compiler, per compile.** The instrumented agbcc already dumps each
+  value's priority and register with its C name (AGBCC_DUMPPRI); seek passes it to the fork server's
+  child, so every variant carries its allocation without a -g compile, and `[alloc N off]` counts
+  values off the ROM's registers (voted once per file node).
+* **Block verdicts up to renaming** answer "is this region's C right?" without being confounded by
+  register shifts from elsewhere; they replace solving regions in isolation, which agbcc's global
+  allocation makes unreliable.
+* **Not built yet:** semantic pruning needs unicorn in build/venv (`[sem]` moves are unchecked
+  without it); region-local search by ROM block (only `--lines`); reload rotation as an objective
+  (the two nearest misses tried, GridAttackActor_OnDamageCollision and ActorStatus_InitializeContact,
+  are the same `ldrsh` index reload, `AGBCC_SPILL=3:2` matches both).
