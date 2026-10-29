@@ -1,16 +1,5 @@
 #include "global.h"
-struct MotionTrackVector {
-    s16 x, y, z, padding;
-};
-struct MotionTrack {
-    const void *data;
-    u8 unknown4[8];
-    struct MotionTrackVector origin, target;
-    u8 unknown1C[12];
-    u8 mode, active;
-    u8 unknown2A[10];
-    u32 cursor;
-};
+#include "motion_track.h"
 static inline void MotionTrack_ClearVector(void *destination)
 {
     volatile u32 zero = 0;
