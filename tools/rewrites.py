@@ -229,7 +229,26 @@ def rw_copy_var(fn):
     for k in range(sites(fn, pred)):
         node, par0, _ = nth(fn, pred, k)
         v = node.lvalue.name
+        # A copy holds this definition's value, not later definitions of v.
+        # Stop before a statement that can modify it (including inside an if
+        # or loop). Taking its address can also let a call modify it, so do
+        # not copy address-taken locals at all.
+        if any(isinstance(n, ca.UnaryOp) and n.op == "&"
+               and isinstance(n.expr, ca.ID) and n.expr.name == v
+               for n, _, _ in walk(fn)):
+            continue
+        declarations = [n for n, _, _ in walk(fn) if isinstance(n, ca.Decl) and n.name == v]
+        if len(declarations) != 1 or any("volatile" in (getattr(n, "quals", []) or [])
+                                         for n, _, _ in walk(declarations[0])):
+            continue
         fol = following(fn, node)
+        for i, st in enumerate(fol):
+            if any((isinstance(n, ca.Assignment) and isinstance(n.lvalue, ca.ID) and n.lvalue.name == v)
+                   or (isinstance(n, ca.UnaryOp) and n.op in ("++", "--", "p++", "p--")
+                       and isinstance(n.expr, ca.ID) and n.expr.name == v)
+                   for n, _, _ in walk(st)):
+                fol = fol[:i]
+                break
         users = [i for i, st in enumerate(fol) if reads_of(st, v)]
         ranges = [(a, b) for a in range(len(users)) for b in range(a, len(users))][:12]
         for a_, b_ in ranges:
