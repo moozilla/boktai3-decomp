@@ -36,6 +36,16 @@ class SearchMovesTests(unittest.TestCase):
         source = 'int F(int a,int b) { typedef unsigned int Opaque; Opaque x; return x+b; }'
         self.assertNotIn("commute", self.kinds(source))
 
+    def test_struct_members_and_out_of_scope_names_are_not_locals(self):
+        source = 'int F(int a,int b){struct {int G;} obj;return G+a;}'
+        self.assertNotIn("commute", self.kinds(source))
+        source = 'int F(int a,int b){{int G;G=a;}return G+b;}'
+        # The inner assignment can introduce a temporary, but the out-of-scope
+        # global name in the return must never be treated as that local.
+        self.assertNotIn("commute", self.kinds(source))
+        source = 'int F(int a,int b){int (*cb)(int G);return G+a;}'
+        self.assertNotIn("commute", self.kinds(source))
+
     def test_independence_is_proved(self):
         self.assertIn("independent-statements", self.kinds('int F(int a,int b){int x;int y;x=a;y=b;return x+y;}'))
         self.assertNotIn("independent-statements", self.kinds('int F(int a,int b){int x;int y;x=a;y=x;return y;}'))
@@ -65,6 +75,11 @@ class SearchMovesTests(unittest.TestCase):
             moves.enumerate_moves(source, "F")
         source = '#define LOCATION __LINE__\n#define GET_LOCATION LOCATION\nint F(int a,int b){return GET_LOCATION+a+b;}'
         with self.assertRaisesRegex(moves.MoveError, "textual"):
+            moves.enumerate_moves(source, "F")
+
+    def test_macro_declared_local_does_not_acquire_a_false_scalar_type(self):
+        source = '#define x *p\nint F(int a,int b){int x;return x+a;}'
+        with self.assertRaisesRegex(moves.MoveError, "identifier is a macro"):
             moves.enumerate_moves(source, "F")
 
     def test_existing_pins_and_empty_barriers_are_retained(self):

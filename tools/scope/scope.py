@@ -1709,6 +1709,34 @@ def regset(rs):
     return "{" + ", ".join(rname(r) for r in sorted(rs)) + "}" if rs else "{}"
 
 
+def preferred_class(wd, pseudo):
+    """The compiler's preferred class and target register set, if recorded.
+
+    find_reg's used1 includes class/fixed-register exclusions as well as live
+    conflicts. In particular STACK_REG excludes every low register even when
+    none of them overlaps the pseudo. Read the target's actual class definition.
+    """
+    path = os.path.join(wd, "u.i.lreg")
+    text = ""
+    if os.path.exists(path):
+        with open(path) as source:
+            text = source.read()
+    hit = re.search(r"^Register " + str(pseudo) + r"\b[^\n]*\bpref (\w+)", text, re.M)
+    header = os.path.join(os.path.dirname(INSTR), "thumb.h")
+    if not hit or not os.path.exists(header):
+        return None, None
+    with open(header) as source:
+        target = source.read()
+    names = re.search(r"#define REG_CLASS_NAMES\b[^\{]*\{(.*?)\}", target, re.S)
+    masks = re.search(r"#define REG_CLASS_CONTENTS\b[^\{]*\{(.*?)\}", target, re.S)
+    if not names or not masks:
+        return hit[1], None
+    classes = dict(zip(re.findall(r'"(\w+)"', names[1]),
+                       [int(h, 16) for h in re.findall(r"0x[0-9a-fA-F]+", masks[1])]))
+    mask = classes.get(hit[1])
+    return hit[1], {r for r in range(16) if mask >> r & 1} if mask is not None else None
+
+
 def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
     """Walk find_reg (global.c) for PSEUDO as the compiler ran it: pass 0 reuses a register already in use
     (regs_used_so_far) that it doesn't conflict with and no lower-priority conflicting pseudo prefers; pass 1
@@ -1722,12 +1750,23 @@ def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
     used = f["used1"] & lo
     pass0 = (f["sofar"] - f["used1"] - f["someone"]) & lo
     found = f"found {rname(f['first'])} in pass {f['passno']}" if f["first"] >= 0 else "found nothing"
-    print(f"    find_reg (global.c) for {nm(pseudo)}: conflicts {regset(used)}; pass 0 may reuse registers"
-          f" already in use {regset(f['sofar'] & lo)} minus conflicts and those a later conflicting pseudo"
+    cls, allowed = preferred_class(wd, pseudo)
+    print(f"    find_reg (global.c) for {nm(pseudo)}: unavailable {regset(used)}"
+          " (class/fixed/call exclusions and live conflicts)"
+          + (f"; preferred class {cls}" if cls else "") + "; pass 0 may reuse registers"
+          f" already in use {regset(f['sofar'] & lo)} minus unavailable registers and those a later conflicting pseudo"
           f" prefers {regset(f['someone'] & lo)}, leaving {regset(pass0)}; it {found}"
           + (f", then its preference moved it to {rname(f['final'])}" if f["final"] != f["first"] else "") + ".")
     if want in f["used1"]:
-        print(f"      {rname(want)} conflicts: a pseudo allocated earlier or a hard-register use overlaps its life.")
+        if not f["alt"] and allowed is not None and want not in allowed:
+            print(f"      {rname(want)} is outside preferred class {cls}; this is a regclass cost decision,"
+                  " not evidence of an overlapping value. Priority alone cannot admit it in this find_reg call."
+                  " Read regclass.c:regclass and thumb.h:REG_CLASS_CONTENTS; compare the pseudo's operand uses.")
+        else:
+            hc = conflicts(wd).get(pseudo, (set(), set()))[1]
+            print(f"      {rname(want)} has a recorded hard-register conflict." if want in hc else
+                  f"      {rname(want)} is excluded by this find_reg call; used1 alone does not distinguish"
+                  " class/fixed/call restrictions from an allocated pseudo's overlap.")
         return True
     if want in f["pref"] | f["cpref"]:
         return True
@@ -2806,6 +2845,9 @@ def cmd_probe(src, func, env):
         fn, uid, reg, t, sv, life, n, once, done = m.groups()
         if fn in fnames and (done == "1" or int(t) * int(sv) * int(life) >= int(n) * (2 if once == "1" else 1)):
             hoists.setdefault(int(uid), (int(reg), int(t), int(life), int(n)))
+    # The trace remains the authority for the decision; the dump supplies its
+    # expression. Invariant register multipliers are several tokens long.
+    giv_expressions = {r["uid"]: r for r in giv_records(open(os.path.join(wd, "u.i.loop")).read())}
     names = pseudo_names(wd, info["obj_name"])
     lines = uid_lines(wd)
     rtl = open(os.path.join(wd, "u.i.rtl")).read()
@@ -2855,7 +2897,9 @@ def cmd_probe(src, func, env):
                  f" threshold {t} x lifetime {life} >= {n} insns)") for u, (r, t, life, n) in sorted(hoists.items())]
              + [("AGBCC_NOGIV" if red else "AGBCC_GIV", str(u),
                  f"loop strength reduction of the {'address' if t == 'addr' else 'value'} computed at line"
-                 f" {lines.get(u, '?')} (insn {u}, {'reduced' if red else 'not reduced'})")
+                 f" {lines.get(u, '?')} (insn {u}, {'reduced' if red else 'not reduced'})"
+                 + (f"; invariant multiplier {giv_expressions[u]['mult']}" if u in giv_expressions
+                    and not re.fullmatch(r"-?\d+", giv_expressions[u]["mult"]) else ""))
                 for u, (t, red) in sorted(givs.items())])
     budget = int(env.get("SCOPE_PROBE_MAX") or os.environ.get("SCOPE_PROBE_MAX", "150"))
     print(f"{func}: {info.get('counts') or base} differ; {len(heads)} cse canonical-register choices,"
@@ -4338,6 +4382,29 @@ def cmd_pre(src, func, env):
     return 0
 
 
+
+def giv_records(text):
+    """Parse GIV declarations, retaining RTL-valued multipliers and addends.
+
+    loop.c prints a constant multiplier as one token but an invariant register
+    as `(reg/v:SI 34)`. Both are real induction values; dropping the latter
+    hides expensive multiply reductions that often introduce a spilled counter.
+    Records preserve repeated scans instead of assuming UIDs identify one pass.
+    """
+    out = []
+    pattern = (r"Insn (\d+): (giv reg \d+|dest address|dest reg \d+) src reg (\d+) benefit (-?\d+) lifetime (\d+)"
+               r"(.*?)mult (.+?) add (.*)")
+    # print_rtl puts nested operands on indented continuation lines.
+    for logical in re.finditer(r"^Insn \d+:[^\n]*(?:\n[ \t]+[^\n]*)*", text, re.M):
+        line = re.sub(r"\s+", " ", logical.group()).strip()
+        m = re.match(pattern, line)
+        if m:
+            out.append(dict(uid=int(m.group(1)), line=text.count("\n", 0, logical.start()), kind="address" if "address" in m.group(2) else "value",
+                            biv=m.group(3), benefit=int(m.group(4)), life=int(m.group(5)),
+                            repl="replaceable" in m.group(6), mult=m.group(7).strip(), add=m.group(8).strip(), fate="?"))
+    return out
+
+
 def cmd_giv(src, func, env):
     """Loop strength reduction from loop.c's own dump (u.i.loop): each loop's induction variables (bivs:
     counters stepped by a constant) and the values computed from them (givs), with the C line, loop.c's
@@ -4364,7 +4431,8 @@ def cmd_giv(src, func, env):
         sys.exit(f"{func}: not in the loop dump")
     ln_of = lambda u: lines.get(int(u), "?")
     loops, cur = [], None
-    for ln in text:
+    giv_by_line = {r["line"]: r for r in giv_records("\n".join(text))}
+    for text_line, ln in enumerate(text):
         m = re.match(r"Loop from (\d+) to (\d+): (\d+) real insns", ln)
         if m:
             cur = dict(span=(int(m.group(1)), int(m.group(2))), insns=int(m.group(3)), bivs={}, givs={}, notes=[])
@@ -4386,14 +4454,10 @@ def cmd_giv(src, func, env):
                 u = re.search(r"insn (\d+)", m.group(2) or "")
                 b["fate"] = "kept" + (f": used at line {ln_of(u.group(1))} (insn {u.group(1)})" if u else "")
             continue
-        m = re.match(r"Insn (\d+): (giv reg \d+|dest address|dest reg \d+) src reg (\d+) benefit (-?\d+) lifetime (\d+)"
-                     r"(.*?)mult (\S+) add (.*)", ln)
-        if m:
-            uid = m.group(1)
-            cur["givs"][uid] = dict(kind="address" if "address" in m.group(2) else "value", biv=m.group(3),
-                                    benefit=int(m.group(4)), life=int(m.group(5)),
-                                    repl="replaceable" in m.group(6), mult=m.group(7), add=m.group(8).strip(),
-                                    fate="?")
+        if text_line in giv_by_line:
+            record = dict(giv_by_line[text_line])
+            uid = str(record.pop("uid"))
+            cur["givs"][uid] = record
             continue
         m = re.match(r"giv of insn (\d+) not worth while, (-?\d+) vs (\d+)", ln)
         if m and m.group(1) in cur["givs"]:

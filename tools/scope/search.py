@@ -71,6 +71,7 @@ def compact(node, evaluation=None):
                 status=result.get("status", "unevaluated"), counts=result.get("counts"),
                 compile_ms=result.get("compile_ms"), semantic=result.get("semantic"),
                 byte_differences=result.get("byte_differences"),
+                protected_regions=result.get("protected_regions"),
                 delta=result.get("delta"), diagnostics=result.get("diagnostics") or None)
 
 
@@ -90,16 +91,31 @@ def evaluate(session, ref, request):
     cached = None if request.get("force") else session.evaluation(node["id"], options=options)
     if cached:
         return node, cached, True
-    result = evaluator.evaluate(source, meta["function"], meta["origin"], options["knobs"], options["semantic_trials"])
-    if result.get("rows"):
-        result["structure"] = analyze(source, meta["function"], result["target_rows"], result["rows"],
-            compiler_root=ROOT / "build/scope/agbcc/gcc", target_data=result.get("target_data", ()),
-            current_data=result.get("current_data", ()))
-    if node["parents"]:
-        parent = session.evaluation(node["parents"][0], options=options)
-        if parent:
-            result["delta"] = decision_delta(parent["result"], result)
-    record = session.evaluate(node["id"], result, options=options)
+    lease_options = dict(options, force_attempt=os.getpid()) if request.get("force") else options
+    if not session.claim(node["id"], options=lease_options):
+        cached = session.evaluation(node["id"], options=options)
+        if cached and not request.get("force"):
+            return node, cached, True
+        raise ValueError("another worker is evaluating this node; reuse its result when the lease completes")
+    try:
+        result = evaluator.evaluate(source, meta["function"], meta["origin"], options["knobs"], options["semantic_trials"])
+        if result.get("rows"):
+            result["structure"] = analyze(source, meta["function"], result["target_rows"], result["rows"],
+                compiler_root=ROOT / "build/scope/agbcc/gcc", target_data=result.get("target_data", ()),
+                current_data=result.get("current_data", ()))
+            protected = meta.get("protected_regions", {})
+            verdicts = {r["target"]: r for r in result["structure"]["regions"] if r.get("target")}
+            result["protected_regions"] = {name: {
+                "preserved": verdicts.get(name, {}).get("local_shape") == "same" and
+                    (mode == "shape" or verdicts.get(name, {}).get("global_binding") == "same"),
+                "mode": mode} for name, mode in protected.items()}
+        if node["parents"]:
+            parent = session.evaluation(node["parents"][0], options=options)
+            if parent:
+                result["delta"] = decision_delta(parent["result"], result)
+        record = session.evaluate(node["id"], result, options=options)
+    finally:
+        session.release(node["id"], options=lease_options)
     if result.get("exact"):
         session.set_frontier(node["id"], "solved", reason="Unmodified build bytes equal ROM bytes.")
     # A failed semantic trial is evidence against the draft; keep it inspectable.
@@ -165,6 +181,22 @@ def dispatch(request):
                 raise ValueError("focus needs an inclusive source line range LO:HI")
             session.set_metadata(focus=focus)
             return {"focus": focus, "note": "Move enumeration is restricted to edits inside these source lines."}
+        if command == "protect":
+            _, record, _ = evaluate(session, ref, request)
+            regions = record["result"].get("structure", {}).get("regions", [])
+            protected = session.metadata().get("protected_regions", {})
+            if request.get("clear"):
+                protected = {}
+            else:
+                for name in request["regions"]:
+                    region = next((r for r in regions if r.get("target") == name), None)
+                    if not region or region.get("local_shape") != "same" or region.get("alignment_ambiguous"):
+                        raise ValueError(f"{name} must have unambiguous equal dependency shape before protecting it")
+                    if request.get("mode", "shape") == "binding" and region.get("global_binding") != "same":
+                        raise ValueError(f"{name} has different hard-register bindings")
+                    protected[name] = request.get("mode", "shape")
+            session.set_metadata(protected_regions=protected)
+            return {"protected_regions": protected, "note": "Future evaluations report violations; branches remain available to the model."}
         if command == "checkout":
             node = session.checkout(ref, request.get("out"))
             return {**compact(node), "out": request.get("out")}
@@ -218,8 +250,20 @@ def dispatch(request):
                 return result
             parent = snapshot(request.get("a", "ROOT"))
             current = snapshot(ref)
-            return {"node": session.node(ref)["id"][:12], "delta": delta(parent, current),
-                    **({"trace": current} if request.get("details") else {})}
+            changes = delta(parent, current)
+            if request.get("details"):
+                return {"node": session.node(ref)["id"][:12], "delta": changes, "trace": current}
+            named = [{**a, "changes": {k: v for k, v in a["changes"].items()
+                        if k in ("allocator", "priority", "refs", "live_length", "rank", "hard_register")}}
+                     for a in changes["allocations"] if not a["ambiguous"] and not a["key"].startswith("=")]
+            return {"node": session.node(ref)["id"][:12],
+                    "earliest_changed_pass": changes["earliest_changed_pass"],
+                    "changed_passes": [p["pass"] for p in changes["changed_passes"]],
+                    "allocations": [a for a in named if a["changes"]],
+                    "ambiguous_allocation_changes": sum(a["ambiguous"] for a in changes["allocations"]),
+                    "reload_changes": len(changes["reloads"]),
+                    "trace_matches_build": changes["trace_matches_build"],
+                    "interpretation": changes["interpretation"]}
         if command in ("why", "compiler"):
             meta = session.metadata()
             evaluator = environment(path)
@@ -262,6 +306,12 @@ def dispatch(request):
             return results
         if command == "import":
             source = Path(request["source"]).read_text()
+            import re
+            clean = re.sub(r"/\*.*?\*/|//[^\n]*", "", source, flags=re.S)
+            for asm in re.finditer(r'\b(?:__asm__|asm)\s*(?:(?:volatile|__volatile__)\s*)?\(\s*"((?:\\.|[^"\\])*)"', clean):
+                literal = asm[1].strip()
+                if literal and not re.fullmatch(r"r(?:1[0-5]|[0-9])|sl|fp|ip|sb|lr", literal):
+                    raise ValueError("handwritten instruction bodies are not matching C moves")
             parent = session.node(request.get("parent", ref))["id"]
             meta = session.metadata()
             context = environment(path).context(source, meta["function"], meta["origin"])
@@ -332,7 +382,9 @@ def serve():
 def runtime_version():
     import hashlib
     # Process loads these modules lazily; restart whenever any implementation changes.
-    return hashlib.sha256(b"".join(p.read_bytes() for p in sorted(HERE.glob("search*.py")))).hexdigest()
+    paths = sorted(HERE.glob("search*.py")) + [HERE / "scope.py", HERE / "fast.py",
+                                               ROOT / "tools/semcheck.py"]
+    return hashlib.sha256(b"".join(p.read_bytes() for p in paths)).hexdigest()
 
 
 def request_server(request):
@@ -417,6 +469,11 @@ def parser():
     q.add_argument("text")
     q.add_argument("--node", default="HEAD")
     q.add_argument("--kind", default="observation")
+    q = sub.add_parser("protect")
+    q.add_argument("regions", nargs="*")
+    q.add_argument("--node", default="HEAD")
+    q.add_argument("--mode", choices=("shape", "binding"), default="shape")
+    q.add_argument("--clear", action="store_true")
     for command in ("serve", "batch", "ping", "stop"):
         sub.add_parser(command)
     return p

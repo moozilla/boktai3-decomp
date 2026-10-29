@@ -181,6 +181,13 @@ def _parse(source, func):
     fn = next((n for n in tree.ext if isinstance(n, ca.FuncDef)), None)
     if fn is None or fn.decl.name != name:
         raise MoveError("selected function was not parsed")
+    macros = {**_header_macros(), **_macro_definitions(source)}
+    if set(KNOWN) & _macro_definitions(source).keys():
+        raise MoveError("source redefines an integer type alias; its type must be preprocessed first")
+    for _, declaration in walk(fn):
+        if (isinstance(declaration, ca.Decl) and declaration.name in macros
+                and declaration.name != fn.decl.name):
+            raise MoveError("a declared identifier is a macro; its binding must be preprocessed first")
     for _, node in walk(fn):
         if isinstance(node, ca.Asm) and (getattr(node.asm, "value", None) != '""' or node.gotos):
             raise MoveError("nonempty or goto assembly requires a source-preserving edit")

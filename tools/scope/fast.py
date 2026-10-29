@@ -146,6 +146,7 @@ class Server:
         except OSError:
             pass
         self.proc.wait()
+        self.reply.close()
         shutil.rmtree(self.dir, ignore_errors=True)
 
 

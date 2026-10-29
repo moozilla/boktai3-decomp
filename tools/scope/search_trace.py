@@ -51,8 +51,12 @@ def _reference(root, filename, symbol):
 def _flow_metrics(wd, pass_name):
     path = Path(wd) / ("u.i." + pass_name)
     text = path.read_text(errors="replace") if path.is_file() else ""
-    return {int(m.group(1)): {"refs": int(m.group(2)), "live_length": int(m.group(3))}
-            for m in re.finditer(r"^Register (\d+) used (\d+) times across (\d+) insns", text, re.M)}
+    out = {}
+    for m in re.finditer(r"^Register (\d+) used (\d+) times across (\d+) insns([^\n]*)", text, re.M):
+        preferred = re.search(r"\bpref ([A-Z_]+)", m.group(4))
+        out[int(m.group(1))] = {"refs": int(m.group(2)), "live_length": int(m.group(3)),
+                                "preferred_class": preferred.group(1) if preferred else None}
+    return out
 
 
 def _identities(scope, wd, function, records):
@@ -136,11 +140,15 @@ def collect(scope, src, function, env=None):
     identities = _identities(scope, wd, function, records)
     flow, lreg = _flow_metrics(wd, "flow"), _flow_metrics(wd, "lreg")
     prefs, conflicts = scope.preferences(wd), scope.conflicts(wd)
+    find_reg = scope.find_reg_view(wd, function)
     allocations = []
     for pseudo, record in records.items():
         kind = record[0]
         item = {"pseudo": pseudo, **identities[pseudo], "allocator": "global" if kind == "G" else "local",
                 "priority": record[2], "hard_register": record[6], "flow": flow.get(pseudo), "lreg": lreg.get(pseudo),
+                "preferred_class": lreg.get(pseudo, {}).get("preferred_class"),
+                "find_reg": [{k: sorted(v) if isinstance(v, set) else v for k, v in decision.items()}
+                             for decision in find_reg.get(pseudo, [])],
                 "preferences": prefs.get(pseudo, []),
                 "conflict_keys": sorted(identities.get(p, {"key": "pseudo:" + str(p)})["key"] for p in conflicts.get(pseudo, (set(), set()))[0]),
                 "hard_conflicts": sorted(conflicts.get(pseudo, (set(), set()))[1]),
@@ -184,7 +192,8 @@ def collect(scope, src, function, env=None):
             "inheritance": [{"uid": u, "pseudo": p, "spill_index": i, "from_uid": f, "kind": k}
                             for u, p, i, f, k in scope.inherit_records(wd, function)],
             "compiler": {"allocation": structure.compiler_references("allocation", root),
-                         "reload": structure.compiler_references("reload", root)},
+                         "reload": structure.compiler_references("reload", root),
+                         "register_class": [_reference(root, "regclass.c", "regclass"), _reference(root, "regclass.c", "record_reg_classes")]},
             "limits": ["All records describe the diagnostic -g compile; trace_matches_build says whether its output matched the no-g build.",
                        "Cross-node name/occurrence correspondence can be ambiguous after inlining, shadowing or edits.",
                        "Earliest changed pass output locates divergence; it does not prove why a pass made that choice.",
@@ -213,7 +222,7 @@ def delta(parent, child):
               for p in order if parent.get("passes", {}).get(p, {}).get("hash") != child.get("passes", {}).get(p, {}).get("hash")]
     return {"schema": 1, "earliest_changed_pass": passes[0] if passes else None, "changed_passes": passes,
             "allocations": _changes(parent.get("allocations", []), child.get("allocations", []),
-                                    ("allocator", "priority", "rank", "refs", "live_length", "flow", "lreg", "hard_register", "preferences", "named_conflict_keys", "hard_conflicts")),
+                                    ("allocator", "priority", "rank", "refs", "live_length", "flow", "lreg", "preferred_class", "find_reg", "hard_register", "preferences", "named_conflict_keys", "hard_conflicts")),
             "reloads": _changes(parent.get("reloads", []), child.get("reloads", []), ("hard_register", "rotation")),
             "trace_matches_build": bool(parent.get("trace_matches_build") and child.get("trace_matches_build")),
             "interpretation": "Compiler observations are actual; cross-node identity is name/occurrence correspondence, with ambiguity exposed. Earliest pass divergence is not a causal proof."}

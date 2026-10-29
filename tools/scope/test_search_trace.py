@@ -72,6 +72,17 @@ class TraceTests(unittest.TestCase):
         self.assertEqual(result['earliest_changed_pass']['compiler']['reference'], 'cse.c:8612')
         self.assertEqual([x['pass'] for x in result['changed_passes']], ['cse', 'greg'])
 
+    def test_preferred_class_is_actual_dump_evidence(self):
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "u.i.lreg").write_text("Register 22 used 16 times across 76 insns; set 1 time; user var; pref STACK_REG; pointer.\n")
+            metrics = trace._flow_metrics(d, "lreg")
+        self.assertEqual(metrics[22]["preferred_class"], "STACK_REG")
+        self.assertEqual(metrics[22]["refs"], 16)
+        a = {"allocations": [{"key": "p#1", "preferred_class": "LO_REGS"}]}
+        b = {"allocations": [{"key": "p#1", "preferred_class": "STACK_REG"}]}
+        changes = trace.delta(a, b)["allocations"][0]["changes"]
+        self.assertEqual(changes["preferred_class"], {"parent": "LO_REGS", "child": "STACK_REG"})
+
     def test_diagnostic_build_mismatch_cannot_be_hidden(self):
         self.assertFalse(trace.delta({'trace_matches_build': True}, {'trace_matches_build': False})['trace_matches_build'])
 

@@ -59,13 +59,40 @@ class Evaluator:
         if os.path.basename(s.build.compiler_for(str(path))) != "agbcc":
             raise ValueError("this session needs the Thumb agbcc compiler")
         flags = s.build.cflags_for(str(path))
-        deps = sorted((ROOT / "include").rglob("*.h"))
+        deps = sorted({p.resolve() for p in (ROOT / "include").rglob("*.h")})
         # Include unit-local headers too. Imported edits are recontextualized.
         local = (ROOT / origin).resolve().parent
         deps += sorted(p for p in local.glob("*.h") if p not in deps)
+        # Unit-local include chains need not live under include/. Discover quoted
+        # paths recursively; system includes are disabled by the build flags.
+        queue = [(source, local)] + [(p.read_text(errors="replace"), p.parent) for p in deps]
+        visited = set(deps)
+        while queue:
+            text, directory = queue.pop()
+            for name in re.findall(r'^\s*#\s*include\s*"([^"\n]+)"', text, re.M):
+                child = (directory / name).resolve()
+                if not child.is_file():
+                    child = (ROOT / "include" / name).resolve()
+                if child.is_file() and child not in visited:
+                    visited.add(child)
+                    deps.append(child)
+                    queue.append((child.read_text(errors="replace"), child.parent))
         headers = [(os.path.relpath(p, ROOT), self.file_hash(p)) for p in deps]
         symbols = [(str(p.relative_to(ROOT)), self.file_hash(p))
                    for p in sorted((ROOT / "symbols").glob("*")) if p.is_file()]
+        environment = digest(json.dumps([headers, symbols, self.file_hash(s.INSTR),
+            self.file_hash(ROOT / "baserom.gba"), self.file_hash(ROOT / "build/boktai3.elf")]))
+        if getattr(self, "_environment", environment) != environment:
+            # Scope's preprocessing cache keys source mtimes, not header contents;
+            # its live fork servers also retain the old symbol resolver.
+            self.close()
+            s._FAST.clear()
+            s._PRE.clear()
+            s._HEADS.clear()
+            s._ROMBYTES.clear()
+            s._MEMO.clear()
+            self.oracles.clear()
+        self._environment = environment
         address, size = addresses[rom_name], sizes[rom_name]
         target = s.rom_bytes()[s.off(address):s.off(address) + size]
         return dict(version=VERSION, function=function, rom_name=rom_name,
