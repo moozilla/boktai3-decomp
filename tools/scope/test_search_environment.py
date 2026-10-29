@@ -94,6 +94,17 @@ class SearchIntegrationTests(unittest.TestCase):
         self.assertNotEqual(result["node"], old)
         self.assertEqual(result["node"], self.command("status")["node"])
 
+    def test_unchanged_function_abi_aliases_do_not_block_import(self):
+        self.db = str(self.path / "aliases.sqlite3")
+        original = 'extern int Helper(void) asm("HelperABI");\nint F(int x) {return x+1;}\n'
+        self.source.write_text(original)
+        self.command("init", source=str(self.source), function="F")
+        self.source.write_text(original.replace("x+1", "1+x"))
+        self.command("import", source=str(self.source))
+        self.source.write_text(original.replace("return x+1;", 'asm("" "nop"); return x+1;'))
+        with self.assertRaisesRegex(ValueError, "instruction bodies"):
+            self.command("import", source=str(self.source))
+
 
 class NativeIsolationTests(unittest.TestCase):
     def environment(self):
@@ -131,6 +142,18 @@ class NativeIsolationTests(unittest.TestCase):
             self.assertNotIn("synthetic", scope._LOCKS)
             with self.assertRaises(OSError):
                 os.fstat(fd)
+
+    def test_materialized_sources_are_immutable_across_workers(self):
+        from search_eval import Evaluator
+        with tempfile.TemporaryDirectory() as directory:
+            a, b = object.__new__(Evaluator), object.__new__(Evaluator)
+            a.directory = b.directory = Path(directory)
+            first = a.materialize("int F(void){return 1;}", "src/fn/F.c")
+            second = b.materialize("int F(void){return 2;}", "src/fn/F.c")
+            self.assertNotEqual(first, second)
+            self.assertEqual(first.read_text(), "int F(void){return 1;}")
+            self.assertEqual(second.read_text(), "int F(void){return 2;}")
+            self.assertEqual(first, b.materialize("int F(void){return 1;}", "src/fn/F.c"))
 
 
 @unittest.skipUnless(os.environ.get("SEARCH_ROM_TESTS") == "1", "opt-in real unmatched compiler trial")

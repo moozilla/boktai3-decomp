@@ -45,6 +45,23 @@ class SearchLiftTests(unittest.TestCase):
         self.assertEqual(induction[0]['stride'], 8)
         self.assertTrue(report['summary']['fixed_point_complete'])
 
+    def test_loop_stride_can_be_held_in_a_higher_numbered_invariant_register(self):
+        report = lift(rows('mov r4,r0', 'movs r7,#8', 'ldrh r2,[r4,#16]', 'adds r4,r4,r7',
+                           'cmp r4,r1', 'blo func+0x4', 'bx lr'))
+        access, = report['memory']
+        self.assertIn('8*iteration[loop0]', access['address']['text'])
+        self.assertEqual(access['address']['certainty'], 'symbolic')
+
+    def test_nested_loop_invariant_projects_into_outer_induction(self):
+        report = lift(rows('mov r4,r0', 'movs r1,#0', 'movs r2,#0', 'ldrh r3,[r4,#16]',
+                           'adds r2,#1', 'cmp r2,#2', 'blt func+0x6', 'adds r4,#8',
+                           'adds r1,#1', 'cmp r1,#3', 'blt func+0x4', 'bx lr'))
+        access, = report['memory']
+        self.assertIn('8*iteration[loop0]', access['address']['text'])
+        self.assertNotIn('iteration[loop1]', access['address']['text'])
+        self.assertEqual(access['address']['certainty'], 'symbolic')
+        self.assertTrue(report['summary']['fixed_point_complete'])
+
     def test_loop_reset_is_not_mistaken_for_induction(self):
         report = lift(rows('mov r4,r0', 'movs r1,#0', 'mov r4,r0', 'adds r4,#8',
                            'ldrh r2,[r4,#16]', 'adds r1,#1', 'cmp r1,#3', 'blt func+0x4', 'bx lr'))

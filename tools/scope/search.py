@@ -121,7 +121,7 @@ def evaluate(session, ref, request):
             parent = session.evaluation(parent_id, options=options)
             parent_context = session.context(parent_id)
             actual_context = session.context(node["id"])
-            versions = ("evaluator", "scope", "fast", "structure", "trace", "semantic", "compiler", "headers", "symbols", "elf")
+            versions = ("evaluator", "scope", "fast", "structure", "trace", "semantic", "semantic_runtime", "support", "compiler", "headers", "symbols", "elf")
             environment_changed = any(parent_context.get(k) != actual_context.get(k) for k in versions)
             same_source = session.node(parent_id)["source_hash"] == node["source_hash"]
             if same_source and environment_changed:
@@ -228,8 +228,9 @@ def dispatch(request):
                 compiled = record["result"]
                 if not compiled.get("rows"):
                     raise ValueError(compiled.get("diagnostics", "compile first"))
-                target = search_lift.lift(compiled["target_rows"], compiled.get("target_data", ()))
-                current = search_lift.lift(compiled["rows"], compiled.get("current_data", ()))
+                entry = session.context(node["id"]).get("address")
+                target = search_lift.lift(compiled["target_rows"], compiled.get("target_data", ()), entry_address=entry)
+                current = search_lift.lift(compiled["rows"], compiled.get("current_data", ()), entry_address=entry)
                 result = {"target": target, "current": current, "comparison": search_lift.compare(target, current)}
                 session.evaluate(node["id"], result, evaluator="values", options=options)
             if request.get("details"):
@@ -262,6 +263,12 @@ def dispatch(request):
                     "ambiguous_target_addresses": len(comparison["unresolved"]["target"]),
                     "ambiguous_current_addresses": len(comparison["unresolved"]["current"]),
                     "target_calls": calls(result["target"]["calls"]), "current_calls": calls(result["current"]["calls"]),
+                    "target_branches": [{"at": f"+0x{b['offset']:X}", "instruction": b["instruction"],
+                        "domain": b["domain"], "relation": b["relation"], "status": b["status"],
+                        "arguments": [expression(v) for v in b["arguments"]]} for b in result["target"].get("branches", [])[:limit]],
+                    "current_branches": [{"at": f"+0x{b['offset']:X}", "instruction": b["instruction"],
+                        "domain": b["domain"], "relation": b["relation"], "status": b["status"],
+                        "arguments": [expression(v) for v in b["arguments"]]} for b in result["current"].get("branches", [])[:limit]],
                     "interpretation": comparison["interpretation"]}
         if command in ("evaluate", "inspect", "regions", "compare", "experiment", "listing"):
             if command == "experiment" and not request.get("knobs"):
@@ -381,12 +388,19 @@ def dispatch(request):
         if command == "import":
             source = Path(request["source"]).read_text()
             import re
-            clean = re.sub(r"/\*.*?\*/|//[^\n]*", "", source, flags=re.S)
-            for asm in re.finditer(r'\b(?:__asm__|asm)\s*(?:(?:volatile|__volatile__)\s*)?\(\s*"((?:\\.|[^"\\])*)"', clean):
-                literal = asm[1].strip()
-                if literal and not re.fullmatch(r"r(?:1[0-5]|[0-9])|sl|fp|ip|sb|lr", literal):
-                    raise ValueError("handwritten instruction bodies are not matching C moves")
+            from collections import Counter
             parent = session.node(request.get("parent", ref))["id"]
+            pattern = re.compile(r'\b(?:__asm__|__asm|asm)\s*(?:(?:volatile|__volatile__)\s*)?\(\s*((?:"(?:\\.|[^"\\])*"\s*)+)')
+            def asm_literals(text):
+                clean = re.sub(r"/\*.*?\*/|//[^\n]*", "", text, flags=re.S)
+                return ["".join(re.findall(r'"((?:\\.|[^"\\])*)"', match[1])).strip()
+                        for match in pattern.finditer(clean)]
+            existing = Counter(asm_literals(session.source(parent)))
+            for literal in asm_literals(source):
+                if existing[literal]:
+                    existing[literal] -= 1  # preserve existing ABI asmlabels and SDK declarations
+                elif literal and not re.fullmatch(r"r(?:1[0-5]|[0-9])|sl|fp|ip|sb|lr", literal):
+                    raise ValueError("handwritten instruction bodies are not matching C moves")
             meta = session.metadata()
             context = environment(path).context(source, meta["function"], meta["origin"])
             # Free edits are first-class moves, never labeled proven equivalent.

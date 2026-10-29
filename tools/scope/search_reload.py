@@ -244,10 +244,15 @@ def analyze(scope, wd, function):
         allocation = allocations.get(pseudo)
         item = {"pseudo": pseudo, "name": names.get(pseudo), "slot_offset": offset,
                 "slot_bytes": size, "slot_order": order, "spilled_from_register": from_reg,
+                "slot_kind": "reload_assigned" if order > 0 else "incoming_or_preexisting_stack",
+                "from_register_valid": order > 0,
                 "pre_reload_allocator": allocation[0] if allocation else None,
                 "pre_reload_hard_register": allocation[6] if allocation else None,
                 "evidence": "S final stack-slot/from-register record"}
-        if from_reg >= 0:
+        # S order -1 denotes an already-stack parameter. Its from-register cell
+        # was never set by alter_reg and can contain the static array's zero or
+        # an earlier function's value; it is not evidence of a register eviction.
+        if order > 0 and from_reg >= 0:
             occupied = set(range(from_reg, from_reg + max(1, (size + 3) // 4)))
             item["spilled_from_registers"] = sorted(occupied)
             candidates = []

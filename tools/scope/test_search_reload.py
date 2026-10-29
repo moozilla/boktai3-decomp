@@ -206,6 +206,14 @@ SET_REGNO_REG_SET (spilled_pseudos, reg);
         self.assertEqual(eviction['spilled_from_registers'], [6, 7])
         self.assertEqual(eviction['earliest_candidate_selection']['selected_registers'], [7])
 
+    def test_preexisting_stack_argument_is_not_a_hard_register_eviction(self):
+        (self.wd / 'names.txt').write_text('S Example 22 32 4 -1 0\n')
+        result = analyze(self.scope, self.wd, 'Example')
+        self.assertEqual(result['evictions'], [])
+        argument = result['unallocated_stack_slots'][0]
+        self.assertEqual(argument['slot_kind'], 'incoming_or_preexisting_stack')
+        self.assertFalse(argument['from_register_valid'])
+
 
 if __name__ == '__main__':
     unittest.main()

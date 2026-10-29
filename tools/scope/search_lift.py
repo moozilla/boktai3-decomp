@@ -223,8 +223,18 @@ def _dominator_loops(blocks):
             header = edge['block']
             if b['id'] in reachable and header in dom.get(b['id'], set()):
                 loops.setdefault(header, []).append(b['id'])
-    return preds, {header: dict(id='loop%d' % n, backedges=back, external=[p for p in preds[header] if p not in back])
-                   for n, (header, back) in enumerate(sorted(loops.items(), key=lambda p: by_id[p[0]]['start']))}, reachable
+    details = {}
+    for n, (header, back) in enumerate(sorted(loops.items(), key=lambda p: by_id[p[0]]['start'])):
+        members, pending = {header}, list(back)
+        while pending:
+            node = pending.pop()
+            if node in members:
+                continue
+            members.add(node)
+            pending.extend(preds[node])
+        details[header] = dict(id='loop%d' % n, backedges=back,
+                               external=[p for p in preds[header] if p not in back], members=members)
+    return preds, details, reachable
 
 
 def _operand(text, state, offset, entry_address=None):
@@ -445,31 +455,33 @@ def _has_unknown(value):
     return any(_has_unknown(x) for x in _children(value) if isinstance(x, tuple))
 
 
-def _expand(value, solutions, active=(), cache=None):
-    key = (value, active)
+def _expand(value, solutions, active=(), cache=None, partial=False):
+    key = (value, active, partial)
     if cache is not None and key in cache:
         return cache[key]
-    result = _expand_uncached(value, solutions, active, cache)
+    result = _expand_uncached(value, solutions, active, cache, partial)
     if cache is not None:
         cache[key] = result
     return result
 
 
-def _expand_uncached(value, solutions, active=(), cache=None):
+def _expand_uncached(value, solutions, active=(), cache=None, partial=False):
     if not isinstance(value, tuple):
         return value
     if value and value[0] == 'loop':
+        if value not in solutions and partial:
+            return value
         if value in active:
             return _unknown('recursive loop equation')
-        return _expand(solutions.get(value, _unknown('unsolved loop equation')), solutions, active + (value,), cache)
+        return _expand(solutions.get(value, _unknown('unsolved loop equation')), solutions, active + (value,), cache, partial)
     if value and value[0] == 'linear':
         result = _const(value[2])
         for atom, scale in value[1]:
-            result = _add(result, _scale(_expand(atom, solutions, active, cache), scale))
+            result = _add(result, _scale(_expand(atom, solutions, active, cache, partial), scale))
         return result
     if value and value[0] == 'phi':
-        return _phi(_expand(v, solutions, active, cache) for v in value[1])
-    result = tuple(_expand(v, solutions, active, cache) if isinstance(v, tuple) else v for v in value)
+        return _phi(_expand(v, solutions, active, cache, partial) for v in value[1])
+    result = tuple(_expand(v, solutions, active, cache, partial) if isinstance(v, tuple) else v for v in value)
     return result if _depth(result) <= MAX_DEPTH and _nodes(result) <= MAX_NODES else _unknown('expanded expression budget')
 
 
@@ -613,7 +625,9 @@ def lift(rows, data_ranges=(), *, entry_address=None):
                     queued.add(dst)
 
     solutions, loop_report = {}, []
-    for bid, loop in loops.items():
+    # Project inner-loop invariants before solving an outer backedge. A value
+    # reset to a base stays a join; only explicit header+constant is induction.
+    for bid, loop in sorted(loops.items(), key=lambda item: (len(item[1]['members']), by_id[item[0]]['start'])):
         seed_states = [outputs[p] for p in loop['external'] if p in outputs]
         if bid == entry:
             seed_states.insert(0, initial)
@@ -625,7 +639,26 @@ def lift(rows, data_ranges=(), *, entry_address=None):
             continue
         candidates = [(r, seed.regs[r], [s.regs[r] for s in back]) for r in REGS if r != 'sp']
         candidates += [('memory:' + _id(key), value, [s.memory.get(key, UNKNOWN) for s in back]) for key, value in seed.memory.items()]
+        # Resolve invariant step registers before any induction, regardless of
+        # hard-register number. Otherwise r4 += r7 would depend on solve order.
+        for _ in range(len(candidates)):
+            changed = False
+            for name, start, values in candidates:
+                symbol = ('loop', loop['id'], name)
+                if symbol in solutions:
+                    continue
+                projected = [_expand(value, solutions, partial=True) for value in values]
+                initial_value = _expand(start, solutions, partial=True)
+                if all(value == symbol for value in projected) or all(value == initial_value for value in projected):
+                    solutions[symbol] = initial_value
+                    changed = True
+            if not changed:
+                break
         for name, start, values in candidates:
+            if ('loop', loop['id'], name) in solutions:
+                continue
+            start = _expand(start, solutions, partial=True)
+            values = [_expand(value, solutions, partial=True) for value in values]
             symbol = ('loop', loop['id'], name)
             steps = [_delta(value, symbol) for value in values]
             if steps and steps[0] is not None and all(d == steps[0] for d in steps):
@@ -641,6 +674,7 @@ def lift(rows, data_ranges=(), *, entry_address=None):
                 equations.append(dict(register=name, status=status, stride=step, initial=_value(start), expression=_value(solution)))
         loop_report.append(dict(id=loop['id'], header=by_id[bid]['start'], status='analyzed', equations=equations))
 
+    loop_report.sort(key=lambda item: item['header'])
     observations = []
     for block in blocks:
         bid = block['id']
@@ -707,7 +741,15 @@ def lift(rows, data_ranges=(), *, entry_address=None):
             unknown.append(observation)
     warnings = []
     if queue:
-        warnings.append('Fixed-point iteration budget reached; affected observations may be unresolved.')
+        warnings.append('Fixed-point iteration budget reached; observations are provisional and cannot be paired as determined identities.')
+        for access in memory:
+            access['identity_key'] = None
+            access['address']['certainty'] = 'ambiguous'
+            access['address']['structural_key'] = None
+        for branch in branches:
+            branch['identity_key'] = None
+        for call in calls:
+            call['identity_key'] = None
     if unknown:
         warnings.append('Unsupported instructions invalidate affected register and memory knowledge.')
     return dict(version=1,

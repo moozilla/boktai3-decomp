@@ -85,8 +85,6 @@ class Evaluator:
         _, addresses, sizes = s.inventory()
         if rom_name not in addresses:
             raise ValueError(f"unknown ROM function: {function}")
-        if s.is_arm(rom_name, addresses[rom_name]):
-            raise ValueError("the search environment currently serves Thumb agbcc functions")
         if os.path.basename(s.build.compiler_for(str(path))) != "agbcc":
             raise ValueError("this session needs the Thumb agbcc compiler")
         flags = s.build.cflags_for(str(path))
@@ -129,6 +127,11 @@ class Evaluator:
             _, addresses, sizes = s.inventory()
         self._environment = environment
         address, size = addresses[rom_name], sizes[rom_name]
+        # The source's compiler directive was checked above; the target mode is
+        # in functions.csv. is_arm() additionally scans every source unit to
+        # locate its owner, which is unnecessary for an immutable copied unit.
+        if any(a == address and mode == "arm" for a, mode in s.arm_starts()):
+            raise ValueError("the search environment currently serves Thumb agbcc functions")
         target = s.rom_bytes()[s.off(address):s.off(address) + size]
         import importlib.util
         import sys
@@ -166,9 +169,17 @@ class Evaluator:
         text = re.sub(r'^(\s*#\s*include\s*)"([^"\n]+)"',
                       lambda m: m[1] + '"' + os.path.relpath(local / m[2], ROOT) + '"'
                       if (local / m[2]).exists() else m[0], source, flags=re.M)
-        path = self.directory / "candidate.c"
-        if not path.exists() or path.read_text() != text:
-            path.write_text(text)
+        # Concurrent workers may compile different nodes of one session. Never
+        # share a mutable candidate.c between their preprocessing operations.
+        directory = self.directory / "sources"
+        directory.mkdir(exist_ok=True)
+        path = directory / (digest(text) + ".c")
+        if not path.exists():
+            import tempfile
+            with tempfile.NamedTemporaryFile(mode="w", dir=directory, prefix=".source-", delete=False) as temporary:
+                temporary.write(text)
+                staged = Path(temporary.name)
+            staged.replace(path)
         return path
 
     def evaluate(self, source, function, origin, knobs=None, semantic_trials=0):
