@@ -962,6 +962,16 @@ def cmd_land(a):
     d = os.path.join(camp, w.target.rom_name)
     os.makedirs(d, exist_ok=True)
     text = w.sess.text(node)
+    if "#ifdef NONMATCHING" not in text:
+        # a whole unit written clean (wrapper and INCLUDE_ASM already gone): it is the file to land
+        src = os.path.join(ROOT, w.target.src)
+        open(src, "w").write(text)
+        fmt = os.path.join(ROOT, "build", "venv", "bin", "clang-format")
+        subprocess.run([fmt if os.path.exists(fmt) else "clang-format", "-i", w.target.src], cwd=ROOT)
+        r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "check.py"), w.target.src], cwd=ROOT)
+        w.sess.event(kind="land", node=node["id"], rc=r.returncode)
+        print(f"n{node['id']} -> {w.target.src} (whole unit)")
+        sys.exit(r.returncode)
     open(os.path.join(d, "best_match.c"), "w").write(text)
     orig = open(os.path.join(ROOT, w.target.src)).read()
     open(os.path.join(d, "base.c"), "w").write(orig)
