@@ -329,6 +329,8 @@ class Work:
             for fam, desc, f2 in M.all_moves(fn, families):
                 if (budget is not None and len(tasks) >= budget) or (deadline is not None and time.time() >= deadline):
                     break
+                if deadline is not None and time.time() >= deadline:
+                    break
                 line = changed_line(fn, f2)
                 if lines and line not in lineset:
                     continue
