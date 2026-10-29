@@ -1,8 +1,7 @@
 #include "global.h"
 
-#ifdef NONMATCHING
-// fuzzy: 72.0%
-// Open: retained link pointers, flag masks and branch tail sharing still differ.
+// MATCHING_CONCESSION: register-pinning
+
 // confidence=low: refreshes map navigation arrows and their destination indices.
 #define MapMenu_RefreshNavigationArrows sub_0816BC54
 struct NavigationArrow {
@@ -30,93 +29,194 @@ struct NavigationMenu {
     u16 currentPage;
 };
 u32 GameState_GetMapRevealFlag(u32);
-static inline void RefreshLink(struct NavigationMenu *menu, struct NavigationPage *page,
-                               s32 direction, struct NavigationPage **pages, u8 *selectedPage)
-{
-    if (page->neighbors[direction] != -1) {
-        if (GameState_GetMapRevealFlag((*pages)[page->neighbors[direction]].map)) {
-            s8 *destination = &menu->destinations[direction];
-            struct NavigationArrow *arrow = &menu->arrows[direction];
-            *destination = page->neighbors[direction];
-            arrow->flags &= ~1;
-            if ((page->solidLinks & (u32)(1 << direction)) != 0)
-                arrow->flags &= ~0x200;
-            else
-                arrow->flags |= 0x200;
-        } else if (menu->page != menu->currentPage) {
-            if ((*pages)[page->neighbors[direction]].map == (*pages)[menu->currentPage].map) {
-                s8 *destination = &menu->destinations[direction];
-                struct NavigationArrow *arrow = &menu->arrows[direction];
-                *destination = menu->currentPage;
-                arrow->flags &= ~1;
-                if (page->neighbors[direction] == menu->currentPage)
-                    arrow->flags &= ~0x200;
-                else
-                    arrow->flags |= 0x200;
-            }
-        }
-    }
-}
-static inline void RefreshAlternate(struct NavigationMenu *menu, struct NavigationPage *page,
-                                    s32 direction, struct NavigationArrow *arrow, s8 *destination,
-                                    struct NavigationPage **pages, u8 *selectedPage)
-{
-    if (GameState_GetMapRevealFlag((*pages)[page->alternate[direction]].map)) {
-        *destination = page->alternate[direction];
-        arrow->flags &= ~1;
-        if ((page->solidLinks & (1 << direction)) &&
-            page->neighbors[direction] == page->alternate[direction])
-            arrow->flags &= ~0x200;
-        else
-            menu->arrows[direction].flags |= 0x200;
-    }
-}
 void MapMenu_RefreshNavigationArrows(struct NavigationMenu *menu)
 {
     struct NavigationArrow *second;
     struct NavigationArrow *first;
     struct NavigationArrow *third;
     struct NavigationArrow *fourth;
+    register s32 invalid asm("r0");
     u8 *destination0;
-    s8 *destination1, *destination2, *destination3;
+    u8 *destination1, *destination2, *destination3;
     struct NavigationPage *page;
     struct NavigationPage **pages;
     u8 *selectedPage;
-    first = (struct NavigationArrow *)((u8 *)menu + 0x3a68);
+    first = &menu->arrows[0];
     first->flags |= 1;
-    second = (struct NavigationArrow *)((u8 *)menu + 0x3ac8);
+    second = &menu->arrows[1];
     second->flags |= 1;
-    third = (struct NavigationArrow *)((u8 *)menu + 0x3b28);
+    third = &menu->arrows[2];
     third->flags |= 1;
-    fourth = (struct NavigationArrow *)((u8 *)menu + 0x3b88);
+    fourth = &menu->arrows[3];
     fourth->flags |= 1;
     destination0 = &menu->destinations[0];
     *destination0 = -1;
-    destination1 = &menu->destinations[1];
-    *destination1 = -1;
-    destination2 = &menu->destinations[2];
-    *destination2 = -1;
-    destination3 = &menu->destinations[3];
-    *destination3 = -1;
+    destination1 = (u8 *)&menu->destinations[1];
+    invalid = -1;
+    *destination1 = invalid;
+    destination2 = (u8 *)&menu->destinations[2];
+    invalid = -1;
+    *destination2 = invalid;
+    destination3 = (u8 *)&menu->destinations[3];
+    invalid = -1;
+    *destination3 = invalid;
     pages = &menu->pages;
     selectedPage = &menu->page;
     page = &(*pages)[*selectedPage];
     if (menu->showAll) {
-        RefreshLink(menu, page, 0, pages, selectedPage);
-        RefreshLink(menu, page, 1, pages, selectedPage);
-        RefreshLink(menu, page, 2, pages, selectedPage);
-        RefreshLink(menu, page, 3, pages, selectedPage);
+
+        if (page->neighbors[0] != -1) {
+            if (GameState_GetMapRevealFlag((*pages)[page->neighbors[0]].map)) {
+                *destination0 = page->neighbors[0];
+                first->flags &= ~1;
+                if ((1u & page->solidLinks) != 0)
+                    first->flags &= ~0x200;
+                else
+                    first->flags |= 0x200;
+            } else if (*selectedPage != menu->currentPage) {
+                register u32 currentIndex asm("r6");
+                if ((*pages)[page->neighbors[0]].map ==
+                    (*pages)[currentIndex = menu->currentPage].map) {
+                    *destination0 = currentIndex;
+                    first->flags &= ~1;
+                    if (page->neighbors[0] == menu->currentPage)
+                        first->flags &= ~0x200;
+                    else
+                        first->flags |= 0x200;
+                }
+            }
+        }
+
+        if (page->neighbors[1] != -1) {
+            if (GameState_GetMapRevealFlag(menu->pages[page->neighbors[1]].map)) {
+                struct NavigationArrow *arrow;
+                menu->destinations[1] = page->neighbors[1];
+                arrow = &menu->arrows[1];
+                arrow->flags &= ~1;
+                if ((2u & page->solidLinks) != 0)
+                    arrow->flags &= ~0x200;
+                else
+                    arrow->flags |= 0x200;
+            } else {
+                u8 *selected = &menu->page;
+                u16 *current = &menu->currentPage;
+                if (*selected != *current) {
+                    register u32 currentIndex asm("r3");
+                    if (menu->pages[page->neighbors[1]].map ==
+                        menu->pages[currentIndex = *current].map) {
+                        s8 *destination = &menu->destinations[1];
+                        struct NavigationArrow *arrow;
+                        *destination = currentIndex;
+                        arrow = &menu->arrows[1];
+                        arrow->flags &= ~1;
+                        if (page->neighbors[1] == *current)
+                            arrow->flags &= ~0x200;
+                        else
+                            arrow->flags |= 0x200;
+                    }
+                }
+            }
+        }
+
+        if (page->neighbors[2] != -1) {
+            if (GameState_GetMapRevealFlag(menu->pages[page->neighbors[2]].map)) {
+                struct NavigationArrow *arrow;
+                menu->destinations[2] = page->neighbors[2];
+                arrow = &menu->arrows[2];
+                arrow->flags &= ~1;
+                if ((4u & page->solidLinks) != 0)
+                    arrow->flags &= ~0x200;
+                else
+                    arrow->flags |= 0x200;
+            } else {
+                u8 *selected = &menu->page;
+                u16 *current = &menu->currentPage;
+                if (*selected != *current) {
+                    register u32 currentIndex asm("r3");
+                    if (menu->pages[page->neighbors[2]].map ==
+                        menu->pages[currentIndex = *current].map) {
+                        s8 *destination = &menu->destinations[2];
+                        struct NavigationArrow *arrow;
+                        *destination = currentIndex;
+                        arrow = &menu->arrows[2];
+                        arrow->flags &= ~1;
+                        if (page->neighbors[2] == *current)
+                            arrow->flags &= ~0x200;
+                        else
+                            arrow->flags |= 0x200;
+                    }
+                }
+            }
+        }
+
+        if (page->neighbors[3] != -1) {
+            if (GameState_GetMapRevealFlag(menu->pages[page->neighbors[3]].map)) {
+                struct NavigationArrow *arrow;
+                menu->destinations[3] = page->neighbors[3];
+                arrow = &menu->arrows[3];
+                arrow->flags &= ~1;
+                if ((8u & page->solidLinks) != 0)
+                    arrow->flags &= ~0x200;
+                else
+                    arrow->flags |= 0x200;
+            } else {
+                u8 *selected = &menu->page;
+                u16 *current = &menu->currentPage;
+                if (*selected != *current) {
+                    register u32 currentIndex asm("r3");
+                    if (menu->pages[page->neighbors[3]].map ==
+                        menu->pages[currentIndex = *current].map) {
+                        s8 *destination = &menu->destinations[3];
+                        struct NavigationArrow *arrow;
+                        *destination = currentIndex;
+                        arrow = &menu->arrows[3];
+                        arrow->flags &= ~1;
+                        if (page->neighbors[3] == *current)
+                            arrow->flags &= ~0x200;
+                        else
+                            arrow->flags |= 0x200;
+                    }
+                }
+            }
+        }
+
     } else {
-        if (page->alternate[0] != -1)
-            RefreshAlternate(menu, page, 0, first, destination0, pages, selectedPage);
-        else if (page->alternate[1] != -1)
-            RefreshAlternate(menu, page, 1, second, destination1, pages, selectedPage);
-        else if (page->alternate[2] != -1)
-            RefreshAlternate(menu, page, 2, third, destination2, pages, selectedPage);
-        else if (page->alternate[3] != -1)
-            RefreshAlternate(menu, page, 3, fourth, destination3, pages, selectedPage);
+        if (page->alternate[0] != -1) {
+            if (GameState_GetMapRevealFlag((*pages)[page->alternate[0]].map)) {
+                *destination0 = page->alternate[0];
+                first->flags &= ~1;
+                if ((page->solidLinks & 1u) && page->neighbors[0] == page->alternate[0])
+                    first->flags &= ~0x200;
+                else
+                    menu->arrows[0].flags |= 0x200;
+            }
+        } else if (page->alternate[1] != -1) {
+            if (GameState_GetMapRevealFlag((*pages)[page->alternate[1]].map)) {
+                *destination1 = page->alternate[1];
+                second->flags &= ~1;
+                if ((page->solidLinks & 2u) && page->neighbors[1] == page->alternate[1])
+                    second->flags &= ~0x200;
+                else
+                    menu->arrows[1].flags |= 0x200;
+            }
+        } else if (page->alternate[2] != -1) {
+            if (GameState_GetMapRevealFlag((*pages)[page->alternate[2]].map)) {
+                *destination2 = page->alternate[2];
+                third->flags &= ~1;
+                if ((page->solidLinks & 4u) && page->neighbors[2] == page->alternate[2])
+                    third->flags &= ~0x200;
+                else
+                    menu->arrows[2].flags |= 0x200;
+            }
+        } else if (page->alternate[3] != -1) {
+            if (GameState_GetMapRevealFlag((*pages)[page->alternate[3]].map)) {
+                *destination3 = page->alternate[3];
+                fourth->flags &= ~1;
+                if ((page->solidLinks & 8u) && page->neighbors[3] == page->alternate[3])
+                    fourth->flags &= ~0x200;
+                else
+                    menu->arrows[3].flags |= 0x200;
+            }
+        }
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_0816BC54);
-#endif
