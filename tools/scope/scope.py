@@ -4385,6 +4385,19 @@ def cmd_pre(src, func, env):
     srclines = open(os.path.join(ROOT, src)).read().splitlines()
     print(f"{func}: {info.get('counts') or 'MATCH'}; {len(recs)} PRE replacement(s) of"
           f" {len({r['expr'] for r in recs})} expression(s)")
+    gcse_path = os.path.join(wd, "u.i.gcse")
+    if os.path.exists(gcse_path):
+        dump = open(gcse_path).read()
+        sections = re.split(r"(?m)^(?=;; Function \w+)", dump)
+        for section in sections:
+            if not re.match(r";; Function " + re.escape(info["obj_name"]) + r"\b", section):
+                continue
+            tables = re.findall(r"Expression hash table \((\d+) buckets, (\d+) entries\)", section)
+            if tables:
+                print("  expression hash table(s): " + "; ".join(
+                    f"{b} buckets / {e} entries" for b, e in tables))
+                print("    gcse.c alloc_expr_hash_table uses (real insns / 2) | 1; bucket order controls"
+                      " reaching-register creation order (AGBCC_GCSE_T tests this decision).")
     differing = {r["uid"] for r in rows if r.get("uid") and r["tag"] != "="}
     scores = {}
     for r in recs:
@@ -4460,10 +4473,14 @@ def cmd_giv(src, func, env):
             r = m.group(1) or m.group(3)
             b = cur["bivs"].setdefault(r, dict(init="?", fate=""))
             if m.group(3):
-                b["fate"] = "eliminated (counting only: the loop can run backwards)"
+                b["fate"] = "candidate for elimination"
             else:
                 u = re.search(r"insn (\d+)", m.group(2) or "")
                 b["fate"] = "kept" + (f": used at line {ln_of(u.group(1))} (insn {u.group(1)})" if u else "")
+            continue
+        m = re.match(r"Final biv value for (\d+), reversed biv\.", ln)
+        if m:
+            cur["bivs"].setdefault(m.group(1), dict(init="?", fate=""))["reversed"] = True
             continue
         m = re.match(r"Insn (\d+): (giv reg \d+|dest address|dest reg \d+) src reg (\d+) benefit (-?\d+) lifetime (\d+)"
                      r"(.*?)mult (\S+) add (.*)", ln)
@@ -4491,7 +4508,8 @@ def cmd_giv(src, func, env):
         ls = sorted({ln_of(u) for u in list(L["givs"]) if ln_of(u) != "?"})
         print(f"  loop insns {L['span'][0]}-{L['span'][1]} ({L['insns']} insns), givs on line(s) {', '.join(map(str, ls)) or '-'}:")
         for r, b in L["bivs"].items():
-            print(f"    biv  pseudo {r} from {b['init'][:40]}: {b['fate'] or 'kept'}")
+            print(f"    biv  pseudo {r} from {b['init'][:40]}: {b['fate'] or 'kept'}"
+                  + ("; reversed counter" if b.get("reversed") else ""))
         for uid, g in L["givs"].items():
             if g["kind"] == "address" and g["benefit"] <= 0:
                 continue  # an address used once: never worth it, never interesting
