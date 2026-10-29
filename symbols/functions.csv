@@ -3004,6 +3004,7 @@ addr,name,mode,confidence,source,notes
 0808D16C,Ghoul_Update,thumb,low,src-alias,Update callback that runs actor logic and conditionally dispatches the current state
 0808D1C0,Ghoul_OnMessage,thumb,low,src-alias,Callback forwarding to a shared actor handler; message role is tentative
 0808D1CC,Ghoul_Destroy,thumb,low,src-alias,Destruction callback releasing scene actor effect resources
+0808D1D8,Ghoul_Init,thumb,low,src-alias,Ghoul initializer: installs its callback table and state handlers; loader called by its Create function
 0808E1D4,Ghoul_Create,thumb,low,src-alias,Allocates and initializes the actor with cleanup on failure; species identification is tentative
 0808E208,Slime_ApplyBodyHit,thumb,low,src-alias,Collider callback: for hit type 1 records the hit value and clears flag 0x1000000; variant 3 rolls random variant flags
 0808E2CC,Slime_ResolveBodyContact,thumb,low,src-alias,
@@ -3192,6 +3193,7 @@ addr,name,mode,confidence,source,notes
 0809DC90,Lun_OnUpdate,thumb,low,src-alias,Actor update callback runs movement then dispatches the current action and checks terrain
 0809DCC8,Lun_OnPlayerTargetInit,thumb,low,src-alias,Initialization callback assigns the player position as target and invokes shared target setup
 0809DCE4,Lun_Destroy,thumb,low,src-alias,Removes graphics and collision resources then unlinks the actor from the registry
+0809DD78,Lun_Init,thumb,low,src-alias,Lun initializer: installs its callback table and state handlers; loader called by its Create function
 0809ECC8,Lun_Create,thumb,low,gcl-behavior,"registry 680E spawner for enemy kinds 26-28; its sprite D28E is a small flame in three variants, matching the -lun spirits クロロホルルン/モエルルン/ヒエルルン (KLOROFOLUN/BURRNUN/CHILLUN)"
 0809ED00,Vorn_OnContactEvent_0809ED00,thumb,low,src-alias,
 0809ED70,Crow_OnBodyContact,thumb,low,src-alias,
@@ -3344,6 +3346,7 @@ addr,name,mode,confidence,source,notes
 080ABCDC,TentacleActor_OnUpdate,thumb,low,src-alias,Actor update callback that applies velocity and dispatches the current state before updating components
 080ABD14,TentacleEnemy_InitPlayerReference,thumb,low,src-alias,Points the actor at player data and runs shared initialization; enemy identity is tentative
 080ABD30,TentacleBody_Destroy,thumb,low,src-alias,
+080ABDCC,TentacleActor_Init,thumb,low,src-alias,Tentacle actor initializer: installs its callback table and state handlers; loader called by its Create function
 080ACBA8,TentacleEnemy_Create,thumb,low,src-alias,Allocates and initializes the tentacled enemy with cleanup on failure; identity is tentative
 080ACBE0,SceneActor_AimArcAtPlayer,thumb,low,src-alias,
 080ACCF0,Vorn_OnContactEvent,thumb,low,src-alias,Records the contact event value and clears a reaction flag when processing is allowed
@@ -3809,6 +3812,7 @@ addr,name,mode,confidence,source,notes
 080F0B48,Ivy_Update,thumb,low,src-alias,Main update callback dispatches the current state and synchronizes collision position
 080F0B80,Ivy_UpdateInteraction,thumb,low,src-alias,Secondary callback invokes shared actor interaction processing; interpretation tentative
 080F0B8C,Ivy_Destroy,thumb,low,src-alias,Destructor callback releases drawable resources and removes collision and registry entries
+080F0C20,Ivy_Init,thumb,low,src-alias,Ivy initializer: installs its callback table and state handlers; loader called by its Create function
 080F1BD4,Ivy_Create,thumb,medium,gcl-behavior,"registry 1744, enemy kind 50; proc 3278 places 'ivy as destroyed remains' with this family's sprite D638"
 080F1C08,Ivy_InitColorTransition,thumb,low,src-alias,Extracts green and blue channels from the packed color and installs the next color callback
 080F1C48,SceneActor_RampColorRed,thumb,low,src-alias,

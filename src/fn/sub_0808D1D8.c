@@ -129,7 +129,7 @@ static inline s32 Ghoul_CellHeight(u16 *pos, u16 *cellOut)
 // fuzzy: 30.2%
 // scope shape 1443 (differences once low registers are set aside)
 // confidence=low: Ghoul enemy loader (Crow/Ivy-shaped): script params, optional patrol route, callback tables
-s32 sub_0808D1D8(u8 *arg0)
+s32 Ghoul_Init(u8 *arg0)
 {
     u8 *heap;
     u32 zero;
@@ -522,5 +522,5 @@ s32 sub_0808D1D8(u8 *arg0)
     return SceneActorRegistry_LinkActor(arg0) ? 0 : -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatching", sub_0808D1D8);
+INCLUDE_ASM("asm/nonmatching", Ghoul_Init);
 #endif
