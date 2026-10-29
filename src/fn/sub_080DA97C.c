@@ -5,30 +5,6 @@
 
 void SceneActorMovement_ResolveRoutePosition(void *);
 
-static inline void Mummy_ChooseRandomRoute(struct SceneActorRegistryResetView *actor)
-{
-    struct SceneActorChaseRouteSelection *route = actor->currentRoute;
-    u8 choice;
-    {
-        u32 index = (gRandomIndex + 1) & 1023;
-        s32 value;
-        gRandomIndex = index;
-        index *= 2;
-        value = *(const u16 *)(RANDOM_TABLE_ADDR + index);
-        value >>= 3;
-        choice = Mod(value, route->points->count);
-    }
-    if (choice == route->index)
-        choice = Mod(choice + 1, route->points->count);
-    route->index = choice;
-    route->phase = 0;
-    {
-        u8 *base = gTerrainMap->routes;
-        base += route->points->offset;
-        route->current = base + route->index * 8;
-    }
-}
-
 /* Choose a route, react to contact, or resume pursuit in motion-flag priority order. */
 u8 Mummy_SelectMovementResponse(struct SceneActorRegistryResetView *actor)
 {
@@ -43,7 +19,7 @@ u8 Mummy_SelectMovementResponse(struct SceneActorRegistryResetView *actor)
         *word &= mask;
     }
     if (SceneActorChase_QueryMotionFlags(actor, 0x10)) {
-        Mummy_ChooseRandomRoute(actor);
+        SceneActorChase_ChooseRoute(actor);
         SceneActorMovement_ResolveRoutePosition(actor);
         SceneActorChase_SetBehavior(actor, 8);
         SceneActorChase_SetControl(actor, group->routeChoiceControl, 0x13);
