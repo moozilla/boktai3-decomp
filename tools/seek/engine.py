@@ -580,7 +580,13 @@ class Session:
         """The node's whole source file."""
         text = self.blob(node["file"])
         for name, h in sorted((node.get("defs") or {}).items()):
-            out = splice(text, [name], self.blob(h))
+            aliases = re.findall(r"^#define[ \t]+(\w+)[ \t]+" + re.escape(name)
+                                 + r"[ \t]*(?://[^\n]*)?$", text, re.M)
+            source_name = next((n for n in [name] + aliases if find_def(text, n)), name)
+            definition = self.blob(h)
+            if source_name != name:
+                definition = re.sub(r"\b" + re.escape(name) + r"\b", source_name, definition)
+            out = splice(text, [source_name], definition)
             if out is None:
                 raise SystemExit(f"n{node['id']}: cannot find {name}'s definition in its base file")
             text = out
