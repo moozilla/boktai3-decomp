@@ -45,7 +45,7 @@ void SceneActorBehavior_ActivatePendingControl(struct SceneActorRegistryActor *)
 s32 SceneActorBehavior_DispatchPendingFlags(struct SceneActorRegistryActor *);
 s32 SceneActorBehavior_UpdateTimersAndContacts(struct SceneActorRegistryActor *);
 void SceneActorMotion_Update(struct SceneActorRegistryActor *);
-void sub_08078EE8(struct SceneActorRegistryActor *);
+s32 SceneActor_UpdateStatus(struct SceneActorRegistryActor *);
 s32 SceneActor_UpdateBehaviorCallbacks(struct SceneActorRegistryActor *p)
 {
     struct SceneActorRegistryCallbackBlock *block = (void *)p->unknown3D4;
@@ -64,7 +64,7 @@ s32 SceneActor_UpdateBehaviorCallbacks(struct SceneActorRegistryActor *p)
         }
         SceneActorBehavior_ActivatePendingControl(p);
         SceneActorBehavior_DispatchPendingFlags(p);
-        sub_08078EE8(p);
+        SceneActor_UpdateStatus(p);
         dispatch(&p->contextCallback274, p->context);
         SceneActorBehavior_UpdateTimersAndContacts(p);
         SceneActorMotion_Update(p);

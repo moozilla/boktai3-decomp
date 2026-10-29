@@ -45,7 +45,7 @@ void SceneActorBehavior_ActivatePendingControl(struct SceneActorRegistryActor *)
 s32 SceneActorBehavior_DispatchPendingFlags(struct SceneActorRegistryActor *);
 s32 SceneActorBehavior_UpdateTimersAndContacts(struct SceneActorRegistryActor *);
 void SceneActorMotion_Update(struct SceneActorRegistryActor *);
-void sub_08078EE8(struct SceneActorRegistryActor *);
+s32 SceneActor_UpdateStatus(struct SceneActorRegistryActor *);
 static inline u8 pending(u8 *p)
 {
     u32 mask = 0x10;
@@ -71,7 +71,7 @@ s32 Skeleton_UpdateBehaviorCallbacks(struct SceneActorRegistryActor *p)
                 Callback_InvokeActor(p, block->fallback);
         }
         SceneActorBehavior_DispatchPendingFlags(p);
-        sub_08078EE8(p);
+        SceneActor_UpdateStatus(p);
         dispatch(&p->contextCallback274, p->context);
         SceneActorBehavior_UpdateTimersAndContacts(p);
         SceneActorMotion_Update(p);

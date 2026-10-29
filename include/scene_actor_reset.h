@@ -5,7 +5,9 @@
 struct SceneActorRegistryControl {
     u8 unknown0[8];
     u16 timer;
-    u8 mode, unknownB[0xD];
+    u8 mode, unknownB[9];
+    u16 field14; /* +0x14: cleared with the route timer/counter. */
+    u8 unknown16[2];
     u32 counter;
 };
 struct SceneActorRegistryControlGroup {
@@ -17,7 +19,8 @@ struct SceneActorRegistryControlGroup {
     u8 unknown68[0xC];
 };
 struct SceneActorRegistryRoute {
-    u8 unknown0[0xC];
+    u8 unknown0[8];
+    const u16 *point; /* +0x8: active route point; 08078EE8. */
     u8 fieldC, unknownD[3];
     u8 parameterA, parameterB, parameterC, unknown13;
 };
@@ -44,7 +47,8 @@ struct SceneActorRegistryResetView {
     u8 category;
     u8 unknown99[0x3];
     s16 health;
-    u8 unknown9E[0xA];
+    u8 unknown9E[8];
+    s16 attachmentLimit; /* +0xA6: signed attachment restart threshold. */
     s16 fieldA8;
     u16 fieldAA;
     u8 unknownAC[4];
@@ -87,10 +91,11 @@ struct SceneActorRegistryResetView {
     u32 flags130;
     struct ContactCollider colliderA;
     struct ContactCollider colliderB;
-    u8 unknown1DC[0x2];
+    u16 alternatePalette; /* +0x1DC: selected by status bit 0x4000. */
     u16 paletteBank;
     u16 basePaletteBank;
-    u8 unknown1E2[0x4];
+    u8 unknown1E2[2];
+    u16 alternateOffset; /* +0x1E4: alternate palette offset. */
     u16 paletteOffset;
     u16 field1E8;
     u16 field1EA;
@@ -101,7 +106,8 @@ struct SceneActorRegistryResetView {
     void *entryTarget228;
     void *savedTarget;
     void *reactionTarget230;
-    u8 unknown234[0x14];
+    void *deathControl; /* +0x234: controller installed by defeat dispatch. */
+    u8 unknown238[0x10];
     void *callback248;
     u8 unknown24C[0x20];
     void *update26C;
@@ -142,12 +148,12 @@ struct SceneActorRegistryResetView {
     u32 field30C;
     struct ContactPosition reactionStart,
         reactionEnd; /* +0x310/+0x318: reaction position snapshots. */
-    u8 unknown320[0xAC];
+    u8 shadow[0xAC]; /* +0x320: first byte gates the shadow enable/disable API. */
     u8 field3CC, unknown3CD[3];
     void *context;
     struct SceneActorRegistryControlGroup group;
     struct SceneActorRegistryRoute route;
-    u8 unknown45C[4];
+    void *contactNode; /* +0x45C: passed to SceneActorContacts_ReleaseNode. */
     u32 word460;
     u8 field464, field465, field466, field467;
     u32 field468;
@@ -157,15 +163,21 @@ struct SceneActorRegistryResetView {
     u8 unknown478[0x140];
     struct ContactPosition motion5B8;
     u16 field5C0, field5C2, field5C4, field5C6; /* 5C6: signed countdown in 08130BD4. */
-    u8 unknown5C8[2];
-    u8 field5CA, unknown5CB[5];
+    u16 countdown5C8;
+    u8 field5CA, unknown5CB;
+    u16 effect5CC;
+    u8 unknown5CE[2];
     void *routeObject;
     void *state5D4;
     u8 field5D8, field5D9, field5DA, unknown5DB;
-    u8 unknown5DC[0x18];
+    void *behaviorControl;
+    u8 unknown5E0[0x14];
     void *routePhaseCallback5F4;
     void *motionFailureCallback; /* +0x5F8: tentative movement failure callback. */
-    u8 unknown5FC[0x28];
+    u8 unknown5FC[0x1C];
+    void *interactionCallback; /* +0x618: invoked when tether interaction ends. */
+    void *responseCallback;    /* +0x61C: response-slot continuation. */
+    u8 unknown620[4];
     u8 animation624[0x38];
     u16 animationFlags65C;
     u8 unknown65E[0x1A];

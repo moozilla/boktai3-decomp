@@ -2873,6 +2873,7 @@ addr,name,mode,confidence,source,notes
 08078854,SceneActorBehavior_ApplyContactReaction,thumb,low,src-alias,
 080789EC,SceneActorBehavior_RecordDefeat,thumb,low,src-alias,
 08078DEC,SceneActorBehavior_ActivatePendingControl,thumb,low,src-alias,
+08078EE8,SceneActor_UpdateStatus,thumb,low,src-alias,Per-actor status timers; palette/reaction recovery; contact release and target facing
 0807A62C,SceneActorBehavior_UpdateTimersAndContacts,thumb,low,src-alias,
 0807A714,SceneActorBehavior_DispatchPendingFlags,thumb,low,src-alias,
 0807A8CC,SceneActorMotion_Update,thumb,low,src-alias,

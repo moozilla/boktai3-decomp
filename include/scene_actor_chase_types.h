@@ -5,10 +5,11 @@
 
 /* Shared player, route and control records used by monster pursuit reactions.
  * Actor and monster-specific body state retain their existing declarations. */
-/* A halfword flag member viewed independently of its owning actor or group. */
+/* A halfword flag member viewed independently of its owning actor or group.
+ * Two-byte alignment also permits the actor flag member at +0x2D6. */
 struct SceneActorChaseFlags16 {
     u16 value;
-};
+} __attribute__((packed, aligned(2)));
 
 struct SceneActorChaseTarget {
     u8 unknown0[8];
@@ -63,8 +64,16 @@ struct SceneActorChaseTurnState {
     u8 unknown3;
 };
 
+/* Placement status at group+0x30, used by actor stability dispatch. */
+struct SceneActorChasePlacement {
+    u8 unknown0[4];
+    u32 flags;
+};
+
 struct SceneActorChaseGroup {
-    u8 unknown0[0x40];
+    u8 unknown0[0x30];
+    struct SceneActorChasePlacement placement;
+    u8 unknown38[8];
     s16 flags;
     u16 field42, timer44, unknown46;
     void *homeControl;
@@ -75,7 +84,9 @@ struct SceneActorChaseGroup {
     struct SceneActorChaseSavedControl saved;
     u8 unknown94[0x162];
     u8 hitReactionLatch;
-    u8 unknown1F7[5];
+    u8 unknown1F7;
+    u16 effect; /* +0x1F8: environment-selected effect number. */
+    u8 unknown1FA[2];
     void *route;
     struct ContactPosition *destination;
     struct SceneActorChaseTurnState turn;
