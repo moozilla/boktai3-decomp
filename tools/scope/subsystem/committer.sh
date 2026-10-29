@@ -11,7 +11,7 @@ while true; do
       [ -e "$d/committed" ] && continue
       src=$(python3 -c "import json,sys;print({r['func']:r['src'] for r in json.load(open(sys.argv[1]))}[sys.argv[2]])" "$W/build/scope/campaign/queue.json" "$f")
       if git -C "$W" diff --quiet -- "$src"; then touch "$d/committed"; continue; fi
-      git -C "$W" add -- "$src" && git -C "$W" commit -q -m "$(cat "$c")
+      git -C "$W" add -- "$src" symbols/progress_functions.csv && git -C "$W" commit -q -m "$(cat "$c")
 
 Matched by a $(cat "$W/build/model" 2>/dev/null || echo "$MODEL") scope worker (subsystem run $(basename "$W"))." && touch "$d/committed" \
         && echo "$(date +%T) $(basename "$W") committed $f"
