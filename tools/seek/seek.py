@@ -23,6 +23,8 @@
   seek.py land N                      a MATCH node: hand it to `campaign.py land` (unwraps NONMATCHING)
 
 SEEK_JOBS=4 compiles expansions in four processes (each with its own agbcc fork server).
+SEEK_FAST_ADD=1 skips spill-rotation probes and ROM register voting when adding files;
+use values or scope on a selected node for detailed allocation diagnostics afterward.
 
 Options: -f FUNC picks the session (default: the last one opened in this tree).
 Sessions are shared across worktrees ($SEEK_HOME, default: the main checkout's build/seek).
@@ -270,7 +272,8 @@ class Work:
         code, err, alloc = self.target.compile_pre(pre, trace=True)
         nrel = alloc.pop("__reloads__", 0)
         ev = self.target.evaluate(code)
-        if code and not ev.get("match") and ev["key"][2] <= 12:
+        fast_add = os.environ.get("SEEK_FAST_ADD") == "1"
+        if code and not fast_add and not ev.get("match") and ev["key"][2] <= 12:
             ev["rot"] = self.target.rotation(pre, nrel) or [ev["key"][2], -1, 99]
         out = sha(code) if code else None
         rec = dict(parent=parent["id"] if parent else None, kind="file", who=who, file=fh, defs={},
@@ -280,7 +283,7 @@ class Work:
         else:
             rec["sem"] = self.target.semantic(code, pre)
             rec["alloc"] = {k: v[0] for k, v in alloc.items()}
-            if not ev.get("match"):
+            if not fast_add and not ev.get("match"):
                 rec["want"] = self.target.wanted(os.path.relpath(tmp, ROOT))
                 rec["awrong"] = len(E.alloc_wrong(rec["alloc"], rec["want"]))
             if parent and parent.get("alloc"):
@@ -651,7 +654,12 @@ def cmd_add(a):
     w = Work(a.f)
     parent = w.node(a.parent) if a.parent else w.best()
     if len(a.file) > 1:  # several spellings of one hypothesis: score them all, best first, no expansion
-        recs = [w.add_file(f, parent, a.m) for f in a.file]
+        recs = []
+        for f in a.file:
+            rec = w.add_file(f, parent, a.m)
+            recs.append(rec)
+            print(fmt_node(rec, parent), flush=True)
+        print("best first:")
         for r in sorted(recs, key=lambda r: (rank(r), r["id"])):
             print(fmt_node(r, parent) + (f"  (same code as n{r['same_as']})" if r.get("same_as") else ""))
         return
