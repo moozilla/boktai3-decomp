@@ -384,7 +384,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/script-selector-display_2026-10-14.md](../notes/script-selector-display_2026-10-14.md) | Script selector and shared display animation | *#scripts #animation* | 7 |
 | [notes/script-utility_2026-10-14.md](../notes/script-utility_2026-10-14.md) | Script utility commands and reference ABI | *#scripts #inventory* | 3 |
 | [notes/script_virtual_machine.md](../notes/script_virtual_machine.md) | Script virtual machine, merged unit | *#scripts* | 8 |
-| [notes/search-sol_2026-10-29.md](../notes/search-sol_2026-10-29.md) | Stateful matching search engine (Sol) | #matching #tooling #compiler #process | 7 |
+| [notes/search-sol_2026-10-29.md](../notes/search-sol_2026-10-29.md) | Stateful matching search engine (Sol) | #matching #tooling #compiler #process | 8 |
 | [notes/selection_menu.md](../notes/selection_menu.md) | Selection menu unit (tentative) | #selection-menu #translation-unit #matching | 5 |
 | [notes/shake-icon-display_2026-10-14.md](../notes/shake-icon-display_2026-10-14.md) | Short-lived shaking keyframe icon |  | 2 |
 | [notes/sol-family-push-2.md](../notes/sol-family-push-2.md) | Sol family push 2 |  | 3 |

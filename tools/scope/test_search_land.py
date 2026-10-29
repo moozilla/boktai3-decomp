@@ -52,6 +52,19 @@ class LandingTests(unittest.TestCase):
         self.patch.stop()
         self.tmp.cleanup()
 
+    def test_timeout_stops_formatter_process_group_before_restoration(self):
+        process = mock.MagicMock()
+        process.pid = 12345
+        process.communicate.side_effect = [subprocess.TimeoutExpired("campaign", 90), ("", "")]
+        process.__enter__.return_value = process
+        with mock.patch("search_land.subprocess.Popen", return_value=process) as spawn, \
+             mock.patch("search_land.os.killpg") as kill:
+            with self.assertRaises(subprocess.TimeoutExpired):
+                search_land.run_campaign(["campaign"], text=True, capture_output=True, timeout=90)
+        self.assertTrue(spawn.call_args.kwargs["start_new_session"])
+        kill.assert_called_once_with(12345, search_land.signal.SIGKILL)
+        self.assertEqual(process.communicate.call_count, 2)
+
     def test_only_unmodified_exact_results_may_land(self):
         for result in ({"exact": False}, {"exact": True, "experiment": True},
                        {"exact": True, "experiment_build": "debug"}):
@@ -69,7 +82,7 @@ class LandingTests(unittest.TestCase):
             self.target.write_text("int F(void){return 1;}\n")
             return subprocess.CompletedProcess(args, 0, "F: unit MATCH", "")
         with mock.patch.dict(os.environ, {"AGBCC_FORCE": "a:0"}), \
-             mock.patch("search_land.subprocess.run", side_effect=verify), \
+             mock.patch("search_land.run_campaign", side_effect=verify), \
              mock.patch("search_land.production_concessions", return_value={"verdict": "NONE_FOUND", "pins": 0, "barriers": 0}):
             result = search_land.land(self.session, self.node, {"exact": True, "experiment_build": "normal no-g build"})
         self.assertTrue(result["production_unit_match"])
@@ -83,7 +96,7 @@ class LandingTests(unittest.TestCase):
                 if isinstance(failure, Exception):
                     raise failure
                 return failure
-            with mock.patch("search_land.subprocess.run", side_effect=verify):
+            with mock.patch("search_land.run_campaign", side_effect=verify):
                 with self.assertRaises((ValueError, TimeoutError)):
                     search_land.land(self.session, self.node, {"exact": True})
             self.assertEqual(self.target.read_text(), SOURCE)
@@ -104,7 +117,7 @@ class LandingTests(unittest.TestCase):
         actual_run = subprocess.run
         def dispatch(args, **kwargs):
             return verify(args, **kwargs) if "tools/scope/campaign.py" in args else actual_run(args, **kwargs)
-        with mock.patch("search_land.subprocess.run", side_effect=dispatch):
+        with mock.patch("search_land.run_campaign", side_effect=dispatch):
             result = search_land.land(self.session, self.node, {"exact": True, "concessions": {"pins": 0, "barriers": 0}})
         self.assertEqual(result["concessions"]["pins"], 1)
         self.assertTrue(self.target.read_text().startswith("// MATCHING_CONCESSION: register-pinning\n"))
@@ -131,7 +144,7 @@ int F(void) { return 1; }
         def verify(args, **kwargs):
             self.target.write_text('int F(void){return 1;}\n')
             return subprocess.CompletedProcess(args, 0, "F: unit MATCH", "")
-        with mock.patch("search_land.subprocess.run", side_effect=verify), \
+        with mock.patch("search_land.run_campaign", side_effect=verify), \
              mock.patch("search_land.production_concessions", return_value={"verdict": "UNKNOWN"}):
             search_land.land(self.session, self.node, {"exact": True})
         self.assertTrue(self.target.read_text().startswith(marker))
@@ -142,7 +155,7 @@ int F(void) { return 1; }
         def verify(args, **kwargs):
             self.target.write_text(marker + 'int F(void){return 1;}\n')
             return subprocess.CompletedProcess(args, 0, "F: unit MATCH", "")
-        with mock.patch("search_land.subprocess.run", side_effect=verify), \
+        with mock.patch("search_land.run_campaign", side_effect=verify), \
              mock.patch("search_land.production_concessions", return_value={"verdict": "NONE_FOUND", "pins": 0, "barriers": 0}):
             search_land.land(self.session, self.node, {"exact": True})
         self.assertNotIn(marker, self.target.read_text())
@@ -155,7 +168,7 @@ int F(void) { return 1; }
             self.target.write_text("partial output")
             (worker / "landed").write_text("new false record")
             return subprocess.CompletedProcess(args, 0, "missing unit verdict", "")
-        with mock.patch("search_land.subprocess.run", side_effect=verify):
+        with mock.patch("search_land.run_campaign", side_effect=verify):
             with self.assertRaises(ValueError):
                 search_land.land(self.session, self.node, {"exact": True})
         self.assertEqual((worker / "landed").read_text(), "old successful record")
@@ -172,7 +185,7 @@ int F(void) { return 1; }
             if Path(path) == self.target:
                 raise OSError("synthetic disk full")
             return original_write(path, text)
-        with mock.patch("search_land.subprocess.run", side_effect=verify), \
+        with mock.patch("search_land.run_campaign", side_effect=verify), \
              mock.patch("search_land.production_concessions", return_value={"verdict": "NONE_FOUND", "pins": 0, "barriers": 0}), \
              mock.patch("search_land.write_atomic", side_effect=fail_target):
             with self.assertRaises(OSError):

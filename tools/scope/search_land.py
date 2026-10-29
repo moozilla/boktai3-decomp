@@ -8,6 +8,7 @@ import fcntl
 import json
 import os
 import re
+import signal
 import subprocess
 import sys
 import tempfile
@@ -20,6 +21,26 @@ def write_atomic(path, text):
     with tempfile.NamedTemporaryFile(mode="w", dir=path.parent, prefix=".search-land-", delete=False) as stream:
         stream.write(text)
     os.replace(stream.name, path)
+
+
+def run_campaign(args, **kwargs):
+    """A timed-out formatter/checker must not outlive source restoration."""
+    timeout = kwargs.pop("timeout", 90)
+    kwargs.pop("capture_output", None)
+    with subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                          start_new_session=True, **kwargs) as process:
+        try:
+            stdout, stderr = process.communicate(timeout=timeout)
+        except BaseException:
+            # The campaign starts formatter/checker grandchildren. Killing only
+            # the coordinator could let a formatter overwrite the restored unit.
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            process.communicate()
+            raise
+        return subprocess.CompletedProcess(args, process.returncode, stdout, stderr)
 
 
 def production_concessions(unit):
@@ -99,7 +120,7 @@ def land(session, node, result, unit=None):
         env["SCOPE_RUN"] = "search-land-" + function
         success = False
         try:
-            child = subprocess.run([sys.executable, "tools/scope/campaign.py", "land", function, "."],
+            child = run_campaign([sys.executable, "tools/scope/campaign.py", "land", function, "."],
                                    cwd=ROOT, env=env, text=True, capture_output=True, timeout=90)
             log = (child.stdout + child.stderr).strip()
             if child.returncode != 0 or "unit MATCH" not in child.stdout:

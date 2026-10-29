@@ -104,10 +104,12 @@ The saved evaluation snapshot contains 595 compile evaluations and 85 diagnostic
 traces over eleven still-unmatched functions, plus additional compiler probes.
 These are stored evaluation counts, not a complete count of compiler processes.
 No ordinary exact match was landed: this batch's code gain is 0.00 percentage
-points. Final validation passed 133 search tests and 16 scope tests, including
+points. Final validation passed 134 search tests and 16 scope tests, including
 actual unmatched compiles and configured CPP integration. A real semantic request
 returned UNAVAILABLE with native signal 4; the next resident ping succeeded.
 An attempted land of the Vulcan counterfactual was rejected without changing src.
+Landing cancellation kills the campaign's process group before restoring the
+source, preventing a timed-out formatter from overwriting the restored unit.
 No full ROM build or compiler patch was performed.
 
 ## Next work
