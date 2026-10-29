@@ -951,23 +951,7 @@ void SceneActorState_SnapReactionPosition(u8 *p, struct SnapVector *position)
     *(u16 *)(p + 0x354) = 64;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 71.3%
-
-// fuzzy: 81.1%
-
-// Scene-actor cutscene dispatcher (Vanargand, Ratatosk). Commands mostly set
-
-// state 2 with a sub-state (setState); 2 places the actor, 9 configures an
-
-// effect, 15/16 pick the body graphics variant, 25 flashes the background.
-
-// Still differs: sb/r8 swapped for entry/i; in cases 15/16 the graphics
-
-// variant branches use other registers, so their tails are not cross-jumped
-
-// as in the original.
-
+/* Scene commands set actor states, positions, graphics variants and background flashes. */
 typedef struct {
     u16 id;
     u8 unk[4];
@@ -1038,19 +1022,31 @@ static inline void setStateFull(struct S *s, u32 state, u32 entered, u32 sub)
 
 #define setState(s, sub) setStateFull(s, 2, 0, sub)
 
-static inline void effect2(u8 *p, int mode, int id, int duration)
+static inline void effect2(struct T *p, int mode, int id, int duration)
 {
-    *(u32 *)(p + 0x390) = id;
-    p[0x38e] = mode;
-    p[0x38f] = duration;
-    if (p[0x38e] == 2) {
+    p->w390 = id;
+    p->b38E = mode;
+    p->b38F = duration;
+    if (p->b38E == 2) {
         u32 value = duration == 5 ? 32 : 64;
-        p[0x38c] = value;
-    } else if (p[0x38e] == 1)
-        p[0x38c] = 0;
+        p->b38C = value;
+    } else if (p->b38E == 1)
+        p->b38C = 0;
 }
 
 #define effect(p, id, mode, d) effect2(p, mode, id, d)
+
+static inline void DispatchSelectPalette(struct T *t, s32 r)
+{
+    if (r == 0)
+        t->palette = t->pal5C4;
+    else if (r == 1)
+        t->palette = t->pal7C4;
+    else {
+        CpuSet(gPaletteBankData + r * 32, t->pal3C4, 0x04000008);
+        t->palette = t->pal3C4;
+    }
+}
 
 void SceneActors_DispatchCommands(struct S *s)
 {
@@ -1167,55 +1163,42 @@ void SceneActors_DispatchCommands(struct S *s)
                     break;
                 case 15:
                     if (m[4] == 0) {
-                        s32 r;
                         t->b38C = 0;
                         t->b38E = 0;
                         t->w390 = SceneActorGraphics_GetResourceId(t);
-                        r = SceneActorGraphics_GetResourceId(t);
-                        switch (r) {
-                            case 0:
-                                t->palette = t->pal5C4;
-                                break;
-                            case 1:
-                                t->palette = t->pal7C4;
-                                break;
-                            default:
-                                CpuSet(gPaletteBankData + r * 32, t->pal3C4, 0x04000008);
-                                t->palette = t->pal3C4;
-                                break;
-                        }
+                        DispatchSelectPalette(t, SceneActorGraphics_GetResourceId(t));
                     } else if (m[5] == 0) {
-                        effect((u8 *)t, 0x338, 3, 5);
+                        effect(t, 0x338, 3, 5);
                     } else {
-                        effect((u8 *)t, 0x33A, 3, 5);
+                        effect(t, 0x33A, 3, 5);
                     }
-                    Trigger_ConsumePending(entry, 1);
+                    Trigger_ConsumePending(&s->entry, 1);
                     break;
                 case 16:
                     if (m[4] == 0)
-                        effect((u8 *)t, 0x335, 1, 5);
+                        effect(t, 0x335, 1, 5);
                     else if (m[5] == 0)
-                        effect((u8 *)t, 0x338, 2, 5);
+                        effect(t, 0x338, 2, 5);
                     else
-                        effect((u8 *)t, 0x33A, 2, 5);
-                    Trigger_ConsumePending(entry, 1);
+                        effect(t, 0x33A, 2, 5);
+                    Trigger_ConsumePending(&s->entry, 1);
                     break;
                 case 9:
                     SceneActors_ConfigureEffect(s, m[4], 0xB4, 0xB4);
-                    Trigger_ConsumePending(entry, 1);
+                    Trigger_ConsumePending(&s->entry, 1);
                     break;
                 case 17:
                     t->b3B8 = m[4];
-                    Trigger_ConsumePending(entry, 1);
+                    Trigger_ConsumePending(&s->entry, 1);
                     break;
                 case 2:
                     s->h54 = m[4];
                     s->h56 = m[5];
                     s->h58 = m[6];
                     t->h260 = s->h54;
-                    t->h262 = t->h344 + s->h56;
+                    t->h262 = s->h56 + t->h344;
                     t->h264 = s->h58;
-                    Trigger_ConsumePending(entry, 1);
+                    Trigger_ConsumePending(&s->entry, 1);
                     break;
                 case 66:
                     t->b3BA = m[4];
@@ -1226,12 +1209,6 @@ void SceneActors_DispatchCommands(struct S *s)
             i++;
         } while (i < entry->count[gSceneEventDispatchState[0x24]]);
 }
-
-#else
-
-INCLUDE_ASM("asm/nonmatching", SceneActors_DispatchCommands);
-
-#endif
 
 static inline u8 TakeFlag(struct StateActor *p)
 {
