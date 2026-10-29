@@ -145,9 +145,11 @@ def validate_knobs(knobs):
         **{k: r"[^,:\n]+:" + integer + r"(?:,[^,:\n]+:" + integer + ")*" for k in ("AGBCC_PRI_LABEL", "AGBCC_FORCE_LABEL")},
         "AGBCC_SPILL_LABEL": r"[^,:\n]+#\d+:" + integer + r"(?:,[^,:\n]+#\d+:" + integer + ")*",
         "AGBCC_SPILL": r"\d+:" + integer + r"(?:,\d+:" + integer + ")*",
-        **{k: r"\d+(?:,\d+)*" for k in ("AGBCC_NOGIV", "AGBCC_GIV", "AGBCC_NOMOVE", "AGBCC_NOTIE")},
+        **{k: r"\d+(?:,\d+)*" for k in ("AGBCC_NOGIV", "AGBCC_GIV", "AGBCC_NOMOVE", "AGBCC_NOTIE", "AGBCC_NOLOCAL")},
         "CSE_KEEP": name + "(?:," + name + ")*", "CSE_NOCANON": name,
         "CSE_NOFOLLOW_JUMP": r"\d+(?::[12])?(?:,\d+(?::[12])?)*",
+        "CSE_NOSUBST": r"[12]:[1-9]\d*(?:,[12]:[1-9]\d*)*",
+        "CSE_SUBST_TRACE": r"1",
         **{k: r"\d+" for k in ("AGBCC_NOPRE", "CSE_NOFOLLOW", "CSE_WHY", "CSE_DEBUG", "CSE_PATH", "CSE_PATHS", "AGBCC_GCSE_T", "AGBCC_NOSTRICT", "AGBCC_PRE_TRACE", "AGBCC_LOOP_TRACE")}}
     for key, value in knobs.items():
         if key not in formats:

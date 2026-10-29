@@ -493,18 +493,24 @@ def safe_dispatch(request):
                 del scope_module._LOCKS[directory]
 
 
-def serve():
+def mailbox_directory(session):
+    """Independent sessions must not queue behind another session's diagnostics."""
+    return location(session).parent / "resident"
+
+
+def serve(session="default"):
     """A filesystem mailbox also works in sandboxes that forbid socket binding."""
     import fcntl
-    BASE.mkdir(parents=True, exist_ok=True)
-    inbox = BASE / "requests"
+    mailbox = mailbox_directory(session)
+    mailbox.mkdir(parents=True, exist_ok=True)
+    inbox = mailbox / "requests"
     inbox.mkdir(exist_ok=True)
-    lock = open(BASE / "serve.lock", "a")
+    lock = open(mailbox / "serve.lock", "a")
     try:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except BlockingIOError:
         return
-    ready = BASE / "resident.json"
+    ready = mailbox / "resident.json"
     loaded_version = runtime_version()
     ready.write_text(json.dumps({"pid": os.getpid(), "version": loaded_version}))
     last = time.monotonic()
@@ -550,12 +556,14 @@ def runtime_version():
 
 def request_server(request):
     import fcntl
-    BASE.mkdir(parents=True, exist_ok=True)
-    inbox = BASE / "requests"
+    session = request.get("session", "default")
+    mailbox = mailbox_directory(session)
+    mailbox.mkdir(parents=True, exist_ok=True)
+    inbox = mailbox / "requests"
     inbox.mkdir(exist_ok=True)
 
     def active():
-        with open(BASE / "serve.lock", "a") as lock:
+        with open(mailbox / "serve.lock", "a") as lock:
             try:
                 fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
                 return False
@@ -563,8 +571,8 @@ def request_server(request):
                 return True
 
     def start():
-        with open(BASE / "serve.log", "a") as log:
-            subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "serve"], cwd=ROOT,
+        with open(mailbox / "serve.log", "a") as log:
+            subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "--session", session, "serve"], cwd=ROOT,
                 stdin=subprocess.DEVNULL, stdout=log, stderr=log, start_new_session=True)
 
     for attempt in range(8):
@@ -580,7 +588,7 @@ def request_server(request):
         while not reply_path.exists():
             now = time.monotonic()
             if now - started > 120:
-                raise RuntimeError("resident did not respond within 120 seconds; inspect build/search-sol/serve.log")
+                raise RuntimeError("resident did not respond within 120 seconds; inspect the session resident/serve.log")
             if now - checked > .25:
                 checked = now
                 if not active():
@@ -747,7 +755,7 @@ def main():
         raise SystemExit("search needs build/venv")
     args = vars(parser().parse_args())
     if args["command"] == "serve":
-        serve()
+        serve(args["session"])
         return
     machine = args.pop("json")
     if args["command"] == "batch":

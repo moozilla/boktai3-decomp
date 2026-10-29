@@ -53,6 +53,12 @@ records and ambiguity; `--json` provides response envelopes. `compiler --view li
 --argument value`, and views `frame`, `hoist`, `giv`, `pre`, `probe`, `spill`, reuse
 scope. Earliest changed pass is not causal proof.
 
+For a precise CSE RHS query, `experiment --knob CSE_SUBST_TRACE=1` records changed
+candidate attempts; `CSE_NOSUBST=1:104,1:105` suppresses selected pass:event pairs.
+Identity candidates remain valid; alternatives may require separate suppression.
+`AGBCC_NOLOCAL=143` leaves the quantity containing pseudo 143 for global allocation.
+These are compiler counterfactuals, never matches.
+
 `experiment --knob AGBCC_PRI=value:+100` stores a separate counterfactual. Only
 ordinary compiler bytes equal to the ROM mean exact. PRI/FORCE and CSE pseudo
 selectors accept unique names; UID/event selectors require numbers. Unsupported

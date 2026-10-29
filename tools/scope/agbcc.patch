@@ -1,9 +1,7 @@
 --- a/local-alloc.c
 +++ b/local-alloc.c
-@@ -70,6 +70,325 @@
- #include "insn-attr.h"
- #include "recog.h"
- #include "output.h"
+@@ -71,0 +72,319 @@
++#include "output.h"
 +
 +/* Instrumentation for tools/rasolve.py (Boktai 3 decomp). Never used by the
 +   real build: this copy of agbcc lives in build/agbcc-instr.
@@ -322,33 +320,14 @@
 +    agbcc_dump = fopen (e, "a");
 +}
 +#undef done
-+#include "output.h"
- #include "toplev.h"
- 
- /* Next quantity number available for allocation.  */
-@@ -249,6 +568,8 @@
- static int qty_sugg_compare    	(int, int);
- static int qty_sugg_compare_1	(const void *, const void *);
- static int qty_compare    	(int, int);
+@@ -252,0 +572,2 @@
 +static int qty_compare_pri	(int);
 +static char *qty_forced;
- static int qty_compare_1	(const void *, const void *);
- static int combine_regs		(rtx, rtx, int, int, rtx, int);
- static int reg_meets_class_p	(int, enum reg_class);
-@@ -298,6 +619,9 @@
-   register int b, i;
-   int max_qty;
- 
+@@ -302,0 +624,3 @@
++
 +  agbcc_instr_init ();
 +  agbcc_apply_labels ();
-+
-   /* Leaf functions and non-leaf functions have different needs.
-      If defined, let the machine say what kind of ordering we
-      should use.  */
-@@ -1005,6 +1329,28 @@
- /* Allocate hard regs to the pseudo regs used only within block number B.
-    Only the pseudos that die but once can be handled.  */
- 
+@@ -1014,0 +1339,22 @@
 +/* AGBCC_NOTIE=uid,uid,...: never tie an output to an input at these insns
 +   (explain.py's counterfactual probes).  */
 +static int
@@ -371,48 +350,19 @@
 +}
 +
 +
- static void
- block_alloc (b)
-      int b;
-@@ -1168,7 +1514,7 @@
- 			   );
- 		      
- 		      if (GET_CODE (r1) == REG || GET_CODE (r1) == SUBREG)
+@@ -1178 +1524 @@
 -			win = combine_regs (r1, r0, may_save_copy,
 +			win = !agbcc_notie_p (INSN_UID (insn)) && combine_regs (r1, r0, may_save_copy,
- 					    insn_number, insn, 0);
- 		    }
- 		  if (win)
-@@ -1204,12 +1550,12 @@
- 	      if (r1 = XEXP (note, 0), GET_CODE (r1) == REG
- 		  /* Check that we have such a sequence.  */
- 		  && no_conflict_p (insn, r0, r1))
+@@ -1214 +1560 @@
 -		win = combine_regs (r1, r0, 1, insn_number, insn, 1);
 +		win = !agbcc_notie_p (INSN_UID (insn)) && combine_regs (r1, r0, 1, insn_number, insn, 1);
- 	      else if (GET_RTX_FORMAT (GET_CODE (XEXP (note, 0)))[0] == 'e'
- 		       && (r1 = XEXP (XEXP (note, 0), 0),
- 			   GET_CODE (r1) == REG || GET_CODE (r1) == SUBREG)
- 		       && no_conflict_p (insn, r0, r1))
+@@ -1219 +1565 @@
 -		win = combine_regs (r1, r0, 0, insn_number, insn, 1);
 +		win = !agbcc_notie_p (INSN_UID (insn)) && combine_regs (r1, r0, 0, insn_number, insn, 1);
- 
- 	      /* Here we care if the operation to be computed is
- 		 commutative.  */
-@@ -1219,7 +1565,7 @@
- 		       && (r1 = XEXP (XEXP (note, 0), 1),
- 			   (GET_CODE (r1) == REG || GET_CODE (r1) == SUBREG))
- 		       && no_conflict_p (insn, r0, r1))
+@@ -1229 +1575 @@
 -		win = combine_regs (r1, r0, 0, insn_number, insn, 1);
 +		win = !agbcc_notie_p (INSN_UID (insn)) && combine_regs (r1, r0, 0, insn_number, insn, 1);
- 
- 	      /* If we did combine something, show the register number
- 		 in question so that we know to ignore its death.  */
-@@ -1328,6 +1674,21 @@
- 
-     default:
-       qsort (qty_order, next_qty, sizeof (int), qty_sugg_compare_1);
-+    }
-+
+@@ -1339,0 +1686,40 @@
 +  /* Instrumentation: forced quantities take their register first.  */
 +  agbcc_instr_init ();
 +  qty_forced = (char *) alloca (next_qty + 1);
@@ -426,31 +376,40 @@
 +	  qty_phys_reg[i] = agbcc_force[r];
 +	  post_mark_life (agbcc_force[r], qty_mode[i], 1, qty_birth[i], qty_death[i]);
 +	}
-     }
- 
-   /* Try to put each quantity in a suggested physical register, if it has one.
-@@ -1336,6 +1697,8 @@
-   for (i = 0; i < next_qty; i++)
-     {
-       q = qty_order[i];
++    }
++
++  /* Diagnostic: leave a selected local quantity for global allocation.
++     Select any pseudo member by number, not merely the quantity head.  */
++  if (getenv ("AGBCC_NOLOCAL"))
++    for (i = 0; i < next_qty; i++)
++      {
++        int r;
++        for (r = qty_first_reg[i]; r >= 0; r = reg_next_in_qty[r])
++          {
++            char *p = getenv ("AGBCC_NOLOCAL");
++            while (p && *p)
++              {
++                if (atoi (p) == r)
++                  {
++                    qty_forced[i] = 1;
++                    qty_phys_reg[i] = -1;
++                    fprintf (stderr, "nolocal qty=%d member=%d head=%d\n",
++                             i, r, qty_first_reg[i]);
++                    break;
++                  }
++                p = strchr (p, ',');
++                if (p) p++;
++              }
++          }
++      }
++
+@@ -1345,0 +1732,2 @@
 +      if (qty_forced[q])
 +	continue;
-       if (qty_phys_num_sugg[q] != 0 || qty_phys_num_copy_sugg[q] != 0)
- 	qty_phys_reg[q] = find_free_reg (qty_min_class[q], qty_mode[q], q,
- 					 0, 1, qty_birth[q], qty_death[q]);
-@@ -1387,7 +1750,7 @@
-   for (i = 0; i < next_qty; i++)
-     {
-       q = qty_order[i];
+@@ -1397 +1785 @@
 -      if (qty_phys_reg[q] < 0)
 +      if (qty_phys_reg[q] < 0 && !qty_forced[q])
- 	{
- 	  if (N_REG_CLASSES > 1)
- 	    {
-@@ -1414,6 +1777,13 @@
- 	for (i = qty_first_reg[q]; i >= 0; i = reg_next_in_qty[i])
- 	  reg_renumber[i] = qty_phys_reg[q] + reg_offset[i];
-       }
+@@ -1423,0 +1812,7 @@
 +  if (agbcc_dump)
 +    for (q = 0; q < next_qty; q++)
 +      fprintf (agbcc_dump, "L %s %d %d %d %d %d %d %d %d %d %s\n",
@@ -458,40 +417,22 @@
 +	       qty_compare_pri (q), qty_birth[q], qty_death[q],
 +	       qty_n_refs[q], qty_phys_num_sugg[q] + qty_phys_num_copy_sugg[q],
 +	       qty_phys_reg[q], agbcc_pseudo_label (qty_first_reg[q]));
- }
- 
- /* Compare two quantities' priority for getting real registers.
-@@ -1432,11 +1802,21 @@
-    Multiplying this by 10000 can't overflow.
-    QTY_CMP_PRI is also used by qty_sugg_compare.  */
- 
+@@ -1443 +1838 @@
 -#define QTY_CMP_PRI(q)		\
 +#define QTY_CMP_PRI_BASE(q)		\
-   ((int) (((double) (floor_log2 (qty_n_refs[q]) * qty_n_refs[q] * qty_size[q]) \
- 	  / (qty_death[q] - qty_birth[q])) * 10000))
+@@ -1445,0 +1841,10 @@
 +#define QTY_CMP_PRI(q) (QTY_CMP_PRI_BASE (q) \
 +  + (qty_first_reg[q] >= 0 && qty_first_reg[q] < AGBCC_MAXREG \
 +     ? agbcc_pri_delta[qty_first_reg[q]] : 0))
- 
- static int
++
++static int
 +qty_compare_pri (q)
 +     int q;
 +{
 +  return QTY_CMP_PRI (q);
 +}
-+
-+static int
- qty_compare (q1, q2)
-      int q1, q2;
- {
-@@ -1505,6 +1885,7 @@
- 
- #undef QTY_CMP_SUGG
- #undef QTY_CMP_PRI
+@@ -1516,0 +1922 @@
 +#undef QTY_CMP_PRI_BASE
- 
- /* Attempt to combine the two registers (rtx's) USEDREG and SETREG.
-    Returns 1 if have done so, or 0 if cannot.
 --- a/global.c
 +++ b/global.c
 @@ -263,6 +263,13 @@
@@ -1162,20 +1103,49 @@
  		    {
 --- a/cse.c
 +++ b/cse.c
-@@ -435,11 +435,28 @@
-   char in_struct;
-   char is_const;
-   char flag;
+@@ -437,0 +438 @@
 +  int born_uid;		/* instrumentation: insn being processed when this entry was made */
- };
- 
- /* We don't want a lot of buckets, because we rarely have very many
-    things stored in the hash table, and a lot of buckets slows
-    down a lot of loops that happen frequently.  */
+@@ -442,0 +444,52 @@
 +/* Instrumentation: the insn cse_insn is working on (for table_elt.born_uid),
 +   and CSE_WHY=UID: print the candidates and the equivalence class cse weighs
 +   for each SET of that insn, before it picks the cheapest.  */
 +static int cse_cur_uid;
++/* RHS candidate events, per function and CSE pass.  A selector is PASS:EVENT.
++   Count changed candidates before validation; the trace says whether a
++   candidate was blocked.  Identity candidates are never suppressed.  */
++static int cse_subst_event;
++static int cse_subst_pass;
++
++static int
++cse_subst_block_p (insn, old_src, trial)
++     rtx insn, old_src, trial;
++{
++  char *p = getenv ("CSE_NOSUBST");
++  int blocked = 0;
++  if ((!p && !getenv ("CSE_SUBST_TRACE"))
++      || old_src == trial || rtx_equal_p (old_src, trial))
++    return 0;
++  cse_subst_event++;
++  while (p && *p)
++    {
++      char *colon = strchr (p, ':');
++      char *comma = strchr (p, ',');
++      if (colon && (!comma || colon < comma)
++          && atoi (p) == cse_subst_pass
++          && atoi (colon + 1) == cse_subst_event)
++        blocked = 1;
++      if (!comma) break;
++      p = comma + 1;
++    }
++  fprintf (stderr, "cse_subst pass=%d event=%d uid=%d blocked=%d old=",
++           cse_subst_pass, cse_subst_event, INSN_UID (insn), blocked);
++  print_inline_rtx (stderr, old_src, 0);
++  fprintf (stderr, " trial=");
++  print_inline_rtx (stderr, trial, 0);
++  fprintf (stderr, "\n");
++  return blocked;
++}
++
 +
 +static void
 +cse_why_print (what, x, cost)
@@ -1188,18 +1158,11 @@
 +  fprintf (stderr, "\n");
 +}
 +
- #define NBUCKETS 31
- 
- /* Compute hash code of X in mode M.  Special-case case where X is a pseudo
-@@ -834,7 +851,44 @@
- 
- /* Make reg NEW equivalent to reg OLD.
-    OLD is not changing; NEW is.  */
-+
+@@ -839,0 +893,37 @@
 +/* Instrumentation: CSE_KEEP=r1,r2 never replaces those registers as a
 +   class's canonical register; CSE_NOCANON=N keeps pseudo N from becoming
 +   canonical; CSE_DEBUG=N traces make_regs_eqv for NEW >= N to stderr.  */
- 
++
 +static int
 +keep_reg_p (r)
 +     int r;
@@ -1233,13 +1196,7 @@
 +  return 0;
 +}
 +
- static void
- make_regs_eqv (new, old)
-      register int new, old;
-@@ -854,7 +908,17 @@
-      hard regs.  Among pseudos, if NEW will live longer than any other reg
-      of the same qty, and that is beyond the current basic block,
-      make it the new canonical replacement for this qty.  */
+@@ -859 +949,11 @@
 -  if (! (firstr < FIRST_PSEUDO_REGISTER && FIXED_REGNO_P (firstr))
 +  int debug_eqv = getenv ("CSE_DEBUG") && *getenv ("CSE_DEBUG") && new >= atoi (getenv ("CSE_DEBUG"));
 +  if (debug_eqv)
@@ -1252,39 +1209,15 @@
 +  if (!(getenv ("CSE_KEEP") && keep_reg_p (firstr))
 +      && !(getenv ("CSE_NOCANON") && *getenv ("CSE_NOCANON") && new == atoi (getenv ("CSE_NOCANON")))
 +      && ! (firstr < FIRST_PSEUDO_REGISTER && FIXED_REGNO_P (firstr))
-       /* Certain fixed registers might be of the class NO_REGS.  This means
- 	 that not only can they not be allocated by the compiler, but
- 	 they cannot be used in substitutions or canonicalizations
-@@ -892,6 +956,8 @@
-       reg_next_eqv[lastr] = new;
-       reg_prev_eqv[new] = lastr;
-     }
+@@ -896,0 +997,2 @@
 +  if (debug_eqv)
 +    fprintf (stderr, " head=%d\n", qty_first_reg[q]);
- }
- 
- /* Remove REG from its equivalence class.  */
-@@ -1362,6 +1428,7 @@
-   elt = get_element ();
-   elt->exp = x;
-   elt->cost = COST (x);
+@@ -1367,0 +1470 @@
 +  elt->born_uid = cse_cur_uid;
-   elt->next_same_value = 0;
-   elt->prev_same_value = 0;
-   elt->next_same_hash = table[hash];
-@@ -6039,6 +6106,8 @@
-   register int i;
-   rtx tem;
-   register int n_sets = 0;
-+
+@@ -6066,0 +6170,2 @@
 +  cse_cur_uid = INSN_UID (insn);
- 
- #ifdef HAVE_cc0
-   /* Records what this insn does to set CC0.  */
-@@ -6722,6 +6791,29 @@
-       if (dest == pc_rtx && src_const && GET_CODE (src_const) == LABEL_REF)
- 	src_folded = src_const, src_folded_cost = -1;
- 	  
++
+@@ -6748,0 +6854,23 @@
 +      if (getenv ("CSE_WHY") && atoi (getenv ("CSE_WHY")) == INSN_UID (insn))
 +	{
 +	  struct table_elt *q;
@@ -1308,13 +1241,10 @@
 +	  fprintf (stderr, "  (equal cost order: src_folded, src, src_eqv, src_related, then class in the order above)\n");
 +	}
 +
-       /* Terminate loop when replacement made.  This must terminate since
-          the current contents will be tested and will always be valid.  */
-       while (1)
-@@ -8187,6 +8279,39 @@
- 	        && (GET_CODE (q) != CODE_LABEL || LABEL_NUSES (q) != 0))
- 	      break;
- 
+@@ -6821,0 +6950,2 @@
++	  if (cse_subst_block_p (insn, old_src, trial))
++	    continue;
+@@ -8219,0 +8350,33 @@
 +	  /* Instrumentation: CSE_PATH=1 traces each jump cse could follow
 +	     into its target; CSE_NOFOLLOW=K refuses the K-th of them (counted
 +	     from 1 over the function, in the order they are met).  */
@@ -1348,23 +1278,13 @@
 +		    }
 +		}
 +	    }
- 	  /* If we ran into a BARRIER, this code is an extension of the
- 	     basic block when the branch is taken.  */
- 	  if (follow_jumps && q != 0 && GET_CODE (q) == BARRIER)
-@@ -8302,6 +8427,9 @@
-   register int i;
- 
-   cse_jumps_altered = 0;
+@@ -8335,0 +8499,5 @@
 +  follow_count = 0;
++  cse_subst_event = 0;
++  cse_subst_pass = after_loop ? 2 : 1;
 +  if (getenv ("CSE_DEBUG") || getenv ("CSE_WHY") || getenv ("CSE_PATH"))
 +    fprintf (stderr, "cse pass %d %s\n", after_loop ? 2 : 1, current_function_name);
-   recorded_label_ref = 0;
-   constant_pool_entries_cost = 0;
-   val.path_size = 0;
-@@ -8407,6 +8535,22 @@
-       cse_basic_block_start = val.low_cuid;
-       cse_basic_block_end = val.high_cuid;
-       max_qty = val.nsets * 2;
+@@ -8440,0 +8609,16 @@
 +
 +      /* CSE_PATHS=1 prints each extended block: its first and last insn and
 +	 the branches on its path (T taken, N not taken, A around).  */
@@ -1381,9 +1301,6 @@
 +		     : val.path[i].status == NOT_TAKEN ? 'N' : 'A');
 +	  fprintf (stderr, "\n");
 +	}
-       
-       if (file)
- 	fprintf (file, ";; Processing block from %d to %d, %d sets.\n",
 --- a/regmove.c
 +++ b/regmove.c
 @@ -1717,6 +1717,28 @@

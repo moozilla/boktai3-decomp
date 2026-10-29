@@ -9,9 +9,12 @@ class SearchKnobValidationTests(unittest.TestCase):
             {'AGBCC_PRI': 'variant:+100,159:-1'},
             {'AGBCC_FORCE': 'actor:7,143:6'},
             {'CSE_NOCANON': 'clamped'},
+            {'CSE_NOSUBST': '1:23,2:7'},
+            {'CSE_SUBST_TRACE': '1'},
             {'CSE_KEEP': 'clamped,143,variant'},
             {'AGBCC_NOPRE': '3'},
             {'AGBCC_NOMOVE': '42,98'},
+            {'AGBCC_NOLOCAL': '42,98'},
             {'AGBCC_SPILL': '44:1,51:-2'},
             {'AGBCC_SPILL_LABEL': 'reg22#1:2,=0#3:-1'},
             {'CSE_NOFOLLOW_JUMP': '545:1,851:2,902'},
@@ -40,7 +43,9 @@ class SearchKnobValidationTests(unittest.TestCase):
 
     def test_malformed_values_rejected(self):
         for knobs in ({'CSE_NOCANON': '22,143'}, {'AGBCC_SPILL': '44'},
-                      {'AGBCC_PRI': 'variant:+1junk'}, {'CSE_NOFOLLOW_JUMP': '545:3'}):
+                      {'AGBCC_PRI': 'variant:+1junk'}, {'CSE_NOFOLLOW_JUMP': '545:3'},
+                      {'CSE_NOSUBST': '542'}, {'CSE_NOSUBST': '3:4'},
+                      {'CSE_NOSUBST': '1:0'}):
             with self.subTest(knobs=knobs), self.assertRaises(ValueError):
                 validate_knobs(knobs)
 

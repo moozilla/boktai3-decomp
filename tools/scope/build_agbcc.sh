@@ -3,7 +3,7 @@
 # Separate from tools/agbcc-instr.sh, which other tools extend, so neither breaks the other.
 # It applies the patch to the agbcc source that tools/setup.sh fetched and
 # compiles with -O2 (about 1.8 times faster than agbcc's own -g build).
-# Without its environment variables (AGBCC_PRI, AGBCC_FORCE, AGBCC_SPILL, AGBCC_GCSE_T, AGBCC_NOTIE, CSE_KEEP, CSE_NOCANON, CSE_DEBUG, CSE_PATH, CSE_NOFOLLOW, AGBCC_NOPRE, AGBCC_PRE_TRACE, AGBCC_NOGIV, AGBCC_GIV, AGBCC_LOOP_TRACE, AGBCC_NOMOVE, AGBCC_NOSTRICT,
+# Without its environment variables (AGBCC_PRI, AGBCC_FORCE, AGBCC_SPILL, AGBCC_GCSE_T, AGBCC_NOTIE, CSE_KEEP, CSE_NOCANON, CSE_NOSUBST, CSE_SUBST_TRACE, AGBCC_NOLOCAL, CSE_DEBUG, CSE_PATH, CSE_NOFOLLOW, AGBCC_NOPRE, AGBCC_PRE_TRACE, AGBCC_NOGIV, AGBCC_GIV, AGBCC_LOOP_TRACE, AGBCC_NOMOVE, AGBCC_NOSTRICT,
 # AGBCC_DUMPPRI, AGBCC_SERVER) it emits the same code as agbcc: checked on
 # every C file in src/ and the guarded drafts. The ROM build never uses it.
 set -e
