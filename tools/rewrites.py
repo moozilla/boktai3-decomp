@@ -347,11 +347,38 @@ def rw_commute(fn):
 
 def rw_swap_stmts(fn):
     """Swap two adjacent statements (scheduling / evaluation order)."""
+    def effects(stmt):
+        # Only straight-line assignments with pure operands can commute here.
+        # Calls and control flow may observe/change any memory, and identifiers
+        # used to form an address still depend on earlier scalar assignments.
+        if not isinstance(stmt, ca.Assignment) or stmt.op != "=":
+            return None
+        nodes = list(walk(stmt))
+        if any(isinstance(n, (ca.FuncCall, ca.Assignment)) and n is not stmt
+               or isinstance(n, ca.UnaryOp) and n.op in ("p++", "p--", "++", "--")
+               for n, _, _ in nodes):
+            return None
+        target = stmt.lvalue
+        writes = {target.name} if isinstance(target, ca.ID) else set()
+        reads = {n.name for n, p, s in nodes if isinstance(n, ca.ID)
+                 and not (p is stmt and s == "lvalue")
+                 and not (isinstance(p, ca.StructRef) and s == "field")}
+        memory = any(isinstance(n, (ca.StructRef, ca.ArrayRef))
+                     or isinstance(n, ca.UnaryOp) and n.op == "*" for n, _, _ in nodes)
+        return reads, writes, not isinstance(target, ca.ID), memory
+
     bl = blocks(fn)
     for bi, b in enumerate(bl):
         for i in range(len(b.block_items) - 1):
             x, y = b.block_items[i], b.block_items[i + 1]
             if isinstance(x, (ca.Decl, ca.Label, ca.Return)) or isinstance(y, (ca.Decl, ca.Label)):
+                continue
+            ex, ey = effects(x), effects(y)
+            if ex is None or ey is None:
+                continue
+            rx, wx, mx, ax = ex
+            ry, wy, my, ay = ey
+            if wx & (ry | wy) or wy & (rx | wx) or mx and ay or my and ax:
                 continue
             f2 = copy.deepcopy(fn)
             b2 = blocks(f2)[bi]
