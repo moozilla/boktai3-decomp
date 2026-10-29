@@ -3,10 +3,10 @@
 
 // confidence=low: per-frame scene actor update: applies queued health costs, drives the overlay and body
 // collider state from the action flags, runs two countdowns, picks the palette bank, steps the effect
-// scale by effect mode, then runs the locked-camera or ambient-particle branch and the flash countdown.
-void SceneActors_SetHealth(void *, s32);
+// scale by effect mode, updates camera tracking and ambient particles, and advances the flash countdown.
+s32 SceneActors_SetHealth(void *, s32);
 void SceneActors_UpdateEffects(void *);
-void Collider_SetPosition(void *, void *, u32);
+void Collider_SetPosition(void *, void *, u16);
 s32 Collider_Refresh(void *);
 void SceneActorGraphics_UpdateVariant(void *);
 void ScaledShadow_Enable(void *);
@@ -14,167 +14,286 @@ void ScaledShadow_Disable(void *);
 s32 SceneActorGraphics_GetResourceId(void *);
 s32 SceneActorGraphics_GetDefaultResourceId(void *);
 void SceneActorGraphics_SelectResource(void *);
-void Palette_InterpolateBanks(void *, void *, void *, u32, u32);
+void Palette_InterpolateBanks(void *, void *, void *, s32, s32);
 void CameraTracking_Update(void *);
 void SceneActors_SpawnAmbientParticlePair(void *);
 void SceneActors_StopBackgroundFlash(void *);
 
-#ifdef NONMATCHING
-// fuzzy: 37.5%
-// scope shape 196 (differences once low registers are set aside)
-// confidence=low: per-frame scene actor update: applies queued health costs, drives the overlay and body
-// collider state from the action flags, runs two countdowns, picks the palette bank, steps the effect
-// scale by effect mode, then runs the locked-camera or ambient-particle branch and the flash countdown.
+struct FrameSprite {
+    u8 pad0[9];
+    u8 direction;
+    u8 padA[0x42];
+};
+union FrameFlags {
+    u32 value;
+    u8 bytes[4];
+};
+struct FrameBase {
+    u8 pad0[0x48];
+    struct FrameSprite sprite;
+    s16 health;
+    u8 pad96[6];
+    union FrameFlags flags;
+    u8 padA0[0x13];
+    u8 ambientMode;
+    u8 padB4[8];
+    u32 requestX, requestZ;
+    u8 padC4[0x20];
+    u32 ticks;
+};
+struct FrameCollider {
+    u8 pad0[6];
+    u16 flags;
+    u8 pad8[0x3a];
+    u8 direction;
+    u8 pad43[0x11];
+};
+struct FrameAnimation {
+    u8 pad0[8];
+    u32 flags;
+    u8 padC[0x14];
+};
+struct FrameCamera {
+    u8 pad0[0x20];
+    u32 flags;
+};
+struct FrameBlendState {
+    union {
+        struct {
+            u32 amount : 8;
+            u32 descending : 8;
+            u32 mode : 8;
+            u32 shift : 8;
+        } fields;
+        struct {
+            u8 amount;
+            u8 descending;
+            u8 mode;
+            u8 shift;
+        } bytes;
+    } control;
+    s32 resource;
+};
+struct VampireFrame {
+    struct FrameBase base;
+    u8 padE8[0x90];
+    struct FrameCollider body;
+    struct FrameCollider overlay;
+    u8 pad220[0x20];
+    struct FrameAnimation animation;
+    u8 position[8];
+    u8 pad268[0x20];
+    void *palette;
+    u8 pad28C[0x14];
+    u8 shadow[0xac];
+    u16 flashTimer;
+    u16 effectTimer;
+    u8 pad350[0x3c];
+    struct FrameBlendState blend;
+    u8 pad394[5];
+    u8 shakeAmplitude;
+    u8 pad39A[2];
+    s32 queuedHeal;
+    s32 queuedDamage;
+    u8 pad3A4[0x14];
+    u8 ambientParticles;
+    u8 pad3B9[7];
+    s32 flashFrames;
+    u8 paletteDefault[0x200];
+    u8 paletteNormal[0x200];
+    u8 paletteSpecial[0x200];
+    u8 pad9C4[0x1c];
+    struct FrameCamera camera;
+};
+
+static inline void Frame_AddFlags(struct FrameBase *p, u32 mask)
+{
+    p->flags.value |= mask;
+}
+static inline u32 Frame_TestFlags(struct FrameBase *p, u32 mask)
+{
+    return p->flags.value & mask;
+}
+#define Frame_SetColliderFlags(collider, mask) ((collider)->flags |= (mask))
+static inline void Frame_ClearColliderFlags(struct FrameCollider *collider, u32 mask)
+{
+    u32 keep = ~mask;
+    collider->flags = keep & collider->flags;
+}
+
+static inline void Frame_HideAnimation(struct FrameAnimation *animation)
+{
+    animation->flags |= 1;
+}
+static inline void Frame_ClearAnimationFlags(struct FrameAnimation *animation, u32 mask)
+{
+    u32 flags = animation->flags;
+    flags &= ~mask;
+    animation->flags = flags;
+}
+static inline void Frame_SetCameraFlags(struct FrameCamera *camera, u32 mask)
+{
+    camera->flags |= mask;
+}
+static inline void Frame_ClearCameraFlags(struct FrameCamera *camera, u32 mask)
+{
+    u32 keep = ~mask;
+    camera->flags &= keep;
+}
+
+static inline u8 Frame_ReadBlendAmount(struct FrameBlendState *blend)
+{
+    return blend->control.fields.amount;
+}
+
 void sub_080289FC(void *arg0)
 {
-    u8 *p = (u8 *)arg0;
-    u8 *b48 = p + 0x48;
-    u8 *ov = p + 0x1CC;
-    u8 *body;
-    u8 *dst;
-    u8 *b240;
-    u8 *b9E0;
-    u32 *flags = (u32 *)(p + 0x9C);
+    struct FrameBase *base = arg0;
+    struct VampireFrame *p = arg0;
+    struct FrameSprite *sprite = &base->sprite;
+    struct FrameCollider *collider;
     s32 cost;
-    s32 res;
-    s32 def;
-    u8 *effScale;
-    u8 *dur;
 
-    *flags |= 0x20;
-    cost = *(s32 *)(p + 0x39C);
+    Frame_AddFlags(base, 0x20);
+    cost = p->queuedHeal;
     if (cost != 0) {
-        SceneActors_SetHealth(p, *(s16 *)(p + 0x94) + cost);
-        *(s32 *)(p + 0x39C) = 0;
+        SceneActors_SetHealth(base, base->health + cost);
+        p->queuedHeal = 0;
     }
-    cost = *(s32 *)(p + 0x3A0);
+    cost = p->queuedDamage;
     if (cost != 0) {
-        SceneActors_SetHealth(p, *(s16 *)(p + 0x94) - cost);
-        *(s32 *)(p + 0x3A0) = 0;
+        SceneActors_SetHealth(base, base->health - cost);
+        p->queuedDamage = 0;
     }
-    SceneActors_UpdateEffects(p);
-    if (*(u16 *)(p + 0x34E) != 0) {
-        *flags |= 4;
-        *(u16 *)(p + 0x34E) -= 1;
+    SceneActors_UpdateEffects(base);
+    if (p->effectTimer != 0) {
+        Frame_AddFlags(base, 4);
+        p->effectTimer--;
     }
-
-    if (*flags & 4) {
-        *(u16 *)(ov + 6) |= 4;
+    collider = &p->overlay;
+    if (Frame_TestFlags(base, 4)) {
+        Frame_SetColliderFlags(collider, 4);
     } else {
-        *(u16 *)(ov + 6) &= ~4;
-        Collider_SetPosition(ov, p + 0x260, 0);
+        Frame_ClearColliderFlags(collider, 4);
+        Collider_SetPosition(collider, p->position, 0);
+        collider->direction = sprite->direction;
     }
-
-    body = p + 0x178;
-    *(u8 *)(p + 0x20E) = b48[9];
-    if (!(*flags & 8)) {
-        Collider_SetPosition(body, p + 0x260, 0);
-        *(u8 *)(p + 0x1BA) = b48[9];
+    collider = &p->body;
+    if (!Frame_TestFlags(base, 8)) {
+        Collider_SetPosition(collider, p->position, 0);
+        collider->direction = sprite->direction;
         SceneActorGraphics_UpdateVariant(p);
-        Collider_Refresh(body);
+        Collider_Refresh(collider);
     }
-
-    b240 = p + 0x240;
-    b9E0 = p + 0x9E0;
-    if (*flags & 0x10) {
-        *(u32 *)(b240 + 8) |= 1;
-        ScaledShadow_Disable(p + 0x2A0);
-        *(u32 *)(b9E0 + 0x20) &= ~1;
-        *(u16 *)(ov + 6) &= ~8;
+    if (Frame_TestFlags(base, 0x10)) {
+        Frame_HideAnimation(&p->animation);
+        ScaledShadow_Disable(p->shadow);
+        Frame_ClearCameraFlags(&p->camera, 1);
+        Frame_ClearColliderFlags(&p->overlay, 8);
     } else {
-        *(u32 *)(b240 + 8) &= ~1;
-        if (*(u8 *)(p + 0xB3) != 0) {
-            ScaledShadow_Enable(p + 0x2A0);
-            *(u32 *)(b9E0 + 0x20) &= ~1;
+        Frame_ClearAnimationFlags(&p->animation, 1);
+        if (base->ambientMode != 0) {
+            ScaledShadow_Enable(p->shadow);
+            Frame_ClearCameraFlags(&p->camera, 1);
         } else {
-            ScaledShadow_Enable(p + 0x2A0);
-            *(u32 *)(b9E0 + 0x20) |= 1;
+            ScaledShadow_Enable(p->shadow);
+            Frame_SetCameraFlags(&p->camera, 1);
         }
-        if (*flags & 0x20) {
-            *(u16 *)(ov + 6) |= 8;
+        if (Frame_TestFlags(base, 0x20)) {
+            Frame_SetColliderFlags(&p->overlay, 8);
         } else {
-            *(u16 *)(ov + 6) &= ~8;
+            Frame_ClearColliderFlags(&p->overlay, 8);
         }
     }
-
-    if (*(u8 *)(p + 0x399) != 0) {
-        *(u8 *)(p + 0x399) -= 1;
-        *flags |= 0x80000;
+    if (p->shakeAmplitude) {
+        p->shakeAmplitude--;
+        Frame_AddFlags(base, 0x20000);
     }
-
-    if (*(s16 *)(p + 0x34C) > 0) {
-        *(u16 *)(p + 0x34C) -= 1;
-        if (*(u16 *)(p + 0x34C) == 0) {
-            res = SceneActorGraphics_GetResourceId(p);
+    if ((s16)p->flashTimer > 0) {
+        p->flashTimer--;
+        if (p->flashTimer == 0) {
+            s32 res = SceneActorGraphics_GetResourceId(p);
             if (res == 0) {
-                dst = p + 0x5C4;
+                p->palette = p->paletteNormal;
             } else if (res == 1) {
-                dst = p + 0x7C4;
+                p->palette = p->paletteSpecial;
             } else {
-                dst = p + 0x3C4;
+                p->palette = p->paletteDefault;
             }
-            *(u8 **)(p + 0x288) = dst;
         }
     } else {
-        def = SceneActorGraphics_GetDefaultResourceId(p);
-        res = *(s32 *)(p + 0x390);
-        dst = p + 0x3C4;
-        effScale = p + 0x38C;
-        dur = p + 0x38F;
-        if (*(u8 *)(p + 0x38E) == 1) {
-            s32 ip = (s8)*effScale;
-            if (ip < (1 << *dur)) {
+        int zero = 0;
+        s32 def = SceneActorGraphics_GetDefaultResourceId(p);
+        s32 res = p->blend.resource;
+        if (p->blend.control.fields.mode == 1) {
+            int amount;
+            void *dst;
+            u8 *dur;
+            u8 *effScale = &p->blend.control.bytes.amount;
+            amount = (s8)*effScale;
+            dur = &p->blend.control.bytes.shift;
+            if (amount < (1 << *dur)) {
+                u8 *a;
+                u8 *b;
                 *effScale += 1;
-                Palette_InterpolateBanks(dst, gPaletteBankData + (def << 5),
-                                         gPaletteBankData + (res << 5), (s8)*effScale, *dur);
-                *(u8 **)(p + 0x288) = dst;
+                a = gPaletteBankData + (def << 5);
+                b = gPaletteBankData + (res << 5);
+                dst = p->paletteDefault;
+                Palette_InterpolateBanks(
+                    dst, a, b, (s8)Frame_ReadBlendAmount((struct FrameBlendState *)effScale), *dur);
+                p->palette = dst;
             }
-        } else if (*(u8 *)(p + 0x38E) == 2) {
+        } else if (p->blend.control.fields.mode == 2) {
+            void *dst;
+            u8 *effScale = &p->blend.control.bytes.amount;
             if ((s8)*effScale > 0) {
+                u8 *a;
+                u8 *b;
                 *effScale -= 1;
-                Palette_InterpolateBanks(dst, gPaletteBankData + (def << 5),
-                                         gPaletteBankData + (res << 5), (s8)*effScale, *dur);
-                *(u8 **)(p + 0x288) = dst;
+                a = gPaletteBankData + (def << 5);
+                b = gPaletteBankData + (res << 5);
+                dst = p->paletteDefault;
+                Palette_InterpolateBanks(
+                    dst, a, b, (s8)Frame_ReadBlendAmount((struct FrameBlendState *)effScale),
+                    p->blend.control.fields.shift);
+                p->palette = dst;
             } else {
                 SceneActorGraphics_SelectResource(p);
             }
-        } else if (*(u8 *)(p + 0x38E) == 3) {
-            s32 amt = (s8)*effScale;
-            Palette_InterpolateBanks(dst, gPaletteBankData + (def << 5),
-                                     gPaletteBankData + (res << 5), amt, *dur);
-            *(u8 **)(p + 0x288) = dst;
-            if (*(u8 *)(p + 0x38D) == 0) {
+        } else if (p->blend.control.fields.mode == 3) {
+            void *dst;
+            u8 *effScale;
+            u8 *a = gPaletteBankData + (def << 5);
+            u8 *b = gPaletteBankData + (res << 5);
+            dst = p->paletteDefault;
+            effScale = &p->blend.control.bytes.amount;
+            Palette_InterpolateBanks(dst, a, b, (s8)*effScale, p->blend.control.fields.shift);
+            p->palette = dst;
+            if (p->blend.control.fields.descending == 0) {
                 *effScale += 1;
-                if ((s8)*effScale > 0x1F) {
+                if ((s8)*effScale > 0x1f) {
                     *effScale = 0x20;
-                    *(u8 *)(p + 0x38D) = 1;
+                    p->blend.control.fields.descending = 1;
                 }
             } else {
                 *effScale -= 1;
                 if ((s8)*effScale <= 0) {
-                    *effScale = 0;
-                    *(u8 *)(p + 0x38D) = 0;
+                    *effScale = zero;
+                    p->blend.control.fields.descending = zero;
                 }
             }
         }
     }
-
-    if (*(u8 *)(p + 0xB3) == 0) {
-        CameraTracking_Update(p + 0x9E0);
-    } else if (*(u8 *)(p + 0x3B8) != 0 && (*(u32 *)(p + 0xE4) & 0xF) == 0) {
+    if (base->ambientMode == 0)
+        CameraTracking_Update(&p->camera);
+    if (base->ambientMode != 0 && p->ambientParticles && (base->ticks & 0xf) == 0)
         SceneActors_SpawnAmbientParticlePair(p);
-    }
-
-    if (*(s32 *)(p + 0x3C0) > 0) {
-        *(s32 *)(p + 0x3C0) -= 1;
-        if (*(s32 *)(p + 0x3C0) == 0) {
+    if (p->flashFrames > 0) {
+        p->flashFrames--;
+        if (p->flashFrames == 0)
             SceneActors_StopBackgroundFlash(p);
-        }
     }
-    *(u32 *)(p + 0xBC) = 0;
-    *(u32 *)(p + 0xC0) = 0;
-    *(u32 *)(p + 0xE4) += 1;
+    base->requestX = 0;
+    base->requestZ = 0;
+    base->ticks++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080289FC);
-#endif
