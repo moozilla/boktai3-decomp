@@ -2147,9 +2147,6 @@ static inline u8 *ProbeCellProps(s32 cell)
     return gTerrainMap->cells + (cell * 4 + 12);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 89.6%
-// scope shape 5 (differences once low registers are set aside)
 // confidence=low: state 6 of the actor's recovery pipeline: grab a tracked target in reach in
 // front (variant 1), otherwise advance to phase 5 once the animation ends or the ground 0x190
 // ahead is more than two tiles above or below.
@@ -2176,7 +2173,8 @@ void sub_08023FE8(State_08023F98 *p)
         r = sub_08022624(actor, actor[0x174], (struct BoxSearchPosition *)&min,
                          (struct BoxSearchPosition *)&max);
         if (r >= 0) {
-            u8 *q = (&(*(u8 **)gPlayers))[r];
+            u8 **players = (u8 **)gPlayers;
+            u8 *q = players[r];
             u32 mask = 0x40000;
             if (!(*(u32 *)(q + 0x20) & mask)) {
                 actor[0x395] = r;
@@ -2190,26 +2188,29 @@ void sub_08023FE8(State_08023F98 *p)
         s32 distance = 0x190;
         u8 *s = actor + 0x48;
         u8 *props;
+        struct ProbePos *at;
         u32 type;
         s32 h;
         u32 bad;
         ProbeProject(&pos, s[9], distance);
         ProbeAdd(&pos, (struct ProbePos *)(s + 0xc));
-        props = ProbeCellProps(ProbeCellAt(&pos));
+        at = &pos;
+        props = ProbeCellProps(ProbeCellAt(at));
         type = *props >> 4;
         h = (*props & 0xf) << 8;
         switch (type) {
             case 1:
-                h -= (u8)pos.z;
+                h -= (u8)at->z;
                 break;
             case 2:
-                h -= (u8)pos.x;
+                h -= (u8)at->x;
                 break;
         }
         {
             u32 d = h - *(s16 *)(actor + 0x352) + 0x1ff;
+            u32 bound = 0x2fe;
             bad = 0;
-            if (d > 0x3fe)
+            if (d > bound)
                 bad = 1;
         }
         if (bad || p->finished) {
@@ -2223,9 +2224,6 @@ void sub_08023FE8(State_08023F98 *p)
             p->elapsed++;
     }
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08023FE8);
-#endif
 
 struct S_0802429C {
     u8 f0[0x9a];
