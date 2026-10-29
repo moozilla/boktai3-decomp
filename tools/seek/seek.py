@@ -137,6 +137,9 @@ class Work:
             if not func:
                 sys.exit("no session: seek.py open FILE.c first (or -f FUNC)")
             self.target = None
+        alias = os.path.join(E.HOME, func or "", "alias")
+        if func and os.path.exists(alias):  # a ROM name (sub_XXXXXXXX) for a draft with a C name
+            func = open(alias).read().strip()
         self.sess = E.Session(func)
         self.sess.fold_updates()
         meta = os.path.join(self.sess.dir, "meta.txt")
@@ -147,6 +150,10 @@ class Work:
             self.target = E.Target(src, f)
         else:
             open(meta, "w").write(f"{self.target.src} {self.target.func}\n")
+            if self.target.rom_name != self.target.func:
+                d = os.path.join(E.HOME, self.target.rom_name)
+                os.makedirs(d, exist_ok=True)
+                open(os.path.join(d, "alias"), "w").write(self.target.func + "\n")
         set_current(self.target.func)
         self.ast = {}  # node id -> (pre, {name: FuncDef})
         self.jobs = int(os.environ.get("SEEK_JOBS", "1"))
@@ -192,7 +199,7 @@ class Work:
             return [compile_one(self.target, base_pre, t[0], t[4], rot, self.hint) for t in tasks]
         if self.pool is None:
             import multiprocessing as mp
-            self.pool = mp.get_context("spawn").Pool(jobs, _winit, (self.target.src, self.func))
+            self.pool = mp.get_context("spawn").Pool(jobs, _winit, (self.target.src, self.func, self.target.block))
         h = sha(base_pre)
         path = os.path.join(E.LOCAL, "cache", f"base-{h}.i")
         if not os.path.exists(path):
@@ -202,6 +209,31 @@ class Work:
         self.target.compiles += len(tasks)
         self.target.compile_time += time.time() - t0
         return out
+
+    def set_block(self, node, b):
+        """Restrict the objective to ROM block B of NODE's block map; returns the C lines behind it."""
+        import json
+        path = self.sess.materialize(node)
+        pre = self.target.preprocess_file(path)
+        code, _ = self.target.compile_pre(pre)
+        _, _, regs = self.target.detail(code)
+        if not 0 <= b < len(regs):
+            sys.exit(f"no block {b} (the map has {len(regs)})")
+        lo, hi = regs[b][0], regs[b][1]
+        self.target.block = (lo, hi)
+        sc = E.scope
+        (mine, addr, info), _ = E.capture(sc.compile_draft, path, self.func)
+        E.capture(sc.report, path, self.func, self.target.rom_code, addr, mine, info, 0)
+        rows = json.load(open(os.path.join(info["wd"], "diff.json")))
+        offs = {self.target.rom_rows[i][0] for i in range(lo, hi)}
+        lines, prev_in = set(), False
+        for r in rows:
+            inside = bool(r.get("rom_addr")) and int(r["rom_addr"], 16) - self.target.addr in offs
+            if (inside or (not r.get("rom_addr") and prev_in)) and str(r.get("line") or "").isdigit():
+                lines.add(int(r["line"]))
+            if r.get("rom_addr"):
+                prev_in = inside
+        return sorted(lines)
 
     def want_of(self, node):
         """The ROM's register per value, from the nearest file node above NODE."""
@@ -281,6 +313,7 @@ class Work:
         depth = node.get("depth", 0) + 1
         main = next(iter(defs))
         tasks = []
+        lineset = set(lines or ())
         r = node.get("rot")
         self.hint = r[1:] if r and r[0] == 0 else None
         for dname, fn in defs.items():
@@ -290,7 +323,7 @@ class Work:
                 if budget is not None and len(tasks) >= budget:
                     break
                 line = changed_line(fn, f2)
-                if lines and (line is None or not (lines[0] <= line <= lines[1])):
+                if lines and line not in lineset:
                     continue
                 try:
                     txt = R.text(f2)
@@ -424,11 +457,12 @@ _WT = None
 _WBASE = {}
 
 
-def _winit(src, func):
+def _winit(src, func, block=None):
     global _WT
     import signal
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     _WT = E.Target(src, func)
+    _WT.block = block
 
 
 def _wcompile(task):
@@ -489,6 +523,8 @@ def fmt_node(n, parent=None):
     semtxt = "" if not sem or sem == "unchecked" else ("  [sem ok]" if sem.startswith("EQUIV") else
                                                        "  [sem: " + sem.split(":")[0] + "]")
     al = ""
+    if OBJECTIVE["mode"] == "block" and n.get("blk") is not None:
+        al += f"  [block {n['blk']}]"
     if n.get("rot"):
         r = n["rot"]
         al += f"  [rotation: AGBCC_SPILL={r[1]}:{r[2]} matches]" if r[0] == 0 else "  [not rotation-only]"
@@ -612,8 +648,11 @@ def cmd_add(a):
 def parse_lines(s):
     if not s:
         return None
-    lo, _, hi = s.partition("-")
-    return [int(lo), int(hi or lo)]
+    out = set()
+    for part in s.split(","):
+        lo, _, hi = part.partition("-")
+        out.update(range(int(lo), int(hi or lo) + 1))
+    return sorted(out)
 
 
 def parse_fams(s):
@@ -641,6 +680,16 @@ def cmd_run(a):
     starts = [w.node(n) for n in a.nodes] if a.nodes else w.best(a.width)
     if isinstance(starts, dict):
         starts = [starts]
+    if a.block is not None:
+        a.objective = "block"
+        lines = w.set_block(starts[0], a.block)
+        a.lines = ",".join(map(str, lines)) if not a.lines else a.lines
+        print(f"block {a.block}: ROM +0x{w.target.rom_rows[w.target.block[0]][0]:X}-+0x"
+              f"{w.target.rom_rows[w.target.block[1] - 1][0]:X}; moves limited to C lines {a.lines}")
+        for n in starts:  # the start nodes' own block cost
+            pre, _ = w.pre_of(n)
+            code, _ = w.target.compile_pre(pre)
+            n["blk"] = w.target.evaluate(code).get("blk")
     if a.objective:
         OBJECTIVE["mode"] = a.objective
     if a.objective == "rotation":
@@ -966,6 +1015,8 @@ def main():
     p.add_argument("--objective", choices=["rotation", "block"], help="rotation: rank by the reload spill "
                    "shift still needed (AGBCC_SPILL=K:D); block: by one ROM block's cost (--block)")
     p.add_argument("--rot-max", type=int, help="rotation: test shifts on children with at most this diff")
+    p.add_argument("--block", type=int, help="work on one ROM block (its number in the block map): moves only on "
+                   "the C lines that produce it, ranked by its own cost first")
     p.add_argument("--fam")
     p.add_argument("--lines")
     p.set_defaults(go=cmd_run)

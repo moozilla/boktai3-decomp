@@ -212,6 +212,19 @@ def regions(rom, mine, pairs):
     return out
 
 
+def block_cost(pairs, lo, hi):
+    """Differing insns charged to ROM rows [lo, hi): ROM rows not exact, and draft-only rows after them."""
+    n, last = 0, -1
+    for x, y, t in pairs:
+        if x is not None:
+            last = x
+            if lo <= x < hi and t != "=":
+                n += 1
+        elif t == "+" and lo <= last < hi:
+            n += 1
+    return n
+
+
 def region_string(regs):
     return "".join(v for _, _, v, _ in regs)
 
@@ -305,6 +318,7 @@ class Target:
                               os.path.join(LOCAL, "cache"), fixup=scope.inline_macros)
         self.compiles = 0
         self.compile_time = 0.0
+        self.block = None  # (lo, hi) ROM rows: the block objective's region
         self._oracle = None
 
     # -- compiling
@@ -355,7 +369,7 @@ class Target:
             return {"ok": False, "key": [9999, 9999, 9999], "counts": "COMPILE FAILED"}
         if code == self.rom_code:
             return {"ok": True, "match": True, "key": [0, 0, 0], "counts": "MATCH", "regions": "",
-                    "size": len(code)}
+                    "size": len(code), "blk": 0}
         rows = scope.decode(code, self.addr, self.fast.data)
         pairs, _ = scope.align(self.rom_rows, rows)
         diff = sum(1 for _, _, t in pairs if t != "=")
@@ -363,8 +377,11 @@ class Target:
         sk, sk_lines = skeleton_diff(self.rom_skel, skeleton(rows, self.symnames))
         regs = regions(self.rom_rows, rows, pairs)
         counts = scope.count_text([{"tag": t} for _, _, t in pairs])
-        return {"ok": True, "match": False, "key": [sk, shape, diff], "counts": counts,
-                "regions": region_string(regs), "skeleton": sk_lines[:12], "size": len(code)}
+        out = {"ok": True, "match": False, "key": [sk, shape, diff], "counts": counts,
+               "regions": region_string(regs), "skeleton": sk_lines[:12], "size": len(code)}
+        if self.block:
+            out["blk"] = block_cost(pairs, *self.block)
+        return out
 
     def detail(self, code):
         rows = scope.decode(code, self.addr, self.fast.data)
