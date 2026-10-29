@@ -77,7 +77,8 @@ tree keeps the old best, and the search will expand around your new idea.
 ## Design notes (where this departs from docs/SEARCH_SPEC.md, and why)
 
 * **One node per distinct binary, not per program.** The space of C programs is infinite, but the
-  space of outputs a neighborhood reaches is small: on 19 drafts, 60-90% of moves changed no byte.
+  space of outputs a neighborhood reaches is small: on the drafts tried, about half of all moves
+  changed no byte, and many of the rest reproduced a binary already in the tree.
   Deduplicating by output (a transposition table) turns the tree into a graph over binaries and
   tells you, per family, which kinds of edit move this function at all.
 * **The determined part is checked, not lifted.** Instead of a lifted value graph, seek extracts
