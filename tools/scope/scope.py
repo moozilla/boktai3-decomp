@@ -336,8 +336,10 @@ def compile_draft(src, func, env=None):
     ENV adds knob settings (CSE_NOCANON=N, AGBCC_FORCE=..., see tools/scope/build_agbcc.sh).
     The dumps, uids and DWARF lines come from a -g compile. Without knobs the bytes are the real
     build's (no -g): where -g changes the code, those win and info["g_differs"] is set."""
-    mine, a, info = compile_draft_g(src, func, env)
+    # Resolve C names before the diagnostic compile. Resolving afterwards
+    # recompiles the baseline and overwrites the knobbed RTL and traces.
     env = resolve_knobs(src, func, env)
+    mine, a, info = compile_draft_g(src, func, env)
     if needs_g(env):  # a knob naming insn uids: the -g compile is the only one it means anything in
         if g_sensitive(src, func):
             info["g_only"] = True
