@@ -38,6 +38,31 @@ from romlib import ROOT, off  # noqa: E402
 import scope as _scope  # noqa: E402,F401
 
 
+_UNICORN_PROBE = """
+from unicorn import Uc, UC_ARCH_ARM, UC_MODE_THUMB
+uc = Uc(UC_ARCH_ARM, UC_MODE_THUMB)
+uc.mem_map(0x08000000, 0x1000)
+uc.mem_write(0x08000000, b"\\x01\\x20\\x70\\x47")  # movs r0, #1; bx lr
+uc.emu_start(0x08000001, 0x08000002)
+"""
+_unicorn_ok = None
+
+
+def unicorn_usable():
+    """Whether unicorn runs here. In some sandboxes (no JIT memory) it dies with SIGILL, which no
+    try/except catches, so probe it once in a child process. SEEK_SEM=0 skips semantics entirely."""
+    global _unicorn_ok
+    if os.environ.get("SEEK_SEM") == "0":
+        return False
+    if _unicorn_ok is None:
+        try:
+            r = subprocess.run([sys.executable, "-c", _UNICORN_PROBE], capture_output=True, timeout=30)
+            _unicorn_ok = r.returncode == 0
+        except Exception:  # noqa: BLE001
+            _unicorn_ok = False
+    return _unicorn_ok
+
+
 def sha(text):
     return hashlib.sha1(text.encode() if isinstance(text, str) else text).hexdigest()[:16]
 
@@ -414,6 +439,10 @@ class Target:
 
     # -- semantics
     def oracle(self, pre):
+        if self._oracle is None and not unicorn_usable():
+            self._oracle = False
+            print("(semcheck unavailable: unicorn cannot run here, e.g. in a sandbox without JIT; SEEK_SEM=0 skips the probe)",
+                  file=sys.stderr)
         if self._oracle is None:
             try:
                 import semcheck
