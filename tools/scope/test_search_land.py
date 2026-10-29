@@ -86,6 +86,9 @@ class LandingTests(unittest.TestCase):
              mock.patch("search_land.production_concessions", return_value={"verdict": "NONE_FOUND", "pins": 0, "barriers": 0}):
             result = search_land.land(self.session, self.node, {"exact": True, "experiment_build": "normal no-g build"})
         self.assertTrue(result["production_unit_match"])
+        done = json.loads((self.root / "build/scope/campaign/F/done").read_text())
+        self.assertTrue(done["match"])
+        self.assertTrue(done["production_unit_match"])
         self.assertTrue(self.session.events)
         self.assertNotIn("NONMATCHING", self.target.read_text())
 
@@ -101,6 +104,25 @@ class LandingTests(unittest.TestCase):
                     search_land.land(self.session, self.node, {"exact": True})
             self.assertEqual(self.target.read_text(), SOURCE)
             self.assertEqual(self.session.events, [])
+            self.assertFalse((self.root / "build/scope/campaign/F/done").exists())
+
+    def test_failed_done_write_rolls_back_verified_source(self):
+        worker = self.root / "build/scope/campaign/F"
+        def verify(args, **kwargs):
+            self.target.write_text("verified candidate")
+            return subprocess.CompletedProcess(args, 0, "F: unit MATCH", "")
+        original_write = search_land.write_atomic
+        def fail_done(path, text):
+            if Path(path) == worker / "done":
+                raise OSError("synthetic disk full")
+            return original_write(path, text)
+        with mock.patch("search_land.run_campaign", side_effect=verify), \
+             mock.patch("search_land.production_concessions", return_value={"verdict": "NONE_FOUND"}), \
+             mock.patch("search_land.write_atomic", side_effect=fail_done):
+            with self.assertRaises(OSError):
+                search_land.land(self.session, self.node, {"exact": True})
+        self.assertEqual(self.target.read_text(), SOURCE)
+        self.assertFalse((worker / "done").exists())
 
     def test_scratch_origin_needs_explicit_unit(self):
         with mock.patch.object(self.session, "metadata", return_value={"function": "F", "origin": "build/f.c"}):

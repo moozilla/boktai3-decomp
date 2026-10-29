@@ -114,6 +114,8 @@ def land(session, node, result, unit=None):
         original = target.read_bytes()
         landed_marker = worker / "landed"
         previous_landed = landed_marker.read_bytes() if landed_marker.exists() else None
+        done_marker = worker / "done"
+        previous_done = done_marker.read_bytes() if done_marker.exists() else None
         env = {k: v for k, v in os.environ.items()
                if not k.startswith(("AGBCC_", "CSE_", "SCOPE_TRANSFORM"))}
         env["PATH"] = str(ROOT / "build/venv/bin") + os.pathsep + env.get("PATH", "")
@@ -140,6 +142,9 @@ def land(session, node, result, unit=None):
             if needs_marker:
                 landed = marker + "\n" + landed
             write_atomic(target, landed)
+            write_atomic(done_marker, json.dumps(dict(match=True, node=node["id"],
+                unit=rel, production_unit_match=True,
+                candidate_concessions=result.get("concessions")), indent=2) + "\n")
             success = True
         finally:
             if not success:
@@ -148,6 +153,10 @@ def land(session, node, result, unit=None):
                     landed_marker.unlink(missing_ok=True)
                 else:
                     landed_marker.write_bytes(previous_landed)
+                if previous_done is None:
+                    done_marker.unlink(missing_ok=True)
+                else:
+                    done_marker.write_bytes(previous_done)
             if saved_revision is not None:
                 revision.write_bytes(saved_revision)
     session.note("Landed through campaign production unit verification.", node["id"], kind="landing",

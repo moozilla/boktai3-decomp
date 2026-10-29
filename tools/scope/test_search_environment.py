@@ -146,8 +146,11 @@ class SearchIntegrationTests(unittest.TestCase):
             self.command("import", source=str(self.source))
 
     def test_explicit_trace_reference_reports_refreshed_node(self):
+        from search_eval import Evaluator
         self.env.scope = types.SimpleNamespace(WORK="")
         self.env.materialize = lambda source, origin: self.source
+        self.env.trace_directory = lambda source, context: Evaluator.trace_directory(
+            types.SimpleNamespace(directory=self.path), source, context)
         old = self.command("status")["node"]
         self.env.version = 2
         with mock.patch("search_trace.collect", return_value={"allocations": [], "reloads": [],
@@ -155,6 +158,30 @@ class SearchIntegrationTests(unittest.TestCase):
             result = self.command("trace", node=old)
         self.assertNotEqual(result["node"], old)
         self.assertEqual(result["node"], self.command("status")["node"])
+
+    def test_diagnostics_preserve_other_source_context_and_query_evidence(self):
+        from search_eval import Evaluator
+        evaluator = Evaluator.__new__(Evaluator)
+        evaluator.directory = self.path / "diagnostics"
+        evaluator.directory.mkdir()
+        version = [1]
+        evaluator.context = lambda *args: {"compiler": version[0]}
+        def compile_dump(source, *args):
+            directory = Path(evaluator.scope.WORK)
+            directory.mkdir(parents=True, exist_ok=True)
+            (directory / "u.i.regmove").write_text(Path(source).read_text())
+        evaluator.scope = types.SimpleNamespace(cmd_why_all=compile_dump, cmd_frame=compile_dump)
+        first_source = "int F(void) { return 1; }"
+        evaluator.diagnose(first_source, "F", "src/f.c")
+        first = Path(evaluator.scope.WORK) / "u.i.regmove"
+        for source, view in (("int F(void) { return 2; }", "why"), (first_source, "frame")):
+            evaluator.diagnose(source, "F", "src/f.c", view)
+            self.assertNotEqual(Path(evaluator.scope.WORK) / "u.i.regmove", first)
+            self.assertEqual(first.read_text(), first_source)
+        version[0] = 2
+        evaluator.diagnose(first_source, "F", "src/f.c")
+        self.assertNotEqual(Path(evaluator.scope.WORK) / "u.i.regmove", first)
+        self.assertEqual(first.read_text(), first_source)
 
     def test_unchanged_function_abi_aliases_do_not_block_import(self):
         self.db = str(self.path / "aliases.sqlite3")

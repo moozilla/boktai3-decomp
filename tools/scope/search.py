@@ -325,13 +325,14 @@ def dispatch(request):
             from search_trace import collect, delta
             meta = session.metadata()
             evaluator = environment(path)
-            evaluator.scope.WORK = str(path.parent / "compiler/traces")
             def snapshot(node_ref):
                 node, _, _ = evaluate(session, node_ref, {})
                 stored = session.evaluation(node["id"], evaluator="trace")
                 if stored and not request.get("force"):
                     return node["id"], stored["result"]
-                source_path = evaluator.materialize(session.source(node["id"]), meta["origin"])
+                source = session.source(node["id"])
+                evaluator.scope.WORK = str(evaluator.trace_directory(source, session.context(node["id"])))
+                source_path = evaluator.materialize(source, meta["origin"])
                 captured = io.StringIO()
                 with contextlib.redirect_stdout(captured), contextlib.redirect_stderr(captured):
                     result = collect(evaluator.scope, str(source_path), meta["function"])
@@ -347,7 +348,9 @@ def dispatch(request):
                 cached = None if request.get("force") else session.evaluation(node["id"], evaluator="priority", options=options)
                 if cached:
                     return cached["result"]
-                source_path = evaluator.materialize(session.source(node["id"]), meta["origin"])
+                source = session.source(node["id"])
+                evaluator.scope.WORK = str(evaluator.trace_directory(source, session.context(node["id"])))
+                source_path = evaluator.materialize(source, meta["origin"])
                 captured = io.StringIO()
                 with contextlib.redirect_stdout(captured), contextlib.redirect_stderr(captured):
                     trace = collect(evaluator.scope, str(source_path), meta["function"])
@@ -364,7 +367,9 @@ def dispatch(request):
                 if cached:
                     result = cached["result"]
                     return result if request.get("details") else compact_demand(result, request.get("limit") or 6)
-                source_path = evaluator.materialize(session.source(node["id"]), meta["origin"])
+                source = session.source(node["id"])
+                evaluator.scope.WORK = str(evaluator.trace_directory(source, session.context(node["id"])))
+                source_path = evaluator.materialize(source, meta["origin"])
                 captured = io.StringIO()
                 with contextlib.redirect_stdout(captured), contextlib.redirect_stderr(captured):
                     trace = collect(evaluator.scope, str(source_path), meta["function"])

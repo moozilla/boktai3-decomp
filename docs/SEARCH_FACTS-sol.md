@@ -41,3 +41,18 @@ current file:line references.
   Scope now resolves unique names for `CSE_NOCANON`/`CSE_KEEP`, as for PRI/FORCE;
   search rejects unsupported UID/event formats. `AGBCC_NOPRE` accepts one event,
   not a comma list. `AGBCC_SPILL_LABEL` requires a `label#occurrence:shift`.
+
+* **A register mismatch can originate before allocation.** In the pin-free
+  EffectPool_UpdateEntry investigation, CSE1 placed a constant mask second;
+  `regmove.c:fixup_match_1` then overwrote a dead input with the AND result and
+  rewrote its dying compare use. Changing priorities could not restore the
+  missing copy. Typed byte extraction and sampled byte/halfword reads recovered
+  the actual access boundaries. A signed-byte probe instead emitted LDRSB and
+  merely traded instructions; a lower count was not a structural explanation.
+* **A cached value can change a singleton conditional's subtraction.**
+  `expr.c:expand_expr` recognizes `condition ? A - 1 : A`, copies A to a target,
+  then conditionally updates it. In EffectPool, a named cached field left a
+  three-operand SUB; selecting directly from the halfword field retained the
+  two-operand decrement. A direct preincrement comparison also preserved the
+  timer's duration-load order. These ordinary C changes completed an exact
+  production match with zero register pins or asm barriers.

@@ -333,9 +333,14 @@ class Evaluator:
             staged.replace(path)
         return path
 
+    def trace_directory(self, source, context, view="trace"):
+        # A selected-node query must not overwrite another node's compiler
+        # evidence while a worker is reading it. Fast compiles create no dumps.
+        key = digest(source + json.dumps(context, sort_keys=True))
+        return self.directory / "traces" / key / view
+
     def evaluate(self, source, function, origin, knobs=None, semantic_trials=0, expected_context=None):
         s = self.scope
-        s.WORK = str(self.directory / "traces")
         knobs = dict(knobs or {})
         validate_knobs(knobs)
         # Neither the caller's environment nor a prior experiment may influence exact.
@@ -345,6 +350,7 @@ class Evaluator:
         start = time.perf_counter()
         try:
             actual_context = self.context(source, function, origin)
+            s.WORK = str(self.trace_directory(source, actual_context))
             if expected_context is not None and expected_context != actual_context:
                 raise StaleContextError("Compiler inputs changed before compilation; refresh the session context.")
             path = self.materialize(source, origin)
@@ -439,7 +445,8 @@ class Evaluator:
 
     def diagnose(self, source, function, origin, command="why", argument="all"):
         s = self.scope
-        s.WORK = str(self.directory / "traces")
+        view = command + "-" + digest(argument)[:16]
+        s.WORK = str(self.trace_directory(source, self.context(source, function, origin), view))
         path = self.materialize(source, origin)
         output = io.StringIO()
         saved = {k: os.environ.pop(k) for k in list(os.environ)

@@ -6,6 +6,13 @@ Worker entry point: [SEARCH_HOWTO-sol.md](../docs/SEARCH_HOWTO-sol.md).
 The implementation is `tools/scope/search.py` and its `search_*.py` modules.
 Runtime evidence and whole-source snapshots live only in `build/search-sol/`.
 
+Further queue continuation produced an ordinary match: **EffectPool_UpdateEntry**,
+verified through campaign landing with zero pins and zero asm barriers. Its
+800 bytes add **0.0332 percentage points** of code coverage. All 15 inherited register pins and 8 asm barriers were removed. The final source retains sampled
+volatile byte flags and halfword command accesses; experimental complex-mode
+representations are absent. Queue completion now means verified MATCH only.
+
+
 ## Design decisions
 
 The model chooses the policy. Each node is immutable source plus compiler context;
@@ -40,8 +47,9 @@ quantity birth/death coordinates and computes rank thresholds under fixed metric
 Exact reload need vectors, victim decisions and every quantity's tied members
 still need additional compiler instrumentation; these gaps are explicit.
 
-The resident uses an atomic filesystem mailbox because this sandbox denies Unix
-socket binding. Requests release scope's dump locks, and code changes restart the
+Each session has its own atomic filesystem mailbox because this sandbox denies
+Unix socket binding. Independent functions no longer serialize long diagnostics.
+Raw compiler evidence is isolated by source, context and query. Requests release scope's dump locks, and code changes restart the
 resident at request boundaries. Source materializations are content-addressed,
 preventing concurrent clients from compiling another client's mutable file.
 Compiler/CPP/assembler flags and binaries, headers, symbols, ROM/ELF, loaded
@@ -121,3 +129,27 @@ session interface. Prototype-based call contracts must be explicit assumptions;
 unknown arity currently remains visible rather than treating stale r0-r3 values
 as proven arguments. Restore a working emulator backend and exercise semantic
 counterexamples on actual execution before using trials for more than evidence.
+
+## Further queue evidence
+
+EffectPool_UpdateEntry started at 10/10 with 15 pins and 8 barriers. A fully stripped
+source was 62/60. A vector helper with distinct destination/source roles and scoped
+axis values improved to 49/47; a byte-mask helper improved to 22/20. Matching sampled flag
+and command access widths/order restored the two missing copies; direct duration
+decode and direct preincrement timer comparison left one subtraction. Direct field
+selection, rather than a cached local, completed MATCH. The graph retains failed
+representation/type/control-flow hypotheses, including signed loads and complex
+containers that traded counts without reproducing the desired structure.
+
+Cleanup retained MATCH after unused work variables and offset scaffolding were
+removed. The production merger initially rejected an edited scratch root as its
+merge base; initializing a landing session from the actual source unit and importing
+the exact candidate provided the genuine three-way ancestor. Production unit MATCH
+then succeeded. Landing now stamps done only after this check and restores it on
+failure; compiler traces cannot overwrite another source/context/query's evidence.
+
+Compiler-source additions CSE_NOSUBST=pass:event and AGBCC_NOLOCAL=member-pseudo
+answer narrower questions than register forcing. The former restored one Ratatosk
+ADDRESSOF rematerialization and was verified against both debug and ordinary event
+streams. Both private compiler revisions passed fastcheck 40 with 40 same and 0
+different. These counterfactual results remain separate from ordinary matches.

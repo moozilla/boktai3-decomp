@@ -196,7 +196,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/SCENE_RANGE_WATCH.md](../docs/SCENE_RANGE_WATCH.md) | Scene range watcher (tentative) | *#scripts #scene* | 2 |
 | [docs/SCENE_STATE_QUERIES.md](../docs/SCENE_STATE_QUERIES.md) | Scene state, spatial queries and pair records (tentative) | *#actors #scene* | 4 |
 | [docs/SCRIPT_TRACING.md](../docs/SCRIPT_TRACING.md) | Script calls in a running game | *#scripts #actors #tooling* | 7 |
-| [docs/SEARCH_FACTS-sol.md](../docs/SEARCH_FACTS-sol.md) | Non-obvious agbcc search facts | #matching #compiler #tooling | 3 |
+| [docs/SEARCH_FACTS-sol.md](../docs/SEARCH_FACTS-sol.md) | Non-obvious agbcc search facts | #matching #compiler #tooling | 4 |
 | [docs/SEARCH_HOWTO-sol.md](../docs/SEARCH_HOWTO-sol.md) | Stateful matching search (Sol) | #tooling #matching #compiler | 5 |
 | [docs/SEARCH_SPEC.md](../docs/SEARCH_SPEC.md) | A matching search engine: spec and brief (2026-10-28) | #tooling #matching #compiler #process | 24 |
 | [docs/SHIFTABILITY.md](../docs/SHIFTABILITY.md) | Shiftable data: how it was proven | #tooling #assets | 1 |
@@ -222,7 +222,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-23-cx-sol08.md](../docs/history/2026-10-23-cx-sol08.md) | 2026-10-23 — cx-sol08 actor campaign batch | #actors #compiler-debugger #matching #mimic #particles #register-pinning #weather | 2 |
 | [docs/history/2026-10-23.md](../docs/history/2026-10-23.md) | Campaign sol05 session 2 wrap-up | #actors #animation #axe #bosses #camera #campaign #charge #compiler #effect-pool #effects #hresvelgr #inventory #ivy #linked-effect #map-menu #matching #monster-book #monsters #mummy #nidhoggr #nonmatching #palette #particles #player #ratatosk #reactions #register-pinning #registry-f3e4 #scene-actor #scene-actors #scene-npc #screamer #script-combat-actor #singleton-slot7 #slime #spider #sprite-effects #tentacle #terrain #vanargand #wireless | 19 |
 | [docs/history/2026-10-27.md](../docs/history/2026-10-27.md) | Work history: 2026-10-27 | #matching #ram #tooling | 1 |
-| [docs/history/2026-10-29.md](../docs/history/2026-10-29.md) | 2026-10-29 | #compiler #matching #process #tooling | 1 |
+| [docs/history/2026-10-29.md](../docs/history/2026-10-29.md) | 2026-10-29 | #compiler #hresvelgr #matching #process #tooling | 1 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
@@ -384,7 +384,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/script-selector-display_2026-10-14.md](../notes/script-selector-display_2026-10-14.md) | Script selector and shared display animation | *#scripts #animation* | 7 |
 | [notes/script-utility_2026-10-14.md](../notes/script-utility_2026-10-14.md) | Script utility commands and reference ABI | *#scripts #inventory* | 3 |
 | [notes/script_virtual_machine.md](../notes/script_virtual_machine.md) | Script virtual machine, merged unit | *#scripts* | 8 |
-| [notes/search-sol_2026-10-29.md](../notes/search-sol_2026-10-29.md) | Stateful matching search engine (Sol) | #matching #tooling #compiler #process | 8 |
+| [notes/search-sol_2026-10-29.md](../notes/search-sol_2026-10-29.md) | Stateful matching search engine (Sol) | #matching #tooling #compiler #process | 10 |
 | [notes/selection_menu.md](../notes/selection_menu.md) | Selection menu unit (tentative) | #selection-menu #translation-unit #matching | 5 |
 | [notes/shake-icon-display_2026-10-14.md](../notes/shake-icon-display_2026-10-14.md) | Short-lived shaking keyframe icon |  | 2 |
 | [notes/sol-family-push-2.md](../notes/sol-family-push-2.md) | Sol family push 2 |  | 3 |

@@ -188,6 +188,7 @@ def _collect(scope, src, function, env=None):
     _, _, sizes = scope.inventory()
     target = scope.rom_bytes()[scope.off(address):scope.off(address) + sizes[scope.rom_name(str(src), function)]]
     return {"schema": 1, "function": function, "source_hash": hashlib.sha256(Path(src).read_bytes()).hexdigest(),
+            "artifacts": os.path.relpath(wd, structure.ROOT),
             "compile_ms": round((time.perf_counter() - started) * 1000, 3), "code_hash": hashlib.sha256(code).hexdigest(),
             "exact": code == target, "trace_matches_build": not bool(info.get("g_differs") or info.get("g_only")),
             "trace_compile": "-g -dp -da instrumented agbcc", "pass_order": list(scope.PASSES), "passes": passes,
