@@ -310,6 +310,13 @@ consume r0–r3 and memory.
 
 ### Stack transport and large-function boundaries
 
+For an exact instruction structure whose only differences are private stack
+offsets, first verify a slot bijection and the compiler's PRE creation order.
+The [scope stack-order explanation](../scope/PRE_STACK_ORDER.md) records the
+hash/table mechanism, collision ordering, rejection conditions, and the two
+large-function matches. Byte distance can remain unchanged across source
+states with materially different ordering constraints.
+
 `stackflow.py` tracks stack offsets, widths, overlapping stores, SP changes,
 push/pop, joins, and loops. It keeps the original physical dependency graph and
 adds `transport_dependencies` separately. A proved identity reload can refer to
