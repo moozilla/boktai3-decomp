@@ -1,0 +1,40 @@
+#ifndef GUARD_SCENE_ACTOR_CHASE_REACTION_H
+#define GUARD_SCENE_ACTOR_CHASE_REACTION_H
+
+/* Shared pursuit/contact operations. Value-domain and field-ownership interfaces
+ * are selected by the consumer before inclusion; the operation bodies live once.
+ * The verified combinations are recorded in docs/SHARED_MONSTER_REACTIONS.md. */
+#ifndef SCENE_ACTOR_CHASE_TYPED_GROUP
+#define SCENE_ACTOR_CHASE_TYPED_GROUP 0
+#endif
+#ifndef SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH
+#define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH 0
+#endif
+#ifndef SCENE_ACTOR_CHASE_WIDE_STATE
+#define SCENE_ACTOR_CHASE_WIDE_STATE 0
+#endif
+#ifndef SCENE_ACTOR_CHASE_FRACTION_ACCESSOR
+#define SCENE_ACTOR_CHASE_FRACTION_ACCESSOR 0
+#endif
+#ifndef SCENE_ACTOR_CHASE_SCALAR_CELLS
+#define SCENE_ACTOR_CHASE_SCALAR_CELLS 0
+#endif
+#ifndef SCENE_ACTOR_CHASE_JOIN_ROUTE_FAILURES
+#define SCENE_ACTOR_CHASE_JOIN_ROUTE_FAILURES 0
+#endif
+#ifndef SCENE_ACTOR_CHASE_DIRECT_ROUTE_FIELDS
+#define SCENE_ACTOR_CHASE_DIRECT_ROUTE_FIELDS 0
+#endif
+
+#include "scene_actor_chase_shared.h"
+#include "scene_actor_chase_step.h"
+
+#undef SCENE_ACTOR_CHASE_TYPED_GROUP
+#undef SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH
+#undef SCENE_ACTOR_CHASE_WIDE_STATE
+#undef SCENE_ACTOR_CHASE_FRACTION_ACCESSOR
+#undef SCENE_ACTOR_CHASE_SCALAR_CELLS
+#undef SCENE_ACTOR_CHASE_JOIN_ROUTE_FAILURES
+#undef SCENE_ACTOR_CHASE_DIRECT_ROUTE_FIELDS
+
+#endif
