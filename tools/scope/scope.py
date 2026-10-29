@@ -306,7 +306,7 @@ def resolve_knobs(src, func, env):
     for k in ("AGBCC_PRI", "AGBCC_FORCE"):
         if k not in env and os.environ.get(k):
             env[k] = os.environ[k]
-    keys = [k for k in ("AGBCC_PRI", "AGBCC_FORCE") if re.search(r"(^|,)[A-Za-z_]", env.get(k, ""))]
+    keys = [k for k in ("AGBCC_PRI", "AGBCC_FORCE") if re.search(r"(^|,)=?[A-Za-z_]", env.get(k, ""))]
     if not keys:
         return env
     saved = {k: os.environ.pop(k) for k in keys if k in os.environ}
