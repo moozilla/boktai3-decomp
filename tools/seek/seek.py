@@ -317,7 +317,12 @@ class Work:
                   f"(moves start from the regenerated form: {self.target.evaluate(base_code)['counts']})")
             own_out = sha(base_code)
         seen_src = set()
-        stats = {"variants": 0, "neutral": 0, "known": 0, "failed": 0, "new": 0, "fam": {}}
+        sig = (tuple(sorted(families)) if families else None, tuple(lines) if lines else None)
+        tried = {h for e in self.sess.events if e.get("kind") == "expand" and e.get("node") == node["id"]
+                 and (tuple(e["families"]) if e.get("families") else None,
+                      tuple(e["lines"]) if e.get("lines") else None) == sig for h in e.get("tried", [])}
+        stats = {"variants": 0, "neutral": 0, "known": 0, "failed": 0, "new": 0, "fam": {},
+                 "complete": True, "tried": []}
         children = []
         file_hash = node["file"]
         depth = node.get("depth", 0) + 1
@@ -331,8 +336,7 @@ class Work:
         for dname, fn in defs.items():
             for fam, desc, f2 in M.all_moves(fn, families):
                 if (budget is not None and len(tasks) >= budget) or (deadline is not None and time.time() >= deadline):
-                    break
-                if deadline is not None and time.time() >= deadline:
+                    stats["complete"] = False
                     break
                 line = changed_line(fn, f2)
                 if lines and line not in lineset:
@@ -342,9 +346,10 @@ class Work:
                 except Exception:  # noqa: BLE001
                     continue
                 h = sha(txt)
-                if h in seen_src:
+                if h in seen_src or h in tried:
                     continue
                 seen_src.add(h)
+                stats["tried"].append(h)
                 tasks.append((dname, fam, desc, f2, txt, line))
         stats["variants"] = len(tasks)
         for (dname, fam, desc, f2, txt, line), res in zip(tasks, self.compile_all(base_pre, tasks)):
@@ -402,6 +407,7 @@ class Work:
         heap, tick = [], 0
         sig = (tuple(sorted(families)) if families else None, tuple(lines) if lines else None)
         done = {e["node"] for e in self.sess.events if e.get("kind") == "expand"
+                and e.get("complete", True)
                 and (tuple(e["families"]) if e.get("families") else None, tuple(e["lines"]) if e.get("lines") else None) == sig}
         for n in starts:
             heapq.heappush(heap, (rank(n), n.get("awrong", 0), n.get("depth", 0), tick, n["id"]))
@@ -564,6 +570,8 @@ def print_expand(w, node, children, st):
     print(f"expand n{node['id']} ({fmt_key(key_of(node))}): {st['variants']} variants in {st['seconds']}s -> "
           f"{st['new']} new outputs, {st['neutral']} no code change, {st['known']} already in the tree, "
           f"{st['failed']} compile errors")
+    if not st.get("complete", True):
+        print("  partial expansion: search limit reached; later runs can try the remaining moves")
     moving = [f"{f} {v[1]}/{v[0]}" + (f" ({v[2]} better)" if v[2] else "") for f, v in sorted(st["fam"].items())
               if v[1]]
     still = [f for f, v in sorted(st["fam"].items()) if not v[1]]
