@@ -8,6 +8,8 @@
   seek.py expand N [--fam F,..] [--lines A-B] [--top K]   every move at node N, compiled and ranked
   seek.py run [N..] [--budget C] [--seconds S] [--fam F,..] [--lines A-B]   best-first search from N
                                       (default: the best nodes), until MATCH or the budget
+  seek.py run N --alloc absY:r7,mode:mem   explicit allocation targets first, then byte distance;
+                                      useful when spill/access facts depend on the allocation
   seek.py show N [--diff]             a node: layers, skeleton gaps, block map, C diff from its parent
                                       (--diff: scope's full listing)
   seek.py values N                    allocation of every named value: draft register, the ROM's, priority
@@ -507,6 +509,12 @@ def _wcompile(task):
 OBJECTIVE = {"mode": None}
 
 
+def allocation_misses(n):
+    """Explicit policy targets, including missing values (which cannot satisfy a target)."""
+    alloc = n.get("alloc", {})
+    return [name for name, reg in OBJECTIVE.get("alloc", {}).items() if alloc.get(name) != reg]
+
+
 def rank(n):
     """The order the search and every listing use. Structure first (determined facts missed), then
     shape + differing insns together, so a node never ranks above another with both more shape and
@@ -526,6 +534,10 @@ def rank(n):
     if n.get("_unverified"):
         return (9998, cost, k[1], k[2])
     mode = OBJECTIVE["mode"]
+    if mode == "allocation":
+        # Spill/access facts depend on allocation, so do not put skeleton distance ahead of
+        # the explicit register targets. This objective guides search; only bytes prove a match.
+        return (len(allocation_misses(n)), cost, k[1], k[0])
     if mode == "rotation" and n.get("rot"):
         r = n["rot"]  # [diff after the best single shift, K, D]
         return (k[0], r[0], r[2] if r[0] == 0 else 99, cost)
@@ -560,6 +572,8 @@ def fmt_node(n, parent=None):
     if n.get("_unverified"):
         semtxt += "  [unchecked move: review before expanding]"
     al = ""
+    if OBJECTIVE["mode"] == "allocation":
+        al += f"  [wanted allocation {len(allocation_misses(n))} off]"
     if OBJECTIVE["mode"] == "block" and n.get("blk") is not None:
         al += f"  [block {n['blk']}]"
     if n.get("rot"):
@@ -712,6 +726,24 @@ def parse_fams(s):
     return fams
 
 
+def parse_allocation(s):
+    out = {}
+    aliases = {"mem": -1, "ip": 12, "fp": 11, "sl": 10, "sb": 9, "sp": 13, "lr": 14}
+    for item in s.split(","):
+        name, sep, value = item.rpartition(":")
+        value = value.strip().lower()
+        if value in aliases:
+            reg = aliases[value]
+        elif re.fullmatch(r"r?(?:[0-9]|1[0-5])", value):
+            reg = int(value.removeprefix("r"))
+        else:
+            sys.exit(f"invalid allocation target {item!r}; use NAME:rN or NAME:mem")
+        if not sep or not name.strip() or name.strip() in out:
+            sys.exit(f"invalid or repeated allocation target {item!r}")
+        out[name.strip()] = reg
+    return out
+
+
 def cmd_expand(a):
     w = Work(a.f)
     if a.objective == "rotation":
@@ -724,6 +756,11 @@ def cmd_expand(a):
 
 def cmd_run(a):
     w = Work(a.f)
+    if a.alloc:
+        if a.objective or a.block is not None:
+            sys.exit("--alloc supplies its own objective; do not combine it with --objective/--block")
+        OBJECTIVE["mode"] = "allocation"
+        OBJECTIVE["alloc"] = parse_allocation(a.alloc)
     starts = [w.node(n) for n in a.nodes] if a.nodes else w.best(a.width)
     if isinstance(starts, dict):
         starts = [starts]
@@ -1082,6 +1119,8 @@ def main():
     p.add_argument("--rot-max", type=int, help="rotation: test shifts on children with at most this diff")
     p.add_argument("--block", type=int, help="work on one ROM block (its number in the block map): moves only on "
                    "the C lines that produce it, ranked by its own cost first")
+    p.add_argument("--alloc", help="rank by explicit named allocation targets before byte distance, e.g. "
+                   "absY:r7,absX:r8,mode:mem; missing names count as misses; does not change matching")
     p.add_argument("--fam")
     p.add_argument("--lines")
     p.set_defaults(go=cmd_run)
