@@ -419,7 +419,10 @@ def compile_draft_g(src, func, env=None):
         os.remove(names)
     # -Wuninitialized changes no code (150 units compared); a draft reading a variable it never set
     # compiles to plausible bytes, so say so
-    r = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "-dp", "-da", "-Wuninitialized", "u.i", "-o", "u.s"],
+    # Use assembler label differences for DWARF lengths. The legacy size
+    # estimator undercounts some large inline line programs (dwarf2out.c:
+    # size_of_line_info); its truncated unit then breaks the line reader.
+    r = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "-ffix-debug-line", "-dp", "-da", "-Wuninitialized", "u.i", "-o", "u.s"],
                        cwd=wd, capture_output=True, text=True,
                        env=dict(os.environ, AGBCC_DUMPPRI=names, **(env or {})))
     open(os.path.join(wd, "stderr.txt"), "w").write(r.stderr)
