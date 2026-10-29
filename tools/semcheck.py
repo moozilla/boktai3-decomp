@@ -173,6 +173,10 @@ class Run:
         self.reads = {}  # address -> pc of the first read (outside the stack and the function's own code)
         self.blocks = set()
         self.status = "ok"
+        if os.environ.get("CODEX_SANDBOX") == "seatbelt":
+            # Codex's seatbelt sandbox allows no JIT memory: unicorn dies with SIGILL (and macOS shows a
+            # crash dialog) instead of raising, so refuse before touching it.
+            raise RuntimeError("unicorn cannot run in Codex's seatbelt sandbox (no JIT memory)")
         uc = unicorn.Uc(unicorn.UC_ARCH_ARM, unicorn.UC_MODE_THUMB)
         self.uc = uc
         map_rom(uc, image, overlay)
