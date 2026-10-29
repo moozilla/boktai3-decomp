@@ -58,16 +58,18 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 
 Recent:
 
-* **Largest-function match completed** (2026-10-29): `Golem_UpdateHitReaction`
-  (`080C9C04`) now matches all 8,764 bytes in ordinary C, with no target pins,
-  barriers, or compiler overrides. Typed records and real helper ownership close
-  the RNG spill, shared tails, and all 61 private address-slot positions. Stock
-  and full-unit checks, 82 directed cases, 135 layout assertions, and the combined
-  ROM/RAM-literal build pass. The C is active in the normal build. Vorn `080AEB74`
-  remains exact. Matching-tool context, semantic-process isolation, worker actions,
-  and rollback checks incorporate the review
-  ([completion evidence](../notes/matching-search-completion_2026-10-29.md),
-  [earlier scale work](../notes/matching-search-scale_2026-10-29.md)).
+* **Second-largest match completed** (2026-10-29): `Skeleton_ReactToContact`
+  (`080C12FC`, formerly `Golem_ReactToContact`) matches all 6,372 bytes in ordinary
+  C, with no pins, barriers, or compiler overrides. Measured PRE constraints
+  resolve 45 generated address slots. Independent stock/full-unit checks,
+  117 directed cases, and 183 layout assertions pass. Both this function and
+  the earlier 8,764-byte `Golem_UpdateHitReaction` (`080C9C04`) use the shared
+  actor layout; remaining compiler-sensitive helper choices are documented.
+  Vorn `080AEB74` remains exact. This checkout predates the user's parallel
+  upstream integrations; refresh aggregate reports on the integration branch
+  ([contact result](../notes/matching-search-contact_2026-10-29.md),
+  [PRE ordering guide](../tools/scope/PRE_STACK_ORDER.md),
+  [earlier Golem result](../notes/matching-search-completion_2026-10-29.md)).
 * **Second subsystem run with RAM layout workers** (2026-10-27): 29 more matches (to 79.7%) and RAM
   objects with one shared declaration 29% -> 75%; gpt-6.1-terra tried and dropped for Sol
   ([notes/subsystem-run_2026-10-27.md](../notes/subsystem-run_2026-10-27.md)).

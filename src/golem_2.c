@@ -291,135 +291,20 @@ struct GolemReactionTracking {
     u8 unknownC, heading, unknownE, flags;
 };
 
-struct GolemReactionActor {
-    void *object;
-    void *drawable;
-    u8 drawableKind;
-    u8 unknown9[0x47];
-    u32 id;
-    u8 unknown54[5];
-    u8 direction;
-    u8 unknown5A[0x2];
-    struct ContactPosition position;
-    struct ContactPosition motion;
-    u8 unknown6C[0xC];
-    void *currentRoute;
-    u8 unknown7C[0x1C];
-    u8 category;
-    u8 unknown99[0x3];
-    s16 health;
-    u8 unknown9E[0xA];
-    s16 heightA8;
-    u16 chargeHeightAA;
-    u8 unknownAC[4];
-    s16 defaultHealth;
-    u8 unknownB2[2];
-    u16 fieldB4;
-    u16 fieldB6;
-    u16 fieldB8;
-    u8 unknownBA[2];
-    u16 fieldBC;
-    u16 fieldBE;
-    u16 fieldC0;
-    u8 unknownC2[2];
-    u16 fieldC4, fieldC6;
-    u16 fieldC8;
-    u8 unknownCA[2];
-    u32 fieldCC;
-    u32 wordD0;
-    u32 wordD4;
-    u8 unknownD8[4];
-    struct GolemReactionTracking tracking;
-    u8 unknownEC[4];
-    u32 distanceF0, rangeF4;
-    u32 distanceLimitF8; /* 080E8200: compared unsigned with distanceF0. */
-    u8 unknownFC[8];
-    u32 word104;
-    u32 word108, word10C, word110;
-    u32 flags114;
-    u32 defaultFlags2CC, defaultFlags2D0;
-    u8 direction120;
-    u8 defaultState, defaultPhase, defaultBehavior;
-    const void *defaultControl;
-    u8 defaultField2B5, unknown129[3];
-    u16 defaultField2EA, defaultFlags2C0;
-    u32 flags130;
-    struct ContactCollider colliderA;
-    struct ContactCollider colliderB;
-    u8 unknown1DC[0x2];
-    u16 paletteBank;
-    u16 basePaletteBank;
-    u8 unknown1E2[0x4];
-    u16 paletteOffset;
-    u16 field1E8;
-    u16 field1EA;
-    u8 unknown1EC[0x30];
-    void *control;
-    u8 unknown220[4];
-    void *entryTarget224;
-    void *idleControl;
-    void *savedTarget;
-    void *chargeControl;
-    u8 unknown234[0x14];
-    void *callback248;
-    u8 unknown24C[0x20];
-    void *update26C;
-    void *update270;
-    u8 unknown274[8];
-    void **callbacks27C, **callbacks280, **callbacks284;
-    void **alternateBehaviorCallbacks; /* +0x288: indexed by behavior2AA. */
-    void **behaviorCallbacks;          /* +0x28C: indexed by behavior2AA. */
-    void **callbacks290, **callbacks294;
-    void **phaseCallbacks; /* +0x298: indexed by phase2A9. */
-    void **callbacks29C, **callbacks2A0;
-    u8 unknown2A4[4];
-    u8 state2A8, phase2A9, behavior2AA, unknown2AB;
-    u32 counter2AC;
-    u8 field2B0, field2B1, field2B2, field2B3;
-    u8 enabled, field2B5, impactDirection, unknown2B7;
-    u16 animationTimer;
-    u8 unknown2BA[4];
-    u16 groundHeight2BE;
-    u16 flags2C0, reactionTimer;
-    u32 profileMode;
-    u16 field2C8;
-    u16 field2CA;
-    u32 actorFlags;
-    u32 collisionFlags;
-    u16 motionFlags;
-    u16 flags2D6;
-    u32 reactionFlags, chargeFlags, field2E0;
-    u16 reactionSoundVariant;
-    u16 impactFlags;
-    u8 unknown2E8[2];
-    u16 field2EA;
-    struct ContactPosition secondaryMotion;
-    u16 terrainCell;
-    u8 unknown2F6[0xE];
-    u32 field304;
-    u32 profileId;
-    u32 unknown30C;
-    struct ContactPosition reactionStart, reactionEnd;
-    u8 unknown320[0xAC];
-    u8 field3CC, unknown3CD[3];
-    struct GolemReactionBody *body;
-    struct GolemReactionGroup group;
-};
-
 static inline void GolemReaction_SetBodyFlags(struct GolemReactionBody *body, u32 flags)
 {
     body->flags628 |= flags;
 }
 static inline void GolemReaction_SetActorFlags(void *object, u32 bits)
 {
-    struct GolemReactionActor *view = object;
-    view->actorFlags |= bits;
+    struct SceneActorRegistryResetView *view = object;
+    view->flags2CC |= bits;
 }
 
 static inline struct GolemReactionGroup *GolemReaction_GroupOf(void *object)
 {
-    struct GolemReactionActor *actor = object;
-    return &actor->group;
+    struct SceneActorRegistryResetView *actor = object;
+    return (struct GolemReactionGroup *)&actor->group;
 }
 
 static inline u8 GolemReaction_Test(u32 value, u32 mask)
@@ -438,12 +323,12 @@ static inline u8 GolemReaction_TestField(u16 *field, u32 mask)
 
 static inline u16 GolemReaction_ReadMotionFlags(void *object)
 {
-    struct GolemReactionActor *actor = object;
-    return actor->motionFlags;
+    struct SceneActorRegistryResetView *actor = object;
+    return actor->flags2D4;
 }
 static inline u16 GolemReaction_MotionFlags(void *object, u32 mask)
 {
-    struct GolemReactionActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     u16 value = GolemReaction_ReadMotionFlags(actor);
     return value & mask;
 }
@@ -455,16 +340,16 @@ static inline u32 GolemReaction_Bits32(u32 *field, u32 mask)
 
 static inline void GolemReaction_InstallControl(void *object, void *callback, u32 kind)
 {
-    struct GolemReactionActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     actor->field2B2 = 1;
     actor->field2B0 = 0;
     actor->field2B5 = kind;
-    actor->control = callback;
+    actor->target = callback;
 }
 
 static inline void GolemReaction_ResetMotionControl(void *object)
 {
-    struct GolemReactionActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     actor->field2C8 = 0;
     {
         u32 *field = &actor->flags114;
@@ -476,14 +361,14 @@ static inline void GolemReaction_ResetMotionControl(void *object)
 
 static inline void GolemReaction_SetControl(void *object, void *callback, u32 kind)
 {
-    struct GolemReactionActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     GolemReaction_InstallControl(actor, callback, kind);
     GolemReaction_ResetMotionControl(actor);
 }
 
 static inline void GolemReaction_SelectState(void *object, u32 state, u32 phase, u32 behavior)
 {
-    struct GolemReactionActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     actor->state2A8 = state;
     actor->phase2A9 = phase;
     actor->behavior2AA = behavior;
@@ -491,28 +376,28 @@ static inline void GolemReaction_SelectState(void *object, u32 state, u32 phase,
 
 static inline void GolemReaction_ResetStateEntry(void *object)
 {
-    struct GolemReactionActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
 
 static inline void GolemReaction_SetState(void *object, u32 state, u32 phase, u32 behavior)
 {
-    struct GolemReactionActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     GolemReaction_SelectState(actor, state, phase, behavior);
     GolemReaction_ResetStateEntry(actor);
 }
 
 static inline void GolemReaction_SetPhase(void *object, u32 phase, u32 behavior)
 {
-    struct GolemReactionActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     GolemReaction_SelectState(actor, 0, phase, behavior);
     GolemReaction_ResetStateEntry(actor);
 }
 
 static inline void GolemReaction_SetBehavior(void *object, u32 behavior)
 {
-    struct GolemReactionActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     GolemReaction_SetPhase(actor, 0, behavior);
 }
 
@@ -615,17 +500,18 @@ static inline void GolemReaction_ClearBits(u16 *field, u32 bits)
         route_status_;                                                                             \
     })
 
-static inline u16 *GolemReaction_MotionFlagsOf(struct GolemReactionActor *actor)
+static inline u16 *GolemReaction_MotionFlagsOf(struct SceneActorRegistryResetView *actor)
 {
-    return &actor->motionFlags;
+    return &actor->flags2D4;
 }
 
-static inline struct ContactPosition *GolemReaction_MotionOf(struct GolemReactionActor *actor)
+static inline struct ContactPosition *
+GolemReaction_MotionOf(struct SceneActorRegistryResetView *actor)
 {
     return &actor->motion;
 }
 
-static inline u8 GolemReaction_TryRoute(struct GolemReactionActor *actor, void *route,
+static inline u8 GolemReaction_TryRoute(struct SceneActorRegistryResetView *actor, void *route,
                                         struct ContactPosition *position,
                                         struct ContactPosition *target)
 {
@@ -641,33 +527,33 @@ static inline u8 GolemReaction_TryRoute(struct GolemReactionActor *actor, void *
 
 static inline void *GolemReaction_CurrentControl(void *object)
 {
-    struct GolemReactionActor *actor = object;
-    return actor->control;
+    struct SceneActorRegistryResetView *actor = object;
+    return actor->target;
 }
 
-static inline u8 GolemReaction_ControlKind(struct GolemReactionActor *actor)
+static inline u8 GolemReaction_ControlKind(struct SceneActorRegistryResetView *actor)
 {
     return actor->field2B5;
 }
 
-static inline u8 GolemReaction_CurrentState(struct GolemReactionActor *actor)
+static inline u8 GolemReaction_CurrentState(struct SceneActorRegistryResetView *actor)
 {
     return actor->state2A8;
 }
 
-static inline u8 GolemReaction_CurrentPhase(struct GolemReactionActor *actor)
+static inline u8 GolemReaction_CurrentPhase(struct SceneActorRegistryResetView *actor)
 {
     return actor->phase2A9;
 }
 
-static inline u8 GolemReaction_CurrentBehavior(struct GolemReactionActor *actor)
+static inline u8 GolemReaction_CurrentBehavior(struct SceneActorRegistryResetView *actor)
 {
     return actor->behavior2AA;
 }
 
 static inline void GolemReaction_SaveControl(void *p, void *object)
 {
-    struct GolemReactionActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     struct GolemReactionSavedControl *packet = p;
     packet->control = GolemReaction_CurrentControl(actor);
     packet->kind = GolemReaction_ControlKind(actor);
@@ -707,7 +593,7 @@ static inline u32 GolemReaction_RandomDirectionExcept(u32 current, const u16 *ra
 
 static inline void GolemReaction_BeginTurn(void *obj, u32 saved, const u16 *randomSamples)
 {
-    struct GolemReactionActor *actor = obj;
+    struct SceneActorRegistryResetView *actor = obj;
     struct GolemReactionGroup *group = GolemReaction_GroupOf(obj);
     if (!GolemReaction_MotionFlags(actor, 0x400) &&
         !GolemReaction_TestField((u16 *)&group->flags, 4)) {
@@ -760,9 +646,9 @@ static inline s32 GolemReaction_PlayerSlot(struct GolemReactionTarget *target)
 static inline u8 GolemReaction_Arrive(void *obj)
 {
     struct ContactPosition target;
-    struct GolemReactionActor *actor = obj;
+    struct SceneActorRegistryResetView *actor = obj;
     struct GolemReactionGroup *group = GolemReaction_GroupOf(obj);
-    struct GolemReactionTracking *tracking = &actor->tracking;
+    struct GolemReactionTracking *tracking = (struct GolemReactionTracking *)&actor->fieldDC;
     s32 cell, player;
     const u16 *randomSamples = gRandomTable;
     void **callback;
@@ -797,7 +683,7 @@ static inline u8 GolemReaction_Arrive(void *obj)
         GolemReaction_SetControl(actor, group->homeControl, 0x1A);
         GolemReaction_SetBehavior(actor, 12);
     } else {
-        GolemReaction_SetControl(actor, actor->idleControl, 1);
+        GolemReaction_SetControl(actor, actor->entryTarget228, 1);
         GolemReaction_SetBehavior(actor, 5);
         GolemReaction_SnapToRoute(group->destination, &group->homeRoute);
         (group->destination)->y =
@@ -809,7 +695,7 @@ static inline u8 GolemReaction_Arrive(void *obj)
         GolemReaction_BeginTurn(obj, saved, randomSamples);
     }
     sub_0807E334(obj);
-    actor->reactionTimer = 0x20;
+    actor->field2C2 = 0x20;
     return 0;
 reroute: {
     GolemReaction_CellCenter(cell, &target);
@@ -826,14 +712,16 @@ success:
 
 /* Fields are established by 080C9C04 and the ordinary ReturnHome/ChargeOrReturnHome
  * relatives. Names for the response count and flags are tentative. */
-static inline u16 GolemReaction_QueryMotionFlags(struct GolemReactionActor *actor, u16 mask)
+static inline u16 GolemReaction_QueryMotionFlags(struct SceneActorRegistryResetView *actor,
+                                                 u16 mask)
 {
-    return actor->motionFlags & mask;
+    return actor->flags2D4 & mask;
 }
-static inline void GolemReaction_ClearMotionFlags(struct GolemReactionActor *actor, u32 bits)
+static inline void GolemReaction_ClearMotionFlags(struct SceneActorRegistryResetView *actor,
+                                                  u32 bits)
 {
     u32 mask = ~bits;
-    actor->motionFlags &= mask;
+    actor->flags2D4 &= mask;
 }
 static inline u8 GolemReaction_TrackingFlags(struct GolemReactionTracking *tracking, u32 mask)
 {
@@ -841,45 +729,46 @@ static inline u8 GolemReaction_TrackingFlags(struct GolemReactionTracking *track
         return 1;
     return 0;
 }
-static inline void GolemReaction_SetResponseControl(struct GolemReactionActor *actor, void *control,
-                                                    u32 kind)
+static inline void GolemReaction_SetResponseControl(struct SceneActorRegistryResetView *actor,
+                                                    void *control, u32 kind)
 {
     GolemReaction_InstallControl(actor, control, kind);
     GolemReaction_ResetMotionControl(actor);
 }
-static inline void GolemReaction_SetResponseState(struct GolemReactionActor *actor, u32 state,
-                                                  u32 phase, u32 behavior)
+static inline void GolemReaction_SetResponseState(struct SceneActorRegistryResetView *actor,
+                                                  u32 state, u32 phase, u32 behavior)
 {
     GolemReaction_SelectState(actor, state, phase, behavior);
     GolemReaction_ResetStateEntry(actor);
 }
 static inline void GolemReaction_LatchHitReact(void *object)
 {
-    struct GolemReactionActor *actor = object;
-    if (!actor->group.hitReactionLatch && (actor->impactFlags & 8)) {
-        actor->animationTimer = 0x2D;
-        actor->group.hitReactionLatch = 0x41;
+    struct SceneActorRegistryResetView *actor = object;
+    if (!actor->field5CA && (actor->field2E6 & 8)) {
+        actor->field2B8 = 0x2D;
+        actor->field5CA = 0x41;
         SceneActorAnimation_SelectDirectionalEntry(actor, 3);
     }
 }
-static inline s16 GolemReaction_CurrentHeight(struct GolemReactionActor *actor)
+static inline s16 GolemReaction_CurrentHeight(struct SceneActorRegistryResetView *actor)
 {
-    return actor->heightA8;
+    return actor->fieldA8;
 }
 
-static inline void GolemReaction_SetChargeHeight(struct GolemReactionActor *actor, s32 height)
+static inline void GolemReaction_SetChargeHeight(struct SceneActorRegistryResetView *actor,
+                                                 s32 height)
 {
-    actor->chargeHeightAA = height;
+    actor->fieldAA = height;
 }
 static inline void GolemReaction_ClearWordFlags(u32 *flags, u32 bits)
 {
     u32 mask = ~bits;
     *flags &= mask;
 }
-static inline void GolemReaction_EnterCharge(struct GolemReactionActor *actor, s16 height)
+static inline void GolemReaction_EnterCharge(struct SceneActorRegistryResetView *actor, s16 height)
 {
     GolemReaction_SetChargeHeight(actor, height);
-    GolemReaction_SetResponseControl(actor, actor->chargeControl, 0x12);
+    GolemReaction_SetResponseControl(actor, actor->reactionTarget230, 0x12);
     GolemReaction_SetResponseState(actor, 3, 0, 0);
 }
 static inline void GolemReaction_HalfwordFlagsSet(u16 *field, u32 bits)
@@ -892,34 +781,36 @@ static inline void GolemReaction_GroupSetFlags(struct GolemReactionGroup *owner,
 {
     GolemReaction_HalfwordFlagsSet((u16 *)&owner->flags, bits);
 }
-static inline void GolemReaction_Settle(struct GolemReactionActor *actor)
+static inline void GolemReaction_Settle(struct SceneActorRegistryResetView *actor)
 {
-    GolemReaction_SetResponseControl(actor, actor->idleControl, 1);
+    GolemReaction_SetResponseControl(actor, actor->entryTarget228, 1);
     GolemReaction_SetResponseState(actor, 0, 0, 7);
-    actor->reactionTimer = 0x20;
+    actor->field2C2 = 0x20;
 }
 
 /* Dispatch the hit-reaction state; return one when entering a state. */
-s32 Golem_UpdateHitReaction(struct GolemReactionActor *actor)
+s32 Golem_UpdateHitReaction(struct SceneActorRegistryResetView *actor)
 {
-    struct GolemReactionBody *body = actor->body;
-    struct GolemReactionGroup *group = &actor->group;
+    struct GolemReactionBody *body = actor->context;
+    struct GolemReactionGroup *group = (struct GolemReactionGroup *)&actor->group;
     void *object = actor;
 
     GolemReaction_SetBodyFlags(body, 0x800);
-    actor->collisionFlags &= ~0x1000000;
+    actor->flags2D0 &= ~0x1000000;
     SceneActorPlacement_PlayVariantEventSound(actor, 1);
 
     if (GolemReaction_QueryMotionFlags(actor, 0x2000)) {
-        actor->direction = actor->impactDirection + 0x80;
+        actor->direction = actor->field2B6 + 0x80;
         SceneActorAnimation_SelectDirectionalEntry(actor, 0);
         GolemReaction_ClearMotionFlags(actor, 0x2020);
         GolemReaction_SetActorFlags(actor, 0x10);
         group->destination->pad = 0;
-        actor->tracking.target = &((struct GolemReactionPlayer *)gUnknown_02000580[0])->target;
+        ((struct GolemReactionTracking *)&actor->fieldDC)->target =
+            &((struct GolemReactionPlayer *)gUnknown_02000580[0])->target;
         if (!GolemReaction_Arrive(object)) {
-            if (!GolemReaction_TryRoute(object, group->route, &actor->position,
-                                        &actor->tracking.target->position)) {
+            if (!GolemReaction_TryRoute(
+                    object, group->route, &actor->position,
+                    &((struct GolemReactionTracking *)&actor->fieldDC)->target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return 0;
             }
@@ -938,47 +829,49 @@ s32 Golem_UpdateHitReaction(struct GolemReactionActor *actor)
         return 1;
     }
     if (GolemReaction_QueryMotionFlags(actor, 0x100)) {
-        if (actor->reactionFlags & 0x400) {
+        if (actor->field2D8 & 0x400) {
             body->shakeStrength = 30;
             body->shakeTimer = 20;
             GolemReaction_EnterCharge(actor, GolemReaction_CurrentHeight(actor));
-            actor->chargeFlags |= 0x80000;
-            GolemReaction_ClearWordFlags(&actor->actorFlags, 0x80);
-            GolemReaction_ClearWordFlags(&actor->collisionFlags, 0x1000003);
-            actor->reactionTimer = 0x40;
+            actor->field2DC |= 0x80000;
+            GolemReaction_ClearWordFlags(&actor->flags2CC, 0x80);
+            GolemReaction_ClearWordFlags(&actor->flags2D0, 0x1000003);
+            actor->field2C2 = 0x40;
             return 1;
         }
-        if (actor->chargeFlags & 0xC0000) {
+        if (actor->field2DC & 0xC0000) {
             GolemReaction_EnterCharge(actor, GolemReaction_CurrentHeight(actor));
-            actor->collisionFlags &= ~0x1000000;
+            actor->flags2D0 &= ~0x1000000;
             return 1;
         }
-        if (actor->tracking.target) {
+        if (((struct GolemReactionTracking *)&actor->fieldDC)->target) {
             SceneActorRoute_CommitReachableDestination(actor);
             body->routeDelay = 120;
         }
         GolemReaction_ClearMotionFlags(actor, 0x20);
         return 0;
     }
-    if (actor->chargeFlags & 0xC0000) {
+    if (actor->field2DC & 0xC0000) {
         GolemReaction_EnterCharge(actor, GolemReaction_CurrentHeight(actor));
-        actor->collisionFlags &= ~0x1000000;
+        actor->flags2D0 &= ~0x1000000;
         return 1;
     }
 
     GolemReaction_ClearMotionFlags(actor, 0x20);
-    if (GolemReaction_TrackingFlags(&actor->tracking, 0x10))
+    if (GolemReaction_TrackingFlags((struct GolemReactionTracking *)&actor->fieldDC, 0x10))
         return 0;
     if (GolemReaction_QueryMotionFlags(actor, 0x80)) {
         GolemReaction_LatchHitReact(object);
-        if (!actor->tracking.target)
+        if (!((struct GolemReactionTracking *)&actor->fieldDC)->target)
             return 0;
-        actor->tracking.target = &((struct GolemReactionPlayer *)gUnknown_02000580[0])->target;
+        ((struct GolemReactionTracking *)&actor->fieldDC)->target =
+            &((struct GolemReactionPlayer *)gUnknown_02000580[0])->target;
         GolemReaction_SetActorFlags(actor, 0x80);
         GolemReaction_GroupSetFlags(group, 4);
         if (!GolemReaction_Arrive(object)) {
-            if (!GolemReaction_TryRoute(object, group->route, &actor->position,
-                                        &actor->tracking.target->position)) {
+            if (!GolemReaction_TryRoute(
+                    object, group->route, &actor->position,
+                    &((struct GolemReactionTracking *)&actor->fieldDC)->target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return 0;
             }
@@ -989,19 +882,21 @@ s32 Golem_UpdateHitReaction(struct GolemReactionActor *actor)
     }
     if (!body->responseCount) {
         GolemReaction_LatchHitReact(object);
-        if (!actor->tracking.target)
+        if (!((struct GolemReactionTracking *)&actor->fieldDC)->target)
             return 0;
-        actor->tracking.target = &((struct GolemReactionPlayer *)gUnknown_02000580[0])->target;
-        actor->direction = actor->tracking.heading;
+        ((struct GolemReactionTracking *)&actor->fieldDC)->target =
+            &((struct GolemReactionPlayer *)gUnknown_02000580[0])->target;
+        actor->direction = actor->fieldE9;
         group->destination->pad = 1;
         if (!GolemReaction_Arrive(object)) {
-            if (!GolemReaction_TryRoute(object, group->route, &actor->position,
-                                        &actor->tracking.target->position)) {
+            if (!GolemReaction_TryRoute(
+                    object, group->route, &actor->position,
+                    &((struct GolemReactionTracking *)&actor->fieldDC)->target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return 0;
             }
         }
-        actor->reactionTimer = 0x40;
+        actor->field2C2 = 0x40;
         if (body->responseCount <= 2)
             body->responseCount++;
         GolemReaction_SetResponseControl(actor, SceneActorReaction_PlayAnimationBUntilComplete, 10);
@@ -1011,14 +906,16 @@ s32 Golem_UpdateHitReaction(struct GolemReactionActor *actor)
     }
 
     GolemReaction_LatchHitReact(object);
-    if (!actor->tracking.target)
+    if (!((struct GolemReactionTracking *)&actor->fieldDC)->target)
         return 0;
-    actor->tracking.target = &((struct GolemReactionPlayer *)gUnknown_02000580[0])->target;
+    ((struct GolemReactionTracking *)&actor->fieldDC)->target =
+        &((struct GolemReactionPlayer *)gUnknown_02000580[0])->target;
     GolemReaction_SetActorFlags(actor, 0x90);
     group->destination->pad = 0;
     if (!GolemReaction_Arrive(object)) {
-        if (!GolemReaction_TryRoute(object, group->route, &actor->position,
-                                    &actor->tracking.target->position)) {
+        if (!GolemReaction_TryRoute(
+                object, group->route, &actor->position,
+                &((struct GolemReactionTracking *)&actor->fieldDC)->target->position)) {
             Callback_InvokeActor(actor, group->fallback);
             return 0;
         }

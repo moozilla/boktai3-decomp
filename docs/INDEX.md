@@ -220,7 +220,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-23-cx-sol08.md](../docs/history/2026-10-23-cx-sol08.md) | 2026-10-23 — cx-sol08 actor campaign batch | #actors #compiler-debugger #matching #mimic #particles #register-pinning #weather | 2 |
 | [docs/history/2026-10-23.md](../docs/history/2026-10-23.md) | Campaign sol05 session 2 wrap-up | #actors #animation #axe #bosses #camera #campaign #charge #compiler #effect-pool #effects #hresvelgr #inventory #ivy #linked-effect #map-menu #matching #monster-book #monsters #mummy #nidhoggr #nonmatching #palette #particles #player #ratatosk #reactions #register-pinning #registry-f3e4 #scene-actor #scene-actors #scene-npc #screamer #script-combat-actor #singleton-slot7 #slime #spider #sprite-effects #tentacle #terrain #vanargand #wireless | 19 |
 | [docs/history/2026-10-27.md](../docs/history/2026-10-27.md) | Work history: 2026-10-27 | #matching #ram #tooling | 1 |
-| [docs/history/2026-10-29.md](../docs/history/2026-10-29.md) | 2026-10-29: matching search and the largest-function experiment | #compiler #matching #monsters #process #tooling | 5 |
+| [docs/history/2026-10-29.md](../docs/history/2026-10-29.md) | 2026-10-29: matching search and the largest-function experiment | #compiler #golem #matching #monsters #process #skeleton #tooling | 6 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
@@ -316,6 +316,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/link-menus_2026-10-12.md](../notes/link-menus_2026-10-12.md) | Wireless menus and result panels | *#panel #menu #wireless* | 4 |
 | [notes/matching-idioms-batch_2026-10-19.md](../notes/matching-idioms-batch_2026-10-19.md) | Matching idioms from the 2026-10-19 cloud batch | #matching #agbcc #techniques | 3 |
 | [notes/matching-search-completion_2026-10-29.md](../notes/matching-search-completion_2026-10-29.md) | Completing the largest unmatched function in ordinary C | #matching #compiler #tooling #monsters | 13 |
+| [notes/matching-search-contact_2026-10-29.md](../notes/matching-search-contact_2026-10-29.md) | Matching the second-largest function and removing the duplicate actor layouts | #matching #compiler #tooling #monsters #skeleton #golem | 9 |
 | [notes/matching-search-scale_2026-10-29.md](../notes/matching-search-scale_2026-10-29.md) | Matching search at the largest unmatched function | #matching #compiler #tooling #monsters | 19 |
 | [notes/matching-search_2026-10-29.md](../notes/matching-search_2026-10-29.md) | Matching search: implementation, evidence, and next steps | #matching #compiler #tooling #process | 18 |
 | [notes/mgs-gcl-round1.md](../notes/mgs-gcl-round1.md) | MGS/GCL matching round 1 | *#scripts #matching* | 3 |

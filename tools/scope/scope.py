@@ -4731,9 +4731,14 @@ def cmd_frame(src, func, env):
     order = [pair[a] for a in sorted(pair) if pair[a] in slots and slots[pair[a]][2] > 0]
     want = [slots[b][0] for b in order]
     if want != sorted(want):
-        print("\nThe ROM's slot order needs these pseudos created in this order (declare or first compute"
-              " them in it):")
+        print("\nAligned slot uses suggest this pseudo creation order; confirm the slot identities"
+              " when instruction structure differs:")
         print("  " + " < ".join(f"{slots[b][0]} {names.get(slots[b][0], '')}".strip() for b in order))
+        print("  PRE-generated field addresses can follow hash-bucket and first-discovery order."
+              " For (plus:SI reg const), this agbcc uses (13772 + pseudo + offset) % T,"
+              " with T = max(11, pre-GCSE real-insn-count // 2) | 1. Validate the candidate's"
+              " actual ordering before inferring target constraints; declaration order may"
+              " not control these temporaries. See tools/scope/PRE_STACK_ORDER.md.")
     if extra:
         print(f"\n{len(extra)} draft slot(s) the ROM does not have: those values need a register in the ROM's"
               " allocation, or do not exist there (a temporary the ROM's C does not make).")

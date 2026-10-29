@@ -187,6 +187,14 @@ the same function wait for each other (`waiting: another scope command ...`).
   fewer low registers free). If `spill` says the difference is only reload's
   choices, the fix is upstream (which values got no register, which
   constants reload loads) in the span it names.
+* **Only stack offsets differ:** establish identical instruction offsets and a
+  consistent slot bijection before optimizing byte distance. PRE-generated
+  field addresses can acquire their slots in hash-bucket order; the table size
+  and inline-expansion pseudo identities jointly determine the permutation.
+  `frame` and `pre` expose the relevant values. Follow
+  [PRE_STACK_ORDER.md](PRE_STACK_ORDER.md) to verify the mechanism against the
+  actual compiler trace and turn it into ordering constraints. Declaration
+  order alone may not control these generated temporaries.
 
 ## Rules
 

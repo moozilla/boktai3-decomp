@@ -2,6 +2,12 @@
 
 Tags: #matching #compiler #tooling #monsters
 
+Follow-up: [the second-largest match and cleanup report](matching-search-contact_2026-10-29.md)
+removes this function's duplicate actor layout while retaining the full match.
+It also qualifies the source-design claims below: matching helper/type choices
+are not proof of historically original abstractions. The test count here records
+this original local checkout; it does not supersede later cross-platform results.
+
 ## Result
 
 `Golem_UpdateHitReaction` (`080C9C04`, formerly `sub_080C9C04`) now matches the
