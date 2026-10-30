@@ -1,40 +1,76 @@
 #include "global.h"
+#include "scene_actor_style.h"
+#include "scene_pool.h"
+#include "input.h"
 #include "game_state.h"
 #include "ram.h"
 #include "engine_globals.h"
-#include "input.h"
 #include "area_effect_link.h"
-#ifdef NONMATCHING
-// fuzzy: 97.2%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Initial position rematerialization, participant access and register lifetimes still differ.
 
-// confidence=low: recoil completion returns to the callback at 081198F8.
+struct GloveModel;
+struct Glove;
+union GloveAnimationKey {
+    u32 word;
+    u16 half[2];
+};
 
-struct Obj {
+struct GloveMotion {
     u8 pad0[4];
     u32 unk4;
     u32 unk8;
-    u8 padC[0x18 - 0xC];
-    s32 z;
-    u8 pad1C[4];
+    u32 boundsFlags;
+    struct ScenePoolVec32 position;
     s32 outX, outY, outZ; /* 0x20 */
     u8 pad2C[0x38 - 0x2C];
     s32 unk38;
     s32 unk3C;
     u32 flags40;
-    u8 pad44[0xC0 - 0x44];
+    u8 color[4];
+    struct SceneActorStyle style;
+    u8 pad64[4];
+    u32 pendingDamage;
+    u8 pad6C[0x7E - 0x6C];
+    u16 recoveryValue;
+    struct GloveModel *parts;
+    u8 pad84[0xC0 - 0x84];
     s32 unkC0;
-    u8 padC4[0x5AC - 0xC4];
+    u8 padC4[4];
+    u32 secondaryBias;
+    u8 padCC[0x2B0 - 0xCC];
+    u32 primaryCallback;
+    u8 pad2B4, primaryKind;
+    u8 pad2B6[8];
+    u16 primaryCharge;
+    u8 pad2C0[0x305 - 0x2C0];
+    u8 primarySpriteRefresh, primaryLatched;
+    u8 actionActive;
+    u16 actionCooldown;
+    u8 pad30A[4];
+    u16 primaryKeyframes;
+    u8 pad310[4];
+    u32 secondaryCallback;
+    u8 pad318;
+    u8 actionKind;
+    u8 pad31A[0x324 - 0x31A];
+    u8 secondaryEnabled;
+    s8 secondarySpriteSlot;
+    u16 recoveryTimer, cooldown;
+    u8 secondaryRelease, secondaryLatched;
+    u8 pad32C[0x524 - 0x32C];
+    union GloveAnimationKey animation;
+    u8 pad528[4];
+    u8 contactIndex[0x40];
+    u32 motionFlags;
+    u8 pad570[10];
+    u8 damageTimer;
+    u8 pad57B[0x59E - 0x57B];
+    u16 spatialTimer;
+    u8 pad5A0[0x5AC - 0x5A0];
     s32 vy; /* 0x5AC */
     s32 y;  /* 0x5B0 */
     s32 vz; /* 0x5B4 */
     u8 pad5B8[4];
-    s32 prevX; /* 0x5BC */
-    u8 pad5C0[4];
-    s32 prevZ; /* 0x5C4 */
-    u8 pad5C8[4];
+    struct ScenePoolVec32 previousPosition;
     s32 dx; /* 0x5CC */
     s32 dy; /* 0x5D0 */
     s32 dz; /* 0x5D4 */
@@ -42,22 +78,39 @@ struct Obj {
     s32 x; /* 0x5DC */
     u8 pad5E0[0x5EC - 0x5E0];
     s8 steps; /* 0x5EC */
-    u8 pad5ED[3];
+    u8 pad5ED;
+    s8 damageFlags;
+    u8 pad5EF;
     u16 angle; /* 0x5F0 */
-    u8 pad5F2[6];
+    u8 pad5F2[2];
+    struct Glove *owner;
+};
+
+struct GloveModelPart {
+    u8 pad0[8];
+    u32 flags;
+    u8 padC[0x48 - 0xC];
+    void *palette;
+    u8 pad4C[0x60 - 0x4C];
+};
+struct GloveModel {
+    struct GloveModelPart parts[5];
+    u8 primaryAnimation[0x30];
+    u8 palette[0x40];
 };
 
 struct Glove {
     u8 pad0[0x18];
-    struct Obj motion;
-    u8 model[0x860 - 0x610];
+    struct GloveMotion motion;
+    struct GloveModel model;
     s8 marker, markerSlot;
     u8 pad862[2];
     u32 timer;
     u8 active;
     u8 pad869[3];
     void (*update)(void *);
-    u8 pad870[0x8C4 - 0x870];
+    u8 pad870[0x8A4 - 0x870];
+    struct ScenePoolVec32 origin, scroll;
     u16 *input;
     u8 pad8C8[0x8E4 - 0x8C8];
     u32 previousInput;
@@ -65,39 +118,26 @@ struct Glove {
     u8 pad8EC[8];
     u16 flags, blinkTimer;
     s8 participant;
-    u8 pad8F9[0x914 - 0x8F9];
+    u8 pad8F9[3];
+    s32 resourceFraction;
+    u32 activeFrames;
+    u32 localScript, entryScript, eventScript, nextScript;
     s32 launchSpeed;
     u8 launchPhase;
+    u8 pad919[3];
+    u32 participantIndex;
+    u8 pad920[0x30];
+    u32 pending[2];
 };
-#define U8(p, o)  (*(u8 *)((u8 *)(p) + (o)))
-#define S8(p, o)  (*(s8 *)((u8 *)(p) + (o)))
-#define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
-#define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
-#define U32(p, o) (*(u32 *)((u8 *)(p) + (o)))
-#define S32(p, o) (*(s32 *)((u8 *)(p) + (o)))
 s32 Div(s32, s32);
-void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
-void Terrain_ResolveActorMotion(struct Obj *);
-void PalFade_Update(struct Obj *);
-void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
-void ActorParticles_SpawnImpactBurst(struct Obj *);
-void CharacterModel_UpdateAccessoryAnimations(void *);
-void ScenePool_ClampMotionSpeeds(struct Obj *);
-void Actor_ClampMovementSpeed(struct Obj *);
-void Glove_SetAnimationKeyframes(struct Glove *, s32);
-s32 ActorRecoil_UpdateMotion(struct Glove *);
-void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
+void Terrain_ResolveActorMotion(struct GloveMotion *);
+void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
 
-void ActorParticles_UpdateEmitter(void *, void *, u32);
-void Trigger_ConsumePending(void *, s32);
-// Animation zero plays until recoil completes, then returns to its resting callback.
-extern u8 *gParticipantActors[];
 extern u32 gUnk_020004E0[];
 void MotionActor_ParsePosition(void *);
 void CharacterModel_SetPrimaryAppearance(void *, void *);
 void CharacterModel_SetSecondaryAppearance(void *, void *, void *);
-s32 Script_GetKeywordValue(u32, s32);
 void Glove_InitializeStyleModifiers(void *);
 void ActorSprite_InitPartDrawings(void *, void *, u32);
 void FieldHud_InitializeWidgets(void *, void *, void *, u32, void *);
@@ -108,60 +148,61 @@ void CharacterPreview_InitializePalette(void *, void *, u32);
 void ActorRecoil_InitCollisionVolumes(void *);
 void SceneTilemap_SetScrollSource(void *);
 void Glove_RegisterMessageReceiver(void *);
-static inline u32 Mode(u32 mask)
+static inline u32 Glove_ModeMask(u32 mask)
 {
     return (gEngineFlags | gScenePauseFlags) & mask;
 }
-static inline s32 Slot(void)
+static inline s32 Glove_LinkParticipant(void)
 {
     if (!gLinkSession)
         return -1;
-    return S16(gLinkSession, 0x18);
+    return gLinkSession->localPlayer;
 }
-static inline void SetCallback(struct Glove *p, void (*fn)(void *), s32 zero)
+static inline void Glove_SetCallback(struct Glove *p, void (*fn)(void *), s32 zero)
 {
     p->active = 1;
     p->update = fn;
     p->timer = zero;
 }
-static inline u32 Mode_1(void)
-{
-    return (gEngineFlags | gScenePauseFlags) & 0x800;
-}
-
-inline static void SetCallback_1(struct Glove *p, void (*fn)(void *))
+inline static void Glove_SetInitialCallback(struct Glove *p, void (*fn)(void *))
 {
     p->active = 1;
     p->update = fn;
     p->timer = 0;
 }
 
+static inline void Glove_ReadMode(u32 *result, u32 mask)
+{
+    *result = (gEngineFlags | gScenePauseFlags) & mask;
+}
+
 s32 Glove_InitFromScript(struct Glove *p)
 {
-    struct Obj *self = &p->motion;
+    struct GloveMotion *self = &p->motion;
     s32 h;
     s32 dx;
     s32 dz;
+    u32 mode;
     u32 a;
     u32 b;
-    Memory_Clear(((u8 *)p) + 0x5d4, 0x10);
-    *((u32 *)(((u8 *)p) + 0x900)) = 0;
-    *((u32 *)(((u8 *)p) + 0x8fc)) = 0;
-    *((void **)(((u8 *)p) + 0x60c)) = p;
+    Memory_Clear(&p->motion.previousPosition, 0x10);
+    p->activeFrames = 0;
+    p->resourceFraction = 0;
+    p->motion.owner = p;
     MotionActor_ParsePosition(p);
-    Memory_Clear(((u8 *)p) + 0x8b4, 0x10);
+    Memory_Clear(&p->scroll, 0x10);
     Memory_Clear(gUnk_020004E0, 0x10);
-    CharacterModel_SetPrimaryAppearance(p->model, ((u8 *)p) + 0x28);
-    CharacterModel_SetSecondaryAppearance(p->model, ((u8 *)p) + 0x28, ((u8 *)p) + 0x50);
+    CharacterModel_SetPrimaryAppearance(&p->model, &p->motion.position);
+    CharacterModel_SetSecondaryAppearance(&p->model, &p->motion.position, &p->motion.unk38);
     p->participant = Script_GetKeywordValue('i', 0);
-    *((u32 *)(((u8 *)p) + 0x908)) = Script_GetKeywordValue('G', 0);
-    *((u32 *)(((u8 *)p) + 0x90c)) = Script_GetKeywordValue('e', 0);
-    *((u32 *)(((u8 *)p) + 0x910)) = Script_GetKeywordValue('n', 0);
-    if (!Mode(0x800))
-        *((u32 *)(((u8 *)p) + 0x904)) = Script_GetKeywordValue('g', 0);
+    p->entryScript = Script_GetKeywordValue('G', 0);
+    p->eventScript = Script_GetKeywordValue('e', 0);
+    p->nextScript = Script_GetKeywordValue('n', 0);
+    if (!Glove_ModeMask(0x800))
+        p->localScript = Script_GetKeywordValue('g', 0);
     Glove_InitializeStyleModifiers(p);
-    ActorSprite_InitPartDrawings(self, p->model, 0x3d99);
-    if ((*((s32 *)(((u8 *)p) + 0x5f4))) == 0x20000)
+    ActorSprite_InitPartDrawings(self, &p->model, 0x3d99);
+    if ((p->motion.x) == 0x20000)
         self->x = -0x40000;
     h = self->vy + self->unkC0;
     self->y += 0x200;
@@ -175,23 +216,21 @@ s32 Glove_InitFromScript(struct Glove *p)
         Memory_Clear(&self->dx, 0x10);
     }
     {
-        s32 *pprevZ;
         s32 *pprevX;
-        s32 *pvz;
+        s32 *pprevZ;
         s32 *px;
         s32 *py;
         s32 lim;
-        self->outX = (h + self->x) - self->prevX;
+        self->outX = (h + self->x) - self->previousPosition.x;
         self->outY = self->y + self->dy;
         self->outZ = self->vz + self->dz;
-        dx = (self->x - self->prevX) >> 12;
-        dz = (self->z - self->prevZ) >> 12;
+        dx = (self->x - self->previousPosition.x) >> 12;
+        dz = (self->position.z - self->previousPosition.z) >> 12;
         lim = 0x3000;
         px = &self->x;
+        pprevX = &self->previousPosition.x;
         py = &self->y;
-        pprevX = &self->prevX;
-        pprevZ = &self->prevZ;
-        pvz = &self->vz;
+        pprevZ = &self->previousPosition.z;
         if (h > lim)
             dx = 0x80;
         if ((dx == 0) && (dz == 0))
@@ -199,7 +238,7 @@ s32 Glove_InitFromScript(struct Glove *p)
         else
             self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
         *pprevX = *px;
-        *pprevZ = self->z;
+        *pprevZ = self->position.z;
         Terrain_ResolveActorMotion(self);
         a = ((u32)(~(self->unk3C >> 12))) >> 31;
         b = ((u32)(~(self->unk38 >> 12))) >> 31;
@@ -214,42 +253,43 @@ s32 Glove_InitFromScript(struct Glove *p)
             *py -= v << 9;
             self->flags40 &= ~1;
         }
-        Actor_UpdateShadowSpriteParts(self, p->model);
+        Actor_UpdateShadowSpriteParts(self, &p->model);
     }
-    if (Mode_1()) {
-        if (p->participant == Slot()) {
-            void *ref = gLinkSession;
+    Glove_ReadMode(&mode, 0x800);
+    if (mode) {
+        if (p->participant == Glove_LinkParticipant()) {
+            struct AreaEffectLinkState *ref = gLinkSession;
             void *optional;
-            if (ref && ((*((u8 *)(((u8 *)ref) + 0x53))) == 1))
-                optional = ((u8 *)ref) + 0x260;
-            else
+            if (ref) {
+                u32 kind = ref->unavailable;
+                optional = ref->unknown260;
+                if (kind != 1)
+                    optional = 0;
+            } else
                 optional = 0;
-            FieldHud_InitializeWidgets(((u8 *)self) + 0x5c, &p->height, ((u8 *)self) + 0x58,
-                                       *((u16 *)(((u8 *)self) + 0x5a)), optional);
+            FieldHud_InitializeWidgets(&self->style.initialWord, &p->height,
+                                       &self->style.initialHalfword,
+                                       (u16)self->style.currentHalfword, optional);
         }
-        SetCallback_1(p, sub_081175F8);
+        Glove_SetInitialCallback(p, sub_081175F8);
     } else {
         s32 ready;
-        FieldHud_InitializeWidgets(((u8 *)self) + 0x5c, &p->height, ((u8 *)self) + 0x58,
-                                   *((u16 *)(((u8 *)self) + 0x5a)), ((u8 *)p) + 0x900);
+        FieldHud_InitializeWidgets(&self->style.initialWord, &p->height,
+                                   &self->style.initialHalfword, (u16)self->style.currentHalfword,
+                                   &p->activeFrames);
         ready = Script_GetKeywordValue('R', 0);
         if (ready)
-            SetCallback(p, (void (*)(void *))Glove_UpdateStopping, 0);
+            Glove_SetCallback(p, (void (*)(void *))Glove_UpdateStopping, 0);
         else
-            SetCallback(p, sub_081172C4, ready);
+            Glove_SetCallback(p, sub_081172C4, ready);
     }
-    CharacterPreview_InitializePalette(((u8 *)self) + 0x68, p->model,
-                                       *((u8 *)(((u8 *)self) + 0x4b)));
+    CharacterPreview_InitializePalette(&self->pendingDamage, &p->model, self->style.parameterD);
     ActorRecoil_InitCollisionVolumes(p);
     SceneTilemap_SetScrollSource(gUnk_020004E0);
-    gParticipantActors[p->participant] = p;
+    gParticipantActors[p->participant] = (struct ScenePoolPlayer *)p;
     Glove_RegisterMessageReceiver(p);
-    *((void **)(((u8 *)p) + 0x8c4)) = ((u8 *)gPadState) + (p->participant * 8);
-    *((u32 *)(((u8 *)p) + 0x91c)) = p->participant;
-    Memory_Clear(((u8 *)p) + 0x950, 8);
+    p->input = gPadState + p->participant * 4;
+    p->participantIndex = p->participant;
+    Memory_Clear(p->pending, 8);
     return 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Glove_InitFromScript);
-#endif
