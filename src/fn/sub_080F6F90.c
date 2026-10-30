@@ -1,22 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
-#include "display_animation.h"
+#include "contact_swarm.h"
+#include "display_sequence_inline.h"
 
-#ifdef NONMATCHING
-// fuzzy: 93.8%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// confidence=low: initializes the four active sword attack components.
-
-// Animation mask lifetime, collider argument addresses and register allocation still differ.
-#define H(p, off) (*(u16 *)((u8 *)(p) + (off)))
-#define S(p, off) (*(s16 *)((u8 *)(p) + (off)))
-#define B(p, off) (*((u8 *)(p) + (off)))
-#define W(p, off) (*(u32 *)((u8 *)(p) + (off)))
-#define P(p, off) ((u8 *)(p) + (off))
 struct SwordSize {
     u32 x : 16, y : 16, z : 16;
 };
-void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void Collider_SetBodyProperties(void *, s32, s32, s32);
 void Collider_SetCallback(void *, void *, void *);
@@ -25,84 +12,11 @@ static inline s32 ReadArgument(void)
 {
     return Script_GetPc() ? Script_GetValue() : 0;
 }
-static inline void Step(struct DisplaySequenceSprite *sprite, struct DisplaySequenceState *state,
-                        const u16 *commands)
-{
-    const volatile u16 *command;
-    u32 duration, flags;
-    command = (void *)((state->index << 1) + (u32)state->commands);
-    sprite->frame = *command >> 6;
-    {
-        u32 first = state->flags & 1;
-        u32 bit = 1;
-        if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 4;
-        else
-            sprite->flags &= ~4;
-    }
-    {
-        u32 bit = 2;
-        u32 first;
-        flags = state->flags;
-        first = (u8)(flags & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-    }
-    {
-        u32 elapsed = state->elapsed + 1;
-        u32 temporary = 0xFFFF;
-        u32 mask;
-        state->elapsed = elapsed;
-        mask = temporary;
-        duration = state->duration;
-        if ((u16)elapsed >= duration) {
-            state->elapsed = 0;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    if (flags & 8)
-                        state->elapsed = duration;
-                    else
-                        state->index = state->frameCount - 1;
-                } else
-                    state->index = index - 1;
-            } else {
-                u32 index = state->index + 1;
-                state->index = index;
-                if ((index & mask) >= state->frameCount) {
-                    if ((u8)(flags & 8)) {
-                        state->elapsed = duration;
-                        state->index = state->frameCount - 1;
-                    } else
-                        state->index = 0;
-                }
-            }
-            command = state->commands + state->index;
-            state->frameWeight = *command & 15;
-            {
-                s32 weight = state->frameWeight;
-                s32 speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!(u8)speed)
-                    state->duration = 1;
-            }
-        }
-    }
-}
-
-struct SwordCollider {
-    u8 unknown0[6];
-    u16 flags;
-    u8 unknown8[0x4C];
-};
 struct SwordComponent {
     struct DisplaySequenceSprite sprite;
-    u8 graphics[0x1C];
-    struct SwordCollider attack;
-    struct SwordCollider body;
+    struct ContactSwarmGraphics graphics;
+    struct ContactCollider attack;
+    struct ContactCollider body;
     u16 fieldF0;
     u16 fieldF2;
     u16 fieldF4;
@@ -136,79 +50,116 @@ struct SwordComponent {
 // confidence=low: the four children are the active sword components updated at 080F63C4.
 void Ivy_OnChildDestroy(void);
 void sub_080F4708(void);
-static inline void Step_InitAttackComponents(struct DisplaySequenceSprite *sprite,
-                                             struct DisplaySequenceState *state,
-                                             const u16 *commands)
+static inline void Sword_SetFrame(struct DisplaySequenceSprite *sprite, u16 frame)
 {
-    const volatile u16 *command;
-    u32 duration;
-    u32 flags;
-    command = (void *)((state->index << 1) + (u32)state->commands);
-    sprite->frame = *command >> 6;
+    sprite->frame = frame;
+}
+static inline void Sword_SetFrameIndex(struct DisplaySequenceState *state, u16 index)
+{
+    state->index = index;
+}
+static inline u16 Sword_ReadCommand(const u16 *command)
+{
+    return *command;
+}
+static inline u8 Sword_GetFrameCount(struct DisplaySequenceState *state)
+{
+    return state->frameCount;
+}
+/* The four child sprites advance one shared playback state during setup. */
+static inline u32 Sword_StepSequence(struct DisplaySequenceSprite *owner,
+                                     struct DisplaySequenceState *state)
+{
+    const u16 *command;
+    u32 ended;
     {
-        u32 first = state->flags & 1;
-        u32 bit = 1;
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = state->commands;
+        command = (const u16 *)((u32)table + offset);
+    }
+    Sword_SetFrame(owner, Sword_ReadCommand(command) >> 6);
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
         if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 4;
+            owner->flags |= 4;
         else
-            sprite->flags &= ~4;
+            owner->flags &= ~4;
     }
     {
-        u32 bit = 2;
-        u32 first;
-        flags = state->flags;
-        first = (u8)(flags & bit);
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
         if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
+            owner->flags |= 8;
         else
-            sprite->flags &= ~8;
+            owner->flags &= ~8;
     }
-    {
-        u32 elapsed = state->elapsed + 1;
-        u32 temporary = 0xFFFF;
-        u32 mask;
-        state->elapsed = elapsed;
-        mask = temporary;
-        duration = state->duration;
-        if ((u16)elapsed >= duration) {
-            state->elapsed = 0;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    if (flags & 8)
-                        state->elapsed = duration;
-                    else
-                        state->index = state->frameCount - 1;
-                } else
-                    state->index = index - 1;
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    Sword_SetFrameIndex(state, Sword_GetFrameCount(state) - 1);
+                ended = 1;
             } else {
-                u32 index = state->index + 1;
-                state->index = index;
-                if ((index & mask) >= state->frameCount) {
-                    if ((u8)(flags & 8)) {
-                        state->elapsed = duration;
-                        state->index = state->frameCount - 1;
-                    } else
-                        state->index = 0;
-                }
+                Sword_SetFrameIndex(state, state->index - 1);
+                ended = 0;
             }
-            command = state->commands + state->index;
-            state->frameWeight = *command & 15;
-            {
-                s32 weight = state->frameWeight;
-                s32 speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!(u8)speed)
-                    state->duration = 1;
+        } else {
+            if (++state->index >= Sword_GetFrameCount(state)) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    Sword_SetFrameIndex(state, Sword_GetFrameCount(state) - 1);
+                } else {
+                    Sword_SetFrameIndex(state, 0);
+                }
+                ended = 1;
+            } else {
+                ended = 0;
             }
         }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(Sword_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    } else {
+        ended = 0;
     }
+    return ended;
 }
 
-void Sword_InitAttackComponents(u8 *input)
+struct SwordAttackSetup {
+    u8 unknown0[0x4BC];
+    struct SwordComponent components[4];
+    u8 unknownB0C[0xD14 - 0xB0C];
+    s16 fieldD14, bodyD16, fieldD18, fieldD1A, bodyD1C, bodyD1E;
+    s16 attackD20, attackD22, attackD24, attackD26;
+    u8 unknownD28[4];
+    u8 count;
+    u8 unknownD2D[0xD55 - 0xD2D];
+    u8 variant;
+    u16 paletteBank;
+    u8 unknownD58[0xD7E - 0xD58];
+    u8 fieldD7E;
+};
+
+static inline void Sword_ClearByte(u8 *field)
 {
-    u8 *p = input;
+    *field = 0;
+}
+
+void Sword_InitAttackComponents(struct SwordAttackSetup *p)
+{
     struct SwordSize size;
     struct SwordSize offset;
     struct DisplaySequenceState sequence;
@@ -221,30 +172,30 @@ void Sword_InitAttackComponents(u8 *input)
     offset.y = 0;
     offset.z = 0;
     if (Script_SeekToKeyword('c')) {
-        *((u16 *)(((u8 *)p) + 0xD14)) = ReadArgument();
-        *((u16 *)(((u8 *)p) + 0xD16)) = ReadArgument();
-        *((u16 *)(((u8 *)p) + 0xD18)) = ReadArgument();
-        *((u16 *)(((u8 *)p) + 0xD1A)) = ReadArgument();
-        *(((u8 *)p) + 0xD7E) = ReadArgument();
-        *((u16 *)(((u8 *)p) + 0xD1C)) = ReadArgument();
-        *((u16 *)(((u8 *)p) + 0xD1E)) = ReadArgument();
+        p->fieldD14 = ReadArgument();
+        p->bodyD16 = ReadArgument();
+        p->fieldD18 = ReadArgument();
+        p->fieldD1A = ReadArgument();
+        p->fieldD7E = ReadArgument();
+        p->bodyD1C = ReadArgument();
+        p->bodyD1E = ReadArgument();
     }
     if (Script_SeekToKeyword('C')) {
-        *((u16 *)(((u8 *)p) + 0xD20)) = ReadArgument();
-        *((u16 *)(((u8 *)p) + 0xD22)) = ReadArgument();
-        *((u16 *)(((u8 *)p) + 0xD24)) = ReadArgument();
-        *((u16 *)(((u8 *)p) + 0xD26)) = ReadArgument();
+        p->attackD20 = ReadArgument();
+        p->attackD22 = ReadArgument();
+        p->attackD24 = ReadArgument();
+        p->attackD26 = ReadArgument();
     }
     if (Script_SeekToKeyword('n'))
-        *(((u8 *)p) + 0xD2C) = Script_GetValue();
+        p->count = Script_GetValue();
     else
-        *(((u8 *)p) + 0xD2C) = 4;
+        p->count = 4;
     Anim_SetSequence(&sequence, (void *)ScriptProc_Start(0x922E, 0x3F72), 2,
-                     (u8)((*(((u8 *)p) + 0xD55)) << 2), 0);
-    for (i = 0; i < 4; i++) {
-        struct SwordComponent *child = (void *)(((u8 *)p) + (0x4BC + (i * 0x194)));
+                     (u8)((p->variant) << 2), 0);
+    for (i = 0, zero = i; i < 4; i++) {
+        struct SwordComponent *child = &p->components[i];
         struct DisplaySequenceSprite *sprite = &child->sprite;
-        void *graphics = child->graphics;
+        void *graphics = &child->graphics;
         void *collider;
         child->fieldF0 = zero;
         child->fieldF2 = zero;
@@ -254,22 +205,20 @@ void Sword_InitAttackComponents(u8 *input)
         child->fieldFC = zero;
         child->field119 = 0;
         child->field10A = zero;
-        do {
-            child->field11A = 0;
-        } while (0);
-        child->field12A = 0;
-        child->field12B = 0;
+        child->field11A = 0;
+        Sword_ClearByte(&child->field12A);
+        Sword_ClearByte(&child->field12B);
         child->field126 = zero;
         child->field128 = zero;
         child->field168 = zero;
         AnimData_Load(graphics, 0x5291);
         Sprite_Init(child, graphics, 0);
-        Step_InitAttackComponents(sprite, &sequence, sequence.commands);
+        Sword_StepSequence(sprite, &sequence);
         sprite->flags = 3;
-        AnimData_SelectPaletteBank((void *)sprite->resource, *((u16 *)(((u8 *)p) + 0xD56)));
+        AnimData_SelectPaletteBank((void *)sprite->resource, p->paletteBank);
         child->field118 = i;
-        child->field11E = 0;
-        child->field11F = 0;
+        child->field11E = zero;
+        child->field11F = zero;
         child->field119 |= 1;
         child->field160 = (u32)p;
         child->field180 = 20;
@@ -278,22 +227,14 @@ void Sword_InitAttackComponents(u8 *input)
         Collider_Init(collider, 0, 0x2001, 0, 16, &size, &offset);
         Collider_SetCallback(collider, Ivy_OnChildDestroy, child);
         Collider_Refresh(collider);
-        Collider_SetAttackProperties(collider, *((s16 *)(((u8 *)p) + 0xD20)),
-                                     *((s16 *)(((u8 *)p) + 0xD22)), 0x2000,
-                                     *((s16 *)(((u8 *)p) + 0xD24)), *((s16 *)(((u8 *)p) + 0xD26)));
+        Collider_SetAttackProperties(collider, p->attackD20, p->attackD22, 0x2000, p->attackD24,
+                                     p->attackD26);
         child->attack.flags |= 4;
         collider = &child->body;
         Collider_Init(collider, 0, 0x5009, 0, 16, &size, &offset);
-        Collider_SetBodyProperties(collider, *((s16 *)(((u8 *)p) + 0xD16)),
-                                   *((s16 *)(((u8 *)p) + 0xD1C)), *((s16 *)(((u8 *)p) + 0xD1E)));
+        Collider_SetBodyProperties(collider, p->bodyD16, p->bodyD1C, p->bodyD1E);
         Collider_SetCallback(collider, sub_080F4708, child);
         Collider_Refresh(collider);
         child->body.flags |= 4;
     }
-
-    zero = 0;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Sword_InitAttackComponents);
-#endif
