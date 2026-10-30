@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "engine_globals.h"
+#include "display_sequence_inline.h"
 typedef void (*MonsterInitCommandHandler)(void *actor, const u16 *command);
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetKeywordValue(u32, s32);
@@ -320,133 +321,6 @@ static inline u16 MonsterInit_GetPaletteOffset(struct MonsterInitActor *actor)
     return actor->field1E6;
 }
 #define SV(d) MonsterInit_Value(d)
-union MonsterInitSequenceControl {
-    u8 raw;
-    struct {
-        u8 flipX : 1;
-        u8 flipY : 1;
-        u8 backwards : 1;
-        u8 hold : 1;
-        u8 unused : 4;
-    } __attribute__((packed)) bits;
-} __attribute__((packed));
-typedef char
-    MonsterInitSequenceControlSizeCheck[(sizeof(union MonsterInitSequenceControl) == 1) ? 1 : -1];
-struct MonsterInitSequence {
-    const u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
-};
-struct MonsterInitDrawable {
-    u32 flags;
-    u8 unknown4[12];
-    u16 frame;
-    u8 unknown12[0x36];
-    struct MonsterInitSequence sequence;
-};
-static inline u16 MonsterInit_SequenceIndex(struct MonsterInitSequence *state)
-{
-    return state->index;
-}
-static inline u8 MonsterInit_SequenceFlags(struct MonsterInitSequence *state)
-{
-    return state->flags;
-}
-static inline u16 MonsterInit_SequenceElapsed(struct MonsterInitSequence *state)
-{
-    return state->elapsed;
-}
-static inline u8 MonsterInit_SequenceDuration(struct MonsterInitSequence *state)
-{
-    return state->duration;
-}
-static inline u8 MonsterInit_SequenceFrameCount(struct MonsterInitSequence *state)
-{
-    return state->frameCount;
-}
-static inline u8 MonsterInit_SequenceFrameWeight(struct MonsterInitSequence *state)
-{
-    return state->frameWeight;
-}
-static inline u16 MonsterInit_SequenceSpeed(struct MonsterInitSequence *state)
-{
-    return state->speed;
-}
-static inline u8 MonsterInit_SequenceMaskedFlags(struct MonsterInitSequence *state, u32 mask)
-{
-    return state->flags & mask;
-}
-static inline u32 MonsterInit_ReadSequenceCommand(const u16 *command)
-{
-    return *command;
-}
-static inline void StepSequence(void *obj)
-{
-    struct MonsterInitDrawable *owner = obj;
-    struct MonsterInitSequence *state;
-    const u16 *command;
-    u32 duration, flags, bit;
-    state = &owner->sequence;
-    {
-        u32 offset = MonsterInit_SequenceIndex(state) << 1;
-        const u16 *table;
-        table = owner->sequence.commands;
-        command = (const u16 *)((u32)table + offset);
-    }
-    owner->frame = *command >> 6;
-    {
-        union MonsterInitSequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->flags |= 4;
-        else
-            owner->flags &= ~4;
-    }
-    {
-        union MonsterInitSequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->flags |= 8;
-        else
-            owner->flags &= ~8;
-    }
-    {
-        if (++state->elapsed >= state->duration) {
-            state->elapsed = 0;
-            if (state->flags & 4) {
-                if (state->index == 0) {
-                    if (state->flags & 8)
-                        state->elapsed = state->duration;
-                    else
-                        state->index = state->frameCount - 1;
-                } else {
-                    state->index--;
-                }
-            } else {
-                if (++state->index >= state->frameCount) {
-                    if (state->flags & 8) {
-                        state->elapsed = state->duration;
-                        state->index = state->frameCount - 1;
-                    } else {
-                        state->index = 0;
-                    }
-                }
-            }
-            command = state->commands + state->index;
-            state->frameWeight =
-                MonsterInit_MaskValue(MonsterInit_ReadSequenceCommand(command), 15);
-            state->duration = (state->frameWeight * (s32)state->speed) >> 6;
-            if (state->duration == 0)
-                state->duration = 1;
-        }
-    }
-}
 static inline u16 MonsterInit_GetMotionFlags(struct MonsterInitActor *actor)
 {
     return actor->field2C0;
@@ -898,7 +772,7 @@ s32 Crow_Init(void *object)
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        StepSequence(actor->drawable);
+        DisplaySequence_Step(actor->drawable);
     else
         Anim_Step(actor->drawable + 0x20, actor->drawable);
     MonsterInit_InitializeReceiver(actor);
