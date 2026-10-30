@@ -64,3 +64,9 @@ Matched 488 bytes by reusing the exact Bee route generator with the Ghost point 
 Tags: 08098A74, Ghost, reaction, PRE
 
 Matched 556 bytes without the old r6 pin. The entry operation owns initial control, player-position capture, flags, and heading; it returns the actor motion-flag component used by animation scaling. This places the shared player-slot address before the returned component address in PRE, resolving the final five-instruction ordering hunk. Context position, player position, and player drain-stat accesses now use typed fields. Formatted stock check has zero differing bytes, SHA-256 `f7f2fc0c21e2b5218171ee177f4c1f95f317563c9f3dfdeeb5621c5c22620ef2`.
+
+## 080A9BD8 — exact, 472 bytes
+
+- Reused the verified Ghost/Lun position interpolation operation for the segment range. Kept caller-owned zero tangent scales and the separately evaluated fixed phase range, matching the original curve arithmetic and loop strength reduction.
+- Canonical actor with typed private trail segments; no pins, barriers, compiler switches, or assembly.
+- Formatted stock check: MATCH, 472 / 472 bytes, zero differing bytes. Evidence: `build/round7/early/080A9BD8/stock-check.json`.
