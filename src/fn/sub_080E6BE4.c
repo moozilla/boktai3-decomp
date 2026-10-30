@@ -23,7 +23,7 @@ static inline u8 Dog_TestApproachFlag(struct DogApproachContext *context, u32 ma
 
 void Dog_UpdateShadowlessApproach(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct DogApproachContext *context = actor->context;
     if (Chase_TakeArrived(actor))
         Chase_SetCtl(actor, SceneActor_EnterShadowlessPhase, 0x24);

@@ -39,8 +39,8 @@ void Dog_ResetIdleControl(struct SceneActorRegistryResetView *actor)
         struct SceneActorRegistryControl *control;
         u16 *flags;
         actor->field2C2 = 0x40;
-        actor->group.flags414 = 0;
-        actor->group.field418 = 0;
+        actor->group.common.gate.flags = 0;
+        actor->group.common.gate.counter = 0;
         flags = &actor->flags2D4;
         {
             u32 mask = ~0x380;
@@ -53,7 +53,7 @@ void Dog_ResetIdleControl(struct SceneActorRegistryResetView *actor)
             mask &= motion->flags;
             motion->flags = mask;
         }
-        control = &actor->group.control;
+        control = &actor->group.common.control;
         if (testFlags(actor, 0x200000)) {
             clearRouteFlag(&actor->flags2D0);
             {
@@ -70,7 +70,7 @@ void Dog_ResetIdleControl(struct SceneActorRegistryResetView *actor)
             mask &= *flags;
             *flags = mask;
         }
-        actor->field5DA = 0xFF;
+        actor->group.turn.turnsRemaining = 0xFF;
 
         motion->fieldDC = 0;
         setControl(actor, actor->savedTarget, 0);

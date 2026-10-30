@@ -9,7 +9,7 @@ void Bat_TickDelayedScript(u8 *);
 u8 Ghoul_ReactToContact(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorRouteContext *context = actor->context;
-    struct SceneActorChaseGroup *group = (struct SceneActorChaseGroup *)&actor->group;
+    struct SceneActorChaseGroup *group = (struct SceneActorChaseGroup *)&actor->group.common;
     if (!(actor->field2D8 & 0x20000)) {
         if (actor->reactionSoundVariant == 0)
             Sound_PlaySong(0x211);
@@ -68,7 +68,7 @@ u8 Ghoul_ReactToContact(struct SceneActorRegistryResetView *actor)
                 return 0;
             }
         }
-        SceneActorChase_SetControl(actor, group->homeControl, 0x1A);
+        SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
         return 1;
     }

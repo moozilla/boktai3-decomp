@@ -40,7 +40,7 @@ struct MummySavedControl {
 static inline void Turn(u8 saved, void *ctx, void *g)
 {
     struct SceneActorRegistryResetView *actor = ctx;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     {
         u32 mask = 0x400;
         if (((struct SceneActorRegistryResetView *)ctx)->flags2D4 & mask)
@@ -66,7 +66,7 @@ static inline u8 Arrive(void *obj)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
     s32 player;
@@ -115,7 +115,7 @@ static inline u8 Arrive(void *obj)
     }
     {
         u8 saved = actor->body.direction;
-        Turn(saved, obj, (u8 *)&actor->group);
+        Turn(saved, obj, (u8 *)&actor->group.common);
     }
     sub_0807E334(actor);
     actor->field2C2 = 0x20;
@@ -173,7 +173,7 @@ static inline void PickRoute(struct SceneActorRegistryResetView *actor)
 }
 void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     u8 *body = actor->context;
     if (Chase_TakeArrived(actor)) {
         Chase_SetCtl(actor, actor->savedTarget, 0);

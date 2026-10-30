@@ -19,7 +19,7 @@ static inline u16 Dog_ReadMotionFlags(struct SceneActorRegistryResetView *actor,
 static inline void Dog_BeginRecoveryTurn(void *obj, u8 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (!Dog_ReadMotionFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
         register s32 prior asm("r7") = actor->body.direction;
         s32 tries = 0;
@@ -46,7 +46,7 @@ static inline u8 Dog_RerouteToTarget(void *obj)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
     s32 player;
@@ -124,9 +124,9 @@ void SceneActorControl_OnIdle(void);
 
 static inline void StartReactionAnimation(struct SceneActorRegistryResetView *a)
 {
-    if (!a->field5CA && (a->field2E6 & 8)) {
+    if (!a->group.hitReactionLatch && (a->field2E6 & 8)) {
         a->field2B8 = 45;
-        a->field5CA = 65;
+        a->group.hitReactionLatch = 65;
         SceneActorAnimation_SelectDirectionalEntry((void *)a, 3);
     }
 }
@@ -134,7 +134,7 @@ static inline void StartReactionAnimation(struct SceneActorRegistryResetView *a)
 s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
 {
     u8 *context = a->context;
-    u8 *group = (u8 *)&a->group;
+    u8 *group = (u8 *)&a->group.common;
     if (a->reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
     else

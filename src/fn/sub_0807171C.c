@@ -3,16 +3,16 @@
 void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
 {
     struct SceneActorRegistryResetView *actor = (void *)argument;
-    struct SceneActorRegistryControlGroup *group = &actor->group;
-    struct SceneActorRegistryRoute *route = &actor->route;
+    struct SceneActorRegistryControlGroup *group = &actor->group.common;
+    struct SceneActorRegistryRoute *route = &actor->group.homeRoute;
     struct ContactPosition *position;
     struct SceneActorRegistryControl *control;
     u32 *flags, *renderFlags;
     s32 x, z, cell, height, slope;
     s32 computedCell;
     u8 *data;
-    route->fieldC = route->parameterC;
-    Route_Start(route, route->parameterA, route->parameterB, route->parameterC);
+    route->currentPoint = route->pointId;
+    Route_Start(route, route->routeId, route->parameterB, route->pointId);
     {
         u32 offset = 0x5D0;
         void *object;

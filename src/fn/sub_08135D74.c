@@ -87,9 +87,9 @@ u32 SceneActorReaction_TryBeginControl29(struct SceneActorRegistryResetView *act
             SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
             SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
             SceneActorEffects_AdvanceSteps(actor, 4);
-            actor->field5C4 = blocked;
-            actor->field5C0 = blocked;
-            actor->field5C2 = blocked;
+            actor->group.field5C4 = blocked;
+            actor->group.field5C0 = blocked;
+            actor->group.field5C2 = blocked;
             collider = &actor->colliderA;
             if (Test(Flag2C0(actor, 0x40)))
                 collider->flags &= ~0x100;

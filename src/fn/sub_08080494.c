@@ -82,7 +82,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor)
 }
 void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorReactionGroup *group = (void *)&actor->group;
+    struct SceneActorReactionGroup *group = (void *)&actor->group.common;
     struct ContactPosition range;
     s32 values[8];
     struct ScriptUtilityArguments arguments;

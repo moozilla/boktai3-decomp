@@ -31,7 +31,7 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
 void Dog_ChasePlayer(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ContactPosition target;
     if (Chase_TakeArrived(actor))
         Chase_SetCtl(actor, Dog_UpdateAnimationFourteenReaction, 0x28);

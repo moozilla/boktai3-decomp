@@ -12,7 +12,7 @@ void SceneActorAttachment_ReplaceResponseSlot(void *, s32, s32, u8);
 // confidence=low: chase-state step; arrives at the route point, starts the next turn or reroutes, and sets up the state machine.
 void sub_080AF2BC(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ContactPosition *p;
     s32 cell;
     s32 player;

@@ -60,12 +60,12 @@ void SceneActorReaction_UpdateGate(struct SceneActorRegistryResetView *p)
     u32 v;
     u16 *f;
     if (active) {
-        Or16(&p->group.flags414, 4);
+        Or16(&p->group.common.gate.flags, 4);
         v = 0x80;
         f = &p->flags2D4;
         v |= *f;
         *f = v;
-        p->group.field418 = p->group.field416;
+        p->group.common.gate.counter = p->group.common.gate.duration;
         if (Test16(f, 0x100) || !SceneActorReaction_IsRangeReady(p) || context->active) {
             if (!ContextBlocked(context))
                 Skeleton_SelectDistanceReaction(p);

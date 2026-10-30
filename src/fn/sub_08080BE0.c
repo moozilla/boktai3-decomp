@@ -77,7 +77,7 @@ inline static void Reaction_SetHalf_08080BE0(struct SceneActorRegistryResetView 
 u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 amplitude)
 {
     struct SceneActorRegistryResetView *actor = owner->actor;
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     struct ContactCollider *second = &actor->colliderB;
     struct ContactCollider *first = &actor->colliderA;
     if (Reaction_IsBlocked(actor))

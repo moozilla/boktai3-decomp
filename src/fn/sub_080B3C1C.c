@@ -54,7 +54,7 @@ u8 sub_080B3C1C(struct SceneActorRegistryResetView *a)
     motion->fieldDC = (u32)object;
     data = *(void **)((u8 *)object + 0x1C);
     cell = *(u16 *)((u8 *)data + 6);
-    a->group.flags414 &= ~2;
+    a->group.common.gate.flags &= ~2;
     if (*(u32 *)((u8 *)a + 0x100) != 0) {
         if (motion->flags & 8) {
             u16 *cellSlot = (u16 *)((u8 *)a + 0x2F8);
@@ -71,7 +71,7 @@ u8 sub_080B3C1C(struct SceneActorRegistryResetView *a)
         return 0;
     a->flags2CC |= 0x80;
     a->flags2D4 &= ~0x100;
-    SceneActorReaction_ResetResponseState(&a->word460, gUnk_0824E230, 0x689);
+    SceneActorReaction_ResetResponseState(&a->group.saved.control, gUnk_0824E230, 0x689);
     a->field2B2 = 1;
     a->field2B0 = 0;
     a->field2B5 = 0x10;
@@ -85,7 +85,7 @@ u8 sub_080B3C1C(struct SceneActorRegistryResetView *a)
     a->counter2AC = 0;
     a->field2B1 = 1;
     a->flags2D4 &= ~0x400;
-    a->field5DA = 0xFF;
+    a->group.turn.turnsRemaining = 0xFF;
     SceneActorAnimation_SelectDirectionalEntry(a, 0);
     *(u16 *)((u8 *)a + 0x428) = 0xB4;
     SceneActorAttachment_ReplaceResponseSlot(a, 0, 1, a->category);

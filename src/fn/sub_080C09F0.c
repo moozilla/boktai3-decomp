@@ -231,7 +231,7 @@ static inline void ResetDestination(void *ctx)
 static inline void Approach(void *ctx)
 {
     struct SceneActorRegistryResetView *actor = ctx;
-    u8 *group = (u8 *)&CTX->group;
+    u8 *group = (u8 *)&CTX->group.common;
     u8 **partnerp = (u8 **)&CTX->tracking.target;
     u32 cell;
     s32 index;
@@ -280,7 +280,7 @@ static inline void Approach(void *ctx)
             }
             DEST->pad = 0;
         }
-        Turn(actor->body.direction, ctx, (u8 *)&CTX->group);
+        Turn(actor->body.direction, ctx, (u8 *)&CTX->group.common);
         sub_0807E334(ctx);
         actor->field2C2 = 0x20;
         return;
@@ -296,7 +296,7 @@ move: {
 void sub_080C09F0(struct SceneActorRegistryResetView *actor)
 {
     struct SkeletonChaseBody *body = actor->context;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (TakeFlag2B1(actor)) {
         void *target = Skeleton_UpdateScriptWaitState;
         SetControl(actor, target, 0x26);

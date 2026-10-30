@@ -67,7 +67,7 @@ void Mummy_ResumeRouteAfterRecovery(struct SceneActorRegistryResetView *actor, s
         sequence->timer = 0;
     reactionFlags = &actor->flags2D6;
     if (actor->field2B3) {
-        u8 *group = (u8 *)(&actor->group);
+        u8 *group = (u8 *)(&actor->group.common);
         actor->field2B0 = 1;
         if (MotionFlags(actor, 2)) {
             Chase_SetState(actor, 3, 0, 0);

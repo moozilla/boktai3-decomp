@@ -12,7 +12,7 @@ s32 SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *actor)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *parent = actor->context;
-    u8 *group = (void *)&actor->group;
+    u8 *group = (void *)&actor->group.common;
     s32 direction = (((actor->body.direction + 0x20) >> 6) + 2) & 3;
     s32 cell = 0;
     s32 count = 0;

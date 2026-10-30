@@ -99,10 +99,10 @@ void Spider_SelectRecoveryRoute(struct SceneActorRegistryResetView *a, s32 frame
     SceneActorAnimation_SelectDirectionalEntry(a, 14);
     if (frame <= ctx->delay)
         return;
-    group = (u8 *)&a->group;
+    group = (u8 *)&a->group.common;
     ClearContext(&ctx->flags, ~4);
     if (a->paletteOffset == 0 && SceneActorControl_CreateFromPosition(actor) >= 0) {
-        SaveRecovery((void *)&a->word460, a->entryTarget228, 7, 60);
+        SaveRecovery((void *)&a->group.saved.control, a->entryTarget228, 7, 60);
         SetControl(a, SceneActorReaction_RestoreAlternateAfterDelay, 14);
         SetState(a, 3, 1, 0);
     } else {

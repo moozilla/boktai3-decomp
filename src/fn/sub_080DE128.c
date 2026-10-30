@@ -56,7 +56,7 @@ static inline void Response(struct SceneActorRegistryResetView *actor, u8 *nav, 
 void Dog_SelectTargetAction(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
-    u8 *nav = (u8 *)&actor->group;
+    u8 *nav = (u8 *)&actor->group.common;
     if (ActorFlag(actor, 0x100))
         return;
     if (actor->tracking.distance < actor->tracking.range) {

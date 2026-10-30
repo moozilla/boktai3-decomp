@@ -177,7 +177,7 @@ static inline s32 CurrentHealth(struct SceneActorRegistryResetView *actor)
 #define Mummy_UpdateBurnDamage sub_080D812C
 void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
 {
-    struct BurnState *burn = (void *)&actor->group;
+    struct BurnState *burn = (void *)&actor->group.common;
     register u16 *flags2C0 asm("r6");
     u8 *category;
     u8 *collider;

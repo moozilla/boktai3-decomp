@@ -138,7 +138,7 @@ static inline void OrFlags(u16 *flags, u32 mask)
 void Skeleton_RestorePursuitRoute(struct SceneActorRegistryResetView *actor)
 {
     struct SkeletonRouteContext *context = actor->context;
-    struct ApproachGroup *group = (void *)&actor->group;
+    struct ApproachGroup *group = (void *)&actor->group.common;
     struct ContactPosition *destination;
     if (MotionFlags(actor, 0x100) || context->active)
         return;

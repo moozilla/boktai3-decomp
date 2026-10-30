@@ -148,7 +148,7 @@ void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
             mask &= motion->flags;
             motion->flags = mask;
         }
-        control = &actor->group.control;
+        control = &actor->group.common.control;
         if (testFlags(actor, 0x200000)) {
             clearRouteFlag(&actor->flags2D0);
             {
@@ -165,7 +165,7 @@ void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
             mask &= *flags;
             *flags = mask;
         }
-        actor->field5DA = 0xFF;
+        actor->group.turn.turnsRemaining = 0xFF;
     }
     {
         register u32 oc asm("r3") = 0x2AC;

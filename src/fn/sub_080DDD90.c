@@ -62,12 +62,12 @@ void Dog_UpdateTargetGate(struct SceneActorRegistryResetView *p)
     context->timer690 = context->timer692;
     active = HasReaction(p);
     if (active) {
-        Or16(&p->group.flags414, 4);
+        Or16(&p->group.common.gate.flags, 4);
         v = 0x80;
         f = &p->flags2D4;
         v |= *f;
         *f = v;
-        p->group.field418 = p->group.field416;
+        p->group.common.gate.counter = p->group.common.gate.duration;
         if (Test16(f, 0x100) || !Dog_IsActionTimerExpired(p)) {
             if (!ContextBlocked(context))
                 Dog_SelectRetreatOrChase(p);

@@ -204,7 +204,7 @@ chosen:
 static inline void Resume(struct SceneActorRegistryResetView *raw, u8 direction)
 {
     struct SceneActorRegistryResetView *actor = raw;
-    struct ApproachGroup *group = (void *)&raw->group;
+    struct ApproachGroup *group = (void *)&raw->group.common;
     u32 mask = 0x400;
     if (!(raw->flags2D4 & mask) && !TestFlag16(&group->flags414, 4)) {
         group->direction = PickDirection(actor);
@@ -231,16 +231,16 @@ static inline u16 MotionFlags(struct SceneActorRegistryResetView *actor, u32 mas
 static inline u8 ReturnHome(void *p)
 {
     struct SceneActorRegistryResetView *actor = p;
-    struct ApproachGroup *group = (void *)&actor->group;
+    struct ApproachGroup *group = (void *)&actor->group.common;
     struct ContactPosition *destination;
     u8 **target = (u8 **)&actor->tracking.target;
     u32 cell;
     s32 slot;
     u32 mask;
     u16 test;
-    destination = actor->state5D4;
-    destination->x = ((struct ApproachRouteLink *)&actor->route)->point->x;
-    destination->z = ((struct ApproachRouteLink *)&actor->route)->point->z;
+    destination = actor->group.destination;
+    destination->x = ((struct ApproachRouteLink *)&actor->group.homeRoute)->point->x;
+    destination->z = ((struct ApproachRouteLink *)&actor->group.homeRoute)->point->z;
     destination->y = CellHeight(destination, CellIndex(destination));
     if (IsScenePaused()) {
         if (!*target)
@@ -421,7 +421,7 @@ static inline void Settle(struct SceneActorRegistryResetView *actor, struct Appr
 
 void Skeleton_ConvergeDisplacedPosition(struct SceneActorRegistryResetView *actor)
 {
-    struct ApproachGroup *group = (void *)(&actor->group);
+    struct ApproachGroup *group = (void *)(&actor->group.common);
     if (Drift(actor)) {
         u8 *context = actor->context;
         actor->field2B0 = 1;

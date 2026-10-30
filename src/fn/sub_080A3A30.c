@@ -90,7 +90,7 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
     if (!(*(u8 **)gPlayers))
         return;
     ctx = a->context;
-    group = (u8 *)(&a->group);
+    group = (u8 *)(&a->group.common);
     ready = HasFlag(ctx, 1);
     if (ready)
         return;

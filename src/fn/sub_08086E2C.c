@@ -44,7 +44,7 @@ static inline void Bat_SetControl(struct SceneActorRegistryResetView *actor, u32
 }
 void Bat_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 12);
         actor->field2B3 = 0;

@@ -32,7 +32,7 @@ static inline struct SceneActorChaseGroup *SceneActorChase_GroupOf(void *object)
 #if !SCENE_ACTOR_CHASE_TYPED_GROUP
     struct SceneActorRegistryResetView *actor = object;
 #endif
-    return (struct SceneActorChaseGroup *)&actor->group;
+    return (struct SceneActorChaseGroup *)&actor->group.common;
 }
 
 static inline void SceneActorChase_SetFlagComponent(struct SceneActorChaseFlags16 *field, u16 bits)
@@ -342,7 +342,7 @@ static inline void SceneActorChase_HalfwordFlagsSet(u16 *field, u32 bits)
 
 static inline void SceneActorChase_GroupSetFlags(struct SceneActorChaseGroup *owner, u32 bits)
 {
-    SceneActorChase_HalfwordFlagsSet((u16 *)&owner->flags, bits);
+    SceneActorChase_HalfwordFlagsSet((u16 *)&owner->common.gate.flags, bits);
 }
 
 static inline void SceneActorChase_SetTypedControl(struct SceneActorRegistryResetView *actor,
@@ -355,9 +355,9 @@ static inline void SceneActorChase_SetTypedControl(struct SceneActorRegistryRese
 /* Contact animation and target selection shared by the ground-monster reactions. */
 static inline u8 SceneActorChase_BeginContactAnimation(struct SceneActorRegistryResetView *actor)
 {
-    if (!actor->field5CA && (actor->field2E6 & 8)) {
+    if (!actor->group.hitReactionLatch && (actor->field2E6 & 8)) {
         actor->field2B8 = 0x2D;
-        actor->field5CA = 0x41;
+        actor->group.hitReactionLatch = 0x41;
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
         return 1;
     }

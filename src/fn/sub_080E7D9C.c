@@ -21,14 +21,14 @@ void Mimic_ResetExpiredTarget(struct SceneActorRegistryResetView *actor)
     flags = &actor->flags2D4;
     if (!(activeMask & *flags))
         return;
-    timer = &actor->group.field418;
+    timer = &actor->group.common.gate.counter;
     if (!*timer && !(*flags & 0x38)) {
         struct SceneActorReactionMotion *motion;
         struct SceneActorRegistryControl *control;
         motion = (void *)&actor->tracking.target;
         motion->fieldDC = 0;
         actor->field2C2 = 0x40;
-        actor->group.flags414 = 0;
+        actor->group.common.gate.flags = 0;
         *timer = 0;
         {
             u32 mask = ~0x380;
@@ -40,7 +40,7 @@ void Mimic_ResetExpiredTarget(struct SceneActorRegistryResetView *actor)
             mask &= motion->flags;
             motion->flags = mask;
         }
-        control = &actor->group.control;
+        control = &actor->group.common.control;
         if (Mimic_TestFlags(actor, 0x200000)) {
             Mimic_ClearRouteFlag(&actor->flags2D0);
             {
@@ -57,7 +57,7 @@ void Mimic_ResetExpiredTarget(struct SceneActorRegistryResetView *actor)
             mask &= *flags;
             *flags = mask;
         }
-        actor->field5DA = 0xFF;
+        actor->group.turn.turnsRemaining = 0xFF;
         Chase_SetCtl(actor, SceneActorControl_OnIdle, 16);
         Chase_SetState(actor, 0, 0, 17);
     }

@@ -38,7 +38,7 @@ static inline u32 Mummy_RandomBits(s16 mask)
 static inline void BeginProbeTurn(void *obj, u32 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (!ActorMotionFlags(actor, 0x400) && !Test16((u16 *)((u8 *)actor + 0x414), 4)) {
         s32 prior = actor->body.direction;
         s32 tries = 0;
@@ -61,7 +61,7 @@ static inline void BeginProbeTurn(void *obj, u32 saved)
 
 void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     u8 *body = actor->context;
     register s32 speed asm("r6");
     if (Chase_TakeArrived(actor)) {

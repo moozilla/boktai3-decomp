@@ -39,7 +39,7 @@ static inline void SceneActorReaction_SetControl(struct SceneActorRegistryResetV
 #define SceneActorReaction_BeginContactResponse sub_0812F3CC
 u8 SceneActorReaction_BeginContactResponse(struct SceneActorRegistryResetView *a)
 {
-    u8 *group = (u8 *)&a->group;
+    u8 *group = (u8 *)&a->group.common;
     void *contact;
     u32 *flags;
     u32 zero;

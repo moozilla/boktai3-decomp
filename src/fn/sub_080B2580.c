@@ -253,7 +253,7 @@ u8 Vorn_SelectReachableEscapeCell(struct SceneActorRegistryResetView *actor, u32
 done:
     GetCenter(dest, &target);
 
-    group = (u8 *)(&actor->group);
+    group = (u8 *)(&actor->group.common);
     if (!TryRoute(actor, group, &target)) {
         Callback_InvokeActor(actor, *((void **)(group + 0x224)));
         return 0;

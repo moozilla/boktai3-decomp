@@ -33,7 +33,7 @@ void SceneActorControl_InitializeHoverState(struct SceneActorRegistryResetView *
     Fill(&context->vectorF04, &zero);
     Fill(&context->vectorF0C, &zero);
     Fill(&context->vectorF14, &zero);
-    Memory_Clear(actor->state5D4, 8);
-    SceneActorReaction_ResetResponseState(&actor->word460, gHoverAnimationData, 0xD4);
+    Memory_Clear(actor->group.destination, 8);
+    SceneActorReaction_ResetResponseState(&actor->group.saved.control, gHoverAnimationData, 0xD4);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
 }

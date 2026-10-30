@@ -40,7 +40,7 @@ static inline void SaveControl(u8 *packet, void *control, u8 behavior)
 }
 void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u8 result;
     u32 *savedFlags;
     if (Chase_TakeArrived(actor)) {

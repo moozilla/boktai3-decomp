@@ -157,7 +157,7 @@ static inline u32 SceneActorChase_Height(struct ContactPosition *position)
 }
 
 static inline void SceneActorChase_SnapToRoute(struct ContactPosition *position,
-                                               struct SceneActorChaseRouteLink *route)
+                                               struct SceneActorRegistryRoute *route)
 {
     position->x = route->point->x;
     position->z = route->point->z;
@@ -169,7 +169,7 @@ static inline void SceneActorChase_BeginTurn(void *obj, u32 saved, const u16 *ra
     struct SceneActorRegistryResetView *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
     if (!SceneActorChase_MotionFlags(actor, 0x400) &&
-        !SceneActorChase_TestField((u16 *)&group->flags, 4)) {
+        !SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
         group->turn.direction =
             SceneActorChase_RandomDirectionExcept(actor->body.direction, randomSamples);
         SceneActorChase_SaveControl(&group->saved, actor);
@@ -217,10 +217,10 @@ static inline u8 SceneActorChase_Arrive(void *obj)
         return 0;
     {
         u32 bits = 4;
-        group->flags &= ~bits;
+        group->common.gate.flags &= ~bits;
     }
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
-        SceneActorChase_SetControl(actor, group->homeControl, 0x1A);
+        SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
     } else {
         SceneActorChase_SetControl(actor, actor->entryTarget228, 1);

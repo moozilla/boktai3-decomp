@@ -24,7 +24,7 @@ void SceneActorReaction_RestoreAfterControl(struct SceneActorRegistryResetView *
         actor->field2B0 = 0;
     }
     if (actor->field2B0) {
-        struct SceneActorReactionCommand *command = (void *)&actor->word460;
+        struct SceneActorReactionCommand *command = (void *)&actor->group.saved.control;
         void *callback = SceneActorControl_OnIdle;
         u32 one = 1;
         u32 zero;

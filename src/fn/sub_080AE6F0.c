@@ -23,7 +23,7 @@ static inline void ClearMotion(u16 *flags, s32 mask)
 }
 void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     u8 *context = actor->context;
     register u32 *flags asm("r8");
     u16 *motionFlags;
@@ -92,7 +92,7 @@ void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
             s32 mask = ~0x18;
             motion->flags &= mask;
         }
-        control = &actor->group.control;
+        control = &actor->group.common.control;
         actionFlags = &actor->flags2CC;
         if ((*actionFlags) & 0x200000) {
             *flags &= ~0x1000000;

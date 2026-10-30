@@ -49,7 +49,7 @@ void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 void Mummy_ResumeSavedRouteAfterAnimation(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     void *body;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct RecoverySequence *sequence;
     body = (u8 *)actor + 0x50;
     sequence = (void *)((u8 *)actor->drawable + 0x48);

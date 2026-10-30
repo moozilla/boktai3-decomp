@@ -108,7 +108,7 @@ void sub_0807D2E0(void *victim, u32 mode, struct ContactPosition *position, u32 
                   u32 p5)
 {
     struct SceneActorRegistryResetView *a = victim;
-    struct SceneActorRegistryControlGroup *group = &a->group;
+    struct SceneActorRegistryControlGroup *group = &a->group.common;
     s32 category;
     s32 i;
     u32 pack[2];
@@ -129,7 +129,7 @@ void sub_0807D2E0(void *victim, u32 mode, struct ContactPosition *position, u32 
             burst[0] = (pack[0] & 0xFFFF0000) | 5;
             burst[0] = (burst[0] & 0xFFFF) | (0xA0000);
             burst[1] = (burst[1] & 0xFFFF0000) | 5;
-            EffectGroup_SpawnPart(&a->group, 3, group, pack, burst, 0x28, 0x28);
+            EffectGroup_SpawnPart(&a->group.common, 3, group, pack, burst, 0x28, 0x28);
         }
         a->flags2D4 &= ~0x2000;
     }
@@ -149,8 +149,8 @@ void sub_0807D2E0(void *victim, u32 mode, struct ContactPosition *position, u32 
     a->flags2D0 |= 4;
     a->flags2CC &= ~0x400000;
     a->field2C2 = 0x40;
-    group->flags414 = 0;
-    group->field418 = 0;
+    group->gate.flags = 0;
+    group->gate.counter = 0;
     a->flags2D4 &= ~0x380;
     a->tracking.flags &= ~0x18;
     if (a->flags2CC & 0x200000) {
@@ -159,7 +159,7 @@ void sub_0807D2E0(void *victim, u32 mode, struct ContactPosition *position, u32 
         a->field2D8 = 0;
     }
     a->flags2D4 &= ~0x400;
-    a->field5DA = 0xFF;
+    a->group.turn.turnsRemaining = 0xFF;
     a->body.position = *position;
     a->body.position.y += p3;
     if (a->drawableKind == 0)

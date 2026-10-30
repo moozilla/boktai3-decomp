@@ -40,7 +40,7 @@ static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor
 void SceneActorReaction_ReturnToRouteEntry(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct SceneActorReactionContext *context = actor->context;
-    struct SceneActorRegistryControlGroup *group = &actor->group;
+    struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         u32 *flags;
         if (!Reaction_MaskFlags(actor, 128)) {
@@ -71,7 +71,7 @@ void SceneActorReaction_ReturnToRouteEntry(struct SceneActorRegistryResetView *a
                 &actor->body.id, (*(struct SceneActorReactionRoutePoint **)((u8 *)group + 0x1FC))->x,
                 (*(struct SceneActorReactionRoutePoint **)((u8 *)group + 0x1FC))->z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-            target = group->entryControl41C;
+            target = group->gate.control;
             Reaction_SetControl(actor, 26, target);
             {
                 u32 behavior = 12;
@@ -82,7 +82,7 @@ void SceneActorReaction_ReturnToRouteEntry(struct SceneActorRegistryResetView *a
                 actor->field2B1 = 1;
             }
             {
-                u16 *f = &group->flags414;
+                u16 *f = &group->gate.flags;
                 u16 four = 4;
                 *f |= four;
             }

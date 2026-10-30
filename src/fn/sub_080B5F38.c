@@ -22,11 +22,11 @@ void Skeleton_ResetRouteReaction(struct SceneActorRegistryResetView *actor)
     context->timer = 0;
     context->counter = 0;
     context->savedFlags = actor->saved.privateFlags;
-    Memory_Clear(actor->state5D4, 8);
-    SceneActorReaction_ResetResponseState(&actor->word460, gUnk_0824E250, 0x120);
+    Memory_Clear(actor->group.destination, 8);
+    SceneActorReaction_ResetResponseState(&actor->group.saved.control, gUnk_0824E250, 0x120);
     actor->field2C2 = 64;
-    actor->group.flags414 = 0;
-    actor->group.field418 = 0;
+    actor->group.common.gate.flags = 0;
+    actor->group.common.gate.counter = 0;
     {
         u16 *motionFlags = &actor->flags2D4;
         {
@@ -39,7 +39,7 @@ void Skeleton_ResetRouteReaction(struct SceneActorRegistryResetView *actor)
             flags[15] = mask & flags[15];
         }
         {
-            register struct SceneActorRegistryControl *control asm("r3") = &actor->group.control;
+            register struct SceneActorRegistryControl *control asm("r3") = &actor->group.common.control;
             u32 mask = 0x200000;
             if (actor->flags2CC & mask) {
                 {
@@ -61,10 +61,10 @@ void Skeleton_ResetRouteReaction(struct SceneActorRegistryResetView *actor)
             *motionFlags = mask & *motionFlags;
         }
     }
-    actor->field5DA = 255;
+    actor->group.turn.turnsRemaining = 255;
     SceneActorMovement_ResolveRoutePosition(actor);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
-    if (SceneActorRoute_IsOutsidePointBounds(&actor->route, &actor->body.position, 32, 32)) {
+    if (SceneActorRoute_IsOutsidePointBounds(&actor->group.homeRoute, &actor->body.position, 32, 32)) {
         u32 behavior = 2;
         register u32 offset asm("r2") = 0x2A8;
         *((u8 *)actor + offset) = 0;

@@ -45,7 +45,7 @@ static inline void setTargetFlags(struct SceneActorRegistryResetView *actor)
 }
 s32 SceneActor_AcquireCollisionTarget(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u8 *motion;
     void *target;
     s32 d;

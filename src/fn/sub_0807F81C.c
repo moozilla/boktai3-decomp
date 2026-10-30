@@ -48,7 +48,7 @@ u8 sub_0807F81C(struct SceneActorRegistryResetView *a)
     }
     motion->fieldDC = *(u32 *)contact;
     cell = *(u16 *)(*(u8 **)((u8 *)motion->fieldDC + 0x1C) + 6);
-    a->group.flags414 &= -3;
+    a->group.common.gate.flags &= -3;
     *nodeSlot = 0;
     if (*(u32 *)((u8 *)a + 0x100) != 0) {
         if (motion->flags & 8) {

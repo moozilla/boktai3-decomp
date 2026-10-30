@@ -200,7 +200,7 @@ static inline u32 Chase_RandomBits(u32 mask)
 static inline void Chase_BeginTurn(void *obj, u8 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (!Chase_MotionFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
         s32 prior = actor->body.direction;
         s32 tries = 0;
@@ -225,7 +225,7 @@ static inline u8 Chase_Arrive(void *obj)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
     s32 player;

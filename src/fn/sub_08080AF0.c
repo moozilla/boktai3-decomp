@@ -15,7 +15,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
 }
 void SceneActorReaction_TurnBackToRoute(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorReactionGroup *group = (void *)&actor->group;
+    struct SceneActorReactionGroup *group = (void *)&actor->group.common;
     u32 offset;
     u32 mask;
     if (TakePrepared(actor)) {

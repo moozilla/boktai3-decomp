@@ -114,8 +114,8 @@ static inline u32 PlayerFlags(u8 *player, u32 mask)
 }
 static inline u8 SelectRoute(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
-    struct ContactPosition *dest = actor->state5D4;
+    u8 *group = (u8 *)&actor->group.common;
+    struct ContactPosition *dest = actor->group.destination;
     struct RouteLink {
         u8 pad[8];
         u16 *point;
@@ -142,7 +142,7 @@ static inline u8 SelectRoute(struct SceneActorRegistryResetView *actor)
 u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset)
 {
     u8 *body = actor->context;
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     u8 old;
     typeof(old) c1;
     if ((!reset) && (*((u16 *)(body + 0x6d0))))

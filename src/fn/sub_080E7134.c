@@ -85,7 +85,7 @@ static inline s32 SpeedBase(u8 *context)
 void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ContactPosition point, delta;
     if (TakeFlag(&actor->field2B2)) {
         s32 correcting;

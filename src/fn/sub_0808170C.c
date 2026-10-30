@@ -80,7 +80,7 @@ static inline u8 Reaction_Test(u32 value, u32 mask)
 }
 void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     s32 counter;
     struct ReactionFollowMotion *follow;
     s32 x;

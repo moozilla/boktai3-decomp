@@ -70,7 +70,7 @@ static inline u8 Arrive(void *obj)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     struct ChaseTarget **slot = (struct ChaseTarget **)(((u8 *)actor) + 0xDC);
     s32 cell;
     s32 player;
@@ -123,7 +123,7 @@ static inline u8 Arrive(void *obj)
     }
     {
         u8 saved = actor->body.direction;
-        Turn(saved, obj, (u8 *)(&actor->group));
+        Turn(saved, obj, (u8 *)(&actor->group.common));
     }
     sub_0807E334(actor);
     actor->field2C2 = 0x20;
@@ -203,7 +203,7 @@ static inline u8 FindPath(struct SceneActorRegistryResetView *actor, s32 goal)
 u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     s32 goal = *((u16 *)((*((u8 **)((u8 *)actor->tracking.target + 0x1c))) + 6));
     if ((*((u32 *)(group + 0x64))) != gTrackedPlayerId[0])
         return 0;

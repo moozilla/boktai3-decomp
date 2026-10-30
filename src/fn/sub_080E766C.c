@@ -24,7 +24,7 @@ void SceneActor_WaitForCategoryAttachment(struct SceneActorRegistryResetView *p,
     if (frame == 160) {
         SceneActorAttachment_ReplaceResponseSlot(p, 0, 2, p->category);
     } else if (frame > 160) {
-        if ((u8)ActorAttachment_IsUnavailable(p->attachment))
+        if ((u8)ActorAttachment_IsUnavailable(p->group.attachment))
             p->field2B0 = 1;
     }
 }

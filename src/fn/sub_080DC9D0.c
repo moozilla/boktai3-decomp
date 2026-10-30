@@ -26,7 +26,7 @@ static inline void Mummy_ClearCheckpointFlags(struct ChaseFlags40 *flags, s32 ma
 
 void Mummy_ResumeRouteAfterCheckpoint(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct MummyCheckpointContext *body = actor->context;
     if (Chase_TakeArrived(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);

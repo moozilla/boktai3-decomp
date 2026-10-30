@@ -119,13 +119,13 @@ void Vorn_BeginTargetPursuit(struct SceneActorRegistryResetView *actor)
     }
     if (MotionFlags(actor, 0x100))
         return;
-    group = (u8 *)&actor->group;
+    group = (u8 *)&actor->group.common;
     if (TestContext(actor->context, 0x1d)) {
         actor->field2C2 = 32;
         if (TestContext(actor->context, 4) && MotionFlags(actor, 0x80)) {
-            actor->group.field418 += 300;
-            if (actor->group.field418 > actor->group.field416)
-                actor->group.field418 = actor->group.field416;
+            actor->group.common.gate.counter += 300;
+            if (actor->group.common.gate.counter > actor->group.common.gate.duration)
+                actor->group.common.gate.counter = actor->group.common.gate.duration;
         }
         if (SceneActor_DispatchContextAction(actor->context, 1))
             return;

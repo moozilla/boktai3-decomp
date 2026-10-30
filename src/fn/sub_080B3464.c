@@ -142,8 +142,8 @@ static inline void Resume(struct SceneActorRegistryResetView *input, u8 *group, 
     };
     struct RouteLink *point;
     actor->field2C2 = 64;
-    actor->group.flags414 = 0;
-    actor->group.field418 = 0;
+    actor->group.common.gate.flags = 0;
+    actor->group.common.gate.counter = 0;
     ClearRouteBits(&actor->flags2D4, 0x380);
     {
         struct SceneActorReactionMotion *motion = (void *)(((u8 *)actor) + 0xdc);
@@ -165,7 +165,7 @@ static inline void Resume(struct SceneActorRegistryResetView *input, u8 *group, 
         }
     }
     ClearRouteBits(&actor->flags2D4, 0x400);
-    actor->field5DA = 255;
+    actor->group.turn.turnsRemaining = 255;
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, 0x19);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
@@ -205,7 +205,7 @@ static inline void Resume(struct SceneActorRegistryResetView *input, u8 *group, 
 
 void Vorn_ResumeRouteAfterReaction(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     u8 *body;
     u32 *flags = &actor->flags2D0;
     if (IsInactive(actor))

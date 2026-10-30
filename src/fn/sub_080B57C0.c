@@ -131,7 +131,7 @@ void Skeleton_BeginStationaryPursuit(struct SceneActorRegistryResetView *a)
     if (Unavailable(a))
         return;
     context = a->context;
-    group = (void *)&a->group;
+    group = (void *)&a->group.common;
     if (Pending(context))
         return;
     if (Flag(a, 0xA03F, 0x2D4))
@@ -153,9 +153,9 @@ void Skeleton_BeginStationaryPursuit(struct SceneActorRegistryResetView *a)
         SetState(a, 0, 0, 12);
         SetControl(a, group->entryControl41C, 0x1A);
         if (MotionFlags(a, 0x80)) {
-            a->group.field418 += 300;
-            if (a->group.field418 > a->group.field416)
-                a->group.field418 = a->group.field416;
+            a->group.common.gate.counter += 300;
+            if (a->group.common.gate.counter > a->group.common.gate.duration)
+                a->group.common.gate.counter = a->group.common.gate.duration;
         }
     } else {
         SetState(a, 0, 0, 7);

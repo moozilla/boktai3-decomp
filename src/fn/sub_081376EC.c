@@ -195,8 +195,8 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct SceneActorRegistryResetView 
         u32 busy = IsBusy(actor);
         if (busy)
             return 0;
-        group = (u8 *)&actor->group;
-        actor->group.control.mode = busy;
+        group = (u8 *)&actor->group.common;
+        actor->group.common.control.mode = busy;
     }
     found = 0;
     best = 0x7FFFFFFF;

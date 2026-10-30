@@ -75,7 +75,7 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         if (Flag(actor, t1 = 8, 0x2D4))
             Sound_PlaySong(0x12A);
         {
-            struct SceneActorRegistryControl *control = &actor->group.control;
+            struct SceneActorRegistryControl *control = &actor->group.common.control;
             u32 *field = &actor->flags2CC;
             u32 mask = ~0x141C0;
             *field &= mask;

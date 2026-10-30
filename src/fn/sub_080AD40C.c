@@ -33,7 +33,7 @@ static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor
 void SceneActorReaction_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct SceneActorReactionContext *context = actor->context;
-    struct SceneActorRegistryControlGroup *group = &actor->group;
+    struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->field2B3 = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 12);

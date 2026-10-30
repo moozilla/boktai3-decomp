@@ -56,7 +56,7 @@ void sub_080A34BC(struct SceneActorRegistryResetView *a)
             return;
         }
         a->field2C2 = 0x40;
-        Spider_SelectRandomEntry((u8 *)&a->group + 0x74);
+        Spider_SelectRandomEntry((u8 *)&a->group.common + 0x74);
         SceneActorMovement_ResolveRoutePosition(a);
         ctx->delay = 0;
         a->state2A8 = 0;
@@ -79,7 +79,7 @@ void sub_080A34BC(struct SceneActorRegistryResetView *a)
         return;
     }
 
-    Spider_SelectRandomEntry((u8 *)&a->group + 0x74);
+    Spider_SelectRandomEntry((u8 *)&a->group.common + 0x74);
     SceneActorMovement_ResolveRoutePosition(a);
 
     if (a->paletteOffset == 0) {

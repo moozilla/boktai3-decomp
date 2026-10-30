@@ -22,7 +22,7 @@ static inline s32 Dot(struct ContactPosition *a, struct ContactPosition *b)
 // confidence=low: aims a route cursor at the first waypoint that lies ahead of the target, else picks a random one
 void sub_080A4798(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     struct RouteCursor *route = (struct RouteCursor *)(group + 0x74);
     u8 selected = 0;
     struct ChaseTarget *t;

@@ -66,7 +66,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *ac
     }
     if (IsPrimary(actor)) {
         {
-            struct SceneActorRegistryControl *control = &actor->group.control;
+            struct SceneActorRegistryControl *control = &actor->group.common.control;
             u32 fieldOffset = 0x2CC;
             u32 *field;
             u32 mask;

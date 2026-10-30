@@ -81,7 +81,7 @@ void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     s32 values[8];
     struct ContactPackedVector rangeB;
     struct ScriptUtilityArguments arguments;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u16 script;
     if (TakeFlag(&actor->field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
@@ -235,9 +235,9 @@ static inline void GolemReaction_SetBodyFlags(struct GolemReactionBody *body, u3
 static inline void GolemReaction_LatchHitReact(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
-    if (!actor->field5CA && (actor->field2E6 & 8)) {
+    if (!actor->group.hitReactionLatch && (actor->field2E6 & 8)) {
         actor->field2B8 = 0x2D;
-        actor->field5CA = 0x41;
+        actor->group.hitReactionLatch = 0x41;
         SceneActorAnimation_SelectDirectionalEntry(actor, 3);
     }
 }
@@ -270,7 +270,7 @@ static inline void GolemReaction_Settle(struct SceneActorRegistryResetView *acto
 s32 Golem_UpdateHitReaction(struct SceneActorRegistryResetView *actor)
 {
     struct GolemReactionBody *body = actor->context;
-    struct SceneActorChaseGroup *group = (struct SceneActorChaseGroup *)&actor->group;
+    struct SceneActorChaseGroup *group = (struct SceneActorChaseGroup *)&actor->group.common;
     void *object = actor;
 
     GolemReaction_SetBodyFlags(body, 0x800);
@@ -354,7 +354,7 @@ s32 Golem_UpdateHitReaction(struct SceneActorRegistryResetView *actor)
                 return 0;
             }
         }
-        SceneActorChase_SetTypedControl(actor, group->homeControl, 0x1A);
+        SceneActorChase_SetTypedControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetTypedState(actor, 0, 0, 12);
         return 1;
     }
@@ -664,7 +664,7 @@ chosen:
 static inline void DelayedRecovery_Wander(struct SceneActorRegistryResetView *input, u8 direction)
 {
     struct SceneActorRegistryResetView *actor = input;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (!DelayedRecovery_Flag16(actor, 0x400, 0x2D4) &&
         !DelayedRecovery_TestBits16((u16 *)(group + 0x40), 4)) {
         ((struct DelayedRecovery_GolemTurn *)(group + 0x204))->direction =
@@ -691,11 +691,11 @@ static inline u8 DelayedRecovery_Chase(struct SceneActorRegistryResetView *input
     s32 slot;
     u32 *targetp;
     actor = input;
-    group = (u8 *)&actor->group;
+    group = (u8 *)&actor->group.common;
     targetp = &actor->tracking.target;
     {
-        struct ContactPosition *dest = actor->state5D4;
-        struct DelayedRecovery_GolemRouteLink *link = (void *)&actor->route;
+        struct ContactPosition *dest = actor->group.destination;
+        struct DelayedRecovery_GolemRouteLink *link = (void *)&actor->group.homeRoute;
         dest->x = link->point->x;
         dest->z = link->point->z;
         dest->y = DelayedRecovery_CellHeight(DelayedRecovery_CellIndex(dest), dest);
@@ -779,7 +779,7 @@ static inline void DelayedRecovery_PrepareDelay(u8 *group, void *callback, u32 b
 // confidence=low: waits for a recovery delay, then restores chase or return-home movement.
 void Golem_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u32 zero;
     if (actor->field2B1)
         actor->field2B1 = 0;

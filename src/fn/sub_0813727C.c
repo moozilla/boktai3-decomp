@@ -153,7 +153,7 @@ static inline u32 ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask
 }
 static inline void ResetControl(struct SceneActorRegistryResetView *actor, u32 enabled, u16 *flags)
 {
-    struct SceneActorRegistryControl *control = &actor->group.control;
+    struct SceneActorRegistryControl *control = &actor->group.common.control;
     if (enabled) {
         ClearWordFlags(&actor->flags2D0, ~0x1000000);
         ClearHalfFlags(flags, ~0x200);
@@ -239,7 +239,7 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
         return 0;
     if (actor->secondaryMotion.z)
         return 0;
-    group = (void *)&actor->group;
+    group = (void *)&actor->group.common;
     {
         register s32 result asm("r0") = *flagsp & ~0x20;
         ((struct FlagHalfword *)flagsp)->bits = result;
@@ -252,8 +252,8 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
     SetFlags(actor, 0x10);
     SaveControl(&group->saved, actor->entryTarget228, 7);
     ResetControl(actor, ActorFlags(actor, 0x200000), flagsp);
-    ProximityVolume_TranslateBounds(actor->routeObject, &actor->body.position);
-    dest = actor->state5D4;
+    ProximityVolume_TranslateBounds(actor->group.route, &actor->body.position);
+    dest = actor->group.destination;
     {
         struct RouteLink *link = &group->route;
         dest->x = link->point->x;
@@ -269,8 +269,8 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
         group->control.counter = 0;
         group->control.recoveryTimer = 0;
         actor->field2C2 = 0x40;
-        actor->group.flags414 = 0;
-        actor->group.field418 = 0;
+        actor->group.common.gate.flags = 0;
+        actor->group.common.gate.counter = 0;
         resetFlags = flagsp;
         {
             u32 mask = ~0x380;
@@ -284,7 +284,7 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
         }
         ResetControl(actor, ActorFlags(actor, 0x200000), resetFlags);
         ClearHalfFlags(flagsp, ~0x400);
-        actor->field5DA = 0xFF;
+        actor->group.turn.turnsRemaining = 0xFF;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
         SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     }

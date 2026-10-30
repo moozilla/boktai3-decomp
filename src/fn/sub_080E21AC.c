@@ -41,7 +41,7 @@ void SceneActorControl_BeginHiddenDefeat(struct SceneActorRegistryResetView *act
         SceneActorEffects_AdvanceSteps(actor, 4);
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
         {
-            struct SceneActorRegistryControl *control = &actor->group.control;
+            struct SceneActorRegistryControl *control = &actor->group.common.control;
             u32 fieldOffset = 0x2CC;
             u32 *field;
             u32 mask;

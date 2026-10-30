@@ -155,13 +155,13 @@ static inline void SetResponseHalfFlag(struct SceneActorRegistryResetView *actor
 void SceneActorAttachment_BeginReturnResponse(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorRegistryResetView *owner = actor;
-    struct ReturnResponseGroup *group = (void *)&actor->group;
+    struct ReturnResponseGroup *group = (void *)&actor->group.common;
     struct ContactPosition position;
     struct ContactPosition *destination;
     struct ReturnResponseCoordinates *source;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-    destination = actor->state5D4;
-    source = (void *)&actor->route;
+    destination = actor->group.destination;
+    source = (void *)&actor->group.homeRoute;
     destination->x = source->coordinates[0];
     destination->z = source->coordinates[1];
     destination->y = HeightAt(destination);

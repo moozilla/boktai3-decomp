@@ -13,7 +13,7 @@ void SceneActorScript_TriggerCallOnCount(struct SceneActorRegistryActor *);
 u8 Skeleton_ReactToContact(struct SceneActorRegistryResetView *actor)
 {
     struct SkeletonReactionBody *body = actor->context;
-    struct SceneActorChaseGroup *group = (struct SceneActorChaseGroup *)&actor->group;
+    struct SceneActorChaseGroup *group = (struct SceneActorChaseGroup *)&actor->group.common;
 
     if (!(actor->field2D8 & 0x20000)) {
         if (actor->reactionSoundVariant == 0)
@@ -79,7 +79,7 @@ otherContact:
                 return 0;
             }
         }
-        SceneActorChase_SetControl(actor, group->homeControl, 0x1A);
+        SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
         actor->field2C2 = 0x20;
         return 1;

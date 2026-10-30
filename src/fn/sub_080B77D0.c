@@ -92,7 +92,7 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
             case 0:
                 next = cell + 1;
                 i = 0;
-                route = &actor->routeObject;
+                route = &actor->group.route;
                 do {
                     if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
@@ -104,7 +104,7 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
             case 1:
                 next = cell + MapWidth();
                 i = 0;
-                route = &actor->routeObject;
+                route = &actor->group.route;
                 do {
                     if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         goto finishSouth;
@@ -116,7 +116,7 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
             case 2:
                 next = cell - 1;
                 i = 0;
-                route = &actor->routeObject;
+                route = &actor->group.route;
                 do {
                     if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
@@ -128,7 +128,7 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
             case 3:
                 next = cell - MapWidth();
                 i = 0;
-                route = &actor->routeObject;
+                route = &actor->group.route;
                 do {
                     if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         goto finishNorth;
@@ -151,7 +151,7 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
                 break;
             default:
                 chosen = actor->terrainCell;
-                route = &actor->routeObject;
+                route = &actor->group.route;
                 break;
         }
         if (chosen != actor->terrainCell)
@@ -163,7 +163,7 @@ selected:
     actor->body.direction = priorDirection;
     SceneActorTerrain_GetCenter(chosen, &center);
     {
-        s16 groupOffset = (u32) & ((struct SceneActorRegistryResetView *)0)->group;
+        s16 groupOffset = (u32) & ((struct SceneActorRegistryResetView *)0)->group.common;
         u8 *group = (u8 *)actor + groupOffset;
         if (TryRoute(actor, *route, &actor->body.position, &center))
             return 1;

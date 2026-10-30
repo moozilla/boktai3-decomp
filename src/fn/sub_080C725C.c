@@ -51,7 +51,7 @@ static inline s32 Quarter(s16 n)
 void Golem_UpdateSlideImpact(struct SceneActorRegistryResetView *actor, u32 frame)
 {
     u8 *context = actor->context;
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     struct GolemSlideBody *body = (struct GolemSlideBody *)(((u8 *)actor) + 0x50);
     if (TakeFlag(&actor->field2B2))
         SceneActorPlacement_PlayVariantEventSound((void *)actor, 4);

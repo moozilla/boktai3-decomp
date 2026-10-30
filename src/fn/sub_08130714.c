@@ -33,7 +33,7 @@ static inline void ResetState(struct SceneActorRegistryResetView *actor)
 }
 void SceneActorControl_UpdateTriggerApproach(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     s32 speed;
     u16 *scale;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {

@@ -19,7 +19,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
 }
 static inline u8 TestMovement(struct SceneActorRegistryResetView *a)
 {
-    void *collider = a->routeObject;
+    void *collider = a->group.route;
     struct ContactPosition *position = &a->body.position;
     struct ContactPosition *destination = &a->tracking.target->position;
     if (!Nav_IsPositionInMesh(collider, position, destination)) {

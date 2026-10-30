@@ -72,7 +72,7 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor,
 // confidence=low: scene actor wait state: on entry clears mode flags; after 60 idle frames walks to the state5D4 destination.
 void sub_08136F58(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorRegistryControlGroup *group = &actor->group;
+    struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (ConsumeEntry(actor)) {
         SetControl(actor, actor->savedTarget, 0);
         ClearWordFlags(&actor->flags2CC, ~0x80);

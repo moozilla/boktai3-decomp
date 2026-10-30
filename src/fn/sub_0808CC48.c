@@ -71,7 +71,7 @@ static inline u8 TestPending(struct GhoulContext *context, u32 mask, u16 **pendi
 s32 Ghoul_ResumePendingRoute(struct SceneActorRegistryResetView *actor)
 {
     register struct GhoulContext *context = actor->context;
-    struct GhoulGroup *group = (void *)&actor->group;
+    struct GhoulGroup *group = (void *)&actor->group.common;
     struct GhoulRouteOrigin **routeSlot;
     u16 *flags;
     u16 *pending;
@@ -105,8 +105,8 @@ s32 Ghoul_ResumePendingRoute(struct SceneActorRegistryResetView *actor)
         SaveDelay(&group->delay, group->delayControl, 12, 30);
         Chase_SetCtl(actor, SceneActorReaction_RestoreAfterDelay, 14);
         Chase_SetState(actor, 3, 1, 0);
-        SceneBody_StartRoute(body, &group->route, group->route.parameterA, group->route.parameterB,
-                             group->route.parameterC);
+        SceneBody_StartRoute(body, &group->route, group->route.routeId, group->route.parameterB,
+                             group->route.pointId);
         {
             void *route = *routeSlot;
             register struct ContactPosition *position asm("r4") = &actor->body.position;

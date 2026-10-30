@@ -270,7 +270,7 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
 {
     s32 values[8];
     struct SkeletonContext *context = actor->context;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u32 mask;
     u32 wrap = 1023;
     u32 bits = 3;

@@ -295,7 +295,7 @@ static inline u32 RandomDirectionExcept(u32 current)
 static inline void Golem_Wander2(struct SceneActorRegistryResetView *input, u8 direction)
 {
     struct SceneActorRegistryResetView *actor = input;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (!Flag16(actor, 0x400, 0x2D4) && !TestBits16((u16 *)(group + 0x40), 4)) {
         group[0x204] = RandomDirectionExcept(actor->body.direction);
         ((struct GolemSavedControl *)(group + 0x8C))->target = actor->target;
@@ -320,11 +320,11 @@ static inline u8 Golem_Chase(struct SceneActorRegistryResetView *input)
     s32 slot;
     u32 *targetp;
     actor = input;
-    group = (u8 *)&actor->group;
+    group = (u8 *)&actor->group.common;
     targetp = &actor->tracking.target;
     {
-        struct ContactPosition *dest = actor->state5D4;
-        struct GolemRouteLink2 *link = (void *)&actor->route;
+        struct ContactPosition *dest = actor->group.destination;
+        struct GolemRouteLink2 *link = (void *)&actor->group.homeRoute;
         dest->x = link->point->x;
         dest->z = link->point->z;
         dest->y = CellHeight(dest, CellIndex(dest));
@@ -403,7 +403,7 @@ static inline void SetCommand(struct SceneActorReactionCommand *command, void *p
 }
 void Golem_UpdateChargePursuit(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct GolemBody *body = actor->context;
     struct ContactPosition diff;
     void *route;

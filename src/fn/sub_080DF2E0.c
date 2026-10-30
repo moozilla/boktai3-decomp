@@ -27,7 +27,7 @@ s32 Dog_ResolvePendingObject(struct SceneActorRegistryResetView *actor)
         u32 cell;
         SceneActorTarget_ResetContactResponse((void *)owner);
         {
-            u16 *flags = &owner->group.flags414;
+            u16 *flags = &owner->group.common.gate.flags;
             u32 mask;
             mask = ~2;
             mask &= *flags;

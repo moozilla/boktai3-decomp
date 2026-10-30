@@ -112,7 +112,7 @@ void sub_080D49DC(struct SceneActorRegistryResetView *actor)
     u8 dir;
     u8 *g8c;
 
-    group = &actor->group;
+    group = &actor->group.common;
     motion = (struct SceneActorReactionMotion *)((u8 *)actor + 0xDC);
     if (actor->field2B1)
         actor->field2B1 = 0;
@@ -138,7 +138,7 @@ void sub_080D49DC(struct SceneActorRegistryResetView *actor)
 
     if (actor->flags2D4 & 0x80) {
         actor->flags2CC |= 0x80;
-        state = (struct ContactPosition *)actor->state5D4;
+        state = (struct ContactPosition *)actor->group.destination;
         src = *(u16 **)((u8 *)actor + 0x448 + 8);
         ((u16 *)state)[0] = src[0];
         ((u16 *)state)[2] = src[1];
@@ -173,12 +173,12 @@ void sub_080D49DC(struct SceneActorRegistryResetView *actor)
             goto L74E;
         }
 
-        group->flags414 &= ~5;
+        group->gate.flags &= ~5;
         if (actor->flags2D4 & 0x80) {
             actor->field2B2 = 1;
             actor->field2B0 = 0;
             actor->field2B5 = 26;
-            actor->target = group->entryControl41C;
+            actor->target = group->gate.control;
             actor->field2C8 = (u16)cellA;
             actor->flags114 &= -2;
             actor->word104 = cellA;
@@ -210,7 +210,7 @@ void sub_080D49DC(struct SceneActorRegistryResetView *actor)
         g8c[8] = 0;
         g8c[9] = 0;
         g8c[0xA] = 7;
-        state = (struct ContactPosition *)actor->state5D4;
+        state = (struct ContactPosition *)actor->group.destination;
         src = *(u16 **)((u8 *)actor + 0x448 + 8);
         ((u16 *)state)[0] = src[0];
         ((u16 *)state)[2] = src[1];
@@ -218,7 +218,7 @@ void sub_080D49DC(struct SceneActorRegistryResetView *actor)
         cy = (s8)(src[1] >> 8);
         cell = sub080D49DC_Cell(cx, cy);
         sub080D49DC_Clip(state, cell);
-        route = actor->routeObject;
+        route = actor->group.route;
         r = 0;
         if (Nav_IsPositionInMesh(route, &actor->body.position, state)) {
             {
@@ -257,7 +257,7 @@ L4DA:
     dir = actor->body.direction;
     if (actor->flags2D4 & 0x400)
         goto L640;
-    if (group->flags414 & 4)
+    if (group->gate.flags & 4)
         goto L640;
     /* 0x526: pick a palette-table slot that differs from dir (up to 4 tries) */
     n = 0;
@@ -308,7 +308,7 @@ L67C:
     else
         tmp.y = (*(gTerrainMap->cells + (cellA * 4 + 12)) & 0xF) << 8;
     tmp.z = (dz << 8) + 0x80;
-    route = actor->routeObject;
+    route = actor->group.route;
     r = 0;
     if (Nav_IsPositionInMesh(route, &actor->body.position, &tmp)) {
         s32 res = Terrain_ApplyBlocked(route, &actor->body.position, &tmp);
@@ -335,7 +335,7 @@ L734:
 L74E:
     if (r)
         goto L7D0;
-    route = actor->routeObject;
+    route = actor->group.route;
     r = 0;
     if (Nav_IsPositionInMesh(route, &actor->body.position, (u8 *)motion->fieldDC + 0xC)) {
         s32 res = Terrain_ApplyBlocked(route, &actor->body.position, (u8 *)motion->fieldDC + 0xC);
@@ -355,10 +355,10 @@ L74E:
     }
 
 L7D0:
-    group->flags414 |= 4;
+    group->gate.flags |= 4;
     g8c = (u8 *)group + 0x8C;
     *(u32 *)(g8c + 0xC) = 0x1E;
-    *(void **)(g8c + 0x10) = group->entryControl41C;
+    *(void **)(g8c + 0x10) = group->gate.control;
     g8c[8] = 0;
     g8c[9] = 0;
     g8c[0xA] = 12;

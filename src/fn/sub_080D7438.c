@@ -28,7 +28,7 @@ void SceneActor_EnterMotionPhase(struct SceneActorRegistryResetView *actor)
     }
     started = MotionStarted((void *)&actor->tracking.target);
     if (started) {
-        u16 *motionFlags = &actor->group.flags414;
+        u16 *motionFlags = &actor->group.common.gate.flags;
         {
             u32 mask = 4;
             u32 value = *motionFlags;
@@ -46,7 +46,7 @@ void SceneActor_EnterMotionPhase(struct SceneActorRegistryResetView *actor)
         }
         {
             u32 mask;
-            actor->group.field418 = actor->group.field416;
+            actor->group.common.gate.counter = actor->group.common.gate.duration;
             mask = 0x100;
             if (*motionFlags & mask)
                 return;

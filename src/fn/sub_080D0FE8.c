@@ -130,7 +130,7 @@ void Mummy_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *direction = ((u8 *)actor) + 0x50;
     struct TurnSequence *sequence = (void *)(((u8 *)actor->drawable) + 0x48);
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     u16 *motionFlags;
     u8 prepared = SceneActorReaction_TakePrepared(actor);
     motionFlags = &actor->flags2D4;

@@ -60,7 +60,7 @@ static inline void SetMotion(struct SceneActorRegistryResetView *actor, void *cb
 void SceneActorReaction_BeginSideStep(void);
 void Vorn_UpdateRouteApproach(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     s32 speed;
     u32 event;
     u16 *scale;

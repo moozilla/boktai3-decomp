@@ -82,7 +82,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorRoute_UpdateRouteCompletion(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     s32 speed, event;
     u16 *scale;
     u16 *motionFlags;

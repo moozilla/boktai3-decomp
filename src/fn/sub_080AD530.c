@@ -19,7 +19,7 @@ static inline u16 ReactionFlagMask(u16 flag)
 }
 void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u8 *context = actor->context;
     if (actor->field2B2)
         actor->field2B2 = 0;

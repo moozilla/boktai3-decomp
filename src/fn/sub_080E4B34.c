@@ -20,7 +20,7 @@ static inline u16 Dog_ReadMotionFlags(struct SceneActorRegistryResetView *actor,
 static inline void Dog_BeginRecoveryTurn(void *obj, u8 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (!Dog_ReadMotionFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
         s32 prior = actor->body.direction;
         s32 tries = 0;
@@ -47,7 +47,7 @@ static inline u8 Dog_RerouteToTarget(void *obj)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
     s32 player;
@@ -133,7 +133,7 @@ static inline u32 Arg1(u32 k_, u8 *group)
 
 void Dog_BeginDelayedRouteRecovery(struct SceneActorRegistryResetView *a)
 {
-    u8 *group = (u8 *)(&a->group);
+    u8 *group = (u8 *)(&a->group.common);
     if (Chase_TakeArrived(a)) {
         Chase_SetCtl(a, a->savedTarget, 0);
         {

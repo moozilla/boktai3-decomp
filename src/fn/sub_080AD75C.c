@@ -92,7 +92,7 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 t
 {
     u8 *ctx = actor->context;
     u8 *anim = ((u8 *)actor->drawable) + 0x20;
-    register u8 *group asm("sl") = (u8 *)(&actor->group);
+    register u8 *group asm("sl") = (u8 *)(&actor->group.common);
     struct ContactPosition range;
     s32 x;
     s32 z;

@@ -3,30 +3,10 @@
 
 #include "contact_collider.h"
 #include "scene_actor_components.h"
+#include "scene_actor_group.h"
 
 /* Extended reset-phase view; fields are offset names unless consumers establish a role. */
-struct SceneActorRegistryControl {
-    u8 unknown0[8];
-    u16 timer;
-    u8 mode, unknownB[9];
-    u16 field14; /* +0x14: cleared with the route timer/counter. */
-    u8 unknown16[2];
-    u32 counter;
-};
-struct SceneActorRegistryControlGroup {
-    u8 unknown0[0x40];
-    u16 flags414, field416, field418;
-    u8 unknown46[2];
-    void *entryControl41C;
-    struct SceneActorRegistryControl control;
-    u8 unknown68[0xC];
-};
-struct SceneActorRegistryRoute {
-    u8 unknown0[8];
-    const u16 *point; /* +0x8: active route point; 08078EE8. */
-    u8 fieldC, unknownD[3];
-    u8 parameterA, parameterB, parameterC, unknown13;
-};
+
 /* Motion/reaction block embedded at actor offset 0xDC. */
 struct SceneActorReactionMotion {
     u32 fieldDC;
@@ -130,33 +110,7 @@ struct SceneActorRegistryResetView {
     u8 shadow[0xAC]; /* +0x320: first byte gates the shadow enable/disable API. */
     u8 field3CC, unknown3CD[3];
     void *context;
-    struct SceneActorRegistryControlGroup group;
-    struct SceneActorRegistryRoute route;
-    void *contactNode; /* +0x45C: passed to SceneActorContacts_ReleaseNode. */
-    u32 word460;
-    u8 field464, field465, field466, field467;
-    u32 field468;
-    u32 delay46C; /* 080EBEE0: initialized to 60. */
-    void *callback470;
-    void *attachment;
-    u8 unknown478[0x140];
-    struct ContactPosition motion5B8;
-    u16 field5C0, field5C2, field5C4, field5C6; /* 5C6: signed countdown in 08130BD4. */
-    u16 countdown5C8;
-    u8 field5CA, unknown5CB;
-    u16 effect5CC;
-    u8 unknown5CE[2];
-    void *routeObject;
-    void *state5D4;
-    u8 field5D8, field5D9, field5DA, unknown5DB;
-    void *behaviorControl;
-    u8 unknown5E0[0x14];
-    void *routePhaseCallback5F4;
-    void *motionFailureCallback; /* +0x5F8: tentative movement failure callback. */
-    u8 unknown5FC[0x1C];
-    void *interactionCallback; /* +0x618: invoked when tether interaction ends. */
-    void *responseCallback;    /* +0x61C: response-slot continuation. */
-    u8 unknown620[4];
+    struct SceneActorChaseGroup group;
     u8 animation624[0x38];
     u16 animationFlags65C;
     u8 unknown65E[0x1A];

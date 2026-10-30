@@ -72,7 +72,7 @@ done:
 }
 void Golem_ReturnHome(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u8 *body = actor->context;
     struct ContactPosition center;
     struct ContactPosition diff;

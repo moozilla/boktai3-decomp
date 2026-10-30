@@ -41,7 +41,7 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group)
 void SceneActorApproach_UpdateRange(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorApproachContext *context = actor->context;
-    u8 *group = (void *)&actor->group;
+    u8 *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     else if (actor->tracking.distance > context->maximumDistance ||

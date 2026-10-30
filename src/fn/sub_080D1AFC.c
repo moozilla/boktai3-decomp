@@ -46,7 +46,7 @@ void Mummy_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 fram
         actor->field2B3 = 0;
     }
     if (frame > 42) {
-        u8 *group = (u8 *)&actor->group;
+        u8 *group = (u8 *)&actor->group.common;
         u16 blocked;
         if (!actor->field2B3) {
             return;

@@ -94,7 +94,7 @@ void Spider_UpdateHiddenRecovery(struct SceneActorRegistryResetView *a)
             ClearHidden((void *)&a->flags2C0, ~0x800);
             ClearCollider(&a->colliderB);
             ClearCollider(&a->colliderA);
-            SaveRecovery((void *)&a->word460, a->savedTarget, 5, 20);
+            SaveRecovery((void *)&a->group.saved.control, a->savedTarget, 5, 20);
             SetControl(a, SceneActorReaction_RestoreAlternateAfterDelay, 14);
             SetState(a, 3, 1, 0);
             ClearContext(ctx, ~1);

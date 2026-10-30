@@ -60,7 +60,7 @@ static inline s32 ReadCounter(struct SceneActorRegistryResetView *actor)
 void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
 {
     struct SpiderContext *ctx = input->context;
-    struct SpiderGroupView *group = (void *)&input->group;
+    struct SpiderGroupView *group = (void *)&input->group.common;
     register struct Transform *transform asm("r5") = (void *)&input->body.id;
     struct ContactPackedVector target;
     register const u16 *table asm("r6") = gRandomTable;
@@ -86,7 +86,7 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
         target.x = ((gUnk_086149C4[(heading + 64) & 255] * distance) >> 14) + transform->position.x;
         target.y = transform->position.y;
         target.z = ((gUnk_086149C4[heading] * distance) >> 14) + transform->position.z;
-        if (!Nav_IsPositionInMesh(input->routeObject, &input->body.position, (void *)(&target))) {
+        if (!Nav_IsPositionInMesh(input->group.route, &input->body.position, (void *)(&target))) {
             if (!Test(ctx, 16))
                 input->field2C2 = 64;
             SceneActorMovement_ResolveRoutePosition(input);

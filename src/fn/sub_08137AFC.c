@@ -75,7 +75,7 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, u8 *group,
 // confidence=low: heads for the nearest eligible link player; FALSE when there is none.
 u32 sub_08137AFC(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     s32 best = FindNearestEligiblePlayer(actor);
 
     if (best < 0)

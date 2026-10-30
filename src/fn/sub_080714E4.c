@@ -3,8 +3,8 @@
 void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *argument)
 {
     struct SceneActorRegistryResetView *actor = (void *)argument;
-    struct SceneActorRegistryControlGroup *group = &actor->group;
-    struct SceneActorRegistryRoute *route = &actor->route;
+    struct SceneActorRegistryControlGroup *group = &actor->group.common;
+    struct SceneActorRegistryRoute *route = &actor->group.homeRoute;
     register struct ContactCollider *collider asm("r9") = &actor->colliderA;
     struct ContactPosition *cachedPosition;
     struct ContactPosition *position;
@@ -15,13 +15,13 @@ void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *a
     u32 category;
     s32 computedCell;
     u8 *data;
-    route->fieldC = route->parameterC;
+    route->currentPoint = route->pointId;
     category = actor->category;
     if (category - 18 > 1 && category != 9 && category != 22) {
         struct ContactPosition *earlyPosition = &actor->body.position;
-        Path_GetPointPositionById((u16 *)earlyPosition, route->parameterA, route->parameterC);
-        Route_Start(route, route->parameterA, route->parameterB, route->parameterC);
-        ProximityVolume_TranslateBounds(actor->routeObject, earlyPosition);
+        Path_GetPointPositionById((u16 *)earlyPosition, route->routeId, route->pointId);
+        Route_Start(route, route->routeId, route->parameterB, route->pointId);
+        ProximityVolume_TranslateBounds(actor->group.route, earlyPosition);
         actor->body.currentRoute = route;
     }
     {

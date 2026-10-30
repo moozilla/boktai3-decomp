@@ -42,7 +42,7 @@ static inline void Show(struct SceneActorRegistryResetView *a)
 }
 void SceneActorReaction_SinkThenDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    struct SceneActorRegistryControlGroup *group = &actor->group;
+    struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         ClearRoute(actor, group);
         if (!ContextFlag(actor->context)) {

@@ -53,7 +53,7 @@ inline static u32 Arg1(u32 k_, struct SceneActorRegistryResetView *actor)
 
 void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
 {
-    u8 *volatile group = (u8 *)(&actor->group);
+    u8 *volatile group = (u8 *)(&actor->group.common);
     s32 timer;
     s32 x;
     s32 z;
@@ -92,7 +92,7 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
             s32 mask = ~0x18;
             motion->flags &= mask;
         }
-        control = &actor->group.control;
+        control = &actor->group.common.control;
         actionFlags = &actor->flags2CC;
         if ((*actionFlags) & 0x200000) {
             *flags &= ~0x1000000;

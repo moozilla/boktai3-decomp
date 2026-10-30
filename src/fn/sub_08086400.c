@@ -81,7 +81,7 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *direction = ((u8 *)actor) + 0x50;
     void *route = ((u8 *)actor) + 0x448;
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     u16 *motionFlags;
     u8 prepared = SceneActorReaction_TakePrepared(actor);
     motionFlags = &actor->flags2D4;

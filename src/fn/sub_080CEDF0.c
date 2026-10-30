@@ -111,7 +111,7 @@ static inline s32 CanCharge(void *ctx)
 }
 void Golem_ChargeOrReturnHome(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u8 *body = actor->context;
     u8 coop;
     if (TakeFlag2B1(actor))

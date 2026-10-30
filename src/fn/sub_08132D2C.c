@@ -93,7 +93,7 @@ static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor
 }
 u32 SceneActorReaction_DefeatRecordStats(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u16 *flags2C0;
     u8 *category;
     u8 *collider;

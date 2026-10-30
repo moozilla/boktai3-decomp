@@ -62,7 +62,7 @@ static inline struct SceneActorReactionMotion *MakeMotionPointer(void *actor)
 }
 u8 SceneActorReaction_BeginTargetRecovery(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct SceneActorReactionMotion *motion;
     if (!ActorFlags(actor, 0x400000) || !ActorFlags(actor, 0x200000) ||
         !HasTargetFlag(&motion, MakeMotionPointer(actor), 1))
@@ -108,7 +108,7 @@ u8 SceneActorReaction_BeginTargetRecovery(struct SceneActorRegistryResetView *ac
         u32 mask = ~0x400;
         *field &= mask;
     }
-    actor->field5DA = 0xff;
+    actor->group.turn.turnsRemaining = 0xff;
     {
         u16 *field = &actor->flags2D4;
         u32 mask = ~0x1000;

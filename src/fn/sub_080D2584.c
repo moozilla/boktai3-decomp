@@ -95,7 +95,7 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         return;
     if (!actor->field2B3)
         return;
-    group = (struct SceneActorChaseGroup *)&actor->group;
+    group = (struct SceneActorChaseGroup *)&actor->group.common;
     actor->field2B0 = 1;
     SceneActorChase_ClearMotionFlags(actor, 0x120);
     SceneActorChase_ClearActorFlags(actor, 0x80);
@@ -129,8 +129,8 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
                 return;
             }
         }
-        SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&group->flags, 4);
-        SceneActorChase_SetControl(actor, group->homeControl, 0x1A);
+        SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&group->common.gate.flags, 4);
+        SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
         return;
     }

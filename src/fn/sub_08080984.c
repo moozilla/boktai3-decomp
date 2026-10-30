@@ -3,7 +3,7 @@ void SceneActorReaction_BeginReactionSound(struct SceneActorRegistryResetView *a
 {
     u32 state;
     u32 timerZero;
-    struct SceneActorReactionGroup *group = (void *)&actor->group;
+    struct SceneActorReactionGroup *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         struct SceneActorRegistryControl *control = &group->control;
         u32 *field = &actor->flags2CC;

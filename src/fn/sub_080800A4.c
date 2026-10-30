@@ -61,7 +61,7 @@ static inline void Reaction_SetDrawMode(struct SceneActorRegistryResetView *acto
 }
 void SceneActorReaction_UpdateContactRouteRecovery(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ContactCollider *collider = &actor->colliderA;
     u8 prepared = SceneActorReaction_TakePrepared(actor);
     u32 *motion = &actor->flags2D0;

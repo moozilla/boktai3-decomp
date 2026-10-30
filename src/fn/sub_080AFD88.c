@@ -9,7 +9,7 @@ static inline u32 TestFlags(struct SceneActorRegistryResetView *a, u32 mask)
 }
 void Vorn_UpdateDescriptorPursuit(struct SceneActorRegistryResetView *a)
 {
-    u8 *group = (u8 *)&a->group;
+    u8 *group = (u8 *)&a->group.common;
     u8 *context = a->context;
     s32 motion;
     s32 event;

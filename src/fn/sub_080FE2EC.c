@@ -18,7 +18,7 @@ static inline u16 SetFlag(struct SceneActorRegistryResetView *actor, u32 mask)
 }
 void Axe_UpdatePlayerDestinationPhase(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorRegistryControlGroup *group = &actor->group;
+    struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (TakeFlag(&actor->field2B1)) {
         void *callback = Axe_UpdateWaitingAnimation;
         u32 kind = 10;
@@ -34,7 +34,7 @@ void Axe_UpdatePlayerDestinationPhase(struct SceneActorRegistryResetView *actor)
         }
         actor->word104 = 0;
         SetFlag(actor, 0x100);
-        group->field418 = group->field416;
+        group->gate.counter = group->gate.duration;
     }
     if (actor->field2B0)
         Axe_BeginMoveToPosition(actor, ((u8 **)gPlayers)[0] + 0x30);

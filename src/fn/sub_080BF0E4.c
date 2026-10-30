@@ -313,7 +313,7 @@ static inline u32 PickDirection(u32 current)
 static inline void Resume(void *argument, struct SkeletonGroup *group, u8 direction)
 {
     struct SceneActorRegistryResetView *actor = argument;
-    if (!Flags2D4(actor, 0x400) && !TestFlag16(&actor->group.flags414, 4)) {
+    if (!Flags2D4(actor, 0x400) && !TestFlag16(&actor->group.common.gate.flags, 4)) {
         Turn(actor, group, PickDirection(actor->body.direction), direction);
     }
 }
@@ -347,7 +347,7 @@ static inline void SetCtlZ(struct SceneActorRegistryResetView *actor, void *cb, 
 static inline void ReturnHome(struct SceneActorRegistryResetView *outer)
 {
     struct SceneActorRegistryResetView *actor = (void *)outer;
-    struct SkeletonGroup *group = (void *)&actor->group;
+    struct SkeletonGroup *group = (void *)&actor->group.common;
     struct ContactPosition *destination;
     struct SkeletonRouteLink *link;
     u8 **target = (u8 **)&actor->tracking.target;
@@ -424,7 +424,7 @@ fail:
 
 void sub_080BF0E4(struct SceneActorRegistryResetView *actor)
 {
-    struct SkeletonGroup *group = (void *)&actor->group;
+    struct SkeletonGroup *group = (void *)&actor->group.common;
     if (TakeFlag2B1(actor)) {
         u8 *category;
         u16 *flags;
@@ -465,9 +465,9 @@ void sub_080BF0E4(struct SceneActorRegistryResetView *actor)
         }
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0, *category);
         SceneActorBehavior_CallActionScript(actor);
-        Or16(&actor->group.flags414, 4);
+        Or16(&actor->group.common.gate.flags, 4);
         Or16(flags, 0x80);
-        actor->group.field418 = actor->group.field416;
+        actor->group.common.gate.counter = actor->group.common.gate.duration;
     }
     if (actor->field2B0) {
         {

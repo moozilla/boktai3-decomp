@@ -102,7 +102,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route
 }
 void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *actor)
 {
-    register u8 *group asm("sl") = (u8 *)(&actor->group);
+    register u8 *group asm("sl") = (u8 *)(&actor->group.common);
     u8 result;
     u16 *motionFlags;
     asm("" : "+r"(group));

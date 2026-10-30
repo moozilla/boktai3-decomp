@@ -62,7 +62,7 @@ static inline void Chase_SnapToRoute_(struct ContactPosition *p, u8 *route)
 
 void sub_0808AF38(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     struct RouteCursor *route = (struct RouteCursor *)(((u8 *)actor) + 0x448);
     u8 selected = 0;
     struct ChaseTarget *t;

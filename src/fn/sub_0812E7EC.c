@@ -131,7 +131,7 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
     if (!HasFlag(actor, 0x100))
         return 0;
     if (HasGroup(actor))
-        group = (u8 *)&actor->group;
+        group = (u8 *)&actor->group.common;
     else
         group = 0;
     attachment = 0;

@@ -16,7 +16,7 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
 {
     struct ContactPosition target;
     u8 *context = a->context;
-    u8 *group = (u8 *)(&a->group);
+    u8 *group = (u8 *)(&a->group.common);
     s32 tries = 0;
     s32 selected;
     u32 k1;

@@ -33,7 +33,7 @@ s32 sub_0807F130(struct SceneActorRegistryResetView *actor)
     s32 r;
     s32 stop;
 
-    group = &actor->group;
+    group = &actor->group.common;
     control = &group->control;
     actor->flags2D0 &= 0xFEFFFFFF;
     stop = (!(actor->flags2CC & 0x200000) || (actor->flags2D0 & 4) || (actor->flags2CC & 0x100) ||
@@ -77,14 +77,14 @@ s32 sub_0807F130(struct SceneActorRegistryResetView *actor)
         actor->flags2D4 &= ~0x1000;
         *(u32 *)((u8 *)actor + 0x45C) = stop;
     }
-    SceneActorPosition_ResolveTaggedPosition(control, &actor->body.id, actor->routeObject, (s8)kind);
+    SceneActorPosition_ResolveTaggedPosition(control, &actor->body.id, actor->group.route, (s8)kind);
     if (actor->flags2D4 & 0x80) {
-        group->field418 += 0x12C;
-        if (group->field418 > group->field416)
-            group->field418 = group->field416;
+        group->gate.counter += 0x12C;
+        if (group->gate.counter > group->gate.duration)
+            group->gate.counter = group->gate.duration;
     }
-    state = (struct ContactPosition *)actor->state5D4;
-    route = actor->routeObject;
+    state = (struct ContactPosition *)actor->group.destination;
+    route = actor->group.route;
     {
         u16 *src = *(u16 **)((u8 *)group + 0x74 + 8);
         ((u16 *)state)[0] = src[0];
@@ -113,7 +113,7 @@ s32 sub_0807F130(struct SceneActorRegistryResetView *actor)
     ((u16 *)state)[1] = val;
     ((u16 *)state)[1] = position->y;
     ((u16 *)state)[3] = 0;
-    route = actor->routeObject;
+    route = actor->group.route;
     target = (s32)((u8 *)group + 0x58);
     r = 0;
     if (!Nav_IsPositionInMesh(route, position, (void *)target)) {

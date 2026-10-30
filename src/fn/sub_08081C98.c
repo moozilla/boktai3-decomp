@@ -73,7 +73,7 @@ static inline s32 Reaction_ThirtySecond(s32 value)
 }
 void SceneActorReaction_UpdateTimedBurst(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u32 duration;
     if (SceneActorReaction_TakePrepared(actor)) {
         struct SceneActorReactionMotion *reaction;

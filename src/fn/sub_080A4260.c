@@ -42,7 +42,7 @@ begin: {
         field = (u8 *)p + phaseOffset;
         one = 1;
         *field = one;
-        control = group->entryControl41C;
+        control = group->gate.control;
         {
             u32 kind = 26;
             offset += 8;

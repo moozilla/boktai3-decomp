@@ -83,7 +83,7 @@ static inline u32 MotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
 }
 void SceneActorRoute_UpdateReturnEntry(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u8 result;
     if (SceneActorControl_TakeFlag(&actor->field2B1))
         BeginControlZero(actor, actor->entryTarget224, 2);

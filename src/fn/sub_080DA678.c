@@ -134,7 +134,7 @@ void Mummy_ResetRevivalMotion(struct SceneActorRegistryResetView *actor)
     body->counter6D4 = 0;
     body->counter6D6 = 0;
     body->counter6F2 = 0;
-    actor->field5C4 = 0;
+    actor->group.field5C4 = 0;
     *(u16 *)((u8 *)body + 0x6EE) = 0;
     Mummy_ResetMotionState(actor);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);

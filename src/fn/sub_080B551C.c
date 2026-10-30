@@ -9,7 +9,7 @@ u8 Skeleton_RerouteToTarget(void *obj)
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
     struct SceneActorRegistryResetView *alt = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
     Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);

@@ -29,7 +29,7 @@ static inline void SubtractPosition(struct ContactPosition *out, struct ContactP
 s32 SceneActor_TryTrackNearbyPlayer(struct SceneActorRegistryResetView *actor,
                                     struct ContactPosition *input, u32 playerId)
 {
-    u8 *group = (void *)&actor->group;
+    u8 *group = (void *)&actor->group.common;
     struct ContactPosition delta;
     struct ContactPosition *deltaPointer;
     struct ContactPosition *position;

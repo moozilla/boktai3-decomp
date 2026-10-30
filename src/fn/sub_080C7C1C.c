@@ -46,7 +46,7 @@ void SceneActorRoute_SetReachableDestination(struct SceneActorRegistryResetView 
                                              struct ContactPosition *destination);
 void Golem_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct BatAnim *anim = &((struct BatDrawable *)actor->drawable)->anim;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);

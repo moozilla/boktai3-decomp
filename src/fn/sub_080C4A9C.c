@@ -13,7 +13,7 @@ static inline void SaveDelay(u8 *saved, void *target, u32 behavior, u32 delay)
 
 void Golem_RestoreRoute(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u16 *flags;
     u32 chasing;
 

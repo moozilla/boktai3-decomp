@@ -20,7 +20,7 @@ void Dog_ResumeAfterReaction(struct SceneActorRegistryResetView *a)
     if (!a->field2B3) {
         return;
     }
-    group = (u8 *)&a->group;
+    group = (u8 *)&a->group.common;
     a->field2B0 = 1;
     {
         u32 mask = 0x80;

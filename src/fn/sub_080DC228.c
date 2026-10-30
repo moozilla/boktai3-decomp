@@ -30,7 +30,7 @@ static inline u8 Mummy_TestGroup(struct SceneActorRegistryResetView *actor, u32 
 static inline void Mummy_BeginTurn(void *obj, u8 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (!Chase_MotionFlags(actor, 0x400) && !Mummy_TestGroup(actor, 4)) {
         s32 prior = actor->body.direction;
         s32 tries = 0;
@@ -58,7 +58,7 @@ static inline u8 Mummy_Arrive(void *obj)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
     s32 player;
@@ -130,7 +130,7 @@ reroute: {
 
 void Mummy_ResumePlayerPursuit(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct MummyPursuitContext *body = actor->context;
     if (Chase_TakeArrived(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);

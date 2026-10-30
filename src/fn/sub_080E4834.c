@@ -25,7 +25,7 @@ void Dog_UpdateArrivalAnimation(void);
 u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 void Dog_ResumeRoute(struct SceneActorRegistryResetView *a)
 {
-    u8 *group = (u8 *)&a->group;
+    u8 *group = (u8 *)&a->group.common;
     u8 *context = a->context;
     if (Chase_TakeArrived(a))
         Chase_SetCtl(a, Dog_UpdateArrivalAnimation, 10);

@@ -135,7 +135,7 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
                 out->z = target->z - from->z;
                 actor->body.direction = actor->tracking.heading = Math_Atan2(d.x, d.z);
                 {
-                    u16 *fl = &actor->group.flags414;
+                    u16 *fl = &actor->group.common.gate.flags;
                     register u32 mask asm("r0") = 4;
                     *fl = mask | *fl;
                 }
@@ -144,7 +144,7 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *input)
                     fp = flags2D4;
                     *fp = mask | *fp;
                 }
-                actor->group.field418 = actor->group.field416;
+                actor->group.common.gate.counter = actor->group.common.gate.duration;
                 {
                     u16 *mode = (u16 *)((u8 *)actor->context + 0x65C);
                     u32 mask;

@@ -123,7 +123,7 @@ static inline void SetResponse(struct RouteResponse *response, void *control, u3
 }
 void SceneActorReaction_TryResumeRoute(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    struct RouteResponseGroup *group = (void *)&actor->group;
+    struct RouteResponseGroup *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->body.direction = (((actor->field2B6 + 3) & 7) << 5) - 64;
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 0);

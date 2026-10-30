@@ -250,7 +250,7 @@ static inline void SetRestore(struct SkelSaved *saved, u32 state, u32 phase, u32
 static inline void ReturnHome(void *ctx)
 {
     struct SceneActorRegistryResetView *actor = ctx;
-    struct SkelGroup *group = (void *)&actor->group;
+    struct SkelGroup *group = (void *)&actor->group.common;
     struct ContactPosition *destination;
     struct SkelRouteLink *link;
     u8 **target = (u8 **)&actor->tracking.target;
@@ -307,7 +307,7 @@ static inline void ReturnHome(void *ctx)
                 group->destination->pad = 0;
             }
         }
-        Resume(ctx, (void *)&((struct SceneActorRegistryResetView *)ctx)->group, actor->body.direction);
+        Resume(ctx, (void *)&((struct SceneActorRegistryResetView *)ctx)->group.common, actor->body.direction);
         actor->field2C2 = 0x20;
         return;
     } else {
@@ -322,7 +322,7 @@ fail:
 
 void sub_080BFCC4(struct SceneActorRegistryResetView *actor)
 {
-    struct SkelGroup *group = (void *)&actor->group;
+    struct SkelGroup *group = (void *)&actor->group.common;
     if (TakeFlag2B1(actor))
         actor->body.direction = actor->tracking.heading;
     if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))

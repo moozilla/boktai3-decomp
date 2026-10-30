@@ -20,8 +20,8 @@ static inline void ResetContext(struct SceneActorRegistryResetView *a)
     struct SceneActorRegistryControl *control;
     u16 *flags;
     a->field2C2 = 64;
-    a->group.flags414 = 0;
-    a->group.field418 = 0;
+    a->group.common.gate.flags = 0;
+    a->group.common.gate.counter = 0;
     flags = &a->flags2D4;
     {
         s32 mask = ~0x380;
@@ -32,7 +32,7 @@ static inline void ResetContext(struct SceneActorRegistryResetView *a)
         s32 mask = ~0x18;
         motion->flags = mask & motion->flags;
     }
-    control = &a->group.control;
+    control = &a->group.common.control;
     if (Chase_Bits32(&a->flags2CC, 0x200000)) {
         u32 *state = &a->flags2D0;
         s32 mask = ~0x1000000;
@@ -49,7 +49,7 @@ static inline void ResetContext(struct SceneActorRegistryResetView *a)
         s32 mask = ~0x400;
         *flags = mask & *flags;
     }
-    a->field5DA = 255;
+    a->group.turn.turnsRemaining = 255;
 }
 // confidence=low: prepares context response state and starts pursuit.
 #define Vorn_BeginResponsePursuit sub_080B3110
@@ -67,8 +67,8 @@ inline static void ResetContext_080B3110(struct SceneActorRegistryResetView *a)
     u16 *flags;
     s32 t1;
     a->field2C2 = 64;
-    a->group.flags414 = 0;
-    a->group.field418 = 0;
+    a->group.common.gate.flags = 0;
+    a->group.common.gate.counter = 0;
     flags = &a->flags2D4;
     {
         s32 mask = ~0x380;
@@ -79,7 +79,7 @@ inline static void ResetContext_080B3110(struct SceneActorRegistryResetView *a)
         s32 mask = ~0x18;
         motion->flags = mask & motion->flags;
     }
-    control = &a->group.control;
+    control = &a->group.common.control;
     t1 = 0x200000;
     if (Chase_Bits32(&a->flags2CC, t1)) {
         u32 *state = &a->flags2D0;
@@ -97,7 +97,7 @@ inline static void ResetContext_080B3110(struct SceneActorRegistryResetView *a)
         s32 mask = ~0x400;
         *flags = mask & (*flags);
     }
-    a->field5DA = 255;
+    a->group.turn.turnsRemaining = 255;
 }
 
 inline static u8 Test_1_080B3110(u16 *p)

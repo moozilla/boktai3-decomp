@@ -11,7 +11,7 @@ static inline u8 IsControlled(struct SceneActorRegistryResetView *a)
 }
 static inline void ClearRoute(struct SceneActorRegistryResetView *a)
 {
-    register struct SceneActorRegistryControl *route asm("r2") = &a->group.control;
+    register struct SceneActorRegistryControl *route asm("r2") = &a->group.common.control;
     register u32 *flags asm("r3") = &a->flags2CC;
     register u32 mask asm("r1") = ~0x141C0;
     *flags &= mask;

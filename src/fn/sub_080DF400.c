@@ -8,7 +8,7 @@ void SceneActorMotion_TestTargetTransition(void);
 void Dog_SelectRetreatOrChase(struct SceneActorRegistryResetView *a)
 {
     u8 *context = a->context;
-    u8 *group = (u8 *)&a->group;
+    u8 *group = (u8 *)&a->group.common;
     SceneActorReaction_ResetResponseState(group + 0x8C, gUnk_0824E2A8, 0x2AA);
     if (FIELD(context, 0x6A7, u8) <= 3) {
         if (a->tracking.distance < FIELD(context, 0x688, u32) || !Dog_IsActionTimerExpired(a)) {
