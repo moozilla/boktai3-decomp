@@ -13,7 +13,6 @@ void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void SceneActorAnimation_InitEnemySequence(void *, u32);
-void CpuSet(const void *, void *, u32);
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
@@ -57,55 +56,6 @@ u8 SceneActorRegistry_LinkActor(void *);
 void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
-
-static inline u16 SkeletonInit_PositionX(const struct ContactPosition *pos)
-{
-    return pos->x;
-}
-static inline u16 SkeletonInit_PositionZ(const struct ContactPosition *pos)
-{
-    return pos->z;
-}
-static inline u32 SkeletonInit_Cell(struct ContactPosition *pos)
-{
-    s32 x = (s16)SkeletonInit_PositionX(pos) >> 8;
-    s32 z = (s16)SkeletonInit_PositionZ(pos) >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
-}
-static inline u8 SkeletonInit_TerrainShape(const u8 *cell)
-{
-    return *cell >> 4;
-}
-static inline u32 SkeletonInit_TerrainBaseHeight(const u8 *cell)
-{
-    return (*cell & 15) << 8;
-}
-static inline u32 SkeletonInit_Height(s32 cell, u16 *pos)
-{
-    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
-    u32 shape;
-    s32 height;
-    if (p)
-        p += 4;
-    else {
-        struct EngineMap *map = (void *)gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        p = map->cells + offset;
-    }
-    shape = SkeletonInit_TerrainShape(p);
-    height = SkeletonInit_TerrainBaseHeight(p);
-    switch (shape) {
-        case 1:
-            height -= ((u8 *)pos)[4];
-            break;
-        case 2:
-            height -= ((u8 *)pos)[0];
-            break;
-    }
-    return height;
-}
 
 struct SkeletonBody {
     u32 id;
@@ -625,7 +575,7 @@ static inline void SkeletonInit_SnapToRoute(struct ContactPosition *position, st
 {
     position->x = SkeletonInit_RoutePointX(route);
     position->z = SkeletonInit_RoutePointZ(route);
-    position->y = SkeletonInit_Height(SkeletonInit_Cell(position), (u16 *)position);
+    position->y = MonsterInit_TerrainHeight(MonsterInit_CellIndex(position), position);
 }
 static inline void SkeletonInit_DrawablePosition(struct SkeletonActor *actor)
 {
@@ -716,9 +666,9 @@ static inline u32 SkeletonInit_ReadRoute(struct SkeletonActor *arg0, struct Skel
             Script_GetPc() ? Script_GetValue() : SkeletonInit_RouteId(rt);
         Path_GetPointPositionById((u16 *)&point, SkeletonInit_RouteId(rt),
                                   SkeletonInit_RoutePointId(rt));
-        arg0->field2F4 = SkeletonInit_Cell(&point);
+        arg0->field2F4 = MonsterInit_CellIndex(&point);
         point.y = arg0->field2BE =
-            SkeletonInit_Height(SkeletonInit_GetTerrainCell(arg0), (u16 *)&point);
+            MonsterInit_TerrainHeight(SkeletonInit_GetTerrainCell(arg0), &point);
         SkeletonInit_BeginRoute(&arg0->body, rt);
         return 1;
     } else {
@@ -1123,9 +1073,8 @@ s32 Skeleton_Init(void *object)
             actor->body.position.z = MonsterInit_ReadHalfword(0);
             actor->body.direction = MonsterInit_ReadByte(0);
             SkeletonInit_ReadWidgetRelativePalette((void *)(actor->drawable + 0x20));
-            actor->field2F4 = SkeletonInit_Cell(SkeletonInit_BodyPosition(&actor->body));
-            actor->field2BE = SkeletonInit_Height(SkeletonInit_GetTerrainCell(actor),
-                                                  (u16 *)SkeletonInit_BodyPosition(&actor->body));
+            actor->field2F4 = MonsterInit_CellIndex(SkeletonInit_BodyPosition(&actor->body));
+            actor->field2BE = MonsterInit_TerrainHeight(SkeletonInit_GetTerrainCell(actor),SkeletonInit_BodyPosition(&actor->body));
             actor->field2EA = actor->body.position.y - actor->field2BE;
             actor->body.position.y = actor->field2BE;
         }

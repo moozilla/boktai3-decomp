@@ -9,7 +9,6 @@ void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void SceneActorAnimation_InitEnemySequence(void *, u32);
-void CpuSet(const void *, void *, u32);
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
@@ -234,52 +233,6 @@ static inline u8 MonsterInit_Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline u16 MonsterInit_PositionX(const struct ContactPosition *pos)
-{
-    return pos->x;
-}
-static inline u16 MonsterInit_PositionZ(const struct ContactPosition *pos)
-{
-    return pos->z;
-}
-static inline u32 MonsterInit_Cell(struct ContactPosition *pos)
-{
-    s32 x = (s16)MonsterInit_PositionX(pos) >> 8;
-    s32 z = (s16)MonsterInit_PositionZ(pos) >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
-}
-static inline u32 MonsterInit_MaskValue(u32 value, u32 mask)
-{
-    mask &= value;
-    return mask;
-}
-static inline s32 MonsterInit_Height(s32 cell, u16 *pos)
-{
-    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
-    u32 attributes, shape;
-    s32 height;
-    if (p)
-        p += 4;
-    else {
-        struct EngineMap *map = (void *)gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        p = map->cells + offset;
-    }
-    attributes = *p;
-    shape = attributes >> 4;
-    height = MonsterInit_MaskValue(attributes, 15) << 8;
-    switch (shape) {
-        case 1:
-            height -= ((u8 *)pos)[4];
-            break;
-        case 2:
-            height -= ((u8 *)pos)[0];
-            break;
-    }
-    return height;
-}
 static inline u8 MonsterInit_GetDrawableKind(struct MonsterInitActor *actor)
 {
     return actor->drawableKind;
@@ -300,7 +253,7 @@ static inline u16 MonsterInit_GetGroundHeight(struct MonsterInitActor *actor)
 {
     return actor->field2BE;
 }
-static inline u16 MonsterInit_GetPaletteBase(struct MonsterInitActor *actor)
+static inline u32 MonsterInit_GetPaletteBase(struct MonsterInitActor *actor)
 {
     return actor->field1E0;
 }
@@ -312,7 +265,7 @@ static inline u16 MonsterInit_GetCurrentPalette(struct MonsterInitActor *actor)
 {
     return actor->field1E4;
 }
-static inline u16 MonsterInit_GetPaletteOffset(struct MonsterInitActor *actor)
+static inline u32 MonsterInit_GetPaletteOffset(struct MonsterInitActor *actor)
 {
     return actor->field1E6;
 }
@@ -738,7 +691,7 @@ static inline void Lun_SnapToRoute(struct ContactPosition *position, struct LunR
 {
     position->x = Lun_RoutePointX(route);
     position->z = Lun_RoutePointZ(route);
-    position->y = MonsterInit_Height(MonsterInit_Cell(position), (u16 *)position);
+    position->y = MonsterInit_TerrainHeight(MonsterInit_CellIndex(position), position);
 }
 static inline u32 Lun_ReadRoute(struct MonsterInitActor *actor, struct LunActor *lun,
                                 struct LunRoute *route)
@@ -756,9 +709,9 @@ static inline u32 Lun_ReadRoute(struct MonsterInitActor *actor, struct LunActor 
         route->branches[Lun_RouteAlternateBranch(route)] =
             Script_GetPc() ? Script_GetValue() : Lun_RouteId(route);
         Path_GetPointPositionById(&point, Lun_RouteId(route), Lun_RoutePointId(route));
-        actor->field2F4 = MonsterInit_Cell(&point);
+        actor->field2F4 = MonsterInit_CellIndex(&point);
         point.y = actor->field2BE =
-            MonsterInit_Height(MonsterInit_GetTerrainCell(actor), (u16 *)&point);
+            MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor), &point);
         Lun_BeginRoute(&actor->body, route);
         return 1;
     } else {
@@ -778,9 +731,9 @@ static inline void Lun_ReadPosition(struct MonsterInitActor *actor, struct LunAc
         actor->body.position.x = MonsterInit_ReadHalfword(0);
         actor->body.position.y = MonsterInit_ReadHalfword(0);
         actor->body.position.z = MonsterInit_ReadHalfword(0);
-        actor->field2F4 = MonsterInit_Cell(&actor->body.position);
+        actor->field2F4 = MonsterInit_CellIndex(&actor->body.position);
         ground =
-            MonsterInit_Height(MonsterInit_GetTerrainCell(actor), (u16 *)&actor->body.position);
+            MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor), &actor->body.position);
         actor->field2BE = ground;
         lun->ground3DC = ground;
         Lun_DrawablePosition(actor);

@@ -11,7 +11,6 @@
 #define U32(p, n) (*(u32 *)((u8 *)(p) + (n)))
 #define PTR(p, n) (*(void **)((u8 *)(p) + (n)))
 #define POS(p, n) (*(struct ContactPosition *)((u8 *)(p) + (n)))
-void CpuSet(const void *, void *, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, u32, void *);
 void Ghost_InitActorProfile(void *);
 void SceneActorAnimation_InitEnemySequence(void *, u32);
@@ -271,11 +270,11 @@ static inline u8 Ghost_GetControlKind(struct GhostActor *a)
 {
     return a->field2B5;
 }
-static inline u16 Ghost_GetPaletteBase(struct GhostActor *a)
+static inline u32 Ghost_GetPaletteBase(struct GhostActor *a)
 {
     return a->basePaletteBank;
 }
-static inline u16 Ghost_GetPaletteOffset(struct GhostActor *a)
+static inline u32 Ghost_GetPaletteOffset(struct GhostActor *a)
 {
     return a->paletteOffset;
 }
@@ -321,7 +320,7 @@ static inline void Ghost_SetStatusFlags(struct GhostActor *a, u32 mask)
 {
     a->flags2D0 |= mask;
 }
-static inline u8 Ghost_GetTargetingFlags(struct GhostTargeting *target)
+static inline u32 Ghost_GetTargetingFlags(struct GhostTargeting *target)
 {
     return target->flags;
 }
@@ -353,44 +352,6 @@ static inline void Ghost_SetAnimationIndex(struct GhostActor *a, u32 value)
 static inline u8 Ghost_GetAnimationRestart(struct GhostActor *a)
 {
     return a->field2B3;
-}
-static inline u32 Cell(struct ContactPosition *p)
-{
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-static inline u32 Ghost_TerrainShape(const u8 *cell)
-{
-    return *cell >> 4;
-}
-static inline u32 Ghost_TerrainBaseHeight(const u8 *cell)
-{
-    return (*cell & 15) << 8;
-}
-static inline u32 Height(u32 cell, struct ContactPosition *p)
-{
-    u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
-    u32 shape, height;
-    if (data)
-        data += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        data = map->cells + offset;
-    }
-    shape = Ghost_TerrainShape(data);
-    height = Ghost_TerrainBaseHeight(data);
-    switch (shape) {
-        case 1:
-            height -= U8(p, 4);
-            break;
-        case 2:
-            height -= U8(p, 0);
-            break;
-    }
-    return height;
 }
 static inline void DrawablePosition(struct GhostActor *a)
 {
@@ -771,6 +732,14 @@ static inline u32 Ghost_AlternateRouteBranch(struct GhostRoute *route)
 {
     return 1 ^ route->activeBranch;
 }
+static inline u32 Ghost_RoutePointXRaw(struct GhostRoute *route)
+{
+    return (u16)route->point->x;
+}
+static inline u32 Ghost_RoutePointZRaw(struct GhostRoute *route)
+{
+    return (u16)route->point->z;
+}
 static inline u32 Ghost_ReadRoute(struct GhostActor *a, struct GhostRoute *route)
 {
     struct ContactPosition point;
@@ -784,8 +753,8 @@ static inline u32 Ghost_ReadRoute(struct GhostActor *a, struct GhostRoute *route
         route->branches[Ghost_AlternateRouteBranch(route)] =
             Script_GetPc() ? Script_GetValue() : Ghost_RouteId(route);
         Path_GetPointPositionById((u16 *)&point, route->routeId, route->pointId);
-        a->terrainCell = Cell(&point);
-        point.y = a->groundHeight2BE = Height(Ghost_GetTerrainCell(a), &point);
+        a->terrainCell = MonsterInit_CellIndex(&point);
+        point.y = a->groundHeight2BE = MonsterInit_TerrainHeight(Ghost_GetTerrainCell(a), &point);
         Ghost_BeginRoute(&a->body, route);
         return 1;
     } else {
@@ -820,9 +789,9 @@ s32 Ghost_Init(void *object)
         {
             struct ContactPosition *dest = &a->body.position;
             struct GhostRoute *link = route;
-            dest->x = link->point->x;
-            dest->z = link->point->z;
-            dest->y = Height(Cell(dest), dest);
+            dest->x = Ghost_RoutePointXRaw(link);
+            dest->z = Ghost_RoutePointZRaw(link);
+            dest->y = MonsterInit_TerrainHeight(MonsterInit_CellIndex(dest), dest);
         }
         DrawablePosition(a);
         a->body.direction = Route_GetCurrentPointFacing(route);
@@ -831,8 +800,8 @@ s32 Ghost_Init(void *object)
         a->body.position.x = MonsterInit_ReadHalfword(0);
         a->body.position.y = MonsterInit_ReadHalfword(0);
         a->body.position.z = MonsterInit_ReadHalfword(0);
-        a->terrainCell = Cell(&a->body.position);
-        a->groundHeight2BE = Height(Ghost_GetTerrainCell(a), &a->body.position);
+        a->terrainCell = MonsterInit_CellIndex(&a->body.position);
+        a->groundHeight2BE = MonsterInit_TerrainHeight(Ghost_GetTerrainCell(a), &a->body.position);
         arg0->baseHeight = a->groundHeight2BE;
         DrawablePosition(a);
     } else

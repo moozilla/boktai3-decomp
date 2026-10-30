@@ -39,7 +39,6 @@ void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void SceneActorAnimation_InitEnemySequence(void *, u32);
-void CpuSet(const void *, void *, u32);
 void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void SceneActorReaction_OnEnemyDefault(void);
@@ -93,7 +92,6 @@ void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void SceneActorAnimation_InitEnemySequence(void *, u32);
-void CpuSet(const void *, void *, u32);
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
@@ -137,57 +135,6 @@ u8 SceneActorRegistry_LinkActor(void *);
 void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
-
-static inline u16 AxeInit_PositionX(const u16 *pos)
-{
-    return pos[0];
-}
-static inline u16 AxeInit_PositionZ(const u16 *pos)
-{
-    return pos[2];
-}
-static inline s32 AxeInit_Cell(u16 *pos)
-{
-    s32 x = (s16)AxeInit_PositionX(pos) >> 8;
-    s32 z = (s16)AxeInit_PositionZ(pos) >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
-}
-static inline u32 AxeInit_TerrainShape(const u8 *cell)
-{
-    return *cell >> 4;
-}
-
-static inline u32 AxeInit_TerrainBaseHeight(const u8 *cell)
-{
-    return (*cell & 15) << 8;
-}
-
-static inline u32 AxeInit_Height(s32 cell, u16 *pos)
-{
-    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
-    u32 attributes, shape;
-    s32 height;
-    if (p)
-        p += 4;
-    else {
-        struct EngineMap *map = (void *)gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        p = map->cells + offset;
-    }
-    shape = AxeInit_TerrainShape(p);
-    height = AxeInit_TerrainBaseHeight(p);
-    switch (shape) {
-        case 1:
-            height -= ((u8 *)pos)[4];
-            break;
-        case 2:
-            height -= ((u8 *)pos)[0];
-            break;
-    }
-    return height;
-}
 
 struct AxeInitBody {
     u32 id;
@@ -657,7 +604,7 @@ static inline void AxeInit_SnapToRoute(struct ContactPosition *position, struct 
 {
     position->x = AxeInit_RoutePointX(route);
     position->z = AxeInit_RoutePointZ(route);
-    position->y = AxeInit_Height(AxeInit_Cell(position), (u16 *)position);
+    position->y = MonsterInit_TerrainHeight(MonsterInit_CellIndex(position), position);
 }
 static inline void AxeInit_DrawablePosition(struct AxeInitActor *actor)
 {
@@ -750,8 +697,8 @@ static inline u32 AxeInit_ReadRoute(struct AxeInitActor *arg0, struct AxeInitGro
         rt->branches[AxeInit_RouteAlternateBranch(rt)] =
             Script_GetPc() ? Script_GetValue() : AxeInit_RouteId(rt);
         Path_GetPointPositionById((u16 *)&point, AxeInit_RouteId(rt), AxeInit_RoutePointId(rt));
-        arg0->field2F4 = AxeInit_Cell(&point);
-        point.y = arg0->field2BE = AxeInit_Height(AxeInit_GetTerrainCell(arg0), (u16 *)&point);
+        arg0->field2F4 = MonsterInit_CellIndex(&point);
+        point.y = arg0->field2BE = MonsterInit_TerrainHeight(AxeInit_GetTerrainCell(arg0), &point);
         AxeInit_BeginRoute(&arg0->body, rt);
         return 1;
     } else {
@@ -1079,8 +1026,8 @@ s32 Axe_Init(void *object)
         actor->body.position.x = MonsterInit_ReadHalfword(0);
         actor->body.position.y = MonsterInit_ReadHalfword(0);
         actor->body.position.z = MonsterInit_ReadHalfword(0);
-        actor->field2F4 = AxeInit_Cell((u16 *)&actor->body.position);
-        height = AxeInit_Height(AxeInit_GetTerrainCell(actor), (u16 *)&actor->body.position);
+        actor->field2F4 = MonsterInit_CellIndex(&actor->body.position);
+        height = MonsterInit_TerrainHeight(AxeInit_GetTerrainCell(actor), &actor->body.position);
         actor->field2BE = height;
         arg0->groundHeightE58 = height;
     } else {

@@ -13,7 +13,6 @@ void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void SceneActorAnimation_InitEnemySequence(void *, u32);
-void CpuSet(const void *, void *, u32);
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
@@ -57,55 +56,6 @@ u8 SceneActorRegistry_LinkActor(void *);
 void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
-
-static inline u16 MummyInit_PositionX(const struct ContactPosition *pos)
-{
-    return pos->x;
-}
-static inline u16 MummyInit_PositionZ(const struct ContactPosition *pos)
-{
-    return pos->z;
-}
-static inline u32 MummyInit_Cell(struct ContactPosition *pos)
-{
-    s32 x = (s16)MummyInit_PositionX(pos) >> 8;
-    s32 z = (s16)MummyInit_PositionZ(pos) >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
-}
-static inline u8 MummyInit_TerrainShape(const u8 *cell)
-{
-    return *cell >> 4;
-}
-static inline u32 MummyInit_TerrainBaseHeight(const u8 *cell)
-{
-    return (*cell & 15) << 8;
-}
-static inline u32 MummyInit_Height(s32 cell, u16 *pos)
-{
-    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
-    u32 shape;
-    s32 height;
-    if (p)
-        p += 4;
-    else {
-        struct EngineMap *map = (void *)gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        p = map->cells + offset;
-    }
-    shape = MummyInit_TerrainShape(p);
-    height = MummyInit_TerrainBaseHeight(p);
-    switch (shape) {
-        case 1:
-            height -= ((u8 *)pos)[4];
-            break;
-        case 2:
-            height -= ((u8 *)pos)[0];
-            break;
-    }
-    return height;
-}
 
 struct MummyInitBody {
     u32 id;
@@ -588,7 +538,7 @@ static inline void MummyInit_SnapToRoute(struct ContactPosition *position,
 {
     position->x = MummyInit_RoutePointX(route);
     position->z = MummyInit_RoutePointZ(route);
-    position->y = MummyInit_Height(MummyInit_Cell(position), (u16 *)position);
+    position->y = MonsterInit_TerrainHeight(MonsterInit_CellIndex(position), position);
 }
 static inline void MummyInit_DrawablePosition(struct MummyInitActor *actor)
 {
@@ -678,8 +628,8 @@ static inline u32 MummyInit_ReadRoute(struct MummyInitActor *arg0, struct MummyI
         rt->branches[MummyInit_RouteAlternateBranch(rt)] =
             Script_GetPc() ? Script_GetValue() : MummyInit_RouteId(rt);
         Path_GetPointPositionById((u16 *)&point, MummyInit_RouteId(rt), MummyInit_RoutePointId(rt));
-        arg0->field2F4 = MummyInit_Cell(&point);
-        point.y = arg0->field2BE = MummyInit_Height(MummyInit_GetTerrainCell(arg0), (u16 *)&point);
+        arg0->field2F4 = MonsterInit_CellIndex(&point);
+        point.y = arg0->field2BE = MonsterInit_TerrainHeight(MummyInit_GetTerrainCell(arg0), &point);
         MummyInit_BeginRoute(&arg0->body, rt);
         return 1;
     } else {

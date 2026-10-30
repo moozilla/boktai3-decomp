@@ -52,4 +52,65 @@ static inline void MonsterInit_ClearPosition(u32 *fill, void *object)
     CpuSet(fill, position, 0x05000002);
 }
 
+/* Coordinates keep their stored halfword domain until the signed cell calculation. */
+static inline u16 MonsterInit_PositionXRaw(const struct ContactPosition *position)
+{
+    return position->x;
+}
+
+static inline u16 MonsterInit_PositionZRaw(const struct ContactPosition *position)
+{
+    return position->z;
+}
+
+static inline u32 MonsterInit_CellIndex(const struct ContactPosition *position)
+{
+    s32 x = (s16)MonsterInit_PositionXRaw(position) >> 8;
+    s32 z = (s16)MonsterInit_PositionZRaw(position) >> 8;
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+        return 0;
+    return gTerrainMap->rows[z] + x;
+}
+
+/* Actor cell IDs are stored as halfwords; map calculations use a word index. */
+static inline u16 MonsterInit_CellId(const struct ContactPosition *position)
+{
+    return MonsterInit_CellIndex(position);
+}
+
+static inline u8 MonsterInit_TerrainShape(const u8 *cell)
+{
+    return *cell >> 4;
+}
+
+static inline u32 MonsterInit_TerrainBaseHeight(const u8 *cell)
+{
+    return (*cell & 15) << 8;
+}
+
+static inline s32 MonsterInit_TerrainHeight(s32 cell, const struct ContactPosition *position)
+{
+    u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
+    u32 shape;
+    s32 height;
+    if (data)
+        data += 4;
+    else {
+        struct EngineMap *map = gTerrainMap;
+        u32 offset = cell * 4 + 12;
+        data = map->cells + offset;
+    }
+    shape = MonsterInit_TerrainShape(data);
+    height = MonsterInit_TerrainBaseHeight(data);
+    switch (shape) {
+        case 1:
+            height -= ((const u8 *)position)[4];
+            break;
+        case 2:
+            height -= ((const u8 *)position)[0];
+            break;
+    }
+    return height;
+}
+
 #endif

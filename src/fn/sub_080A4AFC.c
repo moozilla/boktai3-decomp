@@ -13,7 +13,6 @@ void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void SceneActorAnimation_InitEnemySequence(void *, u32);
-void CpuSet(const void *, void *, u32);
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
@@ -56,55 +55,6 @@ u8 SceneActorRegistry_LinkActor(void *);
 void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
-
-static inline u16 MonsterInit_PositionX(const struct ContactPosition *pos)
-{
-    return pos->x;
-}
-static inline u16 MonsterInit_PositionZ(const struct ContactPosition *pos)
-{
-    return pos->z;
-}
-static inline u32 MonsterInit_Cell(struct ContactPosition *pos)
-{
-    s32 x = (s16)MonsterInit_PositionX(pos) >> 8;
-    s32 z = (s16)MonsterInit_PositionZ(pos) >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
-}
-static inline u32 MonsterInit_TerrainShape(const u8 *cell)
-{
-    return *cell >> 4;
-}
-static inline u32 MonsterInit_TerrainBaseHeight(const u8 *cell)
-{
-    return (*cell & 15) << 8;
-}
-static inline u32 MonsterInit_Height(s32 cell, u16 *pos)
-{
-    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
-    u32 attributes, shape;
-    s32 height;
-    if (p)
-        p += 4;
-    else {
-        struct EngineMap *map = (void *)gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        p = map->cells + offset;
-    }
-    shape = MonsterInit_TerrainShape(p);
-    height = MonsterInit_TerrainBaseHeight(p);
-    switch (shape) {
-        case 1:
-            height -= ((u8 *)pos)[4];
-            break;
-        case 2:
-            height -= ((u8 *)pos)[0];
-            break;
-    }
-    return height;
-}
 
 struct SpiderBody {
     u32 id;
@@ -601,7 +551,7 @@ static inline void MonsterInit_SnapToRoute(struct ContactPosition *position,
 {
     position->x = MonsterInit_RoutePointX(route);
     position->z = MonsterInit_RoutePointZ(route);
-    position->y = MonsterInit_Height(MonsterInit_Cell(position), (u16 *)position);
+    position->y = MonsterInit_TerrainHeight(MonsterInit_CellIndex(position), position);
 }
 static inline void MonsterInit_DrawablePosition(struct SpiderActor *actor)
 {
@@ -692,9 +642,9 @@ static inline u32 MonsterInit_ReadRoute(struct SpiderActor *arg0, struct SpiderG
             Script_GetPc() ? Script_GetValue() : MonsterInit_RouteId(rt);
         Path_GetPointPositionById((u16 *)&point, MonsterInit_RouteId(rt),
                                   MonsterInit_RoutePointId(rt));
-        arg0->field2F4 = MonsterInit_Cell(&point);
+        arg0->field2F4 = MonsterInit_CellIndex(&point);
         point.y = arg0->field2BE =
-            MonsterInit_Height(MonsterInit_GetTerrainCell(arg0), (u16 *)&point);
+            MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(arg0), &point);
         MonsterInit_BeginRoute(&arg0->body, rt);
         return 1;
     } else {

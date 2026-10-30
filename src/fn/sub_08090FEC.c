@@ -9,7 +9,6 @@ void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void SceneActorAnimation_InitEnemySequence(void *, u32);
-void CpuSet(const void *, void *, u32);
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
@@ -239,52 +238,6 @@ static inline u8 MonsterInit_Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline u16 MonsterInit_PositionX(const u16 *pos)
-{
-    return pos[0];
-}
-static inline u16 MonsterInit_PositionZ(const u16 *pos)
-{
-    return pos[2];
-}
-static inline u16 MonsterInit_Cell(u16 *pos)
-{
-    s32 x = (s16)MonsterInit_PositionX(pos) >> 8;
-    s32 z = (s16)MonsterInit_PositionZ(pos) >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
-}
-static inline u32 MonsterInit_MaskValue(u32 value, u32 mask)
-{
-    mask &= value;
-    return mask;
-}
-static inline s32 MonsterInit_Height(s32 cell, u16 *pos)
-{
-    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
-    u32 attributes, shape;
-    s32 height;
-    if (p)
-        p += 4;
-    else {
-        struct EngineMap *map = (void *)gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        p = map->cells + offset;
-    }
-    attributes = *p;
-    shape = attributes >> 4;
-    height = MonsterInit_MaskValue(attributes, 15) << 8;
-    switch (shape) {
-        case 1:
-            height -= ((u8 *)pos)[4];
-            break;
-        case 2:
-            height -= ((u8 *)pos)[0];
-            break;
-    }
-    return height;
-}
 static inline u8 MonsterInit_GetDrawableKind(struct MonsterInitActor *actor)
 {
     return actor->drawableKind;
@@ -362,11 +315,11 @@ static inline u8 MonsterInit_GetDirection(struct MonsterInitActor *actor)
 {
     return actor->body.direction;
 }
-static inline u16 MonsterInit_GetTerrainCell(struct MonsterInitActor *actor)
+static inline u32 MonsterInit_GetTerrainCell(struct MonsterInitActor *actor)
 {
     return actor->field2F4;
 }
-static inline u8 MonsterInit_GetTargetingFlags(struct MonsterInitTargeting *target)
+static inline u32 MonsterInit_GetTargetingFlags(struct MonsterInitTargeting *target)
 {
     return target->fieldEB;
 }
@@ -709,9 +662,9 @@ static inline void MonsterInit_InitializeRegion(struct MonsterInitActor *actor)
 
 static inline s32 MonsterInit_UpdateTerrainCell(struct MonsterInitActor *actor)
 {
-    u16 *position = (u16 *)&actor->body.position;
-    actor->field2F4 = MonsterInit_Cell(position);
-    return MonsterInit_Height(MonsterInit_GetTerrainCell(actor), position);
+    struct ContactPosition *position = &actor->body.position;
+    actor->field2F4 = MonsterInit_CellId(position);
+    return MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor), position);
 }
 s32 Slime_Init(void *object)
 {

@@ -27,7 +27,6 @@ void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void SceneActorAnimation_InitEnemySequence(void *, u32);
-void CpuSet(const void *, void *, u32);
 void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void SceneActorReaction_OnEnemyDefault(void);
@@ -81,7 +80,6 @@ void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void SceneActorAnimation_InitEnemySequence(void *, u32);
-void CpuSet(const void *, void *, u32);
 void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
@@ -125,53 +123,6 @@ u8 SceneActorRegistry_LinkActor(void *);
 void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
-
-static inline u16 MimicInit_PositionX(const u16 *pos)
-{
-    return pos[0];
-}
-static inline u16 MimicInit_PositionZ(const u16 *pos)
-{
-    return pos[2];
-}
-static inline s32 MimicInit_Cell(u16 *pos)
-{
-    s32 x = (s16)MimicInit_PositionX(pos) >> 8;
-    s32 z = (s16)MimicInit_PositionZ(pos) >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
-}
-static inline u32 MimicInit_TerrainShape(const u8 *cell)
-{
-    return *cell >> 4;
-}
-
-static inline u32 MimicInit_TerrainBaseHeight(const u8 *cell)
-{
-    return (*cell & 15) << 8;
-}
-
-static inline u32 MimicInit_Height(s32 cell, u16 *pos)
-{
-    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
-    u32 attributes, shape;
-    s32 height;
-    if (p)
-        p += 4;
-    else {
-        struct EngineMap *map = (void *)gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        p = map->cells + offset;
-    }
-    shape = MimicInit_TerrainShape(p);
-    height = MimicInit_TerrainBaseHeight(p);
-    switch (shape) {
-    case 1: height -= ((u8 *)pos)[4]; break;
-    case 2: height -= ((u8 *)pos)[0]; break;
-    }
-    return height;
-}
 
 struct MimicInitBody {
     u32 id;
@@ -604,7 +555,7 @@ static inline void MimicInit_ReadTargeting(struct MimicInitTargeting *target)
 
 }
 
-static inline u16 MimicInit_RangeRadius(struct MimicInitRange *range)
+static inline u32 MimicInit_RangeRadius(struct MimicInitRange *range)
 {
     return range->field422;
 }
@@ -638,7 +589,7 @@ static inline void MimicInit_SnapToRoute(struct ContactPosition *position, struc
 {
     position->x = MimicInit_RoutePointX(route);
     position->z = MimicInit_RoutePointZ(route);
-    position->y = MimicInit_Height(MimicInit_Cell(position), (u16 *)position);
+    position->y = MonsterInit_TerrainHeight(MonsterInit_CellIndex(position), position);
 }
 static inline void MimicInit_DrawablePosition(struct MimicInitActor *actor)
 {
@@ -729,8 +680,8 @@ static inline u32 MimicInit_ReadRoute(struct MimicInitActor *arg0, struct MimicI
         rt->branches[MimicInit_RouteActiveBranch(rt)] = rt->routeId;
         rt->branches[MimicInit_RouteAlternateBranch(rt)] = Script_GetPc() ? Script_GetValue() : MimicInit_RouteId(rt);
         Path_GetPointPositionById((u16 *)&point, MimicInit_RouteId(rt), MimicInit_RoutePointId(rt));
-        arg0->field2F4 = MimicInit_Cell(&point);
-        point.y = arg0->field2BE = MimicInit_Height(MimicInit_GetTerrainCell(arg0), (u16 *)&point);
+        arg0->field2F4 = MonsterInit_CellIndex(&point);
+        point.y = arg0->field2BE = MonsterInit_TerrainHeight(MimicInit_GetTerrainCell(arg0), &point);
         MimicInit_BeginRoute(&arg0->body, rt);
         return 1;
     } else {
@@ -1045,8 +996,8 @@ s32 Mimic_Init(void *object)
         actor->body.position.x = MonsterInit_ReadHalfword(0);
         actor->body.position.y = MonsterInit_ReadHalfword(0);
         actor->body.position.z = MonsterInit_ReadHalfword(0);
-        MimicInit_InitializeTerrainCell(actor, MimicInit_Cell((u16 *)&actor->body.position));
-        actor->field2BE = MimicInit_Height(MimicInit_GetTerrainCell(actor), (u16 *)&actor->body.position);
+        MimicInit_InitializeTerrainCell(actor, MonsterInit_CellIndex(&actor->body.position));
+        actor->field2BE = MonsterInit_TerrainHeight(MimicInit_GetTerrainCell(actor), &actor->body.position);
         actor->field2EA = 0;
         actor->body.position.y = actor->field2BE;
         MimicInit_DrawablePosition(actor);
