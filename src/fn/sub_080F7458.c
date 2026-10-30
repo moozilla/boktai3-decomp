@@ -19,7 +19,7 @@ s32 Script_GetPc(void);
 s32 Script_GetValue(void);
 s32 Script_SeekToKeyword(u32);
 void Sword_InitAttackComponents(struct SwordTask *);
-void sub_080F67AC(struct SwordTask *);
+void Sword_InitTask(struct SwordTask *);
 static inline u8 Sword_ClampKind(s32 kind)
 {
     if (kind > 1)
@@ -51,6 +51,6 @@ s32 Sword_InitializeFromScript(struct SwordTask *p)
         p->value86 = (Script_GetPc()) ? (Script_GetValue()) : (0);
     }
     Sword_InitAttackComponents(p);
-    sub_080F67AC(p);
+    Sword_InitTask(p);
     return p->ticks = 0;
 }

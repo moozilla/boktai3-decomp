@@ -3902,6 +3902,7 @@ addr,name,mode,confidence,source,notes
 080F645C,Sword_UpdateDamage,thumb,low,src-alias,
 080F669C,Sword_UpdateTask,thumb,low,src-alias,
 080F6718,Sword_DestroyTask,thumb,low,src-alias,
+080F67AC,Sword_InitTask,thumb,low,src-alias,Initializes the main drawable; shadow; colliders; palette and four child sprites from script parameters; task role tentative
 080F6F90,Sword_InitAttackComponents,thumb,low,src-alias,
 080F7458,Sword_InitializeFromScript,thumb,low,src-alias,
 080F752C,Sword_Create,thumb,medium,gcl-name,name from GCL key DB8D ソード (Sword); registry callback
