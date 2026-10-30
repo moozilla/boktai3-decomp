@@ -16,3 +16,10 @@ zero differing bytes.
 Exact 2,344 bytes using canonical chase, saved-response, and state-entry operations.
 The group owner is captured at entry; the zero result of the blocking query supplies
 the later state reset. Stock `tools/check.py` reports zero differing bytes.
+
+## Ghoul disc route recovery (0808A664)
+
+Exact 524 bytes. Canonical state-entry, controller, delayed-response, and route
+operations replace raw actor offsets. The motion-flags operation accepts its actor
+owner so its mask is prepared before the flag address. The context view exposes
+the disc targets and recovery delay. Stock check reports zero differing bytes.
