@@ -38,7 +38,7 @@ struct VornInstanceState {
 void SceneActorBehavior_InitializeShadow(void *);
 
 void SceneActorMovement_ResolveRoutePosition(void *);
-u8 sub_080B3C1C(void *);
+u8 Vorn_UpdateContactResponse(void *);
 void SceneActorPlacement_ResetStateThree(void);
 extern const u8 gUnk_08606038[];
 
@@ -259,7 +259,7 @@ s32 Vorn_Init(void *object)
     MonsterInit_InstallSequenceCallbacks(
         actor, Vorn_OnUpdate, Vorn_GetAnimationEvent, Vorn_UpdateIdleFacing, Vorn_ResetStateEntry,
         Vorn_BeginIdle, Vorn_UpdateHiddenRecovery, sub_080AD75C, Vorn_UpdateDefeat,
-        SceneActorReaction_OnEnemyDefault, sub_080B3C1C, SceneActorTarget_ResolvePendingObject,
+        SceneActorReaction_OnEnemyDefault, Vorn_UpdateContactResponse, SceneActorTarget_ResolvePendingObject,
         sub_081363F4, SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(group, (u8 *)arg0 + 0x6F4, (u8 *)arg0 + 0x718,
                                           Vorn_OnReactionNoOp, SceneActorReaction_ResumeSavedTarget,

@@ -3431,6 +3431,7 @@ addr,name,mode,confidence,source,notes
 080B3464,Vorn_ResumeRouteAfterReaction,thumb,low,src-alias,
 080B3ADC,SceneActor_DispatchContextAction,thumb,low,src-alias,
 080B3BD0,Vorn_BeginContactAnimation,thumb,low,src-alias,
+080B3C1C,Vorn_UpdateContactResponse,thumb,low,src-alias,Handles a selected contact target and enters the shared response state
 080B3E58,Vorn_SelectHitRecovery,thumb,low,src-alias,
 080B401C,Vorn_UpdateBehavior,thumb,low,src-alias,Runs five behavior helpers before the action dispatcher
 080B4044,Vorn_UpdateActionTimers,thumb,low,src-alias,Updates the shared cooldown and three timers and sets an actor flag for selected actions
