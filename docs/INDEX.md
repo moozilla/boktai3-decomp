@@ -327,6 +327,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/matching-search-contact_2026-10-29.md](../notes/matching-search-contact_2026-10-29.md) | Matching the second-largest function and removing the duplicate actor layouts | #matching #compiler #tooling #monsters #skeleton #golem | 9 |
 | [notes/matching-search-scale_2026-10-29.md](../notes/matching-search-scale_2026-10-29.md) | Matching search at the largest unmatched function | #matching #compiler #tooling #monsters | 19 |
 | [notes/matching-search_2026-10-29.md](../notes/matching-search_2026-10-29.md) | Matching search: implementation, evidence, and next steps | #matching #compiler #tooling #process | 18 |
+| [notes/matchsearch-interruption_2026-10-30.md](../notes/matchsearch-interruption_2026-10-30.md) | Formatter interruption regression | #tools #scope | 1 |
 | [notes/mgs-gcl-round1.md](../notes/mgs-gcl-round1.md) | MGS/GCL matching round 1 | *#scripts #matching* | 3 |
 | [notes/mgs-gcl-round2.md](../notes/mgs-gcl-round2.md) | MGS/GCL matching round 2 | *#scripts #matching* | 2 |
 | [notes/mgs-gcl-round3.md](../notes/mgs-gcl-round3.md) | MGS/GCL matching round 3 | *#scripts #matching* | 2 |
