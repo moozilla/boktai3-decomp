@@ -1,32 +1,23 @@
 #include "global.h"
 #include "render.h"
 #include "engine_globals.h"
-
-#define GH_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
-#define SV(d)         (Script_GetPc() ? Script_GetValue() : (d))
-
-struct Gh32Block {
-    u32 w[8];
-};
+#include "display_sequence_inline.h"
 
 s32 Script_SeekToKeyword(u32);
 s32 Script_GetKeywordValue(u32, s32);
 s32 Script_GetValue(void);
 u32 Script_GetPc(void);
-void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void SceneActorAnimation_InitEnemySequence(void *, u32);
 void CpuSet(const void *, void *, u32);
-void *ScriptProc_Start(u32, u32);
 void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
-void SceneActorRegistry_SetObjectContext(void *, void *, s32);
 void Ghoul_BindProfile(void *);
 void Vorn_ParseField624_0808B320(void *);
 void Ghoul_Update(void);
-void Bat_LookupAnimationEntry(void);
+u32 Bat_LookupAnimationEntry(void *);
 void Ghoul_TurnTowardRoute(void);
 void Ghoul_UpdateIdleState(void);
 void Ghoul_UpdateStandingState(void);
@@ -34,7 +25,7 @@ void sub_08087A70(void);
 void Bat_UpdateDefeat(void);
 void Ghoul_UpdateHiddenRecovery(void);
 void SceneActorReaction_OnEnemyDefault(void);
-void sub_0807F81C(void);
+u8 sub_0807F81C(void *);
 void SceneActorTarget_ResolvePendingObject(void);
 void SceneActorReaction_SinkAndRemove(void);
 void sub_081363F4(void);
@@ -74,8 +65,6 @@ void ProximityVolume_TranslateBounds(void *, void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorRegistry_RegisterCategoryReceiver(void *);
 void SceneActorBehavior_InitializeShadow(void *);
-extern const u8 gUnk_086108B0[];
-void *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
@@ -84,113 +73,701 @@ u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
 void SceneBody_SetSprite(void *, void *);
 void SceneBody_SetMovementProbe(void *, void *, s32, s32);
-void AnimData_SelectPaletteBank(void *);
 s32 SceneActorScript_GetManagerField62(void);
 void SceneActorPlacement_HideActor(void *, s32);
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
-void Anim_Step(void *);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
-s32 SceneActorRegistry_LinkActor(void *);
+
+static inline s32 GhoulInit_Value(s32 fallback)
+{
+    if (Script_GetPc())
+        return Script_GetValue();
+    return fallback;
+}
+#define SV(d) GhoulInit_Value(d)
+
+struct GhoulInit32Block {
+    u32 w[8];
+};
+
+void *Heap_Alloc(u32);
+void *ScriptProc_Start(u32, u32);
+void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
+extern const u8 gUnk_086108B0[];
+extern const u8 gUnk_08606400[];
+void *TerrainModifiers_FindCellOverride(s32, s32);
+void AnimData_SelectPaletteBank(void *, s32);
+void Anim_Step(void *, void *);
+u8 SceneActorRegistry_LinkActor(void *);
 void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
 
-/* terrain height probe: (x, y) world pos -> cell id -> height offset */
-static inline s32 Ghoul_CellHeight(u16 *pos, u16 *cellOut)
+struct GhoulInitPosition { s16 x, y, z, pad; };
+struct GhoulInitMap { u32 header; u8 *cells; u8 unknown8[0x1C]; u16 rows[1]; };
+static inline void GhoulInit_ClearPosition(u32 *fill, void *object)
 {
-    s32 x = (s16)pos[0] >> 8;
-    s32 y = (s16)pos[2] >> 8;
-    s32 cell;
-    u8 *p;
-    s32 b, h;
-
-    if (x < 0 || y < 0 || (u32)x >= gTerrainWidth || (u32)y >= gTerrainHeight)
-        cell = 0;
-    else
-        cell = *(u16 *)((u8 *)((u32 *)gTerrainMap) + 0x24 + y * 2) + x;
-    if (cellOut)
-        *cellOut = cell;
-    p = TerrainModifiers_FindCellOverride(cell, 1);
-    if (p)
-        p += 4;
-    else
-        p = (u8 *)((u32 *)gTerrainMap)[1] + cell * 4 + 0xC;
-    b = *p;
-    h = (b & 0xF) << 8;
-    if ((b >> 4) == 1)
-        h -= ((u8 *)pos)[4];
-    else if ((b >> 4) == 2)
-        h -= ((u8 *)pos)[0];
-    return h;
+    struct GhoulInitPosition *position = object;
+    *fill = 0;
+    CpuSet(fill, position, 0x05000002);
+}
+static inline u16 GhoulInit_PositionX(const u16 *pos)
+{
+    return pos[0];
+}
+static inline u16 GhoulInit_PositionZ(const u16 *pos)
+{
+    return pos[2];
+}
+static inline s32 GhoulInit_Cell(u16 *pos)
+{
+    s32 x = (s16)GhoulInit_PositionX(pos) >> 8;
+    s32 z = (s16)GhoulInit_PositionZ(pos) >> 8;
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+        return 0;
+    return ((struct GhoulInitMap *)gTerrainMap)->rows[z] + x;
+}
+static inline u8 GhoulInit_TerrainShape(const u8 *cell)
+{
+    return *cell >> 4;
 }
 
-#ifdef NONMATCHING
-// fuzzy: 30.2%
-// scope shape 1443 (differences once low registers are set aside)
-// confidence=low: Ghoul enemy loader (Crow/Ivy-shaped): script params, optional patrol route, callback tables
-s32 Ghoul_Init(u8 *arg0)
+static inline u32 GhoulInit_TerrainBaseHeight(const u8 *cell)
 {
-    u8 *heap;
-    u32 zero;
-    u32 tmp[2];
-    u32 tmp2[2];
-    u16 pos[4];
-    void *res;
-    s32 mode;
-    s32 i;
-    u32 flag;
-    u8 *rt;
-    u8 *flagp;
-    s32 r4v, r6v, r5v, r2v, r1v;
+    return (*cell & 15) << 8;
+}
 
-    zero = 0;
-    GH_AT(u16, 0x628) = 0;
-    SceneActorRegistry_SetObjectContext(arg0, arg0, 1);
-    GH_AT(u8, 0x98) = 4;
-    Ghoul_BindProfile(arg0);
-    Vorn_ParseField624_0808B320(arg0);
-
-    if (GH_AT(u8, 8) == 0) {
-        heap = Heap_Alloc(0x5C);
-        GH_AT(u8 *, 4) = heap;
-        Memory_Clear(heap, 0x5C);
-        heap = GH_AT(u8 *, 4);
-        AnimData_Load(heap + 0x2C, 0x9247);
-        Sprite_Init(heap, heap + 0x2C, 0);
-        SceneActorAnimation_InitEnemySequence(heap, 0x1DF8);
-        if (GH_AT(u8, 0x98) == 0x11 || GH_AT(u8, 0x98) == 0x17)
-            heap[7] = 1;
-        GH_AT(u8, 0x59) = 0;
-    } else {
-        heap = Heap_Alloc(0x80);
-        GH_AT(u8 *, 4) = heap;
-        Memory_Clear(heap, 0x80);
-        heap = GH_AT(u8 *, 4);
-        CpuSet(&zero, tmp, 0x05000002);
-        res = ScriptProc_Start(0xCB05, 0x9247);
-        *(struct Gh32Block *)heap = *(struct Gh32Block *)res;
-        ResourceHeader_Relocate(heap, res);
-        Widget_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, tmp);
-        GH_AT(u8, 0x2B7) = 0xFF;
+static inline u32 GhoulInit_Height(s32 cell, u16 *pos)
+{
+    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
+    u32 attributes, shape;
+    s32 height;
+    if (p)
+        p += 4;
+    else {
+        struct GhoulInitMap *map = (void *)gTerrainMap;
+        u32 offset = cell * 4 + 12;
+        p = map->cells + offset;
     }
-    flagp = arg0 + 0x59;
+    shape = GhoulInit_TerrainShape(p);
+    height = GhoulInit_TerrainBaseHeight(p);
+    switch (shape) {
+    case 1: height -= ((u8 *)pos)[4]; break;
+    case 2: height -= ((u8 *)pos)[0]; break;
+    }
+    return height;
+}
 
-    GH_AT(u32, 0x2CC) = 0;
-    GH_AT(u32, 0x2D0) = 0;
-    GH_AT(u8, 0x2B4) = 0;
-    GH_AT(u16, 0x2E8) = 8;
-    GH_AT(u16, 0x2C0) = Script_GetKeywordValue(0x4D, 0);
-    GH_AT(u16, 0x2C2) = 0x40;
-    CpuSet(&zero, tmp2, 0x05000002);
+struct GhoulInitBody {
+    u32 id;
+    u8 unknown54[0x5];
+    u8 direction;
+    u8 unknown5A[0x2];
+    struct GhoulInitPosition position;
+    u8 unknown64[0x34];
+};
+struct GhoulInitAttacks {
+    u16 first[4];
+    u16 second[4];
+    u16 parameter[4];
+    u32 flags[4];
+};
+struct GhoulInitGate {
+    u16 field414;
+    u16 field416;
+    u16 field418;
+    u16 field41A;
+    void *field41C;
+};
+struct GhoulInitRange {
+    u32 field420 : 16;
+    u32 field422 : 16;
+    u32 field424;
+    u8 unknown428[0x2];
+    u8 field42A;
+    u8 field42B;
+};
+struct GhoulInitRoutePoint { s16 x, z; };
+struct GhoulInitRoute {
+    u32 unknown0, unknown4;
+    struct GhoulInitRoutePoint *point;
+    u8 currentPoint, branches[2], activeBranch;
+    u8 routeId, parameterB, pointId, unknown13;
+};
+struct GhoulInitGroup {
+    u16 field3D4;
+    u8 unknown3D6[0x2];
+    u32 field3D8;
+    u8 unknown3DC[0x38];
+    struct GhoulInitGate gate;
+    struct GhoulInitRange range;
+    u8 unknown42C[0x10];
+    void * field43C;
+    u32 field440;
+    void * field444;
+    struct GhoulInitRoute route;
+    u8 unknown45C[0x15A];
+    s16 field5B6;
+    u8 unknown5B8[0x14];
+    u16 field5CC;
+    u8 unknown5CE[0x2];
+    u8 * field5D0;
+    u8 * field5D4;
+    u8 unknown5D8[0x4];
+    void * field5DC;
+    void * field5E0;
+    void * field5E4;
+    u32 field5E8;
+    void * field5EC;
+    void * field5F0;
+    void * field5F4;
+    void * field5F8;
+    void * field5FC;
+    void * field600;
+    u32 field604;
+    u32 field608;
+    void * field60C;
+    void * field610;
+    void * field614;
+    void * field618;
+    u32 field61C;
+    u32 field620;};
+struct GhoulInitTargeting {
+    u32 fieldDC;
+    u8 unknownE0[0xA];
+    u8 fieldEA;
+    u8 fieldEB;
+    u16 fieldEC;
+    u16 fieldEE;
+    u8 unknownF0[0x4];
+    u32 fieldF4;
+    u32 fieldF8;
+    u32 fieldFC;
+};
+struct GhoulInitSavedControl {
+    u32 field118;
+    u32 field11C;
+    u8 field120;
+    u8 field121;
+    u8 field122;
+    u8 field123;
+    void *field124;
+    u8 field128;
+    u8 unknown129[0x3];
+    u16 field12C;
+    u16 field12E;
+    u32 field130;
+};
+struct GhoulInitActor {
+    u8 unknown0[0x4];
+    u8 * drawable;
+    u8 drawableKind;
+    u8 unknown9[0x47];
+    struct GhoulInitBody body;
+    u8 category;
+    u8 unknown99[0x1];
+    u16 field9A;
+    s16 field9C;
+    u8 field9E;
+    u8 field9F;
+    u8 fieldA0;
+    u8 fieldA1;
+    u16 fieldA2;
+    u16 fieldA4;
+    u16 fieldA6;
+    u16 fieldA8;
+    u16 fieldAA;
+    u32 fieldAC;
+    u16 fieldB0;
+    u16 fieldB2;
+    struct GhoulInitAttacks attacks;
+    struct GhoulInitTargeting targeting;
+    u8 unknown100[0x4];
+    u32 field104;
+    u32 field108;
+    u32 field10C;
+    u32 field110;
+    u32 field114;
+    struct GhoulInitSavedControl saved;
+    u8 unknown134[0x6];
+    u16 field13A;
+    u8 unknown13C[0xA0];
+    u16 field1DC, field1DE;
+    u16 field1E0;
+    u16 field1E2;
+    u16 field1E4;
+    u16 field1E6;
+    u8 unknown1E8[0x4];
+    u32 field1EC;
+    u32 field1F0;
+    u8 unknown1F4[0x28];
+    void * field21C;
+    void * field220;
+    void * field224;
+    void * field228;
+    void * field22C;
+    void * field230;
+    void * field234;
+    void * field238;
+    void * field23C;
+    u32 field240;
+    u8 unknown244[0x4];
+    void *field248;
+    void * field24C;
+    const void * field250;
+    u8 unknown254[0x4];
+    void * field258;
+    void * field25C;
+    u32 (*field260)(void *);
+    void * field264;
+    void * field268;
+    void * field26C;
+    u8 (*field270)(void *);
+    void * field274;
+    void * field278;
+    u8 unknown27C[0x2C];
+    u8 field2A8;
+    u8 field2A9;
+    u8 field2AA;
+    u8 unknown2AB[0x1];
+    u32 field2AC;
+    u8 field2B0;
+    u8 field2B1;
+    u8 field2B2;
+    u8 unknown2B3[0x1];
+    u8 field2B4;
+    u8 field2B5;
+    u8 unknown2B6[0x1];
+    u8 field2B7;
+    u8 unknown2B8[0x6];
+    u16 field2BE;
+    u16 field2C0;
+    u16 field2C2;
+    u8 unknown2C4[0x4];
+    u16 field2C8;
+    u8 unknown2CA[0x2];
+    u32 field2CC;
+    u32 field2D0;
+    u16 field2D4;
+    u8 unknown2D6[0x12];
+    u16 field2E8;
+    u16 field2EA;
+    u8 unknown2EC[0x8];
+    u16 field2F4;
+    u8 unknown2F6[0x4];
+    u16 field2FA;
+    u8 unknown2FC[0x8];
+    u32 field304;
+    u8 unknown308[0xCC];
+    struct GhoulInitGroup group;
+    u16 field624, field626, field628;
+    u8 unknown62A[0x14];
+    u16 field63E;
+    u8 field640;
+    u8 unknown641[9];
+    u16 field64A;
+    u8 unknown64C[0x90];
+    u32 field6DC;
+    u8 unknown6E0[0x38];
+    u32 field718;};
+
+static inline u8 GhoulInit_GetDrawableKind(struct GhoulInitActor *actor)
+{
+    return actor->drawableKind;
+}
+static inline u8 GhoulInit_GetCategory(void *object)
+{
+    struct GhoulInitActor *actor = object;
+    return actor->category;
+}
+
+static inline u16 GhoulInit_GetInitialHealth(struct GhoulInitActor *actor)
+{
+    return actor->fieldB0;
+}
+
+static inline u32 GhoulInit_GetPaletteBase(struct GhoulInitActor *actor)
+{
+    return actor->field1E0;
+}
+
+static inline u32 GhoulInit_GetPaletteOffset(struct GhoulInitActor *actor)
+{
+    return actor->field1E6;
+}
+
+extern u8 *gUnknown_02000580;
+
+extern const u8 gUnk_086060FC[];
+
+static inline u32 GhoulInit_GetMotionFlags(struct GhoulInitActor *actor)
+{
+    return actor->field2C0;
+}
+static inline u16 GhoulInit_GetHeightOffset(struct GhoulInitActor *actor)
+{
+    return actor->field2EA;
+}
+static inline u32 GhoulInit_GetBehaviorFlags(struct GhoulInitActor *actor)
+{
+    return actor->field2CC;
+}
+static inline u32 GhoulInit_GetStatusFlags(struct GhoulInitActor *actor)
+{
+    return actor->field2D0;
+}
+static inline u8 GhoulInit_GetState(struct GhoulInitActor *actor)
+{
+    return actor->field2A8;
+}
+static inline u8 GhoulInit_GetPhase(struct GhoulInitActor *actor)
+{
+    return actor->field2A9;
+}
+static inline u8 GhoulInit_GetBehavior(struct GhoulInitActor *actor)
+{
+    return actor->field2AA;
+}
+static inline void * GhoulInit_GetCurrentControl(struct GhoulInitActor *actor)
+{
+    return actor->field21C;
+}
+static inline u8 GhoulInit_GetControlKind(struct GhoulInitActor *actor)
+{
+    return actor->field2B5;
+}
+static inline u8 GhoulInit_GetDirection(struct GhoulInitActor *actor)
+{
+    return actor->body.direction;
+}
+static inline u32 GhoulInit_GetTerrainCell(struct GhoulInitActor *actor)
+{
+    return actor->field2F4;
+}
+static inline u32 GhoulInit_GetTargetingFlags(struct GhoulInitTargeting *target)
+{
+    return target->fieldEB;
+}
+static inline struct GhoulInitSavedControl *GhoulInit_SavedControlOf(struct GhoulInitActor *actor)
+{
+    struct GhoulInitSavedControl *saved = &actor->saved;
+    return saved;
+}
+static inline struct GhoulInitPosition *GhoulInit_BodyPosition(void *object)
+{
+    struct GhoulInitBody *body = object;
+    struct GhoulInitPosition *position = &body->position;
+    return position;
+}
+static inline void GhoulInit_SaveControl(struct GhoulInitSavedControl *saved, struct GhoulInitActor *actor)
+{
+    saved->field12E = GhoulInit_GetMotionFlags(actor);
+    saved->field12C = GhoulInit_GetHeightOffset(actor);
+    saved->field118 = GhoulInit_GetBehaviorFlags(actor);
+    saved->field11C = GhoulInit_GetStatusFlags(actor);
+    saved->field120 = GhoulInit_GetDirection(actor);
+    saved->field121 = GhoulInit_GetState(actor);
+    saved->field122 = GhoulInit_GetPhase(actor);
+    saved->field123 = GhoulInit_GetBehavior(actor);
+    saved->field124 = GhoulInit_GetCurrentControl(actor);
+    saved->field128 = GhoulInit_GetControlKind(actor);
+}
+struct GhoulInitCollider { u8 header[6]; u16 flags; };
+static inline void GhoulInit_ClearColliderFlags(struct GhoulInitCollider *collider, u32 mask)
+{
+    collider->flags = mask & collider->flags;
+}
+static inline s32 GhoulInit_Half(s32 value)
+{
+    if (value >= 0)
+        return value >> 1;
+    return -(-value >> 1);
+}
+static inline void GhoulInit_SetBehaviorFlags(struct GhoulInitActor *actor, u32 mask)
+{
+    actor->field2CC |= mask;
+}
+
+static inline void GhoulInit_SetStatusFlags(struct GhoulInitActor *actor, u32 mask)
+{
+    actor->field2D0 |= mask;
+}
+
+static inline u8 GhoulInit_TestMotionFlags(struct GhoulInitActor *actor, u32 mask)
+{
+    if (GhoulInit_GetMotionFlags(actor) & mask)
+        return 1;
+    return 0;
+}
+
+static inline u8 GhoulInit_TestTargetingFlags(struct GhoulInitTargeting *target, u32 mask)
+{
+    if (GhoulInit_GetTargetingFlags(target) & mask)
+        return 1;
+    return 0;
+}
+static inline void GhoulInit_SetTargetingFlags(struct GhoulInitTargeting *target, u8 mask)
+{
+    mask |= target->fieldEB;
+    target->fieldEB = mask;
+}
+static inline void GhoulInit_ClearControlFlags(struct GhoulInitActor *actor, u32 mask)
+{
+    actor->field114 &= mask;
+}
+static inline u8 GhoulInit_IsInCurrentRegion(struct GhoulInitActor *actor)
+{
+    if (*(u32 *)(gGameState + 0x5A0) == actor->field2FA)
+        return 1;
+    return 0;
+}
+static inline void *GhoulInit_GetStandingControl(struct GhoulInitActor *actor)
+{
+    return actor->field22C;
+}
+
+static inline void GhoulInit_SetControl(struct GhoulInitActor *actor, void *callback, u32 behavior)
+{
+    actor->field2B2 = 1;
+    actor->field2B0 = 0;
+    actor->field2B5 = behavior;
+    actor->field21C = callback;
+    actor->field2C8 = 0;
+    GhoulInit_ClearControlFlags(actor, ~1);
+    actor->field104 = 0;
+}
+static inline void GhoulInit_SetState(struct GhoulInitActor *actor, u32 state, u32 phase, u32 behavior)
+{
+    actor->field2A8 = state;
+    actor->field2A9 = phase;
+    actor->field2AA = behavior;
+    actor->field2AC = 0;
+    actor->field2B1 = 1;
+}
+
+static inline void GhoulInit_InitializeGate(struct GhoulInitGate *gate, u32 parameter)
+{
+    gate->field414 = 0;
+    gate->field416 = parameter;
+    gate->field418 = 0;
+    gate->field41A = 0;
+    gate->field41C = 0;
+
+}
+
+static inline void GhoulInit_ReadTargeting(struct GhoulInitTargeting *target)
+{
+    s32 r4v, r2v, r1v;
+    if (Script_SeekToKeyword(0x65)) {
+        r4v = SV(0x30);
+        r2v = Script_GetPc() ? (u8)Script_GetValue() : 0x40;
+        r1v = r4v;
+    } else {
+        r4v = 0x30;
+        r1v = 0x30;
+        r2v = 0x40;
+    }
+    target->fieldDC = 0;
+    target->fieldEC = r4v;
+    target->fieldEE = r1v;
+    target->fieldF8 = r4v * r4v;
+    target->fieldFC = r1v * r1v;
+    target->fieldEA = r2v;
+    if (GhoulInit_TestTargetingFlags(target, 4))
+        target->fieldF4 = target->fieldF8;
+    else
+        target->fieldF4 = Div(target->fieldF8 * 8 - target->fieldF8, 10);
+
+}
+
+static inline u16 GhoulInit_RangeRadius(struct GhoulInitRange *range)
+{
+    return range->field422;
+}
+static inline void GhoulInit_ReadRange(struct GhoulInitRange *range)
+{
+    s32 r4v;
+    if (Script_SeekToKeyword(0x6E)) {
+        r4v = SV(0);
+        range->field420 = SV(0);
+    } else {
+        r4v = 0;
+        range->field420 = r4v;
+    }
+    range->field422 = r4v;
+    range->field424 = GhoulInit_RangeRadius(range) * GhoulInit_RangeRadius(range);
+    range->field42A = 0;
+
+}
+
+static inline u32 GhoulInit_RoutePointX(struct GhoulInitRoute *route)
+{
+    return (u16)route->point->x;
+}
+
+static inline u32 GhoulInit_RoutePointZ(struct GhoulInitRoute *route)
+{
+    return (u16)route->point->z;
+}
+
+static inline void GhoulInit_SnapToRoute(struct GhoulInitPosition *position, struct GhoulInitRoute *route)
+{
+    position->x = GhoulInit_RoutePointX(route);
+    position->z = GhoulInit_RoutePointZ(route);
+    position->y = GhoulInit_Height(GhoulInit_Cell(position), (u16 *)position);
+}
+static inline void GhoulInit_DrawablePosition(struct GhoulInitActor *actor)
+{
+    if (GhoulInit_GetDrawableKind(actor) == 0)
+        *(struct GhoulInitPosition *)(actor->drawable + 0x1C) = actor->body.position;
+    else
+        *(struct GhoulInitPosition *)(actor->drawable + 0x40) = actor->body.position;
+}
+
+static inline u8 GhoulInit_RouteId(struct GhoulInitRoute *route)
+{
+    return route->routeId;
+}
+static inline u8 GhoulInit_RouteParameter(struct GhoulInitRoute *route)
+{
+    return route->parameterB;
+}
+static inline u8 GhoulInit_RoutePointId(struct GhoulInitRoute *route)
+{
+    return route->pointId;
+}
+static inline u8 GhoulInit_RouteActiveBranch(struct GhoulInitRoute *route)
+{
+    return route->activeBranch;
+}
+static inline u16 GhoulInit_ReadKeywordHalfword(u32 keyword, s32 fallback)
+{
+    return Script_GetKeywordValue(keyword, fallback);
+}
+
+static inline s32 GhoulInit_ClampHealth(u16 raw)
+{
+    s32 health = (s16)raw;
+    if (health <= 0)
+        health = 0;
+    return health;
+}
+
+static inline void GhoulInit_InstallIdle(struct GhoulInitActor *actor, void *idle)
+{
+    actor->field21C = idle;
+}
+
+static inline void GhoulInit_InitializeHealth(struct GhoulInitActor *arg0,
+    u16 initialHealth, s32 firstLimit, s32 secondLimit)
+{
+    arg0->field2D4 = 0;
+    GhoulInit_InstallIdle(arg0, SceneActorControl_OnIdle);
+    arg0->field2B2 = 1;
+    arg0->field2B0 = 0;
+    arg0->field9C = GhoulInit_ClampHealth(initialHealth);
+    arg0->fieldAA = 0;
+    if (secondLimit <= 0)
+        secondLimit = firstLimit;
+    arg0->fieldA6 = firstLimit;
+    arg0->fieldA8 = secondLimit;
+    arg0->field2FA = 0;
+
+}
+
+static inline void GhoulInit_SetInitialHealth(struct GhoulInitActor *actor, u16 health)
+{
+    actor->fieldB0 = health;
+}
+
+static inline u32 GhoulInit_RouteAlternateBranch(struct GhoulInitRoute *route)
+{
+    return 1 ^ route->activeBranch;
+}
+static inline void GhoulInit_BeginRoute(struct GhoulInitBody *body, struct GhoulInitRoute *route)
+{
+    SceneBody_StartRoute(body, route, GhoulInit_RouteId(route), GhoulInit_RouteParameter(route), GhoulInit_RoutePointId(route));
+}
+
+static inline u8 GhoulInit_ReadByte(u8 fallback)
+{
+    if (Script_GetPc())
+        return Script_GetValue();
+    return fallback;
+}
+
+static inline u16 GhoulInit_ReadHalfword(u16 fallback)
+{
+    if (Script_GetPc())
+        return Script_GetValue();
+    return fallback;
+}
+static inline void GhoulInit_SetFirstAttack(struct GhoulInitActor *actor, s32 index, s32 value)
+{
+    actor->attacks.first[index] = value;
+}
+
+static inline u32 GhoulInit_ReadRoute(struct GhoulInitActor *arg0, struct GhoulInitGroup *group, struct GhoulInitRoute *rt)
+{
+    struct GhoulInitPosition point;
+    s32 r1v;
+    rt->activeBranch = 0;
+
+    if (Script_SeekToKeyword(0x72)) {
+        rt->routeId = GhoulInit_ReadByte(0);
+        rt->parameterB = 0;
+        r1v = SV(0);
+        rt->pointId = r1v;
+        rt->currentPoint = r1v;
+        rt->branches[GhoulInit_RouteActiveBranch(rt)] = rt->routeId;
+        rt->branches[GhoulInit_RouteAlternateBranch(rt)] = Script_GetPc() ? Script_GetValue() : GhoulInit_RouteId(rt);
+        Path_GetPointPositionById((u16 *)&point, GhoulInit_RouteId(rt), GhoulInit_RoutePointId(rt));
+        arg0->field2F4 = GhoulInit_Cell(&point);
+        point.y = arg0->field2BE = GhoulInit_Height(GhoulInit_GetTerrainCell(arg0), (u16 *)&point);
+        GhoulInit_BeginRoute(&arg0->body, rt);
+        return 1;
+    } else {
+        rt->routeId = 0;
+        rt->parameterB = 0;
+        rt->pointId = 0;
+        rt->currentPoint = 0;
+        group->route.branches[GhoulInit_RouteActiveBranch(rt)] = 0;
+        group->route.branches[GhoulInit_RouteAlternateBranch(rt)] = 0;
+    }
+
+    return 0;
+}
+
+static inline void GhoulInit_InitializeBody(void *object, u32 *fill)
+{
+    struct GhoulInitActor *arg0 = object;
+    struct GhoulInitGroup *group = &arg0->group;
+    struct GhoulInitBody *body = &arg0->body;
+    struct GhoulInitPosition origin;
+    struct GhoulInitPosition point;
+    s32 mode, i, r4v, r6v, r5v, r2v, r1v;
+    u16 initialHealth;
+    struct GhoulInitRoute *rt;
+    arg0->field2CC = 0;
+    arg0->field2D0 = 0;
+    arg0->field2B4 = 0;
+    arg0->field2E8 = 8;
+    arg0->field2C0 = Script_GetKeywordValue(0x4D, 0);
+    arg0->field2C2 = 0x40;
+    GhoulInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
     if (Script_SeekToKeyword(0x61)) {
-        for (i = 0; i <= 3; i++) {
-            GH_AT(u16, 0xB4 + 2 * i) = SV(0x18);
-            GH_AT(u16, 0xBC + 2 * i) = SV(0x18);
-            GH_AT(u32, 0xCC + 4 * i) = SV(0);
-            GH_AT(u16, 0xC4 + 2 * i) = SV(0);
+        i = 0;
+        while (1) {
+            GhoulInit_SetFirstAttack(arg0, i, GhoulInit_ReadHalfword(0x18));
+            arg0->attacks.second[i] = GhoulInit_ReadHalfword(0x18);
+            arg0->attacks.flags[i] = SV(0);
+            arg0->attacks.parameter[i] = GhoulInit_ReadHalfword(0);
+            i++;
+            if (i > 3)
+                break;
         }
     }
 
@@ -203,324 +780,333 @@ s32 Ghoul_Init(u8 *arg0)
         r6v = 0;
         r2v = 0;
     }
-    GH_AT(u16, 0x414) = 0;
-    GH_AT(u16, 0x416) = r2v;
-    GH_AT(u16, 0x418) = 0;
-    GH_AT(u16, 0x41A) = 0;
-    GH_AT(u32, 0x41C) = 0;
-
-    if (Script_SeekToKeyword(0x6E)) {
-        r4v = SV(0);
-        GH_AT(u16, 0x420) = SV(0);
-    } else {
-        r4v = 0;
-        GH_AT(u16, 0x420) = r4v;
-    }
-    GH_AT(u16, 0x422) = r4v;
-    GH_AT(u32, 0x424) = GH_AT(u16, 0x422) * GH_AT(u16, 0x422);
-    GH_AT(u8, 0x42A) = 0;
-
-    if (Script_SeekToKeyword(0x65)) {
-        r4v = SV(0x30);
-        r2v = Script_GetPc() ? (u8)Script_GetValue() : 0x40;
-        r1v = r4v;
-    } else {
-        r4v = 0x30;
-        r1v = 0x30;
-        r2v = 0x40;
-    }
-    GH_AT(u32, 0xDC) = 0;
-    GH_AT(u16, 0xEC) = r4v;
-    GH_AT(u16, 0xEE) = r1v;
-    GH_AT(u32, 0xF8) = r4v * r4v;
-    GH_AT(u32, 0xFC) = r1v * r1v;
-    GH_AT(u8, 0xEA) = r2v;
-    if (GH_AT(u8, 0xEB) & 4)
-        GH_AT(u32, 0xF4) = GH_AT(u32, 0xF8);
-    else
-        GH_AT(u32, 0xF4) = Div(GH_AT(u32, 0xF8) * 8 - GH_AT(u32, 0xF8), 10);
-
+    GhoulInit_InitializeGate(&group->gate, r2v);
+    GhoulInit_ReadRange(&group->range);
+    GhoulInit_ReadTargeting(&arg0->targeting);
     if (Script_GetKeywordValue(0x62, 0))
-        GH_AT(u32, 0x2D0) |= 0x200;
-    GH_AT(u32, 0x1F0) = (u16)Script_GetKeywordValue(0x46, 0);
-    GH_AT(u32, 0x1EC) = (u16)Script_GetKeywordValue(0x52, 0);
+        GhoulInit_SetStatusFlags(arg0, 0x200);
+    arg0->field1F0 = GhoulInit_ReadKeywordHalfword(0x46, 0);
+    arg0->field1EC = GhoulInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
-        GH_AT(u16, 0xB0) = SV(0);
-        GH_AT(s16, 0x5B6) = GH_AT(s16, 0xB0) / 2;
-        GH_AT(u8, 0x9E) = SV(0);
-        GH_AT(u8, 0x9F) = SV(0);
-        GH_AT(u8, 0xA0) = SV(0);
-        GH_AT(u16, 0xA2) = SV(0);
-        GH_AT(u16, 0xA4) = SV(0);
+        GhoulInit_SetInitialHealth(arg0, GhoulInit_ReadHalfword(0));
+        group->field5B6 = GhoulInit_Half(GhoulInit_GetInitialHealth(arg0));
+        arg0->field9E = GhoulInit_ReadByte(0);
+        arg0->field9F = GhoulInit_ReadByte(0);
+        arg0->fieldA0 = GhoulInit_ReadByte(0);
+        arg0->fieldA2 = GhoulInit_ReadHalfword(0);
+        arg0->fieldA4 = GhoulInit_ReadHalfword(0);
     }
 
-    r1v = (s16)GH_AT(u16, 0xB0);
-    GH_AT(u16, 0x2D4) = 0;
-    GH_AT(void *, 0x21C) = SceneActorControl_OnIdle;
-    GH_AT(u8, 0x2B2) = 1;
-    GH_AT(u8, 0x2B0) = 0;
-    if (r1v <= 0)
-        r1v = 0;
-    GH_AT(u16, 0x9C) = r1v;
-    GH_AT(u16, 0xAA) = 0;
-    if (r6v <= 0)
-        r6v = r5v;
-    GH_AT(u16, 0xA6) = r5v;
-    GH_AT(u16, 0xA8) = r6v;
-    GH_AT(u16, 0x2FA) = 0;
+    GhoulInit_InitializeHealth(arg0, GhoulInit_GetInitialHealth(arg0),
+        r5v, r6v);
 
     if (Script_SeekToKeyword(0x58)) {
-        GH_AT(u32, 0xAC) = SV(0);
-        GH_AT(u8, 0xA1) = SV(0);
+        arg0->fieldAC = SV(0);
+        arg0->fieldA1 = GhoulInit_ReadByte(0);
     }
-    GH_AT(u16, 0xB2) = Script_GetKeywordValue(0x4B, 2);
+    arg0->fieldB2 = Script_GetKeywordValue(0x4B, 2);
     r1v = (s16)Script_GetKeywordValue(0x56, -1);
     if (r1v < 0)
         r1v = 0xFFFF;
-    GH_AT(u16, 0x9A) = r1v;
+    arg0->field9A = r1v;
     if (Script_GetKeywordValue(0x48, 0))
-        GH_AT(u32, 0x2D0) |= 0x800;
+        GhoulInit_SetStatusFlags(arg0, 0x800);
     if (Script_GetKeywordValue(0x4C, 0))
-        GH_AT(u32, 0x2D0) |= 0x8000;
+        GhoulInit_SetStatusFlags(arg0, 0x8000);
 
-    SceneBody_Init(arg0 + 0x50, mode, tmp2, 0, 4, arg0);
-    rt = arg0 + 0x448;
-    rt[0xF] = 0;
-
-    if (Script_SeekToKeyword(0x72)) {
-        rt[0x10] = SV(0);
-        rt[0x11] = 0;
-        r1v = SV(0);
-        rt[0x12] = r1v;
-        rt[0xC] = r1v;
-        rt[0xD + rt[0xF]] = rt[0x10];
-        rt[0xD + (rt[0xF] ^ 1)] = Script_GetPc() ? Script_GetValue() : rt[0x10];
-        Path_GetPointPositionById(pos, rt[0x10], rt[0x12]);
-        GH_AT(s16, 0x2BE) = Ghoul_CellHeight(pos, &GH_AT(u16, 0x2F4));
-        pos[1] = GH_AT(s16, 0x2BE);
-        SceneBody_StartRoute(arg0 + 0x50, rt, rt[0x10], rt[0x11], rt[0x12]);
-        GH_AT(u16, 0x5C) = **(u16 **)(rt + 8);
-        GH_AT(u16, 0x60) = (*(u16 **)(rt + 8))[1];
-        GH_AT(s16, 0x5E) = Ghoul_CellHeight((u16 *)(arg0 + 0x5C), 0);
-        if (GH_AT(u8, 8) == 0) {
-            *(u32 *)(GH_AT(u8 *, 4) + 0x1C) = GH_AT(u32, 0x5C);
-            *(u32 *)(GH_AT(u8 *, 4) + 0x20) = GH_AT(u32, 0x60);
-        } else {
-            *(u32 *)(GH_AT(u8 *, 4) + 0x40) = GH_AT(u32, 0x5C);
-            *(u32 *)(GH_AT(u8 *, 4) + 0x44) = GH_AT(u32, 0x60);
-        }
-        GH_AT(u8, 0x59) = Route_GetCurrentPointFacing(rt);
-    } else {
-        rt[0x10] = 0;
-        rt[0x11] = 0;
-        rt[0x12] = 0;
-        rt[0xC] = 0;
-        arg0[0x3D4 + 0x81 + rt[0xF]] = 0;
-        arg0[0x3D4 + 0x81 + (rt[0xF] ^ 1)] = 0;
+    SceneBody_Init(body, mode, &origin, 0, 4, arg0);
+    rt = &group->route;
+    if (GhoulInit_ReadRoute(arg0, group, rt)) {
+        GhoulInit_SnapToRoute(&arg0->body.position, rt);
+        GhoulInit_DrawablePosition(arg0);
+        arg0->body.direction = Route_GetCurrentPointFacing(rt);
     }
 
-    if (GH_AT(u16, 0x2C0) & 0x200)
-        TargetRegistry_RegisterActor(arg0 + 0x404, arg0 + 0x50, sub_08080BE0);
-    SceneBody_SetSprite(arg0 + 0x50, GH_AT(u8, 8) == 0 ? GH_AT(u8 *, 4) : 0);
-    if (GH_AT(u8, 0x98) == 0x15)
-        SceneBody_SetMovementProbe(arg0 + 0x50, arg0 + 0x40, 0x3C, 0x3C);
+    if (GhoulInit_TestMotionFlags(arg0, 0x200))
+        TargetRegistry_RegisterActor((u8 *)group + 0x30, body, sub_08080BE0);
+    SceneBody_SetSprite(body, GhoulInit_GetDrawableKind(arg0) == 0 ? arg0->drawable : 0);
+    if (GhoulInit_GetCategory(arg0) == 0x15)
+        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x3C, 0x3C);
     else
-        SceneBody_SetMovementProbe(arg0 + 0x50, arg0 + 0x40, 0x40, 0x40);
+        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 
-    GH_AT(u16, 0x3D4) = GH_AT(u32, 0x50);
-    GH_AT(u32, 0x3D8) = (u32)(arg0 + 0x5C);
-
-    if (Script_SeekToKeyword(0x50)) {
-        GH_AT(u8, 0x640) = SV(0x78);
-        GH_AT(u16, 0x64A) = SV(0x78);
-        GH_AT(u16, 0x63E) = SV(0x78);
-    } else {
-        GH_AT(u8, 0x640) = 0x78;
-        GH_AT(u16, 0x64A) = 0x78;
-    }
-
-    GH_AT(u16, 0x1E6) = Script_GetKeywordValue(0x43, 0);
-    GH_AT(u16, 0x1E0) = 0x192;
-    GH_AT(u16, 0x1E2) = 0x192;
-    GH_AT(u16, 0x1E4) = GH_AT(u16, 0x1E6) + 0x192;
-    r1v = GH_AT(u16, 0x1E0) + GH_AT(u16, 0x1E6);
-    if (GH_AT(u8, 8) == 0)
-        AnimData_SelectPaletteBank(GH_AT(u8 *, 4) + 0x2C);
-    else
-        *(u8 **)(GH_AT(u8 *, 4) + 0x68) = gPaletteBankData + (r1v << 5);
-    if (GH_AT(u8, 8) == 1)
-        *(u16 *)(GH_AT(u8 *, 4) + 0x5A) = SceneActorScript_GetManagerField62() - 0x5FFF;
-    GH_AT(u16, 0x1DC) = GH_AT(u16, 0x1E0) + 4;
-    GH_AT(u16, 0x1DE) = GH_AT(u16, 0x1E0);
-
-    Ghoul_InitCollision(arg0);
-    GH_AT(u32, 0x2CC) |= 0x2000;
-    GH_AT(void *, 0x274) = Ghoul_Update;
-    GH_AT(void *, 0x260) = Bat_LookupAnimationEntry;
-    GH_AT(void *, 0x224) = Ghoul_TurnTowardRoute;
-    GH_AT(void *, 0x228) = Ghoul_UpdateIdleState;
-    GH_AT(void *, 0x22C) = Ghoul_UpdateStandingState;
-    GH_AT(void *, 0x230) = sub_08087A70;
-    GH_AT(void *, 0x234) = Bat_UpdateDefeat;
-    GH_AT(void *, 0x220) = Ghoul_UpdateHiddenRecovery;
-    GH_AT(void *, 0x278) = SceneActorReaction_OnEnemyDefault;
-    GH_AT(void *, 0x270) = sub_0807F81C;
-    GH_AT(const void *, 0x250) = gUnk_086108B0;
-    GH_AT(u32, 0x248) = 0;
-    GH_AT(void *, 0x26C) = SceneActorTarget_ResolvePendingObject;
-    GH_AT(void *, 0x238) = SceneActorReaction_SinkAndRemove;
-    GH_AT(void *, 0x264) = sub_081363F4;
-    GH_AT(void *, 0x268) = SceneActorPlacement_ResetStateThree;
-    GH_AT(u32, 0x240) = 0;
-    GH_AT(u32, 0x104) = 0;
-    GH_AT(u32, 0x108) = 0;
-    GH_AT(u32, 0x10C) = 0;
-    GH_AT(u32, 0x110) = 0;
-    GH_AT(u32, 0x114) = 0;
-    GH_AT(u8 *, 0x5D0) = arg0 + 0x64C;
-    GH_AT(u8 *, 0x5D4) = arg0 + 0x670;
-    GH_AT(void *, 0x5F4) = Ghoul_UpdateDyingState;
-    GH_AT(void *, 0x5F8) = SceneActorReaction_BeginTargetRecovery;
-    GH_AT(void *, 0x5FC) = SceneActorReaction_BeginFadedState;
-    GH_AT(void *, 0x600) = SceneActorReaction_BeginDefeatBurst;
-    GH_AT(void *, 0x43C) = Bat_ResumeSavedTarget;
-    GH_AT(u32, 0x440) = 0;
-    GH_AT(u8, 0x42B) = 1;
-    GH_AT(void *, 0x618) = sub_0807DB34;
-    GH_AT(u32, 0x608) = 0;
-    GH_AT(u32, 0x61C) = 0;
-    GH_AT(u32, 0x620) = 0;
-    GH_AT(void *, 0x5F0) = SceneActorReaction_RestoreAfterTurns;
-    GH_AT(void *, 0x60C) = sub_0807FCA8;
-    GH_AT(void *, 0x604) = Bat_UpdateAnimationRequest;
-    GH_AT(void *, 0x614) = SceneActorReaction_TurnBackToRoute;
-    GH_AT(u32, 0x5E8) = 0;
-    GH_AT(void *, 0x444) = sub_0807F130;
-    GH_AT(void *, 0x41C) = SceneActorReaction_UpdateAnimationGate;
-    GH_AT(u16, 0x41A) = 0x28;
-    GH_AT(void *, 0x5DC) = sub_0808170C;
-    GH_AT(void *, 0x5E0) = SceneActorReaction_ResumeAfterAnimation;
-    GH_AT(void *, 0x5E4) = SceneActorReaction_TryResumeRoute;
-    GH_AT(void *, 0x610) = SceneActorReaction_BeginReactionSound;
-    ProximityVolume_TranslateBounds(arg0 + 0x64C, arg0 + 0x5C);
-    SceneActorMovement_ResolveRoutePosition(arg0);
-    GH_AT(void *, 0x248) = Ghoul_ResetRouteState;
-    GH_AT(void *, 0x23C) = SceneActorControl_RefreshMotionRoute_0808A90C;
-    GH_AT(void *, 0x268) = Ghoul_ReactToContact;
-    GH_AT(void *, 0x61C) = Ghoul_OnLifecycleEvent;
-    GH_AT(void *, 0x5EC) = Ghoul_ResumeContactRoute;
-    GH_AT(u8, 0xEB) |= 1;
-    GH_AT(u32, 0x2CC) |= 0x1600000;
-    GH_AT(u32, 0x2D0) |= 0x8000000;
-    SceneActorBehavior_InitializeShadow(arg0);
-    SceneActorTerrain_ReadScriptParameters(arg0);
-    r2v = Script_GetKeywordValue(0x75, 0);
-    GH_AT(u16, 0x5CC) = 0x21;
-    if (r2v != 0) {
-        GH_AT(u32, 0x2CC) |= 0x40000;
-        if (r2v == 2)
-            GH_AT(u32, 0x2CC) |= 0x80000;
-    }
-    flag = (GH_AT(u16, 0x2C0) & 4) != 0;
-    if (flag)
-        GH_AT(u32, 0x2D0) |= 0x2000;
-
-    if (!flag) {
-        GH_AT(u8, 0x2A8) = 0;
-        GH_AT(u8, 0x2A9) = 0;
-        GH_AT(u8, 0x2AA) = 0;
-        GH_AT(u32, 0x2AC) = 0;
-        GH_AT(u8, 0x2B1) = 1;
-        GH_AT(u8, 0x2B2) = 1;
-        GH_AT(u8, 0x2B0) = 0;
-        GH_AT(u8, 0x2B5) = 0;
-        GH_AT(u32, 0x21C) = GH_AT(u32, 0x22C);
-        GH_AT(u16, 0x2C8) = 0;
-        GH_AT(u32, 0x114) &= ~1;
-        GH_AT(u32, 0x104) = 0;
-    }
-
-    if (GH_AT(u16, 0x2C0) & 2)
-        GH_AT(u16, 0x2FA) = *(u32 *)(gGameState + 0x5A0);
-    else
-        GH_AT(u16, 0x2FA) = (u16)(u32)Region_FindContaining(arg0 + 0x5C);
-
-    if (GH_AT(u16, 0x2C0) & 0x40)
-        GH_AT(u16, 0x13A) &= 0xFEFF;
-
-    if (Script_GetKeywordValue(0x53, 0) != 0 || *(u32 *)(gGameState + 0x5A0) != GH_AT(u16, 0x2FA))
-        SceneActorPlacement_HideActor(arg0, 0);
-
-    SceneActorAnimation_SelectDirectionalEntry(arg0, 0);
-    if (GH_AT(u8, 8) == 0) {
-        u8 *h = GH_AT(u8 *, 4);
-        u8 *a = h + 0x48;
-        u16 *frame = (u16 *)(*(u8 **)(h + 0x48) + (*(u16 *)(a + 8) << 1));
-        *(u16 *)(h + 0x10) = *frame >> 6;
-        if ((a[4] & 1) != ((*frame >> 4) & 1))
-            *(u32 *)h |= 4;
-        else
-            *(u32 *)h &= ~4;
-        if ((a[4] & 2) != ((*frame >> 4) & 2))
-            *(u32 *)h |= 8;
-        else
-            *(u32 *)h &= ~8;
-        *(u16 *)(a + 0xE) += 1;
-        if (*(u16 *)(a + 0xE) >= a[7]) {
-            *(u16 *)(a + 0xE) = 0;
-            if (a[4] & 4) {
-                if (*(u16 *)(a + 8) == 0) {
-                    if (a[4] & 8)
-                        *(u16 *)(a + 0xE) = a[7];
-                    else
-                        *(u16 *)(a + 8) = a[5] - 1;
-                } else {
-                    *(u16 *)(a + 8) -= 1;
-                }
-            } else {
-                *(u16 *)(a + 8) += 1;
-                if (*(u16 *)(a + 8) >= a[5]) {
-                    if (a[4] & 8)
-                        *(u16 *)(a + 0xE) = a[7];
-                    else
-                        *(u16 *)(a + 8) = a[5] - 1;
-                }
-            }
-        }
-        frame = (u16 *)(*(u8 **)(h + 0x48) + (*(u16 *)(a + 8) << 1));
-        a[6] = *frame & 0xF;
-        a[7] = (a[6] * *(u16 *)(a + 0xC)) >> 6;
-        if (a[7] == 0)
-            a[7] = 1;
-    } else {
-        Anim_Step(GH_AT(u8 *, 4) + 0x20);
-    }
-
-    GH_AT(u32, 0x304) = 0;
-    SceneActorRegistry_RegisterCategoryReceiver(arg0);
-    SceneActorBehavior_InstallCallbackTables(arg0);
-    Ghoul_SetActionHandlers(arg0);
-    Ghoul_SetBehaviorHandlers(arg0);
-    Ghoul_SetSpecialHandlers(arg0);
-    Ghoul_SetBehaviorTable(arg0);
-
-    GH_AT(u16, 0x12E) = GH_AT(u16, 0x2C0);
-    GH_AT(u16, 0x12C) = GH_AT(u16, 0x2EA);
-    GH_AT(u32, 0x118) = GH_AT(u32, 0x2CC);
-    GH_AT(u32, 0x11C) = GH_AT(u32, 0x2D0);
-    GH_AT(u8, 0x120) = *flagp;
-    GH_AT(u8, 0x121) = GH_AT(u8, 0x2A8);
-    GH_AT(u8, 0x122) = GH_AT(u8, 0x2A9);
-    GH_AT(u8, 0x123) = GH_AT(u8, 0x2AA);
-    GH_AT(u32, 0x124) = GH_AT(u32, 0x21C);
-    GH_AT(u8, 0x128) = GH_AT(u8, 0x2B5);
-    GH_AT(void *, 0x24C) = SceneActorScript_OnCommand;
-    GH_AT(void *, 0x258) = Ghoul_OnMessage;
-    GH_AT(void *, 0x25C) = Ghoul_Destroy;
-
-    return SceneActorRegistry_LinkActor(arg0) ? 0 : -1;
+    group->field3D4 = arg0->body.id;
+    group->field3D8 = (u32)&arg0->body.position;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", Ghoul_Init);
-#endif
+
+struct GhoulInitWidget {
+    u8 unknown0[0x3A];
+    u16 paletteBank;
+};
+static inline void GhoulInit_SetWidgetScriptPalette(struct GhoulInitWidget *widget, s32 scriptPalette)
+{
+    widget->paletteBank = scriptPalette - 0x5FFF;
+}
+static inline void GhoulInit_SetMotionControl(struct GhoulInitActor *actor, void *callback, u32 kind)
+{
+    actor->field104 = (u32)callback;
+    actor->field108 = 0;
+    actor->field10C = 0;
+    actor->field110 = kind;
+    actor->field114 = 1;
+}
+static inline void GhoulInit_ClearMotion(void *object)
+{
+    struct GhoulInitActor *actor = object;
+    u32 zero = 0;
+    GhoulInit_SetMotionControl(actor, 0, 0);
+    actor->field114 = zero;
+}
+static inline void GhoulInit_ReadPalette(struct GhoulInitActor *actor, u32 base, u32 alternate)
+{
+    s32 r1v;
+    actor->field1E6 = Script_GetKeywordValue(0x43, 0);
+    actor->field1E0 = base;
+    actor->field1E2 = alternate;
+    actor->field1E4 = GhoulInit_GetPaletteOffset(actor) + base;
+    r1v = GhoulInit_GetPaletteBase(actor) + GhoulInit_GetPaletteOffset(actor);
+    if (GhoulInit_GetDrawableKind(actor) == 0)
+        AnimData_SelectPaletteBank(actor->drawable + 0x2C, r1v);
+    else
+        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (r1v << 5);
+    if (GhoulInit_GetDrawableKind(actor) == 1)
+        GhoulInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20), SceneActorScript_GetManagerField62());
+}
+
+static inline void GhoulInit_InstallPrimary(struct GhoulInitActor *arg0,
+    void *cb0,
+    u32 (*cb1)(void *),
+    void *cb2,
+    void *cb3,
+    void *cb4, void *hidden,
+    void *cb5,
+    void *cb6, void *defaultReaction, u8 (*cb270)(void *),
+    void *targetQuery, void *damage, void *contact)
+{
+    GhoulInit_SetBehaviorFlags(arg0, 0x2000);
+    arg0->field274 = cb0;
+    arg0->field260 = cb1;
+    arg0->field224 = cb2;
+    arg0->field228 = cb3;
+    arg0->field22C = cb4;
+    arg0->field230 = cb5;
+    arg0->field234 = cb6;
+    arg0->field220 = hidden;
+    arg0->field278 = defaultReaction;
+    arg0->field270 = cb270;
+    arg0->field250 = gUnk_086108B0;
+    arg0->field248 = 0;
+    arg0->field26C = targetQuery;
+    arg0->field238 = SceneActorReaction_SinkAndRemove;
+    arg0->field264 = damage;
+    arg0->field268 = contact;
+    arg0->field240 = 0;
+    GhoulInit_ClearMotion(arg0);
+}
+
+static inline void GhoulInit_InitializeGroup(struct GhoulInitGroup *group, void *firstBounds,
+    void *secondBounds, void *downed, void *returnToRoute, void *recover,
+    void *animate, struct GhoulInitBody *body)
+{
+    group->field5D0 = firstBounds;
+    group->field5D4 = secondBounds;
+    group->field5F4 = downed;
+    group->field5F8 = recover;
+    group->field5FC = SceneActorReaction_BeginFadedState;
+    group->field600 = SceneActorReaction_BeginDefeatBurst;
+    group->field43C = returnToRoute;
+    group->field440 = 0;
+    group->range.field42B = 1;
+    group->field618 = sub_0807DB34;
+    group->field608 = 0;
+    group->field61C = 0;
+    group->field620 = 0;
+    group->field5F0 = SceneActorReaction_RestoreAfterTurns;
+    group->field60C = sub_0807FCA8;
+    group->field604 = (u32)animate;
+    group->field614 = SceneActorReaction_TurnBackToRoute;
+    group->field5E8 = 0;
+    group->field444 = sub_0807F130;
+    group->gate.field41C = SceneActorReaction_UpdateAnimationGate;
+    group->gate.field41A = 0x28;
+    group->field5DC = sub_0808170C;
+    group->field5E0 = SceneActorReaction_ResumeAfterAnimation;
+    group->field5E4 = SceneActorReaction_TryResumeRoute;
+    group->field610 = SceneActorReaction_BeginReactionSound;
+    ProximityVolume_TranslateBounds(firstBounds, GhoulInit_BodyPosition(body));
+}
+
+static inline void GhoulInit_InstallRouteDefaults(struct GhoulInitActor *arg0)
+{
+    arg0->field248 = Ghoul_ResetRouteState;
+    arg0->field23C = SceneActorControl_RefreshMotionRoute_0808A90C;
+}
+
+static inline void GhoulInit_ReadInitialMode(struct GhoulInitActor *arg0, struct GhoulInitGroup *group)
+{
+    s32 i;
+    i = Script_GetKeywordValue(0x75, 0);
+    arg0->group.field5CC = 0x21;
+    if (i != 0) {
+        GhoulInit_SetBehaviorFlags(arg0, 0x40000);
+        if (i == 2)
+            GhoulInit_SetBehaviorFlags(arg0, 0x80000);
+    }
+}
+
+static inline void GhoulInit_InitializeRegion(struct GhoulInitActor *arg0)
+{
+    if (GhoulInit_TestMotionFlags(arg0, 2))
+        arg0->field2FA = *(u32 *)(gGameState + 0x5A0);
+    else
+        arg0->field2FA = (u16)(u32)Region_FindContaining(&arg0->body.position);
+
+}
+
+static inline void GhoulInit_InitializeReceiver(struct GhoulInitActor *arg0)
+{
+    arg0->field304 = 0;
+    SceneActorRegistry_RegisterCategoryReceiver(arg0);
+}
+
+static inline void GhoulInit_InstallCompletionCallbacks(struct GhoulInitActor *arg0)
+{
+    arg0->field24C = SceneActorScript_OnCommand;
+    arg0->field258 = Ghoul_OnMessage;
+    arg0->field25C = Ghoul_Destroy;
+
+}
+
+static inline void GhoulInit_InitializePaletteRange(struct GhoulInitActor *actor, u32 alternate, u32 current)
+{
+    actor->field1DC = GhoulInit_GetPaletteBase(actor) + alternate;
+    actor->field1DE = GhoulInit_GetPaletteBase(actor) + current;
+}
+
+static inline u8 *GhoulInit_Drawable(struct GhoulInitActor *actor)
+{
+    return actor->drawable;
+}
+
+static inline void GhoulInit_SetCategory(struct GhoulInitActor *actor, u8 category)
+{
+    actor->category = category;
+}
+
+static inline void GhoulInit_InitializeSprite(u8 *drawable, u16 resource, u16 sequence)
+{
+    AnimData_Load(drawable + 0x2C, resource);
+    Sprite_Init(drawable, drawable + 0x2C, 0);
+    SceneActorAnimation_InitEnemySequence(drawable, sequence);
+}
+
+static inline void GhoulInit_SetContactCallback(struct GhoulInitActor *actor, void *callback)
+{
+    actor->field268 = callback;
+}
+
+static inline void GhoulInit_InitializeWidget(u8 *drawable, u16 script, u16 resource, struct GhoulInitPosition *position)
+{
+    void *source = ScriptProc_Start(script, resource);
+    *(struct GhoulInit32Block *)drawable = *(struct GhoulInit32Block *)source;
+    ResourceHeader_Relocate(drawable, source);
+    Widget_InitLinked(drawable + 0x20, drawable, 0, 0, 2, 2, 0x3C, position);
+}
+
+s32 Ghoul_Init(void *object)
+{
+    struct GhoulInitActor *arg0 = object;
+    struct GhoulInitActor *actor = object;
+    struct GhoulInitGroup *group = &arg0->group;
+    struct GhoulInitBody *body = &arg0->body;
+    u32 zero;
+    struct GhoulInitPosition tmp;
+    u32 flag;
+    s32 mode;
+
+    arg0->field628 = 0;
+    SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
+    GhoulInit_SetCategory(actor, 4);
+    Ghoul_BindProfile(actor);
+    Vorn_ParseField624_0808B320(actor);
+
+    if (GhoulInit_GetDrawableKind(actor) == 0) {
+        u8 *heap;
+        actor->drawable = Heap_Alloc(0x5C);
+        Memory_Clear(actor->drawable, 0x5C);
+        heap = GhoulInit_Drawable(actor);
+        GhoulInit_InitializeSprite(heap, 0x9247, 0x1DF8);
+        if (GhoulInit_GetCategory(actor) == 0x11 || GhoulInit_GetCategory(actor) == 0x17)
+            heap[7] = 1;
+        actor->body.direction = 0;
+    } else {
+        u8 *heap;
+        actor->drawable = Heap_Alloc(0x80);
+        Memory_Clear(actor->drawable, 0x80);
+        heap = GhoulInit_Drawable(actor);
+        GhoulInit_ClearPosition(&zero, &tmp);
+        GhoulInit_InitializeWidget(heap, 0xCB05, 0x9247, &tmp);
+        actor->field2B7 = 0xFF;
+    }
+    GhoulInit_InitializeBody(arg0, &zero);
+    if (Script_SeekToKeyword(0x50)) {
+        arg0->field640 = GhoulInit_ReadByte(0x78);
+        arg0->field64A = GhoulInit_ReadHalfword(0x78);
+        arg0->field63E = GhoulInit_ReadHalfword(0x78);
+    } else {
+        arg0->field640 = 0x78;
+        arg0->field64A = 0x78;
+    }
+    GhoulInit_ReadPalette(actor, 0x192, 0x192);
+    GhoulInit_InitializePaletteRange(actor, 4, 0);
+    Ghoul_InitCollision(actor);
+    GhoulInit_InstallPrimary(actor, Ghoul_Update, Bat_LookupAnimationEntry,
+        Ghoul_TurnTowardRoute, Ghoul_UpdateIdleState, Ghoul_UpdateStandingState, Ghoul_UpdateHiddenRecovery,
+        sub_08087A70, Bat_UpdateDefeat, SceneActorReaction_OnEnemyDefault, sub_0807F81C,
+        SceneActorTarget_ResolvePendingObject, sub_081363F4, SceneActorPlacement_ResetStateThree);
+    GhoulInit_InitializeGroup(group, (u8 *)arg0 + 0x64C, (u8 *)arg0 + 0x670,
+        Ghoul_UpdateDyingState, Bat_ResumeSavedTarget,
+        SceneActorReaction_BeginTargetRecovery, Bat_UpdateAnimationRequest, body);
+    SceneActorMovement_ResolveRoutePosition(arg0);
+    GhoulInit_InstallRouteDefaults(actor);
+    GhoulInit_SetContactCallback(actor, Ghoul_ReactToContact);
+    group->field61C = (u32)Ghoul_OnLifecycleEvent;
+    group->field5EC = Ghoul_ResumeContactRoute;
+    GhoulInit_SetTargetingFlags(&actor->targeting, 1);
+    GhoulInit_SetBehaviorFlags(actor, 0x1600000);
+    GhoulInit_SetStatusFlags(actor, 0x8000000);
+    SceneActorBehavior_InitializeShadow(actor);
+    SceneActorTerrain_ReadScriptParameters(actor);
+    GhoulInit_ReadInitialMode(actor, group);
+    flag = 0;
+    if (GhoulInit_TestMotionFlags(actor, 4)) {
+        GhoulInit_SetStatusFlags(actor, 0x2000);
+        flag = 1;
+    }
+    if (flag != 1) {
+        GhoulInit_SetState(actor, 0, 0, 0);
+        GhoulInit_SetControl(actor, GhoulInit_GetStandingControl(actor), 0);
+    }
+    GhoulInit_InitializeRegion(actor);
+    if (GhoulInit_TestMotionFlags(actor, 0x40))
+        GhoulInit_ClearColliderFlags((void *)((u8 *)actor + 0x134), ~0x100);
+    if (Script_GetKeywordValue(0x53, 0) != 0 || !GhoulInit_IsInCurrentRegion(actor))
+        SceneActorPlacement_HideActor(actor, 0);
+    SceneActorAnimation_SelectDirectionalEntry(actor, 0);
+    if (GhoulInit_GetDrawableKind(actor) == 0)
+        DisplaySequence_Step(actor->drawable);
+    else
+        Anim_Step(actor->drawable + 0x20, actor->drawable);
+    GhoulInit_InitializeReceiver(actor);
+    SceneActorBehavior_InstallCallbackTables(actor);
+    Ghoul_SetActionHandlers(actor);
+    Ghoul_SetBehaviorHandlers(actor);
+    Ghoul_SetSpecialHandlers(actor);
+    Ghoul_SetBehaviorTable(actor);
+    GhoulInit_SaveControl(GhoulInit_SavedControlOf(actor), actor);
+    GhoulInit_InstallCompletionCallbacks(actor);
+    if (!SceneActorRegistry_LinkActor(actor))
+        return -1;
+    return 0;
+}
