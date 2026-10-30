@@ -3,30 +3,8 @@
 #define SCENE_ACTOR_CHASE_SCALAR_CELLS 1
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
+#include "scene_actor_delayed_response.h"
 #include "scene_actor_terrain.h"
-
-/* The delayed response shares its first eight bytes with saved control. */
-struct GolemDelayedResponse {
-    struct SceneActorChaseSavedControl saved;
-    u8 state, phase, behavior, kind;
-    s32 delay;
-    void *control;
-};
-
-static inline void Golem_PrepareDelay(struct GolemDelayedResponse *response, void *control,
-                                      u32 behavior, s32 duration)
-{
-    response->delay = duration;
-    response->control = control;
-    response->state = 0;
-    response->phase = 0;
-    response->behavior = behavior;
-}
-
-static inline u8 Golem_TakeStateEntry(struct SceneActorRegistryResetView *actor)
-{
-    return SceneActorControl_TakeFlag(&actor->field2B1);
-}
 
 void Skeleton_ClearDirectionalEntryFlag(void);
 
@@ -101,7 +79,7 @@ success:
 void Golem_ArriveAndRestore(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    if (Golem_TakeStateEntry(actor)) {
+    if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorChase_SetControl(actor, Skeleton_ClearDirectionalEntryFlag, 0x2C);
         actor->field2B0 = 0;
     }
@@ -110,9 +88,9 @@ void Golem_ArriveAndRestore(struct SceneActorRegistryResetView *actor)
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     if (SceneActorChase_MotionFlags(actor, 0x80))
-        Golem_PrepareDelay((void *)&group->saved, group->common.gate.control, 12, 120);
+        SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 120);
     else
-        Golem_PrepareDelay((void *)&group->saved, actor->entryTarget228, 7, 120);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->entryTarget228, 7, 120);
     SceneActorChase_SetActorFlags(actor, 0x10);
     actor->field2C2 = 0x20;
     SceneActorChase_SetState(actor, 3, 1, 0);
