@@ -3909,6 +3909,7 @@ addr,name,mode,confidence,source,notes
 080F757C,Axe_OnSecondaryColliderContact,thumb,low,src-alias,Empty contact callback installed on the secondary collider group during axe setup
 080F7580,Axe_LatchColliderContact,thumb,low,src-alias,
 080F75BC,Axe_OnAttackColliderContact,thumb,low,src-alias,Empty contact callback shared by collider groups configured during axe attack setup; attack role tentative
+080F75C0,Axe_OnBodyContact,thumb,medium,disasm,Body collider callback records the first response and disables the active collider banks before reverse flicker when armed with timer above two
 080F7714,SceneActor_AdvanceOffsetApproach,thumb,low,src-alias,
 080F7868,ActorPhase_UpdateTimedFlicker,thumb,low,src-alias,
 080F79A8,Axe_UpdateOrbitAttack,thumb,low,src-alias,Updates paired orbit positions and timed radius or heading changes; disables collider banks before reverse flicker
