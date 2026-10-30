@@ -3240,6 +3240,7 @@ addr,name,mode,confidence,source,notes
 080A20B4,SceneActorContact_ApplyWithinBounds,thumb,low,src-alias,
 080A21A4,Spider_SelectActiveAnimation,thumb,low,src-alias,Animation callback clears the entry flag and selects directional animation entry one
 080A21C8,Spider_SelectIdleAnimation,thumb,low,src-alias,Animation callback clears the entry flag and selects directional animation entry zero
+080A21EC,Spider_AdvanceTurnAnimation,thumb,low,src-alias,
 080A24D0,Spider_UpdateHiddenRecovery,thumb,low,src-alias,
 080A2634,Spider_SelectRecoveryRoute,thumb,low,src-alias,
 080A28A0,Spider_OnSecondaryColliderContact,thumb,low,src-alias,Empty callback tentatively associated with the secondary collider initialized by Spider_Init

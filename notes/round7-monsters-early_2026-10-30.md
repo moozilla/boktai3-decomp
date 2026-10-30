@@ -113,3 +113,9 @@ Matched 532 bytes with typed trail health/count and canonical actor motion. Join
 Tags: 08098788, Ghost, visibility, flags, PRE
 
 Matched 628 bytes with canonical actor/player/game-state access and a typed private visibility context. The discarded engine flag query uses a boolean expression return; the early-return form had removed the ROM's dead masked read. Joined visibility-query exits retain both drawable flag tests, and separate context flag clear/set helpers let PRE keep the shared flag address. Formatted stock check reports zero differing bytes, SHA-256 `24a7bae007b90bbc9dc8f55f965931f57eb6ed7768942bed98f3a89c8ec0f484`. No pins, barriers, or compiler overrides.
+
+## Spider facing turn (080A21EC)
+
+Tags: 080A21EC, Spider, turn, CSE, modes
+
+Matched 740 bytes in ordinary C. The cardinal selection remains in the caller, avoiding the temporary return value that CSE had kept across animation selection. The requested heading has a native byte return; the final cardinal query returns a halfword. These domains preserve the original copies and register allocation. Formatted stock check reports zero differing bytes, SHA-256 `2dbf2dfe00a71e154975710a54ac73e9e3267636c22451e31807555516beb0ff`. Named `Spider_AdvanceTurnAnimation` and updated its dispatcher. No pins, barriers, or compiler overrides.

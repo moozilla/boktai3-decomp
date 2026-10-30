@@ -41,7 +41,7 @@ struct SpiderInstanceState {
 void Spider_InitProfile(void *);
 u32 Spider_OnUpdate(void *);
 u32 Spider_GetAnimationEvent(void *);
-void sub_080A21EC(void *);
+void Spider_AdvanceTurnAnimation(void *);
 void Spider_SelectActiveAnimation(void *);
 void Spider_SelectIdleAnimation(void *);
 void Spider_UpdateLandingMotion(void *);
@@ -147,7 +147,7 @@ s32 Spider_Init(void *object)
     if (Script_GetKeywordValue(0x54, 0))
         Spider_SetFlags(arg0, 0x10);
     MonsterInit_InstallAnimationCallbacks(
-        actor, Spider_OnUpdate, Spider_GetAnimationEvent, sub_080A21EC,
+        actor, Spider_OnUpdate, Spider_GetAnimationEvent, Spider_AdvanceTurnAnimation,
         Spider_SelectActiveAnimation, Spider_SelectIdleAnimation, Spider_OnActionEvent,
         Spider_UpdateLandingMotion, Spider_UpdateDefeat, SceneActorReaction_OnEnemyDefault, 0,
         SceneActorPlacement_BeginContactRoute, sub_081363F4,
