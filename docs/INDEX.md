@@ -386,6 +386,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round7-monster-recovery_2026-10-30.md](../notes/round7-monster-recovery_2026-10-30.md) | Round 7: recovered work and continued monster matching | #matching #monsters #compiler #structs #tooling | 7 |
 | [notes/round7-monsters-early_2026-10-30.md](../notes/round7-monsters-early_2026-10-30.md) | Round 7 early monster matches | #monsters #ghoul #matching | 11 |
 | [notes/round7-particle-sample-addresses_2026-10-30.md](../notes/round7-particle-sample-addresses_2026-10-30.md) | Round 7: particle sample addresses | #actors #matching #rng | 2 |
+| [notes/round7-sword-task-initializer_2026-10-30.md](../notes/round7-sword-task-initializer_2026-10-30.md) | Round 7: Sword task initialization | #matching #monsters #sword #080F67AC #scope | 2 |
 | [notes/round7-tentacle-wander_2026-10-30.md](../notes/round7-tentacle-wander_2026-10-30.md) | Tentacle wander-route selection | #matching #monsters #tentacle #080A8904 | 1 |
 | [notes/s0.md](../notes/s0.md) | s0 notes | *#tooling* | 11 |
 | [notes/s1.md](../notes/s1.md) | s1 notes | *#tooling* | 12 |
