@@ -8787,6 +8787,7 @@ addr,name,mode,confidence,source,notes
 0820F1A0,OrangeSpine_TryFireAtPlayer,thumb,low,src-alias,
 0820F298,OrangeSpine_UpdateRecoveryDelay,thumb,low,src-alias,Counts down before starting animation 14 and switching state callbacks; recovery interpretation is tentative
 0820F2EC,OrangeSpine_UpdateDefeatEffect,thumb,low,src-alias,
+0820F378,OrangeSpine_UpdateDamageState,thumb,low,src-alias,Applies collision damage; emits defeat particles and five smoke bursts; updates flash and invulnerability; and advances the display sequence.
 0820F824,OrangeSpine_OnTaskDestroy,thumb,low,src-alias,Task destruction callback that removes the actor sprite
 0820F830,OrangeSpine_InitializeFromScript,thumb,low,src-alias,
 0820FD10,OrangeSpine_Create,thumb,low,src-alias,Creates and initializes the actor task with update and destruction callbacks; tentative actor identity
