@@ -12,4 +12,6 @@ struct HeapBlock {
 };
 extern struct HeapBlock gHeapHead;
 
+#define HEAP_HEAD_ADDR 0x02000714 /* gHeapHead */
+
 #endif

@@ -2,6 +2,7 @@
 #define GUARD_MONSTER_PARTICLE_RANDOM_H
 
 #include "ram.h"
+#include "engine_globals.h"
 
 /* Capture a sample separately from advancing the shared random cursor. */
 #define PARTICLE_RANDOM_READ_SAMPLE(out, table, index)                                             \
@@ -28,6 +29,20 @@ static inline u32 ParticleRandom_ReadBankSample(const u16 *bank)
     bank += 512;
     gRandomIndex = (gRandomIndex + 1) & 0x3FF;
     return bank[gRandomIndex];
+}
+
+static inline u32 ParticleRandom_ReadSampleAddress(u32 address, u32 origin, const u16 *table)
+{
+    u32 offset = address - origin;
+    return *(const u16 *)((const u8 *)table + offset);
+}
+
+static inline u32 ParticleRandom_ReadRelativeSample(u32 origin, const u16 *table)
+{
+    u32 address;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    address = origin + gRandomIndex * sizeof(*table);
+    return ParticleRandom_ReadSampleAddress(address, origin, table);
 }
 
 #endif

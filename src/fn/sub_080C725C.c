@@ -1,4 +1,7 @@
 #include "global.h"
+#include "heap.h"
+#include "resource_registry.h"
+#include "monster_particle_random.h"
 #include "scene_object.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
@@ -23,19 +26,6 @@ static inline u32 GolemSlide_Random(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return table[gRandomIndex];
-}
-
-static inline u32 GolemSlide_ReadSampleAddress(u32 address, u32 origin, const u16 *table)
-{
-    u32 offset = address - origin;
-    return *(const u16 *)((const u8 *)table + offset);
-}
-static inline u32 GolemSlide_NextBankSample(u32 origin, const u16 *table)
-{
-    u32 address;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    address = origin + gRandomIndex * sizeof(*table);
-    return GolemSlide_ReadSampleAddress(address, origin, table);
 }
 
 static inline s32 GolemSlide_Quarter(s16 value)
@@ -98,13 +88,16 @@ void Golem_UpdateSlideImpact(struct SceneActorRegistryResetView *actor, u32 fram
         context->colliderDelay = 20;
         velocity.x = GolemSlide_Quarter(body->motion.z);
         /* The recovered origin cancels when a later sample address becomes a table offset. */
-        randomOrigin = 0x02000714u + 0x0203B000u;
-        velocity.y = GolemSlide_Random((const u16 *)(randomOrigin - 0x02000714u + 0x400)) & 7;
+        randomOrigin = HEAP_HEAD_ADDR + RESOURCE_REGISTRY_ENTRIES_ADDR;
+        velocity.y =
+            GolemSlide_Random((const u16 *)(randomOrigin - HEAP_HEAD_ADDR +
+                                            (RANDOM_TABLE_ADDR - RESOURCE_REGISTRY_ENTRIES_ADDR))) &
+            7;
         velocity.z = GolemSlide_Quarter(body->motion.x);
-        spread.x = (GolemSlide_NextBankSample(randomOrigin, gRandomTable) & 3) + 15;
-        spread.y = (GolemSlide_NextBankSample(randomOrigin, gRandomTable) & 7) + 15;
-        spread.z = (GolemSlide_NextBankSample(randomOrigin, gRandomTable) & 3) + 15;
-        count = (GolemSlide_NextBankSample(randomOrigin, gRandomTable) & 3) + 4;
+        spread.x = (ParticleRandom_ReadRelativeSample(randomOrigin, gRandomTable) & 3) + 15;
+        spread.y = (ParticleRandom_ReadRelativeSample(randomOrigin, gRandomTable) & 7) + 15;
+        spread.z = (ParticleRandom_ReadRelativeSample(randomOrigin, gRandomTable) & 3) + 15;
+        count = (ParticleRandom_ReadRelativeSample(randomOrigin, gRandomTable) & 3) + 4;
         sub_08014634(count, ActorMode_SelectOddStateVariant(actor), (void *)&body->position,
                      &velocity, &spread, 45, 31);
         SceneActorPlacement_PlayVariantEventSound((void *)actor, 5);

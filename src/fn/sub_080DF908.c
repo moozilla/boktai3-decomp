@@ -2,6 +2,8 @@
 #include "engine.h"
 #include "ram.h"
 #include "heap.h"
+#include "resource_registry.h"
+#include "monster_particle_random.h"
 
 extern const s16 gUnk_086149C4[];
 u32 SceneMovingParticle_CreateWithOptions(void *, void *, s32, s32, s32);
@@ -10,20 +12,6 @@ static inline u32 DogTrail_NextSample(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return table[gRandomIndex];
-}
-
-static inline u32 DogTrail_ReadSampleAddress(u32 address, u32 origin, const u16 *table)
-{
-    u32 offset = address - origin;
-    return *(const u16 *)((const u8 *)table + offset);
-}
-
-static inline u32 DogTrail_NextBankSample(u32 origin, const u16 *table)
-{
-    u32 address;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    address = origin + gRandomIndex * sizeof(*table);
-    return DogTrail_ReadSampleAddress(address, origin, table);
 }
 
 static inline s32 DogTrail_Truncate(s32 value)
@@ -45,7 +33,7 @@ void SceneActorAnimation_SpawnTrailAtPosition(void *position, u32 palette)
     s16 *result;
 
     /* The recovered bank origin cancels when converting a sample address to its table offset. */
-    randomOrigin = (u32)&gHeapHead + 0x0203B000u;
+    randomOrigin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;
     earlyTable = (const u16 *)RANDOM_TABLE_ADDR;
     mask = 255;
     heading = DogTrail_NextSample(earlyTable) & mask;
@@ -66,7 +54,7 @@ void SceneActorAnimation_SpawnTrailAtPosition(void *position, u32 palette)
         planar[1] = zero;
         planar[2] = DogTrail_Truncate(gUnk_086149C4[heading] * speed);
     }
-    vertical = DogTrail_NextBankSample(sampleOrigin, (const u16 *)RANDOM_TABLE_ADDR);
+    vertical = ParticleRandom_ReadRelativeSample(sampleOrigin, (const u16 *)RANDOM_TABLE_ADDR);
     vertical &= 63;
     vertical -= 48;
     result = velocity;
