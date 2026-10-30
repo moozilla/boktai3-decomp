@@ -11,6 +11,7 @@ and the store of graphics tagged as containing text (data/gfx_text.csv).
 import collections
 import csv
 import json
+import logging
 import os
 import socket
 import struct
@@ -23,6 +24,7 @@ TAGS = os.path.join(ROOT, "data", "gfx_text.csv")
 NOTES = os.path.join(ROOT, "data", "notes.csv")
 STAGE_PALS = os.path.join(ROOT, "data", "stage_palettes.csv")
 SPRITE_PALS = os.path.join(OUT, "sprite_palettes.json")
+log = logging.getLogger("studio")
 SIZES = {0: [(8, 8), (16, 16), (32, 32), (64, 64)], 1: [(16, 8), (32, 8), (32, 16), (64, 32)],
          2: [(8, 16), (8, 32), (16, 32), (32, 64)], 3: [(8, 8)] * 4}
 
@@ -51,6 +53,7 @@ class Live:
         srv.listen(1)
         while True:
             conn, _ = srv.accept()
+            log.info("live: Centaur connected")
             with self.lock:
                 if self.conn:
                     try:
@@ -80,6 +83,7 @@ class Live:
         with self.lock:
             if self.conn is conn:
                 self.conn = None
+        log.info("live: Centaur disconnected")
 
     def _event(self, e):
         with self.lock:
