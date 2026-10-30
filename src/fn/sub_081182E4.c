@@ -1,21 +1,24 @@
 #include "global.h"
+#include "scene_actor_style.h"
 #include "game_state.h"
 #include "ram.h"
 #include "engine_globals.h"
 #include "area_effect_link.h"
 
-// confidence=low: clears actions and markers, emits defeat bursts, then selects recovery.
+// Clears action effects, emits defeat bursts, and selects the recovery callback.
 
-// MATCHING_CONCESSION: register-pinning
-#ifdef NONMATCHING
-// fuzzy: 86.6%
-// Reset-action pointer lifetimes, motion temporaries and register allocation still differ.
+struct GloveModel;
+union GloveAnimationKey {
+    u32 word;
+    u16 half[2];
+};
 
-struct Obj {
+struct GloveMotion {
     u8 pad0[4];
     u32 unk4;
     u32 unk8;
-    u8 padC[0x18 - 0xC];
+    u32 boundsFlags;
+    u8 pad10[0x18 - 0x10];
     s32 z;
     u8 pad1C[4];
     s32 outX, outY, outZ; /* 0x20 */
@@ -23,9 +26,42 @@ struct Obj {
     s32 unk38;
     s32 unk3C;
     u32 flags40;
-    u8 pad44[0xC0 - 0x44];
+    u8 color[4];
+    struct SceneActorStyle style;
+    u8 pad64[4];
+    u32 pendingDamage;
+    u8 pad6C[0x7E - 0x6C];
+    u16 recoveryValue;
+    void *parts;
+    u8 pad84[0xC0 - 0x84];
     s32 unkC0;
-    u8 padC4[0x5AC - 0xC4];
+    u8 padC4[4];
+    u32 secondaryBias;
+    u8 padCC[0x2B0 - 0xCC];
+    u32 primaryCallback;
+    u8 pad2B4, primaryKind;
+    u8 pad2B6[8];
+    u16 primaryCharge;
+    u8 pad2C0[0x305 - 0x2C0];
+    u8 primarySpriteRefresh, primaryLatched;
+    u8 actionActive;
+    u16 actionCooldown;
+    u8 pad30A[4];
+    u16 primaryKeyframes;
+    u8 pad310[4];
+    u32 secondaryCallback;
+    u8 pad318;
+    u8 actionKind;
+    u8 pad31A[0x324 - 0x31A];
+    u8 secondaryEnabled;
+    s8 secondarySpriteSlot;
+    u16 recoveryTimer, cooldown;
+    u8 secondaryRelease, secondaryLatched;
+    u8 pad32C[0x524 - 0x32C];
+    union GloveAnimationKey animation;
+    u8 pad528[0x57A - 0x528];
+    u8 damageTimer;
+    u8 pad57B[0x5AC - 0x57B];
     s32 vy; /* 0x5AC */
     s32 y;  /* 0x5B0 */
     s32 vz; /* 0x5B4 */
@@ -41,15 +77,30 @@ struct Obj {
     s32 x; /* 0x5DC */
     u8 pad5E0[0x5EC - 0x5E0];
     s8 steps; /* 0x5EC */
-    u8 pad5ED[3];
+    u8 pad5ED;
+    s8 damageFlags;
+    u8 pad5EF;
     u16 angle; /* 0x5F0 */
     u8 pad5F2[6];
 };
 
+struct GloveModelPart {
+    u8 pad0[8];
+    u32 flags;
+    u8 padC[0x48 - 0xC];
+    void *palette;
+    u8 pad4C[0x60 - 0x4C];
+};
+struct GloveModel {
+    struct GloveModelPart parts[5];
+    u8 primaryAnimation[0x30];
+    u8 palette[0x40];
+};
+
 struct Glove {
     u8 pad0[0x18];
-    struct Obj motion;
-    u8 model[0x860 - 0x610];
+    struct GloveMotion motion;
+    struct GloveModel model;
     s8 marker, markerSlot;
     u8 pad862[2];
     u32 timer;
@@ -68,22 +119,16 @@ struct Glove {
     s32 launchSpeed;
     u8 launchPhase;
 };
-#define U8(p, o)  (*(u8 *)((u8 *)(p) + (o)))
-#define S8(p, o)  (*(s8 *)((u8 *)(p) + (o)))
-#define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
-#define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
-#define U32(p, o) (*(u32 *)((u8 *)(p) + (o)))
-#define S32(p, o) (*(s32 *)((u8 *)(p) + (o)))
 s32 Div(s32, s32);
 void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
-void Terrain_ResolveActorMotion(struct Obj *);
-void PalFade_Update(struct Obj *);
-void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
-void ActorParticles_SpawnImpactBurst(struct Obj *);
+void Terrain_ResolveActorMotion(struct GloveMotion *);
+void PalFade_Update(struct GloveMotion *);
+void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
+void ActorParticles_SpawnImpactBurst(struct GloveMotion *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
-void ScenePool_ClampMotionSpeeds(struct Obj *);
-void Actor_ClampMovementSpeed(struct Obj *);
+void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
+void Actor_ClampMovementSpeed(struct GloveMotion *);
 void Glove_SetAnimationKeyframes(struct Glove *, s32);
 void ActorRecoil_UpdateMotion(struct Glove *);
 
@@ -94,11 +139,11 @@ void CharacterModel_SetAnimationFlags(void *, u32);
 void ActorMarkerPool_ShowMarker(s32);
 void Character_SetLowResourceColorEffect(void *, void *);
 void Glove_UpdateStopping(struct Glove *);
-void ActorParticles_SpawnSideBurst(struct Obj *);
+void ActorParticles_SpawnSideBurst(struct GloveMotion *);
 u8 LinkParticipant_IsLocallySelected(struct Glove *);
 void Sound_StopSong(s32);
 void Sound_PlaySong(s32);
-void CallbackList_ResetDispatch(struct Obj *);
+void CallbackList_ResetDispatch(struct GloveMotion *);
 void ActorMarker_HideSlot(s32);
 void ActorMarkerPool_HideMarker(s32);
 void Anim_SetKeyframes(void *, void *, u16, s32, s32);
@@ -109,35 +154,59 @@ void CharacterModel_LoadSecondaryPalette(void *, s32);
 void sub_0810BB4C(void *, s32);
 void sub_0810BB90(void *, s32);
 s32 Mod(s32, s32);
-void ActorParticles_EmitOffsetBurst(struct Obj *);
+void ActorParticles_EmitOffsetBurst(struct GloveMotion *);
 void sub_08117F6C(struct Glove *);
 void Glove_OnActionComplete(struct Glove *);
+struct GloveModelSlotView {
+    void **slot;
+};
+static inline void Glove_RestorePartPalettes(const struct GloveModelSlotView *view)
+{
+    void **sprites = view->slot;
+    u32 paletteOffset = (u32)((struct GloveModel *)0)->palette;
+    u32 offset = 0;
+    s32 count = 4;
+    do {
+        struct GloveModel *base = *sprites;
+        u8 *destination = (u8 *)&base->parts[0].palette;
+        destination += offset;
+        *(void **)destination = (u8 *)base + paletteOffset;
+        offset += sizeof(struct GloveModelPart);
+        count--;
+    } while (count >= 0);
+}
 static inline void ClearFlags(u16 *p, s32 mask)
 {
     *p &= mask;
 }
 static inline u8 IsRecoveryEnabled(u32 mask)
 {
-    if (U32(gGameState, 0x868) & mask)
+    if (gGameState->flags868 & mask)
         return 1;
     return 0;
 }
 void Glove_UpdateDefeatEffects(struct Glove *p)
 {
-    struct Obj *self = &p->motion;
-    register s32 h asm("sl");
+    struct GloveMotion *self = &p->motion;
+    s32 h;
     s32 dx, dz;
-    u32 a, b;
+    u32 a, status;
+    struct GloveMotion *actionSelf;
+    s32 *bias;
+    u32 *motionBias;
+    u16 *flags;
+    u8 *spriteSlot;
+    u16 *actionTimer, *cooldown;
+    u8 *actionPending, *releasePending, *style;
+    void **sprites;
+    s32 *vy, *py, *pvz;
     if (p->active) {
+        struct GloveMotion *entrySelf;
         s32 count;
-        u8 *animation;
+        u32 *animation;
+        u32 hidden;
         u32 offset;
-        struct Obj *actionSelf;
-        u8 *actionKind, *spriteSlot, *releasePending, *actionPending;
-        u16 *actionTimer, *cooldown, *flags;
-        u8 **sprites;
-        u32 *motionBias;
-        u8 *style;
+        u8 *actionKind;
         ActorParticles_SpawnSideBurst(self);
         if (LinkParticipant_IsLocallySelected(p)) {
             Sound_StopSong(0x87);
@@ -147,22 +216,23 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
             Sound_StopSong(0x8B);
             Sound_StopSong(0x93);
         }
-        actionSelf = self;
-        actionKind = (u8 *)p + 0x2CD;
-        spriteSlot = (u8 *)p + 0x33D;
-        releasePending = (u8 *)p + 0x343;
-        actionPending = (u8 *)p + 0x342;
-        actionTimer = (u16 *)((u8 *)p + 0x33E);
-        cooldown = (u16 *)((u8 *)p + 0x340);
+        entrySelf = self;
+        actionKind = &p->motion.primaryKind;
+        spriteSlot = &p->motion.secondarySpriteSlot;
+        releasePending = &p->motion.secondaryLatched;
+        actionPending = &p->motion.secondaryRelease;
+        actionTimer = &p->motion.recoveryTimer;
+        cooldown = &p->motion.cooldown;
         flags = &p->flags;
-        sprites = (u8 **)((u8 *)p + 0x98);
-        style = (u8 *)p + 0x63;
-        motionBias = (u32 *)((u8 *)p + 0xE0);
-        animation = p->model + 8;
+        sprites = &p->motion.parts;
+        style = &p->motion.style.parameterD;
+        motionBias = &p->motion.secondaryBias;
+        hidden = 1;
+        animation = &p->model.parts[0].flags;
         count = 4;
         do {
-            U32(animation, 0) |= 1;
-            animation += 0x60;
+            *animation |= hidden;
+            animation += sizeof(struct GloveModelPart) / sizeof(*animation);
             count--;
         } while (count >= 0);
         ActorMarkerPool_HideMarker(p->marker);
@@ -171,53 +241,50 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
         self->dz = 0;
         self->steps = 0;
         CallbackList_ResetDispatch(self);
+        actionSelf = entrySelf;
         if (*actionKind == 2) {
-            U16(p, 0x2D6) = 0;
+            p->motion.primaryCharge = 0;
             ActorMarker_HideSlot(p->markerSlot);
         } else if (*actionKind == 5) {
-            U8(p, 0x31E) = 1;
-            Anim_SetKeyframes((u8 *)p + 0x670, (u8 *)p + 0x7F0, U16(p, 0x326), 2, 0);
-            Anim_Step((u8 *)p + 0x670, (u8 *)p + 0x7F0);
-            U8(p, 0x31D) = 1;
-            U8(p, 0x31E) = 0;
+            p->motion.primaryLatched = 1;
+            Anim_SetKeyframes(&p->model.parts[1], p->model.primaryAnimation,
+                              p->motion.primaryKeyframes, 2, 0);
+            Anim_Step(&p->model.parts[1], p->model.primaryAnimation);
+            p->motion.primarySpriteRefresh = 1;
+            p->motion.primaryLatched = 0;
             if (LinkParticipant_IsLocallySelected(p))
                 Sound_StopSong(0x93);
-            U8(actionSelf, 0x307) = 0;
+            actionSelf->actionActive = 0;
         } else if (*actionKind == 3) {
-            Anim_SetKeyframes((u8 *)p + 0x670, (u8 *)p + 0x7F0, U16(p, 0x326), 2, 0);
-            Anim_Step((u8 *)p + 0x670, (u8 *)p + 0x7F0);
+            Anim_SetKeyframes(&p->model.parts[1], p->model.primaryAnimation,
+                              p->motion.primaryKeyframes, 2, 0);
+            Anim_Step(&p->model.parts[1], p->model.primaryAnimation);
         }
-        U16(actionSelf, 0x308) = 0;
+        actionSelf->actionCooldown = 0;
         SpritePair_ReleaseSlot(*(s8 *)spriteSlot, 0);
         *releasePending = 0;
         *actionPending = 0;
         *actionTimer = 0;
         *cooldown = 0;
         ClearFlags(flags, ~2);
-        offset = 0;
-        count = 4;
-        do {
-            u8 *base = *sprites;
-            u8 *destination = base + 0x48;
-            destination += offset;
-            *(u32 *)destination = (u32)(base + 0x210);
-            offset += 0x60;
-            count--;
-        } while (count >= 0);
-        CharacterModel_LoadPrimaryPalette(p->model);
-        CharacterModel_LoadSecondaryPalette(p->model, *style);
+        {
+            struct GloveModelSlotView view = {sprites};
+            Glove_RestorePartPalettes(&view);
+        }
+        CharacterModel_LoadPrimaryPalette(&p->model);
+        CharacterModel_LoadSecondaryPalette(&p->model, *style);
         {
             u32 mask = 0x800;
             if ((gEngineFlags | gScenePauseFlags) & mask) {
-                u8 *peer = gLinkSession;
+                struct AreaEffectLinkState *peer = gLinkSession;
                 if (peer) {
-                    if (U8(peer, 0x53) != 1)
+                    if (peer->unavailable != 1)
                         peer = 0;
                 }
                 if (peer) {
-                    peer += 0xE0;
-                    sub_0810BB4C(peer, 1 - p->participant);
-                    sub_0810BB90(peer, p->participant);
+                    void *data = peer->sessionData;
+                    sub_0810BB4C(data, 1 - p->participant);
+                    sub_0810BB90(data, p->participant);
                 }
             }
         }
@@ -242,15 +309,21 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
         }
     }
     {
-        s32 *vy = &self->vy, *bias = &self->unkC0;
-        s32 *py, *px, *idy, *idz;
-        h = *vy + *bias;
-        if (h > 0xF000)
-            h = 0xF000;
+        s32 *px, *idy, *idz;
+        s32 decay;
+        h = self->vy + self->unkC0;
+        {
+            s32 limit = 0xF000;
+            bias = &self->unkC0;
+            vy = &self->vy;
+            if (h > limit)
+                h = limit;
+        }
 
         self->y += 0x200;
+        decay = self->steps;
         py = &self->y;
-        if (self->steps > 0) {
+        if (decay > 0) {
             self->x += self->dx;
             self->dx += Div(-self->dx, self->steps);
             self->dy += Div(-self->dy, self->steps);
@@ -268,7 +341,7 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
         Actor_ClampMovementSpeed(self);
 
         {
-            s32 *pprevZ, *pprevX, *pvz;
+            s32 *pprevZ, *pprevX;
             s32 lim;
             self->outX = *px + h - self->prevX;
             self->outY = *py + *idy;
@@ -277,8 +350,8 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
             dz = (self->z - self->prevZ) >> 12;
             lim = 0x3000;
             pprevX = &self->prevX;
-            pprevZ = &self->prevZ;
             pvz = &self->vz;
+            pprevZ = &self->prevZ;
             if (h > lim)
                 dx = 0x80;
             if (dx == 0 && dz == 0)
@@ -289,9 +362,9 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
             *pprevZ = self->z;
             Terrain_ResolveActorMotion(self);
             a = (u32) ~(self->unk3C >> 12) >> 31;
-            b = (u32) ~(self->unk38 >> 12) >> 31;
+            status = (u32) ~(self->unk38 >> 12) >> 31;
             if (self->unk4 != self->unk8 && (self->unk4 & 0x1000) && !(self->unk8 & 0xF000) &&
-                b <= 1 && a == 1) {
+                status <= 1 && a == 1) {
                 s32 v = ((*vy >> 10) + (*bias >> 8)) >> 1;
                 if (v < 4)
                     v = 4;
@@ -302,7 +375,7 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
             }
             p->height = h;
 
-            Actor_UpdateShadowSpriteParts(self, p->model);
+            Actor_UpdateShadowSpriteParts(self, &p->model);
             if (self->flags40 & 2)
                 *pvz = 0;
             if (self->flags40 & 1)
@@ -311,22 +384,19 @@ void Glove_UpdateDefeatEffects(struct Glove *p)
     }
     if (p->timer > 120) {
         void (*callback)(void *);
-        u32 zero;
+        u8 *active;
         u32 mask = 0x800;
-        if (((gEngineFlags | gScenePauseFlags) & mask) || IsRecoveryEnabled(0x100)) {
+        if (((gEngineFlags | gScenePauseFlags) & mask) || (status = IsRecoveryEnabled(0x100))) {
             callback = (void (*)(void *))sub_08117F6C;
-            zero = 0;
+            active = &p->active;
+            status = 0;
         } else {
             callback = (void (*)(void *))Glove_OnActionComplete;
-            zero = 0;
+            active = &p->active;
         }
-        p->active = 1;
+        *active = 1;
         p->update = callback;
-        p->timer = zero;
+        p->timer = status;
     } else
         p->timer++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Glove_UpdateDefeatEffects);
-#endif
