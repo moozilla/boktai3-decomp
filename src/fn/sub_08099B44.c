@@ -6,6 +6,7 @@
 #include "player.h"
 #include "game_state.h"
 #include "scene_actor_animation.h"
+#include "scene_actor_init_primitives.h"
 #define U8(p, n)  (*((u8 *)(p) + (n)))
 #define U32(p, n) (*(u32 *)((u8 *)(p) + (n)))
 #define PTR(p, n) (*(void **)((u8 *)(p) + (n)))
@@ -337,12 +338,6 @@ static inline void Ghost_SaveControl(struct GhostSavedControl *saved, struct Gho
     saved->field124 = Ghost_GetCurrentControl(a);
     saved->field128 = Ghost_GetControlKind(a);
 }
-static inline void Ghost_ClearPosition(u32 *fill, void *object)
-{
-    struct ContactPosition *position = object;
-    *fill = 0;
-    CpuSet(fill, position, 0x05000002);
-}
 static inline u8 *Ghost_GetDrawable(struct GhostActor *a)
 {
     return a->drawable;
@@ -358,20 +353,6 @@ static inline void Ghost_SetAnimationIndex(struct GhostActor *a, u32 value)
 static inline u8 Ghost_GetAnimationRestart(struct GhostActor *a)
 {
     return a->field2B3;
-}
-static inline u16 Ghost_ReadKeywordHalfword(u32 keyword, s32 fallback)
-{
-    return Script_GetKeywordValue(keyword, fallback);
-}
-static inline s32 Value(s32 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-static inline void Ghost_ReadScriptWord(u32 *output, u32 fallback)
-{
-    *output = Value(fallback);
 }
 static inline u32 Cell(struct ContactPosition *p)
 {
@@ -418,12 +399,6 @@ static inline void DrawablePosition(struct GhostActor *a)
     else
         POS(a->drawable, 0x40) = a->body.position;
 }
-static inline u8 Ghost_ReadByte(u8 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
 static inline u8 Ghost_TestTargetingFlags(struct GhostTargeting *target, u32 mask)
 {
     if (Ghost_GetTargetingFlags(target) & mask)
@@ -435,7 +410,7 @@ static inline void Ghost_ReadTargeting(struct GhostTargeting *motion)
     {
         s32 x, angle, z;
         if (Script_SeekToKeyword('e')) {
-            x = Value(0x30);
+            x = MonsterInit_ReadWord(0x30);
             angle = Script_GetPc() ? (u8)Script_GetValue() : 0x40;
             z = x;
         } else {
@@ -455,12 +430,6 @@ static inline void Ghost_ReadTargeting(struct GhostTargeting *motion)
             motion->range = Div(motion->limit * 7, 10);
     }
 }
-static inline u16 Ghost_ReadHalfword(u16 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
 static inline void Ghost_SetFirstAttack(struct GhostActor *a, s32 index, s32 value)
 {
     a->attacks.first[index] = value;
@@ -471,10 +440,10 @@ static inline struct GhostActor *Ghost_ReadAttacks(struct GhostActor *a)
     if (Script_SeekToKeyword('a')) {
         i = 0;
         while (1) {
-            Ghost_SetFirstAttack(a, i, Ghost_ReadHalfword(24));
-            a->attacks.second[i] = Ghost_ReadHalfword(24);
-            a->attacks.flags[i] = Value(0);
-            a->attacks.parameter[i] = Ghost_ReadHalfword(0);
+            Ghost_SetFirstAttack(a, i, MonsterInit_ReadHalfword(24));
+            a->attacks.second[i] = MonsterInit_ReadHalfword(24);
+            a->attacks.flags[i] = MonsterInit_ReadWord(0);
+            a->attacks.parameter[i] = MonsterInit_ReadHalfword(0);
             i++;
             if (i > 3)
                 break;
@@ -528,35 +497,35 @@ static inline void InitializeScriptFields(struct GhostActor *a, u32 *fill)
     a->flags2D0 = 0;
     a->enabled = 0;
     a->field2E8 = 8;
-    a->flags2C0 = Ghost_ReadKeywordHalfword('M', 0);
-    Ghost_ClearPosition(fill, &origin);
+    a->flags2C0 = MonsterInit_ReadKeywordHalfword('M', 0);
+    MonsterInit_ClearPosition(fill, &origin);
     id = Script_GetKeywordValue('N', 0);
     Ghost_ReadTargeting(&Ghost_ReadAttacks(a)->targeting);
     if (Script_SeekToKeyword('l')) {
-        first = Value(300);
-        second = Value(300);
+        first = MonsterInit_ReadWord(300);
+        second = MonsterInit_ReadWord(300);
     } else {
         first = 0;
         second = 0;
     }
     if (Script_GetKeywordValue('b', 0))
         Ghost_SetStatusFlags(a, 0x200);
-    a->field1F0 = Ghost_ReadKeywordHalfword('F', 0);
-    a->field1EC = Ghost_ReadKeywordHalfword('R', 0);
+    a->field1F0 = MonsterInit_ReadKeywordHalfword('F', 0);
+    a->field1EC = MonsterInit_ReadKeywordHalfword('R', 0);
     if (Script_SeekToKeyword('A')) {
-        Ghost_SetInitialHealth(a, Ghost_ReadHalfword(0));
-        a->field9E = Ghost_ReadByte(0);
-        a->field9F = Ghost_ReadByte(0);
-        a->fieldA0 = Ghost_ReadByte(0);
-        a->fieldA2 = Ghost_ReadHalfword(0);
-        a->fieldA4 = Ghost_ReadHalfword(0);
+        Ghost_SetInitialHealth(a, MonsterInit_ReadHalfword(0));
+        a->field9E = MonsterInit_ReadByte(0);
+        a->field9F = MonsterInit_ReadByte(0);
+        a->fieldA0 = MonsterInit_ReadByte(0);
+        a->fieldA2 = MonsterInit_ReadHalfword(0);
+        a->fieldA4 = MonsterInit_ReadHalfword(0);
     }
     Ghost_InitializeHealth(a, Ghost_GetInitialHealth(a), first, second);
     if (Script_SeekToKeyword('X')) {
-        a->fieldAC = Value(0);
-        a->fieldA1 = Ghost_ReadByte(0);
+        a->fieldAC = MonsterInit_ReadWord(0);
+        a->fieldA1 = MonsterInit_ReadByte(0);
     }
-    MonsterInit_WriteHalfword(&a->fieldB2, Ghost_ReadKeywordHalfword('K', 2));
+    MonsterInit_WriteHalfword(&a->fieldB2, MonsterInit_ReadKeywordHalfword('K', 2));
     variant = (s16)Script_GetKeywordValue('V', -1);
     if (variant < 0)
         variant = 0xFFFF;
@@ -687,7 +656,7 @@ static inline void Ghost_SetWidgetPalette(struct GhostWidgetPalette *widget, s32
 static inline void Ghost_ReadPalette(struct GhostActor *a, u32 base, u32 alternate)
 {
     s32 selected;
-    a->paletteOffset = Ghost_ReadKeywordHalfword('C', 0);
+    a->paletteOffset = MonsterInit_ReadKeywordHalfword('C', 0);
     a->basePaletteBank = base;
     a->paletteAlternateBank = alternate;
     a->alternateOffset = Ghost_GetPaletteOffset(a) + base;
@@ -778,7 +747,7 @@ static inline void Ghost_InitializeDrawable(struct GhostActor *a, u32 *fill)
         a->drawable = Heap_Alloc(0x80);
         Memory_Clear(a->drawable, 0x80);
         d = Ghost_GetDrawable(a);
-        Ghost_ClearPosition(fill, &zero);
+        MonsterInit_ClearPosition(fill, &zero);
         res = ScriptProc_Start(0xCB05, 0xD637);
         *(struct ResourceCopy *)d = *(struct ResourceCopy *)res;
         ResourceHeader_Relocate(d, res);
@@ -807,9 +776,9 @@ static inline u32 Ghost_ReadRoute(struct GhostActor *a, struct GhostRoute *route
     struct ContactPosition point;
     route->activeBranch = 0;
     if (Script_SeekToKeyword('r')) {
-        route->routeId = Value(0);
+        route->routeId = MonsterInit_ReadWord(0);
         route->parameter = 0;
-        route->pointId = Value(0);
+        route->pointId = MonsterInit_ReadWord(0);
         route->currentPoint = route->pointId;
         route->branches[Ghost_RouteActiveBranch(route)] = route->routeId;
         route->branches[Ghost_AlternateRouteBranch(route)] =
@@ -859,27 +828,27 @@ s32 Ghost_Init(void *object)
         a->body.direction = Route_GetCurrentPointFacing(route);
     }
     if (Script_SeekToKeyword('p')) {
-        a->body.position.x = Ghost_ReadHalfword(0);
-        a->body.position.y = Ghost_ReadHalfword(0);
-        a->body.position.z = Ghost_ReadHalfword(0);
+        a->body.position.x = MonsterInit_ReadHalfword(0);
+        a->body.position.y = MonsterInit_ReadHalfword(0);
+        a->body.position.z = MonsterInit_ReadHalfword(0);
         a->terrainCell = Cell(&a->body.position);
         a->groundHeight2BE = Height(Ghost_GetTerrainCell(a), &a->body.position);
         arg0->baseHeight = a->groundHeight2BE;
         DrawablePosition(a);
     } else
         arg0->baseHeight = a->groundHeight2BE;
-    arg0->routeDelay = Ghost_ReadKeywordHalfword('l', 0);
+    arg0->routeDelay = MonsterInit_ReadKeywordHalfword('l', 0);
     arg0->playerPosition = gPlayers[0]->position;
     if (Script_SeekToKeyword('P')) {
-        arg0->phase560 = Ghost_ReadByte(0);
-        arg0->phase561 = Ghost_ReadByte(0);
-        arg0->phase5BC = Ghost_ReadByte(0);
+        arg0->phase560 = MonsterInit_ReadByte(0);
+        arg0->phase561 = MonsterInit_ReadByte(0);
+        arg0->phase5BC = MonsterInit_ReadByte(0);
     }
     if (Script_GetKeywordValue('g', 0))
         Ghost_SetInstanceFlags(arg0, 0x100);
     if (Script_SeekToKeyword('d')) {
-        arg0->effectDuration = Ghost_ReadHalfword(0);
-        Ghost_ReadScriptWord(&arg0->distanceSquared, 0);
+        arg0->effectDuration = MonsterInit_ReadHalfword(0);
+        MonsterInit_ReadScriptWord(&arg0->distanceSquared, 0);
         arg0->distanceSquared *= arg0->distanceSquared;
     } else {
         arg0->effectDuration = 0;

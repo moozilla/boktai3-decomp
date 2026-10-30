@@ -2,6 +2,7 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
+#include "scene_actor_init_primitives.h"
 
 void Octopus_InitProfileId(void *);
 void Octopus_Update(void);
@@ -16,10 +17,6 @@ void Octopus_Destroy(void);
 extern const u8 gUnk_0860635C[];
 
 #define SK_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetKeywordValue(u32, s32);
-s32 Script_GetValue(void);
-u32 Script_GetPc(void);
 void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
@@ -66,24 +63,12 @@ void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 
-s32 Script_GetValue(void);
-u32 Script_GetPc(void);
-static inline s32 OctopusInit_Value(s32 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-#define SV(d) OctopusInit_Value(d)
+#define SV(d) MonsterInit_ReadWord(d)
 
 struct OctopusInit32Block {
     u32 w[8];
 };
 
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetKeywordValue(u32, s32);
-s32 Script_GetValue(void);
-u32 Script_GetPc(void);
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
@@ -114,7 +99,6 @@ void SceneActorScript_OnCommand(void);
 void SceneActorControl_OnIdle(void);
 extern const u8 gUnk_086108B0[];
 extern const u8 gUnk_08606400[];
-void *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
@@ -135,14 +119,6 @@ void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
 
-struct OctopusInitPosition { s16 x, y, z, pad; };
-struct OctopusInitMap { u32 header; u8 *cells; u8 unknown8[0x1C]; u16 rows[1]; };
-static inline void OctopusInit_ClearPosition(u32 *fill, void *object)
-{
-    struct OctopusInitPosition *position = object;
-    *fill = 0;
-    CpuSet(fill, position, 0x05000002);
-}
 static inline u16 OctopusInit_PositionX(const u16 *pos)
 {
     return pos[0];
@@ -157,7 +133,7 @@ static inline s32 OctopusInit_Cell(u16 *pos)
     s32 z = (s16)OctopusInit_PositionZ(pos) >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct OctopusInitMap *)gTerrainMap)->rows[z] + x;
+    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
 }
 static inline u32 OctopusInit_TerrainShape(const u8 *cell)
 {
@@ -177,7 +153,7 @@ static inline u32 OctopusInit_Height(s32 cell, u16 *pos)
     if (p)
         p += 4;
     else {
-        struct OctopusInitMap *map = (void *)gTerrainMap;
+        struct EngineMap *map = (void *)gTerrainMap;
         u32 offset = cell * 4 + 12;
         p = map->cells + offset;
     }
@@ -195,7 +171,7 @@ struct OctopusInitBody {
     u8 unknown54[0x5];
     u8 direction;
     u8 unknown5A[0x2];
-    struct OctopusInitPosition position;
+    struct ContactPosition position;
     u8 unknown64[0x34];
 };
 struct OctopusInitAttacks {
@@ -644,7 +620,7 @@ static inline u32 OctopusInit_RoutePointZ(struct OctopusInitRoute *route)
     return (u16)route->point->z;
 }
 
-static inline void OctopusInit_SnapToRoute(struct OctopusInitPosition *position, struct OctopusInitRoute *route)
+static inline void OctopusInit_SnapToRoute(struct ContactPosition *position, struct OctopusInitRoute *route)
 {
     position->x = OctopusInit_RoutePointX(route);
     position->z = OctopusInit_RoutePointZ(route);
@@ -653,9 +629,9 @@ static inline void OctopusInit_SnapToRoute(struct OctopusInitPosition *position,
 static inline void OctopusInit_DrawablePosition(struct OctopusInitActor *actor)
 {
     if (OctopusInit_GetDrawableKind(actor) == 0)
-        *(struct OctopusInitPosition *)(actor->drawable + 0x1C) = actor->body.position;
+        *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
     else
-        *(struct OctopusInitPosition *)(actor->drawable + 0x40) = actor->body.position;
+        *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
 }
 
 static inline u8 OctopusInit_RouteId(struct OctopusInitRoute *route)
@@ -673,10 +649,6 @@ static inline u8 OctopusInit_RoutePointId(struct OctopusInitRoute *route)
 static inline u8 OctopusInit_RouteActiveBranch(struct OctopusInitRoute *route)
 {
     return route->activeBranch;
-}
-static inline u16 OctopusInit_ReadKeywordHalfword(u32 keyword, s32 fallback)
-{
-    return Script_GetKeywordValue(keyword, fallback);
 }
 
 static inline s32 OctopusInit_ClampHealth(u16 raw)
@@ -723,19 +695,6 @@ static inline void OctopusInit_BeginRoute(struct OctopusInitBody *body, struct O
     SceneBody_StartRoute(body, route, OctopusInit_RouteId(route), OctopusInit_RouteParameter(route), OctopusInit_RoutePointId(route));
 }
 
-static inline u8 OctopusInit_ReadByte(u8 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-
-static inline u16 OctopusInit_ReadHalfword(u16 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
 static inline void OctopusInit_SetFirstAttack(struct OctopusInitActor *actor, s32 index, s32 value)
 {
     actor->attacks.first[index] = value;
@@ -743,7 +702,7 @@ static inline void OctopusInit_SetFirstAttack(struct OctopusInitActor *actor, s3
 
 static inline u32 OctopusInit_ReadRoute(struct OctopusInitActor *arg0, struct OctopusInitGroup *group, struct OctopusInitRoute *rt)
 {
-    struct OctopusInitPosition point;
+    struct ContactPosition point;
     s32 r1v;
     rt->activeBranch = 0;
 
@@ -777,8 +736,8 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
     struct OctopusInitActor *arg0 = object;
     struct OctopusInitGroup *group = &arg0->group;
     struct OctopusInitBody *body = &arg0->body;
-    struct OctopusInitPosition origin;
-    struct OctopusInitPosition point;
+    struct ContactPosition origin;
+    struct ContactPosition point;
     s32 mode, i, r4v, r6v, r5v, r2v, r1v;
     u16 initialHealth;
     struct OctopusInitRoute *rt;
@@ -788,16 +747,16 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
     arg0->field2E8 = 8;
     arg0->field2C0 = Script_GetKeywordValue(0x4D, 0);
     arg0->field2C2 = 0x40;
-    OctopusInit_ClearPosition(fill, &origin);
+    MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
     if (Script_SeekToKeyword(0x61)) {
         i = 0;
         while (1) {
-            OctopusInit_SetFirstAttack(arg0, i, OctopusInit_ReadHalfword(0x18));
-            arg0->attacks.second[i] = OctopusInit_ReadHalfword(0x18);
+            OctopusInit_SetFirstAttack(arg0, i, MonsterInit_ReadHalfword(0x18));
+            arg0->attacks.second[i] = MonsterInit_ReadHalfword(0x18);
             arg0->attacks.flags[i] = SV(0);
-            arg0->attacks.parameter[i] = OctopusInit_ReadHalfword(0);
+            arg0->attacks.parameter[i] = MonsterInit_ReadHalfword(0);
             i++;
             if (i > 3)
                 break;
@@ -818,17 +777,17 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
     OctopusInit_ReadTargeting(&arg0->targeting);
     if (Script_GetKeywordValue(0x62, 0))
         OctopusInit_SetStatusFlags(arg0, 0x200);
-    arg0->field1F0 = OctopusInit_ReadKeywordHalfword(0x46, 0);
-    arg0->field1EC = OctopusInit_ReadKeywordHalfword(0x52, 0);
+    arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
-        OctopusInit_SetInitialHealth(arg0, OctopusInit_ReadHalfword(0));
+        OctopusInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         group->field5B6 = OctopusInit_Half(OctopusInit_GetInitialHealth(arg0));
-        arg0->field9E = OctopusInit_ReadByte(0);
-        arg0->field9F = OctopusInit_ReadByte(0);
-        arg0->fieldA0 = OctopusInit_ReadByte(0);
-        arg0->fieldA2 = OctopusInit_ReadHalfword(0);
-        arg0->fieldA4 = OctopusInit_ReadHalfword(0);
+        arg0->field9E = MonsterInit_ReadByte(0);
+        arg0->field9F = MonsterInit_ReadByte(0);
+        arg0->fieldA0 = MonsterInit_ReadByte(0);
+        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
+        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
     OctopusInit_InitializeHealth(arg0, OctopusInit_GetInitialHealth(arg0),
@@ -836,7 +795,7 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
 
     if (Script_SeekToKeyword(0x58)) {
         arg0->fieldAC = SV(0);
-        arg0->fieldA1 = OctopusInit_ReadByte(0);
+        arg0->fieldA1 = MonsterInit_ReadByte(0);
     }
     arg0->fieldB2 = Script_GetKeywordValue(0x4B, 2);
     r1v = (s16)Script_GetKeywordValue(0x56, -1);
@@ -1014,7 +973,7 @@ static inline void OctopusInit_ClearReceiver(struct OctopusInitActor *actor)
     actor->field304 = 0;
 }
 
-static inline void OctopusInit_InitializeWidget(u8 *drawable, u16 script, u16 resource, struct OctopusInitPosition *position)
+static inline void OctopusInit_InitializeWidget(u8 *drawable, u16 script, u16 resource, struct ContactPosition *position)
 {
     void *source = ScriptProc_Start(script, resource);
     *(struct OctopusInit32Block *)drawable = *(struct OctopusInit32Block *)source;
@@ -1034,7 +993,7 @@ s32 Octopus_Init(void *object)
     struct OctopusInitActor *actor = object;
     struct OctopusInitGroup *group = &arg0->group;
     u32 zero;
-    struct OctopusInitPosition tmp;
+    struct ContactPosition tmp;
     u32 flag;
 
     OctopusInit_ResetCapture(arg0);
@@ -1055,15 +1014,15 @@ s32 Octopus_Init(void *object)
         actor->drawable = Heap_Alloc(0x80);
         Memory_Clear(actor->drawable, 0x80);
         heap = OctopusInit_Drawable(actor);
-        OctopusInit_ClearPosition(&zero, &tmp);
+        MonsterInit_ClearPosition(&zero, &tmp);
         OctopusInit_InitializeWidget(heap, 0xCB05, 0xD291, &tmp);
         actor->field2B7 = 0xFF;
     }
     OctopusInit_InitializeBody(actor, &zero);
     if (Script_SeekToKeyword('P')) {
-        arg0->field636 = OctopusInit_ReadHalfword(0);
-        arg0->field63A = OctopusInit_ReadByte(0);
-        arg0->field639 = OctopusInit_ReadByte(0);
+        arg0->field636 = MonsterInit_ReadHalfword(0);
+        arg0->field63A = MonsterInit_ReadByte(0);
+        arg0->field639 = MonsterInit_ReadByte(0);
     }
     actor->body.position.x += 0x20;
     actor->body.position.z += 0x20;

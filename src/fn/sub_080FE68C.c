@@ -3,6 +3,7 @@
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
 #include "player.h"
+#include "scene_actor_init_primitives.h"
 
 void Axe_InitProfile(void *);
 void Axe_InitAttackCooldowns(void *);
@@ -34,10 +35,6 @@ void Axe_OnRender(void);
 void Axe_ReleaseResources(void);
 
 #define SK_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetKeywordValue(u32, s32);
-s32 Script_GetValue(void);
-u32 Script_GetPc(void);
 void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
@@ -85,24 +82,12 @@ void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 
-s32 Script_GetValue(void);
-u32 Script_GetPc(void);
-static inline s32 AxeInit_Value(s32 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-#define SV(d) AxeInit_Value(d)
+#define SV(d) MonsterInit_ReadWord(d)
 
 struct AxeInit32Block {
     u32 w[8];
 };
 
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetKeywordValue(u32, s32);
-s32 Script_GetValue(void);
-u32 Script_GetPc(void);
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
@@ -133,7 +118,6 @@ void SceneActorScript_OnCommand(void);
 void SceneActorControl_OnIdle(void);
 extern const u8 gUnk_086108B0[];
 extern const u8 gUnk_08606400[];
-void *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
@@ -154,21 +138,6 @@ void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
 
-struct AxeInitPosition {
-    s16 x, y, z, pad;
-};
-struct AxeInitMap {
-    u32 header;
-    u8 *cells;
-    u8 unknown8[0x1C];
-    u16 rows[1];
-};
-static inline void AxeInit_ClearPosition(u32 *fill, void *object)
-{
-    struct AxeInitPosition *position = object;
-    *fill = 0;
-    CpuSet(fill, position, 0x05000002);
-}
 static inline u16 AxeInit_PositionX(const u16 *pos)
 {
     return pos[0];
@@ -183,7 +152,7 @@ static inline s32 AxeInit_Cell(u16 *pos)
     s32 z = (s16)AxeInit_PositionZ(pos) >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct AxeInitMap *)gTerrainMap)->rows[z] + x;
+    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
 }
 static inline u32 AxeInit_TerrainShape(const u8 *cell)
 {
@@ -203,7 +172,7 @@ static inline u32 AxeInit_Height(s32 cell, u16 *pos)
     if (p)
         p += 4;
     else {
-        struct AxeInitMap *map = (void *)gTerrainMap;
+        struct EngineMap *map = (void *)gTerrainMap;
         u32 offset = cell * 4 + 12;
         p = map->cells + offset;
     }
@@ -225,7 +194,7 @@ struct AxeInitBody {
     u8 unknown54[0x5];
     u8 direction;
     u8 unknown5A[0x2];
-    struct AxeInitPosition position;
+    struct ContactPosition position;
     u8 unknown64[0x34];
 };
 struct AxeInitAttacks {
@@ -684,7 +653,7 @@ static inline u32 AxeInit_RoutePointZ(struct AxeInitRoute *route)
     return (u16)route->point->z;
 }
 
-static inline void AxeInit_SnapToRoute(struct AxeInitPosition *position, struct AxeInitRoute *route)
+static inline void AxeInit_SnapToRoute(struct ContactPosition *position, struct AxeInitRoute *route)
 {
     position->x = AxeInit_RoutePointX(route);
     position->z = AxeInit_RoutePointZ(route);
@@ -693,9 +662,9 @@ static inline void AxeInit_SnapToRoute(struct AxeInitPosition *position, struct 
 static inline void AxeInit_DrawablePosition(struct AxeInitActor *actor)
 {
     if (AxeInit_GetDrawableKind(actor) == 0)
-        *(struct AxeInitPosition *)(actor->drawable + 0x1C) = actor->body.position;
+        *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
     else
-        *(struct AxeInitPosition *)(actor->drawable + 0x40) = actor->body.position;
+        *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
 }
 
 static inline u8 AxeInit_RouteId(struct AxeInitRoute *route)
@@ -713,10 +682,6 @@ static inline u8 AxeInit_RoutePointId(struct AxeInitRoute *route)
 static inline u8 AxeInit_RouteActiveBranch(struct AxeInitRoute *route)
 {
     return route->activeBranch;
-}
-static inline u16 AxeInit_ReadKeywordHalfword(u32 keyword, s32 fallback)
-{
-    return Script_GetKeywordValue(keyword, fallback);
 }
 
 static inline s32 AxeInit_ClampHealth(u16 raw)
@@ -763,19 +728,6 @@ static inline void AxeInit_BeginRoute(struct AxeInitBody *body, struct AxeInitRo
                          AxeInit_RoutePointId(route));
 }
 
-static inline u8 AxeInit_ReadByte(u8 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-
-static inline u16 AxeInit_ReadHalfword(u16 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
 static inline void AxeInit_SetFirstAttack(struct AxeInitActor *actor, s32 index, s32 value)
 {
     actor->attacks.first[index] = value;
@@ -784,7 +736,7 @@ static inline void AxeInit_SetFirstAttack(struct AxeInitActor *actor, s32 index,
 static inline u32 AxeInit_ReadRoute(struct AxeInitActor *arg0, struct AxeInitGroup *group,
                                     struct AxeInitRoute *rt)
 {
-    struct AxeInitPosition point;
+    struct ContactPosition point;
     s32 r1v;
     rt->activeBranch = 0;
 
@@ -819,8 +771,8 @@ static inline void AxeInit_InitializeBody(void *object, u32 *fill)
     struct AxeInitActor *arg0 = object;
     struct AxeInitGroup *group = &arg0->group;
     struct AxeInitBody *body = &arg0->body;
-    struct AxeInitPosition origin;
-    struct AxeInitPosition point;
+    struct ContactPosition origin;
+    struct ContactPosition point;
     s32 mode, i, r4v, r6v, r5v, r2v, r1v;
     u16 initialHealth;
     struct AxeInitRoute *rt;
@@ -830,16 +782,16 @@ static inline void AxeInit_InitializeBody(void *object, u32 *fill)
     arg0->field2E8 = 8;
     arg0->field2C0 = Script_GetKeywordValue(0x4D, 0);
     arg0->field2C2 = 0x40;
-    AxeInit_ClearPosition(fill, &origin);
+    MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
     if (Script_SeekToKeyword(0x61)) {
         i = 0;
         while (1) {
-            AxeInit_SetFirstAttack(arg0, i, AxeInit_ReadHalfword(0x18));
-            arg0->attacks.second[i] = AxeInit_ReadHalfword(0x18);
+            AxeInit_SetFirstAttack(arg0, i, MonsterInit_ReadHalfword(0x18));
+            arg0->attacks.second[i] = MonsterInit_ReadHalfword(0x18);
             arg0->attacks.flags[i] = SV(0);
-            arg0->attacks.parameter[i] = AxeInit_ReadHalfword(0);
+            arg0->attacks.parameter[i] = MonsterInit_ReadHalfword(0);
             i++;
             if (i > 3)
                 break;
@@ -860,24 +812,24 @@ static inline void AxeInit_InitializeBody(void *object, u32 *fill)
     AxeInit_ReadTargeting(&arg0->targeting);
     if (Script_GetKeywordValue(0x62, 0))
         AxeInit_SetStatusFlags(arg0, 0x200);
-    arg0->field1F0 = AxeInit_ReadKeywordHalfword(0x46, 0);
-    arg0->field1EC = AxeInit_ReadKeywordHalfword(0x52, 0);
+    arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
-        AxeInit_SetInitialHealth(arg0, AxeInit_ReadHalfword(0));
+        AxeInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         group->field5B6 = AxeInit_Half(AxeInit_GetInitialHealth(arg0));
-        arg0->field9E = AxeInit_ReadByte(0);
-        arg0->field9F = AxeInit_ReadByte(0);
-        arg0->fieldA0 = AxeInit_ReadByte(0);
-        arg0->fieldA2 = AxeInit_ReadHalfword(0);
-        arg0->fieldA4 = AxeInit_ReadHalfword(0);
+        arg0->field9E = MonsterInit_ReadByte(0);
+        arg0->field9F = MonsterInit_ReadByte(0);
+        arg0->fieldA0 = MonsterInit_ReadByte(0);
+        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
+        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
     AxeInit_InitializeHealth(arg0, AxeInit_GetInitialHealth(arg0), r5v, r6v);
 
     if (Script_SeekToKeyword(0x58)) {
         arg0->fieldAC = SV(0);
-        arg0->fieldA1 = AxeInit_ReadByte(0);
+        arg0->fieldA1 = MonsterInit_ReadByte(0);
     }
     arg0->fieldB2 = Script_GetKeywordValue(0x4B, 2);
     r1v = (s16)Script_GetKeywordValue(0x56, -1);
@@ -1049,7 +1001,7 @@ static inline void AxeInit_ClearReceiver(struct AxeInitActor *actor)
 }
 
 static inline void AxeInit_InitializeWidget(u8 *drawable, u16 script, u16 resource,
-                                            struct AxeInitPosition *position)
+                                            struct ContactPosition *position)
 {
     void *source = ScriptProc_Start(script, resource);
     *(struct AxeInit32Block *)drawable = *(struct AxeInit32Block *)source;
@@ -1087,7 +1039,7 @@ s32 Axe_Init(void *object)
     struct AxeInitActor *actor = object;
     struct AxeInitGroup *group = &arg0->group;
     u32 zero;
-    struct AxeInitPosition tmp;
+    struct ContactPosition tmp;
     u32 flag;
     s32 variant;
 
@@ -1115,7 +1067,7 @@ s32 Axe_Init(void *object)
         actor->drawable = Heap_Alloc(0x80);
         Memory_Clear(actor->drawable, 0x80);
         heap = AxeInit_Drawable(actor);
-        AxeInit_ClearPosition(&zero, &tmp);
+        MonsterInit_ClearPosition(&zero, &tmp);
         AxeInit_InitializeWidget(heap, 0xCB05, 0x5291, &tmp);
         actor->field2B7 = 0xFF;
     }
@@ -1124,9 +1076,9 @@ s32 Axe_Init(void *object)
     Axe_InitAttackCooldowns(actor);
     if (Script_SeekToKeyword('p')) {
         u32 height;
-        actor->body.position.x = AxeInit_ReadHalfword(0);
-        actor->body.position.y = AxeInit_ReadHalfword(0);
-        actor->body.position.z = AxeInit_ReadHalfword(0);
+        actor->body.position.x = MonsterInit_ReadHalfword(0);
+        actor->body.position.y = MonsterInit_ReadHalfword(0);
+        actor->body.position.z = MonsterInit_ReadHalfword(0);
         actor->field2F4 = AxeInit_Cell((u16 *)&actor->body.position);
         height = AxeInit_Height(AxeInit_GetTerrainCell(actor), (u16 *)&actor->body.position);
         actor->field2BE = height;

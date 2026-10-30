@@ -2,34 +2,12 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
-
-s32 Script_GetValue(void);
-u32 Script_GetPc(void);
-static inline s32 SkeletonInit_Value(s32 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-static inline u8 SkeletonInit_ReadByte(u8 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-static inline u16 SkeletonInit_ReadHalfword(u16 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
+#include "scene_actor_init_primitives.h"
 
 struct SkeletonResourceBlock {
     u32 w[8];
 };
 
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetKeywordValue(u32, s32);
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
@@ -60,7 +38,6 @@ void SceneActorScript_OnCommand(void);
 void SceneActorControl_OnIdle(void);
 extern const u8 gUnk_086108B0[];
 extern const u8 gUnk_08606400[];
-void *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
@@ -81,36 +58,21 @@ void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
 
-struct SkelPosition {
-    s16 x, y, z, pad;
-};
-struct SkelMap {
-    u32 header;
-    u8 *cells;
-    u8 unknown8[0x1C];
-    u16 rows[1];
-};
-static inline void SkeletonInit_ClearPosition(u32 *fill, void *object)
-{
-    struct SkelPosition *position = object;
-    *fill = 0;
-    CpuSet(fill, position, 0x05000002);
-}
-static inline u16 SkeletonInit_PositionX(const struct SkelPosition *pos)
+static inline u16 SkeletonInit_PositionX(const struct ContactPosition *pos)
 {
     return pos->x;
 }
-static inline u16 SkeletonInit_PositionZ(const struct SkelPosition *pos)
+static inline u16 SkeletonInit_PositionZ(const struct ContactPosition *pos)
 {
     return pos->z;
 }
-static inline u32 SkeletonInit_Cell(struct SkelPosition *pos)
+static inline u32 SkeletonInit_Cell(struct ContactPosition *pos)
 {
     s32 x = (s16)SkeletonInit_PositionX(pos) >> 8;
     s32 z = (s16)SkeletonInit_PositionZ(pos) >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct SkelMap *)gTerrainMap)->rows[z] + x;
+    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
 }
 static inline u8 SkeletonInit_TerrainShape(const u8 *cell)
 {
@@ -128,7 +90,7 @@ static inline u32 SkeletonInit_Height(s32 cell, u16 *pos)
     if (p)
         p += 4;
     else {
-        struct SkelMap *map = (void *)gTerrainMap;
+        struct EngineMap *map = (void *)gTerrainMap;
         u32 offset = cell * 4 + 12;
         p = map->cells + offset;
     }
@@ -150,7 +112,7 @@ struct SkeletonBody {
     u8 unknown54[0x5];
     u8 direction;
     u8 unknown5A[0x2];
-    struct SkelPosition position;
+    struct ContactPosition position;
     u8 unknown64[0x34];
 };
 struct SkeletonAttacks {
@@ -484,10 +446,10 @@ static inline struct SkelSavedControl *SkeletonInit_SavedControlOf(struct Skelet
     struct SkelSavedControl *saved = &actor->saved;
     return saved;
 }
-static inline struct SkelPosition *SkeletonInit_BodyPosition(void *object)
+static inline struct ContactPosition *SkeletonInit_BodyPosition(void *object)
 {
     struct SkeletonBody *body = object;
-    struct SkelPosition *position = &body->position;
+    struct ContactPosition *position = &body->position;
     return position;
 }
 static inline void SkeletonInit_SaveControl(struct SkelSavedControl *saved,
@@ -612,7 +574,7 @@ static inline void SkeletonInit_ReadTargeting(struct SkelTargeting *target)
 {
     s32 nearRadius, flags, farRadius;
     if (Script_SeekToKeyword(0x65)) {
-        nearRadius = SkeletonInit_Value(0x30);
+        nearRadius = MonsterInit_ReadWord(0x30);
         flags = Script_GetPc() ? (u8)Script_GetValue() : 0x40;
         farRadius = nearRadius;
     } else {
@@ -640,8 +602,8 @@ static inline void SkeletonInit_ReadRange(struct SkelRange *range)
 {
     s32 radius;
     if (Script_SeekToKeyword(0x6E)) {
-        radius = SkeletonInit_Value(0);
-        range->field420 = SkeletonInit_Value(0);
+        radius = MonsterInit_ReadWord(0);
+        range->field420 = MonsterInit_ReadWord(0);
     } else {
         radius = 0;
         range->field420 = radius;
@@ -659,7 +621,7 @@ static inline u32 SkeletonInit_RoutePointZ(struct SkelRoute *route)
 {
     return (u16)route->point->z;
 }
-static inline void SkeletonInit_SnapToRoute(struct SkelPosition *position, struct SkelRoute *route)
+static inline void SkeletonInit_SnapToRoute(struct ContactPosition *position, struct SkelRoute *route)
 {
     position->x = SkeletonInit_RoutePointX(route);
     position->z = SkeletonInit_RoutePointZ(route);
@@ -668,18 +630,13 @@ static inline void SkeletonInit_SnapToRoute(struct SkelPosition *position, struc
 static inline void SkeletonInit_DrawablePosition(struct SkeletonActor *actor)
 {
     if (SkeletonInit_GetDrawableKind(actor) == 0)
-        *(struct SkelPosition *)(actor->drawable + 0x1C) = actor->body.position;
+        *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
     else
-        *(struct SkelPosition *)(actor->drawable + 0x40) = actor->body.position;
+        *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
 }
 static inline void SkeletonInit_SetFirstAttack(struct SkeletonActor *actor, s32 index, s32 value)
 {
     actor->attacks.first[index] = value;
-}
-
-static inline u16 SkeletonInit_KeywordHalfword(u32 keyword, s32 fallback)
-{
-    return Script_GetKeywordValue(keyword, fallback);
 }
 
 static inline u8 SkeletonInit_RouteId(struct SkelRoute *route)
@@ -744,14 +701,14 @@ static inline void SkeletonInit_SetInitialHealth(struct SkeletonActor *actor, u1
 static inline u32 SkeletonInit_ReadRoute(struct SkeletonActor *arg0, struct SkeletonGroup *group,
                                          struct SkelRoute *rt)
 {
-    struct SkelPosition point;
+    struct ContactPosition point;
     s32 pointId;
     rt->activeBranch = 0;
 
     if (Script_SeekToKeyword(0x72)) {
-        rt->routeId = SkeletonInit_Value(0);
+        rt->routeId = MonsterInit_ReadWord(0);
         rt->parameterB = 0;
-        pointId = SkeletonInit_Value(0);
+        pointId = MonsterInit_ReadWord(0);
         rt->pointId = pointId;
         rt->currentPoint = pointId;
         rt->branches[SkeletonInit_RouteActiveBranch(rt)] = rt->routeId;
@@ -780,7 +737,7 @@ static inline void SkeletonInit_InitializeBody(void *object, u32 *fill)
     struct SkeletonActor *arg0 = object;
     struct SkeletonGroup *group = &arg0->group;
     struct SkeletonBody *body = &arg0->body;
-    struct SkelPosition origin;
+    struct ContactPosition origin;
     s32 mode, i, secondLimit, firstLimit, gateDuration, identity;
     struct SkelRoute *rt;
     arg0->field2CC = 0;
@@ -789,16 +746,16 @@ static inline void SkeletonInit_InitializeBody(void *object, u32 *fill)
     arg0->field2E8 = 8;
     arg0->field2C0 = Script_GetKeywordValue(0x4D, 0);
     arg0->field2C2 = 0x40;
-    SkeletonInit_ClearPosition(fill, &origin);
+    MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
     if (Script_SeekToKeyword(0x61)) {
         i = 0;
         while (1) {
-            SkeletonInit_SetFirstAttack(arg0, i, SkeletonInit_ReadHalfword(0x18));
-            arg0->attacks.second[i] = SkeletonInit_ReadHalfword(0x18);
-            arg0->attacks.flags[i] = SkeletonInit_Value(0);
-            arg0->attacks.parameter[i] = SkeletonInit_ReadHalfword(0);
+            SkeletonInit_SetFirstAttack(arg0, i, MonsterInit_ReadHalfword(0x18));
+            arg0->attacks.second[i] = MonsterInit_ReadHalfword(0x18);
+            arg0->attacks.flags[i] = MonsterInit_ReadWord(0);
+            arg0->attacks.parameter[i] = MonsterInit_ReadHalfword(0);
             i++;
             if (i > 3)
                 break;
@@ -806,9 +763,9 @@ static inline void SkeletonInit_InitializeBody(void *object, u32 *fill)
     }
 
     if (Script_SeekToKeyword(0x6C)) {
-        firstLimit = SkeletonInit_Value(0x12C);
-        secondLimit = SkeletonInit_Value(0x12C);
-        gateDuration = SkeletonInit_Value(0x12C);
+        firstLimit = MonsterInit_ReadWord(0x12C);
+        secondLimit = MonsterInit_ReadWord(0x12C);
+        gateDuration = MonsterInit_ReadWord(0x12C);
     } else {
         firstLimit = 0;
         secondLimit = 0;
@@ -819,25 +776,25 @@ static inline void SkeletonInit_InitializeBody(void *object, u32 *fill)
     SkeletonInit_ReadTargeting(&arg0->targeting);
     if (Script_GetKeywordValue(0x62, 0))
         SkeletonInit_SetStatusFlags(arg0, 0x200);
-    arg0->field1F0 = SkeletonInit_KeywordHalfword(0x46, 0);
-    arg0->field1EC = SkeletonInit_KeywordHalfword(0x52, 0);
+    arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
-        SkeletonInit_SetInitialHealth(arg0, SkeletonInit_ReadHalfword(0));
+        SkeletonInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         group->field5B6 = SkeletonInit_Half(SkeletonInit_GetInitialHealth(arg0));
-        arg0->field9E = SkeletonInit_ReadByte(0);
-        arg0->field9F = SkeletonInit_ReadByte(0);
-        arg0->fieldA0 = SkeletonInit_ReadByte(0);
-        arg0->fieldA2 = SkeletonInit_ReadHalfword(0);
-        arg0->fieldA4 = SkeletonInit_ReadHalfword(0);
+        arg0->field9E = MonsterInit_ReadByte(0);
+        arg0->field9F = MonsterInit_ReadByte(0);
+        arg0->fieldA0 = MonsterInit_ReadByte(0);
+        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
+        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
     SkeletonInit_InitializeHealth(arg0, SkeletonInit_GetInitialHealth(arg0), firstLimit,
                                   secondLimit);
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->fieldAC = SkeletonInit_Value(0);
-        arg0->fieldA1 = SkeletonInit_ReadByte(0);
+        arg0->fieldAC = MonsterInit_ReadWord(0);
+        arg0->fieldA1 = MonsterInit_ReadByte(0);
     }
     arg0->fieldB2 = Script_GetKeywordValue(0x4B, 2);
     identity = (s16)Script_GetKeywordValue(0x56, -1);
@@ -1041,7 +998,7 @@ static inline void SkeletonInit_InitializeSprite(u8 *drawable, u16 resource, u16
 }
 
 static inline void SkeletonInit_InitializeWidget(u8 *drawable, u16 script, u16 resource,
-                                                 struct SkelPosition *position)
+                                                 struct ContactPosition *position)
 {
     void *source = ScriptProc_Start(script, resource);
     *(struct SkeletonResourceBlock *)drawable = *(struct SkeletonResourceBlock *)source;
@@ -1060,7 +1017,7 @@ s32 Skeleton_Init(void *object)
     struct SkeletonGroup *group = &arg0->group;
     struct SkeletonBody *body = &arg0->body;
     u32 zero;
-    struct SkelPosition tmp;
+    struct ContactPosition tmp;
     u32 flag;
 
     SkeletonInit_ResetFlags(arg0);
@@ -1086,7 +1043,7 @@ s32 Skeleton_Init(void *object)
         actor->drawable = Heap_Alloc(0x80);
         Memory_Clear(actor->drawable, 0x80);
         heap = SkeletonInit_Drawable(actor);
-        SkeletonInit_ClearPosition(&zero, &tmp);
+        MonsterInit_ClearPosition(&zero, &tmp);
         SkeletonInit_InitializeWidget(heap, 0xCB05, 0xAE52, &tmp);
         actor->field2B7 = 0xFF;
     }
@@ -1161,10 +1118,10 @@ s32 Skeleton_Init(void *object)
         SkeletonInit_SetFlags(arg0, 0x10);
         SkeletonInit_SetMotionFlags(actor, 0x1800);
         if (Script_SeekToKeyword(0x70)) {
-            actor->body.position.x = SkeletonInit_ReadHalfword(0);
-            actor->body.position.y = SkeletonInit_ReadHalfword(0);
-            actor->body.position.z = SkeletonInit_ReadHalfword(0);
-            actor->body.direction = SkeletonInit_ReadByte(0);
+            actor->body.position.x = MonsterInit_ReadHalfword(0);
+            actor->body.position.y = MonsterInit_ReadHalfword(0);
+            actor->body.position.z = MonsterInit_ReadHalfword(0);
+            actor->body.direction = MonsterInit_ReadByte(0);
             SkeletonInit_ReadWidgetRelativePalette((void *)(actor->drawable + 0x20));
             actor->field2F4 = SkeletonInit_Cell(SkeletonInit_BodyPosition(&actor->body));
             actor->field2BE = SkeletonInit_Height(SkeletonInit_GetTerrainCell(actor),

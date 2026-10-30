@@ -2,30 +2,12 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
-
-s32 Script_GetValue(void);
-u32 Script_GetPc(void);
-static inline s32 MonsterInit_Value(s32 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-static inline u16 MonsterInit_ReadAttackHalfword(u16 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
+#include "scene_actor_init_primitives.h"
 
 struct MonsterInit32Block {
     u32 w[8];
 };
 
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetKeywordValue(u32, s32);
-s32 Script_GetValue(void);
-u32 Script_GetPc(void);
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
@@ -55,7 +37,6 @@ void sub_081363F4(void);
 void SceneActorScript_OnCommand(void);
 void SceneActorControl_OnIdle(void);
 extern const u8 gUnk_086108B0[];
-void *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
@@ -76,36 +57,21 @@ void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
 
-struct MonsterInitPosition {
-    s16 x, y, z, pad;
-};
-struct MonsterInitMap {
-    u32 header;
-    u8 *cells;
-    u8 unknown8[0x1C];
-    u16 rows[1];
-};
-static inline void MonsterInit_ClearPosition(u32 *fill, void *object)
-{
-    struct MonsterInitPosition *position = object;
-    *fill = 0;
-    CpuSet(fill, position, 0x05000002);
-}
-static inline u16 MonsterInit_PositionX(const struct MonsterInitPosition *pos)
+static inline u16 MonsterInit_PositionX(const struct ContactPosition *pos)
 {
     return pos->x;
 }
-static inline u16 MonsterInit_PositionZ(const struct MonsterInitPosition *pos)
+static inline u16 MonsterInit_PositionZ(const struct ContactPosition *pos)
 {
     return pos->z;
 }
-static inline u32 MonsterInit_Cell(struct MonsterInitPosition *pos)
+static inline u32 MonsterInit_Cell(struct ContactPosition *pos)
 {
     s32 x = (s16)MonsterInit_PositionX(pos) >> 8;
     s32 z = (s16)MonsterInit_PositionZ(pos) >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct MonsterInitMap *)gTerrainMap)->rows[z] + x;
+    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
 }
 static inline u32 MonsterInit_TerrainShape(const u8 *cell)
 {
@@ -123,7 +89,7 @@ static inline u32 MonsterInit_Height(s32 cell, u16 *pos)
     if (p)
         p += 4;
     else {
-        struct MonsterInitMap *map = (void *)gTerrainMap;
+        struct EngineMap *map = (void *)gTerrainMap;
         u32 offset = cell * 4 + 12;
         p = map->cells + offset;
     }
@@ -145,7 +111,7 @@ struct SpiderBody {
     u8 unknown54[0x5];
     u8 direction;
     u8 unknown5A[0x2];
-    struct MonsterInitPosition position;
+    struct ContactPosition position;
     u8 unknown64[0x34];
 };
 struct SpiderAttacks {
@@ -583,7 +549,7 @@ static inline void MonsterInit_ReadTargeting(struct MonsterInitTargeting *target
 {
     s32 r4v, r2v, r1v;
     if (Script_SeekToKeyword(0x65)) {
-        r4v = MonsterInit_Value(0x30);
+        r4v = MonsterInit_ReadWord(0x30);
         r2v = Script_GetPc() ? (u8)Script_GetValue() : 0x40;
         r1v = r4v;
     } else {
@@ -611,8 +577,8 @@ static inline void MonsterInit_ReadRange(struct MonsterInitRange *range)
 {
     s32 r4v;
     if (Script_SeekToKeyword(0x6E)) {
-        r4v = MonsterInit_Value(0);
-        range->field420 = MonsterInit_Value(0);
+        r4v = MonsterInit_ReadWord(0);
+        range->field420 = MonsterInit_ReadWord(0);
     } else {
         r4v = 0;
         range->field420 = r4v;
@@ -630,7 +596,7 @@ static inline u32 MonsterInit_RoutePointZ(struct MonsterInitRoute *route)
 {
     return (u16)route->point->z;
 }
-static inline void MonsterInit_SnapToRoute(struct MonsterInitPosition *position,
+static inline void MonsterInit_SnapToRoute(struct ContactPosition *position,
                                            struct MonsterInitRoute *route)
 {
     position->x = MonsterInit_RoutePointX(route);
@@ -640,18 +606,13 @@ static inline void MonsterInit_SnapToRoute(struct MonsterInitPosition *position,
 static inline void MonsterInit_DrawablePosition(struct SpiderActor *actor)
 {
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        *(struct MonsterInitPosition *)(actor->drawable + 0x1C) = actor->body.position;
+        *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
     else
-        *(struct MonsterInitPosition *)(actor->drawable + 0x40) = actor->body.position;
+        *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
 }
 static inline void MonsterInit_SetFirstAttack(struct SpiderActor *actor, s32 index, s32 value)
 {
     actor->attacks.first[index] = value;
-}
-
-static inline u16 MonsterInit_KeywordHalfword(u32 keyword, s32 fallback)
-{
-    return Script_GetKeywordValue(keyword, fallback);
 }
 
 static inline u8 MonsterInit_RouteId(struct MonsterInitRoute *route)
@@ -716,14 +677,14 @@ static inline void MonsterInit_SetInitialHealth(struct SpiderActor *actor, u16 h
 static inline u32 MonsterInit_ReadRoute(struct SpiderActor *arg0, struct SpiderGroup *group,
                                         struct MonsterInitRoute *rt)
 {
-    struct MonsterInitPosition point;
+    struct ContactPosition point;
     s32 r1v;
     rt->activeBranch = 0;
 
     if (Script_SeekToKeyword(0x72)) {
-        rt->routeId = MonsterInit_Value(0);
+        rt->routeId = MonsterInit_ReadWord(0);
         rt->parameterB = 0;
-        r1v = MonsterInit_Value(0);
+        r1v = MonsterInit_ReadWord(0);
         rt->pointId = r1v;
         rt->currentPoint = r1v;
         rt->branches[MonsterInit_RouteActiveBranch(rt)] = rt->routeId;
@@ -752,7 +713,7 @@ static inline void MonsterInit_InitializeBody(void *object, u32 *fill)
     struct SpiderActor *arg0 = object;
     struct SpiderGroup *group = &arg0->group;
     struct SpiderBody *body = &arg0->body;
-    struct MonsterInitPosition origin;
+    struct ContactPosition origin;
     s32 mode, i, r4v, r6v, r5v, r2v, r1v;
     struct MonsterInitRoute *rt;
     arg0->field2CC = 0;
@@ -767,10 +728,10 @@ static inline void MonsterInit_InitializeBody(void *object, u32 *fill)
     if (Script_SeekToKeyword(0x61)) {
         i = 0;
         while (1) {
-            MonsterInit_SetFirstAttack(arg0, i, MonsterInit_ReadAttackHalfword(0x18));
-            arg0->attacks.second[i] = MonsterInit_ReadAttackHalfword(0x18);
-            arg0->attacks.flags[i] = MonsterInit_Value(0);
-            arg0->attacks.parameter[i] = MonsterInit_ReadAttackHalfword(0);
+            MonsterInit_SetFirstAttack(arg0, i, MonsterInit_ReadHalfword(0x18));
+            arg0->attacks.second[i] = MonsterInit_ReadHalfword(0x18);
+            arg0->attacks.flags[i] = MonsterInit_ReadWord(0);
+            arg0->attacks.parameter[i] = MonsterInit_ReadHalfword(0);
             i++;
             if (i > 3)
                 break;
@@ -778,9 +739,9 @@ static inline void MonsterInit_InitializeBody(void *object, u32 *fill)
     }
 
     if (Script_SeekToKeyword(0x6C)) {
-        r5v = MonsterInit_Value(0x12C);
-        r6v = MonsterInit_Value(0x12C);
-        r2v = MonsterInit_Value(0x12C);
+        r5v = MonsterInit_ReadWord(0x12C);
+        r6v = MonsterInit_ReadWord(0x12C);
+        r2v = MonsterInit_ReadWord(0x12C);
     } else {
         r5v = 0;
         r6v = 0;
@@ -791,24 +752,24 @@ static inline void MonsterInit_InitializeBody(void *object, u32 *fill)
     MonsterInit_ReadTargeting(&arg0->targeting);
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->field1F0 = MonsterInit_KeywordHalfword(0x46, 0);
-    arg0->field1EC = MonsterInit_KeywordHalfword(0x52, 0);
+    arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
-        MonsterInit_SetInitialHealth(arg0, MonsterInit_Value(0));
+        MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadWord(0));
         group->field5B6 = MonsterInit_Half(MonsterInit_GetInitialHealth(arg0));
-        arg0->field9E = MonsterInit_Value(0);
-        arg0->field9F = MonsterInit_Value(0);
-        arg0->fieldA0 = MonsterInit_Value(0);
-        arg0->fieldA2 = MonsterInit_Value(0);
-        arg0->fieldA4 = MonsterInit_Value(0);
+        arg0->field9E = MonsterInit_ReadWord(0);
+        arg0->field9F = MonsterInit_ReadWord(0);
+        arg0->fieldA0 = MonsterInit_ReadWord(0);
+        arg0->fieldA2 = MonsterInit_ReadWord(0);
+        arg0->fieldA4 = MonsterInit_ReadWord(0);
     }
 
     MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), r5v, r6v);
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->fieldAC = MonsterInit_Value(0);
-        arg0->fieldA1 = MonsterInit_Value(0);
+        arg0->fieldAC = MonsterInit_ReadWord(0);
+        arg0->fieldA1 = MonsterInit_ReadWord(0);
     }
     arg0->fieldB2 = Script_GetKeywordValue(0x4B, 2);
     r1v = (s16)Script_GetKeywordValue(0x56, -1);
@@ -1010,7 +971,7 @@ static inline void Spider_InitializeDeferred(struct SpiderDeferredControl *contr
 }
 
 static inline void MonsterInit_InitializeWidget(u8 *drawable, u16 script, u16 resource,
-                                                struct MonsterInitPosition *position)
+                                                struct ContactPosition *position)
 {
     void *source = ScriptProc_Start(script, resource);
     *(struct MonsterInit32Block *)drawable = *(struct MonsterInit32Block *)source;
@@ -1032,7 +993,7 @@ s32 Spider_Init(void *object)
     struct SpiderActor *actor = object;
     struct SpiderGroup *group = &arg0->group;
     u32 zero;
-    struct MonsterInitPosition tmp;
+    struct ContactPosition tmp;
     u32 flag;
     s32 extra;
 

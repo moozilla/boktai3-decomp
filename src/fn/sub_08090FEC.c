@@ -2,11 +2,8 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
+#include "scene_actor_init_primitives.h"
 typedef void (*MonsterInitCommandHandler)(void *actor, const u16 *command);
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetKeywordValue(u32, s32);
-s32 Script_GetValue(void);
-u8 *Script_GetPc(void);
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
@@ -35,7 +32,6 @@ void SceneActorControl_TryActivateProximityResponse(void);
 void SceneActorScript_OnCommand(void);
 void SceneActorControl_BindPrimaryPlayer(void);
 void Bat_Destroy(void);
-void *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 void SceneBody_SetSprite(void *, void *);
@@ -82,21 +78,12 @@ extern u8 *gGameState;
 struct MonsterInit32Block {
     u32 w[8];
 };
-struct MonsterInitPosition {
-    s16 x, y, z, pad;
-};
-struct MonsterInitMap {
-    u32 header;
-    u8 *cells;
-    u8 unknown8[0x1C];
-    u16 rows[1];
-};
 struct MonsterBody {
     u32 id;
     u8 unknown54[0x5];
     u8 direction;
     u8 unknown5A[0x2];
-    struct MonsterInitPosition position;
+    struct ContactPosition position;
     u8 unknown64[0x34];
 };
 struct MonsterAttackParameters {
@@ -246,23 +233,11 @@ struct SlimeActor {
     u8 unknown3DC[0x2E];
     u16 flags40A;
 };
-static inline s32 MonsterInit_Value(s32 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
 static inline u8 MonsterInit_Test(u32 value, u32 mask)
 {
     if (value & mask)
         return 1;
     return 0;
-}
-static inline void MonsterInit_ClearPosition(u32 *fill, void *object)
-{
-    struct MonsterInitPosition *position = object;
-    *fill = 0;
-    CpuSet(fill, position, 0x05000002);
 }
 static inline u16 MonsterInit_PositionX(const u16 *pos)
 {
@@ -278,7 +253,7 @@ static inline u16 MonsterInit_Cell(u16 *pos)
     s32 z = (s16)MonsterInit_PositionZ(pos) >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct MonsterInitMap *)gTerrainMap)->rows[z] + x;
+    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
 }
 static inline u32 MonsterInit_MaskValue(u32 value, u32 mask)
 {
@@ -293,7 +268,7 @@ static inline s32 MonsterInit_Height(s32 cell, u16 *pos)
     if (p)
         p += 4;
     else {
-        struct MonsterInitMap *map = (void *)gTerrainMap;
+        struct EngineMap *map = (void *)gTerrainMap;
         u32 offset = cell * 4 + 12;
         p = map->cells + offset;
     }
@@ -346,7 +321,7 @@ static inline u16 MonsterInit_GetPaletteOffset(struct MonsterInitActor *actor)
 {
     return actor->field1E6;
 }
-#define SV(d) MonsterInit_Value(d)
+#define SV(d) MonsterInit_ReadWord(d)
 static inline u16 MonsterInit_GetMotionFlags(struct MonsterInitActor *actor)
 {
     return actor->field2C0;
@@ -401,10 +376,10 @@ MonsterInit_SavedControlOf(struct MonsterInitActor *actor)
     struct MonsterInitSavedControl *saved = &actor->saved;
     return saved;
 }
-static inline struct MonsterInitPosition *MonsterInit_BodyPosition(void *object)
+static inline struct ContactPosition *MonsterInit_BodyPosition(void *object)
 {
     struct MonsterBody *body = object;
-    struct MonsterInitPosition *position = &body->position;
+    struct ContactPosition *position = &body->position;
     return position;
 }
 static inline void MonsterInit_SaveControl(struct MonsterInitSavedControl *saved,
@@ -520,18 +495,6 @@ static inline void MonsterInit_SetWidgetPalette(struct MonsterInitWidget *widget
 {
     widget->paletteBank = palette;
 }
-static inline u8 MonsterInit_ReadByte(u8 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-static inline u16 MonsterInit_ReadHalfword(u16 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
 static inline void MonsterInit_SetFirstAttack(struct MonsterInitActor *actor, s32 index, s32 value)
 {
     actor->attacks.first[index] = value;
@@ -544,7 +507,7 @@ static inline struct MonsterInitActor *MonsterInit_ReadAttacks(struct MonsterIni
         while (1) {
             MonsterInit_SetFirstAttack(actor, i, MonsterInit_ReadHalfword(24));
             actor->attacks.second[i] = MonsterInit_ReadHalfword(24);
-            actor->attacks.flags[i] = MonsterInit_Value(0);
+            actor->attacks.flags[i] = MonsterInit_ReadWord(0);
             actor->attacks.parameter[i] = MonsterInit_ReadHalfword(0);
             i++;
             if (i > 3)
@@ -565,7 +528,7 @@ static inline s32 MonsterInit_ClampHealth(u16 initialHealth)
 static inline void MonsterInit_InitializeBody(struct MonsterInitActor *arg0, u32 *fill)
 {
     struct MonsterBody *body = &arg0->body;
-    struct MonsterInitPosition origin;
+    struct ContactPosition origin;
     s32 mode, r4v, r6v, r3v;
     s32 initialHealth, scriptVariant;
     arg0->field2CC = 0;
@@ -579,8 +542,8 @@ static inline void MonsterInit_InitializeBody(struct MonsterInitActor *arg0, u32
     MonsterInit_ReadTargeting(&MonsterInit_ReadAttacks(arg0)->targeting);
 
     if (Script_SeekToKeyword(0x6C)) {
-        r6v = MonsterInit_Value(0x12C);
-        r4v = MonsterInit_Value(0x12C);
+        r6v = MonsterInit_ReadWord(0x12C);
+        r4v = MonsterInit_ReadWord(0x12C);
     } else {
         r6v = 0;
         r4v = 0;
@@ -615,7 +578,7 @@ static inline void MonsterInit_InitializeBody(struct MonsterInitActor *arg0, u32
     arg0->field2FA = 0;
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->fieldAC = MonsterInit_Value(0);
+        arg0->fieldAC = MonsterInit_ReadWord(0);
         arg0->fieldA1 = MonsterInit_ReadByte(0);
     }
     arg0->fieldB2 = Script_GetKeywordValue(0x4B, 2);
@@ -755,7 +718,7 @@ s32 Slime_Init(void *object)
     struct SlimeActor *slime = object;
     struct MonsterInitActor *actor = object;
     u32 zero;
-    struct MonsterInitPosition tmp;
+    struct ContactPosition tmp;
     u32 flag;
     s32 j;
     slime->flags40A = 0;
@@ -795,9 +758,9 @@ s32 Slime_Init(void *object)
         actor->field2BE = ground;
         slime->ground3D8 = ground;
         if (MonsterInit_GetDrawableKind(actor) == 0)
-            *(struct MonsterInitPosition *)(actor->drawable + 0x1C) = actor->body.position;
+            *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
         else
-            *(struct MonsterInitPosition *)(actor->drawable + 0x40) = actor->body.position;
+            *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
     }
     j = Script_SeekToKeyword('j');
     if (j) {

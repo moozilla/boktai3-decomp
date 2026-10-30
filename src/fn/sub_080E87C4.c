@@ -2,6 +2,7 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
+#include "scene_actor_init_primitives.h"
 
 void Mimic_InitProfile(void *);
 void SceneActor_InitializeReactionColliders(void *);
@@ -22,10 +23,6 @@ void Mimic_OnUpdate(void);
 void Mimic_ReleaseResources(void);
 
 #define SK_AT(T, off) (*(T *)((u8 *)arg0 + (off)))
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetKeywordValue(u32, s32);
-s32 Script_GetValue(void);
-u32 Script_GetPc(void);
 void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
@@ -73,24 +70,12 @@ void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 
-s32 Script_GetValue(void);
-u32 Script_GetPc(void);
-static inline s32 MimicInit_Value(s32 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-#define SV(d) MimicInit_Value(d)
+#define SV(d) MonsterInit_ReadWord(d)
 
 struct MimicInit32Block {
     u32 w[8];
 };
 
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetKeywordValue(u32, s32);
-s32 Script_GetValue(void);
-u32 Script_GetPc(void);
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
@@ -121,7 +106,6 @@ void SceneActorScript_OnCommand(void);
 void SceneActorControl_OnIdle(void);
 extern const u8 gUnk_086108B0[];
 extern const u8 gUnk_08606400[];
-void *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
@@ -142,14 +126,6 @@ void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
 
-struct MimicInitPosition { s16 x, y, z, pad; };
-struct MimicInitMap { u32 header; u8 *cells; u8 unknown8[0x1C]; u16 rows[1]; };
-static inline void MimicInit_ClearPosition(u32 *fill, void *object)
-{
-    struct MimicInitPosition *position = object;
-    *fill = 0;
-    CpuSet(fill, position, 0x05000002);
-}
 static inline u16 MimicInit_PositionX(const u16 *pos)
 {
     return pos[0];
@@ -164,7 +140,7 @@ static inline s32 MimicInit_Cell(u16 *pos)
     s32 z = (s16)MimicInit_PositionZ(pos) >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct MimicInitMap *)gTerrainMap)->rows[z] + x;
+    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
 }
 static inline u32 MimicInit_TerrainShape(const u8 *cell)
 {
@@ -184,7 +160,7 @@ static inline u32 MimicInit_Height(s32 cell, u16 *pos)
     if (p)
         p += 4;
     else {
-        struct MimicInitMap *map = (void *)gTerrainMap;
+        struct EngineMap *map = (void *)gTerrainMap;
         u32 offset = cell * 4 + 12;
         p = map->cells + offset;
     }
@@ -202,7 +178,7 @@ struct MimicInitBody {
     u8 unknown54[0x5];
     u8 direction;
     u8 unknown5A[0x2];
-    struct MimicInitPosition position;
+    struct ContactPosition position;
     u8 unknown64[0x34];
 };
 struct MimicInitAttacks {
@@ -401,7 +377,7 @@ struct MimicInitActor {
     u8 unknown308[0xCC];
     struct MimicInitGroup group;
     u8 unknown624[0x2C];
-    struct MimicInitPosition origin650;
+    struct ContactPosition origin650;
     u16 originCell658;
     u8 unknown65A[4];
     u8 parameter65E;
@@ -501,10 +477,10 @@ static inline struct MimicInitSavedControl *MimicInit_SavedControlOf(struct Mimi
     struct MimicInitSavedControl *saved = &actor->saved;
     return saved;
 }
-static inline struct MimicInitPosition *MimicInit_BodyPosition(void *object)
+static inline struct ContactPosition *MimicInit_BodyPosition(void *object)
 {
     struct MimicInitBody *body = object;
-    struct MimicInitPosition *position = &body->position;
+    struct ContactPosition *position = &body->position;
     return position;
 }
 static inline void MimicInit_SaveControl(struct MimicInitSavedControl *saved, struct MimicInitActor *actor)
@@ -658,7 +634,7 @@ static inline u32 MimicInit_RoutePointZ(struct MimicInitRoute *route)
     return (u16)route->point->z;
 }
 
-static inline void MimicInit_SnapToRoute(struct MimicInitPosition *position, struct MimicInitRoute *route)
+static inline void MimicInit_SnapToRoute(struct ContactPosition *position, struct MimicInitRoute *route)
 {
     position->x = MimicInit_RoutePointX(route);
     position->z = MimicInit_RoutePointZ(route);
@@ -667,9 +643,9 @@ static inline void MimicInit_SnapToRoute(struct MimicInitPosition *position, str
 static inline void MimicInit_DrawablePosition(struct MimicInitActor *actor)
 {
     if (MimicInit_GetDrawableKind(actor) == 0)
-        *(struct MimicInitPosition *)(actor->drawable + 0x1C) = actor->body.position;
+        *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
     else
-        *(struct MimicInitPosition *)(actor->drawable + 0x40) = actor->body.position;
+        *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
 }
 
 static inline u8 MimicInit_RouteId(struct MimicInitRoute *route)
@@ -687,10 +663,6 @@ static inline u8 MimicInit_RoutePointId(struct MimicInitRoute *route)
 static inline u8 MimicInit_RouteActiveBranch(struct MimicInitRoute *route)
 {
     return route->activeBranch;
-}
-static inline u16 MimicInit_ReadKeywordHalfword(u32 keyword, s32 fallback)
-{
-    return Script_GetKeywordValue(keyword, fallback);
 }
 
 static inline s32 MimicInit_ClampHealth(u16 raw)
@@ -737,19 +709,6 @@ static inline void MimicInit_BeginRoute(struct MimicInitBody *body, struct Mimic
     SceneBody_StartRoute(body, route, MimicInit_RouteId(route), MimicInit_RouteParameter(route), MimicInit_RoutePointId(route));
 }
 
-static inline u8 MimicInit_ReadByte(u8 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-
-static inline u16 MimicInit_ReadHalfword(u16 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
 static inline void MimicInit_SetFirstAttack(struct MimicInitActor *actor, s32 index, s32 value)
 {
     actor->attacks.first[index] = value;
@@ -757,7 +716,7 @@ static inline void MimicInit_SetFirstAttack(struct MimicInitActor *actor, s32 in
 
 static inline u32 MimicInit_ReadRoute(struct MimicInitActor *arg0, struct MimicInitGroup *group, struct MimicInitRoute *rt)
 {
-    struct MimicInitPosition point;
+    struct ContactPosition point;
     s32 r1v;
     rt->activeBranch = 0;
 
@@ -791,8 +750,8 @@ static inline void MimicInit_InitializeBody(void *object, u32 *fill)
     struct MimicInitActor *arg0 = object;
     struct MimicInitGroup *group = &arg0->group;
     struct MimicInitBody *body = &arg0->body;
-    struct MimicInitPosition origin;
-    struct MimicInitPosition point;
+    struct ContactPosition origin;
+    struct ContactPosition point;
     s32 mode, i, r4v, r6v, r5v, r2v, r1v;
     u16 initialHealth;
     struct MimicInitRoute *rt;
@@ -802,16 +761,16 @@ static inline void MimicInit_InitializeBody(void *object, u32 *fill)
     arg0->field2E8 = 8;
     arg0->field2C0 = Script_GetKeywordValue(0x4D, 0);
     arg0->field2C2 = 0x40;
-    MimicInit_ClearPosition(fill, &origin);
+    MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
     if (Script_SeekToKeyword(0x61)) {
         i = 0;
         while (1) {
-            MimicInit_SetFirstAttack(arg0, i, MimicInit_ReadHalfword(0x18));
-            arg0->attacks.second[i] = MimicInit_ReadHalfword(0x18);
+            MimicInit_SetFirstAttack(arg0, i, MonsterInit_ReadHalfword(0x18));
+            arg0->attacks.second[i] = MonsterInit_ReadHalfword(0x18);
             arg0->attacks.flags[i] = SV(0);
-            arg0->attacks.parameter[i] = MimicInit_ReadHalfword(0);
+            arg0->attacks.parameter[i] = MonsterInit_ReadHalfword(0);
             i++;
             if (i > 3)
                 break;
@@ -832,17 +791,17 @@ static inline void MimicInit_InitializeBody(void *object, u32 *fill)
     MimicInit_ReadTargeting(&arg0->targeting);
     if (Script_GetKeywordValue(0x62, 0))
         MimicInit_SetStatusFlags(arg0, 0x200);
-    arg0->field1F0 = MimicInit_ReadKeywordHalfword(0x46, 0);
-    arg0->field1EC = MimicInit_ReadKeywordHalfword(0x52, 0);
+    arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
-        MimicInit_SetInitialHealth(arg0, MimicInit_ReadHalfword(0));
+        MimicInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         group->field5B6 = MimicInit_Half(MimicInit_GetInitialHealth(arg0));
-        arg0->field9E = MimicInit_ReadByte(0);
-        arg0->field9F = MimicInit_ReadByte(0);
-        arg0->fieldA0 = MimicInit_ReadByte(0);
-        arg0->fieldA2 = MimicInit_ReadHalfword(0);
-        arg0->fieldA4 = MimicInit_ReadHalfword(0);
+        arg0->field9E = MonsterInit_ReadByte(0);
+        arg0->field9F = MonsterInit_ReadByte(0);
+        arg0->fieldA0 = MonsterInit_ReadByte(0);
+        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
+        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
     MimicInit_InitializeHealth(arg0, MimicInit_GetInitialHealth(arg0),
@@ -850,7 +809,7 @@ static inline void MimicInit_InitializeBody(void *object, u32 *fill)
 
     if (Script_SeekToKeyword(0x58)) {
         arg0->fieldAC = SV(0);
-        arg0->fieldA1 = MimicInit_ReadByte(0);
+        arg0->fieldA1 = MonsterInit_ReadByte(0);
     }
     arg0->fieldB2 = Script_GetKeywordValue(0x4B, 2);
     r1v = (s16)Script_GetKeywordValue(0x56, -1);
@@ -1037,7 +996,7 @@ static inline void MimicInit_InitializeTerrainCell(struct MimicInitActor *actor,
     actor->field2F6 = cell;
 }
 
-static inline void MimicInit_InitializeWidget(u8 *drawable, u16 script, u16 resource, struct MimicInitPosition *position)
+static inline void MimicInit_InitializeWidget(u8 *drawable, u16 script, u16 resource, struct ContactPosition *position)
 {
     void *source = ScriptProc_Start(script, resource);
     *(struct MimicInit32Block *)drawable = *(struct MimicInit32Block *)source;
@@ -1052,7 +1011,7 @@ s32 Mimic_Init(void *object)
     struct MimicInitGroup *group = &arg0->group;
     struct MimicInitBody *body = &arg0->body;
     u32 zero;
-    struct MimicInitPosition tmp;
+    struct ContactPosition tmp;
     u32 flag;
     s32 lift;
 
@@ -1073,7 +1032,7 @@ s32 Mimic_Init(void *object)
         actor->drawable = Heap_Alloc(0x80);
         Memory_Clear(actor->drawable, 0x80);
         heap = MimicInit_Drawable(actor);
-        MimicInit_ClearPosition(&zero, &tmp);
+        MonsterInit_ClearPosition(&zero, &tmp);
         MimicInit_InitializeWidget(heap, 0xCB05, 0x3876, &tmp);
         actor->field2B7 = 0xFF;
     }
@@ -1083,9 +1042,9 @@ s32 Mimic_Init(void *object)
     arg0->parameter65E = Script_GetKeywordValue('s', 10);
     if (Script_SeekToKeyword('p')) {
         s32 cell;
-        actor->body.position.x = MimicInit_ReadHalfword(0);
-        actor->body.position.y = MimicInit_ReadHalfword(0);
-        actor->body.position.z = MimicInit_ReadHalfword(0);
+        actor->body.position.x = MonsterInit_ReadHalfword(0);
+        actor->body.position.y = MonsterInit_ReadHalfword(0);
+        actor->body.position.z = MonsterInit_ReadHalfword(0);
         MimicInit_InitializeTerrainCell(actor, MimicInit_Cell((u16 *)&actor->body.position));
         actor->field2BE = MimicInit_Height(MimicInit_GetTerrainCell(actor), (u16 *)&actor->body.position);
         actor->field2EA = 0;

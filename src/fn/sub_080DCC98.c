@@ -2,34 +2,12 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
-
-s32 Script_GetValue(void);
-u32 Script_GetPc(void);
-static inline s32 MummyInit_Value(s32 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-static inline u8 MummyInit_ReadByte(u8 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-static inline u16 MummyInit_ReadHalfword(u16 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
+#include "scene_actor_init_primitives.h"
 
 struct MummyResourceBlock {
     u32 w[8];
 };
 
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetKeywordValue(u32, s32);
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
@@ -60,7 +38,6 @@ void SceneActorScript_OnCommand(void);
 void SceneActorControl_OnIdle(void);
 extern const u8 gUnk_086108B0[];
 extern const u8 gUnk_08606400[];
-void *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
@@ -81,36 +58,21 @@ void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
 
-struct MummyInitPosition {
-    s16 x, y, z, pad;
-};
-struct MummyInitMap {
-    u32 header;
-    u8 *cells;
-    u8 unknown8[0x1C];
-    u16 rows[1];
-};
-static inline void MummyInit_ClearPosition(u32 *fill, void *object)
-{
-    struct MummyInitPosition *position = object;
-    *fill = 0;
-    CpuSet(fill, position, 0x05000002);
-}
-static inline u16 MummyInit_PositionX(const struct MummyInitPosition *pos)
+static inline u16 MummyInit_PositionX(const struct ContactPosition *pos)
 {
     return pos->x;
 }
-static inline u16 MummyInit_PositionZ(const struct MummyInitPosition *pos)
+static inline u16 MummyInit_PositionZ(const struct ContactPosition *pos)
 {
     return pos->z;
 }
-static inline u32 MummyInit_Cell(struct MummyInitPosition *pos)
+static inline u32 MummyInit_Cell(struct ContactPosition *pos)
 {
     s32 x = (s16)MummyInit_PositionX(pos) >> 8;
     s32 z = (s16)MummyInit_PositionZ(pos) >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct MummyInitMap *)gTerrainMap)->rows[z] + x;
+    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
 }
 static inline u8 MummyInit_TerrainShape(const u8 *cell)
 {
@@ -128,7 +90,7 @@ static inline u32 MummyInit_Height(s32 cell, u16 *pos)
     if (p)
         p += 4;
     else {
-        struct MummyInitMap *map = (void *)gTerrainMap;
+        struct EngineMap *map = (void *)gTerrainMap;
         u32 offset = cell * 4 + 12;
         p = map->cells + offset;
     }
@@ -150,7 +112,7 @@ struct MummyInitBody {
     u8 unknown54[0x5];
     u8 direction;
     u8 unknown5A[0x2];
-    struct MummyInitPosition position;
+    struct ContactPosition position;
     u8 unknown64[0x34];
 };
 struct MummyInitAttacks {
@@ -460,10 +422,10 @@ static inline struct MummyInitSavedControl *MummyInit_SavedControlOf(struct Mumm
     struct MummyInitSavedControl *saved = &actor->saved;
     return saved;
 }
-static inline struct MummyInitPosition *MummyInit_BodyPosition(void *object)
+static inline struct ContactPosition *MummyInit_BodyPosition(void *object)
 {
     struct MummyInitBody *body = object;
-    struct MummyInitPosition *position = &body->position;
+    struct ContactPosition *position = &body->position;
     return position;
 }
 static inline void MummyInit_SaveControl(struct MummyInitSavedControl *saved,
@@ -574,7 +536,7 @@ static inline void MummyInit_ReadTargeting(struct MummyInitTargeting *target)
 {
     s32 nearRadius, flags, farRadius;
     if (Script_SeekToKeyword(0x65)) {
-        nearRadius = MummyInit_Value(0x30);
+        nearRadius = MonsterInit_ReadWord(0x30);
         flags = Script_GetPc() ? (u8)Script_GetValue() : 0x40;
         farRadius = nearRadius;
     } else {
@@ -602,8 +564,8 @@ static inline void MummyInit_ReadRange(struct MummyInitRange *range)
 {
     s32 radius;
     if (Script_SeekToKeyword(0x6E)) {
-        radius = MummyInit_Value(0);
-        range->field420 = MummyInit_ReadHalfword(0);
+        radius = MonsterInit_ReadWord(0);
+        range->field420 = MonsterInit_ReadHalfword(0);
     } else {
         radius = 0;
         range->field420 = radius;
@@ -621,7 +583,7 @@ static inline u32 MummyInit_RoutePointZ(struct MummyInitRoute *route)
 {
     return (u16)route->point->z;
 }
-static inline void MummyInit_SnapToRoute(struct MummyInitPosition *position,
+static inline void MummyInit_SnapToRoute(struct ContactPosition *position,
                                          struct MummyInitRoute *route)
 {
     position->x = MummyInit_RoutePointX(route);
@@ -631,18 +593,13 @@ static inline void MummyInit_SnapToRoute(struct MummyInitPosition *position,
 static inline void MummyInit_DrawablePosition(struct MummyInitActor *actor)
 {
     if (MummyInit_GetDrawableKind(actor) == 0)
-        *(struct MummyInitPosition *)(actor->drawable + 0x1C) = actor->body.position;
+        *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
     else
-        *(struct MummyInitPosition *)(actor->drawable + 0x40) = actor->body.position;
+        *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
 }
 static inline void MummyInit_SetFirstAttack(struct MummyInitActor *actor, s32 index, s32 value)
 {
     actor->attacks.first[index] = value;
-}
-
-static inline u16 MummyInit_KeywordHalfword(u32 keyword, s32 fallback)
-{
-    return Script_GetKeywordValue(keyword, fallback);
 }
 
 static inline u8 MummyInit_RouteId(struct MummyInitRoute *route)
@@ -707,14 +664,14 @@ static inline void MummyInit_SetInitialHealth(struct MummyInitActor *actor, u16 
 static inline u32 MummyInit_ReadRoute(struct MummyInitActor *arg0, struct MummyInitGroup *group,
                                       struct MummyInitRoute *rt)
 {
-    struct MummyInitPosition point;
+    struct ContactPosition point;
     s32 pointId;
     rt->activeBranch = 0;
 
     if (Script_SeekToKeyword(0x72)) {
-        rt->routeId = MummyInit_ReadByte(0);
+        rt->routeId = MonsterInit_ReadByte(0);
         rt->parameterB = 0;
-        pointId = MummyInit_Value(0);
+        pointId = MonsterInit_ReadWord(0);
         rt->pointId = pointId;
         rt->currentPoint = pointId;
         rt->branches[MummyInit_RouteActiveBranch(rt)] = rt->routeId;
@@ -741,7 +698,7 @@ static inline void MummyInit_InitializeBody(void *object, u32 *fill)
     struct MummyInitActor *arg0 = object;
     struct MummyInitGroup *group = &arg0->group;
     struct MummyInitBody *body = &arg0->body;
-    struct MummyInitPosition origin;
+    struct ContactPosition origin;
     s32 mode, i, secondLimit, firstLimit, gateDuration, identity;
     struct MummyInitRoute *rt;
     arg0->field2CC = 0;
@@ -750,16 +707,16 @@ static inline void MummyInit_InitializeBody(void *object, u32 *fill)
     arg0->field2E8 = 8;
     arg0->field2C0 = Script_GetKeywordValue(0x4D, 0);
     arg0->field2C2 = 0x40;
-    MummyInit_ClearPosition(fill, &origin);
+    MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
     if (Script_SeekToKeyword(0x61)) {
         i = 0;
         while (1) {
-            MummyInit_SetFirstAttack(arg0, i, MummyInit_ReadHalfword(0x18));
-            arg0->attacks.second[i] = MummyInit_ReadHalfword(0x18);
-            arg0->attacks.flags[i] = MummyInit_Value(0);
-            arg0->attacks.parameter[i] = MummyInit_ReadHalfword(0);
+            MummyInit_SetFirstAttack(arg0, i, MonsterInit_ReadHalfword(0x18));
+            arg0->attacks.second[i] = MonsterInit_ReadHalfword(0x18);
+            arg0->attacks.flags[i] = MonsterInit_ReadWord(0);
+            arg0->attacks.parameter[i] = MonsterInit_ReadHalfword(0);
             i++;
             if (i > 3)
                 break;
@@ -767,9 +724,9 @@ static inline void MummyInit_InitializeBody(void *object, u32 *fill)
     }
 
     if (Script_SeekToKeyword(0x6C)) {
-        firstLimit = MummyInit_Value(0x12C);
-        secondLimit = MummyInit_Value(0x12C);
-        gateDuration = MummyInit_Value(0x12C);
+        firstLimit = MonsterInit_ReadWord(0x12C);
+        secondLimit = MonsterInit_ReadWord(0x12C);
+        gateDuration = MonsterInit_ReadWord(0x12C);
     } else {
         firstLimit = 0;
         secondLimit = 0;
@@ -780,24 +737,24 @@ static inline void MummyInit_InitializeBody(void *object, u32 *fill)
     MummyInit_ReadTargeting(&arg0->targeting);
     if (Script_GetKeywordValue(0x62, 0))
         MummyInit_SetStatusFlags(arg0, 0x200);
-    arg0->field1F0 = MummyInit_KeywordHalfword(0x46, 0);
-    arg0->field1EC = MummyInit_KeywordHalfword(0x52, 0);
+    arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
-        MummyInit_SetInitialHealth(arg0, MummyInit_ReadHalfword(0));
+        MummyInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         group->field5B6 = MummyInit_Half(MummyInit_GetInitialHealth(arg0));
-        arg0->field9E = MummyInit_ReadByte(0);
-        arg0->field9F = MummyInit_ReadByte(0);
-        arg0->fieldA0 = MummyInit_ReadByte(0);
-        arg0->fieldA2 = MummyInit_ReadHalfword(0);
-        arg0->fieldA4 = MummyInit_ReadHalfword(0);
+        arg0->field9E = MonsterInit_ReadByte(0);
+        arg0->field9F = MonsterInit_ReadByte(0);
+        arg0->fieldA0 = MonsterInit_ReadByte(0);
+        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
+        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
     MummyInit_InitializeHealth(arg0, MummyInit_GetInitialHealth(arg0), firstLimit, secondLimit);
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->fieldAC = MummyInit_Value(0);
-        arg0->fieldA1 = MummyInit_ReadByte(0);
+        arg0->fieldAC = MonsterInit_ReadWord(0);
+        arg0->fieldA1 = MonsterInit_ReadByte(0);
     }
     arg0->fieldB2 = Script_GetKeywordValue(0x4B, 2);
     identity = (s16)Script_GetKeywordValue(0x56, -1);
@@ -1022,7 +979,7 @@ static inline void MummyInit_InitializeSprite(u8 *drawable, u16 resource, u16 se
 }
 
 static inline void MummyInit_InitializeWidget(u8 *drawable, u16 script, u16 resource,
-                                              struct MummyInitPosition *position)
+                                              struct ContactPosition *position)
 {
     void *source = ScriptProc_Start(script, resource);
     *(struct MummyResourceBlock *)drawable = *(struct MummyResourceBlock *)source;
@@ -1049,7 +1006,7 @@ s32 Mummy_Init(void *object)
     struct MummyInitActor *actor = object;
     struct MummyInitGroup *group = &arg0->group;
     u32 zero;
-    struct MummyInitPosition tmp;
+    struct ContactPosition tmp;
     u32 flag;
 
     MummyInit_ResetFlags(arg0);
@@ -1070,7 +1027,7 @@ s32 Mummy_Init(void *object)
         actor->drawable = Heap_Alloc(0x80);
         Memory_Clear(actor->drawable, 0x80);
         heap = MummyInit_Drawable(actor);
-        MummyInit_ClearPosition(&zero, &tmp);
+        MonsterInit_ClearPosition(&zero, &tmp);
         MummyInit_InitializeWidget(heap, 0xCB05, 0x48DE, &tmp);
         actor->field2B7 = 0xFF;
     }
@@ -1131,8 +1088,8 @@ s32 Mummy_Init(void *object)
     {
         struct MummyInitContext *context = MummyInit_Context(actor);
         if (Script_SeekToKeyword(0x42)) {
-            context->field6CC = MummyInit_ReadHalfword(0x14);
-            context->field6CE = MummyInit_ReadHalfword(0xB4);
+            context->field6CC = MonsterInit_ReadHalfword(0x14);
+            context->field6CE = MonsterInit_ReadHalfword(0xB4);
         } else {
             context->field6CC = 0x14;
             context->field6CE = 0xB4;

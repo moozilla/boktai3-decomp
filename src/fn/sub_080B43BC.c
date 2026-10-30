@@ -2,34 +2,12 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
-
-s32 Script_GetValue(void);
-u32 Script_GetPc(void);
-static inline s32 VornInit_Value(s32 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-static inline u8 VornInit_ReadByte(u8 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
-static inline u16 VornInit_ReadHalfword(u16 fallback)
-{
-    if (Script_GetPc())
-        return Script_GetValue();
-    return fallback;
-}
+#include "scene_actor_init_primitives.h"
 
 struct VornResourceBlock {
     u32 w[8];
 };
 
-s32 Script_SeekToKeyword(u32);
-s32 Script_GetKeywordValue(u32, s32);
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void AnimData_Load(void *, u32);
@@ -59,7 +37,6 @@ void sub_081363F4(void);
 void SceneActorScript_OnCommand(void);
 void SceneActorControl_OnIdle(void);
 extern const u8 gUnk_086108B0[];
-void *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
@@ -80,36 +57,21 @@ void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
 
-struct VornInitPosition {
-    s16 x, y, z, pad;
-};
-struct VornInitMap {
-    u32 header;
-    u8 *cells;
-    u8 unknown8[0x1C];
-    u16 rows[1];
-};
-static inline void VornInit_ClearPosition(u32 *fill, void *object)
-{
-    struct VornInitPosition *position = object;
-    *fill = 0;
-    CpuSet(fill, position, 0x05000002);
-}
-static inline u16 VornInit_PositionX(const struct VornInitPosition *pos)
+static inline u16 VornInit_PositionX(const struct ContactPosition *pos)
 {
     return pos->x;
 }
-static inline u16 VornInit_PositionZ(const struct VornInitPosition *pos)
+static inline u16 VornInit_PositionZ(const struct ContactPosition *pos)
 {
     return pos->z;
 }
-static inline u32 VornInit_Cell(struct VornInitPosition *pos)
+static inline u32 VornInit_Cell(struct ContactPosition *pos)
 {
     s32 x = (s16)VornInit_PositionX(pos) >> 8;
     s32 z = (s16)VornInit_PositionZ(pos) >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
-    return ((struct VornInitMap *)gTerrainMap)->rows[z] + x;
+    return ((struct EngineMap *)gTerrainMap)->rows[z] + x;
 }
 static inline u8 VornInit_TerrainShape(const u8 *cell)
 {
@@ -127,7 +89,7 @@ static inline u32 VornInit_Height(s32 cell, u16 *pos)
     if (p)
         p += 4;
     else {
-        struct VornInitMap *map = (void *)gTerrainMap;
+        struct EngineMap *map = (void *)gTerrainMap;
         u32 offset = cell * 4 + 12;
         p = map->cells + offset;
     }
@@ -149,7 +111,7 @@ struct VornInitBody {
     u8 unknown54[0x5];
     u8 direction;
     u8 unknown5A[0x2];
-    struct VornInitPosition position;
+    struct ContactPosition position;
     u8 unknown64[0x34];
 };
 struct VornInitAttacks {
@@ -453,10 +415,10 @@ static inline struct VornInitSavedControl *VornInit_SavedControlOf(struct VornIn
     struct VornInitSavedControl *saved = &actor->saved;
     return saved;
 }
-static inline struct VornInitPosition *VornInit_BodyPosition(void *object)
+static inline struct ContactPosition *VornInit_BodyPosition(void *object)
 {
     struct VornInitBody *body = object;
-    struct VornInitPosition *position = &body->position;
+    struct ContactPosition *position = &body->position;
     return position;
 }
 static inline void VornInit_SaveControl(struct VornInitSavedControl *saved, struct VornInitActor *actor)
@@ -567,7 +529,7 @@ static inline void VornInit_ReadTargeting(struct VornInitTargeting *target)
 {
     s32 nearRadius, flags, farRadius;
     if (Script_SeekToKeyword(0x65)) {
-        nearRadius = VornInit_Value(0x30);
+        nearRadius = MonsterInit_ReadWord(0x30);
         flags = Script_GetPc() ? (u8)Script_GetValue() : 0x40;
         farRadius = nearRadius;
     } else {
@@ -596,8 +558,8 @@ static inline void VornInit_ReadRange(struct VornInitRange *range)
 {
     s32 radius;
     if (Script_SeekToKeyword(0x6E)) {
-        radius = VornInit_Value(0);
-        range->field420 = VornInit_ReadHalfword(0);
+        radius = MonsterInit_ReadWord(0);
+        range->field420 = MonsterInit_ReadHalfword(0);
     } else {
         radius = 0;
         range->field420 = radius;
@@ -616,7 +578,7 @@ static inline u32 VornInit_RoutePointZ(struct VornInitRoute *route)
 {
     return (u16)route->point->z;
 }
-static inline void VornInit_SnapToRoute(struct VornInitPosition *position, struct VornInitRoute *route)
+static inline void VornInit_SnapToRoute(struct ContactPosition *position, struct VornInitRoute *route)
 {
     position->x = VornInit_RoutePointX(route);
     position->z = VornInit_RoutePointZ(route);
@@ -625,18 +587,13 @@ static inline void VornInit_SnapToRoute(struct VornInitPosition *position, struc
 static inline void VornInit_DrawablePosition(struct VornInitActor *actor)
 {
     if (VornInit_GetDrawableKind(actor) == 0)
-        *(struct VornInitPosition *)(actor->drawable + 0x1C) = actor->body.position;
+        *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
     else
-        *(struct VornInitPosition *)(actor->drawable + 0x40) = actor->body.position;
+        *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
 }
 static inline void VornInit_SetFirstAttack(struct VornInitActor *actor, s32 index, s32 value)
 {
     actor->attacks.first[index] = value;
-}
-
-static inline u16 VornInit_KeywordHalfword(u32 keyword, s32 fallback)
-{
-    return Script_GetKeywordValue(keyword, fallback);
 }
 
 static inline u8 VornInit_RouteId(struct VornInitRoute *route)
@@ -700,14 +657,14 @@ static inline void VornInit_SetInitialHealth(struct VornInitActor *actor, u16 he
 
 static inline u32 VornInit_ReadRoute(struct VornInitActor *arg0, struct VornInitGroup *group, struct VornInitRoute *rt)
 {
-    struct VornInitPosition point;
+    struct ContactPosition point;
     s32 pointId;
     rt->activeBranch = 0;
 
     if (Script_SeekToKeyword(0x72)) {
-        rt->routeId = VornInit_ReadByte(0);
+        rt->routeId = MonsterInit_ReadByte(0);
         rt->parameterB = 0;
-        pointId = VornInit_Value(0);
+        pointId = MonsterInit_ReadWord(0);
         rt->pointId = pointId;
         rt->currentPoint = pointId;
         rt->branches[VornInit_RouteActiveBranch(rt)] = rt->routeId;
@@ -733,7 +690,7 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
     struct VornInitActor *arg0 = object;
     struct VornInitGroup *group = &arg0->group;
     struct VornInitBody *body = &arg0->body;
-    struct VornInitPosition origin;
+    struct ContactPosition origin;
     s32 mode, i, secondLimit, firstLimit, gateDuration, identity;
     struct VornInitRoute *rt;
     arg0->field2CC = 0;
@@ -742,16 +699,16 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
     arg0->field2E8 = 8;
     arg0->field2C0 = Script_GetKeywordValue(0x4D, 0);
     arg0->field2C2 = 0x40;
-    VornInit_ClearPosition(fill, &origin);
+    MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
     if (Script_SeekToKeyword(0x61)) {
         i = 0;
         while (1) {
-            VornInit_SetFirstAttack(arg0, i, VornInit_ReadHalfword(0x18));
-            arg0->attacks.second[i] = VornInit_ReadHalfword(0x18);
-            arg0->attacks.flags[i] = VornInit_Value(0);
-            arg0->attacks.parameter[i] = VornInit_ReadHalfword(0);
+            VornInit_SetFirstAttack(arg0, i, MonsterInit_ReadHalfword(0x18));
+            arg0->attacks.second[i] = MonsterInit_ReadHalfword(0x18);
+            arg0->attacks.flags[i] = MonsterInit_ReadWord(0);
+            arg0->attacks.parameter[i] = MonsterInit_ReadHalfword(0);
             i++;
             if (i > 3)
                 break;
@@ -759,9 +716,9 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
     }
 
     if (Script_SeekToKeyword(0x6C)) {
-        firstLimit = VornInit_Value(0x12C);
-        secondLimit = VornInit_Value(0x12C);
-        gateDuration = VornInit_Value(0x12C);
+        firstLimit = MonsterInit_ReadWord(0x12C);
+        secondLimit = MonsterInit_ReadWord(0x12C);
+        gateDuration = MonsterInit_ReadWord(0x12C);
     } else {
         firstLimit = 0;
         secondLimit = 0;
@@ -772,24 +729,24 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
     VornInit_ReadTargeting(&arg0->targeting);
     if (Script_GetKeywordValue(0x62, 0))
         VornInit_SetStatusFlags(arg0, 0x200);
-    arg0->field1F0 = VornInit_KeywordHalfword(0x46, 0);
-    arg0->field1EC = VornInit_KeywordHalfword(0x52, 0);
+    arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
-        VornInit_SetInitialHealth(arg0, VornInit_ReadHalfword(0));
+        VornInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         group->field5B6 = VornInit_Half(VornInit_GetInitialHealth(arg0));
-        arg0->field9E = VornInit_ReadByte(0);
-        arg0->field9F = VornInit_ReadByte(0);
-        arg0->fieldA0 = VornInit_ReadByte(0);
-        arg0->fieldA2 = VornInit_ReadHalfword(0);
-        arg0->fieldA4 = VornInit_ReadHalfword(0);
+        arg0->field9E = MonsterInit_ReadByte(0);
+        arg0->field9F = MonsterInit_ReadByte(0);
+        arg0->fieldA0 = MonsterInit_ReadByte(0);
+        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
+        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
     VornInit_InitializeHealth(arg0, VornInit_GetInitialHealth(arg0), firstLimit, secondLimit);
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->fieldAC = VornInit_Value(0);
-        arg0->fieldA1 = VornInit_ReadByte(0);
+        arg0->fieldAC = MonsterInit_ReadWord(0);
+        arg0->fieldA1 = MonsterInit_ReadByte(0);
     }
     arg0->fieldB2 = Script_GetKeywordValue(0x4B, 2);
     identity = (s16)Script_GetKeywordValue(0x56, -1);
@@ -1009,7 +966,7 @@ static inline void VornInit_InitializeSprite(u8 *drawable, u16 resource, u16 seq
     SceneActorAnimation_InitEnemySequence(drawable, sequence);
 }
 
-static inline void VornInit_InitializeWidget(u8 *drawable, u16 script, u16 resource, struct VornInitPosition *position)
+static inline void VornInit_InitializeWidget(u8 *drawable, u16 script, u16 resource, struct ContactPosition *position)
 {
     void *source = ScriptProc_Start(script, resource);
     *(struct VornResourceBlock *)drawable = *(struct VornResourceBlock *)source;
@@ -1044,7 +1001,7 @@ s32 Vorn_Init(void *object)
     struct VornInitGroup *group = &arg0->group;
     struct VornInitBody *body = &arg0->body;
     u32 zero;
-    struct VornInitPosition tmp;
+    struct ContactPosition tmp;
     u32 flag;
     s32 mode;
 
@@ -1074,7 +1031,7 @@ s32 Vorn_Init(void *object)
         actor->drawable = Heap_Alloc(0x80);
         Memory_Clear(actor->drawable, 0x80);
         heap = VornInit_Drawable(actor);
-        VornInit_ClearPosition(&zero, &tmp);
+        MonsterInit_ClearPosition(&zero, &tmp);
         VornInit_InitializeWidget(heap, 0xCB05, 0x3DB6, &tmp);
         actor->field2B7 = 0xFF;
     }

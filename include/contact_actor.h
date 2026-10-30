@@ -2,14 +2,12 @@
 #define GUARD_CONTACT_ACTOR_H
 /* Tentative sixteen-slot contact actor pool, beginning at 080427FC. */
 #include "display_animation.h"
+#include "contact_position.h"
 struct ContactPackedVector {
     s32 x : 16;
     s32 y : 16;
     s32 z : 16;
 };
-struct ContactPosition {
-    s16 x, y, z, pad;
-} __attribute__((aligned(4)));
 struct ContactCollider {
     struct ContactCollider *next; /* intrusive collider-manager list link */
     u8 unknown4[2];
