@@ -10,6 +10,9 @@ browser (/sound, tools/studio/sound.py and mp2k.js).
 
   python3 tools/studio/serve.py [--port 8642] [--link-port 8643]    then open http://localhost:8642
 
+At startup it builds the slow indexes in the background (--no-preload skips
+this) and logs each step and request to the terminal.
+
 Everything it reads is ROM-derived and extracted under build/ (run `make` once
 first); it writes only build/text/bank.tsv and, on request, build/mod.gba.
 The server listens on localhost only.
@@ -18,9 +21,12 @@ import argparse
 import csv
 import http.server
 import json
+import logging
 import os
 import subprocess
 import sys
+import threading
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -33,6 +39,14 @@ sys.path.insert(0, os.path.join(ROOT, "tools", "assets"))
 import actors  # noqa: E402
 
 BANK = os.path.join(ROOT, "build", "text", "bank.tsv")
+log = logging.getLogger("studio")
+# Held while the startup preload builds an index; requests that use one wait
+# for it instead of building the same index alongside.
+WARM = threading.Lock()
+SLOW = ("/api/atlas", "/api/rommap", "/api/romtree", "/api/cutscene/", "/api/actors", "/api/procs", "/api/proc/",
+        "/api/code/", "/api/learned", "/api/stages", "/api/areas")
+# polled by the live view several times a second; logged only when slow or failing
+POLLED = ("/api/live", "/api/live/player")
 
 
 def font_path():
@@ -95,10 +109,50 @@ def guide_entries(trans):
     return out
 
 
+_stages = None
+
+
 def stages():
     """Stage loads in the scripts (tools/assets/tilesets.py)."""
-    import tilesets
-    return tilesets.script_stages()
+    global _stages
+    if _stages is None:
+        import tilesets
+        _stages = tilesets.script_stages()
+    return _stages
+
+
+def learned():
+    """Captured stage and sprite palettes, and the large-sprite palette variants."""
+    import bigpalettes  # large sprites: default from the data, variants the game selects
+    return {"stages": live.stage_palettes(), "sprites": live.sprite_palettes(),
+            "bigpools": {f"{h:04X}": bigpalettes.variants(h) for h in bigpalettes.defaults()},
+            "bigsources": {f"{h:04X}": {str(p): src for p, src in t["variants"].items()} for h, t in bigpalettes.table().items()},
+            "poolfuncs": {p: [[f, actors.fname(int(f[4:], 16)) if f.startswith("sub_") else f] for f in fs]
+                          for p, fs in bigpalettes.code_selections().items()}}
+
+
+def preload():
+    """Build the slow indexes once at startup, so the first visit to each page is quick."""
+    import atlas
+    import gclview
+    steps = [("atlas index", atlas.load), ("actors", actors.actors),
+             ("script procedures", lambda: (actors.proc_list(), gclview.callee_names(), gclview.names())),
+             ("disassembly", actors.code), ("sprite palettes", learned), ("stage loads", stages)]
+    start = time.time()
+    for name, fn in steps:
+        t = time.time()
+        with WARM:
+            try:
+                fn()
+            except Exception:
+                log.exception("preload: %s failed", name)
+                continue
+        log.info("preload: %s (%.1fs)", name, time.time() - t)
+    log.info("preload: done in %.1fs", time.time() - start)
+
+
+def size_text(n):
+    return f"{n} B" if n < 1024 else f"{n / 1024:.0f} KB" if n < 1 << 20 else f"{n / (1 << 20):.1f} MB"
 
 
 STAGEMETA = os.path.join(ROOT, "build", "assets", "stages.json")
@@ -246,6 +300,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             body = json.dumps(body, ensure_ascii=False)
         if isinstance(body, str):
             body = body.encode("utf-8")
+        self.status, self.size = code, len(body)
         self.send_response(code)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
@@ -256,8 +311,30 @@ class Handler(http.server.BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         pass
 
+    def timed(self, method, route):
+        start, waited = time.time(), 0.0
+        self.status, self.size = None, 0
+        try:
+            if self.path.startswith(SLOW):
+                with WARM:
+                    waited = time.time() - start
+                    route()
+            else:
+                route()
+        finally:
+            took = time.time() - start
+            if self.path not in POLLED or took > 0.5 or self.status != 200:
+                wait = f" (waited {waited:.1f}s for preload)" if waited > 0.1 else ""
+                log.info("%s %s %s %s %.2fs%s", method, self.path, self.status or "failed", size_text(self.size), took, wait)
+
     def do_GET(self):
         self.path = self.path.split("?")[0]
+        self.timed("GET", self.get)
+
+    def do_POST(self):
+        self.timed("POST", self.post)
+
+    def get(self):
         if self.path in ("/", "/index.html"):
             self.send(200, open(os.path.join(HERE, "index.html"), "rb").read(), "text/html; charset=utf-8")
         elif self.path == "/api/strings":
@@ -386,12 +463,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         elif self.path == "/api/scenes":
             self.send(200, scene_list())
         elif self.path == "/api/learned":
-            import bigpalettes  # large sprites: default from the data, variants the game selects
-            self.send(200, {"stages": live.stage_palettes(), "sprites": live.sprite_palettes(),
-                            "bigpools": {f"{h:04X}": bigpalettes.variants(h) for h in bigpalettes.defaults()},
-                            "bigsources": {f"{h:04X}": {str(p): src for p, src in t["variants"].items()} for h, t in bigpalettes.table().items()},
-                            "poolfuncs": {p: [[f, actors.fname(int(f[4:], 16)) if f.startswith("sub_") else f] for f in fs]
-                                          for p, fs in bigpalettes.code_selections().items()}})
+            self.send(200, learned())
         elif self.path == "/api/tags":
             self.send(200, live.tags())
         elif self.path == "/api/stages":
@@ -422,7 +494,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         else:
             self.send(404, {"error": "not found"})
 
-    def do_POST(self):
+    def post(self):
         n = int(self.headers.get("Content-Length", 0))
         try:
             req = json.loads(self.rfile.read(n) or b"{}")
@@ -459,14 +531,18 @@ def main():
     ap.add_argument("--port", type=int, default=8642)
     ap.add_argument("--link-port", type=int, default=8643, help="port Centaur connects to (its CENTAUR_LINK_PORT)")
     ap.add_argument("--trans", default=os.path.join(os.path.dirname(ROOT), "boktai3trans"))
+    ap.add_argument("--no-preload", action="store_true", help="build each index on first use instead of at startup")
     a = ap.parse_args()
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%H:%M:%S")
     ensure_bank()
     srv = http.server.ThreadingHTTPServer(("127.0.0.1", a.port), Handler)
     srv.original = original_strings()
     srv.live = live.Live(a.link_port)
     srv.trans = a.trans
     srv.display_jp, srv.display_en = display_strings(a.trans)
-    print(f"studio: http://localhost:{a.port}")
+    log.info("studio: http://localhost:%d (Centaur link on port %d)", a.port, a.link_port)
+    if not a.no_preload:
+        threading.Thread(target=preload, daemon=True).start()
     srv.serve_forever()
 
 
