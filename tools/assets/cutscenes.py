@@ -123,8 +123,18 @@ def message(a):
     return {"addr": a, "to": to, "kind": kind, "block": block, "cmd": cmd, "args": args}
 
 
+_table = None
+
+
 def table():
     """[[step messages, ...] or None per cutscene index]."""
+    global _table
+    if _table is None:
+        _table = _read_table()
+    return _table
+
+
+def _read_table():
     out = []
     i = 0
     while True:
@@ -170,9 +180,11 @@ def handlers():
             funcs[cur] = []
         elif cur:
             funcs[cur].append(ln.rstrip())
+    # the dispatchers call this by its current name in gen/code.s
+    call = re.compile(r"\s*bl (sub_08020D54|%s)$" % re.escape(names.get("sub_08020D54", "sub_08020D54")))
     out = {}
     for f, L in funcs.items():
-        if not any(re.match(r"\s*bl sub_08020D54$", x) for x in L):
+        if not any(call.match(x) for x in L):
             continue
         lab = {m.group(1): i for i, x in enumerate(L) for m in [re.match(r"(_[0-9A-F]+):", x)] if m}
 
@@ -209,14 +221,14 @@ def handlers():
     return out
 
 
-def command_name(kind, cmd, _h={}):
+def command_name(kind, cmd, _h=[]):
     n = COMMANDS.get(kind, {}).get(cmd)
     if n:
         return n
     if not _h:
-        _h.update(handlers())
+        _h.append(handlers())
     d = KINDS.get(kind, (None, None, None))[2]
-    h = _h.get(d, {}).get(cmd) if d else None
+    h = _h[0].get(d, {}).get(cmd) if d else None
     return f"cmd{cmd}" + (f"<{h}>" if h else "")
 
 
