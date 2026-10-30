@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_actor_init_actor.h"
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
@@ -136,212 +137,8 @@ void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
 
-struct AxeInitBody {
-    u32 id;
-    u8 unknown54[0x5];
-    u8 direction;
-    u8 unknown5A[0x2];
-    struct ContactPosition position;
-    u8 unknown64[0x34];
-};
-struct AxeInitAttacks {
-    u16 first[4];
-    u16 second[4];
-    u16 parameter[4];
-    u32 flags[4];
-};
-struct AxeInitGate {
-    u16 field414;
-    u16 field416;
-    u16 field418;
-    u16 field41A;
-    void *field41C;
-};
-struct AxeInitRange {
-    u32 field420 : 16;
-    u32 field422 : 16;
-    u32 field424;
-    u8 unknown428[0x2];
-    u8 field42A;
-    u8 field42B;
-};
-struct AxeInitRoutePoint {
-    s16 x, z;
-};
-struct AxeInitRoute {
-    u32 unknown0, unknown4;
-    struct AxeInitRoutePoint *point;
-    u8 currentPoint, branches[2], activeBranch;
-    u8 routeId, parameterB, pointId, unknown13;
-};
-struct AxeInitGroup {
-    u16 field3D4;
-    u8 unknown3D6[0x2];
-    u32 field3D8;
-    u8 unknown3DC[0x38];
-    struct AxeInitGate gate;
-    struct AxeInitRange range;
-    u8 unknown42C[0x10];
-    void *field43C;
-    u32 field440;
-    void *field444;
-    struct AxeInitRoute route;
-    u8 unknown45C[0x15A];
-    s16 field5B6;
-    u8 unknown5B8[0x14];
-    u16 field5CC;
-    u8 unknown5CE[0x2];
-    u8 *field5D0;
-    u8 *field5D4;
-    u8 unknown5D8[0x4];
-    void *field5DC;
-    void *field5E0;
-    void *field5E4;
-    u32 field5E8;
-    void *field5EC;
-    void *field5F0;
-    void *field5F4;
-    void *field5F8;
-    void *field5FC;
-    void *field600;
-    u32 field604;
-    u32 field608;
-    void *field60C;
-    void *field610;
-    void *field614;
-    void *field618;
-    u32 field61C;
-    u32 field620;
-};
-struct AxeInitTargeting {
-    u32 fieldDC;
-    u8 unknownE0[0xA];
-    u8 fieldEA;
-    u8 fieldEB;
-    u16 fieldEC;
-    u16 fieldEE;
-    u8 unknownF0[0x4];
-    u32 fieldF4;
-    u32 fieldF8;
-    u32 fieldFC;
-};
-struct AxeInitSavedControl {
-    u32 field118;
-    u32 field11C;
-    u8 field120;
-    u8 field121;
-    u8 field122;
-    u8 field123;
-    void *field124;
-    u8 field128;
-    u8 unknown129[0x3];
-    u16 field12C;
-    u16 field12E;
-    u32 field130;
-};
-struct AxeInitActor {
-    u8 unknown0[0x4];
-    u8 *drawable;
-    u8 drawableKind;
-    u8 unknown9[0x47];
-    struct AxeInitBody body;
-    u8 category;
-    u8 unknown99[0x1];
-    u16 field9A;
-    s16 field9C;
-    u8 field9E;
-    u8 field9F;
-    u8 fieldA0;
-    u8 fieldA1;
-    u16 fieldA2;
-    u16 fieldA4;
-    u16 fieldA6;
-    u16 fieldA8;
-    u16 fieldAA;
-    u32 fieldAC;
-    u16 fieldB0;
-    u16 fieldB2;
-    struct AxeInitAttacks attacks;
-    struct AxeInitTargeting targeting;
-    u8 unknown100[0x4];
-    u32 field104;
-    u32 field108;
-    u32 field10C;
-    u32 field110;
-    u32 field114;
-    struct AxeInitSavedControl saved;
-    u8 unknown134[0x6];
-    u16 field13A;
-    u8 unknown13C[0xA0];
-    u16 field1DC, field1DE;
-    u16 field1E0;
-    u16 field1E2;
-    u16 field1E4;
-    u16 field1E6;
-    u8 unknown1E8[0x4];
-    u32 field1EC;
-    u32 field1F0;
-    u8 unknown1F4[0x28];
-    void *field21C;
-    void *field220;
-    void *field224;
-    void *field228;
-    void *field22C;
-    void *field230;
-    void *field234;
-    void *field238;
-    void *field23C;
-    u32 field240;
-    u8 unknown244[0x4];
-    void *field248;
-    void *field24C;
-    const void *field250;
-    u8 unknown254[0x4];
-    void *field258;
-    void *field25C;
-    s32 (*field260)(void);
-    void *field264;
-    void *field268;
-    void *field26C;
-    s32 (*field270)(void *);
-    void *field274;
-    void *field278;
-    u8 unknown27C[0x2C];
-    u8 field2A8;
-    u8 field2A9;
-    u8 field2AA;
-    u8 unknown2AB[0x1];
-    u32 field2AC;
-    u8 field2B0;
-    u8 field2B1;
-    u8 field2B2;
-    u8 unknown2B3[0x1];
-    u8 field2B4;
-    u8 field2B5;
-    u8 unknown2B6[0x1];
-    u8 field2B7;
-    u8 unknown2B8[0x6];
-    u16 field2BE;
-    u16 field2C0;
-    u16 field2C2;
-    u8 unknown2C4[0x4];
-    u16 field2C8;
-    u8 unknown2CA[0x2];
-    u32 field2CC;
-    u32 field2D0;
-    u16 field2D4;
-    u8 unknown2D6[0x12];
-    u16 field2E8;
-    u16 field2EA;
-    u8 unknown2EC[0x8];
-    u16 field2F4;
-    u16 field2F6;
-    u8 unknown2F8[2];
-    u16 field2FA;
-    u8 unknown2FC[0x8];
-    u32 field304;
-    u8 unknown308[0xCC];
-    struct AxeInitGroup group;
+struct AxeInstanceState {
+    u8 unknown0[0x624];
     u8 unknown624[0x824];
     s32 halfHealthE48;
     u32 savedFlagsE4C;
@@ -355,32 +152,32 @@ struct AxeInitActor {
     struct SceneVec playerPositionF1C;
 };
 
-static inline u8 AxeInit_GetDrawableKind(struct AxeInitActor *actor)
+static inline u8 AxeInit_GetDrawableKind(struct SceneActorRegistryResetView *actor)
 {
     return actor->drawableKind;
 }
 static inline u8 AxeInit_GetCategory(void *object)
 {
-    struct AxeInitActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     return actor->category;
 }
-static inline s32 AxeInit_GetHealth(struct AxeInitActor *actor)
+static inline s32 AxeInit_GetHealth(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field9C;
+    return actor->health;
 }
-static inline u16 AxeInit_GetInitialHealth(struct AxeInitActor *actor)
+static inline u16 AxeInit_GetInitialHealth(struct SceneActorRegistryResetView *actor)
 {
-    return actor->fieldB0;
-}
-
-static inline u32 AxeInit_GetPaletteBase(struct AxeInitActor *actor)
-{
-    return actor->field1E0;
+    return actor->defaultHealth;
 }
 
-static inline u32 AxeInit_GetPaletteOffset(struct AxeInitActor *actor)
+static inline u32 AxeInit_GetPaletteBase(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field1E6;
+    return actor->basePaletteBank;
+}
+
+static inline u32 AxeInit_GetPaletteOffset(struct SceneActorRegistryResetView *actor)
+{
+    return actor->paletteOffset;
 }
 
 void SceneActorBehavior_InitializeShadow(void *);
@@ -394,79 +191,77 @@ void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
 extern const u8 gUnk_086060FC[];
 
-static inline u16 AxeInit_GetMotionFlags(struct AxeInitActor *actor)
+static inline u16 AxeInit_GetMotionFlags(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2C0;
+    return actor->flags2C0;
 }
-static inline u16 AxeInit_GetHeightOffset(struct AxeInitActor *actor)
+static inline u16 AxeInit_GetHeightOffset(struct SceneActorRegistryResetView *actor)
 {
     return actor->field2EA;
 }
-static inline u32 AxeInit_GetBehaviorFlags(struct AxeInitActor *actor)
+static inline u32 AxeInit_GetBehaviorFlags(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2CC;
+    return actor->flags2CC;
 }
-static inline u32 AxeInit_GetStatusFlags(struct AxeInitActor *actor)
+static inline u32 AxeInit_GetStatusFlags(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2D0;
+    return actor->flags2D0;
 }
-static inline u8 AxeInit_GetState(struct AxeInitActor *actor)
+static inline u8 AxeInit_GetState(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2A8;
+    return actor->state2A8;
 }
-static inline u8 AxeInit_GetPhase(struct AxeInitActor *actor)
+static inline u8 AxeInit_GetPhase(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2A9;
+    return actor->phase2A9;
 }
-static inline u8 AxeInit_GetBehavior(struct AxeInitActor *actor)
+static inline u8 AxeInit_GetBehavior(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2AA;
+    return actor->behavior2AA;
 }
-static inline void *AxeInit_GetCurrentControl(struct AxeInitActor *actor)
+static inline void *AxeInit_GetCurrentControl(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field21C;
+    return actor->target;
 }
-static inline u8 AxeInit_GetControlKind(struct AxeInitActor *actor)
+static inline u8 AxeInit_GetControlKind(struct SceneActorRegistryResetView *actor)
 {
     return actor->field2B5;
 }
-static inline u8 AxeInit_GetDirection(struct AxeInitActor *actor)
+static inline u8 AxeInit_GetDirection(struct SceneActorRegistryResetView *actor)
 {
     return actor->body.direction;
 }
-static inline u32 AxeInit_GetTerrainCell(struct AxeInitActor *actor)
+static inline u32 AxeInit_GetTerrainCell(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2F4;
+    return actor->terrainCell;
 }
-static inline u32 AxeInit_GetTargetingFlags(struct AxeInitTargeting *target)
+static inline u32 AxeInit_GetTargetingFlags(struct SceneActorChaseTracking *target)
 {
-    return target->fieldEB;
+    return target->flags;
 }
-static inline struct AxeInitSavedControl *AxeInit_SavedControlOf(struct AxeInitActor *actor)
+static inline struct SceneActorDefaultControl *
+AxeInit_SavedControlOf(struct SceneActorRegistryResetView *actor)
 {
-    struct AxeInitSavedControl *saved = &actor->saved;
+    struct SceneActorDefaultControl *saved = &actor->saved;
     return saved;
 }
 
-static inline void AxeInit_SaveControl(struct AxeInitSavedControl *saved,
-                                       struct AxeInitActor *actor)
+static inline void AxeInit_SaveControl(struct SceneActorDefaultControl *saved,
+                                       struct SceneActorRegistryResetView *actor)
 {
-    saved->field12E = AxeInit_GetMotionFlags(actor);
-    saved->field12C = AxeInit_GetHeightOffset(actor);
-    saved->field118 = AxeInit_GetBehaviorFlags(actor);
-    saved->field11C = AxeInit_GetStatusFlags(actor);
-    saved->field120 = AxeInit_GetDirection(actor);
-    saved->field121 = AxeInit_GetState(actor);
-    saved->field122 = AxeInit_GetPhase(actor);
-    saved->field123 = AxeInit_GetBehavior(actor);
-    saved->field124 = AxeInit_GetCurrentControl(actor);
-    saved->field128 = AxeInit_GetControlKind(actor);
+    saved->motionFlags = AxeInit_GetMotionFlags(actor);
+    saved->heightOffset = AxeInit_GetHeightOffset(actor);
+    saved->behaviorFlags = AxeInit_GetBehaviorFlags(actor);
+    saved->statusFlags = AxeInit_GetStatusFlags(actor);
+    saved->direction = AxeInit_GetDirection(actor);
+    saved->state = AxeInit_GetState(actor);
+    saved->phase = AxeInit_GetPhase(actor);
+    saved->behavior = AxeInit_GetBehavior(actor);
+    saved->control = AxeInit_GetCurrentControl(actor);
+    saved->kind = AxeInit_GetControlKind(actor);
 }
-struct AxeInitCollider {
-    u8 header[6];
-    u16 flags;
-};
-static inline void AxeInit_ClearColliderFlags(struct AxeInitCollider *collider, u32 mask)
+
+static inline void AxeInit_ClearColliderFlags(struct ContactCollider *collider, u32 mask)
 {
     collider->flags = mask & collider->flags;
 }
@@ -476,78 +271,80 @@ static inline s32 AxeInit_Half(s32 value)
         return value >> 1;
     return -(-value >> 1);
 }
-static inline void AxeInit_SetBehaviorFlags(struct AxeInitActor *actor, u32 mask)
+static inline void AxeInit_SetBehaviorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    actor->field2CC |= mask;
+    actor->flags2CC |= mask;
 }
 
-static inline void AxeInit_SetStatusFlags(struct AxeInitActor *actor, u32 mask)
+static inline void AxeInit_SetStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    actor->field2D0 |= mask;
+    actor->flags2D0 |= mask;
 }
 
-static inline void AxeInit_SetMotionFlags(struct AxeInitActor *actor, u16 mask)
+static inline void AxeInit_SetMotionFlags(struct SceneActorRegistryResetView *actor, u16 mask)
 {
-    actor->field2C0 |= mask;
+    actor->flags2C0 |= mask;
 }
-static inline u8 AxeInit_TestMotionFlags(struct AxeInitActor *actor, u32 mask)
+static inline u8 AxeInit_TestMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     if (AxeInit_GetMotionFlags(actor) & mask)
         return 1;
     return 0;
 }
 
-static inline u8 AxeInit_TestTargetingFlags(struct AxeInitTargeting *target, u32 mask)
+static inline u8 AxeInit_TestTargetingFlags(struct SceneActorChaseTracking *target, u32 mask)
 {
     if (AxeInit_GetTargetingFlags(target) & mask)
         return 1;
     return 0;
 }
 
-static inline void AxeInit_ClearControlFlags(struct AxeInitActor *actor, u32 mask)
+static inline void AxeInit_ClearControlFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    actor->field114 &= mask;
+    actor->flags114 &= mask;
 }
-static inline u8 AxeInit_IsInCurrentRegion(struct AxeInitActor *actor)
+static inline u8 AxeInit_IsInCurrentRegion(struct SceneActorRegistryResetView *actor)
 {
-    if (*(u32 *)(gGameState + 0x5A0) == actor->field2FA)
+    if (*(u32 *)(gGameState + 0x5A0) == actor->regionId)
         return 1;
     return 0;
 }
-static inline void *AxeInit_GetStandingControl(struct AxeInitActor *actor)
+static inline void *AxeInit_GetStandingControl(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field22C;
+    return actor->savedTarget;
 }
 
-static inline void AxeInit_SetControl(struct AxeInitActor *actor, void *callback, u32 behavior)
+static inline void AxeInit_SetControl(struct SceneActorRegistryResetView *actor, void *callback,
+                                      u32 behavior)
 {
     actor->field2B2 = 1;
     actor->field2B0 = 0;
     actor->field2B5 = behavior;
-    actor->field21C = callback;
+    actor->target = callback;
     actor->field2C8 = 0;
     AxeInit_ClearControlFlags(actor, ~1);
-    actor->field104 = 0;
+    actor->word104 = 0;
 }
-static inline void AxeInit_SetState(struct AxeInitActor *actor, u32 state, u32 phase, u32 behavior)
+static inline void AxeInit_SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
+                                    u32 behavior)
 {
-    actor->field2A8 = state;
-    actor->field2A9 = phase;
-    actor->field2AA = behavior;
-    actor->field2AC = 0;
+    actor->state2A8 = state;
+    actor->phase2A9 = phase;
+    actor->behavior2AA = behavior;
+    actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
 
-static inline void AxeInit_InitializeGate(struct AxeInitGate *gate, u32 parameter)
+static inline void AxeInit_InitializeGate(struct SceneActorControlGate *gate, u32 parameter)
 {
-    gate->field414 = 0;
-    gate->field416 = parameter;
-    gate->field418 = 0;
+    gate->flags = 0;
+    gate->duration = parameter;
+    gate->counter = 0;
     gate->field41A = 0;
-    gate->field41C = 0;
+    gate->control = 0;
 }
 
-static inline void AxeInit_ReadTargeting(struct AxeInitTargeting *target)
+static inline void AxeInit_ReadTargeting(struct SceneActorChaseTracking *target)
 {
     s32 r4v, r2v, r1v;
     if (Script_SeekToKeyword(0x65)) {
@@ -559,54 +356,55 @@ static inline void AxeInit_ReadTargeting(struct AxeInitTargeting *target)
         r1v = 0x30;
         r2v = 0x40;
     }
-    target->fieldDC = 0;
-    target->fieldEC = r4v;
-    target->fieldEE = r1v;
-    target->fieldF8 = r4v * r4v;
-    target->fieldFC = r1v * r1v;
+    target->target = 0;
+    target->x = r4v;
+    target->z = r1v;
+    target->limit = r4v * r4v;
+    target->zSquared = r1v * r1v;
     target->fieldEA = r2v;
     if (AxeInit_TestTargetingFlags(target, 4))
-        target->fieldF4 = target->fieldF8;
+        target->range = target->limit;
     else
-        target->fieldF4 = Div(target->fieldF8 * 8 - target->fieldF8, 10);
+        target->range = Div(target->limit * 8 - target->limit, 10);
 }
 
-static inline u16 AxeInit_RangeRadius(struct AxeInitRange *range)
+static inline u16 AxeInit_RangeRadius(struct SceneActorRegistryControl *range)
 {
-    return range->field422;
+    return range->radius;
 }
-static inline void AxeInit_ReadRange(struct AxeInitRange *range)
+static inline void AxeInit_ReadRange(struct SceneActorRegistryControl *range)
 {
     s32 r4v;
     if (Script_SeekToKeyword(0x6E)) {
         r4v = SV(0);
-        range->field420 = SV(0);
+        range->parameter = SV(0);
     } else {
         r4v = 0;
-        range->field420 = r4v;
+        range->parameter = r4v;
     }
-    range->field422 = r4v;
-    range->field424 = AxeInit_RangeRadius(range) * AxeInit_RangeRadius(range);
-    range->field42A = 0;
+    range->radius = r4v;
+    range->radiusSquared = AxeInit_RangeRadius(range) * AxeInit_RangeRadius(range);
+    range->mode = 0;
 }
 
-static inline u32 AxeInit_RoutePointX(struct AxeInitRoute *route)
+static inline u32 AxeInit_RoutePointX(struct SceneActorRegistryRoute *route)
 {
     return (u16)route->point->x;
 }
 
-static inline u32 AxeInit_RoutePointZ(struct AxeInitRoute *route)
+static inline u32 AxeInit_RoutePointZ(struct SceneActorRegistryRoute *route)
 {
     return (u16)route->point->z;
 }
 
-static inline void AxeInit_SnapToRoute(struct ContactPosition *position, struct AxeInitRoute *route)
+static inline void AxeInit_SnapToRoute(struct ContactPosition *position,
+                                       struct SceneActorRegistryRoute *route)
 {
     position->x = AxeInit_RoutePointX(route);
     position->z = AxeInit_RoutePointZ(route);
     position->y = MonsterInit_TerrainHeight(MonsterInit_CellIndex(position), position);
 }
-static inline void AxeInit_DrawablePosition(struct AxeInitActor *actor)
+static inline void AxeInit_DrawablePosition(struct SceneActorRegistryResetView *actor)
 {
     if (AxeInit_GetDrawableKind(actor) == 0)
         *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
@@ -614,19 +412,19 @@ static inline void AxeInit_DrawablePosition(struct AxeInitActor *actor)
         *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
 }
 
-static inline u8 AxeInit_RouteId(struct AxeInitRoute *route)
+static inline u8 AxeInit_RouteId(struct SceneActorRegistryRoute *route)
 {
     return route->routeId;
 }
-static inline u8 AxeInit_RouteParameter(struct AxeInitRoute *route)
+static inline u8 AxeInit_RouteParameter(struct SceneActorRegistryRoute *route)
 {
     return route->parameterB;
 }
-static inline u8 AxeInit_RoutePointId(struct AxeInitRoute *route)
+static inline u8 AxeInit_RoutePointId(struct SceneActorRegistryRoute *route)
 {
     return route->pointId;
 }
-static inline u8 AxeInit_RouteActiveBranch(struct AxeInitRoute *route)
+static inline u8 AxeInit_RouteActiveBranch(struct SceneActorRegistryRoute *route)
 {
     return route->activeBranch;
 }
@@ -639,49 +437,52 @@ static inline s32 AxeInit_ClampHealth(u16 raw)
     return health;
 }
 
-static inline void AxeInit_InstallIdle(struct AxeInitActor *actor, void *idle)
+static inline void AxeInit_InstallIdle(struct SceneActorRegistryResetView *actor, void *idle)
 {
-    actor->field21C = idle;
+    actor->target = idle;
 }
 
-static inline void AxeInit_InitializeHealth(struct AxeInitActor *arg0, u16 initialHealth,
-                                            s32 firstLimit, s32 secondLimit)
+static inline void AxeInit_InitializeHealth(struct SceneActorRegistryResetView *arg0,
+                                            u16 initialHealth, s32 firstLimit, s32 secondLimit)
 {
-    arg0->field2D4 = 0;
+    arg0->flags2D4 = 0;
     AxeInit_InstallIdle(arg0, SceneActorControl_OnIdle);
     arg0->field2B2 = 1;
     arg0->field2B0 = 0;
-    arg0->field9C = AxeInit_ClampHealth(initialHealth);
+    arg0->health = AxeInit_ClampHealth(initialHealth);
     arg0->fieldAA = 0;
     if (secondLimit <= 0)
         secondLimit = firstLimit;
-    arg0->fieldA6 = firstLimit;
+    arg0->attachmentLimit = firstLimit;
     arg0->fieldA8 = secondLimit;
-    arg0->field2FA = 0;
+    arg0->regionId = 0;
 }
 
-static inline void AxeInit_SetInitialHealth(struct AxeInitActor *actor, u16 health)
+static inline void AxeInit_SetInitialHealth(struct SceneActorRegistryResetView *actor, u16 health)
 {
-    actor->fieldB0 = health;
+    actor->defaultHealth = health;
 }
 
-static inline u32 AxeInit_RouteAlternateBranch(struct AxeInitRoute *route)
+static inline u32 AxeInit_RouteAlternateBranch(struct SceneActorRegistryRoute *route)
 {
     return 1 ^ route->activeBranch;
 }
-static inline void AxeInit_BeginRoute(struct AxeInitBody *body, struct AxeInitRoute *route)
+static inline void AxeInit_BeginRoute(struct SceneActorBody *body,
+                                      struct SceneActorRegistryRoute *route)
 {
     SceneBody_StartRoute(body, route, AxeInit_RouteId(route), AxeInit_RouteParameter(route),
                          AxeInit_RoutePointId(route));
 }
 
-static inline void AxeInit_SetFirstAttack(struct AxeInitActor *actor, s32 index, s32 value)
+static inline void AxeInit_SetFirstAttack(struct SceneActorRegistryResetView *actor, s32 index,
+                                          s32 value)
 {
     actor->attacks.first[index] = value;
 }
 
-static inline u32 AxeInit_ReadRoute(struct AxeInitActor *arg0, struct AxeInitGroup *group,
-                                    struct AxeInitRoute *rt)
+static inline u32 AxeInit_ReadRoute(struct SceneActorRegistryResetView *arg0,
+                                    struct SceneActorChaseGroup *group,
+                                    struct SceneActorRegistryRoute *rt)
 {
     struct ContactPosition point;
     s32 r1v;
@@ -697,8 +498,9 @@ static inline u32 AxeInit_ReadRoute(struct AxeInitActor *arg0, struct AxeInitGro
         rt->branches[AxeInit_RouteAlternateBranch(rt)] =
             Script_GetPc() ? Script_GetValue() : AxeInit_RouteId(rt);
         Path_GetPointPositionById((u16 *)&point, AxeInit_RouteId(rt), AxeInit_RoutePointId(rt));
-        arg0->field2F4 = MonsterInit_CellIndex(&point);
-        point.y = arg0->field2BE = MonsterInit_TerrainHeight(AxeInit_GetTerrainCell(arg0), &point);
+        arg0->terrainCell = MonsterInit_CellIndex(&point);
+        point.y = arg0->groundHeight2BE =
+            MonsterInit_TerrainHeight(AxeInit_GetTerrainCell(arg0), &point);
         AxeInit_BeginRoute(&arg0->body, rt);
         return 1;
     } else {
@@ -706,8 +508,8 @@ static inline u32 AxeInit_ReadRoute(struct AxeInitActor *arg0, struct AxeInitGro
         rt->parameterB = 0;
         rt->pointId = 0;
         rt->currentPoint = 0;
-        group->route.branches[AxeInit_RouteActiveBranch(rt)] = 0;
-        group->route.branches[AxeInit_RouteAlternateBranch(rt)] = 0;
+        group->homeRoute.branches[AxeInit_RouteActiveBranch(rt)] = 0;
+        group->homeRoute.branches[AxeInit_RouteAlternateBranch(rt)] = 0;
     }
 
     return 0;
@@ -715,19 +517,19 @@ static inline u32 AxeInit_ReadRoute(struct AxeInitActor *arg0, struct AxeInitGro
 
 static inline void AxeInit_InitializeBody(void *object, u32 *fill)
 {
-    struct AxeInitActor *arg0 = object;
-    struct AxeInitGroup *group = &arg0->group;
-    struct AxeInitBody *body = &arg0->body;
+    struct SceneActorRegistryResetView *arg0 = object;
+    struct SceneActorChaseGroup *group = &arg0->group;
+    struct SceneActorBody *body = &arg0->body;
     struct ContactPosition origin;
     struct ContactPosition point;
     s32 mode, i, r4v, r6v, r5v, r2v, r1v;
     u16 initialHealth;
-    struct AxeInitRoute *rt;
-    arg0->field2CC = 0;
-    arg0->field2D0 = 0;
-    arg0->field2B4 = 0;
+    struct SceneActorRegistryRoute *rt;
+    arg0->flags2CC = 0;
+    arg0->flags2D0 = 0;
+    arg0->enabled = 0;
     arg0->field2E8 = 8;
-    arg0->field2C0 = Script_GetKeywordValue(0x4D, 0);
+    arg0->flags2C0 = Script_GetKeywordValue(0x4D, 0);
     arg0->field2C2 = 0x40;
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
@@ -754,9 +556,9 @@ static inline void AxeInit_InitializeBody(void *object, u32 *fill)
         r6v = 0;
         r2v = 0;
     }
-    AxeInit_InitializeGate(&group->gate, r2v);
-    AxeInit_ReadRange(&group->range);
-    AxeInit_ReadTargeting(&arg0->targeting);
+    AxeInit_InitializeGate(&group->common.gate, r2v);
+    AxeInit_ReadRange(&group->common.control);
+    AxeInit_ReadTargeting(&arg0->tracking);
     if (Script_GetKeywordValue(0x62, 0))
         AxeInit_SetStatusFlags(arg0, 0x200);
     arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
@@ -764,7 +566,7 @@ static inline void AxeInit_InitializeBody(void *object, u32 *fill)
 
     if (Script_SeekToKeyword(0x41)) {
         AxeInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
-        group->field5B6 = AxeInit_Half(AxeInit_GetInitialHealth(arg0));
+        group->halfHealth = AxeInit_Half(AxeInit_GetInitialHealth(arg0));
         arg0->field9E = MonsterInit_ReadByte(0);
         arg0->field9F = MonsterInit_ReadByte(0);
         arg0->fieldA0 = MonsterInit_ReadByte(0);
@@ -789,7 +591,7 @@ static inline void AxeInit_InitializeBody(void *object, u32 *fill)
         AxeInit_SetStatusFlags(arg0, 0x8000);
 
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
-    rt = &group->route;
+    rt = &group->homeRoute;
     if (AxeInit_ReadRoute(arg0, group, rt)) {
         AxeInit_SnapToRoute(&arg0->body.position, rt);
         AxeInit_DrawablePosition(arg0);
@@ -804,8 +606,8 @@ static inline void AxeInit_InitializeBody(void *object, u32 *fill)
     else
         SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 
-    group->field3D4 = arg0->body.id;
-    group->field3D8 = (u32)&arg0->body.position;
+    group->common.bodyId = arg0->body.id;
+    group->common.bodyPosition = &arg0->body.position;
 }
 
 struct AxeInitWidget {
@@ -816,28 +618,30 @@ static inline void AxeInit_SetWidgetScriptPalette(struct AxeInitWidget *widget, 
 {
     widget->paletteBank = scriptPalette - 0x5FFF;
 }
-static inline void AxeInit_SetMotionControl(struct AxeInitActor *actor, void *callback, u32 kind)
+static inline void AxeInit_SetMotionControl(struct SceneActorRegistryResetView *actor,
+                                            void *callback, u32 kind)
 {
-    actor->field104 = (u32)callback;
-    actor->field108 = 0;
-    actor->field10C = 0;
-    actor->field110 = kind;
-    actor->field114 = 1;
+    actor->word104 = (u32)callback;
+    actor->word108 = 0;
+    actor->word10C = 0;
+    actor->word110 = kind;
+    actor->flags114 = 1;
 }
 static inline void AxeInit_ClearMotion(void *object)
 {
-    struct AxeInitActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     u32 zero = 0;
     AxeInit_SetMotionControl(actor, 0, 0);
-    actor->field114 = zero;
+    actor->flags114 = zero;
 }
-static inline void AxeInit_ReadPalette(struct AxeInitActor *actor, u32 base, u32 alternate)
+static inline void AxeInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
+                                       u32 alternate)
 {
     s32 r1v;
-    actor->field1E6 = Script_GetKeywordValue(0x43, 0);
-    actor->field1E0 = base;
-    actor->field1E2 = alternate;
-    actor->field1E4 = AxeInit_GetPaletteOffset(actor) + base;
+    actor->paletteOffset = Script_GetKeywordValue(0x43, 0);
+    actor->basePaletteBank = base;
+    actor->paletteAlternateBank = alternate;
+    actor->alternateOffset = AxeInit_GetPaletteOffset(actor) + base;
     r1v = AxeInit_GetPaletteBase(actor) + AxeInit_GetPaletteOffset(actor);
     if (AxeInit_GetDrawableKind(actor) == 0)
         AnimData_SelectPaletteBank(actor->drawable + 0x2C, r1v);
@@ -848,84 +652,91 @@ static inline void AxeInit_ReadPalette(struct AxeInitActor *actor, u32 base, u32
                                        SceneActorScript_GetManagerField62());
 }
 
-static inline void AxeInit_InstallPrimary(struct AxeInitActor *arg0, void *cb0, s32 (*cb1)(void),
-                                          void *cb2, void *cb3, void *cb4, void *hidden, void *cb5,
-                                          void *cb6, void *defaultReaction, s32 (*cb270)(void *),
-                                          void *targetQuery, void *damage, void *contact)
+static inline void AxeInit_InstallPrimary(struct SceneActorRegistryResetView *arg0, void *cb0,
+                                          s32 (*cb1)(void), void *cb2, void *cb3, void *cb4,
+                                          void *hidden, void *cb5, void *cb6, void *defaultReaction,
+                                          s32 (*cb270)(void *), void *targetQuery, void *damage,
+                                          void *contact)
 {
     AxeInit_SetBehaviorFlags(arg0, 0x2000);
-    arg0->field274 = cb0;
-    arg0->field260 = cb1;
-    arg0->field224 = cb2;
-    arg0->field228 = cb3;
-    arg0->field22C = cb4;
-    arg0->field230 = cb5;
-    arg0->field234 = cb6;
+    arg0->contextCallback = cb0;
+    {
+        s32 (**slot)(void) = (void *)&arg0->animationQuery.opaque;
+        *slot = cb1;
+    }
+    arg0->entryTarget224 = cb2;
+    arg0->entryTarget228 = cb3;
+    arg0->savedTarget = cb4;
+    arg0->reactionTarget230 = cb5;
+    arg0->deathControl = cb6;
     arg0->field220 = hidden;
-    arg0->field278 = defaultReaction;
-    arg0->field270 = cb270;
-    arg0->field250 = gUnk_086108B0;
-    arg0->field248 = 0;
-    arg0->field26C = targetQuery;
+    arg0->defaultReaction = defaultReaction;
+    {
+        s32 (**slot)(void *) = (void *)&arg0->contactQuery.opaque;
+        *slot = cb270;
+    }
+    MonsterInit_WriteDataPointer(&arg0->commandTable.opaque, gUnk_086108B0);
+    arg0->callback248 = 0;
+    arg0->update26C = targetQuery;
     arg0->field238 = SceneActorReaction_SinkAndRemove;
-    arg0->field264 = damage;
-    arg0->field268 = contact;
+    arg0->damageCallback = damage;
+    arg0->contactCallback = contact;
     arg0->field240 = 0;
     AxeInit_ClearMotion(arg0);
 }
 
-static inline void AxeInit_InitializeGroup(struct AxeInitGroup *group, void *firstBounds,
+static inline void AxeInit_InitializeGroup(struct SceneActorChaseGroup *group, void *firstBounds,
                                            void *secondBounds, void *downed, void *returnToRoute,
                                            void *recover, void *animate)
 {
-    group->field5D0 = firstBounds;
-    group->field5D4 = secondBounds;
-    group->field5F4 = downed;
-    group->field5F8 = recover;
+    group->route = firstBounds;
+    group->destination = secondBounds;
+    group->routePhaseCallback = downed;
+    group->fallback = recover;
     group->field5FC = SceneActorReaction_BeginFadedState;
     group->field600 = SceneActorReaction_BeginDefeatBurst;
-    group->field43C = returnToRoute;
-    group->field440 = 0;
-    group->range.field42B = 1;
-    group->field618 = sub_0807DB34;
+    group->common.field43C = returnToRoute;
+    group->common.field440 = 0;
+    group->common.control.active = 1;
+    group->interactionCallback = sub_0807DB34;
     group->field608 = 0;
-    group->field61C = 0;
+    group->responseCallback = 0;
     group->field620 = 0;
-    group->field5F0 = SceneActorReaction_RestoreAfterTurns;
+    group->turnControl = SceneActorReaction_RestoreAfterTurns;
     group->field60C = sub_0807FCA8;
     group->field604 = (u32)animate;
     group->field614 = SceneActorReaction_TurnBackToRoute;
-    group->field5E8 = 0;
-    group->field444 = sub_0807F130;
-    group->gate.field41C = SceneActorReaction_UpdateAnimationGate;
-    group->gate.field41A = 0x28;
-    group->field5DC = sub_0808170C;
+    group->routeChoiceControl = 0;
+    group->common.fallback = sub_0807F130;
+    group->common.gate.control = SceneActorReaction_UpdateAnimationGate;
+    group->common.gate.field41A = 0x28;
+    group->contactControl = sub_0808170C;
     group->field5E0 = SceneActorReaction_ResumeAfterAnimation;
     group->field5E4 = SceneActorReaction_TryResumeRoute;
     group->field610 = SceneActorReaction_BeginReactionSound;
 }
 
-static inline void AxeInit_InitializeRegion(struct AxeInitActor *arg0)
+static inline void AxeInit_InitializeRegion(struct SceneActorRegistryResetView *arg0)
 {
     if (AxeInit_TestMotionFlags(arg0, 2))
-        arg0->field2FA = *(u32 *)(gGameState + 0x5A0);
+        arg0->regionId = *(u32 *)(gGameState + 0x5A0);
     else
-        arg0->field2FA = (u16)(u32)Region_FindContaining(&arg0->body.position);
+        arg0->regionId = (u16)(u32)Region_FindContaining(&arg0->body.position);
 }
 
-static inline void AxeInit_InstallCompletionCallbacks(struct AxeInitActor *arg0)
+static inline void AxeInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
 {
-    arg0->field24C = SceneActorScript_OnCommand;
-    arg0->field258 = Axe_OnRender;
-    arg0->field25C = Axe_ReleaseResources;
+    arg0->messageCallback = SceneActorScript_OnCommand;
+    arg0->updateCallback = Axe_OnRender;
+    arg0->destroyCallback = Axe_ReleaseResources;
 }
 
-static inline u8 *AxeInit_Drawable(struct AxeInitActor *actor)
+static inline u8 *AxeInit_Drawable(struct SceneActorRegistryResetView *actor)
 {
     return actor->drawable;
 }
 
-static inline void AxeInit_SetCategory(struct AxeInitActor *actor, u8 category)
+static inline void AxeInit_SetCategory(struct SceneActorRegistryResetView *actor, u8 category)
 {
     actor->category = category;
 }
@@ -937,12 +748,12 @@ static inline void AxeInit_InitializeSprite(u8 *drawable, u16 resource, u16 sequ
     SceneActorAnimation_InitEnemySequence(drawable, sequence);
 }
 
-static inline void AxeInit_InstallRoutes(struct AxeInitActor *actor)
+static inline void AxeInit_InstallRoutes(struct SceneActorRegistryResetView *actor)
 {
-    actor->field248 = SceneActorControl_InitializeHoverState;
+    actor->callback248 = SceneActorControl_InitializeHoverState;
     actor->field23C = Axe_OnReaction;
 }
-static inline void AxeInit_ClearReceiver(struct AxeInitActor *actor)
+static inline void AxeInit_ClearReceiver(struct SceneActorRegistryResetView *actor)
 {
     actor->field304 = 0;
 }
@@ -963,37 +774,37 @@ static inline u8 AxeInit_BoundedVariant(s32 variant)
     return variant;
 }
 
-static inline void AxeInit_SetVariant(struct AxeInitActor *actor, u8 variant)
+static inline void AxeInit_SetVariant(struct SceneActorRegistryResetView *actor, u8 variant)
 {
-    actor->variantED7 = variant;
+    ((struct AxeInstanceState *)actor)->variantED7 = variant;
 }
 
-static inline void AxeInit_InitializePaletteRange(struct AxeInitActor *actor, u32 alternate,
-                                                  u32 current)
+static inline void AxeInit_InitializePaletteRange(struct SceneActorRegistryResetView *actor,
+                                                  u32 alternate, u32 current)
 {
-    actor->field1DC = AxeInit_GetPaletteBase(actor) + alternate;
-    actor->field1DE = AxeInit_GetPaletteBase(actor) + current;
+    actor->alternatePalette = AxeInit_GetPaletteBase(actor) + alternate;
+    actor->paletteBank = AxeInit_GetPaletteBase(actor) + current;
 }
 
-static inline void AxeInit_SetCurrentPalette(struct AxeInitActor *actor, u16 palette)
+static inline void AxeInit_SetCurrentPalette(struct SceneActorRegistryResetView *actor, u16 palette)
 {
-    actor->field1E4 = palette;
+    actor->alternateOffset = palette;
 }
 
 s32 Axe_Init(void *object)
 {
-    struct AxeInitActor *arg0 = object;
-    struct AxeInitActor *actor = object;
-    struct AxeInitGroup *group = &arg0->group;
+    struct SceneActorRegistryResetView *arg0 = object;
+    struct SceneActorRegistryResetView *actor = object;
+    struct SceneActorChaseGroup *group = &arg0->group;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
     s32 variant;
 
-    arg0->savedFlagsE4C = 0;
+    ((struct AxeInstanceState *)arg0)->savedFlagsE4C = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    actor->variantED7 = Script_GetKeywordValue('t', 0);
-    variant = AxeInit_BoundedVariant(actor->variantED7);
+    ((struct AxeInstanceState *)actor)->variantED7 = Script_GetKeywordValue('t', 0);
+    variant = AxeInit_BoundedVariant(((struct AxeInstanceState *)actor)->variantED7);
     AxeInit_SetVariant(arg0, variant);
     if (variant == 0)
         AxeInit_SetCategory(actor, 12);
@@ -1016,26 +827,26 @@ s32 Axe_Init(void *object)
         heap = AxeInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         AxeInit_InitializeWidget(heap, 0xCB05, 0x5291, &tmp);
-        actor->field2B7 = 0xFF;
+        actor->animationIndex = 0xFF;
     }
     AxeInit_InitializeBody(arg0, &zero);
-    arg0->halfHealthE48 = AxeInit_GetHealth(actor) >> 1;
+    ((struct AxeInstanceState *)arg0)->halfHealthE48 = AxeInit_GetHealth(actor) >> 1;
     Axe_InitAttackCooldowns(actor);
     if (Script_SeekToKeyword('p')) {
         u32 height;
         actor->body.position.x = MonsterInit_ReadHalfword(0);
         actor->body.position.y = MonsterInit_ReadHalfword(0);
         actor->body.position.z = MonsterInit_ReadHalfword(0);
-        actor->field2F4 = MonsterInit_CellIndex(&actor->body.position);
+        actor->terrainCell = MonsterInit_CellIndex(&actor->body.position);
         height = MonsterInit_TerrainHeight(AxeInit_GetTerrainCell(actor), &actor->body.position);
-        actor->field2BE = height;
-        arg0->groundHeightE58 = height;
+        actor->groundHeight2BE = height;
+        ((struct AxeInstanceState *)arg0)->groundHeightE58 = height;
     } else {
-        arg0->groundHeightE58 = actor->field2BE;
+        ((struct AxeInstanceState *)arg0)->groundHeightE58 = actor->groundHeight2BE;
     }
-    arg0->fieldEB6 = Script_GetKeywordValue('w', -1);
+    ((struct AxeInstanceState *)arg0)->fieldEB6 = Script_GetKeywordValue('w', -1);
     ActorGroup_ReadScriptOptions(actor);
-    arg0->playerPositionF1C = gPlayers[0]->position;
+    ((struct AxeInstanceState *)arg0)->playerPositionF1C = gPlayers[0]->position;
     AxeInit_ReadPalette(actor, 0x2BD, 0x192);
     AxeInit_InitializePaletteRange(actor, 0, 2);
     Axe_InitEffectPalettes(actor);
@@ -1048,7 +859,7 @@ s32 Axe_Init(void *object)
                            sub_081363F4, SceneActorControl_AdvanceReactionCount);
     AxeInit_InitializeGroup(group, (u8 *)arg0 + 0xED8, (u8 *)arg0 + 0xEFC, 0, 0, 0, 0);
     AxeInit_InstallRoutes(actor);
-    group->field61C = 0;
+    group->responseCallback = 0;
     group->field5EC = 0;
     group->field614 = Axe_ReleaseAndIdle;
     group->field610 = Axe_UpdateDamageSpin;
@@ -1081,13 +892,13 @@ s32 Axe_Init(void *object)
     Axe_InitMotionTable(actor);
     Axe_InitActionCallbacks(actor);
     Axe_InitEventCallbacks(actor);
-    actor->drawable[7] = 1;
+    AxeInit_Drawable(actor)[7] = 1;
     actor->field2E8 = 0;
     SpriteGroup_InitAnimatedSprites(actor);
     Axe_InitRoutePointHistory(actor);
     ActorCollision_InitThreeAuxiliaryAttacks(actor);
     AxeInit_SaveControl(AxeInit_SavedControlOf(actor), actor);
-    actor->saved.field130 = arg0->savedFlagsE4C;
+    actor->saved.privateFlags = ((struct AxeInstanceState *)arg0)->savedFlagsE4C;
     AxeInit_InstallCompletionCallbacks(actor);
     if (!SceneActorRegistry_LinkActor(actor))
         return -1;
