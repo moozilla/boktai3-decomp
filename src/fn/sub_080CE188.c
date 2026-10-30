@@ -2,29 +2,7 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
-
-/* The delayed response shares its first eight bytes with saved control. */
-struct GolemDelayedResponse {
-    struct SceneActorChaseSavedControl saved;
-    u8 state, phase, behavior, kind;
-    s32 delay;
-    void *control;
-};
-
-static inline void Golem_PrepareDelay(struct GolemDelayedResponse *response, void *control,
-                                      u32 behavior, s32 duration)
-{
-    response->delay = duration;
-    response->control = control;
-    response->state = 0;
-    response->phase = 0;
-    response->behavior = behavior;
-}
-
-static inline u8 Golem_TakeStateEntry(struct SceneActorRegistryResetView *actor)
-{
-    return SceneActorControl_TakeFlag(&actor->field2B1);
-}
+#include "scene_actor_delayed_response.h"
 
 u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
 u8 SceneActorTarget_TrySelectNearestParticipant(struct SceneActorRegistryResetView *);
@@ -38,7 +16,7 @@ static inline void Golem_SetRouteFlags(u32 *field, u32 bits)
 void Golem_ResumeRouteAfterControl(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    Golem_TakeStateEntry(actor);
+    SceneActorControl_TakeStateEntry(actor);
     if (Golem_InvokeEnabledBehavior(actor))
         return;
     if (actor->field2B0) {
@@ -48,7 +26,7 @@ void Golem_ResumeRouteAfterControl(struct SceneActorRegistryResetView *actor)
         ProximityVolume_TranslateBounds(group->route, &actor->body.position);
         blocked = SceneActorChase_MotionFlags(actor, 0x80);
         if (blocked) {
-            Golem_PrepareDelay((void *)&group->saved, group->common.gate.control, 12, 30);
+            SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
             if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
                 if (!SceneActorTarget_TrySelectNearestParticipant(actor))
                     return;
@@ -73,7 +51,7 @@ void Golem_ResumeRouteAfterControl(struct SceneActorRegistryResetView *actor)
             }
             Golem_SetRouteFlags(flags, 0x10);
             actor->field2C2 = 0x40;
-            Golem_PrepareDelay((void *)&group->saved, actor->entryTarget228, 7, 60);
+            SceneActorDelay_Prepare((void *)&group->saved, actor->entryTarget228, 7, 60);
             SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
             group->destination->pad = 1;
             if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,

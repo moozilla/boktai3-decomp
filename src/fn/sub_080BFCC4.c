@@ -1,27 +1,11 @@
 #include "global.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
+#include "scene_actor_delayed_response.h"
 #include "scene_actor_control_phase.h"
 
 u8 sub_0812F3CC(void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
-
-struct SkeletonDelayedResponse {
-    struct SceneActorChaseSavedControl saved;
-    u8 state, phase, behavior, kind;
-    s32 delay;
-    void *control;
-};
-
-static inline void Skeleton_PrepareDelay(struct SkeletonDelayedResponse *response, void *control,
-                                         u32 behavior, s32 duration)
-{
-    response->delay = duration;
-    response->control = control;
-    response->state = 0;
-    response->phase = 0;
-    response->behavior = behavior;
-}
 
 static inline void Skeleton_SnapDelayedRoute(struct ContactPosition *position,
                                              struct SceneActorRegistryRoute *route)
@@ -117,15 +101,10 @@ success:
     return 1;
 }
 
-static inline u8 Skeleton_TakeStateEntry(struct SceneActorRegistryResetView *actor)
-{
-    return SceneActorControl_TakeFlag(&actor->field2B1);
-}
-
 void sub_080BFCC4(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    if (Skeleton_TakeStateEntry(actor))
+    if (SceneActorControl_TakeStateEntry(actor))
         actor->body.direction = actor->tracking.heading;
     if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
@@ -140,7 +119,7 @@ void sub_080BFCC4(struct SceneActorRegistryResetView *actor)
             SceneActorChase_SetState(actor, 3, 1, 0);
             SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
             SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
-            Skeleton_PrepareDelay((void *)&group->saved, actor->entryTarget228, 7, 30);
+            SceneActorDelay_Prepare((void *)&group->saved, actor->entryTarget228, 7, 30);
             Skeleton_SnapDelayedRoute(group->destination, &group->homeRoute);
             if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
                                           group->destination)) {

@@ -1,25 +1,8 @@
 #include "global.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
+#include "scene_actor_delayed_response.h"
 #include "display_sequence_inline.h"
-
-/* The delayed response shares its first eight bytes with saved control. */
-struct GolemDelayedResponse {
-    struct SceneActorChaseSavedControl saved;
-    u8 state, phase, behavior, kind;
-    s32 delay;
-    void *control;
-};
-
-static inline void Golem_PrepareDelay(struct GolemDelayedResponse *response, void *control,
-                                      u32 behavior, s32 duration)
-{
-    response->delay = duration;
-    response->control = control;
-    response->state = 0;
-    response->phase = 0;
-    response->behavior = behavior;
-}
 
 static inline void Golem_SnapDelayedRoute(struct ContactPosition *position,
                                           struct SceneActorRegistryRoute *route)
@@ -134,9 +117,9 @@ void sub_080C7E18(struct SceneActorRegistryResetView *actor, s32 frame)
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         if (Golem_ArriveAfterDelay(actor))
-            Golem_PrepareDelay((void *)&group->saved, group->common.gate.control, 12, 30);
+            SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
     } else {
-        Golem_PrepareDelay((void *)&group->saved, actor->entryTarget228, 7, 40);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->entryTarget228, 7, 40);
         SceneActorChase_SetActorFlags(actor, 0x10);
         actor->field2C2 = 64;
         Golem_SnapDelayedRoute(group->destination, &group->homeRoute);
