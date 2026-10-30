@@ -608,7 +608,7 @@ static inline void GolemInit_ReadRange(struct GolemInitRange *range)
     s32 radius;
     if (Script_SeekToKeyword(0x6E)) {
         radius = GolemInit_Value(0);
-        range->field420 = GolemInit_Value(0);
+        range->field420 = GolemInit_ReadHalfword(0);
     } else {
         radius = 0;
         range->field420 = radius;
@@ -883,7 +883,6 @@ static inline void GolemInit_InstallPrimary(struct GolemInitActor *arg0, s32 (*c
                                             u8 (*cb270)(void *), void *targetQuery, void *damage,
                                             void *contact)
 {
-    GolemInit_SetBehaviorFlags(arg0, 0x2000);
     GolemInit_SetBehaviorFlags(arg0, 0x2000);
     arg0->field274 = cb0;
     arg0->field260 = cb1;
