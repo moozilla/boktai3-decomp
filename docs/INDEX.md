@@ -298,6 +298,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/dialogue-vm_2026-10-12.md](../notes/dialogue-vm_2026-10-12.md) | Dialogue interpreter and scrolling controller |  | 2 |
 | [notes/directional-force_2026-10-14.md](../notes/directional-force_2026-10-14.md) | Directional force controller, 080510B8–080515C0 |  | 2 |
 | [notes/display-track_2026-10-14.md](../notes/display-track_2026-10-14.md) | Script-controlled display tracks | *#scripts* | 4 |
+| [notes/dog-contact-response_2026-10-30.md](../notes/dog-contact-response_2026-10-30.md) | Dog contact response | #matching #monster #dog #080E25FC #compiler | 1 |
 | [notes/effects-background-flash_2026-10-14.md](../notes/effects-background-flash_2026-10-14.md) | Transient sprite effects and BG1 flash controller, October 14 | *#assets* | 7 |
 | [notes/encoded-records_2026-10-14.md](../notes/encoded-records_2026-10-14.md) | Encoded records and password callers, 08044C80–080454C0 | *#menu #tooling* | 5 |
 | [notes/ewram-layout_2026-10-27.md](../notes/ewram-layout_2026-10-27.md) | EWRAM shared declarations and layouts (2026-10-27) | #matching #tooling | 11 |
@@ -380,7 +381,9 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round5-sol.md](../notes/round5-sol.md) | Sol production round 5 |  | 3 |
 | [notes/round6-sol.md](../notes/round6-sol.md) | Production round 6 — Sol |  | 3 |
 | [notes/round7-actor-command-tables_2026-10-30.md](../notes/round7-actor-command-tables_2026-10-30.md) | Round 7 actor command tables | #data #studio #monsters | 1 |
-| [notes/round7-monster-recovery_2026-10-30.md](../notes/round7-monster-recovery_2026-10-30.md) | Round 7: recovered work and continued monster matching | #matching #monsters #compiler #structs #tooling | 5 |
+| [notes/round7-monster-recovery_2026-10-30.md](../notes/round7-monster-recovery_2026-10-30.md) | Round 7: recovered work and continued monster matching | #matching #monsters #compiler #structs #tooling | 7 |
+| [notes/round7-monsters-early_2026-10-30.md](../notes/round7-monsters-early_2026-10-30.md) | Round 7 early monster matches | #monsters #ghoul #matching | 11 |
+| [notes/round7-tentacle-wander_2026-10-30.md](../notes/round7-tentacle-wander_2026-10-30.md) | Tentacle wander-route selection | #matching #monsters #tentacle #080A8904 | 1 |
 | [notes/s0.md](../notes/s0.md) | s0 notes | *#tooling* | 11 |
 | [notes/s1.md](../notes/s1.md) | s1 notes | *#tooling* | 12 |
 | [notes/s2.md](../notes/s2.md) | s2 notes (range 080C9844-0813B134) |  | 11 |
