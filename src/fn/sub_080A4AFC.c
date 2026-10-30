@@ -16,7 +16,6 @@ void sub_081363F4(void);
 void SceneActorScript_OnCommand(void);
 extern SceneActorCommandHandler const gUnk_086108B0[];
 void AnimData_SelectPaletteBank(void *, s32);
-s32 SceneActorScript_GetManagerField62(void);
 void SceneActorPlacement_HideActor(void *, s32);
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void Anim_Step(void *, void *);
@@ -174,7 +173,7 @@ s32 Spider_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_ClearColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);

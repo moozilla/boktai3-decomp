@@ -1,3 +1,4 @@
+#include "scene_body_api.h"
 #include "global.h"
 #include "scene_actor_state.h"
 #include "render.h"
@@ -27,11 +28,7 @@ void Crow_TryActivatePlayerProximityResponse(void);
 void SceneActorScript_OnCommand(void);
 void Crow_InitPlayerTarget(void);
 void Crow_Destroy(void);
-void SceneBody_Init(void *, s32, void *, s32, s32, void *);
-void SceneBody_SetSprite(void *, void *);
-void SceneBody_SetMovementProbe(void *, void *, s32, s32);
 void AnimData_SelectPaletteBank(void *, s32);
-s32 SceneActorScript_GetManagerField62(void);
 void Crow_InitColliders(void *);
 void SceneActorPlacement_HideActor(void *, s32);
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
@@ -116,7 +113,7 @@ static inline void Crow_ReadPalette(struct SceneActorRegistryResetView *actor, u
     actor->paletteAlternateBank = alternate;
     currentPalette = MonsterInit_GetPaletteOffset(actor);
     currentPalette += 0x1CE;
-    MonsterInit_SetCurrentPalette(actor, (u16)currentPalette);
+    MonsterInit_SetAlternatePaletteOffset(actor, (u16)currentPalette);
     r1v = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0)
         AnimData_SelectPaletteBank(actor->drawable + 0x2C, r1v);
@@ -198,7 +195,7 @@ s32 Crow_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_ClearColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);

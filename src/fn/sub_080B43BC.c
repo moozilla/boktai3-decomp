@@ -1,3 +1,4 @@
+#include "scene_body_api.h"
 #include "global.h"
 #include "render.h"
 #include "engine_globals.h"
@@ -14,13 +15,9 @@ void sub_08080BE0(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void sub_081363F4(void);
 void SceneActorScript_OnCommand(void);
-void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
-void SceneBody_SetSprite(void *, void *);
-void SceneBody_SetMovementProbe(void *, void *, s32, s32);
 void AnimData_SelectPaletteBank(void *, s32);
-s32 SceneActorScript_GetManagerField62(void);
 void SceneActorPlacement_HideActor(void *, s32);
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void Anim_Step(void *, void *);
@@ -293,7 +290,7 @@ s32 Vorn_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_ClearColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);

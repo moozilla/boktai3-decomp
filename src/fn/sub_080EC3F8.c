@@ -1,3 +1,4 @@
+#include "scene_body_api.h"
 #include "global.h"
 #include "scene_actor_init_group.h"
 #include "scene_actor_init_dispatch.h"
@@ -30,12 +31,8 @@ void SceneActorScript_OnCommand(void);
 void sub_08080BE0(void);
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorBehavior_InitializeShadow(void *);
-void SceneBody_Init(void *, s32, void *, s32, s32, void *);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
-void SceneBody_SetSprite(void *, void *);
-void SceneBody_SetMovementProbe(void *, void *, s32, s32);
-s32 SceneActorScript_GetManagerField62(void);
 void SceneActorPlacement_HideActor(void *, s32);
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void SceneActorBehavior_InstallCallbackTables(void *);
@@ -239,7 +236,7 @@ s32 Octopus_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_ClearColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
     if (Script_GetKeywordValue('S', 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);

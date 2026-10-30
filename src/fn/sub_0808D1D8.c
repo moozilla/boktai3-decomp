@@ -43,7 +43,6 @@ void Ghoul_SetSpecialHandlers(void *);
 void Ghoul_SetBehaviorTable(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorBehavior_InitializeShadow(void *);
-s32 SceneActorScript_GetManagerField62(void);
 void SceneActorPlacement_HideActor(void *, s32);
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void SceneActorBehavior_InstallCallbackTables(void *);
@@ -169,7 +168,7 @@ s32 Ghoul_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_ClearColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
     if (Script_GetKeywordValue('S', 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);

@@ -46,7 +46,6 @@ void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
 void SceneActorScript_OnCommand(void);
 void SceneActorMovement_ResolveRoutePosition(void *);
-s32 SceneActorScript_GetManagerField62(void);
 void SceneActorPlacement_HideActor(void *, s32);
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void SceneActorBehavior_InstallCallbackTables(void *);
@@ -195,7 +194,7 @@ s32 Axe_Init(void *object)
     MonsterInit_ReadPalette(actor, 0x2BD, 0x192);
     AxeInit_InitializePaletteRange(actor, 0, 2);
     Axe_InitEffectPalettes(actor);
-    MonsterInit_SetCurrentPalette(actor, 0x1EE);
+    MonsterInit_SetAlternatePaletteOffset(actor, 0x1EE);
     Axe_InitColliders(actor);
     AxeInit_InstallPrimary(actor, Axe_OnUpdate, Axe_GetActorCategory, Axe_UpdateTurnAnimation,
                            Axe_OnAnimationReset, sub_080F93A4, 0, Axe_ConvergeRecoveryMotion,
@@ -224,7 +223,7 @@ s32 Axe_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_ClearColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
     if (Script_GetKeywordValue('S', 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);

@@ -1,3 +1,4 @@
+#include "scene_body_api.h"
 #include "global.h"
 #include "scene_actor_control_motion.h"
 #include "display_sequence_inline.h"
@@ -13,11 +14,7 @@
 #define PTR(p, n) (*(void **)((u8 *)(p) + (n)))
 void SceneActorRegistry_SetObjectContext(void *, void *, u32, void *);
 void Ghost_InitActorProfile(void *);
-void SceneBody_Init(void *, u32, void *, u32, u32, void *);
-void SceneBody_SetSprite(void *, void *);
-void SceneBody_SetMovementProbe(void *, void *, u32, u32);
 s32 Route_GetCurrentPointFacing(void *);
-s32 SceneActorScript_GetManagerField62(void);
 void SceneActor_InitLinkedReactionColliders(void *);
 void SceneActorBehavior_InitializeShadow(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);

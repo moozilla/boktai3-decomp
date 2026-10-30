@@ -130,7 +130,7 @@ static inline u32 MonsterInit_GetAlternatePalette(struct SceneActorRegistryReset
 {
     return actor->paletteAlternateBank;
 }
-static inline u32 MonsterInit_GetCurrentPalette(struct SceneActorRegistryResetView *actor)
+static inline u32 MonsterInit_GetAlternatePaletteOffset(struct SceneActorRegistryResetView *actor)
 {
     return actor->alternateOffset;
 }
@@ -138,8 +138,8 @@ static inline u32 MonsterInit_GetPaletteOffset(struct SceneActorRegistryResetVie
 {
     return actor->paletteOffset;
 }
-static inline void MonsterInit_SetCurrentPalette(struct SceneActorRegistryResetView *actor,
-                                                 u32 palette)
+static inline void MonsterInit_SetAlternatePaletteOffset(struct SceneActorRegistryResetView *actor,
+                                                         u32 palette)
 {
     actor->alternateOffset = palette;
 }
@@ -224,10 +224,10 @@ static inline u8 MonsterInit_TestMotionFlags(struct SceneActorRegistryResetView 
         return 1;
     return 0;
 }
-static inline void MonsterInit_ClearControlFlags(struct SceneActorRegistryResetView *actor,
-                                                 u32 mask)
+static inline void MonsterInit_MaskControlFlags(struct SceneActorRegistryResetView *actor,
+                                                u32 keepMask)
 {
-    actor->flags114 &= mask;
+    actor->flags114 &= keepMask;
 }
 static inline void MonsterInit_SetMotionControl(struct SceneActorRegistryResetView *actor,
                                                 void *callback, u32 kind)
@@ -253,7 +253,7 @@ static inline void MonsterInit_SetControl(struct SceneActorRegistryResetView *ac
     actor->field2B5 = behavior;
     actor->target = callback;
     actor->field2C8 = 0;
-    MonsterInit_ClearControlFlags(actor, ~1);
+    MonsterInit_MaskControlFlags(actor, ~1);
     actor->word104 = 0;
 }
 static inline void MonsterInit_SetState(struct SceneActorRegistryResetView *actor, u32 state,
@@ -356,9 +356,9 @@ static inline s32 MonsterInit_Half(s32 value)
     return -(-value >> 1);
 }
 
-static inline void MonsterInit_ClearColliderFlags(struct ContactCollider *collider, u32 mask)
+static inline void MonsterInit_MaskColliderFlags(struct ContactCollider *collider, u32 keepMask)
 {
-    collider->flags = mask & collider->flags;
+    collider->flags = keepMask & collider->flags;
 }
 
 static inline void MonsterInit_ReadInitialMode(struct SceneActorRegistryResetView *arg0)

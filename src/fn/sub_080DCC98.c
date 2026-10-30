@@ -15,7 +15,6 @@ u32 SceneActorReaction_OnEnemyDefault(void);
 void sub_081363F4(void);
 void SceneActorScript_OnCommand(void);
 void AnimData_SelectPaletteBank(void *, s32);
-s32 SceneActorScript_GetManagerField62(void);
 void SceneActorPlacement_HideActor(void *, s32);
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void Anim_Step(void *, void *);
@@ -161,7 +160,7 @@ s32 Mummy_Init(void *object)
     group->common.fallback = sub_080D453C;
     actor->field2E8 = 1;
     MummyInit_EnableInitialFlags(actor);
-    MonsterInit_ClearColliderFlags(&actor->colliderA, ~1);
+    MonsterInit_MaskColliderFlags(&actor->colliderA, ~1);
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorEffects_InitAtActorPosition(arg0);
     SceneActorTerrain_ReadScriptParameters(actor);
@@ -177,7 +176,7 @@ s32 Mummy_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_ClearColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);

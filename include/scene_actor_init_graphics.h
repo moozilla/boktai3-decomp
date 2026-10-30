@@ -2,13 +2,13 @@
 #define GUARD_SCENE_ACTOR_INIT_GRAPHICS_H
 
 #include "scene_actor_init_actor.h"
+#include "scene_actor_script_api.h"
 #include "display_keyframe.h"
 #include "display_resource.h"
 #include "render.h"
 
 s32 AnimData_Load(void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
-s32 SceneActorScript_GetManagerField62(void);
 void Sprite_Init(void *, void *, s32);
 void SceneActorAnimation_InitEnemySequence(void *, u32);
 void *ScriptProc_Start(u16, u16);
