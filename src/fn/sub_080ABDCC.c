@@ -38,7 +38,7 @@ u32 TentacleActor_OnResolveVariantValue(void *);
 void TentacleBody_OnIdleState(void *);
 void TentacleBody_UpdateAttackWindup(void *);
 void TentacleBody_ResetDirectionalPose(void *);
-void sub_080A71A0(void *);
+void TentacleBody_ConvergeReactionMotion(void *);
 void TentacleBody_UpdateDefeat(void *);
 void TentacleBody_UpdateHiddenTransition(void *);
 void sub_080ABB18(void *);
@@ -245,7 +245,7 @@ s32 TentacleActor_Init(void *object)
     MonsterInit_InstallPrimary(actor, TentacleActor_OnUpdate, TentacleActor_OnResolveVariantValue,
                                TentacleBody_OnIdleState, TentacleBody_UpdateAttackWindup,
                                TentacleBody_ResetDirectionalPose,
-                               TentacleBody_UpdateHiddenTransition, sub_080A71A0,
+                               TentacleBody_UpdateHiddenTransition, TentacleBody_ConvergeReactionMotion,
                                TentacleBody_UpdateDefeat, SceneActorReaction_OnEnemyDefault, 0,
                                SceneActorReaction_ResolveDamage, sub_080ABB18);
     Tentacle_InstallRoutes(actor);

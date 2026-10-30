@@ -101,3 +101,9 @@ Matched 828 bytes. Signed acceleration replaces the draft's incorrect byte cast;
 Tags: 08093138, Bee, curve, combine
 
 Matched 476 bytes by reusing the established curve interpolation and typed private context. Updating the halfword time directly with the signed random input preserves the original constant copy and addition; the draft step local made combine replace that addition with OR. Formatted stock check reports zero differing bytes, SHA-256 `a6ce6ee4add39168f1c2ddf0d47cc35914297b59002e1487fc5c941305d4c06b`. Named the routine `Bee_AdvanceMovementCurve` and updated its caller.
+
+## Tentacle reaction convergence (080A71A0)
+
+Tags: 080A71A0, Tentacle, reaction, PRE
+
+Matched 532 bytes with typed trail health/count and canonical actor motion. Joined signed truncation preserves both shift-result copies; shared flag components retain the masks and separate zero values used by control resets. Halfword flag masks and motion-clamp bounds resolve the final PRE slot permutation, confirmed against the compiler hash model. Formatted stock check reports zero differing bytes, SHA-256 `03ebcfafb2ee382a44b0611c97079b11fb2346ffa11723d28d0190bf84445e69`.

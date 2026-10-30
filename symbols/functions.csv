@@ -3287,6 +3287,7 @@ addr,name,mode,confidence,source,notes
 080A69F0,TentacleBody_UpdateChargeSpread,thumb,low,src-alias,
 080A6D18,TentacleBody_BeginDirectedAttack,thumb,low,src-alias,
 080A6F50,TentacleBody_UpdateAttackRecovery,thumb,low,src-alias,
+080A71A0,TentacleBody_ConvergeReactionMotion,thumb,low,src-alias,
 080A73B4,TentacleBody_UpdateDefeat,thumb,low,src-alias,
 080A7700,TentacleBody_ApproachWaypoint,thumb,low,src-alias,
 080A79E8,TentacleBody_UpdateRetreat,thumb,low,src-alias,
