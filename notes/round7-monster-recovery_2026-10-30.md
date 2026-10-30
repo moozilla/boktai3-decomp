@@ -52,7 +52,11 @@ The Bat-specific initializer helpers were already file-local in the supplied bas
 
 The [command-table note](round7-actor-command-tables_2026-10-30.md) records the
 eleven editable tables, disjoint Studio atlas ranges and the macOS formatter-test
-repair. The targeted tool suite passes 23 tests.
+repair. Scope's frame report now uses physical instruction offsets when the
+complete listings differ only by a bijective permutation of stack displacements.
+This avoids misleading alignment votes for repeated loads and stores; other
+instruction differences retain the cautious aligned fallback. The targeted
+tool suite passes 41 tests, including eight frame-correspondence regressions.
 
 ## Verification and continuation
 
