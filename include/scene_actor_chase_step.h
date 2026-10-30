@@ -188,7 +188,7 @@ static inline u8 SceneActorChase_Arrive(void *obj)
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
-    struct SceneActorChaseTracking *tracking = (struct SceneActorChaseTracking *)&actor->tracking.target;
+    struct SceneActorChaseTracking *tracking = &actor->tracking;
     s32 cell, player;
     const u16 *randomSamples = gRandomTable;
     void **callback;

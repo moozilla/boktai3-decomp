@@ -93,7 +93,7 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         return;
     if (!actor->field2B3)
         return;
-    group = (struct SceneActorChaseGroup *)&actor->group.common;
+    group = &actor->group;
     actor->field2B0 = 1;
     SceneActorChase_ClearMotionFlagComponent(actor, 0x120);
     SceneActorChase_ClearActorFlags(actor, 0x80);
@@ -120,15 +120,14 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         SceneActorChase_SetActorFlags(actor, 0x80);
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor)) {
-            if (!SceneActorChase_TryRoute(
-                    actor, group->route, &actor->body.position,
-                    &((struct SceneActorChaseTracking *)&actor->tracking.target)
-                         ->target->position)) {
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
+                                          &actor->tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return;
             }
         }
-        SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&group->common.gate.flags, 4);
+        SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&group->common.gate.flags,
+                                         4);
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
         return;
@@ -137,9 +136,8 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     group->destination->pad = 0;
     SceneActorChase_TrackPlayer(actor);
     if (!SceneActorChase_Arrive(actor)) {
-        if (!SceneActorChase_TryRoute(
-                actor, group->route, &actor->body.position,
-                &((struct SceneActorChaseTracking *)&actor->tracking.target)->target->position)) {
+        if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
+                                      &actor->tracking.target->position)) {
             Callback_InvokeActor(actor, group->fallback);
             return;
         }

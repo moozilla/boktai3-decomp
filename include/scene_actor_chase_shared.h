@@ -32,7 +32,7 @@ static inline struct SceneActorChaseGroup *SceneActorChase_GroupOf(void *object)
 #if !SCENE_ACTOR_CHASE_TYPED_GROUP
     struct SceneActorRegistryResetView *actor = object;
 #endif
-    return (struct SceneActorChaseGroup *)&actor->group.common;
+    return &actor->group;
 }
 
 static inline void SceneActorChase_SetFlagComponent(struct SceneActorChaseFlags16 *field, u16 bits)
@@ -372,8 +372,7 @@ static inline u8 SceneActorChase_BeginContactAnimation(struct SceneActorRegistry
 
 static inline void SceneActorChase_TrackPlayer(struct SceneActorRegistryResetView *actor)
 {
-    ((struct SceneActorChaseTracking *)&actor->tracking.target)->target =
-        &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+    actor->tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
 }
 
 static inline void SceneActorChase_ClearActorFlags(void *object, u32 bits)

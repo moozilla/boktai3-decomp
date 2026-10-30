@@ -8,7 +8,7 @@ void SceneActorMovement_ResolveRoutePosition(void *);
 /* Choose a route, react to contact, or resume pursuit in motion-flag priority order. */
 u8 Mummy_SelectMovementResponse(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorChaseGroup *group = (struct SceneActorChaseGroup *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     if (!actor->reactionSoundVariant)
         Sound_PlaySong(0x211);
     else
@@ -34,9 +34,8 @@ u8 Mummy_SelectMovementResponse(struct SceneActorRegistryResetView *actor)
         group->destination->pad = 0;
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor) &&
-            !SceneActorChase_TryRoute(
-                actor, group->route, &actor->body.position,
-                &((struct SceneActorChaseTracking *)&actor->tracking.target)->target->position)) {
+            !SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
+                                      &actor->tracking.target->position)) {
             Callback_InvokeActor(actor, group->fallback);
             return 0;
         }
@@ -68,9 +67,8 @@ u8 Mummy_SelectMovementResponse(struct SceneActorRegistryResetView *actor)
         SceneActorChase_GroupSetFlags(group, 4);
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor)) {
-            if (!SceneActorChase_TryRoute(
-                    actor, group->route, &actor->body.position,
-                    &((struct SceneActorChaseTracking *)&actor->tracking.target)->target->position)) {
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
+                                          &actor->tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return 0;
             }
@@ -86,9 +84,8 @@ u8 Mummy_SelectMovementResponse(struct SceneActorRegistryResetView *actor)
         group->destination->pad = 0;
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor) &&
-            !SceneActorChase_TryRoute(
-                actor, group->route, &actor->body.position,
-                &((struct SceneActorChaseTracking *)&actor->tracking.target)->target->position)) {
+            !SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
+                                      &actor->tracking.target->position)) {
             Callback_InvokeActor(actor, group->fallback);
             return 0;
         }
