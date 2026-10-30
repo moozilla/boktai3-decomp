@@ -67,7 +67,7 @@ No compiler overrides, new selectors, register pins or assembly barriers are use
 by the new matches.
 
 Preserved unresolved work includes Golem 080C8774 (PRE ordering and one reload
-decision) and the Ghoul 08085DD0/Dog 080DEF78 scan-loop ownership problems. Golem 080C725C
+decision) and the Ghoul 08085DD0 scan-loop ownership problem. Golem 080C725C
 and Dog 080DF908 retain an unused RNG-table literal in the ROM; existing relatives
 use concessions to retain it, so those spellings were not adopted. Resume from
 the exported candidates and causal reports rather than their old rough drafts.
@@ -83,3 +83,11 @@ reference to the current displacement value, magnitude scaling, and an
 early-return clamp preserve the recovery arithmetic and the native expansion
 identities needed for PRE stack ordering. The final source uses the existing
 chase selectors only; the stock check reports zero differing bytes.
+
+## Dog retreat scan — 080DEF78
+
+All 800 bytes match. Distinct symbolic and fixed-address map receivers preserve
+the completed and interrupted vertical scans. A retained route-position output
+separates the later route query from the slope-position owner, reproducing the
+three spill slots and their initialization order. Shared height and cell-center
+operations remain in use; the stock check reports zero differing bytes.
