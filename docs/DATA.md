@@ -56,6 +56,7 @@ the bank, were encoded with it.
 | Format | Range | File | Notes |
 |---|---|---|---|
 | `keyed_callbacks` | `08603300`–`08604998` | `data/actor_registry.csv` | 722 sorted `(key, callback)` records and a zero sentinel. The script `chara` command binary-searches it (`08225844`) and calls the callback. |
+| `callback_array` | `08605C74`–`08605C94`, `08605DB8`–`08605DD4`, `08605EC4`–`08605EE0`, `086108B0`–`086108C8` | `data/monster_commands/*.csv` | Ordered Thumb callback pointers for Bat, Bee, Crow, and the common actor script commands. The command packet's first halfword selects an entry; every non-null pointer remains a linker relocation. |
 | `resource_archive` | 10 ranges `08614DCC`–`08D5A85C` | `build/res/LABEL/index.txt` + `HASH.bin` (extracted) | The archives found by `ScriptProc_Start` (anm, map, ptn, fnt, sprites...). Header, sorted hash table and offsets are regenerated; entries are emitted as `.incbin` of their files and may change size. Their contents are position-independent: about 7,300 pointer-like words inside them (tile and map data) are no longer relocated. Verified in-game: growing the first `anm` entry by 37 bytes shifts every archive and leaves all menu and field screenshots identical. |
 | `text_bank` | `08D6B1E4`–`08DD6B96` | `build/text/bank.tsv` (extracted) | Script text, resizable. The gcx section words, 9,977 entry offsets, then strings (`T`, decoded with `data/charmap.tsv`) and binary blobs (`B`, 82 tables read by script code). Verified in-game: a lengthened config help line renders and the field still plays. |
 
@@ -117,3 +118,25 @@ own strings gives 167 such collisions, including the message speaker tag
 `HAKUSYAKU` ("count"), whose key belongs to the engine callback at `08003A68`, not to an actor. Treat any
 name recovered by hashing as a hypothesis until a second fact (the callback's
 behaviour, a matching family of names) supports it.
+
+### Actor script command tables
+
+The actor member at +0x250 points to an ordered command-handler array.
+`SceneActorScript_OnCommand` (`08136F1C`) reads a command packet's first
+halfword, indexes that array, and invokes the selected handler with the actor
+and packet pointer through `sub_08249240`. Handlers that only use the actor
+ignore the second argument. This command index is separate from the hashed
+registry key used by GCL `chara` and `command`.
+
+`data/monster_commands/` contains the common six entries and the reviewed
+Bat, Bee, and Crow extensions. CSV `index` values must be consecutive in
+physical table order. The `callback` column contains the original Thumb
+address, including its low bit; `name` is informational and does not affect
+encoding. Zero is allowed for an empty slot, and remains a plain zero word.
+The fixed manifest extent prevents an edit from resizing a table implicitly.
+
+The encoder emits nonzero entries as pointers. The normal symbolizer resolves
+them to function symbols, so moving code moves the handler pointers. To change
+a handler, edit its callback value, then run the usual data check and ROM build.
+Do not reorder rows to group similar handlers: the numeric index is the
+dispatch operation.
