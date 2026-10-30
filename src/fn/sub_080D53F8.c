@@ -1,123 +1,155 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
+#include "scene_actor_chase_reaction.h"
+#include "scene_actor_control_phase.h"
+#include "scene_actor_turn.h"
 
-#ifdef NONMATCHING
-// fuzzy: 84.2%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// confidence=low: navigation probe events select turns or acceleration behaviors.
+// Tentative: consumes route probes and selects navigation or a descriptor turn.
 
-// Remaining differences: motion-flags pointer reuse, PRE spill order and random-turn allocation.
-#include "scene_actor_chase.h"
-static inline u32 PlayerFlags(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
-static inline u32 ActorMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
-{
-    return actor->flags2D4 & mask;
-}
-static inline u8 Test16(u16 *field, u16 mask)
-{
-    if ((*field) & mask)
-        return 1;
-    return 0;
-}
+struct MummyNavigationContext {
+    u8 unknown0[0x6D2];
+    u16 pursuitDelay;
+    u8 unknown6D4[0x1E];
+    u16 flags;
+};
 
-// confidence=low: consumes navigation probe events and schedules descriptor turns.
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
 u8 sub_0807AF94(void *);
 u8 Mummy_RequestStraightRoute(void *);
-static inline u32 Mummy_RandomBits(s16 mask)
+
+static inline u32 Mummy_MotionBits(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    return gRandomTable[gRandomIndex = (gRandomIndex + 1) & 1023] & mask;
+    return actor->flags2D4 & mask;
 }
 
-static inline void BeginProbeTurn(void *obj, u32 saved)
+static inline void Mummy_ApplyDuration(struct SceneActorRegistryResetView *a)
 {
-    struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group.common;
-    if (!ActorMotionFlags(actor, 0x400) && !Test16((u16 *)((u8 *)actor + 0x414), 4)) {
-        s32 prior = actor->body.direction;
-        s32 tries = 0;
-        s32 choice;
-        do {
-            choice = Mummy_RandomBits(3) << 6;
-            if (choice != prior)
-                goto chosen;
-        } while (++tries <= 3);
-        choice = prior;
-    chosen:
-        group[0x204] = choice;
-        Chase_SavePacket(group + 0x8C, actor);
-        group[0x205] = saved;
-        Chase_SetCtl(actor, *(void **)(group + 0x21C), 0x1B);
-        Chase_SetState(actor, 3, 1, 0);
-        group[0x206] = 2;
+    u16 *scale;
+    u32 mask = 0xA02F;
+    if (a->flags2D4 & mask) {
+        u16 *p = &a->field2C2;
+        *p = 64;
+        scale = p;
+    } else {
+        u16 *q = &a->field2C2;
+        u16 value = *q;
+        scale = q;
+        if (!value)
+            *scale = 64;
     }
+    if (!a->drawableKind)
+        Anim_SetDurationScale(((struct SceneActorAnimationSequenceDrawable *)a->drawable)->sequence,
+                              *scale);
+    else
+        Anim_SetFrameDurationScale(&((struct SceneActorAnimationTileDrawable *)a->drawable)->tile,
+                                   *scale);
+}
+
+#define MUMMY_READ_RANDOM_SAMPLE(out_, samples_, index_)                                           \
+    do {                                                                                           \
+        (out_) = (samples_)[index_];                                                               \
+    } while (0)
+#define Mummy_NextSample(table_, seed_, wrap_, bits_)                                              \
+    ({                                                                                             \
+        const struct SceneActorChaseRandomTable *table_view_ = (table_);                           \
+        const u16 *samples_ = table_view_->samples;                                                \
+        u32 *cursor_ = (seed_);                                                                    \
+        u32 wrap_mask_ = (wrap_);                                                                  \
+        u32 result_mask_ = (bits_);                                                                \
+        u32 index_ = (*cursor_ + 1) & wrap_mask_;                                                  \
+        u32 sample_;                                                                               \
+        *cursor_ = index_;                                                                         \
+        MUMMY_READ_RANDOM_SAMPLE(sample_, samples_, index_);                                       \
+        sample_ &= result_mask_;                                                                   \
+        sample_;                                                                                   \
+    })
+
+static inline u32 Mummy_RandomDirectionExcept(u32 current, const u16 *randomSamples)
+{
+    s32 tries;
+    struct SceneActorChaseRandomTable table = {randomSamples};
+    for (tries = 0; tries < 4; tries++) {
+        u32 direction = Mummy_NextSample(&table, &gRandomIndex, 1023, 3) << 6;
+        if (direction != current)
+            return direction;
+    }
+    return current;
+}
+
+struct MummyProbeGroup {
+    struct SceneActorChaseGroup *group;
+};
+static inline struct MummyProbeGroup Mummy_ProbeGroup(void *object)
+{
+    struct SceneActorRegistryResetView *actor = object;
+    struct MummyProbeGroup owner;
+    owner.group = SceneActorChase_GroupOf(actor);
+    return owner;
+}
+static inline void Mummy_BeginProbeTurn(void *object, u32 saved)
+{
+    struct SceneActorRegistryResetView *actor = object;
+    struct MummyProbeGroup owner = Mummy_ProbeGroup(object);
+    struct SceneActorChaseGroup *group = owner.group;
+    if (!Mummy_MotionBits(actor, 0x400) &&
+        !SceneActorChase_TestField((u16 *)&actor->group.common.gate.flags, 4)) {
+        group->turn.direction = Mummy_RandomDirectionExcept(actor->body.direction, gRandomTable);
+        SceneActorChase_SaveControl(&group->saved, actor);
+        group->turn.savedDirection = saved;
+        SceneActorChase_SetControl(actor, group->turnControl, 0x1B);
+        SceneActorChase_SetState(actor, 3, 1, 0);
+        group->turn.turnsRemaining = 2;
+    }
+}
+
+static inline void Mummy_SetBehavior(struct SceneActorRegistryResetView *actor, u32 behavior)
+{
+    actor->state2A8 = 0;
+    actor->phase2A9 = 0;
+    actor->behavior2AA = behavior;
+    SceneActorChase_ResetStateEntry(actor);
 }
 
 void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)(&actor->group.common);
-    u8 *body = actor->context;
-    register s32 speed asm("r6");
-    if (Chase_TakeArrived(actor)) {
-        u16 *field = (void *)(body + 0x6f2);
-        u32 mask = 0xffffefff;
+    struct SceneActorChaseGroup *group = &actor->group;
+    struct MummyNavigationContext *body = actor->context;
+    s32 speed;
+    if (SceneActorControl_TakeStateEntry(actor)) {
+        u16 *field = &body->flags;
+        u32 mask = ~0x1000;
         u32 value = *field;
         mask &= value;
         *field = mask;
     }
     if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
-    speed = Callback_InvokeActor(actor, *((void **)(((u8 *)actor) + 0x260)));
-    {
-        u32 mask = 0xa02f;
-        u16 *scale;
-        if (actor->flags2D4 & mask) {
-            actor->field2C2 = 0x40;
-            scale = &actor->field2C2;
-        } else {
-            u16 value = actor->field2C2;
-            scale = &actor->field2C2;
-            if (!value)
-                *scale = 0x40;
-        }
-        if (actor->drawableKind == 0)
-            Anim_SetDurationScale(((u8 *)actor->drawable) + 0x48, *scale);
-        else
-            Anim_SetFrameDurationScale(((u8 *)actor->drawable) + 0x20, *scale);
-    }
-    if (NavMesh_ConsumeProbeEvent(*((void **)(group + 0x1fc)))) {
-        if (!SceneActorBehavior_RequestDescriptorTurn(actor, *((void **)(group + 0x1fc)), 32, 32,
-                                                      speed))
+    speed = Callback_InvokeActor(actor, actor->animationQuery.opaque);
+    Mummy_ApplyDuration(actor);
+    if (NavMesh_ConsumeProbeEvent(group->route)) {
+        if (!SceneActorBehavior_RequestDescriptorTurn(actor, group->route, 32, 32, speed))
             goto increment;
-        if (!Test16((u16 *)(group + 0x40), 4)) {
+        if (!SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
             if (sub_0807AF94(actor))
                 return;
-            if (Test16((u16 *)(group + 0x40), 1)) {
-                u32 saved = ((((u8 *)actor)[0x3cd] + 5) & 7) << 5;
-                BeginProbeTurn(actor, saved);
+            if (SceneActorChase_TestField((u16 *)&group->common.gate.flags, 1)) {
+                u32 saved = ((actor->unknown3CD[0] + 5) & 7) << 5;
+                Mummy_BeginProbeTurn(actor, saved);
                 return;
             }
         }
-        Chase_SetBehavior(actor, 13);
-    } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *((void **)(group + 0x1fc)), 32,
-                                                             32, speed)) {
-        if (PlayerFlags(&gPlayers[0]->flags, 8) && (!(*((u16 *)(body + 0x6d2))))) {
+        Mummy_SetBehavior(actor, 13);
+    } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, group->route, 32, 32, speed)) {
+        if (SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[0])->flags,
+                                   8) &&
+            !body->pursuitDelay) {
             if (Mummy_RequestStraightRoute(actor))
                 return;
         }
-        Chase_SetBehavior(actor, 14);
+        Mummy_SetBehavior(actor, 14);
         return;
     }
 increment:
     actor->counter2AC++;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Mummy_UpdateProbeNavigation);
-#endif
