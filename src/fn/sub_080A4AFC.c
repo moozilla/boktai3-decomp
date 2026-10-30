@@ -1,3 +1,4 @@
+#include "scene_actor_init_dispatch.h"
 #include "global.h"
 #include "render.h"
 #include "engine_globals.h"
@@ -173,33 +174,6 @@ static inline void MonsterInit_ReadPalette(struct SceneActorRegistryResetView *a
                                            SceneActorScript_GetManagerField62());
 }
 
-static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView *arg0, void *cb0,
-                                              u32 (*cb1)(void *), void *cb2, void *cb3, void *cb4,
-                                              void *hidden, void *cb5, void *cb6,
-                                              void *defaultReaction, u8 (*cb270)(void *),
-                                              void *targetQuery, void *damage, void *contact)
-{
-    MonsterInit_SetBehaviorFlags(arg0, 0x2000);
-    arg0->contextCallback = cb0;
-    MonsterInit_WriteAnimationQuery(&arg0->animationQuery.word, cb1);
-    arg0->entryTarget224 = cb2;
-    arg0->entryTarget228 = cb3;
-    arg0->savedTarget = cb4;
-    arg0->reactionTarget230 = cb5;
-    arg0->deathControl = cb6;
-    arg0->field220 = hidden;
-    arg0->defaultReaction = defaultReaction;
-    MonsterInit_WriteContactPredicate(&arg0->contactQuery.predicate, cb270);
-    MonsterInit_WriteDataPointer(&arg0->commandTable.opaque, gUnk_086108B0);
-    arg0->callback248 = 0;
-    arg0->update26C = targetQuery;
-    arg0->field238 = SceneActorReaction_SinkAndRemove;
-    arg0->damageCallback = damage;
-    arg0->contactCallback = contact;
-    arg0->field240 = 0;
-    MonsterInit_ClearMotion(arg0);
-}
-
 static inline void MonsterInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
                                              void *callback)
 {
@@ -302,12 +276,12 @@ s32 Spider_Init(void *object)
     extra = Script_GetKeywordValue(0x66, 0);
     if (Script_GetKeywordValue(0x54, 0))
         Spider_SetFlags(arg0, 0x10);
-    MonsterInit_InstallPrimary(actor, Spider_OnUpdate, Spider_GetAnimationEvent, sub_080A21EC,
-                               Spider_SelectActiveAnimation, Spider_SelectIdleAnimation,
-                               Spider_OnActionEvent, Spider_UpdateLandingMotion,
-                               Spider_UpdateDefeat, SceneActorReaction_OnEnemyDefault, 0,
-                               SceneActorPlacement_BeginContactRoute, sub_081363F4,
-                               SceneActorPlacement_BeginDefaultResponse);
+    MonsterInit_InstallAnimationCallbacks(
+        actor, Spider_OnUpdate, Spider_GetAnimationEvent, sub_080A21EC,
+        Spider_SelectActiveAnimation, Spider_SelectIdleAnimation, Spider_OnActionEvent,
+        Spider_UpdateLandingMotion, Spider_UpdateDefeat, SceneActorReaction_OnEnemyDefault, 0,
+        SceneActorPlacement_BeginContactRoute, sub_081363F4,
+        SceneActorPlacement_BeginDefaultResponse);
     MonsterInit_InitializeGroupWithBounds(
         group, arg0->bounds630, arg0->bounds654, Spider_OnSecondaryColliderContact, 0,
         SceneActorReaction_BeginTargetRecovery, 0, 1, &actor->body);

@@ -1,3 +1,4 @@
+#include "scene_actor_init_dispatch.h"
 #include "global.h"
 #include "scene_actor_init_group.h"
 #include "render.h"
@@ -28,7 +29,6 @@ void Memory_Clear(void *, u32);
 void SceneActorReaction_OnEnemyDefault(void);
 u8 sub_0807F81C(void *);
 void SceneActorTarget_ResolvePendingObject(void);
-void SceneActorReaction_SinkAndRemove(void);
 void sub_081363F4(void);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
@@ -49,7 +49,6 @@ void SceneActorTerrain_ReadScriptParameters(void *);
 
 void *Heap_Alloc(u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
-extern const u8 gUnk_086108B0[];
 void AnimData_SelectPaletteBank(void *, s32);
 void Anim_Step(void *, void *);
 u8 SceneActorRegistry_LinkActor(void *);
@@ -167,33 +166,6 @@ static inline void MimicInit_ReadPalette(struct SceneActorRegistryResetView *act
                                            SceneActorScript_GetManagerField62());
 }
 
-static inline void MimicInit_InstallPrimary(struct SceneActorRegistryResetView *arg0, void *cb0,
-                                            u32 (*cb1)(void *), void *cb2, void *cb3, void *cb4,
-                                            void *hidden, void *cb5, void *cb6,
-                                            void *defaultReaction, void *cb270, void *targetQuery,
-                                            void *damage, void *contact)
-{
-    MonsterInit_SetBehaviorFlags(arg0, 0x2000);
-    arg0->contextCallback = cb0;
-    MonsterInit_WriteAnimationQuery(&arg0->animationQuery.word, cb1);
-    arg0->entryTarget224 = cb2;
-    arg0->entryTarget228 = cb3;
-    arg0->savedTarget = cb4;
-    arg0->reactionTarget230 = cb5;
-    arg0->deathControl = cb6;
-    arg0->field220 = hidden;
-    arg0->defaultReaction = defaultReaction;
-    MonsterInit_WriteCallback(&arg0->contactQuery.opaque, cb270);
-    MonsterInit_WriteDataPointer(&arg0->commandTable.opaque, gUnk_086108B0);
-    arg0->callback248 = 0;
-    arg0->update26C = targetQuery;
-    arg0->field238 = SceneActorReaction_SinkAndRemove;
-    arg0->damageCallback = damage;
-    arg0->contactCallback = contact;
-    arg0->field240 = 0;
-    MonsterInit_ClearMotion(arg0);
-}
-
 static inline void MimicInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
 {
     arg0->messageCallback = SceneActorScript_OnCommand;
@@ -271,7 +243,7 @@ s32 Mimic_Init(void *object)
     MimicInit_ReadPalette(actor, 0x304, 0x192);
     MimicInit_SetPaletteBank(actor, 0x306);
     SceneActor_InitializeReactionColliders(actor);
-    MimicInit_InstallPrimary(
+    MonsterInit_InstallOpaqueContactCallbacks(
         actor, Mimic_UpdateBehavior, 0, 0, SceneActor_EnterFlaggedEntryPhase,
         Mimic_OnAnimationStateChanged, 0, Mimic_ConvergeAndTurn, Mimic_UpdateDefeatBlink,
         SceneActorReaction_OnEnemyDefault, SceneActor_AcquireCollisionTarget,
