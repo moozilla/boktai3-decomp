@@ -1,148 +1,133 @@
-// MATCHING_CONCESSION: register-pinning
-#include "scene_actor_registry.h"
-#ifdef NONMATCHING
-// fuzzy: 84.3%
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: actor allocation, collider argument scheduling, and stack spills.
-struct Frames {
-    u16 *data;
-    u8 flags, count, multiplier, duration;
-    u16 index, pad, rate, timer;
-};
-struct Render {
-    u32 flags;
-    u8 pad[12];
-    u16 tile;
-};
-static inline void step(struct Frames *f, struct Render *r)
-{
-    u16 *word = f->data + f->index;
-    r->tile = *word >> 6;
-    {
-        int settings = f->flags;
-        register int mask asm("r3") = 1;
-        register int mine asm("r1");
-        int bits;
-        mine = mask & settings;
-        bits = (*word & 48) >> 4;
-        bits &= mask;
-        if (mine != bits)
-            r->flags |= 4;
-        else
-            r->flags &= ~4;
-    }
-    {
-        int settings = f->flags;
-        register int mask asm("r3") = 2;
-        register int mine asm("r1");
-        int bits;
-        mine = mask & settings;
-        mine = (u8)mine;
-        bits = (*word & 48) >> 4;
-        bits &= mask;
-        if (mine != bits)
-            r->flags |= 8;
-        else
-            r->flags &= ~8;
-    }
-    {
-        u32 mask;
-        int duration;
-        register int savedDuration asm("r3");
-        u32 timer = f->timer + 1;
-        f->timer = timer;
-        {
-            register u32 initialMask asm("r1") = 65535;
-            asm("" : "+r"(initialMask));
-            mask = initialMask;
-        }
-        duration = f->duration;
-        timer = (u16)timer;
-        savedDuration = duration;
-        if (timer >= (u32)duration) {
-            register int flags asm("r1");
-            int index;
-            f->timer = 0;
-            flags = f->flags;
-            if (flags & 4) {
-                index = f->index;
-                if (!index) {
-                    if (flags & 8) {
-                        f->timer = savedDuration;
-                        goto update;
-                    }
-                    index = f->count;
-                }
-                index--;
-                goto storeIndex;
-            } else {
-                int count;
-                index = f->index + 1;
-                f->index = index;
-                count = f->count;
-                if ((index & mask) < count)
-                    goto update;
-                index = (u8)(flags & 8);
-                if (index) {
-                    f->timer = duration;
-                    index = count - 1;
-                }
-            }
-        storeIndex:
-            f->index = index;
-        update:
-            word = f->data + f->index;
-            {
-                u32 value = *word;
-                u32 low = 15;
-                low &= value;
-                f->multiplier = low;
-            }
-            f->duration = (f->multiplier * f->rate) >> 6;
-            if (!f->duration)
-                f->duration = 1;
-        }
-    }
-}
+#include "scene_actor_reset.h"
+#include "contact_swarm.h"
+#include "display_sequence_inline.h"
 
+struct AxeAttackTrailContext {
+    u8 unknown0[0xA38];
+    union {
+        struct DisplaySequenceSprite sprite;
+        struct ContactSwarmSprite spatial;
+    } draw;
+    struct ContactSwarmGraphics graphics;
+    struct DisplaySequenceState sequence;
+    struct ContactCollider attack[3], body[3];
+    struct ContactPosition origin;
+    u8 unknownC90[0xCA7 - 0xC90];
+    u8 shadowActive;
+    u8 unknownCA8[4];
+    u8 shadow[0x40];
+    u8 unknownCEC[0xED7 - 0xCEC];
+    u8 variant;
+};
 void Collider_SetBodyProperties(void *, u16, u32, u32);
 void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
 void Axe_LatchColliderContact(void);
 void Axe_OnSecondaryColliderContact(void);
 u32 Shadow_Initialize(void *, void *, s32);
-void Axe_InitAttackTrail(struct SceneActorRegistryActor *s)
+
+static inline u32 Axe_StepSequence(struct DisplaySequenceSprite *owner,
+                                   struct DisplaySequenceState *state)
+{
+    const u16 *command;
+    u32 ended;
+    {
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = state->commands;
+        command = (const u16 *)((u32)table + offset);
+    }
+    owner->frame = *command >> 6;
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 4;
+        else
+            owner->flags &= ~4;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 8;
+        else
+            owner->flags &= ~8;
+    }
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->frameCount - 1;
+                ended = 1;
+            } else {
+                state->index--;
+                ended = 0;
+            }
+        } else {
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
+                } else {
+                    state->index = 0;
+                }
+                ended = 1;
+            } else {
+                ended = 0;
+            }
+        }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    } else {
+        ended = 0;
+    }
+    return ended;
+}
+
+static inline u16 Axe_SequenceSelection(struct DisplaySequenceState *source)
+{
+    return source->unknownA;
+}
+
+void Axe_InitAttackTrail(struct SceneActorRegistryResetView *s)
 {
     struct ContactPackedVector bodySize;
     struct ContactPackedVector bodyOffset;
     struct ContactPackedVector attackSize;
     struct ContactPackedVector attackOffset;
-    u8 *d = s->context;
-    void *resource = d + 0xa64;
-    struct Render *sprite;
-    struct Frames *frames;
+    struct AxeAttackTrailContext *d = s->context;
+    void *resource = &d->graphics;
+    struct DisplaySequenceSprite *sprite;
+    struct DisplaySequenceState *frames;
     void *sequence;
     s32 i;
-    typeof(*((u16 *)(((u8 *)s) + 0xb4))) t1;
-    typeof(*((u16 *)(((u8 *)s) + 0xbc))) t2;
-    typeof(*((u32 *)(((u8 *)s) + 0xcc))) t3;
-    typeof(*((u16 *)(((u8 *)s) + 0xc4))) t4;
     AnimData_Load(resource, 0x5291);
-    sprite = (void *)(d + 0xa38);
+    sprite = &d->draw.sprite;
     Sprite_Init(sprite, resource, 0);
     sequence = ScriptProc_Start(0x922e, 0x3f72);
     {
-        struct {
-            u8 pad[0xa];
-            u16 index;
-        } *drawable = (void *)(((u8 *)s->drawable) + 0x48);
-        u32 index = drawable->index;
-        frames = (void *)(d + 0xa80);
-        Anim_SetSequence(frames, sequence, index, d[0xed7], 0);
+        struct DisplaySequenceState *drawable =
+            &((struct SceneActorControlMotionDrawable *)s->drawable)->sequence;
+        u32 index = Axe_SequenceSelection(drawable);
+        frames = &d->sequence;
+        Anim_SetSequence(frames, sequence, index, d->variant, 0);
     }
-    step(frames, sprite);
-    *((u32 *)(d + 0xa38)) |= 1;
-    *((struct ContactPosition *)(d + 0xa54)) = s->position;
-    d[0xa3f] = 1;
+    Axe_StepSequence(sprite, frames);
+    d->draw.sprite.flags |= 1;
+    d->draw.spatial.position = s->body.position;
+    d->draw.sprite.priority = 1;
     bodySize.x = 24;
     bodySize.y = 70;
     bodySize.z = 24;
@@ -150,10 +135,10 @@ void Axe_InitAttackTrail(struct SceneActorRegistryActor *s)
     bodyOffset.y = 0;
     bodyOffset.z = 0;
     for (i = 0; i < 3; i++) {
-        void *c = (d + 0xb8c) + (i * 0x54);
+        void *c = &d->body[i];
         Collider_Init(c, 0, 0x5001, 0, 16, &bodySize, &bodyOffset);
         Collider_SetBodyProperties(c, 0, 0, 0);
-        Collider_SetPosition(c, d + 0xc88, 0);
+        Collider_SetPosition(c, &d->origin, 0);
         Collider_SetCallback(c, Axe_LatchColliderContact, d);
         Collider_Refresh(c);
     }
@@ -165,23 +150,19 @@ void Axe_InitAttackTrail(struct SceneActorRegistryActor *s)
     attackOffset.y = 0;
     attackOffset.z = 0;
     for (i = 0; i < 3; i++) {
-        void *c = (d + 0xa90) + (i * 0x54);
-        do {
-            Collider_Init(c, 0, 0x2401, 0, 16, &attackSize, &attackOffset);
-        } while (0);
-        t1 = *((u16 *)(((u8 *)s) + 0xb4));
-        t2 = *((u16 *)(((u8 *)s) + 0xbc));
-        t3 = *((u32 *)(((u8 *)s) + 0xcc));
-        t4 = *((u16 *)(((u8 *)s) + 0xc4));
-        Collider_SetAttackProperties(c, t1, t2, 0, t3, t4);
-        Collider_SetPosition(c, d + 0xc88, 0);
+        void *c = &d->attack[i];
+        Collider_Init(c, 0, 0x2401, 0, 16, &attackSize, &attackOffset);
+        {
+            u16 first = s->attacks.first[0];
+            u16 second = s->attacks.second[0];
+            u32 flags = s->attacks.flags[0];
+            u16 parameter = s->attacks.parameter[0];
+            Collider_SetAttackProperties(c, first, second, 0, flags, parameter);
+        }
+        Collider_SetPosition(c, &d->origin, 0);
         Collider_SetCallback(c, Axe_OnSecondaryColliderContact, d);
     }
 
-    d[0xca7] = Shadow_Initialize(d + 0xcac, d + 0xa54, 0);
-    ActorShadow_Disable(d + 0xcac);
+    d->shadowActive = Shadow_Initialize(d->shadow, &d->draw.spatial.position, 0);
+    ActorShadow_Disable(d->shadow);
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Axe_InitAttackTrail);
-#endif
