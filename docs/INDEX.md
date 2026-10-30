@@ -380,7 +380,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round5-sol.md](../notes/round5-sol.md) | Sol production round 5 |  | 3 |
 | [notes/round6-sol.md](../notes/round6-sol.md) | Production round 6 — Sol |  | 3 |
 | [notes/round7-actor-command-tables_2026-10-30.md](../notes/round7-actor-command-tables_2026-10-30.md) | Round 7 actor command tables | #data #studio #monsters | 1 |
-| [notes/round7-monster-recovery_2026-10-30.md](../notes/round7-monster-recovery_2026-10-30.md) | Round 7: recovered work and continued monster matching | #matching #monsters #compiler #structs #tooling | 4 |
+| [notes/round7-monster-recovery_2026-10-30.md](../notes/round7-monster-recovery_2026-10-30.md) | Round 7: recovered work and continued monster matching | #matching #monsters #compiler #structs #tooling | 5 |
 | [notes/s0.md](../notes/s0.md) | s0 notes | *#tooling* | 11 |
 | [notes/s1.md](../notes/s1.md) | s1 notes | *#tooling* | 12 |
 | [notes/s2.md](../notes/s2.md) | s2 notes (range 080C9844-0813B134) |  | 11 |

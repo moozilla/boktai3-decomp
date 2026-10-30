@@ -2,8 +2,8 @@
 
 Tags: #matching #monsters #compiler #structs #tooling
 
-Eleven functions match in ordinary C, covering 24,720 bytes of the supplied
-Round 7 queue. Five were recovered from the interrupted run; six were completed
+Fourteen functions match in ordinary C, covering 31,360 bytes of the supplied
+Round 7 queue. Five were recovered from the interrupted run; nine were completed
 after recovery. Every accepted function has its own commit. PROGRESS files are
 unchanged.
 
@@ -20,6 +20,9 @@ unchanged.
 | 080BBDD0 | 4,116 | Skeleton displacement convergence; axis-field ownership and direct group access fix PRE address order. |
 | 080BFCC4 | 2,452 | Skeleton delayed recovery; taking the entry flag through its component fixes address discovery order. |
 | 080E3874 | 2,360 | Dog delayed route/waiting recovery; the same entry operation and a typed route-flag query preserve PRE copies and mask order. |
+| 080CBF24 | 2,300 | Golem delayed route recovery; component entry handling and existing value-domain interfaces recover PRE ordering. |
+| 080CE188 | 2,364 | Golem route restoration after control; a word-flag field owner preserves its load/store lifetime. |
+| 080E4B34 | 1,976 | Dog delayed pursuit recovery; component mask order and measured cell/saved-control interfaces reproduce the PRE slot rotation. |
 
 The four original integrated commits retain their object IDs (`40e221b`,
 `ac405f8`, `6211771`, `2423916`). The additional Skeleton result came from the
@@ -30,9 +33,14 @@ databases. These solved matches were rechecked, not reconstructed again.
 ## Shared operations and initializer ownership
 
 `scene_actor_turn.h` now owns seven identical animation/turn operations used by
-080C5930 and 080BAE04. Both complete extents remain exact. The delayed-route
-functions reuse the chase leaf operations; some local arrival compositions still
+080C5930 and 080BAE04. Both complete extents remain exact. Six functions share
+the delayed-response record and preparation operation; five share the state-entry
+component operation. All six complete extents remain exact after extraction.
+The delayed-route functions reuse the chase leaf operations; some local arrival compositions still
 differ in their field-owner boundaries and remain candidates for later sharing.
+
+Golem's three-function tail moved to `src/golem_3.c` before extracting 080CBF24.
+The remaining 9,952-byte unit and the 240-byte tail retain their existing matches.
 
 Tentacle_Init (080ABDCC), Mummy_Init (080DCC98) and Axe_Init (080FE68C) now embed
 the canonical actor prefix, preserving 12,032 existing exact bytes. The canonical
