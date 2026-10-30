@@ -1,199 +1,129 @@
-// MATCHING_CONCESSION: register-pinning
-#include "scene_actor_chase.h"
+#define SCENE_ACTOR_CHASE_DIRECT_ROUTE_FIELDS 1
+#include "scene_actor_chase_reaction.h"
 #include "scene_actor_control_phase.h"
+#include "scene_actor_reaction.h"
+#include "spark_particle.h"
 
-#ifdef NONMATCHING
-// fuzzy: 77.8%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// Remaining differences: address lifetimes, state scheduling, and register allocation.
 u8 Skeleton_RerouteToTarget(void *);
 u8 SceneActor_DispatchContextAction(void *, u32);
-void Vorn_ResumeRouteAfterDelay(void);
-void Sound_PlaySong(u32);
-void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
-static inline s32 Quarter(s32 v)
+void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *, s32);
+
+struct VornAnimationState {
+    u8 unknown0[12];
+    u16 delay;
+};
+struct VornDrawable {
+    u8 unknown0[0x20];
+    struct VornAnimationState animation;
+};
+static inline s32 Vorn_QuarterDisplacement(s32 value)
 {
-    return v >= 0 ? v >> 2 : -(-v >> 2);
+    return value >= 0 ? value >> 2 : -(-value >> 2);
 }
-static inline s32 Clamp(s32 v)
+static inline s32 Vorn_ReadDisplacementAxis(s32 desired, s16 *current, s16 **field)
 {
-    if (v > 200)
-        return 200;
-    if (v < -200)
-        return -200;
-    return v;
+    s32 difference = desired - *current;
+    *field = current;
+    return Vorn_QuarterDisplacement(difference);
 }
-static inline u8 AtRest(s32 x, s32 z)
+static inline u8 Vorn_DisplacementStopped(s32 x, s32 z)
 {
     if (!x && !z)
         return 1;
     return 0;
 }
-static inline u32 Test(u16 *f, u32 m)
+static inline u8 Vorn_ContextFlags(struct SceneActorAnimationLink *context, u32 mask)
 {
-    u32 mask = m;
-    return *f & mask;
-}
-static inline u8 ContextFlags(u8 *ctx)
-{
-    if (*(u16 *)(ctx + 0x6D4) & 0x1D)
+    if (context->flags & mask)
         return 1;
     return 0;
 }
-static inline u32 Random4(void)
+static inline void Vorn_SetStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    u32 index = (gRandomIndex + 1) & 1023;
-    u32 v;
-    gRandomIndex = index;
-    index *= 2;
-    v = *(const u16 *)((u32)gRandomTable + index);
-    v &= 3;
-    return v + 1;
+    actor->flags2D0 = mask | actor->flags2D0;
 }
-// confidence=low: converges stagger motion before selecting delayed recovery or pursuit.
+
 #define Vorn_UpdateStaggerRecovery sub_080AD75C
-static inline void Chase_SetCtl_(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    void *callback = cb;
-    u32 kind = k;
-    {
-        typeof(actor->field2B2) *q1 = &actor->field2B2;
-        *q1 = 1;
-    }
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
-    {
-        u32 *field = &actor->flags114;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    actor->word104 = 0;
-}
-
-static inline u32 Arg1(u32 k_, u8 *anim)
-{
-    return anim + k_;
-}
-
-inline static u8 ContextFlags_080AD75C(u8 *ctx)
-{
-    {
-        u8 k1 = 0x1D;
-        if ((*((u16 *)(ctx + 0x6D4))) & k1)
-            return 1;
-    }
-    return 0;
-}
-
-void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 tick)
-{
-    u8 *ctx = actor->context;
-    u8 *anim = ((u8 *)actor->drawable) + 0x20;
-    register u8 *group asm("sl") = (u8 *)(&actor->group.common);
-    struct ContactPosition range;
-    s32 x;
-    s32 z;
-    s16 *priorX;
-    s16 *priorZ;
-    register u32 *action asm("sb");
-    u16 *flags;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
-        flags = &actor->flags2D4;
-        if (Test(flags, 8)) {
+    struct SceneActorAnimationLink *context = actor->context;
+    struct VornAnimationState *animation = &((struct VornDrawable *)actor->drawable)->animation;
+    struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(actor);
+    struct ContactPackedVector range;
+    s16 *x, *z;
+    s32 dx, dz;
+    if (SceneActorReaction_TakePrepared(actor)) {
+        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
+        if (SceneActorChase_QueryMotionFlagComponent(actor, 8)) {
             Sound_PlaySong(0x1CB);
             Sound_PlaySong(0x12A);
         }
-        {
-            s32 mask = ~1;
-            *flags = mask & (*flags);
-        }
+        SceneActorChase_ClearMotionFlagComponent(actor, 1);
         actor->field2B3 = 0;
     }
-    action = &actor->flags2CC;
-    {
-        u32 mask = 0x2000;
-        *action = mask | (*action);
-    }
-    {
-        u32 mask = 0x10000;
-        actor->flags2D0 = mask | actor->flags2D0;
-    }
-    if (tick <= 17)
-        *((u16 *)Arg1(12, anim)) = 0;
-    if ((Mod(tick, 12) == 0) && Test(&actor->flags2D4, 8)) {
+    SceneActorChase_SetActorFlags(actor, 0x2000);
+    Vorn_SetStatusFlags(actor, 0x10000);
+    if (frame <= 17)
+        animation->delay = 0;
+    if (Mod(frame, 12) == 0 && SceneActorChase_QueryMotionFlagComponent(actor, 8)) {
+        u32 index, sample;
+        u8 count;
         range.x = 60;
         range.y = 60;
         range.z = 40;
-        SparkParticle_Spawn(&actor->body.position, Random4(), &range, actor->body.direction + 128, 10, 6, 2,
-                            2);
+        index = (gRandomIndex + 1) & 1023;
+        gRandomIndex = index;
+        index *= 2;
+        sample = *(const u16 *)(RANDOM_TABLE_ADDR + index);
+        sample &= 3;
+        count = sample + 1;
+        SparkParticle_Spawn(&actor->body.position, count, (const struct ContactPosition *)&range,
+                            actor->body.direction + 128, 10, 6, 2, 2);
     }
-    {
-        u32 offset = 0x310;
-        s32 current = *((s16 *)(((u8 *)actor) + offset));
-        u32 priorOffset = 0x318;
-        s16 *field = (void *)(((u8 *)actor) + priorOffset);
-        s32 difference = current - (*field);
-        priorX = field;
-        x = Quarter(difference);
+    dx = Vorn_ReadDisplacementAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
+    dz = Vorn_ReadDisplacementAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
+    if (dx > 200)
+        dx = 200;
+    else if (dx < -200)
+        dx = -200;
+    if (dz > 200)
+        dz = 200;
+    else if (dz < -200)
+        dz = -200;
+    actor->body.motion.x += dx;
+    actor->body.motion.z += dz;
+    *x += dx;
+    *z += dz;
+    if (!Vorn_DisplacementStopped(dx, dz))
+        return;
+    if (!actor->field2B3)
+        return;
+    actor->field2B0 = 1;
+    SceneActorChase_ClearMotionFlagComponent(actor, 0x120);
+    SceneActorChase_ClearActorFlags(actor, 0x80);
+    if (actor->field2DC & 0x80000) {
+        SceneActorChase_SetReactionFlags(actor, 2);
+        return;
     }
-    {
-        u32 offset = 0x314;
-        s32 current = *((s16 *)(((u8 *)actor) + offset));
-        u32 priorOffset = 0x31C;
-        s16 *field = (void *)(((u8 *)actor) + priorOffset);
-        s32 difference = current - (*field);
-        priorZ = field;
-        z = Quarter(difference);
-    }
-    x = Clamp(x);
-    z = Clamp(z);
-    actor->body.motion.x += x;
-    actor->body.motion.z += z;
-    *priorX += x;
-    *priorZ += z;
-    if (AtRest(x, z) && actor->field2B3) {
-        actor->field2B0 = 1;
-        flags = &actor->flags2D4;
-        {
-            s32 mask = ~0x120;
-            *flags = mask & (*flags);
-        }
-        *action &= ~0x80;
-        if (actor->field2D8 & 0x80000) {
-            actor->flags2D6 |= 2;
+    if (SceneActorChase_QueryMotionFlagComponent(actor, 8)) {
+        SceneActorChase_SetState(actor, 3, 0, 0);
+        SceneActorChase_SetControl(actor, Vorn_ResumeRouteAfterDelay, 20);
+        SceneActorChase_ClearMotionFlagComponent(actor, 8);
+        actor->field2C2 = 64;
+    } else if (Vorn_ContextFlags(context, 0x1D))
+        SceneActor_DispatchContextAction(context, 1);
+    else {
+        SceneActorChase_TrackPlayer(actor);
+        SceneActorChase_SetActorFlags(actor, 16);
+        group->destination->pad = 0;
+        if (!Skeleton_RerouteToTarget(actor) &&
+            !SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
+                                      &actor->tracking.target->position)) {
+            Callback_InvokeActor(actor, group->fallback);
             return;
         }
-        if (Test(flags, 8)) {
-            Chase_SetState(actor, 3, 0, 0);
-            Chase_SetCtl_(actor, Vorn_ResumeRouteAfterDelay, 20);
-            {
-                s32 mask = ~8;
-                *flags = mask & (*flags);
-            }
-            actor->field2C2 = 64;
-        } else if (ContextFlags_080AD75C(ctx))
-            SceneActor_DispatchContextAction(ctx, 1);
-        else {
-            actor->tracking.target = ((u32)gPlayers[0]) + 0x24;
-            *action |= 16;
-            (*((struct ContactPosition **)(group + 0x200)))->pad = 0;
-            if ((!Skeleton_RerouteToTarget(actor)) &&
-                (!Chase_TryRoute(actor, *((void **)(group + 0x1FC)), &actor->body.position,
-                                 &actor->tracking.target->position))) {
-                Callback_InvokeActor(actor, *((void **)(group + 0x224)));
-                return;
-            }
-            Chase_SetCtl_(actor, actor->entryTarget228, 1);
-            Chase_SetBehavior(actor, 7);
-            actor->field2C2 = 32;
-        }
+        SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+        SceneActorChase_SetBehavior(actor, 7);
+        actor->field2C2 = 32;
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080AD75C);
-#endif
