@@ -91,16 +91,6 @@ void Actor_UpdateShadowSpriteParts(struct Motion *, void *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
 void MotionActor_RunPendingScript(void *);
 void MotionActor_RunDelayedScript(void *);
-static inline void ReadParticipant(struct Glove *p, s32 *out, s8 **ptr)
-{
-    s8 *participant = &p->participant;
-    *out = *participant;
-    *ptr = participant;
-}
-static inline void StoreValue(s32 *out, s32 value)
-{
-    *out = value;
-}
 static inline u32 *LinkResult(void)
 {
     struct LinkMenu *p = ((struct LinkMenu *)gLinkSession);
@@ -120,10 +110,6 @@ static inline s32 LinkParticipant(void)
         return -1;
     return ((struct LinkMenu *)gLinkSession)->participant;
 }
-static inline void AddFlags(u32 mask, u16 *flags)
-{
-    *flags = mask | *flags;
-}
 static inline u32 LinkFlags(u32 mask)
 {
     return (gEngineFlags | gScenePauseFlags) & mask;
@@ -134,10 +120,12 @@ static inline void SetCallback(struct Glove *p, void (*callback)(void *), u32 ze
     p->callback = callback;
     p->timer = zero;
 }
-#ifdef NONMATCHING
-// fuzzy: 86.8%
-// scope shape 7 (differences once low registers are set aside)
 // confidence=low: per-frame glove update: runs its entry script, steps the motion, or switches to a delayed callback when far from its origin.
+static inline s32 Glove_Participant(struct Glove *actor)
+{
+    return actor->participant;
+}
+
 void sub_08116E44(struct Glove *p)
 {
     struct Motion *self = &p->motion;
@@ -149,10 +137,9 @@ void sub_08116E44(struct Glove *p)
     s32 *previousX, *previousZ, *lateral;
     if (p->entered) {
         if (LinkFlags(0x800)) {
-            s8 *participant;
-            ReadParticipant(p, &values[0], &participant);
+            values[0] = Glove_Participant(p);
             values[1] = *LinkResult();
-            if (*participant == LinkParticipant())
+            if (Glove_Participant(p) == LinkParticipant())
                 Registry1745_SetMenuRequest(4);
         } else {
             values[0] = GameState_GetResultIndex();
@@ -281,6 +268,3 @@ void sub_08116E44(struct Glove *p)
     CharacterModel_UpdateAccessoryAnimations(p->model);
     p->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_08116E44);
-#endif
