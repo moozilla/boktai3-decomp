@@ -51,7 +51,8 @@ struct SceneActorDefaultControl {
     u32 privateFlags;
 };
 
-typedef s32 (*SceneActorContextUpdate)(void *actor);
+typedef s32 (*SceneActorResultCallback)(void *actor);
+typedef s32 (*SceneActorValueQuery)(void);
 typedef void (*SceneActorAction)(void *actor);
 typedef u32 (*SceneActorDefaultReaction)(void);
 typedef void (*SceneActorCommandHandler)(void *actor, const u16 *command);
@@ -65,10 +66,12 @@ union SceneActorAnimationQuerySlot {
     void *opaque;
     SceneActorAnimationQuery word;
     SceneActorSequenceQuery sequence;
+    SceneActorValueQuery value;
 };
 union SceneActorContactQuerySlot {
     void *opaque;
     SceneActorContactPredicate predicate;
+    SceneActorResultCallback result;
 };
 union SceneActorCommandTable {
     const void *opaque;
