@@ -1,19 +1,56 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 94.5%
-// fix.py best (sweep after the inlined-insn fix)
-// Register choice for the z pointer (r7 in the ROM), the facing-index pointer
-// reloads and the Anim_SetSequence argument setup still differ.
 #include "scene_vec.h"
+#include "display_animation.h"
+#include "display_sequence_inline.h"
 #include "engine_globals.h"
-struct PHVec {
-    s16 x, y, z, pad;
+union EnemyD459Sprite {
+    struct DisplaySequenceSprite display;
+    struct {
+        u8 unknown0[0x1C];
+        struct SceneVec position;
+    } coordinates;
 };
-struct FanSeq {
-    const volatile u16 *commands;
-    u8 flags, count, weight, duration;
-    u16 index, unused, speed, elapsed;
+struct EnemyD459Actor {
+    u8 unknown0[0x18];
+    s32 timer;
+    struct SceneVec initialPosition;
+    union EnemyD459Sprite sprite;
+    u8 graphics[0x18];
+    u8 unknown68[0x58];
+    u8 body[0x48];
+    void *update;
+    struct DisplaySequenceState sequence;
+    u8 unknown11C[0x4];
+    s16 attackA;
+    s16 attackB;
+    s16 attackC;
+    s16 health;
+    u8 unknown128[0x6];
+    s16 dead;
+    u8 unknown130[0x2];
+    s8 facing;
+    u8 unknown133[0x1];
+    s16 interval;
+    s16 attackD;
+    s16 maxHealth;
+    s16 rangeA;
+    s16 rangeB;
+    s16 hudStyle;
+    s16 bodyEnabled;
+    s16 hudTime;
+    s16 initialDead;
+    u8 unknown146[0x2];
+    s16 unknown148;
+    s16 unknown14A;
+    u32 scriptList;
+    u32 valueD;
+    u32 terrainEnabled;
+    void *resource;
+    void *parent;
+    u8 terrain[0x10];
+    u32 valueG0;
+    u32 valueG1;
+    u32 valueG2;
 };
 struct PHTerrain {
     u8 pad[0x24];
@@ -29,11 +66,8 @@ extern const struct SpawnOffsets gUnk_0824FE5C;
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 s32 Script_GetValueSafe(void);
-void AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
-void *ScriptProc_Start(u32, u32);
-void Anim_SetSequence(void *, void *, u32, u32, u32);
 void EnemyD459_InitCollider(u8 *);
 void EnemyD459_ReadScriptValueList(u8 *);
 s32 EnemyD459_UpdateAttackTiming(void);
@@ -42,200 +76,87 @@ void TerrainModifiers_RegisterCell(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-#define H(o) (*(s16 *)(p + (o)))
-#define U(o) (*(u16 *)(p + (o)))
-#define W(o) (*(u32 *)(p + (o)))
-#define B(o) (*(s8 *)(p + (o)))
-static inline s32 EnemyD459_CellIndex(struct PHVec *v)
+static inline s32 EnemyD459_CellIndex(struct SceneVec *v)
 {
     s32 x = (s16)v->x >> 8, z = (s16)v->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
     return ((struct PHTerrain *)gTerrainMap)->rows[z] + x;
 }
-static inline void EnemyD459_StepAnimation(u8 *p, void *sprite, struct FanSeq *s)
+static inline void EnemyD459_GetFlags(u32 **out, struct DisplaySequenceSprite *sprite)
 {
-    u32 flags, elapsed;
-    u32 duration;
-    register u32 mask asm("r7");
-    register u32 savedDuration asm("r4");
-    const volatile u16 *c = s->commands + s->index;
-    {
-        u32 frame;
-        frame = *c >> 6;
-        *(u16 *)((u8 *)sprite + 0x10) = frame;
-    }
-    {
-        u32 input = s->flags, bit = 1;
-        register u32 first asm("r2");
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != (((*c & 0x30) >> 4) & bit))
-            *(u32 *)(p + 0x24) |= 4;
-        else
-            *(u32 *)(p + 0x24) &= ~4;
-    }
-    {
-        u32 input = s->flags, bit = 2;
-        register u32 first asm("r2");
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != (((*c & 0x30) >> 4) & bit))
-            *(u32 *)sprite |= 8;
-        else
-            *(u32 *)sprite &= ~8;
-    }
-    elapsed = s->elapsed + 1;
-    s->elapsed = elapsed;
-    {
-        register u32 temp asm("r2") = 0xffff;
-        asm("" : "+r"(temp));
-        mask = temp;
-    }
-    duration = s->duration;
-    elapsed = (u16)elapsed;
-    savedDuration = duration;
-    asm("" : "+r"(savedDuration) : "r"(elapsed));
-    if ((u16)elapsed >= duration) {
-        s->elapsed = 0;
-        flags = s->flags;
-        if (flags & 4) {
-            u32 i = s->index;
-            if (!i) {
-                {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold)
-                        s->elapsed = savedDuration;
-                    else
-                        s->index = s->count - 1;
-                }
-            } else
-                s->index = i - 1;
-        } else {
-            u32 i = s->index + 1, n;
-            s->index = i;
-            n = s->count;
-            if ((i & mask) >= n) {
-                {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if ((u8)hold) {
-                        s->elapsed = duration;
-                        s->index = n - 1;
-                    } else
-                        s->index = 0;
-                }
-            }
-        }
-        c = s->commands + s->index;
-        s->weight = *c & 15;
-        {
-            register s32 w asm("r2") = s->weight;
-            s32 speed = s->speed;
-            speed = (speed * w) >> 6;
-            s->duration = speed;
-            if (!(u8)speed)
-                s->duration = 1;
-        }
-    }
+    *out = &sprite->flags;
 }
-static inline void EnemyD459_StepAnimation_InitializeFromScript(u8 *p, void *sprite,
-                                                                struct FanSeq *s)
+static inline u32 EnemyD459_StepSequence(u32 *flipFlags, struct EnemyD459Actor *actor,
+                                         struct DisplaySequenceSprite *owner,
+                                         struct DisplaySequenceState *state)
 {
-    u32 flags;
-    u32 elapsed;
-    u32 duration;
-    register u32 mask asm("r7");
-    register u32 savedDuration asm("r4");
-    const volatile u16 *c = s->commands + s->index;
+    const u16 *command;
+    u32 ended;
     {
-        u32 frame;
-        frame = *c >> 6;
-        *(u16 *)((u8 *)sprite + 0x10) = frame;
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = state->commands;
+        command = (const u16 *)((u32)table + offset);
     }
+    owner->frame = *command >> 6;
     {
-        u32 input = s->flags, bit = 1;
-        register u32 first asm("r2");
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != (((*c & 0x30) >> 4) & bit))
-            *(u32 *)(p + 0x24) |= 4;
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            actor->sprite.display.flags |= 4;
         else
-            *(u32 *)(p + 0x24) &= ~4;
+            actor->sprite.display.flags &= ~4;
     }
     {
-        u32 input = s->flags, bit = 2;
-        register u32 first asm("r2");
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != (((*c & 0x30) >> 4) & bit))
-            *(u32 *)sprite |= 8;
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            *flipFlags |= 8;
         else
-            *(u32 *)sprite &= ~8;
+            *flipFlags &= ~8;
     }
-    elapsed = s->elapsed + 1;
-    s->elapsed = elapsed;
-    {
-        register u32 temp asm("r2") = 0xffff;
-        asm("" : "+r"(temp));
-        mask = temp;
-    }
-    duration = s->duration;
-    elapsed = (u16)elapsed;
-    savedDuration = duration;
-    asm("" : "+r"(savedDuration) : "r"(elapsed));
-    if ((u16)elapsed >= duration) {
-        s->elapsed = 0;
-        flags = s->flags;
-        if (flags & 4) {
-            u32 i = s->index;
-            if (!i) {
-                {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold)
-                        s->elapsed = savedDuration;
-                    else
-                        s->index = s->count - 1;
-                }
-            } else
-                s->index = i - 1;
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->frameCount - 1;
+                ended = 1;
+            } else {
+                state->index--;
+                ended = 0;
+            }
         } else {
-            u32 i = s->index + 1, n;
-            s->index = i;
-            n = s->count;
-            if ((i & mask) >= n) {
-                {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if ((u8)hold) {
-                        s->elapsed = duration;
-                        s->index = n - 1;
-                    } else
-                        s->index = 0;
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
+                } else {
+                    state->index = 0;
                 }
+                ended = 1;
+            } else {
+                ended = 0;
             }
         }
-        c = s->commands + s->index;
-        s->weight = *c & 15;
-        {
-            register s32 w asm("r2") = s->weight;
-            s32 speed = s->speed;
-            speed = (speed * w) >> 6;
-            s->duration = speed;
-            if (!(u8)speed)
-                s->duration = 1;
-        }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    } else {
+        ended = 0;
     }
+    return ended;
 }
 
 inline static u32 Arg1(u32 k_, u8 *p)
@@ -243,102 +164,102 @@ inline static u32 Arg1(u32 k_, u8 *p)
     return p + k_;
 }
 
-s32 EnemyD459_InitializeFromScript(u8 *p, void *parent)
+s32 EnemyD459_InitializeFromScript(struct EnemyD459Actor *p, void *parent)
 {
     struct SpawnOffsets offsets = gUnk_0824FE5C;
     void *resource;
     void **slot;
-    register void *sprite asm("r9");
+    void *sprite;
     s16 *position;
     s16 *zp;
     s32 dead;
     if (Script_SeekToKeyword('p')) {
-        *((s16 *)(p + 0x1c)) = Script_GetValue();
-        *((s16 *)(p + 0x1e)) = Script_GetValue();
-        *((s16 *)(p + 0x20)) = Script_GetValue();
+        p->initialPosition.x = Script_GetValue();
+        p->initialPosition.y = Script_GetValue();
+        p->initialPosition.z = Script_GetValue();
     }
     if (Script_SeekToKeyword('a')) {
-        *((s16 *)(p + 0x120)) = Script_GetValue();
-        *((s16 *)(p + 0x122)) = Script_GetValue();
-        *((s16 *)(p + 0x124)) = Script_GetValue();
-        *((s16 *)(p + 0x136)) = Script_GetValue();
+        p->attackA = Script_GetValue();
+        p->attackB = Script_GetValue();
+        p->attackC = Script_GetValue();
+        p->attackD = Script_GetValue();
     } else {
-        *((s16 *)(p + 0x120)) = 30;
-        *((s16 *)(p + 0x122)) = 30;
-        *((s16 *)(p + 0x124)) = 30;
-        *((s16 *)(p + 0x136)) = 24;
+        p->attackA = 30;
+        p->attackB = 30;
+        p->attackC = 30;
+        p->attackD = 24;
     }
     if (Script_SeekToKeyword('l')) {
         s32 health = Script_GetValue();
-        *((s16 *)(p + 0x138)) = health;
-        *((s16 *)(p + 0x126)) = health;
+        p->maxHealth = health;
+        p->health = health;
         if (((s16)health) < 0)
-            *((s16 *)(p + 0x144)) = 1;
+            p->initialDead = 1;
     } else {
-        *((s16 *)(p + 0x138)) = 120;
-        *((s16 *)(p + 0x126)) = 120;
+        p->maxHealth = 120;
+        p->health = 120;
     }
     if (Script_SeekToKeyword('d'))
-        *((u32 *)(p + 0x154)) = Script_GetValue();
+        p->terrainEnabled = Script_GetValue();
     if (Script_SeekToKeyword('i'))
-        *((s16 *)(p + 0x134)) = Script_GetValue();
+        p->interval = Script_GetValue();
     else
-        *((s16 *)(p + 0x134)) = 60;
+        p->interval = 60;
     if (Script_SeekToKeyword('h')) {
         s32 v = Script_GetValue();
-        s8 *h = &(*((s8 *)(p + 0x132)));
+        s8 *h = &(p->facing);
         *h = v;
         *h = ((*h) - 1) / 2;
         if (((u8)(*h)) > 3)
             *h = 1;
     } else
-        *((s8 *)(p + 0x132)) = 1;
+        p->facing = 1;
     if (Script_SeekToKeyword('r'))
-        *((u32 *)(p + 0x14c)) = Script_GetValueSafe();
+        p->scriptList = Script_GetValueSafe();
     if (Script_SeekToKeyword('S'))
-        *((s16 *)(p + 0x140)) = Script_GetValue();
+        p->bodyEnabled = Script_GetValue();
     if (Script_SeekToKeyword('z')) {
-        *((s16 *)(p + 0x13a)) = Script_GetValue();
-        *((s16 *)(p + 0x13c)) = Script_GetValue();
+        p->rangeA = Script_GetValue();
+        p->rangeB = Script_GetValue();
     }
     if (Script_SeekToKeyword('g'))
-        *((s16 *)(p + 0x13e)) = Script_GetValue();
+        p->hudStyle = Script_GetValue();
     else
-        *((s16 *)(p + 0x13e)) = 2;
+        p->hudStyle = 2;
     if (Script_SeekToKeyword('D'))
-        *((u32 *)(p + 0x150)) = Script_GetValue();
+        p->valueD = Script_GetValue();
     if (Script_SeekToKeyword('G')) {
-        *((u32 *)(p + 0x170)) = Script_GetValue();
-        *((u32 *)(p + 0x174)) = Script_GetValue();
-        *((u32 *)(p + 0x178)) = Script_GetValue();
+        p->valueG0 = Script_GetValue();
+        p->valueG1 = Script_GetValue();
+        p->valueG2 = Script_GetValue();
     }
     if (Script_SeekToKeyword('X')) {
-        *((s16 *)(p + 0x148)) = Script_GetValue();
-        *((s16 *)(p + 0x14a)) = Script_GetValue();
+        p->unknown148 = Script_GetValue();
+        p->unknown14A = Script_GetValue();
     }
     if (Script_SeekToKeyword('V')) {
-        *((s16 *)(p + 0x142)) = Script_GetValue();
-        if ((*((s16 *)(p + 0x142))) > 99)
-            *((s16 *)(p + 0x142)) = 99;
-        if ((*((s16 *)(p + 0x142))) <= 0)
-            *((s16 *)(p + 0x142)) = 1;
+        p->hudTime = Script_GetValue();
+        if ((p->hudTime) > 99)
+            p->hudTime = 99;
+        if ((p->hudTime) <= 0)
+            p->hudTime = 1;
     } else
-        *((s16 *)(p + 0x142)) = 0;
-    *((void **)(p + 0x15c)) = parent;
+        p->hudTime = 0;
+    p->parent = parent;
     {
-        register u8 *graphics asm("r4") = p + 0x50;
+        u8 *graphics = &p->graphics;
         void *earlySprite;
         s16 *x;
         s16 *z;
-        register s8 *h asm("ip");
+        s8 *h;
         AnimData_Load(graphics, 0x7e82);
-        earlySprite = p + 0x24;
+        earlySprite = &p->sprite;
         Sprite_Init(earlySprite, graphics, 1);
-        x = &(*((s16 *)(p + 0x40)));
-        *((struct SceneVec *)(p + 0x40)) = *((struct SceneVec *)(p + 0x1c));
-        h = &(*((s8 *)(p + 0x132)));
+        x = &(p->sprite.coordinates.position.x);
+        p->sprite.coordinates.position = p->initialPosition;
+        h = &(p->facing);
         *x += offsets.e[*h].x << 2;
-        z = &(*((s16 *)(p + 0x44)));
+        z = &(p->sprite.coordinates.position.z);
         *z += offsets.e[*h].z << 2;
         {
             s32 facing = *h;
@@ -349,47 +270,48 @@ s32 EnemyD459_InitializeFromScript(u8 *p, void *parent)
                 *zp -= 0x50;
             else
                 *position -= 0x50;
-            asm("" : : "r"(earlySprite));
         }
-        AnimData_SelectPaletteBank(graphics, 0x227);
+        AnimData_SelectPaletteBank(&p->graphics, 0x227);
     }
     resource = ScriptProc_Start(0x922e, 0xfa45);
-    slot = (void **)(p + 0x158);
+    slot = (void **)(&p->resource);
     *slot = resource;
-    dead = *((s16 *)(p + 0x144));
+    dead = p->initialDead;
     if (dead == 0) {
-        *((void **)(p + 0x108)) = EnemyD459_UpdateAttackTiming;
-        Anim_SetSequence(p + 0x10c, resource, 2, (u8)(*((s8 *)(p + 0x132))), dead);
+        *((void **)(&p->update)) = EnemyD459_UpdateAttackTiming;
+        Anim_SetSequence(&p->sequence, resource, 2, (u8)(p->facing), dead);
     } else {
-        *((void **)(p + 0x108)) = EnemyD459_UpdateDeath;
+        *((void **)(&p->update)) = EnemyD459_UpdateDeath;
         {
-            s16 *d = &(*((s16 *)(p + 0x12e)));
+            s16 *d = &(p->dead);
             s32 zero = 0;
             *d = 1;
-            Anim_SetSequence(p + 0x10c, *slot, 4, 0, zero);
+            Anim_SetSequence(&p->sequence, *slot, 4, 0, zero);
         }
-        *position = (*((u16 *)(p + 0x1c))) + 0x40;
-        *zp = (*((u16 *)(p + 0x20))) + 0x40;
+        *position = (p->initialPosition.x) + 0x40;
+        *zp = (p->initialPosition.z) + 0x40;
         *position -= 0x60;
         *zp -= 0x60;
     }
-    EnemyD459_StepAnimation_InitializeFromScript(p, sprite, (struct FanSeq *)(p + 0x10c));
-    if ((*((s16 *)Arg1(0x144, p))) == 0)
-        EnemyD459_InitCollider(p);
-    if ((*((u32 *)(p + 0x154))) && ((*((s16 *)(p + 0x144))) == 0)) {
-        s32 cell = EnemyD459_CellIndex((struct PHVec *)position);
-        TerrainModifiers_RegisterCell(p + 0x160, cell, 0, (*((s16 *)(p + 0x42))) >> 8, 0, 1);
+    {
+        u32 *flipFlags;
+        EnemyD459_GetFlags(&flipFlags, sprite);
+        EnemyD459_StepSequence(flipFlags, p, sprite, (struct DisplaySequenceState *)(&p->sequence));
     }
-    if (*((s16 *)(p + 0x140))) {
-        u8 *body = p + 0xc0;
-        SceneBody_Init(body, *((void **)(p + 0x15c)), position, 0, 4, p);
+    if ((*((s16 *)&p->initialDead)) == 0)
+        EnemyD459_InitCollider(p);
+    if (p->terrainEnabled && p->initialDead == 0) {
+        s32 cell = EnemyD459_CellIndex((struct SceneVec *)position);
+        TerrainModifiers_RegisterCell(&p->terrain, cell, 0, (p->sprite.coordinates.position.y) >> 8,
+                                      0, 1);
+    }
+    if (p->bodyEnabled) {
+        u8 *body = &p->body;
+        SceneBody_Init(body, p->parent, position, 0, 4, p);
         SceneBody_SetSprite(body, sprite);
         TerrainOverlay_QueueAddActor(body);
     }
-    if (*((u32 *)(p + 0x14c)))
+    if (p->scriptList)
         EnemyD459_ReadScriptValueList(p);
+    /* The initializer has no explicit return assignment on this path. */
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", EnemyD459_InitializeFromScript);
-#endif
