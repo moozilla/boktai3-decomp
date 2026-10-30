@@ -1,208 +1,181 @@
-#include "scene_actor_chase.h"
+#include "scene_actor_chase_reaction.h"
+#include "scene_actor_reaction.h"
 
-#ifdef NONMATCHING
-// fuzzy: 83.5%
-// fix.py best (sweep after the inlined-insn fix)
-// fix.py best version (reprinted C)
-// confidence=low: converges saved motion and restores the route after a reaction timer.
-// Remaining differences: reset-address lifetimes, saved registers, and collision-control scheduling; delaying maskTwo and spilling group reduced structural differences.
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void Vorn_SendMessage(void *);
 u8 Vorn_HasActiveResponse(void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
-static inline s32 Quarter(s32 n)
+
+static inline s32 Vorn_QuarterDisplacement(s32 value)
 {
-    return n >= 0 ? n >> 2 : -((-n) >> 2);
+    return value >= 0 ? value >> 2 : -(-value >> 2);
 }
-static inline s32 Divide32(s32 n)
+static inline s32 Vorn_ReadDisplacementAxis(s32 desired, s16 *current, s16 **field)
 {
-    return n >= 0 ? n >> 5 : -((-n) >> 5);
+    s32 difference = desired - *current;
+    *field = current;
+    return Vorn_QuarterDisplacement(difference);
 }
-static inline s32 Clamp(s32 n)
-{
-    if (n > 200)
-        return 200;
-    if (n < -200)
-        return -200;
-    return n;
-}
-static inline u8 Rest(s32 x, s32 z)
+static inline u8 Vorn_DisplacementStopped(s32 x, s32 z)
 {
     if (!x && !z)
         return 1;
     return 0;
 }
-static inline void ClearMotion(u16 *flags, s32 mask)
+static inline s32 Vorn_DivideDirection(s32 n)
 {
+    return n >= 0 ? n >> 5 : -((-n) >> 5);
+}
+static inline u32 Vorn_StatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    return actor->flags2D0 & mask;
+}
+static inline u32 Vorn_ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    return actor->flags2CC & mask;
+}
+static inline void Vorn_ClearStatusFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+{
+    u32 mask = ~bits;
+    actor->flags2D0 &= mask;
+}
+static inline void Vorn_SetStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    actor->flags2D0 = mask | actor->flags2D0;
+}
+static inline void Vorn_ClearTrackingFlags(struct SceneActorChaseTracking *tracking, u32 bits)
+{
+    u32 mask = ~bits;
+    tracking->flags &= mask;
+}
+static inline void Vorn_SetTrackingFlags(struct SceneActorChaseTracking *tracking, u8 bits)
+{
+    tracking->flags = bits | tracking->flags;
+}
+static inline void Vorn_AdjustMotionFlags(struct SceneActorChaseFlags16 *field, u16 set, u32 clear)
+{
+    u16 value = set;
+    u32 result;
+    value |= field->value;
+    result = value;
+    result &= ~clear;
+    field->value = result;
+}
+static inline void Vorn_SetPaletteTimer(struct SceneActorRegistryResetView *actor, u32 value)
+{
+    actor->field1EA = value;
+}
+static inline void Vorn_ClearRoute(struct SceneActorRegistryResetView *actor,
+                                   struct SceneActorRegistryControl *control)
+{
+    SceneActorChase_ClearActorFlags(actor, 0x141C0);
+    control->counter = 0;
+    control->field14 = 0;
+    control->timer = 0;
+}
+static inline void Vorn_StartRoute(struct SceneActorRegistryResetView *actor,
+                                   struct SceneActorChaseGroup *group)
+{
+    SceneBody_StartRoute(&actor->body.id, &group->homeRoute, group->homeRoute.routeId,
+                         group->homeRoute.parameterB, group->homeRoute.pointId);
+}
+static inline u8 Vorn_ActorCollisionFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+{
+    return SceneActorChase_TestField(&actor->flags2C0, bits);
+}
+static inline void Vorn_ClearContextFlags(u16 *flags, u32 bits)
+{
+    u32 mask = ~bits;
     *flags &= mask;
-}
-static inline void SetMotion(struct SceneActorReactionMotion *m, u32 mask)
-{
-    m->flags |= mask;
-}
-static inline u8 Test(u16 *p, u32 mask)
-{
-    if (*p & mask)
-        return 1;
-    return 0;
-}
-inline static u32 Arg1(u32 k_, struct SceneActorRegistryResetView *actor)
-{
-    return ((u8 *)actor->context) + k_;
 }
 
 void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
 {
-    u8 *volatile group = (u8 *)(&actor->group.common);
+    struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(actor);
     s32 timer;
-    s32 x;
-    s32 z;
-    s16 *priorX;
-    s16 *priorZ;
+    s16 *x, *z;
+    s32 dx, dz;
     if (SceneActorReaction_TakePrepared(actor)) {
-        u32 maskTwo;
-        u32 *flags;
-        u16 *motionFlags;
-        struct SceneActorReactionMotion *motion;
-        struct SceneActorRegistryControl *control;
-        u32 *actionFlags;
+        struct SceneActorChaseFlags16 *motion;
         actor->body.direction = (((actor->body.direction + 32) >> 6) & 3) << 6;
-        SceneActorAnimation_SelectDirectionalEntry((void *)actor, 6);
-        maskTwo = 2;
-        flags = &actor->flags2D0;
-        if (!((*flags) & maskTwo)) {
+        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 6);
+        if (!Vorn_StatusFlags(actor, 2)) {
             SceneActorAttachment_ReplaceResponseSlot(actor, 3, 0, 25);
-            {
-                *flags |= maskTwo;
-            }
+            Vorn_SetStatusFlags(actor, 2);
             Sound_PlaySong(0x1CC);
         }
-        motionFlags = &actor->flags2D4;
+        motion = (struct SceneActorChaseFlags16 *)&actor->flags2D4;
+        Vorn_AdjustMotionFlags(motion, 2, 0x17A9);
         {
-            u32 v = (*motionFlags) | maskTwo;
-            v &= ~0x17A9;
-            *motionFlags = v;
-        }
-        actor->field2C2 = 64;
-        *((u16 *)(((u8 *)actor) + 0x414)) = 0;
-        *((u16 *)(((u8 *)actor) + 0x418)) = 0;
-        ClearMotion(motionFlags, ~0x380);
-        motion = (void *)(&actor->tracking.target);
-        {
-            s32 mask = ~0x18;
-            motion->flags &= mask;
-        }
-        control = &actor->group.common.control;
-        actionFlags = &actor->flags2CC;
-        if ((*actionFlags) & 0x200000) {
-            *flags &= ~0x1000000;
-            ClearMotion(motionFlags, ~0x200);
-            control->mode = 0;
-            control->counter = 0;
-            control->timer = 0;
-        }
-        ClearMotion(motionFlags, ~0x400);
-        *(((u8 *)actor) + 0x5DA) = 0xFF;
-        {
-            s32 mask = ~0x80;
-            *actionFlags &= mask;
-        }
-        actor->field2C2 = 64;
-        {
-            s32 mask = ~0x18;
-            motion->flags &= mask;
-        }
-        *flags &= ~0x1000000;
-        {
-            struct SceneActorRegistryControl *control = (void *)(group + 0x4C);
-            {
-                u16 k1 = 0x141C0;
-                *actionFlags &= ~k1;
+            struct SceneActorRegistryControl *control;
+            actor->field2C2 = 64;
+            actor->group.common.gate.flags = 0;
+            actor->group.common.gate.counter = 0;
+            SceneActorChase_ClearFlagComponent(motion, 0x380);
+            Vorn_ClearTrackingFlags(&actor->tracking, 0x18);
+            control = &actor->group.common.control;
+            if (Vorn_ActorFlags(actor, 0x200000)) {
+                Vorn_ClearStatusFlags(actor, 0x1000000);
+                SceneActorChase_ClearFlagComponent(motion, 0x200);
+                control->mode = 0;
+                control->counter = 0;
+                control->timer = 0;
             }
-            control->counter = 0;
-            *((u16 *)(((u8 *)control) + 0x14)) = 0;
-            control->timer = 0;
+            SceneActorChase_ClearFlagComponent(motion, 0x400);
+            actor->group.turn.turnsRemaining = -1;
         }
-        {
-            u32 mask = 0x2000000;
-            *actionFlags |= mask;
-        }
+        SceneActorChase_ClearActorFlags(actor, 0x80);
+        actor->field2C2 = 64;
+        Vorn_ClearTrackingFlags(&actor->tracking, 0x18);
+        Vorn_ClearStatusFlags(actor, 0x1000000);
+        Vorn_ClearRoute(actor, &group->common.control);
+        SceneActorChase_SetActorFlags(actor, 0x2000000);
         Vorn_SendMessage(actor);
     }
-    {
-        u32 value = 65;
-        *((u16 *)(((u8 *)actor) + 0x1EA)) = value;
-    }
+    Vorn_SetPaletteTimer(actor, 65);
     timer = (s16)actor->fieldAA;
-    if (((u32)(timer - 30)) <= 89) {
+    if ((u32)(timer - 30) <= 89) {
         s32 frame = Mod(timer, 30);
         s32 threshold = 15 - Div(timer, 10);
-        if (frame < threshold) {
-            u32 mask = 32;
-            actor->flags2D6 |= mask;
-        }
+        if (frame < threshold)
+            SceneActorChase_SetReactionFlags(actor, 32);
     }
-    {
-        s32 current = *((s16 *)(((u8 *)actor) + 0x310));
-        s16 *p = (void *)(((u8 *)actor) + 0x318);
-        s32 delta = current - (*p);
-        priorX = p;
-        x = Quarter(delta);
-    }
-    {
-        s32 current = *((s16 *)(((u8 *)actor) + 0x314));
-        s16 *p = (void *)(((u8 *)actor) + 0x31C);
-        s32 delta = current - (*p);
-        priorZ = p;
-        z = Quarter(delta);
-    }
-    x = Clamp(x);
-    z = Clamp(z);
-    actor->body.motion.x += x;
-    actor->body.motion.z += z;
-    *priorX += x;
-    *priorZ += z;
-    if (Rest(x, z) && (timer <= 0)) {
+    dx = Vorn_ReadDisplacementAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
+    dz = Vorn_ReadDisplacementAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
+    if (dx > 200)
+        dx = 200;
+    else if (dx < -200)
+        dx = -200;
+    if (dz > 200)
+        dz = 200;
+    else if (dz < -200)
+        dz = -200;
+    actor->body.motion.x += dx;
+    actor->body.motion.z += dz;
+    *x += dx;
+    *z += dz;
+    if (Vorn_DisplacementStopped(dx, dz) && timer <= 0) {
         struct ContactCollider *collider;
-        u16 *motionFlags;
         actor->fieldAA = 0;
-        actor->field2B6 = (Divide32(actor->body.direction) + 7) & 7;
-        Chase_SetState(actor, 3, 1, 0);
-        Chase_SetCtl(actor, *((void **)(group + 0x20C)), 8);
-        {
-            s8 mask = ~2;
-            actor->flags2D0 &= mask;
-        }
-        motionFlags = &actor->flags2D4;
-        {
-            s32 mask = ~0x3A;
-            *motionFlags &= mask;
-        }
-        Chase_SetState(actor, 3, 1, 0);
+        actor->field2B6 = (Vorn_DivideDirection(actor->body.direction) + 7) & 7;
+        SceneActorChase_SetState(actor, 3, 1, 0);
+        SceneActorChase_SetControl(actor, group->field5E0, 8);
+        SceneActorChase_ClearWordFlags(&actor->flags2D0, 2);
+        SceneActorChase_ClearMotionFlagComponent(actor, 0x3A);
+        SceneActorChase_SetState(actor, 3, 1, 0);
         actor->body.direction = ((actor->body.direction + 32) >> 6) << 6;
-        SceneBody_StartRoute(&actor->body.id, group + 0x74, group[0x84], group[0x85], group[0x86]);
+        Vorn_StartRoute(actor, group);
         collider = &actor->colliderA;
-        if (Test((u16 *)(((u8 *)actor) + 0x2C0), 64))
+        if (Vorn_ActorCollisionFlags(actor, 64))
             collider->flags &= 0xFEFF;
-        else if ((*motionFlags) & 0x2016)
+        else if (SceneActorChase_QueryMotionFlagComponent(actor, 0x2016))
             collider->flags &= 0xFEFF;
         else
             collider->flags |= 0x100;
-        {
-            u16 *f = (u16 *)Arg1(0x6D4, actor);
-            s32 mask = ~0x1E;
-            *f &= mask;
-        }
+        Vorn_ClearContextFlags(&((struct SceneActorAnimationLink *)actor->context)->flags, 0x1E);
         if (Vorn_HasActiveResponse(actor->context)) {
-            SetMotion((void *)(&actor->tracking.target), 8);
-            {
-                u32 mask = 0x80;
-                actor->flags2CC |= mask;
-            }
+            Vorn_SetTrackingFlags(&actor->tracking, 8);
+            SceneActorChase_SetActorFlags(actor, 0x80);
         }
     }
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Vorn_UpdateKnockbackRecovery);
-#endif
