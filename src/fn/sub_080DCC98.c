@@ -6,19 +6,14 @@
 #include "scene_actor_init_group.h"
 #include "scene_actor_init_dispatch.h"
 #include "scene_actor_init_graphics.h"
+#include "scene_actor_init_body.h"
 
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
-void sub_08080BE0(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void sub_081363F4(void);
 void SceneActorScript_OnCommand(void);
-void SceneBody_Init(void *, s32, void *, s32, s32, void *);
-u32 Route_GetCurrentPointFacing(void *);
-s32 TargetRegistry_RegisterActor(void *, void *, void *);
-void SceneBody_SetSprite(void *, void *);
-void SceneBody_SetMovementProbe(void *, void *, s32, s32);
 void AnimData_SelectPaletteBank(void *, s32);
 s32 SceneActorScript_GetManagerField62(void);
 void SceneActorPlacement_HideActor(void *, s32);
@@ -54,88 +49,6 @@ static inline void MummyInit_ResetFlags(void *object)
 {
     struct MummyInstanceState *actor = object;
     actor->field6F2 = 0;
-}
-
-static inline void MummyInit_InitializeBody(void *object, u32 *fill)
-{
-    struct SceneActorRegistryResetView *arg0 = object;
-    struct SceneActorChaseGroup *group = &arg0->group;
-    struct SceneActorBody *body = &arg0->body;
-    struct ContactPosition origin;
-    s32 mode, secondLimit, firstLimit, gateDuration, identity;
-    struct SceneActorRegistryRoute *rt;
-    arg0->flags2CC = 0;
-    arg0->flags2D0 = 0;
-    arg0->enabled = 0;
-    arg0->field2E8 = 8;
-    arg0->flags2C0 = Script_GetKeywordValue(0x4D, 0);
-    arg0->field2C2 = 0x40;
-    MonsterInit_ClearPosition(fill, &origin);
-    mode = Script_GetKeywordValue(0x4E, 0);
-
-    MonsterInit_ReadAttacks(arg0);
-
-    if (Script_SeekToKeyword(0x6C)) {
-        firstLimit = MonsterInit_ReadWord(0x12C);
-        secondLimit = MonsterInit_ReadWord(0x12C);
-        gateDuration = MonsterInit_ReadWord(0x12C);
-    } else {
-        firstLimit = 0;
-        secondLimit = 0;
-        gateDuration = 0;
-    }
-    MonsterInit_InitializeGate(&group->common.gate, gateDuration);
-    MonsterInit_ReadRange(&group->common.control);
-    MonsterInit_ReadTargeting(&arg0->tracking);
-    if (Script_GetKeywordValue(0x62, 0))
-        MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
-    arg0->field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
-
-    if (Script_SeekToKeyword(0x41)) {
-        MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
-        group->halfHealth = MonsterInit_Half(MonsterInit_GetInitialHealth(arg0));
-        arg0->field9E = MonsterInit_ReadByte(0);
-        arg0->field9F = MonsterInit_ReadByte(0);
-        arg0->fieldA0 = MonsterInit_ReadByte(0);
-        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
-        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
-    }
-
-    MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), firstLimit, secondLimit);
-
-    if (Script_SeekToKeyword(0x58)) {
-        arg0->fieldAC = MonsterInit_ReadWord(0);
-        arg0->fieldA1 = MonsterInit_ReadByte(0);
-    }
-    arg0->fieldB2 = Script_GetKeywordValue(0x4B, 2);
-    identity = (s16)Script_GetKeywordValue(0x56, -1);
-    if (identity < 0)
-        identity = 0xFFFF;
-    arg0->field9A = identity;
-    if (Script_GetKeywordValue(0x48, 0))
-        MonsterInit_SetStatusFlags(arg0, 0x800);
-    if (Script_GetKeywordValue(0x4C, 0))
-        MonsterInit_SetStatusFlags(arg0, 0x8000);
-
-    SceneBody_Init(body, mode, &origin, 0, 4, arg0);
-    rt = &group->homeRoute;
-    if (MonsterInit_ReadRoute(arg0, group, rt)) {
-        MonsterInit_SnapToRoute(&arg0->body.position, rt);
-        MonsterInit_DrawablePosition(arg0);
-        arg0->body.direction = Route_GetCurrentPointFacing(rt);
-    }
-
-    if (MonsterInit_TestMotionFlags(arg0, 0x200))
-        TargetRegistry_RegisterActor((u8 *)group + 0x30, body, sub_08080BE0);
-    SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->drawable : 0);
-    if (MonsterInit_GetCategory(arg0) == 0x15)
-        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x3C, 0x3C);
-    else
-        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
-
-    group->common.bodyId = arg0->body.id;
-    group->common.bodyPosition = &arg0->body.position;
 }
 
 static inline void MummyInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
@@ -273,7 +186,7 @@ s32 Mummy_Init(void *object)
         MonsterInit_InitializeWidget(heap, 0xCB05, 0x48DE, &tmp);
         actor->animationIndex = 0xFF;
     }
-    MummyInit_InitializeBody(arg0, &zero);
+    MonsterInit_InitializePursuitBody(arg0, &zero);
     MummyInit_ReadPalette(actor, 0x23, 0x192);
     MummyInit_InitializePaletteRange(actor, MonsterInit_GetPaletteBase(actor) + 3, 4, 0);
     Mummy_InitCollision(actor);
@@ -296,7 +209,7 @@ s32 Mummy_Init(void *object)
     group->common.fallback = sub_080D453C;
     actor->field2E8 = 1;
     MummyInit_EnableInitialFlags(actor);
-    MonsterInit_ClearColliderFlags((void *)((u8 *)actor + 0x134), ~1);
+    MonsterInit_ClearColliderFlags(&actor->colliderA, ~1);
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorEffects_InitAtActorPosition(arg0);
     SceneActorTerrain_ReadScriptParameters(actor);
@@ -312,7 +225,7 @@ s32 Mummy_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_ClearColliderFlags((void *)((u8 *)actor + 0x134), ~0x100);
+        MonsterInit_ClearColliderFlags(&actor->colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);

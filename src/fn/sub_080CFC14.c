@@ -297,7 +297,7 @@ s32 Golem_Init(void *object)
     group->field5EC = Golem_RestoreRoute;
     actor->field2E8 = 0;
     GolemInit_EnableInitialFlags(actor);
-    MonsterInit_ClearColliderFlags((void *)((u8 *)actor + 0x134), ~1);
+    MonsterInit_ClearColliderFlags(&actor->colliderA, ~1);
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorTerrain_ReadScriptParameters(actor);
     GolemInit_ReadInitialMode(actor, group);
@@ -312,7 +312,7 @@ s32 Golem_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_ClearColliderFlags((void *)((u8 *)actor + 0x134), ~0x100);
+        MonsterInit_ClearColliderFlags(&actor->colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);

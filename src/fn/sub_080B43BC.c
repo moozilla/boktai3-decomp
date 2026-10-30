@@ -321,7 +321,7 @@ s32 Vorn_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_ClearColliderFlags((void *)((u8 *)actor + 0x134), ~0x100);
+        MonsterInit_ClearColliderFlags(&actor->colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
