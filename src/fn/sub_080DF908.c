@@ -1,54 +1,78 @@
 #include "contact_actor.h"
 #include "engine.h"
 #include "ram.h"
-
-// confidence=low: spawns one trail particle at the position with a random heading and speed.
+#include "heap.h"
 
 extern const s16 gUnk_086149C4[];
 u32 SceneMovingParticle_CreateWithOptions(void *, void *, s32, s32, s32);
 
-static inline s32 Trunc080DF908(s32 value)
+static inline u32 DogTrail_NextSample(const u16 *table)
+{
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return table[gRandomIndex];
+}
+
+static inline u32 DogTrail_ReadSampleAddress(u32 address, u32 origin, const u16 *table)
+{
+    u32 offset = address - origin;
+    return *(const u16 *)((const u8 *)table + offset);
+}
+
+static inline u32 DogTrail_NextBankSample(u32 origin, const u16 *table)
+{
+    u32 address;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    address = origin + gRandomIndex * sizeof(*table);
+    return DogTrail_ReadSampleAddress(address, origin, table);
+}
+
+static inline s32 DogTrail_Truncate(s32 value)
 {
     if (value >= 0)
         return value >> 12;
     return -((-value) >> 12);
 }
 
-#ifdef NONMATCHING
-// fuzzy: 49.5%
-// scope shape 30 (differences once low registers are set aside)
-// confidence=low: spawns one trail particle at the position with a random heading and speed.
-void SceneActorAnimation_SpawnTrailAtPosition(void *arg0, u32 arg1)
+void SceneActorAnimation_SpawnTrailAtPosition(void *position, u32 palette)
 {
     s16 velocity[3];
-    s16 *v = velocity;
-    u32 *cursor = &gRandomIndex;
-    u32 index;
-    u32 mask;
-    s32 angle;
-    s32 magnitude;
+    s16 *planar;
+    u32 randomOrigin;
+    const u16 *earlyTable;
+    u32 mask, sampleOrigin;
+    s32 heading;
+    s32 speed, vertical;
+    s16 *result;
 
-    index = (*cursor + 1) & 1023;
+    /* The recovered bank origin cancels when converting a sample address to its table offset. */
+    randomOrigin = (u32)&gHeapHead + 0x0203B000u;
+    earlyTable = (const u16 *)RANDOM_TABLE_ADDR;
     mask = 255;
-    angle = *(const u8 *)(index * 2 + (u32)gRandomTable);
-    index = (index + 1) & 1023;
-    *cursor = index;
+    heading = DogTrail_NextSample(earlyTable) & mask;
     {
-        s32 raw = gRandomTable[index];
-        s32 bitmask = 31;
-        raw &= bitmask;
-        magnitude = raw;
+        s32 raw = DogTrail_NextSample(earlyTable);
+        s32 speedMask = 31;
+        planar = velocity;
+        raw &= speedMask;
+        speed = raw;
     }
-    v[0] = Trunc080DF908(gUnk_086149C4[(angle + 64) & mask] * magnitude);
-    v[1] = 0;
-    v[2] = Trunc080DF908(gUnk_086149C4[angle] * magnitude);
-    *cursor = (*cursor + 1) & 1023;
-    v[1] = (gRandomTable[*cursor] & 63) - 48;
-    if (arg1 == 3)
-        SceneMovingParticle_CreateWithOptions(arg0, &velocity, 60, 3, 3);
+    {
+        s32 x, zero, rawX;
+        rawX = gUnk_086149C4[(heading + 64) & mask] * speed;
+        sampleOrigin = randomOrigin;
+        x = DogTrail_Truncate(rawX);
+        zero = 0;
+        planar[0] = x;
+        planar[1] = zero;
+        planar[2] = DogTrail_Truncate(gUnk_086149C4[heading] * speed);
+    }
+    vertical = DogTrail_NextBankSample(sampleOrigin, (const u16 *)RANDOM_TABLE_ADDR);
+    vertical &= 63;
+    vertical -= 48;
+    result = velocity;
+    result[1] = vertical;
+    if (palette == 3)
+        SceneMovingParticle_CreateWithOptions(position, result, 60, 3, 3);
     else
-        SceneMovingParticle_CreateWithOptions(arg0, &velocity, 60, 4, 3);
+        SceneMovingParticle_CreateWithOptions(position, result, 60, 4, 3);
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActorAnimation_SpawnTrailAtPosition);
-#endif
