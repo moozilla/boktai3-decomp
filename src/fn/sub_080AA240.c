@@ -106,7 +106,7 @@ void sub_080AA240(struct SceneActorRegistryResetView *actor)
     }
 }
 
-static void sub_080AA4B8(struct SceneActorRegistryResetView *actor)
+void sub_080AA4B8(struct SceneActorRegistryResetView *actor)
 {
     struct TentacleWaveTrail *trail = actor->context;
     s32 live = 0;
