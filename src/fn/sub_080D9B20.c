@@ -1,55 +1,64 @@
-#include "global.h"
-
-#ifdef NONMATCHING
-// fuzzy: 88.8%
-// fix.py best version (reprinted C)
-// The compiler merges the repeated passability tests and removes redundant cell comparisons.
-#include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
-// confidence=low: keeps the current cell unless the requested neighbour passes the height and flag tests.
-static inline u8 Open(s32 cell, s32 level)
+
+// confidence=low: retains the current cell unless its requested neighbour passes the height and flag checks.
+static inline u32 SceneActor_CellAttributes(s32 cell)
+{
+    return *(u16 *)(SceneActorTerrain_GetCell(cell) + 2);
+}
+
+static inline u8 SceneActor_IsCellOpen(s32 cell, s32 level)
 {
     if ((*SceneActorTerrain_GetCell(cell) & 15) != level ||
-        (*(u16 *)(SceneActorTerrain_GetCell(cell) + 2) & 0x43))
+        (SceneActor_CellAttributes(cell) & 0x43))
         return 0;
     return 1;
 }
-static inline u8 Adjacent(struct SceneActorRegistryResetView *actor, s32 goal)
+static inline u8 SceneActor_IsAdjacentCellOpen(struct SceneActorRegistryResetView *actor, s32 goal)
 {
     s32 cell = actor->terrainCell;
     s32 level = actor->body.position.y >> 8;
     s32 i;
-    typeof(i) c1;
     if ((goal - 1) == cell) {
         i = cell + 1;
-        c1 = i;
-        if (!Open(c1, level))
+        if (!SceneActor_IsCellOpen(i, level))
             return 0;
         if (i == goal)
             return 1;
+        return 0;
     } else if (goal == (cell + SceneActorTerrain_Width())) {
         i = cell + SceneActorTerrain_Width();
-        if (!Open(i, level))
+        if (!SceneActor_IsCellOpen(i, level))
             return 0;
         if (i == goal)
             return 1;
+        return 0;
     } else if ((goal + 1) == cell) {
         i = cell - 1;
-        if (!Open(i, level))
+        if (!SceneActor_IsCellOpen(i, level))
             return 0;
         if (i == goal)
             return 1;
+        return 0;
     } else if (goal == (cell - SceneActorTerrain_Width())) {
         i = cell - SceneActorTerrain_Width();
-        if (!Open(i, level))
+        if (!SceneActor_IsCellOpen(i, level))
             return 0;
         if (i == goal)
-            goto ret1;
+            return 1;
     }
     return 0;
-ret1:
-    return 1;
+}
+
+static inline s32 SceneActor_NextRowCell(const u16 *cell)
+{
+    s32 width = SceneActorTerrain_Width();
+    return *cell + width;
+}
+
+static inline s32 SceneActor_PreviousRowCell(s32 cell)
+{
+    return cell - SceneActorTerrain_Width();
 }
 
 s32 SceneActor_FindDirectionalCell(struct SceneActorRegistryResetView *actor, s32 direction)
@@ -57,28 +66,25 @@ s32 SceneActor_FindDirectionalCell(struct SceneActorRegistryResetView *actor, s3
     s32 result = actor->terrainCell;
     switch (direction) {
         case 0:
-            if (Adjacent(actor, result + 1))
+            if (SceneActor_IsAdjacentCellOpen(actor, result + 1))
                 result = actor->terrainCell + 1;
             break;
 
         case 1:
-            if (Adjacent(actor, result + SceneActorTerrain_Width()))
-                result = actor->terrainCell + SceneActorTerrain_Width();
+            if (SceneActor_IsAdjacentCellOpen(actor, result + SceneActorTerrain_Width()))
+                result = SceneActor_NextRowCell(&actor->terrainCell);
             break;
 
         case 2:
-            if (Adjacent(actor, result - 1))
+            if (SceneActor_IsAdjacentCellOpen(actor, result - 1))
                 result = actor->terrainCell - 1;
             break;
 
         case 3:
-            if (Adjacent(actor, result - SceneActorTerrain_Width()))
-                result = actor->terrainCell - ((u8)SceneActorTerrain_Width());
+            if (SceneActor_IsAdjacentCellOpen(actor, result - SceneActorTerrain_Width()))
+                result = SceneActor_PreviousRowCell(actor->terrainCell);
             break;
     }
 
     return result;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", SceneActor_FindDirectionalCell);
-#endif
