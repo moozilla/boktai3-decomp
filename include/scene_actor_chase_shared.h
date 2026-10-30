@@ -301,23 +301,29 @@ static inline s32 SceneActorChase_PlayerSlot(struct SceneActorChaseTarget *targe
 static inline u16 SceneActorChase_QueryMotionFlags(struct SceneActorRegistryResetView *actor,
                                                    u16 mask)
 {
-#if SCENE_ACTOR_CHASE_COMPONENT_FLAG_QUERY
+    return actor->flags2D4 & mask;
+}
+
+/* Query the separately owned halfword component; used by recovery and status
+ * operations that also pass this flag storage through component interfaces. */
+static inline u16
+SceneActorChase_QueryMotionFlagComponent(struct SceneActorRegistryResetView *actor, u16 mask)
+{
     return SceneActorChase_FlagComponentBits((struct SceneActorChaseFlags16 *)&actor->flags2D4,
                                              mask);
-#else
-    return actor->flags2D4 & mask;
-#endif
 }
 
 static inline void SceneActorChase_ClearMotionFlags(struct SceneActorRegistryResetView *actor,
                                                     u32 bits)
 {
-#if SCENE_ACTOR_CHASE_COMPONENT_FLAG_CLEAR
-    SceneActorChase_ClearFlagComponent((struct SceneActorChaseFlags16 *)&actor->flags2D4, bits);
-#else
     u32 mask = ~bits;
     actor->flags2D4 &= mask;
-#endif
+}
+
+static inline void
+SceneActorChase_ClearMotionFlagComponent(struct SceneActorRegistryResetView *actor, u32 bits)
+{
+    SceneActorChase_ClearFlagComponent((struct SceneActorChaseFlags16 *)&actor->flags2D4, bits);
 }
 
 static inline u8 SceneActorChase_TrackingFlags(struct SceneActorChaseTracking *tracking, u32 mask)

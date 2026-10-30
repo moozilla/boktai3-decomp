@@ -3,8 +3,6 @@
 #define SCENE_ACTOR_CHASE_DIRECT_ROUTE_FIELDS      1
 #define SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL     1
 #define SCENE_ACTOR_CHASE_SCALAR_COORDINATE_OUTPUT 1
-#define SCENE_ACTOR_CHASE_COMPONENT_FLAG_QUERY     1
-#define SCENE_ACTOR_CHASE_COMPONENT_FLAG_CLEAR     1
 #define SCENE_ACTOR_CHASE_ROUTE_COUNT_ACCESSOR     1
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
@@ -47,11 +45,11 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         actor->secondaryMotion.x = Mummy_QuarterDisplacement(actor->secondaryMotion.x);
         actor->secondaryMotion.z = Mummy_QuarterDisplacement(actor->secondaryMotion.z);
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
-        if (SceneActorChase_QueryMotionFlags(actor, 8)) {
+        if (SceneActorChase_QueryMotionFlagComponent(actor, 8)) {
             Sound_PlaySong(0x12A);
             Sound_PlaySong(0xFD);
         }
-        SceneActorChase_ClearMotionFlags(actor, 1);
+        SceneActorChase_ClearMotionFlagComponent(actor, 1);
         actor->field2B3 = 0;
     }
     SceneActorChase_SetActorFlags(actor, 0x2000);
@@ -62,7 +60,7 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     if (frame <= 17 && animation->index == 0 && animation->elapsed == (animation->duration != 0) &&
         animation->duration != 1)
         animation->elapsed = 0;
-    if (Mod(frame, 12) == 0 && SceneActorChase_QueryMotionFlags(actor, 8)) {
+    if (Mod(frame, 12) == 0 && SceneActorChase_QueryMotionFlagComponent(actor, 8)) {
         u32 index, sample;
         u8 count;
         range.x = 60;
@@ -97,34 +95,35 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         return;
     group = (struct SceneActorChaseGroup *)&actor->group.common;
     actor->field2B0 = 1;
-    SceneActorChase_ClearMotionFlags(actor, 0x120);
+    SceneActorChase_ClearMotionFlagComponent(actor, 0x120);
     SceneActorChase_ClearActorFlags(actor, 0x80);
-    if (SceneActorChase_QueryMotionFlags(actor, 0x10)) {
+    if (SceneActorChase_QueryMotionFlagComponent(actor, 0x10)) {
         SceneActorChase_ChooseRoute(actor);
         SceneActorMovement_ResolveRoutePosition(actor);
         SceneActorChase_SetBehavior(actor, 8);
         SceneActorChase_SetControl(actor, group->routeChoiceControl, 0x13);
-        SceneActorChase_ClearMotionFlags(actor, 8);
+        SceneActorChase_ClearMotionFlagComponent(actor, 8);
         return;
     }
     if (actor->field2DC & 0x80000) {
         SceneActorChase_SetReactionFlags(actor, 2);
         return;
     }
-    if (SceneActorChase_QueryMotionFlags(actor, 8)) {
+    if (SceneActorChase_QueryMotionFlagComponent(actor, 8)) {
         SceneActorChase_SetState(actor, 3, 0, 0);
         SceneActorChase_SetControl(actor, Mummy_ResumeRouteAfterRecovery, 0x14);
-        SceneActorChase_ClearMotionFlags(actor, 8);
+        SceneActorChase_ClearMotionFlagComponent(actor, 8);
         actor->field2C2 = 64;
         return;
     }
-    if (SceneActorChase_QueryMotionFlags(actor, 0x80)) {
+    if (SceneActorChase_QueryMotionFlagComponent(actor, 0x80)) {
         SceneActorChase_SetActorFlags(actor, 0x80);
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor)) {
             if (!SceneActorChase_TryRoute(
                     actor, group->route, &actor->body.position,
-                    &((struct SceneActorChaseTracking *)&actor->tracking.target)->target->position)) {
+                    &((struct SceneActorChaseTracking *)&actor->tracking.target)
+                         ->target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return;
             }
