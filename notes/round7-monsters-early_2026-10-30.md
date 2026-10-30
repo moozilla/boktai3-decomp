@@ -70,3 +70,10 @@ Matched 556 bytes without the old r6 pin. The entry operation owns initial contr
 - Reused the verified Ghost/Lun position interpolation operation for the segment range. Kept caller-owned zero tangent scales and the separately evaluated fixed phase range, matching the original curve arithmetic and loop strength reduction.
 - Canonical actor with typed private trail segments; no pins, barriers, compiler switches, or assembly.
 - Formatted stock check: MATCH, 472 / 472 bytes, zero differing bytes. Evidence: `build/round7/early/080A9BD8/stock-check.json`.
+
+## 080AA240 — exact, 740 bytes
+
+- Reconstructed oscillation and midpoint interpolation using canonical actor, typed private trail/drawable components, and the verified curve operation.
+- Recovered the previously unlabeled trailing helper at 080AA4B8 (108 bytes) as an ordinary static C function in its original position; the reviewed span includes both functions.
+- Byte flag mask ownership hoists the full keep-mask in the first loop pass, giving the ROM allocation naturally.
+- Formatted stock check: MATCH, 740 / 740 bytes, zero differing bytes. Evidence: `build/round7/early/080AA240/stock-check.json`.
