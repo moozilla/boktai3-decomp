@@ -4514,6 +4514,7 @@ addr,name,mode,confidence,source,notes
 08119F9C,Glove_StopWithMessage,thumb,low,src-alias,
 0811A004,Glove_CreateStageIconFromScript,thumb,low,src-alias,Reads the glove index from script parameters and creates an icon bound to that glove
 0811A030,MotionActor_DispatchRequestedState,thumb,low,src-alias,
+0811A158,Glove_UpdatePostState,thumb,low,src-alias,
 0811A604,Glove_UpdateTask,thumb,low,src-alias,Runs glove preprocessing then its current state callback and postprocessing each task tick
 0811A62C,MotionActor_Destroy,thumb,low,src-alias,
 0811A6C4,Glove_InitFromScript,thumb,low,src-alias,
