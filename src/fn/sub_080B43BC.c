@@ -54,17 +54,6 @@ u8 sub_080B3C1C(void *);
 void SceneActorPlacement_ResetStateThree(void);
 extern const u8 gUnk_08606038[];
 
-static inline void VornInit_ClearColliderFlags(struct ContactCollider *collider, u32 mask)
-{
-    collider->flags = mask & collider->flags;
-}
-static inline s32 VornInit_Half(s32 value)
-{
-    if (value >= 0)
-        return value >> 1;
-    return -(-value >> 1);
-}
-
 static inline void VornInit_BeginBehavior(struct SceneActorRegistryResetView *actor, u32 behavior)
 {
     MonsterInit_SetState(actor, 0, 0, behavior);
@@ -121,7 +110,7 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
 
     if (Script_SeekToKeyword(0x41)) {
         MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
-        group->halfHealth = VornInit_Half(MonsterInit_GetInitialHealth(arg0));
+        group->halfHealth = MonsterInit_Half(MonsterInit_GetInitialHealth(arg0));
         arg0->field9E = MonsterInit_ReadByte(0);
         arg0->field9F = MonsterInit_ReadByte(0);
         arg0->fieldA0 = MonsterInit_ReadByte(0);
@@ -374,7 +363,7 @@ s32 Vorn_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        VornInit_ClearColliderFlags((void *)((u8 *)actor + 0x134), ~0x100);
+        MonsterInit_ClearColliderFlags((void *)((u8 *)actor + 0x134), ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);

@@ -59,17 +59,6 @@ u8 sub_080D7568(void *);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
 
-static inline void MummyInit_ClearColliderFlags(struct ContactCollider *collider, u32 mask)
-{
-    collider->flags = mask & collider->flags;
-}
-static inline s32 MummyInit_Half(s32 value)
-{
-    if (value >= 0)
-        return value >> 1;
-    return -(-value >> 1);
-}
-
 static inline void MummyInit_ResetFlags(void *object)
 {
     struct MummyInstanceState *actor = object;
@@ -122,7 +111,7 @@ static inline void MummyInit_InitializeBody(void *object, u32 *fill)
 
     if (Script_SeekToKeyword(0x41)) {
         MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
-        group->halfHealth = MummyInit_Half(MonsterInit_GetInitialHealth(arg0));
+        group->halfHealth = MonsterInit_Half(MonsterInit_GetInitialHealth(arg0));
         arg0->field9E = MonsterInit_ReadByte(0);
         arg0->field9F = MonsterInit_ReadByte(0);
         arg0->fieldA0 = MonsterInit_ReadByte(0);
@@ -349,7 +338,7 @@ s32 Mummy_Init(void *object)
     group->common.fallback = sub_080D453C;
     actor->field2E8 = 1;
     MummyInit_EnableInitialFlags(actor);
-    MummyInit_ClearColliderFlags((void *)((u8 *)actor + 0x134), ~1);
+    MonsterInit_ClearColliderFlags((void *)((u8 *)actor + 0x134), ~1);
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorEffects_InitAtActorPosition(arg0);
     SceneActorTerrain_ReadScriptParameters(actor);
@@ -365,7 +354,7 @@ s32 Mummy_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MummyInit_ClearColliderFlags((void *)((u8 *)actor + 0x134), ~0x100);
+        MonsterInit_ClearColliderFlags((void *)((u8 *)actor + 0x134), ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
