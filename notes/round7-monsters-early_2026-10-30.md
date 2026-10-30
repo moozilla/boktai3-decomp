@@ -32,3 +32,11 @@ motion flags instead of reaction flags at 0x2D6 and fetched a group callback whe
 the ROM uses `entryTarget228`. Typed group ownership resolves the final PRE
 first-discovery tie. This uses the existing typed-group interface selector; no
 new selector or compiler override. Formatted stock check reports zero differing bytes.
+
+## Bat displacement recovery (08087A70)
+
+Exact 4,532 bytes using the verified Mummy displacement operations with Bat's
+entry animation, sounds, and route-selection differences. Capturing the pursuit
+group at entry preserves the complete allocation and PRE frame. The existing value/ownership
+interface selections remain unchanged. Stock check reports zero
+differing bytes after formatting.
