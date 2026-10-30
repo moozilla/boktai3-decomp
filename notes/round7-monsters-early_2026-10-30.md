@@ -58,3 +58,9 @@ Matched 436 bytes using the established Lun curve interpolation operation and ca
 Tags: 08098344, Ghost, curve
 
 Matched 488 bytes by reusing the exact Bee route generator with the Ghost point storage and motion scale. Canonical actor position and context access replace the opaque draft. Stock formatted check has zero differing bytes, SHA-256 `1d72275f6d28ab0474c0f38b5c51de478976079d70945148353e88837be83bc7`.
+
+## Ghost drained-player follow (08098A74)
+
+Tags: 08098A74, Ghost, reaction, PRE
+
+Matched 556 bytes without the old r6 pin. The entry operation owns initial control, player-position capture, flags, and heading; it returns the actor motion-flag component used by animation scaling. This places the shared player-slot address before the returned component address in PRE, resolving the final five-instruction ordering hunk. Context position, player position, and player drain-stat accesses now use typed fields. Formatted stock check has zero differing bytes, SHA-256 `f7f2fc0c21e2b5218171ee177f4c1f95f317563c9f3dfdeeb5621c5c22620ef2`.
