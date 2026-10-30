@@ -2,7 +2,7 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
-#include "scene_actor_init_primitives.h"
+#include "scene_actor_init_actor.h"
 
 struct MonsterInit32Block {
     u32 w[8];
@@ -56,218 +56,14 @@ void *Region_FindContaining(void *);
 
 extern u8 *gGameState;
 
-struct SpiderBody {
-    u32 id;
-    u8 unknown54[0x5];
-    u8 direction;
-    u8 unknown5A[0x2];
-    struct ContactPosition position;
-    u8 unknown64[0x34];
-};
-struct SpiderAttacks {
-    u16 first[4];
-    u16 second[4];
-    u16 parameter[4];
-    u32 flags[4];
-};
-struct MonsterInitGate {
-    u16 field414;
-    u16 field416;
-    u16 field418;
-    u16 field41A;
-    void *field41C;
-};
-struct MonsterInitRange {
-    u32 field420 : 16;
-    u32 field422 : 16;
-    u32 field424;
-    u8 unknown428[0x2];
-    u8 field42A;
-    u8 field42B;
-};
-struct MonsterInitRoutePoint {
-    s16 x, z;
-};
-struct MonsterInitRoute {
-    u32 unknown0, unknown4;
-    struct MonsterInitRoutePoint *point;
-    u8 currentPoint, branches[2], activeBranch;
-    u8 routeId, parameterB, pointId, unknown13;
-};
 struct SpiderDeferredControl {
     u8 unknown0[8];
     u8 state, phase, mode, unknownB;
     u32 counter;
     void *callback;
 };
-struct SpiderGroup {
-    u16 field3D4;
-    u8 unknown3D6[0x2];
-    u32 field3D8;
-    u8 unknown3DC[0x38];
-    struct MonsterInitGate gate;
-    struct MonsterInitRange range;
-    u8 unknown42C[0x10];
-    void *field43C;
-    u32 field440;
-    void *field444;
-    struct MonsterInitRoute route;
-    u8 unknown45C[4];
-    struct SpiderDeferredControl deferred;
-    u8 unknown474[0x142];
-    s16 field5B6;
-    u8 unknown5B8[0x14];
-    u16 field5CC;
-    u8 unknown5CE[0x2];
-    u8 *field5D0;
-    u8 *field5D4;
-    u8 unknown5D8[0x4];
-    void *field5DC;
-    void *field5E0;
-    void *field5E4;
-    u32 field5E8;
-    void *field5EC;
-    void *field5F0;
-    void *field5F4;
-    void *field5F8;
-    void *field5FC;
-    void *field600;
-    u32 field604;
-    u32 field608;
-    void *field60C;
-    void *field610;
-    void *field614;
-    void *field618;
-    u32 field61C;
-    u32 field620;
-};
-struct MonsterInitTargeting {
-    u32 fieldDC;
-    u8 unknownE0[0xA];
-    u8 fieldEA;
-    u8 fieldEB;
-    u16 fieldEC;
-    u16 fieldEE;
-    u8 unknownF0[0x4];
-    u32 fieldF4;
-    u32 fieldF8;
-    u32 fieldFC;
-};
-struct MonsterInitSavedControl {
-    u32 field118;
-    u32 field11C;
-    u8 field120;
-    u8 field121;
-    u8 field122;
-    u8 field123;
-    void *field124;
-    u8 field128;
-    u8 unknown129[0x3];
-    u16 field12C;
-    u16 field12E;
-    u32 field130;
-};
-struct SpiderActor {
-    u8 unknown0[0x4];
-    u8 *drawable;
-    u8 drawableKind;
-    u8 unknown9[0x47];
-    struct SpiderBody body;
-    u8 category;
-    u8 unknown99[0x1];
-    u16 field9A;
-    s16 field9C;
-    u8 field9E;
-    u8 field9F;
-    u8 fieldA0;
-    u8 fieldA1;
-    u16 fieldA2;
-    u16 fieldA4;
-    u16 fieldA6;
-    u16 fieldA8;
-    u16 fieldAA;
-    u32 fieldAC;
-    u16 fieldB0;
-    u16 fieldB2;
-    struct SpiderAttacks attacks;
-    struct MonsterInitTargeting targeting;
-    u8 unknown100[0x4];
-    u32 field104;
-    u32 field108;
-    u32 field10C;
-    u32 field110;
-    u32 field114;
-    struct MonsterInitSavedControl saved;
-    u8 unknown134[0x6];
-    u16 field13A;
-    u8 unknown13C[0xA4];
-    u16 field1E0;
-    u16 field1E2;
-    u16 field1E4;
-    u16 field1E6;
-    u8 unknown1E8[0x4];
-    u32 field1EC;
-    u32 field1F0;
-    u8 unknown1F4[0x28];
-    void *field21C;
-    void *field220;
-    void *field224;
-    void *field228;
-    void *field22C;
-    void *field230;
-    void *field234;
-    void *field238;
-    void *field23C;
-    u32 field240;
-    u8 unknown244[0x4];
-    void *field248;
-    void *field24C;
-    const void *field250;
-    u8 unknown254[0x4];
-    void *field258;
-    void *field25C;
-    u32 (*field260)(void *);
-    void *field264;
-    void *field268;
-    void *field26C;
-    u8 (*field270)(void *);
-    void *field274;
-    void *field278;
-    u8 unknown27C[0x2C];
-    u8 field2A8;
-    u8 field2A9;
-    u8 field2AA;
-    u8 unknown2AB[0x1];
-    u32 field2AC;
-    u8 field2B0;
-    u8 field2B1;
-    u8 field2B2;
-    u8 unknown2B3[0x1];
-    u8 field2B4;
-    u8 field2B5;
-    u8 unknown2B6[0x1];
-    u8 field2B7;
-    u8 unknown2B8[0x6];
-    u16 field2BE;
-    u16 field2C0;
-    u16 field2C2;
-    u8 unknown2C4[0x4];
-    u16 field2C8;
-    u8 unknown2CA[0x2];
-    u32 field2CC;
-    u32 field2D0;
-    u16 field2D4;
-    u8 unknown2D6[0x12];
-    u16 field2E8;
-    u16 field2EA;
-    u8 unknown2EC[0x8];
-    u16 field2F4;
-    u8 unknown2F6[0x4];
-    u16 field2FA;
-    u8 unknown2FC[0x8];
-    u32 field304;
-    u8 unknown308[0xCC];
-    struct SpiderGroup group;
+struct SpiderInstanceState {
+    u8 unknown0[0x624];
     u8 unknown624[8];
     u16 flags62C;
     u16 timer62E;
@@ -297,37 +93,37 @@ void SceneActorReaction_RestoreAlternateAfterDelay(void);
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 static inline u8 *MonsterInit_Drawable(void *object)
 {
-    struct SpiderActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     return actor->drawable;
 }
 static inline u8 MonsterInit_GetDrawableKind(void *object)
 {
-    struct SpiderActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     return actor->drawableKind;
 }
-static inline void MonsterInit_SetCategory(struct SpiderActor *actor, u8 category)
+static inline void MonsterInit_SetCategory(struct SceneActorRegistryResetView *actor, u8 category)
 {
     actor->category = category;
 }
 static inline u8 MonsterInit_GetCategory(void *object)
 {
-    struct SpiderActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     return actor->category;
 }
 
-static inline u16 MonsterInit_GetInitialHealth(struct SpiderActor *actor)
+static inline u16 MonsterInit_GetInitialHealth(struct SceneActorRegistryResetView *actor)
 {
-    return actor->fieldB0;
+    return actor->defaultHealth;
 }
 
-static inline u16 MonsterInit_GetPaletteBase(struct SpiderActor *actor)
+static inline u16 MonsterInit_GetPaletteBase(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field1E0;
+    return actor->basePaletteBank;
 }
 
-static inline u16 MonsterInit_GetPaletteOffset(struct SpiderActor *actor)
+static inline u16 MonsterInit_GetPaletteOffset(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field1E6;
+    return actor->paletteOffset;
 }
 
 extern u8 *gUnknown_02000580;
@@ -340,73 +136,74 @@ void Spider_OnSecondaryUpdate(void);
 void Spider_Destroy(void);
 extern const u8 gUnk_08605F34[];
 
-static inline u16 MonsterInit_GetMotionFlags(struct SpiderActor *actor)
+static inline u16 MonsterInit_GetMotionFlags(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2C0;
+    return actor->flags2C0;
 }
-static inline u16 MonsterInit_GetHeightOffset(struct SpiderActor *actor)
+static inline u16 MonsterInit_GetHeightOffset(struct SceneActorRegistryResetView *actor)
 {
     return actor->field2EA;
 }
-static inline u32 MonsterInit_GetBehaviorFlags(struct SpiderActor *actor)
+static inline u32 MonsterInit_GetBehaviorFlags(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2CC;
+    return actor->flags2CC;
 }
-static inline u32 MonsterInit_GetStatusFlags(struct SpiderActor *actor)
+static inline u32 MonsterInit_GetStatusFlags(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2D0;
+    return actor->flags2D0;
 }
-static inline u8 MonsterInit_GetState(struct SpiderActor *actor)
+static inline u8 MonsterInit_GetState(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2A8;
+    return actor->state2A8;
 }
-static inline u8 MonsterInit_GetPhase(struct SpiderActor *actor)
+static inline u8 MonsterInit_GetPhase(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2A9;
+    return actor->phase2A9;
 }
-static inline u8 MonsterInit_GetBehavior(struct SpiderActor *actor)
+static inline u8 MonsterInit_GetBehavior(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2AA;
+    return actor->behavior2AA;
 }
-static inline void *MonsterInit_GetCurrentControl(struct SpiderActor *actor)
+static inline void *MonsterInit_GetCurrentControl(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field21C;
+    return actor->target;
 }
-static inline u8 MonsterInit_GetControlKind(struct SpiderActor *actor)
+static inline u8 MonsterInit_GetControlKind(struct SceneActorRegistryResetView *actor)
 {
     return actor->field2B5;
 }
-static inline u8 MonsterInit_GetDirection(struct SpiderActor *actor)
+static inline u8 MonsterInit_GetDirection(struct SceneActorRegistryResetView *actor)
 {
     return actor->body.direction;
 }
-static inline u32 MonsterInit_GetTerrainCell(struct SpiderActor *actor)
+static inline u32 MonsterInit_GetTerrainCell(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2F4;
+    return actor->terrainCell;
 }
-static inline u8 MonsterInit_GetTargetingFlags(struct MonsterInitTargeting *target)
+static inline u8 MonsterInit_GetTargetingFlags(struct SceneActorChaseTracking *target)
 {
-    return target->fieldEB;
+    return target->flags;
 }
-static inline struct MonsterInitSavedControl *MonsterInit_SavedControlOf(struct SpiderActor *actor)
+static inline struct SceneActorDefaultControl *
+MonsterInit_SavedControlOf(struct SceneActorRegistryResetView *actor)
 {
-    struct MonsterInitSavedControl *saved = &actor->saved;
+    struct SceneActorDefaultControl *saved = &actor->saved;
     return saved;
 }
 
-static inline void MonsterInit_SaveControl(struct MonsterInitSavedControl *saved,
-                                           struct SpiderActor *actor)
+static inline void MonsterInit_SaveControl(struct SceneActorDefaultControl *saved,
+                                           struct SceneActorRegistryResetView *actor)
 {
-    saved->field12E = MonsterInit_GetMotionFlags(actor);
-    saved->field12C = MonsterInit_GetHeightOffset(actor);
-    saved->field118 = MonsterInit_GetBehaviorFlags(actor);
-    saved->field11C = MonsterInit_GetStatusFlags(actor);
-    saved->field120 = MonsterInit_GetDirection(actor);
-    saved->field121 = MonsterInit_GetState(actor);
-    saved->field122 = MonsterInit_GetPhase(actor);
-    saved->field123 = MonsterInit_GetBehavior(actor);
-    saved->field124 = MonsterInit_GetCurrentControl(actor);
-    saved->field128 = MonsterInit_GetControlKind(actor);
+    saved->motionFlags = MonsterInit_GetMotionFlags(actor);
+    saved->heightOffset = MonsterInit_GetHeightOffset(actor);
+    saved->behaviorFlags = MonsterInit_GetBehaviorFlags(actor);
+    saved->statusFlags = MonsterInit_GetStatusFlags(actor);
+    saved->direction = MonsterInit_GetDirection(actor);
+    saved->state = MonsterInit_GetState(actor);
+    saved->phase = MonsterInit_GetPhase(actor);
+    saved->behavior = MonsterInit_GetBehavior(actor);
+    saved->control = MonsterInit_GetCurrentControl(actor);
+    saved->kind = MonsterInit_GetControlKind(actor);
 }
 struct MonsterInitCollider {
     u8 header[6];
@@ -422,80 +219,81 @@ static inline s32 MonsterInit_Half(s32 value)
         return value >> 1;
     return -(-value >> 1);
 }
-static inline void MonsterInit_SetBehaviorFlags(struct SpiderActor *actor, u32 mask)
+static inline void MonsterInit_SetBehaviorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    actor->field2CC |= mask;
+    actor->flags2CC |= mask;
 }
 
-static inline void MonsterInit_SetStatusFlags(struct SpiderActor *actor, u32 mask)
+static inline void MonsterInit_SetStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    actor->field2D0 |= mask;
+    actor->flags2D0 |= mask;
 }
 
-static inline u8 MonsterInit_TestMotionFlags(struct SpiderActor *actor, u32 mask)
+static inline u8 MonsterInit_TestMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     if (MonsterInit_GetMotionFlags(actor) & mask)
         return 1;
     return 0;
 }
 
-static inline u8 MonsterInit_TestTargetingFlags(struct MonsterInitTargeting *target, u32 mask)
+static inline u8 MonsterInit_TestTargetingFlags(struct SceneActorChaseTracking *target, u32 mask)
 {
     if (MonsterInit_GetTargetingFlags(target) & mask)
         return 1;
     return 0;
 }
-static inline void MonsterInit_SetTargetingFlags(struct MonsterInitTargeting *target, u32 mask)
+static inline void MonsterInit_SetTargetingFlags(struct SceneActorChaseTracking *target, u32 mask)
 {
-    mask |= target->fieldEB;
-    target->fieldEB = mask;
+    mask |= target->flags;
+    target->flags = mask;
 }
-static inline void MonsterInit_ClearControlFlags(struct SpiderActor *actor, u32 mask)
+static inline void MonsterInit_ClearControlFlags(struct SceneActorRegistryResetView *actor,
+                                                 u32 mask)
 {
-    actor->field114 &= mask;
+    actor->flags114 &= mask;
 }
-static inline u8 MonsterInit_IsInCurrentRegion(struct SpiderActor *actor)
+static inline u8 MonsterInit_IsInCurrentRegion(struct SceneActorRegistryResetView *actor)
 {
-    if (*(u32 *)(gGameState + 0x5A0) == actor->field2FA)
+    if (*(u32 *)(gGameState + 0x5A0) == actor->regionId)
         return 1;
     return 0;
 }
-static inline void *MonsterInit_GetStandingControl(struct SpiderActor *actor)
+static inline void *MonsterInit_GetStandingControl(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field22C;
+    return actor->savedTarget;
 }
-static inline void MonsterInit_SetControl(struct SpiderActor *actor, void *callback, u32 behavior,
-                                          u32 reset)
+static inline void MonsterInit_SetControl(struct SceneActorRegistryResetView *actor, void *callback,
+                                          u32 behavior, u32 reset)
 {
     actor->field2B2 = 1;
     actor->field2B0 = reset;
     actor->field2B5 = behavior;
-    actor->field21C = callback;
+    actor->target = callback;
     actor->field2C8 = reset;
     MonsterInit_ClearControlFlags(actor, ~1);
-    actor->field104 = reset;
+    actor->word104 = reset;
 }
 
-static inline void MonsterInit_SetState(struct SpiderActor *actor, u32 state, u32 phase,
-                                        u32 behavior)
+static inline void MonsterInit_SetState(struct SceneActorRegistryResetView *actor, u32 state,
+                                        u32 phase, u32 behavior)
 {
-    actor->field2A8 = state;
-    actor->field2A9 = phase;
-    actor->field2AA = behavior;
-    actor->field2AC = 0;
+    actor->state2A8 = state;
+    actor->phase2A9 = phase;
+    actor->behavior2AA = behavior;
+    actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
 
-static inline void MonsterInit_InitializeGate(struct MonsterInitGate *gate, u32 parameter)
+static inline void MonsterInit_InitializeGate(struct SceneActorControlGate *gate, u32 parameter)
 {
-    gate->field414 = 0;
-    gate->field416 = parameter;
-    gate->field418 = 0;
+    gate->flags = 0;
+    gate->duration = parameter;
+    gate->counter = 0;
     gate->field41A = 0;
-    gate->field41C = 0;
+    gate->control = 0;
 }
 
-static inline void MonsterInit_ReadTargeting(struct MonsterInitTargeting *target)
+static inline void MonsterInit_ReadTargeting(struct SceneActorChaseTracking *target)
 {
     s32 r4v, r2v, r1v;
     if (Script_SeekToKeyword(0x65)) {
@@ -507,85 +305,87 @@ static inline void MonsterInit_ReadTargeting(struct MonsterInitTargeting *target
         r1v = 0x30;
         r2v = 0x40;
     }
-    target->fieldDC = 0;
-    target->fieldEC = r4v;
-    target->fieldEE = r1v;
-    target->fieldF8 = r4v * r4v;
-    target->fieldFC = r1v * r1v;
+    target->target = 0;
+    target->x = r4v;
+    target->z = r1v;
+    target->limit = r4v * r4v;
+    target->zSquared = r1v * r1v;
     target->fieldEA = r2v;
     if (MonsterInit_TestTargetingFlags(target, 4))
-        target->fieldF4 = target->fieldF8;
+        target->range = target->limit;
     else
-        target->fieldF4 = Div(target->fieldF8 * 8 - target->fieldF8, 10);
+        target->range = Div(target->limit * 8 - target->limit, 10);
 }
 
-static inline u16 MonsterInit_RangeRadius(struct MonsterInitRange *range)
+static inline u16 MonsterInit_RangeRadius(struct SceneActorRegistryControl *range)
 {
-    return range->field422;
+    return range->radius;
 }
-static inline void MonsterInit_ReadRange(struct MonsterInitRange *range)
+static inline void MonsterInit_ReadRange(struct SceneActorRegistryControl *range)
 {
     s32 r4v;
     if (Script_SeekToKeyword(0x6E)) {
         r4v = MonsterInit_ReadWord(0);
-        range->field420 = MonsterInit_ReadWord(0);
+        range->parameter = MonsterInit_ReadWord(0);
     } else {
         r4v = 0;
-        range->field420 = r4v;
+        range->parameter = r4v;
     }
-    range->field422 = r4v;
-    range->field424 = MonsterInit_RangeRadius(range) * MonsterInit_RangeRadius(range);
-    range->field42A = 0;
+    range->radius = r4v;
+    range->radiusSquared = MonsterInit_RangeRadius(range) * MonsterInit_RangeRadius(range);
+    range->mode = 0;
 }
 
-static inline u32 MonsterInit_RoutePointX(struct MonsterInitRoute *route)
+static inline u32 MonsterInit_RoutePointX(struct SceneActorRegistryRoute *route)
 {
     return (u16)route->point->x;
 }
-static inline u32 MonsterInit_RoutePointZ(struct MonsterInitRoute *route)
+static inline u32 MonsterInit_RoutePointZ(struct SceneActorRegistryRoute *route)
 {
     return (u16)route->point->z;
 }
 static inline void MonsterInit_SnapToRoute(struct ContactPosition *position,
-                                           struct MonsterInitRoute *route)
+                                           struct SceneActorRegistryRoute *route)
 {
     position->x = MonsterInit_RoutePointX(route);
     position->z = MonsterInit_RoutePointZ(route);
     position->y = MonsterInit_TerrainHeight(MonsterInit_CellIndex(position), position);
 }
-static inline void MonsterInit_DrawablePosition(struct SpiderActor *actor)
+static inline void MonsterInit_DrawablePosition(struct SceneActorRegistryResetView *actor)
 {
     if (MonsterInit_GetDrawableKind(actor) == 0)
         *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
     else
         *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
 }
-static inline void MonsterInit_SetFirstAttack(struct SpiderActor *actor, s32 index, s32 value)
+static inline void MonsterInit_SetFirstAttack(struct SceneActorRegistryResetView *actor, s32 index,
+                                              s32 value)
 {
     actor->attacks.first[index] = value;
 }
 
-static inline u8 MonsterInit_RouteId(struct MonsterInitRoute *route)
+static inline u8 MonsterInit_RouteId(struct SceneActorRegistryRoute *route)
 {
     return route->routeId;
 }
-static inline u8 MonsterInit_RouteParameter(struct MonsterInitRoute *route)
+static inline u8 MonsterInit_RouteParameter(struct SceneActorRegistryRoute *route)
 {
     return route->parameterB;
 }
-static inline u8 MonsterInit_RoutePointId(struct MonsterInitRoute *route)
+static inline u8 MonsterInit_RoutePointId(struct SceneActorRegistryRoute *route)
 {
     return route->pointId;
 }
-static inline u8 MonsterInit_RouteActiveBranch(struct MonsterInitRoute *route)
+static inline u8 MonsterInit_RouteActiveBranch(struct SceneActorRegistryRoute *route)
 {
     return route->activeBranch;
 }
-static inline u32 MonsterInit_RouteAlternateBranch(struct MonsterInitRoute *route)
+static inline u32 MonsterInit_RouteAlternateBranch(struct SceneActorRegistryRoute *route)
 {
     return 1 ^ route->activeBranch;
 }
-static inline void MonsterInit_BeginRoute(struct SpiderBody *body, struct MonsterInitRoute *route)
+static inline void MonsterInit_BeginRoute(struct SceneActorBody *body,
+                                          struct SceneActorRegistryRoute *route)
 {
     SceneBody_StartRoute(body, route, MonsterInit_RouteId(route), MonsterInit_RouteParameter(route),
                          MonsterInit_RoutePointId(route));
@@ -598,34 +398,36 @@ static inline s32 MonsterInit_ClampHealth(u16 raw)
     return health;
 }
 
-static inline void MonsterInit_InstallIdle(struct SpiderActor *actor, void *idle)
+static inline void MonsterInit_InstallIdle(struct SceneActorRegistryResetView *actor, void *idle)
 {
-    actor->field21C = idle;
+    actor->target = idle;
 }
 
-static inline void MonsterInit_InitializeHealth(struct SpiderActor *arg0, u16 initialHealth,
-                                                s32 firstLimit, s32 secondLimit)
+static inline void MonsterInit_InitializeHealth(struct SceneActorRegistryResetView *arg0,
+                                                u16 initialHealth, s32 firstLimit, s32 secondLimit)
 {
-    arg0->field2D4 = 0;
+    arg0->flags2D4 = 0;
     MonsterInit_InstallIdle(arg0, SceneActorControl_OnIdle);
     arg0->field2B2 = 1;
     arg0->field2B0 = 0;
-    arg0->field9C = MonsterInit_ClampHealth(initialHealth);
+    arg0->health = MonsterInit_ClampHealth(initialHealth);
     arg0->fieldAA = 0;
     if (secondLimit <= 0)
         secondLimit = firstLimit;
-    arg0->fieldA6 = firstLimit;
+    arg0->attachmentLimit = firstLimit;
     arg0->fieldA8 = secondLimit;
-    arg0->field2FA = 0;
+    arg0->regionId = 0;
 }
 
-static inline void MonsterInit_SetInitialHealth(struct SpiderActor *actor, u16 health)
+static inline void MonsterInit_SetInitialHealth(struct SceneActorRegistryResetView *actor,
+                                                u16 health)
 {
-    actor->fieldB0 = health;
+    actor->defaultHealth = health;
 }
 
-static inline u32 MonsterInit_ReadRoute(struct SpiderActor *arg0, struct SpiderGroup *group,
-                                        struct MonsterInitRoute *rt)
+static inline u32 MonsterInit_ReadRoute(struct SceneActorRegistryResetView *arg0,
+                                        struct SceneActorChaseGroup *group,
+                                        struct SceneActorRegistryRoute *rt)
 {
     struct ContactPosition point;
     s32 r1v;
@@ -642,8 +444,8 @@ static inline u32 MonsterInit_ReadRoute(struct SpiderActor *arg0, struct SpiderG
             Script_GetPc() ? Script_GetValue() : MonsterInit_RouteId(rt);
         Path_GetPointPositionById((u16 *)&point, MonsterInit_RouteId(rt),
                                   MonsterInit_RoutePointId(rt));
-        arg0->field2F4 = MonsterInit_CellIndex(&point);
-        point.y = arg0->field2BE =
+        arg0->terrainCell = MonsterInit_CellIndex(&point);
+        point.y = arg0->groundHeight2BE =
             MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(arg0), &point);
         MonsterInit_BeginRoute(&arg0->body, rt);
         return 1;
@@ -652,25 +454,25 @@ static inline u32 MonsterInit_ReadRoute(struct SpiderActor *arg0, struct SpiderG
         rt->parameterB = 0;
         rt->pointId = 0;
         rt->currentPoint = 0;
-        group->route.branches[MonsterInit_RouteActiveBranch(rt)] = 0;
-        group->route.branches[MonsterInit_RouteAlternateBranch(rt)] = 0;
+        group->homeRoute.branches[MonsterInit_RouteActiveBranch(rt)] = 0;
+        group->homeRoute.branches[MonsterInit_RouteAlternateBranch(rt)] = 0;
     }
 
     return 0;
 }
 static inline void MonsterInit_InitializeBody(void *object, u32 *fill)
 {
-    struct SpiderActor *arg0 = object;
-    struct SpiderGroup *group = &arg0->group;
-    struct SpiderBody *body = &arg0->body;
+    struct SceneActorRegistryResetView *arg0 = object;
+    struct SceneActorChaseGroup *group = &arg0->group;
+    struct SceneActorBody *body = &arg0->body;
     struct ContactPosition origin;
     s32 mode, i, r4v, r6v, r5v, r2v, r1v;
-    struct MonsterInitRoute *rt;
-    arg0->field2CC = 0;
-    arg0->field2D0 = 0;
-    arg0->field2B4 = 0;
+    struct SceneActorRegistryRoute *rt;
+    arg0->flags2CC = 0;
+    arg0->flags2D0 = 0;
+    arg0->enabled = 0;
     arg0->field2E8 = 8;
-    arg0->field2C0 = Script_GetKeywordValue(0x4D, 0);
+    arg0->flags2C0 = Script_GetKeywordValue(0x4D, 0);
     arg0->field2C2 = 0x40;
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
@@ -697,9 +499,9 @@ static inline void MonsterInit_InitializeBody(void *object, u32 *fill)
         r6v = 0;
         r2v = 0;
     }
-    MonsterInit_InitializeGate(&group->gate, r2v);
-    MonsterInit_ReadRange(&group->range);
-    MonsterInit_ReadTargeting(&arg0->targeting);
+    MonsterInit_InitializeGate(&group->common.gate, r2v);
+    MonsterInit_ReadRange(&group->common.control);
+    MonsterInit_ReadTargeting(&arg0->tracking);
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
     arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
@@ -707,7 +509,7 @@ static inline void MonsterInit_InitializeBody(void *object, u32 *fill)
 
     if (Script_SeekToKeyword(0x41)) {
         MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadWord(0));
-        group->field5B6 = MonsterInit_Half(MonsterInit_GetInitialHealth(arg0));
+        group->halfHealth = MonsterInit_Half(MonsterInit_GetInitialHealth(arg0));
         arg0->field9E = MonsterInit_ReadWord(0);
         arg0->field9F = MonsterInit_ReadWord(0);
         arg0->fieldA0 = MonsterInit_ReadWord(0);
@@ -732,7 +534,7 @@ static inline void MonsterInit_InitializeBody(void *object, u32 *fill)
         MonsterInit_SetStatusFlags(arg0, 0x8000);
 
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
-    rt = &group->route;
+    rt = &group->homeRoute;
     if (MonsterInit_ReadRoute(arg0, group, rt)) {
         MonsterInit_SnapToRoute(&arg0->body.position, rt);
         MonsterInit_DrawablePosition(arg0);
@@ -747,8 +549,8 @@ static inline void MonsterInit_InitializeBody(void *object, u32 *fill)
     else
         SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 
-    group->field3D4 = arg0->body.id;
-    group->field3D8 = (u32)&arg0->body.position;
+    group->common.bodyId = arg0->body.id;
+    group->common.bodyPosition = &arg0->body.position;
 }
 
 struct MonsterInitWidget {
@@ -760,27 +562,29 @@ static inline void MonsterInit_SetWidgetScriptPalette(struct MonsterInitWidget *
     widget->paletteBank = palette - 0x5FFF;
 }
 
-static inline void MonsterInit_SetMotionControl(struct SpiderActor *actor, void *callback, u32 kind)
+static inline void MonsterInit_SetMotionControl(struct SceneActorRegistryResetView *actor,
+                                                void *callback, u32 kind)
 {
-    actor->field104 = (u32)callback;
-    actor->field108 = 0;
-    actor->field10C = 0;
-    actor->field110 = kind;
-    actor->field114 = 1;
+    actor->word104 = (u32)callback;
+    actor->word108 = 0;
+    actor->word10C = 0;
+    actor->word110 = kind;
+    actor->flags114 = 1;
 }
 static inline void MonsterInit_ClearMotion(void *object)
 {
-    struct SpiderActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     MonsterInit_SetMotionControl(actor, 0, 0);
-    actor->field114 = 0;
+    actor->flags114 = 0;
 }
-static inline void MonsterInit_ReadPalette(struct SpiderActor *actor, u32 base, u32 alternate)
+static inline void MonsterInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
+                                           u32 alternate)
 {
     s32 r1v;
-    actor->field1E6 = Script_GetKeywordValue(0x43, 0);
-    actor->field1E0 = base;
-    actor->field1E2 = alternate;
-    actor->field1E4 = MonsterInit_GetPaletteOffset(actor) + base;
+    actor->paletteOffset = Script_GetKeywordValue(0x43, 0);
+    actor->basePaletteBank = base;
+    actor->paletteAlternateBank = alternate;
+    actor->alternateOffset = MonsterInit_GetPaletteOffset(actor) + base;
     r1v = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0)
         AnimData_SelectPaletteBank(actor->drawable + 0x2C, r1v);
@@ -791,87 +595,90 @@ static inline void MonsterInit_ReadPalette(struct SpiderActor *actor, u32 base, 
                                            SceneActorScript_GetManagerField62());
 }
 
-static inline void MonsterInit_InstallPrimary(struct SpiderActor *arg0, void *cb0,
+static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView *arg0, void *cb0,
                                               u32 (*cb1)(void *), void *cb2, void *cb3, void *cb4,
                                               void *hidden, void *cb5, void *cb6,
                                               void *defaultReaction, u8 (*cb270)(void *),
                                               void *targetQuery, void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(arg0, 0x2000);
-    arg0->field274 = cb0;
-    arg0->field260 = cb1;
-    arg0->field224 = cb2;
-    arg0->field228 = cb3;
-    arg0->field22C = cb4;
-    arg0->field230 = cb5;
-    arg0->field234 = cb6;
+    arg0->contextCallback = cb0;
+    MonsterInit_WriteAnimationQuery(&arg0->animationQuery.word, cb1);
+    arg0->entryTarget224 = cb2;
+    arg0->entryTarget228 = cb3;
+    arg0->savedTarget = cb4;
+    arg0->reactionTarget230 = cb5;
+    arg0->deathControl = cb6;
     arg0->field220 = hidden;
-    arg0->field278 = defaultReaction;
-    arg0->field270 = cb270;
-    arg0->field250 = gUnk_086108B0;
-    arg0->field248 = 0;
-    arg0->field26C = targetQuery;
+    arg0->defaultReaction = defaultReaction;
+    MonsterInit_WriteContactPredicate(&arg0->contactQuery.predicate, cb270);
+    MonsterInit_WriteDataPointer(&arg0->commandTable.opaque, gUnk_086108B0);
+    arg0->callback248 = 0;
+    arg0->update26C = targetQuery;
     arg0->field238 = SceneActorReaction_SinkAndRemove;
-    arg0->field264 = damage;
-    arg0->field268 = contact;
+    arg0->damageCallback = damage;
+    arg0->contactCallback = contact;
     arg0->field240 = 0;
     MonsterInit_ClearMotion(arg0);
 }
 
-static inline void MonsterInit_InitializeGroup(struct SpiderGroup *group, void *firstBounds,
-                                               void *secondBounds, void *downed,
+static inline void MonsterInit_InitializeGroup(struct SceneActorChaseGroup *group,
+                                               void *firstBounds, void *secondBounds, void *downed,
                                                void *returnToRoute, void *recover, void *animate,
-                                               struct SpiderActor *actor)
+                                               struct SceneActorRegistryResetView *actor)
 {
-    group->field5D0 = firstBounds;
-    group->field5D4 = secondBounds;
-    group->field5F4 = downed;
-    group->field5F8 = recover;
+    group->route = firstBounds;
+    group->destination = secondBounds;
+    group->routePhaseCallback = downed;
+    group->fallback = recover;
     group->field5FC = SceneActorReaction_BeginFadedState;
     group->field600 = SceneActorReaction_BeginDefeatBurst;
-    group->field43C = returnToRoute;
-    group->field440 = 0;
-    group->range.field42B = 1;
-    group->field618 = sub_0807DB34;
+    group->common.field43C = returnToRoute;
+    group->common.field440 = 0;
+    group->common.control.active = 1;
+    group->interactionCallback = sub_0807DB34;
     group->field608 = 0;
-    group->field61C = 0;
+    group->responseCallback = 0;
     group->field620 = 0;
-    group->field5F0 = SceneActorReaction_RestoreAfterTurns;
+    group->turnControl = SceneActorReaction_RestoreAfterTurns;
     group->field60C = sub_0807FCA8;
     group->field604 = (u32)animate;
     group->field614 = SceneActorReaction_TurnBackToRoute;
-    group->field5E8 = 0;
-    group->field444 = sub_0807F130;
-    group->gate.field41C = SceneActorReaction_UpdateAnimationGate;
-    group->gate.field41A = 0x28;
-    group->field5DC = sub_0808170C;
+    group->routeChoiceControl = 0;
+    group->common.fallback = sub_0807F130;
+    group->common.gate.control = SceneActorReaction_UpdateAnimationGate;
+    group->common.gate.field41A = 0x28;
+    group->contactControl = sub_0808170C;
     group->field5E0 = SceneActorReaction_ResumeAfterAnimation;
     group->field5E4 = SceneActorReaction_TryResumeRoute;
     group->field610 = SceneActorReaction_BeginReactionSound;
     ProximityVolume_TranslateBounds(firstBounds, &actor->body.position);
 }
 
-static inline void MonsterInit_SetRouteReset(struct SpiderActor *actor, void *callback)
+static inline void MonsterInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
+                                             void *callback)
 {
-    actor->field248 = callback;
+    actor->callback248 = callback;
 }
-static inline void MonsterInit_SetReactionGate(struct SpiderActor *actor, void *callback)
+static inline void MonsterInit_SetReactionGate(struct SceneActorRegistryResetView *actor,
+                                               void *callback)
 {
     actor->field23C = callback;
 }
 
-static inline void MonsterInit_EnableInitialFlags(struct SpiderActor *arg0)
+static inline void MonsterInit_EnableInitialFlags(struct SceneActorRegistryResetView *arg0)
 {
-    MonsterInit_SetTargetingFlags(&arg0->targeting, 1);
+    MonsterInit_SetTargetingFlags(&arg0->tracking, 1);
     MonsterInit_SetBehaviorFlags(arg0, 0x400000);
     MonsterInit_SetStatusFlags(arg0, 8);
 }
 
-static inline void MonsterInit_ReadInitialMode(struct SpiderActor *arg0, struct SpiderGroup *group)
+static inline void MonsterInit_ReadInitialMode(struct SceneActorRegistryResetView *arg0,
+                                               struct SceneActorChaseGroup *group)
 {
     s32 i;
     i = Script_GetKeywordValue(0x75, 0);
-    arg0->group.field5CC = 0x21;
+    arg0->group.effect = 0x21;
     if (i != 0) {
         MonsterInit_SetBehaviorFlags(arg0, 0x40000);
         if (i == 2)
@@ -879,24 +686,24 @@ static inline void MonsterInit_ReadInitialMode(struct SpiderActor *arg0, struct 
     }
 }
 
-static inline void MonsterInit_InitializeRegion(struct SpiderActor *arg0)
+static inline void MonsterInit_InitializeRegion(struct SceneActorRegistryResetView *arg0)
 {
     if (MonsterInit_TestMotionFlags(arg0, 2))
-        arg0->field2FA = *(u32 *)(gGameState + 0x5A0);
+        arg0->regionId = *(u32 *)(gGameState + 0x5A0);
     else
-        arg0->field2FA = (u16)(u32)Region_FindContaining(&arg0->body.position);
+        arg0->regionId = (u16)(u32)Region_FindContaining(&arg0->body.position);
 }
 
-static inline void MonsterInit_InitializeReceiver(struct SpiderActor *arg0)
+static inline void MonsterInit_InitializeReceiver(struct SceneActorRegistryResetView *arg0)
 {
     arg0->field304 = 0;
 }
 
-static inline void MonsterInit_InstallCompletionCallbacks(struct SpiderActor *arg0)
+static inline void MonsterInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
 {
-    arg0->field24C = SceneActorScript_OnCommand;
-    arg0->field258 = Spider_OnSecondaryUpdate;
-    arg0->field25C = Spider_Destroy;
+    arg0->messageCallback = SceneActorScript_OnCommand;
+    arg0->updateCallback = Spider_OnSecondaryUpdate;
+    arg0->destroyCallback = Spider_Destroy;
 }
 
 static inline void MonsterInit_InitializeSprite(u8 *drawable, u16 resource, u16 sequence)
@@ -906,7 +713,7 @@ static inline void MonsterInit_InitializeSprite(u8 *drawable, u16 resource, u16 
     SceneActorAnimation_InitEnemySequence(drawable, sequence);
 }
 
-static inline void Spider_SetFlags(struct SpiderActor *actor, u32 mask)
+static inline void Spider_SetFlags(struct SpiderInstanceState *actor, u32 mask)
 {
     actor->flags62C |= mask;
 }
@@ -928,20 +735,23 @@ static inline void MonsterInit_InitializeWidget(u8 *drawable, u16 script, u16 re
     ResourceHeader_Relocate(drawable, source);
     Widget_InitLinked(drawable + 0x20, drawable, 0, 0, 2, 2, 0x3C, position);
 }
-static inline void Spider_InstallContact(struct SpiderActor *actor, struct SpiderGroup *group)
+static inline void Spider_InstallContact(struct SceneActorRegistryResetView *actor,
+                                         struct SceneActorChaseGroup *group)
 {
-    actor->field250 = gUnk_08605F34;
-    group->gate.field41C = SceneActorReaction_ResumeEntryTarget;
+    MonsterInit_WriteDataPointer(&actor->commandTable.opaque, gUnk_08605F34);
+    group->common.gate.control = SceneActorReaction_ResumeEntryTarget;
     if (MonsterInit_GetPaletteOffset(actor) == 0)
-        actor->field270 = SceneActorPlacement_BeginNearbyPlayerContact;
+        MonsterInit_WriteContactPredicate(&actor->contactQuery.predicate,
+                                          SceneActorPlacement_BeginNearbyPlayerContact);
     else
-        actor->field270 = SceneActorPlacement_SelectPlayerApproach;
+        MonsterInit_WriteContactPredicate(&actor->contactQuery.predicate,
+                                          SceneActorPlacement_SelectPlayerApproach);
 }
 s32 Spider_Init(void *object)
 {
-    struct SpiderActor *arg0 = object;
-    struct SpiderActor *actor = object;
-    struct SpiderGroup *group = &arg0->group;
+    struct SpiderInstanceState *arg0 = object;
+    struct SceneActorRegistryResetView *actor = object;
+    struct SceneActorChaseGroup *group = &((struct SceneActorRegistryResetView *)arg0)->group;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
@@ -967,7 +777,7 @@ s32 Spider_Init(void *object)
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         MonsterInit_InitializeWidget(heap, 0xCB05, 0x528F, &tmp);
-        actor->field2B7 = 0xFF;
+        actor->animationIndex = 0xFF;
     }
     MonsterInit_InitializeBody(actor, &zero);
     MonsterInit_ReadPalette(actor, 0xC8, 0x192);
@@ -1023,7 +833,7 @@ s32 Spider_Init(void *object)
         Spider_SetFlags(arg0, 1);
     } else {
         MonsterInit_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 0xE, extra);
-        Spider_InitializeDeferred(&group->deferred, actor->field228, 7, 0x3C);
+        Spider_InitializeDeferred((void *)&group->saved, actor->entryTarget228, 7, 0x3C);
     }
     arg0->timer62E = 0x12C;
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);
