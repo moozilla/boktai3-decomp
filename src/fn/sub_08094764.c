@@ -4,14 +4,9 @@
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
 #include "scene_actor_init_group.h"
+#include "scene_actor_init_graphics.h"
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
-void AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, u32);
-void SceneActorAnimation_InitEnemySequence(void *, u32);
-void *ScriptProc_Start(u32, u32);
-void ResourceHeader_Relocate(void *, void *);
-void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void Bee_InitProfile(void *);
 void Bee_OnUpdate(void);
@@ -49,9 +44,6 @@ u8 SceneActorRegistry_LinkActor(void *);
 
 extern SceneActorCommandHandler const gUnk_08605DB8[];
 extern SceneActorCommandHandler const gUnk_086108B0[];
-struct MonsterInit32Block {
-    u32 w[8];
-};
 struct BeeActor {
     u8 unknown0[0x3D4];
     u32 flags;
@@ -67,15 +59,6 @@ struct BeeActor {
     u8 unknown444[0x44];
     struct ContactPosition initialPosition;
 };
-
-struct MonsterInitWidget {
-    u8 unknown0[0x3A];
-    u16 paletteBank;
-};
-static inline void MonsterInit_SetWidgetPalette(struct MonsterInitWidget *widget, u32 palette)
-{
-    widget->paletteBank = palette;
-}
 
 static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView *arg0, u32 *fill)
 {
@@ -183,13 +166,6 @@ static inline void Bee_InstallCompletionCallbacks(struct SceneActorRegistryReset
     actor->destroyCallback = Bee_Destroy;
 }
 
-static inline void MonsterInit_InitializeSprite(u8 *drawable, u16 resource, u16 sequence)
-{
-    AnimData_Load(drawable + 0x2C, resource);
-    Sprite_Init(drawable, drawable + 0x2C, 0);
-    SceneActorAnimation_InitEnemySequence(drawable, sequence);
-}
-
 static inline void Bee_InstallRoutes(struct SceneActorRegistryResetView *actor)
 {
     MonsterInit_WriteCommandTable(&actor->commandTable.handlers, gUnk_08605DB8);
@@ -227,7 +203,7 @@ s32 Bee_Init(void *object)
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         res = ScriptProc_Start(0xCB05, 0x9506);
-        *(struct MonsterInit32Block *)heap = *(struct MonsterInit32Block *)res;
+        *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
         Widget_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
         actor->animationIndex = 0xFF;
