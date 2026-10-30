@@ -1,92 +1,76 @@
 #include "global.h"
+#include "contact_actor.h"
+#include "scene_actor_state.h"
 
-#define TRUNC_SHIFT(v) ((v) >= 0 ? (v) >> 10 : -(-(v) >> 10))
-
-#define TRUNC_SHIFT(v) ((v) >= 0 ? (v) >> 10 : -(-(v) >> 10))
-
-// confidence=low: moves an actor toward a curved target and advances its timer
-
-#define TRUNC_SHIFT(v) ((v) >= 0 ? (v) >> 10 : -(-(v) >> 10))
-
-union AxeVector {
-    struct {
-        s16 x, y, z, unk_06;
-    } c;
-    struct {
-        u32 lo, hi;
-    } words;
-};
-struct AxeMoveContext {
-    u8 unk_00[0xEA8];
+struct AxeCurveContext {
+    u8 unknown0[0xEA8];
     u16 time;
-    u8 unk_EAA[2];
+    u8 unknownEAA[2];
     s16 curve;
-    u8 unk_EAE[0xF04 - 0xEAE];
-    union AxeVector start, end;
+    u8 unknownEAE[0xF04 - 0xEAE];
+    struct ContactPosition start, end;
 };
 struct AxeMoveNode {
-    u8 unk_00[12];
-    union AxeVector position;
+    u8 unknown0[12];
+    struct ContactPosition position;
 };
-struct AxeMoveActor {
-    u8 unk_00[0x3D0];
-    struct AxeMoveContext *context;
-    u8 unk_3D4[0x5D0 - 0x3D4];
-    struct AxeMoveNode *node;
-};
-void CpuSet(const void *, void *, u32);
-#define TRUNC_SHIFT(v) ((v) >= 0 ? (v) >> 10 : -(-(v) >> 10))
-static inline void Subtract(union AxeVector *out, union AxeVector *a, union AxeVector *b)
+static inline s32 Shift10(s32 value)
 {
-    out->c.x = b->c.x - a->c.x;
-    out->c.y = b->c.y - a->c.y;
-    out->c.z = b->c.z - a->c.z;
+    return value >= 0 ? value >> 10 : -((-value) >> 10);
 }
-static inline void Interpolate(union AxeVector *out, union AxeVector *a, union AxeVector *b,
-                               union AxeVector *d, s32 t, s32 curve)
+static inline void Subtract(struct ContactPosition *out, struct ContactPosition *a,
+                            struct ContactPosition *b)
 {
-    s32 square, cube, offset, value, weightB, weightD;
-    value = t * t;
-    square = TRUNC_SHIFT(value);
-    value = square * t;
-    cube = TRUNC_SHIFT(value);
-    weightB = 2 * cube - 3 * square + 1;
-    weightD = 3 * square - 2 * cube;
-    offset = (cube - 2 * square + t) * curve;
-    value = weightB * b->c.x + weightD * d->c.x + offset;
-    out->c.x = a->c.x + TRUNC_SHIFT(value);
-    value = weightB * b->c.y + weightD * d->c.y + offset;
-    out->c.y = a->c.y + TRUNC_SHIFT(value);
-    value = weightB * b->c.z + weightD * d->c.z + offset;
-    out->c.z = a->c.z + TRUNC_SHIFT(value);
+    out->x = b->x - a->x;
+    out->y = b->y - a->y;
+    out->z = b->z - a->z;
 }
-#ifdef NONMATCHING
-// fuzzy: 35.8%
-// scope shape 130 (differences once low registers are set aside)
-s32 sub_080FAA5C(struct AxeMoveActor *actor)
+static inline void Interpolate(struct ContactPosition *out, struct ContactPosition *start,
+                               struct ContactPosition *end, s32 initialScale, s32 t, s32 finalScale,
+                               s32 speed)
 {
-    struct AxeMoveContext *context = actor->context;
-    u32 fill;
-    union AxeVector start, end, delta, zero;
-    union AxeVector *out;
-    s32 t, curve;
-    start = context->start;
-    start.words.lo &= 0xFFFF;
-    end = context->end;
-    end.words.lo &= 0xFFFF;
-    out = &actor->node->position;
-    t = context->time;
-    curve = context->curve;
-    Subtract(&delta, &start, &end);
-    fill = 0;
-    CpuSet(&fill, &zero, 0x05000002);
-    Interpolate(out, &start, &zero, &delta, t, curve);
-    if (context->time <= 1023) {
-        context->time += 128;
-        return 0;
+    struct ContactPosition delta, tangent;
+    s32 square, cube, twiceCube, thriceSquare, sway, final;
+    s32 scaled, value;
+    Subtract(&delta, start, end);
+    ZeroFill8(&tangent);
+    square = Shift10(t * t);
+    cube = Shift10(square * t);
+    twiceCube = cube * 2;
+    thriceSquare = square * 3;
+    sway = (cube - 2 * square + t) * speed;
+    final = (cube - square) * finalScale;
+    scaled = ((twiceCube - thriceSquare + 1) * tangent.x) * initialScale;
+    value = (thriceSquare - twiceCube) * delta.x;
+    value = scaled + value + sway + final;
+    out->x = start->x + Shift10(value);
+    scaled = ((twiceCube - thriceSquare + 1) * tangent.y) * initialScale;
+    value = (-twiceCube + thriceSquare) * delta.y;
+    value = scaled + value + sway + final;
+    out->y = start->y + Shift10(value);
+    scaled = ((twiceCube - thriceSquare + 1) * tangent.z) * initialScale;
+    value = (-twiceCube + thriceSquare) * delta.z;
+    value = scaled + value + sway + final;
+    out->z = start->z + Shift10(value);
+}
+u8 sub_080FAA5C(struct SceneActorRegistryResetView *actor)
+{
+    struct AxeCurveContext *ctx = actor->context;
+    struct ContactPosition start, end;
+    start = ctx->start;
+    {
+        u32 mask = 0xFFFF;
+        *(u32 *)&start = mask & *(u32 *)&start;
     }
-    return 1;
+    end = ctx->end;
+    {
+        u32 mask = 0xFFFF;
+        *(u32 *)&end = mask & *(u32 *)&end;
+    }
+    Interpolate(&((struct AxeMoveNode *)actor->group.route)->position, &start, &end, 1, ctx->time,
+                0, ctx->curve);
+    if (ctx->time > 1023)
+        return 1;
+    ctx->time += 128;
+    return 0;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_080FAA5C);
-#endif
