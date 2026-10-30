@@ -41,13 +41,13 @@ void Skeleton_UpdateHomingBurst(struct SceneActorRegistryResetView *p, s32 tick)
 {
     u8 *context = p->context;
     if (SceneActorReaction_TakePrepared(p)) {
-        struct ContactPackedVector spawn = *(struct ContactPackedVector *)&p->position;
+        struct ContactPackedVector spawn = *(struct ContactPackedVector *)&p->body.position;
         struct ContactPosition delta;
         struct ContactPosition step;
-        u32 base = (u8)(Quarter((p->direction + 0x20) & 0xFF) << 6);
+        u32 base = (u8)(Quarter((p->body.direction + 0x20) & 0xFF) << 6);
         s32 angle, diff;
         struct ContactPosition *dp = &delta;
-        struct ContactPosition *pos = &p->position;
+        struct ContactPosition *pos = &p->body.position;
         struct ContactPosition *target;
         target = (struct ContactPosition *)(context + 0x710);
         Difference(dp, target, pos);
@@ -66,10 +66,10 @@ void Skeleton_UpdateHomingBurst(struct SceneActorRegistryResetView *p, s32 tick)
         {
             struct ContactPackedVector *sp = &spawn;
             u32 b8, c0, d4, c8;
-            b8 = p->fieldB8;
-            c0 = p->fieldC0;
-            d4 = p->wordD4;
-            c8 = p->fieldC8;
+            b8 = p->attacks.first[2];
+            c0 = p->attacks.second[2];
+            d4 = p->attacks.flags[2];
+            c8 = p->attacks.parameter[2];
             MovingSprite_Create(sp, base, b8, c0, d4, c8, 0x2A);
         }
         Sound_PlaySong(0x3A8);

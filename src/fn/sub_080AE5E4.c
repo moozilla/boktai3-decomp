@@ -33,7 +33,7 @@ struct SceneActorResumeContext {
 };
 void SceneActorReaction_ResumeOrRunScript(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 7);
     if (actor->field2B3) {

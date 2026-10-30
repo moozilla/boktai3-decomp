@@ -81,7 +81,7 @@ void Lun_ResumeAfterLiftPenalty(struct SceneActorRegistryResetView *input, s32 e
             u32 zero = delay;
             SetControl(input, Lun_UpdateWaitingAnimation, 10, zero, zero8);
             SetState(input, 1, zero, zero8);
-            input->direction = input->fieldE9;
+            input->body.direction = input->tracking.heading;
             input->field2C2 = 64;
         }
     }

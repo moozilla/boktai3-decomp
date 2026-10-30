@@ -21,13 +21,6 @@ struct SceneActorControlMotionState {
     struct ContactPosition vectors[3];
     struct ContactPosition storedPosition;
 };
-struct SceneActorControlMotionDrawable {
-    u32 flags;
-    u8 unknown4[0xC];
-    u16 frame;
-    u8 unknown12[0x36];
-    struct DisplaySequenceState sequence;
-};
 struct SceneActorControlPresetView {
     u8 unknown0[0x284];
     const void *preset284;

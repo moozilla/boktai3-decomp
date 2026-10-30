@@ -76,7 +76,7 @@ static inline void Sub0807DB34_Finish(struct SceneActorRegistryResetView *actor)
 static inline void Sub0807DB34_Turn(struct SceneActorRegistryResetView *actor,
                                     struct Sub0807DB34Group *group)
 {
-    u8 oldDirection = actor->direction;
+    u8 oldDirection = actor->body.direction;
     u8 newDirection = oldDirection;
     s32 attempt;
 
@@ -117,7 +117,7 @@ static inline s32 Sub0807DB34_FollowRoute(struct SceneActorRegistryResetView *ac
     destination->y = SceneActorTerrain_GetHeight(cell, destination);
 
     if (gEngineFlags & 0x4800) {
-        target = *(u8 **)&actor->fieldDC;
+        target = *(u8 **)&actor->tracking.target;
         if (!target)
             goto failed;
         idx = target[8];
@@ -127,7 +127,7 @@ static inline s32 Sub0807DB34_FollowRoute(struct SceneActorRegistryResetView *ac
             goto failed;
         cellValue = *(u16 *)(*(u8 **)((u8 *)table[idx] + 0x40) + 6);
     } else {
-        target = *(u8 **)&actor->fieldDC;
+        target = *(u8 **)&actor->tracking.target;
         cell = SceneActorTerrain_GetCellIndex((struct ContactPosition *)(target + 0xC));
         cellValue = cell;
         idx = 0;
@@ -139,16 +139,16 @@ static inline s32 Sub0807DB34_FollowRoute(struct SceneActorRegistryResetView *ac
         s32 r;
 
         SceneActorTerrain_GetCenter(cellValue, &center);
-        if (!Nav_IsPositionInMesh(route, &actor->position, &center)) {
+        if (!Nav_IsPositionInMesh(route, &actor->body.position, &center)) {
             actor->flags2D4 &= ~0x200;
             r = 0;
         } else {
-            r = Terrain_ApplyBlocked(route, &actor->position, &center);
+            r = Terrain_ApplyBlocked(route, &actor->body.position, &center);
             if (r == 0) {
                 actor->flags2D4 &= ~0x200;
             } else {
                 if (r != 2)
-                    Memory_Clear(&actor->motion, 8);
+                    Memory_Clear(&actor->body.motion, 8);
                 r = 1;
             }
         }
@@ -196,15 +196,15 @@ static inline void Sub0807DB34_Pursue(struct SceneActorRegistryResetView *actor,
 
     destination->pad = 1;
     route = *(void **)((u8 *)actor + 0x5D0);
-    if (!Nav_IsPositionInMesh(route, &actor->position, destination)) {
+    if (!Nav_IsPositionInMesh(route, &actor->body.position, destination)) {
         actor->flags2D4 &= ~0x200;
     } else {
-        result = Terrain_ApplyBlocked(route, &actor->position, destination);
+        result = Terrain_ApplyBlocked(route, &actor->body.position, destination);
         if (result == 0) {
             actor->flags2D4 &= ~0x200;
         } else {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             result = 1;
         }
     }

@@ -59,7 +59,7 @@ void Mimic_UpdateDefeatBlink(struct SceneActorRegistryResetView *actor, s32 fram
     struct ScriptUtilityArguments arguments;
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectEntryFlags((void *)actor, 10,
-                                             SceneActor_GetDirectionFlags(actor->direction));
+                                             SceneActor_GetDirectionFlags(actor->body.direction));
     ResetElapsed((void *)((u8 *)actor->drawable + 0x48));
     if (frame <= 19)
         return;
@@ -67,7 +67,7 @@ void Mimic_UpdateDefeatBlink(struct SceneActorRegistryResetView *actor, s32 fram
         range.z = 128;
         range.x = 128;
         range.y = 64;
-        SparkParticle_Spawn(&actor->position, 1, &range, 0, 0, 0, 2, 2);
+        SparkParticle_Spawn(&actor->body.position, 1, &range, 0, 0, 0, 2, 2);
         if (!(frame & 3))
             Sound_PlaySong(0x16E);
     }
@@ -80,14 +80,14 @@ void Mimic_UpdateDefeatBlink(struct SceneActorRegistryResetView *actor, s32 fram
         SceneActorBehavior_CallTerrainScript(actor);
         script = *(u16 *)((u8 *)actor + 0x1F8);
         if (script) {
-            values[0] = actor->position.x;
-            values[1] = actor->position.y;
-            values[2] = actor->position.z;
+            values[0] = actor->body.position.x;
+            values[1] = actor->body.position.y;
+            values[2] = actor->body.position.z;
             values[3] = *(s32 *)((u8 *)actor + 0x1FC);
             values[4] = *(s32 *)((u8 *)actor + 0x200);
             values[5] = *(s32 *)((u8 *)actor + 0x204);
             values[6] = actor->field2E0;
-            values[7] = actor->id;
+            values[7] = actor->body.id;
             arguments.count = 8;
             arguments.values = values;
             Script_Call(script, &arguments);

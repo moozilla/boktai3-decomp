@@ -96,7 +96,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
 void Axe_UpdateRouteWander(struct SceneActorRegistryResetView *actor)
 {
     struct AxeContext *context = actor->context;
-    struct AxeGroup *group = (void *)&actor->group;
+    struct AxeGroup *group = (void *)&actor->group.common;
     struct AxeVec targetStorage;
     struct AxeVec *target;
     struct AxeRoutePoint *point;

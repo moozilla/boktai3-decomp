@@ -39,11 +39,11 @@ void SceneActor_ResetCollisionReaction(struct SceneActorRegistryResetView *actor
     u16 *flags;
     resetState(actor, 0x11);
     setControl(actor, SceneActorControl_OnIdle, 0x10);
-    motion = (void *)&actor->fieldDC;
+    motion = (void *)&actor->tracking.target;
     motion->fieldDC = 0;
     actor->field2C2 = 0x40;
-    actor->group.flags414 = 0;
-    actor->group.field418 = 0;
+    actor->group.common.gate.flags = 0;
+    actor->group.common.gate.counter = 0;
     flags = &actor->flags2D4;
     {
         u32 mask = ~0x380;
@@ -55,7 +55,7 @@ void SceneActor_ResetCollisionReaction(struct SceneActorRegistryResetView *actor
         mask &= motion->flags;
         motion->flags = mask;
     }
-    control = &actor->group.control;
+    control = &actor->group.common.control;
     if (testFlags(actor, 0x200000)) {
         clearRouteFlag(&actor->flags2D0);
         {
@@ -72,5 +72,5 @@ void SceneActor_ResetCollisionReaction(struct SceneActorRegistryResetView *actor
         mask &= *flags;
         *flags = mask;
     }
-    actor->field5DA = 0xFF;
+    actor->group.turn.turnsRemaining = 0xFF;
 }

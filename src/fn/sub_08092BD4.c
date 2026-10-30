@@ -156,7 +156,7 @@ void Bee_ResetRoute(struct SceneActorRegistryResetView *actor)
     context[0x437] = zero8;
     *(u32 *)(context + 0x3D4) = zero;
     source = (struct ContactPosition *)(context + 0x488);
-    actor->position = *source;
+    actor->body.position = *source;
     {
         s32 x = source->x >> 8, z = source->z >> 8, index;
         if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -181,14 +181,14 @@ void Bee_ResetRoute(struct SceneActorRegistryResetView *actor)
         }
     }
     actor->groundHeight2BE = height;
-    actor->field2EA = actor->position.y - height;
-    actor->position.y = actor->groundHeight2BE;
+    actor->field2EA = actor->body.position.y - height;
+    actor->body.position.y = actor->groundHeight2BE;
     if (!actor->drawableKind) {
         *(struct BeePlacement *)((u8 *)actor->drawable + 0x1C) =
-            *(struct BeePlacement *)&actor->position;
+            *(struct BeePlacement *)&actor->body.position;
     } else {
         *(struct BeePlacement *)((u8 *)actor->drawable + 0x40) =
-            *(struct BeePlacement *)&actor->position;
+            *(struct BeePlacement *)&actor->body.position;
     }
     {
         u8 *dst = context + 0x470;

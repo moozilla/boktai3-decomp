@@ -20,7 +20,7 @@ void SceneActorControl_UpdateTimedFacing(struct SceneActorRegistryResetView *inp
         control->startTick = Tick();
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
         {
-            u32 direction = actor->direction;
+            u32 direction = actor->body.direction;
             register u32 offset asm("r3") = 0x3DD;
             {
                 u8 *field = (u8 *)control + offset;
@@ -63,7 +63,7 @@ void SceneActorControl_UpdateTimedFacing(struct SceneActorRegistryResetView *inp
             register u8 *saved asm("r6") = (u8 *)control + offset;
             u8 *direction;
             asm("" : "+r"(saved) : "r"(offset));
-            direction = &actor->direction;
+            direction = &actor->body.direction;
             {
                 u32 prior = *saved;
                 u32 current;

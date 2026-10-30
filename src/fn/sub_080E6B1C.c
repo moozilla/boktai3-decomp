@@ -7,7 +7,7 @@ void Dog_UpdateLeapControl(struct SceneActorRegistryResetView *a)
     if (a->field2B0)
         Chase_SetBehavior(a, 0x10);
     else {
-        Callback_InvokeActor(a, a->update270);
+        Callback_InvokeActor(a, a->contactQuery.opaque);
         {
             u32 bit = 0x2000;
             u32 *flags = &a->flags2CC;

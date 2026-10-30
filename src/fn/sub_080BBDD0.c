@@ -141,7 +141,7 @@ static inline u8 MoveTo2(struct SceneActorRegistryResetView *actor, void *route,
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             {
@@ -155,8 +155,8 @@ static inline u8 MoveTo2(struct SceneActorRegistryResetView *actor, void *route,
 static inline u8 Chase(struct SceneActorRegistryResetView *actor, struct ApproachGroup *group)
 {
     void *route = group->routeObject;
-    struct ContactPosition *position = &actor->position;
-    struct ContactPosition *destination = (void *)(*(u8 **)&actor->fieldDC + 12);
+    struct ContactPosition *position = &actor->body.position;
+    struct ContactPosition *destination = (void *)(*(u8 **)&actor->tracking.target + 12);
     s32 result;
     if (!Nav_IsPositionInMesh(route, position, destination)) {
         {
@@ -168,7 +168,7 @@ static inline u8 Chase(struct SceneActorRegistryResetView *actor, struct Approac
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             {
@@ -188,7 +188,7 @@ static inline u32 RandomBits(u32 mask)
 }
 static inline u8 PickDirection(struct SceneActorRegistryResetView *actor)
 {
-    u32 current = actor->direction;
+    u32 current = actor->body.direction;
     s32 i;
     u8 direction;
     i = 0;
@@ -204,7 +204,7 @@ chosen:
 static inline void Resume(struct SceneActorRegistryResetView *raw, u8 direction)
 {
     struct SceneActorRegistryResetView *actor = raw;
-    struct ApproachGroup *group = (void *)&raw->group;
+    struct ApproachGroup *group = (void *)&raw->group.common;
     u32 mask = 0x400;
     if (!(raw->flags2D4 & mask) && !TestFlag16(&group->flags414, 4)) {
         group->direction = PickDirection(actor);
@@ -231,16 +231,16 @@ static inline u16 MotionFlags(struct SceneActorRegistryResetView *actor, u32 mas
 static inline u8 ReturnHome(void *p)
 {
     struct SceneActorRegistryResetView *actor = p;
-    struct ApproachGroup *group = (void *)&actor->group;
+    struct ApproachGroup *group = (void *)&actor->group.common;
     struct ContactPosition *destination;
-    u8 **target = (u8 **)&actor->fieldDC;
+    u8 **target = (u8 **)&actor->tracking.target;
     u32 cell;
     s32 slot;
     u32 mask;
     u16 test;
-    destination = actor->state5D4;
-    destination->x = ((struct ApproachRouteLink *)&actor->route)->point->x;
-    destination->z = ((struct ApproachRouteLink *)&actor->route)->point->z;
+    destination = actor->group.destination;
+    destination->x = ((struct ApproachRouteLink *)&actor->group.homeRoute)->point->x;
+    destination->z = ((struct ApproachRouteLink *)&actor->group.homeRoute)->point->z;
     destination->y = CellHeight(destination, CellIndex(destination));
     if (IsScenePaused()) {
         if (!*target)
@@ -289,13 +289,13 @@ static inline u8 ReturnHome(void *p)
             group->destination->y = CellHeight(group->destination, CellIndex(group->destination));
             group->destination->pad = 0;
         }
-        Resume(p, actor->direction);
+        Resume(p, actor->body.direction);
         actor->field2C2 = 0x20;
         return 0;
     } else {
         struct ContactPosition center;
         SceneActorTerrain_GetCenter(cell, &center);
-        if (!MoveTo2(p, group->routeObject, &actor->position, &center)) {
+        if (!MoveTo2(p, group->routeObject, &actor->body.position, &center)) {
         fail:
             Callback_InvokeActor(actor, group->failure);
             return 0;
@@ -349,8 +349,8 @@ static inline u8 Drift(struct SceneActorRegistryResetView *actor)
         dz = 200;
     else if (dz < -200)
         dz = -200;
-    actor->motion.x += dx;
-    actor->motion.z += dz;
+    actor->body.motion.x += dx;
+    actor->body.motion.z += dz;
     *(s16 *)((u8 *)actor + 0x318) += dx;
     *(s16 *)((u8 *)actor + 0x31C) += dz;
     return IsSettled(dx, dz);
@@ -384,7 +384,7 @@ static inline void Settle(struct SceneActorRegistryResetView *actor, struct Appr
     if (test) {
         *flags2CC |= t1;
         group->flags414 |= 4;
-        actor->fieldDC = ((u32)gPlayers[0]) + 0x24;
+        actor->tracking.target = ((u32)gPlayers[0]) + 0x24;
         if (!ReturnHome(actor)) {
             if (!Chase(actor, group)) {
                 Callback_InvokeActor(actor, group->failure);
@@ -397,7 +397,7 @@ static inline void Settle(struct SceneActorRegistryResetView *actor, struct Appr
         }
         SetState(actor, 0, 0, 12);
     } else {
-        actor->fieldDC = ((u32)gPlayers[0]) + 0x24;
+        actor->tracking.target = ((u32)gPlayers[0]) + 0x24;
         {
             u32 mask = 0x10;
             actor->flags2CC |= t1;
@@ -421,7 +421,7 @@ static inline void Settle(struct SceneActorRegistryResetView *actor, struct Appr
 
 void Skeleton_ConvergeDisplacedPosition(struct SceneActorRegistryResetView *actor)
 {
-    struct ApproachGroup *group = (void *)(&actor->group);
+    struct ApproachGroup *group = (void *)(&actor->group.common);
     if (Drift(actor)) {
         u8 *context = actor->context;
         actor->field2B0 = 1;

@@ -26,7 +26,7 @@ void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *actor)
     u8 *state = actor->context;
     u8 *route = state + 0x8f8;
     s32 cells[4];
-    s32 facing = ((actor->direction + 32) & 255) >> 6;
+    s32 facing = ((actor->body.direction + 32) & 255) >> 6;
     s32 *p;
     s32 count;
     s32 forward;

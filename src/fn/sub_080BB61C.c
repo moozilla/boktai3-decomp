@@ -76,7 +76,7 @@ void Skeleton_BeginKnockedFlight(struct SceneActorRegistryResetView *input)
         SetColliderFlags(&actor->colliderA, mask);
         ClearColliderFlags(&actor->colliderB, mask);
         {
-            u8 direction = actor->direction;
+            u8 direction = actor->body.direction;
             register u32 observed asm("r12") = 0x0403B714;
             register s32 random asm("r1") = NextRandomFirst();
             asm volatile("" : : "r"(observed));

@@ -81,12 +81,12 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *owner,
                         struct ReturnResponseGroup *group, struct ContactPosition *destination)
 {
     void *shape = ReadNavigationShape(&group);
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     if (Nav_IsPositionInMesh(shape, position, destination)) {
         s32 result = Terrain_ApplyBlocked(shape, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&owner->motion, 8);
+                Memory_Clear(&owner->body.motion, 8);
             return 1;
         }
     }
@@ -126,13 +126,13 @@ static inline u8 MoveToSource(struct SceneActorRegistryResetView *owner,
                               struct SceneActorPositionSource **source)
 {
     void *shape = group->shape;
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     struct ContactPosition *destination = &(*source)->position;
     if (Nav_IsPositionInMesh(shape, position, destination)) {
         s32 result = Terrain_ApplyBlocked(shape, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&owner->motion, 8);
+                Memory_Clear(&owner->body.motion, 8);
             return 1;
         }
     }
@@ -155,13 +155,13 @@ static inline void SetResponseHalfFlag(struct SceneActorRegistryResetView *actor
 void SceneActorAttachment_BeginReturnResponse(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorRegistryResetView *owner = actor;
-    struct ReturnResponseGroup *group = (void *)&actor->group;
+    struct ReturnResponseGroup *group = (void *)&actor->group.common;
     struct ContactPosition position;
     struct ContactPosition *destination;
     struct ReturnResponseCoordinates *source;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-    destination = actor->state5D4;
-    source = (void *)&actor->route;
+    destination = actor->group.destination;
+    source = (void *)&actor->group.homeRoute;
     destination->x = source->coordinates[0];
     destination->z = source->coordinates[1];
     destination->y = HeightAt(destination);

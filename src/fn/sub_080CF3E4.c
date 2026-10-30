@@ -34,12 +34,12 @@ static inline u8 TestField(u16 *field, u32 mask)
 static inline void Arrive_BeginTurn(void *obj, u8 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)(&((struct SceneActorRegistryResetView *)obj)->group);
+    u8 *group = (u8 *)(&((struct SceneActorRegistryResetView *)obj)->group.common);
     s32 t1;
     t1 = 4;
     if ((!LoadMotionFlags((struct SceneActorRegistryResetView *)obj, 0x400)) &&
         (!TestField((u16 *)(((u8 *)obj) + 0x414), t1))) {
-        s32 prior = actor->direction;
+        s32 prior = actor->body.direction;
         s32 tries;
         s32 choice;
         for (tries = 0; tries <= 3; tries++) {
@@ -64,7 +64,7 @@ static inline u8 Arrive(void *obj)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
     s32 player;
@@ -111,7 +111,7 @@ static inline u8 Arrive(void *obj)
         (*(struct ContactPosition **)(group + 0x200))->pad = 0;
     }
     {
-        u8 saved = actor->direction;
+        u8 saved = actor->body.direction;
         Arrive_BeginTurn(obj, saved);
     }
     sub_0807E334(actor);
@@ -130,7 +130,7 @@ reroute: {
         data = gTerrainMap->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
-    if (Chase_TryRoute(obj, *(void **)(group + 0x1FC), &actor->position, targetPointer))
+    if (Chase_TryRoute(obj, *(void **)(group + 0x1FC), &actor->body.position, targetPointer))
         return 1;
 }
 invoke:
@@ -141,7 +141,7 @@ done:
 
 void Golem_ArriveAndRestore(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     if (Chase_TakeArrived(actor)) {
         Chase_SetCtl(actor, Skeleton_ClearDirectionalEntryFlag, 0x2C);
         actor->field2B0 = 0;

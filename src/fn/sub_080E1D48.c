@@ -99,7 +99,7 @@ void Dog_UpdateTurnSequence(struct SceneActorRegistryResetView *input, s32 input
                 encoded = value;
                 encodedOutput = (u8 *)actor + 0x3CD;
             } else {
-                s32 prior = actor->direction;
+                s32 prior = actor->body.direction;
                 s32 tries = 0;
                 const u16 *table = gRandomTable;
                 u32 *randomIndex = &gRandomIndex;

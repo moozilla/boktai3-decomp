@@ -203,12 +203,12 @@ void Crow_ApproachPlayerThenRecoil(struct SceneActorRegistryResetView *actor)
         saved = (void *)(body + 0x3fc);
         *((struct SavedPair *)saved) = *((struct SavedPair *)((*((u8 **)gPlayers)) + 0x30));
         Fill(body + 0x42c, zero, 0);
-        Delta(&delta, &actor->position, saved);
-        actor->direction = Math_Atan2(delta.x, delta.z);
+        Delta(&delta, &actor->body.position, saved);
+        actor->body.direction = Math_Atan2(delta.x, delta.z);
         *((s16 *)(body + 0x42c)) =
-            Shift(gUnk_086149C4[(actor->direction + 64) & 255] * body[0x3d9], 12);
+            Shift(gUnk_086149C4[(actor->body.direction + 64) & 255] * body[0x3d9], 12);
         {
-            s32 depth = Shift(gUnk_086149C4[actor->direction] * body[0x3d9], 12);
+            s32 depth = Shift(gUnk_086149C4[actor->body.direction] * body[0x3d9], 12);
             {
                 typeof(*((s16 *)(body + 0x430))) *q1 = &(*((s16 *)(body + 0x430)));
                 u32 z1 = 0;
@@ -228,14 +228,14 @@ void Crow_ApproachPlayerThenRecoil(struct SceneActorRegistryResetView *actor)
         Sound_PlaySong(247);
         body[0x3ec] = 0;
     } else {
-        Callback_InvokeActor(actor, actor->update270);
+        Callback_InvokeActor(actor, actor->contactQuery.opaque);
         Scale(actor);
         *((s16 *)(((u8 *)actor) + 0x2ea)) += *((s16 *)(body + 0x42e));
         if (!Mod(actor->counter2AC, 6))
             *((s16 *)(body + 0x42e)) = Shift(*((s16 *)(body + 0x42e)), 1);
         if (Approach_1(actor, (void *)(body + 0x3f0), ((u8 *)actor) + 0x50, body[0x3d9]) ||
             BodyFlag(body, 2)) {
-            Polar(&actor->secondaryMotion, actor->direction, body[0x3d9] * 2);
+            Polar(&actor->secondaryMotion, actor->body.direction, body[0x3d9] * 2);
             SetState(actor, 0, 2, 2);
         } else {
             actor->counter2AC++;

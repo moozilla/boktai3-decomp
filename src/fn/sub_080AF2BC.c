@@ -12,7 +12,7 @@ void SceneActorAttachment_ReplaceResponseSlot(void *, s32, s32, u8);
 // confidence=low: chase-state step; arrives at the route point, starts the next turn or reroutes, and sets up the state machine.
 void sub_080AF2BC(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ContactPosition *p;
     s32 cell;
     s32 player;
@@ -80,7 +80,7 @@ void sub_080AF2BC(struct SceneActorRegistryResetView *actor)
                            *(struct ContactPosition **)(group + 0x200));
         (*(struct ContactPosition **)(group + 0x200))->pad = 0;
     }
-    Chase_BeginTurn(actor, actor->direction);
+    Chase_BeginTurn(actor, actor->body.direction);
     sub_0807E334(actor);
     actor->field2C2 = 0x20;
     return;
@@ -98,7 +98,7 @@ reroute: {
         data = gTerrainMap->cells + (cell * 4 + 12);
     target.y = (*data & 15) << 8;
     target.z = (z << 8) + 0x80;
-    if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, &target))
+    if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position, &target))
         return;
     Callback_InvokeActor(actor, *(void **)(group + 0x224));
 }

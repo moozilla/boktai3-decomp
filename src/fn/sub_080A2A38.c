@@ -17,7 +17,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
 
 void SceneActorReaction_ResumeEntryTarget(struct SceneActorRegistryResetView *actor)
 {
-    register struct SceneActorReactionGroup *group asm("r5") = (void *)&actor->group;
+    register struct SceneActorReactionGroup *group asm("r5") = (void *)&actor->group.common;
     register u32 timer asm("r5");
     TakePrepared(actor);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);

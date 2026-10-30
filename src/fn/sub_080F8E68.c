@@ -21,7 +21,7 @@ void Axe_UpdateTargetWindup(struct SceneActorRegistryResetView *actor, s32 elaps
     s32 angle, magnitude;
     if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         drawable->flags |= 2;
-        state->direction = actor->fieldE9;
+        state->direction = actor->tracking.heading;
         state->target = *(struct ContactPosition *)((*(u8 **)gPlayers) + 0x30);
         state->active = 1;
         Sound_PlaySong(0x16F);

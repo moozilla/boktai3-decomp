@@ -71,7 +71,7 @@ void Ghost_ChooseRouteDestination(struct SceneActorRegistryResetView *actor)
         {
             struct ContactPosition *q;
             struct ContactPosition *p = &local.target;
-            struct ContactPosition *from = &actor->position;
+            struct ContactPosition *from = &actor->body.position;
             asm("" ::: "r7");
             q = &local.target;
             q->x = q->x - from->x;

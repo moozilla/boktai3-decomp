@@ -29,7 +29,7 @@ static inline void SubtractPosition(struct ContactPosition *out, struct ContactP
 s32 SceneActor_TryTrackNearbyPlayer(struct SceneActorRegistryResetView *actor,
                                     struct ContactPosition *input, u32 playerId)
 {
-    u8 *group = (void *)&actor->group;
+    u8 *group = (void *)&actor->group.common;
     struct ContactPosition delta;
     struct ContactPosition *deltaPointer;
     struct ContactPosition *position;
@@ -44,11 +44,11 @@ s32 SceneActor_TryTrackNearbyPlayer(struct SceneActorRegistryResetView *actor,
             goto fail;
     }
     deltaPointer = &delta;
-    SubtractPosition(deltaPointer, input, &actor->position);
+    SubtractPosition(deltaPointer, input, &actor->body.position);
     distance = delta.x * delta.x + deltaPointer->z * deltaPointer->z;
     {
         u32 range = *(u32 *)(group + 0x50);
-        position = &actor->position;
+        position = &actor->body.position;
         if (distance >= range)
             goto fail;
     }
@@ -67,7 +67,7 @@ s32 SceneActor_TryTrackNearbyPlayer(struct SceneActorRegistryResetView *actor,
         mask |= value;
         *flags = mask;
     }
-    motion = (void *)&actor->fieldDC;
+    motion = (void *)&actor->tracking.target;
     motion->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
     if (IsPlayerTracked(actor))
         motion->fieldDC = (u32)((u8 *)gPlayers[0] + 0x24);
@@ -76,9 +76,9 @@ s32 SceneActor_TryTrackNearbyPlayer(struct SceneActorRegistryResetView *actor,
     {
         struct SceneActorTrackingTarget *target = (void *)motion->fieldDC;
         s32 dx = target->position.x - position->x;
-        s32 dz = target->position.z - actor->position.z;
-        actor->fieldE9 = Math_Atan2(dx, dz);
-        actor->distanceF0 = dx * dx + dz * dz;
+        s32 dz = target->position.z - actor->body.position.z;
+        actor->tracking.heading = Math_Atan2(dx, dz);
+        actor->tracking.distance = dx * dx + dz * dz;
     }
 ready: {
     u32 mask = 0x80;

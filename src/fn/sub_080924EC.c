@@ -101,8 +101,8 @@ void Bee_UpdateMovementStop(struct SceneActorRegistryResetView *input)
     }
     x = Clamp(x);
     z = Clamp(z);
-    actor->motion.x += x;
-    actor->motion.z += z;
+    actor->body.motion.x += x;
+    actor->body.motion.z += z;
     *priorX += x;
     *priorZ += z;
     if (AtRest(x, z)) {

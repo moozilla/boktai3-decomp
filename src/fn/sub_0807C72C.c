@@ -32,42 +32,42 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
     u8 event = inputevent;
     u8 category = inputcategory;
     struct SceneActorRegistryResetView *owner = actor;
-    struct SceneActorAttachmentResponseGroup *group = (void *)&actor->group;
-    struct ActorAttachmentFollowView *follow = (void *)(&actor->id);
+    struct SceneActorAttachmentResponseGroup *group = (void *)&actor->group.common;
+    struct ActorAttachmentFollowView *follow = (void *)(&actor->body.id);
     s32 y;
     s32 z;
     if (event == 127) {
         switch (kind) {
             case 0:
-                actor->attachment =
-                    ActorAttachment_ReleaseResource(actor->attachment, 0, (void *)actor->id);
+                actor->group.attachment =
+                    ActorAttachment_ReleaseResource(actor->group.attachment, 0, (void *)actor->body.id);
                 break;
 
             case 1:
-                actor->attachment =
-                    ActorAttachment_ReleaseResource(actor->attachment, 1, (void *)actor->id);
+                actor->group.attachment =
+                    ActorAttachment_ReleaseResource(actor->group.attachment, 1, (void *)actor->body.id);
                 break;
 
             case 3:
-                actor->attachment =
-                    ActorAttachment_ReleasePartsResource(actor->attachment, 3, (void *)actor->id);
+                actor->group.attachment =
+                    ActorAttachment_ReleasePartsResource(actor->group.attachment, 3, (void *)actor->body.id);
                 break;
 
             case 2:
-                actor->attachment =
-                    ActorAttachment_ReleaseResource(actor->attachment, 2, (void *)actor->id);
+                actor->group.attachment =
+                    ActorAttachment_ReleaseResource(actor->group.attachment, 2, (void *)actor->body.id);
                 break;
         }
 
     } else {
         switch (kind) {
             case 0:
-                actor->attachment =
-                    ActorAttachment_ReleaseResource(actor->attachment, 0, (void *)actor->id);
-                actor->attachment =
-                    ActorAttachment_ReleaseResource(actor->attachment, 1, (void *)actor->id);
-                actor->attachment =
-                    ActorAttachment_ReleaseResource(actor->attachment, 2, (void *)actor->id);
+                actor->group.attachment =
+                    ActorAttachment_ReleaseResource(actor->group.attachment, 0, (void *)actor->body.id);
+                actor->group.attachment =
+                    ActorAttachment_ReleaseResource(actor->group.attachment, 1, (void *)actor->body.id);
+                actor->group.attachment =
+                    ActorAttachment_ReleaseResource(actor->group.attachment, 2, (void *)actor->body.id);
                 SceneActorAttachment_SelectOffsets(category, 0, &y, &z);
                 if ((event == 0) && ReadActorWordFlags(actor, 0x8000))
                     event = 3;
@@ -84,13 +84,13 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
             case 1:
                 if (ReadActorHalfFlags(actor, 2))
                     break;
-                actor->attachment =
-                    ActorAttachment_ReleaseResource(actor->attachment, 0, (void *)actor->id);
-                actor->attachment =
-                    ActorAttachment_ReleaseResource(actor->attachment, 1, (void *)actor->id);
-                actor->attachment =
-                    ActorAttachment_ReleaseResource(actor->attachment, 2, (void *)actor->id);
-                if ((u8)ActorAttachment_IsUnavailable(actor->attachment)) {
+                actor->group.attachment =
+                    ActorAttachment_ReleaseResource(actor->group.attachment, 0, (void *)actor->body.id);
+                actor->group.attachment =
+                    ActorAttachment_ReleaseResource(actor->group.attachment, 1, (void *)actor->body.id);
+                actor->group.attachment =
+                    ActorAttachment_ReleaseResource(actor->group.attachment, 2, (void *)actor->body.id);
+                if ((u8)ActorAttachment_IsUnavailable(actor->group.attachment)) {
                     s16 *value;
                     s32 initial;
                     u8 flag;
@@ -98,8 +98,8 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
                     value = (s16 *)(&actor->fieldAA);
                     initial = actor->fieldA8;
                     flag = ReadActorWordFlags(actor, 0x200) != 0;
-                    actor->attachment = ActorAttachment_CreateValueSpriteSlot(
-                        event, &actor->position, (void *)actor->id, y, z, category, value, initial,
+                    actor->group.attachment = ActorAttachment_CreateValueSpriteSlot(
+                        event, &actor->body.position, (void *)actor->body.id, y, z, category, value, initial,
                         flag, actor, follow);
                     SceneActorEffect_PlayCategorySoundIfEnabled(1, event, category,
                                                                 *(u8 *)&actor->paletteOffset);
@@ -108,19 +108,19 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
 
             case 2:
                 SceneActorAttachment_SelectOffsets(category, 2, &y, &z);
-                actor->attachment = ActorAttachment_CreateSinglePartSlot(
-                    1, &actor->position, (void *)actor->id, z, category, follow);
+                actor->group.attachment = ActorAttachment_CreateSinglePartSlot(
+                    1, &actor->body.position, (void *)actor->body.id, z, category, follow);
                 break;
 
             case 3:
-                actor->attachment =
-                    ActorAttachment_ReleaseResource(actor->attachment, 0, (void *)actor->id);
-                actor->attachment =
-                    ActorAttachment_ReleaseResource(actor->attachment, 1, (void *)actor->id);
-                actor->attachment =
-                    ActorAttachment_ReleaseResource(actor->attachment, 2, (void *)actor->id);
-                actor->attachment =
-                    ActorAttachment_ReleasePartsResource(actor->attachment, 3, (void *)actor->id);
+                actor->group.attachment =
+                    ActorAttachment_ReleaseResource(actor->group.attachment, 0, (void *)actor->body.id);
+                actor->group.attachment =
+                    ActorAttachment_ReleaseResource(actor->group.attachment, 1, (void *)actor->body.id);
+                actor->group.attachment =
+                    ActorAttachment_ReleaseResource(actor->group.attachment, 2, (void *)actor->body.id);
+                actor->group.attachment =
+                    ActorAttachment_ReleasePartsResource(actor->group.attachment, 3, (void *)actor->body.id);
                 SceneActorAttachment_SelectOffsets(category, 3, &y, &z);
                 {
                     u32 count = event;
@@ -130,8 +130,8 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
                         count = 3;
                     value = (s16 *)(&actor->fieldAA);
                     initial = actor->fieldA8;
-                    actor->attachment = ActorAttachment_CreatePartsSlotWithCount(
-                        7, &actor->position, actor->id, z, category, value, initial, count, follow,
+                    actor->group.attachment = ActorAttachment_CreatePartsSlotWithCount(
+                        7, &actor->body.position, actor->body.id, z, category, value, initial, count, follow,
                         actor);
                 }
                 break;

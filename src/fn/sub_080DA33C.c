@@ -19,7 +19,7 @@ s32 BouncingObject_RefreshNearbyHeading(struct SceneActorRegistryResetView *arg)
         *counter = v - 1;
         return 0;
     }
-    if (BouncingObject_GetNearbyHeading(&actor->position) < 0) {
+    if (BouncingObject_GetNearbyHeading(&actor->body.position) < 0) {
         u16 *flags = (u16 *)((u8 *)*slot + 0x6F2);
         u32 mask = ~0x400;
         *flags &= mask;

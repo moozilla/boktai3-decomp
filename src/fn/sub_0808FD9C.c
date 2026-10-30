@@ -24,7 +24,7 @@ void Slime_FollowPlayer(struct SceneActorRegistryResetView *actor)
     struct P *p;
     u32 zero;
     struct T *dst;
-    struct SceneActorReactionMotion *m = (struct SceneActorReactionMotion *)&actor->fieldDC;
+    struct SceneActorReactionMotion *m = (struct SceneActorReactionMotion *)&actor->tracking.target;
     {
         u32 v = 8;
         u32 f = m->flags;

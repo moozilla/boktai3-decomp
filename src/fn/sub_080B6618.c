@@ -62,7 +62,7 @@ u32 Skeleton_TryBeginGuardedAttack(struct SceneActorRegistryResetView *actor,
         Skeleton_SelectDistanceReaction(actor);
         return 1;
     }
-    if (actor->distanceF0 < context->guardRange && context->guardTimer <= 0) {
+    if (actor->tracking.distance < context->guardRange && context->guardTimer <= 0) {
         if (angle <= 12 && actor->health <= context->guardHealth) {
             SetControl(actor, SceneActorControl_OnIdle, 0x10);
             SetState(actor, 0, 2, 2);
@@ -76,13 +76,13 @@ u32 Skeleton_TryBeginGuardedAttack(struct SceneActorRegistryResetView *actor,
             return 1;
         }
     } else {
-        if (angle <= 24 && actor->distanceF0 < context->nearRange && context->nearTimer <= 0) {
+        if (angle <= 24 && actor->tracking.distance < context->nearRange && context->nearTimer <= 0) {
             SetControl(actor, SceneActorControl_OnIdle, 0x10);
             SetState(actor, 0, 2, 0);
             context->attempts = 0;
             return 1;
         }
-        if (angle <= 12 && actor->distanceF0 < context->rangedRange && context->rangedTimer <= 0) {
+        if (angle <= 12 && actor->tracking.distance < context->rangedRange && context->rangedTimer <= 0) {
             SetControl(actor, SceneActorControl_OnIdle, 0x10);
             SetState(actor, 0, 2, 1);
             context->attempts = 0;

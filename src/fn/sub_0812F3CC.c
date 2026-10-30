@@ -39,7 +39,7 @@ static inline void SceneActorReaction_SetControl(struct SceneActorRegistryResetV
 #define SceneActorReaction_BeginContactResponse sub_0812F3CC
 u8 SceneActorReaction_BeginContactResponse(struct SceneActorRegistryResetView *a)
 {
-    u8 *group = (u8 *)&a->group;
+    u8 *group = (u8 *)&a->group.common;
     void *contact;
     u32 *flags;
     u32 zero;
@@ -53,7 +53,7 @@ u8 SceneActorReaction_BeginContactResponse(struct SceneActorRegistryResetView *a
     }
     if (!SceneActorReaction_ReadFlags(a, 0x1000000, &flags))
         goto fail;
-    if (!SceneActorReaction_HasContact((struct SceneActorReactionMotion *)&a->fieldDC, 1))
+    if (!SceneActorReaction_HasContact((struct SceneActorReactionMotion *)&a->tracking.target, 1))
         goto fail;
     {
         u32 mask = 0x80;
@@ -72,7 +72,7 @@ u8 SceneActorReaction_BeginContactResponse(struct SceneActorRegistryResetView *a
                 goto fail;
         }
     }
-    if (!a->distanceLimitF8)
+    if (!a->tracking.limit)
         goto fail;
     result = (u32)SceneActorContacts_SelectForActor(a, 1);
     contact = (void *)result;

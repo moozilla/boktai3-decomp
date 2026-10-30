@@ -88,8 +88,8 @@ static inline u8 Move(struct SceneActorRegistryResetView *a)
         z = 200;
     else if (z < -200)
         z = -200;
-    a->motion.x += x;
-    a->motion.z += z;
+    a->body.motion.x += x;
+    a->body.motion.z += z;
     *(s16 *)((u8 *)a + 0x318) += x;
     *(s16 *)((u8 *)a + 0x31C) += z;
     if (x == 0 && z == 0)
@@ -130,7 +130,7 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
         range.x = 20;
         range.y = 20;
         range.z = 20;
-        SparkParticle_Spawn(&a->position, (Rand() & 3) + 1, &range, a->direction + 128, 10, 6, 2,
+        SparkParticle_Spawn(&a->body.position, (Rand() & 3) + 1, &range, a->body.direction + 128, 10, 6, 2,
                             2);
     }
     SetMotionFlags(a, 0x100000);
@@ -158,10 +158,10 @@ void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame
                 SetState(a, 0, 2, 1);
                 SceneActorControl_ResetCollisionFlags(a);
             } else {
-                a->direction = a->fieldE9;
+                a->body.direction = a->tracking.heading;
                 SetControl(a, Lun_UpdateWaitingAnimation, 10);
                 SetState(a, 0, 1, 1);
-                a->direction = a->fieldE9;
+                a->body.direction = a->tracking.heading;
                 a->field2C2 = 64;
                 SceneActorControl_ResetCollisionFlags(a);
             }

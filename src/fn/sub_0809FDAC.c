@@ -39,7 +39,7 @@ void Crow_UpdateReturnAnimation(struct SceneActorRegistryResetView *s)
     if (TakeEntry(s)) {
         Control(s, RouteActor_UpdateAnimationSequence, 0x23);
     }
-    Callback_InvokeActor(s, s->update270);
+    Callback_InvokeActor(s, s->contactQuery.opaque);
     if (s->field2B0) {
         State(s, 2, 1);
     } else {

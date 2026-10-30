@@ -47,9 +47,9 @@ void Dog_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
     if (TakeFlag(&actor->field2B2)) {
         s32 angle, facing, turn;
         context = actor->context;
-        Delta(&velocity, &actor->position, (struct ContactPosition *)(context + 0x6D8));
+        Delta(&velocity, &actor->body.position, (struct ContactPosition *)(context + 0x6D8));
         angle = Math_Atan2(velocity.x, velocity.z);
-        facing = ((actor->direction + 0x20) & 0xFF) >> 6 << 6;
+        facing = ((actor->body.direction + 0x20) & 0xFF) >> 6 << 6;
         turn = angle - facing;
         if (turn > 0x80)
             turn -= 0x100;

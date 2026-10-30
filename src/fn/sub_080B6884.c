@@ -55,10 +55,10 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
 u32 Skeleton_TryBeginArmedAttack(struct SceneActorRegistryResetView *actor,
                                  struct SkeletonAttackContext *context, s32 angle)
 {
-    if (actor->distanceF0 < context->retreatRange) {
+    if (actor->tracking.distance < context->retreatRange) {
         if (actor->health < context->guardHealth || TestBits(context, 0x80)) {
             if (angle <= 24) {
-                if (actor->distanceF0 < context->nearRange && context->nearTimer <= 0) {
+                if (actor->tracking.distance < context->nearRange && context->nearTimer <= 0) {
                     SetControl(actor, SceneActorControl_OnIdle, 0x10);
                     SetState(actor, 0, 2, 0);
                     context->attempts = 0;
@@ -84,7 +84,7 @@ u32 Skeleton_TryBeginArmedAttack(struct SceneActorRegistryResetView *actor,
         return 1;
     }
     if (angle <= 20) {
-        if ((actor->distanceF0 < context->rangedRange && context->rangedTimer <= 0) ||
+        if ((actor->tracking.distance < context->rangedRange && context->rangedTimer <= 0) ||
             context->attempts) {
             SetControl(actor, SceneActorControl_OnIdle, 0x10);
             SetState(actor, 0, 2, 3);

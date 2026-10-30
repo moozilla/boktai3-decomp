@@ -15,11 +15,11 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
 }
 void SceneActorReaction_TurnBackToRoute(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorReactionGroup *group = (void *)&actor->group;
+    struct SceneActorReactionGroup *group = (void *)&actor->group.common;
     u32 offset;
     u32 mask;
     if (TakePrepared(actor)) {
-        actor->direction = (((actor->direction + 128) & 255) >> 6) << 6;
+        actor->body.direction = (((actor->body.direction + 128) & 255) >> 6) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     }
     mask = 0x10;

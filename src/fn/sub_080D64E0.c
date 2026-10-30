@@ -8,7 +8,7 @@ struct MummyContext {
 void Mummy_EnterIdleControl(struct SceneActorRegistryResetView *actor)
 {
     struct MummyContext *context = actor->context;
-    if (actor->distanceF0 < context->limit) {
+    if (actor->tracking.distance < context->limit) {
         void *fn = SceneActorControl_OnIdle;
         u8 code = 0x10;
         u32 zero;

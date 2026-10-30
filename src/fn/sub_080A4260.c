@@ -20,7 +20,7 @@ begin: {
     asm("" : "+r"(goff));
     group = (struct SceneActorRegistryControlGroup *)((u8 *)p + goff);
 }
-    p->fieldDC = (u32)SceneActorContacts_FindObjectById(p->field304);
+    p->tracking.target = (u32)SceneActorContacts_FindObjectById(p->field304);
     {
         u16 behavior = 12;
         u8 *field;
@@ -42,7 +42,7 @@ begin: {
         field = (u8 *)p + phaseOffset;
         one = 1;
         *field = one;
-        control = group->entryControl41C;
+        control = group->gate.control;
         {
             u32 kind = 26;
             offset += 8;

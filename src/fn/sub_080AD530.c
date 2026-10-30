@@ -19,7 +19,7 @@ static inline u16 ReactionFlagMask(u16 flag)
 }
 void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u8 *context = actor->context;
     if (actor->field2B2)
         actor->field2B2 = 0;
@@ -43,15 +43,15 @@ void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *actor, s32 f
     } else if (ContextFlags(context, 0x1D))
         SceneActor_DispatchContextAction(context, 1);
     else {
-        actor->fieldDC = (u32)gPlayers[0] + 0x24;
+        actor->tracking.target = (u32)gPlayers[0] + 0x24;
         {
             u32 mask = 16;
             actor->flags2CC |= mask;
         }
         (*(struct ContactPosition **)(group + 0x200))->pad = 0;
         if (!Skeleton_RerouteToTarget(actor) &&
-            !Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position,
-                            (void *)(actor->fieldDC + 12))) {
+            !Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position,
+                            &actor->tracking.target->position)) {
             Callback_InvokeActor(actor, *(void **)(group + 0x224));
             return;
         }

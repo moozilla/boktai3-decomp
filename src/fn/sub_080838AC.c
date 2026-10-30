@@ -45,14 +45,14 @@ void SceneActorControl_TickGroundBob(struct SceneActorRegistryResetView *actor)
             stateFlags = firstFlags;
         }
         if (Test(firstValue, ~0)) {
-            actor->position.y = state->baseOffset + actor->field2EA;
+            actor->body.position.y = state->baseOffset + actor->field2EA;
             return;
         }
         if ((s16)actor->field2EA <= 259) {
             {
                 u32 mask = 1;
                 if (Test(*stateFlags, mask)) {
-                    actor->position.y = ((struct SceneActorControlGroundView *)actor)->ground;
+                    actor->body.position.y = ((struct SceneActorControlGroundView *)actor)->ground;
                     return;
                 }
             }
@@ -64,7 +64,7 @@ void SceneActorControl_TickGroundBob(struct SceneActorRegistryResetView *actor)
     }
     {
         s32 currentGround = ((struct SceneActorControlGroundView *)actor)->ground;
-        s32 raisedY = actor->position.y - 260;
+        s32 raisedY = actor->body.position.y - 260;
         delta = currentGround - raisedY;
     }
     absolute = delta >= 0 ? delta : -delta;
@@ -84,7 +84,7 @@ void SceneActorControl_TickGroundBob(struct SceneActorRegistryResetView *actor)
             u32 offset = actor->field2EA;
             {
                 u32 ground = ((struct SceneActorControlGroundView *)actor)->ground;
-                actor->position.y = actor->field2EA + ground;
+                actor->body.position.y = actor->field2EA + ground;
             }
         }
     } while (0);

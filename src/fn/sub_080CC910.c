@@ -72,14 +72,14 @@ done:
 }
 void Golem_ReturnHome(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u8 *body = actor->context;
     struct ContactPosition center;
     struct ContactPosition diff;
     if (TakeFlag2B1(actor)) {
         void *target = Golem_BeginChargeBuildup;
         SetControl(actor, 0x25, target);
-        actor->direction = actor->fieldE9;
+        actor->body.direction = actor->tracking.heading;
         actor->field2B0 = 0;
         *(u16 *)(body + 0x688) = 0;
     }
@@ -100,15 +100,15 @@ void Golem_ReturnHome(struct SceneActorRegistryResetView *actor)
         *(struct ContactPosition *)(body + 0x69C) = *(struct ContactPosition *)(body + 0x694);
         SceneActorTerrain_GetCenter(actor->terrainCell, &center);
         sub_080C47B8(&center);
-        SceneActorTerrain_Subtract(&diff, &actor->position, &center);
+        SceneActorTerrain_Subtract(&diff, &actor->body.position, &center);
         if (diff.x * diff.x + diff.z * diff.z < 0x400)
             sub_080C47DC(body);
         else {
             u8 angle;
             *(struct ContactPosition *)(*(u8 **)(group + 0x1FC) + 0x1C) = center;
-            SceneActorTerrain_Subtract(&diff, &center, &actor->position);
+            SceneActorTerrain_Subtract(&diff, &center, &actor->body.position);
             angle = ((Math_Atan2(diff.x, diff.z) + 0x20) & 0xFF) >> 6 << 6;
-            actor->direction = angle;
+            actor->body.direction = angle;
             body[0x68E] = angle;
         }
         {

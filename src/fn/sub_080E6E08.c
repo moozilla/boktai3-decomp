@@ -91,7 +91,7 @@ static inline u8 TryRouteSaved(struct SceneActorRegistryResetView *actor, void *
     result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->motion, 8);
+            Memory_Clear(&actor->body.motion, 8);
         return 1;
     }
     {
@@ -115,7 +115,7 @@ void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
         struct SceneActorReactionMotion *motion;
         struct SceneActorRegistryControl *control;
         u16 *flags;
-        motion = (void *)&actor->fieldDC;
+        motion = (void *)&actor->tracking.target;
         motion->fieldDC = 0;
         {
             u32 o = 0x2C2;
@@ -148,7 +148,7 @@ void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
             mask &= motion->flags;
             motion->flags = mask;
         }
-        control = &actor->group.control;
+        control = &actor->group.common.control;
         if (testFlags(actor, 0x200000)) {
             clearRouteFlag(&actor->flags2D0);
             {
@@ -165,7 +165,7 @@ void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
             mask &= *flags;
             *flags = mask;
         }
-        actor->field5DA = 0xFF;
+        actor->group.turn.turnsRemaining = 0xFF;
     }
     {
         register u32 oc asm("r3") = 0x2AC;
@@ -293,7 +293,7 @@ void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
                     rp = (void **)((u8 *)actor + orr);
                     route = *rp;
                 }
-                pos = &actor->position;
+                pos = &actor->body.position;
                 tgt = (void *)(context + 0x650);
                 asm("" : "+r"(pos), "+r"(route), "+r"(tgt));
                 if (TryRouteSaved(actor, route, pos, tgt, cc, &afterFlags)) {

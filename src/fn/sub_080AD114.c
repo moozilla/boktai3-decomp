@@ -16,9 +16,9 @@ void SceneActorReaction_UpdateFacingAttack(struct SceneActorRegistryResetView *a
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         if ((*(struct SceneActorFacingTarget **)gPlayers))
-            actor->direction =
-                Math_Atan2((*(struct SceneActorFacingTarget **)gPlayers)->x - actor->position.x,
-                           (*(struct SceneActorFacingTarget **)gPlayers)->z - actor->position.z);
+            actor->body.direction =
+                Math_Atan2((*(struct SceneActorFacingTarget **)gPlayers)->x - actor->body.position.x,
+                           (*(struct SceneActorFacingTarget **)gPlayers)->z - actor->body.position.z);
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         actor->field2EA = 80;
         Sound_PlaySong(0x1CF);

@@ -34,9 +34,9 @@ void SceneActor_UpdateForwardCollider(struct SceneActorRegistryResetView *p)
     union SceneActorRegistryPackedPosition pos;
     union SceneActorRegistryPackedPosition bounds;
     if (!unavailable(p) && p->field2B5 == 0x22) {
-        pos.position = p->position;
-        pos.packed.x += scaled(180 * gUnk_086149C4[(p->direction + 64) & 255]);
-        pos.packed.z += scaled(180 * gUnk_086149C4[p->direction]);
+        pos.position = p->body.position;
+        pos.packed.x += scaled(180 * gUnk_086149C4[(p->body.direction + 64) & 255]);
+        pos.packed.z += scaled(180 * gUnk_086149C4[p->body.direction]);
         bounds.packed.x = 64;
         bounds.packed.z = 64;
         bounds.packed.y = 100;

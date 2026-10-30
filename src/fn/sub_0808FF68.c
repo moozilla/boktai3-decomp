@@ -37,9 +37,9 @@ void Slime_RunPendingActionScript(struct SceneActorRegistryResetView *actor)
     struct ScriptUtilityArguments args;
     u8 *body = actor->context;
     if (*(u16 *)(body + 0x404)) {
-        values[0] = actor->position.x;
-        values[1] = actor->position.y;
-        values[2] = actor->position.z;
+        values[0] = actor->body.position.x;
+        values[1] = actor->body.position.y;
+        values[2] = actor->body.position.z;
         values[3] = *(s16 *)((u8 *)actor + 0x9C);
         Polar(&vector, actor->field2B6, 12);
         values[4] = vector.x;

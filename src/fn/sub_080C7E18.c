@@ -152,7 +152,7 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, void *route,
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             u32 mask = ~0x200;
@@ -187,9 +187,9 @@ chosen:
 static inline void Wander(struct SceneActorRegistryResetView *input, u8 direction)
 {
     struct SceneActorRegistryResetView *actor = input;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (!Flag16(actor, 0x400, 0x2D4) && !TestBits16((u16 *)(group + 0x40), 4)) {
-        ((struct GolemTurn *)(group + 0x204))->direction = RandomDirectionExcept(actor->direction);
+        ((struct GolemTurn *)(group + 0x204))->direction = RandomDirectionExcept(actor->body.direction);
         ((struct GolemSavedControl *)(group + 0x8C))->target = actor->target;
         ((struct GolemSavedControl *)(group + 0x8C))->kind = actor->field2B5;
         ((struct GolemSavedControl *)(group + 0x8C))->state = actor->state2A8;
@@ -212,11 +212,11 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
     s32 slot;
     u32 *targetp;
     actor = input;
-    group = (u8 *)&actor->group;
-    targetp = &actor->fieldDC;
+    group = (u8 *)&actor->group.common;
+    targetp = &actor->tracking.target;
     {
-        struct ContactPosition *dest = actor->state5D4;
-        struct GolemRouteLink *link = (void *)&actor->route;
+        struct ContactPosition *dest = actor->group.destination;
+        struct GolemRouteLink *link = (void *)&actor->group.homeRoute;
         dest->x = link->point->x;
         dest->z = link->point->z;
         dest->y = CellHeight(CellIndex(dest), dest);
@@ -264,7 +264,7 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
                 HOME->pad = 0;
             }
         }
-        Wander(input, actor->direction);
+        Wander(input, actor->body.direction);
         sub_0807E334(input);
         actor->field2C2 = 0x20;
         return 0;
@@ -272,7 +272,7 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
     {
         struct ContactPosition center;
         SceneActorTerrain_GetCenter(cell, &center);
-        if (!TryMove(input, PTR(group, 0x1FC), &actor->position, &center)) {
+        if (!TryMove(input, PTR(group, 0x1FC), &actor->body.position, &center)) {
         fail:
             Callback_InvokeActor(actor, PTR(group, 0x224));
             return 0;
@@ -308,7 +308,7 @@ void Golem_ResumeRouteAfterAnimation(struct SceneActorRegistryResetView *actor, 
         u16 frame;
     };
     struct RecoveryAnim *anim = (void *)(((u8 *)actor->drawable) + 0x48);
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     if (TakeFlag2B2(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
     {
@@ -339,7 +339,7 @@ void Golem_ResumeRouteAfterAnimation(struct SceneActorRegistryResetView *actor, 
         dest->x = link->point->x;
         dest->z = link->point->z;
         dest->y = CellHeight(CellIndex(dest), dest);
-        if (!TryMove(actor, *((void **)(((u8 *)group) + 0x1fc)), &actor->position,
+        if (!TryMove(actor, *((void **)(((u8 *)group) + 0x1fc)), &actor->body.position,
                      *((struct ContactPosition **)(group + 0x200)))) {
             SetControl(actor, 0, SceneActorControl_OnIdle);
             SetState(actor, 3, 0, 0);

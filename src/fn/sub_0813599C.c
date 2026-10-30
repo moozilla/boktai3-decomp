@@ -105,7 +105,7 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct SceneActorRegistryResetView *act
             if (*hits <= 3) {
                 u16 *count;
                 SceneActorEffects_EmitRandomOffsets(actor, 1, 1, 10, 20, -1);
-                count = &actor->field5C0;
+                count = &actor->group.field5C0;
                 {
                     u32 idx = *count * 2;
                     u8 *arr = (u8 *)actor + 0x5B8;
@@ -115,7 +115,7 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct SceneActorRegistryResetView *act
                         *slot = v;
                     }
                 }
-                actor->field5C2 |= 1 << *count;
+                actor->group.field5C2 |= 1 << *count;
                 (*count)++;
             }
             actor->reactionSoundVariant = 1 << *hits;
@@ -137,7 +137,7 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct SceneActorRegistryResetView *act
                 Fill(&zero, buffer);
                 if (actor->reactionSoundVariant || !(actor->field2D8 & 0x20000))
                     DamageNumberDisplay_Show(&actor->colliderA, actor->reactionSoundVariant, 0,
-                                             &actor->position, buffer, 1);
+                                             &actor->body.position, buffer, 1);
             }
             SceneBody_StartRoute(
                 (u8 *)actor + 0x50, nav + 0x74,

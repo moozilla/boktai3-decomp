@@ -32,7 +32,7 @@ void Bat_UpdateProbeReaction(struct SceneActorRegistryResetView *a)
     if (TakeEntry(a))
         return;
     if (Test(context, 2, &flags)) {
-        if (a->distanceF0 > 0xFFFF)
+        if (a->tracking.distance > 0xFFFF)
             SceneActorAnimation_SelectDirectionalEntry(a, 0);
         sub_0808AF38(a);
         Clear(flags, ~2);

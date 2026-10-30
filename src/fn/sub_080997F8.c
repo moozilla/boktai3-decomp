@@ -46,7 +46,7 @@ void Ghost_UpdateFacingTrigger(struct SceneActorRegistryResetView *actor)
         actor->flags2C0 = mask | actor->flags2C0;
     }
     zero8 = 0;
-    actor->direction = actor->fieldE9;
+    actor->body.direction = actor->tracking.heading;
     if (!({
             u32 buttons = gPadState[1];
             register u32 m asm("r0");
@@ -58,12 +58,12 @@ void Ghost_UpdateFacingTrigger(struct SceneActorRegistryResetView *actor)
         goto wait;
     if (((u8 **)gPlayers)[0]) {
         u32 zero;
-        s32 own = ((actor->direction + 0x20) & 0xFF) >> 5;
+        s32 own = ((actor->body.direction + 0x20) & 0xFF) >> 5;
         s32 player = ((((u8 **)gPlayers)[0][0x2D] + 0x20) & 0xFF) >> 5;
         s32 diff = ((own + 4) & 7) - player;
         if (diff < 0)
             diff = -diff;
-        if (diff <= 1 && actor->distanceF0 < context->range && !(gEngineFlags & 0x200) &&
+        if (diff <= 1 && actor->tracking.distance < context->range && !(gEngineFlags & 0x200) &&
             !(zero = Bits(4, &gUnk_02000560))) {
             u32 two = 2;
             actor->state2A8 = two;

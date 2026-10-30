@@ -22,7 +22,7 @@ struct ActorReactionContext {
 };
 static inline u8 HasReactionFlag(struct SceneActorRegistryResetView *s)
 {
-    struct ActorReactionSensor *sensor = (void *)&s->fieldDC;
+    struct ActorReactionSensor *sensor = (void *)&s->tracking.target;
     u32 mask = 2;
     if (sensor->flags & mask)
         return 1;
@@ -39,7 +39,7 @@ s32 SceneActor_TryRequestFacingReaction(struct SceneActorRegistryResetView *s)
     struct ActorReactionContext *context;
     if (!HasReactionFlag(s))
         return 0;
-    sensor = (void *)&s->fieldDC;
+    sensor = (void *)&s->tracking.target;
     {
         u32 mask = -3;
         sensor->flags &= mask;
@@ -48,18 +48,18 @@ s32 SceneActor_TryRequestFacingReaction(struct SceneActorRegistryResetView *s)
         u32 kind = s->field2B5;
         sensor2 = sensor;
         if (kind == 0x27)
-            range = s->rangeF4 * 2;
+            range = s->tracking.range * 2;
         else
-            range = s->rangeF4;
+            range = s->tracking.range;
     }
-    if (s->distanceF0 > range)
+    if (s->tracking.distance > range)
         return 0;
     {
         const s16 *own;
         const s16 *other;
         struct ActorReactionTarget *t;
         out = &delta;
-        own = (const s16 *)&s->position;
+        own = (const s16 *)&s->body.position;
         t = sensor2->target;
         other = (const s16 *)&t->position;
         delta.x = *(s16 *)((u8 *)t + 0xc) - own[0];
@@ -67,7 +67,7 @@ s32 SceneActor_TryRequestFacingReaction(struct SceneActorRegistryResetView *s)
         out->z = other[2] - own[2];
     }
     angle = ((Math_Atan2(delta.x, out->z) + 0x10) & 0xFF) >> 6;
-    if (angle != (((s->direction + 0x10) & 0xFF) >> 6))
+    if (angle != (((s->body.direction + 0x10) & 0xFF) >> 6))
         return 0;
     height = out->y;
     if (height < 0)
@@ -75,7 +75,7 @@ s32 SceneActor_TryRequestFacingReaction(struct SceneActorRegistryResetView *s)
     if (height > 0x1FF)
         return 0;
     context = s->context;
-    context->direction = ((s->fieldE9 + 0x80) & 0xFF) >> 6;
+    context->direction = ((s->tracking.heading + 0x80) & 0xFF) >> 6;
     context->request = 0xE;
     return 1;
 }

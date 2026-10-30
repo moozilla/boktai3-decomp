@@ -38,7 +38,7 @@ static inline u16 MotionFlags(struct SceneActorRegistryResetView *actor, u32 mas
 static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group)
 {
     void *route = *(void **)(group + 0x1FC);
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     u32 mask = 0x200;
     struct ContactPosition *target = *(struct ContactPosition **)(group + mask);
     s32 result = Nav_IsPositionInMesh(route, position, target);
@@ -49,7 +49,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group)
     result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->motion, 8);
+            Memory_Clear(&actor->body.motion, 8);
         return 1;
     }
     ClearFlags(&actor->flags2D4, mask);
@@ -67,7 +67,7 @@ void Mummy_ResumeRouteAfterRecovery(struct SceneActorRegistryResetView *actor, s
         sequence->timer = 0;
     reactionFlags = &actor->flags2D6;
     if (actor->field2B3) {
-        u8 *group = (u8 *)(&actor->group);
+        u8 *group = (u8 *)(&actor->group.common);
         actor->field2B0 = 1;
         if (MotionFlags(actor, 2)) {
             Chase_SetState(actor, 3, 0, 0);

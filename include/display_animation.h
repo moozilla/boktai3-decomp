@@ -2,6 +2,8 @@
 #define GUARD_DISPLAY_ANIMATION_H
 /* Tentative common display wrapper: kind 1 uses sequence sprites; kind 2 uses keyframes. */
 #include "engine.h"
+#include "display_sequence.h"
+#include "display_keyframe.h"
 struct DisplayAnimationResource {
     u8 unknown0[6];
     u16 paletteIndex;
@@ -24,11 +26,6 @@ struct DisplayAnimation {
     struct DisplayPosition *position;
     u32 *displayFlags;
 };
-struct DisplaySequenceState {
-    const u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
-};
 struct DisplaySequenceSprite {
     u32 flags;
     u8 unknown4[2];
@@ -39,18 +36,5 @@ struct DisplaySequenceSprite {
     u8 frameIndex, elapsed, width, height, offsetX, offsetY;
     u32 attributes;
     u8 unknown1C[0x10];
-};
-struct DisplayKeyframeState {
-    u8 unknown0[0x14];
-    u16 frame;
-    u8 unknown16[4];
-    u8 priority;
-    u8 unknown1B[2];
-    u8 status;
-    u8 unknown1E[0x16];
-    u8 palette, paletteVariant;
-    u16 attribute;
-    u8 unknown38[2];
-    u16 paletteIndex;
 };
 #endif

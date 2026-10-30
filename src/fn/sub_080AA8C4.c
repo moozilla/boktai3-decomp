@@ -99,7 +99,7 @@ void TentacleActor_AlignSegmentsToTerrain(struct SceneActorRegistryResetView *ac
                     s32 delta = height - y;
                     if (!NearHeight(delta, delta, 255))
                         *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
-                                  positionY)) = actor->position.y;
+                                  positionY)) = actor->body.position.y;
                     else
                         *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
                                   positionY)) = height;
@@ -107,7 +107,7 @@ void TentacleActor_AlignSegmentsToTerrain(struct SceneActorRegistryResetView *ac
                     s32 delta = rawHeight - y;
                     if (Abs(delta) > 256)
                         *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
-                                  positionY)) = actor->position.y;
+                                  positionY)) = actor->body.position.y;
                     else
                         *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
                                   positionY)) += Div(delta, 10);

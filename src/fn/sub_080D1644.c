@@ -20,7 +20,7 @@ static inline void SetHalf(struct SceneActorRegistryResetView *a, u32 mask)
 #define Mummy_UpdateRecoveryWait sub_080D1644
 void Mummy_UpdateRecoveryWait(struct SceneActorRegistryResetView *a)
 {
-    u8 *group = (u8 *)&a->group;
+    u8 *group = (u8 *)&a->group.common;
     u16 *speed;
     if (SceneActorReaction_TakePrepared(a)) {
         SceneActorAttachment_ReplaceResponseSlot(a, 0, 127, 0);

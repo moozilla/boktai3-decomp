@@ -152,7 +152,7 @@ void TentacleBody_UpdatePursuit(struct SceneActorRegistryResetView *actor)
     Scale(actor);
     if (Approach(actor, (void *)(body + 0x8F8), speed)) {
         TentacleActor_SelectWanderRoute(actor);
-        Delta(&delta, &actor->position, (void *)(body + 0x904));
+        Delta(&delta, &actor->body.position, (void *)(body + 0x904));
         *(((u8 *)actor) + 0x3CD) = Math_Atan2(delta.x, delta.z);
     }
     TentacleActor_AdvanceMotionPhase(actor, speed);

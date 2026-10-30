@@ -11,7 +11,7 @@ s32 SceneActor_IsWithinTetherRange(struct SceneActorRegistryResetView *actor, s3
     {
         s16 delta[4];
         s16 *p = delta;
-        struct ContactPosition *pos = &actor->position;
+        struct ContactPosition *pos = &actor->body.position;
         {
             s16 value = target->x - pos->x;
             s16 *q = delta;

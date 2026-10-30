@@ -58,7 +58,7 @@ void SceneActorControl_WaitForRouteResult(struct SceneActorRegistryResetView *ac
         void *control = actor->entryTarget224;
         SetControl(actor, control, 2);
     }
-    busy = Callback_InvokeActor(actor, actor->update270);
+    busy = Callback_InvokeActor(actor, actor->contactQuery.opaque);
     if (!busy) {
         zero = sub_0812F3CC(actor);
         if (!zero) {

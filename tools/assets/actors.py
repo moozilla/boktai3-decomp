@@ -8,6 +8,10 @@
 Sources (all ROM-derived or in the repository):
   * data/actor_registry.csv: the 722 `chara` keys (16-bit hashes of the
     original names, docs/DATA.md) and their callbacks.
+  * data/monster_commands/*.csv: reviewed, ordered script-handler tables
+    declared in data/manifest.csv. Literal references in a registry callback
+    or its loader link these tables to actors; a later assignment may replace
+    the referenced table.
   * gen/code.s (the generated disassembly): a callback's calls. Most callbacks
     allocate the actor (Heap_Alloc, Memory_Clear) and then call one function
     with it: that is the *loader* (enemy families: docs/ASSETS.md). Sprite
@@ -48,6 +52,7 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 import archive  # noqa: E402
 import gclnames  # noqa: E402
 import gcx  # noqa: E402
+from datafmt import load_manifest  # noqa: E402
 from romlib import load_rom  # noqa: E402
 
 ALLOC = {0x08219C40, 0x08219DD8, 0x08219D38}  # Heap_Alloc, Memory_Clear, Heap_Free
@@ -349,6 +354,46 @@ def proc_detail(cid):
 
 # ---------- actors ----------
 @cached
+def command_tables():
+    """Reviewed actor command arrays, keyed by their original ROM address.
+
+    The encoder validates indices, callback values and table extents. Names
+    come from current function symbols, not the CSV's informational column.
+    """
+    out = {}
+    for entry in load_manifest():
+        source = os.path.relpath(entry.file, ROOT).replace(os.sep, "/")
+        if entry.format != "callback_array" or not source.startswith("data/monster_commands/"):
+            continue
+        handlers = []
+        for index, (_, callback, _) in enumerate(entry.encode()):
+            addr = callback & ~1
+            handlers.append({"index": index, "callback": f"{callback:08X}",
+                             "addr": f"{addr:08X}" if callback else None,
+                             "name": fname(addr) if callback else None})
+        key = f"{entry.start:08X}"
+        out[key] = {"addr": key, "end": f"{entry.end:08X}", "name": entry.name,
+                    "description": entry.description, "source": source,
+                    "size": entry.end - entry.start, "entries": handlers}
+    return out
+
+
+def command_tables_of(funcs):
+    """Decoded table literals in these exact functions, with their provenance.
+
+    This is a reference index, not an assertion that the table remains active
+    after initialization. Nearby callees are deliberately not searched.
+    """
+    tables, refs = command_tables(), defaultdict(list)
+    for addr in sorted(set(funcs)):
+        for value in sorted(set(literals(addr))):
+            key = f"{value:08X}"
+            if key in tables:
+                refs[key].append({"addr": f"{addr:08X}", "name": fname(addr)})
+    return [{"table": key, "in": refs[key]} for key in sorted(refs)]
+
+
+@cached
 def registry():
     out = {}
     with open(os.path.join(ROOT, "data", "actor_registry.csv")) as f:
@@ -396,6 +441,7 @@ def actors():
         lda = loader_of(cb)
         ld = fname(lda) if lda else None
         funcs = [cb] + ([lda] if lda else [])
+        commands = command_tables_of(funcs)
         for f in list(funcs):
             funcs += [names[c] for c in sorted(set(calls(f))) if c in names and abs(names[c] - f) < LOCAL
                       and names[c] not in funcs and names[c] not in ALLOC]
@@ -409,6 +455,7 @@ def actors():
                     cand.append({"id": i, "jp": b.get(i) or "", "via": s["hash"]})
         out.append({"key": key, "callback": f"{cb:08X}", "callback_name": cbname,
                     "loader": f"{lda:08X}" if lda else None, "loader_name": ld,
+                    "command_tables": commands,
                     "sprites": spr, "procs": ps, "scenes": scenes, "spawns": sum(1 for p in ps for s in procs()[p]["spawns"] if s["key"] == key),
                     "names": cand, "gcl": gcl.get(int(key, 16), [])})
     return out

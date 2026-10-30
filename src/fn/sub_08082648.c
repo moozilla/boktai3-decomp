@@ -225,11 +225,11 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
                 u32 max = (u16)a->defaultHealth;
                 s32 kind = ((struct RecoveryHealthView *)a)->kind;
                 s32 param = ((struct RecoveryHealthView *)a)->parameter;
-                SceneHud_SetTimedState(a->id, hp, max, kind, 0, param);
+                SceneHud_SetTimedState(a->body.id, hp, max, kind, 0, param);
                 Fill(&zero, buffer);
                 if (a->reactionSoundVariant || (!(a->field2D8 & 0x20000)))
                     DamageNumberDisplay_Show(recovery.collider, a->reactionSoundVariant, 1,
-                                             &a->position, buffer, 1);
+                                             &a->body.position, buffer, 1);
             }
         }
     }
@@ -245,7 +245,7 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
             return;
     }
     Control(a, (void *)SceneActorControl_OnIdle, 16, zero);
-    motion = (void *)&a->fieldDC;
+    motion = (void *)&a->tracking.target;
     zero = TestMotion(motion, 8);
     if (zero) {
         PhaseStart(a, 2, 1);

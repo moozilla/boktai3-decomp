@@ -93,7 +93,7 @@ void TentacleBody_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 fr
         u8 *entry = (void *)SceneActorProfiles_GetEntryAddress(
             ((struct SceneActorAnimationView *)actor)->profileId,
             ((struct SceneActorAnimationView *)actor)->profileMode, 0);
-        TentacleBody_GetDirectionFrame(actor->direction, &variant, &flags);
+        TentacleBody_GetDirectionFrame(actor->body.direction, &variant, &flags);
         Select((void *)actor, entry[0x44], variant, flags);
         TentacleBody_ResetDirectionalAnimations(actor->context, 18);
         actor->field2B3 = 0;
@@ -107,7 +107,7 @@ void TentacleBody_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 fr
         range.x = 60;
         range.y = 60;
         range.z = 40;
-        SparkParticle_Spawn(&actor->position, Random4(), &range, actor->direction + 128, 10, 8, 2,
+        SparkParticle_Spawn(&actor->body.position, Random4(), &range, actor->body.direction + 128, 10, 8, 2,
                             2);
     }
     TentacleBody_UpdateSegmentMotion(actor, frame);
@@ -115,7 +115,7 @@ void TentacleBody_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 fr
         return;
     actor->field2B0 = 1;
     ActorTrail_RemoveAllSegments(actor);
-    TentacleActor_SpawnSparkBurst(&actor->position);
+    TentacleActor_SpawnSparkBurst(&actor->body.position);
     {
         u32 mask = 0x400;
         if (!(actor->flags2CC & mask))
@@ -123,14 +123,14 @@ void TentacleBody_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 fr
     }
     script = *(u16 *)((u8 *)actor + 0x1F8);
     if (script) {
-        values[0] = actor->position.x;
-        values[1] = actor->position.y;
-        values[2] = actor->position.z;
+        values[0] = actor->body.position.x;
+        values[1] = actor->body.position.y;
+        values[2] = actor->body.position.z;
         values[3] = *(s32 *)((u8 *)actor + 0x1FC);
         values[4] = *(s32 *)((u8 *)actor + 0x200);
         values[5] = *(s32 *)((u8 *)actor + 0x204);
         values[6] = actor->field2E0;
-        values[7] = actor->id;
+        values[7] = actor->body.id;
         arguments.count = 8;
         arguments.values = values;
         Script_Call(script, &arguments);

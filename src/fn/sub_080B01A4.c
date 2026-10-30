@@ -60,13 +60,13 @@ static inline void SetMotion(struct SceneActorRegistryResetView *actor, void *cb
 void SceneActorReaction_BeginSideStep(void);
 void Vorn_UpdateRouteApproach(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     s32 speed;
     u32 event;
     u16 *scale;
     if (actor->field2B1)
         actor->field2B1 = 0;
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     if (sub_0812F3CC(actor))
         return;

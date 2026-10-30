@@ -60,8 +60,8 @@ void Lun_FollowParticipantDisplacement(struct SceneActorRegistryResetView *a)
         u8 **players = &(*(u8 **)gPlayers);
         Delta(&delta, (void *)(ctx + 0x414), (void *)((*(new_var = &(*(u8 **)gPlayers))) + 0x30));
     }
-    a->motion.x += delta.x;
-    a->motion.z += delta.z;
+    a->body.motion.x += delta.x;
+    a->body.motion.z += delta.z;
     *(struct ContactPosition *)(ctx + 0x414) =
         *(struct ContactPosition *)((*(u8 **)gPlayers) + 0x30);
     if (a->field2B0) {

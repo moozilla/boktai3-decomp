@@ -44,13 +44,13 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x14);
         Sound_PlaySong(0x3AB);
     }
-    heading = &p->direction;
+    heading = &p->body.direction;
     HeadingStep(&scratch.step, heading, 32);
     step = &scratch.step;
     /* Keep the motion source separate from the vector cleared for the burst. */
     asm("" : "+r"(step));
-    AddHalf(&p->motion.x, &step->x);
-    motionZ = &p->motion.z;
+    AddHalf(&p->body.motion.x, &step->x);
+    motionZ = &p->body.motion.z;
     step = &scratch.step;
     AddZ(motionZ, step);
     {
@@ -63,7 +63,7 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
     jitter.x = 0x52;
     jitter.y = 0;
     jitter.z = 0x52;
-    SceneParticleBurst_CreateWithPause(&p->position, step, &jitter, 1, 2, 4);
+    SceneParticleBurst_CreateWithPause(&p->body.position, step, &jitter, 1, 2, 4);
     if (p->field2B3) {
         void (*f)(void) = Skeleton_TickDecayingLunge;
         u32 k = 0x29;

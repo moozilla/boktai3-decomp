@@ -53,7 +53,7 @@ void Ghoul_BeginAlternateRoute(struct SceneActorRegistryResetView *actor)
     ClearFlags((u16 *)(context + 0x628), 2);
     Set32(4, &actor->flags2D0);
     SetState(actor, 15);
-    StartRoute((u8 *)actor + 0x50, &actor->route, (u8 *)actor + 0x3D4);
+    StartRoute((u8 *)actor + 0x50, &actor->group.homeRoute, (u8 *)actor + 0x3D4);
     sub_0808AF38(actor);
     ClearFlags((u16 *)(context + 0x628), 2);
 }

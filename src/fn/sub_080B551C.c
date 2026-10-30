@@ -9,7 +9,7 @@ u8 Skeleton_RerouteToTarget(void *obj)
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
     struct SceneActorRegistryResetView *alt = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
     Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
@@ -43,10 +43,10 @@ u8 Skeleton_RerouteToTarget(void *obj)
         }
         targetPointer->z = (z << 8) + 0x80;
         route = *(void **)(group + 0x1FC);
-        if (Nav_IsPositionInMesh(route, &actor->position, &target) &&
-            (result = Terrain_ApplyBlocked(route, &actor->position, &target))) {
+        if (Nav_IsPositionInMesh(route, &actor->body.position, &target) &&
+            (result = Terrain_ApplyBlocked(route, &actor->body.position, &target))) {
             if (result != 2)
-                Memory_Clear(&alt->motion, 8);
+                Memory_Clear(&alt->body.motion, 8);
             ok = 1;
         } else {
             Chase_ClearBits(&alt->flags2D4, 0x200);

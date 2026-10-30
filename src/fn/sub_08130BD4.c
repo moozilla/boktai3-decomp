@@ -10,7 +10,7 @@ static inline u32 TestFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 void SceneActorRoute_UpdateTimedPhase(struct SceneActorRegistryResetView *actor)
 {
     u8 *block = (u8 *)actor + 0x3D4;
-    void *route = actor->currentRoute;
+    void *route = actor->body.currentRoute;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
         void *control = *(void **)(block + 0x220);
         u32 kind = 5;

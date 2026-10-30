@@ -48,7 +48,7 @@ static inline void FromPlayer(u8 **player, struct ContactPosition *out,
                               struct SceneActorRegistryResetView *owner)
 {
     const struct ContactPosition *target = (void *)(*player + 0x30);
-    const struct ContactPosition *actor = &owner->position;
+    const struct ContactPosition *actor = &owner->body.position;
     out->x = actor->x - target->x;
     out->y = actor->y - target->y;
     out->z = actor->z - target->z;
@@ -89,11 +89,11 @@ void Axe_UpdatePursuit(struct SceneActorRegistryResetView *actor)
         context->distance = 512;
     }
     Axe_EmitMotionTrail(actor);
-    if (context->distance > actor->distanceF0) {
+    if (context->distance > actor->tracking.distance) {
         s32 difference;
         FromPlayer(&gPlayers, &delta, actor);
         angle = Math_Atan2(delta.x, delta.z);
-        difference = Normalize(((angle + 64) & 255) - actor->direction);
+        difference = Normalize(((angle + 64) & 255) - actor->body.direction);
         if (difference < 0)
             difference = -difference;
         if (difference <= 63)
@@ -106,9 +106,9 @@ void Axe_UpdatePursuit(struct SceneActorRegistryResetView *actor)
             step = 2;
     } else {
         s32 difference, magnitude;
-        ToPlayer(&gPlayers, &delta, &actor->position);
+        ToPlayer(&gPlayers, &delta, &actor->body.position);
         angle = Math_Atan2(delta.x, delta.z);
-        difference = Normalize(angle - actor->direction);
+        difference = Normalize(angle - actor->body.direction);
         magnitude = Abs(difference);
         {
             s32 result = Eighth(magnitude);
@@ -118,12 +118,12 @@ void Axe_UpdatePursuit(struct SceneActorRegistryResetView *actor)
             step = result;
         }
     }
-    if (Normalize(angle - actor->direction) > 0)
-        actor->direction += step;
+    if (Normalize(angle - actor->body.direction) > 0)
+        actor->body.direction += step;
     else
-        actor->direction -= step;
-    Polar(&velocity, actor->direction, 32);
-    *((u8 *)actor->drawable + 6) = 159 - actor->direction;
-    actor->motion = velocity;
+        actor->body.direction -= step;
+    Polar(&velocity, actor->body.direction, 32);
+    *((u8 *)actor->drawable + 6) = 159 - actor->body.direction;
+    actor->body.motion = velocity;
     actor->counter2AC++;
 }

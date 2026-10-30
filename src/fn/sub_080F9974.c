@@ -19,7 +19,7 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 
 // confidence=low: spins the auxiliary axe after damage and releases it after 30 frames.
 void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    struct SceneActorRegistryControlGroup *group = &actor->group;
+    struct SceneActorRegistryControlGroup *group = &actor->group.common;
     u8 *context = actor->context;
     if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         u8 *state = actor->context;

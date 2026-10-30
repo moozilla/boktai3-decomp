@@ -86,12 +86,12 @@ u8 Vorn_SelectHitRecovery(struct SceneActorRegistryResetView *actor)
         return 0;
     if (Test(context, 0x1D))
         return Vorn_BeginContactAnimation((void *)context);
-    if (actor->field5CA == 0 && (actor->field2E6 & 8)) {
+    if (actor->group.hitReactionLatch == 0 && (actor->field2E6 & 8)) {
         actor->field2B8 = 45;
-        actor->field5CA = 65;
+        actor->group.hitReactionLatch = 65;
         SceneActorAnimation_SelectDirectionalEntry(actor, 3);
     }
-    if (!actor->fieldDC)
+    if (!actor->tracking.target)
         return 0;
     {
         u32 foreign = context->foreignPosition;

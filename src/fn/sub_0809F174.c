@@ -40,8 +40,8 @@ static inline u8 EaseMotion(struct SceneActorRegistryResetView *actor)
         z = 200;
     else if (z < -200)
         z = -200;
-    actor->motion.x += x;
-    actor->motion.z += z;
+    actor->body.motion.x += x;
+    actor->body.motion.z += z;
     *(s16 *)((u8 *)actor + 0x318) += x;
     *(s16 *)((u8 *)actor + 0x31C) += z;
     if (x == 0 && z == 0)
@@ -115,10 +115,10 @@ void Crow_RecoverFromDisplacement(struct SceneActorRegistryResetView *actor, s32
         }
         state[0x3EC] = z4;
         Crow_DisableAttackCollision(actor);
-        actor->direction = actor->fieldE9;
+        actor->body.direction = actor->tracking.heading;
         SetControl(actor, SceneActorControl_OnIdle, 16, z4, z6);
         SetState(actor, z4, z4, 1, z6);
-        actor->direction = actor->fieldE9;
+        actor->body.direction = actor->tracking.heading;
         actor->field2C2 = 64;
     }
 }

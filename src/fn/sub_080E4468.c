@@ -31,18 +31,18 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
 void Dog_ChasePlayer(struct SceneActorRegistryResetView *actor)
 {
     u8 *context = actor->context;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ContactPosition target;
     if (Chase_TakeArrived(actor))
         Chase_SetCtl(actor, Dog_UpdateAnimationFourteenReaction, 0x28);
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     if (sub_0812F3CC(actor))
         return;
     {
         struct DogAnim *anim;
         s32 distance;
-        Delta(&target, &actor->position, (struct ContactPosition *)((u8 *)gPlayers[0] + 0x30));
+        Delta(&target, &actor->body.position, (struct ContactPosition *)((u8 *)gPlayers[0] + 0x30));
         distance = target.x * target.x + target.z * target.z;
         anim = (struct DogAnim *)((u8 *)actor->drawable + 0x48);
         if ((anim->frame == 6 || anim->frame == 0xC || anim->frame == 0x13 ||
@@ -79,7 +79,7 @@ void Dog_ChasePlayer(struct SceneActorRegistryResetView *actor)
         Chase_SnapToRoute(&target, group + 0x74);
         Chase_SetCtl(actor, actor->entryTarget228, 1);
         Chase_SetBehavior(actor, 2);
-        if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, &target))
+        if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position, &target))
             Callback_InvokeActor(actor, *(void **)(group + 0x224));
     } else
         actor->counter2AC++;

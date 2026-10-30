@@ -43,7 +43,7 @@ void Bee_UpdateWanderPause(struct SceneActorRegistryResetView *actor)
         }
         actor->word104 = zero;
         r = Rand();
-        fp = &actor->fieldE9;
+        fp = &actor->tracking.heading;
         angle = (r & 0x1F) + 0x71;
         angle = (angle + *fp) & 0xFF;
         {

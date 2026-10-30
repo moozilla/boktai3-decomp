@@ -52,7 +52,7 @@ u8 SceneActorReaction_TrySink(struct SceneActorRegistryResetView *actor)
     if (actor && !Blocked(actor) && actor->enabled == 1) {
         u16 cellFlags = *(u16 *)(SceneActorTerrain_GetCell(actor->terrainCell) + 2);
         if (cellFlags & 0x40 &&
-            actor->position.y + (s16)actor->field2EA <= actor->groundHeight2BE) {
+            actor->body.position.y + (s16)actor->field2EA <= actor->groundHeight2BE) {
             void *sink = *(void **)((u8 *)actor + 0x238);
             if (!sink)
                 SetControl(actor, SceneActorReaction_SinkAndRemove, 0x16);

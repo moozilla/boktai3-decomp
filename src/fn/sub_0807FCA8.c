@@ -41,8 +41,8 @@ void SceneActorControl_UpdateContactRelease(struct SceneActorRegistryResetView *
     if (SceneActorControl_TakeFlag(&input->field2B2))
         SceneActorAnimation_SelectDirectionalEntry(input, 0);
     node = (void **)(group + 0x88);
-    Delta(&delta, &input->position, (void *)((*((u8 **)(*((void **)(group + 0x88))))) + 12));
-    RelativeAngle(delta.x, delta.z, input->direction);
+    Delta(&delta, &input->body.position, (void *)((*((u8 **)(*((void **)(group + 0x88))))) + 12));
+    RelativeAngle(delta.x, delta.z, input->body.direction);
     if (frame > 59) {
         if (frame <= 119) {
             SceneActorAnimation_SelectDirectionalEntry(input, 3);

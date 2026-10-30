@@ -49,9 +49,9 @@ static inline u8 TestField(u16 *field, u32 mask)
 static inline void BeginContactTurn(void *obj, u32 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (!FullFlags(actor, 0x400) && !TestField((u16 *)((u8 *)actor + 0x414), 4)) {
-        register s32 prior asm("r5") = actor->direction;
+        register s32 prior asm("r5") = actor->body.direction;
         s32 tries = 0;
         s32 choice;
         const u16 *table = gRandomTable;
@@ -99,7 +99,7 @@ inline static void SetBehavior_1(struct SceneActorRegistryResetView *actor)
 
 void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     u32 result;
     s32 event;
     u16 *scale;

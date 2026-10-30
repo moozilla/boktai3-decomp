@@ -87,8 +87,8 @@ void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
     }
     x = Clamp(x);
     z = Clamp(z);
-    actor->motion.x += x;
-    actor->motion.z += z;
+    actor->body.motion.x += x;
+    actor->body.motion.z += z;
     *priorX += x;
     *priorZ += z;
     {

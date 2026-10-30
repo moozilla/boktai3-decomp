@@ -53,11 +53,11 @@ void Skeleton_TickDecayingLunge(struct SceneActorRegistryResetView *p, s32 tick_
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x15);
         context[0x6D1] = 0x48;
     }
-    HeadingStep(&p->direction, context + 0x6D1, &scratch.step);
+    HeadingStep(&p->body.direction, context + 0x6D1, &scratch.step);
     {
         struct ContactPosition *v = &scratch.step;
-        AddHalf(&p->motion.x, &v->x);
-        v = &p->motion;
+        AddHalf(&p->body.motion.x, &v->x);
+        v = &p->body.motion;
         AddZ(&v->z, &scratch.step);
     }
     {
@@ -77,7 +77,7 @@ void Skeleton_TickDecayingLunge(struct SceneActorRegistryResetView *p, s32 tick_
         np = &empty;
         scratch.zero = z;
         Clear(&scratch.zero, np, 0x05000002);
-        SceneParticleBurst_CreateWithPause(&p->position, np, &jitter, 1, 2, 4);
+        SceneParticleBurst_CreateWithPause(&p->body.position, np, &jitter, 1, 2, 4);
     }
     Collider_Refresh(context + 0x678);
     if (p->field2B3 && context[0x6D1] == 0) {

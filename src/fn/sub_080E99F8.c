@@ -59,7 +59,7 @@ static inline void ShowCollider(struct SceneActorRegistryResetView *actor)
 void Ivy_ApplyHeldTargetDamage(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
-        struct DamageTarget *target = (void *)actor->fieldDC;
+        struct DamageTarget *target = (void *)actor->tracking.target;
         if (target->kind == 4) {
             SetControl(actor, 16, SceneActorControl_OnIdle);
             SetState(actor, 0, 0, 1);
@@ -68,7 +68,7 @@ void Ivy_ApplyHeldTargetDamage(struct SceneActorRegistryResetView *actor, s32 fr
         if (target->kind <= 3) {
             u8 *player = target->owner;
             u32 a3, a4, a5, a6;
-            SpriteParticle_SpawnBatch(&actor->position, 1, 2, 0, 0x154);
+            SpriteParticle_SpawnBatch(&actor->body.position, 1, 2, 0, 0x154);
             a3 = *(u16 *)((u8 *)actor + 0xB4);
             a4 = *(u16 *)((u8 *)actor + 0xBC);
             a5 = *(u32 *)((u8 *)actor + 0xCC);

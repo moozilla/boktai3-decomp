@@ -54,7 +54,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group,
                           struct ContactPosition *target)
 {
     void *route = *(void **)(group + 0x1fc);
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     s32 result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
         ClearRouteBits(&actor->flags2D4, 0x200);
@@ -63,7 +63,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group,
     result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->motion, 8);
+            Memory_Clear(&actor->body.motion, 8);
         return 1;
     }
     ClearRouteBits(&actor->flags2D4, 0x200);
@@ -114,8 +114,8 @@ static inline u32 PlayerFlags(u8 *player, u32 mask)
 }
 static inline u8 SelectRoute(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
-    struct ContactPosition *dest = actor->state5D4;
+    u8 *group = (u8 *)&actor->group.common;
+    struct ContactPosition *dest = actor->group.destination;
     struct RouteLink {
         u8 pad[8];
         u16 *point;
@@ -142,7 +142,7 @@ static inline u8 SelectRoute(struct SceneActorRegistryResetView *actor)
 u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset)
 {
     u8 *body = actor->context;
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     u8 old;
     typeof(old) c1;
     if ((!reset) && (*((u16 *)(body + 0x6d0))))
@@ -164,34 +164,34 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
     }
     SceneActorReaction_ResetResponseState(group + 0x8c, gUnk_0824E230, 0x486);
     (*((u32 *)(body + 0x6c4)))++;
-    if (actor->distanceF0 < (*((u32 *)(body + 0x6c8)))) {
-        old = actor->direction;
-        actor->direction = actor->fieldE9 + 0x80;
+    if (actor->tracking.distance < (*((u32 *)(body + 0x6c8)))) {
+        old = actor->body.direction;
+        actor->body.direction = actor->tracking.heading + 0x80;
         if (!Vorn_SelectReachableEscapeCell(actor, old))
             return 0;
         SetControl(actor, SceneActorControl_OnIdle, 0x10);
         SetState(actor, 0x15);
-    } else if (actor->distanceF0 > (*((u32 *)(body + 0x6cc)))) {
-        old = actor->direction;
+    } else if (actor->tracking.distance > (*((u32 *)(body + 0x6cc)))) {
+        old = actor->body.direction;
         {
             u32 random = RandomBits(0xffffffff);
-            actor->direction = (random & 63) + actor->fieldE9;
+            actor->body.direction = (random & 63) + actor->tracking.heading;
         }
-        if (!actor->fieldDC)
-            actor->fieldDC = (u32)(((u8 **)gPlayers)[0] + 0x24);
+        if (!actor->tracking.target)
+            actor->tracking.target = (u32)(((u8 **)gPlayers)[0] + 0x24);
         if ((!SelectRoute(actor)) && (!Vorn_SelectReachableEscapeCell(actor, old)))
             return 0;
         SetControl(actor, SceneActorControl_OnIdle, 0x10);
         SetState(actor, 0x15);
     } else {
-        old = actor->direction;
+        old = actor->body.direction;
         c1 = old;
         {
             u32 random = RandomBits(0xffffffff);
-            actor->direction = (random & 63) + actor->fieldE9;
+            actor->body.direction = (random & 63) + actor->tracking.heading;
         }
-        if (!actor->fieldDC)
-            actor->fieldDC = (u32)(((u8 **)gPlayers)[0] + 0x24);
+        if (!actor->tracking.target)
+            actor->tracking.target = (u32)(((u8 **)gPlayers)[0] + 0x24);
         if ((!SelectRoute(actor)) && (!Vorn_SelectReachableEscapeCell(actor, c1)))
             return 0;
         SetControl(actor, SceneActorControl_OnIdle, 0x10);

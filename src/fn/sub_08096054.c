@@ -68,7 +68,7 @@ void Ghost_UpdateHitStagger(struct SceneActorRegistryResetView *actor, s32 tick)
             range.x = 60;
             range.y = 60;
             range.z = 40;
-            SparkParticle_Spawn(&actor->position, Random4(), &range, actor->direction + 128, 10, 6,
+            SparkParticle_Spawn(&actor->body.position, Random4(), &range, actor->body.direction + 128, 10, 6,
                                 2, 2);
         }
     }
@@ -98,8 +98,8 @@ void Ghost_UpdateHitStagger(struct SceneActorRegistryResetView *actor, s32 tick)
     }
     x = Clamp(x);
     z = Clamp(z);
-    actor->motion.x += x;
-    actor->motion.z += z;
+    actor->body.motion.x += x;
+    actor->body.motion.z += z;
     *priorX += x;
     *priorZ += z;
     if (AtRest(x, z)) {

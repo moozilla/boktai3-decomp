@@ -67,11 +67,11 @@ static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, v
 void SceneActorControl_UpdateEntryTransition(struct SceneActorRegistryResetView *actor)
 {
     u8 result;
-    struct SceneActorRegistryControlGroup *group = &actor->group;
+    struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (SceneActorControl_TakeFlag(&actor->field2B1)) {
         BeginControlZero(actor, actor->entryTarget224, 2);
     }
-    if (!(u8)Callback_InvokeActor(actor, actor->update270)) {
+    if (!(u8)Callback_InvokeActor(actor, actor->contactQuery.opaque)) {
         result = sub_0812F3CC(actor);
         if (!result) {
             if (HasFinishedControl(actor)) {
@@ -83,7 +83,7 @@ void SceneActorControl_UpdateEntryTransition(struct SceneActorRegistryResetView 
                 }
                 actor->counter2AC = result;
                 actor->field2B1 = 1;
-                BeginControl(actor, group->entryControl41C, 26, result);
+                BeginControl(actor, group->gate.control, 26, result);
             } else {
                 ++actor->counter2AC;
             }

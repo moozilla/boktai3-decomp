@@ -11,7 +11,7 @@ static inline u8 IsControlled(struct SceneActorRegistryResetView *a)
 }
 static inline void ClearRoute(struct SceneActorRegistryResetView *a)
 {
-    register struct SceneActorRegistryControl *route asm("r2") = &a->group.control;
+    register struct SceneActorRegistryControl *route asm("r2") = &a->group.common.control;
     register u32 *flags asm("r3") = &a->flags2CC;
     register u32 mask asm("r1") = ~0x141C0;
     *flags &= mask;
@@ -93,11 +93,11 @@ void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *input,
         }
     }
     if (frame > 6) {
-        actor->position.y -= (u32)(frame - 6) * 30;
+        actor->body.position.y -= (u32)(frame - 6) * 30;
         if (!actor->drawableKind)
-            *(struct ContactPosition *)((u8 *)actor->drawable + 0x1C) = actor->position;
+            *(struct ContactPosition *)((u8 *)actor->drawable + 0x1C) = actor->body.position;
         else
-            *(struct ContactPosition *)((u8 *)actor->drawable + 0x40) = actor->position;
+            *(struct ContactPosition *)((u8 *)actor->drawable + 0x40) = actor->body.position;
         if (frame > 8) {
             u32 zeroWord = 0;
             u32 zeroByte = 0;

@@ -15,7 +15,7 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
 void Golem_UpdateAttackProperties(struct SceneActorRegistryResetView *a)
 {
     u8 *state = a->context;
-    u8 *group = (u8 *)&a->group;
+    u8 *group = (u8 *)&a->group.common;
     if (Unavailable(a))
         return;
     if (Flag(a, 0xA027, 0x2D4))

@@ -124,7 +124,7 @@ static inline void Bee_EnterState(struct SceneActorRegistryResetView *a, u32 pha
 
 static inline u8 Bee_GetHeading(const struct SceneActorRegistryResetView *actor)
 {
-    return actor->fieldE9;
+    return actor->tracking.heading;
 }
 
 // confidence=low: follows a randomized route and returns to the Bee behavior selector.
@@ -141,7 +141,7 @@ void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
             {
                 u8 reverseBias = 128;
                 Bee_MakePolarVector(
-                    &dest, (actor->fieldE9 + ((Bee_NextRandom() & 63) + reverseBias)) & 255, 320);
+                    &dest, (actor->tracking.heading + ((Bee_NextRandom() & 63) + reverseBias)) & 255, 320);
             }
             Bee_ClearRouteFlags(body, 8);
             {
@@ -150,7 +150,7 @@ void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
                 body->remaining = duration;
             }
         } else {
-            Bee_MakePolarVector(&dest, Bee_OffsetHeading(Bee_NextRandom(), &actor->fieldE9) & 255,
+            Bee_MakePolarVector(&dest, Bee_OffsetHeading(Bee_NextRandom(), &actor->tracking.heading) & 255,
                                 512);
             {
                 s32 variant = Bee_GetMovementVariant(actor);
@@ -158,29 +158,29 @@ void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
                 body->remaining = duration;
             }
         }
-        Bee_AddPosition(&dest, &actor->position);
+        Bee_AddPosition(&dest, &actor->body.position);
         sub_0809345C(actor, &dest);
-        Bee_SubVector(actor, &actor->position, &dest);
+        Bee_SubVector(actor, &actor->body.position, &dest);
         Bee_ClearVector(&zero, &body->motion);
     }
-    Bee_SubtractPositions(&delta, &actor->position, &body->points[body->index]);
+    Bee_SubtractPositions(&delta, &actor->body.position, &body->points[body->index]);
     {
         u8 facing = Bee_GetHeading(actor);
-        actor->direction = facing;
+        actor->body.direction = facing;
     }
     if ((body->remaining > 0) && (((delta.x * delta.x) + (delta.z * delta.z)) > 1024)) {
         s32 steps = Bee_Max(Bee_TruncateShift(body->remaining, 5), 1);
-        actor->motion.x += Div(body->points[body->index].x - actor->position.x, steps);
-        actor->motion.z += Div(body->points[body->index].z - actor->position.z, steps);
-        body->motion = actor->motion;
+        actor->body.motion.x += Div(body->points[body->index].x - actor->body.position.x, steps);
+        actor->body.motion.z += Div(body->points[body->index].z - actor->body.position.z, steps);
+        body->motion = actor->body.motion;
         body->remaining -= actor->counter2AC;
     } else if ((++body->index) > 8) {
-        actor->position.x = body->points[8].x;
-        actor->position.z = body->points[8].z;
-        Bee_MakePolarVector(&dest, ((Bee_NextRandom() & 63) + actor->fieldE9) & 255, 512);
-        Bee_AddPosition(&dest, &actor->position);
+        actor->body.position.x = body->points[8].x;
+        actor->body.position.z = body->points[8].z;
+        Bee_MakePolarVector(&dest, ((Bee_NextRandom() & 63) + actor->tracking.heading) & 255, 512);
+        Bee_AddPosition(&dest, &actor->body.position);
         sub_0809345C(actor, &dest);
-        Bee_SubVector(actor, &actor->position, &dest);
+        Bee_SubVector(actor, &actor->body.position, &dest);
         {
             s32 variant = Bee_GetMovementVariant(actor);
             s32 duration = (body->duration) << variant;
@@ -190,14 +190,14 @@ void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
         actor->counter2AC = 0;
         return;
     } else {
-        actor->position.x = Bee_GetWaypointX(body, body->index - 1);
-        actor->position.z = Bee_GetWaypointZ(body, body->index - 1);
+        actor->body.position.x = Bee_GetWaypointX(body, body->index - 1);
+        actor->body.position.z = Bee_GetWaypointZ(body, body->index - 1);
     }
     if (((s32)actor->counter2AC) <= 19)
         actor->counter2AC++;
     if (body->cooldown)
         body->cooldown--;
-    else if (actor->distanceF0 <= 0xFFFE) {
+    else if (actor->tracking.distance <= 0xFFFE) {
         if (body->returnMode)
             Bee_EnterState(actor, 2, 1);
         else

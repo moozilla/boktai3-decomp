@@ -36,7 +36,7 @@ void Golem_UpdateHoldTimer(struct SceneActorRegistryResetView *actor)
     TakeFlag(&actor->field2B1);
     if (Golem_InvokeEnabledBehavior(actor))
         return;
-    body->direction = actor->fieldE9;
+    body->direction = actor->tracking.heading;
     if ((s32)actor->counter2AC > 0x77) {
         SetPhase(actor, 0, 2, 5);
         context->field688 = 0;

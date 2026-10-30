@@ -88,7 +88,7 @@ void Golem_UpdateChargeRecovery(struct SceneActorRegistryResetView *actor)
         variantPointer = &directionVariant;
         {
             u8 *mirrorAddress = &mirror;
-            s32 quadrant = ((((s32)actor->direction) + 0x60) >> 6) & 3;
+            s32 quadrant = ((((s32)actor->body.direction) + 0x60) >> 6) & 3;
             mirrorPointer = mirrorAddress;
             flags2D4 = initialFlags;
             if (quadrant > 1) {
@@ -182,7 +182,7 @@ done:
             do {
                 step.z = ((*speed) * gUnk_086149C4[body[0x691]]) >> 16;
             } while (0);
-            candidate = *((struct RecoverySample *)(&actor->position));
+            candidate = *((struct RecoverySample *)(&actor->body.position));
             out = (struct RecoverySample *)(&candidate);
             *((u32 *)out) =
                 ((*((u32 *)out)) & 0xFFFF0000) | ((u16)(((u16)candidate.x) + ((u16)step.x)));
@@ -200,15 +200,15 @@ done:
                 *((u16 *)(body + 0x682)) = 0;
                 body[0x68D] = 1;
             } else {
-                actor->motion.x += step.x;
-                actor->motion.z += step.z;
+                actor->body.motion.x += step.x;
+                actor->body.motion.z += step.z;
             }
         }
     } else if (body[0x68D] == 1) {
         struct ContactPosition delta;
         struct ContactPosition center;
         SceneActorTerrain_GetCenter(actor->terrainCell, &center);
-        Delta(&delta, &actor->position, &center);
+        Delta(&delta, &actor->body.position, &center);
         switch (body[0x691] >> 6) {
             case 0:
 
@@ -250,7 +250,7 @@ done:
                 *((struct ContactPosition *)(body + 0x694));
             sub_080C47DC(body);
             body[0x690] = body[0x68E];
-            actor->direction = body[0x68E];
+            actor->body.direction = body[0x68E];
             actor->field2B0 = 1;
             *counter = zero;
             *((u16 *)(body + 0x682)) = zero;

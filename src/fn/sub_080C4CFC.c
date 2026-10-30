@@ -8,15 +8,15 @@ void SceneActorRoute_CommitReachableDestination(struct SceneActorRegistryResetVi
 {
     struct SceneActorRouteContext *context = actor->context;
     u8 *group = (u8 *)actor + 0x3D4;
-    struct SceneActorRouteDestination *target = (void *)actor->fieldDC;
+    struct SceneActorRouteDestination *target = (void *)actor->tracking.target;
     s32 cell = SceneActorTerrain_GetCellIndex(&target->position);
     u32 flags = *(u16 *)(SceneActorTerrain_GetCell(cell) + 2);
     u32 mask = 0x43;
     if (!(flags & mask)) {
         if (Nav_IsPositionInMesh(
-                *(void **)(group + 0x1FC), &actor->position,
-                &((struct SceneActorRouteDestination *)actor->fieldDC)->position)) {
-            context->destination = ((struct SceneActorRouteDestination *)actor->fieldDC)->position;
+                *(void **)(group + 0x1FC), &actor->body.position,
+                &((struct SceneActorRouteDestination *)actor->tracking.target)->position)) {
+            context->destination = ((struct SceneActorRouteDestination *)actor->tracking.target)->position;
             sub_080C47B8(&context->destination);
         }
     }

@@ -39,13 +39,13 @@ void ActorBehavior_TickParticipantProgress(struct SceneActorRegistryResetView *a
         u16 *mode = &a->paletteOffset;
         u32 value = *mode;
         if (!value) {
-            u32 first = a->fieldB4;
-            u32 second = a->fieldBC;
-            u32 last = a->fieldCC;
+            u32 first = a->attacks.first[0];
+            u32 second = a->attacks.second[0];
+            u32 last = a->attacks.flags[0];
             PlayerContact_ApplySyntheticContact((*(u8 **)gPlayers), first, second, 0, value, last);
         } else {
             {
-                u32 increment = a->fieldB4;
+                u32 increment = a->attacks.first[0];
                 u16 *counter = &s->accumulated;
                 *counter = *counter + increment;
             }

@@ -74,7 +74,7 @@ static inline void Spider_AddMotionFlags(struct SceneActorRegistryResetView *a, 
 }
 static inline void Spider_AddGroupFlags(struct SceneActorRegistryControlGroup *g, u32 mask)
 {
-    u16 *flags = &g->flags414;
+    u16 *flags = &g->gate.flags;
     u32 value = mask;
     value |= *flags;
     *flags = value;
@@ -106,8 +106,8 @@ static inline u8 Spider_MoveLanding(struct LandingState *s, struct SceneActorReg
         z = 200;
     else if (z < -200)
         z = -200;
-    a->motion.x += x;
-    a->motion.z += z;
+    a->body.motion.x += x;
+    a->body.motion.z += z;
     *cx += x;
     *cz += z;
     if (!x && !z)
@@ -148,17 +148,17 @@ void Spider_UpdateLandingMotion(struct SceneActorRegistryResetView *a, s32 frame
     if (frame <= 17 && seq->frame == 1)
         seq->elapsed = 0;
     if (Spider_MoveLanding((void *)a, a)) {
-        struct SceneActorRegistryControlGroup *group = &a->group;
+        struct SceneActorRegistryControlGroup *group = &a->group.common;
         u32 zero = Spider_SetLandingReady((void *)&a->field2B0);
         Spider_SetState(a, zero, zero, 12);
-        Spider_SetControl(a, group->entryControl41C, 26);
+        Spider_SetControl(a, group->gate.control, 26);
         sub_080A4798(a);
         SceneActorMovement_ResolveRoutePosition(a);
-        Spider_AddGroupFlags(&a->group, 4);
+        Spider_AddGroupFlags(&a->group.common, 4);
         Spider_AddMotionFlags(a, 0x80);
-        a->group.field418 = a->group.field416;
+        a->group.common.gate.counter = a->group.common.gate.duration;
         Spider_ClearMotionFlags(a, ~0x20);
-        a->direction = a->fieldE9;
+        a->body.direction = a->tracking.heading;
         {
             u32 mask = 0x10;
             *flags |= mask;

@@ -51,7 +51,7 @@ static inline void Delta(struct ContactPosition *out, struct ContactPosition *fr
 }
 static inline s32 Facing(struct SceneActorRegistryResetView *a, struct ContactPosition *delta)
 {
-    s32 direction = a->direction;
+    s32 direction = a->body.direction;
     s32 difference = Math_Atan2(delta->x, delta->z) - direction;
     if (difference > 128)
         difference -= 256;
@@ -86,9 +86,9 @@ u8 SceneActorPlacement_BeginNearbyPlayerContact(struct SceneActorRegistryResetVi
         return 0;
     if (SaveFlags(a, &flags, 128))
         return 0;
-    if (a->distanceF0 > a->distanceLimitF8)
+    if (a->tracking.distance > a->tracking.limit)
         return 0;
-    Delta(&delta, &a->position, (void *)(player + 0x30));
+    Delta(&delta, &a->body.position, (void *)(player + 0x30));
     angle = Facing(a, &delta);
     if (angle < 0)
         angle = -angle;
@@ -96,7 +96,7 @@ u8 SceneActorPlacement_BeginNearbyPlayerContact(struct SceneActorRegistryResetVi
         return 0;
     if (!sub_0821D4F0(transform + 12, ((u8 **)gPlayers)[0] + 0x30, 5, 256))
         return 0;
-    a->fieldDC = (u32)(((u8 **)gPlayers)[0] + 0x24);
+    a->tracking.target = (u32)(((u8 **)gPlayers)[0] + 0x24);
     State(a, 12);
     Control(a, F(nav, 0x48, void *), 26);
     sub_080A4798(a);

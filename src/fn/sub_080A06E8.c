@@ -46,7 +46,7 @@ void Crow_StopAtRaisedTerrain(struct SceneActorRegistryResetView *actor)
     Clear(context, 2);
     if (actor->field2B5 == 0x25) {
         struct ContactPosition *p = &target;
-        struct ContactPosition *position = &actor->position;
+        struct ContactPosition *position = &actor->body.position;
         struct ContactPosition *offset = &actor->secondaryMotion;
 
         s32 cell, height;
@@ -54,7 +54,7 @@ void Crow_StopAtRaisedTerrain(struct SceneActorRegistryResetView *actor)
         p->x = offset->x + position->x;
         p->y = offset->y + position->y;
         p->z = offset->z + position->z;
-        Add(p, &actor->motion);
+        Add(p, &actor->body.motion);
         cell = SceneActorTerrain_GetCellIndex(&target);
         height = Height(cell, &target);
         if (actor->groundHeight2BE + *(s16 *)((u8 *)actor + 0x2ea) < height) {
@@ -64,14 +64,14 @@ void Crow_StopAtRaisedTerrain(struct SceneActorRegistryResetView *actor)
             context->x = 0;
             context->y = 0;
             context->z = 0;
-            actor->motion.x = 0;
-            actor->motion.z = 0;
-            actor->motion.y = 0;
+            actor->body.motion.x = 0;
+            actor->body.motion.z = 0;
+            actor->body.motion.y = 0;
             Set(context, 2);
         }
         if (target.y < height) {
             actor->secondaryMotion.y = 0;
-            actor->motion.y = 0;
+            actor->body.motion.y = 0;
             context->y = 0;
         }
     }

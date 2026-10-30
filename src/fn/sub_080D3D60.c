@@ -63,7 +63,7 @@ struct MummySavedControl {
 static inline void Turn(u8 saved, void *ctx)
 {
     struct SceneActorRegistryResetView *actor = ctx;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     {
         u32 mask = 0x400;
         if (((struct SceneActorRegistryResetView *)ctx)->flags2D4 & mask)
@@ -71,7 +71,7 @@ static inline void Turn(u8 saved, void *ctx)
     }
     if (Test16((u16 *)((u8 *)ctx + 0x414), 4))
         return;
-    ((struct MummyTurnBytes *)(group + 0x204))->direction = PickTurn(actor->direction);
+    ((struct MummyTurnBytes *)(group + 0x204))->direction = PickTurn(actor->body.direction);
     {
         struct MummySavedControl *save = (struct MummySavedControl *)(group + 0x8C);
         save->target = actor->target;
@@ -95,7 +95,7 @@ static inline u8 Arrive(void *obj)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
     s32 player;
@@ -136,7 +136,7 @@ static inline u8 Arrive(void *obj)
         (*(struct ContactPosition **)(group + 0x200))->pad = 0;
     }
     {
-        u8 saved = actor->direction;
+        u8 saved = actor->body.direction;
         Turn(saved, obj);
     }
     sub_0807E334(obj);
@@ -155,7 +155,7 @@ reroute: {
         data = gTerrainMap->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
-    if (Chase_TryRoute(obj, *(void **)(group + 0x1FC), &actor->position, &target))
+    if (Chase_TryRoute(obj, *(void **)(group + 0x1FC), &actor->body.position, &target))
         goto moved;
     goto invoke;
 }
@@ -179,7 +179,7 @@ static inline u8 TakeControlEntry(struct SceneActorRegistryResetView *actor)
 void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *body = actor->context;
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     if (TakeControlEntry(actor)) {
         u32 mask;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -194,7 +194,7 @@ void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     actor->field2C2 = 32;
     if (!(*((u16 *)(body + 0x6d6)))) {
-        actor->fieldDC = ((u32)gPlayers[0]) + 0x24;
+        actor->tracking.target = ((u32)gPlayers[0]) + 0x24;
         {
             u32 mask = 4;
             SetHalf((u16 *)(group + 0x40), mask);

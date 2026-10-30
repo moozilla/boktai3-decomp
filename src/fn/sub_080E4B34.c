@@ -20,9 +20,9 @@ static inline u16 Dog_ReadMotionFlags(struct SceneActorRegistryResetView *actor,
 static inline void Dog_BeginRecoveryTurn(void *obj, u8 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (!Dog_ReadMotionFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
-        s32 prior = actor->direction;
+        s32 prior = actor->body.direction;
         s32 tries = 0;
         s32 choice;
         const u16 *table = gRandomTable;
@@ -47,7 +47,7 @@ static inline u8 Dog_RerouteToTarget(void *obj)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
     s32 player;
@@ -88,7 +88,7 @@ static inline u8 Dog_RerouteToTarget(void *obj)
         (*(struct ContactPosition **)(group + 0x200))->pad = 0;
     }
     {
-        u8 saved = actor->direction;
+        u8 saved = actor->body.direction;
         Dog_BeginRecoveryTurn(obj, saved);
     }
     sub_0807E334(actor);
@@ -107,7 +107,7 @@ reroute: {
         data = gTerrainMap->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
-    if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, targetPointer))
+    if (Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position, targetPointer))
         return 1;
 invoke:
     Callback_InvokeActor(actor, *(void **)(group + 0x224));
@@ -133,7 +133,7 @@ static inline u32 Arg1(u32 k_, u8 *group)
 
 void Dog_BeginDelayedRouteRecovery(struct SceneActorRegistryResetView *a)
 {
-    u8 *group = (u8 *)(&a->group);
+    u8 *group = (u8 *)(&a->group.common);
     if (Chase_TakeArrived(a)) {
         Chase_SetCtl(a, a->savedTarget, 0);
         {
@@ -143,7 +143,7 @@ void Dog_BeginDelayedRouteRecovery(struct SceneActorRegistryResetView *a)
         }
         Chase_ClearMotionFlags(a, 0x200);
     }
-    if ((u8)Callback_InvokeActor(a, a->update270))
+    if ((u8)Callback_InvokeActor(a, a->contactQuery.opaque))
         return;
     if (sub_0812F3CC(a))
         return;

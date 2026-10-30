@@ -117,19 +117,19 @@ void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor)
         return;
     if (!delta.x && !delta.z)
         return;
-    reaction = (void *)&actor->fieldDC;
+    reaction = (void *)&actor->tracking.target;
     if (!ReactionFlag(reaction, 2))
         return;
     {
         u32 mask = ~2;
         reaction->flags = mask & reaction->flags;
     }
-    height = actor->position.y - *(s16 *)((*(u8 **)gPlayers) + 0x32);
+    height = actor->body.position.y - *(s16 *)((*(u8 **)gPlayers) + 0x32);
     if (height < 0)
         height = -height;
     if (height > 512)
         return;
-    if (actor->distanceF0 >= actor->distanceLimitF8)
+    if (actor->tracking.distance >= actor->tracking.limit)
         return;
     active = ContextFlag(state, 0x10, &savedFlags);
     if (active) {

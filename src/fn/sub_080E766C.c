@@ -15,7 +15,7 @@ static inline u8 TakeFlag(u8 *flag)
 void SceneActor_WaitForCategoryAttachment(struct SceneActorRegistryResetView *p, s32 frame)
 {
     if (TakeFlag(&p->field2B2)) {
-        u32 flags = SceneActor_GetDirectionFlags(p->direction);
+        u32 flags = SceneActor_GetDirectionFlags(p->body.direction);
         struct ContactCollider *collider;
         SceneActorAnimation_SelectEntryFlags(p, 0, flags);
         collider = &p->colliderB;
@@ -24,7 +24,7 @@ void SceneActor_WaitForCategoryAttachment(struct SceneActorRegistryResetView *p,
     if (frame == 160) {
         SceneActorAttachment_ReplaceResponseSlot(p, 0, 2, p->category);
     } else if (frame > 160) {
-        if ((u8)ActorAttachment_IsUnavailable(p->attachment))
+        if ((u8)ActorAttachment_IsUnavailable(p->group.attachment))
             p->field2B0 = 1;
     }
 }

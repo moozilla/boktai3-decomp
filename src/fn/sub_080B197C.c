@@ -44,13 +44,13 @@ void Vorn_SelectReactionControl(struct SceneActorRegistryResetView *a)
     *flags = value;
     if (ShouldReact(ctx, value)) {
         sub_080B3110(a, 1, gUnk_0824E230, 0x279);
-        MarkReactionMotion((void *)&a->fieldDC);
+        MarkReactionMotion((void *)&a->tracking.target);
         {
             u32 mask = 0x80;
             a->flags2CC = mask | a->flags2CC;
         }
     } else {
-        u32 active = MotionFlag((void *)&a->fieldDC, 8);
+        u32 active = MotionFlag((void *)&a->tracking.target, 8);
         /* Keep the motion test result available before selecting its control. */
         asm("" : : "r"(active));
         if (active)
@@ -59,6 +59,6 @@ void Vorn_SelectReactionControl(struct SceneActorRegistryResetView *a)
             Chase_SetState(a, active, 1, active);
             Chase_SetCtl(a, SceneActorControl_OnIdle, 16);
         }
-        SetMotion((void *)&a->fieldDC, 8);
+        SetMotion((void *)&a->tracking.target, 8);
     }
 }

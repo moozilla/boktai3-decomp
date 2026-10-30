@@ -36,7 +36,7 @@ void Vorn_UpdateAnimationRetries(struct SceneActorRegistryResetView *actor)
         context[0x697] = RetryDuration();
         *(u16 *)(context + 0x694) = 0;
     }
-    Callback_InvokeActor(actor, actor->update270);
+    Callback_InvokeActor(actor, actor->contactQuery.opaque);
     if (actor->field2B0) {
         u8 *retries = context + 0x696;
         if (*retries) {

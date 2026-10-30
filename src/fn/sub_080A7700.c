@@ -149,7 +149,7 @@ void TentacleBody_ApproachWaypoint(struct SceneActorRegistryResetView *actor)
         }
         TentacleActor_ResetOscillation(actor);
     }
-    if ((u8)Callback_InvokeActor(actor, actor->update270)) {
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque)) {
         State7(actor);
         return;
     }
@@ -158,9 +158,9 @@ void TentacleBody_ApproachWaypoint(struct SceneActorRegistryResetView *actor)
     if (Approach(actor, (void *)(body + 0x8F8), speed)) {
         s32 angle;
         TentacleActor_SelectWanderRoute(actor);
-        Delta(&delta, &actor->position, (void *)(body + 0x904));
+        Delta(&delta, &actor->body.position, (void *)(body + 0x904));
         *((u8 *)actor + 0x3CD) = Math_Atan2(delta.x, delta.z);
-        angle = *((u8 *)actor + 0x3CD) - actor->direction;
+        angle = *((u8 *)actor + 0x3CD) - actor->body.direction;
         if (angle > 128)
             angle -= 256;
         else if (angle < -128)

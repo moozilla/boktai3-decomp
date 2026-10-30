@@ -62,9 +62,9 @@ void TentacleBody_UpdateSpreadPreparation(struct SceneActorRegistryResetView *ac
         speed = 2;
         actor->field2EA += 40;
     }
-    angle = (actor->direction + 128) & 255;
-    actor->motion.x += Shift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
-    actor->motion.z += Shift(gUnk_086149C4[angle] * speed, 12);
+    angle = (actor->body.direction + 128) & 255;
+    actor->body.motion.x += Shift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
+    actor->body.motion.z += Shift(gUnk_086149C4[angle] * speed, 12);
     sub_080A9DB0(actor, 10, 0x1000);
     ActorTrail_ApplyAngularOffsets(actor, 20, 24, 0);
 }

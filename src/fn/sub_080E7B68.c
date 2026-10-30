@@ -134,11 +134,11 @@ void Mimic_ResetPursuitDrawable(struct SceneActorRegistryResetView *actor)
     *(u16 *)(context + 0x65A) = 0;
     *(u16 *)(context + 0x65C) = 0;
     if (Test(gEngineFlags, 0x4800)) {
-        *(struct ContactPosition *)(context + 0x650) = actor->position;
-        *(u16 *)(context + 0x658) = Cell(&actor->position);
+        *(struct ContactPosition *)(context + 0x650) = actor->body.position;
+        *(u16 *)(context + 0x658) = Cell(&actor->body.position);
     }
     SceneActorAnimation_SelectEntryFlags((void *)actor, 0,
-                                         SceneActor_GetDirectionFlags(actor->direction));
+                                         SceneActor_GetDirectionFlags(actor->body.direction));
     {
         register void *drawable asm("r0") = actor->drawable;
         asm("" : "+r"(drawable));

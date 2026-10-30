@@ -19,9 +19,9 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
 }
 static inline u8 TestMovement(struct SceneActorRegistryResetView *a)
 {
-    void *collider = a->routeObject;
-    struct ContactPosition *position = &a->position;
-    struct ContactPosition *destination = (void *)(a->fieldDC + 12);
+    void *collider = a->group.route;
+    struct ContactPosition *position = &a->body.position;
+    struct ContactPosition *destination = &a->tracking.target->position;
     if (!Nav_IsPositionInMesh(collider, position, destination)) {
         u16 *flags = &a->flags2D4;
         u32 mask = ~0x200;
@@ -31,7 +31,7 @@ static inline u8 TestMovement(struct SceneActorRegistryResetView *a)
         s32 result = Terrain_ApplyBlocked(collider, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&a->motion, 8);
+                Memory_Clear(&a->body.motion, 8);
             return 1;
         } else {
             u16 *flags = &a->flags2D4;

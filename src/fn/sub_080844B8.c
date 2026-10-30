@@ -93,7 +93,7 @@ struct ActorApproachCallbackView {
 static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
                           s32 inSpeed)
 {
-    struct ActorMotionView *motion = (void *)&actor->id;
+    struct ActorMotionView *motion = (void *)&actor->body.id;
     s32 speed = inSpeed;
     s16 dx = saved->position.x - (u16)motion->position.x;
     s16 dz = saved->position.z - (u16)motion->position.z;
@@ -161,9 +161,9 @@ void sub_080844B8(struct SceneActorRegistryResetView *actor)
                 sub_08083C38(actor);
             }
         }
-        if (actor->distanceF0 > 0xFDE8) {
+        if (actor->tracking.distance > 0xFDE8) {
             SceneActorControl_ResetCollisionPhase(actor);
-            actor->direction = actor->fieldE9;
+            actor->body.direction = actor->tracking.heading;
             body->timer = 0x1E;
             return;
         }

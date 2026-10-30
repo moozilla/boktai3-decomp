@@ -36,7 +36,7 @@ void SceneActorControl_UpdateEntryRecoveryPhase_080E55AC(struct SceneActorRegist
         SetControl(actor, control, 2);
     }
     if (Dog_IsActionTimerExpired(actor)) {
-        if ((u8)Callback_InvokeActor(actor, actor->update270))
+        if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
             return;
         if (sub_0812F3CC(actor))
             return;

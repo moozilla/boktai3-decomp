@@ -81,10 +81,10 @@ void Vorn_TryUphillRoute(struct SceneActorRegistryResetView *actor)
     if (Chase_Test_(flags, 0x1D))
         return;
     point = (void *)(context + 0x6B0);
-    SceneActor_SelectDistantRoutePoint(context, point, &actor->position, 0x400000);
+    SceneActor_SelectDistantRoutePoint(context, point, &actor->body.position, 0x400000);
     if (!Vorn_SelectUphillTurn(context, point))
         return;
-    if (!Chase_TryRoute(actor, *((void **)(context + 0x5D0)), &actor->position, point)) {
+    if (!Chase_TryRoute(actor, *((void **)(context + 0x5D0)), &actor->body.position, point)) {
         Callback_InvokeActor(actor, *((void **)(context + 0x5F8)));
         return;
     }

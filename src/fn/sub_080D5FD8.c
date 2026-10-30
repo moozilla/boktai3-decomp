@@ -10,12 +10,12 @@ static inline u32 TestFlags(struct SceneActorRegistryResetView *a, u32 mask)
 }
 void Mummy_UpdateDescriptorPursuit(struct SceneActorRegistryResetView *a)
 {
-    u8 *group = (u8 *)&a->group;
+    u8 *group = (u8 *)&a->group.common;
     s32 motion;
     s32 event;
     if (a->field2B1)
         a->field2B1 = 0;
-    if ((u8)Callback_InvokeActor(a, a->update270))
+    if ((u8)Callback_InvokeActor(a, a->contactQuery.opaque))
         return;
     motion = Callback_InvokeActor(a, *(void **)((u8 *)a + 0x260));
     {

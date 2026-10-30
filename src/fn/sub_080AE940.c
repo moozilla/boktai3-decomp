@@ -33,11 +33,11 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
 static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group)
 {
     void *route = *(void **)(group + 0x1FC);
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     s32 result;
     register u16 *fp asm("r0");
     struct ContactPosition *destination;
-    u32 base = actor->fieldDC;
+    u32 base = actor->tracking.target;
     destination = (void *)(base + 12);
     if (!Nav_IsPositionInMesh(route, position, destination)) {
         u32 o1 = 0x2D4;
@@ -46,7 +46,7 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group)
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             register u32 o2 asm("r2") = 0x2D4;
@@ -72,8 +72,8 @@ void Vorn_UpdateApproachRange(struct SceneActorRegistryResetView *actor)
     }
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-    else if (actor->distanceF0 > context->maximumDistance ||
-             actor->distanceF0 < context->minimumDistance) {
+    else if (actor->tracking.distance > context->maximumDistance ||
+             actor->tracking.distance < context->minimumDistance) {
         Vorn_SelectRetreatRoute((void *)actor, 1);
     } else if (SceneActor_IsFacingNearbyTarget(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);

@@ -28,7 +28,7 @@ extern void *gUnknown_02000580[];
 static inline void S080E9C20_Facing(struct SceneActorRegistryResetView *actor, u8 *quadrant,
                                     u8 *flip)
 {
-    s32 side = ((actor->direction + 0x60) >> 6) & 3;
+    s32 side = ((actor->body.direction + 0x60) >> 6) & 3;
     if (side > 1) {
         *flip = 1;
         *quadrant = 3 - side;
@@ -90,9 +90,9 @@ void sub_080E9C20(struct SceneActorRegistryResetView *actor)
 
             S080E9C20_Facing(actor, &quadrant, &flip);
             e = &gUnk_086062B0[flip * 5 + anim->unk8];
-            pos.x = e->x + actor->position.x;
-            pos.y = e->y + actor->position.y;
-            pos.z = e->z + actor->position.z;
+            pos.x = e->x + actor->body.position.x;
+            pos.y = e->y + actor->body.position.y;
+            pos.z = e->z + actor->body.position.z;
             target = *(struct S080E9C20Target **)((u8 *)actor + 0xDC);
             if (target->kind <= 3) {
                 Player_BeginPositionRequest((void *)gUnknown_02000580[target->kind], &pos, 0, 0,

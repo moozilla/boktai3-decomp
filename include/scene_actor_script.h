@@ -1,6 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_SCRIPT_H
 #define GUARD_SCENE_ACTOR_SCRIPT_H
 #include "scene_actor_registry.h"
+#include "scene_actor_script_api.h"
 /* Tentative view of the script-controlled bytes in the actor's context tail. */
 struct SceneActorScriptControlView {
     u8 unknown0[0x42];

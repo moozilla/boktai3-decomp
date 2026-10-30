@@ -9,14 +9,14 @@ static inline u32 TestFlags(struct SceneActorRegistryResetView *a, u32 mask)
 }
 void Vorn_UpdateDescriptorPursuit(struct SceneActorRegistryResetView *a)
 {
-    u8 *group = (u8 *)&a->group;
+    u8 *group = (u8 *)&a->group.common;
     u8 *context = a->context;
     s32 motion;
     s32 event;
     if (a->field2B1) {
         a->field2B1 = 0;
     }
-    Callback_InvokeActor(a, a->update270);
+    Callback_InvokeActor(a, a->contactQuery.opaque);
     motion = Callback_InvokeActor(a, *(void **)((u8 *)a + 0x260));
     {
         u16 *rate;

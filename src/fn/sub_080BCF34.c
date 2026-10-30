@@ -42,10 +42,10 @@ void Skeleton_UpdateTargetTransition(struct SceneActorRegistryResetView *a)
         u32 value = *address & flag;
         u32 *flags = address;
         if (IsActive(value)) {
-            if (a->distanceF0 > c->timeLimit) {
+            if (a->tracking.distance > c->timeLimit) {
                 SetPhase(a, 17);
                 {
-                    s32 angle = a->fieldE9;
+                    s32 angle = a->tracking.heading;
                     if (angle >= 0)
                         angle >>= 5;
                     else

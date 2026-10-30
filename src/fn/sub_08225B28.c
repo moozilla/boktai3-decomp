@@ -1,7 +1,8 @@
-#include "global.h"
+#include "scene_body_api.h"
+#include "scene_actor_components.h"
 
-u32 SceneBody_SetSprite(u8 *p, u32 v)
+u32 SceneBody_SetSprite(struct SceneActorBody *body, void *sprite)
 {
-    *(u32 *)(p + 0x2c) = v;
+    body->sprite = sprite;
     return 1;
 }

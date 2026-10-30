@@ -16,18 +16,18 @@ void SceneActorReaction_BeginSideStep(struct SceneActorRegistryResetView *actor,
         u32 flags;
         if (!context->side) {
             flags = 1;
-            actor->direction = 64;
-            actor->destinationE0 = actor->position;
-            actor->destinationE0.x -= 160;
+            actor->body.direction = 64;
+            actor->tracking.destination = actor->body.position;
+            actor->tracking.destination.x -= 160;
         } else {
             flags = 0;
-            actor->direction = 64;
-            actor->destinationE0 = actor->position;
-            actor->destinationE0.x += 160;
+            actor->body.direction = 64;
+            actor->tracking.destination = actor->body.position;
+            actor->tracking.destination.x += 160;
         }
         SceneActorAnimation_SelectEntryFlags((void *)actor, 16, flags);
     }
-    SideStep_SetFlags((void *)&actor->fieldDC, 32);
+    SideStep_SetFlags((void *)&actor->tracking.target, 32);
     if (frame > context->duration)
         actor->field2B0 = 1;
 }

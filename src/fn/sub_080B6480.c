@@ -6,7 +6,7 @@ void SceneActorControl_OnIdle(void);
 u32 Skeleton_TryEnterIdleRange(struct SceneActorRegistryResetView *s)
 {
     u8 *context = s->context;
-    if (s->distanceF0 > *(u32 *)(context + 0x708) && s->distanceF0 < *(u32 *)(context + 0x70C)) {
+    if (s->tracking.distance > *(u32 *)(context + 0x708) && s->tracking.distance < *(u32 *)(context + 0x70C)) {
         void (*fn)(void) = SceneActorControl_OnIdle;
         u8 code = 0x10;
         u32 zero;

@@ -58,11 +58,11 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             u32 count;
             gRandomIndex = index;
             count = Mod(*((u16 *)(0x0203B400 + (index * 2))), 3) + 1;
-            pos = &actor->position;
+            pos = &actor->body.position;
             {
                 u16 *a = (u16 *)pos;
-                u16 *b = (u16 *)&actor->position.y;
-                u16 *c = (u16 *)&actor->position.z;
+                u16 *b = (u16 *)&actor->body.position.y;
+                u16 *c = (u16 *)&actor->body.position.z;
                 px = *a;
                 py = *b;
                 pz = *c;
@@ -89,14 +89,14 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     if (script) {
         s32 values[8];
         struct ScriptUtilityArguments arguments;
-        Ghost_SetScriptValue(actor->position.x, &values[0]);
-        Ghost_SetScriptValue(actor->position.y, &values[1]);
-        Ghost_SetScriptValue(actor->position.z, &values[2]);
+        Ghost_SetScriptValue(actor->body.position.x, &values[0]);
+        Ghost_SetScriptValue(actor->body.position.y, &values[1]);
+        Ghost_SetScriptValue(actor->body.position.z, &values[2]);
         Ghost_SetScriptValue(((struct GhostDefeatScriptView *)actor)->parameters[0], &values[3]);
         Ghost_SetScriptValue(((struct GhostDefeatScriptView *)actor)->parameters[1], &values[4]);
         Ghost_SetScriptValue(((struct GhostDefeatScriptView *)actor)->parameters[2], &values[5]);
         Ghost_SetScriptValue(actor->field2E0, &values[6]);
-        Ghost_SetScriptValue(actor->id, &values[7]);
+        Ghost_SetScriptValue(actor->body.id, &values[7]);
         arguments.count = 8;
         arguments.values = values;
         Script_Call(script, &arguments);

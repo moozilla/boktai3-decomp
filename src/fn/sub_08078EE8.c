@@ -1,5 +1,3 @@
-#define SCENE_ACTOR_CHASE_SCALAR_CELLS 1
-#define SCENE_ACTOR_CHASE_WIDE_STATE   1
 #include "scene_actor_chase_reaction.h"
 #include "player.h"
 #include "global.h"
@@ -31,21 +29,23 @@ typedef char Check_secondaryMotion
 typedef char
     Check_particleTimer[(u32) & ((struct SceneActorRegistryResetView *)0)->field30C == 0x30C ? 1
                                                                                              : -1];
-typedef char
-    Check_route[(u32) & ((struct SceneActorRegistryResetView *)0)->route == 0x448 ? 1 : -1];
-typedef char
-    Check_contactNode[(u32) & ((struct SceneActorRegistryResetView *)0)->contactNode == 0x45C ? 1
-                                                                                              : -1];
+typedef char Check_route[(u32) & ((struct SceneActorRegistryResetView *)0)->group.homeRoute == 0x448
+                             ? 1
+                             : -1];
+typedef char Check_contactNode
+    [(u32) & ((struct SceneActorRegistryResetView *)0)->group.contactNode == 0x45C ? 1 : -1];
 typedef char Check_countdown5C8
-    [(u32) & ((struct SceneActorRegistryResetView *)0)->countdown5C8 == 0x5C8 ? 1 : -1];
+    [(u32) & ((struct SceneActorRegistryResetView *)0)->group.countdown5C8 == 0x5C8 ? 1 : -1];
 typedef char
-    Check_effect5CC[(u32) & ((struct SceneActorRegistryResetView *)0)->effect5CC == 0x5CC ? 1 : -1];
+    Check_effect5CC[(u32) & ((struct SceneActorRegistryResetView *)0)->group.effect == 0x5CC ? 1
+                                                                                             : -1];
 typedef char Check_behaviorControl
-    [(u32) & ((struct SceneActorRegistryResetView *)0)->behaviorControl == 0x5DC ? 1 : -1];
+    [(u32) & ((struct SceneActorRegistryResetView *)0)->group.contactControl == 0x5DC ? 1 : -1];
 typedef char Check_interactionCallback
-    [(u32) & ((struct SceneActorRegistryResetView *)0)->interactionCallback == 0x618 ? 1 : -1];
+    [(u32) & ((struct SceneActorRegistryResetView *)0)->group.interactionCallback == 0x618 ? 1
+                                                                                           : -1];
 typedef char Check_responseCallback
-    [(u32) & ((struct SceneActorRegistryResetView *)0)->responseCallback == 0x61C ? 1 : -1];
+    [(u32) & ((struct SceneActorRegistryResetView *)0)->group.responseCallback == 0x61C ? 1 : -1];
 struct UpdateRestorationCommand {
     u8 unknown0[8];
     u8 state, phase, behavior, unknownB;
@@ -215,9 +215,9 @@ static inline void ActorStatus_ReleaseContact(struct SceneActorRegistryResetView
 {
     u32 flag = 0x1000;
     if (actor->flags2D4 & flag) {
-        SceneActorContacts_ReleaseNode(actor->contactNode);
+        SceneActorContacts_ReleaseNode(actor->group.contactNode);
         actor->flags2D4 &= ~flag;
-        actor->contactNode = 0;
+        actor->group.contactNode = 0;
     }
 }
 
@@ -240,7 +240,7 @@ static inline void ActorStatus_ResetInteractionAt(struct SceneActorRegistryReset
 static inline void ActorStatus_ResetInteraction(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
-    ActorStatus_ResetInteractionAt(actor, (void *)&actor->group.control);
+    ActorStatus_ResetInteractionAt(actor, (void *)&actor->group.common.control);
 }
 static inline void ActorStatus_ResetRouteAt(struct SceneActorRegistryResetView *actor,
                                             struct SceneActorRegistryControl *control)
@@ -253,21 +253,21 @@ static inline void ActorStatus_ResetRouteAt(struct SceneActorRegistryResetView *
 static inline void ActorStatus_ResetRoute(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
-    ActorStatus_ResetRouteAt(actor, (void *)&actor->group.control);
+    ActorStatus_ResetRouteAt(actor, (void *)&actor->group.common.control);
 }
 static inline void ActorStatus_ResetSelection(struct SceneActorRegistryResetView *actor)
 {
-    actor->field5DA = 255;
+    actor->group.turn.turnsRemaining = 255;
 }
 
 /* shared reset of the knockback/stun scratch state */
 static inline void ActorStatus_ResetReaction(struct SceneActorRegistryResetView *actor)
 {
     actor->field2C2 = 0x40;
-    actor->group.flags414 = 0;
-    actor->group.field418 = 0;
+    actor->group.common.gate.flags = 0;
+    actor->group.common.gate.counter = 0;
     ActorStatus_ClearMotionFlags(actor, 0x380);
-    ActorStatus_ClearTrackingFlags((void *)&actor->fieldDC, 0x18);
+    ActorStatus_ClearTrackingFlags((void *)&actor->tracking.target, 0x18);
     ActorStatus_ResetInteraction(actor);
     ActorStatus_ClearMotionFlags(actor, 0x400);
     ActorStatus_ResetSelection(actor);
@@ -291,8 +291,8 @@ static inline void ActorStatus_TickAttachment(struct SceneActorRegistryResetView
     } else {
         (*(s16 *)&actor->fieldAA) = remaining - 1;
     }
-    if (actor->countdown5C8)
-        actor->countdown5C8--;
+    if (actor->group.countdown5C8)
+        actor->group.countdown5C8--;
 }
 
 static inline u32 ActorStatus_IsUnstable(struct SceneActorRegistryResetView *actor)
@@ -311,13 +311,13 @@ static inline u32 ActorStatus_IsUnstable(struct SceneActorRegistryResetView *act
 static inline void ActorStatus_CollisionGate(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
-    struct SceneActorChaseGroup *group = (void *)&actor->group;
+    struct SceneActorChaseGroup *group = &actor->group;
     if (ActorStatus_BodyFlags(actor, 0x200)) {
         if ((ActorStatus_IsUnstable(actor) && !ActorStatus_MotionFlags(actor, 0x8000)) ||
             ActorStatus_IsDown(actor))
-            ActorStatus_SetPlacementFlags(&group->placement, 1);
+            ActorStatus_SetPlacementFlags(&group->common.placement, 1);
         else
-            ActorStatus_ClearPlacementFlags(&group->placement, 1);
+            ActorStatus_ClearPlacementFlags(&group->common.placement, 1);
     }
 }
 
@@ -347,7 +347,7 @@ static inline u32 SceneEnvironment_LinkMode(void)
 
 static inline void ActorStatus_EffectSelector(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorChaseGroup *group = (void *)&actor->group;
+    struct SceneActorChaseGroup *group = &actor->group;
     s32 v;
     /* region marker at +0x5CC based on level */
     if (ActorStatus_HasBehaviorFlags(actor, 0x40000)) {
@@ -560,10 +560,10 @@ static inline void ActorStatus_Wake(struct SceneActorRegistryResetView *actor)
         (ActorStatus_BehaviorFlags(actor, 0x1000))) {
         ActorStatus_ResetRoute(actor);
         SceneActorChase_ClearWordFlags(&actor->flags2CC, 0x1000);
-        actor->reactionStart.x = actor->position.x;
-        actor->reactionStart.z = actor->position.z;
-        actor->reactionEnd.x = actor->position.x;
-        actor->reactionEnd.z = actor->position.z;
+        actor->reactionStart.x = actor->body.position.x;
+        actor->reactionStart.z = actor->body.position.z;
+        actor->reactionEnd.x = actor->body.position.x;
+        actor->reactionEnd.z = actor->body.position.z;
         if ((*(s16 *)&actor->fieldAA) >= actor->attachmentLimit)
             (*(s16 *)&actor->fieldAA) = ActorStatus_AttachmentRestart(actor);
         if (actor->health <= 0) {
@@ -578,8 +578,8 @@ static inline void ActorStatus_Wake(struct SceneActorRegistryResetView *actor)
             SceneActorChase_SetState(actor, 3, 0, 0);
         } else {
             SceneActorAttachment_ReplaceResponseSlot(actor, 3, 0x7F, actor->category);
-            Callback_InvokeActor(actor, actor->responseCallback);
-            SceneActorChase_SetControl(actor, actor->behaviorControl, 7);
+            Callback_InvokeActor(actor, actor->group.responseCallback);
+            SceneActorChase_SetControl(actor, actor->group.contactControl, 7);
             SceneActorChase_SetState(actor, 3, 0, 0);
         }
     }
@@ -644,7 +644,7 @@ static inline void ActorStatus_SetRecoveryDuration(struct SceneActorRegistryRese
 static inline void ActorStatus_ReactionFlags(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
-    struct SceneActorChaseGroup *group = (void *)&actor->group;
+    struct SceneActorChaseGroup *group = &actor->group;
     u32 cat;
     /* state-flag dispatch */
     if (((struct SceneActorRegistryResetView *)object)->flags2D4 == 0) {
@@ -662,14 +662,14 @@ static inline void ActorStatus_ReactionFlags(void *object)
 
         if (ActorStatus_MotionFlags(actor, 0x2000)) {
             ActorStatus_ResetReaction(object);
-            ActorStatus_ClearTrackingFlags((void *)&actor->fieldDC, 8);
+            ActorStatus_ClearTrackingFlags((void *)&actor->tracking.target, 8);
             ActorStatus_ClearMotionFlags(actor, 0x500);
             ActorStatus_SetPendingBits(actor, 0x400);
             actor->field2C2 = 0x40;
             SceneActorChase_ClearBits(&actor->flags2D6, 0x980);
         } else if (ActorStatus_MotionFlags(actor, 4)) {
             ActorStatus_ResetReaction(object);
-            ActorStatus_ClearTrackingFlags((void *)&actor->fieldDC, 8);
+            ActorStatus_ClearTrackingFlags((void *)&actor->tracking.target, 8);
             ActorStatus_ClearMotionFlags(actor, 0x2500);
             ActorStatus_SetPendingBits(actor, 0x400);
             actor->field2C2 = 0x40;
@@ -677,7 +677,7 @@ static inline void ActorStatus_ReactionFlags(void *object)
             ActorStatus_SetWord(&actor->flags2CC, 0x2000);
         } else if (ActorStatus_MotionFlags(actor, 2)) {
             ActorStatus_ResetReaction(object);
-            ActorStatus_ClearTrackingFlags((void *)&actor->fieldDC, 8);
+            ActorStatus_ClearTrackingFlags((void *)&actor->tracking.target, 8);
             ActorStatus_ClearMotionFlags(actor, 0x2500);
             ActorStatus_SetPendingBits(actor, 0x400);
             SceneActorChase_ClearBits(&actor->flags2D6, 0x980);
@@ -708,7 +708,7 @@ static inline void ActorStatus_ReactionFlags(void *object)
         if (ActorStatus_MotionFlags(actor, 0x803E)) {
             ActorStatus_ClearMotionFlags(actor, 0x201);
             SceneActorChase_ClearWordFlags(&actor->flags2CC, 0x4000);
-            ActorStatus_ClearTrackingFlags((void *)&actor->fieldDC, 0x10);
+            ActorStatus_ClearTrackingFlags((void *)&actor->tracking.target, 0x10);
             if (!(ActorStatus_MotionFlags(actor, 0x20)))
                 SceneActorChase_ClearWordFlags(&actor->flags2CC, 0x80);
             SceneActorChase_ClearWordFlags(&actor->flags2D0, 0x100004);
@@ -739,7 +739,7 @@ static inline void ActorStatus_ReactionFlags(void *object)
             ActorStatus_SetRecoveryDuration(actor, cat);
         } else {
             ActorStatus_ClearMotionFlags(actor, 0x400);
-            group->flags = 0;
+            group->common.gate.flags = 0;
             group->turn.turnsRemaining = 0xFF;
             group->turn.direction = 0;
             group->turn.savedDirection = 0;
@@ -771,11 +771,11 @@ static inline void ActorStatus_Particles(struct SceneActorRegistryResetView *act
     /* flicker spark while the hit timer runs */
     if ((*(u16 *)&actor->field30C) != 0) {
         (*(u16 *)&actor->field30C)--;
-        if (actor->position.y >= 0 && Mod((*(u16 *)&actor->field30C), 4) == 0) {
+        if (actor->body.position.y >= 0 && Mod((*(u16 *)&actor->field30C), 4) == 0) {
             u8 baseAngle = actor->field2B6;
             u32 rb;
 
-            sparkPos.position = actor->position;
+            sparkPos.position = actor->body.position;
             sparkPos.packed.y += (ActorStatus_RandomSample(gRandomTable) & 255);
             rb = ActorStatus_ParticleHeading(
                 baseAngle, (s32)(ActorStatus_RandomSample(gRandomTable) & 31) - 16);
@@ -801,7 +801,7 @@ static inline u8 ActorStatus_TryRecoveryRoute(struct SceneActorRegistryResetView
     blocked = Terrain_ApplyBlocked(route, from, to);
     if (blocked) {
         if (blocked != 2)
-            Memory_Clear(&actor->motion, sizeof(actor->motion));
+            Memory_Clear(&actor->body.motion, sizeof(actor->body.motion));
         return 1;
     }
     ActorStatus_ClearMotionFlags(actor, 0x200);
@@ -811,15 +811,15 @@ static inline u8 ActorStatus_TryRecoveryRoute(struct SceneActorRegistryResetView
 static inline void ActorStatus_RecoverAndRelease(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
-    struct SceneActorChaseGroup *group = (void *)&actor->group;
+    struct SceneActorChaseGroup *group = &actor->group;
     u32 cat;
     s32 t;
     u32 res;
     struct ContactPosition targetPosition;
     if ((ActorStatus_MotionFlags(object, 0x80)) && !(ActorStatus_MotionFlags(object, 0xA03F)) &&
         ((struct SceneActorRegistryResetView *)object)->colliderA.responseValue == 0) {
-        if (((struct SceneActorRegistryResetView *)object)->group.field418 != 0) {
-            ((struct SceneActorRegistryResetView *)object)->group.field418--;
+        if (((struct SceneActorRegistryResetView *)object)->group.common.gate.counter != 0) {
+            ((struct SceneActorRegistryResetView *)object)->group.common.gate.counter--;
         } else if ((cat = ((struct SceneActorRegistryResetView *)object)->category) != 2 &&
                    cat != 0x19 && !(ActorStatus_MotionFlags(object, 0x100))) {
             u8 *grp;
@@ -831,14 +831,15 @@ static inline void ActorStatus_RecoverAndRelease(void *object)
             SceneActorChase_SetControl(object, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
             SceneActorChase_SetState(object, 3, 1, 0);
             ActorStatus_StoreRestoration(
-                (void *)&((struct SceneActorRegistryResetView *)object)->word460,
+                (void *)&((struct SceneActorRegistryResetView *)object)->group.saved.control,
                 ((struct SceneActorRegistryResetView *)object)->entryTarget228, 0, 0, 7, 60);
             ActorStatus_SetWord(&((struct SceneActorRegistryResetView *)object)->flags2CC, 0x10);
             ActorStatus_MaskHalfword(&((struct SceneActorRegistryResetView *)object)->flags2D6,
                                      (u32)(s16)0xF636);
 
             SceneActorChase_SnapToRoute(
-                &targetPosition, (void *)&((struct SceneActorRegistryResetView *)object)->route);
+                &targetPosition,
+                (void *)&((struct SceneActorRegistryResetView *)object)->group.homeRoute);
 
             group->destination->pad = 1;
             grp = group->route;
@@ -849,23 +850,23 @@ static inline void ActorStatus_RecoverAndRelease(void *object)
         }
     }
     if ((ActorStatus_MotionFlags(object, 0x1000)) && !TetherActor_CanStartInteraction())
-        Callback_InvokeActor(object,
-                             ((struct SceneActorRegistryResetView *)object)->interactionCallback);
+        Callback_InvokeActor(
+            object, ((struct SceneActorRegistryResetView *)object)->group.interactionCallback);
 }
 static inline void ActorStatus_FaceTarget(struct SceneActorRegistryResetView *actor)
 {
     if (ActorStatus_BodyFlags(actor, 2)) {
-        actor->fieldDC = (u32)(gUnknown_02000580[0] + 0x24);
-    } else if (actor->fieldDC == 0) {
+        actor->tracking.target = (u32)(gUnknown_02000580[0] + 0x24);
+    } else if (actor->tracking.target == 0) {
         return;
     }
     {
-        u8 *tg = (void *)actor->fieldDC;
-        s32 dx = *(s16 *)(tg + 0xC) - actor->position.x;
-        s32 dy = *(s16 *)(tg + 0x10) - actor->position.z;
+        u8 *tg = (void *)actor->tracking.target;
+        s32 dx = *(s16 *)(tg + 0xC) - actor->body.position.x;
+        s32 dy = *(s16 *)(tg + 0x10) - actor->body.position.z;
 
-        actor->fieldE9 = Math_Atan2(dx, dy);
-        actor->distanceF0 = dx * dx + dy * dy;
+        actor->tracking.heading = Math_Atan2(dx, dy);
+        actor->tracking.distance = dx * dx + dy * dy;
     }
 }
 
@@ -874,7 +875,8 @@ s32 SceneActor_UpdateStatus(struct SceneActorRegistryActor *actor)
     struct SceneActorRegistryActor *arg0 = (void *)actor;
     if (ActorStatus_StatusFlags(arg0, 0x2000))
         ((struct SceneActorRegistryResetView *)arg0)->field2C2 = 0x15;
-    ActorStatus_TickRouteControl(&((struct SceneActorRegistryResetView *)arg0)->group.control);
+    ActorStatus_TickRouteControl(
+        &((struct SceneActorRegistryResetView *)arg0)->group.common.control);
     if (!ActorStatus_IsDown(arg0))
         ActorStatus_TickAttachment((void *)actor);
     ActorStatus_CollisionGate(actor);
@@ -889,8 +891,8 @@ s32 SceneActor_UpdateStatus(struct SceneActorRegistryActor *actor)
         ActorStatus_FaceTarget((void *)arg0);
     }
     ActorStatus_StoreByte(&((struct SceneActorRegistryResetView *)arg0)->colliderB.direction,
-                          ((struct SceneActorRegistryResetView *)arg0)->direction);
+                          ((struct SceneActorRegistryResetView *)arg0)->body.direction);
     ActorStatus_StoreByte(&((struct SceneActorRegistryResetView *)arg0)->colliderA.direction,
-                          ((struct SceneActorRegistryResetView *)arg0)->direction);
+                          ((struct SceneActorRegistryResetView *)arg0)->body.direction);
     return 1;
 }

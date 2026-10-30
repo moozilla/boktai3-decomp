@@ -66,7 +66,7 @@ void SceneActorControl_UpdateProbeApproach(struct SceneActorRegistryResetView *a
         }
     }
     if (SceneActorReaction_IsRangeReady(actor)) {
-        if ((u8)Callback_InvokeActor(actor, actor->update270)) {
+        if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque)) {
             return;
         }
         if (sub_0812F3CC(actor)) {

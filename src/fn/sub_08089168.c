@@ -107,7 +107,7 @@ void Ghoul_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         range.x = 60;
         range.y = 60;
         range.z = 40;
-        SparkParticle_Spawn(&actor->position, RandomSample(), &range, actor->direction + 128, 10, 6,
+        SparkParticle_Spawn(&actor->body.position, RandomSample(), &range, actor->body.direction + 128, 10, 6,
                             2, 2);
     }
     dx = AxisDelta(actor, 0x310, &x);
@@ -120,8 +120,8 @@ void Ghoul_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         dz = 200;
     else if (dz < -200)
         dz = -200;
-    actor->motion.x += dx;
-    actor->motion.z += dz;
+    actor->body.motion.x += dx;
+    actor->body.motion.z += dz;
     *x += dx;
     *z += dz;
     if (Stopped(dx, dz) && actor->field2B3) {

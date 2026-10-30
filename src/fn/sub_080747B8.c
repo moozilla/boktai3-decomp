@@ -62,10 +62,10 @@ s32 SceneActorMovement_UpdateAirborne(struct SceneActorRegistryResetView *actor)
         s32 dy;
         *y = dy = *y - 2;
         actor->field2EA += dy;
-        actor->motion.x += actor->secondaryMotion.x;
-        actor->motion.z += actor->secondaryMotion.z;
+        actor->body.motion.x += actor->secondaryMotion.x;
+        actor->body.motion.z += actor->secondaryMotion.z;
         index = actor->terrainCell;
-        local = &actor->position;
+        local = &actor->body.position;
         cell = TerrainModifiers_FindCellOverride(index, 1);
         position = (void *)local;
         if (cell) {
@@ -77,8 +77,8 @@ s32 SceneActorMovement_UpdateAirborne(struct SceneActorRegistryResetView *actor)
             actor->secondaryMotion.x = halve(actor->secondaryMotion.x);
             actor->secondaryMotion.z = halve(actor->secondaryMotion.z);
         }
-        actor->motion.x += actor->secondaryMotion.x;
-        actor->motion.z += actor->secondaryMotion.z;
+        actor->body.motion.x += actor->secondaryMotion.x;
+        actor->body.motion.z += actor->secondaryMotion.z;
         return 0;
     }
     cell = gTerrainMap->cells + (index * 4 + 12);

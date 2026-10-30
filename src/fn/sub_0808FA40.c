@@ -29,12 +29,12 @@ void sub_0808FA40(void *arg0, u32 arg1)
 
     context = actor->context;
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    actor->direction = gRandomTable[gRandomIndex];
+    actor->body.direction = gRandomTable[gRandomIndex];
     do {
         cell = actor->terrainCell;
-        height = SceneActorTerrain_GetHeight(cell, &actor->position);
+        height = SceneActorTerrain_GetHeight(cell, &actor->body.position);
         shape = *SceneActorTerrain_GetCell(cell) >> 4;
-        switch (sub0808FA40_Quarter(actor->direction + 32) & 3) {
+        switch (sub0808FA40_Quarter(actor->body.direction + 32) & 3) {
             case 0:
                 next = cell + 1;
                 i = 0;
@@ -85,10 +85,10 @@ void sub_0808FA40(void *arg0, u32 arg1)
         }
         if (chosen != actor->terrainCell)
             break;
-        actor->direction += 64;
+        actor->body.direction += 64;
         tries++;
     } while (tries <= 3);
-    actor->direction = arg1;
+    actor->body.direction = arg1;
     SceneActorTerrain_GetCenter(chosen, &center);
     *(struct ContactPosition *)((u8 *)context + 0x3EC) = center;
 }

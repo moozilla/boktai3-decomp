@@ -47,7 +47,7 @@ void SceneActorPlacement_UpdateFlaggedResponse(struct SceneActorRegistryResetVie
         Sound_PlaySong(0x19B);
     }
     savedOffset = 39;
-    if (p->field2B5 == savedOffset && (u8)Callback_InvokeActor(p, p->update270)) {
+    if (p->field2B5 == savedOffset && (u8)Callback_InvokeActor(p, p->contactQuery.opaque)) {
         u32 two = 2;
         u8 *field = &p->state2A8;
         u32 zero = 0;

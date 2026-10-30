@@ -93,7 +93,7 @@ s32 SceneActorPlacement_TriggerTetherAction(struct SceneActorRegistryResetView *
     target = TetherActor_GetPosition();
     if (!target)
         return 0;
-    if (!Route(a, F(nav, 0x1fc, void *), &a->position, target))
+    if (!Route(a, F(nav, 0x1fc, void *), &a->body.position, target))
         return 0;
     {
         struct Flags {

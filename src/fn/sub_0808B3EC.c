@@ -1,4 +1,3 @@
-#define SCENE_ACTOR_CHASE_SCALAR_CELLS 1
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_animation.h"
 #include "scene_actor_route.h"
@@ -9,7 +8,7 @@ void Bat_TickDelayedScript(u8 *);
 u8 Ghoul_ReactToContact(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorRouteContext *context = actor->context;
-    struct SceneActorChaseGroup *group = (struct SceneActorChaseGroup *)&actor->group;
+    struct SceneActorChaseGroup *group = &actor->group;
     if (!(actor->field2D8 & 0x20000)) {
         if (actor->reactionSoundVariant == 0)
             Sound_PlaySong(0x211);
@@ -18,16 +17,15 @@ u8 Ghoul_ReactToContact(struct SceneActorRegistryResetView *actor)
     }
     Bat_TickDelayedScript((u8 *)actor);
     if (SceneActorChase_QueryMotionFlags(actor, 0x2000)) {
-        actor->direction = actor->field2B6 + 0x80;
+        actor->body.direction = actor->field2B6 + 0x80;
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 0);
         SceneActorChase_ClearMotionFlags(actor, 0x2020);
         SceneActorChase_SetActorFlags(actor, 0x10);
         group->destination->pad = 0;
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor)) {
-            if (!SceneActorChase_TryRoute(
-                    actor, group->route, &actor->position,
-                    &((struct SceneActorChaseTracking *)&actor->fieldDC)->target->position)) {
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
+                                          &actor->tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return 0;
             }
@@ -55,33 +53,31 @@ u8 Ghoul_ReactToContact(struct SceneActorRegistryResetView *actor)
     SceneActorChase_ClearBits((u16 *)&context->flags628, 1);
     if (SceneActorChase_QueryMotionFlags(actor, 0x80)) {
         SceneActorChase_BeginContactAnimation(actor);
-        if (!((struct SceneActorChaseTracking *)&actor->fieldDC)->target)
+        if (!actor->tracking.target)
             return 0;
         SceneActorChase_TrackPlayer(actor);
         SceneActorChase_SetActorFlags(actor, 0x80);
         SceneActorChase_GroupSetFlags(group, 4);
         if (!SceneActorChase_Arrive(actor)) {
-            if (!SceneActorChase_TryRoute(
-                    actor, group->route, &actor->position,
-                    &((struct SceneActorChaseTracking *)&actor->fieldDC)->target->position)) {
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
+                                          &actor->tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return 0;
             }
         }
-        SceneActorChase_SetControl(actor, group->homeControl, 0x1A);
+        SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
         return 1;
     }
     SceneActorChase_BeginContactAnimation(actor);
-    if (!((struct SceneActorChaseTracking *)&actor->fieldDC)->target)
+    if (!actor->tracking.target)
         return 0;
     SceneActorChase_TrackPlayer(actor);
     SceneActorChase_SetActorFlags(actor, 0x10);
     group->destination->pad = 0;
     if (!SceneActorChase_Arrive(actor)) {
-        if (!SceneActorChase_TryRoute(
-                actor, group->route, &actor->position,
-                &((struct SceneActorChaseTracking *)&actor->fieldDC)->target->position)) {
+        if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
+                                      &actor->tracking.target->position)) {
             Callback_InvokeActor(actor, group->fallback);
             return 0;
         }

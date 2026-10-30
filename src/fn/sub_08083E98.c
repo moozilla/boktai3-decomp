@@ -27,7 +27,7 @@ void SceneActorControl_StartPositionCurve(struct SceneActorRegistryResetView *ac
     actor->field2B1 = one;
     {
         struct ContactPosition *difference = &temporary.delta;
-        const struct ContactPosition *position = &actor->position;
+        const struct ContactPosition *position = &actor->body.position;
         difference->x = target->x - position->x;
         difference->y = target->y - position->y;
         difference->z = target->z - position->z;

@@ -80,18 +80,18 @@ void Crow_ApproachPlayer(struct SceneActorRegistryResetView *actor)
     }
     limit = actor->paletteOffset == 1 ? 0x18 : 0x28;
     if ((s32)actor->counter2AC > limit) {
-        if (state->range > actor->distanceF0) {
+        if (state->range > actor->tracking.distance) {
             SetState(actor, 0, 0, 1);
             return;
         }
         pp = &gPlayers;
-        Delta(&delta, &actor->position, (struct ContactPosition *)(*pp + 0x30));
-        if (Magnitude(Normalize(Math_Atan2(delta.x, delta.z) - actor->direction)) > 0x40) {
+        Delta(&delta, &actor->body.position, (struct ContactPosition *)(*pp + 0x30));
+        if (Magnitude(Normalize(Math_Atan2(delta.x, delta.z) - actor->body.direction)) > 0x40) {
             SetState(actor, 0, 0, 1);
             return;
         }
     }
-    Polar(&velocity, actor->direction, state->speed);
-    actor->motion = velocity;
+    Polar(&velocity, actor->body.direction, state->speed);
+    actor->body.motion = velocity;
     actor->counter2AC++;
 }

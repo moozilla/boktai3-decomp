@@ -174,7 +174,7 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, void *route,
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         } else {
             u32 mask = ~0x200;
@@ -206,9 +206,9 @@ static inline u32 RandomDirectionExcept(u32 current)
 static inline void Wander(struct SceneActorRegistryResetView *input, u8 direction)
 {
     struct SceneActorRegistryResetView *actor = input;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (!Flag16(actor, 0x400, 0x2D4) && !TestBits16((u16 *)(group + 0x40), 4)) {
-        ((struct GolemTurn *)(group + 0x204))->direction = RandomDirectionExcept(actor->direction);
+        ((struct GolemTurn *)(group + 0x204))->direction = RandomDirectionExcept(actor->body.direction);
         ((struct GolemSavedControl *)(group + 0x8C))->target = actor->target;
         ((struct GolemSavedControl *)(group + 0x8C))->kind = actor->field2B5;
         ((struct GolemSavedControl *)(group + 0x8C))->state = actor->state2A8;
@@ -231,11 +231,11 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
     s32 slot;
     u32 *targetp;
     actor = input;
-    group = (u8 *)&actor->group;
-    targetp = &actor->fieldDC;
+    group = (u8 *)&actor->group.common;
+    targetp = &actor->tracking.target;
     {
-        struct ContactPosition *dest = actor->state5D4;
-        struct GolemRouteLink *link = (void *)&actor->route;
+        struct ContactPosition *dest = actor->group.destination;
+        struct GolemRouteLink *link = (void *)&actor->group.homeRoute;
         dest->x = link->point->x;
         dest->z = link->point->z;
         dest->y = CellHeight(CellIndex(dest), dest);
@@ -283,7 +283,7 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
                 HOME->pad = 0;
             }
         }
-        Wander(input, actor->direction);
+        Wander(input, actor->body.direction);
         sub_0807E334(input);
         actor->field2C2 = 0x20;
         return 0;
@@ -291,7 +291,7 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
     {
         struct ContactPosition center;
         SceneActorTerrain_GetCenter(cell, &center);
-        if (!TryMove(input, PTR(group, 0x1FC), &actor->position, &center)) {
+        if (!TryMove(input, PTR(group, 0x1FC), &actor->body.position, &center)) {
         fail:
             Callback_InvokeActor(actor, PTR(group, 0x224));
             return 0;
@@ -302,7 +302,7 @@ static inline u8 Chase(struct SceneActorRegistryResetView *input)
 
 void Golem_ResumeBehaviorAfterDisplacement(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     s32 x, z;
     s16 *priorX, *priorZ;
     if (TakeFlag2B2(actor)) {
@@ -337,8 +337,8 @@ void Golem_ResumeBehaviorAfterDisplacement(struct SceneActorRegistryResetView *a
     }
     x = Clamp(x);
     z = Clamp(z);
-    actor->motion.x += x;
-    actor->motion.z += z;
+    actor->body.motion.x += x;
+    actor->body.motion.z += z;
     *priorX += x;
     *priorZ += z;
     if (!AtRest(x, z))
@@ -366,23 +366,23 @@ void Golem_ResumeBehaviorAfterDisplacement(struct SceneActorRegistryResetView *a
                 u16 mask = 4;
                 *flags = mask | *flags;
             }
-            actor->fieldDC = (u32)gPlayers[0] + 0x24;
-            if (Chase(actor) || TryMove(actor, PTR(group, 0x1FC), &actor->position,
-                                        (struct ContactPosition *)(actor->fieldDC + 12))) {
+            actor->tracking.target = (u32)gPlayers[0] + 0x24;
+            if (Chase(actor) || TryMove(actor, PTR(group, 0x1FC), &actor->body.position,
+                                        &actor->tracking.target->position)) {
                 void *target = PTR(group, 0x48);
                 SetControl(actor, 0x1A, target);
                 SetState(actor, 0, 0, 12);
             } else
                 goto invoke;
         } else {
-            actor->fieldDC = (u32)gPlayers[0] + 0x24;
+            actor->tracking.target = (u32)gPlayers[0] + 0x24;
             {
                 u32 mask = 0x90;
                 actor->flags2CC |= mask;
             }
             (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-            if (!Chase(actor) && !TryMove(actor, PTR(group, 0x1FC), &actor->position,
-                                          (struct ContactPosition *)(actor->fieldDC + 12))) {
+            if (!Chase(actor) && !TryMove(actor, PTR(group, 0x1FC), &actor->body.position,
+                                          &actor->tracking.target->position)) {
             invoke:
                 Callback_InvokeActor(actor, PTR(group, 0x224));
             } else {

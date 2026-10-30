@@ -62,11 +62,11 @@ void Skeleton_UpdateFacingColliders(struct SceneActorRegistryResetView *p)
         p->colliderA.flags &= ~4;
         context->body.flags &= ~4;
     }
-    pos.position = p->position;
+    pos.position = p->body.position;
     Collider_SetPosition(&context->body, &pos, 0);
-    pos.packed.x += scaled(gUnk_086149C4[(p->direction + 64) & 255] * 128);
-    pos.packed.z += scaled(gUnk_086149C4[p->direction] * 128);
-    switch (((p->direction + 16) & 255) >> 6) {
+    pos.packed.x += scaled(gUnk_086149C4[(p->body.direction + 64) & 255] * 128);
+    pos.packed.z += scaled(gUnk_086149C4[p->body.direction] * 128);
+    switch (((p->body.direction + 16) & 255) >> 6) {
         case 0:
         case 2:
             if (p->category == 6) {

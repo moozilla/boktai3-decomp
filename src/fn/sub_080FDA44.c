@@ -94,30 +94,30 @@ void Axe_FollowDeceleratingRoute(struct SceneActorRegistryResetView *actor)
         asm volatile("" ::"r"(observed));
         target.x += delta.x;
         target.z += delta.z;
-        Delta(&delta, &actor->position, &target);
-        Polar(&route->motion, Facing(RandomMotion(), &actor->fieldE9) & 255, 32);
+        Delta(&delta, &actor->body.position, &target);
+        Polar(&route->motion, Facing(RandomMotion(), &actor->tracking.heading) & 255, 32);
         route->speed = 1;
     }
-    Delta(&delta, &actor->position, &route->points[route->index]);
+    Delta(&delta, &actor->body.position, &route->points[route->index]);
     Axe_EmitMotionTrail(actor);
     if (delta.x * delta.x + delta.z * delta.z > 1024) {
-        actor->direction = Math_Atan2(route->points[route->index].x - actor->position.x,
-                                      route->points[route->index].z - actor->position.z);
-        Polar(&delta, actor->direction, route->speed);
-        actor->motion.x += delta.x;
-        actor->motion.z += delta.z;
-        route->motion = actor->motion;
+        actor->body.direction = Math_Atan2(route->points[route->index].x - actor->body.position.x,
+                                      route->points[route->index].z - actor->body.position.z);
+        Polar(&delta, actor->body.direction, route->speed);
+        actor->body.motion.x += delta.x;
+        actor->body.motion.z += delta.z;
+        route->motion = actor->body.motion;
     } else if (++route->index > 8) {
-        Delta(&route->motion, &actor->position, &route->points[8]);
+        Delta(&route->motion, &actor->body.position, &route->points[8]);
         route->motion.y = 0;
-        actor->position.x = route->points[8].x;
-        actor->position.z = route->points[8].z;
+        actor->body.position.x = route->points[8].x;
+        actor->body.position.z = route->points[8].z;
         route->index = 0;
         target = (*(struct AxePlayer **)gPlayers)->position;
-        Polar(&delta, Facing(Random(), &actor->fieldE9) & 255, 512);
+        Polar(&delta, Facing(Random(), &actor->tracking.heading) & 255, 512);
         target.x += delta.x;
         target.z += delta.z;
-        Delta(&delta, &actor->position, &target);
+        Delta(&delta, &actor->body.position, &target);
         route->speed >>= 1;
         return;
     }

@@ -4,7 +4,7 @@
 u8 Mimic_TryPursuitRoute(struct SceneActorRegistryResetView *actor)
 {
     u32 output;
-    u32 result = Chase_TryRoute(actor, *(void **)((u8 *)actor + 0x5D0), &actor->position,
+    u32 result = Chase_TryRoute(actor, *(void **)((u8 *)actor + 0x5D0), &actor->body.position,
                                 (void *)((u8 *)actor + 0x650));
     if (result)
         output = 1;

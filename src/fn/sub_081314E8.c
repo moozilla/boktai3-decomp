@@ -94,7 +94,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route
     result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->motion, 8);
+            Memory_Clear(&actor->body.motion, 8);
         return 1;
     }
     *flags &= ~mask;
@@ -102,7 +102,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route
 }
 void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *actor)
 {
-    register u8 *group asm("sl") = (u8 *)(&actor->group);
+    register u8 *group asm("sl") = (u8 *)(&actor->group.common);
     u8 result;
     u16 *motionFlags;
     asm("" : "+r"(group));
@@ -125,7 +125,7 @@ void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *a
         }
         actor->field2C2 = 64;
     }
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     result = sub_0812F3CC(actor);
     if (result)
@@ -134,7 +134,7 @@ void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *a
         struct ContactPosition delta;
         struct ContactPosition *p =
             (void *)((*((u8 **)(*((void **)(((u8 *)group) + 0x88))))) + 0xC);
-        SceneActorTerrain_Subtract(&delta, p, &actor->position);
+        SceneActorTerrain_Subtract(&delta, p, &actor->body.position);
         if (((u32)((delta.x * delta.x) + (delta.z * delta.z))) <= 0xFFFE) {
             BeginControl(actor, *((void **)(((u8 *)group) + 0x238)), 0x19, result);
             {
@@ -171,7 +171,7 @@ void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *a
         destinationOffset = 0x200;
         destination = (void *)(group + destinationOffset);
         (*destination)->pad = 1;
-        if (!TryRoute(actor, *((void **)(((u8 *)group) + 0x1FC)), &actor->position, *destination,
+        if (!TryRoute(actor, *((void **)(((u8 *)group) + 0x1FC)), &actor->body.position, *destination,
                       motionFlags, destinationOffset)) {
             Callback_InvokeActor(actor, *((void **)(((u8 *)group) + 0x224)));
             return;

@@ -82,7 +82,7 @@ void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollide
     if (Unavailable(a))
         return;
     origin.pos = *(struct ContactPosition *)&self->x;
-    switch ((s32)((base->direction + 0x20) & 255) >> 6) {
+    switch ((s32)((base->body.direction + 0x20) & 255) >> 6) {
         case 0:
             origin.packed.x -= 256;
             break;
@@ -100,7 +100,7 @@ void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollide
     self->direction = Math_Atan2(delta.x, delta.z);
     if (other->contactFlags & 15) {
         if (Flag(base, 0x100, 0x2D4)) {
-            if (base->field2B5 == 0x29 || IsFrontal(base->direction, other)) {
+            if (base->field2B5 == 0x29 || IsFrontal(base->body.direction, other)) {
                 RecordContact(a, other);
                 AddImpact(state);
                 {

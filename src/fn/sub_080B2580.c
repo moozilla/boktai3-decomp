@@ -51,11 +51,11 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group,
                           struct ContactPosition *target)
 {
     void *route = *(void **)(group + 0x1fc);
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     s32 result = Nav_IsPositionInMesh(route, position, target);
     if (result && (result = Terrain_ApplyBlocked(route, position, target))) {
         if (result != 2)
-            Memory_Clear(&actor->motion, 8);
+            Memory_Clear(&actor->body.motion, 8);
         return 1;
     }
     ClearRouteBits(&actor->flags2D4, 0x200);
@@ -89,9 +89,9 @@ u8 SceneActorTerrain_CanTraverseCell(u32, u32, u32, u32);
 static inline s32 Sweep(struct SceneActorRegistryResetView *actor, s32 range)
 {
     s32 cell = actor->terrainCell;
-    u32 height = CellHeight(&actor->position, cell);
+    u32 height = CellHeight(&actor->body.position, cell);
     u32 shape = *SceneActorTerrain_GetCell(cell) >> 4;
-    s32 direction = RoundDirection(actor->direction + 32) & 3;
+    s32 direction = RoundDirection(actor->body.direction + 32) & 3;
     s32 next, i;
     switch (direction) {
         case 0:
@@ -165,9 +165,9 @@ static inline s32 Sweep_SelectReachableEscapeCell(struct SceneActorRegistryReset
                                                   s32 range)
 {
     s32 cell = actor->terrainCell;
-    u32 height = CellHeight(&actor->position, cell);
+    u32 height = CellHeight(&actor->body.position, cell);
     u32 shape = *SceneActorTerrain_GetCell(cell) >> 4;
-    s32 direction = RoundDirection(actor->direction + 32) & 3;
+    s32 direction = RoundDirection(actor->body.direction + 32) & 3;
     s32 next;
     s32 i;
     switch (direction) {
@@ -241,19 +241,19 @@ u8 Vorn_SelectReachableEscapeCell(struct SceneActorRegistryResetView *actor, u32
                 found = 1;
                 goto nextRange;
             }
-            actor->direction += 64;
+            actor->body.direction += 64;
         } while ((++tries) <= 3);
     nextRange:
         range--;
 
-        actor->direction = savedDirection;
+        actor->body.direction = savedDirection;
         if (found || (range <= 0))
             goto done;
     } while (1);
 done:
     GetCenter(dest, &target);
 
-    group = (u8 *)(&actor->group);
+    group = (u8 *)(&actor->group.common);
     if (!TryRoute(actor, group, &target)) {
         Callback_InvokeActor(actor, *((void **)(group + 0x224)));
         return 0;

@@ -57,8 +57,8 @@ void Dog_UpdateLeapAttack(struct SceneActorRegistryResetView *a)
         And32((u32 *)((u8 *)a->context + 0x678), ~2);
         {
             void *collider = context->collider;
-            u32 damage = a->fieldB6;
-            u32 response = a->fieldBE;
+            u32 damage = a->attacks.first[1];
+            u32 response = a->attacks.second[1];
             u8 *p = (u8 *)a + 0xD0;
             u32 power = *(u32 *)p;
             u32 extra;

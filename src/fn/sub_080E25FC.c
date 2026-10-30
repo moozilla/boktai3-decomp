@@ -19,9 +19,9 @@ static inline u16 Dog_ReadMotionFlags(struct SceneActorRegistryResetView *actor,
 static inline void Dog_BeginRecoveryTurn(void *obj, u8 saved)
 {
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     if (!Dog_ReadMotionFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
-        register s32 prior asm("r7") = actor->direction;
+        register s32 prior asm("r7") = actor->body.direction;
         s32 tries = 0;
         s32 choice;
         const u16 *table = gRandomTable;
@@ -46,7 +46,7 @@ static inline u8 Dog_RerouteToTarget(void *obj)
 {
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
     s32 player;
@@ -87,7 +87,7 @@ static inline u8 Dog_RerouteToTarget(void *obj)
         (*(struct ContactPosition **)(group + 0x200))->pad = 0;
     }
     {
-        u8 saved = actor->direction;
+        u8 saved = actor->body.direction;
         Dog_BeginRecoveryTurn(obj, saved);
     }
     sub_0807E334(actor);
@@ -106,7 +106,7 @@ reroute: {
         data = gTerrainMap->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
-    if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position, targetPointer)) {
+    if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position, targetPointer)) {
     invoke:
         Callback_InvokeActor(actor, *(void **)(group + 0x224));
         return 0;
@@ -124,9 +124,9 @@ void SceneActorControl_OnIdle(void);
 
 static inline void StartReactionAnimation(struct SceneActorRegistryResetView *a)
 {
-    if (!a->field5CA && (a->field2E6 & 8)) {
+    if (!a->group.hitReactionLatch && (a->field2E6 & 8)) {
         a->field2B8 = 45;
-        a->field5CA = 65;
+        a->group.hitReactionLatch = 65;
         SceneActorAnimation_SelectDirectionalEntry((void *)a, 3);
     }
 }
@@ -134,7 +134,7 @@ static inline void StartReactionAnimation(struct SceneActorRegistryResetView *a)
 s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
 {
     u8 *context = a->context;
-    u8 *group = (u8 *)&a->group;
+    u8 *group = (u8 *)&a->group.common;
     if (a->reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
     else
@@ -169,18 +169,18 @@ s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
         return 0;
     if (a->flags2D4 & 0x80) {
         StartReactionAnimation(a);
-        if (!a->fieldDC)
+        if (!a->tracking.target)
             return 0;
         {
             u32 mask = 0x80;
             a->flags2CC |= mask;
         }
         *(u16 *)(group + 0x40) = 4 | *(u16 *)(group + 0x40);
-        a->fieldDC = (u32)gPlayers[0] + 0x24;
+        a->tracking.target = (u32)gPlayers[0] + 0x24;
         if (Dog_IsActionTimerExpired(a)) {
             if (!Dog_RerouteToTarget(a)) {
-                if (!Chase_TryRoute(a, *(void **)(group + 0x1FC), &a->position,
-                                    (void *)(a->fieldDC + 12))) {
+                if (!Chase_TryRoute(a, *(void **)(group + 0x1FC), &a->body.position,
+                                    &a->tracking.target->position)) {
                     Callback_InvokeActor(a, *(void **)(group + 0x224));
                     return 0;
                 }
@@ -194,7 +194,7 @@ s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
         Chase_SetCtl(a, SceneActorControl_OnIdle, 16);
         Chase_SetBehavior(a, 18);
         {
-            s32 angle = (a->fieldE9 + 0xA0) & 255;
+            s32 angle = (a->tracking.heading + 0xA0) & 255;
             if (angle >= 0)
                 angle >>= 5;
             else
@@ -202,24 +202,24 @@ s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
             ((struct SceneActorAnimationView *)a)->nextDirection = (angle + 3) & 7;
         }
         {
-            u32 direction = a->direction;
-            a->direction = (((direction + 0xA0) & 255) >> 6) << 6;
+            u32 direction = a->body.direction;
+            a->body.direction = (((direction + 0xA0) & 255) >> 6) << 6;
             context[0x6A8] = 90;
             return (u8)sub_080DEF78(a, direction) ? 1 : 0;
         }
     } else {
         StartReactionAnimation(a);
-        if (!a->fieldDC)
+        if (!a->tracking.target)
             return 0;
-        a->fieldDC = (u32)gPlayers[0] + 0x24;
+        a->tracking.target = (u32)gPlayers[0] + 0x24;
         {
             u32 mask = 16;
             a->flags2CC |= mask;
         }
         (*(struct ContactPosition **)(group + 0x200))->pad = 0;
         if (!Dog_RerouteToTarget(a)) {
-            if (!Chase_TryRoute(a, *(void **)(group + 0x1FC), &a->position,
-                                (void *)(a->fieldDC + 12))) {
+            if (!Chase_TryRoute(a, *(void **)(group + 0x1FC), &a->body.position,
+                                &a->tracking.target->position)) {
                 Callback_InvokeActor(a, *(void **)(group + 0x224));
                 return 0;
             }

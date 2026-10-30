@@ -5,7 +5,7 @@ void Slime_RunUpdateThenWait(struct SceneActorRegistryResetView *actor)
     u8 result;
     if (actor->field2B1)
         actor->field2B1 = 0;
-    result = Callback_InvokeActor(actor, actor->update270);
+    result = Callback_InvokeActor(actor, actor->contactQuery.opaque);
     if (!result) {
         Chase_SetCtl(actor, sub_0808E780, 0x27);
         Chase_SetState(actor, 3, 1, 0);

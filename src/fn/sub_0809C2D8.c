@@ -72,7 +72,7 @@ void Lun_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
         SetControl(actor, actor->savedTarget, 0);
         state[0x3E2] = 0;
     }
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     if ((s16)actor->field2EA > 239 && (s32)actor->counter2AC > 60) {
         struct LunRouteEntry *route;
@@ -86,7 +86,7 @@ void Lun_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
         {
             struct ContactPosition *q;
             struct ContactPosition *p = &local.target;
-            struct ContactPosition *from = &actor->position;
+            struct ContactPosition *from = &actor->body.position;
             asm("" ::: "r7");
             q = &local.target;
             q->x = q->x - from->x;

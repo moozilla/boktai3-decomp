@@ -138,7 +138,7 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, void *shape,
     result = Terrain_ApplyBlocked(shape, position, destination);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->motion, 8);
+            Memory_Clear(&actor->body.motion, 8);
         return 1;
     }
     *flags &= ~blocked;
@@ -153,7 +153,7 @@ static inline u32 ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask
 }
 static inline void ResetControl(struct SceneActorRegistryResetView *actor, u32 enabled, u16 *flags)
 {
-    struct SceneActorRegistryControl *control = &actor->group.control;
+    struct SceneActorRegistryControl *control = &actor->group.common.control;
     if (enabled) {
         ClearWordFlags(&actor->flags2D0, ~0x1000000);
         ClearHalfFlags(flags, ~0x200);
@@ -217,7 +217,7 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
     u32 bit;
     if (IsUnavailable(actor))
         return 0;
-    target = (void *)actor->fieldDC;
+    target = (void *)actor->tracking.target;
     if (!target)
         return 0;
     slot = PlayerSlot(target);
@@ -239,21 +239,21 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
         return 0;
     if (actor->secondaryMotion.z)
         return 0;
-    group = (void *)&actor->group;
+    group = (void *)&actor->group.common;
     {
         register s32 result asm("r0") = *flagsp & ~0x20;
         ((struct FlagHalfword *)flagsp)->bits = result;
     }
     actor->field2C2 = 0x40;
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
-    actor->fieldDC = 0;
+    actor->tracking.target = 0;
     SetState(actor, 3, 1, 0);
     SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     SetFlags(actor, 0x10);
     SaveControl(&group->saved, actor->entryTarget228, 7);
     ResetControl(actor, ActorFlags(actor, 0x200000), flagsp);
-    ProximityVolume_TranslateBounds(actor->routeObject, &actor->position);
-    dest = actor->state5D4;
+    ProximityVolume_TranslateBounds(actor->group.route, &actor->body.position);
+    dest = actor->group.destination;
     {
         struct RouteLink *link = &group->route;
         dest->x = link->point->x;
@@ -262,15 +262,15 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
     }
     bit = 0x200;
     group->destination->pad = 1;
-    if (!MoveTo(actor, group->shape, &actor->position, group->destination, flagsp, bit)) {
+    if (!MoveTo(actor, group->shape, &actor->body.position, group->destination, flagsp, bit)) {
         Callback_InvokeActor(actor, group->failureCallback);
     } else {
         register u16 *resetFlags asm("r3");
         group->control.counter = 0;
         group->control.recoveryTimer = 0;
         actor->field2C2 = 0x40;
-        actor->group.flags414 = 0;
-        actor->group.field418 = 0;
+        actor->group.common.gate.flags = 0;
+        actor->group.common.gate.counter = 0;
         resetFlags = flagsp;
         {
             u32 mask = ~0x380;
@@ -279,12 +279,12 @@ u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
         }
         {
             s32 mask = ~0x18;
-            struct SceneActorReactionMotion *motion = (void *)&actor->fieldDC;
+            struct SceneActorReactionMotion *motion = (void *)&actor->tracking.target;
             motion->flags &= mask;
         }
         ResetControl(actor, ActorFlags(actor, 0x200000), resetFlags);
         ClearHalfFlags(flagsp, ~0x400);
-        actor->field5DA = 0xFF;
+        actor->group.turn.turnsRemaining = 0xFF;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
         SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     }

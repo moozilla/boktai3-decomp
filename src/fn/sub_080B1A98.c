@@ -52,7 +52,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route
     result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->motion, 8);
+            Memory_Clear(&actor->body.motion, 8);
         return 1;
     }
     ClearRouteBits(&actor->flags2D4, 0x200);
@@ -119,13 +119,13 @@ void Vorn_BeginTargetPursuit(struct SceneActorRegistryResetView *actor)
     }
     if (MotionFlags(actor, 0x100))
         return;
-    group = (u8 *)&actor->group;
+    group = (u8 *)&actor->group.common;
     if (TestContext(actor->context, 0x1d)) {
         actor->field2C2 = 32;
         if (TestContext(actor->context, 4) && MotionFlags(actor, 0x80)) {
-            actor->group.field418 += 300;
-            if (actor->group.field418 > actor->group.field416)
-                actor->group.field418 = actor->group.field416;
+            actor->group.common.gate.counter += 300;
+            if (actor->group.common.gate.counter > actor->group.common.gate.duration)
+                actor->group.common.gate.counter = actor->group.common.gate.duration;
         }
         if (SceneActor_DispatchContextAction(actor->context, 1))
             return;
@@ -163,7 +163,7 @@ void Vorn_BeginTargetPursuit(struct SceneActorRegistryResetView *actor)
     dest->z = point->point[1];
     dest->y = CellHeight(dest, CellIndex(dest));
     (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-    if (!TryRoute(actor, *(void **)(group + 0x1fc), &actor->position,
-                  (struct ContactPosition *)((u8 *)actor->fieldDC + 12)))
+    if (!TryRoute(actor, *(void **)(group + 0x1fc), &actor->body.position,
+                  &actor->tracking.target->position))
         Callback_InvokeActor(actor, *(void **)(group + 0x224));
 }

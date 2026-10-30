@@ -79,7 +79,7 @@ void Golem_UpdateRecoil(struct SceneActorRegistryResetView *actor)
         variantPointer = &directionVariant;
         {
             u8 *mirrorAddress = &mirror;
-            s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
+            s32 quadrant = (((s32)actor->body.direction + 0x60) >> 6) & 3;
             mirrorPointer = mirrorAddress;
             flags2D4 = initialFlags;
             if (quadrant > 1) {
@@ -174,8 +174,8 @@ done:
             *speed = zero;
             return;
         }
-        actor->motion.x += (*speed * gUnk_086149C4[(body[0x68E] + 0x40) & 0xFF]) >> 16;
-        actor->motion.z += (*speed * gUnk_086149C4[body[0x68E]]) >> 16;
+        actor->body.motion.x += (*speed * gUnk_086149C4[(body[0x68E] + 0x40) & 0xFF]) >> 16;
+        actor->body.motion.z += (*speed * gUnk_086149C4[body[0x68E]]) >> 16;
     } else if (body[0x68D] == 1) {
         struct ContactPosition delta;
         Delta(&delta, &motion->position, (struct ContactPosition *)(body + 0x69C));

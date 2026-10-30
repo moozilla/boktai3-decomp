@@ -18,7 +18,7 @@ void Vorn_SelectPursuitAfterAction(struct SceneActorRegistryResetView *a)
     u8 *context = a->context;
     if (Chase_TakeArrived(a))
         Chase_SetCtl(a, a->entryTarget224, 2);
-    Callback_InvokeActor(a, a->update270);
+    Callback_InvokeActor(a, a->contactQuery.opaque);
     if (a->field2B0) {
         Chase_SetBehavior(a, 15);
         if (Chase_Test(*(u16 *)(context + 0x6D4), 1))

@@ -41,7 +41,7 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct SceneActorRegistryReset
         u32 cell;
         SceneActorTarget_ResetContactResponse((void *)owner);
         {
-            u16 *flags = &owner->group.flags414;
+            u16 *flags = &owner->group.common.gate.flags;
             u32 mask;
             mask = ~2;
             mask &= *flags;
@@ -73,7 +73,7 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct SceneActorRegistryReset
         *(u16 *)((u8 *)owner + 0x2F8) = cell;
         {
             struct Delta *out = &delta;
-            struct ContactPosition *source = &owner->position;
+            struct ContactPosition *source = &owner->body.position;
             target = (void *)(state->target + 0xC);
             {
                 u32 xDelta = (u16)target->x;
@@ -89,7 +89,7 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct SceneActorRegistryReset
                 u32 direction;
                 u8 *field;
                 direction = Math_Atan2(first->x, out->z);
-                field = &owner->direction;
+                field = &owner->body.direction;
                 *field = direction;
             }
         }

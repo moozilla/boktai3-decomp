@@ -33,21 +33,21 @@ s32 sub_0807F130(struct SceneActorRegistryResetView *actor)
     s32 r;
     s32 stop;
 
-    group = &actor->group;
+    group = &actor->group.common;
     control = &group->control;
     actor->flags2D0 &= 0xFEFFFFFF;
     stop = (!(actor->flags2CC & 0x200000) || (actor->flags2D0 & 4) || (actor->flags2CC & 0x100) ||
-            (actor->flags2D4 & 0xE13F) || (actor->flagsEB & 0x10) || actor->field2B8 ||
+            (actor->flags2D4 & 0xE13F) || (actor->tracking.flags & 0x10) || actor->field2B8 ||
             *(u16 *)((u8 *)actor + 0x178))
                ? 1
                : 0;
     if (stop)
         return 0;
     control->mode = stop;
-    position = (struct ContactPosition *)&actor->position;
+    position = (struct ContactPosition *)&actor->body.position;
     hit = 0;
     overlap = (s8)SceneStimulus_FindOverlap(position->x, position->z, *(u16 *)((u8 *)control + 2),
-                                            *((u8 *)control + 0xB), actor->id & 0xFFFF);
+                                            *((u8 *)control + 0xB), actor->body.id & 0xFFFF);
     if (overlap < 0)
         return 0;
     kind = (u8)overlap;
@@ -77,14 +77,14 @@ s32 sub_0807F130(struct SceneActorRegistryResetView *actor)
         actor->flags2D4 &= ~0x1000;
         *(u32 *)((u8 *)actor + 0x45C) = stop;
     }
-    SceneActorPosition_ResolveTaggedPosition(control, &actor->id, actor->routeObject, (s8)kind);
+    SceneActorPosition_ResolveTaggedPosition(control, &actor->body.id, actor->group.route, (s8)kind);
     if (actor->flags2D4 & 0x80) {
-        group->field418 += 0x12C;
-        if (group->field418 > group->field416)
-            group->field418 = group->field416;
+        group->gate.counter += 0x12C;
+        if (group->gate.counter > group->gate.duration)
+            group->gate.counter = group->gate.duration;
     }
-    state = (struct ContactPosition *)actor->state5D4;
-    route = actor->routeObject;
+    state = (struct ContactPosition *)actor->group.destination;
+    route = actor->group.route;
     {
         u16 *src = *(u16 **)((u8 *)group + 0x74 + 8);
         ((u16 *)state)[0] = src[0];
@@ -113,7 +113,7 @@ s32 sub_0807F130(struct SceneActorRegistryResetView *actor)
     ((u16 *)state)[1] = val;
     ((u16 *)state)[1] = position->y;
     ((u16 *)state)[3] = 0;
-    route = actor->routeObject;
+    route = actor->group.route;
     target = (s32)((u8 *)group + 0x58);
     r = 0;
     if (!Nav_IsPositionInMesh(route, position, (void *)target)) {
@@ -124,7 +124,7 @@ s32 sub_0807F130(struct SceneActorRegistryResetView *actor)
             actor->flags2D4 &= ~0x200;
         } else {
             if (res != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             r = 1;
         }
     }

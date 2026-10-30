@@ -6,7 +6,7 @@ extern const u8 gUnk_0824E274[];
 
 void Golem_ResetIdleControl(struct SceneActorRegistryResetView *actor)
 {
-    SceneActorReaction_ResetResponseState(&actor->word460, gUnk_0824E274, 0x22F);
+    SceneActorReaction_ResetResponseState(&actor->group.saved.control, gUnk_0824E274, 0x22F);
     {
         u32 phase = 2;
         actor->state2A8 = 0;

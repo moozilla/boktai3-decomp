@@ -16,13 +16,13 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
 {
     struct ContactPosition target;
     u8 *context = a->context;
-    u8 *group = (u8 *)(&a->group);
+    u8 *group = (u8 *)(&a->group.common);
     s32 tries = 0;
     s32 selected;
     u32 k1;
     do {
         s32 cell = a->terrainCell;
-        s32 height = Chase_HeightAt(cell, &a->position);
+        s32 height = Chase_HeightAt(cell, &a->body.position);
         u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
         s32 kind;
         s32 next;
@@ -32,7 +32,7 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
         else
             data = (gTerrainMap->cells + (cell * 4)) + 12;
         kind = (*data) >> 4;
-        switch (Direction(a->direction + 32) & 3) {
+        switch (Direction(a->body.direction + 32) & 3) {
             case 0:
                 next = cell + 1;
                 count = 0;
@@ -82,9 +82,9 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
         }
 
         if (*((s8 *)(context + (k1 = 0x6A6))))
-            a->direction += 64;
+            a->body.direction += 64;
         else
-            a->direction -= 64;
+            a->body.direction -= 64;
         if (selected != a->terrainCell)
             break;
     } while ((++tries) <= 3);
@@ -96,7 +96,7 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
         else
             context[k1] = 0;
     }
-    a->direction = saved;
+    a->body.direction = saved;
     {
         s32 x = Mod(selected, *((s16 *)(gTerrainMap->cells + 4)));
         s32 z = Div(selected, *((s16 *)(gTerrainMap->cells + 4)));
@@ -110,7 +110,7 @@ void Dog_TryFacingRoute(struct SceneActorRegistryResetView *a, u32 saved)
         target.y = ((*data) & 15) << 8;
         target.z = (z << 8) + 128;
     }
-    if (Chase_TryRoute(a, *((void **)(group + 0x1FC)), &a->position, &target)) {
+    if (Chase_TryRoute(a, *((void **)(group + 0x1FC)), &a->body.position, &target)) {
         context[0x6A7]++;
         return;
     }

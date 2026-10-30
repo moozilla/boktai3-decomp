@@ -92,7 +92,7 @@ void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
     s16 deltaZ;
     if (actor->field2B1)
         actor->field2B1 = 0;
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     if (((s32)actor->counter2AC) > 60) {
         Axe_SelectRandomRoutePoint(actor);
@@ -111,7 +111,7 @@ void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
         sub_080FAA5C(actor);
         SetState(actor, 0, 0, 1, zero);
         {
-            struct AxeVec *position = (struct AxeVec *)(&actor->position);
+            struct AxeVec *position = (struct AxeVec *)(&actor->body.position);
             target = &targetStorage;
             target->x -= position->x;
             copy->y -= position->y;

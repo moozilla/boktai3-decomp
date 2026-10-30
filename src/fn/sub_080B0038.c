@@ -43,7 +43,7 @@ void Vorn_RestoreRouteMovement(struct SceneActorRegistryResetView *a)
     asm("" : "+r"(group));
     if (a->field2B1)
         a->field2B1 = 0;
-    if ((u8)Callback_InvokeActor(a, a->update270))
+    if ((u8)Callback_InvokeActor(a, a->contactQuery.opaque))
         return;
     result = sub_0812F3CC(a);
     if (result)

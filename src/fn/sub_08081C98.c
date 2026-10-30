@@ -73,7 +73,7 @@ static inline s32 Reaction_ThirtySecond(s32 value)
 }
 void SceneActorReaction_UpdateTimedBurst(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     u32 duration;
     if (SceneActorReaction_TakePrepared(actor)) {
         struct SceneActorReactionMotion *reaction;
@@ -82,7 +82,7 @@ void SceneActorReaction_UpdateTimedBurst(struct SceneActorRegistryResetView *act
         u32 *word;
         u16 *motion;
         u32 bank;
-        actor->direction = (((actor->direction + 32) >> 6) & 3) << 6;
+        actor->body.direction = (((actor->body.direction + 32) >> 6) & 3) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         actor->field2C2 = 64;
         reaction = (void *)((u8 *)actor + 0xDC);
@@ -143,7 +143,7 @@ void SceneActorReaction_UpdateTimedBurst(struct SceneActorRegistryResetView *act
         Reaction_ClearHalf(&actor->flags2D4, ~0x2000);
         Chase_SetState(actor, 3, 1, 0);
         Chase_SetCtl(actor, *(void **)(group + 0x210), 15);
-        actor->field2B6 = (Reaction_ThirtySecond((actor->direction + 128) & 255) + 7) & 7;
+        actor->field2B6 = (Reaction_ThirtySecond((actor->body.direction + 128) & 255) + 7) & 7;
     } else {
         actor->field2B8--;
     }

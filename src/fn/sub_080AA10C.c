@@ -45,9 +45,9 @@ void ActorTrail_ResetAtSavedPosition(struct SceneActorRegistryResetView *actor)
         *(struct ContactPosition *)((u8 *)actor->drawable + 0x1C) = *saved;
     else
         *(struct ContactPosition *)((u8 *)actor->drawable + 0x40) = *saved;
-    actor->position = trail->savedPosition;
+    actor->body.position = trail->savedPosition;
     TentacleActor_ResetRouteHistory(actor);
-    TentacleActor_ResetSegmentPositions(trail, &actor->position);
+    TentacleActor_ResetSegmentPositions(trail, &actor->body.position);
     TentacleActor_SelectWanderRoute(actor);
     {
         u32 state = 2;

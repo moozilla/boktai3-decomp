@@ -41,7 +41,7 @@ void SceneActorControl_BeginHiddenDefeat(struct SceneActorRegistryResetView *act
         SceneActorEffects_AdvanceSteps(actor, 4);
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
         {
-            struct SceneActorRegistryControl *control = &actor->group.control;
+            struct SceneActorRegistryControl *control = &actor->group.common.control;
             u32 fieldOffset = 0x2CC;
             u32 *field;
             u32 mask;
@@ -76,14 +76,14 @@ void SceneActorControl_BeginHiddenDefeat(struct SceneActorRegistryResetView *act
             SceneActorControl_CallContextScript(actor);
             script = *(u16 *)((u8 *)actor + 0x1F8);
             if (script) {
-                values[0] = actor->position.x;
-                values[1] = actor->position.y;
-                values[2] = actor->position.z;
+                values[0] = actor->body.position.x;
+                values[1] = actor->body.position.y;
+                values[2] = actor->body.position.z;
                 values[3] = *(s32 *)((u8 *)actor + 0x1FC);
                 values[4] = *(s32 *)((u8 *)actor + 0x200);
                 values[5] = *(s32 *)((u8 *)actor + 0x204);
                 values[6] = actor->field2E0;
-                values[7] = actor->id;
+                values[7] = actor->body.id;
                 arguments.count = 8;
                 arguments.values = values;
                 Script_Call(script, &arguments);

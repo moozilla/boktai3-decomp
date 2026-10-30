@@ -108,32 +108,32 @@ void Crow_HopWithinHomeCell(struct SceneActorRegistryResetView *actor)
         u32 zero;
         struct ContactPosition home, next;
     } local;
-    s32 ground = Chase_HeightAt(actor->terrainCell, &actor->position);
+    s32 ground = Chase_HeightAt(actor->terrainCell, &actor->body.position);
     u8 *arrived;
     s32 cell;
     if (TakeEntry(actor, &arrived)) {
         u32 angle;
         SetControl(actor, actor->savedTarget, 0);
         CellPosition(&local.home, state->homeCell);
-        actor->direction = angle = Random(gRandomTable) & 255;
+        actor->body.direction = angle = Random(gRandomTable) & 255;
         ZeroVector(&local.zero, &state->velocity);
         Polar(&state->velocity, angle, (Random(gRandomTable) & 7) + 1);
         state->velocity.y = 14;
     }
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
-    Add(&local.next, &actor->position, &state->velocity);
+    Add(&local.next, &actor->body.position, &state->velocity);
     cell = Chase_CellAt(&local.next);
     if (state->homeCell != cell) {
         state->velocity.x = 0;
         state->velocity.z = 0;
     }
-    actor->motion.x += state->velocity.x;
-    actor->motion.z += state->velocity.z;
+    actor->body.motion.x += state->velocity.x;
+    actor->body.motion.z += state->velocity.z;
     actor->field2EA += state->velocity.y;
     state->velocity.y -= 2;
     if (ground >= (s16)actor->field2EA) {
-        actor->position.y = ground;
+        actor->body.position.y = ground;
         actor->field2EA = ground;
         ZeroVector(&local.zero, &state->velocity);
         actor->state2A8 = 0;

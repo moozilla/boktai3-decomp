@@ -69,7 +69,7 @@ void Dog_OnAttackContact(u8 *collider, u8 *other, struct SceneActorRegistryReset
     if (blockedFirst((u8 *)actor))
         return;
     position.position = *(struct ContactPosition *)(collider + 0x24);
-    direction = ((facingActor->direction + 0x20) & 0xFF) >> 6;
+    direction = ((facingActor->body.direction + 0x20) & 0xFF) >> 6;
     switch (direction) {
         case 0:
             position.packed.x -= 0x100;

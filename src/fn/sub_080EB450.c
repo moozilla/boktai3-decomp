@@ -38,7 +38,7 @@ void SceneActorReaction_AwaitTargetControl(struct SceneActorRegistryResetView *a
         u8 one;
         u8 byteZero;
         u32 state;
-        actor->fieldDC = (u32)target;
+        actor->tracking.target = (u32)target;
         callback = Ivy_ApplyHeldTargetDamage;
         kind = 45;
         prepared = &actor->field2B2;

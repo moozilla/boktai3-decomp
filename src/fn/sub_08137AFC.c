@@ -38,7 +38,7 @@ static inline s32 FindNearestEligiblePlayer(struct SceneActorRegistryResetView *
             if (!Test(*(u16 *)(data + 2), 0x43)) {
                 s32 distance;
                 SceneActorTerrain_Subtract(&delta, (void *)&gPlayers[i]->position,
-                                           &actor->position);
+                                           &actor->body.position);
                 distance = delta.x * delta.x + delta.z * delta.z;
                 if (distance < bestDistance) {
                     bestDistance = distance;
@@ -58,13 +58,13 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, u8 *group,
                         struct AreaEffectPlayer **slot)
 {
     void *shape = *(void **)(group + 0x1fc);
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     void *destination = &(*slot)->position;
     if (Nav_IsPositionInMesh(shape, position, destination)) {
         s32 result = Terrain_ApplyBlocked(shape, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         }
     }
@@ -75,7 +75,7 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, u8 *group,
 // confidence=low: heads for the nearest eligible link player; FALSE when there is none.
 u32 sub_08137AFC(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     s32 best = FindNearestEligiblePlayer(actor);
 
     if (best < 0)

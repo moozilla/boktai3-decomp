@@ -87,7 +87,7 @@ void Golem_UpdateChargeBuildup(struct SceneActorRegistryResetView *actor, s32 fr
         variantPointer = &directionVariant;
         {
             u8 *mirrorAddress = &mirror;
-            s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
+            s32 quadrant = (((s32)actor->body.direction + 0x60) >> 6) & 3;
             mirrorPointer = mirrorAddress;
             if (quadrant > 1) {
                 *mirrorPointer = 1;

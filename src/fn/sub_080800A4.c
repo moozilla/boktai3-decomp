@@ -61,7 +61,7 @@ static inline void Reaction_SetDrawMode(struct SceneActorRegistryResetView *acto
 }
 void SceneActorReaction_UpdateContactRouteRecovery(struct SceneActorRegistryResetView *actor)
 {
-    u8 *group = (u8 *)&actor->group;
+    u8 *group = (u8 *)&actor->group.common;
     struct ContactCollider *collider = &actor->colliderA;
     u8 prepared = SceneActorReaction_TakePrepared(actor);
     u32 *motion = &actor->flags2D0;
@@ -93,7 +93,7 @@ void SceneActorReaction_UpdateContactRouteRecovery(struct SceneActorRegistryRese
             Reaction_ClearHalf((void *)&collider->flags, 4);
             destination = *(struct ContactPosition **)(group + 0x200);
             Chase_SnapToRoute(destination, group + 0x74);
-            if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->position,
+            if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position,
                                 *(struct ContactPosition **)(group + 0x200))) {
                 Chase_SetCtl(actor, SceneActorControl_OnIdle, 0);
                 Chase_SetState(actor, 3, 0, 0);

@@ -51,7 +51,7 @@ void Vorn_UpdatePursuitWait(struct SceneActorRegistryResetView *input)
             u32 behavior;
             {
                 u32 heading = *((u8 *)a + 0xE9);
-                u8 *direction = &a->direction;
+                u8 *direction = &a->body.direction;
                 register u32 initial asm("r2") = 0;
                 wordZero = initial;
                 *direction = heading;

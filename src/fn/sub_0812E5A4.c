@@ -28,17 +28,17 @@ void ActorParticles_SpawnBurst(struct SceneActorRegistryResetView *actor)
     struct SceneExtent velocity, spread;
     u32 count;
     u32 observed;
-    velocity.x = ActorParticles_Half(actor->motion.x);
+    velocity.x = ActorParticles_Half(actor->body.motion.x);
     /* Preserve the unused setup constant retained by the original RNG expansion. */
     observed = 0x0403B714;
     asm volatile("" : "+l"(observed));
     velocity.y = ActorParticles_FirstRandom() & 7;
     asm volatile("" : "+r"(observed));
-    velocity.z = ActorParticles_Half(actor->motion.z);
+    velocity.z = ActorParticles_Half(actor->body.motion.z);
     spread.x = (ActorParticles_NextRandom() & 3) + 15;
     spread.y = (ActorParticles_NextRandom() & 7) + 15;
     spread.z = (ActorParticles_NextRandom() & 3) + 15;
     count = (ActorParticles_NextRandom() & 3) + 4;
     sub_08014634(count, ActorMode_SelectOddStateVariant(actor),
-                 (struct SceneExtent *)&actor->position, &velocity, &spread, 45, 31);
+                 (struct SceneExtent *)&actor->body.position, &velocity, &spread, 45, 31);
 }

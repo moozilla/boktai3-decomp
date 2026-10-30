@@ -33,7 +33,7 @@ void SceneActorControl_UpdateEntryPhase(struct SceneActorRegistryResetView *acto
         SetControl(actor, control, 2);
     }
     if (SceneActorReaction_IsRangeReady(actor)) {
-        if ((u8)Callback_InvokeActor(actor, actor->update270))
+        if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
             return;
         if (sub_0812F3CC(actor))
             return;

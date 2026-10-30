@@ -178,7 +178,7 @@ void Lun_FollowRoute(struct SceneActorRegistryResetView *actor)
         s32 cell, height;
         u32 kind;
         u16 attr;
-        Polar((void *)(body + 0x424), actor->direction, speed);
+        Polar((void *)(body + 0x424), actor->body.direction, speed);
         route = (void *)(body + 0x42C);
         Lun_SelectRandomRouteEntry(route);
         p = &target;

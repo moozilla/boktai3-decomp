@@ -47,9 +47,9 @@ void SceneActorControl_UpdateHeightReturn(struct SceneActorRegistryResetView *s)
             *flags &= mask;
         }
         s->word104 = zero;
-        s->direction += 0x80;
+        s->body.direction += 0x80;
     }
-    Callback_InvokeActor(s, s->update270);
+    Callback_InvokeActor(s, s->contactQuery.opaque);
     if (TestFlags(s, 0xA02F)) {
         s->field2C2 = 0x40;
         height = &s->field2C2;
@@ -67,7 +67,7 @@ void SceneActorControl_UpdateHeightReturn(struct SceneActorRegistryResetView *s)
         s32 y;
         s32 offset;
         delta = s->groundHeight2BE;
-        y = s->position.y;
+        y = s->body.position.y;
         offset = -280;
         y += offset;
         delta -= y;

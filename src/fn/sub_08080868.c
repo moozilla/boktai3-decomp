@@ -2,7 +2,7 @@
 void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *actor)
 {
     u32 state;
-    struct SceneActorReactionGroup *group = (void *)&actor->group;
+    struct SceneActorReactionGroup *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         struct SceneActorRegistryControl *control = &group->control;
         u32 *field = &actor->flags2CC;

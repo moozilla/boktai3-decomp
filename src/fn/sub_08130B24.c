@@ -9,7 +9,7 @@ static inline u8 SceneActor_IsDetached(struct SceneActorRegistryResetView *actor
 }
 void SceneActor_RunControlAndFallback(struct SceneActorRegistryResetView *actor)
 {
-    if (!(u8)Callback_InvokeActor(actor, actor->update270)) {
+    if (!(u8)Callback_InvokeActor(actor, actor->contactQuery.opaque)) {
         if (!SceneActor_IsDetached(actor))
             sub_0812F3CC(actor);
     }

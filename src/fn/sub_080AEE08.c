@@ -75,7 +75,7 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         if (Flag(actor, t1 = 8, 0x2D4))
             Sound_PlaySong(0x12A);
         {
-            struct SceneActorRegistryControl *control = &actor->group.control;
+            struct SceneActorRegistryControl *control = &actor->group.common.control;
             u32 *field = &actor->flags2CC;
             u32 mask = ~0x141C0;
             *field &= mask;
@@ -106,7 +106,7 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             register s32 count asm("r9");
             register struct ContactPackedVector *range asm("r5") = &rangeB;
             register struct ContactPosition *position asm("r6");
-            SparkParticle_Spawn(position = &actor->position, Random4_UpdateDefeat(), range, 0x20,
+            SparkParticle_Spawn(position = &actor->body.position, Random4_UpdateDefeat(), range, 0x20,
                                 count = 4, duration = 20, scale = 2, 1);
             SparkParticle_Spawn(position, RandomFrom(table), range, 0x40, count, duration, scale,
                                 1);
@@ -132,14 +132,14 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         script = *((u16 *)(((u8 *)actor) + offset));
     }
     if (script) {
-        values[0] = actor->position.x;
-        values[1] = actor->position.y;
-        values[2] = actor->position.z;
+        values[0] = actor->body.position.x;
+        values[1] = actor->body.position.y;
+        values[2] = actor->body.position.z;
         values[3] = *((s32 *)(((u8 *)actor) + 0x1FC));
         values[4] = *((s32 *)(((u8 *)actor) + 0x200));
         values[5] = *((s32 *)(((u8 *)actor) + 0x204));
         values[6] = *((s32 *)(((u8 *)actor) + 0x2E0));
-        values[7] = actor->id;
+        values[7] = actor->body.id;
         arguments.count = 8;
         arguments.values = values;
         Script_Call(script, &arguments);

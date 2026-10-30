@@ -8,7 +8,7 @@ static inline u32 actorFlags(struct SceneActorRegistryResetView *actor, u32 mask
 static inline u8 reactionStarted(struct SceneActorRegistryResetView *actor,
                                  struct SceneActorReactionMotion **out)
 {
-    struct SceneActorReactionMotion *motion = (void *)&actor->fieldDC;
+    struct SceneActorReactionMotion *motion = (void *)&actor->tracking.target;
     u32 mask = 8;
     u32 flags = motion->flags & mask;
     *out = motion;
@@ -42,7 +42,7 @@ void SceneActor_PrepareStationaryReaction(struct SceneActorRegistryResetView *ac
     s32 offset;
     u8 started;
     if (actorFlags(actor, 0x80)) {
-        actor->group.field418 = actor->group.field416;
+        actor->group.common.gate.counter = actor->group.common.gate.duration;
         return;
     }
     started = reactionStarted(actor, &motion);

@@ -77,7 +77,7 @@ inline static void Reaction_SetHalf_08080BE0(struct SceneActorRegistryResetView 
 u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 amplitude)
 {
     struct SceneActorRegistryResetView *actor = owner->actor;
-    u8 *group = (u8 *)(&actor->group);
+    u8 *group = (u8 *)(&actor->group.common);
     struct ContactCollider *second = &actor->colliderB;
     struct ContactCollider *first = &actor->colliderA;
     if (Reaction_IsBlocked(actor))
@@ -100,7 +100,7 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
                     } else if ((*motion) & 0x803E) {
                         *motion &= ~0x201;
                         Reaction_ClearWord_08080BE0(&actor->flags2CC, 0x4000);
-                        actor->flagsEB &= ~0x10;
+                        actor->tracking.flags &= ~0x10;
                         if (!((*motion) & 0x20))
                             Reaction_ClearWord_08080BE0(&actor->flags2CC, 0x80);
                         Reaction_ClearWord_08080BE0(&actor->flags2D0, 0x100004);
@@ -138,7 +138,7 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
             Reaction_ClearHalf(&first->flags, ~4);
             Reaction_ClearHalf(&actor->flags2D4, ~0x8000);
             {
-                u32 direction = actor->direction;
+                u32 direction = actor->body.direction;
                 struct ContactPosition *motion = &actor->secondaryMotion;
                 motion->x = Reaction_ScaleMotion(gUnk_086149C4[(direction + 64) & 255] * amplitude);
                 motion->y = 0;

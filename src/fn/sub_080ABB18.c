@@ -73,8 +73,8 @@ u32 TentacleActor_RecoverFromSegmentLoss(struct SceneActorRegistryResetView *p)
     behavior = &p->behavior2AA;
     stateCounter = &p->counter2AC;
     queued = &p->field2B1;
-    savedDirection = &p->fieldE9;
-    direction = &p->direction;
+    savedDirection = &p->tracking.heading;
+    direction = &p->body.direction;
     if (count < *initialCount)
         do {
             ActorTrail_RemoveLastSegment(p);

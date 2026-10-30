@@ -61,7 +61,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->motion, 8);
+                Memory_Clear(&actor->body.motion, 8);
             return 1;
         }
     }
@@ -86,13 +86,13 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
 
     do {
         cell = actor->terrainCell;
-        height = CellHeight(&actor->position, cell);
+        height = CellHeight(&actor->body.position, cell);
         shape = CellShape(cell);
-        switch (FacingQuarter(actor->direction + 32) & 3) {
+        switch (FacingQuarter(actor->body.direction + 32) & 3) {
             case 0:
                 next = cell + 1;
                 i = 0;
-                route = &actor->routeObject;
+                route = &actor->group.route;
                 do {
                     if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
@@ -104,7 +104,7 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
             case 1:
                 next = cell + MapWidth();
                 i = 0;
-                route = &actor->routeObject;
+                route = &actor->group.route;
                 do {
                     if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         goto finishSouth;
@@ -116,7 +116,7 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
             case 2:
                 next = cell - 1;
                 i = 0;
-                route = &actor->routeObject;
+                route = &actor->group.route;
                 do {
                     if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         break;
@@ -128,7 +128,7 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
             case 3:
                 next = cell - MapWidth();
                 i = 0;
-                route = &actor->routeObject;
+                route = &actor->group.route;
                 do {
                     if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                         goto finishNorth;
@@ -151,21 +151,21 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
                 break;
             default:
                 chosen = actor->terrainCell;
-                route = &actor->routeObject;
+                route = &actor->group.route;
                 break;
         }
         if (chosen != actor->terrainCell)
             goto selected;
-        actor->direction += 64;
+        actor->body.direction += 64;
         tries++;
     } while (tries <= 3);
 selected:
-    actor->direction = priorDirection;
+    actor->body.direction = priorDirection;
     SceneActorTerrain_GetCenter(chosen, &center);
     {
-        s16 groupOffset = (u32) & ((struct SceneActorRegistryResetView *)0)->group;
+        s16 groupOffset = (u32) & ((struct SceneActorRegistryResetView *)0)->group.common;
         u8 *group = (u8 *)actor + groupOffset;
-        if (TryRoute(actor, *route, &actor->position, &center))
+        if (TryRoute(actor, *route, &actor->body.position, &center))
             return 1;
         Callback_InvokeActor(actor, *(void **)(group + 0x224));
     }

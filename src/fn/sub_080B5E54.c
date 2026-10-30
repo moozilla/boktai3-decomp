@@ -11,11 +11,11 @@ u32 SceneActorControl_CanTurnTowardTarget(struct SceneActorRegistryResetView *s)
 {
     struct SceneActorTimedBehaviorContext *context = s->context;
     s32 x, y, z, angle;
-    if (!s->fieldDC)
+    if (!s->tracking.target)
         return 0;
     if (context->timer704)
         return 0;
-    if (!HasTargetFlag((void *)&s->fieldDC))
+    if (!HasTargetFlag((void *)&s->tracking.target))
         return 0;
     {
         struct ContactPosition *v = &s->secondaryMotion;
@@ -28,9 +28,9 @@ u32 SceneActorControl_CanTurnTowardTarget(struct SceneActorRegistryResetView *s)
         if (sum + x * x != 0)
             return 0;
     }
-    if (s->distanceF0 > 0x24000)
+    if (s->tracking.distance > 0x24000)
         return 0;
-    angle = ((struct SceneActorFacingTarget *)s->fieldDC)->heading - s->direction;
+    angle = ((struct SceneActorFacingTarget *)s->tracking.target)->heading - s->body.direction;
     if (angle > 128)
         angle -= 256;
     else if (angle < -128)

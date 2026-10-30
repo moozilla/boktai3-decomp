@@ -24,13 +24,13 @@ static inline void SetTurn(struct SceneActorRegistryResetView *a, u32 value)
 }
 u8 Dog_RequestHeadingTurn(struct SceneActorRegistryResetView *a, s32 heading)
 {
-    s32 difference = heading - a->direction;
+    s32 difference = heading - a->body.direction;
     u16 motion;
     if (difference > 128)
         difference -= 256;
     else if (difference < -128)
         difference += 256;
-    if (Absolute(difference) < a->unknownEA || a->field2B5 == 2)
+    if (Absolute(difference) < a->tracking.fieldEA || a->field2B5 == 2)
         return 0;
     Chase_SetCtl(a, SceneActorControl_OnIdle, 0x10);
     motion = Motion(a, 0x80);

@@ -58,12 +58,12 @@ void Ivy_BeginRelease(struct SceneActorRegistryResetView *actor)
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0x15);
         {
-            struct IvyTarget *target = (void *)actor->fieldDC;
+            struct IvyTarget *target = (void *)actor->tracking.target;
             struct SceneVec position;
             u8 angle;
             CellCenter(&position, actor->terrainCell);
             {
-                s32 turn = (actor->direction + 0x20) & 0xFF;
+                s32 turn = (actor->body.direction + 0x20) & 0xFF;
                 s32 quadrant = turn >= 0 ? turn >> 6 : -(-turn >> 6);
                 angle = quadrant << 6;
             }

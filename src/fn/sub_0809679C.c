@@ -40,8 +40,8 @@ void Ghost_DecelerateMovement(struct SceneActorRegistryResetView *a)
     u8 *ctx = a->context;
     if (TakeFlag(&a->field2B1))
         SetControl(a, a->entryTarget224, 2);
-    a->motion.x += *(s16 *)(ctx + 0x5FC);
-    a->motion.z += *(s16 *)(ctx + 0x600);
+    a->body.motion.x += *(s16 *)(ctx + 0x5FC);
+    a->body.motion.z += *(s16 *)(ctx + 0x600);
     if (Mod(a->counter2AC, 4) == 0) {
         *(s16 *)(ctx + 0x5FC) >>= 1;
         *(s16 *)(ctx + 0x600) >>= 1;

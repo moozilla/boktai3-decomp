@@ -22,7 +22,7 @@ void SceneActorRoute_UpdateWaitPhase(struct SceneActorRegistryResetView *actor)
         }
         actor->word104 = zero;
     }
-    if (!(u8)Callback_InvokeActor(actor, actor->update270)) {
+    if (!(u8)Callback_InvokeActor(actor, actor->contactQuery.opaque)) {
         u32 zero = sub_0812F3CC(actor);
         if (!zero) {
             u32 kind = (*(u8 **)(route + 8))[6] >> 4;

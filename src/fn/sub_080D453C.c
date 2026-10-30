@@ -98,7 +98,7 @@ static inline u8 Mummy_ShouldSkipStimulus(u8 *object)
     if (motion & 4)
         return 1;
     if (ActorWordBits(a, 0x100) || ActorHalfBits(a, 0xE13F) ||
-        Mummy_TestContactFlags((void *)&a->fieldDC, 16))
+        Mummy_TestContactFlags((void *)&a->tracking.target, 16))
         return 1;
     if (((struct SceneActorRegistryResetView *)object)->field2B8)
         return 1;
@@ -119,17 +119,17 @@ u32 Mummy_TryStimulusRoute(struct SceneActorRegistryResetView *a)
     u16 *motionFlags;
     if (Mummy_ShouldSkipStimulus((u8 *)a))
         goto failed;
-    group = (void *)&a->group;
-    ((struct MummyStimulusGroup *)&a->group)->stimulus.phase[0] = 0;
+    group = (void *)&a->group.common;
+    ((struct MummyStimulusGroup *)&a->group.common)->stimulus.phase[0] = 0;
     started = 0;
     body = a->context;
     tag = SceneStimulus_FindOverlap(
-        a->position.x, a->position.z, ((struct MummyStimulusGroup *)&a->group)->stimulus.radius,
-        ((struct MummyStimulusGroup *)&a->group)->stimulus.kind, (u16)a->id);
+        a->body.position.x, a->body.position.z, ((struct MummyStimulusGroup *)&a->group.common)->stimulus.radius,
+        ((struct MummyStimulusGroup *)&a->group.common)->stimulus.kind, (u16)a->body.id);
     if (tag < 0)
         goto failed;
-    if (!((struct MummyStimulusGroup *)&a->group)->stimulus.timer) {
-        ((struct MummyStimulusGroup *)&a->group)->stimulus.timer = 180;
+    if (!((struct MummyStimulusGroup *)&a->group.common)->stimulus.timer) {
+        ((struct MummyStimulusGroup *)&a->group.common)->stimulus.timer = 180;
         Chase_SetCtl(a, group->control, 9);
         Chase_SetBehavior(a, 11);
         {
@@ -139,19 +139,19 @@ u32 Mummy_TryStimulusRoute(struct SceneActorRegistryResetView *a)
         started = 1;
     }
     if (KeepMotionFlags(a, 0x80, &motionFlags)) {
-        u16 *timer = &((struct MummyStimulusGroup *)&a->group)->movementTimer;
+        u16 *timer = &((struct MummyStimulusGroup *)&a->group.common)->movementTimer;
         *timer += 300;
-        if ((*timer) > (((struct MummyStimulusGroup *)&a->group)->timerLimit))
-            *timer = ((struct MummyStimulusGroup *)&a->group)->timerLimit;
+        if ((*timer) > (((struct MummyStimulusGroup *)&a->group.common)->timerLimit))
+            *timer = ((struct MummyStimulusGroup *)&a->group.common)->timerLimit;
     }
-    SceneActorPosition_ResolveTaggedPosition(&group->stimulus, &a->id, group->route, tag);
+    SceneActorPosition_ResolveTaggedPosition(&group->stimulus, &a->body.id, group->route, tag);
     if (SceneActor_TryTrackNearbyPlayer(a, &group->target, group->cell))
         goto success;
     Chase_SnapToRoute(group->destination, (u8 *)&group->link);
-    (group->destination)->y = a->position.y;
+    (group->destination)->y = a->body.position.y;
     (group->destination)->pad = 0;
     SceneGrid_SnapPositionToCellCenter(&group->target, group->cell);
-    if (!Mummy_TryRoute(motionFlags, 0x200, group->route, &a->position, &group->target)) {
+    if (!Mummy_TryRoute(motionFlags, 0x200, group->route, &a->body.position, &group->target)) {
         Callback_InvokeActor(a, group->fallback);
     success:
         return 1;

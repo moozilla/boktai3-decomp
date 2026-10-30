@@ -84,11 +84,11 @@ void Ivy_ReleaseCapturedPlayer(struct SceneActorRegistryResetView *actor)
         s32 angle;
         CellCenter(&position, actor->terrainCell);
         {
-            s32 turn = (actor->direction + 0x20) & 0xFF;
+            s32 turn = (actor->body.direction + 0x20) & 0xFF;
             angle = (turn >= 0 ? turn >> 6 : -(-turn >> 6)) << 6;
         }
         {
-            struct IvyTarget *target = (void *)actor->fieldDC;
+            struct IvyTarget *target = (void *)actor->tracking.target;
             if (target->kind <= 3) {
                 Player_ApplyPositionRequest(target->player, &position, 0x40, angle, 0x3C, 0, 0, 0);
                 Sound_PlaySong(0xE6);

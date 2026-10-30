@@ -131,9 +131,9 @@ done:
 static inline void DrawablePosition(struct SceneActorRegistryResetView *a)
 {
     if (!a->drawableKind)
-        POS(a->drawable, 0x1C) = a->position;
+        POS(a->drawable, 0x1C) = a->body.position;
     else
-        POS(a->drawable, 0x40) = a->position;
+        POS(a->drawable, 0x40) = a->body.position;
 }
 static inline void StepSequence(void *obj)
 {
@@ -294,7 +294,7 @@ static inline void InitializeCallbacks(struct SceneActorRegistryResetView *a)
     PTR(a, 0x620) = 0;
     PTR(a, 0x5E8) = 0;
     U16(a, 0x41A) = 40;
-    ProximityVolume_TranslateBounds((u8 *)a + 0x6AC, &a->position);
+    ProximityVolume_TranslateBounds((u8 *)a + 0x6AC, &a->body.position);
     SceneActorMovement_ResolveRoutePosition(a);
     PTR(a, 0x248) = Dog_ResetActionState;
     PTR(a, 0x23C) = Dog_UpdateTargetGate;
@@ -304,7 +304,7 @@ static inline void InitializeCallbacks(struct SceneActorRegistryResetView *a)
     PTR(a, 0x5F0) = Dog_UpdateTurnSequence;
     U16(a, 0x41A) = 20;
     U16(a, 0x2E8) = 0;
-    a->flagsEB |= 1;
+    a->tracking.flags |= 1;
     a->flags2CC |= 0x01600000;
     a->flags2D0 |= 8;
     SceneActorBehavior_InitializeShadow(a);
@@ -340,7 +340,7 @@ static inline void InitializeCallbacks(struct SceneActorRegistryResetView *a)
     if (Test(a->flags2C0, 2))
         U16(a, 0x2FA) = U32(gGameState, 0x5A0);
     else
-        U16(a, 0x2FA) = Region_FindContaining(&a->position);
+        U16(a, 0x2FA) = Region_FindContaining(&a->body.position);
     if (Test(a->flags2C0, 0x40))
         U16(a, 0x13A) &= ~0x100;
 }
@@ -371,7 +371,7 @@ s32 Dog_Init(struct SceneActorRegistryResetView *a)
         SceneActorAnimation_InitEnemySequence(d, 0xF6E7);
         if (a->category == 0x11 || a->category == 0x17)
             d[7] = 1;
-        a->direction = 0;
+        a->body.direction = 0;
     } else {
         u8 *d;
         void *res;
@@ -448,16 +448,16 @@ s32 Dog_Init(struct SceneActorRegistryResetView *a)
                 z = 0x30;
                 angle = 0x40;
             }
-            a->fieldDC = 0;
+            a->tracking.target = 0;
             U16(a, 0xEC) = x;
             U16(a, 0xEE) = z;
-            a->distanceLimitF8 = x * x;
+            a->tracking.limit = x * x;
             U32(a, 0xFC) = z * z;
             U8(a, 0xEA) = angle;
-            if (Test(a->flagsEB, 4))
-                a->rangeF4 = a->distanceLimitF8;
+            if (Test(a->tracking.flags, 4))
+                a->tracking.range = a->tracking.limit;
             else
-                a->rangeF4 = Div(a->distanceLimitF8 * 7, 10);
+                a->tracking.range = Div(a->tracking.limit * 7, 10);
         }
         if (Script_GetKeywordValue('b', 0))
             a->flags2D0 |= 0x200;
@@ -514,11 +514,11 @@ s32 Dog_Init(struct SceneActorRegistryResetView *a)
         a->groundHeight2BE = Height(a->terrainCell, &point);
         point.y = a->groundHeight2BE;
         SceneBody_StartRoute((u8 *)a + 0x50, route, route[0x10], route[0x11], route[0x12]);
-        a->position.x = ((u16 *)PTR(route, 8))[0];
-        a->position.z = ((u16 *)PTR(route, 8))[1];
-        a->position.y = Height(Cell(&a->position), &a->position);
+        a->body.position.x = ((u16 *)PTR(route, 8))[0];
+        a->body.position.z = ((u16 *)PTR(route, 8))[1];
+        a->body.position.y = Height(Cell(&a->body.position), &a->body.position);
         DrawablePosition(a);
-        a->direction = Route_GetCurrentPointFacing(route);
+        a->body.direction = Route_GetCurrentPointFacing(route);
     } else {
         route[0x10] = 0;
         route[0x11] = 0;
@@ -534,7 +534,7 @@ s32 Dog_Init(struct SceneActorRegistryResetView *a)
         SceneBody_SetMovementProbe((u8 *)a + 0x50, (u8 *)a + 0x40, 60, 60);
     else
         SceneBody_SetMovementProbe((u8 *)a + 0x50, (u8 *)a + 0x40, 64, 64);
-    U16(a, 0x3D4) = a->id;
+    U16(a, 0x3D4) = a->body.id;
     U32(a, 0x3D8) = originalSecond;
     if (Script_SeekToKeyword('P')) {
         U16(a, 0x69C) = Value(200);
@@ -585,16 +585,16 @@ s32 Dog_Init(struct SceneActorRegistryResetView *a)
     Dog_SetControlPreset(a);
     Dog_SetPrimaryBehaviorPreset(a);
     Dog_SetSecondaryBehaviorPreset(a);
-    a->defaultFlags2C0 = a->flags2C0;
-    a->defaultField2EA = a->field2EA;
-    a->defaultFlags2CC = a->flags2CC;
-    a->defaultFlags2D0 = a->flags2D0;
-    a->direction120 = a->direction;
-    a->defaultState = a->state2A8;
-    a->defaultPhase = a->phase2A9;
-    a->defaultBehavior = a->behavior2AA;
-    a->defaultControl = a->target;
-    a->defaultField2B5 = a->field2B5;
+    a->saved.motionFlags = a->flags2C0;
+    a->saved.heightOffset = a->field2EA;
+    a->saved.behaviorFlags = a->flags2CC;
+    a->saved.statusFlags = a->flags2D0;
+    a->saved.direction = a->body.direction;
+    a->saved.state = a->state2A8;
+    a->saved.phase = a->phase2A9;
+    a->saved.behavior = a->behavior2AA;
+    a->saved.control = a->target;
+    a->saved.kind = a->field2B5;
     PTR(a, 0x24C) = SceneActorScript_OnCommand;
     PTR(a, 0x258) = Dog_OnAuxiliaryUpdate;
     PTR(a, 0x25C) = Dog_ReleaseResources;

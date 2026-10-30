@@ -71,7 +71,7 @@ static inline u8 TestPending(struct GhoulContext *context, u32 mask, u16 **pendi
 s32 Ghoul_ResumePendingRoute(struct SceneActorRegistryResetView *actor)
 {
     register struct GhoulContext *context = actor->context;
-    struct GhoulGroup *group = (void *)&actor->group;
+    struct GhoulGroup *group = (void *)&actor->group.common;
     struct GhoulRouteOrigin **routeSlot;
     u16 *flags;
     u16 *pending;
@@ -97,7 +97,7 @@ s32 Ghoul_ResumePendingRoute(struct SceneActorRegistryResetView *actor)
             u32 mask = ~4;
             *p = mask & (*p);
         }
-        body = &actor->id;
+        body = &actor->body.id;
         routeSlot = &group->routeOrigin;
         route = *routeSlot;
         SceneActor_SetPositionXZ(body, route->x, route->z);
@@ -105,11 +105,11 @@ s32 Ghoul_ResumePendingRoute(struct SceneActorRegistryResetView *actor)
         SaveDelay(&group->delay, group->delayControl, 12, 30);
         Chase_SetCtl(actor, SceneActorReaction_RestoreAfterDelay, 14);
         Chase_SetState(actor, 3, 1, 0);
-        SceneBody_StartRoute(body, &group->route, group->route.parameterA, group->route.parameterB,
-                             group->route.parameterC);
+        SceneBody_StartRoute(body, &group->route, group->route.routeId, group->route.parameterB,
+                             group->route.pointId);
         {
             void *route = *routeSlot;
-            register struct ContactPosition *position asm("r4") = &actor->position;
+            register struct ContactPosition *position asm("r4") = &actor->body.position;
             struct ContactPosition *target = &context->target;
             s32 result = Nav_IsPositionInMesh(route, position, target);
             if (!result) {
@@ -119,7 +119,7 @@ s32 Ghoul_ResumePendingRoute(struct SceneActorRegistryResetView *actor)
                 result = Terrain_ApplyBlocked(route, position, target);
                 if (result) {
                     if (result != 2)
-                        Memory_Clear(&actor->motion, 8);
+                        Memory_Clear(&actor->body.motion, 8);
                 } else {
                     u32 mask = ~0x200;
                     *flags = mask & (*flags);

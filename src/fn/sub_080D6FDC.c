@@ -59,7 +59,7 @@ static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 st
 static inline u8 RequestPath(struct SceneActorRegistryResetView *actor, void *route,
                              struct ContactPosition *pos)
 {
-    struct ContactPosition *from = &actor->position;
+    struct ContactPosition *from = &actor->body.position;
     s32 r;
     if (!Nav_IsPositionInMesh(route, from, pos)) {
         u16 *flags = &actor->flags2D4;
@@ -94,7 +94,7 @@ u8 Mummy_RequestStraightRoute(struct SceneActorRegistryResetView *actor)
 
     if (FIELD(state, 0x6D2, u16))
         return 0;
-    dir = ((actor->direction + 0x20) >> 6) & 3;
+    dir = ((actor->body.direction + 0x20) >> 6) & 3;
     cell = actor->terrainCell;
     level = *Cell(cell) & 15;
     total = Width() * Height();
@@ -141,7 +141,7 @@ found:
     if (dest == actor->terrainCell)
         return 0;
     SceneActorTerrain_GetCenter(dest, &pos);
-    pos.y = actor->position.y;
+    pos.y = actor->body.position.y;
     result = RequestPath(actor, FIELD(nav, 0x1FC, void *), &pos);
     if (!result) {
         SetControl(actor);

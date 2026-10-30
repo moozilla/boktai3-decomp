@@ -40,10 +40,10 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
 }
 void SceneActorControl_RefreshMotionRoute_0808A90C(struct SceneActorRegistryResetView *actor)
 {
-    u32 active = MotionActive((void *)&actor->fieldDC);
+    u32 active = MotionActive((void *)&actor->tracking.target);
     if (active) {
         {
-            u16 *flags = &actor->group.flags414;
+            u16 *flags = &actor->group.common.gate.flags;
             u32 mask = 4;
             u32 value = *flags;
             mask |= value;
@@ -56,7 +56,7 @@ void SceneActorControl_RefreshMotionRoute_0808A90C(struct SceneActorRegistryRese
             mask |= value;
             *flags = mask;
         }
-        actor->group.field418 = actor->group.field416;
+        actor->group.common.gate.counter = actor->group.common.gate.duration;
         if (TestFlags(&actor->flags2D4, 256))
             return;
         Ghoul_EnterIdleControl(actor);
@@ -65,7 +65,7 @@ void SceneActorControl_RefreshMotionRoute_0808A90C(struct SceneActorRegistryRese
         SetControl(actor, (void *)SceneActorControl_OnIdle, 16, active);
     }
     {
-        struct SceneActorReactionMotion *motion = (void *)&actor->fieldDC;
+        struct SceneActorReactionMotion *motion = (void *)&actor->tracking.target;
         u32 mask = 8;
         u32 value = motion->flags;
         mask |= value;

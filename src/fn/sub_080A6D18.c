@@ -78,7 +78,7 @@ void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
     u32 variant;
     u32 flags;
     u32 entered = TentacleBody_TakeEntryFlag(&actor->field2B2);
-    u8 *direction = &actor->direction;
+    u8 *direction = &actor->body.direction;
     u32 *attackFlags = &actor->flags2D0;
     if (entered) {
         SceneActor_AimArcAtPlayer(actor);

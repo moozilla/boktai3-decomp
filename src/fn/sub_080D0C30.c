@@ -86,7 +86,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
                 *field &= mask;
             }
         }
-        base->fieldDC = SceneActorContacts_FindObjectById(*(u16 *)&base->field304);
+        base->tracking.target = SceneActorContacts_FindObjectById(*(u16 *)&base->field304);
         {
             u32 value = obj->responseFlags;
             u32 mask = 1;

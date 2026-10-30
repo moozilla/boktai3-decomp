@@ -38,9 +38,9 @@ static inline u8 SceneActorReaction_TakePrepared(struct SceneActorRegistryResetV
 static inline void SceneActorReaction_ClearRoute(struct SceneActorRegistryResetView *actor)
 {
     actor->flags2CC &= ~0x141C0;
-    actor->group.control.counter = 0;
-    *(u16 *)((u8 *)&actor->group.control + 0x14) = 0;
-    actor->group.control.timer = 0;
+    actor->group.common.control.counter = 0;
+    *(u16 *)((u8 *)&actor->group.common.control + 0x14) = 0;
+    actor->group.common.control.timer = 0;
 }
 static inline void SceneActorReaction_Show(struct SceneActorRegistryResetView *actor)
 {

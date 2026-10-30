@@ -92,7 +92,7 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 t
 {
     u8 *ctx = actor->context;
     u8 *anim = ((u8 *)actor->drawable) + 0x20;
-    register u8 *group asm("sl") = (u8 *)(&actor->group);
+    register u8 *group asm("sl") = (u8 *)(&actor->group.common);
     struct ContactPosition range;
     s32 x;
     s32 z;
@@ -128,7 +128,7 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 t
         range.x = 60;
         range.y = 60;
         range.z = 40;
-        SparkParticle_Spawn(&actor->position, Random4(), &range, actor->direction + 128, 10, 6, 2,
+        SparkParticle_Spawn(&actor->body.position, Random4(), &range, actor->body.direction + 128, 10, 6, 2,
                             2);
     }
     {
@@ -151,8 +151,8 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 t
     }
     x = Clamp(x);
     z = Clamp(z);
-    actor->motion.x += x;
-    actor->motion.z += z;
+    actor->body.motion.x += x;
+    actor->body.motion.z += z;
     *priorX += x;
     *priorZ += z;
     if (AtRest(x, z) && actor->field2B3) {
@@ -178,12 +178,12 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 t
         } else if (ContextFlags_080AD75C(ctx))
             SceneActor_DispatchContextAction(ctx, 1);
         else {
-            actor->fieldDC = ((u32)gPlayers[0]) + 0x24;
+            actor->tracking.target = ((u32)gPlayers[0]) + 0x24;
             *action |= 16;
             (*((struct ContactPosition **)(group + 0x200)))->pad = 0;
             if ((!Skeleton_RerouteToTarget(actor)) &&
-                (!Chase_TryRoute(actor, *((void **)(group + 0x1FC)), &actor->position,
-                                 (void *)(actor->fieldDC + 12)))) {
+                (!Chase_TryRoute(actor, *((void **)(group + 0x1FC)), &actor->body.position,
+                                 &actor->tracking.target->position))) {
                 Callback_InvokeActor(actor, *((void **)(group + 0x224)));
                 return;
             }

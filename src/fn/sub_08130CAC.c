@@ -60,12 +60,12 @@ static inline u32 Flags(struct SceneActorRegistryResetView *a, u32 mask)
 }
 void SceneActorRoute_UpdateAdvancePhase(struct SceneActorRegistryResetView *actor)
 {
-    register u8 *group asm("r5") = (u8 *)&actor->group;
+    register u8 *group asm("r5") = (u8 *)&actor->group.common;
     s32 speed, event;
     u16 *scale;
     if (SceneActorControl_TakeFlag(&actor->field2B1))
         BeginControlZero(actor, actor->entryTarget228, 1);
-    if ((u8)Callback_InvokeActor(actor, actor->update270))
+    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
         return;
     if ((u8)sub_0812F3CC(actor))
         return;

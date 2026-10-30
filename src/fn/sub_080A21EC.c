@@ -31,8 +31,8 @@ void sub_080A21EC(struct SceneActorRegistryResetView *a)
     u16 *scale;
 
     if (SceneActorReaction_TakePrepared(a)) {
-        a->direction = ((((a->direction + 0x60) >> 6) & 3) << 6) - 0x40;
-        direction = ((a->direction + 0x60) >> 6) & 3;
+        a->body.direction = ((((a->body.direction + 0x60) >> 6) & 3) << 6) - 0x40;
+        direction = ((a->body.direction + 0x60) >> 6) & 3;
         facing = *((u8 *)a + 0x3CD) >> 1;
         if (direction != facing) {
             diff = facing - direction;
@@ -87,7 +87,7 @@ void sub_080A21EC(struct SceneActorRegistryResetView *a)
 tail:
     dr = a->drawable;
     if (*(u16 *)(dr + 0x56) == 0) {
-        s32 g = a->direction;
+        s32 g = a->body.direction;
         target = (((*((u8 *)a + 0x3CD) + 5) & 7) << 5);
         diff = g - target;
         if (diff < 0)
@@ -98,19 +98,19 @@ tail:
                 if (d < 0)
                     d = -d;
                 if (d <= 0x80)
-                    a->direction = g + 0x40;
+                    a->body.direction = g + 0x40;
                 else
-                    a->direction = g - 0x40;
+                    a->body.direction = g - 0x40;
             } else if (g > target) {
                 if (d < 0)
                     d = -d;
                 if (d <= 0x80)
-                    a->direction = g - 0x40;
+                    a->body.direction = g - 0x40;
                 else
-                    a->direction = g + 0x40;
+                    a->body.direction = g + 0x40;
             }
         } else
-            a->direction = target;
+            a->body.direction = target;
     }
     if (a->flags2D4 & 0xA02F) {
         a->field2C2 = 0x40;
@@ -124,7 +124,7 @@ tail:
         Anim_SetFrameDurationScale(dr + 0x20, *scale);
     if (a->field2B3) {
         a->field2B0 = 1;
-        a->direction = ((((a->direction + 0x60) >> 6) & 3) << 6) - 0x40;
+        a->body.direction = ((((a->body.direction + 0x60) >> 6) & 3) << 6) - 0x40;
         SceneActorAnimation_SelectDirectionalEntry(a, 0);
     }
 }
