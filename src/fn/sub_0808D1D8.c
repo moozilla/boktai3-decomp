@@ -4,13 +4,9 @@
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
 #include "scene_actor_init_primitives.h"
+#include "scene_actor_init_graphics.h"
 
 void Memory_Clear(void *, u32);
-void AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, u32);
-void SceneActorAnimation_InitEnemySequence(void *, u32);
-void ResourceHeader_Relocate(void *, void *);
-void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void Ghoul_BindProfile(void *);
 void Vorn_ParseField624_0808B320(void *);
 void Ghoul_Update(void);
@@ -58,12 +54,7 @@ void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 
-struct GhoulInit32Block {
-    u32 w[8];
-};
-
 void *Heap_Alloc(u32);
-void *ScriptProc_Start(u32, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 extern const u8 gUnk_086108B0[];
 void AnimData_SelectPaletteBank(void *, s32);
@@ -85,14 +76,6 @@ struct GhoulInstanceState {
 };
 
 extern u8 *gUnknown_02000580;
-
-static inline void GhoulInit_DrawablePosition(struct SceneActorRegistryResetView *actor)
-{
-    if (MonsterInit_GetDrawableKind(actor) == 0)
-        *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
-    else
-        *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
-}
 
 static inline void GhoulInit_InitializeBody(void *object, u32 *fill)
 {
@@ -160,7 +143,7 @@ static inline void GhoulInit_InitializeBody(void *object, u32 *fill)
     rt = &group->homeRoute;
     if (MonsterInit_ReadRoute(arg0, group, rt)) {
         MonsterInit_SnapToRoute(&arg0->body.position, rt);
-        GhoulInit_DrawablePosition(arg0);
+        MonsterInit_DrawablePosition(arg0);
         arg0->body.direction = Route_GetCurrentPointFacing(rt);
     }
 
@@ -174,16 +157,6 @@ static inline void GhoulInit_InitializeBody(void *object, u32 *fill)
 
     group->common.bodyId = arg0->body.id;
     group->common.bodyPosition = &arg0->body.position;
-}
-
-struct GhoulInitWidget {
-    u8 unknown0[0x3A];
-    u16 paletteBank;
-};
-static inline void GhoulInit_SetWidgetScriptPalette(struct GhoulInitWidget *widget,
-                                                    s32 scriptPalette)
-{
-    widget->paletteBank = scriptPalette - 0x5FFF;
 }
 
 static inline void GhoulInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
@@ -200,8 +173,8 @@ static inline void GhoulInit_ReadPalette(struct SceneActorRegistryResetView *act
     else
         *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
     if (MonsterInit_GetDrawableKind(actor) == 1)
-        GhoulInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
-                                         SceneActorScript_GetManagerField62());
+        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
+                                           SceneActorScript_GetManagerField62());
 }
 
 static inline void GhoulInit_InstallPrimary(struct SceneActorRegistryResetView *arg0, void *cb0,
@@ -264,26 +237,10 @@ static inline void GhoulInit_InitializePaletteRange(struct SceneActorRegistryRes
     actor->paletteBank = MonsterInit_GetPaletteBase(actor) + current;
 }
 
-static inline void GhoulInit_InitializeSprite(u8 *drawable, u16 resource, u16 sequence)
-{
-    AnimData_Load(drawable + 0x2C, resource);
-    Sprite_Init(drawable, drawable + 0x2C, 0);
-    SceneActorAnimation_InitEnemySequence(drawable, sequence);
-}
-
 static inline void GhoulInit_SetContactCallback(struct SceneActorRegistryResetView *actor,
                                                 void *callback)
 {
     actor->contactCallback = callback;
-}
-
-static inline void GhoulInit_InitializeWidget(u8 *drawable, u16 script, u16 resource,
-                                              struct ContactPosition *position)
-{
-    void *source = ScriptProc_Start(script, resource);
-    *(struct GhoulInit32Block *)drawable = *(struct GhoulInit32Block *)source;
-    ResourceHeader_Relocate(drawable, source);
-    Widget_InitLinked(drawable + 0x20, drawable, 0, 0, 2, 2, 0x3C, position);
 }
 
 s32 Ghoul_Init(void *object)
@@ -308,7 +265,7 @@ s32 Ghoul_Init(void *object)
         actor->drawable = Heap_Alloc(0x5C);
         Memory_Clear(actor->drawable, 0x5C);
         heap = MonsterInit_Drawable(actor);
-        GhoulInit_InitializeSprite(heap, 0x9247, 0x1DF8);
+        MonsterInit_InitializeSprite(heap, 0x9247, 0x1DF8);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             heap[7] = 1;
         actor->body.direction = 0;
@@ -318,7 +275,7 @@ s32 Ghoul_Init(void *object)
         Memory_Clear(actor->drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
-        GhoulInit_InitializeWidget(heap, 0xCB05, 0x9247, &tmp);
+        MonsterInit_InitializeWidget(heap, 0xCB05, 0x9247, &tmp);
         actor->animationIndex = 0xFF;
     }
     GhoulInit_InitializeBody(arg0, &zero);

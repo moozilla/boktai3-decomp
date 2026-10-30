@@ -4,14 +4,9 @@
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
 #include "scene_actor_init_group.h"
+#include "scene_actor_init_graphics.h"
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
-void AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, u32);
-void SceneActorAnimation_InitEnemySequence(void *, u32);
-void *ScriptProc_Start(u32, u32);
-void ResourceHeader_Relocate(void *, void *);
-void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void TentacleActor_InitProfile(void *);
 void SceneActorReaction_OnEnemyDefault(void);
@@ -32,9 +27,6 @@ void SceneActorTerrain_ReadScriptParameters(void *);
 u8 SceneActorRegistry_LinkActor(void *);
 
 extern SceneActorCommandHandler const gUnk_086108B0[];
-struct MonsterInit32Block {
-    u32 w[8];
-};
 struct TentacleInstanceState {
     u8 unknown0[0x8D0];
     u16 flags;
@@ -68,15 +60,6 @@ void TentacleBody_InitSegmentAnimations(void *, u32, u32, u32);
 void TentacleActor_ResetSegmentPositions(void *, void *);
 void TentacleActor_InitSegmentColliders(void *);
 void TentacleActor_ActivateMarkedSegment(void *);
-
-struct MonsterInitWidget {
-    u8 unknown0[0x3A];
-    u16 paletteBank;
-};
-static inline void MonsterInit_SetWidgetPalette(struct MonsterInitWidget *widget, u32 palette)
-{
-    widget->paletteBank = palette;
-}
 
 static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView *arg0, u32 *fill)
 {
@@ -185,13 +168,6 @@ static inline void Tentacle_InstallCompletionCallbacks(struct SceneActorRegistry
     actor->destroyCallback = TentacleBody_Destroy;
 }
 
-static inline void MonsterInit_InitializeSprite(u8 *drawable, u16 resource, u16 sequence)
-{
-    AnimData_Load(drawable + 0x2C, resource);
-    Sprite_Init(drawable, drawable + 0x2C, 0);
-    SceneActorAnimation_InitEnemySequence(drawable, sequence);
-}
-
 static inline void Tentacle_InstallRoutes(struct SceneActorRegistryResetView *actor)
 {
     actor->callback248 = ActorTrail_ResetAtSavedPosition;
@@ -235,7 +211,7 @@ s32 TentacleActor_Init(void *object)
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         res = ScriptProc_Start(0xCB05, 0xD636);
-        *(struct MonsterInit32Block *)heap = *(struct MonsterInit32Block *)res;
+        *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
         Widget_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
         actor->animationIndex = 0xFF;

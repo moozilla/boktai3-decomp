@@ -4,15 +4,10 @@
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
 #include "scene_actor_init_group.h"
+#include "scene_actor_init_graphics.h"
 typedef void (*MonsterInitCommandHandler)(void *actor, const u16 *command);
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
-void AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, u32);
-void SceneActorAnimation_InitEnemySequence(void *, u32);
-void *ScriptProc_Start(u32, u32);
-void ResourceHeader_Relocate(void *, void *);
-void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void Lun_InitProfile(void *);
 void Lun_OnUpdate(void);
@@ -54,9 +49,6 @@ u8 SceneActorRegistry_LinkActor(void *);
 
 extern MonsterInitCommandHandler const gUnk_08605E78[];
 extern MonsterInitCommandHandler const gUnk_086108B0[];
-struct MonsterInit32Block {
-    u32 w[8];
-};
 struct LunActor {
     u8 unknown0[0x3D4];
     u32 flags;
@@ -72,14 +64,6 @@ u32 Route_GetCurrentPointFacing(void *);
 void Lun_InitReactionTable(void *);
 
 #define SV(d) MonsterInit_ReadWord(d)
-struct MonsterInitWidget {
-    u8 unknown0[0x3A];
-    u16 paletteBank;
-};
-static inline void MonsterInit_SetWidgetPalette(struct MonsterInitWidget *widget, u32 palette)
-{
-    widget->paletteBank = palette;
-}
 
 static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView *arg0, u32 *fill)
 {
@@ -199,13 +183,6 @@ static inline void Lun_InstallCompletionCallbacks(struct SceneActorRegistryReset
     actor->destroyCallback = Lun_Destroy;
 }
 
-static inline void MonsterInit_InitializeSprite(u8 *drawable, u16 resource, u16 sequence)
-{
-    AnimData_Load(drawable + 0x2C, resource);
-    Sprite_Init(drawable, drawable + 0x2C, 0);
-    SceneActorAnimation_InitEnemySequence(drawable, sequence);
-}
-
 static inline void Lun_InstallRoutes(struct SceneActorRegistryResetView *actor)
 {
     MonsterInit_WriteCommandTable(&actor->commandTable.handlers, gUnk_08605E78);
@@ -214,13 +191,6 @@ static inline void Lun_InstallRoutes(struct SceneActorRegistryResetView *actor)
     MonsterInit_WriteCallback(&actor->contactQuery.opaque, Lun_OnTargetCheck);
 }
 
-static inline void Lun_DrawablePosition(struct SceneActorRegistryResetView *actor)
-{
-    if (MonsterInit_GetDrawableKind(actor) == 0)
-        *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
-    else
-        *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
-}
 static inline u32 Lun_ReadRoute(struct SceneActorRegistryResetView *actor, struct LunActor *lun,
                                 struct SceneActorRegistryRoute *route)
 {
@@ -265,7 +235,7 @@ static inline void Lun_ReadPosition(struct SceneActorRegistryResetView *actor, s
             MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor), &actor->body.position);
         actor->groundHeight2BE = ground;
         lun->ground3DC = ground;
-        Lun_DrawablePosition(actor);
+        MonsterInit_DrawablePosition(actor);
     }
 }
 
@@ -298,7 +268,7 @@ s32 Lun_Init(void *object)
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         res = ScriptProc_Start(0xCB05, 0xD28E);
-        *(struct MonsterInit32Block *)heap = *(struct MonsterInit32Block *)res;
+        *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
         Widget_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
         actor->animationIndex = 0xFF;
@@ -308,7 +278,7 @@ s32 Lun_Init(void *object)
         struct SceneActorRegistryRoute *route = &lun->route;
         if (Lun_ReadRoute(actor, lun, route)) {
             MonsterInit_SnapToRoute(&actor->body.position, route);
-            Lun_DrawablePosition(actor);
+            MonsterInit_DrawablePosition(actor);
             actor->body.direction = Route_GetCurrentPointFacing(route);
         }
     }

@@ -7,14 +7,12 @@
 #include "game_state.h"
 #include "scene_actor_animation.h"
 #include "scene_actor_init_group.h"
+#include "scene_actor_init_graphics.h"
 #define U8(p, n)  (*((u8 *)(p) + (n)))
 #define U32(p, n) (*(u32 *)((u8 *)(p) + (n)))
 #define PTR(p, n) (*(void **)((u8 *)(p) + (n)))
-#define POS(p, n) (*(struct ContactPosition *)((u8 *)(p) + (n)))
 void SceneActorRegistry_SetObjectContext(void *, void *, u32, void *);
 void Ghost_InitActorProfile(void *);
-void SceneActorAnimation_InitEnemySequence(void *, u32);
-void Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
 void SceneBody_Init(void *, u32, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void SceneBody_SetMovementProbe(void *, void *, u32, u32);
@@ -71,9 +69,6 @@ struct GhostInstanceState {
     u8 unknown620[2];
     u16 routeDelay;
 };
-struct ResourceCopy {
-    u32 words[8];
-};
 static inline void Ghost_SetInstanceFlags(struct GhostInstanceState *a, u32 mask)
 {
     a->flags558 |= mask;
@@ -96,13 +91,7 @@ static inline u8 Ghost_GetAnimationRestart(struct SceneActorRegistryResetView *a
 {
     return a->field2B3;
 }
-static inline void DrawablePosition(struct SceneActorRegistryResetView *a)
-{
-    if (!MonsterInit_GetDrawableKind(a))
-        POS(a->drawable, 0x1C) = a->body.position;
-    else
-        POS(a->drawable, 0x40) = a->body.position;
-}
+
 static inline void InitializeScriptFields(struct SceneActorRegistryResetView *a, u32 *fill)
 {
     struct SceneActorBody *body = &a->body;
@@ -219,14 +208,7 @@ static inline void InitializeCallbacks(struct SceneActorRegistryResetView *a)
         collider->flags = mask & collider->flags;
     }
 }
-struct GhostWidgetPalette {
-    u8 unknown0[0x3A];
-    u16 bank;
-};
-static inline void Ghost_SetWidgetPalette(struct GhostWidgetPalette *widget, s32 scriptPalette)
-{
-    widget->bank = scriptPalette - 0x5FFF;
-}
+
 static inline void Ghost_ReadPalette(struct SceneActorRegistryResetView *a, u32 base, u32 alternate)
 {
     s32 selected;
@@ -240,7 +222,8 @@ static inline void Ghost_ReadPalette(struct SceneActorRegistryResetView *a, u32 
     else
         PTR(a->drawable, 0x68) = gPaletteBankData + (selected << 5);
     if (MonsterInit_GetDrawableKind(a) == 1)
-        Ghost_SetWidgetPalette((void *)(a->drawable + 0x20), SceneActorScript_GetManagerField62());
+        MonsterInit_SetWidgetScriptPalette((void *)(a->drawable + 0x20),
+                                           SceneActorScript_GetManagerField62());
     a->alternatePalette = MonsterInit_GetPaletteBase(a);
     a->paletteBank = MonsterInit_GetPaletteBase(a) + 2;
     a->field1EA = 0x1EE;
@@ -318,7 +301,7 @@ static inline void Ghost_InitializeDrawable(struct SceneActorRegistryResetView *
         d = MonsterInit_Drawable(a);
         MonsterInit_ClearPosition(fill, &zero);
         res = ScriptProc_Start(0xCB05, 0xD637);
-        *(struct ResourceCopy *)d = *(struct ResourceCopy *)res;
+        *(struct DisplayResourceHeader *)d = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(d, res);
         Widget_InitLinked(d + 0x20, d, 0, 0, 2, 2, 0x3C, &zero);
         a->animationIndex = 0xFF;
@@ -379,7 +362,7 @@ s32 Ghost_Init(void *object)
             dest->z = MonsterInit_RoutePointZRaw(link);
             dest->y = MonsterInit_TerrainHeight(MonsterInit_CellIndex(dest), dest);
         }
-        DrawablePosition(a);
+        MonsterInit_DrawablePosition(a);
         a->body.direction = Route_GetCurrentPointFacing(route);
     }
     if (Script_SeekToKeyword('p')) {
@@ -390,7 +373,7 @@ s32 Ghost_Init(void *object)
         a->groundHeight2BE =
             MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(a), &a->body.position);
         arg0->baseHeight = a->groundHeight2BE;
-        DrawablePosition(a);
+        MonsterInit_DrawablePosition(a);
     } else
         arg0->baseHeight = a->groundHeight2BE;
     arg0->routeDelay = MonsterInit_ReadKeywordHalfword('l', 0);

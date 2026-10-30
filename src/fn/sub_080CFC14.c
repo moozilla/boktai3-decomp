@@ -5,19 +5,10 @@
 #include "scene_actor_init_primitives.h"
 #include "scene_actor_init_group.h"
 #include "scene_actor_init_dispatch.h"
-
-struct GolemResourceBlock {
-    u32 w[8];
-};
+#include "scene_actor_init_graphics.h"
 
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
-void AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, u32);
-void SceneActorAnimation_InitEnemySequence(void *, u32);
-void *ScriptProc_Start(u32, u32);
-void ResourceHeader_Relocate(void *, void *);
-void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void sub_08080BE0(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
@@ -68,14 +59,6 @@ static inline void GolemInit_ResetFlags(void *object)
 {
     struct GolemInstanceState *actor = object;
     actor->field628 = 0;
-}
-
-static inline void MonsterInit_DrawablePosition(struct SceneActorRegistryResetView *actor)
-{
-    if (MonsterInit_GetDrawableKind(actor) == 0)
-        *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
-    else
-        *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
 }
 
 static inline void GolemInit_InitializeBody(void *object, u32 *fill)
@@ -160,15 +143,6 @@ static inline void GolemInit_InitializeBody(void *object, u32 *fill)
     group->common.bodyPosition = &arg0->body.position;
 }
 
-struct GolemInitWidget {
-    u8 unknown0[0x3A];
-    u16 paletteBank;
-};
-static inline void GolemInit_SetWidgetScriptPalette(struct GolemInitWidget *widget, s32 palette)
-{
-    widget->paletteBank = palette - 0x5FFF;
-}
-
 static inline void GolemInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
                                          u32 alternate)
 {
@@ -183,8 +157,8 @@ static inline void GolemInit_ReadPalette(struct SceneActorRegistryResetView *act
     else
         *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
     if (MonsterInit_GetDrawableKind(actor) == 1)
-        GolemInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
-                                         SceneActorScript_GetManagerField62());
+        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
+                                           SceneActorScript_GetManagerField62());
 }
 
 static inline void GolemInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
@@ -265,22 +239,6 @@ static inline void GolemInit_InstallCompletionCallbacks(struct SceneActorRegistr
     arg0->destroyCallback = Golem_OnDestroy;
 }
 
-static inline void GolemInit_InitializeSprite(u8 *drawable, u16 resource, u16 sequence)
-{
-    AnimData_Load(drawable + 0x2C, resource);
-    Sprite_Init(drawable, drawable + 0x2C, 0);
-    SceneActorAnimation_InitEnemySequence(drawable, sequence);
-}
-
-static inline void GolemInit_InitializeWidget(u8 *drawable, u16 script, u16 resource,
-                                              struct ContactPosition *position)
-{
-    void *source = ScriptProc_Start(script, resource);
-    *(struct GolemResourceBlock *)drawable = *(struct GolemResourceBlock *)source;
-    ResourceHeader_Relocate(drawable, source);
-    Widget_InitLinked(drawable + 0x20, drawable, 0, 0, 2, 2, 0x3C, position);
-}
-
 static inline void GolemInit_InitializePaletteRange(struct SceneActorRegistryResetView *actor,
                                                     u32 alternate, u32 current)
 {
@@ -306,7 +264,7 @@ s32 Golem_Init(void *object)
         actor->drawable = Heap_Alloc(0x5C);
         Memory_Clear(actor->drawable, 0x5C);
         heap = MonsterInit_Drawable(actor);
-        GolemInit_InitializeSprite(heap, 0x5290, 0x1E38);
+        MonsterInit_InitializeSprite(heap, 0x5290, 0x1E38);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             heap[7] = 1;
         actor->body.direction = 0;
@@ -316,7 +274,7 @@ s32 Golem_Init(void *object)
         Memory_Clear(actor->drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
-        GolemInit_InitializeWidget(heap, 0xCB05, 0x5290, &tmp);
+        MonsterInit_InitializeWidget(heap, 0xCB05, 0x5290, &tmp);
         actor->animationIndex = 0xFF;
     }
     GolemInit_InitializeBody(arg0, &zero);
@@ -335,7 +293,7 @@ s32 Golem_Init(void *object)
     GolemInit_SetRouteReset(actor, Golem_ResetCombatState);
     GolemInit_SetReactionGate(actor, SceneActorControl_RefreshMotionRoute);
     GolemInit_SetContactCallback(actor, Golem_UpdateHitReaction);
-    group->responseCallback = (u32)Golem_ClearControlFlag;
+    group->responseCallback = Golem_ClearControlFlag;
     group->field5EC = Golem_RestoreRoute;
     actor->field2E8 = 0;
     GolemInit_EnableInitialFlags(actor);

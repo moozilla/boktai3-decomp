@@ -5,19 +5,10 @@
 #include "scene_actor_init_primitives.h"
 #include "scene_actor_init_group.h"
 #include "scene_actor_init_dispatch.h"
-
-struct SkeletonResourceBlock {
-    u32 w[8];
-};
+#include "scene_actor_init_graphics.h"
 
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
-void AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, u32);
-void SceneActorAnimation_InitEnemySequence(void *, u32);
-void *ScriptProc_Start(u32, u32);
-void ResourceHeader_Relocate(void *, void *);
-void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void sub_08080BE0(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
@@ -97,14 +88,6 @@ static inline void SkeletonInit_ResetFlags(void *object)
 static inline void SkeletonInit_SetFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     ((struct SkeletonInstanceState *)actor)->field6DC |= mask;
-}
-
-static inline void MonsterInit_DrawablePosition(struct SceneActorRegistryResetView *actor)
-{
-    if (MonsterInit_GetDrawableKind(actor) == 0)
-        *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
-    else
-        *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
 }
 
 static inline void SkeletonInit_InitializeBody(void *object, u32 *fill)
@@ -189,17 +172,9 @@ static inline void SkeletonInit_InitializeBody(void *object, u32 *fill)
     group->common.bodyPosition = &arg0->body.position;
 }
 
-struct SkelWidget {
-    u8 unknown0[0x3A];
-    u16 paletteBank;
-};
-static inline void SkeletonInit_SetWidgetScriptPalette(struct SkelWidget *widget, s32 palette)
+static inline void SkeletonInit_ReadWidgetRelativePalette(struct DisplayKeyframeState *widget)
 {
-    widget->paletteBank = palette - 0x5FFF;
-}
-static inline void SkeletonInit_ReadWidgetRelativePalette(struct SkelWidget *widget)
-{
-    widget->paletteBank = Script_GetPc() ? Script_GetValue() + 0x12B : 0x12B;
+    widget->paletteIndex = Script_GetPc() ? Script_GetValue() + 0x12B : 0x12B;
 }
 
 static inline void SkeletonInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
@@ -216,8 +191,8 @@ static inline void SkeletonInit_ReadPalette(struct SceneActorRegistryResetView *
     else
         *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
     if (MonsterInit_GetDrawableKind(actor) == 1)
-        SkeletonInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
-                                            SceneActorScript_GetManagerField62());
+        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
+                                           SceneActorScript_GetManagerField62());
 }
 
 static inline void SkeletonInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
@@ -266,21 +241,6 @@ static inline void SkeletonInit_InstallCompletionCallbacks(struct SceneActorRegi
     arg0->destroyCallback = Skeleton_Destroy;
 }
 
-static inline void SkeletonInit_InitializeSprite(u8 *drawable, u16 resource, u16 sequence)
-{
-    AnimData_Load(drawable + 0x2C, resource);
-    Sprite_Init(drawable, drawable + 0x2C, 0);
-    SceneActorAnimation_InitEnemySequence(drawable, sequence);
-}
-
-static inline void SkeletonInit_InitializeWidget(u8 *drawable, u16 script, u16 resource,
-                                                 struct ContactPosition *position)
-{
-    void *source = ScriptProc_Start(script, resource);
-    *(struct SkeletonResourceBlock *)drawable = *(struct SkeletonResourceBlock *)source;
-    ResourceHeader_Relocate(drawable, source);
-    Widget_InitLinked(drawable + 0x20, drawable, 0, 0, 2, 2, 0x3C, position);
-}
 static inline void SkeletonInit_SetFlagWord(u32 mask, u32 *field)
 {
     *field |= mask;
@@ -310,7 +270,7 @@ s32 Skeleton_Init(void *object)
         actor->drawable = Heap_Alloc(0x5C);
         Memory_Clear(actor->drawable, 0x5C);
         heap = MonsterInit_Drawable(actor);
-        SkeletonInit_InitializeSprite(heap, 0xAE52, 0);
+        MonsterInit_InitializeSprite(heap, 0xAE52, 0);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             heap[7] = 1;
         actor->body.direction = 0;
@@ -320,7 +280,7 @@ s32 Skeleton_Init(void *object)
         Memory_Clear(actor->drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
-        SkeletonInit_InitializeWidget(heap, 0xCB05, 0xAE52, &tmp);
+        MonsterInit_InitializeWidget(heap, 0xCB05, 0xAE52, &tmp);
         actor->animationIndex = 0xFF;
     }
 

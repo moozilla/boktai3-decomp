@@ -5,6 +5,7 @@
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
 #include "scene_actor_init_primitives.h"
+#include "scene_actor_init_graphics.h"
 
 void Octopus_InitProfileId(void *);
 s32 Octopus_Update(void *);
@@ -19,11 +20,6 @@ void Octopus_Destroy(void);
 extern const u8 gUnk_0860635C[];
 
 void Memory_Clear(void *, u32);
-void AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, u32);
-void SceneActorAnimation_InitEnemySequence(void *, u32);
-void ResourceHeader_Relocate(void *, void *);
-void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 u32 SceneActorReaction_OnEnemyDefault(void);
 u8 sub_0807F81C(void *);
 
@@ -45,12 +41,7 @@ void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 
-struct OctopusInit32Block {
-    u32 w[8];
-};
-
 void *Heap_Alloc(u32);
-void *ScriptProc_Start(u32, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 
 void AnimData_SelectPaletteBank(void *, s32);
@@ -164,16 +155,6 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
     group->common.bodyPosition = &arg0->body.position;
 }
 
-struct OctopusInitWidget {
-    u8 unknown0[0x3A];
-    u16 paletteBank;
-};
-static inline void OctopusInit_SetWidgetScriptPalette(struct OctopusInitWidget *widget,
-                                                      s32 scriptPalette)
-{
-    widget->paletteBank = scriptPalette - 0x5FFF;
-}
-
 static inline void OctopusInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
                                            u32 alternate)
 {
@@ -188,7 +169,7 @@ static inline void OctopusInit_ReadPalette(struct SceneActorRegistryResetView *a
     else
         *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
     if (MonsterInit_GetDrawableKind(actor) == 1)
-        OctopusInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
+        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
                                            SceneActorScript_GetManagerField62());
 }
 
@@ -199,26 +180,10 @@ static inline void OctopusInit_InstallCompletionCallbacks(struct SceneActorRegis
     arg0->destroyCallback = Octopus_Destroy;
 }
 
-static inline void OctopusInit_InitializeSprite(u8 *drawable, u16 resource, u16 sequence)
-{
-    AnimData_Load(drawable + 0x2C, resource);
-    Sprite_Init(drawable, drawable + 0x2C, 0);
-    SceneActorAnimation_InitEnemySequence(drawable, sequence);
-}
-
 static inline void OctopusInit_InstallRoutes(struct SceneActorRegistryResetView *actor)
 {
     actor->callback248 = SceneActorControl_UpdateMotionPhase_080EBD0C;
     MonsterInit_WriteDataPointer(&actor->commandTable.opaque, gUnk_0860635C);
-}
-
-static inline void OctopusInit_InitializeWidget(u8 *drawable, u16 script, u16 resource,
-                                                struct ContactPosition *position)
-{
-    void *source = ScriptProc_Start(script, resource);
-    *(struct OctopusInit32Block *)drawable = *(struct OctopusInit32Block *)source;
-    ResourceHeader_Relocate(drawable, source);
-    Widget_InitLinked(drawable + 0x20, drawable, 0, 0, 2, 2, 0x3C, position);
 }
 
 static inline void OctopusInit_ResetCapture(void *object)
@@ -245,7 +210,7 @@ s32 Octopus_Init(void *object)
         actor->drawable = Heap_Alloc(0x5C);
         Memory_Clear(actor->drawable, 0x5C);
         heap = MonsterInit_Drawable(actor);
-        OctopusInit_InitializeSprite(heap, 0xD291, 0xDCEB);
+        MonsterInit_InitializeSprite(heap, 0xD291, 0xDCEB);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             heap[7] = 1;
         actor->body.direction = 0;
@@ -255,7 +220,7 @@ s32 Octopus_Init(void *object)
         Memory_Clear(actor->drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
-        OctopusInit_InitializeWidget(heap, 0xCB05, 0xD291, &tmp);
+        MonsterInit_InitializeWidget(heap, 0xCB05, 0xD291, &tmp);
         actor->animationIndex = 0xFF;
     }
     OctopusInit_InitializeBody(actor, &zero);

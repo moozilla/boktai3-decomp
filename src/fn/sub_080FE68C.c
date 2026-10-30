@@ -5,6 +5,7 @@
 #include "display_sequence_inline.h"
 #include "player.h"
 #include "scene_actor_init_primitives.h"
+#include "scene_actor_init_graphics.h"
 
 void Axe_InitProfile(void *);
 void Axe_InitAttackCooldowns(void *);
@@ -36,11 +37,6 @@ void Axe_OnRender(void);
 void Axe_ReleaseResources(void);
 
 void Memory_Clear(void *, u32);
-void AnimData_Load(void *, u32);
-void Sprite_Init(void *, void *, u32);
-void SceneActorAnimation_InitEnemySequence(void *, u32);
-void ResourceHeader_Relocate(void *, void *);
-void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void SceneActorReaction_OnEnemyDefault(void);
 u8 sub_0807F81C(void *);
 void SceneActorReaction_SinkAndRemove(void);
@@ -61,12 +57,7 @@ void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 
-struct AxeInit32Block {
-    u32 w[8];
-};
-
 void *Heap_Alloc(u32);
-void *ScriptProc_Start(u32, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 extern const u8 gUnk_086108B0[];
 void AnimData_SelectPaletteBank(void *, s32);
@@ -89,14 +80,6 @@ struct AxeInstanceState {
 };
 
 extern u8 *gUnknown_02000580;
-
-static inline void AxeInit_DrawablePosition(struct SceneActorRegistryResetView *actor)
-{
-    if (MonsterInit_GetDrawableKind(actor) == 0)
-        *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
-    else
-        *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
-}
 
 static inline void AxeInit_InitializeBody(void *object, u32 *fill)
 {
@@ -164,7 +147,7 @@ static inline void AxeInit_InitializeBody(void *object, u32 *fill)
     rt = &group->homeRoute;
     if (MonsterInit_ReadRoute(arg0, group, rt)) {
         MonsterInit_SnapToRoute(&arg0->body.position, rt);
-        AxeInit_DrawablePosition(arg0);
+        MonsterInit_DrawablePosition(arg0);
         arg0->body.direction = Route_GetCurrentPointFacing(rt);
     }
 
@@ -178,15 +161,6 @@ static inline void AxeInit_InitializeBody(void *object, u32 *fill)
 
     group->common.bodyId = arg0->body.id;
     group->common.bodyPosition = &arg0->body.position;
-}
-
-struct AxeInitWidget {
-    u8 unknown0[0x3A];
-    u16 paletteBank;
-};
-static inline void AxeInit_SetWidgetScriptPalette(struct AxeInitWidget *widget, s32 scriptPalette)
-{
-    widget->paletteBank = scriptPalette - 0x5FFF;
 }
 
 static inline void AxeInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
@@ -203,8 +177,8 @@ static inline void AxeInit_ReadPalette(struct SceneActorRegistryResetView *actor
     else
         *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
     if (MonsterInit_GetDrawableKind(actor) == 1)
-        AxeInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
-                                       SceneActorScript_GetManagerField62());
+        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
+                                           SceneActorScript_GetManagerField62());
 }
 
 static inline void AxeInit_InstallPrimary(struct SceneActorRegistryResetView *arg0, void *cb0,
@@ -241,26 +215,10 @@ static inline void AxeInit_InstallCompletionCallbacks(struct SceneActorRegistryR
     arg0->destroyCallback = Axe_ReleaseResources;
 }
 
-static inline void AxeInit_InitializeSprite(u8 *drawable, u16 resource, u16 sequence)
-{
-    AnimData_Load(drawable + 0x2C, resource);
-    Sprite_Init(drawable, drawable + 0x2C, 0);
-    SceneActorAnimation_InitEnemySequence(drawable, sequence);
-}
-
 static inline void AxeInit_InstallRoutes(struct SceneActorRegistryResetView *actor)
 {
     actor->callback248 = SceneActorControl_InitializeHoverState;
     actor->field23C = Axe_OnReaction;
-}
-
-static inline void AxeInit_InitializeWidget(u8 *drawable, u16 script, u16 resource,
-                                            struct ContactPosition *position)
-{
-    void *source = ScriptProc_Start(script, resource);
-    *(struct AxeInit32Block *)drawable = *(struct AxeInit32Block *)source;
-    ResourceHeader_Relocate(drawable, source);
-    Widget_InitLinked(drawable + 0x20, drawable, 0, 0, 2, 2, 0x3C, position);
 }
 
 static inline u8 AxeInit_BoundedVariant(s32 variant)
@@ -307,7 +265,7 @@ s32 Axe_Init(void *object)
         actor->drawable = Heap_Alloc(0x5C);
         Memory_Clear(actor->drawable, 0x5C);
         heap = MonsterInit_Drawable(actor);
-        AxeInit_InitializeSprite(heap, 0x5291, 0x3F72);
+        MonsterInit_InitializeSprite(heap, 0x5291, 0x3F72);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             heap[7] = 1;
         actor->body.direction = 0;
@@ -317,7 +275,7 @@ s32 Axe_Init(void *object)
         Memory_Clear(actor->drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
-        AxeInit_InitializeWidget(heap, 0xCB05, 0x5291, &tmp);
+        MonsterInit_InitializeWidget(heap, 0xCB05, 0x5291, &tmp);
         actor->animationIndex = 0xFF;
     }
     AxeInit_InitializeBody(arg0, &zero);
