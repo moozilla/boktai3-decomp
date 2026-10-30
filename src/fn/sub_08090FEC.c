@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_actor_state.h"
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
@@ -77,154 +78,8 @@ extern u8 *gGameState;
 struct MonsterInit32Block {
     u32 w[8];
 };
-struct MonsterBody {
-    u32 id;
-    u8 unknown54[0x5];
-    u8 direction;
-    u8 unknown5A[0x2];
-    struct ContactPosition position;
-    u8 unknown64[0x34];
-};
-struct MonsterAttackParameters {
-    u16 first[4];
-    u16 second[4];
-    u16 parameter[4];
-    u32 flags[4];
-};
-struct MonsterInitTargeting {
-    u32 fieldDC;
-    u8 unknownE0[0xA];
-    u8 fieldEA;
-    u8 fieldEB;
-    u16 fieldEC;
-    u16 fieldEE;
-    u8 unknownF0[0x4];
-    u32 fieldF4;
-    u32 fieldF8;
-    u32 fieldFC;
-};
-struct MonsterInitSavedControl {
-    u32 field118;
-    u32 field11C;
-    u8 field120;
-    u8 field121;
-    u8 field122;
-    u8 field123;
-    void *field124;
-    u8 field128;
-    u8 unknown129[0x3];
-    u16 field12C;
-    u16 field12E;
-    u32 field130;
-};
-struct MonsterInitActor {
-    u8 unknown0[0x4];
-    u8 *drawable;
-    u8 drawableKind;
-    u8 unknown9[0x47];
-    struct MonsterBody body;
-    u8 category;
-    u8 unknown99[0x1];
-    u16 field9A;
-    u16 field9C;
-    u8 field9E;
-    u8 field9F;
-    u8 fieldA0;
-    u8 fieldA1;
-    u16 fieldA2;
-    u16 fieldA4;
-    u16 fieldA6;
-    u16 fieldA8;
-    u16 fieldAA;
-    u32 fieldAC;
-    u16 fieldB0;
-    u16 fieldB2;
-    struct MonsterAttackParameters attacks;
-    struct MonsterInitTargeting targeting;
-    u8 unknown100[0x4];
-    u32 field104;
-    u32 field108;
-    u32 field10C;
-    u32 field110;
-    u32 field114;
-    struct MonsterInitSavedControl saved;
-    u8 unknown134[0x6];
-    u16 field13A;
-    u8 unknown13C[0x3C];
-    u16 field178;
-    u8 unknown17A[0x66];
-    u16 field1E0;
-    u16 field1E2;
-    u16 field1E4;
-    u16 field1E6;
-    u8 unknown1E8[0x4];
-    u32 field1EC;
-    u32 field1F0;
-    u8 unknown1F4[0x28];
-    void *field21C;
-    void *field220;
-    void *field224;
-    void *field228;
-    void *field22C;
-    void *field230;
-    void *field234;
-    void *field238;
-    void *field23C;
-    void *field240;
-    u8 unknown244[0x4];
-    void *field248;
-    void *field24C;
-    MonsterInitCommandHandler const *field250;
-    u8 unknown254[0x4];
-    void *field258;
-    void *field25C;
-    void *field260;
-    void *field264;
-    void *field268;
-    void *field26C;
-    void *field270;
-    void *field274;
-    void *field278;
-    u8 unknown27C[0x2C];
-    u8 field2A8;
-    u8 field2A9;
-    u8 field2AA;
-    u8 unknown2AB[0x1];
-    u32 field2AC;
-    u8 field2B0;
-    u8 field2B1;
-    u8 field2B2;
-    u8 unknown2B3[0x1];
-    u8 field2B4;
-    u8 field2B5;
-    u8 unknown2B6[0x1];
-    u8 field2B7;
-    u8 unknown2B8[0x6];
-    u16 field2BE;
-    u16 field2C0;
-    u16 field2C2;
-    u8 unknown2C4[0x4];
-    u16 field2C8;
-    u8 unknown2CA[0x2];
-    u32 field2CC;
-    u32 field2D0;
-    u16 field2D4;
-    u8 unknown2D6[0x12];
-    u16 field2E8;
-    u16 field2EA;
-    u16 field2EC;
-    u16 field2EE;
-    u16 field2F0;
-    u8 unknown2F2[2];
-    u16 field2F4;
-    u8 unknown2F6[0x4];
-    u16 field2FA;
-    u8 unknown2FC[0x8];
-    u32 field304;
-    u8 unknown308[0xCC];
-};
 struct SlimeActor {
-    struct MonsterInitActor common;
+    u8 unknown0[0x3D4];
     u16 unknown3D4;
     u16 timeout3D6;
     u16 ground3D8;
@@ -238,152 +93,153 @@ static inline u8 MonsterInit_Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline u8 MonsterInit_GetDrawableKind(struct MonsterInitActor *actor)
+static inline u8 MonsterInit_GetDrawableKind(struct SceneActorRegistryResetView *actor)
 {
     return actor->drawableKind;
 }
-static inline u8 MonsterInit_GetCategory(struct MonsterInitActor *actor)
+static inline u8 MonsterInit_GetCategory(struct SceneActorRegistryResetView *actor)
 {
     return actor->category;
 }
-static inline u16 MonsterInit_GetHealth(struct MonsterInitActor *actor)
+static inline u16 MonsterInit_GetHealth(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field9C;
+    return actor->health;
 }
-static inline u16 MonsterInit_GetInitialHealth(struct MonsterInitActor *actor)
+static inline u16 MonsterInit_GetInitialHealth(struct SceneActorRegistryResetView *actor)
 {
-    return actor->fieldB0;
+    return actor->defaultHealth;
 }
-static inline u16 MonsterInit_GetGroundHeight(struct MonsterInitActor *actor)
+static inline u16 MonsterInit_GetGroundHeight(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2BE;
+    return actor->groundHeight2BE;
 }
-static inline u16 MonsterInit_GetPaletteBase(struct MonsterInitActor *actor)
+static inline u16 MonsterInit_GetPaletteBase(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field1E0;
+    return actor->basePaletteBank;
 }
-static inline u16 MonsterInit_GetAlternatePalette(struct MonsterInitActor *actor)
+static inline u16 MonsterInit_GetAlternatePalette(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field1E2;
+    return actor->paletteAlternateBank;
 }
-static inline u16 MonsterInit_GetCurrentPalette(struct MonsterInitActor *actor)
+static inline u16 MonsterInit_GetCurrentPalette(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field1E4;
+    return actor->alternateOffset;
 }
-static inline u16 MonsterInit_GetPaletteOffset(struct MonsterInitActor *actor)
+static inline u16 MonsterInit_GetPaletteOffset(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field1E6;
+    return actor->paletteOffset;
 }
 #define SV(d) MonsterInit_ReadWord(d)
-static inline u16 MonsterInit_GetMotionFlags(struct MonsterInitActor *actor)
+static inline u16 MonsterInit_GetMotionFlags(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2C0;
+    return actor->flags2C0;
 }
-static inline u16 MonsterInit_GetHeightOffset(struct MonsterInitActor *actor)
+static inline u16 MonsterInit_GetHeightOffset(struct SceneActorRegistryResetView *actor)
 {
     return actor->field2EA;
 }
-static inline u32 MonsterInit_GetBehaviorFlags(struct MonsterInitActor *actor)
+static inline u32 MonsterInit_GetBehaviorFlags(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2CC;
+    return actor->flags2CC;
 }
-static inline u32 MonsterInit_GetStatusFlags(struct MonsterInitActor *actor)
+static inline u32 MonsterInit_GetStatusFlags(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2D0;
+    return actor->flags2D0;
 }
-static inline u8 MonsterInit_GetState(struct MonsterInitActor *actor)
+static inline u8 MonsterInit_GetState(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2A8;
+    return actor->state2A8;
 }
-static inline u8 MonsterInit_GetPhase(struct MonsterInitActor *actor)
+static inline u8 MonsterInit_GetPhase(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2A9;
+    return actor->phase2A9;
 }
-static inline u8 MonsterInit_GetBehavior(struct MonsterInitActor *actor)
+static inline u8 MonsterInit_GetBehavior(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2AA;
+    return actor->behavior2AA;
 }
-static inline void *MonsterInit_GetCurrentControl(struct MonsterInitActor *actor)
+static inline void *MonsterInit_GetCurrentControl(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field21C;
+    return actor->target;
 }
-static inline u8 MonsterInit_GetControlKind(struct MonsterInitActor *actor)
+static inline u8 MonsterInit_GetControlKind(struct SceneActorRegistryResetView *actor)
 {
     return actor->field2B5;
 }
-static inline u8 MonsterInit_GetDirection(struct MonsterInitActor *actor)
+static inline u8 MonsterInit_GetDirection(struct SceneActorRegistryResetView *actor)
 {
     return actor->body.direction;
 }
-static inline u32 MonsterInit_GetTerrainCell(struct MonsterInitActor *actor)
+static inline u32 MonsterInit_GetTerrainCell(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2F4;
+    return actor->terrainCell;
 }
-static inline u32 MonsterInit_GetTargetingFlags(struct MonsterInitTargeting *target)
+static inline u32 MonsterInit_GetTargetingFlags(struct SceneActorChaseTracking *target)
 {
-    return target->fieldEB;
+    return target->flags;
 }
-static inline struct MonsterInitSavedControl *
-MonsterInit_SavedControlOf(struct MonsterInitActor *actor)
+static inline struct SceneActorDefaultControl *
+MonsterInit_SavedControlOf(struct SceneActorRegistryResetView *actor)
 {
-    struct MonsterInitSavedControl *saved = &actor->saved;
+    struct SceneActorDefaultControl *saved = &actor->saved;
     return saved;
 }
 static inline struct ContactPosition *MonsterInit_BodyPosition(void *object)
 {
-    struct MonsterBody *body = object;
+    struct SceneActorBody *body = object;
     struct ContactPosition *position = &body->position;
     return position;
 }
-static inline void MonsterInit_SaveControl(struct MonsterInitSavedControl *saved,
-                                           struct MonsterInitActor *actor)
+static inline void MonsterInit_SaveControl(struct SceneActorDefaultControl *saved,
+                                           struct SceneActorRegistryResetView *actor)
 {
-    saved->field12E = MonsterInit_GetMotionFlags(actor);
-    saved->field12C = MonsterInit_GetHeightOffset(actor);
-    saved->field118 = MonsterInit_GetBehaviorFlags(actor);
-    saved->field11C = MonsterInit_GetStatusFlags(actor);
-    saved->field120 = MonsterInit_GetDirection(actor);
-    saved->field121 = MonsterInit_GetState(actor);
-    saved->field122 = MonsterInit_GetPhase(actor);
-    saved->field123 = MonsterInit_GetBehavior(actor);
-    saved->field124 = MonsterInit_GetCurrentControl(actor);
-    saved->field128 = MonsterInit_GetControlKind(actor);
+    saved->motionFlags = MonsterInit_GetMotionFlags(actor);
+    saved->heightOffset = MonsterInit_GetHeightOffset(actor);
+    saved->behaviorFlags = MonsterInit_GetBehaviorFlags(actor);
+    saved->statusFlags = MonsterInit_GetStatusFlags(actor);
+    saved->direction = MonsterInit_GetDirection(actor);
+    saved->state = MonsterInit_GetState(actor);
+    saved->phase = MonsterInit_GetPhase(actor);
+    saved->behavior = MonsterInit_GetBehavior(actor);
+    saved->control = MonsterInit_GetCurrentControl(actor);
+    saved->kind = MonsterInit_GetControlKind(actor);
 }
-static inline void MonsterInit_SetStatusFlags(struct MonsterInitActor *actor, u32 mask)
+static inline void MonsterInit_SetStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    actor->field2D0 |= mask;
+    actor->flags2D0 |= mask;
 }
-static inline void MonsterInit_SetMotionFlags(struct MonsterInitActor *actor, u16 mask)
+static inline void MonsterInit_SetMotionFlags(struct SceneActorRegistryResetView *actor, u16 mask)
 {
-    actor->field2C0 |= mask;
+    actor->flags2C0 |= mask;
 }
-static inline void *MonsterInit_GetIdleControl(struct MonsterInitActor *actor)
+static inline void *MonsterInit_GetIdleControl(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field22C;
+    return actor->savedTarget;
 }
-static inline u8 MonsterInit_TestMotionFlags(struct MonsterInitActor *actor, u32 mask)
+static inline u8 MonsterInit_TestMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
     if (MonsterInit_GetMotionFlags(actor) & mask)
         return 1;
     return 0;
 }
-static inline u8 MonsterInit_TestTargetingFlags(struct MonsterInitTargeting *target, u32 mask)
+static inline u8 MonsterInit_TestTargetingFlags(struct SceneActorChaseTracking *target, u32 mask)
 {
     if (MonsterInit_GetTargetingFlags(target) & mask)
         return 1;
     return 0;
 }
-static inline void MonsterInit_ClearControlFlags(struct MonsterInitActor *actor, u32 mask)
+static inline void MonsterInit_ClearControlFlags(struct SceneActorRegistryResetView *actor,
+                                                 u32 mask)
 {
-    actor->field114 &= mask;
+    actor->flags114 &= mask;
 }
-static inline u8 MonsterInit_IsInCurrentRegion(struct MonsterInitActor *actor)
+static inline u8 MonsterInit_IsInCurrentRegion(struct SceneActorRegistryResetView *actor)
 {
-    if (*(u32 *)(gGameState + 0x5A0) == actor->field2FA)
+    if (*(u32 *)(gGameState + 0x5A0) == actor->regionId)
         return 1;
     return 0;
 }
-static inline void MonsterInit_SetControl(struct MonsterInitActor *actor, void *callback,
+static inline void MonsterInit_SetControl(struct SceneActorRegistryResetView *actor, void *callback,
                                           u32 behavior)
 {
     u32 zero = 0;
@@ -391,21 +247,21 @@ static inline void MonsterInit_SetControl(struct MonsterInitActor *actor, void *
     actor->field2B2 = one;
     actor->field2B0 = zero;
     actor->field2B5 = behavior;
-    actor->field21C = callback;
+    actor->target = callback;
     actor->field2C8 = zero;
     MonsterInit_ClearControlFlags(actor, ~1);
-    actor->field104 = zero;
+    actor->word104 = zero;
 }
-static inline void MonsterInit_SetState(struct MonsterInitActor *actor, u32 state, u32 phase,
-                                        u32 behavior)
+static inline void MonsterInit_SetState(struct SceneActorRegistryResetView *actor, u32 state,
+                                        u32 phase, u32 behavior)
 {
-    actor->field2A8 = state;
-    actor->field2A9 = phase;
-    actor->field2AA = behavior;
-    actor->field2AC = 0;
+    actor->state2A8 = state;
+    actor->phase2A9 = phase;
+    actor->behavior2AA = behavior;
+    actor->counter2AC = 0;
     actor->field2B1 = 1;
 }
-static inline void MonsterInit_ReadTargeting(struct MonsterInitTargeting *target)
+static inline void MonsterInit_ReadTargeting(struct SceneActorChaseTracking *target)
 {
     s32 r4v, r2v, r1v;
     if (Script_SeekToKeyword(0x65)) {
@@ -417,18 +273,18 @@ static inline void MonsterInit_ReadTargeting(struct MonsterInitTargeting *target
         r1v = 0x30;
         r2v = 0x40;
     }
-    target->fieldDC = 0;
-    target->fieldEC = r4v;
-    target->fieldEE = r1v;
-    target->fieldF8 = r4v * r4v;
-    target->fieldFC = r1v * r1v;
+    target->target = 0;
+    target->x = r4v;
+    target->z = r1v;
+    target->limit = r4v * r4v;
+    target->zSquared = r1v * r1v;
     target->fieldEA = r2v;
     if (MonsterInit_TestTargetingFlags(target, 4))
-        target->fieldF4 = target->fieldF8;
+        target->range = target->limit;
     else
-        target->fieldF4 = Div(target->fieldF8 * 8 - target->fieldF8, 10);
+        target->range = Div(target->limit * 8 - target->limit, 10);
 }
-static inline u8 *MonsterInit_FirstAttackData(struct MonsterInitActor *actor)
+static inline u8 *MonsterInit_FirstAttackData(struct SceneActorRegistryResetView *actor)
 {
     return (u8 *)actor->attacks.first;
 }
@@ -448,11 +304,13 @@ static inline void MonsterInit_SetWidgetPalette(struct MonsterInitWidget *widget
 {
     widget->paletteBank = palette;
 }
-static inline void MonsterInit_SetFirstAttack(struct MonsterInitActor *actor, s32 index, s32 value)
+static inline void MonsterInit_SetFirstAttack(struct SceneActorRegistryResetView *actor, s32 index,
+                                              s32 value)
 {
     actor->attacks.first[index] = value;
 }
-static inline struct MonsterInitActor *MonsterInit_ReadAttacks(struct MonsterInitActor *actor)
+static inline struct SceneActorRegistryResetView *
+MonsterInit_ReadAttacks(struct SceneActorRegistryResetView *actor)
 {
     s32 i;
     if (Script_SeekToKeyword('a')) {
@@ -478,21 +336,21 @@ static inline s32 MonsterInit_ClampHealth(u16 initialHealth)
         health = 0;
     return health;
 }
-static inline void MonsterInit_InitializeBody(struct MonsterInitActor *arg0, u32 *fill)
+static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView *arg0, u32 *fill)
 {
-    struct MonsterBody *body = &arg0->body;
+    struct SceneActorBody *body = &arg0->body;
     struct ContactPosition origin;
     s32 mode, r4v, r6v, r3v;
     s32 initialHealth, scriptVariant;
-    arg0->field2CC = 0;
-    arg0->field2D0 = 0;
-    arg0->field2B4 = 0;
+    arg0->flags2CC = 0;
+    arg0->flags2D0 = 0;
+    arg0->enabled = 0;
     arg0->field2E8 = 8;
-    arg0->field2C0 = Script_GetKeywordValue(0x4D, 0);
+    arg0->flags2C0 = Script_GetKeywordValue(0x4D, 0);
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
-    MonsterInit_ReadTargeting(&MonsterInit_ReadAttacks(arg0)->targeting);
+    MonsterInit_ReadTargeting(&MonsterInit_ReadAttacks(arg0)->tracking);
 
     if (Script_SeekToKeyword(0x6C)) {
         r6v = MonsterInit_ReadWord(0x12C);
@@ -508,7 +366,7 @@ static inline void MonsterInit_InitializeBody(struct MonsterInitActor *arg0, u32
     arg0->field1EC = (u16)Script_GetKeywordValue(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
-        arg0->fieldB0 = MonsterInit_ReadHalfword(0);
+        arg0->defaultHealth = MonsterInit_ReadHalfword(0);
         arg0->field9E = MonsterInit_ReadByte(0);
         arg0->field9F = MonsterInit_ReadByte(0);
         arg0->fieldA0 = MonsterInit_ReadByte(0);
@@ -518,17 +376,17 @@ static inline void MonsterInit_InitializeBody(struct MonsterInitActor *arg0, u32
 
     initialHealth = MonsterInit_GetInitialHealth(arg0);
     r3v = r4v;
-    arg0->field2D4 = 0;
-    arg0->field21C = SceneActorControl_OnIdle;
+    arg0->flags2D4 = 0;
+    arg0->target = SceneActorControl_OnIdle;
     arg0->field2B2 = 1;
     arg0->field2B0 = 0;
-    arg0->field9C = MonsterInit_ClampHealth(initialHealth);
+    arg0->health = MonsterInit_ClampHealth(initialHealth);
     arg0->fieldAA = 0;
     if (r3v <= 0)
         r3v = r6v;
-    arg0->fieldA6 = r6v;
+    arg0->attachmentLimit = r6v;
     arg0->fieldA8 = r3v;
-    arg0->field2FA = 0;
+    arg0->regionId = 0;
 
     if (Script_SeekToKeyword(0x58)) {
         arg0->fieldAC = MonsterInit_ReadWord(0);
@@ -546,24 +404,26 @@ static inline void MonsterInit_InitializeBody(struct MonsterInitActor *arg0, u32
     SceneBody_SetSprite(body, arg0->drawableKind ? 0 : arg0->drawable);
     SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 }
-static inline u8 *MonsterInit_Drawable(struct MonsterInitActor *actor)
+static inline u8 *MonsterInit_Drawable(struct SceneActorRegistryResetView *actor)
 {
     return actor->drawable;
 }
-static inline void MonsterInit_SetBehaviorFlags(struct MonsterInitActor *actor, u32 mask)
+static inline void MonsterInit_SetBehaviorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    actor->field2CC |= mask;
+    actor->flags2CC |= mask;
 }
-static inline void MonsterInit_SetCurrentPalette(struct MonsterInitActor *actor, u32 palette)
+static inline void MonsterInit_SetCurrentPalette(struct SceneActorRegistryResetView *actor,
+                                                 u32 palette)
 {
-    actor->field1E4 = palette;
+    actor->alternateOffset = palette;
 }
-static inline void Slime_ReadPalette(struct MonsterInitActor *actor, u16 base, u16 alternate)
+static inline void Slime_ReadPalette(struct SceneActorRegistryResetView *actor, u16 base,
+                                     u16 alternate)
 {
     s32 r1v;
-    actor->field1E6 = Script_GetKeywordValue(0x43, 0);
-    actor->field1E0 = base;
-    actor->field1E2 = alternate;
+    actor->paletteOffset = Script_GetKeywordValue(0x43, 0);
+    actor->basePaletteBank = base;
+    actor->paletteAlternateBank = alternate;
     MonsterInit_SetCurrentPalette(actor, MonsterInit_GetPaletteOffset(actor) + 0xCC);
     r1v = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0)
@@ -576,47 +436,57 @@ static inline void Slime_ReadPalette(struct MonsterInitActor *actor, u16 base, u
 }
 static inline void MonsterInit_ClearMotion(void *object)
 {
-    struct MonsterInitActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     u32 zero = 0;
-    actor->field104 = zero;
-    actor->field108 = zero;
-    actor->field10C = zero;
-    actor->field110 = zero;
-    actor->field114 = zero;
+    actor->word104 = zero;
+    actor->word108 = zero;
+    actor->word10C = zero;
+    actor->word110 = zero;
+    actor->flags114 = zero;
 }
-static inline void MonsterInit_InstallPrimary(struct MonsterInitActor *actor, void *cb0, void *cb1,
-                                              void *cb2, void *cb3, void *cb4, void *hidden,
-                                              void *cb5, void *cb6, void *defaultReaction,
-                                              void *targetQuery, void *damage, void *contact)
+static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView *actor, void *cb0,
+                                              void *cb1, void *cb2, void *cb3, void *cb4,
+                                              void *hidden, void *cb5, void *cb6,
+                                              void *defaultReaction, void *targetQuery,
+                                              void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
-    actor->field274 = cb0;
-    actor->field260 = cb1;
-    actor->field224 = cb2;
-    actor->field228 = cb3;
-    actor->field22C = cb4;
-    actor->field230 = cb5;
-    actor->field234 = cb6;
+    actor->contextCallback = cb0;
+    {
+        void **slot = &actor->animationQuery.opaque;
+        *slot = cb1;
+    }
+    actor->entryTarget224 = cb2;
+    actor->entryTarget228 = cb3;
+    actor->savedTarget = cb4;
+    actor->reactionTarget230 = cb5;
+    actor->deathControl = cb6;
     actor->field220 = hidden;
-    actor->field278 = defaultReaction;
-    actor->field270 = 0;
-    actor->field250 = gUnk_086108B0;
-    actor->field248 = 0;
-    actor->field26C = targetQuery;
+    actor->defaultReaction = defaultReaction;
+    {
+        void **slot = &actor->contactQuery.opaque;
+        *slot = 0;
+    }
+    {
+        SceneActorCommandHandler const **slot = &actor->commandTable.handlers;
+        *slot = gUnk_086108B0;
+    }
+    actor->callback248 = 0;
+    actor->update26C = targetQuery;
     actor->field238 = SceneActorReaction_SinkAndRemove;
-    actor->field264 = damage;
-    actor->field268 = contact;
+    actor->damageCallback = damage;
+    actor->contactCallback = contact;
     actor->field240 = 0;
     MonsterInit_ClearMotion(actor);
 }
-static inline void Slime_InstallCompletionCallbacks(struct MonsterInitActor *actor)
+static inline void Slime_InstallCompletionCallbacks(struct SceneActorRegistryResetView *actor)
 {
-    actor->field24C = SceneActorScript_OnCommand;
-    actor->field258 = Slime_OnMessage;
-    actor->field25C = Slime_Destroy;
+    actor->messageCallback = SceneActorScript_OnCommand;
+    actor->updateCallback = Slime_OnMessage;
+    actor->destroyCallback = Slime_Destroy;
 }
 
-static inline void MonsterInit_SetCategory(struct MonsterInitActor *actor, u8 category)
+static inline void MonsterInit_SetCategory(struct SceneActorRegistryResetView *actor, u8 category)
 {
     actor->category = category;
 }
@@ -627,20 +497,23 @@ static inline void MonsterInit_InitializeSprite(u8 *drawable, u16 resource, u16 
     SceneActorAnimation_InitEnemySequence(drawable, sequence);
 }
 
-static inline void Slime_InstallRoutes(struct MonsterInitActor *actor)
+static inline void Slime_InstallRoutes(struct SceneActorRegistryResetView *actor)
 {
-    actor->field248 = Slime_ResetIdlePlayback;
+    actor->callback248 = Slime_ResetIdlePlayback;
     actor->field23C = Slime_FollowPlayer;
-    actor->field270 = Slime_TryEnrage;
+    {
+        void **slot = &actor->contactQuery.opaque;
+        *slot = Slime_TryEnrage;
+    }
     actor->field240 = Slime_PlayPendingSound;
 }
-static inline void MonsterInit_ClearReceiver(struct MonsterInitActor *actor)
+static inline void MonsterInit_ClearReceiver(struct SceneActorRegistryResetView *actor)
 {
     actor->field304 = 0;
 }
-static inline s16 Slime_GetHealth(struct MonsterInitActor *actor)
+static inline s16 Slime_GetHealth(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field9C;
+    return actor->health;
 }
 static inline u8 Slime_TestFlags(struct SlimeActor *slime, u32 mask)
 {
@@ -652,24 +525,24 @@ static inline void Slime_SetFlags(struct SlimeActor *slime, u16 mask)
 {
     slime->flags40A |= mask;
 }
-static inline void MonsterInit_InitializeRegion(struct MonsterInitActor *actor)
+static inline void MonsterInit_InitializeRegion(struct SceneActorRegistryResetView *actor)
 {
     if (MonsterInit_TestMotionFlags(actor, 2))
-        actor->field2FA = *(u32 *)(gGameState + 0x5A0);
+        actor->regionId = *(u32 *)(gGameState + 0x5A0);
     else
-        actor->field2FA = Region_FindContaining(&actor->body.position);
+        actor->regionId = Region_FindContaining(&actor->body.position);
 }
 
-static inline s32 MonsterInit_UpdateTerrainCell(struct MonsterInitActor *actor)
+static inline s32 MonsterInit_UpdateTerrainCell(struct SceneActorRegistryResetView *actor)
 {
     struct ContactPosition *position = &actor->body.position;
-    actor->field2F4 = MonsterInit_CellId(position);
+    actor->terrainCell = MonsterInit_CellId(position);
     return MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor), position);
 }
 s32 Slime_Init(void *object)
 {
     struct SlimeActor *slime = object;
-    struct MonsterInitActor *actor = object;
+    struct SceneActorRegistryResetView *actor = object;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
@@ -698,7 +571,7 @@ s32 Slime_Init(void *object)
         *(struct MonsterInit32Block *)heap = *(struct MonsterInit32Block *)res;
         ResourceHeader_Relocate(heap, res);
         Widget_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
-        actor->field2B7 = 0xFF;
+        actor->animationIndex = 0xFF;
     }
     MonsterInit_InitializeBody(actor, &zero);
     slime->halfHealth3DA = Slime_GetHealth(actor) >> 1;
@@ -708,7 +581,7 @@ s32 Slime_Init(void *object)
         actor->body.position.y = MonsterInit_ReadHalfword(0);
         actor->body.position.z = MonsterInit_ReadHalfword(0);
         ground = MonsterInit_UpdateTerrainCell(actor);
-        actor->field2BE = ground;
+        actor->groundHeight2BE = ground;
         slime->ground3D8 = ground;
         if (MonsterInit_GetDrawableKind(actor) == 0)
             *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
@@ -717,20 +590,20 @@ s32 Slime_Init(void *object)
     }
     j = Script_SeekToKeyword('j');
     if (j) {
-        actor->field2EC = MonsterInit_ReadHalfword(0);
-        actor->field2EE = MonsterInit_ReadHalfword(0);
-        actor->field2F0 = MonsterInit_ReadHalfword(0);
+        actor->secondaryMotion.x = MonsterInit_ReadHalfword(0);
+        actor->secondaryMotion.y = MonsterInit_ReadHalfword(0);
+        actor->secondaryMotion.z = MonsterInit_ReadHalfword(0);
         Slime_SetFlags(slime, 0x18);
         {
             s32 health = Script_GetKeywordValue('m', 0);
             if (health)
-                actor->fieldB0 = health;
+                actor->defaultHealth = health;
         }
         actor->field2E8 = 1;
     } else {
         actor->field2E8 = j;
     }
-    actor->field178 = Script_GetKeywordValue('n', 0);
+    actor->colliderA.responseValue = Script_GetKeywordValue('n', 0);
     slime->timeout3D6 = 600;
     actor->field2EA = Script_GetKeywordValue('f', 0);
     if (actor->field2EA)

@@ -58,7 +58,7 @@ struct SceneActorRegistryResetView {
     void *reactionTarget230;
     void *deathControl; /* +0x234: controller installed by defeat dispatch. */
     void *field238, *field23C;
-    u32 field240;
+    void *field240;
     u8 unknown244[4];
     void *callback248;
     void *messageCallback;
