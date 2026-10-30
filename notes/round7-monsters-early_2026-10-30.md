@@ -77,3 +77,9 @@ Matched 556 bytes without the old r6 pin. The entry operation owns initial contr
 - Recovered the previously unlabeled trailing helper at 080AA4B8 (108 bytes) as an ordinary static C function in its original position; the reviewed span includes both functions.
 - Byte flag mask ownership hoists the full keep-mask in the first loop pass, giving the ROM allocation naturally.
 - Formatted stock check: MATCH, 740 / 740 bytes, zero differing bytes. Evidence: `build/round7/early/080AA240/stock-check.json`.
+
+## Tentacle segment impulses (080AAA90)
+
+Tags: 080AAA90, Tentacle, impulse, loop
+
+Matched 348 bytes with canonical actor ownership and typed position/velocity fields. The segment flag query accepts its segment and a byte mask; removing the draft's unused segment-address calculation restores the original three induction values and mask hoists. Context acquisition follows the inactive-actor gate. Formatted stock check reports zero differing bytes, SHA-256 `d4a59f7a0e661fb725d45763b4b9e23001896678df19ba457104d03920ee4ecf`. No register pins or barriers.
