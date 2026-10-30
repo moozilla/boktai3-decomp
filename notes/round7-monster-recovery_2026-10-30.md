@@ -99,3 +99,11 @@ replace raw accesses. The contact-cost value is reused for the subsequent zeroed
 response words; their signed-offset field operation preserves the two response
 views. This reproduces the health clamp and later collider stores without
 register hints or compiler overrides. The stock check covers the complete extent.
+
+## Poison Hand damage and defeat particles — 0820E2A4
+
+All 1,140 bytes match. The particle loop retains the random bank while its first
+three samples use the shared sample-capture operation. Reusing the data owner
+for the final actor age update preserves the bank's stack lifetime. Animation
+playback uses the canonical display-sequence record without volatile reads.
+Private actor fields begin at 0x108, preventing a full canonical actor prefix.
