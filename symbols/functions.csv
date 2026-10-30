@@ -3149,6 +3149,7 @@ addr,name,mode,confidence,source,notes
 08099AAC,Ghost_Destroy,thumb,low,src-alias,
 08099B44,Ghost_Init,thumb,high,gcl-name,name from GCL key CCD3 ゴースト (Ghost); loader called by Ghost_Create
 0809ADD4,Ghost_Create,thumb,high,gcl-name,name from GCL key CCD3 ゴースト (Ghost); registry callback
+0809AE0C,Lun_HandlePlayerContact,thumb,low,src-alias,
 0809B000,Lun_OnBodyContact,thumb,low,src-alias,Lun body collision callback delegates to the common contact reaction
 0809B00C,ActorBehavior_TickParticipantProgress,thumb,low,src-alias,
 0809B178,Lun_UpdateDirectionalPoseNoSelect,thumb,low,src-alias,

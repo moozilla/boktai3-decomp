@@ -125,3 +125,7 @@ Matched 740 bytes in ordinary C. The cardinal selection remains in the caller, a
 Tags: 0808FA40, Slime, terrain, loop, crossjump
 
 Matched 624 bytes with canonical actor and typed target context. Completed and interrupted scans keep distinct terrain-slot owners and return expressions; late cross-jumping joins their common instructions after allocation. The position component precedes the cached map owner, restoring invariant-load order. A shared result-application label avoids the front end rotating the complete inline scan around its lexical break. Formatted stock check reports zero differing bytes, SHA-256 `23d93ef0cca26d9a4e052efde84a7d6d2982bbcddccee9057d2ccd4351346811`. Named `Slime_SelectWanderTarget` and updated its caller.
+
+## Lun player contact callback
+
+`Lun_HandlePlayerContact` (0809AE0C, 500 bytes) matches with the stock compiler. The phase/query input stays a native byte while the context application owns its word mask. A typed palette capture preserves the later field reload. The terminal speed-contact operation is a named statement macro that includes the real callback return; its loop-end note prevents cse2 from following the first palette branch and removing the required pointer copy. Before restoring that boundary, `CSE_NOFOLLOW_JUMP=492:2` proved the last four instruction differences. No diagnostic controls are used by the committed source.
