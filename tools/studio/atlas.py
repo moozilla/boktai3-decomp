@@ -949,6 +949,16 @@ LEVELS = ["named", "decoded", "decompiled", "located", "assembly", "unmapped", "
 DECODED = {"sprite", "map", "tiles", "palette", "font", "animation", "text", "script", "sound"}
 
 
+def command_table_blocks():
+    """Exact decoded extents, rather than treating their surrounding region
+    as decoded. The Actors page shows the ordered handlers and references."""
+    import actors
+    return [{"s": int(t["addr"], 16), "n": t["size"], "k": "data",
+             "t": t["description"] or t["name"], "u": "decoded",
+             "r": f"/actors#commands:{t['addr']}"}
+            for t in actors.command_tables().values()]
+
+
 def rom_tree():
     """The ROM as nested blocks in address order: top-level regions (code by
     subsystem and function, each asset archive by resource, sound, text,
@@ -1094,6 +1104,10 @@ def rom_tree():
             kids.append({"s": ls[0]["s"], "n": sum(x["n"] for x in ls), "k": "sound", "t": title, "c": ls})
     kids.sort(key=lambda x: x["s"])
     tops.append({"s": kids[0]["s"], "n": sum(x["n"] for x in kids), "k": "sound", "t": "Sound (MP2K)", "c": kids})
+    commands = command_table_blocks()
+    if commands:
+        tops.append({"s": commands[0]["s"], "n": sum(t["n"] for t in commands), "k": "data",
+                     "t": "Actor script command tables", "c": commands})
     # the documented regions that items don't cover (sound, text, scripts, graphics, tables)
     covered = sorted((c["s"], c["s"] + c["n"]) for t in tops for c in (t.get("c") or [t]) for c in (c.get("c") or [c]))
     merged = []

@@ -20,7 +20,7 @@
 body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Hiragino Sans", sans-serif; }
 button, input, select, textarea { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
 main { display: grid; grid-template-columns: 300px 1fr; height: calc(100vh - 53px); }
-#side { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+#side { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; min-width: 0; }
 #side .tools { padding: 10px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
 .count, .chk { color: var(--muted); font-size: 12px; }
 #list { overflow-y: auto; flex: 1; }
@@ -54,6 +54,11 @@ th { color: var(--muted); font-weight: 500; }
 .cand { color: var(--muted); font-size: 12px; }
 .conf { font-size: 10px; padding: 0 5px; border-radius: 8px; border: 1px solid var(--line); color: var(--muted); vertical-align: 1px; }
 .conf-high { border-color: var(--ok, #2f7d4f); color: var(--ok, #2f7d4f); }
+.commands { margin: 10px 0; width: 100%; max-width: 760px; table-layout: fixed; }
+.commands th:first-child { width: 46px; }
+.commands th:last-child { width: 104px; }
+.commands td:first-child { font-variant-numeric: tabular-nums; }
+.commands td:nth-child(2) { overflow-wrap: anywhere; }
 body.embed #side { display: none; }
 body.embed main { grid-template-columns: 1fr; }
 @media (max-width: 860px) { main { grid-template-columns: 1fr; height: auto; } #side { height: 40vh; } }
@@ -81,7 +86,7 @@ body.embed main { grid-template-columns: 1fr; }
 // GCL names come from gcl/names/chara.csv; cross-references from
 // tools/assets/actors.py.
 studioHeader();
-let A = [], byKey = {}, enemies = [], characters = [], scenes = {}, en = {}, sel = null;
+let A = [], byKey = {}, enemies = [], characters = [], scenes = {}, en = {}, commandTables = {}, sel = null;
 
 const label = a => noteOf('actor', a.key)?.label;
 const gclTitle = a => a.gcl.length ? a.gcl[0].name + (a.gcl[0].english ? ` (${a.gcl[0].english})` : '') : '';
@@ -92,11 +97,14 @@ function renderList() {
   const hits = A.filter(a => (!fs || a.sprites.length) && (!fu || a.procs.length) && (!fg || a.gcl.length) &&
     (!q || [a.key, label(a), a.callback_name, a.loader_name, ...a.sprites.map(s => s.hash), ...a.names.map(n => n.jp + ' ' + (en[n.id] || '')), ...a.gcl.map(g => g.name + ' ' + g.english)].some(x => (x || '').toUpperCase().includes(q))));
   $('count').textContent = `${hits.length} of ${A.length} registry entries`;
-  const special = document.createElement('div');
-  special.className = 'row special' + (sel === 'names' ? ' on' : ''); special.dataset.key = 'names';
-  special.textContent = 'Name lists from the game (monsters, characters)';
-  special.onclick = () => { location.hash = 'names'; };
-  $('list').replaceChildren(special, ...hits.map(a => {
+  const special = (key, text) => {
+    const d = document.createElement('div');
+    d.className = 'row special' + (sel?.split(':')[0] === key ? ' on' : ''); d.dataset.key = key;
+    d.textContent = text; d.onclick = () => { location.hash = key; };
+    return d;
+  };
+  $('list').replaceChildren(special('names', 'Name lists from the game (monsters, characters)'),
+    special('commands', `Command tables (${Object.keys(commandTables).length} decoded)`), ...hits.map(a => {
     const d = document.createElement('div'); d.className = 'row' + (a.key === sel ? ' on' : ''); d.dataset.key = a.key;
     d.innerHTML = `<code>${a.key}</code><b></b><small></small>`;
     d.querySelector('b').textContent = title(a);
@@ -114,9 +122,11 @@ const sceneChip = s => {
 
 async function show(key) {
   sel = key;
-  document.querySelectorAll('.row').forEach(d => d.classList.toggle('on', d.dataset.key === key));
+  const navKey = key.startsWith('commands:') ? 'commands' : key;
+  document.querySelectorAll('.row').forEach(d => d.classList.toggle('on', d.dataset.key === navKey));
   document.querySelector('.row.on')?.scrollIntoView({ block: 'nearest' });
   if (key === 'names') return showNames();
+  if (navKey === 'commands') return showCommandTables(key.split(':')[1]);
   const a = byKey[key], v = $('view');
   if (!a) { v.innerHTML = `<div class="empty">No registry entry ${esc(key)}.</div>`; return; }
   const names = a.names.map(n => `${stringLink(n.id)} ${esc(n.jp)}${en[n.id] ? ` <span class="cand">(${esc(en[n.id])})</span>` : ''}`).join('<br>');
@@ -130,6 +140,7 @@ async function show(key) {
       <dt>Loader</dt><dd>${a.loader ? `${codeLink(a.loader, a.loader_name)} <span class="mono meta">${a.loader}</span> <span class="meta">(the function the callback hands its new actor to)</span>` : '<span class="empty">none (the callback does not allocate an actor and pass it on)</span>'}</dd>
       <dt>Names</dt><dd>${names || '<span class="empty">no name from the game linked yet</span>'}${a.names.length ? `<div class="cand">Candidates from the monster list (string 9838 on), linked through the sprite by its look in captures (docs/ASSETS.md); not from the game's own index, which is not found yet.</div>` : ''}</dd>
     </dl>
+    ${commandReferences(a)}
     <h3>Sprites</h3>${a.sprites.length ? `<div class="sprites" id="sprites"></div><div class="meta" style="margin-top:6px">16-bit literals in the callback, the loader and their nearby callees that name a sprite package (CB05) or a large sprite (98F5).</div>` : '<div class="empty">No sprite named in the callback or loader.</div>'}
     <h3>Created by scripts (${a.spawns} time${a.spawns === 1 ? '' : 's'}, ${procs.length} procedure${procs.length === 1 ? '' : 's'})</h3>
     ${procs.length ? `<div class="chips">${procs.map(p => `<span class="chip">${procLink(p)}</span>`).join('')}</div>` : '<div class="empty">No script creates it (engine-only, or created by code).</div>'}
@@ -149,6 +160,40 @@ async function show(key) {
   }
 }
 
+function commandReferences(a) {
+  const refs = (a.command_tables || []).filter(r => commandTables[r.table]);
+  if (!refs.length) return '';
+  return `<h3>Referenced command tables</h3>
+    <table><tr><th>Table</th><th>Entries</th><th>Referenced in</th></tr>${refs.map(r => {
+      const t = commandTables[r.table];
+      return `<tr><td><a href="#commands:${t.addr}">${esc(t.description || t.name)}</a> <span class="mono meta">${t.addr}</span></td>
+        <td>${t.entries.length}</td><td>${r.in.map(f => codeLink(f.addr, f.name)).join(', ')}</td></tr>`;
+    }).join('')}</table>
+    <div class="meta">Decoded tables named in this callback or loader. Initialization can replace a table after installing the common defaults.</div>`;
+}
+
+function showCommandTables(addr) {
+  const tables = addr ? [commandTables[addr]].filter(Boolean) : Object.values(commandTables);
+  if (!tables.length) {
+    $('view').innerHTML = `<h2>Actor script command tables</h2><div class="empty">${addr ? `No decoded table at ${esc(addr)}.` : 'No tables decoded yet.'}</div>`;
+    return;
+  }
+  $('view').innerHTML = `<h2>Actor script command tables</h2>
+    <p class="meta">A command packet selects a handler by its numeric index. ${codeLink('08136F1C', 'SceneActorScript_OnCommand')} reads the table from the actor and passes the actor and packet to the selected handler. These indices are separate from GCL registry keys.</p>
+    ${addr ? '<p><a href="#commands">All decoded command tables</a></p>' : ''}
+    ${tables.map(t => {
+      const users = A.filter(a => (a.command_tables || []).some(r => r.table === t.addr));
+      return `<section><h3><a href="#commands:${t.addr}">${esc(t.description || t.name)}</a></h3>
+        <div class="meta"><span class="mono">${t.addr}–${t.end}</span> · ${t.size} bytes · <code>${esc(t.source)}</code></div>
+        <table class="commands"><thead><tr><th>Index</th><th>Handler</th><th>Thumb pointer</th></tr></thead><tbody>
+          ${t.entries.map(e => `<tr><td>${e.index}</td><td>${e.addr ? codeLink(e.addr, e.name) : '<span class="empty">Empty slot</span>'}</td><td class="mono">${e.callback}</td></tr>`).join('')}
+        </tbody></table>
+        <div class="meta">${users.length ? 'Referenced by registry entries: ' + users.map(a => `<a href="#${a.key}" title="${esc(a.callback_name)}">${a.key}</a>`).join(', ') : 'No direct reference found in the registry callbacks or their loaders.'}</div>
+      </section>`;
+    }).join('')}
+    <p class="meta">Rows keep the dispatch order. Handler names follow the current code symbols; pointer values retain the Thumb bit.</p>`;
+}
+
 function showNames() {
   const linked = {};
   for (const a of A) for (const n of a.names) (linked[n.id] ||= []).push(a);
@@ -164,14 +209,15 @@ function showNames() {
 
 $('q').oninput = renderList; $('fspr').onchange = renderList; $('fused').onchange = renderList; $('fgcl').onchange = renderList;
 listKeys(() => $('list'), '.row');
-window.onhashchange = () => { const k = location.hash.slice(1); if (k && k !== sel) show(k); };
+const routeKey = hash => hash.toLowerCase() === 'names' ? 'names' : /^commands(?::|$)/i.test(hash) ? 'commands' + hash.slice(8).toUpperCase() : hash.toUpperCase();
+window.onhashchange = () => { const k = routeKey(location.hash.slice(1)); if (k && k !== sel) show(k); };
 (async () => {
   await loadNotes();
   const [d, e] = await Promise.all([fetch('/api/actors').then(r => r.json()), fetch('/api/english').then(r => r.json()).catch(() => ({}))]);
-  A = d.actors; enemies = d.enemies; characters = d.characters; scenes = d.scenes; en = e;
+  A = d.actors; enemies = d.enemies; characters = d.characters; scenes = d.scenes; en = e; commandTables = d.command_tables || {};
   byKey = Object.fromEntries(A.map(a => [a.key, a]));
   renderList();
-  const k = location.hash.slice(1).toUpperCase() === 'NAMES' ? 'names' : location.hash.slice(1).toUpperCase() || A.find(a => a.loader && a.sprites.length)?.key;
+  const k = routeKey(location.hash.slice(1)) || A.find(a => a.loader && a.sprites.length)?.key;
   if (k) { if (!location.hash) history.replaceState(null, '', '#' + k); show(k); }
 })();
 </script>

@@ -140,3 +140,11 @@ them to function symbols, so moving code moves the handler pointers. To change
 a handler, edit its callback value, then run the usual data check and ROM build.
 Do not reorder rows to group similar handlers: the numeric index is the
 dispatch operation.
+
+Studio's Actors page has a **Command tables** view (`/actors#commands`). It
+shows every decoded entry in dispatch order, with links to the handler's C
+and assembly. An actor page lists tables directly referenced by its registry
+callback or loader and identifies the function containing each reference.
+A reference does not mean the table remains active: a species initializer
+can install the common defaults and replace them later. Studio's ROM view
+marks only the four exact table extents as decoded, a total of 112 bytes.
