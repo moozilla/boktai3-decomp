@@ -69,24 +69,6 @@ void Spider_OnSecondaryUpdate(void);
 void Spider_Destroy(void);
 extern const u8 gUnk_08605F34[];
 
-static inline void MonsterInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
-                                           u32 alternate)
-{
-    s32 palette;
-    actor->paletteOffset = Script_GetKeywordValue(0x43, 0);
-    actor->basePaletteBank = base;
-    actor->paletteAlternateBank = alternate;
-    actor->alternateOffset = MonsterInit_GetPaletteOffset(actor) + base;
-    palette = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
-    if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(actor->drawable + 0x2C, palette);
-    else
-        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
-    if (MonsterInit_GetDrawableKind(actor) == 1)
-        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
-                                           SceneActorScript_GetManagerField62());
-}
-
 static inline void MonsterInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
                                              void *callback)
 {
@@ -103,19 +85,6 @@ static inline void MonsterInit_EnableInitialFlags(struct SceneActorRegistryReset
     MonsterInit_SetTargetingFlags(&arg0->tracking, 1);
     MonsterInit_SetBehaviorFlags(arg0, 0x400000);
     MonsterInit_SetStatusFlags(arg0, 8);
-}
-
-static inline void MonsterInit_ReadInitialMode(struct SceneActorRegistryResetView *arg0,
-                                               struct SceneActorChaseGroup *group)
-{
-    s32 i;
-    i = Script_GetKeywordValue(0x75, 0);
-    arg0->group.effect = 0x21;
-    if (i != 0) {
-        MonsterInit_SetBehaviorFlags(arg0, 0x40000);
-        if (i == 2)
-            MonsterInit_SetBehaviorFlags(arg0, 0x80000);
-    }
 }
 
 static inline void MonsterInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
@@ -204,7 +173,7 @@ s32 Spider_Init(void *object)
     Spider_InstallContact(actor, group);
     MonsterInit_EnableInitialFlags(actor);
     SceneActorTerrain_ReadScriptParameters(actor);
-    MonsterInit_ReadInitialMode(actor, group);
+    MonsterInit_ReadInitialMode(actor);
     flag = 0;
     if (MonsterInit_TestMotionFlags(actor, 4)) {
         MonsterInit_SetStatusFlags(actor, 0x2000);

@@ -71,41 +71,10 @@ struct GhoulInstanceState {
 
 extern u8 *gUnknown_02000580;
 
-static inline void GhoulInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
-                                         u32 alternate)
-{
-    s32 palette;
-    actor->paletteOffset = Script_GetKeywordValue('C', 0);
-    actor->basePaletteBank = base;
-    actor->paletteAlternateBank = alternate;
-    actor->alternateOffset = MonsterInit_GetPaletteOffset(actor) + base;
-    palette = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
-    if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(actor->drawable + 0x2C, palette);
-    else
-        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
-    if (MonsterInit_GetDrawableKind(actor) == 1)
-        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
-                                           SceneActorScript_GetManagerField62());
-}
-
 static inline void GhoulInit_InstallRouteDefaults(struct SceneActorRegistryResetView *arg0)
 {
     arg0->callback248 = Ghoul_ResetRouteState;
     arg0->field23C = SceneActorControl_RefreshMotionRoute_0808A90C;
-}
-
-static inline void GhoulInit_ReadInitialMode(struct SceneActorRegistryResetView *arg0,
-                                             struct SceneActorChaseGroup *group)
-{
-    s32 i;
-    i = Script_GetKeywordValue('u', 0);
-    arg0->group.effect = 0x21;
-    if (i != 0) {
-        MonsterInit_SetBehaviorFlags(arg0, 0x40000);
-        if (i == 2)
-            MonsterInit_SetBehaviorFlags(arg0, 0x80000);
-    }
 }
 
 static inline void GhoulInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
@@ -172,7 +141,7 @@ s32 Ghoul_Init(void *object)
         ((struct GhoulInstanceState *)arg0)->field640 = 0x78;
         ((struct GhoulInstanceState *)arg0)->field64A = 0x78;
     }
-    GhoulInit_ReadPalette(actor, 0x192, 0x192);
+    MonsterInit_ReadPalette(actor, 0x192, 0x192);
     GhoulInit_InitializePaletteRange(actor, 4, 0);
     Ghoul_InitCollision(actor);
     MonsterInit_InstallAnimationCallbacks(
@@ -194,7 +163,7 @@ s32 Ghoul_Init(void *object)
     MonsterInit_SetStatusFlags(actor, 0x8000000);
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorTerrain_ReadScriptParameters(actor);
-    GhoulInit_ReadInitialMode(actor, group);
+    MonsterInit_ReadInitialMode(actor);
     flag = 0;
     if (MonsterInit_TestMotionFlags(actor, 4)) {
         MonsterInit_SetStatusFlags(actor, 0x2000);

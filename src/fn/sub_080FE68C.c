@@ -76,24 +76,6 @@ struct AxeInstanceState {
 
 extern u8 *gUnknown_02000580;
 
-static inline void AxeInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
-                                       u32 alternate)
-{
-    s32 palette;
-    actor->paletteOffset = Script_GetKeywordValue('C', 0);
-    actor->basePaletteBank = base;
-    actor->paletteAlternateBank = alternate;
-    actor->alternateOffset = MonsterInit_GetPaletteOffset(actor) + base;
-    palette = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
-    if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(actor->drawable + 0x2C, palette);
-    else
-        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
-    if (MonsterInit_GetDrawableKind(actor) == 1)
-        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
-                                           SceneActorScript_GetManagerField62());
-}
-
 static inline void AxeInit_InstallPrimary(struct SceneActorRegistryResetView *arg0, void *cb0,
                                           s32 (*cb1)(void), void *cb2, void *cb3, void *cb4,
                                           void *hidden, void *cb5, void *cb6, void *defaultReaction,
@@ -210,7 +192,7 @@ s32 Axe_Init(void *object)
     ((struct AxeInstanceState *)arg0)->fieldEB6 = Script_GetKeywordValue('w', -1);
     ActorGroup_ReadScriptOptions(actor);
     ((struct AxeInstanceState *)arg0)->playerPositionF1C = gPlayers[0]->position;
-    AxeInit_ReadPalette(actor, 0x2BD, 0x192);
+    MonsterInit_ReadPalette(actor, 0x2BD, 0x192);
     AxeInit_InitializePaletteRange(actor, 0, 2);
     Axe_InitEffectPalettes(actor);
     MonsterInit_SetCurrentPalette(actor, 0x1EE);

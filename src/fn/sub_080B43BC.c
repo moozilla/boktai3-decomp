@@ -204,19 +204,6 @@ static inline void VornInit_EnableInitialFlags(struct SceneActorRegistryResetVie
     MonsterInit_SetStatusFlags(actor, 0x8000000);
 }
 
-static inline void VornInit_ReadInitialMode(struct SceneActorRegistryResetView *arg0,
-                                            struct SceneActorChaseGroup *group)
-{
-    s32 i;
-    i = Script_GetKeywordValue(0x75, 0);
-    arg0->group.effect = 0x21;
-    if (i != 0) {
-        MonsterInit_SetBehaviorFlags(arg0, 0x40000);
-        if (i == 2)
-            MonsterInit_SetBehaviorFlags(arg0, 0x80000);
-    }
-}
-
 static inline void VornInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
 {
     arg0->messageCallback = SceneActorScript_OnCommand;
@@ -309,7 +296,7 @@ s32 Vorn_Init(void *object)
     VornInit_EnableInitialFlags(actor);
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorTerrain_ReadScriptParameters(actor);
-    VornInit_ReadInitialMode(actor, group);
+    MonsterInit_ReadInitialMode(actor);
     flag = 0;
     if (MonsterInit_TestMotionFlags(actor, 4)) {
         MonsterInit_SetStatusFlags(actor, 0x2000);

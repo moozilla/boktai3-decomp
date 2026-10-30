@@ -51,24 +51,6 @@ static inline void MummyInit_ResetFlags(void *object)
     actor->field6F2 = 0;
 }
 
-static inline void MummyInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
-                                         u32 alternate)
-{
-    s32 palette;
-    actor->paletteOffset = Script_GetKeywordValue(0x43, 0);
-    actor->basePaletteBank = base;
-    actor->paletteAlternateBank = alternate;
-    actor->alternateOffset = MonsterInit_GetPaletteOffset(actor) + base;
-    palette = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
-    if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(actor->drawable + 0x2C, palette);
-    else
-        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
-    if (MonsterInit_GetDrawableKind(actor) == 1)
-        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
-                                           SceneActorScript_GetManagerField62());
-}
-
 static inline void MummyInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
                                            void *callback)
 {
@@ -115,19 +97,6 @@ static inline void MummyInit_EnableInitialFlags(struct SceneActorRegistryResetVi
     MonsterInit_SetTargetingFlags(&actor->tracking, 1);
     MonsterInit_SetBehaviorFlags(actor, 0x600000);
     MonsterInit_SetStatusFlags(actor, 0x8000000);
-}
-
-static inline void MummyInit_ReadInitialMode(struct SceneActorRegistryResetView *arg0,
-                                             struct SceneActorChaseGroup *group)
-{
-    s32 i;
-    i = Script_GetKeywordValue(0x75, 0);
-    arg0->group.effect = 0x21;
-    if (i != 0) {
-        MonsterInit_SetBehaviorFlags(arg0, 0x40000);
-        if (i == 2)
-            MonsterInit_SetBehaviorFlags(arg0, 0x80000);
-    }
 }
 
 static inline struct MummyInitContext *MummyInit_Context(struct SceneActorRegistryResetView *actor)
@@ -187,7 +156,7 @@ s32 Mummy_Init(void *object)
         actor->animationIndex = 0xFF;
     }
     MonsterInit_InitializePursuitBody(arg0, &zero);
-    MummyInit_ReadPalette(actor, 0x23, 0x192);
+    MonsterInit_ReadPalette(actor, 0x23, 0x192);
     MummyInit_InitializePaletteRange(actor, MonsterInit_GetPaletteBase(actor) + 3, 4, 0);
     Mummy_InitCollision(actor);
     MonsterInit_InstallSequenceCallbacks(
@@ -213,7 +182,7 @@ s32 Mummy_Init(void *object)
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorEffects_InitAtActorPosition(arg0);
     SceneActorTerrain_ReadScriptParameters(actor);
-    MummyInit_ReadInitialMode(arg0, group);
+    MonsterInit_ReadInitialMode(arg0);
     flag = 0;
     if (MonsterInit_TestMotionFlags(actor, 4)) {
         MonsterInit_SetStatusFlags(actor, 0x2000);

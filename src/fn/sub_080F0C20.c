@@ -145,24 +145,6 @@ static inline void IvyInit_InitializeBody(void *object, u32 *fill)
     group->common.bodyPosition = &arg0->body.position;
 }
 
-static inline void IvyInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
-                                       u32 alternate)
-{
-    s32 r1v;
-    actor->paletteOffset = Script_GetKeywordValue(0x43, 0);
-    actor->basePaletteBank = base;
-    actor->paletteAlternateBank = alternate;
-    actor->alternateOffset = MonsterInit_GetPaletteOffset(actor) + base;
-    r1v = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
-    if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(actor->drawable + 0x2C, r1v);
-    else
-        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (r1v << 5);
-    if (MonsterInit_GetDrawableKind(actor) == 1)
-        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
-                                           SceneActorScript_GetManagerField62());
-}
-
 static inline void IvyInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
 {
     arg0->messageCallback = SceneActorScript_OnCommand;
@@ -237,7 +219,7 @@ s32 Ivy_Init(void *object)
     actor->body.position.x += 0x20;
     actor->body.position.z += 0x20;
     MonsterInit_DrawablePosition(actor);
-    IvyInit_ReadPalette(actor, 0x12A, 0x192);
+    MonsterInit_ReadPalette(actor, 0x12A, 0x192);
     SceneActor_InitCollision5005(actor);
     MonsterInit_InstallOpaqueContactCallbacks(actor, Ivy_Update, 0, 0, 0, 0, 0, 0, Ivy_UpdateDefeat,
                                               SceneActorReaction_OnEnemyDefault, 0, 0, sub_081363F4,

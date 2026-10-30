@@ -90,24 +90,6 @@ static inline void SkeletonInit_ReadWidgetRelativePalette(struct DisplayKeyframe
     widget->paletteIndex = Script_GetPc() ? Script_GetValue() + 0x12B : 0x12B;
 }
 
-static inline void SkeletonInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
-                                            u32 alternate)
-{
-    s32 palette;
-    actor->paletteOffset = Script_GetKeywordValue(0x43, 0);
-    actor->basePaletteBank = base;
-    actor->paletteAlternateBank = alternate;
-    actor->alternateOffset = MonsterInit_GetPaletteOffset(actor) + base;
-    palette = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
-    if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(actor->drawable + 0x2C, palette);
-    else
-        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
-    if (MonsterInit_GetDrawableKind(actor) == 1)
-        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
-                                           SceneActorScript_GetManagerField62());
-}
-
 static inline void SkeletonInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
                                               void *callback)
 {
@@ -132,19 +114,6 @@ static inline void SkeletonInit_EnableInitialFlags(struct SceneActorRegistryRese
     MonsterInit_SetBehaviorFlags(arg0, 0x1600000);
     MonsterInit_SetStatusFlags(arg0, 0x8000008);
     MonsterInit_SetMotionFlags(arg0, 0x80);
-}
-
-static inline void SkeletonInit_ReadInitialMode(struct SceneActorRegistryResetView *arg0,
-                                                struct SceneActorChaseGroup *group)
-{
-    s32 i;
-    i = Script_GetKeywordValue(0x75, 0);
-    arg0->group.effect = 0x21;
-    if (i != 0) {
-        MonsterInit_SetBehaviorFlags(arg0, 0x40000);
-        if (i == 2)
-            MonsterInit_SetBehaviorFlags(arg0, 0x80000);
-    }
 }
 
 static inline void SkeletonInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
@@ -202,7 +171,7 @@ s32 Skeleton_Init(void *object)
     SceneActorScript_ReadPParameters(actor);
     SceneActorScript_ReadCallScriptConfig(actor);
 
-    SkeletonInit_ReadPalette(actor, 0x13C, 0x146);
+    MonsterInit_ReadPalette(actor, 0x13C, 0x146);
     SceneActorControl_InitBehaviorColliders(actor);
 
     MonsterInit_InstallSequenceCallbacks(
@@ -227,7 +196,7 @@ s32 Skeleton_Init(void *object)
     MonsterInit_ClearColliderFlags(&actor->colliderA, ~1);
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorTerrain_ReadScriptParameters(actor);
-    SkeletonInit_ReadInitialMode(actor, group);
+    MonsterInit_ReadInitialMode(actor);
     flag = 0;
     if (MonsterInit_TestMotionFlags(actor, 4)) {
         MonsterInit_SetStatusFlags(actor, 0x2000);

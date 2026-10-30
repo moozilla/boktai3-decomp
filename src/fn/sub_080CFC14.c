@@ -143,24 +143,6 @@ static inline void GolemInit_InitializeBody(void *object, u32 *fill)
     group->common.bodyPosition = &arg0->body.position;
 }
 
-static inline void GolemInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
-                                         u32 alternate)
-{
-    s32 palette;
-    actor->paletteOffset = Script_GetKeywordValue(0x43, 0);
-    actor->basePaletteBank = base;
-    actor->paletteAlternateBank = alternate;
-    actor->alternateOffset = MonsterInit_GetPaletteOffset(actor) + base;
-    palette = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
-    if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(actor->drawable + 0x2C, palette);
-    else
-        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
-    if (MonsterInit_GetDrawableKind(actor) == 1)
-        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
-                                           SceneActorScript_GetManagerField62());
-}
-
 static inline void GolemInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
                                            void *callback)
 {
@@ -207,19 +189,6 @@ static inline void GolemInit_EnableInitialFlags(struct SceneActorRegistryResetVi
     MonsterInit_SetTargetingFlags(&actor->tracking, 1);
     MonsterInit_SetBehaviorFlags(actor, 0x1600000);
     MonsterInit_SetStatusFlags(actor, 0x8000008);
-}
-
-static inline void GolemInit_ReadInitialMode(struct SceneActorRegistryResetView *arg0,
-                                             struct SceneActorChaseGroup *group)
-{
-    s32 i;
-    i = Script_GetKeywordValue(0x75, 0);
-    arg0->group.effect = 0x21;
-    if (i != 0) {
-        MonsterInit_SetBehaviorFlags(arg0, 0x40000);
-        if (i == 2)
-            MonsterInit_SetBehaviorFlags(arg0, 0x80000);
-    }
 }
 
 static inline struct GolemInitContext *GolemInit_Context(struct SceneActorRegistryResetView *actor)
@@ -278,7 +247,7 @@ s32 Golem_Init(void *object)
         actor->animationIndex = 0xFF;
     }
     GolemInit_InitializeBody(arg0, &zero);
-    GolemInit_ReadPalette(actor, 0x27D, 0x192);
+    MonsterInit_ReadPalette(actor, 0x27D, 0x192);
     GolemInit_InitializePaletteRange(actor, 2, 0);
     Golem_InitColliders(actor);
     MonsterInit_InstallSequenceCallbacks(
@@ -300,7 +269,7 @@ s32 Golem_Init(void *object)
     MonsterInit_ClearColliderFlags(&actor->colliderA, ~1);
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorTerrain_ReadScriptParameters(actor);
-    GolemInit_ReadInitialMode(actor, group);
+    MonsterInit_ReadInitialMode(actor);
     flag = 0;
     if (MonsterInit_TestMotionFlags(actor, 4)) {
         MonsterInit_SetStatusFlags(actor, 0x2000);

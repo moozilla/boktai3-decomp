@@ -155,24 +155,6 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
     group->common.bodyPosition = &arg0->body.position;
 }
 
-static inline void OctopusInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
-                                           u32 alternate)
-{
-    s32 palette;
-    actor->paletteOffset = Script_GetKeywordValue('C', 0);
-    actor->basePaletteBank = base;
-    actor->paletteAlternateBank = alternate;
-    actor->alternateOffset = MonsterInit_GetPaletteOffset(actor) + base;
-    palette = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
-    if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(actor->drawable + 0x2C, palette);
-    else
-        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
-    if (MonsterInit_GetDrawableKind(actor) == 1)
-        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
-                                           SceneActorScript_GetManagerField62());
-}
-
 static inline void OctopusInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
 {
     arg0->messageCallback = SceneActorScript_OnCommand;
@@ -232,7 +214,7 @@ s32 Octopus_Init(void *object)
     actor->body.position.x += 0x20;
     actor->body.position.z += 0x20;
     OctopusInit_DrawablePosition(actor);
-    OctopusInit_ReadPalette(actor, 0x248, 0x192);
+    MonsterInit_ReadPalette(actor, 0x248, 0x192);
     SceneActorCollision_InitCompactBody(actor);
     MonsterInit_InstallSequenceCallbacks(actor, Octopus_Update, 0, 0, 0, 0, 0, 0,
                                          Octopus_UpdateDefeat, SceneActorReaction_OnEnemyDefault, 0,

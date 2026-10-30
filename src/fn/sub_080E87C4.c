@@ -148,24 +148,6 @@ static inline void MimicInit_InitializeBody(void *object, u32 *fill)
     group->common.bodyPosition = &arg0->body.position;
 }
 
-static inline void MimicInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
-                                         u32 alternate)
-{
-    s32 palette;
-    actor->paletteOffset = Script_GetKeywordValue('C', 0);
-    actor->basePaletteBank = base;
-    actor->paletteAlternateBank = alternate;
-    actor->alternateOffset = MonsterInit_GetPaletteOffset(actor) + base;
-    palette = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
-    if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(actor->drawable + 0x2C, palette);
-    else
-        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
-    if (MonsterInit_GetDrawableKind(actor) == 1)
-        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
-                                           SceneActorScript_GetManagerField62());
-}
-
 static inline void MimicInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
 {
     arg0->messageCallback = SceneActorScript_OnCommand;
@@ -240,7 +222,7 @@ s32 Mimic_Init(void *object)
     }
     ((struct MimicInstanceState *)arg0)->origin650 = actor->body.position;
     ((struct MimicInstanceState *)arg0)->originCell658 = actor->terrainCell;
-    MimicInit_ReadPalette(actor, 0x304, 0x192);
+    MonsterInit_ReadPalette(actor, 0x304, 0x192);
     MimicInit_SetPaletteBank(actor, 0x306);
     SceneActor_InitializeReactionColliders(actor);
     MonsterInit_InstallOpaqueContactCallbacks(
