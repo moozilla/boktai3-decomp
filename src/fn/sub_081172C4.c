@@ -4,11 +4,12 @@
 #include "engine_globals.h"
 #include "area_effect_link.h"
 
-#ifdef NONMATCHING
-// fuzzy: 77.8%
-// fix.py best version (reprinted C)
-// Motion-pointer lifetimes and register allocation still differ.
-struct Obj {
+union GloveAnimationKey {
+    u32 word;
+    u16 half[2];
+};
+
+struct GloveMotion {
     u8 pad0[4];
     u32 unk4;
     u32 unk8;
@@ -22,7 +23,9 @@ struct Obj {
     u32 flags40;
     u8 pad44[0xC0 - 0x44];
     s32 unkC0;
-    u8 padC4[0x5AC - 0xC4];
+    u8 padC4[0x524 - 0xC4];
+    union GloveAnimationKey animation;
+    u8 pad528[0x5AC - 0x528];
     s32 vy; /* 0x5AC */
     s32 y;  /* 0x5B0 */
     s32 vz; /* 0x5B4 */
@@ -45,7 +48,7 @@ struct Obj {
 
 struct Glove {
     u8 pad0[0x18];
-    struct Obj motion;
+    struct GloveMotion motion;
     u8 model[0x860 - 0x610];
     s8 marker, markerSlot;
     u8 pad862[2];
@@ -65,47 +68,68 @@ struct Glove {
     s32 launchSpeed;
     u8 launchPhase;
 };
-#define U8(p, o)  (*(u8 *)((u8 *)(p) + (o)))
-#define S8(p, o)  (*(s8 *)((u8 *)(p) + (o)))
-#define U16(p, o) (*(u16 *)((u8 *)(p) + (o)))
-#define S16(p, o) (*(s16 *)((u8 *)(p) + (o)))
-#define U32(p, o) (*(u32 *)((u8 *)(p) + (o)))
-#define S32(p, o) (*(s32 *)((u8 *)(p) + (o)))
 s32 Div(s32, s32);
 void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
-void Terrain_ResolveActorMotion(struct Obj *);
-void PalFade_Update(struct Obj *);
-void Actor_UpdateShadowSpriteParts(struct Obj *, void *);
-void ActorParticles_SpawnImpactBurst(struct Obj *);
+void Terrain_ResolveActorMotion(struct GloveMotion *);
+void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
+void ActorParticles_SpawnImpactBurst(struct GloveMotion *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
-void ScenePool_ClampMotionSpeeds(struct Obj *);
-void Actor_ClampMovementSpeed(struct Obj *);
-void Glove_SetAnimationKeyframes(struct Glove *, s32);
-void ActorRecoil_UpdateMotion(struct Glove *);
+void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
 
 void StageIconDisplay_Create(s32, s32, void *, void *);
 void Glove_BeginStopping(void);
 u8 LinkParticipant_IsLocallySelected(void *);
 void Character_UpdateLoopingSound(void *);
-// confidence=low: rises while showing a stopping cue, then slows its launch.
+static inline s32 *Motion_GetSpeed(struct GloveMotion *self)
+{
+    return &self->vy;
+}
+static inline s32 *Motion_GetTerrainSpeed(struct GloveMotion *self)
+{
+    return &self->unkC0;
+}
+static inline s32 *Motion_GetVerticalOffset(struct GloveMotion *self)
+{
+    return &self->y;
+}
+static inline s32 *Motion_GetForwardOffset(struct GloveMotion *self)
+{
+    return &self->x;
+}
+static inline s32 *Motion_GetRecoilY(struct GloveMotion *self)
+{
+    return &self->dy;
+}
+static inline s32 *Motion_GetRecoilZ(struct GloveMotion *self)
+{
+    return &self->dz;
+}
+
+static inline s32 *Motion_GetLateralOffset(struct GloveMotion *self)
+{
+    return &self->vz;
+}
+static inline s32 *Motion_GetPreviousZ(struct GloveMotion *self)
+{
+    return &self->prevZ;
+}
 // confidence=low: shows a stopping cue during launch ascent and slowdown.
 #define Glove_UpdateRisingCue sub_081172C4
 void Glove_UpdateRisingCue(struct Glove *p)
 {
-    struct Obj *self = &p->motion;
+    struct GloveMotion *self = &p->motion;
     s32 h;
     s32 dx;
     s32 dz;
     u32 a;
     u32 b;
-    typeof(dx) t1;
     if (p->active) {
         p->active = 0;
         p->launchPhase = 0;
         p->launchSpeed = 0;
         StageIconDisplay_Create(0, 0, Glove_BeginStopping, p);
-        *((u16 *)(((u8 *)p) + 0x53E)) = 0;
+        self->animation.half[1] = 0;
     }
     {
         u16 bit = 0x10;
@@ -115,8 +139,7 @@ void Glove_UpdateRisingCue(struct Glove *p)
         case 0:
             p->launchSpeed += 32;
             self->x += p->launchSpeed;
-            *((u16 *)(((u8 *)p) + 0x53C)) = 0x92;
-            asm("" : : : "memory");
+            self->animation.half[0] = 0x92;
             if (self->x > 0x40000)
                 p->launchPhase = 3;
             break;
@@ -126,61 +149,54 @@ void Glove_UpdateRisingCue(struct Glove *p)
                 p->launchSpeed -= 256;
             else
                 p->launchPhase = 4;
-            *((u16 *)(((u8 *)self) + 0x524)) = 0x88;
+            self->animation.half[0] = 0x88;
             self->x += p->launchSpeed;
             break;
     }
 
     ScenePool_ClampMotionSpeeds(self);
-    h = self->vy + self->unkC0;
-    self->y += 0x200;
+    h = (*Motion_GetSpeed(self)) + (*Motion_GetTerrainSpeed(self));
+    (*Motion_GetVerticalOffset(self)) += 0x200;
     if (self->steps > 0) {
-        self->x += self->dx;
-        self->dy += Div(-self->dy, self->steps);
+        (*Motion_GetForwardOffset(self)) += self->dx;
         self->dx += Div(-self->dx, self->steps);
-        self->dz += Div(-self->dz, self->steps);
+        (*Motion_GetRecoilY(self)) += Div(-(*Motion_GetRecoilY(self)), self->steps);
+        (*Motion_GetRecoilZ(self)) += Div(-(*Motion_GetRecoilZ(self)), self->steps);
         self->steps--;
     } else {
         Memory_Clear(&self->dx, 0x10);
     }
     {
-        s32 *pprevZ;
         s32 *pprevX;
-        s32 *pvz;
-        s32 *px;
-        s32 *py;
         s32 lim;
-        self->outX = (h + self->x) - self->prevX;
-        self->outY = self->y + self->dy;
-        self->outZ = self->vz + self->dz;
-        dx = (t1 = (self->x - self->prevX) >> 12);
-        dz = (self->z - self->prevZ) >> 12;
+        self->outX = (h + (*Motion_GetForwardOffset(self))) - self->prevX;
+        self->outY = (*Motion_GetVerticalOffset(self)) + (*Motion_GetRecoilY(self));
+        self->outZ = (*Motion_GetLateralOffset(self)) + (*Motion_GetRecoilZ(self));
+        dx = ((*Motion_GetForwardOffset(self)) - self->prevX) >> 12;
+        dz = (self->z - *Motion_GetPreviousZ(self)) >> 12;
         lim = 0x3000;
-        px = &self->x;
         pprevX = &self->prevX;
-        py = &self->y;
-        pprevZ = &self->prevZ;
-        pvz = &self->vz;
         if (h > lim)
             dx = 0x80;
-        if ((t1 == 0) && (dz == 0))
+        if ((dx == 0) && (dz == 0))
             self->angle = 0xFFFF;
         else
             self->angle = (Math_Atan2(dx, dz) >> 5) << 5;
-        *pprevX = *px;
-        *pprevZ = self->z;
+        *pprevX = (*Motion_GetForwardOffset(self));
+        *Motion_GetPreviousZ(self) = self->z;
         Terrain_ResolveActorMotion(self);
         a = ((u32)(~(self->unk3C >> 12))) >> 31;
         b = ((u32)(~(self->unk38 >> 12))) >> 31;
         if (((((self->unk4 != self->unk8) && (self->unk4 & 0x1000)) && (!(self->unk8 & 0xF000))) &&
              (b <= 1)) &&
             (a == 1)) {
-            s32 v = ((self->vy >> 10) + (self->unkC0 >> 8)) >> 1;
+            s32 v =
+                (((*Motion_GetSpeed(self)) >> 10) + ((*Motion_GetTerrainSpeed(self)) >> 8)) >> 1;
             if (v < 4)
                 v = 4;
             if (v > 18)
                 v = 18;
-            *py -= v << 9;
+            (*Motion_GetVerticalOffset(self)) -= v << 9;
             self->flags40 &= ~1;
         }
         p->height = h;
@@ -188,15 +204,12 @@ void Glove_UpdateRisingCue(struct Glove *p)
         if (self->flags40 & 4)
             ActorParticles_SpawnImpactBurst(self);
         if (self->flags40 & 2)
-            *pvz = 0;
+            (*Motion_GetLateralOffset(self)) = 0;
         if (self->flags40 & 1)
-            *py = 0;
+            (*Motion_GetVerticalOffset(self)) = 0;
     }
     if (LinkParticipant_IsLocallySelected(p))
         Character_UpdateLoopingSound(self);
     CharacterModel_UpdateAccessoryAnimations(p->model);
     p->timer++;
 }
-#else
-INCLUDE_ASM("asm/nonmatching", sub_081172C4);
-#endif
