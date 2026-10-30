@@ -361,4 +361,16 @@ static inline void MonsterInit_ClearColliderFlags(struct ContactCollider *collid
     collider->flags = mask & collider->flags;
 }
 
+static inline void MonsterInit_ReadInitialMode(struct SceneActorRegistryResetView *arg0)
+{
+    s32 mode;
+    mode = Script_GetKeywordValue('u', 0);
+    arg0->group.effect = 0x21;
+    if (mode != 0) {
+        MonsterInit_SetBehaviorFlags(arg0, 0x40000);
+        if (mode == 2)
+            MonsterInit_SetBehaviorFlags(arg0, 0x80000);
+    }
+}
+
 #endif

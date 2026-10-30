@@ -4,8 +4,11 @@
 #include "scene_actor_init_actor.h"
 #include "display_keyframe.h"
 #include "display_resource.h"
+#include "render.h"
 
 s32 AnimData_Load(void *, s32);
+void AnimData_SelectPaletteBank(void *, s32);
+s32 SceneActorScript_GetManagerField62(void);
 void Sprite_Init(void *, void *, s32);
 void SceneActorAnimation_InitEnemySequence(void *, u32);
 void *ScriptProc_Start(u16, u16);
@@ -44,6 +47,24 @@ static inline void MonsterInit_DrawablePosition(struct SceneActorRegistryResetVi
         *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
     else
         *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
+}
+
+static inline void MonsterInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
+                                           u32 alternate)
+{
+    s32 palette;
+    actor->paletteOffset = Script_GetKeywordValue('C', 0);
+    actor->basePaletteBank = base;
+    actor->paletteAlternateBank = alternate;
+    actor->alternateOffset = MonsterInit_GetPaletteOffset(actor) + base;
+    palette = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
+    if (MonsterInit_GetDrawableKind(actor) == 0)
+        AnimData_SelectPaletteBank(actor->drawable + 0x2C, palette);
+    else
+        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
+    if (MonsterInit_GetDrawableKind(actor) == 1)
+        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
+                                           SceneActorScript_GetManagerField62());
 }
 
 #endif
