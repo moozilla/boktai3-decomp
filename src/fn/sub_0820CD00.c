@@ -1,139 +1,79 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-#ifdef NONMATCHING
-// fuzzy: 89.6%
-// fix.py best (sweep after the inlined-insn fix)
-// Remaining differences: orientation range guard and later address/allocation ordering.
-#include "global.h"
-#define SCREAMER_TEMP     "r2"
-#define SCREAMER_FIRST    "r2"
-#define SCREAMER_MASK     "r7"
-#define SCREAMER_DURATION "r4"
-#define SCREAMER_WEIGHT   "r2"
 #include "screamer_playback.h"
+#include "display_sequence_inline.h"
 s32 Screamer_WaitForPlayerApproach(struct ScreamerState *);
 void SceneDrawablePair_SetFlags(void);
 s32 Screamer_InitColliders(struct ScreamerState *);
 void SceneBody_Init(void *, void *, void *, u32, u32, void *);
 void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
-inline static u32 Screamer_StepAnimation_(struct ScreamerState *owner)
+static inline u32 Screamer_StepSequence(struct ScreamerSprite *owner,
+                                        struct DisplaySequenceState *state)
 {
-    struct ScreamerSprite *sprite = &owner->sprite;
-    struct DisplaySequenceState *state = &owner->sequence;
-    const volatile u16 *command;
+    const u16 *command;
     u32 ended;
-    u32 duration;
-    u32 flags;
-    u32 bit;
     {
-        u32 offset = state->index << 1;
-        const volatile u16 *table;
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
         table = state->commands;
-        command = (const volatile u16 *)(((u32)table) + offset);
+        command = (const u16 *)((u32)table + offset);
     }
-    sprite->frame = (*command) >> 6;
+    owner->frame = *command >> 6;
     {
-        u32 input = state->flags;
-        register u32 first asm("r2");
-        u32 maskBit = 1;
-        bit = maskBit;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        if (first != ((((*command) & 0x30) >> 4) & bit))
-            sprite->flags |= 4;
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 4;
         else
-            sprite->flags &= ~4;
+            owner->flags &= ~4;
     }
     {
-        u32 input = state->flags;
-        u32 bit;
-        register u32 first asm("r2");
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
         bit = 2;
-        asm("" : "+r"(bit));
-        first = bit;
-        first &= input;
-        asm("" : "+r"(first));
-        first = (u8)first;
-        if (first != ((((*command) & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 8;
         else
-            sprite->flags &= ~8;
+            owner->flags &= ~8;
     }
-    {
-        u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r7");
-        register u32 temp asm("r2");
-        register u32 savedDuration asm("r4");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->frameCount - 1;
-                    }
-                    ended = 1;
-                } else {
-                    state->index = index - 1;
-                    ended = 0;
-                }
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->frameCount - 1;
+                ended = 1;
             } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->frameCount;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
-                    ended = 1;
-                } else {
-                    ended = 0;
-                }
-            }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                command = (const volatile u16 *)(((u32)table) + offset);
-                table = state->commands;
-            }
-            state->frameWeight = (*command) & 15;
-            {
-                register s32 weight asm("r2") = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!((u8)speed))
-                    state->duration = 1;
+                state->index--;
+                ended = 0;
             }
         } else {
-            ended = 0;
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
+                } else {
+                    state->index = 0;
+                }
+                ended = 1;
+            } else {
+                ended = 0;
+            }
         }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    } else {
+        ended = 0;
     }
     return ended;
 }
@@ -144,7 +84,7 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
     void *graphics;
     void *sequences;
     s32 value;
-    typeof(p->f1D8) t1;
+    s16 side;
     if (Script_SeekToKeyword('p')) {
         p->initialPosition.x = Script_GetValue();
         p->initialPosition.y = Script_GetValue();
@@ -186,24 +126,14 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
     }
     if (Script_SeekToKeyword('h')) {
         p->f1D8 = Script_GetValue();
-        p->f1D8 = (t1 = (p->f1D8 - 1) / 2);
-        switch ((u32)((u16)t1)) {
-            case 0:
-
-            case 1:
+        p->f1D8 = (side = (p->f1D8 - 1) / 2);
+        if ((u32)(u16)side <= 3) {
+            if ((u32)(u16)side <= 1)
                 p->f1D8 = 0;
-                break;
-
-            case 2:
-
-            case 3:
+            else
                 p->f1D8 = 1;
-                break;
-
-            default:
-                p->f1D8 = 1;
-                break;
-        }
+        } else
+            p->f1D8 = 1;
 
     } else
         p->f1D8 = 0;
@@ -253,7 +183,7 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
         p->f1E0 = 1;
         Anim_SetSequence(&p->sequence, p->f218, 0x1A, (u8)p->f1D8, 8);
     }
-    Screamer_StepAnimation_(p);
+    Screamer_StepSequence(&p->sprite, &p->sequence);
     if (!p->f1F6)
         Screamer_InitColliders(p);
     if (!p->f1D8)
@@ -262,8 +192,8 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
         p->sprite.position.z -= 16;
     if (p->f1EE) {
         struct ActorPosition *offsetPosition;
-        position = p->sprite.position;
         offsetPosition = &position;
+        *offsetPosition = p->sprite.position;
         if (!p->f1D8)
             offsetPosition->x += 128;
         else
@@ -277,7 +207,3 @@ s32 Screamer_InitFromScript(struct ScreamerState *p, void *resource)
     else
         p->f1FC = p->f1DA;
 }
-
-#else
-INCLUDE_ASM("asm/nonmatching", Screamer_InitFromScript);
-#endif
