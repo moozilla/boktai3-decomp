@@ -6483,6 +6483,7 @@ addr,name,mode,confidence,source,notes
 08189CAC,Armor_UpdatePrimaryBehaviorByInverseFlag,thumb,low,src-alias,Selects the same primary behavior pair with the flag 0x200 mapping reversed
 08189CD8,Armor_UpdateSecondaryBehaviorByInverseFlag,thumb,low,src-alias,Selects the same secondary behavior pair with the flag 0x200 mapping reversed
 08189D04,Armor_UpdateAlignedStrikeDecision,thumb,low,src-alias,
+08189FF8,Armor_UpdateModeAttackDecision,thumb,low,src-alias,
 0818A4C8,Armor_DispatchTypeUpdate,thumb,low,src-alias,Calls the update handler indexed by armor type unless flag 0x80 suppresses it
 0818A500,Armor_ApplySceneCommands,thumb,low,src-alias,
 0818ADB4,Armor6_Destroy,thumb,low,src-alias,
