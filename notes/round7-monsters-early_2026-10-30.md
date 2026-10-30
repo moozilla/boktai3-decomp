@@ -89,3 +89,9 @@ Matched 348 bytes with canonical actor ownership and typed position/velocity fie
 Tags: 080AA744, Tentacle, impulse, random, allocation
 
 Matched 384 bytes with typed trail segments and canonical actor motion. The caller owns the active/hidden flag masks, making the segment queries share the intended word-mask interface. The random operation returns its unsigned halfword sample; this preserves the original loop-invariant selection for the sine table and angle masks. The last blocker was proved by one reload-rotation knob before the source ownership/type fix. Formatted stock check reports zero differing bytes, SHA-256 `256c2d936f7c21cb5dc2f580a0e145fa4048ed732d3593637d33defcc58eff96`. No pins, barriers, or compiler overrides.
+
+## Tentacle return to cell center (080A8280)
+
+Tags: 080A8280, Tentacle, motion, PRE
+
+Matched 828 bytes. Signed acceleration replaces the draft's incorrect byte cast; joined signed-truncation and wrapped-heading operations recover the original result copies. Removing the draft's redundant motion pointer and its reassignments lets PRE retain the single canonical motion address. Typed context exposes the starting cell and center, and canonical callback/drawable/body members replace actor offsets. Formatted stock check reports zero differing bytes, SHA-256 `eb738d190fea516b2caacc54a6cb1c5514055572464f361d2df65d0977ab219e`. No pins, barriers, or compiler overrides.
