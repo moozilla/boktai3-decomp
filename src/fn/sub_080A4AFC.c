@@ -2,7 +2,7 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
-#include "scene_actor_init_actor.h"
+#include "scene_actor_init_group.h"
 
 struct MonsterInit32Block {
     u32 w[8];
@@ -18,28 +18,12 @@ void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, s32, s32, s32, s32, s32, void *);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void sub_08080BE0(void);
-void SceneActorReaction_SinkAndRemove(void);
-void SceneActorReaction_BeginFadedState(void);
-void SceneActorReaction_BeginDefeatBurst(void);
-void sub_0807DB34(void);
-void SceneActorReaction_RestoreAfterTurns(void);
-void sub_0807FCA8(void);
-void SceneActorReaction_TurnBackToRoute(void);
-void sub_0807F130(void);
-void SceneActorReaction_UpdateAnimationGate(void);
-void sub_0808170C(void);
-void SceneActorReaction_ResumeAfterAnimation(void);
-void SceneActorReaction_TryResumeRoute(void);
-void SceneActorReaction_BeginReactionSound(void);
+void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *, s32);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void sub_081363F4(void);
 void SceneActorScript_OnCommand(void);
-void SceneActorControl_OnIdle(void);
-extern const u8 gUnk_086108B0[];
-s32 Div(s32, s32);
+extern SceneActorCommandHandler const gUnk_086108B0[];
 void SceneBody_Init(void *, s32, void *, s32, s32, void *);
-void SceneBody_StartRoute(void *, void *, u32, u32, u32);
-s32 Path_GetPointPositionById(u16 *, u32, u32);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
 void SceneBody_SetSprite(void *, void *);
@@ -52,9 +36,6 @@ void Anim_Step(void *, void *);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 u8 SceneActorRegistry_LinkActor(void *);
-void *Region_FindContaining(void *);
-
-extern u8 *gGameState;
 
 struct SpiderDeferredControl {
     u8 unknown0[8];
@@ -91,44 +72,9 @@ void Spider_OnSecondaryColliderContact(void);
 void Spider_UpdateHiddenRecovery(void);
 void SceneActorReaction_RestoreAlternateAfterDelay(void);
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
-static inline u8 *MonsterInit_Drawable(void *object)
-{
-    struct SceneActorRegistryResetView *actor = object;
-    return actor->drawable;
-}
-static inline u8 MonsterInit_GetDrawableKind(void *object)
-{
-    struct SceneActorRegistryResetView *actor = object;
-    return actor->drawableKind;
-}
-static inline void MonsterInit_SetCategory(struct SceneActorRegistryResetView *actor, u8 category)
-{
-    actor->category = category;
-}
-static inline u8 MonsterInit_GetCategory(void *object)
-{
-    struct SceneActorRegistryResetView *actor = object;
-    return actor->category;
-}
-
-static inline u16 MonsterInit_GetInitialHealth(struct SceneActorRegistryResetView *actor)
-{
-    return actor->defaultHealth;
-}
-
-static inline u16 MonsterInit_GetPaletteBase(struct SceneActorRegistryResetView *actor)
-{
-    return actor->basePaletteBank;
-}
-
-static inline u16 MonsterInit_GetPaletteOffset(struct SceneActorRegistryResetView *actor)
-{
-    return actor->paletteOffset;
-}
 
 extern u8 *gUnknown_02000580;
 
-void ProximityVolume_TranslateBounds(void *, void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
 void Spider_UpdateDefeat(void *);
 void SceneActorReaction_BeginTargetRecovery(void);
@@ -136,221 +82,6 @@ void Spider_OnSecondaryUpdate(void);
 void Spider_Destroy(void);
 extern const u8 gUnk_08605F34[];
 
-static inline u16 MonsterInit_GetMotionFlags(struct SceneActorRegistryResetView *actor)
-{
-    return actor->flags2C0;
-}
-static inline u16 MonsterInit_GetHeightOffset(struct SceneActorRegistryResetView *actor)
-{
-    return actor->field2EA;
-}
-static inline u32 MonsterInit_GetBehaviorFlags(struct SceneActorRegistryResetView *actor)
-{
-    return actor->flags2CC;
-}
-static inline u32 MonsterInit_GetStatusFlags(struct SceneActorRegistryResetView *actor)
-{
-    return actor->flags2D0;
-}
-static inline u8 MonsterInit_GetState(struct SceneActorRegistryResetView *actor)
-{
-    return actor->state2A8;
-}
-static inline u8 MonsterInit_GetPhase(struct SceneActorRegistryResetView *actor)
-{
-    return actor->phase2A9;
-}
-static inline u8 MonsterInit_GetBehavior(struct SceneActorRegistryResetView *actor)
-{
-    return actor->behavior2AA;
-}
-static inline void *MonsterInit_GetCurrentControl(struct SceneActorRegistryResetView *actor)
-{
-    return actor->target;
-}
-static inline u8 MonsterInit_GetControlKind(struct SceneActorRegistryResetView *actor)
-{
-    return actor->field2B5;
-}
-static inline u8 MonsterInit_GetDirection(struct SceneActorRegistryResetView *actor)
-{
-    return actor->body.direction;
-}
-static inline u32 MonsterInit_GetTerrainCell(struct SceneActorRegistryResetView *actor)
-{
-    return actor->terrainCell;
-}
-static inline u8 MonsterInit_GetTargetingFlags(struct SceneActorChaseTracking *target)
-{
-    return target->flags;
-}
-static inline struct SceneActorDefaultControl *
-MonsterInit_SavedControlOf(struct SceneActorRegistryResetView *actor)
-{
-    struct SceneActorDefaultControl *saved = &actor->saved;
-    return saved;
-}
-
-static inline void MonsterInit_SaveControl(struct SceneActorDefaultControl *saved,
-                                           struct SceneActorRegistryResetView *actor)
-{
-    saved->motionFlags = MonsterInit_GetMotionFlags(actor);
-    saved->heightOffset = MonsterInit_GetHeightOffset(actor);
-    saved->behaviorFlags = MonsterInit_GetBehaviorFlags(actor);
-    saved->statusFlags = MonsterInit_GetStatusFlags(actor);
-    saved->direction = MonsterInit_GetDirection(actor);
-    saved->state = MonsterInit_GetState(actor);
-    saved->phase = MonsterInit_GetPhase(actor);
-    saved->behavior = MonsterInit_GetBehavior(actor);
-    saved->control = MonsterInit_GetCurrentControl(actor);
-    saved->kind = MonsterInit_GetControlKind(actor);
-}
-struct MonsterInitCollider {
-    u8 header[6];
-    u16 flags;
-};
-static inline void MonsterInit_ClearColliderFlags(struct MonsterInitCollider *collider, u32 mask)
-{
-    collider->flags = mask & collider->flags;
-}
-static inline s32 MonsterInit_Half(s32 value)
-{
-    if (value >= 0)
-        return value >> 1;
-    return -(-value >> 1);
-}
-static inline void MonsterInit_SetBehaviorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
-{
-    actor->flags2CC |= mask;
-}
-
-static inline void MonsterInit_SetStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
-{
-    actor->flags2D0 |= mask;
-}
-
-static inline u8 MonsterInit_TestMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
-{
-    if (MonsterInit_GetMotionFlags(actor) & mask)
-        return 1;
-    return 0;
-}
-
-static inline u8 MonsterInit_TestTargetingFlags(struct SceneActorChaseTracking *target, u32 mask)
-{
-    if (MonsterInit_GetTargetingFlags(target) & mask)
-        return 1;
-    return 0;
-}
-static inline void MonsterInit_SetTargetingFlags(struct SceneActorChaseTracking *target, u32 mask)
-{
-    mask |= target->flags;
-    target->flags = mask;
-}
-static inline void MonsterInit_ClearControlFlags(struct SceneActorRegistryResetView *actor,
-                                                 u32 mask)
-{
-    actor->flags114 &= mask;
-}
-static inline u8 MonsterInit_IsInCurrentRegion(struct SceneActorRegistryResetView *actor)
-{
-    if (*(u32 *)(gGameState + 0x5A0) == actor->regionId)
-        return 1;
-    return 0;
-}
-static inline void *MonsterInit_GetStandingControl(struct SceneActorRegistryResetView *actor)
-{
-    return actor->savedTarget;
-}
-static inline void MonsterInit_SetControl(struct SceneActorRegistryResetView *actor, void *callback,
-                                          u32 behavior, u32 reset)
-{
-    actor->field2B2 = 1;
-    actor->field2B0 = reset;
-    actor->field2B5 = behavior;
-    actor->target = callback;
-    actor->field2C8 = reset;
-    MonsterInit_ClearControlFlags(actor, ~1);
-    actor->word104 = reset;
-}
-
-static inline void MonsterInit_SetState(struct SceneActorRegistryResetView *actor, u32 state,
-                                        u32 phase, u32 behavior)
-{
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
-}
-
-static inline void MonsterInit_InitializeGate(struct SceneActorControlGate *gate, u32 parameter)
-{
-    gate->flags = 0;
-    gate->duration = parameter;
-    gate->counter = 0;
-    gate->field41A = 0;
-    gate->control = 0;
-}
-
-static inline void MonsterInit_ReadTargeting(struct SceneActorChaseTracking *target)
-{
-    s32 r4v, r2v, r1v;
-    if (Script_SeekToKeyword(0x65)) {
-        r4v = MonsterInit_ReadWord(0x30);
-        r2v = Script_GetPc() ? (u8)Script_GetValue() : 0x40;
-        r1v = r4v;
-    } else {
-        r4v = 0x30;
-        r1v = 0x30;
-        r2v = 0x40;
-    }
-    target->target = 0;
-    target->x = r4v;
-    target->z = r1v;
-    target->limit = r4v * r4v;
-    target->zSquared = r1v * r1v;
-    target->fieldEA = r2v;
-    if (MonsterInit_TestTargetingFlags(target, 4))
-        target->range = target->limit;
-    else
-        target->range = Div(target->limit * 8 - target->limit, 10);
-}
-
-static inline u16 MonsterInit_RangeRadius(struct SceneActorRegistryControl *range)
-{
-    return range->radius;
-}
-static inline void MonsterInit_ReadRange(struct SceneActorRegistryControl *range)
-{
-    s32 r4v;
-    if (Script_SeekToKeyword(0x6E)) {
-        r4v = MonsterInit_ReadWord(0);
-        range->parameter = MonsterInit_ReadWord(0);
-    } else {
-        r4v = 0;
-        range->parameter = r4v;
-    }
-    range->radius = r4v;
-    range->radiusSquared = MonsterInit_RangeRadius(range) * MonsterInit_RangeRadius(range);
-    range->mode = 0;
-}
-
-static inline u32 MonsterInit_RoutePointX(struct SceneActorRegistryRoute *route)
-{
-    return (u16)route->point->x;
-}
-static inline u32 MonsterInit_RoutePointZ(struct SceneActorRegistryRoute *route)
-{
-    return (u16)route->point->z;
-}
-static inline void MonsterInit_SnapToRoute(struct ContactPosition *position,
-                                           struct SceneActorRegistryRoute *route)
-{
-    position->x = MonsterInit_RoutePointX(route);
-    position->z = MonsterInit_RoutePointZ(route);
-    position->y = MonsterInit_TerrainHeight(MonsterInit_CellIndex(position), position);
-}
 static inline void MonsterInit_DrawablePosition(struct SceneActorRegistryResetView *actor)
 {
     if (MonsterInit_GetDrawableKind(actor) == 0)
@@ -358,115 +89,14 @@ static inline void MonsterInit_DrawablePosition(struct SceneActorRegistryResetVi
     else
         *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
 }
-static inline void MonsterInit_SetFirstAttack(struct SceneActorRegistryResetView *actor, s32 index,
-                                              s32 value)
-{
-    actor->attacks.first[index] = value;
-}
 
-static inline u8 MonsterInit_RouteId(struct SceneActorRegistryRoute *route)
-{
-    return route->routeId;
-}
-static inline u8 MonsterInit_RouteParameter(struct SceneActorRegistryRoute *route)
-{
-    return route->parameterB;
-}
-static inline u8 MonsterInit_RoutePointId(struct SceneActorRegistryRoute *route)
-{
-    return route->pointId;
-}
-static inline u8 MonsterInit_RouteActiveBranch(struct SceneActorRegistryRoute *route)
-{
-    return route->activeBranch;
-}
-static inline u32 MonsterInit_RouteAlternateBranch(struct SceneActorRegistryRoute *route)
-{
-    return 1 ^ route->activeBranch;
-}
-static inline void MonsterInit_BeginRoute(struct SceneActorBody *body,
-                                          struct SceneActorRegistryRoute *route)
-{
-    SceneBody_StartRoute(body, route, MonsterInit_RouteId(route), MonsterInit_RouteParameter(route),
-                         MonsterInit_RoutePointId(route));
-}
-static inline s32 MonsterInit_ClampHealth(u16 raw)
-{
-    s32 health = (s16)raw;
-    if (health <= 0)
-        health = 0;
-    return health;
-}
-
-static inline void MonsterInit_InstallIdle(struct SceneActorRegistryResetView *actor, void *idle)
-{
-    actor->target = idle;
-}
-
-static inline void MonsterInit_InitializeHealth(struct SceneActorRegistryResetView *arg0,
-                                                u16 initialHealth, s32 firstLimit, s32 secondLimit)
-{
-    arg0->flags2D4 = 0;
-    MonsterInit_InstallIdle(arg0, SceneActorControl_OnIdle);
-    arg0->field2B2 = 1;
-    arg0->field2B0 = 0;
-    arg0->health = MonsterInit_ClampHealth(initialHealth);
-    arg0->fieldAA = 0;
-    if (secondLimit <= 0)
-        secondLimit = firstLimit;
-    arg0->attachmentLimit = firstLimit;
-    arg0->fieldA8 = secondLimit;
-    arg0->regionId = 0;
-}
-
-static inline void MonsterInit_SetInitialHealth(struct SceneActorRegistryResetView *actor,
-                                                u16 health)
-{
-    actor->defaultHealth = health;
-}
-
-static inline u32 MonsterInit_ReadRoute(struct SceneActorRegistryResetView *arg0,
-                                        struct SceneActorChaseGroup *group,
-                                        struct SceneActorRegistryRoute *rt)
-{
-    struct ContactPosition point;
-    s32 r1v;
-    rt->activeBranch = 0;
-
-    if (Script_SeekToKeyword(0x72)) {
-        rt->routeId = MonsterInit_ReadWord(0);
-        rt->parameterB = 0;
-        r1v = MonsterInit_ReadWord(0);
-        rt->pointId = r1v;
-        rt->currentPoint = r1v;
-        rt->branches[MonsterInit_RouteActiveBranch(rt)] = rt->routeId;
-        rt->branches[MonsterInit_RouteAlternateBranch(rt)] =
-            Script_GetPc() ? Script_GetValue() : MonsterInit_RouteId(rt);
-        Path_GetPointPositionById((u16 *)&point, MonsterInit_RouteId(rt),
-                                  MonsterInit_RoutePointId(rt));
-        arg0->terrainCell = MonsterInit_CellIndex(&point);
-        point.y = arg0->groundHeight2BE =
-            MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(arg0), &point);
-        MonsterInit_BeginRoute(&arg0->body, rt);
-        return 1;
-    } else {
-        rt->routeId = 0;
-        rt->parameterB = 0;
-        rt->pointId = 0;
-        rt->currentPoint = 0;
-        group->homeRoute.branches[MonsterInit_RouteActiveBranch(rt)] = 0;
-        group->homeRoute.branches[MonsterInit_RouteAlternateBranch(rt)] = 0;
-    }
-
-    return 0;
-}
 static inline void MonsterInit_InitializeBody(void *object, u32 *fill)
 {
     struct SceneActorRegistryResetView *arg0 = object;
     struct SceneActorChaseGroup *group = &arg0->group;
     struct SceneActorBody *body = &arg0->body;
     struct ContactPosition origin;
-    s32 mode, i, r4v, r6v, r5v, r2v, r1v;
+    s32 mode, secondLimit, firstLimit, gateDuration, identity;
     struct SceneActorRegistryRoute *rt;
     arg0->flags2CC = 0;
     arg0->flags2D0 = 0;
@@ -477,29 +107,18 @@ static inline void MonsterInit_InitializeBody(void *object, u32 *fill)
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
-    if (Script_SeekToKeyword(0x61)) {
-        i = 0;
-        while (1) {
-            MonsterInit_SetFirstAttack(arg0, i, MonsterInit_ReadHalfword(0x18));
-            arg0->attacks.second[i] = MonsterInit_ReadHalfword(0x18);
-            arg0->attacks.flags[i] = MonsterInit_ReadWord(0);
-            arg0->attacks.parameter[i] = MonsterInit_ReadHalfword(0);
-            i++;
-            if (i > 3)
-                break;
-        }
-    }
+    MonsterInit_ReadAttacks(arg0);
 
     if (Script_SeekToKeyword(0x6C)) {
-        r5v = MonsterInit_ReadWord(0x12C);
-        r6v = MonsterInit_ReadWord(0x12C);
-        r2v = MonsterInit_ReadWord(0x12C);
+        firstLimit = MonsterInit_ReadWord(0x12C);
+        secondLimit = MonsterInit_ReadWord(0x12C);
+        gateDuration = MonsterInit_ReadWord(0x12C);
     } else {
-        r5v = 0;
-        r6v = 0;
-        r2v = 0;
+        firstLimit = 0;
+        secondLimit = 0;
+        gateDuration = 0;
     }
-    MonsterInit_InitializeGate(&group->common.gate, r2v);
+    MonsterInit_InitializeGate(&group->common.gate, gateDuration);
     MonsterInit_ReadRange(&group->common.control);
     MonsterInit_ReadTargeting(&arg0->tracking);
     if (Script_GetKeywordValue(0x62, 0))
@@ -508,26 +127,26 @@ static inline void MonsterInit_InitializeBody(void *object, u32 *fill)
     arg0->field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
-        MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadWord(0));
+        MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         group->halfHealth = MonsterInit_Half(MonsterInit_GetInitialHealth(arg0));
-        arg0->field9E = MonsterInit_ReadWord(0);
-        arg0->field9F = MonsterInit_ReadWord(0);
-        arg0->fieldA0 = MonsterInit_ReadWord(0);
-        arg0->fieldA2 = MonsterInit_ReadWord(0);
-        arg0->fieldA4 = MonsterInit_ReadWord(0);
+        arg0->field9E = MonsterInit_ReadByte(0);
+        arg0->field9F = MonsterInit_ReadByte(0);
+        arg0->fieldA0 = MonsterInit_ReadByte(0);
+        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
+        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
-    MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), r5v, r6v);
+    MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), firstLimit, secondLimit);
 
     if (Script_SeekToKeyword(0x58)) {
         arg0->fieldAC = MonsterInit_ReadWord(0);
-        arg0->fieldA1 = MonsterInit_ReadWord(0);
+        arg0->fieldA1 = MonsterInit_ReadByte(0);
     }
     arg0->fieldB2 = Script_GetKeywordValue(0x4B, 2);
-    r1v = (s16)Script_GetKeywordValue(0x56, -1);
-    if (r1v < 0)
-        r1v = 0xFFFF;
-    arg0->field9A = r1v;
+    identity = (s16)Script_GetKeywordValue(0x56, -1);
+    if (identity < 0)
+        identity = 0xFFFF;
+    arg0->field9A = identity;
     if (Script_GetKeywordValue(0x48, 0))
         MonsterInit_SetStatusFlags(arg0, 0x800);
     if (Script_GetKeywordValue(0x4C, 0))
@@ -562,34 +181,19 @@ static inline void MonsterInit_SetWidgetScriptPalette(struct MonsterInitWidget *
     widget->paletteBank = palette - 0x5FFF;
 }
 
-static inline void MonsterInit_SetMotionControl(struct SceneActorRegistryResetView *actor,
-                                                void *callback, u32 kind)
-{
-    actor->word104 = (u32)callback;
-    actor->word108 = 0;
-    actor->word10C = 0;
-    actor->word110 = kind;
-    actor->flags114 = 1;
-}
-static inline void MonsterInit_ClearMotion(void *object)
-{
-    struct SceneActorRegistryResetView *actor = object;
-    MonsterInit_SetMotionControl(actor, 0, 0);
-    actor->flags114 = 0;
-}
 static inline void MonsterInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
                                            u32 alternate)
 {
-    s32 r1v;
+    s32 palette;
     actor->paletteOffset = Script_GetKeywordValue(0x43, 0);
     actor->basePaletteBank = base;
     actor->paletteAlternateBank = alternate;
     actor->alternateOffset = MonsterInit_GetPaletteOffset(actor) + base;
-    r1v = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
+    palette = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(actor->drawable + 0x2C, r1v);
+        AnimData_SelectPaletteBank(actor->drawable + 0x2C, palette);
     else
-        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (r1v << 5);
+        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
     if (MonsterInit_GetDrawableKind(actor) == 1)
         MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
                                            SceneActorScript_GetManagerField62());
@@ -622,39 +226,6 @@ static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView
     MonsterInit_ClearMotion(arg0);
 }
 
-static inline void MonsterInit_InitializeGroup(struct SceneActorChaseGroup *group,
-                                               void *firstBounds, void *secondBounds, void *downed,
-                                               void *returnToRoute, void *recover, void *animate,
-                                               struct SceneActorRegistryResetView *actor)
-{
-    group->route = firstBounds;
-    group->destination = secondBounds;
-    group->routePhaseCallback = downed;
-    group->fallback = recover;
-    group->field5FC = SceneActorReaction_BeginFadedState;
-    group->field600 = SceneActorReaction_BeginDefeatBurst;
-    group->common.field43C = returnToRoute;
-    group->common.field440 = 0;
-    group->common.control.active = 1;
-    group->interactionCallback = sub_0807DB34;
-    group->field608 = 0;
-    group->responseCallback = 0;
-    group->field620 = 0;
-    group->turnControl = SceneActorReaction_RestoreAfterTurns;
-    group->field60C = sub_0807FCA8;
-    group->field604 = (u32)animate;
-    group->field614 = SceneActorReaction_TurnBackToRoute;
-    group->routeChoiceControl = 0;
-    group->common.fallback = sub_0807F130;
-    group->common.gate.control = SceneActorReaction_UpdateAnimationGate;
-    group->common.gate.field41A = 0x28;
-    group->contactControl = sub_0808170C;
-    group->field5E0 = SceneActorReaction_ResumeAfterAnimation;
-    group->field5E4 = SceneActorReaction_TryResumeRoute;
-    group->field610 = SceneActorReaction_BeginReactionSound;
-    ProximityVolume_TranslateBounds(firstBounds, &actor->body.position);
-}
-
 static inline void MonsterInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
                                              void *callback)
 {
@@ -684,19 +255,6 @@ static inline void MonsterInit_ReadInitialMode(struct SceneActorRegistryResetVie
         if (i == 2)
             MonsterInit_SetBehaviorFlags(arg0, 0x80000);
     }
-}
-
-static inline void MonsterInit_InitializeRegion(struct SceneActorRegistryResetView *arg0)
-{
-    if (MonsterInit_TestMotionFlags(arg0, 2))
-        arg0->regionId = *(u32 *)(gGameState + 0x5A0);
-    else
-        arg0->regionId = (u16)(u32)Region_FindContaining(&arg0->body.position);
-}
-
-static inline void MonsterInit_InitializeReceiver(struct SceneActorRegistryResetView *arg0)
-{
-    arg0->field304 = 0;
 }
 
 static inline void MonsterInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
@@ -791,9 +349,9 @@ s32 Spider_Init(void *object)
                                Spider_UpdateDefeat, SceneActorReaction_OnEnemyDefault, 0,
                                SceneActorPlacement_BeginContactRoute, sub_081363F4,
                                SceneActorPlacement_BeginDefaultResponse);
-    MonsterInit_InitializeGroup(group, arg0->bounds630, arg0->bounds654,
-                                Spider_OnSecondaryColliderContact, 0,
-                                SceneActorReaction_BeginTargetRecovery, 0, actor);
+    MonsterInit_InitializeGroupWithBounds(
+        group, arg0->bounds630, arg0->bounds654, Spider_OnSecondaryColliderContact, 0,
+        SceneActorReaction_BeginTargetRecovery, 0, 1, &actor->body);
     SceneActorMovement_ResolveRoutePosition(actor);
     MonsterInit_SetRouteReset(actor, SceneActorRoute_ResetStep);
     MonsterInit_SetReactionGate(actor, 0);
@@ -808,11 +366,11 @@ s32 Spider_Init(void *object)
     }
     if (flag != 1) {
         MonsterInit_SetState(actor, 0, 0, 0);
-        MonsterInit_SetControl(actor, MonsterInit_GetStandingControl(actor), 0, 0);
+        MonsterInit_SetControl(actor, MonsterInit_GetStandingControl(actor), 0);
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_ClearColliderFlags((void *)((u8 *)actor + 0x134), ~0x100);
+        MonsterInit_ClearColliderFlags(&actor->colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
@@ -820,19 +378,19 @@ s32 Spider_Init(void *object)
         DisplaySequence_Step(actor->drawable);
     else
         Anim_Step(actor->drawable + 0x20, actor->drawable);
-    MonsterInit_InitializeReceiver(actor);
+    MonsterInit_ClearReceiver(actor);
     SceneActorBehavior_InstallCallbackTables(actor);
     Spider_SetBehaviorTables(actor);
     if (extra != 0) {
         actor->field2EA = extra;
         actor->field2E8 = 2;
-        MonsterInit_SetControl(actor, Spider_UpdateHiddenRecovery, 0x23, 0);
+        MonsterInit_SetControl(actor, Spider_UpdateHiddenRecovery, 0x23);
         MonsterInit_SetState(actor, 3, 0, 0);
         ScaledShadow_Initialize((u8 *)actor + 0x360, &actor->body.position, 0x40, 0x10, 0x60, 0x64,
                                 0xA00, 1, 5, 1, 0);
         Spider_SetFlags(arg0, 1);
     } else {
-        MonsterInit_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 0xE, extra);
+        MonsterInit_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 0xE);
         Spider_InitializeDeferred((void *)&group->saved, actor->entryTarget228, 7, 0x3C);
     }
     arg0->timer62E = 0x12C;
