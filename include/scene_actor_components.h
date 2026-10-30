@@ -51,6 +51,9 @@ struct SceneActorDefaultControl {
     u32 privateFlags;
 };
 
+typedef s32 (*SceneActorContextUpdate)(void *actor);
+typedef void (*SceneActorAction)(void *actor);
+typedef u32 (*SceneActorDefaultReaction)(void);
 typedef void (*SceneActorCommandHandler)(void *actor, const u16 *command);
 typedef u16 (*SceneActorSequenceQuery)(void *actor);
 typedef u32 (*SceneActorAnimationQuery)(void *actor);

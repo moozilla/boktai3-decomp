@@ -3,7 +3,7 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
-#include "scene_actor_init_primitives.h"
+#include "scene_actor_init_actor.h"
 typedef void (*MonsterInitCommandHandler)(void *actor, const u16 *command);
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
@@ -419,10 +419,7 @@ static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
     actor->contextCallback = cb0;
-    {
-        SceneActorAnimationQuery *slot = &actor->animationQuery.word;
-        *slot = cb1;
-    }
+    MonsterInit_WriteAnimationQuery(&actor->animationQuery.word, cb1);
     actor->entryTarget224 = cb2;
     actor->entryTarget228 = cb3;
     actor->savedTarget = cb4;
@@ -430,14 +427,8 @@ static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView
     actor->deathControl = cb6;
     actor->field220 = hidden;
     actor->defaultReaction = defaultReaction;
-    {
-        void **slot = &actor->contactQuery.opaque;
-        *slot = 0;
-    }
-    {
-        SceneActorCommandHandler const **slot = &actor->commandTable.handlers;
-        *slot = gUnk_086108B0;
-    }
+    MonsterInit_WriteCallback(&actor->contactQuery.opaque, 0);
+    MonsterInit_WriteCommandTable(&actor->commandTable.handlers, gUnk_086108B0);
     actor->callback248 = 0;
     actor->update26C = targetQuery;
     actor->field238 = SceneActorReaction_SinkAndRemove;
@@ -468,10 +459,7 @@ static inline void Tentacle_InstallRoutes(struct SceneActorRegistryResetView *ac
 {
     actor->callback248 = ActorTrail_ResetAtSavedPosition;
     actor->field23C = SceneActor_ResetQueuedState;
-    {
-        void **slot = &actor->contactQuery.opaque;
-        *slot = SceneActor_TryRequestFacingReaction;
-    }
+    MonsterInit_WriteCallback(&actor->contactQuery.opaque, SceneActor_TryRequestFacingReaction);
     actor->field240 = (u32)sub_080AA744;
 }
 

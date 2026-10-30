@@ -3,7 +3,7 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
-#include "scene_actor_init_primitives.h"
+#include "scene_actor_init_actor.h"
 typedef void (*MonsterInitCommandHandler)(void *actor, const u16 *command);
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
@@ -336,10 +336,6 @@ static inline s32 MonsterInit_ClampHealth(u16 initialHealth)
         health = 0;
     return health;
 }
-static inline void MonsterInit_WriteHalfword(u16 *slot, u32 value)
-{
-    *slot = value;
-}
 static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView *arg0, u32 *fill)
 {
     struct SceneActorBody *body = &arg0->body;
@@ -456,10 +452,7 @@ static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
     actor->contextCallback = cb0;
-    {
-        SceneActorAnimationQuery *slot = &actor->animationQuery.word;
-        *slot = cb1;
-    }
+    MonsterInit_WriteAnimationQuery(&actor->animationQuery.word, cb1);
     actor->entryTarget224 = cb2;
     actor->entryTarget228 = cb3;
     actor->savedTarget = cb4;
@@ -467,14 +460,8 @@ static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView
     actor->deathControl = cb6;
     actor->field220 = hidden;
     actor->defaultReaction = defaultReaction;
-    {
-        void **slot = &actor->contactQuery.opaque;
-        *slot = 0;
-    }
-    {
-        SceneActorCommandHandler const **slot = &actor->commandTable.handlers;
-        *slot = gUnk_086108B0;
-    }
+    MonsterInit_WriteCallback(&actor->contactQuery.opaque, 0);
+    MonsterInit_WriteCommandTable(&actor->commandTable.handlers, gUnk_086108B0);
     actor->callback248 = 0;
     actor->update26C = targetQuery;
     actor->field238 = SceneActorReaction_SinkAndRemove;
@@ -503,16 +490,10 @@ static inline void MonsterInit_InitializeSprite(u8 *drawable, u16 resource, u16 
 
 static inline void Lun_InstallRoutes(struct SceneActorRegistryResetView *actor)
 {
-    {
-        SceneActorCommandHandler const **slot = &actor->commandTable.handlers;
-        *slot = gUnk_08605E78;
-    }
+    MonsterInit_WriteCommandTable(&actor->commandTable.handlers, gUnk_08605E78);
     actor->callback248 = Lun_ResetMovementState;
     actor->field23C = Lun_EnterIdleOrCopyCell;
-    {
-        void **slot = &actor->contactQuery.opaque;
-        *slot = Lun_OnTargetCheck;
-    }
+    MonsterInit_WriteCallback(&actor->contactQuery.opaque, Lun_OnTargetCheck);
 }
 static inline void MonsterInit_InitializeReceiver(struct SceneActorRegistryResetView *actor)
 {

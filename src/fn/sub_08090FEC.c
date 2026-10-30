@@ -3,7 +3,7 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
-#include "scene_actor_init_primitives.h"
+#include "scene_actor_init_actor.h"
 typedef void (*MonsterInitCommandHandler)(void *actor, const u16 *command);
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
@@ -452,10 +452,7 @@ static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
     actor->contextCallback = cb0;
-    {
-        void **slot = &actor->animationQuery.opaque;
-        *slot = cb1;
-    }
+    MonsterInit_WriteCallback(&actor->animationQuery.opaque, cb1);
     actor->entryTarget224 = cb2;
     actor->entryTarget228 = cb3;
     actor->savedTarget = cb4;
@@ -463,14 +460,8 @@ static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView
     actor->deathControl = cb6;
     actor->field220 = hidden;
     actor->defaultReaction = defaultReaction;
-    {
-        void **slot = &actor->contactQuery.opaque;
-        *slot = 0;
-    }
-    {
-        SceneActorCommandHandler const **slot = &actor->commandTable.handlers;
-        *slot = gUnk_086108B0;
-    }
+    MonsterInit_WriteCallback(&actor->contactQuery.opaque, 0);
+    MonsterInit_WriteCommandTable(&actor->commandTable.handlers, gUnk_086108B0);
     actor->callback248 = 0;
     actor->update26C = targetQuery;
     actor->field238 = SceneActorReaction_SinkAndRemove;
@@ -501,10 +492,7 @@ static inline void Slime_InstallRoutes(struct SceneActorRegistryResetView *actor
 {
     actor->callback248 = Slime_ResetIdlePlayback;
     actor->field23C = Slime_FollowPlayer;
-    {
-        void **slot = &actor->contactQuery.opaque;
-        *slot = Slime_TryEnrage;
-    }
+    MonsterInit_WriteCallback(&actor->contactQuery.opaque, Slime_TryEnrage);
     actor->field240 = Slime_PlayPendingSound;
 }
 static inline void MonsterInit_ClearReceiver(struct SceneActorRegistryResetView *actor)

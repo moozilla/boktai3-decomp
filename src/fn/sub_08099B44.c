@@ -6,7 +6,7 @@
 #include "player.h"
 #include "game_state.h"
 #include "scene_actor_animation.h"
-#include "scene_actor_init_primitives.h"
+#include "scene_actor_init_actor.h"
 #define U8(p, n)  (*((u8 *)(p) + (n)))
 #define U32(p, n) (*(u32 *)((u8 *)(p) + (n)))
 #define PTR(p, n) (*(void **)((u8 *)(p) + (n)))
@@ -308,10 +308,6 @@ static inline void Ghost_InitializeHealth(struct SceneActorRegistryResetView *a,
     a->fieldA8 = second;
     a->regionId = 0;
 }
-static inline void MonsterInit_WriteHalfword(u16 *slot, u32 value)
-{
-    *slot = value;
-}
 static inline void InitializeScriptFields(struct SceneActorRegistryResetView *a, u32 *fill)
 {
     struct SceneActorBody *body = &a->body;
@@ -381,10 +377,7 @@ static inline void InstallPrimaryCallbacks(struct SceneActorRegistryResetView *a
     u32 mask = 0x2000;
     Ghost_SetBehaviorFlags(a, mask);
     a->contextCallback = cb274;
-    {
-        SceneActorAnimationQuery *query = &a->animationQuery.word;
-        *query = cb260;
-    }
+    MonsterInit_WriteAnimationQuery(&a->animationQuery.word, cb260);
     a->entryTarget224 = cb224;
     a->entryTarget228 = cb228;
     a->savedTarget = cb22C;
@@ -392,14 +385,8 @@ static inline void InstallPrimaryCallbacks(struct SceneActorRegistryResetView *a
     a->deathControl = cb234;
     a->field220 = control;
     a->defaultReaction = defaultReaction;
-    {
-        void **query = &a->contactQuery.opaque;
-        *query = 0;
-    }
-    {
-        const void **commands = &a->commandTable.opaque;
-        *commands = 0;
-    }
+    MonsterInit_WriteCallback(&a->contactQuery.opaque, 0);
+    MonsterInit_WriteDataPointer(&a->commandTable.opaque, 0);
     a->callback248 = 0;
     a->update26C = targetQuery;
     a->field238 = SceneActorReaction_SinkAndRemove;
@@ -452,14 +439,8 @@ static inline void InitializeCallbacks(struct SceneActorRegistryResetView *a)
         SceneActorPlacement_PlayResponseAndResetState);
     a->callback248 = Ghost_ResetMovementState;
     a->field23C = Ghost_OnControlCleanup;
-    {
-        void **query = &a->contactQuery.opaque;
-        *query = Ghost_GetControlStatus;
-    }
-    {
-        const void **commands = &a->commandTable.opaque;
-        *commands = gUnk_08605E14;
-    }
+    MonsterInit_WriteCallback(&a->contactQuery.opaque, Ghost_GetControlStatus);
+    MonsterInit_WriteDataPointer(&a->commandTable.opaque, gUnk_08605E14);
     Ghost_SetMotionFlags(a, 0x20);
     Ghost_SetBehaviorFlags(a, 0x200);
     Ghost_SetStatusFlags(a, 0x02100400);
