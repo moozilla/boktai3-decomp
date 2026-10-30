@@ -3030,6 +3030,7 @@ addr,name,mode,confidence,source,notes
 0808F8C8,Slime_ResetIdlePlayback,thumb,low,src-alias,
 0808F9E8,Slime_InitProfile,thumb,low,src-alias,Finds or adds profile 0x16 and stores its handle
 0808FA04,Slime_GetAnimationMovePulse,thumb,low,src-alias,
+0808FA40,Slime_SelectWanderTarget,thumb,low,src-alias,
 0808FCB0,Slime_TryEnrage,thumb,low,src-alias,"Checks vertical distance to the player and health/context flags, sets reaction flags 0x80 or 0x100; returns 1 when the trigger applies; tentative"
 0808FD9C,Slime_FollowPlayer,thumb,low,src-alias,
 0808FE64,Slime_OnInterrupt,thumb,low,src-alias,"Unless already in wait kinds 0x22-0x24 or 0x26, restarts the random wait control with behavior 0xF; tentative"

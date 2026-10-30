@@ -119,3 +119,9 @@ Matched 628 bytes with canonical actor/player/game-state access and a typed priv
 Tags: 080A21EC, Spider, turn, CSE, modes
 
 Matched 740 bytes in ordinary C. The cardinal selection remains in the caller, avoiding the temporary return value that CSE had kept across animation selection. The requested heading has a native byte return; the final cardinal query returns a halfword. These domains preserve the original copies and register allocation. Formatted stock check reports zero differing bytes, SHA-256 `2dbf2dfe00a71e154975710a54ac73e9e3267636c22451e31807555516beb0ff`. Named `Spider_AdvanceTurnAnimation` and updated its dispatcher. No pins, barriers, or compiler overrides.
+
+## Slime wander target (0808FA40)
+
+Tags: 0808FA40, Slime, terrain, loop, crossjump
+
+Matched 624 bytes with canonical actor and typed target context. Completed and interrupted scans keep distinct terrain-slot owners and return expressions; late cross-jumping joins their common instructions after allocation. The position component precedes the cached map owner, restoring invariant-load order. A shared result-application label avoids the front end rotating the complete inline scan around its lexical break. Formatted stock check reports zero differing bytes, SHA-256 `23d93ef0cca26d9a4e052efde84a7d6d2982bbcddccee9057d2ccd4351346811`. Named `Slime_SelectWanderTarget` and updated its caller.
