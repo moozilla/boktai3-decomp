@@ -66,12 +66,20 @@ log. Acceptance requires zero differing bytes and a byte-identical 16 MiB ROM.
 No compiler overrides, new selectors, register pins or assembly barriers are used
 by the new matches.
 
-Preserved unresolved work includes Dog 080E0750 (4,232-byte instruction stream
-with two PRE slot swaps), Golem 080C8774 (PRE ordering and one reload decision),
-and the Ghoul 08085DD0/Dog 080DEF78 scan-loop ownership problems. Golem 080C725C
+Preserved unresolved work includes Golem 080C8774 (PRE ordering and one reload
+decision) and the Ghoul 08085DD0/Dog 080DEF78 scan-loop ownership problems. Golem 080C725C
 and Dog 080DF908 retain an unused RNG-table literal in the ROM; existing relatives
 use concessions to retain it, so those spellings were not adopted. Resume from
 the exported candidates and causal reports rather than their old rough drafts.
 Skeleton 080BF0E4 retains an animation selection/restart-pointer allocation and
 tail-sharing gap. Golem 080CCD7C retains context-address PRE and charge-tail
 sharing differences. Their ordinary sources and diagnostic traces are preserved.
+
+## Dog displacement recovery — 080E0750
+
+All 4,232 bytes match in ordinary C. Canonical actor fields and the shared chase
+operations replace the duplicated raw-offset draft. Signed axis getters, a
+reference to the current displacement value, magnitude scaling, and an
+early-return clamp preserve the recovery arithmetic and the native expansion
+identities needed for PRE stack ordering. The final source uses the existing
+chase selectors only; the stock check reports zero differing bytes.
