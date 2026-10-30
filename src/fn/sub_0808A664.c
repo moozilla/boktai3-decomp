@@ -12,7 +12,7 @@ struct GhoulDiscContext {
     u16 recoveryDelay;
 };
 
-void sub_08085DD0(struct SceneActorRegistryResetView *);
+void Ghoul_UpdateAimedDiscThrow(struct SceneActorRegistryResetView *);
 
 static inline void Ghoul_SetMotionFlags(struct SceneActorRegistryResetView *actor, u16 bits)
 {
@@ -26,7 +26,7 @@ void sub_0808A664(struct SceneActorRegistryResetView *actor)
     struct GhoulDiscContext *context = actor->context;
     if (SceneActorControl_TakeStateEntry(actor)) {
         Ghoul_SetMotionFlags(actor, 0x100);
-        SceneActorChase_SetControl(actor, sub_08085DD0, 0x23);
+        SceneActorChase_SetControl(actor, Ghoul_UpdateAimedDiscThrow, 0x23);
         context->remaining = context->count;
     }
     if (actor->field2B0) {

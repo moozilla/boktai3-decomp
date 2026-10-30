@@ -2962,6 +2962,7 @@ addr,name,mode,confidence,source,notes
 08085D20,Bat_Create,thumb,high,gcl-name,name from GCL key F8BE バット (Bat); registry callback
 08085D58,Ghoul_OnAttackCollision,thumb,low,src-alias,Attack collider callback records the contact identifier and clears a response flag when unblocked; Ghoul identity is tentative
 08085DC4,Ghoul_OnBodyCollision,thumb,low,src-alias,Body collider callback delegates to the shared actor collision response
+08085DD0,Ghoul_UpdateAimedDiscThrow,thumb,low,src-alias,
 080863C4,Ghoul_UpdateIdleState,thumb,low,src-alias,Idle state callback consumes the pending state entry flag
 080863DC,Ghoul_UpdateStandingState,thumb,low,src-alias,Standing state callback clears the entry flag and selects directional animation zero
 08086400,Ghoul_TurnTowardRoute,thumb,low,src-alias,
